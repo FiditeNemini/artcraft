@@ -1,89 +1,71 @@
-extern crate sdl2;
-extern crate sdl2_mixer;
+extern crate hound;
+extern crate cpal;
 
-use std::path::Path;
-use sdl2::*;
-use sdl2_mixer::{INIT_MP3, INIT_FLAC, INIT_MOD, INIT_FLUIDSYNTH, INIT_MODPLUG,
-                 INIT_OGG, DEFAULT_FREQUENCY};
+use std::path::{Path, PathBuf};
+use std::iter::ExactSizeIterator;
+use std::f32::consts::PI;
+use std::i16;
+use std::io::BufReader;
+use std::fs::File;
+use std::env;
+use std::thread;
+
+use hound::WavSpec;
+use hound::WavReader;
 
 fn main() {
-  setup();
-  println!("Basic Hello World.");
-}
+  let dictionary = [
+    "welcome",
+    "to",
+    "the",
+    "internet",
+    "meme",
+    "generator",
+  ];
 
-fn setup() {
-  println!("linked version: {}", sdl2_mixer::get_linked_version());
+  // Note: Keeping a list of buffered file readers is stupid and is simply 
+  // being done for this example. I'll create a multithreaded shared LRU cache
+  // that reads from the disk and uses the dictionary word as the lookup key.
+  let mut file_readers : Vec<WavReader<BufReader<File>>> = Vec::new();
 
-  let sdl = sdl2::init().unwrap();
-  let _audio = sdl.audio().unwrap();
-  let mut timer = sdl.timer().unwrap();
+  for word in dictionary.iter() {
+    let filename = get_filename(word);
 
-  println!("mixer initialized: {}", sdl2_mixer::init(
-      INIT_MP3 | INIT_FLAC | INIT_MOD | INIT_FLUIDSYNTH |
-      INIT_MODPLUG | INIT_OGG).bits());
+    println!("opening file : {}", filename.to_str().unwrap());
+    let mut reader = hound::WavReader::open(filename).unwrap();
 
-    // TODO: 0x8010 is SDL_audio flag
-    let _ = sdl2_mixer::open_audio(DEFAULT_FREQUENCY, 0x8010u16, 2, 1024);
-    sdl2_mixer::allocate_channels(0);
-
-    {
-        let n = sdl2_mixer::get_chunk_decoders_number();
-        println!("available chunk(sample) decoders: {}", n);
-        for i in (0..n) {
-            println!("  decoder {} => {}", i, sdl2_mixer::get_chunk_decoder(i));
-        }
-    }
-
-    {
-        let n = sdl2_mixer::get_music_decoders_number();
-        println!("available music decoders: {}", n);
-        for i in (0..n) {
-            println!("  decoder {} => {}", i, sdl2_mixer::get_music_decoder(i));
-        }
-    }
-
-    println!("query spec => {:?}", sdl2_mixer::query_spec());
-
-
-
-  let filename = Path::new("/home/bt/dev/trumpet/sounds/trump.wav");
-
-  println!("About to read file: '{}'.", filename.to_str().unwrap());
-
-  {
-    let music = sdl2_mixer::Music::from_file(filename).unwrap();
-
-
-       fn hook_finished() {
-            println!("play ends! from rust cb");
-        }
-
-        sdl2_mixer::Music::hook_finished(hook_finished);
-
-        println!("music => {:?}", music);
-        println!("music type => {:?}", music.get_type());
-        println!("music volume => {:?}", sdl2_mixer::Music::get_volume());
-        println!("play => {:?}", music.play(1));
-
-        //timer.delay(10000);
-        //println!("fading out ... {:?}", sdl2_mixer::Music::fade_out(4000));
-        //timer.delay(5000);
-        //println!("fading in from pos ... {:?}", 
-        //    music.fade_in_from_pos(1, 10000, 100.0));
-
-        timer.delay(700);
-        sdl2_mixer::Music::halt();
-        //timer.delay(1000);
+    file_readers.push(reader);
   }
 
+  let mut all_samples : Vec<i16> = Vec::new();
 
+  for mut reader in file_readers {
+    let samples = reader.samples::<i16>();
+    for sample in samples {
+      all_samples.push(sample.unwrap());
+    }
+  }
 
+  let spec = get_spec(dictionary[0]);
 
-    // here will print hook_finished
-
-    println!("qutting mixer");
-    sdl2_mixer::quit();
-    println!("quitting sdl");
-
+  write_file("output.wav", &spec, all_samples);
 }
 
+fn get_filename(word: &str) -> PathBuf {
+  let sound_directory = Path::new("./sounds"); // TODO: Const or startup param.
+  sound_directory.join(format!("{}.wav", word))
+}
+
+fn get_spec(word: &str) -> WavSpec {
+  let filename = get_filename(word);
+  let mut reader = hound::WavReader::open(filename).unwrap();
+  reader.spec()
+}
+
+fn write_file(filename: &str, spec: &WavSpec, samples: Vec<i16>) {
+  let mut writer = hound::WavWriter::create(filename, *spec).unwrap();
+
+  for s in samples {
+    writer.write_sample(s).unwrap();
+  }
+}

@@ -10,14 +10,13 @@
   name = "trumpet"
 
 [dependencies]
-  iron = "*"
-  log = "0.3.*"
-  regex = "0.1.*"
-  router = "*"
-  rustc-serialize = "0.3.15"
-  sample = "*" # audio stuff
-  sdl2 = "*"
-  sdl2_mixer = "*"
-  time = "0.1.*"
-  toml = "0.1.*"
+  #cpal = "*" # Hardware audio output (for testing); works well with Hound.
+  hound = "1.0.0" # WAV codec.
+  #iron = "*" # HTTP/S server.
+  #log = "0.3.*" # Error and debug logging.
+  #regex = "0.1.*"
+  #rustc-serialize = "0.3.15" # JSON parser, etc.
+  #sample = "*" # Audio sampling tools
+  #time = "0.1.*" # Duration, and other time types.
+  #toml = "0.1.*" # TOML parser.
 
