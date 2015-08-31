@@ -1,0 +1,20 @@
+[package]
+  name = "trumpet"
+  version = "0.0.1"
+  authors = [
+    "Brandon Thomas <bt@brand.io,echelon@gmail.com>",
+    "Scott Adams <scottadams@scottadams.me>",
+  ]
+
+[[bin]]
+  name = "trumpet"
+
+[dependencies]
+  iron = "*"
+  log = "0.3.*"
+  regex = "0.1.*"
+  router = "*"
+  rustc-serialize = "0.3.15"
+  time = "0.1.*"
+  toml = "0.1.*"
+
