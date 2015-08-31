@@ -1,17 +1,10 @@
 extern crate hound;
-extern crate cpal;
 
-use std::path::{Path, PathBuf};
-use std::iter::ExactSizeIterator;
-use std::f32::consts::PI;
-use std::i16;
-use std::io::BufReader;
 use std::fs::File;
-use std::env;
-use std::thread;
+use std::io::BufReader;
+use std::path::{Path, PathBuf};
 
-use hound::WavSpec;
-use hound::WavReader;
+use hound::{WavReader, WavSpec, WavWriter};
 
 fn main() {
   let dictionary = [
@@ -30,10 +23,8 @@ fn main() {
 
   for word in dictionary.iter() {
     let filename = get_filename(word);
-
-    println!("opening file : {}", filename.to_str().unwrap());
-    let mut reader = hound::WavReader::open(filename).unwrap();
-
+    println!("Opening file : {}", filename.to_str().unwrap());
+    let reader = WavReader::open(filename).unwrap();
     file_readers.push(reader);
   }
 
@@ -58,12 +49,13 @@ fn get_filename(word: &str) -> PathBuf {
 
 fn get_spec(word: &str) -> WavSpec {
   let filename = get_filename(word);
-  let mut reader = hound::WavReader::open(filename).unwrap();
+  let reader = WavReader::open(filename).unwrap();
   reader.spec()
 }
 
 fn write_file(filename: &str, spec: &WavSpec, samples: Vec<i16>) {
-  let mut writer = hound::WavWriter::create(filename, *spec).unwrap();
+  let mut writer = WavWriter::create(filename, *spec).unwrap();
+  println!("Writing file : {}", filename);
 
   for s in samples {
     writer.write_sample(s).unwrap();
