@@ -15,6 +15,9 @@
   regex = "0.1.*"
   router = "*"
   rustc-serialize = "0.3.15"
+  sample = "*" # audio stuff
+  sdl2 = "*"
+  sdl2_mixer = "*"
   time = "0.1.*"
   toml = "0.1.*"
 
