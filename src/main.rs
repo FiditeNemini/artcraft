@@ -8,12 +8,8 @@ use hound::{WavReader, WavSpec, WavWriter};
 
 fn main() {
   let dictionary = [
-    "welcome",
-    "to",
-    "the",
-    "internet",
-    "meme",
-    "generator",
+    "absolutely",
+    "that",
   ];
 
   // Note: Keeping a list of buffered file readers is stupid and is simply 
@@ -43,7 +39,8 @@ fn main() {
 }
 
 fn get_filename(word: &str) -> PathBuf {
-  let sound_directory = Path::new("./sounds"); // TODO: Const or startup param.
+  // TODO: Const or startup param.
+  let sound_directory = Path::new("./sounds/trump");
   sound_directory.join(format!("{}.wav", word))
 }
 
