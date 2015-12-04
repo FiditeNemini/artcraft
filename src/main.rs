@@ -1,10 +1,18 @@
 extern crate hound;
+extern crate iron;
+extern crate router;
+
+pub mod vocab_list_handler;
 
 use std::fs::File;
 use std::io::BufReader;
 use std::path::{Path, PathBuf};
 
+use iron::prelude::*;
+use router::Router;
 use hound::{WavReader, WavSpec, WavWriter};
+
+use vocab_list_handler::VocabListHandler;
 
 fn main() {
   let dictionary = [
@@ -36,6 +44,8 @@ fn main() {
   let spec = get_spec(dictionary[0]);
 
   write_file("output.wav", &spec, all_samples);
+
+  //start_server();
 }
 
 fn get_filename(word: &str) -> PathBuf {
@@ -58,3 +68,11 @@ fn write_file(filename: &str, spec: &WavSpec, samples: Vec<i16>) {
     writer.write_sample(s).unwrap();
   }
 }
+
+fn start_server() {
+  println!("starting server");
+  let mut router = Router::new();
+  router.get("/vocab_list", VocabListHandler::new("./sounds/trump"));
+  Iron::new(router).http("0.0.0.0:9000").unwrap();
+}
+
