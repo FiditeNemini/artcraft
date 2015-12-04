@@ -4,6 +4,7 @@ extern crate router;
 
 pub mod vocab_list_handler;
 
+use std::env;
 use std::fs::File;
 use std::io::BufReader;
 use std::path::{Path, PathBuf};
@@ -15,10 +16,7 @@ use hound::{WavReader, WavSpec, WavWriter};
 use vocab_list_handler::VocabListHandler;
 
 fn main() {
-  let dictionary = [
-    "absolutely",
-    "that",
-  ];
+  let dictionary = words_from_argv();
 
   // Note: Keeping a list of buffered file readers is stupid and is simply 
   // being done for this example. I'll create a multithreaded shared LRU cache
@@ -41,11 +39,27 @@ fn main() {
     }
   }
 
-  let spec = get_spec(dictionary[0]);
+  let spec = get_spec(&dictionary[0]);
 
   write_file("output.wav", &spec, all_samples);
 
   //start_server();
+}
+
+fn words_from_argv() -> Vec<String> {
+  let mut words = Vec::new();
+
+  match env::args().nth(1) {
+    None => {},
+    Some(arg) => {
+      let mut split = arg.split(" ");
+      for s in split {
+        words.push(s.to_string());
+      }
+    }
+  }
+
+  words
 }
 
 fn get_filename(word: &str) -> PathBuf {
