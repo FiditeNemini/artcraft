@@ -5,6 +5,7 @@ use iron::mime::Mime;
 use iron::prelude::*;
 use iron::status;
 use router::Router;
+use rustc_serialize::json;
 
 use std::fs::File;
 use std::fs;
@@ -20,30 +21,9 @@ pub struct VocabListHandler {
 
 impl Handler for VocabListHandler {
   fn handle(&self, req: &mut Request) -> IronResult<Response> {
-    /*let not_found = Ok(Response::with((status::NotFound, "File not found.")));
-
-    let filename = req.extensions.get::<Router>().unwrap()
-        .find("filename").unwrap_or("");
-
-    let mime = match filename {
-      s if s.ends_with(".html") => { "text/html" },
-      s if s.ends_with(".js")   => { "application/javascript" },
-      _ => { "text/plain" },
-    };
-
-    match self.open_file(filename) {
-      None => { not_found },
-      Some(contents) => {
-        let content_type = mime.parse::<Mime>().unwrap();
-        Ok(Response::with((content_type, status::Ok, contents)))
-      },
-    }*/
-
-    //let not_found = Ok(Response::with((status::NotFound, "File not found.")));
-
-    self.list_files();
-
-    Ok(Response::with(status::BadRequest))
+    let words = self.list_files();
+    let response = json::encode(&words).unwrap();
+    Ok(Response::with((status::Ok, response)))
   }
 }
 
@@ -52,10 +32,13 @@ impl VocabListHandler {
     VocabListHandler { directory: Path::new(directory).to_path_buf() }
   }
 
-  fn list_files(&self) {
-    println!("listing files...");
+  // TODO: Return errors.
+  /// Return a list of words from the audio files in the directory.
+  fn list_files(&self) -> Vec<String> {
+    let mut words = Vec::new();
+
     let paths = match fs::read_dir(self.directory.as_path()) {
-      Err(_) => { return; },
+      Err(_) => { return words; },
       Ok(r) => r,
     };
 
@@ -63,9 +46,19 @@ impl VocabListHandler {
       match path {
         Err(_) => { continue; },
         Ok(r) => {
-          println!("Path: {:?}", r.file_name());
+          match r.file_name().into_string() {
+            Err(_) => { continue; },
+            Ok(s) => {
+              let word = s.replace(".wav", "");
+              words.push(word);
+            }
+          }
         },
       }
     }
+
+    words.sort();
+    words
   }
 }
+

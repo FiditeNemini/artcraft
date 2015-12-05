@@ -1,6 +1,7 @@
 extern crate hound;
 extern crate iron;
 extern crate router;
+extern crate rustc_serialize;
 
 pub mod vocab_list_handler;
 
@@ -43,7 +44,7 @@ fn main() {
 
   write_file("output.wav", &spec, all_samples);
 
-  //start_server();
+  start_server();
 }
 
 fn words_from_argv() -> Vec<String> {
