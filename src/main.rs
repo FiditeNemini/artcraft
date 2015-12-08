@@ -2,8 +2,10 @@ extern crate hound;
 extern crate iron;
 extern crate router;
 extern crate rustc_serialize;
+extern crate urlencoded;
 
-pub mod vocab_list_handler;
+pub mod handlers;
+pub mod words;
 
 use std::env;
 use std::fs::File;
@@ -14,9 +16,26 @@ use iron::prelude::*;
 use router::Router;
 use hound::{WavReader, WavSpec, WavWriter};
 
-use vocab_list_handler::VocabListHandler;
+use handlers::vocab_list_handler::VocabListHandler;
+use handlers::audio_synth_handler::AudioSynthHandler;
 
 fn main() {
+  //create_from_argv();
+  start_server();
+}
+
+fn start_server() {
+  let audio_path = "./sounds/trump";
+
+  let mut router = Router::new();
+  router.get("/speak", AudioSynthHandler::new(audio_path));
+  router.get("/words", VocabListHandler::new(audio_path));
+
+  println!("Starting server...");
+  Iron::new(router).http("0.0.0.0:9000").unwrap();
+}
+
+fn create_from_argv() {
   let dictionary = words_from_argv();
 
   // Note: Keeping a list of buffered file readers is stupid and is simply 
@@ -43,8 +62,6 @@ fn main() {
   let spec = get_spec(&dictionary[0]);
 
   write_file("output.wav", &spec, all_samples);
-
-  start_server();
 }
 
 fn words_from_argv() -> Vec<String> {
@@ -82,12 +99,5 @@ fn write_file(filename: &str, spec: &WavSpec, samples: Vec<i16>) {
   for s in samples {
     writer.write_sample(s).unwrap();
   }
-}
-
-fn start_server() {
-  println!("starting server");
-  let mut router = Router::new();
-  router.get("/vocab_list", VocabListHandler::new("./sounds/trump"));
-  Iron::new(router).http("0.0.0.0:9000").unwrap();
 }
 

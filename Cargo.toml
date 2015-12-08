@@ -1,7 +1,8 @@
 [package]
   name = "trumpet"
   version = "0.0.1"
-  authors = [ "Brandon Thomas <bt@brand.io,echelon@gmail.com>" ]
+  authors = [ "Brandon Thomas <bt@brand.io>", 
+              "Brandon Thomas <echelon@gmail.com>" ]
 
 [[bin]]
   name = "trumpet"
@@ -9,10 +10,11 @@
 [dependencies]
   #cpal = "*" # Hardware audio output (for testing); works well with Hound.
   hound = "1.0.0" # WAV codec.
+  hyper = "0.7.*"
   iron = "0.2.*"
   log = "0.3.*"
-  hyper = "0.7.*"
   router = "0.0.16"
   rustc-serialize = "0.3.15"
   time = "0.1.*"
+  urlencoded = "0.2.0"
 
