@@ -1,6 +1,24 @@
 
+h1 {
+  font-size: 1.8em;
+  font-family: arial;
+  text-align: center;
+  color: #333;
+}
+
 input {
   width: 80%;
   border: 1px solid #ccc;
   padding: 8px;
+}
+
+button {
+  background-color: #eee;
+  border: 1px solid #ccc;
+  padding: 8px;
+}
+
+#main {
+  margin: auto;
+  width: 90%;
 }
