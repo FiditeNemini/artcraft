@@ -16,8 +16,9 @@ use iron::prelude::*;
 use router::Router;
 use hound::{WavReader, WavSpec, WavWriter};
 
-use handlers::vocab_list_handler::VocabListHandler;
 use handlers::audio_synth_handler::AudioSynthHandler;
+use handlers::file_server_handler::FileServerHandler;
+use handlers::vocab_list_handler::VocabListHandler;
 
 fn main() {
   //create_from_argv();
@@ -26,10 +27,16 @@ fn main() {
 
 fn start_server() {
   let audio_path = "./sounds/trump";
+  let file_path = "./web";
+  let index = "index.html";
 
   let mut router = Router::new();
   router.get("/speak", AudioSynthHandler::new(audio_path));
   router.get("/words", VocabListHandler::new(audio_path));
+
+  // TODO: Share the handler.
+  router.get("/", FileServerHandler::new(file_path, index));
+  router.get("/assets/:filename", FileServerHandler::new(file_path, index));
 
   println!("Starting server...");
   Iron::new(router).http("0.0.0.0:9000").unwrap();

@@ -47,6 +47,8 @@ impl Handler for AudioSynthHandler {
       },
     };
 
+    println!("Request: {}", sentence);
+
     let result = self.create_audio(sentence);
     let mime_type = "audio/wav".parse::<Mime>().unwrap();
 
@@ -71,7 +73,6 @@ impl AudioSynthHandler {
 
     for word in words.iter() {
       let filename = self.get_file_path(word);
-      println!("Opening file : {}", filename.to_str().unwrap());
       let reader = WavReader::open(filename).unwrap();
       file_readers.push(reader);
     }
@@ -120,13 +121,4 @@ impl AudioSynthHandler {
     }
   }
 }
-
-/*fn write_file(filename: &str, spec: &WavSpec, samples: Vec<i16>) {
-  let mut writer = WavWriter::create(filename, *spec).unwrap();
-  println!("Writing file : {}", filename);
-
-  for s in samples {
-    writer.write_sample(s).unwrap();
-  }
-}*/
 
