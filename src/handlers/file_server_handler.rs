@@ -32,6 +32,7 @@ impl Handler for FileServerHandler {
         .unwrap_or(&self.index_file);
 
     let mime = match filename {
+      s if s.ends_with(".css")   => { "text/css" },
       s if s.ends_with(".html") => { "text/html" },
       s if s.ends_with(".js")   => { "application/javascript" },
       _ => { "text/plain" },
