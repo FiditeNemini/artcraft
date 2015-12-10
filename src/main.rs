@@ -1,10 +1,16 @@
+// Copyright (c) 2015 Brandon Thomas <bt@brand.io>
+
 extern crate hound;
 extern crate iron;
+#[macro_use]
+extern crate log;
 extern crate router;
 extern crate rustc_serialize;
+extern crate time;
 extern crate urlencoded;
 
 pub mod handlers;
+pub mod logger;
 pub mod words;
 
 use iron::prelude::*;
@@ -14,8 +20,10 @@ use handlers::audio_synth_handler::AudioSynthHandler;
 use handlers::error_filter::ErrorFilter;
 use handlers::file_server_handler::FileServerHandler;
 use handlers::vocab_list_handler::VocabListHandler;
+use logger::SimpleLogger;
 
 fn main() {
+  SimpleLogger::init().unwrap();
   start_server();
 }
 
@@ -35,7 +43,7 @@ fn start_server() {
   router.get("/", FileServerHandler::new(file_path, index));
   router.get("/assets/:filename", FileServerHandler::new(file_path, index));
 
-  println!("Starting server...");
+  info!("Starting server...");
   Iron::new(router).http("0.0.0.0:9000").unwrap();
 }
 

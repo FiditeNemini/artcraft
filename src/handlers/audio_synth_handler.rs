@@ -25,7 +25,6 @@ use super::error_filter::build_error;
 
 const QUERY_PARAM : &'static str = "q";
 
-
 /// Synthesizes audio from input.
 pub struct AudioSynthHandler {
   /// Root of where files can be served from.
@@ -53,7 +52,7 @@ impl Handler for AudioSynthHandler {
       },
     };
 
-    println!("Request: {}", sentence);
+    info!("Speak Request: {}", sentence);
 
     let result = self.create_audio(sentence);
     let mime_type = "audio/wav".parse::<Mime>().unwrap();
