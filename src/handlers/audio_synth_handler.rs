@@ -3,6 +3,7 @@
 use hound::{WavReader, WavSpec, WavWriter};
 use iron::Handler;
 use iron::mime::Mime;
+//use iron::error::IronError;
 use iron::prelude::*;
 use iron::status;
 use router::Router;
@@ -16,10 +17,14 @@ use std::io::BufWriter;
 use std::io::Cursor;
 use std::io::Read;
 use std::path::{Path, PathBuf};
+use std::error::Error;
+use std::fmt::{self, Debug};
 
 use words::split_sentence;
+use super::error_filter::build_error;
 
 const QUERY_PARAM : &'static str = "q";
+
 
 /// Synthesizes audio from input.
 pub struct AudioSynthHandler {
@@ -29,8 +34,9 @@ pub struct AudioSynthHandler {
 }
 
 impl Handler for AudioSynthHandler {
+  /// Process request.
   fn handle(&self, req: &mut Request) -> IronResult<Response> {
-    let error = Ok(Response::with((status::Ok, "error")));
+    let error = build_error(status::BadRequest, "Missing `q` parameter.");
     
     let sentence = match req.get_ref::<UrlEncodedQuery>() {
       Err(_) => { return error; },
@@ -65,6 +71,10 @@ impl AudioSynthHandler {
   /// Create audio from the sentence.
   fn create_audio(&self, sentence: &str) -> Vec<u8> {
     let words = split_sentence(sentence);
+
+    if words.len() == 0 {
+      // TODO: Raise error!
+    }
 
     // Note: Keeping a list of buffered file readers is stupid and is simply 
     // being done for this example. I'll create a multithreaded shared LRU cache

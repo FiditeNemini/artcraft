@@ -17,6 +17,7 @@ use router::Router;
 use hound::{WavReader, WavSpec, WavWriter};
 
 use handlers::audio_synth_handler::AudioSynthHandler;
+use handlers::error_filter::ErrorFilter;
 use handlers::file_server_handler::FileServerHandler;
 use handlers::vocab_list_handler::VocabListHandler;
 
@@ -31,7 +32,10 @@ fn start_server() {
   let index = "index.html";
 
   let mut router = Router::new();
-  router.get("/speak", AudioSynthHandler::new(audio_path));
+  let mut chain = Chain::new(AudioSynthHandler::new(audio_path));
+  chain.link_after(ErrorFilter);
+  router.get("/speak", chain);
+
   router.get("/words", VocabListHandler::new(audio_path));
 
   // TODO: Share the handler.
