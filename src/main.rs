@@ -1,5 +1,6 @@
 // Copyright (c) 2015 Brandon Thomas <bt@brand.io>
 
+extern crate crypto;
 extern crate hound;
 extern crate iron;
 #[macro_use]

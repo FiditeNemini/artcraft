@@ -1,11 +1,14 @@
 // Copyright (c) 2015 Brandon Thomas <bt@brand.io>
 
+use crypto::digest::Digest;
+use crypto::sha1::Sha1;
 use hound::{WavReader, WavSpec, WavWriter};
 use iron::Handler;
 use iron::mime::Mime;
 //use iron::error::IronError;
 use iron::prelude::*;
 use iron::status;
+use iron::headers::{ETag, EntityTag, Headers, IfNoneMatch};
 use router::Router;
 use rustc_serialize::json;
 use urlencoded::UrlEncodedQuery;
@@ -35,8 +38,19 @@ pub struct AudioSynthHandler {
 impl Handler for AudioSynthHandler {
   /// Process request.
   fn handle(&self, req: &mut Request) -> IronResult<Response> {
+    info!("GET /speak");
+
     let error = build_error(status::BadRequest, "Missing `q` parameter.");
+
+    // Get the request ETag. TODO: Cleanup
+    let request_hash = {
+      match req.headers.get::<IfNoneMatch>() {
+        None => { "".to_string() },
+        Some(etag) => { etag.to_string() }
+      }
+    };
     
+    // Get the request sentence.
     let sentence = match req.get_ref::<UrlEncodedQuery>() {
       Err(_) => { return error; },
       Ok(ref map) => {
@@ -54,10 +68,21 @@ impl Handler for AudioSynthHandler {
 
     info!("Speak Request: {}", sentence);
 
+    // FIXME: Varies with spaces, formatting, etc.
+    let hash = self.sha_digest(sentence);
+    let entity_tag = EntityTag::new(true, hash.to_owned());
+
+    if request_hash == entity_tag.to_string() {
+      return Ok(Response::with(status::NotModified));
+    }
+
     let result = self.create_audio(sentence);
     let mime_type = "audio/wav".parse::<Mime>().unwrap();
 
-    Ok(Response::with((mime_type, status::Ok, result)))
+    let mut response = Response::with((mime_type, status::Ok, result));
+    response.headers.set(ETag(entity_tag));
+
+    Ok(response)
   }
 }
 
@@ -98,6 +123,13 @@ impl AudioSynthHandler {
     let spec = self.get_spec(&words[0]);
 
     self.write_buffer(&spec, all_samples)
+  }
+
+
+  fn sha_digest(&self, sentence: &str) -> String {
+    let mut hasher = Sha1::new();
+    hasher.input_str(sentence);
+    hasher.result_str().to_string()
   }
 
   fn get_file_path(&self, word: &str) -> PathBuf {
