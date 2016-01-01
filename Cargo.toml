@@ -1,6 +1,6 @@
 [package]
   name = "trumpet"
-  version = "0.0.1"
+  version = "0.0.2"
   authors = [ "Brandon Thomas <bt@brand.io>", 
               "Brandon Thomas <echelon@gmail.com>" ]
 
@@ -9,7 +9,7 @@
 
 [dependencies]
   #cpal = "*" # Hardware audio output (for testing); works well with Hound.
-  hound = "1.0.0" # WAV codec.
+  hound = "1.1.0" # WAV codec.
   hyper = "0.7.*"
   iron = "0.2.*"
   log = "0.3.*"
