@@ -1,0 +1,3 @@
+# Dummy Python pip requirements.txt
+# This is to satisfy the `fabistrano` deploy script expectations.
+# TODO: Remove requirement for requirements.txt
