@@ -6,7 +6,7 @@
   };
 
   /** Handle form submission. */
-  var submit = function() {
+  var submit = function(ev) {
     var sentence = document.getElementById('text').value,
         query = encodeURIComponent(sentence);
         url = '/speak?q=' + query,
@@ -20,14 +20,14 @@
     }, false);
 
     audio.load();
+    ev.preventDefault();
+    return false;
   };
 
   /** Install the handler. */
   var install = function() {
     document.getElementById('form')
-      .addEventListener('submit', function() {
-        submit();
-      });
+      .addEventListener('submit', submit, false);
   };
 
   window.onload = function() { install(); };
