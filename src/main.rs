@@ -1,5 +1,6 @@
 // Copyright (c) 2015 Brandon Thomas <bt@brand.io>
 
+extern crate clap;
 extern crate crypto;
 extern crate hound;
 extern crate iron;
@@ -14,6 +15,7 @@ pub mod handlers;
 pub mod logger;
 pub mod words;
 
+use clap::{App, Arg, ArgMatches};
 use iron::prelude::*;
 use router::Router;
 
@@ -25,10 +27,34 @@ use logger::SimpleLogger;
 
 fn main() {
   SimpleLogger::init().unwrap();
-  start_server();
+
+  let matches = App::new("trumpet")
+      .arg(Arg::with_name("PORT")
+           .short("p")
+           .long("port")
+           .help("Sets the port the server listens on.")
+           .takes_value(true)
+           .required(false))
+      .get_matches();
+
+  let port = get_port(&matches, 9000);
+
+  start_server(port);
 }
 
-fn start_server() {
+fn get_port(matches: &ArgMatches, default_port: u16) -> u16 {
+  match matches.value_of("PORT") {
+    None => default_port,
+    Some(port) => {
+      match port.parse::<u16>() {
+        Err(_) => default_port,
+        Ok(p) => p,
+      }
+    },
+  }
+}
+
+fn start_server(port: u16) {
   let audio_path = "./sounds/trump";
   let file_path = "./web";
   let index = "index.html";
@@ -44,7 +70,7 @@ fn start_server() {
   router.get("/", FileServerHandler::new(file_path, index));
   router.get("/assets/:filename", FileServerHandler::new(file_path, index));
 
-  info!("Starting server...");
-  Iron::new(router).http("0.0.0.0:9000").unwrap();
+  info!("Starting server on port {}...", port);
+  Iron::new(router).http(("0.0.0.0", port)).unwrap();
 }
 

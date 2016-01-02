@@ -8,6 +8,7 @@
   name = "trumpet"
 
 [dependencies]
+  clap = "1.5.*" # CLI parsing.
   #cpal = "*" # Hardware audio output (for testing); works well with Hound.
   hound = "1.1.0" # WAV codec.
   hyper = "0.7.*"
