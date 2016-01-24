@@ -5,31 +5,51 @@
     audio.play();
   };
 
-  /** Handle form submission. */
-  var submit = function(ev) {
-    var sentence = document.getElementById('text').value,
+  var formSubmit = function(ev) {
+    var $audio = $('#sound'),
+        sentence = $('#text').val(),
         query = encodeURIComponent(sentence);
-        url = '/speak?q=' + query,
-        audio = document.getElementById('sound');
+        url = '/speak?q=' + query;
 
-    audio.setAttribute('src', url);
+    console.info('formSubmit', sentence, url);
 
-    audio.addEventListener('canplaythrough', function() {
+    $audio.attr('src', url)
+    $audio[0].addEventListener('canplaythrough', function() {
+      console.log('can play');
       // Play after a short delay, just to make sure sound doesn't tear.
-      setTimeout(function() { play(audio); }, 100);
+      setTimeout(function() { play($audio[0]); }, 100);
     }, false);
 
-    audio.load();
     ev.preventDefault();
     return false;
-  };
+  }
 
   /** Install the handler. */
   var install = function() {
-    document.getElementById('form')
-      .addEventListener('submit', submit, false);
-  };
+    /*$('form').submit(function(ev) {
+      var sentence = $('#text').val(),
+          query = encodeURIComponent(sentence);
+          url = '/speak?q=' + query,
+          $audio = $('#sound');
 
-  window.onload = function() { install(); };
+      $audio.attr('src', url);
+
+      audio[0].addEventListener('canplaythrough', function() {
+        // Play after a short delay, just to make sure sound doesn't tear.
+        setTimeout(function() { play(audio); }, 100);
+      }, false);
+
+      audio[0].load();
+
+      ev.preventDefault();
+      return false;
+    });*/
+
+    $('form').submit(formSubmit);
+  }
+
+  $(function() {
+    install();
+  });
 }());
 
