@@ -12,6 +12,11 @@ use std::fs;
 use std::io::Read;
 use std::path::{Path, PathBuf};
 
+#[derive(RustcDecodable, RustcEncodable)]
+struct WordsResponse {
+  pub words: Vec<String>
+}
+
 /// Returns a list of the available vocabulary.
 pub struct VocabListHandler {
   /// Root of where files can be served from.
@@ -22,8 +27,9 @@ pub struct VocabListHandler {
 impl Handler for VocabListHandler {
   fn handle(&self, req: &mut Request) -> IronResult<Response> {
     let words = self.list_files();
-    let response = json::encode(&words).unwrap();
-    Ok(Response::with((status::Ok, response)))
+    let response = json::encode(& WordsResponse { words: words }).unwrap();
+    let mime_type = "application/json".parse::<Mime>().unwrap();
+    Ok(Response::with((mime_type, status::Ok, response)))
   }
 }
 

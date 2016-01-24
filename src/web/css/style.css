@@ -24,3 +24,15 @@ button {
   width: 90%;
   text-align: center;
 }
+
+
+.error input {
+  border-color: #f55;
+  background-color: #fee;
+  color: #500;
+}
+
+.ok input {
+  border-color: #5a5;
+  background-color: #efe;
+}
