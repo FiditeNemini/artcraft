@@ -23,7 +23,10 @@ var buildCss = function() {
 }
 
 var buildJs = function() {
-  return gulp.src('src/web/js/*.js')
+  return gulp.src([
+      'src/web/js/dictionary.js',
+      'src/web/js/script.js',
+    ])
     .pipe(concat('script.js'))
     .pipe(gulp.dest('web/'));
 }
