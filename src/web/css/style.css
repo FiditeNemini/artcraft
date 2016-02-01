@@ -58,3 +58,9 @@ button {
   padding: 5px;
   border: 1px;
 }
+
+#stats {
+  margin: 20px 0;
+  font-size: 0.8em;
+  color #777;
+}

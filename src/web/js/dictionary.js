@@ -8,16 +8,22 @@
     words: [],
 
     /** Load the word list from the server. */
-    load: function() {
+    load: function(successCallback, failureCallback) {
       var that = this;
       $.get('/words')
           .done(function(data) {
             console.log('success', data);
             that.words = data.words;
+            if (typeof successCallback !== 'undefined') {
+              successCallback(that);
+            }
           })
           .fail(function() {
             // Page has catastrophically failed. Suggest reload.
             console.error('failure');
+            if (typeof successCallback !== 'undefined') {
+              failureCallback(that);
+            }
           });
     },
 

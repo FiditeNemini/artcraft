@@ -12,6 +12,12 @@
   var handleTyping = function(ev) {
     var sentence = $(this).val(),
         suggestedWords = [];
+
+    if (ev.keyCode === 27) {
+      $(this).val(''); // ESC key.
+      sentence = '';
+    }
+
     if (Dictionary.checkSentence(sentence)) {
       setState('ok');
     } else {
@@ -20,6 +26,14 @@
 
     suggestedWords = Dictionary.getTypeAhead(sentence);
     uiSetSuggestedWords(suggestedWords);
+  }
+
+  /** Handle typing outside of the input box. */
+  var handleBodyTyping = function(ev) {
+    if (ev.keyCode === 27) {
+      // Handle ESC key.
+      $('input').select();
+    }
   }
 
   /** Handle form submission. */
@@ -69,6 +83,10 @@
     $('ul').html(html);
   }
 
+  var uiDictionaryLoadCallback = function(dictionary) {
+    $('#wordcount').html(dictionary.words.length);
+  }
+
   // TODO: Temp for debug.
   window.setState = setState;
 
@@ -78,7 +96,8 @@
     //$('input').on('keypress', handleTyping);
     //$('input').on('keydown', handleTyping);
     $('input').on('keyup', handleTyping);
-    Dictionary.load();
+    $('body').on('keyup', handleBodyTyping);
+    Dictionary.load(uiDictionaryLoadCallback);
   }
 
   $(function() {

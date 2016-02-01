@@ -94,11 +94,15 @@ impl AudioSynthHandler {
   // TODO: Return errors.
   /// Create audio from the sentence.
   fn create_audio(&self, sentence: &str) -> Vec<u8> {
-    let words = split_sentence(sentence);
+    let mut words = split_sentence(sentence);
 
     if words.len() == 0 {
       // TODO: Raise error!
     }
+
+    // This file adds extra silent padding at both ends.
+    words.insert(0, "_blank".to_string());
+    words.push("_blank".to_string());
 
     // Note: Keeping a list of buffered file readers is stupid and is simply 
     // being done for this example. I'll create a multithreaded shared LRU cache

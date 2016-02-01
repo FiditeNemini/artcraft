@@ -56,6 +56,8 @@ impl VocabListHandler {
             Err(_) => { continue; },
             Ok(s) => {
               let word = s.replace(".wav", "");
+              if (word.starts_with("_")) { continue; }
+              if (word.ends_with("_")) { continue; }
               words.push(word);
             }
           }
