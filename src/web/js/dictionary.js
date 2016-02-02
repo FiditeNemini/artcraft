@@ -70,6 +70,14 @@
       }
     },
 
+    /**
+     * Process a raw sentence into a cleaned up sentence (no extra
+     * spaces, etc.). Returns a string sentence.
+     */
+    cleanSentence: function(rawSentence) {
+      return this.splitSentence(rawSentence).join(' ');
+    },
+
     /** Process a raw sentence into words and other tokens. */
     splitSentence: function(rawSentence) {
       return _.filter(_.map(rawSentence.split(/\s+/),

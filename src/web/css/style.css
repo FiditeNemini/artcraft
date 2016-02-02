@@ -1,7 +1,7 @@
 
 h1 {
+  font-family: ubuntu, tahoma;
   font-size: 1.8em;
-  font-family: arial;
   text-align: center;
   color: #333;
 }
@@ -64,3 +64,8 @@ button {
   font-size: 0.8em;
   color #777;
 }
+
+ul#stats {
+  list-style-type: none;
+}
+

@@ -43,6 +43,8 @@
         query = encodeURIComponent(sentence),
         url = '/speak?q=' + query;
 
+    Url.setSentence(sentence);
+
     $audio.attr('src', url)
     $audio[0].addEventListener('canplaythrough', function() {
       // Play after a short delay, just to make sure sound doesn't tear.
@@ -80,11 +82,19 @@
       html += '<li>' + suggestedWord + '</li>';
     }
 
-    $('ul').html(html);
+    $('#typeahead ul').html(html);
   }
 
   var uiDictionaryLoadCallback = function(dictionary) {
     $('#wordcount').html(dictionary.words.length);
+  }
+
+  var uiInitialize = function() {
+    var sentence = Url.getSentence();
+    if (sentence.length > 0) {
+      $('input').val(sentence);
+      $('form').submit();
+    }
   }
 
   // TODO: Temp for debug.
@@ -98,6 +108,8 @@
     $('input').on('keyup', handleTyping);
     $('body').on('keyup', handleBodyTyping);
     Dictionary.load(uiDictionaryLoadCallback);
+
+    uiInitialize();
   }
 
   $(function() {
