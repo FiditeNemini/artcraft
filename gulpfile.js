@@ -12,6 +12,7 @@ var buildLibraries = function() {
   // See https://gist.github.com/ktmud/9384509
   return gulp.src(mainBowerFiles())
     .pipe(filter('**/*.js')) // filter out CSS (bootstrap, etc.)
+    .pipe(uglify())
     .pipe(concat('libraries.js'))
     .pipe(gulp.dest('web/'));
 }
@@ -28,6 +29,7 @@ var buildJs = function() {
       'src/web/js/url.js',
       'src/web/js/script.js',
     ])
+    .pipe(uglify())
     .pipe(concat('script.js'))
     .pipe(gulp.dest('web/'));
 }

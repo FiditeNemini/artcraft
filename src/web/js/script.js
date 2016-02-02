@@ -87,6 +87,16 @@
 
   var uiDictionaryLoadCallback = function(dictionary) {
     $('#wordcount').html(dictionary.words.length);
+    uiSetState();
+  }
+
+  var uiSetState = function() {
+    var rawSentence = $('input').val();
+    if (Dictionary.checkSentence(rawSentence)) {
+      setState('ok');
+    } else {
+      setState('error');
+    }
   }
 
   /** Init the UI, possibly from a state passed in from the URL. */
