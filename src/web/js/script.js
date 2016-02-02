@@ -89,10 +89,18 @@
     $('#wordcount').html(dictionary.words.length);
   }
 
+  /** Init the UI, possibly from a state passed in from the URL. */
   var uiInitialize = function() {
-    var sentence = Url.getSentence();
+    var sentence = Url.getSentence(),
+        urlPreviousState = false;
     if (sentence.length > 0) {
       $('input').val(sentence);
+      urlPreviousState = true;
+    }
+
+    Dictionary.load(uiDictionaryLoadCallback);
+
+    if (urlPreviousState) {
       $('form').submit();
     }
   }
@@ -101,19 +109,17 @@
   window.setState = setState;
 
   /** Install event handlers. */
-  var install = function() {
+  var installEventHandlers = function() {
     $('form').submit(formSubmit);
     //$('input').on('keypress', handleTyping);
     //$('input').on('keydown', handleTyping);
     $('input').on('keyup', handleTyping);
     $('body').on('keyup', handleBodyTyping);
-    Dictionary.load(uiDictionaryLoadCallback);
-
-    uiInitialize();
   }
 
   $(function() {
-    install();
+    installEventHandlers();
+    uiInitialize();
   });
 }());
 
