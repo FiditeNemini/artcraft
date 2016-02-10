@@ -63,7 +63,7 @@ fn get_port(matches: &ArgMatches, default_port: u16) -> u16 {
 }
 
 fn start_server(port: u16) {
-  let audio_path = "./sounds/trump";
+  let audio_path = "./sounds";
   let file_path = "./web";
   let index = "index.html";
 
