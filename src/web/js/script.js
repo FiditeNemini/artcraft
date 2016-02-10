@@ -43,15 +43,18 @@
         query = encodeURIComponent(sentence),
         url = '/speak?q=' + query;
 
+    ev.preventDefault();
+
     Url.setSentence(sentence);
 
-    $audio.attr('src', url)
+    /*$audio.attr('src', url)
     $audio[0].addEventListener('canplaythrough', function() {
       // Play after a short delay, just to make sure sound doesn't tear.
       setTimeout(function() { play($audio[0]); }, 100);
-    }, false);
+    }, false);*/
 
-    ev.preventDefault();
+    Sound.play(url);
+
     return false;
   }
 
@@ -109,6 +112,7 @@
     }
 
     Dictionary.load(uiDictionaryLoadCallback);
+    Sound.install();
 
     if (urlPreviousState) {
       $('form').submit();
