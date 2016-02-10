@@ -11,20 +11,20 @@ use std::path::{Path, PathBuf};
 pub type VoiceName = String;
 
 #[derive(RustcDecodable, RustcEncodable)]
+pub struct VocabularyLibrary {
+  /**
+   * A map of several vocabularies with their associated speaker.
+   */
+  pub library: HashMap<VoiceName, Vocabulary>
+}
+
+#[derive(RustcDecodable, RustcEncodable)]
 pub struct Vocabulary {
   /**
    * A list of all the words in a vocabulary.
    * This does not include duplicates, punctuation, etc.
    */
   pub words: Vec<String>
-}
-
-#[derive(RustcDecodable, RustcEncodable)]
-pub struct VocabularyLibrary {
-  /**
-   * A map of several vocabularies with their associated speaker.
-   */
-  pub library: HashMap<VoiceName, Vocabulary>
 }
 
 impl VocabularyLibrary {
