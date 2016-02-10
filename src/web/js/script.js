@@ -111,7 +111,7 @@
       urlPreviousState = true;
     }
 
-    Dictionary.load(uiDictionaryLoadCallback);
+    Library.load(uiDictionaryLoadCallback);
     Sound.install();
 
     if (urlPreviousState) {
