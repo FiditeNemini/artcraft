@@ -11,9 +11,12 @@ extern crate rustc_serialize;
 extern crate time;
 extern crate urlencoded;
 
+pub mod dictionary;
 pub mod handlers;
 pub mod logger;
 pub mod words;
+
+use std::path::{Path, PathBuf};
 
 use clap::{App, Arg, ArgMatches};
 use iron::prelude::*;
@@ -24,10 +27,12 @@ use handlers::error_filter::ErrorFilter;
 use handlers::file_server_handler::FileServerHandler;
 use handlers::vocab_list_handler::VocabListHandler;
 use logger::SimpleLogger;
+use dictionary::VocabularyLibrary;
 
 fn main() {
   SimpleLogger::init().unwrap();
 
+  // Parse command line args.
   let matches = App::new("trumpet")
       .arg(Arg::with_name("PORT")
            .short("p")
@@ -38,6 +43,9 @@ fn main() {
       .get_matches();
 
   let port = get_port(&matches, 9000);
+
+
+  VocabularyLibrary::read_from_directory(Path::new("./sounds"));
 
   start_server(port);
 }
