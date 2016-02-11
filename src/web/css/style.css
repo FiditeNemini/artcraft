@@ -85,3 +85,13 @@ ul#stats {
   list-style-type: none;
 }
 
+a:link, a:visited {
+  color: #00f;
+  text-decoration: none;
+}
+
+a:active, a:hover {
+  color: #00f;
+  text-decoration: underline;
+}
+
