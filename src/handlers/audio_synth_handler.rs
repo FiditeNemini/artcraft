@@ -1,4 +1,5 @@
 // Copyright (c) 2015 Brandon Thomas <bt@brand.io>
+// TODO: This looks really bad now. Needs cleanup.
 
 use crypto::digest::Digest;
 use crypto::sha1::Sha1;
@@ -15,6 +16,7 @@ use urlencoded::UrlEncodedQuery;
 
 use std::fs::File;
 use std::fs;
+use std::io;
 use std::io::BufReader;
 use std::io::BufWriter;
 use std::io::Cursor;
@@ -26,7 +28,8 @@ use std::fmt::{self, Debug};
 use words::split_sentence;
 use super::error_filter::build_error;
 
-const QUERY_PARAM : &'static str = "q";
+const SPEAKER_PARAM : &'static str = "v";
+const SENTENCE_PARAM : &'static str = "s";
 
 /// Synthesizes audio from input.
 pub struct AudioSynthHandler {
@@ -40,7 +43,11 @@ impl Handler for AudioSynthHandler {
   fn handle(&self, req: &mut Request) -> IronResult<Response> {
     info!("GET /speak");
 
-    let error = build_error(status::BadRequest, "Missing `q` parameter.");
+    let speaker_error = build_error(status::BadRequest, 
+        &format!("Missing `{}` parameter.", SPEAKER_PARAM));
+
+    let sentence_error = build_error(status::BadRequest, 
+        &format!("Missing `{}` parameter.", SENTENCE_PARAM));
 
     // Get the request ETag. TODO: Cleanup
     let request_hash = {
@@ -50,33 +57,46 @@ impl Handler for AudioSynthHandler {
       }
     };
     
-    // Get the request sentence.
-    let sentence = match req.get_ref::<UrlEncodedQuery>() {
-      Err(_) => { return error; },
+    // Get the request sentence and speaker.
+    // TODO: Cleanup
+    let (sentence, speaker) = match req.get_ref::<UrlEncodedQuery>() {
+      Err(_) => { return sentence_error; },
       Ok(ref map) => {
-        match map.get(QUERY_PARAM) {
-          None => { return error; },
+        let sen = match map.get(SENTENCE_PARAM) {
+          None => { return sentence_error; },
           Some(list) => { 
             match list.get(0) {
-              None => { return error; },
+              None => { return sentence_error; },
               Some(s) => { s },
             }
           },
-        }
+        };
+
+        let spk = match map.get(SPEAKER_PARAM) {
+          None => { return speaker_error; },
+          Some(list) => { 
+            match list.get(0) {
+              None => { return speaker_error; },
+              Some(s) => { s },
+            }
+          },
+        };
+
+        (sen, spk)
       },
     };
 
-    info!("Speak Request: {}", sentence);
+    info!("Speak Request ({}): {}", speaker, sentence);
 
     // FIXME: Varies with spaces, formatting, etc.
-    let hash = self.sha_digest(sentence);
+    let hash = self.sha_digest(speaker, sentence);
     let entity_tag = EntityTag::new(true, hash.to_owned());
 
     if request_hash == entity_tag.to_string() {
       return Ok(Response::with(status::NotModified));
     }
 
-    let result = self.create_audio(sentence);
+    let result = self.create_audio(speaker, sentence);
     let mime_type = "audio/wav".parse::<Mime>().unwrap();
 
     let mut response = Response::with((mime_type, status::Ok, result));
@@ -93,7 +113,7 @@ impl AudioSynthHandler {
 
   // TODO: Return errors.
   /// Create audio from the sentence.
-  fn create_audio(&self, sentence: &str) -> Vec<u8> {
+  fn create_audio(&self, speaker: &str, sentence: &str) -> Vec<u8> {
     let mut words = split_sentence(sentence);
 
     if words.len() == 0 {
@@ -109,8 +129,14 @@ impl AudioSynthHandler {
     // that reads from the disk and uses the dictionary word as the lookup key.
     let mut file_readers : Vec<WavReader<BufReader<File>>> = Vec::new();
 
+    // TODO: Cleanup.
+    let speaker_path = match self.get_speaker_path(speaker) {
+      Err(_) => { Path::new("").to_path_buf() }, // TODO: meh
+      Ok(p) => p,
+    };
+
     for word in words.iter() {
-      let filename = self.get_file_path(word);
+      let filename = self.get_file_path(speaker_path.as_path(), word);
       let reader = WavReader::open(filename).unwrap();
       file_readers.push(reader);
     }
@@ -124,25 +150,42 @@ impl AudioSynthHandler {
       }
     }
 
-    let spec = self.get_spec(&words[0]);
+    let spec = self.get_spec(speaker_path.as_path(), &words[0]);
 
     self.write_buffer(&spec, all_samples)
   }
 
 
-  fn sha_digest(&self, sentence: &str) -> String {
+  fn sha_digest(&self, speaker: &str, sentence: &str) -> String {
     let mut hasher = Sha1::new();
+    hasher.input_str(speaker);
     hasher.input_str(sentence);
     hasher.result_str().to_string()
   }
 
-  fn get_file_path(&self, word: &str) -> PathBuf {
-    let sound_directory = self.directory.as_path();
-    sound_directory.join(format!("{}.wav", word))
+  fn get_speaker_path(&self, speaker: &str) -> Result<PathBuf, io::Error> {
+    // FIXME: Hack so I can release tonight. Rewrite this whole controller plz.
+    if speaker.contains("..") || 
+        speaker.contains("/") || 
+        speaker.contains("$") || 
+        speaker.contains("~") {
+          return Err(io::Error::new(io::ErrorKind::InvalidInput, "invalid path"));
+        }
+
+    let speaker_path = self.directory.as_path().join(Path::new(speaker));
+    // FIXME: This is not the security measure you think it is:
+    if !speaker_path.starts_with(&self.directory) {
+      return Err(io::Error::new(io::ErrorKind::InvalidInput, "invalid path"));
+    } 
+    Ok(speaker_path)
   }
 
-  fn get_spec(&self, word: &str) -> WavSpec {
-    let filename = self.get_file_path(word);
+  fn get_file_path(&self, speaker_path: &Path, word: &str) -> PathBuf {
+    speaker_path.join(format!("{}.wav", word))
+  }
+
+  fn get_spec(&self, speaker_path: &Path, word: &str) -> WavSpec {
+    let filename = self.get_file_path(speaker_path, word);
     let reader = WavReader::open(filename).unwrap();
     reader.spec()
   }

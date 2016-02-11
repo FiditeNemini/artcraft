@@ -29,7 +29,8 @@
       var $audio = $('#sound'),
           sentence = $('#text').val(),
           query = encodeURIComponent(sentence),
-          url = '/speak?q=' + query;
+          speaker = 'trump', // TODO: Don't hardcode
+          url = '/speak?v=' + speaker + '&s=' + query;
 
       ev.preventDefault();
 
