@@ -14,10 +14,12 @@
   /** Init the UI, possibly from a state passed in from the URL. */
   var uiInitialize = function() {
     var sentence = Url.getSentence(),
-        speaker = Url.getSpeaker(),
+        speaker = Url.getSpeaker() || Library.getDefaultSpeaker(),
         urlPreviousState = false;
 
-    $('select').val(speaker); // TODO: whitelist
+    if (speaker) {
+      $('select').val(speaker); // TODO: whitelist
+    }
 
     if (sentence.length > 0) {
       $('input').val(sentence);

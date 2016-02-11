@@ -25,7 +25,7 @@
     /** Get the speaker from the `window.location`. */
     getSpeaker: function() {
       var state = this.parseState(window.location);
-      if (!(this._SPEAKER_KEY in state)) {
+      if (!state || !(this._SPEAKER_KEY in state)) {
         return null;
       } else {
         return state[this._SPEAKER_KEY];
