@@ -11,17 +11,25 @@
     libraryLoadCallback: function(library) {
       var defaultSpeaker = library.getDefaultSpeaker(),
           vocabulary = library.getSpeakerVocabulary(defaultSpeaker);
+
+      // TODO: Iterate over.
+      $('#trump_wordcount').html(library.library['trump'].words.length);
+      $('#hillary_wordcount').html(library.library['hillary'].words.length);
+
       this.currentVocabulary = vocabulary;
-      $('#wordcount').html(vocabulary.words.length);
       this.setStateFromInput();
     },
 
     /** Set the voice. */
     setVoice: function(voice) {
       var vocabulary = Library.getSpeakerVocabulary(voice);
-      if (vocabulary) {
-        this.currentVocabulary = vocabulary;
+      if (!vocabulary) {
+        return;
       }
+      this.currentVocabulary = vocabulary;
+      this.clearInput();
+      this.clearSuggestedWords();
+      this.setStateFromInput();
     },
 
     /** Clear the input box. */
@@ -80,6 +88,11 @@
       }
 
       $('#typeahead ul').html(html);
+    },
+
+    /** Clear the suggested words. */
+    clearSuggestedWords: function() {
+      $('#typeahead ul').html('');
     },
   }
 }());

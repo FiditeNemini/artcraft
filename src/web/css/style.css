@@ -7,7 +7,7 @@ h1 {
 }
 
 input {
-  width: 80%;
+  width: 70%;
   border: 1px solid #ccc;
   padding: 8px;
   margin-bottom: 1em;
@@ -17,6 +17,22 @@ button {
   background-color: #eee;
   border: 1px solid #ccc;
   padding: 8px;
+}
+
+select {
+  background-color: #eee;
+  border: 1px solid #ccc;
+  padding: 7px;
+}
+
+#control_elements {
+  display: inline;
+}
+
+@media (max-width: 600px) {
+  #control_elements {
+    display: block;
+  }
 }
 
 #main {

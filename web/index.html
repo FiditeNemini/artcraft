@@ -14,16 +14,18 @@
       <div id="controls">
         <form id="form" action="#">
           <input id="text">
-          <select name="voice">
-            <option value="trump">trump</option>
-            <option value="hillary">hillary</option>
-          </select>
-          <button id="submit">Submit</button>
+          <div id="control_elements">
+            <select name="voice">
+              <option value="trump">trump</option>
+              <option value="hillary">hillary</option>
+            </select>
+            <button id="submit">Submit</button>
+          </div>
         </form>
       </div>
       <ul id="stats">
-        <li>Currently featuring <span id="wordcount">0</span> Trump words.</li>
-        <li>Next up: Hillary.</li>
+        <li>Currently featuring <span id="trump_wordcount">0</span> Trump words.</li>
+        <li>Now with <span id="hillary_wordcount">0</span> Hillary words.</li>
       </ul>
     </div>
     <audio id="sound"></audio>

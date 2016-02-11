@@ -27,9 +27,7 @@
     /** Handle changing voices. */
     handleVoiceSelect: function(ev) {
       var selectedVoice = $('select').val();
-      Ui.clearInput();
       Ui.setVoice(selectedVoice);
-      Ui.setStateFromInput();
     },
 
     /** Handle form submission. */
