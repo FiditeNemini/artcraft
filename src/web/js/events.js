@@ -27,7 +27,7 @@
     /** Handle changing voices. */
     handleVoiceSelect: function(ev) {
       var selectedVoice = $('select').val();
-      Ui.setVoice(selectedVoice);
+      Ui.setSpeaker(selectedVoice);
     },
 
     /** Handle form submission. */
@@ -40,7 +40,7 @@
 
       ev.preventDefault();
 
-      Url.setSentence(sentence);
+      Url.setState(speaker, sentence);
       Sound.play(url);
 
       return false;

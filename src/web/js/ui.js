@@ -10,7 +10,12 @@
     /** Handle completion of async load of library. */
     libraryLoadCallback: function(library) {
       var defaultSpeaker = library.getDefaultSpeaker(),
+          selectedSpeaker = $('select').val(),
+          vocabulary = library.getSpeakerVocabulary(selectedSpeaker);
+
+      if (!selectedSpeaker) {
           vocabulary = library.getSpeakerVocabulary(defaultSpeaker);
+      }
 
       // TODO: Iterate over.
       $('#trump_wordcount').html(library.library['trump'].words.length);
@@ -21,8 +26,8 @@
     },
 
     /** Set the voice. */
-    setVoice: function(voice) {
-      var vocabulary = Library.getSpeakerVocabulary(voice);
+    setSpeaker: function(speaker) {
+      var vocabulary = Library.getSpeakerVocabulary(speaker);
       if (!vocabulary) {
         return;
       }
@@ -30,6 +35,7 @@
       this.clearInput();
       this.clearSuggestedWords();
       this.setStateFromInput();
+      Url.setState(speaker, '');
     },
 
     /** Clear the input box. */

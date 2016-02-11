@@ -14,7 +14,11 @@
   /** Init the UI, possibly from a state passed in from the URL. */
   var uiInitialize = function() {
     var sentence = Url.getSentence(),
+        speaker = Url.getSpeaker(),
         urlPreviousState = false;
+
+    $('select').val(speaker); // TODO: whitelist
+
     if (sentence.length > 0) {
       $('input').val(sentence);
       urlPreviousState = true;
