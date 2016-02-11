@@ -21,6 +21,9 @@
       if (ev.keyCode === 27) {
         // Handle ESC key.
         $('input').select();
+        Ui.clearInput();
+        Ui.clearSuggestedWords();
+        Ui.setFromInput('');
       }
     },
 
