@@ -16,6 +16,19 @@
       this.setStateFromInput();
     },
 
+    /** Set the voice. */
+    setVoice: function(voice) {
+      var vocabulary = Library.getSpeakerVocabulary(voice);
+      if (vocabulary) {
+        this.currentVocabulary = vocabulary;
+      }
+    },
+
+    /** Clear the input box. */
+    clearInput: function() {
+      $('input').val('');
+    },
+
     // TODO: Rename, redesign.
     setFromInput: function(sentence) {
       var suggestedWords = [];

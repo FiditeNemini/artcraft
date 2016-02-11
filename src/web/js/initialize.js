@@ -8,6 +8,7 @@
     $('form').submit(function(ev) { return Events.handleFormSubmit(ev); });
     $('input').on('keyup', function(ev) { return Events.handleTyping(ev); });
     $('body').on('keyup', function(ev) { return Events.handleBodyTyping(ev); });
+    $('select').on('change', function(ev) { return Events.handleVoiceSelect(ev); });
   }
 
   /** Init the UI, possibly from a state passed in from the URL. */

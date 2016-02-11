@@ -24,12 +24,20 @@
       }
     },
 
+    /** Handle changing voices. */
+    handleVoiceSelect: function(ev) {
+      var selectedVoice = $('select').val();
+      Ui.clearInput();
+      Ui.setVoice(selectedVoice);
+      Ui.setStateFromInput();
+    },
+
     /** Handle form submission. */
     handleFormSubmit: function(ev) {
       var $audio = $('#sound'),
           sentence = $('#text').val(),
+          speaker = $('select').val(),
           query = encodeURIComponent(sentence),
-          speaker = 'trump', // TODO: Don't hardcode
           url = '/speak?v=' + speaker + '&s=' + query;
 
       ev.preventDefault();
