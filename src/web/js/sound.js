@@ -1,6 +1,7 @@
-// TODO: Use real AMD
+'use strict';
+
+// TODO: Use real AMD, and don't install crap globally.
 (function() {
-  // TODO: Don't install globally.
   window.Sound = {
     /** Cached sound clips. Significantly speeds up replay on mobile. */
     soundCache: {},

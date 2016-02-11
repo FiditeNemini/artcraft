@@ -1,9 +1,7 @@
 'use strict';
 
-// TODO: Use real AMD.
+// TODO: Use real AMD, and don't install crap globally.
 (function() {
-
-  // TODO: Don't install globally.
   /** Manipulate the URL. */
   window.Url = {
 
@@ -20,7 +18,7 @@
 
     /** Encode a sentence in a URL hash. */
     fromSentence: function(rawSentence) {
-      var cleanedSentence = Dictionary.cleanSentence(rawSentence),
+      var cleanedSentence = SentenceHelper.cleanSentence(rawSentence),
           uriEncoded = encodeURIComponent(cleanedSentence);
       return new URI("/").hash(uriEncoded).toString();
     },
@@ -30,8 +28,7 @@
       var urlHash = new URI(url).hash(),
           uriDecoded = decodeURIComponent(urlHash),
           hashless = uriDecoded.replace('#', '');
-      return Dictionary.cleanSentence(hashless);
+      return SentenceHelper.cleanSentence(hashless);
     },
   }
-
 }());

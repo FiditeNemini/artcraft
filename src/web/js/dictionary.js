@@ -5,6 +5,9 @@
     /** Libraries: voiceName(str)=> Vocabulary(obj) */
     library: {},
 
+    /** The default speaker to choose. */
+    defaultSpeaker: 'trump',
+
     /** Load the word list from the server. */
     load: function(successCallback, failureCallback) {
       var that = this;
@@ -32,6 +35,32 @@
           }
         });
     },
+
+    /** Return a list of speakers. */
+    getSpeakers: function() {
+      return _.keys(this.library);
+    },
+
+    /** Return the default speaker. */
+    getDefaultSpeaker: function() {
+      var speakers = this.getSpeakers();
+      if (speakers.length === 0) {
+        return null;
+      } else if (_.contains(speakers, this.defaultSpeaker)) {
+        return this.defaultSpeaker;
+      } else {
+        return _.first(speakers);
+      }
+    },
+
+    /** Get the `Vocabulary` for a given speaker name. */
+    getSpeakerVocabulary: function(speaker) {
+      if (!_.contains(this.getSpeakers(), speaker)) {
+        return null;
+      } else {
+        return this.library[speaker];
+      }
+    },
   }
 
   /**
@@ -39,7 +68,7 @@
    * Initialize with the subset of the JSON response corresponding to
    * the speaker.
    */
-  window.Vocabulary = function(responseSubset) {
+  var Vocabulary = function(responseSubset) {
     return {
       /** List of words. */
       words: responseSubset.words,
@@ -52,7 +81,7 @@
        * TODO: Handle punctuation.
        */
       checkSentence: function(rawSentence) {
-        var splitWords = this.splitSentence(rawSentence);
+        var splitWords = SentenceHelper.splitSentence(rawSentence);
         // TODO: Bad efficiency.
         for (var i in splitWords) {
           if (!_.contains(this.words, splitWords[i])) {
@@ -67,7 +96,7 @@
        * word in the sentence. This powers type ahead.
        */
       getTypeAhead: function(rawSentence) {
-        var splitWords = this.splitSentence(rawSentence),
+        var splitWords = SentenceHelper.splitSentence(rawSentence),
             lastWord = '';
         if (splitWords.length === 0) {
           return [];
@@ -86,21 +115,6 @@
           return _.filter(this.words,
              function(word) { return word.lastIndexOf(search, 0) === 0; });
         }
-      },
-
-      /**
-       * Process a raw sentence into a cleaned up sentence (no extra
-       * spaces, etc.). Returns a string sentence.
-       */
-      cleanSentence: function(rawSentence) {
-        return this.splitSentence(rawSentence).join(' ');
-      },
-
-      /** Process a raw sentence into words and other tokens. */
-      splitSentence: function(rawSentence) {
-        return _.filter(_.map(rawSentence.split(/\s+/),
-              function(s) { return s.toLowerCase(); }),
-            function(s) { return s !== ""; });
       },
     }
   }

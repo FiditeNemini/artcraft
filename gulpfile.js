@@ -25,10 +25,13 @@ var buildCss = function() {
 
 var buildJs = function() {
   return gulp.src([
+      'src/web/js/sentence.js',
       'src/web/js/dictionary.js',
       'src/web/js/sound.js',
       'src/web/js/url.js',
-      'src/web/js/script.js',
+      'src/web/js/ui.js',
+      'src/web/js/events.js',
+      'src/web/js/initialize.js',
     ])
     .pipe(uglify())
     .pipe(concat('script.js'))
