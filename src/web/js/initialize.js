@@ -15,7 +15,7 @@
   var uiInitialize = function() {
     var sentence = Url.getSentence(),
         speaker = Url.getSpeaker() || Library.getDefaultSpeaker(),
-        volume = Url.getVolume() || 1.0, // TODO: Better place for default volume
+        volume = Url.getVolume() || Volume.DEFAULT,
         urlPreviousState = false;
 
     if (speaker) {

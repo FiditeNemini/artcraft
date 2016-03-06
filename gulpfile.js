@@ -28,6 +28,7 @@ var buildJs = function() {
       'src/web/js/sentence.js',
       'src/web/js/dictionary.js',
       'src/web/js/sound.js',
+      'src/web/js/volume.js',
       'src/web/js/url.js',
       'src/web/js/ui.js',
       'src/web/js/events.js',
