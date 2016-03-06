@@ -17,6 +17,7 @@ use urlencoded::UrlEncodedQuery;
 use std::fs::File;
 use std::fs;
 use std::io;
+use std::i16;
 use std::io::BufReader;
 use std::io::BufWriter;
 use std::io::Cursor;
@@ -57,7 +58,7 @@ impl Handler for AudioSynthHandler {
         Some(etag) => { etag.to_string() }
       }
     };
-    
+
     // Get the request sentence and speaker.
     // TODO: Cleanup
     let (sentence, speaker, volume) = match req.get_ref::<UrlEncodedQuery>() {
@@ -83,13 +84,13 @@ impl Handler for AudioSynthHandler {
           },
         };
 
-        let volume : Option<i8> = match map.get(VOLUME_PARAM) {
+        let volume : Option<f32> = match map.get(VOLUME_PARAM) {
           None => { None },
           Some(list) => { 
             match list.get(0) {
               None => { None },
               Some(s) => {
-                match s.parse::<i8>() {
+                match s.parse::<f32>() {
                   Err(_) => None,
                   Ok(i) => Some(i),
                 }
@@ -129,7 +130,7 @@ impl AudioSynthHandler {
 
   // TODO: Return errors.
   /// Create audio from the sentence.
-  fn create_audio(&self, speaker: &str, sentence: &str, volume: Option<i8>)
+  fn create_audio(&self, speaker: &str, sentence: &str, volume: Option<f32>)
       -> Vec<u8> {
     let mut words = split_sentence(sentence);
 
@@ -170,11 +171,8 @@ impl AudioSynthHandler {
     // FIXME: Super inefficient.
     let mut pcm_data : Vec<i16> = Vec::with_capacity(all_samples.len());
     for x in &all_samples {
-      let mut data : i16 = *x;
-      if volume.is_some() {
-        data = data.saturating_mul(volume.unwrap() as i16)
-      }
-      pcm_data.push(data)
+      let data = raise_volume(*x, volume);
+      pcm_data.push(data);
     }
 
     let spec = self.get_spec(speaker_path.as_path(), &words[0]);
@@ -183,13 +181,18 @@ impl AudioSynthHandler {
   }
 
 
-  fn sha_digest(&self, speaker: &str, sentence: &str, volume: Option<i8>) -> String {
+  fn sha_digest(&self, speaker: &str, sentence: &str, volume: Option<f32>) -> String {
     let mut hasher = Sha1::new();
     hasher.input_str(speaker);
     hasher.input_str(sentence);
     if volume.is_some() {
-      let vol = volume.unwrap() as u8;
-      hasher.input(&[vol]);
+      let vol = volume.unwrap();
+
+      // FIXME: This isn't perfect hashing for floats, but is mostly what I want.
+      let hashed = (vol * 1000.0) as i16;
+      let hi = (hashed >> 8 & 0xff) as u8;
+      let lo = (hashed & 0xff) as u8;
+      hasher.input(&[hi, lo]);
     }
     hasher.result_str().to_string()
   }
@@ -238,6 +241,28 @@ impl AudioSynthHandler {
       Err(_) => { Vec::new() }, // TODO: Error
       Ok(r) => { r.get_ref().to_vec() },
     }
+  }
+}
+
+/// Raise the volume of a sample by changing its amplitude.
+fn raise_volume(data: i16, volume: Option<f32>) -> i16 {
+  // TODO: Cleanup, make more efficient.
+  match volume {
+    None => data,
+    Some(vol) => {
+      let f : f32 = data as f32 * vol;
+      let g = f as i32;
+
+      let h : i16 = if g > i16::MAX as i32 {
+        i16::MAX
+      } else if g < i16::MIN as i32 {
+        i16::MIN
+      } else {
+        g as i16
+      };
+
+      h
+    },
   }
 }
 
