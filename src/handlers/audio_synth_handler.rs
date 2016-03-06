@@ -33,6 +33,26 @@ const SPEAKER_PARAM : &'static str = "v";
 const SENTENCE_PARAM : &'static str = "s";
 const VOLUME_PARAM : &'static str = "vol";
 
+/// Represents a request to this endpoint.
+struct SpeakRequest {
+  /** The sentence to be spoken. */
+  pub sentence: String,
+
+  /** The voice to use to render the audio. */
+  pub speaker: String,
+
+  /** An optional volume multiplier. */
+  pub volume: Option<f32>,
+}
+
+enum SpeakerRequestError {
+  SentenceMissing,
+  SentenceInvalid,
+  SpeakerMissing,
+  SpeakerInvalid,
+  VolumeInvalid,
+}
+
 /// Synthesizes audio from input.
 pub struct AudioSynthHandler {
   /// Root of where files can be served from.
@@ -40,28 +60,15 @@ pub struct AudioSynthHandler {
   directory: PathBuf,
 }
 
-impl Handler for AudioSynthHandler {
-  /// Process request.
-  fn handle(&self, req: &mut Request) -> IronResult<Response> {
-    info!("GET /speak");
+impl SpeakRequest {
+  pub fn parse(http_request: &mut Request) -> Result<SpeakRequest, SpeakerRequestError> {
 
-    let speaker_error = build_error(status::BadRequest, 
-        &format!("Missing `{}` parameter.", SPEAKER_PARAM));
-
-    let sentence_error = build_error(status::BadRequest, 
-        &format!("Missing `{}` parameter.", SENTENCE_PARAM));
-
-    // Get the request ETag. TODO: Cleanup
-    let request_hash = {
-      match req.headers.get::<IfNoneMatch>() {
-        None => { "".to_string() },
-        Some(etag) => { etag.to_string() }
-      }
-    };
+    let sentence_error = Err(SpeakerRequestError::SentenceInvalid);
+    let speaker_error = Err(SpeakerRequestError::SpeakerInvalid);
 
     // Get the request sentence and speaker.
     // TODO: Cleanup
-    let (sentence, speaker, volume) = match req.get_ref::<UrlEncodedQuery>() {
+    let (sentence, speaker, volume) = match http_request.get_ref::<UrlEncodedQuery>() {
       Err(_) => { return sentence_error; },
       Ok(ref map) => {
         let sen = match map.get(SENTENCE_PARAM) {
@@ -69,7 +76,7 @@ impl Handler for AudioSynthHandler {
           Some(list) => { 
             match list.get(0) {
               None => { return sentence_error; },
-              Some(s) => { s },
+              Some(s) => { s.to_string() },
             }
           },
         };
@@ -79,7 +86,7 @@ impl Handler for AudioSynthHandler {
           Some(list) => { 
             match list.get(0) {
               None => { return speaker_error; },
-              Some(s) => { s },
+              Some(s) => { s.to_string() },
             }
           },
         };
@@ -103,17 +110,52 @@ impl Handler for AudioSynthHandler {
       },
     };
 
-    info!("Speak Request ({}): {}", speaker, sentence);
+    Ok(SpeakRequest {
+      sentence: sentence,
+      speaker: speaker,
+      volume: volume,
+    })
+  }
+}
+
+impl Handler for AudioSynthHandler {
+  /// Process request.
+  fn handle(&self, req: &mut Request) -> IronResult<Response> {
+    info!("GET /speak");
+
+    let speaker_error = build_error(status::BadRequest, 
+        &format!("Missing `{}` parameter.", SPEAKER_PARAM));
+
+    let sentence_error = build_error(status::BadRequest, 
+        &format!("Missing `{}` parameter.", SENTENCE_PARAM));
+
+    // Get the request ETag. TODO: Cleanup
+    let request_hash = {
+      match req.headers.get::<IfNoneMatch>() {
+        None => { "".to_string() },
+        Some(etag) => { etag.to_string() }
+      }
+    };
+
+    // TODO: Cleanup
+    let request = match SpeakRequest::parse(req) {
+      Ok(s) => s,
+      Err(e) => {
+        return sentence_error;
+      },
+    };
+
+    info!("Speak Request ({}): {}", request.speaker, request.sentence);
 
     // FIXME: Varies with spaces, formatting, etc.
-    let hash = self.sha_digest(speaker, sentence, volume);
+    let hash = self.sha_digest(&request.speaker, &request.sentence, request.volume);
     let entity_tag = EntityTag::new(true, hash.to_owned());
 
     if request_hash == entity_tag.to_string() {
       return Ok(Response::with(status::NotModified));
     }
 
-    let result = self.create_audio(speaker, sentence, volume);
+    let result = self.create_audio(&request.speaker, &request.sentence, request.volume);
     let mime_type = "audio/wav".parse::<Mime>().unwrap();
 
     let mut response = Response::with((mime_type, status::Ok, result));
