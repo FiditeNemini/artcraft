@@ -30,6 +30,7 @@ use super::error_filter::build_error;
 
 const SPEAKER_PARAM : &'static str = "v";
 const SENTENCE_PARAM : &'static str = "s";
+const VOLUME_PARAM : &'static str = "vol";
 
 /// Synthesizes audio from input.
 pub struct AudioSynthHandler {
@@ -59,7 +60,7 @@ impl Handler for AudioSynthHandler {
     
     // Get the request sentence and speaker.
     // TODO: Cleanup
-    let (sentence, speaker) = match req.get_ref::<UrlEncodedQuery>() {
+    let (sentence, speaker, volume) = match req.get_ref::<UrlEncodedQuery>() {
       Err(_) => { return sentence_error; },
       Ok(ref map) => {
         let sen = match map.get(SENTENCE_PARAM) {
@@ -82,21 +83,36 @@ impl Handler for AudioSynthHandler {
           },
         };
 
-        (sen, spk)
+        let volume : Option<i8> = match map.get(VOLUME_PARAM) {
+          None => { None },
+          Some(list) => { 
+            match list.get(0) {
+              None => { None },
+              Some(s) => {
+                match s.parse::<i8>() {
+                  Err(_) => None,
+                  Ok(i) => Some(i),
+                }
+              },
+            }
+          },
+        };
+
+        (sen, spk, volume)
       },
     };
 
     info!("Speak Request ({}): {}", speaker, sentence);
 
     // FIXME: Varies with spaces, formatting, etc.
-    let hash = self.sha_digest(speaker, sentence);
+    let hash = self.sha_digest(speaker, sentence, volume);
     let entity_tag = EntityTag::new(true, hash.to_owned());
 
     if request_hash == entity_tag.to_string() {
       return Ok(Response::with(status::NotModified));
     }
 
-    let result = self.create_audio(speaker, sentence);
+    let result = self.create_audio(speaker, sentence, volume);
     let mime_type = "audio/wav".parse::<Mime>().unwrap();
 
     let mut response = Response::with((mime_type, status::Ok, result));
@@ -113,7 +129,8 @@ impl AudioSynthHandler {
 
   // TODO: Return errors.
   /// Create audio from the sentence.
-  fn create_audio(&self, speaker: &str, sentence: &str) -> Vec<u8> {
+  fn create_audio(&self, speaker: &str, sentence: &str, volume: Option<i8>)
+      -> Vec<u8> {
     let mut words = split_sentence(sentence);
 
     if words.len() == 0 {
@@ -150,16 +167,30 @@ impl AudioSynthHandler {
       }
     }
 
+    // FIXME: Super inefficient.
+    let mut pcm_data : Vec<i16> = Vec::with_capacity(all_samples.len());
+    for x in &all_samples {
+      let mut data : i16 = *x;
+      if volume.is_some() {
+        data = data.saturating_mul(volume.unwrap() as i16)
+      }
+      pcm_data.push(data)
+    }
+
     let spec = self.get_spec(speaker_path.as_path(), &words[0]);
 
-    self.write_buffer(&spec, all_samples)
+    self.write_buffer(&spec, pcm_data)
   }
 
 
-  fn sha_digest(&self, speaker: &str, sentence: &str) -> String {
+  fn sha_digest(&self, speaker: &str, sentence: &str, volume: Option<i8>) -> String {
     let mut hasher = Sha1::new();
     hasher.input_str(speaker);
     hasher.input_str(sentence);
+    if volume.is_some() {
+      let vol = volume.unwrap() as u8;
+      hasher.input(&[vol]);
+    }
     hasher.result_str().to_string()
   }
 
