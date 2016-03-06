@@ -10,6 +10,9 @@
     /** JSON key for the `sentence` param. */
     _SENTENCE_KEY: 's',
 
+    /** JSON key for the `volume` param. */
+    _VOLUME_KEY: 'vol',
+
     /** Get the sentence from the `window.location`. */
     getSentence: function() {
       var state = this.parseState(window.location),
@@ -32,24 +35,36 @@
       }
     },
 
+    /** Get the volume from the `window.location`. */
+    getVolume: function() {
+      var state = this.parseState(window.location);
+      if (!state || !(this._VOLUME_KEY in state)) {
+        return null;
+      } else {
+        return state[this._VOLUME_KEY];
+      }
+    },
+
     // TODO: Independent functions to set both speaker and sentence separately.
-    /** Set the `window.history` speaker and sentence. */
-    setState: function(speaker, rawSentence) {
-      var urlHash = this.fromSpeakerAndSentence(speaker, rawSentence);
+    /** Set the `window.history` speaker, volume, and sentence. */
+    setState: function(speaker, rawSentence, volume) {
+      var urlHash = this.fromParams(speaker, rawSentence, volume);
       console.log('set state, urlhash = ', urlHash);
       window.history.replaceState(null, null, urlHash);
     },
 
     /** Encode a speaker and sentence in a URL hash. */
-    fromSpeakerAndSentence: function(speaker, rawSentence) {
+    fromParams: function(speaker, rawSentence, volume) {
       var cleanedSentence = SentenceHelper.cleanSentence(rawSentence),
           cleanedSpeaker = speaker, // TODO: Check against speakers.
+          cleanedVolume = volume, // TODO: Filter invalid values.
           state = {},
           json = null,
           uriEncoded = null;
 
       state[this._SPEAKER_KEY] = cleanedSpeaker;
       state[this._SENTENCE_KEY] = cleanedSentence;
+      state[this._VOLUME_KEY] = cleanedVolume;
 
       json = JSON.stringify(state);
 

@@ -7,10 +7,17 @@ h1 {
 }
 
 input {
-  width: 70%;
   border: 1px solid #ccc;
   padding: 8px;
   margin-bottom: 1em;
+}
+
+input#text {
+  width: 70%;
+}
+
+input#vol {
+  width: 30px;
 }
 
 button {
@@ -42,13 +49,13 @@ select {
 }
 
 
-.error input {
+.error input#text {
   border-color: #f55;
   background-color: #fee;
   color: #500;
 }
 
-.ok input {
+.ok input#text {
   border-color: #5a5;
   background-color: #efe;
 }

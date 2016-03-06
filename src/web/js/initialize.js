@@ -6,7 +6,7 @@
   /** Install event handlers. */
   var installEventHandlers = function() {
     $('form').submit(function(ev) { return Events.handleFormSubmit(ev); });
-    $('input').on('keyup', function(ev) { return Events.handleTyping(ev); });
+    $('input#text').on('keyup', function(ev) { return Events.handleTyping(ev); });
     $('body').on('keyup', function(ev) { return Events.handleBodyTyping(ev); });
     $('select').on('change', function(ev) { return Events.handleVoiceSelect(ev); });
   }
@@ -15,6 +15,7 @@
   var uiInitialize = function() {
     var sentence = Url.getSentence(),
         speaker = Url.getSpeaker() || Library.getDefaultSpeaker(),
+        volume = Url.getVolume() || 1.0, // TODO: Better place for default volume
         urlPreviousState = false;
 
     if (speaker) {
@@ -22,9 +23,11 @@
     }
 
     if (sentence.length > 0) {
-      $('input').val(sentence);
+      $('input#text').val(sentence);
       urlPreviousState = true;
     }
+
+    $('input#vol').val(volume);
 
     Library.load(function(library) { Ui.libraryLoadCallback(library); });
     Sound.install();

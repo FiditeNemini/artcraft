@@ -40,7 +40,7 @@
 
     /** Clear the input box. */
     clearInput: function() {
-      $('input').val('');
+      $('input#text').val('');
     },
 
     // TODO: Rename, redesign.
@@ -58,7 +58,7 @@
 
     /** Set state with respect to input. */
     setStateFromInput: function() {
-      var rawSentence = $('input').val();
+      var rawSentence = $('input#text').val();
       if (this.currentVocabulary.checkSentence(rawSentence)) {
         this.setState('ok');
       } else {
