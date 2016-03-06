@@ -5,29 +5,26 @@ use crypto::digest::Digest;
 use crypto::sha1::Sha1;
 use hound::{WavReader, WavSpec, WavWriter};
 use iron::Handler;
+use iron::headers::{ETag, EntityTag, Headers, IfNoneMatch};
 use iron::mime::Mime;
-//use iron::error::IronError;
 use iron::prelude::*;
 use iron::status;
-use iron::headers::{ETag, EntityTag, Headers, IfNoneMatch};
 use router::Router;
 use rustc_serialize::json;
-use urlencoded::UrlEncodedQuery;
-
+use std::error::Error;
+use std::fmt::{self, Debug};
 use std::fs::File;
 use std::fs;
-use std::io;
 use std::i16;
 use std::io::BufReader;
 use std::io::BufWriter;
 use std::io::Cursor;
 use std::io::Read;
+use std::io;
 use std::path::{Path, PathBuf};
-use std::error::Error;
-use std::fmt::{self, Debug};
-
-use words::split_sentence;
 use super::error_filter::build_error;
+use urlencoded::UrlEncodedQuery;
+use words::split_sentence;
 
 const SPEAKER_PARAM : &'static str = "v";
 const SENTENCE_PARAM : &'static str = "s";
