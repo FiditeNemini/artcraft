@@ -3,8 +3,8 @@
 # Ricardo A. H. Bion, 02/05/2009
 
 form SEGMENT FILES
-	sentence File_to_read_from: /Users/ricardoh/Desktop/example/Anne
-	sentence Directory_to_save_segmented_files: /Users/ricardoh/Desktop/example/segmented/
+	sentence File_to_read_from: /home/bt/dev/trumpet/samples
+	sentence Directory_to_save_segmented_files: /home/bt/dev/trumpet/output
 endform
 
 select all
