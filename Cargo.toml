@@ -8,15 +8,16 @@
   name = "trumpet"
 
 [dependencies]
-  clap = "1.5.*" # CLI parsing.
   #cpal = "*" # Hardware audio output (for testing); works well with Hound.
+  clap = "1.5.*" # CLI parsing.
   hound = "1.1.0" # WAV codec.
   hyper = "0.7.*"
   iron = "0.2.*"
   log = "0.3.*"
   router = "0.0.16"
-  rustc-serialize = "0.3.15"
   rust-crypto = "0.2.*"
+  rustc-serialize = "0.3.15"
   time = "0.1.*"
+  toml = "0.1.*"
   urlencoded = "0.2.0"
 

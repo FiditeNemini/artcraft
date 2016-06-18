@@ -1,11 +1,11 @@
 // Copyright (c) 2016 Brandon Thomas <bt@brand.io>
 
 use std::collections::HashMap;
-use std::fs::File;
 use std::fs::DirEntry;
+use std::fs::File;
 use std::fs;
-use std::io;
 use std::io::Read;
+use std::io;
 use std::path::{Path, PathBuf};
 
 pub type VoiceName = String;

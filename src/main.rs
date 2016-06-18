@@ -1,4 +1,4 @@
-// Copyright (c) 2015 Brandon Thomas <bt@brand.io>
+// Copyright (c) 2015-2016 Brandon Thomas <bt@brand.io>
 
 extern crate clap;
 extern crate crypto;
@@ -9,8 +9,10 @@ extern crate log;
 extern crate router;
 extern crate rustc_serialize;
 extern crate time;
+extern crate toml;
 extern crate urlencoded;
 
+pub mod config;
 pub mod dictionary;
 pub mod handlers;
 pub mod logger;
@@ -21,6 +23,7 @@ use std::path::{Path, PathBuf};
 use clap::{App, Arg, ArgMatches};
 use iron::prelude::*;
 use router::Router;
+use config::Config;
 
 use handlers::audio_synth_handler::AudioSynthHandler;
 use handlers::error_filter::ErrorFilter;
@@ -44,10 +47,12 @@ fn main() {
 
   let port = get_port(&matches, 9000);
 
+  let config = Config::read("./config.toml").unwrap();
 
-  VocabularyLibrary::read_from_directory(Path::new("./sounds"));
+  VocabularyLibrary::read_from_directory(
+      Path::new(&config.sound_path_development));
 
-  start_server(port);
+  start_server(&config, port);
 }
 
 fn get_port(matches: &ArgMatches, default_port: u16) -> u16 {
@@ -62,8 +67,8 @@ fn get_port(matches: &ArgMatches, default_port: u16) -> u16 {
   }
 }
 
-fn start_server(port: u16) {
-  let audio_path = "./sounds";
+fn start_server(config: &Config, port: u16) {
+  let audio_path = &config.sound_path_development;
   let file_path = "./web";
   let index = "index.html";
 
