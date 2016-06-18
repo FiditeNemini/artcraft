@@ -36,11 +36,11 @@
 
 form Input directory name with final slash
     comment Enter parent directory where sound file  is kept:
-    sentence soundDir C:\Users\idarcy\Desktop\Praat_Data\Chisato
+    sentence soundDir /home/bt/dev/trumpet/samples
     comment Enter directory where TextGrid file is kept:
-    sentence textDir C:\Users\idarcy\Desktop\Praat_Data\Chisato
+    sentence textDir /home/bt/dev/trumpet/samples
     comment Enter directory to which created sound files should be saved:
-    sentence outDir C:\Users\idarcy\Desktop\Praat_Data\Chisato
+    sentence outDir /home/bt/dev/trumpet/samples
     comment Specify tier name:
     sentence tierName words
     comment Specify length of left and right buffer (in seconds):
