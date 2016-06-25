@@ -81,6 +81,7 @@ fn start_server(config: &Config, port: u16) {
 
   // TODO: Share the handler.
   router.get("/", FileServerHandler::new(file_path, index));
+  router.get("/test", FileServerHandler::new(file_path, index));
   router.get("/assets/:filename", FileServerHandler::new(file_path, index));
 
   info!("Starting server on port {}...", port);

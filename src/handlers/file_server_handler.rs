@@ -10,7 +10,7 @@ use std::fs::File;
 use std::io::Read;
 use std::path::{Path, PathBuf};
 
-// TODO: Make this secure! Mimetypes, limit to single directory root, 
+// TODO: Make this secure! Mimetypes, limit to single directory root,
 // sanitize input.
 /// FileServerHandler is used to serve files. It is *NOT* secure.
 pub struct FileServerHandler {
@@ -25,21 +25,21 @@ pub struct FileServerHandler {
 impl Handler for FileServerHandler {
   /// Handles routes of the form `/f/:fileame`
   fn handle(&self, req: &mut Request) -> IronResult<Response> {
-    let not_found = Ok(Response::with((status::NotFound, "File not found.")));
+    info!("Request: {}", &req.url);
 
-    let filename = req.extensions.get::<Router>().unwrap()
-        .find("filename")
-        .unwrap_or(&self.index_file);
+    let filename = self.get_filename(&req);
 
-    let mime = match filename {
+    let mime = match &filename {
       s if s.ends_with(".css")   => { "text/css" },
       s if s.ends_with(".html") => { "text/html" },
       s if s.ends_with(".js")   => { "application/javascript" },
       _ => { "text/plain" },
     };
 
-    match self.open_file(filename) {
-      None => { not_found },
+    match self.open_file(&filename) {
+      None => {
+        Ok(Response::with((status::NotFound, "File not found.")))
+      },
       Some(contents) => {
         let content_type = mime.parse::<Mime>().unwrap();
         Ok(Response::with((content_type, status::Ok, contents)))
@@ -50,9 +50,24 @@ impl Handler for FileServerHandler {
 
 impl FileServerHandler {
   pub fn new(file_root: &str, index_file: &str) -> FileServerHandler {
-    FileServerHandler { 
+    FileServerHandler {
       file_root: Path::new(file_root).to_path_buf(),
       index_file: index_file.to_string(),
+    }
+  }
+
+  /// Get the filename requested.
+  fn get_filename(&self, request: &Request) -> String {
+    if request.url.path.len() == 1
+        && request.url.path[0] == "test".to_string() {
+      // Route `/test`
+      "test.html".to_string()
+    } else {
+      // Other routes or default
+      request.extensions.get::<Router>().unwrap()
+          .find("filename")
+          .unwrap_or(&self.index_file)
+          .to_string()
     }
   }
 
@@ -65,11 +80,11 @@ impl FileServerHandler {
 
     let mut full_filename = self.file_root.clone();
     // TODO: `push` security; abspath might replace
-    full_filename.push(filename); 
+    full_filename.push(filename);
 
-    // TODO: whitelist filetypes. 
+    // TODO: whitelist filetypes.
     // TODO: only open non-executable files.
-    println!("Opening file `{}`", full_filename.display());
+    info!("Opening file `{}`", full_filename.display());
 
     let mut file = match File::open(full_filename) {
       Err(_) => { return None },
