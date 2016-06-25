@@ -83,6 +83,7 @@ fn start_server(config: &Config, port: u16) {
   router.get("/", FileServerHandler::new(file_path, index));
   router.get("/test", FileServerHandler::new(file_path, index));
   router.get("/assets/:filename", FileServerHandler::new(file_path, index));
+  router.get("/assets/*", FileServerHandler::new(file_path, index));
 
   info!("Starting server on port {}...", port);
   Iron::new(router).http(("0.0.0.0", port)).unwrap();
