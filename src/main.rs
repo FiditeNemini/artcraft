@@ -6,6 +6,7 @@ extern crate hound;
 extern crate iron;
 #[macro_use]
 extern crate log;
+extern crate resolve;
 extern crate router;
 extern crate rustc_serialize;
 extern crate time;
@@ -23,6 +24,7 @@ use std::path::{Path, PathBuf};
 use clap::{App, Arg, ArgMatches};
 use iron::prelude::*;
 use router::Router;
+use resolve::hostname;
 use config::Config;
 
 use handlers::audio_synth_handler::AudioSynthHandler;
@@ -51,6 +53,8 @@ fn main() {
 
   VocabularyLibrary::read_from_directory(
       Path::new(&config.sound_path_development));
+
+  get_hostname();
 
   start_server(&config, port);
 }
@@ -89,3 +93,15 @@ fn start_server(config: &Config, port: u16) {
   Iron::new(router).http(("0.0.0.0", port)).unwrap();
 }
 
+fn get_hostname() {
+  match hostname::get_hostname() {
+    Ok(s) => { println!("Hostname: {}", s); },
+    Err(_) => {},
+  };
+
+  /*let len = 34u;
+  let mut buf = std::vec::from_elem(len, 0u8);
+
+  let err = unsafe {gethostname (vec::raw::to_mut_ptr(buf) as *mut i8, len as u64)};
+  if err != 0 { println("oops, gethostname failed"); return; }*/
+}
