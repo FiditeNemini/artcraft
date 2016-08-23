@@ -6,6 +6,7 @@ extern crate hound;
 extern crate iron;
 #[macro_use]
 extern crate log;
+extern crate regex;
 extern crate resolve;
 extern crate router;
 extern crate rustc_serialize;
@@ -13,26 +14,28 @@ extern crate time;
 extern crate toml;
 extern crate urlencoded;
 
+pub mod arpabet;
+pub mod atom;
+pub mod error;
 pub mod config;
 pub mod dictionary;
 pub mod handlers;
 pub mod logger;
 pub mod words;
 
-use std::path::{Path, PathBuf};
-
+use arpabet::ArpabetDictionary;
 use clap::{App, Arg, ArgMatches};
-use iron::prelude::*;
-use router::Router;
-use resolve::hostname;
 use config::Config;
-
+use dictionary::VocabularyLibrary;
 use handlers::audio_synth_handler::AudioSynthHandler;
 use handlers::error_filter::ErrorFilter;
 use handlers::file_server_handler::FileServerHandler;
 use handlers::vocab_list_handler::VocabListHandler;
+use iron::prelude::*;
 use logger::SimpleLogger;
-use dictionary::VocabularyLibrary;
+use resolve::hostname;
+use router::Router;
+use std::path::{Path, PathBuf};
 
 fn main() {
   SimpleLogger::init().unwrap();
@@ -55,6 +58,8 @@ fn main() {
       Path::new(&config.sound_path_development));
 
   get_hostname();
+
+  read_arpabet();
 
   start_server(&config, port);
 }
@@ -105,3 +110,13 @@ fn get_hostname() {
   let err = unsafe {gethostname (vec::raw::to_mut_ptr(buf) as *mut i8, len as u64)};
   if err != 0 { println("oops, gethostname failed"); return; }*/
 }
+
+fn read_arpabet() {
+  // TODO: Configurable path.
+  let dict = ArpabetDictionary::load_from_file("./dictionary/cmudict-0.7b").unwrap();
+
+  let result = dict.get("nintendo");
+
+  println!("Result: {:?}", result);
+}
+
