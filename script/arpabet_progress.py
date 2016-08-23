@@ -17,7 +17,8 @@ def current_phonemes():
     for p in os.listdir(PHONE_DIR):
         if not p.endswith('.wav'):
             continue
-        phonemes.append(p.replace('.wav', ''))
+        phoneme = p.replace('.wav', '')
+        phonemes.append(phoneme)
 
     return frozenset(phonemes)
 
@@ -35,8 +36,8 @@ def all_phonemes():
 
     for l in lines:
         word_phones = l.split()[1:]
-        for w in word_phones:
-            phonemes.add(w)
+        for phoneme in word_phones:
+            phonemes.add(phoneme)
 
     return frozenset(phonemes)
 

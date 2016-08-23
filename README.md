@@ -15,16 +15,16 @@ Phoneme
   which uses [Arpabet](https://en.wikipedia.org/wiki/Arpabet).
   - 54 units in the Arpabet:
     - Vowels:
-      - 10 monophthongs
-      - 5 diphthongs
-      - 8 R-colored vowels
+      - 10 monophthongs (AO, AA, IY, UW, EH, IH, UH, AH, AX, AE)
+      - 5 diphthongs (EY, AY, OW, AW, OY)
+      - 8 R-colored vowels (ER, AXR, EH R, UH R, AO R, AA R, IH|IY R, AW R)
     - Consonants:
-      - 6 Stops
-      - 2 Affricates
-      - 9 Fricatives
-      - 6 Nasals
-      - 5 Liquids
-      - 3 Semivowels
+      - 6 Stops (P, B, T, D, K, G)
+      - 2 Affricates (CH, JH)
+      - 9 Fricatives (F, V, TH, DH, S, Z, SH, ZH, HH)
+      - 6 Nasals (M, EM, N, EN, NG, ENG)
+      - 5 Liquids (L, EL, R, DX, MX)
+      - 3 Semivowels (Y, W, Q)
 
 Diphones
 --------
