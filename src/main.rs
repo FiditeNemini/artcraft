@@ -15,15 +15,17 @@ extern crate toml;
 extern crate urlencoded;
 
 pub mod arpabet;
-pub mod atom;
-pub mod error;
+pub mod audiobank;
 pub mod config;
 pub mod dictionary;
+pub mod error;
 pub mod handlers;
 pub mod logger;
+pub mod synthesizer;
 pub mod words;
 
 use arpabet::ArpabetDictionary;
+use audiobank::Audiobank;
 use clap::{App, Arg, ArgMatches};
 use config::Config;
 use dictionary::VocabularyLibrary;
@@ -36,6 +38,9 @@ use logger::SimpleLogger;
 use resolve::hostname;
 use router::Router;
 use std::path::{Path, PathBuf};
+use std::sync::Arc;
+use std::sync::RwLock;
+use synthesizer::Synthesizer;
 
 fn main() {
   SimpleLogger::init().unwrap();
@@ -59,9 +64,9 @@ fn main() {
 
   get_hostname();
 
-  read_arpabet();
+  let synthesizer = create_synthesizer(&config);
 
-  start_server(&config, port);
+  start_server(&config, port, synthesizer);
 }
 
 fn get_port(matches: &ArgMatches, default_port: u16) -> u16 {
@@ -76,14 +81,16 @@ fn get_port(matches: &ArgMatches, default_port: u16) -> u16 {
   }
 }
 
-fn start_server(config: &Config, port: u16) {
+fn start_server(config: &Config, port: u16, synthesizer: Synthesizer) {
   let audio_path = &config.sound_path_development;
   let file_path = "./web";
   let index = "index.html";
 
+  let async_synth = Arc::new(RwLock::new(synthesizer));
+
   // TODO: Cross-cutting filter installation
   let mut router = Router::new();
-  let mut chain = Chain::new(AudioSynthHandler::new(audio_path));
+  let mut chain = Chain::new(AudioSynthHandler::new(async_synth.clone(), audio_path));
   chain.link_after(ErrorFilter);
   router.get("/speak", chain);
   router.get("/words", VocabListHandler::new(audio_path));
@@ -103,20 +110,17 @@ fn get_hostname() {
     Ok(s) => { println!("Hostname: {}", s); },
     Err(_) => {},
   };
-
-  /*let len = 34u;
-  let mut buf = std::vec::from_elem(len, 0u8);
-
-  let err = unsafe {gethostname (vec::raw::to_mut_ptr(buf) as *mut i8, len as u64)};
-  if err != 0 { println("oops, gethostname failed"); return; }*/
 }
 
-fn read_arpabet() {
-  // TODO: Configurable path.
-  let dict = ArpabetDictionary::load_from_file("./dictionary/cmudict-0.7b").unwrap();
+fn create_synthesizer(config: &Config) -> Synthesizer {
+  info!("Reading Arpabet Dictionary...");
 
-  let result = dict.get("nintendo");
+  let arpabet_dictionary = ArpabetDictionary::load_from_file(
+      &config.phoneme_dictionary_file_development).unwrap();
 
-  println!("Result: {:?}", result);
+  let audiobank = Audiobank::new(&config.sound_path_development);
+
+  info!("Building Synthesizer...");
+  Synthesizer::new(arpabet_dictionary, audiobank)
 }
 

@@ -1,6 +1,6 @@
 // Copyright (c) 2016 Brandon Thomas <bt@brand.io, echelon@gmail.com>
 
-use error::Error;
+use error::SynthError;
 use std::collections::HashMap;
 use regex::Regex;
 use std::fs::File;
@@ -21,7 +21,7 @@ pub struct ArpabetDictionary {
 impl ArpabetDictionary {
   /// Read CMU's Arpabet Dictionary.
   /// See http://www.speech.cs.cmu.edu/cgi-bin/cmudict
-  pub fn load_from_file(filename: &str) -> Result<ArpabetDictionary, Error> {
+  pub fn load_from_file(filename: &str) -> Result<ArpabetDictionary, SynthError> {
     let mut f = try!(File::open(filename));
     let mut reader = BufReader::new(f);
 
@@ -52,14 +52,14 @@ impl ArpabetDictionary {
     }
 
     if map.is_empty() {
-      Err(Error::EmptyFile)
+      Err(SynthError::EmptyFile)
     } else {
       Ok(ArpabetDictionary { dictionary: map })
     }
   }
 
   /// Get a polyphone from the dictionary.
-  pub fn get(&self, word: &str) -> Option<Polyphone> {
+  pub fn get_polyphone(&self, word: &str) -> Option<Polyphone> {
     self.dictionary.get(word).and_then(|p| {
       Some(p.iter().map(|s| s.to_string()).collect::<Vec<String>>())
     })

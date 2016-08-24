@@ -22,7 +22,10 @@ use std::io::Cursor;
 use std::io::Read;
 use std::io;
 use std::path::{Path, PathBuf};
+use std::sync::Arc;
+use std::sync::RwLock;
 use super::error_filter::build_error;
+use synthesizer::Synthesizer;
 use urlencoded::UrlEncodedQuery;
 use words::split_sentence;
 
@@ -52,6 +55,9 @@ enum SpeakerRequestError {
 
 /// Synthesizes audio from input.
 pub struct AudioSynthHandler {
+  /// The TTS synthesizer.
+  synthesizer: Arc<RwLock<Synthesizer>>,
+
   /// Root of where files can be served from.
   /// A PathBuf since `Path` can only be created as a borrow.
   directory: PathBuf,
@@ -163,62 +169,30 @@ impl Handler for AudioSynthHandler {
 }
 
 impl AudioSynthHandler {
-  pub fn new(directory: &str) -> AudioSynthHandler {
-    AudioSynthHandler { directory: Path::new(directory).to_path_buf() }
+  pub fn new(synthesizer: Arc<RwLock<Synthesizer>>, directory: &str) -> AudioSynthHandler {
+    AudioSynthHandler { 
+      synthesizer: synthesizer,
+      directory: Path::new(directory).to_path_buf(),
+    }
   }
 
   // TODO: Return errors.
   /// Create audio from the sentence.
   fn create_audio(&self, speaker: &str, sentence: &str, volume: Option<f32>)
       -> Vec<u8> {
-    let mut words = split_sentence(sentence);
-
-    if words.len() == 0 {
-      // TODO: Raise error!
-    }
-
-    // This file adds extra silent padding at both ends.
-    words.insert(0, "_blank".to_string());
-    words.push("_blank".to_string());
-
-    // Note: Keeping a list of buffered file readers is stupid and is simply 
-    // being done for this example. I'll create a multithreaded shared LRU cache
-    // that reads from the disk and uses the dictionary word as the lookup key.
-    let mut file_readers : Vec<WavReader<BufReader<File>>> = Vec::new();
-
-    // TODO: Cleanup.
-    let speaker_path = match self.get_speaker_path(speaker) {
-      Err(_) => { Path::new("").to_path_buf() }, // TODO: meh
-      Ok(p) => p,
-    };
-
-    for word in words.iter() {
-      let filename = self.get_file_path(speaker_path.as_path(), word);
-      let reader = WavReader::open(filename).unwrap();
-      file_readers.push(reader);
-    }
-
-    let mut all_samples : Vec<i16> = Vec::new();
-
-    for mut reader in file_readers {
-      let samples = reader.samples::<i16>();
-      for sample in samples {
-        all_samples.push(sample.unwrap());
+    match self.synthesizer.read() {
+      Err(_) => Vec::new(), // TODO Actual error.
+      Ok(synth) => {
+        match synth.generate(sentence, speaker, volume) {
+          Err(e) => {
+            println!("Error synthesizing: {:?}", e);
+            Vec::new() // TODO FIXME
+          },
+          Ok(wav) => wav,
+        }
       }
     }
-
-    // FIXME: Super inefficient.
-    let mut pcm_data : Vec<i16> = Vec::with_capacity(all_samples.len());
-    for x in &all_samples {
-      let data = raise_volume(*x, volume);
-      pcm_data.push(data);
-    }
-
-    let spec = self.get_spec(speaker_path.as_path(), &words[0]);
-
-    self.write_buffer(&spec, pcm_data)
   }
-
 
   fn sha_digest(&self, speaker: &str, sentence: &str, volume: Option<f32>) -> String {
     let mut hasher = Sha1::new();

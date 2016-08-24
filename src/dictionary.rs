@@ -43,7 +43,7 @@ impl VocabularyLibrary {
       }
 
       let dirname = try!(get_filename(&entry));
-      if ignorable_file(&dirname) { 
+      if ignorable_file(&dirname) {
         continue;
       }
 
@@ -64,7 +64,7 @@ impl VocabularyLibrary {
 
 impl Vocabulary {
   /** Read in the vocabulary from a directory. */
-  pub fn read_from_directory(directory: &Path) -> 
+  pub fn read_from_directory(directory: &Path) ->
       Result<Vocabulary, io::Error> {
 
     let paths = try!(fs::read_dir(directory));
@@ -81,7 +81,7 @@ impl Vocabulary {
       let filename = try!(get_filename(&entry));
       let word = filename.replace(".wav", "");
 
-      if ignorable_file(&word) { 
+      if ignorable_file(&word) {
         continue;
       }
 
