@@ -43,7 +43,8 @@ impl VocabularyLibrary {
       }
 
       let dirname = try!(get_filename(&entry));
-      if ignorable_file(&dirname) {
+
+      if ignorable_file(&dirname) || ignorable_dir(&dirname) {
         continue;
       }
 
@@ -107,5 +108,9 @@ fn get_filename(entry: &DirEntry) -> Result<String, io::Error> {
 /** Files and directories we choose to skip. */
 fn ignorable_file(filename: &str) -> bool {
   filename.starts_with("_") || filename.ends_with("_")
+}
+
+fn ignorable_dir(filename: &str) -> bool {
+  filename == "misc"
 }
 

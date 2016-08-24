@@ -91,6 +91,33 @@ impl Audiobank {
     Some(all_samples)
   }
 
+  /**
+   * Get the miscellaneous sound effect file.
+   */
+  pub fn get_misc(&self, name: &str) -> Option<Vec<i16>> {
+    if check_path(name).is_err() {
+      return None;
+    }
+
+    let path = self.audio_path.join("misc/")
+        .join(format!("{}.wav", name));
+
+    let mut reader = match WavReader::open(path) {
+      Err(_) => { return None; },
+      Ok(reader) => reader,
+    };
+
+    // TODO: Inefficient.
+    let mut all_samples = Vec::new();
+    let samples = reader.samples::<i16>();
+    for sample in samples {
+      all_samples.push(sample.unwrap());
+    }
+
+    Some(all_samples)
+  }
+
+
   // TODO: This should be removed. We should cache the wav headers.
   pub fn get_spec(&self, speaker: &str, word: &str) -> Result<WavSpec, SynthError> {
     try!(check_path(speaker));

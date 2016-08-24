@@ -69,6 +69,12 @@ impl Synthesizer {
           match self.arpabet_dictionary.get_polyphone(word) {
             None => {
               // TODO: ERROR (maybe add static based on word length!)
+              match self.audiobank.get_misc("record_static") {
+                None => {},
+                Some(waveform_data) => {
+                  concatenated_waveform.extend(waveform_data);
+                },
+              }
               continue;
             },
             Some(polyphone) => {
