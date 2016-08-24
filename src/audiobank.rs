@@ -41,14 +41,13 @@ impl Audiobank {
    * Get the wav data for the (speaker,word), or None if it does not exist.
    */
   pub fn get_word(&self, speaker: &str, word: &str) -> Option<Vec<i16>> {
-
-    println!("Audio Path: {:?}", self.audio_path);
+    if check_path(speaker).is_err() || check_path(word).is_err() {
+      return None;
+    }
 
     let path = self.audio_path.join(format!("{}/", speaker))
         .join("_words/")
         .join(format!("{}.wav", word));
-
-    println!("Path: {:?}", path);
 
     let mut reader = match WavReader::open(path) {
       Err(_) => { return None; },
@@ -69,11 +68,13 @@ impl Audiobank {
    * Get the wav data for the (speaker,phoneme), or None if it does not exist.
    */
   pub fn get_phoneme(&self, speaker: &str, phoneme: &str) -> Option<Vec<i16>> {
+    if check_path(speaker).is_err() || check_path(phoneme).is_err() {
+      return None;
+    }
+
     let path = self.audio_path.join(format!("{}/", speaker))
         .join("_phonemes/")
         .join(format!("{}.wav", phoneme));
-
-    println!("Path: {:?}", path);
 
     let mut reader = match WavReader::open(path) {
       Err(_) => { return None; },
@@ -92,14 +93,30 @@ impl Audiobank {
 
   // TODO: This should be removed. We should cache the wav headers.
   pub fn get_spec(&self, speaker: &str, word: &str) -> Result<WavSpec, SynthError> {
+    try!(check_path(speaker));
+    try!(check_path(word));
+
     let path = self.audio_path.join(format!("{}/", speaker))
         .join("_words/")
         .join(format!("{}.wav", word));
 
-    println!("Path: {:?}", path);
-
     let reader = try!(WavReader::open(path));
     Ok(reader.spec())
+  }
+
+
+}
+
+fn check_path(path: &str) -> Result<(), SynthError> {
+  // FIXME: Hack so I can release soon. Rewrite this whole logic plz.
+  if path.contains("..") || 
+      path.contains("/") || 
+      path.contains("$") || 
+      path.contains("~") 
+  {
+    Err(SynthError::BadInput { description: "invalid path" })
+  } else {
+    Ok(())
   }
 }
 

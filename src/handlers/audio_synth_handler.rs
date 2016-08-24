@@ -226,56 +226,5 @@ impl AudioSynthHandler {
     } 
     Ok(speaker_path)
   }
-
-  fn get_file_path(&self, speaker_path: &Path, word: &str) -> PathBuf {
-    speaker_path.join(format!("{}.wav", word))
-  }
-
-  fn get_spec(&self, speaker_path: &Path, word: &str) -> WavSpec {
-    let filename = self.get_file_path(speaker_path, word);
-    let reader = WavReader::open(filename).unwrap();
-    reader.spec()
-  }
-
-  fn write_buffer(&self, spec: &WavSpec, samples: Vec<i16>) -> Vec<u8> {
-    let mut bytes : Vec<u8> = Vec::new();
-    let mut seek : Cursor<Vec<u8>> = Cursor::new(bytes);
-    let mut buffer = BufWriter::new(seek);
-
-    {
-      let mut writer = WavWriter::new(&mut buffer, *spec);
-      for s in samples {
-        writer.write_sample(s).unwrap();
-      }
-      writer.finalize().unwrap(); // TODO: Error
-    }
-
-    match buffer.into_inner() {
-      Err(_) => { Vec::new() }, // TODO: Error
-      Ok(r) => { r.get_ref().to_vec() },
-    }
-  }
-}
-
-/// Raise the volume of a sample by changing its amplitude.
-fn raise_volume(data: i16, volume: Option<f32>) -> i16 {
-  // TODO: Cleanup, make more efficient.
-  match volume {
-    None => data,
-    Some(vol) => {
-      let f : f32 = data as f32 * vol;
-      let g = f as i32;
-
-      let h : i16 = if g > i16::MAX as i32 {
-        i16::MAX
-      } else if g < i16::MIN as i32 {
-        i16::MIN
-      } else {
-        g as i16
-      };
-
-      h
-    },
-  }
 }
 

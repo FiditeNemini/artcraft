@@ -37,7 +37,7 @@ use iron::prelude::*;
 use logger::SimpleLogger;
 use resolve::hostname;
 use router::Router;
-use std::path::{Path, PathBuf};
+use std::path::Path;
 use std::sync::Arc;
 use std::sync::RwLock;
 use synthesizer::Synthesizer;

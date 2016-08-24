@@ -5,13 +5,9 @@ use iron::Handler;
 use iron::mime::Mime;
 use iron::prelude::*;
 use iron::status;
-use router::Router;
 use rustc_serialize::json;
-
-use std::fs::File;
-use std::fs;
-use std::io::Read;
-use std::path::{Path, PathBuf};
+use std::path::Path;
+use std::path::PathBuf;
 
 #[derive(RustcDecodable, RustcEncodable)]
 struct WordsResponse {
@@ -26,7 +22,7 @@ pub struct VocabListHandler {
 }
 
 impl Handler for VocabListHandler {
-  fn handle(&self, req: &mut Request) -> IronResult<Response> {
+  fn handle(&self, _req: &mut Request) -> IronResult<Response> {
     // FIXME: This is inefficient to re-read on every request. 
     match VocabularyLibrary::read_from_directory(
         self.directory.as_path()) {

@@ -2,23 +2,12 @@
 
 use arpabet::ArpabetDictionary;
 use audiobank::Audiobank;
-use dictionary::Vocabulary;
-use dictionary::VocabularyLibrary;
 use error::SynthError;
-use hound::WavReader;
 use hound::WavSpec;
 use hound::WavWriter;
-use std::error::Error;
-use std::fs::File;
-use std::fs;
 use std::i16;
-use std::io::BufReader;
 use std::io::BufWriter;
 use std::io::Cursor;
-use std::io::Read;
-use std::io;
-use std::path::Path;
-use std::path::PathBuf;
 use words::split_sentence;
 
 pub type WavBytes = Vec<u8>;
@@ -83,6 +72,8 @@ impl Synthesizer {
               continue;
             },
             Some(polyphone) => {
+              info!("Word '{}' maps to polyphone '{:?}'", word, polyphone);
+
               for phoneme in polyphone {
                 match self.audiobank.get_phoneme(speaker, &phoneme) {
                   None => {
@@ -115,8 +106,8 @@ impl Synthesizer {
   }
 
   fn write_buffer(&self, spec: &WavSpec, samples: Vec<i16>) -> Vec<u8> {
-    let mut bytes : Vec<u8> = Vec::new();
-    let mut seek : Cursor<Vec<u8>> = Cursor::new(bytes);
+    let bytes : Vec<u8> = Vec::new();
+    let seek : Cursor<Vec<u8>> = Cursor::new(bytes);
     let mut buffer = BufWriter::new(seek);
 
     {
