@@ -1,5 +1,8 @@
 # Various configs
 
+# TODO: This 'hostname' key is present only as a hack.
+hostname = ""
+
 # Sound paths in development and production environments
 sound_path_development = "/home/bt/Dropbox/jungle.horse/sounds"
 sound_path_production = "./sounds"

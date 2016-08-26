@@ -84,6 +84,12 @@ impl Synthesizer {
                 match self.audiobank.get_phoneme(speaker, &phoneme) {
                   None => {
                     // TODO: ERROR (maybe add static based on word length!)
+                    match self.audiobank.get_misc("beep") {
+                      None => {},
+                      Some(waveform_data) => {
+                        concatenated_waveform.extend(waveform_data);
+                      },
+                    }
                     continue;
                   },
                   Some(waveform_data) => {

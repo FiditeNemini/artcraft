@@ -60,7 +60,7 @@ fn main() {
   let config = Config::read("./config.toml").unwrap();
 
   VocabularyLibrary::read_from_directory(
-      Path::new(&config.sound_path_development));
+      Path::new(&config.get_sound_path()));
 
   get_hostname();
 
@@ -82,7 +82,7 @@ fn get_port(matches: &ArgMatches, default_port: u16) -> u16 {
 }
 
 fn start_server(config: &Config, port: u16, synthesizer: Synthesizer) {
-  let audio_path = &config.sound_path_development;
+  let audio_path = &config.get_sound_path();
   let file_path = "./web";
   let index = "index.html";
 
@@ -118,7 +118,7 @@ fn create_synthesizer(config: &Config) -> Synthesizer {
   let arpabet_dictionary = ArpabetDictionary::load_from_file(
       &config.phoneme_dictionary_file_development).unwrap();
 
-  let audiobank = Audiobank::new(&config.sound_path_development);
+  let audiobank = Audiobank::new(&config.get_sound_path());
 
   info!("Building Synthesizer...");
   Synthesizer::new(arpabet_dictionary, audiobank)
