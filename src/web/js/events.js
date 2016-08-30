@@ -40,7 +40,11 @@
           speaker = $('select').val(),
           volume = $('input#vol').val(),
           query = encodeURIComponent(sentence),
-          url = '/speak?v=' + speaker + '&s=' + query + '&vol=' + volume;
+          url = '/speak?v=' + speaker
+              + '&s=' + query
+              + '&vol=' + volume
+              + '&up=' + $('#use_phonemes').prop('checked')
+              + '&uw=' + $('#use_words').prop('checked');
 
       ev.preventDefault();
 

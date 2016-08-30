@@ -8,7 +8,6 @@ use iron::Handler;
 use iron::headers::{ETag, EntityTag, Headers, IfNoneMatch};
 use iron::mime::Mime;
 use iron::prelude::*;
-//use params::Params;
 use iron::status;
 use router::Router;
 use rustc_serialize::json;
@@ -23,6 +22,7 @@ use std::io::Cursor;
 use std::io::Read;
 use std::io;
 use std::path::{Path, PathBuf};
+use std::str::FromStr;
 use std::sync::Arc;
 use std::sync::RwLock;
 use super::error_filter::build_error;
@@ -30,8 +30,10 @@ use synthesizer::Synthesizer;
 use urlencoded::UrlEncodedQuery;
 use words::split_sentence;
 
-const SPEAKER_PARAM : &'static str = "v";
 const SENTENCE_PARAM : &'static str = "s";
+const SPEAKER_PARAM : &'static str = "v";
+const USE_PHONEMES_PARAM: &'static str = "up";
+const USE_WORDS_PARAM: &'static str = "uw";
 const VOLUME_PARAM : &'static str = "vol";
 
 /// Represents a request to this endpoint.
@@ -45,11 +47,11 @@ struct SpeakRequest {
   /** An optional volume multiplier. */
   pub volume: Option<f32>,
 
-  /** Whether to use words. */
-  pub use_words: bool,
-
   /** Whether to use phonemes. */
   pub use_phonemes: bool,
+
+  /** Whether to use words. */
+  pub use_words: bool,
 }
 
 enum SpeakerRequestError {
@@ -78,7 +80,7 @@ impl SpeakRequest {
 
     // Get the request sentence and speaker.
     // TODO: Cleanup
-    let (sentence, speaker, volume) = match http_request.get_ref::<UrlEncodedQuery>() {
+    match http_request.get_ref::<UrlEncodedQuery>() {
       Err(_) => { return sentence_error; },
       Ok(ref map) => {
         let sen = match map.get(SENTENCE_PARAM) {
@@ -116,34 +118,45 @@ impl SpeakRequest {
           },
         };
 
-        (sen, spk, volume)
-      },
-    };
-
-    /*let (use_words, use_phonemes) = match http_request.get_ref::<Params>() {
-      None => {
-        (false, false)
-      },
-      Some(map) => {
-        match map.find("use_words") {
-          Some(_e) => {
-            println!(">>> FOUND");
+        let use_phonemes = match map.get(USE_PHONEMES_PARAM) {
+          None => { true },
+          Some(list) => {
+            match list.get(0) {
+              None => { return speaker_error; },
+              Some(s) => {
+                match FromStr::from_str(s) {
+                  Ok(b) => b,
+                  Err(_) => { return speaker_error; },
+                }
+              },
+            }
           },
-          _ => {
-            println!(">>> NOT FOUND");
-          },
-        }
-        (true, true)
-      },
-    };*/
+        };
 
-    Ok(SpeakRequest {
-      sentence: sentence,
-      speaker: speaker,
-      volume: volume,
-      use_words: false,
-      use_phonemes: true,
-    })
+        let use_words = match map.get(USE_WORDS_PARAM) {
+          None => { true },
+          Some(list) => {
+            match list.get(0) {
+              None => { return speaker_error; },
+              Some(s) => {
+                match FromStr::from_str(s) {
+                  Ok(b) => b,
+                  Err(_) => { return speaker_error; },
+                }
+              },
+            }
+          },
+        };
+
+        Ok(SpeakRequest {
+          sentence: sen,
+          speaker: spk,
+          volume: volume,
+          use_phonemes: use_phonemes,
+          use_words: use_words,
+        })
+      },
+    }
   }
 }
 

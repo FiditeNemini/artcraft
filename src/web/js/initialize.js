@@ -29,6 +29,9 @@
 
     $('input#vol').val(volume);
 
+    $('#use_phonemes').prop('use_phonemes', Url.getUsePhonemes());
+    $('#use_words').prop('use_words', Url.getUseWords());
+
     Library.load(function(library) { Ui.libraryLoadCallback(library); });
     Sound.install();
 
