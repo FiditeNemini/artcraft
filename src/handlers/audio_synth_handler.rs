@@ -1,6 +1,7 @@
 // Copyright (c) 2015 Brandon Thomas <bt@brand.io>
 // TODO: This looks really bad now. Needs cleanup.
 
+use config::Config;
 use crypto::digest::Digest;
 use crypto::sha1::Sha1;
 use hound::{WavReader, WavSpec, WavWriter};
@@ -66,6 +67,9 @@ enum SpeakerRequestError {
 pub struct AudioSynthHandler {
   /// The TTS synthesizer.
   synthesizer: Arc<RwLock<Synthesizer>>,
+
+  /// Server configs.
+  config: Config,
 
   /// Root of where files can be served from.
   /// A PathBuf since `Path` can only be created as a borrow.
@@ -187,14 +191,20 @@ impl Handler for AudioSynthHandler {
       },
     };
 
-    info!("Speak Request ({}): {}", request.speaker, request.sentence);
+    info!("Speak Request ({}): {}.", request.speaker, request.sentence);
 
     // FIXME: Varies with spaces, formatting, etc.
-    let hash = self.sha_digest(&request.speaker, &request.sentence, request.volume);
+    let hash = self.sha_digest(&request);
     let entity_tag = EntityTag::new(true, hash.to_owned());
 
-    if request_hash == entity_tag.to_string() {
-      return Ok(Response::with(status::NotModified));
+    info!("Request Header Caching Sha: {}", hash);
+
+    if self.config.use_caching_headers {
+      // Don't generate file if caching header is matched.
+      if request_hash == entity_tag.to_string() {
+        info!("Caching headers match; responding with NotModified.");
+        return Ok(Response::with(status::NotModified));
+      }
     }
 
     let result = self.create_audio(&request.speaker, &request.sentence,
@@ -211,9 +221,11 @@ impl Handler for AudioSynthHandler {
 }
 
 impl AudioSynthHandler {
-  pub fn new(synthesizer: Arc<RwLock<Synthesizer>>, directory: &str) -> AudioSynthHandler {
+  pub fn new(synthesizer: Arc<RwLock<Synthesizer>>, config: Config,
+             directory: &str) -> AudioSynthHandler {
     AudioSynthHandler {
       synthesizer: synthesizer,
+      config: config,
       directory: Path::new(directory).to_path_buf(),
     }
   }
@@ -236,19 +248,33 @@ impl AudioSynthHandler {
     }
   }
 
-  fn sha_digest(&self, speaker: &str, sentence: &str, volume: Option<f32>) -> String {
+  fn sha_digest(&self, request: &SpeakRequest) -> String {
     let mut hasher = Sha1::new();
-    hasher.input_str(speaker);
-    hasher.input_str(sentence);
-    if volume.is_some() {
-      let vol = volume.unwrap();
 
-      // FIXME: This isn't perfect hashing for floats, but is mostly what I want.
+    hasher.input_str(&request.speaker);
+    hasher.input_str(&request.sentence);
+
+    if request.volume.is_some() {
+      let vol = request.volume.unwrap();
+
+      // This isn't perfect hashing for floats, but is mostly
+      // what I want.
       let hashed = (vol * 1000.0) as i16;
       let hi = (hashed >> 8 & 0xff) as u8;
       let lo = (hashed & 0xff) as u8;
       hasher.input(&[hi, lo]);
+    } else {
+      hasher.input(&[0u8]);
     }
+
+    let mut use_byte = 0u8;
+    if request.use_phonemes { use_byte |= (1 << 1); }
+    if request.use_words { use_byte |= (1 << 2); }
+
+    println!("Use byte: {}", use_byte);
+
+    hasher.input(&[use_byte]);
+
     hasher.result_str().to_string()
   }
 

@@ -1,7 +1,12 @@
 # Various configs
 
 # TODO: This 'hostname' key is present only as a hack.
+# Stop writing bad code, Brandon.
 hostname = ""
+
+# Whether or not to read the "If-None-Match" headers.
+# Turn this off for development and on for production.
+use_caching_headers = false
 
 # Sound paths in development and production environments
 sound_path_development = "/home/bt/Dropbox/jungle.horse/sounds"

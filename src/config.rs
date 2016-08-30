@@ -6,12 +6,15 @@ use std::io::Error;
 use std::io::prelude::*;
 use toml;
 
-#[derive(Debug, RustcEncodable, RustcDecodable)]
+#[derive(Clone, Debug, RustcEncodable, RustcDecodable)]
 pub struct Config {
   /// Machine hostname
   /// TODO: This being public is a total hack.
   /// Really, this shouldn't even be in the config.
   pub hostname: String,
+
+  /// Whether or not to send/respect client caching headers.
+  pub use_caching_headers: bool,
 
   pub sound_path_development: String,
   pub sound_path_production: String,

@@ -90,7 +90,9 @@ fn start_server(config: &Config, port: u16, synthesizer: Synthesizer) {
 
   // TODO: Cross-cutting filter installation
   let mut router = Router::new();
-  let mut chain = Chain::new(AudioSynthHandler::new(async_synth.clone(), audio_path));
+  let mut chain = Chain::new(AudioSynthHandler::new(async_synth.clone(),
+                                                    config.clone(),
+                                                    audio_path));
   chain.link_after(ErrorFilter);
   router.get("/speak", chain);
   router.get("/words", VocabListHandler::new(audio_path));
