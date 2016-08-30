@@ -6,11 +6,23 @@ Trumpet
 
 Running the server
 ------------------
+
+### Locally
+
 1. Install Rust >= 1.1.0
 2. `cargo run`
 
-Phoneme
--------
+### On the Remote Server
+
+1. Install and configure nginx as a reverse HTTP proxy.
+2. SCP Rust server app binaries and start on required ports, ie.
+   `trumpet -p PORT`.
+
+Misc Notes on Speech
+--------------------
+
+### Phonemes
+
 - [CMU Dictionary](http://svn.code.sf.net/p/cmusphinx/code/trunk/cmudict/),
   which uses [Arpabet](https://en.wikipedia.org/wiki/Arpabet).
   - 54 units in the Arpabet:
@@ -26,26 +38,33 @@ Phoneme
       - 5 Liquids (L, EL, R, DX, MX)
       - 3 Semivowels (Y, W, Q)
 
-Diphones
---------
-Generate a list of phoneme 2-tuples.
+### Diphones
 
-Unit Selection
---------------
+TODO: Generate a list of phoneme 2-tuples.
+
+### Unit Selection
+
 - Combine multiple sources into final output (words, phonemes, diphones)
 - Have alternatives (words, phonemes) that pair better with others.
 - Optimize joining on a score (start/ending pitch, tempo, etc.)
 
 Production Server
 -----------------
-The production server is 209.239.112.74.
+The production server is `209.239.112.74`.
 
-**Current nginx config**
+I'm using nginx as a reverse HTTP proxy.
+
+To manage the process, `sudo service nginx restart`, etc.
+
+To see what processes bind a port, `sudo lsof -i:80`, etc.
+
+### Current nginx config
 
 In sites-available,
+
 ```
 server {
-  # Note: port 9000 is a temporary artifact
+  # XXX: Note - port 9000 is a temporary artifact; normally port 80.
   listen 9000;
   server_name jungle.horse;
   location / {
@@ -62,13 +81,13 @@ server {
 }
 ```
 
-**See what processes bind the port**
+### Old IPTABLES Config
 
-```
-sudo lsof -i:80
-```
+This was the old iptables-based routing. Even after flushing the rules,
+port 80 still forwards to 9000 for some reason.
 
-**Old IPTABLES Config**
+The rules were (prior to flush),
+
 ```
 bt@colossus960:~$ sudo iptables --list-rules
 -P INPUT ACCEPT
