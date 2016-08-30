@@ -59,17 +59,17 @@ impl FileServerHandler {
   // FIXME: This is dangerous and horrible code
   /// Get the filename requested.
   fn get_filename(&self, request: &Request) -> String {
-    if request.url.path.len() == 1
-        && request.url.path[0] == "test".to_string() {
+    if request.url.path().len() == 1
+        && request.url.path()[0] == "test".to_string() {
       // Route `/test`
       "test.html".to_string()
-    } else if request.url.path.len() > 2
-        && request.url.path[1] == "output".to_string() {
+    } else if request.url.path().len() > 2
+        && request.url.path()[1] == "output".to_string() {
       // Route `/assets/*/*`
       let mut path = String::new();
 
-      for i in 1..request.url.path.len() {
-        let part = &request.url.path[i];
+      for i in 1..request.url.path().len() {
+        let part = &request.url.path()[i];
         if i == 1 {
           path = path + &part;
         } else {
