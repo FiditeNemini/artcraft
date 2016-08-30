@@ -23,7 +23,7 @@ pub struct VocabListHandler {
 
 impl Handler for VocabListHandler {
   fn handle(&self, _req: &mut Request) -> IronResult<Response> {
-    // FIXME: This is inefficient to re-read on every request. 
+    // FIXME: This is inefficient to re-read on every request.
     match VocabularyLibrary::read_from_directory(
         self.directory.as_path()) {
       Err(_) => {

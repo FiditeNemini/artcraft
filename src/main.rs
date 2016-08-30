@@ -6,6 +6,7 @@ extern crate hound;
 extern crate iron;
 #[macro_use]
 extern crate log;
+//extern crate params;
 extern crate regex;
 extern crate resolve;
 extern crate router;

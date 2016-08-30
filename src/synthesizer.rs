@@ -40,13 +40,14 @@ impl Synthesizer {
   /**
    * Generate a spoken wav from text input.
    */
-  pub fn generate(&self, sentence: &str, speaker: &str, 
+  pub fn generate(&self, sentence: &str, speaker: &str,
+                  use_words: bool, use_phonemes: bool,
                   volume: Option<f32>) -> Result<WavBytes, SynthError> {
 
     let mut words = split_sentence(sentence);
 
     if words.len() == 0 {
-      return Err(SynthError::BadInput { 
+      return Err(SynthError::BadInput {
         description: "There were no words to synthesize."
       });
     }
@@ -54,52 +55,19 @@ impl Synthesizer {
     // This file adds extra silent padding at both ends.
     words.insert(0, "_blank".to_string());
     words.push("_blank".to_string());
-    
+
     let mut concatenated_waveform : Vec<i16> = Vec::new();
 
     // FIXME: Flight of the seagulls here.
     for word in words.iter() {
-      match self.audiobank.get_word(speaker, word) {
-        Some(waveform_data) => {
-          // The word exists in the database.
-          concatenated_waveform.extend(waveform_data);
-        },
-        None => {
-          // The word does not exist in the database, so use phonemes instead.
-          match self.arpabet_dictionary.get_polyphone(word) {
-            None => {
-              // TODO: ERROR (maybe add static based on word length!)
-              match self.audiobank.get_misc("record_static") {
-                None => {},
-                Some(waveform_data) => {
-                  concatenated_waveform.extend(waveform_data);
-                },
-              }
-              continue;
-            },
-            Some(polyphone) => {
-              info!("Word '{}' maps to polyphone '{:?}'", word, polyphone);
+      let mut word_added = false;
 
-              for phoneme in polyphone {
-                match self.audiobank.get_phoneme(speaker, &phoneme) {
-                  None => {
-                    // TODO: ERROR (maybe add static based on word length!)
-                    match self.audiobank.get_misc("beep") {
-                      None => {},
-                      Some(waveform_data) => {
-                        concatenated_waveform.extend(waveform_data);
-                      },
-                    }
-                    continue;
-                  },
-                  Some(waveform_data) => {
-                    concatenated_waveform.extend(waveform_data);
-                  },
-                }
-              }
-            },
-          }
-        },
+      if use_words {
+        word_added = self.concatenate_word(&mut concatenated_waveform, speaker, word);
+      }
+
+      if !word_added && use_phonemes {
+        word_added = self.concatenate_polyphone(&mut concatenated_waveform, speaker, word);
       }
     }
 
@@ -117,7 +85,82 @@ impl Synthesizer {
     Ok(self.write_buffer(&spec, pcm_data))
   }
 
-  fn write_buffer(&self, spec: &WavSpec, samples: Vec<i16>) -> Vec<u8> {
+  /// Concatenate a word to the waveform we're building. Returns
+  /// whether or not the word was successfully found and concatenated.
+  fn concatenate_word(&self, concatenated_waveform: &mut Vec<i16>,
+                      speaker: &str, word: &str) -> bool {
+    match self.audiobank.get_word(speaker, word) {
+      Some(waveform_data) => {
+        // The word exists in the database.
+        concatenated_waveform.extend(waveform_data);
+        true
+      },
+      None => {
+        false
+      },
+    }
+  }
+
+  /// Concatenate a polyphone corresponding to the word to the
+  /// waveform we're building. Returns whether or not the word was
+  /// successfully found and concatenated.
+  fn concatenate_polyphone(&self, concatenated_waveform: &mut Vec<i16>,
+                           speaker: &str, word: &str) -> bool {
+
+
+    let polyphone = match self.arpabet_dictionary.get_polyphone(word) {
+      Some(p) => { p },
+      None => {
+        // XXX: Adding static as a cue to denote that the given
+        // word->polyphone mapping doesn't exist in the database.
+        match self.audiobank.get_misc("record_static") {
+          None => {},
+          Some(waveform_data) => {
+            concatenated_waveform.extend(waveform_data);
+          },
+        }
+        return false;
+      },
+    };
+
+    info!("Word '{}' maps to polyphone '{:?}'", word, polyphone);
+
+    // Insert space before polyphone.
+    match self.audiobank.get_misc("pause") {
+      None => {},
+      Some(pause) => { concatenated_waveform.extend(pause); },
+    }
+
+    for phoneme in polyphone {
+      match self.audiobank.get_phoneme(speaker, &phoneme) {
+        None => {
+          // XXX: Adding beep to denote that the given monophone
+          // doesn't exist in the database.
+          match self.audiobank.get_misc("beep") {
+            None => {},
+            Some(waveform_data) => {
+              concatenated_waveform.extend(waveform_data);
+            },
+          }
+          continue;
+        },
+        Some(waveform_data) => {
+          concatenated_waveform.extend(waveform_data);
+        },
+      }
+    }
+
+    // Insert space after polyphone.
+    match self.audiobank.get_misc("pause") {
+      None => {},
+      Some(pause) => { concatenated_waveform.extend(pause); },
+    }
+
+    true
+  }
+
+  /// Write out final wave data.
+  fn write_buffer(&self, spec: &WavSpec, samples: Vec<i16>) -> WavBytes {
     let bytes : Vec<u8> = Vec::new();
     let seek : Cursor<Vec<u8>> = Cursor::new(bytes);
     let mut buffer = BufWriter::new(seek);

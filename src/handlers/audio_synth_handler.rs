@@ -8,6 +8,7 @@ use iron::Handler;
 use iron::headers::{ETag, EntityTag, Headers, IfNoneMatch};
 use iron::mime::Mime;
 use iron::prelude::*;
+//use params::Params;
 use iron::status;
 use router::Router;
 use rustc_serialize::json;
@@ -43,6 +44,12 @@ struct SpeakRequest {
 
   /** An optional volume multiplier. */
   pub volume: Option<f32>,
+
+  /** Whether to use words. */
+  pub use_words: bool,
+
+  /** Whether to use phonemes. */
+  pub use_phonemes: bool,
 }
 
 enum SpeakerRequestError {
@@ -76,7 +83,7 @@ impl SpeakRequest {
       Ok(ref map) => {
         let sen = match map.get(SENTENCE_PARAM) {
           None => { return sentence_error; },
-          Some(list) => { 
+          Some(list) => {
             match list.get(0) {
               None => { return sentence_error; },
               Some(s) => { s.to_string() },
@@ -86,7 +93,7 @@ impl SpeakRequest {
 
         let spk = match map.get(SPEAKER_PARAM) {
           None => { return speaker_error; },
-          Some(list) => { 
+          Some(list) => {
             match list.get(0) {
               None => { return speaker_error; },
               Some(s) => { s.to_string() },
@@ -96,7 +103,7 @@ impl SpeakRequest {
 
         let volume : Option<f32> = match map.get(VOLUME_PARAM) {
           None => { None },
-          Some(list) => { 
+          Some(list) => {
             match list.get(0) {
               None => { None },
               Some(s) => {
@@ -113,10 +120,29 @@ impl SpeakRequest {
       },
     };
 
+    /*let (use_words, use_phonemes) = match http_request.get_ref::<Params>() {
+      None => {
+        (false, false)
+      },
+      Some(map) => {
+        match map.find("use_words") {
+          Some(_e) => {
+            println!(">>> FOUND");
+          },
+          _ => {
+            println!(">>> NOT FOUND");
+          },
+        }
+        (true, true)
+      },
+    };*/
+
     Ok(SpeakRequest {
       sentence: sentence,
       speaker: speaker,
       volume: volume,
+      use_words: false,
+      use_phonemes: true,
     })
   }
 }
@@ -126,10 +152,10 @@ impl Handler for AudioSynthHandler {
   fn handle(&self, req: &mut Request) -> IronResult<Response> {
     info!("GET /speak");
 
-    let speaker_error = build_error(status::BadRequest, 
+    let speaker_error = build_error(status::BadRequest,
         &format!("Missing `{}` parameter.", SPEAKER_PARAM));
 
-    let sentence_error = build_error(status::BadRequest, 
+    let sentence_error = build_error(status::BadRequest,
         &format!("Missing `{}` parameter.", SENTENCE_PARAM));
 
     // Get the request ETag. TODO: Cleanup
@@ -158,7 +184,10 @@ impl Handler for AudioSynthHandler {
       return Ok(Response::with(status::NotModified));
     }
 
-    let result = self.create_audio(&request.speaker, &request.sentence, request.volume);
+    let result = self.create_audio(&request.speaker, &request.sentence,
+                                   request.use_words, request.use_phonemes,
+                                   request.volume);
+
     let mime_type = "audio/wav".parse::<Mime>().unwrap();
 
     let mut response = Response::with((mime_type, status::Ok, result));
@@ -170,7 +199,7 @@ impl Handler for AudioSynthHandler {
 
 impl AudioSynthHandler {
   pub fn new(synthesizer: Arc<RwLock<Synthesizer>>, directory: &str) -> AudioSynthHandler {
-    AudioSynthHandler { 
+    AudioSynthHandler {
       synthesizer: synthesizer,
       directory: Path::new(directory).to_path_buf(),
     }
@@ -178,12 +207,12 @@ impl AudioSynthHandler {
 
   // TODO: Return errors.
   /// Create audio from the sentence.
-  fn create_audio(&self, speaker: &str, sentence: &str, volume: Option<f32>)
-      -> Vec<u8> {
+  fn create_audio(&self, speaker: &str, sentence: &str, use_words: bool,
+                  use_phonemes: bool, volume: Option<f32>) -> Vec<u8> {
     match self.synthesizer.read() {
       Err(_) => Vec::new(), // TODO Actual error.
       Ok(synth) => {
-        match synth.generate(sentence, speaker, volume) {
+        match synth.generate(sentence, speaker, use_words, use_phonemes, volume) {
           Err(e) => {
             println!("Error synthesizing: {:?}", e);
             Vec::new() // TODO FIXME
@@ -212,9 +241,9 @@ impl AudioSynthHandler {
 
   fn get_speaker_path(&self, speaker: &str) -> Result<PathBuf, io::Error> {
     // FIXME: Hack so I can release tonight. Rewrite this whole controller plz.
-    if speaker.contains("..") || 
-        speaker.contains("/") || 
-        speaker.contains("$") || 
+    if speaker.contains("..") ||
+        speaker.contains("/") ||
+        speaker.contains("$") ||
         speaker.contains("~") {
           return Err(io::Error::new(io::ErrorKind::InvalidInput, "invalid path"));
         }
@@ -223,7 +252,7 @@ impl AudioSynthHandler {
     // FIXME: This is not the security measure you think it is:
     if !speaker_path.starts_with(&self.directory) {
       return Err(io::Error::new(io::ErrorKind::InvalidInput, "invalid path"));
-    } 
+    }
     Ok(speaker_path)
   }
 }

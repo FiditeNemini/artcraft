@@ -22,11 +22,21 @@
             <input id="vol" value="">
             <button id="submit">Submit</button>
           </div>
+          <div id="options">
+            <input type="checkbox" id="use_words" name="use_words"
+                   checked="checked">
+            <label for="use_words">Words</label>
+            <input type="checkbox" id="use_phonemes" name="use_phonemes"
+                   checked="checked">
+            <label for="use_phonemes">Phonemes</label>
+          </div>
         </form>
       </div>
       <ul id="stats">
-        <li>Currently featuring <span id="trump_wordcount">0</span> Trump words.</li>
-        <li>Now with <span id="hillary_wordcount">0</span> Hillary words.</li>
+        <li>Currently featuring <span id="trump_wordcount">0</span>
+            Trump words.</li>
+        <li>Now with <span id="hillary_wordcount">0</span> Hillary
+            words.</li>
         <li><a href="/words">wow such json</a></li>
       </ul>
     </div>

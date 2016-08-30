@@ -7,7 +7,7 @@ use hound::WavWriter;
 use std::path::Path;
 use std::path::PathBuf;
 
-/** 
+/**
  * Fetch wav audio files from the audio bank.
  *
  * The file database has a well-defined structure:
@@ -136,10 +136,10 @@ impl Audiobank {
 
 fn check_path(path: &str) -> Result<(), SynthError> {
   // FIXME: Hack so I can release soon. Rewrite this whole logic plz.
-  if path.contains("..") || 
-      path.contains("/") || 
-      path.contains("$") || 
-      path.contains("~") 
+  if path.contains("..") ||
+      path.contains("/") ||
+      path.contains("$") ||
+      path.contains("~")
   {
     Err(SynthError::BadInput { description: "invalid path" })
   } else {
