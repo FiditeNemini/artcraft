@@ -88,7 +88,7 @@ impl Synthesizer {
     }
 
     // TODO: Cache waveform headers.
-    let spec = try!(self.audiobank.get_spec(speaker, &words[0]));
+    let spec = try!(self.audiobank.get_misc_spec("pause"));
 
     Ok(self.write_buffer(&spec, pcm_data))
   }

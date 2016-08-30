@@ -108,7 +108,7 @@ impl Audiobank {
     };
 
     // TODO: Inefficient.
-    let mut all_samples = Vec::new();
+     let mut all_samples = Vec::new();
     let samples = reader.samples::<i16>();
     for sample in samples {
       all_samples.push(sample.unwrap());
@@ -116,7 +116,6 @@ impl Audiobank {
 
     Some(all_samples)
   }
-
 
   // TODO: This should be removed. We should cache the wav headers.
   pub fn get_spec(&self, speaker: &str, word: &str) -> Result<WavSpec, SynthError> {
@@ -131,7 +130,16 @@ impl Audiobank {
     Ok(reader.spec())
   }
 
+  // TODO: This should be removed. We should cache the wav headers.
+  pub fn get_misc_spec(&self, name: &str) -> Result<WavSpec, SynthError> {
+    try!(check_path(name));
 
+    let path = self.audio_path.join("misc/")
+        .join(format!("{}.wav", name));
+
+    let reader = try!(WavReader::open(path));
+    Ok(reader.spec())
+  }
 }
 
 fn check_path(path: &str) -> Result<(), SynthError> {
