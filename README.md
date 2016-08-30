@@ -113,3 +113,12 @@ Chain OUTPUT (policy ACCEPT)
 target     prot opt source               destination
 ```
 
+### User Creation
+
+1. sudo useradd $NAME
+2. sudo mkdir /home/$NAME
+3. (copy .bashrc, .profile, .bash\_logout to homedir)
+4. (chown homedir to new user)
+5. sudo chsh -s /bin/bash $NAME
+6. sudo passwd $NAME
+
