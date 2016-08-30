@@ -52,11 +52,13 @@ impl Synthesizer {
       });
     }
 
-    // This file adds extra silent padding at both ends.
-    words.insert(0, "_blank".to_string());
-    words.push("_blank".to_string());
-
     let mut concatenated_waveform : Vec<i16> = Vec::new();
+
+    if !self.concatenate_misc(&mut concatenated_waveform, "padding_ends") {
+      return Err(SynthError::BadInput {
+        description: "Cannot prefix with padding."
+      });
+    }
 
     // FIXME: Flight of the seagulls here.
     for word in words.iter() {
@@ -69,6 +71,12 @@ impl Synthesizer {
       if !word_added && use_phonemes {
         word_added = self.concatenate_polyphone(&mut concatenated_waveform, speaker, word);
       }
+    }
+
+    if !self.concatenate_misc(&mut concatenated_waveform, "padding_ends") {
+      return Err(SynthError::BadInput {
+        description: "Cannot suffix with padding."
+      });
     }
 
     // Adjust the volume of the waveform.
@@ -111,6 +119,7 @@ impl Synthesizer {
     let polyphone = match self.arpabet_dictionary.get_polyphone(word) {
       Some(p) => { p },
       None => {
+        info!("Word '{}' does not exist in polyphone database.", word);
         // XXX: Adding static as a cue to denote that the given
         // word->polyphone mapping doesn't exist in the database.
         match self.audiobank.get_misc("record_static") {
@@ -157,6 +166,19 @@ impl Synthesizer {
     }
 
     true
+  }
+
+  /// Concatenate a sound effect to the waveform we're building. Returns
+  /// whether or not the effect was successfully found and concatenated.
+  fn concatenate_misc(&self, concatenated_waveform: &mut Vec<i16>,
+                      misc_name: &str) -> bool {
+    match self.audiobank.get_misc(misc_name) {
+      None => { false },
+      Some(pause) => {
+        concatenated_waveform.extend(pause);
+        true
+      },
+    }
   }
 
   /// Write out final wave data.
