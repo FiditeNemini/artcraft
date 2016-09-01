@@ -16,6 +16,7 @@
     var sentence = Url.getSentence(),
         speaker = Url.getSpeaker() || Library.getDefaultSpeaker(),
         volume = Url.getVolume() || Volume.DEFAULT,
+        speed = Url.getSpeed() || 1.0,
         urlPreviousState = false;
 
     if (speaker) {
@@ -28,6 +29,7 @@
     }
 
     $('input#vol').val(volume);
+    $('input#speed').val(speed);
 
     $('#use_phonemes').prop('use_phonemes', Url.getUsePhonemes());
     $('#use_words').prop('use_words', Url.getUseWords());

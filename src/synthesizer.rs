@@ -2,10 +2,11 @@
 
 use arpabet::ArpabetDictionary;
 use audiobank::Audiobank;
+use effects::speed::change_speed;
+use effects::volume::change_volume;
 use error::SynthError;
 use hound::WavSpec;
 use hound::WavWriter;
-use std::i16;
 use std::io::BufWriter;
 use std::io::Cursor;
 use words::split_sentence;
@@ -42,7 +43,8 @@ impl Synthesizer {
    */
   pub fn generate(&self, sentence: &str, speaker: &str,
                   use_words: bool, use_phonemes: bool,
-                  volume: Option<f32>) -> Result<WavBytes, SynthError> {
+                  volume: Option<f32>, speed: Option<f32>)
+                      -> Result<WavBytes, SynthError> {
 
     let mut words = split_sentence(sentence);
 
@@ -79,18 +81,19 @@ impl Synthesizer {
       });
     }
 
-    // Adjust the volume of the waveform.
-    // FIXME: Super inefficient.
-    let mut pcm_data : Vec<i16> = Vec::with_capacity(concatenated_waveform.len());
-    for x in &concatenated_waveform {
-      let data = raise_volume(*x, volume);
-      pcm_data.push(data);
+    // FIXME: Super inefficient pieces.
+    if speed.is_some() {
+      concatenated_waveform = change_speed(concatenated_waveform, speed.unwrap());
+    }
+
+    if volume.is_some() {
+      concatenated_waveform = change_volume(concatenated_waveform, volume.unwrap());
     }
 
     // TODO: Cache waveform headers.
     let spec = try!(self.audiobank.get_misc_spec("pause"));
 
-    Ok(self.write_buffer(&spec, pcm_data))
+    Ok(self.write_buffer(&spec, concatenated_waveform))
   }
 
   /// Concatenate a word to the waveform we're building. Returns
@@ -199,28 +202,6 @@ impl Synthesizer {
       Err(_) => { Vec::new() }, // TODO: Error
       Ok(r) => { r.get_ref().to_vec() },
     }
-  }
-}
-
-/// Raise the volume of a sample by changing its amplitude.
-fn raise_volume(data: i16, volume: Option<f32>) -> i16 {
-  // TODO: Cleanup, make more efficient.
-  match volume {
-    None => data,
-    Some(vol) => {
-      let f : f32 = data as f32 * vol;
-      let g = f as i32;
-
-      let h : i16 = if g > i16::MAX as i32 {
-        i16::MAX
-      } else if g < i16::MIN as i32 {
-        i16::MIN
-      } else {
-        g as i16
-      };
-
-      h
-    },
   }
 }
 

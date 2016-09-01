@@ -18,6 +18,7 @@ pub mod arpabet;
 pub mod audiobank;
 pub mod config;
 pub mod dictionary;
+pub mod effects;
 pub mod error;
 pub mod handlers;
 pub mod logger;

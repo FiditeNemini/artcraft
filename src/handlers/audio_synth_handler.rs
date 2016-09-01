@@ -33,11 +33,13 @@ use words::split_sentence;
 
 const SENTENCE_PARAM : &'static str = "s";
 const SPEAKER_PARAM : &'static str = "v";
+const SPEED_PARAM : &'static str = "spd";
 const USE_PHONEMES_PARAM: &'static str = "up";
 const USE_WORDS_PARAM: &'static str = "uw";
 const VOLUME_PARAM : &'static str = "vol";
 
 /// Represents a request to this endpoint.
+#[derive(Debug)]
 struct SpeakRequest {
   /** The sentence to be spoken. */
   pub sentence: String,
@@ -47,6 +49,9 @@ struct SpeakRequest {
 
   /** An optional volume multiplier. */
   pub volume: Option<f32>,
+
+  /** An optional speed multiplier. */
+  pub speed: Option<f32>,
 
   /** Whether to use phonemes. */
   pub use_phonemes: bool,
@@ -122,6 +127,28 @@ impl SpeakRequest {
           },
         };
 
+        let speed : Option<f32> = match map.get(SPEED_PARAM) {
+          None => { None },
+          Some(list) => {
+            match list.get(0) {
+              None => { None },
+              Some(s) => {
+                match s.trim().parse::<f32>() {
+                  Err(_) => None,
+                  Ok(i) => {
+                    let diff = i - 1.0;
+                    if diff < 0.005 && diff > -0.005 {
+                      None // Don't waste CPU calculating.
+                    } else {
+                      Some(i)
+                    }
+                  }
+                }
+              },
+            }
+          },
+        };
+
         let use_phonemes = match map.get(USE_PHONEMES_PARAM) {
           None => { true },
           Some(list) => {
@@ -156,6 +183,7 @@ impl SpeakRequest {
           sentence: sen,
           speaker: spk,
           volume: volume,
+          speed: speed,
           use_phonemes: use_phonemes,
           use_words: use_words,
         })
@@ -192,6 +220,7 @@ impl Handler for AudioSynthHandler {
     };
 
     info!("Speak Request ({}): {}.", request.speaker, request.sentence);
+    info!("Request: {:?}", request);
 
     // FIXME: Varies with spaces, formatting, etc.
     let hash = self.sha_digest(&request);
@@ -209,7 +238,7 @@ impl Handler for AudioSynthHandler {
 
     let result = self.create_audio(&request.speaker, &request.sentence,
                                    request.use_words, request.use_phonemes,
-                                   request.volume);
+                                   request.volume, request.speed);
 
     let mime_type = "audio/wav".parse::<Mime>().unwrap();
 
@@ -233,11 +262,14 @@ impl AudioSynthHandler {
   // TODO: Return errors.
   /// Create audio from the sentence.
   fn create_audio(&self, speaker: &str, sentence: &str, use_words: bool,
-                  use_phonemes: bool, volume: Option<f32>) -> Vec<u8> {
+                  use_phonemes: bool, volume: Option<f32>,
+                  speed: Option<f32>) -> Vec<u8> {
     match self.synthesizer.read() {
       Err(_) => Vec::new(), // TODO Actual error.
       Ok(synth) => {
-        match synth.generate(sentence, speaker, use_words, use_phonemes, volume) {
+        let generated = synth.generate(sentence, speaker, use_words,
+                                       use_phonemes, volume, speed);
+        match generated {
           Err(e) => {
             println!("Error synthesizing: {:?}", e);
             Vec::new() // TODO FIXME

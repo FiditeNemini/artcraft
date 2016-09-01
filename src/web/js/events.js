@@ -39,16 +39,18 @@
           sentence = $('#text').val(),
           speaker = $('select').val(),
           volume = $('input#vol').val(),
+          speed = $('input#speed').val(),
           query = encodeURIComponent(sentence),
           url = '/speak?v=' + speaker
               + '&s=' + query
               + '&vol=' + volume
+              + '&spd=' + speed
               + '&up=' + $('#use_phonemes').prop('checked')
               + '&uw=' + $('#use_words').prop('checked');
 
       ev.preventDefault();
 
-      Url.setState(speaker, sentence, volume);
+      Url.setState(speaker, sentence, volume, speed);
       Sound.play(url);
 
       return false;

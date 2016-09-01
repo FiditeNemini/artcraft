@@ -13,6 +13,9 @@
     /** JSON key for the `volume` param. */
     _VOLUME_KEY: 'vol',
 
+    /** JSON key for the `speed` param. */
+    _SPEED_KEY: 'spd',
+
     /** JSON key for the `use_phonemes` param. */
     _USE_PHONEMES_KEY: 'up',
 
@@ -51,6 +54,16 @@
       }
     },
 
+    /** Get the speed from the `window.location`. */
+    getSpeed: function() {
+      var state = this.parseState(window.location);
+      if (!state || !(this._SPEED_KEY in state)) {
+        return null;
+      } else {
+        return state[this._SPEED_KEY];
+      }
+    },
+
     /** Get the "use phonemes" from the `window.location`. */
     getUsePhonemes: function() {
       var state = this.parseState(window.location);
@@ -73,14 +86,14 @@
 
     // TODO: Independent functions to set both speaker and sentence separately.
     /** Set the `window.history` speaker, sentence, phoneme use, and word use. */
-    setState: function(speaker, rawSentence, volume, usePhonemes, useWords) {
-      var urlHash = this.fromParams(speaker, rawSentence, volume, usePhonemes, useWords);
+    setState: function(speaker, rawSentence, volume, speed, usePhonemes, useWords) {
+      var urlHash = this.fromParams(speaker, rawSentence, volume, speed, usePhonemes, useWords);
       console.log('set state, urlhash = ', urlHash);
       window.history.replaceState(null, null, urlHash);
     },
 
     /** Encode a speaker and sentence in a URL hash. */
-    fromParams: function(speaker, rawSentence, volume, usePhonemes, useWords) {
+    fromParams: function(speaker, rawSentence, volume, speed, usePhonemes, useWords) {
       var cleanedSentence = SentenceHelper.cleanSentence(rawSentence),
           cleanedSpeaker = speaker, // TODO: Check against speakers.
           cleanedVolume = volume, // TODO: Filter invalid values.
@@ -91,6 +104,7 @@
       state[this._SPEAKER_KEY] = cleanedSpeaker;
       state[this._SENTENCE_KEY] = cleanedSentence;
       state[this._VOLUME_KEY] = cleanedVolume;
+      state[this._SPEED_KEY] = speed; // TODO: Filter invalid values.
       state[this._USE_PHONEMES_KEY] = !!usePhonemes;
       state[this._USE_WORDS_KEY] = !!useWords;
 
