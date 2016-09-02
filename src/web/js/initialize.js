@@ -17,10 +17,15 @@
         speaker = Url.getSpeaker() || Library.getDefaultSpeaker(),
         volume = Url.getVolume() || Volume.DEFAULT,
         speed = Url.getSpeed() || 1.0,
+        usePhonemes = Url.getUsePhonemes(),
+        useWords = Url.getUseWords(),
         mps = Url.getMonophonePaddingStart() || 0,
         mpe = Url.getMonophonePaddingEnd() || 0,
         ppe = Url.getPolyphonePaddingEnd() || 600,
         urlPreviousState = false;
+
+    if (usePhonemes === null) usePhonemes = true;
+    if (useWords === null) useWords = true;
 
     if (speaker) {
       $('select').val(speaker); // TODO: whitelist
@@ -38,8 +43,8 @@
     console.log('pho', Url.getUsePhonemes());
     console.log('words', Url.getUseWords());
 
-    $('#use_phonemes').prop('checked', Url.getUsePhonemes());
-    $('#use_words').prop('checked', Url.getUseWords());
+    $('#use_phonemes').prop('checked', usePhonemes);
+    $('#use_words').prop('checked', useWords);
 
     $('input#monophone_padding_start').val(mps);
     $('input#monophone_padding_end').val(mpe);
