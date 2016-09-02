@@ -35,8 +35,11 @@
     $('input#speed').val(speed);
     $('input#vol').val(volume);
 
-    $('#use_phonemes').prop('use_phonemes', Url.getUsePhonemes());
-    $('#use_words').prop('use_words', Url.getUseWords());
+    console.log('pho', Url.getUsePhonemes());
+    console.log('words', Url.getUseWords());
+
+    $('#use_phonemes').prop('checked', Url.getUsePhonemes());
+    $('#use_words').prop('checked', Url.getUseWords());
 
     $('input#monophone_padding_start').val(mps);
     $('input#monophone_padding_end').val(mpe);

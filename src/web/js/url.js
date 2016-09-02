@@ -162,9 +162,9 @@
       state[this._SPEED_KEY] = speed; // TODO: Filter invalid values.
       state[this._USE_PHONEMES_KEY] = !!usePhonemes;
       state[this._USE_WORDS_KEY] = !!useWords;
-      state[this._MONOPHONE_PADDING_START] = monophonePaddingStart;
-      state[this._MONOPHONE_PADDING_END] = monophonePaddingEnd;
-      state[this._POLYPHONE_PADDING_END] = polyphonePaddingEnd;
+      state[this._MONOPHONE_PADDING_START_KEY] = monophonePaddingStart;
+      state[this._MONOPHONE_PADDING_END_KEY] = monophonePaddingEnd;
+      state[this._POLYPHONE_PADDING_END_KEY] = polyphonePaddingEnd;
 
       json = JSON.stringify(state);
 
