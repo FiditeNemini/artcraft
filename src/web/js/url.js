@@ -22,6 +22,10 @@
     /** JSON key for the `use_words` param. */
     _USE_WORDS_KEY: 'uw',
 
+    _MONOPHONE_PADDING_START_KEY: 'mps',
+    _MONOPHONE_PADDING_END_KEY: 'mpe',
+    _POLYPHONE_PADDING_END_KEY: 'ppe',
+
     /** Get the sentence from the `window.location`. */
     getSentence: function() {
       var state = this.parseState(window.location),
@@ -84,16 +88,67 @@
       }
     },
 
+    /** Get the MPS value from the `window.location`. */
+    getMonophonePaddingStart: function() {
+      var state = this.parseState(window.location);
+      if (!state || !(this._MONOPHONE_PADDING_START_KEY in state)) {
+        return null;
+      } else {
+        return state[this._MONOPHONE_PADDING_START_KEY];
+      }
+    },
+
+    /** Get the MPE value from the `window.location`. */
+    getMonophonePaddingEnd: function() {
+      var state = this.parseState(window.location);
+      if (!state || !(this._MONOPHONE_PADDING_END_KEY in state)) {
+        return null;
+      } else {
+        return state[this._MONOPHONE_PADDING_END_KEY];
+      }
+    },
+
+    /** Get the PPE value from the `window.location`. */
+    getPolyphonePaddingEnd: function() {
+      var state = this.parseState(window.location);
+      if (!state || !(this._POLYPHONE_PADDING_END_KEY in state)) {
+        return null;
+      } else {
+        return state[this._POLYPHONE_PADDING_END_KEY];
+      }
+    },
+
     // TODO: Independent functions to set both speaker and sentence separately.
     /** Set the `window.history` speaker, sentence, phoneme use, and word use. */
-    setState: function(speaker, rawSentence, volume, speed, usePhonemes, useWords) {
-      var urlHash = this.fromParams(speaker, rawSentence, volume, speed, usePhonemes, useWords);
+    setState: function(speaker,
+                       rawSentence,
+                       volume,
+                       speed,
+                       usePhonemes,
+                       useWords,
+                       monophonePaddingStart,
+                       monophonePaddingEnd,
+                       polyphonePaddingEnd) {
+
+      var urlHash = this.fromParams(speaker, rawSentence, volume, speed,
+          usePhonemes, useWords, monophonePaddingStart, monophonePaddingEnd,
+          polyphonePaddingEnd);
+
       console.log('set state, urlhash = ', urlHash);
       window.history.replaceState(null, null, urlHash);
     },
 
     /** Encode a speaker and sentence in a URL hash. */
-    fromParams: function(speaker, rawSentence, volume, speed, usePhonemes, useWords) {
+    fromParams: function(speaker,
+                         rawSentence,
+                         volume,
+                         speed,
+                         usePhonemes,
+                         useWords,
+                         monophonePaddingStart,
+                         monophonePaddingEnd,
+                         polyphonePaddingEnd) {
+
       var cleanedSentence = SentenceHelper.cleanSentence(rawSentence),
           cleanedSpeaker = speaker, // TODO: Check against speakers.
           cleanedVolume = volume, // TODO: Filter invalid values.
@@ -107,6 +162,9 @@
       state[this._SPEED_KEY] = speed; // TODO: Filter invalid values.
       state[this._USE_PHONEMES_KEY] = !!usePhonemes;
       state[this._USE_WORDS_KEY] = !!useWords;
+      state[this._MONOPHONE_PADDING_START] = monophonePaddingStart;
+      state[this._MONOPHONE_PADDING_END] = monophonePaddingEnd;
+      state[this._POLYPHONE_PADDING_END] = polyphonePaddingEnd;
 
       json = JSON.stringify(state);
 

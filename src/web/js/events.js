@@ -40,17 +40,23 @@
           speaker = $('select').val(),
           volume = $('input#vol').val(),
           speed = $('input#speed').val(),
+          mps = $('input#monophone_padding_start').val(),
+          mpe = $('input#monophone_padding_end').val(),
+          ppe = $('input#polyphone_padding_end').val(),
           query = encodeURIComponent(sentence),
           url = '/speak?v=' + speaker
               + '&s=' + query
               + '&vol=' + volume
               + '&spd=' + speed
+              + '&mps=' + mps
+              + '&mpe=' + mpe
+              + '&ppe=' + ppe
               + '&up=' + $('#use_phonemes').prop('checked')
               + '&uw=' + $('#use_words').prop('checked');
 
       ev.preventDefault();
 
-      Url.setState(speaker, sentence, volume, speed);
+      Url.setState(speaker, sentence, volume, speed, mps, mpe, ppe);
       Sound.play(url);
 
       return false;

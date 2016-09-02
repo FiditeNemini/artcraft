@@ -17,6 +17,9 @@
         speaker = Url.getSpeaker() || Library.getDefaultSpeaker(),
         volume = Url.getVolume() || Volume.DEFAULT,
         speed = Url.getSpeed() || 1.0,
+        mps = Url.getMonophonePaddingStart() || 0,
+        mpe = Url.getMonophonePaddingEnd() || 0,
+        ppe = Url.getPolyphonePaddingEnd() || 600,
         urlPreviousState = false;
 
     if (speaker) {
@@ -28,11 +31,16 @@
       urlPreviousState = true;
     }
 
-    $('input#vol').val(volume);
+    speed = parseFloat(speed).toFixed(2);
     $('input#speed').val(speed);
+    $('input#vol').val(volume);
 
     $('#use_phonemes').prop('use_phonemes', Url.getUsePhonemes());
     $('#use_words').prop('use_words', Url.getUseWords());
+
+    $('input#monophone_padding_start').val(mps);
+    $('input#monophone_padding_end').val(mpe);
+    $('input#polyphone_padding_end').val(ppe);
 
     Library.load(function(library) { Ui.libraryLoadCallback(library); });
     Sound.install();

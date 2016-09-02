@@ -37,9 +37,12 @@ const SPEED_PARAM : &'static str = "spd";
 const USE_PHONEMES_PARAM: &'static str = "up";
 const USE_WORDS_PARAM: &'static str = "uw";
 const VOLUME_PARAM : &'static str = "vol";
+const MONOPHONE_PADDING_START_PARAM : &'static str = "mps";
+const MONOPHONE_PADDING_END_PARAM : &'static str = "mpe";
+const POLYPHONE_PADDING_END_PARAM : &'static str = "ppe";
 
 /// Represents a request to this endpoint.
-#[derive(Debug)]
+#[derive(Clone, Debug)]
 struct SpeakRequest {
   /** The sentence to be spoken. */
   pub sentence: String,
@@ -58,6 +61,15 @@ struct SpeakRequest {
 
   /** Whether to use words. */
   pub use_words: bool,
+
+  /** Padding before a monophone. */
+  pub monophone_padding_start: Option<u16>,
+
+  /** Padding after a monophone. */
+  pub monophone_padding_end: Option<u16>,
+
+  /** Padding after a polyphone. */
+  pub polyphone_padding_end: Option<u16>,
 }
 
 enum SpeakerRequestError {
@@ -82,13 +94,14 @@ pub struct AudioSynthHandler {
 }
 
 impl SpeakRequest {
-  pub fn parse(http_request: &mut Request) -> Result<SpeakRequest, SpeakerRequestError> {
+  pub fn parse(http_request: &mut Request)
+      -> Result<SpeakRequest, SpeakerRequestError> {
 
     let sentence_error = Err(SpeakerRequestError::SentenceInvalid);
     let speaker_error = Err(SpeakerRequestError::SpeakerInvalid);
 
     // Get the request sentence and speaker.
-    // TODO: Cleanup
+    // TODO: OMFG WTF CLEANUP THIS GARBAGE.
     match http_request.get_ref::<UrlEncodedQuery>() {
       Err(_) => { return sentence_error; },
       Ok(ref map) => {
@@ -179,6 +192,69 @@ impl SpeakRequest {
           },
         };
 
+        let mps : Option<u16> = match map.get(MONOPHONE_PADDING_START_PARAM) {
+          None => { None },
+          Some(list) => {
+            match list.get(0) {
+              None => { None },
+              Some(s) => {
+                match s.trim().parse::<u16>() {
+                  Err(_) => None,
+                  Ok(i) => {
+                    if i == 0 {
+                      None
+                    } else {
+                      Some(i)
+                    }
+                  }
+                }
+              },
+            }
+          },
+        };
+
+        let mpe : Option<u16> = match map.get(MONOPHONE_PADDING_END_PARAM) {
+          None => { None },
+          Some(list) => {
+            match list.get(0) {
+              None => { None },
+              Some(s) => {
+                match s.trim().parse::<u16>() {
+                  Err(_) => None,
+                  Ok(i) => {
+                    if i == 0 {
+                      None
+                    } else {
+                      Some(i)
+                    }
+                  }
+                }
+              },
+            }
+          },
+        };
+
+        let ppe : Option<u16> = match map.get(POLYPHONE_PADDING_END_PARAM) {
+          None => { None },
+          Some(list) => {
+            match list.get(0) {
+              None => { None },
+              Some(s) => {
+                match s.trim().parse::<u16>() {
+                  Err(_) => None,
+                  Ok(i) => {
+                    if i == 0 {
+                      None
+                    } else {
+                      Some(i)
+                    }
+                  }
+                }
+              },
+            }
+          },
+        };
+
         Ok(SpeakRequest {
           sentence: sen,
           speaker: spk,
@@ -186,6 +262,9 @@ impl SpeakRequest {
           speed: speed,
           use_phonemes: use_phonemes,
           use_words: use_words,
+          monophone_padding_start: mps,
+          monophone_padding_end: mpe,
+          polyphone_padding_end: ppe,
         })
       },
     }
@@ -236,9 +315,7 @@ impl Handler for AudioSynthHandler {
       }
     }
 
-    let result = self.create_audio(&request.speaker, &request.sentence,
-                                   request.use_words, request.use_phonemes,
-                                   request.volume, request.speed);
+    let result = self.create_audio(request);
 
     let mime_type = "audio/wav".parse::<Mime>().unwrap();
 
@@ -261,14 +338,19 @@ impl AudioSynthHandler {
 
   // TODO: Return errors.
   /// Create audio from the sentence.
-  fn create_audio(&self, speaker: &str, sentence: &str, use_words: bool,
-                  use_phonemes: bool, volume: Option<f32>,
-                  speed: Option<f32>) -> Vec<u8> {
+  fn create_audio(&self, request: SpeakRequest) -> Vec<u8> {
     match self.synthesizer.read() {
       Err(_) => Vec::new(), // TODO Actual error.
       Ok(synth) => {
-        let generated = synth.generate(sentence, speaker, use_words,
-                                       use_phonemes, volume, speed);
+        let generated = synth.generate(&request.sentence,
+                                       &request.speaker,
+                                       request.use_words,
+                                       request.use_phonemes,
+                                       request.volume,
+                                       request.speed,
+                                       request.monophone_padding_start,
+                                       request.monophone_padding_end,
+                                       request.polyphone_padding_end);
         match generated {
           Err(e) => {
             println!("Error synthesizing: {:?}", e);

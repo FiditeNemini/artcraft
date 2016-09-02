@@ -2,6 +2,7 @@
 
 use arpabet::ArpabetDictionary;
 use audiobank::Audiobank;
+use effects::pause::generate_pause;
 use effects::speed::change_speed;
 use effects::volume::change_volume;
 use error::SynthError;
@@ -41,10 +42,17 @@ impl Synthesizer {
   /**
    * Generate a spoken wav from text input.
    */
-  pub fn generate(&self, sentence: &str, speaker: &str,
-                  use_words: bool, use_phonemes: bool,
-                  volume: Option<f32>, speed: Option<f32>)
-                      -> Result<WavBytes, SynthError> {
+  pub fn generate(&self,
+                  sentence: &str,
+                  speaker: &str,
+                  use_words: bool,
+                  use_phonemes: bool,
+                  volume: Option<f32>,
+                  speed: Option<f32>,
+                  monophone_padding_start: Option<u16>,
+                  monophone_padding_end: Option<u16>,
+                  polyphone_padding_end: Option<u16>)
+      -> Result<WavBytes, SynthError> {
 
     let mut words = split_sentence(sentence);
 
@@ -71,7 +79,12 @@ impl Synthesizer {
       }
 
       if !word_added && use_phonemes {
-        word_added = self.concatenate_polyphone(&mut concatenated_waveform, speaker, word);
+        word_added = self.concatenate_polyphone(&mut concatenated_waveform,
+                                                speaker,
+                                                word,
+                                                monophone_padding_start,
+                                                monophone_padding_end,
+                                                polyphone_padding_end);
       }
     }
 
@@ -115,9 +128,13 @@ impl Synthesizer {
   /// Concatenate a polyphone corresponding to the word to the
   /// waveform we're building. Returns whether or not the word was
   /// successfully found and concatenated.
-  fn concatenate_polyphone(&self, concatenated_waveform: &mut Vec<i16>,
-                           speaker: &str, word: &str) -> bool {
-
+  fn concatenate_polyphone(&self,
+                           concatenated_waveform: &mut Vec<i16>,
+                           speaker: &str,
+                           word: &str,
+                           monophone_padding_start: Option<u16>,
+                           monophone_padding_end: Option<u16>,
+                           polyphone_padding_end: Option<u16>) -> bool {
 
     let polyphone = match self.arpabet_dictionary.get_polyphone(word) {
       Some(p) => { p },
@@ -157,15 +174,25 @@ impl Synthesizer {
           continue;
         },
         Some(waveform_data) => {
+          if monophone_padding_start.is_some() {
+            let pause = generate_pause(monophone_padding_start.unwrap());
+            concatenated_waveform.extend(pause);
+          }
+
           concatenated_waveform.extend(waveform_data);
+
+          if monophone_padding_end.is_some() {
+            let pause = generate_pause(monophone_padding_end.unwrap());
+            concatenated_waveform.extend(pause);
+          }
         },
       }
     }
 
     // Insert space after polyphone.
-    match self.audiobank.get_misc("pause") {
-      None => {},
-      Some(pause) => { concatenated_waveform.extend(pause); },
+    if polyphone_padding_end.is_some() {
+      let pause = generate_pause(polyphone_padding_end.unwrap());
+      concatenated_waveform.extend(pause);
     }
 
     true
