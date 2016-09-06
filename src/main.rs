@@ -110,7 +110,7 @@ fn start_server(config: &Config, port: u16, synthesizer: Synthesizer) {
 
 fn get_hostname() {
   match hostname::get_hostname() {
-    Ok(s) => { println!("Hostname: {}", s); },
+    Ok(s) => { info!("Hostname: {}", s); },
     Err(_) => {},
   };
 }

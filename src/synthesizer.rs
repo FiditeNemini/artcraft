@@ -32,7 +32,8 @@ pub struct Synthesizer {
 
 impl Synthesizer {
   /// CTOR
-  pub fn new(arpabet_dictionary: ArpabetDictionary, audiobank: Audiobank) -> Synthesizer {
+  pub fn new(arpabet_dictionary: ArpabetDictionary, audiobank: Audiobank)
+      -> Synthesizer {
     Synthesizer {
       arpabet_dictionary: arpabet_dictionary,
       audiobank: audiobank,
@@ -160,8 +161,24 @@ impl Synthesizer {
       Some(pause) => { concatenated_waveform.extend(pause); },
     }
 
+    let mut i = 0;
+    let end = polyphone.len() - 1;
+
     for phoneme in polyphone {
-      match self.audiobank.get_phoneme(speaker, &phoneme) {
+      let mut read_results = None;
+      if i == 0 {
+        read_results = self.audiobank.get_begin_phoneme(speaker, &phoneme);
+      } else if i == end {
+        read_results = self.audiobank.get_end_phoneme(speaker, &phoneme);
+      }
+
+      i += 1;
+
+      if read_results.is_none() {
+        read_results = self.audiobank.get_phoneme(speaker, &phoneme);
+      }
+
+      match read_results {
         None => {
           // XXX: Adding beep to denote that the given monophone
           // doesn't exist in the database.
