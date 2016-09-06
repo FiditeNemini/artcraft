@@ -18,6 +18,7 @@
         volume = Url.getVolume() || Volume.DEFAULT,
         speed = Url.getSpeed() || 1.0,
         usePhonemes = Url.getUsePhonemes(),
+        useDiphones = Url.getUseDiphones(),
         useWords = Url.getUseWords(),
         mps = Url.getMonophonePaddingStart() || 0,
         mpe = Url.getMonophonePaddingEnd() || 0,
@@ -25,6 +26,7 @@
         urlPreviousState = false;
 
     if (usePhonemes === null) usePhonemes = true;
+    if (useDiphones === null) useDiphones = true;
     if (useWords === null) useWords = true;
 
     if (speaker) {
@@ -40,10 +42,8 @@
     $('input#speed').val(speed);
     $('input#vol').val(volume);
 
-    console.log('pho', Url.getUsePhonemes());
-    console.log('words', Url.getUseWords());
-
     $('#use_phonemes').prop('checked', usePhonemes);
+    $('#use_diphones').prop('checked', useDiphones);
     $('#use_words').prop('checked', useWords);
 
     $('input#monophone_padding_start').val(mps);

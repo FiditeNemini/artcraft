@@ -41,6 +41,7 @@
           volume = $('input#vol').val(),
           speed = $('input#speed').val(),
           up = $('#use_phonemes').prop('checked'),
+          ud = $('#use_diphones').prop('checked'),
           uw = $('#use_words').prop('checked'),
           mps = $('input#monophone_padding_start').val(),
           mpe = $('input#monophone_padding_end').val(),
@@ -54,11 +55,22 @@
               + '&mpe=' + mpe
               + '&ppe=' + ppe
               + '&up=' + up
+              + '&ud=' + ud
               + '&uw=' + uw;
 
       ev.preventDefault();
 
-      Url.setState(speaker, sentence, volume, speed, up, uw, mps, mpe, ppe);
+      Url.setState(speaker,
+                   sentence,
+                   volume,
+                   speed,
+                   up,
+                   ud,
+                   uw,
+                   mps,
+                   mpe,
+                   ppe);
+
       Sound.play(url);
 
       return false;

@@ -48,6 +48,7 @@ impl Synthesizer {
                   speaker: &str,
                   use_words: bool,
                   use_phonemes: bool,
+                  use_diphones: bool,
                   volume: Option<f32>,
                   speed: Option<f32>,
                   monophone_padding_start: Option<u16>,
@@ -83,6 +84,7 @@ impl Synthesizer {
         word_added = self.concatenate_polyphone(&mut concatenated_waveform,
                                                 speaker,
                                                 word,
+                                                use_diphones,
                                                 monophone_padding_start,
                                                 monophone_padding_end,
                                                 polyphone_padding_end);
@@ -133,6 +135,7 @@ impl Synthesizer {
                            concatenated_waveform: &mut Vec<i16>,
                            speaker: &str,
                            word: &str,
+                           use_diphones: bool,
                            monophone_padding_start: Option<u16>,
                            monophone_padding_end: Option<u16>,
                            polyphone_padding_end: Option<u16>) -> bool {
@@ -174,7 +177,7 @@ impl Synthesizer {
       let phoneme = &polyphone[i];
 
       // Attempt to read a diphone.
-      if i < end {
+      if use_diphones && i < end {
         let first = phoneme;
         let second = &polyphone[i+1];
         match self.audiobank.get_diphone(speaker, first, second) {

@@ -19,6 +19,9 @@
     /** JSON key for the `use_phonemes` param. */
     _USE_PHONEMES_KEY: 'up',
 
+    /** JSON key for the `use_diphones` param. */
+    _USE_DIPHONES_KEY: 'ud',
+
     /** JSON key for the `use_words` param. */
     _USE_WORDS_KEY: 'uw',
 
@@ -78,6 +81,16 @@
       }
     },
 
+    /** Get the "use diphones" from the `window.location`. */
+    getUseDiphones: function() {
+      var state = this.parseState(window.location);
+      if (!state || !(this._USE_DIPHONES_KEY in state)) {
+        return null;
+      } else {
+        return state[this._USE_DIPHONES_KEY];
+      }
+    },
+
     /** Get the "use words" from the `window.location`. */
     getUseWords: function() {
       var state = this.parseState(window.location);
@@ -125,14 +138,22 @@
                        volume,
                        speed,
                        usePhonemes,
+                       useDiphones,
                        useWords,
                        monophonePaddingStart,
                        monophonePaddingEnd,
                        polyphonePaddingEnd) {
 
-      var urlHash = this.fromParams(speaker, rawSentence, volume, speed,
-          usePhonemes, useWords, monophonePaddingStart, monophonePaddingEnd,
-          polyphonePaddingEnd);
+      var urlHash = this.fromParams(speaker,
+                                    rawSentence,
+                                    volume,
+                                    speed,
+                                    usePhonemes,
+                                    useDiphones,
+                                    useWords,
+                                    monophonePaddingStart,
+                                    monophonePaddingEnd,
+                                    polyphonePaddingEnd);
 
       console.log('set state, urlhash = ', urlHash);
       window.history.replaceState(null, null, urlHash);
@@ -144,6 +165,7 @@
                          volume,
                          speed,
                          usePhonemes,
+                         useDiphones,
                          useWords,
                          monophonePaddingStart,
                          monophonePaddingEnd,
@@ -161,6 +183,7 @@
       state[this._VOLUME_KEY] = cleanedVolume;
       state[this._SPEED_KEY] = speed; // TODO: Filter invalid values.
       state[this._USE_PHONEMES_KEY] = !!usePhonemes;
+      state[this._USE_DIPHONES_KEY] = !!useDiphones;
       state[this._USE_WORDS_KEY] = !!useWords;
       state[this._MONOPHONE_PADDING_START_KEY] = monophonePaddingStart;
       state[this._MONOPHONE_PADDING_END_KEY] = monophonePaddingEnd;

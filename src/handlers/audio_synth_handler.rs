@@ -35,6 +35,7 @@ const SENTENCE_PARAM : &'static str = "s";
 const SPEAKER_PARAM : &'static str = "v";
 const SPEED_PARAM : &'static str = "spd";
 const USE_PHONEMES_PARAM: &'static str = "up";
+const USE_DIPHONES_PARAM: &'static str = "ud";
 const USE_WORDS_PARAM: &'static str = "uw";
 const VOLUME_PARAM : &'static str = "vol";
 const MONOPHONE_PADDING_START_PARAM : &'static str = "mps";
@@ -58,6 +59,9 @@ struct SpeakRequest {
 
   /** Whether to use phonemes. */
   pub use_phonemes: bool,
+
+  /** Whether to use diphones. */
+  pub use_diphones: bool,
 
   /** Whether to use words. */
   pub use_words: bool,
@@ -177,6 +181,21 @@ impl SpeakRequest {
           },
         };
 
+        let use_diphones = match map.get(USE_DIPHONES_PARAM) {
+          None => { true },
+          Some(list) => {
+            match list.get(0) {
+              None => { return speaker_error; },
+              Some(s) => {
+                match FromStr::from_str(s) {
+                  Ok(b) => b,
+                  Err(_) => { return speaker_error; },
+                }
+              },
+            }
+          },
+        };
+
         let use_words = match map.get(USE_WORDS_PARAM) {
           None => { true },
           Some(list) => {
@@ -261,6 +280,7 @@ impl SpeakRequest {
           volume: volume,
           speed: speed,
           use_phonemes: use_phonemes,
+          use_diphones: use_diphones,
           use_words: use_words,
           monophone_padding_start: mps,
           monophone_padding_end: mpe,
@@ -346,6 +366,7 @@ impl AudioSynthHandler {
                                        &request.speaker,
                                        request.use_words,
                                        request.use_phonemes,
+                                       request.use_diphones,
                                        request.volume,
                                        request.speed,
                                        request.monophone_padding_start,
@@ -383,7 +404,8 @@ impl AudioSynthHandler {
 
     let mut use_byte = 0u8;
     if request.use_phonemes { use_byte |= (1 << 1); }
-    if request.use_words { use_byte |= (1 << 2); }
+    if request.use_diphones { use_byte |= (1 << 2); }
+    if request.use_words { use_byte |= (1 << 3); }
 
     println!("Use byte: {}", use_byte);
 
