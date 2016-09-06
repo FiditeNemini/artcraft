@@ -24,6 +24,12 @@ use std::path::PathBuf;
  *           /IY0.wav
  *         /IY0.wav
  *         /IY1.wav
+ *       /_diphones
+ *         /_begin
+ *           /F_R.wav
+ *         /_end
+ *           /IH0_NG.wav
+ *         /AW1_N.wav
  *
  * TODO: Caching of wav files in memory.
  * TODO: Path generation is _insecure_.
@@ -146,6 +152,36 @@ impl Audiobank {
 
     Some(all_samples)
   }
+
+  /** Get a diphone in the form "{first}_{second}.wav". */
+  pub fn get_diphone(&self, speaker: &str, first: &str, second: &str)
+      -> Option<Vec<i16>> {
+
+    if check_path(speaker).is_err()
+        || check_path(first).is_err()
+        || check_path(second).is_err() {
+      return None;
+    }
+
+    let path = self.audio_path.join(format!("{}/", speaker))
+        .join("_diphones/")
+        .join(format!("{}_{}.wav", first, second));
+
+    let mut reader = match WavReader::open(path) {
+      Err(_) => { return None; },
+      Ok(reader) => reader,
+    };
+
+    // TODO: Inefficient.
+    let mut all_samples = Vec::new();
+    let samples = reader.samples::<i16>();
+    for sample in samples {
+      all_samples.push(sample.unwrap());
+    }
+
+    Some(all_samples)
+  }
+
 
   /**
    * Get the miscellaneous sound effect file.

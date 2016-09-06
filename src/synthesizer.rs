@@ -161,19 +161,43 @@ impl Synthesizer {
       Some(pause) => { concatenated_waveform.extend(pause); },
     }
 
-    let mut i = 0;
     let end = polyphone.len() - 1;
+    let mut skip_next = false;
 
-    for phoneme in polyphone {
-      let mut read_results = None;
-      if i == 0 {
-        read_results = self.audiobank.get_begin_phoneme(speaker, &phoneme);
-      } else if i == end {
-        read_results = self.audiobank.get_end_phoneme(speaker, &phoneme);
+    for i in 0..polyphone.len() {
+      if skip_next {
+        // We just read a diphone.
+        skip_next = false;
+        continue;
       }
 
-      i += 1;
+      let phoneme = &polyphone[i];
 
+      // Attempt to read a diphone.
+      if i < end {
+        let first = phoneme;
+        let second = &polyphone[i+1];
+        match self.audiobank.get_diphone(speaker, first, second) {
+          None => {},
+          Some(diphone_data) => {
+            info!("Read diphone: {}, {}", first, second);
+            skip_next = true;
+            concatenated_waveform.extend(diphone_data);
+            continue;
+          },
+        }
+      }
+
+      // Attempt to read a "begin" or "end" monophone.
+      let mut read_results = if i == 0 {
+        self.audiobank.get_begin_phoneme(speaker, &phoneme)
+      } else if i == end {
+        self.audiobank.get_end_phoneme(speaker, &phoneme)
+      } else {
+        None
+      };
+
+      // Read a regular monophone.
       if read_results.is_none() {
         read_results = self.audiobank.get_phoneme(speaker, &phoneme);
       }
