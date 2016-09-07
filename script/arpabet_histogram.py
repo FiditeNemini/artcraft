@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# Print a histogram of top monophones, diphones, and triphones.
+# Print a histogram of top monophones, diphones, triphones, and n-phones.
 
 from os import path
 import os
