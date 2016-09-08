@@ -331,8 +331,6 @@ impl Synthesizer {
       }
     }
 
-    info!("4-Fulfilled: {:?}", fulfilled);
-
     // 3-phone
     if polyphone.len() >= 3 {
       let range = polyphone.len() - 2;
@@ -354,8 +352,6 @@ impl Synthesizer {
         }
       }
     }
-
-    info!("3-Fulfilled: {:?}", fulfilled);
 
     // 2-phone
     if polyphone.len() >= 2 {
@@ -380,8 +376,6 @@ impl Synthesizer {
       }
     }
 
-    info!("2-Fulfilled: {:?}", fulfilled);
-
     // 1-phone
     for i in 0..polyphone.len() {
       if fulfilled[i] {
@@ -396,8 +390,6 @@ impl Synthesizer {
         fulfilled[i] = true;
       }
     }
-
-    info!("1-Fulfilled: {:?}", fulfilled);
 
     for x in fulfilled {
       if !x {
