@@ -7,6 +7,8 @@ use hound::WavWriter;
 use std::path::Path;
 use std::path::PathBuf;
 
+pub type SampleBytes = Vec<i16>;
+
 /**
  * Fetch wav audio files from the audio bank.
  *
@@ -17,14 +19,14 @@ use std::path::PathBuf;
  *       /_words
  *         /all.wav
  *         /words.wav
- *       /_phonemes
+ *       /1-phones
  *         /_begin (starting syllable of word)
  *           /IY0.wav
  *         /_end (ending syllable of word)
  *           /IY0.wav
  *         /IY0.wav
  *         /IY1.wav
- *       /_diphones
+ *       /2-phones
  *         /_begin
  *           /F_R.wav
  *         /_end
@@ -50,7 +52,7 @@ impl Audiobank {
   /**
    * Get the wav data for the (speaker,word), or None if it does not exist.
    */
-  pub fn get_word(&self, speaker: &str, word: &str) -> Option<Vec<i16>> {
+  pub fn get_word(&self, speaker: &str, word: &str) -> Option<SampleBytes> {
     if check_path(speaker).is_err() || check_path(word).is_err() {
       return None;
     }
@@ -58,6 +60,66 @@ impl Audiobank {
     let path = self.audio_path.join(format!("{}/", speaker))
         .join("_words/")
         .join(format!("{}.wav", word));
+
+    let mut reader = match WavReader::open(path) {
+      Err(_) => { return None; },
+      Ok(reader) => reader,
+    };
+
+    // TODO: Inefficient.
+    let mut all_samples = Vec::new();
+    let samples = reader.samples::<i16>();
+    for sample in samples {
+      all_samples.push(sample.unwrap());
+    }
+
+    Some(all_samples)
+  }
+
+  /** Get an n-phone in the form "{1st}_{2nd}_{...}_{nth}.wav". */
+  pub fn get_n_phone(&self, speaker: &str, n_phone: &[String])
+      -> Option<SampleBytes> {
+
+    let (directory, filename) = match n_phone.len() {
+      1 => {
+        (
+          "1-phones/",
+          format!("{}.wav", n_phone[0]),
+        )
+      },
+      2 => {
+        (
+          "2-phones/",
+          format!("{}_{}.wav", n_phone[0], n_phone[1]),
+        )
+      },
+      3 => {
+        (
+          "3-phones/",
+          format!("{}_{}_{}.wav", n_phone[0], n_phone[1], n_phone[2]),
+        )
+      },
+      4 => {
+        (
+          "4-phones/",
+          format!("{}_{}_{}_{}.wav",
+                  n_phone[0], n_phone[1], n_phone[2], n_phone[3]),
+        )
+      },
+      _ => {
+        return None; // Don't support more than 4-phones.
+      }
+    };
+
+    // FIXME: This is a lame check.
+    if check_path(speaker).is_err()
+        || check_path(&filename).is_err() {
+      return None;
+    }
+
+    let path = self.audio_path.join(format!("{}/", speaker))
+        .join(directory)
+        .join(filename);
 
     let mut reader = match WavReader::open(path) {
       Err(_) => { return None; },
@@ -83,7 +145,7 @@ impl Audiobank {
     }
 
     let path = self.audio_path.join(format!("{}/", speaker))
-        .join("_phonemes/")
+        .join("1-phones/")
         .join(format!("{}.wav", phoneme));
 
     let mut reader = match WavReader::open(path) {
@@ -109,7 +171,7 @@ impl Audiobank {
     }
 
     let path = self.audio_path.join(format!("{}/", speaker))
-        .join("_phonemes/_begin")
+        .join("1-phones/_begin")
         .join(format!("{}.wav", phoneme));
 
     let mut reader = match WavReader::open(path) {
@@ -135,7 +197,7 @@ impl Audiobank {
     }
 
     let path = self.audio_path.join(format!("{}/", speaker))
-        .join("_phonemes/_end")
+        .join("1-phones/_end")
         .join(format!("{}.wav", phoneme));
 
     let mut reader = match WavReader::open(path) {
@@ -164,7 +226,7 @@ impl Audiobank {
     }
 
     let path = self.audio_path.join(format!("{}/", speaker))
-        .join("_diphones/")
+        .join("2-phones/")
         .join(format!("{}_{}.wav", first, second));
 
     let mut reader = match WavReader::open(path) {

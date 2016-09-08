@@ -19,6 +19,7 @@
         speed = Url.getSpeed() || 1.0,
         usePhonemes = Url.getUsePhonemes(),
         useDiphones = Url.getUseDiphones(),
+        useNPhones = Url.getUseNPhones(),
         useWords = Url.getUseWords(),
         mps = Url.getMonophonePaddingStart() || 0,
         mpe = Url.getMonophonePaddingEnd() || 0,
@@ -27,6 +28,7 @@
 
     if (usePhonemes === null) usePhonemes = true;
     if (useDiphones === null) useDiphones = true;
+    if (useNPhones === null) useNPhones = true;
     if (useWords === null) useWords = true;
 
     if (speaker) {
@@ -44,6 +46,7 @@
 
     $('#use_phonemes').prop('checked', usePhonemes);
     $('#use_diphones').prop('checked', useDiphones);
+    $('#use_n_phones').prop('checked', useNPhones);
     $('#use_words').prop('checked', useWords);
 
     $('input#monophone_padding_start').val(mps);

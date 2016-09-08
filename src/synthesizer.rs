@@ -2,6 +2,7 @@
 
 use arpabet::ArpabetDictionary;
 use audiobank::Audiobank;
+use audiobank::SampleBytes;
 use effects::pause::generate_pause;
 use effects::speed::change_speed;
 use effects::volume::change_volume;
@@ -49,6 +50,7 @@ impl Synthesizer {
                   use_words: bool,
                   use_phonemes: bool,
                   use_diphones: bool,
+                  use_n_phones: bool,
                   volume: Option<f32>,
                   speed: Option<f32>,
                   monophone_padding_start: Option<u16>,
@@ -77,10 +79,20 @@ impl Synthesizer {
       let mut word_added = false;
 
       if use_words {
-        word_added = self.concatenate_word(&mut concatenated_waveform, speaker, word);
+        word_added = self.concatenate_word(&mut concatenated_waveform,
+                                           speaker,
+                                           word);
       }
 
+      if !word_added && use_n_phones {
+        // New phoneme algorithm
+        word_added = self.concatenate_n_phone(&mut concatenated_waveform,
+                                              speaker,
+                                              word,
+                                              polyphone_padding_end);
+      }
       if !word_added && use_phonemes {
+        // Old phoneme algorithm
         word_added = self.concatenate_polyphone(&mut concatenated_waveform,
                                                 speaker,
                                                 word,
@@ -240,6 +252,172 @@ impl Synthesizer {
     }
 
     true
+  }
+
+  // TODO: Doc and test.
+  fn concatenate_n_phone(&self,
+                         concatenated_waveform: &mut Vec<i16>,
+                         speaker: &str,
+                         word: &str,
+                         polyphone_padding_end: Option<u16>) -> bool {
+
+    let samples = match self.get_n_phone_samples(speaker, word) {
+      Some(s) => s,
+      None => {
+        return false;
+      },
+    };
+
+
+    for sample in samples {
+      concatenated_waveform.extend(sample);
+    }
+
+    // Insert space after polyphone.
+    if polyphone_padding_end.is_some() {
+      let pause = generate_pause(polyphone_padding_end.unwrap());
+      concatenated_waveform.extend(pause);
+    }
+
+    true
+  }
+
+
+  // TODO: Make this super easy to test (and write some tests).
+  // TODO: Make this super efficient.
+  fn get_n_phone_samples(&self, speaker: &str, word: &str)
+      -> Option<Vec<SampleBytes>> {
+
+    let polyphone = match self.arpabet_dictionary.get_polyphone(word) {
+      None => {
+        return None;
+      },
+      Some(p) => p,
+    };
+
+    let mut fulfilled : Vec<bool> = Vec::with_capacity(polyphone.len());
+    let mut chunks : Vec<Option<SampleBytes>> =
+        Vec::with_capacity(polyphone.len());
+
+    // Use this to debug the synthesis.
+    let mut debug : Vec<Option<String>> = Vec::with_capacity(polyphone.len());
+
+    for i in 0..polyphone.len() {
+      fulfilled.push(false);
+      chunks.push(None);
+      debug.push(None);
+    }
+
+    // 4-phone
+    if polyphone.len() >= 4 {
+      let range = polyphone.len() - 3;
+      for i in 0..range {
+        if fulfilled[i] {
+          continue;
+        }
+
+        let candidate_n_phone = &polyphone[i..i+4];
+
+        let phone = self.audiobank.get_n_phone(speaker, candidate_n_phone);
+
+        if phone.is_some() {
+          chunks[i] = phone;
+          debug[i] = Some(polyphone[i..i+4].join("_"));
+
+          for j in i..i+4 {
+            fulfilled[j] = true;
+          }
+        }
+      }
+    }
+
+    info!("4-Fulfilled: {:?}", fulfilled);
+
+    // 3-phone
+    if polyphone.len() >= 3 {
+      let range = polyphone.len() - 2;
+      for i in 0..range {
+        if fulfilled[i] {
+          continue;
+        }
+
+        let candidate_n_phone = &polyphone[i..i+3];
+
+        let phone = self.audiobank.get_n_phone(speaker, candidate_n_phone);
+
+        if phone.is_some() {
+          chunks[i] = phone;
+          debug[i] = Some(polyphone[i..i+3].join("_"));
+          for j in i..i+3 {
+            fulfilled[j] = true;
+          }
+        }
+      }
+    }
+
+    info!("3-Fulfilled: {:?}", fulfilled);
+
+    // 2-phone
+    if polyphone.len() >= 2 {
+      let range = polyphone.len() - 1;
+      for i in 0..range {
+        //println!("i: {}, range: {}", i, range);
+        if fulfilled[i] {
+          continue;
+        }
+
+        let candidate_n_phone = &polyphone[i..i+2];
+
+        let phone = self.audiobank.get_n_phone(speaker, candidate_n_phone);
+
+        if phone.is_some() {
+          chunks[i] = phone;
+          debug[i] = Some(polyphone[i..i+2].join("_"));
+          for j in i..i+2 {
+            fulfilled[j] = true;
+          }
+        }
+      }
+    }
+
+    info!("2-Fulfilled: {:?}", fulfilled);
+
+    // 1-phone
+    for i in 0..polyphone.len() {
+      if fulfilled[i] {
+        continue;
+      }
+
+      let phone = self.audiobank.get_phoneme(speaker, &polyphone[i]);
+
+      if phone.is_some() {
+        chunks[i] = phone;
+        debug[i] = Some(polyphone[i].to_string());
+        fulfilled[i] = true;
+      }
+    }
+
+    info!("1-Fulfilled: {:?}", fulfilled);
+
+    for x in fulfilled {
+      if !x {
+        return None;
+      }
+    }
+
+    let mut debug_str : Vec<String> = debug.into_iter()
+      .map(|x| if x.is_some() { x.unwrap() } else { "None".to_string() })
+      .collect();
+
+    info!("Comprised of: {:?}", debug_str);
+
+    let results : Vec<SampleBytes> = chunks.into_iter()
+      .filter_map(|x| x) // Woo, already Option<T>!
+      .collect();
+
+    info!("Results Length: {} of {} phones", results.len(), polyphone.len());
+
+    Some(results)
   }
 
   /// Concatenate a sound effect to the waveform we're building. Returns

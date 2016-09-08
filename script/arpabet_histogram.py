@@ -35,14 +35,14 @@ def get_n_phones(phoneme_list, n):
     elif n == len(phoneme_list):
         return [phoneme_list[:]]
     else:
-        span = len(phoneme_list) - n
+        span = len(phoneme_list) - n + 1
         n_phones = []
         for i in range(span):
             n_phone = [phoneme_list[j] for j in range(i, i+n)]
             n_phones.append(n_phone)
         return n_phones
 
-def print_histogram(n):
+def print_histogram(n, print_length = 20):
     """
     Build and print the histogram for the given size
     """
@@ -58,11 +58,20 @@ def print_histogram(n):
 
     ordered = sorted(n_phone_map.items(), key=lambda x: len(x[1]), reverse=True)
 
-    print("MOST FREQUENT {}-PHONES:\n".format(n))
+    title = "MOST FREQUENT {}-PHONES:".format(n)
+    print("\n" + title)
+    print("="*len(title) + "\n")
 
-    for it in ordered[0:100]:
+    for it in ordered[0:print_length]:
         line = "{}, {} - eg.{}".format(it[0], len(it[1]), it[1][0])
         print(line)
 
+print_histogram(2)
 print_histogram(3)
+print_histogram(4)
+
+# Beyond 4-phones, it becomes computationally expensive
+# if we try to guarantee best fit (exponential-time).
+#print_histogram(5)
+#print_histogram(6)
 

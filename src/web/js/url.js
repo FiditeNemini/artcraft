@@ -22,6 +22,9 @@
     /** JSON key for the `use_diphones` param. */
     _USE_DIPHONES_KEY: 'ud',
 
+    /** JSON key for the `use_n_phones` param. */
+    _USE_N_PHONES_KEY: 'un',
+
     /** JSON key for the `use_words` param. */
     _USE_WORDS_KEY: 'uw',
 
@@ -91,6 +94,16 @@
       }
     },
 
+    /** Get the "use n-phones" from the `window.location`. */
+    getUseNPhones: function() {
+      var state = this.parseState(window.location);
+      if (!state || !(this._USE_N_PHONES_KEY in state)) {
+        return null;
+      } else {
+        return state[this._USE_N_PHONES_KEY];
+      }
+    },
+
     /** Get the "use words" from the `window.location`. */
     getUseWords: function() {
       var state = this.parseState(window.location);
@@ -139,6 +152,7 @@
                        speed,
                        usePhonemes,
                        useDiphones,
+                       useNPhones,
                        useWords,
                        monophonePaddingStart,
                        monophonePaddingEnd,
@@ -150,6 +164,7 @@
                                     speed,
                                     usePhonemes,
                                     useDiphones,
+                                    useNPhones,
                                     useWords,
                                     monophonePaddingStart,
                                     monophonePaddingEnd,
@@ -166,6 +181,7 @@
                          speed,
                          usePhonemes,
                          useDiphones,
+                         useNPhones,
                          useWords,
                          monophonePaddingStart,
                          monophonePaddingEnd,
@@ -184,6 +200,7 @@
       state[this._SPEED_KEY] = speed; // TODO: Filter invalid values.
       state[this._USE_PHONEMES_KEY] = !!usePhonemes;
       state[this._USE_DIPHONES_KEY] = !!useDiphones;
+      state[this._USE_N_PHONES_KEY] = !!useNPhones;
       state[this._USE_WORDS_KEY] = !!useWords;
       state[this._MONOPHONE_PADDING_START_KEY] = monophonePaddingStart;
       state[this._MONOPHONE_PADDING_END_KEY] = monophonePaddingEnd;

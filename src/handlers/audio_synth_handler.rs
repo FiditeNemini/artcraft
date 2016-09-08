@@ -36,6 +36,7 @@ const SPEAKER_PARAM : &'static str = "v";
 const SPEED_PARAM : &'static str = "spd";
 const USE_PHONEMES_PARAM: &'static str = "up";
 const USE_DIPHONES_PARAM: &'static str = "ud";
+const USE_N_PHONES_PARAM: &'static str = "un";
 const USE_WORDS_PARAM: &'static str = "uw";
 const VOLUME_PARAM : &'static str = "vol";
 const MONOPHONE_PADDING_START_PARAM : &'static str = "mps";
@@ -62,6 +63,9 @@ struct SpeakRequest {
 
   /** Whether to use diphones. */
   pub use_diphones: bool,
+
+  /** Whether to use n-phones. */
+  pub use_n_phones: bool,
 
   /** Whether to use words. */
   pub use_words: bool,
@@ -196,6 +200,21 @@ impl SpeakRequest {
           },
         };
 
+        let use_n_phones = match map.get(USE_N_PHONES_PARAM) {
+          None => { true },
+          Some(list) => {
+            match list.get(0) {
+              None => { return speaker_error; },
+              Some(s) => {
+                match FromStr::from_str(s) {
+                  Ok(b) => b,
+                  Err(_) => { return speaker_error; },
+                }
+              },
+            }
+          },
+        };
+
         let use_words = match map.get(USE_WORDS_PARAM) {
           None => { true },
           Some(list) => {
@@ -281,6 +300,7 @@ impl SpeakRequest {
           speed: speed,
           use_phonemes: use_phonemes,
           use_diphones: use_diphones,
+          use_n_phones: use_n_phones,
           use_words: use_words,
           monophone_padding_start: mps,
           monophone_padding_end: mpe,
@@ -367,6 +387,7 @@ impl AudioSynthHandler {
                                        request.use_words,
                                        request.use_phonemes,
                                        request.use_diphones,
+                                       request.use_n_phones,
                                        request.volume,
                                        request.speed,
                                        request.monophone_padding_start,

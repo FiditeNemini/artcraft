@@ -6,7 +6,7 @@ import os
 import re
 
 DICTIONARY_FILE = '/home/bt/dev/trumpet/dictionary/cmudict-0.7b'
-PHONE_DIR = '/home/bt/Dropbox/jungle.horse/sounds/trump/_phonemes'
+PHONE_DIR = '/home/bt/Dropbox/jungle.horse/sounds/trump/1-phones'
 
 def current_phonemes():
     """

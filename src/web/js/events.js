@@ -42,6 +42,7 @@
           speed = $('input#speed').val(),
           up = $('#use_phonemes').prop('checked'),
           ud = $('#use_diphones').prop('checked'),
+          un = $('#use_n_phones').prop('checked'),
           uw = $('#use_words').prop('checked'),
           mps = $('input#monophone_padding_start').val(),
           mpe = $('input#monophone_padding_end').val(),
@@ -56,6 +57,7 @@
               + '&ppe=' + ppe
               + '&up=' + up
               + '&ud=' + ud
+              + '&un=' + un
               + '&uw=' + uw;
 
       ev.preventDefault();
@@ -66,6 +68,7 @@
                    speed,
                    up,
                    ud,
+                   un,
                    uw,
                    mps,
                    mpe,
