@@ -5,6 +5,9 @@
     <link rel="stylesheet" href="/assets/style.css" type="text/css">
     <meta http-equiv="Content-Type" content="text/html;charset=utf-8">
     <meta name="viewport" content="initial-scale=1, maximum-scale=1">
+    <!-- Variables -->
+    <meta name="wave_color" content="#777">
+    <meta name="progress_color" content="#222">
   </head>
   <body>
     <div id="main">
@@ -81,7 +84,14 @@
     </div>
     <audio id="sound"></audio>
     <script src="/assets/libraries.js"/></script>
-    <script src="/assets/script.js"/></script>
     <script src="/assets/output/waveform.built.js"/></script>
+    <script type="text/javascript">
+      /*window.waveform_player = new WaveformPlayer(
+        '#waveform',
+        '#f00',
+        '#0ff'
+      );*/
+    </script>
+    <script src="/assets/script.js"/></script>
   </body>
 </html>

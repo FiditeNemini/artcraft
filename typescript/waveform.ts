@@ -1,17 +1,26 @@
-
 // FIXME: no type declarations exist.
+declare var $: any;
 declare var WaveSurfer: any;
 
 type WaveSurfer = any;
 
-export class WaveformPlayer {
+export default class WaveformPlayer {
   wavesurfer: WaveSurfer;
 
-  constructor(css_selector: string) {
+  constructor(css_selector: string, waveColor?: string,
+              progressColor?: string) {
+    waveColor = waveColor
+        || $('meta[name=wave_color]').attr('content')
+        || 'teal';
+
+    progressColor = progressColor
+        || $('meta[name=progress_color]').attr('content')
+        || 'purple';
+
     this.wavesurfer = WaveSurfer.create({
         container: css_selector,
-        waveColor: 'teal',
-        progressColor: 'purple'
+        waveColor: waveColor,
+        progressColor: progressColor,
     });
   }
 
