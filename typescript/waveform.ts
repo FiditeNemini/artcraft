@@ -5,9 +5,17 @@ declare var WaveSurfer: any;
 type WaveSurfer = any;
 
 export default class WaveformPlayer {
+  /** Sound and Vizualization API. */
   wavesurfer: WaveSurfer;
 
-  constructor(css_selector: string, waveColor?: string,
+  /**
+   * Whether the player is "cleared" of an audio file.
+   * Necessary to maintain our own state since the library will happily
+   * resume playing if told, even after it is "cleared".
+   */
+  isCleared: boolean;
+
+  constructor(cssSelector: string, waveColor?: string,
               progressColor?: string) {
     waveColor = waveColor
         || $('meta[name=wave_color]').attr('content')
@@ -18,21 +26,25 @@ export default class WaveformPlayer {
         || 'purple';
 
     this.wavesurfer = WaveSurfer.create({
-        container: css_selector,
+        container: cssSelector,
         waveColor: waveColor,
         progressColor: progressColor,
     });
+
+    this.isCleared = true;
   }
 
   /** Load the wav url. */
-  load(wav_url: string) {
-    this.wavesurfer.load(wav_url);
+  load(wavUrl: string) {
+    this.wavesurfer.load(wavUrl);
+    this.isCleared = false;
   }
 
   /** Load the wav url and immediately play it. */
-  loadAndPlay(wav_url: string) {
+  loadAndPlay(wavUrl: string) {
     let that = this;
-    this.load(wav_url);
+    this.load(wavUrl);
+    this.isCleared = false;
     this.wavesurfer.on('ready', function () {
         that.wavesurfer.play();
     });
@@ -45,6 +57,9 @@ export default class WaveformPlayer {
 
   /** Resume playing at current position. */
   play() {
+    if (this.isCleared) {
+      return; // Nothing to play.
+    }
     this.wavesurfer.play();
   }
 
@@ -65,6 +80,7 @@ export default class WaveformPlayer {
   /** Stop and clear the waveform data. */
   clear() {
     this.wavesurfer.empty();
+    this.isCleared = true;
   }
 }
 
