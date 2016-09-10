@@ -111,11 +111,13 @@ impl Synthesizer {
 
     // FIXME: Super inefficient pieces.
     if speed.is_some() {
-      concatenated_waveform = change_speed(concatenated_waveform, speed.unwrap());
+      concatenated_waveform = change_speed(concatenated_waveform,
+                                           speed.unwrap());
     }
 
     if volume.is_some() {
-      concatenated_waveform = change_volume(concatenated_waveform, volume.unwrap());
+      concatenated_waveform = change_volume(concatenated_waveform,
+                                            volume.unwrap());
     }
 
     // TODO: Cache waveform headers.
@@ -312,7 +314,7 @@ impl Synthesizer {
     if polyphone.len() >= 4 {
       let range = polyphone.len() - 3;
       for i in 0..range {
-        if fulfilled[i] {
+        if fulfilled[i] || fulfilled[i+1] || fulfilled[i+2] || fulfilled[i+3] {
           continue;
         }
 
@@ -331,11 +333,13 @@ impl Synthesizer {
       }
     }
 
+    info!("4-fulfilled: {:?}", fulfilled);
+
     // 3-phone
     if polyphone.len() >= 3 {
       let range = polyphone.len() - 2;
       for i in 0..range {
-        if fulfilled[i] {
+        if fulfilled[i] || fulfilled[i+1] || fulfilled[i+2] {
           continue;
         }
 
@@ -353,12 +357,14 @@ impl Synthesizer {
       }
     }
 
+    info!("3-fulfilled: {:?}", fulfilled);
+
     // 2-phone
     if polyphone.len() >= 2 {
       let range = polyphone.len() - 1;
       for i in 0..range {
         //println!("i: {}, range: {}", i, range);
-        if fulfilled[i] {
+        if fulfilled[i] || fulfilled[i+1] {
           continue;
         }
 
@@ -376,6 +382,8 @@ impl Synthesizer {
       }
     }
 
+    info!("2-fulfilled: {:?}", fulfilled);
+
     // 1-phone
     for i in 0..polyphone.len() {
       if fulfilled[i] {
@@ -390,6 +398,8 @@ impl Synthesizer {
         fulfilled[i] = true;
       }
     }
+
+    info!("1-fulfilled: {:?}", fulfilled);
 
     for x in fulfilled {
       if !x {
