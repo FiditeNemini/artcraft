@@ -13,8 +13,6 @@
       var that = this;
       $.get('/words')
         .done(function(data) {
-          console.log('success', data);
-
           for (var speaker in data.library) {
             var words = data.library[speaker];
             if (words.length !== 0) {
@@ -29,7 +27,6 @@
         })
         .fail(function() {
           // Page has catastrophically failed. Suggest reload.
-          console.error('failure');
           if (typeof successCallback !== 'undefined') {
             failureCallback(that);
           }

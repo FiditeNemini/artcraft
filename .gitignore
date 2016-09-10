@@ -1,7 +1,8 @@
 *~
 bower_components/
 node_modules/
-target/
-web/*.js
-web/*.css
 sounds/
+target/
+web/*.css
+web/*.js
+web/output/

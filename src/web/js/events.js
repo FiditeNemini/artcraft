@@ -9,8 +9,12 @@
       var sentence = $('input#text').val();
 
       if (ev.keyCode === 27) {
-        $(this).val(''); // ESC key.
+        $('input#text').val(''); // ESC key.
         sentence = '';
+        window.waveform_player.clear();
+      } else if (ev.keyCode == 32) {
+        // Space key.
+        ev.stopPropagation();
       }
 
       Ui.setFromInput(sentence);
@@ -18,12 +22,23 @@
 
     /** Handle typing outside of the input box. */
     handleBodyTyping: function(ev) {
+      if (ev.target.tagName.toLowerCase() === 'input') {
+        return; // We'll handle this elsewhere.
+      }
+
       if (ev.keyCode === 27) {
         // Handle ESC key.
         $('input#text').select();
         Ui.clearInput();
         Ui.clearSuggestedWords();
         Ui.setFromInput('');
+        window.waveform_player.clear();
+      } else if (ev.keyCode == 32) {
+        // 'Space' key to toggle playing.
+        window.waveform_player.toggle();
+        // Prevent spacebar from causing scroll.
+        ev.preventDefault();
+        return false;
       }
     },
 

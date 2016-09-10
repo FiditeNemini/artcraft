@@ -1,5 +1,8 @@
 import { WordString } from './words';
 
+// FIXME: no type declarations exist.
+declare var buzz: any;
+
 const URL_PREFIX = '/speak';
 
 interface SoundUrl {

@@ -3,6 +3,7 @@
     "bower": "^1.7.9",
     "jquery": "^3.0.0",
     "ts-loader": "^0.8.2",
-    "typescript": "^1.8.10"
+    "typescript": "^1.8.10",
+    "wavesurfer.js": "^1.1.12"
   }
 }

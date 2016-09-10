@@ -7,7 +7,7 @@
   var installEventHandlers = function() {
     $('form').submit(function(ev) { return Events.handleFormSubmit(ev); });
     $('input#text').on('keyup', function(ev) { return Events.handleTyping(ev); });
-    $('body').on('keyup', function(ev) { return Events.handleBodyTyping(ev); });
+    $('body').on('keydown', function(ev) { return Events.handleBodyTyping(ev); });
     $('select').on('change', function(ev) { return Events.handleVoiceSelect(ev); });
   }
 

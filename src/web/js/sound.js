@@ -16,17 +16,8 @@
 
     /** Play a sound file at a URL. */
     play: function(soundUrl) {
-      var sound = null,
-          fromCache = false;
-      if (soundUrl in this.soundCache && this.useCaching()) {
-        sound = this.soundCache[soundUrl];
-        fromCache = true;
-      } else {
-        sound = new buzz.sound(soundUrl);
-        this.soundCache[soundUrl] = sound;
-      }
-      console.info('Playing ' + soundUrl + ' from cache: ' + fromCache);
-      sound.play();
+      // NB(echelon): This is the new TypeScript player wrapper.
+      window.waveform_player.loadAndPlay(soundUrl);
     },
 
     useCaching: function() {

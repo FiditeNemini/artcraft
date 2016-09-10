@@ -1,8 +1,8 @@
-
 import audio = require('./audio');
 import words = require('./words');
 import sentences = require('./sentences');
 
+// FIXME: Cannot find import.
 import $ = require('jquery');
 
 function main() {

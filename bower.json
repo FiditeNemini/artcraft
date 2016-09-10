@@ -16,6 +16,7 @@
     "underscore": "~1.8.3",
     "urijs": "uri.js#~1.17.0",
     "SoundJS": "~0.6.2",
-    "buzz": "~1.1.10"
+    "buzz": "~1.1.10",
+    "wavesurfer.js": "^1.1.12"
   }
 }
