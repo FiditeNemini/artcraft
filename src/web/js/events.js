@@ -59,6 +59,7 @@
           ud = $('#use_diphones').prop('checked'),
           un = $('#use_n_phones').prop('checked'),
           uw = $('#use_words').prop('checked'),
+          ue = $('#use_ends').prop('checked'),
           mps = $('input#monophone_padding_start').val(),
           mpe = $('input#monophone_padding_end').val(),
           ppe = $('input#polyphone_padding_end').val(),
@@ -73,7 +74,8 @@
               + '&up=' + up
               + '&ud=' + ud
               + '&un=' + un
-              + '&uw=' + uw;
+              + '&uw=' + uw
+              + '&ue=' + ue;
 
       ev.preventDefault();
 
@@ -85,6 +87,7 @@
                    ud,
                    un,
                    uw,
+                   ue,
                    mps,
                    mpe,
                    ppe);

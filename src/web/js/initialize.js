@@ -21,6 +21,7 @@
         useDiphones = Url.getUseDiphones(),
         useNPhones = Url.getUseNPhones(),
         useWords = Url.getUseWords(),
+        useEnds = Url.getUseEnds(),
         mps = Url.getMonophonePaddingStart() || 0,
         mpe = Url.getMonophonePaddingEnd() || 0,
         ppe = Url.getPolyphonePaddingEnd() || 600,
@@ -30,6 +31,7 @@
     if (useDiphones === null) useDiphones = true;
     if (useNPhones === null) useNPhones = true;
     if (useWords === null) useWords = true;
+    if (useEnds === null) useEnds = true;
 
     if (speaker) {
       $('select').val(speaker); // TODO: whitelist
@@ -48,6 +50,7 @@
     $('#use_diphones').prop('checked', useDiphones);
     $('#use_n_phones').prop('checked', useNPhones);
     $('#use_words').prop('checked', useWords);
+    $('#use_ends').prop('checked', useEnds);
 
     $('input#monophone_padding_start').val(mps);
     $('input#monophone_padding_end').val(mpe);

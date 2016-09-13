@@ -3,6 +3,7 @@
 use arpabet::ArpabetDictionary;
 use audiobank::Audiobank;
 use audiobank::SampleBytes;
+use audiobank::SamplePreference;
 use effects::pause::generate_pause;
 use effects::speed::change_speed;
 use effects::volume::change_volume;
@@ -51,6 +52,7 @@ impl Synthesizer {
                   use_phonemes: bool,
                   use_diphones: bool,
                   use_n_phones: bool,
+                  use_ends: bool,
                   volume: Option<f32>,
                   speed: Option<f32>,
                   monophone_padding_start: Option<u16>,
@@ -89,7 +91,8 @@ impl Synthesizer {
         word_added = self.concatenate_n_phone(&mut concatenated_waveform,
                                               speaker,
                                               word,
-                                              polyphone_padding_end);
+                                              polyphone_padding_end,
+                                              use_ends);
       }
       if !word_added && use_phonemes {
         // Old phoneme algorithm
@@ -261,9 +264,12 @@ impl Synthesizer {
                          concatenated_waveform: &mut Vec<i16>,
                          speaker: &str,
                          word: &str,
-                         polyphone_padding_end: Option<u16>) -> bool {
+                         polyphone_padding_end: Option<u16>,
+                         use_ends: bool) -> bool {
 
-    let samples = match self.get_n_phone_samples(speaker, word) {
+    let pref = SamplePreference::Begin;
+
+    let samples = match self.get_n_phone_samples(speaker, word, pref, use_ends) {
       Some(s) => s,
       None => {
         return false;
@@ -287,7 +293,11 @@ impl Synthesizer {
 
   // TODO: Make this super easy to test (and write some tests).
   // TODO: Make this super efficient.
-  fn get_n_phone_samples(&self, speaker: &str, word: &str)
+  fn get_n_phone_samples(&self,
+                         speaker: &str,
+                         word: &str,
+                         sample_preference: SamplePreference,
+                         use_ends: bool)
       -> Option<Vec<SampleBytes>> {
 
     let polyphone = match self.arpabet_dictionary.get_polyphone(word) {
@@ -302,7 +312,8 @@ impl Synthesizer {
         Vec::with_capacity(polyphone.len());
 
     // Use this to debug the synthesis.
-    let mut debug : Vec<Option<String>> = Vec::with_capacity(polyphone.len());
+    let mut debug : Vec<Option<String>> =
+        Vec::with_capacity(polyphone.len());
 
     for i in 0..polyphone.len() {
       fulfilled.push(false);
@@ -314,13 +325,25 @@ impl Synthesizer {
     if polyphone.len() >= 4 {
       let range = polyphone.len() - 3;
       for i in 0..range {
-        if fulfilled[i] || fulfilled[i+1] || fulfilled[i+2] || fulfilled[i+3] {
+        if fulfilled[i]
+            || fulfilled[i+1]
+            || fulfilled[i+2]
+            || fulfilled[i+3] {
           continue;
         }
 
         let candidate_n_phone = &polyphone[i..i+4];
 
-        let phone = self.audiobank.get_n_phone(speaker, candidate_n_phone);
+        let sample_preference = match i {
+          0 => { SamplePreference::Begin },
+          _ if i == range - 1 => { SamplePreference::End },
+          _ => { SamplePreference::Middle },
+        };
+
+        let phone = self.audiobank.get_n_phone(speaker,
+                                               candidate_n_phone,
+                                               sample_preference,
+                                               use_ends);
 
         if phone.is_some() {
           chunks[i] = phone;
@@ -345,7 +368,16 @@ impl Synthesizer {
 
         let candidate_n_phone = &polyphone[i..i+3];
 
-        let phone = self.audiobank.get_n_phone(speaker, candidate_n_phone);
+        let sample_preference = match i {
+          0 => { SamplePreference::Begin },
+          _ if i == range - 1 => { SamplePreference::End },
+          _ => { SamplePreference::Middle },
+        };
+
+        let phone = self.audiobank.get_n_phone(speaker,
+                                               candidate_n_phone,
+                                               sample_preference,
+                                               use_ends);
 
         if phone.is_some() {
           chunks[i] = phone;
@@ -363,14 +395,22 @@ impl Synthesizer {
     if polyphone.len() >= 2 {
       let range = polyphone.len() - 1;
       for i in 0..range {
-        //println!("i: {}, range: {}", i, range);
         if fulfilled[i] || fulfilled[i+1] {
           continue;
         }
 
         let candidate_n_phone = &polyphone[i..i+2];
 
-        let phone = self.audiobank.get_n_phone(speaker, candidate_n_phone);
+        let sample_preference = match i {
+          0 => { SamplePreference::Begin },
+          _ if i == range - 1 => { SamplePreference::End },
+          _ => { SamplePreference::Middle },
+        };
+
+        let phone = self.audiobank.get_n_phone(speaker,
+                                               candidate_n_phone,
+                                               sample_preference,
+                                               use_ends);
 
         if phone.is_some() {
           chunks[i] = phone;
@@ -390,7 +430,15 @@ impl Synthesizer {
         continue;
       }
 
-      let phone = self.audiobank.get_phoneme(speaker, &polyphone[i]);
+      // TODO -
+      /*let sample_preference = match i {
+        0 => { SamplePreference::Begin },
+        _ if i == polyphone.len() - 1 => { SamplePreference::Middle },
+        _ => { SamplePreference::End },
+      };*/
+
+      let phone = self.audiobank.get_phoneme(speaker,
+                                             &polyphone[i]);
 
       if phone.is_some() {
         chunks[i] = phone;
@@ -417,7 +465,9 @@ impl Synthesizer {
       .filter_map(|x| x) // Woo, already Option<T>!
       .collect();
 
-    info!("Results Length: {} of {} phones", results.len(), polyphone.len());
+    info!("Results Length: {} of {} phones",
+          results.len(),
+          polyphone.len());
 
     Some(results)
   }

@@ -22,10 +22,17 @@ pub type SampleBytes = Vec<i16>;
  *       /1-phones
  *         /_begin (starting syllable of word)
  *           /IY0.wav
+ *           ...
  *         /_end (ending syllable of word)
  *           /IY0.wav
+ *           ...
+ *         /_middle (syllables only in the middle)
+ *           ...
+ *         /_question (syllables that end in an interrogative tone)
+ *           ...
  *         /IY0.wav
  *         /IY1.wav
+ *         ...
  *       /2-phones
  *         /_begin
  *           /F_R.wav
@@ -39,6 +46,18 @@ pub type SampleBytes = Vec<i16>;
 pub struct Audiobank {
   /// Root path to the files.
   audio_path: PathBuf,
+}
+
+#[derive(Debug)]
+pub enum SamplePreference {
+  /// Prefer a word-opening syllable.
+  Begin,
+  /// Prefer syllable sampled from the middle of a word.
+  Middle,
+  /// Prefer syllable taken from the end of a word.
+  End,
+  /// Prefer a syllable taken from the end of a question.
+  EndQuestion,
 }
 
 impl Audiobank {
@@ -76,8 +95,18 @@ impl Audiobank {
     Some(all_samples)
   }
 
-  /** Get an n-phone in the form "{1st}_{2nd}_{...}_{nth}.wav". */
-  pub fn get_n_phone(&self, speaker: &str, n_phone: &[String])
+  /**
+   * Get an n-phone in the form "{1st}_{2nd}_{...}_{nth}.wav".
+   *  - speaker: the voice to use
+   *  - n_phone: the phoneme slice, eg ['AH1', 'NG'].
+   *  - sample_preference: which end of a word to prefer.
+   *  - use_ends: use special "begin"/"end" etc. n-phones.
+   */
+  pub fn get_n_phone(&self,
+                     speaker: &str,
+                     n_phone: &[String],
+                     sample_preference: SamplePreference,
+                     use_ends: bool)
       -> Option<SampleBytes> {
 
     let (directory, filename) = match n_phone.len() {
@@ -117,29 +146,42 @@ impl Audiobank {
       return None;
     }
 
+    // Try to obtain our sample from the end we prefer first.
+    if use_ends {
+      let mut pref_path = self.audio_path.join(format!("{}/", speaker))
+          .join(directory);
+
+      pref_path = match sample_preference {
+        SamplePreference::Begin => { pref_path.join("_begin") },
+        SamplePreference::Middle => { pref_path.join("_middle") },
+        SamplePreference::End => { pref_path.join("_end") },
+        SamplePreference::EndQuestion => { pref_path.join("_question") },
+      };
+
+      pref_path = pref_path.join(&filename);
+
+      match self.read_wave_file(&pref_path) {
+        Some(p) => {
+          info!("Used {:?} for {:?}", sample_preference, n_phone);
+          return Some(p)
+        },
+        None => {},
+      }
+    }
+
     let path = self.audio_path.join(format!("{}/", speaker))
         .join(directory)
         .join(filename);
 
-    let mut reader = match WavReader::open(path) {
-      Err(_) => { return None; },
-      Ok(reader) => reader,
-    };
-
-    // TODO: Inefficient.
-    let mut all_samples = Vec::new();
-    let samples = reader.samples::<i16>();
-    for sample in samples {
-      all_samples.push(sample.unwrap());
-    }
-
-    Some(all_samples)
+    self.read_wave_file(&path)
   }
 
   /**
-   * Get the wav data for the (speaker,phoneme), or None if it does not exist.
+   * Get the wav data for the (speaker,phoneme), or None if it does not
+   * exist.
    */
-  pub fn get_phoneme(&self, speaker: &str, phoneme: &str) -> Option<Vec<i16>> {
+  pub fn get_phoneme(&self, speaker: &str, phoneme: &str)
+      -> Option<Vec<i16>> {
     if check_path(speaker).is_err() || check_path(phoneme).is_err() {
       return None;
     }
@@ -294,6 +336,23 @@ impl Audiobank {
 
     let reader = try!(WavReader::open(path));
     Ok(reader.spec())
+  }
+
+  /// Read a waveform.
+  fn read_wave_file(&self, path: &PathBuf) -> Option<Vec<i16>> {
+    let mut reader = match WavReader::open(path) {
+      Err(_) => { return None; },
+      Ok(reader) => reader,
+    };
+
+    // TODO: Inefficient.
+    let mut all_samples = Vec::new();
+    let samples = reader.samples::<i16>();
+    for sample in samples {
+      all_samples.push(sample.unwrap());
+    }
+
+    Some(all_samples)
   }
 }
 

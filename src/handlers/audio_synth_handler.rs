@@ -38,6 +38,7 @@ const USE_PHONEMES_PARAM: &'static str = "up";
 const USE_DIPHONES_PARAM: &'static str = "ud";
 const USE_N_PHONES_PARAM: &'static str = "un";
 const USE_WORDS_PARAM: &'static str = "uw";
+const USE_ENDS_PARAM: &'static str = "ue";
 const VOLUME_PARAM : &'static str = "vol";
 const MONOPHONE_PADDING_START_PARAM : &'static str = "mps";
 const MONOPHONE_PADDING_END_PARAM : &'static str = "mpe";
@@ -69,6 +70,9 @@ struct SpeakRequest {
 
   /** Whether to use words. */
   pub use_words: bool,
+
+  /** Whether to use "ends": start, end, etc. */
+  pub use_ends: bool,
 
   /** Padding before a monophone. */
   pub monophone_padding_start: Option<u16>,
@@ -230,6 +234,21 @@ impl SpeakRequest {
           },
         };
 
+        let use_ends = match map.get(USE_ENDS_PARAM) {
+          None => { true },
+          Some(list) => {
+            match list.get(0) {
+              None => { return speaker_error; },
+              Some(s) => {
+                match FromStr::from_str(s) {
+                  Ok(b) => b,
+                  Err(_) => { return speaker_error; },
+                }
+              },
+            }
+          },
+        };
+
         let mps : Option<u16> = match map.get(MONOPHONE_PADDING_START_PARAM) {
           None => { None },
           Some(list) => {
@@ -302,6 +321,7 @@ impl SpeakRequest {
           use_diphones: use_diphones,
           use_n_phones: use_n_phones,
           use_words: use_words,
+          use_ends: use_ends,
           monophone_padding_start: mps,
           monophone_padding_end: mpe,
           polyphone_padding_end: ppe,
@@ -388,6 +408,7 @@ impl AudioSynthHandler {
                                        request.use_phonemes,
                                        request.use_diphones,
                                        request.use_n_phones,
+                                       request.use_ends,
                                        request.volume,
                                        request.speed,
                                        request.monophone_padding_start,
@@ -424,9 +445,10 @@ impl AudioSynthHandler {
     }
 
     let mut use_byte = 0u8;
-    if request.use_phonemes { use_byte |= (1 << 1); }
-    if request.use_diphones { use_byte |= (1 << 2); }
-    if request.use_words { use_byte |= (1 << 3); }
+    if request.use_phonemes { use_byte |= 1 << 1; }
+    if request.use_diphones { use_byte |= 1 << 2; }
+    if request.use_words { use_byte |= 1 << 3; }
+    if request.use_ends { use_byte |= 1 << 4; }
 
     println!("Use byte: {}", use_byte);
 
