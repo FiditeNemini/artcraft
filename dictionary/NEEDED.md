@@ -1,7 +1,11 @@
+These words aren't in the dictionary
+------------------------------------
 4chan
 asshat
+asswipe
 banjo-kazooie
 banjo-tooie
+bitcoin
 bulbasaur
 charizard
 charmander
@@ -9,8 +13,18 @@ derp
 derpy
 dicking
 dickweed
+doge
+dogecoin
+doggo
+doggu
+doop
+doot
+ejaculating
 ganon
 ganondorf
+gorp
+harambe
+jigglypuff
 kazooie
 lel
 lols
@@ -18,7 +32,6 @@ lucario
 lulz
 mewtwo
 ocarina
-pikachu
 pikachu
 pokemon
 pringles
@@ -28,8 +41,14 @@ rofl
 sheeple
 shiek
 squirtle
+strudel
+sucky
+there's
 triforce
 troglodyte
 waker
+waluigi
+wanker
+wario
 zombo
 zombocom
