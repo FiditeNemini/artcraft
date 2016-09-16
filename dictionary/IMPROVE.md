@@ -30,6 +30,7 @@ fuck
 gas
 gauge
 gigantic
+goddamn
 google
 greatest
 hispanic
@@ -39,6 +40,7 @@ invasion
 invention
 laden
 left
+little
 machine
 mankind's 
 meme

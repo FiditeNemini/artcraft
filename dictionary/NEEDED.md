@@ -10,8 +10,6 @@ bulbasaur
 charizard
 charmander
 derp
-derp
-derpy
 derpy
 dicking
 dickweed
@@ -21,11 +19,11 @@ doggo
 doggu
 doop
 doot
-dork
 dorky
 ejaculating
 ganon
 ganondorf
+git
 gorp
 harambe
 jigglypuff
@@ -34,10 +32,7 @@ lel
 lols
 lucario
 lulz
-mewtwo
 ocarina
-pikachu
-pokemon
 pringles
 rareware
 reddit
