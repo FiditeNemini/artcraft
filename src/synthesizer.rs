@@ -340,6 +340,7 @@ impl Synthesizer {
           _ => { SamplePreference::Middle },
         };
 
+        //println!("n-phone: {:?}", candidate_n_phone);
         let phone = self.audiobank.get_n_phone(speaker,
                                                candidate_n_phone,
                                                sample_preference,

@@ -117,13 +117,18 @@ fn get_hostname() {
 
 fn create_synthesizer(config: &Config) -> Synthesizer {
   info!("Reading Arpabet Dictionary...");
-
   let arpabet_dictionary = ArpabetDictionary::load_from_file(
       &config.phoneme_dictionary_file_development).unwrap();
+
+  info!("Reading Extra Dictionary...");
+  let extra_dictionary = ArpabetDictionary::load_from_file(
+      &config.extra_dictionary_file_development).unwrap();
+
+  let dictionary = arpabet_dictionary.combine(&extra_dictionary);
 
   let audiobank = Audiobank::new(&config.get_sound_path());
 
   info!("Building Synthesizer...");
-  Synthesizer::new(arpabet_dictionary, audiobank)
+  Synthesizer::new(dictionary, audiobank)
 }
 

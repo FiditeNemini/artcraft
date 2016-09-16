@@ -10,6 +10,8 @@ bulbasaur
 charizard
 charmander
 derp
+derp
+derpy
 derpy
 dicking
 dickweed
@@ -19,6 +21,8 @@ doggo
 doggu
 doop
 doot
+dork
+dorky
 ejaculating
 ganon
 ganondorf

@@ -15,4 +15,6 @@ sound_path_production = "./sounds"
 # Complete path to the phoneme dictionary file
 phoneme_dictionary_file_development = "./dictionary/cmudict-0.7b"
 phoneme_dictionary_file_production = "./dictionary/cmudict-0.7b"
+extra_dictionary_file_development = "./dictionary/extra-dict"
+extra_dictionary_file_production = "./dictionary/extra-dict"
 

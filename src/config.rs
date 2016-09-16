@@ -18,8 +18,12 @@ pub struct Config {
 
   pub sound_path_development: String,
   pub sound_path_production: String,
+
   pub phoneme_dictionary_file_development: String,
   pub phoneme_dictionary_file_production: String,
+
+  pub extra_dictionary_file_development: String,
+  pub extra_dictionary_file_production: String,
 }
 
 impl Config {

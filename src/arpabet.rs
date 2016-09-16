@@ -64,5 +64,17 @@ impl ArpabetDictionary {
       Some(p.iter().map(|s| s.to_string()).collect::<Vec<String>>())
     })
   }
+
+  /// Combine two dictionaries into a new one.
+  pub fn combine(&self, other: &ArpabetDictionary) -> ArpabetDictionary {
+    let mut combined = self.dictionary.clone();
+    for (k, v) in other.dictionary.iter() {
+      combined.insert(k.clone(), v.clone());
+    }
+
+    ArpabetDictionary {
+      dictionary: combined
+    }
+  }
 }
 
