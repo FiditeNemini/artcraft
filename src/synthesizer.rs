@@ -431,15 +431,16 @@ impl Synthesizer {
         continue;
       }
 
-      // TODO -
-      /*let sample_preference = match i {
+      let sample_preference = match i {
         0 => { SamplePreference::Begin },
-        _ if i == polyphone.len() - 1 => { SamplePreference::Middle },
+        _ if i == polyphone.len() => { SamplePreference::Middle },
         _ => { SamplePreference::End },
-      };*/
+      };
 
-      let phone = self.audiobank.get_phoneme(speaker,
-                                             &polyphone[i]);
+      let phone = self.audiobank.get_n_phone(speaker,
+                                             &polyphone[i..i+1],
+                                             sample_preference,
+                                             use_ends);
 
       if phone.is_some() {
         chunks[i] = phone;
