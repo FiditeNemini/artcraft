@@ -6,6 +6,7 @@ These words need improvement
 "to do"
 4chan
 able
+access
 again
 arab
 arabic
@@ -62,6 +63,7 @@ memes
 mexicans
 microsoft
 minds
+model
 muslim
 my
 nine
@@ -70,7 +72,9 @@ prick
 probe
 programming
 rectal
+require
 robot
+role
 rounder
 ruby
 sack
@@ -80,8 +84,10 @@ shovel
 software
 such
 ten
+there (sounds like they're)
 unwilling
 waste
 welcome
 whales
 will
+world
