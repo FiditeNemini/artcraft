@@ -1,16 +1,12 @@
 These words aren't in the dictionary
 ------------------------------------
-4chan
-asshat
-asswipe
 banjo-kazooie
 banjo-tooie
 bitcoin
 bulbasaur
 charizard
 charmander
-derp
-derpy
+crafted
 dicking
 dickweed
 doge
@@ -23,9 +19,9 @@ dorky
 ejaculating
 ganon
 ganondorf
-git
 gorp
 harambe
+incongruent
 jigglypuff
 kazooie
 lel
