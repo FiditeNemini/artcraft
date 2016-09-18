@@ -433,8 +433,8 @@ impl Synthesizer {
 
       let sample_preference = match i {
         0 => { SamplePreference::Begin },
-        _ if i == polyphone.len() => { SamplePreference::Middle },
-        _ => { SamplePreference::End },
+        _ if i == polyphone.len() - 1 => { SamplePreference::End },
+        _ => { SamplePreference::Middle },
       };
 
       let phone = self.audiobank.get_n_phone(speaker,
