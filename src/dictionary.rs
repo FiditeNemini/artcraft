@@ -68,7 +68,7 @@ impl Vocabulary {
   pub fn read_from_directory(directory: &Path) ->
       Result<Vocabulary, io::Error> {
 
-    let word_directory = directory.join("_words/");
+    let word_directory = directory.join("words/");
     let paths = try!(fs::read_dir(word_directory));
     let mut words = Vec::new();
 

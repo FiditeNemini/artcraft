@@ -16,9 +16,6 @@ pub type SampleBytes = Vec<i16>;
  *
  *   /sounds
  *     /{speaker_name}
- *       /_words
- *         /all.wav
- *         /words.wav
  *       /1-phones
  *         /_begin (starting syllable of word)
  *           /IY0.wav
@@ -39,6 +36,9 @@ pub type SampleBytes = Vec<i16>;
  *         /_end
  *           /IH0_NG.wav
  *         /AW1_N.wav
+ *       /words
+ *         /all.wav
+ *         /words.wav
  *
  * TODO: Caching of wav files in memory.
  * TODO: Path generation is _insecure_.
@@ -77,7 +77,7 @@ impl Audiobank {
     }
 
     let path = self.audio_path.join(format!("{}/", speaker))
-        .join("_words/")
+        .join("words/")
         .join(format!("{}.wav", word));
 
     let mut reader = match WavReader::open(path) {
