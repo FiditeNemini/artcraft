@@ -30,7 +30,7 @@ impl ArpabetDictionary {
 
     // Format resembles the following,
     // ABBREVIATE  AH0 B R IY1 V IY0 EY2 T
-    let re = Regex::new(r"^([\w']+)\s+(.*)\n$").unwrap();
+    let re = Regex::new(r"^([\w-']+)\s+(.*)\n$").unwrap();
 
     while try!(reader.read_line(&mut buffer)) > 0 {
       match re.captures(&buffer) {
