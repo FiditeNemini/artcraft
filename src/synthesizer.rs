@@ -57,7 +57,9 @@ impl Synthesizer {
                   speed: Option<f32>,
                   monophone_padding_start: Option<u16>,
                   monophone_padding_end: Option<u16>,
-                  polyphone_padding_end: Option<u16>)
+                  polyphone_padding_end: Option<u16>,
+                  word_padding_start: Option<u16>,
+                  word_padding_end: Option<u16>)
       -> Result<WavBytes, SynthError> {
 
     let mut words = split_sentence(sentence);
@@ -83,7 +85,9 @@ impl Synthesizer {
       if use_words {
         word_added = self.concatenate_word(&mut concatenated_waveform,
                                            speaker,
-                                           word);
+                                           word,
+                                           word_padding_start,
+                                           word_padding_end);
       }
 
       if !word_added && use_n_phones {
@@ -131,16 +135,32 @@ impl Synthesizer {
 
   /// Concatenate a word to the waveform we're building. Returns
   /// whether or not the word was successfully found and concatenated.
-  fn concatenate_word(&self, concatenated_waveform: &mut Vec<i16>,
-                      speaker: &str, word: &str) -> bool {
+  fn concatenate_word(&self,
+                      concatenated_waveform: &mut Vec<i16>,
+                      speaker: &str,
+                      word: &str,
+                      word_padding_start: Option<u16>,
+                      word_padding_end: Option<u16>) -> bool {
     match self.audiobank.get_word(speaker, word) {
+      None => {
+        // The word does not exist in the database.
+        false
+      },
       Some(waveform_data) => {
         // The word exists in the database.
+        if word_padding_start.is_some() {
+          let pause = generate_pause(word_padding_start.unwrap());
+          concatenated_waveform.extend(pause);
+        }
+
         concatenated_waveform.extend(waveform_data);
+
+        if word_padding_end.is_some() {
+          let pause = generate_pause(word_padding_end.unwrap());
+          concatenated_waveform.extend(pause);
+        }
+
         true
-      },
-      None => {
-        false
       },
     }
   }

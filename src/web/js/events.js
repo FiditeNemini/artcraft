@@ -63,6 +63,8 @@
           mps = $('input#monophone_padding_start').val(),
           mpe = $('input#monophone_padding_end').val(),
           ppe = $('input#polyphone_padding_end').val(),
+          wps = $('input#word_padding_start').val(),
+          wpe = $('input#word_padding_end').val(),
           query = encodeURIComponent(sentence),
           url = '/speak?v=' + speaker
               + '&s=' + query
@@ -71,6 +73,8 @@
               + '&mps=' + mps
               + '&mpe=' + mpe
               + '&ppe=' + ppe
+              + '&wps=' + wps
+              + '&wpe=' + wpe
               + '&up=' + up
               + '&ud=' + ud
               + '&un=' + un
@@ -90,7 +94,9 @@
                    ue,
                    mps,
                    mpe,
-                   ppe);
+                   ppe,
+                   wps,
+                   wpe);
 
       Sound.play(url);
 

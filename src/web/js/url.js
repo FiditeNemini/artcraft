@@ -34,6 +34,8 @@
     _MONOPHONE_PADDING_START_KEY: 'mps',
     _MONOPHONE_PADDING_END_KEY: 'mpe',
     _POLYPHONE_PADDING_END_KEY: 'ppe',
+    _WORD_PADDING_START_KEY: 'wps',
+    _WORD_PADDING_END_KEY: 'wpe',
 
     /** Get the sentence from the `window.location`. */
     getSentence: function() {
@@ -157,6 +159,25 @@
       }
     },
 
+    getWordPaddingStart: function() {
+      var state = this.parseState(window.location);
+      if (!state || !(this._WORD_PADDING_START_KEY in state)) {
+        return null;
+      } else {
+        return state[this._WORD_PADDING_START_KEY];
+      }
+    },
+
+    getWordPaddingEnd: function() {
+      var state = this.parseState(window.location);
+      if (!state || !(this._WORD_PADDING_END_KEY in state)) {
+        return null;
+      } else {
+        return state[this._WORD_PADDING_END_KEY];
+      }
+    },
+
+
     // TODO: Independent functions to set both speaker and sentence separately.
     /** Set the `window.history` speaker, sentence, phoneme use, and word use. */
     setState: function(speaker,
@@ -170,7 +191,9 @@
                        useEnds,
                        monophonePaddingStart,
                        monophonePaddingEnd,
-                       polyphonePaddingEnd) {
+                       polyphonePaddingEnd,
+                       wordPaddingStart,
+                       wordPaddingEnd) {
 
       var urlHash = this.fromParams(speaker,
                                     rawSentence,
@@ -183,7 +206,9 @@
                                     useEnds,
                                     monophonePaddingStart,
                                     monophonePaddingEnd,
-                                    polyphonePaddingEnd);
+                                    polyphonePaddingEnd,
+                                    wordPaddingStart,
+                                    wordPaddingEnd);
 
       console.log('set state, urlhash = ', urlHash);
       window.history.replaceState(null, null, urlHash);
@@ -201,7 +226,9 @@
                          useEnds,
                          monophonePaddingStart,
                          monophonePaddingEnd,
-                         polyphonePaddingEnd) {
+                         polyphonePaddingEnd,
+                         wordPaddingStart,
+                         wordPaddingEnd) {
 
       var cleanedSentence = SentenceHelper.cleanSentence(rawSentence),
           cleanedSpeaker = speaker, // TODO: Check against speakers.
@@ -222,6 +249,8 @@
       state[this._MONOPHONE_PADDING_START_KEY] = monophonePaddingStart;
       state[this._MONOPHONE_PADDING_END_KEY] = monophonePaddingEnd;
       state[this._POLYPHONE_PADDING_END_KEY] = polyphonePaddingEnd;
+      state[this._WORD_PADDING_START_KEY] = wordPaddingStart;
+      state[this._WORD_PADDING_END_KEY] = wordPaddingEnd;
 
       json = JSON.stringify(state);
 

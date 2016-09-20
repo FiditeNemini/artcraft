@@ -25,6 +25,8 @@
         mps = Url.getMonophonePaddingStart() || 0,
         mpe = Url.getMonophonePaddingEnd() || 0,
         ppe = Url.getPolyphonePaddingEnd() || 600,
+        wps = Url.getWordPaddingStart() || 600,
+        wpe = Url.getWordPaddingEnd() || 600,
         urlPreviousState = false;
 
     if (usePhonemes === null) usePhonemes = true;
@@ -55,6 +57,8 @@
     $('input#monophone_padding_start').val(mps);
     $('input#monophone_padding_end').val(mpe);
     $('input#polyphone_padding_end').val(ppe);
+    $('input#word_padding_start').val(wps);
+    $('input#word_padding_end').val(wpe);
 
     Library.load(function(library) { Ui.libraryLoadCallback(library); });
     Sound.install();

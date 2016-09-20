@@ -1,6 +1,7 @@
 // Copyright (c) 2015 Brandon Thomas <bt@brand.io>
 // TODO: This looks really bad now. Needs cleanup.
 
+use std::collections::HashMap;
 use config::Config;
 use crypto::digest::Digest;
 use crypto::sha1::Sha1;
@@ -43,6 +44,10 @@ const VOLUME_PARAM : &'static str = "vol";
 const MONOPHONE_PADDING_START_PARAM : &'static str = "mps";
 const MONOPHONE_PADDING_END_PARAM : &'static str = "mpe";
 const POLYPHONE_PADDING_END_PARAM : &'static str = "ppe";
+const WORD_PADDING_START_PARAM : &'static str = "wps";
+const WORD_PADDING_END_PARAM : &'static str = "wpe";
+
+type QueryParams = HashMap<String, Vec<String>>;
 
 /// Represents a request to this endpoint.
 #[derive(Clone, Debug)]
@@ -82,6 +87,12 @@ struct SpeakRequest {
 
   /** Padding after a polyphone. */
   pub polyphone_padding_end: Option<u16>,
+
+  /// Silent padding before a word (not one constructed from phones).
+  pub word_padding_start: Option<u16>,
+
+  /// Silent padding after a word (not one constructed from phones).
+  pub word_padding_end: Option<u16>,
 }
 
 enum SpeakerRequestError {
@@ -249,68 +260,11 @@ impl SpeakRequest {
           },
         };
 
-        let mps : Option<u16> = match map.get(MONOPHONE_PADDING_START_PARAM) {
-          None => { None },
-          Some(list) => {
-            match list.get(0) {
-              None => { None },
-              Some(s) => {
-                match s.trim().parse::<u16>() {
-                  Err(_) => None,
-                  Ok(i) => {
-                    if i == 0 {
-                      None
-                    } else {
-                      Some(i)
-                    }
-                  }
-                }
-              },
-            }
-          },
-        };
-
-        let mpe : Option<u16> = match map.get(MONOPHONE_PADDING_END_PARAM) {
-          None => { None },
-          Some(list) => {
-            match list.get(0) {
-              None => { None },
-              Some(s) => {
-                match s.trim().parse::<u16>() {
-                  Err(_) => None,
-                  Ok(i) => {
-                    if i == 0 {
-                      None
-                    } else {
-                      Some(i)
-                    }
-                  }
-                }
-              },
-            }
-          },
-        };
-
-        let ppe : Option<u16> = match map.get(POLYPHONE_PADDING_END_PARAM) {
-          None => { None },
-          Some(list) => {
-            match list.get(0) {
-              None => { None },
-              Some(s) => {
-                match s.trim().parse::<u16>() {
-                  Err(_) => None,
-                  Ok(i) => {
-                    if i == 0 {
-                      None
-                    } else {
-                      Some(i)
-                    }
-                  }
-                }
-              },
-            }
-          },
-        };
+        let mps = get_u16(map, MONOPHONE_PADDING_START_PARAM);
+        let mpe = get_u16(map, MONOPHONE_PADDING_END_PARAM);
+        let ppe = get_u16(map, POLYPHONE_PADDING_END_PARAM);
+        let wps = get_u16(map, WORD_PADDING_START_PARAM);
+        let wpe = get_u16(map, WORD_PADDING_END_PARAM);
 
         Ok(SpeakRequest {
           sentence: sen,
@@ -325,6 +279,8 @@ impl SpeakRequest {
           monophone_padding_start: mps,
           monophone_padding_end: mpe,
           polyphone_padding_end: ppe,
+          word_padding_start: wps,
+          word_padding_end: wpe,
         })
       },
     }
@@ -413,7 +369,9 @@ impl AudioSynthHandler {
                                        request.speed,
                                        request.monophone_padding_start,
                                        request.monophone_padding_end,
-                                       request.polyphone_padding_end);
+                                       request.polyphone_padding_end,
+                                       request.word_padding_start,
+                                       request.word_padding_end);
         match generated {
           Err(e) => {
             println!("Error synthesizing: {:?}", e);
@@ -473,5 +431,16 @@ impl AudioSynthHandler {
     }
     Ok(speaker_path)
   }
+}
+
+
+/** Parse an optional u16 out of query parameters. */
+fn get_u16(params: &QueryParams, param_name: &str) -> Option<u16> {
+  params.get(param_name)
+      .and_then(|v| v.get(0))
+      .map(|s| s.trim())
+      .map(|s| s.parse::<u16>())
+      .and_then(|res| res.ok())
+      .and_then(|d| if d == 0 { None } else { Some(d) } )
 }
 
