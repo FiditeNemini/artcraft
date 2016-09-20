@@ -8,6 +8,7 @@ These words need improvement
 able
 access
 again
+america (non-shout)
 arab
 arabic
 ask
@@ -20,6 +21,7 @@ bite
 bullshit
 can
 cat
+chinese
 code
 cunt
 dank
@@ -49,6 +51,7 @@ home
 horrible
 invasion
 invention
+japanese
 java
 laden
 left
@@ -60,7 +63,9 @@ mankind's
 matter
 meme
 memes
+mexican
 mexicans
+mexico's
 microsoft
 minds
 model
@@ -83,6 +88,7 @@ shiny
 shovel
 software
 such
+sudanese
 ten
 there (sounds like they're)
 unwilling

@@ -1,5 +1,7 @@
 These are great examples of synthesis
 -------------------------------------
+bad
+country
 because
 crucified
 delicious
@@ -9,3 +11,4 @@ patience
 people
 righteous
 savior
+things

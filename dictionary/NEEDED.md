@@ -1,18 +1,14 @@
 These words aren't in the dictionary
 ------------------------------------
-banjo-kazooie
 banjo-tooie
 bulbasaur
 charizard
 crafted
-ejaculating
 ganon
 ganondorf
 gorp
 harambe
 incongruent
-jigglypuff
-kazooie
 lel
 lucario
 ocarina
