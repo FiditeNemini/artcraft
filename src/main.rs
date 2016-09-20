@@ -124,7 +124,13 @@ fn create_synthesizer(config: &Config) -> Synthesizer {
   let extra_dictionary = ArpabetDictionary::load_from_file(
       &config.extra_dictionary_file_development).unwrap();
 
-  let dictionary = arpabet_dictionary.combine(&extra_dictionary);
+  info!("Reading Square Dictionary...");
+  let square_dictionary = ArpabetDictionary::load_from_file(
+      &config.square_dictionary_file_development).unwrap();
+
+  let dictionary = arpabet_dictionary
+      .combine(&extra_dictionary)
+      .combine(&square_dictionary);
 
   let audiobank = Audiobank::new(&config.get_sound_path());
 

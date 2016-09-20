@@ -24,6 +24,9 @@ pub struct Config {
 
   pub extra_dictionary_file_development: String,
   pub extra_dictionary_file_production: String,
+
+  pub square_dictionary_file_development: String,
+  pub square_dictionary_file_production: String,
 }
 
 impl Config {

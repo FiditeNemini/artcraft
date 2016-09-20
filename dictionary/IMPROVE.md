@@ -5,12 +5,14 @@ These words need improvement
 "really?"
 "to do"
 4chan
+^^^ how (THIS IS SO BAD)
 able
 access
 again
 america (non-shout)
 arab
 arabic
+aren't
 ask
 asswipe
 bear
@@ -19,6 +21,7 @@ beta
 bin
 bite
 bullshit
+buy
 can
 cat
 chinese

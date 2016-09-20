@@ -17,4 +17,6 @@ phoneme_dictionary_file_development = "./dictionary/cmudict-0.7b"
 phoneme_dictionary_file_production = "./dictionary/cmudict-0.7b"
 extra_dictionary_file_development = "./dictionary/extra-dict"
 extra_dictionary_file_production = "./dictionary/extra-dict"
+square_dictionary_file_development = "./dictionary/square-dict"
+square_dictionary_file_production = "./dictionary/square-dict"
 
