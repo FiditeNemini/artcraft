@@ -1,23 +1,21 @@
 These words aren't in the dictionary
 ------------------------------------
 banjo-tooie
-bulbasaur
 charizard
 crafted
 ganon
 ganondorf
 gorp
-harambe
 incongruent
+kek
 lel
 lucario
+muah
+mwah
 ocarina
 pringles
 rareware
-rofl
-sheeple
 shiek
-squirtle
 strudel
 sucky
 there's
@@ -28,5 +26,3 @@ waker
 waluigi
 wanker
 wario
-zombo
-zombocom

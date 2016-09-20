@@ -1,9 +1,10 @@
 These are great examples of synthesis
 -------------------------------------
 bad
-country
 because
+country
 crucified
+debates
 delicious
 disqualifies
 honestly
