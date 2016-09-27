@@ -8,8 +8,11 @@ debates
 delicious
 disqualifies
 honestly
+inside
+outside
 patience
 people
 righteous
+satchell
 savior
 things

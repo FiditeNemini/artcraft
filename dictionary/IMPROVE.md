@@ -1,11 +1,13 @@
 These words need improvement
 ----------------------------
+"^^^ again (BAD)
+"^^^ how (THIS IS SO BAD)
+"^^^ then (BAD)
 "do you?"
 "for you"
 "really?"
 "to do"
 4chan
-^^^ how (THIS IS SO BAD)
 able
 access
 again
@@ -31,6 +33,7 @@ dank
 derp
 dildo
 diploma
+do
 doesn't
 dog
 ejaculate
@@ -76,6 +79,7 @@ muslim
 my
 nine
 osama
+planet
 prick
 probe
 programming
@@ -90,11 +94,15 @@ self
 shiny
 shovel
 software
+sometime
+sometimes
 such
 sudanese
 ten
 there (sounds like they're)
+universe
 unwilling
+warheads
 waste
 welcome
 whales

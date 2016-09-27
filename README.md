@@ -60,7 +60,7 @@ To see what processes bind a port, `sudo lsof -i:80`, etc.
 
 ### Current nginx config
 
-In sites-available,
+In sites-available, at `/etc/nginx/sites-enabled/default`,
 
 ```
 server {
