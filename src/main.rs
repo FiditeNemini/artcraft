@@ -1,11 +1,12 @@
 // Copyright (c) 2015-2016 Brandon Thomas <bt@brand.io>
 
+#[macro_use] extern crate lazy_static;
+#[macro_use] extern crate log;
+
 extern crate clap;
 extern crate crypto;
 extern crate hound;
 extern crate iron;
-#[macro_use]
-extern crate log;
 extern crate regex;
 extern crate resolve;
 extern crate router;
@@ -14,28 +15,30 @@ extern crate time;
 extern crate toml;
 extern crate urlencoded;
 
-pub mod arpabet;
 pub mod audiobank;
 pub mod config;
-pub mod dictionary;
 pub mod effects;
 pub mod error;
 pub mod handlers;
+pub mod lang;
 pub mod logger;
+pub mod old_dictionary;
+pub mod old_words;
+pub mod speaker;
 pub mod synthesizer;
-pub mod words;
 
-use arpabet::ArpabetDictionary;
 use audiobank::Audiobank;
 use clap::{App, Arg, ArgMatches};
 use config::Config;
-use dictionary::VocabularyLibrary;
 use handlers::audio_synth_handler::AudioSynthHandler;
 use handlers::error_filter::ErrorFilter;
 use handlers::file_server_handler::FileServerHandler;
 use handlers::vocab_list_handler::VocabListHandler;
 use iron::prelude::*;
+use lang::arpabet::Arpabet;
+use lang::tokenizer::Tokenizer;
 use logger::SimpleLogger;
+use old_dictionary::VocabularyLibrary;
 use resolve::hostname;
 use router::Router;
 use std::path::Path;
@@ -117,15 +120,15 @@ fn get_hostname() {
 
 fn create_synthesizer(config: &Config) -> Synthesizer {
   info!("Reading Arpabet Dictionary...");
-  let arpabet_dictionary = ArpabetDictionary::load_from_file(
+  let arpabet_dictionary = Arpabet::load_from_file(
       &config.phoneme_dictionary_file_development).unwrap();
 
   info!("Reading Extra Dictionary...");
-  let extra_dictionary = ArpabetDictionary::load_from_file(
+  let extra_dictionary = Arpabet::load_from_file(
       &config.extra_dictionary_file_development).unwrap();
 
   info!("Reading Square Dictionary...");
-  let square_dictionary = ArpabetDictionary::load_from_file(
+  let square_dictionary = Arpabet::load_from_file(
       &config.square_dictionary_file_development).unwrap();
 
   let dictionary = arpabet_dictionary
@@ -134,7 +137,9 @@ fn create_synthesizer(config: &Config) -> Synthesizer {
 
   let audiobank = Audiobank::new(&config.get_sound_path());
 
+  let tokenizer = Tokenizer::empty();
+
   info!("Building Synthesizer...");
-  Synthesizer::new(dictionary, audiobank)
+  Synthesizer::new(dictionary, audiobank, tokenizer)
 }
 

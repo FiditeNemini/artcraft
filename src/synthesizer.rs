@@ -1,6 +1,5 @@
 // Copyright (c) 2016 Brandon Thomas <bt@brand.io, echelon@gmail.com>
 
-use arpabet::ArpabetDictionary;
 use audiobank::Audiobank;
 use audiobank::SampleBytes;
 use audiobank::SamplePreference;
@@ -10,9 +9,12 @@ use effects::volume::change_volume;
 use error::SynthError;
 use hound::WavSpec;
 use hound::WavWriter;
+use lang::arpabet::Arpabet;
+use lang::tokenizer::Tokenizer;
+use old_words::split_sentence;
+use speaker::Speaker;
 use std::io::BufWriter;
 use std::io::Cursor;
-use words::split_sentence;
 
 pub type WavBytes = Vec<u8>;
 
@@ -25,20 +27,25 @@ pub struct Synthesizer {
   ///// Word dictionary
   //word_dictionary: Vocabulary,
 
-  /// Arpabet dictionary, (Word) -> (PhonemeList)
-  arpabet_dictionary: ArpabetDictionary,
+  /// Arpabet, (Word) -> (PhonemeList)
+  arpabet_dictionary: Arpabet,
 
   /// WAV Audiobank for sound generation.
   audiobank: Audiobank,
+
+  /// Sentence tokenizer
+  tokenizer: Tokenizer,
 }
 
 impl Synthesizer {
   /// CTOR
-  pub fn new(arpabet_dictionary: ArpabetDictionary, audiobank: Audiobank)
-      -> Synthesizer {
+  pub fn new(arpabet_dictionary: Arpabet,
+             audiobank: Audiobank,
+             tokenizer: Tokenizer) -> Synthesizer {
     Synthesizer {
       arpabet_dictionary: arpabet_dictionary,
       audiobank: audiobank,
+      tokenizer: tokenizer,
     }
   }
 
@@ -47,7 +54,7 @@ impl Synthesizer {
    */
   pub fn generate(&self,
                   sentence: &str,
-                  speaker: &str,
+                  speaker: &Speaker,
                   use_words: bool,
                   use_phonemes: bool,
                   use_diphones: bool,
@@ -62,7 +69,8 @@ impl Synthesizer {
                   word_padding_end: Option<u16>)
       -> Result<WavBytes, SynthError> {
 
-    let mut words = split_sentence(sentence);
+    let prepared = self.tokenizer.convert(speaker, sentence);
+    let mut words = split_sentence(&prepared);
 
     if words.len() == 0 {
       return Err(SynthError::BadInput {
@@ -137,11 +145,11 @@ impl Synthesizer {
   /// whether or not the word was successfully found and concatenated.
   fn concatenate_word(&self,
                       concatenated_waveform: &mut Vec<i16>,
-                      speaker: &str,
+                      speaker: &Speaker,
                       word: &str,
                       word_padding_start: Option<u16>,
                       word_padding_end: Option<u16>) -> bool {
-    match self.audiobank.get_word(speaker, word) {
+    match self.audiobank.get_word(speaker.as_str(), word) {
       None => {
         // The word does not exist in the database.
         false
@@ -170,7 +178,7 @@ impl Synthesizer {
   /// successfully found and concatenated.
   fn concatenate_polyphone(&self,
                            concatenated_waveform: &mut Vec<i16>,
-                           speaker: &str,
+                           speaker: &Speaker,
                            word: &str,
                            use_diphones: bool,
                            monophone_padding_start: Option<u16>,
@@ -217,7 +225,7 @@ impl Synthesizer {
       if use_diphones && i < end {
         let first = phoneme;
         let second = &polyphone[i+1];
-        match self.audiobank.get_diphone(speaker, first, second) {
+        match self.audiobank.get_diphone(speaker.as_str(), first, second) {
           None => {},
           Some(diphone_data) => {
             info!("Read diphone: {}, {}", first, second);
@@ -230,16 +238,16 @@ impl Synthesizer {
 
       // Attempt to read a "begin" or "end" monophone.
       let mut read_results = if i == 0 {
-        self.audiobank.get_begin_phoneme(speaker, &phoneme)
+        self.audiobank.get_begin_phoneme(speaker.as_str(), &phoneme)
       } else if i == end {
-        self.audiobank.get_end_phoneme(speaker, &phoneme)
+        self.audiobank.get_end_phoneme(speaker.as_str(), &phoneme)
       } else {
         None
       };
 
       // Read a regular monophone.
       if read_results.is_none() {
-        read_results = self.audiobank.get_phoneme(speaker, &phoneme);
+        read_results = self.audiobank.get_phoneme(speaker.as_str(), &phoneme);
       }
 
       match read_results {
@@ -282,7 +290,7 @@ impl Synthesizer {
   // TODO: Doc and test.
   fn concatenate_n_phone(&self,
                          concatenated_waveform: &mut Vec<i16>,
-                         speaker: &str,
+                         speaker: &Speaker,
                          word: &str,
                          polyphone_padding_end: Option<u16>,
                          use_ends: bool) -> bool {
@@ -314,7 +322,7 @@ impl Synthesizer {
   // TODO: Make this super easy to test (and write some tests).
   // TODO: Make this super efficient.
   fn get_n_phone_samples(&self,
-                         speaker: &str,
+                         speaker: &Speaker,
                          word: &str,
                          sample_preference: SamplePreference,
                          use_ends: bool)
@@ -361,7 +369,7 @@ impl Synthesizer {
         };
 
         //println!("n-phone: {:?}", candidate_n_phone);
-        let phone = self.audiobank.get_n_phone(speaker,
+        let phone = self.audiobank.get_n_phone(speaker.as_str(),
                                                candidate_n_phone,
                                                sample_preference,
                                                use_ends);
@@ -395,7 +403,7 @@ impl Synthesizer {
           _ => { SamplePreference::Middle },
         };
 
-        let phone = self.audiobank.get_n_phone(speaker,
+        let phone = self.audiobank.get_n_phone(speaker.as_str(),
                                                candidate_n_phone,
                                                sample_preference,
                                                use_ends);
@@ -428,7 +436,7 @@ impl Synthesizer {
           _ => { SamplePreference::Middle },
         };
 
-        let phone = self.audiobank.get_n_phone(speaker,
+        let phone = self.audiobank.get_n_phone(speaker.as_str(),
                                                candidate_n_phone,
                                                sample_preference,
                                                use_ends);
@@ -457,7 +465,7 @@ impl Synthesizer {
         _ => { SamplePreference::Middle },
       };
 
-      let phone = self.audiobank.get_n_phone(speaker,
+      let phone = self.audiobank.get_n_phone(speaker.as_str(),
                                              &polyphone[i..i+1],
                                              sample_preference,
                                              use_ends);

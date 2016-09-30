@@ -1,7 +1,6 @@
 // Copyright (c) 2015 Brandon Thomas <bt@brand.io>
 // TODO: This looks really bad now. Needs cleanup.
 
-use std::collections::HashMap;
 use config::Config;
 use crypto::digest::Digest;
 use crypto::sha1::Sha1;
@@ -11,8 +10,11 @@ use iron::headers::{ETag, EntityTag, Headers, IfNoneMatch};
 use iron::mime::Mime;
 use iron::prelude::*;
 use iron::status;
+use old_words::split_sentence;
 use router::Router;
 use rustc_serialize::json;
+use speaker::Speaker;
+use std::collections::HashMap;
 use std::error::Error;
 use std::fmt::{self, Debug};
 use std::fs::File;
@@ -30,7 +32,6 @@ use std::sync::RwLock;
 use super::error_filter::build_error;
 use synthesizer::Synthesizer;
 use urlencoded::UrlEncodedQuery;
-use words::split_sentence;
 
 const SENTENCE_PARAM : &'static str = "s";
 const SPEAKER_PARAM : &'static str = "v";
@@ -56,7 +57,7 @@ struct SpeakRequest {
   pub sentence: String,
 
   /** The voice to use to render the audio. */
-  pub speaker: String,
+  pub speaker: Speaker,
 
   /** An optional volume multiplier. */
   pub volume: Option<f32>,
@@ -143,7 +144,7 @@ impl SpeakRequest {
           Some(list) => {
             match list.get(0) {
               None => { return speaker_error; },
-              Some(s) => { s.to_string() },
+              Some(s) => { Speaker::new(s.to_string()) },
             }
           },
         };
@@ -386,7 +387,7 @@ impl AudioSynthHandler {
   fn sha_digest(&self, request: &SpeakRequest) -> String {
     let mut hasher = Sha1::new();
 
-    hasher.input_str(&request.speaker);
+    hasher.input_str(&request.speaker.to_string());
     hasher.input_str(&request.sentence);
 
     if request.volume.is_some() {

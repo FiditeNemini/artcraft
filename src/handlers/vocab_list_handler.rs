@@ -1,10 +1,10 @@
 // Copyright (c) 2015 Brandon Thomas <bt@brand.io>
 
-use dictionary::VocabularyLibrary;
 use iron::Handler;
 use iron::mime::Mime;
 use iron::prelude::*;
 use iron::status;
+use old_dictionary::VocabularyLibrary;
 use rustc_serialize::json;
 use std::path::Path;
 use std::path::PathBuf;
