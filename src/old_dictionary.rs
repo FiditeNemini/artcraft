@@ -2,11 +2,9 @@
 
 use std::collections::HashMap;
 use std::fs::DirEntry;
-use std::fs::File;
 use std::fs;
-use std::io::Read;
 use std::io;
-use std::path::{Path, PathBuf};
+use std::path::Path;
 
 pub type VoiceName = String;
 
@@ -49,7 +47,7 @@ impl VocabularyLibrary {
       }
 
       // FIXME: Opening FS reads in a loop is bad. Feel bad.
-      let mut vocabulary = try!(Vocabulary::read_from_directory(
+      let vocabulary = try!(Vocabulary::read_from_directory(
           entry.path().as_path()));
 
       if vocabulary.words.is_empty() {
@@ -98,7 +96,7 @@ impl Vocabulary {
 
 fn get_filename(entry: &DirEntry) -> Result<String, io::Error> {
   match entry.file_name().into_string() {
-    Err(err) => {
+    Err(_) => {
       Err(io::Error::new(io::ErrorKind::Other, "Error reading filename"))
     },
     Ok(filename) => Ok(filename.to_string()),

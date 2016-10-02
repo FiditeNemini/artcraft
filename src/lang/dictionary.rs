@@ -32,6 +32,8 @@ impl Dictionary {
     self.words.contains(word)
   }
 
+  /// For testing only.
+  #[allow(dead_code)]
   fn insert(mut self, word: &str) -> Self {
     self.words.insert(word.to_string());
     self

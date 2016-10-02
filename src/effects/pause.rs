@@ -5,7 +5,7 @@ pub fn generate_pause(length: u16) -> Vec<i16> {
   let mut sound = Vec::new();
 
   let len = length * 2; // number of channels
-  for i in 0..len { sound.push(0); }
+  for _ in 0..len { sound.push(0); }
 
   sound
 }

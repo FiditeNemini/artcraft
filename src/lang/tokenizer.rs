@@ -4,7 +4,7 @@
 
 use regex::Regex;
 use speaker::Speaker;
-use std::sync::Arc;
+//use std::sync::Arc;
 //use super::dictionary::UniversalDictionary;
 
 lazy_static! {
@@ -41,7 +41,7 @@ impl Tokenizer {
     Tokenizer {}
   }
 
-  pub fn convert(&self, speaker: &Speaker, raw_sentence: &str) -> String {
+  pub fn convert(&self, _speaker: &Speaker, raw_sentence: &str) -> String {
     let mut sentence = raw_sentence.to_string();
 
     sentence = RE_ALPHA_COLON.replace_all(&sentence, "$1 ");

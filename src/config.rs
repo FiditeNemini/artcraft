@@ -36,7 +36,7 @@ impl Config {
       Err(_) => None,
       Ok(contents) => {
         let value = toml::Parser::new(&contents).parse().unwrap();
-        let mut config = toml::decode(toml::Value::Table(value));
+        let config = toml::decode(toml::Value::Table(value));
 
         config.map(|mut c: Config| {
           c.hostname = get_hostname();

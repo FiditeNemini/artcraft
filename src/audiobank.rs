@@ -3,7 +3,6 @@
 use error::SynthError;
 use hound::WavReader;
 use hound::WavSpec;
-use hound::WavWriter;
 use std::path::Path;
 use std::path::PathBuf;
 

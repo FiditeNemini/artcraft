@@ -4,28 +4,20 @@
 use config::Config;
 use crypto::digest::Digest;
 use crypto::sha1::Sha1;
-use hound::{WavReader, WavSpec, WavWriter};
 use iron::Handler;
-use iron::headers::{ETag, EntityTag, Headers, IfNoneMatch};
+use iron::Plugin;
+use iron::headers::ETag;
+use iron::headers::EntityTag;
+use iron::headers::IfNoneMatch;
 use iron::mime::Mime;
-use iron::prelude::*;
+use iron::prelude::IronResult;
+use iron::prelude::Request;
+use iron::prelude::Response;
 use iron::status;
-use old_words::split_sentence;
-use router::Router;
-use rustc_serialize::json;
 use speaker::Speaker;
 use std::collections::HashMap;
-use std::error::Error;
-use std::fmt::{self, Debug};
-use std::fs::File;
-use std::fs;
 use std::i16;
-use std::io::BufReader;
-use std::io::BufWriter;
-use std::io::Cursor;
 use std::io::Read;
-use std::io;
-use std::path::{Path, PathBuf};
 use std::str::FromStr;
 use std::sync::Arc;
 use std::sync::RwLock;
@@ -97,11 +89,11 @@ struct SpeakRequest {
 }
 
 enum SpeakerRequestError {
-  SentenceMissing,
+  //SentenceMissing,
   SentenceInvalid,
-  SpeakerMissing,
+  //SpeakerMissing,
   SpeakerInvalid,
-  VolumeInvalid,
+  //VolumeInvalid,
 }
 
 /// Synthesizes audio from input.
@@ -111,10 +103,6 @@ pub struct AudioSynthHandler {
 
   /// Server configs.
   config: Config,
-
-  /// Root of where files can be served from.
-  /// A PathBuf since `Path` can only be created as a borrow.
-  directory: PathBuf,
 }
 
 impl SpeakRequest {
@@ -293,9 +281,6 @@ impl Handler for AudioSynthHandler {
   fn handle(&self, req: &mut Request) -> IronResult<Response> {
     info!("GET /speak");
 
-    let speaker_error = build_error(status::BadRequest,
-        &format!("Missing `{}` parameter.", SPEAKER_PARAM));
-
     let sentence_error = build_error(status::BadRequest,
         &format!("Missing `{}` parameter.", SENTENCE_PARAM));
 
@@ -310,7 +295,7 @@ impl Handler for AudioSynthHandler {
     // TODO: Cleanup
     let request = match SpeakRequest::parse(req) {
       Ok(s) => s,
-      Err(e) => {
+      Err(_) => {
         return sentence_error;
       },
     };
@@ -344,12 +329,11 @@ impl Handler for AudioSynthHandler {
 }
 
 impl AudioSynthHandler {
-  pub fn new(synthesizer: Arc<RwLock<Synthesizer>>, config: Config,
-             directory: &str) -> AudioSynthHandler {
+  pub fn new(synthesizer: Arc<RwLock<Synthesizer>>,
+             config: Config) -> AudioSynthHandler {
     AudioSynthHandler {
       synthesizer: synthesizer,
       config: config,
-      directory: Path::new(directory).to_path_buf(),
     }
   }
 
@@ -415,25 +399,7 @@ impl AudioSynthHandler {
 
     hasher.result_str().to_string()
   }
-
-  fn get_speaker_path(&self, speaker: &str) -> Result<PathBuf, io::Error> {
-    // FIXME: Hack so I can release tonight. Rewrite this whole controller plz.
-    if speaker.contains("..") ||
-        speaker.contains("/") ||
-        speaker.contains("$") ||
-        speaker.contains("~") {
-          return Err(io::Error::new(io::ErrorKind::InvalidInput, "invalid path"));
-        }
-
-    let speaker_path = self.directory.as_path().join(Path::new(speaker));
-    // FIXME: This is not the security measure you think it is:
-    if !speaker_path.starts_with(&self.directory) {
-      return Err(io::Error::new(io::ErrorKind::InvalidInput, "invalid path"));
-    }
-    Ok(speaker_path)
-  }
 }
-
 
 /** Parse an optional u16 out of query parameters. */
 fn get_u16(params: &QueryParams, param_name: &str) -> Option<u16> {

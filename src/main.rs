@@ -64,7 +64,7 @@ fn main() {
   let config = Config::read("./config.toml").unwrap();
 
   VocabularyLibrary::read_from_directory(
-      Path::new(&config.get_sound_path()));
+      Path::new(&config.get_sound_path())).unwrap();
 
   get_hostname();
 
@@ -95,8 +95,7 @@ fn start_server(config: &Config, port: u16, synthesizer: Synthesizer) {
   // TODO: Cross-cutting filter installation
   let mut router = Router::new();
   let mut chain = Chain::new(AudioSynthHandler::new(async_synth.clone(),
-                                                    config.clone(),
-                                                    audio_path));
+                                                    config.clone()));
   chain.link_after(ErrorFilter);
   router.get("/speak", chain);
   router.get("/words", VocabListHandler::new(audio_path));

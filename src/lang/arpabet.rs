@@ -8,7 +8,6 @@ use std::collections::HashSet;
 use std::fs::File;
 use std::io::BufRead;
 use std::io::BufReader;
-use std::io::Read;
 
 pub type Word = String;
 pub type Phoneme = String;
@@ -24,7 +23,7 @@ impl Arpabet {
   /// Read CMU's Arpabet Dictionary.
   /// See http://www.speech.cs.cmu.edu/cgi-bin/cmudict
   pub fn load_from_file(filename: &str) -> Result<Arpabet, SynthError> {
-    let mut f = try!(File::open(filename));
+    let f = try!(File::open(filename));
     let mut reader = BufReader::new(f);
 
     let mut map = HashMap::new();

@@ -7,7 +7,7 @@
  */
 pub fn change_speed(waveform: Vec<i16>, speed: f32) -> Vec<i16> {
   let change = 1.0 / speed;
-  let mut size = (waveform.len() as f32 * change).round() as usize;
+  let size = (waveform.len() as f32 * change).round() as usize;
 
   // FIXME: Use memory of caller.
   // Caller can be more efficient with memory management.

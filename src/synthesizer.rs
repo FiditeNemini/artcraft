@@ -70,7 +70,7 @@ impl Synthesizer {
       -> Result<WavBytes, SynthError> {
 
     let prepared = self.tokenizer.convert(speaker, sentence);
-    let mut words = split_sentence(&prepared);
+    let words = split_sentence(&prepared);
 
     if words.len() == 0 {
       return Err(SynthError::BadInput {
@@ -108,13 +108,13 @@ impl Synthesizer {
       }
       if !word_added && use_phonemes {
         // Old phoneme algorithm
-        word_added = self.concatenate_polyphone(&mut concatenated_waveform,
-                                                speaker,
-                                                word,
-                                                use_diphones,
-                                                monophone_padding_start,
-                                                monophone_padding_end,
-                                                polyphone_padding_end);
+        self.concatenate_polyphone(&mut concatenated_waveform,
+                                   speaker,
+                                   word,
+                                   use_diphones,
+                                   monophone_padding_start,
+                                   monophone_padding_end,
+                                   polyphone_padding_end);
       }
     }
 
@@ -324,7 +324,7 @@ impl Synthesizer {
   fn get_n_phone_samples(&self,
                          speaker: &Speaker,
                          word: &str,
-                         sample_preference: SamplePreference,
+                         _sample_preference: SamplePreference,
                          use_ends: bool)
       -> Option<Vec<SampleBytes>> {
 
@@ -343,7 +343,7 @@ impl Synthesizer {
     let mut debug : Vec<Option<String>> =
         Vec::with_capacity(polyphone.len());
 
-    for i in 0..polyphone.len() {
+    for _ in 0..polyphone.len() {
       fulfilled.push(false);
       chunks.push(None);
       debug.push(None);
@@ -485,7 +485,7 @@ impl Synthesizer {
       }
     }
 
-    let mut debug_str : Vec<String> = debug.into_iter()
+    let debug_str : Vec<String> = debug.into_iter()
       .map(|x| if x.is_some() { x.unwrap() } else { "None".to_string() })
       .collect();
 

@@ -2,8 +2,6 @@
 
 use hound::Error as HoundError;
 use std::convert::From;
-use std::error;
-use std::fmt;
 use std::io;
 
 /** The common error type used throughout the synthesizer. */
