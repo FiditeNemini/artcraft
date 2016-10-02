@@ -44,6 +44,12 @@ impl Tokenizer {
   pub fn convert(&self, _speaker: &Speaker, raw_sentence: &str) -> String {
     let mut sentence = raw_sentence.to_string();
 
+    // Remove quotes
+    sentence = sentence.replace("\"", "")
+        .replace("“", "")
+        .replace("”", "");
+
+    // Regex removals and replacements.
     sentence = RE_ALPHA_COLON.replace_all(&sentence, "$1 ");
     sentence = RE_BEGIN_SINGLE_QUOTE.replace_all(&sentence, "");
     sentence = RE_PERIOD_END.replace_all(&sentence, "");
@@ -62,10 +68,10 @@ impl Tokenizer {
     sentence = RE_URL.replace_all(&sentence, " ");
 
     // Remove characters.
-    sentence = sentence.replace("\"", "")
-        .replace(",", "")
+    sentence = sentence.replace(",", "")
         .replace("!", "")
         .replace("?", "")
+        .replace("—", " ")
         .replace("--", " ")
         .replace(" - ", " ")
         .replace("...", " ")
@@ -121,6 +127,9 @@ mod tests {
     // Drop URLs
     assert_eq!("testing link", &t.convert(&s, "Testing https://t.co/1A2b3cdEfG link"));
     assert_eq!("visit", &t.convert(&s, "Visit https://t.co/A1A1b0b0b0…"));
+
+    // Drop smart quotes, periods.
+    assert_eq!("it would be a bad idea", &t.convert(&s, "“It would be a bad idea.”"));
 
     // Complex examples taken from real tweets.
     assert_eq!("will be in novi michigan this friday at 5:00pm join the movement tickets available at",
