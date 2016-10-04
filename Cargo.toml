@@ -10,7 +10,7 @@
 [dependencies]
   #cpal = "*" # Hardware audio output (for testing); works well with Hound.
   clap = "1.5.*" # CLI parsing.
-  hound = "1.1.0" # WAV codec.
+  hound = "2.0.*" # WAV codec.
   hyper = "0.9.*"
   iron = "0.4.*"
   lazy_static = "0.2.*"
