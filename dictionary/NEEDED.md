@@ -26,3 +26,5 @@ waker
 waluigi
 wanker
 wario
+wwii
+✓

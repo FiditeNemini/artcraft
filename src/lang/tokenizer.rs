@@ -49,6 +49,9 @@ impl Tokenizer {
         .replace("“", "")
         .replace("”", "");
 
+    // Replace smart quotes.
+    sentence = sentence.replace("’", "'");
+
     // Regex removals and replacements.
     sentence = RE_ALPHA_COLON.replace_all(&sentence, "$1 ");
     sentence = RE_BEGIN_SINGLE_QUOTE.replace_all(&sentence, "");
@@ -130,6 +133,7 @@ mod tests {
 
     // Drop smart quotes, periods.
     assert_eq!("it would be a bad idea", &t.convert(&s, "“It would be a bad idea.”"));
+    assert_eq!("a lot of people can't handle it", &t.convert(&s, "A lot of people can’t handle it."));
 
     // Complex examples taken from real tweets.
     assert_eq!("will be in novi michigan this friday at 5:00pm join the movement tickets available at",
