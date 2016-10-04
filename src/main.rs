@@ -36,6 +36,8 @@ use handlers::file_server_handler::FileServerHandler;
 use handlers::vocab_list_handler::VocabListHandler;
 use iron::prelude::*;
 use lang::arpabet::Arpabet;
+use lang::dictionary::UniversalDictionary;
+use lang::parser::Parser;
 use lang::tokenizer::Tokenizer;
 use logger::SimpleLogger;
 use old_dictionary::VocabularyLibrary;
@@ -130,15 +132,19 @@ fn create_synthesizer(config: &Config) -> Synthesizer {
   let square_dictionary = Arpabet::load_from_file(
       &config.square_dictionary_file_development).unwrap();
 
-  let dictionary = arpabet_dictionary
+  let arpabet = arpabet_dictionary
       .combine(&extra_dictionary)
       .combine(&square_dictionary);
 
   let audiobank = Audiobank::new(&config.get_sound_path());
 
-  let tokenizer = Tokenizer::empty();
+  let mut dictionary = UniversalDictionary::new();
+  dictionary.set_arpabet_dictionary(arpabet.to_dictionary());
+
+  let tokenizer = Tokenizer::new(Arc::new(dictionary));
+  let parser = Parser::new(tokenizer);
 
   info!("Building Synthesizer...");
-  Synthesizer::new(dictionary, audiobank, tokenizer)
+  Synthesizer::new(arpabet, audiobank, parser)
 }
 

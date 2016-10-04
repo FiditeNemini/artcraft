@@ -10,7 +10,7 @@ use error::SynthError;
 use hound::WavSpec;
 use hound::WavWriter;
 use lang::arpabet::Arpabet;
-use lang::tokenizer::Tokenizer;
+use lang::parser::Parser;
 use old_words::split_sentence;
 use speaker::Speaker;
 use std::io::BufWriter;
@@ -33,19 +33,19 @@ pub struct Synthesizer {
   /// WAV Audiobank for sound generation.
   audiobank: Audiobank,
 
-  /// Sentence tokenizer
-  tokenizer: Tokenizer,
+  /// Sentence parser
+  parser: Parser,
 }
 
 impl Synthesizer {
   /// CTOR
   pub fn new(arpabet_dictionary: Arpabet,
              audiobank: Audiobank,
-             tokenizer: Tokenizer) -> Synthesizer {
+             parser: Parser) -> Synthesizer {
     Synthesizer {
       arpabet_dictionary: arpabet_dictionary,
       audiobank: audiobank,
-      tokenizer: tokenizer,
+      parser: parser,
     }
   }
 
@@ -69,7 +69,7 @@ impl Synthesizer {
                   word_padding_end: Option<u16>)
       -> Result<WavBytes, SynthError> {
 
-    let prepared = self.tokenizer.convert(speaker, sentence);
+    let prepared = self.parser.parse(speaker, sentence);
     let words = split_sentence(&prepared);
 
     if words.len() == 0 {

@@ -103,7 +103,6 @@ mod tests {
         .set_speaker_dictionary(alice.clone(), alice_dict)
         .set_speaker_dictionary(bob.clone(), bob_dict);
 
-
     assert_eq!(true, uni.contains_for(&alice, "foo"));
     assert_eq!(true, uni.contains_for(&alice, "bar"));
     assert_eq!(false, uni.contains_for(&alice, "baz"));
