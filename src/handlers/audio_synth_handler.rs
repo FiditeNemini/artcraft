@@ -309,7 +309,7 @@ impl Handler for AudioSynthHandler {
 
     info!("Request Header Caching Sha: {}", hash);
 
-    if self.config.use_caching_headers {
+    if self.config.use_caching_headers.unwrap_or(true) {
       // Don't generate file if caching header is matched.
       if request_hash == entity_tag.to_string() {
         info!("Caching headers match; responding with NotModified.");

@@ -1,22 +1,14 @@
-# Various configs
 
-# TODO: This 'hostname' key is present only as a hack.
-# Stop writing bad code, Brandon.
-hostname = ""
+# Configs for the server.
 
-# Whether or not to read the "If-None-Match" headers.
-# Turn this off for development and on for production.
-use_caching_headers = false
+[default] # Production
+  use_caching_headers = false
+  sound_path = "./sounds"
+  phoneme_dictionary_file = "./dictionary/cmudict-0.7b"
+  extra_dictionary_file = "./dictionary/extra-dict"
+  square_dictionary_file = "./dictionary/square-dict"
 
-# Sound paths in development and production environments
-sound_path_development = "/home/bt/Dropbox/jungle.horse/sounds"
-sound_path_production = "./sounds"
-
-# Complete path to the phoneme dictionary file
-phoneme_dictionary_file_development = "./dictionary/cmudict-0.7b"
-phoneme_dictionary_file_production = "./dictionary/cmudict-0.7b"
-extra_dictionary_file_development = "./dictionary/extra-dict"
-extra_dictionary_file_production = "./dictionary/extra-dict"
-square_dictionary_file_development = "./dictionary/square-dict"
-square_dictionary_file_production = "./dictionary/square-dict"
+[x16] # Local Development
+  use_caching_headers = false
+  sound_path = "/home/bt/Dropbox/jungle.horse/sounds"
 

@@ -66,7 +66,7 @@ fn main() {
   let config = Config::read("./config.toml").unwrap();
 
   VocabularyLibrary::read_from_directory(
-      Path::new(&config.get_sound_path())).unwrap();
+      Path::new(&config.sound_path.clone().unwrap())).unwrap();
 
   get_hostname();
 
@@ -88,7 +88,7 @@ fn get_port(matches: &ArgMatches, default_port: u16) -> u16 {
 }
 
 fn start_server(config: &Config, port: u16, synthesizer: Synthesizer) {
-  let audio_path = &config.get_sound_path();
+  let audio_path = &config.sound_path.clone().unwrap();
   let file_path = "./web";
   let index = "index.html";
 
@@ -122,21 +122,21 @@ fn get_hostname() {
 fn create_synthesizer(config: &Config) -> Synthesizer {
   info!("Reading Arpabet Dictionary...");
   let arpabet_dictionary = Arpabet::load_from_file(
-      &config.phoneme_dictionary_file_development).unwrap();
+      &config.phoneme_dictionary_file.clone().unwrap()).unwrap();
 
   info!("Reading Extra Dictionary...");
   let extra_dictionary = Arpabet::load_from_file(
-      &config.extra_dictionary_file_development).unwrap();
+      &config.extra_dictionary_file.clone().unwrap()).unwrap();
 
   info!("Reading Square Dictionary...");
   let square_dictionary = Arpabet::load_from_file(
-      &config.square_dictionary_file_development).unwrap();
+      &config.square_dictionary_file.clone().unwrap()).unwrap();
 
   let arpabet = arpabet_dictionary
       .combine(&extra_dictionary)
       .combine(&square_dictionary);
 
-  let audiobank = Audiobank::new(&config.get_sound_path());
+  let audiobank = Audiobank::new(&config.sound_path.clone().unwrap());
 
   let mut dictionary = UniversalDictionary::new();
   dictionary.set_arpabet_dictionary(arpabet.to_dictionary());

@@ -1,58 +1,105 @@
 // Copyright (c) 2016 Brandon Thomas <bt@brand.io>
 
 use resolve::hostname;
+use std::convert::From;
 use std::fs::File;
 use std::io::Error;
-use std::io::prelude::*;
+use std::io::Read;
+use std::io;
 use toml;
 
 #[derive(Clone, Debug, RustcEncodable, RustcDecodable)]
 pub struct Config {
-  /// Machine hostname
-  /// TODO: This being public is a total hack.
-  /// Really, this shouldn't even be in the config.
-  pub hostname: String,
-
   /// Whether or not to send/respect client caching headers.
-  pub use_caching_headers: bool,
+  pub use_caching_headers: Option<bool>,
 
-  pub sound_path_development: String,
-  pub sound_path_production: String,
+  /// Where sound files are located.
+  pub sound_path: Option<String>,
 
-  pub phoneme_dictionary_file_development: String,
-  pub phoneme_dictionary_file_production: String,
+  /// Where various arpabet files are located.
+  pub phoneme_dictionary_file: Option<String>,
+  pub extra_dictionary_file: Option<String>,
+  pub square_dictionary_file: Option<String>,
+}
 
-  pub extra_dictionary_file_development: String,
-  pub extra_dictionary_file_production: String,
-
-  pub square_dictionary_file_development: String,
-  pub square_dictionary_file_production: String,
+#[derive(Debug)]
+pub enum ConfigError {
+  /// Wraps an IO error.
+  IoError { cause: io::Error },
+  /// TOML parsing error.
+  TomlError,
+  /// Configs absent.
+  TomlMissing,
 }
 
 impl Config {
   /// Static CTOR.
-  pub fn read(filename: &str) -> Option<Config> {
-    match read_file(filename) {
-      Err(_) => None,
-      Ok(contents) => {
-        let value = toml::Parser::new(&contents).parse().unwrap();
-        let config = toml::decode(toml::Value::Table(value));
+  /// Read a [default] set of configs and merge with a ["$hostname"] set.
+  pub fn read(filename: &str) -> Result<Config, ConfigError> {
+    let contents = try!(read_file(filename));
 
-        config.map(|mut c: Config| {
-          c.hostname = get_hostname();
-          c
-        })
+    let table = match toml::Parser::new(&contents).parse() {
+      None => { return Err(ConfigError::TomlError); },
+      Some(table) => table,
+    };
+
+    let system_hostname = hostname::get_hostname().ok();
+
+    let maybe_host = if system_hostname.is_some() {
+      table.get(&system_hostname.unwrap())
+          .and_then(|t| toml::decode::<Config>(t.clone()))
+    } else {
+      None
+    };
+
+    let maybe_default = table.get("default")
+        .and_then(|t| toml::decode::<Config>(t.clone()));
+
+    if maybe_default.is_none() {
+      if maybe_host.is_none() {
+        return Err(ConfigError::TomlMissing);
+      } else {
+        return Ok(maybe_host.unwrap());
       }
+    }
+
+    let default = maybe_default.unwrap();
+
+    if maybe_host.is_some() {
+      let host = maybe_host.unwrap();
+      Ok(host.merge(default))
+    } else {
+      Ok(default)
     }
   }
 
-  /// Get the sound directory path.
-  pub fn get_sound_path(&self) -> String {
-    if self.hostname == "x16" {
-      self.sound_path_development.clone()
-    } else {
-      self.sound_path_production.clone()
+  /// Merge another config object, keeping current values where they
+  /// exist, and overriding Optional values where they do not.
+  pub fn merge(&self, other: Config) -> Config {
+    // TODO: Simplify using generics. Maybe a trait, such as "x.as_default_or(y)"
+    Config {
+      use_caching_headers: self.use_caching_headers
+          .clone()
+          .or(other.use_caching_headers.clone()),
+      sound_path: self.sound_path
+          .clone()
+          .or(other.sound_path.clone()),
+      phoneme_dictionary_file: self.phoneme_dictionary_file
+          .clone()
+          .or(other.phoneme_dictionary_file.clone()),
+      extra_dictionary_file: self.extra_dictionary_file
+          .clone()
+          .or(other.extra_dictionary_file.clone()),
+      square_dictionary_file: self.square_dictionary_file
+          .clone()
+          .or(other.square_dictionary_file.clone()),
     }
+  }
+}
+
+impl From<io::Error> for ConfigError {
+  fn from(error: io::Error) -> ConfigError {
+    ConfigError::IoError { cause: error }
   }
 }
 
@@ -61,13 +108,5 @@ fn read_file(filename: &str) -> Result<String, Error> {
   let mut buf = String::new();
   try!(file.read_to_string(&mut buf));
   Ok(buf)
-}
-
-// TODO: This is a total hack.
-fn get_hostname() -> String {
-  match hostname::get_hostname() {
-    Ok(s) => { s.to_string() },
-    Err(_) => { "".to_string() },
-  }
 }
 
