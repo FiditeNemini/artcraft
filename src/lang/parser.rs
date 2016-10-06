@@ -22,6 +22,7 @@ impl Parser {
       match token {
         Token::Punctuation { value: _v } => {}, // Skip (for now)
         Token::Date { value: _v } => {}, // Skip (for now)
+        Token::Emoji { value: _v } => {}, // Skip (for now)
         Token::Hashtag { value: _v } => {}, // Skip (for now)
         Token::Mention { value: _v } => {}, // Skip (for now)
         Token::Url { value: _v } => {}, // Skip

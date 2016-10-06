@@ -23,6 +23,7 @@ lazy_static! {
   // TODO: initialism regex should not match on ending punctuation
   pub static ref RE_INITIALISM: Regex = Regex::new(r"[A-Z]{3,7}").unwrap();
   pub static ref RE_URL: Regex = Regex::new(r"https?://[\w\.-]+/?(\w+)?").unwrap();
+  pub static ref RE_EMOJI: Regex = Regex::new(r"[\x{1F600}-\x{1F6FF}]").unwrap();
 
   // Twitter matching.
   pub static ref RE_AT_MENTION : Regex = Regex::new(r"@(\w+)").unwrap();
@@ -68,6 +69,11 @@ pub struct Mention {
 }
 
 #[derive(PartialEq)]
+pub struct Emoji {
+  pub value: String,
+}
+
+#[derive(PartialEq)]
 pub struct Initialism {
   pub value: String,
 }
@@ -85,13 +91,14 @@ pub struct Unknown {
 #[derive(PartialEq)]
 pub enum Token {
   Date { value: Date },
-  DictionaryWord { value: DictionaryWord },
+  DictionaryWord { value: DictionaryWord }, // The primary type.
+  Emoji { value: Emoji },
   Hashtag { value: Hashtag },
   Initialism { value: Initialism },
   Mention { value: Mention },
   Punctuation { value: Punctuation },
   Symbol { value: Symbol },
-  Unknown { value: Unknown },
+  Unknown { value: Unknown }, // The unclassified type.
   Url { value: Url },
 }
 
@@ -100,6 +107,7 @@ impl fmt::Debug for Token {
     let val = match *self {
       Token::Date { value : ref v } => format!("Date {}", v.value),
       Token::DictionaryWord { value : ref v } => format!("Word {}", v.value),
+      Token::Emoji { value : ref v } => format!("Emoji {}", v.value),
       Token::Hashtag { value : ref v } => format!("Hashtag {}", v.value),
       Token::Initialism { value : ref v } => format!("Initialism {}", v.value),
       Token::Mention { value : ref v } => format!("Mention {}", v.value),
@@ -127,6 +135,10 @@ impl Token {
 
   pub fn initialism(value: String) -> Token {
     Token::Initialism { value: Initialism { value: value } }
+  }
+
+  pub fn emoji(value: String) -> Token {
+    Token::Emoji { value: Emoji { value: value } }
   }
 
   pub fn hashtag(value: String) -> Token {
@@ -212,9 +224,9 @@ impl Tokenizer {
     // Designed not to match times (5:00) or URLs (http://)
     filtered = RE_ALPHA_COLON.replace_all(&filtered, "$1 ");
 
-    // TODO: TEST; also tokenize properly.
-    // Handle dashes
-    filtered = filtered.replace("—", " ")
+    // Handle dashes (TODO: tokenize instead)
+    filtered = filtered.replace("—", " ") // emdash
+        .replace("–", " ") // endash
         .replace("--", " ")
         .replace(" - ", " ");
 
@@ -350,6 +362,11 @@ impl Tokenizer {
         continue;
       }
 
+      if RE_EMOJI.is_match(&word) {
+        tokens.push(Token::emoji(word.to_string()));
+        continue;
+      }
+
       // TODO: More efficient + cleanup
       // Initialisms
       if RE_INITIALISM.is_match(&w) {
@@ -416,6 +433,7 @@ mod tests {
     static ref WORDS: HashSet<String> = {
       let mut w = HashSet::new();
       w.insert("a".to_string());
+      w.insert("and".to_string());
       w.insert("at".to_string());
       w.insert("atlanta".to_string());
       w.insert("available".to_string());
@@ -443,6 +461,7 @@ mod tests {
       w.insert("me".to_string());
       w.insert("movement".to_string());
       w.insert("of".to_string());
+      w.insert("on".to_string());
       w.insert("one".to_string());
       w.insert("people".to_string());
       w.insert("place".to_string());
@@ -458,6 +477,7 @@ mod tests {
       w.insert("two".to_string());
       w.insert("username".to_string());
       w.insert("visit".to_string());
+      w.insert("vote".to_string());
       w.insert("would".to_string());
       w.insert("you".to_string());
       w
@@ -500,6 +520,41 @@ mod tests {
                     w("three"), Token::period(),
                     w("four"), Token::ellipsis(),
                     w("five"), Token::ellipsis()];
+
+    assert_eq!(expected, result);
+  }
+
+  #[test]
+  fn test_tokenize_dashes() {
+    let t = make_tokenizer();
+
+    let mut result = t.tokenize("One – Two");
+    let mut expected = vec![w("one"), w("two")];
+
+    assert_eq!(expected, result);
+
+    result = t.tokenize("One– Two");
+    expected = vec![w("one"), w("two")];
+
+    assert_eq!(expected, result);
+
+    result = t.tokenize("One—Two");
+    expected = vec![w("one"), w("two")];
+
+    assert_eq!(expected, result);
+
+    result = t.tokenize("One--Two");
+    expected = vec![w("one"), w("two")];
+
+    assert_eq!(expected, result);
+
+    result = t.tokenize("One - Two");
+    expected = vec![w("one"), w("two")];
+
+    assert_eq!(expected, result);
+
+    result = t.tokenize("One  -  Two");
+    expected = vec![w("one"), w("two")];
 
     assert_eq!(expected, result);
   }
@@ -585,12 +640,17 @@ mod tests {
     assert_eq!(expected, result);
   }
 
-  /* TODO examples:
-    - United States in 2016.
-    - RT @username:
-    - Fortune 100.
-    - —Hillary
+  /* TODO examples / things that break:
+    - RT @username: (RT = retweet)
+    - Fortune 100. (Numbers)
+    - Currencies ($5)
+    - United States in 2016. (Years)
     - ✓ Emoji
+      - 😂
+      - ⬇️
+    - a...telling (broken)
+    - (and we aren't stupid) (broken)
+    - ABC… -> i(ABC), ellipsis (broken)
   */
 
   #[test]
@@ -610,8 +670,12 @@ mod tests {
     result = t.tokenize("VOTE on 11/8/16.");
     expected = vec![w("vote"), w("on"), date("11/8/16"), Token::period()];
 
+    assert_eq!(expected, result);
+
     result = t.tokenize("On 10/1 and 10/02");
     expected = vec![w("on"), date("10/1"), w("and"), date("10/02")];
+
+    assert_eq!(expected, result);
   }
 
   #[test]
