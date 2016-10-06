@@ -279,8 +279,6 @@ impl SpeakRequest {
 impl Handler for AudioSynthHandler {
   /// Process request.
   fn handle(&self, req: &mut Request) -> IronResult<Response> {
-    info!("GET /speak");
-
     let sentence_error = build_error(status::BadRequest,
         &format!("Missing `{}` parameter.", SENTENCE_PARAM));
 
@@ -300,19 +298,19 @@ impl Handler for AudioSynthHandler {
       },
     };
 
-    info!("Speak Request ({}): {}.", request.speaker, request.sentence);
-    info!("Request: {:?}", request);
+    info!(target: "handler", "Speak Request: {:?}", request);
 
     // FIXME: Varies with spaces, formatting, etc.
     let hash = self.sha_digest(&request);
     let entity_tag = EntityTag::new(true, hash.to_owned());
 
-    info!("Request Header Caching Sha: {}", hash);
+    info!(target: "handler", "Request Header Caching Sha: {}", hash);
 
     if self.config.use_caching_headers.unwrap_or(true) {
       // Don't generate file if caching header is matched.
       if request_hash == entity_tag.to_string() {
-        info!("Caching headers match; responding with NotModified.");
+        info!(target: "handler",
+              "Caching headers match; responding with NotModified.");
         return Ok(Response::with(status::NotModified));
       }
     }

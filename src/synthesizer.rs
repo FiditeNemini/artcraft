@@ -188,7 +188,8 @@ impl Synthesizer {
     let polyphone = match self.arpabet_dictionary.get_polyphone(word) {
       Some(p) => { p },
       None => {
-        info!("Word '{}' does not exist in polyphone database.", word);
+        info!(target: "synthesis",
+              "Word '{}' does not exist in polyphone database.", word);
         // XXX: Adding static as a cue to denote that the given
         // word->polyphone mapping doesn't exist in the database.
         match self.audiobank.get_misc("record_static") {
@@ -201,7 +202,8 @@ impl Synthesizer {
       },
     };
 
-    info!("Word '{}' maps to polyphone '{:?}'", word, polyphone);
+    info!(target: "synthesis",
+          "Word '{}' maps to polyphone '{:?}'", word, polyphone);
 
     // Insert space before polyphone.
     match self.audiobank.get_misc("pause") {
@@ -228,7 +230,8 @@ impl Synthesizer {
         match self.audiobank.get_diphone(speaker.as_str(), first, second) {
           None => {},
           Some(diphone_data) => {
-            info!("Read diphone: {}, {}", first, second);
+            info!(target: "synthesis",
+                  "Read diphone: {}, {}", first, second);
             skip_next = true;
             concatenated_waveform.extend(diphone_data);
             continue;
@@ -385,7 +388,7 @@ impl Synthesizer {
       }
     }
 
-    info!("4-fulfilled: {:?}", fulfilled);
+    info!(target: "synthesis", "4-fulfilled: {:?}", fulfilled);
 
     // 3-phone
     if polyphone.len() >= 3 {
@@ -418,7 +421,7 @@ impl Synthesizer {
       }
     }
 
-    info!("3-fulfilled: {:?}", fulfilled);
+    info!(target: "synthesis", "3-fulfilled: {:?}", fulfilled);
 
     // 2-phone
     if polyphone.len() >= 2 {
@@ -451,7 +454,7 @@ impl Synthesizer {
       }
     }
 
-    info!("2-fulfilled: {:?}", fulfilled);
+    info!(target: "synthesis", "2-fulfilled: {:?}", fulfilled);
 
     // 1-phone
     for i in 0..polyphone.len() {
@@ -477,7 +480,7 @@ impl Synthesizer {
       }
     }
 
-    info!("1-fulfilled: {:?}", fulfilled);
+    info!(target: "synthesis", "1-fulfilled: {:?}", fulfilled);
 
     for x in fulfilled {
       if !x {
@@ -489,13 +492,13 @@ impl Synthesizer {
       .map(|x| if x.is_some() { x.unwrap() } else { "None".to_string() })
       .collect();
 
-    info!("Comprised of: {:?}", debug_str);
+    info!(target: "synthesis", "Comprised of: {:?}", debug_str);
 
     let results : Vec<SampleBytes> = chunks.into_iter()
       .filter_map(|x| x) // Woo, already Option<T>!
       .collect();
 
-    info!("Results Length: {} of {} phones",
+    info!(target: "synthesis", "Results Length: {} of {} phones",
           results.len(),
           polyphone.len());
 

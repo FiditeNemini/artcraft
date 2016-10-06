@@ -1,4 +1,3 @@
-
 # Configs for the server.
 
 [default] # Production
@@ -8,7 +7,17 @@
   extra_dictionary_file = "./dictionary/extra-dict"
   square_dictionary_file = "./dictionary/square-dict"
 
+  # Logging verbosity
+  log_parsing = false
+  log_synthesis = false
+  log_handler = false
+
 [x16] # Local Development
   use_caching_headers = false
   sound_path = "/home/bt/Dropbox/jungle.horse/sounds"
+
+  # Logging verbosity
+  log_parsing = true
+  log_synthesis = false
+  log_handler = false
 

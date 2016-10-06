@@ -49,7 +49,9 @@ use std::sync::RwLock;
 use synthesizer::Synthesizer;
 
 fn main() {
-  SimpleLogger::init().unwrap();
+  let config = Config::read("./config.toml").unwrap();
+  let logger = SimpleLogger::new(config.clone());
+  logger.init().unwrap();
 
   // Parse command line args.
   let matches = App::new("trumpet")
@@ -62,8 +64,6 @@ fn main() {
       .get_matches();
 
   let port = get_port(&matches, 9000);
-
-  let config = Config::read("./config.toml").unwrap();
 
   VocabularyLibrary::read_from_directory(
       Path::new(&config.sound_path.clone().unwrap())).unwrap();

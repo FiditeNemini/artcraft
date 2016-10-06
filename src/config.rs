@@ -1,4 +1,4 @@
-// Copyright (c) 2016 Brandon Thomas <bt@brand.io>
+// Copyright (c) 2016 Brandon Thomas <bt@brand.io, echelon@gmail.com>
 
 use resolve::hostname;
 use std::convert::From;
@@ -20,6 +20,11 @@ pub struct Config {
   pub phoneme_dictionary_file: Option<String>,
   pub extra_dictionary_file: Option<String>,
   pub square_dictionary_file: Option<String>,
+
+  /// What events to log.
+  pub log_handler: Option<bool>,
+  pub log_parsing: Option<bool>,
+  pub log_synthesis: Option<bool>,
 }
 
 #[derive(Debug)]
@@ -93,6 +98,15 @@ impl Config {
       square_dictionary_file: self.square_dictionary_file
           .clone()
           .or(other.square_dictionary_file.clone()),
+      log_handler: self.log_handler
+          .clone()
+          .or(other.log_handler.clone()),
+      log_parsing: self.log_parsing
+          .clone()
+          .or(other.log_parsing.clone()),
+      log_synthesis: self.log_synthesis
+          .clone()
+          .or(other.log_synthesis.clone()),
     }
   }
 }

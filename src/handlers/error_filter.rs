@@ -20,7 +20,7 @@ pub fn build_error(status: Status, message: &str) -> IronResult<Response> {
 
 impl AfterMiddleware for ErrorFilter {
   fn catch(&self, _: &mut Request, err: IronError) -> IronResult<Response> {
-    error!("Error has occurred! Error: {}", err.error);
+    error!(target: "handler", "Error has occurred! Error: {}", err.error);
 
     // TODO: Return JSON if request was JSON, otherwise HTML.
     match err.response.status {
@@ -39,8 +39,8 @@ impl fmt::Display for StringError {
 }
 
 impl Error for StringError {
-  fn description(&self) -> &str { 
-    &*self.0 
+  fn description(&self) -> &str {
+    &*self.0
   }
 }
 

@@ -25,7 +25,7 @@ pub struct FileServerHandler {
 impl Handler for FileServerHandler {
   /// Handles routes of the form `/f/:fileame`
   fn handle(&self, req: &mut Request) -> IronResult<Response> {
-    info!("Request: {}", &req.url);
+    info!(target: "handler", "Request: {}", &req.url);
 
     let filename = self.get_filename(&req);
 
@@ -101,7 +101,7 @@ impl FileServerHandler {
 
     // TODO: whitelist filetypes.
     // TODO: only open non-executable files.
-    info!("Opening file `{}`", full_filename.display());
+    debug!(target: "handler", "Opening file `{}`", full_filename.display());
 
     let mut file = match File::open(full_filename) {
       Err(_) => { return None },

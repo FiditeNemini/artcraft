@@ -191,6 +191,8 @@ impl Tokenizer {
 
   /// Split a raw sentence into well-defined tokens.
   pub fn tokenize(&self, raw_sentence: &str) -> Vec<Token> {
+    info!(target: "parsing", "Raw Sentence = {}", raw_sentence);
+
     // Remove any type of double quote
     let mut filtered = RE_ANY_DOUBLE_QUOTE.replace_all(raw_sentence, " ");
 
@@ -228,8 +230,6 @@ impl Tokenizer {
         tokens.push(Token::dictionary_word(word));
         continue;
       }
-
-      println!("Dictionary does not contain: {}", word);
 
       // TODO: TEST
       // Match URLs.
@@ -383,8 +383,7 @@ impl Tokenizer {
       tokens.push(Token::unknown(word))
     }
 
-    //println!("TOKENS = {:?}", tokens);
-    info!("TOKENS = {:?}", tokens);
+    info!(target: "parsing", "Tokens = {:?}", tokens);
 
     tokens
   }

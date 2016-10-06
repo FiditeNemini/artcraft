@@ -161,7 +161,8 @@ impl Audiobank {
 
       match self.read_wave_file(&pref_path) {
         Some(p) => {
-          info!("Used {:?} for {:?}", sample_preference, n_phone);
+          info!(target: "synthesis",
+                "Used {:?} for {:?}", sample_preference, n_phone);
           return Some(p)
         },
         None => {},

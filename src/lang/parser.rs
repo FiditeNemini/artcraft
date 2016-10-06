@@ -52,7 +52,7 @@ impl Parser {
 
     let final_sentence = sentence.join(" ");
 
-    info!("Final sentence: {}", final_sentence);
+    info!(target: "parsing", "Final sentence = {}", final_sentence);
 
     final_sentence
   }
