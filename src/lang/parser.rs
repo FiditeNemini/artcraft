@@ -1,5 +1,6 @@
 // Copyright (c) 2016 Brandon Thomas <bt@brand.io, echelon@gmail.com>
 
+use lang::token::*;
 use lang::tokenizer::*;
 use speaker::Speaker;
 
@@ -20,11 +21,12 @@ impl Parser {
 
     for token in tokens {
       match token {
-        Token::Punctuation { value: _v } => {}, // Skip (for now)
         Token::Date { value: _v } => {}, // Skip (for now)
         Token::Emoji { value: _v } => {}, // Skip (for now)
         Token::Hashtag { value: _v } => {}, // Skip (for now)
         Token::Mention { value: _v } => {}, // Skip (for now)
+        Token::Number { value: _v } => {}, // Skip (for now)
+        Token::Punctuation { value: _v } => {}, // Skip (for now)
         Token::Url { value: _v } => {}, // Skip
         Token::DictionaryWord { value : ref v } => sentence.push(v.value.to_string()),
         Token::Initialism { value: ref v } => {
@@ -117,6 +119,7 @@ mod tests {
       w.insert("two".to_string());
       w.insert("username".to_string());
       w.insert("visit".to_string());
+      w.insert("will".to_string());
       w.insert("would".to_string());
       w.insert("you".to_string());
       w
@@ -150,7 +153,7 @@ mod tests {
     assert_eq!("a lot of people can't handle it", &p.parse(&s, "A lot of people can’t handle it."));
 
     // Complex examples taken from real tweets.
-    assert_eq!("will be in atlanta georgia this friday at 5:00pm. join the movement tickets available at",
+    assert_eq!("will be in atlanta georgia this friday at 5:00pm join the movement tickets available at",
                &p.parse(&s, r#"Will be in Atlanta, Georgia this Friday at 5:00pm. Join the MOVEMENT!
                Tickets available at: https://t.co/Q6APf0ZFYA… https://t.co/6WAyO9eQHN"#));
 

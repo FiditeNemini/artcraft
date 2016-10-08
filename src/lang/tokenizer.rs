@@ -1,194 +1,10 @@
 // Copyright (c) 2016 Brandon Thomas <bt@brand.io, echelon@gmail.com>
 
+use lang::token::*;
 use regex::Regex;
-use std::fmt;
+use std::collections::LinkedList;
 use std::sync::Arc;
 use super::dictionary::UniversalDictionary;
-
-lazy_static! {
-  // Note: Rust regexes do not support lookaround.
-  // Designed not to match times (5:00) or URLs (http://)
-  pub static ref RE_ALPHA_COLON: Regex = Regex::new(r"([A-Za-z]):([^/])").unwrap();
-  pub static ref RE_ANY_DOUBLE_QUOTE: Regex= Regex::new("[\"“”]").unwrap();
-  pub static ref RE_ANY_SMART_SINGLE_QUOTE: Regex= Regex::new("[‘’]").unwrap();
-  pub static ref RE_BEGIN_SINGLE_QUOTE: Regex = Regex::new("^'").unwrap();
-  pub static ref RE_PERIOD_END: Regex = Regex::new("\\.$").unwrap();
-  pub static ref RE_PERIOD_SPACE: Regex = Regex::new("\\.\\s").unwrap();
-  pub static ref RE_SINGLE_QUOTE_END: Regex = Regex::new("'$").unwrap();
-  pub static ref RE_SINGLE_QUOTE_SPACE: Regex = Regex::new("'\\s").unwrap();
-  pub static ref RE_SPACE_SINGLE_QUOTE: Regex = Regex::new("\\s'").unwrap();
-
-  // Token type matching.
-  pub static ref RE_DATE: Regex = Regex::new(r"\d{1,2}/\d{1,2}(/\d{1,4})?").unwrap();
-  // TODO: initialism regex should not match on ending punctuation
-  pub static ref RE_INITIALISM: Regex = Regex::new(r"[A-Z]{3,7}").unwrap();
-  pub static ref RE_URL: Regex = Regex::new(r"https?://[\w\.-]+/?(\w+)?").unwrap();
-  pub static ref RE_EMOJI: Regex = Regex::new(r"[\x{1F600}-\x{1F6FF}]").unwrap();
-
-  // Twitter matching.
-  pub static ref RE_AT_MENTION : Regex = Regex::new(r"@(\w+)").unwrap();
-  pub static ref RE_HASHTAG : Regex = Regex::new(r"#(\w+)").unwrap();
-}
-
-#[derive(PartialEq)]
-pub struct DictionaryWord {
-  pub value: String,
-}
-
-#[derive(PartialEq)]
-pub struct Date {
-  pub value: String,
-}
-
-#[derive(Debug, PartialEq)]
-pub enum Punctuation {
-  Comma,
-  Dash,
-  Ellipsis,
-  Exclamation,
-  Period,
-  Question,
-}
-
-#[derive(Debug, PartialEq)]
-pub enum Symbol {
-  Ampersand,
-  AtSign,
-  GreaterThan,
-  LessThan,
-}
-
-#[derive(PartialEq)]
-pub struct Hashtag {
-  pub value: String,
-}
-
-#[derive(PartialEq)]
-pub struct Mention {
-  pub value: String,
-}
-
-#[derive(PartialEq)]
-pub struct Emoji {
-  pub value: String,
-}
-
-#[derive(PartialEq)]
-pub struct Initialism {
-  pub value: String,
-}
-
-#[derive(PartialEq)]
-pub struct Url {
-  pub value: String,
-}
-
-#[derive(PartialEq)]
-pub struct Unknown {
-  pub value: String,
-}
-
-#[derive(PartialEq)]
-pub enum Token {
-  Date { value: Date },
-  DictionaryWord { value: DictionaryWord }, // The primary type.
-  Emoji { value: Emoji },
-  Hashtag { value: Hashtag },
-  Initialism { value: Initialism },
-  Mention { value: Mention },
-  Punctuation { value: Punctuation },
-  Symbol { value: Symbol },
-  Unknown { value: Unknown }, // The unclassified type.
-  Url { value: Url },
-}
-
-impl fmt::Debug for Token {
-  fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-    let val = match *self {
-      Token::Date { value : ref v } => format!("Date {}", v.value),
-      Token::DictionaryWord { value : ref v } => format!("Word {}", v.value),
-      Token::Emoji { value : ref v } => format!("Emoji {}", v.value),
-      Token::Hashtag { value : ref v } => format!("Hashtag {}", v.value),
-      Token::Initialism { value : ref v } => format!("Initialism {}", v.value),
-      Token::Mention { value : ref v } => format!("Mention {}", v.value),
-      Token::Punctuation { value : ref v } => format!("Punctuation {:?}", v),
-      Token::Symbol { value : ref v } => format!("Symbol {:?}", v),
-      Token::Unknown { value : ref v } => format!("Unknown {}", v.value),
-      Token::Url { value : ref v } => format!("Url {}", v.value),
-    };
-    write!(f, "{}", val)
-  }
-}
-
-impl Token {
-  pub fn dictionary_word(value: String) -> Token {
-    Token::DictionaryWord { value: DictionaryWord { value: value } }
-  }
-
-  pub fn date(value: String) -> Token {
-    Token::Date { value: Date { value: value } }
-  }
-
-  pub fn url(value: String) -> Token {
-    Token::Url { value: Url { value: value } }
-  }
-
-  pub fn initialism(value: String) -> Token {
-    Token::Initialism { value: Initialism { value: value } }
-  }
-
-  pub fn emoji(value: String) -> Token {
-    Token::Emoji { value: Emoji { value: value } }
-  }
-
-  pub fn hashtag(value: String) -> Token {
-    Token::Hashtag { value: Hashtag { value: value } }
-  }
-
-  pub fn mention(value: String) -> Token {
-    Token::Mention { value: Mention { value: value } }
-  }
-
-  pub fn unknown(value: String) -> Token {
-    Token::Unknown { value: Unknown { value: value } }
-  }
-
-  pub fn period() -> Token {
-    Token::Punctuation { value: Punctuation::Period }
-  }
-
-  pub fn comma() -> Token {
-    Token::Punctuation { value: Punctuation::Comma }
-  }
-
-  pub fn question() -> Token {
-    Token::Punctuation { value: Punctuation::Question }
-  }
-
-  pub fn exclamation() -> Token {
-    Token::Punctuation { value: Punctuation::Exclamation }
-  }
-
-  pub fn ellipsis() -> Token {
-    Token::Punctuation { value: Punctuation::Ellipsis }
-  }
-
-  pub fn ampersand() -> Token {
-    Token::Symbol { value: Symbol::Ampersand }
-  }
-
-  pub fn at_sign() -> Token {
-    Token::Symbol { value: Symbol::AtSign }
-  }
-
-  pub fn less_than() -> Token {
-    Token::Symbol { value: Symbol::LessThan }
-  }
-
-  pub fn greater_than() -> Token {
-    Token::Symbol { value: Symbol::GreaterThan }
-  }
-}
 
 pub struct Tokenizer {
   /// The dictionary used to check if a word exists.
@@ -204,6 +20,18 @@ impl Tokenizer {
   /// Split a raw sentence into well-defined tokens.
   pub fn tokenize(&self, raw_sentence: &str) -> Vec<Token> {
     info!(target: "parsing", "Raw Sentence = {}", raw_sentence);
+
+    lazy_static! {
+      // Note: Rust regexes do not support lookaround.
+      // Designed not to match times (5:00) or URLs (http://)
+      pub static ref RE_ALPHA_COLON: Regex = Regex::new(r"([A-Za-z]):([^/])").unwrap();
+      pub static ref RE_ANY_DOUBLE_QUOTE: Regex= Regex::new("[\"“”]").unwrap();
+      pub static ref RE_ANY_SMART_SINGLE_QUOTE: Regex= Regex::new("[‘’]").unwrap();
+      pub static ref RE_BEGIN_SINGLE_QUOTE: Regex = Regex::new("^'").unwrap();
+      pub static ref RE_SINGLE_QUOTE_END: Regex = Regex::new("'$").unwrap();
+      pub static ref RE_SINGLE_QUOTE_SPACE: Regex = Regex::new("'\\s").unwrap();
+      pub static ref RE_SPACE_SINGLE_QUOTE: Regex = Regex::new("\\s'").unwrap();
+    }
 
     // Remove any type of double quote
     let mut filtered = RE_ANY_DOUBLE_QUOTE.replace_all(raw_sentence, " ");
@@ -224,186 +52,263 @@ impl Tokenizer {
     // Designed not to match times (5:00) or URLs (http://)
     filtered = RE_ALPHA_COLON.replace_all(&filtered, "$1 ");
 
-    // Handle dashes (TODO: tokenize instead)
-    filtered = filtered.replace("—", " ") // emdash
-        .replace("–", " ") // endash
-        .replace("--", " ")
-        .replace(" - ", " ");
+    let split_spaces = split_sentence(&filtered);
+    let mut tokenized = LinkedList::new();
+    for split in split_spaces {
+      tokenized.push_back(Token::unknown(split));
+    }
 
-    let split_words = split_sentence(&filtered);
+    lazy_static! {
+      static ref ELLIPSIS : Regex = Regex::new(r"\.{2,}|…").unwrap();
+      static ref DASH: Regex = Regex::new(r"—|–|-{2,}|-$").unwrap();
+    }
+
+    tokenized = tokenize(tokenized, &ELLIPSIS, &Token::ellipsis());
+    tokenized = tokenize(tokenized, &DASH, &Token::dash());
+    tokenized = self.classify_tokens(tokenized);
+
+    tokenized = tokenize_end_punctuation(tokenized);
+    tokenized = self.classify_tokens(tokenized);
+    tokenized = self.classify_remaining(tokenized);
 
     let mut tokens = Vec::new();
-
-    for w in split_words {
-      let word = w.to_lowercase();
-
-      // Simple dictionary word matches
-      if self.dictionary.contains(&word) {
-        tokens.push(Token::dictionary_word(word));
-        continue;
-      }
-
-      // TODO: TEST
-      // Match URLs.
-      if RE_URL.is_match(&word) {
-        tokens.push(Token::url(word));
-        continue;
-      }
-
-      // FIXME: Inefficiency, verboseness
-      // Punctuation
-      if word.ends_with("...") {
-        let w = word.trim_right_matches("...");
-        if self.dictionary.contains(&w) {
-          tokens.push(Token::dictionary_word(w.to_string()));
-          tokens.push(Token::ellipsis());
-          continue;
-        }
-      } else if word.ends_with(".") {
-        let w = word.trim_right_matches(".");
-        if self.dictionary.contains(&w) {
-          tokens.push(Token::dictionary_word(w.to_string()));
-          tokens.push(Token::period());
-          continue;
-        }
-      } else if word.ends_with(",") {
-        let w = word.trim_right_matches(",");
-        if self.dictionary.contains(&w) {
-          tokens.push(Token::dictionary_word(w.to_string()));
-          tokens.push(Token::comma());
-          continue;
-        }
-      } else if word.ends_with("?") {
-        let w = word.trim_right_matches("?");
-        if self.dictionary.contains(&w) {
-          tokens.push(Token::dictionary_word(w.to_string()));
-          tokens.push(Token::question());
-          continue;
-        }
-      } else if word.ends_with("!") {
-        let w = word.trim_right_matches("!");
-        if self.dictionary.contains(&w) {
-          tokens.push(Token::dictionary_word(w.to_string()));
-          tokens.push(Token::exclamation());
-          continue;
-        }
-      } else if word.ends_with("…") {
-        let w = word.trim_right_matches("…");
-        if self.dictionary.contains(&w) {
-          tokens.push(Token::dictionary_word(w.to_string()));
-          tokens.push(Token::ellipsis());
-          continue;
-        }
-      }
-
-      // FIXME: Speed up by converting to a hash lookup.
-      // Rogue puncuation
-      if &word == "," {
-        tokens.push(Token::comma());
-        continue;
-      } else if word == "." {
-        tokens.push(Token::period());
-        continue;
-      }
-
-      // Symbols
-      if &word == "@" {
-        tokens.push(Token::at_sign());
-        continue;
-      } else if &word == "&" {
-        tokens.push(Token::ampersand());
-        continue;
-      } else if &word == "<" {
-        tokens.push(Token::less_than());
-        continue;
-      } else if &word == ">" {
-        tokens.push(Token::greater_than());
-        continue;
-      }
-
-      // Match hashtags.
-      if RE_HASHTAG.is_match(&word) {
-        let tag = word.trim_left_matches("#");
-        tokens.push(Token::hashtag(tag.to_string()));
-        continue;
-      }
-
-      // Match mentions.
-      if RE_AT_MENTION.is_match(&word) {
-        let tag = word.trim_left_matches("@");
-        tokens.push(Token::mention(tag.to_string()));
-        continue;
-      }
-
-      if RE_DATE.is_match(&word) {
-        if word.ends_with("?") {
-          let w = word.trim_right_matches("?");
-          tokens.push(Token::date(w.to_string()));
-          tokens.push(Token::question());
-        } else if word.ends_with("!") {
-          let w = word.trim_right_matches("!");
-          tokens.push(Token::date(w.to_string()));
-          tokens.push(Token::exclamation());
-        } else if word.ends_with("...") {
-          let w = word.trim_right_matches("...");
-          tokens.push(Token::date(w.to_string()));
-          tokens.push(Token::ellipsis());
-        } else if word.ends_with(".") {
-          let w = word.trim_right_matches(".");
-          tokens.push(Token::date(w.to_string()));
-          tokens.push(Token::period());
-        } else if word.ends_with(",") {
-          let w = word.trim_right_matches(",");
-          tokens.push(Token::date(w.to_string()));
-          tokens.push(Token::comma());
-        } else {
-          tokens.push(Token::date(word.to_string()));
-        }
-        continue;
-      }
-
-      if RE_EMOJI.is_match(&word) {
-        tokens.push(Token::emoji(word.to_string()));
-        continue;
-      }
-
-      // TODO: More efficient + cleanup
-      // Initialisms
-      if RE_INITIALISM.is_match(&w) {
-        if word.ends_with("?") {
-          let w = word.trim_right_matches("?");
-          tokens.push(Token::initialism(w.to_string()));
-          tokens.push(Token::question());
-        } else if word.ends_with("!") {
-          let w = word.trim_right_matches("!");
-          tokens.push(Token::initialism(w.to_string()));
-          tokens.push(Token::exclamation());
-        } else if word.ends_with("...") {
-          let w = word.trim_right_matches("...");
-          tokens.push(Token::initialism(w.to_string()));
-          tokens.push(Token::ellipsis());
-        } else if word.ends_with(".") {
-          let w = word.trim_right_matches(".");
-          tokens.push(Token::initialism(w.to_string()));
-          tokens.push(Token::period());
-        } else if word.ends_with(",") {
-          let w = word.trim_right_matches(",");
-          tokens.push(Token::initialism(w.to_string()));
-          tokens.push(Token::comma());
-        } else {
-          tokens.push(Token::initialism(word.to_string()));
-        }
-        continue;
-      }
-
-      // Failure to classify
-      tokens.push(Token::unknown(word))
+    for token in tokenized {
+      tokens.push(token);
     }
 
     info!(target: "parsing", "Tokens = {:?}", tokens);
 
     tokens
   }
+
+  // TODO: Test.
+  // TODO: Efficiency.
+  fn classify_tokens(&self, tokens: LinkedList<Token>) -> LinkedList<Token> {
+    lazy_static! {
+      static ref DATE: Regex = Regex::new(r"^\d{1,2}/\d{1,2}(/\d{1,4})?$").unwrap();
+      static ref HASHTAG: Regex = Regex::new(r"#(\w+)").unwrap();
+      static ref MENTION: Regex = Regex::new(r"@(\w+)").unwrap();
+      static ref NUMBER: Regex = Regex::new(r"^\d+(,\d+){0,}(\.\d+)?$").unwrap();
+      static ref URL: Regex = Regex::new(r"https?://[\w\.-]+/?(\w+)?").unwrap();
+    }
+
+    let mut output = LinkedList::new();
+
+    for token in tokens {
+      let unknown = match token.as_unknown() {
+        None => {
+          output.push_back(token.clone());
+          continue;
+        },
+        Some(v) => { &v.value },
+      };
+
+      let word = unknown.to_lowercase();
+
+      // Simple dictionary word matches
+      if self.dictionary.contains(&word) {
+        output.push_back(Token::dictionary_word(word));
+        continue;
+      }
+
+      if URL.is_match(&unknown) {
+        output.push_back(Token::url(unknown.to_string()));
+        continue;
+      }
+
+      // FIXME: Speed up by converting to a hash lookup.
+      // Rogue puncuation
+      if unknown == "," {
+        output.push_back(Token::comma());
+        continue;
+      } else if unknown == "." {
+        output.push_back(Token::period());
+        continue;
+      }
+
+      // Symbols
+      if unknown == "@" {
+        output.push_back(Token::at_sign());
+        continue;
+      } else if unknown == "&" {
+        output.push_back(Token::ampersand());
+        continue;
+      } else if unknown == "<" {
+        output.push_back(Token::less_than());
+        continue;
+      } else if unknown == ">" {
+        output.push_back(Token::greater_than());
+        continue;
+      }
+
+      // Match hashtags.
+      if HASHTAG.is_match(&unknown) {
+        output.push_back(Token::hashtag(unknown.to_string()));
+        continue;
+      }
+
+      // Match mentions.
+      if MENTION.is_match(&unknown) {
+        output.push_back(Token::mention(unknown.to_string()));
+        continue;
+      }
+
+      if DATE.is_match(&unknown) {
+        output.push_back(Token::date(unknown.to_string()));
+        continue;
+      }
+
+      if NUMBER.is_match(&unknown) {
+        output.push_back(Token::number(unknown.to_string()));
+        continue;
+      }
+
+      output.push_back(token.clone());
+    }
+    output
+  }
+
+  /// Classify the remaining unclassified tokens.
+  fn classify_remaining(&self, tokens: LinkedList<Token>) -> LinkedList<Token> {
+    lazy_static! {
+      static ref INITIALISM: Regex = Regex::new(r"[A-Z]{3,7}").unwrap();
+      static ref EMOJI: Regex = Regex::new(r"[\x{1F600}-\x{1F6FF}]").unwrap();
+    }
+    let mut output = LinkedList::new();
+
+    for token in tokens {
+      let unknown = match token.as_unknown() {
+        None => {
+          output.push_back(token.clone());
+          continue;
+        },
+        Some(v) => { &v.value },
+      };
+
+      if INITIALISM.is_match(&unknown) {
+        output.push_back(Token::initialism(unknown.to_string()));
+        continue;
+      }
+
+      if EMOJI.is_match(&unknown) {
+        output.push_back(Token::emoji(unknown.to_string()));
+        continue;
+      }
+
+      output.push_back(token.clone());
+    }
+    output
+  }
+}
+
+// TODO: Test.
+// TODO: Efficiency. Modify input list, and only if there are ellipses.
+/// Tokenize a "split" character with a regex.
+/// eg. "foo,bar" becomes [Word(foo), Comma, Word(bar)].
+fn tokenize(tokens: LinkedList<Token>, regex: &Regex, token_prototype: &Token)
+    -> LinkedList<Token> {
+  let mut output = LinkedList::new();
+
+  for token in tokens {
+    let unknown = match token.as_unknown() {
+      None => {
+        output.push_back(token.clone());
+        continue;
+      },
+      Some(v) => { &v.value },
+    };
+
+    if !regex.is_match(&unknown) {
+      output.push_back(token.clone());
+      continue;
+    }
+
+    let mut begin = 0;
+    let mut matches = LinkedList::new();
+
+    for (first, last) in regex.find_iter(&unknown) {
+      if begin < first {
+        matches.push_back(Token::unknown(unknown[begin..first].to_string()));
+      }
+      matches.push_back(token_prototype.clone());
+      begin = last;
+    }
+    if begin < unknown.len() {
+      matches.push_back(Token::unknown(unknown[begin..unknown.len()].to_string()));
+    }
+
+    output.append(&mut matches);
+  }
+  output
+}
+
+// TODO: Test.
+// TODO: Efficiency. Modify input list, and only if there are ellipses.
+fn tokenize_end_punctuation(tokens: LinkedList<Token>)
+    -> LinkedList<Token> {
+  lazy_static! {
+    static ref END_PUNCTUATION: Regex = Regex::new(r"[\.\?!,;]+$").unwrap();
+  }
+
+  let mut output = LinkedList::new();
+
+  for token in tokens {
+    let unknown = match token.as_unknown() {
+      None => {
+        output.push_back(token.clone());
+        continue;
+      },
+      Some(v) => { &v.value },
+    };
+
+    if !END_PUNCTUATION.is_match(&unknown) {
+      output.push_back(token.clone());
+      continue;
+    }
+
+    let mut begin = 0;
+    let mut matches = LinkedList::new();
+
+    // TODO: Should only be zero or one match, and match should be at the end.
+    for (first, second) in END_PUNCTUATION.find_iter(&unknown) {
+      if begin < first {
+        matches.push_back(Token::unknown(unknown[begin..first].to_string()));
+      }
+
+      // FIXME: This is really awful.
+      let matched = unknown[first..second].to_string();
+      if matched.len() == 1 {
+        if &matched == "?" {
+          matches.push_back(Token::question());
+        } else if &matched == "!" {
+          matches.push_back(Token::exclamation());
+        } else if &matched == ";" {
+          matches.push_back(Token::semicolon());
+        } else if &matched == "." {
+          matches.push_back(Token::period());
+        } else if &matched == "," {
+          matches.push_back(Token::comma());
+        }
+      } else {
+        if matched.starts_with("?") {
+          matches.push_back(Token::question());
+        } else if matched.starts_with("!") {
+          matches.push_back(Token::exclamation());
+        } else if matched.starts_with(";") {
+          matches.push_back(Token::semicolon());
+        } else if matched.starts_with(".") {
+          matches.push_back(Token::period());
+        } else if matched.starts_with(",") {
+          matches.push_back(Token::comma());
+        }
+      }
+
+      begin = second;
+    }
+
+    output.append(&mut matches);
+  }
+  output
 }
 
 /// Split a sentence into words. Remove extra padding, etc.
@@ -422,6 +327,7 @@ fn split_sentence(sentence: &str) -> Vec<String> {
 mod tests {
   use lang::dictionary::Dictionary;
   use lang::dictionary::UniversalDictionary;
+  use lang::token::*;
   use std::collections::HashSet;
   use std::sync::Arc;
   use super::*;
@@ -529,32 +435,32 @@ mod tests {
     let t = make_tokenizer();
 
     let mut result = t.tokenize("One – Two");
-    let mut expected = vec![w("one"), w("two")];
+    let mut expected = vec![w("one"), Token::dash(), w("two")];
 
     assert_eq!(expected, result);
 
     result = t.tokenize("One– Two");
-    expected = vec![w("one"), w("two")];
+    expected = vec![w("one"), Token::dash(), w("two")];
 
     assert_eq!(expected, result);
 
     result = t.tokenize("One—Two");
-    expected = vec![w("one"), w("two")];
+    expected = vec![w("one"), Token::dash(), w("two")];
 
     assert_eq!(expected, result);
 
     result = t.tokenize("One--Two");
-    expected = vec![w("one"), w("two")];
+    expected = vec![w("one"), Token::dash(), w("two")];
 
     assert_eq!(expected, result);
 
     result = t.tokenize("One - Two");
-    expected = vec![w("one"), w("two")];
+    expected = vec![w("one"), Token::dash(), w("two")];
 
     assert_eq!(expected, result);
 
     result = t.tokenize("One  -  Two");
-    expected = vec![w("one"), w("two")];
+    expected = vec![w("one"), Token::dash(), w("two")];
 
     assert_eq!(expected, result);
   }
@@ -602,12 +508,12 @@ mod tests {
     let t = make_tokenizer();
 
     let mut result = t.tokenize("#foo #bar #baz");
-    let mut expected = vec![h("foo"), h("bar"), h("baz")];
+    let mut expected = vec![h("#foo"), h("#bar"), h("#baz")];
 
     assert_eq!(expected, result);
 
     result = t.tokenize("@echelon @UserName");
-    expected = vec![m("echelon"), m("username")];
+    expected = vec![m("@echelon"), m("@UserName")];
 
     assert_eq!(expected, result);
   }
@@ -617,25 +523,25 @@ mod tests {
     let t = make_tokenizer();
 
     let mut result = t.tokenize("FBI");
-    let mut expected = vec![i("fbi")];
+    let mut expected = vec![i("FBI")];
 
     assert_eq!(expected, result);
 
     result = t.tokenize("FOO FUD bar bpa");
-    expected = vec![w("foo"), i("fud"), w("bar"), u("bpa")];
+    expected = vec![w("foo"), i("FUD"), w("bar"), u("bpa")];
 
     assert_eq!(expected, result);
 
     result = t.tokenize("Sign the NDA!");
-    expected = vec![w("sign"), w("the"), i("nda"), Token::exclamation()];
+    expected = vec![w("sign"), w("the"), i("NDA"), Token::exclamation()];
 
     assert_eq!(expected, result);
 
     result = t.tokenize("FDA. NSA? MPAA, RIAA!");
-    expected = vec![i("fda"), Token::period(),
-                    i("nsa"), Token::question(),
-                    i("mpaa"), Token::comma(),
-                    i("riaa"), Token::exclamation()];
+    expected = vec![i("FDA"), Token::period(),
+                    i("NSA"), Token::question(),
+                    i("MPAA"), Token::comma(),
+                    i("RIAA"), Token::exclamation()];
 
     assert_eq!(expected, result);
   }
@@ -648,6 +554,8 @@ mod tests {
     - ✓ Emoji
       - 😂
       - ⬇️
+      - ‼️
+    - w/local officials
     - a...telling (broken)
     - (and we aren't stupid) (broken)
     - ABC… -> i(ABC), ellipsis (broken)
