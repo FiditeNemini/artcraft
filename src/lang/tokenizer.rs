@@ -1,4 +1,7 @@
 // Copyright (c) 2016 Brandon Thomas <bt@brand.io, echelon@gmail.com>
+// The tokenizer takes a raw sentence and converts it into
+// well-defined tokens. It doesn't try to map these tokens to words:
+// that is the job of the parser.
 
 use lang::abbr::AbbreviationsMap;
 use lang::token::*;
@@ -94,7 +97,7 @@ impl Tokenizer {
       static ref DATE: Regex = Regex::new(r"^\d{1,2}/\d{1,2}(/\d{1,4})?$").unwrap();
       static ref HASHTAG: Regex = Regex::new(r"#(\w+)").unwrap();
       static ref MENTION: Regex = Regex::new(r"@(\w+)").unwrap();
-      static ref NUMBER: Regex = Regex::new(r"^\d+(,\d+){0,}(\.\d+)?$").unwrap();
+      static ref NUMBER: Regex = Regex::new(r"^-?\d+(,\d+){0,}(\.\d+)?$").unwrap();
       static ref URL: Regex = Regex::new(r"https?://[\w\.-]+/?(\w+)?").unwrap();
     }
 

@@ -1,6 +1,10 @@
 // Copyright (c) 2016 Brandon Thomas <bt@brand.io, echelon@gmail.com>
+// Parser takes a raw input, passes it to the tokenizer, and then
+// converts it into the final output that is fed to the synthesizer.
+// (The synthesizer only has knowledge of how to handle filtered words.)
 
 use lang::abbr::AbbreviationsMap;
+use lang::numbers::number_to_words;
 use lang::token::*;
 use lang::tokenizer::*;
 use speaker::Speaker;
@@ -32,10 +36,24 @@ impl Parser {
         Token::Emoji { value: _v } => {}, // Skip (for now)
         Token::Hashtag { value: _v } => {}, // Skip (for now)
         Token::Mention { value: _v } => {}, // Skip (for now)
-        Token::Number { value: _v } => {}, // Skip (for now)
         Token::Punctuation { value: _v } => {}, // Skip (for now)
         Token::Url { value: _v } => {}, // Skip
-        Token::DictionaryWord { value : ref v } => sentence.push(v.value.to_string()),
+        Token::DictionaryWord { value : ref v } => {
+          sentence.push(v.value.to_string());
+        }
+        // Integers (TODO: tokenize floats separately.)
+        Token::Number { value: ref v } => {
+          let num = match v.value.parse::<i64>() {
+            Err(_) => { continue; },
+            Ok(num) => num,
+          };
+          match number_to_words(num) {
+            None => { continue; },
+            Some(words) => {
+              for word in words { sentence.push(word); }
+            }
+          }
+        },
         // Abbreviations are mapped to words
         Token::Abbreviation { value: ref v } => {
           match self.abbreviations.get_words(&v.value) {
