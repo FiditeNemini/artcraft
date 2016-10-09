@@ -1,17 +1,24 @@
 // Copyright (c) 2016 Brandon Thomas <bt@brand.io, echelon@gmail.com>
 
+use lang::abbr::AbbreviationsMap;
 use lang::token::*;
 use lang::tokenizer::*;
 use speaker::Speaker;
+use std::sync::Arc;
 
 pub struct Parser {
   tokenizer: Tokenizer,
+  abbreviations: Arc<AbbreviationsMap>,
 }
 
 impl Parser {
   /// CTOR.
-  pub fn new(tokenizer: Tokenizer) -> Parser {
-    Parser { tokenizer: tokenizer }
+  pub fn new(tokenizer: Tokenizer, abbreviations: Arc<AbbreviationsMap>)
+      -> Parser {
+    Parser {
+      tokenizer: tokenizer,
+      abbreviations: abbreviations,
+    }
   }
 
   /// Tokenize, then "parse" the sentence into usable output.
@@ -29,6 +36,18 @@ impl Parser {
         Token::Punctuation { value: _v } => {}, // Skip (for now)
         Token::Url { value: _v } => {}, // Skip
         Token::DictionaryWord { value : ref v } => sentence.push(v.value.to_string()),
+        // Abbreviations are mapped to words
+        Token::Abbreviation { value: ref v } => {
+          match self.abbreviations.get_words(&v.value) {
+            None => { continue; },
+            Some(words) => {
+              for word in words {
+                sentence.push(word.to_string());
+              }
+            }
+          }
+        },
+        // Initialisms are mapped to letters
         Token::Initialism { value: ref v } => {
           let letters : Vec<_> = v.value.split("").collect();
           for letter in letters {
@@ -63,6 +82,7 @@ impl Parser {
 
 #[cfg(test)]
 mod tests {
+  use lang::abbr::AbbreviationsMap;
   use lang::dictionary::Dictionary;
   use lang::dictionary::UniversalDictionary;
   use lang::tokenizer::Tokenizer;
@@ -178,8 +198,10 @@ mod tests {
   // Helper function.
   fn make_parser() -> Parser {
     let dictionary = make_dictionary();
-    let tokenizer = Tokenizer::new(Arc::new(dictionary));
-    Parser::new(tokenizer)
+    let abbreviations = Arc::new(AbbreviationsMap::empty());
+    let tokenizer = Tokenizer::new(Arc::new(dictionary),
+                                   abbreviations.clone());
+    Parser::new(tokenizer, abbreviations.clone())
   }
 }
 

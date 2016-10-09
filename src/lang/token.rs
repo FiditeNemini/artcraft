@@ -1,5 +1,9 @@
 // Copyright (c) 2016 Brandon Thomas <bt@brand.io, echelon@gmail.com>
 
+// Enum variants as types are not supported in Rust, thus I have made
+// inner typed structs.
+// See https://www.reddit.com/r/rust/comments/2rdoxx/enum_variants_as_types/
+
 use std::fmt;
 
 #[derive(Clone, PartialEq)]
@@ -51,6 +55,17 @@ pub struct Emoji {
   pub value: String,
 }
 
+/// An initialism is distinct from an abbreviation in this system.
+/// Initialisms are said letter by letter, whereas an abbreviation gets
+/// mapped to a list of words.
+#[derive(Clone, PartialEq)]
+pub struct Abbreviation {
+  pub value: String,
+}
+
+/// An initialism is distinct from an abbreviation in this system.
+/// Initialisms are said letter by letter, whereas an abbreviation gets
+/// mapped to a list of words.
 #[derive(Clone, PartialEq)]
 pub struct Initialism {
   pub value: String,
@@ -68,6 +83,7 @@ pub struct Unknown {
 
 #[derive(Clone, PartialEq)]
 pub enum Token {
+  Abbreviation { value: Abbreviation },
   Date { value: Date },
   DictionaryWord { value: DictionaryWord }, // The primary type.
   Emoji { value: Emoji },
@@ -84,6 +100,7 @@ pub enum Token {
 impl fmt::Debug for Token {
   fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
     let val = match *self {
+      Token::Abbreviation { value : ref v } => format!("Abbreviation {}", v.value),
       Token::Date { value : ref v } => format!("Date {}", v.value),
       Token::DictionaryWord { value : ref v } => format!("Word {}", v.value),
       Token::Emoji { value : ref v } => format!("Emoji {}", v.value),
@@ -122,6 +139,10 @@ impl Token {
 
   pub fn number(value: String) -> Token {
     Token::Number { value: Number { value: value } }
+  }
+
+  pub fn abbreviation(value: String) -> Token {
+    Token::Abbreviation { value: Abbreviation { value: value } }
   }
 
   pub fn initialism(value: String) -> Token {

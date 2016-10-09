@@ -21,6 +21,9 @@ pub struct Config {
   pub extra_dictionary_file: Option<String>,
   pub square_dictionary_file: Option<String>,
 
+  /// Where the abbreviation file is found.
+  pub abbreviation_file: Option<String>,
+
   /// What events to log.
   pub log_handler: Option<bool>,
   pub log_parsing: Option<bool>,
@@ -98,6 +101,9 @@ impl Config {
       square_dictionary_file: self.square_dictionary_file
           .clone()
           .or(other.square_dictionary_file.clone()),
+      abbreviation_file: self.abbreviation_file
+          .clone()
+          .or(other.abbreviation_file.clone()),
       log_handler: self.log_handler
           .clone()
           .or(other.log_handler.clone()),

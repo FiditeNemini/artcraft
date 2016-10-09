@@ -6,6 +6,7 @@
   phoneme_dictionary_file = "./dictionary/cmudict-0.7b"
   extra_dictionary_file = "./dictionary/extra-dict"
   square_dictionary_file = "./dictionary/square-dict"
+  abbreviation_file = "./dictionary/abbreviations.dict"
 
   # Logging verbosity
   log_parsing = false

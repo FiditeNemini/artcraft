@@ -1,5 +1,6 @@
 // Copyright (c) 2016 Brandon Thomas <bt@brand.io, echelon@gmail.com>
 
+use lang::abbr::AbbreviationsMap;
 use lang::token::*;
 use regex::Regex;
 use std::collections::LinkedList;
@@ -9,12 +10,17 @@ use super::dictionary::UniversalDictionary;
 pub struct Tokenizer {
   /// The dictionary used to check if a word exists.
   dictionary: Arc<UniversalDictionary>,
+  abbreviations: Arc<AbbreviationsMap>,
 }
 
 impl Tokenizer {
   /// CTOR.
-  pub fn new(dictionary: Arc<UniversalDictionary>) -> Tokenizer {
-    Tokenizer { dictionary: dictionary }
+  pub fn new(dictionary: Arc<UniversalDictionary>,
+             abbreviations: Arc<AbbreviationsMap>) -> Tokenizer {
+    Tokenizer {
+      dictionary: dictionary,
+      abbreviations: abbreviations,
+    }
   }
 
   /// Split a raw sentence into well-defined tokens.
@@ -108,6 +114,11 @@ impl Tokenizer {
       // Simple dictionary word matches
       if self.dictionary.contains(&word) {
         output.push_back(Token::dictionary_word(word));
+        continue;
+      }
+
+      if self.abbreviations.is_abbreviation(&word) {
+        output.push_back(Token::abbreviation(word));
         continue;
       }
 
@@ -325,9 +336,11 @@ fn split_sentence(sentence: &str) -> Vec<String> {
 
 #[cfg(test)]
 mod tests {
+  use lang::abbr::AbbreviationsMap;
   use lang::dictionary::Dictionary;
   use lang::dictionary::UniversalDictionary;
   use lang::token::*;
+  use std::collections::HashMap;
   use std::collections::HashSet;
   use std::sync::Arc;
   use super::*;
@@ -387,6 +400,16 @@ mod tests {
       w.insert("would".to_string());
       w.insert("you".to_string());
       w
+    };
+
+    static ref ABBRS: HashMap<String, Vec<String>> = {
+      let mut abbr = HashMap::new();
+      let mut w = Vec::new();
+      w.push("oh".to_string());
+      w.push("my".to_string());
+      w.push("god".to_string());
+      abbr.insert("omg".to_string(), w);
+      abbr
     };
   }
 
@@ -519,6 +542,27 @@ mod tests {
   }
 
   #[test]
+  fn test_tokenize_abbreviations() {
+    let t = make_tokenizer();
+
+    let result = t.tokenize("omg");
+    let expected = vec![a("omg")];
+
+    assert_eq!(expected, result);
+
+    // Case insensitive.
+    let result = t.tokenize("OMG");
+
+    assert_eq!(expected, result);
+
+    // Vs. initialisms
+    let result = t.tokenize("OMG FML");
+    let expected = vec![a("omg"), i("FML")];
+
+    assert_eq!(expected, result);
+  }
+
+  #[test]
   fn test_tokenize_initialisms() {
     let t = make_tokenizer();
 
@@ -614,7 +658,16 @@ mod tests {
   // Helper function.
   fn make_tokenizer() -> Tokenizer {
     let dictionary = make_dictionary();
-    Tokenizer { dictionary: Arc::new(dictionary) }
+    let abbreviations = AbbreviationsMap::new(ABBRS.clone());
+    Tokenizer {
+      dictionary: Arc::new(dictionary),
+      abbreviations: Arc::new(abbreviations),
+    }
+  }
+
+  // Helper function.
+  fn a(value: &str) -> Token {
+    Token::abbreviation(value.to_string())
   }
 
   // Helper function.

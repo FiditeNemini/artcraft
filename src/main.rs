@@ -35,6 +35,7 @@ use handlers::error_filter::ErrorFilter;
 use handlers::file_server_handler::FileServerHandler;
 use handlers::vocab_list_handler::VocabListHandler;
 use iron::prelude::*;
+use lang::abbr::AbbreviationsMap;
 use lang::arpabet::Arpabet;
 use lang::dictionary::UniversalDictionary;
 use lang::parser::Parser;
@@ -136,15 +137,18 @@ fn create_synthesizer(config: &Config) -> Synthesizer {
       .combine(&extra_dictionary)
       .combine(&square_dictionary);
 
-  let audiobank = Audiobank::new(&config.sound_path.clone().unwrap());
-
   let mut dictionary = UniversalDictionary::new();
   dictionary.set_arpabet_dictionary(arpabet.to_dictionary());
 
-  let tokenizer = Tokenizer::new(Arc::new(dictionary));
-  let parser = Parser::new(tokenizer);
+  info!("Reading Abbreviations Map...");
+  let abbreviations = Arc::new(AbbreviationsMap::load_from_file(
+      &config.abbreviation_file.clone().unwrap()).unwrap());
+
+  let tokenizer = Tokenizer::new(Arc::new(dictionary), abbreviations.clone());
+  let parser = Parser::new(tokenizer, abbreviations.clone());
 
   info!("Building Synthesizer...");
+  let audiobank = Audiobank::new(&config.sound_path.clone().unwrap());
   Synthesizer::new(arpabet, audiobank, parser)
 }
 
