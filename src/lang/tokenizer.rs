@@ -603,6 +603,7 @@ mod tests {
     - a...telling (broken)
     - (and we aren't stupid) (broken)
     - ABC… -> i(ABC), ellipsis (broken)
+    - Clinton and Trump at 9 p.m. ET!
   */
 
   #[test]
