@@ -23,6 +23,7 @@ use std::sync::Arc;
 use std::sync::RwLock;
 use super::error_filter::build_error;
 use synthesizer::Synthesizer;
+use time::PreciseTime;
 use urlencoded::UrlEncodedQuery;
 
 const SENTENCE_PARAM : &'static str = "s";
@@ -315,7 +316,11 @@ impl Handler for AudioSynthHandler {
       }
     }
 
+    let start = PreciseTime::now();
     let result = self.create_audio(request);
+
+    info!(target: "timing",
+          "Total parsing and synthesis took: {}", start.to(PreciseTime::now()));
 
     let mime_type = "audio/wav".parse::<Mime>().unwrap();
 
@@ -357,7 +362,7 @@ impl AudioSynthHandler {
                                        request.word_padding_end);
         match generated {
           Err(e) => {
-            println!("Error synthesizing: {:?}", e);
+            warn!("Error synthesizing: {:?}", e);
             Vec::new() // TODO FIXME
           },
           Ok(wav) => wav,
@@ -390,8 +395,6 @@ impl AudioSynthHandler {
     if request.use_diphones { use_byte |= 1 << 2; }
     if request.use_words { use_byte |= 1 << 3; }
     if request.use_ends { use_byte |= 1 << 4; }
-
-    println!("Use byte: {}", use_byte);
 
     hasher.input(&[use_byte]);
 

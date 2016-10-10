@@ -35,6 +35,7 @@ impl log::Log for SimpleLogger {
       "handler" => self.config.log_handler.unwrap_or(false),
       "parsing" => self.config.log_parsing.unwrap_or(false),
       "synthesis" => self.config.log_synthesis.unwrap_or(false),
+      "timing" => self.config.log_timing.unwrap_or(false),
       _ => metadata.level() <= LogLevel::Info,
     }
   }

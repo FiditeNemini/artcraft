@@ -9,16 +9,17 @@
   abbreviation_file = "./dictionary/abbreviations.dict"
 
   # Logging verbosity
+  log_handler = false
   log_parsing = false
   log_synthesis = false
-  log_handler = false
+  log_timing  = true
 
 [x16] # Local Development
   use_caching_headers = false
   sound_path = "/home/bt/Dropbox/jungle.horse/sounds"
 
   # Logging verbosity
+  log_handler = false
   log_parsing = true
   log_synthesis = false
-  log_handler = false
 

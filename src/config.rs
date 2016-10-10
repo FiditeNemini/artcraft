@@ -28,6 +28,7 @@ pub struct Config {
   pub log_handler: Option<bool>,
   pub log_parsing: Option<bool>,
   pub log_synthesis: Option<bool>,
+  pub log_timing: Option<bool>,
 }
 
 #[derive(Debug)]
@@ -113,6 +114,9 @@ impl Config {
       log_synthesis: self.log_synthesis
           .clone()
           .or(other.log_synthesis.clone()),
+      log_timing: self.log_timing
+          .clone()
+          .or(other.log_timing.clone()),
     }
   }
 }
