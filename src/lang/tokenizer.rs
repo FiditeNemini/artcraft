@@ -40,6 +40,8 @@ impl Tokenizer {
       pub static ref RE_SINGLE_QUOTE_END: Regex = Regex::new("'$").unwrap();
       pub static ref RE_SINGLE_QUOTE_SPACE: Regex = Regex::new("'\\s").unwrap();
       pub static ref RE_SPACE_SINGLE_QUOTE: Regex = Regex::new("\\s'").unwrap();
+      // For now remove all of these characters.
+      pub static ref RE_GARBAGE: Regex = Regex::new(r"\*|\[|\]|\|").unwrap();
     }
 
     // Remove any type of double quote
@@ -55,6 +57,7 @@ impl Tokenizer {
     filtered = RE_SINGLE_QUOTE_END.replace_all(&filtered, "");
     filtered = RE_SINGLE_QUOTE_SPACE.replace_all(&filtered, " ");
     filtered = RE_SPACE_SINGLE_QUOTE.replace_all(&filtered, " ");
+    filtered = RE_GARBAGE.replace_all(&filtered, " ");
 
     // TODO: TEST
     // Handle colons
@@ -353,56 +356,67 @@ mod tests {
   lazy_static! {
     /// Word set to use in the tests.
     static ref WORDS: HashSet<String> = {
-      let mut w = HashSet::new();
-      w.insert("a".to_string());
-      w.insert("and".to_string());
-      w.insert("at".to_string());
-      w.insert("atlanta".to_string());
-      w.insert("available".to_string());
-      w.insert("bad".to_string());
-      w.insert("bar".to_string());
-      w.insert("baz".to_string());
-      w.insert("be".to_string());
-      w.insert("can't".to_string());
-      w.insert("echelon".to_string());
-      w.insert("five".to_string());
-      w.insert("foo".to_string());
-      w.insert("four".to_string());
-      w.insert("fox".to_string());
-      w.insert("friday".to_string());
-      w.insert("georgia".to_string());
-      w.insert("handle".to_string());
-      w.insert("hound".to_string());
-      w.insert("idea".to_string());
-      w.insert("in".to_string());
-      w.insert("it".to_string());
-      w.insert("it's".to_string());
-      w.insert("join".to_string());
-      w.insert("link".to_string());
-      w.insert("lot".to_string());
-      w.insert("me".to_string());
-      w.insert("movement".to_string());
-      w.insert("of".to_string());
-      w.insert("on".to_string());
-      w.insert("one".to_string());
-      w.insert("people".to_string());
-      w.insert("place".to_string());
-      w.insert("quote".to_string());
-      w.insert("sign".to_string());
-      w.insert("testing".to_string());
-      w.insert("that".to_string());
-      w.insert("the".to_string());
-      w.insert("thing".to_string());
-      w.insert("this".to_string());
-      w.insert("three".to_string());
-      w.insert("tickets".to_string());
-      w.insert("two".to_string());
-      w.insert("username".to_string());
-      w.insert("visit".to_string());
-      w.insert("vote".to_string());
-      w.insert("would".to_string());
-      w.insert("you".to_string());
-      w
+      let words = vec![
+        "a",
+        "and",
+        "at",
+        "atlanta",
+        "available",
+        "bad",
+        "bar",
+        "baz",
+        "be",
+        "best",
+        "can't",
+        "echelon",
+        "five",
+        "foo",
+        "forget",
+        "four",
+        "fox",
+        "friday",
+        "georgia",
+        "handle",
+        "he",
+        "hi",
+        "hound",
+        "idea",
+        "in",
+        "is",
+        "it",
+        "it's",
+        "join",
+        "link",
+        "lot",
+        "me",
+        "movement",
+        "of",
+        "on",
+        "one",
+        "people",
+        "place",
+        "quote",
+        "sign",
+        "stuff",
+        "testing",
+        "that",
+        "the",
+        "thing",
+        "this",
+        "three",
+        "tickets",
+        "two",
+        "username",
+        "visit",
+        "vote",
+        "waves",
+        "would",
+        "you",
+      ];
+
+      let mut hs = HashSet::new();
+      for w in words { hs.insert(w.to_string()); }
+      hs
     };
 
     static ref ABBRS: HashMap<String, Vec<String>> = {
@@ -415,6 +429,21 @@ mod tests {
       abbr
     };
   }
+
+  /* TODO examples / things that break:
+    - Currencies ($5)
+    - United States in 2016. (Years)
+    - ✓ Emoji
+      - 😂
+      - ⬇️
+      - ‼️
+    - 76% (should be simple.)
+    - w/local officials
+    - a...telling (broken)
+    - (and we aren't stupid) (broken)
+    - ABC… -> i(ABC), ellipsis (broken)
+    - Clinton and Trump at 9 p.m. ET!
+  */
 
   #[test]
   fn test_tokenize_spaces() {
@@ -593,22 +622,6 @@ mod tests {
     assert_eq!(expected, result);
   }
 
-  /* TODO examples / things that break:
-    - RT @username: (RT = retweet)
-    - Fortune 100. (Numbers)
-    - Currencies ($5)
-    - United States in 2016. (Years)
-    - ✓ Emoji
-      - 😂
-      - ⬇️
-      - ‼️
-    - w/local officials
-    - a...telling (broken)
-    - (and we aren't stupid) (broken)
-    - ABC… -> i(ABC), ellipsis (broken)
-    - Clinton and Trump at 9 p.m. ET!
-  */
-
   #[test]
   fn test_date() {
     let t = make_tokenizer();
@@ -631,6 +644,32 @@ mod tests {
     result = t.tokenize("On 10/1 and 10/02");
     expected = vec![w("on"), date("10/1"), w("and"), date("10/02")];
 
+    assert_eq!(expected, result);
+  }
+
+  #[test]
+  fn test_remove_square_brackets() {
+    let t = make_tokenizer();
+
+    let result = t.tokenize("[forget]");
+    let expected = vec![w("forget")];
+    assert_eq!(expected, result);
+
+    let result = t.tokenize("[He is the] best");
+    let expected = vec![w("he"), w("is"), w("the"), w("best")];
+    assert_eq!(expected, result);
+  }
+
+  #[test]
+  fn test_remove_asterisk() {
+    let t = make_tokenizer();
+
+    let result = t.tokenize("*waves*");
+    let expected = vec![w("waves")];
+    assert_eq!(expected, result);
+
+    let result = t.tokenize("*waves hi* and stuff");
+    let expected = vec![w("waves"), w("hi"), w("and"), w("stuff")];
     assert_eq!(expected, result);
   }
 
