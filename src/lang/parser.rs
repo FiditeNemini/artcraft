@@ -76,6 +76,7 @@ impl Parser {
           match *v {
             Symbol::Ampersand => sentence.push("and".to_string()),
             Symbol::AtSign => sentence.push("at".to_string()),
+            Symbol::Percent  => sentence.push("percent".to_string()),
             Symbol::GreaterThan => {
               sentence.push("greater".to_string());
               sentence.push("than".to_string());

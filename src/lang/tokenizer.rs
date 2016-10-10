@@ -34,6 +34,9 @@ impl Tokenizer {
       // Note: Rust regexes do not support lookaround.
       // Designed not to match times (5:00) or URLs (http://)
       pub static ref RE_ALPHA_COLON: Regex = Regex::new(r"([A-Za-z]):([^/])").unwrap();
+      // Designed to match percents that follow digits.
+      // If they match in URL encoding, well, too bad... I don't care about that.
+      pub static ref RE_DIGIT_PERCENT: Regex = Regex::new(r"(\d+)%").unwrap();
       pub static ref RE_ANY_DOUBLE_QUOTE: Regex= Regex::new("[\"“”]").unwrap();
       pub static ref RE_ANY_SMART_SINGLE_QUOTE: Regex= Regex::new("[‘’]").unwrap();
       pub static ref RE_BEGIN_SINGLE_QUOTE: Regex = Regex::new("^'").unwrap();
@@ -59,10 +62,9 @@ impl Tokenizer {
     filtered = RE_SPACE_SINGLE_QUOTE.replace_all(&filtered, " ");
     filtered = RE_GARBAGE.replace_all(&filtered, " ");
 
-    // TODO: TEST
-    // Handle colons
-    // Designed not to match times (5:00) or URLs (http://)
-    filtered = RE_ALPHA_COLON.replace_all(&filtered, "$1 ");
+    // Regexes with match groups
+    filtered = RE_ALPHA_COLON.replace_all(&filtered, "$1 "); // TODO TEST
+    filtered = RE_DIGIT_PERCENT.replace_all(&filtered, "$1 % ");
 
     let split_spaces = split_sentence(&filtered);
     let mut tokenized = LinkedList::new();
@@ -149,6 +151,9 @@ impl Tokenizer {
         continue;
       } else if unknown == "&" {
         output.push_back(Token::ampersand());
+        continue;
+      } else if unknown == "%" {
+        output.push_back(Token::percent());
         continue;
       } else if unknown == "<" {
         output.push_back(Token::less_than());
@@ -398,6 +403,7 @@ mod tests {
         "quote",
         "sign",
         "stuff",
+        "sure",
         "testing",
         "that",
         "the",
@@ -674,6 +680,28 @@ mod tests {
   }
 
   #[test]
+  fn test_percent_symbol() {
+    let t = make_tokenizer();
+
+    let result = t.tokenize("%");
+    let expected = vec![Token::percent()];
+    assert_eq!(expected, result);
+
+    let result = t.tokenize("8 %");
+    let expected = vec![n("8"), Token::percent()];
+    assert_eq!(expected, result);
+
+    let result = t.tokenize("75%");
+    let expected = vec![n("75"), Token::percent()];
+    assert_eq!(expected, result);
+
+    let result = t.tokenize("99.999% sure");
+    let expected = vec![n("99.999"), Token::percent(), w("sure")];
+    assert_eq!(expected, result);
+  }
+
+
+  #[test]
   fn test_split_sentence() {
     fn sen(list: &[&str]) -> Vec<String> {
       let mut out = Vec::new();
@@ -717,6 +745,12 @@ mod tests {
   fn w(value: &str) -> Token {
     Token::dictionary_word(value.to_string())
   }
+
+  // Helper function.
+  fn n(value: &str) -> Token {
+    Token::number(value.to_string())
+  }
+
 
   // Helper function.
   fn u(value: &str) -> Token {

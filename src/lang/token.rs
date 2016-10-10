@@ -33,6 +33,7 @@ pub enum Symbol {
   AtSign,
   GreaterThan,
   LessThan,
+  Percent,
 }
 
 #[derive(Clone, PartialEq)]
@@ -199,6 +200,10 @@ impl Token {
 
   pub fn at_sign() -> Token {
     Token::Symbol { value: Symbol::AtSign }
+  }
+
+  pub fn percent() -> Token {
+    Token::Symbol { value: Symbol::Percent }
   }
 
   pub fn less_than() -> Token {
