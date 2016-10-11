@@ -44,7 +44,7 @@ impl Tokenizer {
       pub static ref RE_SINGLE_QUOTE_SPACE: Regex = Regex::new("'\\s").unwrap();
       pub static ref RE_SPACE_SINGLE_QUOTE: Regex = Regex::new("\\s'").unwrap();
       // For now remove all of these characters.
-      pub static ref RE_GARBAGE: Regex = Regex::new(r"\*|\[|\]|\|").unwrap();
+      pub static ref RE_GARBAGE: Regex = Regex::new(r"\*|\[|\]|\(|\)|\|").unwrap();
     }
 
     // Remove any type of double quote
@@ -404,6 +404,7 @@ mod tests {
         "sign",
         "stuff",
         "sure",
+        "test",
         "testing",
         "that",
         "the",
@@ -663,6 +664,27 @@ mod tests {
 
     let result = t.tokenize("[He is the] best");
     let expected = vec![w("he"), w("is"), w("the"), w("best")];
+    assert_eq!(expected, result);
+
+    let result = t.tokenize("(((test)))");
+    let expected = vec![w("test")];
+    assert_eq!(expected, result);
+  }
+
+  #[test]
+  fn test_remove_parens() {
+    let t = make_tokenizer();
+
+    let result = t.tokenize("(forget)");
+    let expected = vec![w("forget")];
+    assert_eq!(expected, result);
+
+    let result = t.tokenize("(He is the) best");
+    let expected = vec![w("he"), w("is"), w("the"), w("best")];
+    assert_eq!(expected, result);
+
+    let result = t.tokenize("[[[test]]]");
+    let expected = vec![w("test")];
     assert_eq!(expected, result);
   }
 

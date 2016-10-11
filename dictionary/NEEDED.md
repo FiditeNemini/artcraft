@@ -7,15 +7,12 @@ ganon
 ganondorf
 gorp
 incongruent
-kek
 lel
 lucario
 muah
 mwah
 ocarina
 pringles
-rareware
-shiek
 strudel
 sucky
 there's
@@ -23,8 +20,6 @@ triforce
 troglodyte
 undressing
 untrimmed
-waker
-waluigi
 wanker
 wario
 wwii
