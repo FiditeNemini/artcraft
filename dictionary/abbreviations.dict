@@ -1,4 +1,5 @@
-; A list of abbreviations
+; Abbreviations
+; ---------------------------
 DT  donald trump
 FML  fuck my life
 HC  hillary clinton
@@ -8,9 +9,15 @@ RT  retweet
 WTF  what the fuck
 BRB  be right back
 
+; Corrections
+; This is a hack. They'll simply work due to the order of parsing.
+; ---------------------------
+911  nine one one
+
 ; States
 ; Some of these are commented out as they may interfere with words
 ; that are more common than the state abbreviation.
+; ---------------------------
 ; AL  Alabama
 ; CO  Colorado
 ; DC  District of Columbia
@@ -30,6 +37,7 @@ BRB  be right back
 ; OR  Oregon
 ; PA  Pennsylvania
 ; SD  South Dakota
+; ---------------------------
 AK  Alaska
 AR  Arkansas
 AZ  Arizona

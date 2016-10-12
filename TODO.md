@@ -2,12 +2,12 @@ Remaining Tasks
 ===============
 
 Tokenizing
-  - Plurals
   - Ordinals (1st, 25th, ...)
-  - Times (9 p.m. ET)
   - Hyphenated words
   - Monetary units - just parse the leading `$`, etc.
     and let the numbers be parsed as numbers!
+  - Plurals
+  - Times (9 p.m. ET)
 
 Parsing
   - (Everything in tokenizing)
@@ -15,6 +15,15 @@ Parsing
   - Twitter hashtags, usernames
     - CamelCase parsing
     - conjoinedword parsing
+  - Get rid of static with "Uhhh", "Ummm" of variable length.
+
+Audio
+  - Remove extra space between words (using parsing to insert spacing)
+  - No more missing phonemes
+
+Cleanup
+  - Remove old query parameters
+  - Set default volume
 
 Scaling
   1. Load test
@@ -36,7 +45,14 @@ Monetization
     - Contact other developers?
     - PhoneGap? (Blah)
 
+Extra
+  - Clientside speed changing
+  - Let people type nonsense syllables
+
 Parsing Examples
 ----------------
-- Camel case even outside of hashtags: "Google acquires FameBit"
-- Time: 5:30ET
+- Camel case even outside of hashtags:
+  - "Google acquires FameBit", StateOfW, AdaLovelaceDay
+- Time: 7:30pm, 5:30ET, 9pm ET, 8:00 P.M., 8pm ET
+
+

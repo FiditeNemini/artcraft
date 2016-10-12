@@ -6,13 +6,57 @@
 
 use std::fmt;
 
+/// An initialism is distinct from an abbreviation in this system.
+/// Initialisms are said letter by letter, whereas an abbreviation gets
+/// mapped to a list of words.
+#[derive(Clone, PartialEq)]
+pub struct Abbreviation {
+  pub value: String,
+}
+
+#[derive(Clone, PartialEq)]
+pub struct Date {
+  pub value: String,
+}
+
 #[derive(Clone, PartialEq)]
 pub struct DictionaryWord {
   pub value: String,
 }
 
 #[derive(Clone, PartialEq)]
-pub struct Date {
+pub struct Emoji {
+  pub value: String,
+}
+
+#[derive(Clone, PartialEq)]
+pub struct Hashtag {
+  pub value: String,
+}
+
+/// An initialism is distinct from an abbreviation in this system.
+/// Initialisms are said letter by letter, whereas an abbreviation gets
+/// mapped to a list of words.
+#[derive(Clone, PartialEq)]
+pub struct Initialism {
+  pub value: String,
+}
+
+#[derive(Clone, PartialEq)]
+pub struct Mention {
+  pub value: String,
+}
+
+/// A number is simply a standalone number, eg. '64'.
+/// These are NOT ordinals ('1st') or dates ('1/9').
+#[derive(Clone, PartialEq)]
+pub struct Number {
+  pub value: String,
+}
+
+/// Ordinals are numbers with order, eg '1st', '22nd', etc.
+#[derive(Clone, PartialEq)]
+pub struct Ordinal {
   pub value: String,
 }
 
@@ -37,48 +81,12 @@ pub enum Symbol {
 }
 
 #[derive(Clone, PartialEq)]
-pub struct Hashtag {
-  pub value: String,
-}
-
-#[derive(Clone, PartialEq)]
-pub struct Number {
-  pub value: String,
-}
-
-#[derive(Clone, PartialEq)]
-pub struct Mention {
-  pub value: String,
-}
-
-#[derive(Clone, PartialEq)]
-pub struct Emoji {
-  pub value: String,
-}
-
-/// An initialism is distinct from an abbreviation in this system.
-/// Initialisms are said letter by letter, whereas an abbreviation gets
-/// mapped to a list of words.
-#[derive(Clone, PartialEq)]
-pub struct Abbreviation {
-  pub value: String,
-}
-
-/// An initialism is distinct from an abbreviation in this system.
-/// Initialisms are said letter by letter, whereas an abbreviation gets
-/// mapped to a list of words.
-#[derive(Clone, PartialEq)]
-pub struct Initialism {
+pub struct Unknown {
   pub value: String,
 }
 
 #[derive(Clone, PartialEq)]
 pub struct Url {
-  pub value: String,
-}
-
-#[derive(Clone, PartialEq)]
-pub struct Unknown {
   pub value: String,
 }
 
@@ -92,6 +100,7 @@ pub enum Token {
   Initialism { value: Initialism },
   Mention { value: Mention },
   Number { value: Number },
+  Ordinal { value: Ordinal },
   Punctuation { value: Punctuation },
   Symbol { value: Symbol },
   Unknown { value: Unknown }, // The unclassified type.
@@ -109,6 +118,7 @@ impl fmt::Debug for Token {
       Token::Initialism { value : ref v } => format!("Initialism {}", v.value),
       Token::Mention { value : ref v } => format!("Mention {}", v.value),
       Token::Number { value : ref v } => format!("Number {}", v.value),
+      Token::Ordinal { value : ref v } => format!("Ordinal {}", v.value),
       Token::Punctuation { value : ref v } => format!("Punctuation {:?}", v),
       Token::Symbol { value : ref v } => format!("Symbol {:?}", v),
       Token::Unknown { value : ref v } => format!("Unknown {}", v.value),
@@ -126,48 +136,16 @@ impl Token {
     }
   }
 
-  pub fn dictionary_word(value: String) -> Token {
-    Token::DictionaryWord { value: DictionaryWord { value: value } }
-  }
-
-  pub fn date(value: String) -> Token {
-    Token::Date { value: Date { value: value } }
-  }
-
-  pub fn url(value: String) -> Token {
-    Token::Url { value: Url { value: value } }
-  }
-
-  pub fn number(value: String) -> Token {
-    Token::Number { value: Number { value: value } }
-  }
-
   pub fn abbreviation(value: String) -> Token {
     Token::Abbreviation { value: Abbreviation { value: value } }
   }
 
-  pub fn initialism(value: String) -> Token {
-    Token::Initialism { value: Initialism { value: value } }
+  pub fn at_sign() -> Token {
+    Token::Symbol { value: Symbol::AtSign }
   }
 
-  pub fn emoji(value: String) -> Token {
-    Token::Emoji { value: Emoji { value: value } }
-  }
-
-  pub fn hashtag(value: String) -> Token {
-    Token::Hashtag { value: Hashtag { value: value } }
-  }
-
-  pub fn mention(value: String) -> Token {
-    Token::Mention { value: Mention { value: value } }
-  }
-
-  pub fn unknown(value: String) -> Token {
-    Token::Unknown { value: Unknown { value: value } }
-  }
-
-  pub fn period() -> Token {
-    Token::Punctuation { value: Punctuation::Period }
+  pub fn ampersand() -> Token {
+    Token::Symbol { value: Symbol::Ampersand }
   }
 
   pub fn comma() -> Token {
@@ -178,6 +156,62 @@ impl Token {
     Token::Punctuation { value: Punctuation::Dash }
   }
 
+  pub fn date(value: String) -> Token {
+    Token::Date { value: Date { value: value } }
+  }
+
+  pub fn dictionary_word(value: String) -> Token {
+    Token::DictionaryWord { value: DictionaryWord { value: value } }
+  }
+
+  pub fn ellipsis() -> Token {
+    Token::Punctuation { value: Punctuation::Ellipsis }
+  }
+
+  pub fn emoji(value: String) -> Token {
+    Token::Emoji { value: Emoji { value: value } }
+  }
+
+  pub fn exclamation() -> Token {
+    Token::Punctuation { value: Punctuation::Exclamation }
+  }
+
+  pub fn greater_than() -> Token {
+    Token::Symbol { value: Symbol::GreaterThan }
+  }
+
+  pub fn hashtag(value: String) -> Token {
+    Token::Hashtag { value: Hashtag { value: value } }
+  }
+
+  pub fn initialism(value: String) -> Token {
+    Token::Initialism { value: Initialism { value: value } }
+  }
+
+  pub fn less_than() -> Token {
+    Token::Symbol { value: Symbol::LessThan }
+  }
+
+  pub fn mention(value: String) -> Token {
+    Token::Mention { value: Mention { value: value } }
+  }
+
+  pub fn number(value: String) -> Token {
+    Token::Number { value: Number { value: value } }
+  }
+
+  pub fn ordinal(value: String) -> Token {
+    Token::Ordinal { value: Ordinal { value: value } }
+  }
+
+  pub fn percent() -> Token {
+    Token::Symbol { value: Symbol::Percent }
+  }
+
+  pub fn period() -> Token {
+    Token::Punctuation { value: Punctuation::Period }
+  }
+
   pub fn question() -> Token {
     Token::Punctuation { value: Punctuation::Question }
   }
@@ -186,32 +220,12 @@ impl Token {
     Token::Punctuation { value: Punctuation::Semicolon }
   }
 
-  pub fn exclamation() -> Token {
-    Token::Punctuation { value: Punctuation::Exclamation }
+  pub fn unknown(value: String) -> Token {
+    Token::Unknown { value: Unknown { value: value } }
   }
 
-  pub fn ellipsis() -> Token {
-    Token::Punctuation { value: Punctuation::Ellipsis }
-  }
-
-  pub fn ampersand() -> Token {
-    Token::Symbol { value: Symbol::Ampersand }
-  }
-
-  pub fn at_sign() -> Token {
-    Token::Symbol { value: Symbol::AtSign }
-  }
-
-  pub fn percent() -> Token {
-    Token::Symbol { value: Symbol::Percent }
-  }
-
-  pub fn less_than() -> Token {
-    Token::Symbol { value: Symbol::LessThan }
-  }
-
-  pub fn greater_than() -> Token {
-    Token::Symbol { value: Symbol::GreaterThan }
+  pub fn url(value: String) -> Token {
+    Token::Url { value: Url { value: value } }
   }
 }
 

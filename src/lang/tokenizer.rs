@@ -103,6 +103,7 @@ impl Tokenizer {
       static ref HASHTAG: Regex = Regex::new(r"#(\w+)").unwrap();
       static ref MENTION: Regex = Regex::new(r"@(\w+)").unwrap();
       static ref NUMBER: Regex = Regex::new(r"^-?\d+(,\d+){0,}(\.\d+)?$").unwrap();
+      static ref ORDINAL: Regex = Regex::new(r"\d+(,\d+){0,}[st|nd|rd|th]").unwrap();
       static ref URL: Regex = Regex::new(r"https?://[\w\.-]+/?(\w+)?").unwrap();
     }
 
@@ -182,6 +183,11 @@ impl Tokenizer {
 
       if NUMBER.is_match(&unknown) {
         output.push_back(Token::number(unknown.to_string()));
+        continue;
+      }
+
+      if ORDINAL.is_match(&unknown) {
+        output.push_back(Token::ordinal(unknown.to_string()));
         continue;
       }
 
@@ -772,7 +778,6 @@ mod tests {
   fn n(value: &str) -> Token {
     Token::number(value.to_string())
   }
-
 
   // Helper function.
   fn u(value: &str) -> Token {

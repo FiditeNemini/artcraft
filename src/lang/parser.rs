@@ -5,6 +5,7 @@
 
 use lang::abbr::AbbreviationsMap;
 use lang::numbers::number_to_words;
+use lang::ordinals::ordinal_to_words;
 use lang::token::*;
 use lang::tokenizer::*;
 use speaker::Speaker;
@@ -54,7 +55,15 @@ impl Parser {
             }
           }
         },
-        // Abbreviations are mapped to words
+        Token::Ordinal { value: ref v } => {
+          match ordinal_to_words(&v.value) {
+            None => { continue; },
+            Some(words) => {
+              for word in words { sentence.push(word); }
+            }
+          }
+        },
+        // Abbreviations are mapped to words (vs. initialisms)
         Token::Abbreviation { value: ref v } => {
           match self.abbreviations.get_words(&v.value) {
             None => { continue; },
@@ -65,7 +74,7 @@ impl Parser {
             }
           }
         },
-        // Initialisms are mapped to letters
+        // Initialisms are mapped to letters (vs. abbreviations)
         Token::Initialism { value: ref v } => {
           let letters : Vec<_> = v.value.split("").collect();
           for letter in letters {

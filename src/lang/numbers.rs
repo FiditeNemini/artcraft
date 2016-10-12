@@ -5,7 +5,7 @@ use std::usize;
 use std::u64;
 
 lazy_static! {
-  pub static ref FIRST_DIGITS: Vec<&'static str> = vec![
+  static ref FIRST_DIGITS: Vec<&'static str> = vec![
     "zero",
     "one",
     "two",
@@ -28,7 +28,7 @@ lazy_static! {
     "nineteen",
   ];
 
-  pub static ref TENS: Vec<&'static str> = vec![
+  static ref TENS: Vec<&'static str> = vec![
     "twenty",
     "thirty",
     "forty",
@@ -39,7 +39,7 @@ lazy_static! {
     "ninety",
   ];
 
-  pub static ref LARGE: Vec<&'static str> = vec![
+  static ref LARGE: Vec<&'static str> = vec![
     "thousand",
     "million",
     "billion",
@@ -52,7 +52,6 @@ lazy_static! {
     //"octillion",
     //"nonillion",
   ];
-
 }
 
 /// Convert a number to words.
