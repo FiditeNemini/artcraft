@@ -1,5 +1,7 @@
 // Copyright (c) 2015-2016 Brandon Thomas <bt@brand.io, echelon@gmail.com>
 
+use chrono::DateTime;
+use chrono::Local;
 use config::Config;
 use log::LogLevel;
 use log::LogLevelFilter;
@@ -7,7 +9,6 @@ use log::LogMetadata;
 use log::LogRecord;
 use log::SetLoggerError;
 use log;
-use time::now;
 
 /// Simple logger example taken from rust-lang.org docs.
 pub struct SimpleLogger {
@@ -42,9 +43,12 @@ impl log::Log for SimpleLogger {
 
   fn log(&self, record: &LogRecord) {
     if self.enabled(record.metadata()) {
-      let time = now();
-      let timestamp = time.rfc3339();
-      println!("[{}] {} - {}", timestamp, record.level(), record.args());
+      //let utc: DateTime<UTC> = UTC::now();
+      let time: DateTime<Local> = Local::now();
+      let timestamp = time.format("%a %H:%M:%S");
+      let target = record.metadata().target();
+
+      println!("[{}] {} - {} - {}", timestamp, record.level(), target, record.args());
     }
   }
 }

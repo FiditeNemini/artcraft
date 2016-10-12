@@ -1,5 +1,8 @@
 These words need improvement
 ----------------------------
+"^^ bill's
+"^^ hillary's
+"^^ obama's
 "^^^ again (BAD)
 "^^^ how (THIS IS SO BAD)
 "^^^ then (BAD)
@@ -42,8 +45,10 @@ engage
 ever
 everybody's
 everywhere
+forgot
 four
 fuck
+fucked (use fuck as a phone base)
 gas
 gigantic
 goddamn
@@ -55,6 +60,7 @@ hispanic
 hitler
 home
 horrible
+important
 invasion
 invention
 japanese

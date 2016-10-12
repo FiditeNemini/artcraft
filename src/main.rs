@@ -3,6 +3,7 @@
 #[macro_use] extern crate lazy_static;
 #[macro_use] extern crate log;
 
+extern crate chrono;
 extern crate clap;
 extern crate crypto;
 extern crate hound;
