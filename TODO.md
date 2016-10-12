@@ -2,7 +2,6 @@ Remaining Tasks
 ===============
 
 Tokenizing
-  - Ordinals (1st, 25th, ...)
   - Hyphenated words
   - Monetary units - just parse the leading `$`, etc.
     and let the numbers be parsed as numbers!
@@ -54,5 +53,5 @@ Parsing Examples
 - Camel case even outside of hashtags:
   - "Google acquires FameBit", StateOfW, AdaLovelaceDay
 - Time: 7:30pm, 5:30ET, 9pm ET, 8:00 P.M., 8pm ET
-
+- Hyphenated: 2-party
 

@@ -103,7 +103,7 @@ impl Tokenizer {
       static ref HASHTAG: Regex = Regex::new(r"#(\w+)").unwrap();
       static ref MENTION: Regex = Regex::new(r"@(\w+)").unwrap();
       static ref NUMBER: Regex = Regex::new(r"^-?\d+(,\d+){0,}(\.\d+)?$").unwrap();
-      static ref ORDINAL: Regex = Regex::new(r"\d+(,\d+){0,}[st|nd|rd|th]").unwrap();
+      static ref ORDINAL: Regex = Regex::new(r"^\d+(,\d+){0,}(st|nd|rd|th)$").unwrap();
       static ref URL: Regex = Regex::new(r"https?://[\w\.-]+/?(\w+)?").unwrap();
     }
 
@@ -728,6 +728,26 @@ mod tests {
     assert_eq!(expected, result);
   }
 
+  #[test]
+  fn test_ordinals() {
+    let t = make_tokenizer();
+
+    let result = t.tokenize("1st");
+    let expected = vec![o("1st")];
+    assert_eq!(expected, result);
+
+    let result = t.tokenize("The 2nd thing");
+    let expected = vec![w("the"), o("2nd"), w("thing")];
+    assert_eq!(expected, result);
+
+    let result = t.tokenize("123rd?");
+    let expected = vec![o("123rd"), Token::question()];
+    assert_eq!(expected, result);
+
+    let result = t.tokenize("44th.");
+    let expected = vec![o("44th"), Token::period()];
+    assert_eq!(expected, result);
+  }
 
   #[test]
   fn test_split_sentence() {
@@ -777,6 +797,10 @@ mod tests {
   // Helper function.
   fn n(value: &str) -> Token {
     Token::number(value.to_string())
+  }
+
+  fn o(value: &str) -> Token {
+    Token::ordinal(value.to_string())
   }
 
   // Helper function.
