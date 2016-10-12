@@ -21,5 +21,5 @@
   # Logging verbosity
   log_handler = false
   log_parsing = true
-  log_synthesis = false
+  log_synthesis = true
 

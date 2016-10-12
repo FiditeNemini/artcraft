@@ -2,6 +2,7 @@ Remaining Tasks
 ===============
 
 Tokenizing
+  - Plurals
   - Ordinals (1st, 25th, ...)
   - Times (9 p.m. ET)
   - Hyphenated words
@@ -10,7 +11,6 @@ Tokenizing
 
 Parsing
   - (Everything in tokenizing)
-  - Numbers
   - Dates
   - Twitter hashtags, usernames
     - CamelCase parsing
@@ -36,3 +36,7 @@ Monetization
     - Contact other developers?
     - PhoneGap? (Blah)
 
+Parsing Examples
+----------------
+- Camel case even outside of hashtags: "Google acquires FameBit"
+- Time: 5:30ET

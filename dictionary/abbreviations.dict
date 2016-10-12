@@ -6,3 +6,59 @@ OMFG  oh my fucking god
 OMG  oh my god
 RT  retweet
 WTF  what the fuck
+BRB  be right back
+
+; States
+; Some of these are commented out as they may interfere with words
+; that are more common than the state abbreviation.
+; AL  Alabama
+; CO  Colorado
+; DC  District of Columbia
+; DE  Delaware
+; HI  Hawaii
+; ID  Idaho
+; IN  Indiana
+; LA  Louisiana
+; MA  Massachusetts
+; ME  Maine
+; MI  Michigan
+; MO  Missouri
+; MS  Mississippi
+; MT  Montana
+; OH  Ohio
+; OK  Oklahoma
+; OR  Oregon
+; PA  Pennsylvania
+; SD  South Dakota
+AK  Alaska
+AR  Arkansas
+AZ  Arizona
+CA  California
+CT  Connecticut
+FL  Florida
+GA  Georgia
+IA  Iowa
+IL  Illinois
+KS  Kansas
+KY  Kentucky
+MD  Maryland
+MN  Minnesota
+NC  North Carolina
+ND  North Dakota
+NE  Nebraska
+NH  New Hampshire
+NJ  New Jersey
+NM  New Mexico
+NV  Nevada
+NY  New York
+RI  Rhode Island
+SC  South Carolina
+TN  Tennessee
+TX  Texas
+UT  Utah
+VA  Virginia
+VT  Vermont
+WA  Washington
+WI  Wisconsin
+WV  West Virginia
+WY  Wyoming

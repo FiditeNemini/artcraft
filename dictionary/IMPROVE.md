@@ -93,12 +93,14 @@ sack
 self
 shiny
 shovel
+shut
 software
 sometime
 sometimes
 such
 sudanese
 ten
+the
 there (sounds like they're)
 universe
 unwilling

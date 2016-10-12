@@ -17060,9 +17060,10 @@ C2  S IY1 T UW1
 C3  S IY1 TH R IY1
 C4  S IY1 F AO1 R
 C5  S IY1 F AY1 V
-CA  K AH1
-CA(1)  S IY1 EY1
-CA(2)  K AA1
+; "california" is more appropriate here,
+; CA  K AH1
+; CA(1)  S IY1 EY1
+; CA(2)  K AA1
 CAAN  K AA1 N
 CAB  K AE1 B
 CAB'S  K AE1 B Z
@@ -132107,7 +132108,8 @@ WUTTKE  W AH1 T K IY0
 WUXI  W AH1 K S IY0
 WUYDA  W OY1 D AH0
 WUZZY  W UH1 Z IY0
-WY  W EY1
+; Wyoming is more appropriate,
+; WY  W EY1
 WYAN  W AY1 AH0 N
 WYAND  W AY1 AH0 N D
 WYANT  W AY1 AH0 N T
