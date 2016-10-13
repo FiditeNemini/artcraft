@@ -37,7 +37,6 @@ impl Parser {
 
     for token in tokens {
       match token {
-        Token::CamelCaseString { value: _v } => {}, // Skip (for now)
         Token::CurrencySymbol { value: _v } => {}, // Skip (for now)
         Token::Date { value: _v } => {}, // Skip (for now)
         Token::Emoji { value: _v } => {}, // Skip (for now)
@@ -85,6 +84,16 @@ impl Parser {
             sentence.push(letter.to_string());
           }
         },
+        Token::CamelCaseString { value: ref v } => {
+          match self.try_expand_camel_case(&v.value) {
+            None => {
+              sentence.push(v.value.to_string());
+            },
+            Some(words) => {
+              for word in words { sentence.push(word.to_string()); }
+            }
+          }
+        },
         Token::HyphenatedString { value: ref v } => {
           match self.try_expand_hypenated(&v.value) {
             None => {
@@ -128,6 +137,38 @@ impl Parser {
     let split : Vec<&str> = hyphenated.split("-").collect();
     let mut words = Vec::new();
     for word in split {
+      let lower = word.to_lowercase();
+      if !self.dictionary.contains(&lower) {
+        return None;
+      }
+      words.push(lower);
+    }
+    Some(words)
+  }
+
+  /// Attempt to expand a CamelCased non-dictionary word into a list
+  /// of dictionary words. If any of the words don't match, this fails.
+  fn try_expand_camel_case(&self, camel_case: &str) -> Option<Vec<String>> {
+    let mut candidate_words = Vec::new();
+    let mut word_buf = Vec::new();
+
+    // NB: This doesn't work for unicode. See Rust docs.
+    for ch in camel_case.chars() {
+      if ch.is_uppercase() && !word_buf.is_empty() {
+        let word = word_buf.join("");
+        candidate_words.push(word);
+        word_buf.clear();
+      }
+      word_buf.push(ch.to_string());
+    }
+
+    if !word_buf.is_empty() {
+      let word = word_buf.join("");
+      candidate_words.push(word);
+    }
+
+    let mut words = Vec::new();
+    for word in candidate_words {
       let lower = word.to_lowercase();
       if !self.dictionary.contains(&lower) {
         return None;
@@ -246,6 +287,30 @@ mod tests {
     //           &t.parse(&s, "U.S. Murders Increased 10.8% in 2015"));
 
     // TODO: WAAAY MORE TESTS.
+  }
+
+  #[test]
+  fn test_camel_case_expansion() {
+    let p = make_parser();
+    let s = Speaker::new("speaker".to_string());
+
+    let result = &p.parse(&s, "FooBar");
+    let expected = "foo bar";
+    assert_eq!(expected, result);
+
+    let result = &p.parse(&s, "fooBarBaz");
+    let expected = "foo bar baz";
+    assert_eq!(expected, result);
+
+    // A partially unknown camel case
+    let result = &p.parse(&s, "FooBarQuerty");
+    let expected = "FooBarQuerty";
+    assert_eq!(expected, result);
+
+    // An entirely unknown hyphenation
+    let result = &p.parse(&s, "qwertyUiop");
+    let expected = "qwertyUiop";
+    assert_eq!(expected, result);
   }
 
   #[test]
