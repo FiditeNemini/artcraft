@@ -15,7 +15,6 @@ Parsing
   - (Everything in tokenizing)
   - Output a structured form of data with breath/pauses
     (periods, commas, etc...)
-  - CamelCase
   - Decimal numbers
   - Monetary units ($10 -> ten dollars, $10 million -> ten million dollars)
   - Dates
