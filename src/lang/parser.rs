@@ -33,14 +33,15 @@ impl Parser {
 
     for token in tokens {
       match token {
+        Token::CamelCaseString { value: _v } => {}, // Skip (for now)
+        Token::CurrencySymbol { value: _v } => {}, // Skip (for now)
         Token::Date { value: _v } => {}, // Skip (for now)
         Token::Emoji { value: _v } => {}, // Skip (for now)
         Token::Hashtag { value: _v } => {}, // Skip (for now)
         Token::HyphenatedString { value: _v } => {}, // Skip (for now)
-        Token::CamelCaseString { value: _v } => {}, // Skip (for now)
         Token::Mention { value: _v } => {}, // Skip (for now)
         Token::Punctuation { value: _v } => {}, // Skip (for now)
-        Token::Url { value: _v } => {}, // Skip
+        Token::Url { value: _v } => {}, // Skip (forever)
         Token::DictionaryWord { value : ref v } => {
           sentence.push(v.value.to_string());
         }

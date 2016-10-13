@@ -1,24 +1,28 @@
 Remaining Tasks
 ===============
 
+Audio Samples
+  - MORE SAMPLES
+  - IMPROVED SAMPLES
+  - Remove extra space between words (using parsing to insert spacing)
+  - No more missing phonemes
+
 Tokenizing
-  - Hyphenated words
-  - Monetary units - just parse the leading `$`, etc.
-    and let the numbers be parsed as numbers!
   - Plurals
   - Times (9 p.m. ET)
 
 Parsing
   - (Everything in tokenizing)
+  - CamelCase
+  - hyphenated-words
   - Dates
+  - Numbers that are years (2016)!
   - Twitter hashtags, usernames
     - CamelCase parsing
-    - conjoinedword parsing
-  - Get rid of static with "Uhhh", "Ummm" of variable length.
+    - conjoinedword parsing (difficult)
 
-Audio
-  - Remove extra space between words (using parsing to insert spacing)
-  - No more missing phonemes
+Synthesis
+  - Get rid of static with "Uhhh", "Ummm" of variable length (option).
 
 Cleanup
   - Refactor into a very well-defined "SpeakRequest" with all

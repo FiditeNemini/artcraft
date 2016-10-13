@@ -34,6 +34,7 @@ impl Tokenizer {
       // Note: Rust regexes do not support lookaround.
       // Designed not to match times (5:00) or URLs (http://)
       pub static ref RE_ALPHA_COLON: Regex = Regex::new(r"([A-Za-z]):([^/])").unwrap();
+      pub static ref RE_CURRENCY: Regex = Regex::new(r"([Ƀ¢$€£₤¥])").unwrap();
       // Designed to match percents that follow digits.
       // If they match in URL encoding, well, too bad... I don't care about that.
       pub static ref RE_DIGIT_PERCENT: Regex = Regex::new(r"(\d+)%").unwrap();
@@ -64,6 +65,7 @@ impl Tokenizer {
 
     // Regexes with match groups
     filtered = RE_ALPHA_COLON.replace_all(&filtered, "$1 "); // TODO TEST
+    filtered = RE_CURRENCY.replace_all(&filtered, "$1 ");
     filtered = RE_DIGIT_PERCENT.replace_all(&filtered, "$1 % ");
 
     let split_spaces = split_sentence(&filtered);
@@ -169,6 +171,28 @@ impl Tokenizer {
         continue;
       } else if unknown == "+" {
         output.push_back(Token::plus());
+        continue;
+      }
+
+      // Currency Symbols
+      // FIXME: Map lookup for speedup.
+      if unknown == "Ƀ" {
+        output.push_back(Token::bitcoin());
+        continue;
+      } else if unknown == "¢" {
+        output.push_back(Token::cent());
+        continue;
+      } else if unknown == "$" {
+        output.push_back(Token::dollar());
+        continue;
+      } else if unknown == "€" {
+        output.push_back(Token::euro());
+        continue;
+      } else if unknown == "£" || unknown == "₤" {
+        output.push_back(Token::pound());
+        continue;
+      } else if unknown == "¥" {
+        output.push_back(Token::yen());
         continue;
       }
 
@@ -819,7 +843,7 @@ mod tests {
     let result = t.tokenize("& < > + % @");
     let expected = vec![
       Token::ampersand(),
-      Token::less_than(), 
+      Token::less_than(),
       Token::greater_than(),
       Token::plus(),
       Token::percent(),
@@ -830,6 +854,52 @@ mod tests {
     // TODO:
     // let result = t.tokenize("1+2");
     // let expected = vec![n("1"), Token::plus(), n("2")];
+    // assert_eq!(expected, result);
+  }
+
+  #[test]
+  fn test_currency() {
+    let t = make_tokenizer();
+
+    let result = t.tokenize("$");
+    let expected = vec![Token::dollar()];
+    assert_eq!(expected, result);
+
+    let result = t.tokenize("€");
+    let expected = vec![Token::euro()];
+    assert_eq!(expected, result);
+
+    let result = t.tokenize("Ƀ ¢ $ € £ ₤ ¥");
+    let expected = vec![
+      Token::bitcoin(),
+      Token::cent(),
+      Token::dollar(),
+      Token::euro(),
+      Token::pound(),
+      Token::pound(),
+      Token::yen(),
+    ];
+    assert_eq!(expected, result);
+
+    let result = t.tokenize("Ƀ¢$€£₤¥");
+    let expected = vec![
+      Token::bitcoin(),
+      Token::cent(),
+      Token::dollar(),
+      Token::euro(),
+      Token::pound(),
+      Token::pound(),
+      Token::yen(),
+    ];
+    assert_eq!(expected, result);
+
+    let result = t.tokenize("$99");
+    let expected = vec![Token::dollar(), n("99")];
+    assert_eq!(expected, result);
+
+    // TODO: Make this work -
+    // let result = t.tokenize("99¢");
+    // let expected = vec![n("99"), Token::cent()];
     // assert_eq!(expected, result);
   }
 

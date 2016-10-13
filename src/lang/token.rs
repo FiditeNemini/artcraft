@@ -20,6 +20,16 @@ pub struct CamelCaseString {
   pub value: String,
 }
 
+#[derive(Clone, Debug, PartialEq)]
+pub enum CurrencySymbol {
+  Bitcoin,
+  Cent,
+  Dollar,
+  Euro,
+  Pound,
+  Yen,
+}
+
 #[derive(Clone, PartialEq)]
 pub struct Date {
   pub value: String,
@@ -111,6 +121,7 @@ pub struct Url {
 pub enum Token {
   Abbreviation { value: Abbreviation },
   CamelCaseString { value: CamelCaseString },
+  CurrencySymbol { value: CurrencySymbol },
   Date { value: Date },
   DictionaryWord { value: DictionaryWord }, // The primary type.
   Emoji { value: Emoji },
@@ -131,6 +142,7 @@ impl fmt::Debug for Token {
     let val = match *self {
       Token::Abbreviation { value : ref v } => format!("Abbreviation {}", v.value),
       Token::CamelCaseString { value : ref v } => format!("CamelCase {}", v.value),
+      Token::CurrencySymbol { value : ref v } => format!("Currency {:?}", v),
       Token::Date { value : ref v } => format!("Date {}", v.value),
       Token::DictionaryWord { value : ref v } => format!("Word {}", v.value),
       Token::Emoji { value : ref v } => format!("Emoji {}", v.value),
@@ -169,8 +181,16 @@ impl Token {
     Token::Symbol { value: Symbol::Ampersand }
   }
 
+  pub fn bitcoin() -> Token {
+    Token::CurrencySymbol { value: CurrencySymbol::Bitcoin }
+  }
+
   pub fn camel(value: String) -> Token {
     Token::CamelCaseString { value: CamelCaseString { value: value } }
+  }
+
+  pub fn cent() -> Token {
+    Token::CurrencySymbol { value: CurrencySymbol::Cent }
   }
 
   pub fn comma() -> Token {
@@ -189,12 +209,20 @@ impl Token {
     Token::DictionaryWord { value: DictionaryWord { value: value } }
   }
 
+  pub fn dollar() -> Token {
+    Token::CurrencySymbol { value: CurrencySymbol::Dollar }
+  }
+
   pub fn ellipsis() -> Token {
     Token::Punctuation { value: Punctuation::Ellipsis }
   }
 
   pub fn emoji(value: String) -> Token {
     Token::Emoji { value: Emoji { value: value } }
+  }
+
+  pub fn euro() -> Token {
+    Token::CurrencySymbol { value: CurrencySymbol::Euro }
   }
 
   pub fn exclamation() -> Token {
@@ -245,6 +273,10 @@ impl Token {
     Token::Symbol { value: Symbol::Plus }
   }
 
+  pub fn pound() -> Token {
+    Token::CurrencySymbol { value: CurrencySymbol::Pound }
+  }
+
   pub fn question() -> Token {
     Token::Punctuation { value: Punctuation::Question }
   }
@@ -259,6 +291,10 @@ impl Token {
 
   pub fn url(value: String) -> Token {
     Token::Url { value: Url { value: value } }
+  }
+
+  pub fn yen() -> Token {
+    Token::CurrencySymbol { value: CurrencySymbol::Yen }
   }
 }
 
