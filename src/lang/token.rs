@@ -19,6 +19,7 @@ pub struct Date {
   pub value: String,
 }
 
+/// These words exist in the dictionary.
 #[derive(Clone, PartialEq)]
 pub struct DictionaryWord {
   pub value: String,
@@ -31,6 +32,13 @@ pub struct Emoji {
 
 #[derive(Clone, PartialEq)]
 pub struct Hashtag {
+  pub value: String,
+}
+
+/// This is an otherwise unidentified string that contains one or more
+/// mid-string hyphens. It will require additional handling.
+#[derive(Clone, PartialEq)]
+pub struct HyphenatedString {
   pub value: String,
 }
 
@@ -81,6 +89,8 @@ pub enum Symbol {
   Plus,
 }
 
+/// Unknown means we couldn't confer any information on the string.
+/// It's entirely unknown and remains unclassified.
 #[derive(Clone, PartialEq)]
 pub struct Unknown {
   pub value: String,
@@ -98,6 +108,7 @@ pub enum Token {
   DictionaryWord { value: DictionaryWord }, // The primary type.
   Emoji { value: Emoji },
   Hashtag { value: Hashtag },
+  HyphenatedString { value: HyphenatedString },
   Initialism { value: Initialism },
   Mention { value: Mention },
   Number { value: Number },
@@ -116,6 +127,7 @@ impl fmt::Debug for Token {
       Token::DictionaryWord { value : ref v } => format!("Word {}", v.value),
       Token::Emoji { value : ref v } => format!("Emoji {}", v.value),
       Token::Hashtag { value : ref v } => format!("Hashtag {}", v.value),
+      Token::HyphenatedString { value : ref v } => format!("HyphenatedString {}", v.value),
       Token::Initialism { value : ref v } => format!("Initialism {}", v.value),
       Token::Mention { value : ref v } => format!("Mention {}", v.value),
       Token::Number { value : ref v } => format!("Number {}", v.value),
@@ -183,6 +195,10 @@ impl Token {
 
   pub fn hashtag(value: String) -> Token {
     Token::Hashtag { value: Hashtag { value: value } }
+  }
+
+  pub fn hyphenated(value: String) -> Token {
+    Token::HyphenatedString { value: HyphenatedString { value: value } }
   }
 
   pub fn initialism(value: String) -> Token {

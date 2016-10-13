@@ -95,7 +95,6 @@ impl Tokenizer {
     tokens
   }
 
-  // TODO: Test.
   // TODO: Efficiency.
   fn classify_tokens(&self, tokens: LinkedList<Token>) -> LinkedList<Token> {
     lazy_static! {
@@ -105,6 +104,7 @@ impl Tokenizer {
       static ref NUMBER: Regex = Regex::new(r"^-?\d+(,\d+){0,}(\.\d+)?$").unwrap();
       static ref ORDINAL: Regex = Regex::new(r"^\d+(,\d+){0,}(st|nd|rd|th)$").unwrap();
       static ref URL: Regex = Regex::new(r"https?://[\w\.-]+/?(\w+)?").unwrap();
+      static ref HYPHENATED: Regex = Regex::new(r"\w+(-\w+){1,}").unwrap();
     }
 
     let mut output = LinkedList::new();
@@ -128,11 +128,6 @@ impl Tokenizer {
 
       if self.abbreviations.is_abbreviation(&word) {
         output.push_back(Token::abbreviation(word));
-        continue;
-      }
-
-      if URL.is_match(&unknown) {
-        output.push_back(Token::url(unknown.to_string()));
         continue;
       }
 
@@ -168,13 +163,16 @@ impl Tokenizer {
         continue;
       }
 
-      // Match hashtags.
+      if URL.is_match(&unknown) {
+        output.push_back(Token::url(unknown.to_string()));
+        continue;
+      }
+
       if HASHTAG.is_match(&unknown) {
         output.push_back(Token::hashtag(unknown.to_string()));
         continue;
       }
 
-      // Match mentions.
       if MENTION.is_match(&unknown) {
         output.push_back(Token::mention(unknown.to_string()));
         continue;
@@ -192,6 +190,11 @@ impl Tokenizer {
 
       if ORDINAL.is_match(&unknown) {
         output.push_back(Token::ordinal(unknown.to_string()));
+        continue;
+      }
+
+      if HYPHENATED.is_match(&unknown) {
+        output.push_back(Token::hyphenated(unknown.to_string()));
         continue;
       }
 
@@ -383,6 +386,7 @@ mod tests {
         "be",
         "best",
         "can't",
+        "dictionary-word",
         "echelon",
         "five",
         "foo",
@@ -665,6 +669,42 @@ mod tests {
   }
 
   #[test]
+  fn test_hyphenated_words() {
+    let t = make_tokenizer();
+
+    fn hy(value: &str) -> Token {
+      Token::hyphenated(value.to_string())
+    }
+
+    // Doesn't match a dictionary word that happens to contain a hyphen.
+    let result = t.tokenize("dictionary-word");
+    let expected = vec![w("dictionary-word")];
+    assert_eq!(expected, result);
+
+    // Doesn't match a dash separation between two dictionary words.
+    let result = t.tokenize("one--two");
+    let expected = vec![w("one"), Token::dash(), w("two")];
+    assert_eq!(expected, result);
+
+    let result = t.tokenize("one - two");
+    let expected = vec![w("one"), Token::dash(), w("two")];
+    assert_eq!(expected, result);
+
+    // Hyphenated strings
+    let result = t.tokenize("hyphenated-string");
+    let expected = vec![hy("hyphenated-string")];
+    assert_eq!(expected, result);
+
+    let result = t.tokenize("multiply-hyphenated-string");
+    let expected = vec![hy("multiply-hyphenated-string")];
+    assert_eq!(expected, result);
+
+    let result = t.tokenize("UPPER-CASE");
+    let expected = vec![hy("UPPER-CASE")];
+    assert_eq!(expected, result);
+  }
+
+  #[test]
   fn test_remove_square_brackets() {
     let t = make_tokenizer();
 
@@ -725,6 +765,11 @@ mod tests {
       Token::at_sign(),
     ];
     assert_eq!(expected, result);
+
+    // TODO:
+    // let result = t.tokenize("1+2");
+    // let expected = vec![n("1"), Token::plus(), n("2")];
+    // assert_eq!(expected, result);
   }
 
   #[test]
