@@ -105,6 +105,15 @@ impl Tokenizer {
       static ref ORDINAL: Regex = Regex::new(r"^\d+(,\d+){0,}(st|nd|rd|th)$").unwrap();
       static ref URL: Regex = Regex::new(r"https?://[\w\.-]+/?(\w+)?").unwrap();
       static ref HYPHENATED: Regex = Regex::new(r"\w+(-\w+){1,}").unwrap();
+      static ref CAMEL: Regex = {
+        let camel_case = r#"
+          ^
+            ([a-z]+[0-9A-Z]+([a-z]+[0-9A-Z]+){0,}[a-z]*)
+          |
+            ([0-9A-Z]+[a-z]+[0-9A-Z]+([a-z]+[0-9A-Z]+){0,}[a-z]*)
+          $"#;
+        Regex::new(&camel_case.replace(char::is_whitespace, "")).unwrap()
+      };
     }
 
     let mut output = LinkedList::new();
@@ -195,6 +204,11 @@ impl Tokenizer {
 
       if HYPHENATED.is_match(&unknown) {
         output.push_back(Token::hyphenated(unknown.to_string()));
+        continue;
+      }
+
+      if CAMEL.is_match(&unknown) {
+        output.push_back(Token::camel(unknown.to_string()));
         continue;
       }
 
@@ -665,6 +679,48 @@ mod tests {
     result = t.tokenize("On 10/1 and 10/02");
     expected = vec![w("on"), date("10/1"), w("and"), date("10/02")];
 
+    assert_eq!(expected, result);
+  }
+
+  #[test]
+  fn test_camel_case() {
+    let t = make_tokenizer();
+
+    fn cc(value: &str) -> Token {
+      Token::camel(value.to_string())
+    }
+
+    // Doesn't match all-caps.
+    let result = t.tokenize("NOTCAMEL");
+    let expected = vec![i("NOTCAMEL")]; // NB: initialism
+    assert_eq!(expected, result);
+
+    // Doesn't match capitalized (unknown) words.
+    let result = t.tokenize("Dothraki");
+    let expected = vec![u("Dothraki")];
+    assert_eq!(expected, result);
+
+    // Or uncapitalized.
+    let result = t.tokenize("dothraki");
+    let expected = vec![u("dothraki")];
+    assert_eq!(expected, result);
+
+    // Matches various forms of CamelCase.
+    let result = t.tokenize("CamelCase");
+    let expected = vec![cc("CamelCase")];
+    assert_eq!(expected, result);
+
+    let result = t.tokenize("camelCase");
+    let expected = vec![cc("camelCase")];
+    assert_eq!(expected, result);
+
+    let result = t.tokenize("ABigDog AfraidOfI");
+    let expected = vec![cc("ABigDog"), cc("AfraidOfI")];
+    assert_eq!(expected, result);
+
+    // Even for included digits.
+    let result = t.tokenize("OneTwo3 Four5Six");
+    let expected = vec![cc("OneTwo3"), cc("Four5Six")];
     assert_eq!(expected, result);
   }
 

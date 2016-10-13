@@ -14,6 +14,12 @@ pub struct Abbreviation {
   pub value: String,
 }
 
+/// An otherwise unidentified string that happens to be in CamelCase.
+#[derive(Clone, PartialEq)]
+pub struct CamelCaseString {
+  pub value: String,
+}
+
 #[derive(Clone, PartialEq)]
 pub struct Date {
   pub value: String,
@@ -104,6 +110,7 @@ pub struct Url {
 #[derive(Clone, PartialEq)]
 pub enum Token {
   Abbreviation { value: Abbreviation },
+  CamelCaseString { value: CamelCaseString },
   Date { value: Date },
   DictionaryWord { value: DictionaryWord }, // The primary type.
   Emoji { value: Emoji },
@@ -123,11 +130,12 @@ impl fmt::Debug for Token {
   fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
     let val = match *self {
       Token::Abbreviation { value : ref v } => format!("Abbreviation {}", v.value),
+      Token::CamelCaseString { value : ref v } => format!("CamelCase {}", v.value),
       Token::Date { value : ref v } => format!("Date {}", v.value),
       Token::DictionaryWord { value : ref v } => format!("Word {}", v.value),
       Token::Emoji { value : ref v } => format!("Emoji {}", v.value),
       Token::Hashtag { value : ref v } => format!("Hashtag {}", v.value),
-      Token::HyphenatedString { value : ref v } => format!("HyphenatedString {}", v.value),
+      Token::HyphenatedString { value : ref v } => format!("Hyphenated {}", v.value),
       Token::Initialism { value : ref v } => format!("Initialism {}", v.value),
       Token::Mention { value : ref v } => format!("Mention {}", v.value),
       Token::Number { value : ref v } => format!("Number {}", v.value),
@@ -159,6 +167,10 @@ impl Token {
 
   pub fn ampersand() -> Token {
     Token::Symbol { value: Symbol::Ampersand }
+  }
+
+  pub fn camel(value: String) -> Token {
+    Token::CamelCaseString { value: CamelCaseString { value: value } }
   }
 
   pub fn comma() -> Token {

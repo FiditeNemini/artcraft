@@ -37,6 +37,7 @@ impl Parser {
         Token::Emoji { value: _v } => {}, // Skip (for now)
         Token::Hashtag { value: _v } => {}, // Skip (for now)
         Token::HyphenatedString { value: _v } => {}, // Skip (for now)
+        Token::CamelCaseString { value: _v } => {}, // Skip (for now)
         Token::Mention { value: _v } => {}, // Skip (for now)
         Token::Punctuation { value: _v } => {}, // Skip (for now)
         Token::Url { value: _v } => {}, // Skip
