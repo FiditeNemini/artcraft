@@ -705,6 +705,11 @@ mod tests {
     let expected = vec![u("dothraki")];
     assert_eq!(expected, result);
 
+    // Doesn't match words in our dictionary, despite camel case.
+    let result = t.tokenize("AtLanTa");
+    let expected = vec![w("atlanta")];
+    assert_eq!(expected, result);
+
     // Matches various forms of CamelCase.
     let result = t.tokenize("CamelCase");
     let expected = vec![cc("CamelCase")];
