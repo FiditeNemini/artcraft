@@ -33,9 +33,55 @@ impl Parser {
   /// Tokenize, then "parse" the sentence into usable output.
   pub fn parse(&self, _speaker: &Speaker, raw_sentence: &str) -> String {
     let tokens = self.tokenizer.tokenize(raw_sentence);
-    let mut sentence = Vec::new();
 
+    // First round: attempt to swap out certain token types for others.
+    // TODO: Inefficient. Use a mutable linked list to modify in-place.
+    let mut processed_tokens = Vec::new();
     for token in tokens {
+      match token {
+        Token::Hashtag { value: ref v } => {
+          let tag = v.value.replace("#", "");
+          if self.dictionary.contains(&tag.to_lowercase()) {
+            processed_tokens.push(Token::dictionary_word("hashtag".to_string()));
+            processed_tokens.push(Token::dictionary_word(tag));
+            continue;
+          }
+          match self.try_expand_camel_case(&tag) {
+            None => {},
+            Some(words) => {
+              processed_tokens.push(Token::dictionary_word("hashtag".to_string()));
+              for word in words {
+                processed_tokens.push(Token::dictionary_word(word.to_string()));
+              }
+              continue;
+            }
+          }
+        },
+        Token::Mention { value: ref v } => {
+          let name = v.value.replace("@", "");
+          if self.dictionary.contains(&name.to_lowercase()) {
+            processed_tokens.push(Token::dictionary_word(name));
+            continue;
+          }
+          match self.try_expand_camel_case(&name) {
+            None => {},
+            Some(words) => {
+              for word in words {
+                processed_tokens.push(Token::dictionary_word(word.to_string()));
+              }
+              continue;
+            }
+          }
+        },
+        _ => {},
+      }
+
+      processed_tokens.push(token);
+    }
+
+    // Process all token types and construct output sentence.
+    let mut sentence = Vec::new();
+    for token in processed_tokens {
       match token {
         Token::CurrencySymbol { value: _v } => {}, // Skip (for now)
         Token::Date { value: _v } => {}, // Skip (for now)
@@ -167,6 +213,8 @@ impl Parser {
       candidate_words.push(word);
     }
 
+    info!(target: "parsing", "CamelCase breakdown: {:?}", candidate_words);
+
     let mut words = Vec::new();
     for word in candidate_words {
       let lower = word.to_lowercase();
@@ -208,6 +256,7 @@ mod tests {
       w.insert("ending".to_string());
       w.insert("five".to_string());
       w.insert("foo".to_string());
+      w.insert("food".to_string());
       w.insert("four".to_string());
       w.insert("fox".to_string());
       w.insert("friday".to_string());
@@ -220,6 +269,7 @@ mod tests {
       w.insert("it's".to_string());
       w.insert("jack".to_string());
       w.insert("join".to_string());
+      w.insert("jon".to_string());
       w.insert("lantern".to_string());
       w.insert("link".to_string());
       w.insert("lot".to_string());
@@ -233,6 +283,7 @@ mod tests {
       w.insert("place".to_string());
       w.insert("quote".to_string());
       w.insert("sign".to_string());
+      w.insert("snow".to_string());
       w.insert("testing".to_string());
       w.insert("that".to_string());
       w.insert("the".to_string());
@@ -334,6 +385,48 @@ mod tests {
     // An entirely unknown hyphenation
     let result = &p.parse(&s, "qwerty-uiop");
     let expected = "qwerty-uiop";
+    assert_eq!(expected, result);
+  }
+
+  #[test]
+  fn test_twitter_usernames() {
+    let p = make_parser();
+    let s = Speaker::new("speaker".to_string());
+
+    // Simple dictionary word
+    let result = &p.parse(&s, "@echelon");
+    let expected = "echelon";
+    assert_eq!(expected, result);
+
+    // For CamelCase words that exist
+    let result = &p.parse(&s, "@JonSnow");
+    let expected = "jon snow";
+    assert_eq!(expected, result);
+
+    // Unknown
+    let result = &p.parse(&s, "@qwerty");
+    let expected = "";
+    assert_eq!(expected, result);
+  }
+
+  #[test]
+  fn test_twitter_hashtags() {
+    let p = make_parser();
+    let s = Speaker::new("speaker".to_string());
+
+    // Simple dictionary word
+    let result = &p.parse(&s, "#food");
+    let expected = "hashtag food";
+    assert_eq!(expected, result);
+
+    // For CamelCase words that exist
+    let result = &p.parse(&s, "#FooBarBaz");
+    let expected = "hashtag foo bar baz";
+    assert_eq!(expected, result);
+
+    // Unknown
+    let result = &p.parse(&s, "#qwerty");
+    let expected = "";
     assert_eq!(expected, result);
   }
 

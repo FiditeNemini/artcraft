@@ -19,9 +19,7 @@ Parsing
   - Monetary units ($10 -> ten dollars, $10 million -> ten million dollars)
   - Dates
   - Numbers that are years (2016)!
-  - Twitter hashtags, usernames
-    - CamelCase parsing
-    - conjoinedword parsing (difficult)
+  - Twitter hashtags, usernames - conjoined word parsing (difficult)
 
 Synthesis
   - Get rid of static with "Uhhh", "Ummm" of variable length (option).

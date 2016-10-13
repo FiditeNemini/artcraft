@@ -590,11 +590,13 @@ mod tests {
   fn test_tokenize_twitter() {
     let t = make_tokenizer();
 
+    // TODO: Test "#NewYorkCity!", which breaks.
     let mut result = t.tokenize("#foo #bar #baz");
     let mut expected = vec![h("#foo"), h("#bar"), h("#baz")];
 
     assert_eq!(expected, result);
 
+    // TODO: Test "@POTUS,", which breaks.
     result = t.tokenize("@echelon @UserName");
     expected = vec![m("@echelon"), m("@UserName")];
 
