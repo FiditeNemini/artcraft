@@ -9,13 +9,14 @@ Audio Samples
 
 Tokenizing
   - Plurals
-  - Decimal numbers
   - Times (9 p.m. ET)
 
 Parsing
   - (Everything in tokenizing)
+  - Output a structured form of data with breath/pauses
+    (periods, commas, etc...)
   - CamelCase
-  - hyphenated-words
+  - Decimal numbers
   - Monetary units ($10 -> ten dollars, $10 million -> ten million dollars)
   - Dates
   - Numbers that are years (2016)!
@@ -28,7 +29,7 @@ Synthesis
 
 Cleanup
   - Refactor into a very well-defined "SpeakRequest" with all
-    parameters, including new ones like "is_twitter", 
+    parameters, including new ones like "is_twitter",
     "missing_word_mode = slience, record_pop, umm", etc.
   - Remove old query parameters
   - Set default volume

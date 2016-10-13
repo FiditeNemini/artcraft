@@ -141,12 +141,14 @@ fn create_synthesizer(config: &Config) -> Synthesizer {
   let mut dictionary = UniversalDictionary::new();
   dictionary.set_arpabet_dictionary(arpabet.to_dictionary());
 
+  let dictionary = Arc::new(dictionary);
+
   info!("Reading Abbreviations Map...");
   let abbreviations = Arc::new(AbbreviationsMap::load_from_file(
       &config.abbreviation_file.clone().unwrap()).unwrap());
 
-  let tokenizer = Tokenizer::new(Arc::new(dictionary), abbreviations.clone());
-  let parser = Parser::new(tokenizer, abbreviations.clone());
+  let tokenizer = Tokenizer::new(dictionary.clone(), abbreviations.clone());
+  let parser = Parser::new(tokenizer, dictionary.clone(), abbreviations.clone());
 
   info!("Building Synthesizer...");
   let audiobank = Audiobank::new(&config.sound_path.clone().unwrap());

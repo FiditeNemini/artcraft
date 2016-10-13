@@ -4,6 +4,7 @@
 // (The synthesizer only has knowledge of how to handle filtered words.)
 
 use lang::abbr::AbbreviationsMap;
+use lang::dictionary::UniversalDictionary;
 use lang::numbers::number_to_words;
 use lang::ordinals::ordinal_to_words;
 use lang::token::*;
@@ -13,15 +14,18 @@ use std::sync::Arc;
 
 pub struct Parser {
   tokenizer: Tokenizer,
+  dictionary: Arc<UniversalDictionary>,
   abbreviations: Arc<AbbreviationsMap>,
 }
 
 impl Parser {
   /// CTOR.
-  pub fn new(tokenizer: Tokenizer, abbreviations: Arc<AbbreviationsMap>)
-      -> Parser {
+  pub fn new(tokenizer: Tokenizer,
+             dictionary: Arc<UniversalDictionary>,
+             abbreviations: Arc<AbbreviationsMap>) -> Parser {
     Parser {
       tokenizer: tokenizer,
+      dictionary: dictionary,
       abbreviations: abbreviations,
     }
   }
@@ -38,7 +42,6 @@ impl Parser {
         Token::Date { value: _v } => {}, // Skip (for now)
         Token::Emoji { value: _v } => {}, // Skip (for now)
         Token::Hashtag { value: _v } => {}, // Skip (for now)
-        Token::HyphenatedString { value: _v } => {}, // Skip (for now)
         Token::Mention { value: _v } => {}, // Skip (for now)
         Token::Punctuation { value: _v } => {}, // Skip (for now)
         Token::Url { value: _v } => {}, // Skip (forever)
@@ -71,9 +74,7 @@ impl Parser {
           match self.abbreviations.get_words(&v.value) {
             None => { continue; },
             Some(words) => {
-              for word in words {
-                sentence.push(word.to_string());
-              }
+              for word in words { sentence.push(word.to_string()); }
             }
           }
         },
@@ -82,6 +83,16 @@ impl Parser {
           let letters : Vec<_> = v.value.split("").collect();
           for letter in letters {
             sentence.push(letter.to_string());
+          }
+        },
+        Token::HyphenatedString { value: ref v } => {
+          match self.try_expand_hypenated(&v.value) {
+            None => {
+              sentence.push(v.value.to_string());
+            },
+            Some(words) => {
+              for word in words { sentence.push(word.to_string()); }
+            }
           }
         },
         Token::Symbol { value : ref v } => {
@@ -109,6 +120,21 @@ impl Parser {
     info!(target: "parsing", "Final sentence = {}", final_sentence);
 
     final_sentence
+  }
+
+  /// Attempt to expand a hyphenated non-dictionary word into a list
+  /// of dictionary words. If any of the words don't match, this fails.
+  fn try_expand_hypenated(&self, hyphenated: &str) -> Option<Vec<String>> {
+    let split : Vec<&str> = hyphenated.split("-").collect();
+    let mut words = Vec::new();
+    for word in split {
+      let lower = word.to_lowercase();
+      if !self.dictionary.contains(&lower) {
+        return None;
+      }
+      words.push(lower);
+    }
+    Some(words)
   }
 }
 
@@ -138,6 +164,7 @@ mod tests {
       w.insert("be".to_string());
       w.insert("can't".to_string());
       w.insert("echelon".to_string());
+      w.insert("ending".to_string());
       w.insert("five".to_string());
       w.insert("foo".to_string());
       w.insert("four".to_string());
@@ -150,11 +177,15 @@ mod tests {
       w.insert("in".to_string());
       w.insert("it".to_string());
       w.insert("it's".to_string());
+      w.insert("jack".to_string());
       w.insert("join".to_string());
+      w.insert("lantern".to_string());
       w.insert("link".to_string());
       w.insert("lot".to_string());
       w.insert("me".to_string());
       w.insert("movement".to_string());
+      w.insert("never".to_string());
+      w.insert("o".to_string());
       w.insert("of".to_string());
       w.insert("one".to_string());
       w.insert("people".to_string());
@@ -217,6 +248,29 @@ mod tests {
     // TODO: WAAAY MORE TESTS.
   }
 
+  #[test]
+  fn test_hyphenated_expansion() {
+    let p = make_parser();
+    let s = Speaker::new("speaker".to_string());
+
+    let result = &p.parse(&s, "never-ending");
+    let expected = "never ending";
+    assert_eq!(expected, result);
+
+    let result = &p.parse(&s, "jack-o-lantern");
+    let expected = "jack o lantern";
+    assert_eq!(expected, result);
+
+    // A partially unknown hyphenation
+    let result = &p.parse(&s, "jack-o-qwerty");
+    let expected = "jack-o-qwerty";
+    assert_eq!(expected, result);
+
+    // An entirely unknown hyphenation
+    let result = &p.parse(&s, "qwerty-uiop");
+    let expected = "qwerty-uiop";
+    assert_eq!(expected, result);
+  }
 
   // Helper function.
   fn make_dictionary() -> UniversalDictionary {
@@ -229,11 +283,11 @@ mod tests {
 
   // Helper function.
   fn make_parser() -> Parser {
-    let dictionary = make_dictionary();
+    let dictionary = Arc::new(make_dictionary());
     let abbreviations = Arc::new(AbbreviationsMap::empty());
-    let tokenizer = Tokenizer::new(Arc::new(dictionary),
+    let tokenizer = Tokenizer::new(dictionary.clone(),
                                    abbreviations.clone());
-    Parser::new(tokenizer, abbreviations.clone())
+    Parser::new(tokenizer, dictionary.clone(), abbreviations.clone())
   }
 }
 
