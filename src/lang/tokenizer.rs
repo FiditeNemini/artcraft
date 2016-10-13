@@ -142,58 +142,27 @@ impl Tokenizer {
         continue;
       }
 
-      // FIXME: Speed up by converting to a hash lookup.
-      // Rogue puncuation
-      if unknown == "," {
-        output.push_back(Token::comma());
-        continue;
-      } else if unknown == "." {
-        output.push_back(Token::period());
-        continue;
-      }
-
-      // Symbols
-      // FIXME: Map lookup for speedup.
-      if unknown == "@" {
-        output.push_back(Token::at_sign());
-        continue;
-      } else if unknown == "&" {
-        output.push_back(Token::ampersand());
-        continue;
-      } else if unknown == "%" {
-        output.push_back(Token::percent());
-        continue;
-      } else if unknown == "<" {
-        output.push_back(Token::less_than());
-        continue;
-      } else if unknown == ">" {
-        output.push_back(Token::greater_than());
-        continue;
-      } else if unknown == "+" {
-        output.push_back(Token::plus());
-        continue;
-      }
-
-      // Currency Symbols
-      // FIXME: Map lookup for speedup.
-      if unknown == "Ƀ" {
-        output.push_back(Token::bitcoin());
-        continue;
-      } else if unknown == "¢" {
-        output.push_back(Token::cent());
-        continue;
-      } else if unknown == "$" {
-        output.push_back(Token::dollar());
-        continue;
-      } else if unknown == "€" {
-        output.push_back(Token::euro());
-        continue;
-      } else if unknown == "£" || unknown == "₤" {
-        output.push_back(Token::pound());
-        continue;
-      } else if unknown == "¥" {
-        output.push_back(Token::yen());
-        continue;
+      // Handle single characters
+      // FIXME: Is a hash lookup faster?
+      match unknown.as_ref() {
+        // Punctuation
+        "," => { output.push_back(Token::comma()); continue; },
+        "." => { output.push_back(Token::period()); continue; },
+        // Symbols
+        "@" => { output.push_back(Token::at_sign()); continue; },
+        "&" => { output.push_back(Token::ampersand()); continue; },
+        "%" => { output.push_back(Token::percent()); continue; },
+        "<" => { output.push_back(Token::less_than()); continue; },
+        ">" => { output.push_back(Token::greater_than()); continue; },
+        "+" => { output.push_back(Token::plus()); continue; },
+        // Currency symbols
+        "Ƀ" => { output.push_back(Token::bitcoin()); continue; },
+        "¢" => { output.push_back(Token::cent()); continue; },
+        "$" => { output.push_back(Token::dollar()); continue; },
+        "€" => { output.push_back(Token::euro()); continue; },
+        "£" | "₤" => { output.push_back(Token::pound()); continue; },
+        "¥" => { output.push_back(Token::yen()); continue; },
+        _ => {},
       }
 
       if URL.is_match(&unknown) {

@@ -9,12 +9,14 @@ Audio Samples
 
 Tokenizing
   - Plurals
+  - Decimal numbers
   - Times (9 p.m. ET)
 
 Parsing
   - (Everything in tokenizing)
   - CamelCase
   - hyphenated-words
+  - Monetary units ($10 -> ten dollars, $10 million -> ten million dollars)
   - Dates
   - Numbers that are years (2016)!
   - Twitter hashtags, usernames
