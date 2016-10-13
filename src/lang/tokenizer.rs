@@ -147,6 +147,7 @@ impl Tokenizer {
       }
 
       // Symbols
+      // FIXME: Map lookup for speedup.
       if unknown == "@" {
         output.push_back(Token::at_sign());
         continue;
@@ -161,6 +162,9 @@ impl Tokenizer {
         continue;
       } else if unknown == ">" {
         output.push_back(Token::greater_than());
+        continue;
+      } else if unknown == "+" {
+        output.push_back(Token::plus());
         continue;
       }
 
@@ -704,6 +708,22 @@ mod tests {
 
     let result = t.tokenize("*waves hi* and stuff");
     let expected = vec![w("waves"), w("hi"), w("and"), w("stuff")];
+    assert_eq!(expected, result);
+  }
+
+  #[test]
+  fn test_symbols() {
+    let t = make_tokenizer();
+
+    let result = t.tokenize("& < > + % @");
+    let expected = vec![
+      Token::ampersand(),
+      Token::less_than(), 
+      Token::greater_than(),
+      Token::plus(),
+      Token::percent(),
+      Token::at_sign(),
+    ];
     assert_eq!(expected, result);
   }
 

@@ -21,6 +21,9 @@ Audio
   - No more missing phonemes
 
 Cleanup
+  - Refactor into a very well-defined "SpeakRequest" with all
+    parameters, including new ones like "is_twitter", 
+    "missing_word_mode = slience, record_pop, umm", etc.
   - Remove old query parameters
   - Set default volume
 

@@ -78,6 +78,7 @@ pub enum Symbol {
   GreaterThan,
   LessThan,
   Percent,
+  Plus,
 }
 
 #[derive(Clone, PartialEq)]
@@ -210,6 +211,10 @@ impl Token {
 
   pub fn period() -> Token {
     Token::Punctuation { value: Punctuation::Period }
+  }
+
+  pub fn plus() -> Token {
+    Token::Symbol { value: Symbol::Plus }
   }
 
   pub fn question() -> Token {

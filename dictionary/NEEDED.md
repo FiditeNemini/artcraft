@@ -1,8 +1,10 @@
 These words aren't in the dictionary
 ------------------------------------
++ (plus symbol)
 banjo-tooie
 charizard
 crafted
+fearmongers
 ganon
 ganondorf
 gorp
