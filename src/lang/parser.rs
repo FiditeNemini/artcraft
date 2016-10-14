@@ -90,6 +90,12 @@ impl Parser {
         Token::Mention { value: _v } => {}, // Skip (for now)
         Token::Punctuation { value: _v } => {}, // Skip (for now)
         Token::Url { value: _v } => {}, // Skip (forever)
+        Token::MaybeTimeUnit { value: ref v } => {
+          sentence.push(v.value.to_string());
+        },
+        Token::Time { value: ref v } => {
+          sentence.push(v.value.to_string());
+        },
         Token::DictionaryWord { value : ref v } => {
           sentence.push(v.value.to_string());
         }
@@ -328,14 +334,15 @@ mod tests {
     assert_eq!("a lot of people can't handle it", &p.parse(&s, "A lot of people can’t handle it."));
 
     // Complex examples taken from real tweets.
-    assert_eq!("will be in atlanta georgia this friday at 5:00pm join the movement tickets available at",
+    assert_eq!("will be in atlanta georgia this friday at 5:00 pm. \
+               join the movement tickets available at",
                &p.parse(&s, r#"Will be in Atlanta, Georgia this Friday at 5:00pm. Join the MOVEMENT!
                Tickets available at: https://t.co/Q6APf0ZFYA… https://t.co/6WAyO9eQHN"#));
 
     // TODO
     // Handle numerics
     //assert_eq!("u.s. murders increased ten point eight percent in twenty fifteen",
-    //           &t.parse(&s, "U.S. Murders Increased 10.8% in 2015"));
+    //           &p.parse(&s, "U.S. Murders Increased 10.8% in 2015"));
 
     // TODO: WAAAY MORE TESTS.
   }

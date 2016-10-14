@@ -46,6 +46,15 @@ impl Tokenizer {
       pub static ref RE_SPACE_SINGLE_QUOTE: Regex = Regex::new("\\s'").unwrap();
       // For now remove all of these characters.
       pub static ref RE_GARBAGE: Regex = Regex::new(r"\*|\[|\]|\(|\)|\|").unwrap();
+
+      // Match a time conjoined with a unit, eg '2:30ET', or '9pm'.
+      pub static ref RE_TIME: Regex = {
+        let time_with_unit = r#"(?i)
+            (\d{1,2}(:\d{2})?)
+            (a\.?m\.?|p\.?m\.?|e\.?t\.?|p\.?t\.?)
+          "#;
+        Regex::new(&time_with_unit.replace(char::is_whitespace, "")).unwrap()
+      };
     }
 
     // Remove any type of double quote
@@ -67,6 +76,7 @@ impl Tokenizer {
     filtered = RE_ALPHA_COLON.replace_all(&filtered, "$1 "); // TODO TEST
     filtered = RE_CURRENCY.replace_all(&filtered, "$1 ");
     filtered = RE_DIGIT_PERCENT.replace_all(&filtered, "$1 % ");
+    filtered = RE_TIME.replace_all(&filtered, " $1 $3 ");
 
     let split_spaces = split_sentence(&filtered);
     let mut tokenized = LinkedList::new();
@@ -102,11 +112,12 @@ impl Tokenizer {
     lazy_static! {
       static ref DATE: Regex = Regex::new(r"^\d{1,2}/\d{1,2}(/\d{1,4})?$").unwrap();
       static ref HASHTAG: Regex = Regex::new(r"#(\w+)").unwrap();
+      static ref HYPHENATED: Regex = Regex::new(r"\w+(-\w+){1,}").unwrap();
       static ref MENTION: Regex = Regex::new(r"@(\w+)").unwrap();
       static ref NUMBER: Regex = Regex::new(r"^-?\d+(,\d+){0,}(\.\d+)?$").unwrap();
       static ref ORDINAL: Regex = Regex::new(r"^\d+(,\d+){0,}(st|nd|rd|th)$").unwrap();
+      static ref TIME: Regex = Regex::new(r"^\d{1,2}:\d{2}$").unwrap();
       static ref URL: Regex = Regex::new(r"https?://[\w\.-]+/?(\w+)?").unwrap();
-      static ref HYPHENATED: Regex = Regex::new(r"\w+(-\w+){1,}").unwrap();
       static ref CAMEL: Regex = {
         let camel_case = r#"
           ^
@@ -121,6 +132,7 @@ impl Tokenizer {
     let mut output = LinkedList::new();
 
     for token in tokens {
+      // Skip already classified tokens.
       let unknown = match token.as_unknown() {
         None => {
           output.push_back(token.clone());
@@ -130,6 +142,18 @@ impl Tokenizer {
       };
 
       let word = unknown.to_lowercase();
+
+      // Handle possible time units before checking the dictionary.
+      match word.as_ref() {
+        "am" | "a.m" | "am." | "a.m." |
+        "pm" | "p.m" | "pm." | "p.m." |
+        "et" | "e.t." |
+        "pt" | "p.t." => {
+          output.push_back(Token::maybe_time_unit(unknown.to_string()));
+          continue;
+        },
+        _ => {},
+      }
 
       // Simple dictionary word matches
       if self.dictionary.contains(&word) {
@@ -202,6 +226,11 @@ impl Tokenizer {
 
       if CAMEL.is_match(&unknown) {
         output.push_back(Token::camel(unknown.to_string()));
+        continue;
+      }
+
+      if TIME.is_match(&unknown) {
+        output.push_back(Token::time(unknown.to_string()));
         continue;
       }
 
@@ -433,6 +462,7 @@ mod tests {
         "this",
         "three",
         "tickets",
+        "to",
         "two",
         "username",
         "visit",
@@ -674,6 +704,42 @@ mod tests {
     result = t.tokenize("On 10/1 and 10/02");
     expected = vec![w("on"), date("10/1"), w("and"), date("10/02")];
 
+    assert_eq!(expected, result);
+  }
+
+  #[test]
+  fn test_time_units() {
+    let t = make_tokenizer();
+
+    fn tm(value: &str) -> Token {
+      Token::time(value.to_string())
+    }
+
+    fn tu(value: &str) -> Token {
+      Token::maybe_time_unit(value.to_string())
+    }
+
+    let result = t.tokenize("5:30pm.");
+    let expected = vec![tm("5:30"), tu("pm.")];
+    assert_eq!(expected, result);
+
+    let result = t.tokenize("12:00a.m.");
+    let expected = vec![tm("12:00"), tu("a.m.")];
+    assert_eq!(expected, result);
+
+    // Number won't be classified as a time.
+    let result = t.tokenize("12ET");
+    let expected = vec![n("12"), tu("ET")];
+    assert_eq!(expected, result);
+
+    // Number won't be classified as a time.
+    let result = t.tokenize("9 p.m. PT");
+    let expected = vec![n("9"), tu("p.m."), tu("PT")];
+    assert_eq!(expected, result);
+
+    // Numbers won't be classified as a time.
+    let result = t.tokenize("8pm to 10pm");
+    let expected = vec![n("8"), tu("pm"), w("to"), n("10"), tu("pm")];
     assert_eq!(expected, result);
   }
 

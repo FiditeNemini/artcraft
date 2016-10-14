@@ -66,6 +66,13 @@ pub struct Initialism {
   pub value: String,
 }
 
+/// A possible time unit: AM, a.m, PM, ET, PT, etc. Will be interpreted
+/// as a real time word if it occurs close to a time or digit.
+#[derive(Clone, PartialEq)]
+pub struct MaybeTimeUnit {
+  pub value: String,
+}
+
 #[derive(Clone, PartialEq)]
 pub struct Mention {
   pub value: String,
@@ -105,6 +112,14 @@ pub enum Symbol {
   Plus,
 }
 
+/// An identified time string, eg '7:00', '8:30'. Individual digits
+/// will not be classified as times. AM/PM, ET/PT, etc. will also not
+/// be included.
+#[derive(Clone, PartialEq)]
+pub struct Time {
+  pub value: String,
+}
+
 /// Unknown means we couldn't confer any information on the string.
 /// It's entirely unknown and remains unclassified.
 #[derive(Clone, PartialEq)]
@@ -128,11 +143,13 @@ pub enum Token {
   Hashtag { value: Hashtag },
   HyphenatedString { value: HyphenatedString },
   Initialism { value: Initialism },
+  MaybeTimeUnit { value: MaybeTimeUnit },
   Mention { value: Mention },
   Number { value: Number },
   Ordinal { value: Ordinal },
   Punctuation { value: Punctuation },
   Symbol { value: Symbol },
+  Time { value: Time },
   Unknown { value: Unknown }, // The unclassified type.
   Url { value: Url },
 }
@@ -149,11 +166,13 @@ impl fmt::Debug for Token {
       Token::Hashtag { value : ref v } => format!("Hashtag {}", v.value),
       Token::HyphenatedString { value : ref v } => format!("Hyphenated {}", v.value),
       Token::Initialism { value : ref v } => format!("Initialism {}", v.value),
+      Token::MaybeTimeUnit { value : ref v } => format!("MaybeTime {}", v.value),
       Token::Mention { value : ref v } => format!("Mention {}", v.value),
       Token::Number { value : ref v } => format!("Number {}", v.value),
       Token::Ordinal { value : ref v } => format!("Ordinal {}", v.value),
       Token::Punctuation { value : ref v } => format!("Punctuation {:?}", v),
       Token::Symbol { value : ref v } => format!("Symbol {:?}", v),
+      Token::Time { value : ref v } => format!("Time {}", v.value),
       Token::Unknown { value : ref v } => format!("Unknown {}", v.value),
       Token::Url { value : ref v } => format!("Url {}", v.value),
     };
@@ -249,6 +268,10 @@ impl Token {
     Token::Symbol { value: Symbol::LessThan }
   }
 
+  pub fn maybe_time_unit(value: String) -> Token {
+    Token::MaybeTimeUnit { value: MaybeTimeUnit { value: value } }
+  }
+
   pub fn mention(value: String) -> Token {
     Token::Mention { value: Mention { value: value } }
   }
@@ -283,6 +306,10 @@ impl Token {
 
   pub fn semicolon() -> Token {
     Token::Punctuation { value: Punctuation::Semicolon }
+  }
+
+  pub fn time(value: String) -> Token {
+    Token::Time { value: Time { value: value } }
   }
 
   pub fn unknown(value: String) -> Token {

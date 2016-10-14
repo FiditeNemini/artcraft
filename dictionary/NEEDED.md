@@ -1,26 +1,36 @@
 These words aren't in the dictionary
 ------------------------------------
-+ (plus symbol)
+= (equals symbol)
+HN
 banjo-tooie
+batshit
 charizard
 crafted
 fearmongers
 ganon
 ganondorf
 gorp
+hoodie
 incongruent
 lel
+lmao
 lucario
 muah
 mwah
 ocarina
+patreon
+paypal
 pringles
+ramen
 strudel
 sucky
 there's
 triforce
 troglodyte
+tweens
+typescript
 undressing
+unicode
 untrimmed
 wanker
 wario
