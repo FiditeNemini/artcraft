@@ -100,11 +100,17 @@ impl Parser {
           // FIXME: Efficiency, cleanup
           let mut valid = true;
           let mut numbers = Vec::new();
+          let mut oclock = false;
 
-          for split in v.value.split(":").collect::<Vec<&str>>() {
-            match split.parse::<i64>() {
+          let split = v.value.split(":").collect::<Vec<&str>>();
+
+          for (i, part) in split.iter().enumerate() {
+            match part.parse::<i64>() {
               Ok(num) => {
                 if num == 0 {
+                  if i == split.len() - 1 {
+                    oclock = true;
+                  }
                   continue;
                 }
                 numbers.push(num)
@@ -137,6 +143,9 @@ impl Parser {
 
           if valid {
             for word in number_words { sentence.push(word); }
+            if oclock {
+              sentence.push("o'clock".to_string());
+            }
           } else {
             sentence.push(v.value.to_string());
           }
@@ -290,62 +299,66 @@ mod tests {
   lazy_static! {
     /// Word set to use in the tests.
     static ref WORDS: HashSet<String> = {
-      let mut w = HashSet::new();
-      w.insert("a".to_string());
-      w.insert("at".to_string());
-      w.insert("atlanta".to_string());
-      w.insert("available".to_string());
-      w.insert("bad".to_string());
-      w.insert("bar".to_string());
-      w.insert("baz".to_string());
-      w.insert("be".to_string());
-      w.insert("can't".to_string());
-      w.insert("echelon".to_string());
-      w.insert("ending".to_string());
-      w.insert("five".to_string());
-      w.insert("foo".to_string());
-      w.insert("food".to_string());
-      w.insert("four".to_string());
-      w.insert("fox".to_string());
-      w.insert("friday".to_string());
-      w.insert("georgia".to_string());
-      w.insert("handle".to_string());
-      w.insert("hound".to_string());
-      w.insert("idea".to_string());
-      w.insert("in".to_string());
-      w.insert("it".to_string());
-      w.insert("it's".to_string());
-      w.insert("jack".to_string());
-      w.insert("join".to_string());
-      w.insert("jon".to_string());
-      w.insert("lantern".to_string());
-      w.insert("link".to_string());
-      w.insert("lot".to_string());
-      w.insert("me".to_string());
-      w.insert("movement".to_string());
-      w.insert("never".to_string());
-      w.insert("o".to_string());
-      w.insert("of".to_string());
-      w.insert("one".to_string());
-      w.insert("people".to_string());
-      w.insert("place".to_string());
-      w.insert("quote".to_string());
-      w.insert("sign".to_string());
-      w.insert("snow".to_string());
-      w.insert("testing".to_string());
-      w.insert("that".to_string());
-      w.insert("the".to_string());
-      w.insert("thing".to_string());
-      w.insert("this".to_string());
-      w.insert("three".to_string());
-      w.insert("tickets".to_string());
-      w.insert("two".to_string());
-      w.insert("username".to_string());
-      w.insert("visit".to_string());
-      w.insert("will".to_string());
-      w.insert("would".to_string());
-      w.insert("you".to_string());
-      w
+      let words = vec![
+        "a",
+        "at",
+        "atlanta",
+        "available",
+        "bad",
+        "bar",
+        "baz",
+        "be",
+        "can't",
+        "echelon",
+        "ending",
+        "five",
+        "foo",
+        "food",
+        "four",
+        "fox",
+        "friday",
+        "georgia",
+        "handle",
+        "hound",
+        "idea",
+        "in",
+        "it",
+        "it's",
+        "jack",
+        "join",
+        "jon",
+        "lantern",
+        "link",
+        "lot",
+        "me",
+        "movement",
+        "never",
+        "o",
+        "of",
+        "one",
+        "people",
+        "place",
+        "quote",
+        "sign",
+        "snow",
+        "testing",
+        "that",
+        "the",
+        "thing",
+        "this",
+        "three",
+        "tickets",
+        "two",
+        "username",
+        "visit",
+        "will",
+        "would",
+        "you",
+      ];
+
+      let mut hs = HashSet::new();
+      for w in words { hs.insert(w.to_string()); }
+      hs
     };
   }
 
@@ -376,7 +389,7 @@ mod tests {
     assert_eq!("a lot of people can't handle it", &p.parse(&s, "A lot of people can’t handle it."));
 
     // Complex examples taken from real tweets.
-    assert_eq!("will be in atlanta georgia this friday at five pm. \
+    assert_eq!("will be in atlanta georgia this friday at five o'clock pm. \
                join the movement tickets available at",
                &p.parse(&s, r#"Will be in Atlanta, Georgia this Friday at 5:00pm. Join the MOVEMENT!
                Tickets available at: https://t.co/Q6APf0ZFYA… https://t.co/6WAyO9eQHN"#));
@@ -476,6 +489,24 @@ mod tests {
     // Unknown
     let result = &p.parse(&s, "#qwerty");
     let expected = "";
+    assert_eq!(expected, result);
+  }
+
+  #[test]
+  fn test_times() {
+    let p = make_parser();
+    let s = Speaker::new("speaker".to_string());
+
+    let result = &p.parse(&s, "5:00");
+    let expected = "five o'clock";
+    assert_eq!(expected, result);
+
+    let result = &p.parse(&s, "12:30");
+    let expected = "twelve thirty";
+    assert_eq!(expected, result);
+
+    let result = &p.parse(&s, "5pm");
+    let expected = "five pm";
     assert_eq!(expected, result);
   }
 
