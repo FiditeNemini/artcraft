@@ -34,5 +34,6 @@ unicode
 untrimmed
 wanker
 wario
+wristband
 wwii
 ✓

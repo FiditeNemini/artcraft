@@ -93,12 +93,54 @@ impl Parser {
         Token::MaybeTimeUnit { value: ref v } => {
           sentence.push(v.value.to_string());
         },
-        Token::Time { value: ref v } => {
-          sentence.push(v.value.to_string());
-        },
         Token::DictionaryWord { value : ref v } => {
           sentence.push(v.value.to_string());
         }
+        Token::Time { value: ref v } => {
+          // FIXME: Efficiency, cleanup
+          let mut valid = true;
+          let mut numbers = Vec::new();
+
+          for split in v.value.split(":").collect::<Vec<&str>>() {
+            match split.parse::<i64>() {
+              Ok(num) => {
+                if num == 0 {
+                  continue;
+                }
+                numbers.push(num)
+              },
+              Err(_) => {
+                valid = false;
+                break;
+              },
+            };
+          }
+
+          if !valid {
+            sentence.push(v.value.to_string());
+            continue;
+          }
+
+          let mut number_words = Vec::new();
+
+          for num in numbers {
+            match number_to_words(num) {
+              None => {
+                valid = false;
+                break;
+              },
+              Some(words) => {
+                for word in words { number_words.push(word); }
+              }
+            }
+          }
+
+          if valid {
+            for word in number_words { sentence.push(word); }
+          } else {
+            sentence.push(v.value.to_string());
+          }
+        },
         // Integers (TODO: tokenize floats separately.)
         Token::Number { value: ref v } => {
           let num = match v.value.parse::<i64>() {
@@ -334,7 +376,7 @@ mod tests {
     assert_eq!("a lot of people can't handle it", &p.parse(&s, "A lot of people can’t handle it."));
 
     // Complex examples taken from real tweets.
-    assert_eq!("will be in atlanta georgia this friday at 5:00 pm. \
+    assert_eq!("will be in atlanta georgia this friday at five pm. \
                join the movement tickets available at",
                &p.parse(&s, r#"Will be in Atlanta, Georgia this Friday at 5:00pm. Join the MOVEMENT!
                Tickets available at: https://t.co/Q6APf0ZFYA… https://t.co/6WAyO9eQHN"#));
