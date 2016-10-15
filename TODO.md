@@ -23,6 +23,11 @@ Parsing
 
 Synthesis
   - Get rid of static with "Uhhh", "Ummm" of variable length (option).
+  - Syllables:
+    - http://cdmckay.org/blog/2012/08/15/counting-syllables-and-detecting-rhyme-in-php/
+    - http://stackoverflow.com/questions/33111685/convert-arpabet-to-ipa-with-stress
+    - Or scrape something:
+      - http://www.syllablecount.com/syllables/biologically
 
 Cleanup
   - Refactor into a very well-defined "SpeakRequest" with all

@@ -13,6 +13,10 @@ BRB  be right back
 ; This is a hack. They'll simply work due to the order of parsing.
 ; ---------------------------
 911  nine one one
+WWI  world war one
+WWII  world war two
+WWIII  world war three
+w/  with
 
 ; States
 ; Some of these are commented out as they may interfere with words

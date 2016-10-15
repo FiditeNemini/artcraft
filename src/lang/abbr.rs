@@ -36,7 +36,7 @@ impl AbbreviationsMap {
 
     // Format resembles the following,
     // "OMG  oh my god"
-    let re = Regex::new(r"^([\w-']+)\s+(.*)\n$").unwrap();
+    let re = Regex::new(r"^([\w-'/]+)\s+(.*)\n$").unwrap();
 
     while try!(reader.read_line(&mut buffer)) > 0 {
       match re.captures(&buffer) {
