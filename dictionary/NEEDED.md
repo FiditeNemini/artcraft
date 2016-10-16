@@ -22,11 +22,11 @@ patreon
 paypal
 pringles
 ramen
+sanic
 strudel
 sucky
 there's
 triforce
-troglodyte
 tweens
 typescript
 undressing

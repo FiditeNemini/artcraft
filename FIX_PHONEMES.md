@@ -2,3 +2,8 @@
 - K as in killing (K IH1 L IH0 NG)
 - IH1 as in killing (K IH1 L IH0 NG)
 - IH0 as in convict (K AA1 N V IH0 K T)
+
+Fix problems:
+-------------
+1M lives
+November 8, 

@@ -352,6 +352,45 @@ impl Synthesizer {
       debug.push(None);
     }
 
+    // 5-phone
+    if polyphone.len() >= 5 {
+      let range = polyphone.len() - 4;
+      for i in 0..range {
+        if fulfilled[i]
+            || fulfilled[i+1]
+            || fulfilled[i+2]
+            || fulfilled[i+3] 
+            || fulfilled[i+4] {
+          continue;
+        }
+
+        let candidate_n_phone = &polyphone[i..i+5];
+
+        let sample_preference = match i {
+          0 => { SamplePreference::Begin },
+          _ if i == range - 1 => { SamplePreference::End },
+          _ => { SamplePreference::Middle },
+        };
+
+        //println!("n-phone: {:?}", candidate_n_phone);
+        let phone = self.audiobank.get_n_phone(speaker.as_str(),
+                                               candidate_n_phone,
+                                               sample_preference,
+                                               use_ends);
+
+        if phone.is_some() {
+          chunks[i] = phone;
+          debug[i] = Some(polyphone[i..i+5].join("_"));
+
+          for j in i..i+5 {
+            fulfilled[j] = true;
+          }
+        }
+      }
+    }
+
+    info!(target: "synthesis", "5-fulfilled: {:?}", fulfilled);
+
     // 4-phone
     if polyphone.len() >= 4 {
       let range = polyphone.len() - 3;

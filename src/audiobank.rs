@@ -134,8 +134,15 @@ impl Audiobank {
                   n_phone[0], n_phone[1], n_phone[2], n_phone[3]),
         )
       },
+      5 => {
+        (
+          "5-phones/",
+          format!("{}_{}_{}_{}_{}.wav",
+                  n_phone[0], n_phone[1], n_phone[2], n_phone[3], n_phone[4]),
+        )
+      },
       _ => {
-        return None; // Don't support more than 4-phones.
+        return None; // Don't support more than 5-phones.
       }
     };
 
