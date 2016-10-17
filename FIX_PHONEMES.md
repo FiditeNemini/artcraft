@@ -5,5 +5,8 @@
 
 Fix problems:
 -------------
+Clinton
+Right
 1M lives
 November 8, 
+probe.Such a dishonest person 

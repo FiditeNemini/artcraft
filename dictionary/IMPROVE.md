@@ -4,6 +4,7 @@ These words need improvement
 "^^ hillary's
 "^^ obama's
 "^^^ again (BAD)
+"^^^ by (BAD)
 "^^^ how (THIS IS SO BAD)
 "^^^ then (BAD)
 "do you?"
@@ -11,7 +12,6 @@ These words need improvement
 "really?"
 "to do"
 4chan
-able
 access
 again
 america (non-shout)
@@ -108,6 +108,7 @@ sudanese
 ten
 the
 there (sounds like they're)
+towards
 universe
 unwilling
 warheads

@@ -23,7 +23,7 @@ Parsing
 
 Synthesis
   - Get rid of static with "Uhhh", "Ummm" of variable length (option).
-  - Syllables:
+  - Syllable System:
     - http://cdmckay.org/blog/2012/08/15/counting-syllables-and-detecting-rhyme-in-php/
     - http://stackoverflow.com/questions/33111685/convert-arpabet-to-ipa-with-stress
     - Or scrape something:
@@ -66,4 +66,6 @@ Parsing Examples
   - "Google acquires FameBit", StateOfW, AdaLovelaceDay
 - Time: 7:30pm, 5:30ET, 9pm ET, 8:00 P.M., 8pm ET
 - Hyphenated: 2-party
+- They will get horrible sentences, violently.We have the support.#RepealThe1st 
+- #100YearsStrong
 
