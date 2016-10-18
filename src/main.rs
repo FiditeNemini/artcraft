@@ -34,6 +34,7 @@ use config::Config;
 use handlers::audio_synth_handler::AudioSynthHandler;
 use handlers::error_filter::ErrorFilter;
 use handlers::file_server_handler::FileServerHandler;
+use handlers::html_handler::HtmlHandler;
 use handlers::vocab_list_handler::VocabListHandler;
 use iron::prelude::*;
 use lang::abbr::AbbreviationsMap;
@@ -104,9 +105,16 @@ fn start_server(config: &Config, port: u16, synthesizer: Synthesizer) {
   router.get("/speak", chain);
   router.get("/words", VocabListHandler::new(audio_path));
 
-  // TODO: Share the handler.
-  router.get("/", FileServerHandler::new(file_path, index));
-  router.get("/test", FileServerHandler::new(file_path, index));
+  // Public index
+  router.get("/", HtmlHandler::new(config.clone()));
+
+  // Old index
+  router.get("/old", HtmlHandler::new(config.clone()));
+
+  // Demo pages
+  router.get("/demo/:name", HtmlHandler::new(config.clone()));
+
+  // Assets
   router.get("/assets/:filename", FileServerHandler::new(file_path, index));
   router.get("/assets/*", FileServerHandler::new(file_path, index));
 

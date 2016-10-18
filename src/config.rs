@@ -15,6 +15,7 @@ pub struct Config {
 
   /// Where sound files are located.
   pub sound_path: Option<String>,
+  pub html_path: Option<String>,
 
   /// Where various arpabet files are located.
   pub phoneme_dictionary_file: Option<String>,
@@ -93,6 +94,9 @@ impl Config {
       sound_path: self.sound_path
           .clone()
           .or(other.sound_path.clone()),
+      html_path: self.html_path
+          .clone()
+          .or(other.html_path.clone()),
       phoneme_dictionary_file: self.phoneme_dictionary_file
           .clone()
           .or(other.phoneme_dictionary_file.clone()),

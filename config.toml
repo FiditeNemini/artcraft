@@ -3,6 +3,7 @@
 [default] # Production
   use_caching_headers = false
   sound_path = "./sounds"
+  html_path = "./web"
   phoneme_dictionary_file = "./dictionary/cmudict-0.7b"
   extra_dictionary_file = "./dictionary/extra-dict"
   square_dictionary_file = "./dictionary/square-dict"
