@@ -1,0 +1,28 @@
+img#trump {
+  height: 300px;
+}
+
+@media screen and (min-height: 600px) {
+  img#trump {
+    height: 400px;
+  }
+}
+
+@media screen and (min-height: 800px) {
+  img#trump {
+    height: 500px;
+  }
+}
+
+@media screen and (min-height: 1000px) {
+  img#trump {
+    height: 700px;
+  }
+}
+
+@media screen and (min-height: 1500px) {
+  img#trump {
+    height: 1000px;
+  }
+}
+
