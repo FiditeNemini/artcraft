@@ -1,0 +1,94 @@
+html,
+body {
+  margin: 0;
+  padding: 0;
+}
+
+body,
+input,
+button {
+  font-family: "Fira Sans";
+}
+
+#main {
+  margin: auto;
+  max-width: 1000px;
+}
+
+h1 {
+  color: #333;
+  font-family: "Happy Monkey";
+  font-size: 3em;
+  margin: 20px 0 10px;
+  text-align: center;
+}
+
+#image-box {
+  width: 100%;
+}
+
+img#trump {
+  display: block;
+  height: 400px;
+  margin: auto;
+}
+
+#input-box {
+  box-sizing: border-box;
+  padding: 10px;
+  width: 100%;
+}
+
+input {
+  box-sizing: border-box;
+  font-size: 1.2em;
+  padding: 0.3em;
+  width: 100%;
+}
+
+button {
+  background-color: #e5e5e5;
+  border: 0;
+  color: #777;
+  font-size: 1.2em;
+  margin: 20px;
+  min-width: 150px;
+  padding: 0.75em;
+  padding: 10px;
+}
+
+#buttons {
+  margin-top: 20px;
+  width: 100%;
+}
+
+#button-left {
+  float: left;
+  width: 50%;
+}
+
+#button-right {
+  float: right;
+  width: 50%;
+}
+
+button#speak {
+  display: block;
+  margin: 0 auto;
+}
+
+button#clear {
+  display: block;
+  margin: 0 auto;
+}
+
+.clear {
+  clear: both;
+}
+
+@media screen and (min-width: 600px) {
+  button {
+    min-width: 250px;
+  }
+}
+
