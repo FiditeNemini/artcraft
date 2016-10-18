@@ -8,10 +8,12 @@ extern crate clap;
 extern crate crypto;
 extern crate hound;
 extern crate iron;
+extern crate mount;
 extern crate regex;
 extern crate resolve;
 extern crate router;
 extern crate rustc_serialize;
+extern crate staticfile;
 extern crate time;
 extern crate toml;
 extern crate urlencoded;
@@ -33,7 +35,6 @@ use clap::{App, Arg, ArgMatches};
 use config::Config;
 use handlers::audio_synth_handler::AudioSynthHandler;
 use handlers::error_filter::ErrorFilter;
-use handlers::file_server_handler::FileServerHandler;
 use handlers::html_handler::HtmlHandler;
 use handlers::vocab_list_handler::VocabListHandler;
 use iron::prelude::*;
@@ -43,9 +44,11 @@ use lang::dictionary::UniversalDictionary;
 use lang::parser::Parser;
 use lang::tokenizer::Tokenizer;
 use logger::SimpleLogger;
+use mount::Mount;
 use old_dictionary::VocabularyLibrary;
 use resolve::hostname;
 use router::Router;
+use staticfile::Static;
 use std::path::Path;
 use std::sync::Arc;
 use std::sync::RwLock;
@@ -93,33 +96,40 @@ fn get_port(matches: &ArgMatches, default_port: u16) -> u16 {
 fn start_server(config: &Config, port: u16, synthesizer: Synthesizer) {
   let audio_path = &config.sound_path.clone().unwrap();
   let file_path = "./web";
-  let index = "index.html";
 
   let async_synth = Arc::new(RwLock::new(synthesizer));
 
   // TODO: Cross-cutting filter installation
-  let mut router = Router::new();
-  let mut chain = Chain::new(AudioSynthHandler::new(async_synth.clone(),
-                                                    config.clone()));
-  chain.link_after(ErrorFilter);
-  router.get("/speak", chain);
-  router.get("/words", VocabListHandler::new(audio_path));
+  let main_router = {
+    let synth_handler = AudioSynthHandler::new(async_synth.clone(), config.clone());
+    let mut chain = Chain::new(synth_handler);
+    chain.link_after(ErrorFilter);
 
-  // Public index
-  router.get("/", HtmlHandler::new(config.clone()));
+    let mut router = Router::new();
 
-  // Old index
-  router.get("/old", HtmlHandler::new(config.clone()));
+    // Json Endpoints
+    router.get("/speak", chain);
+    router.get("/words", VocabListHandler::new(audio_path));
 
-  // Demo pages
-  router.get("/demo/:name", HtmlHandler::new(config.clone()));
+    // Html Pages
+    router.get("/", HtmlHandler::new(config.clone()));
+    router.get("/old", HtmlHandler::new(config.clone()));
+    router.get("/demo/:name", HtmlHandler::new(config.clone()));
 
-  // Assets
-  router.get("/assets/:filename", FileServerHandler::new(file_path, index));
-  router.get("/assets/*", FileServerHandler::new(file_path, index));
+    router
+  };
+
+  let asset_router = {
+    let handler = Static::new(Path::new(file_path));
+    Chain::new(handler)
+  };
+
+  let mut mount = Mount::new();
+  mount.mount("/assets", asset_router);
+  mount.mount("/", main_router);
 
   info!("Starting server on port {}...", port);
-  Iron::new(router).http(("0.0.0.0", port)).unwrap();
+  Iron::new(mount).http(("0.0.0.0", port)).unwrap();
 }
 
 fn get_hostname() {
