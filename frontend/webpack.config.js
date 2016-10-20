@@ -1,7 +1,7 @@
 module.exports = {
   entry: {
-    testing_app: './testing_app.ts', // TODO: Rename just broke this
-    waveform: './waveform.ts',
+    testing_app: './old_test_page/testing_app.ts', // TODO: Rename broke this
+    waveform_component: './waveform_component.ts',
   },
   output: {
     path: '../web/output',
@@ -12,7 +12,10 @@ module.exports = {
   },
   module: {
     loaders: [
-      { test: /\.ts$/, loader: 'ts-loader' }
+      {
+        test: /\.ts$/,
+        loader: 'ts-loader'
+      }
     ]
   }
 }
