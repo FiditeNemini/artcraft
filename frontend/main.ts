@@ -6,11 +6,14 @@ import Audio from "./audio";
 import { decode_url_hash, get_audio_api_url, set_url_hash } from "./url";
 import { RawSentence, FilteredSentence } from "./sentence";
 
+const INPUT = 'input#jungle';
+
 $(function() {
   console.log('installing...');
   window.audio = new Audio();
   install_events();
   initialize_from_url();
+  focus();
 });
 
 function install_events() {
@@ -31,17 +34,17 @@ function install_events() {
   $('body').on('keyup', function(ev: any): any {
     if (ev.keyCode === 27) {
       // ESC key.
-      $('input#jungle').select();
-      $('input#jungle').val('');
+      focus();
+      $(INPUT).val('');
       window.audio.stop();
     }
   });
 
   $('input#jungle').on('keyup', function(ev: any): any {
-    var sentence = $('input#jungle').val();
+    var sentence = $(INPUT).val();
 
     if (ev.keyCode === 27) {
-      $('input#jungle').val(''); // ESC key.
+      $(INPUT).val(''); // ESC key.
       window.audio.stop();
     }
   });
@@ -53,7 +56,7 @@ function install_events() {
   });
 
   $('button#clear').on('click', function(ev: any): any {
-    $('input#jungle').val(''); // ESC key.
+    $(INPUT).val(''); // ESC key.
     window.audio.stop();
     ev.preventDefault();
     return false;
@@ -65,8 +68,13 @@ function initialize_from_url() {
 
   if (rawSentence == null) return;
 
-  $('input#jungle')
+  $(INPUT)
       .val(rawSentence.filter().value)
       .submit();
+}
+
+function focus() {
+  $(INPUT).focus();
+  $(INPUT).select();
 }
 

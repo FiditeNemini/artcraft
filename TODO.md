@@ -6,6 +6,8 @@ Audio Samples
   - IMPROVED SAMPLES
   - Remove extra space between words (using parsing to insert spacing)
   - No more missing phonemes
+    - Backfilling ['AO0', 'AW0', 'AW2', 'AY0', 'EY0', 'OY0', 'UH0'] with fakes
+      If I get a chance, I should find the real versions of these.
 
 Tokenizing
   - Plurals

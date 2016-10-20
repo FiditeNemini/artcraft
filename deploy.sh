@@ -17,7 +17,7 @@ pushd frontend
 webpack
 popd
 gulp
-rsync -utrv web/output bt@jungle.horse:/home/bt/dev/trumpet/web/output
+rsync -utrv web/output bt@jungle.horse:/home/bt/dev/trumpet/web
 
 # Server
 cargo build --release
