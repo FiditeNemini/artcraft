@@ -14,29 +14,29 @@ var buildLibraries = function() {
     .pipe(filter('**/*.js')) // filter out CSS (bootstrap, etc.)
     .pipe(uglify())
     .pipe(concat('libraries.js'))
-    .pipe(gulp.dest('web/'));
+    .pipe(gulp.dest('web/output/'));
 }
 
 var buildCss = function() {
-  return gulp.src('src/web/css/*.css')
+  return gulp.src('frontend/old_frontend/css/*.css')
     .pipe(concat('style.css'))
-    .pipe(gulp.dest('web/'));
+    .pipe(gulp.dest('web/output/'));
 }
 
 var buildJs = function() {
   return gulp.src([
-      'src/web/js/sentence.js',
-      'src/web/js/dictionary.js',
-      'src/web/js/sound.js',
-      'src/web/js/volume.js',
-      'src/web/js/url.js',
-      'src/web/js/ui.js',
-      'src/web/js/events.js',
-      'src/web/js/initialize.js',
+      'frontend/old_frontend/js/sentence.js',
+      'frontend/old_frontend/js/dictionary.js',
+      'frontend/old_frontend/js/sound.js',
+      'frontend/old_frontend/js/volume.js',
+      'frontend/old_frontend/js/url.js',
+      'frontend/old_frontend/js/ui.js',
+      'frontend/old_frontend/js/events.js',
+      'frontend/old_frontend/js/initialize.js',
     ])
     .pipe(uglify())
     .pipe(concat('script.js'))
-    .pipe(gulp.dest('web/'));
+    .pipe(gulp.dest('web/output/'));
 }
 
 gulp.task('bower', buildLibraries);
@@ -45,8 +45,8 @@ gulp.task('css', buildCss);
 
 gulp.task('watch', function() {
   gulp.watch(['bower.json', '.bowerrc'], ['bower']);
-    watch([ 'src/web/js/*.js' ], buildJs);
-    watch([ 'src/web/css/*.css' ], buildCss);
+    watch([ 'frontend/old_frontend/js/*.js' ], buildJs);
+    watch([ 'frontend/old_frontend/css/*.css' ], buildCss);
 });
 
 gulp.task('build-development', ['bower', 'js', 'css']);
