@@ -5,7 +5,9 @@ These words need improvement
 "^^ obama's
 "^^^ again (BAD)
 "^^^ by (BAD)
+"^^^ ha, haha, hahaha"
 "^^^ how (THIS IS SO BAD)
+"^^^ rigging
 "^^^ then (BAD)
 "do you?"
 "for you"

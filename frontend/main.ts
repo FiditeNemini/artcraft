@@ -3,15 +3,14 @@
 declare var $: any;
 
 import Audio from "./audio";
-import decode_url_hash from "./url";
-import get_audio_api_url from "./url";
-import set_url_hash from "./url";
+import { decode_url_hash, get_audio_api_url, set_url_hash } from "./url";
 import { RawSentence, FilteredSentence } from "./sentence";
 
 $(function() {
   console.log('installing...');
   window.audio = new Audio();
   install_events();
+  initialize_from_url();
 });
 
 function install_events() {
@@ -20,13 +19,22 @@ function install_events() {
         sentence = new RawSentence(input),
         filtered = sentence.filter();
 
-    let url = get_audio_api_url(filtered);
+    set_url_hash(filtered);
 
+    let url = get_audio_api_url(filtered);
     window.audio.playUrl(url);
 
-    console.log(ev);
     ev.preventDefault();
     return false;
+  });
+
+  $('body').on('keyup', function(ev: any): any {
+    if (ev.keyCode === 27) {
+      // ESC key.
+      $('input#jungle').select();
+      $('input#jungle').val('');
+      window.audio.stop();
+    }
   });
 
   $('input#jungle').on('keyup', function(ev: any): any {
@@ -50,5 +58,15 @@ function install_events() {
     ev.preventDefault();
     return false;
   });
+}
+
+function initialize_from_url() {
+  let rawSentence = decode_url_hash();
+
+  if (rawSentence == null) return;
+
+  $('input#jungle')
+      .val(rawSentence.filter().value)
+      .submit();
 }
 

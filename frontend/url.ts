@@ -7,7 +7,7 @@ declare var URI: any; // TODO: Remove dependency.
 /**
  * Sentence -> Audio generation API URL
  */
-export default function get_audio_api_url(sentence: FilteredSentence) : string {
+export function get_audio_api_url(sentence: FilteredSentence) : string {
   // I may expand the API later, but for now this is all I'll expose.
   let encoded = encodeURIComponent(sentence.value);
   return `/speak?v=trump&vol=3&s=${encoded}`;
@@ -28,7 +28,6 @@ export function set_url_hash(sentence: FilteredSentence) {
     urlHash = new URI('/').hash(uriEncoded).toString();
   }
 
-  console.log('set state, urlhash = ', urlHash);
   window.history.replaceState(null, null, urlHash);
 }
 
@@ -48,7 +47,7 @@ export function decode_url_hash(): RawSentence {
   if (!state || !('s' in state)) {
     return null;
   } else {
-    new RawSentence(state['s']);
+    return new RawSentence(state['s']);
   }
 }
 
