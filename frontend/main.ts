@@ -37,5 +37,18 @@ function install_events() {
       window.audio.stop();
     }
   });
+
+  $('button#speak').on('click', function(ev: any): any {
+    $('form').submit();
+    ev.preventDefault();
+    return false;
+  });
+
+  $('button#clear').on('click', function(ev: any): any {
+    $('input#jungle').val(''); // ESC key.
+    window.audio.stop();
+    ev.preventDefault();
+    return false;
+  });
 }
 

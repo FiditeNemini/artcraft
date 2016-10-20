@@ -255,10 +255,10 @@
       json = JSON.stringify(state);
 
       if (!json) {
-        return new URI('/').hash('').toString();
+        return new URI('/old').hash('').toString();
       } else {
         uriEncoded = encodeURIComponent(json);
-        return new URI('/').hash(uriEncoded).toString();
+        return new URI('/old').hash(uriEncoded).toString();
       }
     },
 
