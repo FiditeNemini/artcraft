@@ -15,10 +15,9 @@ Tokenizing
 
 Parsing
   - (Everything in tokenizing)
-  - Output a structured form of data with breath/pauses
-    (periods, commas, etc...)
   - Decimal numbers
   - Monetary units ($10 -> ten dollars, $10 million -> ten million dollars)
+  - Collapse pauses, eg: "Foo,,," -> "Foo (breath)"
   - Dates
   - Numbers that are years (2016)!
   - Twitter hashtags, usernames - conjoined word parsing (difficult)

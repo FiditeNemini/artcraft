@@ -1,6 +1,6 @@
 [root]
 name = "trumpet"
-version = "0.8.0"
+version = "0.9.0"
 dependencies = [
  "chrono 0.2.25 (registry+https://github.com/rust-lang/crates.io-index)",
  "clap 1.5.5 (registry+https://github.com/rust-lang/crates.io-index)",
