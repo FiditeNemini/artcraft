@@ -6,6 +6,7 @@ banjo-tooie
 batshit
 charizard
 crafted
+dipshit
 fam
 fearmongers
 ganon

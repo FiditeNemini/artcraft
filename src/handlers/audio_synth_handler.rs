@@ -17,7 +17,6 @@ use iron::status;
 use speaker::Speaker;
 use std::collections::HashMap;
 use std::i16;
-use std::io::Read;
 use std::str::FromStr;
 use std::sync::Arc;
 use std::sync::RwLock;

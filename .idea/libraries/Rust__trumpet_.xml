@@ -1,0 +1,13 @@
+<component name="libraryTable">
+  <library name="Rust &lt;trumpet&gt;">
+    <CLASSES>
+      <root url="jar://$USER_HOME$/lib/rust-1.12.1-src.zip!/rust-1.12.1/src/libstd" />
+      <root url="jar://$USER_HOME$/lib/rust-1.12.1-src.zip!/rust-1.12.1/src/libcore" />
+      <root url="jar://$USER_HOME$/lib/rust-1.12.1-src.zip!/rust-1.12.1/src/libcollections" />
+      <root url="jar://$USER_HOME$/lib/rust-1.12.1-src.zip!/rust-1.12.1/src/liballoc" />
+      <root url="jar://$USER_HOME$/lib/rust-1.12.1-src.zip!/rust-1.12.1/src/librustc_unicode" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>
