@@ -4,7 +4,7 @@
 // that is the job of the parser.
 
 use lang::abbr::AbbreviationsMap;
-use lang::token::*;
+use lang::tokens::*;
 use regex::Regex;
 use std::collections::LinkedList;
 use std::sync::Arc;
@@ -399,7 +399,7 @@ mod tests {
   use lang::abbr::AbbreviationsMap;
   use lang::dictionary::Dictionary;
   use lang::dictionary::UniversalDictionary;
-  use lang::token::*;
+  use lang::tokens::*;
   use std::collections::HashMap;
   use std::collections::HashSet;
   use std::sync::Arc;

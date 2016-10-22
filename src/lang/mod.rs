@@ -6,6 +6,6 @@ pub mod dictionary;
 pub mod numbers;
 pub mod ordinals;
 pub mod parser;
-pub mod token;
+pub mod tokens;
 pub mod tokenizer;
 

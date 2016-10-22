@@ -11,12 +11,28 @@ use hound::WavSpec;
 use hound::WavWriter;
 use lang::arpabet::Arpabet;
 use lang::parser::Parser;
-use old_words::split_sentence;
 use speaker::Speaker;
 use std::io::BufWriter;
 use std::io::Cursor;
+use synthesis::tokens::*;
 
 pub type WavBytes = Vec<u8>;
+
+/// Parameters for synthesis unrelated to the body of text or the speaker.
+pub struct SynthesisParams {
+  pub use_words: bool,
+  pub use_phonemes: bool,
+  pub use_diphones: bool,
+  pub use_n_phones: bool,
+  pub use_ends: bool,
+  pub volume: Option<f32>,
+  pub speed: Option<f32>,
+  pub monophone_padding_start: Option<u16>,
+  pub monophone_padding_end: Option<u16>,
+  pub polyphone_padding_end: Option<u16>,
+  pub word_padding_start: Option<u16>,
+  pub word_padding_end: Option<u16>,
+}
 
 /**
  * Generates wave files from text input.
@@ -55,24 +71,12 @@ impl Synthesizer {
   pub fn generate(&self,
                   sentence: &str,
                   speaker: &Speaker,
-                  use_words: bool,
-                  use_phonemes: bool,
-                  use_diphones: bool,
-                  use_n_phones: bool,
-                  use_ends: bool,
-                  volume: Option<f32>,
-                  speed: Option<f32>,
-                  monophone_padding_start: Option<u16>,
-                  monophone_padding_end: Option<u16>,
-                  polyphone_padding_end: Option<u16>,
-                  word_padding_start: Option<u16>,
-                  word_padding_end: Option<u16>)
+                  params: SynthesisParams)
       -> Result<WavBytes, SynthError> {
 
-    let prepared = self.parser.parse(speaker, sentence);
-    let words = split_sentence(&prepared);
+    let tokens = self.parser.parse(sentence);
 
-    if words.len() == 0 {
+    if tokens.len() == 0 {
       return Err(SynthError::BadInput {
         description: "There were no words to synthesize."
       });
@@ -86,35 +90,28 @@ impl Synthesizer {
       });
     }
 
-    // FIXME: Flight of the seagulls here.
-    for word in words.iter() {
-      let mut word_added = false;
-
-      if use_words {
-        word_added = self.concatenate_word(&mut concatenated_waveform,
-                                           speaker,
-                                           word,
-                                           word_padding_start,
-                                           word_padding_end);
-      }
-
-      if !word_added && use_n_phones {
-        // New phoneme algorithm
-        word_added = self.concatenate_n_phone(&mut concatenated_waveform,
-                                              speaker,
-                                              word,
-                                              polyphone_padding_end,
-                                              use_ends);
-      }
-      if !word_added && use_phonemes {
-        // Old phoneme algorithm
-        self.concatenate_polyphone(&mut concatenated_waveform,
-                                   speaker,
-                                   word,
-                                   use_diphones,
-                                   monophone_padding_start,
-                                   monophone_padding_end,
-                                   polyphone_padding_end);
+    for token in tokens {
+      match token {
+        SynthToken::Filler { value: _v } => {
+          // TODO: Variable length filler content.
+          self.handle_word_token(&mut concatenated_waveform,
+            &speaker,
+            "um",
+            &params);
+        },
+        SynthToken::Pause { value: ref v } => {
+          let pause_duration = match *v {
+            Pause::Breath => 3000,
+            Pause::HalfStop => 5000,
+            Pause::FullStop => 10000,
+          };
+          let pause = generate_pause(pause_duration);
+          concatenated_waveform.extend(pause);
+        },
+        SynthToken::Word { value: ref v } => {
+          self.handle_word_token(&mut concatenated_waveform, &speaker, &v.value,
+              &params);
+        }
       }
     }
 
@@ -125,20 +122,56 @@ impl Synthesizer {
     }
 
     // FIXME: Super inefficient pieces.
-    if speed.is_some() {
+    if params.speed.is_some() {
       concatenated_waveform = change_speed(concatenated_waveform,
-                                           speed.unwrap());
+                                           params.speed.unwrap());
     }
 
-    if volume.is_some() {
+    if params.volume.is_some() {
       concatenated_waveform = change_volume(concatenated_waveform,
-                                            volume.unwrap());
+                                            params.volume.unwrap());
     }
 
     // TODO: Cache waveform headers.
     let spec = try!(self.audiobank.get_misc_spec("pause"));
 
     Ok(self.write_buffer(&spec, concatenated_waveform))
+  }
+
+  fn handle_word_token(&self,
+                       concatenated_waveform: &mut Vec<i16>,
+                       speaker: &Speaker,
+                       word: &str,
+                       params: &SynthesisParams) {
+
+    let mut word_added = false;
+
+    if params.use_words {
+      word_added = self.concatenate_word(concatenated_waveform,
+        speaker,
+        word,
+        params.word_padding_start,
+        params.word_padding_end);
+    }
+
+    if !word_added && params.use_n_phones {
+      // New phoneme algorithm
+      word_added = self.concatenate_n_phone(concatenated_waveform,
+        speaker,
+        word,
+        params.polyphone_padding_end,
+        params.use_ends);
+    }
+    if !word_added && params.use_phonemes {
+      // Old phoneme algorithm
+      self.concatenate_polyphone(concatenated_waveform,
+        speaker,
+        word,
+        params.use_diphones,
+        params.monophone_padding_start,
+        params.monophone_padding_end,
+        params.polyphone_padding_end);
+    }
   }
 
   /// Concatenate a word to the waveform we're building. Returns

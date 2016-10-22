@@ -21,7 +21,8 @@ use std::str::FromStr;
 use std::sync::Arc;
 use std::sync::RwLock;
 use super::error_filter::build_error;
-use synthesizer::Synthesizer;
+use synthesis::synthesizer::SynthesisParams;
+use synthesis::synthesizer::Synthesizer;
 use time::PreciseTime;
 use urlencoded::UrlEncodedQuery;
 
@@ -345,20 +346,24 @@ impl AudioSynthHandler {
     match self.synthesizer.read() {
       Err(_) => Vec::new(), // TODO Actual error.
       Ok(synth) => {
-        let generated = synth.generate(&request.sentence,
-                                       &request.speaker,
-                                       request.use_words,
-                                       request.use_phonemes,
-                                       request.use_diphones,
-                                       request.use_n_phones,
-                                       request.use_ends,
-                                       request.volume,
-                                       request.speed,
-                                       request.monophone_padding_start,
-                                       request.monophone_padding_end,
-                                       request.polyphone_padding_end,
-                                       request.word_padding_start,
-                                       request.word_padding_end);
+        let params = SynthesisParams {
+          use_words: request.use_words,
+          use_phonemes: request.use_phonemes,
+          use_diphones: request.use_diphones,
+          use_n_phones: request.use_n_phones,
+          use_ends: request.use_ends,
+          volume: request.volume,
+          speed: request.speed,
+          monophone_padding_start: request.monophone_padding_start,
+          monophone_padding_end: request.monophone_padding_end,
+          polyphone_padding_end: request.polyphone_padding_end,
+          word_padding_start: request.word_padding_start,
+          word_padding_end: request.word_padding_end,
+        };
+
+        let generated = synth.generate(&request.sentence, &request.speaker,
+          params);
+
         match generated {
           Err(e) => {
             warn!("Error synthesizing: {:?}", e);

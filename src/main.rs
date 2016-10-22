@@ -26,9 +26,8 @@ pub mod handlers;
 pub mod lang;
 pub mod logger;
 pub mod old_dictionary;
-pub mod old_words;
 pub mod speaker;
-pub mod synthesizer;
+pub mod synthesis;
 
 use audiobank::Audiobank;
 use clap::{App, Arg, ArgMatches};
@@ -52,7 +51,7 @@ use staticfile::Static;
 use std::path::Path;
 use std::sync::Arc;
 use std::sync::RwLock;
-use synthesizer::Synthesizer;
+use synthesis::synthesizer::Synthesizer;
 
 fn main() {
   let config = Config::read("./config.toml").unwrap();
