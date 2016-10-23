@@ -22,10 +22,10 @@ export function set_url_hash(sentence: FilteredSentence) {
       urlHash = '';
 
   if (!json) {
-    urlHash = new URI('/').hash('').toString();
+    urlHash = new URI('').hash('').toString();
   } else {
     let uriEncoded = encodeURIComponent(json);
-    urlHash = new URI('/').hash(uriEncoded).toString();
+    urlHash = new URI('').hash(uriEncoded).toString();
   }
 
   window.history.replaceState(null, null, urlHash);

@@ -1,19 +1,36 @@
 // Copyright (c) 2016 Brandon Thomas <bt@brand.io, echelon@gmail.com>
 
+/// <reference path='./typings/tsd.d.ts' />
+
+import Vue = require('vue');
+
 declare var $: any;
 
+import { setup_animation } from "./animation";
 import Audio from "./audio";
 import { decode_url_hash, get_audio_api_url, set_url_hash } from "./url";
 import { RawSentence, FilteredSentence } from "./sentence";
 
 const INPUT = 'input#jungle';
 
+/*(<any>window).V = new Vue({
+  el: '#image-box',
+  data: {
+    content: 'foo',
+  },
+});*/
+
 $(function() {
   console.log('installing...');
-  window.audio = new Audio();
+  (<any>window).audio = new Audio();
   install_events();
   initialize_from_url();
   focus();
+
+  if ($('#animation').length > 0) {
+    // Only install animation if the page supports it.
+    setup_animation();
+  }
 });
 
 function install_events() {
@@ -25,7 +42,7 @@ function install_events() {
     set_url_hash(filtered);
 
     let url = get_audio_api_url(filtered);
-    window.audio.playUrl(url);
+    (<any>window).audio.playUrl(url);
 
     ev.preventDefault();
     return false;
@@ -36,7 +53,7 @@ function install_events() {
       // ESC key.
       focus();
       $(INPUT).val('');
-      window.audio.stop();
+      (<any>window).audio.stop();
     }
   });
 
@@ -45,7 +62,7 @@ function install_events() {
 
     if (ev.keyCode === 27) {
       $(INPUT).val(''); // ESC key.
-      window.audio.stop();
+      (<any>window).audio.stop();
     }
   });
 
@@ -57,7 +74,7 @@ function install_events() {
 
   $('button#clear').on('click', function(ev: any): any {
     $(INPUT).val(''); // ESC key.
-    window.audio.stop();
+    (<any>window).audio.stop();
     ev.preventDefault();
     return false;
   });

@@ -44,6 +44,11 @@ Scaling
   4. Prevent others from calling it
   5. Caching strategy
 
+Hardening
+  1. Reduce API surface
+  2. Limit length of input sentences
+  3. Rate limiting
+
 Presentation
   - Better frontend UI
   - Testing page (current frontend)

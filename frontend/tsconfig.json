@@ -1,0 +1,12 @@
+{
+  "filesGlob": [
+    "./**/*.ts",
+    "!./node_modules/**/*.ts"
+  ],
+  "files": [
+    "./main.ts",
+    "./typings/pixi.js/pixi.js.d.ts",
+    "./typings/tsd.d.ts",
+    "./typings/vue/vue.d.ts"
+  ]
+}

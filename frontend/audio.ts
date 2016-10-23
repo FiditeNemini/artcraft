@@ -2,6 +2,8 @@
 
 declare var buzz: any; // TODO: static types.
 
+import { talk, stopTalking } from "./animation";
+
 export default class Audio {
   sound: any;
 
@@ -13,6 +15,15 @@ export default class Audio {
     this.stop();
     this.sound = new buzz.sound(url);
     this.sound.play();
+
+    this.sound.bind('play playing', function() {
+      talk(); // UI
+    });
+
+
+    this.sound.bind('ended pause', function() {
+      stopTalking(); // UI
+    });
   }
 
   stop() {

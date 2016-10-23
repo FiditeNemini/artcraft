@@ -1,28 +1,48 @@
-img#trump {
-  height: 300px;
-}
-
-@media screen and (min-height: 600px) {
-  img#trump {
-    height: 400px;
+@media screen and (min-width: 1px) {
+  #animation canvas {
+    width: 200px;
   }
 }
 
-@media screen and (min-height: 800px) {
-  img#trump {
-    height: 500px;
+@media screen and (min-width: 300px) {
+  #animation canvas {
+    width: 300px;
   }
 }
 
-@media screen and (min-height: 1000px) {
-  img#trump {
-    height: 700px;
+@media screen and (min-width: 400px) {
+  #animation canvas {
+    width: 400px;
   }
 }
 
-@media screen and (min-height: 1500px) {
-  img#trump {
-    height: 1000px;
+@media screen and (min-width: 450px) {
+  #animation canvas {
+    width: 450px;
+  }
+}
+
+@media screen and (min-width: 500px) {
+  #animation canvas {
+    width: 500px;
+  }
+}
+
+@media screen and (min-width: 600px) {
+  #animation canvas {
+    width: 600px;
+  }
+}
+
+@media screen and (min-width: 800px) {
+  #animation canvas {
+    width: 800px;
+  }
+}
+
+@media screen and (min-width: 1000px) {
+  #animation canvas {
+    width: 800px;
   }
 }
 
