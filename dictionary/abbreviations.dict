@@ -1,13 +1,33 @@
 ; Abbreviations
 ; ---------------------------
+AFAIK  as far as i know
+AFK  away from keyboard
+BBL  be back later
+BRB  be right back
 DT  donald trump
 FML  fuck my life
+FTL  faster than light
+FU  fuck you
+FWIW  for what it's worth
+GTFO  get the fuck out
+H8  hate
+HBU  how about you
 HC  hillary clinton
+IANAL  i am not a lawyer
+IDK  i don't know
+IIRC  if i recall correctly
+IMHO  in my humble opinion
+IOT  internet of things
+IRL  in real life
+LLAP  live long and prosper
 OMFG  oh my fucking god
 OMG  oh my god
 RT  retweet
+TBH  to be honest
+TTYL  talk to you later
+WRT  with regard to
 WTF  what the fuck
-BRB  be right back
+WYSIWYG  what you see is what you get
 
 ; Corrections
 ; This is a hack. They'll simply work due to the order of parsing.

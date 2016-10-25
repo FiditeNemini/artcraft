@@ -17,7 +17,6 @@ Parsing
   - (Everything in tokenizing)
   - Decimal numbers
   - Collapse pauses, eg: "Foo,,," -> "Foo (breath)"
-  - Dates
   - Numbers that are years (2016)!
   - Twitter hashtags, usernames - conjoined word parsing (difficult)
 
