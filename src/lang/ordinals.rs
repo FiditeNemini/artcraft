@@ -5,7 +5,7 @@ use regex::Regex;
 use std::collections::HashMap;
 
 lazy_static! {
-  static ref ORDINAL_MAP: HashMap<&'static str, &'static str> = {
+  pub static ref ORDINAL_MAP: HashMap<&'static str, &'static str> = {
     let mut o = HashMap::new();
     o.insert("zero", "zeroth");
     o.insert("one", "first");

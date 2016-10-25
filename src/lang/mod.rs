@@ -2,10 +2,10 @@
 
 pub mod abbr;
 pub mod arpabet;
+pub mod dates;
 pub mod dictionary;
 pub mod numbers;
 pub mod ordinals;
 pub mod parser;
-pub mod tokens;
 pub mod tokenizer;
-
+pub mod tokens;

@@ -4,11 +4,12 @@
 // (The synthesizer only has knowledge of how to handle filtered words.)
 
 use lang::abbr::AbbreviationsMap;
+use lang::dates::date_to_words;
 use lang::dictionary::UniversalDictionary;
 use lang::numbers::number_to_words;
 use lang::ordinals::ordinal_to_words;
-use lang::tokens::*;
 use lang::tokenizer::*;
+use lang::tokens::*;
 use std::sync::Arc;
 use synthesis::tokens::*;
 
@@ -117,7 +118,6 @@ impl Parser {
     for token in processed_tokens2 {
       match token {
         Token::CurrencySymbol { value: _v } => {}, // Skip (for now)
-        Token::Date { value: _v } => {}, // Skip (for now)
         Token::Emoji { value: _v } => {}, // Skip (for now)
         Token::Hashtag { value: _v } => {}, // Skip (for now)
         Token::Mention { value: _v } => {}, // Skip (for now)
@@ -148,6 +148,18 @@ impl Parser {
         Token::DictionaryWord { value : ref v } => {
           synth_tokens.push(SynthToken::word(v.value.to_string()));
         }
+        Token::Date { value: ref v } => {
+          match date_to_words(&v.value) {
+            None => {
+              synth_tokens.push(SynthToken::filler(v.value.len()));
+            },
+            Some(date_words) => {
+              for word in date_words {
+                synth_tokens.push(SynthToken::word(word));
+              }
+            },
+          }
+        },
         Token::Time { value: ref v } => {
           // FIXME: Efficiency, cleanup
           let mut valid = true;
