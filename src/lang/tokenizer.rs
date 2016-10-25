@@ -143,6 +143,15 @@ impl Tokenizer {
 
       let word = unknown.to_lowercase();
 
+      // Handle possible scale words before checking the dictionary.
+      match word.as_ref() {
+        "thousand" | "million" | "billion" | "trillion" => {
+          output.push_back(Token::scale_word(unknown.to_string()));
+          continue;
+        },
+        _ => {},
+      }
+
       // Handle possible time units before checking the dictionary.
       match word.as_ref() {
         "am" | "a.m" | "am." | "a.m." |
@@ -983,6 +992,35 @@ mod tests {
   }
 
   #[test]
+  fn test_currencies() {
+    let t = make_tokenizer();
+
+    fn sw(value: &str) -> Token {
+      Token::scale_word(value.to_string())
+    }
+
+    let result = t.tokenize("$10");
+    let expected = vec![Token::dollar(), n("10")];
+    assert_eq!(expected, result);
+
+    let result = t.tokenize("$ 9 thousand");
+    let expected = vec![Token::dollar(), n("9"), sw("thousand")];
+    assert_eq!(expected, result);
+
+    let result = t.tokenize("$10 million");
+    let expected = vec![Token::dollar(), n("10"), sw("million")];
+    assert_eq!(expected, result);
+
+    let result = t.tokenize("£123 billion");
+    let expected = vec![Token::pound(), n("123"), sw("billion")];
+    assert_eq!(expected, result);
+
+    let result = t.tokenize("€999 trillion");
+    let expected = vec![Token::euro(), n("999"), sw("trillion")];
+    assert_eq!(expected, result);
+  }
+
+  #[test]
   fn test_split_sentence() {
     fn sen(list: &[&str]) -> Vec<String> {
       let mut out = Vec::new();
@@ -1017,17 +1055,23 @@ mod tests {
     }
   }
 
-  // Helper function.
+  // Helper functions.
   fn a(value: &str) -> Token {
     Token::abbreviation(value.to_string())
   }
 
-  // Helper function.
-  fn w(value: &str) -> Token {
-    Token::dictionary_word(value.to_string())
+  fn h(value: &str) -> Token {
+    Token::hashtag(value.to_string())
   }
 
-  // Helper function.
+  fn i(value: &str) -> Token {
+    Token::initialism(value.to_string())
+  }
+
+  fn m(value: &str) -> Token {
+    Token::mention(value.to_string())
+  }
+
   fn n(value: &str) -> Token {
     Token::number(value.to_string())
   }
@@ -1036,21 +1080,12 @@ mod tests {
     Token::ordinal(value.to_string())
   }
 
-  // Helper function.
   fn u(value: &str) -> Token {
     Token::unknown(value.to_string())
   }
 
-  fn h(value: &str) -> Token {
-    Token::hashtag(value.to_string())
-  }
-
-  fn m(value: &str) -> Token {
-    Token::mention(value.to_string())
-  }
-
-  fn i(value: &str) -> Token {
-    Token::initialism(value.to_string())
+  fn w(value: &str) -> Token {
+    Token::dictionary_word(value.to_string())
   }
 
   fn date(value: &str) -> Token {

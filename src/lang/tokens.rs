@@ -102,6 +102,12 @@ pub enum Punctuation {
   Semicolon,
 }
 
+/// Words that denote magnitude or scale: thousand, million, billion, etc.
+#[derive(Clone, PartialEq)]
+pub struct ScaleWord {
+  pub value: String,
+}
+
 #[derive(Clone, Debug, PartialEq)]
 pub enum Symbol {
   Ampersand,
@@ -148,6 +154,7 @@ pub enum Token {
   Number { value: Number },
   Ordinal { value: Ordinal },
   Punctuation { value: Punctuation },
+  ScaleWord { value: ScaleWord },
   Symbol { value: Symbol },
   Time { value: Time },
   Unknown { value: Unknown }, // The unclassified type.
@@ -171,6 +178,7 @@ impl fmt::Debug for Token {
       Token::Number { value : ref v } => format!("Number {}", v.value),
       Token::Ordinal { value : ref v } => format!("Ordinal {}", v.value),
       Token::Punctuation { value : ref v } => format!("Punctuation {:?}", v),
+      Token::ScaleWord { value : ref v } => format!("ScaleWord {}", v.value),
       Token::Symbol { value : ref v } => format!("Symbol {:?}", v),
       Token::Time { value : ref v } => format!("Time {}", v.value),
       Token::Unknown { value : ref v } => format!("Unknown {}", v.value),
@@ -304,6 +312,10 @@ impl Token {
     Token::Punctuation { value: Punctuation::Question }
   }
 
+  pub fn scale_word(value: String) -> Token {
+    Token::ScaleWord { value: ScaleWord { value: value } }
+  }
+
   pub fn semicolon() -> Token {
     Token::Punctuation { value: Punctuation::Semicolon }
   }
@@ -325,3 +337,28 @@ impl Token {
   }
 }
 
+impl CurrencySymbol {
+  pub fn to_word_token(&self) -> Token {
+    let word = match *self {
+      CurrencySymbol::Bitcoin => "bitcoin",
+      CurrencySymbol::Cent => "cent",
+      CurrencySymbol::Dollar  => "dollar",
+      CurrencySymbol::Euro => "euro",
+      CurrencySymbol::Pound => "pound",
+      CurrencySymbol::Yen => "yen",
+    };
+    Token::dictionary_word(word.to_string())
+  }
+
+  pub fn to_word_token_plural(&self) -> Token {
+    let word = match *self {
+      CurrencySymbol::Bitcoin => "bitcoins",
+      CurrencySymbol::Cent => "cents",
+      CurrencySymbol::Dollar  => "dollars",
+      CurrencySymbol::Euro => "euros",
+      CurrencySymbol::Pound => "pounds",
+      CurrencySymbol::Yen => "yen",
+    };
+    Token::dictionary_word(word.to_string())
+  }
+}

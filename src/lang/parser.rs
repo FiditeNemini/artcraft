@@ -83,10 +83,38 @@ impl Parser {
       processed_tokens.push(token);
     }
 
+    // Process monetary token structures.
+    // TODO: Inefficient.
+    let mut processed_tokens2 = Vec::new();
+    let mut currency : Option<CurrencySymbol> = None;
+
+    for token in processed_tokens {
+      match token {
+        Token::CurrencySymbol { value: ref v } => {
+          currency = Some(v.clone());
+          continue;
+        },
+        Token::Number { value: _ } => {},
+        Token::ScaleWord { value: _ } => {},
+        _ => {
+          if currency.is_some() {
+            processed_tokens2.push(currency.unwrap().to_word_token_plural());
+            currency = None;
+          }
+        },
+      }
+
+      processed_tokens2.push(token);
+    }
+
+    if currency.is_some() {
+      processed_tokens2.push(currency.unwrap().to_word_token_plural());
+    }
+
     // Process all token types and construct output synthesis vector.
     let mut synth_tokens = Vec::new();
 
-    for token in processed_tokens {
+    for token in processed_tokens2 {
       match token {
         Token::CurrencySymbol { value: _v } => {}, // Skip (for now)
         Token::Date { value: _v } => {}, // Skip (for now)
@@ -114,6 +142,9 @@ impl Parser {
         Token::MaybeTimeUnit { value: ref v } => {
           synth_tokens.push(SynthToken::word(v.value.to_string()));
         },
+        Token::ScaleWord { value : ref v } => {
+          synth_tokens.push(SynthToken::word(v.value.to_string()));
+        }
         Token::DictionaryWord { value : ref v } => {
           synth_tokens.push(SynthToken::word(v.value.to_string()));
         }
@@ -358,7 +389,9 @@ mod tests {
         "jon",
         "lantern",
         "link",
+        "lose",
         "lot",
+        "make",
         "me",
         "movement",
         "never",
@@ -377,6 +410,7 @@ mod tests {
         "this",
         "three",
         "tickets",
+        "today",
         "two",
         "username",
         "visit",
@@ -580,6 +614,49 @@ mod tests {
 
     let result = p.parse("5pm");
     let expected = vec![w("five"), w("pm")];
+    assert_eq!(expected, result);
+  }
+
+  #[test]
+  fn test_monetary() {
+    let p = make_parser();
+
+    let result = p.parse("$10");
+    let expected = vec![w("ten"), w("dollars")];
+    assert_eq!(expected, result);
+
+    let result = p.parse("$ 9 thousand");
+    let expected = vec![w("nine"), w("thousand"), w("dollars")];
+    assert_eq!(expected, result);
+
+    let result = p.parse("$10 million");
+    let expected = vec![w("ten"), w("million"), w("dollars")];
+    assert_eq!(expected, result);
+
+    let result = p.parse("£123 billion");
+    let expected = vec![
+      w("one"), w("hundred"), w("twenty"), w("three"), w("billion"), w("pounds")
+    ];
+    assert_eq!(expected, result);
+
+    let result = p.parse("€999 trillion");
+    let expected = vec![
+      w("nine"), w("hundred"), w("ninety"), w("nine"), w("trillion"), w("euros")
+    ];
+    assert_eq!(expected, result);
+
+    // With other symbols in the mix.
+    let result = p.parse("Make $10 million!");
+    let expected = vec![
+      w("make"), w("ten"), w("million"), w("dollars"), SynthToken::full_stop()
+    ];
+    assert_eq!(expected, result);
+
+    let result = p.parse("Lose $100 million today!");
+    let expected = vec![
+      w("lose"), w("one"),w("hundred"), w("million"), w("dollars"), w("today"),
+      SynthToken::full_stop()
+    ];
     assert_eq!(expected, result);
   }
 

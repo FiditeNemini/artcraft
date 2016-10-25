@@ -6,8 +6,8 @@ Audio Samples
   - IMPROVED SAMPLES
   - Remove extra space between words (using parsing to insert spacing)
   - No more missing phonemes
-    - Backfilling ['AO0', 'AW0', 'AW2', 'AY0', 'EY0', 'OY0', 'UH0'] with fakes
-      If I get a chance, I should find the real versions of these.
+    - Real versions of ['AO0', 'AW0', 'AW2', 'AY0', 'EY0', 'OY0', 'UH0'], which
+      were backfilled with fakes.
 
 Tokenizing
   - Plurals
@@ -16,7 +16,6 @@ Tokenizing
 Parsing
   - (Everything in tokenizing)
   - Decimal numbers
-  - Monetary units ($10 -> ten dollars, $10 million -> ten million dollars)
   - Collapse pauses, eg: "Foo,,," -> "Foo (breath)"
   - Dates
   - Numbers that are years (2016)!
