@@ -20,8 +20,7 @@ export default class Audio {
       talk(); // UI
     });
 
-
-    this.sound.bind('ended pause', function() {
+    this.sound.bind('error ended pause', function() {
       stopTalking(); // UI
     });
   }
