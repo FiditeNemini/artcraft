@@ -2,6 +2,8 @@
 
 use hound::Error as HoundError;
 use std::convert::From;
+use std::error::Error;
+use std::fmt;
 use std::io;
 
 /** The common error type used throughout the synthesizer. */
@@ -13,12 +15,32 @@ pub enum SynthError {
   /// The file was empty or did not have parsable contents.
   EmptyFile,
 
+  /// Could not obtain the lock.
+  LockError,
+
   /// Wraps an IoError.
   IoError { cause: io::Error },
 
   /// Wraps a Hound audio library error.
   AudioError { cause: HoundError },
 }
+
+impl fmt::Display for SynthError {
+  fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    write!(f, "Synthesis Error")
+  }
+}
+
+impl Error for SynthError {
+  fn description(&self) -> &str {
+    "Synthesis Error" // TODO
+  }
+
+  /*fn cause(&self) -> Option<&Error> {
+    Some(&self)
+  }*/
+}
+
 
 impl From<io::Error> for SynthError {
   fn from(error: io::Error) -> SynthError {

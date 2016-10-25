@@ -12,8 +12,7 @@ rsync -utrv config.toml bt@jungle.horse:/home/bt/dev/trumpet
 
 # Frontend
 rsync -utrv web/images bt@jungle.horse:/home/bt/dev/trumpet/web
-rsync -utrv web/*css bt@jungle.horse:/home/bt/dev/trumpet/web
-rsync -utrv web/*html bt@jungle.horse:/home/bt/dev/trumpet/web
+rsync -utrv web/{*css,*html,*txt} bt@jungle.horse:/home/bt/dev/trumpet/web
 pushd frontend
 webpack
 popd

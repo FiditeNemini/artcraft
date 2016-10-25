@@ -42,6 +42,10 @@ Scaling
   4. Prevent others from calling it
   5. Caching strategy
 
+Server
+  1. Favicon, .ico and apple icon
+  2. robots.txt
+
 Hardening
   1. Reduce API surface
   2. Limit length of input sentences

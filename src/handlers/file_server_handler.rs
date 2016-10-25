@@ -30,10 +30,11 @@ impl Handler for FileServerHandler {
     let filename = self.get_filename(&req);
 
     let mime = match &filename {
-      s if s.ends_with(".css")   => { "text/css" },
-      s if s.ends_with(".html") => { "text/html" },
-      s if s.ends_with(".js")   => { "application/javascript" },
-      _ => { "text/plain" },
+      s if s.ends_with(".css")  => "text/css",
+      s if s.ends_with(".html") => "text/html",
+      s if s.ends_with(".js")   => "application/javascript",
+      s if s.ends_with(".txt")  => "text/plain",
+      _                         => "text/plain",
     };
 
     match self.open_file(&filename) {

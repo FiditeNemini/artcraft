@@ -4,7 +4,9 @@
 use config::Config;
 use crypto::digest::Digest;
 use crypto::sha1::Sha1;
+use error::SynthError;
 use iron::Handler;
+use iron::IronError;
 use iron::Plugin;
 use iron::headers::ETag;
 use iron::headers::EntityTag;
@@ -317,7 +319,7 @@ impl Handler for AudioSynthHandler {
     }
 
     let start = PreciseTime::now();
-    let result = self.create_audio(request);
+    let result = try!(self.create_audio(request));
 
     info!(target: "timing",
           "Total parsing and synthesis took: {}", start.to(PreciseTime::now()));
@@ -340,39 +342,29 @@ impl AudioSynthHandler {
     }
   }
 
-  // TODO: Return errors.
   /// Create audio from the sentence.
-  fn create_audio(&self, request: SpeakRequest) -> Vec<u8> {
-    match self.synthesizer.read() {
-      Err(_) => Vec::new(), // TODO Actual error.
-      Ok(synth) => {
-        let params = SynthesisParams {
-          use_words: request.use_words,
-          use_phonemes: request.use_phonemes,
-          use_diphones: request.use_diphones,
-          use_n_phones: request.use_n_phones,
-          use_ends: request.use_ends,
-          volume: request.volume,
-          speed: request.speed,
-          monophone_padding_start: request.monophone_padding_start,
-          monophone_padding_end: request.monophone_padding_end,
-          polyphone_padding_end: request.polyphone_padding_end,
-          word_padding_start: request.word_padding_start,
-          word_padding_end: request.word_padding_end,
-        };
+  fn create_audio(&self, request: SpeakRequest) -> Result<Vec<u8>, SynthError> {
+    let synth = match self.synthesizer.read() {
+      Err(_) => { return Err(SynthError::LockError); },
+      Ok(synth) => synth,
+    };
 
-        let generated = synth.generate(&request.sentence, &request.speaker,
-          params);
+    let params = SynthesisParams {
+      use_words: request.use_words,
+      use_phonemes: request.use_phonemes,
+      use_diphones: request.use_diphones,
+      use_n_phones: request.use_n_phones,
+      use_ends: request.use_ends,
+      volume: request.volume,
+      speed: request.speed,
+      monophone_padding_start: request.monophone_padding_start,
+      monophone_padding_end: request.monophone_padding_end,
+      polyphone_padding_end: request.polyphone_padding_end,
+      word_padding_start: request.word_padding_start,
+      word_padding_end: request.word_padding_end,
+    };
 
-        match generated {
-          Err(e) => {
-            warn!("Error synthesizing: {:?}", e);
-            Vec::new() // TODO FIXME
-          },
-          Ok(wav) => wav,
-        }
-      }
-    }
+    synth.generate(&request.sentence, &request.speaker, params)
   }
 
   fn sha_digest(&self, request: &SpeakRequest) -> String {
@@ -416,3 +408,10 @@ fn get_u16(params: &QueryParams, param_name: &str) -> Option<u16> {
       .and_then(|d| if d == 0 { None } else { Some(d) } )
 }
 
+impl From<SynthError> for IronError {
+  fn from(error: SynthError) -> IronError {
+    let mime = "text/plain".parse::<Mime>().unwrap();
+    let response = (mime, status::InternalServerError, "Service Error");
+    IronError::new(error, response)
+  }
+}
