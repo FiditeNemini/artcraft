@@ -1,6 +1,13 @@
 Remaining Tasks
 ===============
 
+*HIGH LEVEL GOALS*
+  1. Sound better
+  2. Handle load
+  3. Recoup costs
+  4. Look good (UI, speaking capability) - good reflection
+  5. Good code
+
 Audio Samples
   - MORE SAMPLES
   - IMPROVED SAMPLES
@@ -54,7 +61,6 @@ Hardening
 Presentation
   - Better frontend UI
   - Testing page (current frontend)
-  - Art + sprite
 
 Monetization
   - Can I get sued?

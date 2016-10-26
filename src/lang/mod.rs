@@ -7,5 +7,7 @@ pub mod dictionary;
 pub mod numbers;
 pub mod ordinals;
 pub mod parser;
+pub mod phonemes;
+pub mod syllables;
 pub mod tokenizer;
 pub mod tokens;
