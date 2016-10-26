@@ -14,6 +14,7 @@ export function setup_animation() {
 
   let asset: any = null;
   let logo: any = null;
+  let logo2: any = null;
 
   (<any>window).animationState = null;
   let blinkingStart = null;
@@ -144,6 +145,9 @@ export function setup_animation() {
   logo = new PIXI.Text('Jungle Horse', 
                    {font: '150px Impact Bold', fill: 0x000000, align: 'center'});
 
+  let texture = PIXI.Texture.fromImage('/assets/images/jungle_horse_lobster.png');
+  logo2 = new PIXI.Sprite(texture);
+
   PIXI.loader.add('asset', '/assets/images/trumpette/idle_0.png')
       .load(function (loader, resources) {
     // This creates a texture from a 'asset.png' image.
@@ -157,10 +161,14 @@ export function setup_animation() {
     asset.scale.x = 0.5;
     asset.scale.y = 0.5;
 
-    logo.position.y = 260;
+    //logo.position.y = 260;
+    logo2.scale.x = 0.5;
+    logo2.scale.y = 0.5;
+    logo2.position.y = 160;
 
     // Add the asset to the scene we are building.
-    stage.addChild(logo);
+    //stage.addChild(logo);
+    stage.addChild(logo2);
     stage.addChild(asset);
 
     asset.play();
