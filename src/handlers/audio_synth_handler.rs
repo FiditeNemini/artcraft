@@ -109,173 +109,71 @@ pub struct AudioSynthHandler {
 }
 
 impl SpeakRequest {
+  /// Parse a speak request from a raw HTTP request.
   pub fn parse(http_request: &mut Request)
       -> Result<SpeakRequest, SpeakerRequestError> {
-
-    let sentence_error = Err(SpeakerRequestError::SentenceInvalid);
-    let speaker_error = Err(SpeakerRequestError::SpeakerInvalid);
-
-    // Get the request sentence and speaker.
-    // TODO: OMFG WTF CLEANUP THIS GARBAGE.
-    match http_request.get_ref::<UrlEncodedQuery>() {
-      Err(_) => { return sentence_error; },
-      Ok(ref map) => {
-        let sen = match map.get(SENTENCE_PARAM) {
-          None => { return sentence_error; },
-          Some(list) => {
-            match list.get(0) {
-              None => { return sentence_error; },
-              Some(s) => { s.to_string() },
-            }
-          },
-        };
-
-        let spk = match map.get(SPEAKER_PARAM) {
-          None => { return speaker_error; },
-          Some(list) => {
-            match list.get(0) {
-              None => { return speaker_error; },
-              Some(s) => { Speaker::new(s.to_string()) },
-            }
-          },
-        };
-
-        let volume : Option<f32> = match map.get(VOLUME_PARAM) {
-          None => { None },
-          Some(list) => {
-            match list.get(0) {
-              None => { None },
-              Some(s) => {
-                match s.parse::<f32>() {
-                  Err(_) => None,
-                  Ok(i) => Some(i),
-                }
-              },
-            }
-          },
-        };
-
-        let speed : Option<f32> = match map.get(SPEED_PARAM) {
-          None => { None },
-          Some(list) => {
-            match list.get(0) {
-              None => { None },
-              Some(s) => {
-                match s.trim().parse::<f32>() {
-                  Err(_) => None,
-                  Ok(i) => {
-                    let diff = i - 1.0;
-                    if diff < 0.005 && diff > -0.005 {
-                      None // Don't waste CPU calculating.
-                    } else {
-                      Some(i)
-                    }
-                  }
-                }
-              },
-            }
-          },
-        };
-
-        let use_phonemes = match map.get(USE_PHONEMES_PARAM) {
-          None => { true },
-          Some(list) => {
-            match list.get(0) {
-              None => { return speaker_error; },
-              Some(s) => {
-                match FromStr::from_str(s) {
-                  Ok(b) => b,
-                  Err(_) => { return speaker_error; },
-                }
-              },
-            }
-          },
-        };
-
-        let use_diphones = match map.get(USE_DIPHONES_PARAM) {
-          None => { true },
-          Some(list) => {
-            match list.get(0) {
-              None => { return speaker_error; },
-              Some(s) => {
-                match FromStr::from_str(s) {
-                  Ok(b) => b,
-                  Err(_) => { return speaker_error; },
-                }
-              },
-            }
-          },
-        };
-
-        let use_n_phones = match map.get(USE_N_PHONES_PARAM) {
-          None => { true },
-          Some(list) => {
-            match list.get(0) {
-              None => { return speaker_error; },
-              Some(s) => {
-                match FromStr::from_str(s) {
-                  Ok(b) => b,
-                  Err(_) => { return speaker_error; },
-                }
-              },
-            }
-          },
-        };
-
-        let use_words = match map.get(USE_WORDS_PARAM) {
-          None => { true },
-          Some(list) => {
-            match list.get(0) {
-              None => { return speaker_error; },
-              Some(s) => {
-                match FromStr::from_str(s) {
-                  Ok(b) => b,
-                  Err(_) => { return speaker_error; },
-                }
-              },
-            }
-          },
-        };
-
-        let use_ends = match map.get(USE_ENDS_PARAM) {
-          None => { true },
-          Some(list) => {
-            match list.get(0) {
-              None => { return speaker_error; },
-              Some(s) => {
-                match FromStr::from_str(s) {
-                  Ok(b) => b,
-                  Err(_) => { return speaker_error; },
-                }
-              },
-            }
-          },
-        };
-
-        let mps = get_u16(map, MONOPHONE_PADDING_START_PARAM);
-        let mpe = get_u16(map, MONOPHONE_PADDING_END_PARAM);
-        let ppe = get_u16(map, POLYPHONE_PADDING_END_PARAM);
-        let wps = get_u16(map, WORD_PADDING_START_PARAM);
-        let wpe = get_u16(map, WORD_PADDING_END_PARAM);
-
-        Ok(SpeakRequest {
-          sentence: sen,
-          speaker: spk,
-          volume: volume,
-          speed: speed,
-          use_phonemes: use_phonemes,
-          use_diphones: use_diphones,
-          use_n_phones: use_n_phones,
-          use_words: use_words,
-          use_ends: use_ends,
-          monophone_padding_start: mps,
-          monophone_padding_end: mpe,
-          polyphone_padding_end: ppe,
-          word_padding_start: wps,
-          word_padding_end: wpe,
-        })
+    let params = match http_request.get_ref::<UrlEncodedQuery>() {
+      Ok(multimap) => multimap,
+      Err(_) => {
+        return Err(SpeakerRequestError::SentenceInvalid);
       },
-    }
+    };
+
+
+    let sen = match get_str(params, SENTENCE_PARAM) {
+      Some(s) => s.to_string(),
+      None => {
+        return Err(SpeakerRequestError::SentenceInvalid);
+      },
+    };
+
+    let spk = match get_str(params, SPEAKER_PARAM) {
+      Some(s) => Speaker::new(s.to_string()),
+      None => {
+        return Err(SpeakerRequestError::SpeakerInvalid);
+      },
+    };
+
+    let volume = get_f32(params, VOLUME_PARAM);
+
+    let speed = get_f32(params, SPEED_PARAM).and_then(|f| {
+      // Don't waste CPU calculating speed if it isn't supplied.
+      let diff = f - 1.0;
+      if diff > -0.005 && diff < 0.005 {
+        None
+      } else {
+        Some(f)
+      }
+    });
+
+    let use_phonemes = get_bool(params, USE_PHONEMES_PARAM).unwrap_or(true);
+    let use_diphones = get_bool(params, USE_DIPHONES_PARAM).unwrap_or(true);
+    let use_n_phones = get_bool(params, USE_N_PHONES_PARAM).unwrap_or(true);
+    let use_words = get_bool(params, USE_WORDS_PARAM).unwrap_or(true);
+    let use_ends = get_bool(params, USE_ENDS_PARAM).unwrap_or(true);
+
+    let mps = get_u16(params, MONOPHONE_PADDING_START_PARAM);
+    let mpe = get_u16(params, MONOPHONE_PADDING_END_PARAM);
+    let ppe = get_u16(params, POLYPHONE_PADDING_END_PARAM).or(Some(600));
+    let wps = get_u16(params, WORD_PADDING_START_PARAM).or(Some(600));
+    let wpe = get_u16(params, WORD_PADDING_END_PARAM).or(Some(600));
+
+    Ok(SpeakRequest {
+      sentence: sen,
+      speaker: spk,
+      volume: volume,
+      speed: speed,
+      use_phonemes: use_phonemes,
+      use_diphones: use_diphones,
+      use_n_phones: use_n_phones,
+      use_words: use_words,
+      use_ends: use_ends,
+      monophone_padding_start: mps,
+      monophone_padding_end: mpe,
+      polyphone_padding_end: ppe,
+      word_padding_start: wps,
+      word_padding_end: wpe,
+    })
   }
 }
 
@@ -285,6 +183,13 @@ impl Handler for AudioSynthHandler {
     let sentence_error = build_error(status::BadRequest,
         &format!("Missing `{}` parameter.", SENTENCE_PARAM));
 
+    let request = match SpeakRequest::parse(req) {
+      Err(_) => { return sentence_error },
+      Ok(s) => s,
+    };
+
+    info!(target: "handler", "Speak Request: {:?}", request);
+
     // Get the request ETag. TODO: Cleanup
     let request_hash = {
       match req.headers.get::<IfNoneMatch>() {
@@ -292,16 +197,6 @@ impl Handler for AudioSynthHandler {
         Some(etag) => { etag.to_string() }
       }
     };
-
-    // TODO: Cleanup
-    let request = match SpeakRequest::parse(req) {
-      Ok(s) => s,
-      Err(_) => {
-        return sentence_error;
-      },
-    };
-
-    info!(target: "handler", "Speak Request: {:?}", request);
 
     // FIXME: Varies with spaces, formatting, etc.
     let hash = self.sha_digest(&request);
@@ -398,14 +293,32 @@ impl AudioSynthHandler {
   }
 }
 
-/** Parse an optional u16 out of query parameters. */
-fn get_u16(params: &QueryParams, param_name: &str) -> Option<u16> {
+fn get_str<'a>(params: &'a QueryParams, param_name: &str)
+               -> Option<&'a String> {
   params.get(param_name)
       .and_then(|v| v.get(0))
+}
+
+fn get_bool(params: &QueryParams, param_name: &str) -> Option<bool> {
+  get_str(params, param_name)
+      .map(|s| s.trim())
+      .map(|s| FromStr::from_str(s))
+      .and_then(|res| res.ok())
+}
+
+fn get_u16(params: &QueryParams, param_name: &str) -> Option<u16> {
+  get_str(params, param_name)
       .map(|s| s.trim())
       .map(|s| s.parse::<u16>())
       .and_then(|res| res.ok())
       .and_then(|d| if d == 0 { None } else { Some(d) } )
+}
+
+fn get_f32(params: &QueryParams, param_name: &str) -> Option<f32> {
+  get_str(params, param_name)
+      .map(|s| s.trim())
+      .map(|s| s.parse::<f32>())
+      .and_then(|res| res.ok())
 }
 
 impl From<SynthError> for IronError {
