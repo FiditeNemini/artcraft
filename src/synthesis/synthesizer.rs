@@ -3,9 +3,6 @@
 use audiobank::Audiobank;
 use audiobank::SampleBytes;
 use audiobank::SamplePreference;
-use effects::pause::generate_pause;
-use effects::speed::change_speed;
-use effects::volume::change_volume;
 use error::SynthError;
 use hound::WavSpec;
 use hound::WavWriter;
@@ -14,6 +11,9 @@ use lang::parser::Parser;
 use speaker::Speaker;
 use std::io::BufWriter;
 use std::io::Cursor;
+use synthesis::effects::pause::generate_pause;
+use synthesis::effects::speed::change_speed;
+use synthesis::effects::volume::change_volume;
 use synthesis::tokens::*;
 
 pub type WavBytes = Vec<u8>;
@@ -38,11 +38,6 @@ pub struct SynthesisParams {
  * Generates wave files from text input.
  */
 pub struct Synthesizer {
-  // TODO: For now we rely on word files existing on the filesystem
-  // at runtime. This is pretty lame.
-  ///// Word dictionary
-  //word_dictionary: Vocabulary,
-
   /// Arpabet, (Word) -> (PhonemeList)
   arpabet_dictionary: Arpabet,
 
@@ -72,7 +67,7 @@ impl Synthesizer {
                   sentence: &str,
                   speaker: &Speaker,
                   params: SynthesisParams)
-      -> Result<WavBytes, SynthError> {
+                  -> Result<WavBytes, SynthError> {
 
     let tokens = self.parser.parse(sentence);
 
@@ -594,4 +589,3 @@ impl Synthesizer {
     }
   }
 }
-

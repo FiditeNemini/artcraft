@@ -264,36 +264,6 @@ impl Audiobank {
     Some(all_samples)
   }
 
-  /** Get a diphone in the form "{first}_{second}.wav". */
-  pub fn get_diphone(&self, speaker: &str, first: &str, second: &str)
-      -> Option<Vec<i16>> {
-
-    if check_path(speaker).is_err()
-        || check_path(first).is_err()
-        || check_path(second).is_err() {
-      return None;
-    }
-
-    let path = self.audio_path.join(format!("{}/", speaker))
-        .join("2-phones/")
-        .join(format!("{}_{}.wav", first, second));
-
-    let mut reader = match WavReader::open(path) {
-      Err(_) => { return None; },
-      Ok(reader) => reader,
-    };
-
-    // TODO: Inefficient.
-    let mut all_samples = Vec::new();
-    let samples = reader.samples::<i16>();
-    for sample in samples {
-      all_samples.push(sample.unwrap());
-    }
-
-    Some(all_samples)
-  }
-
-
   /**
    * Get the miscellaneous sound effect file.
    */

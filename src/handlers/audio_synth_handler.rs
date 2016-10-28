@@ -1,5 +1,4 @@
 // Copyright (c) 2015 Brandon Thomas <bt@brand.io>
-// TODO: This looks really bad now. Needs cleanup.
 
 use config::Config;
 use crypto::digest::Digest;
@@ -118,7 +117,6 @@ impl SpeakRequest {
         return Err(SpeakerRequestError::SentenceInvalid);
       },
     };
-
 
     let sen = match get_str(params, SENTENCE_PARAM) {
       Some(s) => s.to_string(),
@@ -294,7 +292,6 @@ impl AudioSynthHandler {
 
     synth.generate(&request.sentence, &request.speaker, params)
   }
-
 }
 
 fn get_str<'a>(params: &'a QueryParams, param_name: &str)

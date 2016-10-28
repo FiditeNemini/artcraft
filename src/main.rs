@@ -20,7 +20,6 @@ extern crate urlencoded;
 
 pub mod audiobank;
 pub mod config;
-pub mod effects;
 pub mod error;
 pub mod handlers;
 pub mod lang;
