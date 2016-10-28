@@ -32,7 +32,7 @@ const SENTENCE_PARAM : &'static str = "s";
 const SPEAKER_PARAM : &'static str = "v";
 const SPEED_PARAM : &'static str = "spd";
 const USE_PHONEMES_PARAM: &'static str = "up";
-const USE_DIPHONES_PARAM: &'static str = "ud";
+const USE_SYLLABLES_PARAM: &'static str = "us";
 const USE_N_PHONES_PARAM: &'static str = "un";
 const USE_WORDS_PARAM: &'static str = "uw";
 const USE_ENDS_PARAM: &'static str = "ue";
@@ -63,11 +63,11 @@ struct SpeakRequest {
   /** Whether to use phonemes. */
   pub use_phonemes: bool,
 
-  /** Whether to use diphones. */
-  pub use_diphones: bool,
-
   /** Whether to use n-phones. */
   pub use_n_phones: bool,
+
+  /** Whether to use syllable boundaries. */
+  pub use_syllables: bool,
 
   /** Whether to use words. */
   pub use_words: bool,
@@ -147,8 +147,8 @@ impl SpeakRequest {
     });
 
     let use_phonemes = get_bool(params, USE_PHONEMES_PARAM).unwrap_or(true);
-    let use_diphones = get_bool(params, USE_DIPHONES_PARAM).unwrap_or(true);
     let use_n_phones = get_bool(params, USE_N_PHONES_PARAM).unwrap_or(true);
+    let use_syllables = get_bool(params, USE_SYLLABLES_PARAM).unwrap_or(true);
     let use_words = get_bool(params, USE_WORDS_PARAM).unwrap_or(true);
     let use_ends = get_bool(params, USE_ENDS_PARAM).unwrap_or(true);
 
@@ -164,8 +164,8 @@ impl SpeakRequest {
       volume: volume,
       speed: speed,
       use_phonemes: use_phonemes,
-      use_diphones: use_diphones,
       use_n_phones: use_n_phones,
+      use_syllables: use_syllables,
       use_words: use_words,
       use_ends: use_ends,
       monophone_padding_start: mps,
@@ -247,8 +247,8 @@ impl AudioSynthHandler {
     let params = SynthesisParams {
       use_words: request.use_words,
       use_phonemes: request.use_phonemes,
-      use_diphones: request.use_diphones,
       use_n_phones: request.use_n_phones,
+      use_syllables: request.use_syllables,
       use_ends: request.use_ends,
       volume: request.volume,
       speed: request.speed,
@@ -283,9 +283,10 @@ impl AudioSynthHandler {
 
     let mut use_byte = 0u8;
     if request.use_phonemes { use_byte |= 1 << 1; }
-    if request.use_diphones { use_byte |= 1 << 2; }
-    if request.use_words { use_byte |= 1 << 3; }
-    if request.use_ends { use_byte |= 1 << 4; }
+    if request.use_n_phones { use_byte |= 1 << 2; }
+    if request.use_syllables { use_byte |= 1 << 3; }
+    if request.use_words { use_byte |= 1 << 4; }
+    if request.use_ends { use_byte |= 1 << 5; }
 
     hasher.input(&[use_byte]);
 

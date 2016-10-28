@@ -22,8 +22,8 @@ pub type WavBytes = Vec<u8>;
 pub struct SynthesisParams {
   pub use_words: bool,
   pub use_phonemes: bool,
-  pub use_diphones: bool,
   pub use_n_phones: bool,
+  pub use_syllables: bool,
   pub use_ends: bool,
   pub volume: Option<f32>,
   pub speed: Option<f32>,
@@ -167,7 +167,7 @@ impl Synthesizer {
       self.concatenate_polyphone(concatenated_waveform,
         speaker,
         word,
-        params.use_diphones,
+        params.use_syllables,
         params.monophone_padding_start,
         params.monophone_padding_end,
         params.polyphone_padding_end);
@@ -213,7 +213,7 @@ impl Synthesizer {
                            concatenated_waveform: &mut Vec<i16>,
                            speaker: &Speaker,
                            word: &str,
-                           use_diphones: bool,
+                           _use_syllables: bool,
                            monophone_padding_start: Option<u16>,
                            monophone_padding_end: Option<u16>,
                            polyphone_padding_end: Option<u16>) -> bool {
@@ -255,22 +255,6 @@ impl Synthesizer {
       }
 
       let phoneme = &polyphone[i];
-
-      // Attempt to read a diphone.
-      if use_diphones && i < end {
-        let first = phoneme;
-        let second = &polyphone[i+1];
-        match self.audiobank.get_diphone(speaker.as_str(), first, second) {
-          None => {},
-          Some(diphone_data) => {
-            info!(target: "synthesis",
-                  "Read diphone: {}, {}", first, second);
-            skip_next = true;
-            concatenated_waveform.extend(diphone_data);
-            continue;
-          },
-        }
-      }
 
       // Attempt to read a "begin" or "end" monophone.
       let mut read_results = if i == 0 {
