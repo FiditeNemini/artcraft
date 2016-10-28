@@ -175,6 +175,39 @@ impl SpeakRequest {
       word_padding_end: wpe,
     })
   }
+
+  /// Generate a SHA checksum of the request.
+  /// This can be used as a caching header for the client.
+  fn sha_digest(&self) -> String {
+    let mut hasher = Sha1::new();
+
+    hasher.input_str(&self.speaker.to_string());
+    hasher.input_str(&self.sentence);
+
+    if self.volume.is_some() {
+      let vol = self.volume.unwrap();
+
+      // This isn't perfect hashing for floats, but is mostly
+      // what I want.
+      let hashed = (vol * 1000.0) as i16;
+      let hi = (hashed >> 8 & 0xff) as u8;
+      let lo = (hashed & 0xff) as u8;
+      hasher.input(&[hi, lo]);
+    } else {
+      hasher.input(&[0u8]);
+    }
+
+    let mut use_byte = 0u8;
+    if self.use_phonemes { use_byte |= 1 << 1; }
+    if self.use_n_phones { use_byte |= 1 << 2; }
+    if self.use_syllables { use_byte |= 1 << 3; }
+    if self.use_words { use_byte |= 1 << 4; }
+    if self.use_ends { use_byte |= 1 << 5; }
+
+    hasher.input(&[use_byte]);
+
+    hasher.result_str()
+  }
 }
 
 impl Handler for AudioSynthHandler {
@@ -199,7 +232,7 @@ impl Handler for AudioSynthHandler {
     };
 
     // FIXME: Varies with spaces, formatting, etc.
-    let hash = self.sha_digest(&request);
+    let hash = request.sha_digest();
     let entity_tag = EntityTag::new(true, hash.to_owned());
 
     info!(target: "handler", "Request Header Caching Sha: {}", hash);
@@ -262,36 +295,6 @@ impl AudioSynthHandler {
     synth.generate(&request.sentence, &request.speaker, params)
   }
 
-  fn sha_digest(&self, request: &SpeakRequest) -> String {
-    let mut hasher = Sha1::new();
-
-    hasher.input_str(&request.speaker.to_string());
-    hasher.input_str(&request.sentence);
-
-    if request.volume.is_some() {
-      let vol = request.volume.unwrap();
-
-      // This isn't perfect hashing for floats, but is mostly
-      // what I want.
-      let hashed = (vol * 1000.0) as i16;
-      let hi = (hashed >> 8 & 0xff) as u8;
-      let lo = (hashed & 0xff) as u8;
-      hasher.input(&[hi, lo]);
-    } else {
-      hasher.input(&[0u8]);
-    }
-
-    let mut use_byte = 0u8;
-    if request.use_phonemes { use_byte |= 1 << 1; }
-    if request.use_n_phones { use_byte |= 1 << 2; }
-    if request.use_syllables { use_byte |= 1 << 3; }
-    if request.use_words { use_byte |= 1 << 4; }
-    if request.use_ends { use_byte |= 1 << 5; }
-
-    hasher.input(&[use_byte]);
-
-    hasher.result_str().to_string()
-  }
 }
 
 fn get_str<'a>(params: &'a QueryParams, param_name: &str)
@@ -327,5 +330,88 @@ impl From<SynthError> for IronError {
     let mime = "text/plain".parse::<Mime>().unwrap();
     let response = (mime, status::InternalServerError, "Service Error");
     IronError::new(error, response)
+  }
+}
+
+#[cfg(test)]
+mod tests {
+  use speaker::Speaker;
+  use super::SpeakRequest;
+
+  #[test]
+  fn test_request_hash() {
+    let request_1 = SpeakRequest {
+      sentence: "same sentence".to_string(),
+      speaker: Speaker::new("speaker".to_string()),
+      volume: Some(2.0),
+      speed: Some(1.5),
+      use_phonemes: true,
+      use_n_phones: false,
+      use_syllables: true,
+      use_words: false,
+      use_ends: false,
+      monophone_padding_start: Some(300),
+      monophone_padding_end: None,
+      polyphone_padding_end: None,
+      word_padding_start: None,
+      word_padding_end: None,
+    };
+
+    let request_2 = SpeakRequest {
+      sentence: "same sentence".to_string(),
+      speaker: Speaker::new("speaker".to_string()),
+      volume: Some(2.0),
+      speed: Some(1.5),
+      use_phonemes: true,
+      use_n_phones: false,
+      use_syllables: true,
+      use_words: false,
+      use_ends: false,
+      monophone_padding_start: Some(300),
+      monophone_padding_end: None,
+      polyphone_padding_end: None,
+      word_padding_start: None,
+      word_padding_end: None,
+    };
+
+    assert!(request_1.sha_digest() == request_2.sha_digest());
+
+    let request_2 = SpeakRequest {
+      sentence: "same sentence".to_string(),
+      speaker: Speaker::new("speaker".to_string()),
+      volume: None,
+      speed: Some(1.5),
+      use_phonemes: false,
+      use_n_phones: true,
+      use_syllables: false,
+      use_words: true,
+      use_ends: false,
+      monophone_padding_start: Some(300),
+      monophone_padding_end: None,
+      polyphone_padding_end: None,
+      word_padding_start: None,
+      word_padding_end: Some(400),
+    };
+
+    assert!(request_1.sha_digest() != request_2.sha_digest());
+
+    let request_2 = SpeakRequest {
+      sentence: "different sentence".to_string(),
+      speaker: Speaker::new("speaker".to_string()),
+      volume: Some(2.0),
+      speed: Some(1.5),
+      use_phonemes: true,
+      use_n_phones: false,
+      use_syllables: true,
+      use_words: false,
+      use_ends: false,
+      monophone_padding_start: Some(300),
+      monophone_padding_end: None,
+      polyphone_padding_end: None,
+      word_padding_start: None,
+      word_padding_end: None,
+    };
+
+    assert!(request_1.sha_digest() != request_2.sha_digest());
   }
 }
