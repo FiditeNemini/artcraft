@@ -74,9 +74,9 @@ fn main() {
 
   get_hostname();
 
-  let synthesizer = create_synthesizer(&config);
+  let (parser, synthesizer) = create_parser_and_synthesizer(&config);
 
-  start_server(&config, port, synthesizer);
+  start_server(&config, port, parser, synthesizer);
 }
 
 fn get_port(matches: &ArgMatches, default_port: u16) -> u16 {
@@ -91,7 +91,10 @@ fn get_port(matches: &ArgMatches, default_port: u16) -> u16 {
   }
 }
 
-fn start_server(config: &Config, port: u16, synthesizer: Synthesizer) {
+fn start_server(config: &Config,
+                port: u16,
+                parser: Parser,
+                synthesizer: Synthesizer) {
   let audio_path = &config.sound_path.clone().unwrap();
   let file_path = "./web";
 
@@ -99,7 +102,12 @@ fn start_server(config: &Config, port: u16, synthesizer: Synthesizer) {
 
   // TODO: Cross-cutting filter installation
   let main_router = {
-    let synth_handler = AudioSynthHandler::new(async_synth.clone(), config.clone());
+    let synth_handler = AudioSynthHandler::new(
+      parser,
+      async_synth.clone(),
+      config.clone()
+    );
+
     let mut chain = Chain::new(synth_handler);
     chain.link_after(ErrorFilter);
 
@@ -137,7 +145,7 @@ fn get_hostname() {
   };
 }
 
-fn create_synthesizer(config: &Config) -> Synthesizer {
+fn create_parser_and_synthesizer(config: &Config) -> (Parser, Synthesizer) {
   info!("Reading Arpabet Dictionary...");
   let arpabet_dictionary = Arpabet::load_from_file(
       &config.phoneme_dictionary_file.clone().unwrap()).unwrap();
@@ -168,6 +176,8 @@ fn create_synthesizer(config: &Config) -> Synthesizer {
 
   info!("Building Synthesizer...");
   let audiobank = Audiobank::new(&config.sound_path.clone().unwrap());
-  Synthesizer::new(arpabet, audiobank, parser)
+  let synthesizer = Synthesizer::new(arpabet, audiobank);
+
+  (parser, synthesizer)
 }
 

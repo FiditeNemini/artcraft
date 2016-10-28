@@ -15,6 +15,7 @@ use iron::prelude::IronResult;
 use iron::prelude::Request;
 use iron::prelude::Response;
 use iron::status;
+use lang::parser::Parser;
 use speaker::Speaker;
 use std::collections::HashMap;
 use std::i16;
@@ -100,6 +101,9 @@ enum SpeakerRequestError {
 
 /// Synthesizes audio from input.
 pub struct AudioSynthHandler {
+  /// Sentence parser.
+  parser: Parser,
+
   /// The TTS synthesizer.
   synthesizer: Arc<RwLock<Synthesizer>>,
 
@@ -260,9 +264,11 @@ impl Handler for AudioSynthHandler {
 }
 
 impl AudioSynthHandler {
-  pub fn new(synthesizer: Arc<RwLock<Synthesizer>>,
+  pub fn new(parser: Parser,
+             synthesizer: Arc<RwLock<Synthesizer>>,
              config: Config) -> AudioSynthHandler {
     AudioSynthHandler {
+      parser: parser,
       synthesizer: synthesizer,
       config: config,
     }
@@ -290,7 +296,8 @@ impl AudioSynthHandler {
       word_padding_end: request.word_padding_end,
     };
 
-    synth.generate(&request.sentence, &request.speaker, params)
+    let tokens = self.parser.parse(&request.sentence);
+    synth.generate(tokens, &request.speaker, params)
   }
 }
 

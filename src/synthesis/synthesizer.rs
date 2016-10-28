@@ -7,7 +7,6 @@ use error::SynthError;
 use hound::WavSpec;
 use hound::WavWriter;
 use lang::arpabet::Arpabet;
-use lang::parser::Parser;
 use speaker::Speaker;
 use std::io::BufWriter;
 use std::io::Cursor;
@@ -43,20 +42,14 @@ pub struct Synthesizer {
 
   /// WAV Audiobank for sound generation.
   audiobank: Audiobank,
-
-  /// Sentence parser
-  parser: Parser,
 }
 
 impl Synthesizer {
   /// CTOR
-  pub fn new(arpabet_dictionary: Arpabet,
-             audiobank: Audiobank,
-             parser: Parser) -> Synthesizer {
+  pub fn new(arpabet_dictionary: Arpabet, audiobank: Audiobank) -> Synthesizer {
     Synthesizer {
       arpabet_dictionary: arpabet_dictionary,
       audiobank: audiobank,
-      parser: parser,
     }
   }
 
@@ -64,12 +57,10 @@ impl Synthesizer {
    * Generate a spoken wav from text input.
    */
   pub fn generate(&self,
-                  sentence: &str,
+                  tokens: Vec<SynthToken>,
                   speaker: &Speaker,
                   params: SynthesisParams)
                   -> Result<WavBytes, SynthError> {
-
-    let tokens = self.parser.parse(sentence);
 
     if tokens.len() == 0 {
       return Err(SynthError::BadInput {
