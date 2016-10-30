@@ -3,7 +3,6 @@
 use config::Config;
 use crypto::digest::Digest;
 use crypto::sha1::Sha1;
-use error::SynthError;
 use iron::Handler;
 use iron::IronError;
 use iron::Plugin;
@@ -23,6 +22,7 @@ use std::str::FromStr;
 use std::sync::Arc;
 use std::sync::RwLock;
 use super::error_filter::build_error;
+use synthesis::error::SynthesisError;
 use synthesis::synthesizer::SynthesisParams;
 use synthesis::synthesizer::Synthesizer;
 use time::PreciseTime;
@@ -31,14 +31,14 @@ use urlencoded::UrlEncodedQuery;
 const SENTENCE_PARAM : &'static str = "s";
 const SPEAKER_PARAM : &'static str = "v";
 const SPEED_PARAM : &'static str = "spd";
-const USE_PHONEMES_PARAM: &'static str = "up";
+const USE_MONOPHONES_PARAM: &'static str = "um";
 const USE_SYLLABLES_PARAM: &'static str = "us";
 const USE_N_PHONES_PARAM: &'static str = "un";
 const USE_WORDS_PARAM: &'static str = "uw";
 const USE_ENDS_PARAM: &'static str = "ue";
 const VOLUME_PARAM : &'static str = "vol";
-const MONOPHONE_PADDING_START_PARAM : &'static str = "mps";
-const MONOPHONE_PADDING_END_PARAM : &'static str = "mpe";
+const PADDING_BETWEEN_PHONES_PARAM: &'static str = "pbp";
+const POLYPHONE_PADDING_START_PARAM : &'static str = "pps";
 const POLYPHONE_PADDING_END_PARAM : &'static str = "ppe";
 const WORD_PADDING_START_PARAM : &'static str = "wps";
 const WORD_PADDING_END_PARAM : &'static str = "wpe";
@@ -60,26 +60,26 @@ struct SpeakRequest {
   /** An optional speed multiplier. */
   pub speed: Option<f32>,
 
-  /** Whether to use phonemes. */
-  pub use_phonemes: bool,
+  /** Whether to use words. */
+  pub use_words: bool,
 
   /** Whether to use n-phones. */
   pub use_n_phones: bool,
 
+  /** Whether to use bare monophones. */
+  pub use_bare_monophones: bool,
+
   /** Whether to use syllable boundaries. */
   pub use_syllables: bool,
-
-  /** Whether to use words. */
-  pub use_words: bool,
 
   /** Whether to use "ends": start, end, etc. */
   pub use_ends: bool,
 
-  /** Padding before a monophone. */
-  pub monophone_padding_start: Option<u16>,
+  /** Padding between monophones or n-phone clusters. */
+  pub padding_between_phones: Option<u16>,
 
-  /** Padding after a monophone. */
-  pub monophone_padding_end: Option<u16>,
+  /** Padding before a polyphone. */
+  pub polyphone_padding_start: Option<u16>,
 
   /** Padding after a polyphone. */
   pub polyphone_padding_end: Option<u16>,
@@ -148,14 +148,14 @@ impl SpeakRequest {
       }
     });
 
-    let use_phonemes = get_bool(params, USE_PHONEMES_PARAM).unwrap_or(true);
+    let use_monophones = get_bool(params, USE_MONOPHONES_PARAM).unwrap_or(true);
     let use_n_phones = get_bool(params, USE_N_PHONES_PARAM).unwrap_or(true);
     let use_syllables = get_bool(params, USE_SYLLABLES_PARAM).unwrap_or(true);
     let use_words = get_bool(params, USE_WORDS_PARAM).unwrap_or(true);
     let use_ends = get_bool(params, USE_ENDS_PARAM).unwrap_or(true);
 
-    let mps = get_u16(params, MONOPHONE_PADDING_START_PARAM);
-    let mpe = get_u16(params, MONOPHONE_PADDING_END_PARAM);
+    let pbp = get_u16(params, PADDING_BETWEEN_PHONES_PARAM).or(None);
+    let pps = get_u16(params, POLYPHONE_PADDING_START_PARAM).or(Some(600));
     let ppe = get_u16(params, POLYPHONE_PADDING_END_PARAM).or(Some(600));
     let wps = get_u16(params, WORD_PADDING_START_PARAM).or(Some(600));
     let wpe = get_u16(params, WORD_PADDING_END_PARAM).or(Some(600));
@@ -165,13 +165,13 @@ impl SpeakRequest {
       speaker: spk,
       volume: volume,
       speed: speed,
-      use_phonemes: use_phonemes,
+      use_bare_monophones: use_monophones,
       use_n_phones: use_n_phones,
       use_syllables: use_syllables,
       use_words: use_words,
       use_ends: use_ends,
-      monophone_padding_start: mps,
-      monophone_padding_end: mpe,
+      padding_between_phones: pbp,
+      polyphone_padding_start: pps,
       polyphone_padding_end: ppe,
       word_padding_start: wps,
       word_padding_end: wpe,
@@ -200,7 +200,7 @@ impl SpeakRequest {
     }
 
     let mut use_byte = 0u8;
-    if self.use_phonemes { use_byte |= 1 << 1; }
+    if self.use_bare_monophones { use_byte |= 1 << 1; }
     if self.use_n_phones { use_byte |= 1 << 2; }
     if self.use_syllables { use_byte |= 1 << 3; }
     if self.use_words { use_byte |= 1 << 4; }
@@ -275,22 +275,23 @@ impl AudioSynthHandler {
   }
 
   /// Create audio from the sentence.
-  fn create_audio(&self, request: SpeakRequest) -> Result<Vec<u8>, SynthError> {
+  fn create_audio(&self, request: SpeakRequest)
+                  -> Result<Vec<u8>, SynthesisError> {
     let synth = match self.synthesizer.read() {
-      Err(_) => { return Err(SynthError::LockError); },
+      Err(_) => { return Err(SynthesisError::LockError); },
       Ok(synth) => synth,
     };
 
     let params = SynthesisParams {
       use_words: request.use_words,
-      use_phonemes: request.use_phonemes,
+      use_bare_monophones: request.use_bare_monophones,
       use_n_phones: request.use_n_phones,
       use_syllables: request.use_syllables,
       use_ends: request.use_ends,
       volume: request.volume,
       speed: request.speed,
-      monophone_padding_start: request.monophone_padding_start,
-      monophone_padding_end: request.monophone_padding_end,
+      padding_between_phones: request.padding_between_phones,
+      polyphone_padding_start: request.polyphone_padding_start,
       polyphone_padding_end: request.polyphone_padding_end,
       word_padding_start: request.word_padding_start,
       word_padding_end: request.word_padding_end,
@@ -329,8 +330,8 @@ fn get_f32(params: &QueryParams, param_name: &str) -> Option<f32> {
       .and_then(|res| res.ok())
 }
 
-impl From<SynthError> for IronError {
-  fn from(error: SynthError) -> IronError {
+impl From<SynthesisError> for IronError {
+  fn from(error: SynthesisError) -> IronError {
     let mime = "text/plain".parse::<Mime>().unwrap();
     let response = (mime, status::InternalServerError, "Service Error");
     IronError::new(error, response)
@@ -349,13 +350,13 @@ mod tests {
       speaker: Speaker::new("speaker".to_string()),
       volume: Some(2.0),
       speed: Some(1.5),
-      use_phonemes: true,
+      use_bare_monophones: true,
       use_n_phones: false,
       use_syllables: true,
       use_words: false,
       use_ends: false,
-      monophone_padding_start: Some(300),
-      monophone_padding_end: None,
+      padding_between_phones: Some(300),
+      polyphone_padding_start: None,
       polyphone_padding_end: None,
       word_padding_start: None,
       word_padding_end: None,
@@ -366,13 +367,13 @@ mod tests {
       speaker: Speaker::new("speaker".to_string()),
       volume: Some(2.0),
       speed: Some(1.5),
-      use_phonemes: true,
+      use_bare_monophones: true,
       use_n_phones: false,
       use_syllables: true,
       use_words: false,
       use_ends: false,
-      monophone_padding_start: Some(300),
-      monophone_padding_end: None,
+      padding_between_phones: Some(300),
+      polyphone_padding_start: None,
       polyphone_padding_end: None,
       word_padding_start: None,
       word_padding_end: None,
@@ -385,13 +386,13 @@ mod tests {
       speaker: Speaker::new("speaker".to_string()),
       volume: None,
       speed: Some(1.5),
-      use_phonemes: false,
+      use_bare_monophones: false,
       use_n_phones: true,
       use_syllables: false,
       use_words: true,
       use_ends: false,
-      monophone_padding_start: Some(300),
-      monophone_padding_end: None,
+      padding_between_phones: Some(300),
+      polyphone_padding_start: None,
       polyphone_padding_end: None,
       word_padding_start: None,
       word_padding_end: Some(400),
@@ -404,13 +405,13 @@ mod tests {
       speaker: Speaker::new("speaker".to_string()),
       volume: Some(2.0),
       speed: Some(1.5),
-      use_phonemes: true,
+      use_bare_monophones: true,
       use_n_phones: false,
       use_syllables: true,
       use_words: false,
       use_ends: false,
-      monophone_padding_start: Some(300),
-      monophone_padding_end: None,
+      padding_between_phones: Some(300),
+      polyphone_padding_start: None,
       polyphone_padding_end: None,
       word_padding_start: None,
       word_padding_end: None,

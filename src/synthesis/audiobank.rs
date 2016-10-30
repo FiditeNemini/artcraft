@@ -1,12 +1,12 @@
 // Copyright (c) 2016 Brandon Thomas <bt@brand.io, echelon@gmail.com>
 
-use error::SynthError;
 use hound::WavReader;
 use hound::WavSpec;
+use speaker::Speaker;
 use std::path::Path;
 use std::path::PathBuf;
-
-pub type SampleBytes = Vec<i16>;
+use synthesis::audio::SampleBytes;
+use synthesis::error::SynthesisError;
 
 /**
  * Fetch wav audio files from the audio bank.
@@ -42,6 +42,7 @@ pub type SampleBytes = Vec<i16>;
  * TODO: Caching of wav files in memory.
  * TODO: Path generation is _insecure_.
  */
+#[derive(Clone)]
 pub struct Audiobank {
   /// Root path to the files.
   audio_path: PathBuf,
@@ -70,12 +71,12 @@ impl Audiobank {
   /**
    * Get the wav data for the (speaker,word), or None if it does not exist.
    */
-  pub fn get_word(&self, speaker: &str, word: &str) -> Option<SampleBytes> {
-    if check_path(speaker).is_err() || check_path(word).is_err() {
+  pub fn get_word(&self, speaker: &Speaker, word: &str) -> Option<SampleBytes> {
+    if check_path(speaker.as_str()).is_err() || check_path(word).is_err() {
       return None;
     }
 
-    let path = self.audio_path.join(format!("{}/", speaker))
+    let path = self.audio_path.join(format!("{}/", speaker.as_str()))
         .join("words/")
         .join(format!("{}.wav", word));
 
@@ -292,7 +293,7 @@ impl Audiobank {
 
   // TODO: This should be removed. We should cache the wav headers.
   pub fn get_spec(&self, speaker: &str, word: &str)
-      -> Result<WavSpec, SynthError> {
+      -> Result<WavSpec, SynthesisError> {
     try!(check_path(speaker));
     try!(check_path(word));
 
@@ -305,7 +306,7 @@ impl Audiobank {
   }
 
   // TODO: This should be removed. We should cache the wav headers.
-  pub fn get_misc_spec(&self, name: &str) -> Result<WavSpec, SynthError> {
+  pub fn get_misc_spec(&self, name: &str) -> Result<WavSpec, SynthesisError> {
     try!(check_path(name));
 
     let path = self.audio_path.join("misc/")
@@ -333,14 +334,14 @@ impl Audiobank {
   }
 }
 
-fn check_path(path: &str) -> Result<(), SynthError> {
+fn check_path(path: &str) -> Result<(), SynthesisError> {
   // FIXME: Hack so I can release soon. Rewrite this whole logic plz.
   if path.contains("..") ||
       path.contains("/") ||
       path.contains("$") ||
       path.contains("~")
   {
-    Err(SynthError::BadInput { description: "invalid path" })
+    Err(SynthesisError::BadInput { description: "invalid path" })
   } else {
     Ok(())
   }

@@ -18,7 +18,6 @@ extern crate time;
 extern crate toml;
 extern crate urlencoded;
 
-pub mod audiobank;
 pub mod config;
 pub mod error;
 pub mod handlers;
@@ -28,7 +27,6 @@ pub mod old_dictionary;
 pub mod speaker;
 pub mod synthesis;
 
-use audiobank::Audiobank;
 use clap::{App, Arg, ArgMatches};
 use config::Config;
 use handlers::audio_synth_handler::AudioSynthHandler;
@@ -50,6 +48,7 @@ use staticfile::Static;
 use std::path::Path;
 use std::sync::Arc;
 use std::sync::RwLock;
+use synthesis::audiobank::Audiobank;
 use synthesis::synthesizer::Synthesizer;
 
 fn main() {

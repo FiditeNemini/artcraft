@@ -41,7 +41,6 @@ impl Error for SynthError {
   }*/
 }
 
-
 impl From<io::Error> for SynthError {
   fn from(error: io::Error) -> SynthError {
     SynthError::IoError { cause: error }

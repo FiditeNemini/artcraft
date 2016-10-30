@@ -16,11 +16,8 @@
     /** JSON key for the `speed` param. */
     _SPEED_KEY: 'spd',
 
-    /** JSON key for the `use_phonemes` param. */
-    _USE_PHONEMES_KEY: 'up',
-
-    /** JSON key for the `use_diphones` param. */
-    _USE_DIPHONES_KEY: 'ud',
+    /** JSON key for the `use_monophones` param. */
+    _USE_MONOPHONES_KEY: 'um',
 
     /** JSON key for the `use_n_phones` param. */
     _USE_N_PHONES_KEY: 'un',
@@ -31,8 +28,8 @@
     /** JSON key for the `use_ends` param. */
     _USE_ENDS_KEY: 'ue',
 
-    _MONOPHONE_PADDING_START_KEY: 'mps',
-    _MONOPHONE_PADDING_END_KEY: 'mpe',
+    _PADDING_BETWEEN_PHONES: 'pbp',
+    _POLYPHONE_PADDING_START_KEY: 'pps',
     _POLYPHONE_PADDING_END_KEY: 'ppe',
     _WORD_PADDING_START_KEY: 'wps',
     _WORD_PADDING_END_KEY: 'wpe',
@@ -79,23 +76,13 @@
       }
     },
 
-    /** Get the "use phonemes" from the `window.location`. */
-    getUsePhonemes: function() {
+    /** Get the "use monophones" from the `window.location`. */
+    getUseMonophones: function() {
       var state = this.parseState(window.location);
-      if (!state || !(this._USE_PHONEMES_KEY in state)) {
+      if (!state || !(this._USE_MONOPHONES_KEY in state)) {
         return null;
       } else {
-        return state[this._USE_PHONEMES_KEY];
-      }
-    },
-
-    /** Get the "use diphones" from the `window.location`. */
-    getUseDiphones: function() {
-      var state = this.parseState(window.location);
-      if (!state || !(this._USE_DIPHONES_KEY in state)) {
-        return null;
-      } else {
-        return state[this._USE_DIPHONES_KEY];
+        return state[this._USE_MONOPHONES_KEY];
       }
     },
 
@@ -129,23 +116,23 @@
       }
     },
 
-    /** Get the MPS value from the `window.location`. */
-    getMonophonePaddingStart: function() {
+    /** Get the PBP value from the `window.location`. */
+    getPaddingBetweenPhones: function() {
       var state = this.parseState(window.location);
-      if (!state || !(this._MONOPHONE_PADDING_START_KEY in state)) {
+      if (!state || !(this._PADDING_BETWEEN_PHONES in state)) {
         return null;
       } else {
-        return state[this._MONOPHONE_PADDING_START_KEY];
+        return state[this._PADDING_BETWEEN_PHONES];
       }
     },
 
-    /** Get the MPE value from the `window.location`. */
-    getMonophonePaddingEnd: function() {
+    /** Get the PPS value from the `window.location`. */
+    getPolyphonePaddingStart: function() {
       var state = this.parseState(window.location);
-      if (!state || !(this._MONOPHONE_PADDING_END_KEY in state)) {
+      if (!state || !(this._POLYPHONE_PADDING_START_KEY in state)) {
         return null;
       } else {
-        return state[this._MONOPHONE_PADDING_END_KEY];
+        return state[this._POLYPHONE_PADDING_START_KEY];
       }
     },
 
@@ -184,13 +171,12 @@
                        rawSentence,
                        volume,
                        speed,
-                       usePhonemes,
-                       useDiphones,
+                       useMonophones,
                        useNPhones,
                        useWords,
                        useEnds,
-                       monophonePaddingStart,
-                       monophonePaddingEnd,
+                       paddingBetweenPhones,
+                       polyphonePaddingStart,
                        polyphonePaddingEnd,
                        wordPaddingStart,
                        wordPaddingEnd) {
@@ -199,13 +185,12 @@
                                     rawSentence,
                                     volume,
                                     speed,
-                                    usePhonemes,
-                                    useDiphones,
+                                    useMonophones,
                                     useNPhones,
                                     useWords,
                                     useEnds,
-                                    monophonePaddingStart,
-                                    monophonePaddingEnd,
+                                    paddingBetweenPhones,
+                                    polyphonePaddingStart,
                                     polyphonePaddingEnd,
                                     wordPaddingStart,
                                     wordPaddingEnd);
@@ -219,13 +204,12 @@
                          rawSentence,
                          volume,
                          speed,
-                         usePhonemes,
-                         useDiphones,
+                         useMonophones,
                          useNPhones,
                          useWords,
                          useEnds,
-                         monophonePaddingStart,
-                         monophonePaddingEnd,
+                         paddingBetweenPhones,
+                         polyphonePaddingStart,
                          polyphonePaddingEnd,
                          wordPaddingStart,
                          wordPaddingEnd) {
@@ -234,20 +218,19 @@
           cleanedSpeaker = speaker, // TODO: Check against speakers.
           cleanedVolume = volume, // TODO: Filter invalid values.
           state = {},
-          json = null,
+          json,
           uriEncoded = null;
 
       state[this._SPEAKER_KEY] = cleanedSpeaker;
       state[this._SENTENCE_KEY] = cleanedSentence;
       state[this._VOLUME_KEY] = cleanedVolume;
       state[this._SPEED_KEY] = speed; // TODO: Filter invalid values.
-      state[this._USE_PHONEMES_KEY] = !!usePhonemes;
-      state[this._USE_DIPHONES_KEY] = !!useDiphones;
+      state[this._USE_MONOPHONES_KEY] = !!useMonophones;
       state[this._USE_N_PHONES_KEY] = !!useNPhones;
       state[this._USE_WORDS_KEY] = !!useWords;
       state[this._USE_ENDS_KEY] = !!useEnds;
-      state[this._MONOPHONE_PADDING_START_KEY] = monophonePaddingStart;
-      state[this._MONOPHONE_PADDING_END_KEY] = monophonePaddingEnd;
+      state[this._PADDING_BETWEEN_PHONES] = paddingBetweenPhones;
+      state[this._POLYPHONE_PADDING_START_KEY] = polyphonePaddingStart;
       state[this._POLYPHONE_PADDING_END_KEY] = polyphonePaddingEnd;
       state[this._WORD_PADDING_START_KEY] = wordPaddingStart;
       state[this._WORD_PADDING_END_KEY] = wordPaddingEnd;

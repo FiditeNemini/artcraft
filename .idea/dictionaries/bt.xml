@@ -2,7 +2,9 @@
   <dictionary name="bt">
     <words>
       <w>arpabet</w>
+      <w>monophones</w>
       <w>polyphone</w>
+      <w>polyphones</w>
     </words>
   </dictionary>
 </component>

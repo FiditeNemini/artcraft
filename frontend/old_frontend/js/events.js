@@ -50,18 +50,16 @@
 
     /** Handle form submission. */
     handleFormSubmit: function(ev) {
-      var $audio = $('#sound'),
-          sentence = $('#text').val(),
+      var sentence = $('#text').val(),
           speaker = $('select').val(),
           volume = $('input#vol').val(),
           speed = $('input#speed').val(),
-          up = $('#use_phonemes').prop('checked'),
-          ud = $('#use_diphones').prop('checked'),
+          um = $('#use_monophones').prop('checked'),
           un = $('#use_n_phones').prop('checked'),
           uw = $('#use_words').prop('checked'),
           ue = $('#use_ends').prop('checked'),
-          mps = $('input#monophone_padding_start').val(),
-          mpe = $('input#monophone_padding_end').val(),
+          pbp = $('input#padding_between_phones').val(),
+          pps = $('input#polyphone_padding_start').val(),
           ppe = $('input#polyphone_padding_end').val(),
           wps = $('input#word_padding_start').val(),
           wpe = $('input#word_padding_end').val(),
@@ -70,13 +68,12 @@
               + '&s=' + query
               + '&vol=' + volume
               + '&spd=' + speed
-              + '&mps=' + mps
-              + '&mpe=' + mpe
+              + '&pbp=' + pbp
+              + '&pps=' + pps
               + '&ppe=' + ppe
               + '&wps=' + wps
               + '&wpe=' + wpe
-              + '&up=' + up
-              + '&ud=' + ud
+              + '&um=' + um
               + '&un=' + un
               + '&uw=' + uw
               + '&ue=' + ue;
@@ -87,13 +84,12 @@
                    sentence,
                    volume,
                    speed,
-                   up,
-                   ud,
+                   um,
                    un,
                    uw,
                    ue,
-                   mps,
-                   mpe,
+                   pbp,
+                   pps,
                    ppe,
                    wps,
                    wpe);
