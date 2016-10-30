@@ -14,6 +14,13 @@ export function get_audio_api_url(sentence: FilteredSentence) : string {
 }
 
 /**
+ * Reset the URL.
+ */
+export function clear_url_hash() {
+  window.history.replaceState(null, null, '/');
+}
+
+/**
  * Sentence -> Persistent URL hash
  */
 export function set_url_hash(sentence: FilteredSentence) {

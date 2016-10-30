@@ -8,7 +8,7 @@ declare var $: any;
 
 import { setup_animation } from "./animation";
 import Audio from "./audio";
-import { decode_url_hash, get_audio_api_url, set_url_hash } from "./url";
+import { clear_url_hash, decode_url_hash, get_audio_api_url, set_url_hash } from "./url";
 import { RawSentence, FilteredSentence } from "./sentence";
 
 const INPUT = 'input#jungle';
@@ -75,6 +75,7 @@ function install_events() {
   $('button#clear').on('click', function(ev: any): any {
     $(INPUT).val(''); // ESC key.
     (<any>window).audio.stop();
+    clear_url_hash();
     ev.preventDefault();
     return false;
   });
