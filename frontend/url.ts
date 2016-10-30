@@ -2,7 +2,7 @@
 
 import { RawSentence, FilteredSentence } from "./sentence";
 
-declare var URI: any; // TODO: Remove dependency.
+import URI = require('urijs');
 
 /**
  * Sentence -> Audio generation API URL

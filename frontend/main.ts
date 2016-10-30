@@ -2,9 +2,9 @@
 
 /// <reference path='./typings/tsd.d.ts' />
 
-import Vue = require('vue');
+//import Vue = require('vue');
 
-declare var $: any;
+import $ = require('jquery');
 
 import { setup_animation } from "./animation";
 import Audio from "./audio";

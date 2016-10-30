@@ -6,13 +6,16 @@
   "bundle": "typings/tsd.d.ts",
   "installed": {
     "jquery/jquery.d.ts": {
-      "commit": "73110d92bdab2367e326f297bef3574285cba329"
+      "commit": "44be13ae844ec0721109542d5902e41438d72855"
     },
     "vue/vue.d.ts": {
       "commit": "3cc599268d2dabe3c3ee194e92965ee87440e9c3"
     },
     "pixi.js/pixi.js.d.ts": {
       "commit": "3cc599268d2dabe3c3ee194e92965ee87440e9c3"
+    },
+    "urijs/URIjs.d.ts": {
+      "commit": "44be13ae844ec0721109542d5902e41438d72855"
     }
   }
 }

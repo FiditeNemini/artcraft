@@ -1,11 +1,12 @@
 // Copyright (c) 2016 Brandon Thomas <bt@brand.io, echelon@gmail.com>
 
-declare var buzz: any; // TODO: static types.
+/// <reference path='buzz.d.ts' />
+import buzz = require('buzz');
 
 import { talk, stopTalking } from "./animation";
 
 export default class Audio {
-  sound: any;
+  sound: buzz.Sound;
 
   constructor() {
     this.sound = null;
