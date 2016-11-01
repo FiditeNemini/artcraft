@@ -22,6 +22,8 @@ Scaling
   3. Multi-server, with nginx as load balancer
   4. Prevent others from calling it
   5. Caching strategy
+    - Caching headers (make sure they work)
+    - Filter strings clientside to boost savings.
 
 Tokenizing
   - Plurals

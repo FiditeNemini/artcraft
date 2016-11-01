@@ -6,6 +6,7 @@ banjo-tooie
 batshit
 charizard
 crafted
+damnit
 derping
 dipshit
 dorkiness

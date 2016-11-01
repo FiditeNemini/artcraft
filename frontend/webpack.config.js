@@ -1,5 +1,14 @@
 var webpack = require('webpack');
 
+var plugins = [];
+
+var minify = JSON.parse(process.env.MINIFY || '0');
+if (minify) {
+  plugins.push(new webpack.optimize.UglifyJsPlugin({
+    compress: { warnings: false }
+  }));
+}
+
 module.exports = {
   entry: {
     // Frontend code
@@ -23,9 +32,5 @@ module.exports = {
       }
     ]
   },
-  plugins: [
-    new webpack.optimize.UglifyJsPlugin({
-      compress: { warnings: false }
-    })
-  ]
+  plugins: plugins,
 }

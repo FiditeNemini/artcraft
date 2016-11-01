@@ -3,7 +3,7 @@
 /// <reference path='buzz.d.ts' />
 import buzz = require('buzz');
 
-import { talk, stopTalking } from "./animation";
+import { trumpAnimation } from './trump_animation';
 
 export default class Audio {
   sound: buzz.Sound;
@@ -17,12 +17,14 @@ export default class Audio {
     this.sound = new buzz.sound(url);
     this.sound.play();
 
-    this.sound.bind('play playing', function() {
-      talk(); // UI
+    // Possible events: 'play', 'playing'
+    this.sound.bind('playing', function() {
+      trumpAnimation.talkRandom();
     });
 
-    this.sound.bind('error ended pause', function() {
-      stopTalking(); // UI
+    // Possible events: 'error', 'ended', 'pause'
+    this.sound.bind('pause', function() {
+      trumpAnimation.stopTalking();
     });
   }
 

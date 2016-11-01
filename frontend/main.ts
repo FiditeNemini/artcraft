@@ -2,8 +2,6 @@
 
 /// <reference path='./typings/tsd.d.ts' />
 
-//import Vue = require('vue');
-
 import $ = require('jquery');
 
 import { setup_animation } from "./animation";
@@ -13,15 +11,7 @@ import { RawSentence, FilteredSentence } from "./sentence";
 
 const INPUT = 'input#jungle';
 
-/*(<any>window).V = new Vue({
-  el: '#image-box',
-  data: {
-    content: 'foo',
-  },
-});*/
-
 $(function() {
-  console.log('installing...');
   (<any>window).audio = new Audio();
   install_events();
   initialize_from_url();

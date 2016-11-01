@@ -14,7 +14,7 @@ rsync -utrv config.toml bt@jungle.horse:/home/bt/dev/trumpet
 rsync -utrv web/images bt@jungle.horse:/home/bt/dev/trumpet/web
 rsync -utrv web/{*css,*html,*txt} bt@jungle.horse:/home/bt/dev/trumpet/web
 pushd frontend
-webpack
+MINIFY=1 webpack
 popd
 gulp
 rsync -utrv web/output bt@jungle.horse:/home/bt/dev/trumpet/web
