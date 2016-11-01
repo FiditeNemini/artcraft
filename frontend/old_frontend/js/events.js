@@ -56,6 +56,7 @@
           speed = $('input#speed').val(),
           um = $('#use_monophones').prop('checked'),
           un = $('#use_n_phones').prop('checked'),
+          us = $('#use_syllables').prop('checked'),
           uw = $('#use_words').prop('checked'),
           ue = $('#use_ends').prop('checked'),
           pbp = $('input#padding_between_phones').val(),
@@ -75,6 +76,7 @@
               + '&wpe=' + wpe
               + '&um=' + um
               + '&un=' + un
+              + '&us=' + us
               + '&uw=' + uw
               + '&ue=' + ue;
 
@@ -86,6 +88,7 @@
                    speed,
                    um,
                    un,
+                   us,
                    uw,
                    ue,
                    pbp,

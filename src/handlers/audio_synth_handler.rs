@@ -150,7 +150,7 @@ impl SpeakRequest {
 
     let use_monophones = get_bool(params, USE_MONOPHONES_PARAM).unwrap_or(true);
     let use_n_phones = get_bool(params, USE_N_PHONES_PARAM).unwrap_or(true);
-    let use_syllables = get_bool(params, USE_SYLLABLES_PARAM).unwrap_or(true);
+    let use_syllables = get_bool(params, USE_SYLLABLES_PARAM).unwrap_or(false); // default off
     let use_words = get_bool(params, USE_WORDS_PARAM).unwrap_or(true);
     let use_ends = get_bool(params, USE_ENDS_PARAM).unwrap_or(true);
 

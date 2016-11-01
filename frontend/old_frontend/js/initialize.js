@@ -19,6 +19,7 @@
         speed = Url.getSpeed() || 1.0,
         useMonophones = Url.getUseMonophones(),
         useNPhones = Url.getUseNPhones(),
+        useSyllables = Url.getUseSyllables(),
         useWords = Url.getUseWords(),
         useEnds = Url.getUseEnds(),
         pbp = Url.getPaddingBetweenPhones() || 0,
@@ -30,6 +31,7 @@
 
     if (useMonophones === null) useMonophones = true;
     if (useNPhones === null) useNPhones = true;
+    if (useSyllables === null) useSyllables = true;
     if (useWords === null) useWords = true;
     if (useEnds === null) useEnds = true;
 
@@ -48,6 +50,7 @@
 
     $('#use_monophones').prop('checked', useMonophones);
     $('#use_n_phones').prop('checked', useNPhones);
+    $('#use_syllables').prop('checked', useSyllables);
     $('#use_words').prop('checked', useWords);
     $('#use_ends').prop('checked', useEnds);
 

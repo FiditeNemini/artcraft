@@ -143,17 +143,31 @@ impl Synthesizer {
 
     if !added {
       if params.use_n_phones {
-        // TODO: Prefix buffer and suffix buffer.
-        // TODO: Param for monophone padding.
-        added = try!(self.word_synthesizer.append_n_phones(
-          speaker,
-          word,
-          params.use_ends,
-          params.polyphone_padding_start,
-          params.polyphone_padding_end,
-          params.padding_between_phones,
-          concatenated_waveform)
-            .map(|_| true));
+        if params.use_syllables {
+          // TODO: Prefix buffer and suffix buffer.
+          // TODO: Param for monophone padding.
+          added = try!(self.word_synthesizer.append_syllabic_n_phones(
+            speaker,
+            word,
+            params.use_ends,
+            params.polyphone_padding_start,
+            params.polyphone_padding_end,
+            params.padding_between_phones,
+            concatenated_waveform)
+              .map(|_| true));
+        } else {
+          // TODO: Prefix buffer and suffix buffer.
+          // TODO: Param for monophone padding.
+          added = try!(self.word_synthesizer.append_n_phones(
+            speaker,
+            word,
+            params.use_ends,
+            params.polyphone_padding_start,
+            params.polyphone_padding_end,
+            params.padding_between_phones,
+            concatenated_waveform)
+              .map(|_| true));
+        }
       } else if params.use_bare_monophones {
         // TODO: Prefix buffer and suffix buffer.
         // TODO: Param for monophone padding.

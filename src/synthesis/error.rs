@@ -29,6 +29,7 @@ pub enum SynthesisError {
   LockError,
 
   MonophoneDne,
+  SyllableBreakdownFailure,
   WordSampleDne,
 }
 

@@ -22,6 +22,9 @@
     /** JSON key for the `use_n_phones` param. */
     _USE_N_PHONES_KEY: 'un',
 
+    /** JSON key for the `use_syllables` param. */
+    _USE_SYLLABLES_KEY: 'us',
+
     /** JSON key for the `use_words` param. */
     _USE_WORDS_KEY: 'uw',
 
@@ -96,6 +99,16 @@
       }
     },
 
+    /** Get the "use syllables" from the `window.location`. */
+    getUseSyllables: function() {
+      var state = this.parseState(window.location);
+      if (!state || !(this._USE_SYLLABLES_KEY in state)) {
+        return null;
+      } else {
+        return state[this._USE_SYLLABLES_KEY];
+      }
+    },
+
     /** Get the "use words" from the `window.location`. */
     getUseWords: function() {
       var state = this.parseState(window.location);
@@ -164,7 +177,6 @@
       }
     },
 
-
     // TODO: Independent functions to set both speaker and sentence separately.
     /** Set the `window.history` speaker, sentence, phoneme use, and word use. */
     setState: function(speaker,
@@ -173,6 +185,7 @@
                        speed,
                        useMonophones,
                        useNPhones,
+                       useSyllables,
                        useWords,
                        useEnds,
                        paddingBetweenPhones,
@@ -187,6 +200,7 @@
                                     speed,
                                     useMonophones,
                                     useNPhones,
+                                    useSyllables,
                                     useWords,
                                     useEnds,
                                     paddingBetweenPhones,
@@ -206,6 +220,7 @@
                          speed,
                          useMonophones,
                          useNPhones,
+                         useSyllables,
                          useWords,
                          useEnds,
                          paddingBetweenPhones,
@@ -227,6 +242,7 @@
       state[this._SPEED_KEY] = speed; // TODO: Filter invalid values.
       state[this._USE_MONOPHONES_KEY] = !!useMonophones;
       state[this._USE_N_PHONES_KEY] = !!useNPhones;
+      state[this._USE_SYLLABLES_KEY] = !!useSyllables;
       state[this._USE_WORDS_KEY] = !!useWords;
       state[this._USE_ENDS_KEY] = !!useEnds;
       state[this._PADDING_BETWEEN_PHONES] = paddingBetweenPhones;
