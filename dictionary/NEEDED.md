@@ -14,6 +14,10 @@ ganon
 ganondorf
 gorp
 hoodie
+std
+hsv
+hsv-1
+hsv-2
 incongruent
 lel
 lmao
@@ -29,12 +33,14 @@ sanic
 strudel
 sucky
 there's
+titties
 triforce
 tweens
 typescript
 undressing
 unicode
 untrimmed
+vag
 wanker
 wario
 wristband
