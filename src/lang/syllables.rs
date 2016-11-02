@@ -18,13 +18,23 @@ Arpabet has 54 different units:
   - 3 Semivowels (Y, W, Q)
 */
 
-pub fn arpabet_to_syllables(input: &Vec<String>) -> Option<Vec<Vec<String>>> {
+pub type Polysyllable = Vec<Vec<String>>;
+
+/// Traits on syllables, in case I decide to change the underlying
+/// representation.
+pub trait Polysyllabic {
+  /// Number of monophones in a polysyllable (each syllable has n-many
+  /// monophones).
+  fn monophone_count(&self) -> usize;
+}
+
+/// Break an arpabet string into syllables comprised of arpabet monophones.
+pub fn arpabet_to_syllables(input: &Vec<String>) -> Option<Polysyllable> {
   let mut phones = Vec::new();
 
   for atom in input {
     match Phoneme::from_str(atom) {
       None => {
-        println!("NONE: {}", atom); // TODO REMOVE
         return None;
       },
       Some(phone) => { phones.push(phone); },
@@ -39,9 +49,6 @@ pub fn arpabet_to_syllables(input: &Vec<String>) -> Option<Vec<Vec<String>>> {
   let mut consonants_after_vowel = 0; // Count consonants after vowel
 
   for phone in phones {
-    println!("syllable_has_vowel = {}", syllable_has_vowel);
-    println!("Phone: {:?}, {}", phone, phone.is_vowel());
-
     if !building_syllable {
       // Starting the very first syllable of the word.
       building_syllable = true;
@@ -59,150 +66,39 @@ pub fn arpabet_to_syllables(input: &Vec<String>) -> Option<Vec<Vec<String>>> {
 
         // Find out where to allocate any run of consonants from the
         // previous (current) syllable.
-        let mut leading_consonant = None;
-        if consonants_after_vowel == 2 {
-          // There are two consonants between vowels.
-          // Split consonants - one per vowel.
-          leading_consonant = syllable.pop();
+        if consonants_after_vowel > 0 {
+          let movement = consonant_allocation(&syllable,
+                                              consonants_after_vowel);
 
-          // But let's check some heuristics...
-          // Advance means put the consonants on the NEXT syllable
-          let mut advance = false;
-          // Reattach means put the consonants on the PREVIOUS syllable
-          let mut reattach = false;
-          {
-            // >>> 2-CONSONANT SEPARATION HEURISTICS <<<
-            let first_consonant = syllable.last();
-            if first_consonant.is_some() && leading_consonant.is_some() {
-              // Sequence is:
-              // Vowel, Consonant, Consonant, (Vowel - the current "phone")
-              let first_consonant = first_consonant.unwrap();
-              let second_consonant = leading_consonant.as_ref().unwrap();
-
-              advance = match *first_consonant {
-                Phoneme::K { .. } => {
-                  match *second_consonant {
-                    Phoneme::Y => true, // K Y ..
-                    _ => false,
-                  }
-                },
-                Phoneme::T { .. } => {
-                  match *second_consonant {
-                    Phoneme::R => true, // T R ..
-                    _ => false,
-                  }
-                },
-                _ => false,
-              };
-
-              if !advance {
-                reattach = match *first_consonant {
-                  Phoneme::S { .. } => {
-                    match *second_consonant {
-                      Phoneme::T => true, // .. S T
-                      _ => false,
-                    }
-                  },
-                  _ => false,
-                };
-              }
-            }
-          }
-
-          if advance && leading_consonant.is_some() {
-            // Let's actually move both consonants forward to the next syllable.
-            let first_consonant = syllable.pop();
-            if first_consonant.is_some() {
+          match movement {
+            ConsonantAlloc::MoveNone => {
               syllables.push(syllable);
               syllable = Vec::new();
-              syllable.push(first_consonant.unwrap()); // 1st
-              syllable.push(leading_consonant.unwrap()); // 2nd
-            }
-
-            syllable.push(phone);
-            syllable_has_vowel = true;
-            consonants_after_vowel = 0;
-            continue;
+            },
+            ConsonantAlloc::MoveOne => {
+              let one = syllable.pop();
+              syllables.push(syllable);
+              syllable = Vec::new();
+              syllable.push(one.unwrap());
+            },
+            ConsonantAlloc::MoveTwo => {
+              let one = syllable.pop();
+              let two = syllable.pop();
+              syllables.push(syllable);
+              syllable = Vec::new();
+              syllable.push(two.unwrap());
+              syllable.push(one.unwrap());
+            },
           }
 
-          if reattach && leading_consonant.is_some() {
-            // Keep both consonants on the last syllable.
-            syllable.push(leading_consonant.unwrap());
-            syllables.push(syllable);
-            syllable = Vec::new();
-            syllable.push(phone);
-            syllable_has_vowel = true;
-            consonants_after_vowel = 0;
-            continue;
-          }
-
-        } else if consonants_after_vowel == 1 {
-          // There's just one consonant between vowels.
-          // Usually we want to assign the consonant to the next vowel.
-          leading_consonant = syllable.pop();
-
-          // But let's check some heuristics...
-          let mut reattach = false;
-          {
-            // >>> 1-CONSONANT SEPARATION HEURISTICS <<<
-            let previous_vowel = syllable.last();
-            if previous_vowel.is_some() && leading_consonant.is_some() {
-              // Sequence is: Vowel, Consonant, (Vowel - the current "phone")
-              let previous_vowel = previous_vowel.unwrap();
-              let previous_consonant = leading_consonant.as_ref().unwrap();
-
-              reattach = match *previous_vowel {
-                Phoneme::Aa { .. } => {
-                  match *previous_consonant {
-                    Phoneme::L => true, // AA L .. ("All")
-                    _ => false,
-                  }
-                }
-                Phoneme::Ae { .. } => {
-                  match *previous_consonant {
-                    Phoneme::S => true, // AE S .. ("Ass")
-                    _ => false,
-                  }
-                },
-                Phoneme::Ah { stress : Stress::Secondary } => {
-                  match *previous_consonant {
-                    Phoneme::L => true, // AH2 L .. ("A(u)l", eg (n)ull-ify)
-                    _ => false,
-                  }
-                },
-                Phoneme::Ao { .. } => {
-                  match *previous_consonant {
-                    Phoneme::R => true, // AO R .. ("Orr")
-                    _ => false,
-                  }
-                },
-                Phoneme::Ih { .. } => {
-                  match *previous_consonant {
-                    //Phoneme::K => true, // IH K .. ("Ick")
-                    Phoneme::N => true, // IH N .. ("Inn")
-                    Phoneme::S => true, // IH S .. ("Iss")
-                    _ => false,
-                  }
-                },
-                _ => false,
-              };
-            }
-          }
-
-          if reattach && leading_consonant.is_some() {
-            // Nope, let's put the consonant back with the previous vowel.
-            syllable.push(leading_consonant.unwrap());
-            leading_consonant = None;
-          }
+          syllable.push(phone);
+          syllable_has_vowel = true;
+          consonants_after_vowel = 0;
+          continue;
         }
 
         syllables.push(syllable);
-
         syllable = Vec::new();
-        if leading_consonant.is_some() {
-          syllable.push(leading_consonant.unwrap());
-        }
-
         syllable.push(phone);
         syllable_has_vowel = true;
         consonants_after_vowel = 0;
@@ -226,10 +122,8 @@ pub fn arpabet_to_syllables(input: &Vec<String>) -> Option<Vec<Vec<String>>> {
     syllables.push(syllable);
   }
 
-  println!("Syllables: {} - {:?}\n\n", syllables.len(), syllables);
-
   // Convert back to string.
-  // FIXME: So inefficient!
+  // FIXME: So inefficient! Linked lists would probably be best here.
   let mut output_syllables = Vec::new();
   for syllable in syllables {
     let mut output_syllable = Vec::new();
@@ -239,17 +133,192 @@ pub fn arpabet_to_syllables(input: &Vec<String>) -> Option<Vec<Vec<String>>> {
     output_syllables.push(output_syllable);
   }
 
+  info!(target: "syllable", "Syllables: {:?}", output_syllables);
+
   Some(output_syllables)
 }
 
+// How many consonants to keep for a leading vowel.
+enum ConsonantAlloc {
+  MoveNone,
+  MoveOne,
+  MoveTwo,
+}
+
+// Heuristics for how to handle the consonants between vowels.
+// Determine which vowel they get allocated to.
+#[inline]
+fn consonant_allocation(syllable: &Vec<Phoneme>,
+                        consonants_after_vowel: usize)
+                        -> ConsonantAlloc {
+
+  match consonants_after_vowel {
+    4 => {
+      // There are four consonants between vowels.
+      // Of the four consonants, how many does the last vowel retain?
+      /*let mut movement = ConsonantAlloc::KeepTwo;
+
+      let first_consonant = syllable.get(syllable.len() - 4);
+      let second_consonant = syllable.get(syllable.len() - 3);
+      let third_consonant = syllable.get(syllable.len() - 2);
+      let fourth_consonant = syllable.get(syllable.len() - 1);
+
+      if first_consonant.is_some()
+          && second_consonant.is_some()
+          && third_consonant.is_some()
+          && fourth_consonant.is_some() {
+        let first_consonant = first_consonant.unwrap();
+        let second_consonant = second_consonant.unwrap();
+        let third_consonant = third_consonant.unwrap();
+        let fourth_consonant = fourth_consonant.unwrap();
+
+        movement = match *first_consonant {
+          _ => ConsonantAlloc::KeepTwo,
+        };
+      }
+
+      movement*/
+      ConsonantAlloc::MoveTwo
+    },
+    3 => {
+      let first_consonant = syllable.get(syllable.len() - 3);
+      let second_consonant = syllable.get(syllable.len() - 2);
+      let third_consonant = syllable.get(syllable.len() - 1);
+
+      if first_consonant.is_some()
+          && second_consonant.is_some()
+          && third_consonant.is_some() {
+        let first_consonant = first_consonant.unwrap();
+        let second_consonant = second_consonant.unwrap();
+        let third_consonant = third_consonant.unwrap();
+
+        return match *first_consonant {
+          Phoneme::M => {
+            match *second_consonant {
+              Phoneme::P => {
+                match *third_consonant {
+                  Phoneme::L => ConsonantAlloc::MoveTwo, // M | P L ...
+                  Phoneme::R => ConsonantAlloc::MoveTwo, // M | P R ...
+                  Phoneme::T => ConsonantAlloc::MoveOne, // M P | T ...
+                  _ => ConsonantAlloc::MoveNone,
+                }
+              },
+              _ => ConsonantAlloc::MoveNone,
+            }
+          },
+          Phoneme::Z => ConsonantAlloc::MoveTwo, // Z _ _ ...
+          _ => ConsonantAlloc::MoveNone,
+        };
+      }
+
+      ConsonantAlloc::MoveNone
+    },
+    2 => {
+      // Usually we allocate one consonant per vowel, which seems to work most
+      // of the time.
+      let first_consonant = syllable.get(syllable.len() - 2);
+      let second_consonant = syllable.get(syllable.len() - 1);
+
+      if first_consonant.is_some()
+          && second_consonant.is_some() {
+        let first_consonant = first_consonant.unwrap();
+        let second_consonant = second_consonant.unwrap();
+
+        return match *first_consonant {
+          Phoneme::K => {
+            match *second_consonant {
+              Phoneme::Y => ConsonantAlloc::MoveTwo, // K Y ..
+              _ => ConsonantAlloc::MoveOne,
+            }
+          },
+          Phoneme::S => {
+            match *second_consonant {
+              Phoneme::T => ConsonantAlloc::MoveNone, // .. S T
+              _ => ConsonantAlloc::MoveOne,
+            }
+          }
+          Phoneme::T => {
+            match *second_consonant {
+              Phoneme::R => ConsonantAlloc::MoveTwo, // T R ..
+              _ => ConsonantAlloc::MoveOne,
+            }
+          },
+          _ => ConsonantAlloc::MoveOne,
+        };
+      }
+
+      ConsonantAlloc::MoveOne
+    },
+    1 => {
+      // Usually we want to assign the single consonant to the next vowel.
+      let previous_vowel = syllable.get(syllable.len() - 2);
+      let previous_consonant = syllable.get(syllable.len() - 1);
+
+      if previous_vowel.is_some() && previous_consonant.is_some() {
+        let previous_vowel = previous_vowel.unwrap();
+        let previous_consonant = previous_consonant.unwrap();
+
+        return match *previous_vowel {
+          Phoneme::Aa { .. } => {
+            match *previous_consonant {
+              Phoneme::L => ConsonantAlloc::MoveNone, // AA L .. ("All")
+              _ => ConsonantAlloc::MoveOne,
+            }
+          }
+          Phoneme::Ae { .. } => {
+            match *previous_consonant {
+              Phoneme::S => ConsonantAlloc::MoveNone, // AE S .. ("Ass")
+              _ => ConsonantAlloc::MoveOne,
+            }
+          },
+          Phoneme::Ah { stress: Stress::Secondary } => {
+            match *previous_consonant {
+              // AH2 L .. ("A(u)l", eg (n)ull-ify)
+              Phoneme::L => ConsonantAlloc::MoveNone,
+              _ => ConsonantAlloc::MoveOne,
+            }
+          },
+          Phoneme::Ao { .. } => {
+            match *previous_consonant {
+              Phoneme::R => ConsonantAlloc::MoveNone, // AO R .. ("Orr")
+              _ => ConsonantAlloc::MoveOne,
+            }
+          },
+          Phoneme::Ih { .. } => {
+            match *previous_consonant {
+              //Phoneme::K => ConsonantAlloc::MoveNone, // IH K .. ("Ick")
+              Phoneme::N => ConsonantAlloc::MoveNone, // IH N .. ("Inn")
+              Phoneme::S => ConsonantAlloc::MoveNone, // IH S .. ("Iss")
+              _ => ConsonantAlloc::MoveOne,
+            }
+          },
+          _ => ConsonantAlloc::MoveOne,
+        };
+      }
+
+      ConsonantAlloc::MoveOne
+    },
+    _ => ConsonantAlloc::MoveNone,
+  }
+}
+
+impl Polysyllabic for Polysyllable {
+  fn monophone_count(&self) -> usize {
+    let mut count = 0;
+    for syllable in self {
+      count += syllable.len();
+    }
+    count
+  }
+}
 
 #[cfg(test)]
 mod tests {
-  use super::arpabet_to_syllables;
+  use super::*;
 
   #[test]
   fn test_easy_cases() {
-    // Test a bunch of random words from ARPABET.
+    // Test a bunch of random easy words from ARPABET.
 
     // Reduction
     assert_eq!(syl("R IH0|D AH1 K|SH AH0 N"), conv("R IH0 D AH1 K SH AH0 N"));
@@ -334,37 +403,78 @@ mod tests {
 
     /*
     assert_eq!(syl(""), conv(""));
-    assert_eq!(syl(""), conv(""));
-    assert_eq!(syl(""), conv(""));
-    assert_eq!(syl(""), conv(""));
     */
   }
 
-  // TODO ENABLE
-  //#[test]
-  fn test_lots_of_consonants() {
-    // Wisecracks
-    assert_eq!(syl("W AY1 Z|K R AE2 K S"), conv("W AY1 Z K R AE2 K S"));
+  #[test]
+  fn test_three_consonants() {
+    // Test words with three consonants between vowels
+
+    // Employable (vs. empty)
+    assert_eq!(syl("EH0 M|P L OY1|AH0|B AH0 L"),
+               conv("EH0 M P L OY1 AH0 B AH0 L"));
+
+    // Empty (vs. employable)
+    assert_eq!(syl("EH1 M P|T IY0"), conv("EH1 M P T IY0"));
 
     // Temperamental
     assert_eq!(syl("T EH2 M|P R AH0|M EH1 N|T AH0 L"),
                conv("T EH2 M P R AH0 M EH1 N T AH0 L"));
 
+    // Wisecracks
+    assert_eq!(syl("W AY1 Z|K R AE2 K S"), conv("W AY1 Z K R AE2 K S"));
+
+    /*
+    assert_eq!(syl(""), conv(""));
+    */
+  }
+
+  #[test]
+  fn test_four_consonants() {
+    // TODO ENABLE - These don't work yet.
+
+    // Explain
+    assert_eq!(syl("IH0 K S|P L EY1 N"), conv("IH0 K S P L EY1 N"));
+
     // Landscape
     assert_eq!(syl("L AE1 N D|S K EY2 P"), conv("L AE1 N D S K EY2 P"));
   }
 
-  // TODO ENABLE
   //#[test]
   fn test_difficult() {
-    // Explain
-    assert_eq!(syl("IH0 K|S P L EY1 N"), conv("IH0 K S P L EY1 N"));
+    // TODO ENABLE - These don't work yet.
+
     // Talking
     assert_eq!(syl("T AO1 K|IH0 NG"), conv("T AO1 K IH0 NG"));
 
     // Archipelago
     assert_eq!(syl("AA2 R K|AH0|P EH1 L|AH0|G OW2"),
                conv("AA2 R K AH0 P EH1 L AH0 G OW2"));
+  }
+
+  #[test]
+  fn polysyllablic_monophone_count() {
+    fn syllable(input: Vec<Vec<&str>>) -> Polysyllable {
+      let mut out = Vec::new();
+      for syllable in input {
+        let new_syllable = syllable.iter().map(|s| s.to_string()).collect();
+        out.push(new_syllable);
+      }
+      out
+    }
+
+    let polyphone = syllable(vec![vec![]]);
+    assert_eq!(0, polyphone.monophone_count());
+
+    let polyphone = syllable(vec![vec!["A"]]);
+    assert_eq!(1, polyphone.monophone_count());
+
+    let polyphone = syllable(vec![vec!["A", "B", "C"], vec!["D"]]);
+    assert_eq!(4, polyphone.monophone_count());
+
+    let polyphone = syllable(vec![vec!["A", "B", "C"], vec!["D", "E"],
+                             vec!["F", "G"]]);
+    assert_eq!(7, polyphone.monophone_count());
   }
 
   // Shorter for tests

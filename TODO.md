@@ -16,6 +16,13 @@ Audio Samples
     - Real versions of ['AO0', 'AW0', 'AW2', 'AY0', 'EY0', 'OY0', 'UH0'], which
       were backfilled with fakes.
 
+Scaling
+  1. Load test
+  2. Read wave files into memory
+  3. Multi-server, with nginx as load balancer
+  4. Prevent others from calling it
+  5. Caching strategy
+
 Tokenizing
   - Plurals
   - Times (9 p.m. ET)
@@ -41,13 +48,6 @@ Cleanup
     "missing_word_mode = slience, record_pop, umm", etc.
   - Remove old query parameters
   - Set default volume
-
-Scaling
-  1. Load test
-  2. Read wave files into memory
-  3. Multi-server, with nginx as load balancer
-  4. Prevent others from calling it
-  5. Caching strategy
 
 Server
   1. Favicon, .ico and apple icon

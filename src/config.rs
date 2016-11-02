@@ -28,6 +28,7 @@ pub struct Config {
   /// What events to log.
   pub log_handler: Option<bool>,
   pub log_parsing: Option<bool>,
+  pub log_syllable_decomposition: Option<bool>,
   pub log_synthesis: Option<bool>,
   pub log_timing: Option<bool>,
 }
@@ -115,6 +116,9 @@ impl Config {
       log_parsing: self.log_parsing
           .clone()
           .or(other.log_parsing.clone()),
+      log_syllable_decomposition: self.log_syllable_decomposition
+          .clone()
+          .or(other.log_syllable_decomposition.clone()),
       log_synthesis: self.log_synthesis
           .clone()
           .or(other.log_synthesis.clone()),

@@ -1,6 +1,8 @@
 // Copyright (c) 2016 Brandon Thomas <bt@brand.io, echelon@gmail.com>
 
 use lang::arpabet::Arpabet;
+use lang::syllables::Polysyllabic;
+use lang::syllables::Polysyllable;
 use lang::syllables::arpabet_to_syllables;
 use speaker::Speaker;
 use synthesis::audio::SampleBytes;
@@ -73,10 +75,19 @@ impl WordSynthesizer {
       buffer.extend(pause);
     }
 
-    for syllable_phones in syllables_of_phones {
-      let samples = try!(self.get_syllabic_n_phone_samples(speaker,
-        syllable_phones, false, false));
+    let samples = try!(self.get_polysyllable_sample(speaker,
+      syllables_of_phones, false));
 
+    if debug_padding_between_phones.is_some() {
+      let padding = generate_pause(debug_padding_between_phones.unwrap());
+      let last = samples.len() - 1;
+      for (i, sample) in samples.into_iter().enumerate() {
+        buffer.extend(sample);
+        if i < last {
+          buffer.extend(padding.clone());
+        }
+      }
+    } else {
       for sample in samples {
         buffer.extend(sample);
       }
@@ -162,6 +173,283 @@ impl WordSynthesizer {
     }
 
     Ok(())
+  }
+
+  /// TODO DOC
+  /// TODO DOC
+  fn get_polysyllable_sample(&self,
+                             speaker: &Speaker,
+                             syllables: Polysyllable,
+                             use_ends: bool)
+                             -> Result<Vec<SampleBytes>, SynthesisError> {
+
+    let mut capacity = syllables.monophone_count();
+
+    let mut monophones_fulfilled: Vec<bool> = Vec::with_capacity(capacity);
+    let mut chunks: Vec<Option<SampleBytes>> = Vec::with_capacity(capacity);
+
+    // Use this to debug the synthesis.
+    let mut debug: Vec<Option<String>> = Vec::with_capacity(capacity);
+
+    for _ in 0..capacity {
+      monophones_fulfilled.push(false);
+      chunks.push(None);
+      debug.push(None);
+    }
+
+    let mut syllables_fulfilled: Vec<bool> = Vec::with_capacity(syllables.len());
+
+    for _ in 0..syllables.len() {
+      syllables_fulfilled.push(false);
+    }
+
+    // Part 1: Fulfill entire syllables at once (mono- or poly-syllables).
+
+    // TODO/FIXME: This is a horrendous implementation that *must* change.
+    // NB: Outer two loops look O(n^2), but it cannot be. Inner iteration
+    // eagerly breaks when there is no match.
+    // FIXME: Inner code, however, is terribly inefficient.
+
+    let mut start = 0; // Index into output vectors.
+
+    for i in 0..syllables.len() {
+      for j in i..syllables.len() {
+
+        let mut polyphone: Vec<String> = Vec::new();
+
+        for k in i..j {
+          let ref syllable = syllables[k];
+          for phone in syllable {
+            polyphone.push(phone.clone());
+          }
+        }
+
+        // println!("n-phone: {:?}", candidate_n_phone);
+        let phone = self.audiobank.get_n_phone(
+          speaker.as_str(),
+          &polyphone,
+          SamplePreference::Middle, // TODO
+          false // TODO
+        );
+
+        if phone.is_none() {
+          break;
+        }
+
+        let phone = phone.unwrap();
+        let end = start + polyphone.len();
+
+        chunks[start] = Some(phone);
+        debug[start] = Some(polyphone.join("_"));
+
+        for k in start..end {
+          monophones_fulfilled[k] = true;
+        }
+      }
+
+      start += syllables[i].len(); // Monophone count of single syllable
+    }
+
+    // Part 2: Fix up any holes left unfulfilled.
+
+    let mut monophones = Vec::new();
+
+    for syllable in syllables {
+      for phone in syllable {
+        monophones.push(phone.clone());
+      }
+    }
+
+    // 5-phone
+    if monophones.len() >= 5 {
+      let range = monophones.len() - 4;
+      for i in 0..range {
+        if monophones_fulfilled[i]
+            || monophones_fulfilled[i+1]
+            || monophones_fulfilled[i+2]
+            || monophones_fulfilled[i+3]
+            || monophones_fulfilled[i+4] {
+          continue;
+        }
+
+        let candidate_n_phone = &monophones[i..i+5];
+
+        let sample_preference = match i {
+          0 => { SamplePreference::Begin },
+          _ if i == range - 1 => { SamplePreference::End },
+          _ => { SamplePreference::Middle },
+        };
+
+        //println!("n-phone: {:?}", candidate_n_phone);
+        let phone = self.audiobank.get_n_phone(speaker.as_str(),
+          candidate_n_phone,
+          sample_preference,
+          use_ends);
+
+        if phone.is_some() {
+          chunks[i] = phone;
+          debug[i] = Some(monophones[i..i+5].join("_"));
+
+          for j in i..i+5 {
+            monophones_fulfilled[j] = true;
+          }
+        }
+      }
+    }
+
+    info!(target: "synthesis", "5-fulfilled: {:?}", monophones_fulfilled);
+
+    // 4-phone
+    if monophones.len() >= 4 {
+      let range = monophones.len() - 3;
+      for i in 0..range {
+        if monophones_fulfilled[i]
+            || monophones_fulfilled[i+1]
+            || monophones_fulfilled[i+2]
+            || monophones_fulfilled[i+3] {
+          continue;
+        }
+
+        let candidate_n_phone = &monophones[i..i+4];
+
+        let sample_preference = match i {
+          0 => { SamplePreference::Begin },
+          _ if i == range - 1 => { SamplePreference::End },
+          _ => { SamplePreference::Middle },
+        };
+
+        //println!("n-phone: {:?}", candidate_n_phone);
+        let phone = self.audiobank.get_n_phone(speaker.as_str(),
+          candidate_n_phone,
+          sample_preference,
+          use_ends);
+
+        if phone.is_some() {
+          chunks[i] = phone;
+          debug[i] = Some(monophones[i..i+4].join("_"));
+
+          for j in i..i+4 {
+            monophones_fulfilled[j] = true;
+          }
+        }
+      }
+    }
+
+    info!(target: "synthesis", "4-fulfilled: {:?}", monophones_fulfilled);
+
+    // 3-phone
+    if monophones.len() >= 3 {
+      let range = monophones.len() - 2;
+      for i in 0..range {
+        if monophones_fulfilled[i]
+            || monophones_fulfilled[i+1]
+            || monophones_fulfilled[i+2] {
+          continue;
+        }
+
+        let candidate_n_phone = &monophones[i..i+3];
+
+        let sample_preference = match i {
+          0 => { SamplePreference::Begin },
+          _ if i == range - 1 => { SamplePreference::End },
+          _ => { SamplePreference::Middle },
+        };
+
+        let phone = self.audiobank.get_n_phone(speaker.as_str(),
+          candidate_n_phone,
+          sample_preference,
+          use_ends);
+
+        if phone.is_some() {
+          chunks[i] = phone;
+          debug[i] = Some(monophones[i..i+3].join("_"));
+          for j in i..i+3 {
+            monophones_fulfilled[j] = true;
+          }
+        }
+      }
+    }
+
+    info!(target: "synthesis", "3-fulfilled: {:?}", monophones_fulfilled);
+
+    // 2-phone
+    if monophones.len() >= 2 {
+      let range = monophones.len() - 1;
+      for i in 0..range {
+        if monophones_fulfilled[i] || monophones_fulfilled[i+1] {
+          continue;
+        }
+
+        let candidate_n_phone = &monophones[i..i+2];
+
+        let sample_preference = match i {
+          0 => { SamplePreference::Begin },
+          _ if i == range - 1 => { SamplePreference::End },
+          _ => { SamplePreference::Middle },
+        };
+
+        let phone = self.audiobank.get_n_phone(speaker.as_str(),
+          candidate_n_phone,
+          sample_preference,
+          use_ends);
+
+        if phone.is_some() {
+          chunks[i] = phone;
+          debug[i] = Some(monophones[i..i+2].join("_"));
+          for j in i..i+2 {
+            monophones_fulfilled[j] = true;
+          }
+        }
+      }
+    }
+
+    info!(target: "synthesis", "2-fulfilled: {:?}", monophones_fulfilled);
+
+    // 1-phone
+    for i in 0..monophones.len() {
+      if monophones_fulfilled[i] {
+        continue;
+      }
+
+      let sample_preference = match i {
+        0 => { SamplePreference::Begin },
+        _ if i == monophones.len() - 1 => { SamplePreference::End },
+        _ => { SamplePreference::Middle },
+      };
+
+      let phone = self.audiobank.get_n_phone(speaker.as_str(),
+        &monophones[i..i+1],
+        sample_preference,
+        use_ends);
+
+      if phone.is_some() {
+        chunks[i] = phone;
+        debug[i] = Some(monophones[i].to_string());
+        monophones_fulfilled[i] = true;
+      }
+    }
+
+    info!(target: "synthesis", "1-fulfilled: {:?}", monophones_fulfilled);
+
+    for x in monophones_fulfilled {
+      if !x { return Err(SynthesisError::MonophoneDne); }
+    }
+
+    let debug_str : Vec<String> = debug.into_iter()
+        .map(|x| if x.is_some() { x.unwrap() } else { "None".to_string() })
+        .collect();
+
+    info!(target: "synthesis", "Comprised of: {:?}", debug_str);
+
+    /*info!(target: "synthesis", "Results Length: {} of {} phones",
+    results.len(),
+    syllable.len());*/
+
+    let results: Vec<SampleBytes> = chunks.into_iter()
+        .filter_map(|x| x) // Woo, already Option<T>!
+        .collect();
+
+    Ok(results) // TODO
   }
 
   /// TODO DOC
@@ -363,15 +651,15 @@ impl WordSynthesizer {
         .map(|x| if x.is_some() { x.unwrap() } else { "None".to_string() })
         .collect();
 
-    //info!(target: "synthesis", "Comprised of: {:?}", debug_str);
+    info!(target: "synthesis", "Comprised of: {:?}", debug_str);
 
     let results : Vec<SampleBytes> = chunks.into_iter()
         .filter_map(|x| x) // Woo, already Option<T>!
         .collect();
 
-    info!(target: "synthesis", "Results Length: {} of {} phones",
+    /*info!(target: "synthesis", "Results Length: {} of {} phones",
     results.len(),
-    syllable.len());
+    syllable.len());*/
 
     Ok(results)
   }
