@@ -76,7 +76,7 @@ impl WordSynthesizer {
     }
 
     let samples = try!(self.get_polysyllable_sample(speaker,
-      syllables_of_phones, false));
+      syllables_of_phones, use_ends));
 
     if debug_padding_between_phones.is_some() {
       let padding = generate_pause(debug_padding_between_phones.unwrap());
@@ -183,7 +183,7 @@ impl WordSynthesizer {
                              use_ends: bool)
                              -> Result<Vec<SampleBytes>, SynthesisError> {
 
-    let mut capacity = syllables.monophone_count();
+    let capacity = syllables.monophone_count();
 
     let mut monophones_fulfilled: Vec<bool> = Vec::with_capacity(capacity);
     let mut chunks: Vec<Option<SampleBytes>> = Vec::with_capacity(capacity);
@@ -213,7 +213,7 @@ impl WordSynthesizer {
     let mut start = 0; // Index into output vectors.
 
     for i in 0..syllables.len() {
-      for j in i..syllables.len() {
+      for j in i+1..syllables.len()+1 {
 
         let mut polyphone: Vec<String> = Vec::new();
 
@@ -224,15 +224,24 @@ impl WordSynthesizer {
           }
         }
 
-        // println!("n-phone: {:?}", candidate_n_phone);
+        //println!("> Test: {}, {}, {:?}", i, j, polyphone);
+
+        let mut sample_preference = SamplePreference::Middle;
+        if i == 0 {
+          sample_preference = SamplePreference::Begin;
+        } else if j == syllables.len() - 1 {
+          sample_preference = SamplePreference::End;
+        }
+
         let phone = self.audiobank.get_n_phone(
           speaker.as_str(),
           &polyphone,
-          SamplePreference::Middle, // TODO
-          false // TODO
+          sample_preference,
+          use_ends
         );
 
         if phone.is_none() {
+          //println!("Couldn't find: {:?}", polyphone);
           break;
         }
 
@@ -249,6 +258,9 @@ impl WordSynthesizer {
 
       start += syllables[i].len(); // Monophone count of single syllable
     }
+
+    info!(target: "synthesis", "syllable fulfilled: {:?}",
+          monophones_fulfilled);
 
     // Part 2: Fix up any holes left unfulfilled.
 

@@ -193,6 +193,18 @@ fn consonant_allocation(syllable: &Vec<Phoneme>,
         let third_consonant = third_consonant.unwrap();
 
         return match *first_consonant {
+          Phoneme::F => {
+            match *second_consonant {
+              Phoneme::T => ConsonantAlloc::MoveOne, // F T | ... (eg. soft_)
+              _ => ConsonantAlloc::MoveOne,
+            }
+          },
+          Phoneme::L => {
+            match *second_consonant {
+              Phoneme::S => ConsonantAlloc::MoveOne, // L S | ... (eg. false__)
+              _ => ConsonantAlloc::MoveOne,
+            }
+          },
           Phoneme::M => {
             match *second_consonant {
               Phoneme::P => {
@@ -200,27 +212,30 @@ fn consonant_allocation(syllable: &Vec<Phoneme>,
                   Phoneme::L => ConsonantAlloc::MoveTwo, // M | P L ...
                   Phoneme::R => ConsonantAlloc::MoveTwo, // M | P R ...
                   Phoneme::T => ConsonantAlloc::MoveOne, // M P | T ...
-                  _ => ConsonantAlloc::MoveNone,
+                  _ => ConsonantAlloc::MoveOne,
                 }
               },
-              _ => ConsonantAlloc::MoveNone,
+              _ => ConsonantAlloc::MoveOne,
             }
           },
           Phoneme::Z => ConsonantAlloc::MoveTwo, // Z _ _ ...
-          _ => ConsonantAlloc::MoveNone,
+          _ => ConsonantAlloc::MoveOne,
         };
       }
 
-      ConsonantAlloc::MoveNone
+      ConsonantAlloc::MoveOne
     },
     2 => {
       // Usually we allocate one consonant per vowel, which seems to work most
       // of the time.
+      let last_vowel = syllable.get(syllable.len() - 3);
       let first_consonant = syllable.get(syllable.len() - 2);
       let second_consonant = syllable.get(syllable.len() - 1);
 
-      if first_consonant.is_some()
+      if last_vowel.is_some()
+          && first_consonant.is_some()
           && second_consonant.is_some() {
+        let last_vowel = last_vowel.unwrap();
         let first_consonant = first_consonant.unwrap();
         let second_consonant = second_consonant.unwrap();
 
@@ -231,9 +246,22 @@ fn consonant_allocation(syllable: &Vec<Phoneme>,
               _ => ConsonantAlloc::MoveOne,
             }
           },
+          Phoneme::P => {
+            match *second_consonant {
+              Phoneme::L => ConsonantAlloc::MoveTwo, // P L ..
+              _ => ConsonantAlloc::MoveOne,
+            }
+          },
           Phoneme::S => {
             match *second_consonant {
-              Phoneme::T => ConsonantAlloc::MoveNone, // .. S T
+              Phoneme::T => {
+                match *last_vowel {
+                  Phoneme::Ah { .. } => ConsonantAlloc::MoveOne, // (j)us | t..
+                  Phoneme::Ih { .. } => ConsonantAlloc::MoveOne, // ..I S | T..
+                  _ => ConsonantAlloc::MoveNone, // .. S T
+                }
+              },
+              //
               _ => ConsonantAlloc::MoveOne,
             }
           }
@@ -271,10 +299,17 @@ fn consonant_allocation(syllable: &Vec<Phoneme>,
               _ => ConsonantAlloc::MoveOne,
             }
           },
+          Phoneme::Ah { stress: Stress::None } => {
+            match *previous_consonant {
+              Phoneme::N => ConsonantAlloc::MoveNone, // AH N ("Un")
+              _ => ConsonantAlloc::MoveOne,
+            }
+          },
           Phoneme::Ah { stress: Stress::Secondary } => {
             match *previous_consonant {
               // AH2 L .. ("A(u)l", eg (n)ull-ify)
               Phoneme::L => ConsonantAlloc::MoveNone,
+              Phoneme::N => ConsonantAlloc::MoveNone, // AH N ("Un")
               _ => ConsonantAlloc::MoveOne,
             }
           },
@@ -401,6 +436,35 @@ mod tests {
     //assert_eq!(syl("L IH1 M|AH0 T S"), conv("L IH1 M AH0 T S"));
     assert_eq!(syl("L IH1|M AH0 T S"), conv("L IH1 M AH0 T S"));
 
+    // Unimportant
+    assert_eq!(syl("AH0 N|IH0 M|P AO1 R|T AH0 N T"),
+               conv("AH0 N IH0 M P AO1 R T AH0 N T"));
+
+    // Unintended
+    assert_eq!(syl("AH2 N|IH0 N|T EH1 N|D IH0 D"),
+               conv("AH2 N IH0 N T EH1 N D IH0 D"));
+
+    // Velociraptor
+    assert_eq!(syl("V AH0|L AO1|S AH0|R AE2 P|T ER0"),
+               conv("V AH0 L AO1 S AH0 R AE2 P T ER0"));
+    /*
+    assert_eq!(syl(""), conv(""));
+    */
+  }
+
+  #[test]
+  fn test_two_consonants() {
+    // Test words that rely on heuristics with two consonants between vowels
+
+    // Distance
+    assert_eq!(syl("D IH1 S|T AH0 N S"), conv("D IH1 S T AH0 N S"));
+
+    // Justice
+    assert_eq!(syl("JH AH1 S|T AH0 S"), conv("JH AH1 S T AH0 S"));
+
+    // Replenish
+    assert_eq!(syl("R IY0|P L EH1|N IH0 SH"), conv("R IY0 P L EH1 N IH0 SH"));
+
     /*
     assert_eq!(syl(""), conv(""));
     */
@@ -416,6 +480,12 @@ mod tests {
 
     // Empty (vs. employable)
     assert_eq!(syl("EH1 M P|T IY0"), conv("EH1 M P T IY0"));
+
+    // Falsehoods
+    assert_eq!(syl("F AE1 L S|HH UH2 D Z"), conv("F AE1 L S HH UH2 D Z"));
+
+    // Software
+    assert_eq!(syl("S AO1 F T|W EH2 R"), conv("S AO1 F T W EH2 R"));
 
     // Temperamental
     assert_eq!(syl("T EH2 M|P R AH0|M EH1 N|T AH0 L"),
@@ -438,6 +508,14 @@ mod tests {
 
     // Landscape
     assert_eq!(syl("L AE1 N D|S K EY2 P"), conv("L AE1 N D S K EY2 P"));
+
+    // Redemption
+    assert_eq!(syl("R IH0|D EH1 M P|SH AH0 N"),
+               conv("R IH0 D EH1 M P SH AH0 N"));
+
+    /*
+    assert_eq!(syl(""), conv(""));
+    */
   }
 
   //#[test]
