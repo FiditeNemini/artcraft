@@ -69,6 +69,24 @@ function install_events() {
     ev.preventDefault();
     return false;
   });
+
+  $('#info').on('click', function(ev: any): any {
+    openInfo();
+  });
+
+  $('#close_top,#close_bottom').on('click', function(ev: any): any {
+    closeInfo();
+  });
+}
+
+function openInfo() {
+  $('aside').removeClass('hidden');
+  $(window).scrollTop(0);
+}
+
+function closeInfo() {
+  $('aside').addClass('hidden');
+  $(window).scrollTop(0);
 }
 
 function initialize_from_url() {
