@@ -2,8 +2,26 @@
 
 import PIXI = require('pixi.js');
 
+import $ = require('jquery');
 import { trumpAnimation } from './trump_animation';
 import { getRandomInt } from './util';
+
+
+/**
+ * The image path on AWS is stored under a content hash.
+ * This is injected into the meta tags before upload so we can build the path.
+ */
+function getImagePathPrefix() : string {
+  let environment = $('meta[name=environment]').attr('content'),
+      contentHash = $('meta[name=content_hash]').attr('content');
+
+  switch (environment.toLowerCase()) {
+    case 'production':
+      return `/assets/${contentHash}/images`;
+    default:
+      return '/assets/images';
+  }
+}
 
 // TODO: Clean up this abysmal garbage.
 export function setup_animation() {
@@ -29,63 +47,65 @@ export function setup_animation() {
     renderer.render(stage);
   }
 
+  let prefix = getImagePathPrefix();
+
   let idleImages = [
-    '/assets/images/trumpette/idle_0.png', // 0
-    '/assets/images/trumpette/idle_1.png', // 1
-    '/assets/images/trumpette/idle_2.png', // 2
-    '/assets/images/trumpette/idle_3.png', // 3
-    '/assets/images/trumpette/idle_4.png', // 4
+    '/trumpette/idle_0.png', // 0
+    '/trumpette/idle_1.png', // 1
+    '/trumpette/idle_2.png', // 2
+    '/trumpette/idle_3.png', // 3
+    '/trumpette/idle_4.png', // 4
   ];
 
   let talkImages = [
-    '/assets/images/trumpette/talk_0.png', // 5
-    '/assets/images/trumpette/talk_1.png', // 6
-    '/assets/images/trumpette/talk_2.png', // 7
-    '/assets/images/trumpette/talk_3.png', // 8
-    '/assets/images/trumpette/talk_4.png', // 9
-    '/assets/images/trumpette/talk_5.png', // 10
-    '/assets/images/trumpette/talk_6.png', // 11
-    '/assets/images/trumpette/talk_7.png', // 12
-    '/assets/images/trumpette/talk_8.png', // 13
+    '/trumpette/talk_0.png', // 5
+    '/trumpette/talk_1.png', // 6
+    '/trumpette/talk_2.png', // 7
+    '/trumpette/talk_3.png', // 8
+    '/trumpette/talk_4.png', // 9
+    '/trumpette/talk_5.png', // 10
+    '/trumpette/talk_6.png', // 11
+    '/trumpette/talk_7.png', // 12
+    '/trumpette/talk_8.png', // 13
   ];
 
   let angryImages = [
-    '/assets/images/trumpette/angry_0.png', // 14
-    '/assets/images/trumpette/angry_1.png', // 15
-    '/assets/images/trumpette/angry_2.png', // 16
-    '/assets/images/trumpette/angry_3.png', // 17
-    '/assets/images/trumpette/angry_4.png', // 18
-    '/assets/images/trumpette/angry_5.png', // 19
-    '/assets/images/trumpette/angry_6.png', // 20
-    '/assets/images/trumpette/angry_7.png', // 21
-    '/assets/images/trumpette/angry_8.png', // 22
-    '/assets/images/trumpette/angry_between.png', // 23
+    '/trumpette/angry_0.png', // 14
+    '/trumpette/angry_1.png', // 15
+    '/trumpette/angry_2.png', // 16
+    '/trumpette/angry_3.png', // 17
+    '/trumpette/angry_4.png', // 18
+    '/trumpette/angry_5.png', // 19
+    '/trumpette/angry_6.png', // 20
+    '/trumpette/angry_7.png', // 21
+    '/trumpette/angry_8.png', // 22
+    '/trumpette/angry_between.png', // 23
   ];
 
   let idleTextures = [];
 
   for (let image of idleImages) {
-    let texture = PIXI.Texture.fromImage(image);
+    let texture = PIXI.Texture.fromImage(`${prefix}${image}`);
     idleTextures.push(texture);
   }
 
   for (let image of talkImages) {
-    let texture = PIXI.Texture.fromImage(image);
+    let texture = PIXI.Texture.fromImage(`${prefix}${image}`);
     idleTextures.push(texture);
   }
 
   for (let image of angryImages) {
-    let texture = PIXI.Texture.fromImage(image);
+    let texture = PIXI.Texture.fromImage(`${prefix}${image}`);
     idleTextures.push(texture);
   }
 
   //logo = new PIXI.Text('Jungle Horse',
   //                 {font: '150px Impact Bold', fill: 0x000000, align: 'center'});
 
-  let texture = PIXI.Texture.fromImage('/assets/images/jungle_horse_lobster.png');
+  let texture = PIXI.Texture.fromImage(`${prefix}/jungle_horse_lobster.png`);
   logo2 = new PIXI.Sprite(texture);
 
-  PIXI.loader.add('asset', '/assets/images/trumpette/idle_0.png')
+  PIXI.loader.add('asset', `${prefix}/trumpette/idle_0.png`)
       .load(function (loader, resources) {
     // This creates a texture from a 'asset.png' image.
     //asset = new PIXI.Sprite(resources.asset.texture);
