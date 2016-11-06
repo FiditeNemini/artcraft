@@ -6,18 +6,19 @@ import $ = require('jquery');
 import { trumpAnimation } from './trump_animation';
 import { getRandomInt } from './util';
 
-
 /**
  * The image path on AWS is stored under a content hash.
  * This is injected into the meta tags before upload so we can build the path.
  */
 function getImagePathPrefix() : string {
-  let environment = $('meta[name=environment]').attr('content'),
-      contentHash = $('meta[name=content_hash]').attr('content');
+  // TODO: Cache the values looked up from the DOM statically.
+  let environment = $('meta[name=environment]').attr('content');
 
   switch (environment.toLowerCase()) {
     case 'production':
-      return `/assets/${contentHash}/images`;
+      let cdnHost = $('meta[name=cdn_host]').attr('content'),
+          contentHash = $('meta[name=content_hash]').attr('content');
+      return `${cdnHost}/assets/${contentHash}/images`;
     default:
       return '/assets/images';
   }

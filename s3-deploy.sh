@@ -9,7 +9,7 @@ build_assets() {
 }
 
 echo "> Build artifact."
-#build_assets
+build_assets
 
 # Calculate output directory.
 echo "> Calculate artifact SHA."
@@ -40,12 +40,13 @@ sed -i "s/\/assets/\/\/cdn.junglehorse.com\/assets\/${checksum}/g" index.html
 sed -i "s/asset_content_hash/${checksum}/g" index.html
 sed -i "s/DEVELOPMENT/production/g" index.html
 sed -i "s/API_HOST/http:\/\/jungle.horse/g" index.html
+sed -i "s/CDN_HOST/\/\/cdn.junglehorse.com/g" index.html
 popd > /dev/null
 
 echo "> Upload to S3."
 aws s3 cp $output_dir s3://junglehorse-frontend/assets/${checksum} --recursive
-aws s3 cp $output_dir/index.html s3://junglehorse-frontend/index.html
-aws s3 cp $output_dir/error.html s3://junglehorse-frontend/error.html
+aws s3 cp $output_dir/index.html s3://junglehorse.com/index.html
+aws s3 cp $output_dir/error.html s3://junglehorse.com/error.html
 
 popd > /dev/null
 echo "> Done."
