@@ -27,6 +27,7 @@ mkdir -p $output_dir
 cp *css $output_dir
 cp *html $output_dir
 cp -R images/ $output_dir
+cp favicon.ico $output_dir
 cp output/* $output_dir
 
 # Modify URLs in index.html
@@ -47,6 +48,7 @@ echo "> Upload to S3."
 aws s3 cp $output_dir s3://junglehorse-frontend/assets/${checksum} --recursive
 aws s3 cp $output_dir/index.html s3://junglehorse.com/index.html
 aws s3 cp $output_dir/error.html s3://junglehorse.com/error.html
+aws s3 cp $output_dir/favicon.ico s3://junglehorse.com/favicon.ico
 
 popd > /dev/null
 echo "> Done."

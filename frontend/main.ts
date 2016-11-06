@@ -21,6 +21,9 @@ $(function() {
     // Only install animation if the page supports it.
     setup_animation();
   }
+
+  // TODO: For console debugging only.
+  (<any>window).$ = $;
 });
 
 function install_events() {
@@ -103,4 +106,3 @@ function focus() {
   $(INPUT).focus();
   $(INPUT).select();
 }
-
