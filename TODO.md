@@ -3,13 +3,21 @@ Remaining Tasks
 
 Last Minute Burndown
 --------------------
+- AWS / Cloudfront Hosting
+  - Backend
+  - Frontend
+    - Bucket
+    - Cloudfront
+    - Static HTML gen (remote: asset hash, local: local path)
+    - DNS entries:
+      - api.junglehorse.com -> jungle horse server
+      - junglehorse.com -> AWS
+
 - In-Memory LRU Cache
+
 - Better audio samples
   - Multiple "umm" / "uhh" samples
   - Fix words that sound bad
-- AWS / Cloudfront Hosting
-  - Frontend
-  - Backend
 
 - User input filtering
   - Strip spaces in frontend.

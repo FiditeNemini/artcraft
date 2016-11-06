@@ -1,0 +1,22 @@
+{
+	"Version": "2012-10-17",
+	"Id": "Policy1478413965163",
+	"Statement": [
+		{
+			"Sid": "Stmt1478413958263",
+			"Effect": "Allow",
+			"Principal": {
+				"AWS": "arn:aws:iam::961528074194:user/junglehorse"
+			},
+			"Action": "s3:*",
+			"Resource": "arn:aws:s3:::junglehorse-frontend/*"
+		},
+		{
+			"Sid": "PublicReadGetObject",
+			"Effect": "Allow",
+			"Principal": "*",
+			"Action": ["s3:GetObject"],
+			"Resource": "arn:aws:s3:::junglehorse-frontend/*"
+		}
+	]
+}
