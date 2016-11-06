@@ -1,16 +1,32 @@
 // Copyright (c) 2016 Brandon Thomas <bt@brand.io, echelon@gmail.com>
 
+import $ = require('jquery');
 import { RawSentence, FilteredSentence } from "./sentence";
 
 import URI = require('urijs');
+
+/**
+ * The API server hostname (including HTTP scheme).
+ * This is injected into the meta tags before upload so we can build the path.
+ */
+function getApiHost(): string {
+  let environment = $('meta[name=environment]').attr('content');
+  switch (environment.toLowerCase()) {
+    case 'production':
+      return $('meta[name=api_host]').attr('content');
+    default:
+      return '';
+  }
+}
 
 /**
  * Sentence -> Audio generation API URL
  */
 export function get_audio_api_url(sentence: FilteredSentence) : string {
   // I may expand the API later, but for now this is all I'll expose.
-  let encoded = encodeURIComponent(sentence.value);
-  return `/speak?v=trump&vol=3&s=${encoded}`;
+  let apiHost = getApiHost(),
+      encoded = encodeURIComponent(sentence.value);
+  return `${apiHost}/speak?v=trump&vol=3&s=${encoded}`;
 }
 
 /**

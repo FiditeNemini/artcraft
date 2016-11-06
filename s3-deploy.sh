@@ -36,8 +36,10 @@ pushd $output_dir > /dev/null
 sed -i "s/assets\/output/assets/g" index.html
 # /assets/main.built.js -> //cdn.junglehorse.com/assets/${checksum}/main.built.js
 sed -i "s/\/assets/\/\/cdn.junglehorse.com\/assets\/${checksum}/g" index.html
+# Variable substitutions
 sed -i "s/asset_content_hash/${checksum}/g" index.html
 sed -i "s/DEVELOPMENT/production/g" index.html
+sed -i "s/API_HOST/http:\/\/jungle.horse/g" index.html
 popd > /dev/null
 
 echo "> Upload to S3."
