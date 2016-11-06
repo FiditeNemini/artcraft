@@ -7,5 +7,6 @@ sounds/
 target/
 web/*.css
 web/*.js
+web/deploy/
 web/images/
 web/output/

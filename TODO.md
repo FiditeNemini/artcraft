@@ -1,6 +1,33 @@
 Remaining Tasks
 ===============
 
+Last Minute Burndown
+--------------------
+- In-Memory LRU Cache
+- Better audio samples
+  - Multiple "umm" / "uhh" samples
+  - Fix words that sound bad
+- AWS / Cloudfront Hosting
+  - Frontend
+  - Backend
+
+- User input filtering
+  - Strip spaces in frontend.
+  - Make sure there's no XSS injection.
+  - Maximum # characters (frontend, backend)
+  - Maximum # words (backend, ie. number expansion)
+    - Configs
+  - Remove speed query parameter (for now).
+
+- Frontend filesize
+  - Downscale the animation. Maybe make a sprite sheet?
+  - Progressive loading of the animation (involved).
+  - Zepto.js
+  - Remove pixi.js dependency
+
+Old Goals
+---------
+
 *HIGH LEVEL GOALS*
   1. Sound better
   2. Handle load
