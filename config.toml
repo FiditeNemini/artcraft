@@ -1,7 +1,7 @@
 # Configs for the server.
 
 [default] # Production
-  use_caching_headers = false
+  use_caching_headers = true
   sound_path = "./sounds"
   html_path = "./web"
   phoneme_dictionary_file = "./dictionary/cmudict-0.7b"
