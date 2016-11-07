@@ -2,6 +2,7 @@ These words aren't in the dictionary
 ------------------------------------
 = (equals symbol)
 HN
+anime
 banjo-tooie
 batshit
 charizard

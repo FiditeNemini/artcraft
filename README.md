@@ -12,11 +12,38 @@ Running the server
 1. Install Rust >= 1.1.0
 2. `cargo run`
 
-### On the Remote Server
+### On the Remote Dedicated Server (non-AWS)
 
 1. Install and configure nginx as a reverse HTTP proxy.
 2. SCP Rust server app binaries and start on required ports, ie.
    `trumpet -p PORT`.
+
+### On AWS Infrastructure.
+
+1. The frontend is hosted on AWS + Cloudfront.
+2. The backend is hosted on Elastic Beanstalk (EBS).
+
+The AWS setup is divided into two buckets: one that houses simply index.html,
+which is hosted from `jungle.horse`. The other assets are distributed via 
+Cloudfront, and are loaded from `cdn.jungle.horse`. There is some CORS header
+setup work to do.
+
+The backend is a docker image containing the compiled Rust binary, config file,
+and sound files. It can be built into a zip with the `./ebs-deployable` script.
+This is then uploaded via the EBS panel's front page (the "Upload and Deploy" 
+button). This is hosted from `api.jungle.horse`.
+
+Docker Notes
+------------
+Some notes for local management and testing of Docker images:
+
+Build docker image from Dockerfile (in same working directory):
+
+  `sudo docker build -t TAGNAME .`
+
+Run docker image interactively with port forwarding to host machine:
+
+  `sudo docker run -t -p 8000:8000 -i TAGNAME /bin/bash`
 
 Misc Notes on Speech
 --------------------

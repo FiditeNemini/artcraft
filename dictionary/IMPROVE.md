@@ -4,11 +4,13 @@ These words need improvement
 "^^ hillary's
 "^^ obama's
 "^^^ again (BAD)
+"^^^ by
 "^^^ by (BAD)
 "^^^ ha, haha, hahaha"
 "^^^ how (THIS IS SO BAD)
 "^^^ rigging
 "^^^ then (BAD)
+"^^^ wall"
 "do you?"
 "for you"
 "really?"

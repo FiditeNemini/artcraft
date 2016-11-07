@@ -5,10 +5,10 @@ Last Minute Burndown
 --------------------
 - AWS / Cloudfront Hosting
   - Backend
+    - Containerize
+    - ECS
+    - Elastic Beanstalk
   - Frontend
-    - Bucket
-    - Cloudfront
-    - Static HTML gen (remote: asset hash, local: local path)
     - DNS entries:
       - api.junglehorse.com -> jungle horse server
       - junglehorse.com -> AWS
