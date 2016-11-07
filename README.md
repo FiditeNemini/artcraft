@@ -26,7 +26,7 @@ Running the server
 The AWS setup is divided into two buckets: one that houses simply index.html,
 which is hosted from `jungle.horse`. The other assets are distributed via 
 Cloudfront, and are loaded from `cdn.jungle.horse`. There is some CORS header
-setup work to do.
+setup work to do. (See the s3-cors and s3-bucket files for config.)
 
 The backend is a docker image containing the compiled Rust binary, config file,
 and sound files. It can be built into a zip with the `./ebs-deployable` script.

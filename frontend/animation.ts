@@ -16,9 +16,8 @@ function getImagePathPrefix() : string {
 
   switch (environment.toLowerCase()) {
     case 'production':
-      let cdnHost = $('meta[name=cdn_host]').attr('content'),
-          contentHash = $('meta[name=content_hash]').attr('content');
-      return `${cdnHost}/assets/${contentHash}/images`;
+      let cdnHost = $('meta[name=cdn_host]').attr('content');
+      return `${cdnHost}/images`;
     default:
       return '/assets/images';
   }

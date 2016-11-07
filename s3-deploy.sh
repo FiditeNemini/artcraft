@@ -1,55 +1,73 @@
 #!/bin/bash
 # Upload all the things to S3.
 
+set -ex
+
 build_assets() {
   gulp
-  pushd ./frontend > /dev/null
+  pushd ./frontend
   MINIFY=1 webpack
-  popd > /dev/null
+  popd
 }
 
-echo "> Build artifact."
-build_assets
+# Upload the assets that undergo frequent change (JS, CSS, etc.)
+# Don't include large, infrequently changing files here as it's expensive.
+upload_assets() {
+  echo "> Build artifact."
+  build_assets
 
-# Calculate output directory.
-echo "> Calculate artifact SHA."
-pushd ./web/output > /dev/null
-declare checksum=$(find . -type f -exec md5sum {} + | awk '{print $1}' | \
-                   sort | md5sum | awk '{print $1}')
-popd > /dev/null
+  # Calculate output directory.
+  echo "> Calculate artifact SHA."
+  pushd ./web/output > /dev/null
+  declare checksum=$(find . -type f -exec md5sum {} + | awk '{print $1}' | \
+                     sort | md5sum | awk '{print $1}')
+  popd > /dev/null
 
-declare -r output_dir="deploy/${checksum}"
+  declare -r output_dir="deploy/${checksum}"
 
-# Prep upload artifact.
-echo "> Prep upload of artifact ${checksum}."
-pushd ./web > /dev/null
-mkdir -p $output_dir
-cp *css $output_dir
-cp *html $output_dir
-cp -R images/ $output_dir
-cp favicon.ico $output_dir
-cp output/* $output_dir
+  # Prep upload artifact.
+  echo "> Prep upload of artifact ${checksum}."
+  pushd ./web
 
-# Modify URLs in index.html
-echo "> Modify asset paths, etc. in index.html."
-pushd $output_dir > /dev/null
-# /assets/output/main.built.js -> /assets/main.built.js
-sed -i "s/assets\/output/assets/g" index.html
-# /assets/main.built.js -> //cdn.junglehorse.com/assets/${checksum}/main.built.js
-sed -i "s/\/assets/\/\/cdn.junglehorse.com\/assets\/${checksum}/g" index.html
-# Variable substitutions
-sed -i "s/asset_content_hash/${checksum}/g" index.html
-sed -i "s/DEVELOPMENT/production/g" index.html
-sed -i "s/API_HOST/http:\/\/jungle.horse/g" index.html
-sed -i "s/CDN_HOST/\/\/cdn.junglehorse.com/g" index.html
-popd > /dev/null
+  mkdir -p $output_dir
+  cp *css $output_dir
+  cp *html $output_dir
+  cp output/* $output_dir
 
-echo "> Upload to S3."
-aws s3 cp $output_dir s3://junglehorse-frontend/assets/${checksum} --recursive
-aws s3 cp $output_dir/index.html s3://junglehorse.com/index.html
-aws s3 cp $output_dir/error.html s3://junglehorse.com/error.html
-aws s3 cp $output_dir/favicon.ico s3://junglehorse.com/favicon.ico
+  # Modify URLs in index.html
+  echo "> Modify asset paths, etc. in index.html."
+  pushd $output_dir
+  # /assets/output/main.built.js -> /assets/main.built.js
+  sed -i "s/assets\/output/assets/g" index.html
+  # /assets/main.built.js -> //cdn.junglehorse.com/assets/${checksum}/main.built.js
+  sed -i "s/\/assets/\/\/cdn.junglehorse.com\/assets\/${checksum}/g" index.html
+  # Variable substitutions
+  sed -i "s/asset_content_hash/${checksum}/g" index.html
+  sed -i "s/DEVELOPMENT/production/g" index.html
+  sed -i "s/API_HOST/http:\/\/api.jungle.horse/g" index.html
+  sed -i "s/CDN_HOST/\/\/cdn.junglehorse.com/g" index.html
+  popd
 
-popd > /dev/null
-echo "> Done."
+  aws s3 cp $output_dir s3://junglehorse-frontend/assets/${checksum} --recursive
+  aws s3 cp $output_dir/index.html s3://junglehorse.com/index.html
+
+  popd
+}
+
+# Upload files to S3 that infrequently change.
+# Don't run this often as it adds to PutObject costs!
+upload_stable_assets() {
+  echo '> Upload stable assets (images, robots.txt, etc.)'
+  pushd web
+  # Keep error.html in both buckets.
+  aws s3 cp error.html s3://junglehorse-frontend/
+  aws s3 cp error.html s3://junglehorse.com/
+  aws s3 cp favicon.ico s3://junglehorse.com/favicon.ico
+  aws s3 cp images/ s3://junglehorse-frontend/images/ --recursive
+  aws s3 cp robots.txt s3://junglehorse-frontend/
+  popd
+}
+
+upload_assets
+#upload_stable_assets
 
