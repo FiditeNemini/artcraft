@@ -3,9 +3,7 @@ Remaining Tasks
 
 Last Minute Burndown
 --------------------
-- AWS / Cloudfront Hosting
-  - Move jungle.horse to cloudfront.
-
+- Disable volume and speed parameters.
 - In-Memory LRU Cache
 
 - Better audio samples
@@ -15,9 +13,6 @@ Last Minute Burndown
 - User input filtering
   - Strip spaces in frontend.
   - Make sure there's no XSS injection.
-  - Maximum # characters (frontend, backend)
-  - Maximum # words (backend, ie. number expansion)
-    - Configs
   - Remove speed query parameter (for now).
 
 - Frontend filesize
