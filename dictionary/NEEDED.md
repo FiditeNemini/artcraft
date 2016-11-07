@@ -2,16 +2,10 @@ These words aren't in the dictionary
 ------------------------------------
 = (equals symbol)
 HN
-anime
-api
 banjo-tooie
-batshit
 cdn
 charizard
-crafted
-damnit
 derping
-dipshit
 dorkiness
 fam
 fearmongers
@@ -34,12 +28,10 @@ patreon
 paypal
 pringles
 ramen
-sanic
 std
 strudel
 sucky
 there's
-titties
 triforce
 tweens
 typescript
