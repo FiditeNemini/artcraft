@@ -11,7 +11,8 @@
 
   # Logging verbosity
   log_handler = false
-  log_parsing = true
+  log_parsing = false
+  log_raw_sentence = true
   log_syllable_decomposition = false
   log_synthesis = false
   log_timing  = true
@@ -23,6 +24,7 @@
   # Logging verbosity
   log_handler = false
   log_parsing = false
+  log_raw_sentence = true
   log_syllable_decomposition = true
   log_synthesis = true
   log_timing  = false

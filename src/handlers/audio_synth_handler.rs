@@ -224,6 +224,7 @@ impl Handler for AudioSynthHandler {
     };
 
     info!(target: "handler", "Speak Request: {:?}", request);
+    info!(target: "raw_sentence", "{:?}", request.sentence);
 
     // Get the request ETag. TODO: Cleanup
     let request_hash = {

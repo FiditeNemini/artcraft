@@ -35,6 +35,7 @@ impl log::Log for SimpleLogger {
     match metadata.target() {
       "handler" => self.config.log_handler.unwrap_or(false),
       "parsing" => self.config.log_parsing.unwrap_or(false),
+      "raw_sentence" => self.config.log_raw_sentence.unwrap_or(false),
       "syllable" => self.config.log_syllable_decomposition.unwrap_or(false),
       "synthesis" => self.config.log_synthesis.unwrap_or(false),
       "timing" => self.config.log_timing.unwrap_or(false),
