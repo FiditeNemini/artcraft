@@ -4,14 +4,7 @@ Remaining Tasks
 Last Minute Burndown
 --------------------
 - AWS / Cloudfront Hosting
-  - Backend
-    - Containerize
-    - ECS
-    - Elastic Beanstalk
-  - Frontend
-    - DNS entries:
-      - api.junglehorse.com -> jungle horse server
-      - junglehorse.com -> AWS
+  - Move jungle.horse to cloudfront.
 
 - In-Memory LRU Cache
 
@@ -29,6 +22,10 @@ Last Minute Burndown
 
 - Frontend filesize
   - Downscale the animation. Maybe make a sprite sheet?
+
+Super Low Priority
+------------------
+- Frontend filesize:
   - Progressive loading of the animation (involved).
   - Zepto.js
   - Remove pixi.js dependency

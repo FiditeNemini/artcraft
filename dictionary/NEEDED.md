@@ -3,8 +3,10 @@ These words aren't in the dictionary
 = (equals symbol)
 HN
 anime
+api
 banjo-tooie
 batshit
+cdn
 charizard
 crafted
 damnit

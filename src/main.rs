@@ -119,7 +119,6 @@ fn start_server(config: &Config,
     // Html Pages
     router.get("/", HtmlHandler::new(config.clone()));
     router.get("/old", HtmlHandler::new(config.clone()));
-    router.get("/demo/:name", HtmlHandler::new(config.clone()));
 
     router
   };
