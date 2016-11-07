@@ -7,6 +7,9 @@ set -ex
 declare -r artifact_dir_name="files/"
 declare -r artifact_dir="./docker/${artifact_dir_name}"
 
+# Build the thing.
+cargo build --release
+
 # Copy binary, sound samples, and configs (only if updated).
 # No need to copy web files as these are hosted on AWS/EC2 instead.
 mkdir -p $artifact_dir
