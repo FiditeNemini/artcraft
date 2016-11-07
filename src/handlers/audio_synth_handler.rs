@@ -13,6 +13,7 @@ use iron::mime::Mime;
 use iron::prelude::IronResult;
 use iron::prelude::Request;
 use iron::prelude::Response;
+use iron::status::BadRequest;
 use iron::status;
 use lang::parser::Parser;
 use speaker::Speaker;
@@ -215,7 +216,7 @@ impl SpeakRequest {
 impl Handler for AudioSynthHandler {
   /// Process request.
   fn handle(&self, req: &mut Request) -> IronResult<Response> {
-    let sentence_error = build_error(status::BadRequest,
+    let sentence_error = build_error(BadRequest,
         &format!("Missing `{}` parameter.", SENTENCE_PARAM));
 
     let request = match SpeakRequest::parse(req) {
@@ -249,8 +250,39 @@ impl Handler for AudioSynthHandler {
       }
     }
 
+    let max_characters = self.config.max_num_characters.unwrap_or(5_000);
+    if request.sentence.len() > max_characters {
+      return build_error(BadRequest, "Too many characters in request.");
+    }
+
+    // GENERATE AUDIO
+
     let start = PreciseTime::now();
-    let result = try!(self.create_audio(request));
+
+    let synth = try!(self.synthesizer.read().map_err(|_| SynthesisError::LockError));
+
+    let params = SynthesisParams {
+      use_words: request.use_words,
+      use_bare_monophones: request.use_bare_monophones,
+      use_n_phones: request.use_n_phones,
+      use_syllables: request.use_syllables,
+      use_ends: request.use_ends,
+      volume: request.volume,
+      speed: request.speed,
+      padding_between_phones: request.padding_between_phones,
+      polyphone_padding_start: request.polyphone_padding_start,
+      polyphone_padding_end: request.polyphone_padding_end,
+      word_padding_start: request.word_padding_start,
+      word_padding_end: request.word_padding_end,
+    };
+
+    let tokens = self.parser.parse(&request.sentence);
+
+    if tokens.len() > self.config.max_num_words.unwrap_or(1_000) {
+      return build_error(BadRequest, "Too many words in request.");
+    }
+
+    let result = try!(synth.generate(tokens, &request.speaker, params));
 
     info!(target: "timing",
           "Total parsing and synthesis took: {}", start.to(PreciseTime::now()));
@@ -273,33 +305,6 @@ impl AudioSynthHandler {
       synthesizer: synthesizer,
       config: config,
     }
-  }
-
-  /// Create audio from the sentence.
-  fn create_audio(&self, request: SpeakRequest)
-                  -> Result<Vec<u8>, SynthesisError> {
-    let synth = match self.synthesizer.read() {
-      Err(_) => { return Err(SynthesisError::LockError); },
-      Ok(synth) => synth,
-    };
-
-    let params = SynthesisParams {
-      use_words: request.use_words,
-      use_bare_monophones: request.use_bare_monophones,
-      use_n_phones: request.use_n_phones,
-      use_syllables: request.use_syllables,
-      use_ends: request.use_ends,
-      volume: request.volume,
-      speed: request.speed,
-      padding_between_phones: request.padding_between_phones,
-      polyphone_padding_start: request.polyphone_padding_start,
-      polyphone_padding_end: request.polyphone_padding_end,
-      word_padding_start: request.word_padding_start,
-      word_padding_end: request.word_padding_end,
-    };
-
-    let tokens = self.parser.parse(&request.sentence);
-    synth.generate(tokens, &request.speaker, params)
   }
 }
 

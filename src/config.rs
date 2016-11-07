@@ -25,6 +25,10 @@ pub struct Config {
   /// Where the abbreviation file is found.
   pub abbreviation_file: Option<String>,
 
+  /// Input control. Respond with 400 when over limit.
+  pub max_num_characters: Option<usize>,
+  pub max_num_words: Option<usize>,
+
   /// What events to log.
   pub log_handler: Option<bool>,
   pub log_parsing: Option<bool>,
@@ -111,6 +115,12 @@ impl Config {
       abbreviation_file: self.abbreviation_file
           .clone()
           .or(other.abbreviation_file.clone()),
+      max_num_characters: self.max_num_characters
+          .clone()
+          .or(other.max_num_characters.clone()),
+      max_num_words: self.max_num_words
+          .clone()
+          .or(other.max_num_words.clone()),
       log_handler: self.log_handler
           .clone()
           .or(other.log_handler.clone()),

@@ -9,6 +9,10 @@
   square_dictionary_file = "./dictionary/square-dict"
   abbreviation_file = "./dictionary/abbreviations.dict"
 
+  # Input control. Respond with 400 when over limit.
+  max_num_characters = 255
+  max_num_words = 100
+
   # Logging verbosity
   log_handler = false
   log_parsing = false
