@@ -18,6 +18,9 @@ Running the server
 2. SCP Rust server app binaries and start on required ports, ie.
    `trumpet -p PORT`.
 
+Before moving to AWS, the DNS A records pointed to `209.239.112.74`,
+which is the hostname `colossus960.startdedicated.com`.
+
 ### On AWS Infrastructure.
 
 1. The frontend is hosted on AWS + Cloudfront.

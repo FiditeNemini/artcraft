@@ -49,6 +49,7 @@ upload_assets() {
   popd
 
   aws s3 cp $output_dir s3://junglehorse-frontend/assets/${checksum} --recursive
+  aws s3 cp $output_dir/index.html s3://jungle.horse/index.html
   aws s3 cp $output_dir/index.html s3://junglehorse.com/index.html
 
   popd
@@ -59,12 +60,22 @@ upload_assets() {
 upload_stable_assets() {
   echo '> Upload stable assets (images, robots.txt, etc.)'
   pushd web
-  # Keep error.html in both buckets.
-  aws s3 cp error.html s3://junglehorse-frontend/
+  # S3 Bucket
+  # jungle.horse website
+  aws s3 cp error.html s3://jungle.horse/
+  aws s3 cp favicon.ico s3://jungle.horse/favicon.ico
+  aws s3 cp robots.txt s3://jungle.horse/
+
+  # S3 Bucket
+  # junglehorse.com website
   aws s3 cp error.html s3://junglehorse.com/
   aws s3 cp favicon.ico s3://junglehorse.com/favicon.ico
+  aws s3 cp robots.txt s3://junglehorse.com/
+
+  # Cloudfront bucket.
+  # Keep error.html in both buckets.
+  aws s3 cp error.html s3://junglehorse-frontend/
   aws s3 cp images/ s3://junglehorse-frontend/images/ --recursive
-  aws s3 cp robots.txt s3://junglehorse-frontend/
   popd
 }
 
