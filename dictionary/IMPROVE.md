@@ -10,7 +10,6 @@ These words need improvement
 "^^^ how (THIS IS SO BAD)
 "^^^ rigging
 "^^^ then (BAD)
-"^^^ wall"
 "do you?"
 "for you"
 "really?"
