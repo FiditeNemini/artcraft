@@ -39,13 +39,13 @@ upload_assets() {
   pushd $output_dir
   # /assets/output/main.built.js -> /assets/main.built.js
   sed -i "s/assets\/output/assets/g" index.html
-  # /assets/main.built.js -> //cdn.junglehorse.com/assets/${checksum}/main.built.js
-  sed -i "s/\/assets/\/\/cdn.junglehorse.com\/assets\/${checksum}/g" index.html
+  # /assets/main.built.js -> //cdn.jungle.horse/assets/${checksum}/main.built.js
+  sed -i "s/\/assets/\/\/cdn.jungle.horse\/assets\/${checksum}/g" index.html
   # Variable substitutions
   sed -i "s/asset_content_hash/${checksum}/g" index.html
   sed -i "s/DEVELOPMENT/production/g" index.html
   sed -i "s/API_HOST/http:\/\/api.jungle.horse/g" index.html
-  sed -i "s/CDN_HOST/\/\/cdn.junglehorse.com/g" index.html
+  sed -i "s/CDN_HOST/\/\/cdn.jungle.horse/g" index.html
   popd
 
   aws s3 cp $output_dir s3://junglehorse-frontend/assets/${checksum} --recursive
