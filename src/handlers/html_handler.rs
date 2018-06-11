@@ -63,10 +63,10 @@ impl HtmlHandler {
 
     path.push(filename);
 
-    let mut file = try!(File::open(&path));
+    let mut file = File::open(&path)?;
     let mut contents = String::new();
 
-    try!(file.read_to_string(&mut contents));
+    file.read_to_string(&mut contents)?;
     Ok(contents)
   }
 }

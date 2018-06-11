@@ -28,7 +28,7 @@ impl AbbreviationsMap {
   /// Read custom abbreviation dictionary.
   /// Based on the CMU Arpabet dictionary format.
   pub fn load_from_file(filename: &str) -> Result<AbbreviationsMap, SynthError> {
-    let f = try!(File::open(filename));
+    let f = File::open(filename)?;
     let mut reader = BufReader::new(f);
 
     let mut map = HashMap::new();
@@ -38,7 +38,7 @@ impl AbbreviationsMap {
     // "OMG  oh my god"
     let re = Regex::new(r"^([\w-'/]+)\s+(.*)\n$").unwrap();
 
-    while try!(reader.read_line(&mut buffer)) > 0 {
+    while reader.read_line(&mut buffer)? > 0 {
       match re.captures(&buffer) {
         None => {},
         Some(caps) => {

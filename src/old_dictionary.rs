@@ -29,26 +29,26 @@ impl VocabularyLibrary {
   /** Read all of the vocabularies under a directory. */
   pub fn read_from_directory(directory: &Path) ->
       Result<VocabularyLibrary, io::Error> {
-    let paths = try!(fs::read_dir(directory));
+    let paths = fs::read_dir(directory)?;
     let mut map = HashMap::new();
 
     for path in paths {
-      let entry = try!(path);
-      let filetype = try!(entry.file_type());
+      let entry = path?;
+      let filetype = entry.file_type()?;
 
       if !filetype.is_dir() {
         continue;
       }
 
-      let dirname = try!(get_filename(&entry));
+      let dirname = get_filename(&entry)?;
 
       if ignorable_file(&dirname) || ignorable_dir(&dirname) {
         continue;
       }
 
       // FIXME: Opening FS reads in a loop is bad. Feel bad.
-      let vocabulary = try!(Vocabulary::read_from_directory(
-          entry.path().as_path()));
+      let vocabulary = Vocabulary::read_from_directory(
+          entry.path().as_path())?;
 
       if vocabulary.words.is_empty() {
         continue;
@@ -67,18 +67,18 @@ impl Vocabulary {
       Result<Vocabulary, io::Error> {
 
     let word_directory = directory.join("words/");
-    let paths = try!(fs::read_dir(word_directory));
+    let paths = fs::read_dir(word_directory)?;
     let mut words = Vec::new();
 
     for path in paths {
-      let entry = try!(path);
-      let filetype = try!(entry.file_type());
+      let entry = path?;
+      let filetype = entry.file_type()?;
 
       if filetype.is_dir() {
         continue;
       }
 
-      let filename = try!(get_filename(&entry));
+      let filename = get_filename(&entry)?;
       let word = filename.replace(".wav", "");
 
       if ignorable_file(&word) {

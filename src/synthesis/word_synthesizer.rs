@@ -35,8 +35,8 @@ impl WordSynthesizer {
                             padding_after_word: Option<u16>,
                             buffer: &mut SampleBytes)
                             -> Result<(), SynthesisError> {
-    let bytes = try!(self.audiobank.get_word(speaker, word)
-        .ok_or(SynthesisError::WordSampleDne));
+    let bytes = self.audiobank.get_word(speaker, word)
+        .ok_or(SynthesisError::WordSampleDne)?;
 
     if padding_before_word.is_some() {
       let pause = generate_pause(padding_before_word.unwrap());
@@ -63,20 +63,20 @@ impl WordSynthesizer {
                                   buffer: &mut SampleBytes)
                                   -> Result<(), SynthesisError> {
 
-    let polyphone = try!(self.arpabet_dictionary.get_polyphone(word)
-        .ok_or(SynthesisError::ArpabetEntryDne));
+    let polyphone = self.arpabet_dictionary.get_polyphone(word)
+        .ok_or(SynthesisError::ArpabetEntryDne)?;
 
     // 2d vector.
-    let syllables_of_phones = try!(arpabet_to_syllables(&polyphone)
-        .ok_or(SynthesisError::SyllableBreakdownFailure));
+    let syllables_of_phones = arpabet_to_syllables(&polyphone)
+        .ok_or(SynthesisError::SyllableBreakdownFailure)?;
 
     if padding_before_polyphone.is_some() {
       let pause = generate_pause(padding_before_polyphone.unwrap());
       buffer.extend(pause);
     }
 
-    let samples = try!(self.get_polysyllable_sample(speaker,
-      syllables_of_phones, use_ends));
+    let samples = self.get_polysyllable_sample(speaker,
+      syllables_of_phones, use_ends)?;
 
     if debug_padding_between_phones.is_some() {
       let padding = generate_pause(debug_padding_between_phones.unwrap());
@@ -113,7 +113,7 @@ impl WordSynthesizer {
                          debug_padding_between_phones: Option<u16>,
                          buffer: &mut SampleBytes)
                          -> Result<(), SynthesisError> {
-    let samples = try!(self.get_n_phone_samples(speaker, word, use_ends));
+    let samples = self.get_n_phone_samples(speaker, word, use_ends)?;
 
     if padding_before_polyphone.is_some() {
       let pause = generate_pause(padding_before_polyphone.unwrap());
@@ -157,8 +157,8 @@ impl WordSynthesizer {
                            debug_padding_between_phones: Option<u16>,
                            buffer: &mut SampleBytes)
                            -> Result<(), SynthesisError> {
-    let samples = try!(self.get_monophone_samples(speaker, word,
-      debug_padding_between_phones));
+    let samples = self.get_monophone_samples(speaker, word,
+      debug_padding_between_phones)?;
 
     if padding_before_polyphone.is_some() {
       let pause = generate_pause(padding_before_polyphone.unwrap());
@@ -686,8 +686,8 @@ impl WordSynthesizer {
                          use_ends: bool)
                          -> Result<Vec<SampleBytes>, SynthesisError> {
 
-    let polyphone = try!(self.arpabet_dictionary.get_polyphone(word)
-        .ok_or(SynthesisError::ArpabetEntryDne));
+    let polyphone = self.arpabet_dictionary.get_polyphone(word)
+        .ok_or(SynthesisError::ArpabetEntryDne)?;
 
     let mut fulfilled : Vec<bool> = Vec::with_capacity(polyphone.len());
     let mut chunks : Vec<Option<SampleBytes>> =
@@ -900,8 +900,8 @@ impl WordSynthesizer {
                            debug_padding_between_phones: Option<u16>)
                            -> Result<SampleBytes, SynthesisError> {
 
-    let polyphone = try!(self.arpabet_dictionary.get_polyphone(word)
-        .ok_or(SynthesisError::ArpabetEntryDne));
+    let polyphone = self.arpabet_dictionary.get_polyphone(word)
+        .ok_or(SynthesisError::ArpabetEntryDne)?;
 
     let mut padding = None;
     if debug_padding_between_phones.is_some() {
@@ -932,7 +932,7 @@ impl WordSynthesizer {
         read_results = self.audiobank.get_phoneme(speaker.as_str(), &phoneme);
       }
 
-      let waveform = try!(read_results.ok_or(SynthesisError::MonophoneDne));
+      let waveform = read_results.ok_or(SynthesisError::MonophoneDne)?;
 
       if padding.is_some() {
         output_waveform.extend(padding.clone().unwrap());

@@ -294,25 +294,25 @@ impl Audiobank {
   // TODO: This should be removed. We should cache the wav headers.
   pub fn get_spec(&self, speaker: &str, word: &str)
       -> Result<WavSpec, SynthesisError> {
-    try!(check_path(speaker));
-    try!(check_path(word));
+    check_path(speaker)?;
+    check_path(word)?;
 
     let path = self.audio_path.join(format!("{}/", speaker))
         .join("_words/")
         .join(format!("{}.wav", word));
 
-    let reader = try!(WavReader::open(path));
+    let reader = WavReader::open(path)?;
     Ok(reader.spec())
   }
 
   // TODO: This should be removed. We should cache the wav headers.
   pub fn get_misc_spec(&self, name: &str) -> Result<WavSpec, SynthesisError> {
-    try!(check_path(name));
+    check_path(name)?;
 
     let path = self.audio_path.join("misc/")
         .join(format!("{}.wav", name));
 
-    let reader = try!(WavReader::open(path));
+    let reader = WavReader::open(path)?;
     Ok(reader.spec())
   }
 

@@ -52,7 +52,7 @@ impl Config {
   /// Static CTOR.
   /// Read a [default] set of configs and merge with a ["$hostname"] set.
   pub fn read(filename: &str) -> Result<Config, ConfigError> {
-    let contents = try!(read_file(filename));
+    let contents = read_file(filename)?;
 
     let table = match toml::Parser::new(&contents).parse() {
       None => { return Err(ConfigError::TomlError); },
@@ -150,9 +150,9 @@ impl From<io::Error> for ConfigError {
 }
 
 fn read_file(filename: &str) -> Result<String, Error> {
-  let mut file = try!(File::open(filename));
+  let mut file = File::open(filename)?;
   let mut buf = String::new();
-  try!(file.read_to_string(&mut buf));
+  file.read_to_string(&mut buf)?;
   Ok(buf)
 }
 

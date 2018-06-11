@@ -259,7 +259,7 @@ impl Handler for AudioSynthHandler {
 
     let start = PreciseTime::now();
 
-    let synth = try!(self.synthesizer.read().map_err(|_| SynthesisError::LockError));
+    let synth = self.synthesizer.read().map_err(|_| SynthesisError::LockError)?;
 
     let params = SynthesisParams {
       use_words: request.use_words,
@@ -282,7 +282,7 @@ impl Handler for AudioSynthHandler {
       return build_error(BadRequest, "Too many words in request.");
     }
 
-    let result = try!(synth.generate(tokens, &request.speaker, params));
+    let result = synth.generate(tokens, &request.speaker, params)?;
 
     info!(target: "timing",
           "Total parsing and synthesis took: {}", start.to(PreciseTime::now()));

@@ -69,17 +69,17 @@ impl Synthesizer {
 
     let mut concatenated_waveform : Vec<i16> = Vec::new();
 
-    try!(self.pad_audio(&mut concatenated_waveform));
+    self.pad_audio(&mut concatenated_waveform)?;
 
     for token in tokens {
       match token {
         SynthToken::Filler { value: _v } => {
           // TODO: Variable length filler content.
-          try!(self.synthesize_word(
+          self.synthesize_word(
             &mut concatenated_waveform,
             &speaker,
             "um",
-            &params));
+            &params)?;
         },
         SynthToken::Pause { value: ref v } => {
           let pause_duration = match *v {
@@ -91,16 +91,16 @@ impl Synthesizer {
           concatenated_waveform.extend(pause);
         },
         SynthToken::Word { value: ref v } => {
-          try!(self.synthesize_word(
+          self.synthesize_word(
             &mut concatenated_waveform,
             &speaker,
             &v.value,
-            &params));
+            &params)?;
         }
       }
     }
 
-    try!(self.pad_audio(&mut concatenated_waveform));
+    self.pad_audio(&mut concatenated_waveform)?;
 
     // FIXME: Super inefficient pieces.
     if params.speed.is_some() {
@@ -116,7 +116,7 @@ impl Synthesizer {
     // This is the prototype we use for audio headers.
     // TODO: Cache waveform headers.
     // TODO: Add custom headers with "author" etc. metadata.
-    let spec = try!(self.audiobank.get_misc_spec("pause"));
+    let spec = self.audiobank.get_misc_spec("pause")?;
 
     Ok(self.write_buffer(&spec, concatenated_waveform))
   }
@@ -146,7 +146,7 @@ impl Synthesizer {
         if params.use_syllables {
           // TODO: Prefix buffer and suffix buffer.
           // TODO: Param for monophone padding.
-          added = try!(self.word_synthesizer.append_syllabic_n_phones(
+          added = self.word_synthesizer.append_syllabic_n_phones(
             speaker,
             word,
             params.use_ends,
@@ -154,11 +154,11 @@ impl Synthesizer {
             params.polyphone_padding_end,
             params.padding_between_phones,
             concatenated_waveform)
-              .map(|_| true));
+              .map(|_| true)?;
         } else {
           // TODO: Prefix buffer and suffix buffer.
           // TODO: Param for monophone padding.
-          added = try!(self.word_synthesizer.append_n_phones(
+          added = self.word_synthesizer.append_n_phones(
             speaker,
             word,
             params.use_ends,
@@ -166,19 +166,19 @@ impl Synthesizer {
             params.polyphone_padding_end,
             params.padding_between_phones,
             concatenated_waveform)
-              .map(|_| true));
+              .map(|_| true)?;
         }
       } else if params.use_bare_monophones {
         // TODO: Prefix buffer and suffix buffer.
         // TODO: Param for monophone padding.
-        added = try!(self.word_synthesizer.append_monophones(
+        added = self.word_synthesizer.append_monophones(
           speaker,
           word,
           params.polyphone_padding_start,
           params.polyphone_padding_end,
           params.padding_between_phones,
           concatenated_waveform)
-            .map(|_| true));
+            .map(|_| true)?;
       }
     }
 
