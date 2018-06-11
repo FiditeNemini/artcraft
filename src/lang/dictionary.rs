@@ -1,8 +1,9 @@
 // Copyright (c) 2016 Brandon Thomas <bt@brand.io, echelon@gmail.com>
 
+use arpabet::Arpabet;
 use speaker::Speaker;
-use std::collections::HashSet;
 use std::collections::HashMap;
+use std::collections::HashSet;
 
 pub type Word = String;
 
@@ -25,6 +26,17 @@ impl Dictionary {
 
   pub fn empty() -> Dictionary {
     Dictionary { words: HashSet::new() }
+  }
+
+
+  /// Extract and return the internal word dictionary (a list of all
+  /// the words contained in the arpabet).
+  pub fn from_arpabet(arpabet: &Arpabet) -> Dictionary {
+    let mut words = HashSet::new();
+    for word in arpabet.keys() {
+      words.insert(word.to_string());
+    }
+    Dictionary::new(words)
   }
 
   /// Returns true if the dictionary contains the word.

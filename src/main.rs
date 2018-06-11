@@ -3,6 +3,7 @@
 #[macro_use] extern crate lazy_static;
 #[macro_use] extern crate log;
 
+extern crate arpabet;
 extern crate chrono;
 extern crate clap;
 extern crate crypto;
@@ -27,6 +28,7 @@ pub mod old_dictionary;
 pub mod speaker;
 pub mod synthesis;
 
+use arpabet::Arpabet;
 use clap::{App, Arg, ArgMatches};
 use config::Config;
 use handlers::audio_synth_handler::AudioSynthHandler;
@@ -35,7 +37,7 @@ use handlers::html_handler::HtmlHandler;
 use handlers::vocab_list_handler::VocabListHandler;
 use iron::prelude::*;
 use lang::abbr::AbbreviationsMap;
-use lang::arpabet::Arpabet;
+use lang::dictionary::Dictionary;
 use lang::dictionary::UniversalDictionary;
 use lang::parser::Parser;
 use lang::tokenizer::Tokenizer;
@@ -145,23 +147,25 @@ fn get_hostname() {
 
 fn create_parser_and_synthesizer(config: &Config) -> (Parser, Synthesizer) {
   info!("Reading Arpabet Dictionary...");
-  let arpabet_dictionary = Arpabet::load_from_file(
-      &config.phoneme_dictionary_file.clone().unwrap()).unwrap();
+  let cmudict = Arpabet::load_cmudict();
 
   info!("Reading Extra Dictionary...");
   let extra_dictionary = Arpabet::load_from_file(
-      &config.extra_dictionary_file.clone().unwrap()).unwrap();
+      &config.extra_dictionary_file.clone().unwrap())
+      .expect("Error loading extra dictionary");
 
   info!("Reading Square Dictionary...");
   let square_dictionary = Arpabet::load_from_file(
-      &config.square_dictionary_file.clone().unwrap()).unwrap();
+      &config.square_dictionary_file.clone().unwrap())
+      .expect("Error reading square dictionary");
 
-  let arpabet = arpabet_dictionary
+  let arpabet = cmudict
       .combine(&extra_dictionary)
       .combine(&square_dictionary);
 
   let mut dictionary = UniversalDictionary::new();
-  dictionary.set_arpabet_dictionary(arpabet.to_dictionary());
+  let arpa_dict = Dictionary::from_arpabet(&arpabet);
+  dictionary.set_arpabet_dictionary(arpa_dict);
 
   let dictionary = Arc::new(dictionary);
 

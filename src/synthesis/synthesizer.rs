@@ -1,8 +1,8 @@
 // Copyright (c) 2016 Brandon Thomas <bt@brand.io, echelon@gmail.com>
 
+use arpabet::Arpabet;
 use hound::WavSpec;
 use hound::WavWriter;
-use lang::arpabet::Arpabet;
 use speaker::Speaker;
 use std::io::BufWriter;
 use std::io::Cursor;

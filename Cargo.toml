@@ -9,6 +9,7 @@
 
 [dependencies]
   #cpal = "*" # Hardware audio output (for testing); works well with Hound.
+  arpabet = "0.2"
   chrono = { version = "0.2.*", features = ["rustc-serialize"] }
   clap = "1.5.*" # CLI parsing.
   hound = "2.0.*" # WAV codec.

@@ -1,6 +1,6 @@
 // Copyright (c) 2016 Brandon Thomas <bt@brand.io, echelon@gmail.com>
 
-use lang::arpabet::Arpabet;
+use arpabet::Arpabet;
 use lang::syllables::Polysyllabic;
 use lang::syllables::Polysyllable;
 use lang::syllables::arpabet_to_syllables;
