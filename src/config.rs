@@ -19,6 +19,7 @@ pub struct Config {
 
   /// Where various arpabet files are located.
   pub phoneme_dictionary_file: Option<String>,
+  pub arpabet_override_dictionary_file: Option<String>,
   pub extra_dictionary_file: Option<String>,
   pub square_dictionary_file: Option<String>,
 
@@ -106,6 +107,9 @@ impl Config {
       phoneme_dictionary_file: self.phoneme_dictionary_file
           .clone()
           .or(other.phoneme_dictionary_file.clone()),
+      arpabet_override_dictionary_file: self.arpabet_override_dictionary_file
+          .clone()
+          .or(other.arpabet_override_dictionary_file.clone()),
       extra_dictionary_file: self.extra_dictionary_file
           .clone()
           .or(other.extra_dictionary_file.clone()),

@@ -149,6 +149,11 @@ fn create_parser_and_synthesizer(config: &Config) -> (Parser, Synthesizer) {
   info!("Reading Arpabet Dictionary...");
   let cmudict = Arpabet::load_cmudict();
 
+  info!("Reading Arpabet Override Dictionary...");
+  let override_dictionary = Arpabet::load_from_file(
+      &config.arpabet_override_dictionary_file.clone().unwrap())
+      .expect("Error reading arpabet override dictionary");
+
   info!("Reading Extra Dictionary...");
   let extra_dictionary = Arpabet::load_from_file(
       &config.extra_dictionary_file.clone().unwrap())
@@ -160,6 +165,7 @@ fn create_parser_and_synthesizer(config: &Config) -> (Parser, Synthesizer) {
       .expect("Error reading square dictionary");
 
   let arpabet = cmudict
+      .combine(&override_dictionary)
       .combine(&extra_dictionary)
       .combine(&square_dictionary);
 

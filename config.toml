@@ -5,6 +5,7 @@
   sound_path = "./sounds"
   html_path = "./web"
   phoneme_dictionary_file = "./dictionary/cmudict-0.7b"
+  arpabet_override_dictionary_file = "./dictionary/cmu-changeset"
   extra_dictionary_file = "./dictionary/extra-dict"
   square_dictionary_file = "./dictionary/square-dict"
   abbreviation_file = "./dictionary/abbreviations.dict"
