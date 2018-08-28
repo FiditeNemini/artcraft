@@ -39,18 +39,18 @@ upload_assets() {
   pushd $output_dir
   # /assets/output/main.built.js -> /assets/main.built.js
   sed -i "s/assets\/output/assets/g" index.html
-  # /assets/main.built.js -> //cdn.jungle.horse/assets/${checksum}/main.built.js
-  sed -i "s/\/assets/\/\/cdn.jungle.horse\/assets\/${checksum}/g" index.html
+  # /assets/main.built.js -> //cdn.trumped.com/assets/${checksum}/main.built.js
+  sed -i "s/\/assets/\/\/cdn.trumped.com\/assets\/${checksum}/g" index.html
   # Variable substitutions
   sed -i "s/asset_content_hash/${checksum}/g" index.html
   sed -i "s/DEVELOPMENT/production/g" index.html
-  sed -i "s/API_HOST/http:\/\/api.jungle.horse/g" index.html
-  sed -i "s/CDN_HOST/\/\/cdn.jungle.horse/g" index.html
+  sed -i "s/API_HOST/http:\/\/api.trumped.com/g" index.html
+  sed -i "s/CDN_HOST/\/\/cdn.trumped.com/g" index.html
   popd
 
-  aws s3 cp $output_dir s3://junglehorse-frontend/assets/${checksum} --recursive
-  aws s3 cp $output_dir/index.html s3://jungle.horse/index.html
-  aws s3 cp $output_dir/index.html s3://junglehorse.com/index.html
+  aws s3 cp $output_dir s3://cdn.trumped.com/assets/${checksum} --recursive
+  aws s3 cp $output_dir/index.html s3://trumped.com/index.html
+  #aws s3 cp $output_dir/index.html s3://junglehorse.com/index.html
 
   popd
 }
@@ -61,24 +61,24 @@ upload_stable_assets() {
   echo '> Upload stable assets (images, robots.txt, etc.)'
   pushd web
   # S3 Bucket
-  # jungle.horse website
-  aws s3 cp error.html s3://jungle.horse/
-  aws s3 cp favicon.ico s3://jungle.horse/favicon.ico
-  aws s3 cp robots.txt s3://jungle.horse/
+  # trumped.com website
+  aws s3 cp error.html s3://trumped.com/
+  aws s3 cp favicon.ico s3://trumped.com/favicon.ico
+  aws s3 cp robots.txt s3://trumped.com/
 
   # S3 Bucket
   # junglehorse.com website
-  aws s3 cp error.html s3://junglehorse.com/
-  aws s3 cp favicon.ico s3://junglehorse.com/favicon.ico
-  aws s3 cp robots.txt s3://junglehorse.com/
+  #aws s3 cp error.html s3://junglehorse.com/
+  #aws s3 cp favicon.ico s3://junglehorse.com/favicon.ico
+  #aws s3 cp robots.txt s3://junglehorse.com/
 
   # Cloudfront bucket.
   # Keep error.html in both buckets.
-  aws s3 cp error.html s3://junglehorse-frontend/
-  aws s3 cp images/ s3://junglehorse-frontend/images/ --recursive
+  aws s3 cp error.html s3://cdn.trumped.com/
+  aws s3 cp images/ s3://cdn.trumped.com/images/ --recursive
   popd
 }
 
 upload_assets
-#upload_stable_assets
+upload_stable_assets
 

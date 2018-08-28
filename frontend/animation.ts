@@ -102,7 +102,8 @@ export function setup_animation() {
   //logo = new PIXI.Text('Jungle Horse',
   //                 {font: '150px Impact Bold', fill: 0x000000, align: 'center'});
 
-  let texture = PIXI.Texture.fromImage(`${prefix}/jungle_horse_lobster.png`);
+  //let texture = PIXI.Texture.fromImage(`${prefix}/jungle_horse_lobster.png`);
+  let texture = PIXI.Texture.fromImage(`${prefix}/trumped.png`);
   logo2 = new PIXI.Sprite(texture);
 
   PIXI.loader.add('asset', `${prefix}/trumpette/idle_0.png`)

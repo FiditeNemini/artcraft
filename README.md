@@ -4,6 +4,72 @@ Trumpet
 2. ???
 3. lol
 
+AWS Notes
+---------
+
+### S3 Bucket
+
+- Bucket *must* be named per the domain, eg. `trumped.com` instead of `trumped-index`.
+- Static website hosting: set index.html, error.html
+- Set the Bucket Policy: ```{
+    "Version": "2012-10-17",
+    "Id": "Policy1535378813796",
+    "Statement": [
+        {
+            "Sid": "Stmt1478413958263",
+            "Effect": "Allow",
+            "Principal": {
+                "AWS": "arn:aws:iam::961528074194:user/junglehorse"
+            },
+            "Action": "s3:*",
+            "Resource": "arn:aws:s3:::trumped.com/*"
+        },
+        {
+            "Sid": "PublicReadGetObject",
+            "Effect": "Allow",
+            "Principal": "*",
+            "Action": "s3:GetObject",
+            "Resource": "arn:aws:s3:::trumped.com/*"
+        }
+    ]
+}
+```
+
+- Set CORS headers,
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<CORSConfiguration xmlns="http://s3.amazonaws.com/doc/2006-03-01/">
+<CORSRule>
+    <AllowedOrigin>*</AllowedOrigin>
+    <AllowedMethod>GET</AllowedMethod>
+    <AllowedMethod>HEAD</AllowedMethod>
+    <MaxAgeSeconds>3000</MaxAgeSeconds>
+    <AllowedHeader>*</AllowedHeader>
+</CORSRule>
+</CORSConfiguration>
+```
+
+- Note that the URL is `http://trumped.com.s3-website-us-east-1.amazonaws.com/` (static websites), 
+  not `http://trumped.com.s3.amazonaws.com/` (REST endpoints)!
+
+### Cloudfront
+
+- Origin domain name: trumped-frontend.s3.amazonaws.com
+- Origin path: (null)
+- Origin id: S3-trumped-frontend
+- Restrict access: no
+- Alternative domain names (CNAMEs): trumped.com, www.trumped.com, cdn.trumped.com
+- SSL certificate: Default Cloudfront (\*.cloudfront.net)
+- Default root object: index.html
+- Extra:
+  - Behaviors: `/` at precedence 0, forward query strings.
+  - Error pages (403, 404) to direct to `/error.html`
+
+### Elastic Beanstalk
+
+- (Make sure you're in the same region you set the app up in!)
+
 Running the server
 ------------------
 
