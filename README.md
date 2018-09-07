@@ -69,6 +69,7 @@ AWS Notes
 ### Elastic Beanstalk
 
 - (Make sure you're in the same region you set the app up in!)
+- https://us-west-2.console.aws.amazon.com/elasticbeanstalk/home?region=us-west-2#/environment/dashboard?applicationName=junglehorse-api&environmentId=e-bgpvm79qkt
 
 Running the server
 ------------------
