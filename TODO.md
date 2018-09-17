@@ -1,8 +1,45 @@
-Remaining Tasks
-===============
+Trumped TODO
+============
 
-Last Minute Burndown
---------------------
+Improve synthesis system
+------------------------
+- Speech modes:
+  - "SHOUT" words for emphasis.
+  - Question intonation in interrogative sentences.
+  - Clear conjection words: "But I think..." vs. "Blah blah, BUT blah blah blah."
+- Arpabet where the numbers are parameters: AW(0), AW(2), etc.
+- Multiple word samples with unit selection
+- Pluralization
+
+Words to Fix
+------------
+- you're / your is 'yer'. too short.
+- want is 'wan'. too short.
+- that's
+- 'what' is 'wet'. bad.
+
+# Needed words
+- need
+- shut up
+- suck/sucks
+- tell
+
+# Shout words
+- die
+- favorite
+- hands
+- tiny
+
+# Phonemes to fix
+- BReak
+- badASS
+- deMAND
+- naME
+- thinKING
+- unfortuNate
+
+OLD Last Minute Burndown
+------------------------
 - Disable volume and speed parameters.
 - In-Memory LRU Cache
 
@@ -18,15 +55,15 @@ Last Minute Burndown
 - Frontend filesize
   - Downscale the animation. Maybe make a sprite sheet?
 
-Super Low Priority
-------------------
+OLD Super Low Priority
+----------------------
 - Frontend filesize:
   - Progressive loading of the animation (involved).
   - Zepto.js
   - Remove pixi.js dependency
 
-Old Goals
----------
+OLDER Old Goals
+---------------
 
 *HIGH LEVEL GOALS*
   1. Sound better
@@ -36,10 +73,8 @@ Old Goals
   5. Good code
 
 Audio Samples
-  - MORE SAMPLES
-  - IMPROVED SAMPLES
   - Remove extra space between words (using parsing to insert spacing)
-  - No more missing phonemes
+  - Phonemes
     - Real versions of ['AO0', 'AW0', 'AW2', 'AY0', 'EY0', 'OY0', 'UH0'], which
       were backfilled with fakes.
 
@@ -103,12 +138,11 @@ Extra
   - Clientside speed changing
   - Let people type nonsense syllables
 
-Parsing Examples
-----------------
+OLD Parsing Examples
+--------------------
 - Camel case even outside of hashtags:
   - "Google acquires FameBit", StateOfW, AdaLovelaceDay
-- Time: 7:30pm, 5:30ET, 9pm ET, 8:00 P.M., 8pm ET
 - Hyphenated: 2-party
-- They will get horrible sentences, violently.We have the support.#RepealThe1st 
+- They will get horrible sentences, violently.We have the support.#RepealThe1st
 - #100YearsStrong
 
