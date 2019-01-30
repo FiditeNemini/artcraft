@@ -1,0 +1,237 @@
+html,
+body {
+  margin: 0;
+  padding: 0;
+}
+
+body,
+input,
+button {
+  font-family: "Fira Sans";
+}
+
+#main {
+  margin: auto;
+  max-width: 1000px;
+}
+
+h1 {
+  color: #333;
+  font-family: "Happy Monkey";
+  font-size: 3em;
+  margin: 20px 0 10px;
+  text-align: center;
+}
+
+#animation canvas {
+  display: block;
+  margin: auto;
+}
+
+#logo {
+  display: none;
+  z-index: 100;
+  position: absolute;
+  top: 0;
+  width: 100%;
+}
+
+#input-box {
+  box-sizing: border-box;
+  padding: 12px 15px;
+  width: 100%;
+}
+
+pre {
+  display: inline;
+}
+
+input {
+  box-sizing: border-box;
+  font-size: 1.2em;
+  border: 1px solid #999;
+  padding: 0.3em;
+  width: 100%;
+}
+
+button {
+  background-color: #e5e5e5;
+  border: 0;
+  color: #777;
+  font-size: 1.2em;
+  margin: 20px;
+  min-width: 150px;
+  padding: 0.75em;
+  padding: 10px;
+}
+
+#buttons {
+  margin-top: 20px;
+  width: 100%;
+}
+
+#button-left {
+  float: left;
+  width: 50%;
+}
+
+#button-right {
+  float: right;
+  width: 50%;
+}
+
+button#speak {
+  display: block;
+  margin: 0 auto;
+}
+
+button#clear {
+  display: block;
+  margin: 0 auto;
+}
+
+a:link, a:visited {
+  color: #c75;
+  font-weight: bold;
+}
+
+aside {
+  position: absolute;
+  top: 0;
+  z-index: 100;
+  background-color: rgba(255,255,255,0.85);
+  width: 100%;
+}
+
+aside #about {
+  padding: 20px 20px 50px;
+  margin: auto;
+  max-width: 1000px;
+}
+
+#close_top,
+#close_bottom {
+  float: right;
+}
+
+.hidden {
+  display: none;
+}
+
+footer {
+  width: 100%;
+  position: absolute;
+  bottom: 0em;
+  overflow: auto;
+  padding: 0;
+  margin: 0;
+  color: #777;
+}
+
+footer a:link,
+footer a:visited {
+  color: #d86;
+  font-weight: bold;
+}
+
+#footer-text {
+  text-align: center;
+  padding: 15px;
+}
+
+.clear {
+  clear: both;
+}
+/** RESPONSIVENESS */
+
+@media screen and (min-width: 600px) {
+  button {
+    min-width: 250px;
+  }
+}
+
+@media screen and (min-width: 1px) {
+  #animation canvas {
+    width: 200px;
+  }
+  #animation {
+    height: 117px;
+  }
+}
+
+@media screen and (min-width: 300px) {
+  #animation canvas {
+    width: 300px;
+  }
+  #animation {
+    height: 176px;
+  }
+}
+
+@media screen and (min-width: 400px) {
+  #animation canvas {
+    width: 400px;
+  }
+  #animation {
+    height: 235px;
+  }
+}
+
+@media screen and (min-width: 450px) {
+  #animation canvas {
+    width: 450px;
+  }
+  #animation {
+    height: 264px;
+  }
+}
+
+@media screen and (min-width: 500px) {
+  #animation canvas {
+    width: 500px;
+  }
+  #animation {
+    height: 293px;
+  }
+}
+
+@media screen and (min-width: 600px) {
+  #animation canvas {
+    width: 600px;
+  }
+  #animation {
+    height: 352px;
+  }
+}
+
+@media screen and (min-width: 800px) {
+  #animation canvas {
+    width: 800px;
+  }
+  #animation {
+    height: 470px;
+  }
+}
+
+@media screen and (min-width: 1000px) {
+  #animation canvas {
+    width: 800px;
+  }
+  #animation {
+    height: 470px;
+  }
+}
+
+/** Hide footer when using onscreen keyboard. */
+@media screen and (max-height: 450px) {
+  footer {
+    display: none;
+  }
+}
+
+@media screen and (max-height: 740px) {
+  footer p {
+    display: inline;
+  }
+}
+

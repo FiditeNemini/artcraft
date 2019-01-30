@@ -18,7 +18,7 @@ upload_assets() {
 
   # Calculate output directory.
   echo "> Calculate artifact SHA."
-  pushd ./web/output > /dev/null
+  pushd ./brandon.audio/output > /dev/null
   declare checksum=$(find . -type f -exec md5sum {} + | awk '{print $1}' | \
                      sort | md5sum | awk '{print $1}')
   popd > /dev/null
@@ -27,12 +27,12 @@ upload_assets() {
 
   # Prep upload artifact.
   echo "> Prep upload of artifact ${checksum}."
-  pushd ./web
+  pushd ./brandon.audio
 
   mkdir -p $output_dir
   cp *css $output_dir
   cp *html $output_dir
-  cp output/* $output_dir
+  #cp output/* $output_dir # FIXME(2019-01-30): Not sure why this isn't working. Needed?
 
   # Modify URLs in index.html
   echo "> Modify asset paths, etc. in index.html."

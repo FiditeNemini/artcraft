@@ -1,0 +1,104 @@
+
+h1 {
+  font-family: ubuntu, tahoma;
+  font-size: 1.8em;
+  text-align: center;
+  color: #333;
+}
+
+input {
+  border: 1px solid #ccc;
+  padding: 8px;
+  margin-bottom: 1em;
+}
+
+input#text {
+  width: 70%;
+}
+
+input#vol {
+  width: 30px;
+}
+
+button {
+  background-color: #eee;
+  border: 1px solid #ccc;
+  padding: 8px;
+}
+
+select {
+  background-color: #eee;
+  border: 1px solid #ccc;
+  padding: 7px;
+}
+
+#control_elements {
+  display: inline;
+}
+
+@media (max-width: 600px) {
+  #control_elements {
+    display: block;
+  }
+}
+
+#main {
+  margin: auto;
+  width: 90%;
+  text-align: center;
+}
+
+
+.error input#text {
+  border-color: #f55;
+  background-color: #fee;
+  color: #500;
+}
+
+.ok input#text {
+  border-color: #5a5;
+  background-color: #efe;
+}
+
+#typeahead {
+  color: #777;
+  font-style: italic;
+  width: 100%;
+  height: 1em;
+  margin: 0 0 10px 0;
+  overflow: hidden;
+  /*text-overflow: ellipsis;*/
+}
+
+#typeahead ul {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+}
+
+#typeahead li {
+  display: inline;
+  padding: 5px;
+  border: 1px;
+}
+
+#stats {
+  margin: 20px 0;
+  font-size: 0.8em;
+  color #777;
+}
+
+ul#stats {
+  list-style-type: none;
+}
+
+a:link, a:visited {
+  color: #00f;
+  text-decoration: none;
+}
+
+a:active, a:hover {
+  color: #00f;
+  text-decoration: underline;
+}
+

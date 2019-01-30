@@ -12,3 +12,5 @@ web/*.js
 web/deploy/
 web/images/
 web/output/
+brandon.audio/deploy/
+brandon.audio/output/
