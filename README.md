@@ -7,6 +7,28 @@ Trumpet
 Namecheap DNS Notes
 -------------------
 
+### `trumped.com` DNS
+
+```
+Type    Host    Value                                                         TTL
+CNAME   @       `trumped.com.s3-website-us-east-1.amazonaws.com.`             5 MIN
+CNAME   api     `junglehorseapi-env.us-west-2.elasticbeanstalk.com.`          5 MIN
+CNAME   cdn     `trumped-frontend.s3.amazonaws.com.`                          5 MIN
+CNAME   www     `trumped-frontend.s3.amazonaws.com.`                          5 MIN
+URL     *       `http://trumped.com`                                          Unmasked
+```
+
+### `brandon.audio` DNS
+
+```
+Type    Host    Value                                                         TTL
+CNAME   @       `brandon.audio.s3-website-us-east-1.amazonaws.com`            5 MIN
+CNAME   api     `junglehorseapi-env.us-west-2.elasticbeanstalk.com.`          5 MIN
+CNAME   cdn     `cdn.brandon.audio.s3.amazonaws.com.`                         5 MIN
+CNAME   www     `cdn.brandon.audio.s3.amazonaws.com.`                         5 MIN
+URL     *       `http://brandon.audio`                                        Unmasked
+```
+
 ### Old `jungle.horse`
 
 ```
