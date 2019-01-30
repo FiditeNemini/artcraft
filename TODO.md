@@ -23,6 +23,7 @@ Words to Fix
 - shut up
 - suck/sucks
 - tell
+- idea
 
 # Shout words
 - die
