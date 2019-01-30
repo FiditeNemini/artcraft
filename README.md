@@ -4,6 +4,19 @@ Trumpet
 2. ???
 3. lol
 
+Namecheap DNS Notes
+-------------------
+
+### Old `jungle.horse`
+
+```
+Type    Host    Value                                                         TTL
+CNAME   @       `junglehorse-frontend.s3-website-us-east-1.amazonaws.com.`    5 MIN
+CNAME   api     `junglehorseapi-env.us-west-2.elasticbeanstalk.com.`          20 MIN
+CNAME   cdn     `dy6kf1ub3ccan.cloudfront.net.`                               20 MIN
+URL     www     `http://jungle.horse`                                         301 Permanent
+```
+
 AWS Notes
 ---------
 
