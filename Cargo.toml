@@ -1,0 +1,21 @@
+[package]
+name = "voder"
+version = "0.0.0"
+authors = [ "Brandon Thomas <bt@brand.io>",
+            "Brandon Thomas <echelon@gmail.com>" ]
+
+[[bin]]
+name = "voder"
+
+[dependencies]
+cpal = "0.10.0" # hardware audio out
+hound = "3.4.0" # wav encoder/decoder
+sample = "0.10.0" # DSP toolkit
+sonogram = "0.3.0" # badass spectrograms
+wavy = "0.1.2" # real time audio capture and playback
+
+#chrono
+#clap
+#log
+#time
+#toml
