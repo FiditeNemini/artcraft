@@ -57,3 +57,25 @@ Crates to try:
   - PCM support
   - 18/16/32/64 bit support
 
+
+Hardware
+--------
+
+Enumerate hardware:
+
+* `pactl list short sinks`
+
+The linux headphone jack is named at startup:
+
+* `speaker-test -t wav -c 6 -D front`
+
+To change the 'default' speaker,
+
+```
+pactl list short sinks
+pactl set-default-sink 'alsa_output.pci-0000_00_1f.3.analog-stereo'
+speaker-test -t wav -c 6 -D default
+```
+
+This makes the rust code work on Desktop.
+
