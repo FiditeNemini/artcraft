@@ -83,3 +83,25 @@ Links
 -----
 
 * http://www.rossbencina.com/code/real-time-audio-programming-101-time-waits-for-nothing
+
+Troubleshooting
+---------------
+
+THIS WORKS TO DEFEAT CHIPMUNK NOISES!
+
+* https://bbs.archlinux.org/viewtopic.php?id=179923
+  * https://wiki.archlinux.org/index.php/PulseAudio/Troubleshooting#Setting_the_default_fragment_number_and_buffer_size_in_PulseAudio
+
+```
+device.serial = "Focusrite_Scarlett_2i4_USB"
+device.string = "surround40:1"
+device.buffering.buffer_size = "1048576"
+device.buffering.fragment_size = "524288"
+```
+PulseAudio's default sampling rate and bit depth are set to 44100Hz @ 16 bits. 
+
+> 1048576 / 1411200 (buffer size)
+0.7430385487528345  = 743 ms
+> 524288 / 1411200 (fragment size)
+0.37151927437641724 = 372 ms
+
