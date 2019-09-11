@@ -6,6 +6,8 @@ extern crate sample;
 extern crate sonogram;
 extern crate wavy;
 
+use std::f64;
+
 use wavy::*;
 //use signal;
 
@@ -17,7 +19,7 @@ fn main() {
   record2().unwrap();
 }
 
-const THRESHOLD : i16 = 1500;
+const THRESHOLD : i16 = 750;
 
 fn record2() -> Result<(), AudioError> {
   println!("Opening microphone system");
@@ -28,21 +30,56 @@ fn record2() -> Result<(), AudioError> {
 
   println!("Done");
 
-  let mut buffer = VecDeque::new();
+  let mut buffer = VecDeque::with_capacity(1028 * 1028);
 
   loop {
-    mic.record(&mut |_index, l, r| {
+    mic.record(&mut |_index, mut l, mut r| {
+      if l < THRESHOLD && l > -THRESHOLD {
+        l = l / 2;
+      }
+      if r < THRESHOLD && r > -THRESHOLD {
+        r = r / 2;
+      }
+      //println!("L: {}, R: {}", l, r);
       buffer.push_back((l, l));
     });
 
+    //let mut last_lsample = None;
+    //let mut last_rsample = None;
+
+    let mut i = 0;
+
     speaker.play(&mut || {
-      if let Some((lsample, rsample)) = buffer.pop_front() {
+
+      let y = sin(i);
+      i += 1;
+      //println!("Sin: {}", y);
+      let l = (y * 500.0) as i16;
+
+      AudioSample::stereo(l, l)
+
+      /*if let Some((lsample, rsample)) = buffer.pop_front() {
+        last_lsample = Some(lsample);
+        last_rsample = Some(rsample);
         AudioSample::stereo(lsample, rsample)
       } else {
-        AudioSample::stereo(0, 0)
-      }
+        let lsample = last_lsample.unwrap_or(0);
+        let rsample = last_rsample.unwrap_or(0);
+        //println!("No data!");
+        AudioSample::stereo(lsample, rsample)
+      }*/
     });
   }
+}
+
+fn sin(i: i64) -> f64 {
+  //let x = f64::consts::PI*2.0;
+  //let abs_difference = (x.sin() - 1.0).abs();
+
+  let x = ((i+1) % 3000) as f64 / 3000.0;
+  let x = x * f64::consts::PI * 2.0;
+
+  x.sin()
 }
 
 fn record() -> Result<(), AudioError> {

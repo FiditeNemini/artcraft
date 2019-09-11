@@ -79,3 +79,7 @@ speaker-test -t wav -c 6 -D default
 
 This makes the rust code work on Desktop.
 
+Links
+-----
+
+* http://www.rossbencina.com/code/real-time-audio-programming-101-time-waits-for-nothing
