@@ -13,10 +13,37 @@ use std::collections::VecDeque;
 
 fn main() {
   println!("Run");
-  record().unwrap();
+  //record().unwrap();
+  record2().unwrap();
 }
 
 const THRESHOLD : i16 = 1500;
+
+fn record2() -> Result<(), AudioError> {
+  println!("Opening microphone system");
+  let mut mic = MicrophoneSystem::new(SampleRate::Studio)?;
+
+  println!("Opening speaker system");
+  let mut speaker = SpeakerSystem::new(SampleRate::Studio)?;
+
+  println!("Done");
+
+  let mut buffer = VecDeque::new();
+
+  loop {
+    mic.record(&mut |_index, l, r| {
+      buffer.push_back((l, l));
+    });
+
+    speaker.play(&mut || {
+      if let Some((lsample, rsample)) = buffer.pop_front() {
+        AudioSample::stereo(lsample, rsample)
+      } else {
+        AudioSample::stereo(0, 0)
+      }
+    });
+  }
+}
 
 fn record() -> Result<(), AudioError> {
   // Connect to the speaker and microphone systems.
