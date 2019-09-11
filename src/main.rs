@@ -9,6 +9,8 @@ extern crate wavy;
 use std::f64;
 
 use wavy::*;
+use sample::Signal;
+use sample::signal;
 //use signal;
 
 use std::collections::VecDeque;
@@ -48,6 +50,7 @@ fn record2() -> Result<(), AudioError> {
     //let mut last_rsample = None;
 
     let mut i = 0;
+    let mut sine_signal = signal::rate(44_100.0).const_hz(400.0).sine();
 
     speaker.play(&mut || {
 
@@ -55,6 +58,13 @@ fn record2() -> Result<(), AudioError> {
       i += 1;
       //println!("Sin: {}", y);
       let l = (y * 500.0) as i16;
+
+      let mut frame = sine_signal.take(1);
+      let f = frame.next().unwrap();
+
+      println!("Frame: {:?}", f);
+      //let x = frame.next().unwrap();
+      //let l = (x * 500.0) as i16;
 
       AudioSample::stereo(l, l)
 

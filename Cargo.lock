@@ -536,6 +536,7 @@ name = "voder"
 version = "0.0.0"
 dependencies = [
  "cpal 0.10.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "failure 0.1.5 (registry+https://github.com/rust-lang/crates.io-index)",
  "hound 3.4.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "sample 0.10.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "sonogram 0.3.0 (registry+https://github.com/rust-lang/crates.io-index)",

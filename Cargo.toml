@@ -9,6 +9,7 @@ name = "voder"
 
 [dependencies]
 cpal = "0.10.0" # hardware audio out
+failure = "0.1.5" # required by cpal
 hound = "3.4.0" # wav encoder/decoder
 sample = "0.10.0" # DSP toolkit
 sonogram = "0.3.0" # badass spectrograms
