@@ -1,4 +1,5 @@
 //! NB: FROM CPAL LIBRARY
+//! NB: This sends the mic input to the speaker. It's exactly what we want!
 //!
 //! Feeds back the input stream directly into the output stream.
 //!
@@ -13,7 +14,8 @@ extern crate failure;
 
 use cpal::traits::{DeviceTrait, EventLoopTrait, HostTrait};
 
-const LATENCY_MS: f32 = 150.0;
+//const LATENCY_MS: f32 = 150.0;
+const LATENCY_MS: f32 = 50.0;
 
 fn main() -> Result<(), failure::Error> {
     let host = cpal::default_host();
@@ -98,8 +100,8 @@ fn main() -> Result<(), failure::Error> {
     });
 
     // Run for 3 seconds before closing.
-    println!("Playing for 3 seconds... ");
-    std::thread::sleep(std::time::Duration::from_secs(3));
+    println!("Playing for 30 seconds... Mic -> Speaker!!");
+    std::thread::sleep(std::time::Duration::from_secs(3000));
     println!("Done!");
     Ok(())
 }

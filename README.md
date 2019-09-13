@@ -3,6 +3,18 @@ Voder
 
 Voice things.
 
+Current State
+-------------
+
+* Chunked/batched synthesis from the CycleGAN network is proven to work! 
+* Desktop PC PulseAudio is borked. Need to get the `feedback.rs` demo working.
+* Next steps:
+  * Fix desktop audio so that mic and speaker work
+  * Integrate Neural Network (or lightweight transform) into `feedback.rs/cpal` code.
+
+Resources
+---------
+
 Crates to try:
 
 - [hound](https://crates.io/crates/hound)
