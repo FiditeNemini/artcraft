@@ -83,7 +83,7 @@ fn main() -> Result<(), failure::Error> {
                     let mut input_fell_behind = None;
                     for sample in buffer.iter_mut() {
                         *sample = match rx.try_recv() {
-                            Ok(s) => s,
+                            Ok(s) => s * 5.5,
                             Err(err) => {
                                 input_fell_behind = Some(err);
                                 0.0
