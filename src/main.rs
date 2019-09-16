@@ -3,12 +3,77 @@
 //! This example records audio and plays it back in real time as it's being recorded.
 
 extern crate wavy;
+extern crate tensorflow;
 
 use wavy::*;
 
 use std::collections::VecDeque;
+use std::fs::File;
+use std::io::Read;
+use std::path::Path;
+use std::process::exit;
+use tensorflow::Code;
+use tensorflow::Graph;
+use tensorflow::ImportGraphDefOptions;
+use tensorflow::Session;
+use tensorflow::SessionOptions;
+use tensorflow::SessionRunArgs;
+use tensorflow::Status;
+use tensorflow::Tensor;
 
-fn main() -> Result<(), AudioError> {
+fn main() {
+  load_model();
+  //load_model_2();
+  run_audio().expect("should work");
+  run_audio().expect("should work");
+}
+
+fn load_model() {
+    let export_dir = "/home/bt/dev/voder/saved_model";
+
+    let mut graph = Graph::new();
+    let session = Session::from_saved_model(
+        &SessionOptions::new(),
+        //&["train", "serve"],
+        &["serve"],
+        &mut graph,
+        export_dir,
+    ).expect("Should load");
+
+}
+
+fn load_model_2() {
+  // from regression_checkpoint.rs example
+
+  let filename = "/home/bt/dev/voder/saved_model/saved_model.pb";
+
+  let mut graph = Graph::new();
+  let mut proto = Vec::new();
+
+  File::open(filename)
+      .expect("opened")
+      .read_to_end(&mut proto)
+      .expect("cannot read");
+
+  graph.import_graph_def(&proto, &ImportGraphDefOptions::new()).expect("cannot import");
+
+  let session = Session::new(&SessionOptions::new(), &graph).expect("cannot session");
+
+  /*let op_x = graph.operation_by_name_required("x").expect("x");
+  let op_y = graph.operation_by_name_required("y").expect("y");
+  let op_init = graph.operation_by_name_required("init").expect("init");
+  let op_train = graph.operation_by_name_required("train").expect("train");
+  let op_w = graph.operation_by_name_required("w").expect("w");
+  let op_b = graph.operation_by_name_required("b").expect("b");
+  let op_file_path = graph.operation_by_name_required("save/Const").expect("const");
+  let op_save = graph.operation_by_name_required("save/control_dependency").expect("save");*/
+
+  //let file_path_tensor: Tensor<String> =
+  //    Tensor::from(String::from("/home/bt/dev/voder/extra_model/sf1_tm1.ckpt.data-00000-of-00001"));
+  //println!("Tensor: {:?}", file_path_tensor);
+}
+
+fn run_audio() -> Result<(), AudioError> {
     println!("Opening microphone system");
     let mut mic = MicrophoneSystem::new(SampleRate::Normal)?;
 
