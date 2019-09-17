@@ -20,12 +20,21 @@ use tensorflow::SessionOptions;
 use tensorflow::SessionRunArgs;
 use tensorflow::Status;
 use tensorflow::Tensor;
+use tensorflow::version;
 
 fn main() {
+  print_version();
   load_model();
   //load_model_2();
   run_audio().expect("should work");
   run_audio().expect("should work");
+}
+
+fn print_version() {
+  // Python TensorFlow version: 1.14.0
+  // Rust TensorFlow version:   1.13.1
+  let version = version().expect("version");
+  println!("Tensorflow version: {}", version);
 }
 
 fn load_model() {
