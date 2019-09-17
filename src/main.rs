@@ -32,7 +32,7 @@ fn main() {
 
 fn print_version() {
   // Python TensorFlow version: 1.14.0
-  // Rust TensorFlow version:   1.13.1
+  // Rust TensorFlow version:   1.13.1 (default, must be hand-upgraded)
   let version = version().expect("version");
   println!("Tensorflow version: {}", version);
 }
@@ -48,6 +48,22 @@ fn load_model() {
         &mut graph,
         export_dir,
     ).expect("Should load");
+
+  //graph.import_graph_def(&proto, &ImportGraphDefOptions::new())?;
+  //let session = Session::new(&SessionOptions::new(), &graph)?;
+
+  // Run the graph.
+  let mut x = Tensor::new(&[1]);
+  x[0] = 2i32;
+  let mut y = Tensor::new(&[1]);
+  y[0] = 40i32;
+
+  let mut args = SessionRunArgs::new();
+  args.add_feed(&graph.operation_by_name_required("input_A_test").expect("x"), 0, &x);
+  //args.add_feed(&graph.operation_by_name_required("y").expect("y"), 0, &y);
+  //let z = args.request_fetch(&graph.operation_by_name_required("z").expect("z"), 0);
+
+  session.run(&mut args).expect("Run success");
 
 }
 
