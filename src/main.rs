@@ -22,12 +22,15 @@ use tensorflow::Status;
 use tensorflow::Tensor;
 use tensorflow::version;
 
+const INPUT_NAME : &'static str = "input_A_test";
+const OUTPUT_NAME : &'static str = "generator_A2B_3/output_transpose";
+
 fn main() {
   print_version();
   load_model();
   //load_model_2();
   run_audio().expect("should work");
-  run_audio().expect("should work");
+  //run_audio().expect("should work");
 }
 
 fn print_version() {
@@ -52,18 +55,31 @@ fn load_model() {
   //graph.import_graph_def(&proto, &ImportGraphDefOptions::new())?;
   //let session = Session::new(&SessionOptions::new(), &graph)?;
 
-  // Run the graph.
   let mut x = Tensor::new(&[1]);
-  x[0] = 2i32;
+  x[0] = 2.0f32;
+
   let mut y = Tensor::new(&[1]);
   y[0] = 40i32;
 
+  // Run the graph.
   let mut args = SessionRunArgs::new();
-  args.add_feed(&graph.operation_by_name_required("input_A_test").expect("x"), 0, &x);
-  //args.add_feed(&graph.operation_by_name_required("y").expect("y"), 0, &y);
-  //let z = args.request_fetch(&graph.operation_by_name_required("z").expect("z"), 0);
+  
+  // input_A_test:
+  // Tensor("input_A_test:0", shape=(?, 24, ?), dtype=float32)
+  args.add_feed(&graph.operation_by_name_required(INPUT_NAME)
+      .expect(INPUT_NAME), 0, &x);
+
+  // generation_B_test:
+  // Tensor("generator_A2B_3/output_transpose:0", shape=(?, 24, ?), dtype=float32)
+  let _z = args.request_fetch(
+    &graph.operation_by_name_required(OUTPUT_NAME)
+        .expect(OUTPUT_NAME), 0);
 
   session.run(&mut args).expect("Run success");
+
+  // Check our results.
+  //let z_res: i32 = args.fetch(z).expect("ret")[0];
+  //println!("{:?}", z_res);
 
 }
 
