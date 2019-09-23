@@ -40,26 +40,60 @@ fn print_version() {
   println!("Tensorflow version: {}", version);
 }
 
-fn load_model() {
-    let export_dir = "/home/bt/dev/voder/saved_model";
+struct VoiceModel {
+  graph: Graph,
+  session: Session,
+}
 
+impl VoiceModel {
+  pub fn load(dir_name: &str) -> Self {
     let mut graph = Graph::new();
     let session = Session::from_saved_model(
-        &SessionOptions::new(),
-        //&["train", "serve"],
-        &["serve"],
-        &mut graph,
-        export_dir,
+      &SessionOptions::new(),
+      &["serve"],
+      &mut graph,
+      dir_name,
     ).expect("Should load");
 
-  //graph.import_graph_def(&proto, &ImportGraphDefOptions::new())?;
-  //let session = Session::new(&SessionOptions::new(), &graph)?;
+    VoiceModel {
+      graph,
+      session,
+    }
+  }
 
-  //let mut x = Tensor::new(&[2]);
-  //x[0] = 2.0f32;
-  //x[1] = 2.0f32;
+  pub fn evaluate(&self, input: &Tensor<f32>) {
+    println!(">>> Input tensor dims: {:?}", input.dims());
 
-  let mut x = Tensor::new(&[2, 24, 2])
+    // Run the graph.
+    let mut args = SessionRunArgs::new();
+
+    // input_A_test:
+    // Tensor("input_A_test:0", shape=(?, 24, ?), dtype=float32)
+    args.add_feed(&self.graph.operation_by_name_required(INPUT_NAME)
+        .expect(INPUT_NAME), 0, &input);
+
+    // generation_B_test:
+    // Tensor("generator_A2B_3/output_transpose:0", shape=(?, 24, ?), dtype=float32)
+    let z = args.request_fetch(
+      &self.graph.operation_by_name_required(OUTPUT_NAME)
+          .expect(OUTPUT_NAME), 0);
+
+    self.session.run(&mut args).expect("Run success");
+
+    // Check our results.
+    let z_res = args.fetch::<f32>(z).expect("ret");
+
+    println!("z_rez.dims(): {:?}", z_res.dims());
+    println!("z_rez: {:?}", z_res);
+  }
+}
+
+
+fn load_model() {
+  let model_dir = "/home/bt/dev/voder/saved_model";
+  let model = VoiceModel::load(model_dir);
+
+  let mut input  = Tensor::new(&[2, 24, 2])
       .with_values(&[
         0.0f32, 0.0f32, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
         0.0f32, 0.0f32, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
@@ -76,37 +110,9 @@ fn load_model() {
       ])
       .unwrap();
 
-  println!(">>> Tensor dims: {:?}", x.dims());
-
-  /*
-2019-09-23 01:05:40.971382: I tensorflow/cc/saved_model/loader.cc:311] SavedModel load for tags { serve }; Status: success. Took 3432598 microseconds.
-2019-09-23 01:05:42.734062: W tensorflow/core/framework/op_kernel.cc:1502] OP_REQUIRES failed at transpose_op.cc:157 : Invalid argument: transpose expects a vector of size 1. But input(1) is a vector of size 3
-thread 'main' panicked at 'Run success: {inner:0x5648cba1b510, InvalidArgument: transpose expects a vector of size 1. But input(1) is a vector of size 3
-  */
-
-  // Run the graph.
-  let mut args = SessionRunArgs::new();
-
-  // input_A_test:
-  // Tensor("input_A_test:0", shape=(?, 24, ?), dtype=float32)
-  args.add_feed(&graph.operation_by_name_required(INPUT_NAME)
-      .expect(INPUT_NAME), 0, &x);
-
-  // generation_B_test:
-  // Tensor("generator_A2B_3/output_transpose:0", shape=(?, 24, ?), dtype=float32)
-  let z = args.request_fetch(
-    &graph.operation_by_name_required(OUTPUT_NAME)
-        .expect(OUTPUT_NAME), 0);
-
-  session.run(&mut args).expect("Run success");
-
-  // Check our results.
-  let z_res = args.fetch::<f32>(z).expect("ret");
-
-  println!("z_rez.dims(): {:?}", z_res.dims());
-  println!("z_rez: {:?}", z_res);
-  //println!("Z: {:?}", z);
-
+  model.evaluate(&input);
+  model.evaluate(&input);
+  model.evaluate(&input);
 }
 
 fn load_model_2() {
@@ -152,16 +158,16 @@ fn run_audio() -> Result<(), AudioError> {
     let mut buffer = VecDeque::new();
 
     loop {
-        mic.record(&mut |_index, l, r| {
-            buffer.push_back((l, l));
-        });
+      mic.record(&mut |_index, l, r| {
+        buffer.push_back((l, l));
+      });
 
-        speaker.play(&mut || {
-            if let Some((lsample, rsample)) = buffer.pop_front() {
-                AudioSample::stereo(lsample, rsample)
-            } else {
-                AudioSample::stereo(0, 0)
-            }
-        });
+      speaker.play(&mut || {
+        if let Some((lsample, rsample)) = buffer.pop_front() {
+          AudioSample::stereo(lsample, rsample)
+        } else {
+          AudioSample::stereo(0, 0)
+        }
+      });
     }
 }
