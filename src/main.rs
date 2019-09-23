@@ -94,15 +94,18 @@ thread 'main' panicked at 'Run success: {inner:0x5648cba1b510, InvalidArgument: 
 
   // generation_B_test:
   // Tensor("generator_A2B_3/output_transpose:0", shape=(?, 24, ?), dtype=float32)
-  let _z = args.request_fetch(
+  let z = args.request_fetch(
     &graph.operation_by_name_required(OUTPUT_NAME)
         .expect(OUTPUT_NAME), 0);
 
   session.run(&mut args).expect("Run success");
 
   // Check our results.
-  //let z_res: i32 = args.fetch(z).expect("ret")[0];
-  //println!("{:?}", z_res);
+  let z_res: f32 = args.fetch(z).expect("ret")[0];
+
+  println!("z_rez: {:?}", z_res);
+  //println!("Z.dims(): {:?}", z.dims());
+  //println!("Z: {:?}", z);
 
 }
 
