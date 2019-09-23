@@ -101,10 +101,10 @@ thread 'main' panicked at 'Run success: {inner:0x5648cba1b510, InvalidArgument: 
   session.run(&mut args).expect("Run success");
 
   // Check our results.
-  let z_res: f32 = args.fetch(z).expect("ret")[0];
+  let z_res = args.fetch::<f32>(z).expect("ret");
 
+  println!("z_rez.dims(): {:?}", z_res.dims());
   println!("z_rez: {:?}", z_res);
-  //println!("Z.dims(): {:?}", z.dims());
   //println!("Z: {:?}", z);
 
 }
