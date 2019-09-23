@@ -1,153 +1,125 @@
+//! NB: From wavy library
+//!
+//! This example records audio and plays it back in real time as it's being recorded.
 
-extern crate cpal;
-extern crate hound;
-extern crate sample;
-//extern crate signal;
-extern crate sonogram;
 extern crate wavy;
-
-use std::f64;
+extern crate tensorflow;
 
 use wavy::*;
-use sample::Signal;
-use sample::signal;
-//use signal;
 
 use std::collections::VecDeque;
+use std::fs::File;
+use std::io::Read;
+use std::path::Path;
+use std::process::exit;
+use tensorflow::Code;
+use tensorflow::Graph;
+use tensorflow::ImportGraphDefOptions;
+use tensorflow::Session;
+use tensorflow::SessionOptions;
+use tensorflow::SessionRunArgs;
+use tensorflow::Status;
+use tensorflow::Tensor;
+use tensorflow::version;
 
 fn main() {
-  println!("Run");
-  //record().unwrap();
-  record2().unwrap();
+  print_version();
+  load_model();
+  //load_model_2();
+  run_audio().expect("should work");
+  run_audio().expect("should work");
 }
 
-const THRESHOLD : i16 = 750;
-
-fn record2() -> Result<(), AudioError> {
-  println!("Opening microphone system");
-  let mut mic = MicrophoneSystem::new(SampleRate::Studio)?;
-
-  println!("Opening speaker system");
-  let mut speaker = SpeakerSystem::new(SampleRate::Studio)?;
-
-  println!("Done");
-
-  let mut buffer = VecDeque::with_capacity(1028 * 1028);
-
-  loop {
-    mic.record(&mut |_index, mut l, mut r| {
-      if l < THRESHOLD && l > -THRESHOLD {
-        l = l / 2;
-      }
-      if r < THRESHOLD && r > -THRESHOLD {
-        r = r / 2;
-      }
-      //println!("L: {}, R: {}", l, r);
-      buffer.push_back((l, l));
-    });
-
-    //let mut last_lsample = None;
-    //let mut last_rsample = None;
-
-    let mut i = 0;
-    let mut sine_signal = signal::rate(44_100.0).const_hz(400.0).sine();
-
-    speaker.play(&mut || {
-
-      let y = sin(i);
-      i += 1;
-      //println!("Sin: {}", y);
-      let l = (y * 500.0) as i16;
-
-      let mut frame = sine_signal.take(1);
-      let f = frame.next().unwrap();
-
-      println!("Frame: {:?}", f);
-      //let x = frame.next().unwrap();
-      //let l = (x * 500.0) as i16;
-
-      AudioSample::stereo(l, l)
-
-      /*if let Some((lsample, rsample)) = buffer.pop_front() {
-        last_lsample = Some(lsample);
-        last_rsample = Some(rsample);
-        AudioSample::stereo(lsample, rsample)
-      } else {
-        let lsample = last_lsample.unwrap_or(0);
-        let rsample = last_rsample.unwrap_or(0);
-        //println!("No data!");
-        AudioSample::stereo(lsample, rsample)
-      }*/
-    });
-  }
+fn print_version() {
+  // Python TensorFlow version: 1.14.0
+  // Rust TensorFlow version:   1.13.1 (default, must be hand-upgraded)
+  let version = version().expect("version");
+  println!("Tensorflow version: {}", version);
 }
 
-fn sin(i: i64) -> f64 {
-  //let x = f64::consts::PI*2.0;
-  //let abs_difference = (x.sin() - 1.0).abs();
+fn load_model() {
+    let export_dir = "/home/bt/dev/voder/saved_model";
 
-  let x = ((i+1) % 3000) as f64 / 3000.0;
-  let x = x * f64::consts::PI * 2.0;
+    let mut graph = Graph::new();
+    let session = Session::from_saved_model(
+        &SessionOptions::new(),
+        //&["train", "serve"],
+        &["serve"],
+        &mut graph,
+        export_dir,
+    ).expect("Should load");
 
-  x.sin()
+  //graph.import_graph_def(&proto, &ImportGraphDefOptions::new())?;
+  //let session = Session::new(&SessionOptions::new(), &graph)?;
+
+  // Run the graph.
+  let mut x = Tensor::new(&[1]);
+  x[0] = 2i32;
+  let mut y = Tensor::new(&[1]);
+  y[0] = 40i32;
+
+  let mut args = SessionRunArgs::new();
+  args.add_feed(&graph.operation_by_name_required("input_A_test").expect("x"), 0, &x);
+  //args.add_feed(&graph.operation_by_name_required("y").expect("y"), 0, &y);
+  //let z = args.request_fetch(&graph.operation_by_name_required("z").expect("z"), 0);
+
+  session.run(&mut args).expect("Run success");
+
 }
 
-fn record() -> Result<(), AudioError> {
-  // Connect to the speaker and microphone systems.
-  let mut mic = MicrophoneSystem::new(SampleRate::Studio)?;
-  let mut speaker = SpeakerSystem::new(SampleRate::Normal)?;
+fn load_model_2() {
+  // from regression_checkpoint.rs example
 
-  let mut buffer = VecDeque::with_capacity(2048);
+  let filename = "/home/bt/dev/voder/saved_model/saved_model.pb";
 
-/*  // Convert a signal to its RMS.
-let signal = signal::rate(44_100.0).const_hz(440.0).sine();;
-let ring_buffer = ring_buffer::Fixed::from([[0.0]; WINDOW_SIZE]);
-let mut rms_signal = signal.rms(ring_buffer);*/
+  let mut graph = Graph::new();
+  let mut proto = Vec::new();
 
-  loop {
-    // Record some sound.
-    mic.record(&mut |_whichmic, mut l, mut r| {
-      //println!("Enqueue");
-      /*if buffer.len() < 20480 {
-        buffer.push_back((l, r));
-      }*/
-      println!("Left: {}, Right: {}", l, r);
-      if l < THRESHOLD && l > -THRESHOLD {
-        l = l / 2;
-      }
-      if r < THRESHOLD && r > -THRESHOLD {
-        r = r / 2;
-      }
-      buffer.push_back((l, r));
-    });
+  File::open(filename)
+      .expect("opened")
+      .read_to_end(&mut proto)
+      .expect("cannot read");
 
-    let mut last_rsample = None;
-    let mut last_lsample = None;
-    
-    // Play that sound.
-    speaker.play(&mut || {
-      if let Some((lsample, rsample)) = buffer.pop_front() {
-        //let rsample = rsample.saturating_mul(2);
-        //let lsample = lsample.saturating_mul(2);
-        last_rsample = Some(rsample);
-        last_lsample = Some(lsample);
-        /*let swap = rsample;
-        let rsample = lsample;
-        let lsample = swap;*/
-        let mono = lsample;
+  graph.import_graph_def(&proto, &ImportGraphDefOptions::new()).expect("cannot import");
 
-        //let mono = mono.saturating_mul(2);
+  let session = Session::new(&SessionOptions::new(), &graph).expect("cannot session");
 
-        AudioSample::stereo(mono, mono)
-      } else {
-        // Play silence if not enough has been recorded yet.
-        //let rsample = last_rsample.unwrap_or(0);
-        //let lsample = last_lsample.unwrap_or(0);
-        let rsample = 0;
-        let lsample = 0;
-        println!("No data!");
-        AudioSample::stereo(rsample, lsample)
-      }
-    });
-  }
+  /*let op_x = graph.operation_by_name_required("x").expect("x");
+  let op_y = graph.operation_by_name_required("y").expect("y");
+  let op_init = graph.operation_by_name_required("init").expect("init");
+  let op_train = graph.operation_by_name_required("train").expect("train");
+  let op_w = graph.operation_by_name_required("w").expect("w");
+  let op_b = graph.operation_by_name_required("b").expect("b");
+  let op_file_path = graph.operation_by_name_required("save/Const").expect("const");
+  let op_save = graph.operation_by_name_required("save/control_dependency").expect("save");*/
+
+  //let file_path_tensor: Tensor<String> =
+  //    Tensor::from(String::from("/home/bt/dev/voder/extra_model/sf1_tm1.ckpt.data-00000-of-00001"));
+  //println!("Tensor: {:?}", file_path_tensor);
+}
+
+fn run_audio() -> Result<(), AudioError> {
+    println!("Opening microphone system");
+    let mut mic = MicrophoneSystem::new(SampleRate::Normal)?;
+
+    println!("Opening speaker system");
+    let mut speaker = SpeakerSystem::new(SampleRate::Sparse)?;
+
+    println!("Done");
+
+    let mut buffer = VecDeque::new();
+
+    loop {
+        mic.record(&mut |_index, l, r| {
+            buffer.push_back((l, l));
+        });
+
+        speaker.play(&mut || {
+            if let Some((lsample, rsample)) = buffer.pop_front() {
+                AudioSample::stereo(lsample, rsample)
+            } else {
+                AudioSample::stereo(0, 0)
+            }
+        });
+    }
 }

@@ -15,6 +15,13 @@ sample = "0.10.0" # DSP toolkit
 sonogram = "0.3.0" # badass spectrograms
 wavy = "0.1.2" # real time audio capture and playback
 
+
+# NB: Manually upgraded 'tensorflow-sys' library from 1.13.1 to 1.14.0
+# The downloaded tensorflow libs in target/ must be moved to /lib 
+# (I couldn't figure out the Rust linker flags)
+tensorflow = { path = "/home/bt/dev/3rd/tensorflow.rs" }
+#tensorflow = "0.13.0" # tensorflow bindings
+
 #chrono
 #clap
 #log
