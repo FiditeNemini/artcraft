@@ -55,15 +55,30 @@ fn load_model() {
   //graph.import_graph_def(&proto, &ImportGraphDefOptions::new())?;
   //let session = Session::new(&SessionOptions::new(), &graph)?;
 
-  let mut x = Tensor::new(&[1]);
-  x[0] = 2.0f32;
+  //let mut x = Tensor::new(&[2]);
+  //x[0] = 2.0f32;
+  //x[1] = 2.0f32;
 
-  let mut y = Tensor::new(&[1]);
-  y[0] = 40i32;
+  let mut x = Tensor::new(&[2, 2, 2])
+      .with_values(&[
+        0.0f32, 0.0f32,
+        0.1f32, 3.0f32,
+        0.0, 0.0,
+        0.0, 0.0
+      ])
+      .unwrap();
+
+  println!(">>> Tensor dims: {:?}", x.dims());
+
+  /*
+2019-09-23 01:05:40.971382: I tensorflow/cc/saved_model/loader.cc:311] SavedModel load for tags { serve }; Status: success. Took 3432598 microseconds.
+2019-09-23 01:05:42.734062: W tensorflow/core/framework/op_kernel.cc:1502] OP_REQUIRES failed at transpose_op.cc:157 : Invalid argument: transpose expects a vector of size 1. But input(1) is a vector of size 3
+thread 'main' panicked at 'Run success: {inner:0x5648cba1b510, InvalidArgument: transpose expects a vector of size 1. But input(1) is a vector of size 3
+  */
 
   // Run the graph.
   let mut args = SessionRunArgs::new();
-  
+
   // input_A_test:
   // Tensor("input_A_test:0", shape=(?, 24, ?), dtype=float32)
   args.add_feed(&graph.operation_by_name_required(INPUT_NAME)
