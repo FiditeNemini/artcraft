@@ -12,6 +12,40 @@ Current State
   * Fix desktop audio so that mic and speaker work
   * Integrate Neural Network (or lightweight transform) into `feedback.rs/cpal` code.
 
+TensorFlow
+----------
+
+### Tensorflow bindings (do they know things?)
+I had to do a thing in the Cargo.toml,
+```
+[patch.crates-io]
+# NB: Manually upgraded 'tensorflow-sys' library from 1.13.1 to 1.14.0
+# The downloaded tensorflow libs in target/ must be moved to /lib 
+# (I couldn't figure out the Rust linker flags)
+tensorflow = { path = "/home/bt/dev/3rd/tensorflow.rs" }
+```
+
+### Model 
+Saved model (.pb file) must be in `saved_model/saved_model.pb` or similar. 
+
+Need TensorFlow model tools:
+
+`bazel build tensorflow/python/tools:saved_model_cli`
+
+```
+# NB: Save the graph
+definition = self.model.sess.graph_def
+directory = 'output_model_pb'
+tf.train.write_graph(definition, directory, 'model.pb', as_text=False)
+
+# https://github.com/tensorflow/models/issues/3530#issuecomment-395968881
+output_dir = './saved_model/'
+builder = tf.saved_model.builder.SavedModelBuilder(output_dir)
+builder.add_meta_graph_and_variables(self.model.sess, [
+	tf.saved_model.tag_constants.SERVING],)
+builder.save()
+```
+
 Resources
 ---------
 
@@ -117,27 +151,4 @@ PulseAudio's default sampling rate and bit depth are set to 44100Hz @ 16 bits.
 > 524288 / 1411200 (fragment size)
 0.37151927437641724 = 372 ms
 
-
-TensorFlow Model
-----------------
-
-Saved model (.pb file) must be in `saved_model/saved_model.pb` or similar. 
-
-Need TensorFlow model tools:
-
-`bazel build tensorflow/python/tools:saved_model_cli`
-
-```
-# NB: Save the graph
-definition = self.model.sess.graph_def
-directory = 'output_model_pb'
-tf.train.write_graph(definition, directory, 'model.pb', as_text=False)
-
-# https://github.com/tensorflow/models/issues/3530#issuecomment-395968881
-output_dir = './saved_model/'
-builder = tf.saved_model.builder.SavedModelBuilder(output_dir)
-builder.add_meta_graph_and_variables(self.model.sess, [
-	tf.saved_model.tag_constants.SERVING],)
-builder.save()
-```
 
