@@ -25,6 +25,30 @@ I had to do a thing in the Cargo.toml,
 tensorflow = { path = "/home/bt/dev/3rd/tensorflow.rs" }
 ```
 
+The `libtensorflow.so.1` might go missing if dependencies change. I've been copying it 
+around like a lazy person that doesn't understand the build process. Gross.
+
+```
++ bt@halide:~/dev/voder/target/debug/build/tensorflow-sys-0fdab7e44f6d3e04/out$ ls -lA
+-r-xr-xr-x 1 bt bt  34748520 Sep 30 01:55 libtensorflow_framework.so
+-r-xr-xr-x 1 bt bt 216546752 Sep 30 01:55 libtensorflow.so
+
++ bt@halide:~/dev/voder/target/debug/build/tensorflow-sys-0fdab7e44f6d3e04/out$ cp ~/dev/voder/target/debug/build/tensorflow-sys-b3beaea4e172b1c8/out/libtensorflow.so.1 . 
++ bt@halide:~/dev/voder/target/debug/build/tensorflow-sys-0fdab7e44f6d3e04/out$ cp ~/dev/voder/target/debug/build/tensorflow-sys-b3beaea4e172b1c8/out/libtensorflow.so.1.14.0 . 
++ bt@halide:~/dev/voder/target/debug/build/tensorflow-sys-0fdab7e44f6d3e04/out$ cp ~/dev/voder/target/debug/build/tensorflow-sys-b3beaea4e172b1c8/out/libtensorflow_framework.so.1 . 
++ bt@halide:~/dev/voder/target/debug/build/tensorflow-sys-0fdab7e44f6d3e04/out$ cp ~/dev/voder/target/debug/build/tensorflow-sys-b3beaea4e172b1c8/out/libtensorflow_framework.so.1.14.0 . 
++ bt@halide:~/dev/voder/target/debug/build/tensorflow-sys-0fdab7e44f6d3e04/out$ ls -lA
+
+-r-xr-xr-x 1 bt bt  34748520 Sep 30 01:55 libtensorflow_framework.so
+-r-xr-xr-x 1 bt bt  34748520 Oct 11 00:31 libtensorflow_framework.so.1
+-r-xr-xr-x 1 bt bt  34748520 Oct 11 00:31 libtensorflow_framework.so.1.14.0
+-r-xr-xr-x 1 bt bt 216546752 Sep 30 01:55 libtensorflow.so
+-r-xr-xr-x 1 bt bt 216546752 Oct 11 00:30 libtensorflow.so.1
+-r-xr-xr-x 1 bt bt 216546752 Oct 11 00:31 libtensorflow.so.1.14.0
+
+(And now it works. Ugh)
+```
+
 ### Model 
 Saved model (.pb file) must be in `saved_model/saved_model.pb` or similar. 
 

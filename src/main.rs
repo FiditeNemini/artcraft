@@ -2,8 +2,11 @@
 //!
 //! This example records audio and plays it back in real time as it's being recorded.
 
-extern crate wavy;
 extern crate tensorflow;
+extern crate wavy;
+extern crate world_sys;
+
+pub mod synthesis;
 
 use wavy::*;
 

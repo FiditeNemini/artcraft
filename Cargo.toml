@@ -15,6 +15,7 @@ sample = "0.10.0" # DSP toolkit
 sonogram = "0.3.0" # badass spectrograms
 tensorflow = "0.13.0" # tensorflow bindings
 wavy = "0.1.2" # real time audio capture and playback
+world-sys = { path = "/home/bt/dev/world-sys" } # AWESOME WORLD VOCODER BINDINGS HAH HA HAH
 
 [patch.crates-io]
 # NB: Manually upgraded 'tensorflow-sys' library from 1.13.1 to 1.14.0
