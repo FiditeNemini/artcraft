@@ -311,6 +311,11 @@ dependencies = [
 ]
 
 [[package]]
+name = "error-chain"
+version = "0.10.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+
+[[package]]
 name = "failure"
 version = "0.1.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -465,6 +470,16 @@ dependencies = [
 name = "memchr"
 version = "2.2.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
+
+[[package]]
+name = "metadeps"
+version = "1.1.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+dependencies = [
+ "error-chain 0.10.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "pkg-config 0.3.15 (registry+https://github.com/rust-lang/crates.io-index)",
+ "toml 0.2.1 (registry+https://github.com/rust-lang/crates.io-index)",
+]
 
 [[package]]
 name = "miniz-sys"
@@ -871,6 +886,11 @@ dependencies = [
 ]
 
 [[package]]
+name = "toml"
+version = "0.2.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+
+[[package]]
 name = "ucd-util"
 version = "0.1.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -922,6 +942,7 @@ dependencies = [
  "tensorflow 0.13.0",
  "wavy 0.1.2 (registry+https://github.com/rust-lang/crates.io-index)",
  "world-sys 0.1.0",
+ "zmq 0.9.2 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
 [[package]]
@@ -1010,6 +1031,26 @@ dependencies = [
  "libc 0.2.62 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
+[[package]]
+name = "zmq"
+version = "0.9.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+dependencies = [
+ "bitflags 1.1.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "libc 0.2.62 (registry+https://github.com/rust-lang/crates.io-index)",
+ "log 0.4.8 (registry+https://github.com/rust-lang/crates.io-index)",
+ "zmq-sys 0.11.0 (registry+https://github.com/rust-lang/crates.io-index)",
+]
+
+[[package]]
+name = "zmq-sys"
+version = "0.11.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+dependencies = [
+ "libc 0.2.62 (registry+https://github.com/rust-lang/crates.io-index)",
+ "metadeps 1.1.2 (registry+https://github.com/rust-lang/crates.io-index)",
+]
+
 [metadata]
 "checksum adler32 1.0.3 (registry+https://github.com/rust-lang/crates.io-index)" = "7e522997b529f05601e05166c07ed17789691f562762c7f3b987263d2dedee5c"
 "checksum aho-corasick 0.6.10 (registry+https://github.com/rust-lang/crates.io-index)" = "81ce3d38065e618af2d7b77e10c5ad9a069859b4be3c2250f674af3840d9c8a5"
@@ -1044,6 +1085,7 @@ dependencies = [
 "checksum deflate 0.7.20 (registry+https://github.com/rust-lang/crates.io-index)" = "707b6a7b384888a70c8d2e8650b3e60170dfc6a67bb4aa67b6dfca57af4bedb4"
 "checksum env_logger 0.4.3 (registry+https://github.com/rust-lang/crates.io-index)" = "3ddf21e73e016298f5cb37d6ef8e8da8e39f91f9ec8b0df44b7deb16a9f8cd5b"
 "checksum env_logger 0.6.2 (registry+https://github.com/rust-lang/crates.io-index)" = "aafcde04e90a5226a6443b7aabdb016ba2f8307c847d524724bd9b346dd1a2d3"
+"checksum error-chain 0.10.0 (registry+https://github.com/rust-lang/crates.io-index)" = "d9435d864e017c3c6afeac1654189b06cdb491cf2ff73dbf0d73b0f292f42ff8"
 "checksum failure 0.1.5 (registry+https://github.com/rust-lang/crates.io-index)" = "795bd83d3abeb9220f257e597aa0080a508b27533824adf336529648f6abf7e2"
 "checksum failure_derive 0.1.5 (registry+https://github.com/rust-lang/crates.io-index)" = "ea1063915fd7ef4309e222a5a07cf9c319fb9c7836b1f89b85458672dbb127e1"
 "checksum filetime 0.2.7 (registry+https://github.com/rust-lang/crates.io-index)" = "6bd7380b54ced79dda72ecc35cc4fbbd1da6bba54afaa37e96fd1c2a308cd469"
@@ -1064,6 +1106,7 @@ dependencies = [
 "checksum log 0.4.8 (registry+https://github.com/rust-lang/crates.io-index)" = "14b6052be84e6b71ab17edffc2eeabf5c2c3ae1fdb464aae35ac50c67a44e1f7"
 "checksum memchr 1.0.2 (registry+https://github.com/rust-lang/crates.io-index)" = "148fab2e51b4f1cfc66da2a7c32981d1d3c083a803978268bb11fe4b86925e7a"
 "checksum memchr 2.2.1 (registry+https://github.com/rust-lang/crates.io-index)" = "88579771288728879b57485cc7d6b07d648c9f0141eb955f8ab7f9d45394468e"
+"checksum metadeps 1.1.2 (registry+https://github.com/rust-lang/crates.io-index)" = "73b122901b3a675fac8cecf68dcb2f0d3036193bc861d1ac0e1c337f7d5254c2"
 "checksum miniz-sys 0.1.12 (registry+https://github.com/rust-lang/crates.io-index)" = "1e9e3ae51cea1576ceba0dde3d484d30e6e5b86dee0b2d412fe3a16a15c98202"
 "checksum miniz_oxide 0.3.2 (registry+https://github.com/rust-lang/crates.io-index)" = "7108aff85b876d06f22503dcce091e29f76733b2bfdd91eebce81f5e68203a10"
 "checksum nom 3.2.1 (registry+https://github.com/rust-lang/crates.io-index)" = "05aec50c70fd288702bcd93284a8444607f3292dbdf2a30de5ea5dcdbe72287b"
@@ -1109,6 +1152,7 @@ dependencies = [
 "checksum termcolor 1.0.5 (registry+https://github.com/rust-lang/crates.io-index)" = "96d6098003bde162e4277c70665bd87c326f5a0c3f3fbfb285787fa482d54e6e"
 "checksum textwrap 0.11.0 (registry+https://github.com/rust-lang/crates.io-index)" = "d326610f408c7a4eb6f51c37c330e496b08506c9457c9d34287ecc38809fb060"
 "checksum thread_local 0.3.6 (registry+https://github.com/rust-lang/crates.io-index)" = "c6b53e329000edc2b34dbe8545fd20e55a333362d0a321909685a19bd28c3f1b"
+"checksum toml 0.2.1 (registry+https://github.com/rust-lang/crates.io-index)" = "736b60249cb25337bc196faa43ee12c705e426f3d55c214d73a4e7be06f92cb4"
 "checksum ucd-util 0.1.5 (registry+https://github.com/rust-lang/crates.io-index)" = "fa9b3b49edd3468c0e6565d85783f51af95212b6fa3986a5500954f00b460874"
 "checksum unicode-width 0.1.6 (registry+https://github.com/rust-lang/crates.io-index)" = "7007dbd421b92cc6e28410fe7362e2e0a2503394908f417b68ec8d1c364c4e20"
 "checksum unicode-xid 0.1.0 (registry+https://github.com/rust-lang/crates.io-index)" = "fc72304796d0818e357ead4e000d19c9c174ab23dc11093ac919054d20a6a7fc"
@@ -1128,3 +1172,5 @@ dependencies = [
 "checksum winapi-x86_64-pc-windows-gnu 0.4.0 (registry+https://github.com/rust-lang/crates.io-index)" = "712e227841d057c1ee1cd2fb22fa7e5a5461ae8e48fa2ca79ec42cfc1931183f"
 "checksum wincolor 1.0.2 (registry+https://github.com/rust-lang/crates.io-index)" = "96f5016b18804d24db43cebf3c77269e7569b8954a8464501c216cc5e070eaa9"
 "checksum xattr 0.2.2 (registry+https://github.com/rust-lang/crates.io-index)" = "244c3741f4240ef46274860397c7c74e50eb23624996930e484c16679633a54c"
+"checksum zmq 0.9.2 (registry+https://github.com/rust-lang/crates.io-index)" = "aad98a7a617d608cd9e1127147f630d24af07c7cd95ba1533246d96cbdd76c66"
+"checksum zmq-sys 0.11.0 (registry+https://github.com/rust-lang/crates.io-index)" = "d33a2c51dde24d5b451a2ed4b488266df221a5eaee2ee519933dc46b9a9b3648"

@@ -5,6 +5,7 @@
 extern crate tensorflow;
 extern crate wavy;
 extern crate world_sys;
+extern crate zmq;
 
 pub mod synthesis;
 
@@ -15,6 +16,8 @@ use std::fs::File;
 use std::io::Read;
 use std::path::Path;
 use std::process::exit;
+use std::thread;
+
 use tensorflow::Code;
 use tensorflow::Graph;
 use tensorflow::ImportGraphDefOptions;
@@ -24,6 +27,7 @@ use tensorflow::SessionRunArgs;
 use tensorflow::Status;
 use tensorflow::Tensor;
 use tensorflow::version;
+use zmq::{Error, Socket};
 
 const INPUT_NAME : &'static str = "input_A_test";
 const OUTPUT_NAME : &'static str = "generator_A2B_3/output_transpose";
@@ -134,7 +138,7 @@ fn load_model() {
   model.evaluate(&input);
 }
 
-fn load_model_2() {
+/*fn load_model_2() {
   // from regression_checkpoint.rs example
 
   let filename = "/home/bt/dev/voder/saved_model/saved_model.pb";
@@ -163,7 +167,7 @@ fn load_model_2() {
   //let file_path_tensor: Tensor<String> =
   //    Tensor::from(String::from("/home/bt/dev/voder/extra_model/sf1_tm1.ckpt.data-00000-of-00001"));
   //println!("Tensor: {:?}", file_path_tensor);
-}
+}*/
 
 fn run_audio() -> Result<(), AudioError> {
     println!("Opening microphone system");
@@ -175,6 +179,38 @@ fn run_audio() -> Result<(), AudioError> {
     println!("Done");
 
     let mut buffer = VecDeque::new();
+
+    thread::spawn(|| {
+      let ctx = zmq::Context::new();
+      let mut socket = ctx.socket(zmq::REQ).unwrap();
+      let mut reconnect = false;
+      socket.connect("tcp://127.0.0.1:5555").unwrap();
+
+      loop {
+        if reconnect {
+          match ctx.socket(zmq::REQ) {
+            Err(_) => {},
+            Ok(s) => {
+              match s.connect("tcp://127.0.0.1:5555") {
+                Err(_) => {},
+                Ok(_) => {
+                  socket = s;
+                  reconnect = false;
+                },
+              }
+            },
+          }
+        }
+        match socket.send("hello world!", 0) {
+          Ok(_) => {
+            println!("Sent");
+          },
+          Err(_) => {
+            reconnect = true;
+          },
+        }
+      }
+    });
 
     loop {
       mic.record(&mut |_index, l, r| {
