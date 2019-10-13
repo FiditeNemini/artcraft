@@ -7,6 +7,7 @@ extern crate wavy;
 extern crate world_sys;
 extern crate zmq;
 
+pub mod ipc;
 pub mod synthesis;
 
 use wavy::*;
@@ -29,13 +30,14 @@ use tensorflow::Tensor;
 use tensorflow::version;
 use zmq::{Error, Socket};
 
+use ipc::QueueSender;
+
 const INPUT_NAME : &'static str = "input_A_test";
 const OUTPUT_NAME : &'static str = "generator_A2B_3/output_transpose";
 
 fn main() {
   print_version();
-  load_model();
-  //load_model_2();
+  //load_model(); // TODO: This works. Temporarily commented out
   run_audio().expect("should work");
   //run_audio().expect("should work");
 }
@@ -180,40 +182,13 @@ fn run_audio() -> Result<(), AudioError> {
 
     let mut buffer = VecDeque::new();
 
-    thread::spawn(|| {
-      let ctx = zmq::Context::new();
-      let mut socket = ctx.socket(zmq::REQ).unwrap();
-      let mut reconnect = false;
-      socket.connect("tcp://127.0.0.1:5555").unwrap();
-
-      loop {
-        if reconnect {
-          match ctx.socket(zmq::REQ) {
-            Err(_) => {},
-            Ok(s) => {
-              match s.connect("tcp://127.0.0.1:5555") {
-                Err(_) => {},
-                Ok(_) => {
-                  socket = s;
-                  reconnect = false;
-                },
-              }
-            },
-          }
-        }
-        match socket.send("hello world!", 0) {
-          Ok(_) => {
-            println!("Sent");
-          },
-          Err(_) => {
-            reconnect = true;
-          },
-        }
-      }
-    });
+    let mut queue_sender = QueueSender::new();
 
     loop {
       mic.record(&mut |_index, l, r| {
+        if !queue_sender.send("test hello") {
+          queue_sender.connect();
+        }
         buffer.push_back((l, l));
       });
 
@@ -225,4 +200,38 @@ fn run_audio() -> Result<(), AudioError> {
         }
       });
     }
+}
+
+fn zeromq_test() {
+  thread::spawn(|| {
+    let ctx = zmq::Context::new();
+    let mut socket = ctx.socket(zmq::REQ).unwrap();
+    let mut reconnect = false;
+    socket.connect("tcp://127.0.0.1:5555").unwrap();
+
+    loop {
+      if reconnect {
+        match ctx.socket(zmq::REQ) {
+          Err(_) => {},
+          Ok(s) => {
+            match s.connect("tcp://127.0.0.1:5555") {
+              Err(_) => {},
+              Ok(_) => {
+                socket = s;
+                reconnect = false;
+              },
+            }
+          },
+        }
+      }
+      match socket.send("hello world!", 0) {
+        Ok(_) => {
+          println!("Sent");
+        },
+        Err(_) => {
+          reconnect = true;
+        },
+      }
+    }
+  });
 }
