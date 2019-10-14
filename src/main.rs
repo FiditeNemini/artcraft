@@ -43,8 +43,6 @@ fn run_audio() -> Result<(), AudioError> {
 
   println!("Done");
 
-  let mut buffer = VecDeque::new();
-
   let mut audio_queue = Arc::new(AudioQueue::new());
   let mut audio_queue_2 = audio_queue.clone();
 
@@ -58,7 +56,7 @@ fn run_audio() -> Result<(), AudioError> {
     let mut fail_count = 0;
 
     loop {
-      let mut drained = match audio_queue_2.drain_size(1000) {
+      let mut drained = match audio_queue_2.drain_size(10000) {
         None => { continue; },
         Some(d) => d,
       };
@@ -108,19 +106,21 @@ fn run_audio() -> Result<(), AudioError> {
     }
   });
 
+  //let mut buffer = VecDeque::new();
+
   loop {
     mic.record(&mut |_index, l, r| {
       audio_queue.push_back(l);
-      buffer.push_back((l, l));
+      //buffer.push_back((l, l));
     });
 
-    speaker.play(&mut || {
+    /*speaker.play(&mut || {
       if let Some((lsample, rsample)) = buffer.pop_front() {
         AudioSample::stereo(lsample, rsample)
       } else {
         AudioSample::stereo(0, 0)
       }
-    });
+    });*/
   }
 }
 
