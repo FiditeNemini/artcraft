@@ -1,9 +1,47 @@
 use zmq;
 use zmq::{Error, Socket};
+use std::collections::VecDeque;
+use std::sync::{RwLock, PoisonError};
+
+pub struct AudioQueue {
+  queue: RwLock<VecDeque<i16>>,
+}
+
+impl AudioQueue {
+  pub fn new() -> Self {
+    Self {
+      queue: RwLock::new(VecDeque::new()),
+    }
+  }
+
+  pub fn push_back(&self, val: i16) {
+    match self.queue.write() {
+      Ok(mut queue) => {
+        queue.push_back(val);
+      },
+      Err(_) => {
+        unreachable!("This shouldn't happen");
+      },
+    }
+  }
+
+  pub fn drain(&self) -> Vec<i16> {
+    match self.queue.write() {
+      Ok(mut queue) => {
+        return queue.drain(..)
+            .collect::<Vec<_>>();
+      },
+      Err(_) => {
+        unreachable!("This shouldn't happen (drain)");
+      },
+    }
+  }
+}
 
 pub struct QueueSender {
   context: zmq::Context,
   socket: Option<zmq::Socket>,
+  queue: RwLock<VecDeque<i16>>,
 }
 
 impl QueueSender {
@@ -11,8 +49,32 @@ impl QueueSender {
     Self {
       context: zmq::Context::new(),
       socket: None,
+      queue: RwLock::new(VecDeque::new()),
     }
   }
+
+  /*pub fn push_back(&self, val: i16) {
+    match self.queue.write() {
+      Ok(mut queue) => {
+        queue.push_back(val);
+      },
+      Err(_) => {
+        unreachable!("This shouldn't happen (push_back)");
+      },
+    }
+  }*/
+
+  /*pub fn drain(&self) -> Vec<i16> {
+    match self.queue.write() {
+      Ok(mut queue) => {
+        return queue.drain(..)
+            .collect::<Vec<_>>();
+      },
+      Err(_) => {
+        unreachable!("This shouldn't happen (drain)");
+      },
+    }
+  }*/
 
   /// Connect to ZeroMQ server.
   pub fn connect(&mut self) -> bool {
@@ -25,9 +87,11 @@ impl QueueSender {
 
     match socket.connect("tcp://127.0.0.1:5555") {
       Err(_) => {
+        println!("X");
         return false;
       },
       Ok(_) => {
+        println!("Y");
         self.socket = Some(socket);
         return true;
       },
@@ -40,17 +104,31 @@ impl QueueSender {
   {
     let mut socket = match &mut self.socket {
       None => {
+        println!("A");
         return false;
       },
       Some(s) => s,
     };
     match socket.send(data, 0) {
       Err(_) => {
+        println!("B");
         return false;
       },
       Ok(_) => {
         return true;
       },
     }
+  }
+
+  /*
+    Python downsampled data,
+    Downsampled.shape: (31208,)
+    Downsampled.max: 0.2798332135682282
+    Downsampled.min: -0.26734864508137157
+    Downsampled.mean: 0.00024197357508030375
+  */
+  pub fn enqueue(&mut self, val: i16) -> bool {
+    let bytes = val.to_be_bytes();
+    self.send(&bytes[..])
   }
 }
