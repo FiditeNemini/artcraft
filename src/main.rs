@@ -74,44 +74,39 @@ fn run_audio() -> Result<(), AudioError> {
           bytes.push(byte_pair[1]);
         }
 
-        socket.send(bytes, 0);
+        loop {
+          if reconnect {
+            reconnect = false;
 
-        /*for val in drained {
-          let bytes = val.to_be_bytes();
-          loop {
-            if reconnect {
-              reconnect = false;
+            thread::sleep(Duration::from_millis(200));
 
-              thread::sleep(Duration::from_millis(200));
-
-              socket = match context.socket(zmq::REQ) {
-                Ok(s) => s,
-                Err(e) => {
-                  println!("Error creating socket: {:?}", e);
-                  continue
-                },
-              };
-
-              match socket.connect("tcp://127.0.0.1:5555") {
-                Ok(_) => {},
-                Err(err) => {
-                  println!("Err B: {:?}", err);
-                },
-              }
-            }
-            match socket.send(&bytes[..], 0) {
-              Ok(_) => { break; },
+            socket = match context.socket(zmq::REQ) {
+              Ok(s) => s,
               Err(e) => {
-                println!("send err: {:?}", e);
-                fail_count += 1;
-                if fail_count > 5 {
-                  fail_count = 0;
-                  reconnect = true;
-                }
+                println!("Error creating socket: {:?}", e);
+                continue
+              },
+            };
+
+            match socket.connect("tcp://127.0.0.1:5555") {
+              Ok(_) => {},
+              Err(err) => {
+                println!("Err B: {:?}", err);
               },
             }
           }
-        }*/
+          match socket.send(&bytes, 0) {
+            Ok(_) => { break; },
+            Err(e) => {
+              println!("send err: {:?}", e);
+              fail_count += 1;
+              if fail_count > 5 {
+                fail_count = 0;
+                reconnect = true;
+              }
+            },
+          }
+        }
 
       }
     });
