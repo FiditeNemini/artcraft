@@ -70,14 +70,14 @@ fn run_cpal_audio() -> Result<(), failure::Error> {
     let data = match result {
       Ok(data) => data,
       Err(err) => {
-        eprintln!("an error occurred on stream {:?}: {}", id, err);
+        eprintln!("An error occurred on stream {:?}: {}", id, err);
         return;
       }
     };
 
     match data {
       cpal::StreamData::Input { buffer: cpal::UnknownTypeInputBuffer::F32(buffer) } => {
-        assert_eq!(id, input_stream_id);
+        //assert_eq!(id, input_stream_id);
         let mut output_fell_behind = false;
         for &sample in buffer.iter() {
           if tx.try_send(sample).is_err() {
@@ -85,11 +85,11 @@ fn run_cpal_audio() -> Result<(), failure::Error> {
           }
         }
         if output_fell_behind {
-          eprintln!("output stream fell behind: try increasing latency");
+          eprintln!("Output stream fell behind: try increasing latency");
         }
       },
       cpal::StreamData::Output { buffer: cpal::UnknownTypeOutputBuffer::F32(mut buffer) } => {
-        assert_eq!(id, output_stream_id);
+        //assert_eq!(id, output_stream_id);
         let mut input_fell_behind = None;
         for sample in buffer.iter_mut() {
           *sample = match rx.try_recv() {
@@ -101,10 +101,10 @@ fn run_cpal_audio() -> Result<(), failure::Error> {
           };
         }
         if let Some(err) = input_fell_behind {
-          eprintln!("input stream fell behind: {}: try increasing latency", err);
+          eprintln!("Input stream fell behind: {}: try increasing latency", err);
         }
       },
-      _ => panic!("we're expecting f32 data"),
+      _ => panic!("We're expecting f32 data."),
     }
   });
 }
@@ -147,25 +147,26 @@ fn run_audio() -> Result<(), AudioError> {
 
       loop {
         if reconnect {
-                   reconnect = false;
+          reconnect = false;
 
-                   thread::sleep(Duration::from_millis(200));
+          thread::sleep(Duration::from_millis(200));
 
-                   socket = match context.socket(zmq::REQ) {
-                   Ok(s) => s,
-                   Err(e) => {
-                   println!("Error creating socket: {:?}", e);
-                   continue
-                   },
-                   };
+          socket = match context.socket(zmq::REQ) {
+            Ok(s) => s,
+            Err(e) => {
+              println!("Error creating socket: {:?}", e);
+              continue
+            },
+          };
 
-                   match socket.connect("tcp://127.0.0.1:5555") {
-                   Ok(_) => {},
-                   Err(err) => {
-                   println!("Err B: {:?}", err);
-                   },
-                   }
-                   }
+          match socket.connect("tcp://127.0.0.1:5555") {
+            Ok(_) => {},
+            Err(err) => {
+              println!("Err B: {:?}", err);
+            },
+          }
+        }
+
         match socket.send(&bytes, 0) {
           Ok(_) => { break; },
           Err(e) => {
