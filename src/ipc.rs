@@ -36,6 +36,23 @@ impl AudioQueue {
       },
     }
   }
+
+  pub fn drain_size(&self, size: usize) -> Option<Vec<i16>> {
+    match self.queue.write() {
+      Ok(mut queue) => {
+        if queue.len() < size {
+          return None;
+        }
+        let vec = queue.drain(0..size)
+            .collect::<Vec<_>>();
+
+        return Some(vec);
+      },
+      Err(_) => {
+        unreachable!("This shouldn't happen (drain)");
+      },
+    }
+  }
 }
 
 pub struct QueueSender {

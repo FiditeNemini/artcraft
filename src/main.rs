@@ -60,10 +60,23 @@ fn run_audio() -> Result<(), AudioError> {
       let mut fail_count = 0;
 
       loop {
-        let mut drained = audio_queue_2.drain();
+        let mut drained = match audio_queue_2.drain_size(1000) {
+          None => { continue; },
+          Some(d) => d,
+        };
+
         println!("Len drained: {}", drained.len());
+        let mut bytes: Vec<u8> = Vec::with_capacity(drained.len()*2);
 
         for val in drained {
+          let byte_pair = val.to_be_bytes();
+          bytes.push(byte_pair[0]);
+          bytes.push(byte_pair[1]);
+        }
+
+        socket.send(bytes, 0);
+
+        /*for val in drained {
           let bytes = val.to_be_bytes();
           loop {
             if reconnect {
@@ -98,7 +111,8 @@ fn run_audio() -> Result<(), AudioError> {
               },
             }
           }
-        }
+        }*/
+
       }
     });
 
