@@ -16,7 +16,7 @@ pub mod synthesis;
 
 use wavy::*;
 
-use byteorder::{ByteOrder, BigEndian, LittleEndian};
+use byteorder::{ByteOrder, BigEndian, LittleEndian, ReadBytesExt};
 use cpal::traits::{DeviceTrait, EventLoopTrait, HostTrait};
 use failure::_core::time::Duration;
 use ipc::{QueueSender, AudioQueue};
@@ -24,7 +24,7 @@ use model::load_model;
 use model::print_version;
 use std::collections::VecDeque;
 use std::fs::File;
-use std::io::Read;
+use std::io::{Read, Cursor};
 use std::path::Path;
 use std::process::exit;
 use std::sync::Arc;
@@ -66,11 +66,13 @@ fn run_cpal_audio() -> Result<(), failure::Error> {
   let latency_samples = latency_frames as usize * format.channels as usize;
 
   // The channel to share samples.
-  let (tx, rx) = std::sync::mpsc::sync_channel(latency_samples * 2);
-
+  //let (tx, rx) = std::sync::mpsc::sync_channel(latency_samples * 2);
 
   let mut audio_queue = Arc::new(AudioQueue::new());
   let mut audio_queue_2 = audio_queue.clone();
+
+  let mut post_process_queue = Arc::new(AudioQueue::new());
+  let mut post_process_queue_2 = post_process_queue.clone();
 
   thread::spawn(move || {
     let mut context = zmq::Context::new();
@@ -87,7 +89,7 @@ fn run_cpal_audio() -> Result<(), failure::Error> {
         Some(d) => d,
       };
 
-      println!("Len drained: {}", drained.len());
+      //println!("Len drained: {}", drained.len());
       let mut bytes: Vec<u8> = Vec::with_capacity(drained.len()*2);
 
       for val in drained {
@@ -131,11 +133,31 @@ fn run_cpal_audio() -> Result<(), failure::Error> {
           Err(e) => {
             println!("send err: {:?}", e);
             fail_count += 1;
-            if fail_count > 5 {
-              fail_count = 0;
-              reconnect = true;
+          },
+        }
+
+        match socket.recv_bytes(0) {
+          Ok(buf) => {
+            if buf.len() > 2 {
+              // Receive data condition.
+              println!("---> Buf len: {}", buf.len());
+              let mut cur = Cursor::new(buf);
+              let mut floats : Vec<f32> = Vec::new();
+              while let Ok(val) = cur.read_f32::<LittleEndian>() {
+                floats.push(val);
+              }
+              post_process_queue.extend(floats);
             }
           },
+          Err(e) => {
+            fail_count += 1;
+            println!("recv err: {:?}", e);
+          },
+        }
+
+        if fail_count > 5 {
+          fail_count = 0;
+          reconnect = true;
         }
       }
     }
@@ -156,18 +178,38 @@ fn run_cpal_audio() -> Result<(), failure::Error> {
         let mut output_fell_behind = false;
         for &sample in buffer.iter() {
           audio_queue.push_back(sample);
-          if tx.try_send(sample).is_err() {
+          /*if tx.try_send(sample).is_err() {
             output_fell_behind = true;
-          }
+          }*/
         }
-        if output_fell_behind {
+        /*if output_fell_behind {
           eprintln!("Output stream fell behind: try increasing latency");
-        }
+        }*/
       },
       cpal::StreamData::Output { buffer: cpal::UnknownTypeOutputBuffer::F32(mut buffer) } => {
         //assert_eq!(id, output_stream_id);
-        let mut input_fell_behind = None;
-        for sample in buffer.iter_mut() {
+        //let mut input_fell_behind = None;
+        match post_process_queue_2.drain_size((buffer.len())) {
+          None => {
+            for sample in buffer.iter_mut() {
+              *sample = 0.0;
+            }
+          },
+          Some(mut drained) => {
+            println!("Data received");
+            for (i, sample) in buffer.iter_mut().enumerate() {
+              let val = drained.pop();
+              *sample = match val {
+                None => {
+                  println!("Couldn't drain at index: {}", i);
+                  0.0
+                },
+                Some(d) => d * 5.0,
+              }
+            }
+          },
+        }
+        /*for sample in buffer.iter_mut() {
           *sample = match rx.try_recv() {
             Ok(s) => s * 5.5,
             Err(err) => {
@@ -178,11 +220,11 @@ fn run_cpal_audio() -> Result<(), failure::Error> {
         }
         if let Some(err) = input_fell_behind {
           eprintln!("Input stream fell behind: {}: try increasing latency", err);
-        }
+        }*/
       },
       _ => panic!("We're expecting f32 data."),
     }
-  });
+  })
 }
 
 /*fn run_audio() -> Result<(), AudioError> {

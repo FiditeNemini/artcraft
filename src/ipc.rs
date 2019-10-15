@@ -20,7 +20,18 @@ impl AudioQueue {
         queue.push_back(val);
       },
       Err(_) => {
-        unreachable!("This shouldn't happen");
+        unreachable!("This shouldn't happen (push_back)");
+      },
+    }
+  }
+
+  pub fn extend(&self, buf: Vec<f32>) {
+    match self.queue.write() {
+      Ok(mut queue) => {
+        queue.extend(buf);
+      },
+      Err(_) => {
+        unreachable!("This shouldn't happen (extend)");
       },
     }
   }
@@ -49,7 +60,7 @@ impl AudioQueue {
         return Some(vec);
       },
       Err(_) => {
-        unreachable!("This shouldn't happen (drain)");
+        unreachable!("This shouldn't happen (drain_size)");
       },
     }
   }
