@@ -4,7 +4,7 @@ use std::collections::VecDeque;
 use std::sync::{RwLock, PoisonError};
 
 pub struct AudioQueue {
-  queue: RwLock<VecDeque<i16>>,
+  queue: RwLock<VecDeque<f32>>,
 }
 
 impl AudioQueue {
@@ -14,7 +14,7 @@ impl AudioQueue {
     }
   }
 
-  pub fn push_back(&self, val: i16) {
+  pub fn push_back(&self, val: f32) {
     match self.queue.write() {
       Ok(mut queue) => {
         queue.push_back(val);
@@ -25,7 +25,7 @@ impl AudioQueue {
     }
   }
 
-  pub fn drain(&self) -> Vec<i16> {
+  pub fn drain(&self) -> Vec<f32> {
     match self.queue.write() {
       Ok(mut queue) => {
         return queue.drain(..)
@@ -37,7 +37,7 @@ impl AudioQueue {
     }
   }
 
-  pub fn drain_size(&self, size: usize) -> Option<Vec<i16>> {
+  pub fn drain_size(&self, size: usize) -> Option<Vec<f32>> {
     match self.queue.write() {
       Ok(mut queue) => {
         if queue.len() < size {

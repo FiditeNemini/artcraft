@@ -2,6 +2,7 @@
 //!
 //! This example records audio and plays it back in real time as it's being recorded.
 
+extern crate byteorder;
 extern crate cpal;
 extern crate failure;
 extern crate tensorflow;
@@ -15,6 +16,7 @@ pub mod synthesis;
 
 use wavy::*;
 
+use byteorder::{ByteOrder, BigEndian, LittleEndian};
 use cpal::traits::{DeviceTrait, EventLoopTrait, HostTrait};
 use failure::_core::time::Duration;
 use ipc::{QueueSender, AudioQueue};
@@ -33,7 +35,7 @@ fn main() {
   print_version();
   //load_model(); // TODO: This works. Temporarily commented out
   run_cpal_audio().expect("Should work");
-  run_audio().expect("should work");
+  //run_audio().expect("should work");
   //run_audio().expect("should work");
 }
 
@@ -66,6 +68,79 @@ fn run_cpal_audio() -> Result<(), failure::Error> {
   // The channel to share samples.
   let (tx, rx) = std::sync::mpsc::sync_channel(latency_samples * 2);
 
+
+  let mut audio_queue = Arc::new(AudioQueue::new());
+  let mut audio_queue_2 = audio_queue.clone();
+
+  thread::spawn(move || {
+    let mut context = zmq::Context::new();
+    let mut socket = context.socket(zmq::REQ).unwrap();
+
+    socket.connect("tcp://127.0.0.1:5555").unwrap();
+
+    let mut reconnect = false;
+    let mut fail_count = 0;
+
+    loop {
+      let mut drained = match audio_queue_2.drain_size(10000) {
+        None => { continue; },
+        Some(d) => d,
+      };
+
+      println!("Len drained: {}", drained.len());
+      let mut bytes: Vec<u8> = Vec::with_capacity(drained.len()*2);
+
+      for val in drained {
+        /*let byte_pair = val.to_be_bytes();
+        bytes.push(byte_pair[0]);
+        bytes.push(byte_pair[1]);
+        bytes.push(byte_pair[3]);
+        bytes.push(byte_pair[4]);*/
+        let mut buf = [0; 4];
+        LittleEndian::write_f32(&mut buf, val);
+        bytes.push(buf[0]);
+        bytes.push(buf[1]);
+        bytes.push(buf[2]);
+        bytes.push(buf[3]);
+      }
+
+      loop {
+        if reconnect {
+          reconnect = false;
+
+          thread::sleep(Duration::from_millis(200));
+
+          socket = match context.socket(zmq::REQ) {
+            Ok(s) => s,
+            Err(e) => {
+              println!("Error creating socket: {:?}", e);
+              continue
+            },
+          };
+
+          match socket.connect("tcp://127.0.0.1:5555") {
+            Ok(_) => {},
+            Err(err) => {
+              println!("Err B: {:?}", err);
+            },
+          }
+        }
+
+        match socket.send(&bytes, 0) {
+          Ok(_) => { break; },
+          Err(e) => {
+            println!("send err: {:?}", e);
+            fail_count += 1;
+            if fail_count > 5 {
+              fail_count = 0;
+              reconnect = true;
+            }
+          },
+        }
+      }
+    }
+  });
+
   event_loop.run(move |id, result| {
     let data = match result {
       Ok(data) => data,
@@ -80,6 +155,7 @@ fn run_cpal_audio() -> Result<(), failure::Error> {
         //assert_eq!(id, input_stream_id);
         let mut output_fell_behind = false;
         for &sample in buffer.iter() {
+          audio_queue.push_back(sample);
           if tx.try_send(sample).is_err() {
             output_fell_behind = true;
           }
@@ -109,7 +185,7 @@ fn run_cpal_audio() -> Result<(), failure::Error> {
   });
 }
 
-fn run_audio() -> Result<(), AudioError> {
+/*fn run_audio() -> Result<(), AudioError> {
   println!("Opening microphone system");
   let mut mic = MicrophoneSystem::new(SampleRate::Normal)?;
 
@@ -198,5 +274,5 @@ fn run_audio() -> Result<(), AudioError> {
       }
     });*/
   }
-}
+}*/
 
