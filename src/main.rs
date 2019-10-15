@@ -101,59 +101,62 @@ fn run_cpal_audio() -> Result<(), failure::Error> {
         bytes.push(buf[3]);
       }
 
-      loop {
-        if reconnect {
-          reconnect = false;
+      if reconnect {
+        reconnect = false;
+        println!("RECONNECT");
 
-          //thread::sleep(Duration::from_millis(200));
+        //thread::sleep(Duration::from_millis(200));
 
-          socket = match context.socket(zmq::REQ) {
-            Ok(s) => s,
-            Err(e) => {
-              println!("Error creating socket: {:?}", e);
-              continue
-            },
-          };
-
-          match socket.connect("tcp://127.0.0.1:5555") {
-            Ok(_) => {},
-            Err(err) => {
-              println!("Err B: {:?}", err);
-            },
-          }
-        }
-
-        match socket.send(&bytes, 0) {
-          Ok(_) => { break; },
+        socket = match context.socket(zmq::REQ) {
+          Ok(s) => s,
           Err(e) => {
-            //println!("send err: {:?}", e);
-            fail_count += 1;
+            println!("Error creating socket: {:?}", e);
+            continue
+          },
+        };
+
+        match socket.connect("tcp://127.0.0.1:5555") {
+          Ok(_) => {},
+          Err(err) => {
+            println!("Err B: {:?}", err);
           },
         }
+      }
 
-        match socket.recv_bytes(0) {
-          Ok(buf) => {
-            if buf.len() > 2 {
-              // Receive data condition.
-              //println!("---> Buf len: {}", buf.len());
-              let mut cur = Cursor::new(buf);
-              let mut floats : Vec<f32> = Vec::new();
-              while let Ok(val) = cur.read_f32::<LittleEndian>() {
-                floats.push(val);
-              }
-              post_process_queue.extend(floats);
+      match socket.send(&bytes, 0) {
+        Ok(_) => {
+          //println!("Sent len: {}", bytes.len());
+        },
+        Err(e) => {
+          println!("send err {}: {:?}", e.to_raw(), e);
+          fail_count += 1;
+        },
+      }
+
+      //thread::sleep(Duration::from_millis(10));
+
+      match socket.recv_bytes(0) {
+        Ok(buf) => {
+          //println!("---> Buf len: {}", buf.len());
+          if buf.len() > 2 {
+            // Receive data condition.
+            let mut cur = Cursor::new(buf);
+            let mut floats : Vec<f32> = Vec::new();
+            while let Ok(val) = cur.read_f32::<LittleEndian>() {
+              floats.push(val);
             }
-          },
-          Err(e) => {
-            fail_count += 1;
-            println!("recv err: {:?}", e);
-          },
-        }
+            post_process_queue.extend(floats);
+          }
+        },
+        Err(e) => {
+          fail_count += 1;
+          println!("recv err: {:?}", e);
+        },
+      }
 
-        if fail_count > 5 {
-          fail_count = 0;
-          reconnect = true;
-        }
+      if fail_count > 5 {
+        fail_count = 0;
+        reconnect = true;
       }
     }
   });
@@ -173,18 +176,10 @@ fn run_cpal_audio() -> Result<(), failure::Error> {
         let mut output_fell_behind = false;
         for &sample in buffer.iter() {
           audio_queue.push_back(sample);
-          /*if tx.try_send(sample).is_err() {
-            output_fell_behind = true;
-          }*/
         }
-        /*if output_fell_behind {
-          eprintln!("Output stream fell behind: try increasing latency");
-        }*/
       },
       cpal::StreamData::Output { buffer: cpal::UnknownTypeOutputBuffer::F32(mut buffer) } => {
         //println!("Audio out buffer len: {}", post_process_queue_2.len());
-        //assert_eq!(id, output_stream_id);
-        //let mut input_fell_behind = None;
         let request_size = buffer.len();
         let mut drained = post_process_queue_2.drain_size((request_size));
         match drained {
@@ -202,7 +197,7 @@ fn run_cpal_audio() -> Result<(), failure::Error> {
                   println!("Couldn't drain at index: {}", i);
                   0.0
                 },
-                Some(d) => d * 1.0,
+                Some(d) => d * 0.3,
               };
             }
           },

@@ -17,6 +17,8 @@ use cpal::traits::{DeviceTrait, EventLoopTrait, HostTrait};
 //const LATENCY_MS: f32 = 150.0;
 const LATENCY_MS: f32 = 50.0;
 
+const AUDIO_VOLUME_MULTIPLIER: f32 = 1.0;
+
 fn main() -> Result<(), failure::Error> {
     let host = cpal::default_host();
     let event_loop = host.event_loop();
@@ -83,7 +85,7 @@ fn main() -> Result<(), failure::Error> {
                     let mut input_fell_behind = None;
                     for sample in buffer.iter_mut() {
                         *sample = match rx.try_recv() {
-                            Ok(s) => s * 5.5,
+                            Ok(s) => s * AUDIO_VOLUME_MULTIPLIER,
                             Err(err) => {
                                 input_fell_behind = Some(err);
                                 0.0
