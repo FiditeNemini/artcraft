@@ -187,16 +187,18 @@ fn run_cpal_audio() -> Result<(), failure::Error> {
         }*/
       },
       cpal::StreamData::Output { buffer: cpal::UnknownTypeOutputBuffer::F32(mut buffer) } => {
+        println!("Audio out buffer len: {}", post_process_queue_2.len());
         //assert_eq!(id, output_stream_id);
         //let mut input_fell_behind = None;
-        match post_process_queue_2.drain_size((buffer.len())) {
+        let request_size = buffer.len();
+        let mut drained = post_process_queue_2.drain_size((request_size));
+        match drained {
           None => {
             for sample in buffer.iter_mut() {
               *sample = 0.0;
             }
           },
           Some(mut drained) => {
-            println!("Data received");
             for (i, sample) in buffer.iter_mut().enumerate() {
               let val = drained.pop();
               *sample = match val {
@@ -204,8 +206,22 @@ fn run_cpal_audio() -> Result<(), failure::Error> {
                   println!("Couldn't drain at index: {}", i);
                   0.0
                 },
-                Some(d) => d * 5.0,
-              }
+                Some(d) => d * 2.0,
+              };
+              /*sample = match val {
+                None => {
+                  println!("Couldn't drain at index: {}", i);
+                  0.0
+                },
+                Some(d) => d * 2.0,
+              };
+              *sample = match val {
+                None => {
+                  println!("Couldn't drain at index: {}", i);
+                  0.0
+                },
+                Some(d) => d * 2.0,
+              };*/
             }
           },
         }

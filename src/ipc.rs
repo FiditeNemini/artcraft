@@ -64,6 +64,18 @@ impl AudioQueue {
       },
     }
   }
+
+  pub fn len(&self) -> usize {
+    match self.queue.read() {
+      Ok(mut queue) => {
+        return queue.len();
+      },
+      Err(_) => {
+        unreachable!("This shouldn't happen (len)");
+      },
+    }
+  }
+
 }
 
 pub struct QueueSender {
