@@ -81,8 +81,10 @@ fn run_cpal_audio() -> Result<(), failure::Error> {
     let mut reconnect = false;
     let mut fail_count = 0;
 
+    const SEND_SIZE : usize = 5000;
+
     loop {
-      let mut drained = match audio_queue_2.drain_size(10000) {
+      let mut drained = match audio_queue_2.drain_size(SEND_SIZE) {
         None => { continue; },
         Some(d) => d,
       };
@@ -133,7 +135,7 @@ fn run_cpal_audio() -> Result<(), failure::Error> {
           Ok(buf) => {
             if buf.len() > 2 {
               // Receive data condition.
-              println!("---> Buf len: {}", buf.len());
+              //println!("---> Buf len: {}", buf.len());
               let mut cur = Cursor::new(buf);
               let mut floats : Vec<f32> = Vec::new();
               while let Ok(val) = cur.read_f32::<LittleEndian>() {
@@ -188,6 +190,7 @@ fn run_cpal_audio() -> Result<(), failure::Error> {
         match drained {
           None => {
             for sample in buffer.iter_mut() {
+              println!("WTF");
               *sample = 0.0;
             }
           },
@@ -201,35 +204,9 @@ fn run_cpal_audio() -> Result<(), failure::Error> {
                 },
                 Some(d) => d * 1.0,
               };
-              /*sample = match val {
-                None => {
-                  println!("Couldn't drain at index: {}", i);
-                  0.0
-                },
-                Some(d) => d * 2.0,
-              };
-              *sample = match val {
-                None => {
-                  println!("Couldn't drain at index: {}", i);
-                  0.0
-                },
-                Some(d) => d * 2.0,
-              };*/
             }
           },
         }
-        /*for sample in buffer.iter_mut() {
-          *sample = match rx.try_recv() {
-            Ok(s) => s * 5.5,
-            Err(err) => {
-              input_fell_behind = Some(err);
-              0.0
-            },
-          };
-        }
-        if let Some(err) = input_fell_behind {
-          eprintln!("Input stream fell behind: {}: try increasing latency", err);
-        }*/
       },
       _ => panic!("We're expecting f32 data."),
     }
