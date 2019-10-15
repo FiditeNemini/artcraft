@@ -191,14 +191,15 @@ fn run_cpal_audio() -> Result<(), failure::Error> {
           },
           Some(mut drained) => {
             for (i, sample) in buffer.iter_mut().enumerate() {
-              let val = drained.pop();
+              *sample = drained.get(i).copied().unwrap();
+              /*let val = drained.pop();
               *sample = match val {
                 None => {
                   println!("Couldn't drain at index: {}", i);
                   0.0
                 },
                 Some(d) => d * 0.3,
-              };
+              };*/
             }
           },
         }
