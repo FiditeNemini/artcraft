@@ -19,7 +19,7 @@ use wavy::*;
 use byteorder::{ByteOrder, BigEndian, LittleEndian, ReadBytesExt};
 use cpal::traits::{DeviceTrait, EventLoopTrait, HostTrait};
 use failure::_core::time::Duration;
-use ipc::{QueueSender, AudioQueue};
+use ipc::AudioQueue;
 use model::load_model;
 use model::print_version;
 use std::collections::VecDeque;
@@ -35,8 +35,6 @@ fn main() {
   print_version();
   //load_model(); // TODO: This works. Temporarily commented out
   run_cpal_audio().expect("Should work");
-  //run_audio().expect("should work");
-  //run_audio().expect("should work");
 }
 
 const LATENCY_MS: f32 = 50.0;
@@ -93,11 +91,6 @@ fn run_cpal_audio() -> Result<(), failure::Error> {
       let mut bytes: Vec<u8> = Vec::with_capacity(drained.len()*2);
 
       for val in drained {
-        /*let byte_pair = val.to_be_bytes();
-        bytes.push(byte_pair[0]);
-        bytes.push(byte_pair[1]);
-        bytes.push(byte_pair[3]);
-        bytes.push(byte_pair[4]);*/
         let mut buf = [0; 4];
         LittleEndian::write_f32(&mut buf, val);
         bytes.push(buf[0]);
@@ -110,7 +103,7 @@ fn run_cpal_audio() -> Result<(), failure::Error> {
         if reconnect {
           reconnect = false;
 
-          thread::sleep(Duration::from_millis(200));
+          //thread::sleep(Duration::from_millis(200));
 
           socket = match context.socket(zmq::REQ) {
             Ok(s) => s,
@@ -131,7 +124,7 @@ fn run_cpal_audio() -> Result<(), failure::Error> {
         match socket.send(&bytes, 0) {
           Ok(_) => { break; },
           Err(e) => {
-            println!("send err: {:?}", e);
+            //println!("send err: {:?}", e);
             fail_count += 1;
           },
         }
@@ -187,7 +180,7 @@ fn run_cpal_audio() -> Result<(), failure::Error> {
         }*/
       },
       cpal::StreamData::Output { buffer: cpal::UnknownTypeOutputBuffer::F32(mut buffer) } => {
-        println!("Audio out buffer len: {}", post_process_queue_2.len());
+        //println!("Audio out buffer len: {}", post_process_queue_2.len());
         //assert_eq!(id, output_stream_id);
         //let mut input_fell_behind = None;
         let request_size = buffer.len();
@@ -206,7 +199,7 @@ fn run_cpal_audio() -> Result<(), failure::Error> {
                   println!("Couldn't drain at index: {}", i);
                   0.0
                 },
-                Some(d) => d * 2.0,
+                Some(d) => d * 7.0,
               };
               /*sample = match val {
                 None => {
@@ -242,95 +235,3 @@ fn run_cpal_audio() -> Result<(), failure::Error> {
     }
   })
 }
-
-/*fn run_audio() -> Result<(), AudioError> {
-  println!("Opening microphone system");
-  let mut mic = MicrophoneSystem::new(SampleRate::Normal)?;
-
-  println!("Opening speaker system");
-  let mut speaker = SpeakerSystem::new(SampleRate::Sparse)?;
-
-  println!("Done");
-
-  let mut audio_queue = Arc::new(AudioQueue::new());
-  let mut audio_queue_2 = audio_queue.clone();
-
-  thread::spawn(move || {
-    let mut context = zmq::Context::new();
-    let mut socket = context.socket(zmq::REQ).unwrap();
-
-    socket.connect("tcp://127.0.0.1:5555").unwrap();
-
-    let mut reconnect = false;
-    let mut fail_count = 0;
-
-    loop {
-      let mut drained = match audio_queue_2.drain_size(10000) {
-        None => { continue; },
-        Some(d) => d,
-      };
-
-      println!("Len drained: {}", drained.len());
-      let mut bytes: Vec<u8> = Vec::with_capacity(drained.len()*2);
-
-      for val in drained {
-        let byte_pair = val.to_be_bytes();
-        bytes.push(byte_pair[0]);
-        bytes.push(byte_pair[1]);
-      }
-
-      loop {
-        if reconnect {
-          reconnect = false;
-
-          thread::sleep(Duration::from_millis(200));
-
-          socket = match context.socket(zmq::REQ) {
-            Ok(s) => s,
-            Err(e) => {
-              println!("Error creating socket: {:?}", e);
-              continue
-            },
-          };
-
-          match socket.connect("tcp://127.0.0.1:5555") {
-            Ok(_) => {},
-            Err(err) => {
-              println!("Err B: {:?}", err);
-            },
-          }
-        }
-
-        match socket.send(&bytes, 0) {
-          Ok(_) => { break; },
-          Err(e) => {
-            println!("send err: {:?}", e);
-            fail_count += 1;
-            if fail_count > 5 {
-              fail_count = 0;
-              reconnect = true;
-            }
-          },
-        }
-      }
-    }
-  });
-
-  //let mut buffer = VecDeque::new();
-
-  loop {
-    mic.record(&mut |_index, l, r| {
-      audio_queue.push_back(l);
-      //buffer.push_back((l, l));
-    });
-
-    /*speaker.play(&mut || {
-      if let Some((lsample, rsample)) = buffer.pop_front() {
-        AudioSample::stereo(lsample, rsample)
-      } else {
-        AudioSample::stereo(0, 0)
-      }
-    });*/
-  }
-}*/
-
