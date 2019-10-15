@@ -88,7 +88,7 @@ fn run_cpal_audio() -> Result<(), failure::Error> {
       };
 
       //println!("Len drained: {}", drained.len());
-      let mut bytes: Vec<u8> = Vec::with_capacity(drained.len()*2);
+      let mut bytes: Vec<u8> = Vec::with_capacity(drained.len()*4);
 
       for val in drained {
         let mut buf = [0; 4];
@@ -199,7 +199,7 @@ fn run_cpal_audio() -> Result<(), failure::Error> {
                   println!("Couldn't drain at index: {}", i);
                   0.0
                 },
-                Some(d) => d * 7.0,
+                Some(d) => d * 1.0,
               };
               /*sample = match val {
                 None => {
