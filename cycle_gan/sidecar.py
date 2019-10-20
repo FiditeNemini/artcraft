@@ -1,0 +1,209 @@
+#!/usr/bin/env python3
+
+"""
+Starts a demo HTTP server to capture and transform audio
+as a live demonstration of the trained model.
+
+Brandon Thomas 2019-07-29 <bt@brand.io> <echelon@gmail.com>
+"""
+
+import argparse
+import io
+import librosa
+import numpy as np
+import os
+import pathlib
+import scipy
+import soundfile
+import struct
+import subprocess
+import tempfile
+import tensorflow as tf
+import zmq
+
+from falcon_multipart.middleware import MultipartMiddleware
+from model import CycleGAN
+from preprocess import *
+from wsgiref import simple_server
+
+print("TensorFlow version: {}".format(tf.version.VERSION))
+
+
+class Converter():
+    def __init__(self, model_dir, model_name):
+        self.num_features = 24
+        self.sampling_rate = 16000
+        self.frame_period = 5.0
+
+        self.model = CycleGAN(num_features = self.num_features, mode = 'test')
+
+        self.model.load(filepath = os.path.join(model_dir, model_name))
+
+        self.mcep_normalization_params = np.load(os.path.join(model_dir, 'mcep_normalization.npz'))
+        self.mcep_mean_A = self.mcep_normalization_params['mean_A']
+        self.mcep_std_A = self.mcep_normalization_params['std_A']
+        self.mcep_mean_B = self.mcep_normalization_params['mean_B']
+        self.mcep_std_B = self.mcep_normalization_params['std_B']
+
+        self.logf0s_normalization_params = np.load(os.path.join(model_dir,
+          'logf0s_normalization.npz'))
+        self.logf0s_mean_A = self.logf0s_normalization_params['mean_A']
+        self.logf0s_std_A = self.logf0s_normalization_params['std_A']
+        self.logf0s_mean_B = self.logf0s_normalization_params['mean_B']
+        self.logf0s_std_B = self.logf0s_normalization_params['std_B']
+
+    def convert_partial(self, wav, conversion_direction='A2B'):
+        wav = wav_padding(wav = wav,
+            sr = self.sampling_rate,
+            frame_period = self.frame_period,
+            multiple = 4)
+        f0, timeaxis, sp, ap = world_decompose(wav = wav,
+            fs = self.sampling_rate,
+            frame_period = self.frame_period)
+        coded_sp = world_encode_spectral_envelop(sp = sp,
+            fs = self.sampling_rate,
+            dim = self.num_features)
+        coded_sp_transposed = coded_sp.T
+
+        f0_converted = pitch_conversion(f0 = f0,
+            mean_log_src = self.logf0s_mean_A,
+            std_log_src = self.logf0s_std_A,
+            mean_log_target = self.logf0s_mean_B,
+            std_log_target = self.logf0s_std_B)
+        coded_sp_norm = (coded_sp_transposed - self.mcep_mean_A) / self.mcep_std_A
+
+        coded_sp_converted_norm = self.model.test(inputs = np.array([coded_sp_norm]),
+            direction = conversion_direction)[0]
+        coded_sp_converted = coded_sp_converted_norm * self.mcep_std_B + self.mcep_mean_B
+
+        coded_sp_converted = coded_sp_converted.T
+        coded_sp_converted = np.ascontiguousarray(coded_sp_converted)
+        decoded_sp_converted = world_decode_spectral_envelop(coded_sp = coded_sp_converted,
+            fs = self.sampling_rate)
+        wav_transformed = world_speech_synthesis(f0 = f0_converted,
+            decoded_sp = decoded_sp_converted,
+            ap = ap,
+            fs = self.sampling_rate,
+            frame_period = self.frame_period)
+
+        # For debugging model output, uncomment the following line:
+        # librosa.output.write_wav('model_output.wav', wav_transformed, self.sampling_rate)
+
+        """
+        # TODO: Perhaps ditch this. It's probably unnecessary work.
+        upsampled = librosa.resample(wav_transformed, self.sampling_rate, 48000)
+        pcm_data = upsampled.astype(np.float64)
+        stereo_pcm_data = np.tile(pcm_data, (2,1)).T
+        return stereo_pcm_data.astype(np.float32)
+        """
+
+        #return wav
+        return wav_transformed
+
+    #def convert(self, wav, conversion_direction='A2B'):
+    #    pcm_data = self.convert_partial(wav, conversion_direction=conversion_direction)
+    #    buf = io.BytesIO()
+    #    # pcm_data: A 1-D or 2-D numpy array of either integer or float data-type.
+    #    # To write multiple-channels, use a 2-D array of shape (Nsamples, Nchannels).
+    #    scipy.io.wavfile.write(buf, 48000, pcm_data)
+    #    return buf
+
+# Set up model
+# This should live long in memory, so we do it up front.
+model_dir_default = './model/sf1_tm1'
+model_name_default = 'sf1_tm1.ckpt'
+
+# TODO: UNCOMMENT
+converter = Converter(model_dir_default, model_name_default)
+
+TEMP_DIR = tempfile.TemporaryDirectory(prefix='queue_audio')
+
+def temp_file_name(suffix='.wav'):
+    # NB: Not actually using the tempfile. Just the random name.
+    temp_file = tempfile.NamedTemporaryFile(suffix=suffix)
+    name = os.path.basename(temp_file.name)
+    return os.path.join(TEMP_DIR.name, name)
+
+SAVE_FILES = False
+SKIP_CONVERT = False
+
+def convert(audio):
+    #audio = np.array(audio, dtype=np.int16)
+    audio = np.array(audio, dtype=np.float32)
+    print(audio)
+
+    #source_rate = 38000 # Experimentally determined for Rust library 'wavy'
+    #source_rate = 88000 # Experimentally determined for Rust library 'CPAL'
+    source_rate = 44100
+
+    if SAVE_FILES:
+        filename = temp_file_name('.wav')
+        print('----- Original wav file out: {}'.format(filename))
+        scipy.io.wavfile.write(filename, source_rate, audio)
+
+    audio = librosa.resample(audio, source_rate, 16000)
+
+    if SAVE_FILES:
+        filename = temp_file_name('.wav')
+        print('----- Downsampled file out: {}'.format(filename))
+        scipy.io.wavfile.write(filename, 16000, audio)
+
+    if SKIP_CONVERT:
+        return
+
+    results = converter.convert_partial(audio, conversion_direction = 'A2B')
+    #results = audio[:]
+
+    #consume_rate = 68000 # Experimentally determined for Rust lib 'CPAL'
+    consume_rate = 44100
+    upsampled = librosa.resample(results, 16000, consume_rate)
+
+    if SAVE_FILES:
+        filename = temp_file_name('.wav')
+        print('----- Upsampled (transformed) file out: {}'.format(filename))
+        scipy.io.wavfile.write(filename, consume_rate, upsampled)
+
+    return upsampled
+
+
+BUFFER_SIZE = 5000
+MULTIPLIER = 10
+#MULTIPLIER = 1
+
+def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--port', type=int, default=5555)
+    args = parser.parse_args()
+
+    context = zmq.Context()
+    socket = context.socket(zmq.REP)
+    socket.bind("tcp://*:{}".format(args.port))
+    print('Running server...')
+
+    queue = []
+    while True:
+        #  Wait for next request from client
+        message = socket.recv()
+        #socket.send(message)
+        #continue
+
+        # 16-bit PCM (-32768, +32767) int16
+        # layout =  '!' + ('h' * BUFFER_SIZE) # NB: Audio from 'wavy' Rust library
+        layout =  '<' + ('f' * BUFFER_SIZE) # NB: Audio from 'CPAL' Rust library
+        decoded = struct.unpack(layout, message)
+        queue.extend(decoded)
+
+        if len(queue) >= BUFFER_SIZE * MULTIPLIER:
+            #results = queue[:]
+            results = convert(queue)
+            queue = []
+            layout = '<' + ('f' * len(results))
+            result_bytes = struct.pack(layout, *results)
+            socket.send(result_bytes)
+        else:
+            # Must send reply back to client
+            socket.send(b"OK")
+
+if __name__ == '__main__':
+    main()
+
