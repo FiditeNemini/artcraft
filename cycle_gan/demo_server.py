@@ -214,19 +214,32 @@ class ApiHandler():
         form_data = request.params['audio_data'].file
         data, samplerate = soundfile.read(form_data)
 
+        print('samplerate', samplerate)
+        print('data', data)
+        print('data.shape', data.shape)
+        print('data.dtype', data.dtype)
+
         # For debugging browser input, uncomment the following line:
         # scipy.io.wavfile.write('browser_input_audio.wav', samplerate, data)
 
         # NB: Convert the input stereo signal into mono.
         # In the future the frontend should be responsible for sampling details.
         mono = data[:, 0]
+        print('mono', mono)
+        print('mono.shape', mono.shape)
+        print('mono.dtype', mono.dtype)
 
         # NB: We must downsample to the rate that the network is trained on.
         downsampled = librosa.resample(mono, samplerate, 16000)
+        print('downsampled', downsampled)
+        print('downsampled.shape', downsampled.shape)
+        print('downsampled.dtype', downsampled.dtype)
 
         # Evaluate the model
         print(">>> Converting...")
         results = converter.convert(downsampled, conversion_direction = 'A2B')
+
+        print('type(results)', type(results))
 
         temp_dir = tempfile.TemporaryDirectory(prefix='tmp_ml_audio')
         temp_file = tempfile.NamedTemporaryFile(suffix='.wav')

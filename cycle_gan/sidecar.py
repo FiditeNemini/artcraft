@@ -115,7 +115,7 @@ model_dir_default = './model/sf1_tm1'
 model_name_default = 'sf1_tm1.ckpt'
 
 # TODO: UNCOMMENT
-#converter = Converter(model_dir_default, model_name_default)
+converter = Converter(model_dir_default, model_name_default)
 
 TEMP_DIR = tempfile.TemporaryDirectory(prefix='queue_audio')
 
@@ -125,10 +125,30 @@ def temp_file_name(suffix='.wav'):
     name = os.path.basename(temp_file.name)
     return os.path.join(TEMP_DIR.name, name)
 
-def convert(audio, skip_vocode = False, save_files = False, source_rate = 44100, output_rate = 44100):
+def convert(audio, skip_vocode=False, save_files=False, skip_resample=False, discard_vocoded_audio=False,
+            source_rate=44100, output_rate=44100):
     #audio = np.array(audio, dtype=np.int16)
-    #audio = np.array(audio, dtype=np.float32)
-    audio = np.array(audio, dtype=np.float32)
+    #data, samplerate = soundfile.read(audio)
+    #print('samplerate', samplerate)
+    """
+    samplerate 44100
+    data.shape (77824, 2)
+    data.dtype float64
+    mono [0.0050354  0.00518799 0.0050354  ... 0.11651611 0.11935425 0.1164856 ]
+    mono.shape (77824,)
+    mono.dtype float64
+    downsampled [0.00329925 0.00577342 0.00474898 ... 0.0851728  0.1166483  0.        ]
+    downsampled.shape (28236,)
+    downsampled.dtype float64
+
+    1) Data should be float64
+    2) Output is BYTES!! Not floats.
+    3) Result is still somehow mono!?
+    """
+
+    audio = np.array(audio, dtype=np.float64)
+    print('audio.shape', audio.shape)
+    print('audio.type', audio.dtype)
 
     #source_rate = 88000 # Experimentally determined for Rust library 'CPAL'
     #source_rate = 44100
@@ -138,9 +158,15 @@ def convert(audio, skip_vocode = False, save_files = False, source_rate = 44100,
         print('----- Original wav file out: {}'.format(filename))
         scipy.io.wavfile.write(filename, source_rate, audio)
 
-    if source_rate != 16000:
+    # NB: Convert the input stereo signal into mono.
+    # In the future the frontend should be responsible for sampling details.
+    #audio = audio[:, 0]
+
+    if not skip_resample:
         print("Resampling audio from {} Hz to 16000 Hz".format(source_rate))
         audio = librosa.resample(audio, source_rate, 16000)
+        print('resampled_audio.shape', audio.shape)
+        print('resampled_audio.type', audio.dtype)
         if save_files:
             filename = temp_file_name('.wav')
             print('----- Downsampled file out: {}'.format(filename))
@@ -150,17 +176,23 @@ def convert(audio, skip_vocode = False, save_files = False, source_rate = 44100,
         return audio
 
     results = converter.convert_partial(audio, conversion_direction = 'A2B')
-    #results = audio[:]
 
-    #consume_rate = 68000 # Experimentally determined for Rust lib 'CPAL'
-    upsampled = librosa.resample(results, 16000, output_rate)
+    print('results.type', type(results))
+    print('results.len', len(results))
 
-    if save_files:
-        filename = temp_file_name('.wav')
-        print('----- Upsampled (transformed) file out: {}'.format(filename))
-        scipy.io.wavfile.write(filename, output_rate, upsampled)
+    if output_rate != 16000:
+        print("Resampling output audio from {} Hz to 16000 Hz".format(source_rate))
+        #consume_rate = 68000 # Experimentally determined for Rust lib 'CPAL'
+        results = librosa.resample(results, 16000, output_rate)
+        if save_files:
+            filename = temp_file_name('.wav')
+            print('----- Upsampled (transformed) file out: {}'.format(filename))
+            scipy.io.wavfile.write(filename, output_rate, results)
 
-    return upsampled
+    if discard_vocoded_audio:
+        return audio
+    else:
+        return results
 
 def main():
     parser = argparse.ArgumentParser()
@@ -184,10 +216,12 @@ def main():
         if len(queue) >= vocode_request.buffer_size_minimum:
             #results = queue[:]
             results = convert(queue,
-                              source_rate = vocode_request.sample_rate,
-                              output_rate = vocode_request.output_rate,
-                              skip_vocode = vocode_request.skip_vocode,
-                              save_files = vocode_request.save_files)
+                              source_rate=vocode_request.sample_rate,
+                              output_rate=vocode_request.output_rate,
+                              skip_vocode=vocode_request.skip_vocode,
+                              skip_resample=vocode_request.skip_resample,
+                              save_files=vocode_request.save_files,
+                              discard_vocoded_audio=vocode_request.discard_vocoded_audio)
             queue = []
 
             vocode_response = VocodeAudioResponse()

@@ -7,15 +7,21 @@ pub struct VocodeAudioRequest {
     #[prost(int32, tag="2")]
     pub sample_rate: i32,
     #[prost(bool, tag="3")]
-    pub skip_vocode: bool,
+    pub skip_resample: bool,
     #[prost(bool, tag="4")]
+    pub skip_vocode: bool,
+    /// Debugging
+    #[prost(bool, tag="5")]
     pub save_files: bool,
     /// How big we let the buffer grow before running 'convert'.
-    #[prost(int32, tag="5")]
+    #[prost(int32, tag="6")]
     pub buffer_size_minimum: i32,
     /// Requested output rate
-    #[prost(int32, tag="6")]
+    #[prost(int32, tag="7")]
     pub output_rate: i32,
+    /// Discard the vocoded audio and return the original
+    #[prost(bool, tag="8")]
+    pub discard_vocoded_audio: bool,
 }
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct VocodeAudioResponse {

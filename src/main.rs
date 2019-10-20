@@ -103,26 +103,15 @@ fn run_cpal_audio() -> Result<(), failure::Error> {
       let mut vocode_request = VocodeAudioRequest::default();
       vocode_request.sample_rate = 16000;
       vocode_request.output_rate = 16000;
-      vocode_request.skip_vocode = true;
+      vocode_request.skip_resample = false;
+      vocode_request.skip_vocode = false;
+      vocode_request.discard_vocoded_audio = false;
       vocode_request.save_files = false;
       vocode_request.buffer_size_minimum = 100000;
       vocode_request.float_audio = drained.clone();
 
       let mut encoded_bytes = Vec::with_capacity(vocode_request.encoded_len());
       vocode_request.encode(&mut encoded_bytes).unwrap();
-      //println!("Encoded len: {}", vocode_request.encoded_len());
-
-      /*//println!("Len drained: {}", drained.len());
-      let mut bytes: Vec<u8> = Vec::with_capacity(drained.len()*4);
-
-      for val in drained {
-        let mut buf = [0; 4];
-        LittleEndian::write_f32(&mut buf, val);
-        bytes.push(buf[0]);
-        bytes.push(buf[1]);
-        bytes.push(buf[2]);
-        bytes.push(buf[3]);
-      }*/
 
       if reconnect {
         reconnect = false;
@@ -164,11 +153,6 @@ fn run_cpal_audio() -> Result<(), failure::Error> {
           if buf.len() > 2 {
             // Receive data condition.
             let vocode_response = VocodeAudioResponse::decode(buf).unwrap();
-            /*let mut cur = Cursor::new(buf);
-            let mut floats : Vec<f32> = Vec::new();
-            while let Ok(val) = cur.read_f32::<LittleEndian>() {
-              floats.push(val);
-            }*/
             post_process_queue.extend(vocode_response.float_audio);
           }
         },
