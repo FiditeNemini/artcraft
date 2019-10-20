@@ -1,0 +1,9 @@
+syntax = "proto3";
+package voder.audio;
+
+message AudioSample {
+  repeated int32 integer_audio = 1;
+  repeated float float_audio = 2;
+
+  bool skip_vocode = 3;
+}

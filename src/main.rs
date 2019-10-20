@@ -2,16 +2,21 @@
 //!
 //! This example records audio and plays it back in real time as it's being recorded.
 
+extern crate bytes;
 extern crate byteorder;
 extern crate cpal;
 extern crate failure;
-extern crate tensorflow;
+extern crate prost;
+extern crate prost_types;
+//extern crate tensorflow;
 extern crate wavy;
 extern crate world_sys;
 extern crate zmq;
 
+include!(concat!(env!("OUT_DIR"), "/voder.audio.rs"));
+
 pub mod ipc;
-pub mod model;
+//pub mod model;
 pub mod synthesis;
 
 use wavy::*;
@@ -20,8 +25,8 @@ use byteorder::{ByteOrder, BigEndian, LittleEndian, ReadBytesExt};
 use cpal::traits::{DeviceTrait, EventLoopTrait, HostTrait};
 use failure::_core::time::Duration;
 use ipc::AudioQueue;
-use model::load_model;
-use model::print_version;
+//use model::load_model;
+//use model::print_version;
 use std::collections::VecDeque;
 use std::fs::File;
 use std::io::{Read, Cursor};
@@ -32,7 +37,7 @@ use std::thread;
 use zmq::{Error, Socket};
 
 fn main() {
-  print_version();
+  //print_version();
   //load_model(); // TODO: This works. Temporarily commented out
   run_cpal_audio().expect("Should work");
 }
@@ -185,7 +190,6 @@ fn run_cpal_audio() -> Result<(), failure::Error> {
         match drained {
           None => {
             for sample in buffer.iter_mut() {
-              println!("WTF");
               *sample = 0.0;
             }
           },
