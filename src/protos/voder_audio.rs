@@ -13,6 +13,9 @@ pub struct VocodeAudioRequest {
     /// How big we let the buffer grow before running 'convert'.
     #[prost(int32, tag="5")]
     pub buffer_size_minimum: i32,
+    /// Requested output rate
+    #[prost(int32, tag="6")]
+    pub output_rate: i32,
 }
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct VocodeAudioResponse {

@@ -102,6 +102,7 @@ fn run_cpal_audio() -> Result<(), failure::Error> {
 
       let mut vocode_request = VocodeAudioRequest::default();
       vocode_request.sample_rate = 16000;
+      vocode_request.output_rate = 16000;
       vocode_request.skip_vocode = true;
       vocode_request.save_files = false;
       vocode_request.buffer_size_minimum = 100000;
@@ -162,12 +163,13 @@ fn run_cpal_audio() -> Result<(), failure::Error> {
           //println!("---> Buf len: {}", buf.len());
           if buf.len() > 2 {
             // Receive data condition.
-            let mut cur = Cursor::new(buf);
+            let vocode_response = VocodeAudioResponse::decode(buf).unwrap();
+            /*let mut cur = Cursor::new(buf);
             let mut floats : Vec<f32> = Vec::new();
             while let Ok(val) = cur.read_f32::<LittleEndian>() {
               floats.push(val);
-            }
-            post_process_queue.extend(floats);
+            }*/
+            post_process_queue.extend(vocode_response.float_audio);
           }
         },
         Err(e) => {

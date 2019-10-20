@@ -12,9 +12,11 @@ message VocodeAudioRequest {
 
   // How big we let the buffer grow before running 'convert'.
   int32 buffer_size_minimum = 5;
+
+  // Requested output rate
+  int32 output_rate = 6;
 }
 
 message VocodeAudioResponse {
   repeated float float_audio = 1;
 }
-

@@ -125,7 +125,7 @@ def temp_file_name(suffix='.wav'):
     name = os.path.basename(temp_file.name)
     return os.path.join(TEMP_DIR.name, name)
 
-def convert(audio, skip_vocode = False, save_files = False, source_rate = 44100):
+def convert(audio, skip_vocode = False, save_files = False, source_rate = 44100, output_rate = 44100):
     #audio = np.array(audio, dtype=np.int16)
     #audio = np.array(audio, dtype=np.float32)
     audio = np.array(audio, dtype=np.float32)
@@ -138,12 +138,13 @@ def convert(audio, skip_vocode = False, save_files = False, source_rate = 44100)
         print('----- Original wav file out: {}'.format(filename))
         scipy.io.wavfile.write(filename, source_rate, audio)
 
-    audio = librosa.resample(audio, source_rate, 16000)
-
-    if save_files:
-        filename = temp_file_name('.wav')
-        print('----- Downsampled file out: {}'.format(filename))
-        scipy.io.wavfile.write(filename, 16000, audio)
+    if source_rate != 16000:
+        print("Resampling audio from {} Hz to 16000 Hz".format(source_rate))
+        audio = librosa.resample(audio, source_rate, 16000)
+        if save_files:
+            filename = temp_file_name('.wav')
+            print('----- Downsampled file out: {}'.format(filename))
+            scipy.io.wavfile.write(filename, 16000, audio)
 
     if skip_vocode:
         return audio
@@ -152,13 +153,12 @@ def convert(audio, skip_vocode = False, save_files = False, source_rate = 44100)
     #results = audio[:]
 
     #consume_rate = 68000 # Experimentally determined for Rust lib 'CPAL'
-    consume_rate = 44100
-    upsampled = librosa.resample(results, 16000, consume_rate)
+    upsampled = librosa.resample(results, 16000, output_rate)
 
     if save_files:
         filename = temp_file_name('.wav')
         print('----- Upsampled (transformed) file out: {}'.format(filename))
-        scipy.io.wavfile.write(filename, consume_rate, upsampled)
+        scipy.io.wavfile.write(filename, output_rate, upsampled)
 
     return upsampled
 
@@ -185,12 +185,15 @@ def main():
             #results = queue[:]
             results = convert(queue,
                               source_rate = vocode_request.sample_rate,
+                              output_rate = vocode_request.output_rate,
                               skip_vocode = vocode_request.skip_vocode,
                               save_files = vocode_request.save_files)
             queue = []
-            layout = '<' + ('f' * len(results))
-            result_bytes = struct.pack(layout, *results)
-            socket.send(result_bytes)
+
+            vocode_response = VocodeAudioResponse()
+            vocode_response.float_audio[:] = results
+
+            socket.send(vocode_response.SerializeToString())
         else:
             # Must send reply back to client
             socket.send(b"OK")
