@@ -7,6 +7,7 @@ as a live demonstration of the trained model.
 Brandon Thomas 2019-07-29 <bt@brand.io> <echelon@gmail.com>
 """
 
+# noinspection PyInterpreter
 import argparse
 import io
 import librosa
@@ -24,6 +25,8 @@ import zmq
 from falcon_multipart.middleware import MultipartMiddleware
 from model import CycleGAN
 from preprocess import *
+from protos.audio_pb2 import VocodeAudioRequest
+from protos.audio_pb2 import VocodeAudioResponse
 from wsgiref import simple_server
 
 print("TensorFlow version: {}".format(tf.version.VERSION))

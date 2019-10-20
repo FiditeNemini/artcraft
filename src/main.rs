@@ -20,15 +20,17 @@ pub mod ipc;
 pub mod protos;
 pub mod synthesis;
 
-use wavy::*;
-
 use protos::voder_audio::VocodeAudioRequest;
 use protos::voder_audio::VocodeAudioResponse;
+
+use wavy::*;
+
 
 use byteorder::{ByteOrder, BigEndian, LittleEndian, ReadBytesExt};
 use cpal::traits::{DeviceTrait, EventLoopTrait, HostTrait};
 use failure::_core::time::Duration;
 use ipc::AudioQueue;
+use prost::Message;
 //use model::load_model;
 //use model::print_version;
 use std::collections::VecDeque;
@@ -98,6 +100,13 @@ fn run_cpal_audio() -> Result<(), failure::Error> {
         Some(d) => d,
       };
 
+      let mut vocode_request = VocodeAudioRequest::default();
+      vocode_request.float_audio = drained.clone();
+
+      let mut encoded_bytes = Vec::with_capacity(vocode_request.encoded_len());
+      vocode_request.encode(&mut encoded_bytes).unwrap();
+      //println!("Encoded len: {}", vocode_request.encoded_len());
+
       //println!("Len drained: {}", drained.len());
       let mut bytes: Vec<u8> = Vec::with_capacity(drained.len()*4);
 
@@ -131,8 +140,6 @@ fn run_cpal_audio() -> Result<(), failure::Error> {
           },
         }
       }
-
-      let mut outgoing = VocodeAudioRequest::default();
 
       match socket.send(&bytes, 0) {
         Ok(_) => {

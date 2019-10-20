@@ -70,6 +70,14 @@ builder.add_meta_graph_and_variables(self.model.sess, [
 builder.save()
 ```
 
+Protos
+------
+Codegen for Rust is built in. Codegen for Python uses,
+
+```
+protoc --python_out=cycle_gan protos/audio.proto
+```
+
 Resources
 ---------
 
