@@ -101,14 +101,17 @@ fn run_cpal_audio() -> Result<(), failure::Error> {
       };
 
       let mut vocode_request = VocodeAudioRequest::default();
+      vocode_request.sample_rate = 16000;
+      vocode_request.skip_vocode = true;
+      vocode_request.save_files = false;
+      vocode_request.buffer_size_minimum = 100000;
       vocode_request.float_audio = drained.clone();
-      vocode_request.test_name = "Foo Bar".into();
 
       let mut encoded_bytes = Vec::with_capacity(vocode_request.encoded_len());
       vocode_request.encode(&mut encoded_bytes).unwrap();
       //println!("Encoded len: {}", vocode_request.encoded_len());
 
-      //println!("Len drained: {}", drained.len());
+      /*//println!("Len drained: {}", drained.len());
       let mut bytes: Vec<u8> = Vec::with_capacity(drained.len()*4);
 
       for val in drained {
@@ -118,7 +121,7 @@ fn run_cpal_audio() -> Result<(), failure::Error> {
         bytes.push(buf[1]);
         bytes.push(buf[2]);
         bytes.push(buf[3]);
-      }
+      }*/
 
       if reconnect {
         reconnect = false;

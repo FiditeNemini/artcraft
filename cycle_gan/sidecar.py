@@ -22,12 +22,10 @@ import tempfile
 import tensorflow as tf
 import zmq
 
-from falcon_multipart.middleware import MultipartMiddleware
 from model import CycleGAN
 from preprocess import *
 from protos.audio_pb2 import VocodeAudioRequest
 from protos.audio_pb2 import VocodeAudioResponse
-from wsgiref import simple_server
 
 print("TensorFlow version: {}".format(tf.version.VERSION))
 
@@ -127,31 +125,27 @@ def temp_file_name(suffix='.wav'):
     name = os.path.basename(temp_file.name)
     return os.path.join(TEMP_DIR.name, name)
 
-SAVE_FILES = False
-SKIP_CONVERT = True
-
-def convert(audio):
+def convert(audio, skip_vocode = False, save_files = False, source_rate = 44100):
     #audio = np.array(audio, dtype=np.int16)
+    #audio = np.array(audio, dtype=np.float32)
     audio = np.array(audio, dtype=np.float32)
-    print(audio)
 
-    #source_rate = 38000 # Experimentally determined for Rust library 'wavy'
     #source_rate = 88000 # Experimentally determined for Rust library 'CPAL'
-    source_rate = 44100
+    #source_rate = 44100
 
-    if SAVE_FILES:
+    if save_files:
         filename = temp_file_name('.wav')
         print('----- Original wav file out: {}'.format(filename))
         scipy.io.wavfile.write(filename, source_rate, audio)
 
     audio = librosa.resample(audio, source_rate, 16000)
 
-    if SAVE_FILES:
+    if save_files:
         filename = temp_file_name('.wav')
         print('----- Downsampled file out: {}'.format(filename))
         scipy.io.wavfile.write(filename, 16000, audio)
 
-    if SKIP_CONVERT:
+    if skip_vocode:
         return audio
 
     results = converter.convert_partial(audio, conversion_direction = 'A2B')
@@ -161,17 +155,12 @@ def convert(audio):
     consume_rate = 44100
     upsampled = librosa.resample(results, 16000, consume_rate)
 
-    if SAVE_FILES:
+    if save_files:
         filename = temp_file_name('.wav')
         print('----- Upsampled (transformed) file out: {}'.format(filename))
         scipy.io.wavfile.write(filename, consume_rate, upsampled)
 
     return upsampled
-
-
-BUFFER_SIZE = 5000
-MULTIPLIER = 10
-#MULTIPLIER = 1
 
 def main():
     parser = argparse.ArgumentParser()
@@ -190,22 +179,14 @@ def main():
 
         vocode_request = VocodeAudioRequest.FromString(message)
 
-        print('Vocode Request: {}'.format(vocode_request.test_name))
-        print('Vocode Request audio len: {}'.format(len(vocode_request.float_audio)))
-
-        #socket.send(message)
-        #continue
-
-        # 16-bit PCM (-32768, +32767) int16
-        # layout =  '!' + ('h' * BUFFER_SIZE) # NB: Audio from 'wavy' Rust library
-        #layout =  '<' + ('f' * BUFFER_SIZE) # NB: Audio from 'CPAL' Rust library
-        #decoded = struct.unpack(layout, message)
-        #queue.extend(decoded)
         queue.extend(vocode_request.float_audio)
 
-        if len(queue) >= BUFFER_SIZE * MULTIPLIER:
+        if len(queue) >= vocode_request.buffer_size_minimum:
             #results = queue[:]
-            results = convert(queue)
+            results = convert(queue,
+                              source_rate = vocode_request.sample_rate,
+                              skip_vocode = vocode_request.skip_vocode,
+                              save_files = vocode_request.save_files)
             queue = []
             layout = '<' + ('f' * len(results))
             result_bytes = struct.pack(layout, *results)

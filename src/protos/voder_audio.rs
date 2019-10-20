@@ -1,20 +1,21 @@
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct VocodeAudioRequest {
-    #[prost(int32, repeated, tag="1")]
-    pub integer_audio: ::std::vec::Vec<i32>,
-    #[prost(float, repeated, tag="2")]
+    #[prost(float, repeated, tag="1")]
     pub float_audio: ::std::vec::Vec<f32>,
+    /// We'll resend these params for every batch, but will only use
+    /// the last batch's settings. Kind of a dumb API, but it'll work.
+    #[prost(int32, tag="2")]
+    pub sample_rate: i32,
     #[prost(bool, tag="3")]
     pub skip_vocode: bool,
-    #[prost(string, tag="4")]
-    pub test_name: std::string::String,
+    #[prost(bool, tag="4")]
+    pub save_files: bool,
+    /// How big we let the buffer grow before running 'convert'.
+    #[prost(int32, tag="5")]
+    pub buffer_size_minimum: i32,
 }
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct VocodeAudioResponse {
-    #[prost(int32, repeated, tag="1")]
-    pub integer_audio: ::std::vec::Vec<i32>,
-    #[prost(float, repeated, tag="2")]
+    #[prost(float, repeated, tag="1")]
     pub float_audio: ::std::vec::Vec<f32>,
-    #[prost(string, tag="3")]
-    pub test_name: std::string::String,
 }

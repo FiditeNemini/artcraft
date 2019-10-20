@@ -2,16 +2,19 @@ syntax = "proto3";
 package voder_audio;
 
 message VocodeAudioRequest {
-  repeated int32 integer_audio = 1;
-  repeated float float_audio = 2;
+  repeated float float_audio = 1;
 
+  // We'll resend these params for every batch, but will only use
+  // the last batch's settings. Kind of a dumb API, but it'll work.
+  int32 sample_rate = 2;
   bool skip_vocode = 3;
-  string test_name = 4;
+  bool save_files = 4;
+
+  // How big we let the buffer grow before running 'convert'.
+  int32 buffer_size_minimum = 5;
 }
 
 message VocodeAudioResponse {
-  repeated int32 integer_audio = 1;
-  repeated float float_audio = 2;
-  string test_name = 3;
+  repeated float float_audio = 1;
 }
 
