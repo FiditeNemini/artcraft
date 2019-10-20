@@ -78,6 +78,15 @@ Codegen for Rust is built in. Codegen for Python uses,
 protoc --python_out=cycle_gan protos/audio.proto
 ```
 
+Results
+-------
+Currently there is 4.39 seconds of delay between speaking and generated output
+with the sidecar setup on my desktop computer. This is really great and seems
+promising.
+
+This gets up to 6.0 seconds later. Drift continues to accrue, but it's a slow 
+build.
+
 Resources
 ---------
 

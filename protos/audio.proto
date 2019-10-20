@@ -22,6 +22,9 @@ message VocodeAudioRequest {
 
   // Discard the vocoded audio and return the original
   bool discard_vocoded_audio = 8;
+
+  // Rate param for the model
+  int32 model_sampling_rate = 9;
 }
 
 message VocodeAudioResponse {

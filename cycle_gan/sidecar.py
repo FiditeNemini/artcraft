@@ -53,11 +53,17 @@ class Converter():
         self.logf0s_mean_B = self.logf0s_normalization_params['mean_B']
         self.logf0s_std_B = self.logf0s_normalization_params['std_B']
 
-    def convert_partial(self, wav, conversion_direction='A2B'):
+    def convert_partial(self, wav, conversion_direction='A2B', model_sampling_rate=16000):
+        # TODO FIXME
+        self.sampling_rate = model_sampling_rate
+
         wav = wav_padding(wav = wav,
             sr = self.sampling_rate,
             frame_period = self.frame_period,
             multiple = 4)
+
+        librosa.output.write_wav('wav_padding.wav', wav, self.sampling_rate)
+
         f0, timeaxis, sp, ap = world_decompose(wav = wav,
             fs = self.sampling_rate,
             frame_period = self.frame_period)
@@ -88,15 +94,14 @@ class Converter():
             frame_period = self.frame_period)
 
         # For debugging model output, uncomment the following line:
-        # librosa.output.write_wav('model_output.wav', wav_transformed, self.sampling_rate)
+        #librosa.output.write_wav('model_output.wav', wav_transformed, self.sampling_rate)
 
-        """
         # TODO: Perhaps ditch this. It's probably unnecessary work.
         upsampled = librosa.resample(wav_transformed, self.sampling_rate, 48000)
         pcm_data = upsampled.astype(np.float64)
-        stereo_pcm_data = np.tile(pcm_data, (2,1)).T
-        return stereo_pcm_data.astype(np.float32)
-        """
+        #stereo_pcm_data = np.tile(pcm_data, (2,1)).T
+        #return stereo_pcm_data.astype(np.float32)
+        librosa.output.write_wav('model_output.wav', pcm_data, 48000)
 
         #return wav
         return wav_transformed
@@ -126,7 +131,7 @@ def temp_file_name(suffix='.wav'):
     return os.path.join(TEMP_DIR.name, name)
 
 def convert(audio, skip_vocode=False, save_files=False, skip_resample=False, discard_vocoded_audio=False,
-            source_rate=44100, output_rate=44100):
+            source_rate=44100, output_rate=44100, model_sampling_rate=16000):
     #audio = np.array(audio, dtype=np.int16)
     #data, samplerate = soundfile.read(audio)
     #print('samplerate', samplerate)
@@ -175,7 +180,7 @@ def convert(audio, skip_vocode=False, save_files=False, skip_resample=False, dis
     if skip_vocode:
         return audio
 
-    results = converter.convert_partial(audio, conversion_direction = 'A2B')
+    results = converter.convert_partial(audio, conversion_direction='A2B', model_sampling_rate=model_sampling_rate)
 
     print('results.type', type(results))
     print('results.len', len(results))
@@ -218,6 +223,7 @@ def main():
             results = convert(queue,
                               source_rate=vocode_request.sample_rate,
                               output_rate=vocode_request.output_rate,
+                              model_sampling_rate=vocode_request.model_sampling_rate,
                               skip_vocode=vocode_request.skip_vocode,
                               skip_resample=vocode_request.skip_resample,
                               save_files=vocode_request.save_files,

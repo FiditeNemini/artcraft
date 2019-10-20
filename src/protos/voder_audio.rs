@@ -22,6 +22,9 @@ pub struct VocodeAudioRequest {
     /// Discard the vocoded audio and return the original
     #[prost(bool, tag="8")]
     pub discard_vocoded_audio: bool,
+    /// Rate param for the model
+    #[prost(int32, tag="9")]
+    pub model_sampling_rate: i32,
 }
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct VocodeAudioResponse {

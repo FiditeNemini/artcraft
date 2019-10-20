@@ -19,7 +19,7 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   name='protos/audio.proto',
   package='voder_audio',
   syntax='proto3',
-  serialized_pb=_b('\n\x12protos/audio.proto\x12\x0bvoder_audio\"\xcf\x01\n\x12VocodeAudioRequest\x12\x13\n\x0b\x66loat_audio\x18\x01 \x03(\x02\x12\x13\n\x0bsample_rate\x18\x02 \x01(\x05\x12\x15\n\rskip_resample\x18\x03 \x01(\x08\x12\x13\n\x0bskip_vocode\x18\x04 \x01(\x08\x12\x12\n\nsave_files\x18\x05 \x01(\x08\x12\x1b\n\x13\x62uffer_size_minimum\x18\x06 \x01(\x05\x12\x13\n\x0boutput_rate\x18\x07 \x01(\x05\x12\x1d\n\x15\x64iscard_vocoded_audio\x18\x08 \x01(\x08\"*\n\x13VocodeAudioResponse\x12\x13\n\x0b\x66loat_audio\x18\x01 \x03(\x02\x62\x06proto3')
+  serialized_pb=_b('\n\x12protos/audio.proto\x12\x0bvoder_audio\"\xec\x01\n\x12VocodeAudioRequest\x12\x13\n\x0b\x66loat_audio\x18\x01 \x03(\x02\x12\x13\n\x0bsample_rate\x18\x02 \x01(\x05\x12\x15\n\rskip_resample\x18\x03 \x01(\x08\x12\x13\n\x0bskip_vocode\x18\x04 \x01(\x08\x12\x12\n\nsave_files\x18\x05 \x01(\x08\x12\x1b\n\x13\x62uffer_size_minimum\x18\x06 \x01(\x05\x12\x13\n\x0boutput_rate\x18\x07 \x01(\x05\x12\x1d\n\x15\x64iscard_vocoded_audio\x18\x08 \x01(\x08\x12\x1b\n\x13model_sampling_rate\x18\t \x01(\x05\"*\n\x13VocodeAudioResponse\x12\x13\n\x0b\x66loat_audio\x18\x01 \x03(\x02\x62\x06proto3')
 )
 _sym_db.RegisterFileDescriptor(DESCRIPTOR)
 
@@ -89,6 +89,13 @@ _VOCODEAUDIOREQUEST = _descriptor.Descriptor(
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
+    _descriptor.FieldDescriptor(
+      name='model_sampling_rate', full_name='voder_audio.VocodeAudioRequest.model_sampling_rate', index=8,
+      number=9, type=5, cpp_type=1, label=1,
+      has_default_value=False, default_value=0,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None),
   ],
   extensions=[
   ],
@@ -102,7 +109,7 @@ _VOCODEAUDIOREQUEST = _descriptor.Descriptor(
   oneofs=[
   ],
   serialized_start=36,
-  serialized_end=243,
+  serialized_end=272,
 )
 
 
@@ -132,8 +139,8 @@ _VOCODEAUDIORESPONSE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=245,
-  serialized_end=287,
+  serialized_start=274,
+  serialized_end=316,
 )
 
 DESCRIPTOR.message_types_by_name['VocodeAudioRequest'] = _VOCODEAUDIOREQUEST

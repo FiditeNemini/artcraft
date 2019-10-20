@@ -103,6 +103,7 @@ fn run_cpal_audio() -> Result<(), failure::Error> {
       let mut vocode_request = VocodeAudioRequest::default();
       vocode_request.sample_rate = 16000;
       vocode_request.output_rate = 16000;
+      vocode_request.model_sampling_rate = 88000;
       vocode_request.skip_resample = false;
       vocode_request.skip_vocode = false;
       vocode_request.discard_vocoded_audio = false;
@@ -199,14 +200,7 @@ fn run_cpal_audio() -> Result<(), failure::Error> {
           Some(mut drained) => {
             for (i, sample) in buffer.iter_mut().enumerate() {
               *sample = drained.get(i).copied().unwrap();
-              /*let val = drained.pop();
-              *sample = match val {
-                None => {
-                  println!("Couldn't drain at index: {}", i);
-                  0.0
-                },
-                Some(d) => d * 0.3,
-              };*/
+              //*sample = 0.0;
             }
           },
         }
