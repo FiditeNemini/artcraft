@@ -117,7 +117,7 @@ model_dir_default = './model/sf1_tm1'
 model_name_default = 'sf1_tm1.ckpt'
 
 # TODO: UNCOMMENT
-converter = Converter(model_dir_default, model_name_default)
+#converter = Converter(model_dir_default, model_name_default)
 
 TEMP_DIR = tempfile.TemporaryDirectory(prefix='queue_audio')
 
@@ -128,7 +128,7 @@ def temp_file_name(suffix='.wav'):
     return os.path.join(TEMP_DIR.name, name)
 
 SAVE_FILES = False
-SKIP_CONVERT = False
+SKIP_CONVERT = True
 
 def convert(audio):
     #audio = np.array(audio, dtype=np.int16)
@@ -152,7 +152,7 @@ def convert(audio):
         scipy.io.wavfile.write(filename, 16000, audio)
 
     if SKIP_CONVERT:
-        return
+        return audio
 
     results = converter.convert_partial(audio, conversion_direction = 'A2B')
     #results = audio[:]
@@ -187,14 +187,21 @@ def main():
     while True:
         #  Wait for next request from client
         message = socket.recv()
+
+        vocode_request = VocodeAudioRequest.FromString(message)
+
+        print('Vocode Request: {}'.format(vocode_request.test_name))
+        print('Vocode Request audio len: {}'.format(len(vocode_request.float_audio)))
+
         #socket.send(message)
         #continue
 
         # 16-bit PCM (-32768, +32767) int16
         # layout =  '!' + ('h' * BUFFER_SIZE) # NB: Audio from 'wavy' Rust library
-        layout =  '<' + ('f' * BUFFER_SIZE) # NB: Audio from 'CPAL' Rust library
-        decoded = struct.unpack(layout, message)
-        queue.extend(decoded)
+        #layout =  '<' + ('f' * BUFFER_SIZE) # NB: Audio from 'CPAL' Rust library
+        #decoded = struct.unpack(layout, message)
+        #queue.extend(decoded)
+        queue.extend(vocode_request.float_audio)
 
         if len(queue) >= BUFFER_SIZE * MULTIPLIER:
             #results = queue[:]

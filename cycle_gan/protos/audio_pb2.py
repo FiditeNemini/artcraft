@@ -19,7 +19,7 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   name='protos/audio.proto',
   package='voder_audio',
   syntax='proto3',
-  serialized_pb=_b('\n\x12protos/audio.proto\x12\x0bvoder_audio\"U\n\x12VocodeAudioRequest\x12\x15\n\rinteger_audio\x18\x01 \x03(\x05\x12\x13\n\x0b\x66loat_audio\x18\x02 \x03(\x02\x12\x13\n\x0bskip_vocode\x18\x03 \x01(\x08\"A\n\x13VocodeAudioResponse\x12\x15\n\rinteger_audio\x18\x01 \x03(\x05\x12\x13\n\x0b\x66loat_audio\x18\x02 \x03(\x02\x62\x06proto3')
+  serialized_pb=_b('\n\x12protos/audio.proto\x12\x0bvoder_audio\"h\n\x12VocodeAudioRequest\x12\x15\n\rinteger_audio\x18\x01 \x03(\x05\x12\x13\n\x0b\x66loat_audio\x18\x02 \x03(\x02\x12\x13\n\x0bskip_vocode\x18\x03 \x01(\x08\x12\x11\n\ttest_name\x18\x04 \x01(\t\"T\n\x13VocodeAudioResponse\x12\x15\n\rinteger_audio\x18\x01 \x03(\x05\x12\x13\n\x0b\x66loat_audio\x18\x02 \x03(\x02\x12\x11\n\ttest_name\x18\x03 \x01(\tb\x06proto3')
 )
 _sym_db.RegisterFileDescriptor(DESCRIPTOR)
 
@@ -54,6 +54,13 @@ _VOCODEAUDIOREQUEST = _descriptor.Descriptor(
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
+    _descriptor.FieldDescriptor(
+      name='test_name', full_name='voder_audio.VocodeAudioRequest.test_name', index=3,
+      number=4, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=_b("").decode('utf-8'),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None),
   ],
   extensions=[
   ],
@@ -67,7 +74,7 @@ _VOCODEAUDIOREQUEST = _descriptor.Descriptor(
   oneofs=[
   ],
   serialized_start=35,
-  serialized_end=120,
+  serialized_end=139,
 )
 
 
@@ -92,6 +99,13 @@ _VOCODEAUDIORESPONSE = _descriptor.Descriptor(
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
+    _descriptor.FieldDescriptor(
+      name='test_name', full_name='voder_audio.VocodeAudioResponse.test_name', index=2,
+      number=3, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=_b("").decode('utf-8'),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None),
   ],
   extensions=[
   ],
@@ -104,8 +118,8 @@ _VOCODEAUDIORESPONSE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=122,
-  serialized_end=187,
+  serialized_start=141,
+  serialized_end=225,
 )
 
 DESCRIPTOR.message_types_by_name['VocodeAudioRequest'] = _VOCODEAUDIOREQUEST

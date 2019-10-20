@@ -6,10 +6,12 @@ message VocodeAudioRequest {
   repeated float float_audio = 2;
 
   bool skip_vocode = 3;
+  string test_name = 4;
 }
 
 message VocodeAudioResponse {
   repeated int32 integer_audio = 1;
   repeated float float_audio = 2;
+  string test_name = 3;
 }
 

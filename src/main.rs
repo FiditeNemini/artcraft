@@ -102,6 +102,7 @@ fn run_cpal_audio() -> Result<(), failure::Error> {
 
       let mut vocode_request = VocodeAudioRequest::default();
       vocode_request.float_audio = drained.clone();
+      vocode_request.test_name = "Foo Bar".into();
 
       let mut encoded_bytes = Vec::with_capacity(vocode_request.encoded_len());
       vocode_request.encode(&mut encoded_bytes).unwrap();
@@ -141,7 +142,7 @@ fn run_cpal_audio() -> Result<(), failure::Error> {
         }
       }
 
-      match socket.send(&bytes, 0) {
+      match socket.send(&encoded_bytes, 0) {
         Ok(_) => {
           //println!("Sent len: {}", bytes.len());
         },
