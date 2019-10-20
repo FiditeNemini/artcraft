@@ -13,13 +13,17 @@ extern crate wavy;
 extern crate world_sys;
 extern crate zmq;
 
-include!(concat!(env!("OUT_DIR"), "/voder.audio.rs"));
+//include!(concat!(env!("OUT_DIR"), "/voder.audio.rs"));
 
 pub mod ipc;
 //pub mod model;
+pub mod protos;
 pub mod synthesis;
 
 use wavy::*;
+
+use protos::voder_audio::VocodeAudioRequest;
+use protos::voder_audio::VocodeAudioResponse;
 
 use byteorder::{ByteOrder, BigEndian, LittleEndian, ReadBytesExt};
 use cpal::traits::{DeviceTrait, EventLoopTrait, HostTrait};
@@ -127,6 +131,8 @@ fn run_cpal_audio() -> Result<(), failure::Error> {
           },
         }
       }
+
+      let mut outgoing = VocodeAudioRequest::default();
 
       match socket.send(&bytes, 0) {
         Ok(_) => {
