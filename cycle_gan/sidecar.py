@@ -131,7 +131,8 @@ def temp_file_name(suffix='.wav'):
     return os.path.join(TEMP_DIR.name, name)
 
 def convert(audio, vocode_params=None,
-            skip_vocode=False, save_files=False, skip_resample=False, discard_vocoded_audio=False):
+            request_batch_number=0,
+            skip_vocode=False, save_files=False, discard_vocoded_audio=False):
     #audio = np.array(audio, dtype=np.int16)
     #data, samplerate = soundfile.read(audio)
     #print('samplerate', samplerate)
@@ -166,8 +167,9 @@ def convert(audio, vocode_params=None,
     #source_rate = 88000 # Experimentally determined for Rust library 'CPAL'
     #source_rate = 44100
 
-    if save_files:
-        filename = temp_file_name('.wav')
+    if vocode_params.original_source_save_file:
+        #filename = temp_file_name('.wav')
+        filename = 'debug/{}_original_source.wav'.format(request_batch_number)
         print('----- Original wav file out: {}'.format(filename))
         scipy.io.wavfile.write(filename, vocode_params.original_source_rate, audio)
 
@@ -182,7 +184,8 @@ def convert(audio, vocode_params=None,
         print('resampled_audio.shape', audio.shape)
         print('resampled_audio.type', audio.dtype)
         if save_files:
-            filename = temp_file_name('.wav')
+            #filename = temp_file_name('.wav')
+            filename = 'debug/{}_pre_convert_resample.wav'.format(request_batch_number)
             print('----- Downsampled file out: {}'.format(filename))
             scipy.io.wavfile.write(filename, vocode_params.pre_convert_resample_rate, audio)
 
@@ -192,6 +195,12 @@ def convert(audio, vocode_params=None,
     results = converter.convert_partial(audio,
                                         conversion_direction='A2B',
                                         model_sampling_rate=vocode_params.model_hyperparameter_sampling_rate)
+
+    if vocode_params.model_save_file:
+        #filename = temp_file_name('.wav')
+        filename = 'debug/{}_model_output.wav'.format(request_batch_number)
+        print('----- Model file out: {}'.format(filename))
+        scipy.io.wavfile.write(filename, vocode_params.model_hyperparameter_sampling_rate, results)
 
     print('results.type', type(results))
     print('results.len', len(results))
@@ -236,8 +245,8 @@ def main():
             #results = queue[:]
             results = convert(queue,
                               vocode_params=vocode_params,
+                              request_batch_number=vocode_request.request_batch_number,
                               skip_vocode=vocode_request.skip_vocode,
-                              save_files=vocode_request.save_files,
                               discard_vocoded_audio=vocode_request.discard_vocoded_audio)
             queue = []
 

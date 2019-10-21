@@ -2,19 +2,21 @@
 pub struct VocodeAudioRequest {
     #[prost(float, repeated, tag="1")]
     pub float_audio: ::std::vec::Vec<f32>,
+    /// An autoincrement sent with each request.
+    #[prost(int64, tag="2")]
+    pub request_batch_number: i64,
     #[prost(message, optional, tag="10")]
     pub vocode_params: ::std::option::Option<vocode_audio_request::VocodeParams>,
     // We'll resend these params for every batch, but will only use
     // the last batch's settings. Kind of a dumb API, but it'll work.
     //int32 sample_rate = 2;
 
-    #[prost(bool, tag="3")]
-    pub skip_resample: bool,
+    ///bool skip_resample = 3;
     #[prost(bool, tag="4")]
     pub skip_vocode: bool,
-    /// Debugging
-    #[prost(bool, tag="5")]
-    pub save_files: bool,
+    // Debugging
+    //bool save_files = 5;
+
     /// How big we let the buffer grow before running 'convert'.
     #[prost(int32, tag="6")]
     pub buffer_size_minimum: i32,
@@ -31,9 +33,11 @@ pub mod vocode_audio_request {
         /// The initial sample rate coming from the microphone.
         #[prost(int32, tag="1")]
         pub initial_sample_rate: i32,
-        /// Original sample rate
+        /// Original sample
         #[prost(int32, tag="9")]
         pub original_source_rate: i32,
+        #[prost(bool, tag="10")]
+        pub original_source_save_file: bool,
         /// Resample before passing to the algorithm?
         #[prost(bool, tag="2")]
         pub pre_convert_resample: bool,
@@ -45,6 +49,8 @@ pub mod vocode_audio_request {
         /// Probably don't want to change from 16000.
         #[prost(int32, tag="5")]
         pub model_hyperparameter_sampling_rate: i32,
+        #[prost(bool, tag="11")]
+        pub model_save_file: bool,
         /// Resample after passing to the algorithm?
         #[prost(bool, tag="6")]
         pub post_convert_resample: bool,
@@ -58,4 +64,7 @@ pub mod vocode_audio_request {
 pub struct VocodeAudioResponse {
     #[prost(float, repeated, tag="1")]
     pub float_audio: ::std::vec::Vec<f32>,
+    /// A sidecar-side autoincrement sent with each request.
+    #[prost(int64, tag="2")]
+    pub response_batch_number: i64,
 }

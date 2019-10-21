@@ -4,12 +4,16 @@ package voder_audio;
 message VocodeAudioRequest {
   repeated float float_audio = 1;
 
+  // An autoincrement sent with each request.
+  int64 request_batch_number = 2;
+
   message VocodeParams {
     // The initial sample rate coming from the microphone.
     int32 initial_sample_rate = 1;
 
-    // Original sample rate
+    // Original sample
     int32 original_source_rate = 9;
+    bool original_source_save_file = 10;
 
     // Resample before passing to the algorithm?
     bool pre_convert_resample = 2;
@@ -19,6 +23,7 @@ message VocodeAudioRequest {
     // The hard-coded hyperparameter of the model.
     // Probably don't want to change from 16000.
     int32 model_hyperparameter_sampling_rate = 5;
+    bool model_save_file = 11;
 
     // Resample after passing to the algorithm?
     bool post_convert_resample = 6;
@@ -32,11 +37,11 @@ message VocodeAudioRequest {
   // the last batch's settings. Kind of a dumb API, but it'll work.
   //int32 sample_rate = 2;
 
-  bool skip_resample = 3;
+  //bool skip_resample = 3;
   bool skip_vocode = 4;
 
   // Debugging
-  bool save_files = 5;
+  //bool save_files = 5;
 
   // How big we let the buffer grow before running 'convert'.
   int32 buffer_size_minimum = 6;
@@ -53,4 +58,7 @@ message VocodeAudioRequest {
 
 message VocodeAudioResponse {
   repeated float float_audio = 1;
+
+  // A sidecar-side autoincrement sent with each request.
+  int64 response_batch_number = 2;
 }
