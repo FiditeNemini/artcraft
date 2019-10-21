@@ -132,9 +132,9 @@ fn run_cpal_audio() -> Result<(), failure::Error> {
       vocode_params.model_hyperparameter_sampling_rate = 16000;
       vocode_params.model_save_file = true;
 
-      vocode_params.post_convert_resample = false;
-      vocode_params.post_convert_resample_rate = 16000;
-      vocode_params.post_convert_resample_save_file = false;
+      vocode_params.post_convert_resample = true;
+      vocode_params.post_convert_resample_rate = 88000;
+      vocode_params.post_convert_resample_save_file = true;
 
       vocode_request.vocode_params = Some(vocode_params);
 

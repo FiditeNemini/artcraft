@@ -205,16 +205,18 @@ def convert(audio, vocode_params=None,
     print('results.type', type(results))
     print('results.len', len(results))
 
-    """
-    if output_rate != 16000:
-        print("Resampling output audio from {} Hz to 16000 Hz".format(vocode_params.source_rate))
+    if vocode_params.post_convert_resample:
+        print("Resampling output audio from {} Hz to {} Hz".format(vocode_params.model_hyperparameter_sampling_rate,
+                                                                   vocode_params.post_convert_resample_rate))
         #consume_rate = 68000 # Experimentally determined for Rust lib 'CPAL'
-        results = librosa.resample(results, 16000, output_rate)
-        if save_files:
-            filename = temp_file_name('.wav')
+        results = librosa.resample(results,
+                                   vocode_params.model_hyperparameter_sampling_rate,
+                                   vocode_params.post_convert_resample_rate)
+        if vocode_params.post_convert_resample_save_file:
+            #filename = temp_file_name('.wav')
+            filename = 'debug/{}_post_convert_resample.wav'.format(request_batch_number)
             print('----- Upsampled (transformed) file out: {}'.format(filename))
-            scipy.io.wavfile.write(filename, output_rate, results)
-    """
+            scipy.io.wavfile.write(filename, vocode_params.post_convert_resample_rate, results)
 
     if discard_vocoded_audio:
         return audio
