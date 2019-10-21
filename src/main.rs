@@ -173,9 +173,9 @@ fn run_cpal_audio() -> Result<(), failure::Error> {
       vocode_request.discard_vocoded_audio = false;
       //vocode_request.buffer_size_minimum = 5000; // AWFUL. SO CHOPPY.
       //vocode_request.buffer_size_minimum = 50000; // Practically real time, but lots more phase distortion.
-      vocode_request.buffer_size_minimum = 30000; // Hm, hmm... not bad
+      //vocode_request.buffer_size_minimum = 30000; // Hm, hmm... not bad
       //vocode_request.buffer_size_minimum = 70000; // Sounds pretty good.
-      //vocode_request.buffer_size_minimum = 100000; // This sounds good! A bit slow ~3seconds.
+      vocode_request.buffer_size_minimum = 100000; // This sounds good! A bit slow ~3seconds.
       //vocode_request.buffer_size_minimum = 200000;
       vocode_request.float_audio = drained.clone();
       vocode_request.request_batch_number = request_batch_number;
