@@ -97,11 +97,69 @@ fn run_cpal_audio() -> Result<(), failure::Error> {
 
     let mut request_batch_number = 0i64;
 
+    let mut activated = false;
+    let mut frames_activated = 0;
+    let mut frames_deactivated = 0;
+
+    fn is_speaking(audio: &Vec<f32>) -> bool {
+      let mut avg_pos = 0.0f32;
+      let mut num_pos = 0;
+
+      for x in audio {
+        if x > &0.0f32 {
+          avg_pos += x;
+          num_pos += 1;
+        }
+      }
+
+      avg_pos = avg_pos / num_pos as f32;
+      avg_pos > 0.006f32
+    }
+
     loop {
       let mut drained = match audio_queue_2.drain_size(SEND_SIZE) {
         None => { continue; },
         Some(d) => d,
       };
+
+      /*
+      Heuristic for audio. Don't record when silent (using threshold).
+
+        mic: act act act dec act act act act dec dec dec dec dec act dec
+        sent:         | ok ok ok ok ok ok ok ok ok ok ok|
+      */
+      if activated {
+        if !is_speaking(&drained) {
+          frames_deactivated += 1;
+        } else {
+          frames_deactivated = 0;
+        }
+
+        if frames_deactivated > 20 {
+          println!("Deactivating edge");
+          activated = false;
+          frames_activated = 0;
+          frames_deactivated = 0;
+        }
+
+      } else {
+        if is_speaking(&drained) {
+          frames_activated += 1;
+        } else {
+          frames_activated = 0;
+        }
+
+        if frames_activated > 3 {
+          println!("Activating edge");
+          activated = true;
+          frames_activated = 0;
+          frames_deactivated = 0;
+        }
+      }
+
+      if !activated {
+        continue;
+      }
 
       request_batch_number += 1;
 
@@ -114,7 +172,8 @@ fn run_cpal_audio() -> Result<(), failure::Error> {
       vocode_request.skip_vocode = false;
       vocode_request.discard_vocoded_audio = false;
       //vocode_request.buffer_size_minimum = 5000; // AWFUL. SO CHOPPY.
-      vocode_request.buffer_size_minimum = 50000; // Practically real time, but lots more phase distortion.
+      //vocode_request.buffer_size_minimum = 50000; // Practically real time, but lots more phase distortion.
+      vocode_request.buffer_size_minimum = 30000; // Hm, hmm... not bad
       //vocode_request.buffer_size_minimum = 70000; // Sounds pretty good.
       //vocode_request.buffer_size_minimum = 100000; // This sounds good! A bit slow ~3seconds.
       //vocode_request.buffer_size_minimum = 200000;
