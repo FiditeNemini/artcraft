@@ -117,24 +117,25 @@ fn run_cpal_audio() -> Result<(), failure::Error> {
       vocode_request.buffer_size_minimum = 50000; // Practically real time, but lots more phase distortion.
       //vocode_request.buffer_size_minimum = 70000; // Sounds pretty good.
       //vocode_request.buffer_size_minimum = 100000; // This sounds good! A bit slow ~3seconds.
-      vocode_request.buffer_size_minimum = 200000;
+      //vocode_request.buffer_size_minimum = 200000;
       vocode_request.float_audio = drained.clone();
       vocode_request.request_batch_number = request_batch_number;
 
       let mut vocode_params = VocodeParams::default();
       vocode_params.original_source_rate = 88000; // This is correct for saving
-      vocode_params.original_source_save_file = true;
 
       vocode_params.pre_convert_resample = true;
       vocode_params.pre_convert_resample_rate = 16000;
-      vocode_params.pre_convert_resample_save_file = true;
 
       vocode_params.model_hyperparameter_sampling_rate = 16000;
-      vocode_params.model_save_file = true;
 
       vocode_params.post_convert_resample = true;
       vocode_params.post_convert_resample_rate = 88000;
-      vocode_params.post_convert_resample_save_file = true;
+
+      vocode_params.original_source_save_file = false;
+      vocode_params.pre_convert_resample_save_file = false;
+      vocode_params.model_save_file = false;
+      vocode_params.post_convert_resample_save_file = false;
 
       vocode_request.vocode_params = Some(vocode_params);
 
