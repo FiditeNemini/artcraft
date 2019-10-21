@@ -62,7 +62,7 @@ class Converter():
             frame_period = self.frame_period,
             multiple = 4)
 
-        librosa.output.write_wav('wav_padding.wav', wav, self.sampling_rate)
+        #librosa.output.write_wav('wav_padding.wav', wav, self.sampling_rate)
 
         f0, timeaxis, sp, ap = world_decompose(wav = wav,
             fs = self.sampling_rate,
@@ -97,11 +97,11 @@ class Converter():
         #librosa.output.write_wav('model_output.wav', wav_transformed, self.sampling_rate)
 
         # TODO: Perhaps ditch this. It's probably unnecessary work.
-        upsampled = librosa.resample(wav_transformed, self.sampling_rate, 48000)
-        pcm_data = upsampled.astype(np.float64)
+        #upsampled = librosa.resample(wav_transformed, self.sampling_rate, 48000)
+        #pcm_data = upsampled.astype(np.float64)
         #stereo_pcm_data = np.tile(pcm_data, (2,1)).T
         #return stereo_pcm_data.astype(np.float32)
-        librosa.output.write_wav('model_output.wav', pcm_data, 48000)
+        #librosa.output.write_wav('model_output.wav', pcm_data, 48000)
 
         #return wav
         return wav_transformed
@@ -130,8 +130,8 @@ def temp_file_name(suffix='.wav'):
     name = os.path.basename(temp_file.name)
     return os.path.join(TEMP_DIR.name, name)
 
-def convert(audio, skip_vocode=False, save_files=False, skip_resample=False, discard_vocoded_audio=False,
-            source_rate=44100, output_rate=44100, model_sampling_rate=16000):
+def convert(audio, vocode_params=None,
+            skip_vocode=False, save_files=False, skip_resample=False, discard_vocoded_audio=False):
     #audio = np.array(audio, dtype=np.int16)
     #data, samplerate = soundfile.read(audio)
     #print('samplerate', samplerate)
@@ -149,6 +149,14 @@ def convert(audio, skip_vocode=False, save_files=False, skip_resample=False, dis
     1) Data should be float64
     2) Output is BYTES!! Not floats.
     3) Result is still somehow mono!?
+    --------------------------------------------------
+
+    demo_server.py
+
+       capture sample rate = 44100
+       downsample for algorithm = 16000
+       upsample after done = 48000
+
     """
 
     audio = np.array(audio, dtype=np.float64)
@@ -161,38 +169,43 @@ def convert(audio, skip_vocode=False, save_files=False, skip_resample=False, dis
     if save_files:
         filename = temp_file_name('.wav')
         print('----- Original wav file out: {}'.format(filename))
-        scipy.io.wavfile.write(filename, source_rate, audio)
+        scipy.io.wavfile.write(filename, vocode_params.original_source_rate, audio)
 
     # NB: Convert the input stereo signal into mono.
     # In the future the frontend should be responsible for sampling details.
     #audio = audio[:, 0]
 
-    if not skip_resample:
-        print("Resampling audio from {} Hz to 16000 Hz".format(source_rate))
-        audio = librosa.resample(audio, source_rate, 16000)
+    if vocode_params.pre_convert_resample:
+        print("Resampling audio from {} Hz to {} Hz".format(vocode_params.original_source_rate,
+                                                            vocode_params.pre_convert_resample_rate))
+        audio = librosa.resample(audio, vocode_params.original_source_rate, vocode_params.pre_convert_resample_rate)
         print('resampled_audio.shape', audio.shape)
         print('resampled_audio.type', audio.dtype)
         if save_files:
             filename = temp_file_name('.wav')
             print('----- Downsampled file out: {}'.format(filename))
-            scipy.io.wavfile.write(filename, 16000, audio)
+            scipy.io.wavfile.write(filename, vocode_params.pre_convert_resample_rate, audio)
 
     if skip_vocode:
         return audio
 
-    results = converter.convert_partial(audio, conversion_direction='A2B', model_sampling_rate=model_sampling_rate)
+    results = converter.convert_partial(audio,
+                                        conversion_direction='A2B',
+                                        model_sampling_rate=vocode_params.model_hyperparameter_sampling_rate)
 
     print('results.type', type(results))
     print('results.len', len(results))
 
+    """
     if output_rate != 16000:
-        print("Resampling output audio from {} Hz to 16000 Hz".format(source_rate))
+        print("Resampling output audio from {} Hz to 16000 Hz".format(vocode_params.source_rate))
         #consume_rate = 68000 # Experimentally determined for Rust lib 'CPAL'
         results = librosa.resample(results, 16000, output_rate)
         if save_files:
             filename = temp_file_name('.wav')
             print('----- Upsampled (transformed) file out: {}'.format(filename))
             scipy.io.wavfile.write(filename, output_rate, results)
+    """
 
     if discard_vocoded_audio:
         return audio
@@ -215,17 +228,15 @@ def main():
         message = socket.recv()
 
         vocode_request = VocodeAudioRequest.FromString(message)
+        vocode_params = vocode_request.vocode_params
 
         queue.extend(vocode_request.float_audio)
 
         if len(queue) >= vocode_request.buffer_size_minimum:
             #results = queue[:]
             results = convert(queue,
-                              source_rate=vocode_request.sample_rate,
-                              output_rate=vocode_request.output_rate,
-                              model_sampling_rate=vocode_request.model_sampling_rate,
+                              vocode_params=vocode_params,
                               skip_vocode=vocode_request.skip_vocode,
-                              skip_resample=vocode_request.skip_resample,
                               save_files=vocode_request.save_files,
                               discard_vocoded_audio=vocode_request.discard_vocoded_audio)
             queue = []
