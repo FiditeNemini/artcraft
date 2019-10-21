@@ -183,10 +183,10 @@ def convert(audio, vocode_params=None,
         audio = librosa.resample(audio, vocode_params.original_source_rate, vocode_params.pre_convert_resample_rate)
         print('resampled_audio.shape', audio.shape)
         print('resampled_audio.type', audio.dtype)
-        if save_files:
+        if vocode_params.pre_convert_resample_save_file:
             #filename = temp_file_name('.wav')
             filename = 'debug/{}_pre_convert_resample.wav'.format(request_batch_number)
-            print('----- Downsampled file out: {}'.format(filename))
+            print('----- Pre-downsampled file out: {}'.format(filename))
             scipy.io.wavfile.write(filename, vocode_params.pre_convert_resample_rate, audio)
 
     if skip_vocode:
