@@ -1,6 +1,6 @@
 use cpal::traits::{DeviceTrait, EventLoopTrait, HostTrait};
 use cpal;
-use ipc::AudioQueue;
+use audio_queue::AudioQueue;
 use std::sync::Arc;
 
 /// CPAL Audio Device
