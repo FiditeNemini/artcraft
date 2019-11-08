@@ -15,19 +15,19 @@ extern crate zmq;
 
 //include!(concat!(env!("OUT_DIR"), "/voder.audio.rs"));
 
+pub mod audio_hardware;
 pub mod ipc;
 //pub mod model;
 pub mod protos;
 pub mod synthesis;
 
+use audio_hardware::AudioHardware;
 use protos::voder_audio::VocodeAudioRequest;
 use protos::voder_audio::VocodeAudioResponse;
 
 use wavy::*;
 
-
 use byteorder::{ByteOrder, BigEndian, LittleEndian, ReadBytesExt};
-use cpal::traits::{DeviceTrait, EventLoopTrait, HostTrait};
 use failure::_core::time::Duration;
 use ipc::AudioQueue;
 use prost::Message;
@@ -46,38 +46,12 @@ use protos::voder_audio::vocode_audio_request::VocodeParams;
 fn main() {
   //print_version();
   //load_model(); // TODO: This works. Temporarily commented out
-  run_cpal_audio().expect("Should work");
+  run_audio().expect("Should work");
 }
 
 const LATENCY_MS: f32 = 50.0;
 
-fn run_cpal_audio() -> Result<(), failure::Error> {
-  let host = cpal::default_host();
-  let event_loop = host.event_loop();
-
-  // Default devices.
-  let input_device = host.default_input_device().expect("failed to get default input device");
-  let output_device = host.default_output_device().expect("failed to get default output device");
-  println!("Using default input device: \"{}\"", input_device.name()?);
-  println!("Using default output device: \"{}\"", output_device.name()?);
-
-  // We'll try and use the same format between streams to keep it simple
-  let mut format = input_device.default_input_format()?;
-  format.data_type = cpal::SampleFormat::F32;
-
-  // Build streams.
-  println!("Attempting to build both streams with `{:?}`.", format);
-  let input_stream_id = event_loop.build_input_stream(&input_device, &format)?;
-  let output_stream_id = event_loop.build_output_stream(&output_device, &format)?;
-  println!("Successfully built streams.");
-
-  // Create a delay in case the input and output devices aren't synced.
-  let latency_frames = (LATENCY_MS / 1_000.0) * format.sample_rate.0 as f32;
-  let latency_samples = latency_frames as usize * format.channels as usize;
-
-  // The channel to share samples.
-  //let (tx, rx) = std::sync::mpsc::sync_channel(latency_samples * 2);
-
+fn run_audio() -> Result<(), failure::Error> {
   let mut audio_queue = Arc::new(AudioQueue::new());
   let mut audio_queue_2 = audio_queue.clone();
 
@@ -257,42 +231,7 @@ fn run_cpal_audio() -> Result<(), failure::Error> {
     }
   });
 
-  event_loop.run(move |id, result| {
-    let data = match result {
-      Ok(data) => data,
-      Err(err) => {
-        eprintln!("An error occurred on stream {:?}: {}", id, err);
-        return;
-      }
-    };
-
-    match data {
-      cpal::StreamData::Input { buffer: cpal::UnknownTypeInputBuffer::F32(buffer) } => {
-        //assert_eq!(id, input_stream_id);
-        let mut output_fell_behind = false;
-        for &sample in buffer.iter() {
-          audio_queue.push_back(sample);
-        }
-      },
-      cpal::StreamData::Output { buffer: cpal::UnknownTypeOutputBuffer::F32(mut buffer) } => {
-        //println!("Audio out buffer len: {}", post_process_queue_2.len());
-        let request_size = buffer.len();
-        let mut drained = post_process_queue_2.drain_size((request_size));
-        match drained {
-          None => {
-            for sample in buffer.iter_mut() {
-              *sample = 0.0;
-            }
-          },
-          Some(mut drained) => {
-            for (i, sample) in buffer.iter_mut().enumerate() {
-              *sample = drained.get(i).copied().unwrap();
-              //*sample = 0.0;
-            }
-          },
-        }
-      },
-      _ => panic!("We're expecting f32 data."),
-    }
-  })
+  let mut audio_hardware = AudioHardware::new(audio_queue, post_process_queue_2).expect("");
+  audio_hardware.run();
+  Ok(())
 }
