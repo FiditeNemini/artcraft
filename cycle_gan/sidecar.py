@@ -33,7 +33,6 @@ print("TensorFlow version: {}".format(tf.version.VERSION))
 class Converter():
     def __init__(self, model_dir, model_name):
         self.num_features = 24
-        self.sampling_rate = 16000
         self.frame_period = 5.0
 
         self.model = CycleGAN(num_features = self.num_features, mode = 'test')
@@ -54,21 +53,18 @@ class Converter():
         self.logf0s_std_B = self.logf0s_normalization_params['std_B']
 
     def convert_partial(self, wav, conversion_direction='A2B', model_sampling_rate=16000):
-        # TODO FIXME
-        self.sampling_rate = model_sampling_rate
-
         wav = wav_padding(wav = wav,
-            sr = self.sampling_rate,
+            sr = model_sampling_rate,
             frame_period = self.frame_period,
             multiple = 4)
 
-        #librosa.output.write_wav('wav_padding.wav', wav, self.sampling_rate)
+        #librosa.output.write_wav('wav_padding.wav', wav, model_sampling_rate)
 
         f0, timeaxis, sp, ap = world_decompose(wav = wav,
-            fs = self.sampling_rate,
+            fs = model_sampling_rate,
             frame_period = self.frame_period)
         coded_sp = world_encode_spectral_envelop(sp = sp,
-            fs = self.sampling_rate,
+            fs = model_sampling_rate,
             dim = self.num_features)
         coded_sp_transposed = coded_sp.T
 
@@ -86,18 +82,18 @@ class Converter():
         coded_sp_converted = coded_sp_converted.T
         coded_sp_converted = np.ascontiguousarray(coded_sp_converted)
         decoded_sp_converted = world_decode_spectral_envelop(coded_sp = coded_sp_converted,
-            fs = self.sampling_rate)
+            fs = model_sampling_rate)
         wav_transformed = world_speech_synthesis(f0 = f0_converted,
             decoded_sp = decoded_sp_converted,
             ap = ap,
-            fs = self.sampling_rate,
+            fs = model_sampling_rate,
             frame_period = self.frame_period)
 
         # For debugging model output, uncomment the following line:
-        #librosa.output.write_wav('model_output.wav', wav_transformed, self.sampling_rate)
+        #librosa.output.write_wav('model_output.wav', wav_transformed, model_sampling_rate)
 
         # TODO: Perhaps ditch this. It's probably unnecessary work.
-        #upsampled = librosa.resample(wav_transformed, self.sampling_rate, 48000)
+        #upsampled = librosa.resample(wav_transformed, model_sampling_rate, 48000)
         #pcm_data = upsampled.astype(np.float64)
         #stereo_pcm_data = np.tile(pcm_data, (2,1)).T
         #return stereo_pcm_data.astype(np.float32)
@@ -130,9 +126,12 @@ def temp_file_name(suffix='.wav'):
     name = os.path.basename(temp_file.name)
     return os.path.join(TEMP_DIR.name, name)
 
-def convert(audio, vocode_params=None,
+def convert(audio,
+            vocode_params=None,
             request_batch_number=0,
-            skip_vocode=False, save_files=False, discard_vocoded_audio=False):
+            skip_vocode=False,
+            save_files=False,
+            discard_vocoded_audio=False):
     #audio = np.array(audio, dtype=np.int16)
     #data, samplerate = soundfile.read(audio)
     #print('samplerate', samplerate)

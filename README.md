@@ -6,11 +6,21 @@ Voice things.
 Current State
 -------------
 
-* Chunked/batched synthesis from the CycleGAN network is proven to work! 
+* Chunked/batched synthesis from the CycleGAN network is proven to work!
 * Desktop PC PulseAudio is borked. Need to get the `feedback.rs` demo working.
 * Next steps:
   * Fix desktop audio so that mic and speaker work
   * Integrate Neural Network (or lightweight transform) into `feedback.rs/cpal` code.
+
+CycleGAN
+--------
+
+It's possible to train and evaluate at the same time using dual GPUs.
+To run the sidecar on a particular GPU (0-indexded), use:
+
+```
+CUDA_VISIBLE_DEVICES=1 ./sidecar.py
+```
 
 TensorFlow
 ----------
@@ -20,12 +30,12 @@ I had to do a thing in the Cargo.toml,
 ```
 [patch.crates-io]
 # NB: Manually upgraded 'tensorflow-sys' library from 1.13.1 to 1.14.0
-# The downloaded tensorflow libs in target/ must be moved to /lib 
+# The downloaded tensorflow libs in target/ must be moved to /lib
 # (I couldn't figure out the Rust linker flags)
 tensorflow = { path = "/home/bt/dev/3rd/tensorflow.rs" }
 ```
 
-The `libtensorflow.so.1` might go missing if dependencies change. I've been copying it 
+The `libtensorflow.so.1` might go missing if dependencies change. I've been copying it
 around like a lazy person that doesn't understand the build process. Gross.
 
 ```
@@ -33,10 +43,10 @@ around like a lazy person that doesn't understand the build process. Gross.
 -r-xr-xr-x 1 bt bt  34748520 Sep 30 01:55 libtensorflow_framework.so
 -r-xr-xr-x 1 bt bt 216546752 Sep 30 01:55 libtensorflow.so
 
-+ bt@halide:~/dev/voder/target/debug/build/tensorflow-sys-0fdab7e44f6d3e04/out$ cp ~/dev/voder/target/debug/build/tensorflow-sys-b3beaea4e172b1c8/out/libtensorflow.so.1 . 
-+ bt@halide:~/dev/voder/target/debug/build/tensorflow-sys-0fdab7e44f6d3e04/out$ cp ~/dev/voder/target/debug/build/tensorflow-sys-b3beaea4e172b1c8/out/libtensorflow.so.1.14.0 . 
-+ bt@halide:~/dev/voder/target/debug/build/tensorflow-sys-0fdab7e44f6d3e04/out$ cp ~/dev/voder/target/debug/build/tensorflow-sys-b3beaea4e172b1c8/out/libtensorflow_framework.so.1 . 
-+ bt@halide:~/dev/voder/target/debug/build/tensorflow-sys-0fdab7e44f6d3e04/out$ cp ~/dev/voder/target/debug/build/tensorflow-sys-b3beaea4e172b1c8/out/libtensorflow_framework.so.1.14.0 . 
++ bt@halide:~/dev/voder/target/debug/build/tensorflow-sys-0fdab7e44f6d3e04/out$ cp ~/dev/voder/target/debug/build/tensorflow-sys-b3beaea4e172b1c8/out/libtensorflow.so.1 .
++ bt@halide:~/dev/voder/target/debug/build/tensorflow-sys-0fdab7e44f6d3e04/out$ cp ~/dev/voder/target/debug/build/tensorflow-sys-b3beaea4e172b1c8/out/libtensorflow.so.1.14.0 .
++ bt@halide:~/dev/voder/target/debug/build/tensorflow-sys-0fdab7e44f6d3e04/out$ cp ~/dev/voder/target/debug/build/tensorflow-sys-b3beaea4e172b1c8/out/libtensorflow_framework.so.1 .
++ bt@halide:~/dev/voder/target/debug/build/tensorflow-sys-0fdab7e44f6d3e04/out$ cp ~/dev/voder/target/debug/build/tensorflow-sys-b3beaea4e172b1c8/out/libtensorflow_framework.so.1.14.0 .
 + bt@halide:~/dev/voder/target/debug/build/tensorflow-sys-0fdab7e44f6d3e04/out$ ls -lA
 
 -r-xr-xr-x 1 bt bt  34748520 Sep 30 01:55 libtensorflow_framework.so
@@ -49,8 +59,28 @@ around like a lazy person that doesn't understand the build process. Gross.
 (And now it works. Ugh)
 ```
 
-### Model 
-Saved model (.pb file) must be in `saved_model/saved_model.pb` or similar. 
+### Python Model Output
+
+- sf1tm1.ckpt.meta
+  - ~10MB
+  - Graph structure definition. Not needed if you still have the Python code.
+    ```python
+    with tf.Session() as sess:
+        saver = tf.train.import_meta_graph('/tmp/model.ckpt.meta')
+        saver.restore(sess, "/tmp/model.ckpt")
+    ```
+  - https://github.com/tensorflow/tensorflow/blob/master/tensorflow/core/protobuf/meta_graph.proto
+  - https://stackoverflow.com/a/36203288
+- index file
+  - a string-string immutable table(tensorflow::table::Table). Each key is a name of a tensor and its
+    value is a serialized BundleEntryProto. Each BundleEntryProto describes the metadata of a tensor:
+    which of the "data" files contains the content of a tensor, the offset into that file, checksum,
+    some auxiliary data, etc.
+    https://stackoverflow.com/a/45033500
+
+
+### Model
+Saved model (.pb file) must be in `saved_model/saved_model.pb` or similar.
 
 Need TensorFlow model tools:
 
@@ -84,7 +114,7 @@ Currently there is 4.39 seconds of delay between speaking and generated output
 with the sidecar setup on my desktop computer. This is really great and seems
 promising.
 
-This gets up to 6.0 seconds later. Drift continues to accrue, but it's a slow 
+This gets up to 6.0 seconds later. Drift continues to accrue, but it's a slow
 build.
 
 Resources
@@ -112,7 +142,7 @@ Crates to try:
   - signal generators (sine, saw, noise, etc.)
 
 - [sonogram](https://crates.io/crates/sonogram)
-  - generate spectrograms! 
+  - generate spectrograms!
   - THEY LOOK SICK!
 
 - [audrey](https://crates.io/crates/audrey)
@@ -185,7 +215,7 @@ device.string = "surround40:1"
 device.buffering.buffer_size = "1048576"
 device.buffering.fragment_size = "524288"
 ```
-PulseAudio's default sampling rate and bit depth are set to 44100Hz @ 16 bits. 
+PulseAudio's default sampling rate and bit depth are set to 44100Hz @ 16 bits.
 
 > 1048576 / 1411200 (buffer size)
 0.7430385487528345  = 743 ms

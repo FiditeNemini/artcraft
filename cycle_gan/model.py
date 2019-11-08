@@ -19,6 +19,9 @@ class CycleGAN(object):
         self.optimizer_initializer()
 
         self.saver = tf.train.Saver()
+
+        #config = tf.ConfigProto(device_count = {'GPU': 1})
+        #self.sess = tf.Session(config=config)
         self.sess = tf.Session()
         self.sess.run(tf.global_variables_initializer())
 
