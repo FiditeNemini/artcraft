@@ -1,4 +1,5 @@
 extern crate tensorflow;
+extern crate hound;
 
 pub mod model;
 
@@ -81,10 +82,6 @@ pub fn main() {
     args.add_feed(&graph.operation_by_name_required(INPUT_LENGTHS_NAME)
         .expect(INPUT_LENGTHS_NAME), 0, &input_length);
 
-    // You must feed a value for placeholder tensor 'inputs' with dtype int32 and shape [1,?]
-    // InvalidArgument: You must feed a value for placeholder tensor 'input_lengths' with dtype int32 and shape [1]
-    //thread 'main' panicked at 'inputs_lengths: {inner:0x56247a89c920, Unavailable: Operation "inputs_lengths" not found}', src/libcore/result.rs:1165:5
-
     let z = args.request_fetch(
         &graph.operation_by_name_required(OUTPUT_NAME)
             .expect(OUTPUT_NAME), 0);
@@ -98,5 +95,72 @@ pub fn main() {
 
     println!("z_rez.dims(): {:?}", z_res.dims());
     println!("z_rez: {:?}", z_res);
+
+    println!("Data[0]: {:?}", &z_res.get(0));
+    println!("Data[1]: {:?}", &z_res.get(1));
+    println!("Data[2]: {:?}", &z_res.get(2));
+
+    let processed = process_audio(z_res.to_vec());
+
+    write_wav(processed);
   }
+}
+
+fn process_audio(signal: Vec<f32>) -> Vec<f64> {
+  //  wav *= 32767 / max(0.01, np.max(np.abs(wav)))
+  //  scipy.io.wavfile.write(path, hparams.sample_rate, wav.astype(np.int16))
+
+  // abs
+  //[0.0000000e+00 4.1254760e-12 7.1285297e-11 ... 5.9092813e-14 4.0335224e-14
+  // 2.1358613e-15]
+  //max abs
+  //0.08918631
+
+  let signal = signal.iter()
+      .map(|f| *f as f64)
+      .collect::<Vec<f64>>();
+
+  let abs = signal.iter()
+      .map(|f|  f.abs())
+      .collect::<Vec<f64>>();
+
+  println!("Abs[0]: {:?}", &abs.get(0));
+  println!("Abs[1]: {:?}", &abs.get(1));
+  println!("Abs[2]: {:?}", &abs.get(2));
+
+  let max : f64 = abs.iter()
+      .fold(0.01f64, |x, y| x.max(*y));
+
+  println!("Max: {:?}", max);
+
+  let mult = 32767.0f64 / max;
+  let rust_mult = 367225.3669259117;
+  let python_mult = 367399.4329151011;
+
+  println!("Mult: {:?}", mult);
+
+  let result = signal.iter()
+      .map(|f| f * python_mult)
+      .collect::<Vec<f64>>();
+
+  println!("Res[0]: {:?}", &abs.get(0));
+  println!("Res[1]: {:?}", &abs.get(1));
+  println!("Res[2]: {:?}", &abs.get(2));
+
+  result
+}
+
+fn write_wav(signal: Vec<f64>) {
+  let spec = hound::WavSpec {
+    channels: 1,
+    sample_rate: 16000,
+    bits_per_sample: 32,
+    sample_format: hound::SampleFormat::Float,
+  };
+  let mut writer = hound::WavWriter::create("output.wav", spec).unwrap();
+
+  for sample in signal {
+    writer.write_sample(sample as f32).unwrap();
+  }
+  writer.finalize().unwrap();
 }
