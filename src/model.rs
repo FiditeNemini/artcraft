@@ -132,7 +132,7 @@ pub fn load_model() {
   //println!("Tensor: {:?}", file_path_tensor);
 }*/
 
-pub fn print_version() {
+pub fn print_tensorfow_version() {
   // Python TensorFlow version: 1.14.0
   // Rust TensorFlow version:   1.13.1 (default, must be hand-upgraded)
   let version = version().expect("version");
