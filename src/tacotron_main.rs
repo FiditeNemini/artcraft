@@ -13,7 +13,7 @@ use tensorflow::{
 use model::print_tensorfow_version;
 
 const INPUT_NAME : &'static str = "inputs";
-const INPUT_LENGTHS_NAME : &'static str = "inputs_lengths";
+const INPUT_LENGTHS_NAME : &'static str = "input_lengths";
 
 // Tensor("model/griffinlim/Squeeze:0", shape=(?,), dtype=float32)
 const OUTPUT_NAME : &'static str = "model/griffinlim/Squeeze";
@@ -84,24 +84,42 @@ pub fn main() {
       ])
       .unwrap();
 
-  println!(">>> Input tensor dims: {:?}", input.dims());
+    let mut input = Tensor::new(&[1, 16])
+        .with_values(&[
+            0, 1, 2, 3, 4, 5, 6, 7,
+            0, 1, 2, 3, 4, 5, 6, 7,
+        ])
+        .unwrap();
+
+    let mut input_length  = Tensor::new(&[1])
+        .with_values(&[
+            16
+        ])
+        .unwrap();
+
+
+    println!(">>> Input tensor dims: {:?}", input.dims());
 
     {
         let mut args = SessionRunArgs::new();
 
-        // input_A_test:
-        // Tensor("input_A_test:0", shape=(?, 24, ?), dtype=float32)
+        println!(">>> Inputs ...");
         args.add_feed(&graph.operation_by_name_required(INPUT_NAME)
             .expect(INPUT_NAME), 0, &input);
 
-        args.add_feed(&graph.operation_by_name_required(INPUT_NAME)
-            .expect(INPUT_LENGTHS_NAME), 0, &input);
+        println!(">>> Input Lengths ...");
+        args.add_feed(&graph.operation_by_name_required(INPUT_LENGTHS_NAME)
+            .expect(INPUT_LENGTHS_NAME), 0, &input_length);
 
-        // generation_B_test:
-        // Tensor("generator_A2B_3/output_transpose:0", shape=(?, 24, ?), dtype=float32)
+        // You must feed a value for placeholder tensor 'inputs' with dtype int32 and shape [1,?]
+        // InvalidArgument: You must feed a value for placeholder tensor 'input_lengths' with dtype int32 and shape [1]
+        //thread 'main' panicked at 'inputs_lengths: {inner:0x56247a89c920, Unavailable: Operation "inputs_lengths" not found}', src/libcore/result.rs:1165:5
+
         let z = args.request_fetch(
             &graph.operation_by_name_required(OUTPUT_NAME)
                 .expect(OUTPUT_NAME), 0);
+
+        println!(">>> Running...");
 
         session.run(&mut args).expect("Run success");
 
