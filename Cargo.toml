@@ -5,7 +5,12 @@ authors = [ "Brandon Thomas <bt@brand.io>",
             "Brandon Thomas <echelon@gmail.com>" ]
 
 [[bin]]
+name = "tacotron"
+path = "src/tacotron_main.rs"
+
+[[bin]]
 name = "voder"
+path = "src/voder_main.rs"
 
 [dependencies]
 bytes = "0.4.12" # required by 'prost'
