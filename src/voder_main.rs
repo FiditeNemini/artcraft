@@ -1,6 +1,8 @@
-//! NB: From wavy library
 //!
-//! This example records audio and plays it back in real time as it's being recorded.
+//! This is a process that captures microphone input, ships proto-over-zeromq to a python
+//! CycleGAN-VC (tensorflow) sidecar server, collects the results, then plays them over
+//! the speaker.
+//!
 
 extern crate bytes;
 extern crate byteorder;
@@ -8,7 +10,6 @@ extern crate cpal;
 extern crate failure;
 extern crate prost;
 extern crate prost_types;
-//extern crate tensorflow;
 extern crate wavy;
 extern crate world_sys;
 extern crate zmq;
