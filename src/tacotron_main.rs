@@ -55,78 +55,48 @@ pub fn main() {
 
   println!("Model Loaded!");
 
-  let mut input = Tensor::new(&[1, 24, 10])
-      .with_values(&[
-        0.0f32, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
-        0.0f32, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
-        0.0f32, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
-        0.0f32, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
-        0.0f32, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
-        0.0f32, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
-        0.0f32, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
-        0.0f32, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
-        0.0f32, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
-        0.0f32, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
-        0.0f32, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
-        0.0f32, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
-        0.0f32, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
-        0.0f32, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
-        0.0f32, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
-        0.0f32, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
-        0.0f32, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
-        0.0f32, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
-        0.0f32, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
-        0.0f32, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
-        0.0f32, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
-        0.0f32, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
-        0.0f32, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
-        0.0f32, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
-      ])
-      .unwrap();
+  let sentence = [40, 52, 64, 41, 28, 40, 32, 64, 36, 46, 64, 31, 42, 41, 28, 39, 31, 64, 47, 45, 48, 40, 43, 1];
 
-    let mut input = Tensor::new(&[1, 16])
-        .with_values(&[
-            0, 1, 2, 3, 4, 5, 6, 7,
-            0, 1, 2, 3, 4, 5, 6, 7,
-        ])
-        .unwrap();
+  let mut input = Tensor::new(&[1, 24])
+    .with_values(
+      // cleaned string "my name is donald trump"
+      &sentence
+    )
+    .unwrap();
 
-    let mut input_length  = Tensor::new(&[1])
-        .with_values(&[
-            16
-        ])
-        .unwrap();
+  let mut input_length  = Tensor::new(&[1])
+    .with_values(&[24])
+    .unwrap();
 
+  println!(">>> Input tensor dims: {:?}", input.dims());
 
-    println!(">>> Input tensor dims: {:?}", input.dims());
+  {
+    let mut args = SessionRunArgs::new();
 
-    {
-        let mut args = SessionRunArgs::new();
+    println!(">>> Inputs ...");
+    args.add_feed(&graph.operation_by_name_required(INPUT_NAME)
+        .expect(INPUT_NAME), 0, &input);
 
-        println!(">>> Inputs ...");
-        args.add_feed(&graph.operation_by_name_required(INPUT_NAME)
-            .expect(INPUT_NAME), 0, &input);
+    println!(">>> Input Lengths ...");
+    args.add_feed(&graph.operation_by_name_required(INPUT_LENGTHS_NAME)
+        .expect(INPUT_LENGTHS_NAME), 0, &input_length);
 
-        println!(">>> Input Lengths ...");
-        args.add_feed(&graph.operation_by_name_required(INPUT_LENGTHS_NAME)
-            .expect(INPUT_LENGTHS_NAME), 0, &input_length);
+    // You must feed a value for placeholder tensor 'inputs' with dtype int32 and shape [1,?]
+    // InvalidArgument: You must feed a value for placeholder tensor 'input_lengths' with dtype int32 and shape [1]
+    //thread 'main' panicked at 'inputs_lengths: {inner:0x56247a89c920, Unavailable: Operation "inputs_lengths" not found}', src/libcore/result.rs:1165:5
 
-        // You must feed a value for placeholder tensor 'inputs' with dtype int32 and shape [1,?]
-        // InvalidArgument: You must feed a value for placeholder tensor 'input_lengths' with dtype int32 and shape [1]
-        //thread 'main' panicked at 'inputs_lengths: {inner:0x56247a89c920, Unavailable: Operation "inputs_lengths" not found}', src/libcore/result.rs:1165:5
+    let z = args.request_fetch(
+        &graph.operation_by_name_required(OUTPUT_NAME)
+            .expect(OUTPUT_NAME), 0);
 
-        let z = args.request_fetch(
-            &graph.operation_by_name_required(OUTPUT_NAME)
-                .expect(OUTPUT_NAME), 0);
+    println!(">>> Running...");
 
-        println!(">>> Running...");
+    session.run(&mut args).expect("Run success");
 
-        session.run(&mut args).expect("Run success");
+    // Check our results.
+    let z_res = args.fetch::<f32>(z).expect("ret");
 
-        // Check our results.
-        let z_res = args.fetch::<f32>(z).expect("ret");
-
-        println!("z_rez.dims(): {:?}", z_res.dims());
-        println!("z_rez: {:?}", z_res);
-    }
+    println!("z_rez.dims(): {:?}", z_res.dims());
+    println!("z_rez: {:?}", z_res);
+  }
 }
