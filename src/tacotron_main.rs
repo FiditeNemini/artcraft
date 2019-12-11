@@ -1,5 +1,6 @@
 extern crate tensorflow;
 extern crate hound;
+extern crate sample;
 
 pub mod model;
 
@@ -12,6 +13,7 @@ use tensorflow::{
 };
 
 use model::print_tensorfow_version;
+use sample::ring_buffer::Slice;
 
 const INPUT_NAME : &'static str = "inputs";
 const INPUT_LENGTHS_NAME : &'static str = "input_lengths";
@@ -56,21 +58,22 @@ pub fn main() {
 
   println!("Model Loaded!");
 
-  let sentence = [40, 52, 64, 41, 28, 40, 32, 64, 36, 46, 64, 31, 42, 41, 28, 39, 31, 64, 47, 45, 48, 40, 43, 1];
+  let sentence = vec![40, 52, 64, 41, 28, 40, 32, 64, 36, 46, 64, 31, 42, 41, 28, 39, 31, 64, 47, 45, 48, 40, 43, 1];
 
-  let mut input = Tensor::new(&[1, 24])
-    .with_values(
-      // cleaned string "my name is donald trump"
-      &sentence
-    )
-    .unwrap();
+  convert_sentence(&mut graph, &session, &sentence)
+}
 
-  let mut input_length  = Tensor::new(&[1])
-    .with_values(&[24])
-    .unwrap();
-
+fn convert_sentence(graph: &mut Graph, session: &Session, sentence: &Vec<i32>) -> () {
+  let mut input = Tensor::new(&[1, sentence.len() as u64])
+      .with_values(
+        // cleaned string "my name is donald trump"
+        sentence.slice()
+      )
+      .unwrap();
+  let mut input_length = Tensor::new(&[1])
+      .with_values(&[sentence.len() as i32])
+      .unwrap();
   println!(">>> Input tensor dims: {:?}", input.dims());
-
   {
     let mut args = SessionRunArgs::new();
 
@@ -83,8 +86,8 @@ pub fn main() {
         .expect(INPUT_LENGTHS_NAME), 0, &input_length);
 
     let z = args.request_fetch(
-        &graph.operation_by_name_required(OUTPUT_NAME)
-            .expect(OUTPUT_NAME), 0);
+      &graph.operation_by_name_required(OUTPUT_NAME)
+          .expect(OUTPUT_NAME), 0);
 
     println!(">>> Running...");
 
@@ -131,6 +134,15 @@ fn process_audio(signal: Vec<f32>) -> Vec<f64> {
   let max : f64 = abs.iter()
       .fold(0.01f64, |x, y| x.max(*y));
 
+
+  let signal_mult = signal.iter()
+      .map(|f| *f * 32767.0f64)
+      .collect::<Vec<f64>>();
+
+  let signal_div = signal_mult.iter()
+      .map(|f| *f / max)
+      .collect::<Vec<f64>>();
+
   println!("Max: {:?}", max);
 
   let mult = 32767.0f64 / max;
@@ -139,15 +151,15 @@ fn process_audio(signal: Vec<f32>) -> Vec<f64> {
 
   println!("Mult: {:?}", mult);
 
-  let result = signal.iter()
+  /*let result = signal.iter()
       .map(|f| f * python_mult)
       .collect::<Vec<f64>>();
 
   println!("Res[0]: {:?}", &abs.get(0));
   println!("Res[1]: {:?}", &abs.get(1));
-  println!("Res[2]: {:?}", &abs.get(2));
+  println!("Res[2]: {:?}", &abs.get(2));*/
 
-  result
+  signal_div
 }
 
 fn write_wav(signal: Vec<f64>) {
