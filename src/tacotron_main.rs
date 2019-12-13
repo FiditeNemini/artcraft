@@ -60,7 +60,9 @@ pub fn main() {
 
   let sentence = vec![40, 52, 64, 41, 28, 40, 32, 64, 36, 46, 64, 31, 42, 41, 28, 39, 31, 64, 47, 45, 48, 40, 43, 1];
 
-  convert_sentence(&mut graph, &session, &sentence)
+  for _i in 0..32 {
+    convert_sentence(&mut graph, &session, &sentence)
+  }
 }
 
 fn convert_sentence(graph: &mut Graph, session: &Session, sentence: &Vec<i32>) -> () {

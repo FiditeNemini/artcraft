@@ -137,5 +137,13 @@ pub fn print_tensorfow_version() {
   // Rust TensorFlow version:   1.13.1 (default, must be hand-upgraded)
   let version = version().expect("version");
   println!("Tensorflow version: {}", version);
+
+  let graph = Graph::new();
+  let options = SessionOptions::new();
+  let session = Session::new(&options, &graph).unwrap();
+  let devices = session.device_list().unwrap();
+  for device in devices {
+    println!("Device: {:?}", device);
+  }
 }
 
