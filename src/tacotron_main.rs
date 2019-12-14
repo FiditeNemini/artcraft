@@ -131,11 +131,11 @@ fn visualize(tensor : Tensor<f32>) {
   let mut k: u32 = 0;
 
   for x in tensor.iter() {
-    if i >= width {
-      i = 0;
-      j += 1
-    }
     if j >= height {
+      j = 0;
+      i += 1
+    }
+    if i >= width {
       println!("Break @ {}", k);
       break;
     }
@@ -148,11 +148,17 @@ fn visualize(tensor : Tensor<f32>) {
     let val = (*x) * 255f32;
     let val = val.abs() as u8;
     image.put_pixel(i, j, Rgb([val, val, val]));
-    i += 1;
+    j += 1;
     k += 1;
   }
 
   image.save("output.png").unwrap();
+
+  println!("Dimensions: {:?}", dims);
+  println!("Width: {:?}", width);
+  println!("Height: {:?}", height);
+  println!("Num pixels calc: {:?}", (width * height));
+  println!("Num pixels covered: {:?}", k);
 }
 
 fn process_audio(signal: Vec<f32>) -> Vec<f64> {
