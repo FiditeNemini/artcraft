@@ -25,7 +25,8 @@ prost = "0.5.*" # protobuf
 prost-types = "0.5.0" # protobuf
 sample = "0.10.0" # DSP toolkit
 sonogram = "0.3.0" # badass spectrograms
-tensorflow = { version = "0.14.0", features = ["tensorflow_gpu"], optional = true }
+#tensorflow = { version = "0.14.0", features = ["tensorflow_gpu"], optional = true }
+tensorflow = { version = "0.14.0", optional = true }
 wavy = "0.1.2" # real time audio capture and playback
 world-sys = { path = "/home/bt/dev/world-sys", optional = true } # AWESOME WORLD VOCODER BINDINGS HAH HA HAH
 zmq = "0.9.2" # zeromq
@@ -39,7 +40,8 @@ default = ["tacotron"] # TODO: This is annoying in CLion
 # NB: Manually upgraded 'tensorflow-sys' library from 1.13.1 to 1.14.0
 # The downloaded tensorflow libs in target/ must be moved to /lib 
 # (I couldn't figure out the Rust linker flags)
-#tensorflow = { path = "/home/bt/dev/3rd/tensorflow.rs" }
+#tensorflow = { path = "/home/bt/dev/3rd/tensorflow.rs-modified" }
+#tensorflow = { path = "/home/bt/dev/3rd/tensorflow.rs", features = ["tensorflow_gpu"] }
 
 [build-dependencies]
 prost-build = "0.5.0"

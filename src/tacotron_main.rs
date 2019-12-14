@@ -18,8 +18,11 @@ use sample::ring_buffer::Slice;
 const INPUT_NAME : &'static str = "inputs";
 const INPUT_LENGTHS_NAME : &'static str = "input_lengths";
 
+// NB: This goes through the griffin-lim pipeline, but is hella slow off GPU
 // Tensor("model/griffinlim/Squeeze:0", shape=(?,), dtype=float32)
-const OUTPUT_NAME : &'static str = "model/griffinlim/Squeeze";
+//const OUTPUT_NAME : &'static str = "model/griffinlim/Squeeze";
+
+const OUTPUT_NAME : &'static str = "model/Pow_1";
 
 /**
  * To save:
