@@ -1,6 +1,7 @@
-extern crate tensorflow;
 extern crate hound;
+extern crate image;
 extern crate sample;
+extern crate tensorflow;
 
 pub mod model;
 
@@ -14,6 +15,9 @@ use tensorflow::{
 
 use model::print_tensorfow_version;
 use sample::ring_buffer::Slice;
+use image::RgbImage;
+use image::ImageBuffer;
+use image::Rgb;
 
 const INPUT_NAME : &'static str = "inputs";
 const INPUT_LENGTHS_NAME : &'static str = "input_lengths";
@@ -63,9 +67,9 @@ pub fn main() {
 
   let sentence = vec![40, 52, 64, 41, 28, 40, 32, 64, 36, 46, 64, 31, 42, 41, 28, 39, 31, 64, 47, 45, 48, 40, 43, 1];
 
-  for _i in 0..32 {
+  //for _i in 0..32 {
     convert_sentence(&mut graph, &session, &sentence)
-  }
+  //}
 }
 
 fn convert_sentence(graph: &mut Graph, session: &Session, sentence: &Vec<i32>) -> () {
@@ -108,10 +112,47 @@ fn convert_sentence(graph: &mut Graph, session: &Session, sentence: &Vec<i32>) -
     println!("Data[1]: {:?}", &z_res.get(1));
     println!("Data[2]: {:?}", &z_res.get(2));
 
-    let processed = process_audio(z_res.to_vec());
+    visualize(z_res);
 
-    write_wav(processed);
+    //let processed = process_audio(z_res.to_vec());
+    //write_wav(processed);
   }
+}
+
+fn visualize(tensor : Tensor<f32>) {
+  let dims = tensor.dims();
+  let width = *dims.get(0).unwrap() as u32;
+  let height = *dims.get(1).unwrap() as u32;
+
+  let mut image: RgbImage = ImageBuffer::new(width, height);
+
+  let mut i: u32 = 0;
+  let mut j: u32 = 0;
+  let mut k: u32 = 0;
+
+  for x in tensor.iter() {
+    if i >= width {
+      i = 0;
+      j += 1
+    }
+    if j >= height {
+      println!("Break @ {}", k);
+      break;
+    }
+    /*if i % 5 == 0  {
+      image.put_pixel(i, j, Rgb([0, 0, 0]));
+    } else {
+      image.put_pixel(i, j, Rgb([0, 255, 0]));
+    }*/
+    // [-1.0, 1.0]
+    let val = (*x) * 255f32;
+    let val = val.abs() as u8;
+    image.put_pixel(i, j, Rgb([val, val, val]));
+    i += 1;
+    k += 1;
+  }
+
+  image.save("output.png").unwrap();
 }
 
 fn process_audio(signal: Vec<f32>) -> Vec<f64> {
