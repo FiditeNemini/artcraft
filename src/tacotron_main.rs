@@ -1,3 +1,8 @@
+/**
+ * This takes SavedModels from Keith Ito's Tacotron impl and runs them in Rust.
+ * Critically, it can short-circuit the entire model evaluation and only run the pipeline
+ * pieces that we care about.
+ */
 extern crate hound;
 extern crate image;
 extern crate sample;
@@ -18,14 +23,22 @@ use sample::ring_buffer::Slice;
 use image::RgbImage;
 use image::ImageBuffer;
 use image::Rgb;
+use image::imageops::{rotate90, flip_horizontal, flip_vertical, resize, FilterType, crop};
 
 const INPUT_NAME : &'static str = "inputs";
 const INPUT_LENGTHS_NAME : &'static str = "input_lengths";
 
 // NB: This goes through the griffin-lim pipeline, but is hella slow off GPU
+// The output of this is *actual* audio, though there are a few more steps in the
+// network to run before the audio is a 1:1 match with Tacotron Python.
 // Tensor("model/griffinlim/Squeeze:0", shape=(?,), dtype=float32)
 //const OUTPUT_NAME : &'static str = "model/griffinlim/Squeeze";
 
+// This appears to be the mel spectrogram before griffin-lim reconstruction.
+// Image output shows visible formants. If my thinking holds, we can short circuit
+// Griffin-Lim reconstruction and send this to a trained MelGan network for a HUGE
+// performance boost end-to-end. It should even be realtime on a CPU.
+// Executing the model to this point is *extremely* fast.
 const OUTPUT_NAME : &'static str = "model/Pow_1";
 
 /**
@@ -65,7 +78,38 @@ pub fn main() {
 
   println!("Model Loaded!");
 
-  let sentence = vec![40, 52, 64, 41, 28, 40, 32, 64, 36, 46, 64, 31, 42, 41, 28, 39, 31, 64, 47, 45, 48, 40, 43, 1];
+  // cleaned string "my name is donald trump"
+  let sentence = vec![
+    40, 52, 64,
+    41, 28, 40, 32, 64,
+    36, 46, 64,
+    31, 42, 41, 28, 39, 31, 64,
+    47, 45, 48, 40, 43, 1
+  ];
+
+  /*let sentence = vec![
+    40, 52, 64,
+    40, 52, 64,
+    40, 52, 64,
+    40, 52, 64,
+    40, 52, 64,
+    40, 52, 64,
+    40, 52, 64,
+    41, 28, 40, 32, 64,
+    41, 28, 40, 32, 64,
+    41, 28, 40, 32, 64,
+    41, 28, 40, 32, 64,
+    41, 28, 40, 32, 64,
+    41, 28, 40, 32, 64,
+    41, 28, 40, 32, 64,
+    36, 46, 64,
+    36, 46, 64,
+    36, 46, 64,
+    36, 46, 64,
+    36, 46, 64,
+    31, 42, 41, 28, 39, 31, 64,
+    47, 45, 48, 40, 43, 1
+  ];*/
 
   //for _i in 0..32 {
     convert_sentence(&mut graph, &session, &sentence)
@@ -152,6 +196,12 @@ fn visualize(tensor : Tensor<f32>) {
     k += 1;
   }
 
+  //image = rotate90(&image);
+  //image = flip_horizontal(&image);
+  image = flip_vertical(&image);
+  let cropped = crop(&mut image,0, 0, 200, height);
+  let mut image = cropped.to_image();
+  image = resize(&image, 200, 100, FilterType::Triangle);
   image.save("output.png").unwrap();
 
   println!("Dimensions: {:?}", dims);
