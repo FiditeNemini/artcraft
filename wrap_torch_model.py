@@ -1,27 +1,115 @@
 #!/usr/bin/env python3
 # From: https://github.com/pytorch/pytorch/issues/20356#issuecomment-545572400
 import torch
+import torch.nn as nn
+import torch.nn.functional as F
 
 from collections import OrderedDict
+import yaml
+
+class ResStack(nn.Module):
+    def __init__(self, channel):
+        super(ResStack, self).__init__()
+
+        self.blocks = nn.ModuleList([
+            nn.Sequential(
+                nn.LeakyReLU(0.2),
+                nn.ReflectionPad1d(3**i),
+                nn.utils.weight_norm(nn.Conv1d(channel, channel, kernel_size=3, dilation=3**i)),
+                nn.LeakyReLU(0.2),
+                nn.utils.weight_norm(nn.Conv1d(channel, channel, kernel_size=1)),
+            )
+            for i in range(3)
+        ])
+
+        self.shortcuts = nn.ModuleList([
+            nn.utils.weight_norm(nn.Conv1d(channel, channel, kernel_size=1))
+            for i in range(3)
+        ])
+
+    def forward(self, x):
+        # TODO: THIS WON'T WORK
+        #for block, shortcut in zip(self.blocks, self.shortcuts):
+        #    x = shortcut(x) + block(x)
+        for block in self.blocks:
+            x = block(x)
+        return x
+
+    # TODO: Looks unnecessary. Remove once this works.
+    #def remove_weight_norm(self):
+    #    for block, shortcut in zip(self.blocks, self.shortcuts):
+    #        nn.utils.remove_weight_norm(block[2])
+    #        nn.utils.remove_weight_norm(block[4])
+    #        nn.utils.remove_weight_norm(shortcut)
 
 class Container(torch.nn.Module):
     def __init__(self, my_values):
         super().__init__()
+
         for key in my_values:
             setattr(self, key, my_values[key])
 
-    def forward(self, x):
-        # NB(bt): This wasn't originally provided. I'm assuming this is a torch thing
-        #y = [self.layer1(x[0]), self.layer2(x[1])]
-        #return y
-        return x
+        mel_channel = 80 # TODO: Load from yaml
 
-# my_values = {
-#    'a': torch.ones(2, 2),
-#    'b': torch.ones(2, 2) + 10,
-#    'c': 'hello',
-#    'd': 6
-#}
+        # TODO:
+        #print("Hprams:")
+        #print(self.melgan_hp_str)
+        #hparams = yaml.loads(self.melgan_hp_str)
+        #print(hparams)
+        #hp = load_hparam_str(checkpoint['hp_str'])
+        #hp.audio.n_mel_channels
+
+        self.generator = nn.Sequential(
+            nn.ReflectionPad1d(3),
+            nn.utils.weight_norm(nn.Conv1d(mel_channel, 512, kernel_size=7, stride=1)),
+
+            nn.LeakyReLU(0.2),
+            nn.utils.weight_norm(nn.ConvTranspose1d(512, 256, kernel_size=16, stride=8, padding=4)),
+
+            ResStack(256),
+
+            nn.LeakyReLU(0.2),
+            nn.utils.weight_norm(nn.ConvTranspose1d(256, 128, kernel_size=16, stride=8, padding=4)),
+
+            ResStack(128),
+
+            nn.LeakyReLU(0.2),
+            nn.utils.weight_norm(nn.ConvTranspose1d(128, 64, kernel_size=4, stride=2, padding=1)),
+
+            ResStack(64),
+
+            nn.LeakyReLU(0.2),
+            nn.utils.weight_norm(nn.ConvTranspose1d(64, 32, kernel_size=4, stride=2, padding=1)),
+
+            ResStack(32),
+
+            nn.LeakyReLU(0.2),
+            nn.ReflectionPad1d(3),
+            nn.utils.weight_norm(nn.Conv1d(32, 1, kernel_size=7, stride=1)),
+            nn.Tanh(),
+        )
+
+    # TODO: Looks unnecessary. Remove once this works.
+    def eval(self, inference=False):
+        super(Container, self).eval()
+
+        # don't remove weight norm while validation in training loop
+        if inference:
+            self.remove_weight_norm()
+
+    # TODO: Looks unnecessary. Remove once this works.
+    #def remove_weight_norm(self):
+    #    for idx, layer in enumerate(self.generator):
+    #        if len(layer.state_dict()) != 0:
+    #            try:
+    #                nn.utils.remove_weight_norm(layer)
+    #            except:
+    #                layer.remove_weight_norm()
+
+    def forward(self, mel):
+        mel = (mel + 5.0) / 5.0 # roughly normalize spectrogram
+        return self.generator(mel)
+
 
 print('Loading melgan model...')
 melgan_model_file = '/home/bt/models/melgan-swpark/firstgo_a7c2351_1100.pt'
@@ -45,26 +133,6 @@ def cuda_to_cpu(model):
 print('Converitng to CPU model...')
 cuda_to_cpu(melgan_model)
 
-"""
-for model_key, model_payload in melgan_model.items():
-    print("===== Model Key: {} =====".format(model_key))
-    if isinstance(model_payload, dict) or isinstance(model_payload, OrderedDict):
-        for k, v in model_payload.items():
-            #print("Key: {}".format(k))
-            #print("Type v: {}".format(type(v)))
-            if isinstance(v, torch.Tensor):
-                v = v.cpu()
-            #print(v)
-
-for model_key, model_payload in melgan_model.items():
-    print("===== Model Key: {} =====".format(model_key))
-    if isinstance(model_payload, dict) or isinstance(model_payload, OrderedDict):
-        for k, v in model_payload.items():
-            pass
-            #print("Key: {}".format(k))
-            #print("Type v: {}".format(type(v)))
-            #print(v)
-"""
 
 print('Containerizing model...')
 # Save arbitrary values supported by TorchScript
@@ -72,17 +140,25 @@ print('Containerizing model...')
 graph = {
     # NB: You can't save a toplevel dictionary of dictionaries,
     # like so: 'melgan': melgan_model,
-    'melgan_model_g': melgan_model['model_g'],
-    'melgan_model_d': melgan_model['model_d'],
-    'melgan_optim_g': melgan_model['optim_g'],
-    'melgan_optim_d': melgan_model['optim_d'],
+    # Per inference.py, it looks like only model_g is used.
+    #'melgan_model_g': melgan_model['model_g'], # NB: keeping this out to load below.
+    #'melgan_model_d': melgan_model['model_d'],
+    #'melgan_optim_g': melgan_model['optim_g'],
+    #'melgan_optim_d': melgan_model['optim_d'],
     'melgan_step': melgan_model['step'],
     'melgan_epoch': melgan_model['epoch'],
     'melgan_hp_str': melgan_model['hp_str'],
     'melgan_githash': melgan_model['githash'],
 }
 
-container = torch.jit.script(Container(graph))
+module = Container(graph)
+
+print('Load state dict...')
+module.load_state_dict(melgan_model['model_g'])
+module.eval(inference=False)
+
+print('JIT model...')
+container = torch.jit.script(module)
 
 print('Saving model...')
 container.save("container.pt")

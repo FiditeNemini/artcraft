@@ -1,5 +1,10 @@
 extern crate tch;
 
+use tch::vision::imagenet;
+use tch::vision::resnet;
+use tch::nn::ModuleT;
+use tch::Tensor;
+
 
 //const TACOTRON_MODEL_PATH : &'static str = "/home/bt/models/tacotron2-nvidia/tacotron2_statedict.pt";
 //const MELGAN_MODEL_PATH : &'static str = "/home/bt/models/melgan-swpark/firstgo_a7c2351_1100.pt";
@@ -12,12 +17,51 @@ pub fn main() {
   let mut vs = tch::nn::VarStore::new(tch::Device::Cpu);
 
   println!("Loading Wrapped model: {}", WRAPPED_MODEL_PATH);
-  vs.load(WRAPPED_MODEL_PATH).unwrap();
 
   println!("loaded");
 
-  // TODO: Now how do I evaluate the model?
+  /* Just gotta do this...
+    model = Generator(hp.audio.n_mel_channels).cuda()
+    model.load_state_dict(checkpoint['model_g'])
+    model.eval(inference=False)
 
+    with torch.no_grad():
+        for melpath in tqdm.tqdm(glob.glob(os.path.join(args.input_folder, '*.mel'))):
+            mel = torch.load(melpath)
+            if len(mel.shape) == 2:
+                mel = mel.unsqueeze(0)
+
+            filename = melpath.replace('.mel', '_reconstructed_epoch%04d.png' % checkpoint['epoch'])
+            #render_histogram(mel, filename)
+            mel = mel.cuda()
+
+            audio = model.inference(mel)
+            audio = audio.cpu().detach().numpy()
+
+            out_path = melpath.replace('.mel', '_reconstructed_epoch%04d.wav' % checkpoint['epoch'])
+            write(out_path, hp.audio.sampling_rate, audio)
+  */
+
+  vs.load(WRAPPED_MODEL_PATH).unwrap();
+
+  // TODO: Now how do I evaluate the model?
+  //let resnet18 = tch::vision::resnet::resnet18(&vs.root(), imagenet::CLASS_COUNT);
+
+  let path = "/home/bt/Downloads/virtual-studio-design.jpg";
+  let image = imagenet::load_image_and_resize(path, 100, 100).unwrap();
+
+  // NB: This works
+  let net = Box::new(resnet::resnet18(&vs.root(), imagenet::CLASS_COUNT));
+
+  for _ in 0..10 {
+    let output = net
+        .forward_t(&image.unsqueeze(0), /*train=*/ false)
+        .softmax(-1, tch::Kind::Float); // Convert to probability.
+
+    for (probability, class) in imagenet::top(&output, 5).iter() {
+      println!("{:50} {:5.2}%", class, 100.0 * probability)
+    }
+  }
 
   /*// Apply the forward pass of the model to get the logits.
   let output = net
@@ -25,8 +69,5 @@ pub fn main() {
       .softmax(-1, tch::Kind::Float); // Convert to probability.
 
   // Print the top 5 categories for this image.
-  for (probability, class) in imagenet::top(&output, 5).iter() {
-    println!("{:50} {:5.2}%", class, 100.0 * probability)
-  }
   Ok(())*/
 }
