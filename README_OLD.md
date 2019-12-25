@@ -12,15 +12,6 @@ Current State
   * Fix desktop audio so that mic and speaker work
   * Integrate Neural Network (or lightweight transform) into `feedback.rs/cpal` code.
 
-CycleGAN
---------
-
-It's possible to train and evaluate at the same time using dual GPUs.
-To run the sidecar on a particular GPU (0-indexded), use:
-
-```
-CUDA_VISIBLE_DEVICES=1 ./sidecar.py
-```
 
 TensorFlow
 ----------
@@ -99,23 +90,6 @@ builder.add_meta_graph_and_variables(self.model.sess, [
 	tf.saved_model.tag_constants.SERVING],)
 builder.save()
 ```
-
-Protos
-------
-Codegen for Rust is built in. Codegen for Python uses,
-
-```
-protoc --python_out=cycle_gan protos/audio.proto
-```
-
-Results
--------
-Currently there is 4.39 seconds of delay between speaking and generated output
-with the sidecar setup on my desktop computer. This is really great and seems
-promising.
-
-This gets up to 6.0 seconds later. Drift continues to accrue, but it's a slow
-build.
 
 Resources
 ---------

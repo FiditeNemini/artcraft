@@ -1,0 +1,12 @@
+[package]
+name = "tacotron_melgan"
+version = "0.0.1"
+authors = [ "Brandon Thomas <bt@brand.io>",
+            "Brandon Thomas <echelon@gmail.com>" ]
+
+[[bin]]
+name = "tacotron_melgan"
+path = "src/main.rs"
+
+[dependencies]
+tch = "0.1.3" # libtorch bindings (pytorch)

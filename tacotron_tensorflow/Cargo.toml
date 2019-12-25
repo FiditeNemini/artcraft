@@ -1,0 +1,15 @@
+[package]
+name = "tacotron_tensorflow"
+version = "0.0.1"
+authors = [ "Brandon Thomas <bt@brand.io>",
+            "Brandon Thomas <echelon@gmail.com>" ]
+
+[[bin]]
+name = "tacotron_tensorflow"
+path = "src/main.rs"
+
+[dependencies]
+hound = "3.4.0" # wav encoder/decoder
+image = "0.23.0-preview.0"
+sample = "0.10.0" # DSP toolkit
+tensorflow = "0.14.0"
