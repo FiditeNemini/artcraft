@@ -8,8 +8,9 @@ use tch::Tensor;
 
 //const TACOTRON_MODEL_PATH : &'static str = "/home/bt/models/tacotron2-nvidia/tacotron2_statedict.pt";
 //const MELGAN_MODEL_PATH : &'static str = "/home/bt/models/melgan-swpark/firstgo_a7c2351_1100.pt";
-const WRAPPED_MODEL_PATH : &'static str = "/home/bt/dev/voder/container.pt";
+const WRAPPED_MODEL_PATH : &'static str = "/home/bt/dev/voder/tacotron_melgan/container.pt";
 
+// TODO: This isn't working because I need mels in the format of a torch tensor. Not python pickle file
 const EXAMPLE_MEL_PATH : &'static str = "/home/bt/dev/2nd/melgan/temp/output/trump_2018_02_15-001.mel";
 
 pub fn main() {

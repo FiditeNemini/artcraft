@@ -4,4 +4,5 @@ target/
 
 # Project specific ignores
 cycle_gan/python
+tacotron_melgan/python
 voice_converter_sidecar/cycle_gan/python
