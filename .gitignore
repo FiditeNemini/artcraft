@@ -1,4 +1,7 @@
 *~
-target/
 __pycache__/
+target/
+
+# Project specific ignores
 cycle_gan/python
+voice_converter_sidecar/cycle_gan/python
