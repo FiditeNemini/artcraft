@@ -10,6 +10,8 @@ use tch::Tensor;
 //const MELGAN_MODEL_PATH : &'static str = "/home/bt/models/melgan-swpark/firstgo_a7c2351_1100.pt";
 const WRAPPED_MODEL_PATH : &'static str = "/home/bt/dev/voder/container.pt";
 
+const EXAMPLE_MEL_PATH : &'static str = "/home/bt/dev/2nd/melgan/temp/output/trump_2018_02_15-001.mel";
+
 pub fn main() {
   println!("Tacotron2 + MelGan");
 
@@ -42,9 +44,24 @@ pub fn main() {
             write(out_path, hp.audio.sampling_rate, audio)
   */
 
-  vs.load(WRAPPED_MODEL_PATH).unwrap();
+  //vs.load(WRAPPED_MODEL_PATH).unwrap();
 
-  // TODO: Now how do I evaluate the model?
+  println!("Loading trained model...");
+  let model = tch::CModule::load(WRAPPED_MODEL_PATH).unwrap();
+
+  // NB: This is just random data for now. Kind of mel shaped since it's an image.
+  //let path = "/home/bt/Downloads/virtual-studio-design.jpg";
+  //let image = imagenet::load_image_and_resize(path, 100, 100).unwrap();
+  //let image = imagenet::load_image(EXAMPLE_MEL_PATH).unwrap();
+
+  println!("Loading mel file...");
+  let mel_file = Tensor::load(EXAMPLE_MEL_PATH).unwrap();
+
+  println!("Forwarding mel to model...");
+  let output = model.forward_ts(&[mel_file.unsqueeze(0)]).unwrap();
+
+
+  /*// TODO: Now how do I evaluate the model?
   //let resnet18 = tch::vision::resnet::resnet18(&vs.root(), imagenet::CLASS_COUNT);
 
   let path = "/home/bt/Downloads/virtual-studio-design.jpg";
@@ -61,7 +78,7 @@ pub fn main() {
     for (probability, class) in imagenet::top(&output, 5).iter() {
       println!("{:50} {:5.2}%", class, 100.0 * probability)
     }
-  }
+  }*/
 
   /*// Apply the forward pass of the model to get the logits.
   let output = net
