@@ -188,8 +188,12 @@ module.load_state_dict(melgan_model['model_g'])
 #module.eval(inference=False)
 
 print('JIT model...')
-container = torch.jit.script(module)
+mel_file = '/home/bt/dev/voder/data/mels/LJ002-0320.mel'
+example = torch.load(mel_file, map_location=torch.device('cpu'))
+traced_script_module = torch.jit.trace(module, example)
+traced_script_module.save("container.pt")
+#container = torch.jit.script(module)
 
-print('Saving model...')
-container.save("container.pt")
+#print('Saving model...')
+#container.save("container.pt")
 
