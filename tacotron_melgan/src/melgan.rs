@@ -42,24 +42,8 @@ pub fn load_wrapped_mel(filename: &str) -> Tensor {
   module.forward(&temp)
 }
 
-pub fn run_melgan() {
-  let mut mel = load_wrapped_mel(EXAMPLE_MEL_1);
-  println!("Got mel: {:?} of dim {}", mel, mel.dim());
-
-  if mel.dim() == 2 {
-    println!("mel unsqeeze");
-    mel = mel.unsqueeze(0);
-  }
-
-  let mut vs = tch::nn::VarStore::new(tch::Device::Cpu);
-  let melgan_model = load_melgan_model(WRAPPED_MODEL_PATH);
-
-  println!("Evaluating model...");
-  let output = melgan_model.forward(&mel);
-
-  println!("Result tensor: {:?}", output);
-
-  let mut flat_audio_tensor = output.squeeze();
+pub fn process_raw_mel(mel: Tensor) -> Vec<f32> {
+  let mut flat_audio_tensor = mel.squeeze();
 
   println!("Sqeueezed tensor: {:?}, dim: {}",
     flat_audio_tensor,
@@ -84,6 +68,22 @@ pub fn run_melgan() {
         audio = audio.short()
 
         return audio
+
+     Should be getting results like these:
+      torch.Size([1, 1, 251392])
+      # Before multiplication by MAX_WAV_VALUE
+      tensor(0.0003)
+      tensor(0.0003)
+      tensor(0.0001)
+      tensor(0.0004)
+      tensor(0.0013)
+      # After multiplication by MAX_WAV_VALUE
+      tensor(9.2422)
+      tensor(10.3533)
+      tensor(4.9135)
+      tensor(13.2481)
+      tensor(42.3114)
+
   */
 
   // Hmm, this isn't flat.
@@ -108,21 +108,39 @@ pub fn run_melgan() {
   println!("Mul Tensor Data: {:?}", flat_audio_tensor.get(10000));
 
   let mut data : Vec<f32> = Vec::with_capacity(length);
+
   for i in 0 .. length {
     data.push(0.0f32);
   }
 
   flat_audio_tensor.copy_data(data.as_mut_slice(), length as usize);
 
-  println!("Data: {:?}", data.get(0));
-  println!("Data: {:?}", data.get(100));
-  println!("Data: {:?}", data.get(2000));
-  println!("Data: {:?}", data.get(5000));
-  println!("Data: {:?}", data.get(10000));
+  data
+}
+
+pub fn run_melgan() {
+  let mut mel = load_wrapped_mel(EXAMPLE_MEL_1);
+  println!("Got mel: {:?} of dim {}", mel, mel.dim());
+
+  if mel.dim() == 2 {
+    println!("mel unsqeeze");
+    mel = mel.unsqueeze(0);
+  }
+
+  let mut vs = tch::nn::VarStore::new(tch::Device::Cpu);
+  let melgan_model = load_melgan_model(WRAPPED_MODEL_PATH);
+
+  println!("Evaluating model...");
+  let output = melgan_model.forward(&mel);
+
+  println!("Result tensor: {:?}", output);
+
+  let data = process_raw_mel(output);
 
   let mut rng = rand::thread_rng();
+
   for _ in 0..30 {
-    let ri = rng.gen_range(0, length);
+    let ri = rng.gen_range(0, data.len());
     println!("data[{}]: {:?}", ri, data.get(ri as usize));
   }
 
@@ -139,81 +157,4 @@ pub fn run_melgan() {
     let sample = MAX_WAV_VALUE * sample;
     writer.write_sample(sample).unwrap();
   }
-
-
-  /*println!("Tacotron2 + MelGan");
-
-  // Create the model and load the weights from the file.
-  let mut vs = tch::nn::VarStore::new(tch::Device::Cpu);
-
-  println!("Loading Wrapped model: {}", WRAPPED_MODEL_PATH);
-
-  println!("loaded");
-
-  /* Just gotta do this...
-    model = Generator(hp.audio.n_mel_channels).cuda()
-    model.load_state_dict(checkpoint['model_g'])
-    model.eval(inference=False)
-
-    with torch.no_grad():
-        for melpath in tqdm.tqdm(glob.glob(os.path.join(args.input_folder, '*.mel'))):
-            mel = torch.load(melpath)
-            if len(mel.shape) == 2:
-                mel = mel.unsqueeze(0)
-
-            filename = melpath.replace('.mel', '_reconstructed_epoch%04d.png' % checkpoint['epoch'])
-            #render_histogram(mel, filename)
-            mel = mel.cuda()
-
-            audio = model.inference(mel)
-            audio = audio.cpu().detach().numpy()
-
-            out_path = melpath.replace('.mel', '_reconstructed_epoch%04d.wav' % checkpoint['epoch'])
-            write(out_path, hp.audio.sampling_rate, audio)
-  */
-
-  //vs.load(WRAPPED_MODEL_PATH).unwrap();
-
-  println!("Loading trained model...");
-  let model = tch::CModule::load(WRAPPED_MODEL_PATH).unwrap();
-
-  // NB: This is just random data for now. Kind of mel shaped since it's an image.
-  //let path = "/home/bt/Downloads/virtual-studio-design.jpg";
-  //let image = imagenet::load_image_and_resize(path, 100, 100).unwrap();
-  //let image = imagenet::load_image(EXAMPLE_MEL_PATH).unwrap();
-
-  println!("Loading mel file...");
-  let mel_file = Tensor::load(EXAMPLE_MEL_PATH).unwrap();
-
-  println!("Forwarding mel to model...");
-  let output = model.forward_ts(&[mel_file.unsqueeze(0)]).unwrap();
-
-
-  /*// TODO: Now how do I evaluate the model?
-  //let resnet18 = tch::vision::resnet::resnet18(&vs.root(), imagenet::CLASS_COUNT);
-
-  let path = "/home/bt/Downloads/virtual-studio-design.jpg";
-  let image = imagenet::load_image_and_resize(path, 100, 100).unwrap();
-
-  // NB: This works
-  let net = Box::new(resnet::resnet18(&vs.root(), imagenet::CLASS_COUNT));
-
-  for _ in 0..10 {
-    let output = net
-        .forward_t(&image.unsqueeze(0), /*train=*/ false)
-        .softmax(-1, tch::Kind::Float); // Convert to probability.
-
-    for (probability, class) in imagenet::top(&output, 5).iter() {
-      println!("{:50} {:5.2}%", class, 100.0 * probability)
-    }
-  }*/
-
-  /*// Apply the forward pass of the model to get the logits.
-  let output = net
-      .forward_t(&image.unsqueeze(0), /*train=*/ false)
-      .softmax(-1, tch::Kind::Float); // Convert to probability.
-
-  // Print the top 5 categories for this image.
-  Ok(())*/
-  */
 }

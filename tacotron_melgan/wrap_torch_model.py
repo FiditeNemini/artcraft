@@ -11,7 +11,7 @@ class ResStack(nn.Module):
     def __init__(self, channel):
         super(ResStack, self).__init__()
 
-        self.blocks = nn.ModuleList([
+        self.block_list = [
             nn.Sequential(
                 nn.LeakyReLU(0.2),
                 nn.ReflectionPad1d(3**i),
@@ -20,12 +20,23 @@ class ResStack(nn.Module):
                 nn.utils.weight_norm(nn.Conv1d(channel, channel, kernel_size=1)),
             )
             for i in range(3)
-        ])
+        ]
 
-        self.shortcuts = nn.ModuleList([
+        self.blocks = nn.ModuleList(self.block_list)
+        self.block0 = self.block_list[0]
+        self.block1 = self.block_list[1]
+        self.block2 = self.block_list[2]
+
+        self.shortcut_list = [
             nn.utils.weight_norm(nn.Conv1d(channel, channel, kernel_size=1))
             for i in range(3)
-        ])
+        ]
+
+        self.shortcuts = nn.ModuleList(self.shortcut_list)
+        self.shortcut0 = self.shortcut_list[0]
+        self.shortcut1 = self.shortcut_list[1]
+        self.shortcut2 = self.shortcut_list[2]
+
 
     def forward(self, x):
         # TODO: THIS WON'T WORK
@@ -38,8 +49,11 @@ class ResStack(nn.Module):
         #for i in range(len(self.blocks)):
         #    x = self.blocks[i](x)
         #zipped = zip(self.blocks, self.shortcuts)
-        for block in self.blocks:
-            x = block(x)
+        x = self.shortcut0(x) + self.block0(x)
+        x = self.shortcut1(x) + self.block1(x)
+        x = self.shortcut2(x) + self.block2(x)
+        #for block, shortcut in zip(self.block_list, self.shortcut_list):
+        #    x = block(x)
         #for shortcut in self.shortcuts:
         #    x = shortcut(x)
         return x
@@ -164,7 +178,7 @@ graph = {
 module = Container(graph)
 
 print('Load state dict...')
-module.load_state_dict(melgan_model['model_g'])
+#module.load_state_dict(melgan_model['model_g'])
 module.eval(inference=False)
 
 print('JIT model...')
