@@ -157,4 +157,10 @@ pub fn run_melgan() {
     let sample = MAX_WAV_VALUE * sample;
     writer.write_sample(sample).unwrap();
   }
+
+  println!("Testing model speed. Evaluating ten times.");
+  for i in 0..10 {
+    println!("Exec {}", i);
+    let _ = melgan_model.forward(&mel);
+  }
 }
