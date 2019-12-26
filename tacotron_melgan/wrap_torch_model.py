@@ -5,13 +5,14 @@ import torch.nn as nn
 import torch.nn.functional as F
 
 from collections import OrderedDict
+import re
 import yaml
 
 class ResStack(nn.Module):
     def __init__(self, channel):
         super(ResStack, self).__init__()
 
-        self.block_list = [
+        block_list = [
             nn.Sequential(
                 nn.LeakyReLU(0.2),
                 nn.ReflectionPad1d(3**i),
@@ -22,40 +23,33 @@ class ResStack(nn.Module):
             for i in range(3)
         ]
 
-        self.blocks = nn.ModuleList(self.block_list)
-        self.block0 = self.block_list[0]
-        self.block1 = self.block_list[1]
-        self.block2 = self.block_list[2]
+        # The following uses: generator.4.blocks.0.2.bias
+        #self.blocks = nn.ModuleList(block_list)
 
-        self.shortcut_list = [
+        # NB: This might work, but the weights need to be renamed
+        # the following expects: generator.4.block0.4.weight_v
+        self.block0 = block_list[0]
+        self.block1 = block_list[1]
+        self.block2 = block_list[2]
+
+        shortcut_list = [
             nn.utils.weight_norm(nn.Conv1d(channel, channel, kernel_size=1))
             for i in range(3)
         ]
 
-        self.shortcuts = nn.ModuleList(self.shortcut_list)
-        self.shortcut0 = self.shortcut_list[0]
-        self.shortcut1 = self.shortcut_list[1]
-        self.shortcut2 = self.shortcut_list[2]
+        #self.shortcuts = nn.ModuleList(shortcut_list)
+        self.shortcut0 = shortcut_list[0]
+        self.shortcut1 = shortcut_list[1]
+        self.shortcut2 = shortcut_list[2]
 
 
     def forward(self, x):
         # TODO: THIS WON'T WORK
         #for block, shortcut in zip(self.blocks, self.shortcuts):
         #    x = shortcut(x) + block(x)
-        #for block in self.blocks:
-        #    x = block(x)
-        #    for shortcut in self.shortcuts:
-        #        x = shortcut(x)
-        #for i in range(len(self.blocks)):
-        #    x = self.blocks[i](x)
-        #zipped = zip(self.blocks, self.shortcuts)
         x = self.shortcut0(x) + self.block0(x)
         x = self.shortcut1(x) + self.block1(x)
         x = self.shortcut2(x) + self.block2(x)
-        #for block, shortcut in zip(self.block_list, self.shortcut_list):
-        #    x = block(x)
-        #for shortcut in self.shortcuts:
-        #    x = shortcut(x)
         return x
 
     # TODO: Looks unnecessary. Remove once this works.
@@ -69,18 +63,10 @@ class Container(torch.nn.Module):
     def __init__(self, my_values):
         super().__init__()
 
-        for key in my_values:
-            setattr(self, key, my_values[key])
+        #for key in my_values:
+        #    setattr(self, key, my_values[key])
 
         mel_channel = 80 # TODO: Load from yaml
-
-        # TODO:
-        #print("Hprams:")
-        #print(self.melgan_hp_str)
-        #hparams = yaml.loads(self.melgan_hp_str)
-        #print(hparams)
-        #hp = load_hparam_str(checkpoint['hp_str'])
-        #hp.audio.n_mel_channels
 
         self.generator = nn.Sequential(
             nn.ReflectionPad1d(3),
@@ -177,9 +163,29 @@ graph = {
 
 module = Container(graph)
 
+# NB: This is done so we can rename the model components above since `zip` won't work :(
+BLOCK_REGEX = re.compile('blocks\.(\d+)\.')
+SHORTCUT_REGEX = re.compile('shortcuts\.(\d+)\.')
+
+new_model_g = [] # Rebuild the ordered dict
+for key, value in melgan_model['model_g'].items():
+    if 'blocks.' in key:
+        new_key = BLOCK_REGEX.sub(r'block\1.', key)
+        #print('{} -> {}'.format(key, new_key))
+        key = new_key
+    elif 'shortcuts.' in key:
+        new_key = SHORTCUT_REGEX.sub(r'shortcut\1.', key)
+        #print('{} -> {}'.format(key, new_key))
+        key = new_key
+
+    new_model_g.append((key, value))
+
+
+melgan_model['model_g'] = OrderedDict(new_model_g)
+
 print('Load state dict...')
-#module.load_state_dict(melgan_model['model_g'])
-module.eval(inference=False)
+module.load_state_dict(melgan_model['model_g'])
+#module.eval(inference=False)
 
 print('JIT model...')
 container = torch.jit.script(module)
