@@ -1,26 +1,42 @@
 use tch::Tensor;
 use tch::CModule;
 use tch;
+use tch::nn::Module;
 
 //const TACOTRON_MODEL_PATH : &'static str = "/home/bt/models/tacotron2-nvidia/tacotron2_statedict.pt";
 //const MELGAN_MODEL_PATH : &'static str = "/home/bt/models/melgan-swpark/firstgo_a7c2351_1100.pt";
-const WRAPPED_MODEL_PATH : &'static str = "/home/bt/dev/voder/tacotron_melgan/container.pt";
+//const WRAPPED_MODEL_PATH : &'static str = "/home/bt/dev/voder/tacotron_melgan/container.pt";
+const WRAPPED_MODEL_PATH : &'static str = "/home/bt/dev/voder/tacotron_melgan/cpu_container.pt";
 
 // TODO: This isn't working because I need mels in the format of a torch tensor. Not python pickle file
-const EXAMPLE_MEL_PATH : &'static str = "/home/bt/dev/2nd/voder/data/mels/trump_2018_02_15-001.mel";
+//const EXAMPLE_MEL_1: &'static str = "/home/bt/dev/voder/data/mels/LJ002-0320.mel";
+const EXAMPLE_MEL_1: &'static str = "/home/bt/dev/voder/tacotron_melgan/mel_file.pt";
+const EXAMPLE_MEL_2 : &'static str = "/home/bt/dev/voder/data/mels/trump_2018_02_15-001.mel";
 
 pub fn load_melgan_model(filename: &str) -> CModule {
   println!("Loading model: {}", filename);
-  tch::CModule::load(WRAPPED_MODEL_PATH).unwrap()
+  tch::CModule::load(filename).unwrap()
+}
+
+pub fn load_wrapped_mel(filename: &str) -> Tensor {
+  println!("Loading wrapped mel file: {}", filename);
+  let module = tch::CModule::load(filename).unwrap();
+  let mut temp = Tensor::zeros(
+    &[10, 10, 10],
+    (tch::Kind::Float, tch::Device::Cpu)
+  );
+  module.forward(&temp)
 }
 
 pub fn load_mel(filename: &str) -> Tensor {
   println!("Loading mel file: {}", filename);
+  // The file format is the same as the one used by the PyTorch C++ API.
   Tensor::load(filename).unwrap()
 }
 
 pub fn run_melgan() {
-  let mel = load_mel(EXAMPLE_MEL_PATH);
+  let mel = load_wrapped_mel(EXAMPLE_MEL_1);
+  println!("Got mel: {:?}", mel);
 
   let mut vs = tch::nn::VarStore::new(tch::Device::Cpu);
   let melgan_model = load_melgan_model(WRAPPED_MODEL_PATH);
