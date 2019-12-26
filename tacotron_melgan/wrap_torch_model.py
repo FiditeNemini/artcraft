@@ -31,8 +31,17 @@ class ResStack(nn.Module):
         # TODO: THIS WON'T WORK
         #for block, shortcut in zip(self.blocks, self.shortcuts):
         #    x = shortcut(x) + block(x)
+        #for block in self.blocks:
+        #    x = block(x)
+        #    for shortcut in self.shortcuts:
+        #        x = shortcut(x)
+        #for i in range(len(self.blocks)):
+        #    x = self.blocks[i](x)
+        #zipped = zip(self.blocks, self.shortcuts)
         for block in self.blocks:
             x = block(x)
+        #for shortcut in self.shortcuts:
+        #    x = shortcut(x)
         return x
 
     # TODO: Looks unnecessary. Remove once this works.

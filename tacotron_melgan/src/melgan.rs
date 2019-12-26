@@ -3,7 +3,6 @@ use tch::CModule;
 use tch;
 use tch::nn::Module;
 
-
 //const TACOTRON_MODEL_PATH : &'static str = "/home/bt/models/tacotron2-nvidia/tacotron2_statedict.pt";
 //const MELGAN_MODEL_PATH : &'static str = "/home/bt/models/melgan-swpark/firstgo_a7c2351_1100.pt";
 const WRAPPED_MODEL_PATH : &'static str = "/home/bt/dev/voder/tacotron_melgan/container.pt";
@@ -12,6 +11,11 @@ const WRAPPED_MODEL_PATH : &'static str = "/home/bt/dev/voder/tacotron_melgan/co
 //const EXAMPLE_MEL_1: &'static str = "/home/bt/dev/voder/data/mels/LJ002-0320.mel";
 const EXAMPLE_MEL_1: &'static str = "/home/bt/dev/voder/data/mels/LJ002-0320.mel.containerized.pt";
 const EXAMPLE_MEL_2 : &'static str = "/home/bt/dev/voder/data/mels/trump_2018_02_15-001.mel";
+
+const MAX_WAV_VALUE : f32 = 32768.0f32;
+
+// TODO: This is an hparam and should be dynamic.
+const HOP_LENGTH : i64 = 256;
 
 pub fn load_melgan_model(filename: &str) -> CModule {
   println!("Loading model: {}", filename);
@@ -53,19 +57,66 @@ pub fn run_melgan() {
 
   println!("Result tensor: {:?}", output);
 
-  let flat = output.squeeze();
+  let mut flat_audio_tensor = output.squeeze();
 
-  println!("Sqeueezed tensor: {:?}, dim: {}", flat, flat.dim());
+  println!("Sqeueezed tensor: {:?}, dim: {}",
+    flat_audio_tensor,
+    flat_audio_tensor.dim());
 
-  let length = flat.size1().unwrap() as usize;
+  let length = flat_audio_tensor.size1().unwrap() as usize;
   println!("Length: {}", length);
+
+  /*
+      def inference(self, mel):
+        hop_length = 256
+        # pad input mel with zeros to cut artifact
+        # see https://github.com/seungwonpark/melgan/issues/8
+        zero = torch.full((1, self.mel_channel, 10), -11.5129).to(mel.device)
+        mel = torch.cat((mel, zero), dim=2)
+
+        audio = self.forward(mel)
+        audio = audio.squeeze() # collapse all dimension except time axis
+        audio = audio[:-(hop_length*10)]
+        audio = MAX_WAV_VALUE * audio
+        audio = audio.clamp(min=-MAX_WAV_VALUE, max=MAX_WAV_VALUE-1)
+        audio = audio.short()
+
+        return audio
+  */
+
+  // Hmm, this isn't flat.
+  println!("Tensor Data: {:?}", flat_audio_tensor.get(0));
+  println!("Tensor Data: {:?}", flat_audio_tensor.get(100));
+  println!("Tensor Data: {:?}", flat_audio_tensor.get(2000));
+  println!("Tensor Data: {:?}", flat_audio_tensor.get(5000));
+  println!("Tensor Data: {:?}", flat_audio_tensor.get(10000));
+
+  //let trim_back = HOP_LENGTH * 10;
+  //let new_size = length as i64 - trim_back;
+  //println!("Old size: {}", length);
+  //println!("New size: {}", new_size);
+  //flat_audio_tensor = flat_audio_tensor.resize_(&[new_size]);
+
+  flat_audio_tensor = flat_audio_tensor * MAX_WAV_VALUE as f64;
+
+  println!("Mul Tensor Data: {:?}", flat_audio_tensor.get(0));
+  println!("Mul Tensor Data: {:?}", flat_audio_tensor.get(100));
+  println!("Mul Tensor Data: {:?}", flat_audio_tensor.get(2000));
+  println!("Mul Tensor Data: {:?}", flat_audio_tensor.get(5000));
+  println!("Mul Tensor Data: {:?}", flat_audio_tensor.get(10000));
 
   let mut data : Vec<f32> = Vec::with_capacity(length);
   for i in 0 .. length {
     data.push(0.0f32);
   }
 
-  flat.copy_data(data.as_mut_slice(), length as usize);
+  flat_audio_tensor.copy_data(data.as_mut_slice(), length as usize);
+
+  println!("Data: {:?}", data.get(0));
+  println!("Data: {:?}", data.get(100));
+  println!("Data: {:?}", data.get(2000));
+  println!("Data: {:?}", data.get(5000));
+  println!("Data: {:?}", data.get(10000));
 
   let spec = hound::WavSpec {
     channels: 1,
@@ -74,9 +125,10 @@ pub fn run_melgan() {
     sample_format: hound::SampleFormat::Float,
   };
 
-  let mut writer = hound::WavWriter::create("output.wav", spec).unwrap();
+  let mut writer = hound::WavWriter::create("melgan_output.wav", spec).unwrap();
 
   for sample in data {
+    let sample = MAX_WAV_VALUE * sample;
     writer.write_sample(sample).unwrap();
   }
 
