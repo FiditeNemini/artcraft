@@ -1,5 +1,6 @@
-extern crate tch;
 extern crate hound;
+extern crate rand;
+extern crate tch;
 
 use tch::vision::imagenet;
 use tch::vision::resnet;

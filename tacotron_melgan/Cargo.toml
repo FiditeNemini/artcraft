@@ -10,4 +10,5 @@ path = "src/main.rs"
 
 [dependencies]
 hound = "3.4.0" # wav codec
+rand = "0.7.2" # random sampling for testing (TODO: temp)
 tch = "0.1.3" # libtorch bindings (pytorch)

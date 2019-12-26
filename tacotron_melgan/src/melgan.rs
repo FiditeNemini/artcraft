@@ -3,6 +3,8 @@ use tch::CModule;
 use tch;
 use tch::nn::Module;
 
+use rand::Rng;
+
 //const TACOTRON_MODEL_PATH : &'static str = "/home/bt/models/tacotron2-nvidia/tacotron2_statedict.pt";
 //const MELGAN_MODEL_PATH : &'static str = "/home/bt/models/melgan-swpark/firstgo_a7c2351_1100.pt";
 const WRAPPED_MODEL_PATH : &'static str = "/home/bt/dev/voder/tacotron_melgan/container.pt";
@@ -117,6 +119,12 @@ pub fn run_melgan() {
   println!("Data: {:?}", data.get(2000));
   println!("Data: {:?}", data.get(5000));
   println!("Data: {:?}", data.get(10000));
+
+  let mut rng = rand::thread_rng();
+  for _ in 0..30 {
+    let ri = rng.gen_range(0, length);
+    println!("data[{}]: {:?}", ri, data.get(ri as usize));
+  }
 
   let spec = hound::WavSpec {
     channels: 1,
