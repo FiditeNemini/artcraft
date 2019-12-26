@@ -1152,6 +1152,7 @@ dependencies = [
 name = "tacotron_melgan"
 version = "0.0.1"
 dependencies = [
+ "hound 3.4.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "tch 0.1.3 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 

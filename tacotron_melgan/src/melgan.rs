@@ -3,14 +3,14 @@ use tch::CModule;
 use tch;
 use tch::nn::Module;
 
+
 //const TACOTRON_MODEL_PATH : &'static str = "/home/bt/models/tacotron2-nvidia/tacotron2_statedict.pt";
 //const MELGAN_MODEL_PATH : &'static str = "/home/bt/models/melgan-swpark/firstgo_a7c2351_1100.pt";
-//const WRAPPED_MODEL_PATH : &'static str = "/home/bt/dev/voder/tacotron_melgan/container.pt";
-const WRAPPED_MODEL_PATH : &'static str = "/home/bt/dev/voder/tacotron_melgan/cpu_container.pt";
+const WRAPPED_MODEL_PATH : &'static str = "/home/bt/dev/voder/tacotron_melgan/container.pt";
+//const WRAPPED_MODEL_PATH : &'static str = "/home/bt/dev/voder/tacotron_melgan/cpu_container.pt";
 
-// TODO: This isn't working because I need mels in the format of a torch tensor. Not python pickle file
 //const EXAMPLE_MEL_1: &'static str = "/home/bt/dev/voder/data/mels/LJ002-0320.mel";
-const EXAMPLE_MEL_1: &'static str = "/home/bt/dev/voder/tacotron_melgan/mel_file.pt";
+const EXAMPLE_MEL_1: &'static str = "/home/bt/dev/voder/data/mels/LJ002-0320.mel.containerized.pt";
 const EXAMPLE_MEL_2 : &'static str = "/home/bt/dev/voder/data/mels/trump_2018_02_15-001.mel";
 
 pub fn load_melgan_model(filename: &str) -> CModule {
@@ -18,6 +18,14 @@ pub fn load_melgan_model(filename: &str) -> CModule {
   tch::CModule::load(filename).unwrap()
 }
 
+/// This is a _HACK_ to load a single Tensor.
+///
+/// It seems currently impossible to load tensors into tch.rs (libtorch),
+/// (eg with 'Tensor::load(filename)') that are saved from pytorch. They
+/// use different serialization formats. Luckily, I can embed a tensor in
+/// a JIT module and unpack it from there instead. The most
+/// straightforward way of getting it out is to define a 'forward()'
+/// method that simply returns the wrapped tensor.
 pub fn load_wrapped_mel(filename: &str) -> Tensor {
   println!("Loading wrapped mel file: {}", filename);
   let module = tch::CModule::load(filename).unwrap();
@@ -28,20 +36,50 @@ pub fn load_wrapped_mel(filename: &str) -> Tensor {
   module.forward(&temp)
 }
 
-pub fn load_mel(filename: &str) -> Tensor {
-  println!("Loading mel file: {}", filename);
-  // The file format is the same as the one used by the PyTorch C++ API.
-  Tensor::load(filename).unwrap()
-}
-
 pub fn run_melgan() {
-  let mel = load_wrapped_mel(EXAMPLE_MEL_1);
-  println!("Got mel: {:?}", mel);
+  let mut mel = load_wrapped_mel(EXAMPLE_MEL_1);
+  println!("Got mel: {:?} of dim {}", mel, mel.dim());
+
+  if mel.dim() == 2 {
+    println!("mel unsqeeze");
+    mel = mel.unsqueeze(0);
+  }
 
   let mut vs = tch::nn::VarStore::new(tch::Device::Cpu);
   let melgan_model = load_melgan_model(WRAPPED_MODEL_PATH);
 
-  let output = melgan_model.forward_ts(&[mel.unsqueeze(0)]).unwrap();
+  println!("Evaluating model...");
+  let output = melgan_model.forward(&mel);
+
+  println!("Result tensor: {:?}", output);
+
+  let flat = output.squeeze();
+
+  println!("Sqeueezed tensor: {:?}, dim: {}", flat, flat.dim());
+
+  let length = flat.size1().unwrap() as usize;
+  println!("Length: {}", length);
+
+  let mut data : Vec<f32> = Vec::with_capacity(length);
+  for i in 0 .. length {
+    data.push(0.0f32);
+  }
+
+  flat.copy_data(data.as_mut_slice(), length as usize);
+
+  let spec = hound::WavSpec {
+    channels: 1,
+    sample_rate: 16000,
+    bits_per_sample: 32,
+    sample_format: hound::SampleFormat::Float,
+  };
+
+  let mut writer = hound::WavWriter::create("output.wav", spec).unwrap();
+
+  for sample in data {
+    writer.write_sample(sample).unwrap();
+  }
+
 
   /*println!("Tacotron2 + MelGan");
 

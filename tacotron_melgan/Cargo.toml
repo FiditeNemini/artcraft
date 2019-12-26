@@ -9,4 +9,5 @@ name = "tacotron_melgan"
 path = "src/main.rs"
 
 [dependencies]
+hound = "3.4.0" # wav codec
 tch = "0.1.3" # libtorch bindings (pytorch)

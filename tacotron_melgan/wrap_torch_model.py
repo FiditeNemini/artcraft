@@ -112,8 +112,9 @@ class Container(torch.nn.Module):
 
 
 print('Loading melgan model...')
-melgan_model_file = '/home/bt/models/melgan-swpark/firstgo_a7c2351_1100.pt'
-melgan_model = torch.load(melgan_model_file)
+#melgan_model_file = '/home/bt/models/melgan-swpark/firstgo_a7c2351_1100.pt'
+melgan_model_file = '/home/bt/models/firstgo_a7c2351_1100.pt'
+melgan_model = torch.load(melgan_model_file, map_location=torch.device('cpu'))
 
 def cuda_to_cpu(model):
     """Recursively make everything non-CUDA"""
@@ -141,7 +142,7 @@ graph = {
     # NB: You can't save a toplevel dictionary of dictionaries,
     # like so: 'melgan': melgan_model,
     # Per inference.py, it looks like only model_g is used.
-    #'melgan_model_g': melgan_model['model_g'], # NB: keeping this out to load below.
+    'melgan_model_g': melgan_model['model_g'], # NB: keeping this out to load below.
     #'melgan_model_d': melgan_model['model_d'],
     #'melgan_optim_g': melgan_model['optim_g'],
     #'melgan_optim_d': melgan_model['optim_d'],
