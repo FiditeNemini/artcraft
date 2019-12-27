@@ -5,8 +5,8 @@ import torch
 from torch.autograd import Variable
 from torch import nn
 from torch.nn import functional as F
-from layers import ConvNorm, LinearNorm
-from utils import to_gpu, get_mask_from_lengths
+#from layers import ConvNorm, LinearNorm
+#from utils import to_gpu, get_mask_from_lengths
 
 class LocationLayer(nn.Module):
     def __init__(self, attention_n_filters, attention_kernel_size,
@@ -31,6 +31,8 @@ class Attention(nn.Module):
     def __init__(self, attention_rnn_dim, embedding_dim, attention_dim,
                  attention_location_n_filters, attention_location_kernel_size):
         super(Attention, self).__init__()
+        # TODO(TEMP)
+        """
         self.query_layer = LinearNorm(attention_rnn_dim, attention_dim,
                                       bias=False, w_init_gain='tanh')
         self.memory_layer = LinearNorm(embedding_dim, attention_dim, bias=False,
@@ -39,6 +41,7 @@ class Attention(nn.Module):
         self.location_layer = LocationLayer(attention_location_n_filters,
                                             attention_location_kernel_size,
                                             attention_dim)
+        """
         self.score_mask_value = -float("inf")
 
     def get_alignment_energies(self, query, processed_memory,
@@ -91,9 +94,12 @@ class Prenet(nn.Module):
     def __init__(self, in_dim, sizes):
         super(Prenet, self).__init__()
         in_sizes = [in_dim] + sizes[:-1]
+        # TODO(TEMP)
+        """
         self.layers = nn.ModuleList(
             [LinearNorm(in_size, out_size, bias=False)
              for (in_size, out_size) in zip(in_sizes, sizes)])
+        """
 
     def forward(self, x):
         for linear in self.layers:
@@ -110,6 +116,8 @@ class Postnet(nn.Module):
         super(Postnet, self).__init__()
         self.convolutions = nn.ModuleList()
 
+        # TODO(TEMP)
+        """
         self.convolutions.append(
             nn.Sequential(
                 ConvNorm(hparams.n_mel_channels, hparams.postnet_embedding_dim,
@@ -138,6 +146,7 @@ class Postnet(nn.Module):
                          dilation=1, w_init_gain='linear'),
                 nn.BatchNorm1d(hparams.n_mel_channels))
             )
+        """
 
     def forward(self, x):
         for i in range(len(self.convolutions) - 1):
@@ -155,6 +164,8 @@ class Encoder(nn.Module):
     def __init__(self, hparams):
         super(Encoder, self).__init__()
 
+        # TODO(TEMP)
+        """
         convolutions = []
         for _ in range(hparams.encoder_n_convolutions):
             conv_layer = nn.Sequential(
@@ -166,6 +177,7 @@ class Encoder(nn.Module):
                 nn.BatchNorm1d(hparams.encoder_embedding_dim))
             convolutions.append(conv_layer)
         self.convolutions = nn.ModuleList(convolutions)
+        """
 
         self.lstm = nn.LSTM(hparams.encoder_embedding_dim,
                             int(hparams.encoder_embedding_dim / 2), 1,
@@ -233,6 +245,8 @@ class Decoder(nn.Module):
             hparams.attention_rnn_dim + hparams.encoder_embedding_dim,
             hparams.decoder_rnn_dim, 1)
 
+        # TODO(TEMP)
+        """
         self.linear_projection = LinearNorm(
             hparams.decoder_rnn_dim + hparams.encoder_embedding_dim,
             hparams.n_mel_channels * hparams.n_frames_per_step)
@@ -240,6 +254,7 @@ class Decoder(nn.Module):
         self.gate_layer = LinearNorm(
             hparams.decoder_rnn_dim + hparams.encoder_embedding_dim, 1,
             bias=True, w_init_gain='sigmoid')
+        """
 
     def get_go_frame(self, memory):
         """ Gets all zeros frames to use as first decoder input
@@ -463,12 +478,13 @@ class Tacotron2(nn.Module):
         self.n_mel_channels = hparams.n_mel_channels
         self.n_frames_per_step = hparams.n_frames_per_step
 
-        print(">> n_symbols: {}".format(hparams.n_symbols))
-        print(">> symbols_embedding_dim: {}".format(hparams.symbols_embedding_dim))
+        #print(">> n_symbols: {}".format(hparams.n_symbols))
+        #print(">> symbols_embedding_dim: {}".format(hparams.symbols_embedding_dim))
 
         # https://pytorch.org/docs/stable/tensors.html
         #torch.set_default_tensor_type('torch.HalfTensor')
-        torch.set_default_tensor_type('torch.DoubleTensor')
+        #torch.set_default_tensor_type('torch.DoubleTensor')
+
         self.embedding = nn.Embedding(
             hparams.n_symbols, hparams.symbols_embedding_dim)
 

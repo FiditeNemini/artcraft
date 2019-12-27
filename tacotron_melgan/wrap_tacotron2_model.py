@@ -9,6 +9,8 @@ import re
 import yaml
 from math import sqrt
 
+from tacotron_model import Tacotron2
+
 print('Loading tacotron model...')
 #melgan_model_file = '/home/bt/models/melgan-swpark/firstgo_a7c2351_3650.pt'
 tacotron_model_file = '/home/bt/models/tacotron2-nvidia/tacotron2_statedict.pt'
@@ -39,21 +41,29 @@ print(tacotron_model.keys())
 print('Containerizing model...')
 # Save arbitrary values supported by TorchScript
 # https://pytorch.org/docs/master/jit.html#supported-type
-#graph = {
-#    # NB: You can't save a toplevel dictionary of dictionaries,
-#    # like so: 'melgan': melgan_model,
-#    # Per inference.py, it looks like only model_g is used.
-#    'melgan_model_g': melgan_model['model_g'], # NB: keeping this out to load below.
-#    #'melgan_model_d': melgan_model['model_d'],
-#    #'melgan_optim_g': melgan_model['optim_g'],
-#    #'melgan_optim_d': melgan_model['optim_d'],
-#    'melgan_step': melgan_model['step'],
-#    'melgan_epoch': melgan_model['epoch'],
-#    'melgan_hp_str': melgan_model['hp_str'],
-#    'melgan_githash': melgan_model['githash'],
-#}
 
-module = Tacotron2()
+class HParams:
+    mask_padding = True
+    fp16_run = False
+    n_mel_channels = 80
+    n_frames_per_step = 1
+    n_symbols = 148 # NB: Determined by running inference
+    symbols_embedding_dim = 512
+    encoder_kernel_size = 5
+    encoder_n_convolutions = 3
+    encoder_embedding_dim = 512
+    attention_rnn_dim = 1024
+    decoder_rnn_dim = 1024
+    prenet_dim = 256
+    max_decoder_steps = 1000
+    gate_threshold = 0.5
+    p_attention_dropout = 0.1
+    p_decoder_dropout = 0.1
+    attention_dim = 128
+    attention_location_n_filters = 32
+    attention_location_kernel_size = 31
+
+module = Tacotron2(HParams())
 
 print('Load state dict...')
 module.load_state_dict(tacotron_model['state_dict'])
