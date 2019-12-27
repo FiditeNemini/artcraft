@@ -5,7 +5,7 @@ import torch
 from torch.autograd import Variable
 from torch import nn
 from torch.nn import functional as F
-#from layers import ConvNorm, LinearNorm
+from layers import ConvNorm, LinearNorm
 #from utils import to_gpu, get_mask_from_lengths
 
 class LocationLayer(nn.Module):
@@ -31,8 +31,6 @@ class Attention(nn.Module):
     def __init__(self, attention_rnn_dim, embedding_dim, attention_dim,
                  attention_location_n_filters, attention_location_kernel_size):
         super(Attention, self).__init__()
-        # TODO(TEMP)
-        """
         self.query_layer = LinearNorm(attention_rnn_dim, attention_dim,
                                       bias=False, w_init_gain='tanh')
         self.memory_layer = LinearNorm(embedding_dim, attention_dim, bias=False,
@@ -41,7 +39,6 @@ class Attention(nn.Module):
         self.location_layer = LocationLayer(attention_location_n_filters,
                                             attention_location_kernel_size,
                                             attention_dim)
-        """
         self.score_mask_value = -float("inf")
 
     def get_alignment_energies(self, query, processed_memory,
@@ -94,12 +91,9 @@ class Prenet(nn.Module):
     def __init__(self, in_dim, sizes):
         super(Prenet, self).__init__()
         in_sizes = [in_dim] + sizes[:-1]
-        # TODO(TEMP)
-        """
         self.layers = nn.ModuleList(
             [LinearNorm(in_size, out_size, bias=False)
              for (in_size, out_size) in zip(in_sizes, sizes)])
-        """
 
     def forward(self, x):
         for linear in self.layers:
@@ -164,8 +158,6 @@ class Encoder(nn.Module):
     def __init__(self, hparams):
         super(Encoder, self).__init__()
 
-        # TODO(TEMP)
-        """
         convolutions = []
         for _ in range(hparams.encoder_n_convolutions):
             conv_layer = nn.Sequential(
@@ -177,7 +169,6 @@ class Encoder(nn.Module):
                 nn.BatchNorm1d(hparams.encoder_embedding_dim))
             convolutions.append(conv_layer)
         self.convolutions = nn.ModuleList(convolutions)
-        """
 
         self.lstm = nn.LSTM(hparams.encoder_embedding_dim,
                             int(hparams.encoder_embedding_dim / 2), 1,
@@ -245,8 +236,6 @@ class Decoder(nn.Module):
             hparams.attention_rnn_dim + hparams.encoder_embedding_dim,
             hparams.decoder_rnn_dim, 1)
 
-        # TODO(TEMP)
-        """
         self.linear_projection = LinearNorm(
             hparams.decoder_rnn_dim + hparams.encoder_embedding_dim,
             hparams.n_mel_channels * hparams.n_frames_per_step)
@@ -254,7 +243,6 @@ class Decoder(nn.Module):
         self.gate_layer = LinearNorm(
             hparams.decoder_rnn_dim + hparams.encoder_embedding_dim, 1,
             bias=True, w_init_gain='sigmoid')
-        """
 
     def get_go_frame(self, memory):
         """ Gets all zeros frames to use as first decoder input
@@ -519,7 +507,8 @@ class Tacotron2(nn.Module):
 
             outputs[0].data.masked_fill_(mask, 0.0)
             # NB(bt): No postnet. outputs[1].data.masked_fill_(mask, 0.0)
-            outputs[2].data.masked_fill_(mask[:, 0, :], 1e3)  # gate energies
+            #outputs[2].data.masked_fill_(mask[:, 0, :], 1e3)  # gate energies
+            outputs[1].data.masked_fill_(mask[:, 0, :], 1e3)  # gate energies
 
         return outputs
 
@@ -556,7 +545,7 @@ class Tacotron2(nn.Module):
         outputs = self.parse_output(
             [
               mel_outputs,
-              None, #mel_outputs_postnet,
+              #mel_outputs_postnet,
               gate_outputs,
               alignments
             ])

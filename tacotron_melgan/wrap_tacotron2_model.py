@@ -44,7 +44,6 @@ for key, value in tacotron_model['state_dict'].items():
 
 tacotron_model['state_dict'] = OrderedDict(new_state_dict)
 
-
 print(type(tacotron_model))
 print(tacotron_model.keys())
 
@@ -81,11 +80,11 @@ module.load_state_dict(tacotron_model['state_dict'])
 
 print('JIT model...')
 mel_file = '/home/bt/dev/voder/data/mels/LJ002-0320.mel'
-example = torch.load(mel_file, map_location=torch.device('cpu'))
-traced_script_module = torch.jit.trace(module, example)
-traced_script_module.save("container2.pt")
+example = torch.load(mel_file, map_location=torch.device('cpu')) # TODO
+#traced_script_module = torch.jit.trace(module, example)
+#traced_script_module.save("tacotron_container2.pt")
 
 #print('Saving model...')
-#container = torch.jit.script(module)
-#container.save("container.pt")
+container = torch.jit.script(module)
+container.save("tacotron_container.pt")
 
