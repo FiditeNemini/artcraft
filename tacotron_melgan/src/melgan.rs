@@ -7,12 +7,12 @@ use rand::Rng;
 
 //const TACOTRON_MODEL_PATH : &'static str = "/home/bt/models/tacotron2-nvidia/tacotron2_statedict.pt";
 //const MELGAN_MODEL_PATH : &'static str = "/home/bt/models/melgan-swpark/firstgo_a7c2351_1100.pt";
-const WRAPPED_MODEL_PATH : &'static str = "/home/bt/dev/voder/tacotron_melgan/container.pt";
+const WRAPPED_MODEL_PATH : &'static str = "/home/bt/dev/voder/tacotron_melgan/container2.pt";
 //const WRAPPED_MODEL_PATH : &'static str = "/home/bt/dev/voder/tacotron_melgan/cpu_container.pt";
 
 //const EXAMPLE_MEL_1: &'static str = "/home/bt/dev/voder/data/mels/LJ002-0320.mel";
 const EXAMPLE_MEL_1: &'static str = "/home/bt/dev/voder/data/mels/LJ002-0320.mel.containerized.pt";
-const EXAMPLE_MEL_2 : &'static str = "/home/bt/dev/voder/data/mels/trump_2018_02_15-001.mel";
+const EXAMPLE_MEL_2 : &'static str = "/home/bt/dev/voder/data/mels/trump_2018_02_15-001.mel.containerized.pt";
 
 const MAX_WAV_VALUE : f32 = 32768.0f32;
 
@@ -158,9 +158,9 @@ pub fn run_melgan() {
     writer.write_sample(sample).unwrap();
   }
 
-  println!("Testing model speed. Evaluating ten times.");
+  /*println!("Testing model speed. Evaluating ten times.");
   for i in 0..10 {
     println!("Exec {}", i);
     let _ = melgan_model.forward(&mel);
-  }
+  }*/
 }

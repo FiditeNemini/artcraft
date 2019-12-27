@@ -122,7 +122,8 @@ class Container(torch.nn.Module):
 
 print('Loading melgan model...')
 #melgan_model_file = '/home/bt/models/melgan-swpark/firstgo_a7c2351_1100.pt'
-melgan_model_file = '/home/bt/models/firstgo_a7c2351_1100.pt'
+#melgan_model_file = '/home/bt/models/firstgo_a7c2351_1100.pt'
+melgan_model_file = '/home/bt/models/melgan-swpark/firstgo_a7c2351_3650.pt'
 melgan_model = torch.load(melgan_model_file, map_location=torch.device('cpu'))
 
 def cuda_to_cpu(model):
@@ -191,7 +192,7 @@ print('JIT model...')
 mel_file = '/home/bt/dev/voder/data/mels/LJ002-0320.mel'
 example = torch.load(mel_file, map_location=torch.device('cpu'))
 traced_script_module = torch.jit.trace(module, example)
-traced_script_module.save("container.pt")
+traced_script_module.save("container2.pt")
 #container = torch.jit.script(module)
 
 #print('Saving model...')
