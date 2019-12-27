@@ -494,7 +494,8 @@ class Tacotron2(nn.Module):
         self.embedding.weight.data.uniform_(-val, val)
         self.encoder = Encoder(hparams)
         self.decoder = Decoder(hparams)
-        self.postnet = Postnet(hparams)
+        # NB(bt): Postnet does not seem to have different output per inference experiments
+        #self.postnet = Postnet(hparams)
 
     def parse_batch(self, batch):
         text_padded, input_lengths, mel_padded, gate_padded, \
@@ -517,7 +518,7 @@ class Tacotron2(nn.Module):
             mask = mask.permute(1, 0, 2)
 
             outputs[0].data.masked_fill_(mask, 0.0)
-            outputs[1].data.masked_fill_(mask, 0.0)
+            # NB(bt): No postnet. outputs[1].data.masked_fill_(mask, 0.0)
             outputs[2].data.masked_fill_(mask[:, 0, :], 1e3)  # gate energies
 
         return outputs
@@ -541,24 +542,23 @@ class Tacotron2(nn.Module):
             output_lengths)
 
     def inference(self, inputs):
-        print(">>> Inputs: ")
-        print(inputs)
-        print(inputs.dtype)
-        print(self.embedding)
-        torch.set_default_tensor_type('torch.DoubleTensor')
+        #torch.set_default_tensor_type('torch.DoubleTensor')
         temp = self.embedding(inputs)
-        print('>>> Temp:')
-        print(temp)
-        print(temp.dtype)
         embedded_inputs = temp.transpose(1, 2)
         encoder_outputs = self.encoder.inference(embedded_inputs)
         mel_outputs, gate_outputs, alignments = self.decoder.inference(
             encoder_outputs)
 
-        mel_outputs_postnet = self.postnet(mel_outputs)
-        mel_outputs_postnet = mel_outputs + mel_outputs_postnet
+        # TODO(bt): The postnet seemed to produce the *same* output, but perhaps not necessary
+        #mel_outputs_postnet = self.postnet(mel_outputs)
+        #mel_outputs_postnet = mel_outputs + mel_outputs_postnet
 
         outputs = self.parse_output(
-            [mel_outputs, mel_outputs_postnet, gate_outputs, alignments])
+            [
+              mel_outputs,
+              None, #mel_outputs_postnet,
+              gate_outputs,
+              alignments
+            ])
 
         return outputs

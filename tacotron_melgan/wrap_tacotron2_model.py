@@ -35,6 +35,16 @@ def cuda_to_cpu(model):
 print('Converitng to CPU model...')
 tacotron_model = cuda_to_cpu(tacotron_model)
 
+print('Remove unused keys...')
+new_state_dict = [] # Rebuild the ordered dict
+for key, value in tacotron_model['state_dict'].items():
+    if key.startswith('postnet'):
+        continue
+    new_state_dict.append((key, value))
+
+tacotron_model['state_dict'] = OrderedDict(new_state_dict)
+
+
 print(type(tacotron_model))
 print(tacotron_model.keys())
 
