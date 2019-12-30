@@ -6,8 +6,8 @@ use tch;
 use rand::Rng;
 
 use model::{
-  load_model,
-  load_wrapped_tensor,
+  load_model_file,
+  load_wrapped_tensor_file,
 };
 
 const WRAPPED_MODEL_PATH : &'static str = "/home/bt/dev/voder/tacotron_melgan/container2.pt";
@@ -16,6 +16,7 @@ const EXAMPLE_MEL_1: &'static str = "/home/bt/dev/voder/data/mels/LJ002-0320.mel
 const EXAMPLE_MEL_2 : &'static str = "/home/bt/dev/voder/data/mels/trump_2018_02_15-001.mel.containerized.pt";
 
 pub const MAX_WAV_VALUE : f32 = 32768.0f32;
+pub const HALF_WAV_VALUE : f32 = MAX_WAV_VALUE * 0.5f32;
 
 // TODO: This is an hparam and should be dynamic.
 pub const HOP_LENGTH : i64 = 256;
@@ -58,7 +59,7 @@ fn debug_print_sample(audio: &Vec<f32>, num_samples: usize) {
 }
 
 pub fn run_melgan_network() {
-  let mut mel = load_wrapped_tensor(EXAMPLE_MEL_1);
+  let mut mel = load_wrapped_tensor_file(EXAMPLE_MEL_1);
   println!("Got mel: {:?} of dim {}", mel, mel.dim());
 
   if mel.dim() == 2 {
@@ -66,18 +67,18 @@ pub fn run_melgan_network() {
     mel = mel.unsqueeze(0);
   }
 
-  let melgan_model = load_model(WRAPPED_MODEL_PATH);
+  let melgan_model = load_model_file(WRAPPED_MODEL_PATH);
 
   println!("Evaluating model...");
   let output = melgan_model.forward(&mel);
 
   println!("Result tensor: {:?}", output);
 
-  let data = audio_tensor_to_audio_signal(output);
+  let audio = audio_tensor_to_audio_signal(output);
 
-  debug_print_sample(&data, 10);
+  debug_print_sample(&audio, 10);
 
-  write_audio_file(data, "melgan_output.wav");
+  write_audio_file(audio, "melgan_output.wav");
 }
 
 pub fn write_audio_file(audio_signal: Vec<f32>, filename: &str) {
@@ -91,7 +92,7 @@ pub fn write_audio_file(audio_signal: Vec<f32>, filename: &str) {
   let mut writer = hound::WavWriter::create(filename, spec).unwrap();
 
   for sample in audio_signal {
-    let sample = MAX_WAV_VALUE * sample;
+    let sample = sample * 0.0001f32;
     writer.write_sample(sample).unwrap();
   }
 }
