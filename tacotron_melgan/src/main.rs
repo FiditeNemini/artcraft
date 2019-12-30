@@ -12,5 +12,6 @@ pub mod tacotron;
 
 pub fn main() {
   println!("Tacotron2 + MelGan");
-  melgan::run_melgan();
+  //melgan::run_melgan();
+  tacotron::run_tacotron();
 }

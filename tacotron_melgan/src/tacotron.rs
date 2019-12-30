@@ -1,12 +1,41 @@
+use tch::Tensor;
+use tch::CModule;
+use tch;
+use tch::nn::Module;
 
-const WRAPPED_MODEL_PATH : &'static str = "/home/bt/dev/voder/...";
 
-pub fn load_tacotron_model() {
+const WRAPPED_MODEL_PATH : &'static str = "/home/bt/dev/voder/tacotron_melgan/tacotron_container.pt";
+//const EXAMPLE_TEXT_SEQUENCE : &'static str = "/home/bt/dev/voder/data/text/tacotron_text_sequence.pt";
+const EXAMPLE_TEXT_SEQUENCE : &'static str = "/home/bt/dev/voder/data/text/tacotron_text_sequence.pt.containerized.pt";
+
+pub fn load_tacotron_model(filename: &str) -> CModule {
   // TODO
+  println!("Loading model: {}", filename);
+  tch::CModule::load(filename).unwrap()
 }
 
+pub fn load_wrapped_text(filename: &str) -> Tensor {
+  println!("Loading wrapped text sequence file: {}", filename);
+  let module = tch::CModule::load(filename).unwrap();
+  let mut temp = Tensor::zeros(
+    &[10, 10, 10],
+    (tch::Kind::Float, tch::Device::Cpu)
+  );
+  module.forward(&temp)
+}
+
+
 pub fn run_tacotron() {
-  // TODO
+  let mut text_sequence = load_wrapped_text(EXAMPLE_TEXT_SEQUENCE);
+  println!("Got text_sequence: {:?} of dim {}", text_sequence, text_sequence.dim());
+
+  let mut vs = tch::nn::VarStore::new(tch::Device::Cpu);
+  let tacotron_model = load_tacotron_model(WRAPPED_MODEL_PATH);
+
+  println!("Evaluating model...");
+  let output = tacotron_model.forward(&text_sequence);
+
+  println!("Result tensor: {:?}", output);
 }
 
 /*println!("Tacotron2 + MelGan");
