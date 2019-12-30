@@ -1,7 +1,8 @@
 use hound::SampleFormat;
 use hound::WavSpec;
 use hound::WavWriter;
-use tch::CModule;
+
+use tch::{CModule, Device, Kind};
 use tch::Tensor;
 use tch::nn::Module;
 use tch;
@@ -58,11 +59,40 @@ impl TacoMelModel {
   }
 
   pub fn run_tts(&self, text: &str) -> Vec<f32> {
-    // TODO
-    let text_sequence =
-        load_wrapped_tensor_file("/home/bt/dev/voder/data/text/tacotron_text_sequence.pt.containerized.pt");
+    println!("Text : {:?}", text);
+    /*let text_tensor = Tensor::new()
+        .new_empty(&[text.len() as i64], (Kind::Int16, Device::Cpu));*/
 
-    let mut mel_tensor = self.tacotron_model.forward(&text_sequence);
+    // tensor([[45, 46, 11, 62, 52, 58]]) = "hi you"
+    //tensor: [104, 105, 37, 50, 48, 121, 111, 117]
+    //Text tensor: [45, 46, -22, -9, -11, 62, 52, 58] %20
+    // Text tensor: [45, 46, -16, 62, 52, 58] +
+    // Text tensor: [45, 46, 11, 62, 52, 58]
+    let copied = text.to_string().to_ascii_lowercase();
+    let mut text_buffer : Vec<i64> = Vec::new();
+
+    for ch in copied.chars() {
+      // TODO: HORRIBLE EXPERIMENTAL HACK. Write a formal module to clean and process text
+      let mut v = ch as i64 - 59;
+      if v < 1 {
+        v = 11; // NB: Space
+      }
+      text_buffer.push(v);
+    }
+
+    let text_tensor = Tensor::of_slice(text_buffer.as_slice());
+
+    println!("Text tensor: {:?}", text_tensor);
+
+    /*for ch in text {
+      text_tensor.set
+    }*/
+
+    // TODO
+    /*let text_sequence =
+        load_wrapped_tensor_file("/home/bt/dev/voder/data/text/tacotron_text_sequence.pt.containerized.pt");*/
+
+    let mut mel_tensor = self.tacotron_model.forward(&text_tensor);
     let audio_tensor = self.melgan_model.forward(&mel_tensor);
 
     audio_tensor_to_audio_signal(audio_tensor)
