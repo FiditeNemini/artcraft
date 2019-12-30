@@ -84,13 +84,19 @@ impl TacoMelModel {
 
     println!("Text tensor: {:?}", text_tensor);
 
+    let text_tensor = text_tensor.unsqueeze(0);
+
+    println!("Text tensor unsq: {:?}", text_tensor);
+
     /*for ch in text {
       text_tensor.set
     }*/
 
     // TODO
-    /*let text_sequence =
-        load_wrapped_tensor_file("/home/bt/dev/voder/data/text/tacotron_text_sequence.pt.containerized.pt");*/
+    // Loaded Text tensor: Tensor[[1, 62], Int64]
+    /*let text_tensor =
+        load_wrapped_tensor_file("/home/bt/dev/voder/data/text/tacotron_text_sequence.pt.containerized.pt");
+    println!("Loaded Text tensor: {:?}", text_tensor);*/
 
     let mut mel_tensor = self.tacotron_model.forward(&text_tensor);
     let audio_tensor = self.melgan_model.forward(&mel_tensor);
