@@ -14,10 +14,10 @@ const WRAPPED_MODEL_PATH : &'static str = "/home/bt/dev/voder/tacotron_melgan/co
 const EXAMPLE_MEL_1: &'static str = "/home/bt/dev/voder/data/mels/LJ002-0320.mel.containerized.pt";
 const EXAMPLE_MEL_2 : &'static str = "/home/bt/dev/voder/data/mels/trump_2018_02_15-001.mel.containerized.pt";
 
-const MAX_WAV_VALUE : f32 = 32768.0f32;
+pub const MAX_WAV_VALUE : f32 = 32768.0f32;
 
 // TODO: This is an hparam and should be dynamic.
-const HOP_LENGTH : i64 = 256;
+pub const HOP_LENGTH : i64 = 256;
 
 pub fn load_melgan_model(filename: &str) -> CModule {
   println!("Loading model: {}", filename);
@@ -116,6 +116,22 @@ pub fn process_raw_mel(mel: Tensor) -> Vec<f32> {
   flat_audio_tensor.copy_data(data.as_mut_slice(), length as usize);
 
   data
+}
+
+pub fn write_audio_file(audio_signal: Vec<f32>, filename: &str) {
+  let spec = hound::WavSpec {
+    channels: 1,
+    sample_rate: 16000,
+    bits_per_sample: 32,
+    sample_format: hound::SampleFormat::Float,
+  };
+
+  let mut writer = hound::WavWriter::create(filename, spec).unwrap();
+
+  for sample in audio_signal {
+    let sample = MAX_WAV_VALUE * sample;
+    writer.write_sample(sample).unwrap();
+  }
 }
 
 pub fn run_melgan() {

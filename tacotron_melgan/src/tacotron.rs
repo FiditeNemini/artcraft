@@ -32,10 +32,12 @@ pub fn run_tacotron() {
   let mut vs = tch::nn::VarStore::new(tch::Device::Cpu);
   let tacotron_model = load_tacotron_model(WRAPPED_MODEL_PATH);
 
-  println!("Evaluating model...");
-  let output = tacotron_model.forward(&text_sequence);
+  for i in 0..10 {
+    println!("Evaluating model... {}", i);
+    let output = tacotron_model.forward(&text_sequence);
 
-  println!("Result tensor: {:?}", output);
+    println!("Result tensor: {:?}", output);
+  }
 }
 
 /*println!("Tacotron2 + MelGan");
