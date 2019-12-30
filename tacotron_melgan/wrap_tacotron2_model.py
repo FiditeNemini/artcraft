@@ -81,10 +81,10 @@ module.load_state_dict(tacotron_model['state_dict'])
 print('JIT model...')
 mel_file = '/home/bt/dev/voder/data/mels/LJ002-0320.mel'
 example = torch.load(mel_file, map_location=torch.device('cpu')) # TODO
-#traced_script_module = torch.jit.trace(module, example)
-#traced_script_module.save("tacotron_container2.pt")
+traced_script_module = torch.jit.trace(module, example)
+traced_script_module.save("tacotron_container.pt")
 
 #print('Saving model...')
-container = torch.jit.script(module)
-container.save("tacotron_container.pt")
+#container = torch.jit.script(module)
+#container.save("tacotron_container.pt")
 
