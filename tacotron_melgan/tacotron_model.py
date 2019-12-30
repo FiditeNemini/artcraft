@@ -255,8 +255,8 @@ class Decoder(nn.Module):
         decoder_input: all zeros frames
         """
         B = memory.size(0)
-        decoder_input = Variable(memory.data.new(
-            B, self.n_mel_channels * self.n_frames_per_step).zero_())
+        mem = memory.data.new(B, self.n_mel_channels * self.n_frames_per_step)
+        decoder_input = Variable(mem.zero_())
         return decoder_input
 
     def initialize_decoder_states(self, memory, mask):
@@ -548,4 +548,5 @@ class Tacotron2(nn.Module):
               alignments
             ])
 
-        return outputs
+        #return outputs
+        return outputs[0]
