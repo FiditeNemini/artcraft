@@ -14,9 +14,9 @@ pub mod tacotron;
 pub fn main() {
   println!("Tacotron2 + MelGan");
 
-  //melgan::run_melgan();
+  melgan::run_melgan_network();
   //tacotron::run_tacotron();
-  run_end_to_end();
+  //run_end_to_end();
 }
 
 fn run_end_to_end() {
@@ -32,24 +32,26 @@ fn run_end_to_end() {
   let text_sequence =
       model::load_wrapped_tensor("/home/bt/dev/voder/data/text/tacotron_text_sequence.pt.containerized.pt");
 
-  println!("Evaluating Tacotron Model");
-  let mut mel_tensor = tacotron_model.forward(&text_sequence);
+  for i in 0..10 {
+    println!(">>> Evaluating Tacotron Model {}", i);
+    let mut mel_tensor = tacotron_model.forward(&text_sequence);
 
-  println!("Result mel tensor: {:?}", mel_tensor);
+    println!("Result mel tensor: {:?}", mel_tensor);
 
-  if mel_tensor.dim() == 2 {
-    println!("mel unsqeeze");
-    mel_tensor = mel_tensor.unsqueeze(0);
+    if mel_tensor.dim() == 2 {
+      println!("mel unsqeeze");
+      mel_tensor = mel_tensor.unsqueeze(0);
+    }
+
+    let audio_tensor = melgan_model.forward(&mel_tensor);
+
+    println!("Result audio tensor: {:?}", audio_tensor);
+
+    let audio = melgan::audio_tensor_to_audio_signal(audio_tensor);
+
+    //println!("Writing audio file...");
+    //melgan::write_audio_file(audio, "double_model_results.wav");
+
+    println!("Done.");
   }
-
-  let audio_tensor = melgan_model.forward(&mel_tensor);
-
-  println!("Result audio tensor: {:?}", audio_tensor);
-
-  let audio = melgan::process_raw_mel(audio_tensor);
-
-  println!("Writing audio file...");
-  melgan::write_audio_file(audio, "double_model_results.wav");
-
-  println!("Done.");
 }

@@ -1,16 +1,17 @@
-use tch::Tensor;
 use tch::CModule;
-use tch;
+use tch::Tensor;
 use tch::nn::Module;
+use tch;
 
 use rand::Rng;
 
-//const TACOTRON_MODEL_PATH : &'static str = "/home/bt/models/tacotron2-nvidia/tacotron2_statedict.pt";
-//const MELGAN_MODEL_PATH : &'static str = "/home/bt/models/melgan-swpark/firstgo_a7c2351_1100.pt";
-const WRAPPED_MODEL_PATH : &'static str = "/home/bt/dev/voder/tacotron_melgan/container2.pt";
-//const WRAPPED_MODEL_PATH : &'static str = "/home/bt/dev/voder/tacotron_melgan/cpu_container.pt";
+use model::{
+  load_model,
+  load_wrapped_tensor,
+};
 
-//const EXAMPLE_MEL_1: &'static str = "/home/bt/dev/voder/data/mels/LJ002-0320.mel";
+const WRAPPED_MODEL_PATH : &'static str = "/home/bt/dev/voder/tacotron_melgan/container2.pt";
+
 const EXAMPLE_MEL_1: &'static str = "/home/bt/dev/voder/data/mels/LJ002-0320.mel.containerized.pt";
 const EXAMPLE_MEL_2 : &'static str = "/home/bt/dev/voder/data/mels/trump_2018_02_15-001.mel.containerized.pt";
 
@@ -19,30 +20,7 @@ pub const MAX_WAV_VALUE : f32 = 32768.0f32;
 // TODO: This is an hparam and should be dynamic.
 pub const HOP_LENGTH : i64 = 256;
 
-pub fn load_melgan_model(filename: &str) -> CModule {
-  println!("Loading model: {}", filename);
-  tch::CModule::load(filename).unwrap()
-}
-
-/// This is a _HACK_ to load a single Tensor.
-///
-/// It seems currently impossible to load tensors into tch.rs (libtorch),
-/// (eg with 'Tensor::load(filename)') that are saved from pytorch. They
-/// use different serialization formats. Luckily, I can embed a tensor in
-/// a JIT module and unpack it from there instead. The most
-/// straightforward way of getting it out is to define a 'forward()'
-/// method that simply returns the wrapped tensor.
-pub fn load_wrapped_mel(filename: &str) -> Tensor {
-  println!("Loading wrapped mel file: {}", filename);
-  let module = tch::CModule::load(filename).unwrap();
-  let mut temp = Tensor::zeros(
-    &[10, 10, 10],
-    (tch::Kind::Float, tch::Device::Cpu)
-  );
-  module.forward(&temp)
-}
-
-pub fn process_raw_mel(mel: Tensor) -> Vec<f32> {
+pub fn audio_tensor_to_audio_signal(mel: Tensor) -> Vec<f32> {
   let mut flat_audio_tensor = mel.squeeze();
 
   println!("Sqeueezed tensor: {:?}, dim: {}",
@@ -52,47 +30,6 @@ pub fn process_raw_mel(mel: Tensor) -> Vec<f32> {
   let length = flat_audio_tensor.size1().unwrap() as usize;
   println!("Length: {}", length);
 
-  /*
-      def inference(self, mel):
-        hop_length = 256
-        # pad input mel with zeros to cut artifact
-        # see https://github.com/seungwonpark/melgan/issues/8
-        zero = torch.full((1, self.mel_channel, 10), -11.5129).to(mel.device)
-        mel = torch.cat((mel, zero), dim=2)
-
-        audio = self.forward(mel)
-        audio = audio.squeeze() # collapse all dimension except time axis
-        audio = audio[:-(hop_length*10)]
-        audio = MAX_WAV_VALUE * audio
-        audio = audio.clamp(min=-MAX_WAV_VALUE, max=MAX_WAV_VALUE-1)
-        audio = audio.short()
-
-        return audio
-
-     Should be getting results like these:
-      torch.Size([1, 1, 251392])
-      # Before multiplication by MAX_WAV_VALUE
-      tensor(0.0003)
-      tensor(0.0003)
-      tensor(0.0001)
-      tensor(0.0004)
-      tensor(0.0013)
-      # After multiplication by MAX_WAV_VALUE
-      tensor(9.2422)
-      tensor(10.3533)
-      tensor(4.9135)
-      tensor(13.2481)
-      tensor(42.3114)
-
-  */
-
-  // Hmm, this isn't flat.
-  println!("Tensor Data: {:?}", flat_audio_tensor.get(0));
-  println!("Tensor Data: {:?}", flat_audio_tensor.get(100));
-  println!("Tensor Data: {:?}", flat_audio_tensor.get(2000));
-  println!("Tensor Data: {:?}", flat_audio_tensor.get(5000));
-  println!("Tensor Data: {:?}", flat_audio_tensor.get(10000));
-
   //let trim_back = HOP_LENGTH * 10;
   //let new_size = length as i64 - trim_back;
   //println!("Old size: {}", length);
@@ -100,12 +37,6 @@ pub fn process_raw_mel(mel: Tensor) -> Vec<f32> {
   //flat_audio_tensor = flat_audio_tensor.resize_(&[new_size]);
 
   flat_audio_tensor = flat_audio_tensor * MAX_WAV_VALUE as f64;
-
-  println!("Mul Tensor Data: {:?}", flat_audio_tensor.get(0));
-  println!("Mul Tensor Data: {:?}", flat_audio_tensor.get(100));
-  println!("Mul Tensor Data: {:?}", flat_audio_tensor.get(2000));
-  println!("Mul Tensor Data: {:?}", flat_audio_tensor.get(5000));
-  println!("Mul Tensor Data: {:?}", flat_audio_tensor.get(10000));
 
   let mut data : Vec<f32> = Vec::with_capacity(length);
 
@@ -116,6 +47,37 @@ pub fn process_raw_mel(mel: Tensor) -> Vec<f32> {
   flat_audio_tensor.copy_data(data.as_mut_slice(), length as usize);
 
   data
+}
+
+fn debug_print_sample(audio: &Vec<f32>, num_samples: usize) {
+  let mut rng = rand::thread_rng();
+  for _ in 0..num_samples {
+    let ri = rng.gen_range(0, audio.len());
+    println!("audio_data[{}]: {:?}", ri, audio.get(ri as usize));
+  }
+}
+
+pub fn run_melgan_network() {
+  let mut mel = load_wrapped_tensor(EXAMPLE_MEL_1);
+  println!("Got mel: {:?} of dim {}", mel, mel.dim());
+
+  if mel.dim() == 2 {
+    println!("mel unsqeeze");
+    mel = mel.unsqueeze(0);
+  }
+
+  let melgan_model = load_model(WRAPPED_MODEL_PATH);
+
+  println!("Evaluating model...");
+  let output = melgan_model.forward(&mel);
+
+  println!("Result tensor: {:?}", output);
+
+  let data = audio_tensor_to_audio_signal(output);
+
+  debug_print_sample(&data, 10);
+
+  write_audio_file(data, "melgan_output.wav");
 }
 
 pub fn write_audio_file(audio_signal: Vec<f32>, filename: &str) {
@@ -132,51 +94,4 @@ pub fn write_audio_file(audio_signal: Vec<f32>, filename: &str) {
     let sample = MAX_WAV_VALUE * sample;
     writer.write_sample(sample).unwrap();
   }
-}
-
-pub fn run_melgan() {
-  let mut mel = load_wrapped_mel(EXAMPLE_MEL_1);
-  println!("Got mel: {:?} of dim {}", mel, mel.dim());
-
-  if mel.dim() == 2 {
-    println!("mel unsqeeze");
-    mel = mel.unsqueeze(0);
-  }
-
-  let mut vs = tch::nn::VarStore::new(tch::Device::Cpu);
-  let melgan_model = load_melgan_model(WRAPPED_MODEL_PATH);
-
-  println!("Evaluating model...");
-  let output = melgan_model.forward(&mel);
-
-  println!("Result tensor: {:?}", output);
-
-  let data = process_raw_mel(output);
-
-  let mut rng = rand::thread_rng();
-
-  for _ in 0..30 {
-    let ri = rng.gen_range(0, data.len());
-    println!("data[{}]: {:?}", ri, data.get(ri as usize));
-  }
-
-  let spec = hound::WavSpec {
-    channels: 1,
-    sample_rate: 16000,
-    bits_per_sample: 32,
-    sample_format: hound::SampleFormat::Float,
-  };
-
-  let mut writer = hound::WavWriter::create("melgan_output.wav", spec).unwrap();
-
-  for sample in data {
-    let sample = MAX_WAV_VALUE * sample;
-    writer.write_sample(sample).unwrap();
-  }
-
-  /*println!("Testing model speed. Evaluating ten times.");
-  for i in 0..10 {
-    println!("Exec {}", i);
-    let _ = melgan_model.forward(&mel);
-  }*/
 }
