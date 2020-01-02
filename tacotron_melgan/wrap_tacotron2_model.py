@@ -76,18 +76,25 @@ module = Tacotron2(HParams())
 
 print('Load state dict...')
 module.load_state_dict(tacotron_model['state_dict'])
-module.eval() # NB: Complains unless called `Did you forget call .eval() on your model?`
+#module.eval() # NB: Complains unless called: Did you forget call .eval() on your model?
 
-#print('JIT model...')
-text_sequence_file = '/home/bt/dev/voder/data/text/tacotron_text_sequence.pt'
-#text_sequence_file = '/home/bt/dev/voder/data/mels/LJ002-0320.mel'
-text_sequence = torch.load(text_sequence_file, map_location=torch.device('cpu'))
-# NB: Getting `Tracing failed sanity checks! Graphs differed across invocations!`
-traced_script_module = torch.jit.trace(module, text_sequence, check_trace=False)
-traced_script_module.save("tacotron_container.pt")
+output_filename = 'tacotron_container.pt'
 
-#print('Saving model...')
-#container = torch.jit.script(module)
-#container.save("tacotron_container.pt")
+# NB: Tracing evaluates the model on input and unrolls and hardcodes branching
+# and loops. Scripting allows these to remain by converting the entire program
+# to TorchScript.
+trace_model = False
+if trace_model:
+    print('JIT model...')
+    text_sequence_file = '/home/bt/dev/voder/data/text/tacotron_text_sequence.pt'
+    text_sequence = torch.load(text_sequence_file, map_location=torch.device('cpu'))
+    # NB: Getting `Tracing failed sanity checks! Graphs differed across invocations!`
+    traced_script_module = torch.jit.trace(module, text_sequence, check_trace=False)
+    traced_script_module.save(output_filename)
+else:
+    # TODO(bt): This branch isn't working yet
+    print('Saving model...')
+    container = torch.jit.script(module)
+    container.save(output_filename)
 
 print('Done.')

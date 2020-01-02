@@ -56,6 +56,7 @@ class TacotronSTFT(torch.nn.Module):
         output = dynamic_range_compression(magnitudes)
         return output
 
+    @torch.jit.ignore
     def spectral_de_normalize(self, magnitudes):
         output = dynamic_range_decompression(magnitudes)
         return output

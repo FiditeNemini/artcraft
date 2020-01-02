@@ -64,7 +64,8 @@ class Attention(nn.Module):
         return energies
 
     def forward(self, attention_hidden_state, memory, processed_memory,
-                attention_weights_cat, mask):
+                #attention_weights_cat, mask):
+                attention_weights_cat):
         """
         PARAMS
         ------
@@ -77,8 +78,8 @@ class Attention(nn.Module):
         alignment = self.get_alignment_energies(
             attention_hidden_state, processed_memory, attention_weights_cat)
 
-        if mask is not None:
-            alignment.data.masked_fill_(mask, self.score_mask_value)
+        #if mask is not None:
+        #    alignment.data.masked_fill_(mask, self.score_mask_value)
 
         attention_weights = F.softmax(alignment, dim=1)
         attention_context = torch.bmm(attention_weights.unsqueeze(1), memory)
@@ -200,7 +201,9 @@ class Encoder(nn.Module):
 
         x = x.transpose(1, 2)
 
-        self.lstm.flatten_parameters()
+        # NB(bt): Don't need to flatten, per the method comments:
+        # Right now, this works only if the module is on the GPU and cuDNN is enabled.
+        #self.lstm.flatten_parameters()
         outputs, _ = self.lstm(x)
 
         return outputs
@@ -208,6 +211,20 @@ class Encoder(nn.Module):
 class Decoder(nn.Module):
     def __init__(self, hparams):
         super(Decoder, self).__init__()
+
+        # NB(bt): Initializing these upfront because JIT script fails otherwise:
+        #  "Tried to set nonexistent attribute: attention_hidden.
+        #   Did you forget to initialize it in __init__()?:"
+        self.attention_hidden = torch.zeros(1,1)
+        self.attention_cell = torch.zeros(1, 1)
+        self.decoder_hidden = torch.zeros(1, 1)
+        self.decoder_cell = torch.zeros(1, 1)
+        self.attention_weights = torch.zeros(1, 1)
+        self.attention_weights_cum = torch.zeros(1, 1)
+        self.attention_context = torch.zeros(1, 1)
+        self.memory = torch.zeros(1, 1)
+        self.processed_memory = torch.zeros(1, 1)
+
         self.n_mel_channels = hparams.n_mel_channels
         self.n_frames_per_step = hparams.n_frames_per_step
         self.encoder_embedding_dim = hparams.encoder_embedding_dim
@@ -254,12 +271,20 @@ class Decoder(nn.Module):
         -------
         decoder_input: all zeros frames
         """
-        B = memory.size(0)
-        mem = memory.data.new(B, self.n_mel_channels * self.n_frames_per_step)
-        decoder_input = Variable(mem.zero_())
-        return decoder_input
 
-    def initialize_decoder_states(self, memory, mask):
+        B = memory.size(0)
+        # NB(bt): Rewriting this as it doesn't work with scripting (but
+        # does with tracing).
+        # mem = memory.data.new(B, self.n_mel_channels * self.n_frames_per_step)
+        # decoder_input = Variable(mem.zero_())
+        mem = torch.zeros(B, self.n_mel_channels * self.n_frames_per_step)
+        # NB(bt): I don't think I need a variable as we don't need to do backprop.
+        # decoder_input = Variable(mem)
+        # return decoder_input
+        return mem
+
+    #def initialize_decoder_states(self, memory, mask):
+    def initialize_decoder_states(self, memory):
         """ Initializes attention rnn states, decoder rnn states, attention
         weights, attention cumulative weights, attention context, stores memory
         and stores processed memory
@@ -271,26 +296,35 @@ class Decoder(nn.Module):
         B = memory.size(0)
         MAX_TIME = memory.size(1)
 
-        self.attention_hidden = Variable(memory.data.new(
-            B, self.attention_rnn_dim).zero_())
-        self.attention_cell = Variable(memory.data.new(
-            B, self.attention_rnn_dim).zero_())
+        # NB(bt): Rewriting for scripting
+        #self.attention_hidden = Variable(memory.data.new(
+        #    B, self.attention_rnn_dim).zero_())
+        self.attention_hidden = torch.zeros(B, self.attention_rnn_dim)
+        #self.attention_cell = Variable(memory.data.new(
+        #    B, self.attention_rnn_dim).zero_())
+        self.attention_cell = torch.zeros(B, self.attention_rnn_dim)
 
-        self.decoder_hidden = Variable(memory.data.new(
-            B, self.decoder_rnn_dim).zero_())
-        self.decoder_cell = Variable(memory.data.new(
-            B, self.decoder_rnn_dim).zero_())
+        #self.decoder_hidden = Variable(memory.data.new(
+        #    B, self.decoder_rnn_dim).zero_())
+        self.decoder_hidden = torch.zeros(B, self.decoder_rnn_dim)
+        #self.decoder_cell = Variable(memory.data.new(
+        #    B, self.decoder_rnn_dim).zero_())
+        self.decoder_cell = torch.zeros(B, self.decoder_rnn_dim)
 
-        self.attention_weights = Variable(memory.data.new(
-            B, MAX_TIME).zero_())
-        self.attention_weights_cum = Variable(memory.data.new(
-            B, MAX_TIME).zero_())
-        self.attention_context = Variable(memory.data.new(
-            B, self.encoder_embedding_dim).zero_())
+        #self.attention_weights = Variable(memory.data.new(
+        #    B, MAX_TIME).zero_())
+        self.attention_weights = torch.zeros(B, MAX_TIME)
+        #self.attention_weights_cum = Variable(memory.data.new(
+        #    B, MAX_TIME).zero_())
+        self.attention_weights_cum = torch.zeros(B, MAX_TIME)
+        #self.attention_context = Variable(memory.data.new(
+        #    B, self.encoder_embedding_dim).zero_())
+        self.attention_context = torch.zeros(B, self.encoder_embedding_dim)
 
         self.memory = memory
         self.processed_memory = self.attention_layer.memory_layer(memory)
-        self.mask = mask
+        # NB(bt): Can't set to None in the CTOR as it gets optimized out.
+        # self.mask = mask
 
     def parse_decoder_inputs(self, decoder_inputs):
         """ Prepares decoder inputs, i.e. mel outputs
@@ -326,6 +360,8 @@ class Decoder(nn.Module):
         gate_outpust: gate output energies
         alignments:
         """
+        # type: (List[torch.Tensor], List[torch.Tensor], List[torch.Tensor]) -> Tuple[torch.Tensor, torch.Tensor, torch.Tensor]
+
         # (T_out, B) -> (B, T_out)
         alignments = torch.stack(alignments).transpose(0, 1)
         # (T_out, B) -> (B, T_out)
@@ -354,23 +390,33 @@ class Decoder(nn.Module):
         attention_weights:
         """
         cell_input = torch.cat((decoder_input, self.attention_context), -1)
-        self.attention_hidden, self.attention_cell = self.attention_rnn(
-            cell_input, (self.attention_hidden, self.attention_cell))
+
+        #self.attention_hidden, self.attention_cell = self.attention_rnn(
+        results = self.attention_rnn(cell_input, (self.attention_hidden, self.attention_cell))
+        self.attention_hidden = results[0]
+        self.attention_cell = results[1]
         self.attention_hidden = F.dropout(
             self.attention_hidden, self.p_attention_dropout, self.training)
 
         attention_weights_cat = torch.cat(
             (self.attention_weights.unsqueeze(1),
              self.attention_weights_cum.unsqueeze(1)), dim=1)
-        self.attention_context, self.attention_weights = self.attention_layer(
+        #self.attention_context, self.attention_weights = self.attention_layer(
+        results = self.attention_layer(
             self.attention_hidden, self.memory, self.processed_memory,
-            attention_weights_cat, self.mask)
+            #attention_weights_cat, self.mask)
+            attention_weights_cat)
+        self.attention_context = results[0]
+        self.attention_weights = results[1]
 
         self.attention_weights_cum += self.attention_weights
         decoder_input = torch.cat(
             (self.attention_hidden, self.attention_context), -1)
-        self.decoder_hidden, self.decoder_cell = self.decoder_rnn(
+        #self.decoder_hidden, self.decoder_cell = self.decoder_rnn(
+        results = self.decoder_rnn(
             decoder_input, (self.decoder_hidden, self.decoder_cell))
+        self.decoder_hidden = results[0]
+        self.decoder_cell = results[1]
         self.decoder_hidden = F.dropout(
             self.decoder_hidden, self.p_decoder_dropout, self.training)
 
@@ -433,7 +479,8 @@ class Decoder(nn.Module):
         """
         decoder_input = self.get_go_frame(memory)
 
-        self.initialize_decoder_states(memory, mask=None)
+        #self.initialize_decoder_states(memory, mask=None)
+        self.initialize_decoder_states(memory)
 
         mel_outputs, gate_outputs, alignments = [], [], []
         while True:
@@ -494,7 +541,11 @@ class Tacotron2(nn.Module):
 #            (text_padded, input_lengths, mel_padded, max_len, output_lengths),
 #            (mel_padded, gate_padded))
 #
-    def parse_output(self, outputs, output_lengths=None):
+    #def parse_output(self, outputs, output_lengths=None):
+    def parse_output(self, outputs):
+        # type: (List[torch.Tensor]) -> List[torch.Tensor]
+        # NB(bt): Not calling this currently
+        """
         if self.mask_padding and output_lengths is not None:
             mask = ~get_mask_from_lengths(output_lengths)
             mask = mask.expand(self.n_mel_channels, mask.size(0), mask.size(1))
@@ -504,6 +555,7 @@ class Tacotron2(nn.Module):
             # NB(bt): No postnet. outputs[1].data.masked_fill_(mask, 0.0)
             #outputs[2].data.masked_fill_(mask[:, 0, :], 1e3)  # gate energies
             outputs[1].data.masked_fill_(mask[:, 0, :], 1e3)  # gate energies
+        """
 
         return outputs
 

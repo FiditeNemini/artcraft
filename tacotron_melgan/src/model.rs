@@ -46,11 +46,8 @@ pub struct TacoMelModel {
 impl TacoMelModel {
 
   pub fn create(tacotron_filename: &str, melgan_filename: &str) -> Self {
-    let tacotron_model =
-        load_model_file("/home/bt/dev/voder/tacotron_melgan/tacotron_jit_model_voder_c0cac635.pt");
-
-    let melgan_model =
-        load_model_file("/home/bt/dev/voder/tacotron_melgan/melgan_jit_model_voder_c0cac635.pt");
+    let tacotron_model = load_model_file(tacotron_filename);
+    let melgan_model = load_model_file(melgan_filename);
 
     Self {
       tacotron_model,
