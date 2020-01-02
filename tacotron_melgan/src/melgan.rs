@@ -10,7 +10,7 @@ use model::{
   load_wrapped_tensor_file,
 };
 
-const WRAPPED_MODEL_PATH : &'static str = "/home/bt/dev/voder/tacotron_melgan/container2.pt";
+const WRAPPED_MODEL_PATH : &'static str = "/home/bt/dev/voder/tacotron_melgan/melgan_jit_model_voder_c0cac635.pt";
 
 const EXAMPLE_MEL_1: &'static str = "/home/bt/dev/voder/data/mels/LJ002-0320.mel.containerized.pt";
 const EXAMPLE_MEL_2 : &'static str = "/home/bt/dev/voder/data/mels/trump_2018_02_15-001.mel.containerized.pt";

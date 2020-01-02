@@ -47,10 +47,10 @@ impl TacoMelModel {
 
   pub fn create(tacotron_filename: &str, melgan_filename: &str) -> Self {
     let tacotron_model =
-        load_model_file("/home/bt/dev/voder/tacotron_melgan/tacotron_container.pt");
+        load_model_file("/home/bt/dev/voder/tacotron_melgan/tacotron_jit_model_voder_c0cac635.pt");
 
     let melgan_model =
-        load_model_file("/home/bt/dev/voder/tacotron_melgan/container2.pt");
+        load_model_file("/home/bt/dev/voder/tacotron_melgan/melgan_jit_model_voder_c0cac635.pt");
 
     Self {
       tacotron_model,
@@ -79,6 +79,16 @@ impl TacoMelModel {
       }
       text_buffer.push(v);
     }
+
+    /*let mut text_buffer4: Vec<i64> = Vec::new();
+    text_buffer.push(45);
+    text_buffer.push(46);
+    text_buffer.push(11);
+    text_buffer.push(62);
+    text_buffer.push(52);
+    text_buffer.push(58);*/
+
+    println!("Text buffer: {:?}", text_buffer);
 
     let text_tensor = Tensor::of_slice(text_buffer.as_slice());
 

@@ -4,7 +4,7 @@ use tch;
 use tch::nn::Module;
 
 
-const WRAPPED_MODEL_PATH : &'static str = "/home/bt/dev/voder/tacotron_melgan/tacotron_container.pt";
+const WRAPPED_MODEL_PATH : &'static str = "/home/bt/dev/voder/tacotron_melgan/tacotron_jit_model_voder_c0cac635.pt";
 //const EXAMPLE_TEXT_SEQUENCE : &'static str = "/home/bt/dev/voder/data/text/tacotron_text_sequence.pt";
 const EXAMPLE_TEXT_SEQUENCE : &'static str = "/home/bt/dev/voder/data/text/tacotron_text_sequence.pt.containerized.pt";
 

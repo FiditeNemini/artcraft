@@ -33,11 +33,11 @@ pub fn main() {
 fn run_end_to_end() {
   println!("Load Tacotron Model");
   let tacotron_model =
-      model::load_model_file("/home/bt/dev/voder/tacotron_melgan/tacotron_container.pt");
+      model::load_model_file("/home/bt/dev/voder/tacotron_melgan/tacotron_jit_model_voder_c0cac635.pt");
 
   println!("Load Melgan Model");
   let melgan_model =
-      model::load_model_file("/home/bt/dev/voder/tacotron_melgan/container2.pt");
+      model::load_model_file("/home/bt/dev/voder/tacotron_melgan/melgan_jit_model_voder_c0cac635.pt");
 
   println!("Load Text Sequence Tensor");
   let text_sequence =
