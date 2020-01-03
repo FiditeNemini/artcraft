@@ -57,14 +57,6 @@ impl TacoMelModel {
 
   pub fn run_tts(&self, text: &str) -> Vec<f32> {
     println!("Text : {:?}", text);
-    /*let text_tensor = Tensor::new()
-        .new_empty(&[text.len() as i64], (Kind::Int16, Device::Cpu));*/
-
-    // tensor([[45, 46, 11, 62, 52, 58]]) = "hi you"
-    //tensor: [104, 105, 37, 50, 48, 121, 111, 117]
-    //Text tensor: [45, 46, -22, -9, -11, 62, 52, 58] %20
-    // Text tensor: [45, 46, -16, 62, 52, 58] +
-    // Text tensor: [45, 46, 11, 62, 52, 58]
     let copied = text.to_string().to_ascii_lowercase();
     let mut text_buffer : Vec<i64> = Vec::new();
 
@@ -77,14 +69,6 @@ impl TacoMelModel {
       text_buffer.push(v);
     }
 
-    /*let mut text_buffer4: Vec<i64> = Vec::new();
-    text_buffer.push(45);
-    text_buffer.push(46);
-    text_buffer.push(11);
-    text_buffer.push(62);
-    text_buffer.push(52);
-    text_buffer.push(58);*/
-
     println!("Text buffer: {:?}", text_buffer);
 
     let text_tensor = Tensor::of_slice(text_buffer.as_slice());
@@ -95,17 +79,56 @@ impl TacoMelModel {
 
     println!("Text tensor unsq: {:?}", text_tensor);
 
-    /*for ch in text {
-      text_tensor.set
-    }*/
+    //let mut mel_tensor = self.tacotron_model.forward(&text_tensor);
 
-    // TODO
-    // Loaded Text tensor: Tensor[[1, 62], Int64]
-    /*let text_tensor =
-        load_wrapped_tensor_file("/home/bt/dev/voder/data/text/tacotron_text_sequence.pt.containerized.pt");
-    println!("Loaded Text tensor: {:?}", text_tensor);*/
+    println!("Loading mel...");
+    let mel_tensor
+        = load_wrapped_tensor_file("/home/bt/dev/tacotron-melgan/input_mel.pt.containerized.pt");
 
-    let mut mel_tensor = self.tacotron_model.forward(&text_tensor);
+    println!("\n\n>>> Mel tensor:\n{:?}\n\n", mel_tensor);
+
+    //let repr = mel_tensor.to_string(20000).unwrap();
+    //println!("\n{:?}\n\n", repr);
+
+    /*
+    This is the data from Pytorch: "want to go outside".
+
+      # Text
+      tensor([[60, 38, 51, 57, 11, 57, 52, 11, 44, 52, 11, 52, 58, 57, 56, 46, 41, 42]])
+      # Mel
+      torch.Size([1, 80, 133])
+      torch.float64
+      tensor([[[ -7.3141,  -6.6971,  -6.9072,  ...,  -8.8831,  -8.4337,  -7.9514],
+               [ -6.7884,  -6.0337,  -5.9880,  ...,  -7.4524,  -7.2237,  -7.0247],
+               [ -6.0898,  -5.1923,  -4.8882,  ...,  -6.3464,  -6.3288,  -6.4104],
+               ...,
+               [-10.1161, -10.0742,  -9.8574,  ...,  -9.3989,  -9.4183,  -9.3537],
+               [-10.1554, -10.1308,  -9.9062,  ...,  -9.4762,  -9.4767,  -9.3855],
+               [-10.2204, -10.1800,  -9.9611,  ...,  -9.5313,  -9.5202,  -9.4251]]],
+             grad_fn=<TransposeBackward0>)
+      Minimum: tensor(-11.3642, requires_grad=True)
+      Maximum: tensor(0.4480, requires_grad=True)
+
+    This is the data from Rust: "want to go outside".
+
+      Text : "want%20to%20go%20outside"
+      Text tensor: Tensor[[24], Int64]
+      Text tensor unsq: Tensor[[1, 24], Int64]
+      Text buffer: [60, 38, 51, 57, 11, 11, 11, 57, 52, 11, 11, 11, 44, 52, 11, 11, 11, 52, 58, 57, 56, 46, 41, 42]
+      >>> Mel tensor:
+      Tensor[[1, 80, 200], Float]
+
+    URLencoding was the cause of the length discrepancy, now only the encoding (float vs int) matters.
+    (However, perhaps the payload contents differ in more than just the encoding?)
+
+      Text : "want+to+go+outside"
+      Text buffer: [60, 38, 51, 57, 11, 57, 52, 11, 44, 52, 11, 52, 58, 57, 56, 46, 41, 42]
+      Text tensor: Tensor[[18], Int64]
+      Text tensor unsq: Tensor[[1, 18], Int64]
+      >>> Mel tensor:
+      Tensor[[1, 80, 133], Float]
+    */
+
     let audio_tensor = self.melgan_model.forward(&mel_tensor);
 
     audio_tensor_to_audio_signal(audio_tensor)
@@ -128,7 +151,7 @@ impl TacoMelModel {
     {
       let mut writer = WavWriter::new(&mut buffer, spec).unwrap();
       for s in audio_signal {
-        let s = s * 0.0001f32; // TODO: Temporary fix for audio
+        let s = s * 0.00001f32; // TODO: Find a more appropriate multiplier
         writer.write_sample(s).unwrap();
       }
       writer.finalize().unwrap(); // TODO: Error

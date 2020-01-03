@@ -11,8 +11,10 @@ from math import sqrt
 
 from tacotron_model import Tacotron2
 
+#torch.set_default_tensor_type('torch.DoubleTensor')
+#torch.set_default_tensor_type('torch.FloatTensor')
+
 print('Loading tacotron model...')
-#melgan_model_file = '/home/bt/models/melgan-swpark/firstgo_a7c2351_3650.pt'
 tacotron_model_file = '/home/bt/models/tacotron2-nvidia/tacotron2_statedict.pt'
 tacotron_model = torch.load(tacotron_model_file, map_location=torch.device('cpu'))
 
@@ -28,7 +30,6 @@ def cuda_to_cpu(model):
     elif isinstance(model, torch.Tensor):
         return model.cpu()
     else:
-        #print(type(model))
         return model
 
 # TODO: Maybe not necessary anymore with `map_location=torch.device('cpu')`
@@ -44,13 +45,11 @@ for key, value in tacotron_model['state_dict'].items():
 
 tacotron_model['state_dict'] = OrderedDict(new_state_dict)
 
-print(type(tacotron_model))
-print(tacotron_model.keys())
-
 print('Containerizing model...')
 # Save arbitrary values supported by TorchScript
 # https://pytorch.org/docs/master/jit.html#supported-type
 
+# Yay duck typing
 class HParams:
     mask_padding = True
     fp16_run = False
@@ -78,22 +77,21 @@ print('Load state dict...')
 module.load_state_dict(tacotron_model['state_dict'])
 #module.eval() # NB: Complains unless called: Did you forget call .eval() on your model?
 
-output_filename = 'tacotron_container.pt'
+output_filename = 'tacotron_container2.pt'
 
 # NB: Tracing evaluates the model on input and unrolls and hardcodes branching
 # and loops. Scripting allows these to remain by converting the entire program
-# to TorchScript.
+# to TorchScript. Scripting seems MUCH faster, is also harder get working.
 trace_model = False
 if trace_model:
-    print('JIT model...')
+    print('Tracing model and saving as:'.format(output_filename))
     text_sequence_file = '/home/bt/dev/voder/data/text/tacotron_text_sequence.pt'
     text_sequence = torch.load(text_sequence_file, map_location=torch.device('cpu'))
     # NB: Getting `Tracing failed sanity checks! Graphs differed across invocations!`
     traced_script_module = torch.jit.trace(module, text_sequence, check_trace=False)
     traced_script_module.save(output_filename)
 else:
-    # TODO(bt): This branch isn't working yet
-    print('Saving model...')
+    print('Saving script model as: {}'.format(output_filename))
     container = torch.jit.script(module)
     container.save(output_filename)
 

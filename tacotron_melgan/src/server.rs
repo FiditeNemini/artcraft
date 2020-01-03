@@ -40,7 +40,7 @@ pub fn run_server() {
       .mount("/pub", StaticFiles::new("/www/public", options).rank(-1))*/
 
   //let tacotron = "/home/bt/dev/voder/tacotron_melgan/tacotron_jit_model_voder_c0cac635.pt";
-  let tacotron = "/home/bt/dev/voder/tacotron_melgan/tacotron_container.pt";
+  let tacotron = "/home/bt/dev/voder/tacotron_melgan/tacotron_container2.pt";
   let model = TacoMelModel::create(
     tacotron,
     "/home/bt/dev/voder/tacotron_melgan/melgan_jit_model_voder_c0cac635.pt");
