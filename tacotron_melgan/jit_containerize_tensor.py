@@ -16,6 +16,14 @@ import torch.nn.functional as F
 import sys
 from collections import OrderedDict
 
+# If set, change the tensor type.
+output_type = 'float'
+
+if output_type == 'float':
+    torch.set_default_tensor_type('torch.FloatTensor')
+elif output_type == 'double':
+    torch.set_default_tensor_type('torch.DoubleTensor')
+
 def cuda_to_cpu(model):
     """Recursively make everything non-CUDA"""
     if isinstance(model, dict) or isinstance(model, OrderedDict):
@@ -43,17 +51,22 @@ def main(filename):
     print('Loading tensor file: {}'.format(filename))
     tensor = torch.load(filename, map_location=torch.device('cpu'))
 
+    if output_type == 'float':
+        tensor = tensor.float()
+    elif output_type == 'double':
+        tensor = tensor.double()
+
     if not isinstance(tensor, torch.Tensor):
         type_ = type(tensor)
         raise Exception('File should contain object of type Tensor, not {}'.format(type_))
 
     print('Switching device from CUDA to CPU (if necessary)')
-    cpu_tensor = cuda_to_cpu(tensor)
+    tensor = cuda_to_cpu(tensor)
 
     print('Containerizing. Libtorch can\'t read raw tensors from ' \
         + 'pytorch (at least I don\'t know how)')
 
-    container = Container(cpu_tensor)
+    container = Container(tensor)
     jit_container = torch.jit.script(container)
 
     print('Saving: {}'.format(output_filename))
