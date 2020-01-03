@@ -11,7 +11,7 @@ from math import sqrt
 
 from tacotron_model import Tacotron2
 
-#torch.set_default_tensor_type('torch.DoubleTensor')
+torch.set_default_tensor_type('torch.DoubleTensor')
 #torch.set_default_tensor_type('torch.FloatTensor')
 
 print('Loading tacotron model...')
@@ -33,8 +33,8 @@ def cuda_to_cpu(model):
         return model
 
 # TODO: Maybe not necessary anymore with `map_location=torch.device('cpu')`
-print('Converitng to CPU model...')
-tacotron_model = cuda_to_cpu(tacotron_model)
+#print('Converitng to CPU model...')
+#tacotron_model = cuda_to_cpu(tacotron_model)
 
 print('Remove unused keys...')
 new_state_dict = [] # Rebuild the ordered dict

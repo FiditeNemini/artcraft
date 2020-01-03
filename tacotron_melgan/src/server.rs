@@ -41,9 +41,11 @@ pub fn run_server() {
 
   //let tacotron = "/home/bt/dev/voder/tacotron_melgan/tacotron_jit_model_voder_c0cac635.pt";
   let tacotron = "/home/bt/dev/voder/tacotron_melgan/tacotron_container2.pt";
+  //let melgan = "/home/bt/dev/voder/tacotron_melgan/melgan_jit_model_voder_c0cac635.pt";
+  let melgan = "/home/bt/dev/voder/tacotron_melgan/melgan_container2.pt";
   let model = TacoMelModel::create(
     tacotron,
-    "/home/bt/dev/voder/tacotron_melgan/melgan_jit_model_voder_c0cac635.pt");
+    melgan);
 
   rocket::ignite()
       .mount("/", routes![

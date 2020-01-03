@@ -8,6 +8,8 @@ from collections import OrderedDict
 import re
 import yaml
 
+#torch.set_default_tensor_type('torch.DoubleTensor')
+
 class ResStack(nn.Module):
     def __init__(self, channel):
         super(ResStack, self).__init__()
@@ -117,7 +119,9 @@ class Container(torch.nn.Module):
 
     def forward(self, mel):
         mel = (mel + 5.0) / 5.0 # roughly normalize spectrogram
-        return self.generator(mel)
+        audio = self.generator(mel)
+        #return audio.float()
+        return audio
 
 
 print('Loading melgan model...')
@@ -188,13 +192,30 @@ print('Load state dict...')
 module.load_state_dict(melgan_model['model_g'])
 #module.eval(inference=False)
 
-print('JIT model...')
-mel_file = '/home/bt/dev/voder/data/mels/LJ002-0320.mel'
-example = torch.load(mel_file, map_location=torch.device('cpu'))
-traced_script_module = torch.jit.trace(module, example)
-traced_script_module.save("container2.pt")
+#print('JIT model...')
+#traced_script_module = torch.jit.trace(module, example)
+#traced_script_module.save("container2.pt")
 #container = torch.jit.script(module)
 
 #print('Saving model...')
 #container.save("container.pt")
+
+output_filename = 'melgan_container2.pt'
+
+# NB: Tracing evaluates the model on input and unrolls and hardcodes branching
+# and loops. Scripting allows these to remain by converting the entire program
+# to TorchScript. Scripting seems MUCH faster, is also harder get working.
+trace_model = True
+if trace_model:
+    print('Tracing model and saving as:'.format(output_filename))
+    mel_file = '/home/bt/dev/voder/data/mels/LJ002-0320.mel'
+    mel = torch.load(mel_file, map_location=torch.device('cpu'))
+    # NB: Getting `Tracing failed sanity checks! Graphs differed across invocations!`
+    traced_script_module = torch.jit.trace(module, mel, check_trace=False)
+    traced_script_module.save(output_filename)
+else:
+    print('Saving script model as: {}'.format(output_filename))
+    container = torch.jit.script(module)
+    container.save(output_filename)
+
 

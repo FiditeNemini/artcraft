@@ -82,54 +82,18 @@ impl TacoMelModel {
     //let mut mel_tensor = self.tacotron_model.forward(&text_tensor);
 
     println!("Loading mel...");
-    let mel_tensor
-        = load_wrapped_tensor_file("/home/bt/dev/tacotron-melgan/input_mel.pt.containerized.pt");
+    let mel_tensor = load_wrapped_tensor_file("/home/bt/dev/tacotron-melgan/input_mel.pt.containerized.pt");
 
     println!("\n\n>>> Mel tensor:\n{:?}\n\n", mel_tensor);
 
     //let repr = mel_tensor.to_string(20000).unwrap();
     //println!("\n{:?}\n\n", repr);
 
-    /*
-    This is the data from Pytorch: "want to go outside".
-
-      # Text
-      tensor([[60, 38, 51, 57, 11, 57, 52, 11, 44, 52, 11, 52, 58, 57, 56, 46, 41, 42]])
-      # Mel
-      torch.Size([1, 80, 133])
-      torch.float64
-      tensor([[[ -7.3141,  -6.6971,  -6.9072,  ...,  -8.8831,  -8.4337,  -7.9514],
-               [ -6.7884,  -6.0337,  -5.9880,  ...,  -7.4524,  -7.2237,  -7.0247],
-               [ -6.0898,  -5.1923,  -4.8882,  ...,  -6.3464,  -6.3288,  -6.4104],
-               ...,
-               [-10.1161, -10.0742,  -9.8574,  ...,  -9.3989,  -9.4183,  -9.3537],
-               [-10.1554, -10.1308,  -9.9062,  ...,  -9.4762,  -9.4767,  -9.3855],
-               [-10.2204, -10.1800,  -9.9611,  ...,  -9.5313,  -9.5202,  -9.4251]]],
-             grad_fn=<TransposeBackward0>)
-      Minimum: tensor(-11.3642, requires_grad=True)
-      Maximum: tensor(0.4480, requires_grad=True)
-
-    This is the data from Rust: "want to go outside".
-
-      Text : "want%20to%20go%20outside"
-      Text tensor: Tensor[[24], Int64]
-      Text tensor unsq: Tensor[[1, 24], Int64]
-      Text buffer: [60, 38, 51, 57, 11, 11, 11, 57, 52, 11, 11, 11, 44, 52, 11, 11, 11, 52, 58, 57, 56, 46, 41, 42]
-      >>> Mel tensor:
-      Tensor[[1, 80, 200], Float]
-
-    URLencoding was the cause of the length discrepancy, now only the encoding (float vs int) matters.
-    (However, perhaps the payload contents differ in more than just the encoding?)
-
-      Text : "want+to+go+outside"
-      Text buffer: [60, 38, 51, 57, 11, 57, 52, 11, 44, 52, 11, 52, 58, 57, 56, 46, 41, 42]
-      Text tensor: Tensor[[18], Int64]
-      Text tensor unsq: Tensor[[1, 18], Int64]
-      >>> Mel tensor:
-      Tensor[[1, 80, 133], Float]
-    */
+    println!("Running melgan...");
 
     let audio_tensor = self.melgan_model.forward(&mel_tensor);
+
+    println!("\n\n>>> Audio tensor:\n{:?}\n\n", audio_tensor);
 
     audio_tensor_to_audio_signal(audio_tensor)
   }
@@ -156,13 +120,6 @@ impl TacoMelModel {
       }
       writer.finalize().unwrap(); // TODO: Error
     }
-
-    //let mut writer = hound::WavWriter::create(filename, spec).unwrap();
-
-    /*for sample in audio_signal {
-      let sample = sample * 0.0001f32;
-      writer.write_sample(sample).unwrap();
-    }*/
 
     match buffer.into_inner() {
       Err(_) => { Vec::new() }, // TODO: Error
