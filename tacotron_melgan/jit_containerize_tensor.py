@@ -17,7 +17,7 @@ import sys
 from collections import OrderedDict
 
 # If set, change the tensor type.
-output_type = 'float'
+output_type = 'double'
 
 if output_type == 'float':
     torch.set_default_tensor_type('torch.FloatTensor')

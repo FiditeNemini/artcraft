@@ -82,7 +82,7 @@ impl TacoMelModel {
     //let mut mel_tensor = self.tacotron_model.forward(&text_tensor);
 
     println!("Loading mel...");
-    let mel_tensor = load_wrapped_tensor_file("/home/bt/dev/tacotron-melgan/input_mel.pt.containerized.pt");
+    let mel_tensor = load_wrapped_tensor_file("/home/bt/dev/tacotron-melgan/saved_mel.pt.containerized.pt");
 
     println!("\n\n>>> Mel tensor:\n{:?}\n\n", mel_tensor);
 
@@ -101,29 +101,30 @@ impl TacoMelModel {
   pub fn run_tts_audio(&self, text: &str) -> Vec<u8> {
     let audio_signal = self.run_tts(text);
 
-    let spec = WavSpec {
-      channels: 1,
-      sample_rate: 16000,
-      bits_per_sample: 32,
-      sample_format: SampleFormat::Float,
-    };
+    audio_signal_to_wav_bytes(audio_signal)
+  }
+}
 
-    let bytes : Vec<u8> = Vec::new();
-    let seek : Cursor<Vec<u8>> = Cursor::new(bytes);
-    let mut buffer = BufWriter::new(seek);
-
-    {
-      let mut writer = WavWriter::new(&mut buffer, spec).unwrap();
-      for s in audio_signal {
-        let s = s * 0.00001f32; // TODO: Find a more appropriate multiplier
-        writer.write_sample(s).unwrap();
-      }
-      writer.finalize().unwrap(); // TODO: Error
+pub fn audio_signal_to_wav_bytes(audio_signal: Vec<f32>) -> Vec<u8> {
+  let spec = WavSpec {
+    channels: 1,
+    sample_rate: 16000,
+    bits_per_sample: 32,
+    sample_format: SampleFormat::Float,
+  };
+  let bytes: Vec<u8> = Vec::new();
+  let seek: Cursor<Vec<u8>> = Cursor::new(bytes);
+  let mut buffer = BufWriter::new(seek);
+  {
+    let mut writer = WavWriter::new(&mut buffer, spec).unwrap();
+    for s in audio_signal {
+      //let s = s * 0.00001f32; // TODO: Find a more appropriate multiplier
+      writer.write_sample(s).unwrap();
     }
-
-    match buffer.into_inner() {
-      Err(_) => { Vec::new() }, // TODO: Error
-      Ok(r) => { r.get_ref().to_vec() },
-    }
+    writer.finalize().unwrap(); // TODO: Error
+  }
+  match buffer.into_inner() {
+    Err(_) => { Vec::new() }, // TODO: Error
+    Ok(r) => { r.get_ref().to_vec() },
   }
 }

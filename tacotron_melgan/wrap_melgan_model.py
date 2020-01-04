@@ -25,11 +25,6 @@ class ResStack(nn.Module):
             for i in range(3)
         ]
 
-        # The following uses: generator.4.blocks.0.2.bias
-        #self.blocks = nn.ModuleList(block_list)
-
-        # NB: This might work, but the weights need to be renamed
-        # the following expects: generator.4.block0.4.weight_v
         self.block0 = block_list[0]
         self.block1 = block_list[1]
         self.block2 = block_list[2]
@@ -39,34 +34,20 @@ class ResStack(nn.Module):
             for i in range(3)
         ]
 
-        #self.shortcuts = nn.ModuleList(shortcut_list)
         self.shortcut0 = shortcut_list[0]
         self.shortcut1 = shortcut_list[1]
         self.shortcut2 = shortcut_list[2]
 
 
     def forward(self, x):
-        # TODO: THIS WON'T WORK
-        #for block, shortcut in zip(self.blocks, self.shortcuts):
-        #    x = shortcut(x) + block(x)
         x = self.shortcut0(x) + self.block0(x)
         x = self.shortcut1(x) + self.block1(x)
         x = self.shortcut2(x) + self.block2(x)
         return x
 
-    # TODO: Looks unnecessary. Remove once this works.
-    #def remove_weight_norm(self):
-    #    for block, shortcut in zip(self.blocks, self.shortcuts):
-    #        nn.utils.remove_weight_norm(block[2])
-    #        nn.utils.remove_weight_norm(block[4])
-    #        nn.utils.remove_weight_norm(shortcut)
-
 class Container(torch.nn.Module):
-    def __init__(self, my_values):
+    def __init__(self):
         super().__init__()
-
-        #for key in my_values:
-        #    setattr(self, key, my_values[key])
 
         mel_channel = 80 # TODO: Load from yaml
 
@@ -101,72 +82,28 @@ class Container(torch.nn.Module):
         )
 
     # TODO: Looks unnecessary. Remove once this works.
-    def eval(self, inference=False):
+    def eval(self):
         super(Container, self).eval()
 
-        # don't remove weight norm while validation in training loop
-        if inference:
-            self.remove_weight_norm()
-
-    # TODO: Looks unnecessary. Remove once this works.
-    #def remove_weight_norm(self):
-    #    for idx, layer in enumerate(self.generator):
-    #        if len(layer.state_dict()) != 0:
-    #            try:
-    #                nn.utils.remove_weight_norm(layer)
-    #            except:
-    #                layer.remove_weight_norm()
 
     def forward(self, mel):
         mel = (mel + 5.0) / 5.0 # roughly normalize spectrogram
         audio = self.generator(mel)
+
+        # From inference() method:
+        audio = audio.squeeze()
+        #MAX_WAV_VALUE = 32768.0
+        #audio = MAX_WAV_VALUE * audio
+
         #return audio.float()
         return audio
 
 
 print('Loading melgan model...')
-#melgan_model_file = '/home/bt/models/melgan-swpark/firstgo_a7c2351_1100.pt'
-#melgan_model_file = '/home/bt/models/firstgo_a7c2351_1100.pt'
 melgan_model_file = '/home/bt/models/melgan-swpark/firstgo_a7c2351_3650.pt'
 melgan_model = torch.load(melgan_model_file, map_location=torch.device('cpu'))
 
-def cuda_to_cpu(model):
-    """Recursively make everything non-CUDA"""
-    if isinstance(model, dict) or isinstance(model, OrderedDict):
-        for key, value in model.items():
-            model[key] = cuda_to_cpu(value)
-        return model
-    if isinstance(model, list):
-        for i, value in enumerate(model):
-            model[i] = cuda_to_cpu(value)
-    elif isinstance(model, torch.Tensor):
-        return model.cpu()
-    else:
-        #print(type(model))
-        return model
-
-print('Converitng to CPU model...')
-cuda_to_cpu(melgan_model)
-
-
-print('Containerizing model...')
-# Save arbitrary values supported by TorchScript
-# https://pytorch.org/docs/master/jit.html#supported-type
-graph = {
-    # NB: You can't save a toplevel dictionary of dictionaries,
-    # like so: 'melgan': melgan_model,
-    # Per inference.py, it looks like only model_g is used.
-    'melgan_model_g': melgan_model['model_g'], # NB: keeping this out to load below.
-    #'melgan_model_d': melgan_model['model_d'],
-    #'melgan_optim_g': melgan_model['optim_g'],
-    #'melgan_optim_d': melgan_model['optim_d'],
-    'melgan_step': melgan_model['step'],
-    'melgan_epoch': melgan_model['epoch'],
-    'melgan_hp_str': melgan_model['hp_str'],
-    'melgan_githash': melgan_model['githash'],
-}
-
-module = Container(graph)
+module = Container()
 
 # NB: This is done so we can rename the model components above since `zip` won't work :(
 BLOCK_REGEX = re.compile('blocks\.(\d+)\.')
@@ -176,13 +113,10 @@ new_model_g = [] # Rebuild the ordered dict
 for key, value in melgan_model['model_g'].items():
     if 'blocks.' in key:
         new_key = BLOCK_REGEX.sub(r'block\1.', key)
-        #print('{} -> {}'.format(key, new_key))
         key = new_key
     elif 'shortcuts.' in key:
         new_key = SHORTCUT_REGEX.sub(r'shortcut\1.', key)
-        #print('{} -> {}'.format(key, new_key))
         key = new_key
-
     new_model_g.append((key, value))
 
 
@@ -190,15 +124,6 @@ melgan_model['model_g'] = OrderedDict(new_model_g)
 
 print('Load state dict...')
 module.load_state_dict(melgan_model['model_g'])
-#module.eval(inference=False)
-
-#print('JIT model...')
-#traced_script_module = torch.jit.trace(module, example)
-#traced_script_module.save("container2.pt")
-#container = torch.jit.script(module)
-
-#print('Saving model...')
-#container.save("container.pt")
 
 output_filename = 'melgan_container2.pt'
 
@@ -207,11 +132,11 @@ output_filename = 'melgan_container2.pt'
 # to TorchScript. Scripting seems MUCH faster, is also harder get working.
 trace_model = True
 if trace_model:
-    print('Tracing model and saving as:'.format(output_filename))
+    print('Tracing model and saving as: {}'.format(output_filename))
     mel_file = '/home/bt/dev/voder/data/mels/LJ002-0320.mel'
     mel = torch.load(mel_file, map_location=torch.device('cpu'))
     # NB: Getting `Tracing failed sanity checks! Graphs differed across invocations!`
-    traced_script_module = torch.jit.trace(module, mel, check_trace=False)
+    traced_script_module = torch.jit.trace(module, mel, check_trace=True)
     traced_script_module.save(output_filename)
 else:
     print('Saving script model as: {}'.format(output_filename))

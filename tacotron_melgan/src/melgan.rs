@@ -92,7 +92,7 @@ pub fn write_audio_file(audio_signal: Vec<f32>, filename: &str) {
   let mut writer = hound::WavWriter::create(filename, spec).unwrap();
 
   for sample in audio_signal {
-    let sample = sample * 0.0001f32;
+    //let sample = sample * 0.0001f32;
     writer.write_sample(sample).unwrap();
   }
 }
