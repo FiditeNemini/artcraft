@@ -108,7 +108,7 @@ impl TacoMelModel {
 pub fn audio_signal_to_wav_bytes(audio_signal: Vec<i16>) -> Vec<u8> {
   let spec = WavSpec {
     channels: 1,
-    sample_rate: 16000,
+    sample_rate: 20000,
     bits_per_sample: 16,
     sample_format: SampleFormat::Int,
   };

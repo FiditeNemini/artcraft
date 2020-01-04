@@ -37,6 +37,10 @@ fn print_audio(tensor: &Tensor, i: i64) {
   println!("A[{}] = {:?}", i, t.get(i));
 }
 
+fn print_audio_signal(signal: &Vec<i16>, i: usize) {
+  println!("W[{}] = {:?}", i, signal.get(i).unwrap());
+}
+
 
 #[get("/tts_test")]
 fn get_tts_test() -> Content<Vec<u8>> {
@@ -62,7 +66,6 @@ fn get_tts_test() -> Content<Vec<u8>> {
   print_audio(&audio_tensor, 0);
   print_audio(&audio_tensor, 1);
   print_audio(&audio_tensor, 2);
-
   print_audio(&audio_tensor, 100);
   print_audio(&audio_tensor, 101);
   print_audio(&audio_tensor, 102);
@@ -70,6 +73,13 @@ fn get_tts_test() -> Content<Vec<u8>> {
   //println!("\n\n>>> Audio tensor:\n{:?}\n\n", mel_tensor);
 
   let audio_signal = audio_tensor_to_audio_signal(audio_tensor);
+
+  print_audio_signal(&audio_signal, 0);
+  print_audio_signal(&audio_signal, 1);
+  print_audio_signal(&audio_signal, 2);
+  print_audio_signal(&audio_signal, 100);
+  print_audio_signal(&audio_signal, 101);
+  print_audio_signal(&audio_signal, 102);
 
   let audio_bytes = audio_signal_to_wav_bytes(audio_signal);
   Content(ContentType::new("audio", "wav"), audio_bytes)

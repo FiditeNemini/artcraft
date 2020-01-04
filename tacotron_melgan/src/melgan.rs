@@ -48,7 +48,7 @@ pub fn audio_tensor_to_audio_signal(mel: Tensor) -> Vec<i16> {
 
   flat_audio_tensor.copy_data(data.as_mut_slice(), length as usize);
 
-  data.iter().map(|x| *x as i16).collect()
+  data.iter().map(|x| x.trunc() as i16).collect()
 }
 
 fn debug_print_sample(audio: &Vec<f32>, num_samples: usize) {
@@ -85,7 +85,7 @@ pub fn run_melgan_network() {
 pub fn write_audio_file(audio_signal: Vec<i16>, filename: &str) {
   let spec = hound::WavSpec {
     channels: 1,
-    sample_rate: 16000,
+    sample_rate: 20000,
     bits_per_sample: 16,
     sample_format: hound::SampleFormat::Int,
   };
