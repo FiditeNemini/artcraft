@@ -79,10 +79,10 @@ impl TacoMelModel {
 
     println!("Text tensor unsq: {:?}", text_tensor);
 
-    //let mut mel_tensor = self.tacotron_model.forward(&text_tensor);
+    let mut mel_tensor = self.tacotron_model.forward(&text_tensor);
 
-    println!("Loading mel...");
-    let mel_tensor = load_wrapped_tensor_file("/home/bt/dev/tacotron-melgan/saved_mel.pt.containerized.pt");
+    //println!("Loading mel...");
+    //let mel_tensor = load_wrapped_tensor_file("/home/bt/dev/tacotron-melgan/saved_mel.pt.containerized.pt");
 
     println!("\n\n>>> Mel tensor:\n{:?}\n\n", mel_tensor);
 

@@ -100,17 +100,18 @@ pub fn run_server() {
   let tacotron = "/home/bt/dev/voder/tacotron_melgan/tacotron_container2.pt";
   //let melgan = "/home/bt/dev/voder/tacotron_melgan/melgan_jit_model_voder_c0cac635.pt";
   let melgan = "/home/bt/dev/voder/tacotron_melgan/melgan_container2.pt";
-  /*let model = TacoMelModel::create(
+  let melgan = "/home/bt/dev/tacotron-melgan/shared_melgan_container.pt";
+  let model = TacoMelModel::create(
     tacotron,
-    melgan);*/
+    melgan);
 
   rocket::ignite()
       .mount("/", routes![
-          //get_index,
-          //get_tts,
+          get_index,
+          get_tts,
           get_tts_test,
       ])
-      //.manage(model)
+      .manage(model)
       .register(catchers![not_found])
       .launch();
 }
