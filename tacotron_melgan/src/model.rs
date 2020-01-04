@@ -55,7 +55,7 @@ impl TacoMelModel {
     }
   }
 
-  pub fn run_tts(&self, text: &str) -> Vec<f32> {
+  pub fn run_tts(&self, text: &str) -> Vec<i16> {
     println!("Text : {:?}", text);
     let copied = text.to_string().to_ascii_lowercase();
     let mut text_buffer : Vec<i64> = Vec::new();
@@ -105,12 +105,12 @@ impl TacoMelModel {
   }
 }
 
-pub fn audio_signal_to_wav_bytes(audio_signal: Vec<f32>) -> Vec<u8> {
+pub fn audio_signal_to_wav_bytes(audio_signal: Vec<i16>) -> Vec<u8> {
   let spec = WavSpec {
     channels: 1,
     sample_rate: 16000,
-    bits_per_sample: 32,
-    sample_format: SampleFormat::Float,
+    bits_per_sample: 16,
+    sample_format: SampleFormat::Int,
   };
   let bytes: Vec<u8> = Vec::new();
   let seek: Cursor<Vec<u8>> = Cursor::new(bytes);

@@ -9,19 +9,20 @@ use model::{
   load_model_file,
   load_wrapped_tensor_file,
 };
+use hound::Sample;
 
 const WRAPPED_MODEL_PATH : &'static str = "/home/bt/dev/voder/tacotron_melgan/melgan_jit_model_voder_c0cac635.pt";
 
 const EXAMPLE_MEL_1: &'static str = "/home/bt/dev/voder/data/mels/LJ002-0320.mel.containerized.pt";
 const EXAMPLE_MEL_2 : &'static str = "/home/bt/dev/voder/data/mels/trump_2018_02_15-001.mel.containerized.pt";
 
-pub const MAX_WAV_VALUE : f32 = 32768.0f32;
-pub const HALF_WAV_VALUE : f32 = MAX_WAV_VALUE * 0.5f32;
+//pub const MAX_WAV_VALUE : f32 = 32768.0f32;
+//pub const HALF_WAV_VALUE : f32 = MAX_WAV_VALUE * 0.5f32;
 
 // TODO: This is an hparam and should be dynamic.
-pub const HOP_LENGTH : i64 = 256;
+//pub const HOP_LENGTH : i64 = 256;
 
-pub fn audio_tensor_to_audio_signal(mel: Tensor) -> Vec<f32> {
+pub fn audio_tensor_to_audio_signal(mel: Tensor) -> Vec<i16> {
   let mut flat_audio_tensor = mel.squeeze();
 
   println!("Sqeueezed tensor: {:?}, dim: {}",
@@ -37,7 +38,7 @@ pub fn audio_tensor_to_audio_signal(mel: Tensor) -> Vec<f32> {
   //println!("New size: {}", new_size);
   //flat_audio_tensor = flat_audio_tensor.resize_(&[new_size]);
 
-  flat_audio_tensor = flat_audio_tensor * MAX_WAV_VALUE as f64;
+  //flat_audio_tensor = flat_audio_tensor * MAX_WAV_VALUE as f64;
 
   let mut data : Vec<f32> = Vec::with_capacity(length);
 
@@ -47,7 +48,7 @@ pub fn audio_tensor_to_audio_signal(mel: Tensor) -> Vec<f32> {
 
   flat_audio_tensor.copy_data(data.as_mut_slice(), length as usize);
 
-  data
+  data.iter().map(|x| *x as i16).collect()
 }
 
 fn debug_print_sample(audio: &Vec<f32>, num_samples: usize) {
@@ -76,17 +77,17 @@ pub fn run_melgan_network() {
 
   let audio = audio_tensor_to_audio_signal(output);
 
-  debug_print_sample(&audio, 10);
+  //debug_print_sample(&audio, 10);
 
   write_audio_file(audio, "melgan_output.wav");
 }
 
-pub fn write_audio_file(audio_signal: Vec<f32>, filename: &str) {
+pub fn write_audio_file(audio_signal: Vec<i16>, filename: &str) {
   let spec = hound::WavSpec {
     channels: 1,
     sample_rate: 16000,
-    bits_per_sample: 32,
-    sample_format: hound::SampleFormat::Float,
+    bits_per_sample: 16,
+    sample_format: hound::SampleFormat::Int,
   };
 
   let mut writer = hound::WavWriter::create(filename, spec).unwrap();
