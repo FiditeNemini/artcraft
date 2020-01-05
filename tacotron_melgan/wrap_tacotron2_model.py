@@ -11,7 +11,7 @@ from math import sqrt
 
 from tacotron_model import Tacotron2
 
-torch.set_default_tensor_type('torch.DoubleTensor')
+#torch.set_default_tensor_type('torch.DoubleTensor')
 #torch.set_default_tensor_type('torch.FloatTensor')
 
 print('Loading tacotron model...')
@@ -77,7 +77,7 @@ print('Load state dict...')
 module.load_state_dict(tacotron_model['state_dict'])
 #module.eval() # NB: Complains unless called: Did you forget call .eval() on your model?
 
-output_filename = 'tacotron_container2.pt'
+output_filename = 'tacotron_container3.pt'
 
 # NB: Tracing evaluates the model on input and unrolls and hardcodes branching
 # and loops. Scripting allows these to remain by converting the entire program

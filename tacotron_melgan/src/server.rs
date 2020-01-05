@@ -97,7 +97,7 @@ pub fn run_server() {
       .mount("/pub", StaticFiles::new("/www/public", options).rank(-1))*/
 
   //let tacotron = "/home/bt/dev/voder/tacotron_melgan/tacotron_jit_model_voder_c0cac635.pt";
-  let tacotron = "/home/bt/dev/voder/tacotron_melgan/tacotron_container2.pt";
+  let tacotron = "/home/bt/dev/voder/tacotron_melgan/tacotron_container3.pt";
   //let melgan = "/home/bt/dev/voder/tacotron_melgan/melgan_jit_model_voder_c0cac635.pt";
   let melgan = "/home/bt/dev/voder/tacotron_melgan/melgan_container2.pt";
   let melgan = "/home/bt/dev/tacotron-melgan/shared_melgan_container.pt";

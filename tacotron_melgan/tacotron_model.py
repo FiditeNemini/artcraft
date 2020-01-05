@@ -601,4 +601,4 @@ class Tacotron2(nn.Module):
             ])
 
         #return outputs
-        return outputs[0]
+        return outputs[0].float()
