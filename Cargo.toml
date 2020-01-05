@@ -8,11 +8,13 @@ authors = [ "Brandon Thomas <bt@brand.io>",
 members = [
   "tacotron_melgan",
   "tacotron_tensorflow",
+  "tts_service",
   "voice_converter_sidecar",
 ]
 default-members = [
   "tacotron_melgan",
   "tacotron_tensorflow",
+  "tts_service",
   "voice_converter_sidecar",
 ]
 

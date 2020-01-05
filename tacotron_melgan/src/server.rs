@@ -6,6 +6,7 @@ use model::{TacoMelModel, load_wrapped_tensor_file, load_model_file, audio_signa
 use tch::nn::Module;
 use melgan::audio_tensor_to_audio_signal;
 use tch::Tensor;
+use std::panic;
 
 #[derive(Serialize, Deserialize)]
 struct Message {
@@ -19,8 +20,20 @@ fn get_index() -> String {
 
 #[get("/tts?<text>")]
 fn get_tts(model: State<TacoMelModel>, text: &RawStr) -> Content<Vec<u8>> {
-  let audio_bytes = model.inner().run_tts_audio(text.as_str());
-  Content(ContentType::new("audio", "wav"), audio_bytes)
+
+  let result = panic::catch_unwind(|| {
+    let audio_bytes = model.inner().run_tts_audio(text.as_str());
+    audio_bytes
+  });
+
+  match result {
+    Err(_) => {
+      Content(ContentType::Plain, "there was an error".as_bytes().to_vec())
+    },
+    Ok(audio_bytes) => {
+      Content(ContentType::new("audio", "wav"), audio_bytes)
+    }
+  }
 }
 
 fn print_mel(tensor: &Tensor, i: i64) {
@@ -46,6 +59,7 @@ fn print_audio_signal(signal: &Vec<i16>, i: usize) {
 fn get_tts_test() -> Content<Vec<u8>> {
   println!("Loading melgan model...");
   let melgan_filename  = "/home/bt/dev/tacotron-melgan/shared_melgan_container.pt";
+  let melgan_filename  = "/home/bt/dev/tacotron-melgan/shared_melgan_container2.pt";
   let melgan_model = load_model_file(melgan_filename);
 
   println!("Loading mel...");
@@ -101,6 +115,7 @@ pub fn run_server() {
   //let melgan = "/home/bt/dev/voder/tacotron_melgan/melgan_jit_model_voder_c0cac635.pt";
   let melgan = "/home/bt/dev/voder/tacotron_melgan/melgan_container2.pt";
   let melgan = "/home/bt/dev/tacotron-melgan/shared_melgan_container.pt";
+  let melgan = "/home/bt/dev/tacotron-melgan/shared_melgan_container2.pt";
   let model = TacoMelModel::create(
     tacotron,
     melgan);
