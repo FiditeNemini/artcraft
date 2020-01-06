@@ -1,0 +1,41 @@
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: tts-service
+  namespace: trumped
+spec:
+  type: LoadBalancer
+  selector:
+    app: tts-service
+  ports:
+    - name: http
+      protocol: TCP
+      port: 80
+      targetPort: 8080
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tts-service
+  namespace: trumped
+  labels:
+    app: tts-service
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: tts-service
+  template:
+    metadata:
+      labels:
+        app: tts-service
+    spec:
+      imagePullSecrets:
+      - name: regcred
+      containers:
+      - name: tts-service
+        image: docker.pkg.github.com/echelon/voder/tts-service:d5f4d229ff4b
+        ports:
+        - containerPort: 8080
+          protocol: TCP

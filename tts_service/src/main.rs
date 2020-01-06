@@ -24,6 +24,7 @@ use actix_web::{
 
 #[get("/")]
 async fn get_root(request: HttpRequest) -> std::io::Result<HttpResponse> {
+  println!("GET /");
   Ok(HttpResponse::build(StatusCode::OK)
       .content_type("text/html; charset=utf-8")
       .body("Hello World"))
@@ -31,6 +32,7 @@ async fn get_root(request: HttpRequest) -> std::io::Result<HttpResponse> {
 
 #[get("/readiness")]
 async fn get_readiness(request: HttpRequest) -> std::io::Result<HttpResponse> {
+  println!("GET /readiness");
   Ok(HttpResponse::build(StatusCode::OK)
       .content_type("text/html; charset=utf-8")
       .body("Ready"))
@@ -38,6 +40,7 @@ async fn get_readiness(request: HttpRequest) -> std::io::Result<HttpResponse> {
 
 #[get("/liveness")]
 async fn get_liveness(request: HttpRequest) -> std::io::Result<HttpResponse> {
+  println!("GET /liveness");
   Ok(HttpResponse::build(StatusCode::OK)
       .content_type("text/html; charset=utf-8")
       .body("Live"))
@@ -50,7 +53,7 @@ async fn main() -> std::io::Result<()> {
       .service(get_readiness)
       .service(get_liveness)
     )
-    .bind("127.0.0.1:8080")?
+    .bind("0.0.0.0:8080")?
     .run()
     .await
 }
