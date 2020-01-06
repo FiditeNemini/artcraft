@@ -33,6 +33,10 @@ spec:
     spec:
       imagePullSecrets:
       - name: regcred
+      volumes:
+        - name: model-pv
+          persistentVolumeClaim:
+            claimName: model-pvc
       containers:
       - name: tts
         image: docker.pkg.github.com/echelon/voder/tts-service:a8858f2375a4
@@ -41,3 +45,6 @@ spec:
         ports:
         - containerPort: 12345
           protocol: TCP
+        volumeMounts:
+          - mountPath: "/store"
+            name: model-pv
