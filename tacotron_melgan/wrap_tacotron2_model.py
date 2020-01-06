@@ -15,7 +15,8 @@ from tacotron_model import Tacotron2
 #torch.set_default_tensor_type('torch.FloatTensor')
 
 print('Loading tacotron model...')
-tacotron_model_file = '/home/bt/models/tacotron2-nvidia/tacotron2_statedict.pt'
+#tacotron_model_file = '/home/bt/models/tacotron2-nvidia/tacotron2_statedict.pt'
+tacotron_model_file = '/home/bt/models/tacotron2-nvidia/checkpoint_2000'
 tacotron_model = torch.load(tacotron_model_file, map_location=torch.device('cpu'))
 
 def cuda_to_cpu(model):
@@ -77,7 +78,7 @@ print('Load state dict...')
 module.load_state_dict(tacotron_model['state_dict'])
 #module.eval() # NB: Complains unless called: Did you forget call .eval() on your model?
 
-output_filename = 'tacotron_container3.pt'
+output_filename = 'tacotron_container4.pt'
 
 # NB: Tracing evaluates the model on input and unrolls and hardcodes branching
 # and loops. Scripting allows these to remain by converting the entire program

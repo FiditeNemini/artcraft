@@ -1,41 +1,64 @@
+# ---
+# kind: Service
+# apiVersion: v1
+# metadata:
+#   name: tts
+#   namespace: trumped
+#   #labels:
+#   #  tier: backend
+# spec:
+#   type: LoadBalancer
+#   selector:
+#     app: tts
+#     #tier: backend
+#   ports:
+#   - name: http
+#     protocol: TCP
+#     port: 80
+#     targetPort: 8080
 ---
 kind: Service
 apiVersion: v1
 metadata:
-  name: tts-service
+  name: tts
   namespace: trumped
+  #labels:
+  #  tier: backend
 spec:
-  type: LoadBalancer
+  #type: LoadBalancer
   selector:
-    app: tts-service
+    app: tts
+    #tier: backend
   ports:
-    - name: http
-      protocol: TCP
-      port: 80
-      targetPort: 8080
+  - name: http
+    protocol: TCP
+    port: 8080
+    targetPort: 8080
+  externalIPs:
+  - 167.71.83.38
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: tts-service
+  name: tts
   namespace: trumped
   labels:
-    app: tts-service
+    app: tts
 spec:
   replicas: 2
   selector:
     matchLabels:
-      app: tts-service
+      app: tts
   template:
     metadata:
       labels:
-        app: tts-service
+        app: tts
     spec:
       imagePullSecrets:
       - name: regcred
       containers:
-      - name: tts-service
-        image: docker.pkg.github.com/echelon/voder/tts-service:d5f4d229ff4b
+      - name: tts
+        image: docker.pkg.github.com/echelon/voder/tts-service:539570e07923
         ports:
         - containerPort: 8080
           protocol: TCP

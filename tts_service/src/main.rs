@@ -1,15 +1,17 @@
 #[macro_use] extern crate actix_web;
-#[macro_use] extern crate serde_derive;
+// #[macro_use] extern crate serde_derive;
 
-extern crate hound;
-extern crate serde;
-extern crate serde_json;
-extern crate tch;
+//extern crate hound;
+//extern crate serde;
+//extern crate serde_json;
+//extern crate tch;
 
-use tch::CModule;
-use tch::Tensor;
-use tch::nn::Module;
-use tch::nn::ModuleT;
+//use tch::CModule;
+//use tch::Tensor;
+//use tch::nn::Module;
+//use tch::nn::ModuleT;
+
+use std::env;
 
 use actix_web::http::{header, Method, StatusCode};
 use actix_web::{
@@ -48,12 +50,21 @@ async fn get_liveness(request: HttpRequest) -> std::io::Result<HttpResponse> {
 
 #[actix_rt::main]
 async fn main() -> std::io::Result<()> {
+  let args = env::args()
+      .into_iter()
+      .collect::<Vec<String>>();
+  let bind_address = args.get(1)
+      .expect("Must specify binding address, eg. `0.0.0.0:8080`.");
+
+  println!("Starting HTTP service.");
+  println!("Listening on: {}", bind_address);
+
   HttpServer::new(|| App::new()
       .service(get_root)
       .service(get_readiness)
       .service(get_liveness)
     )
-    .bind("0.0.0.0:8080")?
+    .bind(bind_address)?
     .run()
     .await
 }
