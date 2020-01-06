@@ -11,6 +11,7 @@ members = [
   "tts_service",
   "voice_converter_sidecar",
 ]
+
 default-members = [
   "tacotron_melgan",
   "tacotron_tensorflow",
@@ -18,53 +19,3 @@ default-members = [
   "voice_converter_sidecar",
 ]
 
-# [[bin]]
-# name = "tacotron1"
-# path = "src/tacotron_main.rs"
-# required-features = ["tacotron"]
-# default-features = true
-
-#[[bin]]
-#name = "tacotron2melgan"
-#path = "src/tacotron2_melgan_main.rs"
-#required-features = ["torch"]
-#default-features = true
-
-# [[bin]]
-# name = "voder"
-# path = "src/voder_main.rs"
-# required-features = ["vocoder"]
-
-#[dependencies]
-#tensorflow = { version = "0.14.0", features = ["tensorflow_gpu"], optional = true }
-# sonogram = "0.3.0" # badass spectrograms
-
-# [features]
-# tacotron = ["tensorflow", "image"]
-# # torch = ["tch"]
-# vocoder = ["world-sys"]
-# default = ["tacotron"] # TODO: This is annoying in CLion
-
-#[patch.crates-io]
-# NB: Manually upgraded 'tensorflow-sys' library from 1.13.1 to 1.14.0
-# The downloaded tensorflow libs in target/ must be moved to /lib 
-# (I couldn't figure out the Rust linker flags)
-#tensorflow = { path = "/home/bt/dev/3rd/tensorflow.rs-modified" }
-#tensorflow = { path = "/home/bt/dev/3rd/tensorflow.rs", features = ["tensorflow_gpu"] }
-
-#[build-dependencies]
-#prost-build = "0.5.0"
-
-#chrono
-#clap
-#log
-#time
-#toml
-#chrono
-#clap
-#log
-#time
-#toml
-# sonogram = "0.3.0" # badass spectrograms
-# tch = { version = "0.1.3", optional = true } # pytorch bindings
-# tensorflow = { version = "0.14.0", optional = true }

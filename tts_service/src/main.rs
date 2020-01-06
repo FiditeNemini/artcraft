@@ -1,50 +1,57 @@
-#![feature(proc_macro_hygiene, decl_macro)]
-
-#[macro_use] extern crate rocket;
-#[macro_use] extern crate rocket_contrib;
+#[macro_use] extern crate actix_web;
 #[macro_use] extern crate serde_derive;
+
 extern crate hound;
 extern crate serde;
 extern crate serde_json;
 extern crate tch;
 
-use rocket::http::{RawStr, ContentType};
-use rocket::response::content::Content;
-use rocket::{Request, State, Response};
-use rocket_contrib::json::{Json, JsonValue};
 use tch::CModule;
 use tch::Tensor;
 use tch::nn::Module;
 use tch::nn::ModuleT;
 
-#[catch(404)]
-fn not_found(_req: &Request) -> String {
-  "404 Not Found".into()
-}
+use actix_web::http::{header, Method, StatusCode};
+use actix_web::{
+  App,
+  HttpRequest,
+  HttpResponse,
+  HttpServer,
+  Responder,
+  get,
+  web,
+};
 
 #[get("/")]
-pub fn get_root() -> String {
-  "Hello World".into()
+async fn get_root(request: HttpRequest) -> std::io::Result<HttpResponse> {
+  Ok(HttpResponse::build(StatusCode::OK)
+      .content_type("text/html; charset=utf-8")
+      .body("Hello World"))
 }
 
 #[get("/readiness")]
-pub fn get_readiness() -> String {
-  "Ready".into()
+async fn get_readiness(request: HttpRequest) -> std::io::Result<HttpResponse> {
+  Ok(HttpResponse::build(StatusCode::OK)
+      .content_type("text/html; charset=utf-8")
+      .body("Ready"))
 }
 
 #[get("/liveness")]
-pub fn get_liveness() -> String {
-  "Live".into()
+async fn get_liveness(request: HttpRequest) -> std::io::Result<HttpResponse> {
+  Ok(HttpResponse::build(StatusCode::OK)
+      .content_type("text/html; charset=utf-8")
+      .body("Live"))
 }
 
-pub fn main() {
-  rocket::ignite()
-      .mount("/", routes![
-          get_root,
-          get_readiness,
-          get_liveness,
-      ])
-      //.manage(model)
-      .register(catchers![not_found])
-      .launch();
+#[actix_rt::main]
+async fn main() -> std::io::Result<()> {
+  HttpServer::new(|| App::new()
+      .service(get_root)
+      .service(get_readiness)
+      .service(get_liveness)
+    )
+    .bind("127.0.0.1:8080")?
+    .run()
+    .await
 }
+
