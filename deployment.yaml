@@ -22,7 +22,8 @@ metadata:
   labels:
     app: tts
 spec:
-  replicas: 2
+  # NB: DigitalOcean PersistentVolumes can only be attached to one droplet at a time!? WTF!
+  replicas: 1
   selector:
     matchLabels:
       app: tts
@@ -39,12 +40,33 @@ spec:
             claimName: model-pvc
       containers:
       - name: tts
-        image: docker.pkg.github.com/echelon/voder/tts-service:a8858f2375a4
+        # NB: Container builds are triggered by Github Actions
+        image: docker.pkg.github.com/echelon/voder/tts-service:374e1a477d90
+        env:
+        - name: BIND_ADDRESS
+          value: "0.0.0.0:12345"
+        - name: TACOTRON_MODEL
+          value: "/store/models/tacotron2-nvidia/tacotron_container.pt"
+        - name: MELGAN_MODEL
+          value: "/store/models/melgan-swpark/shared_melgan_container.pt"
         command: ["/tts_service"]
-        args: ["0.0.0.0:12345"]
         ports:
         - containerPort: 12345
           protocol: TCP
         volumeMounts:
           - mountPath: "/store"
             name: model-pv
+        readinessProbe:
+          httpGet:
+            path: /readiness
+            port: 12345
+          initialDelaySeconds: 5
+          periodSeconds: 5
+        livenessProbe:
+          httpGet:
+            path: /liveness
+            port: 12345
+          initialDelaySeconds: 20
+          periodSeconds: 3
+          timeoutSeconds: 3
+          failureThreshold: 3

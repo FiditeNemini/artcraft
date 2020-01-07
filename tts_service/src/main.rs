@@ -76,6 +76,8 @@ const BIND_ADDRESS : &'static str = "BIND_ADDRESS";
 
 #[actix_rt::main]
 async fn main() -> std::io::Result<()> {
+  println!("Starting service.");
+
   let bind_address = env::var(BIND_ADDRESS)
       .expect(&format!("Must include {} env var, eg `0.0.0.0:8000`", BIND_ADDRESS));
 
@@ -84,6 +86,8 @@ async fn main() -> std::io::Result<()> {
 
   let melgan_filename = env::var(MELGAN_MODEL)
       .expect(&format!("Must include {} env var", MELGAN_MODEL));
+
+  println!("Loading models...");
 
   let ttsEngine = TacoMelModel::create(&tacotron_filename, &melgan_filename);
 
