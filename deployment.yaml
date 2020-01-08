@@ -76,7 +76,8 @@ spec:
           value: "true"
       - name: tts
         # NB: Container builds are triggered by Github Actions
-        image: docker.pkg.github.com/echelon/voder/tts-service:374e1a477d90
+        #image: docker.pkg.github.com/echelon/voder/tts-service:374e1a477d90
+        image: docker.pkg.github.com/echelon/voder/tts-service:841c644d57b6
         volumeMounts:
         - name: mntdatas3fs
           mountPath: /data:shared

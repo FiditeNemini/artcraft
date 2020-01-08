@@ -1,6 +1,11 @@
 *~
 __pycache__/
+node_modules/
 target/
+
+# IntelliJ
+.idea/
+voder.iml
 
 # Project specific ignores
 cycle_gan/python
