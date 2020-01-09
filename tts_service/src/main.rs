@@ -12,6 +12,8 @@ use model::TacoMelModel;
 use std::env;
 use std::sync::Arc;
 
+use actix_cors::Cors;
+use actix_web::middleware::Logger;
 use actix_web::http::{header, Method, StatusCode};
 use actix_web::{
   App,
@@ -20,6 +22,7 @@ use actix_web::{
   HttpServer,
   Responder,
   get,
+  http,
   web,
 };
 
@@ -47,17 +50,44 @@ async fn get_liveness(request: HttpRequest) -> std::io::Result<HttpResponse> {
       .body("Live"))
 }
 
+/// For JSON payloads
 #[derive(Deserialize)]
 pub struct TtsRequest {
   text: String,
+  speaker: String,
 }
 
-#[get("/tts")]
+/// For query strings
+#[derive(Deserialize)]
+pub struct TtsQueryRequest {
+  text: String,
+}
+
+//#[get("/tts")]
 async fn get_tts(request: HttpRequest,
-  query: web::Query<TtsRequest>,
+  query: web::Query<TtsQueryRequest>,
   model: web::Data<Arc<TacoMelModel>>)
     -> std::io::Result<HttpResponse> {
   println!("GET /tts");
+
+  let text = query.text.to_string();
+
+  println!("Text: {}", text);
+
+  let wav_data = model.run_tts_audio(&text);
+
+  Ok(HttpResponse::build(StatusCode::OK)
+      .content_type("audio/wav")
+      .body(wav_data))
+}
+
+//#[post("/tts")]
+async fn post_tts(request: HttpRequest,
+  query: web::Json<TtsRequest>,
+  //query: web::Form<TtsRequest>,
+  model: web::Data<Arc<TacoMelModel>>)
+  -> std::io::Result<HttpResponse> {
+  println!("POST /tts");
 
   let text = query.text.to_string();
 
@@ -97,10 +127,42 @@ async fn main() -> std::io::Result<()> {
   println!("Listening on: {}", bind_address);
 
   HttpServer::new(move || App::new()
+      .wrap(Logger::default())
+      // Configure CORS policy
+      /*.configure(|app| Cors::new()
+          .allowed_origin("https://localhost:12345/")
+          .allowed_origin("https://localhost:3000/")
+          .allowed_origin("https://localhost:8000/")
+          .allowed_methods(vec!["GET", "POST"])
+          .allowed_headers(vec![http::header::AUTHORIZATION, http::header::ACCEPT])
+          .allowed_header(http::header::CONTENT_TYPE)
+          .max_age(3600)
+          .resource("/tts", |r| {
+            r.method(http::Method::GET).f(|_| HttpResponse::Ok());
+            r.method(http::Method::POST).f(|_| HttpResponse::Ok());
+          })
+          .register())*/
+      /*.wrap(
+        Cors::new()
+            .allowed_origin("https://localhost:12345/")
+            .allowed_origin("https://localhost:3000/")
+            .allowed_origin("https://localhost:8000/")
+            .allowed_methods(vec!["GET", "POST"])
+            .allowed_headers(vec![http::header::AUTHORIZATION, http::header::ACCEPT])
+            .allowed_header(http::header::CONTENT_TYPE)
+            .max_age(3600)
+            .finish())*/
+      .service(
+        web::resource("/tts")
+            .route(web::get().to(get_tts))
+            .route(web::post().to(post_tts))
+            .route(web::head().to(|| HttpResponse::Ok()))
+      )
       .service(get_root)
       .service(get_readiness)
       .service(get_liveness)
-      .service(get_tts)
+      //.service(get_tts)
+      //.service(post_tts)
       .app_data(arc.clone())
     )
     .bind(bind_address)?
