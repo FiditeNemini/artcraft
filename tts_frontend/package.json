@@ -1,5 +1,6 @@
 {
   "name": "tts_frontend",
+  "homepage" : "http://jungle.horse/frontend",
   "version": "0.1.0",
   "private": true,
   "dependencies": {

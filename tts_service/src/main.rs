@@ -1,6 +1,7 @@
 #[macro_use] extern crate actix_web;
 #[macro_use] extern crate serde_derive;
 
+extern crate actix_files;
 extern crate hound;
 extern crate serde;
 extern crate tch;
@@ -13,8 +14,9 @@ use std::env;
 use std::sync::Arc;
 
 use actix_cors::Cors;
-use actix_web::middleware::Logger;
+use actix_files::Files;
 use actix_web::http::{header, Method, StatusCode};
+use actix_web::middleware::Logger;
 use actix_web::{
   App,
   HttpRequest,
@@ -103,6 +105,7 @@ async fn post_tts(request: HttpRequest,
 const TACOTRON_MODEL : &'static str = "TACOTRON_MODEL";
 const MELGAN_MODEL : &'static str = "MELGAN_MODEL";
 const BIND_ADDRESS : &'static str = "BIND_ADDRESS";
+const ASSET_DIRECTORY : &'static str = "ASSET_DIRECTORY";
 
 #[actix_rt::main]
 async fn main() -> std::io::Result<()> {
@@ -117,6 +120,9 @@ async fn main() -> std::io::Result<()> {
   let melgan_filename = env::var(MELGAN_MODEL)
       .expect(&format!("Must include {} env var", MELGAN_MODEL));
 
+  let asset_directory = env::var(ASSET_DIRECTORY)
+      .expect(&format!("Must include {} env var", ASSET_DIRECTORY));
+
   println!("Loading models...");
 
   let ttsEngine = TacoMelModel::create(&tacotron_filename, &melgan_filename);
@@ -124,6 +130,7 @@ async fn main() -> std::io::Result<()> {
   let arc = web::Data::new(Arc::new(ttsEngine));
 
   println!("Starting HTTP service.");
+  println!("Asset directory: {}", asset_directory);
   println!("Listening on: {}", bind_address);
 
   HttpServer::new(move || App::new()
@@ -152,6 +159,7 @@ async fn main() -> std::io::Result<()> {
             .allowed_header(http::header::CONTENT_TYPE)
             .max_age(3600)
             .finish())*/
+      .service(Files::new("/frontend", asset_directory.clone()).show_files_listing())
       .service(
         web::resource("/tts")
             .route(web::get().to(get_tts))
