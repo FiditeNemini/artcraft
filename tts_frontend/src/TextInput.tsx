@@ -1,10 +1,12 @@
 import React from 'react';
+import Howl from 'howler';
 
 interface Props {
 }
 
 interface State {
   text?: String,
+  howl?: Howl,
 }
 
 /// Requests to the backend.
@@ -25,6 +27,7 @@ class TextInput extends React.Component<Props, State> {
     super(props);
     this.state = {
       text: undefined,
+      howl: undefined,
     };
   }
 
@@ -45,6 +48,7 @@ class TextInput extends React.Component<Props, State> {
     }
 
     let request = new TtsRequest(this.state.text);
+    let that = this;
 
     const url = `http://localhost:12345/tts`;
     fetch(url, {
@@ -54,7 +58,22 @@ class TextInput extends React.Component<Props, State> {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify(request),
-    });
+    })
+    .then(res => res.blob())
+    .then(blob => {
+      console.log(blob);
+      const url = window.URL.createObjectURL(blob);
+      console.log(url);
+      const sound = new Howl.Howl({
+        src: [url],
+        format: 'wav',
+      });
+      
+      this.setState({howl: sound});
+      sound.play();
+      (window as any).sound = sound;
+    })
+
     //.then(res => res.json())
     //.then(...
 
