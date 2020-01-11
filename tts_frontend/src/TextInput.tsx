@@ -49,7 +49,7 @@ class TextInput extends React.Component<Props, State> {
 
     let request = new TtsRequest(this.state.text);
 
-    const url = `http://localhost:12345/tts`;
+    const url = `/tts`;
     fetch(url, {
       method: 'POST',
       headers: {
