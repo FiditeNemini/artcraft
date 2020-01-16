@@ -48,29 +48,29 @@ impl TacoMelModel {
 
     println!("Text buffer: {:?}", text_buffer);
 
+    self.encoded_text_to_audio_signal(&text_buffer)
+  }
+
+  fn encoded_text_to_audio_signal(&self, text_buffer: &Vec<i64>) -> Vec<i16> {
     let text_tensor = Tensor::of_slice(text_buffer.as_slice());
-
     println!("Text tensor: {:?}", text_tensor);
-
     let text_tensor = text_tensor.unsqueeze(0);
-
     println!("Text tensor unsq: {:?}", text_tensor);
-
     let mut mel_tensor = self.tacotron_model.forward(&text_tensor);
-
     println!("\n\n>>> Mel tensor:\n{:?}\n\n", mel_tensor);
     println!("Running melgan...");
-
     let audio_tensor = self.melgan_model.forward(&mel_tensor);
-
     println!("\n\n>>> Audio tensor:\n{:?}\n\n", audio_tensor);
-
     Self::audio_tensor_to_audio_signal(audio_tensor)
   }
 
   pub fn run_tts_audio(&self, text: &str) -> Vec<u8> {
     let audio_signal = self.run_tts(text);
+    Self::audio_signal_to_wav_bytes(audio_signal)
+  }
 
+  pub fn run_tts_encoded(&self, encoded_text: &Vec<i64>) -> Vec<u8> {
+    let audio_signal = self.encoded_text_to_audio_signal(encoded_text);
     Self::audio_signal_to_wav_bytes(audio_signal)
   }
 

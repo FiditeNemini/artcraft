@@ -11,12 +11,17 @@ from math import sqrt
 
 from tacotron_model import Tacotron2
 
+tacotron_model_file = '/home/bt/models/tacotron2-nvidia/tacotron2_arpabet_ljs_checkpoint_22000'
+output_filename = 'tacotron_arpabet_1.pt'
+
+# NB: Tacotron's original shape is [148, 512]. Arpabet encoding is [256, 512].
+NUM_SYMBOLS_ENCODED = 256 # 148 by default, 256 with my custom Arpabet encoding
+
 #torch.set_default_tensor_type('torch.DoubleTensor')
 #torch.set_default_tensor_type('torch.FloatTensor')
 
 print('Loading tacotron model...')
 #tacotron_model_file = '/home/bt/models/tacotron2-nvidia/tacotron2_statedict.pt'
-tacotron_model_file = '/home/bt/models/tacotron2-nvidia/checkpoint_2000'
 tacotron_model = torch.load(tacotron_model_file, map_location=torch.device('cpu'))
 
 def cuda_to_cpu(model):
@@ -56,7 +61,7 @@ class HParams:
     fp16_run = False
     n_mel_channels = 80
     n_frames_per_step = 1
-    n_symbols = 148 # NB: Determined by running inference
+    n_symbols = NUM_SYMBOLS_ENCODED
     symbols_embedding_dim = 512
     encoder_kernel_size = 5
     encoder_n_convolutions = 3
@@ -77,8 +82,6 @@ module = Tacotron2(HParams())
 print('Load state dict...')
 module.load_state_dict(tacotron_model['state_dict'])
 #module.eval() # NB: Complains unless called: Did you forget call .eval() on your model?
-
-output_filename = 'tacotron_container4.pt'
 
 # NB: Tracing evaluates the model on input and unrolls and hardcodes branching
 # and loops. Scripting allows these to remain by converting the entire program

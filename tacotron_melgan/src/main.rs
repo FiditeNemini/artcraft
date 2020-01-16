@@ -1,7 +1,7 @@
 #![feature(proc_macro_hygiene, decl_macro)]
 
-#[macro_use] extern crate rocket;
-#[macro_use] extern crate rocket_contrib;
+//#[macro_use] extern crate rocket;
+//#[macro_use] extern crate rocket_contrib;
 #[macro_use] extern crate serde_derive;
 extern crate hound;
 extern crate rand;
@@ -13,11 +13,11 @@ use tch::CModule;
 use tch::Tensor;
 use tch::nn::Module;
 use tch::nn::ModuleT;
-use server::run_server;
+//use server::run_server;
 
 pub mod melgan;
 pub mod model;
-pub mod server;
+//pub mod server;
 pub mod tacotron;
 
 pub fn main() {
@@ -27,7 +27,7 @@ pub fn main() {
   //tacotron::run_tacotron();
   //run_end_to_end();
 
-  run_server();
+  //run_server();
 }
 
 fn run_end_to_end() {
