@@ -11,7 +11,8 @@ from math import sqrt
 
 from tacotron_model import Tacotron2
 
-tacotron_model_file = '/home/bt/models/tacotron2-nvidia/tacotron2_arpabet_ljs_checkpoint_22000'
+#tacotron_model_file = '/home/bt/models/tacotron2-nvidia/tacotron2_arpabet_ljs_checkpoint_22000'
+tacotron_model_file = '/home/bt/models/tacotron2-nvidia/tacotron2_arpabet_ljs_checkpoint_54000'
 output_filename = 'tacotron_arpabet_1.pt'
 
 # NB: Tacotron's original shape is [148, 512]. Arpabet encoding is [256, 512].

@@ -1,7 +1,9 @@
 import React from 'react';
 import Howl from 'howler';
+import {TextAudioPair }from './MainComponent'
 
 interface Props {
+  appendUtteranceCallback: (utterance: TextAudioPair) => void
 }
 
 interface State {
@@ -70,6 +72,9 @@ class TextInput extends React.Component<Props, State> {
       
       this.setState({howl: sound});
       sound.play();
+
+      this.props.appendUtteranceCallback(new TextAudioPair(request.text, sound));
+
       (window as any).sound = sound;
     })
 

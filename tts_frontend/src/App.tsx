@@ -1,11 +1,12 @@
 import React from 'react';
-import TextInput from './TextInput';
 import './App.css';
+import { MainComponent } from './components/MainComponent';
 
 const App: React.FC = () => {
   return (
     <div className="App">
-      <TextInput></TextInput>
+      <h1>Test2</h1>
+      <MainComponent />
     </div>
   );
 }
