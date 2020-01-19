@@ -1,4 +1,4 @@
-import React from 'react';
+import * as React from 'react';
 import Howl from 'howler';
 
 interface Props {
@@ -20,11 +20,22 @@ class TextAudioTrack extends React.Component<Props, State> {
     this.props.howl.play();
   }
 
+  reload = () => {
+    console.log('Reload clicked');
+  }
+
   public render() {
     return (
-      <div onClick={this.play}>
-        Track:
-        <p onClick={this.play}>{this.props.text}</p>
+      <div className="track">
+        <span 
+          className="play_button" 
+          onClick={this.play}>&#x25b6;</span>
+        <span
+          className="reload_button"
+          onClick={this.reload}>&#x21bb;</span>
+        <span 
+          className="track_text"
+          onClick={this.play}>{this.props.text}</span>
       </div>
     );
   }
