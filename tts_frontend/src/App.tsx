@@ -5,7 +5,7 @@ import { MainComponent } from './components/MainComponent';
 const App: React.FC = () => {
   return (
     <div className="App">
-      <h1>Test2</h1>
+      <h1>Neural TTS</h1>
       <MainComponent />
     </div>
   );

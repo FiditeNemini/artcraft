@@ -1,5 +1,6 @@
 import * as React from 'react';
 import Howl from 'howler';
+import {makeTtsRequest} from '../TtsService'
 
 interface Props {
   text: String,
@@ -22,6 +23,12 @@ class TextAudioTrack extends React.Component<Props, State> {
 
   reload = () => {
     console.log('Reload clicked');
+
+    const sentence = this.props.text.toString();
+    
+    makeTtsRequest(sentence).then(response => {
+      response.howl.play();
+    });
   }
 
   public render() {
