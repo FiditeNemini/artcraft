@@ -29,17 +29,16 @@ pub fn main() {
 
   println!("getting serial number...");
   let mut serial_size : size_t = 13; // experimentally determined - serial size: 13
-  let mut message_bytes : Vec<u8> = vec![0u8; 13];
+  let mut message_bytes : Vec<c_char> = vec![c_char::default(); 13];
   let mut serial_number: *const c_char = std::ptr::null();
   let result = unsafe {
     k4a_device_get_serialnum(device_handle, message_bytes.as_mut_ptr(), &mut serial_size)
   };
   println!("result: {:?}", result);
   println!("serial size: {:?}", serial_size);
-  println!("serial number: {:?}", serial_number);
 
-  let serial = String::from_utf8(message_bytes).unwrap();
-  println!("serial: {}", serial);
+  let serial = unsafe { CString::from_raw(message_bytes.as_mut_ptr()) };
+  println!("serial: {:?}", serial);
 
   /*println!("closing device...");
   unsafe {
