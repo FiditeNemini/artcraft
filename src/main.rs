@@ -7,6 +7,7 @@ use libc::size_t;
 use wrapper::*;
 use std::ffi::{CStr, CString};
 use std::os::raw::c_char;
+use std::borrow::BorrowMut;
 
 pub fn main() {
   println!("hello world");
@@ -15,13 +16,28 @@ pub fn main() {
   println!("Device count: {}", device_count);
 
   println!("opening device...");
-  let mut device_handle = k4a_device_t::default();
+  let mut device_handle : k4a_device_t = unsafe { std::mem::zeroed() };
 
   println!("[before] device handle: {:?}", device_handle);
 
   let result = unsafe {
     k4a_device_open(K4A_DEVICE_DEFAULT, &mut device_handle)
   };
+  /*
+  let result = unsafe {
+    let mut handle = std::mem::MaybeUninit::uninit();
+    let result = k4a_device_open(K4A_DEVICE_DEFAULT, handle.as_mut_ptr());
+
+    device_handle = handle.assume_init().read();
+    //device_handle = std::mem::take(&mut handle.read());
+    result
+  };
+  let result = unsafe {
+    let mut mut_ref : *mut k4a_device_t = &mut device_handle;
+    //let dbl_mut : *mut &mut k4a_device_t = &mut mut_ref;
+    k4a_device_open(K4A_DEVICE_DEFAULT, &mut mut_ref)
+  };
+  */
 
   println!("result: {:?}", result);
   println!("device handle: {:?}", device_handle);
@@ -40,10 +56,10 @@ pub fn main() {
   let serial = unsafe { CString::from_raw(message_bytes.as_mut_ptr()) };
   println!("serial: {:?}", serial);
 
-  /*println!("closing device...");
+  println!("closing device...");
   unsafe {
     k4a_device_close(device_handle)
-  };*/
+  };
 
   //println!("device handle: {:?}", device_handle);
 

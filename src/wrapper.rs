@@ -82,6 +82,8 @@ NB(bt): Opaque device handles are declared with the following macro:
 /// Invalid handles are set to 0.
 #[derive(Debug,Default)]
 #[repr(C)]
-pub struct k4a_device_t {
+pub struct k4a_device_struct {
   pub _rsvd: size_t,
 }
+
+pub type k4a_device_t = *const k4a_device_struct;
