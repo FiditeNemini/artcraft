@@ -12,16 +12,6 @@ extern {
   /// Get number of Kinect devices
   pub fn k4a_device_get_installed_count() -> u32;
 
-  /*
-  NB(bt): Device handles are declared with the following macro:
-
-  #define K4A_DECLARE_HANDLE(_handle_name_)                                                                              \
-    typedef struct _##_handle_name_                                                                                    \
-    {                                                                                                                  \
-        size_t _rsvd; /**< Reserved, do not use. */                                                                    \
-    } * _handle_name_;
-  */
-
   /// Open an Azure Kinect device.
   ///
   /// Returns:
@@ -32,7 +22,10 @@ extern {
   /// This handle grants exclusive access to the device and may be used in the other Azure Kinect
   /// API calls.
   /// When done with the device, close the handle with k4a_device_close()
-  pub fn k4a_device_open(index: u32, device_handle: *mut k4a_device_t) -> k4a_result_t;
+  pub fn k4a_device_open(//uint32_t  	index,
+                         index: u32,
+                         //k4a_device_t *  	device_handle
+                         device_handle: *mut k4a_device_t) -> k4a_result_t;
 
   /// Closes an Azure Kinect device.
   ///
@@ -40,7 +33,8 @@ extern {
   /// Once closed, the handle is no longer valid.
   /// Before closing the handle to the device, ensure that all k4a_capture_t captures
   /// have been released with k4a_capture_release().
-  pub fn k4a_device_close(device_handle: *mut k4a_device_t);
+  pub fn k4a_device_close(//k4a_device_t  	device_handle
+                          device_handle: k4a_device_t);
 
 
   pub fn k4a_device_get_serialnum(//k4a_device_t  	device_handle,
@@ -72,9 +66,20 @@ pub enum k4a_buffer_result_t {
 }
 }
 
+/*
+NB(bt): Opaque device handles are declared with the following macro:
 
-// Opaque device handle
-//#[no_mangle]
+#define K4A_DECLARE_HANDLE(_handle_name_)                                                                              \
+  typedef struct _##_handle_name_                                                                                    \
+  {                                                                                                                  \
+      size_t _rsvd; /**< Reserved, do not use. */                                                                    \
+  } * _handle_name_;
+*/
+/// Handle to an Azure Kinect device.
+///
+/// Remarks
+/// Handles are created with k4a_device_open() and closed with k4a_device_close().
+/// Invalid handles are set to 0.
 #[derive(Debug,Default)]
 #[repr(C)]
 pub struct k4a_device_t {
