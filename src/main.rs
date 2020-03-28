@@ -5,7 +5,7 @@ pub mod wrapper;
 
 use libc::size_t;
 use wrapper::*;
-use std::ffi::CStr;
+use std::ffi::{CStr, CString};
 use std::os::raw::c_char;
 
 pub fn main() {
@@ -28,13 +28,18 @@ pub fn main() {
   unsafe { println!("&device handle: {:?}", &device_handle); }
 
   println!("getting serial number...");
-  let mut serial_size : size_t = 0;
+  let mut serial_size : size_t = 13; // experimentally determined - serial size: 13
+  let mut message_bytes : Vec<u8> = vec![0u8; 13];
   let mut serial_number: *const c_char = std::ptr::null();
   let result = unsafe {
-    k4a_device_get_serialnum(device_handle, serial_number, &mut serial_size)
+    k4a_device_get_serialnum(device_handle, message_bytes.as_mut_ptr(), &mut serial_size)
   };
   println!("result: {:?}", result);
   println!("serial size: {:?}", serial_size);
+  println!("serial number: {:?}", serial_number);
+
+  let serial = String::from_utf8(message_bytes).unwrap();
+  println!("serial: {}", serial);
 
   /*println!("closing device...");
   unsafe {
