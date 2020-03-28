@@ -1,4 +1,5 @@
 use libc::size_t;
+use std::os::raw::c_char;
 
 /// Default device index
 ///
@@ -31,7 +32,7 @@ extern {
   /// This handle grants exclusive access to the device and may be used in the other Azure Kinect
   /// API calls.
   /// When done with the device, close the handle with k4a_device_close()
-  pub fn k4a_device_open(index: u32, device_handle: *const size_t) -> k4a_result_t;
+  pub fn k4a_device_open(index: u32, device_handle: *mut k4a_device_t) -> k4a_result_t;
 
   /// Closes an Azure Kinect device.
   ///
@@ -39,7 +40,15 @@ extern {
   /// Once closed, the handle is no longer valid.
   /// Before closing the handle to the device, ensure that all k4a_capture_t captures
   /// have been released with k4a_capture_release().
-  pub fn k4a_device_close(device_handle: *const size_t);
+  pub fn k4a_device_close(device_handle: *mut k4a_device_t);
+
+
+  pub fn k4a_device_get_serialnum(//k4a_device_t  	device_handle,
+                                  device_handle: *const k4a_device_t,
+                                  //char *  	serial_number,
+                                  serial_number: *mut c_char,
+                                  //size_t *  	serial_number_size
+                                  serial_number_size: *mut size_t) -> k4a_buffer_result_t;
 }
 
 enum_from_primitive! {
@@ -48,4 +57,26 @@ pub enum k4a_result_t {
   K4A_RESULT_SUCCEEDED = 0,
   K4A_RESULT_FAILED,
 }
+}
+
+/// Result code returned by Azure Kinect APIs.
+enum_from_primitive! {
+#[derive(Debug, PartialEq)]
+pub enum k4a_buffer_result_t {
+  /// The result was successful.
+  K4A_BUFFER_RESULT_SUCCEEDED,
+  /// The result was a failure.
+  K4A_BUFFER_RESULT_FAILED,
+  /// The input buffer was too small.
+  K4A_BUFFER_RESULT_TOO_SMALL,
+}
+}
+
+
+// Opaque device handle
+//#[no_mangle]
+#[derive(Debug,Default)]
+#[repr(C)]
+pub struct k4a_device_t {
+  pub _rsvd: size_t,
 }
