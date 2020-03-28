@@ -15,9 +15,7 @@ pub fn main() {
   println!("Device count: {}", device_count);
 
   println!("opening device...");
-  let mut device_handle = k4a_device_t {
-    _rsvd: 0,
-  };
+  let mut device_handle = k4a_device_t::default();
 
   println!("[before] device handle: {:?}", device_handle);
 
@@ -29,18 +27,19 @@ pub fn main() {
   println!("device handle: {:?}", device_handle);
   unsafe { println!("&device handle: {:?}", &device_handle); }
 
-  /*println!("getting serial number...");
+  println!("getting serial number...");
   let mut serial_size : size_t = 0;
-  let mut serial_number : c_char = c_char::default();
+  let mut serial_number: *const c_char = std::ptr::null();
   let result = unsafe {
-    k4a_device_get_serialnum(&device_handle, &mut serial_number, &mut serial_size)
+    k4a_device_get_serialnum(device_handle, serial_number, &mut serial_size)
   };
-  println!("result: {:?}", result);*/
+  println!("result: {:?}", result);
+  println!("serial size: {:?}", serial_size);
 
-  println!("closing device...");
+  /*println!("closing device...");
   unsafe {
     k4a_device_close(device_handle)
-  };
+  };*/
 
   //println!("device handle: {:?}", device_handle);
 

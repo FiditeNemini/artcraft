@@ -38,9 +38,9 @@ extern {
 
 
   pub fn k4a_device_get_serialnum(//k4a_device_t  	device_handle,
-                                  device_handle: *const k4a_device_t,
+                                  device_handle: k4a_device_t,
                                   //char *  	serial_number,
-                                  serial_number: *mut c_char,
+                                  serial_number: *const c_char,
                                   //size_t *  	serial_number_size
                                   serial_number_size: *mut size_t) -> k4a_buffer_result_t;
 }
