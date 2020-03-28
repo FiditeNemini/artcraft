@@ -1,0 +1,12 @@
+[package]
+name = "storyteller"
+version = "0.0.0"
+authors = [ "Brandon Thomas <bt@brand.io>",
+            "Brandon Thomas <echelon@gmail.com>" ]
+
+[[bin]]
+name = "camera"
+path = "src/main.rs"
+
+[dependencies]
+libc = "0.2.68"
