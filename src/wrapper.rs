@@ -86,4 +86,4 @@ pub struct k4a_device_struct {
   pub _rsvd: size_t,
 }
 
-pub type k4a_device_t = *const k4a_device_struct;
+pub type k4a_device_t = *mut k4a_device_struct;

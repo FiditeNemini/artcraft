@@ -43,25 +43,37 @@ pub fn main() {
   println!("device handle: {:?}", device_handle);
   unsafe { println!("&device handle: {:?}", &device_handle); }
 
-  println!("getting serial number...");
-  let mut serial_size : size_t = 13; // experimentally determined - serial size: 13
-  let mut message_bytes : Vec<c_char> = vec![c_char::default(); 13];
-  let mut serial_number: *const c_char = std::ptr::null();
-  let result = unsafe {
-    k4a_device_get_serialnum(device_handle, message_bytes.as_mut_ptr(), &mut serial_size)
-  };
-  println!("result: {:?}", result);
-  println!("serial size: {:?}", serial_size);
-
-  let serial = unsafe { CString::from_raw(message_bytes.as_mut_ptr()) };
-  println!("serial: {:?}", serial);
+  get_serial_number(device_handle);
 
   println!("closing device...");
   unsafe {
     k4a_device_close(device_handle)
   };
 
-  //println!("device handle: {:?}", device_handle);
+  println!("done!");
+}
 
-  println!("done");
+fn get_serial_number(device_handle: k4a_device_t) {
+  // We first interrogate the size (and don't return a serial number).
+  let mut serial_size : size_t = 0;
+
+  println!("getting serial size...");
+  let result = unsafe {
+    k4a_device_get_serialnum(device_handle, std::ptr::null_mut(), &mut serial_size)
+  };
+
+  println!("result: {:?}", result);
+  println!("serial size: {:?}", serial_size);
+
+  println!("getting serial value...");
+  let mut message_bytes : Vec<c_char> = vec![c_char::default(); serial_size];
+  let result = unsafe {
+    k4a_device_get_serialnum(device_handle, message_bytes.as_mut_ptr(), &mut serial_size)
+  };
+  println!("result: {:?}", result);
+  println!("serial size: {:?}", serial_size);
+
+  // Careful not to produce a double-free:
+  let mut serial = unsafe { CString::from_raw(message_bytes.as_mut_ptr()).clone() };
+  println!("serial: {:?}", serial);
 }
