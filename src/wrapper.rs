@@ -87,3 +87,4 @@ pub struct k4a_device_struct {
 }
 
 pub type k4a_device_t = *mut k4a_device_struct;
+
