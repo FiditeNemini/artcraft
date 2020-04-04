@@ -120,10 +120,10 @@ impl Device {
   }
 
   /// Get capture and return a new buffer.
-  pub fn get_capture(&self, timeout_ms: i32) -> Result<k4a_sys::k4a_capture_t, GetCaptureError> {
+  pub fn get_capture(&self, timeout_ms: i32) -> Result<Capture, GetCaptureError> {
     let mut capture_buffer: k4a_sys::k4a_capture_t = ptr::null_mut();
     self.get_capture_buffered(&mut capture_buffer, timeout_ms)
-        .map(|_| capture_buffer)
+        .map(|_| Capture(capture_buffer)) // TODO: Can capture be null?
   }
 
   /// Get capture and reuse an existing buffer.
@@ -154,10 +154,82 @@ impl Device {
 }
 
 /// Errors for GetCapture
+#[derive(Debug)]
 pub enum GetCaptureError {
   TimeoutError,
   FailedError,
   UnknownError(u32),
+}
+
+#[derive(Debug)]
+pub enum CaptureError {
+  NullCapture,
+}
+
+/// Adapted from k4a-sys. Represents a capture.
+#[derive(Debug)]
+pub struct Capture(pub k4a_sys::k4a_capture_t);
+
+impl Capture {
+  pub fn get_depth_image(&self) -> Result<Image, CaptureError> {
+    let image = unsafe {
+      k4a_sys::k4a_capture_get_depth_image(self.0)
+    };
+    if image.is_null() {
+      return Err(CaptureError::NullCapture);
+    }
+    Ok(Image(image))
+  }
+
+  pub fn get_color_image(&self) -> Result<Image, CaptureError> {
+    let image = unsafe {
+      k4a_sys::k4a_capture_get_color_image(self.0)
+    };
+    if image.is_null() {
+      return Err(CaptureError::NullCapture);
+    }
+    Ok(Image(image))
+  }
+
+  pub fn get_ir_image(&self) -> Result<Image, CaptureError> {
+    let image = unsafe {
+      k4a_sys::k4a_capture_get_ir_image(self.0)
+    };
+    if image.is_null() {
+      return Err(CaptureError::NullCapture);
+    }
+    Ok(Image(image))
+  }
+}
+
+/// Adapted from k4a-sys. Represents an image within a capture.
+#[derive(Debug)]
+pub struct Image(pub k4a_sys::k4a_image_t);
+
+impl Image {
+  pub fn get_height_pixels(&self) -> usize {
+    unsafe {
+      k4a_sys::k4a_image_get_height_pixels(self.0) as usize
+    }
+  }
+
+  pub fn get_width_pixels(&self) -> usize {
+    unsafe {
+      k4a_sys::k4a_image_get_width_pixels(self.0) as usize
+    }
+  }
+
+  pub fn get_stride_bytes(&self) -> usize {
+    unsafe {
+      k4a_sys::k4a_image_get_stride_bytes(self.0) as usize
+    }
+  }
+
+  pub fn get_buffer(&self) -> *mut u8 {
+    unsafe {
+      k4a_sys::k4a_image_get_buffer(self.0)
+    }
+  }
 }
 
 /// Deallocate open device handles
@@ -165,6 +237,22 @@ impl Drop for Device {
   fn drop(&mut self) {
     unsafe {
       k4a_sys::k4a_device_close(self.device_pointer);
+    }
+  }
+}
+
+impl Drop for Capture {
+  fn drop(&mut self) {
+    unsafe {
+      k4a_sys::k4a_capture_release(self.0);
+    }
+  }
+}
+
+impl Drop for Image {
+  fn drop(&mut self) {
+    unsafe {
+      k4a_sys::k4a_image_release(self.0);
     }
   }
 }
@@ -185,7 +273,6 @@ impl DeviceConfiguration {
       wired_sync_mode: 0,
       subordinate_delay_off_master_usec: 0,
       disable_streaming_indicator: false,
-    }
-    )
+    })
   }
 }

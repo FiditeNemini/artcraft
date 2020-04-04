@@ -13,3 +13,4 @@ enum_primitive = "0.1.1"
 # k4a-sys = "0.2.0"
 k4a-sys = { path = "/home/bt/dev/3rd/k4a-sys" }
 libc = "0.2.68"
+opencv = "0.33.1"
