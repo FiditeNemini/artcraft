@@ -144,7 +144,7 @@ dependencies = [
 
 [[package]]
 name = "k4a-sys"
-version = "0.2.2"
+version = "0.2.0"
 dependencies = [
  "bindgen 0.52.0 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
@@ -268,7 +268,7 @@ name = "storyteller"
 version = "0.0.0"
 dependencies = [
  "enum_primitive 0.1.1 (registry+https://github.com/rust-lang/crates.io-index)",
- "k4a-sys 0.2.2",
+ "k4a-sys 0.2.0",
  "libc 0.2.68 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
