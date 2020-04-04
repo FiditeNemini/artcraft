@@ -10,12 +10,15 @@ pub mod k4a_sys_wrapper;
 use handwritten_wrapper::*;
 use k4a_sys_wrapper::device_get_installed_count;
 use k4a_sys_wrapper::Device;
+use k4a_sys_wrapper::Image;
 
 use libc::size_t;
 use opencv::highgui;
+use opencv::imgproc;
+use opencv::core;
 use opencv::prelude::*;
 use std::borrow::BorrowMut;
-use std::ffi::{CStr, CString};
+use std::ffi::{CStr, CString, c_void};
 use std::os::raw::c_char;
 use std::thread;
 use std::time::Duration;
@@ -39,29 +42,50 @@ pub fn main() {
 
     loop {
       let capture = device.get_capture(1000).ok().unwrap();
-      println!("Capture: {:?}", capture);
-
       let image = capture.get_depth_image().ok().unwrap();
-      println!("Image: {:?}", capture);
 
-      let height = image.get_height_pixels();
-      let width = image.get_width_pixels();
+      let opencv_image = depth_to_opencv(&image).ok().unwrap();
 
-      println!("Dimensions: {}x{}", width, height);
-
-      /*highgui::imshow(window_name, &output_image).unwrap();
+      highgui::imshow(window_name, &opencv_image).unwrap();
       if highgui::wait_key(10).unwrap() > 0 {
         break;
-      }*/
-
-      thread::sleep(Duration::from_secs(1));
+      }
     }
 
-
-    println!("Stopping cameras...");
     device.stop_cameras();
   }
 
   handwritten_wrapper_test::test_integration();
 }
 
+/// Copied from k4a-sys
+pub fn color_to_opencv(mut image: Image) -> opencv::Result<Mat> {
+  let with_alpha = unsafe {
+    let stride = image.get_stride_bytes();
+    Mat::new_rows_cols_with_data(
+      image.get_height_pixels() as i32,
+      image.get_width_pixels() as i32,
+      core::CV_8UC4,
+      &mut *(image.get_buffer() as *mut c_void),
+      stride,
+    )?
+  };
+  let mut no_alpha = Mat::default()?;
+  imgproc::cvt_color(&with_alpha, &mut no_alpha, imgproc::COLOR_BGRA2BGR, 0)?;
+  return Ok(no_alpha);
+}
+
+/// Copied from k4a-sys
+pub fn depth_to_opencv(image: &Image) -> opencv::Result<Mat> {
+  unsafe {
+    let stride = image.get_stride_bytes();
+    let mat = Mat::new_rows_cols_with_data(
+      image.get_height_pixels() as i32,
+      image.get_width_pixels() as i32,
+      core::CV_16U,
+      &mut *(image.get_buffer() as *mut c_void),
+      stride,
+    );
+    mat
+  }
+}
