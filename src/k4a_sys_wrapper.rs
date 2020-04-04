@@ -118,6 +118,46 @@ impl Device {
       k4a_sys::k4a_device_stop_cameras(self.device_pointer)
     }
   }
+
+  /// Get capture and return a new buffer.
+  pub fn get_capture(&self, timeout_ms: i32) -> Result<k4a_sys::k4a_capture_t, GetCaptureError> {
+    let mut capture_buffer: k4a_sys::k4a_capture_t = ptr::null_mut();
+    self.get_capture_buffered(&mut capture_buffer, timeout_ms)
+        .map(|_| capture_buffer)
+  }
+
+  /// Get capture and reuse an existing buffer.
+  pub fn get_capture_buffered(&self, capture_buffer: &mut k4a_sys::k4a_capture_t, timeout_ms: i32)
+      -> Result<(), GetCaptureError>
+  {
+    let timeout_millis = 1000;
+
+    let result = unsafe {
+      k4a_sys::k4a_device_get_capture(self.device_pointer, capture_buffer, timeout_ms)
+    };
+
+    match result {
+      k4a_sys::k4a_wait_result_t_K4A_WAIT_RESULT_SUCCEEDED  => { /* ok, continue */ },
+      k4a_sys::k4a_wait_result_t_K4A_WAIT_RESULT_TIMEOUT => {
+        return Err(GetCaptureError::TimeoutError);
+      },
+      k4a_sys::k4a_wait_result_t_K4A_WAIT_RESULT_FAILED => {
+        return Err(GetCaptureError::TimeoutError);
+      }
+      _ => {
+        return Err(GetCaptureError::UnknownError(result));
+      }
+    }
+
+    Ok(())
+  }
+}
+
+/// Errors for GetCapture
+pub enum GetCaptureError {
+  TimeoutError,
+  FailedError,
+  UnknownError(u32),
 }
 
 /// Deallocate open device handles

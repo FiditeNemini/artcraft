@@ -30,8 +30,12 @@ pub fn main() {
     println!("Starting cameras...");
     device.start_cameras().unwrap();
 
-    thread::sleep(Duration::from_secs(5));
-    
+    //thread::sleep(Duration::from_secs(5));
+
+    let capture = device.get_capture(1000).ok().unwrap();
+
+    println!("Capture: {:?}", capture);
+
     println!("Stopping cameras...");
     device.stop_cameras();
   }
