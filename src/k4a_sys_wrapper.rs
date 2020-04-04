@@ -6,7 +6,6 @@ use k4a_sys;
 use std::ffi::{CString, CStr};
 use std::ptr;
 use handwritten_wrapper::{K4A_DEVICE_DEFAULT, k4a_device_close};
-use k4a_sys_wrapper::K4AError::UnableToGetSerialNumber;
 
 pub fn device_get_installed_count() -> u32 {
   unsafe {
@@ -24,11 +23,13 @@ pub fn device_get_installed_count() -> u32 {
   }
 }*/
 
+// TODO: this is kind of lame.
 /// A library error
 #[derive(Debug)]
-pub enum K4AError {
+pub enum KinectError {
   UnableToOpen { error_code: u32 },
   UnableToGetSerialNumber,
+  UnableToStartCameras { error_code: u32 },
 }
 
 /// A Kinect Device Handle
@@ -39,12 +40,12 @@ pub struct Device {
 
 impl Device {
   /// Open a device with the given index
-  pub fn open(device_index: u32) -> Result<Self, K4AError> {
+  pub fn open(device_index: u32) -> Result<Self, KinectError> {
     let mut device_pointer: k4a_sys::k4a_device_t = ptr::null_mut();
     unsafe {
       let result = k4a_sys::k4a_device_open(device_index, &mut device_pointer);
       if result != k4a_sys::k4a_buffer_result_t_K4A_BUFFER_RESULT_SUCCEEDED {
-        return Err(K4AError::UnableToOpen { error_code: result })
+        return Err(KinectError::UnableToOpen { error_code: result })
       }
     }
     Ok(Device {
@@ -53,7 +54,7 @@ impl Device {
   }
 
   /// Fetch the device serial number.
-  pub fn get_serial_number(&self) -> Result<String, K4AError> {
+  pub fn get_serial_number(&self) -> Result<String, KinectError> {
     // First we interrogate the serial number size.
     let mut serial_number_length: usize = 0;
 
@@ -62,7 +63,7 @@ impl Device {
     };
 
     if result != k4a_sys::k4a_buffer_result_t_K4A_BUFFER_RESULT_TOO_SMALL {
-      return Err(K4AError::UnableToGetSerialNumber);
+      return Err(KinectError::UnableToGetSerialNumber);
     }
 
     // Now we request to fill a serial number buffer.
@@ -74,7 +75,7 @@ impl Device {
     };
 
     if result != k4a_sys::k4a_buffer_result_t_K4A_BUFFER_RESULT_SUCCEEDED {
-      return Err(K4AError::UnableToGetSerialNumber);
+      return Err(KinectError::UnableToGetSerialNumber);
     }
 
     // NB: Library shouldn't be returning i8's
@@ -82,7 +83,40 @@ impl Device {
 
     String::from_utf8(serial_number)
         .map(|s| s.trim_matches(char::from(0)).into()) // Remove trailing null byte
-        .map_err(|_| K4AError::UnableToGetSerialNumber)
+        .map_err(|_| KinectError::UnableToGetSerialNumber)
+  }
+
+  // TODO: Pass options.
+  /// Start the cameras.
+  pub fn start_cameras(&self) -> Result<(), KinectError> {
+    let mut device_config = DeviceConfiguration::new();
+    device_config.0.color_format = k4a_sys::k4a_image_format_t_K4A_IMAGE_FORMAT_COLOR_MJPG;
+    device_config.0.color_resolution = k4a_sys::k4a_color_resolution_t_K4A_COLOR_RESOLUTION_2160P;
+    device_config.0.depth_mode = k4a_sys::k4a_depth_mode_t_K4A_DEPTH_MODE_NFOV_UNBINNED;
+    device_config.0.camera_fps = k4a_sys::k4a_fps_t_K4A_FRAMES_PER_SECOND_30;
+
+    let result = unsafe {
+      k4a_sys::k4a_device_start_cameras(self.device_pointer, &device_config.0)
+    };
+
+    if result != k4a_sys::k4a_buffer_result_t_K4A_BUFFER_RESULT_SUCCEEDED {
+      return Err(KinectError::UnableToStartCameras { error_code: result });
+    }
+
+    return Ok(())
+  }
+
+  /// Stops the color and depth camera capture.
+  ///
+  /// The streaming of individual sensors stops as a result of this call. Once called,
+  /// k4a_device_start_cameras() may be called again to resume sensor streaming.
+  /// This function may be called while another thread is blocking in k4a_device_get_capture().
+  /// Calling this function while another thread is in that function will result in that function
+  /// returning a failure.
+  pub fn stop_cameras(&self) {
+    unsafe {
+      k4a_sys::k4a_device_stop_cameras(self.device_pointer)
+    }
   }
 }
 
@@ -92,5 +126,26 @@ impl Drop for Device {
     unsafe {
       k4a_sys::k4a_device_close(self.device_pointer);
     }
+  }
+}
+
+/// Copied from k4a-sys
+pub struct DeviceConfiguration (k4a_sys::k4a_device_configuration_t);
+
+/// Copied from k4a-sys
+impl DeviceConfiguration {
+  pub fn new() -> Self {
+    Self (k4a_sys::k4a_device_configuration_t {
+      color_format: k4a_sys::k4a_image_format_t_K4A_IMAGE_FORMAT_COLOR_MJPG,
+      color_resolution: k4a_sys::k4a_color_resolution_t_K4A_COLOR_RESOLUTION_720P,
+      depth_mode: k4a_sys::k4a_depth_mode_t_K4A_DEPTH_MODE_WFOV_2X2BINNED,
+      camera_fps: 0,
+      synchronized_images_only: false,
+      depth_delay_off_color_usec: 0,
+      wired_sync_mode: 0,
+      subordinate_delay_off_master_usec: 0,
+      disable_streaming_indicator: false,
+    }
+    )
   }
 }
