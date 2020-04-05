@@ -90,7 +90,8 @@ impl Device {
   /// Start the cameras.
   pub fn start_cameras(&self) -> Result<(), KinectError> {
     let mut device_config = DeviceConfiguration::new();
-    device_config.0.color_format = k4a_sys::k4a_image_format_t_K4A_IMAGE_FORMAT_COLOR_MJPG;
+    // device_config.0.color_format = k4a_sys::k4a_image_format_t_K4A_IMAGE_FORMAT_COLOR_MJPG; // TODO: Broken?
+    device_config.0.color_format = k4a_sys::k4a_image_format_t_K4A_IMAGE_FORMAT_COLOR_BGRA32;
     device_config.0.color_resolution = k4a_sys::k4a_color_resolution_t_K4A_COLOR_RESOLUTION_2160P;
     device_config.0.depth_mode = k4a_sys::k4a_depth_mode_t_K4A_DEPTH_MODE_NFOV_UNBINNED;
     device_config.0.camera_fps = k4a_sys::k4a_fps_t_K4A_FRAMES_PER_SECOND_30;
@@ -222,6 +223,12 @@ impl Image {
   pub fn get_stride_bytes(&self) -> usize {
     unsafe {
       k4a_sys::k4a_image_get_stride_bytes(self.0) as usize
+    }
+  }
+
+  pub fn get_size(&self) -> usize {
+    unsafe {
+      k4a_sys::k4a_image_get_size(self.0) // returns size_t
     }
   }
 

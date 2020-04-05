@@ -59,8 +59,24 @@ pub fn grab_single_frame() {
     println!("Starting cameras...");
     device.start_cameras().unwrap();
 
-    let capture = device.get_capture(1000).ok().unwrap();
-    let image = capture.get_depth_image().ok().unwrap();
+    let mut capturedImage = None;
+    loop {
+      let capture = device.get_capture(1000).ok().unwrap();
+
+      match capture.get_color_image() {
+        Ok(image) => {
+          capturedImage = Some(image);
+          break;
+        }
+        _ => {},
+      }
+    }
+
+    let image = capturedImage.unwrap();
+
+    /*let image = capture.get_ir_image().expect("Got IR image");
+    let image = capture.get_depth_image().expect("Got depth image");
+    let image = capture.get_color_image().expect("Got color image");*/
 
     //let opencv_image = depth_to_opencv(&image).ok().unwrap();
     let image_image = depth_to_image(&image).expect("depth_to_image should work");
@@ -89,12 +105,17 @@ pub fn depth_to_image(image: &Image) -> Result<DynamicImage, ImageError> {
 
     image::load_from_memory_with_format(slice, ImageFormat::Bmp)*/
 
-    let len = image.get_width_pixels() * image.get_height_pixels() * image.get_stride_bytes();
+    println!("Width: {}", image.get_width_pixels());
+    println!("Height: {}", image.get_height_pixels());
+    println!("Stride: {}", image.get_stride_bytes());
+    println!("size_t: {}", image.get_size());
 
+    //let len = image.get_width_pixels() * image.get_height_pixels() * image.get_stride_bytes();
+    let len = image.get_size();
     let samples = unsafe { slice::from_raw_parts(image.get_buffer(), len) };
 
     //let layout = unsafe { ptr::read(layout) };
-    let layout = SampleLayout::row_major_packed(3, image.get_width_pixels() as u32, image.get_height_pixels() as u32);
+    let layout = SampleLayout::row_major_packed(4, image.get_width_pixels() as u32, image.get_height_pixels() as u32);
 
     let mut buffer = FlatSamples {
       samples,
