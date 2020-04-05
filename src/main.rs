@@ -22,6 +22,15 @@ use glium::glutin::event::{Event, StartCause};
 use glium::glutin::event_loop::{EventLoop, ControlFlow};
 use glium::vertex::VertexBufferAny;
 use glium::{glutin, Surface, Display};
+use image::GenericImage;
+use image::ImageBuffer;
+use image::ImageError;
+use image::Rgb;
+use image::RgbImage;
+use image::Rgba;
+use image::RgbaImage;
+use image::flat::{FlatSamples, SampleLayout};
+use image::{DynamicImage, ImageFormat};
 use libc::size_t;
 use opencv::core;
 use opencv::highgui;
@@ -31,10 +40,80 @@ use std::borrow::BorrowMut;
 use std::ffi::{CStr, CString, c_void};
 use std::io::Cursor;
 use std::os::raw::c_char;
-use std::thread;
+use std::ptr;
+use std::slice;
 use std::sync::Arc;
 use std::sync::RwLock;
+use std::thread;
 use std::time::Duration;
+
+pub fn grab_single_frame() {
+  let installed_devices = device_get_installed_count();
+  println!("Installed devices: {}", installed_devices);
+  {
+    let device = Device::open(0).unwrap();
+    println!("Device: {:?}", device);
+    let serial_number = device.get_serial_number().unwrap();
+    println!("Device: {:?}", serial_number);
+
+    println!("Starting cameras...");
+    device.start_cameras().unwrap();
+
+    let capture = device.get_capture(1000).ok().unwrap();
+    let image = capture.get_depth_image().ok().unwrap();
+
+    //let opencv_image = depth_to_opencv(&image).ok().unwrap();
+    let image_image = depth_to_image(&image).expect("depth_to_image should work");
+
+    /*let imageB = image::load(Cursor::new(&include_bytes!("../n64logo.png")[..]),
+      image::ImageFormat::Png).unwrap().to_rgba();*/
+
+    device.stop_cameras();
+  }
+}
+
+// https://docs.rs/image/0.23.2/image/flat/index.html
+pub fn depth_to_image(image: &Image) -> Result<DynamicImage, ImageError> {
+  unsafe {
+    /*let stride = image.get_stride_bytes();
+    let mat = Mat::new_rows_cols_with_data(
+      image.get_height_pixels() as i32,
+      image.get_width_pixels() as i32,
+      core::CV_16U,
+      &mut *(image.get_buffer() as *mut c_void),
+      stride,
+    );*/
+
+    /*let count_of_items = image.get_width_pixels() * image.get_height_pixels() * image.get_stride_bytes() * 30;
+    let slice = unsafe { std::slice::from_raw_parts(image.get_buffer(), count_of_items) };
+
+    image::load_from_memory_with_format(slice, ImageFormat::Bmp)*/
+
+    let len = image.get_width_pixels() * image.get_height_pixels() * image.get_stride_bytes();
+
+    let samples = unsafe { slice::from_raw_parts(image.get_buffer(), len) };
+
+    //let layout = unsafe { ptr::read(layout) };
+    let layout = SampleLayout::row_major_packed(3, image.get_width_pixels() as u32, image.get_height_pixels() as u32);
+
+    let mut buffer = FlatSamples {
+      samples,
+      layout,
+      color_hint: None,
+    };
+
+    let view = buffer.as_view::<Rgba<u8>>()
+        .expect("view should work");
+
+    let mut img: RgbaImage = ImageBuffer::new(image.get_width_pixels() as u32, image.get_height_pixels() as u32);
+    let mut img = DynamicImage::ImageRgba8(img);
+
+    img.copy_from(&view, 0, 0).expect("Should be able to copy");
+
+    Ok(img)
+  }
+}
+
 
 pub fn main() {
   /*let event_loop = glutin::event_loop::EventLoop::new();
@@ -71,10 +150,11 @@ pub fn main() {
     target.finish().unwrap();
   });*/
 
-  thread::spawn(|| {
+  /*thread::spawn(|| {
     run();
-  });
+  });*/
 
+  grab_single_frame();
 
   let event_loop = glutin::event_loop::EventLoop::new();
   let wb = glutin::window::WindowBuilder::new();
@@ -197,7 +277,6 @@ pub fn main() {
       &Default::default()).unwrap();
     target.finish().unwrap();
   });
-
 }
 
 pub fn run() {
