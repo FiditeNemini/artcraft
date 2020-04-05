@@ -47,7 +47,7 @@ use std::sync::RwLock;
 use std::thread;
 use std::time::Duration;
 
-pub fn grab_single_frame() {
+pub fn grab_single_frame() -> DynamicImage {
   let installed_devices = device_get_installed_count();
   println!("Installed devices: {}", installed_devices);
   {
@@ -85,6 +85,8 @@ pub fn grab_single_frame() {
       image::ImageFormat::Png).unwrap().to_rgba();*/
 
     device.stop_cameras();
+
+    return image_image;
   }
 }
 
@@ -175,7 +177,7 @@ pub fn main() {
     run();
   });*/
 
-  grab_single_frame();
+  let frame_image = grab_single_frame().to_rgba();
 
   let event_loop = glutin::event_loop::EventLoop::new();
   let wb = glutin::window::WindowBuilder::new();
@@ -196,6 +198,10 @@ pub fn main() {
 
   let imageB = glium::texture::RawImage2d::from_raw_rgba_reversed(&imageB.into_raw(), imageB_dimensions);
   let textureB = glium::texture::Texture2d::new(&display, imageB).unwrap();
+
+  let frame_dimensions = frame_image.dimensions();
+  let frame_image = glium::texture::RawImage2d::from_raw_rgba_reversed(&frame_image.into_raw(), frame_dimensions);
+  let textureFrame = glium::texture::Texture2d::new(&display, frame_image).unwrap();
 
   #[derive(Copy, Clone)]
   struct Vertex {
@@ -289,7 +295,7 @@ pub fn main() {
                 [ t , 0.0, 0.0, 1.0f32],
             ],
             tex: match useTexture {
-              0 => &textureA,
+              0 => &textureFrame,
               _ => &textureB,
             },
         };
