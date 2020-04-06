@@ -4,7 +4,7 @@ use std::io::Cursor;
 use std::os::raw::c_char;
 use std::ptr;
 use std::slice;
-use std::sync::Arc;
+use std::sync::{Arc, PoisonError, RwLockWriteGuard};
 use std::sync::RwLock;
 use std::thread;
 use std::time::Duration;
@@ -32,6 +32,50 @@ use handwritten_wrapper::*;
 use k4a_sys_wrapper::Device;
 use k4a_sys_wrapper::device_get_installed_count;
 use k4a_sys_wrapper::Image;
+
+pub fn capture_thread(frame: Arc<RwLock<Option<DynamicImage>>>) {
+  let installed_devices = device_get_installed_count();
+  println!("Installed devices: {}", installed_devices);
+
+  let device = Device::open(0).unwrap();
+  println!("Device: {:?}", device);
+
+  let serial_number = device.get_serial_number().unwrap();
+  println!("Device: {:?}", serial_number);
+
+  println!("Starting cameras...");
+  device.start_cameras().unwrap();
+
+  loop {
+    let mut captured_image = None;
+
+    let capture = device.get_capture(1000)
+        .expect("Should be able to get frame capture.");
+
+    match capture.get_color_image() {
+      Ok(image) => {
+        captured_image = Some(image);
+      }
+      _ => {
+        continue; // We didn't grab a frame.
+      },
+    }
+
+    let image = captured_image.unwrap();
+
+    let image_image = depth_to_image(&image)
+        .expect("depth_to_image should work");
+
+    match frame.write() {
+      Ok(mut lock) => {
+        *lock = Some(image_image)
+      },
+      Err(_) => {
+        continue; // Wat.
+      },
+    }
+  }
+}
 
 pub fn grab_single_frame() -> DynamicImage {
   let installed_devices = device_get_installed_count();

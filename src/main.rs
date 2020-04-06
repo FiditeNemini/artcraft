@@ -18,8 +18,9 @@ use handwritten_wrapper::*;
 use k4a_sys_wrapper::device_get_installed_count;
 use k4a_sys_wrapper::Device;
 use k4a_sys_wrapper::Image;
-use sensors::grab_single_frame;
+use sensors::{grab_single_frame, capture_thread};
 
+use glium::Texture2d;
 use glium::glutin::event::{Event, StartCause};
 use glium::glutin::event_loop::{EventLoop, ControlFlow};
 use glium::vertex::VertexBufferAny;
@@ -44,17 +45,18 @@ use std::io::Cursor;
 use std::os::raw::c_char;
 use std::ptr;
 use std::slice;
-use std::sync::Arc;
+use std::sync::{Arc, PoisonError, RwLockReadGuard};
 use std::sync::RwLock;
 use std::thread;
 use std::time::Duration;
 
-pub fn capture_frames() {
-
-}
-
 pub fn main() {
-  let frame_image = grab_single_frame().to_rgba();
+  let frame : Arc<RwLock<Option<DynamicImage>>> = Arc::new(RwLock::new(None));
+  let frame2 = frame.clone();
+
+  thread::spawn(move || {
+    capture_thread(frame2);
+  });
 
   let event_loop = glutin::event_loop::EventLoop::new();
   let wb = glutin::window::WindowBuilder::new();
@@ -76,9 +78,9 @@ pub fn main() {
   let imageB = glium::texture::RawImage2d::from_raw_rgba_reversed(&imageB.into_raw(), imageB_dimensions);
   let textureB = glium::texture::Texture2d::new(&display, imageB).unwrap();
 
-  let frame_dimensions = frame_image.dimensions();
+  /*let frame_dimensions = frame_image.dimensions();
   let frame_image = glium::texture::RawImage2d::from_raw_rgba_reversed(&frame_image.into_raw(), frame_dimensions);
-  let textureFrame = glium::texture::Texture2d::new(&display, frame_image).unwrap();
+  let textureFrame = glium::texture::Texture2d::new(&display, frame_image).unwrap();*/
 
   #[derive(Copy, Clone)]
   struct Vertex {
@@ -164,6 +166,27 @@ pub fn main() {
     let mut target = display.draw();
     target.clear_color(0.0, 0.0, 1.0, 1.0);
 
+    let mut texture_frame : Option<Texture2d> = None;
+
+    match frame.read() {
+      Ok(lock) => {
+        let frame_image = lock.as_ref();
+
+        match lock.as_ref() {
+          Some(dynamic_image) => {
+            let frame_image = dynamic_image.to_rgba();
+            let frame_dimensions = frame_image.dimensions();
+            let frame_image = glium::texture::RawImage2d::from_raw_rgba_reversed(&frame_image.into_raw(), frame_dimensions);
+            texture_frame = Some(glium::texture::Texture2d::new(&display, frame_image).unwrap());
+          },
+          None => {},
+        }
+      },
+      Err(_) => {},
+    }
+
+    let texture_to_use: &Texture2d = texture_frame.as_ref().unwrap_or(&textureB);
+
     let uniforms = uniform! {
             matrix: [
                 [1.0, 0.0, 0.0, 0.0],
@@ -171,10 +194,7 @@ pub fn main() {
                 [0.0, 0.0, 1.0, 0.0],
                 [ t , 0.0, 0.0, 1.0f32],
             ],
-            tex: match useTexture {
-              0 => &textureFrame,
-              _ => &textureB,
-            },
+            tex: texture_to_use,
         };
 
     target.draw(&vertex_buffer, &indices, &program, &uniforms,
