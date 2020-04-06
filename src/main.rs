@@ -46,14 +46,22 @@ use k4a_sys_wrapper::Device;
 use k4a_sys_wrapper::device_get_installed_count;
 use k4a_sys_wrapper::Image;
 use sensors::{capture_thread, grab_single_frame};
+use glium::texture::RawImage2d;
+use conversion::TextureData2d;
 
+pub mod conversion;
 pub mod handwritten_wrapper;
 pub mod handwritten_wrapper_test;
 pub mod k4a_sys_wrapper;
 pub mod sensors;
 
+pub struct TextureContainer<'a> {
+  pub texture_data: Option<TextureData2d<'a>>,
+  pub texture: Option<Texture2d>
+}
+
 pub fn main() {
-  let frame : Arc<Mutex<Option<DynamicImage>>> = Arc::new(Mutex::new(None));
+  let frame : Arc<Mutex<Option<TextureData2d>>> = Arc::new(Mutex::new(None));
   let frame2 = frame.clone();
 
   thread::spawn(move || {
@@ -129,6 +137,9 @@ pub fn main() {
   let mut switchTexture = false;
   let mut useTexture = 0; // 0 for 'A', 1 for 'B'
 
+  let mut texture_data_2d : Option<TextureData2d> = None;
+  let mut texture_container : Option<TextureContainer> = None;
+
   event_loop.run(move |event, _, control_flow| {
     let next_frame_time = std::time::Instant::now() +
         std::time::Duration::from_nanos(16_666_667);
@@ -168,28 +179,41 @@ pub fn main() {
     let mut target = display.draw();
     target.clear_color(0.0, 0.0, 1.0, 1.0);
 
-    let mut dynamic_image : Option<DynamicImage> = None;
-
     match frame.lock() {
       Ok(mut lock) => {
-        dynamic_image = lock.take();
+        let tex_data_2d = lock.take();
+
+        match tex_data_2d {
+          None => {},
+          Some(tex_data) => {
+            let texture = glium::texture::Texture2d::new(&display, tex_data.raw_image).unwrap();
+
+            texture_container = Some(TextureContainer{
+              texture_data: None,
+              texture: Some(texture),
+            })
+          },
+        }
       },
       Err(_) => {},
     }
 
-    let mut texture_frame : Option<Texture2d> = None;
+    let mut texture_2d: Option<Texture2d> = None;
 
-    match dynamic_image {
+    /*match texture_data_2d {
       Some(image) => {
-        let frame_image = image.to_rgba();
+        /*let frame_image = image.to_rgba();
         let frame_dimensions = frame_image.dimensions();
-        let frame_image = glium::texture::RawImage2d::from_raw_rgba_reversed(&frame_image.into_raw(), frame_dimensions);
-        texture_frame = Some(glium::texture::Texture2d::new(&display, frame_image).unwrap());
+        let frame_image = glium::texture::RawImage2d::from_raw_rgba_reversed(&frame_image.into_raw(), frame_dimensions);*/
+        //texture_2d = Some(glium::texture::Texture2d::new(&display, image.raw_image).unwrap());
       },
       None => {},
-    }
+    }*/
 
-    let texture_to_use: &Texture2d = texture_frame.as_ref().unwrap_or(&textureB);
+    let texture_to_use: &Texture2d = texture_container
+        .as_ref()
+        .and_then(|c| c.texture.as_ref())
+        .unwrap_or(&textureB);
 
     let uniforms = uniform! {
             matrix: [

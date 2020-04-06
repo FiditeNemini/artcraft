@@ -33,8 +33,10 @@ use handwritten_wrapper::*;
 use k4a_sys_wrapper::Device;
 use k4a_sys_wrapper::device_get_installed_count;
 use k4a_sys_wrapper::Image;
+use conversion::{depth_to_image, TextureData2d};
+use glium::texture::RawImage2d;
 
-pub fn capture_thread(frame: Arc<Mutex<Option<DynamicImage>>>) {
+pub fn capture_thread(frame: Arc<Mutex<Option<TextureData2d>>>) {
   let installed_devices = device_get_installed_count();
   println!("Installed devices: {}", installed_devices);
 
@@ -61,17 +63,14 @@ pub fn capture_thread(frame: Arc<Mutex<Option<DynamicImage>>>) {
         continue; // We didn't grab a frame.
       },
     }
-    println!("Got frame!");
 
     let image = captured_image.unwrap();
 
-    let image_image = depth_to_image(&image)
-        .expect("depth_to_image should work");
+    let texture_data_2d = TextureData2d::from_k4a_color_image(&image);
 
     match frame.lock() {
       Ok(mut lock) => {
-        println!("Wrote to mutex!");
-        *lock = Some(image_image)
+        *lock = Some(texture_data_2d)
       },
       Err(_) => {
         continue; // Wat.
@@ -115,31 +114,3 @@ pub fn grab_single_frame() -> DynamicImage {
   }
 }
 
-// https://docs.rs/image/0.23.2/image/flat/index.html
-pub fn depth_to_image(image: &Image) -> Result<DynamicImage, ImageError> {
-  let len = image.get_size();
-  let samples = unsafe { slice::from_raw_parts(image.get_buffer(), len) };
-
-  let layout = SampleLayout::row_major_packed(
-    4,
-    image.get_width_pixels() as u32,
-    image.get_height_pixels() as u32);
-
-  let mut buffer = FlatSamples {
-    samples,
-    layout,
-    color_hint: None,
-  };
-
-  let view = buffer.as_view::<Rgba<u8>>()
-      .expect("view should work");
-
-  let mut img: RgbaImage = ImageBuffer::new(
-    image.get_width_pixels() as u32,
-    image.get_height_pixels() as u32);
-  let mut img = DynamicImage::ImageRgba8(img);
-
-  img.copy_from(&view, 0, 0).expect("Should be able to copy");
-
-  Ok(img)
-}
