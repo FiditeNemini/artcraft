@@ -2,10 +2,12 @@
 //! I tried using the open source 'k4a-rs' crate from the same author,
 //! but it's in a bad state and won't compile against any version of 'k4a-sys'.
 
-use k4a_sys;
-use std::ffi::{CString, CStr};
+use std::ffi::{CStr, CString};
 use std::ptr;
-use handwritten_wrapper::{K4A_DEVICE_DEFAULT, k4a_device_close};
+
+use k4a_sys;
+
+use handwritten_wrapper::{k4a_device_close, K4A_DEVICE_DEFAULT};
 
 pub fn device_get_installed_count() -> u32 {
   unsafe {

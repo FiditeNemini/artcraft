@@ -1,5 +1,6 @@
-use libc::size_t;
 use std::os::raw::c_char;
+
+use libc::size_t;
 
 /// Default device index
 ///
