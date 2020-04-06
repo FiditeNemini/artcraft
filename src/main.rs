@@ -12,11 +12,13 @@ extern crate opencv;
 pub mod handwritten_wrapper;
 pub mod handwritten_wrapper_test;
 pub mod k4a_sys_wrapper;
+pub mod sensors;
 
 use handwritten_wrapper::*;
 use k4a_sys_wrapper::device_get_installed_count;
 use k4a_sys_wrapper::Device;
 use k4a_sys_wrapper::Image;
+use sensors::grab_single_frame;
 
 use glium::glutin::event::{Event, StartCause};
 use glium::glutin::event_loop::{EventLoop, ControlFlow};
@@ -47,136 +49,11 @@ use std::sync::RwLock;
 use std::thread;
 use std::time::Duration;
 
-pub fn grab_single_frame() -> DynamicImage {
-  let installed_devices = device_get_installed_count();
-  println!("Installed devices: {}", installed_devices);
-  {
-    let device = Device::open(0).unwrap();
-    println!("Device: {:?}", device);
-    let serial_number = device.get_serial_number().unwrap();
-    println!("Device: {:?}", serial_number);
+pub fn capture_frames() {
 
-    println!("Starting cameras...");
-    device.start_cameras().unwrap();
-
-    let mut capturedImage = None;
-    loop {
-      let capture = device.get_capture(1000).ok().unwrap();
-
-      match capture.get_color_image() {
-        Ok(image) => {
-          capturedImage = Some(image);
-          break;
-        }
-        _ => {},
-      }
-    }
-
-    let image = capturedImage.unwrap();
-
-    /*let image = capture.get_ir_image().expect("Got IR image");
-    let image = capture.get_depth_image().expect("Got depth image");
-    let image = capture.get_color_image().expect("Got color image");*/
-
-    //let opencv_image = depth_to_opencv(&image).ok().unwrap();
-    let image_image = depth_to_image(&image).expect("depth_to_image should work");
-
-    /*let imageB = image::load(Cursor::new(&include_bytes!("../n64logo.png")[..]),
-      image::ImageFormat::Png).unwrap().to_rgba();*/
-
-    device.stop_cameras();
-
-    return image_image;
-  }
 }
-
-// https://docs.rs/image/0.23.2/image/flat/index.html
-pub fn depth_to_image(image: &Image) -> Result<DynamicImage, ImageError> {
-  unsafe {
-    /*let stride = image.get_stride_bytes();
-    let mat = Mat::new_rows_cols_with_data(
-      image.get_height_pixels() as i32,
-      image.get_width_pixels() as i32,
-      core::CV_16U,
-      &mut *(image.get_buffer() as *mut c_void),
-      stride,
-    );*/
-
-    /*let count_of_items = image.get_width_pixels() * image.get_height_pixels() * image.get_stride_bytes() * 30;
-    let slice = unsafe { std::slice::from_raw_parts(image.get_buffer(), count_of_items) };
-
-    image::load_from_memory_with_format(slice, ImageFormat::Bmp)*/
-
-    println!("Width: {}", image.get_width_pixels());
-    println!("Height: {}", image.get_height_pixels());
-    println!("Stride: {}", image.get_stride_bytes());
-    println!("size_t: {}", image.get_size());
-
-    //let len = image.get_width_pixels() * image.get_height_pixels() * image.get_stride_bytes();
-    let len = image.get_size();
-    let samples = unsafe { slice::from_raw_parts(image.get_buffer(), len) };
-
-    //let layout = unsafe { ptr::read(layout) };
-    let layout = SampleLayout::row_major_packed(4, image.get_width_pixels() as u32, image.get_height_pixels() as u32);
-
-    let mut buffer = FlatSamples {
-      samples,
-      layout,
-      color_hint: None,
-    };
-
-    let view = buffer.as_view::<Rgba<u8>>()
-        .expect("view should work");
-
-    let mut img: RgbaImage = ImageBuffer::new(image.get_width_pixels() as u32, image.get_height_pixels() as u32);
-    let mut img = DynamicImage::ImageRgba8(img);
-
-    img.copy_from(&view, 0, 0).expect("Should be able to copy");
-
-    Ok(img)
-  }
-}
-
 
 pub fn main() {
-  /*let event_loop = glutin::event_loop::EventLoop::new();
-  let wb = glutin::window::WindowBuilder::new();
-  let cb = glutin::ContextBuilder::new();
-  let display = glium::Display::new(wb, cb, &event_loop).unwrap();
-
-  // building the vertex and index buffers
-  //let vertex_buffer = load_wavefront(&display, include_bytes!("../torus.obj"));
-
-  event_loop.run(move |event, _, control_flow| {
-    let next_frame_time = std::time::Instant::now() +
-        std::time::Duration::from_nanos(16_666_667);
-    *control_flow = glutin::event_loop::ControlFlow::WaitUntil(next_frame_time);
-
-    match event {
-      glutin::event::Event::WindowEvent { event, .. } => match event {
-        glutin::event::WindowEvent::CloseRequested => {
-          *control_flow = glutin::event_loop::ControlFlow::Exit;
-          return;
-        },
-        _ => return,
-      },
-      glutin::event::Event::NewEvents(cause) => match cause {
-        glutin::event::StartCause::ResumeTimeReached { .. } => (),
-        glutin::event::StartCause::Init => (),
-        _ => return,
-      },
-      _ => return,
-    }
-
-    let mut target = display.draw();
-    target.clear_color(0.0, 0.0, 1.0, 1.0);
-    target.finish().unwrap();
-  });*/
-
-  /*thread::spawn(|| {
-    run();
-  });*/
-
   let frame_image = grab_single_frame().to_rgba();
 
   let event_loop = glutin::event_loop::EventLoop::new();
@@ -372,47 +249,3 @@ pub fn depth_to_opencv(image: &Image) -> opencv::Result<Mat> {
     mat
   }
 }
-
-/*/// From glium examples
-/// Returns a vertex buffer that should be rendered as `TrianglesList`.
-pub fn load_wavefront(display: &Display, data: &[u8]) -> VertexBufferAny {
-  #[derive(Copy, Clone)]
-  struct Vertex {
-    position: [f32; 3],
-    normal: [f32; 3],
-    texture: [f32; 2],
-  }
-
-  implement_vertex!(Vertex, position, normal, texture);
-
-  let mut data = ::std::io::BufReader::new(data);
-  let data = obj::Obj::load_buf(&mut data).unwrap();
-
-  let mut vertex_data = Vec::new();
-
-  for object in data.objects.iter() {
-    for polygon in object.groups.iter().flat_map(|g| g.polys.iter()) {
-      match polygon {
-        &genmesh::Polygon::PolyTri(genmesh::Triangle { x: v1, y: v2, z: v3 }) => {
-          for v in [v1, v2, v3].iter() {
-            let position = data.position[v.0];
-            let texture = v.1.map(|index| data.texture[index]);
-            let normal = v.2.map(|index| data.normal[index]);
-
-            let texture = texture.unwrap_or([0.0, 0.0]);
-            let normal = normal.unwrap_or([0.0, 0.0, 0.0]);
-
-            vertex_data.push(Vertex {
-              position: position,
-              normal: normal,
-              texture: texture,
-            })
-          }
-        },
-        _ => unimplemented!()
-      }
-    }
-  }
-
-  glium::vertex::VertexBuffer::new(display, &vertex_data).unwrap().into()
-}*/
