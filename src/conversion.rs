@@ -35,8 +35,8 @@ use k4a_sys_wrapper::Device;
 use k4a_sys_wrapper::device_get_installed_count;
 use k4a_sys_wrapper::Image;
 
-/// We can't send trait 'Texture2dDataSource' impl 'RawImage2d' as it requires data lives
-/// So here we collect it together.
+/// We can't send trait 'Texture2dDataSource' impl 'RawImage2d' as it requires its data has
+/// the same lifetime, so here we collect it together here.
 pub struct TextureData2d<'a> {
   pub raw_data: Vec<u8>,
   pub dimensions: (u32, u32),

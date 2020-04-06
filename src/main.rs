@@ -55,9 +55,8 @@ pub mod handwritten_wrapper_test;
 pub mod k4a_sys_wrapper;
 pub mod sensors;
 
-pub struct TextureContainer<'a> {
-  pub texture_data: Option<TextureData2d<'a>>,
-  pub texture: Option<Texture2d>
+pub struct TextureContainer {
+  pub texture: Texture2d
 }
 
 pub fn main() {
@@ -189,8 +188,7 @@ pub fn main() {
             let texture = glium::texture::Texture2d::new(&display, tex_data.raw_image).unwrap();
 
             texture_container = Some(TextureContainer{
-              texture_data: None,
-              texture: Some(texture),
+              texture,
             })
           },
         }
@@ -198,21 +196,9 @@ pub fn main() {
       Err(_) => {},
     }
 
-    let mut texture_2d: Option<Texture2d> = None;
-
-    /*match texture_data_2d {
-      Some(image) => {
-        /*let frame_image = image.to_rgba();
-        let frame_dimensions = frame_image.dimensions();
-        let frame_image = glium::texture::RawImage2d::from_raw_rgba_reversed(&frame_image.into_raw(), frame_dimensions);*/
-        //texture_2d = Some(glium::texture::Texture2d::new(&display, image.raw_image).unwrap());
-      },
-      None => {},
-    }*/
-
     let texture_to_use: &Texture2d = texture_container
         .as_ref()
-        .and_then(|c| c.texture.as_ref())
+        .map(|c| &c.texture)
         .unwrap_or(&textureB);
 
     let uniforms = uniform! {
