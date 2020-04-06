@@ -19,6 +19,7 @@ use std::sync::{Arc, PoisonError, RwLockReadGuard};
 use std::sync::RwLock;
 use std::thread;
 use std::time::Duration;
+use std::sync::Mutex;
 
 use glium::{Display, glutin, Surface};
 use glium::glutin::event::{Event, StartCause};
@@ -52,7 +53,7 @@ pub mod k4a_sys_wrapper;
 pub mod sensors;
 
 pub fn main() {
-  let frame : Arc<RwLock<Option<DynamicImage>>> = Arc::new(RwLock::new(None));
+  let frame : Arc<Mutex<Option<DynamicImage>>> = Arc::new(Mutex::new(None));
   let frame2 = frame.clone();
 
   thread::spawn(move || {
@@ -167,23 +168,25 @@ pub fn main() {
     let mut target = display.draw();
     target.clear_color(0.0, 0.0, 1.0, 1.0);
 
-    let mut texture_frame : Option<Texture2d> = None;
+    let mut dynamic_image : Option<DynamicImage> = None;
 
-    match frame.read() {
-      Ok(lock) => {
-        let frame_image = lock.as_ref();
-
-        match lock.as_ref() {
-          Some(dynamic_image) => {
-            let frame_image = dynamic_image.to_rgba();
-            let frame_dimensions = frame_image.dimensions();
-            let frame_image = glium::texture::RawImage2d::from_raw_rgba_reversed(&frame_image.into_raw(), frame_dimensions);
-            texture_frame = Some(glium::texture::Texture2d::new(&display, frame_image).unwrap());
-          },
-          None => {},
-        }
+    match frame.lock() {
+      Ok(mut lock) => {
+        dynamic_image = lock.take();
       },
       Err(_) => {},
+    }
+
+    let mut texture_frame : Option<Texture2d> = None;
+
+    match dynamic_image {
+      Some(image) => {
+        let frame_image = image.to_rgba();
+        let frame_dimensions = frame_image.dimensions();
+        let frame_image = glium::texture::RawImage2d::from_raw_rgba_reversed(&frame_image.into_raw(), frame_dimensions);
+        texture_frame = Some(glium::texture::Texture2d::new(&display, frame_image).unwrap());
+      },
+      None => {},
     }
 
     let texture_to_use: &Texture2d = texture_frame.as_ref().unwrap_or(&textureB);

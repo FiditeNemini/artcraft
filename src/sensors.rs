@@ -5,6 +5,7 @@ use std::os::raw::c_char;
 use std::ptr;
 use std::slice;
 use std::sync::{Arc, PoisonError, RwLockWriteGuard};
+use std::sync::Mutex;
 use std::sync::RwLock;
 use std::thread;
 use std::time::Duration;
@@ -33,7 +34,7 @@ use k4a_sys_wrapper::Device;
 use k4a_sys_wrapper::device_get_installed_count;
 use k4a_sys_wrapper::Image;
 
-pub fn capture_thread(frame: Arc<RwLock<Option<DynamicImage>>>) {
+pub fn capture_thread(frame: Arc<Mutex<Option<DynamicImage>>>) {
   let installed_devices = device_get_installed_count();
   println!("Installed devices: {}", installed_devices);
 
@@ -60,14 +61,16 @@ pub fn capture_thread(frame: Arc<RwLock<Option<DynamicImage>>>) {
         continue; // We didn't grab a frame.
       },
     }
+    println!("Got frame!");
 
     let image = captured_image.unwrap();
 
     let image_image = depth_to_image(&image)
         .expect("depth_to_image should work");
 
-    match frame.write() {
+    match frame.lock() {
       Ok(mut lock) => {
+        println!("Wrote to mutex!");
         *lock = Some(image_image)
       },
       Err(_) => {
