@@ -32,12 +32,11 @@ use opencv::imgproc;
 use opencv::prelude::*;
 
 use conversion::TextureData2d;
-use handwritten_wrapper::*;
-use handwritten_wrapper_test;
 use k4a_sys_wrapper::Device;
 use k4a_sys_wrapper::device_get_installed_count;
 use k4a_sys_wrapper::Image;
 use sensor_control::{capture_thread, grab_single_frame};
+use old_k4a_wrapper;
 
 pub struct TextureContainer {
   pub texture: Texture2d
@@ -233,7 +232,7 @@ pub fn run() {
     device.stop_cameras();
   }
 
-  handwritten_wrapper_test::test_integration();
+  old_k4a_wrapper::handwritten_wrapper_test::test_integration();
 }
 
 /// Copied from k4a-sys

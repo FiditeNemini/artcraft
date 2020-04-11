@@ -29,7 +29,6 @@ use opencv::highgui;
 use opencv::imgproc;
 use opencv::prelude::*;
 
-use handwritten_wrapper::*;
 use k4a_sys_wrapper::Device;
 use k4a_sys_wrapper::device_get_installed_count;
 use k4a_sys_wrapper::Image;

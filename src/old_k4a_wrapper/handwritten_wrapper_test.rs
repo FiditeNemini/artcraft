@@ -4,7 +4,7 @@ use std::os::raw::c_char;
 
 use libc::size_t;
 
-use handwritten_wrapper::*;
+use old_k4a_wrapper::handwritten_wrapper::{k4a_device_close, K4A_DEVICE_DEFAULT, k4a_device_get_installed_count, k4a_device_get_serialnum, k4a_device_open, k4a_device_t};
 
 pub fn test_integration() {
   println!("hello world");

@@ -7,8 +7,6 @@ use std::ptr;
 
 use k4a_sys;
 
-use handwritten_wrapper::{k4a_device_close, K4A_DEVICE_DEFAULT};
-
 pub fn device_get_installed_count() -> u32 {
   unsafe {
     k4a_sys::k4a_device_get_installed_count()
