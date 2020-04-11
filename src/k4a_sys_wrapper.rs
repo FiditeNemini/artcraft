@@ -92,7 +92,8 @@ impl Device {
   /// Start the cameras.
   pub fn start_cameras(&self) -> Result<(), KinectError> {
     let mut device_config = DeviceConfiguration::new();
-    // device_config.0.color_format = k4a_sys::k4a_image_format_t_K4A_IMAGE_FORMAT_COLOR_MJPG; // TODO: Broken?
+    // NB: Although the Kinect docs say this format isn't natively supported by the color camera
+    // and that extra CPU is required, this is the only color mode supported by 'k4aviewer' 3D view.
     device_config.0.color_format = k4a_sys::k4a_image_format_t_K4A_IMAGE_FORMAT_COLOR_BGRA32;
     device_config.0.color_resolution = k4a_sys::k4a_color_resolution_t_K4A_COLOR_RESOLUTION_2160P;
     device_config.0.depth_mode = k4a_sys::k4a_depth_mode_t_K4A_DEPTH_MODE_NFOV_UNBINNED;

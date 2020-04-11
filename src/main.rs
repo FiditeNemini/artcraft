@@ -45,7 +45,7 @@ use handwritten_wrapper::*;
 use k4a_sys_wrapper::Device;
 use k4a_sys_wrapper::device_get_installed_count;
 use k4a_sys_wrapper::Image;
-use sensors::{capture_thread, grab_single_frame};
+use sensor_control::{capture_thread, grab_single_frame};
 use glium::texture::RawImage2d;
 use conversion::TextureData2d;
 
@@ -53,7 +53,7 @@ pub mod conversion;
 pub mod handwritten_wrapper;
 pub mod handwritten_wrapper_test;
 pub mod k4a_sys_wrapper;
-pub mod sensors;
+pub mod sensor_control;
 
 pub struct TextureContainer {
   pub texture: Texture2d
