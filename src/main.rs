@@ -3,6 +3,8 @@
 #[macro_use] extern crate enum_primitive;
 extern crate genmesh;
 #[macro_use] extern crate glium;
+extern crate glutin;
+extern crate grr;
 extern crate image;
 extern crate k4a_sys;
 extern crate libc;
@@ -21,7 +23,7 @@ use std::sync::RwLock;
 use std::thread;
 use std::time::Duration;
 
-use glium::{Display, glutin, Surface};
+use glium::{Display, Surface};
 use glium::glutin::event::{Event, StartCause};
 use glium::glutin::event_loop::{ControlFlow, EventLoop};
 use glium::Texture2d;
@@ -52,11 +54,13 @@ use sensor_control::{capture_thread, grab_single_frame};
 
 pub mod conversion;
 pub mod graphics_glium;
+pub mod graphics_grr;
 pub mod handwritten_wrapper;
 pub mod handwritten_wrapper_test;
 pub mod k4a_sys_wrapper;
 pub mod sensor_control;
 
 pub fn main() {
-  run_glium();
+  graphics_grr::run().unwrap();
+  //graphics_glium::run_glium();
 }
