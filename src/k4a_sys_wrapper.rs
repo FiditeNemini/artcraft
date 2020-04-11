@@ -204,6 +204,29 @@ impl Capture {
   }
 }
 
+impl Drop for Capture {
+  fn drop(&mut self) {
+    unsafe {
+      k4a_sys::k4a_capture_release(self.0);
+    }
+  }
+}
+
+/// FIXME FIXME FIXME: WHY IS THIS NOT SEND WITH ARC<MUTEX<T>>!?
+/// We are making k4a_sys::k4a_capture_t Send only when wrapped with Arc<Mutex<>>,
+/// but the compiler can't figure that out. Freaky gross.
+///
+/// "Rust automatically determines whether a type is Send and/or Sync. Anything that has a
+/// raw ptr inside, which is what you have here, is considered !Send and !Sync. This isn’t because
+/// it automatically means the type is unsafe in Send/Sync terms, but rather more like a lint for
+/// the code author: they need to determine the safety themselves, and then if they’re safe,
+/// manually impl Send and/or Sync, as appropriate, for the type."
+///
+/// Actually Rust is doing a good job here.
+///
+/// https://users.rust-lang.org/t/solved-how-to-move-non-send-between-threads-or-an-alternative/19928/11
+unsafe impl Send for Capture{}
+
 /// Adapted from k4a-sys. Represents an image within a capture.
 #[derive(Debug)]
 pub struct Image(pub k4a_sys::k4a_image_t);
@@ -245,14 +268,6 @@ impl Drop for Device {
   fn drop(&mut self) {
     unsafe {
       k4a_sys::k4a_device_close(self.device_pointer);
-    }
-  }
-}
-
-impl Drop for Capture {
-  fn drop(&mut self) {
-    unsafe {
-      k4a_sys::k4a_capture_release(self.0);
     }
   }
 }

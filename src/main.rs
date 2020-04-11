@@ -49,7 +49,7 @@ use graphics_glium::run_glium;
 use k4a_sys_wrapper::Device;
 use k4a_sys_wrapper::device_get_installed_count;
 use k4a_sys_wrapper::Image;
-use sensor_control::{capture_thread, grab_single_frame};
+use sensor_control::{capture_thread_to_texture, grab_single_frame, CaptureProvider, capture_thread};
 
 pub mod conversion;
 pub mod graphics_glium;
@@ -59,6 +59,11 @@ pub mod k4a_sys_wrapper;
 pub mod sensor_control;
 
 pub fn main() {
+  let capture_provider = Arc::new(CaptureProvider::new());
+  let capture_provider2= capture_provider.clone();
+
+  thread::spawn(move || capture_thread(capture_provider2));
+
   graphics_grr::run().unwrap();
   //graphics_glium::run_glium();
 }

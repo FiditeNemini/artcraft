@@ -35,7 +35,7 @@ use conversion::TextureData2d;
 use k4a_sys_wrapper::Device;
 use k4a_sys_wrapper::device_get_installed_count;
 use k4a_sys_wrapper::Image;
-use sensor_control::{capture_thread, grab_single_frame};
+use sensor_control::{capture_thread_to_texture, grab_single_frame};
 use old_k4a_wrapper;
 
 pub struct TextureContainer {
@@ -47,7 +47,7 @@ pub fn run_glium() {
   let frame2 = frame.clone();
 
   thread::spawn(move || {
-    capture_thread(frame2);
+    capture_thread_to_texture(frame2);
   });
 
   let event_loop = glutin::event_loop::EventLoop::new();
