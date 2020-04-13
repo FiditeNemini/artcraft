@@ -43,13 +43,13 @@ void main() {
 static FRAGMENT_SHADER_SRC: &'static str = "
 #version 150 core
 
-uniform vec3 triangleColor;
-uniform sampler2D tex;
-
 in vec3 Color;
 in vec2 Texcoord;
 
 out vec4 out_color;
+
+//uniform vec3 triangleColor;
+uniform sampler2D tex;
 
 void main() {
     //out_color = vec4(1.0, 1.0, 1.0, 1.0);
@@ -220,10 +220,10 @@ pub fn run() {
     );
 
     // Specify the layout of the vertex data
-    let pos_attr = gl::GetAttribLocation(program, CString::new("in_color").unwrap().as_ptr());
-    gl::EnableVertexAttribArray(pos_attr as GLuint);
+    let color_attr = gl::GetAttribLocation(program, CString::new("in_color").unwrap().as_ptr());
+    gl::EnableVertexAttribArray(color_attr as GLuint);
     gl::VertexAttribPointer(
-      pos_attr as GLuint,
+      color_attr as GLuint,
       3,
       gl::FLOAT,
       gl::FALSE as GLboolean,
@@ -232,7 +232,7 @@ pub fn run() {
     );
 
     // Specify the layout of the vertex data
-    let tex_attr = gl::GetAttribLocation(program, CString::new("tex_coordinate").unwrap().as_ptr());
+    let tex_attr = gl::GetAttribLocation(program, CString::new("tex_coord").unwrap().as_ptr());
     gl::EnableVertexAttribArray(tex_attr as GLuint);
     gl::VertexAttribPointer(
       tex_attr as GLuint,
