@@ -250,7 +250,7 @@ pub fn run(capture_provider: Arc<CaptureProvider>) {
     gl::Uniform3f(triangle_color_attr, 1.0, 0.0, 1.0);
   }
 
-  event_loop.run(move |event, _, control_flow| {
+  event_loop.run(move |event, window, control_flow| {
     //*control_flow = ControlFlow::Wait;
     match event {
       Event::LoopDestroyed => return,
@@ -314,9 +314,17 @@ pub fn run(capture_provider: Arc<CaptureProvider>) {
             gl::UNSIGNED_BYTE,
             buffer as *const c_void,
           );
-        }
-        *control_flow = ControlFlow::Poll;
 
+          gl::ClearColor(0.3, 0.3, 0.3, 1.0);
+          gl::Clear(gl::COLOR_BUFFER_BIT);
+
+          gl::DrawElements(
+            gl::TRIANGLES,
+            ELEMENTS.len() as GLsizei,
+            gl::UNSIGNED_INT,
+            std::mem::transmute(&ELEMENTS[0])
+          );
+        }
         gl_window.swap_buffers().unwrap();
       }
     }
