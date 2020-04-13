@@ -1,4 +1,5 @@
 use glutin::dpi::LogicalSize;
+use glutin::dpi::PhysicalSize;
 use grr;
 
 use std::path::Path;
@@ -37,10 +38,10 @@ const INDICES: [u16; 6] = [0, 1, 2, 2, 3, 0];
 
 pub fn run(capture_provider: Arc<CaptureProvider>) -> grr::Result<()> {
   unsafe {
-    let mut events_loop = glutin::EventsLoop::new();
-    let wb = glutin::WindowBuilder::new()
+    let mut events_loop = glutin::event_loop::EventLoop::new();
+    let wb = glutin::window::WindowBuilder::new()
         .with_title("grr - Texture")
-        .with_dimensions(LogicalSize {
+        .with_inner_size(LogicalSize {
           width: 1024.0,
           height: 768.0,
         });
@@ -53,10 +54,10 @@ pub fn run(capture_provider: Arc<CaptureProvider>) -> grr::Result<()> {
         .make_current()
         .unwrap();
 
-    let LogicalSize {
+    let PhysicalSize {
       width: mut w,
       height: mut h,
-    } = window.window().get_inner_size().unwrap();
+    } = window.window().inner_size(); //window().get_inner_size().unwrap();
 
     let grr = grr::Device::new(
       |symbol| window.get_proc_address(symbol) as *const _,
@@ -185,14 +186,14 @@ pub fn run(capture_provider: Arc<CaptureProvider>) -> grr::Result<()> {
 
     let mut running = true;
     while running {
-      events_loop.poll_events(|event| match event {
-        glutin::Event::WindowEvent { event, .. } => match event {
-          glutin::WindowEvent::CloseRequested => running = false,
-          glutin::WindowEvent::Resized(size) => {
-            w = size.width;
-            h = size.height;
-            let dpi_factor = window.window().get_hidpi_factor();
-            window.resize(size.to_physical(dpi_factor));
+      events_loop.run(move |event, _, _| match event {
+        glutin::event::Event::WindowEvent { event, .. } => match event {
+          glutin::event::WindowEvent::CloseRequested => running = false,
+          glutin::event::WindowEvent::Resized(size) => {
+            //w = size.width;
+            //h = size.height;
+            //let dpi_factor = window.window().get_hidpi_factor();
+            //window.resize(size.to_physical(dpi_factor));
           }
           _ => (),
         },

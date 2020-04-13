@@ -12,8 +12,10 @@ path = "src/main.rs"
 enum_primitive = "0.1.1" # c wrapper ergonomics
 genmesh = "0.6.0" # for glium example
 gfx = "0.18.2" # another high level OpenGL / multi-API abstraction?
+gl = "0.14.0" # this looks like bare bones OpenGL
+glfw = "0.37.0" # GL framework - windows, contexts, devices
 glium="0.27.0" # high-level OpenGL abstraction (*not* vanilla OpenGL)
-glutin = "0.21" # used by glium example code
+glutin = "0.24.0" # used by glium example code
 grr = "0.7.0" # purports to be low-level OpenGL
 image = "0.23.2"
 k4a-sys = { path = "/home/bt/dev/3rd/k4a-sys" } # k4a-sys = "0.2.0"

@@ -1,8 +1,10 @@
 #![allow(warnings)]
 
 #[macro_use] extern crate enum_primitive;
-extern crate genmesh;
 #[macro_use] extern crate glium;
+extern crate genmesh;
+extern crate gl;
+extern crate glfw;
 extern crate glutin;
 extern crate grr;
 extern crate image;
@@ -52,10 +54,11 @@ use k4a_sys_wrapper::Image;
 use sensor_control::{capture_thread_to_texture, grab_single_frame, CaptureProvider, capture_thread};
 
 pub mod conversion;
+pub mod graphics_gl;
 pub mod graphics_glium;
 pub mod graphics_grr;
-pub mod old_k4a_wrapper;
 pub mod k4a_sys_wrapper;
+pub mod old_k4a_wrapper;
 pub mod sensor_control;
 
 pub fn main() {
@@ -64,6 +67,7 @@ pub fn main() {
 
   thread::spawn(move || capture_thread(capture_provider));
 
-  graphics_grr::run(capture_provider2).unwrap();
+  //graphics_grr::run(capture_provider2).unwrap();
   //graphics_glium::run_glium();
+  graphics_gl::run();
 }
