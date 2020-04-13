@@ -57,7 +57,8 @@ void main() {
     //out_color = vec4(1.0, 1.0, 1.0, 1.0);
     //out_color = vec4(triangleColor, 1.0); // Uniform
     //out_color = vec4(Color, 1.0);
-    out_color = texture(tex, Texcoord) * vec4(Color, 1.0);
+    //out_color = texture(tex, Texcoord) * vec4(Color, 1.0);
+    out_color = texture(tex, Texcoord);
 }";
 
 // Vertex data
@@ -290,14 +291,15 @@ pub fn run(capture_provider: Arc<CaptureProvider>) {
 
     // TODO: This belongs in a worker thread with buffers on both producer and consumer.
     if let Some(capture) = capture_provider.get_capture() {
-      if let Ok(image) = capture.get_depth_image() {
+      if let Ok(image) = capture.get_color_image() {
         let width = image.get_width_pixels() as i32;
         let height = image.get_height_pixels() as i32;
         println!("Size: {}x{}", width, height);
+
+        let format = image.get_format();
+        println!("format: {:?}", format);
+
         let buffer = image.get_buffer();
-
-        //let img_ptr: *const c_void = raw_img.as_ptr() as *const c_void;
-
 
         unsafe {
           gl::BindTexture(gl::TEXTURE_2D, tex);
@@ -305,12 +307,10 @@ pub fn run(capture_provider: Arc<CaptureProvider>) {
             gl::TEXTURE_2D,
             0,
             gl::RGBA as i32,
-            //format as i32,
             width,
             height,
             0,
             gl::RGBA,
-            //format,
             gl::UNSIGNED_BYTE,
             buffer as *const c_void,
           );

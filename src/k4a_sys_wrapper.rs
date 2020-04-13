@@ -6,6 +6,8 @@ use std::ffi::{CStr, CString};
 use std::ptr;
 
 use k4a_sys;
+use k4a_sys_wrapper::ImageFormat::ColorMjpg;
+use glutin::platform::unix::x11::ffi::IconMaskHint;
 
 pub fn device_get_installed_count() -> u32 {
   unsafe {
@@ -261,6 +263,47 @@ impl Image {
       k4a_sys::k4a_image_get_buffer(self.0)
     }
   }
+
+  /// Use this function to determine the format of the image buffer.
+  /// This function is not expected to fail, all k4a_image_t's are created with a
+  /// known format. If the image_handle is invalid, the function will return
+  /// K4A_IMAGE_FORMAT_CUSTOM.
+  pub fn get_format(&self) -> ImageFormat {
+    unsafe {
+      let format = k4a_sys::k4a_image_get_format(self.0);
+      match format {
+        0 => ImageFormat::ColorMjpg,
+        1 => ImageFormat::ColorNv12,
+        2 => ImageFormat::ColorYuy2,
+        3 => ImageFormat::ColorBgra32,
+        4 => ImageFormat::Depth16,
+        5 => ImageFormat::Ir16,
+        6 => ImageFormat::Custom8,
+        7 => ImageFormat::Custom16,
+        8 => ImageFormat::Custom,
+        _ => ImageFormat::UnknownFormatError,
+      }
+    }
+  }
+}
+
+#[derive(Debug,Clone,Copy)]
+pub enum ImageFormat {
+  ColorMjpg,
+  ColorNv12,
+  ColorYuy2,
+  ColorBgra32,
+  /// Depth image type DEPTH16.
+  /// Each pixel of DEPTH16 data is two bytes of little endian unsigned depth data.
+  /// The unit of the data is in millimeters from the origin of the camera.
+  /// Stride indicates the length of each line in bytes and should be used to determine
+  /// the start location of each line of the image in memory.
+  Depth16,
+  Ir16,
+  Custom8,
+  Custom16,
+  Custom,
+  UnknownFormatError, // FIXME: Just return Result<T>?
 }
 
 /// Deallocate open device handles
