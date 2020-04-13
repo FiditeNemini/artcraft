@@ -19,19 +19,25 @@ use glutin::ContextBuilder;
 //use shader::Shader;
 
 // Shader sources
-static VS_SRC: &'static str = "
+static VERTEX_SHADER_SRC: &'static str = "
 #version 150 core
+
 in vec2 position;
+
 void main() {
-    gl_Position = vec4(position, 0.0, 1.0);
-    //gl_Position = vec4(position.x, position.y, 0.0, 1.0);
+    // gl_Position = vec4(position, 0.0, 1.0);
+    gl_Position = vec4(position.x, position.y, 0.0, 1.0);
 }";
 
-static FS_SRC: &'static str = "
+static FRAGMENT_SHADER_SRC: &'static str = "
 #version 150 core
+
+uniform vec3 triangleColor;
 out vec4 out_color;
+
 void main() {
-    out_color = vec4(1.0, 1.0, 1.0, 1.0);
+    // out_color = vec4(1.0, 1.0, 1.0, 1.0);
+    out_color = vec4(triangleColor, 1.0);
 }";
 
 // Vertex data
@@ -79,8 +85,8 @@ pub fn run() {
   gl::load_with(|symbol| gl_window.get_proc_address(symbol));
 
   // Create GLSL shaders
-  let vs = compile_shader(VS_SRC, gl::VERTEX_SHADER);
-  let fs = compile_shader(FS_SRC, gl::FRAGMENT_SHADER);
+  let vs = compile_shader(VERTEX_SHADER_SRC, gl::VERTEX_SHADER);
+  let fs = compile_shader(FRAGMENT_SHADER_SRC, gl::FRAGMENT_SHADER);
   let program = link_program(vs, fs);
 
   let mut vbo = 0;
@@ -116,6 +122,9 @@ pub fn run() {
       0,
       ptr::null(),
     );
+
+    let triangle_color_attr =  gl::GetUniformLocation(program, CString::new("triangleColor").unwrap().as_ptr());
+    gl::Uniform3f(triangle_color_attr, 1.0, 0.0, 1.0);
   }
 
   event_loop.run(move |event, _, control_flow| {
