@@ -15,6 +15,7 @@ use glutin::event::{Event, WindowEvent};
 use glutin::event_loop::{ControlFlow, EventLoop};
 use glutin::window::WindowBuilder;
 use glutin::ContextBuilder;
+use std::mem::size_of;
 
 //use shader::Shader;
 
@@ -23,8 +24,13 @@ static VERTEX_SHADER_SRC: &'static str = "
 #version 150 core
 
 in vec2 position;
+in vec3 in_color;
+
+out vec3 Color;
 
 void main() {
+    Color = in_color;
+
     // gl_Position = vec4(position, 0.0, 1.0);
     gl_Position = vec4(position.x, position.y, 0.0, 1.0);
 }";
@@ -33,17 +39,21 @@ static FRAGMENT_SHADER_SRC: &'static str = "
 #version 150 core
 
 uniform vec3 triangleColor;
+
+in vec3 Color;
+
 out vec4 out_color;
 
 void main() {
-    // out_color = vec4(1.0, 1.0, 1.0, 1.0);
-    out_color = vec4(triangleColor, 1.0);
+    //out_color = vec4(1.0, 1.0, 1.0, 1.0);
+    //out_color = vec4(triangleColor, 1.0); // Uniform
+    out_color = vec4(Color, 1.0);
 }";
 
 // Vertex data
 // static VERTEX_DATA: [GLfloat; 6] = [0.0, 0.5, 0.5, -0.5, -0.5, -0.5];
 
-static VERTEX_DATA: [GLfloat; 6] = [
+static VERTEX_DATA: [GLfloat; 15] = [
   /*// Triangle 1
   -0.5, 0.5,
   0.5, 0.5,
@@ -54,9 +64,14 @@ static VERTEX_DATA: [GLfloat; 6] = [
   -0.5, -0.5,*/
 
   // from open.gl tutorial
-  0.0,  0.5, // Vertex 1 (X, Y)
+  /*0.0,  0.5, // Vertex 1 (X, Y)
   0.5, -0.5, // Vertex 2 (X, Y)
-  -0.5, -0.5  // Vertex 3 (X, Y)
+  -0.5, -0.5  // Vertex 3 (X, Y)*/
+
+  // colored triangle from open.gl tutorial
+  0.0,  0.5, 1.0, 0.0, 0.0, // Vertex 1: Red
+  0.5, -0.5, 0.0, 1.0, 0.0, // Vertex 2: Green
+  -0.5, -0.5, 0.0, 0.0, 1.0,  // Vertex 3: Blue
 
   /*// From open.gl tutorial - square
   -0.5,  0.5, 1.0, 0.0, 0.0, // Top-left
@@ -119,8 +134,20 @@ pub fn run() {
       2,
       gl::FLOAT,
       gl::FALSE as GLboolean,
-      0,
+      (5 * std::mem::size_of::<f32>()) as gl::types::GLint,
       ptr::null(),
+    );
+
+    // Specify the layout of the vertex data
+    let pos_attr = gl::GetAttribLocation(program, CString::new("in_color").unwrap().as_ptr());
+    gl::EnableVertexAttribArray(pos_attr as GLuint);
+    gl::VertexAttribPointer(
+      pos_attr as GLuint,
+      3,
+      gl::FLOAT,
+      gl::FALSE as GLboolean,
+      (5 * std::mem::size_of::<f32>()) as gl::types::GLint,
+      (2 * std::mem::size_of::<f32>()) as *const gl::types::GLvoid,
     );
 
     let triangle_color_attr =  gl::GetUniformLocation(program, CString::new("triangleColor").unwrap().as_ptr());
