@@ -17,6 +17,7 @@ use glutin::window::WindowBuilder;
 use glutin::ContextBuilder;
 use std::mem::size_of;
 use std::ptr::null;
+use glium::framebuffer::ColorAttachment::Texture;
 
 //use shader::Shader;
 
@@ -26,11 +27,14 @@ static VERTEX_SHADER_SRC: &'static str = "
 
 in vec2 position;
 in vec3 in_color;
+in vec2 tex_coord;
 
 out vec3 Color;
+out vec2 Texcoord;
 
 void main() {
     Color = in_color;
+    Texcoord = tex_coord;
 
     // gl_Position = vec4(position, 0.0, 1.0);
     gl_Position = vec4(position.x, position.y, 0.0, 1.0);
@@ -40,21 +44,24 @@ static FRAGMENT_SHADER_SRC: &'static str = "
 #version 150 core
 
 uniform vec3 triangleColor;
+uniform sampler2D tex;
 
 in vec3 Color;
+in vec2 Texcoord;
 
 out vec4 out_color;
 
 void main() {
     //out_color = vec4(1.0, 1.0, 1.0, 1.0);
     //out_color = vec4(triangleColor, 1.0); // Uniform
-    out_color = vec4(Color, 1.0);
+    //out_color = vec4(Color, 1.0);
+    out_color = texture(tex, Texcoord) * vec4(Color, 1.0);
 }";
 
 // Vertex data
 // static VERTEX_DATA: [GLfloat; 6] = [0.0, 0.5, 0.5, -0.5, -0.5, -0.5];
 
-static VERTEX_DATA: [GLfloat; 20] = [
+static VERTEX_DATA: [GLfloat; 28] = [
   /*// Triangle 1
   -0.5, 0.5,
   0.5, 0.5,
@@ -75,16 +82,23 @@ static VERTEX_DATA: [GLfloat; 20] = [
   -0.5, -0.5, 0.0, 0.0, 1.0,  // Vertex 3: Blue*/
 
   // From open.gl tutorial - square
-  -0.5,  0.5, 1.0, 0.0, 0.0, // Top-left
-  0.5,  0.5, 0.0, 1.0, 0.0, // Top-right
-  0.5, -0.5, 0.0, 0.0, 1.0, // Bottom-right
-  -0.5, -0.5, 1.0, 1.0, 1.0  // Bottom-left
+  //  Position      Color      Texcoords
+  -0.5,  0.5, 1.0,  0.0, 0.0,  0.0, 0.0, // Top-left
+  0.5,  0.5, 0.0,   1.0, 0.0,  1.0, 0.0, // Top-right
+  0.5, -0.5, 0.0,   0.0, 1.0,  1.0, 1.0, // Bottom-right
+  -0.5, -0.5, 1.0,  1.0, 1.0,  0.0, 1.0, // Bottom-left
 ];
 
 static ELEMENTS: [GLint; 6] = [
   // From open.gl tutorial
   0, 1, 2,
   2, 3, 0,
+];
+
+// From open.gl tutorial
+static TEXTURE_CHECKERBOARD : [GLfloat; 12] = [
+  0.0, 0.0, 0.0,   1.0, 1.0, 1.0,
+  1.0, 1.0, 1.0,   0.0, 0.0, 0.0,
 ];
 
 pub fn run() {
@@ -108,6 +122,7 @@ pub fn run() {
   let mut vbo = 0;
   let mut vao = 0;
   let mut ebo = 0;
+  let mut tex = 0;
 
   unsafe {
     // Create a Vertex Buffer Object and copy the vertex data to it
@@ -130,6 +145,26 @@ pub fn run() {
       gl::STATIC_DRAW,
     );
 
+    // Texture
+    gl::GenTextures(1, &mut tex);
+    gl::BindTexture(gl::TEXTURE_2D, tex);
+    gl::TexParameteri(gl::TEXTURE_2D, gl::TEXTURE_WRAP_S, gl::REPEAT as i32);
+    gl::TexParameteri(gl::TEXTURE_2D, gl::TEXTURE_WRAP_T, gl::REPEAT as i32);
+    gl::TexParameteri(gl::TEXTURE_2D, gl::TEXTURE_MIN_FILTER, gl::LINEAR as i32);
+    gl::TexParameteri(gl::TEXTURE_2D, gl::TEXTURE_MAG_FILTER, gl::LINEAR as i32);
+
+    gl::TexImage2D(
+      gl::TEXTURE_2D,
+      0,
+      gl::RGB as i32,
+      2,
+      2,
+      0,
+      gl::RGB as u32,
+      gl::FLOAT,
+      mem::transmute(&TEXTURE_CHECKERBOARD[0]),
+    );
+
     // Create Vertex Array Object
     gl::GenVertexArrays(1, &mut vao);
     gl::BindVertexArray(vao);
@@ -146,7 +181,7 @@ pub fn run() {
       2,
       gl::FLOAT,
       gl::FALSE as GLboolean,
-      get_stride::<f32>(5),
+      get_stride::<f32>(7),
       get_pointer_offset::<f32>(0),
     );
 
@@ -158,8 +193,20 @@ pub fn run() {
       3,
       gl::FLOAT,
       gl::FALSE as GLboolean,
-      get_stride::<f32>(5),
+      get_stride::<f32>(7),
       get_pointer_offset::<f32>(2),
+    );
+
+    // Specify the layout of the vertex data
+    let tex_attr = gl::GetAttribLocation(program, CString::new("tex_coordinate").unwrap().as_ptr());
+    gl::EnableVertexAttribArray(tex_attr as GLuint);
+    gl::VertexAttribPointer(
+      tex_attr as GLuint,
+      2,
+      gl::FLOAT,
+      gl::FALSE as GLboolean,
+      get_stride::<f32>(7),
+      get_pointer_offset::<f32>(5),
     );
 
     let triangle_color_attr =  gl::GetUniformLocation(program, CString::new("triangleColor").unwrap().as_ptr());
