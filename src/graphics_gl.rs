@@ -18,6 +18,8 @@ use glutin::ContextBuilder;
 use std::mem::size_of;
 use std::ptr::null;
 use glium::framebuffer::ColorAttachment::Texture;
+use std::sync::Arc;
+use sensor_control::CaptureProvider;
 
 //use shader::Shader;
 
@@ -101,7 +103,7 @@ static TEXTURE_CHECKERBOARD : [GLfloat; 12] = [
   1.0, 1.0, 1.0,   0.0, 0.0, 0.0,
 ];
 
-pub fn run() {
+pub fn run(capture_provider: Arc<CaptureProvider>) {
   let event_loop = EventLoop::new();
   let window = WindowBuilder::new();
   let gl_window = ContextBuilder::new()
@@ -149,9 +151,10 @@ pub fn run() {
     gl::GenTextures(1, &mut tex);
     gl::BindTexture(gl::TEXTURE_2D, tex);
 
-    //let img = image::open(&Path::new("sneslogo.png"))
-    //let img = image::open(&Path::new("n64logo.png"))
-    let img = image::open(&Path::new("sample.png"))
+    //let filename = "sneslogo.png";
+    let filename = "n64logo.png";
+    //let filename = "sample.png";
+    let img = image::open(&Path::new(filename))
         .expect("failed to load")
         .to_rgba();
 
@@ -248,7 +251,7 @@ pub fn run() {
   }
 
   event_loop.run(move |event, _, control_flow| {
-    *control_flow = ControlFlow::Wait;
+    //*control_flow = ControlFlow::Wait;
     match event {
       Event::LoopDestroyed => return,
       Event::WindowEvent { event, .. } => match event {
@@ -283,6 +286,39 @@ pub fn run() {
         gl_window.swap_buffers().unwrap();
       },
       _ => (),
+    }
+
+    // TODO: This belongs in a worker thread with buffers on both producer and consumer.
+    if let Some(capture) = capture_provider.get_capture() {
+      if let Ok(image) = capture.get_depth_image() {
+        let width = image.get_width_pixels() as i32;
+        let height = image.get_height_pixels() as i32;
+        println!("Size: {}x{}", width, height);
+        let buffer = image.get_buffer();
+
+        //let img_ptr: *const c_void = raw_img.as_ptr() as *const c_void;
+
+
+        unsafe {
+          gl::BindTexture(gl::TEXTURE_2D, tex);
+          gl::TexImage2D(
+            gl::TEXTURE_2D,
+            0,
+            gl::RGBA as i32,
+            //format as i32,
+            width,
+            height,
+            0,
+            gl::RGBA,
+            //format,
+            gl::UNSIGNED_BYTE,
+            buffer as *const c_void,
+          );
+        }
+        *control_flow = ControlFlow::Poll;
+
+        gl_window.swap_buffers().unwrap();
+      }
     }
   });
 }
