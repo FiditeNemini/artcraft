@@ -2,6 +2,8 @@ use glutin::dpi::LogicalSize;
 use grr;
 
 use std::path::Path;
+use sensor_control::CaptureProvider;
+use std::sync::Arc;
 
 const VERTEX_SRC: &str = r#"
     #version 450 core
@@ -33,7 +35,7 @@ const VERTICES: [f32; 16] = [
 
 const INDICES: [u16; 6] = [0, 1, 2, 2, 3, 0];
 
-pub fn run() -> grr::Result<()> {
+pub fn run(capture_provider: Arc<CaptureProvider>) -> grr::Result<()> {
   unsafe {
     let mut events_loop = glutin::EventsLoop::new();
     let wb = glutin::WindowBuilder::new()
@@ -138,7 +140,7 @@ pub fn run() -> grr::Result<()> {
       },
     );
 
-    let texture_view = grr.create_image_view(
+    let mut texture_view = grr.create_image_view(
       texture,
       grr::ImageViewType::D2,
       grr::Format::R8G8B8A8_SRGB,
@@ -179,6 +181,8 @@ pub fn run() -> grr::Result<()> {
       }],
     };
 
+    //let mut my_buffer = grr.create_buffer(640000, grr::MemoryFlags::DYNAMIC)?;
+
     let mut running = true;
     while running {
       events_loop.poll_events(|event| match event {
@@ -194,6 +198,19 @@ pub fn run() -> grr::Result<()> {
         },
         _ => (),
       });
+
+      // TODO: This belongs in a worker thread with buffers on both producer and consumer.
+      if let Some(capture) = capture_provider.get_capture() {
+        if let Ok(image) = capture.get_depth_image() {
+          let width = image.get_width_pixels();
+          let height = image.get_height_pixels();
+          println!("Size: {}x{}", width, height);
+
+          //let buffer = image.get_buffer();
+
+
+        }
+      }
 
       grr.bind_pipeline(pipeline);
       grr.bind_vertex_array(vertex_array);

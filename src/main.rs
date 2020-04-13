@@ -62,8 +62,8 @@ pub fn main() {
   let capture_provider = Arc::new(CaptureProvider::new());
   let capture_provider2= capture_provider.clone();
 
-  thread::spawn(move || capture_thread(capture_provider2));
+  thread::spawn(move || capture_thread(capture_provider));
 
-  graphics_grr::run().unwrap();
+  graphics_grr::run(capture_provider2).unwrap();
   //graphics_glium::run_glium();
 }
