@@ -10,7 +10,7 @@ use gl;
 use gl::types::*;
 use glfw::{Action, Context, Key};
 use glutin;
-use image::{GenericImage, GenericImageView};
+use image::{GenericImage, GenericImageView, DynamicImage};
 use glutin::event::{Event, WindowEvent};
 use glutin::event_loop::{ControlFlow, EventLoop};
 use glutin::window::WindowBuilder;
@@ -148,22 +148,56 @@ pub fn run() {
     // Texture
     gl::GenTextures(1, &mut tex);
     gl::BindTexture(gl::TEXTURE_2D, tex);
-    gl::TexParameteri(gl::TEXTURE_2D, gl::TEXTURE_WRAP_S, gl::REPEAT as i32);
-    gl::TexParameteri(gl::TEXTURE_2D, gl::TEXTURE_WRAP_T, gl::REPEAT as i32);
-    gl::TexParameteri(gl::TEXTURE_2D, gl::TEXTURE_MIN_FILTER, gl::LINEAR as i32);
-    gl::TexParameteri(gl::TEXTURE_2D, gl::TEXTURE_MAG_FILTER, gl::LINEAR as i32);
+
+    //let img = image::open(&Path::new("sneslogo.png"))
+    //let img = image::open(&Path::new("n64logo.png"))
+    let img = image::open(&Path::new("sample.png"))
+        .expect("failed to load")
+        .to_rgba();
+
+    /*let format = match img {
+      /*image::ImageRgb8(_) => gl::RGB,
+      image::ImageRgba8(_) => gl::RGBA,*/
+      DynamicImage::ImageRgb8(_) =>  gl::RGB, // RGB8: types::GLenum = 0x8051;
+      DynamicImage::ImageRgba8(_) => gl::RGBA, // RGBA: types::GLenum = 0x1908;
+      _ => panic!("What is this format?"),
+      /*ImageLuma8(GrayImage) => {},
+      ImageLumaA8(GrayAlphaImage) => {},
+      ImageBgr8(BgrImage) => {},
+      ImageBgra8(BgraImage) => {},
+      ImageLuma16(Gray16Image) => {},
+      ImageLumaA16(GrayAlpha16Image) => {},
+      ImageRgb16(Rgb16Image) => {},
+      ImageRgba16(Rgba16Image) => {},*/
+    };*/
+
+    let width = img.dimensions().0 as i32;
+    let height = img.dimensions().1 as i32;
+    //let raw_img = img.into_raw();
+    //let img_ptr: *const c_void = raw_img.as_ptr() as *const c_void;
+    let data = img.into_raw();
+
+    println!("Loaded image: {}x{}", width, height);
+    //println!("Format: {:?}", format);
 
     gl::TexImage2D(
       gl::TEXTURE_2D,
       0,
-      gl::RGB as i32,
-      2,
-      2,
+      gl::RGBA as i32,
+      //format as i32,
+      width,
+      height,
       0,
-      gl::RGB as u32,
-      gl::FLOAT,
-      mem::transmute(&TEXTURE_CHECKERBOARD[0]),
+      gl::RGBA,
+      //format,
+      gl::UNSIGNED_BYTE,
+      &data[0] as *const u8 as *const c_void,
     );
+
+    gl::TexParameteri(gl::TEXTURE_2D, gl::TEXTURE_WRAP_S, gl::REPEAT as i32);
+    gl::TexParameteri(gl::TEXTURE_2D, gl::TEXTURE_WRAP_T, gl::REPEAT as i32);
+    gl::TexParameteri(gl::TEXTURE_2D, gl::TEXTURE_MIN_FILTER, gl::LINEAR as i32);
+    gl::TexParameteri(gl::TEXTURE_2D, gl::TEXTURE_MAG_FILTER, gl::LINEAR as i32);
 
     // Create Vertex Array Object
     gl::GenVertexArrays(1, &mut vao);
