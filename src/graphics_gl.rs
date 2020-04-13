@@ -81,10 +81,10 @@ static VERTEX_DATA: [GLfloat; 15] = [
   -0.5, -0.5, 1.0, 1.0, 1.0  // Bottom-left*/
 ];
 
-static ELEMENTS: [GLint; 6] = [
+static ELEMENTS: [GLint; 3] = [
   // From open.gl tutorial
   0, 1, 2,
-  2, 3, 0,
+  //2, 3, 0,
 ];
 
 pub fn run() {
@@ -107,6 +107,7 @@ pub fn run() {
 
   let mut vbo = 0;
   let mut vao = 0;
+  let mut ebo = 0;
 
   unsafe {
     // Create a Vertex Buffer Object and copy the vertex data to it
@@ -116,6 +117,16 @@ pub fn run() {
       gl::ARRAY_BUFFER,
       (VERTEX_DATA.len() * mem::size_of::<GLfloat>()) as GLsizeiptr,
       mem::transmute(&VERTEX_DATA[0]),
+      gl::STATIC_DRAW,
+    );
+
+    // Element buffer
+    gl::GenBuffers(1, &mut ebo);
+    gl::BindBuffer(gl::ELEMENT_ARRAY_BUFFER, ebo);
+    gl::BufferData(
+      gl::ELEMENT_ARRAY_BUFFER,
+      (ELEMENTS.len() * mem::size_of::<GLfloat>()) as GLsizeiptr,
+      mem::transmute(&ELEMENTS[0]),
       gl::STATIC_DRAW,
     );
 
@@ -179,9 +190,14 @@ pub fn run() {
           gl::ClearColor(0.3, 0.3, 0.3, 1.0);
           gl::Clear(gl::COLOR_BUFFER_BIT);
           // Draw a triangle from the 3 vertices
-          gl::DrawArrays(gl::TRIANGLES, 0, 3);
+          //gl::DrawArrays(gl::TRIANGLES, 0, 3);
 
-          //gl::DrawElements(gl::TRIANGLES, 6, gl::UNSIGNED_INT, std::ptr::null())
+          gl::DrawElements(
+            gl::TRIANGLES,
+            ELEMENTS.len() as GLsizei,
+            gl::UNSIGNED_INT,
+            std::mem::transmute(&ELEMENTS[0])
+          );
         }
         gl_window.swap_buffers().unwrap();
       },
