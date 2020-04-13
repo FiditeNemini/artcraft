@@ -16,6 +16,7 @@ use glutin::event_loop::{ControlFlow, EventLoop};
 use glutin::window::WindowBuilder;
 use glutin::ContextBuilder;
 use std::mem::size_of;
+use std::ptr::null;
 
 //use shader::Shader;
 
@@ -134,8 +135,8 @@ pub fn run() {
       2,
       gl::FLOAT,
       gl::FALSE as GLboolean,
-      (5 * std::mem::size_of::<f32>()) as gl::types::GLint,
-      ptr::null(),
+      get_stride::<f32>(5),
+      get_pointer_offset::<f32>(0),
     );
 
     // Specify the layout of the vertex data
@@ -146,8 +147,8 @@ pub fn run() {
       3,
       gl::FLOAT,
       gl::FALSE as GLboolean,
-      (5 * std::mem::size_of::<f32>()) as gl::types::GLint,
-      (2 * std::mem::size_of::<f32>()) as *const gl::types::GLvoid,
+      get_stride::<f32>(5),
+      get_pointer_offset::<f32>(2),
     );
 
     let triangle_color_attr =  gl::GetUniformLocation(program, CString::new("triangleColor").unwrap().as_ptr());
@@ -255,5 +256,20 @@ fn link_program(vs: GLuint, fs: GLuint) -> GLuint {
       );
     }
     program
+  }
+}
+
+/// Calculate the stride width for OpenGL
+/// Useful for `gl::VertexAttribPointer`.
+fn get_stride<T>(size: usize) -> gl::types::GLint {
+  (size * std::mem::size_of::<T>()) as gl::types::GLint
+}
+
+/// Calculate the offset for OpenGL
+/// Useful for `gl::VertexAttribPointer`.
+fn get_pointer_offset<T>(offset: usize) -> *const gl::types::GLvoid {
+  match offset {
+    0 => null(),
+    _ => (offset * std::mem::size_of::<T>()) as *const gl::types::GLvoid,
   }
 }
