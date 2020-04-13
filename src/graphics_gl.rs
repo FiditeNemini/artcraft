@@ -54,7 +54,7 @@ void main() {
 // Vertex data
 // static VERTEX_DATA: [GLfloat; 6] = [0.0, 0.5, 0.5, -0.5, -0.5, -0.5];
 
-static VERTEX_DATA: [GLfloat; 15] = [
+static VERTEX_DATA: [GLfloat; 20] = [
   /*// Triangle 1
   -0.5, 0.5,
   0.5, 0.5,
@@ -70,21 +70,21 @@ static VERTEX_DATA: [GLfloat; 15] = [
   -0.5, -0.5  // Vertex 3 (X, Y)*/
 
   // colored triangle from open.gl tutorial
-  0.0,  0.5, 1.0, 0.0, 0.0, // Vertex 1: Red
+  /*0.0,  0.5, 1.0, 0.0, 0.0, // Vertex 1: Red
   0.5, -0.5, 0.0, 1.0, 0.0, // Vertex 2: Green
-  -0.5, -0.5, 0.0, 0.0, 1.0,  // Vertex 3: Blue
+  -0.5, -0.5, 0.0, 0.0, 1.0,  // Vertex 3: Blue*/
 
-  /*// From open.gl tutorial - square
+  // From open.gl tutorial - square
   -0.5,  0.5, 1.0, 0.0, 0.0, // Top-left
   0.5,  0.5, 0.0, 1.0, 0.0, // Top-right
   0.5, -0.5, 0.0, 0.0, 1.0, // Bottom-right
-  -0.5, -0.5, 1.0, 1.0, 1.0  // Bottom-left*/
+  -0.5, -0.5, 1.0, 1.0, 1.0  // Bottom-left
 ];
 
-static ELEMENTS: [GLint; 3] = [
+static ELEMENTS: [GLint; 6] = [
   // From open.gl tutorial
   0, 1, 2,
-  //2, 3, 0,
+  2, 3, 0,
 ];
 
 pub fn run() {
