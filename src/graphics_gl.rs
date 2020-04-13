@@ -18,23 +18,52 @@ use glutin::ContextBuilder;
 
 //use shader::Shader;
 
-// Vertex data
-static VERTEX_DATA: [GLfloat; 6] = [0.0, 0.5, 0.5, -0.5, -0.5, -0.5];
-
 // Shader sources
 static VS_SRC: &'static str = "
-#version 150
+#version 150 core
 in vec2 position;
 void main() {
     gl_Position = vec4(position, 0.0, 1.0);
+    //gl_Position = vec4(position.x, position.y, 0.0, 1.0);
 }";
 
 static FS_SRC: &'static str = "
-#version 150
+#version 150 core
 out vec4 out_color;
 void main() {
     out_color = vec4(1.0, 1.0, 1.0, 1.0);
 }";
+
+// Vertex data
+// static VERTEX_DATA: [GLfloat; 6] = [0.0, 0.5, 0.5, -0.5, -0.5, -0.5];
+
+static VERTEX_DATA: [GLfloat; 6] = [
+  /*// Triangle 1
+  -0.5, 0.5,
+  0.5, 0.5,
+  0.5, -0.5,
+  // Triangle 2 -- doesn't work
+  0.5, -0.5,
+  -0.5, 0.5,
+  -0.5, -0.5,*/
+
+  // from open.gl tutorial
+  0.0,  0.5, // Vertex 1 (X, Y)
+  0.5, -0.5, // Vertex 2 (X, Y)
+  -0.5, -0.5  // Vertex 3 (X, Y)
+
+  /*// From open.gl tutorial - square
+  -0.5,  0.5, 1.0, 0.0, 0.0, // Top-left
+  0.5,  0.5, 0.0, 1.0, 0.0, // Top-right
+  0.5, -0.5, 0.0, 0.0, 1.0, // Bottom-right
+  -0.5, -0.5, 1.0, 1.0, 1.0  // Bottom-left*/
+];
+
+static ELEMENTS: [GLint; 6] = [
+  // From open.gl tutorial
+  0, 1, 2,
+  2, 3, 0,
+];
 
 pub fn run() {
   let event_loop = EventLoop::new();
@@ -54,14 +83,10 @@ pub fn run() {
   let fs = compile_shader(FS_SRC, gl::FRAGMENT_SHADER);
   let program = link_program(vs, fs);
 
-  let mut vao = 0;
   let mut vbo = 0;
+  let mut vao = 0;
 
   unsafe {
-    // Create Vertex Array Object
-    gl::GenVertexArrays(1, &mut vao);
-    gl::BindVertexArray(vao);
-
     // Create a Vertex Buffer Object and copy the vertex data to it
     gl::GenBuffers(1, &mut vbo);
     gl::BindBuffer(gl::ARRAY_BUFFER, vbo);
@@ -71,6 +96,10 @@ pub fn run() {
       mem::transmute(&VERTEX_DATA[0]),
       gl::STATIC_DRAW,
     );
+
+    // Create Vertex Array Object
+    gl::GenVertexArrays(1, &mut vao);
+    gl::BindVertexArray(vao);
 
     // Use shader program
     gl::UseProgram(program);
@@ -114,6 +143,8 @@ pub fn run() {
           gl::Clear(gl::COLOR_BUFFER_BIT);
           // Draw a triangle from the 3 vertices
           gl::DrawArrays(gl::TRIANGLES, 0, 3);
+
+          //gl::DrawElements(gl::TRIANGLES, 6, gl::UNSIGNED_INT, std::ptr::null())
         }
         gl_window.swap_buffers().unwrap();
       },
