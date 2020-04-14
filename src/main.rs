@@ -60,6 +60,7 @@ pub mod graphics_grr;
 pub mod k4a_sys_wrapper;
 pub mod old_k4a_wrapper;
 pub mod sensor_control;
+pub mod shaders;
 
 pub fn main() {
   let capture_provider = Arc::new(CaptureProvider::new());

@@ -20,6 +20,8 @@ use std::ptr::null;
 use glium::framebuffer::ColorAttachment::Texture;
 use std::sync::Arc;
 use sensor_control::CaptureProvider;
+use shaders;
+use shaders::compute_shader::ComputeShader;
 
 //use shader::Shader;
 
@@ -116,6 +118,8 @@ pub fn run(capture_provider: Arc<CaptureProvider>) {
 
   // Load the OpenGL function pointers
   gl::load_with(|symbol| gl_window.get_proc_address(symbol));
+
+  let compute_shader = ComputeShader::create();
 
   // Create GLSL shaders
   let vs = compile_shader(VERTEX_SHADER_SRC, gl::VERTEX_SHADER);
