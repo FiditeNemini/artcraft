@@ -1,1 +1,1 @@
-pub mod compute_shader;
+pub mod point_cloud_shader;
