@@ -352,7 +352,8 @@ impl PointCloudComputeShader {
   // p is the index of a given pixel.
   //
   pub fn generate_xy_table(calibration: k4a_sys::k4a_calibration_t,
-                           calibration_type: k4a_sys::k4a_calibration_type_t) -> Result<k4a_sys_wrapper::Image>
+                           calibration_type: k4a_sys::k4a_calibration_type_t)
+    -> Result<Image>
   {
 
     /*
@@ -384,49 +385,83 @@ impl PointCloudComputeShader {
       width,
       height,
       stride_bytes,
-    );
+    ).map_err(|_| PointCloudError::UnknownError)?;
 
-    unimplemented!();
-    /*
+    // typedef union
+    // {
+    //     // XY or array representation of vector
+    //     struct _xy
+    //     {
+    //         float x; // < X component of a vector
+    //         float y; // < Y component of a vector
+    //     } xy;        // < X, Y representation of a vector
+    //     float v[2];  // < Array representation of a vector
+    // } k4a_float2_t;
+    let mut p = k4a_sys::k4a_float2_t {
+      xy: k4a_sys::k4a_float2_t__xy {
+        x: 0.0,
+        y: 0.0,
+      }
+    };
 
-    k4a::image xyTable = k4a::image::create(K4A_IMAGE_FORMAT_CUSTOM,
-                                            cameraCalibration.resolution_width,
-                                            cameraCalibration.resolution_height,
-                                            cameraCalibration.resolution_width *
-                                                static_cast<int>(sizeof(k4a_float2_t)));
+    // typedef union
+    // {
+    //     // XYZ or array representation of vector.
+    //     struct _xyz
+    //     {
+    //         float x; // < X component of a vector.
+    //         float y; // < Y component of a vector.
+    //         float z; // < Z component of a vector.
+    //     } xyz;       // < X, Y, Z representation of a vector.
+    //     float v[3];  // < Array representation of a vector.
+    // } k4a_float3_t;
+    let mut ray = k4a_sys::k4a_float3_t {
+      xyz: k4a_sys::k4a_float3_t__xyz {
+        x: 0.0,
+        y: 0.0,
+        z: 0.0,
+      }
+    };
 
-    k4a_float2_t *tableData = reinterpret_cast<k4a_float2_t *>(xyTable.get_buffer());
+    let mut idx = 0;
 
-    int width = cameraCalibration.resolution_width;
-    int height = cameraCalibration.resolution_height;
+    // TODO: I'm not sure any of this works...
+    // k4a_float2_t *tableData = reinterpret_cast<k4a_float2_t *>(xyTable.get_buffer());
+    let mut buffer = xy_table.get_buffer();
 
-    k4a_float2_t p;
-    k4a_float3_t ray;
+    let length = width*height;
+    unsafe {
+      let mut table_data : *mut k4a_sys::k4a_float2_t = std::mem::transmute_copy(&buffer);
+      let mut table_data2 = std::slice::from_raw_parts_mut(table_data, length as usize);
 
-    for (int y = 0, idx = 0; y < height; y++)
-    {
-        p.xy.y = static_cast<float>(y);
-        for (int x = 0; x < width; x++, idx++)
-        {
-            p.xy.x = static_cast<float>(x);
+      for y in 0..height {
+        p.xy.y = y as f32;
 
-            if (calibration.convert_2d_to_3d(p, 1.f, calibrationType, calibrationType, &ray))
-            {
-                tableData[idx].xy.x = ray.xyz.x;
-                tableData[idx].xy.y = ray.xyz.y;
+        for x in 0..width {
+          p.xy.x = x as f32;
+
+          // TODO: Implement the function this calls.
+          // TODO: Implement the function this calls.
+          // TODO: Implement the function this calls.
+          // TODO: Implement the function this calls.
+          if (true) {
+            unsafe {
+              table_data2[idx].xy.x = ray.xyz.x;
+              table_data2[idx].xy.y = ray.xyz.y;
             }
-            else
-            {
-                // The pixel is invalid.
-                //
-                tableData[idx].xy.x = 0.0f;
-                tableData[idx].xy.y = 0.0f;
+          } else {
+            unsafe {
+              table_data2[idx].xy.x = 0.0;
+              table_data2[idx].xy.y = 0.0;
             }
+          }
+
+          idx += 1;
         }
+      }
     }
 
-    return xyTable;
-    */
+    Ok(xy_table)
   }
 }
 
