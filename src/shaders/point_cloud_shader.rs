@@ -118,103 +118,6 @@ impl PointCloudComputeShader {
     }
   }
 
-  // Creates a k4a::image containing the XY tables from calibration based on calibrationType.
-  // The table is a 2D array of k4a_float2_t's with the same resolution as the camera of calibrationType
-  // specified in calibration.
-  //
-  // You can use this table to convert a depth image into a point cloud, e.g. by using the Convert method.
-  // Conversion is done by multiplying the depth pixel value by the XY table values - i.e. the result
-  // pixel will be (xyTable[p].x * depthImage[p], xyTable[p].y * depthImage[p], depthImage[p]), where
-  // p is the index of a given pixel.
-  //
-  pub fn generate_xy_table(calibration: k4a_sys::k4a_calibration_t,
-                           calibration_type: k4a_sys::k4a_calibration_type_t) -> Result<k4a_sys_wrapper::Image> {
-
-    // TODO: Just a static function
-    unimplemented!();
-  }
-
-  // Set the XY table that will be used by future calls to Convert().  Get an XY table by calling
-  // GenerateXyTable().
-  pub fn set_active_xy_table(&mut self, xy_table: k4a_sys_wrapper::Image) {
-    let width = xy_table.get_width_pixels() as i32;
-    let height = xy_table.get_height_pixels() as i32;
-
-    // OpenGL resource DSL
-    //
-    // OpenGL::Texture m_depthImageTexture;
-    //
-    // m_xyTableTexture.Init();
-    //
-    // ----- openglhelpers.h -----
-    // using Texture = Internal::BasicWrapper<Internal::GenTextures, Internal::DeleteTextures>;
-    //
-    // template<void (*createFn)(GLsizei, GLuint *), void (*deleteFn)(GLsizei, GLuint *)> class BasicWrapper
-    //
-    // inline void GenTextures(GLsizei n, GLuint *textures)
-    // {
-    //   glGenTextures(n, textures);
-    // }
-    //
-    // void Init()
-    // {
-    //   Reset();
-    //   createFn(1, &m_id);
-    // }
-    //
-    //
-    // void Reset()
-    // {
-    //   if (m_id != 0)
-    //   {
-    //     deleteFn(1, &m_id);
-    //     m_id = 0;
-    //   }
-    // }
-    //
-
-    // Upload the XY table as a texture so we can use it as a uniform
-    self.xy_table_texture.init();
-
-    unsafe {
-      gl::BindTexture(gl::TEXTURE_2D, self.xy_table_texture.id());
-      gl::TexStorage2D(
-        gl::TEXTURE_2D,
-        1,
-        gl::RGB32F, // constexpr GLenum xyTableInternalFormat = GL_RG32F;
-        width,
-        height,
-      );
-
-      let xy_table_buffer = xy_table.get_buffer();
-
-      gl::TexSubImage2D(
-        gl::TEXTURE_2D,
-        0, // level
-        0, // xoffset
-        0, // yoffset
-        width,
-        height,
-        gl::RG, //constexpr GLenum xyTableDataFormat = GL_RG;
-        gl::FLOAT, //constexpr GLenum xyTableDataType = GL_FLOAT;
-        xy_table_buffer as *const c_void,
-      );
-
-      gl::TexParameteri(gl::TEXTURE_2D, gl::TEXTURE_MIN_FILTER, gl::NEAREST as i32);
-      gl::TexParameteri(gl::TEXTURE_2D, gl::TEXTURE_MAG_FILTER, gl::NEAREST as i32);
-    }
-
-    // Pre-allocate a texture for the depth images so we don't have to
-    // reallocate on every frame
-    self.depth_image_texture.init();
-    self.depth_image_pixel_buffer.init();
-
-    // TODO: CONTINUE IMPLEMENTATION
-
-    unimplemented!();
-
-  }
-
   // Takes depth data and turns it into a texture containing the XYZ coordinates of the depth map
   // using the most recently set-to-active XY table.  The input depth image and output texture
   // (if already set) must be of the same resolution that was used to generate that XY table, or
@@ -353,6 +256,71 @@ impl PointCloudComputeShader {
 
       Err(PointCloudError::UnknownError)
     }
+  }
+
+  // Set the XY table that will be used by future calls to Convert().  Get an XY table by calling
+  // GenerateXyTable().
+  pub fn set_active_xy_table(&mut self, xy_table: k4a_sys_wrapper::Image) {
+    let width = xy_table.get_width_pixels() as i32;
+    let height = xy_table.get_height_pixels() as i32;
+
+    // Upload the XY table as a texture so we can use it as a uniform
+    self.xy_table_texture.init();
+
+    unsafe {
+      gl::BindTexture(gl::TEXTURE_2D, self.xy_table_texture.id());
+      gl::TexStorage2D(
+        gl::TEXTURE_2D,
+        1,
+        gl::RGB32F, // constexpr GLenum xyTableInternalFormat = GL_RG32F;
+        width,
+        height,
+      );
+
+      let xy_table_buffer = xy_table.get_buffer();
+
+      gl::TexSubImage2D(
+        gl::TEXTURE_2D,
+        0, // level
+        0, // xoffset
+        0, // yoffset
+        width,
+        height,
+        gl::RG, //constexpr GLenum xyTableDataFormat = GL_RG;
+        gl::FLOAT, //constexpr GLenum xyTableDataType = GL_FLOAT;
+        xy_table_buffer as *const c_void,
+      );
+
+      gl::TexParameteri(gl::TEXTURE_2D, gl::TEXTURE_MIN_FILTER, gl::NEAREST as i32);
+      gl::TexParameteri(gl::TEXTURE_2D, gl::TEXTURE_MAG_FILTER, gl::NEAREST as i32);
+    }
+
+    // Pre-allocate a texture for the depth images so we don't have to
+    // reallocate on every frame
+    self.depth_image_texture.init();
+    self.depth_image_pixel_buffer.init();
+
+    // TODO: CONTINUE IMPLEMENTATION
+    let num_bytes: GLuint = (width * height * size_of::<u16>() as i32) as GLuint; // libc::uint16_t = u16
+
+    unimplemented!();
+
+  }
+
+  // Creates a k4a::image containing the XY tables from calibration based on calibrationType.
+  // The table is a 2D array of k4a_float2_t's with the same resolution as the camera of calibrationType
+  // specified in calibration.
+  //
+  // You can use this table to convert a depth image into a point cloud, e.g. by using the Convert method.
+  // Conversion is done by multiplying the depth pixel value by the XY table values - i.e. the result
+  // pixel will be (xyTable[p].x * depthImage[p], xyTable[p].y * depthImage[p], depthImage[p]), where
+  // p is the index of a given pixel.
+  //
+  pub fn generate_xy_table(calibration: k4a_sys::k4a_calibration_t,
+                           calibration_type: k4a_sys::k4a_calibration_type_t) -> Result<k4a_sys_wrapper::Image> {
+
+    // TODO: Just a static function
+    unimplemented!();
   }
 }
 
