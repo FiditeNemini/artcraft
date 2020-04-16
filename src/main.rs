@@ -47,7 +47,6 @@ use opencv::imgproc;
 use opencv::prelude::*;
 
 use conversion::TextureData2d;
-use graphics_glium::run_glium;
 use k4a_sys_wrapper::Device;
 use k4a_sys_wrapper::device_get_installed_count;
 use k4a_sys_wrapper::Image;
@@ -55,8 +54,7 @@ use sensor_control::{capture_thread_to_texture, grab_single_frame, CaptureProvid
 
 pub mod conversion;
 pub mod graphics_gl;
-pub mod graphics_glium;
-pub mod graphics_grr;
+pub mod old_graphics_libraries;
 pub mod k4a_sys_wrapper;
 pub mod old_k4a_wrapper;
 pub mod sensor_control;

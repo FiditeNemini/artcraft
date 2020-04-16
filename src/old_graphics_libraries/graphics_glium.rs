@@ -55,10 +55,10 @@ pub fn run_glium() {
   let cb = glutin::ContextBuilder::new();
   let display = glium::Display::new(wb, cb, &event_loop).unwrap();
 
-  let imageA = image::load(Cursor::new(&include_bytes!("../sneslogo.png")[..]),
+  let imageA = image::load(Cursor::new(&include_bytes!("../../sneslogo.png")[..]),
     image::ImageFormat::Png).unwrap().to_rgba();
 
-  let imageB = image::load(Cursor::new(&include_bytes!("../n64logo.png")[..]),
+  let imageB = image::load(Cursor::new(&include_bytes!("../../n64logo.png")[..]),
     image::ImageFormat::Png).unwrap().to_rgba();
 
   let imageA_dimensions = imageA.dimensions();
