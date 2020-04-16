@@ -54,6 +54,7 @@ use sensor_control::{capture_thread_to_texture, grab_single_frame, CaptureProvid
 
 pub mod conversion;
 pub mod graphics_gl;
+pub mod opengl_wrapper;
 pub mod old_graphics_libraries;
 pub mod k4a_sys_wrapper;
 pub mod old_k4a_wrapper;

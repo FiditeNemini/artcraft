@@ -15,6 +15,8 @@ use std::mem::size_of;
 use std::ptr::null;
 use std::fmt::{Formatter, Error};
 
+use opengl_wrapper::Texture;
+
 pub type Result<T> = std::result::Result<T,PointCloudError>;
 
 #[derive(Clone, Debug)]
@@ -230,26 +232,32 @@ impl PointCloudComputeShader {
   // by this function, provided the depth image and XY table previously used was for the same
   // sized texture.
   //
-  pub fn convert(&self, depth_image: k4a_sys_wrapper::Image) -> Result<()> {
+  pub fn convert(&self, depth_image: k4a_sys_wrapper::Image,
+                 output_texture: &mut Texture) -> Result<()> {
     // TODO xy_table_texture
 
-    let width = depth_image.get_width_pixels();
-    let height = depth_image.get_height_pixels();
+    let width = depth_image.get_width_pixels() as i32;
+    let height = depth_image.get_height_pixels() as i32;
+
+    if !output_texture.is_initialized() {
+      output_texture.init();
+
+      unsafe {
+        gl::ActiveTexture(gl::TEXTURE0);
+        gl::BindTexture(gl::TEXTURE_2D, output_texture.id());
+
+        // The format that the point cloud texture uses internally to store points.
+        // If you want to use the texture that this outputs from your shader, you
+        // need to pass this as the format argument to glBindImageTexture().
+        // static constexpr GLenum PointCloudTextureFormat = GL_RGBA32F;
+        gl::TexStorage2D(gl::TEXTURE_2D, 1, POINT_CLOUD_TEXTURE_FORMAT, width, height);
+
+        gl::TexParameteri(gl::TEXTURE_2D, gl::TEXTURE_MIN_FILTER, gl::NEAREST as i32);
+        gl::TexParameteri(gl::TEXTURE_2D, gl::TEXTURE_MAG_FILTER, gl::NEAREST as i32);
+      }
+    }
 
     unsafe {
-      // TODO - init output_texture
-      gl::ActiveTexture(gl::TEXTURE0);
-      gl::BindTexture(gl::TEXTURE_2D, self.output_texture);
-
-      // The format that the point cloud texture uses internally to store points.
-      // If you want to use the texture that this outputs from your shader, you
-      // need to pass this as the format argument to glBindImageTexture().
-      // static constexpr GLenum PointCloudTextureFormat = GL_RGBA32F;
-      gl::TexStorage2D(gl::TEXTURE_2D, 1, POINT_CLOUD_TEXTURE_FORMAT, width as i32, height as i32);
-
-      gl::TexParameteri(gl::TEXTURE_2D, gl::TEXTURE_MIN_FILTER, gl::NEAREST as i32);
-      gl::TexParameteri(gl::TEXTURE_2D, gl::TEXTURE_MAG_FILTER, gl::NEAREST as i32);
-
       let depth_image_pixel_buffer_id = self.depth_image_pixel_buffer_id
           .ok_or(PointCloudError::UnknownError)?;
       let depth_image_texture_id = self.depth_image_texture_id
@@ -265,7 +273,7 @@ impl PointCloudComputeShader {
       gl::BindBuffer(gl::PIXEL_UNPACK_BUFFER, depth_image_pixel_buffer_id);
       gl::BindTexture(gl::TEXTURE_2D, depth_image_texture_id);
 
-      let num_bytes: GLuint = (width * height * size_of::<u16>()) as GLuint; // libc::uint16_t = u16
+      let num_bytes: GLuint = (width * height * size_of::<u16>() as i32) as GLuint; // libc::uint16_t = u16
 
       // TODO: GLubyte *textureMappedBuffer = reinterpret_cast<GLubyte *>(...)
       let texture_mapped_buffer = gl::MapBufferRange(
@@ -290,8 +298,8 @@ impl PointCloudComputeShader {
         0, // level
         0, // x offset
         0, // y offset
-        width as i32,
-        height as i32,
+        width,
+        height,
         gl::RED_INTEGER, //constexpr GLenum depthImageDataFormat = GL_RED_INTEGER;
         gl::UNSIGNED_SHORT, //constexpr GLenum depthImageDataType = GL_UNSIGNED_SHORT;
         null(), // data
