@@ -267,7 +267,7 @@ impl PointCloudComputeShader {
 
   // Set the XY table that will be used by future calls to Convert().  Get an XY table by calling
   // GenerateXyTable().
-  pub fn set_active_xy_table(&mut self, xy_table: k4a_sys_wrapper::Image) {
+  pub fn set_active_xy_table(&mut self, xy_table: k4a_sys_wrapper::Image) -> Result<()> {
     let width = xy_table.get_width_pixels() as i32;
     let height = xy_table.get_height_pixels() as i32;
 
@@ -307,11 +307,38 @@ impl PointCloudComputeShader {
     self.depth_image_texture.init();
     self.depth_image_pixel_buffer.init();
 
-    // TODO: CONTINUE IMPLEMENTATION
-    let num_bytes: GLuint = (width * height * size_of::<u16>() as i32) as GLuint; // libc::uint16_t = u16
+    let depth_image_size_bytes = (width * height * size_of::<u16>() as i32) as isize; // libc::uint16_t = u16
 
-    unimplemented!();
+    unsafe {
+      gl::BindBuffer(gl::PIXEL_UNPACK_BUFFER, self.depth_image_pixel_buffer.id());
+      gl::BufferData(
+        gl::PIXEL_UNPACK_BUFFER,
+        depth_image_size_bytes,
+        ptr::null_mut(),
+        gl::STREAM_DRAW,
+      );
+      gl::BindBuffer(gl::PIXEL_UNPACK_BUFFER, 0);
 
+
+      gl::BindTexture(gl::TEXTURE_2D, self.depth_image_texture.id());
+
+      gl::TexStorage2D(
+        gl::TEXTURE_2D,
+        1,
+        gl::R16UI, // constexpr GLenum depthImageInternalFormat = GL_R16UI;
+        width,
+        height,
+      );
+
+      gl::TexParameteri(gl::TEXTURE_2D, gl::TEXTURE_MIN_FILTER, gl::NEAREST as i32);
+      gl::TexParameteri(gl::TEXTURE_2D, gl::TEXTURE_MAG_FILTER, gl::NEAREST as i32);
+    }
+
+    // TODO: Return status / error handling
+    // GLenum status = glGetError();
+    //return status;
+
+    Ok(())
   }
 
   // Creates a k4a::image containing the XY tables from calibration based on calibrationType.
