@@ -8,6 +8,7 @@ use std::ptr;
 use k4a_sys;
 use k4a_sys_wrapper::ImageFormat::ColorMjpg;
 use glutin::platform::unix::x11::ffi::IconMaskHint;
+use std::ptr::null_mut;
 
 pub fn device_get_installed_count() -> u32 {
   unsafe {
@@ -32,6 +33,7 @@ pub enum KinectError {
   UnableToOpen { error_code: u32 },
   UnableToGetSerialNumber,
   UnableToStartCameras { error_code: u32 },
+  UnableToCreateImage { error_code: u32 },
 }
 
 /// A Kinect Device Handle
@@ -234,6 +236,33 @@ unsafe impl Send for Capture{}
 pub struct Image(pub k4a_sys::k4a_image_t);
 
 impl Image {
+
+  /// Create a blank image.
+  pub fn create(format: ImageFormat,
+                width: u32,
+                height: u32,
+                stride_bytes: u32)
+    -> Result<Self, KinectError>
+  {
+    let mut handle = null_mut();
+
+    let result = unsafe {
+      k4a_sys::k4a_image_create(
+        format as k4a_sys::k4a_image_format_t,
+        width as i32,
+        height as i32,
+        stride_bytes as i32,
+        &mut handle
+      )
+    };
+
+    if result != 0 /* k4a_sys::K4A_RESULT_SUCCEEDED */ {
+      return Err(KinectError::UnableToCreateImage { error_code: result });
+    }
+
+    Ok(Image(handle))
+  }
+
   pub fn get_height_pixels(&self) -> usize {
     unsafe {
       k4a_sys::k4a_image_get_height_pixels(self.0) as usize
@@ -269,21 +298,10 @@ impl Image {
   /// known format. If the image_handle is invalid, the function will return
   /// K4A_IMAGE_FORMAT_CUSTOM.
   pub fn get_format(&self) -> ImageFormat {
-    unsafe {
-      let format = k4a_sys::k4a_image_get_format(self.0);
-      match format {
-        0 => ImageFormat::ColorMjpg,
-        1 => ImageFormat::ColorNv12,
-        2 => ImageFormat::ColorYuy2,
-        3 => ImageFormat::ColorBgra32,
-        4 => ImageFormat::Depth16,
-        5 => ImageFormat::Ir16,
-        6 => ImageFormat::Custom8,
-        7 => ImageFormat::Custom16,
-        8 => ImageFormat::Custom,
-        _ => ImageFormat::UnknownFormatError,
-      }
-    }
+    let format = unsafe {
+      k4a_sys::k4a_image_get_format(self.0)
+    };
+    format.into()
   }
 }
 
@@ -304,6 +322,23 @@ pub enum ImageFormat {
   Custom16,
   Custom,
   UnknownFormatError, // FIXME: Just return Result<T>?
+}
+
+impl From<k4a_sys::k4a_image_format_t> for ImageFormat {
+  fn from(format: k4a_sys::k4a_image_format_t) -> Self {
+    match format {
+      0 => ImageFormat::ColorMjpg,
+      1 => ImageFormat::ColorNv12,
+      2 => ImageFormat::ColorYuy2,
+      3 => ImageFormat::ColorBgra32,
+      4 => ImageFormat::Depth16,
+      5 => ImageFormat::Ir16,
+      6 => ImageFormat::Custom8,
+      7 => ImageFormat::Custom16,
+      8 => ImageFormat::Custom,
+      _ => ImageFormat::UnknownFormatError,
+    }
+  }
 }
 
 /// Deallocate open device handles

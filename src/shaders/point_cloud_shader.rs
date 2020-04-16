@@ -2,21 +2,22 @@
 //! This code turns depth images into point clouds.
 
 use std::ffi::CString;
+use std::fmt::{Error, Formatter};
+use std::mem::size_of;
 use std::os::raw::c_void;
 use std::ptr;
+use std::ptr::null;
 use std::str;
-use libc;
 
 use gl;
 use gl::types::*;
+use libc;
 
 use k4a_sys_wrapper;
-use std::mem::size_of;
-use std::ptr::null;
-use std::fmt::{Formatter, Error};
-
-use opengl_wrapper::Texture;
+use k4a_sys_wrapper::Image;
+use k4a_sys_wrapper::ImageFormat;
 use opengl_wrapper::Buffer;
+use opengl_wrapper::Texture;
 
 pub type Result<T> = std::result::Result<T,PointCloudError>;
 
@@ -351,10 +352,81 @@ impl PointCloudComputeShader {
   // p is the index of a given pixel.
   //
   pub fn generate_xy_table(calibration: k4a_sys::k4a_calibration_t,
-                           calibration_type: k4a_sys::k4a_calibration_type_t) -> Result<k4a_sys_wrapper::Image> {
+                           calibration_type: k4a_sys::k4a_calibration_type_t) -> Result<k4a_sys_wrapper::Image>
+  {
 
-    // TODO: Just a static function
+    /*
+    typedef enum
+    {
+        K4A_CALIBRATION_TYPE_UNKNOWN = -1, /**< Calibration type is unknown */
+        K4A_CALIBRATION_TYPE_DEPTH,        /**< Depth sensor */
+        K4A_CALIBRATION_TYPE_COLOR,        /**< Color sensor */
+        K4A_CALIBRATION_TYPE_GYRO,         /**< Gyroscope sensor */
+        K4A_CALIBRATION_TYPE_ACCEL,        /**< Accelerometer sensor */
+        K4A_CALIBRATION_TYPE_NUM,          /**< Number of types excluding unknown type*/
+    } k4a_calibration_type_t;
+    */
+
+    let camera_calibration :  k4a_sys::k4a_calibration_camera_t = match calibration_type {
+      // FIXME: k4a_sys::K4A_CALIBRATION_TYPE_COLOR  should be "1" per above enum.
+      1 => calibration.color_camera_calibration,
+      _ => calibration.depth_camera_calibration,
+    };
+
+    let width = camera_calibration.resolution_width as u32;
+    let height = camera_calibration.resolution_height as u32;
+
+    let stride_bytes = width * size_of::<k4a_sys::k4a_float2_t>() as u32;
+
+    // TODO: continue impl
+    let xy_table = Image::create(
+      ImageFormat::Custom,
+      width,
+      height,
+      stride_bytes,
+    );
+
     unimplemented!();
+    /*
+
+    k4a::image xyTable = k4a::image::create(K4A_IMAGE_FORMAT_CUSTOM,
+                                            cameraCalibration.resolution_width,
+                                            cameraCalibration.resolution_height,
+                                            cameraCalibration.resolution_width *
+                                                static_cast<int>(sizeof(k4a_float2_t)));
+
+    k4a_float2_t *tableData = reinterpret_cast<k4a_float2_t *>(xyTable.get_buffer());
+
+    int width = cameraCalibration.resolution_width;
+    int height = cameraCalibration.resolution_height;
+
+    k4a_float2_t p;
+    k4a_float3_t ray;
+
+    for (int y = 0, idx = 0; y < height; y++)
+    {
+        p.xy.y = static_cast<float>(y);
+        for (int x = 0; x < width; x++, idx++)
+        {
+            p.xy.x = static_cast<float>(x);
+
+            if (calibration.convert_2d_to_3d(p, 1.f, calibrationType, calibrationType, &ray))
+            {
+                tableData[idx].xy.x = ray.xyz.x;
+                tableData[idx].xy.y = ray.xyz.y;
+            }
+            else
+            {
+                // The pixel is invalid.
+                //
+                tableData[idx].xy.x = 0.0f;
+                tableData[idx].xy.y = 0.0f;
+            }
+        }
+    }
+
+    return xyTable;
+    */
   }
 }
 
