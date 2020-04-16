@@ -138,7 +138,10 @@ impl PointCloudComputeShader {
                  depth_image: k4a_sys_wrapper::Image,
                  output_texture: &mut Texture) -> Result<()>
   {
-    // TODO xy_table_texture
+    if !self.xy_table_texture.is_initialized() {
+      // throw std::logic_error("You must call SetActiveXyTable at least once before calling Convert!");
+      return Err(PointCloudError::UnknownError);
+    }
 
     let width = depth_image.get_width_pixels() as i32;
     let height = depth_image.get_height_pixels() as i32;
@@ -162,34 +165,28 @@ impl PointCloudComputeShader {
     }
 
     unsafe {
-      let depth_image_id = self.depth_image_id
-          .ok_or(PointCloudError::UnknownError)?;
-      let xy_table_id = self.xy_table_id
-          .ok_or(PointCloudError::UnknownError)?;
-
       // Upload data to uniform texture
       gl::BindBuffer(gl::PIXEL_UNPACK_BUFFER, self.depth_image_pixel_buffer.id());
       gl::BindTexture(gl::TEXTURE_2D, self.depth_image_texture.id());
 
       let num_bytes: GLuint = (width * height * size_of::<u16>() as i32) as GLuint; // libc::uint16_t = u16
 
+      // TODO: Handle error.
       // TODO: GLubyte *textureMappedBuffer = reinterpret_cast<GLubyte *>(...)
-      let texture_mapped_buffer = gl::MapBufferRange(
+      gl::MapBufferRange(
         gl::PIXEL_UNPACK_BUFFER,
         0,
         num_bytes as isize,
         gl::MAP_WRITE_BIT | gl::MAP_INVALIDATE_BUFFER_BIT
       );
 
-      // TODO: Handle error.
-
       let mut depth_src = depth_image.get_buffer();
 
+      // TODO: Copy memory!
       // TODO: std::copy(depthSrc, depthSrc + numBytes, textureMappedBuffer);
 
-      gl::UnmapBuffer(gl::PIXEL_UNPACK_BUFFER);
-
       // TODO: Handle error.
+      gl::UnmapBuffer(gl::PIXEL_UNPACK_BUFFER);
 
       gl::TexSubImage2D(
         gl::TEXTURE_2D, // target
@@ -202,7 +199,6 @@ impl PointCloudComputeShader {
         gl::UNSIGNED_SHORT, //constexpr GLenum depthImageDataType = GL_UNSIGNED_SHORT;
         null(), // data
       );
-
       gl::BindBuffer(gl::PIXEL_UNPACK_BUFFER, 0);
 
       gl::UseProgram(self.shader_id);
@@ -220,6 +216,9 @@ impl PointCloudComputeShader {
         POINT_CLOUD_TEXTURE_FORMAT
       );
 
+      let depth_image_id = self.depth_image_id
+          .ok_or(PointCloudError::UnknownError)?;
+
       gl::ActiveTexture(gl::TEXTURE1);
       gl::BindTexture(gl::TEXTURE_2D, self.depth_image_texture.id());
       gl::BindImageTexture(
@@ -232,6 +231,9 @@ impl PointCloudComputeShader {
         gl::R16UI, //constexpr GLenum depthImageInternalFormat = GL_R16UI;
       );
       gl::Uniform1i(depth_image_id, 1);
+
+      let xy_table_id = self.xy_table_id
+          .ok_or(PointCloudError::UnknownError)?;
 
       gl::ActiveTexture(gl::TEXTURE2);
       gl::BindTexture(gl::TEXTURE_2D, self.xy_table_texture.id());
@@ -247,14 +249,19 @@ impl PointCloudComputeShader {
       gl::Uniform1i(xy_table_id, 2);
 
       // Render point cloud
-      //gl::DispatchCompute(static_cast<GLuint>(depth.get_width_pixels()), static_cast<GLuint>(depth.get_height_pixels()), 1);
+      gl::DispatchCompute(
+        depth_image.get_width_pixels() as u32,
+        depth_image.get_height_pixels() as u32,
+        1,
+      );
 
       // Wait for the rendering to finish before allowing reads to the texture we just wrote
       gl::MemoryBarrier(gl::TEXTURE_FETCH_BARRIER_BIT);
 
+      // TODO: Return status or error.
       let status = gl::GetError();
 
-      Err(PointCloudError::UnknownError)
+      Ok(())
     }
   }
 
