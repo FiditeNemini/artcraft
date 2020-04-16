@@ -16,6 +16,7 @@ use std::ptr::null;
 use std::fmt::{Formatter, Error};
 
 use opengl_wrapper::Texture;
+use opengl_wrapper::Buffer;
 
 pub type Result<T> = std::result::Result<T,PointCloudError>;
 
@@ -87,17 +88,14 @@ pub struct PointCloudComputeShader {
   program_id: GLuint,
   shader_id: GLuint,
 
-  xy_table_texture_id: Option<GLuint>,
-  depth_image_texture_id: Option<GLuint>,
-  depth_image_pixel_buffer_id: Option<GLuint>,
+  xy_table_texture: Texture,
+  depth_image_texture: Texture,
+  depth_image_pixel_buffer: Buffer,
 
   // TODO: Not sure if I need all of these things...
   dest_tex_id: Option<GLint>,
   xy_table_id: Option<GLint>,
   depth_image_id: Option<GLint>,
-
-  // TODO: I invented this. Not sure if I need it.
-  output_texture: GLuint,
 }
 
 impl PointCloudComputeShader {
@@ -108,20 +106,15 @@ impl PointCloudComputeShader {
 
     link_program(program, shader);
 
-    // TODO: Build this elsewhere?
-    let mut output_texture = 0;
-    unsafe { gl::GenTextures(1, &mut output_texture); }
-
     PointCloudComputeShader {
       program_id: program,
       shader_id: shader,
       dest_tex_id: None,
       xy_table_id: None,
       depth_image_id: None,
-      depth_image_texture_id: None,
-      depth_image_pixel_buffer_id: None,
-      xy_table_texture_id: None,
-      output_texture,
+      depth_image_texture: Texture::new(),
+      xy_table_texture: Texture::new(),
+      depth_image_pixel_buffer: Buffer::new(),
     }
   }
 
@@ -144,9 +137,8 @@ impl PointCloudComputeShader {
   // Set the XY table that will be used by future calls to Convert().  Get an XY table by calling
   // GenerateXyTable().
   pub fn set_active_xy_table(&mut self, xy_table: k4a_sys_wrapper::Image) {
-
-    let width = xy_table.get_width_pixels();
-    let height = xy_table.get_height_pixels();
+    let width = xy_table.get_width_pixels() as i32;
+    let height = xy_table.get_height_pixels() as i32;
 
     // OpenGL resource DSL
     //
@@ -182,15 +174,17 @@ impl PointCloudComputeShader {
     //
 
     // Upload the XY table as a texture so we can use it as a uniform
+    self.xy_table_texture.init();
 
     unsafe {
-      let mut xy_table_texture_id = 0;
-      gl::GenTextures(1, &mut xy_table_texture_id);
-      self.xy_table_texture_id = Some(xy_table_texture_id);
-
-      gl::BindTexture(gl::TEXTURE_2D, xy_table_texture_id);
-      // constexpr GLenum xyTableInternalFormat = GL_RG32F;
-      gl::TexStorage2D(gl::TEXTURE_2D, 1, gl::RGB32F, width as i32, height as i32);
+      gl::BindTexture(gl::TEXTURE_2D, self.xy_table_texture.id());
+      gl::TexStorage2D(
+        gl::TEXTURE_2D,
+        1,
+        gl::RGB32F, // constexpr GLenum xyTableInternalFormat = GL_RG32F;
+        width,
+        height,
+      );
 
       let xy_table_buffer = xy_table.get_buffer();
 
@@ -199,8 +193,8 @@ impl PointCloudComputeShader {
         0, // level
         0, // xoffset
         0, // yoffset
-        width as i32,
-        height as i32,
+        width,
+        height,
         gl::RG, //constexpr GLenum xyTableDataFormat = GL_RG;
         gl::FLOAT, //constexpr GLenum xyTableDataType = GL_FLOAT;
         xy_table_buffer as *const c_void,
@@ -208,9 +202,14 @@ impl PointCloudComputeShader {
 
       gl::TexParameteri(gl::TEXTURE_2D, gl::TEXTURE_MIN_FILTER, gl::NEAREST as i32);
       gl::TexParameteri(gl::TEXTURE_2D, gl::TEXTURE_MAG_FILTER, gl::NEAREST as i32);
-
-      // TODO: Continue implementation...
     }
+
+    // Pre-allocate a texture for the depth images so we don't have to
+    // reallocate on every frame
+    self.depth_image_texture.init();
+    self.depth_image_pixel_buffer.init();
+
+    // TODO: CONTINUE IMPLEMENTATION
 
     unimplemented!();
 
@@ -232,8 +231,10 @@ impl PointCloudComputeShader {
   // by this function, provided the depth image and XY table previously used was for the same
   // sized texture.
   //
-  pub fn convert(&self, depth_image: k4a_sys_wrapper::Image,
-                 output_texture: &mut Texture) -> Result<()> {
+  pub fn convert(&self,
+                 depth_image: k4a_sys_wrapper::Image,
+                 output_texture: &mut Texture) -> Result<()>
+  {
     // TODO xy_table_texture
 
     let width = depth_image.get_width_pixels() as i32;
@@ -258,20 +259,14 @@ impl PointCloudComputeShader {
     }
 
     unsafe {
-      let depth_image_pixel_buffer_id = self.depth_image_pixel_buffer_id
-          .ok_or(PointCloudError::UnknownError)?;
-      let depth_image_texture_id = self.depth_image_texture_id
-          .ok_or(PointCloudError::UnknownError)?;
       let depth_image_id = self.depth_image_id
-          .ok_or(PointCloudError::UnknownError)?;
-      let xy_table_texture_id = self.xy_table_texture_id
           .ok_or(PointCloudError::UnknownError)?;
       let xy_table_id = self.xy_table_id
           .ok_or(PointCloudError::UnknownError)?;
 
       // Upload data to uniform texture
-      gl::BindBuffer(gl::PIXEL_UNPACK_BUFFER, depth_image_pixel_buffer_id);
-      gl::BindTexture(gl::TEXTURE_2D, depth_image_texture_id);
+      gl::BindBuffer(gl::PIXEL_UNPACK_BUFFER, self.depth_image_pixel_buffer.id());
+      gl::BindTexture(gl::TEXTURE_2D, self.depth_image_texture.id());
 
       let num_bytes: GLuint = (width * height * size_of::<u16>() as i32) as GLuint; // libc::uint16_t = u16
 
@@ -311,10 +306,10 @@ impl PointCloudComputeShader {
 
       // Bind textures that we're going to pass to the texture
       gl::ActiveTexture(gl::TEXTURE0);
-      gl::BindTexture(gl::TEXTURE_2D, self.output_texture);
+      gl::BindTexture(gl::TEXTURE_2D, output_texture.id());
       gl::BindImageTexture(
         0,
-        self.output_texture,
+        output_texture.id(),
         0,
         gl::FALSE,
         0,
@@ -323,10 +318,10 @@ impl PointCloudComputeShader {
       );
 
       gl::ActiveTexture(gl::TEXTURE1);
-      gl::BindTexture(gl::TEXTURE_2D, depth_image_texture_id);
+      gl::BindTexture(gl::TEXTURE_2D, self.depth_image_texture.id());
       gl::BindImageTexture(
         1,
-        depth_image_texture_id,
+        self.depth_image_texture.id(),
         0,
         gl::FALSE,
         0,
@@ -336,10 +331,10 @@ impl PointCloudComputeShader {
       gl::Uniform1i(depth_image_id, 1);
 
       gl::ActiveTexture(gl::TEXTURE2);
-      gl::BindTexture(gl::TEXTURE_2D, xy_table_texture_id);
+      gl::BindTexture(gl::TEXTURE_2D, self.xy_table_texture.id());
       gl::BindImageTexture(
         2,
-        xy_table_texture_id,
+        self.xy_table_texture.id(),
         0,
         gl::FALSE,
         0,
