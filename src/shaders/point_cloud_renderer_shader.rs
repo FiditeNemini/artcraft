@@ -10,12 +10,15 @@ use std::ptr::null;
 use std::str;
 
 use gl;
+use k4a_sys_wrapper;
 use gl::types::*;
 use libc;
 
 use opengl_wrapper::{Buffer, VertexArray};
 use opengl_wrapper::Texture;
 use shaders::compile_shader::compile_shader;
+use shaders::point_cloud_compute_shader::POINT_CLOUD_TEXTURE_FORMAT;
+use graphics_gl::{get_stride, get_pointer_offset};
 
 pub type Result<T> = std::result::Result<T, PointCloudRendererError>;
 
@@ -202,6 +205,10 @@ pub struct PointCloudRendererShader {
 impl PointCloudRendererShader {
 
   pub fn new() -> Self {
+    // TODO: Init view and projection matrices
+    // mat4x4_identity(m_view);
+    // mat4x4_identity(m_projection);
+
     let vertex_array_object = VertexArray::new_initialized();
     let vertex_color_buffer_object = Buffer::new_initialized();
 
@@ -258,6 +265,125 @@ impl PointCloudRendererShader {
       vertex_array_object,
       vertex_color_buffer_object,
     }
+  }
+
+  // TODO need matrix maths
+  pub fn update_view_projection(&mut self) {
+    // TODO - matrix math
+    // void PointCloudRenderer::UpdateViewProjection(mat4x4 view, mat4x4 projection)
+    //mat4x4_dup(m_view, view);
+    //mat4x4_dup(m_projection, projection);
+    unimplemented!();
+  }
+
+  pub fn update_point_clouds(&mut self, color_image: &k4a_sys_wrapper::Image,
+                             point_cloud_texture: &Texture) -> Result<GLenum>
+  {
+    unsafe {
+      gl::BindVertexArray(self.vertex_array_object.id());
+
+      // Vertex Colors
+      gl::BindBuffer(gl::ARRAY_BUFFER, self.vertex_color_buffer_object.id());
+    }
+
+    let color_image_size_bytes = color_image.get_size() as i32;
+
+    if self.vertex_array_size_bytes != color_image_size_bytes {
+      self.vertex_array_size_bytes = color_image_size_bytes;
+      unsafe {
+        gl::BufferData(
+          gl::ARRAY_BUFFER,
+          self.vertex_array_size_bytes as isize,
+          null(),
+          gl::STREAM_DRAW
+        );
+      }
+    }
+
+    let vertex_mapped_buffer = unsafe {
+      // GLubyte *vertexMappedBuffer = reinterpret_cast<GLubyte *>(
+      gl::MapBufferRange(
+        gl::ARRAY_BUFFER,
+        0,
+        color_image_size_bytes as isize,
+        gl::MAP_WRITE_BIT | gl::MAP_INVALIDATE_BUFFER_BIT
+      )
+    };
+
+    if vertex_mapped_buffer as usize == 0 {
+      // TODO: return glGetError() instead
+      return Err(PointCloudRendererError::UnknownError);
+    }
+
+    let mut color_src = color_image.get_buffer();
+
+    let result = unsafe {
+      //const GLubyte *colorSrc = reinterpret_cast<const GLubyte *>(color.get_buffer());
+      //std::copy(colorSrc, colorSrc + colorImageSizeBytes, vertexMappedBuffer);
+      std::ptr::copy_nonoverlapping::<u8>(color_src, vertex_mapped_buffer as *mut u8,
+        color_image_size_bytes as usize);
+
+      gl::UnmapBuffer(gl::ARRAY_BUFFER)
+    };
+
+    if result == gl::FALSE {
+      return Err(PointCloudRendererError::UnknownError);
+    }
+
+    unsafe {
+      gl::EnableVertexAttribArray(0);
+      gl::VertexAttribPointer(
+        0,
+        gl::BGRA as i32,
+        gl::UNSIGNED_BYTE,
+        gl::TRUE,
+        get_stride::<f32>(0),
+        get_pointer_offset::<f32>(0),
+      );
+      gl::UseProgram(self.program_id);
+    }
+
+    // Uniforms
+    // Bind our point cloud texture
+    unsafe {
+      gl::ActiveTexture(gl::TEXTURE0);
+      gl::BindTexture(gl::TEXTURE_2D, point_cloud_texture.id());
+      gl::BindImageTexture(
+        0,
+        point_cloud_texture.id(),
+        0,
+        gl::FALSE,
+        0,
+        gl::READ_ONLY,
+        POINT_CLOUD_TEXTURE_FORMAT,
+      );
+      gl::Uniform1i(self.point_cloud_texture_index, 0);
+
+      gl::BindVertexArray(0);
+    }
+
+
+    let result = unsafe {
+      gl::GetError()
+    };
+
+    if result != gl::NO_ERROR {
+      return Err(PointCloudRendererError::UnknownError);
+    }
+
+    Ok(result)
+  }
+
+  pub fn render() -> Result<GLenum> {
+    unimplemented!();
+  }
+
+  pub fn set_point_size(&mut self, point_size: u8) {
+    self.point_size = point_size;
+  }
+
+  pub fn set_enable_shading(&mut self, enable_shading: bool) {
+    self.enable_shading = enable_shading;
   }
 }
 

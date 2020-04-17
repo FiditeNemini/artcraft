@@ -22,6 +22,7 @@ use std::sync::Arc;
 use sensor_control::CaptureProvider;
 use shaders;
 use shaders::point_cloud_compute_shader::PointCloudComputeShader;
+use shaders::point_cloud_renderer_shader::PointCloudRendererShader;
 
 //use shader::Shader;
 
@@ -120,6 +121,7 @@ pub fn run(capture_provider: Arc<CaptureProvider>) {
   gl::load_with(|symbol| gl_window.get_proc_address(symbol));
 
   let compute_shader = PointCloudComputeShader::new();
+  let render_shader = PointCloudRendererShader::new();
 
   // Create GLSL shaders
   let vs = compile_shader(VERTEX_SHADER_SRC, gl::VERTEX_SHADER);
@@ -406,13 +408,13 @@ fn link_program(vs: GLuint, fs: GLuint) -> GLuint {
 
 /// Calculate the stride width for OpenGL
 /// Useful for `gl::VertexAttribPointer`.
-fn get_stride<T>(size: usize) -> gl::types::GLint {
+pub fn get_stride<T>(size: usize) -> gl::types::GLint {
   (size * std::mem::size_of::<T>()) as gl::types::GLint
 }
 
 /// Calculate the offset for OpenGL
 /// Useful for `gl::VertexAttribPointer`.
-fn get_pointer_offset<T>(offset: usize) -> *const gl::types::GLvoid {
+pub fn get_pointer_offset<T>(offset: usize) -> *const gl::types::GLvoid {
   match offset {
     0 => null(),
     _ => (offset * std::mem::size_of::<T>()) as *const gl::types::GLvoid,

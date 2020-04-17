@@ -87,7 +87,7 @@ void main()
 /// The format that the point cloud texture uses internally to store points.
 /// If you want to use the texture that this outputs from your shader, you
 /// need to pass this as the format argument to glBindImageTexture().
-const POINT_CLOUD_TEXTURE_FORMAT : GLuint = gl::RGBA32F;
+pub const POINT_CLOUD_TEXTURE_FORMAT : GLuint = gl::RGBA32F;
 
 pub struct PointCloudComputeShader {
   /// The OpenGL program
