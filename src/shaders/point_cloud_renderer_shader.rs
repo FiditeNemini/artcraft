@@ -362,7 +362,6 @@ impl PointCloudRendererShader {
       gl::BindVertexArray(0);
     }
 
-
     let result = unsafe {
       gl::GetError()
     };
@@ -374,8 +373,46 @@ impl PointCloudRendererShader {
     Ok(result)
   }
 
-  pub fn render() -> Result<GLenum> {
-    unimplemented!();
+  pub fn render(&self) -> Result<GLenum> {
+    unsafe {
+      gl::Enable(gl::DEPTH_TEST);
+      gl::Enable(gl::BLEND);
+      gl::BlendFunc(gl::SRC_ALPHA, gl::ONE_MINUS_SRC_ALPHA);
+
+      gl::PointSize(self.point_size as f32);
+
+      gl::UseProgram(self.program_id);
+
+      // TODO:
+      // Update view/projection matrices in shader
+      // glUniformMatrix4fv(m_viewIndex, 1, GL_FALSE, reinterpret_cast<const GLfloat *>(m_view));
+      // glUniformMatrix4fv(m_projectionIndex, 1, GL_FALSE, reinterpret_cast<const GLfloat *>(m_projection));
+
+      // Update render settings in shader
+      let enable_shading = if self.enable_shading { 1 } else { 0 };
+      gl::Uniform1i(self.enable_shading_index, enable_shading);
+
+      // glDrawArrays(GL_POINTS, 0, m_vertexArraySizeBytes / static_cast<GLsizei>(sizeof(BgraPixel)));
+      let size = self.vertex_array_size_bytes/64;
+
+      // Render point cloud
+      gl::BindVertexArray(self.vertex_array_object.id());
+      gl::DrawArrays(
+        gl::POINTS,
+        0,
+        size,
+      );
+
+      gl::BindVertexArray(0);
+
+      let result = gl::GetError();
+
+      if result != gl::NO_ERROR {
+        return Err(PointCloudRendererError::UnknownError);
+      }
+
+      Ok(result)
+    }
   }
 
   pub fn set_point_size(&mut self, point_size: u8) {
