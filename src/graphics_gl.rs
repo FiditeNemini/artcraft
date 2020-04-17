@@ -21,7 +21,7 @@ use glium::framebuffer::ColorAttachment::Texture;
 use std::sync::Arc;
 use sensor_control::CaptureProvider;
 use shaders;
-use shaders::point_cloud_shader::PointCloudComputeShader;
+use shaders::point_cloud_compute_shader::PointCloudComputeShader;
 
 //use shader::Shader;
 

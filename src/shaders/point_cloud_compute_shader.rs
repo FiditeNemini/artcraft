@@ -1,10 +1,10 @@
-//! This is a port of libk4a's `tools/k4aviewer/graphics/shaders/gpudepthtopointcloudconverter.h`.
+//! This is a port of Microsoft's libk4a `tools/k4aviewer/graphics/shaders/gpudepthtopointcloudconverter.h`.
 //! This code turns depth images into point clouds.
 
 use std::ffi::CString;
 use std::fmt::{Error, Formatter};
 use std::mem::size_of;
-use std::os::raw::{c_void, c_int, c_char};
+use std::os::raw::{c_char, c_int, c_void};
 use std::ptr;
 use std::ptr::null;
 use std::str;
@@ -18,21 +18,22 @@ use k4a_sys_wrapper::Image;
 use k4a_sys_wrapper::ImageFormat;
 use opengl_wrapper::Buffer;
 use opengl_wrapper::Texture;
+use shaders::compile_shader::compile_shader;
 
-pub type Result<T> = std::result::Result<T,PointCloudError>;
+pub type Result<T> = std::result::Result<T, PointCloudComputeError>;
 
 #[derive(Clone, Debug)]
-pub enum PointCloudError {
+pub enum PointCloudComputeError {
   UnknownError,
 }
 
-impl std::fmt::Display for PointCloudError {
+impl std::fmt::Display for PointCloudComputeError {
   fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
-    write!(f, "point cloud error")
+    write!(f, "unknown point cloud COMPUTE error")
   }
 }
 
-impl std::error::Error for PointCloudError {
+impl std::error::Error for PointCloudComputeError {
   fn source(&self) -> Option<&(dyn std::error::Error +'static)> {
     // Generic error, no backtrace.
     None
@@ -177,7 +178,7 @@ impl PointCloudComputeShader {
   {
     if !self.xy_table_texture.is_initialized() {
       // throw std::logic_error("You must call SetActiveXyTable at least once before calling Convert!");
-      return Err(PointCloudError::UnknownError);
+      return Err(PointCloudComputeError::UnknownError);
     }
 
     let width = depth_image.get_width_pixels() as i32;
@@ -217,7 +218,7 @@ impl PointCloudComputeShader {
       );
 
       if texture_mapped_buffer as usize == 0 {
-        return Err(PointCloudError::UnknownError);
+        return Err(PointCloudComputeError::UnknownError);
       }
 
       let mut depth_src = depth_image.get_buffer();
@@ -230,7 +231,7 @@ impl PointCloudComputeShader {
 
       let result = gl::UnmapBuffer(gl::PIXEL_UNPACK_BUFFER);
       if result == gl::FALSE {
-        return Err(PointCloudError::UnknownError);
+        return Err(PointCloudComputeError::UnknownError);
       }
 
       gl::TexSubImage2D(
@@ -417,7 +418,7 @@ impl PointCloudComputeShader {
       width,
       height,
       stride_bytes,
-    ).map_err(|_| PointCloudError::UnknownError)?;
+    ).map_err(|_| PointCloudComputeError::UnknownError)?;
 
     // k4a_float2_t *tableData = reinterpret_cast<k4a_float2_t *>(xyTable.get_buffer());
     let mut xy_table_buffer = xy_table.get_buffer();
@@ -505,42 +506,6 @@ impl PointCloudComputeShader {
 
     Ok(xy_table)
   }
-}
-
-pub fn compile_shader(src: &str, ty: GLenum) -> GLuint {
-  let shader;
-  unsafe {
-    shader = gl::CreateShader(ty);
-    // Attempt to compile the shader
-    let c_str = CString::new(src.as_bytes()).unwrap();
-    gl::ShaderSource(shader, 1, &c_str.as_ptr(), ptr::null());
-    gl::CompileShader(shader);
-
-    // Get the compile status
-    let mut status = gl::FALSE as GLint;
-    gl::GetShaderiv(shader, gl::COMPILE_STATUS, &mut status);
-
-    // Fail on error
-    if status != (gl::TRUE as GLint) {
-      let mut len = 0;
-      gl::GetShaderiv(shader, gl::INFO_LOG_LENGTH, &mut len);
-      let mut buf = Vec::with_capacity(len as usize);
-      buf.set_len((len as usize) - 1); // subtract 1 to skip the trailing null character
-      gl::GetShaderInfoLog(
-        shader,
-        len,
-        ptr::null_mut(),
-        buf.as_mut_ptr() as *mut GLchar,
-      );
-      panic!(
-        "{}",
-        str::from_utf8(&buf)
-            .ok()
-            .expect("ShaderInfoLog not valid utf8")
-      );
-    }
-  }
-  shader
 }
 
 fn link_program(program: GLuint, shader: GLuint) -> GLuint {
