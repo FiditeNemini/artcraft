@@ -4,7 +4,7 @@
 use std::ffi::CString;
 use std::fmt::{Error, Formatter};
 use std::mem::size_of;
-use std::os::raw::{c_void, c_int};
+use std::os::raw::{c_void, c_int, c_char};
 use std::ptr;
 use std::ptr::null;
 use std::str;
@@ -86,33 +86,66 @@ void main()
 const POINT_CLOUD_TEXTURE_FORMAT : GLuint = gl::RGBA32F;
 
 pub struct PointCloudComputeShader {
+  /// The OpenGL program
   program_id: GLuint,
+
+  /// The OpenGL compute shader
   shader_id: GLuint,
 
+  /// The x,y table as a texture
   xy_table_texture: Texture,
+
+  /// Preallocated texture for depth image so we don't have to reallocate every frame.
   depth_image_texture: Texture,
+
   depth_image_pixel_buffer: Buffer,
 
-  // TODO: Not sure if I need all of these things...
-  dest_tex_id: Option<GLint>,
-  xy_table_id: Option<GLint>,
-  depth_image_id: Option<GLint>,
+  /// Uniform location in the shader program
+  dest_tex_id: GLint,
+
+  /// Uniform location in the shader program
+  xy_table_id: GLint,
+
+  /// Uniform location in the shader program
+  depth_image_id: GLint,
 }
 
 impl PointCloudComputeShader {
 
   pub fn create() -> Self {
-    let program = unsafe { gl::CreateProgram() };
-    let shader = compile_shader(COMPUTE_SHADER_SRC, gl::COMPUTE_SHADER);
+    let program_id = unsafe { gl::CreateProgram() };
+    let shader_id = compile_shader(COMPUTE_SHADER_SRC, gl::COMPUTE_SHADER);
 
-    link_program(program, shader);
+    link_program(program_id, shader_id);
+
+    let mut dest_tex_id = 0;
+    let mut xy_table_id = 0;
+    let mut depth_image_id = 0;
+
+    /// Uniform variable name in OpenGL shader program
+    let DEST_TEX : CString = CString::new("destTex").expect("string is correct");
+    let DEST_TEX_PTR : *const c_char = DEST_TEX.as_ptr() as *const c_char;
+
+    /// Uniform variable name in OpenGL shader program
+    let XY_TABLE : CString = CString::new("xyTable").expect("string is correct");
+    let XY_TABLE_PTR: *const c_char = XY_TABLE.as_ptr() as *const c_char;
+
+    /// Uniform variable name in OpenGL shader program
+    let DEPTH_IMAGE : CString = CString::new("depthImage").expect("string is correct");
+    let DEPTH_IMAGE_PTR : *const c_char = DEPTH_IMAGE.as_ptr() as *const c_char;
+
+    unsafe {
+      dest_tex_id = gl::GetUniformLocation(program_id, DEST_TEX_PTR);
+      xy_table_id = gl::GetUniformLocation(program_id, XY_TABLE_PTR);
+      depth_image_id = gl::GetUniformLocation(program_id, DEPTH_IMAGE_PTR);
+    }
 
     PointCloudComputeShader {
-      program_id: program,
-      shader_id: shader,
-      dest_tex_id: None,
-      xy_table_id: None,
-      depth_image_id: None,
+      program_id,
+      shader_id,
+      dest_tex_id,
+      xy_table_id,
+      depth_image_id,
       depth_image_texture: Texture::new(),
       xy_table_texture: Texture::new(),
       depth_image_pixel_buffer: Buffer::new(),
@@ -217,9 +250,6 @@ impl PointCloudComputeShader {
         POINT_CLOUD_TEXTURE_FORMAT
       );
 
-      let depth_image_id = self.depth_image_id
-          .ok_or(PointCloudError::UnknownError)?;
-
       gl::ActiveTexture(gl::TEXTURE1);
       gl::BindTexture(gl::TEXTURE_2D, self.depth_image_texture.id());
       gl::BindImageTexture(
@@ -231,10 +261,7 @@ impl PointCloudComputeShader {
         gl::READ_ONLY,
         gl::R16UI, //constexpr GLenum depthImageInternalFormat = GL_R16UI;
       );
-      gl::Uniform1i(depth_image_id, 1);
-
-      let xy_table_id = self.xy_table_id
-          .ok_or(PointCloudError::UnknownError)?;
+      gl::Uniform1i(self.depth_image_id, 1);
 
       gl::ActiveTexture(gl::TEXTURE2);
       gl::BindTexture(gl::TEXTURE_2D, self.xy_table_texture.id());
@@ -247,7 +274,7 @@ impl PointCloudComputeShader {
         gl::READ_ONLY,
         gl::RG32F, //constexpr GLenum xyTableInternalFormat = GL_RG32F;
       );
-      gl::Uniform1i(xy_table_id, 2);
+      gl::Uniform1i(self.xy_table_id, 2);
 
       // Render point cloud
       gl::DispatchCompute(
