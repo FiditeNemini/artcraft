@@ -83,6 +83,9 @@ void main()
 }
 ";
 
+/// The format that the point cloud texture uses internally to store points.
+/// If you want to use the texture that this outputs from your shader, you
+/// need to pass this as the format argument to glBindImageTexture().
 const POINT_CLOUD_TEXTURE_FORMAT : GLuint = gl::RGBA32F;
 
 pub struct PointCloudComputeShader {
@@ -112,7 +115,7 @@ pub struct PointCloudComputeShader {
 
 impl PointCloudComputeShader {
 
-  pub fn create() -> Self {
+  pub fn new() -> Self {
     let program_id = unsafe { gl::CreateProgram() };
     let shader_id = compile_shader(COMPUTE_SHADER_SRC, gl::COMPUTE_SHADER);
 
@@ -205,22 +208,30 @@ impl PointCloudComputeShader {
 
       let num_bytes: GLuint = (width * height * size_of::<u16>() as i32) as GLuint; // libc::uint16_t = u16
 
-      // TODO: Handle error.
-      // TODO: GLubyte *textureMappedBuffer = reinterpret_cast<GLubyte *>(...)
-      gl::MapBufferRange(
+      // GLubyte *textureMappedBuffer = reinterpret_cast<GLubyte *>(...)
+      let mut texture_mapped_buffer = gl::MapBufferRange(
         gl::PIXEL_UNPACK_BUFFER,
         0,
         num_bytes as isize,
         gl::MAP_WRITE_BIT | gl::MAP_INVALIDATE_BUFFER_BIT
       );
 
+      if texture_mapped_buffer as usize == 0 {
+        return Err(PointCloudError::UnknownError);
+      }
+
       let mut depth_src = depth_image.get_buffer();
 
-      // TODO: Copy memory!
-      // TODO: std::copy(depthSrc, depthSrc + numBytes, textureMappedBuffer);
+      // std::copy(depthSrc, depthSrc + numBytes, textureMappedBuffer);
+      // NB: Slightly different calculation; libc::uint16_t = u16 (TODO: is this byte multiples?)
+      // Rust function copies count * size_of::<T>()
+      let count = (width * height * 2) as usize;
+      std::ptr::copy_nonoverlapping::<u8>(depth_src, texture_mapped_buffer as *mut u8, count);
 
-      // TODO: Handle error.
-      gl::UnmapBuffer(gl::PIXEL_UNPACK_BUFFER);
+      let result = gl::UnmapBuffer(gl::PIXEL_UNPACK_BUFFER);
+      if result == gl::FALSE {
+        return Err(PointCloudError::UnknownError);
+      }
 
       gl::TexSubImage2D(
         gl::TEXTURE_2D, // target
@@ -293,8 +304,8 @@ impl PointCloudComputeShader {
     }
   }
 
-  // Set the XY table that will be used by future calls to Convert().  Get an XY table by calling
-  // GenerateXyTable().
+  /// Set the XY table that will be used by future calls to Convert().  Get an XY table by calling
+  /// GenerateXyTable().
   pub fn set_active_xy_table(&mut self, xy_table: k4a_sys_wrapper::Image) -> Result<()> {
     let width = xy_table.get_width_pixels() as i32;
     let height = xy_table.get_height_pixels() as i32;
@@ -369,22 +380,20 @@ impl PointCloudComputeShader {
     Ok(())
   }
 
-  // Creates a k4a::image containing the XY tables from calibration based on calibrationType.
-  // The table is a 2D array of k4a_float2_t's with the same resolution as the camera of calibrationType
-  // specified in calibration.
-  //
-  // You can use this table to convert a depth image into a point cloud, e.g. by using the Convert method.
-  // Conversion is done by multiplying the depth pixel value by the XY table values - i.e. the result
-  // pixel will be (xyTable[p].x * depthImage[p], xyTable[p].y * depthImage[p], depthImage[p]), where
-  // p is the index of a given pixel.
-  //
+  /// Creates a k4a::image containing the XY tables from calibration based on calibrationType.
+  /// The table is a 2D array of k4a_float2_t's with the same resolution as the camera of calibrationType
+  /// specified in calibration.
+  ///
+  /// You can use this table to convert a depth image into a point cloud, e.g. by using the Convert method.
+  /// Conversion is done by multiplying the depth pixel value by the XY table values - i.e. the result
+  /// pixel will be (xyTable[p].x * depthImage[p], xyTable[p].y * depthImage[p], depthImage[p]), where
+  /// p is the index of a given pixel.
   pub fn generate_xy_table(calibration: k4a_sys::k4a_calibration_t,
                            calibration_type: k4a_sys::k4a_calibration_type_t)
     -> Result<Image>
   {
 
-    /*
-    typedef enum
+    /*typedef enum
     {
         K4A_CALIBRATION_TYPE_UNKNOWN = -1, /**< Calibration type is unknown */
         K4A_CALIBRATION_TYPE_DEPTH,        /**< Depth sensor */
@@ -392,27 +401,26 @@ impl PointCloudComputeShader {
         K4A_CALIBRATION_TYPE_GYRO,         /**< Gyroscope sensor */
         K4A_CALIBRATION_TYPE_ACCEL,        /**< Accelerometer sensor */
         K4A_CALIBRATION_TYPE_NUM,          /**< Number of types excluding unknown type*/
-    } k4a_calibration_type_t;
-    */
-
+    } k4a_calibration_type_t;*/
     let camera_calibration :  k4a_sys::k4a_calibration_camera_t = match calibration_type {
-      // FIXME: k4a_sys::K4A_CALIBRATION_TYPE_COLOR  should be "1" per above enum.
+      // k4a_sys::K4A_CALIBRATION_TYPE_COLOR  should be "1" per above enum.
       1 => calibration.color_camera_calibration,
       _ => calibration.depth_camera_calibration,
     };
 
     let width = camera_calibration.resolution_width as u32;
     let height = camera_calibration.resolution_height as u32;
-
     let stride_bytes = width * size_of::<k4a_sys::k4a_float2_t>() as u32;
 
-    // TODO: continue impl
     let xy_table = Image::create(
       ImageFormat::Custom,
       width,
       height,
       stride_bytes,
     ).map_err(|_| PointCloudError::UnknownError)?;
+
+    // k4a_float2_t *tableData = reinterpret_cast<k4a_float2_t *>(xyTable.get_buffer());
+    let mut xy_table_buffer = xy_table.get_buffer();
 
     // typedef union
     // {
@@ -452,14 +460,10 @@ impl PointCloudComputeShader {
 
     let mut idx = 0;
 
-    // TODO: I'm not sure any of this works...
-    // k4a_float2_t *tableData = reinterpret_cast<k4a_float2_t *>(xyTable.get_buffer());
-    let mut buffer = xy_table.get_buffer();
-
     let length = width*height;
     unsafe {
-      let mut table_data : *mut k4a_sys::k4a_float2_t = std::mem::transmute_copy(&buffer);
-      let mut table_data2 = std::slice::from_raw_parts_mut(table_data, length as usize);
+      let mut xy_table_buffer2: *mut k4a_sys::k4a_float2_t = std::mem::transmute_copy(&xy_table_buffer);
+      let mut xy_table_buffer3 = std::slice::from_raw_parts_mut(xy_table_buffer2, length as usize);
 
       for y in 0..height {
         p.xy.y = y as f32;
@@ -483,14 +487,14 @@ impl PointCloudComputeShader {
 
           if result == 0 {
             unsafe {
-              table_data2[idx].xy.x = ray.xyz.x;
-              table_data2[idx].xy.y = ray.xyz.y;
+              xy_table_buffer3[idx].xy.x = ray.xyz.x;
+              xy_table_buffer3[idx].xy.y = ray.xyz.y;
             }
           } else {
             unsafe {
               // This pixel is invalid
-              table_data2[idx].xy.x = 0.0;
-              table_data2[idx].xy.y = 0.0;
+              xy_table_buffer3[idx].xy.x = 0.0;
+              xy_table_buffer3[idx].xy.y = 0.0;
             }
           }
 

@@ -119,7 +119,7 @@ pub fn run(capture_provider: Arc<CaptureProvider>) {
   // Load the OpenGL function pointers
   gl::load_with(|symbol| gl_window.get_proc_address(symbol));
 
-  let compute_shader = PointCloudComputeShader::create();
+  let compute_shader = PointCloudComputeShader::new();
 
   // Create GLSL shaders
   let vs = compile_shader(VERTEX_SHADER_SRC, gl::VERTEX_SHADER);
