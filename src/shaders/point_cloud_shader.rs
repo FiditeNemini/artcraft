@@ -4,7 +4,7 @@
 use std::ffi::CString;
 use std::fmt::{Error, Formatter};
 use std::mem::size_of;
-use std::os::raw::c_void;
+use std::os::raw::{c_void, c_int};
 use std::ptr;
 use std::ptr::null;
 use std::str;
@@ -440,17 +440,28 @@ impl PointCloudComputeShader {
         for x in 0..width {
           p.xy.x = x as f32;
 
-          // TODO: Implement the function this calls.
-          // TODO: Implement the function this calls.
-          // TODO: Implement the function this calls.
-          // TODO: Implement the function this calls.
-          if (true) {
+          let mut result : c_int = -1;
+          unsafe {
+            // https://docs.rs/k4a-sys/0.2.0/k4a_sys/fn.k4a_calibration_2d_to_3d.html
+            k4a_sys::k4a_calibration_2d_to_3d(
+              &calibration,
+              &p, // source point 2d
+              1.0, // source depth mm
+              calibration_type, // source camera
+              calibration_type, // target camera
+              &mut ray, // target point3d mm
+              &mut result // set to zero when valid result
+            );
+          };
+
+          if result == 0 {
             unsafe {
               table_data2[idx].xy.x = ray.xyz.x;
               table_data2[idx].xy.y = ray.xyz.y;
             }
           } else {
             unsafe {
+              // This pixel is invalid
               table_data2[idx].xy.x = 0.0;
               table_data2[idx].xy.y = 0.0;
             }
