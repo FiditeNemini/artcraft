@@ -7,6 +7,7 @@ use gl;
 use gl::types::*;
 
 /// A slightly more convenient OpenGL Buffer type
+#[derive(Clone, Debug)]
 pub struct Buffer {
   id: GLuint,
 }
@@ -58,6 +59,7 @@ impl Buffer {
 }
 
 /// A slightly more convenient OpenGL Framebuffer type
+#[derive(Clone, Debug)]
 pub struct Framebuffer {
   id: GLuint,
 }
@@ -109,6 +111,7 @@ impl Framebuffer {
 }
 
 /// A slightly more convenient OpenGL Renderbuffer type
+#[derive(Clone, Debug)]
 pub struct Renderbuffer {
   id: GLuint,
 }
@@ -160,6 +163,7 @@ impl Renderbuffer {
 }
 
 /// A slightly more convenient OpenGL Texture type
+#[derive(Clone, Debug)]
 pub struct Texture {
   id: GLuint,
 }
@@ -211,6 +215,7 @@ impl Texture {
 }
 
 /// A slightly more convenient OpenGL VertexArray type
+#[derive(Clone, Debug)]
 pub struct VertexArray {
   id: GLuint,
 }

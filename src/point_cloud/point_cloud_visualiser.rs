@@ -12,9 +12,9 @@ use opengl_wrapper::OpenGlError;
 use point_cloud::pixel_structs::BgraPixel;
 use point_cloud::pixel_structs::DepthPixel;
 use std::mem::size_of;
+use point_cloud::viewer_image::ViewerImage;
 
 pub type Result<T> = std::result::Result<T, PointCloudVisualizerError>;
-
 
 #[derive(Clone, Debug)]
 pub enum PointCloudVisualizerError {
@@ -110,6 +110,7 @@ pub struct PointCloudVisualizer {
   depth_xy_table: Image,
 }
 
+// TODO: Dedup
 struct CleanupGuard {}
 
 impl Drop for CleanupGuard {
@@ -193,7 +194,7 @@ impl PointCloudVisualizer {
     self.point_cloud_renderer.set_point_size(point_size);
   }
 
-  pub fn update_texture(&mut self, capture: &Capture) -> Result<()> {
+  pub fn update_texture(&mut self, texture: &ViewerImage, capture: &Capture) -> Result<()> {
 
     // Update the point cloud renderer with the latest point data
     self.update_point_clouds(capture)?;
@@ -212,6 +213,7 @@ impl PointCloudVisualizer {
       // TODO:
       //  glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, static_cast<GLuint>(**texture), 0);
       //  gl::FramebufferTexture(gl::FRAMEBUFFER, gl::COLOR_ATTACHMENT0, texture_buffer, 0);
+      //gl::FramebufferTexture(gl::FRAMEBUFFER, gl::COLOR_ATTACHMENT0, texture, 0);
 
       gl::DrawBuffers(1, &gl::COLOR_ATTACHMENT0);
 
