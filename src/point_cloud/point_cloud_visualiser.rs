@@ -110,6 +110,17 @@ pub struct PointCloudVisualizer {
   depth_xy_table: Image,
 }
 
+struct CleanupGuard {}
+
+impl Drop for CleanupGuard {
+  fn drop(&mut self) {
+    println!("Running CleanupGuard");
+    unsafe {
+      gl::BindFramebuffer(gl::FRAMEBUFFER, 0);
+    }
+  }
+}
+
 impl PointCloudVisualizer {
   pub fn new(enable_color_point_cloud: bool,
              calibration_data: k4a_sys::k4a_calibration_t) -> Self
@@ -182,16 +193,10 @@ impl PointCloudVisualizer {
     self.point_cloud_renderer.set_point_size(point_size);
   }
 
-  pub fn update_texture(&mut self) -> Result<()> {
+  pub fn update_texture(&mut self, capture: &Capture) -> Result<()> {
 
-    /* TODO // Update the point cloud renderer with the latest point data
-    //
-    PointCloudVisualizationResult result = UpdatePointClouds(capture);
-    if (result != PointCloudVisualizationResult::Success)
-    {
-      return result;
-    }*/
-
+    // Update the point cloud renderer with the latest point data
+    self.update_point_clouds(capture)?;
 
     // Set up rendering to a texture
     unsafe {
@@ -199,8 +204,8 @@ impl PointCloudVisualizer {
       gl::BindFramebuffer(gl::FRAMEBUFFER, self.frame_buffer.id());
     }
 
-    // TODO
-    //  CleanupGuard frameBufferBindingGuard([]() { glBindFramebuffer(GL_FRAMEBUFFER, 0); });
+    // CleanupGuard frameBufferBindingGuard([]() { glBindFramebuffer(GL_FRAMEBUFFER, 0); });
+    let cleanup_guard = CleanupGuard {};
 
     unsafe {
       gl::FramebufferRenderbuffer(gl::FRAMEBUFFER, gl::DEPTH_ATTACHMENT, gl::RENDERBUFFER, self.depth_buffer.id());
