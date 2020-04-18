@@ -14,7 +14,7 @@ use k4a_sys_wrapper;
 use gl::types::*;
 use libc;
 
-use opengl_wrapper::{Buffer, VertexArray};
+use opengl_wrapper::{Buffer, VertexArray, gl_get_error, OpenGlError};
 use opengl_wrapper::Texture;
 use shaders::compile_shader::compile_shader;
 use shaders::point_cloud_compute_shader::POINT_CLOUD_TEXTURE_FORMAT;
@@ -24,12 +24,20 @@ pub type Result<T> = std::result::Result<T, PointCloudRendererError>;
 
 #[derive(Clone, Debug)]
 pub enum PointCloudRendererError {
+  OpenGlError(OpenGlError),
   UnknownError,
 }
 
 impl std::fmt::Display for PointCloudRendererError {
   fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
-    write!(f, "unknown point cloud RENDERER error")
+    let description = match self {
+      PointCloudRendererError::OpenGlError(inner) => {
+        format!("Renderer OpenGL error: {}", inner)
+      },
+      PointCloudRendererError::UnknownError => "Unknown Renderer Error".into(),
+    };
+
+    write!(f, "{}", description)
   }
 }
 
@@ -277,7 +285,7 @@ impl PointCloudRendererShader {
   }
 
   pub fn update_point_clouds(&mut self, color_image: &k4a_sys_wrapper::Image,
-                             point_cloud_texture: &Texture) -> Result<GLenum>
+                             point_cloud_texture: &Texture) -> Result<()>
   {
     unsafe {
       gl::BindVertexArray(self.vertex_array_object.id());
@@ -362,18 +370,11 @@ impl PointCloudRendererShader {
       gl::BindVertexArray(0);
     }
 
-    let result = unsafe {
-      gl::GetError()
-    };
-
-    if result != gl::NO_ERROR {
-      return Err(PointCloudRendererError::UnknownError);
-    }
-
-    Ok(result)
+    gl_get_error()
+        .map_err(|err| PointCloudRendererError::OpenGlError(err))
   }
 
-  pub fn render(&self) -> Result<GLenum> {
+  pub fn render(&self) -> Result<()> {
     unsafe {
       gl::Enable(gl::DEPTH_TEST);
       gl::Enable(gl::BLEND);
@@ -405,13 +406,8 @@ impl PointCloudRendererShader {
 
       gl::BindVertexArray(0);
 
-      let result = gl::GetError();
-
-      if result != gl::NO_ERROR {
-        return Err(PointCloudRendererError::UnknownError);
-      }
-
-      Ok(result)
+      gl_get_error()
+          .map_err(|err| PointCloudRendererError::OpenGlError(err))
     }
   }
 
