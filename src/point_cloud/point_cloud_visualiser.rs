@@ -4,8 +4,9 @@
 use point_cloud::point_cloud_renderer_shader::{PointCloudRendererShader, PointCloudRendererError};
 use k4a_sys_wrapper::{Capture, Transformation};
 use k4a_sys_wrapper::Image;
+use k4a_sys_wrapper::ImageFormat;
 use opengl_wrapper::{Texture, Renderbuffer, Framebuffer};
-use point_cloud::point_cloud_compute_shader::PointCloudComputeShader;
+use point_cloud::point_cloud_compute_shader::{PointCloudComputeShader, PointCloudComputeError};
 use std::fmt::{Error, Formatter};
 use opengl_wrapper::OpenGlError;
 
@@ -16,7 +17,9 @@ pub type Result<T> = std::result::Result<T, PointCloudVisualizerError>;
 pub enum PointCloudVisualizerError {
   OpenGlError(OpenGlError),
   PointCloudRendererError(PointCloudRendererError),
+  PointCloudComputeError(PointCloudComputeError),
   FramebufferError,
+  UnsupportedMode,
   UnknownError,
 }
 
@@ -29,7 +32,11 @@ impl std::fmt::Display for PointCloudVisualizerError {
       PointCloudVisualizerError::PointCloudRendererError(inner) => {
         format!("Visualizer PointCloudRenderer error: {}", inner)
       },
+      PointCloudVisualizerError::PointCloudComputeError(inner) => {
+        format!("Visualizer PointCloudCompute error: {}", inner)
+      },
       PointCloudVisualizerError::FramebufferError => "Visualizer Framebuffer Error".into(),
+      PointCloudVisualizerError::UnsupportedMode => "Visualizer Unsupported Mode Error".into(),
       PointCloudVisualizerError::UnknownError => "Visualizer Unknown Error".into(),
     };
 
@@ -44,11 +51,17 @@ impl std::error::Error for PointCloudVisualizerError {
   }
 }
 
+#[derive(Copy, Clone, Debug, PartialEq)]
+pub enum ColorizationStrategy {
+  Simple,
+  Shaded,
+  Color,
+}
+
 pub struct PointCloudVisualizer {
   // TODO: std::pair<DepthPixel, DepthPixel> m_expectedValueRange;
   // TODO: ImageDimensions m_dimensions;
   // TODO: ViewControl m_viewControl;
-  // TODO: ColorizationStrategy m_colorizationStrategy;
   // TODO: linmath::mat4x4 m_projection{};
   // TODO: linmath::mat4x4 m_view{};
 
@@ -56,6 +69,7 @@ pub struct PointCloudVisualizer {
   height: u16,
 
   enable_color_point_cloud: bool,
+  colorization_strategy: ColorizationStrategy,
 
   point_cloud_renderer: PointCloudRendererShader,
   point_cloud_converter: PointCloudComputeShader,
@@ -133,6 +147,7 @@ impl PointCloudVisualizer {
       depth_buffer,
       color_xy_table,
       depth_xy_table,
+      colorization_strategy: ColorizationStrategy::Simple,
       calibration_data: calibration_data.clone(),
       transformation: Transformation::from_calibration(&calibration_data),
       last_capture: None,
@@ -144,11 +159,6 @@ impl PointCloudVisualizer {
 
   pub fn set_point_size(&mut self, point_size: u8) {
     self.point_cloud_renderer.set_point_size(point_size);
-  }
-
-  // TODO
-  pub fn set_colorization_strategy(&mut self) {
-    unimplemented!();
   }
 
   pub fn update_texture(&mut self) -> Result<()> {
@@ -205,8 +215,60 @@ impl PointCloudVisualizer {
         .map_err(|err| PointCloudVisualizerError::PointCloudRendererError(err))
   }
 
-  fn update_point_clouds(&mut self) -> Result<()> {
+  fn update_point_clouds(&mut self, capture: &Capture) -> Result<()> {
 
     unimplemented!();
+  }
+
+  pub fn set_colorization_strategy(&mut self, strategy: ColorizationStrategy) -> Result<()> {
+    if strategy == ColorizationStrategy::Color && !self.enable_color_point_cloud {
+      return Err(PointCloudVisualizerError::UnsupportedMode);
+    }
+
+    self.colorization_strategy = strategy;
+    self.point_cloud_renderer.set_enable_shading(strategy == ColorizationStrategy::Shaded);
+
+    let xy_table_status = if strategy == ColorizationStrategy::Color {
+      // sizeof DepthPixel = uint16_t;
+      let stride = self.calibration_data.color_camera_calibration.resolution_width * 2;
+      self.transformed_depth_image = Some(Image::create(
+        ImageFormat::Depth16,
+        self.calibration_data.color_camera_calibration.resolution_width as u32,
+        self.calibration_data.color_camera_calibration.resolution_height as u32,
+        stride as u32,
+      ).expect("Construction should work FIXME"));
+
+      self.point_cloud_converter.set_active_xy_table(&self.color_xy_table)
+
+    } else {
+      /* struct BgraPixel
+          {
+              uint8_t Blue;
+              uint8_t Green;
+              uint8_t Red;
+              uint8_t Alpha;
+          }; */
+      let stride = self.calibration_data.depth_camera_calibration.resolution_width * 4;
+      self.point_cloud_colorization = Some(Image::create(
+        ImageFormat::Depth16,
+        self.calibration_data.color_camera_calibration.resolution_width as u32,
+        self.calibration_data.color_camera_calibration.resolution_height as u32,
+        stride as u32,
+      ).expect("Construction should work FIXME"));
+
+      self.point_cloud_converter.set_active_xy_table(&self.depth_xy_table)
+    };
+
+    if let Err(e) = xy_table_status {
+      return Err(PointCloudVisualizerError::PointCloudComputeError(e));
+    }
+
+    self.xyz_texture.reset();
+
+    if let Some(ref capture) = self.last_capture.as_ref().map(|cap| cap.clone()) {
+      self.update_point_clouds(capture); // TODO: INEFFICIENT CLONE.
+    }
+
+    Ok(())
   }
 }

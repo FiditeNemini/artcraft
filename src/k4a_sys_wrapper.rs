@@ -173,7 +173,7 @@ pub enum CaptureError {
 }
 
 /// Adapted from k4a-sys. Represents a capture.
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Capture(pub k4a_sys::k4a_capture_t);
 
 impl Capture {

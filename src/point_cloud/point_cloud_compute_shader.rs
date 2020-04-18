@@ -307,7 +307,7 @@ impl PointCloudComputeShader {
 
   /// Set the XY table that will be used by future calls to Convert().  Get an XY table by calling
   /// GenerateXyTable().
-  pub fn set_active_xy_table(&mut self, xy_table: k4a_sys_wrapper::Image) -> Result<()> {
+  pub fn set_active_xy_table(&mut self, xy_table: &k4a_sys_wrapper::Image) -> Result<()> {
     let width = xy_table.get_width_pixels() as i32;
     let height = xy_table.get_height_pixels() as i32;
 
