@@ -173,7 +173,7 @@ impl PointCloudComputeShader {
   // sized texture.
   //
   pub fn convert(&self,
-                 depth_image: k4a_sys_wrapper::Image,
+                 depth_image: &k4a_sys_wrapper::Image,
                  output_texture: &mut Texture) -> Result<()>
   {
     if !self.xy_table_texture.is_initialized() {

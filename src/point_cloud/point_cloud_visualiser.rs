@@ -9,6 +9,9 @@ use opengl_wrapper::{Texture, Renderbuffer, Framebuffer};
 use point_cloud::point_cloud_compute_shader::{PointCloudComputeShader, PointCloudComputeError};
 use std::fmt::{Error, Formatter};
 use opengl_wrapper::OpenGlError;
+use point_cloud::pixel_structs::BgraPixel;
+use point_cloud::pixel_structs::DepthPixel;
+use std::mem::size_of;
 
 pub type Result<T> = std::result::Result<T, PointCloudVisualizerError>;
 
@@ -19,6 +22,12 @@ pub enum PointCloudVisualizerError {
   PointCloudRendererError(PointCloudRendererError),
   PointCloudComputeError(PointCloudComputeError),
   FramebufferError,
+  /// Capture is missing depth info; drop the frame
+  MissingDepthImage,
+  /// Capture is missing color info; drop the frame
+  MissingColorImage,
+  // TODO: Implement this
+  ColorSupportNotYetImplemented,
   UnsupportedMode,
   UnknownError,
 }
@@ -37,6 +46,9 @@ impl std::fmt::Display for PointCloudVisualizerError {
       },
       PointCloudVisualizerError::FramebufferError => "Visualizer Framebuffer Error".into(),
       PointCloudVisualizerError::UnsupportedMode => "Visualizer Unsupported Mode Error".into(),
+      PointCloudVisualizerError::MissingDepthImage => "Visualizer Missing Depth Image (drop frame)".into(),
+      PointCloudVisualizerError::MissingColorImage => "Visualizer Missing Color Image (drop frame)".into(),
+      PointCloudVisualizerError::ColorSupportNotYetImplemented => "Visualizer Color Support Not Yet Implemented (TODO)".into(),
       PointCloudVisualizerError::UnknownError => "Visualizer Unknown Error".into(),
     };
 
@@ -88,7 +100,7 @@ pub struct PointCloudVisualizer {
 
   /// In color mode, this is just a shallow copy of the latest color image.
   /// In depth mode, this is a buffer that holds the colorization of the depth image.
-  point_cloud_colorization: Option<Image>,
+  point_cloud_colorization: Image,
 
   /// Holds the XYZ point cloud as a texture.
   /// Format is XYZA, where A (the alpha channel) is unused.
@@ -134,10 +146,15 @@ impl PointCloudVisualizer {
       0, // k4a_sys::K4A_CALIBRATION_TYPE_DEPTH,
     ).unwrap();
 
-    // TODO: C++ does further construction within the CTOR by calling:
-    //  SetColorizationStrategy(m_colorizationStrategy);
+    // TODO: Entirely guessing here.
+    let depth_image = Image::create(
+      ImageFormat::Depth16,
+      width as u32,
+      height as u32,
+      3
+    ).expect("should allocate");
 
-    Self {
+    let mut visualizer = Self {
       width: width as u16,
       height: height as u16,
       enable_color_point_cloud,
@@ -152,9 +169,13 @@ impl PointCloudVisualizer {
       transformation: Transformation::from_calibration(&calibration_data),
       last_capture: None,
       transformed_depth_image: None,
-      point_cloud_colorization: None,
+      point_cloud_colorization: depth_image,
       xyz_texture: Texture::new(),
-    }
+    };
+
+    visualizer.set_colorization_strategy(ColorizationStrategy::Simple).expect("Should work");
+
+    visualizer
   }
 
   pub fn set_point_size(&mut self, point_size: u8) {
@@ -216,8 +237,77 @@ impl PointCloudVisualizer {
   }
 
   fn update_point_clouds(&mut self, capture: &Capture) -> Result<()> {
+    let depth_image = match capture.get_depth_image() {
+      Ok(img) => img,
+      Err(e) => {
+        // Capture doesn't have depth info. Drop the capture.
+        return Err(PointCloudVisualizerError::MissingDepthImage)
+      },
+    };
 
-    unimplemented!();
+    let maybe_color_image = capture.get_color_image();
+
+    if self.enable_color_point_cloud {
+      if maybe_color_image.is_err() {
+        return Err(PointCloudVisualizerError::MissingColorImage);
+      }
+      if self.colorization_strategy == ColorizationStrategy::Color {
+        // TODO
+        //  m_transformation.depth_image_to_color_camera(depthImage, &m_transformedDepthImage);
+        //  depthImage = m_transformedDepthImage;
+        return Err(PointCloudVisualizerError::ColorSupportNotYetImplemented);
+      }
+    }
+
+    let result = self.point_cloud_converter.convert(
+      &depth_image,
+      &mut self.xyz_texture
+    );
+
+    if let Err(err) = result {
+      return Err(PointCloudVisualizerError::PointCloudComputeError(err));
+    }
+
+    self.last_capture = Some(capture.clone()); // TODO: Inefficient. Should take ownership.
+
+    if self.colorization_strategy == ColorizationStrategy::Color {
+      // TODO
+      //  m_pointCloudColorization = std::move(colorImage);
+      return Err(PointCloudVisualizerError::ColorSupportNotYetImplemented);
+    } else {
+      // This creates a color spectrum based on depth.
+
+      let length = depth_image.get_size();
+      let dst_length = length / size_of::<BgraPixel>();
+
+      unsafe {
+        // src: DepthPixel
+        let mut src_pixel = depth_image.get_buffer();
+        let mut src_pixel_2: *mut DepthPixel = std::mem::transmute_copy(&src_pixel);
+        let mut src_pixel_3= std::slice::from_raw_parts_mut(src_pixel_2, length as usize);
+
+        // dst: BgraPixel
+        let mut dst_pixel = self.point_cloud_colorization.get_buffer();
+        let mut dst_pixel_2: *mut BgraPixel = std::mem::transmute_copy(&dst_pixel);
+        let mut dst_pixel_3= std::slice::from_raw_parts_mut(dst_pixel_2, dst_length as usize);
+
+        // TODO
+        //  let end_pixel = dst_pixel_3 + dst_length;
+        /*while src_pixel_3 != end_pixel {
+          // TODO
+          //  *dstPixel = K4ADepthPixelColorizer::ColorizeBlueToRed(*srcPixel,
+          //    m_expectedValueRange.first,
+          //    m_expectedValueRange.second);
+          dst_pixel_3 += 1;
+          src_pixel_3 += 1;
+        }*/
+      }
+    }
+
+    self.point_cloud_renderer.update_point_clouds(
+      &self.point_cloud_colorization,
+      &self.xyz_texture
+    ).map_err(|err| PointCloudVisualizerError::PointCloudRendererError(err))
   }
 
   pub fn set_colorization_strategy(&mut self, strategy: ColorizationStrategy) -> Result<()> {
@@ -249,12 +339,12 @@ impl PointCloudVisualizer {
               uint8_t Alpha;
           }; */
       let stride = self.calibration_data.depth_camera_calibration.resolution_width * 4;
-      self.point_cloud_colorization = Some(Image::create(
+      self.point_cloud_colorization = Image::create(
         ImageFormat::Depth16,
         self.calibration_data.color_camera_calibration.resolution_width as u32,
         self.calibration_data.color_camera_calibration.resolution_height as u32,
         stride as u32,
-      ).expect("Construction should work FIXME"));
+      ).expect("Construction should work FIXME");
 
       self.point_cloud_converter.set_active_xy_table(&self.depth_xy_table)
     };
