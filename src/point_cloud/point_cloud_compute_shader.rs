@@ -1,4 +1,4 @@
-//! This is a port of Microsoft's libk4a `tools/k4aviewer/graphics/shaders/gpudepthtopointcloudconverter.h`.
+//! This is a port of Microsoft's libk4a `gpudepthtopointcloudconverter.h`.
 //! This code turns depth images into point clouds.
 
 use std::ffi::CString;
@@ -18,7 +18,7 @@ use k4a_sys_wrapper::Image;
 use k4a_sys_wrapper::ImageFormat;
 use opengl_wrapper::Buffer;
 use opengl_wrapper::Texture;
-use shaders::compile_shader::compile_shader;
+use point_cloud::compile_shader::compile_shader;
 
 pub type Result<T> = std::result::Result<T, PointCloudComputeError>;
 

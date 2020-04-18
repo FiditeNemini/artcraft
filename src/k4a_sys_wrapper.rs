@@ -377,3 +377,44 @@ impl DeviceConfiguration {
     })
   }
 }
+
+#[derive(Clone,Debug)]
+pub struct Resolution {
+  pub width: i32,
+  pub height: i32,
+}
+
+#[derive(Clone,Debug)]
+pub struct Transformation {
+  transformation: k4a_sys::k4a_transformation_t,
+  pub color_resolution: Resolution,
+  pub depth_resolution: Resolution,
+}
+
+impl Transformation {
+  /// Creates a transformation associated with a calibration
+  pub fn from_calibration(calibration: &k4a_sys::k4a_calibration_t) -> Self {
+    let transformation = unsafe {
+      k4a_sys::k4a_transformation_create(calibration)
+    };
+    Self {
+      transformation,
+      color_resolution: Resolution {
+        width: calibration.color_camera_calibration.resolution_width,
+        height: calibration.color_camera_calibration.resolution_height,
+      },
+      depth_resolution: Resolution {
+        width: calibration.depth_camera_calibration.resolution_width,
+        height: calibration.depth_camera_calibration.resolution_height,
+      },
+    }
+  }
+}
+
+impl Drop for Transformation {
+  fn drop(&mut self) {
+    unsafe {
+      k4a_sys::k4a_transformation_destroy(self.transformation);
+    }
+  }
+}
