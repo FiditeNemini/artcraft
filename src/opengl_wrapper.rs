@@ -2,6 +2,7 @@
 //! This draws inspiration from some of the code in Microsoft's MIT-licensed libk4a,
 //! particularly the code in `openglhelpers.h`.
 
+use std::fmt::{Error, Formatter};
 use gl;
 use gl::types::*;
 
@@ -158,3 +159,80 @@ impl VertexArray {
   }
 }
 
+/// Represents the OpenGL errors returned by `glGetError()`.
+/// https://www.khronos.org/registry/OpenGL-Refpages/gl4/html/glGetError.xhtml
+/// When an error flag is set, results of a GL operation are undefined only if GL_OUT_OF_MEMORY
+/// has occurred. In all other cases, the command generating the error is ignored and has no effect
+/// on the GL state or frame buffer contents. If the generating command returns a value, it
+/// returns 0. If glGetError itself generates an error, it returns 0.
+#[derive(Copy,Clone,Debug)]
+pub enum OpenGlError {
+  /// No error has been recorded. The value of this symbolic constant is guaranteed to be 0.
+  /// NB: While GL_NO_ERROR is represented here, it won't be returned by the convenience function.
+  NoError,
+  /// An unacceptable value is specified for an enumerated argument. The offending command is
+  /// ignored and has no other side effect than to set the error flag.
+  InvalidEnum,
+  /// A numeric argument is out of range. The offending command is ignored and has no other side
+  /// effect than to set the error flag.
+  InvalidValue,
+  /// The specified operation is not allowed in the current state. The offending command is
+  /// ignored and has no other side effect than to set the error flag.
+  InvalidOperation,
+  /// The framebuffer object is not complete. The offending command is ignored and has no other
+  /// side effect than to set the error flag.
+  InvalidFramebufferOperation,
+  /// There is not enough memory left to execute the command. The state of the GL is undefined,
+  /// except for the state of the error flags, after this error is recorded.
+  OutOfMemory,
+  /// An attempt has been made to perform an operation that would cause an internal stack to
+  /// underflow.
+  StackUnderflow,
+  /// An attempt has been made to perform an operation that would cause an internal stack to
+  /// overflow.
+  StackOverflow,
+  /// Invented error if we can't determine which enum was returned.
+  UnknownError(u32),
+}
+
+impl std::fmt::Display for OpenGlError {
+  fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+    let explain = match self {
+      OpenGlError::NoError => "OpenGL error: No Error (this shouldn't ever be set)".into(),
+      OpenGlError::InvalidEnum => "OpenGL error: Invalid Enum".into(),
+      OpenGlError::InvalidValue => "OpenGL error: Invalid Value".into(),
+      OpenGlError::InvalidOperation => "OpenGL error: Invalid Operation".into(),
+      OpenGlError::InvalidFramebufferOperation => "OpenGL error: Invalid Framebuffer Operation".into(),
+      OpenGlError::OutOfMemory => "OpenGL error: Out of Memory".into(),
+      OpenGlError::StackUnderflow => "OpenGL error: Stack Underflow".into(),
+      OpenGlError::StackOverflow => "OpenGL error: Stack Overflow".into(),
+      OpenGlError::UnknownError(result) => format!("OpenGL error: Unknown Error {}", result),
+    };
+    write!(f, "{}", explain)
+  }
+}
+
+impl std::error::Error for OpenGlError {
+  fn source(&self) -> Option<&(dyn std::error::Error +'static)> {
+    // Generic error, no backtrace.
+    None
+  }
+}
+
+/// Query OpenGL for the current error.
+pub fn gl_get_error() -> Result<(), OpenGlError> {
+  let result = unsafe {
+    gl::GetError()
+  };
+  match result {
+    gl::NO_ERROR => Ok(()),
+    gl::INVALID_ENUM => Err(OpenGlError::InvalidEnum),
+    gl::INVALID_VALUE => Err(OpenGlError::InvalidValue),
+    gl::INVALID_OPERATION => Err(OpenGlError::InvalidOperation),
+    gl::INVALID_FRAMEBUFFER_OPERATION => Err(OpenGlError::InvalidFramebufferOperation),
+    gl::OUT_OF_MEMORY => Err(OpenGlError::OutOfMemory),
+    gl::STACK_UNDERFLOW => Err(OpenGlError::StackUnderflow),
+    gl::STACK_OVERFLOW => Err(OpenGlError::StackOverflow),
+    _ => Err(OpenGlError::UnknownError(result)),
+  }
+}
