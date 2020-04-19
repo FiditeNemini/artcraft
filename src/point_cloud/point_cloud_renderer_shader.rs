@@ -19,6 +19,7 @@ use opengl_wrapper::Texture;
 use point_cloud::compile_shader::compile_shader;
 use point_cloud::point_cloud_compute_shader::POINT_CLOUD_TEXTURE_FORMAT;
 use graphics_gl::{get_stride, get_pointer_offset};
+use point_cloud::pixel_structs::BgraPixel;
 
 pub type Result<T> = std::result::Result<T, PointCloudRendererError>;
 
@@ -394,7 +395,7 @@ impl PointCloudRendererShader {
       gl::Uniform1i(self.enable_shading_index, enable_shading);
 
       // glDrawArrays(GL_POINTS, 0, m_vertexArraySizeBytes / static_cast<GLsizei>(sizeof(BgraPixel)));
-      let size = self.vertex_array_size_bytes/64;
+      let size = self.vertex_array_size_bytes / size_of::<BgraPixel>() as i32;
 
       // Render point cloud
       gl::BindVertexArray(self.vertex_array_object.id());
