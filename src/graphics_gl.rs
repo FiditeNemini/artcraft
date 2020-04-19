@@ -125,7 +125,9 @@ pub fn run(capture_provider: Arc<CaptureProvider>, calibration_data: k4a_sys::k4
   // TODO
   //  k4a::calibration calib = m_device.get_calibration(m_config.DepthMode, m_config.ColorResolution);
 
-  let mut visualizer = PointCloudVisualizer::new(false, calibration_data);
+  // TODO: Uncomment.
+  //let mut visualizer = PointCloudVisualizer::new(false, calibration_data);
+
   // TODO - constructed in PointCloudWindow.
   /*
     // TODO GLenum initResult = m_pointCloudVisualizer.InitializeTexture(&m_texture);
@@ -269,13 +271,13 @@ pub fn run(capture_provider: Arc<CaptureProvider>, calibration_data: k4a_sys::k4
     gl::Uniform3f(triangle_color_attr, 1.0, 0.0, 1.0);
   }
 
-
-  let mut texture = ViewerImage::create(
+  // TODO: Uncomment
+  /*let mut texture = ViewerImage::create(
     800,
     800,
     None,
     None
-  ).expect("ViewerImage texture creation should work");
+  ).expect("ViewerImage texture creation should work");*/
 
   event_loop.run(move |event, window, control_flow| {
     //*control_flow = ControlFlow::Wait;
@@ -317,13 +319,12 @@ pub fn run(capture_provider: Arc<CaptureProvider>, calibration_data: k4a_sys::k4
 
     // TODO: This belongs in a worker thread with buffers on both producer and consumer.
     if let Some(capture) = capture_provider.get_capture() {
-      /*if let Ok(image) = capture.get_color_image() {
+      if let Ok(image) = capture.get_color_image() {
         let width = image.get_width_pixels() as i32;
         let height = image.get_height_pixels() as i32;
-        println!("Size: {}x{}", width, height);
-
+        /*println!("Size: {}x{}", width, height);
         let format = image.get_format();
-        println!("format: {:?}", format);
+        println!("format: {:?}", format);*/
 
         let buffer = image.get_buffer();
 
@@ -352,9 +353,9 @@ pub fn run(capture_provider: Arc<CaptureProvider>, calibration_data: k4a_sys::k4
           );
         }
         gl_window.swap_buffers().unwrap();
-      }*/
+      }
 
-      visualizer.update_texture(&texture, &capture);
+      //visualizer.update_texture(&texture, &capture);
 
     }
   });
