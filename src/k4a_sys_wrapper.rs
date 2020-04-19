@@ -8,7 +8,7 @@ use std::ptr;
 use k4a_sys;
 use k4a_sys_wrapper::ImageFormat::ColorMjpg;
 use glutin::platform::unix::x11::ffi::IconMaskHint;
-use std::ptr::null_mut;
+use std::ptr::{null_mut, null};
 use std::mem::MaybeUninit;
 
 pub fn device_get_installed_count() -> u32 {
@@ -142,7 +142,7 @@ impl Device {
     };
 
     match result {
-      k4a_sys::k4a_wait_result_t_K4A_WAIT_RESULT_SUCCEEDED  => { /* ok, continue */ },
+      k4a_sys::k4a_wait_result_t_K4A_WAIT_RESULT_SUCCEEDED => { /* ok, continue */ },
       k4a_sys::k4a_wait_result_t_K4A_WAIT_RESULT_TIMEOUT => {
         return Err(GetCaptureError::TimeoutError);
       },
@@ -224,7 +224,7 @@ pub enum GetCalibrationError {
 
 
 /// Adapted from k4a-sys. Represents a capture.
-#[derive(Debug, Clone)]
+#[derive(Debug)]
 pub struct Capture(pub k4a_sys::k4a_capture_t);
 
 impl Capture {
@@ -263,6 +263,7 @@ impl Drop for Capture {
   fn drop(&mut self) {
     unsafe {
       k4a_sys::k4a_capture_release(self.0);
+      self.0 = null_mut();
     }
   }
 }

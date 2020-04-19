@@ -279,6 +279,7 @@ pub fn run(capture_provider: Arc<CaptureProvider>, calibration_data: k4a_sys::k4
 
   event_loop.run(move |event, window, control_flow| {
     //*control_flow = ControlFlow::Wait;
+    println!("\n\n------- event loop ------");
     match event {
       Event::LoopDestroyed => return,
       Event::WindowEvent { event, .. } => match event {
@@ -357,14 +358,14 @@ pub fn run(capture_provider: Arc<CaptureProvider>, calibration_data: k4a_sys::k4
 
     // TODO: This belongs in a worker thread with buffers on both producer and consumer.
     if let Some(capture) = capture_provider.get_capture() {
-      println!("Got capture");
+      println!("Got capture: {:?}", capture.0);
       unsafe {
         // TODO: CLEARING FOR TEMPORARY DEBUGGING.
         gl::ClearColor(0.8, 0.0, 0.0, 1.0);
         gl::Clear(gl::COLOR_BUFFER_BIT);
       }
 
-      visualizer.update_texture(&texture, &capture)
+      visualizer.update_texture(&texture, capture)
           .map(|_| {
             println!("UPDATED TEXTURE!");
           })

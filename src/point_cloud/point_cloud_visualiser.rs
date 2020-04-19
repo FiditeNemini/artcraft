@@ -195,7 +195,7 @@ impl PointCloudVisualizer {
     self.point_cloud_renderer.set_point_size(point_size);
   }
 
-  pub fn update_texture(&mut self, texture: &ViewerImage, capture: &Capture) -> Result<()> {
+  pub fn update_texture(&mut self, texture: &ViewerImage, capture: Capture) -> Result<()> {
 
     // Update the point cloud renderer with the latest point data
     self.update_point_clouds(capture)?;
@@ -245,7 +245,7 @@ impl PointCloudVisualizer {
         .map_err(|err| PointCloudVisualizerError::PointCloudRendererError(err))
   }
 
-  fn update_point_clouds(&mut self, capture: &Capture) -> Result<()> {
+  fn update_point_clouds(&mut self, capture: Capture) -> Result<()> {
     let depth_image = match capture.get_depth_image() {
       Ok(img) => img,
       Err(e) => {
@@ -288,7 +288,7 @@ impl PointCloudVisualizer {
       return Err(PointCloudVisualizerError::PointCloudComputeError(err));
     }
 
-    self.last_capture = Some(capture.clone()); // TODO: Inefficient. Should take ownership.
+    self.last_capture = Some(capture); // TODO: Inefficient. Should take ownership.
 
     if self.colorization_strategy == ColorizationStrategy::Color {
       // TODO
@@ -394,7 +394,7 @@ impl PointCloudVisualizer {
 
     self.xyz_texture.reset();
 
-    if let Some(ref capture) = self.last_capture.as_ref().map(|cap| cap.clone()) {
+    if let Some(capture) = self.last_capture.take().map(|cap| cap) {
       self.update_point_clouds(capture); // TODO: INEFFICIENT CLONE.
     }
 

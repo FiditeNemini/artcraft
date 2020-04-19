@@ -156,6 +156,8 @@ void main()
 
         vertexColor = vec4(attenuation * diffuse * vertexColor.rgb, vertexColor.a);
     }
+
+    vertexColor = vec4(0.0, 1.0, 1.0, 1.0);
 }
 ";
 
@@ -176,7 +178,9 @@ void main()
         discard;
     }
 
-    fragmentColor = vertexColor;
+    //fragmentColor = vertexColor;
+
+    fragmentColor = vec4(0.5, 1.0, 0.0, 1.0);
 }
 ";
 
