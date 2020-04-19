@@ -23,6 +23,7 @@ pub enum PointCloudVisualizerError {
   PointCloudRendererError(PointCloudRendererError),
   PointCloudComputeError(PointCloudComputeError),
   FramebufferError,
+  DepthToColorConversionFailed,
   /// Capture is missing depth info; drop the frame
   MissingDepthImage,
   /// Capture is missing color info; drop the frame
@@ -46,6 +47,7 @@ impl std::fmt::Display for PointCloudVisualizerError {
         format!("Visualizer PointCloudCompute error: {}", inner)
       },
       PointCloudVisualizerError::FramebufferError => "Visualizer Framebuffer Error".into(),
+      PointCloudVisualizerError::DepthToColorConversionFailed => "Visualizer Depth To Color Conversion Error".into(),
       PointCloudVisualizerError::UnsupportedMode => "Visualizer Unsupported Mode Error".into(),
       PointCloudVisualizerError::MissingDepthImage => "Visualizer Missing Depth Image (drop frame)".into(),
       PointCloudVisualizerError::MissingColorImage => "Visualizer Missing Color Image (drop frame)".into(),
@@ -284,15 +286,25 @@ impl PointCloudVisualizer {
             .expect("Must be present");*/
 
         if let Some(transformed_depth_image) = self.transformed_depth_image.as_ref() {
-          println!("Take transformed depth image...");
+          println!("Take transformed depth image... {}x{} [{:?}]",
+            transformed_depth_image.get_width_pixels(),
+            transformed_depth_image.get_height_pixels(),
+            transformed_depth_image.get_format());
+
           unsafe {
             // TODO: Totally missed error handling here.
-            k4a_sys::k4a_transformation_depth_image_to_color_camera(
+            let result = k4a_sys::k4a_transformation_depth_image_to_color_camera(
               self.transformation.get_handle(),
               depth_image.get_handle(),
               transformed_depth_image.get_handle(),
             );
 
+            if result != k4a_sys::k4a_buffer_result_t_K4A_BUFFER_RESULT_SUCCEEDED {
+              println!("FAILED: Depth to color conversion");
+              return Err(PointCloudVisualizerError::DepthToColorConversionFailed);
+            }
+
+            println!("Saving transformed depth image: {:?}", transformed_depth_image.get_format());
             depth_image = transformed_depth_image.clone();
           }
         }
@@ -308,14 +320,15 @@ impl PointCloudVisualizer {
       return Err(PointCloudVisualizerError::PointCloudComputeError(err));
     }
 
-    self.last_capture = Some(capture); // TODO: Inefficient. Should take ownership.
+    self.last_capture = Some(capture);
 
     if self.colorization_strategy == ColorizationStrategy::Color {
-      // TODO
-      //  m_pointCloudColorization = std::move(colorImage);
-      //return Err(PointCloudVisualizerError::ColorSupportNotYetImplemented);
-      self.point_cloud_colorization = Some(maybe_color_image
-          .expect("logic above should handle"));
+      let color_image = maybe_color_image.expect("logic above should ensure present");
+      println!("Owning point_cloud_colorization image: {}x{} {:?}",
+        color_image.get_width_pixels(),
+        color_image.get_height_pixels(),
+        color_image.get_format());
+      self.point_cloud_colorization = Some(color_image);
 
     } else {
       // This creates a color spectrum based on depth.

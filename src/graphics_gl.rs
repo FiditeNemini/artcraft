@@ -364,11 +364,12 @@ pub fn run(capture_provider: Arc<CaptureProvider>, calibration_data: k4a_sys::k4
 
     // TODO: This belongs in a worker thread with buffers on both producer and consumer.
     if let Some(capture) = capture_provider.get_capture() {
-      println!("Got capture: {:?}", capture.0);
+      println!("\n\n------- event loop: got capture ------");
+      println!("capture: {:?}", capture.0);
       unsafe {
         // TODO: CLEARING FOR TEMPORARY DEBUGGING.
-        gl::ClearColor(0.8, 0.0, 0.0, 1.0);
-        gl::Clear(gl::COLOR_BUFFER_BIT);
+        //gl::ClearColor(0.8, 0.0, 0.0, 1.0);
+        //gl::Clear(gl::COLOR_BUFFER_BIT);
       }
 
       visualizer.update_texture(&texture, capture)
@@ -385,7 +386,7 @@ pub fn run(capture_provider: Arc<CaptureProvider>, calibration_data: k4a_sys::k4
             }
           });
 
-      println!("Updated capture");
+      println!("swapping buffers");
       gl_window.swap_buffers().unwrap();
     }
   });

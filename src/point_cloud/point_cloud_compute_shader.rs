@@ -16,20 +16,35 @@ use libc;
 use k4a_sys_wrapper;
 use k4a_sys_wrapper::Image;
 use k4a_sys_wrapper::ImageFormat;
-use opengl_wrapper::Buffer;
+use opengl_wrapper::{Buffer, gl_get_error};
 use opengl_wrapper::Texture;
+use opengl_wrapper::OpenGlError;
 use point_cloud::compile_shader::compile_shader;
 
 pub type Result<T> = std::result::Result<T, PointCloudComputeError>;
 
 #[derive(Clone, Debug)]
 pub enum PointCloudComputeError {
+  OpenGlError(OpenGlError),
   UnknownError,
+}
+
+impl From<OpenGlError> for PointCloudComputeError {
+  fn from(error: OpenGlError) -> Self {
+    PointCloudComputeError::OpenGlError(error)
+  }
 }
 
 impl std::fmt::Display for PointCloudComputeError {
   fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
-    write!(f, "unknown point cloud COMPUTE error")
+    let description = match self {
+      PointCloudComputeError::OpenGlError(inner) => {
+        format!("Compute OpenGL error: {}", inner)
+      },
+      PointCloudComputeError::UnknownError => "Unknown Compute Error".into(),
+    };
+
+    write!(f, "{}", description)
   }
 }
 
@@ -180,7 +195,10 @@ impl PointCloudComputeShader {
                  depth_image: &k4a_sys_wrapper::Image,
                  output_texture: &mut Texture) -> Result<()>
   {
+    println!("==== ComputeShader.convert()");
+
     if !self.xy_table_texture.is_initialized() {
+      println!("Error: xyz texture is not initialized!!!");
       // throw std::logic_error("You must call SetActiveXyTable at least once before calling Convert!");
       return Err(PointCloudComputeError::UnknownError);
     }
@@ -189,30 +207,40 @@ impl PointCloudComputeShader {
     let height = depth_image.get_height_pixels() as i32;
 
     if !output_texture.is_initialized() {
+      println!("Output texture is not initialized. Initializing.");
+
       output_texture.init();
 
       unsafe {
+        println!("-> gl::ActiveTexture(TEXTURE0)");
         gl::ActiveTexture(gl::TEXTURE0);
+        println!("-> gl::BindTexture(): {:?}", output_texture.id());
         gl::BindTexture(gl::TEXTURE_2D, output_texture.id());
 
         // The format that the point cloud texture uses internally to store points.
         // If you want to use the texture that this outputs from your shader, you
         // need to pass this as the format argument to glBindImageTexture().
         // static constexpr GLenum PointCloudTextureFormat = GL_RGBA32F;
+        println!("-> gl::TexStorage2D(...)");
         gl::TexStorage2D(gl::TEXTURE_2D, 1, POINT_CLOUD_TEXTURE_FORMAT, width, height);
 
+        println!("-> gl::TexParameteri()");
         gl::TexParameteri(gl::TEXTURE_2D, gl::TEXTURE_MIN_FILTER, gl::NEAREST as i32);
+        println!("-> gl::TexParameteri()");
         gl::TexParameteri(gl::TEXTURE_2D, gl::TEXTURE_MAG_FILTER, gl::NEAREST as i32);
       }
     }
 
     unsafe {
       // Upload data to uniform texture
+      println!("-> gl::BindBuffer(): {:?}", self.depth_image_pixel_buffer.id());
       gl::BindBuffer(gl::PIXEL_UNPACK_BUFFER, self.depth_image_pixel_buffer.id());
+      println!("-> gl::BindTexture(): {:?}", self.depth_image_texture.id());
       gl::BindTexture(gl::TEXTURE_2D, self.depth_image_texture.id());
 
       let num_bytes: GLuint = (width * height * size_of::<u16>() as i32) as GLuint; // libc::uint16_t = u16
 
+      println!("-> gl::MapBufferRange(...)");
       // GLubyte *textureMappedBuffer = reinterpret_cast<GLubyte *>(...)
       let mut texture_mapped_buffer = gl::MapBufferRange(
         gl::PIXEL_UNPACK_BUFFER,
@@ -222,6 +250,7 @@ impl PointCloudComputeShader {
       );
 
       if texture_mapped_buffer as usize == 0 {
+        println!("Error: Texture buffer mapping failed.");
         return Err(PointCloudComputeError::UnknownError);
       }
 
@@ -230,14 +259,18 @@ impl PointCloudComputeShader {
       // std::copy(depthSrc, depthSrc + numBytes, textureMappedBuffer);
       // NB: Slightly different calculation; libc::uint16_t = u16 (TODO: is this byte multiples?)
       // Rust function copies count * size_of::<T>()
+      println!("Copying depth_src to texture_mapped_buffer");
       let count = (width * height * 2) as usize;
       std::ptr::copy_nonoverlapping::<u8>(depth_src, texture_mapped_buffer as *mut u8, count);
 
+      println!("-> gl::UnmapBuffer(PIXEL_UNPACK_BUFFER)");
       let result = gl::UnmapBuffer(gl::PIXEL_UNPACK_BUFFER);
       if result == gl::FALSE {
+        println!("Error: unknown errror");
         return Err(PointCloudComputeError::UnknownError);
       }
 
+      println!("-> gl::TexSubImage2D(...)");
       gl::TexSubImage2D(
         gl::TEXTURE_2D, // target
         0, // level
@@ -249,13 +282,18 @@ impl PointCloudComputeShader {
         gl::UNSIGNED_SHORT, //constexpr GLenum depthImageDataType = GL_UNSIGNED_SHORT;
         null(), // data
       );
+      println!("-> gl::BindBuffer(PIXEL_UNPACK_BUFFER)");
       gl::BindBuffer(gl::PIXEL_UNPACK_BUFFER, 0);
 
+      println!("-> gl::UseProgram(): {:?}", self.program_id);
       gl::UseProgram(self.program_id);
 
       // Bind textures that we're going to pass to the texture
+      println!("-> gl::ActiveTexture(TEXTURE0)");
       gl::ActiveTexture(gl::TEXTURE0);
+      println!("-> gl::BindTexture(): {:?}", output_texture.id());
       gl::BindTexture(gl::TEXTURE_2D, output_texture.id());
+      println!("-> gl::BindImageTexture(...)");
       gl::BindImageTexture(
         0,
         output_texture.id(),
@@ -266,8 +304,11 @@ impl PointCloudComputeShader {
         POINT_CLOUD_TEXTURE_FORMAT
       );
 
+      println!("-> gl::ActiveTexture(TEXTURE1)");
       gl::ActiveTexture(gl::TEXTURE1);
+      println!("-> gl::BindTexture(): {:?}", self.depth_image_texture.id());
       gl::BindTexture(gl::TEXTURE_2D, self.depth_image_texture.id());
+      println!("-> gl::BindImageTexture(...): {:?}", self.depth_image_texture.id());
       gl::BindImageTexture(
         1,
         self.depth_image_texture.id(),
@@ -277,10 +318,14 @@ impl PointCloudComputeShader {
         gl::READ_ONLY,
         gl::R16UI, //constexpr GLenum depthImageInternalFormat = GL_R16UI;
       );
+      println!("-> gl::Uniform1i(): {:?}", self.depth_image_id);
       gl::Uniform1i(self.depth_image_id, 1);
 
+      println!("-> gl::ActiveTexture(TEXTURE2)");
       gl::ActiveTexture(gl::TEXTURE2);
+      println!("-> gl::BindTexture(): {:?}", self.xy_table_texture.id());
       gl::BindTexture(gl::TEXTURE_2D, self.xy_table_texture.id());
+      println!("-> gl::BindImageTexture(): {:?}", self.xy_table_texture.id());
       gl::BindImageTexture(
         2,
         self.xy_table_texture.id(),
@@ -293,6 +338,8 @@ impl PointCloudComputeShader {
       gl::Uniform1i(self.xy_table_id, 2);
 
       // Render point cloud
+      println!("-> gl::DispatchCompute(): {}x{}",
+        depth_image.get_width_pixels(), depth_image.get_height_pixels());
       gl::DispatchCompute(
         depth_image.get_width_pixels() as u32,
         depth_image.get_height_pixels() as u32,
@@ -300,10 +347,11 @@ impl PointCloudComputeShader {
       );
 
       // Wait for the rendering to finish before allowing reads to the texture we just wrote
+      println!("-> gl::MemoryBarrier(TEXTURE_FETCH_BARRIER_BIT)");
       gl::MemoryBarrier(gl::TEXTURE_FETCH_BARRIER_BIT);
 
       // TODO: Return status or error.
-      let status = gl::GetError();
+      gl_get_error()?;
 
       Ok(())
     }
@@ -476,8 +524,8 @@ impl PointCloudComputeShader {
         for x in 0..width {
           p.xy.x = x as f32;
 
-          let mut result : c_int = -1;
-          unsafe {
+          let mut valid: c_int = -1;
+          let result = unsafe {
             // https://docs.rs/k4a-sys/0.2.0/k4a_sys/fn.k4a_calibration_2d_to_3d.html
             k4a_sys::k4a_calibration_2d_to_3d(
               &calibration,
@@ -486,18 +534,24 @@ impl PointCloudComputeShader {
               calibration_type, // source camera
               calibration_type, // target camera
               &mut ray, // target point3d mm
-              &mut result // set to zero when valid result
-            );
+              &mut valid // set to 1 when valid result, 0 when coordinate is not valid
+            )
           };
 
-          if result == 0 {
+          if result != k4a_sys::k4a_buffer_result_t_K4A_BUFFER_RESULT_SUCCEEDED {
+            return Err(PointCloudComputeError::UnknownError);
+          }
+
+          if valid == 1 {
             unsafe {
+              //println!("This pixel is GOOD: {}, {}", ray.xyz.x, ray.xyz.y);
               xy_table_buffer3[idx].xy.x = ray.xyz.x;
               xy_table_buffer3[idx].xy.y = ray.xyz.y;
             }
           } else {
             unsafe {
               // This pixel is invalid
+              //println!("This pixel is invalid: {}", idx);
               xy_table_buffer3[idx].xy.x = 0.0;
               xy_table_buffer3[idx].xy.y = 0.0;
             }
