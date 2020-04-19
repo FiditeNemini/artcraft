@@ -122,11 +122,7 @@ pub fn run(capture_provider: Arc<CaptureProvider>, calibration_data: k4a_sys::k4
   // Load the OpenGL function pointers
   gl::load_with(|symbol| gl_window.get_proc_address(symbol));
 
-  // TODO
-  //  k4a::calibration calib = m_device.get_calibration(m_config.DepthMode, m_config.ColorResolution);
-
-  // TODO: Uncomment.
-  //let mut visualizer = PointCloudVisualizer::new(false, calibration_data);
+  let mut visualizer = PointCloudVisualizer::new(false, calibration_data);
 
   // TODO - constructed in PointCloudWindow.
   /*

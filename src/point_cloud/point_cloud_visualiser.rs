@@ -100,7 +100,7 @@ pub struct PointCloudVisualizer {
 
   /// In color mode, this is just a shallow copy of the latest color image.
   /// In depth mode, this is a buffer that holds the colorization of the depth image.
-  point_cloud_colorization: Image,
+  point_cloud_colorization: Option<Image>,
 
   /// Holds the XYZ point cloud as a texture.
   /// Format is XYZA, where A (the alpha channel) is unused.
@@ -159,12 +159,12 @@ impl PointCloudVisualizer {
     ).unwrap();
 
     // TODO: Entirely guessing here.
-    let depth_image = Image::create(
+    /*let depth_image = Image::create(
       ImageFormat::Depth16,
       width as u32,
       height as u32,
-      3
-    ).expect("should allocate");
+      0
+    ).expect("should allocate");*/
 
     let mut visualizer = Self {
       width: width as u16,
@@ -181,7 +181,7 @@ impl PointCloudVisualizer {
       transformation: Transformation::from_calibration(&calibration_data),
       last_capture: None,
       transformed_depth_image: None,
-      point_cloud_colorization: depth_image,
+      point_cloud_colorization: None,
       xyz_texture: Texture::new(),
     };
 
@@ -294,7 +294,11 @@ impl PointCloudVisualizer {
         let mut src_pixel_3= std::slice::from_raw_parts_mut(src_pixel_2, length as usize);
 
         // dst: BgraPixel
-        let mut dst_pixel = self.point_cloud_colorization.get_buffer();
+        let mut dst_pixel = self.point_cloud_colorization
+            .as_ref()
+            .expect("point cloud color image must be set")
+            .get_buffer();
+
         let mut dst_pixel_2: *mut BgraPixel = std::mem::transmute_copy(&dst_pixel);
         let mut dst_pixel_3= std::slice::from_raw_parts_mut(dst_pixel_2, dst_length as usize);
 
@@ -312,7 +316,9 @@ impl PointCloudVisualizer {
     }
 
     self.point_cloud_renderer.update_point_clouds(
-      &self.point_cloud_colorization,
+      &self.point_cloud_colorization
+          .as_ref()
+          .expect("point cloud color image be set"),
       &self.xyz_texture
     ).map_err(|err| PointCloudVisualizerError::PointCloudRendererError(err))
   }
@@ -346,12 +352,12 @@ impl PointCloudVisualizer {
               uint8_t Alpha;
           }; */
       let stride = self.calibration_data.depth_camera_calibration.resolution_width * 4;
-      self.point_cloud_colorization = Image::create(
+      self.point_cloud_colorization = Some(Image::create(
         ImageFormat::Depth16,
         self.calibration_data.color_camera_calibration.resolution_width as u32,
         self.calibration_data.color_camera_calibration.resolution_height as u32,
         stride as u32,
-      ).expect("Construction should work FIXME");
+      ).expect("Construction should work FIXME"));
 
       self.point_cloud_converter.set_active_xy_table(&self.depth_xy_table)
     };

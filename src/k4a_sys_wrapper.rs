@@ -292,6 +292,26 @@ pub struct Image(pub k4a_sys::k4a_image_t);
 impl Image {
 
   /// Create a blank image.
+  ///
+  /// This function is used to create images of formats that have consistent stride. The function
+  /// is not suitable for compressed formats that may not be represented by the same number of bytes
+  /// per line.
+  ///
+  /// For most image formats, the function will allocate an image buffer of size
+  /// height_pixels * stride_bytes. Buffers K4A_IMAGE_FORMAT_COLOR_NV12 format will allocate an
+  /// additional height_pixels / 2 set of lines (each of stride_bytes). This function cannot be used
+  /// to allocate K4A_IMAGE_FORMAT_COLOR_MJPG buffers.
+  ///
+  /// To create an image object without the API allocating memory, or to represent an image that has
+  /// a non-deterministic stride, use k4a_image_create_from_buffer().
+  ///
+  /// The k4a_image_t is created with a reference count of 1.
+  ///
+  /// When finished using the created image, release it with k4a_image_release.
+  ///
+  ///   stride_bytes - The number of bytes per horizontal line of the image. If set to 0, the stride
+  ///                  will be set to the minimum size given the format and width_pixels.
+  ///
   pub fn create(format: ImageFormat,
                 width: u32,
                 height: u32,
