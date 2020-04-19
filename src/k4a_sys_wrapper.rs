@@ -9,6 +9,7 @@ use k4a_sys;
 use k4a_sys_wrapper::ImageFormat::ColorMjpg;
 use glutin::platform::unix::x11::ffi::IconMaskHint;
 use std::ptr::null_mut;
+use std::mem::MaybeUninit;
 
 pub fn device_get_installed_count() -> u32 {
   unsafe {
@@ -136,8 +137,6 @@ impl Device {
   pub fn get_capture_buffered(&self, capture_buffer: &mut k4a_sys::k4a_capture_t, timeout_ms: i32)
       -> Result<(), GetCaptureError>
   {
-    let timeout_millis = 1000;
-
     let result = unsafe {
       k4a_sys::k4a_device_get_capture(self.device_pointer, capture_buffer, timeout_ms)
     };
@@ -157,6 +156,50 @@ impl Device {
 
     Ok(())
   }
+
+  /// Get the camera calibration for the entire Azure Kinect device.
+  ///
+  /// The calibration represents the data needed to transform between the camera views and may be
+  /// different for each operating depth_mode and color_resolution the device is configured to
+  /// operate in.
+  /// The calibration output is used as input to all calibration and transformation functions.
+  pub fn get_calibration(&self,
+                          depth_mode: k4a_sys::k4a_depth_mode_t,
+                          color_resolution: k4a_sys::k4a_color_resolution_t)
+    -> Result<k4a_sys::k4a_calibration_t, GetCalibrationError>
+  {
+    // TODO: Why isn't the way I've been using to init structures before still working?
+    //let mut calibration_buffer: k4a_sys::k4a_calibration_t = ptr::null_mut();
+    /*let mut calibration_buffer: k4a_sys::k4a_calibration_t = k4a_sys::k4a_calibration_t {
+      color_camera_calibration: 0,
+      color_resolution: 0,
+      depth_camera_calibration: 0,
+      depth_mode: 0,
+      extrinsics: [0,0,0,0],
+    };*/
+
+    unsafe {
+      let mut calibration_buffer = MaybeUninit::uninit();
+      let result =  k4a_sys::k4a_device_get_calibration(
+        self.device_pointer,
+        depth_mode,
+        color_resolution,
+        calibration_buffer.as_mut_ptr(),
+      );
+
+      match result {
+        k4a_sys::k4a_result_t_K4A_RESULT_SUCCEEDED  => { /* ok, continue */ },
+        k4a_sys::k4a_result_t_K4A_RESULT_FAILED => {
+          return Err(GetCalibrationError::FailedError);
+        },
+        _ => {
+          return Err(GetCalibrationError::UnknownError(result));
+        },
+      }
+
+      Ok(calibration_buffer.assume_init())
+    }
+  }
 }
 
 /// Errors for GetCapture
@@ -171,6 +214,14 @@ pub enum GetCaptureError {
 pub enum CaptureError {
   NullCapture,
 }
+
+/// Errors for GetCalibration
+#[derive(Debug)]
+pub enum GetCalibrationError {
+  FailedError,
+  UnknownError(u32),
+}
+
 
 /// Adapted from k4a-sys. Represents a capture.
 #[derive(Debug, Clone)]
@@ -230,6 +281,9 @@ impl Drop for Capture {
 ///
 /// https://users.rust-lang.org/t/solved-how-to-move-non-send-between-threads-or-an-alternative/19928/11
 unsafe impl Send for Capture{}
+
+/// TODO: We also need to send device
+unsafe impl Send for Device{}
 
 /// Adapted from k4a-sys. Represents an image within a capture.
 #[derive(Debug)]

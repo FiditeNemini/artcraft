@@ -62,11 +62,18 @@ pub mod sensor_control;
 pub mod point_cloud;
 
 pub fn main() {
+  let device = Device::open(0).expect("Device should open");
+
+  let depth_mode : k4a_sys::k4a_depth_mode_t = 2; //k4a_sys::K4A_DEPTH_MODE_NFOV_UNBINNED;
+  let color_format: k4a_sys::k4a_color_resolution_t = 1; //k4a_sys::K4A_COLOR_RESOLUTION_720P;
+  let calibration = device.get_calibration(depth_mode, color_format).unwrap();
+
   let capture_provider = Arc::new(CaptureProvider::new());
   let capture_provider2= capture_provider.clone();
-  thread::spawn(move || capture_thread(capture_provider));
+
+  thread::spawn(move || capture_thread(capture_provider, Some(device)));
 
   //graphics_grr::run(capture_provider2).unwrap();
   //graphics_glium::run_glium();
-  graphics_gl::run(capture_provider2);
+  graphics_gl::run(capture_provider2, calibration);
 }

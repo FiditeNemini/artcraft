@@ -17,12 +17,14 @@ use glutin::window::WindowBuilder;
 use glutin::ContextBuilder;
 use std::mem::size_of;
 use std::ptr::null;
-use glium::framebuffer::ColorAttachment::Texture;
+//use glium::framebuffer::ColorAttachment::Texture;
 use std::sync::Arc;
 use sensor_control::CaptureProvider;
 use point_cloud;
 use point_cloud::point_cloud_compute_shader::PointCloudComputeShader;
 use point_cloud::point_cloud_renderer_shader::PointCloudRendererShader;
+use point_cloud::point_cloud_visualiser::PointCloudVisualizer;
+use point_cloud::viewer_image::ViewerImage;
 
 //use shader::Shader;
 
@@ -107,7 +109,7 @@ static TEXTURE_CHECKERBOARD : [GLfloat; 12] = [
   1.0, 1.0, 1.0,   0.0, 0.0, 0.0,
 ];
 
-pub fn run(capture_provider: Arc<CaptureProvider>) {
+pub fn run(capture_provider: Arc<CaptureProvider>, calibration_data: k4a_sys::k4a_calibration_t) {
   let event_loop = EventLoop::new();
   let window = WindowBuilder::new();
   let gl_window = ContextBuilder::new()
@@ -120,8 +122,18 @@ pub fn run(capture_provider: Arc<CaptureProvider>) {
   // Load the OpenGL function pointers
   gl::load_with(|symbol| gl_window.get_proc_address(symbol));
 
-  let compute_shader = PointCloudComputeShader::new();
-  let render_shader = PointCloudRendererShader::new();
+  // TODO
+  //  k4a::calibration calib = m_device.get_calibration(m_config.DepthMode, m_config.ColorResolution);
+
+  let mut visualizer = PointCloudVisualizer::new(false, calibration_data);
+  // TODO - constructed in PointCloudWindow.
+  /*
+    // TODO GLenum initResult = m_pointCloudVisualizer.InitializeTexture(&m_texture);
+    if (initResult != GL_NO_ERROR)
+    {
+        CheckVisualizationResult(PointCloudVisualizationResult::OpenGlError);
+    }
+  */
 
   // Create GLSL shaders
   let vs = compile_shader(VERTEX_SHADER_SRC, gl::VERTEX_SHADER);
@@ -257,6 +269,14 @@ pub fn run(capture_provider: Arc<CaptureProvider>) {
     gl::Uniform3f(triangle_color_attr, 1.0, 0.0, 1.0);
   }
 
+
+  let mut texture = ViewerImage::create(
+    800,
+    800,
+    None,
+    None
+  ).expect("ViewerImage texture creation should work");
+
   event_loop.run(move |event, window, control_flow| {
     //*control_flow = ControlFlow::Wait;
     match event {
@@ -297,7 +317,7 @@ pub fn run(capture_provider: Arc<CaptureProvider>) {
 
     // TODO: This belongs in a worker thread with buffers on both producer and consumer.
     if let Some(capture) = capture_provider.get_capture() {
-      if let Ok(image) = capture.get_color_image() {
+      /*if let Ok(image) = capture.get_color_image() {
         let width = image.get_width_pixels() as i32;
         let height = image.get_height_pixels() as i32;
         println!("Size: {}x{}", width, height);
@@ -332,7 +352,10 @@ pub fn run(capture_provider: Arc<CaptureProvider>) {
           );
         }
         gl_window.swap_buffers().unwrap();
-      }
+      }*/
+
+      visualizer.update_texture(&texture, &capture);
+
     }
   });
 }

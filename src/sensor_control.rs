@@ -70,12 +70,18 @@ impl CaptureProvider {
   }
 }
 
-pub fn capture_thread(capture_provider: Arc<CaptureProvider>) {
-  let installed_devices = device_get_installed_count();
-  println!("Installed devices: {}", installed_devices);
+pub fn capture_thread(capture_provider: Arc<CaptureProvider>, device: Option<Device>) {
+  let device = match device {
+    Some(device) => device,
+    None => {
+      let installed_devices = device_get_installed_count();
+      println!("Installed devices: {}", installed_devices);
 
-  let device = Device::open(0).unwrap();
-  println!("Device: {:?}", device);
+      let device = Device::open(0).unwrap();
+      println!("Device: {:?}", device);
+      device
+    },
+  };
 
   let serial_number = device.get_serial_number().unwrap();
   println!("Device: {:?}", serial_number);
@@ -90,7 +96,6 @@ pub fn capture_thread(capture_provider: Arc<CaptureProvider>) {
     capture_provider.set_capture(capture);
   }
 }
-
 
 pub fn capture_thread_to_texture(frame: Arc<Mutex<Option<TextureData2d>>>) {
   let installed_devices = device_get_installed_count();

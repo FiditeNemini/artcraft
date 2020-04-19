@@ -79,7 +79,7 @@ impl ViewerImage {
   pub fn create(
     width: u32,
     height: u32,
-    data: &[uint8_t],
+    //data: &[uint8_t],
     format: Option<GLenum>,
     internal_format: Option<GLenum>) -> Result<Self>
   {
@@ -105,9 +105,9 @@ impl ViewerImage {
       );
     }
 
-    unsafe {
+    /*unsafe {
       viewer_image.update_texture(data)?;
-    }
+    }*/
 
     if let Err(err) = gl_get_error() {
       return Err(ViewerImageError::OpenGlError(err));
