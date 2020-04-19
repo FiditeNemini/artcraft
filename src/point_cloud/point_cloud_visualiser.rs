@@ -34,6 +34,18 @@ pub enum PointCloudVisualizerError {
   UnknownError,
 }
 
+impl From<OpenGlError> for PointCloudVisualizerError {
+  fn from(error: OpenGlError) -> Self {
+    PointCloudVisualizerError::OpenGlError(error)
+  }
+}
+
+impl From<PointCloudComputeError> for PointCloudVisualizerError {
+  fn from(error: PointCloudComputeError) -> Self {
+    PointCloudVisualizerError::PointCloudComputeError(error)
+  }
+}
+
 impl std::fmt::Display for PointCloudVisualizerError {
   fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
     let description = match self {
@@ -390,9 +402,10 @@ impl PointCloudVisualizer {
     self.colorization_strategy = strategy;
     self.point_cloud_renderer.set_enable_shading(strategy == ColorizationStrategy::Shaded);
 
-    let xy_table_status = if strategy == ColorizationStrategy::Color {
-      // sizeof DepthPixel = uint16_t;
-      let stride = self.calibration_data.color_camera_calibration.resolution_width * 2;
+    if strategy == ColorizationStrategy::Color {
+      let stride =
+          self.calibration_data.color_camera_calibration.resolution_width * size_of::<DepthPixel>() as i32;
+
       self.transformed_depth_image = Some(Image::create(
         ImageFormat::Depth16,
         self.calibration_data.color_camera_calibration.resolution_width as u32,
@@ -400,17 +413,12 @@ impl PointCloudVisualizer {
         stride as u32,
       ).expect("Construction should work FIXME"));
 
-      self.point_cloud_converter.set_active_xy_table(&self.color_xy_table)
+      self.point_cloud_converter.set_active_xy_table(&self.color_xy_table)?;
 
     } else {
-      /* struct BgraPixel
-          {
-              uint8_t Blue;
-              uint8_t Green;
-              uint8_t Red;
-              uint8_t Alpha;
-          }; */
-      let stride = self.calibration_data.depth_camera_calibration.resolution_width * 4;
+      let stride =
+          self.calibration_data.depth_camera_calibration.resolution_width * size_of::<BgraPixel>() as i32;
+
       self.point_cloud_colorization = Some(Image::create(
         ImageFormat::Depth16,
         self.calibration_data.color_camera_calibration.resolution_width as u32,
@@ -418,17 +426,15 @@ impl PointCloudVisualizer {
         stride as u32,
       ).expect("Construction should work FIXME"));
 
-      self.point_cloud_converter.set_active_xy_table(&self.depth_xy_table)
-    };
-
-    if let Err(e) = xy_table_status {
-      return Err(PointCloudVisualizerError::PointCloudComputeError(e));
+      self.point_cloud_converter.set_active_xy_table(&self.depth_xy_table)?;
     }
 
     self.xyz_texture.reset();
 
-    if let Some(capture) = self.last_capture.take().map(|cap| cap) {
-      self.update_point_clouds(capture); // TODO: INEFFICIENT CLONE.
+
+    if let Some(capture) = self.last_capture.as_ref() {
+      let capture = (*capture).clone();
+      self.update_point_clouds(capture);
     }
 
     Ok(())

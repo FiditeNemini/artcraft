@@ -360,6 +360,8 @@ impl PointCloudComputeShader {
   /// Set the XY table that will be used by future calls to Convert().  Get an XY table by calling
   /// GenerateXyTable().
   pub fn set_active_xy_table(&mut self, xy_table: &k4a_sys_wrapper::Image) -> Result<()> {
+    println!("==== Compute.set_active_xy_table");
+
     let width = xy_table.get_width_pixels() as i32;
     let height = xy_table.get_height_pixels() as i32;
 
@@ -426,11 +428,8 @@ impl PointCloudComputeShader {
       gl::TexParameteri(gl::TEXTURE_2D, gl::TEXTURE_MAG_FILTER, gl::NEAREST as i32);
     }
 
-    // TODO: Return status / error handling
-    // GLenum status = glGetError();
-    //return status;
-
-    Ok(())
+    gl_get_error()
+        .map_err(|err| PointCloudComputeError::OpenGlError(err))
   }
 
   /// Creates a k4a::image containing the XY tables from calibration based on calibrationType.
@@ -544,14 +543,16 @@ impl PointCloudComputeShader {
 
           if valid == 1 {
             unsafe {
-              //println!("This pixel is GOOD: {}, {}", ray.xyz.x, ray.xyz.y);
+              /*if y % 10_000 == 0 {
+                println!("This pixel is GOOD: {}, {}", ray.xyz.x, ray.xyz.y);
+              }*/
               xy_table_buffer3[idx].xy.x = ray.xyz.x;
               xy_table_buffer3[idx].xy.y = ray.xyz.y;
             }
           } else {
             unsafe {
               // This pixel is invalid
-              //println!("This pixel is invalid: {}", idx);
+              println!("This pixel is invalid: {}", idx);
               xy_table_buffer3[idx].xy.x = 0.0;
               xy_table_buffer3[idx].xy.y = 0.0;
             }
