@@ -13,6 +13,7 @@ use point_cloud::pixel_structs::BgraPixel;
 use point_cloud::pixel_structs::DepthPixel;
 use std::mem::size_of;
 use point_cloud::viewer_image::ViewerImage;
+use rand::Rng;
 
 pub type Result<T> = std::result::Result<T, PointCloudVisualizerError>;
 
@@ -288,6 +289,8 @@ impl PointCloudVisualizer {
       let length = depth_image.get_size();
       let dst_length = length / size_of::<BgraPixel>();
 
+      let mut rng = rand::thread_rng();
+
       unsafe {
         // src: DepthPixel
         let mut src_pixel = depth_image.get_buffer();
@@ -313,6 +316,14 @@ impl PointCloudVisualizer {
           dst_pixel_3 += 1;
           src_pixel_3 += 1;
         }*/
+
+        // TODO: This should help us see output.
+        for i in 0 .. dst_length {
+          dst_pixel_3[i].blue = rng.gen_range(0, 255);
+          dst_pixel_3[i].green = rng.gen_range(0, 255);
+          dst_pixel_3[i].red = rng.gen_range(0, 255);
+          dst_pixel_3[i].alpha = rng.gen_range(0, 255);
+        }
       }
     }
 

@@ -20,6 +20,7 @@ use point_cloud::compile_shader::compile_shader;
 use point_cloud::point_cloud_compute_shader::POINT_CLOUD_TEXTURE_FORMAT;
 use graphics_gl::{get_stride, get_pointer_offset};
 use point_cloud::pixel_structs::BgraPixel;
+use point_cloud::point_cloud_visualiser::PointCloudVisualizer;
 
 pub type Result<T> = std::result::Result<T, PointCloudRendererError>;
 
@@ -27,6 +28,12 @@ pub type Result<T> = std::result::Result<T, PointCloudRendererError>;
 pub enum PointCloudRendererError {
   OpenGlError(OpenGlError),
   UnknownError,
+}
+
+impl From<OpenGlError> for PointCloudRendererError {
+  fn from(error: OpenGlError) -> Self {
+    PointCloudRendererError::OpenGlError(error)
+  }
 }
 
 impl std::fmt::Display for PointCloudRendererError {
@@ -385,7 +392,7 @@ impl PointCloudRendererShader {
 
       gl::UseProgram(self.program_id);
 
-      // TODO:
+      // TODO: view and projection matrices
       // Update view/projection matrices in shader
       // glUniformMatrix4fv(m_viewIndex, 1, GL_FALSE, reinterpret_cast<const GLfloat *>(m_view));
       // glUniformMatrix4fv(m_projectionIndex, 1, GL_FALSE, reinterpret_cast<const GLfloat *>(m_projection));

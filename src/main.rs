@@ -12,6 +12,7 @@ extern crate k4a_sys;
 extern crate libc;
 extern crate obj;
 extern crate opencv;
+extern crate rand;
 
 use std::borrow::BorrowMut;
 use std::ffi::{c_void, CStr, CString};
