@@ -134,16 +134,16 @@ pub fn run(capture_provider: Arc<CaptureProvider>, calibration_data: k4a_sys::k4
   */
 
   // Create GLSL shaders
-  let vs = compile_shader(VERTEX_SHADER_SRC, gl::VERTEX_SHADER);
+  /*let vs = compile_shader(VERTEX_SHADER_SRC, gl::VERTEX_SHADER);
   let fs = compile_shader(FRAGMENT_SHADER_SRC, gl::FRAGMENT_SHADER);
-  let program = link_program(vs, fs);
+  let program = link_program(vs, fs);*/
 
   let mut vbo = 0;
   let mut vao = 0;
   let mut ebo = 0;
   let mut tex = 0;
 
-  unsafe {
+  /*unsafe {
     // Create a Vertex Buffer Object and copy the vertex data to it
     gl::GenBuffers(1, &mut vbo);
     gl::BindBuffer(gl::ARRAY_BUFFER, vbo);
@@ -175,26 +175,8 @@ pub fn run(capture_provider: Arc<CaptureProvider>, calibration_data: k4a_sys::k4
         .expect("failed to load")
         .to_rgba();
 
-    /*let format = match img {
-      /*image::ImageRgb8(_) => gl::RGB,
-      image::ImageRgba8(_) => gl::RGBA,*/
-      DynamicImage::ImageRgb8(_) =>  gl::RGB, // RGB8: types::GLenum = 0x8051;
-      DynamicImage::ImageRgba8(_) => gl::RGBA, // RGBA: types::GLenum = 0x1908;
-      _ => panic!("What is this format?"),
-      /*ImageLuma8(GrayImage) => {},
-      ImageLumaA8(GrayAlphaImage) => {},
-      ImageBgr8(BgrImage) => {},
-      ImageBgra8(BgraImage) => {},
-      ImageLuma16(Gray16Image) => {},
-      ImageLumaA16(GrayAlpha16Image) => {},
-      ImageRgb16(Rgb16Image) => {},
-      ImageRgba16(Rgba16Image) => {},*/
-    };*/
-
     let width = img.dimensions().0 as i32;
     let height = img.dimensions().1 as i32;
-    //let raw_img = img.into_raw();
-    //let img_ptr: *const c_void = raw_img.as_ptr() as *const c_void;
     let data = img.into_raw();
 
     println!("Loaded image: {}x{}", width, height);
@@ -265,15 +247,14 @@ pub fn run(capture_provider: Arc<CaptureProvider>, calibration_data: k4a_sys::k4
 
     let triangle_color_attr =  gl::GetUniformLocation(program, CString::new("triangleColor").unwrap().as_ptr());
     gl::Uniform3f(triangle_color_attr, 1.0, 0.0, 1.0);
-  }
+  }*/
 
-  // TODO: Uncomment
-  /*let mut texture = ViewerImage::create(
+  let mut texture = ViewerImage::create(
     800,
     800,
     None,
     None
-  ).expect("ViewerImage texture creation should work");*/
+  ).expect("ViewerImage texture creation should work");
 
   event_loop.run(move |event, window, control_flow| {
     //*control_flow = ControlFlow::Wait;
@@ -282,13 +263,13 @@ pub fn run(capture_provider: Arc<CaptureProvider>, calibration_data: k4a_sys::k4
       Event::WindowEvent { event, .. } => match event {
         WindowEvent::CloseRequested => {
           // Cleanup
-          unsafe {
+          /*unsafe {
             gl::DeleteProgram(program);
             gl::DeleteShader(fs);
             gl::DeleteShader(vs);
             gl::DeleteBuffers(1, &vbo);
             gl::DeleteVertexArrays(1, &vao);
-          }
+          }*/
           *control_flow = ControlFlow::Exit
         },
         _ => (),
@@ -301,12 +282,12 @@ pub fn run(capture_provider: Arc<CaptureProvider>, calibration_data: k4a_sys::k4
           // Draw a triangle from the 3 vertices
           //gl::DrawArrays(gl::TRIANGLES, 0, 3);
 
-          gl::DrawElements(
+          /*gl::DrawElements(
             gl::TRIANGLES,
             ELEMENTS.len() as GLsizei,
             gl::UNSIGNED_INT,
             std::mem::transmute(&ELEMENTS[0])
-          );
+          );*/
         }
         gl_window.swap_buffers().unwrap();
       },
@@ -314,7 +295,7 @@ pub fn run(capture_provider: Arc<CaptureProvider>, calibration_data: k4a_sys::k4
     }
 
     // TODO: This belongs in a worker thread with buffers on both producer and consumer.
-    if let Some(capture) = capture_provider.get_capture() {
+    /*if let Some(capture) = capture_provider.get_capture() {
       if let Ok(image) = capture.get_color_image() {
         let width = image.get_width_pixels() as i32;
         let height = image.get_height_pixels() as i32;
@@ -350,9 +331,11 @@ pub fn run(capture_provider: Arc<CaptureProvider>, calibration_data: k4a_sys::k4
         }
         gl_window.swap_buffers().unwrap();
       }
+    }*/
 
+    // TODO: This belongs in a worker thread with buffers on both producer and consumer.
+    if let Some(capture) = capture_provider.get_capture() {
       //visualizer.update_texture(&texture, &capture);
-
     }
   });
 }

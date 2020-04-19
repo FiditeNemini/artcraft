@@ -16,6 +16,12 @@ pub enum ViewerImageError {
   OpenGlError(OpenGlError),
 }
 
+impl From<OpenGlError> for ViewerImageError {
+  fn from(error: OpenGlError) -> Self {
+    ViewerImageError::OpenGlError(error)
+  }
+}
+
 impl std::fmt::Display for ViewerImageError {
   fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
     let description = match self {
@@ -54,7 +60,7 @@ pub struct ViewerImage {
 
 impl ViewerImage {
   /// private ctor
-  fn new(dimensions: ImageDimensions, format: GLenum) -> Self {
+  fn new(dimensions: ImageDimensions, format: GLenum) -> Result<Self> {
     let texture = Texture::new_initialized();
     let texture_buffer = Buffer::new_initialized();
 
@@ -67,13 +73,13 @@ impl ViewerImage {
       gl::BindBuffer(gl::PIXEL_UNPACK_BUFFER, 0);
     }
 
-    Self {
+    Ok(Self {
       dimensions,
       format,
       texture_buffer_size,
       texture,
       texture_buffer,
-    }
+    })
   }
 
   pub fn create(
@@ -87,7 +93,7 @@ impl ViewerImage {
     let mut viewer_image = ViewerImage::new(
       dimensions,
       format.unwrap_or(gl::BGRA)
-    );
+    )?;
 
     unsafe {
       gl::BindTexture(gl::TEXTURE_2D, viewer_image.texture.id());
@@ -108,10 +114,6 @@ impl ViewerImage {
     /*unsafe {
       viewer_image.update_texture(data)?;
     }*/
-
-    if let Err(err) = gl_get_error() {
-      return Err(ViewerImageError::OpenGlError(err));
-    }
 
     Ok(viewer_image)
   }
