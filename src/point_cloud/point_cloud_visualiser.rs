@@ -215,6 +215,7 @@ impl PointCloudVisualizer {
       //  gl::FramebufferTexture(gl::FRAMEBUFFER, gl::COLOR_ATTACHMENT0, texture_buffer, 0);
       //gl::FramebufferTexture(gl::FRAMEBUFFER, gl::COLOR_ATTACHMENT0, texture, 0);
 
+      println!("gl::DrawBuffers");
       gl::DrawBuffers(1, &gl::COLOR_ATTACHMENT0);
 
       let frame_buffer_status = gl::CheckFramebufferStatus(gl::FRAMEBUFFER);
@@ -248,7 +249,7 @@ impl PointCloudVisualizer {
       Ok(img) => img,
       Err(e) => {
         // Capture doesn't have depth info. Drop the capture.
-        return Err(PointCloudVisualizerError::MissingDepthImage)
+        return Err(PointCloudVisualizerError::MissingDepthImage);
       },
     };
 

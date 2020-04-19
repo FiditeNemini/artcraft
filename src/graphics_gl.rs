@@ -23,7 +23,7 @@ use sensor_control::CaptureProvider;
 use point_cloud;
 use point_cloud::point_cloud_compute_shader::PointCloudComputeShader;
 use point_cloud::point_cloud_renderer_shader::PointCloudRendererShader;
-use point_cloud::point_cloud_visualiser::PointCloudVisualizer;
+use point_cloud::point_cloud_visualiser::{PointCloudVisualizer, PointCloudVisualizerError};
 use point_cloud::viewer_image::ViewerImage;
 
 //use shader::Shader;
@@ -335,7 +335,23 @@ pub fn run(capture_provider: Arc<CaptureProvider>, calibration_data: k4a_sys::k4
 
     // TODO: This belongs in a worker thread with buffers on both producer and consumer.
     if let Some(capture) = capture_provider.get_capture() {
-      //visualizer.update_texture(&texture, &capture);
+      println!("Got capture");
+      visualizer.update_texture(&texture, &capture)
+          .map(|_| {
+            println!("UPDATED TEXTURE!");
+          })
+          .map_err(|err| {
+            match err {
+              PointCloudVisualizerError::MissingDepthImage => { println!("Missing depth image"); },
+              PointCloudVisualizerError::MissingColorImage => { println!("Missing color image"); },
+              _ => {
+                unreachable!("Error: {:?}", err);
+              }
+            }
+          });
+
+      println!("Updated capture");
+      gl_window.swap_buffers().unwrap();
     }
   });
 }

@@ -281,7 +281,7 @@ impl PointCloudRendererShader {
     // void PointCloudRenderer::UpdateViewProjection(mat4x4 view, mat4x4 projection)
     //mat4x4_dup(m_view, view);
     //mat4x4_dup(m_projection, projection);
-    unimplemented!();
+    //unimplemented!();
   }
 
   pub fn update_point_clouds(&mut self, color_image: &k4a_sys_wrapper::Image,
@@ -398,6 +398,7 @@ impl PointCloudRendererShader {
 
       // Render point cloud
       gl::BindVertexArray(self.vertex_array_object.id());
+      println!("gl::DrawArrays - points in the point cloud");
       gl::DrawArrays(
         gl::POINTS,
         0,
