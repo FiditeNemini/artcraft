@@ -1,4 +1,5 @@
 use std::ffi::CString;
+use std::ffi::CStr;
 use std::mem;
 use std::os::raw::c_void;
 use std::path::Path;
@@ -109,6 +110,19 @@ static TEXTURE_CHECKERBOARD : [GLfloat; 12] = [
   1.0, 1.0, 1.0,   0.0, 0.0, 0.0,
 ];
 
+extern "system" fn glDebugOutput(
+  source: GLenum,
+  gltype: GLenum,
+  id: GLuint,
+  severity: GLenum,
+  length: GLsizei,
+  message: *const GLchar,
+  userParam: *mut c_void)
+{
+  let message = unsafe { CStr::from_ptr(message) };
+  println!(">>> GL DEBUG = {:?}", message);
+}
+
 pub fn run(capture_provider: Arc<CaptureProvider>, calibration_data: k4a_sys::k4a_calibration_t) {
   let event_loop = EventLoop::new();
   let window = WindowBuilder::new();
@@ -132,6 +146,13 @@ pub fn run(capture_provider: Arc<CaptureProvider>, calibration_data: k4a_sys::k4
         CheckVisualizationResult(PointCloudVisualizationResult::OpenGlError);
     }
   */
+
+  unsafe {
+    gl::Enable(gl::DEBUG_OUTPUT);
+    gl::Enable(gl::DEBUG_OUTPUT_SYNCHRONOUS);
+    gl::DebugMessageCallback(Some(glDebugOutput), null());
+    gl::DebugMessageControl(gl::DONT_CARE, gl::DONT_CARE, gl::DONT_CARE, 0, null(), gl::TRUE);
+  }
 
   // Create GLSL shaders
   /*let vs = compile_shader(VERTEX_SHADER_SRC, gl::VERTEX_SHADER);
@@ -275,6 +296,7 @@ pub fn run(capture_provider: Arc<CaptureProvider>, calibration_data: k4a_sys::k4
         _ => (),
       },
       Event::RedrawRequested(_) => {
+        println!("Redraw requested.");
         unsafe {
           // Clear the screen to black
           gl::ClearColor(0.3, 0.3, 0.3, 1.0);
@@ -336,6 +358,12 @@ pub fn run(capture_provider: Arc<CaptureProvider>, calibration_data: k4a_sys::k4
     // TODO: This belongs in a worker thread with buffers on both producer and consumer.
     if let Some(capture) = capture_provider.get_capture() {
       println!("Got capture");
+      unsafe {
+        // TODO: CLEARING FOR TEMPORARY DEBUGGING.
+        gl::ClearColor(0.8, 0.0, 0.0, 1.0);
+        gl::Clear(gl::COLOR_BUFFER_BIT);
+      }
+
       visualizer.update_texture(&texture, &capture)
           .map(|_| {
             println!("UPDATED TEXTURE!");

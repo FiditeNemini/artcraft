@@ -295,6 +295,8 @@ impl PointCloudRendererShader {
   pub fn update_point_clouds(&mut self, color_image: &k4a_sys_wrapper::Image,
                              point_cloud_texture: &Texture) -> Result<()>
   {
+    println!("Renderer.update_point_clouds()");
+
     unsafe {
       gl::BindVertexArray(self.vertex_array_object.id());
 
@@ -305,7 +307,9 @@ impl PointCloudRendererShader {
     let color_image_size_bytes = color_image.get_size() as i32;
 
     if self.vertex_array_size_bytes != color_image_size_bytes {
+      println!("Updating vertex array size bytes: {}", color_image_size_bytes);
       self.vertex_array_size_bytes = color_image_size_bytes;
+
       unsafe {
         gl::BufferData(
           gl::ARRAY_BUFFER,
@@ -315,6 +319,8 @@ impl PointCloudRendererShader {
         );
       }
     }
+
+    gl_get_error()?; // TODO TEMPORARY DEBUG
 
     let vertex_mapped_buffer = unsafe {
       // GLubyte *vertexMappedBuffer = reinterpret_cast<GLubyte *>(
@@ -326,12 +332,26 @@ impl PointCloudRendererShader {
       )
     };
 
+    println!("glMapBufferRange: memAddr = {:?} (bytes: {})", vertex_mapped_buffer, color_image_size_bytes);
+
     if vertex_mapped_buffer as usize == 0 {
       // TODO: return glGetError() instead
       return Err(PointCloudRendererError::UnknownError);
     }
 
     let mut color_src = color_image.get_buffer();
+
+    unsafe {
+      println!(
+        "Color image bytes: {:?} {:?} {:?} {:?} {:?} {:?}",
+        *color_src.offset(0),
+        *color_src.offset(100),
+        *color_src.offset(1000),
+        *color_src.offset(2000),
+        *color_src.offset(3000),
+        *color_src.offset(5000),
+      );
+    }
 
     let result = unsafe {
       //const GLubyte *colorSrc = reinterpret_cast<const GLubyte *>(color.get_buffer());
@@ -401,12 +421,16 @@ impl PointCloudRendererShader {
       let enable_shading = if self.enable_shading { 1 } else { 0 };
       gl::Uniform1i(self.enable_shading_index, enable_shading);
 
+      // TODO: Not sure what is setting this false.
+      let enable_shading = 1;
+      println!("Enable shading: {} -> {}", self.enable_shading, enable_shading);
+
       // glDrawArrays(GL_POINTS, 0, m_vertexArraySizeBytes / static_cast<GLsizei>(sizeof(BgraPixel)));
       let size = self.vertex_array_size_bytes / size_of::<BgraPixel>() as i32;
 
       // Render point cloud
       gl::BindVertexArray(self.vertex_array_object.id());
-      println!("gl::DrawArrays - points in the point cloud");
+      println!("gl::DrawArrays - points in the point cloud; size = {}", size);
       gl::DrawArrays(
         gl::POINTS,
         0,
@@ -425,6 +449,7 @@ impl PointCloudRendererShader {
   }
 
   pub fn set_enable_shading(&mut self, enable_shading: bool) {
+    println!("renderer.set_enable_shading(): {}", enable_shading);
     self.enable_shading = enable_shading;
   }
 }

@@ -264,6 +264,17 @@ impl PointCloudVisualizer {
         // TODO
         //  m_transformation.depth_image_to_color_camera(depthImage, &m_transformedDepthImage);
         //  depthImage = m_transformedDepthImage;
+        /*
+            try
+            {
+                m_transformation.depth_image_to_color_camera(depthImage, &m_transformedDepthImage);
+                depthImage = m_transformedDepthImage;
+            }
+            catch (const k4a::error &)
+            {
+                return PointCloudVisualizationResult::DepthToColorTransformationFailed;
+            }
+        */
         return Err(PointCloudVisualizerError::ColorSupportNotYetImplemented);
       }
     }
@@ -282,7 +293,10 @@ impl PointCloudVisualizer {
     if self.colorization_strategy == ColorizationStrategy::Color {
       // TODO
       //  m_pointCloudColorization = std::move(colorImage);
-      return Err(PointCloudVisualizerError::ColorSupportNotYetImplemented);
+      //return Err(PointCloudVisualizerError::ColorSupportNotYetImplemented);
+      self.point_cloud_colorization = Some(maybe_color_image
+          .expect("logic above should handle"));
+
     } else {
       // This creates a color spectrum based on depth.
 
