@@ -118,6 +118,7 @@ impl Drop for CleanupGuard {
   fn drop(&mut self) {
     println!("Running CleanupGuard");
     unsafe {
+      println!("-> gl::BindFramebuffer(0) [cleanup]");
       gl::BindFramebuffer(gl::FRAMEBUFFER, 0);
     }
   }
@@ -167,6 +168,8 @@ impl PointCloudVisualizer {
       0
     ).expect("should allocate");*/
 
+    let color_strategy = ColorizationStrategy::Color;
+
     let mut visualizer = Self {
       width: width as u16,
       height: height as u16,
@@ -177,7 +180,7 @@ impl PointCloudVisualizer {
       depth_buffer,
       color_xy_table,
       depth_xy_table,
-      colorization_strategy: ColorizationStrategy::Simple,
+      colorization_strategy: color_strategy,
       calibration_data: calibration_data.clone(),
       transformation: Transformation::from_calibration(&calibration_data),
       last_capture: None,
@@ -186,7 +189,7 @@ impl PointCloudVisualizer {
       xyz_texture: Texture::new(),
     };
 
-    visualizer.set_colorization_strategy(ColorizationStrategy::Simple).expect("Should work");
+    visualizer.set_colorization_strategy(color_strategy).expect("Should work");
 
     visualizer
   }
@@ -196,13 +199,16 @@ impl PointCloudVisualizer {
   }
 
   pub fn update_texture(&mut self, texture: &ViewerImage, capture: Capture) -> Result<()> {
+    println!("==== Visualizer.update_texture()");
 
     // Update the point cloud renderer with the latest point data
     self.update_point_clouds(capture)?;
 
     // Set up rendering to a texture
     unsafe {
+      println!("-> gl::BindRenderbuffer(): {:?}", self.depth_buffer.id());
       gl::BindRenderbuffer(gl::RENDERBUFFER, self.depth_buffer.id());
+      println!("-> gl::BindFramebuffer(): {:?}", self.frame_buffer.id());
       gl::BindFramebuffer(gl::FRAMEBUFFER, self.frame_buffer.id());
     }
 
@@ -210,25 +216,31 @@ impl PointCloudVisualizer {
     let cleanup_guard = CleanupGuard {};
 
     unsafe {
+      println!("-> gl::FramebufferRenderbuffer(...)");
       gl::FramebufferRenderbuffer(gl::FRAMEBUFFER, gl::DEPTH_ATTACHMENT, gl::RENDERBUFFER, self.depth_buffer.id());
       // TODO:
       //  glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, static_cast<GLuint>(**texture), 0);
       //  gl::FramebufferTexture(gl::FRAMEBUFFER, gl::COLOR_ATTACHMENT0, texture_buffer, 0);
-      //gl::FramebufferTexture(gl::FRAMEBUFFER, gl::COLOR_ATTACHMENT0, texture, 0);
+      gl::FramebufferTexture(gl::FRAMEBUFFER, gl::COLOR_ATTACHMENT0, texture.texture_id(), 0);
 
-      println!("gl::DrawBuffers");
+      println!("-> gl::DrawBuffers(COLOR_ATTACHMENT0)");
       gl::DrawBuffers(1, &gl::COLOR_ATTACHMENT0);
 
+      println!("-> gl::CheckFramebufferStatus()");
       let frame_buffer_status = gl::CheckFramebufferStatus(gl::FRAMEBUFFER);
 
       if frame_buffer_status != gl::FRAMEBUFFER_COMPLETE {
         return Err(PointCloudVisualizerError::FramebufferError);
       }
 
+      println!("-> gl::Viewport() {}x{}", self.width, self.height);
       gl::Viewport(0, 0, self.width as i32, self.height as i32);
 
+      println!("-> gl::Enable(DEPTH_TEST");
       gl::Enable(gl::DEPTH_TEST);
+      println!("-> gl::ClearColor()");
       gl::ClearColor(0.0, 0.0, 0.0, 0.0);
+      println!("-> gl::Clear(COLOR,DEPTH)");
       gl::Clear(gl::COLOR_BUFFER_BIT | gl::DEPTH_BUFFER_BIT);
     }
 
@@ -238,6 +250,7 @@ impl PointCloudVisualizer {
     let render_status = self.point_cloud_renderer.render();
 
     unsafe {
+      println!("-> gl::BindRenderbuffer(RENDERBUFFER, 0)");
       gl::BindRenderbuffer(gl::RENDERBUFFER, 0);
     }
 
@@ -246,9 +259,13 @@ impl PointCloudVisualizer {
   }
 
   fn update_point_clouds(&mut self, capture: Capture) -> Result<()> {
-    let depth_image = match capture.get_depth_image() {
+    println!("==== Visualizer.update_point_clouds() [from kinect capture]");
+    println!("colorization strategy = {:?}", self.colorization_strategy);
+
+    let mut depth_image = match capture.get_depth_image() {
       Ok(img) => img,
       Err(e) => {
+        println!("<< Missing Depth Image >> ");
         // Capture doesn't have depth info. Drop the capture.
         return Err(PointCloudVisualizerError::MissingDepthImage);
       },
@@ -258,24 +275,27 @@ impl PointCloudVisualizer {
 
     if self.enable_color_point_cloud {
       if maybe_color_image.is_err() {
+        println!("<< Missing Color Image >> ");
         return Err(PointCloudVisualizerError::MissingColorImage);
       }
       if self.colorization_strategy == ColorizationStrategy::Color {
-        // TODO
-        //  m_transformation.depth_image_to_color_camera(depthImage, &m_transformedDepthImage);
-        //  depthImage = m_transformedDepthImage;
-        /*
-            try
-            {
-                m_transformation.depth_image_to_color_camera(depthImage, &m_transformedDepthImage);
-                depthImage = m_transformedDepthImage;
-            }
-            catch (const k4a::error &)
-            {
-                return PointCloudVisualizationResult::DepthToColorTransformationFailed;
-            }
-        */
-        return Err(PointCloudVisualizerError::ColorSupportNotYetImplemented);
+
+        /*let mut transformed_depth_image = self.transformed_depth_image.take()
+            .expect("Must be present");*/
+
+        if let Some(transformed_depth_image) = self.transformed_depth_image.as_ref() {
+          println!("Take transformed depth image...");
+          unsafe {
+            // TODO: Totally missed error handling here.
+            k4a_sys::k4a_transformation_depth_image_to_color_camera(
+              self.transformation.get_handle(),
+              depth_image.get_handle(),
+              transformed_depth_image.get_handle(),
+            );
+
+            depth_image = transformed_depth_image.clone();
+          }
+        }
       }
     }
 

@@ -92,7 +92,8 @@ void main()
     ivec2 currentDepthPixelCoordinates = ivec2(gl_VertexID % pointCloudSize.x, gl_VertexID / pointCloudSize.x);
     vec3 vertexPosition = imageLoad(pointCloudTexture, currentDepthPixelCoordinates).xyz;
 
-    gl_Position = projection * view * vec4(vertexPosition, 1);
+    //gl_Position = projection * view * vec4(vertexPosition, 1);
+    gl_Position = vec4(vertexPosition, 1);
 
     vertexColor = inColor;
 
@@ -265,11 +266,20 @@ impl PointCloudRendererShader {
     let mut point_cloud_texture_index = 0;
 
     unsafe {
+      // This function returns -1 if name does not correspond to an active uniform variable in
+      // program, if name starts with the reserved prefix "gl_", or if name is associated with an
+      // atomic counter or a named uniform block.
+      // FIXME: THe 'view' and 'projection' uniforms are not binding for some reason.
       view_index = gl::GetUniformLocation(program_id, VIEW_PTR);
       projection_index = gl::GetUniformLocation(program_id, PROJECTION_PTR);
       enable_shading_index = gl::GetUniformLocation(program_id, ENABLE_SHADING_PTR);
       point_cloud_texture_index = gl::GetUniformLocation(program_id, POINT_CLOUD_PTR);
     }
+
+    println!("Uniform view location - view: {:?}", view_index);
+    println!("Uniform projection location - view: {:?}", projection_index);
+    println!("Uniform enable shading location - view: {:?}", enable_shading_index);
+    println!("Uniform point cloud texture location - view: {:?}", point_cloud_texture_index);
 
     Self {
       program_id,
@@ -299,22 +309,25 @@ impl PointCloudRendererShader {
   pub fn update_point_clouds(&mut self, color_image: &k4a_sys_wrapper::Image,
                              point_cloud_texture: &Texture) -> Result<()>
   {
-    println!("Renderer.update_point_clouds()");
+    println!("==== Renderer.update_point_clouds() [buffering data]");
 
     unsafe {
+      println!("-> gl::BindVertexArray(): {:?}", self.vertex_array_object.id());
       gl::BindVertexArray(self.vertex_array_object.id());
 
       // Vertex Colors
+      println!("-> gl::BindBuffer(): {:?}", self.vertex_color_buffer_object.id());
       gl::BindBuffer(gl::ARRAY_BUFFER, self.vertex_color_buffer_object.id());
     }
 
     let color_image_size_bytes = color_image.get_size() as i32;
 
-    if self.vertex_array_size_bytes != color_image_size_bytes {
+    if self.vertex_array_size_bytes != color_image_size_bytes /* TODO TEMP ENABLE W/ +1 */ {
       println!("Updating vertex array size bytes: {}", color_image_size_bytes);
       self.vertex_array_size_bytes = color_image_size_bytes;
 
       unsafe {
+        println!("-> gl::BufferData(...)");
         gl::BufferData(
           gl::ARRAY_BUFFER,
           self.vertex_array_size_bytes as isize,
@@ -328,6 +341,9 @@ impl PointCloudRendererShader {
 
     let vertex_mapped_buffer = unsafe {
       // GLubyte *vertexMappedBuffer = reinterpret_cast<GLubyte *>(
+      println!("-> gl::MapBufferRange(...) [puts the buffer into client addr space] size = {}",
+        color_image_size_bytes);
+
       gl::MapBufferRange(
         gl::ARRAY_BUFFER,
         0,
@@ -343,11 +359,16 @@ impl PointCloudRendererShader {
       return Err(PointCloudRendererError::UnknownError);
     }
 
+    println!("color image: handle = {:?} size = {}x{}",
+      color_image.0,
+      color_image.get_width_pixels(),
+      color_image.get_height_pixels());
+
     let mut color_src = color_image.get_buffer();
 
     unsafe {
       println!(
-        "Color image bytes: {:?} {:?} {:?} {:?} {:?} {:?}",
+        "color image bytes: {:?} {:?} {:?} {:?} {:?} {:?}",
         *color_src.offset(0),
         *color_src.offset(100),
         *color_src.offset(1000),
@@ -362,16 +383,22 @@ impl PointCloudRendererShader {
       //std::copy(colorSrc, colorSrc + colorImageSizeBytes, vertexMappedBuffer);
       std::ptr::copy_nonoverlapping::<u8>(color_src, vertex_mapped_buffer as *mut u8,
         color_image_size_bytes as usize);
+      std::ptr::copy::<u8>(color_src, vertex_mapped_buffer as *mut u8,
+        color_image_size_bytes as usize);
 
+      println!("-> gl::UnmapBuffer()");
       gl::UnmapBuffer(gl::ARRAY_BUFFER)
     };
 
     if result == gl::FALSE {
+      println!("Failure copying data / unmapping buffer");
       return Err(PointCloudRendererError::UnknownError);
     }
 
     unsafe {
+      println!("-> gl::EnableVertexAttribArray(0)");
       gl::EnableVertexAttribArray(0);
+      println!("-> gl::VertexAttribPointer(...)");
       gl::VertexAttribPointer(
         0,
         gl::BGRA as i32,
@@ -380,14 +407,18 @@ impl PointCloudRendererShader {
         get_stride::<f32>(0),
         get_pointer_offset::<f32>(0),
       );
+      println!("-> gl::UseProgram(): {:?}", self.program_id);
       gl::UseProgram(self.program_id);
     }
 
     // Uniforms
     // Bind our point cloud texture
     unsafe {
+      println!("-> gl::ActiveTexture(TEXTURE0)");
       gl::ActiveTexture(gl::TEXTURE0);
+      println!("-> gl::BindTexture(): {:?}", point_cloud_texture.id());
       gl::BindTexture(gl::TEXTURE_2D, point_cloud_texture.id());
+      println!("-> gl::BindImageTexture(...)");
       gl::BindImageTexture(
         0,
         point_cloud_texture.id(),
@@ -397,8 +428,10 @@ impl PointCloudRendererShader {
         gl::READ_ONLY,
         POINT_CLOUD_TEXTURE_FORMAT,
       );
+      println!("-> gl::Uniform1i(): {:?}", self.point_cloud_texture_index);
       gl::Uniform1i(self.point_cloud_texture_index, 0);
 
+      println!("-> gl::BindVertexArray(0)");
       gl::BindVertexArray(0);
     }
 
@@ -407,13 +440,19 @@ impl PointCloudRendererShader {
   }
 
   pub fn render(&self) -> Result<()> {
+    println!("==== Renderer.render() [the draw call]");
     unsafe {
+      println!("-> gl::Enable(DEPTH_TEST)");
       gl::Enable(gl::DEPTH_TEST);
+      println!("-> gl::Enable(BLEND)");
       gl::Enable(gl::BLEND);
+      println!("-> gl::BlendFunc(...)");
       gl::BlendFunc(gl::SRC_ALPHA, gl::ONE_MINUS_SRC_ALPHA);
 
+      println!("-> gl::PointSize(): {:?}", self.point_size as f32);
       gl::PointSize(self.point_size as f32);
 
+      println!("-> gl::UseProgram(): {:?}", self.program_id);
       gl::UseProgram(self.program_id);
 
       // TODO: view and projection matrices
@@ -423,24 +462,30 @@ impl PointCloudRendererShader {
 
       // Update render settings in shader
       let enable_shading = if self.enable_shading { 1 } else { 0 };
-      gl::Uniform1i(self.enable_shading_index, enable_shading);
 
       // TODO: Not sure what is setting this false.
       let enable_shading = 1;
       println!("Enable shading: {} -> {}", self.enable_shading, enable_shading);
 
+
+      println!("-> gl::Uniform1i(): {:?}", self.enable_shading_index);
+      gl::Uniform1i(self.enable_shading_index, enable_shading);
+
       // glDrawArrays(GL_POINTS, 0, m_vertexArraySizeBytes / static_cast<GLsizei>(sizeof(BgraPixel)));
       let size = self.vertex_array_size_bytes / size_of::<BgraPixel>() as i32;
 
       // Render point cloud
+      println!("-> gl::BindVertexArray(): {:?}", self.vertex_array_object.id());
       gl::BindVertexArray(self.vertex_array_object.id());
-      println!("gl::DrawArrays - points in the point cloud; size = {}", size);
+      println!("gl::DrawArrays - points in the point cloud; size = {} (indices to be rendered)", size);
+      println!("-> gl::DrawArrays(...)");
       gl::DrawArrays(
         gl::POINTS,
         0,
         size,
       );
 
+      println!("-> gl::BindVertexArray(0)");
       gl::BindVertexArray(0);
 
       gl_get_error()

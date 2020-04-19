@@ -378,6 +378,48 @@ impl Image {
     };
     format.into()
   }
+
+  /// Returns the underlying opaque handle *without* an additional refcount.
+  /// Do not deallocate it.
+  pub fn get_handle(&self) -> k4a_sys::k4a_image_t {
+    self.0
+  }
+}
+
+/// Remove a libk4a image refcount on every drop.
+/// When the refcount drops to zero, the image goes away.
+impl Drop for Image {
+  fn drop(&mut self) {
+    unsafe {
+      k4a_sys::k4a_image_release(self.0);
+    }
+  }
+}
+
+/// Handles are refcounted by libk4a. The final reference is destroyed
+impl Clone for Image {
+  fn clone(&self) -> Self {
+    // We must increment the refcount.
+    let handle = self.get_handle();
+    unsafe {
+      k4a_sys::k4a_image_reference(handle);
+    }
+    Self {
+      0: handle,
+    }
+  }
+
+  fn clone_from(&mut self, source: &Self) {
+    let handle = source.get_handle();
+    unsafe {
+      k4a_sys::k4a_image_reference(handle);
+    }
+    unsafe {
+      // drop refcount, potentially releasing if reached zero
+      k4a_sys::k4a_image_release(self.0);
+    }
+    self.0 = handle;
+  }
 }
 
 #[derive(Debug,Clone,Copy)]
@@ -421,14 +463,6 @@ impl Drop for Device {
   fn drop(&mut self) {
     unsafe {
       k4a_sys::k4a_device_close(self.device_pointer);
-    }
-  }
-}
-
-impl Drop for Image {
-  fn drop(&mut self) {
-    unsafe {
-      k4a_sys::k4a_image_release(self.0);
     }
   }
 }
@@ -483,6 +517,12 @@ impl Transformation {
         height: calibration.depth_camera_calibration.resolution_height,
       },
     }
+  }
+
+  /// Returns the underlying opaque handle *without* an additional refcount.
+  /// Do not deallocate it.
+  pub fn get_handle(&self) -> k4a_sys::k4a_transformation_t {
+    self.transformation
   }
 }
 

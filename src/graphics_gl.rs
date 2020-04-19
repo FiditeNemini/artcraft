@@ -120,7 +120,8 @@ extern "system" fn glDebugOutput(
   userParam: *mut c_void)
 {
   let message = unsafe { CStr::from_ptr(message) };
-  println!(">>> GL DEBUG = {:?}", message);
+  println!(">>> [GL DEBUG] id: {:?} message: {:?} source: {:?} type: {:?} severity: {:?}",
+    id, message, source, gltype, severity);
 }
 
 pub fn run(capture_provider: Arc<CaptureProvider>, calibration_data: k4a_sys::k4a_calibration_t) {
@@ -136,7 +137,10 @@ pub fn run(capture_provider: Arc<CaptureProvider>, calibration_data: k4a_sys::k4
   // Load the OpenGL function pointers
   gl::load_with(|symbol| gl_window.get_proc_address(symbol));
 
-  let mut visualizer = PointCloudVisualizer::new(false, calibration_data);
+  let mut visualizer = PointCloudVisualizer::new(
+    true,
+    calibration_data
+  );
 
   // TODO - constructed in PointCloudWindow.
   /*
@@ -148,9 +152,11 @@ pub fn run(capture_provider: Arc<CaptureProvider>, calibration_data: k4a_sys::k4
   */
 
   unsafe {
+    // Set debugging. This can be expensive, so we should be able to trigger it with a flag.
     gl::Enable(gl::DEBUG_OUTPUT);
     gl::Enable(gl::DEBUG_OUTPUT_SYNCHRONOUS);
     gl::DebugMessageCallback(Some(glDebugOutput), null());
+    // Opt into everything.
     gl::DebugMessageControl(gl::DONT_CARE, gl::DONT_CARE, gl::DONT_CARE, 0, null(), gl::TRUE);
   }
 
@@ -279,7 +285,7 @@ pub fn run(capture_provider: Arc<CaptureProvider>, calibration_data: k4a_sys::k4
 
   event_loop.run(move |event, window, control_flow| {
     //*control_flow = ControlFlow::Wait;
-    println!("\n\n------- event loop ------");
+    //println!("\n\n------- event loop ------");
     match event {
       Event::LoopDestroyed => return,
       Event::WindowEvent { event, .. } => match event {

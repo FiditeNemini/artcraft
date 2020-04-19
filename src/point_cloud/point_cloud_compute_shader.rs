@@ -144,6 +144,10 @@ impl PointCloudComputeShader {
       depth_image_id = gl::GetUniformLocation(program_id, DEPTH_IMAGE_PTR);
     }
 
+    println!("Uniform: dest_tex_id location = {:?}", dest_tex_id);
+    println!("Uniform: xy_table_id location = {:?}", xy_table_id);
+    println!("Uniform: depth_image_id location = {:?}", depth_image_id);
+
     PointCloudComputeShader {
       program_id,
       shader_id,
