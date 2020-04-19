@@ -247,7 +247,7 @@ impl PointCloudComputeShader {
       );
       gl::BindBuffer(gl::PIXEL_UNPACK_BUFFER, 0);
 
-      gl::UseProgram(self.shader_id);
+      gl::UseProgram(self.program_id);
 
       // Bind textures that we're going to pass to the texture
       gl::ActiveTexture(gl::TEXTURE0);
