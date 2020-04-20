@@ -19,14 +19,23 @@ use support;
 pub fn run(capture_provider: Arc<CaptureProvider>, calibration_data: k4a_sys::k4a_calibration_t) {
   let system = support::init(file!());
 
-  /*let mut visualizer = PointCloudVisualizer::new(
-    true,
-    calibration_data
-  );*/
-
   let context = system.display.get_context();
 
   enable_opengl_debugging();
+
+  let mut last_texture_id = 0;
+  unsafe {
+    gl::GetIntegerv(gl::TEXTURE_BINDING_2D, &mut last_texture_id);
+  }
+
+  let mut visualizer = PointCloudVisualizer::new(
+    true,
+    calibration_data
+  );
+
+  unsafe {
+    gl::BindTexture(gl::TEXTURE_2D, last_texture_id as u32);
+  }
 
   let mut texture = ViewerImage::create(
     800,
