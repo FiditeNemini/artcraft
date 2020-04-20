@@ -65,6 +65,7 @@ pub mod k4a_sys_wrapper;
 pub mod old_graphics_libraries;
 pub mod support;
 pub mod old_k4a_wrapper;
+pub mod gl_debug;
 pub mod opengl_wrapper;
 pub mod point_cloud;
 pub mod sensor_control;

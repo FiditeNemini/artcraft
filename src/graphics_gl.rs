@@ -26,6 +26,7 @@ use point_cloud::point_cloud_compute_shader::PointCloudComputeShader;
 use point_cloud::point_cloud_renderer_shader::PointCloudRendererShader;
 use point_cloud::point_cloud_visualiser::{PointCloudVisualizer, PointCloudVisualizerError};
 use point_cloud::viewer_image::ViewerImage;
+use gl_debug::enable_opengl_debugging;
 
 //use shader::Shader;
 
@@ -110,20 +111,6 @@ static TEXTURE_CHECKERBOARD : [GLfloat; 12] = [
   1.0, 1.0, 1.0,   0.0, 0.0, 0.0,
 ];
 
-extern "system" fn glDebugOutput(
-  source: GLenum,
-  gltype: GLenum,
-  id: GLuint,
-  severity: GLenum,
-  length: GLsizei,
-  message: *const GLchar,
-  userParam: *mut c_void)
-{
-  let message = unsafe { CStr::from_ptr(message) };
-  println!(">>> [GL DEBUG] id: {:?} message: {:?} source: {:?} type: {:?} severity: {:?}",
-    id, message, source, gltype, severity);
-}
-
 pub fn run(capture_provider: Arc<CaptureProvider>, calibration_data: k4a_sys::k4a_calibration_t) {
   let event_loop = EventLoop::new();
   let window = WindowBuilder::new();
@@ -151,14 +138,7 @@ pub fn run(capture_provider: Arc<CaptureProvider>, calibration_data: k4a_sys::k4
     }
   */
 
-  unsafe {
-    // Set debugging. This can be expensive, so we should be able to trigger it with a flag.
-    gl::Enable(gl::DEBUG_OUTPUT);
-    gl::Enable(gl::DEBUG_OUTPUT_SYNCHRONOUS);
-    gl::DebugMessageCallback(Some(glDebugOutput), null());
-    // Opt into everything.
-    gl::DebugMessageControl(gl::DONT_CARE, gl::DONT_CARE, gl::DONT_CARE, 0, null(), gl::TRUE);
-  }
+  enable_opengl_debugging();
 
   // Create GLSL shaders
   /*let vs = compile_shader(VERTEX_SHADER_SRC, gl::VERTEX_SHADER);

@@ -1,41 +1,41 @@
 use imgui::*;
 
-use support;
-use std::sync::Arc;
-use sensor_control::CaptureProvider;
-use point_cloud::point_cloud_visualiser::PointCloudVisualizer;
+use glium::Display;
+use glutin::ContextBuilder;
 use glutin::event::{Event, WindowEvent};
 use glutin::event_loop::{ControlFlow, EventLoop};
+use glium::backend::Facade;
 use glutin::window::WindowBuilder;
-use glutin::ContextBuilder;
+use point_cloud::point_cloud_visualiser::{PointCloudVisualizer, PointCloudVisualizerError};
+use point_cloud::viewer_image::ViewerImage;
+use sensor_control::CaptureProvider;
+use std::sync::Arc;
+use support;
+use gl_debug::enable_opengl_debugging;
 
 pub fn run(capture_provider: Arc<CaptureProvider>, calibration_data: k4a_sys::k4a_calibration_t) {
-  /*let event_loop = EventLoop::new();
-  let window = WindowBuilder::new();
-  let gl_window = ContextBuilder::new()
-      .build_windowed(window, &event_loop)
-      .unwrap();
-  // It is essential to make the context current before calling `gl::load_with`.
-  let gl_window = unsafe { gl_window.make_current() }.unwrap();
-
-  // Load the OpenGL function pointers
-  gl::load_with(|symbol| gl_window.get_proc_address(symbol));*/
-
   let system = support::init(file!());
 
-  // Load the OpenGL function pointers
-  //gl::load_with(|symbol| gl_window.get_proc_address(symbol));
-
-  let mut visualizer = PointCloudVisualizer::new(
+  /*let mut visualizer = PointCloudVisualizer::new(
     true,
     calibration_data
-  );
+  );*/
+
+  let context = system.display.get_context();
+
+  enable_opengl_debugging();
+
+  /*let mut texture = ViewerImage::create(
+    800,
+    800,
+    None,
+    None
+  ).expect("ViewerImage texture creation should work");*/
 
   system.main_loop(move |_, ui| {
-    println!("main loop");
-
     Window::new(im_str!("Hello world"))
-        .size([300.0, 110.0], Condition::FirstUseEver)
+        //.size([300.0, 110.0], Condition::FirstUseEver)
+        .size([300.0, 110.0], Condition::Always)
         .build(ui, || {
           ui.text(im_str!("Hello world!"));
           ui.text(im_str!("こんにちは世界！"));
@@ -47,5 +47,34 @@ pub fn run(capture_provider: Arc<CaptureProvider>, calibration_data: k4a_sys::k4
             mouse_pos[0], mouse_pos[1]
           ));
         });
+
+
+    // TODO: This belongs in a worker thread with buffers on both producer and consumer.
+    if let Some(capture) = capture_provider.get_capture() {
+      //println!("\n\n------- event loop: got capture ------");
+      //println!("capture: {:?}", capture.0);
+      unsafe {
+        // TODO: CLEARING FOR TEMPORARY DEBUGGING.
+        //gl::ClearColor(0.8, 0.0, 0.0, 1.0);
+        //gl::Clear(gl::COLOR_BUFFER_BIT);
+      }
+
+      /*visualizer.update_texture(&texture, capture)
+          .map(|_| {
+            println!("UPDATED TEXTURE!");
+          })
+          .map_err(|err| {
+            match err {
+              PointCloudVisualizerError::MissingDepthImage => { println!("Missing depth image"); },
+              PointCloudVisualizerError::MissingColorImage => { println!("Missing color image"); },
+              _ => {
+                unreachable!("Error: {:?}", err);
+              }
+            }
+          });*/
+
+      //println!("swapping buffers");
+      //gl_window.swap_buffers().unwrap();
+    }
   });
 }
