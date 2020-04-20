@@ -48,6 +48,9 @@ pub fn init(title: &str) -> System {
         platform.attach_window(imgui.io_mut(), &window, HiDpiMode::Rounded);
     }
 
+    // Load the OpenGL function pointers
+    gl::load_with(|symbol| display.gl_window().get_proc_address(symbol));
+
     let hidpi_factor = platform.hidpi_factor();
     let font_size = (13.0 * hidpi_factor) as f32;
     imgui.fonts().add_font(&[

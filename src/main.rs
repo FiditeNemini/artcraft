@@ -85,5 +85,5 @@ pub fn main() {
   //graphics_glium::run_glium();
   //graphics_gl::run(capture_provider2, calibration);
 
-  graphics_imgui::run();
+  graphics_imgui::run(capture_provider2, calibration);
 }
