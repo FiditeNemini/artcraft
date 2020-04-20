@@ -2,17 +2,22 @@
 
 #[macro_use] extern crate enum_primitive;
 #[macro_use] extern crate glium;
+#[macro_use] extern crate imgui;
+extern crate clipboard;
 extern crate genmesh;
 extern crate gl;
 extern crate glfw;
 extern crate glutin;
 extern crate grr;
 extern crate image;
+extern crate imgui_glium_renderer;
+extern crate imgui_winit_support;
 extern crate k4a_sys;
 extern crate libc;
 extern crate obj;
 extern crate opencv;
 extern crate rand;
+extern crate winit;
 
 use std::borrow::BorrowMut;
 use std::ffi::{c_void, CStr, CString};
@@ -55,12 +60,14 @@ use sensor_control::{capture_thread_to_texture, grab_single_frame, CaptureProvid
 
 pub mod conversion;
 pub mod graphics_gl;
-pub mod opengl_wrapper;
-pub mod old_graphics_libraries;
+pub mod graphics_imgui;
 pub mod k4a_sys_wrapper;
+pub mod old_graphics_libraries;
+pub mod support;
 pub mod old_k4a_wrapper;
-pub mod sensor_control;
+pub mod opengl_wrapper;
 pub mod point_cloud;
+pub mod sensor_control;
 
 pub fn main() {
   let device = Device::open(0).expect("Device should open");
@@ -76,5 +83,7 @@ pub fn main() {
 
   //graphics_grr::run(capture_provider2).unwrap();
   //graphics_glium::run_glium();
-  graphics_gl::run(capture_provider2, calibration);
+  //graphics_gl::run(capture_provider2, calibration);
+
+  graphics_imgui::run();
 }
