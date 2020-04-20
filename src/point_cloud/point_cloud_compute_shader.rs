@@ -351,8 +351,11 @@ impl PointCloudComputeShader {
       println!("-> gl::MemoryBarrier(TEXTURE_FETCH_BARRIER_BIT)");
       gl::MemoryBarrier(gl::TEXTURE_FETCH_BARRIER_BIT);
 
-      // TODO: Return status or error.
       gl_get_error()?;
+
+      // NB(bt): Restore to default active texture? Looks like this is required for 'imgui'
+      // This is needed despite using glGetInteger(GL_ACTIVE_TEXTURE) and resetting that value.
+      gl::ActiveTexture(gl::TEXTURE0);
 
       Ok(())
     }

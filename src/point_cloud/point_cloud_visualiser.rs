@@ -251,13 +251,13 @@ impl PointCloudVisualizer {
         return Err(PointCloudVisualizerError::FramebufferError);
       }
 
-      println!("-> gl::Viewport() {}x{}", self.width, self.height);
-      gl::Viewport(0, 0, self.width as i32, self.height as i32);
+      // TODO: This really warps things in 'imgui' land!
+      // gl::Viewport(0, 0, self.width as i32, self.height as i32);
 
       println!("-> gl::Enable(DEPTH_TEST");
       gl::Enable(gl::DEPTH_TEST);
-      //println!("-> gl::ClearColor()");
-      //gl::ClearColor(0.0, 0.0, 0.0, 0.0);
+      println!("-> gl::ClearColor()");
+      gl::ClearColor(0.0, 0.0, 0.0, 0.0);
       println!("-> gl::Clear(COLOR,DEPTH)");
       gl::Clear(gl::COLOR_BUFFER_BIT | gl::DEPTH_BUFFER_BIT);
     }

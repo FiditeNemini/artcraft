@@ -31,6 +31,8 @@ pub fn run(capture_provider: Arc<CaptureProvider>, calibration_data: k4a_sys::k4
   let mut last_vertex_array_binding = 0;
   let mut last_draw_framebuffer_binding = 0;
   let mut last_read_framebuffer_binding = 0;
+  let mut last_current_program = 0;
+  let mut last_active_texture = 0;
   unsafe {
     gl::GetIntegerv(gl::TEXTURE_BINDING_2D, &mut last_texture_id);
     gl::GetIntegerv(gl::ARRAY_BUFFER_BINDING, &mut last_array_buffer_id);
@@ -40,6 +42,8 @@ pub fn run(capture_provider: Arc<CaptureProvider>, calibration_data: k4a_sys::k4
     gl::GetIntegerv(gl::VERTEX_ARRAY_BINDING, &mut last_vertex_array_binding);
     gl::GetIntegerv(gl::DRAW_FRAMEBUFFER_BINDING, &mut last_draw_framebuffer_binding);
     gl::GetIntegerv(gl::READ_FRAMEBUFFER_BINDING, &mut last_read_framebuffer_binding);
+    gl::GetIntegerv(gl::CURRENT_PROGRAM, &mut last_current_program);
+    gl::GetIntegerv(gl::ACTIVE_TEXTURE, &mut last_active_texture);
   }
 
   let mut visualizer = PointCloudVisualizer::new(
@@ -56,6 +60,8 @@ pub fn run(capture_provider: Arc<CaptureProvider>, calibration_data: k4a_sys::k4
     gl::BindVertexArray(last_vertex_array_binding as u32);
     gl::BindFramebuffer(gl::DRAW_FRAMEBUFFER, last_draw_framebuffer_binding as u32);
     gl::BindFramebuffer(gl::READ_FRAMEBUFFER, last_read_framebuffer_binding as u32);
+    gl::UseProgram(last_current_program as u32);
+    gl::ActiveTexture(last_active_texture as u32);
   }
 
   let mut texture = ViewerImage::create(
@@ -100,6 +106,9 @@ pub fn run(capture_provider: Arc<CaptureProvider>, calibration_data: k4a_sys::k4
       let mut last_vertex_array_binding = 0;
       let mut last_draw_framebuffer_binding = 0;
       let mut last_read_framebuffer_binding = 0;
+      let mut last_current_program = 0;
+      let mut last_active_texture = 0;
+      let mut last_depth_test = 0;
       unsafe {
         gl::GetIntegerv(gl::TEXTURE_BINDING_2D, &mut last_texture_id);
         gl::GetIntegerv(gl::ARRAY_BUFFER_BINDING, &mut last_array_buffer_id);
@@ -109,6 +118,9 @@ pub fn run(capture_provider: Arc<CaptureProvider>, calibration_data: k4a_sys::k4
         gl::GetIntegerv(gl::VERTEX_ARRAY_BINDING, &mut last_vertex_array_binding);
         gl::GetIntegerv(gl::DRAW_FRAMEBUFFER_BINDING, &mut last_draw_framebuffer_binding);
         gl::GetIntegerv(gl::READ_FRAMEBUFFER_BINDING, &mut last_read_framebuffer_binding);
+        gl::GetIntegerv(gl::CURRENT_PROGRAM, &mut last_current_program);
+        gl::GetIntegerv(gl::ACTIVE_TEXTURE, &mut last_active_texture);
+        gl::GetBooleanv(gl::DEPTH_TEST, &mut last_depth_test);
       }
 
       visualizer.update_texture(&texture, capture)
@@ -134,6 +146,13 @@ pub fn run(capture_provider: Arc<CaptureProvider>, calibration_data: k4a_sys::k4
         gl::BindVertexArray(last_vertex_array_binding as u32);
         gl::BindFramebuffer(gl::DRAW_FRAMEBUFFER, last_draw_framebuffer_binding as u32);
         gl::BindFramebuffer(gl::READ_FRAMEBUFFER, last_read_framebuffer_binding as u32);
+        gl::UseProgram(last_current_program as u32);
+        gl::ActiveTexture(last_active_texture as u32);
+        if last_depth_test == 0 {
+          gl::Disable(gl::DEPTH_TEST);
+        } else {
+          gl::Enable(gl::DEPTH_TEST);
+        }
       }
 
       //println!("swapping buffers");
