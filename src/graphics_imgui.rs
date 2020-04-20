@@ -1,17 +1,20 @@
 use imgui::*;
 
+use gl::types::*;
+use gl;
+use gl_debug::enable_opengl_debugging;
 use glium::Display;
+use glium::backend::Facade;
 use glutin::ContextBuilder;
 use glutin::event::{Event, WindowEvent};
 use glutin::event_loop::{ControlFlow, EventLoop};
-use glium::backend::Facade;
 use glutin::window::WindowBuilder;
+use opengl_wrapper::{Texture, Buffer};
 use point_cloud::point_cloud_visualiser::{PointCloudVisualizer, PointCloudVisualizerError};
-use point_cloud::viewer_image::ViewerImage;
+use point_cloud::viewer_image::{ViewerImage, ImageDimensions};
 use sensor_control::CaptureProvider;
 use std::sync::Arc;
 use support;
-use gl_debug::enable_opengl_debugging;
 
 pub fn run(capture_provider: Arc<CaptureProvider>, calibration_data: k4a_sys::k4a_calibration_t) {
   let system = support::init(file!());
@@ -25,12 +28,12 @@ pub fn run(capture_provider: Arc<CaptureProvider>, calibration_data: k4a_sys::k4
 
   enable_opengl_debugging();
 
-  /*let mut texture = ViewerImage::create(
+  let mut texture = ViewerImage::create(
     800,
     800,
     None,
     None
-  ).expect("ViewerImage texture creation should work");*/
+  ).expect("ViewerImage texture creation should work");
 
   system.main_loop(move |_, ui| {
     Window::new(im_str!("Hello world"))

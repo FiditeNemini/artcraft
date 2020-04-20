@@ -97,7 +97,13 @@ impl ViewerImage {
       format.unwrap_or(gl::BGRA)
     )?;
 
+    // NB: To be a nice citizen with other tools, let's unbind.
+    let mut last_texture_id = 0;
+
     unsafe {
+      // NB: To be a good citizen, let's rebind the old texture.
+      gl::GetIntegerv(gl::TEXTURE_BINDING_2D, &mut last_texture_id);
+
       gl::BindTexture(gl::TEXTURE_2D, viewer_image.texture.id());
 
       gl::TexParameteri(gl::TEXTURE_2D, gl::TEXTURE_MIN_FILTER, gl::LINEAR as i32);
@@ -111,11 +117,11 @@ impl ViewerImage {
         width as i32,
         height as i32,
       );
-    }
 
-    unsafe {
-      //viewer_image.update_texture(data)?;
       viewer_image.update_texture(None)?;
+
+      // NB: To be a nice citizen with other tools, let's unbind.
+      gl::BindTexture(gl::TEXTURE_2D, last_texture_id as u32);
     }
 
     Ok(viewer_image)
