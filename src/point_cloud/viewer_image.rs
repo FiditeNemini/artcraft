@@ -89,6 +89,8 @@ impl ViewerImage {
     format: Option<GLenum>,
     internal_format: Option<GLenum>) -> Result<Self>
   {
+    println!("ViewerImage.create() =========================================");
+
     let dimensions = ImageDimensions { width, height };
     let mut viewer_image = ViewerImage::new(
       dimensions,
@@ -111,9 +113,10 @@ impl ViewerImage {
       );
     }
 
-    /*unsafe {
-      viewer_image.update_texture(data)?;
-    }*/
+    unsafe {
+      //viewer_image.update_texture(data)?;
+      viewer_image.update_texture(None)?;
+    }
 
     Ok(viewer_image)
   }
@@ -122,7 +125,8 @@ impl ViewerImage {
     self.texture.id()
   }
 
-  pub unsafe fn update_texture(&mut self, data: &[uint8_t]) -> Result<()> {
+  pub unsafe fn update_texture(&mut self, data: Option<&[uint8_t]>) -> Result<()> {
+    println!("ViewerImage.update_texture() =========================================");
     gl::BindBuffer(gl::PIXEL_UNPACK_BUFFER, self.texture_buffer.id());
     gl::BindTexture(gl::TEXTURE_2D, self.texture.id());
 
@@ -152,6 +156,18 @@ impl ViewerImage {
         std::fill(buffer, buffer + m_textureBufferSize, static_cast<uint8_t>(0));
     }
     */
+    match data {
+      Some(_) => {
+        // TODO - does this get used in k4a!?
+        unreachable!("TODO")
+      },
+      None => {
+        unsafe {
+          *buffer = std::mem::zeroed();
+        }
+
+      },
+    }
 
     let result = gl::UnmapBuffer(gl::PIXEL_UNPACK_BUFFER);
 

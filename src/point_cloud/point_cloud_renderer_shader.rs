@@ -93,15 +93,17 @@ void main()
     vec3 vertexPosition = imageLoad(pointCloudTexture, currentDepthPixelCoordinates).xyz;
 
     //gl_Position = projection * view * vec4(vertexPosition, 1);
-    gl_Position = vec4(vertexPosition, 1);
+    //gl_Position = vec4(vertexPosition, 1);
+    gl_Position = vec4(0.5, 0.5, 0.5, 1);
 
-    vertexColor = inColor;
+    //vertexColor = inColor;
+    vertexColor = vec4(0.0, 0.0, 1.0, 1.0);
 
     // Pass along the 'invalid pixel' flag as the alpha channel
     //
     if (vertexPosition.z == 0.0f)
     {
-        vertexColor.a = 0.0f;
+        //vertexColor.a = 0.0f;
     }
 
     if (enableShading)
@@ -286,7 +288,7 @@ impl PointCloudRendererShader {
       vertex_shader_id,
       fragment_shader_id,
       point_size: 2,
-      enable_shading: true,
+      enable_shading: false,
       vertex_array_size_bytes: 0,
       view_index,
       projection_index,
@@ -412,7 +414,7 @@ impl PointCloudRendererShader {
     }
 
     // Uniforms
-    // Bind our point cloud texture
+    // Bind our point cloud texture (which was written by the compute shader)
     unsafe {
       println!("-> gl::ActiveTexture(TEXTURE0)");
       gl::ActiveTexture(gl::TEXTURE0);
@@ -464,7 +466,7 @@ impl PointCloudRendererShader {
       let enable_shading = if self.enable_shading { 1 } else { 0 };
 
       // TODO: Not sure what is setting this false.
-      let enable_shading = 1;
+      //let enable_shading = 1;
       println!("Enable shading: {} -> {}", self.enable_shading, enable_shading);
 
 

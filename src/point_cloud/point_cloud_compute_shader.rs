@@ -340,6 +340,7 @@ impl PointCloudComputeShader {
       // Render point cloud
       println!("-> gl::DispatchCompute(): {}x{}",
         depth_image.get_width_pixels(), depth_image.get_height_pixels());
+
       gl::DispatchCompute(
         depth_image.get_width_pixels() as u32,
         depth_image.get_height_pixels() as u32,

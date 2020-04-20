@@ -237,6 +237,10 @@ impl PointCloudVisualizer {
       //  gl::FramebufferTexture(gl::FRAMEBUFFER, gl::COLOR_ATTACHMENT0, texture_buffer, 0);
       gl::FramebufferTexture(gl::FRAMEBUFFER, gl::COLOR_ATTACHMENT0, texture.texture_id(), 0);
 
+      // DrawBuffers writes to a COLOR BUFFER
+      //
+      // COLOR_ATTACHMENT{N} - The fragment shader output value is written into the nth color
+      // attachment of the current framebuffer.
       println!("-> gl::DrawBuffers(COLOR_ATTACHMENT0)");
       gl::DrawBuffers(1, &gl::COLOR_ATTACHMENT0);
 
@@ -430,7 +434,6 @@ impl PointCloudVisualizer {
     }
 
     self.xyz_texture.reset();
-
 
     if let Some(capture) = self.last_capture.as_ref() {
       let capture = (*capture).clone();

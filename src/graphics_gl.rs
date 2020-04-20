@@ -306,8 +306,8 @@ pub fn run(capture_provider: Arc<CaptureProvider>, calibration_data: k4a_sys::k4
         println!("Redraw requested.");
         unsafe {
           // Clear the screen to black
-          gl::ClearColor(0.3, 0.3, 0.3, 1.0);
-          gl::Clear(gl::COLOR_BUFFER_BIT);
+          //gl::ClearColor(0.3, 0.3, 0.3, 1.0);
+          //gl::Clear(gl::COLOR_BUFFER_BIT);
           // Draw a triangle from the 3 vertices
           //gl::DrawArrays(gl::TRIANGLES, 0, 3);
 
@@ -318,7 +318,7 @@ pub fn run(capture_provider: Arc<CaptureProvider>, calibration_data: k4a_sys::k4
             std::mem::transmute(&ELEMENTS[0])
           );*/
         }
-        gl_window.swap_buffers().unwrap();
+        //gl_window.swap_buffers().unwrap();
       },
       _ => (),
     }
@@ -368,8 +368,8 @@ pub fn run(capture_provider: Arc<CaptureProvider>, calibration_data: k4a_sys::k4
       println!("capture: {:?}", capture.0);
       unsafe {
         // TODO: CLEARING FOR TEMPORARY DEBUGGING.
-        //gl::ClearColor(0.8, 0.0, 0.0, 1.0);
-        //gl::Clear(gl::COLOR_BUFFER_BIT);
+        gl::ClearColor(0.8, 0.0, 0.0, 1.0);
+        gl::Clear(gl::COLOR_BUFFER_BIT);
       }
 
       visualizer.update_texture(&texture, capture)
@@ -385,6 +385,14 @@ pub fn run(capture_provider: Arc<CaptureProvider>, calibration_data: k4a_sys::k4
               }
             }
           });
+
+      /*TODO: Ugh, there has to be a way to debug this... unsafe {
+        gl::DrawArrays(
+          gl::POINTS,
+          0,
+          1000,
+        );
+      }*/
 
       println!("swapping buffers");
       gl_window.swap_buffers().unwrap();
