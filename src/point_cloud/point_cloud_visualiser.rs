@@ -256,8 +256,8 @@ impl PointCloudVisualizer {
 
       println!("-> gl::Enable(DEPTH_TEST");
       gl::Enable(gl::DEPTH_TEST);
-      println!("-> gl::ClearColor()");
-      gl::ClearColor(0.0, 0.0, 0.0, 0.0);
+      //println!("-> gl::ClearColor()");
+      //gl::ClearColor(0.0, 0.0, 0.0, 0.0);
       println!("-> gl::Clear(COLOR,DEPTH)");
       gl::Clear(gl::COLOR_BUFFER_BIT | gl::DEPTH_BUFFER_BIT);
     }

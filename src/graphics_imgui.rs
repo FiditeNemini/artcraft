@@ -24,8 +24,22 @@ pub fn run(capture_provider: Arc<CaptureProvider>, calibration_data: k4a_sys::k4
   enable_opengl_debugging();
 
   let mut last_texture_id = 0;
+  let mut last_array_buffer_id = 0;
+  let mut last_element_array_buffer_id = 0;
+  let mut last_pixel_unpack_buffer_id = 0;
+  let mut last_renderbuffer_binding = 0;
+  let mut last_vertex_array_binding = 0;
+  let mut last_draw_framebuffer_binding = 0;
+  let mut last_read_framebuffer_binding = 0;
   unsafe {
     gl::GetIntegerv(gl::TEXTURE_BINDING_2D, &mut last_texture_id);
+    gl::GetIntegerv(gl::ARRAY_BUFFER_BINDING, &mut last_array_buffer_id);
+    gl::GetIntegerv(gl::ELEMENT_ARRAY_BUFFER_BINDING, &mut last_element_array_buffer_id);
+    gl::GetIntegerv(gl::PIXEL_UNPACK_BUFFER_BINDING, &mut last_pixel_unpack_buffer_id);
+    gl::GetIntegerv(gl::RENDERBUFFER_BINDING, &mut last_renderbuffer_binding);
+    gl::GetIntegerv(gl::VERTEX_ARRAY_BINDING, &mut last_vertex_array_binding);
+    gl::GetIntegerv(gl::DRAW_FRAMEBUFFER_BINDING, &mut last_draw_framebuffer_binding);
+    gl::GetIntegerv(gl::READ_FRAMEBUFFER_BINDING, &mut last_read_framebuffer_binding);
   }
 
   let mut visualizer = PointCloudVisualizer::new(
@@ -35,6 +49,13 @@ pub fn run(capture_provider: Arc<CaptureProvider>, calibration_data: k4a_sys::k4
 
   unsafe {
     gl::BindTexture(gl::TEXTURE_2D, last_texture_id as u32);
+    gl::BindBuffer(gl::ARRAY_BUFFER, last_array_buffer_id as u32);
+    gl::BindBuffer(gl::ELEMENT_ARRAY_BUFFER, last_element_array_buffer_id as u32);
+    gl::BindBuffer(gl::PIXEL_UNPACK_BUFFER, last_pixel_unpack_buffer_id as u32);
+    gl::BindRenderbuffer(gl::RENDERBUFFER, last_renderbuffer_binding as u32);
+    gl::BindVertexArray(last_vertex_array_binding as u32);
+    gl::BindFramebuffer(gl::DRAW_FRAMEBUFFER, last_draw_framebuffer_binding as u32);
+    gl::BindFramebuffer(gl::READ_FRAMEBUFFER, last_read_framebuffer_binding as u32);
   }
 
   let mut texture = ViewerImage::create(
@@ -71,7 +92,26 @@ pub fn run(capture_provider: Arc<CaptureProvider>, calibration_data: k4a_sys::k4
         //gl::Clear(gl::COLOR_BUFFER_BIT);
       }
 
-      /*visualizer.update_texture(&texture, capture)
+      let mut last_texture_id = 0;
+      let mut last_array_buffer_id = 0;
+      let mut last_element_array_buffer_id = 0;
+      let mut last_pixel_unpack_buffer_id = 0;
+      let mut last_renderbuffer_binding = 0;
+      let mut last_vertex_array_binding = 0;
+      let mut last_draw_framebuffer_binding = 0;
+      let mut last_read_framebuffer_binding = 0;
+      unsafe {
+        gl::GetIntegerv(gl::TEXTURE_BINDING_2D, &mut last_texture_id);
+        gl::GetIntegerv(gl::ARRAY_BUFFER_BINDING, &mut last_array_buffer_id);
+        gl::GetIntegerv(gl::ELEMENT_ARRAY_BUFFER_BINDING, &mut last_element_array_buffer_id);
+        gl::GetIntegerv(gl::PIXEL_UNPACK_BUFFER_BINDING, &mut last_pixel_unpack_buffer_id);
+        gl::GetIntegerv(gl::RENDERBUFFER_BINDING, &mut last_renderbuffer_binding);
+        gl::GetIntegerv(gl::VERTEX_ARRAY_BINDING, &mut last_vertex_array_binding);
+        gl::GetIntegerv(gl::DRAW_FRAMEBUFFER_BINDING, &mut last_draw_framebuffer_binding);
+        gl::GetIntegerv(gl::READ_FRAMEBUFFER_BINDING, &mut last_read_framebuffer_binding);
+      }
+
+      visualizer.update_texture(&texture, capture)
           .map(|_| {
             println!("UPDATED TEXTURE!");
           })
@@ -83,7 +123,18 @@ pub fn run(capture_provider: Arc<CaptureProvider>, calibration_data: k4a_sys::k4
                 unreachable!("Error: {:?}", err);
               }
             }
-          });*/
+          });
+
+      unsafe {
+        gl::BindTexture(gl::TEXTURE_2D, last_texture_id as u32);
+        gl::BindBuffer(gl::ARRAY_BUFFER, last_array_buffer_id as u32);
+        gl::BindBuffer(gl::ELEMENT_ARRAY_BUFFER, last_element_array_buffer_id as u32);
+        gl::BindBuffer(gl::PIXEL_UNPACK_BUFFER, last_pixel_unpack_buffer_id as u32);
+        gl::BindRenderbuffer(gl::RENDERBUFFER, last_renderbuffer_binding as u32);
+        gl::BindVertexArray(last_vertex_array_binding as u32);
+        gl::BindFramebuffer(gl::DRAW_FRAMEBUFFER, last_draw_framebuffer_binding as u32);
+        gl::BindFramebuffer(gl::READ_FRAMEBUFFER, last_read_framebuffer_binding as u32);
+      }
 
       //println!("swapping buffers");
       //gl_window.swap_buffers().unwrap();
