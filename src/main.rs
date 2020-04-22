@@ -11,12 +11,15 @@ extern crate glutin;
 extern crate grr;
 extern crate image;
 extern crate imgui_glium_renderer;
+extern crate imgui_opengl_renderer;
+extern crate imgui_sdl2;
 extern crate imgui_winit_support;
 extern crate k4a_sys;
 extern crate libc;
 extern crate obj;
 extern crate opencv;
 extern crate rand;
+extern crate sdl2;
 extern crate winit;
 
 use std::borrow::BorrowMut;
