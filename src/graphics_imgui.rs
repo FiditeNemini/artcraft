@@ -88,6 +88,31 @@ pub fn run(capture_provider: Arc<CaptureProvider>, calibration_data: k4a_sys::k4
   let _gl_context = window.gl_create_context().expect("Couldn't create GL context");
   gl::load_with(|s| video.gl_get_proc_address(s) as _);
 
+  enable_opengl_debugging();
+
+  let mut last_texture_id = 0;
+  let mut last_array_buffer_id = 0;
+  let mut last_element_array_buffer_id = 0;
+  let mut last_pixel_unpack_buffer_id = 0;
+  let mut last_renderbuffer_binding = 0;
+  let mut last_vertex_array_binding = 0;
+  let mut last_draw_framebuffer_binding = 0;
+  let mut last_read_framebuffer_binding = 0;
+  let mut last_current_program = 0;
+  let mut last_active_texture = 0;
+
+  unsafe {
+    gl::GetIntegerv(gl::TEXTURE_BINDING_2D, &mut last_texture_id);
+    gl::GetIntegerv(gl::ARRAY_BUFFER_BINDING, &mut last_array_buffer_id);
+    gl::GetIntegerv(gl::ELEMENT_ARRAY_BUFFER_BINDING, &mut last_element_array_buffer_id);
+    gl::GetIntegerv(gl::PIXEL_UNPACK_BUFFER_BINDING, &mut last_pixel_unpack_buffer_id);
+    gl::GetIntegerv(gl::RENDERBUFFER_BINDING, &mut last_renderbuffer_binding);
+    gl::GetIntegerv(gl::VERTEX_ARRAY_BINDING, &mut last_vertex_array_binding);
+    gl::GetIntegerv(gl::DRAW_FRAMEBUFFER_BINDING, &mut last_draw_framebuffer_binding);
+    gl::GetIntegerv(gl::READ_FRAMEBUFFER_BINDING, &mut last_read_framebuffer_binding);
+    gl::GetIntegerv(gl::CURRENT_PROGRAM, &mut last_current_program);
+    gl::GetIntegerv(gl::ACTIVE_TEXTURE, &mut last_active_texture);
+  }
 
   let mut imgui = imgui::Context::create();
   imgui.set_ini_filename(None);
@@ -99,6 +124,26 @@ pub fn run(capture_provider: Arc<CaptureProvider>, calibration_data: k4a_sys::k4
     calibration_data
   );
 
+  unsafe {
+    gl::BindTexture(gl::TEXTURE_2D, last_texture_id as u32);
+    gl::BindBuffer(gl::ARRAY_BUFFER, last_array_buffer_id as u32);
+    gl::BindBuffer(gl::ELEMENT_ARRAY_BUFFER, last_element_array_buffer_id as u32);
+    gl::BindBuffer(gl::PIXEL_UNPACK_BUFFER, last_pixel_unpack_buffer_id as u32);
+    gl::BindRenderbuffer(gl::RENDERBUFFER, last_renderbuffer_binding as u32);
+    gl::BindVertexArray(last_vertex_array_binding as u32);
+    gl::BindFramebuffer(gl::DRAW_FRAMEBUFFER, last_draw_framebuffer_binding as u32);
+    gl::BindFramebuffer(gl::READ_FRAMEBUFFER, last_read_framebuffer_binding as u32);
+    gl::UseProgram(last_current_program as u32);
+    gl::ActiveTexture(last_active_texture as u32);
+  }
+
+  let mut texture = ViewerImage::create(
+    800,
+    800,
+    None,
+    None
+  ).expect("ViewerImage texture creation should work");
+  let imgui_texture_id_2 = TextureId::from(texture.texture_id() as usize);
 
 
   let mut imgui_sdl2 = imgui_sdl2::ImguiSdl2::new(&mut imgui, &window);
@@ -113,6 +158,31 @@ pub fn run(capture_provider: Arc<CaptureProvider>, calibration_data: k4a_sys::k4
   'running: loop {
     use sdl2::event::Event;
     use sdl2::keyboard::Keycode;
+
+    let mut last_texture_id = 0;
+    let mut last_array_buffer_id = 0;
+    let mut last_element_array_buffer_id = 0;
+    let mut last_pixel_unpack_buffer_id = 0;
+    let mut last_renderbuffer_binding = 0;
+    let mut last_vertex_array_binding = 0;
+    let mut last_draw_framebuffer_binding = 0;
+    let mut last_read_framebuffer_binding = 0;
+    let mut last_current_program = 0;
+    let mut last_active_texture = 0;
+    let mut last_depth_test = 0;
+    unsafe {
+      gl::GetIntegerv(gl::TEXTURE_BINDING_2D, &mut last_texture_id);
+      gl::GetIntegerv(gl::ARRAY_BUFFER_BINDING, &mut last_array_buffer_id);
+      gl::GetIntegerv(gl::ELEMENT_ARRAY_BUFFER_BINDING, &mut last_element_array_buffer_id);
+      gl::GetIntegerv(gl::PIXEL_UNPACK_BUFFER_BINDING, &mut last_pixel_unpack_buffer_id);
+      gl::GetIntegerv(gl::RENDERBUFFER_BINDING, &mut last_renderbuffer_binding);
+      gl::GetIntegerv(gl::VERTEX_ARRAY_BINDING, &mut last_vertex_array_binding);
+      gl::GetIntegerv(gl::DRAW_FRAMEBUFFER_BINDING, &mut last_draw_framebuffer_binding);
+      gl::GetIntegerv(gl::READ_FRAMEBUFFER_BINDING, &mut last_read_framebuffer_binding);
+      gl::GetIntegerv(gl::CURRENT_PROGRAM, &mut last_current_program);
+      gl::GetIntegerv(gl::ACTIVE_TEXTURE, &mut last_active_texture);
+      gl::GetBooleanv(gl::DEPTH_TEST, &mut last_depth_test);
+    }
 
     for event in event_pump.poll_iter() {
       imgui_sdl2.handle_event(&mut imgui, &event);
@@ -144,9 +214,14 @@ pub fn run(capture_provider: Arc<CaptureProvider>, calibration_data: k4a_sys::k4
       "Mouse Position: ({:.1},{:.1})",
       mouse_pos[0], mouse_pos[1]
     ));
+
     ui.separator();
 
     Image::new(imgui_texture_id, [100.0, 100.0]).build(&ui);
+
+    ui.separator();
+
+    Image::new(imgui_texture_id_2, [100.0, 100.0]).build(&ui);
 
     unsafe {
       gl::ClearColor(0.2, 0.2, 0.2, 1.0);
@@ -159,6 +234,41 @@ pub fn run(capture_provider: Arc<CaptureProvider>, calibration_data: k4a_sys::k4
     window.gl_swap_window();
 
     ::std::thread::sleep(::std::time::Duration::new(0, 1_000_000_000u32 / 60));
+
+    if let Some(capture) = capture_provider.get_capture() {
+      visualizer.update_texture(&texture, capture)
+          .map(|_| {
+            println!("UPDATED TEXTURE!");
+          })
+          .map_err(|err| {
+            match err {
+              PointCloudVisualizerError::MissingDepthImage => { println!("Missing depth image"); },
+              PointCloudVisualizerError::MissingColorImage => { println!("Missing color image"); },
+              _ => {
+                unreachable!("Error: {:?}", err);
+              }
+            }
+          });
+    }
+
+    unsafe {
+      gl::BindTexture(gl::TEXTURE_2D, last_texture_id as u32);
+      gl::BindBuffer(gl::ARRAY_BUFFER, last_array_buffer_id as u32);
+      gl::BindBuffer(gl::ELEMENT_ARRAY_BUFFER, last_element_array_buffer_id as u32);
+      gl::BindBuffer(gl::PIXEL_UNPACK_BUFFER, last_pixel_unpack_buffer_id as u32);
+      gl::BindRenderbuffer(gl::RENDERBUFFER, last_renderbuffer_binding as u32);
+      gl::BindVertexArray(last_vertex_array_binding as u32);
+      gl::BindFramebuffer(gl::DRAW_FRAMEBUFFER, last_draw_framebuffer_binding as u32);
+      gl::BindFramebuffer(gl::READ_FRAMEBUFFER, last_read_framebuffer_binding as u32);
+      gl::UseProgram(last_current_program as u32);
+      gl::ActiveTexture(last_active_texture as u32);
+      if last_depth_test == 0 {
+        gl::Disable(gl::DEPTH_TEST);
+      } else {
+        gl::Enable(gl::DEPTH_TEST);
+      }
+    }
+
   }
 
 
