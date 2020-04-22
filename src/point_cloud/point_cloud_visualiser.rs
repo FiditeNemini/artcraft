@@ -93,9 +93,6 @@ pub struct PointCloudVisualizer {
   // TODO: linmath::mat4x4 m_projection{};
   // TODO: linmath::mat4x4 m_view{};
 
-  width: u16,
-  height: u16,
-
   enable_color_point_cloud: bool,
   colorization_strategy: ColorizationStrategy,
 
@@ -171,10 +168,20 @@ impl PointCloudVisualizer {
       1, //k4a_sys::K4A_CALIBRATION_TYPE_COLOR,
     ).unwrap();
 
+    println!("color_xy_table size: {}x{} (stride = {})",
+      color_xy_table.get_width_pixels(),
+      color_xy_table.get_height_pixels(),
+      color_xy_table.get_stride_bytes());
+
     let depth_xy_table = PointCloudComputeShader::generate_xy_table(
       calibration_data.clone(),
       0, // k4a_sys::K4A_CALIBRATION_TYPE_DEPTH,
     ).unwrap();
+
+    println!("depth_xy_table size: {}x{} (stride = {})",
+      depth_xy_table.get_width_pixels(),
+      depth_xy_table.get_height_pixels(),
+      depth_xy_table.get_stride_bytes());
 
     // TODO: Entirely guessing here.
     /*let depth_image = Image::create(
@@ -185,8 +192,6 @@ impl PointCloudVisualizer {
     ).expect("should allocate");*/
 
     let mut visualizer = Self {
-      width: width as u16,
-      height: height as u16,
       enable_color_point_cloud,
       point_cloud_renderer: PointCloudRendererShader::new(),
       point_cloud_converter: PointCloudComputeShader::new(),
@@ -225,17 +230,13 @@ impl PointCloudVisualizer {
 
     // Set up rendering to a texture
     unsafe {
-      println!("-> gl::BindRenderbuffer(): {:?}", self.depth_buffer.id());
       gl::BindRenderbuffer(gl::RENDERBUFFER, self.depth_buffer.id());
-      println!("-> gl::BindFramebuffer(): {:?}", self.frame_buffer.id());
       gl::BindFramebuffer(gl::FRAMEBUFFER, self.frame_buffer.id());
     }
 
-    // CleanupGuard frameBufferBindingGuard([]() { glBindFramebuffer(GL_FRAMEBUFFER, 0); });
     let cleanup_guard = CleanupGuard {};
 
     unsafe {
-      println!("-> gl::FramebufferRenderbuffer(...)");
       gl::FramebufferRenderbuffer(
         gl::FRAMEBUFFER,
         gl::DEPTH_ATTACHMENT,
@@ -243,19 +244,13 @@ impl PointCloudVisualizer {
         self.depth_buffer.id()
       );
 
-      // TODO:
-      //  glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, static_cast<GLuint>(**texture), 0);
-      //  gl::FramebufferTexture(gl::FRAMEBUFFER, gl::COLOR_ATTACHMENT0, texture_buffer, 0);
       gl::FramebufferTexture(gl::FRAMEBUFFER, gl::COLOR_ATTACHMENT0, texture_id, 0);
 
       // DrawBuffers writes to a COLOR BUFFER
-      //
       // COLOR_ATTACHMENT{N} - The fragment shader output value is written into the nth color
       // attachment of the current framebuffer.
-      println!("-> gl::DrawBuffers(COLOR_ATTACHMENT0)");
       gl::DrawBuffers(1, &gl::COLOR_ATTACHMENT0);
 
-      println!("-> gl::CheckFramebufferStatus()");
       let frame_buffer_status = gl::CheckFramebufferStatus(gl::FRAMEBUFFER);
 
       if frame_buffer_status != gl::FRAMEBUFFER_COMPLETE {
@@ -263,13 +258,12 @@ impl PointCloudVisualizer {
       }
 
       // TODO: This really warps things in 'imgui' land!
-      // gl::Viewport(0, 0, self.width as i32, self.height as i32);
+      gl::Viewport(0, 0, 800, 800);
 
-      println!("-> gl::Enable(DEPTH_TEST");
       gl::Enable(gl::DEPTH_TEST);
-      println!("-> gl::ClearColor()");
       gl::ClearColor(0.0, 0.0, 0.0, 0.0);
-      println!("-> gl::Clear(COLOR,DEPTH)");
+      gl::ClearDepth(1.0);
+
       gl::Clear(gl::COLOR_BUFFER_BIT | gl::DEPTH_BUFFER_BIT);
     }
 
@@ -279,7 +273,6 @@ impl PointCloudVisualizer {
     let render_status = self.point_cloud_renderer.render();
 
     unsafe {
-      println!("-> gl::BindRenderbuffer(RENDERBUFFER, 0)");
       gl::BindRenderbuffer(gl::RENDERBUFFER, 0);
     }
 

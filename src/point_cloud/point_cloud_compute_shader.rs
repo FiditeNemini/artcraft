@@ -356,7 +356,7 @@ impl PointCloudComputeShader {
 
       // NB(bt): Restore to default active texture? Looks like this is required for 'imgui'
       // This is needed despite using glGetInteger(GL_ACTIVE_TEXTURE) and resetting that value.
-      gl::ActiveTexture(gl::TEXTURE0);
+      //gl::ActiveTexture(gl::TEXTURE0);
 
       Ok(())
     }
