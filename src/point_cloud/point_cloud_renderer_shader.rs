@@ -64,8 +64,8 @@ layout(location = 0) in vec4 inColor;
 
 out vec4 vertexColor;
 
-uniform mat4 view;
-uniform mat4 projection;
+//uniform mat4 view;
+//uniform mat4 projection;
 layout(rgba32f) readonly uniform image2D pointCloudTexture;
 uniform bool enableShading;
 
@@ -93,17 +93,19 @@ void main()
     vec3 vertexPosition = imageLoad(pointCloudTexture, currentDepthPixelCoordinates).xyz;
 
     //gl_Position = projection * view * vec4(vertexPosition, 1);
-    //gl_Position = vec4(vertexPosition, 1);
-    gl_Position = vec4(0.5, 0.5, 0.5, 1);
+    gl_Position = vec4(vertexPosition, 1);
+    //gl_Position = vec4(0.5, 0.5, 0.5, 1);
 
-    //vertexColor = inColor;
-    vertexColor = vec4(0.0, 0.0, 1.0, 1.0);
+    //TODO TEST WITH vertexColor = vec4(0.0, 0.0, 1.0, 1.0);
+    vertexColor = inColor;
 
     // Pass along the 'invalid pixel' flag as the alpha channel
     //
     if (vertexPosition.z == 0.0f)
     {
         //vertexColor.a = 0.0f;
+        vertexColor.a = 0.5f;
+        vertexColor.r = 0.5f;
     }
 
     if (enableShading)
@@ -159,8 +161,6 @@ void main()
 
         vertexColor = vec4(attenuation * diffuse * vertexColor.rgb, vertexColor.a);
     }
-
-    vertexColor = vec4(0.0, 1.0, 1.0, 1.0);
 }
 ";
 
@@ -176,14 +176,13 @@ uniform bool enableShading;
 
 void main()
 {
-    if (vertexColor.a == 0.0f)
-    {
-        discard;
-    }
+    // if (vertexColor.a == 0.0f)
+    // {
+    //     discard;
+    // }
 
-    //fragmentColor = vertexColor;
-
-    fragmentColor = vec4(0.5, 1.0, 0.0, 1.0);
+    // TODO TEST WITH : fragmentColor = vec4(0.5, 1.0, 0.0, 1.0);
+    fragmentColor = vertexColor;
 }
 ";
 
@@ -442,19 +441,12 @@ impl PointCloudRendererShader {
   }
 
   pub fn render(&self) -> Result<()> {
-    println!("==== Renderer.render() [the draw call]");
     unsafe {
-      println!("-> gl::Enable(DEPTH_TEST)");
       gl::Enable(gl::DEPTH_TEST);
-      println!("-> gl::Enable(BLEND)");
       gl::Enable(gl::BLEND);
-      println!("-> gl::BlendFunc(...)");
       gl::BlendFunc(gl::SRC_ALPHA, gl::ONE_MINUS_SRC_ALPHA);
-
-      println!("-> gl::PointSize(): {:?}", self.point_size as f32);
       gl::PointSize(self.point_size as f32);
 
-      println!("-> gl::UseProgram(): {:?}", self.program_id);
       gl::UseProgram(self.program_id);
 
       // TODO: view and projection matrices
@@ -464,30 +456,17 @@ impl PointCloudRendererShader {
 
       // Update render settings in shader
       let enable_shading = if self.enable_shading { 1 } else { 0 };
+      let enable_shading = 0; // TODO FIXME FIXME FIXME
 
-      // TODO: Not sure what is setting this false.
-      //let enable_shading = 1;
-      println!("Enable shading: {} -> {}", self.enable_shading, enable_shading);
-
-
-      println!("-> gl::Uniform1i(): {:?}", self.enable_shading_index);
       gl::Uniform1i(self.enable_shading_index, enable_shading);
 
       // glDrawArrays(GL_POINTS, 0, m_vertexArraySizeBytes / static_cast<GLsizei>(sizeof(BgraPixel)));
       let size = self.vertex_array_size_bytes / size_of::<BgraPixel>() as i32;
 
       // Render point cloud
-      println!("-> gl::BindVertexArray(): {:?}", self.vertex_array_object.id());
       gl::BindVertexArray(self.vertex_array_object.id());
-      println!("gl::DrawArrays - points in the point cloud; size = {} (indices to be rendered)", size);
-      println!("-> gl::DrawArrays(...)");
-      gl::DrawArrays(
-        gl::POINTS,
-        0,
-        size,
-      );
+      gl::DrawArrays(gl::POINTS, 0, size);
 
-      println!("-> gl::BindVertexArray(0)");
       gl::BindVertexArray(0);
 
       gl_get_error()

@@ -88,10 +88,12 @@ pub enum ColorizationStrategy {
 
 pub struct PointCloudVisualizer {
   // TODO: std::pair<DepthPixel, DepthPixel> m_expectedValueRange;
-  // TODO: ImageDimensions m_dimensions;
   // TODO: ViewControl m_viewControl;
   // TODO: linmath::mat4x4 m_projection{};
   // TODO: linmath::mat4x4 m_view{};
+
+  m_dimensions_width : i32,
+  m_dimensions_height : i32,
 
   enable_color_point_cloud: bool,
   colorization_strategy: ColorizationStrategy,
@@ -192,6 +194,8 @@ impl PointCloudVisualizer {
     ).expect("should allocate");*/
 
     let mut visualizer = Self {
+      m_dimensions_width: 1280, // Resolution of the point cloud texture
+      m_dimensions_height: 1152, // ImageDimensions PointCloudVisualizerTextureDimensions = { 1280, 1152 };
       enable_color_point_cloud,
       point_cloud_renderer: PointCloudRendererShader::new(),
       point_cloud_converter: PointCloudComputeShader::new(),
@@ -257,9 +261,7 @@ impl PointCloudVisualizer {
         return Err(PointCloudVisualizerError::FramebufferError);
       }
 
-      // TODO: This really warps things in 'imgui' land!
-      gl::Viewport(0, 0, 800, 800);
-
+      gl::Viewport(0, 0, self.m_dimensions_width, self.m_dimensions_height);
       gl::Enable(gl::DEPTH_TEST);
       gl::ClearColor(0.0, 0.0, 0.0, 0.0);
       gl::ClearDepth(1.0);
