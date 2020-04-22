@@ -294,6 +294,9 @@ impl PointCloudVisualizer {
       },
     };
 
+    println!("Depth image dimensions: {}x{}",
+      depth_image.get_width_pixels(), depth_image.get_height_pixels());
+
     let maybe_color_image = capture.get_color_image();
 
     if self.enable_color_point_cloud {
