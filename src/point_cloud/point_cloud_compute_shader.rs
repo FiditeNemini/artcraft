@@ -207,7 +207,7 @@ impl PointCloudComputeShader {
     let height = depth_image.get_height_pixels() as i32;
 
     if !output_texture.is_initialized() {
-      println!("Output texture is not initialized. Initializing.");
+      println!("      >>>>>> OUTPUT TEXTURE IS NOT INITIALIZED. INITIALIZING. <<<<<<<      ");
 
       output_texture.init();
 
@@ -259,9 +259,10 @@ impl PointCloudComputeShader {
       // std::copy(depthSrc, depthSrc + numBytes, textureMappedBuffer);
       // NB: Slightly different calculation; libc::uint16_t = u16 (TODO: is this byte multiples?)
       // Rust function copies count * size_of::<T>()
-      println!("Copying depth_src to texture_mapped_buffer");
       let count = (width * height * 2) as usize;
-      std::ptr::copy_nonoverlapping::<u8>(depth_src, texture_mapped_buffer as *mut u8, count);
+      println!("Copying depth_src to texture_mapped_buffer; count bytes = {}", num_bytes);
+
+      std::ptr::copy_nonoverlapping::<u8>(depth_src, texture_mapped_buffer as *mut u8, num_bytes as usize);
 
       println!("-> gl::UnmapBuffer(PIXEL_UNPACK_BUFFER)");
       let result = gl::UnmapBuffer(gl::PIXEL_UNPACK_BUFFER);

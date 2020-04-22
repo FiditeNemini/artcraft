@@ -120,7 +120,7 @@ pub struct PointCloudVisualizer {
 
   /// Holds the XYZ point cloud as a texture.
   /// Format is XYZA, where A (the alpha channel) is unused.
-  xyz_texture: Texture,
+  pub xyz_texture: Texture,
 
   color_xy_table: Image,
   depth_xy_table: Image,
@@ -141,6 +141,7 @@ impl Drop for CleanupGuard {
 
 impl PointCloudVisualizer {
   pub fn new(enable_color_point_cloud: bool,
+             initial_colorization_strategy: ColorizationStrategy,
              calibration_data: k4a_sys::k4a_calibration_t) -> Self
   {
     // TODO:
@@ -183,8 +184,6 @@ impl PointCloudVisualizer {
       0
     ).expect("should allocate");*/
 
-    let color_strategy = ColorizationStrategy::Color;
-
     let mut visualizer = Self {
       width: width as u16,
       height: height as u16,
@@ -195,7 +194,7 @@ impl PointCloudVisualizer {
       depth_buffer,
       color_xy_table,
       depth_xy_table,
-      colorization_strategy: color_strategy,
+      colorization_strategy: initial_colorization_strategy,
       calibration_data: calibration_data.clone(),
       transformation: Transformation::from_calibration(&calibration_data),
       last_capture: None,
@@ -204,7 +203,7 @@ impl PointCloudVisualizer {
       xyz_texture: Texture::new(),
     };
 
-    visualizer.set_colorization_strategy(color_strategy).expect("Should work");
+    visualizer.set_colorization_strategy(initial_colorization_strategy).expect("Should work");
 
     visualizer
   }
@@ -214,11 +213,12 @@ impl PointCloudVisualizer {
   }
 
   pub fn update_texture(&mut self, texture: &ViewerImage, capture: Capture) -> Result<()> {
+    println!("==== Visualizer.update_texture()");
     self.update_texture_id(texture.texture_id(), capture)
   }
 
   pub fn update_texture_id(&mut self, texture_id: GLuint, capture: Capture) -> Result<()> {
-    println!("==== Visualizer.update_texture()");
+    println!("==== Visualizer.update_texture_id()");
 
     // Update the point cloud renderer with the latest point data
     self.update_point_clouds(capture)?;
@@ -236,7 +236,13 @@ impl PointCloudVisualizer {
 
     unsafe {
       println!("-> gl::FramebufferRenderbuffer(...)");
-      gl::FramebufferRenderbuffer(gl::FRAMEBUFFER, gl::DEPTH_ATTACHMENT, gl::RENDERBUFFER, self.depth_buffer.id());
+      gl::FramebufferRenderbuffer(
+        gl::FRAMEBUFFER,
+        gl::DEPTH_ATTACHMENT,
+        gl::RENDERBUFFER,
+        self.depth_buffer.id()
+      );
+
       // TODO:
       //  glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, static_cast<GLuint>(**texture), 0);
       //  gl::FramebufferTexture(gl::FRAMEBUFFER, gl::COLOR_ATTACHMENT0, texture_buffer, 0);
@@ -428,13 +434,17 @@ impl PointCloudVisualizer {
       self.point_cloud_converter.set_active_xy_table(&self.color_xy_table)?;
 
     } else {
-      let stride =
-          self.calibration_data.depth_camera_calibration.resolution_width * size_of::<BgraPixel>() as i32;
+      let width = self.calibration_data.depth_camera_calibration.resolution_width as u32;
+      let height = self.calibration_data.depth_camera_calibration.resolution_height as u32;
+      let stride = width as i32 * size_of::<BgraPixel>() as i32;
+
+      // Calibration resolution: 640 x 576 (stride: 2560) -- really!? That's low res.
+      println!("Calibration resolution: {} x {} (stride: {})", width, height, stride);
 
       self.point_cloud_colorization = Some(Image::create(
-        ImageFormat::Depth16,
-        self.calibration_data.color_camera_calibration.resolution_width as u32,
-        self.calibration_data.color_camera_calibration.resolution_height as u32,
+        ImageFormat::ColorBgra32,
+        width,
+        height,
         stride as u32,
       ).expect("Construction should work FIXME"));
 
@@ -444,8 +454,11 @@ impl PointCloudVisualizer {
     self.xyz_texture.reset();
 
     if let Some(capture) = self.last_capture.as_ref() {
+      println!("calling update_point_clouds...");
       let capture = (*capture).clone();
       self.update_point_clouds(capture);
+    } else {
+      println!("NO LAST CAPTURE!?");
     }
 
     Ok(())

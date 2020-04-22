@@ -24,7 +24,7 @@ use sensor_control::CaptureProvider;
 use point_cloud;
 use point_cloud::point_cloud_compute_shader::PointCloudComputeShader;
 use point_cloud::point_cloud_renderer_shader::PointCloudRendererShader;
-use point_cloud::point_cloud_visualiser::{PointCloudVisualizer, PointCloudVisualizerError};
+use point_cloud::point_cloud_visualiser::{PointCloudVisualizer, PointCloudVisualizerError, ColorizationStrategy};
 use point_cloud::viewer_image::ViewerImage;
 use opengl::debug::enable_opengl_debugging;
 
@@ -126,6 +126,7 @@ pub fn run(capture_provider: Arc<CaptureProvider>, calibration_data: k4a_sys::k4
 
   let mut visualizer = PointCloudVisualizer::new(
     true,
+    ColorizationStrategy::Color,
     calibration_data
   );
 

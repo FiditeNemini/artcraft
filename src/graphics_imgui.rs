@@ -11,7 +11,7 @@ use glutin::event::{Event, WindowEvent};
 use glutin::event_loop::{ControlFlow, EventLoop};
 use glutin::window::WindowBuilder;
 use opengl_wrapper::{Texture, Buffer};
-use point_cloud::point_cloud_visualiser::{PointCloudVisualizer, PointCloudVisualizerError};
+use point_cloud::point_cloud_visualiser::{PointCloudVisualizer, PointCloudVisualizerError, ColorizationStrategy};
 use point_cloud::viewer_image::{ViewerImage, ImageDimensions};
 use sensor_control::CaptureProvider;
 use std::sync::Arc;
@@ -55,12 +55,14 @@ pub fn run(capture_provider: Arc<CaptureProvider>, calibration_data: k4a_sys::k4
   let imgui_texture_id = TextureId::from(gl_texture_id as usize);
 
   let mut visualizer = PointCloudVisualizer::new(
-    true,
+    false,
+    ColorizationStrategy::Simple,
     calibration_data
   );
 
   let mut gl_texture_id_3 = load_texture("sneslogo.png");
   let mut imgui_texture_id_3 = TextureId::from(gl_texture_id_3 as usize);
+  let mut imgui_texture_id_4 = TextureId::from(visualizer.xyz_texture.id() as usize);
 
 
   rebinder.restore();
@@ -146,11 +148,12 @@ pub fn run(capture_provider: Arc<CaptureProvider>, calibration_data: k4a_sys::k4
           // Depth image dimensions: 640x576
           // Take transformed depth image... 1280x720 [Depth16]
           Image::new(imgui_texture_id_3, [1280.0, 720.0]).build(&ui);
+          //Image::new(imgui_texture_id_4, [1280.0, 720.0]).build(&ui);
         });
 
     unsafe {
-      gl::ClearColor(0.2, 0.2, 0.2, 1.0);
-      gl::Clear(gl::COLOR_BUFFER_BIT);
+      //gl::ClearColor(0.2, 0.2, 0.2, 1.0);
+      //gl::Clear(gl::COLOR_BUFFER_BIT);
     }
 
     imgui_sdl2.prepare_render(&ui, &window);
