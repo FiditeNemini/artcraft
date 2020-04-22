@@ -96,7 +96,6 @@ void main()
     gl_Position = vec4(vertexPosition, 1);
     //gl_Position = vec4(0.5, 0.5, 0.5, 1);
 
-    //TODO TEST WITH vertexColor = vec4(0.0, 0.0, 1.0, 1.0);
     vertexColor = inColor;
 
     // Pass along the 'invalid pixel' flag as the alpha channel
@@ -181,14 +180,14 @@ void main()
     //     discard;
     // }
 
-    // TODO TEST WITH : fragmentColor = vec4(0.5, 1.0, 0.0, 1.0);
-    fragmentColor = vertexColor;
+    fragmentColor = vec4(0.5, 1.0, 0.0, 1.0);
+    //fragmentColor = vertexColor;
 }
 ";
 
 pub struct PointCloudRendererShader {
   /// The OpenGL program
-  program_id: GLuint,
+  shader_program_id: GLuint,
 
   /// The OpenGL vertex shader
   vertex_shader_id: GLuint,
@@ -283,7 +282,7 @@ impl PointCloudRendererShader {
     println!("Uniform point cloud texture location - view: {:?}", point_cloud_texture_index);
 
     Self {
-      program_id,
+      shader_program_id: program_id,
       vertex_shader_id,
       fragment_shader_id,
       point_size: 2,
@@ -313,22 +312,18 @@ impl PointCloudRendererShader {
     println!("==== Renderer.update_point_clouds() [buffering data]");
 
     unsafe {
-      println!("-> gl::BindVertexArray(): {:?}", self.vertex_array_object.id());
       gl::BindVertexArray(self.vertex_array_object.id());
 
       // Vertex Colors
-      println!("-> gl::BindBuffer(): {:?}", self.vertex_color_buffer_object.id());
       gl::BindBuffer(gl::ARRAY_BUFFER, self.vertex_color_buffer_object.id());
     }
 
     let color_image_size_bytes = color_image.get_size() as i32;
 
-    if self.vertex_array_size_bytes != color_image_size_bytes /* TODO TEMP ENABLE W/ +1 */ {
-      println!("Updating vertex array size bytes: {}", color_image_size_bytes);
+    if self.vertex_array_size_bytes != color_image_size_bytes {
       self.vertex_array_size_bytes = color_image_size_bytes;
 
       unsafe {
-        println!("-> gl::BufferData(...)");
         gl::BufferData(
           gl::ARRAY_BUFFER,
           self.vertex_array_size_bytes as isize,
@@ -338,13 +333,7 @@ impl PointCloudRendererShader {
       }
     }
 
-    gl_get_error()?; // TODO TEMPORARY DEBUG
-
     let vertex_mapped_buffer = unsafe {
-      // GLubyte *vertexMappedBuffer = reinterpret_cast<GLubyte *>(
-      println!("-> gl::MapBufferRange(...) [puts the buffer into client addr space] size = {}",
-        color_image_size_bytes);
-
       gl::MapBufferRange(
         gl::ARRAY_BUFFER,
         0,
@@ -353,53 +342,29 @@ impl PointCloudRendererShader {
       )
     };
 
-    println!("glMapBufferRange: memAddr = {:?} (bytes: {})", vertex_mapped_buffer, color_image_size_bytes);
-
     if vertex_mapped_buffer as usize == 0 {
-      // TODO: return glGetError() instead
-      return Err(PointCloudRendererError::UnknownError);
+      let error = gl_get_error().expect_err("should be map buffer range error");
+      return Err(PointCloudRendererError::OpenGlError(error));
     }
-
-    println!("color image: handle = {:?} size = {}x{}",
-      color_image.0,
-      color_image.get_width_pixels(),
-      color_image.get_height_pixels());
 
     let mut color_src = color_image.get_buffer();
 
-    unsafe {
-      println!(
-        "color image bytes: {:?} {:?} {:?} {:?} {:?} {:?}",
-        *color_src.offset(0),
-        *color_src.offset(100),
-        *color_src.offset(1000),
-        *color_src.offset(2000),
-        *color_src.offset(3000),
-        *color_src.offset(5000),
-      );
-    }
-
     let result = unsafe {
-      //const GLubyte *colorSrc = reinterpret_cast<const GLubyte *>(color.get_buffer());
-      //std::copy(colorSrc, colorSrc + colorImageSizeBytes, vertexMappedBuffer);
+      //std::ptr::copy::<u8>(color_src, vertex_mapped_buffer as *mut u8,
+      //  color_image_size_bytes as usize);
       std::ptr::copy_nonoverlapping::<u8>(color_src, vertex_mapped_buffer as *mut u8,
         color_image_size_bytes as usize);
-      std::ptr::copy::<u8>(color_src, vertex_mapped_buffer as *mut u8,
-        color_image_size_bytes as usize);
 
-      println!("-> gl::UnmapBuffer()");
       gl::UnmapBuffer(gl::ARRAY_BUFFER)
     };
 
     if result == gl::FALSE {
-      println!("Failure copying data / unmapping buffer");
-      return Err(PointCloudRendererError::UnknownError);
+      let error = gl_get_error().expect_err("should be unmap buffer error");
+      return Err(PointCloudRendererError::OpenGlError(error));
     }
 
     unsafe {
-      println!("-> gl::EnableVertexAttribArray(0)");
       gl::EnableVertexAttribArray(0);
-      println!("-> gl::VertexAttribPointer(...)");
       gl::VertexAttribPointer(
         0,
         gl::BGRA as i32,
@@ -408,18 +373,14 @@ impl PointCloudRendererShader {
         get_stride::<f32>(0),
         get_pointer_offset::<f32>(0),
       );
-      println!("-> gl::UseProgram(): {:?}", self.program_id);
-      gl::UseProgram(self.program_id);
+      gl::UseProgram(self.shader_program_id);
     }
 
     // Uniforms
     // Bind our point cloud texture (which was written by the compute shader)
     unsafe {
-      println!("-> gl::ActiveTexture(TEXTURE0)");
       gl::ActiveTexture(gl::TEXTURE0);
-      println!("-> gl::BindTexture(): {:?}", point_cloud_texture.id());
       gl::BindTexture(gl::TEXTURE_2D, point_cloud_texture.id());
-      println!("-> gl::BindImageTexture(...)");
       gl::BindImageTexture(
         0,
         point_cloud_texture.id(),
@@ -429,10 +390,8 @@ impl PointCloudRendererShader {
         gl::READ_ONLY,
         POINT_CLOUD_TEXTURE_FORMAT,
       );
-      println!("-> gl::Uniform1i(): {:?}", self.point_cloud_texture_index);
       gl::Uniform1i(self.point_cloud_texture_index, 0);
 
-      println!("-> gl::BindVertexArray(0)");
       gl::BindVertexArray(0);
     }
 
@@ -447,7 +406,7 @@ impl PointCloudRendererShader {
       gl::BlendFunc(gl::SRC_ALPHA, gl::ONE_MINUS_SRC_ALPHA);
       gl::PointSize(self.point_size as f32);
 
-      gl::UseProgram(self.program_id);
+      gl::UseProgram(self.shader_program_id);
 
       // TODO: view and projection matrices
       // Update view/projection matrices in shader
@@ -460,11 +419,9 @@ impl PointCloudRendererShader {
 
       gl::Uniform1i(self.enable_shading_index, enable_shading);
 
-      // glDrawArrays(GL_POINTS, 0, m_vertexArraySizeBytes / static_cast<GLsizei>(sizeof(BgraPixel)));
-      let size = self.vertex_array_size_bytes / size_of::<BgraPixel>() as i32;
-
       // Render point cloud
       gl::BindVertexArray(self.vertex_array_object.id());
+      let size = self.vertex_array_size_bytes / size_of::<BgraPixel>() as i32;
       gl::DrawArrays(gl::POINTS, 0, size);
 
       gl::BindVertexArray(0);
