@@ -1,19 +1,20 @@
 //! Based off Microsoft's MIT-licensed k4a library code and examples, specifically
 //! `k4apointcloudvisualizer.h`
 
-use point_cloud::point_cloud_renderer_shader::{PointCloudRendererShader, PointCloudRendererError};
-use k4a_sys_wrapper::{Capture, Transformation};
+use gl::types::*;
 use k4a_sys_wrapper::Image;
 use k4a_sys_wrapper::ImageFormat;
-use opengl_wrapper::{Texture, Renderbuffer, Framebuffer};
-use point_cloud::point_cloud_compute_shader::{PointCloudComputeShader, PointCloudComputeError};
-use std::fmt::{Error, Formatter};
+use k4a_sys_wrapper::{Capture, Transformation};
 use opengl_wrapper::OpenGlError;
+use opengl_wrapper::{Texture, Renderbuffer, Framebuffer};
 use point_cloud::pixel_structs::BgraPixel;
 use point_cloud::pixel_structs::DepthPixel;
-use std::mem::size_of;
+use point_cloud::point_cloud_compute_shader::{PointCloudComputeShader, PointCloudComputeError};
+use point_cloud::point_cloud_renderer_shader::{PointCloudRendererShader, PointCloudRendererError};
 use point_cloud::viewer_image::ViewerImage;
 use rand::Rng;
+use std::fmt::{Error, Formatter};
+use std::mem::size_of;
 
 pub type Result<T> = std::result::Result<T, PointCloudVisualizerError>;
 
@@ -213,6 +214,10 @@ impl PointCloudVisualizer {
   }
 
   pub fn update_texture(&mut self, texture: &ViewerImage, capture: Capture) -> Result<()> {
+    self.update_texture_id(texture.texture_id(), capture)
+  }
+
+  pub fn update_texture_id(&mut self, texture_id: GLuint, capture: Capture) -> Result<()> {
     println!("==== Visualizer.update_texture()");
 
     // Update the point cloud renderer with the latest point data
@@ -235,7 +240,7 @@ impl PointCloudVisualizer {
       // TODO:
       //  glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, static_cast<GLuint>(**texture), 0);
       //  gl::FramebufferTexture(gl::FRAMEBUFFER, gl::COLOR_ATTACHMENT0, texture_buffer, 0);
-      gl::FramebufferTexture(gl::FRAMEBUFFER, gl::COLOR_ATTACHMENT0, texture.texture_id(), 0);
+      gl::FramebufferTexture(gl::FRAMEBUFFER, gl::COLOR_ATTACHMENT0, texture_id, 0);
 
       // DrawBuffers writes to a COLOR BUFFER
       //

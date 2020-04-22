@@ -53,10 +53,15 @@ pub fn run(capture_provider: Arc<CaptureProvider>, calibration_data: k4a_sys::k4
 
   let gl_texture_id = load_texture("n64logo.png");
   let imgui_texture_id = TextureId::from(gl_texture_id as usize);
+
   let mut visualizer = PointCloudVisualizer::new(
     true,
     calibration_data
   );
+
+  let mut gl_texture_id_3 = load_texture("sneslogo.png");
+  let mut imgui_texture_id_3 = TextureId::from(gl_texture_id_3 as usize);
+
 
   rebinder.restore();
 
@@ -118,10 +123,13 @@ pub fn run(capture_provider: Arc<CaptureProvider>, calibration_data: k4a_sys::k4
     ui.separator();
 
     Image::new(imgui_texture_id, [100.0, 100.0]).build(&ui);
-
     ui.separator();
 
     Image::new(imgui_texture_id_2, [100.0, 100.0]).build(&ui);
+    ui.separator();
+
+    Image::new(imgui_texture_id_3, [100.0, 100.0]).build(&ui);
+    ui.separator();
 
     unsafe {
       gl::ClearColor(0.2, 0.2, 0.2, 1.0);
@@ -134,7 +142,7 @@ pub fn run(capture_provider: Arc<CaptureProvider>, calibration_data: k4a_sys::k4
     window.gl_swap_window();
 
     if let Some(capture) = capture_provider.get_capture() {
-      visualizer.update_texture(&texture, capture)
+      visualizer.update_texture_id(gl_texture_id_3, capture)
           .map(|_| {
             println!("UPDATED TEXTURE!");
           })
@@ -155,8 +163,7 @@ pub fn run(capture_provider: Arc<CaptureProvider>, calibration_data: k4a_sys::k4
   }
 }
 
-
-fn asdf(capture_provider: Arc<CaptureProvider>, calibration_data: k4a_sys::k4a_calibration_t) {
+/*fn asdf(capture_provider: Arc<CaptureProvider>, calibration_data: k4a_sys::k4a_calibration_t) {
   let system = support::init(file!());
 
   let context = system.display.get_context();
@@ -329,4 +336,4 @@ fn asdf(capture_provider: Arc<CaptureProvider>, calibration_data: k4a_sys::k4a_c
       //gl_window.swap_buffers().unwrap();
     }
   });
-}
+}*/
