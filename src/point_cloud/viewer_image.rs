@@ -89,8 +89,6 @@ impl ViewerImage {
     format: Option<GLenum>,
     internal_format: Option<GLenum>) -> Result<Self>
   {
-    println!("ViewerImage.create() =========================================");
-
     let dimensions = ImageDimensions { width, height };
     let mut viewer_image = ViewerImage::new(
       dimensions,
@@ -132,7 +130,6 @@ impl ViewerImage {
   }
 
   pub unsafe fn update_texture(&mut self, data: Option<&[uint8_t]>) -> Result<()> {
-    println!("ViewerImage.update_texture() =========================================");
     gl::BindBuffer(gl::PIXEL_UNPACK_BUFFER, self.texture_buffer.id());
     gl::BindTexture(gl::TEXTURE_2D, self.texture.id());
 

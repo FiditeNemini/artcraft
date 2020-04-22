@@ -7,6 +7,7 @@ extern crate clipboard;
 extern crate genmesh;
 extern crate gl;
 extern crate glfw;
+extern crate glfw_sys;
 extern crate glutin;
 extern crate grr;
 extern crate image;

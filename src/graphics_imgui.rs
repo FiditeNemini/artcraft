@@ -44,7 +44,7 @@ pub fn run(capture_provider: Arc<CaptureProvider>, calibration_data: k4a_sys::k4
   let _gl_context = window.gl_create_context().expect("Couldn't create GL context");
   gl::load_with(|s| video.gl_get_proc_address(s) as _);
 
-  enable_opengl_debugging();
+  //enable_opengl_debugging();
 
   let mut rebinder = Rebinder::snapshot();
 
@@ -65,7 +65,7 @@ pub fn run(capture_provider: Arc<CaptureProvider>, calibration_data: k4a_sys::k4
   let mut imgui_texture_id_4 = TextureId::from(visualizer.xyz_texture.id() as usize);
 
 
-  rebinder.restore();
+  //rebinder.restore();
 
   let mut texture = ViewerImage::create(
     800,
@@ -177,7 +177,7 @@ pub fn run(capture_provider: Arc<CaptureProvider>, calibration_data: k4a_sys::k4
           });
     }
 
-    rebinder.restore();
+    //rebinder.restore();
 
     std::thread::sleep(::std::time::Duration::new(0, 1_000_000_000u32 / 60));
   }

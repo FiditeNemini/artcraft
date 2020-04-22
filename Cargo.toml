@@ -15,6 +15,7 @@ genmesh = "0.6.0" # for glium example
 gfx = "0.18.2" # another high level OpenGL / multi-API abstraction?
 gl = "0.14.0" # this looks like bare bones OpenGL
 glfw = "0.37.0" # GL framework - windows, contexts, devices
+glfw-sys = "3.3.2" # Does this have linear algebra?
 glium = { version = "0.26.0", default-features = true } # high-level OpenGL abstraction (*not* vanilla OpenGL)
 glutin = "0.23.0" # used by glium example code
 grr = "0.7.0" # purports to be low-level OpenGL

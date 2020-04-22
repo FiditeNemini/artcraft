@@ -64,8 +64,8 @@ layout(location = 0) in vec4 inColor;
 
 out vec4 vertexColor;
 
-//uniform mat4 view;
-//uniform mat4 projection;
+uniform mat4 view;
+uniform mat4 projection;
 layout(rgba32f) readonly uniform image2D pointCloudTexture;
 uniform bool enableShading;
 
@@ -92,8 +92,8 @@ void main()
     ivec2 currentDepthPixelCoordinates = ivec2(gl_VertexID % pointCloudSize.x, gl_VertexID / pointCloudSize.x);
     vec3 vertexPosition = imageLoad(pointCloudTexture, currentDepthPixelCoordinates).xyz;
 
-    //gl_Position = projection * view * vec4(vertexPosition, 1);
-    gl_Position = vec4(vertexPosition, 1);
+    gl_Position = projection * view * vec4(vertexPosition, 1);
+    //gl_Position = vec4(vertexPosition, 1);
     //gl_Position = vec4(0.5, 0.5, 0.5, 1);
 
     vertexColor = inColor;
@@ -195,8 +195,9 @@ pub struct PointCloudRendererShader {
   /// The OpenGL fragment shader
   fragment_shader_id: GLuint,
 
-  // TODO: matrix for view
-  // TODO: matrix for projection
+  // TODO: better matrix types
+  view: [f32; 16],
+  projection: [f32; 16],
 
   /// Renderer setting: size of the rendered points
   point_size: u8,
@@ -221,6 +222,24 @@ pub struct PointCloudRendererShader {
 
   vertex_array_object: VertexArray,
   vertex_color_buffer_object: Buffer,
+}
+
+const fn identity_matrix_4x4() -> [f32; 16] {
+  return [
+    1.0, 0.0, 0.0, 0.0,
+    0.0, 1.0, 0.0, 0.0,
+    0.0, 0.0, 1.0, 0.0,
+    0.0, 0.0, 0.0, 1.0,
+  ];
+}
+
+const fn zero_matrix_4x4() -> [f32; 16] {
+  return [
+    0.0, 0.0, 0.0, 0.0,
+    0.0, 0.0, 0.0, 0.0,
+    0.0, 0.0, 0.0, 0.0,
+    0.0, 0.0, 0.0, 0.0,
+  ];
 }
 
 impl PointCloudRendererShader {
@@ -282,6 +301,8 @@ impl PointCloudRendererShader {
     println!("Uniform point cloud texture location - view: {:?}", point_cloud_texture_index);
 
     Self {
+      view: identity_matrix_4x4(),
+      projection: identity_matrix_4x4(),
       shader_program_id: program_id,
       vertex_shader_id,
       fragment_shader_id,
@@ -309,8 +330,6 @@ impl PointCloudRendererShader {
   pub fn update_point_clouds(&mut self, color_image: &k4a_sys_wrapper::Image,
                              point_cloud_texture: &Texture) -> Result<()>
   {
-    println!("==== Renderer.update_point_clouds() [buffering data]");
-
     unsafe {
       gl::BindVertexArray(self.vertex_array_object.id());
 
@@ -408,9 +427,9 @@ impl PointCloudRendererShader {
 
       gl::UseProgram(self.shader_program_id);
 
-      // TODO: view and projection matrices
       // Update view/projection matrices in shader
-      // glUniformMatrix4fv(m_viewIndex, 1, GL_FALSE, reinterpret_cast<const GLfloat *>(m_view));
+      gl::UniformMatrix4fv(self.view_index, 1, gl::FALSE, self.view.as_ptr());
+      gl::UniformMatrix4fv(self.projection_index, 1, gl::FALSE, self.projection.as_ptr());
       // glUniformMatrix4fv(m_projectionIndex, 1, GL_FALSE, reinterpret_cast<const GLfloat *>(m_projection));
 
       // Update render settings in shader
@@ -436,7 +455,6 @@ impl PointCloudRendererShader {
   }
 
   pub fn set_enable_shading(&mut self, enable_shading: bool) {
-    println!("renderer.set_enable_shading(): {}", enable_shading);
     self.enable_shading = enable_shading;
   }
 }

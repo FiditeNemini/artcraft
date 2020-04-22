@@ -130,9 +130,7 @@ struct CleanupGuard {}
 
 impl Drop for CleanupGuard {
   fn drop(&mut self) {
-    println!("Running CleanupGuard");
     unsafe {
-      println!("-> gl::BindFramebuffer(0) [cleanup]");
       gl::BindFramebuffer(gl::FRAMEBUFFER, 0);
     }
   }
@@ -170,20 +168,10 @@ impl PointCloudVisualizer {
       1, //k4a_sys::K4A_CALIBRATION_TYPE_COLOR,
     ).unwrap();
 
-    println!("color_xy_table size: {}x{} (stride = {})",
-      color_xy_table.get_width_pixels(),
-      color_xy_table.get_height_pixels(),
-      color_xy_table.get_stride_bytes());
-
     let depth_xy_table = PointCloudComputeShader::generate_xy_table(
       calibration_data.clone(),
       0, // k4a_sys::K4A_CALIBRATION_TYPE_DEPTH,
     ).unwrap();
-
-    println!("depth_xy_table size: {}x{} (stride = {})",
-      depth_xy_table.get_width_pixels(),
-      depth_xy_table.get_height_pixels(),
-      depth_xy_table.get_stride_bytes());
 
     // TODO: Entirely guessing here.
     /*let depth_image = Image::create(
@@ -222,13 +210,10 @@ impl PointCloudVisualizer {
   }
 
   pub fn update_texture(&mut self, texture: &ViewerImage, capture: Capture) -> Result<()> {
-    println!("==== Visualizer.update_texture()");
     self.update_texture_id(texture.texture_id(), capture)
   }
 
   pub fn update_texture_id(&mut self, texture_id: GLuint, capture: Capture) -> Result<()> {
-    println!("==== Visualizer.update_texture_id()");
-
     // Update the point cloud renderer with the latest point data
     self.update_point_clouds(capture)?;
 
@@ -283,20 +268,13 @@ impl PointCloudVisualizer {
   }
 
   fn update_point_clouds(&mut self, capture: Capture) -> Result<()> {
-    println!("==== Visualizer.update_point_clouds() [from kinect capture]");
-    println!("colorization strategy = {:?}", self.colorization_strategy);
-
     let mut depth_image = match capture.get_depth_image() {
       Ok(img) => img,
       Err(e) => {
-        println!("<< Missing Depth Image >> ");
         // Capture doesn't have depth info. Drop the capture.
         return Err(PointCloudVisualizerError::MissingDepthImage);
       },
     };
-
-    println!("Depth image dimensions: {}x{}",
-      depth_image.get_width_pixels(), depth_image.get_height_pixels());
 
     let maybe_color_image = capture.get_color_image();
 
@@ -349,10 +327,6 @@ impl PointCloudVisualizer {
 
     if self.colorization_strategy == ColorizationStrategy::Color {
       let color_image = maybe_color_image.expect("logic above should ensure present");
-      println!("Owning point_cloud_colorization image: {}x{} {:?}",
-        color_image.get_width_pixels(),
-        color_image.get_height_pixels(),
-        color_image.get_format());
       self.point_cloud_colorization = Some(color_image);
 
     } else {
@@ -449,11 +423,8 @@ impl PointCloudVisualizer {
     self.xyz_texture.reset();
 
     if let Some(capture) = self.last_capture.as_ref() {
-      println!("calling update_point_clouds...");
       let capture = (*capture).clone();
       self.update_point_clouds(capture);
-    } else {
-      println!("NO LAST CAPTURE!?");
     }
 
     Ok(())

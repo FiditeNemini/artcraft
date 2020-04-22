@@ -1492,6 +1492,7 @@ dependencies = [
  "gfx 0.18.2 (registry+https://github.com/rust-lang/crates.io-index)",
  "gl 0.14.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "glfw 0.37.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "glfw-sys 3.3.2 (registry+https://github.com/rust-lang/crates.io-index)",
  "glium 0.26.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "glutin 0.23.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "grr 0.7.0 (registry+https://github.com/rust-lang/crates.io-index)",
