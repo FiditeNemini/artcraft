@@ -1,4 +1,5 @@
 use imgui::*;
+use imgui::Image;
 
 use gl::types::*;
 use gl;
@@ -15,6 +16,55 @@ use point_cloud::viewer_image::{ViewerImage, ImageDimensions};
 use sensor_control::CaptureProvider;
 use std::sync::Arc;
 use support;
+use std::path::Path;
+use std::ffi::c_void;
+
+fn load_texture(filename: &str) -> GLuint {
+  let mut texture_id = 0;
+
+  unsafe {
+    gl::GenTextures(1, &mut texture_id);
+    gl::BindTexture(gl::TEXTURE_2D, texture_id);
+
+    // Set up filtering params and other texture attributes
+    gl::TexParameteri(gl::TEXTURE_2D, gl::TEXTURE_MIN_FILTER, gl::LINEAR as i32);
+    gl::TexParameteri(gl::TEXTURE_2D, gl::TEXTURE_MAG_FILTER, gl::LINEAR as i32);
+    gl::TexParameteri(gl::TEXTURE_2D, gl::TEXTURE_WRAP_S, gl::REPEAT as i32);
+    gl::TexParameteri(gl::TEXTURE_2D, gl::TEXTURE_WRAP_T, gl::REPEAT as i32);
+  }
+
+  let img = image::open(&Path::new(filename))
+      .expect("failed to load")
+      .to_rgba();
+
+  let width = img.dimensions().0 as i32;
+  let height = img.dimensions().1 as i32;
+  let data = img.into_raw();
+
+  println!("Loaded image: {}x{}", width, height);
+
+  unsafe {
+    gl::PixelStorei(gl::UNPACK_ROW_LENGTH, 0);
+    gl::TexImage2D(
+      gl::TEXTURE_2D,
+      0,
+      gl::RGBA as i32,
+      //format as i32,
+      width,
+      height,
+      0,
+      gl::RGBA,
+      //format,
+      gl::UNSIGNED_BYTE,
+      &data[0] as *const u8 as *const c_void,
+    );
+
+    //gl::BindTexture(gl::TEXTURE_2D, 0);
+  }
+
+  println!("Returning texture id: {}", texture_id);
+  return texture_id;
+}
 
 pub fn run(capture_provider: Arc<CaptureProvider>, calibration_data: k4a_sys::k4a_calibration_t) {
   let system = support::init(file!());
@@ -46,6 +96,9 @@ pub fn run(capture_provider: Arc<CaptureProvider>, calibration_data: k4a_sys::k4
     gl::GetIntegerv(gl::ACTIVE_TEXTURE, &mut last_active_texture);
   }
 
+  let gl_texture_id = load_texture("n64logo.png");
+  let imgui_texture_id = TextureId::from(gl_texture_id as usize);
+
   let mut visualizer = PointCloudVisualizer::new(
     true,
     calibration_data
@@ -71,6 +124,9 @@ pub fn run(capture_provider: Arc<CaptureProvider>, calibration_data: k4a_sys::k4
     None
   ).expect("ViewerImage texture creation should work");
 
+  let mut written = false;
+  //let mut loaded_texture = None;
+
   system.main_loop(move |_, ui| {
     Window::new(im_str!("Hello world"))
         //.size([300.0, 110.0], Condition::FirstUseEver)
@@ -85,6 +141,29 @@ pub fn run(capture_provider: Arc<CaptureProvider>, calibration_data: k4a_sys::k4
             "Mouse Position: ({:.1},{:.1})",
             mouse_pos[0], mouse_pos[1]
           ));
+          ui.separator();
+
+          /*// TODO: this segfaults.
+          //  https://github.com/ocornut/imgui/wiki/Image-Loading-and-Displaying-Examples
+          if written {
+            let texture_id = texture.texture_id() as usize;
+            let my_texture_id = TextureId::from(texture_id);
+            Image::new(my_texture_id, [100.0, 100.0]).build(ui);
+          }*/
+
+          /*match loaded_texture {
+            None => {
+              loaded_texture = Some(load_texture("n64logo.png"));
+            },
+            Some(texture_id) => {
+              let texture_id = texture_id as usize;
+              let my_texture_id = TextureId::from(texture_id);
+              Image::new(my_texture_id, [100.0, 100.0]).build(ui);
+            }
+          }*/
+
+          // TODO: This also segfaults.
+          //Image::new(imgui_texture_id, [100.0, 100.0]).build(ui);
         });
 
 
@@ -155,6 +234,7 @@ pub fn run(capture_provider: Arc<CaptureProvider>, calibration_data: k4a_sys::k4
         }
       }
 
+      written = true;
       //println!("swapping buffers");
       //gl_window.swap_buffers().unwrap();
     }
