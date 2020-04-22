@@ -26,7 +26,7 @@ use point_cloud::point_cloud_compute_shader::PointCloudComputeShader;
 use point_cloud::point_cloud_renderer_shader::PointCloudRendererShader;
 use point_cloud::point_cloud_visualiser::{PointCloudVisualizer, PointCloudVisualizerError};
 use point_cloud::viewer_image::ViewerImage;
-use gl_debug::enable_opengl_debugging;
+use opengl::debug::enable_opengl_debugging;
 
 //use shader::Shader;
 
