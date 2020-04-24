@@ -92,9 +92,20 @@ void main()
     ivec2 currentDepthPixelCoordinates = ivec2(gl_VertexID % pointCloudSize.x, gl_VertexID / pointCloudSize.x);
     vec3 vertexPosition = imageLoad(pointCloudTexture, currentDepthPixelCoordinates).xyz;
 
+    mat4 view2 = view; // Can't manipulate uniforms.
+    mat4 projection2 = view; // Can't manipulate uniforms.
+
+    //view2[0][3] = 2000.0f;
+    //view2[1][3] = 2000.0f;
+    //view2[2][3] = 8000.0f;
+
+    //projection2[0][0] = 109349.0f;
+    //projection2[1][3] = -100349.0f;
+    //projection2[3][2] = 10049.0f;
+
+
+    //gl_Position = projection2 * view2 * vec4(vertexPosition, 1);
     gl_Position = projection * view * vec4(vertexPosition, 1);
-    //gl_Position = vec4(vertexPosition, 1);
-    //gl_Position = vec4(0.5, 0.5, 0.5, 1);
 
     vertexColor = inColor;
 
@@ -175,13 +186,13 @@ uniform bool enableShading;
 
 void main()
 {
-    // if (vertexColor.a == 0.0f)
-    // {
-    //     discard;
-    // }
+    if (vertexColor.a == 0.0f)
+    {
+        discard;
+    }
 
-    fragmentColor = vec4(0.5, 1.0, 0.0, 1.0);
-    //fragmentColor = vertexColor;
+    //fragmentColor = vec4(0.5, 1.0, 0.0, 1.0);
+    fragmentColor = vertexColor;
 }
 ";
 
@@ -224,6 +235,15 @@ pub struct PointCloudRendererShader {
   vertex_color_buffer_object: Buffer,
 }
 
+const fn translation_matrix_4x4(x: f32, y: f32, z: f32) -> [f32; 16] {
+  return [
+    1.0, 0.0, 0.0, x,
+    0.0, 1.0, 0.0, y,
+    0.0, 0.0, 1.0, z,
+    0.0, 0.0, 0.0, 1.0,
+  ];
+}
+
 const fn identity_matrix_4x4() -> [f32; 16] {
   return [
     1.0, 0.0, 0.0, 0.0,
@@ -239,6 +259,26 @@ const fn zero_matrix_4x4() -> [f32; 16] {
     0.0, 0.0, 0.0, 0.0,
     0.0, 0.0, 0.0, 0.0,
     0.0, 0.0, 0.0, 0.0,
+  ];
+}
+
+/// This is the view matrix k4aviewer starts with
+const fn initial_view_matrix_4x4() -> [f32; 16] {
+  return [
+    -1.0,         0.0,    8.74228e-08, 0.0,
+    0.0,          1.0,    0.0,         0.0,
+    -8.74228e-08, 0.0,    -1.0,        0.0,
+    2.62268e-07,  1.0,    -5.0,        1.0,
+  ];
+}
+
+/// This is the projection matrix k4aviewer starts with
+const fn initial_projection_matrix_4x4() -> [f32; 16] {
+  return [
+    1.41272,    0.0,      0.0,      0.0,
+    0.0,        1.56969,  0.0,      0.0,
+    0.0,        0.0,      -1.002,   -1.0,
+    0.0,        0.0,      -0.2002,  0.0,
   ];
 }
 
@@ -301,8 +341,8 @@ impl PointCloudRendererShader {
     println!("Uniform point cloud texture location - view: {:?}", point_cloud_texture_index);
 
     Self {
-      view: identity_matrix_4x4(),
-      projection: identity_matrix_4x4(),
+      view: initial_view_matrix_4x4(),
+      projection: initial_projection_matrix_4x4(),
       shader_program_id: program_id,
       vertex_shader_id,
       fragment_shader_id,
