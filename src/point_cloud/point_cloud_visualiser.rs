@@ -380,12 +380,12 @@ impl PointCloudVisualizer {
         }*/
 
         // TODO: This should help us see output.
-        for i in 0 .. dst_length {
+        /*for i in 0 .. dst_length {
           dst_pixel_3[i].blue = rng.gen_range(0, 255);
           dst_pixel_3[i].green = rng.gen_range(0, 255);
           dst_pixel_3[i].red = rng.gen_range(0, 255);
           dst_pixel_3[i].alpha = rng.gen_range(0, 255);
-        }
+        }*/
       }
     }
 

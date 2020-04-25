@@ -33,7 +33,7 @@ pub fn run(capture_provider: Arc<CaptureProvider>, calibration_data: k4a_sys::k4
     gl_attr.set_context_version(3, 0);
   }
 
-  let window = video.window("rust-imgui-sdl2 demo", 2000, 2000)
+  let window = video.window("rust-imgui-sdl2 demo", 3000, 2000)
       .position_centered()
       .resizable()
       .opengl()
@@ -115,10 +115,11 @@ pub fn run(capture_provider: Arc<CaptureProvider>, calibration_data: k4a_sys::k4
     imgui.io_mut().delta_time = delta_s;
 
     let ui = imgui.frame();
-    ui.show_demo_window(&mut true);
+    //ui.show_demo_window(&mut true);
 
     Window::new(im_str!("Loading Images"))
         .size([1500.0, 1500.0], Condition::FirstUseEver)
+        .position([0.0, 0.0], Condition::FirstUseEver)
         .build(&ui, || {
           let mouse_pos = ui.io().mouse_pos;
           ui.text(format!(
@@ -128,27 +129,34 @@ pub fn run(capture_provider: Arc<CaptureProvider>, calibration_data: k4a_sys::k4
           ui.separator();
           Image::new(imgui_texture_n64, [100.0, 100.0]).build(&ui);
           ui.separator();
-          Image::new(imgui_texture_snes, [1280.0, 720.0]).build(&ui);
+          Image::new(imgui_texture_snes, [200.0, 200.0]).build(&ui);
           ui.separator();
         });
 
-    Window::new(im_str!("Visualizer XYZ Texture"))
-        .size([1500.0, 1500.0], Condition::FirstUseEver)
-        .build(&ui, || {
-          Image::new(imgui_visualizer_xyz_texture, [1280.0, 720.0]).build(&ui);
-        });
+    const window_width : f32 = 1290.0;
+    const window_height : f32 = 760.0;
+
     Window::new(im_str!("Point Cloud Converter Depth Image"))
-        .size([1500.0, 1500.0], Condition::FirstUseEver)
+        .size([window_width, window_height], Condition::FirstUseEver)
+        .position([0.0, 0.0], Condition::FirstUseEver)
         .build(&ui, || {
           Image::new(imgui_point_cloud_convert_depth_image, [1280.0, 720.0]).build(&ui);
         });
     Window::new(im_str!("Point Cloud Converter XY Table"))
-        .size([1500.0, 1500.0], Condition::FirstUseEver)
+        .size([window_width, window_height], Condition::FirstUseEver)
+        .position([0.0, window_height + 50.0], Condition::FirstUseEver)
         .build(&ui, || {
           Image::new(imgui_point_cloud_convert_xy_table, [1280.0, 720.0]).build(&ui);
         });
+    Window::new(im_str!("Visualizer XYZ Texture"))
+        .size([window_width, window_height], Condition::FirstUseEver)
+        .position([window_width + 50.0, 0.0], Condition::FirstUseEver)
+        .build(&ui, || {
+          Image::new(imgui_visualizer_xyz_texture, [1280.0, 720.0]).build(&ui);
+        });
     Window::new(im_str!("Final Output"))
-        .size([1500.0, 1500.0], Condition::FirstUseEver)
+        .size([window_width, window_height], Condition::FirstUseEver)
+        .position([window_width + 50.0, window_height + 50.0], Condition::FirstUseEver)
         .build(&ui, || {
           Image::new(imgui_kinect_final_output, [1280.0, 720.0]).build(&ui);
         });
