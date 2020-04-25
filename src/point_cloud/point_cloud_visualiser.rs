@@ -98,8 +98,8 @@ pub struct PointCloudVisualizer {
   enable_color_point_cloud: bool,
   colorization_strategy: ColorizationStrategy,
 
-  point_cloud_renderer: PointCloudRenderer,
-  point_cloud_converter: GpuPointCloudConverter,
+  pub point_cloud_renderer: PointCloudRenderer,
+  pub point_cloud_converter: GpuPointCloudConverter,
 
   calibration_data: k4a_sys::k4a_calibration_t,
   transformation: Transformation, // TODO: WAT k4a_sys::k4a_transformation_t

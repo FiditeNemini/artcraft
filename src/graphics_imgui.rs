@@ -51,19 +51,17 @@ pub fn run(capture_provider: Arc<CaptureProvider>, calibration_data: k4a_sys::k4
   let mut imgui = imgui::Context::create();
   imgui.set_ini_filename(None);
 
-  let gl_texture_id = load_texture("n64logo.png");
-  let imgui_texture_id = TextureId::from(gl_texture_id as usize);
+  let gl_texture_n64 = load_texture("n64logo.png");
+  let imgui_texture_n64 = TextureId::from(gl_texture_n64 as usize);
+
+  let mut gl_texture_snes = load_texture("sneslogo.png");
+  let mut imgui_texture_snes = TextureId::from(gl_texture_snes as usize);
 
   let mut visualizer = PointCloudVisualizer::new(
     true,
     ColorizationStrategy::Color,
     calibration_data
   );
-
-  let mut gl_texture_id_3 = load_texture("sneslogo.png");
-  let mut imgui_texture_id_3 = TextureId::from(gl_texture_id_3 as usize);
-  let mut imgui_texture_id_4 = TextureId::from(visualizer.xyz_texture.id() as usize);
-
 
   //rebinder.restore();
 
@@ -73,7 +71,12 @@ pub fn run(capture_provider: Arc<CaptureProvider>, calibration_data: k4a_sys::k4
     None,
     None
   ).expect("ViewerImage texture creation should work");
-  let imgui_texture_id_2 = TextureId::from(texture.texture_id() as usize);
+
+  let imgui_visualizer_xyz_texture = TextureId::from(visualizer.xyz_texture.id() as usize);
+  let imgui_point_cloud_convert_depth_image = TextureId::from(visualizer.point_cloud_converter.depth_image_texture.id() as usize);
+  let imgui_point_cloud_convert_xy_table= TextureId::from(visualizer.point_cloud_converter.xy_table_texture.id() as usize);
+
+  let imgui_kinect_final_output = TextureId::from(texture.texture_id() as usize);
 
 
   let mut imgui_sdl2 = imgui_sdl2::ImguiSdl2::new(&mut imgui, &window);
@@ -83,7 +86,6 @@ pub fn run(capture_provider: Arc<CaptureProvider>, calibration_data: k4a_sys::k4
   let mut event_pump = sdl_context.event_pump().unwrap();
 
   let mut last_frame = Instant::now();
-
 
   'running: loop {
     use sdl2::event::Event;
@@ -115,44 +117,45 @@ pub fn run(capture_provider: Arc<CaptureProvider>, calibration_data: k4a_sys::k4
     let ui = imgui.frame();
     ui.show_demo_window(&mut true);
 
-    ui.separator();
-    let mouse_pos = ui.io().mouse_pos;
-    ui.text(format!(
-      "Mouse Position: ({:.1},{:.1})",
-      mouse_pos[0], mouse_pos[1]
-    ));
-
-    ui.separator();
-
-    Image::new(imgui_texture_id, [100.0, 100.0]).build(&ui);
-    ui.separator();
-
-    Image::new(imgui_texture_id_2, [1280.0, 720.0]).build(&ui);
-
-    ui.separator();
-
-    Window::new(im_str!("Hello world"))
+    Window::new(im_str!("Loading Images"))
         .size([1500.0, 1500.0], Condition::FirstUseEver)
         .build(&ui, || {
-          ui.text(im_str!("Hello world!"));
-          ui.text(im_str!("こんにちは世界！"));
-          ui.text(im_str!("This...is...imgui-rs!"));
-          ui.separator();
           let mouse_pos = ui.io().mouse_pos;
           ui.text(format!(
             "Mouse Position: ({:.1},{:.1})",
             mouse_pos[0], mouse_pos[1]
           ));
           ui.separator();
-          // Depth image dimensions: 640x576
-          // Take transformed depth image... 1280x720 [Depth16]
-          Image::new(imgui_texture_id_2, [1280.0, 720.0]).build(&ui);
-          //Image::new(imgui_texture_id_4, [1280.0, 720.0]).build(&ui);
+          Image::new(imgui_texture_n64, [100.0, 100.0]).build(&ui);
+          ui.separator();
+          Image::new(imgui_texture_snes, [1280.0, 720.0]).build(&ui);
+          ui.separator();
+        });
+
+    Window::new(im_str!("Visualizer XYZ Texture"))
+        .size([1500.0, 1500.0], Condition::FirstUseEver)
+        .build(&ui, || {
+          Image::new(imgui_visualizer_xyz_texture, [1280.0, 720.0]).build(&ui);
+        });
+    Window::new(im_str!("Point Cloud Converter Depth Image"))
+        .size([1500.0, 1500.0], Condition::FirstUseEver)
+        .build(&ui, || {
+          Image::new(imgui_point_cloud_convert_depth_image, [1280.0, 720.0]).build(&ui);
+        });
+    Window::new(im_str!("Point Cloud Converter XY Table"))
+        .size([1500.0, 1500.0], Condition::FirstUseEver)
+        .build(&ui, || {
+          Image::new(imgui_point_cloud_convert_xy_table, [1280.0, 720.0]).build(&ui);
+        });
+    Window::new(im_str!("Final Output"))
+        .size([1500.0, 1500.0], Condition::FirstUseEver)
+        .build(&ui, || {
+          Image::new(imgui_kinect_final_output, [1280.0, 720.0]).build(&ui);
         });
 
     unsafe {
-      //gl::ClearColor(0.2, 0.2, 0.2, 1.0);
-      //gl::Clear(gl::COLOR_BUFFER_BIT);
+      gl::ClearColor(0.2, 0.2, 0.2, 1.0);
+      gl::Clear(gl::COLOR_BUFFER_BIT);
     }
 
     imgui_sdl2.prepare_render(&ui, &window);
