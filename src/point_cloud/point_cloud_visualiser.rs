@@ -9,8 +9,8 @@ use opengl_wrapper::OpenGlError;
 use opengl_wrapper::{Texture, Renderbuffer, Framebuffer};
 use point_cloud::pixel_structs::BgraPixel;
 use point_cloud::pixel_structs::DepthPixel;
-use point_cloud::point_cloud_compute_shader::{PointCloudComputeShader, PointCloudComputeError};
-use point_cloud::point_cloud_renderer_shader::{PointCloudRendererShader, PointCloudRendererError};
+use point_cloud::gpu_point_cloud_converter::{GpuPointCloudConverter, PointCloudComputeError};
+use point_cloud::point_cloud_renderer::{PointCloudRenderer, PointCloudRendererError};
 use point_cloud::viewer_image::ViewerImage;
 use rand::Rng;
 use std::fmt::{Error, Formatter};
@@ -98,8 +98,8 @@ pub struct PointCloudVisualizer {
   enable_color_point_cloud: bool,
   colorization_strategy: ColorizationStrategy,
 
-  point_cloud_renderer: PointCloudRendererShader,
-  point_cloud_converter: PointCloudComputeShader,
+  point_cloud_renderer: PointCloudRenderer,
+  point_cloud_converter: GpuPointCloudConverter,
 
   calibration_data: k4a_sys::k4a_calibration_t,
   transformation: Transformation, // TODO: WAT k4a_sys::k4a_transformation_t
@@ -167,12 +167,12 @@ impl PointCloudVisualizer {
     } k4a_calibration_type_t;*/
 
     // TODO: generate color xytable only on `enable_color_point_cloud`.
-    let color_xy_table = PointCloudComputeShader::generate_xy_table(
+    let color_xy_table = GpuPointCloudConverter::generate_xy_table(
       calibration_data.clone(),
       1, //k4a_sys::K4A_CALIBRATION_TYPE_COLOR,
     ).unwrap();
 
-    let depth_xy_table = PointCloudComputeShader::generate_xy_table(
+    let depth_xy_table = GpuPointCloudConverter::generate_xy_table(
       calibration_data.clone(),
       0, // k4a_sys::K4A_CALIBRATION_TYPE_DEPTH,
     ).unwrap();
@@ -189,8 +189,8 @@ impl PointCloudVisualizer {
       m_dimensions_width: 1280, // Resolution of the point cloud texture
       m_dimensions_height: 1152, // ImageDimensions PointCloudVisualizerTextureDimensions = { 1280, 1152 };
       enable_color_point_cloud,
-      point_cloud_renderer: PointCloudRendererShader::new(),
-      point_cloud_converter: PointCloudComputeShader::new(),
+      point_cloud_renderer: PointCloudRenderer::new(),
+      point_cloud_converter: GpuPointCloudConverter::new(),
       frame_buffer: Framebuffer::new_initialized(),
       depth_buffer,
       color_xy_table,

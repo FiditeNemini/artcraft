@@ -17,7 +17,7 @@ use libc;
 use opengl_wrapper::{Buffer, VertexArray, gl_get_error, OpenGlError};
 use opengl_wrapper::Texture;
 use point_cloud::compile_shader::compile_shader;
-use point_cloud::point_cloud_compute_shader::POINT_CLOUD_TEXTURE_FORMAT;
+use point_cloud::gpu_point_cloud_converter::POINT_CLOUD_TEXTURE_FORMAT;
 use graphics_gl::{get_stride, get_pointer_offset};
 use point_cloud::pixel_structs::BgraPixel;
 use point_cloud::point_cloud_visualiser::PointCloudVisualizer;
@@ -197,7 +197,7 @@ void main()
 }
 ";
 
-pub struct PointCloudRendererShader {
+pub struct PointCloudRenderer {
   /// The OpenGL program
   shader_program_id: GLuint,
 
@@ -283,7 +283,7 @@ const fn initial_projection_matrix_4x4() -> [f32; 16] {
   ];
 }
 
-impl PointCloudRendererShader {
+impl PointCloudRenderer {
 
   pub fn new() -> Self {
     // TODO: Init view and projection matrices
@@ -347,7 +347,7 @@ impl PointCloudRendererShader {
       shader_program_id: program_id,
       vertex_shader_id,
       fragment_shader_id,
-      point_size: 2,
+      point_size: 5,
       enable_shading: false,
       vertex_array_size_bytes: 0,
       view_index,

@@ -104,7 +104,7 @@ void main()
 /// need to pass this as the format argument to glBindImageTexture().
 pub const POINT_CLOUD_TEXTURE_FORMAT : GLuint = gl::RGBA32F;
 
-pub struct PointCloudComputeShader {
+pub struct GpuPointCloudConverter {
   /// The OpenGL program
   program_id: GLuint,
 
@@ -112,10 +112,10 @@ pub struct PointCloudComputeShader {
   shader_id: GLuint,
 
   /// The x,y table as a texture
-  xy_table_texture: Texture,
+  pub xy_table_texture: Texture,
 
   /// Preallocated texture for depth image so we don't have to reallocate every frame.
-  depth_image_texture: Texture,
+  pub depth_image_texture: Texture,
 
   depth_image_pixel_buffer: Buffer,
 
@@ -129,7 +129,7 @@ pub struct PointCloudComputeShader {
   depth_image_id: GLint,
 }
 
-impl PointCloudComputeShader {
+impl GpuPointCloudConverter {
 
   pub fn new() -> Self {
     let program_id = unsafe { gl::CreateProgram() };
@@ -163,7 +163,7 @@ impl PointCloudComputeShader {
     println!("Uniform: xy_table_id location = {:?}", xy_table_id);
     println!("Uniform: depth_image_id location = {:?}", depth_image_id);
 
-    PointCloudComputeShader {
+    GpuPointCloudConverter {
       program_id,
       shader_id,
       dest_tex_id,

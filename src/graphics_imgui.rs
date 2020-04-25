@@ -127,8 +127,7 @@ pub fn run(capture_provider: Arc<CaptureProvider>, calibration_data: k4a_sys::k4
     Image::new(imgui_texture_id, [100.0, 100.0]).build(&ui);
     ui.separator();
 
-    Image::new(imgui_texture_id_2, [100.0, 100.0]).build(&ui);
-    ui.separator();
+    Image::new(imgui_texture_id_2, [1280.0, 720.0]).build(&ui);
 
     ui.separator();
 
