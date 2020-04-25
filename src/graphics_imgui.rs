@@ -55,8 +55,8 @@ pub fn run(capture_provider: Arc<CaptureProvider>, calibration_data: k4a_sys::k4
   let imgui_texture_id = TextureId::from(gl_texture_id as usize);
 
   let mut visualizer = PointCloudVisualizer::new(
-    false,
-    ColorizationStrategy::Simple,
+    true,
+    ColorizationStrategy::Color,
     calibration_data
   );
 
@@ -147,7 +147,7 @@ pub fn run(capture_provider: Arc<CaptureProvider>, calibration_data: k4a_sys::k4
           ui.separator();
           // Depth image dimensions: 640x576
           // Take transformed depth image... 1280x720 [Depth16]
-          Image::new(imgui_texture_id_3, [1280.0, 720.0]).build(&ui);
+          Image::new(imgui_texture_id_2, [1280.0, 720.0]).build(&ui);
           //Image::new(imgui_texture_id_4, [1280.0, 720.0]).build(&ui);
         });
 
@@ -162,9 +162,8 @@ pub fn run(capture_provider: Arc<CaptureProvider>, calibration_data: k4a_sys::k4
     window.gl_swap_window();
 
     if let Some(capture) = capture_provider.get_capture() {
-      visualizer.update_texture_id(gl_texture_id_3, capture)
+      visualizer.update_texture_id(texture.texture_id(), capture)
           .map(|_| {
-            println!("UPDATED TEXTURE!");
           })
           .map_err(|err| {
             match err {

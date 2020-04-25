@@ -137,6 +137,10 @@ impl Drop for CleanupGuard {
 }
 
 impl PointCloudVisualizer {
+
+  ///
+  ///
+  ///
   pub fn new(enable_color_point_cloud: bool,
              initial_colorization_strategy: ColorizationStrategy,
              calibration_data: k4a_sys::k4a_calibration_t) -> Self
@@ -205,14 +209,23 @@ impl PointCloudVisualizer {
     visualizer
   }
 
+  ///
+  ///
+  ///
   pub fn set_point_size(&mut self, point_size: u8) {
     self.point_cloud_renderer.set_point_size(point_size);
   }
 
+  ///
+  ///
+  ///
   pub fn update_texture(&mut self, texture: &ViewerImage, capture: Capture) -> Result<()> {
     self.update_texture_id(texture.texture_id(), capture)
   }
 
+  ///
+  ///
+  ///
   pub fn update_texture_id(&mut self, texture_id: GLuint, capture: Capture) -> Result<()> {
     // Update the point cloud renderer with the latest point data
     self.update_point_clouds(capture)?;
@@ -267,6 +280,9 @@ impl PointCloudVisualizer {
         .map_err(|err| PointCloudVisualizerError::PointCloudRendererError(err))
   }
 
+  ///
+  ///
+  ///
   fn update_point_clouds(&mut self, capture: Capture) -> Result<()> {
     let mut depth_image = match capture.get_depth_image() {
       Ok(img) => img,
@@ -289,10 +305,10 @@ impl PointCloudVisualizer {
             .expect("Must be present");*/
 
         if let Some(transformed_depth_image) = self.transformed_depth_image.as_ref() {
-          println!("Take transformed depth image... {}x{} [{:?}]",
+          /*println!("Take transformed depth image... {}x{} [{:?}]",
             transformed_depth_image.get_width_pixels(),
             transformed_depth_image.get_height_pixels(),
-            transformed_depth_image.get_format());
+            transformed_depth_image.get_format());*/
 
           unsafe {
             // TODO: Totally missed error handling here.
@@ -307,7 +323,7 @@ impl PointCloudVisualizer {
               return Err(PointCloudVisualizerError::DepthToColorConversionFailed);
             }
 
-            println!("Saving transformed depth image: {:?}", transformed_depth_image.get_format());
+            //println!("Saving transformed depth image: {:?}", transformed_depth_image.get_format());
             depth_image = transformed_depth_image.clone();
           }
         }
@@ -381,6 +397,9 @@ impl PointCloudVisualizer {
     ).map_err(|err| PointCloudVisualizerError::PointCloudRendererError(err))
   }
 
+  ///
+  ///
+  ///
   pub fn set_colorization_strategy(&mut self, strategy: ColorizationStrategy) -> Result<()> {
     if strategy == ColorizationStrategy::Color && !self.enable_color_point_cloud {
       return Err(PointCloudVisualizerError::UnsupportedMode);
@@ -408,7 +427,7 @@ impl PointCloudVisualizer {
       let stride = width as i32 * size_of::<BgraPixel>() as i32;
 
       // Calibration resolution: 640 x 576 (stride: 2560) -- really!? That's low res.
-      println!("Calibration resolution: {} x {} (stride: {})", width, height, stride);
+      //println!("Calibration resolution: {} x {} (stride: {})", width, height, stride);
 
       self.point_cloud_colorization = Some(Image::create(
         ImageFormat::ColorBgra32,

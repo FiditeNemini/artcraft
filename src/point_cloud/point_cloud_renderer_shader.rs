@@ -92,8 +92,8 @@ void main()
     ivec2 currentDepthPixelCoordinates = ivec2(gl_VertexID % pointCloudSize.x, gl_VertexID / pointCloudSize.x);
     vec3 vertexPosition = imageLoad(pointCloudTexture, currentDepthPixelCoordinates).xyz;
 
-    mat4 view2 = view; // Can't manipulate uniforms.
-    mat4 projection2 = view; // Can't manipulate uniforms.
+    //mat4 view2 = view; // Can't manipulate uniforms.
+    //mat4 projection2 = view; // Can't manipulate uniforms.
 
     //view2[0][3] = 2000.0f;
     //view2[1][3] = 2000.0f;
@@ -105,6 +105,7 @@ void main()
 
 
     //gl_Position = projection2 * view2 * vec4(vertexPosition, 1);
+
     gl_Position = projection * view * vec4(vertexPosition, 1);
 
     vertexColor = inColor;
@@ -113,9 +114,9 @@ void main()
     //
     if (vertexPosition.z == 0.0f)
     {
-        //vertexColor.a = 0.0f;
-        vertexColor.a = 0.5f;
-        vertexColor.r = 0.5f;
+        vertexColor.a = 0.0f;
+        //vertexColor.a = 0.5f;
+        //vertexColor.r = 0.5f;
     }
 
     if (enableShading)
@@ -409,10 +410,14 @@ impl PointCloudRendererShader {
     let mut color_src = color_image.get_buffer();
 
     let result = unsafe {
-      //std::ptr::copy::<u8>(color_src, vertex_mapped_buffer as *mut u8,
-      //  color_image_size_bytes as usize);
-      std::ptr::copy_nonoverlapping::<u8>(color_src, vertex_mapped_buffer as *mut u8,
+      std::ptr::copy::<u8>(color_src, vertex_mapped_buffer as *mut u8,
         color_image_size_bytes as usize);
+
+      //std::ptr::copy_nonoverlapping::<u8>(color_src, vertex_mapped_buffer as *mut u8,
+      //  color_image_size_bytes as usize);
+
+      // TODO: Based on writing pure white, this isn't the problem:
+      //std::ptr::write_bytes(vertex_mapped_buffer as *mut u8, 255, color_image_size_bytes as usize);
 
       gl::UnmapBuffer(gl::ARRAY_BUFFER)
     };
@@ -432,12 +437,11 @@ impl PointCloudRendererShader {
         get_stride::<f32>(0),
         get_pointer_offset::<f32>(0),
       );
-      gl::UseProgram(self.shader_program_id);
-    }
 
-    // Uniforms
-    // Bind our point cloud texture (which was written by the compute shader)
-    unsafe {
+      gl::UseProgram(self.shader_program_id);
+
+      // Uniforms
+      // Bind our point cloud texture (which was written by the compute shader)
       gl::ActiveTexture(gl::TEXTURE0);
       gl::BindTexture(gl::TEXTURE_2D, point_cloud_texture.id());
       gl::BindImageTexture(
@@ -470,11 +474,10 @@ impl PointCloudRendererShader {
       // Update view/projection matrices in shader
       gl::UniformMatrix4fv(self.view_index, 1, gl::FALSE, self.view.as_ptr());
       gl::UniformMatrix4fv(self.projection_index, 1, gl::FALSE, self.projection.as_ptr());
-      // glUniformMatrix4fv(m_projectionIndex, 1, GL_FALSE, reinterpret_cast<const GLfloat *>(m_projection));
 
       // Update render settings in shader
       let enable_shading = if self.enable_shading { 1 } else { 0 };
-      let enable_shading = 0; // TODO FIXME FIXME FIXME
+      //let enable_shading = 1; // TODO FIXME FIXME FIXME
 
       gl::Uniform1i(self.enable_shading_index, enable_shading);
 

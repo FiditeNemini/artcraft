@@ -242,13 +242,19 @@ impl PointCloudComputeShader {
 
       let mut depth_src = depth_image.get_buffer();
 
+      // TODO TESTING
+      //std::ptr::write_bytes(texture_mapped_buffer as *mut u8, 120, num_bytes as usize);
+
       std::ptr::copy_nonoverlapping::<u8>(depth_src, texture_mapped_buffer as *mut u8, num_bytes as usize);
+
+      //std::ptr::copy::<u8>(depth_src, texture_mapped_buffer as *mut u8, num_bytes as usize);
 
       let result = gl::UnmapBuffer(gl::PIXEL_UNPACK_BUFFER);
       if result == gl::FALSE {
         return Err(PointCloudComputeError::UnknownError);
       }
 
+      // TODO: Changing the bounds here affected the "line" that is being rendered.
       gl::TexSubImage2D(
         gl::TEXTURE_2D, // target
         0, // level
@@ -328,6 +334,8 @@ impl PointCloudComputeShader {
     let width = xy_table.get_width_pixels() as i32;
     let height = xy_table.get_height_pixels() as i32;
 
+    println!("set_active_xy_table dims: {}x{}", width, height);
+
     // Upload the XY table as a texture so we can use it as a uniform
     self.xy_table_texture.init();
 
@@ -375,7 +383,6 @@ impl PointCloudComputeShader {
         gl::STREAM_DRAW,
       );
       gl::BindBuffer(gl::PIXEL_UNPACK_BUFFER, 0);
-
 
       gl::BindTexture(gl::TEXTURE_2D, self.depth_image_texture.id());
 
@@ -434,9 +441,6 @@ impl PointCloudComputeShader {
       stride_bytes,
     ).map_err(|_| PointCloudComputeError::UnknownError)?;
 
-    // k4a_float2_t *tableData = reinterpret_cast<k4a_float2_t *>(xyTable.get_buffer());
-    let mut xy_table_buffer = xy_table.get_buffer();
-
     // typedef union
     // {
     //     // XY or array representation of vector
@@ -474,11 +478,14 @@ impl PointCloudComputeShader {
     };
 
     let mut idx = 0;
-
-    let length = width*height;
+    //let length = width*height;
     unsafe {
-      let mut xy_table_buffer2: *mut k4a_sys::k4a_float2_t = std::mem::transmute_copy(&xy_table_buffer);
-      let mut xy_table_buffer3 = std::slice::from_raw_parts_mut(xy_table_buffer2, length as usize);
+      //let mut xy_table_buffer2: *mut k4a_sys::k4a_float2_t = std::mem::transmute(&table_data);
+      //let mut xy_table_buffer3 = std::slice::from_raw_parts_mut(xy_table_buffer2, length as usize);
+      //let xy_table_buffer2 = table_data as *mut k4a_sys::k4a_float2_t; // TODO: Don't use transmute!
+
+      let mut table_data = xy_table.get_buffer();
+      let mut typed_buffer = table_data as *mut k4a_sys::k4a_float2_t;
 
       for y in 0..height {
         p.xy.y = y as f32;
@@ -509,20 +516,55 @@ impl PointCloudComputeShader {
               /*if y % 10_000 == 0 {
                 println!("This pixel is GOOD: {}, {}", ray.xyz.x, ray.xyz.y);
               }*/
-              xy_table_buffer3[idx].xy.x = ray.xyz.x;
-              xy_table_buffer3[idx].xy.y = ray.xyz.y;
+              //typed_buffer[idx].xy.x = ray.xyz.x;
+              //typed_buffer[idx].xy.y = ray.xyz.y;
+              (*typed_buffer.offset(idx)).xy.x = ray.xyz.x;
+              (*typed_buffer.offset(idx)).xy.y = ray.xyz.y;
+              //xy_table_buffer3[idx].xy.x = 1.0;
+              //xy_table_buffer3[idx].xy.y = 1.0;
             }
           } else {
             unsafe {
               // This pixel is invalid
-              xy_table_buffer3[idx].xy.x = 0.0;
-              xy_table_buffer3[idx].xy.y = 0.0;
+              (*typed_buffer.offset(idx)).xy.x = 0.0;
+              (*typed_buffer.offset(idx)).xy.y = 0.0;
             }
           }
 
           idx += 1;
         }
       }
+
+      //let byte_size = width * height * size_of::<k4a_sys::k4a_float2_t>() as u32;
+      //std::ptr::write_bytes(table_data as *mut u8, 0, byte_size as usize);
+      /*println!("Table size: {} x {}", width , height);
+
+      // k4a_float2_t *tableData = reinterpret_cast<k4a_float2_t *>(xyTable.get_buffer());
+
+      println!("Created XY Table reports: {} x {} (stride = {}",
+        xy_table.get_width_pixels(),
+        xy_table.get_height_pixels(),
+        xy_table.get_stride_bytes(),
+      );
+
+      //let mut xy_table_buffer2: *mut k4a_sys::k4a_float2_t = std::mem::transmute::< k4a_sys::k4a_float2_t>(&table_data);
+      let mut xy_table_buffer2 = table_data as *mut k4a_sys::k4a_float2_t;
+      // TODO: When this is actually working, it should render a diagonal line...
+      let mut idx = 0;
+      for y in 0..height {
+        //println!("Y: {}", y);
+        for x in 0 .. width {
+          //println!("X: {}", x);
+          //println!("idx: {}", idx);
+          (*xy_table_buffer2.offset(idx)).xy.x = 0.0;
+          (*xy_table_buffer2.offset(idx)).xy.y = 0.0;
+          idx += 1;
+        }
+      }
+
+      let byte_size = width * height * size_of::<k4a_sys::k4a_float2_t>() as u32;
+      std::ptr::write_bytes(table_data, 0, byte_size as usize);*/
+
     }
 
     Ok(xy_table)
