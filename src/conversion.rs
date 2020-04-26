@@ -15,7 +15,7 @@ use glium::glutin::event_loop::{ControlFlow, EventLoop};
 use glium::Texture2d;
 use glium::texture::RawImage2d;
 use glium::vertex::VertexBufferAny;
-use image::{DynamicImage, ImageFormat};
+use image::{DynamicImage};
 use image::flat::{FlatSamples, SampleLayout};
 use image::GenericImage;
 use image::ImageBuffer;
@@ -33,6 +33,7 @@ use opencv::prelude::*;
 use k4a_sys_wrapper::Device;
 use k4a_sys_wrapper::device_get_installed_count;
 use k4a_sys_wrapper::Image;
+use point_cloud::pixel_structs::DepthPixel;
 
 /// We can't send trait 'Texture2dDataSource' impl 'RawImage2d' as it requires its data has
 /// the same lifetime, so here we collect it together here.
@@ -89,4 +90,37 @@ pub fn depth_to_image(image: &Image) -> Result<DynamicImage, ImageError> {
   img.copy_from(&view, 0, 0).expect("Should be able to copy");
 
   Ok(img)
+}
+
+// Not efficient, but good for debugging
+pub fn k4a_image_to_rust_image_for_debug(image: &Image) -> Result<RgbImage, ImageError> {
+  let width = image.get_width_pixels() as u32;
+  let height= image.get_height_pixels() as u32;
+  let image_buffer = image.get_buffer();
+  let image_format = image.get_format();
+
+  let rgb_image = match image_format {
+    Depth16 => {
+      let output_image = DynamicImage::new_rgb8(width, height);
+      let typed_buffer = image_buffer as *const DepthPixel;
+
+      let mut rgb_image = output_image.to_rgb();
+
+      let mut offset = 0;
+      for x in 0 .. width {
+        for y in 0 .. height {
+          let pixel = unsafe { *typed_buffer.offset(offset) };
+          let scaled_pixel = (pixel as f32 / std::u16::MAX as f32);
+          let scaled_pixel = (scaled_pixel * std::u8::MAX as f32) as u8;
+          rgb_image.put_pixel(x, y, Rgb([scaled_pixel, scaled_pixel, scaled_pixel]));
+          offset += 1;
+        }
+      }
+
+      rgb_image
+    },
+    _ => unimplemented!("conversion not implemented for: {:?}", image_format),
+  };
+
+  return Ok(rgb_image)
 }

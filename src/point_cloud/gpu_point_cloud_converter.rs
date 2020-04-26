@@ -20,6 +20,9 @@ use opengl_wrapper::{Buffer, gl_get_error};
 use opengl_wrapper::Texture;
 use opengl_wrapper::OpenGlError;
 use point_cloud::compile_shader::compile_shader;
+use point_cloud::pixel_structs::DepthPixel;
+use conversion::{depth_to_image, k4a_image_to_rust_image_for_debug};
+use std::path::Path;
 
 pub type Result<T> = std::result::Result<T, PointCloudComputeError>;
 
@@ -175,22 +178,22 @@ impl GpuPointCloudConverter {
     }
   }
 
-  // Takes depth data and turns it into a texture containing the XYZ coordinates of the depth map
-  // using the most recently set-to-active XY table.  The input depth image and output texture
-  // (if already set) must be of the same resolution that was used to generate that XY table, or
-  // else behavior is undefined.
-  //
-  // Essentially a reimplementation of k4a::transform::depth_image_to_point_cloud on the GPU.
-  // This is much more performant than k4a::transform::depth_image_to_point_cloud, but is a bit
-  // more unwieldly to use since you have to use its output in shaders.
-  //
-  // The output texture has an internal format of GL_RGBA32F and is intended to be used directly
-  // by other OpenGL shaders as an image2d uniform.
-  //
-  // To avoid excess image allocations, you can reuse a texture that was previously output
-  // by this function, provided the depth image and XY table previously used was for the same
-  // sized texture.
-  //
+  /// Takes depth data and turns it into a texture containing the XYZ coordinates of the depth map
+  /// using the most recently set-to-active XY table.  The input depth image and output texture
+  /// (if already set) must be of the same resolution that was used to generate that XY table, or
+  /// else behavior is undefined.
+  ///
+  /// Essentially a reimplementation of k4a::transform::depth_image_to_point_cloud on the GPU.
+  /// This is much more performant than k4a::transform::depth_image_to_point_cloud, but is a bit
+  /// more unwieldly to use since you have to use its output in shaders.
+  ///
+  /// The output texture has an internal format of GL_RGBA32F and is intended to be used directly
+  /// by other OpenGL shaders as an image2d uniform.
+  ///
+  /// To avoid excess image allocations, you can reuse a texture that was previously output
+  /// by this function, provided the depth image and XY table previously used was for the same
+  /// sized texture.
+  ///
   pub fn convert(&self,
                  depth_image: &k4a_sys_wrapper::Image,
                  output_texture: &mut Texture) -> Result<()>
@@ -199,6 +202,32 @@ impl GpuPointCloudConverter {
       // throw std::logic_error("You must call SetActiveXyTable at least once before calling Convert!");
       return Err(PointCloudComputeError::UnknownError);
     }
+
+    k4a_image_to_rust_image_for_debug(depth_image)
+        .expect("depth_to_image should work")
+        .save(Path::new("depth_before.png"))
+        .expect("should save");
+
+    unsafe {
+      let width = depth_image.get_width_pixels() as i32;
+      let height = depth_image.get_height_pixels() as i32;
+      let format = depth_image.get_format();
+      println!("Depth Image Dimensions: {}x{} (format: {:?})", width, height, format);
+
+      let depth_image_buffer = depth_image.get_buffer();
+      let mut typed_buffer = depth_image_buffer as *mut DepthPixel;
+
+      // TODO: This should overwrite the first 150 lines.
+      for i in 0 .. 1280 * 150 {
+        (*typed_buffer.offset(i)) = 5000;
+        (*typed_buffer.offset(i)) = 5000;
+      }
+    }
+
+    k4a_image_to_rust_image_for_debug(depth_image)
+        .expect("depth_to_image should work")
+        .save(Path::new("depth_after.png"))
+        .expect("should save");
 
     let width = depth_image.get_width_pixels() as i32;
     let height = depth_image.get_height_pixels() as i32;
@@ -227,6 +256,7 @@ impl GpuPointCloudConverter {
       gl::BindTexture(gl::TEXTURE_2D, self.depth_image_texture.id());
 
       let num_bytes: GLuint = (width * height * size_of::<u16>() as i32) as GLuint; // libc::uint16_t = u16
+      //let num_bytes: GLuint = (width * height * size_of::<DepthPixel>() as i32) as GLuint; // libc::uint16_t = u16
 
       // GLubyte *textureMappedBuffer = reinterpret_cast<GLubyte *>(...)
       let mut texture_mapped_buffer = gl::MapBufferRange(
@@ -242,19 +272,18 @@ impl GpuPointCloudConverter {
 
       let mut depth_src = depth_image.get_buffer();
 
-      // TODO TESTING
+      // TODO TESTING - setting this to nothing destroys the final output "line". Hmm...
       //std::ptr::write_bytes(texture_mapped_buffer as *mut u8, 120, num_bytes as usize);
 
-      std::ptr::copy_nonoverlapping::<u8>(depth_src, texture_mapped_buffer as *mut u8, num_bytes as usize);
-
-      //std::ptr::copy::<u8>(depth_src, texture_mapped_buffer as *mut u8, num_bytes as usize);
+      //std::ptr::copy_nonoverlapping::<u8>(depth_src, texture_mapped_buffer as *mut u8, num_bytes as usize);
+      std::ptr::copy::<u8>(depth_src, texture_mapped_buffer as *mut u8, num_bytes as usize);
 
       let result = gl::UnmapBuffer(gl::PIXEL_UNPACK_BUFFER);
       if result == gl::FALSE {
         return Err(PointCloudComputeError::UnknownError);
       }
 
-      // TODO: Changing the bounds here affected the "line" that is being rendered.
+      // TODO TESTING - Changing the bounds here affected the final output "line" that is being rendered.
       gl::TexSubImage2D(
         gl::TEXTURE_2D, // target
         0, // level

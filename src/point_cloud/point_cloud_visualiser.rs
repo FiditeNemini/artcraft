@@ -368,6 +368,7 @@ impl PointCloudVisualizer {
         let mut dst_pixel_2: *mut BgraPixel = std::mem::transmute_copy(&dst_pixel);
         let mut dst_pixel_3= std::slice::from_raw_parts_mut(dst_pixel_2, dst_length as usize);
 
+        //unimplemented!("FIX THIS SHIT. PROBABLY THE BUG");
         // TODO
         //  let end_pixel = dst_pixel_3 + dst_length;
         /*while src_pixel_3 != end_pixel {

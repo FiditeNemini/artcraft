@@ -410,14 +410,13 @@ impl PointCloudRenderer {
     let mut color_src = color_image.get_buffer();
 
     let result = unsafe {
-      std::ptr::copy::<u8>(color_src, vertex_mapped_buffer as *mut u8,
-        color_image_size_bytes as usize);
-
       //std::ptr::copy_nonoverlapping::<u8>(color_src, vertex_mapped_buffer as *mut u8,
       //  color_image_size_bytes as usize);
 
-      // TODO: Based on writing pure white, this isn't the problem:
+      // TODO TESTING - writing pure white changes the color of the final output "line" to white:
       //std::ptr::write_bytes(vertex_mapped_buffer as *mut u8, 255, color_image_size_bytes as usize);
+
+      std::ptr::copy::<u8>(color_src, vertex_mapped_buffer as *mut u8, color_image_size_bytes as usize);
 
       gl::UnmapBuffer(gl::ARRAY_BUFFER)
     };
