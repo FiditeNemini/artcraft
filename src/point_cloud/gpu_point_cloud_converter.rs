@@ -175,9 +175,9 @@ impl GpuPointCloudConverter {
       //dest_tex_id,
       xy_table_id,
       depth_image_id,
-      depth_image_texture: Texture::new(),
-      xy_table_texture: Texture::new(),
-      depth_image_pixel_buffer: Buffer::new(),
+      depth_image_texture: Texture::new_initialized(),
+      xy_table_texture: Texture::new_initialized(),
+      depth_image_pixel_buffer: Buffer::new_initialized(),
     }
   }
 
@@ -201,10 +201,7 @@ impl GpuPointCloudConverter {
                  depth_image: &k4a_sys_wrapper::Image,
                  output_texture: &mut Texture) -> Result<()>
   {
-    println!("Convert for XYZ Table Texture ID: {}", output_texture.id());
-
     if !self.xy_table_texture.is_initialized() {
-      // throw std::logic_error("You must call SetActiveXyTable at least once before calling Convert!");
       return Err(PointCloudComputeError::UnknownError);
     }
 
@@ -390,14 +387,14 @@ impl GpuPointCloudConverter {
     let height = xy_table.get_height_pixels() as i32;
 
     // Upload the XY table as a texture so we can use it as a uniform
-    self.xy_table_texture.init();
+    //self.xy_table_texture.init();
 
     unsafe {
       gl::BindTexture(gl::TEXTURE_2D, self.xy_table_texture.id());
       gl::TexStorage2D(
         gl::TEXTURE_2D,
         1,
-        gl::RGB32F, // constexpr GLenum xyTableInternalFormat = GL_RG32F;
+        gl::RG32F, // constexpr GLenum xyTableInternalFormat = GL_RG32F;
         width,
         height,
       );
@@ -422,8 +419,8 @@ impl GpuPointCloudConverter {
 
     // Pre-allocate a texture for the depth images so we don't have to
     // reallocate on every frame
-    self.depth_image_texture.init();
-    self.depth_image_pixel_buffer.init();
+    //self.depth_image_texture.init();
+    //self.depth_image_pixel_buffer.init();
 
     let depth_image_size_bytes = (width * height * size_of::<u16>() as i32) as isize; // libc::uint16_t = u16
 

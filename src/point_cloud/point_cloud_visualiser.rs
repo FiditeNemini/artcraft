@@ -461,12 +461,12 @@ impl PointCloudVisualizer {
         stride as u32,
       ).expect("Construction should work FIXME"));
 
-      println!("Allocate point_cloud_colorization BGRA with size {}x{}", width, height);
+      /*println!("Allocate point_cloud_colorization BGRA with size {}x{}", width, height);
       let img = self.point_cloud_colorization.as_ref().expect("exists");
       println!("Allocate point_cloud_colorization has size {}x{} format {:?}",
         img.get_width_pixels(),
         img.get_height_pixels(),
-        img.get_format());
+        img.get_format());*/
 
       /*k4a_image_to_rust_image_for_debug(self.point_cloud_colorization.as_ref().expect("should exist"))
           .expect("should convert")
