@@ -173,12 +173,12 @@ impl PointCloudVisualizer {
     // TODO: generate color xytable only on `enable_color_point_cloud`.
     let color_xy_table = GpuPointCloudConverter::generate_xy_table(
       calibration_data.clone(),
-      1, //k4a_sys::K4A_CALIBRATION_TYPE_COLOR,
+      k4a_sys::k4a_calibration_type_t_K4A_CALIBRATION_TYPE_COLOR,
     ).unwrap();
 
     let depth_xy_table = GpuPointCloudConverter::generate_xy_table(
       calibration_data.clone(),
-      0, // k4a_sys::K4A_CALIBRATION_TYPE_DEPTH,
+      k4a_sys::k4a_calibration_type_t_K4A_CALIBRATION_TYPE_DEPTH,
     ).unwrap();
 
     let mut visualizer = Self {

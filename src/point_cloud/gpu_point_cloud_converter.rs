@@ -75,9 +75,12 @@ void main()
     ivec2 pixel = ivec2(gl_GlobalInvocationID.xy);
 
     float vertexValue = float(imageLoad(depthImage, pixel));
+    // TODO: The problem is that these are bound to (0.0, 0.0). It isn't working.
     vec2 xyValue = imageLoad(xyTable, pixel).xy;
 
     float alpha = 1.0f;
+    // vertexPosition format: RGB colors as floats, but not range [0.0, 1.0], but rather [0.0, 255.0]
+    // HOWEVER, there are operations that reverse the sign of the 'x' channel ('r') and scale down by 1000 below.
     vec3 vertexPosition = vec3(vertexValue * xyValue.x, vertexValue * xyValue.y, vertexValue);
 
     // Invalid pixels have their XY table values set to 0.
@@ -100,7 +103,6 @@ void main()
     vertexPosition.x *= -1;
 
     imageStore(destTex, pixel, vec4(vertexPosition, alpha));
-    //imageStore(destTex, pixel, vec4(1.0, 1.0, 1.0, 1.0));
 }
 ";
 
@@ -146,8 +148,8 @@ impl GpuPointCloudConverter {
 
     /// Uniform variable name in OpenGL shader program
     // TODO: Turns out this does nothing.
-    //let DEST_TEX : CString = CString::new("destTex").expect("string is correct");
-    //let DEST_TEX_PTR : *const c_char = DEST_TEX.as_ptr() as *const c_char;
+    let DEST_TEX : CString = CString::new("destTex").expect("string is correct");
+    let DEST_TEX_PTR : *const c_char = DEST_TEX.as_ptr() as *const c_char;
 
     /// Uniform variable name in OpenGL shader program
     let XY_TABLE : CString = CString::new("xyTable").expect("string is correct");
@@ -158,12 +160,12 @@ impl GpuPointCloudConverter {
     let DEPTH_IMAGE_PTR : *const c_char = DEPTH_IMAGE.as_ptr() as *const c_char;
 
     unsafe {
-      //dest_tex_id = gl::GetUniformLocation(program_id, DEST_TEX_PTR);
+      dest_tex_id = gl::GetUniformLocation(program_id, DEST_TEX_PTR);
       xy_table_id = gl::GetUniformLocation(program_id, XY_TABLE_PTR);
       depth_image_id = gl::GetUniformLocation(program_id, DEPTH_IMAGE_PTR);
     }
 
-    //println!("Uniform: dest_tex_id location = {:?}", dest_tex_id);
+    println!("Uniform: dest_tex_id location = {:?}", dest_tex_id);
     println!("Uniform: xy_table_id location = {:?}", xy_table_id);
     println!("Uniform: depth_image_id location = {:?}", depth_image_id);
 
@@ -211,7 +213,7 @@ impl GpuPointCloudConverter {
         .save(Path::new("depth_before.png"))
         .expect("should save");*/
 
-    // TODO: This should overwrite the first few lines.
+    /*// TODO: This should overwrite the first few lines.
     unsafe {
       let width = depth_image.get_width_pixels() as i32;
       let height = depth_image.get_height_pixels() as i32;
@@ -223,7 +225,7 @@ impl GpuPointCloudConverter {
         (*typed_buffer.offset(i)) = 5000;
         (*typed_buffer.offset(i)) = 5000;
       }
-    }
+    }*/
 
     /*
     // TODO: This depth image looks good -- it's truncated as we would expect.
@@ -467,20 +469,10 @@ impl GpuPointCloudConverter {
                            calibration_type: k4a_sys::k4a_calibration_type_t)
     -> Result<Image>
   {
-
-    /*typedef enum
-    {
-        K4A_CALIBRATION_TYPE_UNKNOWN = -1, /**< Calibration type is unknown */
-        K4A_CALIBRATION_TYPE_DEPTH,        /**< Depth sensor */
-        K4A_CALIBRATION_TYPE_COLOR,        /**< Color sensor */
-        K4A_CALIBRATION_TYPE_GYRO,         /**< Gyroscope sensor */
-        K4A_CALIBRATION_TYPE_ACCEL,        /**< Accelerometer sensor */
-        K4A_CALIBRATION_TYPE_NUM,          /**< Number of types excluding unknown type*/
-    } k4a_calibration_type_t;*/
     let camera_calibration :  k4a_sys::k4a_calibration_camera_t = match calibration_type {
-      // k4a_sys::K4A_CALIBRATION_TYPE_COLOR  should be "1" per above enum.
-      1 => calibration.color_camera_calibration,
-      _ => calibration.depth_camera_calibration,
+      k4a_sys::k4a_calibration_type_t_K4A_CALIBRATION_TYPE_COLOR => calibration.color_camera_calibration,
+      k4a_sys::k4a_calibration_type_t_K4A_CALIBRATION_TYPE_DEPTH => calibration.depth_camera_calibration,
+      _ => return Err(PointCloudComputeError::UnknownError),
     };
 
     let width = camera_calibration.resolution_width as u32;
@@ -531,12 +523,7 @@ impl GpuPointCloudConverter {
     };
 
     let mut idx = 0;
-    //let length = width*height;
     unsafe {
-      //let mut xy_table_buffer2: *mut k4a_sys::k4a_float2_t = std::mem::transmute(&table_data);
-      //let mut xy_table_buffer3 = std::slice::from_raw_parts_mut(xy_table_buffer2, length as usize);
-      //let xy_table_buffer2 = table_data as *mut k4a_sys::k4a_float2_t; // TODO: Don't use transmute!
-
       let mut table_data = xy_table.get_buffer();
       let mut typed_buffer = table_data as *mut k4a_sys::k4a_float2_t;
 
@@ -566,60 +553,20 @@ impl GpuPointCloudConverter {
 
           if valid == 1 {
             unsafe {
-              /*if y % 10_000 == 0 {
-                println!("This pixel is GOOD: {}, {}", ray.xyz.x, ray.xyz.y);
-              }*/
-              //typed_buffer[idx].xy.x = ray.xyz.x;
-              //typed_buffer[idx].xy.y = ray.xyz.y;
               (*typed_buffer.offset(idx)).xy.x = ray.xyz.x;
               (*typed_buffer.offset(idx)).xy.y = ray.xyz.y;
-              //xy_table_buffer3[idx].xy.x = 1.0;
-              //xy_table_buffer3[idx].xy.y = 1.0;
             }
           } else {
             unsafe {
               // This pixel is invalid
-              //(*typed_buffer.offset(idx)).xy.x = 0.0;
-              //(*typed_buffer.offset(idx)).xy.y = 0.0;
-              (*typed_buffer.offset(idx)).xy.x = 1.0;
-              (*typed_buffer.offset(idx)).xy.y = 1.0;
+              (*typed_buffer.offset(idx)).xy.x = 0.0;
+              (*typed_buffer.offset(idx)).xy.y = 0.0;
             }
           }
 
           idx += 1;
         }
       }
-
-      //let byte_size = width * height * size_of::<k4a_sys::k4a_float2_t>() as u32;
-      //std::ptr::write_bytes(table_data as *mut u8, 0, byte_size as usize);
-      /*println!("Table size: {} x {}", width , height);
-
-      // k4a_float2_t *tableData = reinterpret_cast<k4a_float2_t *>(xyTable.get_buffer());
-
-      println!("Created XY Table reports: {} x {} (stride = {}",
-        xy_table.get_width_pixels(),
-        xy_table.get_height_pixels(),
-        xy_table.get_stride_bytes(),
-      );
-
-      //let mut xy_table_buffer2: *mut k4a_sys::k4a_float2_t = std::mem::transmute::< k4a_sys::k4a_float2_t>(&table_data);
-      let mut xy_table_buffer2 = table_data as *mut k4a_sys::k4a_float2_t;
-      // TODO: When this is actually working, it should render a diagonal line...
-      let mut idx = 0;
-      for y in 0..height {
-        //println!("Y: {}", y);
-        for x in 0 .. width {
-          //println!("X: {}", x);
-          //println!("idx: {}", idx);
-          (*xy_table_buffer2.offset(idx)).xy.x = 0.0;
-          (*xy_table_buffer2.offset(idx)).xy.y = 0.0;
-          idx += 1;
-        }
-      }
-
-      let byte_size = width * height * size_of::<k4a_sys::k4a_float2_t>() as u32;
-      std::ptr::write_bytes(table_data, 0, byte_size as usize);*/
-
     }
 
     Ok(xy_table)
