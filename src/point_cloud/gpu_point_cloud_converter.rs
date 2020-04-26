@@ -85,7 +85,7 @@ void main()
     //
     if (xyValue.x == 0.0f && xyValue.y == 0.0f)
     {
-        alpha = 0.0f;
+        //alpha = 0.0f;
         vertexValue = 0.0f;
     }
 
@@ -98,8 +98,8 @@ void main()
     //
     vertexPosition.x *= -1;
 
-    //imageStore(destTex, pixel, vec4(vertexPosition, alpha));
-    imageStore(destTex, pixel, vec4(1.0, 1.0, 1.0, 1.0));
+    imageStore(destTex, pixel, vec4(vertexPosition, alpha));
+    //imageStore(destTex, pixel, vec4(1.0, 1.0, 1.0, 1.0));
 }
 ";
 
