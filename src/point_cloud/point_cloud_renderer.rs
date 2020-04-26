@@ -21,6 +21,8 @@ use point_cloud::gpu_point_cloud_converter::POINT_CLOUD_TEXTURE_FORMAT;
 use graphics_gl::{get_stride, get_pointer_offset};
 use point_cloud::pixel_structs::BgraPixel;
 use point_cloud::point_cloud_visualiser::PointCloudVisualizer;
+use conversion::k4a_image_to_rust_image_for_debug;
+use std::path::Path;
 
 pub type Result<T> = std::result::Result<T, PointCloudRendererError>;
 
@@ -371,6 +373,12 @@ impl PointCloudRenderer {
   pub fn update_point_clouds(&mut self, color_image: &k4a_sys_wrapper::Image,
                              point_cloud_texture: &Texture) -> Result<()>
   {
+
+    k4a_image_to_rust_image_for_debug(color_image)
+        .expect("depth_to_image should work")
+        .save(Path::new("update_point_cloud_color_image.png"))
+        .expect("should save");
+
     unsafe {
       gl::BindVertexArray(self.vertex_array_object.id());
 

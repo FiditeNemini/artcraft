@@ -218,10 +218,10 @@ impl GpuPointCloudConverter {
       let mut typed_buffer = depth_image_buffer as *mut DepthPixel;
 
       // TODO: This should overwrite the first 150 lines.
-      for i in 0 .. 1280 * 150 {
-        //(*typed_buffer.offset(i)) = 5000;
-        //(*typed_buffer.offset(i)) = 5000;
-      }
+      /*for i in 0 .. 1280 * 150 {
+        (*typed_buffer.offset(i)) = 5000;
+        (*typed_buffer.offset(i)) = 5000;
+      }*/
     }
 
     /*k4a_image_to_rust_image_for_debug(depth_image)

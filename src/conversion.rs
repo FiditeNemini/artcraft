@@ -33,7 +33,8 @@ use opencv::prelude::*;
 use k4a_sys_wrapper::Device;
 use k4a_sys_wrapper::device_get_installed_count;
 use k4a_sys_wrapper::Image;
-use point_cloud::pixel_structs::DepthPixel;
+use point_cloud::pixel_structs::{DepthPixel, BgraPixel};
+use k4a_sys_wrapper;
 
 /// We can't send trait 'Texture2dDataSource' impl 'RawImage2d' as it requires its data has
 /// the same lifetime, so here we collect it together here.
@@ -93,18 +94,20 @@ pub fn depth_to_image(image: &Image) -> Result<DynamicImage, ImageError> {
 }
 
 // Not efficient, but good for debugging
-pub fn k4a_image_to_rust_image_for_debug(image: &Image) -> Result<RgbImage, ImageError> {
+pub fn k4a_image_to_rust_image_for_debug(image: &Image) -> Result<RgbaImage, ImageError> {
   let width = image.get_width_pixels() as u32;
   let height= image.get_height_pixels() as u32;
   let image_buffer = image.get_buffer();
   let image_format = image.get_format();
 
+  println!("k4a_image_to_rust: {}x{} (format={:?}", width, height, image_format);
+
   let rgb_image = match image_format {
-    Depth16 => {
+    k4a_sys_wrapper::ImageFormat::Depth16 => {
       let output_image = DynamicImage::new_rgb8(width, height);
       let typed_buffer = image_buffer as *const DepthPixel;
 
-      let mut rgb_image = output_image.to_rgb();
+      let mut rgba_image = output_image.to_rgba();
 
       let mut offset = 0;
       for x in 0 .. width {
@@ -112,12 +115,27 @@ pub fn k4a_image_to_rust_image_for_debug(image: &Image) -> Result<RgbImage, Imag
           let pixel = unsafe { *typed_buffer.offset(offset) };
           let scaled_pixel = (pixel as f32 / std::u16::MAX as f32);
           let scaled_pixel = (scaled_pixel * std::u8::MAX as f32) as u8;
-          rgb_image.put_pixel(x, y, Rgb([scaled_pixel, scaled_pixel, scaled_pixel]));
+          rgba_image.put_pixel(x, y, Rgba([scaled_pixel, scaled_pixel, scaled_pixel, 255]));
           offset += 1;
         }
       }
+      rgba_image
+    },
+    k4a_sys_wrapper::ImageFormat::ColorBgra32 => {
+      let output_image = DynamicImage::new_rgba16(width, height);
+      let typed_buffer = image_buffer as *const BgraPixel;
 
-      rgb_image
+      let mut rgba_image = output_image.to_rgba();
+
+      let mut offset = 0;
+      for x in 0 .. width {
+        for y in 0 .. height {
+          let pixel = unsafe { &*typed_buffer.offset(offset) };
+          rgba_image.put_pixel(x, y, Rgba([pixel.red, pixel.blue, pixel.green, pixel.alpha]));
+          offset += 1;
+        }
+      }
+      rgba_image
     },
     _ => unimplemented!("conversion not implemented for: {:?}", image_format),
   };
