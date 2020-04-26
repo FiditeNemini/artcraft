@@ -85,8 +85,9 @@ void main()
     //
     if (xyValue.x == 0.0f && xyValue.y == 0.0f)
     {
+        // TODO: FIXME
         //alpha = 0.0f;
-        vertexValue = 0.0f;
+        //vertexValue = 0.0f;
     }
 
     // Vertex positions are in millimeters, but everything else is in meters, so we need to convert

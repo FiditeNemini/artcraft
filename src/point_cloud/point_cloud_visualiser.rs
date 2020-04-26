@@ -390,8 +390,9 @@ impl PointCloudVisualizer {
             alpha: 255,
           };*/
 
-          (*typed_dst_pixel_buffer.offset(i)).blue = 255;
-          //(*typed_dst_pixel_buffer.offset(i)).green = 255;
+          (*typed_dst_pixel_buffer.offset(i)).red = 255;
+          (*typed_dst_pixel_buffer.offset(i)).green = 0;
+          (*typed_dst_pixel_buffer.offset(i)).blue = 0;
           (*typed_dst_pixel_buffer.offset(i)).alpha = 255;
         }
 
