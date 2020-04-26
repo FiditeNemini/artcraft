@@ -389,8 +389,6 @@ impl GpuPointCloudConverter {
     let width = xy_table.get_width_pixels() as i32;
     let height = xy_table.get_height_pixels() as i32;
 
-    println!("set_active_xy_table dims: {}x{}", width, height);
-
     // Upload the XY table as a texture so we can use it as a uniform
     self.xy_table_texture.init();
 
@@ -553,6 +551,25 @@ impl GpuPointCloudConverter {
 
           if valid == 1 {
             unsafe {
+              /*
+              println!("[size: {}x{}] 2D coord {}x{} --> 3D cord {}x{}x{}",
+                        width, height, p.xy.x, p.xy.y, ray.xyz.x, ray.xyz.y, ray.xyz.z);
+              [size: 1280x720] 2D coord 0x0 --> 3D cord -1.0120127x-0.5833072x1
+              [size: 1280x720] 2D coord 1x0 --> 3D cord -1.010335x-0.5832499x1
+              [size: 1280x720] 2D coord 2x0 --> 3D cord -1.0086561x-0.58319193x1
+              ...
+              [size: 1280x720] 2D coord 1277x719 --> 3D cord 1.0083642x0.55422443x1
+              [size: 1280x720] 2D coord 1278x719 --> 3D cord 1.0100702x0.55429035x1
+              [size: 1280x720] 2D coord 1279x719 --> 3D cord 1.0117699x0.55435246x1
+              ...
+              [size: 640x576] 2D coord 0x0 --> 3D cord -0.97488284x-1.0173141x1
+              [size: 640x576] 2D coord 1x0 --> 3D cord -0.97017723x-1.0155252x1
+              [size: 640x576] 2D coord 2x0 --> 3D cord -0.9654954x-1.0137504x1
+              ...
+              [size: 640x576] 2D coord 637x575 --> 3D cord 0.7947599x0.60008353x1
+              [size: 640x576] 2D coord 638x575 --> 3D cord 0.79833484x0.60085475x1
+              [size: 640x576] 2D coord 639x575 --> 3D cord 0.8019226x0.60163087x1
+              */
               (*typed_buffer.offset(idx)).xy.x = ray.xyz.x;
               (*typed_buffer.offset(idx)).xy.y = ray.xyz.y;
             }

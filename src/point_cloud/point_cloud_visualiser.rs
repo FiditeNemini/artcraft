@@ -441,6 +441,11 @@ impl PointCloudVisualizer {
 
       self.point_cloud_converter.set_active_xy_table(&self.color_xy_table)?;
 
+      /*k4a_image_to_rust_image_for_debug(&self.color_xy_table)
+          .expect("should convert")
+          .save(Path::new("debug_images/color_xy_table.png"))
+          .expect("should save");*/
+
     } else {
       let width = self.calibration_data.depth_camera_calibration.resolution_width as u32;
       let height = self.calibration_data.depth_camera_calibration.resolution_height as u32;
@@ -469,6 +474,11 @@ impl PointCloudVisualizer {
           .expect("should save");*/
 
       self.point_cloud_converter.set_active_xy_table(&self.depth_xy_table)?;
+
+      /*k4a_image_to_rust_image_for_debug(&self.depth_xy_table)
+          .expect("should convert")
+          .save(Path::new("debug_images/depth_xy_table.png"))
+          .expect("should save");*/
     }
 
     self.xyz_texture.reset();

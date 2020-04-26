@@ -35,6 +35,8 @@ use k4a_sys_wrapper::device_get_installed_count;
 use k4a_sys_wrapper::Image;
 use point_cloud::pixel_structs::{DepthPixel, BgraPixel};
 use k4a_sys_wrapper;
+use std::mem::size_of;
+use image::error::{UnsupportedError, ImageFormatHint};
 
 /// We can't send trait 'Texture2dDataSource' impl 'RawImage2d' as it requires its data has
 /// the same lifetime, so here we collect it together here.
@@ -126,6 +128,75 @@ pub fn k4a_image_to_rust_image_for_debug(image: &Image) -> Result<RgbaImage, Ima
           let pixel = unsafe { &*typed_buffer.offset(offset) };
           // BGRA32: The fourth byte is the alpha channel and is unused in the Azure Kinect APIs.
           rgba_image.put_pixel(x, y, Rgba([pixel.red, pixel.green, pixel.blue, 255]));
+          offset += 1;
+        }
+      }
+    },
+    k4a_sys_wrapper::ImageFormat::Custom => {
+      // Stride is image_width * bytes_per_pixel, so we solve for bytes_per_pixel
+      let stride = image.get_stride_bytes();
+      let image_width = image.get_width_pixels();
+      let bytes_per_pixel = stride / image_width;
+
+      // The only format we know how to represent is k4a_float2_t.
+      let known_size = size_of::<k4a_sys::k4a_float2_t>();
+
+      if bytes_per_pixel != known_size {
+        return Err(ImageError::Unsupported(UnsupportedError::from(ImageFormatHint::Unknown)))
+      }
+
+      let typed_buffer = image_buffer as *const k4a_sys::k4a_float2_t;
+
+      let mut max_x = -10000.0;
+      let mut max_y = -10000.0;
+      let mut min_x= 10000.0;
+      let mut min_y = 10000.0;
+
+      offset = 0;
+      for _ in 0 .. height {
+        for _ in 0 .. width {
+          unsafe {
+            let pixel = &*typed_buffer.offset(offset);
+            let xp = pixel.xy.x;
+            let yp = pixel.xy.y;
+            if xp < min_x {
+              min_x = xp;
+            }
+            if xp > max_x {
+              max_x = xp;
+            }
+            if yp < min_y {
+              min_y = yp;
+            }
+            if yp > max_y {
+              max_y = yp;
+            }
+          }
+          offset += 1;
+        }
+      }
+
+      //println!("Max x: {}", max_x);
+      //println!("Max y: {}", max_y);
+      //println!("Min x: {}", min_x);
+      //println!("Min y: {}", min_y);
+
+      offset = 0;
+      for y in 0 .. height {
+        for x in 0 .. width {
+          unsafe {
+            let pixel = &*typed_buffer.offset(offset);
+            let xp = pixel.xy.x;
+            let yp = pixel.xy.y;
+
+            let scaled_x =  (xp - min_x) / (max_x - min_x);
+            let scaled_x =  (255.0 * scaled_x) as u8;
+
+            let scaled_y =  (yp - min_y) / (max_y - min_y);
+            let scaled_y =  (255.0 * scaled_y) as u8;
+
+            rgba_image.put_pixel(x, y, Rgba([scaled_x, 0, scaled_y, 255]));
+          }
           offset += 1;
         }
       }
