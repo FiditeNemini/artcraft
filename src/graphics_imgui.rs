@@ -59,17 +59,15 @@ pub fn run(capture_provider: Arc<CaptureProvider>, calibration_data: k4a_sys::k4
 
   let mut visualizer = PointCloudVisualizer::new(
     true,
-    ColorizationStrategy::Shaded,
+    ColorizationStrategy::Color,
     calibration_data
   );
 
   //rebinder.restore();
 
   let mut texture = ViewerImage::create(
-    2000,
-    2000,
-    None,
-    None
+    1280,
+    1152,
   ).expect("ViewerImage texture creation should work");
 
   let mut imgui_visualizer_xyz_texture : Option<TextureId> = None;

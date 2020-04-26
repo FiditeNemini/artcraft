@@ -8,6 +8,7 @@ use gl;
 use gl::types::*;
 use image::image_dimensions;
 use std::ptr::null;
+use point_cloud::pixel_structs::BgraPixel;
 
 pub type Result<T> = std::result::Result<T, ViewerImageError>;
 
@@ -58,9 +59,14 @@ pub struct ViewerImage {
   texture_buffer_size: GLuint,
 }
 
+// GLenum format = GL_BGRA (default), but overridden as gl::RGBA
+// GLenum internalFormat = GL_RGBA8 (default)
 impl ViewerImage {
   /// private ctor
-  fn new(dimensions: ImageDimensions, format: GLenum) -> Result<Self> {
+  fn new(
+    dimensions: ImageDimensions,
+    format: GLenum
+  ) -> Result<Self> {
     let texture = Texture::new_initialized();
     let texture_buffer = Buffer::new_initialized();
 
@@ -86,21 +92,19 @@ impl ViewerImage {
     width: u32,
     height: u32,
     //data: &[uint8_t],
-    format: Option<GLenum>,
-    internal_format: Option<GLenum>) -> Result<Self>
+    //format: Option<GLenum>,
+    //internal_format: Option<GLenum>
+  ) -> Result<Self>
   {
     let dimensions = ImageDimensions { width, height };
-    let mut viewer_image = ViewerImage::new(
-      dimensions,
-      format.unwrap_or(gl::BGRA)
-    )?;
+    let mut viewer_image = ViewerImage::new(dimensions, gl::RGBA)?;
 
     // NB: To be a nice citizen with other tools, let's unbind.
-    let mut last_texture_id = 0;
+    //let mut last_texture_id = 0;
 
     unsafe {
       // NB: To be a good citizen, let's rebind the old texture.
-      gl::GetIntegerv(gl::TEXTURE_BINDING_2D, &mut last_texture_id);
+      //gl::GetIntegerv(gl::TEXTURE_BINDING_2D, &mut last_texture_id);
 
       gl::BindTexture(gl::TEXTURE_2D, viewer_image.texture.id());
 
@@ -111,7 +115,7 @@ impl ViewerImage {
       gl::TexStorage2D(
         gl::TEXTURE_2D,
         1,
-        internal_format.unwrap_or(gl::RGBA8),
+        gl::RGBA8,
         width as i32,
         height as i32,
       );
@@ -119,7 +123,7 @@ impl ViewerImage {
       viewer_image.update_texture(None)?;
 
       // NB: To be a nice citizen with other tools, let's unbind.
-      gl::BindTexture(gl::TEXTURE_2D, last_texture_id as u32);
+      //gl::BindTexture(gl::TEXTURE_2D, last_texture_id as u32);
     }
 
     Ok(viewer_image)
@@ -140,7 +144,7 @@ impl ViewerImage {
       0,
       self.texture_buffer_size as isize,
       gl::MAP_WRITE_BIT | gl::MAP_INVALIDATE_BUFFER_BIT,
-    );
+    ) as *mut BgraPixel; // TODO: It's actually RGBA, not BGRA.
 
     if buffer as usize == 0 {
       return Err(ViewerImageError::OpenGlError(gl_get_error().err().unwrap()));
@@ -159,6 +163,19 @@ impl ViewerImage {
         std::fill(buffer, buffer + m_textureBufferSize, static_cast<uint8_t>(0));
     }
     */
+
+    // TODO: Should initially show up as white.
+    let mut i = 0;
+    for y in 0 .. self.dimensions.height {
+      for x in 0 .. self.dimensions.width {
+        (*buffer.offset(i)).red = 255;
+        (*buffer.offset(i)).green = 255;
+        (*buffer.offset(i)).blue = 255;
+        (*buffer.offset(i)).alpha = 255;
+        i += 1;
+      }
+    }
+
     match data {
       Some(_) => {
         // TODO - does this get used in k4a!?

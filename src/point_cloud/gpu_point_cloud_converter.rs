@@ -211,19 +211,19 @@ impl GpuPointCloudConverter {
         .save(Path::new("depth_before.png"))
         .expect("should save");*/
 
-    // TODO: This should overwrite the first 150 lines.
-    /*unsafe {
+    // TODO: This should overwrite the first few lines.
+    unsafe {
       let width = depth_image.get_width_pixels() as i32;
       let height = depth_image.get_height_pixels() as i32;
       let format = depth_image.get_format();
       println!("Depth Image Dimensions: {}x{} (format: {:?})", width, height, format);
       let depth_image_buffer = depth_image.get_buffer();
       let mut typed_buffer = depth_image_buffer as *mut DepthPixel;
-      for i in 0 .. 1280 * 150 {
+      for i in 0 .. 1280 * 50 {
         (*typed_buffer.offset(i)) = 5000;
         (*typed_buffer.offset(i)) = 5000;
       }
-    }*/
+    }
 
     /*
     // TODO: This depth image looks good -- it's truncated as we would expect.
@@ -274,9 +274,10 @@ impl GpuPointCloudConverter {
       let mut texture_mapped_buffer = gl::MapBufferRange(
         gl::PIXEL_UNPACK_BUFFER,
         0,
-        //num_bytes as isize,
-        (std::mem::size_of::<DepthPixel>() * length) as GLsizeiptr,
+        num_bytes as isize,
+        //(std::mem::size_of::<DepthPixel>() * length) as GLsizeiptr,
         gl::MAP_WRITE_BIT | gl::MAP_INVALIDATE_BUFFER_BIT
+      //);
       ) as *mut DepthPixel;
 
       if texture_mapped_buffer as usize == 0 {
@@ -288,7 +289,7 @@ impl GpuPointCloudConverter {
 
       // TODO TESTING - setting this to nothing destroys the final output "line". Hmm...
       //std::ptr::write_bytes(texture_mapped_buffer as *mut u8, 255, num_bytes as usize);
-      std::ptr::copy::<u8>(depth_image_buffer, texture_mapped_buffer as *mut u8, num_bytes as usize);
+      //std::ptr::copy::<u8>(depth_image_buffer, texture_mapped_buffer as *mut u8, num_bytes as usize);
       //std::ptr::copy_nonoverlapping::<u8>(depth_src, texture_mapped_buffer as *mut u8, num_bytes as usize);
       /*let mut i = 0;
       for y in 0 .. height {
@@ -297,7 +298,7 @@ impl GpuPointCloudConverter {
           i += 1;
         }
       }*/
-      //std::ptr::copy::<DepthPixel>(typed_depth_image_buffer, texture_mapped_buffer, length as usize);
+      std::ptr::copy::<DepthPixel>(typed_depth_image_buffer, texture_mapped_buffer, length as usize);
 
       let result = gl::UnmapBuffer(gl::PIXEL_UNPACK_BUFFER);
       if result == gl::FALSE {
@@ -578,8 +579,10 @@ impl GpuPointCloudConverter {
           } else {
             unsafe {
               // This pixel is invalid
-              (*typed_buffer.offset(idx)).xy.x = 0.0;
-              (*typed_buffer.offset(idx)).xy.y = 0.0;
+              //(*typed_buffer.offset(idx)).xy.x = 0.0;
+              //(*typed_buffer.offset(idx)).xy.y = 0.0;
+              (*typed_buffer.offset(idx)).xy.x = 1.0;
+              (*typed_buffer.offset(idx)).xy.y = 1.0;
             }
           }
 

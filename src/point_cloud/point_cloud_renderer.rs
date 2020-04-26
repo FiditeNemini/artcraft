@@ -92,6 +92,7 @@ void main()
 {
     ivec2 pointCloudSize = imageSize(pointCloudTexture);
     ivec2 currentDepthPixelCoordinates = ivec2(gl_VertexID % pointCloudSize.x, gl_VertexID / pointCloudSize.x);
+    //ivec2 currentDepthPixelCoordinates = ivec2(gl_VertexID / pointCloudSize.y, gl_VertexID % pointCloudSize.y);
     vec3 vertexPosition = imageLoad(pointCloudTexture, currentDepthPixelCoordinates).xyz;
 
     //mat4 view2 = view; // Can't manipulate uniforms.
@@ -107,16 +108,18 @@ void main()
 
 
     //gl_Position = projection2 * view2 * vec4(vertexPosition, 1);
-
     gl_Position = projection * view * vec4(vertexPosition, 1);
+    //gl_Position = vec4(vertexPosition, 1);
+    //gl_Position = gl_VertexID;
 
     vertexColor = inColor;
+    //vertexColor = vec4(1.0, 0.5, 0.5, 1.0);
 
     // Pass along the 'invalid pixel' flag as the alpha channel
     //
     if (vertexPosition.z == 0.0f)
     {
-        vertexColor.a = 0.0f;
+        //vertexColor.a = 0.0f;
         //vertexColor.a = 0.5f;
         //vertexColor.r = 0.5f;
     }
@@ -191,7 +194,7 @@ void main()
 {
     if (vertexColor.a == 0.0f)
     {
-        discard;
+        //discard;
     }
 
     //fragmentColor = vec4(0.5, 1.0, 0.0, 1.0);
@@ -379,8 +382,14 @@ impl PointCloudRenderer {
 
     /*k4a_image_to_rust_image_for_debug(color_image)
         .expect("depth_to_image should work")
-        .save(Path::new("debug_images/point_cloud_renderer.update_point_clouds.initial_color_image.png"))
+        .save(Path::new("debug_images/final_color_image.png"))
         .expect("should save");*/
+
+    println!("update_point_clouds() color_image: {}x{} (format={:?})",
+      color_image.get_width_pixels(),
+      color_image.get_height_pixels(),
+      color_image.get_format());
+    println!("updating point_cloud_texture: {}", point_cloud_texture.id());
 
     unsafe {
       gl::BindVertexArray(self.vertex_array_object.id());
@@ -473,6 +482,9 @@ impl PointCloudRenderer {
         .map_err(|err| PointCloudRendererError::OpenGlError(err))
   }
 
+  ///
+  ///
+  ///
   pub fn render(&self) -> Result<()> {
     unsafe {
       gl::Enable(gl::DEPTH_TEST);
@@ -488,13 +500,13 @@ impl PointCloudRenderer {
 
       // Update render settings in shader
       let enable_shading = if self.enable_shading { 1 } else { 0 };
-      //let enable_shading = 1; // TODO FIXME FIXME FIXME
+      let enable_shading = 0; // TODO FIXME FIXME FIXME
 
       gl::Uniform1i(self.enable_shading_index, enable_shading);
 
       // Render point cloud
       gl::BindVertexArray(self.vertex_array_object.id());
-      let size = self.vertex_array_size_bytes / size_of::<BgraPixel>() as i32;
+      let size = self.vertex_array_size_bytes;// / size_of::<BgraPixel>() as i32; // todo  // todo  // todo  // todo
       gl::DrawArrays(gl::POINTS, 0, size);
 
       gl::BindVertexArray(0);

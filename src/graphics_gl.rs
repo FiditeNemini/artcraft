@@ -260,8 +260,6 @@ pub fn run(capture_provider: Arc<CaptureProvider>, calibration_data: k4a_sys::k4
   let mut texture = ViewerImage::create(
     800,
     800,
-    None,
-    None
   ).expect("ViewerImage texture creation should work");
 
   event_loop.run(move |event, window, control_flow| {
