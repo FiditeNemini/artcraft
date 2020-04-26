@@ -203,10 +203,10 @@ impl GpuPointCloudConverter {
       return Err(PointCloudComputeError::UnknownError);
     }
 
-    k4a_image_to_rust_image_for_debug(depth_image)
+    /*k4a_image_to_rust_image_for_debug(depth_image)
         .expect("depth_to_image should work")
         .save(Path::new("depth_before.png"))
-        .expect("should save");
+        .expect("should save");*/
 
     unsafe {
       let width = depth_image.get_width_pixels() as i32;
@@ -219,15 +219,15 @@ impl GpuPointCloudConverter {
 
       // TODO: This should overwrite the first 150 lines.
       for i in 0 .. 1280 * 150 {
-        (*typed_buffer.offset(i)) = 5000;
-        (*typed_buffer.offset(i)) = 5000;
+        //(*typed_buffer.offset(i)) = 5000;
+        //(*typed_buffer.offset(i)) = 5000;
       }
     }
 
-    k4a_image_to_rust_image_for_debug(depth_image)
+    /*k4a_image_to_rust_image_for_debug(depth_image)
         .expect("depth_to_image should work")
         .save(Path::new("depth_after.png"))
-        .expect("should save");
+        .expect("should save");*/
 
     let width = depth_image.get_width_pixels() as i32;
     let height = depth_image.get_height_pixels() as i32;

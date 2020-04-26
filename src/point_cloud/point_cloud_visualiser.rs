@@ -351,42 +351,34 @@ impl PointCloudVisualizer {
       let length = depth_image.get_size();
       let dst_length = length / size_of::<BgraPixel>();
 
-      let mut rng = rand::thread_rng();
-
       unsafe {
         // src: DepthPixel
-        let mut src_pixel = depth_image.get_buffer();
-        let mut src_pixel_2: *mut DepthPixel = std::mem::transmute_copy(&src_pixel);
-        let mut src_pixel_3= std::slice::from_raw_parts_mut(src_pixel_2, length as usize);
+        //let mut src_pixel_buffer = depth_image.get_buffer();
+        //let mut typed_src_pixel_buffer = src_pixel_buffer as *const DepthPixel;
 
         // dst: BgraPixel
-        let mut dst_pixel = self.point_cloud_colorization
+        let mut dst_pixel_buffer = self.point_cloud_colorization
             .as_ref()
             .expect("point cloud color image must be set")
             .get_buffer();
 
-        let mut dst_pixel_2: *mut BgraPixel = std::mem::transmute_copy(&dst_pixel);
-        let mut dst_pixel_3= std::slice::from_raw_parts_mut(dst_pixel_2, dst_length as usize);
-
-        //unimplemented!("FIX THIS SHIT. PROBABLY THE BUG");
-        // TODO
-        //  let end_pixel = dst_pixel_3 + dst_length;
-        /*while src_pixel_3 != end_pixel {
-          // TODO
-          //  *dstPixel = K4ADepthPixelColorizer::ColorizeBlueToRed(*srcPixel,
-          //    m_expectedValueRange.first,
-          //    m_expectedValueRange.second);
-          dst_pixel_3 += 1;
-          src_pixel_3 += 1;
-        }*/
+        let mut typed_dst_pixel_buffer = dst_pixel_buffer as *mut BgraPixel;
 
         // TODO: This should help us see output.
-        /*for i in 0 .. dst_length {
-          dst_pixel_3[i].blue = rng.gen_range(0, 255);
-          dst_pixel_3[i].green = rng.gen_range(0, 255);
-          dst_pixel_3[i].red = rng.gen_range(0, 255);
-          dst_pixel_3[i].alpha = rng.gen_range(0, 255);
-        }*/
+        // TODO: This requires implementation of `K4ADepthPixelColorizer::ColorizeBlueToRed()`
+        for i in 0 .. dst_length as isize {
+          /*let src_pixel = (*typed_src_pixel_buffer.offset(i));
+          // Default to opaque black
+          let output_pixel = BgraPixel {
+            blue: 0,
+            green: 0,
+            red: 0,
+            alpha: 255,
+          };*/
+
+          (*typed_dst_pixel_buffer.offset(i)).blue = 255;
+          (*typed_dst_pixel_buffer.offset(i)).alpha = 255;
+        }
       }
     }
 
