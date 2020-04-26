@@ -102,14 +102,13 @@ pub fn k4a_image_to_rust_image_for_debug(image: &Image) -> Result<RgbaImage, Ima
 
   println!("k4a_image_to_rust: {}x{} (format={:?}", width, height, image_format);
 
-  let rgb_image = match image_format {
+  let output_image = DynamicImage::new_rgba16(width, height);
+  let mut rgba_image = output_image.to_rgba();
+  let mut offset = 0;
+
+  match image_format {
     k4a_sys_wrapper::ImageFormat::Depth16 => {
-      let output_image = DynamicImage::new_rgb8(width, height);
       let typed_buffer = image_buffer as *const DepthPixel;
-
-      let mut rgba_image = output_image.to_rgba();
-
-      let mut offset = 0;
       for x in 0 .. width {
         for y in 0 .. height {
           let pixel = unsafe { *typed_buffer.offset(offset) };
@@ -119,15 +118,9 @@ pub fn k4a_image_to_rust_image_for_debug(image: &Image) -> Result<RgbaImage, Ima
           offset += 1;
         }
       }
-      rgba_image
     },
     k4a_sys_wrapper::ImageFormat::ColorBgra32 => {
-      let output_image = DynamicImage::new_rgba16(width, height);
       let typed_buffer = image_buffer as *const BgraPixel;
-
-      let mut rgba_image = output_image.to_rgba();
-
-      let mut offset = 0;
       for x in 0 .. width {
         for y in 0 .. height {
           let pixel = unsafe { &*typed_buffer.offset(offset) };
@@ -135,10 +128,9 @@ pub fn k4a_image_to_rust_image_for_debug(image: &Image) -> Result<RgbaImage, Ima
           offset += 1;
         }
       }
-      rgba_image
     },
     _ => unimplemented!("conversion not implemented for: {:?}", image_format),
   };
 
-  return Ok(rgb_image)
+  return Ok(rgba_image)
 }
