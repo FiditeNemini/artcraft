@@ -109,8 +109,8 @@ pub fn k4a_image_to_rust_image_for_debug(image: &Image) -> Result<RgbaImage, Ima
   match image_format {
     k4a_sys_wrapper::ImageFormat::Depth16 => {
       let typed_buffer = image_buffer as *const DepthPixel;
-      for x in 0 .. width {
-        for y in 0 .. height {
+      for y in 0 .. height {
+        for x in 0 .. width {
           let pixel = unsafe { *typed_buffer.offset(offset) };
           let scaled_pixel = (pixel as f32 / std::u16::MAX as f32);
           let scaled_pixel = (scaled_pixel * std::u8::MAX as f32) as u8;
@@ -121,10 +121,11 @@ pub fn k4a_image_to_rust_image_for_debug(image: &Image) -> Result<RgbaImage, Ima
     },
     k4a_sys_wrapper::ImageFormat::ColorBgra32 => {
       let typed_buffer = image_buffer as *const BgraPixel;
-      for x in 0 .. width {
-        for y in 0 .. height {
+      for y in 0 .. height {
+        for x in 0 .. width {
           let pixel = unsafe { &*typed_buffer.offset(offset) };
-          rgba_image.put_pixel(x, y, Rgba([pixel.red, pixel.blue, pixel.green, pixel.alpha]));
+          // BGRA32: The fourth byte is the alpha channel and is unused in the Azure Kinect APIs.
+          rgba_image.put_pixel(x, y, Rgba([pixel.red, pixel.green, pixel.blue, 255]));
           offset += 1;
         }
       }

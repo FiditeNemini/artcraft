@@ -15,6 +15,8 @@ use point_cloud::viewer_image::ViewerImage;
 use rand::Rng;
 use std::fmt::{Error, Formatter};
 use std::mem::size_of;
+use conversion::k4a_image_to_rust_image_for_debug;
+use std::path::Path;
 
 pub type Result<T> = std::result::Result<T, PointCloudVisualizerError>;
 
@@ -345,11 +347,17 @@ impl PointCloudVisualizer {
       let color_image = maybe_color_image.expect("logic above should ensure present");
       self.point_cloud_colorization = Some(color_image);
 
+      k4a_image_to_rust_image_for_debug(self.point_cloud_colorization.as_ref().expect("should exist"))
+          .expect("should convert")
+          .save(Path::new("debug_images/point_cloud_visualizer.update_point_clouds.color_image.png"))
+          .expect("should save");
+
     } else {
       // This creates a color spectrum based on depth.
 
       let length = depth_image.get_size();
       let dst_length = length / size_of::<BgraPixel>();
+      let dst_length = depth_image.get_width_pixels() * depth_image.get_height_pixels();
 
       unsafe {
         // src: DepthPixel
@@ -361,6 +369,11 @@ impl PointCloudVisualizer {
             .as_ref()
             .expect("point cloud color image must be set")
             .get_buffer();
+
+        k4a_image_to_rust_image_for_debug(self.point_cloud_colorization.as_ref().expect("should exist"))
+            .expect("should convert")
+            .save(Path::new("debug_images/point_cloud_visualizer.update_point_clouds.colorization_image_before_edit.png"))
+            .expect("should save");
 
         let mut typed_dst_pixel_buffer = dst_pixel_buffer as *mut BgraPixel;
 
@@ -377,8 +390,15 @@ impl PointCloudVisualizer {
           };*/
 
           (*typed_dst_pixel_buffer.offset(i)).blue = 255;
+          //(*typed_dst_pixel_buffer.offset(i)).green = 255;
           (*typed_dst_pixel_buffer.offset(i)).alpha = 255;
         }
+
+        k4a_image_to_rust_image_for_debug(self.point_cloud_colorization.as_ref().expect("should exist"))
+            .expect("should convert")
+            .save(Path::new("debug_images/point_cloud_visualizer.update_point_clouds.colorization_image_after_edit.png"))
+            .expect("should save");
+
       }
     }
 
@@ -412,6 +432,11 @@ impl PointCloudVisualizer {
         stride as u32,
       ).expect("Construction should work FIXME"));
 
+      k4a_image_to_rust_image_for_debug(self.transformed_depth_image.as_ref().expect("should exist"))
+          .expect("should convert")
+          .save(Path::new("debug_images/point_cloud_visualizer.set_colorization_strategy.transformed_depth_image_after_allocate.png"))
+          .expect("should save");
+
       self.point_cloud_converter.set_active_xy_table(&self.color_xy_table)?;
 
     } else {
@@ -428,6 +453,18 @@ impl PointCloudVisualizer {
         height,
         stride as u32,
       ).expect("Construction should work FIXME"));
+
+      println!("Allocate point_cloud_colorization BGRA with size {}x{}", width, height);
+      let img = self.point_cloud_colorization.as_ref().expect("exists");
+      println!("Allocate point_cloud_colorization has size {}x{} format {:?}",
+        img.get_width_pixels(),
+        img.get_height_pixels(),
+        img.get_format());
+
+      k4a_image_to_rust_image_for_debug(self.point_cloud_colorization.as_ref().expect("should exist"))
+          .expect("should convert")
+          .save(Path::new("debug_images/point_cloud_visualizer.set_colorization_strategy.point_cloud_colorization_image_after_allocate.png"))
+          .expect("should save");
 
       self.point_cloud_converter.set_active_xy_table(&self.depth_xy_table)?;
     }

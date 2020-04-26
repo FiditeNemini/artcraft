@@ -376,8 +376,10 @@ impl PointCloudRenderer {
 
     k4a_image_to_rust_image_for_debug(color_image)
         .expect("depth_to_image should work")
-        .save(Path::new("update_point_cloud_color_image.png"))
+        .save(Path::new("debug_images/point_cloud_renderer.update_point_clouds.initial_color_image.png"))
         .expect("should save");
+
+    unimplemented!("end");
 
     unsafe {
       gl::BindVertexArray(self.vertex_array_object.id());
