@@ -9,10 +9,10 @@ use gl;
 use gl::types::*;
 use libc;
 
-pub fn compile_shader(src: &str, ty: GLenum) -> GLuint {
+pub fn compile_shader(src: &str, shader_type: GLenum) -> GLuint {
   let shader;
   unsafe {
-    shader = gl::CreateShader(ty);
+    shader = gl::CreateShader(shader_type);
     // Attempt to compile the shader
     let c_str = CString::new(src.as_bytes()).unwrap();
     gl::ShaderSource(shader, 1, &c_str.as_ptr(), ptr::null());

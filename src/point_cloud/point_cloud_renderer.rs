@@ -370,16 +370,17 @@ impl PointCloudRenderer {
     //unimplemented!();
   }
 
+  ///
+  ///
+  ///
   pub fn update_point_clouds(&mut self, color_image: &k4a_sys_wrapper::Image,
                              point_cloud_texture: &Texture) -> Result<()>
   {
 
-    k4a_image_to_rust_image_for_debug(color_image)
+    /*k4a_image_to_rust_image_for_debug(color_image)
         .expect("depth_to_image should work")
         .save(Path::new("debug_images/point_cloud_renderer.update_point_clouds.initial_color_image.png"))
-        .expect("should save");
-
-    unimplemented!("end");
+        .expect("should save");*/
 
     unsafe {
       gl::BindVertexArray(self.vertex_array_object.id());
@@ -388,7 +389,8 @@ impl PointCloudRenderer {
       gl::BindBuffer(gl::ARRAY_BUFFER, self.vertex_color_buffer_object.id());
     }
 
-    let color_image_size_bytes = color_image.get_size() as i32;
+    let color_image_size_bytes = color_image.get_size() as i32; // TODO: Seems wrong!
+    let color_image_size_bytes = ( color_image.get_width_pixels() * color_image.get_height_pixels() * size_of::<BgraPixel>() ) as i32;
 
     if self.vertex_array_size_bytes != color_image_size_bytes {
       self.vertex_array_size_bytes = color_image_size_bytes;

@@ -59,7 +59,7 @@ pub fn run(capture_provider: Arc<CaptureProvider>, calibration_data: k4a_sys::k4
 
   let mut visualizer = PointCloudVisualizer::new(
     true,
-    ColorizationStrategy::Color,
+    ColorizationStrategy::Shaded,
     calibration_data
   );
 
@@ -72,7 +72,8 @@ pub fn run(capture_provider: Arc<CaptureProvider>, calibration_data: k4a_sys::k4
     None
   ).expect("ViewerImage texture creation should work");
 
-  let imgui_visualizer_xyz_texture = TextureId::from(visualizer.xyz_texture.id() as usize);
+  let mut imgui_visualizer_xyz_texture : Option<TextureId> = None;
+
   let imgui_point_cloud_convert_depth_image = TextureId::from(visualizer.point_cloud_converter.depth_image_texture.id() as usize);
   let imgui_point_cloud_convert_xy_table= TextureId::from(visualizer.point_cloud_converter.xy_table_texture.id() as usize);
 
@@ -148,11 +149,23 @@ pub fn run(capture_provider: Arc<CaptureProvider>, calibration_data: k4a_sys::k4
         .build(&ui, || {
           Image::new(imgui_point_cloud_convert_xy_table, [1280.0, 720.0]).build(&ui);
         });
+
+    if imgui_visualizer_xyz_texture.is_none() {
+      if visualizer.xyz_texture.id() != 0 {
+        imgui_visualizer_xyz_texture = Some(TextureId::from(visualizer.xyz_texture.id() as usize));
+      }
+    }
+
     Window::new(im_str!("Visualizer XYZ Texture"))
         .size([window_width, window_height], Condition::FirstUseEver)
         .position([window_width + 50.0, 0.0], Condition::FirstUseEver)
         .build(&ui, || {
-          Image::new(imgui_visualizer_xyz_texture, [1280.0, 720.0]).build(&ui);
+          match imgui_visualizer_xyz_texture.as_ref() {
+            None => {},
+            Some(xyz_texture) => {
+              Image::new(xyz_texture.clone(), [1280.0, 720.0]).build(&ui);
+            },
+          }
         });
     Window::new(im_str!("Final Output"))
         .size([window_width, window_height], Condition::FirstUseEver)

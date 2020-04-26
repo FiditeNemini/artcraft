@@ -98,7 +98,8 @@ void main()
     //
     vertexPosition.x *= -1;
 
-    imageStore(destTex, pixel, vec4(vertexPosition, alpha));
+    //imageStore(destTex, pixel, vec4(vertexPosition, alpha));
+    imageStore(destTex, pixel, vec4(1.0, 1.0, 1.0, 1.0));
 }
 ";
 
@@ -109,10 +110,7 @@ pub const POINT_CLOUD_TEXTURE_FORMAT : GLuint = gl::RGBA32F;
 
 pub struct GpuPointCloudConverter {
   /// The OpenGL program
-  program_id: GLuint,
-
-  /// The OpenGL compute shader
-  shader_id: GLuint,
+  shader_program_id: GLuint,
 
   /// The x,y table as a texture
   pub xy_table_texture: Texture,
@@ -123,7 +121,8 @@ pub struct GpuPointCloudConverter {
   depth_image_pixel_buffer: Buffer,
 
   /// Uniform location in the shader program
-  dest_tex_id: GLint,
+  // TODO: Turns out this does nothing
+  //dest_tex_id: GLint,
 
   /// Uniform location in the shader program
   xy_table_id: GLint,
@@ -145,8 +144,9 @@ impl GpuPointCloudConverter {
     let mut depth_image_id = 0;
 
     /// Uniform variable name in OpenGL shader program
-    let DEST_TEX : CString = CString::new("destTex").expect("string is correct");
-    let DEST_TEX_PTR : *const c_char = DEST_TEX.as_ptr() as *const c_char;
+    // TODO: Turns out this does nothing.
+    //let DEST_TEX : CString = CString::new("destTex").expect("string is correct");
+    //let DEST_TEX_PTR : *const c_char = DEST_TEX.as_ptr() as *const c_char;
 
     /// Uniform variable name in OpenGL shader program
     let XY_TABLE : CString = CString::new("xyTable").expect("string is correct");
@@ -157,19 +157,19 @@ impl GpuPointCloudConverter {
     let DEPTH_IMAGE_PTR : *const c_char = DEPTH_IMAGE.as_ptr() as *const c_char;
 
     unsafe {
-      dest_tex_id = gl::GetUniformLocation(program_id, DEST_TEX_PTR);
+      //dest_tex_id = gl::GetUniformLocation(program_id, DEST_TEX_PTR);
       xy_table_id = gl::GetUniformLocation(program_id, XY_TABLE_PTR);
       depth_image_id = gl::GetUniformLocation(program_id, DEPTH_IMAGE_PTR);
     }
 
-    println!("Uniform: dest_tex_id location = {:?}", dest_tex_id);
+    //println!("Uniform: dest_tex_id location = {:?}", dest_tex_id);
     println!("Uniform: xy_table_id location = {:?}", xy_table_id);
     println!("Uniform: depth_image_id location = {:?}", depth_image_id);
 
     GpuPointCloudConverter {
-      program_id,
-      shader_id,
-      dest_tex_id,
+      shader_program_id: program_id,
+      //shader_id,
+      //dest_tex_id,
       xy_table_id,
       depth_image_id,
       depth_image_texture: Texture::new(),
@@ -198,6 +198,8 @@ impl GpuPointCloudConverter {
                  depth_image: &k4a_sys_wrapper::Image,
                  output_texture: &mut Texture) -> Result<()>
   {
+    println!("Convert for XYZ Table Texture ID: {}", output_texture.id());
+
     if !self.xy_table_texture.is_initialized() {
       // throw std::logic_error("You must call SetActiveXyTable at least once before calling Convert!");
       return Err(PointCloudComputeError::UnknownError);
@@ -208,27 +210,34 @@ impl GpuPointCloudConverter {
         .save(Path::new("depth_before.png"))
         .expect("should save");*/
 
-    unsafe {
+    // TODO: This should overwrite the first 150 lines.
+    /*unsafe {
       let width = depth_image.get_width_pixels() as i32;
       let height = depth_image.get_height_pixels() as i32;
       let format = depth_image.get_format();
       println!("Depth Image Dimensions: {}x{} (format: {:?})", width, height, format);
-
       let depth_image_buffer = depth_image.get_buffer();
       let mut typed_buffer = depth_image_buffer as *mut DepthPixel;
-
-      // TODO: This should overwrite the first 150 lines.
-      /*for i in 0 .. 1280 * 150 {
+      for i in 0 .. 1280 * 150 {
         (*typed_buffer.offset(i)) = 5000;
         (*typed_buffer.offset(i)) = 5000;
-      }*/
-    }
+      }
+    }*/
 
-    /*k4a_image_to_rust_image_for_debug(depth_image)
+    /*
+    // TODO: This depth image looks good -- it's truncated as we would expect.
+    k4a_image_to_rust_image_for_debug(depth_image)
         .expect("depth_to_image should work")
-        .save(Path::new("depth_after.png"))
-        .expect("should save");*/
+        .save(Path::new("debug_images/gpu_point_cloud_renderer.convert.depth_after_mod.png"))
+        .expect("should save");
+    */
 
+    // Create output texture if it doesn't already exist
+    //
+    // We don't use the alpha channel, but it turns out OpenGL doesn't
+    // actually have a 3-component (i.e. RGB32F) format - you get
+    // 1, 2, or 4 components.
+    //
     let width = depth_image.get_width_pixels() as i32;
     let height = depth_image.get_height_pixels() as i32;
 
@@ -243,7 +252,8 @@ impl GpuPointCloudConverter {
         // If you want to use the texture that this outputs from your shader, you
         // need to pass this as the format argument to glBindImageTexture().
         // static constexpr GLenum PointCloudTextureFormat = GL_RGBA32F;
-        gl::TexStorage2D(gl::TEXTURE_2D, 1, POINT_CLOUD_TEXTURE_FORMAT, width, height);
+        // gl::TexStorage2D(gl::TEXTURE_2D, 1, POINT_CLOUD_TEXTURE_FORMAT, width, height);
+        gl::TexStorage2D(gl::TEXTURE_2D, 1, gl::RGBA32F, width, height);
 
         gl::TexParameteri(gl::TEXTURE_2D, gl::TEXTURE_MIN_FILTER, gl::NEAREST as i32);
         gl::TexParameteri(gl::TEXTURE_2D, gl::TEXTURE_MAG_FILTER, gl::NEAREST as i32);
@@ -256,27 +266,37 @@ impl GpuPointCloudConverter {
       gl::BindTexture(gl::TEXTURE_2D, self.depth_image_texture.id());
 
       let num_bytes: GLuint = (width * height * size_of::<u16>() as i32) as GLuint; // libc::uint16_t = u16
+      let length = (width * height) as usize;
       //let num_bytes: GLuint = (width * height * size_of::<DepthPixel>() as i32) as GLuint; // libc::uint16_t = u16
 
       // GLubyte *textureMappedBuffer = reinterpret_cast<GLubyte *>(...)
       let mut texture_mapped_buffer = gl::MapBufferRange(
         gl::PIXEL_UNPACK_BUFFER,
         0,
-        num_bytes as isize,
+        //num_bytes as isize,
+        (std::mem::size_of::<DepthPixel>() * length) as GLsizeiptr,
         gl::MAP_WRITE_BIT | gl::MAP_INVALIDATE_BUFFER_BIT
-      );
+      ) as *mut DepthPixel;
 
       if texture_mapped_buffer as usize == 0 {
         return Err(PointCloudComputeError::UnknownError);
       }
 
-      let mut depth_src = depth_image.get_buffer();
+      let mut depth_image_buffer = depth_image.get_buffer();
+      let mut typed_depth_image_buffer = depth_image_buffer as *const DepthPixel;
 
       // TODO TESTING - setting this to nothing destroys the final output "line". Hmm...
-      //std::ptr::write_bytes(texture_mapped_buffer as *mut u8, 120, num_bytes as usize);
-
+      //std::ptr::write_bytes(texture_mapped_buffer as *mut u8, 255, num_bytes as usize);
+      std::ptr::copy::<u8>(depth_image_buffer, texture_mapped_buffer as *mut u8, num_bytes as usize);
       //std::ptr::copy_nonoverlapping::<u8>(depth_src, texture_mapped_buffer as *mut u8, num_bytes as usize);
-      std::ptr::copy::<u8>(depth_src, texture_mapped_buffer as *mut u8, num_bytes as usize);
+      /*let mut i = 0;
+      for y in 0 .. height {
+        for x in 0 .. width {
+          (*texture_mapped_buffer.offset(i)) = 50000;
+          i += 1;
+        }
+      }*/
+      //std::ptr::copy::<DepthPixel>(typed_depth_image_buffer, texture_mapped_buffer, length as usize);
 
       let result = gl::UnmapBuffer(gl::PIXEL_UNPACK_BUFFER);
       if result == gl::FALSE {
@@ -297,7 +317,7 @@ impl GpuPointCloudConverter {
       );
       gl::BindBuffer(gl::PIXEL_UNPACK_BUFFER, 0);
 
-      gl::UseProgram(self.program_id);
+      gl::UseProgram(self.shader_program_id);
 
       // Bind textures that we're going to pass to the texture
       gl::ActiveTexture(gl::TEXTURE0);
@@ -309,7 +329,9 @@ impl GpuPointCloudConverter {
         gl::FALSE,
         0,
         gl::WRITE_ONLY,
-        POINT_CLOUD_TEXTURE_FORMAT
+        //POINT_CLOUD_TEXTURE_FORMAT
+        //static constexpr GLenum PointCloudTextureFormat = GL_RGBA32F;
+        gl::RGBA32F,
       );
 
       gl::ActiveTexture(gl::TEXTURE1);
@@ -604,6 +626,7 @@ fn link_program(program: GLuint, shader: GLuint) -> GLuint {
   unsafe {
     gl::AttachShader(program, shader);
     gl::LinkProgram(program);
+
     // Get the link status
     let mut status = gl::FALSE as GLint;
     gl::GetProgramiv(program, gl::LINK_STATUS, &mut status);
