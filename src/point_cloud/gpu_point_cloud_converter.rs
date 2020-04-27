@@ -88,9 +88,8 @@ void main()
     //
     if (xyValue.x == 0.0f && xyValue.y == 0.0f)
     {
-        // TODO: FIXME
-        //alpha = 0.0f;
-        //vertexValue = 0.0f;
+        alpha = 0.0f;
+        vertexValue = 0.0f;
     }
 
     // Vertex positions are in millimeters, but everything else is in meters, so we need to convert
@@ -165,19 +164,15 @@ impl GpuPointCloudConverter {
       depth_image_id = gl::GetUniformLocation(program_id, DEPTH_IMAGE_PTR);
     }
 
-    println!("Uniform: dest_tex_id location = {:?}", dest_tex_id);
-    println!("Uniform: xy_table_id location = {:?}", xy_table_id);
-    println!("Uniform: depth_image_id location = {:?}", depth_image_id);
-
     GpuPointCloudConverter {
       shader_program_id: program_id,
       //shader_id,
       //dest_tex_id,
       xy_table_id,
       depth_image_id,
-      depth_image_texture: Texture::new_initialized(),
-      xy_table_texture: Texture::new_initialized(),
-      depth_image_pixel_buffer: Buffer::new_initialized(),
+      depth_image_texture: Texture::new(),
+      xy_table_texture: Texture::new(),
+      depth_image_pixel_buffer: Buffer::new(),
     }
   }
 
@@ -387,7 +382,7 @@ impl GpuPointCloudConverter {
     let height = xy_table.get_height_pixels() as i32;
 
     // Upload the XY table as a texture so we can use it as a uniform
-    //self.xy_table_texture.init();
+    self.xy_table_texture.init();
 
     unsafe {
       gl::BindTexture(gl::TEXTURE_2D, self.xy_table_texture.id());
@@ -419,8 +414,8 @@ impl GpuPointCloudConverter {
 
     // Pre-allocate a texture for the depth images so we don't have to
     // reallocate on every frame
-    //self.depth_image_texture.init();
-    //self.depth_image_pixel_buffer.init();
+    self.depth_image_texture.init();
+    self.depth_image_pixel_buffer.init();
 
     let depth_image_size_bytes = (width * height * size_of::<u16>() as i32) as isize; // libc::uint16_t = u16
 

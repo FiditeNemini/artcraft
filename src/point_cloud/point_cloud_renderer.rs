@@ -92,36 +92,17 @@ void main()
 {
     ivec2 pointCloudSize = imageSize(pointCloudTexture);
     ivec2 currentDepthPixelCoordinates = ivec2(gl_VertexID % pointCloudSize.x, gl_VertexID / pointCloudSize.x);
-    //ivec2 currentDepthPixelCoordinates = ivec2(gl_VertexID / pointCloudSize.y, gl_VertexID % pointCloudSize.y);
     vec3 vertexPosition = imageLoad(pointCloudTexture, currentDepthPixelCoordinates).xyz;
 
-    //mat4 view2 = view; // Can't manipulate uniforms.
-    //mat4 projection2 = view; // Can't manipulate uniforms.
-
-    //view2[0][3] = 2000.0f;
-    //view2[1][3] = 2000.0f;
-    //view2[2][3] = 8000.0f;
-
-    //projection2[0][0] = 109349.0f;
-    //projection2[1][3] = -100349.0f;
-    //projection2[3][2] = 10049.0f;
-
-
-    //gl_Position = projection2 * view2 * vec4(vertexPosition, 1);
     gl_Position = projection * view * vec4(vertexPosition, 1);
-    //gl_Position = vec4(vertexPosition, 1);
-    //gl_Position = gl_VertexID;
 
     vertexColor = inColor;
-    //vertexColor = vec4(1.0, 0.5, 0.5, 1.0);
 
     // Pass along the 'invalid pixel' flag as the alpha channel
     //
     if (vertexPosition.z == 0.0f)
     {
-        //vertexColor.a = 0.0f;
-        //vertexColor.a = 0.5f;
-        //vertexColor.r = 0.5f;
+        vertexColor.a = 0.0f;
     }
 
     if (enableShading)
@@ -194,10 +175,9 @@ void main()
 {
     if (vertexColor.a == 0.0f)
     {
-        //discard;
+        discard;
     }
 
-    //fragmentColor = vec4(0.5, 1.0, 0.0, 1.0);
     fragmentColor = vertexColor;
 }
 ";
@@ -352,7 +332,7 @@ impl PointCloudRenderer {
       shader_program_id: program_id,
       vertex_shader_id,
       fragment_shader_id,
-      point_size: 5,
+      point_size: 2,
       enable_shading: false,
       vertex_array_size_bytes: 0,
       view_index,
@@ -385,11 +365,11 @@ impl PointCloudRenderer {
         .save(Path::new("debug_images/final_color_image.png"))
         .expect("should save");*/
 
-    println!("update_point_clouds() color_image: {}x{} (format={:?})",
+    /*println!("update_point_clouds() color_image: {}x{} (format={:?})",
       color_image.get_width_pixels(),
       color_image.get_height_pixels(),
       color_image.get_format());
-    println!("updating point_cloud_texture: {}", point_cloud_texture.id());
+    println!("updating point_cloud_texture: {}", point_cloud_texture.id());*/
 
     unsafe {
       gl::BindVertexArray(self.vertex_array_object.id());
@@ -399,7 +379,7 @@ impl PointCloudRenderer {
     }
 
     let color_image_size_bytes = color_image.get_size() as i32; // TODO: Seems wrong!
-    let color_image_size_bytes = ( color_image.get_width_pixels() * color_image.get_height_pixels() * size_of::<BgraPixel>() ) as i32;
+    //let color_image_size_bytes = ( color_image.get_width_pixels() * color_image.get_height_pixels() * size_of::<BgraPixel>() ) as i32;
 
     if self.vertex_array_size_bytes != color_image_size_bytes {
       self.vertex_array_size_bytes = color_image_size_bytes;
@@ -420,7 +400,7 @@ impl PointCloudRenderer {
         0,
         color_image_size_bytes as isize,
         gl::MAP_WRITE_BIT | gl::MAP_INVALIDATE_BUFFER_BIT
-      )
+      ) as *mut GLubyte
     };
 
     if vertex_mapped_buffer as usize == 0 {
@@ -429,6 +409,9 @@ impl PointCloudRenderer {
     }
 
     let mut color_src = color_image.get_buffer();
+    //let mut typed_color_src = color_src as *const BgraPixel;
+    let mut typed_color_src = color_src as *const GLubyte;
+    //let length = color_image.get_width_pixels() * color_image.get_height_pixels();
 
     let result = unsafe {
       //std::ptr::copy_nonoverlapping::<u8>(color_src, vertex_mapped_buffer as *mut u8,
@@ -437,7 +420,9 @@ impl PointCloudRenderer {
       // TODO TESTING - writing pure white changes the color of the final output "line" to white:
       //std::ptr::write_bytes(vertex_mapped_buffer as *mut u8, 255, color_image_size_bytes as usize);
 
-      std::ptr::copy::<u8>(color_src, vertex_mapped_buffer as *mut u8, color_image_size_bytes as usize);
+      //std::ptr::copy::<u8>(color_src, vertex_mapped_buffer as *mut u8, color_image_size_bytes as usize);
+
+      std::ptr::copy::<GLubyte>(typed_color_src, vertex_mapped_buffer, color_image_size_bytes as usize);
 
       gl::UnmapBuffer(gl::ARRAY_BUFFER)
     };
@@ -506,7 +491,7 @@ impl PointCloudRenderer {
 
       // Render point cloud
       gl::BindVertexArray(self.vertex_array_object.id());
-      let size = self.vertex_array_size_bytes;// / size_of::<BgraPixel>() as i32; // todo  // todo  // todo  // todo
+      let size = self.vertex_array_size_bytes / size_of::<BgraPixel>() as i32;
       gl::DrawArrays(gl::POINTS, 0, size);
 
       gl::BindVertexArray(0);

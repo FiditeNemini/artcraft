@@ -59,7 +59,7 @@ pub fn run(capture_provider: Arc<CaptureProvider>, calibration_data: k4a_sys::k4
 
   let mut visualizer = PointCloudVisualizer::new(
     true,
-    ColorizationStrategy::Color,
+    ColorizationStrategy::Simple,
     calibration_data
   );
 

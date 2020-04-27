@@ -17,6 +17,7 @@ use std::fmt::{Error, Formatter};
 use std::mem::size_of;
 use conversion::k4a_image_to_rust_image_for_debug;
 use std::path::Path;
+use point_cloud::util::{ValueRange, get_depth_mode_range, colorize_depth_blue_to_red};
 
 pub type Result<T> = std::result::Result<T, PointCloudVisualizerError>;
 
@@ -89,7 +90,6 @@ pub enum ColorizationStrategy {
 }
 
 pub struct PointCloudVisualizer {
-  // TODO: std::pair<DepthPixel, DepthPixel> m_expectedValueRange;
   // TODO: ViewControl m_viewControl;
   // TODO: linmath::mat4x4 m_projection{};
   // TODO: linmath::mat4x4 m_view{};
@@ -125,6 +125,9 @@ pub struct PointCloudVisualizer {
 
   color_xy_table: Image,
   depth_xy_table: Image,
+
+  /// Near and far minima/maxima for the current depth sensor mode.
+  depth_value_range: ValueRange,
 }
 
 // TODO: Dedup
@@ -181,6 +184,9 @@ impl PointCloudVisualizer {
       k4a_sys::k4a_calibration_type_t_K4A_CALIBRATION_TYPE_DEPTH,
     ).unwrap();
 
+    let expected_value_range = get_depth_mode_range(calibration_data.depth_mode)
+        .expect("Should be in correct depth sensor mode.");
+
     let mut visualizer = Self {
       m_dimensions_width: width, // Resolution of the point cloud texture
       m_dimensions_height: height, // ImageDimensions PointCloudVisualizerTextureDimensions = { 1280, 1152 };
@@ -198,6 +204,7 @@ impl PointCloudVisualizer {
       transformed_depth_image: None,
       point_cloud_colorization: None,
       xyz_texture: Texture::new(),
+      depth_value_range: expected_value_range,
     };
 
     visualizer.set_colorization_strategy(initial_colorization_strategy).expect("Should work");
@@ -362,8 +369,8 @@ impl PointCloudVisualizer {
 
       unsafe {
         // src: DepthPixel
-        //let mut src_pixel_buffer = depth_image.get_buffer();
-        //let mut typed_src_pixel_buffer = src_pixel_buffer as *const DepthPixel;
+        let mut src_pixel_buffer = depth_image.get_buffer();
+        let mut typed_src_pixel_buffer = src_pixel_buffer as *const DepthPixel;
 
         // dst: BgraPixel
         let mut dst_pixel_buffer = self.point_cloud_colorization
@@ -378,22 +385,13 @@ impl PointCloudVisualizer {
 
         let mut typed_dst_pixel_buffer = dst_pixel_buffer as *mut BgraPixel;
 
-        // TODO: This should help us see output.
-        // TODO: This requires implementation of `K4ADepthPixelColorizer::ColorizeBlueToRed()`
         for i in 0 .. dst_length as isize {
-          /*let src_pixel = (*typed_src_pixel_buffer.offset(i));
-          // Default to opaque black
-          let output_pixel = BgraPixel {
-            blue: 0,
-            green: 0,
-            red: 0,
-            alpha: 255,
-          };*/
-
-          (*typed_dst_pixel_buffer.offset(i)).red = 255;
-          (*typed_dst_pixel_buffer.offset(i)).green = 0;
-          (*typed_dst_pixel_buffer.offset(i)).blue = 0;
-          (*typed_dst_pixel_buffer.offset(i)).alpha = 255;
+          let src_pixel = *typed_src_pixel_buffer.offset(i);
+          let pixel = colorize_depth_blue_to_red(src_pixel, &self.depth_value_range);
+          (*typed_dst_pixel_buffer.offset(i)).red = pixel.red;
+          (*typed_dst_pixel_buffer.offset(i)).green = pixel.green;
+          (*typed_dst_pixel_buffer.offset(i)).blue = pixel.blue;
+          (*typed_dst_pixel_buffer.offset(i)).alpha = pixel.alpha;
         }
 
         /*k4a_image_to_rust_image_for_debug(self.point_cloud_colorization.as_ref().expect("should exist"))
