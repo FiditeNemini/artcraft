@@ -365,7 +365,7 @@ impl Image {
       )
     };
 
-    if result != 0 /* k4a_sys::K4A_RESULT_SUCCEEDED */ {
+    if result != k4a_sys::k4a_result_t_K4A_RESULT_SUCCEEDED {
       return Err(KinectError::UnableToCreateImage { error_code: result });
     }
 

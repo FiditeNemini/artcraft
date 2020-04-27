@@ -200,33 +200,6 @@ impl GpuPointCloudConverter {
       return Err(PointCloudComputeError::UnknownError);
     }
 
-    /*k4a_image_to_rust_image_for_debug(depth_image)
-        .expect("depth_to_image should work")
-        .save(Path::new("depth_before.png"))
-        .expect("should save");*/
-
-    /*// TODO: This should overwrite the first few lines.
-    unsafe {
-      let width = depth_image.get_width_pixels() as i32;
-      let height = depth_image.get_height_pixels() as i32;
-      let format = depth_image.get_format();
-      println!("Depth Image Dimensions: {}x{} (format: {:?})", width, height, format);
-      let depth_image_buffer = depth_image.get_buffer();
-      let mut typed_buffer = depth_image_buffer as *mut DepthPixel;
-      for i in 0 .. 1280 * 50 {
-        (*typed_buffer.offset(i)) = 5000;
-        (*typed_buffer.offset(i)) = 5000;
-      }
-    }*/
-
-    /*
-    // TODO: This depth image looks good -- it's truncated as we would expect.
-    k4a_image_to_rust_image_for_debug(depth_image)
-        .expect("depth_to_image should work")
-        .save(Path::new("debug_images/gpu_point_cloud_renderer.convert.depth_after_mod.png"))
-        .expect("should save");
-    */
-
     // Create output texture if it doesn't already exist
     //
     // We don't use the alpha channel, but it turns out OpenGL doesn't
@@ -281,17 +254,6 @@ impl GpuPointCloudConverter {
       let mut depth_image_buffer = depth_image.get_buffer();
       let mut typed_depth_image_buffer = depth_image_buffer as *const DepthPixel;
 
-      // TODO TESTING - setting this to nothing destroys the final output "line". Hmm...
-      //std::ptr::write_bytes(texture_mapped_buffer as *mut u8, 255, num_bytes as usize);
-      //std::ptr::copy::<u8>(depth_image_buffer, texture_mapped_buffer as *mut u8, num_bytes as usize);
-      //std::ptr::copy_nonoverlapping::<u8>(depth_src, texture_mapped_buffer as *mut u8, num_bytes as usize);
-      /*let mut i = 0;
-      for y in 0 .. height {
-        for x in 0 .. width {
-          (*texture_mapped_buffer.offset(i)) = 50000;
-          i += 1;
-        }
-      }*/
       std::ptr::copy::<DepthPixel>(typed_depth_image_buffer, texture_mapped_buffer, length as usize);
 
       let result = gl::UnmapBuffer(gl::PIXEL_UNPACK_BUFFER);
@@ -299,7 +261,6 @@ impl GpuPointCloudConverter {
         return Err(PointCloudComputeError::UnknownError);
       }
 
-      // TODO TESTING - Changing the bounds here affected the final output "line" that is being rendered.
       gl::TexSubImage2D(
         gl::TEXTURE_2D, // target
         0, // level

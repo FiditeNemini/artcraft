@@ -62,7 +62,7 @@ impl std::error::Error for PointCloudRendererError {
 /// From the file `tools/k4aviewer/graphics/shaders/k4apointcloudshaders.h`
 pub static POINT_CLOUD_VERTEX_SHADER : &'static str = "\
 #version 430
-layout(location = 0) in vec4 inColor;
+layout(location = 1) in vec4 inColor;
 
 out vec4 vertexColor;
 
@@ -71,28 +71,15 @@ uniform mat4 projection;
 layout(rgba32f) readonly uniform image2D pointCloudTexture;
 uniform bool enableShading;
 
-bool GetPoint3d(in vec2 pointCloudSize, in ivec2 point2d, out vec3 point3d)
-{
-    if (point2d.x < 0 || point2d.x >= pointCloudSize.x ||
-        point2d.y < 0 || point3d.y >= pointCloudSize.y)
-    {
-        return false;
-    }
-
-    point3d = imageLoad(pointCloudTexture, point2d).xyz;
-    if (point3d.z <= 0)
-    {
-        return false;
-    }
-
-    return true;
-}
-
 void main()
 {
     ivec2 pointCloudSize = imageSize(pointCloudTexture);
     ivec2 currentDepthPixelCoordinates = ivec2(gl_VertexID % pointCloudSize.x, gl_VertexID / pointCloudSize.x);
     vec3 vertexPosition = imageLoad(pointCloudTexture, currentDepthPixelCoordinates).xyz;
+
+    //vertexPosition.x = vertexPosition.x * 50.0;
+    //vertexPosition.y = vertexPosition.y * 50.0;
+    //vertexPosition.z = vertexPosition.z * 50.0;
 
     gl_Position = projection * view * vec4(vertexPosition, 1);
 
@@ -105,59 +92,19 @@ void main()
         vertexColor.a = 0.0f;
     }
 
-    if (enableShading)
-    {
-        // Compute the location of the closest neighbor pixel to compute lighting
-        //
-        vec3 closestNeighbor = vertexPosition;
+    //float average = (inColor.r + inColor.g + inColor.b) / 3;
+    //vertexColor.r = average;
+    //vertexColor.g = average;
+    //vertexColor.b = average;
+    //vertexColor.a = 255;
 
-        // If no neighbors have data, default to 1 meter behind point.
-        //
-        closestNeighbor.z += 1.0f;
+    /*if (gl_VertexID < 300000) {
+       vertexColor = vec4(255, 0, 0, 255);
+    } else {
+       vertexColor = vec4(0, 255, 0, 255);
+    }*/
 
-        vec3 outPoint;
-        if (GetPoint3d(pointCloudSize, currentDepthPixelCoordinates - ivec2(1, 0), outPoint))
-        {
-            if (closestNeighbor.z > outPoint.z)
-            {
-                closestNeighbor = outPoint;
-            }
-        }
-        if (GetPoint3d(pointCloudSize, currentDepthPixelCoordinates + ivec2(1, 0), outPoint))
-        {
-            if (closestNeighbor.z > outPoint.z)
-            {
-                closestNeighbor = outPoint;
-            }
-        }
-        if (GetPoint3d(pointCloudSize, currentDepthPixelCoordinates - ivec2(0, 1), outPoint))
-        {
-            if (closestNeighbor.z > outPoint.z)
-            {
-                closestNeighbor = outPoint;
-            }
-        }
-        if (GetPoint3d(pointCloudSize, currentDepthPixelCoordinates + ivec2(0, 1), outPoint))
-        {
-            if (closestNeighbor.z > outPoint.z)
-            {
-                closestNeighbor = outPoint;
-            }
-        }
-
-        vec3 lightPosition = vec3(0, 0, 0);
-        float occlusion = length(vertexPosition - closestNeighbor) * 20.0f;
-        float diffuse = 1.0f - clamp(occlusion, 0.0f, 0.6f);
-
-        float distance = length(lightPosition - vertexPosition);
-
-        // Attenuation term for light source that covers distance up to 50 meters
-        // http://wiki.ogre3d.org/tiki-index.php?page=-Point+Light+Attenuation
-        //
-        float attenuation = 1.0 / (1.0 + 0.09 * distance + 0.032 * distance * distance);
-
-        vertexColor = vec4(attenuation * diffuse * vertexColor.rgb, vertexColor.a);
-    }
+    vertexColor = inColor;
 }
 ";
 
@@ -175,7 +122,7 @@ void main()
 {
     if (vertexColor.a == 0.0f)
     {
-        discard;
+        //discard;
     }
 
     fragmentColor = vertexColor;
@@ -271,10 +218,6 @@ const fn initial_projection_matrix_4x4() -> [f32; 16] {
 impl PointCloudRenderer {
 
   pub fn new() -> Self {
-    // TODO: Init view and projection matrices
-    // mat4x4_identity(m_view);
-    // mat4x4_identity(m_projection);
-
     let vertex_array_object = VertexArray::new_initialized();
     let vertex_color_buffer_object = Buffer::new_initialized();
 
@@ -332,7 +275,7 @@ impl PointCloudRenderer {
       shader_program_id: program_id,
       vertex_shader_id,
       fragment_shader_id,
-      point_size: 2,
+      point_size: 1,
       enable_shading: false,
       vertex_array_size_bytes: 0,
       view_index,
@@ -365,21 +308,24 @@ impl PointCloudRenderer {
         .save(Path::new("debug_images/final_color_image.png"))
         .expect("should save");*/
 
-    /*println!("update_point_clouds() color_image: {}x{} (format={:?})",
+    //println!("updating point_cloud_texture: {}", point_cloud_texture.id());
+
+    println!("update_point_clouds() color_image: {}x{} (format={:?})",
       color_image.get_width_pixels(),
       color_image.get_height_pixels(),
       color_image.get_format());
-    println!("updating point_cloud_texture: {}", point_cloud_texture.id());*/
 
     unsafe {
+      //println!("Binding VAO vertex_array_object id = {}", self.vertex_array_object.id());
       gl::BindVertexArray(self.vertex_array_object.id());
-
       // Vertex Colors
       gl::BindBuffer(gl::ARRAY_BUFFER, self.vertex_color_buffer_object.id());
+      //println!("Binding buffer ARRAY_BUFFER vertex_color_buffer_object id = {}", self.vertex_color_buffer_object.id());
     }
 
-    let color_image_size_bytes = color_image.get_size() as i32; // TODO: Seems wrong!
-    //let color_image_size_bytes = ( color_image.get_width_pixels() * color_image.get_height_pixels() * size_of::<BgraPixel>() ) as i32;
+    let color_image_size_bytes = color_image.get_size() as i32;
+
+    println!("color_image_size_bytes = {}", color_image_size_bytes);
 
     if self.vertex_array_size_bytes != color_image_size_bytes {
       self.vertex_array_size_bytes = color_image_size_bytes;
@@ -400,7 +346,7 @@ impl PointCloudRenderer {
         0,
         color_image_size_bytes as isize,
         gl::MAP_WRITE_BIT | gl::MAP_INVALIDATE_BUFFER_BIT
-      ) as *mut GLubyte
+      ) as *mut u8
     };
 
     if vertex_mapped_buffer as usize == 0 {
@@ -409,8 +355,8 @@ impl PointCloudRenderer {
     }
 
     let mut color_src = color_image.get_buffer();
+    let mut typed_color_src = color_src as *const u8;
     //let mut typed_color_src = color_src as *const BgraPixel;
-    let mut typed_color_src = color_src as *const GLubyte;
     //let length = color_image.get_width_pixels() * color_image.get_height_pixels();
 
     let result = unsafe {
@@ -418,11 +364,12 @@ impl PointCloudRenderer {
       //  color_image_size_bytes as usize);
 
       // TODO TESTING - writing pure white changes the color of the final output "line" to white:
-      //std::ptr::write_bytes(vertex_mapped_buffer as *mut u8, 255, color_image_size_bytes as usize);
-
       //std::ptr::copy::<u8>(color_src, vertex_mapped_buffer as *mut u8, color_image_size_bytes as usize);
+      //std::ptr::write_bytes(vertex_mapped_buffer, 255, color_image_size_bytes as usize);
 
-      std::ptr::copy::<GLubyte>(typed_color_src, vertex_mapped_buffer, color_image_size_bytes as usize);
+      std::ptr::copy_nonoverlapping::<u8>(typed_color_src,
+        vertex_mapped_buffer,
+        color_image_size_bytes  as usize);
 
       gl::UnmapBuffer(gl::ARRAY_BUFFER)
     };
@@ -439,8 +386,10 @@ impl PointCloudRenderer {
         gl::BGRA as i32,
         gl::UNSIGNED_BYTE,
         gl::TRUE,
-        get_stride::<f32>(0),
-        get_pointer_offset::<f32>(0),
+        //get_stride::<f32>(0),
+        //get_pointer_offset::<f32>(0),
+        0 as i32,
+        0 as *const c_void,
       );
 
       gl::UseProgram(self.shader_program_id);
@@ -456,7 +405,7 @@ impl PointCloudRenderer {
         gl::FALSE,
         0,
         gl::READ_ONLY,
-        POINT_CLOUD_TEXTURE_FORMAT,
+        gl::RGBA32F, //POINT_CLOUD_TEXTURE_FORMAT,
       );
       gl::Uniform1i(self.point_cloud_texture_index, 0);
 
@@ -491,7 +440,9 @@ impl PointCloudRenderer {
 
       // Render point cloud
       gl::BindVertexArray(self.vertex_array_object.id());
+      //let size = self.vertex_array_size_bytes / size_of::<BgraPixel>() as i32 / 3; // TODO: 1/3rd of information to draw
       let size = self.vertex_array_size_bytes / size_of::<BgraPixel>() as i32;
+      println!("Draw size: {}", size);
       gl::DrawArrays(gl::POINTS, 0, size);
 
       gl::BindVertexArray(0);

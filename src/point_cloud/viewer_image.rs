@@ -67,11 +67,11 @@ impl ViewerImage {
     dimensions: ImageDimensions,
     format: GLenum
   ) -> Result<Self> {
-    let texture = Texture::new_initialized();
-    let texture_buffer = Buffer::new_initialized();
-
     let texture_buffer_size = (dimensions.width * dimensions.height) as GLuint
         * get_format_pixel_element_count(format);
+
+    let texture = Texture::new_initialized();
+    let texture_buffer = Buffer::new_initialized();
 
     unsafe {
       gl::BindBuffer(gl::PIXEL_UNPACK_BUFFER, texture_buffer.id());
@@ -91,21 +91,13 @@ impl ViewerImage {
   pub fn create(
     width: u32,
     height: u32,
-    //data: &[uint8_t],
-    //format: Option<GLenum>,
-    //internal_format: Option<GLenum>
   ) -> Result<Self>
   {
     let dimensions = ImageDimensions { width, height };
-    let mut viewer_image = ViewerImage::new(dimensions, gl::RGBA)?;
-
-    // NB: To be a nice citizen with other tools, let's unbind.
-    //let mut last_texture_id = 0;
+    let format = gl::RGBA;
+    let mut viewer_image = ViewerImage::new(dimensions, format)?;
 
     unsafe {
-      // NB: To be a good citizen, let's rebind the old texture.
-      //gl::GetIntegerv(gl::TEXTURE_BINDING_2D, &mut last_texture_id);
-
       gl::BindTexture(gl::TEXTURE_2D, viewer_image.texture.id());
 
       gl::TexParameteri(gl::TEXTURE_2D, gl::TEXTURE_MIN_FILTER, gl::LINEAR as i32);
@@ -121,9 +113,6 @@ impl ViewerImage {
       );
 
       viewer_image.update_texture(None)?;
-
-      // NB: To be a nice citizen with other tools, let's unbind.
-      //gl::BindTexture(gl::TEXTURE_2D, last_texture_id as u32);
     }
 
     Ok(viewer_image)
@@ -151,41 +140,14 @@ impl ViewerImage {
     }
 
     // TODO COPY DATA
-    /*
-    if (data)
-    {
-    // TODO TODO TODO TODO
-        std::copy(data, data + m_textureBufferSize, buffer);
-    }
-    else
-    {
-    // TODO TODO TODO TODO
-        std::fill(buffer, buffer + m_textureBufferSize, static_cast<uint8_t>(0));
-    }
-    */
-
-    // TODO: Should initially show up as white.
-    let mut i = 0;
-    for y in 0 .. self.dimensions.height {
-      for x in 0 .. self.dimensions.width {
-        (*buffer.offset(i)).red = 255;
-        (*buffer.offset(i)).green = 255;
-        (*buffer.offset(i)).blue = 255;
-        (*buffer.offset(i)).alpha = 255;
-        i += 1;
-      }
-    }
-
     match data {
       Some(_) => {
-        // TODO - does this get used in k4a!?
         unreachable!("TODO")
       },
       None => {
         unsafe {
           *buffer = std::mem::zeroed();
         }
-
       },
     }
 

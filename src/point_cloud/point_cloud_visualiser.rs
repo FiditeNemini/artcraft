@@ -151,8 +151,7 @@ impl PointCloudVisualizer {
              calibration_data: k4a_sys::k4a_calibration_t) -> Self
   {
     // Resolution of the point cloud texture
-    //
-    //constexpr ImageDimensions PointCloudVisualizerTextureDimensions = { 1280, 1152 };
+    // constexpr ImageDimensions PointCloudVisualizerTextureDimensions = { 1280, 1152 };
     let width = 1280;
     let height= 1152;
 
@@ -162,16 +161,6 @@ impl PointCloudVisualizer {
       gl::BindRenderbuffer(gl::RENDERBUFFER, depth_buffer.id());
       gl::RenderbufferStorage(gl::RENDERBUFFER, gl::DEPTH_COMPONENT, width, height);
     }
-
-    /*typedef enum
-    {
-        K4A_CALIBRATION_TYPE_UNKNOWN = -1, /**< Calibration type is unknown */
-        K4A_CALIBRATION_TYPE_DEPTH,        /**< Depth sensor */
-        K4A_CALIBRATION_TYPE_COLOR,        /**< Color sensor */
-        K4A_CALIBRATION_TYPE_GYRO,         /**< Gyroscope sensor */
-        K4A_CALIBRATION_TYPE_ACCEL,        /**< Accelerometer sensor */
-        K4A_CALIBRATION_TYPE_NUM,          /**< Number of types excluding unknown type*/
-    } k4a_calibration_type_t;*/
 
     // TODO: generate color xytable only on `enable_color_point_cloud`.
     let color_xy_table = GpuPointCloudConverter::generate_xy_table(
@@ -188,8 +177,8 @@ impl PointCloudVisualizer {
         .expect("Should be in correct depth sensor mode.");
 
     let mut visualizer = Self {
-      m_dimensions_width: width, // Resolution of the point cloud texture
-      m_dimensions_height: height, // ImageDimensions PointCloudVisualizerTextureDimensions = { 1280, 1152 };
+      m_dimensions_width: width,
+      m_dimensions_height: height,
       enable_color_point_cloud,
       point_cloud_renderer: PointCloudRenderer::new(),
       point_cloud_converter: GpuPointCloudConverter::new(),
@@ -264,7 +253,7 @@ impl PointCloudVisualizer {
 
       gl::Viewport(0, 0, self.m_dimensions_width, self.m_dimensions_height);
       gl::Enable(gl::DEPTH_TEST);
-      gl::ClearColor(0.3, 0.0, 0.0, 0.3);
+      gl::ClearColor(0.3, 0.3, 0.3, 0.3);
       gl::ClearDepth(1.0);
 
       gl::Clear(gl::COLOR_BUFFER_BIT | gl::DEPTH_BUFFER_BIT);
@@ -299,22 +288,17 @@ impl PointCloudVisualizer {
 
     if self.enable_color_point_cloud {
       if maybe_color_image.is_err() {
-        println!("<< Missing Color Image >> ");
         return Err(PointCloudVisualizerError::MissingColorImage);
       }
       if self.colorization_strategy == ColorizationStrategy::Color {
-
-        /*let mut transformed_depth_image = self.transformed_depth_image.take()
-            .expect("Must be present");*/
-
-        if let Some(transformed_depth_image) = self.transformed_depth_image.as_ref() {
-          /*println!("Take transformed depth image... {}x{} [{:?}]",
-            transformed_depth_image.get_width_pixels(),
-            transformed_depth_image.get_height_pixels(),
-            transformed_depth_image.get_format());*/
-
+        if let Some(transformed_depth_image) = self.transformed_depth_image.as_mut() {
           unsafe {
-            // TODO: Totally missed error handling here.
+
+            /*k4a_image_to_rust_image_for_debug(&depth_image)
+                .unwrap()
+                .save(Path::new("debug_images/depth_before_transform.png"))
+                .unwrap();*/
+
             let result = k4a_sys::k4a_transformation_depth_image_to_color_camera(
               self.transformation.get_handle(),
               depth_image.get_handle(),
@@ -322,23 +306,19 @@ impl PointCloudVisualizer {
             );
 
             if result != k4a_sys::k4a_buffer_result_t_K4A_BUFFER_RESULT_SUCCEEDED {
-              println!("FAILED: Depth to color conversion");
               return Err(PointCloudVisualizerError::DepthToColorConversionFailed);
             }
 
-            //println!("Saving transformed depth image: {:?}", transformed_depth_image.get_format());
+            /*k4a_image_to_rust_image_for_debug(&transformed_depth_image)
+                .unwrap()
+                .save(Path::new("debug_images/depth_after_transform.png"))
+                .unwrap();*/
+
             depth_image = transformed_depth_image.clone();
           }
         }
       }
     }
-
-    /*
-    // This depth image looks good --
-    k4a_image_to_rust_image_for_debug(&depth_image)
-        .expect("should convert")
-        .save(Path::new("debug_images/point_cloud_visualizer.update_point_clouds.fresh_new_depth_image.png"))
-        .expect("should save");*/
 
     let result = self.point_cloud_converter.convert(
       &depth_image,
@@ -355,16 +335,8 @@ impl PointCloudVisualizer {
       let color_image = maybe_color_image.expect("logic above should ensure present");
       self.point_cloud_colorization = Some(color_image);
 
-      /*k4a_image_to_rust_image_for_debug(self.point_cloud_colorization.as_ref().expect("should exist"))
-          .expect("should convert")
-          .save(Path::new("debug_images/point_cloud_visualizer.update_point_clouds.color_image.png"))
-          .expect("should save");*/
-
     } else {
       // This creates a color spectrum based on depth.
-
-      let length = depth_image.get_size();
-      let dst_length = length / size_of::<BgraPixel>();
       let dst_length = depth_image.get_width_pixels() * depth_image.get_height_pixels();
 
       unsafe {
@@ -378,11 +350,6 @@ impl PointCloudVisualizer {
             .expect("point cloud color image must be set")
             .get_buffer();
 
-        /*k4a_image_to_rust_image_for_debug(self.point_cloud_colorization.as_ref().expect("should exist"))
-            .expect("should convert")
-            .save(Path::new("debug_images/point_cloud_visualizer.update_point_clouds.colorization_image_before_edit.png"))
-            .expect("should save");*/
-
         let mut typed_dst_pixel_buffer = dst_pixel_buffer as *mut BgraPixel;
 
         for i in 0 .. dst_length as isize {
@@ -393,12 +360,6 @@ impl PointCloudVisualizer {
           (*typed_dst_pixel_buffer.offset(i)).blue = pixel.blue;
           (*typed_dst_pixel_buffer.offset(i)).alpha = pixel.alpha;
         }
-
-        /*k4a_image_to_rust_image_for_debug(self.point_cloud_colorization.as_ref().expect("should exist"))
-            .expect("should convert")
-            .save(Path::new("debug_images/point_cloud_visualizer.update_point_clouds.colorization_image_after_edit.png"))
-            .expect("should save");*/
-
       }
     }
 
@@ -422,35 +383,23 @@ impl PointCloudVisualizer {
     self.point_cloud_renderer.set_enable_shading(strategy == ColorizationStrategy::Shaded);
 
     if strategy == ColorizationStrategy::Color {
-      let stride =
-          self.calibration_data.color_camera_calibration.resolution_width * size_of::<DepthPixel>() as i32;
+      let width = self.calibration_data.color_camera_calibration.resolution_width;
+      let height = self.calibration_data.color_camera_calibration.resolution_height;
+      let stride = width * size_of::<DepthPixel>() as i32;
 
       self.transformed_depth_image = Some(Image::create(
         ImageFormat::Depth16,
-        self.calibration_data.color_camera_calibration.resolution_width as u32,
-        self.calibration_data.color_camera_calibration.resolution_height as u32,
+        width as u32,
+        height as u32,
         stride as u32,
       ).expect("Construction should work FIXME"));
 
-      /*k4a_image_to_rust_image_for_debug(self.transformed_depth_image.as_ref().expect("should exist"))
-          .expect("should convert")
-          .save(Path::new("debug_images/point_cloud_visualizer.set_colorization_strategy.transformed_depth_image_after_allocate.png"))
-          .expect("should save");*/
-
       self.point_cloud_converter.set_active_xy_table(&self.color_xy_table)?;
-
-      /*k4a_image_to_rust_image_for_debug(&self.color_xy_table)
-          .expect("should convert")
-          .save(Path::new("debug_images/color_xy_table.png"))
-          .expect("should save");*/
 
     } else {
       let width = self.calibration_data.depth_camera_calibration.resolution_width as u32;
       let height = self.calibration_data.depth_camera_calibration.resolution_height as u32;
       let stride = width as i32 * size_of::<BgraPixel>() as i32;
-
-      // Calibration resolution: 640 x 576 (stride: 2560) -- really!? That's low res.
-      //println!("Calibration resolution: {} x {} (stride: {})", width, height, stride);
 
       self.point_cloud_colorization = Some(Image::create(
         ImageFormat::ColorBgra32,
@@ -459,24 +408,7 @@ impl PointCloudVisualizer {
         stride as u32,
       ).expect("Construction should work FIXME"));
 
-      /*println!("Allocate point_cloud_colorization BGRA with size {}x{}", width, height);
-      let img = self.point_cloud_colorization.as_ref().expect("exists");
-      println!("Allocate point_cloud_colorization has size {}x{} format {:?}",
-        img.get_width_pixels(),
-        img.get_height_pixels(),
-        img.get_format());*/
-
-      /*k4a_image_to_rust_image_for_debug(self.point_cloud_colorization.as_ref().expect("should exist"))
-          .expect("should convert")
-          .save(Path::new("debug_images/point_cloud_visualizer.set_colorization_strategy.point_cloud_colorization_image_after_allocate.png"))
-          .expect("should save");*/
-
       self.point_cloud_converter.set_active_xy_table(&self.depth_xy_table)?;
-
-      /*k4a_image_to_rust_image_for_debug(&self.depth_xy_table)
-          .expect("should convert")
-          .save(Path::new("debug_images/depth_xy_table.png"))
-          .expect("should save");*/
     }
 
     self.xyz_texture.reset();

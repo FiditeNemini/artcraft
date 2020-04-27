@@ -18,10 +18,9 @@ use std::sync::Arc;
 use support;
 use std::path::Path;
 use std::ffi::c_void;
-use std::time::Instant;
+use std::time::{Instant, Duration};
 use opengl::rebinder::Rebinder;
 use opengl::texture::load_texture;
-
 
 pub fn run(capture_provider: Arc<CaptureProvider>, calibration_data: k4a_sys::k4a_calibration_t) {
   let sdl_context = sdl2::init().unwrap();
@@ -57,9 +56,11 @@ pub fn run(capture_provider: Arc<CaptureProvider>, calibration_data: k4a_sys::k4
   let mut gl_texture_snes = load_texture("sneslogo.png");
   let mut imgui_texture_snes = TextureId::from(gl_texture_snes as usize);
 
+  let mut colorization_strategy = ColorizationStrategy::Color;
+
   let mut visualizer = PointCloudVisualizer::new(
     true,
-    ColorizationStrategy::Simple,
+    colorization_strategy,
     calibration_data
   );
 
@@ -85,6 +86,7 @@ pub fn run(capture_provider: Arc<CaptureProvider>, calibration_data: k4a_sys::k4
   let mut event_pump = sdl_context.event_pump().unwrap();
 
   let mut last_frame = Instant::now();
+  let mut last_change = Instant::now();
 
   'running: loop {
     use sdl2::event::Event;
@@ -165,11 +167,12 @@ pub fn run(capture_provider: Arc<CaptureProvider>, calibration_data: k4a_sys::k4
             },
           }
         });
-    Window::new(im_str!("Final Output"))
-        .size([window_width, window_height], Condition::FirstUseEver)
+    // NB: This is larger. The texture is 1280x1152.
+    Window::new(&im_str!("Final Output: {:?}", colorization_strategy))
+        .size([window_width, window_height + 435.0], Condition::FirstUseEver)
         .position([window_width + 50.0, window_height + 50.0], Condition::FirstUseEver)
         .build(&ui, || {
-          Image::new(imgui_kinect_final_output, [1280.0, 720.0]).build(&ui);
+          Image::new(imgui_kinect_final_output, [1280.0, 1152.0]).build(&ui);
         });
 
     unsafe {
@@ -195,6 +198,21 @@ pub fn run(capture_provider: Arc<CaptureProvider>, calibration_data: k4a_sys::k4
               }
             }
           });
+    }
+
+    let change_delta = last_frame - last_change;
+
+    if change_delta > Duration::from_millis(5000) {
+      colorization_strategy = match colorization_strategy {
+        ColorizationStrategy::Simple => ColorizationStrategy::Shaded, // NB: We won't do simple.
+        ColorizationStrategy::Shaded => ColorizationStrategy::Color,
+        ColorizationStrategy::Color => ColorizationStrategy::Shaded,
+      };
+
+      println!("Changing colorization strategy: {:?}", colorization_strategy);
+
+      visualizer.set_colorization_strategy(colorization_strategy);
+      last_change = Instant::now();
     }
 
     //rebinder.restore();
