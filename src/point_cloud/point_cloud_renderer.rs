@@ -363,9 +363,10 @@ impl PointCloudRenderer {
 
     //println!("updating point_cloud_texture: {}", point_cloud_texture.id());
 
-    println!("update_point_clouds() color_image: {}x{} (format={:?})",
+    println!("update_point_clouds() color_image: {}x{}, bytes={}, (format={:?})",
       color_image.get_width_pixels(),
       color_image.get_height_pixels(),
+      color_image.get_size(),
       color_image.get_format());
 
     unsafe {
@@ -377,8 +378,6 @@ impl PointCloudRenderer {
     }
 
     let color_image_size_bytes = color_image.get_size() as i32;
-
-    println!("color_image_size_bytes = {}", color_image_size_bytes);
 
     if self.vertex_array_size_bytes != color_image_size_bytes {
       self.vertex_array_size_bytes = color_image_size_bytes;
@@ -495,7 +494,7 @@ impl PointCloudRenderer {
       gl::BindVertexArray(self.vertex_array_object.id());
       //let size = self.vertex_array_size_bytes / size_of::<BgraPixel>() as i32 / 3; // TODO: 1/3rd of information to draw
       let size = self.vertex_array_size_bytes / size_of::<BgraPixel>() as i32;
-      println!("Draw size: {}", size);
+      println!("Draw size: {} (vertex array size bytes: {})", size, self.vertex_array_size_bytes);
       gl::DrawArrays(gl::POINTS, 0, size);
 
       gl::BindVertexArray(0);

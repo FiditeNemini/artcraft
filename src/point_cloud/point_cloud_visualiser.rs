@@ -385,7 +385,13 @@ impl PointCloudVisualizer {
     if strategy == ColorizationStrategy::Color {
       let width = self.calibration_data.color_camera_calibration.resolution_width;
       let height = self.calibration_data.color_camera_calibration.resolution_height;
+      //let width = 3840;
+      //let height = 2160;
       let stride = width * size_of::<DepthPixel>() as i32;
+
+      for _ in 0..10 {
+        println!("setting color calibration: {}x{} (stride={})", width, height, stride);
+      }
 
       self.transformed_depth_image = Some(Image::create(
         ImageFormat::Depth16,
@@ -400,6 +406,10 @@ impl PointCloudVisualizer {
       let width = self.calibration_data.depth_camera_calibration.resolution_width as u32;
       let height = self.calibration_data.depth_camera_calibration.resolution_height as u32;
       let stride = width as i32 * size_of::<BgraPixel>() as i32;
+
+      for _ in 0..10 {
+        println!("setting depth calibration: {}x{} (stride={})", width, height, stride);
+      }
 
       self.point_cloud_colorization = Some(Image::create(
         ImageFormat::ColorBgra32,
