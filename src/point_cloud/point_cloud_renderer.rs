@@ -62,7 +62,7 @@ impl std::error::Error for PointCloudRendererError {
 /// From the file `tools/k4aviewer/graphics/shaders/k4apointcloudshaders.h`
 pub static POINT_CLOUD_VERTEX_SHADER : &'static str = "\
 #version 430
-layout(location = 1) in vec4 inColor;
+layout(location = 0) in vec4 inColor;
 
 out vec4 vertexColor;
 
@@ -71,15 +71,28 @@ uniform mat4 projection;
 layout(rgba32f) readonly uniform image2D pointCloudTexture;
 uniform bool enableShading;
 
+bool GetPoint3d(in vec2 pointCloudSize, in ivec2 point2d, out vec3 point3d)
+{
+    if (point2d.x < 0 || point2d.x >= pointCloudSize.x ||
+        point2d.y < 0 || point3d.y >= pointCloudSize.y)
+    {
+        return false;
+    }
+
+    point3d = imageLoad(pointCloudTexture, point2d).xyz;
+    if (point3d.z <= 0)
+    {
+        return false;
+    }
+
+    return true;
+}
+
 void main()
 {
     ivec2 pointCloudSize = imageSize(pointCloudTexture);
     ivec2 currentDepthPixelCoordinates = ivec2(gl_VertexID % pointCloudSize.x, gl_VertexID / pointCloudSize.x);
     vec3 vertexPosition = imageLoad(pointCloudTexture, currentDepthPixelCoordinates).xyz;
-
-    //vertexPosition.x = vertexPosition.x * 50.0;
-    //vertexPosition.y = vertexPosition.y * 50.0;
-    //vertexPosition.z = vertexPosition.z * 50.0;
 
     gl_Position = projection * view * vec4(vertexPosition, 1);
 
@@ -92,19 +105,59 @@ void main()
         vertexColor.a = 0.0f;
     }
 
-    //float average = (inColor.r + inColor.g + inColor.b) / 3;
-    //vertexColor.r = average;
-    //vertexColor.g = average;
-    //vertexColor.b = average;
-    //vertexColor.a = 255;
+    if (enableShading)
+    {
+        // Compute the location of the closest neighbor pixel to compute lighting
+        //
+        vec3 closestNeighbor = vertexPosition;
 
-    /*if (gl_VertexID < 300000) {
-       vertexColor = vec4(255, 0, 0, 255);
-    } else {
-       vertexColor = vec4(0, 255, 0, 255);
-    }*/
+        // If no neighbors have data, default to 1 meter behind point.
+        //
+        closestNeighbor.z += 1.0f;
 
-    vertexColor = inColor;
+        vec3 outPoint;
+        if (GetPoint3d(pointCloudSize, currentDepthPixelCoordinates - ivec2(1, 0), outPoint))
+        {
+            if (closestNeighbor.z > outPoint.z)
+            {
+                closestNeighbor = outPoint;
+            }
+        }
+        if (GetPoint3d(pointCloudSize, currentDepthPixelCoordinates + ivec2(1, 0), outPoint))
+        {
+            if (closestNeighbor.z > outPoint.z)
+            {
+                closestNeighbor = outPoint;
+            }
+        }
+        if (GetPoint3d(pointCloudSize, currentDepthPixelCoordinates - ivec2(0, 1), outPoint))
+        {
+            if (closestNeighbor.z > outPoint.z)
+            {
+                closestNeighbor = outPoint;
+            }
+        }
+        if (GetPoint3d(pointCloudSize, currentDepthPixelCoordinates + ivec2(0, 1), outPoint))
+        {
+            if (closestNeighbor.z > outPoint.z)
+            {
+                closestNeighbor = outPoint;
+            }
+        }
+
+        vec3 lightPosition = vec3(0, 0, 0);
+        float occlusion = length(vertexPosition - closestNeighbor) * 20.0f;
+        float diffuse = 1.0f - clamp(occlusion, 0.0f, 0.6f);
+
+        float distance = length(lightPosition - vertexPosition);
+
+        // Attenuation term for light source that covers distance up to 50 meters
+        // http://wiki.ogre3d.org/tiki-index.php?page=-Point+Light+Attenuation
+        //
+        float attenuation = 1.0 / (1.0 + 0.09 * distance + 0.032 * distance * distance);
+
+        vertexColor = vec4(attenuation * diffuse * vertexColor.rgb, vertexColor.a);
+    }
 }
 ";
 
@@ -122,7 +175,7 @@ void main()
 {
     if (vertexColor.a == 0.0f)
     {
-        //discard;
+        discard;
     }
 
     fragmentColor = vertexColor;
@@ -434,7 +487,7 @@ impl PointCloudRenderer {
 
       // Update render settings in shader
       let enable_shading = if self.enable_shading { 1 } else { 0 };
-      let enable_shading = 0; // TODO FIXME FIXME FIXME
+      let enable_shading = 1; // TODO FIXME FIXME FIXME
 
       gl::Uniform1i(self.enable_shading_index, enable_shading);
 
