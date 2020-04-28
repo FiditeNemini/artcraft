@@ -202,7 +202,7 @@ pub fn run(capture_provider: Arc<CaptureProvider>, calibration_data: k4a_sys::k4
 
     let change_delta = last_frame - last_change;
 
-    if change_delta > Duration::from_millis(5000) {
+    /*if change_delta > Duration::from_millis(5000) {
       colorization_strategy = match colorization_strategy {
         ColorizationStrategy::Simple => ColorizationStrategy::Shaded, // NB: We won't do simple.
         ColorizationStrategy::Shaded => ColorizationStrategy::Color,
@@ -213,7 +213,7 @@ pub fn run(capture_provider: Arc<CaptureProvider>, calibration_data: k4a_sys::k4
 
       visualizer.set_colorization_strategy(colorization_strategy);
       last_change = Instant::now();
-    }
+    }*/
 
     //rebinder.restore();
 

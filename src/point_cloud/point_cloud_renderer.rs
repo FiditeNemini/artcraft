@@ -94,6 +94,11 @@ void main()
     ivec2 currentDepthPixelCoordinates = ivec2(gl_VertexID % pointCloudSize.x, gl_VertexID / pointCloudSize.x);
     vec3 vertexPosition = imageLoad(pointCloudTexture, currentDepthPixelCoordinates).xyz;
 
+    // Scale up while model view matrices not implemented.
+    vertexPosition.x *= 5.0;
+    vertexPosition.y *= 5.0;
+    vertexPosition.z *= 5.0;
+
     gl_Position = projection * view * vec4(vertexPosition, 1);
 
     vertexColor = inColor;
