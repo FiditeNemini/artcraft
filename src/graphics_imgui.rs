@@ -15,7 +15,7 @@ use point_cloud::point_cloud_visualiser::{PointCloudVisualizer, PointCloudVisual
 use point_cloud::viewer_image::{ViewerImage, ImageDimensions};
 use sensor_control::CaptureProvider;
 use std::sync::Arc;
-use support;
+use imgui_support;
 use std::path::Path;
 use std::ffi::c_void;
 use std::time::{Instant, Duration};

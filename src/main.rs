@@ -67,7 +67,7 @@ pub mod graphics_gl;
 pub mod graphics_imgui;
 pub mod k4a_sys_wrapper;
 pub mod old_graphics_libraries;
-pub mod support;
+pub mod imgui_support;
 pub mod opengl;
 pub mod old_k4a_wrapper;
 pub mod opengl_wrapper;
@@ -78,7 +78,6 @@ pub fn main() {
   let device = Device::open(0).expect("Device should open");
 
   let depth_mode : k4a_sys::k4a_depth_mode_t = 2; //k4a_sys::K4A_DEPTH_MODE_NFOV_UNBINNED;
-  let color_format: k4a_sys::k4a_color_resolution_t = 1; //k4a_sys::K4A_COLOR_RESOLUTION_720P;
   let color_format: k4a_sys::k4a_color_resolution_t = k4a_sys::k4a_color_resolution_t_K4A_COLOR_RESOLUTION_2160P;
 
   let calibration = device.get_calibration(depth_mode, color_format).unwrap();
@@ -87,10 +86,6 @@ pub fn main() {
   let capture_provider2= capture_provider.clone();
 
   thread::spawn(move || capture_thread(capture_provider, Some(device)));
-
-  //graphics_grr::run(capture_provider2).unwrap();
-  //graphics_glium::run_glium();
-  //graphics_gl::run(capture_provider2, calibration);
 
   graphics_imgui::run(capture_provider2, calibration);
 }
