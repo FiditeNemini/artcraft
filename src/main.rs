@@ -25,7 +25,7 @@ extern crate winit;
 
 use std::borrow::BorrowMut;
 use std::ffi::{c_void, CStr, CString};
-use std::io::Cursor;
+use std::io::{Cursor, Write};
 use std::os::raw::c_char;
 use std::ptr;
 use std::slice;
@@ -61,6 +61,8 @@ use k4a_sys_wrapper::Device;
 use k4a_sys_wrapper::device_get_installed_count;
 use k4a_sys_wrapper::Image;
 use sensor_control::{capture_thread_to_texture, grab_single_frame, CaptureProvider, capture_thread};
+use std::fs::File;
+use rand::Rng;
 
 pub mod conversion;
 pub mod graphics_gl;
@@ -75,7 +77,7 @@ pub mod point_cloud;
 pub mod sensor_control;
 
 pub fn main() {
-  let device = Device::open(0).expect("Device should open");
+  /*let device = Device::open(0).expect("Device should open");
 
   let depth_mode : k4a_sys::k4a_depth_mode_t = 2; //k4a_sys::K4A_DEPTH_MODE_NFOV_UNBINNED;
   let color_format: k4a_sys::k4a_color_resolution_t = k4a_sys::k4a_color_resolution_t_K4A_COLOR_RESOLUTION_2160P;
@@ -87,5 +89,22 @@ pub fn main() {
 
   thread::spawn(move || capture_thread(capture_provider, Some(device)));
 
-  graphics_imgui::run(capture_provider2, calibration);
+  graphics_imgui::run(capture_provider2, calibration);*/
+
+  let mut rng = rand::thread_rng();
+  let mut file = File::create("/dev/video7").expect("write");
+
+  println!("Streaming...");
+
+  loop {
+    let mut buffer = Vec::<u8>::with_capacity(1024);
+    for _ in 0..buffer.capacity() {
+      buffer.push(rng.gen_range(0, 255));
+    }
+    file.write(&buffer).expect("work");
+  }
+
+  println!("Done");
+
+
 }
