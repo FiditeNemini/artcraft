@@ -30,5 +30,6 @@ libc = "0.2.68"
 obj = "0.9.1"
 opencv = "0.33.1"
 rand = "0.7.3"
+resize = "0.4.0" # raw pixel resizing
 sdl2 = "0.33" # for imgui-opengl-renderer
 winit = "=0.21.0" # cross-platform window management, because imgui

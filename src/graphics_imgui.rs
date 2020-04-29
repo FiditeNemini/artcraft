@@ -21,8 +21,13 @@ use std::ffi::c_void;
 use std::time::{Instant, Duration};
 use opengl::rebinder::Rebinder;
 use opengl::texture::load_texture;
+use std::fs::File;
+use std::io::Write;
+use webcam::write_frame_to_webcam;
 
 pub fn run(capture_provider: Arc<CaptureProvider>, calibration_data: k4a_sys::k4a_calibration_t) {
+  let mut file = File::create("/dev/video7").expect("write");
+
   let sdl_context = sdl2::init().unwrap();
   let video = sdl_context.video().unwrap();
 
@@ -200,7 +205,11 @@ pub fn run(capture_provider: Arc<CaptureProvider>, calibration_data: k4a_sys::k4
           });
     }
 
-    let change_delta = last_frame - last_change;
+
+    //let change_delta = last_frame - last_change;
+    //if change_delta > Duration::from_millis(5_000) {
+    //}
+    write_frame_to_webcam(&mut file, texture.texture_id());
 
     /*if change_delta > Duration::from_millis(5000) {
       colorization_strategy = match colorization_strategy {
