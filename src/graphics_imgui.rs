@@ -31,7 +31,7 @@ use std::error::Error;
 
 pub fn run(capture_provider: Arc<CaptureProvider>, calibration_data: k4a_sys::k4a_calibration_t) {
   //let mut file = File::create("/dev/video7").expect("write");
-  let path = Path::new("/dev/video6");
+  let path = Path::new("/dev/video0");
   let mut file = OpenOptions::new()
       //.append(true)
       //.create(true)
