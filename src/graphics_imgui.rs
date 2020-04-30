@@ -1,32 +1,66 @@
-use imgui::*;
-use imgui::Image;
-
 use gl::types::*;
 use gl;
-use opengl::debug::enable_opengl_debugging;
 use glium::Display;
 use glium::backend::Facade;
 use glutin::ContextBuilder;
 use glutin::event::{Event, WindowEvent};
 use glutin::event_loop::{ControlFlow, EventLoop};
 use glutin::window::WindowBuilder;
+use imgui::*;
+use imgui::Image;
+use imgui_support;
+use memmap2::{MmapMut, Mmap};
+use mmap::MapOption::{MapReadable, MapWritable, MapFd};
+use mmap::MemoryMap;
+use opengl::debug::enable_opengl_debugging;
+use opengl::rebinder::Rebinder;
+use opengl::texture::load_texture;
 use opengl_wrapper::{Texture, Buffer};
 use point_cloud::point_cloud_visualiser::{PointCloudVisualizer, PointCloudVisualizerError, ColorizationStrategy};
 use point_cloud::viewer_image::{ViewerImage, ImageDimensions};
 use sensor_control::CaptureProvider;
-use std::sync::Arc;
-use imgui_support;
-use std::path::Path;
 use std::ffi::c_void;
+use std::fs::{File, OpenOptions};
+use std::io::{Write, Read};
+use std::os::unix::io::AsRawFd;
+use std::path::Path;
+use std::sync::Arc;
 use std::time::{Instant, Duration};
-use opengl::rebinder::Rebinder;
-use opengl::texture::load_texture;
-use std::fs::File;
-use std::io::Write;
 use webcam::write_frame_to_webcam;
+use std::error::Error;
 
 pub fn run(capture_provider: Arc<CaptureProvider>, calibration_data: k4a_sys::k4a_calibration_t) {
-  let mut file = File::create("/dev/video7").expect("write");
+  //let mut file = File::create("/dev/video7").expect("write");
+  let path = Path::new("/dev/video6");
+  let mut file = OpenOptions::new()
+      //.append(true)
+      //.create(true)
+      .read(true)
+      .truncate(true)
+      .write(true)
+      .open(path)
+      .expect("file open");
+
+  //let mut contents = Vec::new();
+  //file.read_to_end(&mut contents).expect("read");
+
+  //file.set_len(0 as u64).expect("set length");
+  //file.set_len(100).expect("set length");
+
+  //let mut mmap_read = unsafe { Mmap::map(&file).expect("mmmap") };
+  //let mut mmap = unsafe { mmap_read.make_mut().expect("making mut") };
+  //let mut mmap = unsafe { MmapMut::map_mut(&file).expect("mmmap") };
+
+  /*let size = 1280*720*3 * 10;
+  let size = 640*480*3;
+  let file_descriptor = file.as_raw_fd();
+  println!("File descriptor: {}", file_descriptor);
+  let options = [
+    MapReadable,
+    MapWritable,
+    MapFd(file_descriptor)
+  ];
+  let mut mmap = MemoryMap::new(size as usize, &options).expect("mmap");*/
 
   let sdl_context = sdl2::init().unwrap();
   let video = sdl_context.video().unwrap();
@@ -71,11 +105,12 @@ pub fn run(capture_provider: Arc<CaptureProvider>, calibration_data: k4a_sys::k4
   //rebinder.restore();
 
   let mut texture = ViewerImage::create(
-    // TODO: The following values work and look great:
+    // TODO: The following commented-out values work and look great,
+    //  but now we're doing suboptimal webcam stuff:
     //1280,
     //1152,
-    640,
-    640,
+    1280,
+    720,
   ).expect("ViewerImage texture creation should work");
 
   let mut imgui_visualizer_xyz_texture : Option<TextureId> = None;
@@ -180,7 +215,8 @@ pub fn run(capture_provider: Arc<CaptureProvider>, calibration_data: k4a_sys::k4
         .position([window_width + 50.0, window_height + 50.0], Condition::FirstUseEver)
         .build(&ui, || {
           //Image::new(imgui_kinect_final_output, [1280.0, 1152.0]).build(&ui);
-          Image::new(imgui_kinect_final_output, [640.0, 480.0]).build(&ui);
+          //Image::new(imgui_kinect_final_output, [640.0, 480.0]).build(&ui);
+          Image::new(imgui_kinect_final_output, [1280.0, 720.0]).build(&ui);
         });
 
     unsafe {
@@ -212,6 +248,7 @@ pub fn run(capture_provider: Arc<CaptureProvider>, calibration_data: k4a_sys::k4
     //let change_delta = last_frame - last_change;
     //if change_delta > Duration::from_millis(5_000) {
     //}
+    //write_frame_to_webcam(&mut file, texture.texture_id());
     write_frame_to_webcam(&mut file, texture.texture_id());
 
     /*if change_delta > Duration::from_millis(5000) {

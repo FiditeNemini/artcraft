@@ -22,6 +22,8 @@ extern crate opencv;
 extern crate rand;
 extern crate sdl2;
 extern crate winit;
+extern crate memmap2;
+extern crate mmap;
 
 use std::borrow::BorrowMut;
 use std::ffi::{c_void, CStr, CString};
