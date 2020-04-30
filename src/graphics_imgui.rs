@@ -55,11 +55,10 @@ pub fn run(capture_provider: Arc<CaptureProvider>, calibration_data: k4a_sys::k4
   let mut imgui = imgui::Context::create();
   imgui.set_ini_filename(None);
 
-  let gl_texture_n64 = load_texture("n64logo.png");
+  /*let gl_texture_n64 = load_texture("n64logo.png");
   let imgui_texture_n64 = TextureId::from(gl_texture_n64 as usize);
-
   let mut gl_texture_snes = load_texture("sneslogo.png");
-  let mut imgui_texture_snes = TextureId::from(gl_texture_snes as usize);
+  let mut imgui_texture_snes = TextureId::from(gl_texture_snes as usize);*/
 
   let mut colorization_strategy = ColorizationStrategy::Color;
 
@@ -72,8 +71,11 @@ pub fn run(capture_provider: Arc<CaptureProvider>, calibration_data: k4a_sys::k4
   //rebinder.restore();
 
   let mut texture = ViewerImage::create(
-    1280,
-    1152,
+    // TODO: The following values work and look great:
+    //1280,
+    //1152,
+    640,
+    640,
   ).expect("ViewerImage texture creation should work");
 
   let mut imgui_visualizer_xyz_texture : Option<TextureId> = None;
@@ -123,7 +125,7 @@ pub fn run(capture_provider: Arc<CaptureProvider>, calibration_data: k4a_sys::k4
     let ui = imgui.frame();
     //ui.show_demo_window(&mut true);
 
-    Window::new(im_str!("Loading Images"))
+    /*Window::new(im_str!("Loading Images"))
         .size([1500.0, 1500.0], Condition::FirstUseEver)
         .position([0.0, 0.0], Condition::FirstUseEver)
         .build(&ui, || {
@@ -137,7 +139,7 @@ pub fn run(capture_provider: Arc<CaptureProvider>, calibration_data: k4a_sys::k4
           ui.separator();
           Image::new(imgui_texture_snes, [200.0, 200.0]).build(&ui);
           ui.separator();
-        });
+        });*/
 
     const window_width : f32 = 1290.0;
     const window_height : f32 = 760.0;
@@ -177,7 +179,8 @@ pub fn run(capture_provider: Arc<CaptureProvider>, calibration_data: k4a_sys::k4
         .size([window_width, window_height + 435.0], Condition::FirstUseEver)
         .position([window_width + 50.0, window_height + 50.0], Condition::FirstUseEver)
         .build(&ui, || {
-          Image::new(imgui_kinect_final_output, [1280.0, 1152.0]).build(&ui);
+          //Image::new(imgui_kinect_final_output, [1280.0, 1152.0]).build(&ui);
+          Image::new(imgui_kinect_final_output, [640.0, 480.0]).build(&ui);
         });
 
     unsafe {

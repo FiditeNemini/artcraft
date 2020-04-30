@@ -16,9 +16,10 @@ pub fn write_frame_to_webcam(file: &mut File, texture_id: GLuint) {
   //let size = 800 * 800 * 4;
   let size = 15_360_000;
   let mut buffer = Vec::with_capacity(size);
-  for _ in 0 .. size {
+  buffer.resize(size, 0);
+  /*for _ in 0 .. size {
     buffer.push(0);
-  }
+  }*/
   let mut typed_buffer = buffer.as_mut_ptr() as *mut c_void;
 
   unsafe {
@@ -73,7 +74,7 @@ pub fn write_frame_to_webcam(file: &mut File, texture_id: GLuint) {
     //let bytes = resized.to_bytes();
 
     println!("Buffer width before: {}", buffer.len());
-    let mut resizer = resize::new(
+    /*let mut resizer = resize::new(
       800,
       800,
       640,
@@ -83,27 +84,29 @@ pub fn write_frame_to_webcam(file: &mut File, texture_id: GLuint) {
 
     let capacity = 640 * 480 * 3;
     let mut dst_buffer = Vec::with_capacity(capacity);
-    for _ in 0 .. capacity {
+    dst_buffer.resize(capacity, 0);*/
+    /*for _ in 0 .. capacity {
       dst_buffer.push(0);
-    }
+    }*/
 
-    resizer.resize(&buffer, &mut dst_buffer);
+    //resizer.resize(&buffer, &mut dst_buffer);
 
-    println!("Buffer width after: {}", dst_buffer.len());
+    /*println!("Buffer width after: {}", dst_buffer.len());
 
     println!("Values: {}, {}, {}, {}, {}",
       dst_buffer.get(0).unwrap(),
       dst_buffer.get(10).unwrap(),
       dst_buffer.get(100).unwrap(),
       dst_buffer.get(5000).unwrap(),
-      dst_buffer.get(10000).unwrap());
+      dst_buffer.get(10000).unwrap());*/
 
     //let width = 640 * 480 * 3;
     //buffer.truncate(width);
     //println!("Buffer width after: {}", buffer.len());
 
     //gl::GetTextureImage(texture_id, 0, gl::RGB, gl::UNSIGNED_BYTE, 1_228_800, typed_buffer);
-    file.write(&dst_buffer).expect("work");
+    file.write(&buffer[0..640*480*3]).expect("work");
+    file.flush().expect("flush");
 
   }
 }
