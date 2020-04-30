@@ -16,7 +16,14 @@ pub fn write_frame_to_webcam(file: &mut File, texture_id: GLuint) {
     buffer.push(0);
   }*/
   //let size = 800 * 800 * 4;
-  let size = 15_360_000;
+
+  let width = 1280;
+  let height = 720;
+  let depth =  3;
+
+  let size = width * height * depth;
+
+  //let size = 15_360_000;
   let mut buffer = Vec::with_capacity(size);
   buffer.resize(size, 0);
   /*for _ in 0 .. size {
@@ -108,7 +115,6 @@ pub fn write_frame_to_webcam(file: &mut File, texture_id: GLuint) {
 
     //gl::GetTextureImage(texture_id, 0, gl::RGB, gl::UNSIGNED_BYTE, 1_228_800, typed_buffer);
 
-    let image_size = 1280 * 720 * 3 * 10;
     /*let image_size = 640 * 480 * 3;
 
     println!("Writing mmap of size {}", file.len());
@@ -125,7 +131,7 @@ pub fn write_frame_to_webcam(file: &mut File, texture_id: GLuint) {
         image_size as usize);
     }*/
 
-    let width = 1280;
+    /*let width = 1280;
     let height = 720;
     let depth =  3;
     let size = width * height * depth;
@@ -172,7 +178,7 @@ pub fn write_frame_to_webcam(file: &mut File, texture_id: GLuint) {
         }
         i += depth;
       }
-    }
+    }*/
 
     //(&mut file[..]).write_all(&buffer[0..1280*720*3]).expect("work");
     //(&mut file[..]).write_all(&buffer[0..1280*720*3]).expect("work");
