@@ -95,9 +95,12 @@ void main()
     vec3 vertexPosition = imageLoad(pointCloudTexture, currentDepthPixelCoordinates).xyz;
 
     // Scale up while model view matrices not implemented.
-    vertexPosition.x *= 2.0 + 10.0;
-    vertexPosition.y *= 2.0 + 10.0;
-    vertexPosition.z *= 2.0;
+    //vertexPosition.x *= 2.0 + 10.0;
+    //vertexPosition.y *= 2.0 + 10.0;
+    //vertexPosition.z *= 2.0;
+
+    vertexPosition.x -= 2.0;
+    vertexPosition.y -= 2.0;
 
     gl_Position = projection * view * vec4(vertexPosition, 1);
 
