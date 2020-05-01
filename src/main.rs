@@ -69,13 +69,10 @@ use std::fs::File;
 use rand::Rng;
 
 pub mod conversion;
-pub mod graphics_gl;
 pub mod mouse;
 pub mod graphics_imgui;
 pub mod imgui_support;
 pub mod k4a_sys_wrapper;
-pub mod old_graphics_libraries;
-pub mod old_k4a_wrapper;
 pub mod opengl;
 pub mod opengl_wrapper;
 pub mod point_cloud;

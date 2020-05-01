@@ -14,14 +14,14 @@ use k4a_sys_wrapper;
 use gl::types::*;
 use libc;
 
-use opengl_wrapper::{Buffer, VertexArray, gl_get_error, OpenGlError};
+use conversion::k4a_image_to_rust_image_for_debug;
 use opengl_wrapper::Texture;
+use opengl_wrapper::{Buffer, VertexArray, gl_get_error, OpenGlError};
+use opengl_wrapper::{get_stride, get_pointer_offset};
 use point_cloud::compile_shader::compile_shader;
 use point_cloud::gpu_point_cloud_converter::POINT_CLOUD_TEXTURE_FORMAT;
-use graphics_gl::{get_stride, get_pointer_offset};
 use point_cloud::pixel_structs::BgraPixel;
 use point_cloud::point_cloud_visualiser::PointCloudVisualizer;
-use conversion::k4a_image_to_rust_image_for_debug;
 use std::path::Path;
 
 pub type Result<T> = std::result::Result<T, PointCloudRendererError>;

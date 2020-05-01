@@ -5,6 +5,7 @@
 use std::fmt::{Error, Formatter};
 use gl;
 use gl::types::*;
+use std::ptr::null;
 
 /// A slightly more convenient OpenGL Buffer type
 #[derive(Clone, Debug)]
@@ -341,5 +342,20 @@ pub fn gl_get_error() -> Result<(), OpenGlError> {
     gl::STACK_UNDERFLOW => Err(OpenGlError::StackUnderflow),
     gl::STACK_OVERFLOW => Err(OpenGlError::StackOverflow),
     _ => Err(OpenGlError::UnknownError(result)),
+  }
+}
+
+/// Calculate the stride width for OpenGL
+/// Useful for `gl::VertexAttribPointer`.
+pub fn get_stride<T>(size: usize) -> gl::types::GLint {
+  (size * std::mem::size_of::<T>()) as gl::types::GLint
+}
+
+/// Calculate the offset for OpenGL
+/// Useful for `gl::VertexAttribPointer`.
+pub fn get_pointer_offset<T>(offset: usize) -> *const gl::types::GLvoid {
+  match offset {
+    0 => null(),
+    _ => (offset * std::mem::size_of::<T>()) as *const gl::types::GLvoid,
   }
 }
