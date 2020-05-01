@@ -1,16 +1,12 @@
-//#![allow(warnings)]
+#![allow(warnings)]
 
 extern crate arcball;
 extern crate cgmath;
 extern crate clipboard;
-#[macro_use] extern crate enum_primitive;
-extern crate genmesh;
 extern crate gl;
 extern crate glfw;
 extern crate glfw_sys;
 #[macro_use] extern crate glium;
-extern crate glutin;
-extern crate grr;
 extern crate image;
 #[macro_use] extern crate imgui;
 extern crate imgui_glium_renderer;
@@ -19,8 +15,6 @@ extern crate imgui_sdl2;
 extern crate imgui_winit_support;
 extern crate k4a_sys;
 extern crate libc;
-extern crate memmap2;
-extern crate mmap;
 extern crate obj;
 extern crate opencv;
 extern crate rand;
