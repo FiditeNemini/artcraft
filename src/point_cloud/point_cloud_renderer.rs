@@ -8,11 +8,14 @@ use std::os::raw::{c_char, c_void};
 use std::ptr;
 use std::ptr::null;
 use std::str;
+use std::sync::{Arc, Mutex};
 
+use arcball::ArcballCamera;
 use gl;
 use gl::types::*;
 
 use k4a_sys_wrapper;
+use mouse::SdlArcball;
 use opengl_wrapper::{Buffer, gl_get_error, OpenGlError, VertexArray};
 use opengl_wrapper::Texture;
 use point_cloud::compile_shader::compile_shader;
@@ -188,6 +191,8 @@ void main()
 ";
 
 pub struct PointCloudRenderer {
+  arcball_camera: Arc<Mutex<SdlArcball>>,
+
   /// The OpenGL program
   shader_program_id: GLuint,
 
@@ -200,7 +205,8 @@ pub struct PointCloudRenderer {
   // TODO: better matrix types
   view: [f32; 16],
   projection: [f32; 16],
-  proj_view: [[f32; 4]; 4],
+  view_matrix: [[f32; 4]; 4],
+  projection_matrix: [[f32; 4]; 4],
 
   /// Renderer setting: size of the rendered points
   point_size: u8,
@@ -276,7 +282,7 @@ const fn initial_projection_matrix_4x4() -> [f32; 16] {
 
 impl PointCloudRenderer {
 
-  pub fn new() -> Self {
+  pub fn new(arcball: Arc<Mutex<SdlArcball>>) -> Self {
     let vertex_array_object = VertexArray::new_initialized();
     let vertex_color_buffer_object = Buffer::new_initialized();
 
@@ -335,10 +341,19 @@ impl PointCloudRenderer {
       [2.62268e-07,  1.0,    -5.0,        1.0],
     ];
 
+    let initial_projection = [
+      [1.41272,    0.0,      0.0,      0.0],
+      [0.0,        1.56969,  0.0,      0.0],
+      [0.0,        0.0,      -1.002,   -1.0],
+      [0.0,        0.0,      -0.2002,  0.0],
+    ];
+
     Self {
+      arcball_camera: arcball,
       view: initial_view_matrix_4x4(),
       projection: initial_projection_matrix_4x4(),
-      proj_view: initial_view,
+      view_matrix: initial_view,
+      projection_matrix: initial_projection,
       shader_program_id: program_id,
       vertex_shader_id,
       fragment_shader_id,
@@ -355,11 +370,26 @@ impl PointCloudRenderer {
   }
 
   ///
-  /// Update the view matrix
+  /// Update the view matrices
   ///
-  pub fn update_view_projection(&mut self, proj_view: [[f32; 4]; 4]) {
-    //println!("Matrix: {:?}", proj_view);
-    self.proj_view = proj_view;
+  pub fn update_view_projection(&mut self, view: [[f32; 4]; 4], projection: [[f32; 4]; 4]) {
+    println!("\nView Matrix: {:?}", view);
+    println!("Updated: {:?}", projection);
+    self.view_matrix = view;
+    //self.projection_matrix = projection;
+
+    let initial_projection = [
+      [1.41272,    0.0,      0.0,      0.0],
+      [0.0,        1.56969,  0.0,      0.0],
+      [0.0,        0.0,      -1.002,   -1.0],
+      [0.0,        0.0,      -0.2002,  0.0],
+    ];
+
+    // Initial: [[1.41272,    0.0, 0.0, 0.0], [0.0, 1.56969, 0.0, 0.0],   [0.0, 0.0, -1.002,    -1.0],       [0.0, 0.0, -0.2002, 0.0]]
+    // Updated: [[0.88294804, 0.0, 0.0, 0.0], [0.0, 1.5696855, 0.0, 0.0], [0.0, 0.0, -1.002002, -0.2002002], [0.0, 0.0, -1.0,    0.0]]
+    println!("Initial: {:?}", initial_projection);
+
+    self.projection_matrix = initial_projection;
   }
 
   ///
@@ -495,9 +525,11 @@ impl PointCloudRenderer {
 
       // Update view/projection matrices in shader
       //gl::UniformMatrix4fv(self.view_index, 1, gl::FALSE, self.view.as_ptr());
-      gl::UniformMatrix4fv(self.projection_index, 1, gl::FALSE, self.projection.as_ptr());
+      //gl::UniformMatrix4fv(self.projection_index, 1, gl::FALSE, self.projection.as_ptr());
+      let typed_projection = self.projection_matrix.as_ptr() as *const GLfloat;
+      gl::UniformMatrix4fv(self.projection_index, 1, gl::FALSE, typed_projection);
 
-      let typed_view = self.proj_view.as_ptr() as *const GLfloat;
+      let typed_view = self.view_matrix.as_ptr() as *const GLfloat;
       gl::UniformMatrix4fv(self.view_index, 1, gl::FALSE, typed_view);
       //gl::UniformMatrix4fv(self.projection_index, 1, gl::FALSE, typed_view);
 

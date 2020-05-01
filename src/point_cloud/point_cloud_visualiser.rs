@@ -182,11 +182,11 @@ impl PointCloudVisualizer {
         .expect("Should be in correct depth sensor mode.");
 
     let mut visualizer = Self {
-      arcball_camera,
+      arcball_camera: arcball_camera.clone(),
       m_dimensions_width: width,
       m_dimensions_height: height,
       enable_color_point_cloud,
-      point_cloud_renderer: PointCloudRenderer::new(),
+      point_cloud_renderer: PointCloudRenderer::new(arcball_camera.clone()),
       point_cloud_converter: GpuPointCloudConverter::new(),
       frame_buffer: Framebuffer::new_initialized(),
       depth_buffer,
@@ -273,9 +273,9 @@ impl PointCloudVisualizer {
 
     match self.arcball_camera.lock() {
       Ok(arcball) => {
-        let proj_view: [[f32; 4]; 4] = (arcball.get_mat4()).into();
-        // TODO: View matrix maths
-        self.point_cloud_renderer.update_view_projection(proj_view);
+        let view: [[f32; 4]; 4] = (arcball.get_view_matrix()).into();
+        let perspective: [[f32; 4]; 4] = (arcball.get_perspective_matrix()).into();
+        self.point_cloud_renderer.update_view_projection(view, perspective);
       },
       Err(_) => {},
     }

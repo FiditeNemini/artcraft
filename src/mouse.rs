@@ -4,32 +4,46 @@ use cgmath::Vector3;
 use sdl2::event::Event;
 use sdl2::mouse::MouseButton;
 
+const DEFAULT_ZOOM: f32 = 65.0;
+
+// TODO: Enable camera resizing (or change of texture to differently sized texture)
 /// Wrap a camera arcball for use with SDL
 pub struct SdlArcball {
-  // TODO: Enable camera resizing (or change of texture to differently sized texture)
+  // Arcball camera state
   arcball: ArcballCamera<f32>,
+
+  // Dimensions of the window
+  window_width: u32,
+  window_height: u32,
+
+  // Last mouse state
   left_mouse_active: bool,
   right_mouse_active: bool,
   last_x: f32,
   last_y: f32,
+  last_zoom: f32,
 }
 
 impl SdlArcball {
   /// CTOR
-  pub fn new(width: f32, height: f32) -> Self {
+  pub fn new(window_width: u32, window_height: u32) -> Self {
     let center = Vector3::new(0.0, 0.0, 0.0);
     let zoom_speed = 1.0;
-    let screen = [width, height];
+    let screen = [window_width as f32, window_height as f32];
     let arcball = ArcballCamera::new(center, zoom_speed, screen);
     Self {
       arcball,
+      window_width,
+      window_height,
       left_mouse_active: false,
       right_mouse_active: false,
       last_x: 0.0,
       last_y: 0.0,
+      last_zoom: DEFAULT_ZOOM,
     }
   }
 
+  /// Process an SDL event.
   pub fn process_event(&mut self, event: &Event) {
     match event {
       Event::MouseWheel { timestamp: _, window_id: _, which: _, x: _, y, direction: _ } => {
@@ -52,12 +66,55 @@ impl SdlArcball {
     }
   }
 
-  pub fn get_mat4(&self) -> Matrix4<f32> {
+  /// Get the view matrix
+  pub fn get_view_matrix(&self) -> Matrix4<f32> {
     self.arcball.get_mat4()
   }
 
+  /// Get the perspective matrix
+  pub fn get_perspective_matrix(&self) -> Matrix4<f32> {
+    let zoom = self.last_zoom;
+    let y_fov = zoom.to_radians();
+    let aspect = self.window_width as f32 / self.window_height as f32;
+    let n = 0.1f32;
+    let f = 100.0f32;
+
+    // From linmath.h included in Microsoft's k4a open source code
+    let a = 1.0f32 / (y_fov / 2.0).tan();
+
+    // NB: This is column-major, which is dumb.
+    Matrix4::new(
+      // Column 0
+      a / aspect,
+      0.0,
+      0.0,
+      0.0,
+
+      // Column 1
+      0.0,
+      a,
+      0.0,
+      0.0,
+
+      // Column 2
+      0.0,
+      0.0,
+      -((f + n) / (f - n)),
+      -((2.0 * f * n) / (f - n)),
+
+      // Column 3
+      0.0,
+      0.0,
+      -1.0, // NB: This is not zero
+      0.0,
+    )
+  }
+
   fn mouse_wheel(&mut self, y: i32) {
-    self.arcball.zoom(y as f32, 0.16);
+    let y = y as f32;
+    println!("Zoom: {}", y);
+    self.arcball.zoom(y, 0.16);
+    self.last_zoom = y;
   }
 
   fn mouse_button_press(&mut self, mouse_button: &MouseButton, down: bool) {

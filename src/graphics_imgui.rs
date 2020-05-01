@@ -19,7 +19,7 @@ pub fn run(capture_provider: Arc<CaptureProvider>, calibration_data: k4a_sys::k4
   let mut webcam_writer = WebcamWriter::open_file("/dev/video0", 1280, 720, 3)
       .expect("should be able to create webcamwriter");
 
-  let sdl_arcball = Arc::new(Mutex::new(SdlArcball::new(1280.0, 720.0)));
+  let sdl_arcball = Arc::new(Mutex::new(SdlArcball::new(1280, 720)));
 
   let sdl_context = sdl2::init().unwrap();
   let video = sdl_context.video().unwrap();
