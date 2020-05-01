@@ -26,41 +26,13 @@ use std::os::unix::io::AsRawFd;
 use std::path::Path;
 use std::sync::Arc;
 use std::time::{Instant, Duration};
-use webcam::write_frame_to_webcam;
+use webcam::{WebcamWriter};
 use std::error::Error;
 
 pub fn run(capture_provider: Arc<CaptureProvider>, calibration_data: k4a_sys::k4a_calibration_t) {
-  //let mut file = File::create("/dev/video7").expect("write");
-  let path = Path::new("/dev/video0");
-  let mut file = OpenOptions::new()
-      //.append(true)
-      //.create(true)
-      .read(true)
-      .truncate(true)
-      .write(true)
-      .open(path)
-      .expect("file open");
 
-  //let mut contents = Vec::new();
-  //file.read_to_end(&mut contents).expect("read");
-
-  //file.set_len(0 as u64).expect("set length");
-  //file.set_len(100).expect("set length");
-
-  //let mut mmap_read = unsafe { Mmap::map(&file).expect("mmmap") };
-  //let mut mmap = unsafe { mmap_read.make_mut().expect("making mut") };
-  //let mut mmap = unsafe { MmapMut::map_mut(&file).expect("mmmap") };
-
-  /*let size = 1280*720*3 * 10;
-  let size = 640*480*3;
-  let file_descriptor = file.as_raw_fd();
-  println!("File descriptor: {}", file_descriptor);
-  let options = [
-    MapReadable,
-    MapWritable,
-    MapFd(file_descriptor)
-  ];
-  let mut mmap = MemoryMap::new(size as usize, &options).expect("mmap");*/
+  let mut webcam_writer = WebcamWriter::open_file("/dev/video0", 1280, 720, 3)
+      .expect("should be able to create webcamwriter");
 
   let sdl_context = sdl2::init().unwrap();
   let video = sdl_context.video().unwrap();
@@ -244,12 +216,12 @@ pub fn run(capture_provider: Arc<CaptureProvider>, calibration_data: k4a_sys::k4
           });
     }
 
+    webcam_writer.write_current_frame_to_file(texture.texture_id())
+        .expect("should write");
 
     //let change_delta = last_frame - last_change;
     //if change_delta > Duration::from_millis(5_000) {
     //}
-    //write_frame_to_webcam(&mut file, texture.texture_id());
-    write_frame_to_webcam(&mut file, texture.texture_id());
 
     /*if change_delta > Duration::from_millis(5000) {
       colorization_strategy = match colorization_strategy {
