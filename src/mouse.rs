@@ -4,6 +4,8 @@ use cgmath::Vector3;
 use sdl2::event::Event;
 use sdl2::mouse::MouseButton;
 
+const MIN_ZOOM : f32 = 1.0;
+const MAX_ZOOM : f32 = 120.0;
 const DEFAULT_ZOOM: f32 = 65.0;
 
 // TODO: Enable camera resizing (or change of texture to differently sized texture)
@@ -30,7 +32,24 @@ impl SdlArcball {
     let center = Vector3::new(0.0, 0.0, 0.0);
     let zoom_speed = 1.0;
     let screen = [window_width as f32, window_height as f32];
-    let arcball = ArcballCamera::new(center, zoom_speed, screen);
+    let mut arcball = ArcballCamera::new(center, zoom_speed, screen);
+
+    // TODO: This should be cleaned up to use pure math rather than stupid experimentally determined fixes
+    arcball.zoom(-8.0, 0.16);
+
+    let mut prev = Vector2::new(window_width as f32, (window_height/2) as f32);
+
+    for i in 0 .. window_width / 2 {
+      let pos = Vector2::new(prev.x - 1.0, (window_height/2) as f32);
+      arcball.rotate(prev, pos);
+      prev = pos.clone();
+    }
+
+    for i in 0..600 {
+      let delta = Vector2::new(0.0, 1.0);
+      arcball.pan(delta, 0.16);
+    }
+
     Self {
       arcball,
       window_width,
@@ -77,7 +96,7 @@ impl SdlArcball {
     let y_fov = zoom.to_radians();
     let aspect = self.window_width as f32 / self.window_height as f32;
     let n = 0.1f32;
-    let f = 100.0f32;
+    let f = 1000.0f32;
 
     // From linmath.h included in Microsoft's k4a open source code
     let a = 1.0f32 / (y_fov / 2.0).tan();
@@ -112,9 +131,15 @@ impl SdlArcball {
 
   fn mouse_wheel(&mut self, y: i32) {
     let y = y as f32;
-    println!("Zoom: {}", y);
     self.arcball.zoom(y, 0.16);
-    self.last_zoom = y;
+
+    // NB: 'y' is a scroll amount, typically 1 or -1.
+    let zoom = (self.last_zoom + y)
+        .max(MIN_ZOOM)
+        .min(MAX_ZOOM);
+
+    self.last_zoom = zoom;
+    println!("Zoom: {}", zoom);
   }
 
   fn mouse_button_press(&mut self, mouse_button: &MouseButton, down: bool) {
