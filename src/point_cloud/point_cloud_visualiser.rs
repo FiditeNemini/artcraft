@@ -21,6 +21,7 @@ use point_cloud::util::{ValueRange, get_depth_mode_range, colorize_depth_blue_to
 use arcball::ArcballCamera;
 use std::rc::Rc;
 use std::sync::{Arc, Mutex, PoisonError, MutexGuard};
+use mouse::SdlArcball;
 
 pub type Result<T> = std::result::Result<T, PointCloudVisualizerError>;
 
@@ -93,7 +94,7 @@ pub enum ColorizationStrategy {
 }
 
 pub struct PointCloudVisualizer {
-  arcball_camera: Arc<Mutex<ArcballCamera<f32>>>,
+  arcball_camera: Arc<Mutex<SdlArcball>>,
 
   m_dimensions_width : i32,
   m_dimensions_height : i32,
@@ -150,7 +151,7 @@ impl PointCloudVisualizer {
   pub fn new(enable_color_point_cloud: bool,
              initial_colorization_strategy: ColorizationStrategy,
              calibration_data: k4a_sys::k4a_calibration_t,
-             arcball_camera: Arc<Mutex<ArcballCamera<f32>>>) -> Self
+             arcball_camera: Arc<Mutex<SdlArcball>>) -> Self
   {
     // Resolution of the point cloud texture
     // constexpr ImageDimensions PointCloudVisualizerTextureDimensions = { 1280, 1152 };

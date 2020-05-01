@@ -25,27 +25,21 @@ use std::fs::{File, OpenOptions};
 use std::io::{Write, Read};
 use std::os::unix::io::AsRawFd;
 use std::path::Path;
-use std::sync::{Arc, Mutex, PoisonError};
+use std::sync::{Arc, Mutex, PoisonError, MutexGuard};
 use std::time::{Instant, Duration};
 use cgmath::Vector3;
 use cgmath::Vector2;
 use webcam::{WebcamWriter};
 use std::error::Error;
 use arcball::ArcballCamera;
+use mouse::SdlArcball;
 
 pub fn run(capture_provider: Arc<CaptureProvider>, calibration_data: k4a_sys::k4a_calibration_t) {
 
   let mut webcam_writer = WebcamWriter::open_file("/dev/video0", 1280, 720, 3)
       .expect("should be able to create webcamwriter");
 
-  let mut arcball_camera = Arc::new(
-    Mutex::new(
-      ArcballCamera::new(Vector3::new(0.0, 0.0, 0.0), 1.0, [1280.0, 720.0])));
-      //[display_dims.0 as f32, display_dims.1 as f32]);
-
-  // Track if left/right mouse is down
-  let mut mouse_pressed = [false, false];
-  let mut prev_mouse = Vector2::new(0.0, 0.0);
+  let sdl_arcball = Arc::new(Mutex::new(SdlArcball::new(1280.0, 720.0)));
 
   let sdl_context = sdl2::init().unwrap();
   let video = sdl_context.video().unwrap();
@@ -85,7 +79,7 @@ pub fn run(capture_provider: Arc<CaptureProvider>, calibration_data: k4a_sys::k4
     true,
     colorization_strategy,
     calibration_data,
-    arcball_camera.clone(),
+    sdl_arcball.clone(),
   );
 
   //rebinder.restore();
@@ -105,7 +99,6 @@ pub fn run(capture_provider: Arc<CaptureProvider>, calibration_data: k4a_sys::k4
   let imgui_point_cloud_convert_xy_table= TextureId::from(visualizer.point_cloud_converter.xy_table_texture.id() as usize);
 
   let imgui_kinect_final_output = TextureId::from(texture.texture_id() as usize);
-
 
   let mut imgui_sdl2 = imgui_sdl2::ImguiSdl2::new(&mut imgui, &window);
 
@@ -130,57 +123,13 @@ pub fn run(capture_provider: Arc<CaptureProvider>, calibration_data: k4a_sys::k4
         Event::Quit {..} | Event::KeyDown { keycode: Some(Keycode::Escape), .. } => {
           break 'running
         },
-        Event::MouseButtonDown { timestamp, window_id, which, mouse_btn, clicks, x, y } => {
-          //println!("Mouse down");
-          match mouse_btn {
-            sdl2::mouse::MouseButton::Left => mouse_pressed[0] = true,
-            sdl2::mouse::MouseButton::Right => mouse_pressed[1] = true,
-            _ => {},
-          }
-        },
-        Event::MouseButtonUp { timestamp, window_id, which, mouse_btn, clicks, x, y } => {
-          //println!("Mouse up");
-          match mouse_btn {
-            sdl2::mouse::MouseButton::Left => mouse_pressed[0] = false,
-            sdl2::mouse::MouseButton::Right => mouse_pressed[1] = false,
-            _ => {},
-          }
-        },
-        Event::MouseMotion { timestamp, window_id, which, mousestate, x, y, xrel, yrel } => {
-          //println!("XY Mouse: {},{}", x, y);
-          if mouse_pressed[0] {
-            match arcball_camera.lock() {
-              Ok(mut arcball) => {
-                arcball.rotate(
-                  Vector2::new(prev_mouse.x as f32, prev_mouse.y as f32),
-                  Vector2::new(x as f32, y as f32),
-                );
-              },
-              Err(_) => {},
-            }
-          } else if mouse_pressed[1] {
-            let mouse_delta = Vector2::new(
-              (x as f32 - prev_mouse.x as f32),
-              (prev_mouse.y as f32 - y as f32), // Invert scrolling
-            );
-            match arcball_camera.lock() {
-              Ok(mut arcball) => {
-                arcball.pan(mouse_delta, 0.16);
-              },
-              Err(_) => {},
-            }
-          }
-          prev_mouse = Vector2::new(x as f32, y as f32);
-        },
-        Event::MouseWheel { timestamp, window_id, which, x, y, direction } => {
-          match arcball_camera.lock() {
-            Ok(mut arcball) => {
-              arcball.zoom(y as f32, 0.16);
-            },
-            Err(_) => {},
-          }
-        },
         _ => {}
+      }
+
+      // Also send to the arcball to update the view matrix.
+      match sdl_arcball.lock() {
+        Ok(mut arcball) => arcball.process_event(&event),
+        Err(_) => {},
       }
     }
 

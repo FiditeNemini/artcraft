@@ -70,6 +70,7 @@ use rand::Rng;
 
 pub mod conversion;
 pub mod graphics_gl;
+pub mod mouse;
 pub mod graphics_imgui;
 pub mod imgui_support;
 pub mod k4a_sys_wrapper;

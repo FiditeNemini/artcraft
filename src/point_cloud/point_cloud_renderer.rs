@@ -364,7 +364,7 @@ impl PointCloudRenderer {
   /// Update the view matrix
   ///
   pub fn update_view_projection(&mut self, proj_view: [[f32; 4]; 4]) {
-    println!("Matrix: {:?}", proj_view);
+    //println!("Matrix: {:?}", proj_view);
     self.proj_view = proj_view;
   }
 

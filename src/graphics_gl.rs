@@ -30,6 +30,7 @@ use opengl::debug::enable_opengl_debugging;
 use arcball::ArcballCamera;
 use cgmath::Vector2;
 use cgmath::Vector3;
+use mouse::SdlArcball;
 
 //use shader::Shader;
 
@@ -131,8 +132,7 @@ pub fn run(capture_provider: Arc<CaptureProvider>, calibration_data: k4a_sys::k4
     true,
     ColorizationStrategy::Color,
     calibration_data,
-    Arc::new(Mutex::new(ArcballCamera::new(Vector3::new(0.0, 0.0, 0.0), 1.0,
-      [1280.0, 720.0])))
+    Arc::new(Mutex::new(SdlArcball::new(100.0, 100.0)))
   );
 
   // TODO - constructed in PointCloudWindow.
