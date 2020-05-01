@@ -18,6 +18,9 @@ use std::mem::size_of;
 use conversion::k4a_image_to_rust_image_for_debug;
 use std::path::Path;
 use point_cloud::util::{ValueRange, get_depth_mode_range, colorize_depth_blue_to_red};
+use arcball::ArcballCamera;
+use std::rc::Rc;
+use std::sync::{Arc, Mutex, PoisonError, MutexGuard};
 
 pub type Result<T> = std::result::Result<T, PointCloudVisualizerError>;
 
@@ -90,9 +93,7 @@ pub enum ColorizationStrategy {
 }
 
 pub struct PointCloudVisualizer {
-  // TODO: ViewControl m_viewControl;
-  // TODO: linmath::mat4x4 m_projection{};
-  // TODO: linmath::mat4x4 m_view{};
+  arcball_camera: Arc<Mutex<ArcballCamera<f32>>>,
 
   m_dimensions_width : i32,
   m_dimensions_height : i32,
@@ -148,7 +149,8 @@ impl PointCloudVisualizer {
   ///
   pub fn new(enable_color_point_cloud: bool,
              initial_colorization_strategy: ColorizationStrategy,
-             calibration_data: k4a_sys::k4a_calibration_t) -> Self
+             calibration_data: k4a_sys::k4a_calibration_t,
+             arcball_camera: Arc<Mutex<ArcballCamera<f32>>>) -> Self
   {
     // Resolution of the point cloud texture
     // constexpr ImageDimensions PointCloudVisualizerTextureDimensions = { 1280, 1152 };
@@ -177,6 +179,7 @@ impl PointCloudVisualizer {
         .expect("Should be in correct depth sensor mode.");
 
     let mut visualizer = Self {
+      arcball_camera,
       m_dimensions_width: width,
       m_dimensions_height: height,
       enable_color_point_cloud,
@@ -260,8 +263,14 @@ impl PointCloudVisualizer {
       gl::Clear(gl::COLOR_BUFFER_BIT | gl::DEPTH_BUFFER_BIT);
     }
 
-    // TODO: View matrix maths
-    self.point_cloud_renderer.update_view_projection();
+    match self.arcball_camera.lock() {
+      Ok(arcball) => {
+        let proj_view: [[f32; 4]; 4] = (arcball.get_mat4()).into();
+        // TODO: View matrix maths
+        self.point_cloud_renderer.update_view_projection(proj_view);
+      },
+      Err(_) => {},
+    }
 
     let render_status = self.point_cloud_renderer.render();
 

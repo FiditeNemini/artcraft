@@ -99,8 +99,11 @@ void main()
     //vertexPosition.y *= 2.0 + 10.0;
     //vertexPosition.z *= 2.0;
 
-    vertexPosition.x -= 2.0;
-    vertexPosition.y -= 2.0;
+
+    if (view[0][0] > 0.5) {
+      vertexPosition.x -= 2.0;
+      vertexPosition.y -= 2.0;
+    }
 
     gl_Position = projection * view * vec4(vertexPosition, 1);
 
@@ -203,6 +206,7 @@ pub struct PointCloudRenderer {
   // TODO: better matrix types
   view: [f32; 16],
   projection: [f32; 16],
+  proj_view: [[f32; 4]; 4],
 
   /// Renderer setting: size of the rendered points
   point_size: u8,
@@ -330,9 +334,17 @@ impl PointCloudRenderer {
     println!("Uniform enable shading location - view: {:?}", enable_shading_index);
     println!("Uniform point cloud texture location - view: {:?}", point_cloud_texture_index);
 
+    let initial_view = [
+      [-1.0,         0.0,    8.74228e-08, 0.0],
+      [0.0,          1.0,    0.0,         0.0],
+      [-8.74228e-08, 0.0,    -1.0,        0.0],
+      [2.62268e-07,  1.0,    -5.0,        1.0],
+    ];
+
     Self {
       view: initial_view_matrix_4x4(),
       projection: initial_projection_matrix_4x4(),
+      proj_view: initial_view,
       shader_program_id: program_id,
       vertex_shader_id,
       fragment_shader_id,
@@ -348,13 +360,12 @@ impl PointCloudRenderer {
     }
   }
 
-  // TODO need matrix maths
-  pub fn update_view_projection(&mut self) {
-    // TODO - matrix math
-    // void PointCloudRenderer::UpdateViewProjection(mat4x4 view, mat4x4 projection)
-    //mat4x4_dup(m_view, view);
-    //mat4x4_dup(m_projection, projection);
-    //unimplemented!();
+  ///
+  /// Update the view matrix
+  ///
+  pub fn update_view_projection(&mut self, proj_view: [[f32; 4]; 4]) {
+    println!("Matrix: {:?}", proj_view);
+    self.proj_view = proj_view;
   }
 
   ///
@@ -371,11 +382,11 @@ impl PointCloudRenderer {
 
     //println!("updating point_cloud_texture: {}", point_cloud_texture.id());
 
-    println!("update_point_clouds() color_image: {}x{}, bytes={}, (format={:?})",
+    /*println!("update_point_clouds() color_image: {}x{}, bytes={}, (format={:?})",
       color_image.get_width_pixels(),
       color_image.get_height_pixels(),
       color_image.get_size(),
-      color_image.get_format());
+      color_image.get_format());*/
 
     unsafe {
       //println!("Binding VAO vertex_array_object id = {}", self.vertex_array_object.id());
@@ -489,8 +500,12 @@ impl PointCloudRenderer {
       gl::UseProgram(self.shader_program_id);
 
       // Update view/projection matrices in shader
-      gl::UniformMatrix4fv(self.view_index, 1, gl::FALSE, self.view.as_ptr());
+      //gl::UniformMatrix4fv(self.view_index, 1, gl::FALSE, self.view.as_ptr());
       gl::UniformMatrix4fv(self.projection_index, 1, gl::FALSE, self.projection.as_ptr());
+
+      let typed_view = self.proj_view.as_ptr() as *const GLfloat;
+      gl::UniformMatrix4fv(self.view_index, 1, gl::FALSE, typed_view);
+      //gl::UniformMatrix4fv(self.projection_index, 1, gl::FALSE, typed_view);
 
       // Update render settings in shader
       let enable_shading = if self.enable_shading { 1 } else { 0 };
@@ -502,7 +517,7 @@ impl PointCloudRenderer {
       gl::BindVertexArray(self.vertex_array_object.id());
       //let size = self.vertex_array_size_bytes / size_of::<BgraPixel>() as i32 / 3; // TODO: 1/3rd of information to draw
       let size = self.vertex_array_size_bytes / size_of::<BgraPixel>() as i32;
-      println!("Draw size: {} (vertex array size bytes: {})", size, self.vertex_array_size_bytes);
+      //println!("Draw size: {} (vertex array size bytes: {})", size, self.vertex_array_size_bytes);
       gl::DrawArrays(gl::POINTS, 0, size);
 
       gl::BindVertexArray(0);

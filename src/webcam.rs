@@ -50,6 +50,7 @@ impl WebcamWriter {
     })
   }
 
+  // TODO: Make it easy to update for new textures of different sizes (dynamic buffer resize)
   /// Grab the current texture held by `texture_id` and immediately write it to file.
   pub fn write_current_frame_to_file(&mut self, texture_id: GLuint) -> Result<(), WebcamError> {
     let mut typed_buffer = self.buffer.as_mut_ptr() as *mut c_void;

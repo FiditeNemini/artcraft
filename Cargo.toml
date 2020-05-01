@@ -9,6 +9,8 @@ name = "camera"
 path = "src/main.rs"
 
 [dependencies]
+arcball = "1.0.0" # camera
+cgmath = "0.17.0" # for arcball, but probably good for matrices, vecs, etc.
 clipboard = "0.5" # to support imgui...
 enum_primitive = "0.1.1" # c wrapper ergonomics
 genmesh = "0.6.0" # for glium example

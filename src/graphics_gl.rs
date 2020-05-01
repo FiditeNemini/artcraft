@@ -19,7 +19,7 @@ use glutin::ContextBuilder;
 use std::mem::size_of;
 use std::ptr::null;
 //use glium::framebuffer::ColorAttachment::Texture;
-use std::sync::Arc;
+use std::sync::{Arc, Mutex};
 use sensor_control::CaptureProvider;
 use point_cloud;
 use point_cloud::gpu_point_cloud_converter::GpuPointCloudConverter;
@@ -27,6 +27,9 @@ use point_cloud::point_cloud_renderer::PointCloudRenderer;
 use point_cloud::point_cloud_visualiser::{PointCloudVisualizer, PointCloudVisualizerError, ColorizationStrategy};
 use point_cloud::viewer_image::ViewerImage;
 use opengl::debug::enable_opengl_debugging;
+use arcball::ArcballCamera;
+use cgmath::Vector2;
+use cgmath::Vector3;
 
 //use shader::Shader;
 
@@ -127,7 +130,9 @@ pub fn run(capture_provider: Arc<CaptureProvider>, calibration_data: k4a_sys::k4
   let mut visualizer = PointCloudVisualizer::new(
     true,
     ColorizationStrategy::Color,
-    calibration_data
+    calibration_data,
+    Arc::new(Mutex::new(ArcballCamera::new(Vector3::new(0.0, 0.0, 0.0), 1.0,
+      [1280.0, 720.0])))
   );
 
   // TODO - constructed in PointCloudWindow.

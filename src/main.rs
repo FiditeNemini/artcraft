@@ -3,6 +3,8 @@
 #[macro_use] extern crate enum_primitive;
 #[macro_use] extern crate glium;
 #[macro_use] extern crate imgui;
+extern crate arcball;
+extern crate cgmath;
 extern crate clipboard;
 extern crate genmesh;
 extern crate gl;
@@ -17,13 +19,13 @@ extern crate imgui_sdl2;
 extern crate imgui_winit_support;
 extern crate k4a_sys;
 extern crate libc;
+extern crate memmap2;
+extern crate mmap;
 extern crate obj;
 extern crate opencv;
 extern crate rand;
 extern crate sdl2;
 extern crate winit;
-extern crate memmap2;
-extern crate mmap;
 
 use std::borrow::BorrowMut;
 use std::ffi::{c_void, CStr, CString};

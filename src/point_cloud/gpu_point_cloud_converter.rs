@@ -103,12 +103,12 @@ void main()
 
     // Distance Threshold
     // TODO: Make configurable.
-    if (vertexPosition.z > 1.5) {
+    /*if (vertexPosition.z > 1.5) {
         alpha = 0.0f;
         vertexPosition.x = 0.0;
         vertexPosition.y = 0.0;
         vertexPosition.z = 0.0;
-    }
+    }*/
 
     imageStore(destTex, pixel, vec4(vertexPosition, alpha));
 }
