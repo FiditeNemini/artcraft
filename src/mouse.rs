@@ -24,6 +24,8 @@ pub struct SdlArcball {
   last_x: f32,
   last_y: f32,
   last_zoom: f32,
+
+  animation_counter: f32,
 }
 
 impl SdlArcball {
@@ -59,6 +61,8 @@ impl SdlArcball {
       last_x: 0.0,
       last_y: 0.0,
       last_zoom: DEFAULT_ZOOM,
+
+      animation_counter: 0.0,
     }
   }
 
@@ -127,6 +131,15 @@ impl SdlArcball {
       -1.0, // NB: This is not zero
       0.0,
     )
+  }
+
+  pub fn animate(&mut self) {
+    let x = self.animation_counter.sin();
+    let y = self.animation_counter.cos();
+    self.animation_counter.sin();
+    let mouse_delta = Vector2::new(x * 10.0, y * 10.0);
+    self.arcball.pan(mouse_delta, 0.16);
+    self.animation_counter += 0.1;
   }
 
   fn mouse_wheel(&mut self, y: i32) {

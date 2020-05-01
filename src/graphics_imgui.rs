@@ -1,4 +1,4 @@
-use std::sync::{Arc, Mutex};
+use std::sync::{Arc, Mutex, PoisonError, MutexGuard};
 use std::time::Instant;
 
 use gl;
@@ -210,6 +210,13 @@ pub fn run(capture_provider: Arc<CaptureProvider>, calibration_data: k4a_sys::k4
               }
             }
           });
+    }
+
+    match sdl_arcball.lock() {
+      Ok(mut arcball) => {
+        arcball.animate();
+      },
+      Err(_) => {},
     }
 
     webcam_writer.write_current_frame_to_file(texture.texture_id())
