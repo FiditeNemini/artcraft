@@ -5,8 +5,10 @@ use gl;
 use imgui::*;
 use imgui::Image;
 
+use core_types::RgbaF32;
 use mouse::SdlArcball;
 use opengl::rebinder::Rebinder;
+use point_cloud::pixel_structs::BgraPixel;
 use point_cloud::point_cloud_visualiser::{ColorizationStrategy, PointCloudVisualizer, PointCloudVisualizerError};
 use point_cloud::viewer_image::ViewerImage;
 use sensor_control::CaptureProvider;
@@ -53,10 +55,13 @@ pub fn run(capture_provider: Arc<CaptureProvider>, calibration_data: k4a_sys::k4
 
   let colorization_strategy = ColorizationStrategy::Color;
 
+  let clear_color = RgbaF32::black();
+
   let mut visualizer = PointCloudVisualizer::new(
     true,
     colorization_strategy,
     calibration_data,
+    clear_color,
     sdl_arcball.clone(),
   );
 

@@ -7,6 +7,7 @@ use std::sync::{Arc, Mutex};
 
 use gl::types::*;
 
+use core_types::RgbaF32;
 use k4a_sys_wrapper::{Capture, Transformation};
 use k4a_sys_wrapper::Image;
 use k4a_sys_wrapper::ImageFormat;
@@ -127,6 +128,9 @@ pub struct PointCloudVisualizer {
 
   /// Near and far minima/maxima for the current depth sensor mode.
   depth_value_range: ValueRange,
+
+  /// Background clear color for OpenGL.
+  clear_color: RgbaF32,
 }
 
 // TODO: Dedup
@@ -143,11 +147,12 @@ impl Drop for CleanupGuard {
 impl PointCloudVisualizer {
 
   ///
-  ///
+  /// CTOR
   ///
   pub fn new(enable_color_point_cloud: bool,
              initial_colorization_strategy: ColorizationStrategy,
              calibration_data: k4a_sys::k4a_calibration_t,
+             clear_color: RgbaF32,
              arcball_camera: Arc<Mutex<SdlArcball>>) -> Self
   {
     // Resolution of the point cloud texture
@@ -195,6 +200,7 @@ impl PointCloudVisualizer {
       point_cloud_colorization: None,
       xyz_texture: Texture::new(),
       depth_value_range: expected_value_range,
+      clear_color,
     };
 
     visualizer.set_colorization_strategy(initial_colorization_strategy).expect("Should work");
@@ -254,8 +260,12 @@ impl PointCloudVisualizer {
 
       gl::Viewport(0, 0, self.m_dimensions_width, self.m_dimensions_height);
       gl::Enable(gl::DEPTH_TEST);
-      //gl::ClearColor(0.3, 0.3, 0.3, 0.3);
-      gl::ClearColor(0.5, 0.5, 0.5, 1.0);
+      gl::ClearColor(
+        self.clear_color.red,
+        self.clear_color.green,
+        self.clear_color.blue,
+        self.clear_color.alpha,
+      );
       gl::ClearDepth(1.0);
 
       gl::Clear(gl::COLOR_BUFFER_BIT | gl::DEPTH_BUFFER_BIT);
@@ -302,11 +312,6 @@ impl PointCloudVisualizer {
         if let Some(transformed_depth_image) = self.transformed_depth_image.as_mut() {
           unsafe {
 
-            /*k4a_image_to_rust_image_for_debug(&depth_image)
-                .unwrap()
-                .save(Path::new("debug_images/depth_before_transform.png"))
-                .unwrap();*/
-
             let result = k4a_sys::k4a_transformation_depth_image_to_color_camera(
               self.transformation.get_handle(),
               depth_image.get_handle(),
@@ -316,11 +321,6 @@ impl PointCloudVisualizer {
             if result != k4a_sys::k4a_buffer_result_t_K4A_BUFFER_RESULT_SUCCEEDED {
               return Err(PointCloudVisualizerError::DepthToColorConversionFailed);
             }
-
-            /*k4a_image_to_rust_image_for_debug(&transformed_depth_image)
-                .unwrap()
-                .save(Path::new("debug_images/depth_after_transform.png"))
-                .unwrap();*/
 
             depth_image = transformed_depth_image.clone();
           }
@@ -393,13 +393,7 @@ impl PointCloudVisualizer {
     if strategy == ColorizationStrategy::Color {
       let width = self.calibration_data.color_camera_calibration.resolution_width;
       let height = self.calibration_data.color_camera_calibration.resolution_height;
-      //let width = 3840;
-      //let height = 2160;
       let stride = width * size_of::<DepthPixel>() as i32;
-
-      for _ in 0..10 {
-        println!("setting color calibration: {}x{} (stride={})", width, height, stride);
-      }
 
       self.transformed_depth_image = Some(Image::create(
         ImageFormat::Depth16,
@@ -414,10 +408,6 @@ impl PointCloudVisualizer {
       let width = self.calibration_data.depth_camera_calibration.resolution_width as u32;
       let height = self.calibration_data.depth_camera_calibration.resolution_height as u32;
       let stride = width as i32 * size_of::<BgraPixel>() as i32;
-
-      for _ in 0..10 {
-        println!("setting depth calibration: {}x{} (stride={})", width, height, stride);
-      }
 
       self.point_cloud_colorization = Some(Image::create(
         ImageFormat::ColorBgra32,
