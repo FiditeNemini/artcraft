@@ -1,4 +1,4 @@
-#![allow(warnings)]
+//#![allow(warnings)]
 
 #[macro_use] extern crate enum_primitive;
 #[macro_use] extern crate glium;
