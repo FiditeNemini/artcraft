@@ -2,10 +2,11 @@
 //! This draws inspiration from some of the code in Microsoft's MIT-licensed libk4a,
 //! particularly the code in `openglhelpers.h`.
 
-use std::fmt::{Error, Formatter};
+use std::fmt::Formatter;
+use std::ptr::null;
+
 use gl;
 use gl::types::*;
-use std::ptr::null;
 
 /// A slightly more convenient OpenGL Buffer type
 #[derive(Clone, Debug)]

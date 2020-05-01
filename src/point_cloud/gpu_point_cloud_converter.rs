@@ -2,7 +2,7 @@
 //! This code turns depth images into point clouds.
 
 use std::ffi::CString;
-use std::fmt::{Error, Formatter};
+use std::fmt::Formatter;
 use std::mem::size_of;
 use std::os::raw::{c_char, c_int, c_void};
 use std::ptr;
@@ -11,18 +11,15 @@ use std::str;
 
 use gl;
 use gl::types::*;
-use libc;
 
 use k4a_sys_wrapper;
 use k4a_sys_wrapper::Image;
 use k4a_sys_wrapper::ImageFormat;
 use opengl_wrapper::{Buffer, gl_get_error};
-use opengl_wrapper::Texture;
 use opengl_wrapper::OpenGlError;
+use opengl_wrapper::Texture;
 use point_cloud::compile_shader::compile_shader;
 use point_cloud::pixel_structs::DepthPixel;
-use conversion::{depth_to_image, k4a_image_to_rust_image_for_debug};
-use std::path::Path;
 
 pub type Result<T> = std::result::Result<T, PointCloudComputeError>;
 
@@ -247,7 +244,7 @@ impl GpuPointCloudConverter {
       //let num_bytes: GLuint = (width * height * size_of::<DepthPixel>() as i32) as GLuint; // libc::uint16_t = u16
 
       // GLubyte *textureMappedBuffer = reinterpret_cast<GLubyte *>(...)
-      let mut texture_mapped_buffer = gl::MapBufferRange(
+      let texture_mapped_buffer = gl::MapBufferRange(
         gl::PIXEL_UNPACK_BUFFER,
         0,
         num_bytes as isize,
@@ -260,8 +257,8 @@ impl GpuPointCloudConverter {
         return Err(PointCloudComputeError::UnknownError);
       }
 
-      let mut depth_image_buffer = depth_image.get_buffer();
-      let mut typed_depth_image_buffer = depth_image_buffer as *const DepthPixel;
+      let depth_image_buffer = depth_image.get_buffer();
+      let typed_depth_image_buffer = depth_image_buffer as *const DepthPixel;
 
       std::ptr::copy::<DepthPixel>(typed_depth_image_buffer, texture_mapped_buffer, length as usize);
 
@@ -484,8 +481,8 @@ impl GpuPointCloudConverter {
 
     let mut idx = 0;
     unsafe {
-      let mut table_data = xy_table.get_buffer();
-      let mut typed_buffer = table_data as *mut k4a_sys::k4a_float2_t;
+      let table_data = xy_table.get_buffer();
+      let typed_buffer = table_data as *mut k4a_sys::k4a_float2_t;
 
       for y in 0..height {
         p.xy.y = y as f32;

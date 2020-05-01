@@ -2,14 +2,11 @@
 //! I tried using the open source 'k4a-rs' crate from the same author,
 //! but it's in a bad state and won't compile against any version of 'k4a-sys'.
 
-use std::ffi::{CStr, CString};
+use std::mem::MaybeUninit;
 use std::ptr;
+use std::ptr::null_mut;
 
 use k4a_sys;
-use k4a_sys_wrapper::ImageFormat::ColorMjpg;
-use glutin::platform::unix::x11::ffi::IconMaskHint;
-use std::ptr::{null_mut, null};
-use std::mem::MaybeUninit;
 
 pub fn device_get_installed_count() -> u32 {
   unsafe {

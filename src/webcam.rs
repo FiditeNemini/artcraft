@@ -1,15 +1,14 @@
-use gl::types::*;
-use gl;
+use std::{fmt, io};
 use std::ffi::c_void;
+use std::fmt::Formatter;
 use std::fs::{File, OpenOptions};
 use std::io::Write;
-use opengl_wrapper::{gl_get_error, OpenGlError};
-use image::imageops::FilterType;
-use memmap2::MmapMut;
-use mmap::MemoryMap;
 use std::path::Path;
-use std::{io, fmt};
-use std::fmt::Formatter;
+
+use gl;
+use gl::types::*;
+
+use opengl_wrapper::{gl_get_error, OpenGlError};
 
 /// WebcamWriter uses Webcamoid's akvcam kernel driver to stream output to a /dev/video*
 /// file. Their wiki contains all of the setup instructions, and I'm checked in some example
@@ -53,7 +52,7 @@ impl WebcamWriter {
   // TODO: Make it easy to update for new textures of different sizes (dynamic buffer resize)
   /// Grab the current texture held by `texture_id` and immediately write it to file.
   pub fn write_current_frame_to_file(&mut self, texture_id: GLuint) -> Result<(), WebcamError> {
-    let mut typed_buffer = self.buffer.as_mut_ptr() as *mut c_void;
+    let typed_buffer = self.buffer.as_mut_ptr() as *mut c_void;
 
     unsafe {
       gl::BindTexture(gl::TEXTURE_2D, texture_id);

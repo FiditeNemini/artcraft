@@ -1,13 +1,13 @@
-use opengl_wrapper::{Buffer, gl_get_error};
-use opengl_wrapper::Texture;
-use opengl_wrapper::OpenGlError;
-use std::fmt::{Error, Formatter};
+use std::fmt::Formatter;
+use std::ptr::null;
 
-use libc::uint8_t;
 use gl;
 use gl::types::*;
-use image::image_dimensions;
-use std::ptr::null;
+use libc::uint8_t;
+
+use opengl_wrapper::{Buffer, gl_get_error};
+use opengl_wrapper::OpenGlError;
+use opengl_wrapper::Texture;
 use point_cloud::pixel_structs::BgraPixel;
 
 pub type Result<T> = std::result::Result<T, ViewerImageError>;
@@ -126,7 +126,7 @@ impl ViewerImage {
     gl::BindBuffer(gl::PIXEL_UNPACK_BUFFER, self.texture_buffer.id());
     gl::BindTexture(gl::TEXTURE_2D, self.texture.id());
 
-    let cleanup_guard = CleanupGuard {};
+    let _cleanup_guard = CleanupGuard {};
 
     let buffer = gl::MapBufferRange(
       gl::PIXEL_UNPACK_BUFFER,

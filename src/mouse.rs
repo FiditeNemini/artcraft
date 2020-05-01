@@ -1,5 +1,5 @@
 use arcball::ArcballCamera;
-use cgmath::{Vector2, Matrix4};
+use cgmath::{Matrix4, Vector2};
 use cgmath::Vector3;
 use sdl2::event::Event;
 use sdl2::mouse::MouseButton;
@@ -32,16 +32,16 @@ impl SdlArcball {
 
   pub fn process_event(&mut self, event: &Event) {
     match event {
-      Event::MouseWheel { timestamp, window_id, which, x, y, direction } => {
+      Event::MouseWheel { timestamp: _, window_id: _, which: _, x: _, y, direction: _ } => {
         self.mouse_wheel(*y);
       },
-      Event::MouseButtonDown { timestamp, window_id, which, mouse_btn, clicks, x, y } => {
+      Event::MouseButtonDown { timestamp: _, window_id: _, which: _, mouse_btn, clicks: _, x: _, y: _ } => {
         self.mouse_button_press(mouse_btn, true);
       },
-      Event::MouseButtonUp { timestamp, window_id, which, mouse_btn, clicks, x, y } => {
+      Event::MouseButtonUp { timestamp: _, window_id: _, which: _, mouse_btn, clicks: _, x: _, y: _ } => {
         self.mouse_button_press(mouse_btn, false);
       },
-      Event::MouseMotion { timestamp, window_id, which, mousestate, x, y, xrel, yrel } => {
+      Event::MouseMotion { timestamp: _, window_id: _, which: _, mousestate: _, x, y, xrel: _, yrel: _ } => {
         let x = *x as f32;
         let y = *y as f32;
         self.mouse_motion(x, y);
@@ -75,8 +75,8 @@ impl SdlArcball {
       self.arcball.rotate(previous, current);
     } else if self.right_mouse_active {
       let mouse_delta = Vector2::new(
-        (x - self.last_x),
-        (self.last_y - y), // Invert scrolling
+        x - self.last_x,
+        self.last_y - y, // Invert scrolling
       );
       self.arcball.pan(mouse_delta, 0.16);
     }

@@ -1,18 +1,18 @@
 //#![allow(warnings)]
 
-#[macro_use] extern crate enum_primitive;
-#[macro_use] extern crate glium;
-#[macro_use] extern crate imgui;
 extern crate arcball;
 extern crate cgmath;
 extern crate clipboard;
+#[macro_use] extern crate enum_primitive;
 extern crate genmesh;
 extern crate gl;
 extern crate glfw;
 extern crate glfw_sys;
+#[macro_use] extern crate glium;
 extern crate glutin;
 extern crate grr;
 extern crate image;
+#[macro_use] extern crate imgui;
 extern crate imgui_glium_renderer;
 extern crate imgui_opengl_renderer;
 extern crate imgui_sdl2;
@@ -27,46 +27,13 @@ extern crate rand;
 extern crate sdl2;
 extern crate winit;
 
-use std::borrow::BorrowMut;
-use std::ffi::{c_void, CStr, CString};
-use std::io::{Cursor, Write};
-use std::os::raw::c_char;
-use std::ptr;
-use std::slice;
-use std::sync::{Arc, PoisonError, RwLockReadGuard};
-use std::sync::Mutex;
-use std::sync::RwLock;
+use std::sync::Arc;
 use std::thread;
-use std::time::Duration;
 
-use glium::{Display, Surface};
-use glium::glutin::event::{Event, StartCause};
-use glium::glutin::event_loop::{ControlFlow, EventLoop};
-use glium::Texture2d;
-use glium::texture::RawImage2d;
-use glium::vertex::VertexBufferAny;
-use image::{DynamicImage, ImageFormat};
-use image::flat::{FlatSamples, SampleLayout};
-use image::GenericImage;
-use image::ImageBuffer;
-use image::ImageError;
-use image::Rgb;
-use image::Rgba;
-use image::RgbaImage;
-use image::RgbImage;
-use libc::size_t;
-use opencv::core;
-use opencv::highgui;
-use opencv::imgproc;
 use opencv::prelude::*;
 
-use conversion::TextureData2d;
 use k4a_sys_wrapper::Device;
-use k4a_sys_wrapper::device_get_installed_count;
-use k4a_sys_wrapper::Image;
-use sensor_control::{capture_thread_to_texture, grab_single_frame, CaptureProvider, capture_thread};
-use std::fs::File;
-use rand::Rng;
+use sensor_control::{capture_thread, CaptureProvider};
 
 pub mod conversion;
 pub mod mouse;

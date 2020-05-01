@@ -1,38 +1,16 @@
-use gl::types::*;
+use std::sync::{Arc, Mutex};
+use std::time::Instant;
+
 use gl;
-use glium::Display;
-use glium::backend::Facade;
-use glutin::ContextBuilder;
-use glutin::event::{Event, WindowEvent};
-use glutin::event_loop::{ControlFlow, EventLoop};
-use glutin::window::WindowBuilder;
-use imgui::MouseButton;
 use imgui::*;
 use imgui::Image;
-use imgui_support;
-use memmap2::{MmapMut, Mmap};
-use mmap::MapOption::{MapReadable, MapWritable, MapFd};
-use mmap::MemoryMap;
-use opengl::debug::enable_opengl_debugging;
-use opengl::rebinder::Rebinder;
-use opengl::texture::load_texture;
-use opengl_wrapper::{Texture, Buffer};
-use point_cloud::point_cloud_visualiser::{PointCloudVisualizer, PointCloudVisualizerError, ColorizationStrategy};
-use point_cloud::viewer_image::{ViewerImage, ImageDimensions};
-use sensor_control::CaptureProvider;
-use std::ffi::c_void;
-use std::fs::{File, OpenOptions};
-use std::io::{Write, Read};
-use std::os::unix::io::AsRawFd;
-use std::path::Path;
-use std::sync::{Arc, Mutex, PoisonError, MutexGuard};
-use std::time::{Instant, Duration};
-use cgmath::Vector3;
-use cgmath::Vector2;
-use webcam::{WebcamWriter};
-use std::error::Error;
-use arcball::ArcballCamera;
+
 use mouse::SdlArcball;
+use opengl::rebinder::Rebinder;
+use point_cloud::point_cloud_visualiser::{ColorizationStrategy, PointCloudVisualizer, PointCloudVisualizerError};
+use point_cloud::viewer_image::ViewerImage;
+use sensor_control::CaptureProvider;
+use webcam::WebcamWriter;
 
 pub fn run(capture_provider: Arc<CaptureProvider>, calibration_data: k4a_sys::k4a_calibration_t) {
 
@@ -63,7 +41,7 @@ pub fn run(capture_provider: Arc<CaptureProvider>, calibration_data: k4a_sys::k4
 
   //enable_opengl_debugging();
 
-  let mut rebinder = Rebinder::snapshot();
+  let _rebinder = Rebinder::snapshot();
 
   let mut imgui = imgui::Context::create();
   imgui.set_ini_filename(None);
@@ -73,7 +51,7 @@ pub fn run(capture_provider: Arc<CaptureProvider>, calibration_data: k4a_sys::k4
   let mut gl_texture_snes = load_texture("sneslogo.png");
   let mut imgui_texture_snes = TextureId::from(gl_texture_snes as usize);*/
 
-  let mut colorization_strategy = ColorizationStrategy::Color;
+  let colorization_strategy = ColorizationStrategy::Color;
 
   let mut visualizer = PointCloudVisualizer::new(
     true,
@@ -84,7 +62,7 @@ pub fn run(capture_provider: Arc<CaptureProvider>, calibration_data: k4a_sys::k4
 
   //rebinder.restore();
 
-  let mut texture = ViewerImage::create(
+  let texture = ViewerImage::create(
     // TODO: The following commented-out values work and look great,
     //  but now we're doing suboptimal webcam stuff:
     //1280,
@@ -107,13 +85,13 @@ pub fn run(capture_provider: Arc<CaptureProvider>, calibration_data: k4a_sys::k4
   let mut event_pump = sdl_context.event_pump().unwrap();
 
   let mut last_frame = Instant::now();
-  let mut last_change = Instant::now();
+  let _last_change = Instant::now();
 
   'running: loop {
     use sdl2::event::Event;
     use sdl2::keyboard::Keycode;
 
-    let mut rebinder = Rebinder::snapshot();
+    let _rebinder = Rebinder::snapshot();
 
     for event in event_pump.poll_iter() {
       imgui_sdl2.handle_event(&mut imgui, &event);

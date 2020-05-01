@@ -1,27 +1,24 @@
 //! Based off Microsoft's MIT-licensed k4a library code and examples, specifically
 //! `k4apointcloudvisualizer.h`
 
+use std::fmt::Formatter;
+use std::mem::size_of;
+use std::sync::{Arc, Mutex};
+
 use gl::types::*;
+
+use k4a_sys_wrapper::{Capture, Transformation};
 use k4a_sys_wrapper::Image;
 use k4a_sys_wrapper::ImageFormat;
-use k4a_sys_wrapper::{Capture, Transformation};
+use mouse::SdlArcball;
+use opengl_wrapper::{Framebuffer, Renderbuffer, Texture};
 use opengl_wrapper::OpenGlError;
-use opengl_wrapper::{Texture, Renderbuffer, Framebuffer};
+use point_cloud::gpu_point_cloud_converter::{GpuPointCloudConverter, PointCloudComputeError};
 use point_cloud::pixel_structs::BgraPixel;
 use point_cloud::pixel_structs::DepthPixel;
-use point_cloud::gpu_point_cloud_converter::{GpuPointCloudConverter, PointCloudComputeError};
 use point_cloud::point_cloud_renderer::{PointCloudRenderer, PointCloudRendererError};
+use point_cloud::util::{colorize_depth_blue_to_red, get_depth_mode_range, ValueRange};
 use point_cloud::viewer_image::ViewerImage;
-use rand::Rng;
-use std::fmt::{Error, Formatter};
-use std::mem::size_of;
-use conversion::k4a_image_to_rust_image_for_debug;
-use std::path::Path;
-use point_cloud::util::{ValueRange, get_depth_mode_range, colorize_depth_blue_to_red};
-use arcball::ArcballCamera;
-use std::rc::Rc;
-use std::sync::{Arc, Mutex, PoisonError, MutexGuard};
-use mouse::SdlArcball;
 
 pub type Result<T> = std::result::Result<T, PointCloudVisualizerError>;
 
@@ -232,7 +229,7 @@ impl PointCloudVisualizer {
       gl::BindFramebuffer(gl::FRAMEBUFFER, self.frame_buffer.id());
     }
 
-    let cleanup_guard = CleanupGuard {};
+    let _cleanup_guard = CleanupGuard {};
 
     unsafe {
       gl::FramebufferRenderbuffer(
@@ -289,7 +286,7 @@ impl PointCloudVisualizer {
   fn update_point_clouds(&mut self, capture: Capture) -> Result<()> {
     let mut depth_image = match capture.get_depth_image() {
       Ok(img) => img,
-      Err(e) => {
+      Err(_e) => {
         // Capture doesn't have depth info. Drop the capture.
         return Err(PointCloudVisualizerError::MissingDepthImage);
       },
@@ -352,16 +349,16 @@ impl PointCloudVisualizer {
 
       unsafe {
         // src: DepthPixel
-        let mut src_pixel_buffer = depth_image.get_buffer();
-        let mut typed_src_pixel_buffer = src_pixel_buffer as *const DepthPixel;
+        let src_pixel_buffer = depth_image.get_buffer();
+        let typed_src_pixel_buffer = src_pixel_buffer as *const DepthPixel;
 
         // dst: BgraPixel
-        let mut dst_pixel_buffer = self.point_cloud_colorization
+        let dst_pixel_buffer = self.point_cloud_colorization
             .as_ref()
             .expect("point cloud color image must be set")
             .get_buffer();
 
-        let mut typed_dst_pixel_buffer = dst_pixel_buffer as *mut BgraPixel;
+        let typed_dst_pixel_buffer = dst_pixel_buffer as *mut BgraPixel;
 
         for i in 0 .. dst_length as isize {
           let src_pixel = *typed_src_pixel_buffer.offset(i);

@@ -1,39 +1,12 @@
-use std::borrow::BorrowMut;
-use std::ffi::{c_void, CStr, CString};
-use std::io::Cursor;
-use std::os::raw::c_char;
-use std::ptr;
-use std::slice;
-use std::sync::{Arc, PoisonError, RwLockWriteGuard, MutexGuard};
+use std::sync::Arc;
 use std::sync::Mutex;
-use std::sync::RwLock;
-use std::thread;
-use std::time::Duration;
 
-use glium::{Display, glutin, Surface};
-use glium::glutin::event::{Event, StartCause};
-use glium::glutin::event_loop::{ControlFlow, EventLoop};
-use glium::vertex::VertexBufferAny;
-use image::{DynamicImage, ImageFormat};
-use image::flat::{FlatSamples, SampleLayout};
-use image::GenericImage;
-use image::ImageBuffer;
-use image::ImageError;
-use image::Rgb;
-use image::Rgba;
-use image::RgbaImage;
-use image::RgbImage;
-use libc::size_t;
-use opencv::core;
-use opencv::highgui;
-use opencv::imgproc;
+use image::DynamicImage;
 use opencv::prelude::*;
 
-use k4a_sys_wrapper::{Device, Capture};
-use k4a_sys_wrapper::device_get_installed_count;
-use k4a_sys_wrapper::Image;
 use conversion::{depth_to_image, TextureData2d};
-use glium::texture::RawImage2d;
+use k4a_sys_wrapper::{Capture, Device};
+use k4a_sys_wrapper::device_get_installed_count;
 
 /** Self-locking holder of Capture objects. */
 pub struct CaptureProvider {

@@ -1,13 +1,9 @@
 use std::ffi::CString;
-use std::fmt::{Error, Formatter};
-use std::mem::size_of;
-use std::os::raw::{c_void, c_int, c_char};
 use std::ptr;
-use std::ptr::null;
 use std::str;
+
 use gl;
 use gl::types::*;
-use libc;
 
 pub fn compile_shader(src: &str, shader_type: GLenum) -> GLuint {
   let shader;

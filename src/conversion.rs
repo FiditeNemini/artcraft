@@ -1,42 +1,23 @@
 //! Format conversion
 //! k4a frames, image-rs, opencv, OpenGL textures, etc.
 
-use std::ptr;
+use std::mem::size_of;
 use std::slice;
-use std::sync::{Arc, PoisonError, RwLockWriteGuard};
-use std::sync::Mutex;
-use std::sync::RwLock;
-use std::thread;
-use std::time::Duration;
 
-use glium::{Display, glutin, Surface};
-use glium::glutin::event::{Event, StartCause};
-use glium::glutin::event_loop::{ControlFlow, EventLoop};
-use glium::Texture2d;
 use glium::texture::RawImage2d;
-use glium::vertex::VertexBufferAny;
-use image::{DynamicImage};
+use image::DynamicImage;
+use image::error::{ImageFormatHint, UnsupportedError};
 use image::flat::{FlatSamples, SampleLayout};
 use image::GenericImage;
 use image::ImageBuffer;
 use image::ImageError;
-use image::Rgb;
 use image::Rgba;
 use image::RgbaImage;
-use image::RgbImage;
-use libc::size_t;
-use opencv::core;
-use opencv::highgui;
-use opencv::imgproc;
 use opencv::prelude::*;
 
-use k4a_sys_wrapper::Device;
-use k4a_sys_wrapper::device_get_installed_count;
-use k4a_sys_wrapper::Image;
-use point_cloud::pixel_structs::{DepthPixel, BgraPixel};
 use k4a_sys_wrapper;
-use std::mem::size_of;
-use image::error::{UnsupportedError, ImageFormatHint};
+use k4a_sys_wrapper::Image;
+use point_cloud::pixel_structs::{BgraPixel, DepthPixel};
 
 /// We can't send trait 'Texture2dDataSource' impl 'RawImage2d' as it requires its data has
 /// the same lifetime, so here we collect it together here.
@@ -76,7 +57,7 @@ pub fn depth_to_image(image: &Image) -> Result<DynamicImage, ImageError> {
     image.get_width_pixels() as u32,
     image.get_height_pixels() as u32);
 
-  let mut buffer = FlatSamples {
+  let buffer = FlatSamples {
     samples,
     layout,
     color_hint: None,
@@ -85,7 +66,7 @@ pub fn depth_to_image(image: &Image) -> Result<DynamicImage, ImageError> {
   let view = buffer.as_view::<Rgba<u8>>()
       .expect("view should work");
 
-  let mut img: RgbaImage = ImageBuffer::new(
+  let img: RgbaImage = ImageBuffer::new(
     image.get_width_pixels() as u32,
     image.get_height_pixels() as u32);
   let mut img = DynamicImage::ImageRgba8(img);
@@ -114,7 +95,7 @@ pub fn k4a_image_to_rust_image_for_debug(image: &Image) -> Result<RgbaImage, Ima
       for y in 0 .. height {
         for x in 0 .. width {
           let pixel = unsafe { *typed_buffer.offset(offset) };
-          let scaled_pixel = (pixel as f32 / std::u16::MAX as f32);
+          let scaled_pixel = pixel as f32 / std::u16::MAX as f32;
           let scaled_pixel = (scaled_pixel * std::u8::MAX as f32) as u8;
           rgba_image.put_pixel(x, y, Rgba([scaled_pixel, scaled_pixel, scaled_pixel, 255]));
           offset += 1;

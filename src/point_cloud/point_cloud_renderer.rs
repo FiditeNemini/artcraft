@@ -2,27 +2,21 @@
 //! This provides the visual output.
 
 use std::ffi::CString;
-use std::fmt::{Error, Formatter};
+use std::fmt::Formatter;
 use std::mem::size_of;
-use std::os::raw::{c_char, c_int, c_void};
+use std::os::raw::{c_char, c_void};
 use std::ptr;
 use std::ptr::null;
 use std::str;
 
 use gl;
-use k4a_sys_wrapper;
 use gl::types::*;
-use libc;
 
-use conversion::k4a_image_to_rust_image_for_debug;
+use k4a_sys_wrapper;
+use opengl_wrapper::{Buffer, gl_get_error, OpenGlError, VertexArray};
 use opengl_wrapper::Texture;
-use opengl_wrapper::{Buffer, VertexArray, gl_get_error, OpenGlError};
-use opengl_wrapper::{get_stride, get_pointer_offset};
 use point_cloud::compile_shader::compile_shader;
-use point_cloud::gpu_point_cloud_converter::POINT_CLOUD_TEXTURE_FORMAT;
 use point_cloud::pixel_structs::BgraPixel;
-use point_cloud::point_cloud_visualiser::PointCloudVisualizer;
-use std::path::Path;
 
 pub type Result<T> = std::result::Result<T, PointCloudRendererError>;
 
@@ -425,8 +419,8 @@ impl PointCloudRenderer {
       return Err(PointCloudRendererError::OpenGlError(error));
     }
 
-    let mut color_src = color_image.get_buffer();
-    let mut typed_color_src = color_src as *const u8;
+    let color_src = color_image.get_buffer();
+    let typed_color_src = color_src as *const u8;
     //let mut typed_color_src = color_src as *const BgraPixel;
     //let length = color_image.get_width_pixels() * color_image.get_height_pixels();
 
@@ -508,7 +502,7 @@ impl PointCloudRenderer {
       //gl::UniformMatrix4fv(self.projection_index, 1, gl::FALSE, typed_view);
 
       // Update render settings in shader
-      let enable_shading = if self.enable_shading { 1 } else { 0 };
+      let _enable_shading = if self.enable_shading { 1 } else { 0 };
       let enable_shading = 1; // TODO FIXME FIXME FIXME
 
       gl::Uniform1i(self.enable_shading_index, enable_shading);
