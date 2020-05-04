@@ -28,6 +28,7 @@ use opencv::prelude::*;
 
 use kinect::k4a_sys_wrapper::Device;
 use kinect::sensor_control::{capture_thread, CaptureProvider};
+use kinect::multi_device_capturer::MultiDeviceCapturer;
 
 pub mod image_debug;
 pub mod core_types;
@@ -46,22 +47,10 @@ const PRIMARY_DEVICE_SERIAL : &'static str = "000513594512";
 const SECONDARY_DEVICE_SERIAL : &'static str = "000886694512";
 
 pub fn main() {
-  let device_1 = Device::open(0).expect("Device should open");
-  let device_2 = Device::open(1).expect("Device should open");
+  let multi_device = MultiDeviceCapturer::new(2).expect("multi-device create");
+  multi_device.start_cameras().expect("start cameras");
 
-  let primary_device;
-  let secondary_device;
-  {
-    if PRIMARY_DEVICE_SERIAL.eq(&device_1.get_serial_number().expect("device 1 serial")) {
-      primary_device = device_1;
-      secondary_device = device_2;
-    } else if PRIMARY_DEVICE_SERIAL.eq(&device_2.get_serial_number().expect("device 2 serial")) {
-      primary_device = device_2;
-      secondary_device = device_1;
-    } else {
-      panic!("Primary device not found: {}", PRIMARY_DEVICE_SERIAL);
-    }
-  }
+  let primary_device = multi_device.primary_device;
 
   let depth_mode : k4a_sys::k4a_depth_mode_t = 2; //k4a_sys::K4A_DEPTH_MODE_NFOV_UNBINNED;
   let color_format: k4a_sys::k4a_color_resolution_t = k4a_sys::k4a_color_resolution_t_K4A_COLOR_RESOLUTION_2160P;
@@ -71,7 +60,7 @@ pub fn main() {
   let capture_provider = Arc::new(CaptureProvider::new());
   let capture_provider2= capture_provider.clone();
 
-  thread::spawn(move || capture_thread(capture_provider, Some(primary_device)));
+  thread::spawn(move || capture_thread(capture_provider, Some(primary_device), false));
 
   graphics_imgui::run(capture_provider2, calibration);
 }

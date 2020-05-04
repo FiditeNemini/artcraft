@@ -8,12 +8,6 @@ use std::ptr::null_mut;
 
 use k4a_sys;
 
-pub fn device_get_installed_count() -> u32 {
-  unsafe {
-    k4a_sys::k4a_device_get_installed_count()
-  }
-}
-
 /*pub fn device_open() {
 
     k4a_sys::k4a_device_open(k4a_sys::K4A_DEVICE_DEFAULT)
@@ -32,6 +26,7 @@ pub enum KinectError {
   UnableToGetSerialNumber,
   UnableToStartCameras { error_code: u32 },
   UnableToCreateImage { error_code: u32 },
+  UnableToGetSyncJackStatus { error_code: u32 },
 }
 
 /// A Kinect Device Handle
@@ -41,6 +36,13 @@ pub struct Device {
 }
 
 impl Device {
+  /// Get the number of installed devices
+  pub fn get_installed_count() -> u32 {
+    unsafe {
+      k4a_sys::k4a_device_get_installed_count()
+    }
+  }
+
   /// Open a device with the given index
   pub fn open(device_index: u32) -> Result<Self, KinectError> {
     let mut device_pointer: k4a_sys::k4a_device_t = ptr::null_mut();
@@ -88,9 +90,47 @@ impl Device {
         .map_err(|_| KinectError::UnableToGetSerialNumber)
   }
 
-  // TODO: Pass options.
+  /// Get the device synchronization jack statuses.
+  /// Each device has an 'in' jack and an 'out' jack.
+  pub fn get_synchronization_jack_status(&self) -> Result<SynchronizationJackStatus, KinectError> {
+    let mut sync_in_jack_connected = false;
+    let mut sync_out_jack_connected = false;
+
+    let result = unsafe {
+      k4a_sys::k4a_device_get_sync_jack(self.device_pointer,
+        &mut sync_in_jack_connected, &mut sync_out_jack_connected)
+    };
+
+    if result != k4a_sys::k4a_result_t_K4A_RESULT_SUCCEEDED {
+      return Err(KinectError::UnableToGetSyncJackStatus { error_code: result });
+    }
+
+    Ok(SynchronizationJackStatus {
+      sync_in_jack_connected,
+      sync_out_jack_connected,
+    })
+  }
+
+  // TODO: having a 'DeviceConfigurations' struct that goes unused is kind of gross.
+  /// Start the cameras
+  pub fn start_cameras(&self,
+                       device_config: k4a_sys::k4a_device_configuration_t)
+    -> Result<(), KinectError>
+  {
+    let result = unsafe {
+      k4a_sys::k4a_device_start_cameras(self.device_pointer, &device_config)
+    };
+
+    if result != k4a_sys::k4a_buffer_result_t_K4A_BUFFER_RESULT_SUCCEEDED {
+      return Err(KinectError::UnableToStartCameras { error_code: result });
+    }
+
+    return Ok(())
+  }
+
+  // TODO: More sensible defaults, or get rid of this entirely.
   /// Start the cameras.
-  pub fn start_cameras(&self) -> Result<(), KinectError> {
+  pub fn start_cameras_default_config(&self) -> Result<(), KinectError> {
     let mut device_config = DeviceConfiguration::new();
     // NB: Although the Kinect docs say this format isn't natively supported by the color camera
     // and that extra CPU is required, this is the only color mode supported by 'k4aviewer' 3D view.
@@ -99,15 +139,7 @@ impl Device {
     device_config.0.depth_mode = k4a_sys::k4a_depth_mode_t_K4A_DEPTH_MODE_NFOV_UNBINNED;
     device_config.0.camera_fps = k4a_sys::k4a_fps_t_K4A_FRAMES_PER_SECOND_30;
 
-    let result = unsafe {
-      k4a_sys::k4a_device_start_cameras(self.device_pointer, &device_config.0)
-    };
-
-    if result != k4a_sys::k4a_buffer_result_t_K4A_BUFFER_RESULT_SUCCEEDED {
-      return Err(KinectError::UnableToStartCameras { error_code: result });
-    }
-
-    return Ok(())
+    self.start_cameras(device_config.0)
   }
 
   /// Stops the color and depth camera capture.
@@ -197,6 +229,13 @@ impl Device {
       Ok(calibration_buffer.assume_init())
     }
   }
+}
+
+/// Synchronization jack status.
+#[derive(Debug,Copy,Clone)]
+pub struct SynchronizationJackStatus {
+  pub sync_in_jack_connected: bool,
+  pub sync_out_jack_connected: bool,
 }
 
 /// Errors for GetCapture

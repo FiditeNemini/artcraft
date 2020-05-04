@@ -5,7 +5,6 @@ use image::DynamicImage;
 use opencv::prelude::*;
 
 use image_debug::depth_to_image;
-use kinect::k4a_sys_wrapper::device_get_installed_count;
 use kinect::k4a_sys_wrapper::{Capture, Device};
 
 /** Self-locking holder of Capture objects. */
@@ -43,11 +42,13 @@ impl CaptureProvider {
   }
 }
 
-pub fn capture_thread(capture_provider: Arc<CaptureProvider>, device: Option<Device>) {
+pub fn capture_thread(capture_provider: Arc<CaptureProvider>, device: Option<Device>, start_camera: bool) {
+  let start_camera = device.is_none() || start_camera;
+
   let device = match device {
     Some(device) => device,
     None => {
-      let installed_devices = device_get_installed_count();
+      let installed_devices = Device::get_installed_count();
       println!("Installed devices: {}", installed_devices);
 
       let device = Device::open(0).unwrap();
@@ -59,8 +60,10 @@ pub fn capture_thread(capture_provider: Arc<CaptureProvider>, device: Option<Dev
   let serial_number = device.get_serial_number().unwrap();
   println!("Device: {:?}", serial_number);
 
-  println!("Starting cameras...");
-  device.start_cameras().unwrap();
+  if start_camera {
+    println!("Starting cameras...");
+    device.start_cameras_default_config().unwrap();
+  }
 
   loop {
     let capture = device.get_capture(1000)
