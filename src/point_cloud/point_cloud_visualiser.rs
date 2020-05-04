@@ -8,12 +8,12 @@ use std::sync::{Arc, Mutex};
 use gl::types::*;
 
 use core_types::RgbaF32;
-use k4a_sys_wrapper::{Capture, Transformation};
+use gui::mouse_camera_arcball::MouseCameraArcball;
 use k4a_sys_wrapper::Image;
 use k4a_sys_wrapper::ImageFormat;
-use mouse::SdlArcball;
-use opengl_wrapper::{Framebuffer, Renderbuffer, Texture};
+use k4a_sys_wrapper::{Capture, Transformation};
 use opengl_wrapper::OpenGlError;
+use opengl_wrapper::{Framebuffer, Renderbuffer, Texture};
 use point_cloud::gpu_point_cloud_converter::{GpuPointCloudConverter, PointCloudComputeError};
 use point_cloud::pixel_structs::BgraPixel;
 use point_cloud::pixel_structs::DepthPixel;
@@ -92,7 +92,7 @@ pub enum ColorizationStrategy {
 }
 
 pub struct PointCloudVisualizer {
-  arcball_camera: Arc<Mutex<SdlArcball>>,
+  arcball_camera: Arc<Mutex<MouseCameraArcball>>,
 
   m_dimensions_width : i32,
   m_dimensions_height : i32,
@@ -153,7 +153,7 @@ impl PointCloudVisualizer {
              initial_colorization_strategy: ColorizationStrategy,
              calibration_data: k4a_sys::k4a_calibration_t,
              clear_color: RgbaF32,
-             arcball_camera: Arc<Mutex<SdlArcball>>) -> Self
+             arcball_camera: Arc<Mutex<MouseCameraArcball>>) -> Self
   {
     // Resolution of the point cloud texture
     // constexpr ImageDimensions PointCloudVisualizerTextureDimensions = { 1280, 1152 };

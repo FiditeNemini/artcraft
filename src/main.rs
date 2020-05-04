@@ -35,7 +35,6 @@ pub mod graphics_imgui;
 pub mod gui;
 pub mod imgui_support;
 pub mod k4a_sys_wrapper;
-pub mod mouse;
 pub mod opengl;
 pub mod opengl_wrapper;
 pub mod point_cloud;

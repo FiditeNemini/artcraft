@@ -11,7 +11,7 @@ const DEFAULT_ZOOM: f32 = 65.0;
 
 // TODO: Enable camera resizing (or change of texture to differently sized texture)
 /// Wrap a camera arcball for use with SDL
-pub struct SdlArcball {
+pub struct MouseCameraArcball {
   // Arcball camera state
   arcball: ArcballCamera<f32>,
 
@@ -29,7 +29,7 @@ pub struct SdlArcball {
   animation_counter: f32,
 }
 
-impl SdlArcball {
+impl MouseCameraArcball {
   /// CTOR
   pub fn new(window_width: u32, window_height: u32) -> Self {
     let center = Vector3::new(0.0, 0.0, 0.0);

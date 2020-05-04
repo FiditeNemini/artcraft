@@ -14,10 +14,10 @@ use arcball::ArcballCamera;
 use gl;
 use gl::types::*;
 
+use gui::mouse_camera_arcball::MouseCameraArcball;
 use k4a_sys_wrapper;
-use mouse::SdlArcball;
-use opengl_wrapper::{Buffer, gl_get_error, OpenGlError, VertexArray};
 use opengl_wrapper::Texture;
+use opengl_wrapper::{Buffer, gl_get_error, OpenGlError, VertexArray};
 use point_cloud::compile_shader::compile_shader;
 use point_cloud::pixel_structs::BgraPixel;
 
@@ -191,7 +191,7 @@ void main()
 ";
 
 pub struct PointCloudRenderer {
-  arcball_camera: Arc<Mutex<SdlArcball>>,
+  arcball_camera: Arc<Mutex<MouseCameraArcball>>,
 
   /// The OpenGL program
   shader_program_id: GLuint,
@@ -282,7 +282,7 @@ const fn initial_projection_matrix_4x4() -> [f32; 16] {
 
 impl PointCloudRenderer {
 
-  pub fn new(arcball: Arc<Mutex<SdlArcball>>) -> Self {
+  pub fn new(arcball: Arc<Mutex<MouseCameraArcball>>) -> Self {
     let vertex_array_object = VertexArray::new_initialized();
     let vertex_color_buffer_object = Buffer::new_initialized();
 

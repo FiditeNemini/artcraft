@@ -6,14 +6,14 @@ use imgui::*;
 use imgui::Image;
 
 use core_types::RgbaF32;
-use mouse::SdlArcball;
+use gui::enhanced_window::EnhancedWindow;
+use gui::mouse_camera_arcball::MouseCameraArcball;
 use opengl::rebinder::Rebinder;
 use point_cloud::pixel_structs::BgraPixel;
 use point_cloud::point_cloud_visualiser::{ColorizationStrategy, PointCloudVisualizer, PointCloudVisualizerError};
 use point_cloud::viewer_image::ViewerImage;
 use sensor_control::CaptureProvider;
 use webcam::WebcamWriter;
-use gui::enhanced_window::EnhancedWindow;
 
 pub const ENABLE_WEBCAM: bool = false;
 
@@ -26,7 +26,7 @@ pub fn run(capture_provider: Arc<CaptureProvider>, calibration_data: k4a_sys::k4
         .expect("should be able to create webcamwriter"));
   }
 
-  let sdl_arcball = Arc::new(Mutex::new(SdlArcball::new(1280, 720)));
+  let sdl_arcball = Arc::new(Mutex::new(MouseCameraArcball::new(1280, 720)));
 
   let sdl_context = sdl2::init().unwrap();
   let video = sdl_context.video().unwrap();
