@@ -137,9 +137,26 @@ impl SdlArcball {
     let x = self.animation_counter.sin();
     let y = self.animation_counter.cos();
     self.animation_counter.sin();
-    let mouse_delta = Vector2::new(x * 10.0, y * 10.0);
+    let mouse_delta = Vector2::new(x * 4.0, y * 4.0);
     self.arcball.pan(mouse_delta, 0.16);
-    self.animation_counter += 0.1;
+
+
+    let x = self.animation_counter.sin();
+
+    if x > 0.0 {
+      let y = 1.0;
+      let prev = Vector2::new(0.0, 0.0);
+      let cur = Vector2::new(y, y);
+      self.arcball.rotate(prev, cur);
+    } else {
+      let y = 1.0;
+      let prev = Vector2::new(y, y);
+      let cur = Vector2::new(0.0, 0.0);
+      self.arcball.rotate(prev, cur);
+    };
+
+
+    self.animation_counter += 0.05;
   }
 
   fn mouse_wheel(&mut self, y: i32) {
