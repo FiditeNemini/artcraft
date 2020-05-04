@@ -13,10 +13,11 @@ use point_cloud::pixel_structs::BgraPixel;
 use point_cloud::point_cloud_visualiser::{ColorizationStrategy, PointCloudVisualizer, PointCloudVisualizerError};
 use point_cloud::viewer_image::ViewerImage;
 use webcam::WebcamWriter;
+use kinect::multi_device_capturer::MultiDeviceCaptureProvider;
 
 pub const ENABLE_WEBCAM: bool = false;
 
-pub fn run(capture_provider: Arc<CaptureProvider>, calibration_data: k4a_sys::k4a_calibration_t) {
+pub fn run(capture_provider: Arc<MultiDeviceCaptureProvider>, calibration_data: k4a_sys::k4a_calibration_t) {
 
   let mut webcam_writer = None;
 
@@ -197,19 +198,20 @@ pub fn run(capture_provider: Arc<CaptureProvider>, calibration_data: k4a_sys::k4
 
     window.gl_swap_window();
 
-    if let Some(capture) = capture_provider.get_capture() {
-      visualizer.update_texture_id(texture.texture_id(), capture)
-          .map(|_| {
-          })
-          .map_err(|err| {
-            match err {
-              PointCloudVisualizerError::MissingDepthImage => { println!("Missing depth image"); },
-              PointCloudVisualizerError::MissingColorImage => { println!("Missing color image"); },
-              _ => {
-                unreachable!("Error: {:?}", err);
+    if let Some(mut captures) = capture_provider.get_captures() {
+      if let Some(capture) = captures.pop() {
+        visualizer.update_texture_id(texture.texture_id(), capture)
+            .map(|_| {})
+            .map_err(|err| {
+              match err {
+                PointCloudVisualizerError::MissingDepthImage => { println!("Missing depth image"); },
+                PointCloudVisualizerError::MissingColorImage => { println!("Missing color image"); },
+                _ => {
+                  unreachable!("Error: {:?}", err);
+                }
               }
-            }
-          });
+            });
+      }
     }
 
     match sdl_arcball.lock() {

@@ -28,7 +28,7 @@ use opencv::prelude::*;
 
 use kinect::k4a_sys_wrapper::Device;
 use kinect::sensor_control::{capture_thread, CaptureProvider};
-use kinect::multi_device_capturer::MultiDeviceCapturer;
+use kinect::multi_device_capturer::{MultiDeviceCapturer, start_capture_thread};
 
 pub mod image_debug;
 pub mod core_types;
@@ -50,17 +50,18 @@ pub fn main() {
   let multi_device = MultiDeviceCapturer::new(2).expect("multi-device create");
   multi_device.start_cameras().expect("start cameras");
 
-  let primary_device = multi_device.primary_device;
-
   let depth_mode : k4a_sys::k4a_depth_mode_t = 2; //k4a_sys::K4A_DEPTH_MODE_NFOV_UNBINNED;
   let color_format: k4a_sys::k4a_color_resolution_t = k4a_sys::k4a_color_resolution_t_K4A_COLOR_RESOLUTION_2160P;
 
+  let primary_device = &multi_device.primary_device;
   let calibration = primary_device.get_calibration(depth_mode, color_format).unwrap();
 
-  let capture_provider = Arc::new(CaptureProvider::new());
-  let capture_provider2= capture_provider.clone();
+  //let capture_provider = Arc::new(CaptureProvider::new());
+  //let capture_provider2= capture_provider.clone();
+  let capture_provider = multi_device.get_sync_capture_provider();
 
-  thread::spawn(move || capture_thread(capture_provider, Some(primary_device), false));
+  //thread::spawn(move || capture_thread(capture_provider, Some(primary_device), false));
+  thread::spawn(move || start_capture_thread(multi_device));
 
-  graphics_imgui::run(capture_provider2, calibration);
+  graphics_imgui::run(capture_provider, calibration);
 }

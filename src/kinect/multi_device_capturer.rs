@@ -1,12 +1,18 @@
-
-use kinect::k4a_sys_wrapper::{Device, KinectError};
+use kinect::k4a_sys_wrapper::{Device, KinectError, Capture, CaptureError, GetCaptureError};
+use std::sync::Arc;
+use std::sync::Mutex;
 
 // Allowing at least 160 microseconds between depth cameras should ensure they do not interfere with one another.
 const MIN_TIME_BETWEEN_DEPTH_CAMERA_PICTURES_USEC : libc::int32_t = 160;
 
 pub struct MultiDeviceCapturer {
   pub primary_device: Device,  // TODO: Temporary public viz
-  secondary_devices: Vec<Device>
+  secondary_devices: Vec<Device>,
+  capture_provider: Arc<MultiDeviceCaptureProvider>,
+}
+
+pub struct MultiDeviceCaptureProvider {
+  captures: Arc<Mutex<Vec<Capture>>>, // TODO: Shouldn't need to wrap in mutex if we wrap struct instead.
 }
 
 impl MultiDeviceCapturer {
@@ -39,6 +45,7 @@ impl MultiDeviceCapturer {
     Ok(Self {
       primary_device: primary_device.unwrap(),
       secondary_devices,
+      capture_provider: Arc::new(MultiDeviceCaptureProvider::new()),
     })
   }
 
@@ -62,6 +69,72 @@ impl MultiDeviceCapturer {
 
     Ok(())
   }
+
+  pub fn get_synchronized_captures(&self) -> Result<Vec<Capture>, GetCaptureError> {
+    let mut captures = Vec::with_capacity(1 + self.secondary_devices.len());
+
+    // TODO: -1 is K4A_WAIT_INDEFINITE
+    let capture = self.primary_device.get_capture(-1)?;
+    captures.push(capture);
+
+    for device in self.secondary_devices.iter() {
+      let capture = device.get_capture(-1)?;
+      captures.push(capture);
+    }
+
+    // TODO TODO TODO - Lots of sync logic goes here
+    // TODO TODO TODO - Lots of sync logic goes here
+    // TODO TODO TODO - Lots of sync logic goes here
+    // TODO TODO TODO - Lots of sync logic goes here
+
+    Ok(captures)
+  }
+
+  /// Get a capture provider for another thread
+  pub fn get_sync_capture_provider(&self) -> Arc<MultiDeviceCaptureProvider> {
+    self.capture_provider.clone()
+  }
+}
+
+impl MultiDeviceCaptureProvider {
+  pub fn new() -> Self {
+    Self {
+      captures: Arc::new(Mutex::new(Vec::new())),
+    }
+  }
+
+  /**
+   * Take the latest captures, if available, through interior mutability.
+   * This leaves the mutex holding an empty vec.
+   */
+  pub fn get_captures(&self) -> Option<Vec<Capture>> {
+    self.captures.lock()
+        .ok()
+        .map(|mut v| (*v).split_off(0))
+  }
+
+  /**
+   * Consume captures and replace whatever we currently hold.
+   */
+  pub fn set_captures(&self, captures: Vec<Capture>) {
+    match self.captures.lock() {
+      Ok(mut lock) => {
+        *lock = captures;
+      },
+      Err(_) => {},
+    }
+  }
+}
+
+pub fn start_capture_thread(capturer: MultiDeviceCapturer) {
+  let mut capture_provider = capturer.get_sync_capture_provider();
+
+  loop {
+    let captures = capturer.get_synchronized_captures()
+        .expect("Should get captures");
+
+    capture_provider.set_captures(captures);
+  }
 }
 
 fn get_primary_device_config() -> k4a_sys::k4a_device_configuration_t {
@@ -80,6 +153,7 @@ fn get_primary_device_config() -> k4a_sys::k4a_device_configuration_t {
   //  They may need to be adjusted
   config.color_resolution = k4a_sys::k4a_color_resolution_t_K4A_COLOR_RESOLUTION_2160P;
   config.depth_mode = k4a_sys::k4a_depth_mode_t_K4A_DEPTH_MODE_NFOV_UNBINNED;
+  //config.camera_fps = k4a_sys::k4a_fps_t_K4A_FRAMES_PER_SECOND_30;
 
   config
 }
@@ -99,6 +173,7 @@ fn get_secondary_device_config() -> k4a_sys::k4a_device_configuration_t {
   //  They may need to be adjusted
   config.color_resolution = k4a_sys::k4a_color_resolution_t_K4A_COLOR_RESOLUTION_2160P;
   config.depth_mode = k4a_sys::k4a_depth_mode_t_K4A_DEPTH_MODE_NFOV_UNBINNED;
+  //config.camera_fps = k4a_sys::k4a_fps_t_K4A_FRAMES_PER_SECOND_30;
 
   config
 }
