@@ -15,10 +15,10 @@ use gl;
 use gl::types::*;
 
 use gui::mouse_camera_arcball::MouseCameraArcball;
-use k4a_sys_wrapper;
-use opengl_wrapper::Texture;
-use opengl_wrapper::{Buffer, gl_get_error, OpenGlError, VertexArray};
-use point_cloud::compile_shader::compile_shader;
+use kinect::k4a_sys_wrapper;
+use opengl::compile_shader::compile_shader;
+use opengl::opengl_wrapper::Texture;
+use opengl::opengl_wrapper::{Buffer, gl_get_error, OpenGlError, VertexArray};
 use point_cloud::pixel_structs::BgraPixel;
 
 pub type Result<T> = std::result::Result<T, PointCloudRendererError>;

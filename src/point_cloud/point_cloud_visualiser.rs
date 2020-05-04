@@ -9,11 +9,11 @@ use gl::types::*;
 
 use core_types::RgbaF32;
 use gui::mouse_camera_arcball::MouseCameraArcball;
-use k4a_sys_wrapper::Image;
-use k4a_sys_wrapper::ImageFormat;
-use k4a_sys_wrapper::{Capture, Transformation};
-use opengl_wrapper::OpenGlError;
-use opengl_wrapper::{Framebuffer, Renderbuffer, Texture};
+use kinect::k4a_sys_wrapper::Image;
+use kinect::k4a_sys_wrapper::ImageFormat;
+use kinect::k4a_sys_wrapper::{Capture, Transformation};
+use opengl::opengl_wrapper::OpenGlError;
+use opengl::opengl_wrapper::{Framebuffer, Renderbuffer, Texture};
 use point_cloud::gpu_point_cloud_converter::{GpuPointCloudConverter, PointCloudComputeError};
 use point_cloud::pixel_structs::BgraPixel;
 use point_cloud::pixel_structs::DepthPixel;

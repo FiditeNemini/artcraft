@@ -15,37 +15,9 @@ use image::Rgba;
 use image::RgbaImage;
 use opencv::prelude::*;
 
-use k4a_sys_wrapper;
-use k4a_sys_wrapper::Image;
+use kinect::k4a_sys_wrapper;
+use kinect::k4a_sys_wrapper::Image;
 use point_cloud::pixel_structs::{BgraPixel, DepthPixel};
-
-/// We can't send trait 'Texture2dDataSource' impl 'RawImage2d' as it requires its data has
-/// the same lifetime, so here we collect it together here.
-pub struct TextureData2d<'a> {
-  pub raw_data: Vec<u8>,
-  pub dimensions: (u32, u32),
-  pub raw_image: RawImage2d<'a, u8>,
-}
-
-impl <'a> TextureData2d<'a> {
-  pub fn from_k4a_color_image(k4a_color_image: &Image) -> Self {
-    let dynamic_image = depth_to_image(k4a_color_image)
-        .expect("Should convert");
-    let rgba_image = dynamic_image.to_rgba();
-    let dimensions = rgba_image.dimensions();
-    let raw_data= rgba_image.into_raw();
-
-    let texture = glium::texture::RawImage2d::from_raw_rgba_reversed(
-      &raw_data,
-      dimensions);
-
-    TextureData2d {
-      raw_data,
-      dimensions,
-      raw_image: texture,
-    }
-  }
-}
 
 // https://docs.rs/image/0.23.2/image/flat/index.html
 pub fn depth_to_image(image: &Image) -> Result<DynamicImage, ImageError> {

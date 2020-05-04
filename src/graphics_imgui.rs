@@ -8,11 +8,10 @@ use imgui::Image;
 use core_types::RgbaF32;
 use gui::enhanced_window::EnhancedWindow;
 use gui::mouse_camera_arcball::MouseCameraArcball;
-use opengl::rebinder::Rebinder;
+use kinect::sensor_control::CaptureProvider;
 use point_cloud::pixel_structs::BgraPixel;
 use point_cloud::point_cloud_visualiser::{ColorizationStrategy, PointCloudVisualizer, PointCloudVisualizerError};
 use point_cloud::viewer_image::ViewerImage;
-use sensor_control::CaptureProvider;
 use webcam::WebcamWriter;
 
 pub const ENABLE_WEBCAM: bool = false;
@@ -49,8 +48,6 @@ pub fn run(capture_provider: Arc<CaptureProvider>, calibration_data: k4a_sys::k4
   gl::load_with(|s| video.gl_get_proc_address(s) as _);
 
   //enable_opengl_debugging();
-
-  let _rebinder = Rebinder::snapshot();
 
   let mut imgui = imgui::Context::create();
   imgui.set_ini_filename(None);

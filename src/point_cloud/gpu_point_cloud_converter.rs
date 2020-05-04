@@ -12,13 +12,13 @@ use std::str;
 use gl;
 use gl::types::*;
 
-use k4a_sys_wrapper;
-use k4a_sys_wrapper::Image;
-use k4a_sys_wrapper::ImageFormat;
-use opengl_wrapper::{Buffer, gl_get_error};
-use opengl_wrapper::OpenGlError;
-use opengl_wrapper::Texture;
-use point_cloud::compile_shader::compile_shader;
+use kinect::k4a_sys_wrapper::Image;
+use kinect::k4a_sys_wrapper::ImageFormat;
+use kinect::k4a_sys_wrapper;
+use opengl::compile_shader::compile_shader;
+use opengl::opengl_wrapper::OpenGlError;
+use opengl::opengl_wrapper::Texture;
+use opengl::opengl_wrapper::{Buffer, gl_get_error};
 use point_cloud::pixel_structs::DepthPixel;
 
 pub type Result<T> = std::result::Result<T, PointCloudComputeError>;

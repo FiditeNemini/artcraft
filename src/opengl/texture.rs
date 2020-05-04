@@ -5,7 +5,7 @@ use std::ffi::c_void;
 use std::path::Path;
 
 /// Load a texture from a file.
-pub fn load_texture(filename: &str) -> GLuint {
+pub fn load_texture_from_file(filename: &str) -> GLuint {
   let mut texture_id = 0;
 
   unsafe {
