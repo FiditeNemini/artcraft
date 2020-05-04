@@ -32,6 +32,7 @@ use sensor_control::{capture_thread, CaptureProvider};
 pub mod conversion;
 pub mod core_types;
 pub mod graphics_imgui;
+pub mod gui;
 pub mod imgui_support;
 pub mod k4a_sys_wrapper;
 pub mod mouse;

@@ -3,6 +3,7 @@ use cgmath::{Matrix4, Vector2};
 use cgmath::Vector3;
 use sdl2::event::Event;
 use sdl2::mouse::MouseButton;
+use gui::enhanced_window::CompleteMouseState;
 
 const MIN_ZOOM : f32 = 1.0;
 const MAX_ZOOM : f32 = 120.0;
@@ -67,15 +68,22 @@ impl SdlArcball {
   }
 
   /// Process an SDL event.
+  /// This is a bad idea in a multi-window Imgui setup since the SDL coordinates and events take up
+  /// the entire process window and may be sequestered on a per-window level. That said, this is
+  /// reasonable for single-window apps.
   pub fn process_event(&mut self, event: &Event) {
     match event {
       Event::MouseWheel { timestamp: _, window_id: _, which: _, x: _, y, direction: _ } => {
-        self.mouse_wheel(*y);
+        //println!("Mouse wheel event.");
+        let y = *y as f32;
+        self.mouse_wheel(y);
       },
       Event::MouseButtonDown { timestamp: _, window_id: _, which: _, mouse_btn, clicks: _, x: _, y: _ } => {
+        //println!("Mouse button down event.");
         self.mouse_button_press(mouse_btn, true);
       },
       Event::MouseButtonUp { timestamp: _, window_id: _, which: _, mouse_btn, clicks: _, x: _, y: _ } => {
+        //println!("Mouse button up event.");
         self.mouse_button_press(mouse_btn, false);
       },
       Event::MouseMotion { timestamp: _, window_id: _, which: _, mousestate: _, x, y, xrel: _, yrel: _ } => {
@@ -87,6 +95,18 @@ impl SdlArcball {
       },
       _ => {},
     }
+  }
+
+  /// Process Imgui window-scoped mouse state.
+  /// Since we don't process individual events, we set all of the internal state at once.
+  pub fn process_mouse_state(&mut self, mouse_state: CompleteMouseState) {
+    // TODO: Cleanup
+    self.right_mouse_active = mouse_state.right_button_down;
+    self.left_mouse_active = mouse_state.left_button_down;
+    self.mouse_motion(mouse_state.cursor_x, mouse_state.cursor_y);
+    self.mouse_wheel(mouse_state.scroll_wheel);
+    self.last_x = mouse_state.cursor_x;
+    self.last_y = mouse_state.cursor_y;
   }
 
   /// Get the view matrix
@@ -159,8 +179,7 @@ impl SdlArcball {
     self.animation_counter += 0.05;
   }
 
-  fn mouse_wheel(&mut self, y: i32) {
-    let y = y as f32;
+  fn mouse_wheel(&mut self, y: f32) {
     self.arcball.zoom(y, 0.16);
 
     // NB: 'y' is a scroll amount, typically 1 or -1.
@@ -169,7 +188,6 @@ impl SdlArcball {
         .min(MAX_ZOOM);
 
     self.last_zoom = zoom;
-    println!("Zoom: {}", zoom);
   }
 
   fn mouse_button_press(&mut self, mouse_button: &MouseButton, down: bool) {

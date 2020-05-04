@@ -329,11 +329,6 @@ impl PointCloudRenderer {
       point_cloud_texture_index = gl::GetUniformLocation(program_id, POINT_CLOUD_PTR);
     }
 
-    println!("Uniform view location - view: {:?}", view_index);
-    println!("Uniform projection location - view: {:?}", projection_index);
-    println!("Uniform enable shading location - view: {:?}", enable_shading_index);
-    println!("Uniform point cloud texture location - view: {:?}", point_cloud_texture_index);
-
     let initial_view = [
       [-1.0,         0.0,    8.74228e-08, 0.0],
       [0.0,          1.0,    0.0,         0.0],
@@ -373,8 +368,6 @@ impl PointCloudRenderer {
   /// Update the view matrices
   ///
   pub fn update_view_projection(&mut self, view: [[f32; 4]; 4], projection: [[f32; 4]; 4]) {
-    println!("\nView Matrix: {:?}", view);
-    println!("Updated: {:?}", projection);
     self.view_matrix = view;
     //self.projection_matrix = projection;
 
@@ -387,7 +380,6 @@ impl PointCloudRenderer {
 
     // Initial: [[1.41272,    0.0, 0.0, 0.0], [0.0, 1.56969,   0.0, 0.0], [0.0, 0.0, -1.002,    -1.0],       [0.0, 0.0, -0.2002, 0.0]]
     // Updated: [[0.88294804, 0.0, 0.0, 0.0], [0.0, 1.5696855, 0.0, 0.0], [0.0, 0.0, -1.002002, -0.2002002], [0.0, 0.0, -1.0,    0.0]]
-    println!("Initial: {:?}", initial_projection);
 
     self.projection_matrix = initial_projection;
   }

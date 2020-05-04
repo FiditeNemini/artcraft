@@ -13,11 +13,18 @@ use point_cloud::point_cloud_visualiser::{ColorizationStrategy, PointCloudVisual
 use point_cloud::viewer_image::ViewerImage;
 use sensor_control::CaptureProvider;
 use webcam::WebcamWriter;
+use gui::enhanced_window::EnhancedWindow;
+
+pub const ENABLE_WEBCAM: bool = false;
 
 pub fn run(capture_provider: Arc<CaptureProvider>, calibration_data: k4a_sys::k4a_calibration_t) {
 
-  let mut webcam_writer = WebcamWriter::open_file("/dev/video0", 1280, 720, 3)
-      .expect("should be able to create webcamwriter");
+  let mut webcam_writer = None;
+
+  if ENABLE_WEBCAM {
+    webcam_writer = Some(WebcamWriter::open_file("/dev/video0", 1280, 720, 3)
+        .expect("should be able to create webcamwriter"));
+  }
 
   let sdl_arcball = Arc::new(Mutex::new(SdlArcball::new(1280, 720)));
 
@@ -47,6 +54,7 @@ pub fn run(capture_provider: Arc<CaptureProvider>, calibration_data: k4a_sys::k4
 
   let mut imgui = imgui::Context::create();
   imgui.set_ini_filename(None);
+  imgui.io_mut().config_windows_move_from_title_bar_only = true;
 
   /*let gl_texture_n64 = load_texture("n64logo.png");
   let imgui_texture_n64 = TextureId::from(gl_texture_n64 as usize);
@@ -96,10 +104,10 @@ pub fn run(capture_provider: Arc<CaptureProvider>, calibration_data: k4a_sys::k4
     use sdl2::event::Event;
     use sdl2::keyboard::Keycode;
 
-    let _rebinder = Rebinder::snapshot();
-
     for event in event_pump.poll_iter() {
       imgui_sdl2.handle_event(&mut imgui, &event);
+
+      // TODO: This is how Imgui appears to tell SDL to ignore certain events.
       if imgui_sdl2.ignore_event(&event) { continue; }
 
       match event {
@@ -116,7 +124,6 @@ pub fn run(capture_provider: Arc<CaptureProvider>, calibration_data: k4a_sys::k4
       }
     }
 
-
     imgui_sdl2.prepare_frame(imgui.io_mut(), &window, &event_pump.mouse_state());
 
     let now = Instant::now();
@@ -126,28 +133,14 @@ pub fn run(capture_provider: Arc<CaptureProvider>, calibration_data: k4a_sys::k4
     imgui.io_mut().delta_time = delta_s;
 
     let ui = imgui.frame();
-    //ui.show_demo_window(&mut true);
 
-    /*Window::new(im_str!("Loading Images"))
-        .size([1500.0, 1500.0], Condition::FirstUseEver)
-        .position([0.0, 0.0], Condition::FirstUseEver)
-        .build(&ui, || {
-          let mouse_pos = ui.io().mouse_pos;
-          ui.text(format!(
-            "Mouse Position: ({:.1},{:.1})",
-            mouse_pos[0], mouse_pos[1]
-          ));
-          ui.separator();
-          Image::new(imgui_texture_n64, [100.0, 100.0]).build(&ui);
-          ui.separator();
-          Image::new(imgui_texture_snes, [200.0, 200.0]).build(&ui);
-          ui.separator();
-        });*/
+    //ui.show_demo_window(&mut true);
 
     const window_width : f32 = 1290.0;
     const window_height : f32 = 760.0;
 
     Window::new(im_str!("Point Cloud Converter Depth Image"))
+        .scrollable(true)
         .size([window_width, window_height], Condition::FirstUseEver)
         .position([0.0, 0.0], Condition::FirstUseEver)
         .build(&ui, || {
@@ -169,6 +162,7 @@ pub fn run(capture_provider: Arc<CaptureProvider>, calibration_data: k4a_sys::k4
     Window::new(im_str!("Visualizer XYZ Texture"))
         .size([window_width, window_height], Condition::FirstUseEver)
         .position([window_width + 50.0, 0.0], Condition::FirstUseEver)
+        .movable(false)
         .build(&ui, || {
           match imgui_visualizer_xyz_texture.as_ref() {
             None => {},
@@ -177,15 +171,33 @@ pub fn run(capture_provider: Arc<CaptureProvider>, calibration_data: k4a_sys::k4
             },
           }
         });
+
     // NB: This is larger. The texture is 1280x1152.
-    Window::new(&im_str!("Final Output: {:?}", colorization_strategy))
+    EnhancedWindow::new(&im_str!("Final Output: {:?}", colorization_strategy))
         .size([window_width, window_height + 435.0], Condition::FirstUseEver)
         .position([window_width + 50.0, window_height + 50.0], Condition::FirstUseEver)
-        .build(&ui, || {
-          //Image::new(imgui_kinect_final_output, [1280.0, 1152.0]).build(&ui);
-          //Image::new(imgui_kinect_final_output, [640.0, 480.0]).build(&ui);
+        .mouse_inputs(true)
+        .build(&ui, |window| {
+
+          if let Some(mouse_state) = window.get_window_bounded_mouse_state() {
+            println!("\nwindow_helper.cursor_pos: {:?}", mouse_state);
+            match sdl_arcball.lock() {
+              Ok(mut arcball) => arcball.process_mouse_state(mouse_state),
+              Err(_) => {},
+            }
+          }
+
+          /*println!("is_window_hovered: {:?}", ui.is_window_hovered());
+          println!("cursor_pos: {:?}", ui.cursor_pos());
+          println!("cursor_screen_pos: {:?}", ui.cursor_screen_pos());
+          println!("window_pos: {:?}", ui.window_pos());
+          println!("IO mouse pos: {:?}\n", ui.io().mouse_pos);*/
+
           Image::new(imgui_kinect_final_output, [1280.0, 720.0]).build(&ui);
         });
+
+    //println!("imgui.cursor_pos: {:?}", ui.cursor_pos());
+    //println!("imgui.cursor_screen_pos: {:?}", ui.cursor_screen_pos());
 
     unsafe {
       gl::ClearColor(0.2, 0.2, 0.2, 1.0);
@@ -219,8 +231,10 @@ pub fn run(capture_provider: Arc<CaptureProvider>, calibration_data: k4a_sys::k4
       Err(_) => {},
     }
 
-    webcam_writer.write_current_frame_to_file(texture.texture_id())
-        .expect("should write");
+    if let Some(mut webcam) = webcam_writer.as_mut() {
+      webcam.write_current_frame_to_file(texture.texture_id())
+          .expect("should write");
+    }
 
     //let change_delta = last_frame - last_change;
     //if change_delta > Duration::from_millis(5_000) {
