@@ -117,11 +117,11 @@ pub fn run(capture_provider: Arc<CaptureProvider>, calibration_data: k4a_sys::k4
         _ => {}
       }
 
-      // Also send to the arcball to update the view matrix.
+      /*// Also send to the arcball to update the view matrix.
       match sdl_arcball.lock() {
         Ok(mut arcball) => arcball.process_event(&event),
         Err(_) => {},
-      }
+      }*/
     }
 
     imgui_sdl2.prepare_frame(imgui.io_mut(), &window, &event_pump.mouse_state());
@@ -146,6 +146,7 @@ pub fn run(capture_provider: Arc<CaptureProvider>, calibration_data: k4a_sys::k4
         .build(&ui, || {
           Image::new(imgui_point_cloud_convert_depth_image, [1280.0, 720.0]).build(&ui);
         });
+
     Window::new(im_str!("Point Cloud Converter XY Table"))
         .size([window_width, window_height], Condition::FirstUseEver)
         .position([0.0, window_height + 50.0], Condition::FirstUseEver)
@@ -180,24 +181,14 @@ pub fn run(capture_provider: Arc<CaptureProvider>, calibration_data: k4a_sys::k4
         .build(&ui, |window| {
 
           if let Some(mouse_state) = window.get_window_bounded_mouse_state() {
-            println!("\nwindow_helper.cursor_pos: {:?}", mouse_state);
             match sdl_arcball.lock() {
               Ok(mut arcball) => arcball.process_mouse_state(mouse_state),
               Err(_) => {},
             }
           }
 
-          /*println!("is_window_hovered: {:?}", ui.is_window_hovered());
-          println!("cursor_pos: {:?}", ui.cursor_pos());
-          println!("cursor_screen_pos: {:?}", ui.cursor_screen_pos());
-          println!("window_pos: {:?}", ui.window_pos());
-          println!("IO mouse pos: {:?}\n", ui.io().mouse_pos);*/
-
           Image::new(imgui_kinect_final_output, [1280.0, 720.0]).build(&ui);
         });
-
-    //println!("imgui.cursor_pos: {:?}", ui.cursor_pos());
-    //println!("imgui.cursor_screen_pos: {:?}", ui.cursor_screen_pos());
 
     unsafe {
       gl::ClearColor(0.2, 0.2, 0.2, 1.0);
