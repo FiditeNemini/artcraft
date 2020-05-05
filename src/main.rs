@@ -47,7 +47,9 @@ const PRIMARY_DEVICE_SERIAL : &'static str = "000513594512";
 const SECONDARY_DEVICE_SERIAL : &'static str = "000886694512";
 
 pub fn main() {
-  let multi_device = MultiDeviceCapturer::new(2).expect("multi-device create");
+  let multi_device = MultiDeviceCapturer::new(2, Some(0))
+      .expect("multi-device create");
+
   multi_device.start_cameras().expect("start cameras");
 
   let depth_mode : k4a_sys::k4a_depth_mode_t = 2; //k4a_sys::K4A_DEPTH_MODE_NFOV_UNBINNED;

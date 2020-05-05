@@ -19,7 +19,7 @@ impl MultiDeviceCapturer {
 
   // TODO: Don't panic everywere.
   /// Open the primary and secondary devices.
-  pub fn new(num_devices: u32) -> Result<Self, KinectError> {
+  pub fn new(num_devices: u32, limit_secondary_devices: Option<usize>) -> Result<Self, KinectError> {
     let mut primary_device = None;
     let mut secondary_devices = Vec::new();
 
@@ -29,6 +29,7 @@ impl MultiDeviceCapturer {
 
       if jack_status.sync_out_jack_connected && !jack_status.sync_in_jack_connected {
         if primary_device.is_some() {
+          // NB: This assumes a daisy chain topology.
           panic!("We already one primary device. We can't have two.");
         }
         primary_device = Some(device);
@@ -42,8 +43,16 @@ impl MultiDeviceCapturer {
       secondary_devices.push(device);
     }
 
+    if primary_device.is_none() {
+      panic!("Could not find primary device!");
+    }
+
+    if let Some(limit) = limit_secondary_devices {
+      secondary_devices.truncate(limit);
+    }
+
     Ok(Self {
-      primary_device: primary_device.unwrap(),
+      primary_device: primary_device.expect("There must be a primary device"),
       secondary_devices,
       capture_provider: Arc::new(MultiDeviceCaptureProvider::new()),
     })
