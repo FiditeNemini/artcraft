@@ -46,6 +46,8 @@ const PRIMARY_DEVICE_SERIAL : &'static str = "000513594512";
 /// This is a second device
 const SECONDARY_DEVICE_SERIAL : &'static str = "000886694512";
 
+const ENABLE_WEBCAM : bool = true;
+
 pub fn main() {
   let multi_device = MultiDeviceCapturer::new(2, Some(0))
       .expect("multi-device create");
@@ -65,5 +67,5 @@ pub fn main() {
   //thread::spawn(move || capture_thread(capture_provider, Some(primary_device), false));
   thread::spawn(move || start_capture_thread(multi_device));
 
-  graphics_imgui::run(capture_provider, calibration);
+  graphics_imgui::run(capture_provider, calibration, ENABLE_WEBCAM);
 }

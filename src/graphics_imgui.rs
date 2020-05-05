@@ -15,13 +15,10 @@ use point_cloud::viewer_image::ViewerImage;
 use webcam::WebcamWriter;
 use kinect::multi_device_capturer::MultiDeviceCaptureProvider;
 
-pub const ENABLE_WEBCAM: bool = false;
-
-pub fn run(capture_provider: Arc<MultiDeviceCaptureProvider>, calibration_data: k4a_sys::k4a_calibration_t) {
-
+pub fn run(capture_provider: Arc<MultiDeviceCaptureProvider>, calibration_data: k4a_sys::k4a_calibration_t, enable_webcam: bool) {
   let mut webcam_writer = None;
 
-  if ENABLE_WEBCAM {
+  if enable_webcam {
     webcam_writer = Some(WebcamWriter::open_file("/dev/video0", 1280, 720, 3)
         .expect("should be able to create webcamwriter"));
   }
