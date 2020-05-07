@@ -4,6 +4,7 @@
 set -ex
 
 build_assets() {
+  # TODO: For now, manually invoke this and then copy `./web/output` into `./brandon.audio/output`
   #gulp # FIXME(2019-01-30): Not sure why this isn't working. Not sure if critical.
   pushd ./frontend
   MINIFY=1 webpack
