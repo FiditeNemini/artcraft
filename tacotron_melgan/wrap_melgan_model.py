@@ -101,6 +101,7 @@ class Container(torch.nn.Module):
 
 print('Loading melgan model...')
 melgan_model_file = '/home/bt/models/melgan-swpark/firstgo_a7c2351_3650.pt'
+melgan_model_file = '/home/bt/models/melgan-swpark/ljs-high-pitch_8741385_6975.pt'
 melgan_model = torch.load(melgan_model_file, map_location=torch.device('cpu'))
 
 module = Container()
@@ -125,7 +126,8 @@ melgan_model['model_g'] = OrderedDict(new_model_g)
 print('Load state dict...')
 module.load_state_dict(melgan_model['model_g'])
 
-output_filename = 'melgan_container2.pt'
+#output_filename = 'melgan_container2.pt'
+output_filename = 'melgan_ljs-high-pitch_container.pt'
 
 # NB: Tracing evaluates the model on input and unrolls and hardcodes branching
 # and loops. Scripting allows these to remain by converting the entire program

@@ -13,8 +13,80 @@ from tacotron_model import Tacotron2
 
 #tacotron_model_file = '/home/bt/models/tacotron2-nvidia/tacotron2_arpabet_ljs_checkpoint_22000'
 #tacotron_model_file = '/home/bt/models/tacotron2-nvidia/tacotron2_arpabet_ljs_checkpoint_54000'
-tacotron_model_file = '/home/bt/models/tacotron2-nvidia/tacotron2_arpabet_ljs_checkpoint_93000'
-output_filename = 'tacotron_arpabet_1.pt'
+#tacotron_model_file = '/home/bt/models/tacotron2-nvidia/tacotron2_arpabet_ljs_checkpoint_93000'
+#tacotron_model_file = '/home/bt/models/tacotron2-nvidia/tacotron2_arpabet_ljs_checkpoint_128000'
+#tacotron_model_file = '/home/bt/models/tacotron2-nvidia/tacotron2_arpabet_txlearn_trump_checkpoint_3000'
+#tacotron_model_file = '/home/bt/models/tacotron2-nvidia/checkpoint_10000'
+tacotron_model_file = '/home/bt/models/tacotron2-nvidia/checkpoint_9500'
+tacotron_model_file = '/home/bt/models/tacotron2-nvidia/checkpoint_2000'
+# AWFUL
+tacotron_model_file = '/home/bt/models/tacotron2-nvidia/checkpoint_11500'
+# Start new... (bad)
+tacotron_model_file = '/home/bt/models/tacotron2-nvidia/checkpoint_500'
+tacotron_model_file = '/home/bt/models/tacotron2-nvidia/checkpoint_1500'
+tacotron_model_file = '/home/bt/models/tacotron2-nvidia/checkpoint_20500'
+tacotron_model_file = '/home/bt/models/tacotron2-nvidia/checkpoint_29500'
+tacotron_model_file = '/home/bt/models/tacotron2-nvidia/checkpoint_41000'
+# Great
+tacotron_model_file = '/home/bt/models/tacotron2-nvidia/checkpoint_5000'
+# Awful
+tacotron_model_file = '/home/bt/models/tacotron2-nvidia/checkpoint_13000'
+tacotron_model_file = '/home/bt/models/tacotron2-nvidia/checkpoint_6000'
+tacotron_model_file = '/home/bt/models/tacotron2-nvidia/checkpoint_12000'
+tacotron_model_file = '/home/bt/models/tacotron2-nvidia/checkpoint_500'
+tacotron_model_file = '/home/bt/models/tacotron2-nvidia/checkpoint_1500'
+# Distributed run with carefully tweaked validation set
+tacotron_model_file = '/home/bt/models/tacotron2-nvidia/checkpoint_4500'
+tacotron_model_file = '/home/bt/models/tacotron2-nvidia/checkpoint_6000'
+tacotron_model_file = '/home/bt/models/tacotron2-nvidia/checkpoint_7000'
+tacotron_model_file = '/home/bt/models/tacotron2-nvidia/checkpoint_15500'
+tacotron_model_file = '/home/bt/models/tacotron2-nvidia/checkpoint_16500'
+tacotron_model_file = '/home/bt/models/tacotron2-nvidia/checkpoint_20500'
+tacotron_model_file = '/home/bt/models/tacotron2-nvidia/checkpoint_500'
+tacotron_model_file = '/home/bt/models/tacotron2-nvidia/checkpoint_1000'
+tacotron_model_file = '/home/bt/models/tacotron2-nvidia/checkpoint_9500'
+tacotron_model_file = '/home/bt/models/tacotron2-nvidia/checkpoint_11000'
+tacotron_model_file = '/home/bt/models/tacotron2-nvidia/checkpoint_16000'
+# Really good:
+tacotron_model_file = '/home/bt/models/tacotron2-nvidia/checkpoint_26000'
+# So awful (loss skyrocketed for no reason):
+tacotron_model_file = '/home/bt/models/tacotron2-nvidia/checkpoint_32500'
+# This one was right before the uptick in loss:
+tacotron_model_file = '/home/bt/models/tacotron2-nvidia/checkpoint_30000'
+# Trying this again with more data
+tacotron_model_file = '/home/bt/models/tacotron2-nvidia/checkpoint_500'
+tacotron_model_file = '/home/bt/models/tacotron2-nvidia/checkpoint_13000'
+tacotron_model_file = '/home/bt/models/tacotron2-nvidia/checkpoint_28000'
+tacotron_model_file = '/home/bt/models/tacotron2-nvidia/checkpoint_35500'
+# Trying with my voice (very limited data)
+tacotron_model_file = '/home/bt/models/tacotron2-nvidia/checkpoint_32500'
+tacotron_model_file = '/home/bt/models/tacotron2-nvidia/checkpoint_3000'
+# Another training run
+tacotron_model_file = '/home/bt/models/tacotron2-nvidia/checkpoint_500'
+# Sounds awesome, but 100% spectral robot noise:
+tacotron_model_file = '/home/bt/models/tacotron2-nvidia/checkpoint_2000'
+# OH GOD, AWFUL. NOT EVEN WORDS:
+tacotron_model_file = '/home/bt/models/tacotron2-nvidia/checkpoint_7500'
+tacotron_model_file = '/home/bt/models/tacotron2-nvidia/checkpoint_3000'
+tacotron_model_file = '/home/bt/models/tacotron2-nvidia/checkpoint_10000'
+tacotron_model_file = '/home/bt/models/tacotron2-nvidia/checkpoint_76000'
+# Modified LJS - pitch +700 reverb +2 +noise
+tacotron_model_file = '/home/bt/models/tacotron2-nvidia/checkpoint_4500'
+tacotron_model_file = '/home/bt/models/tacotron2-nvidia/checkpoint_6500'
+# Got some spectral noise. Isn't clean. But English is good:
+tacotron_model_file = '/home/bt/models/tacotron2-nvidia/checkpoint_17500'
+tacotron_model_file = '/home/bt/models/tacotron2-nvidia/checkpoint_78500'
+# Training a larger transformed LJS dataset of the same construction:
+tacotron_model_file = '/home/bt/models/tacotron2-nvidia/checkpoint_9500'
+# Post-coronavirus outbreak training
+tacotron_model_file = '/home/bt/models/tacotron2-nvidia/checkpoint_17500'
+
+# Going back in time, this is an old trump txlearned model:
+tacotron_model_file = '/home/bt/models/tacotron2-nvidia/tacotron2_trump_txlearn_ljs_arpabet_ckpt30000_2020_02_06'
+
+
+#output_filename = 'tacotron_arpabet_1.pt'
+output_filename = 'tacotron2_trump_txlearn_ljs_arpabet_ckpt30000_2020_02_06.jit'
 
 # NB: Tacotron's original shape is [148, 512]. Arpabet encoding is [256, 512].
 NUM_SYMBOLS_ENCODED = 256 # 148 by default, 256 with my custom Arpabet encoding

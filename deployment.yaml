@@ -30,6 +30,8 @@ spec:
     metadata:
       labels:
         app: tts
+      annotations:
+        bump: '1'
     spec:
       imagePullSecrets:
       - name: regcred
@@ -99,7 +101,8 @@ spec:
         - name: MELGAN_MODEL
           value: "/data/models/melgan-swpark/shared_melgan_container.pt"
         - name: ASSET_DIRECTORY
-          value: "/data/frontend"
+          #value: "/data/frontend" # OLD, PLAIN FRONTEND
+          value: "/data/frontend/build"
         command: ["/tts_service"]
         #command: ["sleep"]
         #args: ["30000"]
