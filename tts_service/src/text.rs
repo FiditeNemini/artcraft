@@ -54,7 +54,9 @@ pub fn text_to_arpabet_encoding(arpabet: &Arpabet, text: &str) -> Vec<i64> {
 
   for token in tokens {
     match token {
-      Token::Word(word) => {
+      Token::ApostrophenatedWord(word)
+          | Token::HyphenatedWord(word)
+          | Token::Word(word) => {
         if needs_space {
           encoded_buffer.push(space);
           needs_space = false;
