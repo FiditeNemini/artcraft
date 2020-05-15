@@ -1,6 +1,7 @@
 import React from 'react';
 import Howl from 'howler';
 import {TextAudioPair }from './MainComponent'
+import { ModelPickerDropdownComponent } from './model_picker/ModelPickerDropdownComponent';
 
 interface Props {
   appendUtteranceCallback: (utterance: TextAudioPair) => void
@@ -9,12 +10,16 @@ interface Props {
 interface State {
   text?: String,
   howl?: Howl,
+  arpabet_tacotron_model?: string,
+  melgan_model?: string,
 }
 
 /// Requests to the backend.
 class TtsRequest {
   text: String
   speaker: String
+  arpabet_tacotron_model?: string
+  melgan_model?: string
 
   constructor(text: String) {
     this.text = text;
@@ -42,6 +47,18 @@ class TextInput extends React.Component<Props, State> {
     this.setState({text: text});
   }
 
+  handleArpabetTacotronModelChange = (ev: React.FormEvent<HTMLSelectElement>) => {
+    console.log('callback A');
+    const model = (ev.target as HTMLInputElement).value;
+    this.setState({arpabet_tacotron_model: model});
+  }
+
+  handleMelganModelChange = (ev: React.FormEvent<HTMLSelectElement>) => {
+    console.log('callback B');
+    const model = (ev.target as HTMLInputElement).value;
+    this.setState({melgan_model: model});
+  }
+
   makeRequest = (ev: React.FormEvent<HTMLFormElement>) => {
     console.log("Form Submit");
 
@@ -50,8 +67,10 @@ class TextInput extends React.Component<Props, State> {
     }
 
     let request = new TtsRequest(this.state.text);
+    request.arpabet_tacotron_model = this.state.arpabet_tacotron_model || "";
+    request.melgan_model = this.state.melgan_model || "";
 
-    const url = `/tts`;
+    const url = '/tts';
     fetch(url, {
       method: 'POST',
       headers: {
@@ -63,8 +82,10 @@ class TextInput extends React.Component<Props, State> {
     .then(res => res.blob())
     .then(blob => {
       console.log(blob);
+
       const url = window.URL.createObjectURL(blob);
       console.log(url);
+
       const sound = new Howl.Howl({
         src: [url],
         format: 'wav',
@@ -76,10 +97,7 @@ class TextInput extends React.Component<Props, State> {
       this.props.appendUtteranceCallback(new TextAudioPair(request.text, sound));
 
       (window as any).sound = sound;
-    })
-
-    //.then(res => res.json())
-    //.then(...
+    });
 
     ev.preventDefault();
     return false;
@@ -89,6 +107,10 @@ class TextInput extends React.Component<Props, State> {
     return (
       <form onSubmit={this.makeRequest}>
         <input onChange={this.handleTextChange} />
+        <ModelPickerDropdownComponent 
+          changeArpabetTacotronCallback={this.handleArpabetTacotronModelChange}
+          changeMelganCallback={this.handleMelganModelChange}
+        />
         <button>Submit</button>
       </form>
     );

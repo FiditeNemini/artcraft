@@ -5,6 +5,10 @@ class TtsRequest {
   text: String
   speaker: String
 
+  // Which model to use
+  melgan_model?: Number
+  arpabet_tacotron_model?: Number
+
   constructor(text: String) {
     this.text = text;
     // LJSpeech dataset from Keith Ito & LibriVox, spoken by Linda Johnson.

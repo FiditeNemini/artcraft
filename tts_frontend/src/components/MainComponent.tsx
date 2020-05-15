@@ -2,6 +2,7 @@ import React from 'react';
 import Howl from 'howler';
 import TextInput from './TextInput';
 import TrackList from './TrackList';
+import { ModelPickerDropdownComponent } from './model_picker/ModelPickerDropdownComponent';
 
 interface Props {
 }
@@ -26,7 +27,6 @@ class MainComponent extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props);
     this.state = { utterances: new Array() };
-    //this.setState({utterances: new Array()});
   }
 
   /** Add a new audio track. */

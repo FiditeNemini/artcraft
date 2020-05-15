@@ -10,9 +10,11 @@ use tch::nn::ModuleT;
 use std::io::Cursor;
 use std::io::BufWriter;
 
+use crate::model::arpabet_tacotron_model::ArpabetTacotronModel;
+use crate::model::model_container::ModelContainer;
+use crate::model::melgan_model::MelganModel;
+
 pub struct TacoMelModel {
-  tacotron_model: CModule,
-  melgan_model: CModule,
 }
 
 impl TacoMelModel {
@@ -21,17 +23,16 @@ impl TacoMelModel {
     CModule::load(filename).unwrap()
   }
 
-  pub fn create(tacotron_filename: &str, melgan_filename: &str) -> Self {
-    let tacotron_model = Self::load_model_file(tacotron_filename);
-    let melgan_model = Self::load_model_file(melgan_filename);
-
-    Self {
-      tacotron_model,
-      melgan_model,
-    }
+  pub fn new() -> Self {
+    Self {}
   }
 
-  pub fn run_tts(&self, text: &str) -> Vec<i16> {
+  /*pub fn run_tts_audio(&self, text: &str) -> Vec<u8> {
+    let audio_signal = self.run_tts(text);
+    Self::audio_signal_to_wav_bytes(audio_signal)
+  }
+
+  fn run_tts(&self, text: &str) -> Vec<i16> {
     println!("Text : {:?}", text);
     let copied = text.to_string().to_ascii_lowercase();
     let mut text_buffer : Vec<i64> = Vec::new();
@@ -49,29 +50,21 @@ impl TacoMelModel {
     println!("Text buffer: {:?}", text_buffer);
 
     self.encoded_text_to_audio_signal(&text_buffer)
+  }*/
+
+  /// Run TTS on Arpabet encoding
+  pub fn run_tts_encoded(&self, tacotron: &ArpabetTacotronModel, melgan: &MelganModel, encoded_text: &Vec<i64>) -> Vec<u8> {
+    let audio_signal = self.encoded_text_to_audio_signal(tacotron, melgan, encoded_text);
+    Self::audio_signal_to_wav_bytes(audio_signal)
   }
 
-  fn encoded_text_to_audio_signal(&self, text_buffer: &Vec<i64>) -> Vec<i16> {
-    let text_tensor = Tensor::of_slice(text_buffer.as_slice());
-    println!("Text tensor: {:?}", text_tensor);
-    let text_tensor = text_tensor.unsqueeze(0);
-    println!("Text tensor unsq: {:?}", text_tensor);
-    let mut mel_tensor = self.tacotron_model.forward(&text_tensor);
+  fn encoded_text_to_audio_signal(&self, tacotron: &ArpabetTacotronModel, melgan: &MelganModel, text_buffer: &Vec<i64>) -> Vec<i16> {
+    let mut mel_tensor = tacotron.encoded_arpabet_to_mel(&text_buffer);
     println!("\n\n>>> Mel tensor:\n{:?}\n\n", mel_tensor);
     println!("Running melgan...");
-    let audio_tensor = self.melgan_model.forward(&mel_tensor);
+    let audio_tensor = melgan.tacotron_mel_to_audio(&mel_tensor);
     println!("\n\n>>> Audio tensor:\n{:?}\n\n", audio_tensor);
     Self::audio_tensor_to_audio_signal(audio_tensor)
-  }
-
-  pub fn run_tts_audio(&self, text: &str) -> Vec<u8> {
-    let audio_signal = self.run_tts(text);
-    Self::audio_signal_to_wav_bytes(audio_signal)
-  }
-
-  pub fn run_tts_encoded(&self, encoded_text: &Vec<i64>) -> Vec<u8> {
-    let audio_signal = self.encoded_text_to_audio_signal(encoded_text);
-    Self::audio_signal_to_wav_bytes(audio_signal)
   }
 
   fn audio_tensor_to_audio_signal(mel: Tensor) -> Vec<i16> {

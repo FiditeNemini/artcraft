@@ -1,0 +1,36 @@
+# --------------- Tacotron ---------------
+
+[[tacotron]]
+file = "/home/bt/dev/voder/tacotron_melgan/tacotron2_trump_txlearn_ljs_arpabet_ckpt30000_2020_02_06.jit"
+description = "First Trump txlearn with Arpabet"
+
+[[tacotron]]
+file = "/home/bt/dev/voder/tacotron_melgan/tacotron2_trump_txlearn_ljs_arpabet_2020-05-14_ckpt7000.jit"
+description = "Trump txlearn with Arpabet 2020-05-14"
+
+[[tacotron]]
+file = "/home/bt/dev/voder/tacotron_melgan/tacotron2_trump_txlearn_ljs_arpabet_2020-05-14_ckpt11500.jit"
+description = "Trump txlearn with Arpabet 2020-05-14"
+
+# ---------------- Melgan ----------------
+
+[[melgan]]
+file = "/home/bt/dev/tacotron-melgan/melgan_trump-txlearn-2020.05.05.jit"
+description = "Latest LJS transfer learned Trump."
+
+[[melgan]]
+file = "/home/bt/dev/tacotron-melgan/melgan_trump-txlearn-2020.05.05_13675.jit"
+description = "Latest LJS transfer learned Trump."
+
+[[melgan]]
+file = "/home/bt/dev/tacotron-melgan/melgan_ljs-high-pitch_container.pt"
+description = "High-pitched LJS"
+
+[[melgan]]
+file = "/home/bt/dev/tacotron-melgan/shared_melgan_container.pt"
+description = "Unknown"
+
+[[melgan]]
+file = "/home/bt/dev/tacotron-melgan/shared_melgan_container2.pt"
+description = "Unknown"
+
