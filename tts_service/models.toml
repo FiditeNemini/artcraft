@@ -1,36 +1,56 @@
 # --------------- Tacotron ---------------
 
-[[tacotron]]
-file = "/home/bt/dev/voder/tacotron_melgan/tacotron2_trump_txlearn_ljs_arpabet_ckpt30000_2020_02_06.jit"
-description = "First Trump txlearn with Arpabet"
+# TODO: Get a high-quality LJS Tacotron
 
 [[tacotron]]
-file = "/home/bt/dev/voder/tacotron_melgan/tacotron2_trump_txlearn_ljs_arpabet_2020-05-14_ckpt7000.jit"
+file_path = "/home/bt/dev/voder/tacotron_melgan/tacotron2_trump_txlearn_ljs_arpabet_2020-02-06_ckpt30000.jit"
+description = "First Trump txlearn with Arpabet. Trained 30k iters and sounds great!"
+
+[[tacotron]]
+file_path = "/home/bt/dev/voder/tacotron_melgan/tacotron2_trump_txlearn_ljs_arpabet_2020-05-14_ckpt7000.jit"
 description = "Trump txlearn with Arpabet 2020-05-14"
 
 [[tacotron]]
-file = "/home/bt/dev/voder/tacotron_melgan/tacotron2_trump_txlearn_ljs_arpabet_2020-05-14_ckpt11500.jit"
+file_path = "/home/bt/dev/voder/tacotron_melgan/tacotron2_trump_txlearn_ljs_arpabet_2020-05-14_ckpt11500.jit"
 description = "Trump txlearn with Arpabet 2020-05-14"
+
+[[tacotron]]
+#file_path = "/home/bt/dev/voder/tacotron_melgan/tacotron_arpabet_1.pt"
+file_path = "/home/bt/dev/voder/tacotron_melgan/tacotron2_ljs_high_pitch_arpabet_2020-03-28.jit"
+description = "High-quality high-pitched LJS; arpabet encodings."
+
+[[tacotron]]
+# TODO: Remove. This blows up.
+file_path = "/home/bt/dev/voder/tacotron_melgan/tacotron_container.pt"
+description = "Unknown (broken)"
+
+[[tacotron]]
+# TODO: Remove. This hangs forever.
+file_path = "/home/bt/dev/voder/tacotron_melgan/tacotron_jit_model_voder_c0cac635.pt"
+description = "Unknown (broken)"
+
 
 # ---------------- Melgan ----------------
 
+# TODO: Get a high-quality LJS Melgan
+
 [[melgan]]
-file = "/home/bt/dev/tacotron-melgan/melgan_trump-txlearn-2020.05.05.jit"
+file_path = "/home/bt/dev/tacotron-melgan/melgan_trump-txlearn-2020.05.05_7525.jit"
 description = "Latest LJS transfer learned Trump."
 
 [[melgan]]
-file = "/home/bt/dev/tacotron-melgan/melgan_trump-txlearn-2020.05.05_13675.jit"
+file_path = "/home/bt/dev/tacotron-melgan/melgan_trump-txlearn-2020.05.05_13675.jit"
 description = "Latest LJS transfer learned Trump."
 
 [[melgan]]
-file = "/home/bt/dev/tacotron-melgan/melgan_ljs-high-pitch_container.pt"
+file_path = "/home/bt/dev/tacotron-melgan/melgan_ljs-high-pitch_container.pt"
 description = "High-pitched LJS"
 
 [[melgan]]
-file = "/home/bt/dev/tacotron-melgan/shared_melgan_container.pt"
+file_path = "/home/bt/dev/tacotron-melgan/shared_melgan_container-2020.01.04.pt"
 description = "Unknown"
 
 [[melgan]]
-file = "/home/bt/dev/tacotron-melgan/shared_melgan_container2.pt"
+file_path = "/home/bt/dev/tacotron-melgan/shared_melgan_container-2020.01.05.pt"
 description = "Unknown"
 

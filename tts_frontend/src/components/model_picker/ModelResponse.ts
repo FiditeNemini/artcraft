@@ -5,8 +5,9 @@ class ModelResponse {
 }
 
 class ModelDetails {
-  file?: string
+  file_path?: string
   description?: string
+  base_name?: string
 }
 
 export {ModelResponse, ModelDetails};

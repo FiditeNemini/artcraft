@@ -145,8 +145,6 @@ async fn post_tts(request: HttpRequest,
       .body(wav_data))
 }
 
-const TACOTRON_MODEL : &'static str = "TACOTRON_MODEL";
-const MELGAN_MODEL : &'static str = "MELGAN_MODEL";
 const BIND_ADDRESS : &'static str = "BIND_ADDRESS";
 const ASSET_DIRECTORY : &'static str = "ASSET_DIRECTORY";
 
@@ -167,22 +165,13 @@ async fn main() -> std::io::Result<()> {
   let bind_address = env::var(BIND_ADDRESS)
       .expect(&format!("Must include {} env var, eg `0.0.0.0:8000`", BIND_ADDRESS));
 
-  let tacotron_filename = env::var(TACOTRON_MODEL)
-      .expect(&format!("Must include {} env var", TACOTRON_MODEL));
-
-  let melgan_filename = env::var(MELGAN_MODEL)
-      .expect(&format!("Must include {} env var", MELGAN_MODEL));
-
   let asset_directory = env::var(ASSET_DIRECTORY)
       .expect(&format!("Must include {} env var", ASSET_DIRECTORY));
 
   println!("Loading models...");
 
-  //let ttsEngine = TacoMelModel::create(&tacotron_filename, &melgan_filename);
   let model_cache = ModelCache::new();
-
   let arc = web::Data::new(Arc::new(model_cache));
-  //let arc2 = web::Data::new(Arc::new(arpabet));
 
   println!("Starting HTTP service.");
   println!("Asset directory: {}", asset_directory);

@@ -1,5 +1,6 @@
 use serde_derive::Deserialize;
 use std::fs;
+use std::path::Path;
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct ModelConfigs {
@@ -9,15 +10,38 @@ pub struct ModelConfigs {
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
 pub struct ModelDetails {
-  pub file: String,
+  pub file_path: String,
   pub description: String,
+
+  /// Just the file name without a path
+  #[serde(skip_deserializing)]
+  pub base_name: Option<String>,
 }
 
 impl ModelConfigs {
   pub fn load_from_file(filename: &str) -> Self {
     let contents = fs::read_to_string(filename)
         .expect("Couldn't read file");
-    toml::from_str(&contents)
-        .expect("Couldn't parse toml")
+    let mut model_configs : ModelConfigs = toml::from_str(&contents)
+        .expect("Couldn't parse toml");
+
+    model_configs.update_base_names();
+    model_configs
+  }
+
+  fn update_base_names(&mut self) {
+    for mut details in self.tacotron.iter_mut() {
+      let path = Path::new(&details.file_path);
+      details.base_name = path.file_name()
+          .and_then(|name| name.to_str())
+          .map(|s| s.to_string());
+    }
+
+    for mut details in self.melgan.iter_mut() {
+      let path = Path::new(&details.file_path);
+      details.base_name = path.file_name()
+          .and_then(|name| name.to_str())
+          .map(|s| s.to_string());
+    }
   }
 }
