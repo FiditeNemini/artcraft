@@ -318,12 +318,16 @@ impl PointCloudVisualizer {
   ///
   ///
   fn update_point_clouds(&mut self, camera_index: usize, mut captures: Vec<Capture>) -> Result<()> {
-    //let capture = captures.get(camera_index).unwrap().clone(); // TODO
-    for (i, capture) in captures.drain(0 .. self.num_cameras).into_iter().enumerate() {
-      self.update_point_clouds_for_camera(i, capture)?;
+    for (camera_index, capture) in captures.drain(0 .. self.num_cameras).into_iter().enumerate() {
+      self.update_point_clouds_for_camera(camera_index, capture)?;
     }
 
-    Ok(())
+    self.point_cloud_renderer.update_point_clouds(
+      &self.point_cloud_colorizations.get(camera_index).unwrap() // TODO TEMP MULTI-CAMERA SUPPORT
+          .as_ref()
+          .expect("point cloud color image be set"),
+      &self.xyz_textures.get(camera_index).unwrap() // TODO TEMP MULTI-CAMERA SUPPORT
+    ).map_err(|err| PointCloudVisualizerError::PointCloudRendererError(err))
   }
 
   fn update_point_clouds_for_camera(&mut self, camera_index: usize, capture: Capture) -> Result<()> {
@@ -418,12 +422,7 @@ impl PointCloudVisualizer {
       }
     }
 
-    self.point_cloud_renderer.update_point_clouds(
-      &self.point_cloud_colorizations.get(camera_index).unwrap() // TODO TEMP MULTI-CAMERA SUPPORT
-          .as_ref()
-          .expect("point cloud color image be set"),
-      &self.xyz_textures.get(camera_index).unwrap() // TODO TEMP MULTI-CAMERA SUPPORT
-    ).map_err(|err| PointCloudVisualizerError::PointCloudRendererError(err))
+    Ok(())
   }
 
   ///
