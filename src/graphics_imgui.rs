@@ -1,5 +1,5 @@
 use std::sync::{Arc, Mutex, PoisonError, MutexGuard};
-use std::time::Instant;
+use std::time::{Instant, Duration};
 
 use gl;
 use imgui::*;
@@ -94,7 +94,9 @@ pub fn run(capture_provider: Arc<MultiDeviceCaptureProvider>, calibration_data: 
   let mut event_pump = sdl_context.event_pump().unwrap();
 
   let mut last_frame = Instant::now();
-  let _last_change = Instant::now();
+  let mut last_change = Instant::now();
+
+  let mut camera_index = 0;
 
   'running: loop {
     use sdl2::event::Event;
@@ -197,7 +199,7 @@ pub fn run(capture_provider: Arc<MultiDeviceCaptureProvider>, calibration_data: 
     window.gl_swap_window();
 
     if let Some(mut captures) = capture_provider.get_captures() {
-      visualizer.update_texture_id(texture.texture_id(), captures)
+      visualizer.update_texture_id(camera_index, texture.texture_id(), captures)
           .map(|_| {})
           .map_err(|err| {
             match err {
@@ -222,9 +224,11 @@ pub fn run(capture_provider: Arc<MultiDeviceCaptureProvider>, calibration_data: 
           .expect("should write");
     }
 
-    //let change_delta = last_frame - last_change;
-    //if change_delta > Duration::from_millis(5_000) {
-    //}
+    let change_delta = last_frame - last_change;
+    if change_delta > Duration::from_millis(5_000) {
+      camera_index = (camera_index + 1) % capture_provider.get_num_cameras();
+      last_change = Instant::now();
+    }
 
     /*if change_delta > Duration::from_millis(5000) {
       colorization_strategy = match colorization_strategy {

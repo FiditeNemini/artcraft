@@ -241,17 +241,17 @@ impl PointCloudVisualizer {
   ///
   ///
   ///
-  pub fn update_texture(&mut self, texture: &ViewerImage, mut captures: Vec<Capture>) -> Result<()> {
-    self.update_texture_id(texture.texture_id(), captures)
+  pub fn update_texture(&mut self, camera_index: usize, texture: &ViewerImage, mut captures: Vec<Capture>) -> Result<()> {
+    self.update_texture_id(camera_index, texture.texture_id(), captures)
   }
 
   ///
   /// Take the latest capture, calculate updates to the xyz texture, then render the point cloud to
   /// the output texture.
   ///
-  pub fn update_texture_id(&mut self, texture_id: GLuint, mut captures: Vec<Capture>) -> Result<()> {
+  pub fn update_texture_id(&mut self, camera_index: usize, texture_id: GLuint, mut captures: Vec<Capture>) -> Result<()> {
     // Update the point cloud renderer with the latest point data
-    self.update_point_clouds(captures)?;
+    self.update_point_clouds(camera_index, captures)?;
 
     // Set up rendering to a texture
     unsafe {
@@ -317,11 +317,12 @@ impl PointCloudVisualizer {
   ///
   ///
   ///
-  fn update_point_clouds(&mut self, mut captures: Vec<Capture>) -> Result<()> {
-    //for (i, capture) in captures.iter() {
-    //}
-    let capture = captures.pop().unwrap(); // TODO
+  fn update_point_clouds(&mut self, camera_index: usize, mut captures: Vec<Capture>) -> Result<()> {
+    let capture = captures.get(camera_index).unwrap().clone(); // TODO
+    self.update_point_clouds_for_camera(camera_index, capture)
+  }
 
+  fn update_point_clouds_for_camera(&mut self, camera_index: usize, capture: Capture) -> Result<()> {
     //
     // Depth Image extractor
     //
@@ -341,7 +342,7 @@ impl PointCloudVisualizer {
         return Err(PointCloudVisualizerError::MissingColorImage);
       }
       if self.colorization_strategy == ColorizationStrategy::Color {
-        if let Some(transformed_depth_image) = self.transformed_depth_images.get_mut(0).unwrap().as_mut() { // TODO: TEMP SUPPORT MULTI-CAMERA
+        if let Some(transformed_depth_image) = self.transformed_depth_images.get_mut(camera_index).unwrap().as_mut() { // TODO: TEMP SUPPORT MULTI-CAMERA
           unsafe {
 
             let result = k4a_sys::k4a_transformation_depth_image_to_color_camera(
@@ -364,9 +365,9 @@ impl PointCloudVisualizer {
     // Convert depth image to depth texture
     //
 
-    let result = self.point_cloud_converters.get(0).unwrap().convert(
+    let result = self.point_cloud_converters.get(camera_index).unwrap().convert(
       &depth_image,
-      &mut self.xyz_textures.get_mut(0).unwrap() // TODO: TEMP MULTI CAMERA SUPPORT
+      &mut self.xyz_textures.get_mut(camera_index).unwrap() // TODO: TEMP MULTI CAMERA SUPPORT
     );
 
     if let Err(err) = result {
@@ -374,14 +375,14 @@ impl PointCloudVisualizer {
     }
 
     // TODO: TEMP MULTI CAMERA SUPPORT
-    if let Some(mut inner) = self.last_captures.get_mut(0) {
+    if let Some(mut inner) = self.last_captures.get_mut(camera_index) {
       *inner = Some(capture);
     }
 
     if self.colorization_strategy == ColorizationStrategy::Color {
       let color_image = maybe_color_image.expect("logic above should ensure present");
       // TODO: TEMP MULTI CAMERA SUPPORT
-      if let Some(mut inner) = self.point_cloud_colorizations.get_mut(0) {
+      if let Some(mut inner) = self.point_cloud_colorizations.get_mut(camera_index) {
         *inner = Some(color_image);
       }
 
@@ -395,7 +396,7 @@ impl PointCloudVisualizer {
         let typed_src_pixel_buffer = src_pixel_buffer as *const DepthPixel;
 
         // dst: BgraPixel
-        let dst_pixel_buffer = self.point_cloud_colorizations.get_mut(0).unwrap() // TODO TEMP MULTI-CAMERA SUPPORT
+        let dst_pixel_buffer = self.point_cloud_colorizations.get_mut(camera_index).unwrap() // TODO TEMP MULTI-CAMERA SUPPORT
             .as_ref()
             .expect("point cloud color image must be set")
             .get_buffer();
@@ -414,10 +415,10 @@ impl PointCloudVisualizer {
     }
 
     self.point_cloud_renderer.update_point_clouds(
-      &self.point_cloud_colorizations.get(0).unwrap() // TODO TEMP MULTI-CAMERA SUPPORT
+      &self.point_cloud_colorizations.get(camera_index).unwrap() // TODO TEMP MULTI-CAMERA SUPPORT
           .as_ref()
           .expect("point cloud color image be set"),
-      &self.xyz_textures.get(0).unwrap() // TODO TEMP MULTI-CAMERA SUPPORT
+      &self.xyz_textures.get(camera_index).unwrap() // TODO TEMP MULTI-CAMERA SUPPORT
     ).map_err(|err| PointCloudVisualizerError::PointCloudRendererError(err))
   }
 
@@ -425,6 +426,13 @@ impl PointCloudVisualizer {
   ///
   ///
   pub fn set_colorization_strategy(&mut self, strategy: ColorizationStrategy) -> Result<()> {
+    for i in 0 .. self.num_cameras {
+      self.set_colorization_strategy_for_camera(i, strategy)?;
+    }
+    Ok(())
+  }
+
+  fn set_colorization_strategy_for_camera(&mut self, camera_index: usize, strategy: ColorizationStrategy) -> Result<()> {
     if strategy == ColorizationStrategy::Color && !self.enable_color_point_cloud {
       return Err(PointCloudVisualizerError::UnsupportedMode);
     }
@@ -438,7 +446,7 @@ impl PointCloudVisualizer {
       let stride = width * size_of::<DepthPixel>() as i32;
 
       // TODO: TEMP MULTI-CAMERA SUPPORT
-      if let Some(mut transformed_depth_image) = self.transformed_depth_images.get_mut(0) {
+      if let Some(mut transformed_depth_image) = self.transformed_depth_images.get_mut(camera_index) {
         *transformed_depth_image = Some(Image::create(
           ImageFormat::Depth16,
           width as u32,
@@ -448,7 +456,7 @@ impl PointCloudVisualizer {
       }
 
       for point_cloud_converter in self.point_cloud_converters.iter_mut() {
-        point_cloud_converter.set_active_xy_table(&self.color_xy_tables.get(0).unwrap())?; // TODO: TEMP MULTI-CAMERA SUPPORT
+        point_cloud_converter.set_active_xy_table(&self.color_xy_tables.get(camera_index).unwrap())?; // TODO: TEMP MULTI-CAMERA SUPPORT
       }
 
     } else {
@@ -457,7 +465,7 @@ impl PointCloudVisualizer {
       let stride = width as i32 * size_of::<BgraPixel>() as i32;
 
       // TODO: TEMP MULTI-CAMERA SUPPORT
-      if let Some(mut point_cloud_colorization) = self.point_cloud_colorizations.get_mut(0) {
+      if let Some(mut point_cloud_colorization) = self.point_cloud_colorizations.get_mut(camera_index) {
         *point_cloud_colorization = Some(Image::create(
           ImageFormat::ColorBgra32,
           width,
@@ -467,19 +475,19 @@ impl PointCloudVisualizer {
       }
 
       for point_cloud_converter in self.point_cloud_converters.iter_mut() {
-        point_cloud_converter.set_active_xy_table(&self.depth_xy_tables.get(0).unwrap())?; // TODO: TEMP MULTI-CAMERA SUPPORT
+        point_cloud_converter.set_active_xy_table(&self.depth_xy_tables.get(camera_index).unwrap())?; // TODO: TEMP MULTI-CAMERA SUPPORT
       }
     }
 
     self.xyz_textures.get_mut(0).unwrap().reset(); // TODO: TEMP MULTI-CAMERA SUPPORT
 
     // TODO: TEMP MULTI-CAMERA SUPPORT
-    if let Some(capture) = self.last_captures.get_mut(0).unwrap().as_ref() {
+    if let Some(capture) = self.last_captures.get_mut(camera_index).unwrap().as_ref() {
       let capture = (*capture).clone();
       // TODO: TEMP MULTI-CAMERA SUPPORT
       let mut captures = Vec::new();
       captures.push(capture);
-      self.update_point_clouds(captures);
+      self.update_point_clouds(camera_index, captures);
     }
 
     Ok(())
