@@ -318,8 +318,12 @@ impl PointCloudVisualizer {
   ///
   ///
   fn update_point_clouds(&mut self, camera_index: usize, mut captures: Vec<Capture>) -> Result<()> {
-    let capture = captures.get(camera_index).unwrap().clone(); // TODO
-    self.update_point_clouds_for_camera(camera_index, capture)
+    //let capture = captures.get(camera_index).unwrap().clone(); // TODO
+    for (i, capture) in captures.drain(0 .. self.num_cameras).into_iter().enumerate() {
+      self.update_point_clouds_for_camera(i, capture)?;
+    }
+
+    Ok(())
   }
 
   fn update_point_clouds_for_camera(&mut self, camera_index: usize, capture: Capture) -> Result<()> {

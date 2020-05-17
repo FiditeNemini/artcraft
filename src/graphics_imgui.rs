@@ -80,9 +80,9 @@ pub fn run(capture_provider: Arc<MultiDeviceCaptureProvider>, calibration_data: 
     720,
   ).expect("ViewerImage texture creation should work");
 
-  let mut imgui_visualizer_xyz_texture : Option<TextureId> = None;
+  let mut imgui_visualizer_xyz_texture_0 : Option<TextureId> = None;
+  let mut imgui_visualizer_xyz_texture_1 : Option<TextureId> = None;
 
-  let imgui_point_cloud_convert_depth_image = TextureId::from(visualizer.point_cloud_converters.get(0).unwrap().depth_image_texture.id() as usize);
   let imgui_point_cloud_convert_xy_table= TextureId::from(visualizer.point_cloud_converters.get(0).unwrap().xy_table_texture.id() as usize);
 
   let imgui_kinect_final_output = TextureId::from(texture.texture_id() as usize);
@@ -137,12 +137,42 @@ pub fn run(capture_provider: Arc<MultiDeviceCaptureProvider>, calibration_data: 
     const window_width : f32 = 1290.0;
     const window_height : f32 = 760.0;
 
-    Window::new(im_str!("Point Cloud Converter Depth Image"))
+    if imgui_visualizer_xyz_texture_0.is_none() {
+      if visualizer.xyz_textures.get(0).unwrap().id() != 0 { // TODO: TEMP SUPPORT MULTI-CAMERA
+        imgui_visualizer_xyz_texture_0 = Some(TextureId::from(visualizer.xyz_textures.get(0).unwrap().id() as usize)); // TODO: TEMP SUPPORT MULTI-CAMERA
+      }
+    }
+
+    if imgui_visualizer_xyz_texture_1.is_none() {
+      if visualizer.xyz_textures.get(1).unwrap().id() != 0 { // TODO: TEMP SUPPORT MULTI-CAMERA
+        imgui_visualizer_xyz_texture_1 = Some(TextureId::from(visualizer.xyz_textures.get(1).unwrap().id() as usize)); // TODO: TEMP SUPPORT MULTI-CAMERA
+      }
+    }
+
+    Window::new(im_str!("Visualizer XYZ Texture (0)"))
         .scrollable(true)
         .size([window_width, window_height], Condition::FirstUseEver)
         .position([0.0, 0.0], Condition::FirstUseEver)
         .build(&ui, || {
-          Image::new(imgui_point_cloud_convert_depth_image, [1280.0, 720.0]).build(&ui);
+          match imgui_visualizer_xyz_texture_0.as_ref() {
+            None => {},
+            Some(xyz_texture) => {
+              Image::new(xyz_texture.clone(), [1280.0, 720.0]).build(&ui);
+            },
+          }
+        });
+
+    Window::new(im_str!("Visualizer XYZ Texture (1)"))
+        .size([window_width, window_height], Condition::FirstUseEver)
+        .position([window_width + 50.0, 0.0], Condition::FirstUseEver)
+        .movable(false)
+        .build(&ui, || {
+          match imgui_visualizer_xyz_texture_1.as_ref() {
+            None => {},
+            Some(xyz_texture) => {
+              Image::new(xyz_texture.clone(), [1280.0, 720.0]).build(&ui);
+            },
+          }
         });
 
     Window::new(im_str!("Point Cloud Converter XY Table"))
@@ -150,25 +180,6 @@ pub fn run(capture_provider: Arc<MultiDeviceCaptureProvider>, calibration_data: 
         .position([0.0, window_height + 50.0], Condition::FirstUseEver)
         .build(&ui, || {
           Image::new(imgui_point_cloud_convert_xy_table, [1280.0, 720.0]).build(&ui);
-        });
-
-    if imgui_visualizer_xyz_texture.is_none() {
-      if visualizer.xyz_textures.get(0).unwrap().id() != 0 { // TODO: TEMP SUPPORT MULTI-CAMERA
-        imgui_visualizer_xyz_texture = Some(TextureId::from(visualizer.xyz_textures.get(0).unwrap().id() as usize)); // TODO: TEMP SUPPORT MULTI-CAMERA
-      }
-    }
-
-    Window::new(im_str!("Visualizer XYZ Texture"))
-        .size([window_width, window_height], Condition::FirstUseEver)
-        .position([window_width + 50.0, 0.0], Condition::FirstUseEver)
-        .movable(false)
-        .build(&ui, || {
-          match imgui_visualizer_xyz_texture.as_ref() {
-            None => {},
-            Some(xyz_texture) => {
-              Image::new(xyz_texture.clone(), [1280.0, 720.0]).build(&ui);
-            },
-          }
         });
 
     // NB: This is larger. The texture is 1280x1152.
