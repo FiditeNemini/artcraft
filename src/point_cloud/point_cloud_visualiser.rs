@@ -94,6 +94,8 @@ pub enum ColorizationStrategy {
 pub struct PointCloudVisualizer {
   arcball_camera: Arc<Mutex<MouseCameraArcball>>,
 
+  num_cameras: usize,
+
   m_dimensions_width : i32,
   m_dimensions_height : i32,
 
@@ -101,7 +103,7 @@ pub struct PointCloudVisualizer {
   colorization_strategy: ColorizationStrategy,
 
   pub point_cloud_renderer: PointCloudRenderer,
-  pub point_cloud_converter: GpuPointCloudConverter,
+  pub point_cloud_converters: Vec<GpuPointCloudConverter>,
 
   calibration_data: k4a_sys::k4a_calibration_t,
   transformation: Transformation, // TODO: WAT k4a_sys::k4a_transformation_t
@@ -149,7 +151,8 @@ impl PointCloudVisualizer {
   ///
   /// CTOR
   ///
-  pub fn new(enable_color_point_cloud: bool,
+  pub fn new(num_cameras: usize,
+             enable_color_point_cloud: bool,
              initial_colorization_strategy: ColorizationStrategy,
              calibration_data: k4a_sys::k4a_calibration_t,
              clear_color: RgbaF32,
@@ -181,13 +184,19 @@ impl PointCloudVisualizer {
     let expected_value_range = get_depth_mode_range(calibration_data.depth_mode)
         .expect("Should be in correct depth sensor mode.");
 
+    let mut point_cloud_converters = Vec::with_capacity(num_cameras);
+    for _ in 0 .. num_cameras {
+      point_cloud_converters.push(GpuPointCloudConverter::new());
+    }
+
     let mut visualizer = Self {
+      num_cameras,
       arcball_camera: arcball_camera.clone(),
       m_dimensions_width: width,
       m_dimensions_height: height,
       enable_color_point_cloud,
       point_cloud_renderer: PointCloudRenderer::new(arcball_camera.clone()),
-      point_cloud_converter: GpuPointCloudConverter::new(),
+      point_cloud_converters,
       frame_buffer: Framebuffer::new_initialized(),
       depth_buffer,
       color_xy_table,
@@ -218,16 +227,17 @@ impl PointCloudVisualizer {
   ///
   ///
   ///
-  pub fn update_texture(&mut self, texture: &ViewerImage, capture: Capture) -> Result<()> {
-    self.update_texture_id(texture.texture_id(), capture)
+  pub fn update_texture(&mut self, texture: &ViewerImage, mut captures: Vec<Capture>) -> Result<()> {
+    self.update_texture_id(texture.texture_id(), captures)
   }
 
   ///
+  /// Take the latest capture, calculate updates to the xyz texture, then render the point cloud to
+  /// the output texture.
   ///
-  ///
-  pub fn update_texture_id(&mut self, texture_id: GLuint, capture: Capture) -> Result<()> {
+  pub fn update_texture_id(&mut self, texture_id: GLuint, mut captures: Vec<Capture>) -> Result<()> {
     // Update the point cloud renderer with the latest point data
-    self.update_point_clouds(capture)?;
+    self.update_point_clouds(captures)?;
 
     // Set up rendering to a texture
     unsafe {
@@ -293,7 +303,15 @@ impl PointCloudVisualizer {
   ///
   ///
   ///
-  fn update_point_clouds(&mut self, capture: Capture) -> Result<()> {
+  fn update_point_clouds(&mut self, mut captures: Vec<Capture>) -> Result<()> {
+    //for (i, capture) in captures.iter() {
+    //}
+    let capture = captures.pop().unwrap(); // TODO
+
+    //
+    // Depth Image extractor
+    //
+
     let mut depth_image = match capture.get_depth_image() {
       Ok(img) => img,
       Err(_e) => {
@@ -328,7 +346,11 @@ impl PointCloudVisualizer {
       }
     }
 
-    let result = self.point_cloud_converter.convert(
+    //
+    // Convert depth image to depth texture
+    //
+
+    let result = self.point_cloud_converters.get(0).unwrap().convert(
       &depth_image,
       &mut self.xyz_texture
     );
@@ -402,7 +424,9 @@ impl PointCloudVisualizer {
         stride as u32,
       ).expect("Construction should work FIXME"));
 
-      self.point_cloud_converter.set_active_xy_table(&self.color_xy_table)?;
+      for point_cloud_converter in self.point_cloud_converters.iter_mut() {
+        point_cloud_converter.set_active_xy_table(&self.color_xy_table)?;
+      }
 
     } else {
       let width = self.calibration_data.depth_camera_calibration.resolution_width as u32;
@@ -416,14 +440,18 @@ impl PointCloudVisualizer {
         stride as u32,
       ).expect("Construction should work FIXME"));
 
-      self.point_cloud_converter.set_active_xy_table(&self.depth_xy_table)?;
+      for point_cloud_converter in self.point_cloud_converters.iter_mut() {
+        point_cloud_converter.set_active_xy_table(&self.depth_xy_table)?;
+      }
     }
 
     self.xyz_texture.reset();
 
     if let Some(capture) = self.last_capture.as_ref() {
       let capture = (*capture).clone();
-      self.update_point_clouds(capture);
+      let mut captures = Vec::new();
+      captures.push(capture);
+      self.update_point_clouds(captures);
     }
 
     Ok(())

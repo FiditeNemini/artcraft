@@ -56,11 +56,12 @@ pub fn run(capture_provider: Arc<MultiDeviceCaptureProvider>, calibration_data: 
   let mut gl_texture_snes = load_texture("sneslogo.png");
   let mut imgui_texture_snes = TextureId::from(gl_texture_snes as usize);*/
 
-  let colorization_strategy = ColorizationStrategy::Color;
+  let colorization_strategy = ColorizationStrategy::Shaded;
 
   let clear_color = RgbaF32::black();
 
   let mut visualizer = PointCloudVisualizer::new(
+    capture_provider.get_num_cameras(),
     true,
     colorization_strategy,
     calibration_data,
@@ -81,8 +82,8 @@ pub fn run(capture_provider: Arc<MultiDeviceCaptureProvider>, calibration_data: 
 
   let mut imgui_visualizer_xyz_texture : Option<TextureId> = None;
 
-  let imgui_point_cloud_convert_depth_image = TextureId::from(visualizer.point_cloud_converter.depth_image_texture.id() as usize);
-  let imgui_point_cloud_convert_xy_table= TextureId::from(visualizer.point_cloud_converter.xy_table_texture.id() as usize);
+  let imgui_point_cloud_convert_depth_image = TextureId::from(visualizer.point_cloud_converters.get(0).unwrap().depth_image_texture.id() as usize);
+  let imgui_point_cloud_convert_xy_table= TextureId::from(visualizer.point_cloud_converters.get(0).unwrap().xy_table_texture.id() as usize);
 
   let imgui_kinect_final_output = TextureId::from(texture.texture_id() as usize);
 
@@ -196,19 +197,17 @@ pub fn run(capture_provider: Arc<MultiDeviceCaptureProvider>, calibration_data: 
     window.gl_swap_window();
 
     if let Some(mut captures) = capture_provider.get_captures() {
-      if let Some(capture) = captures.pop() {
-        visualizer.update_texture_id(texture.texture_id(), capture)
-            .map(|_| {})
-            .map_err(|err| {
-              match err {
-                PointCloudVisualizerError::MissingDepthImage => { println!("Missing depth image"); },
-                PointCloudVisualizerError::MissingColorImage => { println!("Missing color image"); },
-                _ => {
-                  unreachable!("Error: {:?}", err);
-                }
+      visualizer.update_texture_id(texture.texture_id(), captures)
+          .map(|_| {})
+          .map_err(|err| {
+            match err {
+              PointCloudVisualizerError::MissingDepthImage => { println!("Missing depth image"); },
+              PointCloudVisualizerError::MissingColorImage => { println!("Missing color image"); },
+              _ => {
+                unreachable!("Error: {:?}", err);
               }
-            });
-      }
+            }
+          });
     }
 
     match sdl_arcball.lock() {

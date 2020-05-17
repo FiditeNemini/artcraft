@@ -49,7 +49,7 @@ const SECONDARY_DEVICE_SERIAL : &'static str = "000886694512";
 const ENABLE_WEBCAM : bool = true;
 
 pub fn main() {
-  let multi_device = MultiDeviceCapturer::new(2, Some(0))
+  let multi_device = MultiDeviceCapturer::new(2, Some(1))
       .expect("multi-device create");
 
   multi_device.start_cameras().expect("start cameras");

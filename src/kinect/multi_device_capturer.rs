@@ -6,12 +6,14 @@ use std::sync::Mutex;
 const MIN_TIME_BETWEEN_DEPTH_CAMERA_PICTURES_USEC : libc::int32_t = 160;
 
 pub struct MultiDeviceCapturer {
+  num_cameras: usize,
   pub primary_device: Device,  // TODO: Temporary public viz
   secondary_devices: Vec<Device>,
   capture_provider: Arc<MultiDeviceCaptureProvider>,
 }
 
 pub struct MultiDeviceCaptureProvider {
+  num_cameras: usize,
   captures: Arc<Mutex<Vec<Capture>>>, // TODO: Shouldn't need to wrap in mutex if we wrap struct instead.
 }
 
@@ -51,11 +53,19 @@ impl MultiDeviceCapturer {
       secondary_devices.truncate(limit);
     }
 
+    let num_cameras = 1 + secondary_devices.len();
+
     Ok(Self {
+      num_cameras,
       primary_device: primary_device.expect("There must be a primary device"),
       secondary_devices,
-      capture_provider: Arc::new(MultiDeviceCaptureProvider::new()),
+      capture_provider: Arc::new(MultiDeviceCaptureProvider::new(num_cameras)),
     })
+  }
+
+  /// Return the number of cameras
+  pub fn get_num_cameras(&self) -> usize {
+    self.num_cameras
   }
 
   // TODO:
@@ -106,10 +116,16 @@ impl MultiDeviceCapturer {
 }
 
 impl MultiDeviceCaptureProvider {
-  pub fn new() -> Self {
+  pub fn new(num_cameras: usize) -> Self {
     Self {
+      num_cameras,
       captures: Arc::new(Mutex::new(Vec::new())),
     }
+  }
+
+  /** Return the number of cameras. */
+  pub fn get_num_cameras(&self) -> usize {
+    self.num_cameras
   }
 
   /**
