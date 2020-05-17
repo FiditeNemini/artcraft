@@ -151,8 +151,8 @@ pub fn run(capture_provider: Arc<MultiDeviceCaptureProvider>, calibration_data: 
         });
 
     if imgui_visualizer_xyz_texture.is_none() {
-      if visualizer.xyz_texture.id() != 0 {
-        imgui_visualizer_xyz_texture = Some(TextureId::from(visualizer.xyz_texture.id() as usize));
+      if visualizer.xyz_textures.get(0).unwrap().id() != 0 { // TODO: TEMP SUPPORT MULTI-CAMERA
+        imgui_visualizer_xyz_texture = Some(TextureId::from(visualizer.xyz_textures.get(0).unwrap().id() as usize)); // TODO: TEMP SUPPORT MULTI-CAMERA
       }
     }
 
