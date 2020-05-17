@@ -65,7 +65,10 @@ out vec4 vertexColor;
 
 uniform mat4 view;
 uniform mat4 projection;
-layout(rgba32f) readonly uniform image2D pointCloudTexture;
+
+layout(rgba32f, binding=0) readonly uniform image2D pointCloudTexture0;
+layout(rgba32f, binding=1) readonly uniform image2D pointCloudTexture1;
+
 uniform bool enableShading;
 
 bool GetPoint3d(in vec2 pointCloudSize, in ivec2 point2d, out vec3 point3d)
@@ -76,7 +79,7 @@ bool GetPoint3d(in vec2 pointCloudSize, in ivec2 point2d, out vec3 point3d)
         return false;
     }
 
-    point3d = imageLoad(pointCloudTexture, point2d).xyz;
+    point3d = imageLoad(pointCloudTexture1, point2d).xyz;
     if (point3d.z <= 0)
     {
         return false;
@@ -87,9 +90,9 @@ bool GetPoint3d(in vec2 pointCloudSize, in ivec2 point2d, out vec3 point3d)
 
 void main()
 {
-    ivec2 pointCloudSize = imageSize(pointCloudTexture);
+    ivec2 pointCloudSize = imageSize(pointCloudTexture1);
     ivec2 currentDepthPixelCoordinates = ivec2(gl_VertexID % pointCloudSize.x, gl_VertexID / pointCloudSize.x);
-    vec3 vertexPosition = imageLoad(pointCloudTexture, currentDepthPixelCoordinates).xyz;
+    vec3 vertexPosition = imageLoad(pointCloudTexture1, currentDepthPixelCoordinates).xyz;
 
     // Scale up while model view matrices not implemented.
     //vertexPosition.x *= 2.0 + 10.0;
@@ -191,6 +194,8 @@ void main()
 ";
 
 pub struct PointCloudRenderer {
+  num_cameras: usize,
+
   arcball_camera: Arc<Mutex<MouseCameraArcball>>,
 
   /// The OpenGL program
@@ -227,7 +232,7 @@ pub struct PointCloudRenderer {
   enable_shading_index: GLint,
 
   /// Uniform location in the shader program.
-  point_cloud_texture_index: GLint,
+  point_cloud_texture_indices: Vec<GLint>,
 
   vertex_array_object: VertexArray,
   vertex_color_buffer_object: Buffer,
@@ -282,7 +287,7 @@ const fn initial_projection_matrix_4x4() -> [f32; 16] {
 
 impl PointCloudRenderer {
 
-  pub fn new(arcball: Arc<Mutex<MouseCameraArcball>>) -> Self {
+  pub fn new(num_cameras: usize, arcball: Arc<Mutex<MouseCameraArcball>>) -> Self {
     let vertex_array_object = VertexArray::new_initialized();
     let vertex_color_buffer_object = Buffer::new_initialized();
 
@@ -310,13 +315,17 @@ impl PointCloudRenderer {
     let ENABLE_SHADING_PTR : *const c_char = ENABLE_SHADING.as_ptr() as *const c_char;
 
     /// Uniform variable name in OpenGL shader program
-    let POINT_CLOUD : CString = CString::new("pointCloudTexture").expect("string is correct");
-    let POINT_CLOUD_PTR : *const c_char = POINT_CLOUD.as_ptr() as *const c_char;
+    let POINT_CLOUD_0 : CString = CString::new("pointCloudTexture0").expect("string is correct");
+    let POINT_CLOUD_0_PTR : *const c_char = POINT_CLOUD_0.as_ptr() as *const c_char;
+
+    let POINT_CLOUD_1 : CString = CString::new("pointCloudTexture1").expect("string is correct");
+    let POINT_CLOUD_1_PTR : *const c_char = POINT_CLOUD_1.as_ptr() as *const c_char;
+
+    let mut point_cloud_texture_indices = Vec::with_capacity(num_cameras);
 
     let mut view_index = 0;
     let mut projection_index = 0;
     let mut enable_shading_index = 0;
-    let mut point_cloud_texture_index = 0;
 
     unsafe {
       // This function returns -1 if name does not correspond to an active uniform variable in
@@ -326,7 +335,9 @@ impl PointCloudRenderer {
       view_index = gl::GetUniformLocation(program_id, VIEW_PTR);
       projection_index = gl::GetUniformLocation(program_id, PROJECTION_PTR);
       enable_shading_index = gl::GetUniformLocation(program_id, ENABLE_SHADING_PTR);
-      point_cloud_texture_index = gl::GetUniformLocation(program_id, POINT_CLOUD_PTR);
+      // TODO: This is hardcoded to 2
+      point_cloud_texture_indices.push(gl::GetUniformLocation(program_id, POINT_CLOUD_0_PTR));
+      point_cloud_texture_indices.push(gl::GetUniformLocation(program_id, POINT_CLOUD_1_PTR));
     }
 
     let initial_view = [
@@ -344,6 +355,7 @@ impl PointCloudRenderer {
     ];
 
     Self {
+      num_cameras,
       arcball_camera: arcball,
       view: initial_view_matrix_4x4(),
       projection: initial_projection_matrix_4x4(),
@@ -358,7 +370,7 @@ impl PointCloudRenderer {
       view_index,
       projection_index,
       enable_shading_index,
-      point_cloud_texture_index,
+      point_cloud_texture_indices,
       vertex_array_object,
       vertex_color_buffer_object,
     }
@@ -387,29 +399,16 @@ impl PointCloudRenderer {
   ///
   ///
   ///
-  pub fn update_point_clouds(&mut self, color_image: &k4a_sys_wrapper::Image,
-                             point_cloud_texture: &Texture) -> Result<()>
+  pub fn update_point_clouds(&mut self, color_images: &Vec<k4a_sys_wrapper::Image>,
+                             point_cloud_textures: &Vec<Texture>) -> Result<()>
   {
 
-    /*k4a_image_to_rust_image_for_debug(color_image)
-        .expect("depth_to_image should work")
-        .save(Path::new("debug_images/final_color_image.png"))
-        .expect("should save");*/
-
-    //println!("updating point_cloud_texture: {}", point_cloud_texture.id());
-
-    /*println!("update_point_clouds() color_image: {}x{}, bytes={}, (format={:?})",
-      color_image.get_width_pixels(),
-      color_image.get_height_pixels(),
-      color_image.get_size(),
-      color_image.get_format());*/
+    let color_image = color_images.get(0).unwrap();
 
     unsafe {
-      //println!("Binding VAO vertex_array_object id = {}", self.vertex_array_object.id());
       gl::BindVertexArray(self.vertex_array_object.id());
       // Vertex Colors
       gl::BindBuffer(gl::ARRAY_BUFFER, self.vertex_color_buffer_object.id());
-      //println!("Binding buffer ARRAY_BUFFER vertex_color_buffer_object id = {}", self.vertex_color_buffer_object.id());
     }
 
     let color_image_size_bytes = color_image.get_size() as i32;
@@ -481,22 +480,32 @@ impl PointCloudRenderer {
 
       gl::UseProgram(self.shader_program_id);
 
-      // Uniforms
-      // Bind our point cloud texture (which was written by the compute shader)
-      gl::ActiveTexture(gl::TEXTURE0);
-      gl::BindTexture(gl::TEXTURE_2D, point_cloud_texture.id());
-      gl::BindImageTexture(
-        0,
-        point_cloud_texture.id(),
-        0,
-        gl::FALSE,
-        0,
-        gl::READ_ONLY,
-        gl::RGBA32F, //POINT_CLOUD_TEXTURE_FORMAT,
-      );
-      gl::Uniform1i(self.point_cloud_texture_index, 0);
+      for (i, point_cloud_texture) in point_cloud_textures.iter().enumerate() {
+        //if i == 1 {
+        //  continue; // FIXME: AHA! So that's what's happening. I'm only uploading to the same texture. And in one case, the texture and color are from different cameras
+        //}
 
-      gl::BindVertexArray(0);
+        //let point_cloud_texture_index = self.point_cloud_texture_indices.get(i).unwrap().clone(); // NB: it's okay to copy an i32, but this sucks
+        //gl::Uniform1i(point_cloud_texture_index, 0);
+
+        // Uniforms
+        // Bind our point cloud texture (which was written by the compute shader)
+        // TODO: WTF, setting an active texture seemed to prevent this from swapping indices! Okay...
+        //gl::ActiveTexture(gl::TEXTURE0 + i as GLuint + 2);
+        gl::BindTexture(gl::TEXTURE_2D, point_cloud_texture.id());
+        gl::BindImageTexture(
+          // TODO: DO these have predefined meanings per https://www.khronos.org/opengl/wiki/Sampler_(GLSL) ?
+          i as GLuint, // TODO -----> WOW, this seems to do a thing.
+          point_cloud_texture.id(),
+          0, //i as GLint,
+          gl::FALSE,
+          0,
+          gl::READ_ONLY,
+          gl::RGBA32F, //POINT_CLOUD_TEXTURE_FORMAT,
+        );
+
+        gl::BindVertexArray(0);
+      }
     }
 
     gl_get_error()

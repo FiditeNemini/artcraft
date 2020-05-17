@@ -209,7 +209,7 @@ impl PointCloudVisualizer {
       m_dimensions_width: width,
       m_dimensions_height: height,
       enable_color_point_cloud,
-      point_cloud_renderer: PointCloudRenderer::new(arcball_camera.clone()),
+      point_cloud_renderer: PointCloudRenderer::new(num_cameras, arcball_camera.clone()),
       point_cloud_converters,
       frame_buffer: Framebuffer::new_initialized(),
       depth_buffer,
@@ -322,11 +322,14 @@ impl PointCloudVisualizer {
       self.update_point_clouds_for_camera(camera_index, capture)?;
     }
 
+    // TODO: wrt k4a::Image.clone(), k4a should use ref counting. (I did this one other place a few commits ago. Hope it's not ref leaking.)
+    let colorizations: Vec<Image>  = self.point_cloud_colorizations.iter()
+        .map(|img| img.as_ref().map(|img| img.clone()).unwrap())
+        .collect();
+
     self.point_cloud_renderer.update_point_clouds(
-      &self.point_cloud_colorizations.get(camera_index).unwrap() // TODO TEMP MULTI-CAMERA SUPPORT
-          .as_ref()
-          .expect("point cloud color image be set"),
-      &self.xyz_textures.get(camera_index).unwrap() // TODO TEMP MULTI-CAMERA SUPPORT
+      &colorizations,
+      &self.xyz_textures
     ).map_err(|err| PointCloudVisualizerError::PointCloudRendererError(err))
   }
 

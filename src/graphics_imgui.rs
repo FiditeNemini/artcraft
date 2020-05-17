@@ -56,7 +56,7 @@ pub fn run(capture_provider: Arc<MultiDeviceCaptureProvider>, calibration_data: 
   let mut gl_texture_snes = load_texture("sneslogo.png");
   let mut imgui_texture_snes = TextureId::from(gl_texture_snes as usize);*/
 
-  let colorization_strategy = ColorizationStrategy::Color;
+  let colorization_strategy = ColorizationStrategy::Shaded;
 
   let clear_color = RgbaF32::black();
 
