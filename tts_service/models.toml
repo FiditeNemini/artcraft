@@ -15,7 +15,23 @@ file_path = "/home/bt/dev/voder/tacotron_melgan/tacotron2_trump_txlearn_ljs_arpa
 description = "Trump txlearn with Arpabet 2020-05-14"
 
 [[tacotron]]
-#file_path = "/home/bt/dev/voder/tacotron_melgan/tacotron_arpabet_1.pt"
+file_path = "/home/bt/dev/voder/tacotron_melgan/tacotron2_trump_txlearn_ljs_arpabet_2020-05-14_ckpt17000.jit"
+description = "Trump txlearn with Arpabet 2020-05-14"
+
+[[tacotron]]
+file_path = "/home/bt/dev/voder/tacotron_melgan/tacotron2_trump_txlearn_ljs_arpabet_2020-05-14_ckpt27000.jit"
+description = "Trump txlearn with Arpabet 2020-05-14"
+
+[[tacotron]]
+file_path = "/home/bt/dev/voder/tacotron_melgan/tacotron2_trump_txlearn_ljs_arpabet_2020-05-14_ckpt27000-18000.jit"
+description = "Trump txlearn with Arpabet 2020-05-14"
+
+[[tacotron]]
+file_path = "/home/bt/dev/voder/tacotron_melgan/tacotron2_trump_txlearn_ljs_arpabet_2020-05-14_ckpt53500.jit"
+description = "Trump txlearn with Arpabet 2020-05-14"
+
+[[tacotron]]
+# OLD NAME, perhaps I can get the epoch: file_path = "/home/bt/dev/voder/tacotron_melgan/tacotron_arpabet_1.pt"
 file_path = "/home/bt/dev/voder/tacotron_melgan/tacotron2_ljs_high_pitch_arpabet_2020-03-28.jit"
 description = "High-quality high-pitched LJS; arpabet encodings."
 
