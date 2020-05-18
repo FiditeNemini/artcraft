@@ -60,8 +60,9 @@ impl std::error::Error for PointCloudRendererError {
 pub static POINT_CLOUD_VERTEX_SHADER : &'static str = "\
 #version 430
 
+// NB: It appears that locations need to be wide enough apart, or the colors bleed across locations.
 layout(location = 0) in vec4 inColor0;
-layout(location = 1) in vec4 inColor1;
+layout(location = 4) in vec4 inColor1;
 
 out vec4 vertexColor;
 
@@ -109,14 +110,11 @@ void main()
 
     gl_Position = projection * view * vec4(vertexPosition, 1);
 
-    vec4 color0 = inColor1;
-    vec4 color1 = inColor0;
-
     vec4 colorOut = vec4(
-      color0.r + color1.r,
-      color0.g + color1.g,
-      color0.b + color1.b,
-      color0.a + color1.a
+      inColor0.r  +  inColor1.r ,
+      inColor0.g  +  inColor1.g ,
+      inColor0.b  +  inColor1.b ,
+      inColor0.a  +  inColor1.a
     );
 
     vertexColor = colorOut;
@@ -530,8 +528,8 @@ impl PointCloudRenderer {
         gl::EnableVertexAttribArray(*vertex_attrib_location as u32);
 
         gl::VertexAttribPointer(
-          //0 as u32,
-          location as u32, // TODO: Does this matter?
+          *vertex_attrib_location as u32,
+          //location as u32, // TODO: Does this matter?
           gl::BGRA as i32,
           gl::UNSIGNED_BYTE,
           gl::TRUE,
@@ -610,6 +608,10 @@ impl PointCloudRenderer {
 
       // Render point cloud
       for i in 0 .. self.num_cameras {
+        if i == 0 {
+          continue;
+        }
+
         let vertex_array_object = self.vertex_array_objects.get(i).unwrap(); // TODO: TEMP MULTI-CAMERA SUPPORT
         let vertex_array_size_bytes = self.vertex_arrays_size_bytes.get(i).unwrap(); // TODO: TEMP MULTI-CAMERA SUPPORT
 
