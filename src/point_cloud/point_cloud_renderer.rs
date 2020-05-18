@@ -59,6 +59,7 @@ impl std::error::Error for PointCloudRendererError {
 /// From the file `tools/k4aviewer/graphics/shaders/k4apointcloudshaders.h`
 pub static POINT_CLOUD_VERTEX_SHADER : &'static str = "\
 #version 430
+
 layout(location = 0) in vec4 inColor0;
 layout(location = 1) in vec4 inColor1;
 
@@ -108,7 +109,17 @@ void main()
 
     gl_Position = projection * view * vec4(vertexPosition, 1);
 
-    vertexColor = inColor0;
+    vec4 color0 = inColor1;
+    vec4 color1 = inColor0;
+
+    vec4 colorOut = vec4(
+      color0.r + color1.r,
+      color0.g + color1.g,
+      color0.b + color1.b,
+      color0.a + color1.a
+    );
+
+    vertexColor = colorOut;
 
     // Pass along the 'invalid pixel' flag as the alpha channel
     //
@@ -237,6 +248,8 @@ pub struct PointCloudRenderer {
 
   vertex_array_objects: Vec<VertexArray>,
   vertex_color_buffer_objects: Vec<Buffer>,
+
+  vertex_attrib_locations: Vec<GLint>,
 }
 
 const fn translation_matrix_4x4(x: f32, y: f32, z: f32) -> [f32; 16] {
@@ -298,6 +311,24 @@ impl PointCloudRenderer {
     let vertex_shader_id = compile_shader(POINT_CLOUD_VERTEX_SHADER, gl::VERTEX_SHADER);
     let fragment_shader_id = compile_shader(POINT_CLOUD_FRAGMENT_SHADER, gl::FRAGMENT_SHADER);
 
+    let ATTRIB_LOCATION_0 : CString = CString::new("inColor0").expect("string is correct");
+    let ATTRIB_LOCATION_0_PTR : *const c_char = ATTRIB_LOCATION_0.as_ptr() as *const c_char;
+
+    let ATTRIB_LOCATION_1 : CString = CString::new("inColor1").expect("string is correct");
+    let ATTRIB_LOCATION_1_PTR : *const c_char = ATTRIB_LOCATION_1.as_ptr() as *const c_char;
+
+    //let ATTRIB_LOCATION_2 : CString = CString::new("inColor2").expect("string is correct");
+    //let ATTRIB_LOCATION_2_PTR : *const c_char = ATTRIB_LOCATION_2.as_ptr() as *const c_char;
+
+    //let ATTRIB_LOCATION_3 : CString = CString::new("inColor3").expect("string is correct");
+    //let ATTRIB_LOCATION_3_PTR : *const c_char = ATTRIB_LOCATION_3.as_ptr() as *const c_char;
+
+    //unsafe {
+    //  gl::BindAttribLocation(program_id, 1, ATTRIB_LOCATION_1_PTR);
+    //  gl::BindAttribLocation(program_id, 2, ATTRIB_LOCATION_2_PTR);
+    //  gl::BindAttribLocation(program_id, 3, ATTRIB_LOCATION_3_PTR);
+    //}
+
     link_program(program_id, vertex_shader_id, fragment_shader_id);
 
     /// Uniform variable name in OpenGL shader program
@@ -349,6 +380,19 @@ impl PointCloudRenderer {
       vertex_arrays_size_bytes.push(0);
     }
 
+    let mut vertex_attrib_locations = Vec::with_capacity(num_cameras);
+
+    unsafe {
+      let location_0 = gl::GetAttribLocation(program_id, ATTRIB_LOCATION_0_PTR);
+      let location_1 = gl::GetAttribLocation(program_id, ATTRIB_LOCATION_1_PTR);
+
+      println!("Location0: {}", location_0);
+      println!("Location1: {}", location_1);
+
+      vertex_attrib_locations.push(location_0);
+      vertex_attrib_locations.push(location_1);
+    }
+
     let initial_view = [
       [-1.0,         0.0,    8.74228e-08, 0.0],
       [0.0,          1.0,    0.0,         0.0],
@@ -382,6 +426,7 @@ impl PointCloudRenderer {
       point_cloud_texture_indices,
       vertex_array_objects,
       vertex_color_buffer_objects,
+      vertex_attrib_locations,
     }
   }
 
@@ -466,7 +511,7 @@ impl PointCloudRenderer {
 
         std::ptr::copy_nonoverlapping::<u8>(typed_color_src,
           vertex_mapped_buffer,
-          color_image_size_bytes  as usize);
+          color_image_size_bytes as usize);
 
         gl::UnmapBuffer(gl::ARRAY_BUFFER)
       };
@@ -476,13 +521,17 @@ impl PointCloudRenderer {
         return Err(PointCloudRendererError::OpenGlError(error));
       }
 
-      let location = 0;
+      let location = i;
+
+      let vertex_attrib_location = self.vertex_attrib_locations.get(i).unwrap(); // TODO: TEMP Multi-camera support
 
       unsafe {
         // NB: Controling these indices change where the color bytes are uploaded
-        gl::EnableVertexAttribArray(location as u32);
+        gl::EnableVertexAttribArray(*vertex_attrib_location as u32);
+
         gl::VertexAttribPointer(
-          location as u32,
+          //0 as u32,
+          location as u32, // TODO: Does this matter?
           gl::BGRA as i32,
           gl::UNSIGNED_BYTE,
           gl::TRUE,
@@ -491,6 +540,8 @@ impl PointCloudRenderer {
           0 as i32,
           0 as *const c_void,
         );
+
+        gl::BindVertexArray(0);
       }
     }
 
