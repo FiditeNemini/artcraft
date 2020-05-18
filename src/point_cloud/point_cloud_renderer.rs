@@ -96,17 +96,25 @@ void main()
     ivec2 pointCloudSize = imageSize(pointCloudTexture0);
     ivec2 currentDepthPixelCoordinates = ivec2(gl_VertexID % pointCloudSize.x, gl_VertexID / pointCloudSize.x);
     //vec3 vertexPosition = imageLoad(pointCloudTexture0, currentDepthPixelCoordinates).xyz;
-
     //int pointCloudVertexLength = pointCloudSize.x * pointCloudSize.y;
 
     vec3 vertexPosition;
     vec4 colorOut;
 
     if (gl_VertexID % 2 == 0) {
+      // Camera #0
       vertexPosition = imageLoad(pointCloudTexture0, currentDepthPixelCoordinates).xyz;
       colorOut = inColor0;
     } else {
-      vertexPosition = imageLoad(pointCloudTexture1, currentDepthPixelCoordinates).xyz;
+      // Camera #1
+      vec3 originalPosition = imageLoad(pointCloudTexture1, currentDepthPixelCoordinates).xyz;
+
+      vertexPosition = vec3(
+        originalPosition.x - 1.5,
+        originalPosition.y,
+        originalPosition.z
+      );
+
       //colorOut = inColor1; // NOT WORKING FULLY
       colorOut = vec4(
         inColor1.r + 255,
