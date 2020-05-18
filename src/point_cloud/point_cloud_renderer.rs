@@ -82,7 +82,7 @@ bool GetPoint3d(in vec2 pointCloudSize, in ivec2 point2d, out vec3 point3d)
         return false;
     }
 
-    point3d = imageLoad(pointCloudTexture1, point2d).xyz;
+    point3d = imageLoad(pointCloudTexture0, point2d).xyz;
     if (point3d.z <= 0)
     {
         return false;
@@ -93,9 +93,29 @@ bool GetPoint3d(in vec2 pointCloudSize, in ivec2 point2d, out vec3 point3d)
 
 void main()
 {
-    ivec2 pointCloudSize = imageSize(pointCloudTexture1);
+    ivec2 pointCloudSize = imageSize(pointCloudTexture0);
     ivec2 currentDepthPixelCoordinates = ivec2(gl_VertexID % pointCloudSize.x, gl_VertexID / pointCloudSize.x);
-    vec3 vertexPosition = imageLoad(pointCloudTexture1, currentDepthPixelCoordinates).xyz;
+    //vec3 vertexPosition = imageLoad(pointCloudTexture0, currentDepthPixelCoordinates).xyz;
+
+    //int pointCloudVertexLength = pointCloudSize.x * pointCloudSize.y;
+
+    vec3 vertexPosition;
+    vec4 colorOut;
+
+    if (gl_VertexID % 2 == 0) {
+      vertexPosition = imageLoad(pointCloudTexture0, currentDepthPixelCoordinates).xyz;
+      colorOut = inColor0;
+    } else {
+      vertexPosition = imageLoad(pointCloudTexture1, currentDepthPixelCoordinates).xyz;
+      //colorOut = inColor1; // NOT WORKING FULLY
+      colorOut = vec4(
+        inColor1.r + 255,
+        inColor1.g + 0,
+        inColor1.b + 0,
+        inColor1.a + 255
+      );
+    }
+
 
     // Scale up while model view matrices not implemented.
     //vertexPosition.x *= 2.0 + 10.0;
@@ -109,14 +129,6 @@ void main()
     }
 
     gl_Position = projection * view * vec4(vertexPosition, 1);
-
-    vec4 colorOut = vec4(
-      inColor0.r  +  inColor1.r ,
-      inColor0.g  +  inColor1.g ,
-      inColor0.b  +  inColor1.b ,
-      inColor0.a  +  inColor1.a
-    );
-
     vertexColor = colorOut;
 
     // Pass along the 'invalid pixel' flag as the alpha channel
@@ -608,9 +620,9 @@ impl PointCloudRenderer {
 
       // Render point cloud
       for i in 0 .. self.num_cameras {
-        if i == 0 {
-          continue;
-        }
+        //if i == 0 {
+        //  continue;
+        //}
 
         let vertex_array_object = self.vertex_array_objects.get(i).unwrap(); // TODO: TEMP MULTI-CAMERA SUPPORT
         let vertex_array_size_bytes = self.vertex_arrays_size_bytes.get(i).unwrap(); // TODO: TEMP MULTI-CAMERA SUPPORT
