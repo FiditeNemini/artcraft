@@ -318,6 +318,11 @@ impl PointCloudVisualizer {
   ///
   ///
   fn update_point_clouds(&mut self, camera_index: usize, mut captures: Vec<Capture>) -> Result<()> {
+    if captures.len() != self.num_cameras {
+      println!("Length of captures in insufficient (unplug the cameras from USB and retry): {}", captures.len());
+      return Ok(());
+    }
+
     for (camera_index, capture) in captures.drain(0 .. self.num_cameras).into_iter().enumerate() {
       self.update_point_clouds_for_camera(camera_index, capture)?;
     }

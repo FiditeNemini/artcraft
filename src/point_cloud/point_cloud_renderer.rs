@@ -59,7 +59,8 @@ impl std::error::Error for PointCloudRendererError {
 /// From the file `tools/k4aviewer/graphics/shaders/k4apointcloudshaders.h`
 pub static POINT_CLOUD_VERTEX_SHADER : &'static str = "\
 #version 430
-layout(location = 0) in vec4 inColor;
+layout(location = 0) in vec4 inColor0;
+layout(location = 1) in vec4 inColor1;
 
 out vec4 vertexColor;
 
@@ -107,7 +108,7 @@ void main()
 
     gl_Position = projection * view * vec4(vertexPosition, 1);
 
-    vertexColor = inColor;
+    vertexColor = inColor0;
 
     // Pass along the 'invalid pixel' flag as the alpha channel
     //
@@ -220,7 +221,7 @@ pub struct PointCloudRenderer {
   enable_shading: bool,
 
   /// Point array size
-  vertex_array_size_bytes: GLsizei,
+  vertex_arrays_size_bytes: Vec<GLsizei>,
 
   /// Uniform location in the shader program.
   view_index: GLint,
@@ -234,8 +235,8 @@ pub struct PointCloudRenderer {
   /// Uniform location in the shader program.
   point_cloud_texture_indices: Vec<GLint>,
 
-  vertex_array_object: VertexArray,
-  vertex_color_buffer_object: Buffer,
+  vertex_array_objects: Vec<VertexArray>,
+  vertex_color_buffer_objects: Vec<Buffer>,
 }
 
 const fn translation_matrix_4x4(x: f32, y: f32, z: f32) -> [f32; 16] {
@@ -288,9 +289,6 @@ const fn initial_projection_matrix_4x4() -> [f32; 16] {
 impl PointCloudRenderer {
 
   pub fn new(num_cameras: usize, arcball: Arc<Mutex<MouseCameraArcball>>) -> Self {
-    let vertex_array_object = VertexArray::new_initialized();
-    let vertex_color_buffer_object = Buffer::new_initialized();
-
     // Context Settings
     unsafe {
       gl::Enable(gl::PROGRAM_POINT_SIZE);
@@ -340,6 +338,17 @@ impl PointCloudRenderer {
       point_cloud_texture_indices.push(gl::GetUniformLocation(program_id, POINT_CLOUD_1_PTR));
     }
 
+    // TODO: If this works, these could use grouping in a single struct.
+    let mut vertex_array_objects = Vec::with_capacity(num_cameras);
+    let mut vertex_color_buffer_objects = Vec::with_capacity(num_cameras);
+    let mut vertex_arrays_size_bytes = Vec::with_capacity(num_cameras);
+
+    for _ in 0 .. num_cameras {
+      vertex_array_objects.push(VertexArray::new_initialized());
+      vertex_color_buffer_objects.push(Buffer::new_initialized());
+      vertex_arrays_size_bytes.push(0);
+    }
+
     let initial_view = [
       [-1.0,         0.0,    8.74228e-08, 0.0],
       [0.0,          1.0,    0.0,         0.0],
@@ -366,13 +375,13 @@ impl PointCloudRenderer {
       fragment_shader_id,
       point_size: 1,
       enable_shading: false,
-      vertex_array_size_bytes: 0,
+      vertex_arrays_size_bytes,
       view_index,
       projection_index,
       enable_shading_index,
       point_cloud_texture_indices,
-      vertex_array_object,
-      vertex_color_buffer_object,
+      vertex_array_objects,
+      vertex_color_buffer_objects,
     }
   }
 
@@ -402,82 +411,90 @@ impl PointCloudRenderer {
   pub fn update_point_clouds(&mut self, color_images: &Vec<k4a_sys_wrapper::Image>,
                              point_cloud_textures: &Vec<Texture>) -> Result<()>
   {
-
-    let color_image = color_images.get(0).unwrap();
-
-    unsafe {
-      gl::BindVertexArray(self.vertex_array_object.id());
-      // Vertex Colors
-      gl::BindBuffer(gl::ARRAY_BUFFER, self.vertex_color_buffer_object.id());
-    }
-
-    let color_image_size_bytes = color_image.get_size() as i32;
-
-    if self.vertex_array_size_bytes != color_image_size_bytes {
-      self.vertex_array_size_bytes = color_image_size_bytes;
+    for (i, color_image) in color_images.iter().enumerate() {
+      let vertex_array_object = self.vertex_array_objects.get(i).unwrap(); // TODO: TEMP MULTI-CAMERA SUPPORT
+      let vertex_color_buffer_object = self.vertex_color_buffer_objects.get(i).unwrap(); // TODO: TEMP MULTI-CAMERA SUPPORT
+      let mut vertex_array_size_bytes = self.vertex_arrays_size_bytes.get_mut(i).unwrap(); // TODO: TEMP MULTI-CAMERA SUPPORT
 
       unsafe {
-        gl::BufferData(
+        gl::BindVertexArray(vertex_array_object.id());
+        // Vertex Colors
+        gl::BindBuffer(gl::ARRAY_BUFFER, vertex_color_buffer_object.id());
+      }
+
+      let color_image_size_bytes = color_image.get_size() as i32;
+
+      if *vertex_array_size_bytes != color_image_size_bytes {
+        *vertex_array_size_bytes = color_image_size_bytes;
+
+        unsafe {
+          gl::BufferData(
+            gl::ARRAY_BUFFER,
+            *vertex_array_size_bytes as isize,
+            null(),
+            gl::STREAM_DRAW
+          );
+        }
+      }
+
+      let vertex_mapped_buffer = unsafe {
+        gl::MapBufferRange(
           gl::ARRAY_BUFFER,
-          self.vertex_array_size_bytes as isize,
-          null(),
-          gl::STREAM_DRAW
+          0,
+          color_image_size_bytes as isize,
+          gl::MAP_WRITE_BIT | gl::MAP_INVALIDATE_BUFFER_BIT
+        ) as *mut u8
+      };
+
+      if vertex_mapped_buffer as usize == 0 {
+        let error = gl_get_error().expect_err("should be map buffer range error");
+        return Err(PointCloudRendererError::OpenGlError(error));
+      }
+
+      let color_src = color_image.get_buffer();
+      let typed_color_src = color_src as *const u8;
+      //let mut typed_color_src = color_src as *const BgraPixel;
+      //let length = color_image.get_width_pixels() * color_image.get_height_pixels();
+
+      let result = unsafe {
+        //std::ptr::copy_nonoverlapping::<u8>(color_src, vertex_mapped_buffer as *mut u8,
+        //  color_image_size_bytes as usize);
+
+        // TODO TESTING - writing pure white changes the color of the final output "line" to white:
+        //std::ptr::copy::<u8>(color_src, vertex_mapped_buffer as *mut u8, color_image_size_bytes as usize);
+        //std::ptr::write_bytes(vertex_mapped_buffer, 255, color_image_size_bytes as usize);
+
+        std::ptr::copy_nonoverlapping::<u8>(typed_color_src,
+          vertex_mapped_buffer,
+          color_image_size_bytes  as usize);
+
+        gl::UnmapBuffer(gl::ARRAY_BUFFER)
+      };
+
+      if result == gl::FALSE {
+        let error = gl_get_error().expect_err("should be unmap buffer error");
+        return Err(PointCloudRendererError::OpenGlError(error));
+      }
+
+      let location = 0;
+
+      unsafe {
+        // NB: Controling these indices change where the color bytes are uploaded
+        gl::EnableVertexAttribArray(location as u32);
+        gl::VertexAttribPointer(
+          location as u32,
+          gl::BGRA as i32,
+          gl::UNSIGNED_BYTE,
+          gl::TRUE,
+          //get_stride::<f32>(0),
+          //get_pointer_offset::<f32>(0),
+          0 as i32,
+          0 as *const c_void,
         );
       }
     }
 
-    let vertex_mapped_buffer = unsafe {
-      gl::MapBufferRange(
-        gl::ARRAY_BUFFER,
-        0,
-        color_image_size_bytes as isize,
-        gl::MAP_WRITE_BIT | gl::MAP_INVALIDATE_BUFFER_BIT
-      ) as *mut u8
-    };
-
-    if vertex_mapped_buffer as usize == 0 {
-      let error = gl_get_error().expect_err("should be map buffer range error");
-      return Err(PointCloudRendererError::OpenGlError(error));
-    }
-
-    let color_src = color_image.get_buffer();
-    let typed_color_src = color_src as *const u8;
-    //let mut typed_color_src = color_src as *const BgraPixel;
-    //let length = color_image.get_width_pixels() * color_image.get_height_pixels();
-
-    let result = unsafe {
-      //std::ptr::copy_nonoverlapping::<u8>(color_src, vertex_mapped_buffer as *mut u8,
-      //  color_image_size_bytes as usize);
-
-      // TODO TESTING - writing pure white changes the color of the final output "line" to white:
-      //std::ptr::copy::<u8>(color_src, vertex_mapped_buffer as *mut u8, color_image_size_bytes as usize);
-      //std::ptr::write_bytes(vertex_mapped_buffer, 255, color_image_size_bytes as usize);
-
-      std::ptr::copy_nonoverlapping::<u8>(typed_color_src,
-        vertex_mapped_buffer,
-        color_image_size_bytes  as usize);
-
-      gl::UnmapBuffer(gl::ARRAY_BUFFER)
-    };
-
-    if result == gl::FALSE {
-      let error = gl_get_error().expect_err("should be unmap buffer error");
-      return Err(PointCloudRendererError::OpenGlError(error));
-    }
-
     unsafe {
-      gl::EnableVertexAttribArray(0);
-      gl::VertexAttribPointer(
-        0,
-        gl::BGRA as i32,
-        gl::UNSIGNED_BYTE,
-        gl::TRUE,
-        //get_stride::<f32>(0),
-        //get_pointer_offset::<f32>(0),
-        0 as i32,
-        0 as *const c_void,
-      );
-
       gl::UseProgram(self.shader_program_id);
 
       for (i, point_cloud_texture) in point_cloud_textures.iter().enumerate() {
@@ -541,11 +558,16 @@ impl PointCloudRenderer {
       gl::Uniform1i(self.enable_shading_index, enable_shading);
 
       // Render point cloud
-      gl::BindVertexArray(self.vertex_array_object.id());
-      //let size = self.vertex_array_size_bytes / size_of::<BgraPixel>() as i32 / 3; // TODO: 1/3rd of information to draw
-      let size = self.vertex_array_size_bytes / size_of::<BgraPixel>() as i32;
-      //println!("Draw size: {} (vertex array size bytes: {})", size, self.vertex_array_size_bytes);
-      gl::DrawArrays(gl::POINTS, 0, size);
+      for i in 0 .. self.num_cameras {
+        let vertex_array_object = self.vertex_array_objects.get(i).unwrap(); // TODO: TEMP MULTI-CAMERA SUPPORT
+        let vertex_array_size_bytes = self.vertex_arrays_size_bytes.get(i).unwrap(); // TODO: TEMP MULTI-CAMERA SUPPORT
+
+        gl::BindVertexArray(vertex_array_object.id());
+        //let size = self.vertex_array_size_bytes / size_of::<BgraPixel>() as i32 / 3; // TODO: 1/3rd of information to draw
+        let size = vertex_array_size_bytes / size_of::<BgraPixel>() as i32;
+        //println!("Draw size: {} (vertex array size bytes: {})", size, self.vertex_array_size_bytes);
+        gl::DrawArrays(gl::POINTS, 0, size);
+      }
 
       gl::BindVertexArray(0);
 
