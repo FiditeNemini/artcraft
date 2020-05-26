@@ -18,9 +18,12 @@ COPY tts_service/src/ ./src
 
 RUN $HOME/.cargo/bin/cargo fetch
 
-RUN wget https://download.pytorch.org/libtorch/cpu/libtorch-cxx11-abi-shared-with-deps-1.3.1%2Bcpu.zip
-RUN unzip libtorch-cxx11-abi-shared-with-deps-1.3.1+cpu.zip
-RUN cd libtorch/lib && ls -lA && ln -s libgomp-753e6e92.so.1 libgomp.so.1 && cd /tmp
+# Libtorch package index: https://pytorch.org/get-started/locally/
+# tch.rs wants libtorch version 1.5 now.
+RUN wget https://download.pytorch.org/libtorch/cpu/libtorch-cxx11-abi-shared-with-deps-1.5.0%2Bcpu.zip
+RUN unzip libtorch-cxx11-abi-shared-with-deps-1.5.0+cpu.zip
+
+RUN cd libtorch/lib && ls -lA && ln -s libgomp-75eea7e8.so.1 libgomp.so.1 && cd /tmp
 RUN cp -R libtorch/lib /usr
 
 #RUN LD_LIBRARY_PATH=/usr/lib:${LD_LIBRARY_PATH} $HOME/.cargo/bin/cargo build
@@ -35,3 +38,4 @@ COPY --from=build /tmp/libtorch/lib /usr/lib
 RUN ldd tts_service
 EXPOSE 8080
 CMD LD_LIBRARY_PATH=/usr/lib /tts_service
+
