@@ -3,7 +3,7 @@ kind: Service
 apiVersion: v1
 metadata:
   name: tts
-  namespace: trumped
+  namespace: mumble
 spec:
   type: LoadBalancer
   selector:
@@ -18,7 +18,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: tts
-  namespace: trumped
+  namespace: mumble
   labels:
     app: tts
 spec:
@@ -61,7 +61,7 @@ spec:
         - name: AWS_S3_URL
           value: "https://nyc3.digitaloceanspaces.com"
         - name: AWS_STORAGE_BUCKET_NAME
-          value: "upload-datas"
+          value: "upload-models"
         - name: AWS_ACCESS_KEY_ID
           valueFrom:
             secretKeyRef:
@@ -86,26 +86,22 @@ spec:
 
         # The following image runs a rudimentary Arbapet engine, but doesn't
         # handle puncutation and tokenization
-        image: docker.pkg.github.com/echelon/voder/tts-service:6e766720ca7d
+        #image: docker.pkg.github.com/ml-applications/voder/tts-service:6e766720ca7d
+        image: docker.pkg.github.com/ml-applications/voder/tts-service:dafe174dc364
         volumeMounts:
         - name: mntdatas3fs
           mountPath: /data:shared
         env:
         - name: BIND_ADDRESS
           value: "0.0.0.0:12345"
-        - name: TACOTRON_MODEL
-          # The following image is non-Arpabet LSpeech that sounds AMAZING
-          # value: "/data/models/tacotron2-nvidia/tacotron_container.pt"
-          # The following image is Trump transfer learned on LJS Arpabet
-          value: "/data/models/tacotron2-nvidia/trump_txlearn_ljs_arpabet_ckpt30000_2020_02_06.pt"
-        - name: MELGAN_MODEL
-          value: "/data/models/melgan-swpark/shared_melgan_container.pt"
         - name: ASSET_DIRECTORY
-          #value: "/data/frontend" # OLD, PLAIN FRONTEND
           value: "/data/frontend/build"
-        command: ["/tts_service"]
+        - name: MODEL_CONFIG_FILE
+          value: "/data/models/deployed_models.toml"
+        command: ["./tts_service"]
+        args: [""]
         #command: ["sleep"]
-        #args: ["30000"]
+        #args: ["300000"]
         ports:
         - containerPort: 12345
           protocol: TCP
