@@ -147,6 +147,7 @@ async fn post_tts(request: HttpRequest,
 
 const BIND_ADDRESS : &'static str = "BIND_ADDRESS";
 const ASSET_DIRECTORY : &'static str = "ASSET_DIRECTORY";
+const MODEL_CONFIG_FILE : &'static str = "MODEL_CONFIG_FILE";
 
 //pub struct AppState {
 //  pub arpabet: Arpabet,
@@ -157,7 +158,17 @@ const ASSET_DIRECTORY : &'static str = "ASSET_DIRECTORY";
 async fn main() -> std::io::Result<()> {
   println!("Loading configs.");
 
-  let configs = ModelConfigs::load_from_file("models.toml");
+  let model_config_file = match env::var(MODEL_CONFIG_FILE).as_ref().ok() {
+    Some(filename) => filename.to_string(),
+    None => {
+      println!("MODEL_CONFIG_FILE not set, defaulting to 'models.toml'.");
+      "models.toml".to_string()
+    },
+  };
+
+  println!("Using model config file: {}", model_config_file);
+
+  let configs = ModelConfigs::load_from_file(&model_config_file);
   println!("Configs: {:?}", configs);
 
   println!("Starting service.");
