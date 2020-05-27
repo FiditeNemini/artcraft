@@ -4,7 +4,7 @@ use std::path::Path;
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct ModelConfigs {
-  speakers: Vec<Speaker>,
+  pub speakers: Vec<Speaker>,
   pub model_locations: Vec<ModelLocation>,
   tacotron: Vec<ModelDetails>,
   melgan: Vec<ModelDetails>,
@@ -83,5 +83,10 @@ impl ModelConfigs {
           .and_then(|name| name.to_str())
           .map(|s| s.to_string());
     }
+  }
+
+  pub fn find_speaker_by_slug(&self, slug: &str) -> Option<&Speaker> {
+    self.speakers.iter()
+        .find(|speaker| speaker.slug == slug)
   }
 }

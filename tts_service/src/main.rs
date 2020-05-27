@@ -38,6 +38,8 @@ use crate::endpoints::index::get_root;
 use crate::endpoints::liveness::get_liveness;
 use crate::endpoints::models::get_models;
 use crate::endpoints::readiness::get_readiness;
+use crate::endpoints::speak::post_speak;
+use crate::endpoints::speakers::get_speakers;
 use crate::endpoints::tts::post_tts;
 
 const BIND_ADDRESS : &'static str = "BIND_ADDRESS";
@@ -103,10 +105,16 @@ async fn main() -> std::io::Result<()> {
             .route(web::post().to(post_tts))
             .route(web::head().to(|| HttpResponse::Ok()))
       )
+      .service(
+        web::resource("/speak")
+            .route(web::post().to(post_speak))
+            .route(web::head().to(|| HttpResponse::Ok()))
+      )
       .service(get_root)
       .service(get_readiness)
       .service(get_liveness)
       .service(get_models)
+      .service(get_speakers)
       .app_data(arc.clone())
     )
     .bind(bind_address)?
