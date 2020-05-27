@@ -2,6 +2,7 @@
 # I have instructions for that here: https://hub.docker.com/r/echelon/testcontainer/dockerfile
 FROM ubuntu:xenial as build
 WORKDIR /tmp
+
 RUN apt-get update \
     && apt-get install -y \
         build-essential \
@@ -12,9 +13,11 @@ RUN apt-get update \
         wget
 RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs \
     | sh  -s -- --default-toolchain stable -y
+
 COPY Cargo.lock . 
 COPY tts_service/Cargo.toml .
 COPY tts_service/src/ ./src
+COPY tts_service/script/ ./script
 
 RUN $HOME/.cargo/bin/cargo fetch
 
@@ -32,9 +35,12 @@ RUN LD_LIBRARY_PATH=/usr/lib:${LD_LIBRARY_PATH} $HOME/.cargo/bin/cargo build --r
 # Final image
 FROM ubuntu:xenial
 WORKDIR /
+
 #COPY --from=build /tmp/target/debug/tts_service /
 COPY --from=build /tmp/target/release/tts_service /
 COPY --from=build /tmp/libtorch/lib /usr/lib
+COPY --from=build /tmp/script /
+
 RUN ldd tts_service
 EXPOSE 8080
 CMD LD_LIBRARY_PATH=/usr/lib /tts_service
