@@ -23,12 +23,7 @@ use actix_cors::Cors;
 use actix_files::Files;
 use actix_web::middleware::Logger;
 use actix_web::web::Json;
-use actix_web::{
-  App,
-  HttpResponse,
-  HttpServer,
-  web,
-};
+use actix_web::{App, HttpResponse, HttpServer, web, http};
 
 use crate::config::ModelConfigs;
 use crate::model::model_cache::ModelCache;
@@ -63,6 +58,8 @@ pub struct AppState {
 #[actix_rt::main]
 async fn main() -> std::io::Result<()> {
   println!("Loading configs.");
+  std::env::set_var("RUST_LOG", "actix_web=info");
+  env_logger::init();
 
   let model_config_file = match env::var(MODEL_CONFIG_FILE).as_ref().ok() {
     Some(filename) => filename.to_string(),
@@ -98,18 +95,17 @@ async fn main() -> std::io::Result<()> {
   println!("Starting HTTP service.");
 
   HttpServer::new(move || App::new()
+      .wrap(Cors::new()
+          .allowed_origin("http://localhost:12345")
+          .allowed_origin("http://localhost:8080")
+          .allowed_origin("http://trumped.com")
+          .allowed_origin("http://jungle.horse")
+          .allowed_methods(vec!["GET", "POST"])
+          .allowed_headers(vec![http::header::AUTHORIZATION, http::header::ACCEPT])
+          .allowed_header(http::header::CONTENT_TYPE)
+          .max_age(3600)
+          .finish())
       .wrap(Logger::default())
-      .wrap(
-        Cors::new()
-            .allowed_origin("http://localhost:12345")
-            .allowed_origin("http://localhost:8080")
-            .allowed_origin("http://trumped.com")
-            .allowed_origin("http://jungle.horse")
-            .allowed_methods(vec!["GET", "POST"])
-            //.allowed_headers(vec![http::header::AUTHORIZATION, http::header::ACCEPT])
-            //.allowed_header(http::header::CONTENT_TYPE)
-            .max_age(3600)
-            .finish())
       .service(Files::new("/frontend", asset_directory.clone()).show_files_listing())
       .service(
         web::resource("/advanced_tts")
