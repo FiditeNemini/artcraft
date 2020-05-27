@@ -53,8 +53,11 @@ pub async fn post_tts(_request: HttpRequest,
 
   let mut app_state = app_state.into_inner();
 
-  let tacotron = app_state.model_cache.get_or_load_arbabet_tacotron(&tacotron_model).unwrap();
-  let melgan = app_state.model_cache.get_or_load_melgan(&melgan_model).unwrap();
+  let tacotron = app_state.model_cache.get_or_load_arbabet_tacotron(&tacotron_model)
+      .expect(&format!("Couldn't load tacotron: {}", &tacotron_model));
+
+  let melgan = app_state.model_cache.get_or_load_melgan(&melgan_model)
+      .expect(&format!("Couldn't load melgan: {}", &melgan_model));
 
   let wav_data = TacoMelModel::new().run_tts_encoded(&tacotron, &melgan, &encoded);
 
