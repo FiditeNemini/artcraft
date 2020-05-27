@@ -1,8 +1,5 @@
 use actix_web::http::StatusCode;
-use actix_web::web::{
-  Data,
-  Json,
-};
+use actix_web::web::{Data, Query};
 use actix_web::{
   HttpRequest,
   HttpResponse,
@@ -16,23 +13,26 @@ use crate::text::text_to_arpabet_encoding;
 use crate::old_model::TacoMelModel;
 use crate::config::{Speaker, ModelPipeline};
 
+/// Example request: v=trump&vol=3&s=this is funny isn't it
 #[derive(Deserialize)]
-pub struct SpeakRequest {
-  /// Slug for the speaker
-  speaker: String,
-  /// Raw text to be spoken
-  text: String,
+pub struct LegacyGetSpeakRequest {
+  /// Voice slug
+  v: String,
+  /// Volume. Not used.
+  vol: i32,
+  /// Sentence
+  s: String,
 }
 
-pub async fn post_speak(_request: HttpRequest,
-  query: Json<SpeakRequest>,
+pub async fn legacy_get_speak(_request: HttpRequest,
+  query: Query<LegacyGetSpeakRequest>,
   app_state: Data<Arc<AppState>>
 ) -> std::io::Result<HttpResponse> {
-  println!("POST /speak");
+  println!("GET /speak");
 
   let mut app_state = app_state.into_inner();
 
-  let speaker = match app_state.model_configs.find_speaker_by_slug(&query.speaker) {
+  let speaker = match app_state.model_configs.find_speaker_by_slug(&query.v) {
     Some(speaker) => speaker,
     None => {
       return Ok(HttpResponse::build(StatusCode::NOT_FOUND)
@@ -53,7 +53,7 @@ pub async fn post_speak(_request: HttpRequest,
           .map(|s| s.clone())
           .expect("TODO ERROR HANDLING");
 
-      let text = query.text.to_string();
+      let text = query.s.to_string();
       println!("Tacotron Model: {}", tacotron_model);
       println!("Melgan Model: {}", melgan_model);
       println!("Text: {}", text);

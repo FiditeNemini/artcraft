@@ -26,16 +26,17 @@ use actix_web::web::Json;
 use actix_web::{App, HttpResponse, HttpServer, web, http};
 
 use crate::config::ModelConfigs;
-use crate::model::model_cache::ModelCache;
-use crate::old_model::TacoMelModel;
-use crate::text::text_to_arpabet_encoding;
 use crate::endpoints::index::get_root;
+use crate::endpoints::legacy_speak::legacy_get_speak;
 use crate::endpoints::liveness::get_liveness;
 use crate::endpoints::models::get_models;
 use crate::endpoints::readiness::get_readiness;
 use crate::endpoints::speak::post_speak;
 use crate::endpoints::speakers::get_speakers;
 use crate::endpoints::tts::post_tts;
+use crate::model::model_cache::ModelCache;
+use crate::old_model::TacoMelModel;
+use crate::text::text_to_arpabet_encoding;
 
 const BIND_ADDRESS : &'static str = "BIND_ADDRESS";
 const ASSET_DIRECTORY : &'static str = "ASSET_DIRECTORY";
@@ -99,7 +100,9 @@ async fn main() -> std::io::Result<()> {
           .allowed_origin("http://localhost:12345")
           .allowed_origin("http://localhost:8080")
           .allowed_origin("http://trumped.com")
+          .allowed_origin("https://trumped.com")
           .allowed_origin("http://jungle.horse")
+          .allowed_origin("https://jungle.horse")
           .allowed_methods(vec!["GET", "POST"])
           .allowed_headers(vec![http::header::ACCEPT])
           .allowed_header(http::header::CONTENT_TYPE)
@@ -115,6 +118,7 @@ async fn main() -> std::io::Result<()> {
       .service(
         web::resource("/speak")
             .route(web::post().to(post_speak))
+            .route(web::get().to(legacy_get_speak))
             .route(web::head().to(|| HttpResponse::Ok()))
       )
       .service(get_root)
