@@ -51,8 +51,13 @@ spec:
           allowPrivilegeEscalation: true
         # TODO: Find a pinned tag for this. `latest` is dangerous
         image: panubo/s3fs:latest
-        #command: ["sleep"]
-        #args: ["30000"]
+        # NB: This container spews logs, making Graphana hard to read. I can't figure
+        # out how to filter out by sidecar, label, app, whatever, so I'm disabling these
+        # logs outright. I do not anticipate a problem with s3fs that I'll need logs for.
+        # If I change my mind, I can remove the override setting in the future, because
+        # Docker has the correct entrypoint.
+        command: ["/bin/sh"]
+        args: ["-c", "echo 'Disabled s3fs logging in k8s deployment for Graphana' && ./entry.sh 2> /dev/null"]
         volumeMounts:
         - name: devfuse
           mountPath: /dev/fuse
