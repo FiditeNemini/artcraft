@@ -1,7 +1,7 @@
 import React from 'react';
 import Howl from 'howler';
-import {TextAudioPair }from './MainComponent'
-import { ModelPickerDropdownComponent } from './model_picker/ModelPickerDropdownComponent';
+import {TextAudioPair }from '../../MainComponent'
+import { ModelPickerDropdownComponent } from './ModelPickerDropdownComponent';
 
 interface Props {
   appendUtteranceCallback: (utterance: TextAudioPair) => void

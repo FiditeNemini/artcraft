@@ -1,6 +1,6 @@
 import React from 'react';
-import TextInput from './TextInput';
-import TrackList from './TrackList';
+import TextInput from './modes/advanced_mode/TextInput';
+import TrackList from './modes/advanced_mode/TrackList';
 import { SpeakerModeComponent } from './modes/speaker_mode/SpeakerModeComponent';
 
 enum Mode {

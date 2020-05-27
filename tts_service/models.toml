@@ -10,8 +10,8 @@ melgan = "melgan_trump-txlearn-2020.05.05_13675.jit"
 name = "High-pitched Linda Johnson"
 slug = "ljsh"
 model_pipeline = "ArpabetTacotronMelgan"
-tacotron = ""
-melgan = ""
+tacotron = "tacotron2_ljs_high_pitch_arpabet_2020-03-28.jit"
+melgan = "melgan_ljs-high-pitch_container.pt"
 
 # --------------- Model configs ---------------
 
@@ -101,7 +101,7 @@ description = "Unknown (broken)"
 
 [[tacotron]]
 # TODO: Remove. This hangs forever.
-file_path = "acotron_jit_model_voder_c0cac635.pt"
+file_path = "tacotron_jit_model_voder_c0cac635.pt"
 description = "Unknown (broken)"
 
 

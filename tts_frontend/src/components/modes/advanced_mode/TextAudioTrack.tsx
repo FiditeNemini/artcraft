@@ -1,6 +1,6 @@
 import * as React from 'react';
 import Howl from 'howler';
-import {makeTtsRequest} from '../TtsService'
+import {makeTtsRequest} from '../../../TtsService'
 
 interface Props {
   text: String,

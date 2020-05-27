@@ -1,6 +1,6 @@
 import React from 'react';
 import Howl from 'howler';
-import { TextAudioPair } from './MainComponent';
+import { TextAudioPair } from '../../MainComponent';
 import TextAudioTrack from './TextAudioTrack';
 
 interface Props {
