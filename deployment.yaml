@@ -88,7 +88,7 @@ spec:
         # The following image runs a rudimentary Arbapet engine, but doesn't
         # handle puncutation and tokenization
         #image: docker.pkg.github.com/ml-applications/voder/tts-service:6e766720ca7d
-        image: docker.pkg.github.com/ml-applications/voder/tts-service:805bad97c311
+        image: docker.pkg.github.com/ml-applications/voder/tts-service:6b89620b3c3b
         volumeMounts:
         - name: mntdatas3fs
           mountPath: /data:shared
