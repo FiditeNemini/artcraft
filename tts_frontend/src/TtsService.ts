@@ -28,7 +28,7 @@ class TtsResponse {
 
 let makeTtsRequest = (sentence: string): Promise<TtsResponse> => {
   const request = new TtsRequest(sentence);
-  const url = `/tts`;
+  const url = `http://localhost:12345/advanced_tts`;
 
   return fetch(url, {
     method: 'POST',

@@ -70,7 +70,7 @@ class TextInput extends React.Component<Props, State> {
     request.arpabet_tacotron_model = this.state.arpabet_tacotron_model || "";
     request.melgan_model = this.state.melgan_model || "";
 
-    const url = '/tts';
+    const url = 'http://localhost:12345/advanced_tts';
     fetch(url, {
       method: 'POST',
       headers: {

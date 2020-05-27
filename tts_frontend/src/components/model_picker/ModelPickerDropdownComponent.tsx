@@ -26,7 +26,7 @@ class ModelPickerDropdownComponent extends React.Component<Props, State> {
   }
 
   public loadModels() {
-    const url = '/models';
+    const url = 'http://localhost:12345/models';
     fetch(url)
       .then(res => res.json())
       .then(

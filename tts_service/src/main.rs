@@ -101,7 +101,7 @@ async fn main() -> std::io::Result<()> {
           .allowed_origin("http://trumped.com")
           .allowed_origin("http://jungle.horse")
           .allowed_methods(vec!["GET", "POST"])
-          .allowed_headers(vec![http::header::AUTHORIZATION, http::header::ACCEPT])
+          .allowed_headers(vec![http::header::ACCEPT])
           .allowed_header(http::header::CONTENT_TYPE)
           .max_age(3600)
           .finish())
