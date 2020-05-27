@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { SpeakerResponse, SpeakerDetails } from './SpeakerResponse';
+import { SpeakerDetails } from './SpeakerResponse';
 
 interface Props {
   changeCallback: (ev: React.FormEvent<HTMLSelectElement>) => void,

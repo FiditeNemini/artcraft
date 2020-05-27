@@ -2,6 +2,7 @@ import React from 'react';
 import TextInput from './modes/advanced_mode/TextInput';
 import TrackList from './modes/advanced_mode/TrackList';
 import { SpeakerModeComponent } from './modes/speaker_mode/SpeakerModeComponent';
+import ApiConfig from '../ApiConfig';
 
 enum Mode {
   SPEAKER,
@@ -9,6 +10,7 @@ enum Mode {
 }
 
 interface Props {
+  apiConfig: ApiConfig,
 }
 
 interface State {
@@ -82,8 +84,14 @@ class MainComponent extends React.Component<Props, State> {
   public renderAdvancedMode() {
     return (
       <div>
-        <TextInput appendUtteranceCallback={this.appendUtterance} />
-        <TrackList utterances={this.state.utterances} />
+        <TextInput 
+          appendUtteranceCallback={this.appendUtterance} 
+          apiConfig={this.props.apiConfig} 
+          />
+        <TrackList 
+          apiConfig={this.props.apiConfig}
+          utterances={this.state.utterances} 
+          />
       </div>
     );
   }
@@ -91,7 +99,7 @@ class MainComponent extends React.Component<Props, State> {
   public renderSpeakerMode() {
     return (
       <div>
-        <SpeakerModeComponent></SpeakerModeComponent>
+        <SpeakerModeComponent apiConfig={this.props.apiConfig} />
       </div>
     );
   }

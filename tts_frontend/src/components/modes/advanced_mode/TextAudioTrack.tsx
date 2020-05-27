@@ -1,8 +1,10 @@
 import * as React from 'react';
 import Howl from 'howler';
 import {makeTtsRequest} from '../../../TtsService'
+import ApiConfig from '../../../ApiConfig';
 
 interface Props {
+  apiConfig: ApiConfig,
   text: String,
   howl: Howl,
 }
@@ -26,7 +28,7 @@ class TextAudioTrack extends React.Component<Props, State> {
 
     const sentence = this.props.text.toString();
     
-    makeTtsRequest(sentence).then(response => {
+    makeTtsRequest(sentence, this.props.apiConfig).then(response => {
       response.howl.play();
     });
   }

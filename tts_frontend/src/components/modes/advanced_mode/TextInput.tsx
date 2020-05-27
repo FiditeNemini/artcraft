@@ -2,8 +2,10 @@ import React from 'react';
 import Howl from 'howler';
 import {TextAudioPair }from '../../MainComponent'
 import { ModelPickerDropdownComponent } from './ModelPickerDropdownComponent';
+import ApiConfig from '../../../ApiConfig';
 
 interface Props {
+  apiConfig: ApiConfig,
   appendUtteranceCallback: (utterance: TextAudioPair) => void
 }
 
@@ -70,7 +72,8 @@ class TextInput extends React.Component<Props, State> {
     request.arpabet_tacotron_model = this.state.arpabet_tacotron_model || "";
     request.melgan_model = this.state.melgan_model || "";
 
-    const url = 'http://localhost:12345/advanced_tts';
+    const url = this.props.apiConfig.getEndpoint('/advanced_tts');
+
     fetch(url, {
       method: 'POST',
       headers: {
@@ -108,6 +111,7 @@ class TextInput extends React.Component<Props, State> {
       <form onSubmit={this.makeRequest}>
         <input onChange={this.handleTextChange} />
         <ModelPickerDropdownComponent 
+          apiConfig={this.props.apiConfig}
           changeArpabetTacotronCallback={this.handleArpabetTacotronModelChange}
           changeMelganCallback={this.handleMelganModelChange}
         />

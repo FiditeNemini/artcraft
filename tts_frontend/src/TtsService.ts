@@ -1,4 +1,5 @@
 import Howl from 'howler';
+import ApiConfig from './ApiConfig';
 
 /// Requests to the backend.
 class TtsRequest {
@@ -26,9 +27,9 @@ class TtsResponse {
   }
 }
 
-let makeTtsRequest = (sentence: string): Promise<TtsResponse> => {
+let makeTtsRequest = (sentence: string, apiConfig: ApiConfig): Promise<TtsResponse> => {
   const request = new TtsRequest(sentence);
-  const url = `http://localhost:12345/advanced_tts`;
+  const url = apiConfig.getEndpoint('/advanced_tts');
 
   return fetch(url, {
     method: 'POST',

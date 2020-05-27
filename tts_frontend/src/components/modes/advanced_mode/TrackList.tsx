@@ -2,8 +2,10 @@ import React from 'react';
 import Howl from 'howler';
 import { TextAudioPair } from '../../MainComponent';
 import TextAudioTrack from './TextAudioTrack';
+import ApiConfig from '../../../ApiConfig';
 
 interface Props {
+  apiConfig: ApiConfig,
   utterances: Array<TextAudioPair>
 }
 
@@ -20,6 +22,7 @@ class TrackList extends React.Component<Props, State> {
     const tracks = this.props.utterances.map((utterance) =>
     <TextAudioTrack 
         key={utterance.text.toString()}
+        apiConfig={this.props.apiConfig}
         text={utterance.text} 
         howl={utterance.howl}>
       {utterance.text}

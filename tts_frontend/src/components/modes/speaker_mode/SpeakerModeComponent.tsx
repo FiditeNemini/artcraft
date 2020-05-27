@@ -2,8 +2,10 @@ import React from 'react';
 import { SpeakerDetails, SpeakerResponse } from './SpeakerResponse';
 import { SpeakerDropdownComponent } from './SpeakerDropdownComponent';
 import SpeakerAudioForm from './SpeakerAudioForm';
+import ApiConfig from '../../../ApiConfig';
 
 interface Props {
+  apiConfig: ApiConfig,
 }
 
 interface State {
@@ -26,7 +28,7 @@ class SpeakerModeComponent extends React.Component<Props, State> {
   }
 
   public loadSpeakers() {
-    const url = 'http://localhost:12345/speakers';
+    const url = this.props.apiConfig.getEndpoint('/speakers');
     fetch(url)
       .then(res => res.json())
       .then(
@@ -63,7 +65,10 @@ class SpeakerModeComponent extends React.Component<Props, State> {
       <div>
         <b>SpeakerMode</b>
         {dropdown}
-        <SpeakerAudioForm speaker={this.state.speaker_slug!} />
+        <SpeakerAudioForm 
+          speaker={this.state.speaker_slug!} 
+          apiConfig={this.props.apiConfig}
+          />
       </div>
     );
   }

@@ -1,7 +1,9 @@
 import React from 'react';
 import Howl from 'howler';
+import ApiConfig from '../../../ApiConfig';
 
 interface Props {
+  apiConfig: ApiConfig,
   speaker?: String,
 }
 
@@ -49,7 +51,8 @@ class SpeakerAudioForm extends React.Component<Props, State> {
 
     let request = new SpeakRequest(this.state.text, this.props.speaker!);
 
-    const url = 'http://localhost:12345/speak';
+    const url = this.props.apiConfig.getEndpoint('/speak');
+
     fetch(url, {
       method: 'POST',
       headers: {

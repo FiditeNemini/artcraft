@@ -2,8 +2,10 @@ import React from 'react';
 import { ModelResponse, ModelDetails } from './ModelResponse';
 import { DropdownMelgan } from './DropdownMelgan';
 import { DropdownArpabetTacotron } from './DropdownArpabetTacotron';
+import ApiConfig from '../../../ApiConfig';
 
 interface Props {
+  apiConfig: ApiConfig,
   changeArpabetTacotronCallback: (ev: React.FormEvent<HTMLSelectElement>) => void,
   changeMelganCallback: (ev: React.FormEvent<HTMLSelectElement>) => void,
 }
@@ -26,7 +28,7 @@ class ModelPickerDropdownComponent extends React.Component<Props, State> {
   }
 
   public loadModels() {
-    const url = 'http://localhost:12345/models';
+    const url = this.props.apiConfig.getEndpoint('/models');
     fetch(url)
       .then(res => res.json())
       .then(
