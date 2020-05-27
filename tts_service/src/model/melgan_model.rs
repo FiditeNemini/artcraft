@@ -1,13 +1,14 @@
 use crate::model::model_container::ModelContainer;
 use anyhow::Result;
 use tch::Tensor;
+use std::path::Path;
 
 pub struct MelganModel {
   model_container: ModelContainer,
 }
 
 impl MelganModel {
-  pub fn load(filename: &str) -> Result<Self> {
+  pub fn load(filename: &Path) -> Result<Self> {
     let model_container = ModelContainer::load(filename)?;
     Ok(Self {
       model_container,

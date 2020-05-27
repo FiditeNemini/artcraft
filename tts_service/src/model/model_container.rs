@@ -3,25 +3,26 @@ use tch::CModule;
 use tch::Tensor;
 use tch::nn::Module;
 use tch::nn::ModuleT;
+use std::path::{Path, PathBuf};
 
 /// Holds the loaded pytorch JIT model
 pub struct ModelContainer {
-  filename: String,
+  filename: PathBuf,
   jit_model: CModule,
 }
 
 impl ModelContainer {
-  pub fn load(filename: &str) -> Result<Self> {
+  pub fn load(filename: &Path) -> Result<Self> {
     let model = CModule::load(filename)
         .map_err(|e| anyhow!("jit model failed to load: {}", e))?;
 
     Ok(Self {
-      filename: filename.to_string(),
+      filename: filename.to_path_buf(),
       jit_model: model,
     })
   }
 
-  pub fn get_filename(&self) -> &str {
+  pub fn get_filename(&self) -> &Path {
     &self.filename
   }
 

@@ -75,9 +75,11 @@ async fn main() -> std::io::Result<()> {
   let model_configs = ModelConfigs::load_from_file(&model_config_file);
   println!("Model configs: {:?}", model_configs);
 
+  let model_cache = ModelCache::new(&model_configs.model_locations);
+
   let app_state = AppState {
     model_configs,
-    model_cache: ModelCache::new(),
+    model_cache,
   };
 
   let bind_address = env::var(BIND_ADDRESS)

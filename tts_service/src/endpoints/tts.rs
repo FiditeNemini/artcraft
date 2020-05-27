@@ -25,7 +25,7 @@ pub struct TtsRequest {
   melgan_model: Option<String>,
 }
 
-pub async fn post_tts(request: HttpRequest,
+pub async fn post_tts(_request: HttpRequest,
   query: Json<TtsRequest>,
   app_state: Data<Arc<AppState>>
 ) -> std::io::Result<HttpResponse> {

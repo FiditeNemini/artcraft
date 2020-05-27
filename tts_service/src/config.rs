@@ -4,8 +4,48 @@ use std::path::Path;
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct ModelConfigs {
+  speakers: Vec<Speaker>,
+  pub model_locations: Vec<ModelLocation>,
   tacotron: Vec<ModelDetails>,
   melgan: Vec<ModelDetails>,
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
+pub struct Speaker {
+  /// Name of the speaker
+  pub name: String,
+  /// URL slug / key
+  pub slug: String,
+  /// Model pipeline to use
+  pub model_pipeline: ModelPipeline,
+  /// Tacotron model, if used.
+  pub tacotron: Option<String>,
+  /// Melgan model, if used.
+  pub melgan: Option<String>,
+}
+
+/// The types of models supported by our system.
+#[derive(Serialize, Deserialize, Debug, Clone, Copy, PartialEq, Eq, Hash)]
+pub enum ModelType {
+  RawTextTacotron,
+  ArpabetTacotron,
+  Melgan,
+}
+
+/// Where the various models are stored.
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
+pub struct ModelLocation {
+  pub model_type: ModelType,
+  pub base_directory: Option<String>,
+}
+
+/// The valid model pipelines in use by our system.
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
+pub enum ModelPipeline {
+  //ArpabetTacotronGriffinLim,
+  //ArpabetTacotronWorld,
+  ArpabetTacotronMelgan,
+  RawTextTacotronMelgan,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]

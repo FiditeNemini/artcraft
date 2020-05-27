@@ -33,6 +33,7 @@ spec:
       annotations:
         bump: '1'
     spec:
+      terminationGracePeriodSeconds: 60
       imagePullSecrets:
       - name: regcred
       volumes:
@@ -87,7 +88,7 @@ spec:
         # The following image runs a rudimentary Arbapet engine, but doesn't
         # handle puncutation and tokenization
         #image: docker.pkg.github.com/ml-applications/voder/tts-service:6e766720ca7d
-        image: docker.pkg.github.com/ml-applications/voder/tts-service:dafe174dc364
+        image: docker.pkg.github.com/ml-applications/voder/tts-service:805bad97c311
         volumeMounts:
         - name: mntdatas3fs
           mountPath: /data:shared
