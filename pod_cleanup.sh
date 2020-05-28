@@ -16,10 +16,20 @@
 #
 # This stop-gap non-solution is taken from https://stackoverflow.com/q/50336665
 #
-pods=$( kubectl -n mumble get pods | grep -v Running | tail -n +2 | awk -F " " '{print $1}' )
-for pod in $pods;
-do
-  echo "Deleting pod ${pod}"
-  kubectl -n mumble delete pod $pod --grace-period=0 --force
-done
+function cleanup_pods() {
+  namespace=$1
+
+  echo "Cleanup pods in namespace ${namespace}"
+
+  pods=$( kubectl -n ${namespace} get pods | grep -v Running | tail -n +2 | awk -F " " '{print $1}' )
+
+  for pod in $pods;
+  do
+    echo "Deleting pod ${pod}"
+    kubectl -n ${namespace} delete pod $pod --grace-period=0 --force 2> /dev/null
+  done
+}
+
+cleanup_pods "mumble"
+cleanup_pods "trumped"
 
