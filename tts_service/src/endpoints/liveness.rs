@@ -7,7 +7,6 @@ use actix_web::{
 
 #[get("/liveness")]
 pub async fn get_liveness(_request: HttpRequest) -> std::io::Result<HttpResponse> {
-  println!("GET /liveness");
   Ok(HttpResponse::build(StatusCode::OK)
       .content_type("text/html; charset=utf-8")
       .body("Live"))

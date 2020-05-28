@@ -108,7 +108,9 @@ async fn main() -> std::io::Result<()> {
           .allowed_header(http::header::CONTENT_TYPE)
           .max_age(3600)
           .finish())
-      .wrap(Logger::default())
+      .wrap(Logger::default()
+          .exclude("/liveness")
+          .exclude("/readiness"))
       .service(Files::new("/frontend", asset_directory.clone()).show_files_listing())
       .service(
         web::resource("/advanced_tts")
