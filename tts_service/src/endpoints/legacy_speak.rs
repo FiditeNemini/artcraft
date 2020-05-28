@@ -17,11 +17,11 @@ use crate::config::{Speaker, ModelPipeline};
 #[derive(Deserialize)]
 pub struct LegacyGetSpeakRequest {
   /// Voice slug
-  v: String,
-  /// Volume. Not used.
-  vol: i32,
+  v: Option<String>,
   /// Sentence
-  s: String,
+  s: Option<String>,
+  /// Volume. Not used.
+  vol: Option<i32>,
 }
 
 pub async fn legacy_get_speak(_request: HttpRequest,
@@ -30,9 +30,29 @@ pub async fn legacy_get_speak(_request: HttpRequest,
 ) -> std::io::Result<HttpResponse> {
   println!("GET /speak");
 
+  let speaker = match query.v.as_ref() {
+    None => {
+      return Ok(HttpResponse::build(StatusCode::BAD_REQUEST)
+          .content_type("text/plain")
+          .body("Speaker parameter missing."));
+    },
+    Some(v) => v.to_string(),
+  };
+
+  let text = match query.s.as_ref() {
+    None => {
+      return Ok(HttpResponse::build(StatusCode::BAD_REQUEST)
+          .content_type("text/plain")
+          .body("Text parameter missing."));
+    },
+    Some(s) => s.to_string(),
+  };
+
+  println!("Speaker: {}, Text: {}", speaker, text);
+
   let mut app_state = app_state.into_inner();
 
-  let speaker = match app_state.model_configs.find_speaker_by_slug(&query.v) {
+  let speaker = match app_state.model_configs.find_speaker_by_slug(&speaker) {
     Some(speaker) => speaker,
     None => {
       return Ok(HttpResponse::build(StatusCode::NOT_FOUND)
@@ -53,10 +73,8 @@ pub async fn legacy_get_speak(_request: HttpRequest,
           .map(|s| s.clone())
           .expect("TODO ERROR HANDLING");
 
-      let text = query.s.to_string();
       println!("Tacotron Model: {}", tacotron_model);
       println!("Melgan Model: {}", melgan_model);
-      println!("Text: {}", text);
 
       let arpabet = Arpabet::load_cmudict();
       let encoded = text_to_arpabet_encoding(arpabet, &text);
