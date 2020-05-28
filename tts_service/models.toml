@@ -84,7 +84,24 @@ file_path = "tacotron2_trump_txlearn_ljs_arpabet_2020-05-25_chkpt17000.jit"
 description = "(see previous)"
 
 [[tacotron]]
+# This is the best version of the Trump Tacotron network so far.
+# Later iterations lose quality. You can see it in the training graph.
+# It looks like ~28.62k is the lowest, and ~29.14k is the last before the
+# first of two major peaks upwards.
 file_path = "tacotron2_trump_txlearn_ljs_arpabet_2020-05-25_chkpt26500.jit"
+description = "BEST TACOTRON FOR TRUMP THUS FAR!"
+
+[[tacotron]]
+# Oh my god, this suddenly lost the ability to speak words.
+# This is a serious loss of quality.
+file_path = "tacotron2_trump_txlearn_ljs_arpabet_2020-05-25_chkpt40000.jit"
+description = "(see previous)"
+
+[[tacotron]]
+# The syllables are back, but the words are inexact.
+# It sounds like Trump.
+# Step 26500 still sounds much better than this.
+file_path = "tacotron2_trump_txlearn_ljs_arpabet_2020-05-25_chkpt50000.jit"
 description = "(see previous)"
 
 # ======== OLDER RUNS ======

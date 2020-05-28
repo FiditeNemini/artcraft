@@ -28,6 +28,8 @@ tacotron_model_file = '/home/bt/models/tacotron2-nvidia/tacotron2_trump_txlearn_
 tacotron_model_file = '/home/bt/models/tacotron2-nvidia/tacotron2_trump_txlearn_arpabet_2020-05-25_chkpt7000'
 tacotron_model_file = '/home/bt/models/tacotron2-nvidia/tacotron2_trump_txlearn_arpabet_2020-05-25_chkpt17000'
 tacotron_model_file = '/home/bt/models/tacotron2-nvidia/tacotron2_trump_txlearn_arpabet_2020-05-25_chkpt26500'
+tacotron_model_file = '/home/bt/models/tacotron2-nvidia/tacotron2_trump_txlearn_arpabet_2020-05-25_chkpt40000'
+tacotron_model_file = '/home/bt/models/tacotron2-nvidia/tacotron2_trump_txlearn_arpabet_2020-05-25_chkpt50000'
 
 
 #output_filename = 'tacotron_arpabet_1.pt'
@@ -46,6 +48,8 @@ output_filename = 'tacotron2_trump_txlearn_ljs_arpabet_2020-05-24_chkpt16000.jit
 output_filename = 'tacotron2_trump_txlearn_ljs_arpabet_2020-05-25_chkpt7000.jit'
 output_filename = 'tacotron2_trump_txlearn_ljs_arpabet_2020-05-25_chkpt17000.jit'
 output_filename = 'tacotron2_trump_txlearn_ljs_arpabet_2020-05-25_chkpt26500.jit'
+output_filename = 'tacotron2_trump_txlearn_ljs_arpabet_2020-05-25_chkpt40000.jit'
+output_filename = 'tacotron2_trump_txlearn_ljs_arpabet_2020-05-25_chkpt50000.jit'
 
 
 # NB: Tacotron's original shape is [148, 512]. Arpabet encoding is [256, 512].
