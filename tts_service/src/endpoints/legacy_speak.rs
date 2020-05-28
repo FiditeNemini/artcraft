@@ -28,7 +28,6 @@ pub async fn legacy_get_speak(_request: HttpRequest,
   query: Query<LegacyGetSpeakRequest>,
   app_state: Data<Arc<AppState>>
 ) -> std::io::Result<HttpResponse> {
-  println!("GET /speak");
 
   let speaker = match query.v.as_ref() {
     None => {
@@ -73,13 +72,11 @@ pub async fn legacy_get_speak(_request: HttpRequest,
           .map(|s| s.clone())
           .expect("TODO ERROR HANDLING");
 
-      println!("Tacotron Model: {}", tacotron_model);
-      println!("Melgan Model: {}", melgan_model);
+      //println!("Tacotron Model: {}", tacotron_model);
+      //println!("Melgan Model: {}", melgan_model);
 
       let arpabet = Arpabet::load_cmudict();
       let encoded = text_to_arpabet_encoding(arpabet, &text);
-
-      println!("Encoded Text: {:?}", encoded);
 
       let tacotron = app_state.model_cache.get_or_load_arbabet_tacotron(&tacotron_model).unwrap();
       let melgan = app_state.model_cache.get_or_load_melgan(&melgan_model).unwrap();

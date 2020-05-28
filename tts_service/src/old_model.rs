@@ -60,23 +60,14 @@ impl TacoMelModel {
 
   fn encoded_text_to_audio_signal(&self, tacotron: &ArpabetTacotronModel, melgan: &MelganModel, text_buffer: &Vec<i64>) -> Vec<i16> {
     let mut mel_tensor = tacotron.encoded_arpabet_to_mel(&text_buffer);
-    println!("\n\n>>> Mel tensor:\n{:?}\n\n", mel_tensor);
-    println!("Running melgan...");
     let audio_tensor = melgan.tacotron_mel_to_audio(&mel_tensor);
-    println!("\n\n>>> Audio tensor:\n{:?}\n\n", audio_tensor);
     Self::audio_tensor_to_audio_signal(audio_tensor)
   }
 
   fn audio_tensor_to_audio_signal(mel: Tensor) -> Vec<i16> {
     let mut flat_audio_tensor = mel.squeeze();
 
-    println!("Sqeueezed tensor: {:?}, dim: {}",
-      flat_audio_tensor,
-      flat_audio_tensor.dim());
-
     let length = flat_audio_tensor.size1().unwrap() as usize;
-    println!("Length: {}", length);
-
     let mut data : Vec<f32> = Vec::with_capacity(length);
 
     for i in 0 .. length {
