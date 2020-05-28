@@ -64,8 +64,8 @@ spec:
         # logs outright. I do not anticipate a problem with s3fs that I'll need logs for.
         # If I change my mind, I can remove the override setting in the future, because
         # Docker has the correct entrypoint.
-        #command: ["/bin/sh"]
-        #args: ["-c", "echo 'Disabled s3fs logging in k8s deployment for Graphana' && ./entry.sh 2> /dev/null"]
+        command: ["/bin/sh"]
+        args: ["-c", "echo 'Disabled s3fs logging in k8s deployment for Graphana' && ./entry.sh 2> /dev/null"]
         volumeMounts:
         - name: devfuse
           mountPath: /dev/fuse
