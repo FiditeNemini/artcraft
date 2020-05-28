@@ -95,6 +95,8 @@ async fn main() -> std::io::Result<()> {
 
   println!("Starting HTTP service.");
 
+  let log_format = "[%{HOSTNAME}e] %a \"%r\" %s %b \"%{Referer}i\" \"%{User-Agent}i\" %T";
+
   HttpServer::new(move || App::new()
       .wrap(Cors::new()
           .allowed_origin("http://localhost:12345")
@@ -108,7 +110,7 @@ async fn main() -> std::io::Result<()> {
           .allowed_header(http::header::CONTENT_TYPE)
           .max_age(3600)
           .finish())
-      .wrap(Logger::default()
+      .wrap(Logger::new(&log_format)
           .exclude("/liveness")
           .exclude("/readiness"))
       .service(Files::new("/frontend", asset_directory.clone()).show_files_listing())
