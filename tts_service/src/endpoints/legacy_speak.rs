@@ -12,6 +12,7 @@ use arpabet::Arpabet;
 use crate::text::text_to_arpabet_encoding;
 use crate::old_model::TacoMelModel;
 use crate::config::{Speaker, ModelPipeline};
+use crate::model::arpabet_tacotron_model::ArpabetTacotronModel;
 
 /// Example request: v=trump&vol=3&s=this is funny isn't it
 #[derive(Deserialize)]
@@ -78,8 +79,23 @@ pub async fn legacy_get_speak(_request: HttpRequest,
       let arpabet = Arpabet::load_cmudict();
       let encoded = text_to_arpabet_encoding(arpabet, &text);
 
-      let tacotron = app_state.model_cache.get_or_load_arbabet_tacotron(&tacotron_model).unwrap();
-      let melgan = app_state.model_cache.get_or_load_melgan(&melgan_model).unwrap();
+      let tacotron = match app_state.model_cache.get_or_load_arbabet_tacotron(&tacotron_model) {
+        Some(model) => model,
+        None => {
+          return Ok(HttpResponse::build(StatusCode::INTERNAL_SERVER_ERROR)
+              .content_type("text/plain")
+              .body("Couldn't load model."));
+        },
+      };
+
+      let melgan = match app_state.model_cache.get_or_load_melgan(&melgan_model) {
+        Some(model) => model,
+        None => {
+          return Ok(HttpResponse::build(StatusCode::INTERNAL_SERVER_ERROR)
+              .content_type("text/plain")
+              .body("Couldn't load model."));
+        },
+      };
 
       let wav_data = TacoMelModel::new().run_tts_encoded(&tacotron, &melgan, &encoded);
 
