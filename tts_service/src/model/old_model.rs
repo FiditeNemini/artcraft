@@ -53,13 +53,20 @@ impl TacoMelModel {
   }*/
 
   /// Run TTS on Arpabet encoding
-  pub fn run_tts_encoded(&self, tacotron: &ArpabetTacotronModel, melgan: &MelganModel, encoded_text: &Vec<i64>) -> Vec<u8> {
-    let audio_signal = self.encoded_text_to_audio_signal(tacotron, melgan, encoded_text);
-    Self::audio_signal_to_wav_bytes(audio_signal)
+  pub fn run_tts_encoded(&self, tacotron: &ArpabetTacotronModel, melgan: &MelganModel, encoded_text: &Vec<i64>) -> Option<Vec<u8>> {
+    let audio_signal = match self.encoded_text_to_audio_signal(tacotron, melgan, encoded_text) {
+      None => return None,
+      Some(audio_signal) => audio_signal,
+    };
+    let result = Self::audio_signal_to_wav_bytes(audio_signal);
+    Some(result)
   }
 
-  fn encoded_text_to_audio_signal(&self, tacotron: &ArpabetTacotronModel, melgan: &MelganModel, text_buffer: &Vec<i64>) -> Vec<i16> {
-    let mut mel_tensor : Tensor = tacotron.encoded_arpabet_to_mel(&text_buffer);
+  fn encoded_text_to_audio_signal(&self, tacotron: &ArpabetTacotronModel, melgan: &MelganModel, text_buffer: &Vec<i64>) -> Option<Vec<i16>> {
+    let mut mel_tensor = match tacotron.encoded_arpabet_to_mel(&text_buffer) {
+      None => return None,
+      Some(mel) => mel,
+    };
 
     // TODO: The following experiment demonstrates that Tacotron is the source of the segfaults
     //  Tacotron must feature self-mutating features.
@@ -90,7 +97,8 @@ impl TacoMelModel {
      */
 
     let audio_tensor = melgan.tacotron_mel_to_audio(&mel_tensor);
-    Self::audio_tensor_to_audio_signal(audio_tensor)
+    let result = Self::audio_tensor_to_audio_signal(audio_tensor);
+    Some(result)
   }
 
   fn audio_tensor_to_audio_signal(mel: Tensor) -> Vec<i16> {

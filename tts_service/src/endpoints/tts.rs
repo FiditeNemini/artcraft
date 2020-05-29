@@ -59,9 +59,18 @@ pub async fn post_tts(_request: HttpRequest,
   let melgan = app_state.model_cache.get_or_load_melgan(&melgan_model)
       .expect(&format!("Couldn't load melgan: {}", &melgan_model));
 
-  let wav_data = TacoMelModel::new().run_tts_encoded(&tacotron, &melgan, &encoded);
-
-  Ok(HttpResponse::build(StatusCode::OK)
-      .content_type("audio/wav")
-      .body(wav_data))
+  match TacoMelModel::new().run_tts_encoded(&tacotron, &melgan, &encoded) {
+    None => {
+      Ok(HttpResponse::build(StatusCode::TOO_MANY_REQUESTS)
+          .content_type("text/plain")
+          .body("The service is receiving too many requests. Although there are many worker \
+                 containers, model access is serialized on a per-container basis until the \
+                 segfaults are fixed."))
+    },
+    Some(wav_data) => {
+      Ok(HttpResponse::build(StatusCode::OK)
+          .content_type("audio/wav")
+          .body(wav_data))
+    },
+  }
 }
