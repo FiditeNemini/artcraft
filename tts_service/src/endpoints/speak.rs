@@ -13,7 +13,7 @@ use std::sync::Arc;
 use crate::AppState;
 use arpabet::Arpabet;
 use crate::text::text_to_arpabet_encoding;
-use crate::old_model::TacoMelModel;
+use crate::model::old_model::TacoMelModel;
 use crate::config::{Speaker, ModelPipeline};
 
 #[derive(Deserialize)]

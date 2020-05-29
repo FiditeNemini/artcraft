@@ -2,7 +2,7 @@ use hound::SampleFormat;
 use hound::WavSpec;
 use hound::WavWriter;
 
-use tch::CModule;
+use tch::{CModule, Kind};
 use tch::Tensor;
 use tch::nn::Module;
 use tch::nn::ModuleT;
@@ -59,7 +59,36 @@ impl TacoMelModel {
   }
 
   fn encoded_text_to_audio_signal(&self, tacotron: &ArpabetTacotronModel, melgan: &MelganModel, text_buffer: &Vec<i64>) -> Vec<i16> {
-    let mut mel_tensor = tacotron.encoded_arpabet_to_mel(&text_buffer);
+    let mut mel_tensor : Tensor = tacotron.encoded_arpabet_to_mel(&text_buffer);
+
+    // TODO: The following experiment demonstrates that Tacotron is the source of the segfaults
+    //  Tacotron must feature self-mutating features.
+    /*let length = 1 * 80 * 1000 * 4; // NB: Each float is four bytes
+    let data = [0].repeat(length);
+
+    let mut size = Vec::new();
+    size.push(1);
+    size.push(80);
+    size.push(1000);
+
+    let mut mel_tensor = Tensor::of_data_size(&data, &size, Kind::Float);
+
+    println!("Mel Tensor from tacotron: {:?}", mel_tensor);
+    println!("Mel Tensor from tacotron.dim: {:?}", mel_tensor.dim());
+    println!("Mel Tensor from tacotron.size: {:?}", mel_tensor.size());*/
+
+    /*
+    Text: test
+    Sentence Tokens: [Word("test")]
+    Encoded Text: [201, 24, 135, 22, 24, 254]
+    Text tensor: [201, 24, 135, 22, 24, 254]
+    Text tensor unsq: Tensor[[1, 6], Int64]
+    Warning! Reached max decoder steps
+    Mel Tensor from tacotron: Tensor[[1, 80, 1000], Float]
+    Mel Tensor from tacotron.dim: 3
+    Mel Tensor from tacotron.size: [1, 80, 1000]
+     */
+
     let audio_tensor = melgan.tacotron_mel_to_audio(&mel_tensor);
     Self::audio_tensor_to_audio_signal(audio_tensor)
   }

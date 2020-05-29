@@ -11,7 +11,6 @@ extern crate tch;
 pub mod config;
 pub mod endpoints;
 pub mod model;
-pub mod old_model;
 pub mod text;
 
 use std::env;
@@ -35,7 +34,7 @@ use crate::endpoints::speak::post_speak;
 use crate::endpoints::speakers::get_speakers;
 use crate::endpoints::tts::post_tts;
 use crate::model::model_cache::ModelCache;
-use crate::old_model::TacoMelModel;
+use crate::model::old_model::TacoMelModel;
 use crate::text::text_to_arpabet_encoding;
 
 const BIND_ADDRESS : &'static str = "BIND_ADDRESS";
@@ -146,6 +145,7 @@ async fn main() -> std::io::Result<()> {
       .app_data(arc.clone())
     )
     .bind(bind_address)?
+    .workers(5)
     .run()
     .await
 }
