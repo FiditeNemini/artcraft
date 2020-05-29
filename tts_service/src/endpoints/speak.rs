@@ -63,8 +63,11 @@ pub async fn post_speak(_request: HttpRequest,
 
       println!("Encoded Text: {:?}", encoded);
 
-      let tacotron = app_state.model_cache.get_or_load_arbabet_tacotron(&tacotron_model).unwrap();
-      let melgan = app_state.model_cache.get_or_load_melgan(&melgan_model).unwrap();
+      let tacotron = app_state.model_cache.get_or_load_arbabet_tacotron(&tacotron_model)
+          .expect(&format!("Couldn't load tacotron model: {}", tacotron_model));
+
+      let melgan = app_state.model_cache.get_or_load_melgan(&melgan_model)
+          .expect(&format!("Couldn't load melgan model: {}", melgan_model));
 
       let wav_data = TacoMelModel::new().run_tts_encoded(&tacotron, &melgan, &encoded);
 
