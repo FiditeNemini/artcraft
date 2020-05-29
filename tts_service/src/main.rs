@@ -42,6 +42,8 @@ const BIND_ADDRESS : &'static str = "BIND_ADDRESS";
 const ASSET_DIRECTORY : &'static str = "ASSET_DIRECTORY";
 const MODEL_CONFIG_FILE : &'static str = "MODEL_CONFIG_FILE";
 
+const DEFAULT_BIND_ADDRESS : &'static str = "0.0.0.0:12345";
+const DEFAULT_ASSET_DIRECTORY : &'static str = "/home/bt/dev/voder/tts_frontend/build";
 const DEFAULT_MODEL_CONFIG_FILE: &'static str = "models.toml";
 
 /// For query strings
@@ -58,14 +60,32 @@ pub struct AppState {
 
 #[actix_rt::main]
 async fn main() -> std::io::Result<()> {
-  println!("Loading configs.");
   std::env::set_var("RUST_LOG", "actix_web=info");
   env_logger::init();
+
+  let bind_address = match env::var(BIND_ADDRESS).as_ref().ok() {
+    Some(address) => address.to_string(),
+    None => {
+      println!("BIND_ADDRESS env var not set, defaulting to '{}'.", DEFAULT_BIND_ADDRESS);
+      DEFAULT_BIND_ADDRESS.to_string()
+    },
+  };
+
+  let asset_directory = match env::var(ASSET_DIRECTORY).as_ref().ok() {
+    Some(dir) => dir.to_string(),
+    None => {
+      println!("ASSET_DIRECTORY env var not set, defaulting to '{}'.", DEFAULT_ASSET_DIRECTORY);
+      DEFAULT_ASSET_DIRECTORY.to_string()
+    },
+  };
+
+  println!("Asset directory: {}", asset_directory);
+  println!("Bind address: {}", bind_address);
 
   let model_config_file = match env::var(MODEL_CONFIG_FILE).as_ref().ok() {
     Some(filename) => filename.to_string(),
     None => {
-      println!("MODEL_CONFIG_FILE not set, defaulting to '{}'.", DEFAULT_MODEL_CONFIG_FILE);
+      println!("MODEL_CONFIG_FILE env var not set, defaulting to '{}'.", DEFAULT_MODEL_CONFIG_FILE);
       DEFAULT_MODEL_CONFIG_FILE.to_string()
     },
   };
@@ -73,6 +93,7 @@ async fn main() -> std::io::Result<()> {
   println!("Using model config file: {}", model_config_file);
 
   let model_configs = ModelConfigs::load_from_file(&model_config_file);
+
   println!("Model configs: {:?}", model_configs);
 
   let model_cache = ModelCache::new(&model_configs.model_locations);
@@ -82,16 +103,7 @@ async fn main() -> std::io::Result<()> {
     model_cache,
   };
 
-  let bind_address = env::var(BIND_ADDRESS)
-      .expect(&format!("Must include {} env var, eg `0.0.0.0:8000`", BIND_ADDRESS));
-
-  let asset_directory = env::var(ASSET_DIRECTORY)
-      .expect(&format!("Must include {} env var", ASSET_DIRECTORY));
-
   let arc = web::Data::new(Arc::new(app_state));
-
-  println!("Asset directory: {}", asset_directory);
-  println!("Listening on: {}", bind_address);
 
   println!("Starting HTTP service.");
 
@@ -113,7 +125,8 @@ async fn main() -> std::io::Result<()> {
       .wrap(Logger::new(&log_format)
           .exclude("/liveness")
           .exclude("/readiness"))
-      .service(Files::new("/frontend", asset_directory.clone()).show_files_listing())
+      .service(Files::new("/frontend", asset_directory.clone())
+          .index_file("index.html"))
       .service(
         web::resource("/advanced_tts")
             .route(web::post().to(post_tts))
