@@ -26,10 +26,13 @@ RUN $HOME/.cargo/bin/cargo build --release
 # Final image
 FROM ubuntu:xenial
 WORKDIR /
-#COPY --from=build /tmp/target/debug/do_spaces_downloader /
-COPY --from=build /tmp/target/release/do_spaces_downloader /
+# SSL certs are required to make requests
+COPY --from=build /etc/ssl /etc/ssl
+# Shared libs are necessary
 COPY --from=build /lib/x86_64-linux-gnu/libssl.so.1.0.0 /lib/x86_64-linux-gnu
 COPY --from=build /lib/x86_64-linux-gnu/libcrypto.so.1.0.0 /lib/x86_64-linux-gnu
+#COPY --from=build /tmp/target/debug/do_spaces_downloader /
+COPY --from=build /tmp/target/release/do_spaces_downloader /
 
 CMD LD_LIBRARY_PATH=/usr/lib /do_spaces_downloader
 
