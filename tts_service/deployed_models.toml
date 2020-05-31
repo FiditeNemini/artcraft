@@ -17,11 +17,11 @@ melgan = "melgan_ljs-high-pitch_container.pt"
 
 [[model_locations]]
 model_type = "ArpabetTacotron"
-base_directory = "/data/models/tacotron2-nvidia/"
+base_directory = "/data/downloads/downloaded/models/tacotron2-nvidia/"
 
 [[model_locations]]
 model_type = "Melgan"
-base_directory = "/data/models/melgan-swpark/"
+base_directory = "/data/downloads/downloaded/models/melgan-swpark/"
 
 # --------------- Tacotron ---------------
 

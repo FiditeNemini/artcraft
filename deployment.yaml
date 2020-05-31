@@ -37,65 +37,44 @@ spec:
       imagePullSecrets:
       - name: regcred
       volumes:
-      - name: devfuse
+      - name: downloads
         hostPath:
-          path: /dev/fuse
-      - name: mntdatas3fs
-        # NB: Doesn't set an explicit hostpath because:
-        # error while creating mount source path '...': mkdir ...: file exists
-        #emptyDir: {}
-        # NB: *ACTUALLY*, the above error happened with emptyDir too. I don't know
-        # what the problem is. Additionally, I had to introduce '-o nonempty' as 
-        # described in the env vars section below.
-        hostPath:
-          path: /dev/fuse_data_mountpt
+          path: /downloads
           type: DirectoryOrCreate
       containers:
-      - name: s3fs
-        securityContext:
-          privileged: true
-          allowPrivilegeEscalation: true
-        # TODO: Find a pinned tag for this. `latest` is dangerous
-        # This is ancient (2~3 years old): https://github.com/panubo/docker-s3fs
-        # This is what it wraps, and it is very recent: https://github.com/s3fs-fuse/s3fs-fuse
-        image: panubo/s3fs:latest
-        # NB: This container spews logs, making Graphana hard to read. I can't figure
-        # out how to filter out by sidecar, label, app, whatever, so I'm disabling these
-        # logs outright. I do not anticipate a problem with s3fs that I'll need logs for.
-        # If I change my mind, I can remove the override setting in the future, because
-        # Docker has the correct entrypoint.
+      - name: downloader
+        image: docker.pkg.github.com/ml-applications/do-spaces-downloader/do-spaces-downloader:40349c08daf6
         command: ["/bin/sh"]
-        args: ["-c", "echo 'Disabled s3fs logging in k8s deployment for Graphana' && ./entry.sh 2> /dev/null"]
+        args: ["-c", "mkdir -p /data/downloads/downloaded; mkdir -p /data/downloads/tmp; ./do_spaces_downloader"]
+        #command: ["sleep"]
+        #args: ["300000"]
         volumeMounts:
-        - name: devfuse
-          mountPath: /dev/fuse
-        - name: mntdatas3fs
-          mountPath: /data:shared
+        - name: downloads
+          mountPath: /data/downloads
         env:
-        - name: AWS_S3_URL
-          value: "https://nyc3.digitaloceanspaces.com"
-        - name: AWS_STORAGE_BUCKET_NAME
-          value: "upload-models"
-        - name: AWS_ACCESS_KEY_ID
+        - name: ACCESS_KEY
           valueFrom:
             secretKeyRef:
               name: spaces-secrets
               key: aws_access_key_id
-        - name: AWS_SECRET_ACCESS_KEY
+        - name: SECRET_KEY
           valueFrom:
             secretKeyRef:
               name: spaces-secrets
               key: aws_secret_access_key
-        - name: AWS_S3_MOUNTPOINT
-          value: "/data"
-        - name: DEBUG
-          value: "true"
-          # Per this message,
-          #     "s3fs: MOUNTPOINT directory /data is not empty. if you are sure this is safe, can use
-          #      the 'nonempty' mount option"
-          # To appease 'hostMount' volume, I think this will work:
-        - name: S3FS_ARGS
-          value: "-o nonempty"
+        - name: BUCKET_NAME
+          value: "upload-models"
+        - name: REGION
+          value: "nyc3"
+        # NB: These filesystem paths are strage because they need to be on the
+        # same filesystem. Rust can't handle moving files between filesystems yet: 
+        # "Error: Invalid cross-device link (os error 18)"
+        - name: DOWNLOAD_DIR
+          value: "/data/downloads/downloaded"
+        - name: TEMP_DIR
+          value: "/data/downloads/tmp"
+        - name: MATCH_PATH
+          value: "models/"
       - name: tts
         # NB: Container builds are triggered by Github Actions
         #image: docker.pkg.github.com/echelon/voder/tts-service:374e1a477d90
@@ -107,17 +86,17 @@ spec:
         # The following image runs a rudimentary Arbapet engine, but doesn't
         # handle puncutation and tokenization
         #image: docker.pkg.github.com/ml-applications/voder/tts-service:6e766720ca7d
-        image: docker.pkg.github.com/ml-applications/voder/tts-service:b4dd56b65cb4
+        image: docker.pkg.github.com/ml-applications/voder/tts-service:5a7886520a05
         volumeMounts:
-        - name: mntdatas3fs
-          mountPath: /data:shared
+        - name: downloads
+          mountPath: /data/downloads
         env:
         - name: BIND_ADDRESS
           value: "0.0.0.0:12345"
         - name: ASSET_DIRECTORY
-          value: "/data/frontend/build"
+          value: "/data/downloads/downloaded/frontend/build" # TODO
         - name: MODEL_CONFIG_FILE
-          value: "/data/models/deployed_models.toml"
+          value: "/data/downloads/downloaded/models/deployed_models.toml"
         command: ["./launch.sh"]
         args: [""]
         #command: ["sleep"]
