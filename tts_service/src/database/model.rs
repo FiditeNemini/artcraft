@@ -37,7 +37,8 @@ impl Sentence {
 
   pub fn load(db_connector: &DatabaseConnector, limit: i64) -> AnyhowResult<Vec<Sentence>> {
     let pooled_connection : MysqlPooledConnection = db_connector.get_pooled_connection()?;
-    let results = sentences::table
+    let results = sentences::dsl::sentences
+        .limit(limit)
         .load::<Sentence>(&pooled_connection)?;
     Ok(results)
   }
