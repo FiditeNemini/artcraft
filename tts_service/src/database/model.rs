@@ -1,10 +1,11 @@
-use diesel::prelude::*;
-use crate::schema::sentences;
 use anyhow::Result as AnyhowResult;
-use crate::database::connector::DatabaseConnector;
-use chrono::NaiveDateTime;
+use chrono::{NaiveDateTime, DateTime, Utc};
+use crate::database::connector::{DatabaseConnector, MysqlPooledConnection};
+use crate::schema::sentences;
+//use crate::schema::sentences::dsl::*;
+use diesel::prelude::*;
 
-#[derive(Queryable)]
+#[derive(Queryable, Serialize, Debug)]
 pub struct Sentence {
   pub id: i32,
   pub sentence: String,
@@ -31,3 +32,14 @@ impl NewSentence {
     Ok(())
   }
 }
+
+impl Sentence {
+
+  pub fn load(db_connector: &DatabaseConnector, limit: i64) -> AnyhowResult<Vec<Sentence>> {
+    let pooled_connection : MysqlPooledConnection = db_connector.get_pooled_connection()?;
+    let results = sentences::table
+        .load::<Sentence>(&pooled_connection)?;
+    Ok(results)
+  }
+}
+

@@ -58,7 +58,7 @@ pub async fn legacy_get_speak(request: HttpRequest,
 
   info!("Speaker: {}, Text: {}", speaker, text);
 
-  let mut app_state = app_state.into_inner();
+  let app_state = app_state.into_inner();
 
   // NB: There is also `request.connection_info().remote()`, which contains
   // proxy info via X-Forwarded-For, etc.

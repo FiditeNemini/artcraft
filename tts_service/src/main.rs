@@ -46,6 +46,7 @@ use crate::model::model_cache::ModelCache;
 use crate::model::old_model::TacoMelModel;
 use crate::text::text_to_arpabet_encoding;
 use crate::database::connector::DatabaseConnector;
+use crate::endpoints::sentences::get_sentences;
 
 const BIND_ADDRESS : &'static str = "BIND_ADDRESS";
 const ASSET_DIRECTORY : &'static str = "ASSET_DIRECTORY";
@@ -208,6 +209,7 @@ async fn run_server(app_state: AppState, server_args: ServerArgs) -> std::io::Re
       .service(get_liveness)
       .service(get_models)
       .service(get_speakers)
+      .service(get_sentences)
       .app_data(arc.clone())
     )
     .bind(bind_address)?
