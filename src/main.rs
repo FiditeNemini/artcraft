@@ -67,7 +67,7 @@ impl BucketDownloader {
 		}
 
 		for object in objects.iter() {
-			info!("object: {:?}", object.key);
+			info!("all objects: {:?}", object.key);
 		}
 
 		let objects : Vec<Object> = objects.into_iter()
@@ -84,6 +84,7 @@ impl BucketDownloader {
 
   fn download_object(&self, object: &Object) -> AnyhowResult<()> {
     if self.object_already_downloaded(object) {
+			info!("Object already downloaded: {}", object.key);
 			return Ok(());
 		}
 		self.download_object_to_temp(object)?;
@@ -99,18 +100,23 @@ impl BucketDownloader {
 
 		let download_path = self.destination_directory.join(path);
 		if !download_path.exists() {
+			info!("Download path does not already exist: {:?}", download_path);
 			return false;
 		}
 
 		let file_hash = Self::hash_file_contents(&download_path).unwrap(); // TODO
 		let object_hash = Self::hash_object(object);
 
-		let exists = file_hash == object_hash;
-		exists
+		if file_hash == object_hash {
+			info!("File hash '{}' does not match object hash '{}", file_hash, object_hash);
+			return false;
+		}
+
+		true
 	}
 
 	fn download_object_to_temp(&self, object: &Object) -> AnyhowResult<()> {
-		info!("Downloading: {}", object.key);
+		info!("Downloading object: {}", object.key);
 
 		let temp_file_path = self.temp_download_path(object);
 		let mut temp_file = File::create(temp_file_path)?;
