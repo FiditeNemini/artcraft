@@ -57,7 +57,10 @@ impl ModelCache {
         lock.insert(filename.to_string(), arc.clone());
         Some(arc)
       },
-      Err(_) => None,
+      Err(e) => {
+        warn!("There was an error loading the model `{:?}`: {}", file_path, e);
+        None
+      },
     }
   }
 
@@ -84,7 +87,10 @@ impl ModelCache {
         lock.insert(filename.to_string(), arc.clone());
         Some(arc)
       },
-      Err(_) => None,
+      Err(e) => {
+        warn!("There was an error loading the model `{:?}`: {}", file_path, e);
+        None
+      },
     }
   }
 
