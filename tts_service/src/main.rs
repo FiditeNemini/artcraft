@@ -1,4 +1,5 @@
 #[macro_use] extern crate anyhow;
+#[macro_use] extern crate diesel;
 #[macro_use] extern crate log;
 #[macro_use] extern crate serde_derive;
 
@@ -10,8 +11,10 @@ extern crate serde;
 extern crate tch;
 
 pub mod config;
+pub mod database;
 pub mod endpoints;
 pub mod model;
+pub mod schema;
 pub mod text;
 
 use std::env;
@@ -27,7 +30,8 @@ use actix_files::Files;
 use actix_web::middleware::Logger;
 use actix_web::web::Json;
 use actix_web::{App, HttpResponse, HttpServer, web, http};
-use anyhow::Result as AnyhowResult;
+use anyhow::{Result as AnyhowResult, Error};
+use dotenv::dotenv;
 
 use crate::config::ModelConfigs;
 use crate::endpoints::index::get_root;
@@ -41,6 +45,7 @@ use crate::endpoints::tts::post_tts;
 use crate::model::model_cache::ModelCache;
 use crate::model::old_model::TacoMelModel;
 use crate::text::text_to_arpabet_encoding;
+use crate::database::connector::DatabaseConnector;
 
 const BIND_ADDRESS : &'static str = "BIND_ADDRESS";
 const ASSET_DIRECTORY : &'static str = "ASSET_DIRECTORY";
@@ -64,6 +69,7 @@ pub struct TtsQueryRequest {
 pub struct AppState {
   pub model_configs: ModelConfigs,
   pub model_cache: ModelCache,
+  pub database_connector: DatabaseConnector,
 }
 
 /** Startup parameters for the server. */
@@ -130,9 +136,19 @@ pub fn main() -> AnyhowResult<()> {
 
   let model_cache = ModelCache::new(&model_configs.model_locations);
 
+  let connection_string = "mysql://root:root@localhost/mumble";
+  let mut db_connector = DatabaseConnector::create(connection_string);
+
+  info!("Connecting to database...");
+  match db_connector.connect() {
+    Ok(_) => info!("Connected successfully"),
+    Err(_) => error!("Could not connect to database."),
+  }
+
   let app_state = AppState {
     model_configs,
     model_cache,
+    database_connector: db_connector,
   };
 
   let server_args = ServerArgs {
