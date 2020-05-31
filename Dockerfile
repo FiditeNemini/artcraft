@@ -17,6 +17,7 @@ RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs \
 COPY Cargo.lock . 
 COPY Cargo.toml .
 COPY src/ ./src
+COPY script/ ./script
 
 RUN $HOME/.cargo/bin/cargo fetch
 
@@ -33,6 +34,7 @@ COPY --from=build /lib/x86_64-linux-gnu/libssl.so.1.0.0 /lib/x86_64-linux-gnu
 COPY --from=build /lib/x86_64-linux-gnu/libcrypto.so.1.0.0 /lib/x86_64-linux-gnu
 #COPY --from=build /tmp/target/debug/do_spaces_downloader /
 COPY --from=build /tmp/target/release/do_spaces_downloader /
+COPY --from=build /tmp/script /
 
 CMD LD_LIBRARY_PATH=/usr/lib /do_spaces_downloader
 
