@@ -15,6 +15,9 @@ pub mod model;
 pub mod text;
 
 use std::env;
+use std::fmt::Debug;
+use std::fmt::Display;
+use std::str::FromStr;
 use std::sync::Arc;
 
 use arpabet::Arpabet;
@@ -24,6 +27,7 @@ use actix_files::Files;
 use actix_web::middleware::Logger;
 use actix_web::web::Json;
 use actix_web::{App, HttpResponse, HttpServer, web, http};
+use anyhow::Result as AnyhowResult;
 
 use crate::config::ModelConfigs;
 use crate::endpoints::index::get_root;
@@ -42,11 +46,13 @@ const BIND_ADDRESS : &'static str = "BIND_ADDRESS";
 const ASSET_DIRECTORY : &'static str = "ASSET_DIRECTORY";
 const MODEL_CONFIG_FILE : &'static str = "MODEL_CONFIG_FILE";
 const ENV_RUST_LOG : &'static str = "RUST_LOG";
+const ENV_NUMBER_WORKERS : &'static str = "NUM_WORKERS";
 
 const DEFAULT_BIND_ADDRESS : &'static str = "0.0.0.0:12345";
 const DEFAULT_ASSET_DIRECTORY : &'static str = "/home/bt/dev/voder/tts_frontend/build";
 const DEFAULT_MODEL_CONFIG_FILE: &'static str = "models.toml";
 const DEFAULT_RUST_LOG: &'static str = "debug,actix_web=info";
+const DEFAULT_NUM_WORKERS : usize = 4;
 
 /// For query strings
 #[derive(Deserialize)]
@@ -60,8 +66,43 @@ pub struct AppState {
   pub model_cache: ModelCache,
 }
 
-#[actix_rt::main]
-async fn main() -> std::io::Result<()> {
+/** Startup parameters for the server. */
+pub struct ServerArgs {
+  pub bind_address: String,
+  pub num_workers: usize,
+  pub asset_directory: String,
+}
+
+fn get_env_string(env_name: &str, default: &str) -> String {
+  match env::var(env_name).as_ref().ok() {
+    Some(s) => s.to_string(),
+    None => {
+      warn!("Env var '{}' not supplied. Using default '{}'.", env_name, default);
+      default.to_string()
+    },
+  }
+}
+
+// the trait `std::error::Error` is not implemented for `<T as std::str::FromStr>::Err`
+fn get_env_num<T>(env_name: &str, default: T) -> AnyhowResult<T>
+  where T: FromStr + Display,
+        T::Err: Debug
+{
+  match env::var(env_name).as_ref().ok() {
+    None => {
+      warn!("Env var '{}' not supplied. Using default '{}'.", env_name, default);
+      Ok(default)
+    },
+    Some(val) => {
+      match val.parse::<T>() {
+        Err(e) => bail!("Can't parse value '{:?}'. Error: {:?}", val, e),
+        Ok(val) => Ok(val),
+      }
+    },
+  }
+}
+
+pub fn main() -> AnyhowResult<()> {
   if env::var(ENV_RUST_LOG)
       .as_ref()
       .ok()
@@ -74,33 +115,13 @@ async fn main() -> std::io::Result<()> {
 
   env_logger::init();
 
-  let bind_address = match env::var(BIND_ADDRESS).as_ref().ok() {
-    Some(address) => address.to_string(),
-    None => {
-      warn!("BIND_ADDRESS env var not set, defaulting to '{}'.", DEFAULT_BIND_ADDRESS);
-      DEFAULT_BIND_ADDRESS.to_string()
-    },
-  };
-
-  let asset_directory = match env::var(ASSET_DIRECTORY).as_ref().ok() {
-    Some(dir) => dir.to_string(),
-    None => {
-      warn!("ASSET_DIRECTORY env var not set, defaulting to '{}'.", DEFAULT_ASSET_DIRECTORY);
-      DEFAULT_ASSET_DIRECTORY.to_string()
-    },
-  };
+  let bind_address = get_env_string(BIND_ADDRESS, DEFAULT_BIND_ADDRESS);
+  let asset_directory = get_env_string(ASSET_DIRECTORY, DEFAULT_ASSET_DIRECTORY);
+  let model_config_file = get_env_string(MODEL_CONFIG_FILE, DEFAULT_MODEL_CONFIG_FILE);
+  let num_workers = get_env_num::<usize>(ENV_NUMBER_WORKERS, DEFAULT_NUM_WORKERS)?;
 
   info!("Asset directory: {}", asset_directory);
   info!("Bind address: {}", bind_address);
-
-  let model_config_file = match env::var(MODEL_CONFIG_FILE).as_ref().ok() {
-    Some(filename) => filename.to_string(),
-    None => {
-      warn!("MODEL_CONFIG_FILE env var not set, defaulting to '{}'.", DEFAULT_MODEL_CONFIG_FILE);
-      DEFAULT_MODEL_CONFIG_FILE.to_string()
-    },
-  };
-
   info!("Using model config file: {}", model_config_file);
 
   let model_configs = ModelConfigs::load_from_file(&model_config_file);
@@ -114,11 +135,26 @@ async fn main() -> std::io::Result<()> {
     model_cache,
   };
 
+  let server_args = ServerArgs {
+    bind_address,
+    num_workers,
+    asset_directory,
+  };
+
+  run_server(app_state, server_args)?;
+  Ok(())
+}
+
+#[actix_rt::main]
+async fn run_server(app_state: AppState, server_args: ServerArgs) -> std::io::Result<()> {
   let arc = web::Data::new(Arc::new(app_state));
 
   info!("Starting HTTP service.");
 
   let log_format = "[%{HOSTNAME}e] %a \"%r\" %s %b \"%{Referer}i\" \"%{User-Agent}i\" %T";
+
+  let asset_directory = server_args.asset_directory.clone();
+  let bind_address = server_args.bind_address.clone();
 
   HttpServer::new(move || App::new()
       .wrap(Cors::new()
@@ -157,7 +193,7 @@ async fn main() -> std::io::Result<()> {
       .app_data(arc.clone())
     )
     .bind(bind_address)?
-    .workers(5)
+    .workers(server_args.num_workers)
     .run()
     .await
 }
