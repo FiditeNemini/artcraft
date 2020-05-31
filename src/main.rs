@@ -107,6 +107,8 @@ impl BucketDownloader {
 		let file_hash = Self::hash_file_contents(&download_path).unwrap(); // TODO
 		let object_hash = Self::hash_object(object);
 
+		// NB: Multipart-uploaded objects do not have an accurate md5 hash.
+		// Read more: https://stackoverflow.com/a/29350548
 		if !file_hash.eq_ignore_ascii_case(&object_hash) {
 			info!("File hash '{}' does not match object hash '{}' for file {}",
 						file_hash, object_hash, object.key);
