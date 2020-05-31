@@ -1,7 +1,8 @@
-extern crate actix_web;
 #[macro_use] extern crate anyhow;
+#[macro_use] extern crate log;
 #[macro_use] extern crate serde_derive;
 
+extern crate actix_web;
 extern crate actix_files;
 extern crate arpabet;
 extern crate hound;
@@ -40,10 +41,12 @@ use crate::text::text_to_arpabet_encoding;
 const BIND_ADDRESS : &'static str = "BIND_ADDRESS";
 const ASSET_DIRECTORY : &'static str = "ASSET_DIRECTORY";
 const MODEL_CONFIG_FILE : &'static str = "MODEL_CONFIG_FILE";
+const ENV_RUST_LOG : &'static str = "RUST_LOG";
 
 const DEFAULT_BIND_ADDRESS : &'static str = "0.0.0.0:12345";
 const DEFAULT_ASSET_DIRECTORY : &'static str = "/home/bt/dev/voder/tts_frontend/build";
 const DEFAULT_MODEL_CONFIG_FILE: &'static str = "models.toml";
+const DEFAULT_RUST_LOG: &'static str = "debug,actix_web=info";
 
 /// For query strings
 #[derive(Deserialize)]
@@ -59,13 +62,22 @@ pub struct AppState {
 
 #[actix_rt::main]
 async fn main() -> std::io::Result<()> {
-  std::env::set_var("RUST_LOG", "actix_web=info");
+  if env::var(ENV_RUST_LOG)
+      .as_ref()
+      .ok()
+      .is_none()
+  {
+    println!("Setting default logging level to \"{}\", override with env var {}.",
+      DEFAULT_RUST_LOG, ENV_RUST_LOG);
+    std::env::set_var(ENV_RUST_LOG, DEFAULT_RUST_LOG);
+  }
+
   env_logger::init();
 
   let bind_address = match env::var(BIND_ADDRESS).as_ref().ok() {
     Some(address) => address.to_string(),
     None => {
-      println!("BIND_ADDRESS env var not set, defaulting to '{}'.", DEFAULT_BIND_ADDRESS);
+      warn!("BIND_ADDRESS env var not set, defaulting to '{}'.", DEFAULT_BIND_ADDRESS);
       DEFAULT_BIND_ADDRESS.to_string()
     },
   };
@@ -73,27 +85,27 @@ async fn main() -> std::io::Result<()> {
   let asset_directory = match env::var(ASSET_DIRECTORY).as_ref().ok() {
     Some(dir) => dir.to_string(),
     None => {
-      println!("ASSET_DIRECTORY env var not set, defaulting to '{}'.", DEFAULT_ASSET_DIRECTORY);
+      warn!("ASSET_DIRECTORY env var not set, defaulting to '{}'.", DEFAULT_ASSET_DIRECTORY);
       DEFAULT_ASSET_DIRECTORY.to_string()
     },
   };
 
-  println!("Asset directory: {}", asset_directory);
-  println!("Bind address: {}", bind_address);
+  info!("Asset directory: {}", asset_directory);
+  info!("Bind address: {}", bind_address);
 
   let model_config_file = match env::var(MODEL_CONFIG_FILE).as_ref().ok() {
     Some(filename) => filename.to_string(),
     None => {
-      println!("MODEL_CONFIG_FILE env var not set, defaulting to '{}'.", DEFAULT_MODEL_CONFIG_FILE);
+      warn!("MODEL_CONFIG_FILE env var not set, defaulting to '{}'.", DEFAULT_MODEL_CONFIG_FILE);
       DEFAULT_MODEL_CONFIG_FILE.to_string()
     },
   };
 
-  println!("Using model config file: {}", model_config_file);
+  info!("Using model config file: {}", model_config_file);
 
   let model_configs = ModelConfigs::load_from_file(&model_config_file);
 
-  println!("Model configs: {:?}", model_configs);
+  info!("Model configs: {:?}", model_configs);
 
   let model_cache = ModelCache::new(&model_configs.model_locations);
 
@@ -104,7 +116,7 @@ async fn main() -> std::io::Result<()> {
 
   let arc = web::Data::new(Arc::new(app_state));
 
-  println!("Starting HTTP service.");
+  info!("Starting HTTP service.");
 
   let log_format = "[%{HOSTNAME}e] %a \"%r\" %s %b \"%{Referer}i\" \"%{User-Agent}i\" %T";
 

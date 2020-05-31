@@ -48,7 +48,7 @@ pub async fn legacy_get_speak(_request: HttpRequest,
     Some(s) => s.to_string(),
   };
 
-  println!("Speaker: {}, Text: {}", speaker, text);
+  info!("Speaker: {}, Text: {}", speaker, text);
 
   let mut app_state = app_state.into_inner();
 
@@ -73,8 +73,8 @@ pub async fn legacy_get_speak(_request: HttpRequest,
           .map(|s| s.clone())
           .expect("TODO ERROR HANDLING");
 
-      //println!("Tacotron Model: {}", tacotron_model);
-      //println!("Melgan Model: {}", melgan_model);
+      debug!("Tacotron Model: {}", tacotron_model);
+      debug!("Melgan Model: {}", melgan_model);
 
       let arpabet = Arpabet::load_cmudict();
       let encoded = text_to_arpabet_encoding(arpabet, &text);
@@ -82,6 +82,7 @@ pub async fn legacy_get_speak(_request: HttpRequest,
       let tacotron = match app_state.model_cache.get_or_load_arbabet_tacotron(&tacotron_model) {
         Some(model) => model,
         None => {
+          warn!("Couldn't load tacotron model: {}", tacotron_model);
           return Ok(HttpResponse::build(StatusCode::INTERNAL_SERVER_ERROR)
               .content_type("text/plain")
               .body("Couldn't load model."));
@@ -91,6 +92,7 @@ pub async fn legacy_get_speak(_request: HttpRequest,
       let melgan = match app_state.model_cache.get_or_load_melgan(&melgan_model) {
         Some(model) => model,
         None => {
+          warn!("Couldn't load melgan model: {}", melgan_model);
           return Ok(HttpResponse::build(StatusCode::INTERNAL_SERVER_ERROR)
               .content_type("text/plain")
               .body("Could not load model."));
