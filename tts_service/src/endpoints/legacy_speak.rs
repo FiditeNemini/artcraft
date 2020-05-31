@@ -93,7 +93,7 @@ pub async fn legacy_get_speak(_request: HttpRequest,
         None => {
           return Ok(HttpResponse::build(StatusCode::INTERNAL_SERVER_ERROR)
               .content_type("text/plain")
-              .body("Couldn't load model."));
+              .body("Could not load model."));
         },
       };
 
