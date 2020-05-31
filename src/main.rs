@@ -107,8 +107,9 @@ impl BucketDownloader {
 		let file_hash = Self::hash_file_contents(&download_path).unwrap(); // TODO
 		let object_hash = Self::hash_object(object);
 
-		if file_hash == object_hash {
-			info!("File hash '{}' does not match object hash '{}", file_hash, object_hash);
+		if !file_hash.eq_ignore_ascii_case(&object_hash) {
+			info!("File hash '{}' does not match object hash '{}' for file {}",
+						file_hash, object_hash, object.key);
 			return false;
 		}
 
