@@ -8,6 +8,7 @@ use chrono::NaiveDateTime;
 pub struct Sentence {
   pub id: i32,
   pub sentence: String,
+  pub speaker: String,
   pub ip_address: String,
   pub created_at: NaiveDateTime,
 }
@@ -16,6 +17,7 @@ pub struct Sentence {
 #[table_name="sentences"]
 pub struct NewSentence {
   pub sentence: String,
+  pub speaker: String,
   pub ip_address: String,
 }
 

@@ -68,6 +68,7 @@ pub async fn legacy_get_speak(request: HttpRequest,
 
   let sentence_record = NewSentence {
     sentence: text.clone(),
+    speaker: speaker.clone(),
     ip_address: ip_address,
   };
 
