@@ -8,5 +8,6 @@ mkdir -p "${TEMP_DIR}"
 
 while :; do
   ./do_spaces_downloader
+  echo "Sleeping for ${SLEEP_TIMEOUT} seconds at $(date)"
   sleep "${SLEEP_TIMEOUT}"
 done
