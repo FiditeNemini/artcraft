@@ -42,7 +42,13 @@ COPY --from=build /tmp/target/release/tts_service /
 COPY --from=build /tmp/libtorch/lib /usr/lib
 COPY --from=build /tmp/script /
 
+# Mysql client libraries
+COPY --from=build /lib/x86_64-linux-gnu/libmysqlclient.so         /lib/x86_64-linux-gnu
+COPY --from=build /lib/x86_64-linux-gnu/libmysqlclient.so.20      /lib/x86_64-linux-gnu
+COPY --from=build /lib/x86_64-linux-gnu/libmysqlclient.so.20.3.17 /lib/x86_64-linux-gnu
+
 RUN ldd tts_service
+
 EXPOSE 8080
 CMD LD_LIBRARY_PATH=/usr/lib /tts_service
 
