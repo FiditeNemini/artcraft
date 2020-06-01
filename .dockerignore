@@ -13,6 +13,8 @@ tacotron_melgan/
 tacotron_tensorflow/
 target/
 tmp/
+tts_frontend/
+tts_frontend_old/
 voice_conversion_sidecar/
 
 # Ignore Files

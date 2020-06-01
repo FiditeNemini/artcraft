@@ -7,6 +7,7 @@ RUN apt-get update \
     && apt-get install -y \
         build-essential \
         curl \
+        libmysqlclient-dev \
         libssl-dev \
         pkg-config \
         unzip \
