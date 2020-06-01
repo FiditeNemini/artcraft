@@ -43,7 +43,7 @@ COPY --from=build /tmp/libtorch/lib /usr/lib
 COPY --from=build /tmp/script /
 
 # Mysql client libraries
-COPY --from=build /lib/x86_64-linux-gnu/libmysqlclient.so         /lib/x86_64-linux-gnu
+#COPY --from=build /lib/x86_64-linux-gnu/libmysqlclient.so         /lib/x86_64-linux-gnu
 COPY --from=build /lib/x86_64-linux-gnu/libmysqlclient.so.20      /lib/x86_64-linux-gnu
 COPY --from=build /lib/x86_64-linux-gnu/libmysqlclient.so.20.3.17 /lib/x86_64-linux-gnu
 
