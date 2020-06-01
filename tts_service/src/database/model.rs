@@ -39,6 +39,7 @@ impl Sentence {
     let pooled_connection : MysqlPooledConnection = db_connector.get_pooled_connection()?;
     let results = sentences::dsl::sentences
         .limit(limit)
+        .order(sentences::dsl::id.desc())
         .load::<Sentence>(&pooled_connection)?;
     Ok(results)
   }

@@ -21,7 +21,7 @@ pub async fn get_sentences(
 ) -> Either<Json<SentencesResult>, std::io::Result<HttpResponse>>{
   let app_state = app_state.into_inner();
 
-  let limit = 100;
+  let limit = 1000;
   let sentences = match Sentence::load(&app_state.database_connector, limit) {
     Err(e) => {
       error!("Couldn't query database for sentences: {:?}", e);
