@@ -9,6 +9,7 @@ RUN apt-get update \
         curl \
         libmysqlclient-dev \
         libssl-dev \
+        libssl1.0.0 \
         pkg-config \
         unzip \
         wget
@@ -42,11 +43,15 @@ COPY --from=build /tmp/target/release/tts_service /
 COPY --from=build /tmp/libtorch/lib /usr/lib
 COPY --from=build /tmp/script /
 
-# Mysql client libraries
-#COPY --from=build /lib/x86_64-linux-gnu/libmysqlclient.so         /lib/x86_64-linux-gnu
-COPY --from=build /lib/x86_64-linux-gnu/libmysqlclient.so.20      /lib/x86_64-linux-gnu
-COPY --from=build /lib/x86_64-linux-gnu/libmysqlclient.so.20.3.17 /lib/x86_64-linux-gnu
+# SSL certs are required for crypto
+COPY --from=build /etc/ssl /etc/ssl
 
+# Required dynamically linked libraries
+COPY --from=build /usr/lib/x86_64-linux-gnu/libmysqlclient.* /lib/x86_64-linux-gnu/
+COPY --from=build /lib/x86_64-linux-gnu/libssl.*             /lib/x86_64-linux-gnu/
+COPY --from=build /lib/x86_64-linux-gnu/libcrypto.*          /lib/x86_64-linux-gnu/
+
+# Make sure all the links resolve
 RUN ldd tts_service
 
 EXPOSE 8080
