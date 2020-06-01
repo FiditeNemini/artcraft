@@ -4,7 +4,8 @@ name = "Donald Trump"
 slug = "trump"
 model_pipeline = "ArpabetTacotronMelgan"
 tacotron = "tacotron2_trump_txlearn_ljs_arpabet_2020-05-25_chkpt26500.jit"
-melgan = "melgan_trump-txlearn-2020.05.05_13675.jit"
+#melgan = "melgan_trump-txlearn-2020.05.05_13675.jit"
+melgan = "melgan_trump_txlearn_2020-05-30_steno_chkpt9800.torchjit"
 
 [[speakers]]
 name = "High-pitched Linda Johnson"
@@ -133,6 +134,10 @@ description = "Latest LJS transfer learned Trump."
 [[melgan]]
 file_path = "melgan_trump-txlearn-2020.05.05_13675.jit"
 description = "Latest LJS transfer learned Trump."
+
+[[melgan]]
+file_path = "melgan_trump_txlearn_2020-05-30_steno_chkpt9800.torchjit"
+description = "Trump steno data"
 
 [[melgan]]
 file_path = "melgan_ljs-high-pitch_container.pt"
