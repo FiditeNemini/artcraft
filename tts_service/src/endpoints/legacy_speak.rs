@@ -8,10 +8,11 @@ use actix_web::{
 use std::sync::Arc;
 use crate::AppState;
 use arpabet::Arpabet;
-use crate::text::text_to_arpabet_encoding;
+use crate::text::arpabet::text_to_arpabet_encoding;
 use crate::config::ModelPipeline;
 use crate::model::old_model::TacoMelModel;
 use crate::database::model::NewSentence;
+use crate::text::cleaners::clean_text;
 
 /// Example request: v=trump&vol=3&s=this is funny isn't it
 #[derive(Deserialize)]
@@ -105,8 +106,10 @@ pub async fn legacy_get_speak(request: HttpRequest,
       debug!("Tacotron Model: {}", tacotron_model);
       debug!("Melgan Model: {}", melgan_model);
 
+      let cleaned_text = clean_text(&text);
+
       let arpabet = Arpabet::load_cmudict();
-      let encoded = text_to_arpabet_encoding(arpabet, &text);
+      let encoded = text_to_arpabet_encoding(arpabet, &cleaned_text);
 
       let tacotron = match app_state.model_cache.get_or_load_arbabet_tacotron(&tacotron_model) {
         Some(model) => model,

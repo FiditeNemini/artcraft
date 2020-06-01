@@ -11,9 +11,10 @@ use actix_web::{
 use std::sync::Arc;
 use crate::AppState;
 use arpabet::Arpabet;
-use crate::text::text_to_arpabet_encoding;
+use crate::text::arpabet::text_to_arpabet_encoding;
 use crate::model::old_model::TacoMelModel;
 use crate::config::ModelPipeline;
+use crate::text::cleaners::clean_text;
 
 #[derive(Deserialize)]
 pub struct SpeakRequest {
@@ -57,8 +58,10 @@ pub async fn post_speak(_request: HttpRequest,
       println!("Melgan Model: {}", melgan_model);
       println!("Text: {}", text);
 
+      let cleaned_text = clean_text(&text);
+
       let arpabet = Arpabet::load_cmudict();
-      let encoded = text_to_arpabet_encoding(arpabet, &text);
+      let encoded = text_to_arpabet_encoding(arpabet, &cleaned_text);
 
       println!("Encoded Text: {:?}", encoded);
 

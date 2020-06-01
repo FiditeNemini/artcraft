@@ -8,11 +8,12 @@ use actix_web::{
   HttpResponse,
 };
 
-use std::sync::Arc;
-use crate::AppState;
 use arpabet::Arpabet;
-use crate::text::text_to_arpabet_encoding;
+use crate::AppState;
 use crate::model::old_model::TacoMelModel;
+use crate::text::arpabet::text_to_arpabet_encoding;
+use crate::text::cleaners::clean_text;
+use std::sync::Arc;
 
 /// For JSON payloads
 #[derive(Deserialize)]
@@ -41,14 +42,16 @@ pub async fn post_tts(_request: HttpRequest,
       .unwrap_or("/home/bt/dev/tacotron-melgan/melgan_trump-txlearn-2020.05.05_13675.jit".to_string());
 
   let text = query.text.to_string();
-  println!("Tacotron Model: {}", tacotron_model);
-  println!("Melgan Model: {}", melgan_model);
-  println!("Text: {}", text);
+  debug!("Tacotron Model: {}", tacotron_model);
+  debug!("Melgan Model: {}", melgan_model);
+  debug!("Text: {}", text);
+
+  let cleaned_text = clean_text(&text);
 
   let arpabet = Arpabet::load_cmudict();
-  let encoded = text_to_arpabet_encoding(arpabet, &text);
+  let encoded = text_to_arpabet_encoding(arpabet, &cleaned_text);
 
-  println!("Encoded Text: {:?}", encoded);
+  debug!("Encoded Text: {:?}", encoded);
 
   let app_state = app_state.into_inner();
 
