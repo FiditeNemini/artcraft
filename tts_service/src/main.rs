@@ -45,14 +45,16 @@ use crate::endpoints::sentences::get_sentences;
 const BIND_ADDRESS : &'static str = "BIND_ADDRESS";
 const ASSET_DIRECTORY : &'static str = "ASSET_DIRECTORY";
 const MODEL_CONFIG_FILE : &'static str = "MODEL_CONFIG_FILE";
-const ENV_RUST_LOG : &'static str = "RUST_LOG";
+const ENV_DATABASE_URL : &'static str = "DATABASE_URL";
 const ENV_NUMBER_WORKERS : &'static str = "NUM_WORKERS";
+const ENV_RUST_LOG : &'static str = "RUST_LOG";
 
 const DEFAULT_BIND_ADDRESS : &'static str = "0.0.0.0:12345";
 const DEFAULT_ASSET_DIRECTORY : &'static str = "/home/bt/dev/voder/tts_frontend/build";
 const DEFAULT_MODEL_CONFIG_FILE: &'static str = "models.toml";
 const DEFAULT_RUST_LOG: &'static str = "debug,actix_web=info";
 const DEFAULT_NUM_WORKERS : usize = 4;
+const DEFAULT_DATABASE_URL : &'static str = "mysql://root:root@localhost/mumble";
 
 /** State that is easy to pass between handlers. */
 pub struct AppState {
@@ -114,6 +116,7 @@ pub fn main() -> AnyhowResult<()> {
   let asset_directory = get_env_string(ASSET_DIRECTORY, DEFAULT_ASSET_DIRECTORY);
   let model_config_file = get_env_string(MODEL_CONFIG_FILE, DEFAULT_MODEL_CONFIG_FILE);
   let num_workers = get_env_num::<usize>(ENV_NUMBER_WORKERS, DEFAULT_NUM_WORKERS)?;
+  let database_url = get_env_string(ENV_DATABASE_URL, DEFAULT_DATABASE_URL);
 
   info!("Asset directory: {}", asset_directory);
   info!("Bind address: {}", bind_address);
@@ -125,10 +128,9 @@ pub fn main() -> AnyhowResult<()> {
 
   let model_cache = ModelCache::new(&model_configs.model_locations);
 
-  let connection_string = "mysql://root:root@localhost/mumble";
-  let mut db_connector = DatabaseConnector::create(connection_string);
-
   info!("Connecting to database...");
+
+  let mut db_connector = DatabaseConnector::create(&database_url);
   match db_connector.connect() {
     Ok(_) => info!("Connected successfully"),
     Err(_) => error!("Could not connect to database."),
