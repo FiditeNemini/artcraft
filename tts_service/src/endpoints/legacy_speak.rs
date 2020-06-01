@@ -59,9 +59,16 @@ pub async fn legacy_get_speak(request: HttpRequest,
 
   // NB: There is also `request.connection_info().remote()`, which contains
   // proxy info via X-Forwarded-For, etc.
-  let ip_address = request.peer_addr()
+  /*let ip_address = request.peer_addr()
       .map(|socket| socket.to_string())
-      .unwrap_or("".to_string());
+      .unwrap_or("".to_string());*/
+
+  // NB: Actually, we want the X-Forwarded-For IP address, since otherwise
+  // we get the load balancer.
+  let ip_address = request.connection_info()
+      .remote()
+      .unwrap_or("")
+      .to_string();
 
   let sentence_record = NewSentence {
     sentence: text.clone(),
