@@ -2,7 +2,6 @@ use anyhow::Result;
 use tch::CModule;
 use tch::Tensor;
 use tch::nn::Module;
-use tch::nn::ModuleT;
 use std::path::{Path, PathBuf};
 
 /// Holds the loaded pytorch JIT model

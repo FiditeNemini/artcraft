@@ -1,10 +1,10 @@
 use crate::model::model_container::ModelContainer;
 use anyhow::Result;
-use tch::Tensor;
 use std::path::Path;
-use std::sync::{Mutex, MutexGuard, TryLockError};
-use std::time::Duration;
+use std::sync::Mutex;
 use std::thread;
+use std::time::Duration;
+use tch::Tensor;
 
 pub struct ArpabetTacotronModel {
   model_container: Mutex<ModelContainer>,

@@ -6,7 +6,6 @@ use actix_web::web::{
 use actix_web::{
   HttpRequest,
   HttpResponse,
-  get,
 };
 
 use std::sync::Arc;
@@ -51,7 +50,7 @@ pub async fn post_tts(_request: HttpRequest,
 
   println!("Encoded Text: {:?}", encoded);
 
-  let mut app_state = app_state.into_inner();
+  let app_state = app_state.into_inner();
 
   let tacotron = app_state.model_cache.get_or_load_arbabet_tacotron(&tacotron_model)
       .expect(&format!("Couldn't load tacotron: {}", &tacotron_model));

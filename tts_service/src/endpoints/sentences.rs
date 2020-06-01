@@ -3,13 +3,11 @@ use actix_web::web::{
   Json,
 };
 use actix_web::http::StatusCode;
-use actix_web::{HttpRequest, get, HttpResponse, Responder, Either};
+use actix_web::{HttpRequest, get, HttpResponse, Either};
 
 use std::sync::Arc;
 use crate::AppState;
-use crate::config::{ModelConfigs, Speaker};
 use crate::database::model::Sentence;
-use anyhow::Error;
 
 #[derive(Serialize, Debug)]
 pub struct SentencesResult {

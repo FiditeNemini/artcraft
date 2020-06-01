@@ -9,7 +9,7 @@ use actix_web::{
 
 use std::sync::Arc;
 use crate::AppState;
-use crate::config::{ModelConfigs, Speaker};
+use crate::config::Speaker;
 
 #[derive(Serialize, Debug, Clone)]
 pub struct SpeakersResult {

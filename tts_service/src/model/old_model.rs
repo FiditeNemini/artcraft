@@ -1,28 +1,16 @@
 use hound::SampleFormat;
 use hound::WavSpec;
 use hound::WavWriter;
-
-use tch::{CModule, Kind};
-use tch::Tensor;
-use tch::nn::Module;
-use tch::nn::ModuleT;
-
-use std::io::Cursor;
 use std::io::BufWriter;
-
+use std::io::Cursor;
+use tch::Tensor;
 use crate::model::arpabet_tacotron_model::ArpabetTacotronModel;
-use crate::model::model_container::ModelContainer;
 use crate::model::melgan_model::MelganModel;
 
 pub struct TacoMelModel {
 }
 
 impl TacoMelModel {
-  fn load_model_file(filename: &str) -> CModule {
-    println!("Loading model: {}", filename);
-    CModule::load(filename).unwrap()
-  }
-
   pub fn new() -> Self {
     Self {}
   }
@@ -63,7 +51,7 @@ impl TacoMelModel {
   }
 
   fn encoded_text_to_audio_signal(&self, tacotron: &ArpabetTacotronModel, melgan: &MelganModel, text_buffer: &Vec<i64>) -> Option<Vec<i16>> {
-    let mut mel_tensor = match tacotron.encoded_arpabet_to_mel(&text_buffer) {
+    let mel_tensor = match tacotron.encoded_arpabet_to_mel(&text_buffer) {
       None => return None,
       Some(mel) => mel,
     };
@@ -102,14 +90,10 @@ impl TacoMelModel {
   }
 
   fn audio_tensor_to_audio_signal(mel: Tensor) -> Vec<i16> {
-    let mut flat_audio_tensor = mel.squeeze();
+    let flat_audio_tensor = mel.squeeze();
 
     let length = flat_audio_tensor.size1().unwrap() as usize;
-    let mut data : Vec<f32> = Vec::with_capacity(length);
-
-    for i in 0 .. length {
-      data.push(0.0f32);
-    }
+    let mut data = [0.0f32].repeat(length);
 
     flat_audio_tensor.copy_data(data.as_mut_slice(), length as usize);
 

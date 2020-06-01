@@ -6,7 +6,6 @@ use actix_web::web::{
 use actix_web::{
   HttpRequest,
   HttpResponse,
-  get,
 };
 
 use std::sync::Arc;
@@ -14,7 +13,7 @@ use crate::AppState;
 use arpabet::Arpabet;
 use crate::text::text_to_arpabet_encoding;
 use crate::model::old_model::TacoMelModel;
-use crate::config::{Speaker, ModelPipeline};
+use crate::config::ModelPipeline;
 
 #[derive(Deserialize)]
 pub struct SpeakRequest {
@@ -30,7 +29,7 @@ pub async fn post_speak(_request: HttpRequest,
 ) -> std::io::Result<HttpResponse> {
   println!("POST /speak");
 
-  let mut app_state = app_state.into_inner();
+  let app_state = app_state.into_inner();
 
   let speaker = match app_state.model_configs.find_speaker_by_slug(&query.speaker) {
     Some(speaker) => speaker,

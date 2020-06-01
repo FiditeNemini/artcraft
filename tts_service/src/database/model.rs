@@ -1,5 +1,5 @@
 use anyhow::Result as AnyhowResult;
-use chrono::{NaiveDateTime, DateTime, Utc};
+use chrono::NaiveDateTime;
 use crate::database::connector::{DatabaseConnector, MysqlPooledConnection};
 use crate::schema::sentences;
 //use crate::schema::sentences::dsl::*;

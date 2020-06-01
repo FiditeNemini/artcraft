@@ -1,12 +1,10 @@
-use anyhow::Error;
 use crate::model::arpabet_tacotron_model::ArpabetTacotronModel;
 use crate::model::melgan_model::MelganModel;
 use std::collections::HashMap;
 use std::sync::Arc;
 use std::sync::Mutex;
 use crate::config::{ModelType, ModelLocation};
-use crate::config::ModelType::ArpabetTacotron;
-use std::path::{PathBuf, Path};
+use std::path::PathBuf;
 
 pub struct ModelCache {
   /// Base directories for each model type(if configured)

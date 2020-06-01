@@ -1,11 +1,8 @@
 use arpabet::Arpabet;
-use arpabet::phoneme::{Phoneme,VowelStress,Vowel,Consonant};
-use arpabet::Polyphone;
+use arpabet::phoneme::Phoneme;
 use arpabet::extensions::Punctuation as ArpabetPunctuation;
-use arpabet::extensions::SentenceToken;
 use sentence::{SentenceTokenizer, Token, Punctuation};
-use numerics::{NumericsBuilder, Numerics};
-use std::num::ParseIntError;
+use numerics::Numerics;
 
 /// Convert text to the encoding used in Nvidia/Tacotron2 natively.
 pub fn text_to_standard_encoding(text: &str) -> Vec<i64> {

@@ -23,15 +23,11 @@ use std::fmt::Display;
 use std::str::FromStr;
 use std::sync::Arc;
 
-use arpabet::Arpabet;
-
 use actix_cors::Cors;
 use actix_files::Files;
 use actix_web::middleware::Logger;
-use actix_web::web::Json;
 use actix_web::{App, HttpResponse, HttpServer, web, http};
-use anyhow::{Result as AnyhowResult, Error};
-use dotenv::dotenv;
+use anyhow::Result as AnyhowResult;
 
 use crate::config::ModelConfigs;
 use crate::endpoints::index::get_root;
@@ -43,8 +39,6 @@ use crate::endpoints::speak::post_speak;
 use crate::endpoints::speakers::get_speakers;
 use crate::endpoints::tts::post_tts;
 use crate::model::model_cache::ModelCache;
-use crate::model::old_model::TacoMelModel;
-use crate::text::text_to_arpabet_encoding;
 use crate::database::connector::DatabaseConnector;
 use crate::endpoints::sentences::get_sentences;
 
@@ -59,12 +53,6 @@ const DEFAULT_ASSET_DIRECTORY : &'static str = "/home/bt/dev/voder/tts_frontend/
 const DEFAULT_MODEL_CONFIG_FILE: &'static str = "models.toml";
 const DEFAULT_RUST_LOG: &'static str = "debug,actix_web=info";
 const DEFAULT_NUM_WORKERS : usize = 4;
-
-/// For query strings
-#[derive(Deserialize)]
-pub struct TtsQueryRequest {
-  text: String,
-}
 
 /** State that is easy to pass between handlers. */
 pub struct AppState {

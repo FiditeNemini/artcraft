@@ -3,18 +3,15 @@ use actix_web::web::{Data, Query};
 use actix_web::{
   HttpRequest,
   HttpResponse,
-  get,
 };
 
 use std::sync::Arc;
 use crate::AppState;
 use arpabet::Arpabet;
 use crate::text::text_to_arpabet_encoding;
-use crate::config::{Speaker, ModelPipeline};
-use crate::model::arpabet_tacotron_model::ArpabetTacotronModel;
+use crate::config::ModelPipeline;
 use crate::model::old_model::TacoMelModel;
 use crate::database::model::NewSentence;
-use anyhow::Error;
 
 /// Example request: v=trump&vol=3&s=this is funny isn't it
 #[derive(Deserialize)]
