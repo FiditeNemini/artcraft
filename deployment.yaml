@@ -83,8 +83,8 @@ spec:
         # The following image runs a non-Arpabet engine that can run an 
         # LSpeech model that sounds 100% amazing
         # image: docker.pkg.github.com/echelon/voder/tts-service:6b5c22567614
-
-        image: docker.pkg.github.com/ml-applications/voder/tts-service:17091b4b4491
+        #
+        image: docker.pkg.github.com/ml-applications/voder/tts-service:d83cd11aaf1f
         resources:
           limits:
             memory: "2048Mi" # 2048 MiB = 2 GiB
@@ -96,6 +96,11 @@ spec:
         - name: downloads
           mountPath: /data/downloads
         env:
+        - name: DATABASE_URL
+          valueFrom:
+            secretKeyRef:
+              name: db-secrets
+              key: url
         - name: BIND_ADDRESS
           value: "0.0.0.0:12345"
         - name: NUM_WORKERS
