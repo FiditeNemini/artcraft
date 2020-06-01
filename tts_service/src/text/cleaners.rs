@@ -1,8 +1,14 @@
 
+const MAX_TEXT_LENGTH: usize = 255;
+
 pub fn clean_text(text: &str) -> String {
   let text = text.trim();
   let replaced = text.replace("’", "'"); // Smart quotes
   replaced
+}
+
+pub fn is_text_too_long(text: &str) -> bool {
+  text.len() > MAX_TEXT_LENGTH
 }
 
 #[cfg(test)]

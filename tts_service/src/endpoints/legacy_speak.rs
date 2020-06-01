@@ -91,6 +91,14 @@ pub async fn legacy_get_speak(request: HttpRequest,
     },
   };
 
+  let cleaned_text = clean_text(&text);
+
+  if let Some(err) = app_state.text_checker.check_text(&cleaned_text) {
+    return Ok(HttpResponse::build(StatusCode::BAD_REQUEST)
+        .content_type("text/plain")
+        .body(format!("Bad input: {}", err.description())));
+  }
+
   match speaker.model_pipeline {
     ModelPipeline::ArpabetTacotronMelgan => {
       let tacotron_model = speaker.tacotron
@@ -105,8 +113,6 @@ pub async fn legacy_get_speak(request: HttpRequest,
 
       debug!("Tacotron Model: {}", tacotron_model);
       debug!("Melgan Model: {}", melgan_model);
-
-      let cleaned_text = clean_text(&text);
 
       let arpabet = Arpabet::load_cmudict();
       let encoded = text_to_arpabet_encoding(arpabet, &cleaned_text);

@@ -41,10 +41,13 @@ use crate::endpoints::tts::post_tts;
 use crate::model::model_cache::ModelCache;
 use crate::database::connector::DatabaseConnector;
 use crate::endpoints::sentences::get_sentences;
+use crate::text::checker::TextChecker;
 
 const ENV_ASSET_DIRECTORY: &'static str = "ASSET_DIRECTORY";
 const ENV_BIND_ADDRESS: &'static str = "BIND_ADDRESS";
 const ENV_DATABASE_URL : &'static str = "DATABASE_URL";
+const ENV_MAX_CHAR_LEN : &'static str = "MAX_CHAR_LEN";
+const ENV_MIN_CHAR_LEN : &'static str = "MIN_CHAR_LEN";
 const ENV_MODEL_CONFIG_FILE: &'static str = "MODEL_CONFIG_FILE";
 const ENV_NUM_WORKERS: &'static str = "NUM_WORKERS";
 const ENV_RUST_LOG : &'static str = "RUST_LOG";
@@ -52,15 +55,19 @@ const ENV_RUST_LOG : &'static str = "RUST_LOG";
 const DEFAULT_ASSET_DIRECTORY : &'static str = "/home/bt/dev/voder/tts_frontend/build";
 const DEFAULT_BIND_ADDRESS : &'static str = "0.0.0.0:12345";
 const DEFAULT_DATABASE_URL : &'static str = "mysql://root:root@localhost/mumble";
+const DEFAULT_MAX_CHAR_LEN : usize = 255;
+const DEFAULT_MIN_CHAR_LEN : usize = 0;
 const DEFAULT_MODEL_CONFIG_FILE: &'static str = "models.toml";
 const DEFAULT_NUM_WORKERS : usize = 4;
 const DEFAULT_RUST_LOG: &'static str = "debug,actix_web=info";
+
 
 /** State that is easy to pass between handlers. */
 pub struct AppState {
   pub model_configs: ModelConfigs,
   pub model_cache: ModelCache,
   pub database_connector: DatabaseConnector,
+  pub text_checker: TextChecker,
 }
 
 /** Startup parameters for the server. */
@@ -117,10 +124,14 @@ pub fn main() -> AnyhowResult<()> {
   let model_config_file = get_env_string(ENV_MODEL_CONFIG_FILE, DEFAULT_MODEL_CONFIG_FILE);
   let num_workers = get_env_num::<usize>(ENV_NUM_WORKERS, DEFAULT_NUM_WORKERS)?;
   let database_url = get_env_string(ENV_DATABASE_URL, DEFAULT_DATABASE_URL);
+  let max_char_len = get_env_num::<usize>(ENV_MAX_CHAR_LEN, DEFAULT_MAX_CHAR_LEN)?;
+  let min_char_len = get_env_num::<usize>(ENV_MIN_CHAR_LEN, DEFAULT_MIN_CHAR_LEN)?;
 
   info!("Asset directory: {}", asset_directory);
   info!("Bind address: {}", bind_address);
   info!("Using model config file: {}", model_config_file);
+  info!("Max character length: {}", max_char_len);
+  info!("Min character length: {}", min_char_len);
 
   let model_configs = ModelConfigs::load_from_file(&model_config_file);
 
@@ -136,10 +147,18 @@ pub fn main() -> AnyhowResult<()> {
     Err(_) => error!("Could not connect to database."),
   }
 
+  let max_char_len = if max_char_len == 0 { None } else { Some(max_char_len) };
+  let min_char_len = if min_char_len == 0 { None } else { Some(min_char_len) };
+
+  let mut text_checker = TextChecker::create();
+  text_checker.set_max_character_length(max_char_len);
+  text_checker.set_min_character_length(min_char_len);
+
   let app_state = AppState {
     model_configs,
     model_cache,
     database_connector: db_connector,
+    text_checker,
   };
 
   let server_args = ServerArgs {
