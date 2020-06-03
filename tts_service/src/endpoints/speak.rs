@@ -12,8 +12,8 @@ use std::sync::Arc;
 use crate::AppState;
 use arpabet::Arpabet;
 use crate::text::arpabet::text_to_arpabet_encoding;
+use crate::model::model_config::ModelPipeline;
 use crate::model::old_model::TacoMelModel;
-use crate::config::ModelPipeline;
 use crate::text::cleaners::clean_text;
 
 #[derive(Deserialize)]

@@ -10,7 +10,6 @@ extern crate hound;
 extern crate serde;
 extern crate tch;
 
-pub mod config;
 pub mod database;
 pub mod endpoints;
 pub mod model;
@@ -29,18 +28,18 @@ use actix_web::middleware::Logger;
 use actix_web::{App, HttpResponse, HttpServer, web, http};
 use anyhow::Result as AnyhowResult;
 
-use crate::config::ModelConfigs;
+use crate::database::connector::DatabaseConnector;
 use crate::endpoints::index::get_root;
 use crate::endpoints::legacy_speak::legacy_get_speak;
 use crate::endpoints::liveness::get_liveness;
 use crate::endpoints::models::get_models;
 use crate::endpoints::readiness::get_readiness;
+use crate::endpoints::sentences::get_sentences;
 use crate::endpoints::speak::post_speak;
 use crate::endpoints::speakers::get_speakers;
 use crate::endpoints::tts::post_tts;
 use crate::model::model_cache::ModelCache;
-use crate::database::connector::DatabaseConnector;
-use crate::endpoints::sentences::get_sentences;
+use crate::model::model_config::ModelConfigs;
 use crate::text::checker::TextChecker;
 
 const ENV_ASSET_DIRECTORY: &'static str = "ASSET_DIRECTORY";

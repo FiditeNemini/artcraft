@@ -9,7 +9,7 @@ use actix_web::{
 
 use std::sync::Arc;
 use crate::AppState;
-use crate::config::ModelConfigs;
+use crate::model::model_config::ModelConfigs;
 
 #[get("/models")]
 pub async fn get_models(

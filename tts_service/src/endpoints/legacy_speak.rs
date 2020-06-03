@@ -9,7 +9,7 @@ use std::sync::Arc;
 use crate::AppState;
 use arpabet::Arpabet;
 use crate::text::arpabet::text_to_arpabet_encoding;
-use crate::config::ModelPipeline;
+use crate::model::model_config::ModelPipeline;
 use crate::model::old_model::TacoMelModel;
 use crate::database::model::NewSentence;
 use crate::text::cleaners::clean_text;
