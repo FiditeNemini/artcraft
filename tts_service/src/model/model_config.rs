@@ -7,6 +7,7 @@ pub struct ModelConfigs {
   pub speakers: Vec<Speaker>,
   pub model_locations: Vec<ModelLocation>,
   tacotron: Vec<ModelDetails>,
+  glow_tts: Vec<ModelDetails>,
   melgan: Vec<ModelDetails>,
 }
 
@@ -20,6 +21,8 @@ pub struct Speaker {
   pub model_pipeline: ModelPipeline,
   /// Tacotron model, if used.
   pub tacotron: Option<String>,
+  /// Glow-tts model, if used.
+  pub glow_tts: Option<String>,
   /// Melgan model, if used.
   pub melgan: Option<String>,
 }
@@ -29,6 +32,7 @@ pub struct Speaker {
 pub enum ModelType {
   RawTextTacotron,
   ArpabetTacotron,
+  ArpabetGlowTts, // NB: This uses a different arpabet preprocessor
   Melgan,
 }
 
@@ -46,6 +50,7 @@ pub enum ModelPipeline {
   //ArpabetTacotronWorld,
   ArpabetTacotronMelgan,
   RawTextTacotronMelgan,
+  ArpabetGlowTtsMelgan,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]

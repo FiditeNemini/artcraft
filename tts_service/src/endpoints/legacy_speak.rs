@@ -13,6 +13,7 @@ use crate::model::model_config::ModelPipeline;
 use crate::model::old_model::TacoMelModel;
 use crate::database::model::NewSentence;
 use crate::text::cleaners::clean_text;
+use crate::model::pipelines::arpabet_tacotron_melgan_pipeline;
 
 /// Example request: v=trump&vol=3&s=this is funny isn't it
 #[derive(Deserialize)]
@@ -114,9 +115,6 @@ pub async fn legacy_get_speak(request: HttpRequest,
       debug!("Tacotron Model: {}", tacotron_model);
       debug!("Melgan Model: {}", melgan_model);
 
-      let arpabet = Arpabet::load_cmudict();
-      let encoded = text_to_arpabet_encoding(arpabet, &cleaned_text);
-
       let tacotron = match app_state.model_cache.get_or_load_arbabet_tacotron(&tacotron_model) {
         Some(model) => model,
         None => {
@@ -137,7 +135,9 @@ pub async fn legacy_get_speak(request: HttpRequest,
         },
       };
 
-      match TacoMelModel::new().run_tts_encoded(&tacotron, &melgan, &encoded) {
+      let result = arpabet_tacotron_melgan_pipeline(&cleaned_text, &tacotron, &melgan);
+
+      match result {
         None => {
           Ok(HttpResponse::build(StatusCode::TOO_MANY_REQUESTS)
               .content_type("text/plain")
@@ -152,6 +152,7 @@ pub async fn legacy_get_speak(request: HttpRequest,
         },
       }
     },
+    ModelPipeline::ArpabetGlowTtsMelgan => unimplemented!(),
     ModelPipeline::RawTextTacotronMelgan => unimplemented!(),
   }
 }

@@ -8,6 +8,13 @@ tacotron = "tacotron2_trump_txlearn_ljs_arpabet_2020-05-25_chkpt26500.jit"
 melgan = "melgan_trump_txlearn_2020-05-30_steno_chkpt9800.torchjit"
 
 [[speakers]]
+name = "Donald Trump (Glow-TTS experiments)"
+slug = "trump2"
+model_pipeline = "ArpabetGlowTtsMelgan"
+glow_tts = "glow-experimental.torchjit"
+melgan = "melgan_trump_txlearn_2020-05-30_steno_chkpt9800.torchjit"
+
+[[speakers]]
 name = "High-pitched Linda Johnson"
 slug = "ljsh"
 model_pipeline = "ArpabetTacotronMelgan"
@@ -19,6 +26,10 @@ melgan = "melgan_ljs-high-pitch_container.pt"
 [[model_locations]]
 model_type = "ArpabetTacotron"
 base_directory = "/home/bt/dev/voder/tacotron_melgan"
+
+[[model_locations]]
+model_type = "ArpabetGlowTts" # TODO: This is not the Arpabet I'm using
+base_directory = "/home/bt/dev/jit-models/output/glow-tts-jaywalnut"
 
 [[model_locations]]
 model_type = "Melgan"
@@ -122,6 +133,11 @@ description = "Unknown (broken)"
 file_path = "tacotron_jit_model_voder_c0cac635.pt"
 description = "Unknown (broken)"
 
+# ---------------- Glow TTS----------------
+
+[[glow_tts]]
+file_path = "glow-experimental.torchjit"
+description = "First experiments"
 
 # ---------------- Melgan ----------------
 
