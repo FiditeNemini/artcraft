@@ -2,7 +2,7 @@ use arpabet::Arpabet;
 use crate::model::arpabet_tacotron_model::ArpabetTacotronModel;
 use crate::model::melgan_model::MelganModel;
 use crate::model::old_model::TacoMelModel;
-use crate::text::arpabet::text_to_arpabet_encoding;
+use crate::text::arpabet::{text_to_arpabet_encoding, text_to_arpabet_encoding_glow_tts};
 use hound::SampleFormat;
 use hound::WavSpec;
 use hound::WavWriter;
@@ -20,9 +20,9 @@ pub fn arpabet_glow_tts_melgan_pipeline(
   melgan: &MelganModel) -> Option<Vec<u8>> {
 
   let arpabet = Arpabet::load_cmudict(); // TODO: Inefficient.
-  let encoded = text_to_arpabet_encoding(arpabet, &cleaned_text);
+  let arpabet_sentence = text_to_arpabet_encoding_glow_tts(arpabet, &cleaned_text);
 
-  let mel_tensor = arpabet_glow_tts.encoded_arpabet_to_mel(&encoded);
+  let mel_tensor = arpabet_glow_tts.encoded_arpabet_to_mel(&arpabet_sentence);
 
   let audio_tensor = melgan.tacotron_mel_to_audio(&mel_tensor);
   let audio_signal = mel_audio_tensor_to_audio_signal(audio_tensor);

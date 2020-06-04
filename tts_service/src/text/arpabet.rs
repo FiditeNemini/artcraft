@@ -22,6 +22,109 @@ pub fn text_to_standard_encoding(text: &str) -> Vec<i64> {
   text_buffer
 }
 
+/// This is the encoding that Glow TTS uses.
+pub fn text_to_arpabet_encoding_glow_tts(arpabet: &Arpabet, text: &str) -> String {
+  let sentence_tokenizer = SentenceTokenizer::new();
+  let numerics = Numerics::default();
+
+  let text = text.to_ascii_lowercase();
+
+  let tokens = sentence_tokenizer.tokenize(&text);
+  info!("Sentence Tokens: {:?}", tokens);
+
+  let mut needs_space = false;
+
+  let mut transformed_sentence = String::new();
+
+  for token in tokens {
+    match token {
+      Token::ApostrophenatedWord(word)
+      | Token::HyphenatedWord(word)
+      | Token::Word(word) => {
+        if needs_space {
+          transformed_sentence.push_str(" ");
+          needs_space = false;
+        }
+
+        // Option<Polyphone>
+        //pub type Polyphone = Vec<Phoneme>;
+        //
+        match arpabet.get_polyphone(&word) {
+          None => {
+            transformed_sentence.push_str(&word);
+            needs_space = true;
+          },
+          Some(arpas) => {
+            let collected : Vec<String>= arpas.iter()
+                .map(|a| ["@", a.to_str()].join("")) // TODO: Add to arpabet library
+                .collect();
+
+            let transformed = collected.join("");
+
+            transformed_sentence.push_str(&transformed);
+            needs_space = true;
+          },
+        }
+      },
+      Token::Integer(integer_string) => {
+        if needs_space {
+          transformed_sentence.push_str(" ");
+          needs_space = false;
+        }
+        // TODO
+        /*let number_words = integer_string.parse::<i64>()
+            .ok()
+            .and_then(|number| numerics.convert_number(number).ok())
+            .unwrap_or(Vec::new());*/
+
+        /*for word in number_words {
+          if needs_space {
+            encoded_buffer.push(space);
+            needs_space = false;
+          }
+          if arpabet_lookup_and_encode_word(&word, &arpabet, &mut encoded_buffer) {
+            needs_space = true;
+          }
+        }*/
+      },
+      Token::Punctuation(punctuation) => {
+        match punctuation {
+          Punctuation::Period => {
+            transformed_sentence.push_str(".");
+            needs_space = true;
+          },
+          Punctuation::Comma | Punctuation::Semicolon => {
+            transformed_sentence.push_str(",");
+            needs_space = true;
+          },
+          Punctuation::Question => {
+            transformed_sentence.push_str("?");
+            needs_space = true;
+          },
+          Punctuation::Exclamation => {
+            transformed_sentence.push_str("!");
+            needs_space = true;
+          },
+          Punctuation::Colon | Punctuation::Dash => {
+            transformed_sentence.push_str(" - ");
+            needs_space = false;
+          },
+        }
+      },
+      // TODO:
+      Token::RealNumber(_) => continue,
+      Token::CommaFormattedInteger(_) => continue,
+      Token::CommaFormattedRealNumber(_) => continue,
+      Token::Hashtag(_) => continue,
+      Token::UsernameMention(_) => continue,
+      Token::Url(_) => continue,
+      Token::Unknown(_) => continue, // skip, we don't know what this is yet.
+    }
+  }
+
+  transformed_sentence
+}
+
 /// Convert text to the encoding used in my Arpabet extension
 pub fn text_to_arpabet_encoding(arpabet: &Arpabet, text: &str) -> Vec<i64> {
   let sentence_tokenizer = SentenceTokenizer::new();
