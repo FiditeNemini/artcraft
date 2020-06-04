@@ -11,7 +11,8 @@ melgan = "melgan_trump_txlearn_2020-05-30_steno_chkpt9800.torchjit"
 name = "Donald Trump (Glow-TTS experiments)"
 slug = "trump2"
 model_pipeline = "ArpabetGlowTtsMelgan"
-glow_tts = "glow-experimental.torchjit"
+#glow_tts = "glow-experimental.torchjit"
+glow_tts = "output.torchjit"
 melgan = "melgan_trump_txlearn_2020-05-30_steno_chkpt9800.torchjit"
 
 [[speakers]]
@@ -29,7 +30,8 @@ base_directory = "/home/bt/dev/voder/tacotron_melgan"
 
 [[model_locations]]
 model_type = "ArpabetGlowTts" # TODO: This is not the Arpabet I'm using
-base_directory = "/home/bt/dev/jit-models/output/glow-tts-jaywalnut"
+#base_directory = "/home/bt/dev/jit-models/output/glow-tts-jaywalnut"
+base_directory = "/home/bt/dev/jit-models/glow-tts-jaywalnut"
 
 [[model_locations]]
 model_type = "Melgan"

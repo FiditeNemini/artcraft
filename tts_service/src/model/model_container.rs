@@ -3,6 +3,8 @@ use tch::CModule;
 use tch::Tensor;
 use tch::nn::Module;
 use std::path::{Path, PathBuf};
+use anyhow::Result as AnyhowResult;
+use std::fmt::Formatter;
 
 /// Holds the loaded pytorch JIT model
 pub struct ModelContainer {
@@ -27,5 +29,15 @@ impl ModelContainer {
 
   pub fn forward(&self, tensor: &Tensor) -> Tensor {
     self.jit_model.forward(tensor)
+  }
+
+  pub fn forward2(&self, arg1: &Tensor, arg2: &Tensor) -> Tensor {
+    let result = self.jit_model.forward_ts(&[arg1, arg2]);
+
+    if let Err(err) = result.as_ref() {
+      println!("error: {:?}", err);
+    }
+
+    result.expect("SHOULD WORK")
   }
 }
