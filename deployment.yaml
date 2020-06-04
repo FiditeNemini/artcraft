@@ -88,7 +88,7 @@ spec:
         resources:
           limits:
             #memory: "2048Mi" # 2048 MiB = 2 GiB
-            memory: "2000Mi" # 2048 MiB = 2 GiB
+            memory: "3072Mi" # 3072 MiB = 3 GiB
             cpu: "700m" # 700 milliCPU
           requests:
             #memory: "2048Mi" # 2048 MiB = 2 GiB
