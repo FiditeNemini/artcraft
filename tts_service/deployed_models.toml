@@ -2,10 +2,10 @@
 [[speakers]]
 name = "Donald Trump"
 slug = "trump"
-model_pipeline = "ArpabetTacotronMelgan"
-tacotron = "tacotron2_trump_txlearn_ljs_arpabet_2020-05-25_chkpt26500.jit"
-#melgan = "melgan_trump-txlearn-2020.05.05_13675.jit" (OLD)
-#melgan = "melgan_trump_txlearn_2020-05-30_steno_chkpt9800.torchjit" (BEST TACOTRON)
+#model_pipeline = "ArpabetTacotronMelgan"
+model_pipeline = "ArpabetGlowTtsMelgan"
+#tacotron = "tacotron2_trump_txlearn_ljs_arpabet_2020-05-25_chkpt26500.jit"
+melgan = "melgan_trump_txlearn_2020-05-30_steno_chkpt9800.torchjit"
 glow_tts = "glow_tts_ljs_txlearn_arpabet_2020-06-01_G_1007.torchjit"
 
 [[speakers]]
