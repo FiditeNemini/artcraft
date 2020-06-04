@@ -20,9 +20,9 @@ pub fn arpabet_glow_tts_melgan_pipeline(
   melgan: &MelganModel) -> Option<Vec<u8>> {
 
   let arpabet = Arpabet::load_cmudict(); // TODO: Inefficient.
-  let arpabet_sentence = text_to_arpabet_encoding_glow_tts(arpabet, &cleaned_text);
+  let arpabet_encodings = text_to_arpabet_encoding_glow_tts(arpabet, &cleaned_text);
 
-  let mel_tensor = arpabet_glow_tts.encoded_arpabet_to_mel(&arpabet_sentence);
+  let mel_tensor = arpabet_glow_tts.encoded_arpabet_to_mel(&arpabet_encodings);
 
   let audio_tensor = melgan.tacotron_mel_to_audio(&mel_tensor);
   let audio_signal = mel_audio_tensor_to_audio_signal(audio_tensor);
