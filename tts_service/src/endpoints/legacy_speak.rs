@@ -13,7 +13,7 @@ use crate::model::model_config::ModelPipeline;
 use crate::model::old_model::TacoMelModel;
 use crate::database::model::NewSentence;
 use crate::text::cleaners::clean_text;
-use crate::model::pipelines::arpabet_tacotron_melgan_pipeline;
+use crate::model::pipelines::{arpabet_tacotron_melgan_pipeline, arpabet_glow_tts_melgan_pipeline};
 
 /// Example request: v=trump&vol=3&s=this is funny isn't it
 #[derive(Deserialize)]
@@ -152,7 +152,46 @@ pub async fn legacy_get_speak(request: HttpRequest,
         },
       }
     },
-    ModelPipeline::ArpabetGlowTtsMelgan => unimplemented!(),
+    ModelPipeline::ArpabetGlowTtsMelgan => {
+      let glow_tts_model = speaker.glow_tts
+          .as_ref()
+          .map(|s| s.clone())
+          .expect("TODO ERROR HANDLING");
+
+      let melgan_model = speaker.melgan
+          .as_ref()
+          .map(|s| s.clone())
+          .expect("TODO ERROR HANDLING");
+
+      debug!("Glow-TTS Model: {}", glow_tts_model);
+      debug!("Melgan Model: {}", melgan_model);
+
+      let glow_tts = match app_state.model_cache.get_or_load_arbabet_glow_tts(&glow_tts_model) {
+        Some(model) => model,
+        None => {
+          warn!("Couldn't load glow-tts model: {}", glow_tts_model);
+          return Ok(HttpResponse::build(StatusCode::INTERNAL_SERVER_ERROR)
+              .content_type("text/plain")
+              .body("Couldn't load model."));
+        },
+      };
+
+      let melgan = match app_state.model_cache.get_or_load_melgan(&melgan_model) {
+        Some(model) => model,
+        None => {
+          warn!("Couldn't load melgan model: {}", melgan_model);
+          return Ok(HttpResponse::build(StatusCode::INTERNAL_SERVER_ERROR)
+              .content_type("text/plain")
+              .body("Could not load model."));
+        },
+      };
+
+      let wav_data = arpabet_glow_tts_melgan_pipeline(&cleaned_text, &glow_tts, &melgan);
+
+      Ok(HttpResponse::build(StatusCode::OK)
+          .content_type("audio/wav")
+          .body(wav_data))
+    },
     ModelPipeline::RawTextTacotronMelgan => unimplemented!(),
   }
 }

@@ -138,7 +138,7 @@ description = "Unknown (broken)"
 # ---------------- Glow TTS----------------
 
 [[glow_tts]]
-file_path = "glow-experimental.torchjit"
+file_path = "glow_tts_ljs_txlearn_arpabet_2020-06-01_G_1007.torchjit"
 description = "First experiments"
 
 # ---------------- Melgan ----------------

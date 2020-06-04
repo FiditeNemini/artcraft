@@ -17,7 +17,7 @@ use crate::model::arpabet_glow_tts_model::ArpabetGlowTtsModel;
 pub fn arpabet_glow_tts_melgan_pipeline(
   cleaned_text: &str,
   arpabet_glow_tts: &ArpabetGlowTtsModel,
-  melgan: &MelganModel) -> Option<Vec<u8>> {
+  melgan: &MelganModel) -> Vec<u8> {
 
   let arpabet = Arpabet::load_cmudict(); // TODO: Inefficient.
   let arpabet_encodings = text_to_arpabet_encoding_glow_tts(arpabet, &cleaned_text);
@@ -27,8 +27,7 @@ pub fn arpabet_glow_tts_melgan_pipeline(
   let audio_tensor = melgan.tacotron_mel_to_audio(&mel_tensor);
   let audio_signal = mel_audio_tensor_to_audio_signal(audio_tensor);
 
-  let wav = audio_signal_to_wav_bytes(audio_signal);
-  Some(wav)
+  audio_signal_to_wav_bytes(audio_signal)
 }
 
 pub fn arpabet_tacotron_melgan_pipeline(

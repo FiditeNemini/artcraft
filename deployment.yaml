@@ -84,13 +84,15 @@ spec:
         # LSpeech model that sounds 100% amazing
         # image: docker.pkg.github.com/echelon/voder/tts-service:6b5c22567614
         #
-        image: docker.pkg.github.com/ml-applications/voder/tts-service:2bafa7cec0c5
+        image: docker.pkg.github.com/ml-applications/voder/tts-service:6f6101fa7730
         resources:
           limits:
-            memory: "2048Mi" # 2048 MiB = 2 GiB
+            #memory: "2048Mi" # 2048 MiB = 2 GiB
+            memory: "1048Mi" # 2048 MiB = 2 GiB
             cpu: "700m" # 700 milliCPU
           requests:
-            memory: "2048Mi" # 2048 MiB = 2 GiB
+            #memory: "2048Mi" # 2048 MiB = 2 GiB
+            memory: "1048Mi" # 2048 MiB = 2 GiB
             cpu: "700m" # 700 milliCPU
         volumeMounts:
         - name: downloads

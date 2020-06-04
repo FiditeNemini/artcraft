@@ -111,22 +111,11 @@ pub async fn post_speak(_request: HttpRequest,
       let melgan = app_state.model_cache.get_or_load_melgan(&melgan_model)
           .expect(&format!("Couldn't load melgan model: {}", melgan_model));
 
-      let result = arpabet_glow_tts_melgan_pipeline(&cleaned_text, &glow_tts, &melgan);
+      let wav_data = arpabet_glow_tts_melgan_pipeline(&cleaned_text, &glow_tts, &melgan);
 
-      match result {
-        None => {
-          Ok(HttpResponse::build(StatusCode::TOO_MANY_REQUESTS)
-              .content_type("text/plain")
-              .body("The service is receiving too many requests. Although there are many worker \
-                     containers, model access is serialized on a per-container basis until the \
-                     segfaults are fixed."))
-        },
-        Some(wav_data) => {
-          Ok(HttpResponse::build(StatusCode::OK)
-              .content_type("audio/wav")
-              .body(wav_data))
-        },
-      }
+      Ok(HttpResponse::build(StatusCode::OK)
+          .content_type("audio/wav")
+          .body(wav_data))
     },
     ModelPipeline::RawTextTacotronMelgan => unimplemented!(),
   }
