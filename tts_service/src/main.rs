@@ -24,7 +24,7 @@ use std::sync::Arc;
 
 use actix_cors::Cors;
 use actix_files::Files;
-use actix_web::middleware::Logger;
+use actix_web::middleware::{Logger, DefaultHeaders};
 use actix_web::{App, HttpResponse, HttpServer, web, http};
 use anyhow::Result as AnyhowResult;
 
@@ -72,6 +72,7 @@ pub struct AppState {
 /** Startup parameters for the server. */
 pub struct ServerArgs {
   pub bind_address: String,
+  pub hostname: String,
   pub num_workers: usize,
   pub asset_directory: String,
 }
@@ -126,11 +127,17 @@ pub fn main() -> AnyhowResult<()> {
   let max_char_len = get_env_num::<usize>(ENV_MAX_CHAR_LEN, DEFAULT_MAX_CHAR_LEN)?;
   let min_char_len = get_env_num::<usize>(ENV_MIN_CHAR_LEN, DEFAULT_MIN_CHAR_LEN)?;
 
+  let server_hostname = hostname::get()
+      .ok()
+      .and_then(|h| h.into_string().ok())
+      .unwrap_or("tts-unknown".to_string());
+
   info!("Asset directory: {}", asset_directory);
   info!("Bind address: {}", bind_address);
   info!("Using model config file: {}", model_config_file);
   info!("Max character length: {}", max_char_len);
   info!("Min character length: {}", min_char_len);
+  info!("Hostname: {}", server_hostname);
 
   let model_configs = ModelConfigs::load_from_file(&model_config_file);
 
@@ -162,6 +169,7 @@ pub fn main() -> AnyhowResult<()> {
 
   let server_args = ServerArgs {
     bind_address,
+    hostname: server_hostname,
     num_workers,
     asset_directory,
   };
@@ -180,6 +188,7 @@ async fn run_server(app_state: AppState, server_args: ServerArgs) -> std::io::Re
 
   let asset_directory = server_args.asset_directory.clone();
   let bind_address = server_args.bind_address.clone();
+  let server_hostname = server_args.hostname.clone();
 
   HttpServer::new(move || App::new()
       .wrap(Cors::new()
@@ -199,6 +208,7 @@ async fn run_server(app_state: AppState, server_args: ServerArgs) -> std::io::Re
       .wrap(Logger::new(&log_format)
           .exclude("/liveness")
           .exclude("/readiness"))
+      .wrap(DefaultHeaders::new().header("X-Backend-Hostname", &server_hostname))
       .service(Files::new("/frontend", asset_directory.clone())
           .index_file("index.html"))
       .service(
