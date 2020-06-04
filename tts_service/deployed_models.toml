@@ -7,7 +7,8 @@ slug = "trump"
 model_pipeline = "ArpabetGlowTtsMelgan"
 melgan = "melgan_trump_txlearn_2020-05-30_steno_chkpt9800.torchjit"
 #glow_tts = "glow_tts_ljs_txlearn_arpabet_2020-06-01_G_1007.torchjit"
-glow_tts = "glow_tts_ljs_txlearn_arpabet_2020-06-01_G_1689.torchjit"
+#glow_tts = "glow_tts_ljs_txlearn_arpabet_2020-06-01_G_1689.torchjit"
+glow_tts = "glow_tts_ljs_txlearn_arpabet_2020-06-01_G_1689-2.torchjit"
 
 [[speakers]]
 name = "High-pitched Linda Johnson"
@@ -118,6 +119,10 @@ description = "First experiments"
 [[glow_tts]]
 file_path = "glow_tts_ljs_txlearn_arpabet_2020-06-01_G_1689.torchjit"
 description = "First experiments (continued)"
+
+[[glow_tts]]
+file_path = "glow_tts_ljs_txlearn_arpabet_2020-06-01_G_1689-2.torchjit"
+description = "First experiments (continued); longer JIT tracing input"
 
 # ---------------- Melgan ----------------
 
