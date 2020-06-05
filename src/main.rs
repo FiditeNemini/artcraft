@@ -242,3 +242,36 @@ pub fn main() -> AnyhowResult<()> {
 
   Ok(())
 }
+
+#[cfg(test)]
+mod tests {
+  use crate::BucketDownloader;
+  use s3::serde_types::Object;
+  use std::path::PathBuf;
+
+  #[test]
+  fn test_hash_object() {
+    let mut object = empty_object();
+    object.e_tag = String::from("\"asdf\""); // S3 objects are surrounded by quotes.
+    assert_eq!("asdf", &BucketDownloader::hash_object(&object));
+  }
+
+  #[test]
+  fn test_base_directory() {
+    let mut path = PathBuf::from("models/glow-tts-test/glow_tts_ljs_txlearn-2020.06.torchjit");
+    assert_eq!(PathBuf::from("models/glow-tts-test"),
+               BucketDownloader::base_directory(&path));
+  }
+
+  /// Helper function
+  fn empty_object() -> Object {
+    Object {
+      last_modified: "".to_string(),
+      e_tag: "".to_string(),
+      storage_class: "".to_string(),
+      key: "".to_string(),
+      owner: None,
+      size: 0
+    }
+  }
+}
