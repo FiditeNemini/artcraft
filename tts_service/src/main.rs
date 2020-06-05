@@ -194,15 +194,20 @@ async fn run_server(app_state: AppState, server_args: ServerArgs) -> std::io::Re
       .wrap(Cors::new()
           .allowed_origin("http://localhost:12345")
           .allowed_origin("http://localhost:8080")
+          .allowed_origin("http://localhost:8000")
+          .allowed_origin("http://localhost:7000")
           .allowed_origin("http://jungle.horse")
           .allowed_origin("https://jungle.horse")
           .allowed_origin("http://mumble.stream")
           .allowed_origin("https://mumble.stream")
           .allowed_origin("http://trumped.com")
           .allowed_origin("https://trumped.com")
-          .allowed_methods(vec!["GET", "POST"])
-          .allowed_headers(vec![http::header::ACCEPT])
-          .allowed_header(http::header::CONTENT_TYPE)
+          .allowed_methods(vec!["GET", "POST", "OPTIONS"])
+          .allowed_headers(vec![
+            http::header::ACCEPT,
+            http::header::CONTENT_TYPE,
+            http::header::HeaderName::from_static("x-requested-with") // Tabulator Ajax sends
+          ])
           .max_age(3600)
           .finish())
       .wrap(Logger::new(&log_format)
