@@ -11,6 +11,7 @@ use crate::database::model::Sentence;
 pub struct SentencesRequest {
   page: Option<i64>,
   per_page: Option<i64>,
+  sort_direction: Option<String>,
 }
 
 /// Paginated responses in the format expected by Tabulator.js
@@ -43,9 +44,18 @@ pub async fn get_sentences(
 
   let offset = limit * (page - 1);
 
-  debug!("Sentence Query Limit: {}, Offset: {}", limit, offset);
+  let sort_ascending = match query.sort_direction.as_ref() {
+    None => true,
+    Some(direction) => match direction.as_ref() {
+      "asc" => true,
+      "desc" => false,
+      _ => true,
+    },
+  };
 
-  let sentences = match Sentence::load(&app_state.database_connector, limit, offset) {
+  debug!("Sentence Query: Limit: {}, Offset: {}, Sort Ascending: {}", limit, offset, sort_ascending);
+
+  let sentences = match Sentence::load(&app_state.database_connector, limit, offset, sort_ascending) {
     Err(e) => {
       error!("Couldn't query database for sentences: {:?}", e);
       return Either::B(Ok(HttpResponse::build(StatusCode::INTERNAL_SERVER_ERROR)
@@ -55,7 +65,7 @@ pub async fn get_sentences(
     Ok(results) => results,
   };
 
-  let last_page = sentence_count / limit;
+  let last_page = (sentence_count / limit) + 1;
 
   Either::A(Json(SentencesResult {
     data: sentences,

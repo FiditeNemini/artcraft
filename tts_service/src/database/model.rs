@@ -46,13 +46,22 @@ impl Sentence {
   }
 
   /// Load sentence records
-  pub fn load(db_connector: &DatabaseConnector, limit: i64, offset: i64) -> AnyhowResult<Vec<Sentence>> {
+  pub fn load(db_connector: &DatabaseConnector, limit: i64, offset: i64, sort_ascending: bool) -> AnyhowResult<Vec<Sentence>> {
     let pooled_connection : MysqlPooledConnection = db_connector.get_pooled_connection()?;
-    let results = sentences::dsl::sentences
+
+    let query = sentences::dsl::sentences
         .limit(limit)
         .offset(offset)
-        .order(sentences::dsl::id.asc())
-        .load::<Sentence>(&pooled_connection)?;
+        .into_boxed();
+
+    let query = if sort_ascending {
+      query.order(sentences::dsl::id.asc())
+    } else {
+      query.order(sentences::dsl::id.desc())
+    };
+
+    let results = query.load::<Sentence>(&pooled_connection)?;
+
     Ok(results)
   }
 }
