@@ -4,6 +4,7 @@ use crate::database::connector::{DatabaseConnector, MysqlPooledConnection};
 use crate::schema::sentences;
 //use crate::schema::sentences::dsl::*;
 use diesel::prelude::*;
+use diesel::expression::dsl::count_star;
 
 #[derive(Queryable, Serialize, Debug)]
 pub struct Sentence {
@@ -35,11 +36,22 @@ impl NewSentence {
 
 impl Sentence {
 
-  pub fn load(db_connector: &DatabaseConnector, limit: i64) -> AnyhowResult<Vec<Sentence>> {
+  /// Get a count of all sentence records.
+  pub fn count(db_connector: &DatabaseConnector) -> AnyhowResult<i64> {
+    let pooled_connection : MysqlPooledConnection = db_connector.get_pooled_connection()?;
+    let count : i64 = sentences::dsl::sentences
+        .select(count_star())
+        .first(&*pooled_connection)?;
+    Ok(count)
+  }
+
+  /// Load sentence records
+  pub fn load(db_connector: &DatabaseConnector, limit: i64, offset: i64) -> AnyhowResult<Vec<Sentence>> {
     let pooled_connection : MysqlPooledConnection = db_connector.get_pooled_connection()?;
     let results = sentences::dsl::sentences
         .limit(limit)
-        .order(sentences::dsl::id.desc())
+        .offset(offset)
+        .order(sentences::dsl::id.asc())
         .load::<Sentence>(&pooled_connection)?;
     Ok(results)
   }

@@ -205,6 +205,7 @@ async fn run_server(app_state: AppState, server_args: ServerArgs) -> std::io::Re
           .allowed_methods(vec!["GET", "POST", "OPTIONS"])
           .allowed_headers(vec![
             http::header::ACCEPT,
+            http::header::ACCESS_CONTROL_ALLOW_ORIGIN, // Tabulator Ajax
             http::header::CONTENT_TYPE,
             http::header::HeaderName::from_static("x-requested-with") // Tabulator Ajax sends
           ])
