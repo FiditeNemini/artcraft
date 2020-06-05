@@ -1,6 +1,6 @@
 use anyhow::Result as AnyhowResult;
 use anyhow::bail;
-use log::{info, warn};
+use log::{info, warn, debug};
 use md5::{Md5, Digest};
 use s3::bucket::Bucket;
 use s3::creds::Credentials;
@@ -84,7 +84,7 @@ impl BucketDownloader {
 
   fn download_object(&self, object: &Object) -> AnyhowResult<()> {
     if self.object_already_downloaded(object) {
-      info!("Object already downloaded: {}", object.key);
+      info!("Object already downloaded (skipping): {}", object.key);
       return Ok(());
     }
     self.download_object_to_temp(object)?;
@@ -100,7 +100,7 @@ impl BucketDownloader {
 
     let download_path = self.destination_directory.join(path);
     if !download_path.exists() {
-      info!("Download path does not already exist: {:?}", download_path);
+      info!("Downloadable object does not already exist at path: {:?}", download_path);
       return false;
     }
 
@@ -111,12 +111,12 @@ impl BucketDownloader {
     // The fix for this is to copy them, which recomputes the md5 wholesale.
     // Read more: https://stackoverflow.com/a/29350548
     if object_hash.contains("-") {
-      warn!("Multipart hash '{}' for file {}. This will continue to download indefinitely until fixed.",
+      warn!("Multipart hash '{}' for object {}. This will continue to download indefinitely until fixed.",
             object_hash, object.key);
     }
 
     if !file_hash.eq_ignore_ascii_case(&object_hash) {
-      info!("File hash '{}' does not match object hash '{}' for file {}",
+      info!("File hash '{}' does not match object hash '{}' for file {}. Contents changed, and it needs to be updated.",
             file_hash, object_hash, object.key);
       return false;
     }
@@ -125,29 +125,36 @@ impl BucketDownloader {
   }
 
   fn download_object_to_temp(&self, object: &Object) -> AnyhowResult<()> {
-    info!("Downloading object: {}", object.key);
-
     let temp_file_path = self.temp_download_path(object);
+
+    debug!("Downloading object to temp: {} (as {:?})", object.key, temp_file_path);
+
     let mut temp_file = File::create(temp_file_path)?;
 
     let code = self.bucket.get_object_stream_blocking(&object.key, &mut temp_file)?;
     if code != 200 {
-      bail!("Couldn't download object. Code = {}", code);
+      bail!("Couldn't download object to temp. Code = {}", code);
     }
 
     Ok(())
   }
 
   fn move_temp_to_downloads(&self, object: &Object) -> AnyhowResult<()> {
+    info!("Moving temp file to permanent download directory: {}", object.key);
+
     let full_download_path = self.permanent_download_path(object);
     let download_directory_base = Self::base_directory(&full_download_path);
 
     if !download_directory_base.exists() {
-      info!("Creating directory: {:?}", download_directory_base);
+      info!("Creating base download directory: {:?}", download_directory_base);
       fs::create_dir_all(download_directory_base)?;
+    } else {
+      debug!("Base download directory already exists: {:?}", download_directory_base);
     }
 
     let temp_file_path = self.temp_download_path(object);
+
+    debug!("Renaming temp {:?} to final {:?}", temp_file_path, full_download_path);
 
     fs::rename(&temp_file_path, full_download_path)?;
     Ok(())
