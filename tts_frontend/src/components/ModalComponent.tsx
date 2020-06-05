@@ -1,7 +1,8 @@
 import ApiConfig from '../ApiConfig';
 import React from 'react';
 import { ModeSelector } from './ModeSelector';
-import { SentencesComponent } from './sentences/SentencesComponent'
+import { SentencesComponent } from './modes/sentences/SentencesComponent'
+import { MainComponent } from './MainComponent'
 
 enum Mode {
   SPEAKER,
@@ -36,8 +37,10 @@ class ModalComponent extends React.Component<Props, State> {
 
     switch (this.state.mode) {
       case Mode.SPEAKER:
+        component = <MainComponent apiConfig={this.props.apiConfig} mode={this.state.mode} />;
         break;
       case Mode.ADVANCED:
+        component = <MainComponent apiConfig={this.props.apiConfig} mode={this.state.mode } />;
         break;
       case Mode.SENTENCE:
         component = <SentencesComponent apiConfig={this.props.apiConfig} />;

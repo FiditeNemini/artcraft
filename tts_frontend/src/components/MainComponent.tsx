@@ -3,19 +3,15 @@ import TextInput from './modes/advanced_mode/TextInput';
 import TrackList from './modes/advanced_mode/TrackList';
 import { SpeakerModeComponent } from './modes/speaker_mode/SpeakerModeComponent';
 import ApiConfig from '../ApiConfig';
-
-enum Mode {
-  SPEAKER,
-  ADVANCED,
-}
+import { Mode } from './ModalComponent'
 
 interface Props {
   apiConfig: ApiConfig,
+  mode: Mode,
 }
 
 interface State {
   utterances: Array<TextAudioPair>
-  mode: Mode,
 }
 
 class TextAudioPair {
@@ -35,7 +31,6 @@ class MainComponent extends React.Component<Props, State> {
     super(props);
     this.state = { 
       utterances: new Array(),
-      mode: Mode.ADVANCED,
     };
   }
 
@@ -48,25 +43,9 @@ class MainComponent extends React.Component<Props, State> {
     this.setState({utterances: utterances});
   }
 
-  changeMode = () => {
-    let nextMode;
-    switch (this.state.mode) {
-      case Mode.ADVANCED:
-        nextMode = Mode.SPEAKER;
-        break;
-
-      case Mode.SPEAKER:
-        nextMode = Mode.ADVANCED;
-        break;
-    }
-    this.setState({
-      mode: nextMode
-    });
-  }
-
   public render() {
     let component;
-    if (this.state.mode == Mode.ADVANCED) {
+    if (this.props.mode == Mode.ADVANCED) {
       component = this.renderAdvancedMode();
     } else {
       component = this.renderSpeakerMode();
@@ -74,8 +53,6 @@ class MainComponent extends React.Component<Props, State> {
 
     return (
       <div>
-        <button onClick={this.changeMode}>Change Mode</button>
-        <hr />
         {component}
       </div>
     )
