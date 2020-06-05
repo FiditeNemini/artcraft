@@ -3,6 +3,8 @@ import './App.css';
 import { MainComponent } from './components/MainComponent';
 import ApiConfig from './ApiConfig';
 import { SentencesComponent } from './components/sentences/SentencesComponent';
+import { ModeSelector } from './components/ModeSelector';
+import { ModalComponent } from './components/ModalComponent';
 
 const App: React.FC = () => {
   let apiConfig = new ApiConfig();
@@ -12,8 +14,7 @@ const App: React.FC = () => {
   //
   return (
     <div className="App">
-      <br />
-      <SentencesComponent apiConfig={apiConfig} />
+      <ModalComponent apiConfig={apiConfig} />
     </div>
   );
 }
