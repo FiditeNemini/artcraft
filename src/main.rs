@@ -11,6 +11,8 @@ use std::path::{PathBuf, Path};
 use std::{fs, io, env};
 use std::str::FromStr;
 
+const ENV_RUST_LOG : &'static str = "RUST_LOG";
+
 struct BucketDownloader {
   bucket: Bucket,
   destination_directory: PathBuf,
@@ -210,7 +212,14 @@ fn get_env(env_name: &str) -> AnyhowResult<String> {
 }
 
 pub fn main() -> AnyhowResult<()> {
-  std::env::set_var("RUST_LOG", "info");
+  if env::var(ENV_RUST_LOG)
+    .as_ref()
+    .ok()
+    .is_none()
+  {
+    std::env::set_var(ENV_RUST_LOG, "info");
+  }
+
   env_logger::init();
 
   info!("starting");
@@ -222,6 +231,7 @@ pub fn main() -> AnyhowResult<()> {
   let download_dir = get_env(ENV_DOWNLOAD_DIR)?;
   let temp_dir = get_env(ENV_TEMP_DIR)?;
   let match_path = get_env(ENV_MATCH_PATH)?;
+
 
   let credentials = Credentials::new_blocking(
     Some(&access_key),
@@ -258,7 +268,7 @@ mod tests {
 
   #[test]
   fn test_base_directory() {
-    let mut path = PathBuf::from("models/glow-tts-test/glow_tts_ljs_txlearn-2020.06.torchjit");
+    let path = PathBuf::from("models/glow-tts-test/glow_tts_ljs_txlearn-2020.06.torchjit");
     assert_eq!(PathBuf::from("models/glow-tts-test"),
                BucketDownloader::base_directory(&path));
   }
