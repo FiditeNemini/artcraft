@@ -28,7 +28,6 @@ class ModalComponent extends React.Component<Props, State> {
   }
 
   switchMode = (mode: Mode) => {
-    console.log('switchMode', mode, this);
     this.setState({ mode: mode });
   }
 
@@ -37,9 +36,9 @@ class ModalComponent extends React.Component<Props, State> {
 
     switch (this.state.mode) {
       case Mode.SPEAKER:
-        component = <MainComponent apiConfig={this.props.apiConfig} mode={this.state.mode} />;
-        break;
       case Mode.ADVANCED:
+        // TODO: CLEAN THIS UP.
+        // Share the text input, but change the form logic and dropdowns.
         component = <MainComponent apiConfig={this.props.apiConfig} mode={this.state.mode } />;
         break;
       case Mode.SENTENCE:

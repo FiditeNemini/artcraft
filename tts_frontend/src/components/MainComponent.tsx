@@ -5,6 +5,10 @@ import { SpeakerModeComponent } from './modes/speaker_mode/SpeakerModeComponent'
 import ApiConfig from '../ApiConfig';
 import { Mode } from './ModalComponent'
 
+// TODO: CLEAN THIS UP.
+// `ModalComponent` is the new way of organizing this. This needs to be cannibalized 
+// and broken into sub-components that `ModalComponent` controls.
+
 interface Props {
   apiConfig: ApiConfig,
   mode: Mode,
@@ -37,7 +41,6 @@ class MainComponent extends React.Component<Props, State> {
   /** Add a new audio track. */
   appendUtterance = (utterance: TextAudioPair) => {
     console.log('utterance', utterance);
-    console.log('this', this);
     let utterances = this.state.utterances.slice();
     utterances.push(utterance);
     this.setState({utterances: utterances});
