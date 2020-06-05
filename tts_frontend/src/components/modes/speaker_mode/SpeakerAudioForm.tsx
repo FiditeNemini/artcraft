@@ -1,6 +1,7 @@
 import React from 'react';
 import Howl from 'howler';
 import ApiConfig from '../../../ApiConfig';
+import { SpeakRequest } from '../../../api/ApiDefinition'
 
 interface Props {
   apiConfig: ApiConfig,
@@ -12,16 +13,6 @@ interface State {
   howl?: Howl,
 }
 
-/// Requests to the "speak" endpoint.
-class SpeakRequest {
-  text: String
-  speaker: String
-
-  constructor(text: String, speaker: String) {
-    this.text = text;
-    this.speaker = speaker; 
-  }
-}
 
 class SpeakerAudioForm extends React.Component<Props, State> {
 

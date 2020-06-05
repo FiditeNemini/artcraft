@@ -13,7 +13,7 @@ const App: React.FC = () => {
   return (
     <div className="App">
       <br />
-      <SentencesComponent />
+      <SentencesComponent apiConfig={apiConfig} />
     </div>
   );
 }
