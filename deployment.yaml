@@ -22,7 +22,7 @@ metadata:
   labels:
     app: tts
 spec:
-  replicas: 6
+  replicas: 4
   selector:
     matchLabels:
       app: tts
@@ -31,7 +31,7 @@ spec:
       labels:
         app: tts
       annotations:
-        bump: '2'
+        bump: '1'
     spec:
       terminationGracePeriodSeconds: 60
       imagePullSecrets:
@@ -43,7 +43,7 @@ spec:
           type: DirectoryOrCreate
       containers:
       - name: downloader
-        image: docker.pkg.github.com/ml-applications/do-spaces-downloader/do-spaces-downloader:d61138cd1059
+        image: docker.pkg.github.com/ml-applications/do-spaces-downloader/do-spaces-downloader:58ec25e3aa3c
         command: ["./launch.sh"]
         args: [""]
         #command: ["sleep"]
@@ -77,6 +77,8 @@ spec:
           value: "" # previously "models/"
         - name: SLEEP_TIMEOUT
           value: "300"
+        - name: RUST_LOG
+          value: "info,do_spaces_downloader=debug"
       - name: tts
         # NB: Container builds are triggered by Github Actions
 
@@ -87,12 +89,18 @@ spec:
         image: docker.pkg.github.com/ml-applications/voder/tts-service:c5db0e473479
         resources:
           limits:
-            #memory: "2048Mi" # 2048 MiB = 2 GiB
-            memory: "3072Mi" # 3072 MiB = 3 GiB
+            # 4 GiB (4096 MiB)
+            # 3 GiB (3072 MiB)
+            # 2 GiB (2048 MiB)
+            memory: "4Gi" # Just under 4 GB
             cpu: "700m" # 700 milliCPU
           requests:
-            #memory: "2048Mi" # 2048 MiB = 2 GiB
-            memory: "1000Mi" # 2048 MiB = 2 GiB
+            #memory: "50Mi" - we're getting evicted!
+            # Warning  FailedScheduling   <unknown>  default-scheduler   0/6 nodes are available: 6 Insufficient memory.
+            # Normal   NotTriggerScaleUp  29s        cluster-autoscaler  pod didn't trigger scale-up (it wouldn't fit if 
+            #                                                            a new node is added):
+            #
+            memory: "4Gi" # Just under 4 GB
             cpu: "700m" # 700 milliCPU
         volumeMounts:
         - name: downloads
