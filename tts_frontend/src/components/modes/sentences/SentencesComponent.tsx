@@ -135,7 +135,7 @@ class SentencesComponent extends React.Component<Props, State> {
         }
 
         const page = params.page;
-        const urlWithParams = `${url}?page=${page}&sort_direction=${sortDirection}&per_page=100`;
+        const urlWithParams = `${url}?page=${page}&sort_direction=${sortDirection}&per_page=200`;
         return urlWithParams;
       },
     }
