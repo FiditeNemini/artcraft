@@ -69,7 +69,8 @@ class SentencesComponent extends React.Component<Props, State> {
         title: "Sentence", 
         field: "sentence", 
         formatter: "textarea",
-        minWidth: 600,
+        minWidth: 700,
+        variableHight: true,
       },
       { 
         title: "Speaker", 
