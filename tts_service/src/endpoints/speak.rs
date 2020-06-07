@@ -16,6 +16,7 @@ use crate::model::model_config::ModelPipeline;
 use crate::model::old_model::TacoMelModel;
 use crate::text::cleaners::clean_text;
 use crate::model::pipelines::arpabet_glow_tts_melgan_pipeline;
+use crate::database::model::NewSentence;
 
 #[derive(Deserialize)]
 pub struct SpeakRequest {
@@ -25,15 +26,15 @@ pub struct SpeakRequest {
   text: String,
 }
 
-pub async fn post_speak(_request: HttpRequest,
+pub async fn post_speak(request: HttpRequest,
   query: Json<SpeakRequest>,
   app_state: Data<Arc<AppState>>
 ) -> std::io::Result<HttpResponse> {
-  println!("POST /speak");
-
   let app_state = app_state.into_inner();
 
-  let speaker = match app_state.model_configs.find_speaker_by_slug(&query.speaker) {
+  let speaker_slug = query.speaker.to_string();
+
+  let speaker = match app_state.model_configs.find_speaker_by_slug(&speaker_slug) {
     Some(speaker) => speaker,
     None => {
       return Ok(HttpResponse::build(StatusCode::NOT_FOUND)
@@ -41,6 +42,34 @@ pub async fn post_speak(_request: HttpRequest,
           .body("Speaker not found"));
     },
   };
+
+  let text = query.text.to_string();
+
+  if text.is_empty() {
+    return Ok(HttpResponse::build(StatusCode::BAD_REQUEST)
+        .content_type("text/plain")
+        .body("Request has empty text."));
+  }
+
+  // NB: Actually, we want the X-Forwarded-For IP address, since otherwise
+  // we get the load balancer.
+  let ip_address = request.connection_info()
+      .remote()
+      .unwrap_or("")
+      .to_string();
+
+  let sentence_record = NewSentence {
+    sentence: text.clone(),
+    speaker: speaker_slug.clone(),
+    ip_address: ip_address,
+  };
+
+  match sentence_record.insert(&app_state.database_connector) {
+    Err(_) => error!("Could not insert sentence record for: {:?}", sentence_record),
+    Ok(_) => {},
+  }
+
+  let cleaned_text = clean_text(&text);
 
   match speaker.model_pipeline {
     ModelPipeline::ArpabetTacotronMelgan => {
@@ -54,17 +83,12 @@ pub async fn post_speak(_request: HttpRequest,
           .map(|s| s.clone())
           .expect("TODO ERROR HANDLING");
 
-      let text = query.text.to_string();
-      println!("Tacotron Model: {}", tacotron_model);
-      println!("Melgan Model: {}", melgan_model);
-      println!("Text: {}", text);
-
-      let cleaned_text = clean_text(&text);
+      info!("Tacotron Model: {}", tacotron_model);
+      info!("Melgan Model: {}", melgan_model);
+      info!("Text: {}", text);
 
       let arpabet = Arpabet::load_cmudict();
       let encoded = text_to_arpabet_encoding(arpabet, &cleaned_text);
-
-      println!("Encoded Text: {:?}", encoded);
 
       let tacotron = app_state.model_cache.get_or_load_arbabet_tacotron(&tacotron_model)
           .expect(&format!("Couldn't load tacotron model: {}", tacotron_model));
@@ -98,12 +122,9 @@ pub async fn post_speak(_request: HttpRequest,
           .map(|s| s.clone())
           .expect("TODO ERROR HANDLING");
 
-      let text = query.text.to_string();
-      println!("Glow-TTS Model: {}", glow_tts_model);
-      println!("Melgan Model: {}", melgan_model);
-      println!("Text: {}", text);
-
-      let cleaned_text = clean_text(&text);
+      info!("Glow-TTS Model: {}", glow_tts_model);
+      info!("Melgan Model: {}", melgan_model);
+      info!("Text: {}", text);
 
       let glow_tts = app_state.model_cache.get_or_load_arbabet_glow_tts(&glow_tts_model)
           .expect(&format!("Couldn't load glow-tts model: {}", glow_tts_model));

@@ -13,7 +13,9 @@ slug = "trump2"
 model_pipeline = "ArpabetGlowTtsMelgan"
 #glow_tts = "glow-experimental.torchjit"
 #glow_tts = "glow_tts_ljs_txlearn_arpabet_2020-06-01_G_1689.torchjit"
-glow_tts = "glow_tts_ljs_txlearn_arpabet_2020-06-01_G_1689-2.torchjit"
+#glow_tts = "glow_tts_ljs_txlearn_arpabet_2020-06-01_G_1689-2.torchjit"
+#glow_tts = "glow_tts_ljs_txlearn_arpabet_2020-06-01_G_2590.torchjit"
+glow_tts = "glow_tts_ljs_txlearn_arpabet_2020-06-01_G_3614.torchjit"
 melgan = "melgan_trump_txlearn_2020-05-30_steno_chkpt9800.torchjit"
 
 [[speakers]]
@@ -148,6 +150,14 @@ description = "First experiments (continued)"
 
 [[glow_tts]]
 file_path = "glow_tts_ljs_txlearn_arpabet_2020-06-01_G_1689-2.torchjit"
+description = "First experiments (continued); modified with longer input to JIT"
+
+[[glow_tts]]
+file_path = "glow_tts_ljs_txlearn_arpabet_2020-06-01_G_2590.torchjit"
+description = "First experiments (continued); modified with longer input to JIT"
+
+[[glow_tts]]
+file_path = "glow_tts_ljs_txlearn_arpabet_2020-06-01_G_3614.torchjit"
 description = "First experiments (continued); modified with longer input to JIT"
 
 # ---------------- Melgan ----------------
