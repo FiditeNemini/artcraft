@@ -31,7 +31,7 @@ spec:
       labels:
         app: tts
       annotations:
-        bump: '1'
+        bump: '2'
     spec:
       terminationGracePeriodSeconds: 60
       imagePullSecrets:
