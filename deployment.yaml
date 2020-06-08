@@ -86,7 +86,7 @@ spec:
         # LSpeech model that sounds 100% amazing
         # image: docker.pkg.github.com/echelon/voder/tts-service:6b5c22567614
         #
-        image: docker.pkg.github.com/ml-applications/voder/tts-service:a0f5c1987e5f
+        image: docker.pkg.github.com/ml-applications/voder/tts-service:078f2183b13e
         resources:
           limits:
             # 4 GiB (4096 MiB)
