@@ -1,4 +1,4 @@
-use actix_web::http::StatusCode;
+use actix_web::http::{StatusCode, header};
 use actix_web::web::{
   Data,
   Json,
@@ -105,8 +105,12 @@ pub async fn post_speak(request: HttpRequest,
                      segfaults are fixed."))
         },
         Some(wav_data) => {
+          // To make iOS Safari work, you need a Content-Range and Content-Length header:
+          // https://stackoverflow.com/a/17835399
           Ok(HttpResponse::build(StatusCode::OK)
               .content_type("audio/wav")
+              .set_header(header::CONTENT_DISPOSITION, "attachment; filename = \"generated.wav\"")
+              .set_header(header::CONTENT_RANGE, "bytes */*")
               .body(wav_data))
         },
       }
@@ -134,8 +138,12 @@ pub async fn post_speak(request: HttpRequest,
 
       let wav_data = arpabet_glow_tts_melgan_pipeline(&cleaned_text, &glow_tts, &melgan);
 
+      // To make iOS Safari work, you need a Content-Range and Content-Length header:
+      // https://stackoverflow.com/a/17835399
       Ok(HttpResponse::build(StatusCode::OK)
           .content_type("audio/wav")
+          .set_header(header::CONTENT_DISPOSITION, "attachment; filename = \"generated.wav\"")
+          .set_header(header::CONTENT_RANGE, "bytes */*")
           .body(wav_data))
     },
     ModelPipeline::RawTextTacotronMelgan => unimplemented!(),
