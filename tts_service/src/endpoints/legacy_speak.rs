@@ -154,10 +154,11 @@ pub async fn legacy_get_speak(request: HttpRequest,
           // Content-Type: audio/wav
           // Content-Disposition:
           // Content-Length: len()
+          let content_range_value = format!("bytes 0-{}/{}", wav_data.len(), wav_data.len());
           Ok(HttpResponse::build(StatusCode::OK)
               .content_type("audio/wav")
               .set_header(header::CONTENT_DISPOSITION, "attachment; filename = \"generated.wav\"")
-              .set_header(header::CONTENT_RANGE, "bytes */*")
+              .set_header(header::CONTENT_RANGE, content_range_value)
               .body(wav_data))
         },
       }
@@ -209,10 +210,11 @@ pub async fn legacy_get_speak(request: HttpRequest,
       // Content-Type: audio/wav
       // Content-Disposition:
       // Content-Length: len()
+      let content_range_value = format!("bytes 0-{}/{}", wav_data.len(), wav_data.len());
       Ok(HttpResponse::build(StatusCode::OK)
           .content_type("audio/wav")
           .set_header(header::CONTENT_DISPOSITION, "attachment; filename = \"generated.wav\"")
-          .set_header(header::CONTENT_RANGE, "bytes */*")
+          .set_header(header::CONTENT_RANGE, content_range_value)
           .body(wav_data))
     },
     ModelPipeline::RawTextTacotronMelgan => unimplemented!(),

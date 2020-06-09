@@ -107,10 +107,11 @@ pub async fn post_speak(request: HttpRequest,
         Some(wav_data) => {
           // To make iOS Safari work, you need a Content-Range and Content-Length header:
           // https://stackoverflow.com/a/17835399
+          let content_range_value = format!("bytes 0-{}/{}", wav_data.len(), wav_data.len());
           Ok(HttpResponse::build(StatusCode::OK)
               .content_type("audio/wav")
               .set_header(header::CONTENT_DISPOSITION, "attachment; filename = \"generated.wav\"")
-              .set_header(header::CONTENT_RANGE, "bytes */*")
+              .set_header(header::CONTENT_RANGE, content_range_value)
               .body(wav_data))
         },
       }
@@ -140,10 +141,11 @@ pub async fn post_speak(request: HttpRequest,
 
       // To make iOS Safari work, you need a Content-Range and Content-Length header:
       // https://stackoverflow.com/a/17835399
+      let content_range_value = format!("bytes 0-{}/{}", wav_data.len(), wav_data.len());
       Ok(HttpResponse::build(StatusCode::OK)
           .content_type("audio/wav")
           .set_header(header::CONTENT_DISPOSITION, "attachment; filename = \"generated.wav\"")
-          .set_header(header::CONTENT_RANGE, "bytes */*")
+          .set_header(header::CONTENT_RANGE, content_range_value)
           .body(wav_data))
     },
     ModelPipeline::RawTextTacotronMelgan => unimplemented!(),
