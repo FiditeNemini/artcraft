@@ -1,0 +1,357 @@
+@import-normalize; /* bring in normalize.css styles */
+
+$page-width: 800px;
+
+$light-text-color: #777;
+$button-text-color: #666;
+
+$body-font-family: 'Nunito', serif;
+$nav-font-family: 'Fira Sans', sans-serif;
+$footer-font-family: 'Fira Sans', sans-serif;
+$textarea-font-family: 'Fira Sans', sans-serif;
+$headings-font-family: 'Merriweather', serif;
+
+body {
+  margin: 0 auto;
+  width: $page-width;
+  font-family: $body-font-family;
+}
+
+p {
+  font-family: $body-font-family;
+  font-size: 1.2em;
+
+  a:link, 
+  a:visited {
+    color: #c75;
+    font-weight: bold;
+  }
+}
+
+button {
+  background-color: #e5e5e5;
+  border: 0;
+  color: $button-text-color;
+  font-size: 1.2em;
+  margin: 20px;
+  min-width: 150px;
+  padding: 0.75em;
+  padding: 10px;
+}
+
+#main {
+  position: relative; // Footer attachment.
+  min-height: 100vh;
+}
+
+$footer-height: 6rem;
+
+#viewable {
+  padding-bottom: $footer-height;
+}
+
+footer {
+  font-family: $footer-font-family;
+  width: $page-width;
+  text-align: center;
+  position: absolute; // Footer attachment.
+  bottom: 0;
+  // NB: Setting explicit height doesn't appear to be necessary, and
+  // it was creating an annoying scrollbar.
+  //height: $footer-height; 
+  color: $light-text-color;
+}
+
+nav {
+  font-family: $nav-font-family;
+  width: $page-width;
+  text-align: justify;
+  a,
+  a:link {
+    text-decoration: none;
+    color: $light-text-color;
+    padding: 10px;
+    display: inline-block;
+    font-size: 1.3em;
+    cursor: pointer;
+  }
+  a:after {
+    content: '';
+    width: 99.5%;
+  }
+  a:hover,
+  a:active {
+    background-color: #fadada;
+  }
+}
+
+form {
+  width: $page-width;
+
+  textarea {
+    font-family: $textarea-font-family;
+    border: 1px solid #999;
+    width: $page-width;
+    box-sizing: border-box;
+    font-size: 1.2em;
+    resize: vertical;
+    padding: 1em;
+    margin: 0;
+  }
+
+  button {
+    display: block;
+    margin: 1.5em auto;
+  }
+
+  .left {
+    float: left;
+    width: 50%;
+  }
+
+  .right {
+    float: right;
+    width: 50%;
+  }
+
+  .clear {
+    clear: both;
+  }
+}
+
+#status {
+  .info {
+    color: #888888;
+  }
+  .warn {
+    color: #aaaa00;
+  }
+  .error {
+    color: #aa0000;
+  }
+  min-height: 1.5em;
+}
+
+#usage,
+#updates,
+#help-wanted,
+#terms {
+  h1, h2 {
+    font-family: $headings-font-family;
+  }
+  p {
+    text-align: justify;
+  }
+  li {
+    font-size: 1.2em;
+    text-align: justify;
+    margin-bottom: 1em;
+  }
+}
+
+/** RESPONSIVENESS **/
+
+@media screen and (min-width: 600px) {
+  $page-width: 600px;
+  
+  button {
+    min-width: 250px;
+  }
+}
+
+@media screen and (min-width: 1px) {
+  $page-width: 200px;
+
+  body {
+    width: $page-width;
+  }
+  #animation canvas {
+    width: 200px;
+  }
+  #animation {
+    height: 117px;
+  }
+  nav,
+  footer {
+    width: $page-width;
+  }
+  form {
+    width: $page-width;
+    textarea {
+      width: $page-width;
+    }
+  }
+}
+
+@media screen and (min-width: 300px) {
+  $page-width: 300px;
+
+  body {
+    width: $page-width;
+  }
+  #animation canvas {
+    width: $page-width;
+  }
+  #animation {
+    height: 176px;
+  }
+  nav,
+  footer {
+    width: $page-width;
+  }
+  form {
+    width: $page-width;
+    textarea {
+      width: $page-width;
+    }
+  }
+}
+
+@media screen and (min-width: 400px) {
+  $page-width: 400px;
+
+  body {
+    width: $page-width;
+  }
+  #animation canvas {
+    width: $page-width;
+  }
+  #animation {
+    height: 235px;
+  }
+  nav,
+  footer {
+    width: $page-width;
+  }
+  form {
+    width: $page-width;
+    textarea {
+      width: $page-width;
+    }
+  }
+}
+
+@media screen and (min-width: 450px) {
+  $page-width: 450px;
+
+  body {
+    width: $page-width;
+  }
+  #animation canvas {
+    width: $page-width;
+  }
+  #animation {
+    height: 264px;
+  }
+  nav,
+  footer {
+    width: $page-width;
+  }
+  form {
+    width: $page-width;
+    textarea {
+      width: $page-width;
+    }
+  }
+}
+
+@media screen and (min-width: 500px) {
+  $page-width: 500px;
+
+  body {
+    width: $page-width;
+  }
+  #animation canvas {
+    width: $page-width;
+  }
+  #animation {
+    height: 293px;
+  }
+  nav,
+  footer {
+    width: $page-width;
+  }
+  form {
+    width: $page-width;
+    textarea {
+      width: $page-width;
+    }
+  }
+}
+
+@media screen and (min-width: 600px) {
+  $page-width: 600px;
+
+  body {
+    width: $page-width;
+  }
+  #animation canvas {
+    width: $page-width;
+  }
+  #animation {
+    height: 352px;
+  }
+  nav,
+  footer {
+    width: $page-width;
+  }
+  form {
+    width: $page-width;
+    textarea {
+      width: $page-width;
+    }
+  }
+}
+
+@media screen and (min-width: 800px) {
+  $page-width: 800px;
+
+  body {
+    width: $page-width;
+  }
+  #animation canvas {
+    width: $page-width;
+  }
+  #animation {
+    height: 470px;
+  }
+  nav, 
+  footer {
+    width: $page-width;
+  }
+  form {
+    width: $page-width;
+    textarea {
+      width: $page-width;
+    }
+  }
+}
+
+@media screen and (min-width: 1000px) {
+  #animation canvas {
+    width: 800px;
+  }
+  #animation {
+    height: 470px;
+  }
+}
+
+/** Hide footer when using onscreen keyboard. */
+@media screen and (max-height: 550px) {
+  footer {
+    display: none;
+  }
+  nav {
+    display: none;
+  }
+}
+
+@media screen and (max-height: 740px) {
+  footer p {
+    display: inline;
+  }
+  footer p:after {
+    content: ' '; // Not sure why the space disappears when inline.
+  }
+}
+

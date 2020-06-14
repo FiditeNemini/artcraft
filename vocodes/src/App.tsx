@@ -1,26 +1,66 @@
+import './App.scss';
 import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import { Footer } from './navigation/Footer';
+import { HelpWantedComponent } from './modes/help_wanted/HelpWantedComponent';
+import { Mode } from './AppMode';
+import { NewsComponent } from './modes/news/NewsComponent';
+import { SpeakComponent } from './modes/speak/SpeakComponent';
+import { TermsComponent } from './modes/terms/TermsComponent';
+import { TopNav } from './navigation/TopNav';
+import { UsageComponent } from './modes/usage/UsageComponent';
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+interface Props {}
+
+interface State {
+  mode: Mode,
+}
+
+class App extends React.Component<Props, State> {
+
+  constructor(props: Props) {
+    super(props);
+    this.state = {
+      mode: Mode.SPEAK_MODE,
+    };
+  }
+
+  switchMode = (mode: Mode) => {
+    this.setState({ mode: mode });
+  }
+
+  resetMode = () => {
+    this.setState({ mode: Mode.SPEAK_MODE });
+  }
+
+  public render() {
+    let component;
+    switch (this.state.mode) {
+      case Mode.SPEAK_MODE:
+        component = <SpeakComponent />;
+        break;
+      case Mode.USAGE_MODE:
+        component = <UsageComponent resetModeCallback={this.resetMode} />;
+        break;
+      case Mode.NEWS_MODE:
+        component = <NewsComponent resetModeCallback={this.resetMode} />;
+        break;
+      case Mode.HELP_WANTED_MODE:
+        component = <HelpWantedComponent resetModeCallback={this.resetMode} />;
+        break;
+      case Mode.TERMS_MODE:
+        component = <TermsComponent resetModeCallback={this.resetMode} />;
+        break;
+    }
+    return (
+      <div id="main">
+        <div id="viewable">
+          <TopNav mode={this.state.mode} switchModeCallback={this.switchMode} />
+          {component}
+        </div>
+        <Footer mode={this.state.mode} switchModeCallback={this.switchMode} />
+      </div>
+    );
+  }
 }
 
 export default App;
