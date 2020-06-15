@@ -26,12 +26,78 @@ tacotron = "tacotron2_ljs_high_pitch_arpabet_2020-03-28.jit"
 melgan = "melgan_ljs-high-pitch_container.pt"
 
 [[speakers]]
+name = "John F. Kennedy"
+slug = "jfk"
+model_pipeline = "ArpabetGlowTtsMultiSpeakerMelgan"
+glow_tts_multi_speaker = "glow_multispeaker.torchjit"
+melgan = "melgan_trump_txlearn_2020-05-30_steno_chkpt9800.torchjit"
+speaker_id = 1
+
+[[speakers]]
 name = "Arnold Schwarzenegger"
 slug = "arnold"
 model_pipeline = "ArpabetGlowTtsMultiSpeakerMelgan"
 glow_tts_multi_speaker = "glow_multispeaker.torchjit"
 melgan = "melgan_trump_txlearn_2020-05-30_steno_chkpt9800.torchjit"
 speaker_id = 2
+
+[[speakers]]
+name = "Bill Gates"
+slug = "gates"
+model_pipeline = "ArpabetGlowTtsMultiSpeakerMelgan"
+glow_tts_multi_speaker = "glow_multispeaker.torchjit"
+melgan = "melgan_trump_txlearn_2020-05-30_steno_chkpt9800.torchjit"
+speaker_id = 3
+
+[[speakers]]
+name = "Mark Zuckerberg"
+slug = "zuckerberg"
+model_pipeline = "ArpabetGlowTtsMultiSpeakerMelgan"
+glow_tts_multi_speaker = "glow_multispeaker.torchjit"
+melgan = "melgan_trump_txlearn_2020-05-30_steno_chkpt9800.torchjit"
+speaker_id = 4
+
+[[speakers]]
+name = "Ronald Reagan"
+slug = "reagan"
+model_pipeline = "ArpabetGlowTtsMultiSpeakerMelgan"
+glow_tts_multi_speaker = "glow_multispeaker.torchjit"
+melgan = "melgan_trump_txlearn_2020-05-30_steno_chkpt9800.torchjit"
+speaker_id = 5
+
+[[speakers]]
+name = "Queen Elizabeth II"
+slug = "queen-elizabeth"
+model_pipeline = "ArpabetGlowTtsMultiSpeakerMelgan"
+glow_tts_multi_speaker = "glow_multispeaker.torchjit"
+melgan = "melgan_trump_txlearn_2020-05-30_steno_chkpt9800.torchjit"
+speaker_id = 6
+
+[[speakers]]
+name = "Mario"
+slug = "mario"
+model_pipeline = "ArpabetGlowTtsMultiSpeakerMelgan"
+glow_tts_multi_speaker = "glow_multispeaker.torchjit"
+melgan = "melgan_trump_txlearn_2020-05-30_steno_chkpt9800.torchjit"
+speaker_id = 7
+
+[[speakers]]
+name = "Zapp Brannigan"
+slug = "zapp"
+model_pipeline = "ArpabetGlowTtsMultiSpeakerMelgan"
+glow_tts_multi_speaker = "glow_multispeaker.torchjit"
+melgan = "melgan_trump_txlearn_2020-05-30_steno_chkpt9800.torchjit"
+speaker_id = 8
+
+[[speakers]]
+name = "Morgan Freeman"
+slug = "morgan"
+model_pipeline = "ArpabetGlowTtsMultiSpeakerMelgan"
+glow_tts_multi_speaker = "glow_multispeaker.torchjit"
+#melgan = "melgan_trump_txlearn_2020-05-30_steno_chkpt9800.torchjit"
+#melgan = "shared_melgan_container-2020.01.05.pt"
+melgan = "melgan_ljs-high-pitch_container.pt"
+speaker_id = 9
 
 # --------------- Model configs ---------------
 

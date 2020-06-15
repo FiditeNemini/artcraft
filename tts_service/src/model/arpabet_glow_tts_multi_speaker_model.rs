@@ -25,6 +25,9 @@ impl ArpabetGlowTtsMultiSpeakerModel {
     let lengths = [arpabet_encodings.len() as i64];
     let lengths_tensor = Tensor::of_slice(&lengths);
 
+    // x_tst_lengths = torch.tensor([x_tst.shape[1]]).cuda()
+    // speaker_g = torch.IntTensor([int(speaker_id)]).cuda().long()
+
     let speaker = [speaker_id];
     let speaker_tensor = Tensor::of_slice(&speaker);
 
