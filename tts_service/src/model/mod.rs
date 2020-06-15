@@ -1,4 +1,5 @@
 pub mod arpabet_glow_tts_model;
+pub mod arpabet_glow_tts_multi_speaker_model;
 pub mod arpabet_tacotron_model;
 pub mod melgan_model;
 pub mod model_cache;

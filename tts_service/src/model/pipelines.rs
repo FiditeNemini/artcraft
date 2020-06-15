@@ -9,10 +9,28 @@ use hound::WavWriter;
 use std::io::{Cursor, BufWriter};
 use tch::Tensor;
 use crate::model::arpabet_glow_tts_model::ArpabetGlowTtsModel;
+use crate::model::arpabet_glow_tts_multi_speaker_model::ArpabetGlowTtsMultiSpeakerModel;
 
 // TODO: This might be useful to implement as a multi-stage
 //  state machine struct with functions, that way you can pull out
 //  intermediate pieces (eg. text to send to the db, or reject the request)
+
+pub fn arpabet_glow_tts_multi_speaker_melgan_pipeline(
+  cleaned_text: &str,
+  speaker_id: i64,
+  arpabet_glow_tts: &ArpabetGlowTtsMultiSpeakerModel,
+  melgan: &MelganModel) -> Vec<u8> {
+
+  let arpabet = Arpabet::load_cmudict(); // TODO: Inefficient.
+  let arpabet_encodings = text_to_arpabet_encoding_glow_tts(arpabet, &cleaned_text);
+
+  let mel_tensor = arpabet_glow_tts.encoded_arpabet_to_mel(&arpabet_encodings, speaker_id);
+
+  let audio_tensor = melgan.tacotron_mel_to_audio(&mel_tensor);
+  let audio_signal = mel_audio_tensor_to_audio_signal(audio_tensor);
+
+  audio_signal_to_wav_bytes(audio_signal)
+}
 
 pub fn arpabet_glow_tts_melgan_pipeline(
   cleaned_text: &str,

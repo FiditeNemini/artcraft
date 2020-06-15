@@ -25,6 +25,14 @@ model_pipeline = "ArpabetTacotronMelgan"
 tacotron = "tacotron2_ljs_high_pitch_arpabet_2020-03-28.jit"
 melgan = "melgan_ljs-high-pitch_container.pt"
 
+[[speakers]]
+name = "Arnold Schwarzenegger"
+slug = "arnold"
+model_pipeline = "ArpabetGlowTtsMultiSpeakerMelgan"
+glow_tts_multi_speaker = "glow_multispeaker.torchjit"
+melgan = "melgan_trump_txlearn_2020-05-30_steno_chkpt9800.torchjit"
+speaker_id = 2
+
 # --------------- Model configs ---------------
 
 [[model_locations]]
@@ -39,6 +47,10 @@ base_directory = "/home/bt/dev/jit-models/glow-tts-jaywalnut"
 [[model_locations]]
 model_type = "Melgan"
 base_directory = "/home/bt/dev/tacotron-melgan/"
+
+[[model_locations]]
+model_type = "ArpabetGlowTtsMultiSpeaker"
+base_directory = "/home/bt/dev/jit-models/glow-tts-jaywalnut-multispeaker"
 
 # --------------- Tacotron ---------------
 
@@ -159,6 +171,12 @@ description = "First experiments (continued); modified with longer input to JIT"
 [[glow_tts]]
 file_path = "glow_tts_ljs_txlearn_arpabet_2020-06-01_G_3614.torchjit"
 description = "First experiments (continued); modified with longer input to JIT"
+
+
+# ---------------- Glow TTS Multi-speaker ----------------
+[[glow_tts_multi_speaker]]
+file_path = "glow_multispeaker.torchjit"
+description = "Mutli-speaker garbage"
 
 # ---------------- Melgan ----------------
 

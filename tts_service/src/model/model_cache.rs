@@ -6,6 +6,7 @@ use std::path::PathBuf;
 use std::sync::Arc;
 use std::sync::Mutex;
 use crate::model::arpabet_glow_tts_model::ArpabetGlowTtsModel;
+use crate::model::arpabet_glow_tts_multi_speaker_model::ArpabetGlowTtsMultiSpeakerModel;
 
 pub struct ModelCache {
   /// Base directories for each model type(if configured)
@@ -13,6 +14,7 @@ pub struct ModelCache {
 
   arpabet_tacotron_models: Arc<Mutex<HashMap<String, Arc<ArpabetTacotronModel>>>>,
   arpabet_glow_tts_models: Arc<Mutex<HashMap<String, Arc<ArpabetGlowTtsModel>>>>,
+  arpabet_glow_tts_multi_speaker_models: Arc<Mutex<HashMap<String, Arc<ArpabetGlowTtsMultiSpeakerModel>>>>,
   melgan_models: Arc<Mutex<HashMap<String, Arc<MelganModel>>>>,
 }
 
@@ -31,6 +33,7 @@ impl ModelCache {
       base_directories,
       arpabet_tacotron_models: Arc::new(Mutex::new(HashMap::new())),
       arpabet_glow_tts_models: Arc::new(Mutex::new(HashMap::new())),
+      arpabet_glow_tts_multi_speaker_models: Arc::new(Mutex::new(HashMap::new())),
       melgan_models: Arc::new(Mutex::new(HashMap::new())),
     }
   }
@@ -83,6 +86,36 @@ impl ModelCache {
     }
 
     match ArpabetGlowTtsModel::load(&file_path) {
+      Ok(model) => {
+        let arc = Arc::new(model);
+        lock.insert(filename.to_string(), arc.clone());
+        Some(arc)
+      },
+      Err(e) => {
+        warn!("There was an error loading the model `{:?}`: {}", file_path, e);
+        None
+      },
+    }
+  }
+
+  pub fn get_or_load_arbabet_glow_tts_multi_speaker(&self, filename: &str) -> Option<Arc<ArpabetGlowTtsMultiSpeakerModel>> {
+    let base_directory = self.get_base_directory(ModelType::ArpabetGlowTtsMultiSpeaker);
+
+    let mut file_path = PathBuf::from(filename);
+
+    if !file_path.is_absolute() {
+      file_path = base_directory.map(|base_dir| base_dir.join(&file_path))
+          .unwrap_or(file_path);
+    }
+
+    let mut lock = self.arpabet_glow_tts_multi_speaker_models.lock()
+        .expect("should unlock");
+
+    if let Some(model) = lock.get(filename) {
+      return Some(model.clone());
+    }
+
+    match ArpabetGlowTtsMultiSpeakerModel::load(&file_path) {
       Ok(model) => {
         let arc = Arc::new(model);
         lock.insert(filename.to_string(), arc.clone());

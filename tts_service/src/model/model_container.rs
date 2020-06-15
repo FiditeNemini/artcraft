@@ -40,4 +40,14 @@ impl ModelContainer {
 
     result.expect("SHOULD WORK")
   }
+
+  pub fn forward3(&self, arg1: &Tensor, arg2: &Tensor, arg3: &Tensor) -> Tensor {
+    let result = self.jit_model.forward_ts(&[arg1, arg2, arg3]);
+
+    if let Err(err) = result.as_ref() {
+      println!("error: {:?}", err);
+    }
+
+    result.expect("SHOULD WORK")
+  }
 }

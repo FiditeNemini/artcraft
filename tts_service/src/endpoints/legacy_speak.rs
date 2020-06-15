@@ -217,6 +217,7 @@ pub async fn legacy_get_speak(request: HttpRequest,
           .set_header(header::CONTENT_RANGE, content_range_value)
           .body(wav_data))
     },
+    ModelPipeline::ArpabetGlowTtsMultiSpeakerMelgan=> unimplemented!(),
     ModelPipeline::RawTextTacotronMelgan => unimplemented!(),
   }
 }
