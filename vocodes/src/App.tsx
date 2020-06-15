@@ -8,11 +8,13 @@ import { SpeakComponent } from './modes/speak/SpeakComponent';
 import { TermsComponent } from './modes/terms/TermsComponent';
 import { TopNav } from './navigation/TopNav';
 import { UsageComponent } from './modes/usage/UsageComponent';
+import { Speaker, SPEAKERS } from './Speakers';
 
 interface Props {}
 
 interface State {
   mode: Mode,
+  speaker: Speaker,
 }
 
 class App extends React.Component<Props, State> {
@@ -21,6 +23,7 @@ class App extends React.Component<Props, State> {
     super(props);
     this.state = {
       mode: Mode.SPEAK_MODE,
+      speaker: SPEAKERS[0],
     };
   }
 
@@ -32,11 +35,24 @@ class App extends React.Component<Props, State> {
     this.setState({ mode: Mode.SPEAK_MODE });
   }
 
+  setSpeaker = (speaker: Speaker) : void => {
+    this.setState({ speaker: speaker });
+  }
+
+  setSpeakerBySlug = (speakerSlug: string) : void => {
+    console.log('speaker', speakerSlug);
+    SPEAKERS.forEach(speaker => {
+      if (speaker.slug == speakerSlug) {
+        this.setState({ speaker: speaker });
+      }
+    })
+  }
+
   public render() {
     let component;
     switch (this.state.mode) {
       case Mode.SPEAK_MODE:
-        component = <SpeakComponent />;
+        component = <SpeakComponent currentSpeaker={this.state.speaker} changeSpeakerCallback={this.setSpeakerBySlug} />;
         break;
       case Mode.USAGE_MODE:
         component = <UsageComponent resetModeCallback={this.resetMode} />;

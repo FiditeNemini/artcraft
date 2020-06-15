@@ -8,6 +8,13 @@ function NewsComponent(props: Props) {
   return (
     <div id="updates">
       <h1> Updates </h1>
+      <h2>
+        June 14, 2020: New website.
+      </h2>
+
+      <p>
+        I'm creating models for a variety of speakers.
+      </p>
 
       <h2>
         June 7, 2020: Website rewrite.

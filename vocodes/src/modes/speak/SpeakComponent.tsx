@@ -2,6 +2,9 @@ import React from 'react';
 import { Form } from './Form';
 import { StatusText } from './StatusText';
 import { getRandomInt } from '../../Utils';
+import { Avatar } from './Avatar';
+import { SpeakerDropdown } from './SpeakerDropdown';
+import { Speaker } from '../../Speakers';
 
 enum StatusState {
   NONE,
@@ -10,7 +13,10 @@ enum StatusState {
   ERROR,
 }
 
-interface Props {}
+interface Props {
+  currentSpeaker: Speaker;
+  changeSpeakerCallback: (slug: string) => void,
+}
 
 interface State {
   statusState: StatusState;
@@ -77,7 +83,7 @@ class SpeakComponent extends React.Component<Props, State> {
         message = "Playing.";
         break;
       case 3:
-        message = "Here's some Trump audio.";
+        message = "Here's some audio.";
         break;
       case 4:
       default:
@@ -102,10 +108,23 @@ class SpeakComponent extends React.Component<Props, State> {
   public render() {
     return (
       <div>
+        <SpeakerDropdown 
+          currentSpeaker={this.props.currentSpeaker} 
+          changeSpeakerCallback={this.props.changeSpeakerCallback} 
+          />
+
+        <div>
+          <Avatar currentSpeaker={this.props.currentSpeaker} />
+          <p>{this.props.currentSpeaker.getDescription()}</p>
+
+        </div>
+
         <StatusText 
           statusState={this.state.statusState} 
-          statusMessage={this.state.statusMessage}/>
+          statusMessage={this.state.statusMessage}
+          />
         <Form 
+          currentSpeaker={this.props.currentSpeaker}
           clearStatusCallback={this.clearMessage}
           setHintMessage={this.setHintMessage}
           onSpeakRequestCallback={this.onSpeakRequest}
@@ -113,7 +132,7 @@ class SpeakComponent extends React.Component<Props, State> {
           onSpeakErrorCallback={this.onSpeakError}
           onPlayCallback={this.onPlay}
           onStopCallback={this.onStop}
-        />
+          />
       </div>
     );
   }

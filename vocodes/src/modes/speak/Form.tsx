@@ -1,9 +1,11 @@
 import Howl from 'howler';
 import React from 'react';
 import { SpeakRequest } from './SpeakRequest';
+import { Speaker } from '../../Speakers';
 
 
 interface Props {
+  currentSpeaker: Speaker,
   clearStatusCallback: () => void,
   setHintMessage: (message: string) => void,
   onSpeakRequestCallback: () => void,
@@ -111,7 +113,8 @@ class Form extends React.Component<Props, State> {
 
   handleFormSubmit = (ev: React.FormEvent<HTMLFormElement>) : boolean => {
     ev.preventDefault();
-    this.speak(this.state.text, 'trump');
+    let speaker = this.props.currentSpeaker.getSlug();
+    this.speak(this.state.text, speaker);
     return false;
   }
 
