@@ -21,3 +21,7 @@
 .track_text {
   margin-left: 0.5em;
 }
+
+canvas#spectrogram {
+  transform: scaleY(-1); /* Spectrograms are flipped */
+}

@@ -128,9 +128,9 @@ class SpeakerSpectrogramAudioForm extends React.Component<Props, State> {
 
       var image = new ImageData(this.state.spectrogram!.pixels, width, height);
 
-      createImageBitmap(image).then(renderer => 
+      createImageBitmap(image).then(renderer => {
         ctx.drawImage(renderer, 0, 0, width * 3, height * 3)
-      );
+      });
     }
   }
 
@@ -143,7 +143,7 @@ class SpeakerSpectrogramAudioForm extends React.Component<Props, State> {
       height = this.state.spectrogram.height * 3;
     }
 
-    let canvas = <canvas ref="canvas" width={width} height={height}/>
+    let canvas = <canvas ref="canvas" width={width} height={height} id="spectrogram" />
 
     return (
       <div>
