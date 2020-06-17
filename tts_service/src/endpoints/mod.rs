@@ -5,5 +5,6 @@ pub mod models;
 pub mod readiness;
 pub mod sentences;
 pub mod speak;
+pub mod speak_with_spectrogram;
 pub mod speakers;
 pub mod tts;

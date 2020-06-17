@@ -10,6 +10,7 @@ use std::io::{Cursor, BufWriter};
 use tch::Tensor;
 use crate::model::arpabet_glow_tts_model::ArpabetGlowTtsModel;
 use crate::model::arpabet_glow_tts_multi_speaker_model::ArpabetGlowTtsMultiSpeakerModel;
+use crate::endpoints::speak_with_spectrogram::Spectrogram;
 
 // TODO: This might be useful to implement as a multi-stage
 //  state machine struct with functions, that way you can pull out
@@ -32,6 +33,61 @@ pub fn arpabet_glow_tts_multi_speaker_melgan_pipeline(
   audio_signal_to_wav_bytes(audio_signal)
 }
 
+pub fn arpabet_glow_tts_multi_speaker_melgan_pipeline_with_spectrogram(
+  cleaned_text: &str,
+  speaker_id: i64,
+  arpabet_glow_tts: &ArpabetGlowTtsMultiSpeakerModel,
+  melgan: &MelganModel) -> (Spectrogram, Vec<u8>) {
+
+  let arpabet = Arpabet::load_cmudict(); // TODO: Inefficient.
+  let arpabet_encodings = text_to_arpabet_encoding_glow_tts(arpabet, &cleaned_text);
+
+  let mel_tensor = arpabet_glow_tts.encoded_arpabet_to_mel(&arpabet_encodings, speaker_id);
+
+  let spectrogram = {
+    let dims = mel_tensor.size3().expect("This should work");
+
+    let mut spectrogram = Spectrogram::default();
+    spectrogram.height = dims.1;
+    spectrogram.width = dims.2;
+
+    let length = dims.0 * dims.1 * dims.2;
+    let mut data = [0.0f32].repeat(length as usize);
+    mel_tensor.copy_data(data.as_mut_slice(), length as usize);
+
+    // NB: The real maxima and minima are +/-inf, but I don't want to deal with that.
+    let mut max_value = -100000.0f32;
+    let mut min_value = 100000.0f32;
+
+    for sample in data.iter() {
+      if *sample < min_value {
+        min_value = *sample;
+      } else if *sample > max_value {
+        max_value = *sample;
+      }
+    }
+
+    let mut scaled_data = Vec::with_capacity(data.len());
+    for sample in data {
+      let scaled_sample = ( (255.0f32 - 0.0f32) * (sample - min_value) ) / ( max_value - min_value );
+      scaled_data.push(scaled_sample);
+    }
+
+    let bytes : Vec<u8> = scaled_data.iter().map(|s| *s as u8).collect();
+
+    spectrogram.bytes_base64 = base64::encode(bytes);
+    spectrogram
+  };
+
+  let audio_tensor = melgan.tacotron_mel_to_audio(&mel_tensor);
+  let audio_signal = mel_audio_tensor_to_audio_signal(audio_tensor);
+
+  (
+    spectrogram,
+    audio_signal_to_wav_bytes(audio_signal),
+  )
+}
+
 pub fn arpabet_glow_tts_melgan_pipeline(
   cleaned_text: &str,
   arpabet_glow_tts: &ArpabetGlowTtsModel,
@@ -46,6 +102,60 @@ pub fn arpabet_glow_tts_melgan_pipeline(
   let audio_signal = mel_audio_tensor_to_audio_signal(audio_tensor);
 
   audio_signal_to_wav_bytes(audio_signal)
+}
+
+pub fn arpabet_glow_tts_melgan_pipeline_with_spectrogram(
+  cleaned_text: &str,
+  arpabet_glow_tts: &ArpabetGlowTtsModel,
+  melgan: &MelganModel) -> (Spectrogram, Vec<u8>) {
+
+  let arpabet = Arpabet::load_cmudict(); // TODO: Inefficient.
+  let arpabet_encodings = text_to_arpabet_encoding_glow_tts(arpabet, &cleaned_text);
+
+  let mel_tensor = arpabet_glow_tts.encoded_arpabet_to_mel(&arpabet_encodings);
+
+  let spectrogram = {
+    let dims = mel_tensor.size3().expect("This should work");
+
+    let mut spectrogram = Spectrogram::default();
+    spectrogram.height = dims.1;
+    spectrogram.width = dims.2;
+
+    let length = dims.0 * dims.1 * dims.2;
+    let mut data = [0.0f32].repeat(length as usize);
+    mel_tensor.copy_data(data.as_mut_slice(), length as usize);
+
+    // NB: The real maxima and minima are +/-inf, but I don't want to deal with that.
+    let mut max_value = -100000.0f32;
+    let mut min_value = 100000.0f32;
+
+    for sample in data.iter() {
+      if *sample < min_value {
+        min_value = *sample;
+      } else if *sample > max_value {
+        max_value = *sample;
+      }
+    }
+
+    let mut scaled_data = Vec::with_capacity(data.len());
+    for sample in data {
+      let scaled_sample = ( (255.0f32 - 0.0f32) * (sample - min_value) ) / ( max_value - min_value );
+      scaled_data.push(scaled_sample);
+    }
+
+    let bytes : Vec<u8> = scaled_data.iter().map(|s| *s as u8).collect();
+
+    spectrogram.bytes_base64 = base64::encode(bytes);
+    spectrogram
+  };
+
+  let audio_tensor = melgan.tacotron_mel_to_audio(&mel_tensor);
+  let audio_signal = mel_audio_tensor_to_audio_signal(audio_tensor);
+
+  (
+    spectrogram,
+    audio_signal_to_wav_bytes(audio_signal),
+  )
 }
 
 pub fn arpabet_tacotron_melgan_pipeline(

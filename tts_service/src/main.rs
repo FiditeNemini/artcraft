@@ -41,6 +41,7 @@ use crate::endpoints::tts::post_tts;
 use crate::model::model_cache::ModelCache;
 use crate::model::model_config::ModelConfigs;
 use crate::text::checker::TextChecker;
+use crate::endpoints::speak_with_spectrogram::post_speak_with_spectrogram;
 
 const ENV_ASSET_DIRECTORY: &'static str = "ASSET_DIRECTORY";
 const ENV_BIND_ADDRESS: &'static str = "BIND_ADDRESS";
@@ -231,6 +232,11 @@ async fn run_server(app_state: AppState, server_args: ServerArgs) -> std::io::Re
         web::resource("/speak")
             .route(web::post().to(post_speak))
             .route(web::get().to(legacy_get_speak))
+            .route(web::head().to(|| HttpResponse::Ok()))
+      )
+      .service(
+        web::resource("/speak_spectrogram")
+            .route(web::post().to(post_speak_with_spectrogram))
             .route(web::head().to(|| HttpResponse::Ok()))
       )
       .service(get_root)
