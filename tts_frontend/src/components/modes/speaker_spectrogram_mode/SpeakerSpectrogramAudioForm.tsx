@@ -15,11 +15,11 @@ interface State {
 }
 
 class Spectrogram {
-  pixels: Uint8Array;
+  pixels: Uint8ClampedArray;
   width: number;
   height: number;
 
-  constructor(pixels: Uint8Array, width: number, height: number) {
+  constructor(pixels: Uint8ClampedArray, width: number, height: number) {
     this.pixels = pixels;
     this.width = width;
     this.height = height;
@@ -70,12 +70,15 @@ class SpeakerSpectrogramAudioForm extends React.Component<Props, State> {
       // console.log('image', image);
 
       // https://stackoverflow.com/a/21797381
-      function base64ToArrayBuffer(base64string: string) : Uint8Array {
+      function base64ToArrayBuffer(base64string: string) : Uint8ClampedArray {
         var binary_string = window.atob(base64string);
-        var len = binary_string.length;
-        var bytes = new Uint8Array(len);
-        for (var i = 0; i < len; i++) {
-            bytes[i] = binary_string.charCodeAt(i);
+        var len = binary_string.length * 4;
+        let bytes = new Uint8ClampedArray(len);
+        for (let i = 0, j = 0; i < len; i++, j += 4) {
+            bytes[j+0] = binary_string.charCodeAt(i);
+            bytes[j+1] = binary_string.charCodeAt(i);
+            bytes[j+2] = binary_string.charCodeAt(i);
+            bytes[j+3] = 255;
         }
         //return bytes.buffer;
         return bytes;
@@ -115,45 +118,29 @@ class SpeakerSpectrogramAudioForm extends React.Component<Props, State> {
 
   updateCanvas() {
     const ctx = (this.refs.canvas as any).getContext('2d');
-
-    let width = 300;
-    let height = 80;
-    ctx.clearRect(0,0, width, height);
+    // let width = 300;
+    // let height = 80;
+    // ctx.clearRect(0,0, width, height);
 
     if (this.state.spectrogram !== undefined) {
-      width = this.state.spectrogram!.width || 300;
-      height = this.state.spectrogram!.height || 80;
+      let width = this.state.spectrogram!.width;
+      let height = this.state.spectrogram!.height;
 
-      ctx.clearRect(0,0, width, height);
+      var image = new ImageData(this.state.spectrogram!.pixels, width, height);
 
-      //for (let i = 0; i < width; i++) {
-      //  for (let j = 0; j < height; j++) {
-      //  }
-      //}
-
-      var imageData = ctx.getImageData(0, 0, width, height);
-      var data = imageData.data;
-
-      for (let i = 0, j = 0; i < data.length; i += 4, j += 1) {
-        let value = this.state.spectrogram!.pixels[j];
-
-        data[i]     = value; // red
-        data[i + 1] = value; // green
-        data[i + 2] = value; // blue
-        data[i + 3] = 255;
-      }
-      console.log('updating context');
-      ctx.putImageData(imageData, 0, 0);
+      createImageBitmap(image).then(renderer => 
+        ctx.drawImage(renderer, 0, 0, width * 3, height * 3)
+      );
     }
   }
 
   public render() {
-    let width = 150;
-    let height = 80;
-    if (this.state.spectrogram !== undefined) {
-      width = this.state.spectrogram.width;
-      height = this.state.spectrogram.height;
+    let width = 150 * 3;
+    let height = 80 * 3;
 
+    if (this.state.spectrogram !== undefined) {
+      width = this.state.spectrogram.width * 3;
+      height = this.state.spectrogram.height * 3;
     }
 
     let canvas = <canvas ref="canvas" width={width} height={height}/>
