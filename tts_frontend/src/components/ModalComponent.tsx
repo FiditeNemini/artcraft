@@ -3,9 +3,11 @@ import React from 'react';
 import { ModeSelector } from './ModeSelector';
 import { SentencesComponent } from './modes/sentences/SentencesComponent'
 import { MainComponent } from './MainComponent'
+import { SpeakerSpectrogramModeComponent } from './modes/speaker_spectrogram_mode/SpeakerSpectrogramModeComponent';
 
 enum Mode {
   SPEAKER,
+  SPEAKER_SPECTROGRAM,
   ADVANCED,
   SENTENCE,
 }
@@ -40,6 +42,9 @@ class ModalComponent extends React.Component<Props, State> {
         // TODO: CLEAN THIS UP.
         // Share the text input, but change the form logic and dropdowns.
         component = <MainComponent apiConfig={this.props.apiConfig} mode={this.state.mode } />;
+        break;
+      case Mode.SPEAKER_SPECTROGRAM:
+        component = <SpeakerSpectrogramModeComponent apiConfig={this.props.apiConfig} />;
         break;
       case Mode.SENTENCE:
         component = <SentencesComponent apiConfig={this.props.apiConfig} />;

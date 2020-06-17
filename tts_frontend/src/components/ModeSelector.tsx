@@ -17,12 +17,16 @@ class ModeSelector extends React.Component<Props, State> {
 
   public render() {
     let speakerDisabled = false;
+    let speakerSpectrogramDisabled = false;
     let advancedDisabled = false;
     let sentencesDisabled = false;
 
     switch (this.props.mode) {
       case Mode.SPEAKER:
         speakerDisabled = true;
+        break;
+      case Mode.SPEAKER_SPECTROGRAM:
+        speakerSpectrogramDisabled = true;
         break;
       case Mode.ADVANCED:
         advancedDisabled = true;
@@ -38,6 +42,11 @@ class ModeSelector extends React.Component<Props, State> {
           disabled={speakerDisabled} 
           onClick={() => this.props.switchModeCallback(Mode.SPEAKER)}>
             Speakers
+        </button>
+        <button 
+          disabled={speakerSpectrogramDisabled} 
+          onClick={() => this.props.switchModeCallback(Mode.SPEAKER_SPECTROGRAM)}>
+            Speaker + Spectrogram
         </button>
         <button 
           disabled={advancedDisabled}

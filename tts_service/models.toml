@@ -30,7 +30,8 @@ name = "John F. Kennedy"
 slug = "jfk"
 model_pipeline = "ArpabetGlowTtsMultiSpeakerMelgan"
 glow_tts_multi_speaker = "glow_multispeaker.torchjit"
-melgan = "melgan_trump_txlearn_2020-05-30_steno_chkpt9800.torchjit"
+#melgan = "melgan_trump_txlearn_2020-05-30_steno_chkpt9800.torchjit"
+melgan = "melgan_multivoice-1.0_2020.06.15_12d5838_6725.torchjit" # TODO: Wtf - noise
 speaker_id = 1
 
 [[speakers]]
@@ -38,7 +39,8 @@ name = "Arnold Schwarzenegger"
 slug = "arnold"
 model_pipeline = "ArpabetGlowTtsMultiSpeakerMelgan"
 glow_tts_multi_speaker = "glow_multispeaker.torchjit"
-melgan = "melgan_trump_txlearn_2020-05-30_steno_chkpt9800.torchjit"
+#melgan = "melgan_trump_txlearn_2020-05-30_steno_chkpt9800.torchjit"
+melgan = "melgan_multivoice-1.0_2020.06.15_12d5838_6725.torchjit"
 speaker_id = 2
 
 [[speakers]]
@@ -46,7 +48,8 @@ name = "Bill Gates"
 slug = "gates"
 model_pipeline = "ArpabetGlowTtsMultiSpeakerMelgan"
 glow_tts_multi_speaker = "glow_multispeaker.torchjit"
-melgan = "melgan_trump_txlearn_2020-05-30_steno_chkpt9800.torchjit"
+#melgan = "melgan_trump_txlearn_2020-05-30_steno_chkpt9800.torchjit"
+melgan = "melgan_multivoice-1.0_2020.06.15_12d5838_6725.torchjit"
 speaker_id = 3
 
 [[speakers]]
@@ -54,7 +57,8 @@ name = "Mark Zuckerberg"
 slug = "zuckerberg"
 model_pipeline = "ArpabetGlowTtsMultiSpeakerMelgan"
 glow_tts_multi_speaker = "glow_multispeaker.torchjit"
-melgan = "melgan_trump_txlearn_2020-05-30_steno_chkpt9800.torchjit"
+#melgan = "melgan_trump_txlearn_2020-05-30_steno_chkpt9800.torchjit"
+melgan = "melgan_multivoice-1.0_2020.06.15_12d5838_6725.torchjit"
 speaker_id = 4
 
 [[speakers]]
@@ -62,7 +66,8 @@ name = "Ronald Reagan"
 slug = "reagan"
 model_pipeline = "ArpabetGlowTtsMultiSpeakerMelgan"
 glow_tts_multi_speaker = "glow_multispeaker.torchjit"
-melgan = "melgan_trump_txlearn_2020-05-30_steno_chkpt9800.torchjit"
+#melgan = "melgan_trump_txlearn_2020-05-30_steno_chkpt9800.torchjit"
+melgan = "melgan_multivoice-1.0_2020.06.15_12d5838_6725.torchjit"
 speaker_id = 5
 
 [[speakers]]
@@ -70,7 +75,8 @@ name = "Queen Elizabeth II"
 slug = "queen-elizabeth"
 model_pipeline = "ArpabetGlowTtsMultiSpeakerMelgan"
 glow_tts_multi_speaker = "glow_multispeaker.torchjit"
-melgan = "melgan_trump_txlearn_2020-05-30_steno_chkpt9800.torchjit"
+#melgan = "melgan_trump_txlearn_2020-05-30_steno_chkpt9800.torchjit"
+melgan = "melgan_multivoice-1.0_2020.06.15_12d5838_6725.torchjit"
 speaker_id = 6
 
 [[speakers]]
@@ -78,7 +84,8 @@ name = "Mario"
 slug = "mario"
 model_pipeline = "ArpabetGlowTtsMultiSpeakerMelgan"
 glow_tts_multi_speaker = "glow_multispeaker.torchjit"
-melgan = "melgan_trump_txlearn_2020-05-30_steno_chkpt9800.torchjit"
+#melgan = "melgan_trump_txlearn_2020-05-30_steno_chkpt9800.torchjit"
+melgan = "melgan_multivoice-1.0_2020.06.15_12d5838_6725.torchjit"
 speaker_id = 7
 
 [[speakers]]
@@ -86,7 +93,8 @@ name = "Zapp Brannigan"
 slug = "zapp"
 model_pipeline = "ArpabetGlowTtsMultiSpeakerMelgan"
 glow_tts_multi_speaker = "glow_multispeaker.torchjit"
-melgan = "melgan_trump_txlearn_2020-05-30_steno_chkpt9800.torchjit"
+#melgan = "melgan_trump_txlearn_2020-05-30_steno_chkpt9800.torchjit"
+melgan = "melgan_multivoice-1.0_2020.06.15_12d5838_6725.torchjit"
 speaker_id = 8
 
 [[speakers]]
@@ -96,8 +104,34 @@ model_pipeline = "ArpabetGlowTtsMultiSpeakerMelgan"
 glow_tts_multi_speaker = "glow_multispeaker.torchjit"
 #melgan = "melgan_trump_txlearn_2020-05-30_steno_chkpt9800.torchjit"
 #melgan = "shared_melgan_container-2020.01.05.pt"
-melgan = "melgan_ljs-high-pitch_container.pt"
+#melgan = "melgan_ljs-high-pitch_container.pt"
+melgan = "melgan_multivoice-1.0_2020.06.15_12d5838_6725.torchjit"
 speaker_id = 9
+
+[[speakers]]
+name = "LJS Multi Base 1"
+slug = "multi1"
+model_pipeline = "ArpabetGlowTtsMultiSpeakerMelgan"
+glow_tts_multi_speaker = "glow_ljs_base.torchjit"
+melgan = "melgan_trump_txlearn_2020-05-30_steno_chkpt9800.torchjit"
+speaker_id = 1
+
+[[speakers]]
+name = "LJS Multi Base 2"
+slug = "multi1"
+model_pipeline = "ArpabetGlowTtsMultiSpeakerMelgan"
+glow_tts_multi_speaker = "glow_ljs_base.torchjit"
+melgan = "melgan_trump_txlearn_2020-05-30_steno_chkpt9800.torchjit"
+speaker_id = 2
+
+[[speakers]]
+name = "LJS Multi Base 50"
+slug = "multi1"
+model_pipeline = "ArpabetGlowTtsMultiSpeakerMelgan"
+glow_tts_multi_speaker = "glow_ljs_base.torchjit"
+melgan = "melgan_trump_txlearn_2020-05-30_steno_chkpt9800.torchjit"
+speaker_id = 50
+
 
 # --------------- Model configs ---------------
 
@@ -244,6 +278,10 @@ description = "First experiments (continued); modified with longer input to JIT"
 file_path = "glow_multispeaker.torchjit"
 description = "Mutli-speaker garbage"
 
+[[glow_tts_multi_speaker]]
+file_path = "glow_ljs_base.torchjit"
+description = "Mutli-speaker base model (LambdaLabs expensive Tesla GPU)"
+
 # ---------------- Melgan ----------------
 
 # TODO: Get a high-quality LJS Melgan
@@ -272,3 +310,18 @@ description = "Unknown"
 file_path = "shared_melgan_container-2020.01.05.pt"
 description = "Unknown"
 
+[[melgan]]
+file_path = "melgan_multivoice-1.0_2020.06.15_12d5838_6275.torchjit"
+description = "first multivoice (txlearned)"
+
+[[melgan]]
+file_path = "melgan_multivoice-1.0_2020.06.15_12d5838_6300.torchjit"
+description = "first multivoice (txlearned)"
+
+[[melgan]]
+file_path = "melgan_multivoice-1.0_2020.06.15_12d5838_6475.torchjit"
+description = "first multivoice (txlearned)"
+
+[[melgan]]
+file_path = "melgan_multivoice-1.0_2020.06.15_12d5838_6725.torchjit"
+description = "first multivoice (txlearned)"
