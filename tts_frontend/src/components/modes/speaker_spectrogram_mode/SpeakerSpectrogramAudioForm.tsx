@@ -1,6 +1,8 @@
 import React from 'react';
 import Howl from 'howler';
 import ApiConfig from '../../../ApiConfig';
+import { createColorMap, linearScale } from "@colormap/core";
+import { VIRIDIS, CIVIDIS, PLASMA, INFERNO, MAGMA, BLACK_WHITE,  } from "@colormap/presets";
 import { SpeakRequest } from '../../../api/ApiDefinition'
 
 interface Props {
@@ -69,18 +71,28 @@ class SpeakerSpectrogramAudioForm extends React.Component<Props, State> {
       // image.src = `data:image/bmp;base64,${res.spectrogram.bytes_base64}`;
       // console.log('image', image);
 
+      let scale = linearScale([0, 255], [0, 1]);
+      let colorMap = createColorMap(MAGMA, scale);
+
       // https://stackoverflow.com/a/21797381
       function base64ToArrayBuffer(base64string: string) : Uint8ClampedArray {
         var binary_string = window.atob(base64string);
         var len = binary_string.length * 4;
         let bytes = new Uint8ClampedArray(len);
         for (let i = 0, j = 0; i < len; i++, j += 4) {
-            bytes[j+0] = binary_string.charCodeAt(i);
-            bytes[j+1] = binary_string.charCodeAt(i);
-            bytes[j+2] = binary_string.charCodeAt(i);
-            bytes[j+3] = 255;
+          let val = binary_string.charCodeAt(i);
+          if (isNaN(val)) {
+            val = 0;
+          }
+          let mapped = colorMap(val);
+          let r = Math.floor(mapped[0] * 255)
+          let g = Math.floor(mapped[1] * 255)
+          let b = Math.floor(mapped[2] * 255)
+          bytes[j+0] = r;
+          bytes[j+1] = g;
+          bytes[j+2] = b;
+          bytes[j+3] = 255;
         }
-        //return bytes.buffer;
         return bytes;
       }
 
