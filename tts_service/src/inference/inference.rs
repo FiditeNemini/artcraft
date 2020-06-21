@@ -11,13 +11,13 @@ pub trait InferencePipelineStart <'a> {
   fn return_inner(self) -> Self::State;
 
   fn next(self)
-    -> AnyhowResult<GlowTtsMultiSpeakerMelganPipelineMelDone<'a>>;
+    -> AnyhowResult<Box<dyn InferencePipelineMelDone<'a, State = Self::State>>>;
 }
 
 pub trait InferencePipelineMelDone <'b> {
   type State;
 
-  fn return_inner(self) -> Self::State;
+  fn return_inner(self: Box<Self>) -> Self::State;
 
   //fn infer_audio(self) -> AnyhowResult<Box<dyn InferencePipelineAudioDone + 'a>>;
   //fn infer_audio(&'a self);

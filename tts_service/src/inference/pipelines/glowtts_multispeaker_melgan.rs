@@ -45,7 +45,7 @@ impl <'a> InferencePipelineStart<'a> for GlowTtsMultiSpeakerMelganPipeline<'a> {
     self.existing_state
   }
 
-  fn next(self) -> AnyhowResult<GlowTtsMultiSpeakerMelganPipelineMelDone<'a>> {
+  fn next(self) -> AnyhowResult<Box<dyn InferencePipelineMelDone<'a, State = Self::State>>> {
     unimplemented!();
   }
 
@@ -77,7 +77,7 @@ impl <'a> InferencePipelineMelDone<'_> for GlowTtsMultiSpeakerMelganPipelineMelD
 
   type State = &'a str;
 
-  fn return_inner(self) -> Self::State {
+  fn return_inner(self: Box<Self>) -> Self::State {
     self.existing_state
   }
   /*fn infer_audio(&'a self) {
