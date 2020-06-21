@@ -8,13 +8,17 @@ pub trait InferencePipelineStart <'a> {
   type State;
   //fn infer_mel<'b>(self, text: &'b str, speaker_id: i32) -> AnyhowResult<Box<dyn InferencePipelineMelDone<'a> + 'a>>;
 
-  //fn infer_mel(self, text: &str, speaker_id: i32)
-  //   -> AnyhowResult<GlowTtsMultiSpeakerMelganPipelineMelDone<'a>>;
-
   fn return_inner(self) -> Self::State;
+
+  fn next(self)
+    -> AnyhowResult<GlowTtsMultiSpeakerMelganPipelineMelDone<'a>>;
 }
 
 pub trait InferencePipelineMelDone <'b> {
+  type State;
+
+  fn return_inner(self) -> Self::State;
+
   //fn infer_audio(self) -> AnyhowResult<Box<dyn InferencePipelineAudioDone + 'a>>;
   //fn infer_audio(&'a self);
 }

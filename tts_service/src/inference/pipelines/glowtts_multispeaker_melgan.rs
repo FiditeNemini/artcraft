@@ -38,11 +38,15 @@ impl <'a> GlowTtsMultiSpeakerMelganPipeline <'a> {
   }
 }
 
-impl <'a> InferencePipelineStart<'_> for GlowTtsMultiSpeakerMelganPipeline<'a> {
+impl <'a> InferencePipelineStart<'a> for GlowTtsMultiSpeakerMelganPipeline<'a> {
   type State = &'a str;
 
   fn return_inner(self) -> Self::State {
     self.existing_state
+  }
+
+  fn next(self) -> AnyhowResult<GlowTtsMultiSpeakerMelganPipelineMelDone<'a>> {
+    unimplemented!();
   }
 
   /*fn infer_mel<'longer, 'a: 'longer>(self, text: &str, speaker_id: i32) -> AnyhowResult<GlowTtsMultiSpeakerMelganPipelineMelDone<'longer>> {
@@ -69,7 +73,13 @@ impl <'a> InferencePipelineStart<'_> for GlowTtsMultiSpeakerMelganPipeline<'a> {
   }*/
 }
 
-impl InferencePipelineMelDone<'_> for GlowTtsMultiSpeakerMelganPipelineMelDone <'_> {
+impl <'a> InferencePipelineMelDone<'_> for GlowTtsMultiSpeakerMelganPipelineMelDone <'a> {
+
+  type State = &'a str;
+
+  fn return_inner(self) -> Self::State {
+    self.existing_state
+  }
   /*fn infer_audio(&'a self) {
     unimplemented!()
   }*/
@@ -95,6 +105,8 @@ impl InferencePipelineMelDone<'_> for GlowTtsMultiSpeakerMelganPipelineMelDone <
 
 fn test(existing_state: &str) {
   let pipeline = GlowTtsMultiSpeakerMelganPipeline::new(existing_state)
+      .next()
+      .unwrap()
       .return_inner();
 }
 
