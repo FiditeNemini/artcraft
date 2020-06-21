@@ -28,7 +28,7 @@ pub fn arpabet_glow_tts_multi_speaker_melgan_pipeline(
   let mel_tensor = arpabet_glow_tts.encoded_arpabet_to_mel(&arpabet_encodings, speaker_id);
 
   let audio_tensor = melgan.tacotron_mel_to_audio(&mel_tensor);
-  let audio_signal = mel_audio_tensor_to_audio_signal(audio_tensor);
+  let audio_signal = mel_audio_tensor_to_audio_signal(&audio_tensor);
 
   audio_signal_to_wav_bytes(audio_signal)
 }
@@ -80,7 +80,7 @@ pub fn arpabet_glow_tts_multi_speaker_melgan_pipeline_with_spectrogram(
   };
 
   let audio_tensor = melgan.tacotron_mel_to_audio(&mel_tensor);
-  let audio_signal = mel_audio_tensor_to_audio_signal(audio_tensor);
+  let audio_signal = mel_audio_tensor_to_audio_signal(&audio_tensor);
 
   (
     spectrogram,
@@ -99,7 +99,7 @@ pub fn arpabet_glow_tts_melgan_pipeline(
   let mel_tensor = arpabet_glow_tts.encoded_arpabet_to_mel(&arpabet_encodings);
 
   let audio_tensor = melgan.tacotron_mel_to_audio(&mel_tensor);
-  let audio_signal = mel_audio_tensor_to_audio_signal(audio_tensor);
+  let audio_signal = mel_audio_tensor_to_audio_signal(&audio_tensor);
 
   audio_signal_to_wav_bytes(audio_signal)
 }
@@ -150,7 +150,7 @@ pub fn arpabet_glow_tts_melgan_pipeline_with_spectrogram(
   };
 
   let audio_tensor = melgan.tacotron_mel_to_audio(&mel_tensor);
-  let audio_signal = mel_audio_tensor_to_audio_signal(audio_tensor);
+  let audio_signal = mel_audio_tensor_to_audio_signal(&audio_tensor);
 
   (
     spectrogram,
@@ -172,14 +172,14 @@ pub fn arpabet_tacotron_melgan_pipeline(
   };
 
   let audio_tensor = melgan.tacotron_mel_to_audio(&mel_tensor);
-  let audio_signal = mel_audio_tensor_to_audio_signal(audio_tensor);
+  let audio_signal = mel_audio_tensor_to_audio_signal(&audio_tensor);
 
   let wav = audio_signal_to_wav_bytes(audio_signal);
   Some(wav)
 }
 
 /// Convert mel spectrogram with audio into an audio signal
-fn mel_audio_tensor_to_audio_signal(mel: Tensor) -> Vec<i16> {
+pub fn mel_audio_tensor_to_audio_signal(mel: &Tensor) -> Vec<i16> {
   let flat_audio_tensor = mel.squeeze();
 
   let length = flat_audio_tensor.size1().unwrap() as usize;
@@ -191,7 +191,7 @@ fn mel_audio_tensor_to_audio_signal(mel: Tensor) -> Vec<i16> {
 }
 
 /// Convert vector-encoded sound into a wave file.
-fn audio_signal_to_wav_bytes(audio_signal: Vec<i16>) -> Vec<u8> {
+pub fn audio_signal_to_wav_bytes(audio_signal: Vec<i16>) -> Vec<u8> {
   let spec = WavSpec {
     channels: 1,
     sample_rate: 20000,

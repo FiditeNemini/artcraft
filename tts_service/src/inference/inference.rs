@@ -3,27 +3,25 @@ use crate::inference::spectrogram::Base64MelSpectrogram;
 use crate::inference::audio::Base64WaveAudio;
 use crate::inference::pipelines::glowtts_multispeaker_melgan::GlowTtsMultiSpeakerMelganPipelineMelDone;
 
-// declare a lifetime 'b that lives at least as long as 'a by declaring 'b using the syntax 'b: 'a.
+/// Stage of the pipeline before work is done.
 pub trait InferencePipelineStart <'a> {
   type TtsModel;
   type VocoderModel;
-  //fn infer_mel<'b>(self, text: &'b str, speaker_id: i32) -> AnyhowResult<Box<dyn InferencePipelineMelDone<'a> + 'a>>;
 
   fn infer_mel(self, text: &str, speaker_id: i64)
     -> AnyhowResult<Box<dyn InferencePipelineMelDone<'a, TtsModel = Self::TtsModel, VocoderModel = Self::VocoderModel> + 'a>>;
 }
 
+/// Stage of the pipeline after the mel is computed.
 pub trait InferencePipelineMelDone <'b> {
   type TtsModel;
   type VocoderModel;
 
-  fn next(self: Box<Self>)
+  fn infer_audio(self: Box<Self>)
     -> AnyhowResult<Box<dyn InferencePipelineAudioDone<'b, TtsModel = Self::TtsModel, VocoderModel = Self::VocoderModel> + 'b>>;
-
-  //fn infer_audio(self) -> AnyhowResult<Box<dyn InferencePipelineAudioDone + 'a>>;
-  //fn infer_audio(&'a self);
 }
 
+/// Stage of the pipeline after the audio is computed.
 pub trait InferencePipelineAudioDone <'c> {
   type TtsModel;
   type VocoderModel;
