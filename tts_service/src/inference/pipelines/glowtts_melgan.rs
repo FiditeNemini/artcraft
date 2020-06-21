@@ -4,26 +4,26 @@ use crate::inference::audio::Base64WaveAudio;
 use crate::inference::inference::{InferencePipelineStart, InferencePipelineMelDone, InferencePipelineAudioDone};
 use crate::inference::spectrogram::Base64MelSpectrogram;
 use crate::inference::spectrogram::MelSpectrogram;
-use crate::model::arpabet_glow_tts_multi_speaker_model::ArpabetGlowTtsMultiSpeakerModel;
+use crate::model::arpabet_glow_tts_model::ArpabetGlowTtsModel;
 use crate::model::melgan_model::MelganModel;
+use crate::model::pipelines::{mel_audio_tensor_to_audio_signal, audio_signal_to_wav_bytes};
 use crate::text::arpabet::text_to_arpabet_encoding_glow_tts;
 use tch::Tensor;
-use crate::model::pipelines::{mel_audio_tensor_to_audio_signal, audio_signal_to_wav_bytes};
 
-pub struct GlowTtsMultiSpeakerMelganPipeline<'a> {
-  glow_tts: &'a ArpabetGlowTtsMultiSpeakerModel,
+pub struct GlowTtsMelganPipeline<'a> {
+  glow_tts: &'a ArpabetGlowTtsModel,
   melgan: &'a MelganModel,
 }
 
-pub struct GlowTtsMultiSpeakerMelganPipelineMelDone<'a> {
-  glow_tts: &'a ArpabetGlowTtsMultiSpeakerModel,
+pub struct GlowTtsMelganPipelineMelDone<'a> {
+  glow_tts: &'a ArpabetGlowTtsModel,
   melgan: &'a MelganModel,
   mel_tensor: Tensor,
   mel_spectrogram: MelSpectrogram,
 }
 
-pub struct GlowTtsMultiSpeakerMelganPipelineAudioDone<'a> {
-  glow_tts: &'a ArpabetGlowTtsMultiSpeakerModel,
+pub struct GlowTtsMelganPipelineAudioDone<'a> {
+  glow_tts: &'a ArpabetGlowTtsModel,
   melgan: &'a MelganModel,
   mel_tensor: Tensor,
   mel_spectrogram: MelSpectrogram,
@@ -31,8 +31,8 @@ pub struct GlowTtsMultiSpeakerMelganPipelineAudioDone<'a> {
   wav_audio_signal: Vec<u8>
 }
 
-impl <'a> GlowTtsMultiSpeakerMelganPipeline <'a> {
-  pub fn new(glow_tts: &'a ArpabetGlowTtsMultiSpeakerModel, melgan: &'a MelganModel) -> Self {
+impl <'a> GlowTtsMelganPipeline <'a> {
+  pub fn new(glow_tts: &'a ArpabetGlowTtsModel, melgan: &'a MelganModel) -> Self {
     Self {
       glow_tts,
       melgan,
@@ -40,18 +40,18 @@ impl <'a> GlowTtsMultiSpeakerMelganPipeline <'a> {
   }
 }
 
-impl <'a> InferencePipelineStart<'a> for GlowTtsMultiSpeakerMelganPipeline<'a> {
-  type TtsModel = &'a ArpabetGlowTtsMultiSpeakerModel;
+impl <'a> InferencePipelineStart<'a> for GlowTtsMelganPipeline<'a> {
+  type TtsModel = &'a ArpabetGlowTtsModel;
   type VocoderModel = &'a MelganModel;
 
-  fn infer_mel(self, text: &str, speaker_id: i64)
+  fn infer_mel(self, text: &str, _speaker_id: i64)
     -> AnyhowResult<Box<dyn InferencePipelineMelDone<'a, TtsModel = Self::TtsModel, VocoderModel = Self::VocoderModel> + 'a>>
   {
     // TODO: Creating arpabet instances every time is inefficient (even if lazy_static! under the hood).
     let arpabet = Arpabet::load_cmudict();
     let arpabet_encodings = text_to_arpabet_encoding_glow_tts(arpabet, &text);
 
-    let mel_tensor = self.glow_tts.encoded_arpabet_to_mel(&arpabet_encodings, speaker_id);
+    let mel_tensor = self.glow_tts.encoded_arpabet_to_mel(&arpabet_encodings);
 
     let spectrogram = {
       let dims = mel_tensor.size3().expect("This should work");
@@ -88,7 +88,7 @@ impl <'a> InferencePipelineStart<'a> for GlowTtsMultiSpeakerMelganPipeline<'a> {
       spectrogram
     };
 
-    let boxed : Box<GlowTtsMultiSpeakerMelganPipelineMelDone<'a>> = Box::new(GlowTtsMultiSpeakerMelganPipelineMelDone {
+    let boxed : Box<GlowTtsMelganPipelineMelDone<'a>> = Box::new(GlowTtsMelganPipelineMelDone {
       glow_tts: self.glow_tts,
       melgan: self.melgan,
       mel_tensor: mel_tensor,
@@ -99,8 +99,8 @@ impl <'a> InferencePipelineStart<'a> for GlowTtsMultiSpeakerMelganPipeline<'a> {
   }
 }
 
-impl <'a> InferencePipelineMelDone<'a> for GlowTtsMultiSpeakerMelganPipelineMelDone<'a> {
-  type TtsModel = &'a ArpabetGlowTtsMultiSpeakerModel;
+impl <'a> InferencePipelineMelDone<'a> for GlowTtsMelganPipelineMelDone<'a> {
+  type TtsModel = &'a ArpabetGlowTtsModel;
   type VocoderModel = &'a MelganModel;
 
   fn infer_audio(self: Box<Self>)
@@ -111,7 +111,7 @@ impl <'a> InferencePipelineMelDone<'a> for GlowTtsMultiSpeakerMelganPipelineMelD
     let raw_audio_signal = mel_audio_tensor_to_audio_signal(&audio_tensor);
     let wav_audio_signal = audio_signal_to_wav_bytes(raw_audio_signal);
 
-    let boxed : Box<GlowTtsMultiSpeakerMelganPipelineAudioDone<'a>> = Box::new(GlowTtsMultiSpeakerMelganPipelineAudioDone {
+    let boxed : Box<GlowTtsMelganPipelineAudioDone<'a>> = Box::new(GlowTtsMelganPipelineAudioDone {
       glow_tts: self.glow_tts,
       melgan: self.melgan,
       mel_tensor: self.mel_tensor,
@@ -124,8 +124,8 @@ impl <'a> InferencePipelineMelDone<'a> for GlowTtsMultiSpeakerMelganPipelineMelD
   }
 }
 
-impl <'a> InferencePipelineAudioDone<'_> for GlowTtsMultiSpeakerMelganPipelineAudioDone <'a> {
-  type TtsModel = &'a ArpabetGlowTtsMultiSpeakerModel;
+impl <'a> InferencePipelineAudioDone<'_> for GlowTtsMelganPipelineAudioDone <'a> {
+  type TtsModel = &'a ArpabetGlowTtsModel;
   type VocoderModel = &'a MelganModel;
 
   fn get_base64_mel_spectrogram(&self) -> AnyhowResult<Base64MelSpectrogram> {
