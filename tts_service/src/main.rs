@@ -1,3 +1,5 @@
+mod inference;
+
 #[macro_use] extern crate anyhow;
 #[macro_use] extern crate diesel;
 #[macro_use] extern crate log;
