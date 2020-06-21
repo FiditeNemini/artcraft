@@ -37,7 +37,7 @@ impl <'a> InferencePipelineStart<'a> for GlowTtsMultiSpeakerMelganPipeline<'a> {
   type TtsModel = &'a ArpabetGlowTtsMultiSpeakerModel;
   type VocoderModel = &'a MelganModel;
 
-  fn next(self) -> AnyhowResult<Box<dyn InferencePipelineMelDone<'a, TtsModel = Self::TtsModel, VocoderModel = Self::VocoderModel>>> {
+  fn infer_mel(self, text: &str, speaker_id: i64) -> AnyhowResult<Box<dyn InferencePipelineMelDone<'a, TtsModel = Self::TtsModel, VocoderModel = Self::VocoderModel>>> {
     unimplemented!();
   }
 
@@ -65,12 +65,22 @@ impl <'a> InferencePipelineStart<'a> for GlowTtsMultiSpeakerMelganPipeline<'a> {
   }*/
 }
 
-impl <'a> InferencePipelineMelDone<'a> for GlowTtsMultiSpeakerMelganPipelineMelDone <'a> {
+impl <'a> InferencePipelineMelDone<'a> for Box<GlowTtsMultiSpeakerMelganPipelineMelDone<'a>> {
   type TtsModel = &'a ArpabetGlowTtsMultiSpeakerModel;
   type VocoderModel = &'a MelganModel;
 
-  fn next(self: Box<Self>) -> AnyhowResult<Box<dyn InferencePipelineAudioDone<'a, TtsModel = Self::TtsModel, VocoderModel = Self::VocoderModel>>> {
-    unimplemented!()
+  fn next(self: Box<Self>) -> AnyhowResult<Box<dyn InferencePipelineAudioDone<'a, TtsModel = Self::TtsModel, VocoderModel = Self::VocoderModel> + 'a>> {
+    let glow_tts : &'a ArpabetGlowTtsMultiSpeakerModel = self.glow_tts;
+    let melgan : &'a MelganModel = self.melgan;
+
+    let boxed : Box<GlowTtsMultiSpeakerMelganPipelineAudioDone<'a>> = Box::new(GlowTtsMultiSpeakerMelganPipelineAudioDone {
+      glow_tts,
+      melgan,
+      mel: None,
+      wave_audio: None
+    });
+
+    Ok(boxed)
   }
   /*fn infer_audio(&'a self) {
     unimplemented!()
@@ -100,7 +110,7 @@ impl <'a> InferencePipelineAudioDone<'_> for GlowTtsMultiSpeakerMelganPipelineAu
 
 fn test(glow: &ArpabetGlowTtsMultiSpeakerModel, melgan: &MelganModel) {
   let pipeline = GlowTtsMultiSpeakerMelganPipeline::new(glow, melgan)
-      .next()
+      .infer_mel("test", 1)
       .unwrap()
       .next()
       .unwrap()

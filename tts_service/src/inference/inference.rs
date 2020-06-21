@@ -9,7 +9,7 @@ pub trait InferencePipelineStart <'a> {
   type VocoderModel;
   //fn infer_mel<'b>(self, text: &'b str, speaker_id: i32) -> AnyhowResult<Box<dyn InferencePipelineMelDone<'a> + 'a>>;
 
-  fn next(self)
+  fn infer_mel(self, text: &str, speaker_id: i64)
     -> AnyhowResult<Box<dyn InferencePipelineMelDone<'a, TtsModel = Self::TtsModel, VocoderModel = Self::VocoderModel>>>;
 }
 
@@ -18,7 +18,7 @@ pub trait InferencePipelineMelDone <'b> {
   type VocoderModel;
 
   fn next(self: Box<Self>)
-    -> AnyhowResult<Box<dyn InferencePipelineAudioDone<'b, TtsModel = Self::TtsModel, VocoderModel = Self::VocoderModel>>>;
+    -> AnyhowResult<Box<dyn InferencePipelineAudioDone<'b, TtsModel = Self::TtsModel, VocoderModel = Self::VocoderModel> + 'b>>;
 
   //fn infer_audio(self) -> AnyhowResult<Box<dyn InferencePipelineAudioDone + 'a>>;
   //fn infer_audio(&'a self);
