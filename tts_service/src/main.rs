@@ -1,5 +1,3 @@
-mod inference;
-
 #[macro_use] extern crate anyhow;
 #[macro_use] extern crate diesel;
 #[macro_use] extern crate log;
@@ -14,6 +12,7 @@ extern crate tch;
 
 pub mod database;
 pub mod endpoints;
+pub mod inference;
 pub mod model;
 pub mod schema;
 pub mod text;

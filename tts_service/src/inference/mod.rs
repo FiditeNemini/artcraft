@@ -1,4 +1,4 @@
-mod audio;
-mod spectrogram;
-mod inference;
-mod pipelines;
+pub mod audio;
+pub mod spectrogram;
+pub mod inference;
+pub mod pipelines;

@@ -9,15 +9,19 @@ use actix_web::{
   HttpResponse,
 };
 
-use std::sync::Arc;
-use crate::AppState;
 use arpabet::Arpabet;
-use crate::text::arpabet::text_to_arpabet_encoding;
+use crate::AppState;
+use crate::database::model::NewSentence;
+use crate::inference::inference::InferencePipelineStart;
+use crate::inference::pipelines::glowtts_melgan::GlowTtsMelganPipeline;
+use crate::inference::pipelines::glowtts_multispeaker_melgan::{GlowTtsMultiSpeakerMelganPipeline, GlowTtsMultiSpeakerMelganPipelineMelDone};
+use crate::inference::spectrogram::Base64MelSpectrogram;
 use crate::model::model_config::ModelPipeline;
 use crate::model::old_model::TacoMelModel;
-use crate::text::cleaners::clean_text;
 use crate::model::pipelines::{arpabet_glow_tts_melgan_pipeline, arpabet_glow_tts_multi_speaker_melgan_pipeline, arpabet_glow_tts_melgan_pipeline_with_spectrogram, arpabet_glow_tts_multi_speaker_melgan_pipeline_with_spectrogram};
-use crate::database::model::NewSentence;
+use crate::text::arpabet::text_to_arpabet_encoding;
+use crate::text::cleaners::clean_text;
+use std::sync::Arc;
 
 #[derive(Deserialize)]
 pub struct SpeakRequest {
@@ -37,7 +41,7 @@ pub struct Spectrogram {
 #[derive(Serialize)]
 pub struct SpeakSpectrogramResponse {
   pub audio_base64: String,
-  pub spectrogram: Spectrogram,
+  pub spectrogram: Base64MelSpectrogram,
 }
 
 pub async fn post_speak_with_spectrogram(request: HttpRequest,
@@ -86,47 +90,7 @@ pub async fn post_speak_with_spectrogram(request: HttpRequest,
 
   let cleaned_text = clean_text(&text);
 
-  match speaker.model_pipeline {
-    ModelPipeline::ArpabetTacotronMelgan => {
-      let tacotron_model = speaker.tacotron
-          .as_ref()
-          .map(|s| s.clone())
-          .expect("TODO ERROR HANDLING");
-
-      let melgan_model = speaker.melgan
-          .as_ref()
-          .map(|s| s.clone())
-          .expect("TODO ERROR HANDLING");
-
-      info!("Tacotron Model: {}", tacotron_model);
-      info!("Melgan Model: {}", melgan_model);
-      info!("Text: {}", text);
-
-      let arpabet = Arpabet::load_cmudict();
-      let encoded = text_to_arpabet_encoding(arpabet, &cleaned_text);
-
-      let tacotron = app_state.model_cache.get_or_load_arbabet_tacotron(&tacotron_model)
-          .expect(&format!("Couldn't load tacotron model: {}", tacotron_model));
-
-      let melgan = app_state.model_cache.get_or_load_melgan(&melgan_model)
-          .expect(&format!("Couldn't load melgan model: {}", melgan_model));
-
-      match TacoMelModel::new().run_tts_encoded(&tacotron, &melgan, &encoded) {
-        None => {
-          Either::B(Ok(HttpResponse::build(StatusCode::TOO_MANY_REQUESTS)
-              .content_type("text/plain")
-              .body("The service is receiving too many requests. Although there are many worker \
-                     containers, model access is serialized on a per-container basis until the \
-                     segfaults are fixed.")))
-        },
-        Some(wav_data) => {
-          Either::A(Json(SpeakSpectrogramResponse {
-            audio_base64: base64::encode(wav_data),
-            spectrogram: Default::default()
-          }))
-        },
-      }
-    },
+  let (base64_image, base64_audio) = match speaker.model_pipeline {
     ModelPipeline::ArpabetGlowTtsMelgan => {
       let glow_tts_model = speaker.glow_tts
           .as_ref()
@@ -148,14 +112,16 @@ pub async fn post_speak_with_spectrogram(request: HttpRequest,
       let melgan = app_state.model_cache.get_or_load_melgan(&melgan_model)
           .expect(&format!("Couldn't load melgan model: {}", melgan_model));
 
-      let (mel_data, wav_data) = arpabet_glow_tts_melgan_pipeline_with_spectrogram(&cleaned_text, &glow_tts, &melgan);
+      let pipeline = GlowTtsMelganPipeline::new(&glow_tts, &melgan)
+          .infer_mel(&cleaned_text, 0)
+          .unwrap()
+          .infer_audio()
+          .unwrap();
 
-      println!("Mel Data: {}x{}", mel_data.width, mel_data.height);
+      let base64_image = pipeline.get_base64_mel_spectrogram().unwrap();
+      let base64_audio = pipeline.get_base64_audio().unwrap();
 
-      Either::A(Json(SpeakSpectrogramResponse {
-        audio_base64: base64::encode(wav_data),
-        spectrogram: mel_data,
-      }))
+      (base64_image, base64_audio)
     },
     ModelPipeline::ArpabetGlowTtsMultiSpeakerMelgan=> {
       let glow_tts_multi_speaker_model = speaker.glow_tts_multi_speaker
@@ -184,16 +150,24 @@ pub async fn post_speak_with_spectrogram(request: HttpRequest,
           .get_or_load_melgan(&melgan_model)
           .expect(&format!("Couldn't load melgan model: {}", melgan_model));
 
-      let (mel_data, wav_data) = arpabet_glow_tts_multi_speaker_melgan_pipeline_with_spectrogram(
-        &cleaned_text, speaker_id, &glow_tts_multi_speaker, &melgan);
 
-      println!("Mel Data: {}x{}", mel_data.width, mel_data.height);
+      let pipeline = GlowTtsMultiSpeakerMelganPipeline::new(&glow_tts_multi_speaker, &melgan)
+          .infer_mel(&cleaned_text, speaker_id)
+          .unwrap()
+          .infer_audio()
+          .unwrap();
 
-      Either::A(Json(SpeakSpectrogramResponse {
-        audio_base64: base64::encode(wav_data),
-        spectrogram: mel_data,
-      }))
+      let base64_image = pipeline.get_base64_mel_spectrogram().unwrap();
+      let base64_audio = pipeline.get_base64_audio().unwrap();
+
+      (base64_image, base64_audio)
     },
     ModelPipeline::RawTextTacotronMelgan => unimplemented!(),
-  }
+    ModelPipeline::ArpabetTacotronMelgan => unimplemented!(),
+  };
+
+  Either::A(Json(SpeakSpectrogramResponse {
+    audio_base64: base64_audio.bytes_base64,
+    spectrogram: base64_image,
+  }))
 }
