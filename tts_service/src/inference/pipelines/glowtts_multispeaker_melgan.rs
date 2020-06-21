@@ -8,40 +8,36 @@ use crate::inference::spectrogram::Base64MelSpectrogram;
 
 pub struct GlowTtsMultiSpeakerMelganPipeline<'a> {
   glow_tts: &'a ArpabetGlowTtsMultiSpeakerModel,
-  //melgan: &'a MelganModel,
+  melgan: &'a MelganModel,
 }
 
 pub struct GlowTtsMultiSpeakerMelganPipelineMelDone<'b> {
   glow_tts: &'b ArpabetGlowTtsMultiSpeakerModel,
-  //melgan: &'a MelganModel,
+  melgan: &'b MelganModel,
   mel: Option<Tensor>,
 }
 
 pub struct GlowTtsMultiSpeakerMelganPipelineAudioDone<'c> {
   glow_tts: &'c ArpabetGlowTtsMultiSpeakerModel,
-  //melgan: &'a MelganModel,
+  melgan: &'c MelganModel,
   mel: Option<Tensor>,
   wave_audio: Option<Tensor>,
 }
 
 impl <'a> GlowTtsMultiSpeakerMelganPipeline <'a> {
-  //pub fn new(glow_tts: &'a ArpabetGlowTtsMultiSpeakerModel, melgan: &'a MelganModel) -> Self {
-  pub fn new(glow_tts: &'a ArpabetGlowTtsMultiSpeakerModel) -> Self {
+  pub fn new(glow_tts: &'a ArpabetGlowTtsMultiSpeakerModel, melgan: &'a MelganModel) -> Self {
     Self {
       glow_tts,
-      //melgan,
+      melgan,
     }
   }
 }
 
 impl <'a> InferencePipelineStart<'a> for GlowTtsMultiSpeakerMelganPipeline<'a> {
-  type State = &'a ArpabetGlowTtsMultiSpeakerModel;
+  type TtsModel = &'a ArpabetGlowTtsMultiSpeakerModel;
+  type VocoderModel = &'a MelganModel;
 
-  fn return_inner(self) -> Self::State {
-    self.existing_state
-  }
-
-  fn next(self) -> AnyhowResult<Box<dyn InferencePipelineMelDone<'a, State = Self::State>>> {
+  fn next(self) -> AnyhowResult<Box<dyn InferencePipelineMelDone<'a, TtsModel = Self::TtsModel, VocoderModel = Self::VocoderModel>>> {
     unimplemented!();
   }
 
@@ -70,13 +66,10 @@ impl <'a> InferencePipelineStart<'a> for GlowTtsMultiSpeakerMelganPipeline<'a> {
 }
 
 impl <'a> InferencePipelineMelDone<'a> for GlowTtsMultiSpeakerMelganPipelineMelDone <'a> {
-  type State = &'a ArpabetGlowTtsMultiSpeakerModel;
+  type TtsModel = &'a ArpabetGlowTtsMultiSpeakerModel;
+  type VocoderModel = &'a MelganModel;
 
-  fn return_inner(self: Box<Self>) -> Self::State {
-    self.existing_state
-  }
-
-  fn next(self: Box<Self>) -> AnyhowResult<Box<dyn InferencePipelineAudioDone<'a, State=Self::State>>> {
+  fn next(self: Box<Self>) -> AnyhowResult<Box<dyn InferencePipelineAudioDone<'a, TtsModel = Self::TtsModel, VocoderModel = Self::VocoderModel>>> {
     unimplemented!()
   }
   /*fn infer_audio(&'a self) {
@@ -93,11 +86,8 @@ impl <'a> InferencePipelineMelDone<'a> for GlowTtsMultiSpeakerMelganPipelineMelD
 }
 
 impl <'a> InferencePipelineAudioDone<'_> for GlowTtsMultiSpeakerMelganPipelineAudioDone <'a> {
-  type State = &'a ArpabetGlowTtsMultiSpeakerModel;
-
-  fn return_inner(self: Box<Self>) -> Self::State {
-    self.existing_state
-  }
+  type TtsModel = &'a ArpabetGlowTtsMultiSpeakerModel;
+  type VocoderModel = &'a MelganModel;
 
   fn get_base64_mel_spectrogram(&self) -> AnyhowResult<Base64MelSpectrogram> {
     unimplemented!()
@@ -108,12 +98,12 @@ impl <'a> InferencePipelineAudioDone<'_> for GlowTtsMultiSpeakerMelganPipelineAu
   }
 }
 
-fn test(glow: &ArpabetGlowTtsMultiSpeakerModel) {
-  let pipeline = GlowTtsMultiSpeakerMelganPipeline::new(glow)
+fn test(glow: &ArpabetGlowTtsMultiSpeakerModel, melgan: &MelganModel) {
+  let pipeline = GlowTtsMultiSpeakerMelganPipeline::new(glow, melgan)
       .next()
       .unwrap()
       .next()
       .unwrap()
-      .return_inner();
+      .get_base64_audio();
 }
 
