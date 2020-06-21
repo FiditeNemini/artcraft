@@ -10,7 +10,7 @@ pub trait InferencePipelineStart <'a> {
   //fn infer_mel<'b>(self, text: &'b str, speaker_id: i32) -> AnyhowResult<Box<dyn InferencePipelineMelDone<'a> + 'a>>;
 
   fn infer_mel(self, text: &str, speaker_id: i64)
-    -> AnyhowResult<Box<dyn InferencePipelineMelDone<'a, TtsModel = Self::TtsModel, VocoderModel = Self::VocoderModel>>>;
+    -> AnyhowResult<Box<dyn InferencePipelineMelDone<'a, TtsModel = Self::TtsModel, VocoderModel = Self::VocoderModel> + 'a>>;
 }
 
 pub trait InferencePipelineMelDone <'b> {

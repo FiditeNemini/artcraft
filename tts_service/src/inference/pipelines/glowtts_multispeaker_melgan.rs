@@ -37,18 +37,18 @@ impl <'a> InferencePipelineStart<'a> for GlowTtsMultiSpeakerMelganPipeline<'a> {
   type TtsModel = &'a ArpabetGlowTtsMultiSpeakerModel;
   type VocoderModel = &'a MelganModel;
 
-  fn infer_mel(self, text: &str, speaker_id: i64) -> AnyhowResult<Box<dyn InferencePipelineMelDone<'a, TtsModel = Self::TtsModel, VocoderModel = Self::VocoderModel>>> {
-    unimplemented!();
+  fn infer_mel(self, text: &str, speaker_id: i64) -> AnyhowResult<Box<dyn InferencePipelineMelDone<'a, TtsModel = Self::TtsModel, VocoderModel = Self::VocoderModel> + 'a>> {
+    let boxed : Box<GlowTtsMultiSpeakerMelganPipelineMelDone<'a>> = Box::new(GlowTtsMultiSpeakerMelganPipelineMelDone {
+      glow_tts: self.glow_tts,
+      melgan: self.melgan,
+      mel: None,
+    });
+
+    Ok(boxed)
   }
 
   /*fn infer_mel<'longer, 'a: 'longer>(self, text: &str, speaker_id: i32) -> AnyhowResult<GlowTtsMultiSpeakerMelganPipelineMelDone<'longer>> {
     let consume: &'longer str = self.existing_state;
-    Ok(GlowTtsMultiSpeakerMelganPipelineMelDone {
-      //glow_tts: self.glow_tts,
-      //melgan: self.melgan,
-      existing_state: consume,
-      mel: None,
-    })
   }*/
 
   /*fn infer_mel<'b>(self, text: &'b str, speaker_id: i32) -> AnyhowResult<Box<dyn InferencePipelineMelDone<'a> + 'a>> {
@@ -65,17 +65,14 @@ impl <'a> InferencePipelineStart<'a> for GlowTtsMultiSpeakerMelganPipeline<'a> {
   }*/
 }
 
-impl <'a> InferencePipelineMelDone<'a> for Box<GlowTtsMultiSpeakerMelganPipelineMelDone<'a>> {
+impl <'a> InferencePipelineMelDone<'a> for GlowTtsMultiSpeakerMelganPipelineMelDone<'a> {
   type TtsModel = &'a ArpabetGlowTtsMultiSpeakerModel;
   type VocoderModel = &'a MelganModel;
 
   fn next(self: Box<Self>) -> AnyhowResult<Box<dyn InferencePipelineAudioDone<'a, TtsModel = Self::TtsModel, VocoderModel = Self::VocoderModel> + 'a>> {
-    let glow_tts : &'a ArpabetGlowTtsMultiSpeakerModel = self.glow_tts;
-    let melgan : &'a MelganModel = self.melgan;
-
     let boxed : Box<GlowTtsMultiSpeakerMelganPipelineAudioDone<'a>> = Box::new(GlowTtsMultiSpeakerMelganPipelineAudioDone {
-      glow_tts,
-      melgan,
+      glow_tts: self.glow_tts,
+      melgan: self.melgan,
       mel: None,
       wave_audio: None
     });
