@@ -82,7 +82,7 @@ pub fn text_to_arpabet_encoding_glow_tts(arpabet: &Arpabet, text: &str) -> Vec<i
             encoded_buffer.push(space);
             needs_space = false;
           }
-          if arpabet_lookup_and_encode_word(&word, &arpabet, &mut encoded_buffer) {
+          if arpabet_lookup_and_encode_word_glow_tts(&word, &arpabet, &mut encoded_buffer) {
             needs_space = true;
           }
         }
