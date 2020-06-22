@@ -17,6 +17,10 @@ body {
   font-family: $body-font-family;
 }
 
+canvas#spectrogram {
+  transform: scaleY(-1); /* Spectrograms are flipped */
+}
+
 p {
   font-family: $body-font-family;
   font-size: 1.2em;
