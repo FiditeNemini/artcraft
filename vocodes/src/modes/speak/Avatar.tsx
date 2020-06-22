@@ -20,7 +20,7 @@ class Avatar extends React.Component<Props, State> {
     const source = `https://via.placeholder.com/300x300/FF0000/FFFFFF?text=${this.props.currentSpeaker.getSlug()}`;
     return (
       <div>
-        <img src={source} />
+        <img src={source} alt="speaker image" />
       </div>
     );
   }

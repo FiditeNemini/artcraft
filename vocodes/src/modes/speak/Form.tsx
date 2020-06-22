@@ -3,7 +3,8 @@ import React from 'react';
 import { SpeakRequest } from './SpeakRequest';
 import { Speaker } from '../../Speakers';
 import { createColorMap, linearScale } from "@colormap/core";
-import { VIRIDIS, CIVIDIS, PLASMA, INFERNO, MAGMA, BLACK_WHITE,  } from "@colormap/presets";
+//import { VIRIDIS, CIVIDIS, PLASMA, INFERNO, MAGMA, BLACK_WHITE,  } from "@colormap/presets";
+import { MAGMA } from "@colormap/presets";
 
 class Spectrogram {
   pixels: Uint8ClampedArray;

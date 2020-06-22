@@ -42,7 +42,7 @@ class App extends React.Component<Props, State> {
   setSpeakerBySlug = (speakerSlug: string) : void => {
     console.log('speaker', speakerSlug);
     SPEAKERS.forEach(speaker => {
-      if (speaker.slug == speakerSlug) {
+      if (speaker.slug === speakerSlug) {
         this.setState({ speaker: speaker });
       }
     })
