@@ -8,7 +8,7 @@ pub trait InferencePipelineStart {
   type TtsModel;
   type VocoderModel;
 
-  fn clean_text(self, text: &str)
+  fn clean_text(self: Box<Self>, text: &str)
     -> AnyhowResult<Box<dyn InferencePipelineTextCleaningDone<TtsModel = Self::TtsModel, VocoderModel = Self::VocoderModel>>>;
 }
 
@@ -17,7 +17,7 @@ pub trait InferencePipelineTextCleaningDone {
   type TtsModel;
   type VocoderModel;
 
-  fn infer_mel(self, speaker_id: i64)
+  fn infer_mel(self: Box<Self>, speaker_id: i64)
     -> AnyhowResult<Box<dyn InferencePipelineMelDone<TtsModel = Self::TtsModel, VocoderModel = Self::VocoderModel>>>;
 }
 

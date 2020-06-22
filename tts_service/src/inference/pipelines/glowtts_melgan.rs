@@ -54,7 +54,7 @@ impl InferencePipelineStart for GlowTtsMelganPipeline {
   type TtsModel = Arc<dyn TtsModelT>;
   type VocoderModel = Arc<dyn VocoderModelT>;
 
-  fn clean_text(self, text: &str)
+  fn clean_text(self: Box<Self>, text: &str)
     -> AnyhowResult<Box<dyn InferencePipelineTextCleaningDone<TtsModel=Self::TtsModel, VocoderModel=Self::VocoderModel>>>
   {
     let cleaned_text = clean_text(text);
@@ -71,7 +71,7 @@ impl InferencePipelineTextCleaningDone for GlowTtsMelganPipelineTextCleaningDone
   type TtsModel = Arc<dyn TtsModelT>;
   type VocoderModel = Arc<dyn VocoderModelT>;
 
-  fn infer_mel(self, _speaker_id: i64)
+  fn infer_mel(self: Box<Self>, _speaker_id: i64)
     -> AnyhowResult<Box<dyn InferencePipelineMelDone<TtsModel = Self::TtsModel, VocoderModel = Self::VocoderModel>>>
   {
     // TODO: Creating arpabet instances every time is inefficient (even if lazy_static! under the hood).
