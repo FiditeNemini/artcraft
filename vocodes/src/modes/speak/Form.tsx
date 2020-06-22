@@ -104,7 +104,6 @@ class Form extends React.Component<Props, State> {
     const url = 'https://mumble.stream/speak_spectrogram';
 
     this.props.onSpeakRequestCallback();
-    let that = this;
 
     fetch(url, {
       method: 'POST',
