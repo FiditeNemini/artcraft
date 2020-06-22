@@ -34,49 +34,29 @@ const SPEAKERS : Speaker[] = [
     description: "The 45th President of the United States.",
   }),
   Speaker.fromJson({
-    name: "John F. Kennedy",
-    slug: "jfk",
-    description: "The 35th President of the United States.",
+    name: "Donald Trump (Multi-speaker model)",
+    slug: "glow-multi-trump",
+    description: "The 45th President of the United States.",
   }),
   Speaker.fromJson({
-    name: "Arnold Schwarzenegger",
-    slug: "arnold",
-    description: "Terminator.",
+    name: "John Oliver (Multi-speaker model)",
+    slug: "glow-multi-oliver",
+    description: "TV news.",
   }),
   Speaker.fromJson({
-    name: "Bill Gates",
-    slug: "gates",
+    name: "Bill Gates (Multi-speaker model)",
+    slug: "glow-multi-gates",
     description: "Microsoft.",
   }),
   Speaker.fromJson({
-    name: "Mark Zuckerberg",
-    slug: "zuckerberg",
-    description: "Facebook.",
+    name: "Arnold Schwarzenegger (Multi-speaker model)",
+    slug: "glow-multi-arnold",
+    description: "Terminator.",
   }),
   Speaker.fromJson({
-    name: "Ronald Reagan",
-    slug: "reagan",
+    name: "Ronald Reagan (Multi-speaker model)",
+    slug: "glow-multi-reagan",
     description: "The 40th President of the United States.",
-  }),
-  Speaker.fromJson({
-    name: "Queen Elizabeth II",
-    slug: "queen",
-    description: "The Queen.",
-  }),
-  Speaker.fromJson({
-    name: "Mario",
-    slug: "mario",
-    description: "Plumber.",
-  }),
-  Speaker.fromJson({
-    name: "Zapp Brannigan",
-    slug: "zapp",
-    description: "Commander.",
-  }),
-  Speaker.fromJson({
-    name: "Morgan Freeman",
-    slug: "freeman",
-    description: "Otherwise known as the voice of God.",
   }),
 ];
 
