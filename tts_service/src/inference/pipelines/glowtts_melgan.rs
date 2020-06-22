@@ -4,15 +4,15 @@ use crate::inference::audio::Base64WaveAudio;
 use crate::inference::inference::{InferencePipelineStart, InferencePipelineMelDone, InferencePipelineAudioDone, InferencePipelineTextCleaningDone};
 use crate::inference::spectrogram::Base64MelSpectrogram;
 use crate::inference::spectrogram::MelSpectrogram;
+use crate::inference::tts_model::TtsModelT;
+use crate::inference::vocoder_model::VocoderModelT;
 use crate::model::arpabet_glow_tts_model::ArpabetGlowTtsModel;
 use crate::model::melgan_model::MelganModel;
 use crate::model::pipelines::{mel_audio_tensor_to_audio_signal, audio_signal_to_wav_bytes};
 use crate::text::arpabet::text_to_arpabet_encoding_glow_tts;
-use tch::Tensor;
 use crate::text::cleaners::clean_text;
-use crate::inference::vocoder_model::VocoderModelT;
-use crate::inference::tts_model::TtsModelT;
 use std::sync::Arc;
+use tch::Tensor;
 
 pub struct GlowTtsMelganPipeline {
   glow_tts: Arc<dyn TtsModelT>,

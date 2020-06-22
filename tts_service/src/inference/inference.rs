@@ -1,7 +1,7 @@
 use anyhow::Result as AnyhowResult;
-use crate::inference::spectrogram::Base64MelSpectrogram;
 use crate::inference::audio::Base64WaveAudio;
 use crate::inference::pipelines::glowtts_multispeaker_melgan::GlowTtsMultiSpeakerMelganPipelineMelDone;
+use crate::inference::spectrogram::Base64MelSpectrogram;
 
 /// 1) Stage of the pipeline before work is done.
 pub trait InferencePipelineStart {

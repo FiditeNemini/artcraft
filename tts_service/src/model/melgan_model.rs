@@ -1,8 +1,8 @@
-use crate::model::model_container::ModelContainer;
 use anyhow::Result;
-use tch::Tensor;
-use std::path::Path;
 use crate::inference::vocoder_model::VocoderModelT;
+use crate::model::model_container::ModelContainer;
+use std::path::Path;
+use tch::Tensor;
 
 pub struct MelganModel {
   model_container: ModelContainer,

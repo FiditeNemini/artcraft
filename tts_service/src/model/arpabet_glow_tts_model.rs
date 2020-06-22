@@ -1,11 +1,11 @@
-use crate::model::model_container::ModelContainer;
 use anyhow::{Result, Error};
+use crate::inference::tts_model::TtsModelT;
+use crate::model::model_container::ModelContainer;
+use crate::text::arpabet::text_to_arpabet_encoding_glow_tts;
 use std::path::Path;
 use std::thread;
 use std::time::Duration;
 use tch::Tensor;
-use crate::text::arpabet::text_to_arpabet_encoding_glow_tts;
-use crate::inference::tts_model::TtsModelT;
 
 pub struct ArpabetGlowTtsModel {
   model_container: ModelContainer,
