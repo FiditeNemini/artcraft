@@ -1,7 +1,7 @@
 use anyhow::Result as AnyhowResult;
 use arpabet::Arpabet;
 use crate::inference::audio::Base64WaveAudio;
-use crate::inference::inference::{InferencePipelineStart, InferencePipelineMelDone, InferencePipelineAudioDone};
+use crate::inference::inference::{InferencePipelineStart, InferencePipelineMelDone, InferencePipelineAudioDone, InferencePipelineTextCleaningDone};
 use crate::inference::spectrogram::Base64MelSpectrogram;
 use crate::inference::spectrogram::MelSpectrogram;
 use crate::model::arpabet_glow_tts_model::ArpabetGlowTtsModel;
@@ -9,10 +9,17 @@ use crate::model::melgan_model::MelganModel;
 use crate::model::pipelines::{mel_audio_tensor_to_audio_signal, audio_signal_to_wav_bytes};
 use crate::text::arpabet::text_to_arpabet_encoding_glow_tts;
 use tch::Tensor;
+use crate::text::cleaners::clean_text;
 
 pub struct GlowTtsMelganPipeline<'a> {
   glow_tts: &'a ArpabetGlowTtsModel,
   melgan: &'a MelganModel,
+}
+
+pub struct GlowTtsMelganPipelineTextCleaningDone<'a> {
+  glow_tts: &'a ArpabetGlowTtsModel,
+  melgan: &'a MelganModel,
+  cleaned_text: String,
 }
 
 pub struct GlowTtsMelganPipelineMelDone<'a> {
@@ -44,12 +51,29 @@ impl <'a> InferencePipelineStart<'a> for GlowTtsMelganPipeline<'a> {
   type TtsModel = &'a ArpabetGlowTtsModel;
   type VocoderModel = &'a MelganModel;
 
-  fn infer_mel(self, text: &str, _speaker_id: i64)
+  fn clean_text(self, text: &str)
+    -> AnyhowResult<Box<dyn InferencePipelineTextCleaningDone<'a, TtsModel=Self::TtsModel, VocoderModel=Self::VocoderModel> + 'a>>
+  {
+    let cleaned_text = clean_text(text);
+
+    Ok(Box::new(GlowTtsMelganPipelineTextCleaningDone {
+      glow_tts: self.glow_tts,
+      melgan: self.melgan,
+      cleaned_text: cleaned_text,
+    }))
+  }
+}
+
+impl <'a> InferencePipelineTextCleaningDone<'a> for GlowTtsMelganPipelineTextCleaningDone<'a> {
+  type TtsModel = &'a ArpabetGlowTtsModel;
+  type VocoderModel = &'a MelganModel;
+
+  fn infer_mel(self, _speaker_id: i64)
     -> AnyhowResult<Box<dyn InferencePipelineMelDone<'a, TtsModel = Self::TtsModel, VocoderModel = Self::VocoderModel> + 'a>>
   {
     // TODO: Creating arpabet instances every time is inefficient (even if lazy_static! under the hood).
     let arpabet = Arpabet::load_cmudict();
-    let arpabet_encodings = text_to_arpabet_encoding_glow_tts(arpabet, &text);
+    let arpabet_encodings = text_to_arpabet_encoding_glow_tts(arpabet, &self.cleaned_text);
 
     let mel_tensor = self.glow_tts.encoded_arpabet_to_mel(&arpabet_encodings);
 

@@ -88,9 +88,7 @@ pub async fn post_speak_with_spectrogram(request: HttpRequest,
     Ok(_) => {},
   }
 
-  let cleaned_text = clean_text(&text);
-
-  let (base64_image, base64_audio) = match speaker.model_pipeline {
+  let pipeline : Box<dyn InferencePipelineStart> = match speaker.model_pipeline {
     ModelPipeline::ArpabetGlowTtsMelgan => {
       let glow_tts_model = speaker.glow_tts
           .as_ref()
@@ -112,16 +110,7 @@ pub async fn post_speak_with_spectrogram(request: HttpRequest,
       let melgan = app_state.model_cache.get_or_load_melgan(&melgan_model)
           .expect(&format!("Couldn't load melgan model: {}", melgan_model));
 
-      let pipeline = GlowTtsMelganPipeline::new(&glow_tts, &melgan)
-          .infer_mel(&cleaned_text, 0)
-          .unwrap()
-          .infer_audio()
-          .unwrap();
-
-      let base64_image = pipeline.get_base64_mel_spectrogram().unwrap();
-      let base64_audio = pipeline.get_base64_audio().unwrap();
-
-      (base64_image, base64_audio)
+      Box::new(GlowTtsMelganPipeline::new(&glow_tts, &melgan))
     },
     ModelPipeline::ArpabetGlowTtsMultiSpeakerMelgan=> {
       let glow_tts_multi_speaker_model = speaker.glow_tts_multi_speaker
@@ -138,33 +127,34 @@ pub async fn post_speak_with_spectrogram(request: HttpRequest,
       info!("Melgan Model: {}", melgan_model);
       info!("Text: {}", text);
 
-      let speaker_id = speaker.speaker_id.expect("Should have speaker_id");
+      let melgan = app_state
+          .model_cache
+          .get_or_load_melgan(&melgan_model)
+          .expect(&format!("Couldn't load melgan model: {}", melgan_model));
 
       let glow_tts_multi_speaker = app_state
           .model_cache
           .get_or_load_arbabet_glow_tts_multi_speaker(&glow_tts_multi_speaker_model)
           .expect(&format!("Couldn't load glow-tts multi-speaker model: {}", glow_tts_multi_speaker_model));
 
-      let melgan = app_state
-          .model_cache
-          .get_or_load_melgan(&melgan_model)
-          .expect(&format!("Couldn't load melgan model: {}", melgan_model));
-
-
-      let pipeline = GlowTtsMultiSpeakerMelganPipeline::new(&glow_tts_multi_speaker, &melgan)
-          .infer_mel(&cleaned_text, speaker_id)
-          .unwrap()
-          .infer_audio()
-          .unwrap();
-
-      let base64_image = pipeline.get_base64_mel_spectrogram().unwrap();
-      let base64_audio = pipeline.get_base64_audio().unwrap();
-
-      (base64_image, base64_audio)
+      Box::new(GlowTtsMultiSpeakerMelganPipeline::new(&glow_tts_multi_speaker, &melgan))
     },
     ModelPipeline::RawTextTacotronMelgan => unimplemented!(),
     ModelPipeline::ArpabetTacotronMelgan => unimplemented!(),
   };
+
+  let speaker_id = speaker.speaker_id.unwrap_or(-1);
+
+  // TODO: Error handling for rich API errors
+  let pipeline_done = pipeline.clean_text(&text)
+    .unwrap()
+    .infer_mel(speaker_id)
+    .unwrap()
+    .infer_audio()
+    .unwrap();
+
+  let base64_image = pipeline_done.get_base64_mel_spectrogram().unwrap();
+  let base64_audio = pipeline_done.get_base64_audio().unwrap();
 
   Either::A(Json(SpeakSpectrogramResponse {
     audio_base64: base64_audio.bytes_base64,

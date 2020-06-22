@@ -1,7 +1,7 @@
 use anyhow::Result as AnyhowResult;
 use arpabet::Arpabet;
 use crate::inference::audio::Base64WaveAudio;
-use crate::inference::inference::{InferencePipelineStart, InferencePipelineMelDone, InferencePipelineAudioDone};
+use crate::inference::inference::{InferencePipelineStart, InferencePipelineMelDone, InferencePipelineAudioDone, InferencePipelineTextCleaningDone};
 use crate::inference::spectrogram::Base64MelSpectrogram;
 use crate::inference::spectrogram::MelSpectrogram;
 use crate::model::arpabet_glow_tts_multi_speaker_model::ArpabetGlowTtsMultiSpeakerModel;
@@ -9,15 +9,23 @@ use crate::model::melgan_model::MelganModel;
 use crate::text::arpabet::text_to_arpabet_encoding_glow_tts;
 use tch::Tensor;
 use crate::model::pipelines::{mel_audio_tensor_to_audio_signal, audio_signal_to_wav_bytes};
+use crate::text::cleaners::clean_text;
 
 pub struct GlowTtsMultiSpeakerMelganPipeline<'a> {
   glow_tts: &'a ArpabetGlowTtsMultiSpeakerModel,
   melgan: &'a MelganModel,
 }
 
+pub struct GlowTtsMultiSpeakerMelganPipelineTextCleaningDone<'a> {
+  glow_tts: &'a ArpabetGlowTtsMultiSpeakerModel,
+  melgan: &'a MelganModel,
+  cleaned_text: String,
+}
+
 pub struct GlowTtsMultiSpeakerMelganPipelineMelDone<'a> {
   glow_tts: &'a ArpabetGlowTtsMultiSpeakerModel,
   melgan: &'a MelganModel,
+  cleaned_text: String,
   mel_tensor: Tensor,
   mel_spectrogram: MelSpectrogram,
 }
@@ -25,6 +33,7 @@ pub struct GlowTtsMultiSpeakerMelganPipelineMelDone<'a> {
 pub struct GlowTtsMultiSpeakerMelganPipelineAudioDone<'a> {
   glow_tts: &'a ArpabetGlowTtsMultiSpeakerModel,
   melgan: &'a MelganModel,
+  cleaned_text: String,
   mel_tensor: Tensor,
   mel_spectrogram: MelSpectrogram,
   audio_tensor: Tensor,
@@ -44,12 +53,29 @@ impl <'a> InferencePipelineStart<'a> for GlowTtsMultiSpeakerMelganPipeline<'a> {
   type TtsModel = &'a ArpabetGlowTtsMultiSpeakerModel;
   type VocoderModel = &'a MelganModel;
 
-  fn infer_mel(self, text: &str, speaker_id: i64)
+  fn clean_text(self, text: &str)
+    -> AnyhowResult<Box<dyn InferencePipelineTextCleaningDone<'a, TtsModel=Self::TtsModel, VocoderModel=Self::VocoderModel> + 'a>>
+  {
+    let cleaned_text = clean_text(text);
+
+    Ok(Box::new(GlowTtsMultiSpeakerMelganPipelineTextCleaningDone {
+      glow_tts: self.glow_tts,
+      melgan: self.melgan,
+      cleaned_text: cleaned_text,
+    }))
+  }
+}
+
+impl <'a> InferencePipelineTextCleaningDone<'a> for GlowTtsMultiSpeakerMelganPipelineTextCleaningDone<'a> {
+  type TtsModel = &'a ArpabetGlowTtsMultiSpeakerModel;
+  type VocoderModel = &'a MelganModel;
+
+  fn infer_mel(self, speaker_id: i64)
     -> AnyhowResult<Box<dyn InferencePipelineMelDone<'a, TtsModel = Self::TtsModel, VocoderModel = Self::VocoderModel> + 'a>>
   {
     // TODO: Creating arpabet instances every time is inefficient (even if lazy_static! under the hood).
     let arpabet = Arpabet::load_cmudict();
-    let arpabet_encodings = text_to_arpabet_encoding_glow_tts(arpabet, &text);
+    let arpabet_encodings = text_to_arpabet_encoding_glow_tts(arpabet, &self.cleaned_text);
 
     let mel_tensor = self.glow_tts.encoded_arpabet_to_mel(&arpabet_encodings, speaker_id);
 
@@ -88,14 +114,13 @@ impl <'a> InferencePipelineStart<'a> for GlowTtsMultiSpeakerMelganPipeline<'a> {
       spectrogram
     };
 
-    let boxed : Box<GlowTtsMultiSpeakerMelganPipelineMelDone<'a>> = Box::new(GlowTtsMultiSpeakerMelganPipelineMelDone {
+    Ok(Box::new(GlowTtsMultiSpeakerMelganPipelineMelDone {
       glow_tts: self.glow_tts,
       melgan: self.melgan,
+      cleaned_text: self.cleaned_text,
       mel_tensor: mel_tensor,
       mel_spectrogram: spectrogram,
-    });
-
-    Ok(boxed)
+    }))
   }
 }
 
@@ -111,16 +136,15 @@ impl <'a> InferencePipelineMelDone<'a> for GlowTtsMultiSpeakerMelganPipelineMelD
     let raw_audio_signal = mel_audio_tensor_to_audio_signal(&audio_tensor);
     let wav_audio_signal = audio_signal_to_wav_bytes(raw_audio_signal);
 
-    let boxed : Box<GlowTtsMultiSpeakerMelganPipelineAudioDone<'a>> = Box::new(GlowTtsMultiSpeakerMelganPipelineAudioDone {
+    Ok(Box::new(GlowTtsMultiSpeakerMelganPipelineAudioDone {
       glow_tts: self.glow_tts,
       melgan: self.melgan,
+      cleaned_text: self.cleaned_text,
       mel_tensor: self.mel_tensor,
       mel_spectrogram: self.mel_spectrogram,
       audio_tensor: audio_tensor,
       wav_audio_signal: wav_audio_signal,
-    });
-
-    Ok(boxed)
+    }))
   }
 }
 
