@@ -22,6 +22,8 @@ use crate::model::pipelines::{arpabet_glow_tts_melgan_pipeline, arpabet_glow_tts
 use crate::text::arpabet::text_to_arpabet_encoding;
 use crate::text::cleaners::clean_text;
 use std::sync::Arc;
+use crate::inference::vocoder_model::VocoderModelT;
+use crate::inference::tts_model::TtsModelT;
 
 #[derive(Deserialize)]
 pub struct SpeakRequest {
@@ -88,7 +90,8 @@ pub async fn post_speak_with_spectrogram(request: HttpRequest,
     Ok(_) => {},
   }
 
-  let pipeline : Box<dyn InferencePipelineStart> = match speaker.model_pipeline {
+  //let pipeline : Box<dyn InferencePipelineStart<TtsModel=TtsModelT, VocoderModel=VocoderModelT>> = match speaker.model_pipeline {
+  let pipeline : Box<dyn InferencePipelineStart<TtsModel = Arc<dyn TtsModelT>, VocoderModel = Arc<dyn VocoderModelT>>> = match speaker.model_pipeline {
     ModelPipeline::ArpabetGlowTtsMelgan => {
       let glow_tts_model = speaker.glow_tts
           .as_ref()
@@ -110,7 +113,8 @@ pub async fn post_speak_with_spectrogram(request: HttpRequest,
       let melgan = app_state.model_cache.get_or_load_melgan(&melgan_model)
           .expect(&format!("Couldn't load melgan model: {}", melgan_model));
 
-      Box::new(GlowTtsMelganPipeline::new(&glow_tts, &melgan))
+      let inner = GlowTtsMelganPipeline::new(glow_tts.clone(), melgan.clone());
+      Box::new(inner)
     },
     ModelPipeline::ArpabetGlowTtsMultiSpeakerMelgan=> {
       let glow_tts_multi_speaker_model = speaker.glow_tts_multi_speaker
@@ -137,7 +141,8 @@ pub async fn post_speak_with_spectrogram(request: HttpRequest,
           .get_or_load_arbabet_glow_tts_multi_speaker(&glow_tts_multi_speaker_model)
           .expect(&format!("Couldn't load glow-tts multi-speaker model: {}", glow_tts_multi_speaker_model));
 
-      Box::new(GlowTtsMultiSpeakerMelganPipeline::new(&glow_tts_multi_speaker, &melgan))
+      let inner = GlowTtsMultiSpeakerMelganPipeline::new(glow_tts_multi_speaker.clone(), melgan.clone());
+      Box::new(inner)
     },
     ModelPipeline::RawTextTacotronMelgan => unimplemented!(),
     ModelPipeline::ArpabetTacotronMelgan => unimplemented!(),

@@ -5,6 +5,7 @@ use std::thread;
 use std::time::Duration;
 use tch::Tensor;
 use crate::text::arpabet::text_to_arpabet_encoding_glow_tts;
+use crate::inference::tts_model::TtsModelT;
 
 pub struct ArpabetGlowTtsModel {
   model_container: ModelContainer,
@@ -26,5 +27,15 @@ impl ArpabetGlowTtsModel {
     let lengths_tensor = Tensor::of_slice(&lengths);
 
     self.model_container.forward2(&text_tensor_2d, &lengths_tensor)
+  }
+}
+
+impl TtsModelT for ArpabetGlowTtsModel {
+  fn encoded_sequence_to_mel(&self, arpabet_encodings: &Vec<i64>, _speaker_id: i64) -> Tensor {
+    self.encoded_arpabet_to_mel(arpabet_encodings)
+  }
+
+  fn encoded_sequence_to_mel_single_speaker(&self, arpabet_encodings: &Vec<i64>) -> Tensor {
+    self.encoded_arpabet_to_mel(arpabet_encodings)
   }
 }

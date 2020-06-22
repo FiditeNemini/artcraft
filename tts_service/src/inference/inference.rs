@@ -4,34 +4,34 @@ use crate::inference::audio::Base64WaveAudio;
 use crate::inference::pipelines::glowtts_multispeaker_melgan::GlowTtsMultiSpeakerMelganPipelineMelDone;
 
 /// 1) Stage of the pipeline before work is done.
-pub trait InferencePipelineStart <'a> {
+pub trait InferencePipelineStart {
   type TtsModel;
   type VocoderModel;
 
   fn clean_text(self, text: &str)
-    -> AnyhowResult<Box<dyn InferencePipelineTextCleaningDone<'a, TtsModel = Self::TtsModel, VocoderModel = Self::VocoderModel> + 'a>>;
+    -> AnyhowResult<Box<dyn InferencePipelineTextCleaningDone<TtsModel = Self::TtsModel, VocoderModel = Self::VocoderModel>>>;
 }
 
 /// 2) Stage of the pipeline after text is cleaned.
-pub trait InferencePipelineTextCleaningDone <'b> {
+pub trait InferencePipelineTextCleaningDone {
   type TtsModel;
   type VocoderModel;
 
   fn infer_mel(self, speaker_id: i64)
-    -> AnyhowResult<Box<dyn InferencePipelineMelDone<'b, TtsModel = Self::TtsModel, VocoderModel = Self::VocoderModel> + 'b>>;
+    -> AnyhowResult<Box<dyn InferencePipelineMelDone<TtsModel = Self::TtsModel, VocoderModel = Self::VocoderModel>>>;
 }
 
 /// 3) Stage of the pipeline after the mel is computed.
-pub trait InferencePipelineMelDone <'c> {
+pub trait InferencePipelineMelDone {
   type TtsModel;
   type VocoderModel;
 
   fn infer_audio(self: Box<Self>)
-    -> AnyhowResult<Box<dyn InferencePipelineAudioDone<'c, TtsModel = Self::TtsModel, VocoderModel = Self::VocoderModel> + 'c>>;
+    -> AnyhowResult<Box<dyn InferencePipelineAudioDone<TtsModel = Self::TtsModel, VocoderModel = Self::VocoderModel>>>;
 }
 
 /// 4) Stage of the pipeline after the audio is computed.
-pub trait InferencePipelineAudioDone <'d> {
+pub trait InferencePipelineAudioDone {
   type TtsModel;
   type VocoderModel;
 
