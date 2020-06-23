@@ -28,8 +28,9 @@ pub struct SpeakRequest {
 
 pub async fn post_speak(request: HttpRequest,
   query: Json<SpeakRequest>,
-  app_state: Data<Arc<AppState>>
-) -> std::io::Result<HttpResponse> {
+  app_state: Data<Arc<AppState>>)
+  -> std::io::Result<HttpResponse>
+{
   let app_state = app_state.into_inner();
 
   let speaker_slug = query.speaker.to_string();
@@ -65,7 +66,8 @@ pub async fn post_speak(request: HttpRequest,
   };
 
   match sentence_record.insert(&app_state.database_connector) {
-    Err(_) => error!("Could not insert sentence record for: {:?}", sentence_record),
+    Err(e) => error!("Could not insert sentence record for: {:?}, because: {:?}",
+      sentence_record, e),
     Ok(_) => {},
   }
 

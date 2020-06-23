@@ -86,7 +86,8 @@ pub async fn post_speak_with_spectrogram(request: HttpRequest,
   };
 
   match sentence_record.insert(&app_state.database_connector) {
-    Err(_) => error!("Could not insert sentence record for: {:?}", sentence_record),
+    Err(e) => error!("Could not insert sentence record for: {:?}, because: {:?}",
+      sentence_record, e),
     Ok(_) => {},
   }
 
