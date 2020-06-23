@@ -22,7 +22,7 @@ metadata:
   labels:
     app: tts
 spec:
-  replicas: 4
+  replicas: 3 # 4 would never launch with cluster configs as of 2020-06-20
   selector:
     matchLabels:
       app: tts
