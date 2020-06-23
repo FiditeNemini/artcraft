@@ -39,22 +39,16 @@ class Speaker {
 
 const SPEAKERS : Speaker[] = [
   Speaker.fromJson({
-    name: "Donald Trump (single-speaker model)",
+    name: "Donald Trump",
     slug: "trump",
     description: "The 45th President of the United States.",
     avatarUrl: "donald-trump.jpg",
   }),
   Speaker.fromJson({
-    name: "Ronald Reagan (single-speaker model)",
+    name: "Ronald Reagan",
     slug: "glow-solo-reagan",
     description: "The 40th President of the United States.",
     avatarUrl: "ronald-reagan.jpg",
-  }),
-  Speaker.fromJson({
-    name: "Donald Trump (multi-speaker model)",
-    slug: "glow-multi-trump",
-    description: "The 45th President of the United States.",
-    avatarUrl: "donald-trump.jpg",
   }),
   Speaker.fromJson({
     name: "John Oliver (multi-speaker model)",
@@ -73,12 +67,6 @@ const SPEAKERS : Speaker[] = [
     slug: "glow-multi-arnold",
     description: "Terminator.",
     avatarUrl: "arnold-schwarzenegger.jpg",
-  }),
-  Speaker.fromJson({
-    name: "Ronald Reagan (multi-speaker model)",
-    slug: "glow-multi-reagan",
-    description: "The 40th President of the United States.",
-    avatarUrl: "ronald-reagan.jpg",
   }),
 ];
 
