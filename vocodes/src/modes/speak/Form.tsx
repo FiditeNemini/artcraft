@@ -5,18 +5,7 @@ import { Speaker } from '../../Speakers';
 import { createColorMap, linearScale } from "@colormap/core";
 //import { VIRIDIS, CIVIDIS, PLASMA, INFERNO, MAGMA, BLACK_WHITE,  } from "@colormap/presets";
 import { MAGMA } from "@colormap/presets";
-
-class Spectrogram {
-  pixels: Uint8ClampedArray;
-  width: number;
-  height: number;
-
-  constructor(pixels: Uint8ClampedArray, width: number, height: number) {
-    this.pixels = pixels;
-    this.width = width;
-    this.height = height;
-  }
-}
+import { Spectrogram } from './extras/Spectrogram';
 
 interface Props {
   currentSpeaker: Speaker,
@@ -27,12 +16,12 @@ interface Props {
   onSpeakErrorCallback: () => void,
   onPlayCallback: () => void,
   onStopCallback: () => void,
+  updateSpectrogramCallback: (spectrogram: Spectrogram) => void,
 }
 
 interface State {
   text: string,
   howl?: Howl,
-  spectrogram?: Spectrogram,
 }
 
 class Form extends React.Component<Props, State> {
@@ -149,6 +138,7 @@ class Form extends React.Component<Props, State> {
       let bytes = base64ToArrayBuffer(res.spectrogram.bytes_base64);
 
       const spectrogram = new Spectrogram(bytes, res.spectrogram.width, res.spectrogram.height);
+      this.props.updateSpectrogramCallback(spectrogram);
 
       const sound = new Howl.Howl({
         src: [data],
@@ -162,7 +152,6 @@ class Form extends React.Component<Props, State> {
       
       this.setState({
         howl: sound,
-        spectrogram: spectrogram,
       });
 
       sound.play();
@@ -219,48 +208,11 @@ class Form extends React.Component<Props, State> {
   
   componentDidMount() {
     this.textarea?.focus();
-    this.updateCanvas();
   }
-
-  componentDidUpdate() {
-    this.updateCanvas();
-  }
-
-  updateCanvas() {
-    const ctx = (this.refs.canvas as any).getContext('2d');
-    // let width = 300;
-    // let height = 80;
-    // ctx.clearRect(0,0, width, height);
-
-    if (this.state.spectrogram !== undefined) {
-      let width = this.state.spectrogram!.width;
-      let height = this.state.spectrogram!.height;
-
-      var image = new ImageData(this.state.spectrogram!.pixels, width, height);
-
-      createImageBitmap(image).then(renderer => {
-        ctx.drawImage(renderer, 0, 0, width * 3, height * 3)
-      });
-    }
-  }
-
 
   public render() {
-    let width = 150 * 3;
-    let height = 80 * 3;
-
-    if (this.state.spectrogram !== undefined) {
-      width = this.state.spectrogram.width * 3;
-      height = this.state.spectrogram.height * 3;
-    }
-
-    // TODO: This needs to go way up the tree.
-    let canvas = <canvas ref="canvas" width={width} height={height} id="spectrogram" />
-
     return (
       <div>
-        {canvas}
-
         <form onSubmit={this.handleFormSubmit}>
           <textarea 
             onChange={this.handleTextChange} 

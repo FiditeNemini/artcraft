@@ -2,9 +2,11 @@ import React from 'react';
 import { Form } from './Form';
 import { StatusText } from './StatusText';
 import { getRandomInt } from '../../Utils';
-import { Avatar } from './Avatar';
+import { Avatar } from './extras/Avatar';
 import { SpeakerDropdown } from './SpeakerDropdown';
 import { Speaker } from '../../Speakers';
+import { ExtrasComponent, ExtrasMode } from './extras/ExtrasComponent';
+import { Spectrogram } from './extras/Spectrogram';
 
 enum StatusState {
   NONE,
@@ -14,14 +16,17 @@ enum StatusState {
 }
 
 interface Props {
-  currentSpeaker: Speaker;
+  currentSpeaker: Speaker,
+  extrasMode: ExtrasMode,
   changeSpeakerCallback: (slug: string) => void,
+  changeExtrasModeCallback: (extrasMode: ExtrasMode) => void,
 }
 
 interface State {
   statusState: StatusState;
   statusMessage: string,
   isTalking: boolean,
+  currentSpectrogram?: Spectrogram,
 }
 
 class SpeakComponent extends React.Component<Props, State> {
@@ -32,6 +37,7 @@ class SpeakComponent extends React.Component<Props, State> {
       statusState: StatusState.NONE,
       statusMessage: '',
       isTalking: false,
+      currentSpectrogram: undefined,
     };
   }
 
@@ -105,6 +111,10 @@ class SpeakComponent extends React.Component<Props, State> {
     this.setState({ isTalking: false });
   }
 
+  updateSpectrogram = (spectrogram: Spectrogram) => {
+    this.setState({ currentSpectrogram: spectrogram });
+  }
+
   public render() {
     return (
       <div>
@@ -114,9 +124,12 @@ class SpeakComponent extends React.Component<Props, State> {
           />
 
         <div>
-          <Avatar currentSpeaker={this.props.currentSpeaker} />
-          <p>{this.props.currentSpeaker.getDescription()}</p>
-
+          <ExtrasComponent 
+            extrasMode={this.props.extrasMode}
+            currentSpeaker={this.props.currentSpeaker} 
+            currentSpectrogram={this.state.currentSpectrogram}
+            changeExtrasModeCallback={this.props.changeExtrasModeCallback}
+            />
         </div>
 
         <StatusText 
@@ -132,6 +145,7 @@ class SpeakComponent extends React.Component<Props, State> {
           onSpeakErrorCallback={this.onSpeakError}
           onPlayCallback={this.onPlay}
           onStopCallback={this.onStop}
+          updateSpectrogramCallback={this.updateSpectrogram}
           />
       </div>
     );

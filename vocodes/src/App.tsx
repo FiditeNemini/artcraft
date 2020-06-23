@@ -9,11 +9,13 @@ import { TermsComponent } from './modes/terms/TermsComponent';
 import { TopNav } from './navigation/TopNav';
 import { UsageComponent } from './modes/usage/UsageComponent';
 import { Speaker, SPEAKERS } from './Speakers';
+import { ExtrasMode } from './modes/speak/extras/ExtrasComponent';
 
 interface Props {}
 
 interface State {
   mode: Mode,
+  extrasMode: ExtrasMode,
   speaker: Speaker,
 }
 
@@ -23,6 +25,7 @@ class App extends React.Component<Props, State> {
     super(props);
     this.state = {
       mode: Mode.SPEAK_MODE,
+      extrasMode: ExtrasMode.SPEAKER_INFO,
       speaker: SPEAKERS[0],
     };
   }
@@ -33,6 +36,10 @@ class App extends React.Component<Props, State> {
 
   resetMode = () => {
     this.setState({ mode: Mode.SPEAK_MODE });
+  }
+
+  switchExtrasMode = (extrasMode: ExtrasMode) => {
+    this.setState({ extrasMode: extrasMode });
   }
 
   setSpeaker = (speaker: Speaker) : void => {
@@ -52,7 +59,12 @@ class App extends React.Component<Props, State> {
     let component;
     switch (this.state.mode) {
       case Mode.SPEAK_MODE:
-        component = <SpeakComponent currentSpeaker={this.state.speaker} changeSpeakerCallback={this.setSpeakerBySlug} />;
+        component = <SpeakComponent 
+          currentSpeaker={this.state.speaker} 
+          changeSpeakerCallback={this.setSpeakerBySlug} 
+          extrasMode={this.state.extrasMode}
+          changeExtrasModeCallback={this.switchExtrasMode}
+          />;
         break;
       case Mode.USAGE_MODE:
         component = <UsageComponent resetModeCallback={this.resetMode} />;
