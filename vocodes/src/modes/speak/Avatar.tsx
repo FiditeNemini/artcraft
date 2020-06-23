@@ -17,10 +17,18 @@ class Avatar extends React.Component<Props, State> {
   }
 
   public render() {
-    const source = `https://via.placeholder.com/300x300/FF0000/FFFFFF?text=${this.props.currentSpeaker.getSlug()}`;
+    let source;
+
+    if (this.props.currentSpeaker.hasAvatar()) {
+      source = `/avatars/${this.props.currentSpeaker.avatarUrl!}`;
+    } else {
+      source = `https://via.placeholder.com/300x300/FF0000/FFFFFF?text=${this.props.currentSpeaker.getSlug()}`;
+    }
+    console.log('test', source, this.props.currentSpeaker.getAvatar());
+
     return (
       <div>
-        <img src={source} alt="speaker" />
+        <img src={source} id="avatar" alt="speaker" />
       </div>
     );
   }

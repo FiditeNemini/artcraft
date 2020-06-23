@@ -21,6 +21,11 @@ canvas#spectrogram {
   transform: scaleY(-1); /* Spectrograms are flipped */
 }
 
+#avatar {
+  width: 400px;
+  height: 400px;
+}
+
 p {
   font-family: $body-font-family;
   font-size: 1.2em;
