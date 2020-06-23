@@ -43,6 +43,7 @@ use crate::model::model_cache::ModelCache;
 use crate::model::model_config::ModelConfigs;
 use crate::text::checker::TextChecker;
 use crate::endpoints::speak_with_spectrogram::post_speak_with_spectrogram;
+use crate::endpoints::words::get_words;
 
 const ENV_ASSET_DIRECTORY: &'static str = "ASSET_DIRECTORY";
 const ENV_BIND_ADDRESS: &'static str = "BIND_ADDRESS";
@@ -246,6 +247,7 @@ async fn run_server(app_state: AppState, server_args: ServerArgs) -> std::io::Re
       .service(get_models)
       .service(get_speakers)
       .service(get_sentences)
+      .service(get_words)
       .app_data(arc.clone())
     )
     .bind(bind_address)?

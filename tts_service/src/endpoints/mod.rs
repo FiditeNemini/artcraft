@@ -8,3 +8,4 @@ pub mod speak;
 pub mod speak_with_spectrogram;
 pub mod speakers;
 pub mod tts;
+pub mod words;
