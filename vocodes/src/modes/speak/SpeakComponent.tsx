@@ -16,9 +16,11 @@ enum StatusState {
 }
 
 interface Props {
-  currentSpeaker: Speaker,
   extrasMode: ExtrasMode,
+  currentSpeaker: Speaker,
+  currentSpectrogram?: Spectrogram,
   changeSpeakerCallback: (slug: string) => void,
+  changeSpectrogramCallback: (spectrogram: Spectrogram) => void,
   changeExtrasModeCallback: (extrasMode: ExtrasMode) => void,
 }
 
@@ -26,7 +28,6 @@ interface State {
   statusState: StatusState;
   statusMessage: string,
   isTalking: boolean,
-  currentSpectrogram?: Spectrogram,
 }
 
 class SpeakComponent extends React.Component<Props, State> {
@@ -37,7 +38,6 @@ class SpeakComponent extends React.Component<Props, State> {
       statusState: StatusState.NONE,
       statusMessage: '',
       isTalking: false,
-      currentSpectrogram: undefined,
     };
   }
 
@@ -111,10 +111,6 @@ class SpeakComponent extends React.Component<Props, State> {
     this.setState({ isTalking: false });
   }
 
-  updateSpectrogram = (spectrogram: Spectrogram) => {
-    this.setState({ currentSpectrogram: spectrogram });
-  }
-
   public render() {
     return (
       <div>
@@ -127,7 +123,7 @@ class SpeakComponent extends React.Component<Props, State> {
           <ExtrasComponent 
             extrasMode={this.props.extrasMode}
             currentSpeaker={this.props.currentSpeaker} 
-            currentSpectrogram={this.state.currentSpectrogram}
+            currentSpectrogram={this.props.currentSpectrogram}
             changeExtrasModeCallback={this.props.changeExtrasModeCallback}
             />
         </div>
@@ -145,7 +141,7 @@ class SpeakComponent extends React.Component<Props, State> {
           onSpeakErrorCallback={this.onSpeakError}
           onPlayCallback={this.onPlay}
           onStopCallback={this.onStop}
-          updateSpectrogramCallback={this.updateSpectrogram}
+          updateSpectrogramCallback={this.props.changeSpectrogramCallback}
           />
       </div>
     );

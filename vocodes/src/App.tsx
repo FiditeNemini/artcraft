@@ -10,6 +10,7 @@ import { TopNav } from './navigation/TopNav';
 import { UsageComponent } from './modes/usage/UsageComponent';
 import { Speaker, SPEAKERS } from './Speakers';
 import { ExtrasMode } from './modes/speak/extras/ExtrasComponent';
+import { Spectrogram } from './modes/speak/extras/Spectrogram';
 
 interface Props {}
 
@@ -17,6 +18,7 @@ interface State {
   mode: Mode,
   extrasMode: ExtrasMode,
   speaker: Speaker,
+  currentSpectrogram?: Spectrogram,
 }
 
 class App extends React.Component<Props, State> {
@@ -47,12 +49,27 @@ class App extends React.Component<Props, State> {
   }
 
   setSpeakerBySlug = (speakerSlug: string) : void => {
-    console.log('speaker', speakerSlug);
+    let selectedSpeaker = undefined;
+
     SPEAKERS.forEach(speaker => {
       if (speaker.slug === speakerSlug) {
-        this.setState({ speaker: speaker });
+        selectedSpeaker = speaker;
       }
     })
+
+    if (selectedSpeaker !== undefined) {
+      this.setState({ 
+        speaker: selectedSpeaker,
+        extrasMode: ExtrasMode.SPEAKER_INFO,
+      });
+    }
+  }
+
+  updateSpectrogram = (spectrogram: Spectrogram) => {
+    this.setState({ 
+      currentSpectrogram: spectrogram,
+      extrasMode: ExtrasMode.SPECTROGRAM,
+    });
   }
 
   public render() {
@@ -60,9 +77,11 @@ class App extends React.Component<Props, State> {
     switch (this.state.mode) {
       case Mode.SPEAK_MODE:
         component = <SpeakComponent 
-          currentSpeaker={this.state.speaker} 
-          changeSpeakerCallback={this.setSpeakerBySlug} 
           extrasMode={this.state.extrasMode}
+          currentSpeaker={this.state.speaker} 
+          currentSpectrogram={this.state.currentSpectrogram}
+          changeSpeakerCallback={this.setSpeakerBySlug} 
+          changeSpectrogramCallback={this.updateSpectrogram} 
           changeExtrasModeCallback={this.switchExtrasMode}
           />;
         break;
