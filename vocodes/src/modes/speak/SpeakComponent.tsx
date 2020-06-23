@@ -2,7 +2,6 @@ import React from 'react';
 import { Form } from './Form';
 import { StatusText } from './StatusText';
 import { getRandomInt } from '../../Utils';
-import { Avatar } from './extras/Avatar';
 import { SpeakerDropdown } from './SpeakerDropdown';
 import { Speaker } from '../../Speakers';
 import { ExtrasComponent, ExtrasMode } from './extras/ExtrasComponent';
