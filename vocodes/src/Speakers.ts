@@ -51,19 +51,19 @@ const SPEAKERS : Speaker[] = [
     avatarUrl: "ronald-reagan.jpg",
   }),
   Speaker.fromJson({
-    name: "John Oliver (multi-speaker model)",
-    slug: "glow-multi-oliver",
+    name: "John Oliver",
+    slug: "glow-solo-oliver",
     description: "TV news.",
     avatarUrl: "john-oliver.jpg",
   }),
   Speaker.fromJson({
-    name: "Bill Gates (multi-speaker model)",
+    name: "Bill Gates (multi-speaker model*)",
     slug: "glow-multi-gates",
     description: "Microsoft.",
     avatarUrl: "bill-gates.jpg",
   }),
   Speaker.fromJson({
-    name: "Arnold Schwarzenegger (multi-speaker model)",
+    name: "Arnold Schwarzenegger (multi-speaker model*)",
     slug: "glow-multi-arnold",
     description: "Terminator.",
     avatarUrl: "arnold-schwarzenegger.jpg",
