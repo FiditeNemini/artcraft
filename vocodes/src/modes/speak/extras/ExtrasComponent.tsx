@@ -39,11 +39,11 @@ class ExtrasComponent extends React.Component<Props, State> {
     }
     return (
       <div>
-        <div>
+        {modeComponent}
+        <div className="extra_mode_buttons">
           <button onClick={() => this.props.changeExtrasModeCallback(ExtrasMode.SPEAKER_INFO)}>Speaker Info</button>
           <button onClick={() => this.props.changeExtrasModeCallback(ExtrasMode.SPECTROGRAM)}>Spectrogram</button>
         </div>
-        {modeComponent}
       </div>
     )
   }

@@ -18,9 +18,14 @@ class SpeakerInfo extends React.Component<Props, State> {
 
   public render() {
     return (
-      <div>
-        Speaker Info
-        <Avatar currentSpeaker={this.props.currentSpeaker} />
+      <div className="speaker_info_component">
+        <div className="speaker_avatar">
+          <Avatar currentSpeaker={this.props.currentSpeaker} />
+        </div>
+        <div className="speaker_details">
+          {this.props.currentSpeaker.getDescription()}
+        </div>
+        <div className="speaker_break" />
       </div>
     )
   }
