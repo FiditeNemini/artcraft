@@ -1,21 +1,16 @@
+#[macro_use] extern crate anyhow;
 #[macro_use] extern crate log;
 #[macro_use] extern crate serde_derive;
 
-
-/*#[derive(Deserialize)]
-pub struct SpeakRequest {
-  /// Slug for the speaker
-  speaker: String,
-  /// Raw text to be spoken
-  text: String,
-}*/
-
+use anyhow::Result as AnyhowResult;
 use futures::future::{self, Future};
 use hyper::server::conn::AddrStream;
 use hyper::service::{service_fn, make_service_fn};
 use hyper::{Body, Request, Response, Server};
-use anyhow::Result as AnyhowResult;
 use std::env;
+use std::fmt::Debug;
+use std::fmt::Display;
+use std::str::FromStr;
 
 type BoxFut = Box<Future<Item=Response<Body>, Error=hyper::Error> + Send>;
 
@@ -23,11 +18,13 @@ const ENV_PROXY_CONFIG_FILE : &'static str = "PROXY_CONFIG_FILE";
 const ENV_ROUTE_ONE : &'static str = "ROUTE_ONE";
 const ENV_ROUTE_TWO : &'static str = "ROUTE_TWO";
 const ENV_RUST_LOG : &'static str = "RUST_LOG";
+const ENV_SERVICE_PORT : &'static str = "SERVICE_PORT";
 
-const ROUTE_ONE_DEFAULT : &'static str = "http://127.0.0.1:12345";
-const ROUTE_TWO_DEFAULT : &'static str = "http://127.0.0.1:3000";
 const DEFAULT_PROXY_CONFIG_FILE : &'static str = "proxy_configs.toml";
 const DEFAULT_RUST_LOG: &'static str = "debug";
+const DEFAULT_SERVICE_PORT: u16 = 5555;
+const ROUTE_ONE_DEFAULT : &'static str = "http://127.0.0.1:12345";
+const ROUTE_TWO_DEFAULT : &'static str = "http://127.0.0.1:3000";
 
 #[derive(Deserialize, Debug, Clone)]
 struct ProxyConfigs {
@@ -49,12 +46,39 @@ impl ProxyConfigs {
   }
 }
 
+#[derive(Deserialize, Debug)]
+pub struct SpeakRequest {
+  /// Slug for the speaker
+  speaker: String,
+  /// Raw text to be spoken
+  text: String,
+}
+
 fn get_env_string(env_name: &str, default: &str) -> String {
   match env::var(env_name).as_ref().ok() {
     Some(s) => s.to_string(),
     None => {
       warn!("Env var '{}' not supplied. Using default '{}'.", env_name, default);
       default.to_string()
+    },
+  }
+}
+
+// the trait `std::error::Error` is not implemented for `<T as std::str::FromStr>::Err`
+fn get_env_num<T>(env_name: &str, default: T) -> AnyhowResult<T>
+  where T: FromStr + Display,
+        T::Err: Debug
+{
+  match env::var(env_name).as_ref().ok() {
+    None => {
+      warn!("Env var '{}' not supplied. Using default '{}'.", env_name, default);
+      Ok(default)
+    },
+    Some(val) => {
+      match val.parse::<T>() {
+        Err(e) => bail!("Can't parse value '{:?}'. Error: {:?}", val, e),
+        Ok(val) => Ok(val),
+      }
     },
   }
 }
@@ -80,6 +104,7 @@ fn main() -> AnyhowResult<()> {
 
   let route_one = get_env_string(ENV_ROUTE_ONE, ROUTE_ONE_DEFAULT);
   let route_two = get_env_string(ENV_ROUTE_TWO, ROUTE_TWO_DEFAULT);
+  let service_port = get_env_num::<u16>(ENV_SERVICE_PORT, DEFAULT_SERVICE_PORT)?;
 
   info!("Route one: {}", route_one);
   info!("Route two: {}", route_two);
@@ -91,7 +116,7 @@ fn main() -> AnyhowResult<()> {
   info!("Proxy configs: {:?}", proxy_configs);
 
   // This is our socket address...
-  let addr = ([127, 0, 0, 1], 13900).into();
+  let addr = ([127, 0, 0, 1], service_port).into();
 
   // A `Service` is needed for every connection.
   let make_svc = make_service_fn(move |socket: &AddrStream| {
@@ -100,11 +125,16 @@ fn main() -> AnyhowResult<()> {
     let route_b = route_two.clone();
 
     service_fn(move |req: Request<Body>| { // returns BoxFut
+      if req.uri().path().eq("/speak") {
+        //let request : SpeakRequest = serde_json::from_str(&req.body().into()).unwrap();
+        //info!("Request: {:?}", request);
 
-      if req.uri().path().starts_with("/first") {
         return hyper_reverse_proxy::call(remote_addr.ip(), &route_a, req)
 
-      } else if req.uri().path().starts_with("/second") {
+      } else if req.uri().path().eq("/speak_spectrogram") {
+        //let request : SpeakRequest = serde_json::from_str(&req.body().into()).unwrap();
+        //info!("Request: {:?}", request);
+
         return hyper_reverse_proxy::call(remote_addr.ip(), &route_b, req)
 
       } else {
