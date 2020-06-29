@@ -36,20 +36,14 @@ COPY --from=build /etc/ssl /etc/ssl
 COPY --from=build /lib/x86_64-linux-gnu/libssl.*             /lib/x86_64-linux-gnu/
 COPY --from=build /lib/x86_64-linux-gnu/libcrypto.*          /lib/x86_64-linux-gnu/
 
-# Copy curl utility
-COPY --from=build /usr/bin/curl                                 /usr/bin/
-COPY --from=build /usr/lib/x86_64-linux-gnu/libcurl*            /lib/x86_64-linux-gnu/
-COPY --from=build /usr/lib/x86_64-linux-gnu/libgnutls.so*       /lib/x86_64-linux-gnu/
-COPY --from=build /usr/lib/x86_64-linux-gnu/libgssapi_krb5.so*  /lib/x86_64-linux-gnu/
-COPY --from=build /usr/lib/x86_64-linux-gnu/libidn.so*          /lib/x86_64-linux-gnu/
-COPY --from=build /usr/lib/x86_64-linux-gnu/liblber-2.4.so*     /lib/x86_64-linux-gnu/
-COPY --from=build /usr/lib/x86_64-linux-gnu/libldap_r-2.4.so*   /lib/x86_64-linux-gnu/
-COPY --from=build /usr/lib/x86_64-linux-gnu/libnettle.so*       /lib/x86_64-linux-gnu/
-COPY --from=build /usr/lib/x86_64-linux-gnu/librtmp.so*         /lib/x86_64-linux-gnu/
-
 # Make sure all the links resolve
-RUN ldd /usr/bin/curl
 RUN ldd tts-service-proxy
+
+# Install things we want in the final container
+RUN apt-get update \
+    && apt-get install -y \
+        curl \
+    && apt-get clean
 
 EXPOSE 8080
 CMD LD_LIBRARY_PATH=/usr/lib /tts-service-proxy
