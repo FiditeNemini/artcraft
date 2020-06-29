@@ -104,14 +104,9 @@ fn speak_spectrogram_request(req: Request<Body>, remote_addr: SocketAddr) -> Box
 }
 
 fn speak_proxy(req: Request<Body>, remote_addr: SocketAddr, endpoint: &'static str) -> BoxFut {
-  let mut headers : HashMap<HeaderName, HeaderValue> = HashMap::new();
-
-  for (header_name, header_value) in req.headers().into_iter() {
-    match header_name.as_str().to_lowercase().as_ref() {
-      "content-length" => continue, // We have to recalculate since we change the spacing.
-      _ => { headers.insert(header_name.clone(), header_value.clone()); },
-    }
-  }
+  let mut headers = req.headers().clone();
+  // NB: Rehydrating the request payload can change the content length if whitespace is changed.
+  headers.remove(HeaderName::from_static("content-length"));
 
   Box::new(req.into_body().concat2().map(move |b| { // Builds a BoxedFut to return
     let request_bytes = b.as_ref();
@@ -132,11 +127,6 @@ fn speak_proxy(req: Request<Body>, remote_addr: SocketAddr, endpoint: &'static s
     for (k, v) in headers.iter() {
       request_builder.header(k, v);
     }
-      /*.header("Host", "localhost:12345")
-      .header("Content-Type", "application/json")
-      .header("Origin", "http://localhost:7000")
-      .header("Referer", "http://localhost:7000/frontend/index.html")
-      //.header("X-Forwarded-For", "http://localhost:7000/frontend/index.html")*/
 
     let new_req = request_builder
       .body(Body::from(request_json))
