@@ -37,11 +37,18 @@ COPY --from=build /lib/x86_64-linux-gnu/libssl.*             /lib/x86_64-linux-g
 COPY --from=build /lib/x86_64-linux-gnu/libcrypto.*          /lib/x86_64-linux-gnu/
 
 # Copy curl utility
-COPY --from=build /usr/bin/curl                              /usr/bin/
-COPY --from=build /usr/lib/x86_64-linux-gnu/libcurl*         /lib/x86_64-linux-gnu/
-COPY --from=build /usr/lib/x86_64-linux-gnu/libidn.so*       /lib/x86_64-linux-gnu/
+COPY --from=build /usr/bin/curl                                 /usr/bin/
+COPY --from=build /usr/lib/x86_64-linux-gnu/libcurl*            /lib/x86_64-linux-gnu/
+COPY --from=build /usr/lib/x86_64-linux-gnu/libgnutls.so*       /lib/x86_64-linux-gnu/
+COPY --from=build /usr/lib/x86_64-linux-gnu/libgssapi_krb5.so*  /lib/x86_64-linux-gnu/
+COPY --from=build /usr/lib/x86_64-linux-gnu/libidn.so*          /lib/x86_64-linux-gnu/
+COPY --from=build /usr/lib/x86_64-linux-gnu/liblber-2.4.so*     /lib/x86_64-linux-gnu/
+COPY --from=build /usr/lib/x86_64-linux-gnu/libldap_r-2.4.so*   /lib/x86_64-linux-gnu/
+COPY --from=build /usr/lib/x86_64-linux-gnu/libnettle.so*       /lib/x86_64-linux-gnu/
+COPY --from=build /usr/lib/x86_64-linux-gnu/librtmp.so*         /lib/x86_64-linux-gnu/
 
 # Make sure all the links resolve
+RUN ldd /usr/bin/curl
 RUN ldd tts-service-proxy
 
 EXPOSE 8080
