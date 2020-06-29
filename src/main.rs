@@ -14,6 +14,9 @@ use std::fmt::Debug;
 use std::fmt::Display;
 use std::str::FromStr;
 use std::net::SocketAddr;
+use std::collections::HashMap;
+use hyper::header::HeaderValue;
+use hyper::http::header::HeaderName;
 
 type BoxFut = Box<dyn Future<Item=Response<Body>, Error=hyper::Error> + Send>;
 
@@ -101,6 +104,15 @@ fn speak_spectrogram_request(req: Request<Body>, remote_addr: SocketAddr) -> Box
 }
 
 fn speak_proxy(req: Request<Body>, remote_addr: SocketAddr, endpoint: &'static str) -> BoxFut {
+  let mut headers : HashMap<HeaderName, HeaderValue> = HashMap::new();
+
+  for (header_name, header_value) in req.headers().into_iter() {
+    match header_name.as_str().to_lowercase().as_ref() {
+      "content-length" => continue, // We have to recalculate since we change the spacing.
+      _ => { headers.insert(header_name.clone(), header_value.clone()); },
+    }
+  }
+
   Box::new(req.into_body().concat2().map(move |b| { // Builds a BoxedFut to return
     let request_bytes = b.as_ref();
     let mut request = serde_json::from_slice::<SpeakRequest>(request_bytes)
@@ -113,30 +125,20 @@ fn speak_proxy(req: Request<Body>, remote_addr: SocketAddr, endpoint: &'static s
     let request_json = serde_json::to_string(&speak_request)
       .unwrap();
 
-    info!("Request: {:?}", request_json);
-    println!("{}", request_json);
+    let mut request_builder = Request::builder();
+    request_builder.method(Method::POST)
+      .uri(endpoint);
 
-    /*
-    Accept-Encoding: gzip, deflate, br
-    Accept-Language: en-US,en;q=0.5
-    Accept: application/json
-    Connection: keep-alive
-    Content-Length: 42
-    Content-Type: application/json
-    Host: mumble.stream
-    Origin: https://trumped.com
-    Referer: https://trumped.com/
-    User-Agent: Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:77.0) Gecko/20100101 Firefox/77.0
-     */
-    // TODO: Copy all headers.
-    let new_req = Request::builder()
-      .method(Method::POST)
-      .uri(endpoint)
-      .header("Host", "localhost:12345")
+    for (k, v) in headers.iter() {
+      request_builder.header(k, v);
+    }
+      /*.header("Host", "localhost:12345")
       .header("Content-Type", "application/json")
       .header("Origin", "http://localhost:7000")
       .header("Referer", "http://localhost:7000/frontend/index.html")
-      //.header("X-Forwarded-For", "http://localhost:7000/frontend/index.html")
+      //.header("X-Forwarded-For", "http://localhost:7000/frontend/index.html")*/
+
+    let new_req = request_builder
       .body(Body::from(request_json))
       .unwrap();
 
