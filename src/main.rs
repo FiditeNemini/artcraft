@@ -155,67 +155,10 @@ fn main() -> AnyhowResult<()> {
         return hyper_reverse_proxy::call(remote_addr.ip(), &route_a, new_req)
 
       } else if req.uri().path().eq("/speak_spectrogram") {
-        info!("/speak_spectrogram");
-
         Box::new(req.into_body().concat2().map(move |b| { // Builds a BoxedFut to return
-          // Parse the request body. form_urlencoded::parse
-          // always succeeds, but in general parsing may
-          // fail (for example, an invalid post of json), so
-          // returning early with BadRequest may be
-          // necessary.
-          //
-          // Warning: this is a simplified use case. In
-          // principle names can appear multiple times in a
-          // form, and the values should be rolled up into a
-          // HashMap<String, Vec<String>>. However in this
-          // example the simpler approach is sufficient.
-          //let params = form_urlencoded::parse(b.as_ref()).into_owned().collect::<HashMap<String, String>>();
-
-          // Validate the request parameters, returning
-          // early if an invalid input is detected.
-          /*let name = if let Some(n) = params.get("name") {
-            n
-          } else {
-            return Response::builder()
-              .status(StatusCode::UNPROCESSABLE_ENTITY)
-              .body(MISSING.into())
-              .unwrap();
-          };
-          let number = if let Some(n) = params.get("number") {
-            if let Ok(v) = n.parse::<f64>() {
-              v
-            } else {
-              return Response::builder()
-                .status(StatusCode::UNPROCESSABLE_ENTITY)
-                .body(NOTNUMERIC.into())
-                .unwrap();
-            }
-          } else {
-            return Response::builder()
-              .status(StatusCode::UNPROCESSABLE_ENTITY)
-              .body(MISSING.into())
-              .unwrap();
-          };*/
-
-          //let request : SpeakRequest = serde_json::from_str(&req.body().into()).unwrap();
-          //let request: SpeakRequest = serde_json::from_slice(&body_bytes).unwrap();
-          let request : SpeakRequest = serde_json::from_slice(b.as_ref()).unwrap();
-          info!("Request: {:?}", request);
-
-          let name = "asdf";
-          let number = "asdf";
-
-
-          // Render the response. This will often involve
-          // calls to a database or web service, which will
-          // require creating a new stream for the response
-          // body. Since those may fail, other error
-          // responses such as InternalServiceError may be
-          // needed here, too.
-          let body = format!("Hello {}, your number is {}", name, number);
-          Response::new(body.into())
-
-        }).and_then(move |f: Response<Body>| {
+          serde_json::from_slice::<SpeakRequest>(b.as_ref())
+            .unwrap()
+        }).and_then(move |speak_request: SpeakRequest| {
           let remote_addr3 = remote_addr2.clone();
           let new_req = Request::new(Body::empty());
           hyper_reverse_proxy::call(remote_addr3.ip(), "http://127.0.0.1:12345/speak_request", new_req)
