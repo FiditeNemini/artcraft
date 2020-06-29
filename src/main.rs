@@ -13,6 +13,7 @@ use std::env;
 use std::fmt::Debug;
 use std::fmt::Display;
 use std::str::FromStr;
+use std::net::SocketAddr;
 
 type BoxFut = Box<dyn Future<Item=Response<Body>, Error=hyper::Error> + Send>;
 
@@ -91,6 +92,58 @@ fn debug_request(req: Request<Body>) -> BoxFut {
   Box::new(future::ok(response))
 }
 
+fn speak_request(req: Request<Body>, remote_addr: SocketAddr) -> BoxFut {
+  speak_proxy(req, remote_addr, "/speak")
+}
+
+fn speak_spectrogram_request(req: Request<Body>, remote_addr: SocketAddr) -> BoxFut {
+  speak_proxy(req, remote_addr, "/speak_spectrogram")
+}
+
+fn speak_proxy(req: Request<Body>, remote_addr: SocketAddr, endpoint: &'static str) -> BoxFut {
+  Box::new(req.into_body().concat2().map(move |b| { // Builds a BoxedFut to return
+    let request_bytes = b.as_ref();
+    let mut request = serde_json::from_slice::<SpeakRequest>(request_bytes)
+      .unwrap();
+
+    request.speaker = "glow-ljs-single".to_string();
+
+    request
+  }).and_then(move |speak_request: SpeakRequest| {
+    let request_json = serde_json::to_string(&speak_request)
+      .unwrap();
+
+    info!("Request: {:?}", request_json);
+    println!("{}", request_json);
+
+    /*
+    Accept-Encoding: gzip, deflate, br
+    Accept-Language: en-US,en;q=0.5
+    Accept: application/json
+    Connection: keep-alive
+    Content-Length: 42
+    Content-Type: application/json
+    Host: mumble.stream
+    Origin: https://trumped.com
+    Referer: https://trumped.com/
+    User-Agent: Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:77.0) Gecko/20100101 Firefox/77.0
+     */
+    // TODO: Copy all headers.
+    let new_req = Request::builder()
+      .method(Method::POST)
+      .uri(endpoint)
+      .header("Host", "localhost:12345")
+      .header("Content-Type", "application/json")
+      .header("Origin", "http://localhost:7000")
+      .header("Referer", "http://localhost:7000/frontend/index.html")
+      //.header("X-Forwarded-For", "http://localhost:7000/frontend/index.html")
+      .body(Body::from(request_json))
+      .unwrap();
+
+    hyper_reverse_proxy::call(remote_addr.ip(), "http://127.0.0.1:12345", new_req)
+  }))
+}
+
 fn main() -> AnyhowResult<()> {
   if env::var(ENV_RUST_LOG)
     .as_ref()
@@ -125,7 +178,6 @@ fn main() -> AnyhowResult<()> {
     let remote_addr = socket.remote_addr();
     info!("Got a request from: {:?}", remote_addr);
 
-
     let route_a = route_one.clone();
     let route_b = route_two.clone();
 
@@ -141,50 +193,9 @@ fn main() -> AnyhowResult<()> {
       let remote_addr2 = remote_addr.clone();
 
       if req.uri().path().eq("/speak") {
-
-        info!("/speak");
-
-        let (_parts, body) = req.into_parts();
-
-        let body_bytes = body.concat2().wait().unwrap().into_bytes();
-        let request: SpeakRequest = serde_json::from_slice(&body_bytes).unwrap();
-
-        print!("Request: {:?}", request);
-
-        let new_req = Request::new(Body::empty());
-        return hyper_reverse_proxy::call(remote_addr.ip(), &route_a, new_req)
-
+        speak_request(req, remote_addr2)
       } else if req.uri().path().eq("/speak_spectrogram") {
-        Box::new(req.into_body().concat2().map(move |b| { // Builds a BoxedFut to return
-          let request_bytes = b.as_ref();
-          serde_json::from_slice::<SpeakRequest>(request_bytes)
-            .unwrap()
-        }).and_then(move |speak_request: SpeakRequest| {
-          let remote_addr3 = remote_addr2.clone();
-
-          let request_json = serde_json::to_string(&speak_request)
-            .unwrap();
-
-          let new_req = Request::builder()
-            .method(Method::POST)
-            .uri("/speak_spectrogram")
-            .header("X-Forwarded-For", "https://localhost:12345/frontend/index.html")
-            .header("Origin", "http://localhost:12345")
-            .header("Referer", "http://localhost:12345/frontend/index.html")
-            .body(Body::from(request_json))
-            .unwrap();
-
-          hyper_reverse_proxy::call(remote_addr3.ip(), "http://127.0.0.1:12345", new_req)
-        }))
-
-        //Box::new(boxed.then( |b : Result<Response<Body>, Error> | {
-        //  let new_req = Request::new(Body::empty());
-        //  hyper_reverse_proxy::call(remote_addr2.ip(), "http://127.0.0.1:12345/speak_request", new_req)
-        //}))
-
-        //let new_req = Request::new(Body::empty());
-        //return hyper_reverse_proxy::call(remote_addr.ip(), &route_b, new_req)
-
+        speak_spectrogram_request(req, remote_addr2)
       } else {
         debug_request(req)
       }
