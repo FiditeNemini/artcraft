@@ -696,6 +696,18 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "e604eb7b43c06650e854be16a2a03155743d3752dd1c943f6829e26b7a36e382"
 
 [[package]]
+name = "tts-service-proxy"
+version = "0.0.1"
+dependencies = [
+ "anyhow",
+ "env_logger",
+ "futures",
+ "hyper",
+ "hyper-reverse-proxy",
+ "log",
+]
+
+[[package]]
 name = "unicase"
 version = "2.6.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -709,18 +721,6 @@ name = "version_check"
 version = "0.9.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "b5a972e5669d67ba988ce3dc826706fb0a8b01471c088cb0b6110b805cc36aed"
-
-[[package]]
-name = "voder-proxy"
-version = "0.0.1"
-dependencies = [
- "anyhow",
- "env_logger",
- "futures",
- "hyper",
- "hyper-reverse-proxy",
- "log",
-]
 
 [[package]]
 name = "want"

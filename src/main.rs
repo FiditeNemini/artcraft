@@ -50,15 +50,18 @@ fn main() {
   let addr = ([127, 0, 0, 1], 13900).into();
 
   // A `Service` is needed for every connection.
-  let make_svc = make_service_fn(|socket: &AddrStream| {
+  let make_svc = make_service_fn(move |socket: &AddrStream| {
     let remote_addr = socket.remote_addr();
+    let route_a = route_one.clone();
+    let route_b = route_two.clone();
+
     service_fn(move |req: Request<Body>| { // returns BoxFut
 
       if req.uri().path().starts_with("/first") {
-        return hyper_reverse_proxy::call(remote_addr.ip(), &route_one, req)
+        return hyper_reverse_proxy::call(remote_addr.ip(), &route_a, req)
 
       } else if req.uri().path().starts_with("/second") {
-        return hyper_reverse_proxy::call(remote_addr.ip(), &route_two, req)
+        return hyper_reverse_proxy::call(remote_addr.ip(), &route_b, req)
 
       } else {
         debug_request(req)

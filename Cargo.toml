@@ -1,5 +1,5 @@
 [package]
-name = "voder-proxy"
+name = "tts-service-proxy"
 edition = "2018"
 version = "0.0.1"
 authors = [
@@ -9,7 +9,7 @@ authors = [
 publish = false
 
 [[bin]]
-name = "voder-proxy"
+name = "tts-service-proxy"
 path = "src/main.rs"
 
 [dependencies]
