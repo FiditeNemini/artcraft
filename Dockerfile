@@ -38,7 +38,7 @@ COPY --from=build /lib/x86_64-linux-gnu/libcrypto.*          /lib/x86_64-linux-g
 
 # Copy curl utility
 COPY --from=build /usr/bin/curl                              /usr/bin/
-COPY --from=build /lib/x86_64-linux-gnu/libcurl.*            /lib/x86_64-linux-gnu/
+COPY --from=build /usr/lib/x86_64-linux-gnu/libcurl*         /lib/x86_64-linux-gnu/
 
 # Make sure all the links resolve
 RUN ldd tts-service-proxy
