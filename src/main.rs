@@ -2,8 +2,10 @@
 #[macro_use] extern crate log;
 #[macro_use] extern crate serde_derive;
 
-use anyhow::Result as AnyhowResult;
+use anyhow::{Result as AnyhowResult, Error};
 use futures::future::{self, Future};
+use hyper::Method;
+use hyper::rt::Stream;
 use hyper::server::conn::AddrStream;
 use hyper::service::{service_fn, make_service_fn};
 use hyper::{Body, Request, Response, Server};
@@ -12,7 +14,7 @@ use std::fmt::Debug;
 use std::fmt::Display;
 use std::str::FromStr;
 
-type BoxFut = Box<Future<Item=Response<Body>, Error=hyper::Error> + Send>;
+type BoxFut = Box<dyn Future<Item=Response<Body>, Error=hyper::Error> + Send>;
 
 const ENV_PROXY_CONFIG_FILE : &'static str = "PROXY_CONFIG_FILE";
 const ENV_ROUTE_ONE : &'static str = "ROUTE_ONE";
@@ -121,21 +123,53 @@ fn main() -> AnyhowResult<()> {
   // A `Service` is needed for every connection.
   let make_svc = make_service_fn(move |socket: &AddrStream| {
     let remote_addr = socket.remote_addr();
+    info!("Got a request from: {:?}", remote_addr);
+
     let route_a = route_one.clone();
     let route_b = route_two.clone();
 
     service_fn(move |req: Request<Body>| { // returns BoxFut
-      if req.uri().path().eq("/speak") {
-        //let request : SpeakRequest = serde_json::from_str(&req.body().into()).unwrap();
-        //info!("Request: {:?}", request);
+      match req.method() {
+        &Method::OPTIONS => {
+          // TODO: CORS should be hardcoded here, not wastefully proxied.
+          return hyper_reverse_proxy::call(remote_addr.ip(), &route_a, req);
+        },
+        _ => {},
+      }
 
-        return hyper_reverse_proxy::call(remote_addr.ip(), &route_a, req)
+      if req.uri().path().eq("/speak") {
+        info!("/speak");
+
+        let (_parts, body) = req.into_parts();
+
+        let body_bytes = body.concat2().wait().unwrap().into_bytes();
+        let request: SpeakRequest = serde_json::from_slice(&body_bytes).unwrap();
+
+        print!("Request: {:?}", request);
+
+        let new_req = Request::new(Body::empty());
+        return hyper_reverse_proxy::call(remote_addr.ip(), &route_a, new_req)
 
       } else if req.uri().path().eq("/speak_spectrogram") {
+        info!("/speak_spectrogram");
         //let request : SpeakRequest = serde_json::from_str(&req.body().into()).unwrap();
         //info!("Request: {:?}", request);
 
-        return hyper_reverse_proxy::call(remote_addr.ip(), &route_b, req)
+        let (_parts, body) = req.into_parts();
+
+        let body_bytes = body.concat2().wait().unwrap().into_bytes();
+
+        let json_string = String::from_utf8(body_bytes.to_vec());
+
+        info!("Request String: {:?}", json_string);
+
+        let request: SpeakRequest = serde_json::from_slice(&body_bytes).unwrap();
+
+        print!("Request: {:?}", request);
+
+        let new_req = Request::new(Body::empty());
+
+        return hyper_reverse_proxy::call(remote_addr.ip(), &route_b, new_req)
 
       } else {
         debug_request(req)
