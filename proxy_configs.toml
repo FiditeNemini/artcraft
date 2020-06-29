@@ -1,0 +1,9 @@
+[[backends]]
+voice = "foo"
+ip = "127.0.0.1"
+port = "12345"
+
+[[backends]]
+voice = "bar"
+ip = "1.1.1.1"
+port = "12345"
