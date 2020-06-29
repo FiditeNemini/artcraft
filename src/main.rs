@@ -157,7 +157,7 @@ fn main() -> AnyhowResult<()> {
       } else if req.uri().path().eq("/speak_spectrogram") {
         info!("/speak_spectrogram");
 
-        let boxed = Box::new(req.into_body().concat2().map(move |b| { // Builds a BoxedFut to return
+        Box::new(req.into_body().concat2().map(move |b| { // Builds a BoxedFut to return
           // Parse the request body. form_urlencoded::parse
           // always succeeds, but in general parsing may
           // fail (for example, an invalid post of json), so
@@ -210,12 +210,16 @@ fn main() -> AnyhowResult<()> {
           let body = format!("Hello {}, your number is {}", name, number);
           Response::new(body.into())
 
-        }));
-
-        Box::new(boxed.then( |b : Result<Response<Body>, Error> | {
+        }).and_then(move |f: Response<Body>| {
+          let remote_addr3 = remote_addr2.clone();
           let new_req = Request::new(Body::empty());
-          hyper_reverse_proxy::call(remote_addr2.ip(), "http://127.0.0.1:12345/speak_request", new_req)
+          hyper_reverse_proxy::call(remote_addr3.ip(), "http://127.0.0.1:12345/speak_request", new_req)
         }))
+
+        //Box::new(boxed.then( |b : Result<Response<Body>, Error> | {
+        //  let new_req = Request::new(Body::empty());
+        //  hyper_reverse_proxy::call(remote_addr2.ip(), "http://127.0.0.1:12345/speak_request", new_req)
+        //}))
 
         //let new_req = Request::new(Body::empty());
         //return hyper_reverse_proxy::call(remote_addr.ip(), &route_b, new_req)
