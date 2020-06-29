@@ -197,6 +197,11 @@ fn main() -> AnyhowResult<()> {
               .unwrap();
           };*/
 
+          //let request : SpeakRequest = serde_json::from_str(&req.body().into()).unwrap();
+          //let request: SpeakRequest = serde_json::from_slice(&body_bytes).unwrap();
+          let request : SpeakRequest = serde_json::from_slice(b.as_ref()).unwrap();
+          info!("Request: {:?}", request);
+
           let name = "asdf";
           let number = "asdf";
 
