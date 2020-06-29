@@ -12,7 +12,28 @@ glow_tts = "glow_tts_ljs_txlearn_arpabet_2020-06-01_G_1689-2.torchjit"
 name = "Ronald Reagan"
 slug = "glow-solo-reagan"
 model_pipeline = "ArpabetGlowTtsMelgan"
-glow_tts = "glow-tts_solo_reagan_ljstx_2020.06.22_expr-1_chkpt-1084.torchjit"
+glow_tts = "glow-tts_solo_reagan_ljstx_2020.06.22_expr-1_chkpt-1406.torchjit"
+melgan = "melgan_vocodes1.0_multispeaker_2020.06.19_12d5838_experiment-2_chkpt-10400.torchjit"
+
+[[speakers]]
+name = "John Oliver"
+slug = "glow-solo-oliver"
+model_pipeline = "ArpabetGlowTtsMelgan"
+glow_tts = "glow-tts_solo_oliver_ljstx_2020.06.22_expr-1_chkpt-1189.torchjit"
+melgan = "melgan_vocodes1.0_multispeaker_2020.06.19_12d5838_experiment-2_chkpt-10400.torchjit"
+
+[[speakers]]
+name = "Bill Gates"
+slug = "glow-solo-billgates"
+model_pipeline = "ArpabetGlowTtsMelgan"
+glow_tts = "glow-tts_solo_billgates_ljstx_2020.06.24_expr-1_chkpt-2011.torchjit"
+melgan = "melgan_vocodes1.0_multispeaker_2020.06.19_12d5838_experiment-2_chkpt-10400.torchjit"
+
+[[speakers]]
+name = "Mark Zuckerberg"
+slug = "glow-solo-zuckerberg"
+model_pipeline = "ArpabetGlowTtsMelgan"
+glow_tts = "glow-tts_solo_zuckerberg_ljstx_2020.06.24_expr-1_chkpt-2280.torchjit"
 melgan = "melgan_vocodes1.0_multispeaker_2020.06.19_12d5838_experiment-2_chkpt-10400.torchjit"
 
 # ---------------  Speakers: Vo.codes Beta  ---------------
@@ -76,7 +97,7 @@ base_directory = "/data/downloads/downloaded/models/melgan-swpark/"
 file_path = "DELETE_ME" # NB: The service crashes without this currently
 description = "DELETE_ME"
 
-# ---------------- Glow TTS----------------
+# ---------------- Glow TTS Single speaker ----------------
 
 [[glow_tts]]
 file_path = "glow_tts_ljs_txlearn_arpabet_2020-06-01_G_1689-2.torchjit"
@@ -85,6 +106,18 @@ description = "First single-speaker experiments in glow-tts (continued); the '-2
 [[glow_tts]]
 file_path = "glow-tts_solo_reagan_ljstx_2020.06.22_expr-1_chkpt-1084.torchjit"
 description = "First single-speaker Ronald Reagan"
+
+[[glow_tts]]
+file_path = "glow-tts_solo_oliver_ljstx_2020.06.22_expr-1_chkpt-1189.torchjit"
+description = "First single-speaker John Oliver"
+
+[[glow_tts]]
+file_path = "glow-tts_solo_billgates_ljstx_2020.06.24_expr-1_chkpt-2011.torchjit"
+description = "First single-speaker Bill Gates"
+
+[[glow_tts]]
+file_path = "glow-tts_solo_zuckerberg_ljstx_2020.06.24_expr-1_chkpt-2280.torchjit"
+description = "First single-speaker Mark Zuckerberg"
 
 # ---------------- Glow TTS Multi-speaker ----------------
 

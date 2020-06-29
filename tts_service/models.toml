@@ -4,9 +4,10 @@ name = "Glow LJS (Single Speaker)"
 slug = "glow-ljs-single"
 model_pipeline = "ArpabetGlowTtsMelgan"
 glow_tts = "glow_tts_single_speaker.torchjit"
+#glow_tts = "glow-tts_solo_zuckerberg_ljstx_2020.06.24_expr-1_chkpt-2280.torchjit"
 #melgan = "melgan_trump_txlearn_2020-05-30_steno_chkpt9800.torchjit"
-#melgan = "shared_melgan_container-2020.01.04.pt"
-melgan = "melgan_multivoice-1.0_2020.06.15_12d5838_6725.torchjit"
+melgan = "shared_melgan_container-2020.01.04.pt"
+#melgan = "melgan_multivoice-1.0_2020.06.15_12d5838_6725.torchjit"
 
 [[speakers]]
 name = "Donald Trump"
@@ -399,6 +400,11 @@ description = "First experiments (continued); modified with longer input to JIT"
 [[glow_tts]]
 file_path = "glow_tts_single_speaker.torchjit"
 description = "Single speaker training again (fixed arpabet; 2020-06-22)"
+
+[[glow_tts]]
+file_path = "glow-tts_solo_zuckerberg_ljstx_2020.06.24_expr-1_chkpt-2280.torchjit"
+description = ""
+
 
 # ---------------- Glow TTS Multi-speaker ----------------
 [[glow_tts_multi_speaker]]
