@@ -95,14 +95,6 @@ fn debug_request(req: Request<Body>) -> BoxFut {
   Box::new(future::ok(response))
 }
 
-fn speak_request(req: Request<Body>, remote_addr: SocketAddr) -> BoxFut {
-  speak_proxy(req, remote_addr, "/speak")
-}
-
-fn speak_spectrogram_request(req: Request<Body>, remote_addr: SocketAddr) -> BoxFut {
-  speak_proxy(req, remote_addr, "/speak_spectrogram")
-}
-
 fn speak_proxy(req: Request<Body>, remote_addr: SocketAddr, endpoint: &'static str) -> BoxFut {
   let mut headers = req.headers().clone();
   // NB: Rehydrating the request payload can change the content length if whitespace is changed.
@@ -182,14 +174,13 @@ fn main() -> AnyhowResult<()> {
         _ => {},
       }
 
-      let remote_addr2 = remote_addr.clone();
-
-      if req.uri().path().eq("/speak") {
-        speak_request(req, remote_addr2)
-      } else if req.uri().path().eq("/speak_spectrogram") {
-        speak_spectrogram_request(req, remote_addr2)
-      } else {
-        debug_request(req)
+      match req.uri().path() {
+        "/speak" =>
+          speak_proxy(req, remote_addr.clone(), "/speak"),
+        "/speak_spectrogram" =>
+          speak_proxy(req, remote_addr.clone(), "/speak_spectrogram"),
+        _ =>
+          debug_request(req),
       }
     })
   });
