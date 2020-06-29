@@ -48,7 +48,7 @@ impl ProxyConfigs {
   }
 }
 
-#[derive(Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug)]
 pub struct SpeakRequest {
   /// Slug for the speaker
   speaker: String,
@@ -156,12 +156,25 @@ fn main() -> AnyhowResult<()> {
 
       } else if req.uri().path().eq("/speak_spectrogram") {
         Box::new(req.into_body().concat2().map(move |b| { // Builds a BoxedFut to return
-          serde_json::from_slice::<SpeakRequest>(b.as_ref())
+          let request_bytes = b.as_ref();
+          serde_json::from_slice::<SpeakRequest>(request_bytes)
             .unwrap()
         }).and_then(move |speak_request: SpeakRequest| {
           let remote_addr3 = remote_addr2.clone();
-          let new_req = Request::new(Body::empty());
-          hyper_reverse_proxy::call(remote_addr3.ip(), "http://127.0.0.1:12345/speak_request", new_req)
+
+          let request_json = serde_json::to_string(&speak_request)
+            .unwrap();
+
+          let new_req = Request::builder()
+            .method(Method::POST)
+            .uri("/speak_spectrogram")
+            .header("X-Forwarded-For", "https://localhost:12345/frontend/index.html")
+            .header("Origin", "http://localhost:12345")
+            .header("Referer", "http://localhost:12345/frontend/index.html")
+            .body(Body::from(request_json))
+            .unwrap();
+
+          hyper_reverse_proxy::call(remote_addr3.ip(), "http://127.0.0.1:12345", new_req)
         }))
 
         //Box::new(boxed.then( |b : Result<Response<Body>, Error> | {
