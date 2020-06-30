@@ -15,6 +15,13 @@ melgan = "melgan_trump_txlearn_2020-05-30_steno_chkpt9800.torchjit"
 glow_tts = "glow_tts_ljs_txlearn_arpabet_2020-06-01_G_1689-2.torchjit"
 
 [[speakers]]
+name = "Gilbert Gottfried"
+slug = "gilbert-gottfried"
+model_pipeline = "ArpabetGlowTtsMelgan"
+glow_tts = "glow-tts_gilbert-gottfried_ljstx_2020.06.28_expr-1_chkpt-1766.torchjit"
+melgan = "manyvoice1.0_2020-06-28_12d5838_6610.torchjit"
+
+[[speakers]]
 name = "Ronald Reagan"
 slug = "glow-solo-reagan"
 model_pipeline = "ArpabetGlowTtsMelgan"
