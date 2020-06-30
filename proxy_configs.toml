@@ -1,9 +1,9 @@
 [[backends]]
-voice = "foo"
+voice = "trump"
 ip = "127.0.0.1"
 port = "12345"
 
 [[backends]]
-voice = "bar"
-ip = "1.1.1.1"
+voice = "glow-ljs-single"
+ip = "localhost"
 port = "12345"

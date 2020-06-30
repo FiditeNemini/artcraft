@@ -2,35 +2,33 @@
 #[macro_use] extern crate log;
 #[macro_use] extern crate serde_derive;
 
-use anyhow::{Result as AnyhowResult, Error};
+use anyhow::Result as AnyhowResult;
 use futures::future::{self, Future};
 use hyper::Method;
 use hyper::rt::Stream;
 use hyper::server::conn::AddrStream;
 use hyper::service::{service_fn, make_service_fn};
 use hyper::{Body, Request, Response, Server};
+use std::collections::HashMap;
 use std::env;
 use std::fmt::Debug;
 use std::fmt::Display;
-use std::str::FromStr;
 use std::net::SocketAddr;
-use std::collections::HashMap;
-use hyper::header::HeaderValue;
-use hyper::http::header::HeaderName;
+use std::str::FromStr;
+use std::sync::Arc;
+use rand::seq::IteratorRandom;
 
 type BoxFut = Box<dyn Future<Item=Response<Body>, Error=hyper::Error> + Send>;
 
+const ENV_DEFAULT_ROUTE : &'static str = "DEFAULT_ROUTE";
 const ENV_PROXY_CONFIG_FILE : &'static str = "PROXY_CONFIG_FILE";
-const ENV_ROUTE_ONE : &'static str = "ROUTE_ONE";
-const ENV_ROUTE_TWO : &'static str = "ROUTE_TWO";
 const ENV_RUST_LOG : &'static str = "RUST_LOG";
 const ENV_SERVICE_PORT : &'static str = "SERVICE_PORT";
 
+const DEFAULT_DEFAULT_ROUTE : &'static str = "http://127.0.0.1:12345";
 const DEFAULT_PROXY_CONFIG_FILE : &'static str = "proxy_configs.toml";
-const DEFAULT_RUST_LOG: &'static str = "debug";
+const DEFAULT_RUST_LOG: &'static str = "tokio_reactor=warn,hyper=info,debug";
 const DEFAULT_SERVICE_PORT: u16 = 5555;
-const ROUTE_ONE_DEFAULT : &'static str = "http://127.0.0.1:12345";
-const ROUTE_TWO_DEFAULT : &'static str = "http://127.0.0.1:3000";
 
 #[derive(Deserialize, Debug, Clone)]
 struct ProxyConfigs {
@@ -91,7 +89,7 @@ fn get_env_num<T>(env_name: &str, default: T) -> AnyhowResult<T>
   }
 }
 
-fn debug_request(req: Request<Body>) -> BoxFut {
+fn _debug_request(req: Request<Body>) -> BoxFut {
   let body_str = format!("{:?}", req);
   let response = Response::new(Body::from(body_str));
   Box::new(future::ok(response))
@@ -102,8 +100,26 @@ struct RequestDetails {
   pub speaker: String,
 }
 
-fn speak_proxy(req: Request<Body>, remote_addr: SocketAddr, endpoint: &'static str) -> BoxFut {
-  let mut headers = req.headers().clone();
+struct Router {
+  pub routes: HashMap<String, String>,
+}
+
+impl Router {
+  fn get_random_host(&self) -> Option<String> {
+    let mut rng = rand::thread_rng();
+    self.routes.values()
+      .choose(&mut rng)
+      .map(|url| url.to_string())
+  }
+
+  fn get_speaker_host(&self, voice: &str) -> Option<String> {
+    self.routes.get(voice)
+      .map(|url| url.to_string())
+  }
+}
+
+fn speak_proxy(req: Request<Body>, remote_addr: SocketAddr, router: Arc<Router>, endpoint: &'static str) -> BoxFut {
+  let headers = req.headers().clone();
 
   Box::new(req.into_body().concat2().map(move |b| { // Builds a BoxedFut to return
     let request_bytes = b.as_ref();
@@ -116,6 +132,19 @@ fn speak_proxy(req: Request<Body>, remote_addr: SocketAddr, endpoint: &'static s
       speaker: request.speaker,
     }
   }).and_then(move |request_details: RequestDetails| {
+    let proxy_host = match router.get_speaker_host(&request_details.speaker) {
+      Some(host) => host,
+      None => {
+        let response = Response::builder()
+          .body(Body::from("error"))
+          .unwrap();
+        let result : BoxFut = Box::new(future::ok(response));
+        return result;
+      },
+    };
+
+    info!("Routing {} for {} to {}", endpoint, &request_details.speaker, &proxy_host);
+
     let mut request_builder = Request::builder();
     request_builder.method(Method::POST)
       .uri(endpoint);
@@ -128,7 +157,7 @@ fn speak_proxy(req: Request<Body>, remote_addr: SocketAddr, endpoint: &'static s
       .body(Body::from(request_details.request_bytes))
       .unwrap();
 
-    hyper_reverse_proxy::call(remote_addr.ip(), "http://127.0.0.1:12345", new_req)
+    hyper_reverse_proxy::call(remote_addr.ip(), &proxy_host, new_req)
   }))
 }
 
@@ -145,12 +174,10 @@ fn main() -> AnyhowResult<()> {
 
   env_logger::init();
 
-  let route_one = get_env_string(ENV_ROUTE_ONE, ROUTE_ONE_DEFAULT);
-  let route_two = get_env_string(ENV_ROUTE_TWO, ROUTE_TWO_DEFAULT);
+  let default_route = get_env_string(ENV_DEFAULT_ROUTE, DEFAULT_DEFAULT_ROUTE);
   let service_port = get_env_num::<u16>(ENV_SERVICE_PORT, DEFAULT_SERVICE_PORT)?;
 
-  info!("Route one: {}", route_one);
-  info!("Route two: {}", route_two);
+  info!("Default route: {}", default_route);
 
   let proxy_configs_file = get_env_string(ENV_PROXY_CONFIG_FILE, DEFAULT_PROXY_CONFIG_FILE);
   info!("Proxy config file: {}", proxy_configs_file);
@@ -158,33 +185,51 @@ fn main() -> AnyhowResult<()> {
   let proxy_configs = ProxyConfigs::load_from_file(&proxy_configs_file)?;
   info!("Proxy configs: {:?}", proxy_configs);
 
-  // This is our socket address...
-  let addr = ([127, 0, 0, 1], service_port).into();
+  let mut route_map = HashMap::new();
+
+  for backend in proxy_configs.backends.iter() {
+    let host = format!("http://{}:{}", backend.ip, backend.port);
+    route_map.insert(backend.voice.clone(), host);
+  }
+
+  let router = Arc::new(Router {
+    routes: route_map,
+  });
+
+  //let routes = route_map.clone();
 
   // A `Service` is needed for every connection.
-  let make_svc = make_service_fn(move |socket: &AddrStream| {
+  let make_service = make_service_fn(move |socket: &AddrStream| {
     let remote_addr = socket.remote_addr();
     info!("Got a request from: {:?}", remote_addr);
 
-    let route_a = route_one.clone();
+    let router2 = router.clone();
+    let default_route2 = default_route.clone();
 
     service_fn(move |req: Request<Body>| {
+      let router3 = router2.clone();
+
       match (req.method(), req.uri().path()) {
         (&Method::POST, "/speak") =>
-          speak_proxy(req, remote_addr.clone(), "/speak"),
+          speak_proxy(req, remote_addr.clone(), router3, "/speak"),
         (&Method::POST, "/speak_spectrogram") =>
-          speak_proxy(req, remote_addr.clone(), "/speak_spectrogram"),
-        _ =>
-          hyper_reverse_proxy::call(remote_addr.ip(), &route_a, req),
+          speak_proxy(req, remote_addr.clone(), router3, "/speak_spectrogram"),
+        _ => {
+          let forward = router3.get_random_host()
+            .unwrap_or(default_route2.clone());
+          hyper_reverse_proxy::call(remote_addr.ip(), &forward, req)
+        }
       }
     })
   });
 
-  let server = Server::bind(&addr)
-    .serve(make_svc)
-    .map_err(|e| eprintln!("server error: {}", e));
+  let addr = ([127, 0, 0, 1], service_port).into();
 
-  println!("Running server on {:?}", addr);
+  info!("Running server on {:?}", addr);
+
+  let server = Server::bind(&addr)
+    .serve(make_service)
+    .map_err(|e| eprintln!("server error: {}", e));
 
   // Run this server for... forever!
   hyper::rt::run(server);
