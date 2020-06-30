@@ -9,7 +9,7 @@ melgan = "melgan-vocodes.torchjit"
 # --------------- Stable Speakers ---------------
 [[speakers]]
 name = "Donald Trump"
-slug = "trump"
+slug = "donald-trump"
 model_pipeline = "ArpabetGlowTtsMelgan"
 melgan = "melgan_trump_txlearn_2020-05-30_steno_chkpt9800.torchjit"
 glow_tts = "glow_tts_ljs_txlearn_arpabet_2020-06-01_G_1689-2.torchjit"
@@ -23,35 +23,35 @@ glow_tts = "glow-tts_gilbert-gottfried_ljstx_2020.06.28_expr-1_chkpt-1766.torchj
 
 [[speakers]]
 name = "Ronald Reagan"
-slug = "glow-solo-reagan"
+slug = "ronald-reagan"
 model_pipeline = "ArpabetGlowTtsMelgan"
 melgan = "melgan_vocodes1.0_multispeaker_2020.06.19_12d5838_experiment-2_chkpt-10400.torchjit"
 glow_tts = "glow-tts_solo_reagan_ljstx_2020.06.22_expr-1_chkpt-1406.torchjit"
 
 [[speakers]]
 name = "John Oliver"
-slug = "glow-solo-oliver"
+slug = "john-oliver"
 model_pipeline = "ArpabetGlowTtsMelgan"
 melgan = "melgan_vocodes1.0_multispeaker_2020.06.19_12d5838_experiment-2_chkpt-10400.torchjit"
 glow_tts = "glow-tts_solo_oliver_ljstx_2020.06.22_expr-1_chkpt-1189.torchjit"
 
 [[speakers]]
 name = "Bill Gates"
-slug = "glow-solo-billgates"
+slug = "bill-gates"
 model_pipeline = "ArpabetGlowTtsMelgan"
 melgan = "melgan_vocodes1.0_multispeaker_2020.06.19_12d5838_experiment-2_chkpt-10400.torchjit"
 glow_tts = "glow-tts_solo_billgates_ljstx_2020.06.24_expr-1_chkpt-2011.torchjit"
 
 [[speakers]]
 name = "Mark Zuckerberg"
-slug = "glow-solo-zuckerberg"
+slug = "mark-zuckerberg"
 model_pipeline = "ArpabetGlowTtsMelgan"
 melgan = "melgan_vocodes1.0_multispeaker_2020.06.19_12d5838_experiment-2_chkpt-10400.torchjit"
 glow_tts = "glow-tts_solo_zuckerberg_ljstx_2020.06.24_expr-1_chkpt-2280.torchjit"
 
 [[speakers]]
 name = "Arnold Schwarzenegger (Multi-speaker model)"
-slug = "glow-multi-arnold"
+slug = "arnold-schwarzenegger"
 model_pipeline = "ArpabetGlowTtsMultiSpeakerMelgan"
 melgan = "melgan_vocodes1.0_multispeaker_2020.06.19_12d5838_experiment-2_chkpt-10400.torchjit"
 glow_tts_multi_speaker = "glow_tts_multispeaker_8-speaker_256-gin_ljs_txlearn_2020.06.19_experiment-5_chkpt-7466.torchjit"
