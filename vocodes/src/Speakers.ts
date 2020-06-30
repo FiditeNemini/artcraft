@@ -78,11 +78,13 @@ const SPEAKERS : Speaker[] = [
     name: "Dr. Phil McGraw",
     slug: "dr-phil-mcgraw",
     description: "Celebrity doctor.",
+    avatarUrl: "dr-phil-mcgraw.jpg",
   }),
   Speaker.fromJson({
     name: "Barack Obama",
     slug: "barack-obama",
     description: "The 44th President of the United States.",
+    avatarUrl: "barack-obama.jpg",
   }),
   Speaker.fromJson({
     name: "Bill Gates",
@@ -94,6 +96,7 @@ const SPEAKERS : Speaker[] = [
     name: "Mr. Fred Rogers",
     slug: "fred-rogers",
     description: "Educator and amazing human being.",
+    avatarUrl: "fred-rogers.jpg",
   }),
   Speaker.fromJson({
     name: "Mark Zuckerberg",
@@ -105,11 +108,13 @@ const SPEAKERS : Speaker[] = [
     name: "Bill Clinton",
     slug: "bill-clinton",
     description: "The 42nd President of the United States.",
+    avatarUrl: "bill-clinton.jpg",
   }),
   Speaker.fromJson({
     name: "Betty White (Beta)",
     slug: "betty-white",
     description: "This model needs more training.",
+    avatarUrl: "betty-white.jpg",
   }),
   Speaker.fromJson({
     name: "Arnold Schwarzenegger (multi-speaker model*)",
