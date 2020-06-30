@@ -197,6 +197,7 @@ async fn run_server(app_state: AppState, server_args: ServerArgs) -> std::io::Re
       .wrap(Cors::new()
           .allowed_origin("http://localhost:12345")
           .allowed_origin("http://localhost:3000")
+          .allowed_origin("http://localhost:5555")
           .allowed_origin("http://localhost:8080")
           .allowed_origin("http://localhost:8000")
           .allowed_origin("http://localhost:7000")
