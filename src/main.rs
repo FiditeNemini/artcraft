@@ -229,6 +229,7 @@ fn main() -> AnyhowResult<()> {
           speak_proxy(req, remote_addr.clone(), router3, "/speak_spectrogram"),
         _ => {
           let forward = router3.get_random_host();
+          info!("Forwarding to `{}` random host: {}", &forward, req.uri());
           hyper_reverse_proxy::call(remote_addr.ip(), &forward, req)
         }
       }
