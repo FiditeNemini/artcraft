@@ -236,7 +236,7 @@ fn main() -> AnyhowResult<()> {
     })
   });
 
-  let addr = ([127, 0, 0, 1], service_port).into();
+  let addr = ([0, 0, 0, 0], service_port).into();
 
   info!("Running server on {:?}", addr);
 
