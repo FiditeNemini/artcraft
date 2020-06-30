@@ -48,6 +48,7 @@ const SPEAKERS : Speaker[] = [
     name: "Gilbert Gottfried",
     slug: "gilbert-gottfried",
     description: "Voice actor and comedian.",
+    avatarUrl: "gilbert-gottfried.jpg",
   }),
   Speaker.fromJson({
     name: "Ronald Reagan",
