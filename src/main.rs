@@ -97,7 +97,6 @@ fn debug_request(req: Request<Body>) -> BoxFut {
   Box::new(future::ok(response))
 }
 
-#[derive(Default)]
 struct RequestDetails {
   pub request_bytes: Vec<u8>,
   pub speaker: String,
@@ -168,24 +167,15 @@ fn main() -> AnyhowResult<()> {
     info!("Got a request from: {:?}", remote_addr);
 
     let route_a = route_one.clone();
-    let route_b = route_two.clone();
 
-    service_fn(move |req: Request<Body>| { // returns BoxFut
-      match req.method() {
-        &Method::OPTIONS => {
-          // TODO: CORS should be hardcoded here, not wastefully proxied.
-          return hyper_reverse_proxy::call(remote_addr.ip(), &route_a, req); // Return BoxFut
-        },
-        _ => {},
-      }
-
-      match req.uri().path() {
-        "/speak" =>
+    service_fn(move |req: Request<Body>| {
+      match (req.method(), req.uri().path()) {
+        (&Method::POST, "/speak") =>
           speak_proxy(req, remote_addr.clone(), "/speak"),
-        "/speak_spectrogram" =>
+        (&Method::POST, "/speak_spectrogram") =>
           speak_proxy(req, remote_addr.clone(), "/speak_spectrogram"),
         _ =>
-          debug_request(req),
+          hyper_reverse_proxy::call(remote_addr.ip(), &route_a, req),
       }
     })
   });
