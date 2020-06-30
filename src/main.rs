@@ -52,6 +52,8 @@ impl ProxyConfigs {
   }
 }
 
+/// NB: This much match the shape of SpeakRequest in the 'voder/tts_service' code.
+/// This is used for both /speak and /speak_spectrogram requests.
 #[derive(Serialize, Deserialize, Debug)]
 pub struct SpeakRequest {
   /// Slug for the speaker
@@ -95,23 +97,26 @@ fn debug_request(req: Request<Body>) -> BoxFut {
   Box::new(future::ok(response))
 }
 
+#[derive(Default)]
+struct RequestDetails {
+  pub request_bytes: Vec<u8>,
+  pub speaker: String,
+}
+
 fn speak_proxy(req: Request<Body>, remote_addr: SocketAddr, endpoint: &'static str) -> BoxFut {
   let mut headers = req.headers().clone();
-  // NB: Rehydrating the request payload can change the content length if whitespace is changed.
-  headers.remove(HeaderName::from_static("content-length"));
 
   Box::new(req.into_body().concat2().map(move |b| { // Builds a BoxedFut to return
     let request_bytes = b.as_ref();
-    let mut request = serde_json::from_slice::<SpeakRequest>(request_bytes)
+
+    let request = serde_json::from_slice::<SpeakRequest>(request_bytes)
       .unwrap();
 
-    request.speaker = "glow-ljs-single".to_string();
-
-    request
-  }).and_then(move |speak_request: SpeakRequest| {
-    let request_json = serde_json::to_string(&speak_request)
-      .unwrap();
-
+    RequestDetails {
+      request_bytes: request_bytes.to_vec(),
+      speaker: request.speaker,
+    }
+  }).and_then(move |request_details: RequestDetails| {
     let mut request_builder = Request::builder();
     request_builder.method(Method::POST)
       .uri(endpoint);
@@ -121,7 +126,7 @@ fn speak_proxy(req: Request<Body>, remote_addr: SocketAddr, endpoint: &'static s
     }
 
     let new_req = request_builder
-      .body(Body::from(request_json))
+      .body(Body::from(request_details.request_bytes))
       .unwrap();
 
     hyper_reverse_proxy::call(remote_addr.ip(), "http://127.0.0.1:12345", new_req)
