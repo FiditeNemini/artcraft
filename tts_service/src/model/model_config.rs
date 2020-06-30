@@ -26,6 +26,9 @@ pub struct Speaker {
   pub glow_tts_multi_speaker: Option<String>,
   /// Melgan model, if used.
   pub melgan: Option<String>,
+  /// Whether the model is "production" or not
+  /// Production models are backed up on GDrive and are synced to DigitalOcean
+  pub production: Option<bool>,
 }
 
 /// The types of models supported by our system.
@@ -42,7 +45,8 @@ pub enum ModelType {
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
 pub struct ModelLocation {
   pub model_type: ModelType,
-  pub base_directory: Option<String>,
+  pub dev_base_directory: Option<String>,
+  pub prod_base_directory: Option<String>,
 }
 
 /// The valid model pipelines in use by our system.

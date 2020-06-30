@@ -61,13 +61,15 @@ speaker_id = 3
 
 [[model_locations]]
 model_type = "ArpabetGlowTts"
-base_directory = "/home/bt/dev/jit-models/glow-tts-jaywalnut/OUTPUT"
-
-[[model_locations]]
-model_type = "Melgan"
-base_directory = "/home/bt/dev/jit-models/melgan-swpark/OUTPUT"
+dev_base_directory = "/home/bt/dev/jit-models/glow-tts-jaywalnut/OUTPUT"
+prod_base_directory = "/home/bt/models/jit/glow-tts-jaywalnut"
 
 [[model_locations]]
 model_type = "ArpabetGlowTtsMultiSpeaker"
-base_directory = "/home/bt/dev/jit-models/glow-tts-jaywalnut-multispeaker/OUTPUT"
+dev_base_directory = "/home/bt/dev/jit-models/glow-tts-jaywalnut-multispeaker/OUTPUT"
+prod_base_directory = "/home/bt/models/jit/glow-tts-jaywalnut-multispeaker"
 
+[[model_locations]]
+model_type = "Melgan"
+dev_base_directory = "/home/bt/dev/jit-models/melgan-swpark/OUTPUT"
+prod_base_directory = "/home/bt/models/jit/melgan-swpark"
