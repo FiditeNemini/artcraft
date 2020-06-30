@@ -97,6 +97,11 @@ fn _debug_request(req: Request<Body>) -> BoxFut {
   Box::new(future::ok(response))
 }
 
+fn health_check_response(_req: Request<Body>) -> BoxFut {
+  let response = Response::new(Body::from("healthy"));
+  Box::new(future::ok(response))
+}
+
 struct RequestDetails {
   pub request_bytes: Vec<u8>,
   pub speaker: String,
@@ -227,6 +232,8 @@ fn main() -> AnyhowResult<()> {
           speak_proxy(req, remote_addr.clone(), router3, "/speak"),
         (&Method::POST, "/speak_spectrogram") =>
           speak_proxy(req, remote_addr.clone(), router3, "/speak_spectrogram"),
+        (&Method::GET, "/proxy_health") =>
+          health_check_response(req),
         _ => {
           let forward = router3.get_random_host();
           info!("Forwarding to `{}` random host: {}", &forward, req.uri());
