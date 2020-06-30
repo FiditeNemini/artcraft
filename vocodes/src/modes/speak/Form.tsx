@@ -170,6 +170,8 @@ class Form extends React.Component<Props, State> {
   handleTextChange = (ev: React.FormEvent<HTMLTextAreaElement>) => {
     const text = (ev.target as HTMLTextAreaElement).value;
 
+    ev.preventDefault();
+
     let pseudoWords = text.split(' ');
 
     if (text.length > 0) {
@@ -183,6 +185,8 @@ class Form extends React.Component<Props, State> {
     }
 
     this.setState({text: text});
+
+    return false;
   }
 
   handleFormSubmit = (ev: React.FormEvent<HTMLFormElement>) : boolean => {
