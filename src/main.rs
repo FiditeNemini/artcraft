@@ -17,6 +17,8 @@ use std::net::SocketAddr;
 use std::str::FromStr;
 use std::sync::Arc;
 use rand::seq::IteratorRandom;
+use hyper::http::header::HeaderName;
+use hyper::header::HeaderValue;
 
 type BoxFut = Box<dyn Future<Item=Response<Body>, Error=hyper::Error> + Send>;
 
@@ -122,7 +124,12 @@ impl Router {
 }
 
 fn speak_proxy(req: Request<Body>, remote_addr: SocketAddr, router: Arc<Router>, endpoint: &'static str) -> BoxFut {
-  let headers = req.headers().clone();
+  let mut headers = req.headers().clone();
+
+  let forwarded_for = HeaderValue::from_str(&remote_addr.ip().to_string())
+    .ok()
+    .unwrap_or(HeaderValue::from_static("127.0.0.1"));
+  headers.insert(HeaderName::from_static("x-forwarded-for"), forwarded_for);
 
   Box::new(req.into_body().concat2().map(move |b| { // Builds a BoxedFut to return
     let request_bytes = b.as_ref();

@@ -45,6 +45,8 @@ RUN apt-get update \
         curl \
     && apt-get clean
 
+COPY proxy_configs.toml .
+
 EXPOSE 8080
 CMD LD_LIBRARY_PATH=/usr/lib /tts-service-proxy
 
