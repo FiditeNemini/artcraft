@@ -126,10 +126,11 @@ impl Router {
 fn speak_proxy(req: Request<Body>, remote_addr: SocketAddr, router: Arc<Router>, endpoint: &'static str) -> BoxFut {
   let mut headers = req.headers().clone();
 
-  let forwarded_for = HeaderValue::from_str(&remote_addr.ip().to_string())
+  let forwarded_ip = HeaderValue::from_str(&remote_addr.ip().to_string())
     .ok()
     .unwrap_or(HeaderValue::from_static("127.0.0.1"));
-  headers.insert(HeaderName::from_static("x-forwarded-for"), forwarded_for);
+  headers.insert(HeaderName::from_static("forwarded"), forwarded_ip.clone());
+  headers.insert(HeaderName::from_static("x-forwarded-for"), forwarded_ip.clone());
 
   Box::new(req.into_body().concat2().map(move |b| { // Builds a BoxedFut to return
     let request_bytes = b.as_ref();
