@@ -102,19 +102,22 @@ struct RequestDetails {
 
 struct Router {
   pub routes: HashMap<String, String>,
+  pub default_route: String,
 }
 
 impl Router {
-  fn get_random_host(&self) -> Option<String> {
+  fn get_random_host(&self) -> String {
     let mut rng = rand::thread_rng();
     self.routes.values()
       .choose(&mut rng)
       .map(|url| url.to_string())
+      .unwrap_or(self.default_route.clone())
   }
 
-  fn get_speaker_host(&self, voice: &str) -> Option<String> {
+  fn get_speaker_host(&self, voice: &str) -> String {
     self.routes.get(voice)
       .map(|url| url.to_string())
+      .unwrap_or(self.default_route.clone())
   }
 }
 
@@ -132,7 +135,7 @@ fn speak_proxy(req: Request<Body>, remote_addr: SocketAddr, router: Arc<Router>,
       speaker: request.speaker,
     }
   }).and_then(move |request_details: RequestDetails| {
-    let proxy_host = match router.get_speaker_host(&request_details.speaker) {
+    /*let proxy_host = match router.get_speaker_host(&request_details.speaker) {
       Some(host) => host,
       None => {
         let response = Response::builder()
@@ -141,7 +144,9 @@ fn speak_proxy(req: Request<Body>, remote_addr: SocketAddr, router: Arc<Router>,
         let result : BoxFut = Box::new(future::ok(response));
         return result;
       },
-    };
+    };*/
+
+    let proxy_host = router.get_speaker_host(&request_details.speaker);
 
     info!("Routing {} for {} to {}", endpoint, &request_details.speaker, &proxy_host);
 
@@ -194,6 +199,7 @@ fn main() -> AnyhowResult<()> {
 
   let router = Arc::new(Router {
     routes: route_map,
+    default_route: default_route,
   });
 
   //let routes = route_map.clone();
@@ -204,7 +210,6 @@ fn main() -> AnyhowResult<()> {
     info!("Got a request from: {:?}", remote_addr);
 
     let router2 = router.clone();
-    let default_route2 = default_route.clone();
 
     service_fn(move |req: Request<Body>| {
       let router3 = router2.clone();
@@ -215,8 +220,7 @@ fn main() -> AnyhowResult<()> {
         (&Method::POST, "/speak_spectrogram") =>
           speak_proxy(req, remote_addr.clone(), router3, "/speak_spectrogram"),
         _ => {
-          let forward = router3.get_random_host()
-            .unwrap_or(default_route2.clone());
+          let forward = router3.get_random_host();
           hyper_reverse_proxy::call(remote_addr.ip(), &forward, req)
         }
       }
