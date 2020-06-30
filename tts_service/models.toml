@@ -18,43 +18,43 @@ glow_tts = "glow_tts_ljs_txlearn_arpabet_2020-06-01_G_1689-2.torchjit"
 name = "Gilbert Gottfried"
 slug = "gilbert-gottfried"
 model_pipeline = "ArpabetGlowTtsMelgan"
-glow_tts = "glow-tts_gilbert-gottfried_ljstx_2020.06.28_expr-1_chkpt-1766.torchjit"
 melgan = "manyvoice1.0_2020-06-28_12d5838_6610.torchjit"
+glow_tts = "glow-tts_gilbert-gottfried_ljstx_2020.06.28_expr-1_chkpt-1766.torchjit"
 
 [[speakers]]
 name = "Ronald Reagan"
 slug = "glow-solo-reagan"
 model_pipeline = "ArpabetGlowTtsMelgan"
-glow_tts = "glow-tts_solo_reagan_ljstx_2020.06.22_expr-1_chkpt-1406.torchjit"
 melgan = "melgan_vocodes1.0_multispeaker_2020.06.19_12d5838_experiment-2_chkpt-10400.torchjit"
+glow_tts = "glow-tts_solo_reagan_ljstx_2020.06.22_expr-1_chkpt-1406.torchjit"
 
 [[speakers]]
 name = "John Oliver"
 slug = "glow-solo-oliver"
 model_pipeline = "ArpabetGlowTtsMelgan"
-glow_tts = "glow-tts_solo_oliver_ljstx_2020.06.22_expr-1_chkpt-1189.torchjit"
 melgan = "melgan_vocodes1.0_multispeaker_2020.06.19_12d5838_experiment-2_chkpt-10400.torchjit"
+glow_tts = "glow-tts_solo_oliver_ljstx_2020.06.22_expr-1_chkpt-1189.torchjit"
 
 [[speakers]]
 name = "Bill Gates"
 slug = "glow-solo-billgates"
 model_pipeline = "ArpabetGlowTtsMelgan"
-glow_tts = "glow-tts_solo_billgates_ljstx_2020.06.24_expr-1_chkpt-2011.torchjit"
 melgan = "melgan_vocodes1.0_multispeaker_2020.06.19_12d5838_experiment-2_chkpt-10400.torchjit"
+glow_tts = "glow-tts_solo_billgates_ljstx_2020.06.24_expr-1_chkpt-2011.torchjit"
 
 [[speakers]]
 name = "Mark Zuckerberg"
 slug = "glow-solo-zuckerberg"
 model_pipeline = "ArpabetGlowTtsMelgan"
-glow_tts = "glow-tts_solo_zuckerberg_ljstx_2020.06.24_expr-1_chkpt-2280.torchjit"
 melgan = "melgan_vocodes1.0_multispeaker_2020.06.19_12d5838_experiment-2_chkpt-10400.torchjit"
+glow_tts = "glow-tts_solo_zuckerberg_ljstx_2020.06.24_expr-1_chkpt-2280.torchjit"
 
 [[speakers]]
 name = "Arnold Schwarzenegger (Multi-speaker model)"
 slug = "glow-multi-arnold"
 model_pipeline = "ArpabetGlowTtsMultiSpeakerMelgan"
-glow_tts_multi_speaker = "glow_tts_multispeaker_8-speaker_256-gin_ljs_txlearn_2020.06.19_experiment-5_chkpt-7466.torchjit"
 melgan = "melgan_vocodes1.0_multispeaker_2020.06.19_12d5838_experiment-2_chkpt-10400.torchjit"
+glow_tts_multi_speaker = "glow_tts_multispeaker_8-speaker_256-gin_ljs_txlearn_2020.06.19_experiment-5_chkpt-7466.torchjit"
 speaker_id = 3
 
 # --------------- Model configs ---------------
