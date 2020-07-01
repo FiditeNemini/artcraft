@@ -1,137 +1,114 @@
-# --------------- Speakers: Trumped.com ---------------
+
+[[speakers]]
+name = "Bill Clinton"
+slug = "bill-clinton"
+model_pipeline = "ArpabetGlowTtsMelgan"
+glow_tts = "glow-tts_bill_clinton_ljstx_2020.06.28_expr-1_chkpt-1659.torchjit"
+melgan = "melgan_manyvoice1.0_2020-06-28_12d5838_6730.torchjit"
+
+[[speakers]]
+name = "Christopher Lee"
+slug = "christopher-lee"
+model_pipeline = "ArpabetGlowTtsMelgan"
+glow_tts = "glow-tts_christopher_lee_ljstx_2020.06.28_expr-1_chkpt-4100.torchjit"
+melgan = "melgan_manyvoice1.0_2020-06-28_12d5838_6730.torchjit"
+
+[[speakers]]
+name = "Barack Obama"
+slug = "barack-obama"
+model_pipeline = "ArpabetGlowTtsMelgan"
+glow_tts = "glow-tts_barack_obama_ljstx_2020.06.28_expr-1_chkpt-1729.torchjit"
+melgan = "melgan_manyvoice1.0_2020-06-28_12d5838_6730.torchjit"
+
+[[speakers]]
+name = "Betty White (beta)"
+slug = "betty-white"
+model_pipeline = "ArpabetGlowTtsMelgan"
+glow_tts = "glow-tts_betty_white_ljstx_2020.06.28_expr-1_chkpt-1666.torchjit"
+melgan = "melgan_manyvoice1.0_2020-06-28_12d5838_6730.torchjit"
+
+[[speakers]]
+name = "Dr. Phil McGraw"
+slug = "dr-phil-mcgraw"
+model_pipeline = "ArpabetGlowTtsMelgan"
+glow_tts = "glow-tts_dr_phil_mcgraw_ljstx_2020.06.28_expr-1_chkpt-1813.torchjit"
+melgan = "melgan_manyvoice1.0_2020-06-28_12d5838_6730.torchjit"
+
+[[speakers]]
+name = "Fred Rogers"
+slug = "fred-rogers"
+model_pipeline = "ArpabetGlowTtsMelgan"
+glow_tts = "glow-tts_fred_rogers_ljstx_2020.06.28_expr-1_chkpt-2575.torchjit"
+melgan = "melgan_manyvoice1.0_2020-06-28_12d5838_6730.torchjit"
+
+[[speakers]]
+name = "Danny Devito"
+slug = "danny-devito"
+model_pipeline = "ArpabetGlowTtsMelgan"
+glow_tts = "glow-tts_danny_devito_ljstx_2020.06.28_expr-1_chkpt-3757.torchjit"
+melgan = "melgan_manyvoice1.0_2020-06-28_12d5838_6730.torchjit"
+
+
 [[speakers]]
 name = "Donald Trump"
-slug = "trump"
+slug = "donald-trump"
 model_pipeline = "ArpabetGlowTtsMelgan"
 melgan = "melgan_trump_txlearn_2020-05-30_steno_chkpt9800.torchjit"
 glow_tts = "glow_tts_ljs_txlearn_arpabet_2020-06-01_G_1689-2.torchjit"
 
-# ---------------  Speakers: Vo.codes  ---------------
+[[speakers]]
+name = "Gilbert Gottfried"
+slug = "gilbert-gottfried"
+model_pipeline = "ArpabetGlowTtsMelgan"
+melgan = "manyvoice1.0_2020-06-28_12d5838_6610.torchjit"
+glow_tts = "glow-tts_gilbert-gottfried_ljstx_2020.06.28_expr-1_chkpt-1766.torchjit"
 
 [[speakers]]
 name = "Ronald Reagan"
-slug = "glow-solo-reagan"
+slug = "ronald-reagan"
 model_pipeline = "ArpabetGlowTtsMelgan"
-glow_tts = "glow-tts_solo_reagan_ljstx_2020.06.22_expr-1_chkpt-1406.torchjit"
 melgan = "melgan_vocodes1.0_multispeaker_2020.06.19_12d5838_experiment-2_chkpt-10400.torchjit"
+glow_tts = "glow-tts_solo_reagan_ljstx_2020.06.22_expr-1_chkpt-1406.torchjit"
 
 [[speakers]]
 name = "John Oliver"
-slug = "glow-solo-oliver"
+slug = "john-oliver"
 model_pipeline = "ArpabetGlowTtsMelgan"
-glow_tts = "glow-tts_solo_oliver_ljstx_2020.06.22_expr-1_chkpt-1189.torchjit"
 melgan = "melgan_vocodes1.0_multispeaker_2020.06.19_12d5838_experiment-2_chkpt-10400.torchjit"
+glow_tts = "glow-tts_solo_oliver_ljstx_2020.06.22_expr-1_chkpt-1189.torchjit"
 
 [[speakers]]
 name = "Bill Gates"
-slug = "glow-solo-billgates"
+slug = "bill-gates"
 model_pipeline = "ArpabetGlowTtsMelgan"
-glow_tts = "glow-tts_solo_billgates_ljstx_2020.06.24_expr-1_chkpt-2011.torchjit"
 melgan = "melgan_vocodes1.0_multispeaker_2020.06.19_12d5838_experiment-2_chkpt-10400.torchjit"
+glow_tts = "glow-tts_solo_billgates_ljstx_2020.06.24_expr-1_chkpt-2011.torchjit"
 
 [[speakers]]
 name = "Mark Zuckerberg"
-slug = "glow-solo-zuckerberg"
+slug = "mark-zuckerberg"
 model_pipeline = "ArpabetGlowTtsMelgan"
+melgan = "melgan_vocodes1.0_multispeaker_2020.06.19_12d5838_experiment-2_chkpt-10400.torchjit"
 glow_tts = "glow-tts_solo_zuckerberg_ljstx_2020.06.24_expr-1_chkpt-2280.torchjit"
-melgan = "melgan_vocodes1.0_multispeaker_2020.06.19_12d5838_experiment-2_chkpt-10400.torchjit"
-
-# ---------------  Speakers: Vo.codes Beta  ---------------
-[[speakers]]
-name = "Donald Trump (Multi-speaker model)"
-slug = "glow-multi-trump"
-model_pipeline = "ArpabetGlowTtsMultiSpeakerMelgan"
-glow_tts_multi_speaker = "glow_tts_multispeaker_8-speaker_256-gin_ljs_txlearn_2020.06.19_experiment-5_chkpt-7466.torchjit"
-melgan = "melgan_vocodes1.0_multispeaker_2020.06.19_12d5838_experiment-2_chkpt-10400.torchjit"
-speaker_id = 0
-
-[[speakers]]
-name = "John Oliver (Multi-speaker model)"
-slug = "glow-multi-oliver"
-model_pipeline = "ArpabetGlowTtsMultiSpeakerMelgan"
-glow_tts_multi_speaker = "glow_tts_multispeaker_8-speaker_256-gin_ljs_txlearn_2020.06.19_experiment-5_chkpt-7466.torchjit"
-melgan = "melgan_vocodes1.0_multispeaker_2020.06.19_12d5838_experiment-2_chkpt-10400.torchjit"
-speaker_id = 1
-
-[[speakers]]
-name = "Bill Gates (Multi-speaker model)"
-slug = "glow-multi-gates"
-model_pipeline = "ArpabetGlowTtsMultiSpeakerMelgan"
-glow_tts_multi_speaker = "glow_tts_multispeaker_8-speaker_256-gin_ljs_txlearn_2020.06.19_experiment-5_chkpt-7466.torchjit"
-melgan = "melgan_vocodes1.0_multispeaker_2020.06.19_12d5838_experiment-2_chkpt-10400.torchjit"
-speaker_id = 2
 
 [[speakers]]
 name = "Arnold Schwarzenegger (Multi-speaker model)"
-slug = "glow-multi-arnold"
+slug = "arnold-schwarzenegger"
 model_pipeline = "ArpabetGlowTtsMultiSpeakerMelgan"
-glow_tts_multi_speaker = "glow_tts_multispeaker_8-speaker_256-gin_ljs_txlearn_2020.06.19_experiment-5_chkpt-7466.torchjit"
 melgan = "melgan_vocodes1.0_multispeaker_2020.06.19_12d5838_experiment-2_chkpt-10400.torchjit"
+glow_tts_multi_speaker = "glow_tts_multispeaker_8-speaker_256-gin_ljs_txlearn_2020.06.19_experiment-5_chkpt-7466.torchjit"
 speaker_id = 3
-
-[[speakers]]
-name = "Ronald Reagan (Multi-speaker model)"
-slug = "glow-multi-reagan"
-model_pipeline = "ArpabetGlowTtsMultiSpeakerMelgan"
-glow_tts_multi_speaker = "glow_tts_multispeaker_8-speaker_256-gin_ljs_txlearn_2020.06.19_experiment-5_chkpt-7466.torchjit"
-melgan = "melgan_vocodes1.0_multispeaker_2020.06.19_12d5838_experiment-2_chkpt-10400.torchjit"
-speaker_id = 4
 
 # --------------- Model configs ---------------
 
 [[model_locations]]
 model_type = "ArpabetGlowTts"
-base_directory = "/data/downloads/downloaded/models/glow-tts-jaywalnut/"
+prod_base_directory = "/data/downloads/downloaded/models/glow-tts-jaywalnut/"
 
 [[model_locations]]
 model_type = "ArpabetGlowTtsMultiSpeaker"
-base_directory = "/data/downloads/downloaded/models/glow-tts-jaywalnut-multispeaker/"
+prod_base_directory = "/data/downloads/downloaded/models/glow-tts-jaywalnut-multispeaker/"
 
 [[model_locations]]
 model_type = "Melgan"
-base_directory = "/data/downloads/downloaded/models/melgan-swpark/"
-
-# ---------------- Tacotron ----------------
-
-[[tacotron]]
-file_path = "DELETE_ME" # NB: The service crashes without this currently
-description = "DELETE_ME"
-
-# ---------------- Glow TTS Single speaker ----------------
-
-[[glow_tts]]
-file_path = "glow_tts_ljs_txlearn_arpabet_2020-06-01_G_1689-2.torchjit"
-description = "First single-speaker experiments in glow-tts (continued); the '-2' is longer JIT tracing input"
-
-[[glow_tts]]
-file_path = "glow-tts_solo_reagan_ljstx_2020.06.22_expr-1_chkpt-1084.torchjit"
-description = "First single-speaker Ronald Reagan"
-
-[[glow_tts]]
-file_path = "glow-tts_solo_oliver_ljstx_2020.06.22_expr-1_chkpt-1189.torchjit"
-description = "First single-speaker John Oliver"
-
-[[glow_tts]]
-file_path = "glow-tts_solo_billgates_ljstx_2020.06.24_expr-1_chkpt-2011.torchjit"
-description = "First single-speaker Bill Gates"
-
-[[glow_tts]]
-file_path = "glow-tts_solo_zuckerberg_ljstx_2020.06.24_expr-1_chkpt-2280.torchjit"
-description = "First single-speaker Mark Zuckerberg"
-
-# ---------------- Glow TTS Multi-speaker ----------------
-
-[[glow_tts_multi_speaker]]
-file_path = "glow_tts_multispeaker_8-speaker_256-gin_ljs_txlearn_2020.06.19_experiment-5_chkpt-7466.torchjit"
-description = "First multi-speaker model in glow-tts"
-
-# ---------------- Melgan ----------------
-
-[[melgan]]
-file_path = "melgan_trump_txlearn_2020-05-30_steno_chkpt9800.torchjit"
-description = "Trump steno data"
-
-[[melgan]]
-file_path = "melgan_vocodes1.0_multispeaker_2020.06.19_12d5838_experiment-2_chkpt-10400.torchjit"
-description = "First round of multi-speaker experiments for glow-tts"
-
+prod_base_directory = "/data/downloads/downloaded/models/melgan-swpark/"

@@ -7,6 +7,58 @@ glow_tts = "glow_tts_single_speaker.torchjit"
 melgan = "melgan-vocodes.torchjit"
 
 # --------------- Stable Speakers ---------------
+
+
+[[speakers]]
+name = "Bill Clinton"
+slug = "bill-clinton"
+model_pipeline = "ArpabetGlowTtsMelgan"
+glow_tts = "glow-tts_bill_clinton_ljstx_2020.06.28_expr-1_chkpt-1659.torchjit"
+melgan = "melgan_manyvoice1.0_2020-06-28_12d5838_6730.torchjit"
+
+[[speakers]]
+name = "Christopher Lee"
+slug = "christopher-lee"
+model_pipeline = "ArpabetGlowTtsMelgan"
+glow_tts = "glow-tts_christopher_lee_ljstx_2020.06.28_expr-1_chkpt-4100.torchjit"
+melgan = "melgan_manyvoice1.0_2020-06-28_12d5838_6730.torchjit"
+
+[[speakers]]
+name = "Barack Obama"
+slug = "barack-obama"
+model_pipeline = "ArpabetGlowTtsMelgan"
+glow_tts = "glow-tts_barack_obama_ljstx_2020.06.28_expr-1_chkpt-1729.torchjit"
+melgan = "melgan_manyvoice1.0_2020-06-28_12d5838_6730.torchjit"
+
+[[speakers]]
+name = "Betty White (beta)"
+slug = "betty-white"
+model_pipeline = "ArpabetGlowTtsMelgan"
+glow_tts = "glow-tts_betty_white_ljstx_2020.06.28_expr-1_chkpt-1666.torchjit"
+melgan = "melgan_manyvoice1.0_2020-06-28_12d5838_6730.torchjit"
+
+[[speakers]]
+name = "Dr. Phil McGraw"
+slug = "dr-phil-mcgraw"
+model_pipeline = "ArpabetGlowTtsMelgan"
+glow_tts = "glow-tts_dr_phil_mcgraw_ljstx_2020.06.28_expr-1_chkpt-1813.torchjit"
+melgan = "melgan_manyvoice1.0_2020-06-28_12d5838_6730.torchjit"
+
+[[speakers]]
+name = "Fred Rogers"
+slug = "fred-rogers"
+model_pipeline = "ArpabetGlowTtsMelgan"
+glow_tts = "glow-tts_fred_rogers_ljstx_2020.06.28_expr-1_chkpt-2575.torchjit"
+melgan = "melgan_manyvoice1.0_2020-06-28_12d5838_6730.torchjit"
+
+[[speakers]]
+name = "Danny Devito"
+slug = "danny-devito"
+model_pipeline = "ArpabetGlowTtsMelgan"
+glow_tts = "glow-tts_danny_devito_ljstx_2020.06.28_expr-1_chkpt-3757.torchjit"
+melgan = "melgan_manyvoice1.0_2020-06-28_12d5838_6730.torchjit"
+
+
 [[speakers]]
 name = "Donald Trump"
 slug = "donald-trump"
