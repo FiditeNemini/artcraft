@@ -131,20 +131,26 @@ impl Router {
 fn speak_proxy(req: Request<Body>, remote_addr: SocketAddr, router: Arc<Router>, endpoint: &'static str) -> BoxFut {
   let mut headers = req.headers().clone();
 
-  for (k, v) in headers.iter() {
-    info!("Header: {:?} = {:?}", k, v);
-  }
-
-  // This is the correct client IP, not the IP of the load balancer.
-  // We're adding it to the headers so that downstream can use it for rate limiting and logging.
-  let forwarded_ip = HeaderValue::from_str(&remote_addr.ip().to_string())
+  // This is the IP of the Digital Ocean load balancer.
+  let gateway_ip = HeaderValue::from_str(&remote_addr.ip().to_string())
     .ok()
-    .unwrap_or(HeaderValue::from_static("127.0.0.1"));
-  headers.insert(HeaderName::from_static("forwarded"), forwarded_ip.clone());
-  headers.insert(HeaderName::from_static("x-forwarded-for"), forwarded_ip.clone());
+    .unwrap_or(HeaderValue::from_static(""));
+
+  // This is the IP of the upstream client browser.
+  let upstream_client_ip = req.headers().get(HeaderName::from_static("x-forwarded-for"))
+    .map(|ip| ip.to_str().unwrap_or(""))
+    .unwrap_or("");
+
+  let upstream_client_ip = HeaderValue::from_str(upstream_client_ip)
+    .ok()
+    .unwrap_or(HeaderValue::from_static(""));
+
+  headers.insert(HeaderName::from_static("forwarded"), upstream_client_ip.clone());
+  headers.insert(HeaderName::from_static("x-forwarded-for"), upstream_client_ip.clone());
   // Unfortunately it looks like this middleware trounces the standard headers, so
   // here we put it somewhere it won't be overwritten.
-  headers.insert(HeaderName::from_static("x-voder-proxy-for"), forwarded_ip.clone());
+  headers.insert(HeaderName::from_static("x-voder-proxy-for"), upstream_client_ip.clone());
+  headers.insert(HeaderName::from_static("x-gateway-ip"), gateway_ip);
 
   Box::new(req.into_body().concat2().map(move |b| { // Builds a BoxedFut to return
     let request_bytes = b.as_ref();
