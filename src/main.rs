@@ -138,6 +138,9 @@ fn speak_proxy(req: Request<Body>, remote_addr: SocketAddr, router: Arc<Router>,
     .unwrap_or(HeaderValue::from_static("127.0.0.1"));
   headers.insert(HeaderName::from_static("forwarded"), forwarded_ip.clone());
   headers.insert(HeaderName::from_static("x-forwarded-for"), forwarded_ip.clone());
+  // Unfortunately it looks like this middleware trounces the standard headers, so
+  // here we put it somewhere it won't be overwritten.
+  headers.insert(HeaderName::from_static("x-voder-proxy-for"), forwarded_ip.clone());
 
   Box::new(req.into_body().concat2().map(move |b| { // Builds a BoxedFut to return
     let request_bytes = b.as_ref();
