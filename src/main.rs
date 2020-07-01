@@ -137,6 +137,8 @@ fn speak_proxy(req: Request<Body>, remote_addr: SocketAddr, router: Arc<Router>,
   headers.insert(HeaderName::from_static("forwarded"), forwarded_ip.clone());
   headers.insert(HeaderName::from_static("x-forwarded-for"), forwarded_ip.clone());
 
+  info!("Remote IP: {:?}", remote_addr.ip().to_string());
+
   Box::new(req.into_body().concat2().map(move |b| { // Builds a BoxedFut to return
     let request_bytes = b.as_ref();
 
@@ -148,17 +150,6 @@ fn speak_proxy(req: Request<Body>, remote_addr: SocketAddr, router: Arc<Router>,
       speaker: request.speaker,
     }
   }).and_then(move |request_details: RequestDetails| {
-    /*let proxy_host = match router.get_speaker_host(&request_details.speaker) {
-      Some(host) => host,
-      None => {
-        let response = Response::builder()
-          .body(Body::from("error"))
-          .unwrap();
-        let result : BoxFut = Box::new(future::ok(response));
-        return result;
-      },
-    };*/
-
     let proxy_host = router.get_speaker_host(&request_details.speaker);
 
     info!("Routing {} for {} to {}", endpoint, &request_details.speaker, &proxy_host);
@@ -215,9 +206,6 @@ fn main() -> AnyhowResult<()> {
     default_route: default_route,
   });
 
-  //let routes = route_map.clone();
-
-  // A `Service` is needed for every connection.
   let make_service = make_service_fn(move |socket: &AddrStream| {
     let remote_addr = socket.remote_addr();
     info!("Got a request from: {:?}", remote_addr);
@@ -251,7 +239,6 @@ fn main() -> AnyhowResult<()> {
     .serve(make_service)
     .map_err(|e| eprintln!("server error: {}", e));
 
-  // Run this server for... forever!
   hyper::rt::run(server);
 
   Ok(())
