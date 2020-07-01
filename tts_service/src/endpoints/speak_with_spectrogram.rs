@@ -72,6 +72,10 @@ pub async fn post_speak_with_spectrogram(request: HttpRequest,
         .body("Request has empty text.")));
   }
 
+  for (k, v) in request.headers().iter() {
+    info!("Header: {:?} = {:?}", k, v);
+  }
+
   // NB: Actually, we want the X-Forwarded-For IP address, since otherwise
   // we get the load balancer.
   let ip_address = request.connection_info()
