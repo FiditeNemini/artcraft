@@ -131,6 +131,10 @@ impl Router {
 fn speak_proxy(req: Request<Body>, remote_addr: SocketAddr, router: Arc<Router>, endpoint: &'static str) -> BoxFut {
   let mut headers = req.headers().clone();
 
+  for (k, v) in headers.iter() {
+    info!("Header: {:?} = {:?}", k, v);
+  }
+
   // This is the correct client IP, not the IP of the load balancer.
   // We're adding it to the headers so that downstream can use it for rate limiting and logging.
   let forwarded_ip = HeaderValue::from_str(&remote_addr.ip().to_string())
