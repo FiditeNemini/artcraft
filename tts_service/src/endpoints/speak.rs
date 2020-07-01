@@ -1,4 +1,4 @@
-use actix_web::http::{StatusCode, header};
+use actix_web::http::{StatusCode, header, HeaderName, HeaderValue};
 use actix_web::web::{
   Data,
   Json,
@@ -58,6 +58,20 @@ pub async fn post_speak(request: HttpRequest,
       .remote()
       .unwrap_or("")
       .to_string();
+
+  match request.headers().get(HeaderName::from_static("x-forwarded-for")) {
+    Some(header_value) => {
+      info!("Remote x-forwarded-for: {:?}", header_value);
+    },
+    None => {},
+  }
+
+  match request.headers().get(HeaderName::from_static("forwarded")) {
+    Some(header_value) => {
+      info!("Remote forwarded: {:?}", header_value);
+    },
+    None => {},
+  }
 
   let sentence_record = NewSentence {
     sentence: text.clone(),
