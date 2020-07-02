@@ -66,6 +66,10 @@ class SpeakerSpectrogramAudioForm extends React.Component<Props, State> {
     .then(res => res.json())
     .then(res => {
       const data = `data:audio/wav;base64,${res.audio_base64}`;
+      console.log(data);
+      
+      const audioUrl = new URL(data);
+      console.log(audioUrl);
 
       // var image = new Image();
       // image.src = `data:image/bmp;base64,${res.spectrogram.bytes_base64}`;
