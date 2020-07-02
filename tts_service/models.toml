@@ -15,7 +15,6 @@ slug = "bill-clinton"
 model_pipeline = "ArpabetGlowTtsMelgan"
 glow_tts = "glow-tts_bill_clinton_ljstx_2020.06.28_expr-1_chkpt-1659.torchjit"
 melgan = "melgan_manyvoice1.0_2020-06-28_12d5838_6730.torchjit"
-sample_rate_hz = 22050
 
 [[speakers]]
 name = "Christopher Lee"
@@ -23,7 +22,6 @@ slug = "christopher-lee"
 model_pipeline = "ArpabetGlowTtsMelgan"
 glow_tts = "glow-tts_christopher_lee_ljstx_2020.06.28_expr-1_chkpt-4100.torchjit"
 melgan = "melgan_manyvoice1.0_2020-06-28_12d5838_6730.torchjit"
-sample_rate_hz = 22050
 
 [[speakers]]
 name = "Barack Obama"
@@ -39,7 +37,6 @@ slug = "betty-white"
 model_pipeline = "ArpabetGlowTtsMelgan"
 glow_tts = "glow-tts_betty_white_ljstx_2020.06.28_expr-1_chkpt-1666.torchjit"
 melgan = "melgan_manyvoice1.0_2020-06-28_12d5838_6730.torchjit"
-sample_rate_hz = 22050
 
 [[speakers]]
 name = "Dr. Phil McGraw"
@@ -47,7 +44,6 @@ slug = "dr-phil-mcgraw"
 model_pipeline = "ArpabetGlowTtsMelgan"
 glow_tts = "glow-tts_dr_phil_mcgraw_ljstx_2020.06.28_expr-1_chkpt-1813.torchjit"
 melgan = "melgan_manyvoice1.0_2020-06-28_12d5838_6730.torchjit"
-sample_rate_hz = 22050
 
 [[speakers]]
 name = "Fred Rogers"
@@ -55,7 +51,6 @@ slug = "fred-rogers"
 model_pipeline = "ArpabetGlowTtsMelgan"
 glow_tts = "glow-tts_fred_rogers_ljstx_2020.06.28_expr-1_chkpt-2575.torchjit"
 melgan = "melgan_manyvoice1.0_2020-06-28_12d5838_6730.torchjit"
-sample_rate_hz = 22050
 
 [[speakers]]
 name = "Danny Devito"
@@ -63,7 +58,6 @@ slug = "danny-devito"
 model_pipeline = "ArpabetGlowTtsMelgan"
 glow_tts = "glow-tts_danny_devito_ljstx_2020.06.28_expr-1_chkpt-3757.torchjit"
 melgan = "melgan_manyvoice1.0_2020-06-28_12d5838_6730.torchjit"
-sample_rate_hz = 22050
 
 [[speakers]]
 name = "Donald Trump"
@@ -71,7 +65,6 @@ slug = "donald-trump"
 model_pipeline = "ArpabetGlowTtsMelgan"
 melgan = "melgan_trump_txlearn_2020-05-30_steno_chkpt9800.torchjit"
 glow_tts = "glow_tts_ljs_txlearn_arpabet_2020-06-01_G_1689-2.torchjit"
-# sample_rate_hz = Not sure... 22050 is too high
 
 [[speakers]]
 name = "Gilbert Gottfried"
@@ -79,7 +72,6 @@ slug = "gilbert-gottfried"
 model_pipeline = "ArpabetGlowTtsMelgan"
 melgan = "manyvoice1.0_2020-06-28_12d5838_6610.torchjit"
 glow_tts = "glow-tts_gilbert-gottfried_ljstx_2020.06.28_expr-1_chkpt-1766.torchjit"
-sample_rate_hz = 22050
 
 [[speakers]]
 name = "Ronald Reagan"
@@ -103,7 +95,6 @@ slug = "bill-gates"
 model_pipeline = "ArpabetGlowTtsMelgan"
 melgan = "melgan_vocodes1.0_multispeaker_2020.06.19_12d5838_experiment-2_chkpt-10400.torchjit"
 glow_tts = "glow-tts_solo_billgates_ljstx_2020.06.24_expr-1_chkpt-2011.torchjit"
-sample_rate_hz = 22050
 
 [[speakers]]
 name = "Mark Zuckerberg"

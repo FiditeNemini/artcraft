@@ -19,6 +19,7 @@ slug = "barack-obama"
 model_pipeline = "ArpabetGlowTtsMelgan"
 glow_tts = "glow-tts_barack_obama_ljstx_2020.06.28_expr-1_chkpt-1729.torchjit"
 melgan = "melgan_manyvoice1.0_2020-06-28_12d5838_6730.torchjit"
+sample_rate_hz = 22000 # This is lower than normal
 
 [[speakers]]
 name = "Betty White (beta)"
@@ -69,6 +70,7 @@ slug = "ronald-reagan"
 model_pipeline = "ArpabetGlowTtsMelgan"
 melgan = "melgan_vocodes1.0_multispeaker_2020.06.19_12d5838_experiment-2_chkpt-10400.torchjit"
 glow_tts = "glow-tts_solo_reagan_ljstx_2020.06.22_expr-1_chkpt-1406.torchjit"
+sample_rate_hz = 21000 # This is lower than normal
 
 [[speakers]]
 name = "John Oliver"
@@ -76,6 +78,7 @@ slug = "john-oliver"
 model_pipeline = "ArpabetGlowTtsMelgan"
 melgan = "melgan_vocodes1.0_multispeaker_2020.06.19_12d5838_experiment-2_chkpt-10400.torchjit"
 glow_tts = "glow-tts_solo_oliver_ljstx_2020.06.22_expr-1_chkpt-1189.torchjit"
+sample_rate_hz = 21000 # This is lower than normal
 
 [[speakers]]
 name = "Bill Gates"
@@ -90,6 +93,7 @@ slug = "mark-zuckerberg"
 model_pipeline = "ArpabetGlowTtsMelgan"
 melgan = "melgan_vocodes1.0_multispeaker_2020.06.19_12d5838_experiment-2_chkpt-10400.torchjit"
 glow_tts = "glow-tts_solo_zuckerberg_ljstx_2020.06.24_expr-1_chkpt-2280.torchjit"
+sample_rate_hz = 21000 # This is lower than normal
 
 [[speakers]]
 name = "Arnold Schwarzenegger (Multi-speaker model)"
@@ -98,6 +102,7 @@ model_pipeline = "ArpabetGlowTtsMultiSpeakerMelgan"
 melgan = "melgan_vocodes1.0_multispeaker_2020.06.19_12d5838_experiment-2_chkpt-10400.torchjit"
 glow_tts_multi_speaker = "glow_tts_multispeaker_8-speaker_256-gin_ljs_txlearn_2020.06.19_experiment-5_chkpt-7466.torchjit"
 speaker_id = 3
+sample_rate_hz = 21000 # This is lower than normal
 
 # --------------- Model configs ---------------
 
