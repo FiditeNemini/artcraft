@@ -64,6 +64,8 @@ pub async fn post_speak_with_spectrogram(request: HttpRequest,
     },
   };
 
+  let sample_rate_hz = speaker.sample_rate_hz.unwrap_or(app_state.default_sample_rate_hz);
+
   let text = query.text.to_string();
 
   if text.is_empty() {
@@ -176,7 +178,7 @@ pub async fn post_speak_with_spectrogram(request: HttpRequest,
     .unwrap()
     .infer_mel(speaker_id)
     .unwrap()
-    .infer_audio()
+    .infer_audio(sample_rate_hz)
     .unwrap();
 
   let base64_image = pipeline_done.get_base64_mel_spectrogram().unwrap();

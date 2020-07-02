@@ -41,12 +41,17 @@ impl TacoMelModel {
   }*/
 
   /// Run TTS on Arpabet encoding
-  pub fn run_tts_encoded(&self, tacotron: &ArpabetTacotronModel, melgan: &MelganModel, encoded_text: &Vec<i64>) -> Option<Vec<u8>> {
+  pub fn run_tts_encoded(&self,
+    tacotron: &ArpabetTacotronModel,
+    melgan: &MelganModel,
+    encoded_text: &Vec<i64>,
+    sample_rate_hz: u32
+  ) -> Option<Vec<u8>> {
     let audio_signal = match self.encoded_text_to_audio_signal(tacotron, melgan, encoded_text) {
       None => return None,
       Some(audio_signal) => audio_signal,
     };
-    let result = Self::audio_signal_to_wav_bytes(audio_signal);
+    let result = Self::audio_signal_to_wav_bytes(audio_signal, sample_rate_hz);
     Some(result)
   }
 
@@ -100,10 +105,10 @@ impl TacoMelModel {
     data.iter().map(|x| x.trunc() as i16).collect()
   }
 
-  pub fn audio_signal_to_wav_bytes(audio_signal: Vec<i16>) -> Vec<u8> {
+  pub fn audio_signal_to_wav_bytes(audio_signal: Vec<i16>, sample_rate_hz: u32) -> Vec<u8> {
     let spec = WavSpec {
       channels: 1,
-      sample_rate: 20000,
+      sample_rate: sample_rate_hz,
       bits_per_sample: 16,
       sample_format: SampleFormat::Int,
     };

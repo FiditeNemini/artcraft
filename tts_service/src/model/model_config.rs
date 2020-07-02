@@ -26,9 +26,8 @@ pub struct Speaker {
   pub glow_tts_multi_speaker: Option<String>,
   /// Melgan model, if used.
   pub melgan: Option<String>,
-  /// Whether the model is "production" or not
-  /// Production models are backed up on GDrive and are synced to DigitalOcean
-  pub production: Option<bool>,
+  /// The sample rate that Melgan outputs.
+  pub sample_rate_hz: Option<u32>,
 }
 
 /// The types of models supported by our system.

@@ -128,13 +128,13 @@ impl InferencePipelineMelDone for GlowTtsMelganPipelineMelDone {
   type TtsModel = Arc<dyn TtsModelT>;
   type VocoderModel = Arc<dyn VocoderModelT>;
 
-  fn infer_audio(self: Box<Self>)
+  fn infer_audio(self: Box<Self>, sample_rate_hz: u32)
     -> AnyhowResult<Box<dyn InferencePipelineAudioDone<TtsModel = Self::TtsModel, VocoderModel = Self::VocoderModel>>>
   {
     let audio_tensor = self.melgan.mel_to_audio(&self.mel_tensor);
 
     let raw_audio_signal = mel_audio_tensor_to_audio_signal(&audio_tensor);
-    let wav_audio_signal = audio_signal_to_wav_bytes(raw_audio_signal);
+    let wav_audio_signal = audio_signal_to_wav_bytes(raw_audio_signal, sample_rate_hz);
 
     Ok(Box::new(GlowTtsMelganPipelineAudioDone {
       glow_tts: self.glow_tts,

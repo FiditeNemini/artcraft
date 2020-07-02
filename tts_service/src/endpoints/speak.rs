@@ -44,6 +44,8 @@ pub async fn post_speak(request: HttpRequest,
     },
   };
 
+  let sample_rate_hz = speaker.sample_rate_hz.unwrap_or(app_state.default_sample_rate_hz);
+
   let text = query.text.to_string();
 
   if text.is_empty() {
@@ -132,7 +134,7 @@ pub async fn post_speak(request: HttpRequest,
       let melgan = app_state.model_cache.get_or_load_melgan(&melgan_model)
           .expect(&format!("Couldn't load melgan model: {}", melgan_model));
 
-      match TacoMelModel::new().run_tts_encoded(&tacotron, &melgan, &encoded) {
+      match TacoMelModel::new().run_tts_encoded(&tacotron, &melgan, &encoded, sample_rate_hz) {
         None => {
           Ok(HttpResponse::build(StatusCode::TOO_MANY_REQUESTS)
               .content_type("text/plain")
@@ -173,7 +175,7 @@ pub async fn post_speak(request: HttpRequest,
       let melgan = app_state.model_cache.get_or_load_melgan(&melgan_model)
           .expect(&format!("Couldn't load melgan model: {}", melgan_model));
 
-      let wav_data = arpabet_glow_tts_melgan_pipeline(&cleaned_text, &glow_tts, &melgan);
+      let wav_data = arpabet_glow_tts_melgan_pipeline(&cleaned_text, &glow_tts, &melgan, sample_rate_hz);
 
       // To make iOS Safari work, you need a Content-Range and Content-Length header:
       // https://stackoverflow.com/a/17835399
@@ -212,7 +214,11 @@ pub async fn post_speak(request: HttpRequest,
           .expect(&format!("Couldn't load melgan model: {}", melgan_model));
 
       let wav_data = arpabet_glow_tts_multi_speaker_melgan_pipeline(
-        &cleaned_text, speaker_id, &glow_tts_multi_speaker, &melgan);
+        &cleaned_text,
+        speaker_id,
+        &glow_tts_multi_speaker,
+        &melgan,
+        sample_rate_hz);
 
       // To make iOS Safari work, you need a Content-Range and Content-Length header:
       // https://stackoverflow.com/a/17835399

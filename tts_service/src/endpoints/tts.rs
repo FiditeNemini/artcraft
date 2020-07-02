@@ -51,6 +51,8 @@ pub async fn post_tts(_request: HttpRequest,
   let arpabet = Arpabet::load_cmudict();
   let encoded = text_to_arpabet_encoding(arpabet, &cleaned_text);
 
+  let sample_rate_hz = app_state.default_sample_rate_hz;
+
   debug!("Encoded Text: {:?}", encoded);
 
   let app_state = app_state.into_inner();
@@ -61,7 +63,7 @@ pub async fn post_tts(_request: HttpRequest,
   let melgan = app_state.model_cache.get_or_load_melgan(&melgan_model)
       .expect(&format!("Couldn't load melgan: {}", &melgan_model));
 
-  match TacoMelModel::new().run_tts_encoded(&tacotron, &melgan, &encoded) {
+  match TacoMelModel::new().run_tts_encoded(&tacotron, &melgan, &encoded, sample_rate_hz) {
     None => {
       Ok(HttpResponse::build(StatusCode::TOO_MANY_REQUESTS)
           .content_type("text/plain")

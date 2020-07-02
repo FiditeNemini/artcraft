@@ -26,7 +26,7 @@ pub trait InferencePipelineMelDone {
   type TtsModel;
   type VocoderModel;
 
-  fn infer_audio(self: Box<Self>)
+  fn infer_audio(self: Box<Self>, sample_rate_hz: u32)
     -> AnyhowResult<Box<dyn InferencePipelineAudioDone<TtsModel = Self::TtsModel, VocoderModel = Self::VocoderModel>>>;
 }
 

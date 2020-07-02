@@ -20,7 +20,8 @@ pub fn arpabet_glow_tts_multi_speaker_melgan_pipeline(
   cleaned_text: &str,
   speaker_id: i64,
   arpabet_glow_tts: &ArpabetGlowTtsMultiSpeakerModel,
-  melgan: &MelganModel) -> Vec<u8> {
+  melgan: &MelganModel,
+  sample_rate_hz: u32) -> Vec<u8> {
 
   let arpabet = Arpabet::load_cmudict(); // TODO: Inefficient.
   let arpabet_encodings = text_to_arpabet_encoding_glow_tts(arpabet, &cleaned_text);
@@ -30,14 +31,15 @@ pub fn arpabet_glow_tts_multi_speaker_melgan_pipeline(
   let audio_tensor = melgan.tacotron_mel_to_audio(&mel_tensor);
   let audio_signal = mel_audio_tensor_to_audio_signal(&audio_tensor);
 
-  audio_signal_to_wav_bytes(audio_signal)
+  audio_signal_to_wav_bytes(audio_signal, sample_rate_hz)
 }
 
 pub fn arpabet_glow_tts_multi_speaker_melgan_pipeline_with_spectrogram(
   cleaned_text: &str,
   speaker_id: i64,
   arpabet_glow_tts: &ArpabetGlowTtsMultiSpeakerModel,
-  melgan: &MelganModel) -> (Spectrogram, Vec<u8>) {
+  melgan: &MelganModel,
+  sample_rate_hz: u32) -> (Spectrogram, Vec<u8>) {
 
   let arpabet = Arpabet::load_cmudict(); // TODO: Inefficient.
   let arpabet_encodings = text_to_arpabet_encoding_glow_tts(arpabet, &cleaned_text);
@@ -84,14 +86,15 @@ pub fn arpabet_glow_tts_multi_speaker_melgan_pipeline_with_spectrogram(
 
   (
     spectrogram,
-    audio_signal_to_wav_bytes(audio_signal),
+    audio_signal_to_wav_bytes(audio_signal, sample_rate_hz),
   )
 }
 
 pub fn arpabet_glow_tts_melgan_pipeline(
   cleaned_text: &str,
   arpabet_glow_tts: &ArpabetGlowTtsModel,
-  melgan: &MelganModel) -> Vec<u8> {
+  melgan: &MelganModel,
+  sample_rate_hz: u32) -> Vec<u8> {
 
   let arpabet = Arpabet::load_cmudict(); // TODO: Inefficient.
   let arpabet_encodings = text_to_arpabet_encoding_glow_tts(arpabet, &cleaned_text);
@@ -101,13 +104,14 @@ pub fn arpabet_glow_tts_melgan_pipeline(
   let audio_tensor = melgan.tacotron_mel_to_audio(&mel_tensor);
   let audio_signal = mel_audio_tensor_to_audio_signal(&audio_tensor);
 
-  audio_signal_to_wav_bytes(audio_signal)
+  audio_signal_to_wav_bytes(audio_signal, sample_rate_hz)
 }
 
 pub fn arpabet_glow_tts_melgan_pipeline_with_spectrogram(
   cleaned_text: &str,
   arpabet_glow_tts: &ArpabetGlowTtsModel,
-  melgan: &MelganModel) -> (Spectrogram, Vec<u8>) {
+  melgan: &MelganModel,
+  sample_rate_hz: u32) -> (Spectrogram, Vec<u8>) {
 
   let arpabet = Arpabet::load_cmudict(); // TODO: Inefficient.
   let arpabet_encodings = text_to_arpabet_encoding_glow_tts(arpabet, &cleaned_text);
@@ -154,14 +158,15 @@ pub fn arpabet_glow_tts_melgan_pipeline_with_spectrogram(
 
   (
     spectrogram,
-    audio_signal_to_wav_bytes(audio_signal),
+    audio_signal_to_wav_bytes(audio_signal, sample_rate_hz),
   )
 }
 
 pub fn arpabet_tacotron_melgan_pipeline(
   cleaned_text: &str,
   arpabet_tacotron: &ArpabetTacotronModel,
-  melgan: &MelganModel) -> Option<Vec<u8>> {
+  melgan: &MelganModel,
+  sample_rate_hz: u32) -> Option<Vec<u8>> {
 
   let arpabet = Arpabet::load_cmudict(); // TODO: Inefficient.
   let encoded = text_to_arpabet_encoding(arpabet, &cleaned_text);
@@ -174,7 +179,7 @@ pub fn arpabet_tacotron_melgan_pipeline(
   let audio_tensor = melgan.tacotron_mel_to_audio(&mel_tensor);
   let audio_signal = mel_audio_tensor_to_audio_signal(&audio_tensor);
 
-  let wav = audio_signal_to_wav_bytes(audio_signal);
+  let wav = audio_signal_to_wav_bytes(audio_signal, sample_rate_hz);
   Some(wav)
 }
 
@@ -191,10 +196,10 @@ pub fn mel_audio_tensor_to_audio_signal(mel: &Tensor) -> Vec<i16> {
 }
 
 /// Convert vector-encoded sound into a wave file.
-pub fn audio_signal_to_wav_bytes(audio_signal: Vec<i16>) -> Vec<u8> {
+pub fn audio_signal_to_wav_bytes(audio_signal: Vec<i16>, sample_rate_hz: u32) -> Vec<u8> {
   let spec = WavSpec {
     channels: 1,
-    sample_rate: 20000,
+    sample_rate: sample_rate_hz,
     bits_per_sample: 16,
     sample_format: SampleFormat::Int,
   };

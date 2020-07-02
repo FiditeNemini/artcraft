@@ -89,6 +89,8 @@ pub async fn legacy_get_speak(request: HttpRequest,
     },
   };
 
+  let sample_rate_hz = speaker.sample_rate_hz.unwrap_or(app_state.default_sample_rate_hz);
+
   let cleaned_text = clean_text(&text);
 
   if let Some(err) = app_state.text_checker.check_text(&cleaned_text) {
@@ -132,7 +134,7 @@ pub async fn legacy_get_speak(request: HttpRequest,
         },
       };
 
-      let result = arpabet_tacotron_melgan_pipeline(&cleaned_text, &tacotron, &melgan);
+      let result = arpabet_tacotron_melgan_pipeline(&cleaned_text, &tacotron, &melgan, sample_rate_hz);
 
       match result {
         None => {
@@ -197,7 +199,7 @@ pub async fn legacy_get_speak(request: HttpRequest,
         },
       };
 
-      let wav_data = arpabet_glow_tts_melgan_pipeline(&cleaned_text, &glow_tts, &melgan);
+      let wav_data = arpabet_glow_tts_melgan_pipeline(&cleaned_text, &glow_tts, &melgan, sample_rate_hz);
 
       // To make iOS Safari work, you need a Content-Range and Content-Length header:
       // https://stackoverflow.com/a/17835399
