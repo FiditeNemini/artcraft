@@ -6,9 +6,11 @@ import { createColorMap, linearScale } from "@colormap/core";
 //import { VIRIDIS, CIVIDIS, PLASMA, INFERNO, MAGMA, BLACK_WHITE,  } from "@colormap/presets";
 import { MAGMA } from "@colormap/presets";
 import { Spectrogram } from './extras/Spectrogram';
+import { SpectrogramMode } from '../../App';
 
 interface Props {
   currentSpeaker: Speaker,
+  spectrogramMode: SpectrogramMode,
   clearStatusCallback: () => void,
   setHintMessage: (message: string) => void,
   onSpeakRequestCallback: () => void,
@@ -137,7 +139,9 @@ class Form extends React.Component<Props, State> {
 
       let bytes = base64ToArrayBuffer(res.spectrogram.bytes_base64);
 
-      const spectrogram = new Spectrogram(bytes, res.spectrogram.width, res.spectrogram.height);
+      let base64ByteString = res.spectrogram.bytes_base64;
+
+      const spectrogram = new Spectrogram(base64ByteString, bytes, res.spectrogram.width, res.spectrogram.height);
       this.props.updateSpectrogramCallback(spectrogram);
 
       const sound = new Howl.Howl({

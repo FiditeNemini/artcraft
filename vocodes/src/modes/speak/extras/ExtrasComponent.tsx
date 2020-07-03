@@ -3,6 +3,7 @@ import { Speaker } from '../../../Speakers';
 import { SpeakerInfo } from './SpeakerInfo';
 import { Spectrogram } from './Spectrogram';
 import { SpectrogramComponent } from './SpectrogramComponent';
+import { SpectrogramMode } from '../../../App';
 
 enum ExtrasMode {
   SPEAKER_INFO,
@@ -13,7 +14,9 @@ interface Props {
   extrasMode: ExtrasMode,
   currentSpeaker: Speaker,
   currentSpectrogram?: Spectrogram,
+  spectrogramMode: SpectrogramMode,
   changeExtrasModeCallback: (extrasMode: ExtrasMode) => void,
+  changeSpectrogramMode: (spectrogramMode: SpectrogramMode) => void,
 }
 
 interface State {
@@ -34,7 +37,11 @@ class ExtrasComponent extends React.Component<Props, State> {
         modeComponent = <SpeakerInfo currentSpeaker={this.props.currentSpeaker} />
         break;
       case ExtrasMode.SPECTROGRAM:
-        modeComponent = <SpectrogramComponent currentSpectrogram={this.props.currentSpectrogram} />
+        modeComponent = <SpectrogramComponent 
+          currentSpectrogram={this.props.currentSpectrogram} 
+          spectrogramMode={this.props.spectrogramMode}
+          changeSpectrogramMode={this.props.changeSpectrogramMode}
+          />
         break;
     }
     return (

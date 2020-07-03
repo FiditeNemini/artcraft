@@ -1,8 +1,11 @@
 import React from 'react';
-import { Spectrogram } from './Spectrogram';
+import { Spectrogram, nextSpectrogramMode } from './Spectrogram';
+import { SpectrogramMode } from '../../../App';
 
 interface Props {
   currentSpectrogram?: Spectrogram,
+  spectrogramMode: SpectrogramMode,
+  changeSpectrogramMode: (spectrogramMode: SpectrogramMode) => void,
 }
 
 interface State {
@@ -34,7 +37,9 @@ class SpectrogramComponent extends React.Component<Props, State> {
       let width = this.props.currentSpectrogram!.width;
       let height = this.props.currentSpectrogram!.height;
 
-      var image = new ImageData(this.props.currentSpectrogram!.pixels, width, height);
+      let pixels = this.props.currentSpectrogram.calculatePixelsForMode(this.props.spectrogramMode);
+
+      var image = new ImageData(pixels, width, height);
 
       createImageBitmap(image).then(renderer => {
         ctx.drawImage(renderer, 0, 0, width * 3, height * 3)
@@ -55,9 +60,12 @@ class SpectrogramComponent extends React.Component<Props, State> {
     // TODO: This needs to go way up the tree.
     let canvas = <canvas ref="canvas" width={width} height={height} id="spectrogram" />
 
+    let nextMode = nextSpectrogramMode(this.props.spectrogramMode);
+
     return (
       <div>
         {canvas}
+        <button onClick={() => this.props.changeSpectrogramMode(nextMode)}>Next</button>
       </div>
     )
   }

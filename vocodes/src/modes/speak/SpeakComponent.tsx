@@ -6,6 +6,7 @@ import { SpeakerDropdown } from './SpeakerDropdown';
 import { Speaker } from '../../Speakers';
 import { ExtrasComponent, ExtrasMode } from './extras/ExtrasComponent';
 import { Spectrogram } from './extras/Spectrogram';
+import { SpectrogramMode } from '../../App';
 
 enum StatusState {
   NONE,
@@ -18,9 +19,11 @@ interface Props {
   extrasMode: ExtrasMode,
   currentSpeaker: Speaker,
   currentSpectrogram?: Spectrogram,
+  spectrogramMode: SpectrogramMode,
   changeSpeakerCallback: (slug: string) => void,
   changeSpectrogramCallback: (spectrogram: Spectrogram) => void,
   changeExtrasModeCallback: (extrasMode: ExtrasMode) => void,
+  changeSpectrogramMode: (spectrogramMode: SpectrogramMode) => void,
 }
 
 interface State {
@@ -123,7 +126,9 @@ class SpeakComponent extends React.Component<Props, State> {
             extrasMode={this.props.extrasMode}
             currentSpeaker={this.props.currentSpeaker} 
             currentSpectrogram={this.props.currentSpectrogram}
+            spectrogramMode={this.props.spectrogramMode}
             changeExtrasModeCallback={this.props.changeExtrasModeCallback}
+            changeSpectrogramMode={this.props.changeSpectrogramMode}
             />
         </div>
 
@@ -135,6 +140,7 @@ class SpeakComponent extends React.Component<Props, State> {
           currentSpeaker={this.props.currentSpeaker}
           clearStatusCallback={this.clearMessage}
           setHintMessage={this.setHintMessage}
+          spectrogramMode={this.props.spectrogramMode}
           onSpeakRequestCallback={this.onSpeakRequest}
           onSpeakSuccessCallback={this.onSpeakSuccess}
           onSpeakErrorCallback={this.onSpeakError}

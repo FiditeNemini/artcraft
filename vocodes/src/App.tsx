@@ -14,11 +14,31 @@ import { Spectrogram } from './modes/speak/extras/Spectrogram';
 
 interface Props {}
 
+enum SpectrogramMode {
+  VIRIDIS,
+  CIVIDIS,
+  PLASMA,
+  INFERNO,
+  MAGMA,
+  GIST_HEAT,
+  AFMHOT,
+  PINK,
+  BLACK_WHITE,
+  BONE,
+  COPPER,
+  JET,
+  RDBU,
+  RDGY,
+  SPRING,
+  COOL,
+}
+
 interface State {
   mode: Mode,
   extrasMode: ExtrasMode,
   speaker: Speaker,
   currentSpectrogram?: Spectrogram,
+  spectrogramMode: SpectrogramMode,
 }
 
 class App extends React.Component<Props, State> {
@@ -29,6 +49,7 @@ class App extends React.Component<Props, State> {
       mode: Mode.SPEAK_MODE,
       extrasMode: ExtrasMode.SPEAKER_INFO,
       speaker: SPEAKERS[0],
+      spectrogramMode: SpectrogramMode.VIRIDIS,
     };
   }
 
@@ -72,6 +93,10 @@ class App extends React.Component<Props, State> {
     });
   }
 
+  setSpectrogramMode = (spectrogramMode: SpectrogramMode) : void => {
+    this.setState({ spectrogramMode: spectrogramMode });
+  }
+
   public render() {
     let component;
     switch (this.state.mode) {
@@ -83,6 +108,8 @@ class App extends React.Component<Props, State> {
           changeSpeakerCallback={this.setSpeakerBySlug} 
           changeSpectrogramCallback={this.updateSpectrogram} 
           changeExtrasModeCallback={this.switchExtrasMode}
+          spectrogramMode={this.state.spectrogramMode}
+          changeSpectrogramMode={this.setSpectrogramMode}
           />;
         break;
       case Mode.USAGE_MODE:
@@ -110,4 +137,4 @@ class App extends React.Component<Props, State> {
   }
 }
 
-export default App;
+export { App, SpectrogramMode };
