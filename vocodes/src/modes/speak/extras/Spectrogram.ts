@@ -1,16 +1,16 @@
 import { ColorMap, createColorMap, linearScale, RGBColor } from "@colormap/core";
 import { SpectrogramMode } from "../../../App";
 import { VIRIDIS, INFERNO, MAGMA, BLACK_WHITE, CIVIDIS, PLASMA,  } from "@colormap/presets";
-import { BONE } from "./colormap-bone";
-import { COPPER } from "./colormap-copper";
-import { JET } from "./colormap-jet";
-import { RDBU } from "./colormap-rdbu";
-import { RDGY } from "./colormap-rdgy";
-import { GIST_HEAT } from "./colormap-gist_heat";
-import { PINK } from "./colormap-pink";
-import { AFMHOT } from "./colormap-afmhot";
-import { COOL } from "./colormap-cool";
-import { SPRING } from "./colormap-spring";
+import { BONE } from "../../../extra_colormaps/colormap-bone";
+import { COPPER } from "../../../extra_colormaps/colormap-copper";
+import { JET } from "../../../extra_colormaps/colormap-jet";
+import { RDBU } from "../../../extra_colormaps/colormap-rdbu";
+import { RDGY } from "../../../extra_colormaps/colormap-rdgy";
+import { GIST_HEAT } from "../../../extra_colormaps/colormap-gist_heat";
+import { PINK } from "../../../extra_colormaps/colormap-pink";
+import { AFMHOT } from "../../../extra_colormaps/colormap-afmhot";
+import { COOL } from "../../../extra_colormaps/colormap-cool";
+import { SPRING } from "../../../extra_colormaps/colormap-spring";
 
 class Spectrogram {
   base64bytes: string;
