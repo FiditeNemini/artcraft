@@ -32,7 +32,7 @@ class HistoryComponent extends React.Component<Props, State> {
       ];
     } else {
       utterances.unshift(
-        <p>Note: these will disappear when you leave the page.</p>
+        <p>Note: these will disappear when you leave the website.</p>
       );
     }
     return (
