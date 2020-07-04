@@ -1,13 +1,11 @@
 import './App.scss';
 import React from 'react';
 import { Footer } from './navigation/Footer';
-import { HelpWantedComponent } from './modes/help_wanted/HelpWantedComponent';
 import { Mode } from './AppMode';
-import { NewsComponent } from './modes/news/NewsComponent';
 import { SpeakComponent } from './modes/speak/SpeakComponent';
 import { TermsComponent } from './modes/terms/TermsComponent';
 import { TopNav } from './navigation/TopNav';
-import { UsageComponent } from './modes/usage/UsageComponent';
+import { AboutComponent } from './modes/about/AboutComponent';
 import { Speaker, SPEAKERS } from './Speakers';
 import { ExtrasMode } from './modes/speak/extras/ExtrasComponent';
 import { Spectrogram } from './modes/speak/extras/Spectrogram';
@@ -126,14 +124,8 @@ class App extends React.Component<Props, State> {
       case Mode.HISTORY_MODE:
         component = <HistoryComponent utterances={this.state.utterances} />
         break;
-      case Mode.USAGE_MODE:
-        component = <UsageComponent resetModeCallback={this.resetMode} />;
-        break;
-      case Mode.NEWS_MODE:
-        component = <NewsComponent resetModeCallback={this.resetMode} />;
-        break;
-      case Mode.HELP_WANTED_MODE:
-        component = <HelpWantedComponent resetModeCallback={this.resetMode} />;
+      case Mode.ABOUT_MODE:
+        component = <AboutComponent resetModeCallback={this.resetMode} />;
         break;
       case Mode.TERMS_MODE:
         component = <TermsComponent resetModeCallback={this.resetMode} />;
