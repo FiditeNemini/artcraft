@@ -4,16 +4,18 @@ class Speaker {
   slug: string;
   description: string;
   avatarUrl?: string;
+  fullUrl?: string;
 
-  constructor(name: string, slug: string, description: string, avatarUrl?: string) {
+  constructor(name: string, slug: string, description: string, avatarUrl?: string, fullUrl?: string) {
     this.name = name;
     this.slug = slug;
     this.description = description;
     this.avatarUrl = avatarUrl;
+    this.fullUrl = fullUrl;
   }
 
   static fromJson(json: any) : Speaker {
-    return new Speaker(json.name, json.slug, json.description, json.avatarUrl);
+    return new Speaker(json.name, json.slug, json.description, json.avatarUrl, json.fullUrl);
   }
 
   getName() : string {
@@ -35,6 +37,14 @@ class Speaker {
   getAvatar() : string | undefined {
     return this.avatarUrl;
   }
+
+  hasFull() : boolean {
+    return this.fullUrl !== undefined;
+  }
+
+  getFull() : string | undefined {
+    return this.fullUrl;
+  }
 }
 
 const SPEAKERS : Speaker[] = [
@@ -43,12 +53,14 @@ const SPEAKERS : Speaker[] = [
     slug: "christopher-lee",
     description: "An actor well known for playing Count Dooku and Saruman.",
     avatarUrl: "christopher-lee.jpg",
+    fullUrl: "christopher-lee-full.png",
   }),
   Speaker.fromJson({
     name: "Danny Devito",
     slug: "danny-devito",
     description: "Always delightful.",
     avatarUrl: "danny-devito.jpg",
+    fullUrl: "danny-devito-full.png",
   }),
   Speaker.fromJson({
     name: "Gilbert Gottfried",

@@ -199,6 +199,11 @@ form {
 }
 
 .speaker_info_component {
+  .full_image {
+    img {
+      max-width: 800px;
+    }
+  }
   .speaker_avatar {
     float: left;
     img {
@@ -402,6 +407,14 @@ form {
       width: $page-width;
     }
   }
+
+  .speaker_info_component {
+    .full_image {
+      img {
+        max-width: $page-width;
+      }
+    }
+  }
 }
 
 @media screen and (min-width: 800px) {
@@ -424,6 +437,14 @@ form {
     width: $page-width;
     textarea {
       width: $page-width;
+    }
+  }
+
+  .speaker_info_component {
+    .full_image {
+      img {
+        max-width: $page-width;
+      }
     }
   }
 }
