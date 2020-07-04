@@ -102,12 +102,14 @@ const SPEAKERS : Speaker[] = [
     slug: "bill-gates",
     description: "Microsoft.",
     avatarUrl: "bill-gates.jpg",
+    fullUrl: "bill-gates-full.png",
   }),
   Speaker.fromJson({
     name: "Mr. Fred Rogers",
     slug: "fred-rogers",
     description: "Educator and amazing human being.",
     avatarUrl: "fred-rogers.jpg",
+    fullUrl: "fred-rogers-full.png",
   }),
   Speaker.fromJson({
     name: "Mark Zuckerberg",
