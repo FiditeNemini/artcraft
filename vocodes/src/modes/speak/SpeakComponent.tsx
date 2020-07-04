@@ -144,7 +144,9 @@ class SpeakComponent extends React.Component<Props, State> {
           changeSpeakerCallback={this.props.changeSpeakerCallback} 
           />
 
-        <button onClick={this.toggleMode}>{modeText}</button>
+        <button 
+          className="mode_button"
+          onClick={this.toggleMode}>{modeText}</button>
 
         <div>
           <ExtrasComponent 

@@ -30,12 +30,8 @@ canvas#spectrogram {
 }
 
 select {
-  max-width: 300px;
+  max-width: 600px;
   height: 2.3em;
-}
-
-.extra_mode_buttons {
-  text-align: center;
 }
 
 p {
@@ -56,8 +52,11 @@ button {
   font-size: 1.2em;
   margin: 20px;
   min-width: 150px;
-  padding: 0.75em;
   padding: 10px;
+}
+
+.extra_mode_buttons {
+  text-align: center;
 }
 
 #main {
@@ -390,6 +389,13 @@ form {
     }
   }
 
+  select {
+    max-width: 300px;
+  }
+
+  .mode_button {
+    margin: 0;
+  }
 
   canvas#spectrogram {
     width: $page-width;
@@ -425,6 +431,14 @@ form {
     textarea {
       width: $page-width;
     }
+  }
+
+  select {
+    max-width: 350px;
+  }
+
+  .mode_button {
+    margin: 0;
   }
 
   canvas#spectrogram {
@@ -463,6 +477,14 @@ form {
     }
   }
 
+  select {
+    max-width: 350px;
+  }
+
+  .mode_button {
+    margin: 0px;
+  }
+
   canvas#spectrogram {
     width: $page-width;
   }
@@ -497,6 +519,14 @@ form {
     textarea {
       width: $page-width;
     }
+  }
+
+  select {
+    max-width: 650px;
+  }
+
+  .mode_button {
+    margin: 0 20px;
   }
 
   canvas#spectrogram {
