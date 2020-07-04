@@ -238,7 +238,7 @@ form {
     }
     .details {
       float: left;
-      width: 550px;
+      max-width: 550px;
       margin: 0;
       padding: 10px 0 1em 1em;
       h3 {
