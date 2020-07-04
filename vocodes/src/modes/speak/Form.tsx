@@ -3,10 +3,10 @@ import React from 'react';
 import { SpeakRequest } from './SpeakRequest';
 import { Speaker } from '../../Speakers';
 import { createColorMap, linearScale } from "@colormap/core";
-//import { VIRIDIS, CIVIDIS, PLASMA, INFERNO, MAGMA, BLACK_WHITE,  } from "@colormap/presets";
 import { MAGMA } from "@colormap/presets";
 import { Spectrogram } from './extras/Spectrogram';
 import { SpectrogramMode } from '../../App';
+import { Utterance } from '../../model/utterance';
 
 interface Props {
   currentSpeaker: Speaker,
@@ -19,6 +19,7 @@ interface Props {
   onPlayCallback: () => void,
   onStopCallback: () => void,
   updateSpectrogramCallback: (spectrogram: Spectrogram) => void,
+  appendUtteranceCallback: (utterance: Utterance) => void,
 }
 
 interface State {
@@ -37,8 +38,8 @@ class Form extends React.Component<Props, State> {
     };
   }
 
-  public speak(sentence: string, speaker: string) {
-    let request = new SpeakRequest(sentence, speaker);
+  public speak(sentence: string, speaker: Speaker) {
+    let request = new SpeakRequest(sentence, speaker.getSlug());
 
     console.log("Making SpeakRequest:", request);
 
@@ -107,6 +108,7 @@ class Form extends React.Component<Props, State> {
     .then(res => res.json())
     .then(res => {
       const data = `data:audio/wav;base64,${res.audio_base64}`;
+      (window as any).audio_base64 = res.audio_base64;
 
       // var image = new Image();
       // image.src = `data:image/bmp;base64,${res.spectrogram.bytes_base64}`;
@@ -160,6 +162,9 @@ class Form extends React.Component<Props, State> {
 
       sound.play();
 
+      const utterance = new Utterance(sentence, speaker, sound, res.audio_base64);
+      this.props.appendUtteranceCallback(utterance);
+
       (window as any).sound = sound;
     })
     .catch(e => {
@@ -195,8 +200,7 @@ class Form extends React.Component<Props, State> {
 
   handleFormSubmit = (ev: React.FormEvent<HTMLFormElement>) : boolean => {
     ev.preventDefault();
-    let speaker = this.props.currentSpeaker.getSlug();
-    this.speak(this.state.text, speaker);
+    this.speak(this.state.text, this.props.currentSpeaker);
     return false;
   }
 

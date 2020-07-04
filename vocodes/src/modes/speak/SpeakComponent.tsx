@@ -7,6 +7,7 @@ import { Speaker } from '../../Speakers';
 import { ExtrasComponent, ExtrasMode } from './extras/ExtrasComponent';
 import { Spectrogram } from './extras/Spectrogram';
 import { SpectrogramMode } from '../../App';
+import { Utterance } from '../../model/utterance';
 
 enum StatusState {
   NONE,
@@ -24,6 +25,7 @@ interface Props {
   changeSpectrogramCallback: (spectrogram: Spectrogram) => void,
   changeExtrasModeCallback: (extrasMode: ExtrasMode) => void,
   changeSpectrogramMode: (spectrogramMode: SpectrogramMode) => void,
+  appendUtteranceCallback: (utterance: Utterance) => void,
 }
 
 interface State {
@@ -147,6 +149,7 @@ class SpeakComponent extends React.Component<Props, State> {
           onPlayCallback={this.onPlay}
           onStopCallback={this.onStop}
           updateSpectrogramCallback={this.props.changeSpectrogramCallback}
+          appendUtteranceCallback={this.props.appendUtteranceCallback}
           />
       </div>
     );

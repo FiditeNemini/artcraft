@@ -11,6 +11,8 @@ import { UsageComponent } from './modes/usage/UsageComponent';
 import { Speaker, SPEAKERS } from './Speakers';
 import { ExtrasMode } from './modes/speak/extras/ExtrasComponent';
 import { Spectrogram } from './modes/speak/extras/Spectrogram';
+import { Utterance } from './model/utterance';
+import { HistoryComponent } from './modes/history/HistoryComponent';
 
 interface Props {}
 
@@ -39,6 +41,7 @@ interface State {
   speaker: Speaker,
   currentSpectrogram?: Spectrogram,
   spectrogramMode: SpectrogramMode,
+  utterances: Utterance[],
 }
 
 class App extends React.Component<Props, State> {
@@ -50,6 +53,7 @@ class App extends React.Component<Props, State> {
       extrasMode: ExtrasMode.SPEAKER_INFO,
       speaker: SPEAKERS[0],
       spectrogramMode: SpectrogramMode.VIRIDIS,
+      utterances: [],
     };
   }
 
@@ -97,6 +101,12 @@ class App extends React.Component<Props, State> {
     this.setState({ spectrogramMode: spectrogramMode });
   }
 
+  appendUtterance = (utterance: Utterance) => {
+    let utterances = this.state.utterances.slice();
+    utterances.push(utterance);
+    this.setState({ utterances: utterances });
+  }
+
   public render() {
     let component;
     switch (this.state.mode) {
@@ -110,7 +120,11 @@ class App extends React.Component<Props, State> {
           changeExtrasModeCallback={this.switchExtrasMode}
           spectrogramMode={this.state.spectrogramMode}
           changeSpectrogramMode={this.setSpectrogramMode}
+          appendUtteranceCallback={this.appendUtterance}
           />;
+        break;
+      case Mode.HISTORY_MODE:
+        component = <HistoryComponent utterances={this.state.utterances} />
         break;
       case Mode.USAGE_MODE:
         component = <UsageComponent resetModeCallback={this.resetMode} />;
