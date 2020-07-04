@@ -29,6 +29,11 @@ canvas#spectrogram {
   cursor: pointer;
 }
 
+select {
+  max-width: 300px;
+  height: 2.3em;
+}
+
 .extra_mode_buttons {
   text-align: center;
 }

@@ -115,13 +115,36 @@ class SpeakComponent extends React.Component<Props, State> {
     this.setState({ isTalking: false });
   }
 
+  toggleMode = () => {
+    switch (this.props.extrasMode) {
+      case ExtrasMode.SPEAKER_INFO:
+        this.props.changeExtrasModeCallback(ExtrasMode.SPECTROGRAM);
+        break;
+      case ExtrasMode.SPECTROGRAM:
+        this.props.changeExtrasModeCallback(ExtrasMode.SPEAKER_INFO);
+        break;
+    }
+  }
+
   public render() {
+    let modeText;
+    switch (this.props.extrasMode) {
+      case ExtrasMode.SPEAKER_INFO:
+        modeText = "Speaker Info";
+        break;
+      case ExtrasMode.SPECTROGRAM:
+        modeText = "Spectrogram";
+        break;
+    }
+
     return (
       <div>
         <SpeakerDropdown 
           currentSpeaker={this.props.currentSpeaker} 
           changeSpeakerCallback={this.props.changeSpeakerCallback} 
           />
+
+        <button onClick={this.toggleMode}>{modeText}</button>
 
         <div>
           <ExtrasComponent 
