@@ -103,7 +103,7 @@ class App extends React.Component<Props, State> {
 
   appendUtterance = (utterance: Utterance) => {
     let utterances = this.state.utterances.slice();
-    utterances.push(utterance);
+    utterances.unshift(utterance);
     this.setState({ utterances: utterances });
   }
 
