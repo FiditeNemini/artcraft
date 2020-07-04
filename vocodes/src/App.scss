@@ -317,6 +317,14 @@ form {
     }
   }
 
+  select {
+    max-width: 200px;
+  }
+
+  .mode_button {
+    margin: 0;
+  }
+
   canvas#spectrogram {
     width: $page-width;
   }
@@ -351,6 +359,14 @@ form {
     textarea {
       width: $page-width;
     }
+  }
+
+  select {
+    max-width: 250px;
+  }
+
+  .mode_button {
+    margin: 0;
   }
 
   canvas#spectrogram {
