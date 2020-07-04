@@ -84,13 +84,23 @@ nav {
   #logo_text {
     font-family: "Fugaz One";
     font-size: 2.5em;
+    margin-right: 0.3em;
     .vo {
       color:  #209CEE;
     }
     .codes {
       color:  rgba(32, 156, 238, 0.685);
     }
-    margin-right: 0.5em;
+    a:link,
+    a:visited {
+      text-decoration: none;
+      background-color: #fff;
+    }
+    a:active,
+    a:hover{
+      text-decoration: underline;
+      background-color: #fff;
+    }
   }
   a,
   a:link {
@@ -107,7 +117,7 @@ nav {
   }
   a:hover,
   a:active {
-    background-color: #fadada;
+    background-color: #bfdff5;
   }
 }
 
