@@ -311,6 +311,11 @@ form {
       width: $page-width;
     }
   }
+
+  canvas#spectrogram {
+    width: $page-width;
+  }
+
   .speaker_info_component {
     .full_image {
       img {
@@ -342,6 +347,11 @@ form {
       width: $page-width;
     }
   }
+
+  canvas#spectrogram {
+    width: $page-width;
+  }
+
   .speaker_info_component {
     .full_image {
       img {
@@ -373,6 +383,12 @@ form {
       width: $page-width;
     }
   }
+
+
+  canvas#spectrogram {
+    width: $page-width;
+  }
+
   .speaker_info_component {
     .full_image {
       img {
@@ -404,6 +420,18 @@ form {
       width: $page-width;
     }
   }
+
+  canvas#spectrogram {
+    width: $page-width;
+  }
+
+  .speaker_info_component {
+    .full_image {
+      img {
+        width: $page-width;
+      }
+    }
+  }
 }
 
 @media screen and (min-width: 600px) {
@@ -427,6 +455,10 @@ form {
     textarea {
       width: $page-width;
     }
+  }
+
+  canvas#spectrogram {
+    width: $page-width;
   }
 
   .speaker_info_component {
@@ -459,6 +491,10 @@ form {
     textarea {
       width: $page-width;
     }
+  }
+
+  canvas#spectrogram {
+    width: $page-width;
   }
 
   .speaker_info_component {
