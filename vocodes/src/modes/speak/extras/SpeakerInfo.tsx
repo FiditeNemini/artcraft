@@ -22,7 +22,7 @@ class SpeakerInfo extends React.Component<Props, State> {
       return (
         <div className="speaker_info_component">
           <div className="full_image">
-            <img src={source} alt="speaker image"></img>
+            <img src={source} alt="speaker"></img>
           </div>
         </div>
       )
