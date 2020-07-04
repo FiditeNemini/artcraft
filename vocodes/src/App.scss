@@ -80,16 +80,26 @@ footer {
 nav {
   font-family: "Fugaz One";
   width: $page-width;
-  text-align: justify;
+  margin: 0.2em 0 0 0;
+  padding: 0;
   #logo_text {
     font-family: "Fugaz One";
-    font-size: 2.5em;
-    margin-right: 0.3em;
+    font-size: 1.5em;
+    margin: 0 0.3em 0 0;
+    padding: 0;
     .vo {
       color:  #209CEE;
+      padding: 0;
+      margin: 0;
     }
     .codes {
       color:  rgba(32, 156, 238, 0.685);
+      padding: 0;
+      margin: 0;
+    }
+    a {
+      padding: 0;
+      margin: 0;
     }
     a:link,
     a:visited {
@@ -102,12 +112,15 @@ nav {
       background-color: #fff;
     }
   }
+  a {
+    margin: 0;
+    padding: 0;
+  }
   a,
   a:link {
     text-decoration: none;
     color: $light-text-color;
-    padding: 10px;
-    display: inline-block;
+    padding: 0 10px;
     font-size: 1.3em;
     cursor: pointer;
   }
