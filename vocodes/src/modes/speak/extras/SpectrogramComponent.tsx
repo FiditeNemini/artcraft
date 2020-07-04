@@ -57,15 +57,21 @@ class SpectrogramComponent extends React.Component<Props, State> {
       height = this.props.currentSpectrogram.height * 3;
     }
 
-    // TODO: This needs to go way up the tree.
-    let canvas = <canvas ref="canvas" width={width} height={height} id="spectrogram" />
-
     let nextMode = nextSpectrogramMode(this.props.spectrogramMode);
+
+    // TODO: This needs to go way up the tree.
+    let canvas = <canvas 
+      ref="canvas" 
+      width={width}
+      height={height}
+      id="spectrogram"
+      onClick={() => this.props.changeSpectrogramMode(nextMode)}
+      />
 
     return (
       <div>
         {canvas}
-        <button onClick={() => this.props.changeSpectrogramMode(nextMode)}>Next</button>
+        <p>(Click or tap to change spectrogram theme.)</p>
       </div>
     )
   }

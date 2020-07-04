@@ -26,6 +26,7 @@ canvas#spectrogram {
   transform: scaleY(-1); /* Spectrograms are flipped */
   height: 300px;
   width: 800px;
+  cursor: pointer;
 }
 
 .extra_mode_buttons {

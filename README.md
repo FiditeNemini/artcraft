@@ -35,3 +35,6 @@ https://favicon.io/favicon-generator/
 
 fugaz one, 110, #209CEE
 
+Transparent Images
+------------------
+https://www.remove.bg (pretty cheap)
