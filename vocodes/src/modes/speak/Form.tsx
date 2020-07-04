@@ -1,7 +1,7 @@
 import Howl from 'howler';
 import React from 'react';
 import { SpeakRequest } from './SpeakRequest';
-import { Speaker } from '../../Speakers';
+import { Speaker } from '../../model/Speakers';
 import { createColorMap, linearScale } from "@colormap/core";
 import { MAGMA } from "@colormap/presets";
 import { Spectrogram } from './extras/Spectrogram';

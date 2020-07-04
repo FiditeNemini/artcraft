@@ -1,16 +1,16 @@
 import './App.scss';
 import React from 'react';
+import { AboutComponent } from './modes/about/AboutComponent';
+import { ExtrasMode } from './modes/speak/extras/ExtrasComponent';
 import { Footer } from './navigation/Footer';
+import { HistoryComponent } from './modes/history/HistoryComponent';
 import { Mode } from './AppMode';
 import { SpeakComponent } from './modes/speak/SpeakComponent';
+import { Speaker, SPEAKERS } from './model/Speakers';
+import { Spectrogram } from './modes/speak/extras/Spectrogram';
 import { TermsComponent } from './modes/terms/TermsComponent';
 import { TopNav } from './navigation/TopNav';
-import { AboutComponent } from './modes/about/AboutComponent';
-import { Speaker, SPEAKERS } from './Speakers';
-import { ExtrasMode } from './modes/speak/extras/ExtrasComponent';
-import { Spectrogram } from './modes/speak/extras/Spectrogram';
 import { Utterance } from './model/utterance';
-import { HistoryComponent } from './modes/history/HistoryComponent';
 
 interface Props {}
 

@@ -39,12 +39,6 @@ class Speaker {
 
 const SPEAKERS : Speaker[] = [
   Speaker.fromJson({
-    name: "Donald Trump",
-    slug: "donald-trump",
-    description: "The 45th President of the United States.",
-    avatarUrl: "donald-trump.jpg",
-  }),
-  Speaker.fromJson({
     name: "Christopher Lee",
     slug: "christopher-lee",
     description: "An actor well known for playing Count Dooku and Saruman.",
@@ -63,6 +57,12 @@ const SPEAKERS : Speaker[] = [
     avatarUrl: "gilbert-gottfried.jpg",
   }),
   Speaker.fromJson({
+    name: "Donald Trump",
+    slug: "donald-trump",
+    description: "The 45th President of the United States.",
+    avatarUrl: "donald-trump.jpg",
+  }),
+  Speaker.fromJson({
     name: "Ronald Reagan",
     slug: "ronald-reagan",
     description: "The 40th President of the United States.",
@@ -79,12 +79,6 @@ const SPEAKERS : Speaker[] = [
     slug: "dr-phil-mcgraw",
     description: "Celebrity doctor.",
     avatarUrl: "dr-phil-mcgraw.jpg",
-  }),
-  Speaker.fromJson({
-    name: "Barack Obama",
-    slug: "barack-obama",
-    description: "The 44th President of the United States.",
-    avatarUrl: "barack-obama.jpg",
   }),
   Speaker.fromJson({
     name: "Bill Gates",
@@ -111,13 +105,19 @@ const SPEAKERS : Speaker[] = [
     avatarUrl: "bill-clinton.jpg",
   }),
   Speaker.fromJson({
-    name: "Betty White (Beta)",
+    name: "Barack Obama (needs more training)",
+    slug: "barack-obama",
+    description: "The 44th President of the United States.",
+    avatarUrl: "barack-obama.jpg",
+  }),
+  Speaker.fromJson({
+    name: "Betty White (needs more training)",
     slug: "betty-white",
     description: "This model needs more training.",
     avatarUrl: "betty-white.jpg",
   }),
   Speaker.fromJson({
-    name: "Arnold Schwarzenegger (multi-speaker model*)",
+    name: "Arnold Schwarzenegger (needs more training)",
     slug: "arnold-schwarzenegger",
     description: "Terminator.",
     avatarUrl: "arnold-schwarzenegger.jpg",

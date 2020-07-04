@@ -1,4 +1,4 @@
-import { Speaker } from "../Speakers";
+import { Speaker } from "./Speakers";
 
 class Utterance {
   static counter: number = 0;

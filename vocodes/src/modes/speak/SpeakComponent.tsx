@@ -3,7 +3,7 @@ import { Form } from './Form';
 import { StatusText } from './StatusText';
 import { getRandomInt } from '../../Utils';
 import { SpeakerDropdown } from './SpeakerDropdown';
-import { Speaker } from '../../Speakers';
+import { Speaker } from '../../model/Speakers';
 import { ExtrasComponent, ExtrasMode } from './extras/ExtrasComponent';
 import { Spectrogram } from './extras/Spectrogram';
 import { SpectrogramMode } from '../../App';

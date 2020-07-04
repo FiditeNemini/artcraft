@@ -1,5 +1,5 @@
 import React from 'react';
-import { Speaker, SPEAKERS } from '../../Speakers';
+import { Speaker, SPEAKERS } from '../../model/Speakers';
 
 interface Props {
   currentSpeaker: Speaker;
