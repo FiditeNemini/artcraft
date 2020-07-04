@@ -116,30 +116,35 @@ const SPEAKERS : Speaker[] = [
     slug: "mark-zuckerberg",
     description: "Facebook.",
     avatarUrl: "mark-zuckerberg.jpg",
+    fullUrl: "mark-zuckerberg-full.png",
   }),
   Speaker.fromJson({
     name: "Bill Clinton",
     slug: "bill-clinton",
     description: "The 42nd President of the United States.",
     avatarUrl: "bill-clinton.jpg",
+    fullUrl: "bill-clinton-full.png",
   }),
   Speaker.fromJson({
     name: "Barack Obama (needs more training)",
     slug: "barack-obama",
     description: "The 44th President of the United States.",
     avatarUrl: "barack-obama.jpg",
+    fullUrl: "barack-obama-full.png",
   }),
   Speaker.fromJson({
     name: "Betty White (needs more training)",
     slug: "betty-white",
     description: "This model needs more training.",
     avatarUrl: "betty-white.jpg",
+    fullUrl: "betty-white-full.png",
   }),
   Speaker.fromJson({
     name: "Arnold Schwarzenegger (needs more training)",
     slug: "arnold-schwarzenegger",
     description: "Terminator.",
     avatarUrl: "arnold-schwarzenegger.jpg",
+    fullUrl: "arnold-schwarzenegger-full.png",
   }),
 ];
 
