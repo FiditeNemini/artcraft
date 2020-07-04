@@ -78,9 +78,20 @@ footer {
 }
 
 nav {
-  font-family: $nav-font-family;
+  font-family: "Fugaz One";
   width: $page-width;
   text-align: justify;
+  #logo_text {
+    font-family: "Fugaz One";
+    font-size: 2.5em;
+    .vo {
+      color:  #209CEE;
+    }
+    .codes {
+      color:  rgba(32, 156, 238, 0.685);
+    }
+    margin-right: 0.5em;
+  }
   a,
   a:link {
     text-decoration: none;
