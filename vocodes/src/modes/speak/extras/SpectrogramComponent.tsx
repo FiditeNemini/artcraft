@@ -11,20 +11,41 @@ interface Props {
 interface State {
 }
 
-/* Safari and Edge polyfill for createImageBitmap
- * https://developer.mozilla.org/en-US/docs/Web/API/WindowOrWorkerGlobalScope/createImageBitmap
- * From https://dev.to/nektro/createimagebitmap-polyfill-for-safari-and-edge-228
- */
+/*
+* Safari and Edge polyfill for createImageBitmap
+* https://developer.mozilla.org/en-US/docs/Web/API/WindowOrWorkerGlobalScope/createImageBitmap
+*
+* Support source image types Blob and ImageData.
+*
+* From: https://dev.to/nektro/createimagebitmap-polyfill-for-safari-and-edge-228
+* Updated by Yoan Tournade <yoan@ytotech.com>
+*
+* Gist found here:
+* https://gist.github.com/MonsieurV/fb640c29084c171b4444184858a91bc7
+*/
 if (!('createImageBitmap' in window)) {
-    (window as any).createImageBitmap = async function(blob: any) {
-        return new Promise((resolve,reject) => {
-            let img = document.createElement('img');
-            img.addEventListener('load', function() {
-                resolve(this);
-            });
-            img.src = URL.createObjectURL(blob);
-        });
-    }
+  (window as any).createImageBitmap = async function (data: any) {
+    return new Promise((resolve,reject) => {
+      let dataURL;
+      if (data instanceof Blob) {
+        dataURL = URL.createObjectURL(data);
+      } else if (data instanceof ImageData) {
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+        canvas.width = data.width;
+        canvas.height = data.height;
+        ctx!.putImageData(data,0,0);
+        dataURL = canvas.toDataURL();
+      } else {
+        throw new Error('createImageBitmap does not handle the provided image source type');
+      }
+      const img = document.createElement('img');
+      img.addEventListener('load',function () {
+        resolve(this);
+      });
+      img.src = dataURL;
+    });
+  };
 }
 
 class SpectrogramComponent extends React.Component<Props, State> {
