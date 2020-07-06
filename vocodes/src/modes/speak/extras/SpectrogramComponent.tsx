@@ -11,6 +11,22 @@ interface Props {
 interface State {
 }
 
+/* Safari and Edge polyfill for createImageBitmap
+ * https://developer.mozilla.org/en-US/docs/Web/API/WindowOrWorkerGlobalScope/createImageBitmap
+ * From https://dev.to/nektro/createimagebitmap-polyfill-for-safari-and-edge-228
+ */
+if (!('createImageBitmap' in window)) {
+    (window as any).createImageBitmap = async function(blob: any) {
+        return new Promise((resolve,reject) => {
+            let img = document.createElement('img');
+            img.addEventListener('load', function() {
+                resolve(this);
+            });
+            img.src = URL.createObjectURL(blob);
+        });
+    }
+}
+
 class SpectrogramComponent extends React.Component<Props, State> {
 
   constructor(props: Props) {
