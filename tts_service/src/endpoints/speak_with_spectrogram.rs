@@ -176,7 +176,7 @@ pub async fn post_speak_with_spectrogram(request: HttpRequest,
   // TODO: Error handling for rich API errors
   let pipeline_done = pipeline.clean_text(&text)
     .unwrap()
-    .infer_mel(speaker_id)
+    .infer_mel(speaker_id, &app_state.arpabet)
     .unwrap()
     .infer_audio(sample_rate_hz)
     .unwrap();

@@ -2,6 +2,7 @@ use anyhow::Result as AnyhowResult;
 use crate::inference::audio::Base64WaveAudio;
 use crate::inference::pipelines::glowtts_multispeaker_melgan::GlowTtsMultiSpeakerMelganPipelineMelDone;
 use crate::inference::spectrogram::Base64MelSpectrogram;
+use arpabet::Arpabet;
 
 /// 1) Stage of the pipeline before work is done.
 pub trait InferencePipelineStart {
@@ -17,7 +18,7 @@ pub trait InferencePipelineTextCleaningDone {
   type TtsModel;
   type VocoderModel;
 
-  fn infer_mel(self: Box<Self>, speaker_id: i64)
+  fn infer_mel(self: Box<Self>, speaker_id: i64, arpabet: &Arpabet)
     -> AnyhowResult<Box<dyn InferencePipelineMelDone<TtsModel = Self::TtsModel, VocoderModel = Self::VocoderModel>>>;
 }
 

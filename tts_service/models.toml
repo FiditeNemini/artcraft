@@ -14,21 +14,24 @@ name = "Bill Clinton"
 slug = "bill-clinton"
 model_pipeline = "ArpabetGlowTtsMelgan"
 glow_tts = "glow-tts_bill_clinton_ljstx_2020.06.28_expr-1_chkpt-1659.torchjit"
-melgan = "melgan_manyvoice1.0_2020-06-28_12d5838_7050.torchjit"
+#melgan = "melgan_manyvoice1.0_2020-06-28_12d5838_7050.torchjit"
+melgan = "melgan-vocodes.torchjit"
 
 [[speakers]]
 name = "Christopher Lee"
 slug = "christopher-lee"
 model_pipeline = "ArpabetGlowTtsMelgan"
 glow_tts = "glow-tts_christopher_lee_ljstx_2020.06.28_expr-1_chkpt-4100.torchjit"
-melgan = "melgan_manyvoice1.0_2020-06-28_12d5838_7050.torchjit"
+#melgan = "melgan_manyvoice1.0_2020-06-28_12d5838_7050.torchjit"
+melgan = "melgan-vocodes.torchjit"
 
 [[speakers]]
 name = "Barack Obama (needs work)"
 slug = "barack-obama"
 model_pipeline = "ArpabetGlowTtsMelgan"
 glow_tts = "glow-tts_barack_obama_ljstx_2020.06.28_expr-1_chkpt-1729.torchjit"
-melgan = "melgan_manyvoice1.0_2020-06-28_12d5838_7050.torchjit"
+#melgan = "melgan_manyvoice1.0_2020-06-28_12d5838_7050.torchjit"
+melgan = "melgan-vocodes.torchjit"
 sample_rate_hz = 22000 # This is lower than normal
 
 [[speakers]]
@@ -36,36 +39,40 @@ name = "Betty White"
 slug = "betty-white"
 model_pipeline = "ArpabetGlowTtsMelgan"
 glow_tts = "glow-tts_betty_white_ljstx_2020.06.28_expr-1_chkpt-1666.torchjit"
-melgan = "melgan_manyvoice1.0_2020-06-28_12d5838_7050.torchjit"
+#melgan = "melgan_manyvoice1.0_2020-06-28_12d5838_7050.torchjit"
+melgan = "melgan-vocodes.torchjit"
 
 [[speakers]]
 name = "Dr. Phil McGraw"
 slug = "dr-phil-mcgraw"
 model_pipeline = "ArpabetGlowTtsMelgan"
 glow_tts = "glow-tts_dr_phil_mcgraw_ljstx_2020.06.28_expr-1_chkpt-1813.torchjit"
-melgan = "melgan_manyvoice1.0_2020-06-28_12d5838_7050.torchjit"
+#melgan = "melgan_manyvoice1.0_2020-06-28_12d5838_7050.torchjit"
+melgan = "melgan-vocodes.torchjit"
 
 [[speakers]]
 name = "Fred Rogers"
 slug = "fred-rogers"
 model_pipeline = "ArpabetGlowTtsMelgan"
 glow_tts = "glow-tts_fred_rogers_ljstx_2020.06.28_expr-1_chkpt-2575.torchjit"
-melgan = "melgan_manyvoice1.0_2020-06-28_12d5838_7050.torchjit"
+#melgan = "melgan_manyvoice1.0_2020-06-28_12d5838_7050.torchjit"
+melgan = "melgan-vocodes.torchjit"
 
 [[speakers]]
 name = "Danny Devito"
 slug = "danny-devito"
 model_pipeline = "ArpabetGlowTtsMelgan"
 glow_tts = "glow-tts_danny_devito_ljstx_2020.06.28_expr-1_chkpt-3757.torchjit"
-melgan = "melgan_manyvoice1.0_2020-06-28_12d5838_7050.torchjit"
+#melgan = "melgan_manyvoice1.0_2020-06-28_12d5838_7050.torchjit"
+melgan = "melgan-vocodes.torchjit"
 
 [[speakers]]
 name = "Donald Trump"
 slug = "donald-trump"
 model_pipeline = "ArpabetGlowTtsMelgan"
 glow_tts = "glow_tts_ljs_txlearn_arpabet_2020-06-01_G_1689-2.torchjit"
-#melgan = "melgan_manyvoice1.0_2020-06-28_12d5838_7050.torchjit"
-melgan = "melgan_trump_txlearn_2020-05-30_steno_chkpt9800.torchjit"
+#melgan = "melgan_trump_txlearn_2020-05-30_steno_chkpt9800.torchjit"
+melgan = "melgan-vocodes.torchjit"
 sample_rate_hz = 21000 # This is lower than normal
 
 [[speakers]]
@@ -73,14 +80,16 @@ name = "Gilbert Gottfried"
 slug = "gilbert-gottfried"
 model_pipeline = "ArpabetGlowTtsMelgan"
 glow_tts = "glow-tts_gilbert-gottfried_ljstx_2020.06.28_expr-1_chkpt-1766.torchjit"
-melgan = "melgan_manyvoice1.0_2020-06-28_12d5838_7050.torchjit"
+#melgan = "melgan_manyvoice1.0_2020-06-28_12d5838_7050.torchjit"
+melgan = "melgan-vocodes.torchjit"
 
 [[speakers]]
 name = "Ronald Reagan"
 slug = "ronald-reagan"
 model_pipeline = "ArpabetGlowTtsMelgan"
 glow_tts = "glow-tts_solo_reagan_ljstx_2020.06.22_expr-1_chkpt-1406.torchjit"
-melgan = "melgan_manyvoice1.0_2020-06-28_12d5838_7050.torchjit"
+#melgan = "melgan_manyvoice1.0_2020-06-28_12d5838_7050.torchjit"
+melgan = "melgan-vocodes.torchjit"
 sample_rate_hz = 21000 # This is lower than normal
 
 [[speakers]]
@@ -88,7 +97,8 @@ name = "John Oliver"
 slug = "john-oliver"
 model_pipeline = "ArpabetGlowTtsMelgan"
 glow_tts = "glow-tts_solo_oliver_ljstx_2020.06.22_expr-1_chkpt-1189.torchjit"
-melgan = "melgan_manyvoice1.0_2020-06-28_12d5838_7050.torchjit"
+#melgan = "melgan_manyvoice1.0_2020-06-28_12d5838_7050.torchjit"
+melgan = "melgan-vocodes.torchjit"
 sample_rate_hz = 21000 # This is lower than normal
 
 [[speakers]]
@@ -96,14 +106,16 @@ name = "Bill Gates"
 slug = "bill-gates"
 model_pipeline = "ArpabetGlowTtsMelgan"
 glow_tts = "glow-tts_solo_billgates_ljstx_2020.06.24_expr-1_chkpt-2011.torchjit"
-melgan = "melgan_manyvoice1.0_2020-06-28_12d5838_7050.torchjit"
+#melgan = "melgan_manyvoice1.0_2020-06-28_12d5838_7050.torchjit"
+melgan = "melgan-vocodes.torchjit"
 
 [[speakers]]
 name = "Mark Zuckerberg"
 slug = "mark-zuckerberg"
 model_pipeline = "ArpabetGlowTtsMelgan"
 glow_tts = "glow-tts_solo_zuckerberg_ljstx_2020.06.24_expr-1_chkpt-2280.torchjit"
-melgan = "melgan_manyvoice1.0_2020-06-28_12d5838_7050.torchjit"
+#melgan = "melgan_manyvoice1.0_2020-06-28_12d5838_7050.torchjit"
+melgan = "melgan-vocodes.torchjit"
 sample_rate_hz = 21000 # This is lower than normal
 
 [[speakers]]
@@ -112,8 +124,8 @@ slug = "arnold-schwarzenegger"
 model_pipeline = "ArpabetGlowTtsMultiSpeakerMelgan"
 glow_tts_multi_speaker = "glow_tts_multispeaker_8-speaker_256-gin_ljs_txlearn_2020.06.19_experiment-5_chkpt-7466.torchjit"
 speaker_id = 3
-melgan = "melgan_vocodes1.0_multispeaker_2020.06.19_12d5838_experiment-2_chkpt-10400.torchjit"
-#melgan = "melgan_manyvoice1.0_2020-06-28_12d5838_7050.torchjit"
+#melgan = "melgan_vocodes1.0_multispeaker_2020.06.19_12d5838_experiment-2_chkpt-10400.torchjit"
+melgan = "melgan-vocodes.torchjit"
 sample_rate_hz = 21000 # This is lower than normal
 
 # --------------- Model configs ---------------

@@ -44,7 +44,9 @@ use crate::model::model_config::ModelConfigs;
 use crate::text::checker::TextChecker;
 use crate::endpoints::speak_with_spectrogram::post_speak_with_spectrogram;
 use crate::endpoints::words::get_words;
+use arpabet::Arpabet;
 
+const ENV_ARPABET_EXTRAS_FILE : &'static str = "ARPABET_EXTRAS_FILE";
 const ENV_ASSET_DIRECTORY: &'static str = "ASSET_DIRECTORY";
 const ENV_BIND_ADDRESS: &'static str = "BIND_ADDRESS";
 const ENV_DATABASE_URL : &'static str = "DATABASE_URL";
@@ -68,6 +70,7 @@ const DEFAULT_RUST_LOG: &'static str = "debug,actix_web=info";
 
 /** State that is easy to pass between handlers. */
 pub struct AppState {
+  pub arpabet: Arpabet,
   pub model_configs: ModelConfigs,
   pub model_cache: ModelCache,
   pub database_connector: DatabaseConnector,
@@ -81,6 +84,16 @@ pub struct ServerArgs {
   pub hostname: String,
   pub num_workers: usize,
   pub asset_directory: String,
+}
+
+fn get_env_string_optional(env_name: &str) -> Option<String> {
+  match env::var(env_name).as_ref().ok() {
+    Some(s) => Some(s.to_string()),
+    None => {
+      warn!("Env var '{}' not supplied.", env_name);
+      None
+    },
+  }
 }
 
 fn get_env_string(env_name: &str, default: &str) -> String {
@@ -125,6 +138,7 @@ pub fn main() -> AnyhowResult<()> {
 
   env_logger::init();
 
+  let arpabet_extras_file = get_env_string_optional(ENV_ARPABET_EXTRAS_FILE);
   let bind_address = get_env_string(ENV_BIND_ADDRESS, DEFAULT_BIND_ADDRESS);
   let asset_directory = get_env_string(ENV_ASSET_DIRECTORY, DEFAULT_ASSET_DIRECTORY);
   let model_config_file = get_env_string(ENV_MODEL_CONFIG_FILE, DEFAULT_MODEL_CONFIG_FILE);
@@ -140,6 +154,7 @@ pub fn main() -> AnyhowResult<()> {
       .and_then(|h| h.into_string().ok())
       .unwrap_or("tts-unknown".to_string());
 
+  info!("Arpabet extras file: {:?}", arpabet_extras_file);
   info!("Asset directory: {}", asset_directory);
   info!("Bind address: {}", bind_address);
   info!("Using model config file: {}", model_config_file);
@@ -169,7 +184,27 @@ pub fn main() -> AnyhowResult<()> {
   text_checker.set_max_character_length(max_char_len);
   text_checker.set_min_character_length(min_char_len);
 
+  let arpabet : Arpabet = match arpabet_extras_file {
+    Some(extras_filename) => {
+      info!("Loading default CMUdict Arpabet...");
+      // Here we introduce silly internet words such as "lulz".
+      // NB: The extras file takes precedence for any dictionary collisions.
+      let cmu_dict = Arpabet::load_cmudict();
+      info!("Loading Arpabet extensions...");
+      let extra_arpabet = Arpabet::load_from_file(&extras_filename)?;
+      let arpabet = cmu_dict.combine(&extra_arpabet);
+      arpabet.clone()
+    },
+    None => {
+      info!("Loading default CMUdict Arpabet...");
+      Arpabet::load_cmudict().clone()
+    },
+  };
+
+  info!("Arpabet loaded. {} entries", arpabet.len());
+
   let app_state = AppState {
+    arpabet,
     model_configs,
     model_cache,
     database_connector: db_connector,

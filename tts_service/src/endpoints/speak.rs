@@ -175,7 +175,12 @@ pub async fn post_speak(request: HttpRequest,
       let melgan = app_state.model_cache.get_or_load_melgan(&melgan_model)
           .expect(&format!("Couldn't load melgan model: {}", melgan_model));
 
-      let wav_data = arpabet_glow_tts_melgan_pipeline(&cleaned_text, &glow_tts, &melgan, sample_rate_hz);
+      let wav_data = arpabet_glow_tts_melgan_pipeline(
+        &cleaned_text,
+        &glow_tts,
+        &melgan,
+        sample_rate_hz,
+        &app_state.arpabet);
 
       // To make iOS Safari work, you need a Content-Range and Content-Length header:
       // https://stackoverflow.com/a/17835399
@@ -218,7 +223,8 @@ pub async fn post_speak(request: HttpRequest,
         speaker_id,
         &glow_tts_multi_speaker,
         &melgan,
-        sample_rate_hz);
+        sample_rate_hz,
+        &app_state.arpabet);
 
       // To make iOS Safari work, you need a Content-Range and Content-Length header:
       // https://stackoverflow.com/a/17835399

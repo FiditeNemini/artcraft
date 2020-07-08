@@ -21,9 +21,9 @@ pub fn arpabet_glow_tts_multi_speaker_melgan_pipeline(
   speaker_id: i64,
   arpabet_glow_tts: &ArpabetGlowTtsMultiSpeakerModel,
   melgan: &MelganModel,
-  sample_rate_hz: u32) -> Vec<u8> {
-
-  let arpabet = Arpabet::load_cmudict(); // TODO: Inefficient.
+  sample_rate_hz: u32,
+  arpabet: &Arpabet
+) -> Vec<u8> {
   let arpabet_encodings = text_to_arpabet_encoding_glow_tts(arpabet, &cleaned_text);
 
   let mel_tensor = arpabet_glow_tts.encoded_arpabet_to_mel(&arpabet_encodings, speaker_id);
@@ -39,9 +39,9 @@ pub fn arpabet_glow_tts_multi_speaker_melgan_pipeline_with_spectrogram(
   speaker_id: i64,
   arpabet_glow_tts: &ArpabetGlowTtsMultiSpeakerModel,
   melgan: &MelganModel,
-  sample_rate_hz: u32) -> (Spectrogram, Vec<u8>) {
-
-  let arpabet = Arpabet::load_cmudict(); // TODO: Inefficient.
+  sample_rate_hz: u32,
+  arpabet: &Arpabet
+) -> (Spectrogram, Vec<u8>) {
   let arpabet_encodings = text_to_arpabet_encoding_glow_tts(arpabet, &cleaned_text);
 
   let mel_tensor = arpabet_glow_tts.encoded_arpabet_to_mel(&arpabet_encodings, speaker_id);
@@ -94,9 +94,9 @@ pub fn arpabet_glow_tts_melgan_pipeline(
   cleaned_text: &str,
   arpabet_glow_tts: &ArpabetGlowTtsModel,
   melgan: &MelganModel,
-  sample_rate_hz: u32) -> Vec<u8> {
-
-  let arpabet = Arpabet::load_cmudict(); // TODO: Inefficient.
+  sample_rate_hz: u32,
+  arpabet: &Arpabet
+) -> Vec<u8> {
   let arpabet_encodings = text_to_arpabet_encoding_glow_tts(arpabet, &cleaned_text);
 
   let mel_tensor = arpabet_glow_tts.encoded_arpabet_to_mel(&arpabet_encodings);
@@ -111,9 +111,9 @@ pub fn arpabet_glow_tts_melgan_pipeline_with_spectrogram(
   cleaned_text: &str,
   arpabet_glow_tts: &ArpabetGlowTtsModel,
   melgan: &MelganModel,
-  sample_rate_hz: u32) -> (Spectrogram, Vec<u8>) {
-
-  let arpabet = Arpabet::load_cmudict(); // TODO: Inefficient.
+  sample_rate_hz: u32,
+  arpabet: &Arpabet
+) -> (Spectrogram, Vec<u8>) {
   let arpabet_encodings = text_to_arpabet_encoding_glow_tts(arpabet, &cleaned_text);
 
   let mel_tensor = arpabet_glow_tts.encoded_arpabet_to_mel(&arpabet_encodings);
@@ -166,9 +166,9 @@ pub fn arpabet_tacotron_melgan_pipeline(
   cleaned_text: &str,
   arpabet_tacotron: &ArpabetTacotronModel,
   melgan: &MelganModel,
-  sample_rate_hz: u32) -> Option<Vec<u8>> {
-
-  let arpabet = Arpabet::load_cmudict(); // TODO: Inefficient.
+  sample_rate_hz: u32,
+  arpabet: &Arpabet
+) -> Option<Vec<u8>> {
   let encoded = text_to_arpabet_encoding(arpabet, &cleaned_text);
 
   let mel_tensor = match arpabet_tacotron.encoded_arpabet_to_mel(&encoded) {

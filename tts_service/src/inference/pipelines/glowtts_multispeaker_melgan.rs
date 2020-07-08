@@ -73,11 +73,9 @@ impl  InferencePipelineTextCleaningDone for GlowTtsMultiSpeakerMelganPipelineTex
   type TtsModel = Arc<dyn TtsModelT>;
   type VocoderModel = Arc<dyn VocoderModelT>;
 
-  fn infer_mel(self: Box<Self>, speaker_id: i64)
+  fn infer_mel(self: Box<Self>, speaker_id: i64, arpabet: &Arpabet)
     -> AnyhowResult<Box<dyn InferencePipelineMelDone<TtsModel = Self::TtsModel, VocoderModel = Self::VocoderModel>>>
   {
-    // TODO: Creating arpabet instances every time is inefficient (even if lazy_static! under the hood).
-    let arpabet = Arpabet::load_cmudict();
     let arpabet_encodings = text_to_arpabet_encoding_glow_tts(arpabet, &self.cleaned_text);
 
     let mel_tensor = self.glow_tts.encoded_sequence_to_mel(&arpabet_encodings, speaker_id);
