@@ -13,7 +13,7 @@ function TopNav(props: Props) {
         <a href="#speak" onClick={() => props.switchModeCallback(Mode.SPEAK_MODE)}><span 
           className="vo">Vo</span><span className="codes">codes</span></a>
       </span>
-      <a href="#history" onClick={() => props.switchModeCallback(Mode.HISTORY_MODE)}>History</a>
+      <a href="#history" onClick={() => props.switchModeCallback(Mode.HISTORY_MODE)}>Replay &amp; Download</a>
       <a href="#use" onClick={() => props.switchModeCallback(Mode.ABOUT_MODE)}>About</a>
       <hr />
     </nav>
