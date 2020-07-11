@@ -49,6 +49,13 @@ class Speaker {
 
 const SPEAKERS : Speaker[] = [
   Speaker.fromJson({
+    name: "Sir David Attenborough",
+    slug: "david-attenborough",
+    description: "Naturalist",
+    avatarUrl: "david-attenborough.jpg",
+    fullUrl: "david-attenborough-full.png",
+  }),
+  Speaker.fromJson({
     name: "Christopher Lee",
     slug: "christopher-lee",
     description: "An actor well known for playing Count Dooku and Saruman.",
@@ -61,6 +68,13 @@ const SPEAKERS : Speaker[] = [
     description: "Always delightful.",
     avatarUrl: "danny-devito.jpg",
     fullUrl: "danny-devito-full.png",
+  }),
+  Speaker.fromJson({
+    name: "Richard Nixon",
+    slug: "richard-nixon",
+    description: "President",
+    avatarUrl: "richard-nixon.jpg",
+    fullUrl: "richard-nixon-full.png",
   }),
   Speaker.fromJson({
     name: "Gilbert Gottfried",
