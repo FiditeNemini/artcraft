@@ -1,7 +1,7 @@
 import './App.scss';
 import React from 'react';
 import { AboutComponent } from './modes/about/AboutComponent';
-import { ExtrasMode } from './modes/speak/extras/ExtrasComponent';
+import { ExtrasMode } from './modes/speak/SpeakComponent';
 import { Footer } from './navigation/Footer';
 import { HistoryComponent } from './modes/history/HistoryComponent';
 import { Mode } from './AppMode';
@@ -12,7 +12,13 @@ import { TermsComponent } from './modes/terms/TermsComponent';
 import { TopNav } from './navigation/TopNav';
 import { Utterance } from './model/utterance';
 
-interface Props {}
+interface Props {
+  // Certan browsers (iPhone) have pitiful support for drawing APIs. Worse yet,
+  // they seem to lose the "touch event sandboxing" that allows for audio to be 
+  // played after user interaction if the XHRs delivering the audio don't do so
+  // as actual audio mimetypes. (Decoding from base64 and trying to play fails.)
+  enableSpectrograms: boolean,
+}
 
 enum SpectrogramMode {
   VIRIDIS,
@@ -66,6 +72,9 @@ class App extends React.Component<Props, State> {
   }
 
   switchExtrasMode = (extrasMode: ExtrasMode) => {
+    if (!this.props.enableSpectrograms && extrasMode == ExtrasMode.SPECTROGRAM) {
+      return;
+    }
     this.setState({ extrasMode: extrasMode });
   }
 
@@ -91,6 +100,9 @@ class App extends React.Component<Props, State> {
   }
 
   updateSpectrogram = (spectrogram: Spectrogram) => {
+    if (!this.props.enableSpectrograms) {
+      return; // unsupported
+    }
     this.setState({ 
       currentSpectrogram: spectrogram,
       extrasMode: ExtrasMode.SPECTROGRAM,
@@ -116,6 +128,7 @@ class App extends React.Component<Props, State> {
     switch (this.state.mode) {
       case Mode.SPEAK_MODE:
         component = <SpeakComponent 
+          enableSpectrograms={this.props.enableSpectrograms}
           extrasMode={this.state.extrasMode}
           currentSpeaker={this.state.speaker} 
           currentSpectrogram={this.state.currentSpectrogram}

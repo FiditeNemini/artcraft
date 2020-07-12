@@ -1,13 +1,14 @@
 import React from 'react';
 import { Form } from './Form';
-import { StatusText } from './StatusText';
-import { getRandomInt } from '../../Utils';
-import { SpeakerDropdown } from './SpeakerDropdown';
 import { Speaker } from '../../model/Speakers';
-import { ExtrasComponent, ExtrasMode } from './extras/ExtrasComponent';
+import { SpeakerDropdown } from './SpeakerDropdown';
+import { SpeakerInfo } from './extras/SpeakerInfo';
 import { Spectrogram } from './extras/Spectrogram';
+import { SpectrogramComponent } from './extras/SpectrogramComponent';
 import { SpectrogramMode } from '../../App';
+import { StatusText } from './StatusText';
 import { Utterance } from '../../model/utterance';
+import { getRandomInt } from '../../Utils';
 
 enum StatusState {
   NONE,
@@ -16,7 +17,13 @@ enum StatusState {
   ERROR,
 }
 
+enum ExtrasMode {
+  SPEAKER_INFO,
+  SPECTROGRAM,
+}
+
 interface Props {
+  enableSpectrograms: boolean,
   extrasMode: ExtrasMode,
   currentSpeaker: Speaker,
   currentSpectrogram?: Spectrogram,
@@ -129,14 +136,35 @@ class SpeakComponent extends React.Component<Props, State> {
   }
 
   public render() {
-    let modeText;
+    let speakerPictureOrSpectrogram;
     switch (this.props.extrasMode) {
       case ExtrasMode.SPEAKER_INFO:
-        modeText = "Speaker Info";
+        speakerPictureOrSpectrogram = <SpeakerInfo currentSpeaker={this.props.currentSpeaker} />
         break;
       case ExtrasMode.SPECTROGRAM:
-        modeText = "Spectrogram";
+        speakerPictureOrSpectrogram = <SpectrogramComponent 
+          currentSpectrogram={this.props.currentSpectrogram} 
+          spectrogramMode={this.props.spectrogramMode}
+          changeSpectrogramMode={this.props.changeSpectrogramMode}
+          />
         break;
+    }
+
+    let switchButton = <span />
+    if (this.props.enableSpectrograms) {
+      let modeText;
+      switch (this.props.extrasMode) {
+        case ExtrasMode.SPEAKER_INFO:
+          modeText = "Speaker Info";
+          break;
+        case ExtrasMode.SPECTROGRAM:
+          modeText = "Spectrogram";
+          break;
+      }
+
+      switchButton = <button 
+        className="mode_button"
+        onClick={this.toggleMode}>{modeText}</button>
     }
 
     return (
@@ -146,25 +174,17 @@ class SpeakComponent extends React.Component<Props, State> {
           changeSpeakerCallback={this.props.changeSpeakerCallback} 
           />
 
-        <button 
-          className="mode_button"
-          onClick={this.toggleMode}>{modeText}</button>
+        {switchButton}
 
         <div>
-          <ExtrasComponent 
-            extrasMode={this.props.extrasMode}
-            currentSpeaker={this.props.currentSpeaker} 
-            currentSpectrogram={this.props.currentSpectrogram}
-            spectrogramMode={this.props.spectrogramMode}
-            changeExtrasModeCallback={this.props.changeExtrasModeCallback}
-            changeSpectrogramMode={this.props.changeSpectrogramMode}
-            />
+          {speakerPictureOrSpectrogram}
         </div>
 
         <StatusText 
           statusState={this.state.statusState} 
           statusMessage={this.state.statusMessage}
           />
+
         <Form 
           currentSpeaker={this.props.currentSpeaker}
           currentText={this.props.currentText}
@@ -185,4 +205,4 @@ class SpeakComponent extends React.Component<Props, State> {
   }
 }
 
-export { SpeakComponent, StatusState };
+export { SpeakComponent, StatusState, ExtrasMode };
