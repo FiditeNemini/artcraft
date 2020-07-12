@@ -113,7 +113,6 @@ nav {
     text-decoration: none;
     color: $light-text-color;
     padding: 0 10px;
-    font-size: 1.3em;
     cursor: pointer;
   }
   a:after {
@@ -123,6 +122,10 @@ nav {
   a:hover,
   a:active {
     background-color: #bfdff5;
+  }
+
+  hr {
+    margin: 5px 0 15px 0;
   }
 }
 
