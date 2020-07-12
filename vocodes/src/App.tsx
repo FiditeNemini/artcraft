@@ -40,6 +40,7 @@ interface State {
   currentSpectrogram?: Spectrogram,
   spectrogramMode: SpectrogramMode,
   utterances: Utterance[],
+  currentText: string,
 }
 
 class App extends React.Component<Props, State> {
@@ -52,6 +53,7 @@ class App extends React.Component<Props, State> {
       speaker: SPEAKERS[0],
       spectrogramMode: SpectrogramMode.VIRIDIS,
       utterances: [],
+      currentText: '',
     };
   }
 
@@ -105,6 +107,10 @@ class App extends React.Component<Props, State> {
     this.setState({ utterances: utterances });
   }
 
+  setText = (text: string) => {
+    this.setState({ currentText : text });
+  }
+
   public render() {
     let component;
     switch (this.state.mode) {
@@ -113,12 +119,14 @@ class App extends React.Component<Props, State> {
           extrasMode={this.state.extrasMode}
           currentSpeaker={this.state.speaker} 
           currentSpectrogram={this.state.currentSpectrogram}
+          currentText={this.state.currentText}
           changeSpeakerCallback={this.setSpeakerBySlug} 
           changeSpectrogramCallback={this.updateSpectrogram} 
           changeExtrasModeCallback={this.switchExtrasMode}
           spectrogramMode={this.state.spectrogramMode}
           changeSpectrogramMode={this.setSpectrogramMode}
           appendUtteranceCallback={this.appendUtterance}
+          setTextCallback={this.setText}
           />;
         break;
       case Mode.HISTORY_MODE:

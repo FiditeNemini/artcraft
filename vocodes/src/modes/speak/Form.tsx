@@ -11,6 +11,7 @@ import { Utterance } from '../../model/utterance';
 interface Props {
   currentSpeaker: Speaker,
   spectrogramMode: SpectrogramMode,
+  currentText: string,
   clearStatusCallback: () => void,
   setHintMessage: (message: string) => void,
   onSpeakRequestCallback: () => void,
@@ -20,10 +21,10 @@ interface Props {
   onStopCallback: () => void,
   updateSpectrogramCallback: (spectrogram: Spectrogram) => void,
   appendUtteranceCallback: (utterance: Utterance) => void,
+  setTextCallback: (text: string) => void,
 }
 
 interface State {
-  text: string,
   howl?: Howl,
 }
 
@@ -33,64 +34,13 @@ class Form extends React.Component<Props, State> {
 
   constructor(props: Props) {
     super(props);
-    this.state = {
-      text: '',
-    };
+    this.state = {};
   }
 
   public speak(sentence: string, speaker: Speaker) {
     let request = new SpeakRequest(sentence, speaker.getSlug());
 
     console.log("Making SpeakRequest:", request);
-
-    /*//const url = this.props.apiConfig.getEndpoint('/speak');
-    const url = 'https://mumble.stream/speak';
-
-    this.props.onSpeakRequestCallback();
-    let that = this;
-
-    fetch(url, {
-      method: 'POST',
-      headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(request),
-    })
-    .then(res => res.blob())
-    .then(blob => {
-      this.props.onSpeakSuccessCallback();
-
-      console.log(blob);
-
-      const url = window.URL.createObjectURL(blob);
-      console.log(url);
-
-      const sound = new Howl.Howl({
-        src: [url],
-        format: 'wav',
-        // NB: Attempting to get this working on iPhone Safari
-        // https://github.com/goldfire/howler.js/issues/1093
-        // Other issues cite needing to cache a single player 
-        // across all user interaction events.
-        html5: true,
-        onplay: () => {
-          that.props.onPlayCallback();
-        },
-        onend: () => {
-          that.props.onStopCallback();
-        },
-      });
-      
-      this.setState({howl: sound});
-      sound.play();
-
-      (window as any).sound = sound;
-    })
-    .catch(e => {
-      this.props.onSpeakErrorCallback();
-    });
-    */
 
     //const url = this.props.apiConfig.getEndpoint('/speak_spectrogram');
     const url = 'https://mumble.stream/speak_spectrogram';
@@ -173,7 +123,7 @@ class Form extends React.Component<Props, State> {
   }
 
   clear() {
-    this.setState({text: ''});
+    this.props.setTextCallback('');
   }
 
   handleTextChange = (ev: React.FormEvent<HTMLTextAreaElement>) => {
@@ -193,14 +143,14 @@ class Form extends React.Component<Props, State> {
       this.props.clearStatusCallback();
     }
 
-    this.setState({text: text});
+    this.props.setTextCallback(text);
 
     return false;
   }
 
   handleFormSubmit = (ev: React.FormEvent<HTMLFormElement>) : boolean => {
     ev.preventDefault();
-    this.speak(this.state.text, this.props.currentSpeaker);
+    this.speak(this.props.currentText, this.props.currentSpeaker);
     return false;
   }
 
@@ -229,7 +179,7 @@ class Form extends React.Component<Props, State> {
           <textarea 
             onChange={this.handleTextChange} 
             onKeyDown={this.handleKeyDown}
-            value={this.state.text} 
+            value={this.props.currentText} 
             ref={(textarea) => { this.textarea = textarea; }} 
             />
           <div>

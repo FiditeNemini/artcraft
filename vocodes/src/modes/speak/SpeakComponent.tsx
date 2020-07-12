@@ -21,11 +21,13 @@ interface Props {
   currentSpeaker: Speaker,
   currentSpectrogram?: Spectrogram,
   spectrogramMode: SpectrogramMode,
+  currentText: string,
   changeSpeakerCallback: (slug: string) => void,
   changeSpectrogramCallback: (spectrogram: Spectrogram) => void,
   changeExtrasModeCallback: (extrasMode: ExtrasMode) => void,
   changeSpectrogramMode: (spectrogramMode: SpectrogramMode) => void,
   appendUtteranceCallback: (utterance: Utterance) => void,
+  setTextCallback: (text: string) => void,
 }
 
 interface State {
@@ -165,6 +167,7 @@ class SpeakComponent extends React.Component<Props, State> {
           />
         <Form 
           currentSpeaker={this.props.currentSpeaker}
+          currentText={this.props.currentText}
           clearStatusCallback={this.clearMessage}
           setHintMessage={this.setHintMessage}
           spectrogramMode={this.props.spectrogramMode}
@@ -175,6 +178,7 @@ class SpeakComponent extends React.Component<Props, State> {
           onStopCallback={this.onStop}
           updateSpectrogramCallback={this.props.changeSpectrogramCallback}
           appendUtteranceCallback={this.props.appendUtteranceCallback}
+          setTextCallback={this.props.setTextCallback}
           />
       </div>
     );
