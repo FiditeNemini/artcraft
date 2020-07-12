@@ -11,8 +11,8 @@ function AboutComponent(props: Props) {
 
       <p>
         This is Brandon's this pandemic side project. When he's not 
-        <a href="https://www.youtube.com/watch?v=x034jVB1avs" target="_blank">building games to play on 
-        the side of skyscrapers</a>, or working on his one-man film studio side hustle, he's doing 
+        <a href="https://www.youtube.com/watch?v=x034jVB1avs" target="_blank" rel="noopener noreferrer">building
+        games to play on the side of skyscrapers</a>, or working on his one-man film studio side hustle, he's doing 
         crazy stuff like this.
       </p>
 
