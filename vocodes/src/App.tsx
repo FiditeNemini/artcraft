@@ -72,7 +72,7 @@ class App extends React.Component<Props, State> {
   }
 
   switchExtrasMode = (extrasMode: ExtrasMode) => {
-    if (!this.props.enableSpectrograms && extrasMode == ExtrasMode.SPECTROGRAM) {
+    if (!this.props.enableSpectrograms && extrasMode === ExtrasMode.SPECTROGRAM) {
       return;
     }
     this.setState({ extrasMode: extrasMode });
