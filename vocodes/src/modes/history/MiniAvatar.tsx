@@ -24,12 +24,11 @@ class MiniAvatar extends React.Component<Props, State> {
     } else {
       source = `https://via.placeholder.com/300x300/FF0000/FFFFFF?text=${this.props.speaker.getSlug()}`;
     }
-    console.log('test', source, this.props.speaker.getAvatar());
 
     return (
-      <div>
-        <img src={source} className="mini_avatar" alt="speaker" />
-      </div>
+      <figure className="image is-128x128">
+        <img src={source} className="is-rounded" alt="speaker" />
+      </figure>
     );
   }
 }

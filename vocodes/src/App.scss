@@ -1,4 +1,4 @@
-@import-normalize; /* bring in normalize.css styles */
+//@import-normalize; /* bring in normalize.css styles */
 
 $page-width: 800px;
 
@@ -12,51 +12,39 @@ $textarea-font-family: 'Fira Sans', sans-serif;
 $headings-font-family: 'Merriweather', serif;
 
 body {
-  margin: 0 auto;
-  width: $page-width;
   font-family: $body-font-family;
 }
 
-.clear {
-  clear: both;
+.mainwrap {
+  max-width: 800px;
+  margin: auto;
 }
 
 canvas#spectrogram {
   margin: 0.5em 0;
   transform: scaleY(-1); /* Spectrograms are flipped */
   height: 300px;
-  width: 800px;
+  width: 100%;
   cursor: pointer;
 }
 
-select {
-  max-width: 600px;
-  height: 2.3em;
-}
-
-p {
-  font-family: $body-font-family;
-  font-size: 1.2em;
-
+/*p {
   a:link, 
   a:visited {
-    color: #c75;
+    color: rgb(119, 165, 235);
     font-weight: bold;
   }
-}
+  a:hover, 
+  a:active{
+    color: rgb(85, 133, 204);
+    font-weight: bold;
+  }
+}*/
 
-button {
-  background-color: #e5e5e5;
-  border: 0;
-  color: $button-text-color;
-  font-size: 1.2em;
-  margin: 20px;
-  min-width: 150px;
-  padding: 10px;
-}
-
-.extra_mode_buttons {
-  text-align: center;
+p {
+  a:before {
+    content: ' ';
+  }
 }
 
 #main {
@@ -72,8 +60,8 @@ $footer-height: 6rem;
 
 footer {
   font-family: $footer-font-family;
-  width: $page-width;
   text-align: center;
+  width: 100%;
   position: absolute; // Footer attachment.
   bottom: 0;
   // NB: Setting explicit height doesn't appear to be necessary, and
@@ -84,7 +72,6 @@ footer {
 
 nav {
   font-family: "Fugaz One";
-  width: $page-width;
   margin: 0.2em 0 0 0;
   padding: 0;
   #logo_text {
@@ -139,38 +126,8 @@ nav {
   }
 }
 
-form {
-  width: $page-width;
-
-  textarea {
-    font-family: $textarea-font-family;
-    border: 1px solid #999;
-    width: $page-width;
-    box-sizing: border-box;
-    font-size: 1.2em;
-    resize: vertical;
-    padding: 1em;
-    margin: 0;
-  }
-
-  button {
-    display: block;
-    margin: 1.5em auto;
-  }
-
-  .left {
-    float: left;
-    width: 50%;
-  }
-
-  .right {
-    float: right;
-    width: 50%;
-  }
-
-  .clear {
-    clear: both;
-  }
+.button-group {
+  padding: 1em 0;
 }
 
 #status {
@@ -203,373 +160,8 @@ form {
   }
 }
 
-.speaker_info_component {
-  .full_image {
-    img {
-      max-width: 800px;
-    }
-  }
-  .speaker_avatar {
-    float: left;
-    img {
-      width: 300px;
-      height: 300px;
-    }
-  }
-  .speaker_details {
-    float: right;
-    padding: 0;
-  }
-  .speaker_break {
-    float: none;
-  }
-
-  margin: 0.5em 0 0.5em;
-  min-height: 300px;
-}
-
-.history_component {
-  .utterance {
-    margin: 0 0 5px;
-    border-radius: 25px;
-    .avatar {
-      float: left;
-      width: 150px;
-      img {
-        border-radius: 25px;
-        width: 150px;
-        height: 150px;
-      }
-    }
-    .details {
-      float: left;
-      max-width: 550px;
-      margin: 0;
-      padding: 10px 0 1em 1em;
-      h3 {
-        margin: 0;
-        padding: 0 0 1em;
-      }
-    }
-  }
-  .utterance:nth-child(odd) {
-    background-color: #fff5f5;
-  }
-  .utterance:nth-child(even) {
-    background-color: #fefefe;
-  }
-}
 
 /** RESPONSIVENESS **/
-
-@media screen and (min-width: 600px) {
-  $page-width: 600px;
-  
-  button {
-    min-width: 250px;
-  }
-}
-
-@media screen and (min-width: 1px) {
-  $page-width: 200px;
-
-  body {
-    width: $page-width;
-  }
-  #animation canvas {
-    width: 200px;
-  }
-  #animation {
-    height: 117px;
-  }
-  nav,
-  footer {
-    width: $page-width;
-  }
-  form {
-    width: $page-width;
-    textarea {
-      width: $page-width;
-    }
-  }
-}
-
-@media screen and (min-width: 300px) {
-  $page-width: 300px;
-
-  body {
-    width: $page-width;
-  }
-  #animation canvas {
-    width: $page-width;
-  }
-  #animation {
-    height: 176px;
-  }
-  nav,
-  footer {
-    width: $page-width;
-  }
-  form {
-    width: $page-width;
-    textarea {
-      width: $page-width;
-    }
-  }
-
-  select {
-    max-width: 200px;
-    height: 42px;
-  }
-
-  .mode_button {
-    margin: 0;
-    height: 42px;
-  }
-
-  canvas#spectrogram {
-    width: $page-width;
-  }
-
-  .speaker_info_component {
-    .full_image {
-      img {
-        width: $page-width;
-      }
-    }
-  }
-}
-
-@media screen and (min-width: 400px) {
-  $page-width: 400px;
-
-  body {
-    width: $page-width;
-  }
-  #animation canvas {
-    width: $page-width;
-  }
-  #animation {
-    height: 235px;
-  }
-  nav,
-  footer {
-    width: $page-width;
-  }
-  form {
-    width: $page-width;
-    textarea {
-      width: $page-width;
-    }
-  }
-
-  select {
-    max-width: 250px;
-    height: 42px;
-  }
-
-  .mode_button {
-    margin: 0;
-    height: 42px;
-  }
-
-  canvas#spectrogram {
-    width: $page-width;
-  }
-
-  .speaker_info_component {
-    .full_image {
-      img {
-        width: $page-width;
-      }
-    }
-  }
-}
-
-@media screen and (min-width: 450px) {
-  $page-width: 450px;
-
-  body {
-    width: $page-width;
-  }
-  #animation canvas {
-    width: $page-width;
-  }
-  #animation {
-    height: 264px;
-  }
-  nav,
-  footer {
-    width: $page-width;
-  }
-  form {
-    width: $page-width;
-    textarea {
-      width: $page-width;
-    }
-  }
-
-  select {
-    max-width: 300px;
-  }
-
-  .mode_button {
-    margin: 0;
-  }
-
-  canvas#spectrogram {
-    width: $page-width;
-  }
-
-  .speaker_info_component {
-    .full_image {
-      img {
-        width: $page-width;
-      }
-    }
-  }
-}
-
-@media screen and (min-width: 500px) {
-  $page-width: 500px;
-
-  body {
-    width: $page-width;
-  }
-  #animation canvas {
-    width: $page-width;
-  }
-  #animation {
-    height: 293px;
-  }
-  nav,
-  footer {
-    width: $page-width;
-  }
-  form {
-    width: $page-width;
-    textarea {
-      width: $page-width;
-    }
-  }
-
-  select {
-    max-width: 350px;
-  }
-
-  .mode_button {
-    margin: 0;
-  }
-
-  canvas#spectrogram {
-    width: $page-width;
-  }
-
-  .speaker_info_component {
-    .full_image {
-      img {
-        width: $page-width;
-      }
-    }
-  }
-}
-
-@media screen and (min-width: 600px) {
-  $page-width: 600px;
-
-  body {
-    width: $page-width;
-  }
-  #animation canvas {
-    width: $page-width;
-  }
-  #animation {
-    height: 352px;
-  }
-  nav,
-  footer {
-    width: $page-width;
-  }
-  form {
-    width: $page-width;
-    textarea {
-      width: $page-width;
-    }
-  }
-
-  select {
-    max-width: 350px;
-  }
-
-  .mode_button {
-    margin: 0px;
-  }
-
-  canvas#spectrogram {
-    width: $page-width;
-  }
-
-  .speaker_info_component {
-    .full_image {
-      img {
-        width: $page-width;
-      }
-    }
-  }
-}
-
-@media screen and (min-width: 800px) {
-  $page-width: 800px;
-
-  body {
-    width: $page-width;
-  }
-  #animation canvas {
-    width: $page-width;
-  }
-  #animation {
-    height: 470px;
-  }
-  nav, 
-  footer {
-    width: $page-width;
-  }
-  form {
-    width: $page-width;
-    textarea {
-      width: $page-width;
-    }
-  }
-
-  select {
-    max-width: 650px;
-  }
-
-  .mode_button {
-    margin: 0 20px;
-  }
-
-  canvas#spectrogram {
-    width: $page-width;
-  }
-
-  .speaker_info_component {
-    .full_image {
-      img {
-        width: $page-width;
-      }
-    }
-  }
-}
-
-@media screen and (min-width: 1000px) {
-  #animation canvas {
-    width: 800px;
-  }
-  #animation {
-    height: 470px;
-  }
-}
 
 /** Hide footer when using onscreen keyboard. */
 @media screen and (max-height: 550px) {

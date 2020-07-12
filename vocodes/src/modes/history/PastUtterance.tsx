@@ -27,21 +27,33 @@ class PastUtterance extends React.Component<Props, State> {
     let filename = `vocodes_${this.props.utterance.speaker.slug}_${number}.wav`;
 
     return (
-      <div key={this.props.utterance.id} className="utterance">
-        <div className="avatar">
-          <MiniAvatar speaker={this.props.utterance.speaker} />
+      <div key={this.props.utterance.id} className="box">
+        <div className="columns">
+          <div className="column is-one-fifth">
+            <MiniAvatar speaker={this.props.utterance.speaker} />
+          </div>
+          <div className="column is-four-fifths">
+            <h3 className="title is-4">
+              Utterance #{number}:&nbsp;
+              {this.props.utterance.speaker.getName()}
+            </h3>
+            <div className="content">
+              <p>
+                {this.props.utterance.originalText}
+              </p>
+            </div>
+            
+            <div className="columns is-mobile">
+              <div className="column">
+                <button className="button is-medium" onClick={this.play}>Play</button>
+              </div>
+              <div className="column">
+                <a className="button is-medium" href={url} download={filename}>Download</a>
+              </div>
+            </div>
+
+          </div>
         </div>
-        <div className="details">
-          <h3>
-            Utterance #{number}:
-            {this.props.utterance.speaker.getName()}
-          </h3>
-          {this.props.utterance.originalText}
-          <br/>
-          <button onClick={this.play}>Play</button>
-          <a href={url} download={filename}>Download</a>
-        </div>
-        <div className="clear" />
       </div>
     )
   }

@@ -176,21 +176,26 @@ class Form extends React.Component<Props, State> {
     return (
       <div>
         <form onSubmit={this.handleFormSubmit}>
+
           <textarea 
+            className="textarea"
             onChange={this.handleTextChange} 
             onKeyDown={this.handleKeyDown}
             value={this.props.currentText} 
             ref={(textarea) => { this.textarea = textarea; }} 
             />
-          <div>
-            <div className="left">
-              <button>Speak</button>
+
+          <div className="button-group">
+            <div className="columns is-mobile">
+              <div className="column has-text-centered">
+                <button className="button is-info is-large">Speak</button>
+              </div>
+              <div className="column has-text-centered">
+                <button className="button is-info is-light is-large" onClick={this.handleCancelClick}>Cancel</button>
+              </div>
             </div>
-            <div className="right">
-              <button onClick={this.handleCancelClick}>Cancel</button>
-            </div>
-            <div className="clear"></div>
           </div>
+
         </form>
       </div>
     );

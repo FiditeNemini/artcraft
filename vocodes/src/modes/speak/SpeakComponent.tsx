@@ -1,7 +1,6 @@
 import React from 'react';
 import { Form } from './Form';
-import { Speaker } from '../../model/Speakers';
-import { SpeakerDropdown } from './SpeakerDropdown';
+import { Speaker, SPEAKERS } from '../../model/Speakers';
 import { SpeakerInfo } from './extras/SpeakerInfo';
 import { Spectrogram } from './extras/Spectrogram';
 import { SpectrogramComponent } from './extras/SpectrogramComponent';
@@ -135,6 +134,11 @@ class SpeakComponent extends React.Component<Props, State> {
     }
   }
 
+  changeSpeaker = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    let slug = event.target.value;
+    this.props.changeSpeakerCallback(slug);
+  }
+
   public render() {
     let speakerPictureOrSpectrogram;
     switch (this.props.extrasMode) {
@@ -163,18 +167,36 @@ class SpeakComponent extends React.Component<Props, State> {
       }
 
       switchButton = <button 
-        className="mode_button"
+        className="button is-light is-info"
         onClick={this.toggleMode}>{modeText}</button>
     }
 
-    return (
-      <div>
-        <SpeakerDropdown 
-          currentSpeaker={this.props.currentSpeaker} 
-          changeSpeakerCallback={this.props.changeSpeakerCallback} 
-          />
+    let speakerOptions : any[] = [];
 
-        {switchButton}
+    SPEAKERS.forEach(speaker => {
+      let slug = speaker.getSlug();
+      speakerOptions.push(<option key={slug} value={speaker.getSlug()}>{speaker.getName()}</option>);
+    });
+
+    return (
+      <section>
+
+        <div className="columns is-mobile">
+          <div className="column is-three-quarters">
+            <div className="control is-expanded">
+            <div className="select is-fullwidth">
+              <select onChange={this.changeSpeaker}>
+                {speakerOptions.map(option => {
+                  return option;
+                })}
+              </select>
+            </div>
+            </div>
+          </div>
+          <div className="column">
+            {switchButton}
+          </div>
+        </div>
 
         <div>
           {speakerPictureOrSpectrogram}
@@ -200,7 +222,7 @@ class SpeakComponent extends React.Component<Props, State> {
           appendUtteranceCallback={this.props.appendUtteranceCallback}
           setTextCallback={this.props.setTextCallback}
           />
-      </div>
+      </section>
     );
   }
 }

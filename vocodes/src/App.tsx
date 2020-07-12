@@ -1,4 +1,6 @@
+import 'bulma/css/bulma.css'
 import './App.scss';
+
 import React from 'react';
 import { AboutComponent } from './modes/about/AboutComponent';
 import { ExtrasMode } from './modes/speak/SpeakComponent';
@@ -143,7 +145,10 @@ class App extends React.Component<Props, State> {
           />;
         break;
       case Mode.HISTORY_MODE:
-        component = <HistoryComponent utterances={this.state.utterances} />
+        component = <HistoryComponent 
+          utterances={this.state.utterances} 
+          resetModeCallback={this.resetMode}
+          />
         break;
       case Mode.ABOUT_MODE:
         component = <AboutComponent resetModeCallback={this.resetMode} />;
@@ -153,7 +158,7 @@ class App extends React.Component<Props, State> {
         break;
     }
     return (
-      <div id="main">
+      <div id="main" className="mainwrap">
         <div id="viewable">
           <TopNav mode={this.state.mode} switchModeCallback={this.switchMode} />
           {component}

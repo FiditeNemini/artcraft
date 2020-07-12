@@ -19,12 +19,14 @@ class SpeakerInfo extends React.Component<Props, State> {
   public render() {
     if (this.props.currentSpeaker.hasFull()) {
       let source = `/full/${this.props.currentSpeaker.fullUrl!}`;
-      return (
-        <div className="speaker_info_component">
+        {/*<div className="speaker_info_component">
           <div className="full_image">
-            <img src={source} alt="speaker"></img>
           </div>
-        </div>
+        </div>*/}
+      return (
+        <figure className="image is-4by3">
+          <img src={source} alt="speaker"></img>
+        </figure>
       )
     }
     return (

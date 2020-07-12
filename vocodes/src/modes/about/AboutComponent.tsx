@@ -6,9 +6,60 @@ interface Props {
 
 function AboutComponent(props: Props) {
   return (
-    <div id="usage">
-      <h1> Updates </h1>
-      <h2>
+    <div id="usage" className="content is-4">
+      <h1 className="title is-4"> What is this? </h1>
+
+      <p>
+        This is Brandon's this pandemic side project. When he's not 
+        <a href="https://www.youtube.com/watch?v=x034jVB1avs" target="_blank">building games to play on 
+        the side of skyscrapers</a>, or working on his one-man film studio side hustle, he's doing 
+        crazy stuff like this.
+      </p>
+
+      <p>
+        Your brain was already capable of imagining things spoken in other people's voices. This is 
+        a demonstration of how far computers have caught up to that. Can you imagine the day computers
+        are able to bring all of the rich and vivid imagery you're capable of thinking to life? 
+      </p>
+
+      {/*<h1 className="title is-4"> Hello VC</h1>
+
+      <p>
+        You can get in touch with Brandon via Twitter (@echelon) or Gmail (echelon@).
+        He'll accept $3M at $30M (OBO), standard pro rata rights and no board seat. This isn't the 
+        problem he's solving; rather, he's making several quadratic human processes linear and automated, 
+        Uber-ing a vast industry that isn't ready for change. This makes a lot of people very happy, 
+        and a few people rather upset. The world isn't the same anymore.
+      </p>
+        
+      <p>
+        If $3M is too much, I'll throw in Vocodes.com (again, unrelated to my product). I won't just 
+        accept this from anyone. Only qualified mentors that want a three comma exit in an exciting
+        new market. Get in touch and I'll send you my pitch.
+      </p>*/}
+
+      <h1 className="title is-4"> Updates </h1>
+      <h2 className="subtitle is-5">
+        July 12, 2020: HTML rewrite.
+      </h2>
+
+      <p>
+        I can do HTML, CSS, and responsive design. I just don't have the time to roll my own with all
+        other (more important) work that must be done, so I ported to Bulma instead.
+      </p>
+
+      <h2 className="subtitle is-5">
+        July 10, 2020: Social media + new models.
+      </h2>
+
+      <p>
+        I'm going to be setting aside some time to promote the site. Once I get it running, I'll see
+        if I can outsource so that I can focus on product development.
+      </p>
+
+      <p>Also, David Attenborough and Richard Nixon join the party.</p>
+
+      <h2 className="subtitle is-5">
         July 4, 2020: Website improvements.
       </h2>
 
@@ -19,7 +70,7 @@ function AboutComponent(props: Props) {
         a priority.
       </p>
 
-      <h2>
+      <h2 className="subtitle is-5">
         June 14, 2020: New website.
       </h2>
 
@@ -27,7 +78,7 @@ function AboutComponent(props: Props) {
         I'm creating models for a variety of speakers.
       </p>
 
-      <h2>
+      <h2 className="subtitle is-5">
         June 7, 2020: Website rewrite.
       </h2>
 
@@ -38,7 +89,7 @@ function AboutComponent(props: Props) {
         ability to download audio files and replay them.
       </p>
 
-      <h2>
+      <h2 className="subtitle is-5">
         June 4, 2020: There's a new model.
       </h2>
 
@@ -49,14 +100,16 @@ function AboutComponent(props: Props) {
         immediately. I'll make it sound better soon. So many things in the pipeline...
       </p>
 
-      <h2>May 30, 2020: Intermittent failure.</h2> 
+      <h2 className="subtitle is-5">
+        May 30, 2020: Intermittent failure.
+      </h2> 
 
       <p>
         There's now another issue with how models are distributed to the workers. I have 
         a solution in the works and expect it to be in place before morning tomorrow.
       </p>
 
-      <h2>
+      <h2 className="subtitle is-5">
         May 25, 2020: I'm actively working on development.
       </h2>
 
@@ -73,10 +126,11 @@ function AboutComponent(props: Props) {
         cache results.
       </p>
 
+      <h1 className="title is-4">Usage Recommendations</h1>
 
-      <h1>Usage Recommendations</h1>
-
-      <h2>Short sentences are bad</h2>
+      <h2 className="subtitle is-5">
+        Short sentences are bad
+      </h2>
 
       <p>
         Don't say things like "hello" or "hi". They're too short for the current 
@@ -84,20 +138,22 @@ function AboutComponent(props: Props) {
         is low on the list of priorities.
       </p>
 
-      <h2>Try and try again</h2>
+      <h2 className="subtitle is-5">
+        Try and try again
+      </h2>
 
       <p>
         If you're unhappy with how the results sound, try changing the words a litle. 
         Experiment. Try adding punctuation, such as periods and question marks.
       </p>
 
-      <h2>Use real words</h2>
+      <h2 className="subtitle">Use real words</h2>
 
       <p>
         "Asdfagdadf" is not a word, and Trump won't know how to say it. 
       </p>
 
-      <h2>Sound out difficult words</h2>
+      <h2 className="subtitle">Sound out difficult words</h2>
       
       <p>
         If the words you want to use aren't working, that's likely because I trained the 
@@ -116,52 +172,9 @@ function AboutComponent(props: Props) {
         I'll fix this issue as soon as I can, because I know how important this is to you.
       </p>
 
-      <h2>Example sentences</h2>
+      <h1 className="title is-4">Contact</h1>
 
-      <p>Try getting Trump to say the following:</p>
-
-      <ul>
-        <li>Why does it always rain on Christmas? It's so depressing.</li>
-        <li>I really appreciate how good of a friend you are.</li>
-        <li>You're clearly not trying hard enough. What's up with you?</li>
-        <li>The Dinosaurs were the dominant land animals of the Mesozoic era. 
-          Over 500 different genera of dinosaurs are known. Fossils of dinosaurs 
-          have been found on every continent, and there are still frequent 
-          new discoveries.</li>
-        <li>Dinosaurs had adaptations which helped make them successful. 
-          The first known dinosaurs were small predators that walked on two legs. 
-          All their descendants had an upright posture, with the legs underneath 
-          the body. This transformed their whole lifestyle.</li>
-        <li>Are you really reading this far? Good for you.</li>
-      </ul>
-
-      <h1>Help Wanted</h1>
-
-      <h2>Training Data</h2>
-      <p>
-        Are you currently creating TTS models? I'd be happy to pay to license
-        your annotated audio samples. Tell me what voices you have, the sample 
-        rate, how noisy the data is, and a little about your annotation process.
-      </p>
-
-      <h2>3D Modeller</h2>
-      <p>
-        I'm looking for a 3D artist or animator to make custom models and 
-        animations for various characters (speaking, walking, articulating).
-        Environment, terrain, and world building skills are a huge plus.
-        I could rip models from VR Chat and make an attempt myself, but I'm 
-        quite busy with working on the speech engine.
-      </p>
-
-      <p>
-        This is a paid position. It isn't necessarily for this project.
-      </p>
-
-      <h2>Contact</h2>
-
-      <p>Send me a message on Twitter or Gmail (same handle).</p>
-
-      <button onClick={() => props.resetModeCallback()}>Go Back</button>
+      <button className="button is-link is-medium" onClick={() => props.resetModeCallback()}>Go Back</button>
     </div>
   )
 }
