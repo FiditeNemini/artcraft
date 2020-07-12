@@ -181,16 +181,16 @@ class SpeakComponent extends React.Component<Props, State> {
     return (
       <section>
 
-        <div className="columns is-mobile">
-          <div className="column is-three-quarters">
+        <div className="columns is-mobile is-gapless">
+          <div className="column is-two-thirds">
             <div className="control is-expanded">
-            <div className="select is-fullwidth">
-              <select onChange={this.changeSpeaker}>
-                {speakerOptions.map(option => {
-                  return option;
-                })}
-              </select>
-            </div>
+              <div className="select is-fullwidth">
+                <select onChange={this.changeSpeaker}>
+                  {speakerOptions.map(option => {
+                    return option;
+                  })}
+                </select>
+              </div>
             </div>
           </div>
           <div className="column">
