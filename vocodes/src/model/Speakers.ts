@@ -70,6 +70,13 @@ const SPEAKERS : Speaker[] = [
     fullUrl: "bill-gates-full.png",
   }),
   Speaker.fromJson({
+    name: "Bill Nye",
+    slug: "bill-nye",
+    description: "The Science Guy.",
+    avatarUrl: "bill-nye.jpg",
+    fullUrl: "bill-nye-full.png",
+  }),
+  Speaker.fromJson({
     name: "Christopher Lee",
     slug: "christopher-lee",
     description: "An actor well known for playing Count Dooku and Saruman.",
