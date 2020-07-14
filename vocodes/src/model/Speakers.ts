@@ -63,7 +63,7 @@ const SPEAKERS : Speaker[] = [
     fullUrl: "betty-white-full.png",
   }),
   Speaker.fromJson({
-    name: "Bill Gates",
+    name: "Bill Gates (needs work)",
     slug: "bill-gates",
     description: "Microsoft.",
     avatarUrl: "bill-gates.jpg",
@@ -105,7 +105,7 @@ const SPEAKERS : Speaker[] = [
     fullUrl: "john-oliver-full.png",
   }),
   Speaker.fromJson({
-    name: "Mark Zuckerberg",
+    name: "Mark Zuckerberg (needs work)",
     slug: "mark-zuckerberg",
     description: "Facebook.",
     avatarUrl: "mark-zuckerberg.jpg",
@@ -154,7 +154,7 @@ const SPEAKERS : Speaker[] = [
     fullUrl: "donald-trump-full.png",
   }),
   Speaker.fromJson({
-    name: "[needs more training] Arnold Schwarzenegger",
+    name: "[outdated architecture] Arnold Schwarzenegger",
     slug: "arnold-schwarzenegger",
     description: "Terminator.",
     avatarUrl: "arnold-schwarzenegger.jpg",
