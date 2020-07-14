@@ -126,6 +126,13 @@ const SPEAKERS : Speaker[] = [
     fullUrl: "richard-nixon-full.png",
   }),
   Speaker.fromJson({
+    name: "President #39 Jimmy Carter",
+    slug: "jimmy-carter",
+    description: "The 39th President of the United States.",
+    avatarUrl: "jimmy-carter.jpg",
+    fullUrl: "jimmy-carter-full.png",
+  }),
+  Speaker.fromJson({
     name: "President #40 Ronald Reagan",
     slug: "ronald-reagan",
     description: "The 40th President of the United States.",
