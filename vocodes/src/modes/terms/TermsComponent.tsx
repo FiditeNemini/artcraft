@@ -50,7 +50,7 @@ function TermsComponent(props: Props) {
         <p>I'm very busy between work and my startup, so please give me time.</p>
 
         <p><sup>&dagger;</sup> Anyone can download Tacotron from Github to produce the same
-        results on their own. Trumped.com is not connected with your activities.</p>
+        results on their own. Vocodes.com / Trumped.com is not connected with your activities.</p>
         
       <button onClick={() => props.resetModeCallback()}>Go Back</button>
     </div>
