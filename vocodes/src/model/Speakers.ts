@@ -168,6 +168,13 @@ const SPEAKERS : Speaker[] = [
     fullUrl: "donald-trump-full.png",
   }),
   Speaker.fromJson({
+    name: "Tupac Shakur",
+    slug: "tupac-shakur",
+    description: "Musician.",
+    avatarUrl: "tupac-shakur.jpg",
+    fullUrl: "tupac-shakur-full.png",
+  }),
+  Speaker.fromJson({
     name: "[outdated architecture] Arnold Schwarzenegger",
     slug: "arnold-schwarzenegger",
     description: "Terminator.",
