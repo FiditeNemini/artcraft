@@ -168,7 +168,7 @@ const SPEAKERS : Speaker[] = [
     fullUrl: "donald-trump-full.png",
   }),
   Speaker.fromJson({
-    name: "Tupac Shakur",
+    name: "Tupac Shakur (acapella lyrics)",
     slug: "tupac-shakur",
     description: "Musician.",
     avatarUrl: "tupac-shakur.jpg",
