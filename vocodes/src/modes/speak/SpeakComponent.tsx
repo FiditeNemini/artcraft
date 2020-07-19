@@ -207,22 +207,22 @@ class SpeakComponent extends React.Component<Props, State> {
             <div className="control is-expanded">
               <div className="select is-fullwidth">
                 <select onChange={this.changeSpeaker}>
-                  <optgroup label="Highest Quality Voices">
+                  <optgroup label="&mdash; Highest Quality Voices &mdash;">
                     {bestSpeakerOptions.map(option => {
                       return option;
                     })}
                   </optgroup>
-                  <optgroup label="Decent Quality Voices">
+                  <optgroup label="&mdash; Decent Quality Voices &mdash;">
                     {goodSpeakerOptions.map(option => {
                       return option;
                     })}
                   </optgroup>
-                  <optgroup label="Poor Quality Voices (need retraining)">
+                  <optgroup label="&mdash; Poor Quality Voices (need cleanup) &mdash;">
                     {badSpeakerOptions.map(option => {
                       return option;
                     })}
                   </optgroup>
-                  <optgroup label="Terrible Quality Voices (ugh, really need work)">
+                  <optgroup label="&mdash; Terrible Quality Voices (need rework) &mdash;">
                     {terribleSpeakerOptions.map(option => {
                       return option;
                     })}
