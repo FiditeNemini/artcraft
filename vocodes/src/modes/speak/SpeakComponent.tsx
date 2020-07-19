@@ -171,11 +171,32 @@ class SpeakComponent extends React.Component<Props, State> {
         onClick={this.toggleMode}>{modeText}</button>
     }
 
-    let speakerOptions : any[] = [];
+    let bestSpeakerOptions : any[] = [];
+    let goodSpeakerOptions : any[] = [];
+    let badSpeakerOptions : any[] = [];
+    let terribleSpeakerOptions : any[] = [];
 
     SPEAKERS.forEach(speaker => {
-      let slug = speaker.getSlug();
-      speakerOptions.push(<option key={slug} value={speaker.getSlug()}>{speaker.getName()}</option>);
+      const quality = speaker.getVoiceQuality();
+      const slug = speaker.getSlug();
+      let selected = undefined;
+      if (this.props.currentSpeaker.slug === speaker.slug) {
+        selected = true;
+      }
+      const option = <option 
+        key={slug} 
+        value={speaker.getSlug()} 
+        selected={selected}>{speaker.getName()}</option>;
+
+      if (quality >= 7.5) {
+        bestSpeakerOptions.push(option);
+      } else if (quality >= 5.9) {
+        goodSpeakerOptions.push(option);
+      } else if (quality >= 4.5) {
+        badSpeakerOptions.push(option);
+      } else {
+        terribleSpeakerOptions.push(option);
+      }
     });
 
     return (
@@ -186,13 +207,31 @@ class SpeakComponent extends React.Component<Props, State> {
             <div className="control is-expanded">
               <div className="select is-fullwidth">
                 <select onChange={this.changeSpeaker}>
-                  {speakerOptions.map(option => {
-                    return option;
-                  })}
+                  <optgroup label="Highest Quality Voices">
+                    {bestSpeakerOptions.map(option => {
+                      return option;
+                    })}
+                  </optgroup>
+                  <optgroup label="Decent Quality Voices">
+                    {goodSpeakerOptions.map(option => {
+                      return option;
+                    })}
+                  </optgroup>
+                  <optgroup label="Poor Quality Voices (need retraining)">
+                    {badSpeakerOptions.map(option => {
+                      return option;
+                    })}
+                  </optgroup>
+                  <optgroup label="Terrible Quality Voices (ugh, really need work)">
+                    {terribleSpeakerOptions.map(option => {
+                      return option;
+                    })}
+                  </optgroup>
                 </select>
               </div>
             </div>
           </div>
+
           <div className="column">
             {switchButton}
           </div>

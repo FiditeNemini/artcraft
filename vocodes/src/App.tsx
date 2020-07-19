@@ -55,10 +55,13 @@ class App extends React.Component<Props, State> {
 
   constructor(props: Props) {
     super(props);
+
+    let defaultSpeaker : Speaker = SPEAKERS.find(speaker => speaker.isDefaultVoice())!;
+
     this.state = {
       mode: Mode.SPEAK_MODE,
       extrasMode: ExtrasMode.SPEAKER_INFO,
-      speaker: SPEAKERS[0],
+      speaker: defaultSpeaker,
       spectrogramMode: SpectrogramMode.VIRIDIS,
       utterances: [],
       currentText: '',
