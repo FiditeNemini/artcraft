@@ -22,7 +22,6 @@ class PastUtterance extends React.Component<Props, State> {
   }
 
   public render() {
-    let url = `data:audio/wav;base64,${this.props.utterance.base64data}`;
     let number = this.props.utterance.id + 1;
     let filename = `vocodes_${this.props.utterance.speaker.slug}_${number}.wav`;
 
@@ -48,7 +47,9 @@ class PastUtterance extends React.Component<Props, State> {
                 <button className="button is-medium" onClick={this.play}>Play</button>
               </div>
               <div className="column">
-                <a className="button is-medium" href={url} download={filename}>Download</a>
+                <a className="button is-medium" 
+                   href={this.props.utterance.getUrl()}
+                   download={filename}>Download</a>
               </div>
             </div>
 

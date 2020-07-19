@@ -252,6 +252,7 @@ class SpeakComponent extends React.Component<Props, State> {
           clearStatusCallback={this.clearMessage}
           setHintMessage={this.setHintMessage}
           spectrogramMode={this.props.spectrogramMode}
+          enableSpectrograms={this.props.enableSpectrograms}
           onSpeakRequestCallback={this.onSpeakRequest}
           onSpeakSuccessCallback={this.onSpeakSuccess}
           onSpeakErrorCallback={this.onSpeakError}

@@ -77,7 +77,7 @@ const SPEAKERS : Speaker[] = [
     voiceQuality: 7.6,
   }),
   Speaker.fromJson({
-    name: "Bill Gates (needs work)",
+    name: "Bill Gates",
     slug: "bill-gates",
     description: "Microsoft.",
     avatarUrl: "bill-gates.jpg",

@@ -12,6 +12,7 @@ interface Props {
   currentSpeaker: Speaker,
   spectrogramMode: SpectrogramMode,
   currentText: string,
+  enableSpectrograms: boolean,
   clearStatusCallback: () => void,
   setHintMessage: (message: string) => void,
   onSpeakRequestCallback: () => void,
@@ -42,10 +43,18 @@ class Form extends React.Component<Props, State> {
 
     console.log("Making SpeakRequest:", request);
 
+    this.props.onSpeakRequestCallback();
+
+    if (this.props.enableSpectrograms) {
+      this.speakWithSpectrogram(sentence, speaker, request);
+    } else {
+      this.speakWithoutSpectrogram(sentence, speaker, request);
+    }
+  }
+
+  speakWithSpectrogram(sentence: string, speaker: Speaker, request: SpeakRequest) {
     //const url = this.props.apiConfig.getEndpoint('/speak_spectrogram');
     const url = 'https://mumble.stream/speak_spectrogram';
-
-    this.props.onSpeakRequestCallback();
 
     fetch(url, {
       method: 'POST',
@@ -112,7 +121,47 @@ class Form extends React.Component<Props, State> {
 
       sound.play();
 
-      const utterance = new Utterance(sentence, speaker, sound, res.audio_base64);
+      const utterance = new Utterance(sentence, speaker, sound, res.audio_base64, undefined);
+      this.props.appendUtteranceCallback(utterance);
+
+      (window as any).sound = sound;
+    })
+    .catch(e => {
+      this.props.onSpeakErrorCallback();
+    });
+  }
+
+  speakWithoutSpectrogram(sentence: string, speaker: Speaker, request: SpeakRequest) {
+    //const url = this.props.apiConfig.getEndpoint('/speak_spectrogram');
+    const url = 'https://mumble.stream/speak';
+
+    fetch(url, {
+      method: 'POST',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(request),
+    })
+    .then(res => res.blob())
+    .then(blob => {
+      const audioUrl = window.URL.createObjectURL(blob);
+      //console.log(url);
+
+      const sound = new Howl.Howl({
+        src: [audioUrl],
+        format: 'wav',
+        // NB: Attempting to get this working on iPhone Safari
+        // https://github.com/goldfire/howler.js/issues/1093
+        // Other issues cite needing to cache a single player 
+        // across all user interaction events.
+        html5: true,
+      });
+      
+      this.setState({howl: sound});
+      sound.play();
+
+      const utterance = new Utterance(sentence, speaker, sound, undefined, audioUrl);
       this.props.appendUtteranceCallback(utterance);
 
       (window as any).sound = sound;
