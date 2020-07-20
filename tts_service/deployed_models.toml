@@ -1,4 +1,90 @@
 [[speakers]]
+name = "Craig Ferguson"
+slug = "craig-ferguson"
+model_pipeline = "ArpabetGlowTtsMelgan"
+glow_tts = "glow-tts_craig_ferguson_ljstx_2020.07.13_expr-1_chkpt-7680.torchjit"
+melgan = "melgan_manyvoice3.0_2020-07-17_12d5838_10090.torchjit"
+
+[[speakers]]
+name = "Bryan Cranston"
+slug = "bryan-cranston"
+model_pipeline = "ArpabetGlowTtsMelgan"
+glow_tts = "glow-tts_bryan_cranston_ljstx_2020.07.13_expr-1_chkpt-7795.torchjit"
+melgan = "melgan_manyvoice3.0_2020-07-17_12d5838_10090.torchjit"
+
+[[speakers]]
+name = "Neil deGrasse Tyson"
+slug = "neil-degrasse-tyson"
+model_pipeline = "ArpabetGlowTtsMelgan"
+glow_tts = "glow-tts_neil_degrasse_tyson_ljstx_2020.07.05_expr-1_chkpt-2482.torchjit"
+melgan = "melgan_manyvoice3.0_2020-07-17_12d5838_10090.torchjit"
+
+[[speakers]]
+name = "Hillary Clinton"
+slug = "hillary-clinton"
+model_pipeline = "ArpabetGlowTtsMelgan"
+glow_tts = "glow-tts_hillary_clinton_ljstx_2020.07.15_expr-2_chkpt-7250.torchjit"
+melgan = "melgan_manyvoice3.0_2020-07-17_12d5838_10090.torchjit"
+
+[[speakers]]
+name = "James Earl Jones"
+slug = "james-earl-jones"
+model_pipeline = "ArpabetGlowTtsMelgan"
+glow_tts = "glow-tts_james_earl_jones_ljstx_2020.07.07_expr-1_chkpt-2573.torchjit"
+melgan = "melgan_manyvoice3.0_2020-07-17_12d5838_10090.torchjit"
+
+[[speakers]]
+name = "Arnold Schwarzenegger"
+slug = "arnold-schwarzenegger"
+model_pipeline = "ArpabetGlowTtsMelgan"
+glow_tts = "glow-tts_arnold_schwarzenegger_ljstx_2020.07.16_expr-2_chkpt-9045.torchjit"
+melgan = "melgan_manyvoice3.0_2020-07-17_12d5838_10090.torchjit"
+
+[[speakers]]
+name = "David Cross"
+slug = "david-cross"
+model_pipeline = "ArpabetGlowTtsMelgan"
+glow_tts = "glow-tts_david_cross_ljstx_2020.07.13_expr-1_chkpt-9462.torchjit"
+melgan = "melgan_manyvoice3.0_2020-07-17_12d5838_10090.torchjit"
+
+[[speakers]]
+name = "George Takei"
+slug = "george-takei"
+model_pipeline = "ArpabetGlowTtsMelgan"
+glow_tts = "glow-tts_george_takei_ljstx_2020.07.08_expr-1_chkpt-4060.torchjit"
+melgan = "melgan_manyvoice3.0_2020-07-17_12d5838_10090.torchjit"
+
+[[speakers]]
+name = "Judi Dench"
+slug = "judi-dench"
+model_pipeline = "ArpabetGlowTtsMelgan"
+glow_tts = "glow-tts_judi_dench_ljstx_2020.07.08_expr-1_chkpt-4693.torchjit"
+melgan = "melgan_manyvoice3.0_2020-07-17_12d5838_10090.torchjit"
+
+[[speakers]]
+name = "George W. Bush"
+slug = "george-w-bush"
+model_pipeline = "ArpabetGlowTtsMelgan"
+glow_tts = "glow-tts_george_w_bush_ljstx_2020.06.26_expr-1_chkpt-1735.torchjit"
+melgan = "melgan_manyvoice3.0_2020-07-17_12d5838_10090.torchjit"
+
+# ---
+
+[[speakers]]
+name = "Bill Nye"
+slug = "bill-nye"
+model_pipeline = "ArpabetGlowTtsMelgan"
+glow_tts = "glow-tts_bill_nye_ljstx_2020.07.07_expr-1_chkpt-2510.torchjit"
+melgan = "melgan_manyvoice2.0_2020-07-08_12d5838_9330.torchjit"
+
+[[speakers]]
+name = "Jimmy Carter"
+slug = "jimmy-carter"
+model_pipeline = "ArpabetGlowTtsMelgan"
+glow_tts = "glow-tts_jimmy_carter_ljstx_2020.07.05_expr-1_chkpt-2391.torchjit"
+melgan = "melgan_manyvoice2.0_2020-07-08_12d5838_9330.torchjit"
+
+[[speakers]]
 name = "Richard Nixon"
 slug = "richard-nixon"
 model_pipeline = "ArpabetGlowTtsMelgan"
@@ -110,13 +196,11 @@ melgan = "melgan_manyvoice1.0_2020-06-28_12d5838_7050.torchjit"
 sample_rate_hz = 21000 # This is lower than normal
 
 [[speakers]]
-name = "Arnold Schwarzenegger (Multi-speaker model)"
-slug = "arnold-schwarzenegger"
-model_pipeline = "ArpabetGlowTtsMultiSpeakerMelgan"
-glow_tts_multi_speaker = "glow_tts_multispeaker_8-speaker_256-gin_ljs_txlearn_2020.06.19_experiment-5_chkpt-7466.torchjit"
-speaker_id = 3
-melgan = "melgan_vocodes1.0_multispeaker_2020.06.19_12d5838_experiment-2_chkpt-10400.torchjit" # Bespoke
-sample_rate_hz = 21000 # This is lower than normal
+name = "Tupac Shakur"
+slug = "tupac-shakur"
+model_pipeline = "ArpabetGlowTtsMelgan"
+glow_tts = "glow-tts_tupac_shakur_ljstx_2020.07.16_expr-2_chkpt-6341.torchjit"
+melgan = "melgan_manyvoice3.0_2020-07-17_12d5838_9920.torchjit"
 
 # --------------- Model configs ---------------
 
