@@ -60,91 +60,6 @@ class Speaker {
 }
 
 const SPEAKERS : Speaker[] = [
-
-  Speaker.fromJson({
-    name: "Craig Ferguson",
-    slug: "craig-ferguson",
-    description: "Night show host.",
-    avatarUrl: "craig-ferguson.jpg",
-    fullUrl: "craig-ferguson-full.png",
-    voiceQuality: 7.9,
-  }),
-
-  Speaker.fromJson({
-    name: "Bryan Cranston",
-    slug: "bryan-cranston",
-    description: "Actor.",
-    avatarUrl: "bryan-cranston.jpg",
-    fullUrl: "bryan-cranston-full.png",
-    voiceQuality: 7.1,
-  }),
-
-
-  Speaker.fromJson({
-    name: "Neil deGrasse Tyson",
-    slug: "neil-degrasse-tyson",
-    description: "Total badass",
-    avatarUrl: "neil-degrasse-tyson.jpg",
-    fullUrl: "neil-degrasse-tyson-full.png",
-    voiceQuality: 6.4,
-  }),
-
-
-  Speaker.fromJson({
-    name: "Hillary Clinton",
-    slug: "hillary-clinton",
-    description: "Politics.",
-    avatarUrl: "hillary-clinton.jpg",
-    fullUrl: "hillary-clinton-full.png",
-    voiceQuality: 5.5,
-  }),
-
-  Speaker.fromJson({
-    name: "James Earl Jones",
-    slug: "james-earl-jones",
-    description: "Actor and voice actor.",
-    avatarUrl: "darth-vader.jpg",
-    fullUrl: "james-earl-jones-full.png",
-    voiceQuality: 5.5,
-  }),
-
-
-  Speaker.fromJson({
-    name: "David Cross",
-    slug: "david-cross",
-    description: "Actor.",
-    avatarUrl: "david-cross.jpg",
-    fullUrl: "david-cross-full.png",
-    voiceQuality: 5.8,
-  }),
-
-  Speaker.fromJson({
-    name: "George Takei",
-    slug: "george-takei",
-    description: "Actor.",
-    avatarUrl: "george-takei.jpg",
-    fullUrl: "george-takei-full.png",
-    voiceQuality: 0.0,
-  }),
-
-  Speaker.fromJson({
-    name: "Judi Dench",
-    slug: "judi-dench",
-    description: "Actress",
-    avatarUrl: "judi-dench.jpg",
-    fullUrl: "judi-dench-full.png",
-    voiceQuality: 6.3,
-  }),
-
-  Speaker.fromJson({
-    name: "President #43 George W. Bush",
-    slug: "george-w-bush",
-    description: "President",
-    avatarUrl: "george-w-bush.jpg",
-    fullUrl: "george-w-bush-full.png",
-    voiceQuality: 7.4,
-  }),
-
   Speaker.fromJson({
     name: "Arnold Schwarzenegger",
     slug: "arnold-schwarzenegger",
@@ -178,6 +93,14 @@ const SPEAKERS : Speaker[] = [
     voiceQuality: 6.7,
   }),
   Speaker.fromJson({
+    name: "Bryan Cranston",
+    slug: "bryan-cranston",
+    description: "Actor.",
+    avatarUrl: "bryan-cranston.jpg",
+    fullUrl: "bryan-cranston-full.png",
+    voiceQuality: 7.1,
+  }),
+  Speaker.fromJson({
     name: "Christopher Lee",
     slug: "christopher-lee",
     description: "An actor well known for playing Count Dooku and Saruman.",
@@ -186,12 +109,29 @@ const SPEAKERS : Speaker[] = [
     voiceQuality: 6.5,
   }),
   Speaker.fromJson({
+    name: "Craig Ferguson",
+    slug: "craig-ferguson",
+    description: "Night show host.",
+    avatarUrl: "craig-ferguson.jpg",
+    fullUrl: "craig-ferguson-full.png",
+    voiceQuality: 7.9,
+  }),
+
+  Speaker.fromJson({
     name: "Danny Devito",
     slug: "danny-devito",
     description: "Always delightful.",
     avatarUrl: "danny-devito.jpg",
     fullUrl: "danny-devito-full.png",
     voiceQuality: 6.9,
+  }),
+  Speaker.fromJson({
+    name: "David Cross",
+    slug: "david-cross",
+    description: "Actor.",
+    avatarUrl: "david-cross.jpg",
+    fullUrl: "david-cross-full.png",
+    voiceQuality: 5.8,
   }),
   Speaker.fromJson({
     name: "Dr. Phil McGraw",
@@ -202,6 +142,14 @@ const SPEAKERS : Speaker[] = [
     voiceQuality: 6.1,
   }),
   Speaker.fromJson({
+    name: "George Takei",
+    slug: "george-takei",
+    description: "Actor.",
+    avatarUrl: "george-takei.jpg",
+    fullUrl: "george-takei-full.png",
+    voiceQuality: 0.0,
+  }),
+  Speaker.fromJson({
     name: "Gilbert Gottfried",
     slug: "gilbert-gottfried",
     description: "Voice actor and comedian.",
@@ -210,12 +158,36 @@ const SPEAKERS : Speaker[] = [
     voiceQuality: 6.2,
   }),
   Speaker.fromJson({
+    name: "Hillary Clinton",
+    slug: "hillary-clinton",
+    description: "Politics.",
+    avatarUrl: "hillary-clinton.jpg",
+    fullUrl: "hillary-clinton-full.png",
+    voiceQuality: 5.5,
+  }),
+  Speaker.fromJson({
+    name: "James Earl Jones",
+    slug: "james-earl-jones",
+    description: "Actor and voice actor.",
+    avatarUrl: "darth-vader.jpg",
+    fullUrl: "james-earl-jones-full.png",
+    voiceQuality: 5.5,
+  }),
+  Speaker.fromJson({
     name: "John Oliver",
     slug: "john-oliver",
     description: "TV news.",
     avatarUrl: "john-oliver.jpg",
     fullUrl: "john-oliver-full.png",
     voiceQuality: 5.2,
+  }),
+  Speaker.fromJson({
+    name: "Judi Dench",
+    slug: "judi-dench",
+    description: "Actress",
+    avatarUrl: "judi-dench.jpg",
+    fullUrl: "judi-dench-full.png",
+    voiceQuality: 6.3,
   }),
   Speaker.fromJson({
     name: "Mark Zuckerberg",
@@ -232,6 +204,14 @@ const SPEAKERS : Speaker[] = [
     avatarUrl: "fred-rogers.jpg",
     fullUrl: "fred-rogers-full.png",
     voiceQuality: 4.9,
+  }),
+  Speaker.fromJson({
+    name: "Neil deGrasse Tyson",
+    slug: "neil-degrasse-tyson",
+    description: "Total badass",
+    avatarUrl: "neil-degrasse-tyson.jpg",
+    fullUrl: "neil-degrasse-tyson-full.png",
+    voiceQuality: 6.4,
   }),
   Speaker.fromJson({
     name: "President #37 Richard Nixon",
@@ -264,6 +244,14 @@ const SPEAKERS : Speaker[] = [
     avatarUrl: "bill-clinton.jpg",
     fullUrl: "bill-clinton-full.png",
     voiceQuality: 6.5,
+  }),
+  Speaker.fromJson({
+    name: "President #43 George W. Bush",
+    slug: "george-w-bush",
+    description: "The 43th President of the United States.",
+    avatarUrl: "george-w-bush.jpg",
+    fullUrl: "george-w-bush-full.png",
+    voiceQuality: 7.4,
   }),
   Speaker.fromJson({
     name: "President #44 Barack Obama",
