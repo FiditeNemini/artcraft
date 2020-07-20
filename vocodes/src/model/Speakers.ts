@@ -74,7 +74,7 @@ const SPEAKERS : Speaker[] = [
     description: "Actress.",
     avatarUrl: "betty-white.jpg",
     fullUrl: "betty-white-full.png",
-    voiceQuality: 7.6,
+    voiceQuality: 7.3,
   }),
   Speaker.fromJson({
     name: "Bill Gates",

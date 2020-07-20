@@ -25,6 +25,10 @@ function AboutComponent(props: Props) {
       {/*<h1 className="title is-4"> Hello VC</h1>
 
       <p>
+        Please buy this stupid app so Brandon has the capital to work on something world-changing.
+      </p>
+
+      <p>
         You can get in touch with Brandon via Twitter (@echelon) or Gmail (echelon@).
         He'll accept $3M at $30M (OBO), standard pro rata rights and no board seat. This isn't the 
         problem he's solving; rather, he's making several quadratic human processes linear and automated, 
