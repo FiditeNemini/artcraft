@@ -60,6 +60,91 @@ class Speaker {
 }
 
 const SPEAKERS : Speaker[] = [
+
+  Speaker.fromJson({
+    name: "Craig Ferguson",
+    slug: "craig-ferguson",
+    description: "Night show host.",
+    avatarUrl: "craig-ferguson.jpg",
+    fullUrl: "craig-ferguson-full.png",
+    voiceQuality: 7.9,
+  }),
+
+  Speaker.fromJson({
+    name: "Bryan Cranston",
+    slug: "bryan-cranston",
+    description: "Actor.",
+    avatarUrl: "bryan-cranston.jpg",
+    fullUrl: "bryan-cranston-full.png",
+    voiceQuality: 7.1,
+  }),
+
+
+  Speaker.fromJson({
+    name: "Neil deGrasse Tyson",
+    slug: "neil-degrasse-tyson",
+    description: "Total badass",
+    avatarUrl: "neil-degrasse-tyson.jpg",
+    fullUrl: "neil-degrasse-tyson-full.png",
+    voiceQuality: 6.4,
+  }),
+
+
+  Speaker.fromJson({
+    name: "Hillary Clinton",
+    slug: "hillary-clinton",
+    description: "Politics.",
+    avatarUrl: "hillary-clinton.jpg",
+    fullUrl: "hillary-clinton-full.png",
+    voiceQuality: 5.5,
+  }),
+
+  Speaker.fromJson({
+    name: "James Earl Jones",
+    slug: "james-earl-jones",
+    description: "Actor and voice actor.",
+    avatarUrl: "darth-vader.jpg",
+    fullUrl: "james-earl-jones-full.png",
+    voiceQuality: 5.5,
+  }),
+
+
+  Speaker.fromJson({
+    name: "David Cross",
+    slug: "david-cross",
+    description: "Actor.",
+    avatarUrl: "david-cross.jpg",
+    fullUrl: "david-cross-full.png",
+    voiceQuality: 5.8,
+  }),
+
+  Speaker.fromJson({
+    name: "George Takei",
+    slug: "george-takei",
+    description: "Actor.",
+    avatarUrl: "george-takei.jpg",
+    fullUrl: "george-takei-full.png",
+    voiceQuality: 0.0,
+  }),
+
+  Speaker.fromJson({
+    name: "Judi Dench",
+    slug: "judi-dench",
+    description: "Actress",
+    avatarUrl: "judi-dench.jpg",
+    fullUrl: "judi-dench-full.png",
+    voiceQuality: 6.3,
+  }),
+
+  Speaker.fromJson({
+    name: "President #43 George W. Bush",
+    slug: "george-w-bush",
+    description: "President",
+    avatarUrl: "george-w-bush.jpg",
+    fullUrl: "george-w-bush-full.png",
+    voiceQuality: 7.4,
+  }),
+
   Speaker.fromJson({
     name: "Arnold Schwarzenegger",
     slug: "arnold-schwarzenegger",
