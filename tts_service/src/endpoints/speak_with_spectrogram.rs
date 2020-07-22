@@ -53,27 +53,6 @@ pub async fn post_speak_with_spectrogram(request: HttpRequest,
 {
   let app_state = app_state.into_inner();
 
-  let speaker_slug = query.speaker.to_string();
-
-  let speaker = match app_state.model_configs.find_speaker_by_slug(&speaker_slug) {
-    Some(speaker) => speaker,
-    None => {
-      return Either::B(Ok(HttpResponse::build(StatusCode::NOT_FOUND)
-          .content_type("text/plain")
-          .body("Speaker not found")));
-    },
-  };
-
-  let sample_rate_hz = speaker.sample_rate_hz.unwrap_or(app_state.default_sample_rate_hz);
-
-  let text = query.text.to_string();
-
-  if text.is_empty() {
-    return Either::B(Ok(HttpResponse::build(StatusCode::BAD_REQUEST)
-        .content_type("text/plain")
-        .body("Request has empty text.")));
-  }
-
   let ip_address = match request.headers().get(HeaderName::from_static("x-voder-proxy-for")) {
     Some(ip_address) => {
       // Unfortunately the upstream Rust proxy is replacing the `forwarded` and `x-forwarded-for`
@@ -100,6 +79,34 @@ pub async fn post_speak_with_spectrogram(request: HttpRequest,
       ip_address
     },
   };
+
+  if let Err(err) = app_state.rate_limiter.acquire(&ip_address) {
+    // Couldn't acquire rate limiter
+    return Either::B(Ok(HttpResponse::build(StatusCode::TOO_MANY_REQUESTS)
+        .content_type("text/plain")
+        .body("Rate limiter not acquired. Slow down.")));
+  }
+
+  let speaker_slug = query.speaker.to_string();
+
+  let speaker = match app_state.model_configs.find_speaker_by_slug(&speaker_slug) {
+    Some(speaker) => speaker,
+    None => {
+      return Either::B(Ok(HttpResponse::build(StatusCode::NOT_FOUND)
+          .content_type("text/plain")
+          .body("Speaker not found")));
+    },
+  };
+
+  let sample_rate_hz = speaker.sample_rate_hz.unwrap_or(app_state.default_sample_rate_hz);
+
+  let text = query.text.to_string();
+
+  if text.is_empty() {
+    return Either::B(Ok(HttpResponse::build(StatusCode::BAD_REQUEST)
+        .content_type("text/plain")
+        .body("Request has empty text.")));
+  }
 
   let sentence_record = NewSentence {
     sentence: text.clone(),

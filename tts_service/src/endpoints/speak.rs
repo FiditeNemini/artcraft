@@ -66,8 +66,7 @@ pub async fn post_speak(request: HttpRequest,
     },
   };
 
-  let timeout = Duration::from_millis(10000);
-  if let Err(err) = app_state.rate_limiter.acquire_with_timeout(&ip_address, timeout) {
+  if let Err(err) = app_state.rate_limiter.acquire(&ip_address) {
     // Couldn't acquire rate limiter
     return Ok(HttpResponse::build(StatusCode::TOO_MANY_REQUESTS)
         .content_type("text/plain")
