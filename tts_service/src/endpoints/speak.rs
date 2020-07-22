@@ -8,15 +8,21 @@ use actix_web::{
   HttpResponse,
 };
 
-use std::sync::Arc;
-use crate::AppState;
 use arpabet::Arpabet;
-use crate::text::arpabet::text_to_arpabet_encoding;
+use crate::AppState;
+use crate::database::model::NewSentence;
 use crate::model::model_config::ModelPipeline;
 use crate::model::old_model::TacoMelModel;
-use crate::text::cleaners::clean_text;
 use crate::model::pipelines::{arpabet_glow_tts_melgan_pipeline, arpabet_glow_tts_multi_speaker_melgan_pipeline};
-use crate::database::model::NewSentence;
+use crate::text::arpabet::text_to_arpabet_encoding;
+use crate::text::cleaners::clean_text;
+use futures::{future, Future, Lazy, SelectNext, MapErr};
+use limitation::{Error as LimitationError, Error};
+use limitation::Status;
+use std::sync::Arc;
+use std::thread;
+use std::time::Duration;
+use futures::future::FutureResult;
 
 #[derive(Deserialize)]
 pub struct SpeakRequest {
@@ -24,6 +30,11 @@ pub struct SpeakRequest {
   speaker: String,
   /// Raw text to be spoken
   text: String,
+}
+
+enum ErrorOrTimeout {
+  Error(LimitationError),
+  PermitAcquireTimeout,
 }
 
 pub async fn post_speak(request: HttpRequest,
@@ -81,6 +92,42 @@ pub async fn post_speak(request: HttpRequest,
     },
   };
 
+  let permit = app_state.rate_limiter.count(&ip_address)
+      .map_err(|e| ErrorOrTimeout::Error(e));
+      /*.and_then(|f| match f {
+        Ok(ok) => future::ok(ok),
+        Err(err) => future::err(err),
+      });*/
+
+  let permit_timeout = future::lazy(|| {
+    thread::sleep(Duration::from_millis(5000));
+    future::err::<Status, ErrorOrTimeout>(ErrorOrTimeout::PermitAcquireTimeout)
+  });
+
+  let result = permit.select(permit_timeout).wait();
+  match result {
+    Err(_) => warn!("WAT"),
+    Ok((Ok(permit_status), _timeout_future)) => {
+
+    },
+    Ok((Err(permit_status), _timeout_future)) => {
+
+    },
+
+    /*Ok((data, _timeout_future)) => {
+      warn!("Testing")
+    }*/
+
+    /*Ok((Ok(data), _timeout_future)) => info!("Redis did fine"),
+
+    Ok((Err(_timeout), _timeout_future)) => warn!("Error doing redis things"),
+
+    // A normal I/O error happened, so we pass that on through.
+    Err((e, _other_future)) => warn!("wat"),
+
+    _ => warn!("WAT WAT")*/
+  }
+
   match request.headers().get(HeaderName::from_static("x-forwarded-for")) {
     Some(header_value) => {
       info!("Remote x-forwarded-for: {:?}", header_value);
@@ -98,7 +145,7 @@ pub async fn post_speak(request: HttpRequest,
   let sentence_record = NewSentence {
     sentence: text.clone(),
     speaker: speaker_slug.clone(),
-    ip_address: ip_address,
+    ip_address: ip_address.clone(),
   };
 
   match sentence_record.insert(&app_state.database_connector) {

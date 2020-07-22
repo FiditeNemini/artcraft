@@ -23,12 +23,16 @@ base64 = "0.12.2"
 chrono = { version = "0.4.11", features = ["serde"] }
 diesel = { version = "1.4.4", features = ["mysql", "r2d2", "chrono"] }
 env_logger = "0.7.1"
+futures = "0.1.29"
 hostname = "0.3.1"
 hound = "3.4.0" # wav codec
+limitation = "0.1.1" # redis rate limiter
 log = "0.4.8"
+redis = "0.13.0"
 serde = "1.0.104"
 serde_derive = "1.0.104"
 tch = "0.1.7" # libtorch bindings (pytorch)
+tokio = "0.1.22"
 toml = "0.5.6"
 
 # My libraries

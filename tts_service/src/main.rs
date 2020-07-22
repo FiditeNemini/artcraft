@@ -45,12 +45,17 @@ use crate::text::checker::TextChecker;
 use crate::endpoints::speak_with_spectrogram::post_speak_with_spectrogram;
 use crate::endpoints::words::get_words;
 use arpabet::Arpabet;
+use limitation::Limiter;
+use std::time::Duration;
 
 const ENV_ARPABET_EXTRAS_FILE : &'static str = "ARPABET_EXTRAS_FILE";
 const ENV_ASSET_DIRECTORY: &'static str = "ASSET_DIRECTORY";
 const ENV_BIND_ADDRESS: &'static str = "BIND_ADDRESS";
 const ENV_DATABASE_URL : &'static str = "DATABASE_URL";
 const ENV_DEFAULT_SAMPLE_RATE_HZ : &'static str = "DEFAULT_SAMPLE_RATE_HZ";
+const ENV_LIMITER_MAX_REQUESTS : &'static str = "LIMITER_MAX_REQUESTS";
+const ENV_LIMITER_REDIS_ADDR  : &'static str = "LIMITER_REDIS_ADDR";
+const ENV_LIMITER_WINDOW_SECONDS : &'static str = "LIMITER_WINDOW_SECONDS";
 const ENV_MAX_CHAR_LEN : &'static str = "MAX_CHAR_LEN";
 const ENV_MIN_CHAR_LEN : &'static str = "MIN_CHAR_LEN";
 const ENV_MODEL_CONFIG_FILE: &'static str = "MODEL_CONFIG_FILE";
@@ -61,6 +66,9 @@ const DEFAULT_ASSET_DIRECTORY : &'static str = "/home/bt/dev/voder/tts_frontend/
 const DEFAULT_BIND_ADDRESS : &'static str = "0.0.0.0:12345";
 const DEFAULT_DATABASE_URL : &'static str = "mysql://root:root@localhost/mumble";
 const DEFAULT_DEFAULT_SAMPLE_RATE_HZ : u32 = 22050;
+const DEFAULT_LIMITER_MAX_REQUESTS : usize = 5;
+const DEFAULT_LIMITER_REDIS_ADDR  : &'static str = "redis://127.0.0.1/";
+const DEFAULT_LIMITER_WINDOW_SECONDS : u64 = 10;
 const DEFAULT_MAX_CHAR_LEN : usize = 255;
 const DEFAULT_MIN_CHAR_LEN : usize = 0;
 const DEFAULT_MODEL_CONFIG_FILE: &'static str = "models.toml";
@@ -76,6 +84,7 @@ pub struct AppState {
   pub database_connector: DatabaseConnector,
   pub text_checker: TextChecker,
   pub default_sample_rate_hz: u32,
+  pub rate_limiter: Limiter,
 }
 
 /** Startup parameters for the server. */
@@ -149,6 +158,10 @@ pub fn main() -> AnyhowResult<()> {
   let default_sample_rate_hz = get_env_num::<u32>(ENV_DEFAULT_SAMPLE_RATE_HZ,
     DEFAULT_DEFAULT_SAMPLE_RATE_HZ)?;
 
+  let limiter_redis_addr = get_env_string(ENV_LIMITER_REDIS_ADDR, DEFAULT_LIMITER_REDIS_ADDR);
+  let limiter_max_requests = get_env_num::<usize>(ENV_LIMITER_MAX_REQUESTS, DEFAULT_LIMITER_MAX_REQUESTS)?;
+  let limiter_window_seconds = get_env_num::<u64>(ENV_LIMITER_WINDOW_SECONDS, DEFAULT_LIMITER_WINDOW_SECONDS)?;
+
   let server_hostname = hostname::get()
       .ok()
       .and_then(|h| h.into_string().ok())
@@ -162,12 +175,22 @@ pub fn main() -> AnyhowResult<()> {
   info!("Min character length: {}", min_char_len);
   info!("Hostname: {}", server_hostname);
   info!("Default sample rate hz: {}", default_sample_rate_hz);
+  info!("Limiter redis address: {}", limiter_redis_addr);
+  info!("Limiter max requests: {}", limiter_max_requests);
+  info!("Limiter window seconds: {}", limiter_window_seconds);
 
   let model_configs = ModelConfigs::load_from_file(&model_config_file);
 
   info!("Model configs: {:?}", model_configs);
 
   let model_cache = ModelCache::new(&model_configs.model_locations);
+
+  info!("Connecting to redis...");
+
+  let limiter = Limiter::build(&limiter_redis_addr)
+      .limit(limiter_max_requests)
+      .period(Duration::from_secs(limiter_window_seconds))
+      .finish()?;
 
   info!("Connecting to database...");
 
@@ -209,7 +232,8 @@ pub fn main() -> AnyhowResult<()> {
     model_cache,
     database_connector: db_connector,
     text_checker,
-    default_sample_rate_hz
+    default_sample_rate_hz,
+    rate_limiter: limiter,
   };
 
   let server_args = ServerArgs {
