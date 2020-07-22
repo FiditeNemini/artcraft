@@ -32,6 +32,7 @@ pub struct SpeakRequest {
   text: String,
 }
 
+#[derive(Debug)]
 enum ErrorOrTimeout {
   Error(LimitationError),
   PermitAcquireTimeout,
@@ -106,13 +107,15 @@ pub async fn post_speak(request: HttpRequest,
 
   let result = permit.select(permit_timeout).wait();
   match result {
-    Err(_) => warn!("WAT"),
-    Ok((Ok(permit_status), _timeout_future)) => {
+    Err((permitted_status, timeout_error)) => {
+      match permitted_status {
+        ErrorOrTimeout::PermitAcquireTimeout => { warn!("Timeout talking to redis") },
+        ErrorOrTimeout::Error(limit_error) => { warn!("Limit error: {:?}", limit_error) },
+      }
+    }
+    Ok((permitted_status, _timeout_future)) => warn!("OK"),
 
-    },
-    Ok((Err(permit_status), _timeout_future)) => {
-
-    },
+  }
 
     /*Ok((data, _timeout_future)) => {
       warn!("Testing")
@@ -126,7 +129,6 @@ pub async fn post_speak(request: HttpRequest,
     Err((e, _other_future)) => warn!("wat"),
 
     _ => warn!("WAT WAT")*/
-  }
 
   match request.headers().get(HeaderName::from_static("x-forwarded-for")) {
     Some(header_value) => {
