@@ -14,7 +14,7 @@ pub mod database;
 pub mod endpoints;
 pub mod inference;
 pub mod model;
-pub mod redis;
+pub mod rate_limiter;
 pub mod schema;
 pub mod text;
 
@@ -44,17 +44,20 @@ use crate::endpoints::tts::post_tts;
 use crate::endpoints::words::get_words;
 use crate::model::model_cache::ModelCache;
 use crate::model::model_config::ModelConfigs;
-use crate::redis::rate_limiter::RateLimiter;
+use crate::rate_limiter::redis_rate_limiter::RedisRateLimiter;
 use crate::text::checker::TextChecker;
 use arpabet::Arpabet;
 use limitation::Limiter;
 use std::time::Duration;
+use crate::rate_limiter::RateLimiter;
+use crate::rate_limiter::noop_rate_limiter::NoOpRateLimiter;
 
 const ENV_ARPABET_EXTRAS_FILE : &'static str = "ARPABET_EXTRAS_FILE";
 const ENV_ASSET_DIRECTORY: &'static str = "ASSET_DIRECTORY";
 const ENV_BIND_ADDRESS: &'static str = "BIND_ADDRESS";
 const ENV_DATABASE_URL : &'static str = "DATABASE_URL";
 const ENV_DEFAULT_SAMPLE_RATE_HZ : &'static str = "DEFAULT_SAMPLE_RATE_HZ";
+const ENV_LIMITER_ENABLED : &'static str = "LIMITER_ENABLED";
 const ENV_LIMITER_MAX_REQUESTS : &'static str = "LIMITER_MAX_REQUESTS";
 const ENV_LIMITER_REDIS_ADDR  : &'static str = "LIMITER_REDIS_ADDR";
 const ENV_LIMITER_WINDOW_SECONDS : &'static str = "LIMITER_WINDOW_SECONDS";
@@ -68,6 +71,7 @@ const DEFAULT_ASSET_DIRECTORY : &'static str = "/home/bt/dev/voder/tts_frontend/
 const DEFAULT_BIND_ADDRESS : &'static str = "0.0.0.0:12345";
 const DEFAULT_DATABASE_URL : &'static str = "mysql://root:root@localhost/mumble";
 const DEFAULT_DEFAULT_SAMPLE_RATE_HZ : u32 = 22050;
+const DEFAULT_LIMITER_ENABLED : bool = true;
 const DEFAULT_LIMITER_MAX_REQUESTS : usize = 3;
 const DEFAULT_LIMITER_REDIS_ADDR  : &'static str = "redis://127.0.0.1/";
 const DEFAULT_LIMITER_WINDOW_SECONDS : u64 = 10;
@@ -86,7 +90,7 @@ pub struct AppState {
   pub database_connector: DatabaseConnector,
   pub text_checker: TextChecker,
   pub default_sample_rate_hz: u32,
-  pub rate_limiter: RateLimiter,
+  pub rate_limiter: Box<dyn RateLimiter>,
 }
 
 /** Startup parameters for the server. */
@@ -114,6 +118,22 @@ fn get_env_string(env_name: &str, default: &str) -> String {
       warn!("Env var '{}' not supplied. Using default '{}'.", env_name, default);
       default.to_string()
     },
+  }
+}
+
+fn get_env_bool(env_name: &str, default: bool) -> AnyhowResult<bool> {
+  match env::var(env_name).as_ref().ok() {
+    None => {
+      warn!("Env var '{}' not supplied. Using default '{}'.", env_name, default);
+      Ok(default)
+    },
+    Some(val) => match val.as_ref() {
+      "TRUE" => Ok(true),
+      "true" => Ok(true),
+      "FALSE" => Ok(false),
+      "false" => Ok(false),
+      _ => bail!("Invalid boolean value: {:?}", val),
+    }
   }
 }
 
@@ -160,6 +180,7 @@ pub fn main() -> AnyhowResult<()> {
   let default_sample_rate_hz = get_env_num::<u32>(ENV_DEFAULT_SAMPLE_RATE_HZ,
     DEFAULT_DEFAULT_SAMPLE_RATE_HZ)?;
 
+  let limiter_enabled = get_env_bool(ENV_LIMITER_ENABLED, DEFAULT_LIMITER_ENABLED)?;
   let limiter_redis_addr = get_env_string(ENV_LIMITER_REDIS_ADDR, DEFAULT_LIMITER_REDIS_ADDR);
   let limiter_max_requests = get_env_num::<usize>(ENV_LIMITER_MAX_REQUESTS, DEFAULT_LIMITER_MAX_REQUESTS)?;
   let limiter_window_seconds = get_env_num::<u64>(ENV_LIMITER_WINDOW_SECONDS, DEFAULT_LIMITER_WINDOW_SECONDS)?;
@@ -189,10 +210,16 @@ pub fn main() -> AnyhowResult<()> {
 
   info!("Connecting to redis...");
 
-  let limiter = Limiter::build(&limiter_redis_addr)
-      .limit(limiter_max_requests)
-      .period(Duration::from_secs(limiter_window_seconds))
-      .finish()?;
+  let rate_limiter : Box<dyn RateLimiter> = if limiter_enabled {
+    let limiter = Limiter::build(&limiter_redis_addr)
+        .limit(limiter_max_requests)
+        .period(Duration::from_secs(limiter_window_seconds))
+        .finish()?;
+
+    Box::new(RedisRateLimiter::new(limiter))
+  } else {
+    Box::new(NoOpRateLimiter {})
+  };
 
   info!("Connecting to database...");
 
@@ -235,7 +262,7 @@ pub fn main() -> AnyhowResult<()> {
     database_connector: db_connector,
     text_checker,
     default_sample_rate_hz,
-    rate_limiter: RateLimiter::new(limiter),
+    rate_limiter,
   };
 
   let server_args = ServerArgs {

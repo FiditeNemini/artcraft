@@ -2,19 +2,11 @@ use limitation::{Limiter, Status, Error as LimitationError, Error};
 use std::time::Duration;
 use std::thread;
 use futures::{future, Future};
-use crate::redis::rate_limiter::RateLimiterError::RateLimitExceededError;
+use crate::rate_limiter::redis_rate_limiter::RateLimiterError::RateLimitExceededError;
+use crate::rate_limiter::{RateLimiterError, RateLimiter};
 
-pub struct RateLimiter {
+pub struct RedisRateLimiter {
   limiter: Limiter,
-}
-
-pub enum RateLimiterError {
-  // Fail open
-  //TimeoutError,
-  //RedisError,
-  //OtherError,
-  // Fail closed
-  RateLimitExceededError,
 }
 
 enum ErrorOrTimeoutInternal {
@@ -22,28 +14,10 @@ enum ErrorOrTimeoutInternal {
   PermitAcquireTimeout,
 }
 
-impl RateLimiter {
+impl RedisRateLimiter {
   pub fn new(limiter: Limiter) -> Self {
-    RateLimiter {
+    RedisRateLimiter {
       limiter,
-    }
-  }
-
-  pub fn acquire(&self, rate_limit_key: &str) -> Result<(), RateLimiterError> {
-    let permit = self.limiter.count(rate_limit_key)
-        .map_err(|e| ErrorOrTimeoutInternal::Error(e));
-
-    // TODO: Theoretically this could block.
-    match permit.wait() {
-      Ok(_) => Ok(()),
-      Err(err) => match err {
-        ErrorOrTimeoutInternal::PermitAcquireTimeout => Ok(()),
-        ErrorOrTimeoutInternal::Error(err) => match err {
-          Error::Client(_) => Ok(()),
-          Error::Time(_) => Ok(()),
-          Error::LimitExceeded(_) => Err(RateLimiterError::RateLimitExceededError),
-        },
-      },
     }
   }
 
@@ -86,3 +60,24 @@ impl RateLimiter {
     }
   }
 }
+
+impl RateLimiter for RedisRateLimiter {
+  fn acquire(&self, rate_limit_key: &str) -> Result<(), RateLimiterError> {
+    let permit = self.limiter.count(rate_limit_key)
+        .map_err(|e| ErrorOrTimeoutInternal::Error(e));
+
+    // TODO: Theoretically this could block.
+    match permit.wait() {
+      Ok(_) => Ok(()),
+      Err(err) => match err {
+        ErrorOrTimeoutInternal::PermitAcquireTimeout => Ok(()),
+        ErrorOrTimeoutInternal::Error(err) => match err {
+          Error::Client(_) => Ok(()),
+          Error::Time(_) => Ok(()),
+          Error::LimitExceeded(_) => Err(RateLimiterError::RateLimitExceededError),
+        },
+      },
+    }
+  }
+}
+
