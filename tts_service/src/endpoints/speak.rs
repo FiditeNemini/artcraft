@@ -17,7 +17,6 @@ use crate::model::pipelines::{arpabet_glow_tts_melgan_pipeline, arpabet_glow_tts
 use crate::text::arpabet::text_to_arpabet_encoding;
 use crate::text::cleaners::clean_text;
 use futures::{future, Future, Lazy, SelectNext, MapErr};
-use limitation::{Error as LimitationError, Error};
 use limitation::Status;
 use std::sync::Arc;
 use std::thread;
@@ -32,11 +31,6 @@ pub struct SpeakRequest {
   text: String,
 }
 
-#[derive(Debug)]
-enum ErrorOrTimeout {
-  Error(LimitationError),
-  PermitAcquireTimeout,
-}
 
 pub async fn post_speak(request: HttpRequest,
   query: Json<SpeakRequest>,
@@ -44,27 +38,6 @@ pub async fn post_speak(request: HttpRequest,
   -> std::io::Result<HttpResponse>
 {
   let app_state = app_state.into_inner();
-
-  let speaker_slug = query.speaker.to_string();
-
-  let speaker = match app_state.model_configs.find_speaker_by_slug(&speaker_slug) {
-    Some(speaker) => speaker,
-    None => {
-      return Ok(HttpResponse::build(StatusCode::NOT_FOUND)
-          .content_type("text/plain")
-          .body("Speaker not found"));
-    },
-  };
-
-  let sample_rate_hz = speaker.sample_rate_hz.unwrap_or(app_state.default_sample_rate_hz);
-
-  let text = query.text.to_string();
-
-  if text.is_empty() {
-    return Ok(HttpResponse::build(StatusCode::BAD_REQUEST)
-        .content_type("text/plain")
-        .body("Request has empty text."));
-  }
 
   let ip_address = match request.headers().get(HeaderName::from_static("x-voder-proxy-for")) {
     Some(ip_address) => {
@@ -93,42 +66,34 @@ pub async fn post_speak(request: HttpRequest,
     },
   };
 
-  let permit = app_state.rate_limiter.count(&ip_address)
-      .map_err(|e| ErrorOrTimeout::Error(e));
-      /*.and_then(|f| match f {
-        Ok(ok) => future::ok(ok),
-        Err(err) => future::err(err),
-      });*/
-
-  let permit_timeout = future::lazy(|| {
-    thread::sleep(Duration::from_millis(5000));
-    future::err::<Status, ErrorOrTimeout>(ErrorOrTimeout::PermitAcquireTimeout)
-  });
-
-  let result = permit.select(permit_timeout).wait();
-  match result {
-    Err((permitted_status, timeout_error)) => {
-      match permitted_status {
-        ErrorOrTimeout::PermitAcquireTimeout => { warn!("Timeout talking to redis") },
-        ErrorOrTimeout::Error(limit_error) => { warn!("Limit error: {:?}", limit_error) },
-      }
-    }
-    Ok((permitted_status, _timeout_future)) => warn!("OK"),
-
+  let timeout = Duration::from_millis(10000);
+  if let Err(err) = app_state.rate_limiter.acquire_with_timeout(&ip_address, timeout) {
+    // Couldn't acquire rate limiter
+    return Ok(HttpResponse::build(StatusCode::TOO_MANY_REQUESTS)
+        .content_type("text/plain")
+        .body("Rate limiter not acquired. Slow down."));
   }
 
-    /*Ok((data, _timeout_future)) => {
-      warn!("Testing")
-    }*/
+  let speaker_slug = query.speaker.to_string();
 
-    /*Ok((Ok(data), _timeout_future)) => info!("Redis did fine"),
+  let speaker = match app_state.model_configs.find_speaker_by_slug(&speaker_slug) {
+    Some(speaker) => speaker,
+    None => {
+      return Ok(HttpResponse::build(StatusCode::NOT_FOUND)
+          .content_type("text/plain")
+          .body("Speaker not found"));
+    },
+  };
 
-    Ok((Err(_timeout), _timeout_future)) => warn!("Error doing redis things"),
+  let sample_rate_hz = speaker.sample_rate_hz.unwrap_or(app_state.default_sample_rate_hz);
 
-    // A normal I/O error happened, so we pass that on through.
-    Err((e, _other_future)) => warn!("wat"),
+  let text = query.text.to_string();
 
-    _ => warn!("WAT WAT")*/
+  if text.is_empty() {
+    return Ok(HttpResponse::build(StatusCode::BAD_REQUEST)
+        .content_type("text/plain")
+        .body("Request has empty text."));
+  }
 
   match request.headers().get(HeaderName::from_static("x-forwarded-for")) {
     Some(header_value) => {

@@ -14,6 +14,7 @@ pub mod database;
 pub mod endpoints;
 pub mod inference;
 pub mod model;
+pub mod redis;
 pub mod schema;
 pub mod text;
 
@@ -37,13 +38,14 @@ use crate::endpoints::models::get_models;
 use crate::endpoints::readiness::get_readiness;
 use crate::endpoints::sentences::get_sentences;
 use crate::endpoints::speak::post_speak;
+use crate::endpoints::speak_with_spectrogram::post_speak_with_spectrogram;
 use crate::endpoints::speakers::get_speakers;
 use crate::endpoints::tts::post_tts;
+use crate::endpoints::words::get_words;
 use crate::model::model_cache::ModelCache;
 use crate::model::model_config::ModelConfigs;
+use crate::redis::rate_limiter::RateLimiter;
 use crate::text::checker::TextChecker;
-use crate::endpoints::speak_with_spectrogram::post_speak_with_spectrogram;
-use crate::endpoints::words::get_words;
 use arpabet::Arpabet;
 use limitation::Limiter;
 use std::time::Duration;
@@ -84,7 +86,7 @@ pub struct AppState {
   pub database_connector: DatabaseConnector,
   pub text_checker: TextChecker,
   pub default_sample_rate_hz: u32,
-  pub rate_limiter: Limiter,
+  pub rate_limiter: RateLimiter,
 }
 
 /** Startup parameters for the server. */
@@ -233,7 +235,7 @@ pub fn main() -> AnyhowResult<()> {
     database_connector: db_connector,
     text_checker,
     default_sample_rate_hz,
-    rate_limiter: limiter,
+    rate_limiter: RateLimiter::new(limiter),
   };
 
   let server_args = ServerArgs {
