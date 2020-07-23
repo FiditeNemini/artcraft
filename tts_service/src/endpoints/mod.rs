@@ -1,3 +1,4 @@
+pub mod helpers;
 pub mod index;
 pub mod legacy_speak;
 pub mod liveness;

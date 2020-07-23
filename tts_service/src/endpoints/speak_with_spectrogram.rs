@@ -12,18 +12,19 @@ use actix_web::{
 use arpabet::Arpabet;
 use crate::AppState;
 use crate::database::model::NewSentence;
+use crate::endpoints::helpers::ip_address::get_request_ip;
 use crate::inference::inference::InferencePipelineStart;
 use crate::inference::pipelines::glowtts_melgan::GlowTtsMelganPipeline;
 use crate::inference::pipelines::glowtts_multispeaker_melgan::{GlowTtsMultiSpeakerMelganPipeline, GlowTtsMultiSpeakerMelganPipelineMelDone};
 use crate::inference::spectrogram::Base64MelSpectrogram;
+use crate::inference::tts_model::TtsModelT;
+use crate::inference::vocoder_model::VocoderModelT;
 use crate::model::model_config::ModelPipeline;
 use crate::model::old_model::TacoMelModel;
 use crate::model::pipelines::{arpabet_glow_tts_melgan_pipeline, arpabet_glow_tts_multi_speaker_melgan_pipeline, arpabet_glow_tts_melgan_pipeline_with_spectrogram, arpabet_glow_tts_multi_speaker_melgan_pipeline_with_spectrogram};
 use crate::text::arpabet::text_to_arpabet_encoding;
 use crate::text::cleaners::clean_text;
 use std::sync::Arc;
-use crate::inference::vocoder_model::VocoderModelT;
-use crate::inference::tts_model::TtsModelT;
 
 #[derive(Deserialize)]
 pub struct SpeakRequest {
@@ -53,32 +54,7 @@ pub async fn post_speak_with_spectrogram(request: HttpRequest,
 {
   let app_state = app_state.into_inner();
 
-  let ip_address = match request.headers().get(HeaderName::from_static("x-voder-proxy-for")) {
-    Some(ip_address) => {
-      // Unfortunately the upstream Rust proxy is replacing the `forwarded` and `x-forwarded-for`
-      // headers, so we populate this custom header as a workaround.
-      info!("Proxied IP address: {:?}", ip_address);
-      ip_address.to_str()
-          .unwrap_or("")
-          .to_string()
-    },
-    None => {
-      // If we're running without the upstream Rust proxy, we can grab 'x-forarded-for', which is
-      // populated by the Digital Ocean load balancer.
-      let ip_address_and_port = request.connection_info()
-          .remote()
-          .unwrap_or("")
-          .to_string();
-      let ip_address = ip_address_and_port.split(":")
-          .collect::<Vec<&str>>()
-          .get(0)
-          .copied()
-          .unwrap_or("")
-          .to_string();
-      info!("Forwarded IP address: {}", &ip_address);
-      ip_address
-    },
-  };
+  let ip_address = get_request_ip(&request);
 
   if let Err(err) = app_state.rate_limiter.acquire(&ip_address) {
     // Couldn't acquire rate limiter

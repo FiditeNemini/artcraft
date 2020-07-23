@@ -11,17 +11,18 @@ use actix_web::{
 use arpabet::Arpabet;
 use crate::AppState;
 use crate::database::model::NewSentence;
+use crate::endpoints::helpers::ip_address::get_request_ip;
 use crate::model::model_config::ModelPipeline;
 use crate::model::old_model::TacoMelModel;
 use crate::model::pipelines::{arpabet_glow_tts_melgan_pipeline, arpabet_glow_tts_multi_speaker_melgan_pipeline};
 use crate::text::arpabet::text_to_arpabet_encoding;
 use crate::text::cleaners::clean_text;
+use futures::future::FutureResult;
 use futures::{future, Future, Lazy, SelectNext, MapErr};
 use limitation::Status;
 use std::sync::Arc;
 use std::thread;
 use std::time::Duration;
-use futures::future::FutureResult;
 
 #[derive(Deserialize)]
 pub struct SpeakRequest {
@@ -31,7 +32,6 @@ pub struct SpeakRequest {
   text: String,
 }
 
-
 pub async fn post_speak(request: HttpRequest,
   query: Json<SpeakRequest>,
   app_state: Data<Arc<AppState>>)
@@ -39,32 +39,7 @@ pub async fn post_speak(request: HttpRequest,
 {
   let app_state = app_state.into_inner();
 
-  let ip_address = match request.headers().get(HeaderName::from_static("x-voder-proxy-for")) {
-    Some(ip_address) => {
-      // Unfortunately the upstream Rust proxy is replacing the `forwarded` and `x-forwarded-for`
-      // headers, so we populate this custom header as a workaround.
-      info!("Proxied IP address: {:?}", ip_address);
-      ip_address.to_str()
-          .unwrap_or("")
-          .to_string()
-    },
-    None => {
-      // If we're running without the upstream Rust proxy, we can grab 'x-forarded-for', which is
-      // populated by the Digital Ocean load balancer.
-      let ip_address_and_port = request.connection_info()
-          .remote()
-          .unwrap_or("")
-          .to_string();
-      let ip_address = ip_address_and_port.split(":")
-          .collect::<Vec<&str>>()
-          .get(0)
-          .copied()
-          .unwrap_or("")
-          .to_string();
-      info!("Forwarded IP address: {}", &ip_address);
-      ip_address
-    },
-  };
+  let ip_address = get_request_ip(&request);
 
   if let Err(err) = app_state.rate_limiter.acquire(&ip_address) {
     // Couldn't acquire rate limiter
