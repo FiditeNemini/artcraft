@@ -1,12 +1,19 @@
-use limitation::{Limiter, Status, Error as LimitationError, Error};
-use std::time::Duration;
-use std::thread;
-use futures::{future, Future};
+use crate::rate_limiter::rate_limiter::{RateLimiterError, RateLimiter};
 use crate::rate_limiter::redis_rate_limiter::RateLimiterError::RateLimitExceededError;
-use crate::rate_limiter::{RateLimiterError, RateLimiter};
+use futures::{future, Future};
+use limitation::{Limiter, Status, Error as LimitationError, Error};
+use std::thread;
+use std::time::Duration;
+use actix_web::HttpRequest;
+use crate::endpoints::helpers::ip_address::get_request_ip;
+use actix_web::http::header::HeaderMap;
+use actix_web::http::HeaderName;
+
+const RATE_LIMIT_BYPASS_HEADER : &'static str = "limitless";
 
 pub struct RedisRateLimiter {
   limiter: Limiter,
+  rate_limit_bypass_header: HeaderName,
 }
 
 enum ErrorOrTimeoutInternal {
@@ -16,8 +23,10 @@ enum ErrorOrTimeoutInternal {
 
 impl RedisRateLimiter {
   pub fn new(limiter: Limiter) -> Self {
+    let rate_limit_bypass_header = HeaderName::from_static(RATE_LIMIT_BYPASS_HEADER);
     RedisRateLimiter {
       limiter,
+      rate_limit_bypass_header,
     }
   }
 
@@ -62,6 +71,15 @@ impl RedisRateLimiter {
 }
 
 impl RateLimiter for RedisRateLimiter {
+  fn maybe_ratelimit_request(&self, ip_address: &str, headers: &HeaderMap) -> Result<(), RateLimiterError> {
+    if headers.contains_key(&self.rate_limit_bypass_header) {
+      info!("Bypassing rate limiter");
+      return Ok(());
+    }
+
+    self.acquire(ip_address)
+  }
+
   fn acquire(&self, rate_limit_key: &str) -> Result<(), RateLimiterError> {
     let permit = self.limiter.count(rate_limit_key)
         .map_err(|e| ErrorOrTimeoutInternal::Error(e));

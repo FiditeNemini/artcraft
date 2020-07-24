@@ -56,7 +56,7 @@ pub async fn post_speak_with_spectrogram(request: HttpRequest,
 
   let ip_address = get_request_ip(&request);
 
-  if let Err(err) = app_state.rate_limiter.acquire(&ip_address) {
+  if let Err(err) = app_state.rate_limiter.maybe_ratelimit_request(&ip_address, &request.headers()) {
     // Couldn't acquire rate limiter
     return Either::B(Ok(HttpResponse::build(StatusCode::TOO_MANY_REQUESTS)
         .content_type("text/plain")
