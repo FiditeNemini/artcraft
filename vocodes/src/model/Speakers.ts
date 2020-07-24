@@ -338,7 +338,7 @@ const SPEAKERS : Speaker[] = [
     description: "Entrepreneur",
     avatarUrl: "sam-altman.jpg",
     fullUrl: "sam-altman-full.png",
-    voiceQuality: 4.0,
+    voiceQuality: 6.0,
   }),
   Speaker.fromJson({
     name: "Sir David Attenborough",
