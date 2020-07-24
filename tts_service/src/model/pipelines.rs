@@ -1,4 +1,7 @@
 use arpabet::Arpabet;
+use crate::endpoints::speak::speak_with_spectrogram::Spectrogram;
+use crate::model::arpabet_glow_tts_model::ArpabetGlowTtsModel;
+use crate::model::arpabet_glow_tts_multi_speaker_model::ArpabetGlowTtsMultiSpeakerModel;
 use crate::model::arpabet_tacotron_model::ArpabetTacotronModel;
 use crate::model::melgan_model::MelganModel;
 use crate::model::old_model::TacoMelModel;
@@ -8,9 +11,6 @@ use hound::WavSpec;
 use hound::WavWriter;
 use std::io::{Cursor, BufWriter};
 use tch::Tensor;
-use crate::model::arpabet_glow_tts_model::ArpabetGlowTtsModel;
-use crate::model::arpabet_glow_tts_multi_speaker_model::ArpabetGlowTtsMultiSpeakerModel;
-use crate::endpoints::speak_with_spectrogram::Spectrogram;
 
 // TODO: This might be useful to implement as a multi-stage
 //  state machine struct with functions, that way you can pull out

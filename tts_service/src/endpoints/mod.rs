@@ -1,12 +1,9 @@
 pub mod helpers;
 pub mod index;
-pub mod legacy_speak;
 pub mod liveness;
 pub mod models;
 pub mod readiness;
 pub mod sentences;
 pub mod speak;
-pub mod speak_with_spectrogram;
 pub mod speakers;
-pub mod tts;
 pub mod words;
