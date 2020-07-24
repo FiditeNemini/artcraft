@@ -44,7 +44,7 @@ pub async fn post_speak(request: HttpRequest,
   let speaker = match app_state.model_configs.find_speaker_by_slug(&speaker_slug) {
     Some(speaker) => speaker,
     None => {
-      return Err(SpeakError::bad_speaker());
+      return Err(SpeakError::unknown_speaker());
     },
   };
 

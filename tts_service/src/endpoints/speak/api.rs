@@ -37,7 +37,7 @@ impl SpeakError {
     }
   }
 
-  pub fn bad_speaker() -> Self {
+  pub fn unknown_speaker() -> Self {
     Self {
       error_type: ErrorType::NoSuchSpeaker,
       description: "That speaker doesn't exist!".to_string(),
@@ -76,5 +76,3 @@ impl ResponseError for SpeakError {
     }
   }
 }
-
-

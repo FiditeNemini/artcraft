@@ -7,13 +7,14 @@ use actix_web::{
   Either,
   HttpRequest,
   HttpResponse,
+  Result as ActixResult,
 };
 
 use arpabet::Arpabet;
 use crate::AppState;
 use crate::database::model::NewSentence;
 use crate::endpoints::helpers::ip_address::get_request_ip;
-use crate::endpoints::speak::api::SpeakRequest;
+use crate::endpoints::speak::api::{SpeakRequest, SpeakError};
 use crate::inference::inference::InferencePipelineStart;
 use crate::inference::pipelines::glowtts_melgan::GlowTtsMelganPipeline;
 use crate::inference::pipelines::glowtts_multispeaker_melgan::{GlowTtsMultiSpeakerMelganPipeline, GlowTtsMultiSpeakerMelganPipelineMelDone};
@@ -43,17 +44,14 @@ pub struct SpeakSpectrogramResponse {
 pub async fn post_speak_with_spectrogram(request: HttpRequest,
   query: Json<SpeakRequest>,
   app_state: Data<Arc<AppState>>)
-  -> Either<Json<SpeakSpectrogramResponse>, std::io::Result<HttpResponse>>
+  -> ActixResult<Json<SpeakSpectrogramResponse>, SpeakError>
 {
   let app_state = app_state.into_inner();
 
   let ip_address = get_request_ip(&request);
 
   if let Err(err) = app_state.rate_limiter.maybe_ratelimit_request(&ip_address, &request.headers()) {
-    // Couldn't acquire rate limiter
-    return Either::B(Ok(HttpResponse::build(StatusCode::TOO_MANY_REQUESTS)
-        .content_type("text/plain")
-        .body("Rate limiter not acquired. Slow down.")));
+    return Err(SpeakError::rate_limited());
   }
 
   let speaker_slug = query.speaker.to_string();
@@ -61,9 +59,7 @@ pub async fn post_speak_with_spectrogram(request: HttpRequest,
   let speaker = match app_state.model_configs.find_speaker_by_slug(&speaker_slug) {
     Some(speaker) => speaker,
     None => {
-      return Either::B(Ok(HttpResponse::build(StatusCode::NOT_FOUND)
-          .content_type("text/plain")
-          .body("Speaker not found")));
+      return Err(SpeakError::unknown_speaker());
     },
   };
 
@@ -72,9 +68,7 @@ pub async fn post_speak_with_spectrogram(request: HttpRequest,
   let text = query.text.to_string();
 
   if text.is_empty() {
-    return Either::B(Ok(HttpResponse::build(StatusCode::BAD_REQUEST)
-        .content_type("text/plain")
-        .body("Request has empty text.")));
+    return Err(SpeakError::generic_bad_request("Request has empty text."));
   }
 
   let sentence_record = NewSentence {
@@ -160,7 +154,7 @@ pub async fn post_speak_with_spectrogram(request: HttpRequest,
   let base64_image = pipeline_done.get_base64_mel_spectrogram().unwrap();
   let base64_audio = pipeline_done.get_base64_audio().unwrap();
 
-  Either::A(Json(SpeakSpectrogramResponse {
+  Ok(Json(SpeakSpectrogramResponse {
     audio_base64: base64_audio.bytes_base64,
     spectrogram: base64_image,
   }))
