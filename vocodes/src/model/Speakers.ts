@@ -60,6 +60,90 @@ class Speaker {
 }
 
 const SPEAKERS : Speaker[] = [
+
+  Speaker.fromJson({
+    name: "Anderson Cooper",
+    slug: "anderson-cooper",
+    description: "Reporter",
+    avatarUrl: "anderson-cooper.jpg",
+    fullUrl: "anderson-cooper-full.png",
+    voiceQuality: 4.9,
+  }),
+  Speaker.fromJson({
+    name: "Peter Thiel",
+    slug: "peter-thiel",
+    description: "Entrepreneur",
+    avatarUrl: "peter-thiel.jpg",
+    fullUrl: "peter-thiel-full.png",
+    voiceQuality: 5.1,
+  }),
+  Speaker.fromJson({
+    name: "Larry King",
+    slug: "larry-king",
+    description: "Reporter",
+    avatarUrl: "larry-king.jpg",
+    fullUrl: "larry-king-full.png",
+    voiceQuality: 4.8,
+  }),
+  Speaker.fromJson({
+    name: "J. K. Simmons",
+    slug: "j-k-simmons",
+    description: "Actor",
+    avatarUrl: "j-k-simmons.jpg",
+    fullUrl: "j-k-simmons-full.png",
+    voiceQuality: 6.2,
+  }),
+  Speaker.fromJson({
+    name: "Sam Altman",
+    slug: "sam-altman",
+    description: "Entrepreneur",
+    avatarUrl: "sam-altman.jpg",
+    fullUrl: "sam-altman-full.png",
+    voiceQuality: 4.0,
+  }),
+  Speaker.fromJson({
+    name: "Leonard Nimoy",
+    slug: "leonard-nimoy",
+    description: "Actor",
+    avatarUrl: "spock.jpg",
+    fullUrl: "leonard-nimoy-full.png",
+    voiceQuality: 5.9,
+  }),
+  Speaker.fromJson({
+    name: "Ben Stein",
+    slug: "ben-stein",
+    description: "Actor and commentator.",
+    avatarUrl: "ben-stein.jpg",
+    fullUrl: "ben-stein-full.png",
+    voiceQuality: 5.0,
+  }),
+  Speaker.fromJson({
+    name: "Paul Graham",
+    slug: "paul-graham",
+    description: "Entrepreneur",
+    avatarUrl: "paul-graham.jpg",
+    fullUrl: "paul-graham-full.png",
+    voiceQuality: 2.0,
+  }),
+  Speaker.fromJson({
+    name: "Alan Rickman",
+    slug: "alan-rickman",
+    description: "Actor",
+    avatarUrl: "snape.jpg",
+    fullUrl: "alan-rickman-full.png",
+    voiceQuality: 6.0,
+  }),
+
+
+
+
+
+
+
+
+
+
+
   Speaker.fromJson({
     name: "Arnold Schwarzenegger",
     slug: "arnold-schwarzenegger",
