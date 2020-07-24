@@ -178,7 +178,7 @@ const SPEAKERS : Speaker[] = [
     description: "Voice actor and comedian.",
     avatarUrl: "gilbert-gottfried.jpg",
     fullUrl: "gilbert-gottfried-full.png",
-    voiceQuality: 6.2,
+    voiceQuality: 7.8,
   }),
   Speaker.fromJson({
     name: "Hillary Clinton",
