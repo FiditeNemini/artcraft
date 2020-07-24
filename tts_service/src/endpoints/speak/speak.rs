@@ -56,17 +56,7 @@ pub async fn post_speak(request: HttpRequest,
     return Err(SpeakError::generic_bad_request("Request has empty text."));
   }
 
-  let sentence_record = NewSentence {
-    sentence: text.clone(),
-    speaker: speaker_slug.clone(),
-    ip_address: ip_address.clone(),
-  };
-
-  match sentence_record.insert(&app_state.database_connector) {
-    Err(e) => error!("Could not insert sentence record for: {:?}, because: {:?}",
-      sentence_record, e),
-    Ok(_) => {},
-  }
+  app_state.sentence_recorder.record_sentence(&speaker_slug, &text, &ip_address);
 
   let cleaned_text = clean_text(&text);
 

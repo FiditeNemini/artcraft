@@ -69,16 +69,7 @@ pub async fn legacy_get_speak(request: HttpRequest,
       .unwrap_or("")
       .to_string();
 
-  let sentence_record = NewSentence {
-    sentence: text.clone(),
-    speaker: speaker.clone(),
-    ip_address: ip_address,
-  };
-
-  match sentence_record.insert(&app_state.database_connector) {
-    Err(_) => error!("Could not insert sentence record for: {:?}", sentence_record),
-    Ok(_) => {},
-  }
+  app_state.sentence_recorder.record_sentence(&speaker, &text, &ip_address);
 
   let speaker = match app_state.model_configs.find_speaker_by_slug(&speaker) {
     Some(speaker) => speaker,

@@ -51,10 +51,12 @@ use crate::rate_limiter::redis_rate_limiter::RedisRateLimiter;
 use crate::text::checker::TextChecker;
 use limitation::Limiter;
 use std::time::Duration;
+use crate::database::sentence_recorder::SentenceRecorder;
 
 const ENV_ARPABET_EXTRAS_FILE : &'static str = "ARPABET_EXTRAS_FILE";
 const ENV_ASSET_DIRECTORY: &'static str = "ASSET_DIRECTORY";
 const ENV_BIND_ADDRESS: &'static str = "BIND_ADDRESS";
+const ENV_DATABASE_ENABLED : &'static str = "DATABASE_ENABLED";
 const ENV_DATABASE_URL : &'static str = "DATABASE_URL";
 const ENV_DEFAULT_SAMPLE_RATE_HZ : &'static str = "DEFAULT_SAMPLE_RATE_HZ";
 const ENV_MAX_CHAR_LEN : &'static str = "MAX_CHAR_LEN";
@@ -72,6 +74,7 @@ const ENV_RUST_LOG : &'static str = "RUST_LOG";
 
 const DEFAULT_ASSET_DIRECTORY : &'static str = "/home/bt/dev/voder/tts_frontend/build";
 const DEFAULT_BIND_ADDRESS : &'static str = "0.0.0.0:12345";
+const DEFAULT_DATABASE_ENABLED : bool = true;
 const DEFAULT_DATABASE_URL : &'static str = "mysql://root:root@localhost/mumble";
 const DEFAULT_DEFAULT_SAMPLE_RATE_HZ : u32 = 22050;
 const DEFAULT_MAX_CHAR_LEN : usize = 255;
@@ -91,7 +94,7 @@ pub struct AppState {
   pub arpabet: Arpabet,
   pub model_configs: ModelConfigs,
   pub model_cache: ModelCache,
-  pub database_connector: DatabaseConnector,
+  pub sentence_recorder: SentenceRecorder,
   pub text_checker: TextChecker,
   pub default_sample_rate_hz: u32,
   pub rate_limiter: Box<dyn RateLimiter>,
@@ -195,6 +198,7 @@ pub fn main() -> AnyhowResult<()> {
   let asset_directory = get_env_string(ENV_ASSET_DIRECTORY, DEFAULT_ASSET_DIRECTORY);
   let model_config_file = get_env_string(ENV_MODEL_CONFIG_FILE, DEFAULT_MODEL_CONFIG_FILE);
   let num_workers = get_env_num::<usize>(ENV_NUM_WORKERS, DEFAULT_NUM_WORKERS)?;
+  let database_enabled = get_env_bool(ENV_DATABASE_ENABLED, DEFAULT_DATABASE_ENABLED)?;
   let database_url = get_env_string(ENV_DATABASE_URL, DEFAULT_DATABASE_URL);
   let max_char_len = get_env_num::<usize>(ENV_MAX_CHAR_LEN, DEFAULT_MAX_CHAR_LEN)?;
   let min_char_len = get_env_num::<usize>(ENV_MIN_CHAR_LEN, DEFAULT_MIN_CHAR_LEN)?;
@@ -229,11 +233,9 @@ pub fn main() -> AnyhowResult<()> {
 
   let model_cache = ModelCache::new(&model_configs.model_locations);
 
-  info!("Connecting to redis...");
-
   let rate_limiter : Box<dyn RateLimiter> = if limiter_enabled {
     let redis_address = get_rate_limiter_redis()?;
-    info!("Redis connection string: {}", redis_address);
+    info!("Redis connection string: {} ; connecting...", redis_address);
 
     let limiter = Limiter::build(&redis_address)
         .limit(limiter_max_requests)
@@ -242,16 +244,24 @@ pub fn main() -> AnyhowResult<()> {
 
     Box::new(RedisRateLimiter::new(limiter))
   } else {
+    info!("Not using Redis. Installing NoOp limiter.");
     Box::new(NoOpRateLimiter {})
   };
 
-  info!("Connecting to database...");
+  let sentence_recorder = if database_enabled {
+    info!("Connecting to database...");
+    let mut db_connector = DatabaseConnector::create(&database_url);
 
-  let mut db_connector = DatabaseConnector::create(&database_url);
-  match db_connector.connect() {
-    Ok(_) => info!("Connected successfully"),
-    Err(_) => error!("Could not connect to database."),
-  }
+    match db_connector.connect() {
+      Ok(_) => info!("Connected successfully"),
+      Err(_) => error!("Could not connect to database."),
+    }
+
+    SentenceRecorder::new(db_connector)
+  } else {
+    info!("Not using database; will not record sentences.");
+    SentenceRecorder::no_op_recoder()
+  };
 
   let max_char_len = if max_char_len == 0 { None } else { Some(max_char_len) };
   let min_char_len = if min_char_len == 0 { None } else { Some(min_char_len) };
@@ -283,7 +293,7 @@ pub fn main() -> AnyhowResult<()> {
     arpabet,
     model_configs,
     model_cache,
-    database_connector: db_connector,
+    sentence_recorder,
     text_checker,
     default_sample_rate_hz,
     rate_limiter,

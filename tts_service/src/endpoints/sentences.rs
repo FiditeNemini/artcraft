@@ -5,6 +5,7 @@ use actix_web::{HttpRequest, get, HttpResponse, Either};
 use std::sync::Arc;
 use crate::AppState;
 use crate::database::model::Sentence;
+use crate::database::connector::DatabaseConnector;
 
 /// Request with pagination from Tabulator.js
 #[derive(Deserialize, Debug)]
@@ -33,7 +34,10 @@ pub async fn get_sentences(
 
   let app_state = app_state.into_inner();
 
-  let sentence_count = Sentence::count(&app_state.database_connector)
+  // TODO: FIXME
+  let database_connector = DatabaseConnector::create("");
+
+  let sentence_count = Sentence::count(&database_connector)
       .ok()
       .unwrap_or(0);
 
@@ -55,7 +59,7 @@ pub async fn get_sentences(
 
   debug!("Sentence Query: Limit: {}, Offset: {}, Sort Ascending: {}", limit, offset, sort_ascending);
 
-  let sentences = match Sentence::load(&app_state.database_connector, limit, offset, sort_ascending) {
+  let sentences = match Sentence::load(&database_connector, limit, offset, sort_ascending) {
     Err(e) => {
       error!("Couldn't query database for sentences: {:?}", e);
       return Either::B(Ok(HttpResponse::build(StatusCode::INTERNAL_SERVER_ERROR)

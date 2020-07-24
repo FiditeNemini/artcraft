@@ -6,6 +6,7 @@ use std::sync::Arc;
 use crate::AppState;
 use crate::database::model::Sentence;
 use std::collections::HashMap;
+use crate::database::connector::DatabaseConnector;
 
 /// Paginated responses in the format expected by Tabulator.js
 #[derive(Serialize, Debug)]
@@ -26,7 +27,10 @@ pub async fn get_words(
   let offset = 0;
   let sort_ascending = true;
 
-  let records = match Sentence::load(&app_state.database_connector, limit, offset, sort_ascending) {
+  // TODO: FIXME
+  let database_connector = DatabaseConnector::create("");
+
+  let records = match Sentence::load(&database_connector, limit, offset, sort_ascending) {
     Err(e) => {
       error!("Couldn't query database for sentences: {:?}", e);
       return Either::B(Ok(HttpResponse::build(StatusCode::INTERNAL_SERVER_ERROR)
