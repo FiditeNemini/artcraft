@@ -16,6 +16,84 @@ glow_tts = "glow_ljs_original.torchjit"
 melgan = "melgan-vocodes.torchjit"
 #melgan = "manyvoice1.0_2020-06-28_12d5838_6610.torchjit"
 
+[[speakers]]
+name = "Gilbert A"
+slug = "gilbert-a"
+model_pipeline = "ArpabetGlowTtsMelgan"
+glow_tts = "glow-tts_gilbert-gottfried_ljstx_2020.06.28_expr-1_chkpt-1766.torchjit"
+melgan = "melgan_manyvoice2.0_2020-07-08_12d5838_8940.torchjit"
+
+[[speakers]]
+name = "Gilbert B"
+slug = "gilbert-b"
+model_pipeline = "ArpabetGlowTtsMelgan"
+glow_tts = "glow-tts_gilbert-gottfried_ljstx_2020.06.28_expr-1_chkpt-1766.torchjit"
+melgan = "melgan_manyvoice5.0_2020-07-23_12d5838_10490.torchit"
+
+# --------------- YC ---------------
+
+[[speakers]]
+name = "Peter Thiel"
+slug = "peter-thiel"
+model_pipeline = "ArpabetGlowTtsMelgan"
+glow_tts = "glow-tts_peter_thiel_ljstx_2020.07.18_expr-1_chkpt-8182.torchjit"
+melgan = "melgan_manyvoice5.0_2020-07-23_12d5838_10490.torchit"
+
+[[speakers]]
+name = "Larry King"
+slug = "larry-king"
+model_pipeline = "ArpabetGlowTtsMelgan"
+glow_tts = "glow-tts_larry_king_ljstx_2020.07.19_expr-1_chkpt-6656.torchjit"
+melgan = "melgan_manyvoice5.0_2020-07-23_12d5838_10490.torchit"
+
+[[speakers]]
+name = "J.K. Simmons"
+slug = "j-k-simmons"
+model_pipeline = "ArpabetGlowTtsMelgan"
+glow_tts = "glow-tts_j-k-simmons_ljstx_2020.07.19_expr-1_chkpt-6633.torchjit"
+melgan = "melgan_manyvoice5.0_2020-07-23_12d5838_10490.torchit"
+
+[[speakers]]
+name = "Sam Altman"
+slug = "sam-altman"
+model_pipeline = "ArpabetGlowTtsMelgan"
+glow_tts = "glow-tts_sam_altman_ljstx_2020.07.20_expr-2_chkpt-4871.torchjit"
+melgan = "melgan_manyvoice5.0_2020-07-23_12d5838_10490.torchit"
+
+[[speakers]]
+name = "Leonard Nimoy"
+slug = "leonard-nimoy"
+model_pipeline = "ArpabetGlowTtsMelgan"
+glow_tts = "glow-tts_leonard_nimoy_ljstx_2020.07.20_expr-1_chkpt-6401.torchjit"
+melgan = "melgan_manyvoice5.0_2020-07-23_12d5838_10490.torchit"
+
+[[speakers]]
+name = "Ben Stein"
+slug = "ben-stein"
+model_pipeline = "ArpabetGlowTtsMelgan"
+glow_tts = "glow-tts_ben-stein_ljstx_2020.07.21_expr-1_chkpt-7516.torchjit"
+melgan = "melgan_manyvoice5.0_2020-07-23_12d5838_10490.torchit"
+
+[[speakers]]
+name = "Anderson Cooper"
+slug = "anderson-cooper"
+model_pipeline = "ArpabetGlowTtsMelgan"
+glow_tts = "glow-tts_anderson_cooper_ljstx_2020.07.21_expr-1_chkpt-6622.torchjit"
+melgan = "melgan_manyvoice5.0_2020-07-23_12d5838_10490.torchit"
+
+[[speakers]]
+name = "Paul Graham"
+slug = "paul-graham"
+model_pipeline = "ArpabetGlowTtsMelgan"
+glow_tts = "glow-tts_paul_graham_ljstx_2020.07.22_expr-1_chkpt-5605.torchjit"
+melgan = "melgan_manyvoice5.0_2020-07-23_12d5838_10490.torchit"
+
+[[speakers]]
+name = "Alan Rickman"
+slug = "alan-rickman"
+model_pipeline = "ArpabetGlowTtsMelgan"
+glow_tts = "glow-tts_alan-rickman_ljstx_2020.07.22_expr-1_chkpt-4765.torchjit"
+melgan = "melgan_manyvoice5.0_2020-07-23_12d5838_10490.torchit"
 
 # --------------- Stable Speakers ---------------
 
@@ -73,7 +151,8 @@ name = "George Takei"
 slug = "george-takei"
 model_pipeline = "ArpabetGlowTtsMelgan"
 glow_tts = "glow-tts_george_takei_ljstx_2020.07.08_expr-1_chkpt-4060.torchjit"
-melgan = "melgan_manyvoice3.0_2020-07-17_12d5838_10090.torchjit"
+melgan = "melgan_manyvoice5.0_2020-07-23_12d5838_10490.torchit"
+#melgan = "melgan_manyvoice3.0_2020-07-17_12d5838_10090.torchjit"
 
 [[speakers]]
 name = "Judi Dench"
@@ -216,8 +295,7 @@ name = "Gilbert Gottfried"
 slug = "gilbert-gottfried"
 model_pipeline = "ArpabetGlowTtsMelgan"
 glow_tts = "glow-tts_gilbert-gottfried_ljstx_2020.06.28_expr-1_chkpt-1766.torchjit"
-melgan = "melgan_manyvoice2.0_2020-07-08_12d5838_8940.torchjit"
-#melgan = "melgan-vocodes.torchjit"
+melgan = "melgan_manyvoice5.0_2020-07-23_12d5838_10490.torchit"
 
 [[speakers]]
 name = "Ronald Reagan"
@@ -233,8 +311,9 @@ name = "John Oliver"
 slug = "john-oliver"
 model_pipeline = "ArpabetGlowTtsMelgan"
 glow_tts = "glow-tts_solo_oliver_ljstx_2020.06.22_expr-1_chkpt-1189.torchjit"
-melgan = "melgan_manyvoice2.0_2020-07-08_12d5838_8940.torchjit"
+#melgan = "melgan_manyvoice2.0_2020-07-08_12d5838_8940.torchjit"
 #melgan = "melgan-vocodes.torchjit"
+melgan = "melgan_manyvoice5.0_2020-07-23_12d5838_10490.torchit"
 sample_rate_hz = 21000 # This is lower than normal
 
 [[speakers]]
