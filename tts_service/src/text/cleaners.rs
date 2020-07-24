@@ -3,8 +3,38 @@ const MAX_TEXT_LENGTH: usize = 255;
 
 pub fn clean_text(text: &str) -> String {
   let text = text.trim();
-  let replaced = text.replace("’", "'"); // Smart quotes
+  let mut replaced = text.replace("’", "'"); // Smart quotes
+
+  if contains_slurs(text) {
+    replaced = "you should not say something hateful like that".to_string();
+  }
+
+  // TODO HACK - I RAN OUT OF TIME TO PUT THIS ANYWHERE ELSE
+
   replaced
+}
+
+pub fn contains_slurs(text: &str) -> bool {
+  let test_text = text.to_lowercase();
+  if test_text.contains("nigger") {
+    return true;
+  }
+  if test_text.contains("wetback") {
+    return true;
+  }
+  if test_text.contains("spick") {
+    return true;
+  }
+  if test_text.contains("chink") {
+    return true;
+  }
+  if test_text.contains("ching-chong") {
+    return true;
+  }
+  if test_text.contains("ching chong") {
+    return true;
+  }
+  false
 }
 
 pub fn is_text_too_long(text: &str) -> bool {
