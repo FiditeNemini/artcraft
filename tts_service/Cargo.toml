@@ -35,6 +35,9 @@ serde_json = "1.0.56"
 tch = "0.1.7" # libtorch bindings (pytorch)
 toml = "0.5.6"
 
+# TODO: Investigate the following Rate Limiting library
+#rusty_redis_rate_limiting = { git = "https://github.com/tinrab/rusty-redis-rate-limiting", rev = "46d95040708df92d46cef22d319d0182e12a2c0c" }
+
 # My libraries
 arpabet = "1.0.0"
 numerics = "0.0.1"

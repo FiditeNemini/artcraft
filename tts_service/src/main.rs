@@ -57,28 +57,32 @@ const ENV_ASSET_DIRECTORY: &'static str = "ASSET_DIRECTORY";
 const ENV_BIND_ADDRESS: &'static str = "BIND_ADDRESS";
 const ENV_DATABASE_URL : &'static str = "DATABASE_URL";
 const ENV_DEFAULT_SAMPLE_RATE_HZ : &'static str = "DEFAULT_SAMPLE_RATE_HZ";
-const ENV_LIMITER_ENABLED : &'static str = "LIMITER_ENABLED";
-const ENV_LIMITER_MAX_REQUESTS : &'static str = "LIMITER_MAX_REQUESTS";
-const ENV_LIMITER_REDIS_ADDR  : &'static str = "LIMITER_REDIS_ADDR";
-const ENV_LIMITER_WINDOW_SECONDS : &'static str = "LIMITER_WINDOW_SECONDS";
 const ENV_MAX_CHAR_LEN : &'static str = "MAX_CHAR_LEN";
 const ENV_MIN_CHAR_LEN : &'static str = "MIN_CHAR_LEN";
 const ENV_MODEL_CONFIG_FILE: &'static str = "MODEL_CONFIG_FILE";
 const ENV_NUM_WORKERS: &'static str = "NUM_WORKERS";
+const ENV_RATE_LIMITER_ENABLED : &'static str = "RATE_LIMITER_ENABLED";
+const ENV_RATE_LIMITER_MAX_REQUESTS : &'static str = "RATE_LIMITER_MAX_REQUESTS";
+const ENV_RATE_LIMITER_REDIS_HOST : &'static str = "RATE_LIMITER_REDIS_HOST";
+const ENV_RATE_LIMITER_REDIS_PASS: &'static str = "RATE_LIMITER_REDIS_PASS";
+const ENV_RATE_LIMITER_REDIS_PORT : &'static str = "RATE_LIMITER_REDIS_PORT";
+const ENV_RATE_LIMITER_REDIS_USER : &'static str = "RATE_LIMITER_REDIS_USER";
+const ENV_RATE_LIMITER_WINDOW_SECONDS : &'static str = "RATE_LIMITER_WINDOW_SECONDS";
 const ENV_RUST_LOG : &'static str = "RUST_LOG";
 
 const DEFAULT_ASSET_DIRECTORY : &'static str = "/home/bt/dev/voder/tts_frontend/build";
 const DEFAULT_BIND_ADDRESS : &'static str = "0.0.0.0:12345";
 const DEFAULT_DATABASE_URL : &'static str = "mysql://root:root@localhost/mumble";
 const DEFAULT_DEFAULT_SAMPLE_RATE_HZ : u32 = 22050;
-const DEFAULT_LIMITER_ENABLED : bool = true;
-const DEFAULT_LIMITER_MAX_REQUESTS : usize = 3;
-const DEFAULT_LIMITER_REDIS_ADDR  : &'static str = "redis://127.0.0.1/";
-const DEFAULT_LIMITER_WINDOW_SECONDS : u64 = 10;
 const DEFAULT_MAX_CHAR_LEN : usize = 255;
 const DEFAULT_MIN_CHAR_LEN : usize = 0;
 const DEFAULT_MODEL_CONFIG_FILE: &'static str = "models.toml";
 const DEFAULT_NUM_WORKERS : usize = 4;
+const DEFAULT_RATE_LIMITER_ENABLED : bool = true;
+const DEFAULT_RATE_LIMITER_MAX_REQUESTS : usize = 3;
+const DEFAULT_RATE_LIMITER_REDIS_HOST : &'static str = "127.0.0.1";
+const DEFAULT_RATE_LIMITER_REDIS_PORT : u16 = 6379;
+const DEFAULT_RATE_LIMITER_WINDOW_SECONDS : u64 = 10;
 const DEFAULT_RUST_LOG: &'static str = "debug,actix_web=info";
 
 
@@ -156,6 +160,23 @@ fn get_env_num<T>(env_name: &str, default: T) -> AnyhowResult<T>
   }
 }
 
+pub fn get_rate_limiter_redis() -> AnyhowResult<String> {
+  let redis_host = get_env_string(ENV_RATE_LIMITER_REDIS_HOST, DEFAULT_RATE_LIMITER_REDIS_HOST);
+  let redis_port = get_env_num::<u16>(ENV_RATE_LIMITER_REDIS_PORT, DEFAULT_RATE_LIMITER_REDIS_PORT)?;
+
+  let address = if let Some(redis_user) = get_env_string_optional(ENV_RATE_LIMITER_REDIS_USER) {
+    if let Some(redis_password) = get_env_string_optional(ENV_RATE_LIMITER_REDIS_PASS) {
+      format!("redis://{}:{}@{}:{}/", redis_user, redis_password, redis_host, redis_port)
+    } else {
+      format!("redis://{}@{}:{}/", redis_user, redis_host, redis_port)
+    }
+  } else {
+    format!("redis://{}:{}/", redis_host, redis_port)
+  };
+
+  Ok(address)
+}
+
 pub fn main() -> AnyhowResult<()> {
   if env::var(ENV_RUST_LOG)
       .as_ref()
@@ -180,10 +201,9 @@ pub fn main() -> AnyhowResult<()> {
   let default_sample_rate_hz = get_env_num::<u32>(ENV_DEFAULT_SAMPLE_RATE_HZ,
     DEFAULT_DEFAULT_SAMPLE_RATE_HZ)?;
 
-  let limiter_enabled = get_env_bool(ENV_LIMITER_ENABLED, DEFAULT_LIMITER_ENABLED)?;
-  let limiter_redis_addr = get_env_string(ENV_LIMITER_REDIS_ADDR, DEFAULT_LIMITER_REDIS_ADDR);
-  let limiter_max_requests = get_env_num::<usize>(ENV_LIMITER_MAX_REQUESTS, DEFAULT_LIMITER_MAX_REQUESTS)?;
-  let limiter_window_seconds = get_env_num::<u64>(ENV_LIMITER_WINDOW_SECONDS, DEFAULT_LIMITER_WINDOW_SECONDS)?;
+  let limiter_enabled = get_env_bool(ENV_RATE_LIMITER_ENABLED, DEFAULT_RATE_LIMITER_ENABLED)?;
+  let limiter_max_requests = get_env_num::<usize>(ENV_RATE_LIMITER_MAX_REQUESTS, DEFAULT_RATE_LIMITER_MAX_REQUESTS)?;
+  let limiter_window_seconds = get_env_num::<u64>(ENV_RATE_LIMITER_WINDOW_SECONDS, DEFAULT_RATE_LIMITER_WINDOW_SECONDS)?;
 
   let server_hostname = hostname::get()
       .ok()
@@ -198,9 +218,10 @@ pub fn main() -> AnyhowResult<()> {
   info!("Min character length: {}", min_char_len);
   info!("Hostname: {}", server_hostname);
   info!("Default sample rate hz: {}", default_sample_rate_hz);
-  info!("Limiter redis address: {}", limiter_redis_addr);
-  info!("Limiter max requests: {}", limiter_max_requests);
-  info!("Limiter window seconds: {}", limiter_window_seconds);
+
+  info!("Rate Limiter enabled: {}", limiter_enabled);
+  info!("Rate Limiter max requests: {}", limiter_max_requests);
+  info!("Rate Limiter window seconds: {}", limiter_window_seconds);
 
   let model_configs = ModelConfigs::load_from_file(&model_config_file);
 
@@ -211,7 +232,10 @@ pub fn main() -> AnyhowResult<()> {
   info!("Connecting to redis...");
 
   let rate_limiter : Box<dyn RateLimiter> = if limiter_enabled {
-    let limiter = Limiter::build(&limiter_redis_addr)
+    let redis_address = get_rate_limiter_redis()?;
+    info!("Redis connection string: {}", redis_address);
+
+    let limiter = Limiter::build(&redis_address)
         .limit(limiter_max_requests)
         .period(Duration::from_secs(limiter_window_seconds))
         .finish()?;
