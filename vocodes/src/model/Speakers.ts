@@ -274,7 +274,7 @@ const SPEAKERS : Speaker[] = [
     description: "Entrepreneur",
     avatarUrl: "peter-thiel.jpg",
     fullUrl: "peter-thiel-full.png",
-    voiceQuality: 6.2,
+    voiceQuality: 7.0,
   }),
   Speaker.fromJson({
     name: "President #37 Richard Nixon",
@@ -338,7 +338,7 @@ const SPEAKERS : Speaker[] = [
     description: "Entrepreneur",
     avatarUrl: "sam-altman.jpg",
     fullUrl: "sam-altman-full.png",
-    voiceQuality: 6.0,
+    voiceQuality: 8.0,
   }),
   Speaker.fromJson({
     name: "Sir David Attenborough",
