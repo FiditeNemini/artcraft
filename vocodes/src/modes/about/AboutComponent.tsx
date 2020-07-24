@@ -12,14 +12,31 @@ function AboutComponent(props: Props) {
       <p>
         This is Brandon's this pandemic side project. When he's not 
         <a href="https://www.youtube.com/watch?v=x034jVB1avs" target="_blank" rel="noopener noreferrer">building
-        games to play on the side of skyscrapers</a>, or working on his one-man film studio side hustle, he's doing 
-        crazy stuff like this.
+        games to play on the side of skyscrapers</a>, or working to replace a slow quadratic time industry with 
+        something linear and automated, he's doing crazy stuff like this.
       </p>
 
       <p>
         Your brain was already capable of imagining things spoken in other people's voices. This is 
-        a demonstration of how far computers have caught up to that. Can you imagine the day computers
-        are able to bring all of the rich and vivid imagery you're capable of thinking to life? 
+        a demonstration of how far computers have caught up. One day computers will be able to 
+        bring all of the rich and vivid imagery of your hopes and dreams to life. There's never been a 
+        better time throughout all history to be a creative than now.
+      </p>
+
+      <p>
+        Vocodes is not my startup, it's just a fun hobby that illustrates the kind of deep work I do.
+        I'm not ready to give up the kind of equity that funds such as 
+        Apollo Projects want this early on, but nevertheless I included Sam Altman and friends so that they'll 
+        recognize me when the time comes.
+      </p>
+
+      <p>
+        If you're dead set in helping me build something truly impressive that will strike a giant industry
+        from existence and replace it with something several orders of magnitue cheaper and more accessible, 
+        and you want me to accomplish that 
+        <em>now</em>, consider buying Vocodes.com so that I can in turn buy all the expensive equipment I need. 
+        I'm by no means relying on nor anticipating this, but I'll be able to speed up my work dramatically.
+        It's not low hanging CRUD fruit, but it is important and transformative and I believe in it wholeheartedly.
       </p>
 
       {/*<h1 className="title is-4"> Hello VC</h1>
@@ -42,7 +59,18 @@ function AboutComponent(props: Props) {
         new market. Get in touch and I'll send you my pitch.
       </p>*/}
 
-      <h1 className="title is-4"> Updates </h1>
+      {/*<h1 className="title is-4"> Updates </h1>
+      <h2 className="subtitle is-5">
+        July 24, 2020: Lots of updates.
+      </h2>
+      <p>I don't always keep this list updated with changes, but yesterday I knocked out a lot of work.</p>
+
+      <p>
+        I took a day OOO to help my partner with immigration paperwork, and I closed out the day
+        by knocking out a number of unfinishd tasks on Vocodes. I added nine new voices, scaled 
+        the cluster, and made numerous backend improvements.
+      </p>
+
       <h2 className="subtitle is-5">
         July 12, 2020: HTML rewrite.
       </h2>
@@ -128,7 +156,7 @@ function AboutComponent(props: Props) {
         There's an occasional server crash bug I'm chasing down (right now the server 
         instances respawn when they die). The frontend will be updated soon to no longer
         cache results.
-      </p>
+        </p>*/}
 
       <h1 className="title is-4">Usage Recommendations</h1>
 
@@ -143,7 +171,7 @@ function AboutComponent(props: Props) {
       </p>
 
       <h2 className="subtitle is-5">
-        Try and try again
+        Try your sentences again
       </h2>
 
       <p>
@@ -151,32 +179,47 @@ function AboutComponent(props: Props) {
         Experiment. Try adding punctuation, such as periods and question marks.
       </p>
 
-      <h2 className="subtitle">Use real words</h2>
+      <h2 className="subtitle is-5">Use real words</h2>
 
       <p>
-        "Asdfagdadf" is not a word, and Trump won't know how to say it. 
+        "Asdfagdadf" is not a word, and the models won't know how to say it. The technical
+        reason is that I use CMUdict lookup and there are "only" 140,000 entries (plus a 
+        few I've made). In the future there will be an additional model step to predict
+        phonemes from graphemes or words.
       </p>
 
-      <h2 className="subtitle">Sound out difficult words</h2>
+      <h2 className="subtitle is-5">Sound out difficult words</h2>
       
       <p>
-        If the words you want to use aren't working, that's likely because I trained the 
-        network on phonemes instead of raw text. This phonetic information
-        comes from a database, and although this database contains over 130,000 words, it 
-        unfortunately doesn't have entries such as "Fortnite".
-      </p>
-      
-      <p>
-        To make this work, try sounding out the problematic words: "pikachu is a pokemon"
-        can be rewritten as "peek ah choo is a poke ay mon". You can try "Fort Night" 
+        To make unpronounceable words work, try sounding them out: "pikachu is a pokemon"
+        can be rewritten as "peek ah choo is a poke ay mon". You can use "Fort Night" 
         instead of "Fortnite". 
       </p>
 
+      <h1 className="title is-4">Contact</h1>
+
       <p>
-        I'll fix this issue as soon as I can, because I know how important this is to you.
+        I'm "echelon" on Gmail, Twitter, and Hacker News. Say hi.
       </p>
 
-      <h1 className="title is-4">Contact</h1>
+      <div className="columns is-mobile">
+        <div className="column">
+          <figure className="image is-square">
+            <img src="/logos/pytorch.png" />
+          </figure>
+
+        </div>
+        <div className="column">
+          <figure className="image is-square">
+            <img src="/logos/kubernetes.png" />
+          </figure>
+        </div>
+        <div className="column">
+          <figure className="image is-square">
+            <img src="/logos/rust.png" />
+          </figure>
+        </div>
+      </div>
 
       <button className="button is-link is-medium" onClick={() => props.resetModeCallback()}>Go Back</button>
     </div>

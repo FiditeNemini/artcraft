@@ -112,7 +112,8 @@ class SpeakComponent extends React.Component<Props, State> {
   }
 
   onSpeakError = () => {
-    this.setMessage(StatusState.ERROR, "There was an error. Perhaps you sent too much text or the server is busy. Try again.");
+    this.setMessage(StatusState.ERROR, 
+      "There was an error and I still haven't implemented retry to make it invisible. You can absolutely submit your request again a few times. This is a self-healing Kubernetes cluster.");
   }
 
   onPlay = () => {

@@ -13,11 +13,11 @@ function Footer(props: Props) {
         Made in Atlanta by
         <a href="https://twitter.com/echelon">@echelon</a>.
       </p>
-      <p>
+      {/*<p>
         By using this, you agree to
         <a href="#terms" 
           onClick={() => props.switchModeCallback(Mode.TERMS_MODE)}>the things</a>.
-      </p>
+      </p>*/}
     </footer>
   )
 }
