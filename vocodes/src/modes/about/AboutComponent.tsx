@@ -25,9 +25,6 @@ function AboutComponent(props: Props) {
 
       <p>
         Vocodes is not my startup, it's just a fun hobby that illustrates the kind of deep work I do.
-        I'm not ready to give up the kind of equity that funds such as 
-        Apollo Projects want this early on, but nevertheless I included Sam Altman and friends so that they'll 
-        recognize me when the time comes.
       </p>
 
       <p>
