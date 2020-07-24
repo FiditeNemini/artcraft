@@ -1,3 +1,4 @@
+pub mod api;
 pub mod legacy_speak;
 pub mod legacy_tts;
 pub mod speak;

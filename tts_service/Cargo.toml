@@ -15,6 +15,7 @@ path = "src/main.rs"
 [dependencies]
 actix-cors = "0.2.0"
 actix-files= "0.2.1"
+actix-http = "1.0.0"
 actix-rt = "1.0.0"
 actix-utils = "1.0.3"
 actix-web = "2.0.0"
@@ -30,6 +31,7 @@ limitation = "0.1.1" # redis rate limiter
 log = "0.4.8"
 serde = "1.0.104"
 serde_derive = "1.0.104"
+serde_json = "1.0.56"
 tch = "0.1.7" # libtorch bindings (pytorch)
 toml = "0.5.6"
 

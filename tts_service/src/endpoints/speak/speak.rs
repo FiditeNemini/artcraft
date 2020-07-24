@@ -6,12 +6,14 @@ use actix_web::web::{
 use actix_web::{
   HttpRequest,
   HttpResponse,
+  Result as ActixResult,
 };
 
 use arpabet::Arpabet;
 use crate::AppState;
 use crate::database::model::NewSentence;
 use crate::endpoints::helpers::ip_address::get_request_ip;
+use crate::endpoints::speak::api::{SpeakRequest, SpeakError};
 use crate::model::model_config::ModelPipeline;
 use crate::model::old_model::TacoMelModel;
 use crate::model::pipelines::{arpabet_glow_tts_melgan_pipeline, arpabet_glow_tts_multi_speaker_melgan_pipeline};
@@ -24,28 +26,17 @@ use std::sync::Arc;
 use std::thread;
 use std::time::Duration;
 
-#[derive(Deserialize)]
-pub struct SpeakRequest {
-  /// Slug for the speaker
-  speaker: String,
-  /// Raw text to be spoken
-  text: String,
-}
-
 pub async fn post_speak(request: HttpRequest,
   query: Json<SpeakRequest>,
   app_state: Data<Arc<AppState>>)
-  -> std::io::Result<HttpResponse>
+  -> ActixResult<HttpResponse, SpeakError>
 {
   let app_state = app_state.into_inner();
 
   let ip_address = get_request_ip(&request);
 
   if let Err(err) = app_state.rate_limiter.maybe_ratelimit_request(&ip_address, &request.headers()) {
-    // Couldn't acquire rate limiter
-    return Ok(HttpResponse::build(StatusCode::TOO_MANY_REQUESTS)
-        .content_type("text/plain")
-        .body("Rate limiter not acquired. Slow down."));
+    return Err(SpeakError::rate_limited());
   }
 
   let speaker_slug = query.speaker.to_string();
@@ -53,9 +44,7 @@ pub async fn post_speak(request: HttpRequest,
   let speaker = match app_state.model_configs.find_speaker_by_slug(&speaker_slug) {
     Some(speaker) => speaker,
     None => {
-      return Ok(HttpResponse::build(StatusCode::NOT_FOUND)
-          .content_type("text/plain")
-          .body("Speaker not found"));
+      return Err(SpeakError::bad_speaker());
     },
   };
 
@@ -64,23 +53,7 @@ pub async fn post_speak(request: HttpRequest,
   let text = query.text.to_string();
 
   if text.is_empty() {
-    return Ok(HttpResponse::build(StatusCode::BAD_REQUEST)
-        .content_type("text/plain")
-        .body("Request has empty text."));
-  }
-
-  match request.headers().get(HeaderName::from_static("x-forwarded-for")) {
-    Some(header_value) => {
-      info!("Remote x-forwarded-for: {:?}", header_value);
-    },
-    None => {},
-  }
-
-  match request.headers().get(HeaderName::from_static("forwarded")) {
-    Some(header_value) => {
-      info!("Remote forwarded: {:?}", header_value);
-    },
-    None => {},
+    return Err(SpeakError::generic_bad_request("Request has empty text."));
   }
 
   let sentence_record = NewSentence {

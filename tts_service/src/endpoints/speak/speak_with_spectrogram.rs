@@ -13,6 +13,7 @@ use arpabet::Arpabet;
 use crate::AppState;
 use crate::database::model::NewSentence;
 use crate::endpoints::helpers::ip_address::get_request_ip;
+use crate::endpoints::speak::api::SpeakRequest;
 use crate::inference::inference::InferencePipelineStart;
 use crate::inference::pipelines::glowtts_melgan::GlowTtsMelganPipeline;
 use crate::inference::pipelines::glowtts_multispeaker_melgan::{GlowTtsMultiSpeakerMelganPipeline, GlowTtsMultiSpeakerMelganPipelineMelDone};
@@ -25,14 +26,6 @@ use crate::model::pipelines::{arpabet_glow_tts_melgan_pipeline, arpabet_glow_tts
 use crate::text::arpabet::text_to_arpabet_encoding;
 use crate::text::cleaners::clean_text;
 use std::sync::Arc;
-
-#[derive(Deserialize)]
-pub struct SpeakRequest {
-  /// Slug for the speaker
-  speaker: String,
-  /// Raw text to be spoken
-  text: String,
-}
 
 #[derive(Serialize, Default)]
 pub struct Spectrogram {
