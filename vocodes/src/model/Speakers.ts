@@ -274,7 +274,7 @@ const SPEAKERS : Speaker[] = [
     description: "Entrepreneur",
     avatarUrl: "peter-thiel.jpg",
     fullUrl: "peter-thiel-full.png",
-    voiceQuality: 5.1,
+    voiceQuality: 6.2,
   }),
   Speaker.fromJson({
     name: "President #37 Richard Nixon",
