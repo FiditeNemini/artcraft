@@ -18,6 +18,7 @@ interface Props {
 
 interface State {
   mode: Mode,
+  text: string,
 }
 
 class ModalComponent extends React.Component<Props, State> {
@@ -26,11 +27,16 @@ class ModalComponent extends React.Component<Props, State> {
     super(props);
     this.state = {
       mode: Mode.SPEAKER,
+      text: '',
     };
   }
 
   switchMode = (mode: Mode) => {
     this.setState({ mode: mode });
+  }
+
+  updateText = (text: string) => {
+    this.setState({ text: text });
   }
 
   public render() {
@@ -41,10 +47,17 @@ class ModalComponent extends React.Component<Props, State> {
       case Mode.ADVANCED:
         // TODO: CLEAN THIS UP.
         // Share the text input, but change the form logic and dropdowns.
-        component = <MainComponent apiConfig={this.props.apiConfig} mode={this.state.mode } />;
+        component = <MainComponent
+          apiConfig={this.props.apiConfig}
+          mode={this.state.mode }
+          text={this.state.text}
+          updateTextCallback={this.updateText} />;
         break;
       case Mode.SPEAKER_SPECTROGRAM:
-        component = <SpeakerSpectrogramModeComponent apiConfig={this.props.apiConfig} />;
+        component = <SpeakerSpectrogramModeComponent
+          apiConfig={this.props.apiConfig}
+          text={this.state.text}
+          updateTextCallback={this.updateText} />;
         break;
       case Mode.SENTENCE:
         component = <SentencesComponent apiConfig={this.props.apiConfig} />;

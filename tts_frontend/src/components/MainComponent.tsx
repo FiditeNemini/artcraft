@@ -12,6 +12,8 @@ import { Mode } from './ModalComponent'
 interface Props {
   apiConfig: ApiConfig,
   mode: Mode,
+  text: string,
+  updateTextCallback: (text: string) => void,
 }
 
 interface State {
@@ -79,7 +81,11 @@ class MainComponent extends React.Component<Props, State> {
   public renderSpeakerMode() {
     return (
       <div>
-        <SpeakerModeComponent apiConfig={this.props.apiConfig} />
+        <SpeakerModeComponent 
+          apiConfig={this.props.apiConfig}
+          text={this.props.text}
+          updateTextCallback={this.props.updateTextCallback}
+          />
       </div>
     );
   }

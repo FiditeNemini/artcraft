@@ -6,10 +6,11 @@ import { SpeakRequest } from '../../../api/ApiDefinition'
 interface Props {
   apiConfig: ApiConfig,
   speaker?: String,
+  text: string,
+  updateTextCallback: (text: string) => void,
 }
 
 interface State {
-  text?: String,
   howl?: Howl,
 }
 
@@ -19,7 +20,6 @@ class SpeakerAudioForm extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props);
     this.state = {
-      text: undefined,
       howl: undefined,
     };
   }
@@ -30,17 +30,17 @@ class SpeakerAudioForm extends React.Component<Props, State> {
 
   handleTextChange = (ev: React.FormEvent<HTMLInputElement>) => {
     const text = (ev.target as HTMLInputElement).value;
-    this.setState({text: text});
+    this.props.updateTextCallback(text);
   }
 
   makeRequest = (ev: React.FormEvent<HTMLFormElement>) => {
     console.log("Form Submit");
 
-    if (!this.state.text) {
+    if (!this.props.text) {
       return;
     }
 
-    let request = new SpeakRequest(this.state.text, this.props.speaker!);
+    let request = new SpeakRequest(this.props.text, this.props.speaker!);
 
     const url = this.props.apiConfig.getEndpoint('/speak');
 
@@ -77,7 +77,7 @@ class SpeakerAudioForm extends React.Component<Props, State> {
   public render() {
     return (
       <form onSubmit={this.makeRequest}>
-        <input onChange={this.handleTextChange} />
+        <input onChange={this.handleTextChange} value={this.props.text} />
         <button>Submit</button>
       </form>
     );

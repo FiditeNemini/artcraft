@@ -8,10 +8,7 @@ import { ModalComponent } from './components/ModalComponent';
 
 const App: React.FC = () => {
   let apiConfig = new ApiConfig();
-  //
-  //<h1>Neural TTS</h1>
-  //<MainComponent apiConfig={apiConfig} />
-  //
+
   return (
     <div className="App">
       <ModalComponent apiConfig={apiConfig} />

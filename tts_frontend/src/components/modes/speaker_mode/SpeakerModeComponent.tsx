@@ -6,6 +6,8 @@ import ApiConfig from '../../../ApiConfig';
 
 interface Props {
   apiConfig: ApiConfig,
+  text: string,
+  updateTextCallback: (text: string) => void,
 }
 
 interface State {
@@ -68,6 +70,8 @@ class SpeakerModeComponent extends React.Component<Props, State> {
         <SpeakerAudioForm 
           speaker={this.state.speaker_slug!} 
           apiConfig={this.props.apiConfig}
+          text={this.props.text}
+          updateTextCallback={this.props.updateTextCallback}
           />
       </div>
     );
