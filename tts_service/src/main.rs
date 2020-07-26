@@ -72,7 +72,7 @@ const ENV_RATE_LIMITER_REDIS_USER : &'static str = "RATE_LIMITER_REDIS_USER";
 const ENV_RATE_LIMITER_WINDOW_SECONDS : &'static str = "RATE_LIMITER_WINDOW_SECONDS";
 const ENV_RUST_LOG : &'static str = "RUST_LOG";
 
-const DEFAULT_ASSET_DIRECTORY : &'static str = "/home/bt/dev/voder/tts_frontend/build";
+const DEFAULT_ASSET_DIRECTORY : &'static str = "/home/bt/dev/voice/voder/tts_frontend/build";
 const DEFAULT_BIND_ADDRESS : &'static str = "0.0.0.0:12345";
 const DEFAULT_DATABASE_ENABLED : bool = true;
 const DEFAULT_DATABASE_URL : &'static str = "mysql://root:root@localhost/mumble";
