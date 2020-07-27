@@ -199,6 +199,10 @@ function AboutComponent(props: Props) {
         I'm "echelon" on Gmail, Twitter, and Hacker News. Say hi.
       </p>
 
+      <p>
+        &mdash; Learning Machines, LLC
+      </p>
+
       <div className="columns is-mobile">
         <div className="column">
           <figure className="image is-square">
