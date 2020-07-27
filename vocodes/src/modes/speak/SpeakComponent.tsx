@@ -113,7 +113,7 @@ class SpeakComponent extends React.Component<Props, State> {
 
   onSpeakError = () => {
     this.setMessage(StatusState.ERROR, 
-      "There was an error and I still haven't implemented retry to make it invisible. You can absolutely submit your request again a few times. This is a self-healing Kubernetes cluster.");
+      "There was an error and I still haven't implemented retry to make it invisible. You can absolutely submit your request again a few times. This is a self-healing Kubernetes cluster. Some models (voices) get more load than others or are scaled to fewer or more pods.");
   }
 
   onPlay = () => {

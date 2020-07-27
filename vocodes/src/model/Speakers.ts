@@ -357,6 +357,14 @@ const SPEAKERS : Speaker[] = [
     fullUrl: "tupac-shakur-full.png",
     voiceQuality: 5.0,
   }),
+  Speaker.fromJson({
+    name: "Wilford Brimley",
+    slug: "wilford-brimley",
+    description: "Actor",
+    avatarUrl: "wilford-brimley.jpg",
+    fullUrl: "wilford-brimley-full.png",
+    voiceQuality: 7.4,
+  }),
 ];
 
 export { Speaker, SPEAKERS };
