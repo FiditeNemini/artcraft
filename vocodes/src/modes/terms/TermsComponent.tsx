@@ -20,8 +20,8 @@ function TermsComponent(props: Props) {
 
         <p>This website is a form of artistic expression, parody, and engineering creativity.
         It is not meant to be harmful to anyone in any way. The audio generated is sufficiently
-        poor in quality and should not be confused with actual speech. Everyone should be
-        able to have a good laugh.</p>
+        poor in quality and should not be confused with actual speech. Everyone should see
+        how far we've come with technology and what opportunities lie ahead.</p>
 
         <h2>Deep fakes are good.</h2>
 
