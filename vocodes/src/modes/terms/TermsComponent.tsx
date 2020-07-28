@@ -6,18 +6,17 @@ interface Props {
 
 function TermsComponent(props: Props) {
   return (
-    <div id="terms">
-        <h1>Terms and Conditions.</h1>
+    <div id="terms" className="content is-4">
+        <h1 className="title is-3"> Terms and Conditions</h1>
+
 
         <h2>Don't use this website for mischief.</h2>
 
         <p>Please have fun with this app amongst your friends and colleages, but don't
         do anything stupid. The actions you take are your own, and I am not responsible
-        for any trouble you might get into<sup>&dagger;</sup>. Use your best judgment.
-        For example, though you might find it funny, please don't use this app to harass
-        the poor people working at Gamestop. They don't have Battle Toads.</p>
+        for any trouble you might get into<sup>&dagger;</sup>. Use your best judgment.</p>
 
-        <h2>Artistic intent.</h2>
+        <h1 className="title is-4"> Artistic Intent </h1>
 
         <p>This website is a form of artistic expression, parody, and engineering creativity.
         It is not meant to be harmful to anyone in any way. The audio generated is sufficiently
@@ -35,6 +34,15 @@ function TermsComponent(props: Props) {
         If it's left wide open, it's just a toy. Society will learn to accept and enjoy it just
         as we did with Photoshop.</p>
 
+        <p>
+          Furthermore, this technology will propel us into a new era of creative productivity.
+          We'll democratize music, giving voices to those who have none. We'll enhance film making, 
+          making it possible for small teams to make movies visually comperable to big-budget 
+          Hollywood films. We'll empower artists to make things they couldn't even dream of.
+          This is one of the most exciting fields in the world right now.
+        </p>
+
+
         <p>Our brains are already capable of reading passages in other people's voices and
         picturing vivid scenes without them ever existing. Deep models give computers the
         ability to do the same thing. That's powerful. This and related advances in computer
@@ -42,15 +50,8 @@ function TermsComponent(props: Props) {
 
         <p><em>Don't legislate deep fakes.</em></p>
 
-        <h2>What's next?</h2>
-
-        <p>I'll be improving trumped.com, adding more voices, and scaling the app.
-        I've got some new models baking in the GPU ovens right now.</p>
-
-        <p>I'm very busy between work and my startup, so please give me time.</p>
-
         <p><sup>&dagger;</sup> Anyone can download Tacotron from Github to produce the same
-        results on their own. Vocodes.com / Trumped.com is not connected with your activities.</p>
+        results on their own. Vocodes.com is not connected with your activities.</p>
         
       <button onClick={() => props.resetModeCallback()}>Go Back</button>
     </div>
