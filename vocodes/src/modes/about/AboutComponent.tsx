@@ -40,7 +40,8 @@ function AboutComponent(props: Props) {
       <p>
         <em>I'll be happy to remove any of the voices featured here for any reason.</em>
         &nbsp;
-        I'm not a jerk, and I don't want anything in return.
+        I'm not a jerk, and I don't want anything in return. I don't mean to offend any parties, and my hope
+        is that everyone will think this is really cool (like the laser video I linked above).
       </p>
       
       <p>
