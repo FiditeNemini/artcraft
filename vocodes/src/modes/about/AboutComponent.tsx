@@ -36,6 +36,33 @@ function AboutComponent(props: Props) {
         It's not low hanging CRUD fruit, but it is important and transformative and I believe in it wholeheartedly.
       </p>
 
+      <h1 className="title is-4">Disclosure</h1>
+
+      <p>
+        <em>I'll be happy to remove any voices featured here.</em>
+      </p>
+      
+      <p>
+        The technology to clone voices is already out in the open, and 13 year olds are replicating 
+        these results on thier own at home. People are making voices from all sorts of public figures 
+        (independent of me and my work) and posting them on YouTube and social media.
+      </p>
+
+      <p>
+        Even if the United States chooses to ban this technology, institutions in China, Korea, 
+        Japan and other countries are rapidly conducting and publishing research on this topic. 
+        Individuals all over the world have access to this easy-to-use technology and state actors
+        probably have even more sophisiticated versions.
+      </p>
+
+      <p>
+        This is kind of like Photoshop when it first came out. It's impressive, maybe a little
+        scary, but it's about to become the new norm. 
+        <a href="https://github.com/NVIDIA/tacotron2" target="_blank">NVIDIA makes these tools 
+        publicly available for you to make your own voice models.</a>
+      </p>
+
+
       {/*<h1 className="title is-4"> Hello VC</h1>
 
       <p>
@@ -197,24 +224,6 @@ function AboutComponent(props: Props) {
 
       <p>
         I'm "echelon" on Gmail, Twitter, and Hacker News. Say hi.
-      </p>
-
-      <p>
-        I'll be happy to remove any voices featured here. The technology to clone voices
-        is already out in the open, and 13 year olds are replicating these results on thier own 
-        at home. People are making voices from all sorts of public figures (independent of me 
-        and my work) and posting them on YouTube and social media.
-      </p>
-
-      <p>
-        Even if the United States chooses to ban this technology, institutions in China, Korea, 
-        Japan and other countries are rapidly conducting and publishing research on this topic.
-      </p>
-
-      <p>
-        This is kind of like Photoshop when it first came out. It's impressive, maybe a little
-        scary, but it's about to become the new norm. NVIDIA makes these tools publicly available
-        for you to make your own.
       </p>
 
       <p>
