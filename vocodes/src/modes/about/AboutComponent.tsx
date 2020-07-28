@@ -31,7 +31,8 @@ function AboutComponent(props: Props) {
         If you're dead set in helping me build something truly impressive that will strike a giant industry
         from existence and replace it with something several orders of magnitue cheaper and more accessible, 
         and you want me to accomplish that 
-        &nbsp;<em>now</em>, consider buying Vocodes.com so that I can in turn buy all the expensive equipment I need. 
+        &nbsp;<em>now</em>, consider buying Vocodes.com (technology) so that I can in turn buy all the 
+        expensive equipment I need. 
         I'm by no means relying on nor anticipating this, but I'll be able to speed up my work dramatically.
         It's not low hanging CRUD fruit, but it is important and transformative and I believe in it wholeheartedly.
       </p>
@@ -40,6 +41,7 @@ function AboutComponent(props: Props) {
 
       <p>
         <em>I'll be happy to remove any of the voices featured here for any reason.</em>
+        &nbsp;
         I'm not a jerk, and I don't want anything in return.
       </p>
       
