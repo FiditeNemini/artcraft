@@ -325,14 +325,6 @@ const SPEAKERS : Speaker[] = [
     voiceQuality: 4.2,
   }),
   Speaker.fromJson({
-    name: "President #45 Donald Trump",
-    slug: "donald-trump",
-    description: "The 45th President of the United States.",
-    avatarUrl: "donald-trump.jpg",
-    fullUrl: "donald-trump-full.png",
-    voiceQuality: 5.2,
-  }),
-  Speaker.fromJson({
     name: "Sam Altman",
     slug: "sam-altman",
     description: "Entrepreneur",
