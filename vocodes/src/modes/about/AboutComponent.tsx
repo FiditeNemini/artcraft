@@ -24,7 +24,7 @@ function AboutComponent(props: Props) {
       </p>
 
       <p>
-        Vocodes is not my startup, it's just a fun hobby that illustrates the kind of deep work I do.
+        Vocodes is not my startup, it's just a fun project that illustrates the kind of deep work I do.
       </p>
 
       <p>
@@ -36,10 +36,10 @@ function AboutComponent(props: Props) {
         It's not low hanging CRUD fruit, but it is important and transformative and I believe in it wholeheartedly.
       </p>
 
-      <h1 className="title is-4">Disclosure</h1>
+      <h1 className="title is-4"> Technology disclosure </h1>
 
       <p>
-        <em>I'll be happy to remove any voices featured here.</em>
+        <em>I'll be happy to remove any of the voices featured here for any reason.</em>
       </p>
       
       <p>
@@ -49,17 +49,21 @@ function AboutComponent(props: Props) {
       </p>
 
       <p>
-        Even if the United States chooses to ban this technology, institutions in China, Korea, 
-        Japan and other countries are rapidly conducting and publishing research on this topic. 
-        Individuals all over the world have access to this easy-to-use technology and state actors
-        probably have even more sophisiticated versions.
+        Even if the United States chooses to ban this technology, institutions in China, Japan, 
+        and other countries all over the world are rapidly conducting and publishing research
+        on this topic. 
+        People everywhere have access to this easy-to-use technology. State actors
+        probably have even more sophisiticated versions available.
       </p>
 
       <p>
-        This is kind of like Photoshop when it first came out. It's impressive, maybe a little
-        scary, but it's about to become the new norm. 
+        This is kind of like Photoshop when it first came out. It's impressive, maybe a little scary, but it's 
+        about to become the new norm. 
+      </p>
+
+      <p>
         <a href="https://github.com/NVIDIA/tacotron2" target="_blank">NVIDIA makes these tools 
-        publicly available for you to make your own voice models.</a>
+        publicly available for you to make your own voice models</a>. Check it out!
       </p>
 
 
@@ -182,7 +186,7 @@ function AboutComponent(props: Props) {
         cache results.
         </p>*/}
 
-      <h1 className="title is-4">Usage Recommendations</h1>
+      <h1 className="title is-4"> Usage recommendations </h1>
 
       <h2 className="subtitle is-5">
         Short sentences are bad
