@@ -40,6 +40,7 @@ function AboutComponent(props: Props) {
 
       <p>
         <em>I'll be happy to remove any of the voices featured here for any reason.</em>
+        I'm not a jerk, and I don't want anything in return.
       </p>
       
       <p>
@@ -51,14 +52,19 @@ function AboutComponent(props: Props) {
       <p>
         Even if the United States chooses to ban this technology, institutions in China, Japan, 
         and other countries all over the world are rapidly conducting and publishing research
-        on this topic. 
-        People everywhere have access to this easy-to-use technology. State actors
+        on this topic. People everywhere have access to this easy-to-use technology. State actors
         probably have even more sophisiticated versions available.
       </p>
 
       <p>
         This is kind of like Photoshop when it first came out. It's impressive, maybe a little scary, but it's 
         about to become the new norm. 
+      </p>
+
+      <p>
+        As an interesting asside, the voices you are actually hearing are Linda Johnson or myself with a little
+        bit layered on top. All voices have the same fundamental behavior and representation and only vary in
+        a few paramenters.
       </p>
 
       <p>
