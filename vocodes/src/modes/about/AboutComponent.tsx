@@ -62,8 +62,8 @@ function AboutComponent(props: Props) {
       </p>
 
       <p>
-        <a href="https://github.com/NVIDIA/tacotron2" target="_blank">NVIDIA makes these tools 
-        publicly available for you to make your own voice models</a>. Check it out!
+        <a href="https://github.com/NVIDIA/tacotron2" target="_blank" rel="noopener noreferrer">NVIDIA 
+        makes these tools publicly available for you to make your own voice models</a>. Check it out!
       </p>
 
 
