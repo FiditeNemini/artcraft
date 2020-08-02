@@ -35,9 +35,11 @@ pub async fn post_speak(request: HttpRequest,
 
   let ip_address = get_request_ip(&request);
 
-  if let Err(err) = app_state.rate_limiter.maybe_ratelimit_request(&ip_address, &request.headers()) {
+  if let Err(_err) = app_state.rate_limiter.maybe_ratelimit_request(&ip_address, &request.headers()) {
     return Err(SpeakError::rate_limited());
   }
+
+  app_state.stats_recorder.record_stats(&query.speaker, &query.text, &ip_address);
 
   let speaker_slug = query.speaker.to_string();
 
