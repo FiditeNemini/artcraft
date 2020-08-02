@@ -1,3 +1,4 @@
+use actix_rt;
 use actix_web::http::{StatusCode, header, HeaderName, HeaderValue};
 use actix_web::web::{
   Data,
@@ -28,6 +29,9 @@ use crate::text::arpabet::text_to_arpabet_encoding;
 use crate::text::cleaners::clean_text;
 use std::sync::Arc;
 use actix_web::client::Client;
+use actix::{Actor, SyncContext, Handler, Message};
+use std::thread;
+use std::time::Duration;
 
 #[derive(Serialize, Default)]
 pub struct Spectrogram {
@@ -49,12 +53,44 @@ struct RecordRequest {
   speaker: String,
 }
 
+
+pub struct BackgroundTask;
+
+impl Message for BackgroundTask {
+  type Result = ();
+}
+
+#[derive(Default)]
+pub struct BackgroundTaskActor;
+
+impl Actor for BackgroundTaskActor {
+  type Context = SyncContext<Self>;
+
+  fn started(&mut self, _: &mut SyncContext<Self>) {
+    info!("Background task actor started up")
+  }
+}
+
+impl Handler<BackgroundTask> for BackgroundTaskActor {
+  type Result = ();
+
+  fn handle(&mut self, _: BackgroundTask, _: &mut SyncContext<Self>) {
+    info!("Starting background task");
+    thread::sleep(Duration::new(4,0));
+    info!("Finished background task");
+  }
+}
+
+
+
 pub async fn post_speak_with_spectrogram(request: HttpRequest,
   query: Json<SpeakRequest>,
   app_state: Data<Arc<AppState>>)
   -> ActixResult<Json<SpeakSpectrogramResponse>, SpeakError>
 {
   let app_state = app_state.into_inner();
+
+  app_state.background_actor.do_send(BackgroundTask {});
 
   let client = Client::new();
 
@@ -75,8 +111,7 @@ pub async fn post_speak_with_spectrogram(request: HttpRequest,
   let result = client.post("http://localhost:11111/sentence")
       .no_decompress()
       .header(header::CONTENT_TYPE, "application/json")
-      .send_json(&r)
-      .await;
+      .send_json(&r);
 
   let speaker = match app_state.model_configs.find_speaker_by_slug(&speaker_slug) {
     Some(speaker) => speaker,

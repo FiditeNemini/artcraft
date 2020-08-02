@@ -40,7 +40,7 @@ use crate::endpoints::sentences::get_sentences;
 use crate::endpoints::speak::legacy_speak::legacy_get_speak;
 use crate::endpoints::speak::legacy_tts::post_tts;
 use crate::endpoints::speak::speak::post_speak;
-use crate::endpoints::speak::speak_with_spectrogram::post_speak_with_spectrogram;
+use crate::endpoints::speak::speak_with_spectrogram::{post_speak_with_spectrogram, BackgroundTaskActor};
 use crate::endpoints::speakers::get_speakers;
 use crate::endpoints::words::get_words;
 use crate::model::model_cache::ModelCache;
@@ -52,6 +52,7 @@ use crate::text::checker::TextChecker;
 use limitation::Limiter;
 use std::time::Duration;
 use crate::database::sentence_recorder::SentenceRecorder;
+use actix::{Addr, SyncArbiter};
 
 const ENV_ARPABET_EXTRAS_FILE : &'static str = "ARPABET_EXTRAS_FILE";
 const ENV_ASSET_DIRECTORY: &'static str = "ASSET_DIRECTORY";
@@ -98,6 +99,7 @@ pub struct AppState {
   pub text_checker: TextChecker,
   pub default_sample_rate_hz: u32,
   pub rate_limiter: Box<dyn RateLimiter>,
+  pub background_actor: Addr<BackgroundTaskActor>,
 }
 
 /** Startup parameters for the server. */
@@ -289,6 +291,9 @@ pub fn main() -> AnyhowResult<()> {
 
   info!("Arpabet loaded. {} entries", arpabet.len());
 
+  let sys = actix::System::new("background-worker");
+  let bt_actor = SyncArbiter::start(1, move || BackgroundTaskActor::default());
+
   let app_state = AppState {
     arpabet,
     model_configs,
@@ -297,6 +302,7 @@ pub fn main() -> AnyhowResult<()> {
     text_checker,
     default_sample_rate_hz,
     rate_limiter,
+    background_actor: bt_actor.clone(),
   };
 
   let server_args = ServerArgs {
