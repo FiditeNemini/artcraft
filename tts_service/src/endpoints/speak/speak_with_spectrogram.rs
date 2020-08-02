@@ -42,6 +42,13 @@ pub struct SpeakSpectrogramResponse {
   pub spectrogram: Base64MelSpectrogram,
 }
 
+#[derive(Serialize,Debug)]
+struct RecordRequest {
+  remote_ip_address: String,
+  text: String,
+  speaker: String,
+}
+
 pub async fn post_speak_with_spectrogram(request: HttpRequest,
   query: Json<SpeakRequest>,
   app_state: Data<Arc<AppState>>)
@@ -51,11 +58,6 @@ pub async fn post_speak_with_spectrogram(request: HttpRequest,
 
   let client = Client::new();
 
-  let result = client.get("http://localhost:11111/test")
-      .no_decompress()
-      .send()
-      .await;
-
   let ip_address = get_request_ip(&request);
 
   if let Err(err) = app_state.rate_limiter.maybe_ratelimit_request(&ip_address, &request.headers()) {
@@ -63,6 +65,18 @@ pub async fn post_speak_with_spectrogram(request: HttpRequest,
   }
 
   let speaker_slug = query.speaker.to_string();
+
+  let r = RecordRequest {
+    remote_ip_address: "1.1.1.1".to_string(),
+    speaker: query.speaker.to_string(),
+    text: query.text.to_string(),
+  };
+
+  let result = client.post("http://localhost:11111/sentence")
+      .no_decompress()
+      .header(header::CONTENT_TYPE, "application/json")
+      .send_json(&r)
+      .await;
 
   let speaker = match app_state.model_configs.find_speaker_by_slug(&speaker_slug) {
     Some(speaker) => speaker,
