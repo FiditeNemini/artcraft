@@ -11,8 +11,11 @@ use actix_web::{
   Result as ActixResult,
 };
 
+use actix::{Actor, SyncContext, Handler, Message};
+use actix_web::client::Client;
 use arpabet::Arpabet;
 use crate::AppState;
+use crate::actors::stats_recorder_actor::BackgroundTask;
 use crate::database::model::NewSentence;
 use crate::endpoints::helpers::ip_address::get_request_ip;
 use crate::endpoints::speak::api::{SpeakRequest, SpeakError};
@@ -28,8 +31,6 @@ use crate::model::pipelines::{arpabet_glow_tts_melgan_pipeline, arpabet_glow_tts
 use crate::text::arpabet::text_to_arpabet_encoding;
 use crate::text::cleaners::clean_text;
 use std::sync::Arc;
-use actix_web::client::Client;
-use actix::{Actor, SyncContext, Handler, Message};
 use std::thread;
 use std::time::Duration;
 
@@ -53,36 +54,6 @@ struct RecordRequest {
   speaker: String,
 }
 
-
-pub struct BackgroundTask;
-
-impl Message for BackgroundTask {
-  type Result = ();
-}
-
-#[derive(Default)]
-pub struct BackgroundTaskActor;
-
-impl Actor for BackgroundTaskActor {
-  type Context = SyncContext<Self>;
-
-  fn started(&mut self, _: &mut SyncContext<Self>) {
-    info!("Background task actor started up")
-  }
-}
-
-impl Handler<BackgroundTask> for BackgroundTaskActor {
-  type Result = ();
-
-  fn handle(&mut self, _: BackgroundTask, _: &mut SyncContext<Self>) {
-    info!("Starting background task");
-    thread::sleep(Duration::new(4,0));
-    info!("Finished background task");
-  }
-}
-
-
-
 pub async fn post_speak_with_spectrogram(request: HttpRequest,
   query: Json<SpeakRequest>,
   app_state: Data<Arc<AppState>>)
@@ -90,9 +61,8 @@ pub async fn post_speak_with_spectrogram(request: HttpRequest,
 {
   let app_state = app_state.into_inner();
 
-  app_state.background_actor.do_send(BackgroundTask {});
+  //app_state.background_actor.do_send(BackgroundTask {} );
 
-  let client = Client::new();
 
   let ip_address = get_request_ip(&request);
 
@@ -102,16 +72,24 @@ pub async fn post_speak_with_spectrogram(request: HttpRequest,
 
   let speaker_slug = query.speaker.to_string();
 
+  let client = Client::new();
+
   let r = RecordRequest {
     remote_ip_address: "1.1.1.1".to_string(),
     speaker: query.speaker.to_string(),
     text: query.text.to_string(),
   };
 
-  let result = client.post("http://localhost:11111/sentence")
-      .no_decompress()
-      .header(header::CONTENT_TYPE, "application/json")
-      .send_json(&r);
+
+  actix_rt::spawn(async move {
+    thread::sleep(Duration::from_millis(10_000));
+    info!("Alerting endpoint");
+    let result = client.post("http://localhost:11111/sentence")
+        .no_decompress()
+        .header(header::CONTENT_TYPE, "application/json")
+        .send_json(&r);
+    result.await;
+  });
 
   let speaker = match app_state.model_configs.find_speaker_by_slug(&speaker_slug) {
     Some(speaker) => speaker,
