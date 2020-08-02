@@ -27,6 +27,7 @@ use crate::model::pipelines::{arpabet_glow_tts_melgan_pipeline, arpabet_glow_tts
 use crate::text::arpabet::text_to_arpabet_encoding;
 use crate::text::cleaners::clean_text;
 use std::sync::Arc;
+use actix_web::client::Client;
 
 #[derive(Serialize, Default)]
 pub struct Spectrogram {
@@ -47,6 +48,13 @@ pub async fn post_speak_with_spectrogram(request: HttpRequest,
   -> ActixResult<Json<SpeakSpectrogramResponse>, SpeakError>
 {
   let app_state = app_state.into_inner();
+
+  let client = Client::new();
+
+  let result = client.get("http://localhost:11111/test")
+      .no_decompress()
+      .send()
+      .await;
 
   let ip_address = get_request_ip(&request);
 
