@@ -10,22 +10,42 @@ struct RecordRequest {
   speaker: String,
 }
 
-pub fn record_stats(speaker: &str, text: &str, ip_address: &str) {
-  let client = Client::new();
+/// This is a stupid name for a microservice that just records
+/// sentences and speakers.
+pub struct StatsRecorder {
+  endpoint: String,
+  enabled: bool,
+}
 
-  let r = RecordRequest {
-    remote_ip_address: "1.1.1.1".to_string(),
-    speaker: speaker.to_string(),
-    text: text.to_string(),
-  };
+impl StatsRecorder {
+  pub fn new(endpoint: &str, enabled: bool) -> Self {
+    Self {
+      endpoint: endpoint.to_string(),
+      enabled,
+    }
+  }
 
-  actix_rt::spawn(async move {
-    thread::sleep(Duration::from_millis(10_000));
-    info!("Alerting endpoint");
-    let result = client.post("http://localhost:11111/sentence")
-        .no_decompress()
-        .header(header::CONTENT_TYPE, "application/json")
-        .send_json(&r);
-    result.await;
-  });
+  pub fn record_stats(&self, speaker: &str, text: &str, ip_address: &str) {
+    if !self.enabled {
+      info!("StatsRecorder is disabled.");
+      return;
+    }
+
+    let endpoint = self.endpoint.clone();
+    let client = Client::new();
+
+    let request = RecordRequest {
+      remote_ip_address: ip_address.to_string(),
+      speaker: speaker.to_string(),
+      text: text.to_string(),
+    };
+
+    actix_rt::spawn(async move {
+      let result = client.post(&endpoint)
+          .no_decompress()
+          .header(header::CONTENT_TYPE, "application/json")
+          .send_json(&request);
+      result.await;
+    });
+  }
 }

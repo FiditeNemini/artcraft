@@ -53,6 +53,7 @@ use crate::rate_limiter::redis_rate_limiter::RedisRateLimiter;
 use crate::text::checker::TextChecker;
 use limitation::Limiter;
 use std::time::Duration;
+use crate::endpoints::helpers::stats_recorder::StatsRecorder;
 
 const ENV_ARPABET_EXTRAS_FILE : &'static str = "ARPABET_EXTRAS_FILE";
 const ENV_ASSET_DIRECTORY: &'static str = "ASSET_DIRECTORY";
@@ -72,6 +73,8 @@ const ENV_RATE_LIMITER_REDIS_PORT : &'static str = "RATE_LIMITER_REDIS_PORT";
 const ENV_RATE_LIMITER_REDIS_USER : &'static str = "RATE_LIMITER_REDIS_USER";
 const ENV_RATE_LIMITER_WINDOW_SECONDS : &'static str = "RATE_LIMITER_WINDOW_SECONDS";
 const ENV_RUST_LOG : &'static str = "RUST_LOG";
+const ENV_STATS_MICROSERVICE_ENABLED : &'static str = "STATS_MICROSERVICE_ENABLED";
+const ENV_STATS_MICROSERVICE_ENDPOINT : &'static str = "STATS_MICROSERVICE_ENDPOINT";
 
 const DEFAULT_ASSET_DIRECTORY : &'static str = "/home/bt/dev/voice/voder/tts_frontend/build";
 const DEFAULT_BIND_ADDRESS : &'static str = "0.0.0.0:12345";
@@ -88,6 +91,8 @@ const DEFAULT_RATE_LIMITER_REDIS_HOST : &'static str = "127.0.0.1";
 const DEFAULT_RATE_LIMITER_REDIS_PORT : u16 = 6379;
 const DEFAULT_RATE_LIMITER_WINDOW_SECONDS : u64 = 10;
 const DEFAULT_RUST_LOG: &'static str = "debug,actix_web=info";
+const DEFAULT_STATS_MICROSERVICE_ENABLED : bool = true;
+const DEFAULT_STATS_MICROSERVICE_ENDPOINT : &'static str = "http://localhost:11111/sentence";
 
 
 /** State that is easy to pass between handlers. */
@@ -99,6 +104,7 @@ pub struct AppState {
   pub text_checker: TextChecker,
   pub default_sample_rate_hz: u32,
   pub rate_limiter: Box<dyn RateLimiter>,
+  pub stats_recorder: StatsRecorder,
 }
 
 /** Startup parameters for the server. */
@@ -210,6 +216,9 @@ pub fn main() -> AnyhowResult<()> {
   let limiter_max_requests = get_env_num::<usize>(ENV_RATE_LIMITER_MAX_REQUESTS, DEFAULT_RATE_LIMITER_MAX_REQUESTS)?;
   let limiter_window_seconds = get_env_num::<u64>(ENV_RATE_LIMITER_WINDOW_SECONDS, DEFAULT_RATE_LIMITER_WINDOW_SECONDS)?;
 
+  let stats_recorder_enabled = get_env_bool(ENV_STATS_MICROSERVICE_ENABLED, DEFAULT_STATS_MICROSERVICE_ENABLED)?;
+  let stats_recorder_endpoint = get_env_string(ENV_STATS_MICROSERVICE_ENDPOINT, DEFAULT_STATS_MICROSERVICE_ENDPOINT);
+
   let server_hostname = hostname::get()
       .ok()
       .and_then(|h| h.into_string().ok())
@@ -227,6 +236,9 @@ pub fn main() -> AnyhowResult<()> {
   info!("Rate Limiter enabled: {}", limiter_enabled);
   info!("Rate Limiter max requests: {}", limiter_max_requests);
   info!("Rate Limiter window seconds: {}", limiter_window_seconds);
+
+  info!("Stats Recorder Enabled: {}", stats_recorder_enabled);
+  info!("Stats Recorder Endpoint: {}", stats_recorder_endpoint);
 
   let model_configs = ModelConfigs::load_from_file(&model_config_file);
 
@@ -290,6 +302,8 @@ pub fn main() -> AnyhowResult<()> {
 
   info!("Arpabet loaded. {} entries", arpabet.len());
 
+  let stats_recorder = StatsRecorder::new(&stats_recorder_endpoint, stats_recorder_enabled);
+
   let app_state = AppState {
     arpabet,
     model_configs,
@@ -298,6 +312,7 @@ pub fn main() -> AnyhowResult<()> {
     text_checker,
     default_sample_rate_hz,
     rate_limiter,
+    stats_recorder,
   };
 
   let server_args = ServerArgs {

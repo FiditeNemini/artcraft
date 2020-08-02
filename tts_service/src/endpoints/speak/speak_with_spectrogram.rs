@@ -17,7 +17,6 @@ use arpabet::Arpabet;
 use crate::AppState;
 use crate::database::model::NewSentence;
 use crate::endpoints::helpers::ip_address::get_request_ip;
-use crate::endpoints::helpers::stats_recorder::record_stats;
 use crate::endpoints::speak::api::{SpeakRequest, SpeakError};
 use crate::inference::inference::InferencePipelineStart;
 use crate::inference::pipelines::glowtts_melgan::GlowTtsMelganPipeline;
@@ -47,13 +46,6 @@ pub struct SpeakSpectrogramResponse {
   pub spectrogram: Base64MelSpectrogram,
 }
 
-#[derive(Serialize,Debug)]
-struct RecordRequest {
-  remote_ip_address: String,
-  text: String,
-  speaker: String,
-}
-
 pub async fn post_speak_with_spectrogram(request: HttpRequest,
   query: Json<SpeakRequest>,
   app_state: Data<Arc<AppState>>)
@@ -61,38 +53,15 @@ pub async fn post_speak_with_spectrogram(request: HttpRequest,
 {
   let app_state = app_state.into_inner();
 
-  //app_state.background_actor.do_send(BackgroundTask {} );
-
-
   let ip_address = get_request_ip(&request);
 
-  if let Err(err) = app_state.rate_limiter.maybe_ratelimit_request(&ip_address, &request.headers()) {
+  if let Err(_err) = app_state.rate_limiter.maybe_ratelimit_request(&ip_address, &request.headers()) {
     return Err(SpeakError::rate_limited());
   }
 
+  app_state.stats_recorder.record_stats(&query.speaker, &query.text, &ip_address);
+
   let speaker_slug = query.speaker.to_string();
-
-  /*let client = Client::new();
-
-  let r = RecordRequest {
-    remote_ip_address: "1.1.1.1".to_string(),
-    speaker: query.speaker.to_string(),
-    text: query.text.to_string(),
-  };
-
-
-  actix_rt::spawn(async move {
-    thread::sleep(Duration::from_millis(10_000));
-    info!("Alerting endpoint");
-    let result = client.post("http://localhost:11111/sentence")
-        .no_decompress()
-        .header(header::CONTENT_TYPE, "application/json")
-        .send_json(&r);
-    result.await;
-  });*/
-
-  record_stats(&query.speaker, &query.text, &ip_address);
-
 
   let speaker = match app_state.model_configs.find_speaker_by_slug(&speaker_slug) {
     Some(speaker) => speaker,
@@ -111,7 +80,6 @@ pub async fn post_speak_with_spectrogram(request: HttpRequest,
 
   app_state.sentence_recorder.record_sentence(&speaker_slug, &text, &ip_address);
 
-  //let pipeline : Box<dyn InferencePipelineStart<TtsModel=TtsModelT, VocoderModel=VocoderModelT>> = match speaker.model_pipeline {
   let pipeline : Box<dyn InferencePipelineStart<TtsModel = Arc<dyn TtsModelT>, VocoderModel = Arc<dyn VocoderModelT>>> = match speaker.model_pipeline {
     ModelPipeline::ArpabetGlowTtsMelgan => {
       let glow_tts_model = speaker.glow_tts
