@@ -15,9 +15,9 @@ use actix::{Actor, SyncContext, Handler, Message};
 use actix_web::client::Client;
 use arpabet::Arpabet;
 use crate::AppState;
-use crate::actors::stats_recorder_actor::BackgroundTask;
 use crate::database::model::NewSentence;
 use crate::endpoints::helpers::ip_address::get_request_ip;
+use crate::endpoints::helpers::stats_recorder::record_stats;
 use crate::endpoints::speak::api::{SpeakRequest, SpeakError};
 use crate::inference::inference::InferencePipelineStart;
 use crate::inference::pipelines::glowtts_melgan::GlowTtsMelganPipeline;
@@ -72,7 +72,7 @@ pub async fn post_speak_with_spectrogram(request: HttpRequest,
 
   let speaker_slug = query.speaker.to_string();
 
-  let client = Client::new();
+  /*let client = Client::new();
 
   let r = RecordRequest {
     remote_ip_address: "1.1.1.1".to_string(),
@@ -89,7 +89,10 @@ pub async fn post_speak_with_spectrogram(request: HttpRequest,
         .header(header::CONTENT_TYPE, "application/json")
         .send_json(&r);
     result.await;
-  });
+  });*/
+
+  record_stats(&query.speaker, &query.text, &ip_address);
+
 
   let speaker = match app_state.model_configs.find_speaker_by_slug(&speaker_slug) {
     Some(speaker) => speaker,
