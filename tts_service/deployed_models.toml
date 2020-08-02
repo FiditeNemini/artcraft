@@ -1,4 +1,20 @@
 [[speakers]]
+name = "Wilford Brimley"
+slug = "wilford-brimley"
+model_pipeline = "ArpabetGlowTtsMelgan"
+glow_tts = "glow-tts_wilford_brimley_ljstx_2020.07.26_expr-1_chkpt-4441.torchjit"
+# TODO: Wilford doesn't have any Melgan training contribution yet!
+melgan = "melgan_manyvoice5.0_2020-07-23_12d5838_10760.torchjit"
+
+[[speakers]]
+name = "John Oliver"
+slug = "john-oliver"
+model_pipeline = "ArpabetGlowTtsMelgan"
+glow_tts = "glow-tts_john_oliver_ljstx_2020.07.26_expr-3_chkpt-4789.torchjit"
+# TODO: John Oliver only has 15 minutes of Melgan contribution
+melgan = "melgan_manyvoice5.0_2020-07-23_12d5838_10760.torchjit"
+
+[[speakers]]
 name = "Peter Thiel"
 slug = "peter-thiel"
 model_pipeline = "ArpabetGlowTtsMelgan"
@@ -24,14 +40,14 @@ name = "Sam Altman"
 slug = "sam-altman"
 model_pipeline = "ArpabetGlowTtsMelgan"
 glow_tts = "glow-tts_sam_altman_ljstx_2020.07.20_expr-2_chkpt-4871.torchjit"
-melgan = "melgan_manyvoice5.0_2020-07-23_12d5838_10490.torchit"
+melgan = "melgan_manyvoice5.0_2020-07-23_12d5838_10760.torchjit"
 
 [[speakers]]
 name = "Leonard Nimoy"
 slug = "leonard-nimoy"
 model_pipeline = "ArpabetGlowTtsMelgan"
 glow_tts = "glow-tts_leonard_nimoy_ljstx_2020.07.20_expr-1_chkpt-6401.torchjit"
-melgan = "melgan_manyvoice5.0_2020-07-23_12d5838_10490.torchit"
+melgan = "melgan_manyvoice5.0_2020-07-23_12d5838_10760.torchjit"
 
 [[speakers]]
 name = "Ben Stein"
@@ -45,7 +61,7 @@ name = "Anderson Cooper"
 slug = "anderson-cooper"
 model_pipeline = "ArpabetGlowTtsMelgan"
 glow_tts = "glow-tts_anderson_cooper_ljstx_2020.07.21_expr-1_chkpt-6622.torchjit"
-melgan = "melgan_manyvoice5.0_2020-07-23_12d5838_10490.torchit"
+melgan = "melgan_manyvoice5.0_2020-07-23_12d5838_10760.torchjit"
 
 [[speakers]]
 name = "Paul Graham"
@@ -59,7 +75,7 @@ name = "Alan Rickman"
 slug = "alan-rickman"
 model_pipeline = "ArpabetGlowTtsMelgan"
 glow_tts = "glow-tts_alan-rickman_ljstx_2020.07.22_expr-1_chkpt-4765.torchjit"
-melgan = "melgan_manyvoice5.0_2020-07-23_12d5838_10490.torchit"
+melgan = "melgan_manyvoice5.0_2020-07-23_12d5838_10760.torchjit"
 
 [[speakers]]
 name = "Craig Ferguson"
@@ -73,7 +89,7 @@ name = "Bryan Cranston"
 slug = "bryan-cranston"
 model_pipeline = "ArpabetGlowTtsMelgan"
 glow_tts = "glow-tts_bryan_cranston_ljstx_2020.07.13_expr-1_chkpt-7795.torchjit"
-melgan = "melgan_manyvoice3.0_2020-07-17_12d5838_10090.torchjit"
+melgan = "melgan_manyvoice5.0_2020-07-23_12d5838_10760.torchjit"
 
 [[speakers]]
 name = "Neil deGrasse Tyson"
@@ -233,14 +249,6 @@ slug = "ronald-reagan"
 model_pipeline = "ArpabetGlowTtsMelgan"
 glow_tts = "glow-tts_solo_reagan_ljstx_2020.06.22_expr-1_chkpt-1406.torchjit"
 melgan = "melgan_manyvoice1.0_2020-06-28_12d5838_7050.torchjit"
-sample_rate_hz = 21000 # This is lower than normal
-
-[[speakers]]
-name = "John Oliver"
-slug = "john-oliver"
-model_pipeline = "ArpabetGlowTtsMelgan"
-glow_tts = "glow-tts_solo_oliver_ljstx_2020.06.22_expr-1_chkpt-1189.torchjit"
-melgan = "melgan_manyvoice5.0_2020-07-23_12d5838_10490.torchit"
 sample_rate_hz = 21000 # This is lower than normal
 
 [[speakers]]
