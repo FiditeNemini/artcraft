@@ -49,6 +49,7 @@ impl MaybeNewRelicTransaction {
 
   pub fn add_attribute(&self, name: &str, value: &str) {
     if let Some(ref transaction) = self.transaction {
+      info!("Logging attribute to NewRelic");
       let _result = transaction.add_attribute(name, value);
     }
   }
