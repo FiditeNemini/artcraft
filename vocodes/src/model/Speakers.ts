@@ -85,6 +85,14 @@ const SPEAKERS : Speaker[] = [
     voiceQuality: 2.0,
   }),
   Speaker.fromJson({
+    name: "Bart Simpson",
+    slug: "bart-simpson",
+    description: "The Simpsons",
+    avatarUrl: "bart-simpson.jpg",
+    fullUrl: "bart-simpson-full.png",
+    voiceQuality: 7.2,
+  }),
+  Speaker.fromJson({
     name: "Ben Stein",
     slug: "ben-stein",
     description: "Actor and commentator.",
@@ -261,6 +269,14 @@ const SPEAKERS : Speaker[] = [
     voiceQuality: 6.4,
   }),
   Speaker.fromJson({
+    name: "Palmer Luckey",
+    slug: "palmer-luckey",
+    description: "Inventor, Entrepreneur",
+    avatarUrl: "palmer-luckey.jpg",
+    fullUrl: "palmer-luckey-full.png",
+    voiceQuality: 6.3,
+  }),
+  Speaker.fromJson({
     name: "Paul Graham",
     slug: "paul-graham",
     description: "Entrepreneur",
@@ -331,6 +347,22 @@ const SPEAKERS : Speaker[] = [
     avatarUrl: "sam-altman.jpg",
     fullUrl: "sam-altman-full.png",
     voiceQuality: 8.0,
+  }),
+  Speaker.fromJson({
+    name: "Sarah Palin",
+    slug: "sarah-palin",
+    description: "Politician",
+    avatarUrl: "sarah-palin.jpg",
+    fullUrl: "sarah-palin-full.png",
+    voiceQuality: 5.3,
+  }),
+  Speaker.fromJson({
+    name: "Shohreh Aghdashloo",
+    slug: "shohreh-aghdashloo",
+    description: "Politician",
+    avatarUrl: "shohreh-aghdashloo.jpg",
+    fullUrl: "shohreh-aghdashloo-full.png",
+    voiceQuality: 6.7,
   }),
   Speaker.fromJson({
     name: "Sir David Attenborough",
