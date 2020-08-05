@@ -2,6 +2,8 @@
 #[macro_use] extern crate log;
 #[macro_use] extern crate serde_derive;
 
+pub mod newrelic_logger;
+
 use anyhow::Result as AnyhowResult;
 use futures::future::{self, Future};
 use hyper::Method;
@@ -19,18 +21,22 @@ use std::sync::Arc;
 use rand::seq::IteratorRandom;
 use hyper::http::header::HeaderName;
 use hyper::header::HeaderValue;
+use newrelic::App;
+use crate::newrelic_logger::NewRelicLogger;
 
 type BoxFut = Box<dyn Future<Item=Response<Body>, Error=hyper::Error> + Send>;
 
 const ENV_DEFAULT_ROUTE : &'static str = "DEFAULT_ROUTE";
+const ENV_NEWRELIC_API_KEY : &'static str = "NEWRELIC_API_KEY";
 const ENV_PROXY_CONFIG_FILE : &'static str = "PROXY_CONFIG_FILE";
 const ENV_RUST_LOG : &'static str = "RUST_LOG";
 const ENV_SERVICE_PORT : &'static str = "SERVICE_PORT";
 
 const DEFAULT_DEFAULT_ROUTE : &'static str = "http://127.0.0.1:12345";
+const DEFAULT_NEWRELIC_API_KEY : &'static str = "";
 const DEFAULT_PROXY_CONFIG_FILE : &'static str = "proxy_configs.toml";
-const DEFAULT_RUST_LOG: &'static str = "tokio_reactor=warn,hyper=info,debug";
-const DEFAULT_SERVICE_PORT: u16 = 5555;
+const DEFAULT_RUST_LOG : &'static str = "tokio_reactor=warn,hyper=info,debug";
+const DEFAULT_SERVICE_PORT : u16 = 5555;
 
 #[derive(Deserialize, Debug, Clone)]
 struct ProxyConfigs {
@@ -198,6 +204,7 @@ fn main() -> AnyhowResult<()> {
 
   let default_route = get_env_string(ENV_DEFAULT_ROUTE, DEFAULT_DEFAULT_ROUTE);
   let service_port = get_env_num::<u16>(ENV_SERVICE_PORT, DEFAULT_SERVICE_PORT)?;
+  let newrelic_api_key = get_env_string(ENV_NEWRELIC_API_KEY, DEFAULT_NEWRELIC_API_KEY);
 
   info!("Default route: {}", default_route);
 
@@ -219,23 +226,38 @@ fn main() -> AnyhowResult<()> {
     default_route: default_route,
   });
 
+  let newrelic_logger = if newrelic_api_key.is_empty() {
+    NewRelicLogger::null_instance()
+  } else {
+    NewRelicLogger::try_new_or_null("voder-proxy", &newrelic_api_key)
+  };
+
+  let newrelic_logger = Arc::new(newrelic_logger);
+
   let make_service = make_service_fn(move |socket: &AddrStream| {
     let remote_addr = socket.remote_addr();
     info!("Got a request from: {:?}", remote_addr);
 
     let router2 = router.clone();
+    let newrelic_logger2 = newrelic_logger.clone();
 
     service_fn(move |req: Request<Body>| {
       let router3 = router2.clone();
+      let newrelic_logger3 = newrelic_logger2.clone();
 
       match (req.method(), req.uri().path()) {
-        (&Method::POST, "/speak") =>
-          speak_proxy(req, remote_addr.clone(), router3, "/speak"),
-        (&Method::POST, "/speak_spectrogram") =>
-          speak_proxy(req, remote_addr.clone(), router3, "/speak_spectrogram"),
+        (&Method::POST, "/speak") => {
+          let _droppable_transaction = newrelic_logger3.web_transaction("proxy /speak");
+          speak_proxy(req, remote_addr.clone(), router3, "/speak")
+        },
+        (&Method::POST, "/speak_spectrogram") => {
+          let _droppable_transaction = newrelic_logger3.web_transaction("proxy /speak_spectrogram");
+          speak_proxy(req, remote_addr.clone(), router3, "/speak_spectrogram")
+        },
         (&Method::GET, "/proxy_health") =>
           health_check_response(req),
         _ => {
+          let _droppable_transaction = newrelic_logger3.web_transaction("unmatched endpoint");
           let forward = router3.get_random_host();
           info!("Forwarding to `{}` random host: {}", &forward, req.uri());
           hyper_reverse_proxy::call(remote_addr.ip(), &forward, req)
