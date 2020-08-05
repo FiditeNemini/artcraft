@@ -91,6 +91,41 @@ melgan = "melgan-vocodes-2.torchjit"
 # --------------- New ---------------
 
 [[speakers]]
+name = "Bart Simpson"
+slug = "bart-simpson"
+model_pipeline = "ArpabetGlowTtsMelgan"
+glow_tts = "glow-tts_bart_simpson_ljstx_2020.08.02_expr-1_chkpt-5507.torchjit"
+melgan = "melgan_bart-simpson_2020.08.03_58e5387_15100.torchjit"
+
+
+[[speakers]]
+name = "Palmer Luckey"
+slug = "palmer-luckey"
+model_pipeline = "ArpabetGlowTtsMelgan"
+glow_tts = "glow-tts_palmer_luckey_ljstx_2020.08.03_expr-1_chkpt-5192.torchjit"
+# TODO: Palmer doesn't have any Melgan training contribution yet!
+melgan = "melgan_manyvoice5.0_2020-07-23_12d5838_10760.torchjit"
+
+
+[[speakers]]
+name = "Sarah Palin"
+slug = "sarah-palin"
+model_pipeline = "ArpabetGlowTtsMelgan"
+glow_tts = "glow-tts_sarah_palin_ljstx_2020.07.28_expr-1_chkpt-5736.torchjit"
+# TODO: Sarah doesn't have any Melgan training contribution yet!
+melgan = "melgan_manyvoice5.0_2020-07-23_12d5838_10760.torchjit"
+
+
+[[speakers]]
+name = "Shohreh Aghdashloo"
+slug = "shohreh-aghdashloo"
+model_pipeline = "ArpabetGlowTtsMelgan"
+glow_tts = "glow-tts_shohreh-aghdashloo_ljstx_2020.08.03_expr-1_chkpt-4177.torchjit"
+# TODO: Shohreh doesn't have any Melgan training contribution yet!
+melgan = "melgan_manyvoice5.0_2020-07-23_12d5838_10760.torchjit"
+
+
+[[speakers]]
 name = "Wilford Brimley"
 slug = "wilford-brimley"
 model_pipeline = "ArpabetGlowTtsMelgan"
