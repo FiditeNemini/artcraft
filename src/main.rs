@@ -5,12 +5,16 @@
 pub mod newrelic_logger;
 
 use anyhow::Result as AnyhowResult;
+use crate::newrelic_logger::{NewRelicLogger, MaybeNewRelicTransaction};
 use futures::future::{self, Future};
 use hyper::Method;
+use hyper::header::HeaderValue;
+use hyper::http::header::HeaderName;
 use hyper::rt::Stream;
 use hyper::server::conn::AddrStream;
 use hyper::service::{service_fn, make_service_fn};
 use hyper::{Body, Request, Response, Server};
+use rand::seq::IteratorRandom;
 use std::collections::HashMap;
 use std::env;
 use std::fmt::Debug;
@@ -18,11 +22,6 @@ use std::fmt::Display;
 use std::net::SocketAddr;
 use std::str::FromStr;
 use std::sync::Arc;
-use rand::seq::IteratorRandom;
-use hyper::http::header::HeaderName;
-use hyper::header::HeaderValue;
-use newrelic::App;
-use crate::newrelic_logger::NewRelicLogger;
 
 type BoxFut = Box<dyn Future<Item=Response<Body>, Error=hyper::Error> + Send>;
 
@@ -134,7 +133,13 @@ impl Router {
   }
 }
 
-fn speak_proxy(req: Request<Body>, remote_addr: SocketAddr, router: Arc<Router>, endpoint: &'static str) -> BoxFut {
+fn speak_proxy(
+  req: Request<Body>,
+  remote_addr: SocketAddr,
+  router: Arc<Router>,
+  transaction: MaybeNewRelicTransaction,
+  endpoint: &'static str) -> BoxFut
+{
   let mut headers = req.headers().clone();
 
   // This is the IP of the Digital Ocean load balancer.
@@ -172,6 +177,8 @@ fn speak_proxy(req: Request<Body>, remote_addr: SocketAddr, router: Arc<Router>,
     let proxy_host = router.get_speaker_host(&request_details.speaker);
 
     info!("Routing {} for {} to {}", endpoint, &request_details.speaker, &proxy_host);
+
+    transaction.add_attribute("speaker", &request_details.speaker);
 
     let mut request_builder = Request::builder();
     request_builder.method(Method::POST)
@@ -247,15 +254,17 @@ fn main() -> AnyhowResult<()> {
 
       match (req.method(), req.uri().path()) {
         (&Method::POST, "/speak") => {
-          let _droppable_transaction = newrelic_logger3.web_transaction("proxy /speak");
-          speak_proxy(req, remote_addr.clone(), router3, "/speak")
+          let nr_transaction = newrelic_logger3.web_transaction("/speak");
+          speak_proxy(req, remote_addr.clone(), router3, nr_transaction, "/speak")
         },
         (&Method::POST, "/speak_spectrogram") => {
-          let _droppable_transaction = newrelic_logger3.web_transaction("proxy /speak_spectrogram");
-          speak_proxy(req, remote_addr.clone(), router3, "/speak_spectrogram")
+          let nr_transaction = newrelic_logger3.web_transaction("/speak_spectrogram");
+          speak_proxy(req, remote_addr.clone(), router3, nr_transaction, "/speak_spectrogram")
         },
-        (&Method::GET, "/proxy_health") =>
-          health_check_response(req),
+        (&Method::GET, "/proxy_health") => {
+          let _droppable_transaction = newrelic_logger3.web_transaction("/proxy_health");
+          health_check_response(req)
+        },
         _ => {
           let _droppable_transaction = newrelic_logger3.web_transaction("unmatched endpoint");
           let forward = router3.get_random_host();
