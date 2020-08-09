@@ -3,6 +3,7 @@ use arpabet::phoneme::Phoneme;
 use arpabet::extensions::Punctuation as ArpabetPunctuation;
 use sentence::{SentenceTokenizer, Token, Punctuation};
 use numerics::Numerics;
+use grapheme_to_phoneme::{Model, PhonemeToken, GraphToPhoneError};
 
 /// Convert text to the encoding used in Nvidia/Tacotron2 natively.
 pub fn text_to_standard_encoding(text: &str) -> Vec<i64> {
@@ -23,7 +24,11 @@ pub fn text_to_standard_encoding(text: &str) -> Vec<i64> {
 }
 
 /// This is the encoding that Glow TTS uses.
-pub fn text_to_arpabet_encoding_glow_tts(arpabet: &Arpabet, text: &str) -> Vec<i64> {
+pub fn text_to_arpabet_encoding_glow_tts(
+  arpabet: &Arpabet,
+  g2p_model: &Model,
+  text: &str) -> Vec<i64>
+{
   let sentence_tokenizer = SentenceTokenizer::new();
   let numerics = Numerics::default();
 
@@ -53,10 +58,6 @@ pub fn text_to_arpabet_encoding_glow_tts(arpabet: &Arpabet, text: &str) -> Vec<i
         }
 
         match arpabet.get_polyphone(&word) {
-          None => {
-            encoded_buffer.push(space);
-            needs_space = true;
-          },
           Some(polyphone) => {
             let encodings : Vec<i64> = polyphone.iter()
                 .map(|phoneme| arpabet_phoneme_to_glow_tts_encoding(&phoneme))
@@ -64,6 +65,35 @@ pub fn text_to_arpabet_encoding_glow_tts(arpabet: &Arpabet, text: &str) -> Vec<i
 
             encoded_buffer.extend(&encodings);
             needs_space = true;
+          },
+          None => {
+            // Couldn't find it (OOV). Let's try to predict what it could be.
+            match g2p_model.predict_phonemes(&word) {
+              Ok(phoneme_tokens) => {
+                let polyphone : Vec<Phoneme> = phoneme_tokens.iter()
+                    .filter(|token| match token {
+                      PhonemeToken::ArpabetPhoneme(_) => true,
+                      _ => false,
+                    })
+                    .map(|token| match token {
+                      PhonemeToken::ArpabetPhoneme(inner) => inner.to_owned(),
+                      _ => unreachable!()
+                    })
+                    .collect();
+
+                let encodings : Vec<i64> = polyphone.iter()
+                    .map(|phoneme| arpabet_phoneme_to_glow_tts_encoding(&phoneme))
+                    .collect();
+
+                encoded_buffer.extend(&encodings);
+                needs_space = true;
+              },
+              Err(e) => {
+                warn!("Error with G2P prediction (word case): {:?}", e);
+                encoded_buffer.push(space);
+                needs_space = true;
+              },
+            }
           },
         }
       },
@@ -112,13 +142,37 @@ pub fn text_to_arpabet_encoding_glow_tts(arpabet: &Arpabet, text: &str) -> Vec<i
         }
       },
       Token::Unknown(word) => {
-        for ch in word.chars() {
-          // TODO: INEFFICIENT
-          let enc = character_to_glow_tts_encoding(&ch.to_string());
-          if enc > -1 {
-            encoded_buffer.push(enc);
+        match g2p_model.predict_phonemes(&word) {
+          Ok(phoneme_tokens) => {
+            let polyphone : Vec<Phoneme> = phoneme_tokens.iter()
+                .filter(|token| match token {
+                  PhonemeToken::ArpabetPhoneme(_) => true,
+                  _ => false,
+                })
+                .map(|token| match token {
+                  PhonemeToken::ArpabetPhoneme(inner) => inner.to_owned(),
+                  _ => unreachable!()
+                })
+                .collect();
+
+            let encodings : Vec<i64> = polyphone.iter()
+                .map(|phoneme| arpabet_phoneme_to_glow_tts_encoding(&phoneme))
+                .collect();
+
+            encoded_buffer.extend(&encodings);
             needs_space = true;
-          }
+          },
+          Err(e) => {
+            warn!("Error with G2P prediction (unknown case): {:?}", e);
+            for ch in word.chars() {
+              // TODO: INEFFICIENT
+              let enc = character_to_glow_tts_encoding(&ch.to_string());
+              if enc > -1 {
+                encoded_buffer.push(enc);
+                needs_space = true;
+              }
+            }
+          },
         }
       },
       // TODO: We need to handle these now.

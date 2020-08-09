@@ -13,6 +13,7 @@ use crate::text::arpabet::text_to_arpabet_encoding_glow_tts;
 use crate::text::cleaners::clean_text;
 use std::sync::Arc;
 use tch::Tensor;
+use grapheme_to_phoneme::Model;
 
 pub struct GlowTtsMelganPipeline {
   glow_tts: Arc<dyn TtsModelT>,
@@ -71,10 +72,10 @@ impl InferencePipelineTextCleaningDone for GlowTtsMelganPipelineTextCleaningDone
   type TtsModel = Arc<dyn TtsModelT>;
   type VocoderModel = Arc<dyn VocoderModelT>;
 
-  fn infer_mel(self: Box<Self>, _speaker_id: i64, arpabet: &Arpabet)
+  fn infer_mel(self: Box<Self>, _speaker_id: i64, arpabet: &Arpabet, g2p_model: &Model)
     -> AnyhowResult<Box<dyn InferencePipelineMelDone<TtsModel = Self::TtsModel, VocoderModel = Self::VocoderModel>>>
   {
-    let arpabet_encodings = text_to_arpabet_encoding_glow_tts(arpabet, &self.cleaned_text);
+    let arpabet_encodings = text_to_arpabet_encoding_glow_tts(arpabet, g2p_model, &self.cleaned_text);
 
     let mel_tensor = self.glow_tts.encoded_sequence_to_mel_single_speaker(&arpabet_encodings);
 

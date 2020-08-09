@@ -54,6 +54,7 @@ use crate::text::checker::TextChecker;
 use limitation::Limiter;
 use std::time::Duration;
 use crate::endpoints::helpers::stats_recorder::StatsRecorder;
+use grapheme_to_phoneme::Model;
 
 const ENV_ARPABET_EXTRAS_FILE : &'static str = "ARPABET_EXTRAS_FILE";
 const ENV_ASSET_DIRECTORY: &'static str = "ASSET_DIRECTORY";
@@ -98,6 +99,7 @@ const DEFAULT_STATS_MICROSERVICE_ENDPOINT : &'static str = "http://localhost:111
 /** State that is easy to pass between handlers. */
 pub struct AppState {
   pub arpabet: Arpabet,
+  pub g2p_model: Model,
   pub model_configs: ModelConfigs,
   pub model_cache: ModelCache,
   pub sentence_recorder: SentenceRecorder,
@@ -302,10 +304,17 @@ pub fn main() -> AnyhowResult<()> {
 
   info!("Arpabet loaded. {} entries", arpabet.len());
 
+  info!("Loading G2P model...");
+
+  let g2p_model = Model::load_in_memory()?;
+
+  info!("G2P model loaded.");
+
   let stats_recorder = StatsRecorder::new(&stats_recorder_endpoint, stats_recorder_enabled);
 
   let app_state = AppState {
     arpabet,
+    g2p_model,
     model_configs,
     model_cache,
     sentence_recorder,

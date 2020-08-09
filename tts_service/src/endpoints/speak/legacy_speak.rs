@@ -200,7 +200,8 @@ pub async fn legacy_get_speak(request: HttpRequest,
         &glow_tts,
         &melgan,
         sample_rate_hz,
-        &app_state.arpabet);
+        &app_state.arpabet,
+        &app_state.g2p_model);
 
       // To make iOS Safari work, you need a Content-Range and Content-Length header:
       // https://stackoverflow.com/a/17835399

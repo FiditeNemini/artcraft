@@ -11,6 +11,7 @@ use hound::WavSpec;
 use hound::WavWriter;
 use std::io::{Cursor, BufWriter};
 use tch::Tensor;
+use grapheme_to_phoneme::Model;
 
 // TODO: This might be useful to implement as a multi-stage
 //  state machine struct with functions, that way you can pull out
@@ -22,9 +23,10 @@ pub fn arpabet_glow_tts_multi_speaker_melgan_pipeline(
   arpabet_glow_tts: &ArpabetGlowTtsMultiSpeakerModel,
   melgan: &MelganModel,
   sample_rate_hz: u32,
-  arpabet: &Arpabet
+  arpabet: &Arpabet,
+  g2p_model: &Model
 ) -> Vec<u8> {
-  let arpabet_encodings = text_to_arpabet_encoding_glow_tts(arpabet, &cleaned_text);
+  let arpabet_encodings = text_to_arpabet_encoding_glow_tts(arpabet, g2p_model, &cleaned_text);
 
   let mel_tensor = arpabet_glow_tts.encoded_arpabet_to_mel(&arpabet_encodings, speaker_id);
 
@@ -40,9 +42,10 @@ pub fn arpabet_glow_tts_multi_speaker_melgan_pipeline_with_spectrogram(
   arpabet_glow_tts: &ArpabetGlowTtsMultiSpeakerModel,
   melgan: &MelganModel,
   sample_rate_hz: u32,
-  arpabet: &Arpabet
+  arpabet: &Arpabet,
+  g2p_model: &Model
 ) -> (Spectrogram, Vec<u8>) {
-  let arpabet_encodings = text_to_arpabet_encoding_glow_tts(arpabet, &cleaned_text);
+  let arpabet_encodings = text_to_arpabet_encoding_glow_tts(arpabet, g2p_model, &cleaned_text);
 
   let mel_tensor = arpabet_glow_tts.encoded_arpabet_to_mel(&arpabet_encodings, speaker_id);
 
@@ -95,9 +98,10 @@ pub fn arpabet_glow_tts_melgan_pipeline(
   arpabet_glow_tts: &ArpabetGlowTtsModel,
   melgan: &MelganModel,
   sample_rate_hz: u32,
-  arpabet: &Arpabet
+  arpabet: &Arpabet,
+  g2p_model: &Model
 ) -> Vec<u8> {
-  let arpabet_encodings = text_to_arpabet_encoding_glow_tts(arpabet, &cleaned_text);
+  let arpabet_encodings = text_to_arpabet_encoding_glow_tts(arpabet, g2p_model, &cleaned_text);
 
   let mel_tensor = arpabet_glow_tts.encoded_arpabet_to_mel(&arpabet_encodings);
 
@@ -112,9 +116,10 @@ pub fn arpabet_glow_tts_melgan_pipeline_with_spectrogram(
   arpabet_glow_tts: &ArpabetGlowTtsModel,
   melgan: &MelganModel,
   sample_rate_hz: u32,
-  arpabet: &Arpabet
+  arpabet: &Arpabet,
+  g2p_model: &Model
 ) -> (Spectrogram, Vec<u8>) {
-  let arpabet_encodings = text_to_arpabet_encoding_glow_tts(arpabet, &cleaned_text);
+  let arpabet_encodings = text_to_arpabet_encoding_glow_tts(arpabet, g2p_model, &cleaned_text);
 
   let mel_tensor = arpabet_glow_tts.encoded_arpabet_to_mel(&arpabet_encodings);
 
