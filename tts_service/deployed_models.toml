@@ -1,4 +1,11 @@
 [[speakers]]
+name = "SpongeBob SquarePants"
+slug = "spongebob-squarepants"
+model_pipeline = "ArpabetGlowTtsMelgan"
+glow_tts = "glow-tts_spongebob_squarepants_ljstx_2020.08.11_expr-1_chkpt-5740.torchjit"
+melgan = "melgan_spongebob-squarepants_2020.08.11_58e5387_11725.torchjit"
+
+[[speakers]]
 name = "Bart Simpson"
 slug = "bart-simpson"
 model_pipeline = "ArpabetGlowTtsMelgan"
