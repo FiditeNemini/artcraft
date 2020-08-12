@@ -374,6 +374,15 @@ const SPEAKERS : Speaker[] = [
     defaultVoice: true,
   }),
   Speaker.fromJson({
+    name: "SpongeBob SquarePants",
+    slug: "spongebob-squarepants",
+    description: "Lives in a sponge under the sea.",
+    avatarUrl: "spongebob-squarepants.jpg",
+    fullUrl: "spongebob-squarepants-full.png",
+    voiceQuality: 7.0,
+    defaultVoice: true,
+  }),
+  Speaker.fromJson({
     name: "Tupac Shakur (acapella lyrics)",
     slug: "tupac-shakur",
     description: "Musician.",
