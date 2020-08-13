@@ -102,16 +102,18 @@ void main()
     vec3 vertexPosition;
     vec4 colorOut;
 
-    if (gl_VertexID % 2 == 0) {
+    // We're having to multiplex on gl_VertexID, and I don't think we get double the range for two
+    // cameras. This effectively 'downsamples' each camera. We need to find a way to double this.
+    // I hate drawing like this
+    if (gl_VertexID % 10 == 0) {
       // Camera #0
       ivec2 currentDepthPixelCoordinates = ivec2(gl_VertexID % pointCloudSize0.x, gl_VertexID / pointCloudSize0.x);
 
       vertexPosition = imageLoad(pointCloudTexture0, currentDepthPixelCoordinates).xyz;
 
-      //colorOut = inColor0;
-
       colorOut = vec4(
         100,
+        //inColor0.r,
         inColor0.g,
         inColor0.b,
         255
@@ -122,28 +124,22 @@ void main()
 
       vec3 originalPosition = imageLoad(pointCloudTexture1, currentDepthPixelCoordinates).xyz;
 
-      //vertexPosition = originalPosition;
-
       vertexPosition = vec3(
         originalPosition.x - 1.5,
         originalPosition.y,
         originalPosition.z
       );
 
+      // MAJOR PROBLEM HERE!
+      // While we appear to have geometry data from both cameras, we do NOT have the color/texture
+      // data from the second camera. That's annoying.
       colorOut = vec4(
         inColor1.r,
         inColor1.g,
+        //inColor1.b,
         100,
         255
       );
-
-      //colorOut = inColor1;
-      /*colorOut = vec4(
-        inColor1.r + 0,
-        inColor1.g + 0,
-        inColor1.b + 0,
-        inColor1.a + 0
-      );*/
     }
 
     //vec3 vertexPosition = imageLoad(pointCloudTexture0, currentDepthPixelCoordinates).xyz;
@@ -650,27 +646,27 @@ impl PointCloudRenderer {
 
       // Update render settings in shader
       let _enable_shading = if self.enable_shading { 1 } else { 0 };
-      let enable_shading = 1; // TODO FIXME FIXME FIXME
+      let enable_shading = 0; // TODO FIXME FIXME FIXME
 
       gl::Uniform1i(self.enable_shading_index, enable_shading);
 
       // Render point cloud
-      for i in 0 .. self.num_cameras {
-        //if i == 0 {
-        //  continue;
-        //}
+      for j in 0 .. self.num_cameras {
+        // NB: Changing the order here impacts which camera gets shaded. For some reason only one
+        // camera is actually getting real texture data.
+        //let i = 1 - j;
+        let i = j;
 
-        let vertex_array_object = self.vertex_array_objects.get(i).unwrap(); // TODO: TEMP MULTI-CAMERA SUPPORT
-        let vertex_array_size_bytes = self.vertex_arrays_size_bytes.get(i).unwrap(); // TODO: TEMP MULTI-CAMERA SUPPORT
+        let vertex_array_object = self.vertex_array_objects.get(i).unwrap();
+        let vertex_array_size_bytes = self.vertex_arrays_size_bytes.get(i).unwrap();
 
         gl::BindVertexArray(vertex_array_object.id());
-        //let size = self.vertex_array_size_bytes / size_of::<BgraPixel>() as i32 / 3; // TODO: 1/3rd of information to draw
         let size = vertex_array_size_bytes / size_of::<BgraPixel>() as i32;
-        //println!("Draw size: {} (vertex array size bytes: {})", size, self.vertex_array_size_bytes);
-        gl::DrawArrays(gl::POINTS, 0, size);
-      }
 
-      gl::BindVertexArray(0);
+        gl::DrawArrays(gl::POINTS, 0, size);
+
+        gl::BindVertexArray(0);
+      }
 
       gl_get_error()
           .map_err(|err| PointCloudRendererError::OpenGlError(err))

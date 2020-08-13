@@ -210,7 +210,7 @@ pub fn run(capture_provider: Arc<MultiDeviceCaptureProvider>, calibration_data: 
     window.gl_swap_window();
 
     if let Some(mut captures) = capture_provider.get_captures() {
-      visualizer.update_texture_id(camera_index, texture.texture_id(), captures)
+      visualizer.update_texture_id(texture.texture_id(), captures)
           .map(|_| {})
           .map_err(|err| {
             match err {

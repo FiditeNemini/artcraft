@@ -46,7 +46,7 @@ const PRIMARY_DEVICE_SERIAL : &'static str = "000513594512";
 /// This is a second device
 const SECONDARY_DEVICE_SERIAL : &'static str = "000886694512";
 
-const ENABLE_WEBCAM : bool = true;
+const ENABLE_WEBCAM : bool = false;
 
 pub fn main() {
   let multi_device = MultiDeviceCapturer::new(2, Some(1))

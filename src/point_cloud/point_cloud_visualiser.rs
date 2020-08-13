@@ -241,17 +241,17 @@ impl PointCloudVisualizer {
   ///
   ///
   ///
-  pub fn update_texture(&mut self, camera_index: usize, texture: &ViewerImage, mut captures: Vec<Capture>) -> Result<()> {
-    self.update_texture_id(camera_index, texture.texture_id(), captures)
+  pub fn update_texture(&mut self, texture: &ViewerImage, mut captures: Vec<Capture>) -> Result<()> {
+    self.update_texture_id(texture.texture_id(), captures)
   }
 
   ///
   /// Take the latest capture, calculate updates to the xyz texture, then render the point cloud to
   /// the output texture.
   ///
-  pub fn update_texture_id(&mut self, camera_index: usize, texture_id: GLuint, mut captures: Vec<Capture>) -> Result<()> {
+  pub fn update_texture_id(&mut self, texture_id: GLuint, mut captures: Vec<Capture>) -> Result<()> {
     // Update the point cloud renderer with the latest point data
-    self.update_point_clouds(camera_index, captures)?;
+    self.update_point_clouds(captures)?;
 
     // Set up rendering to a texture
     unsafe {
@@ -317,7 +317,7 @@ impl PointCloudVisualizer {
   ///
   ///
   ///
-  fn update_point_clouds(&mut self, camera_index: usize, mut captures: Vec<Capture>) -> Result<()> {
+  fn update_point_clouds(&mut self, mut captures: Vec<Capture>) -> Result<()> {
     if captures.len() != self.num_cameras {
       println!("Length of captures in insufficient (unplug the cameras from USB and retry): {}", captures.len());
       return Ok(());
@@ -498,7 +498,7 @@ impl PointCloudVisualizer {
       // TODO: TEMP MULTI-CAMERA SUPPORT
       let mut captures = Vec::new();
       captures.push(capture);
-      self.update_point_clouds(camera_index, captures);
+      self.update_point_clouds(captures);
     }
 
     Ok(())
