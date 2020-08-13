@@ -20,6 +20,7 @@ use opengl::compile_shader::compile_shader;
 use opengl::opengl_wrapper::Texture;
 use opengl::opengl_wrapper::{Buffer, gl_get_error, OpenGlError, VertexArray};
 use point_cloud::pixel_structs::BgraPixel;
+use std::time::{SystemTime, UNIX_EPOCH};
 
 pub type Result<T> = std::result::Result<T, PointCloudRendererError>;
 
@@ -124,6 +125,7 @@ void main()
 
       vec3 originalPosition = imageLoad(pointCloudTexture1, currentDepthPixelCoordinates).xyz;
 
+      // Let's move the model away a bit.
       vertexPosition = vec3(
         originalPosition.x - 1.5,
         originalPosition.y,
@@ -498,10 +500,22 @@ impl PointCloudRenderer {
   pub fn update_point_clouds(&mut self, color_images: &Vec<k4a_sys_wrapper::Image>,
                              point_cloud_textures: &Vec<Texture>) -> Result<()>
   {
-    for (i, color_image) in color_images.iter().enumerate() {
-      let vertex_array_object = self.vertex_array_objects.get(i).unwrap(); // TODO: TEMP MULTI-CAMERA SUPPORT
-      let vertex_color_buffer_object = self.vertex_color_buffer_objects.get(i).unwrap(); // TODO: TEMP MULTI-CAMERA SUPPORT
-      let mut vertex_array_size_bytes = self.vertex_arrays_size_bytes.get_mut(i).unwrap(); // TODO: TEMP MULTI-CAMERA SUPPORT
+    let time = SystemTime::now();
+    let time_since_epoch = time.duration_since(UNIX_EPOCH).unwrap();
+    let seconds = time_since_epoch.as_secs();
+
+    for (j, color_image) in color_images.iter().enumerate() {
+      // NB: This experiment demonstrates that only one set of texture (colors) seem to be updated.
+      let i = if seconds % 10 > 4 {
+        j // primary camera first
+      } else {
+        1 - j // secondary camera first
+      };
+      //let i = j;
+
+      let vertex_array_object = self.vertex_array_objects.get(i).unwrap();
+      let vertex_color_buffer_object = self.vertex_color_buffer_objects.get(i).unwrap();
+      let mut vertex_array_size_bytes = self.vertex_arrays_size_bytes.get_mut(i).unwrap();
 
       unsafe {
         gl::BindVertexArray(vertex_array_object.id());
@@ -512,6 +526,7 @@ impl PointCloudRenderer {
       let color_image_size_bytes = color_image.get_size() as i32;
 
       if *vertex_array_size_bytes != color_image_size_bytes {
+        println!("Establishing buffer");
         *vertex_array_size_bytes = color_image_size_bytes;
 
         unsafe {
@@ -544,16 +559,16 @@ impl PointCloudRenderer {
       //let length = color_image.get_width_pixels() * color_image.get_height_pixels();
 
       let result = unsafe {
-        //std::ptr::copy_nonoverlapping::<u8>(color_src, vertex_mapped_buffer as *mut u8,
-        //  color_image_size_bytes as usize);
-
-        // TODO TESTING - writing pure white changes the color of the final output "line" to white:
-        //std::ptr::copy::<u8>(color_src, vertex_mapped_buffer as *mut u8, color_image_size_bytes as usize);
-        //std::ptr::write_bytes(vertex_mapped_buffer, 255, color_image_size_bytes as usize);
-
-        std::ptr::copy_nonoverlapping::<u8>(typed_color_src,
-          vertex_mapped_buffer,
-          color_image_size_bytes as usize);
+        if i == 9 {
+          // TODO TESTING - writing pure white changes the color of the final output "line" to white:
+          std::ptr::copy::<u8>(color_src, vertex_mapped_buffer as *mut u8, color_image_size_bytes as usize);
+          std::ptr::write_bytes(vertex_mapped_buffer, 255, color_image_size_bytes as usize);
+        } else {
+          // NB: This is the working texturing:
+          std::ptr::copy_nonoverlapping::<u8>(typed_color_src,
+            vertex_mapped_buffer,
+            color_image_size_bytes as usize);
+        }
 
         gl::UnmapBuffer(gl::ARRAY_BUFFER)
       };
@@ -563,14 +578,16 @@ impl PointCloudRenderer {
         return Err(PointCloudRendererError::OpenGlError(error));
       }
 
-      let location = i;
-
-      let vertex_attrib_location = self.vertex_attrib_locations.get(i).unwrap(); // TODO: TEMP Multi-camera support
+      // NB: This controls which geometry gets the texture/color data. If we hardcode it to
+      // a single index, only one of the camera geometries gets shaded.
+      let i = 1 - j;
+      let vertex_attrib_location = self.vertex_attrib_locations.get(i).unwrap();
 
       unsafe {
         // NB: Controling these indices change where the color bytes are uploaded
         gl::EnableVertexAttribArray(*vertex_attrib_location as u32);
 
+        //let location = i;
         gl::VertexAttribPointer(
           *vertex_attrib_location as u32,
           //location as u32, // TODO: Does this matter?
@@ -582,9 +599,11 @@ impl PointCloudRenderer {
           0 as i32,
           0 as *const c_void,
         );
-
-        gl::BindVertexArray(0);
       }
+    }
+
+    unsafe {
+      gl::BindVertexArray(0);
     }
 
     unsafe {
@@ -614,8 +633,11 @@ impl PointCloudRenderer {
           gl::RGBA32F, //POINT_CLOUD_TEXTURE_FORMAT,
         );
 
-        gl::BindVertexArray(0);
       }
+    }
+
+    unsafe {
+      gl::BindVertexArray(0);
     }
 
     gl_get_error()
@@ -650,15 +672,29 @@ impl PointCloudRenderer {
 
       gl::Uniform1i(self.enable_shading_index, enable_shading);
 
+      let time = SystemTime::now();
+      let time_since_epoch = time.duration_since(UNIX_EPOCH).unwrap();
+      let seconds = time_since_epoch.as_secs();
+
       // Render point cloud
       for j in 0 .. self.num_cameras {
         // NB: Changing the order here impacts which camera gets shaded. For some reason only one
         // camera is actually getting real texture data.
-        //let i = 1 - j;
+        // let i = if seconds % 5 > 2 {
+        //   j // primary camera first
+        // } else {
+        //   1 - j // secondary camera first
+        // };
+
         let i = j;
 
         let vertex_array_object = self.vertex_array_objects.get(i).unwrap();
         let vertex_array_size_bytes = self.vertex_arrays_size_bytes.get(i).unwrap();
+
+        // NB: Interesting experiment / behavior:
+        // The following experiment cuts down on the geometry being drawn! Not just the color!
+        // I wonder if this changes the length of whatever feeds gl_VertexID?
+        // let vertex_array_size_bytes = vertex_array_size_bytes / 5;
 
         gl::BindVertexArray(vertex_array_object.id());
         let size = vertex_array_size_bytes / size_of::<BgraPixel>() as i32;
