@@ -506,12 +506,19 @@ impl PointCloudRenderer {
 
     for (j, color_image) in color_images.iter().enumerate() {
       // NB: This experiment demonstrates that only one set of texture (colors) seem to be updated.
-      let i = if seconds % 10 > 4 {
-        j // primary camera first
-      } else {
-        1 - j // secondary camera first
-      };
-      //let i = j;
+      // let i = if seconds % 10 > 4 {
+      //   j // primary camera first
+      // } else {
+      //   1 - j // secondary camera first
+      // };
+
+      // EXPERIMENTAL RESULTS TABLE.
+      // The first camera index is the one that gets the color
+      //let i = j; // geometry1, cameratexture1, (below is i=j)
+      //let i = 1 - j; //geometry2, cameratexture2 (below is i=j)
+      //let i = j; // geometry2, cameratexture1, (below is i=1-j)
+      //let i = 1 - j; //geometry1, cameratexture2 (below is i=1-j)
+      let i = j;
 
       let vertex_array_object = self.vertex_array_objects.get(i).unwrap();
       let vertex_color_buffer_object = self.vertex_color_buffer_objects.get(i).unwrap();
@@ -580,7 +587,10 @@ impl PointCloudRenderer {
 
       // NB: This controls which geometry gets the texture/color data. If we hardcode it to
       // a single index, only one of the camera geometries gets shaded.
-      let i = 1 - j;
+      //let i = j; // (SEE TABLE ABOVE)
+      //let i = 1 - j; // (SEE TABLE ABOVE)
+      let i = j;
+
       let vertex_attrib_location = self.vertex_attrib_locations.get(i).unwrap();
 
       unsafe {
