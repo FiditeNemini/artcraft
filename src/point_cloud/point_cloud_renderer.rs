@@ -504,6 +504,10 @@ impl PointCloudRenderer {
     let time_since_epoch = time.duration_since(UNIX_EPOCH).unwrap();
     let seconds = time_since_epoch.as_secs();
 
+    unsafe {
+      gl::UseProgram(self.shader_program_id);
+    }
+
     for (j, color_image) in color_images.iter().enumerate() {
       // NB: This experiment demonstrates that only one set of texture (colors) seem to be updated.
       // let i = if seconds % 10 > 4 {
@@ -609,40 +613,46 @@ impl PointCloudRenderer {
           0 as i32,
           0 as *const c_void,
         );
+
       }
     }
 
     unsafe {
-      gl::BindVertexArray(0);
+      //gl::BindVertexArray(0);
     }
 
     unsafe {
-      gl::UseProgram(self.shader_program_id);
+      //gl::UseProgram(self.shader_program_id);
 
-      for (i, point_cloud_texture) in point_cloud_textures.iter().enumerate() {
-        //if i == 1 {
-        //  continue; // FIXME: AHA! So that's what's happening. I'm only uploading to the same texture. And in one case, the texture and color are from different cameras
-        //}
+      // NB: I believe these point cloud textures are the geometry itself. Not the color data.
+      // I think the code here is *fine* because the point cloud structures are in-tact.
+      for (j, point_cloud_texture) in point_cloud_textures.iter().enumerate() {
+        // NB: This changes the point cloud geometry index.
+        // Flipping them changes where in the scene the geometry winds up, since the 1st-indexed
+        // geometry is given an offset.
+        //if i == 1 { continue }
+        //let i = 1 - j;
+        let i = j;
 
-        //let point_cloud_texture_index = self.point_cloud_texture_indices.get(i).unwrap().clone(); // NB: it's okay to copy an i32, but this sucks
-        //gl::Uniform1i(point_cloud_texture_index, 0);
+        // // NB: it's okay to copy an i32, but this sucks
+        // let point_cloud_texture_index = self.point_cloud_texture_indices.get(i).unwrap().clone();
+        // gl::Uniform1i(point_cloud_texture_index, i as i32);
 
-        // Uniforms
         // Bind our point cloud texture (which was written by the compute shader)
-        // TODO: WTF, setting an active texture seemed to prevent this from swapping indices! Okay...
         //gl::ActiveTexture(gl::TEXTURE0 + i as GLuint + 2);
+        //gl::ActiveTexture(gl::TEXTURE0);
+
         gl::BindTexture(gl::TEXTURE_2D, point_cloud_texture.id());
         gl::BindImageTexture(
-          // TODO: DO these have predefined meanings per https://www.khronos.org/opengl/wiki/Sampler_(GLSL) ?
-          i as GLuint, // TODO -----> WOW, this seems to do a thing.
-          point_cloud_texture.id(),
-          0, //i as GLint,
-          gl::FALSE,
-          0,
-          gl::READ_ONLY,
+          // https://www.khronos.org/opengl/wiki/Sampler_(GLSL) ?
+          i as GLuint, // image unit (zero-indexed)
+          point_cloud_texture.id(), // texture
+          0, // level
+          gl::FALSE, // layered
+          0, // layer
+          gl::READ_ONLY, // access
           gl::RGBA32F, //POINT_CLOUD_TEXTURE_FORMAT,
         );
-
       }
     }
 
