@@ -503,6 +503,11 @@ impl PointCloudRenderer {
     let time = SystemTime::now();
     let time_since_epoch = time.duration_since(UNIX_EPOCH).unwrap();
     let seconds = time_since_epoch.as_secs();
+    let swap = if seconds % 10 > 4 {
+      false
+    } else {
+      true
+    };
 
     unsafe {
       gl::UseProgram(self.shader_program_id);
@@ -523,6 +528,7 @@ impl PointCloudRenderer {
       //let i = j; // geometry2, cameratexture1, (below is i=1-j)
       //let i = 1 - j; //geometry1, cameratexture2 (below is i=1-j)
       let i = j;
+      //let i = if swap { j } else { 1 - j }; // swaps which image data is used
 
       let vertex_array_object = self.vertex_array_objects.get(i).unwrap();
       let vertex_color_buffer_object = self.vertex_color_buffer_objects.get(i).unwrap();
@@ -593,7 +599,8 @@ impl PointCloudRenderer {
       // a single index, only one of the camera geometries gets shaded.
       //let i = j; // (SEE TABLE ABOVE)
       //let i = 1 - j; // (SEE TABLE ABOVE)
-      let i = j;
+      //let i = j;
+      //let i = if !swap { j } else { 1 - j }; // (in isolation) PUTS THE IMAGES ON BOTH POINTCLOUD GEOS!?
 
       let vertex_attrib_location = self.vertex_attrib_locations.get(i).unwrap();
 
@@ -632,6 +639,7 @@ impl PointCloudRenderer {
         // geometry is given an offset.
         //if i == 1 { continue }
         //let i = 1 - j;
+        //let i = if swap { j } else { 1 - j }; // swaps physical location of the geometry
         let i = j;
 
         // // NB: it's okay to copy an i32, but this sucks
