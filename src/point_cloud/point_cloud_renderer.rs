@@ -62,8 +62,8 @@ pub static POINT_CLOUD_VERTEX_SHADER : &'static str = "\
 #version 430
 
 // NB: It appears that locations need to be wide enough apart, or the colors bleed across locations.
-layout(location = 0) in vec4 inColor0;
-layout(location = 10) in vec4 inColor1;
+in vec4 inColor0;
+in vec4 inColor1;
 
 out vec4 vertexColor;
 
@@ -509,11 +509,16 @@ impl PointCloudRenderer {
       true
     };
 
+    let do_break = swap;
+
     unsafe {
       gl::UseProgram(self.shader_program_id);
     }
 
-    for (j, color_image) in color_images.iter().enumerate() {
+    for j in 0 .. color_images.len() {
+      let color_image = color_images.get(j).unwrap();
+      let point_cloud_texture = point_cloud_textures.get(j).unwrap();
+
       // NB: This experiment demonstrates that only one set of texture (colors) seem to be updated.
       // let i = if seconds % 10 > 4 {
       //   j // primary camera first
@@ -599,41 +604,54 @@ impl PointCloudRenderer {
       // a single index, only one of the camera geometries gets shaded.
       //let i = j; // (SEE TABLE ABOVE)
       //let i = 1 - j; // (SEE TABLE ABOVE)
-      //let i = j;
+      let i = j;
       //let i = if !swap { j } else { 1 - j }; // (in isolation) PUTS THE IMAGES ON BOTH POINTCLOUD GEOS!?
 
-      let vertex_attrib_location = self.vertex_attrib_locations.get(i).unwrap();
 
       unsafe {
-        // NB: Controling these indices change where the color bytes are uploaded
-        gl::EnableVertexAttribArray(*vertex_attrib_location as u32);
+        if !do_break {
+          //let i = 1 - j; // face image -> room geo
+          let vertex_attrib_location = self.vertex_attrib_locations.get(i).unwrap();
 
-        //let location = i;
-        gl::VertexAttribPointer(
-          *vertex_attrib_location as u32,
-          //location as u32, // TODO: Does this matter?
-          gl::BGRA as i32,
-          gl::UNSIGNED_BYTE,
-          gl::TRUE,
-          //get_stride::<f32>(0),
-          //get_pointer_offset::<f32>(0),
-          0 as i32,
-          0 as *const c_void,
-        );
+          // NB: Controling these indices change where the color bytes are uploaded
+          gl::EnableVertexAttribArray(*vertex_attrib_location as u32);
 
-      }
-    }
+          //let location = i;
+          gl::VertexAttribPointer(
+            *vertex_attrib_location as u32,
+            //location as u32, // TODO: Does this matter?
+            gl::BGRA as i32,
+            gl::UNSIGNED_BYTE,
+            gl::TRUE,
+            //get_stride::<f32>(0),
+            //get_pointer_offset::<f32>(0),
+            0 as i32,
+            0 as *const c_void,
+          );
+        } else {
+          //let i = 1 - j; // face image -> room geo
+          let vertex_attrib_location = self.vertex_attrib_locations.get(i).unwrap();
 
-    unsafe {
-      //gl::BindVertexArray(0);
-    }
+          // NB: Controling these indices change where the color bytes are uploaded
+          gl::EnableVertexAttribArray(*vertex_attrib_location as u32);
 
-    unsafe {
-      //gl::UseProgram(self.shader_program_id);
+          //let location = i;
+          gl::VertexAttribPointer(
+            *vertex_attrib_location as u32,
+            //location as u32, // TODO: Does this matter?
+            gl::BGRA as i32,
+            gl::UNSIGNED_BYTE,
+            gl::TRUE,
+            //get_stride::<f32>(0),
+            //get_pointer_offset::<f32>(0),
+            0 as i32,
+            0 as *const c_void,
+          );
+        }
 
-      // NB: I believe these point cloud textures are the geometry itself. Not the color data.
-      // I think the code here is *fine* because the point cloud structures are in-tact.
-      for (j, point_cloud_texture) in point_cloud_textures.iter().enumerate() {
+        // NB: I believe these point cloud textures are the geometry itself. Not the color data.
+        // I think the code here is *fine* because the point cloud structures are in-tact.
+
         // NB: This changes the point cloud geometry index.
         // Flipping them changes where in the scene the geometry winds up, since the 1st-indexed
         // geometry is given an offset.
