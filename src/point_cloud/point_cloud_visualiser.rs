@@ -323,11 +323,14 @@ impl PointCloudVisualizer {
       return Ok(());
     }
 
-    for (camera_index, capture) in captures.drain(0 .. self.num_cameras).into_iter().enumerate() {
+    for (camera_index, capture) in captures.drain(0 .. self.num_cameras)
+        .into_iter()
+        .enumerate() {
       self.update_point_clouds_for_camera(camera_index, capture)?;
     }
 
-    // TODO: wrt k4a::Image.clone(), k4a should use ref counting. (I did this one other place a few commits ago. Hope it's not ref leaking.)
+    // TODO: wrt k4a::Image.clone(), k4a should use ref counting. (I did this one other place a few commits ago.
+    //  Hope it's not ref leaking.)
     let colorizations: Vec<Image>  = self.point_cloud_colorizations.iter()
         .map(|img| img.as_ref().map(|img| img.clone()).unwrap())
         .collect();

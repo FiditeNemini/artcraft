@@ -5,8 +5,9 @@ use std::ffi::CString;
 use std::fmt::Formatter;
 use std::mem::size_of;
 use std::os::raw::{c_char, c_void};
-use std::ptr;
+use std::path::Path;
 use std::ptr::null;
+use std::ptr;
 use std::str;
 use std::sync::{Arc, Mutex};
 
@@ -22,8 +23,8 @@ use opengl::opengl_wrapper::Texture;
 use opengl::opengl_wrapper::{Buffer, gl_get_error, OpenGlError, VertexArray};
 use point_cloud::pixel_structs::BgraPixel;
 use std::time::{SystemTime, UNIX_EPOCH};
-use std::fs::File;
-use std::io::Read;
+use std::fs::{File, OpenOptions};
+use std::io::{Read, Write};
 use opengl::link_program::link_shader_program;
 
 pub type Result<T> = std::result::Result<T, PointCloudRendererError>;
@@ -385,6 +386,9 @@ impl PointCloudRenderer {
       let color_src = color_image.get_buffer();
       let typed_color_src = color_src as *const u8;
 
+      let filename = format!("output/color_src_{}", i);
+      write_file_from_byte_ptr(&filename, color_src, color_image_size_bytes as usize).unwrap();
+
       let result = unsafe {
         /*if i == 9 {
           // TODO TESTING - writing pure white changes the color of the final output "line" to white:
@@ -559,3 +563,21 @@ fn read_file_contents(filename: &str) -> AnyhowResult<String> {
   Ok(contents)
 }
 
+/// Raw memory copy into a file
+fn write_file_from_byte_ptr(filename: &str, byte_src: *const u8, size_bytes: usize) -> AnyhowResult<()> {
+  let mut file = OpenOptions::new()
+      .write(true)
+      .create(true)
+      .open(filename)?;
+
+  let mut vec = vec![0u8; size_bytes];
+
+  unsafe {
+    let vec_ptr = vec.as_mut_ptr();
+    //ptr::write_bytes(vec_ptr, color_src, size_bytes);
+    ptr::copy_nonoverlapping(byte_src, vec_ptr, size_bytes);
+  }
+
+  file.write(&vec)?;
+  Ok(())
+}
