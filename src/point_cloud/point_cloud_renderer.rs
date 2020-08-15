@@ -24,6 +24,7 @@ use point_cloud::pixel_structs::BgraPixel;
 use std::time::{SystemTime, UNIX_EPOCH};
 use std::fs::File;
 use std::io::Read;
+use opengl::link_program::link_shader_program;
 
 pub type Result<T> = std::result::Result<T, PointCloudRendererError>;
 
@@ -175,19 +176,13 @@ impl PointCloudRenderer {
     let ATTRIB_LOCATION_1 : CString = CString::new("inColor1").expect("string is correct");
     let ATTRIB_LOCATION_1_PTR : *const c_char = ATTRIB_LOCATION_1.as_ptr() as *const c_char;
 
-    //let ATTRIB_LOCATION_2 : CString = CString::new("inColor2").expect("string is correct");
-    //let ATTRIB_LOCATION_2_PTR : *const c_char = ATTRIB_LOCATION_2.as_ptr() as *const c_char;
+    unsafe {
+      // NB: These calls aren't necessary.
+      //gl::BindAttribLocation(program_id, 1, ATTRIB_LOCATION_0_PTR);
+      //gl::BindAttribLocation(program_id, 2, ATTRIB_LOCATION_1_PTR);
+    }
 
-    //let ATTRIB_LOCATION_3 : CString = CString::new("inColor3").expect("string is correct");
-    //let ATTRIB_LOCATION_3_PTR : *const c_char = ATTRIB_LOCATION_3.as_ptr() as *const c_char;
-
-    //unsafe {
-    //  gl::BindAttribLocation(program_id, 1, ATTRIB_LOCATION_1_PTR);
-    //  gl::BindAttribLocation(program_id, 2, ATTRIB_LOCATION_2_PTR);
-    //  gl::BindAttribLocation(program_id, 3, ATTRIB_LOCATION_3_PTR);
-    //}
-
-    link_program(program_id, vertex_shader_id, fragment_shader_id);
+    link_shader_program(program_id, vertex_shader_id, fragment_shader_id);
 
     /// Uniform variable name in OpenGL shader program
     let VIEW : CString = CString::new("view").expect("string is correct");
@@ -291,7 +286,7 @@ impl PointCloudRenderer {
   ///
   /// Update the view matrices
   ///
-  pub fn update_view_projection(&mut self, view: [[f32; 4]; 4], projection: [[f32; 4]; 4]) {
+  pub fn update_view_projection(&mut self, view: [[f32; 4]; 4], _projection: [[f32; 4]; 4]) {
     self.view_matrix = view;
     //self.projection_matrix = projection;
 
@@ -554,39 +549,6 @@ impl PointCloudRenderer {
 
   pub fn set_enable_shading(&mut self, enable_shading: bool) {
     self.enable_shading = enable_shading;
-  }
-}
-
-// TODO: Reuse.
-fn link_program(program: GLuint, vertex_shader: GLuint, fragment_shader: GLuint) -> GLuint {
-  unsafe {
-    gl::AttachShader(program, vertex_shader);
-    gl::AttachShader(program, fragment_shader);
-    gl::LinkProgram(program);
-    // Get the link status
-    let mut status = gl::FALSE as GLint;
-    gl::GetProgramiv(program, gl::LINK_STATUS, &mut status);
-
-    // Fail on error
-    if status != (gl::TRUE as GLint) {
-      let mut len: GLint = 0;
-      gl::GetProgramiv(program, gl::INFO_LOG_LENGTH, &mut len);
-      let mut buf = Vec::with_capacity(len as usize);
-      buf.set_len((len as usize) - 1); // subtract 1 to skip the trailing null character
-      gl::GetProgramInfoLog(
-        program,
-        len,
-        ptr::null_mut(),
-        buf.as_mut_ptr() as *mut GLchar,
-      );
-      panic!(
-        "{}",
-        str::from_utf8(&buf)
-            .ok()
-            .expect("ProgramInfoLog not valid utf8")
-      );
-    }
-    program
   }
 }
 
