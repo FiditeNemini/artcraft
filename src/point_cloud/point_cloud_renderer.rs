@@ -62,12 +62,10 @@ pub static POINT_CLOUD_VERTEX_SHADER : &'static str = "\
 #version 430
 
 // NB: It appears that locations need to be wide enough apart, or the colors bleed across locations.
-//layout(location=0) in vec4 inColor0;
-//layout(location=10) in vec4 inColor1;
+layout(location=0) in vec4 inColor0;
+layout(location=10) in vec4 inColor1;
 //in vec4 inColor0;
 //in vec4 inColor1;
-layout(location=10) in vec4 inColor0;
-layout(location=0) in vec4 inColor1;
 
 out vec4 vertexColor;
 
@@ -641,6 +639,9 @@ impl PointCloudRenderer {
         //gl::ActiveTexture(gl::TEXTURE0 + i as GLuint + 2);
         //gl::ActiveTexture(gl::TEXTURE0);
 
+        //
+        // THIS IS THE POINT CLOUD
+        //
         gl::BindTexture(gl::TEXTURE_2D, point_cloud_texture.id());
         gl::BindImageTexture(
           // https://www.khronos.org/opengl/wiki/Sampler_(GLSL) ?
@@ -711,6 +712,9 @@ impl PointCloudRenderer {
         //   1 - j // secondary camera first
         // };
 
+        //
+        // THIS IS THE COLOR IMAGE
+        //
         let vertex_array_object = self.vertex_array_objects.get(i).unwrap();
         let vertex_array_size_bytes = self.vertex_arrays_size_bytes.get(i).unwrap();
 
