@@ -324,7 +324,7 @@ impl PointCloudRenderer {
       (1, 2)
     };
 
-    //let (lower_range, upper_range)  = (0, 2);
+    let (lower_range, upper_range)  = (0, 2);
 
     //for i in 0 .. self.num_cameras  {
     for i in lower_range .. upper_range {
@@ -511,7 +511,7 @@ impl PointCloudRenderer {
         (1, 2)
       };
 
-      //let (lower_range, upper_range) = (0, 2);
+      let (lower_range, upper_range) = (0, 2);
 
       // Render point cloud
       //for i in 0 .. self.num_cameras {
