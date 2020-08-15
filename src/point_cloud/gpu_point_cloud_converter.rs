@@ -21,6 +21,7 @@ use opengl::opengl_wrapper::Texture;
 use opengl::opengl_wrapper::{Buffer, gl_get_error};
 use point_cloud::pixel_structs::DepthPixel;
 use files::read_file_string_contents::read_file_string_contents;
+use files::write_to_file_from_byte_ptr::write_to_file_from_byte_ptr;
 
 pub type Result<T> = std::result::Result<T, PointCloudComputeError>;
 
@@ -148,8 +149,9 @@ impl GpuPointCloudConverter {
   ///
   pub fn convert(&self,
                  depth_image: &k4a_sys_wrapper::Image,
-                 output_texture: &mut Texture) -> Result<()>
-  {
+                 output_texture: &mut Texture,
+                 camera_index: usize
+  ) -> Result<()> {
     if !self.xy_table_texture.is_initialized() {
       return Err(PointCloudComputeError::UnknownError);
     }
@@ -206,6 +208,11 @@ impl GpuPointCloudConverter {
       }
 
       let depth_image_buffer = depth_image.get_buffer();
+
+      let filename = format!("output/depth_src_{}", camera_index);
+      let size = (width * height) as usize * size_of::<u16>();
+      write_to_file_from_byte_ptr(&filename, depth_image_buffer, size).unwrap();
+
       let typed_depth_image_buffer = depth_image_buffer as *const DepthPixel;
 
       std::ptr::copy::<DepthPixel>(typed_depth_image_buffer, texture_mapped_buffer, length as usize);
@@ -285,6 +292,30 @@ impl GpuPointCloudConverter {
       // NB(bt): Restore to default active texture? Looks like this is required for 'imgui'
       // This is needed despite using glGetInteger(GL_ACTIVE_TEXTURE) and resetting that value.
       //gl::ActiveTexture(gl::TEXTURE0);
+
+      /*
+      // Try to save the texture buffer to file... (not working yet)
+      let size_bytes = (width * height * 4);
+      let mut vec = vec![0u8; size_bytes as usize];
+      let mut pointer = vec.as_mut_ptr() as *mut c_void;
+
+      // Pull the texture out as bytes.
+      //gl::ActiveTexture(gl::TEXTURE1);
+      gl::BindTexture(gl::TEXTURE_2D, output_texture.id());
+
+      gl_get_error().unwrap();
+
+      gl::GetTextureImage(
+        output_texture.id(),
+        0, // level
+        gl::RGBA32F, // format
+        gl::UNSIGNED_BYTE, // type
+        size_bytes, // buffer size
+        pointer,
+      );
+
+      gl_get_error().unwrap();
+      */
 
       Ok(())
     }

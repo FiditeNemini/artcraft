@@ -386,7 +386,8 @@ impl PointCloudVisualizer {
 
     let result = self.point_cloud_converters.get(camera_index).unwrap().convert(
       &depth_image,
-      &mut self.xyz_textures.get_mut(camera_index).unwrap() // TODO: TEMP MULTI CAMERA SUPPORT
+      &mut self.xyz_textures.get_mut(camera_index).unwrap(), // TODO: TEMP MULTI CAMERA SUPPORT
+      camera_index
     );
 
     if let Err(err) = result {

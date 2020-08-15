@@ -28,6 +28,7 @@ use std::io::{Read, Write};
 use opengl::link_program::link_shader_program;
 use point_cloud::debug::color_image_bytes::ColorImageBytes;
 use files::read_file_string_contents::read_file_string_contents;
+use files::write_to_file_from_byte_ptr::write_to_file_from_byte_ptr;
 
 pub type Result<T> = std::result::Result<T, PointCloudRendererError>;
 
@@ -269,8 +270,8 @@ impl PointCloudRenderer {
 
     let mut debug_static_color_frames = Vec::new();
 
-    debug_static_color_frames.push(ColorImageBytes::from_file("output/color_src_0").unwrap());
-    debug_static_color_frames.push(ColorImageBytes::from_file("output/color_src_1").unwrap());
+    //debug_static_color_frames.push(ColorImageBytes::from_file("output/color_src_0").unwrap());
+    //debug_static_color_frames.push(ColorImageBytes::from_file("output/color_src_1").unwrap());
 
     Self {
       num_cameras,
@@ -354,6 +355,10 @@ impl PointCloudRenderer {
       } else {
         let color_image = color_images.get(i).unwrap();
         let color_image_bytes = ColorImageBytes::from_k4a_image(&color_image);
+
+        let filename = format!("output/color_src_{}", i);
+        write_to_file_from_byte_ptr(&filename, color_image_bytes.as_ptr(), color_image_bytes.len()).unwrap();
+
         color_image_storage = Some(color_image_bytes);
         color_image_storage.as_ref().unwrap()
       };
@@ -556,23 +561,4 @@ impl PointCloudRenderer {
   pub fn set_enable_shading(&mut self, enable_shading: bool) {
     self.enable_shading = enable_shading;
   }
-}
-
-/// Raw memory copy into a file
-fn write_file_from_byte_ptr(filename: &str, byte_src: *const u8, size_bytes: usize) -> AnyhowResult<()> {
-  let mut file = OpenOptions::new()
-      .write(true)
-      .create(true)
-      .open(filename)?;
-
-  let mut vec = vec![0u8; size_bytes];
-
-  unsafe {
-    let vec_ptr = vec.as_mut_ptr();
-    //ptr::write_bytes(vec_ptr, color_src, size_bytes);
-    ptr::copy_nonoverlapping(byte_src, vec_ptr, size_bytes);
-  }
-
-  file.write(&vec)?;
-  Ok(())
 }
