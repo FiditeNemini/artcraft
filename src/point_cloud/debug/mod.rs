@@ -1,1 +1,1 @@
-pub mod color_image_bytes;
+pub mod camera_image_bytes;

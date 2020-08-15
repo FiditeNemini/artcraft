@@ -26,7 +26,7 @@ use std::time::{SystemTime, UNIX_EPOCH};
 use std::fs::{File, OpenOptions};
 use std::io::{Read, Write};
 use opengl::link_program::link_shader_program;
-use point_cloud::debug::color_image_bytes::ColorImageBytes;
+use point_cloud::debug::camera_image_bytes::CameraImageBytes;
 use files::read_file_string_contents::read_file_string_contents;
 use files::write_to_file_from_byte_ptr::write_to_file_from_byte_ptr;
 
@@ -111,8 +111,8 @@ pub struct PointCloudRenderer {
   vertex_attrib_locations: Vec<GLint>,
 
   /// For debugging
-  /// If present, use these instead of camera captures.
-  debug_static_color_frames: Vec<ColorImageBytes>,
+  /// If present, use these for color images instead of camera captures.
+  debug_static_color_frames: Vec<CameraImageBytes>,
 }
 
 const fn translation_matrix_4x4(x: f32, y: f32, z: f32) -> [f32; 16] {
@@ -269,9 +269,8 @@ impl PointCloudRenderer {
     ];
 
     let mut debug_static_color_frames = Vec::new();
-
-    //debug_static_color_frames.push(ColorImageBytes::from_file("output/color_src_0").unwrap());
-    //debug_static_color_frames.push(ColorImageBytes::from_file("output/color_src_1").unwrap());
+    debug_static_color_frames.push(CameraImageBytes::from_file("output/color_src_0", 0, 0).unwrap());
+    debug_static_color_frames.push(CameraImageBytes::from_file("output/color_src_1", 0, 0).unwrap());
 
     Self {
       num_cameras,
@@ -348,16 +347,16 @@ impl PointCloudRenderer {
       }
 
       // Hack to hold onto the K4A ColorImageBytes wrapper.
-      let mut color_image_storage : Option<ColorImageBytes> = None;
+      let mut color_image_storage : Option<CameraImageBytes> = None;
 
       let color_image_bytes = if let Some(debug_color_image) = self.debug_static_color_frames.get(i) {
         debug_color_image
       } else {
         let color_image = color_images.get(i).unwrap();
-        let color_image_bytes = ColorImageBytes::from_k4a_image(&color_image);
+        let color_image_bytes = CameraImageBytes::from_k4a_image(&color_image);
 
-        let filename = format!("output/color_src_{}", i);
-        write_to_file_from_byte_ptr(&filename, color_image_bytes.as_ptr(), color_image_bytes.len()).unwrap();
+        //let filename = format!("output/color_src_{}", i);
+        //write_to_file_from_byte_ptr(&filename, color_image_bytes.as_ptr(), color_image_bytes.len()).unwrap();
 
         color_image_storage = Some(color_image_bytes);
         color_image_storage.as_ref().unwrap()

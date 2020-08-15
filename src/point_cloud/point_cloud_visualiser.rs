@@ -20,6 +20,7 @@ use point_cloud::pixel_structs::DepthPixel;
 use point_cloud::point_cloud_renderer::{PointCloudRenderer, PointCloudRendererError};
 use point_cloud::util::{colorize_depth_blue_to_red, get_depth_mode_range, ValueRange};
 use point_cloud::viewer_image::ViewerImage;
+use point_cloud::debug::camera_image_bytes::CameraImageBytes;
 
 pub type Result<T> = std::result::Result<T, PointCloudVisualizerError>;
 
@@ -133,6 +134,10 @@ pub struct PointCloudVisualizer {
 
   /// Background clear color for OpenGL.
   clear_color: RgbaF32,
+
+  /// For debugging
+  /// If present, use these for depth images instead of camera captures.
+  debug_static_depth_frames: Vec<CameraImageBytes>,
 }
 
 // TODO: Dedup
@@ -203,6 +208,10 @@ impl PointCloudVisualizer {
       depth_xy_tables.push(depth_xy_table);
     }
 
+    let mut debug_static_depth_frames = Vec::new();
+    debug_static_depth_frames.push(CameraImageBytes::from_file("output/depth_src_0", 3840, 2160).unwrap());
+    debug_static_depth_frames.push(CameraImageBytes::from_file("output/depth_src_1", 3840, 2160).unwrap());
+
     let mut visualizer = Self {
       num_cameras,
       arcball_camera: arcball_camera.clone(),
@@ -224,6 +233,7 @@ impl PointCloudVisualizer {
       xyz_textures,
       depth_value_range: expected_value_range,
       clear_color,
+      debug_static_depth_frames,
     };
 
     visualizer.set_colorization_strategy(initial_colorization_strategy).expect("Should work");
@@ -383,6 +393,17 @@ impl PointCloudVisualizer {
     //
     // Convert depth image to depth texture
     //
+
+    // Hack to hold onto the K4A ColorImageBytes wrapper.
+    let mut depth_image_storage : Option<CameraImageBytes> = None;
+
+    let depth_image = if let Some(image) = self.debug_static_depth_frames.get(camera_index) {
+      image
+    } else {
+      let camera_image = CameraImageBytes::from_k4a_image(&depth_image);
+      depth_image_storage = Some(camera_image);
+      depth_image_storage.as_ref().unwrap()
+    };
 
     let result = self.point_cloud_converters.get(camera_index).unwrap().convert(
       &depth_image,

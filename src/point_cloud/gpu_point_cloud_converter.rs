@@ -22,6 +22,7 @@ use opengl::opengl_wrapper::{Buffer, gl_get_error};
 use point_cloud::pixel_structs::DepthPixel;
 use files::read_file_string_contents::read_file_string_contents;
 use files::write_to_file_from_byte_ptr::write_to_file_from_byte_ptr;
+use point_cloud::debug::camera_image_bytes::CameraImageBytes;
 
 pub type Result<T> = std::result::Result<T, PointCloudComputeError>;
 
@@ -148,7 +149,8 @@ impl GpuPointCloudConverter {
   /// sized texture.
   ///
   pub fn convert(&self,
-                 depth_image: &k4a_sys_wrapper::Image,
+                 //depth_image: &k4a_sys_wrapper::Image,
+                 depth_image: &CameraImageBytes,
                  output_texture: &mut Texture,
                  camera_index: usize
   ) -> Result<()> {
@@ -209,9 +211,9 @@ impl GpuPointCloudConverter {
 
       let depth_image_buffer = depth_image.get_buffer();
 
-      let filename = format!("output/depth_src_{}", camera_index);
-      let size = (width * height) as usize * size_of::<u16>();
-      write_to_file_from_byte_ptr(&filename, depth_image_buffer, size).unwrap();
+      //let filename = format!("output/depth_src_{}", camera_index);
+      //let size = (width * height) as usize * size_of::<u16>();
+      //write_to_file_from_byte_ptr(&filename, depth_image_buffer, size).unwrap();
 
       let typed_depth_image_buffer = depth_image_buffer as *const DepthPixel;
 
