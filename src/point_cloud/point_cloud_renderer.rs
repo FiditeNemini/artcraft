@@ -10,9 +10,10 @@ use std::ptr::null;
 use std::str;
 use std::sync::{Arc, Mutex};
 
+use anyhow::Result as AnyhowResult;
 use arcball::ArcballCamera;
-use gl;
 use gl::types::*;
+use gl;
 
 use gui::mouse_camera_arcball::MouseCameraArcball;
 use kinect::k4a_sys_wrapper;
@@ -21,6 +22,8 @@ use opengl::opengl_wrapper::Texture;
 use opengl::opengl_wrapper::{Buffer, gl_get_error, OpenGlError, VertexArray};
 use point_cloud::pixel_structs::BgraPixel;
 use std::time::{SystemTime, UNIX_EPOCH};
+use std::fs::File;
+use std::io::Read;
 
 pub type Result<T> = std::result::Result<T, PointCloudRendererError>;
 
@@ -55,201 +58,6 @@ impl std::error::Error for PointCloudRendererError {
     None
   }
 }
-
-/// This is taken from Microsoft's MIT-licensed k4a libraries.
-/// From the file `tools/k4aviewer/graphics/shaders/k4apointcloudshaders.h`
-pub static POINT_CLOUD_VERTEX_SHADER : &'static str = "\
-#version 430
-
-// NB: It appears that locations need to be wide enough apart, or the colors bleed across locations.
-layout(location=0) in vec4 inColor0;
-layout(location=10) in vec4 inColor1;
-//in vec4 inColor0;
-//in vec4 inColor1;
-
-out vec4 vertexColor;
-
-uniform mat4 view;
-uniform mat4 projection;
-
-layout(rgba32f, binding=0) readonly uniform image2D pointCloudTexture0;
-layout(rgba32f, binding=1) readonly uniform image2D pointCloudTexture1;
-
-uniform bool enableShading;
-
-// bool GetPoint3d(in vec2 pointCloudSize, in ivec2 point2d, out vec3 point3d)
-// {
-//     if (point2d.x < 0 || point2d.x >= pointCloudSize.x ||
-//         point2d.y < 0 || point3d.y >= pointCloudSize.y)
-//     {
-//         return false;
-//     }
-//
-//     point3d = imageLoad(pointCloudTexture0, point2d).xyz;
-//     if (point3d.z <= 0)
-//     {
-//         return false;
-//     }
-//
-//     return true;
-// }
-
-void main()
-{
-    ivec2 pointCloudSize0 = imageSize(pointCloudTexture0);
-    ivec2 pointCloudSize1 = imageSize(pointCloudTexture1);
-
-    int pointCloudLength0 = pointCloudSize0.x * pointCloudSize0.y;
-    int pointCloudLength1 = pointCloudSize1.x * pointCloudSize1.y;
-
-    vec3 vertexPosition;
-    vec4 colorOut;
-
-    // We're having to multiplex on gl_VertexID, and I don't think we get double the range for two
-    // cameras. This effectively 'downsamples' each camera. We need to find a way to double this.
-    // I hate drawing like this
-    if (gl_VertexID % 10 == 0) {
-      // Camera #0
-      ivec2 currentDepthPixelCoordinates = ivec2(gl_VertexID % pointCloudSize0.x, gl_VertexID / pointCloudSize0.x);
-
-      vertexPosition = imageLoad(pointCloudTexture0, currentDepthPixelCoordinates).xyz;
-
-      colorOut = vec4(
-        inColor0.r,
-        inColor0.g,
-        inColor0.b,
-        255
-      );
-    } else {
-      // Camera #1
-      ivec2 currentDepthPixelCoordinates = ivec2(gl_VertexID % pointCloudSize1.x, gl_VertexID / pointCloudSize1.x);
-
-      // vec3 originalPosition = imageLoad(pointCloudTexture1, currentDepthPixelCoordinates).xyz;
-
-      // // Let's move the model away a bit.
-      // vertexPosition = vec3(
-      //   originalPosition.x - 1.5,
-      //   originalPosition.y,
-      //   originalPosition.z
-      // );
-
-      vertexPosition = imageLoad(pointCloudTexture1, currentDepthPixelCoordinates).xyz;
-
-      // MAJOR PROBLEM HERE!
-      // While we appear to have geometry data from both cameras, we do NOT have the color/texture
-      // data from the second camera. That's annoying.
-      colorOut = vec4(
-        inColor1.r,
-        inColor1.g,
-        inColor1.b,
-        255
-      );
-    }
-
-    //vec3 vertexPosition = imageLoad(pointCloudTexture0, currentDepthPixelCoordinates).xyz;
-    //int pointCloudVertexLength = pointCloudSize.x * pointCloudSize.y;
-
-    //if (gl_VertexID % 2 == 0) {
-    //} else {
-    //}
-
-    // Scale up while model view matrices not implemented.
-    //vertexPosition.x *= 2.0 + 10.0;
-    //vertexPosition.y *= 2.0 + 10.0;
-    //vertexPosition.z *= 2.0;
-
-    if (view[0][0] > 0.5) {
-      vertexPosition.x -= 2.0;
-      vertexPosition.y -= 2.0;
-    }
-
-    gl_Position = projection * view * vec4(vertexPosition, 1);
-    vertexColor = colorOut;
-
-    // Pass along the 'invalid pixel' flag as the alpha channel
-    //
-    if (vertexPosition.z == 0.0f)
-    {
-        vertexColor.a = 0.0f;
-    }
-
-    // NB: This is affecting the second camera. Disabling for now.
-    // if (enableShading)
-    // {
-    //     // Compute the location of the closest neighbor pixel to compute lighting
-    //     //
-    //     vec3 closestNeighbor = vertexPosition;
-    //
-    //     // If no neighbors have data, default to 1 meter behind point.
-    //     //
-    //     closestNeighbor.z += 1.0f;
-    //
-    //     vec3 outPoint;
-    //     if (GetPoint3d(pointCloudSize, currentDepthPixelCoordinates - ivec2(1, 0), outPoint))
-    //     {
-    //         if (closestNeighbor.z > outPoint.z)
-    //         {
-    //             closestNeighbor = outPoint;
-    //         }
-    //     }
-    //     if (GetPoint3d(pointCloudSize, currentDepthPixelCoordinates + ivec2(1, 0), outPoint))
-    //     {
-    //         if (closestNeighbor.z > outPoint.z)
-    //         {
-    //             closestNeighbor = outPoint;
-    //         }
-    //     }
-    //     if (GetPoint3d(pointCloudSize, currentDepthPixelCoordinates - ivec2(0, 1), outPoint))
-    //     {
-    //         if (closestNeighbor.z > outPoint.z)
-    //         {
-    //             closestNeighbor = outPoint;
-    //         }
-    //     }
-    //     if (GetPoint3d(pointCloudSize, currentDepthPixelCoordinates + ivec2(0, 1), outPoint))
-    //     {
-    //         if (closestNeighbor.z > outPoint.z)
-    //         {
-    //             closestNeighbor = outPoint;
-    //         }
-    //     }
-    //
-    //     vec3 lightPosition = vec3(0, 0, 0);
-    //     float occlusion = length(vertexPosition - closestNeighbor) * 20.0f;
-    //     float diffuse = 1.0f - clamp(occlusion, 0.0f, 0.6f);
-    //
-    //     float distance = length(lightPosition - vertexPosition);
-    //
-    //     // Attenuation term for light source that covers distance up to 50 meters
-    //     // http://wiki.ogre3d.org/tiki-index.php?page=-Point+Light+Attenuation
-    //     //
-    //     float attenuation = 1.0 / (1.0 + 0.09 * distance + 0.032 * distance * distance);
-    //
-    //     vertexColor = vec4(attenuation * diffuse * vertexColor.rgb, vertexColor.a);
-    // }
-}
-";
-
-/// This is taken from Microsoft's MIT-licensed k4a libraries.
-/// From the file `tools/k4aviewer/graphics/shaders/k4apointcloudshaders.h`
-pub static POINT_CLOUD_FRAGMENT_SHADER: &'static str = "\
-#version 430
-
-in vec4 vertexColor;
-out vec4 fragmentColor;
-
-uniform bool enableShading;
-
-void main()
-{
-    if (vertexColor.a == 0.0f)
-    {
-        discard;
-    }
-
-    fragmentColor = vertexColor;
-}
-";
 
 pub struct PointCloudRenderer {
   num_cameras: usize,
@@ -354,8 +162,12 @@ impl PointCloudRenderer {
     }
 
     let program_id = unsafe { gl::CreateProgram() };
-    let vertex_shader_id = compile_shader(POINT_CLOUD_VERTEX_SHADER, gl::VERTEX_SHADER);
-    let fragment_shader_id = compile_shader(POINT_CLOUD_FRAGMENT_SHADER, gl::FRAGMENT_SHADER);
+
+    let mut point_cloud_vertex_shader = read_file_contents("src/point_cloud/shaders/point_cloud_vertex_shader.glsl").unwrap();
+    let mut point_cloud_fragment_shader = read_file_contents("src/point_cloud/shaders/point_cloud_fragment_shader.glsl").unwrap();
+
+    let vertex_shader_id = compile_shader(&point_cloud_vertex_shader, gl::VERTEX_SHADER);
+    let fragment_shader_id = compile_shader(&point_cloud_fragment_shader, gl::FRAGMENT_SHADER);
 
     let ATTRIB_LOCATION_0 : CString = CString::new("inColor0").expect("string is correct");
     let ATTRIB_LOCATION_0_PTR : *const c_char = ATTRIB_LOCATION_0.as_ptr() as *const c_char;
@@ -777,3 +589,11 @@ fn link_program(program: GLuint, vertex_shader: GLuint, fragment_shader: GLuint)
     program
   }
 }
+
+fn read_file_contents(filename: &str) -> AnyhowResult<String> {
+  let mut file = File::open(filename)?;
+  let mut contents = String::new();
+  file.read_to_string(&mut contents)?;
+  Ok(contents)
+}
+

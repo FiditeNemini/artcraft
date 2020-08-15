@@ -1,5 +1,6 @@
 #![allow(warnings)]
 
+extern crate anyhow;
 extern crate arcball;
 extern crate cgmath;
 extern crate clipboard;

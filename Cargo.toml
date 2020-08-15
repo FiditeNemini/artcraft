@@ -9,6 +9,7 @@ name = "camera"
 path = "src/main.rs"
 
 [dependencies]
+anyhow = "1.0.32"
 arcball = "1.0.0" # camera
 cgmath = "0.17.0" # for arcball, but probably good for matrices, vecs, etc.
 clipboard = "0.5" # to support imgui...
