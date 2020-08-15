@@ -26,6 +26,7 @@ use std::time::{SystemTime, UNIX_EPOCH};
 use std::fs::{File, OpenOptions};
 use std::io::{Read, Write};
 use opengl::link_program::link_shader_program;
+use point_cloud::debug::color_image_bytes::ColorImageBytes;
 
 pub type Result<T> = std::result::Result<T, PointCloudRendererError>;
 
@@ -106,6 +107,10 @@ pub struct PointCloudRenderer {
   vertex_color_buffer_objects: Vec<Buffer>,
 
   vertex_attrib_locations: Vec<GLint>,
+
+  /// For debugging
+  /// If present, use these instead of camera captures.
+  debug_static_color_frames: Vec<ColorImageBytes>,
 }
 
 const fn translation_matrix_4x4(x: f32, y: f32, z: f32) -> [f32; 16] {
@@ -261,6 +266,11 @@ impl PointCloudRenderer {
       [0.0,        0.0,      -0.2002,  0.0],
     ];
 
+    let mut debug_static_color_frames = Vec::new();
+
+    debug_static_color_frames.push(ColorImageBytes::from_file("output/color_src_0").unwrap());
+    debug_static_color_frames.push(ColorImageBytes::from_file("output/color_src_1").unwrap());
+
     Self {
       num_cameras,
       arcball_camera: arcball,
@@ -281,6 +291,7 @@ impl PointCloudRenderer {
       vertex_array_objects,
       vertex_color_buffer_objects,
       vertex_attrib_locations,
+      debug_static_color_frames,
     }
   }
 
@@ -320,29 +331,10 @@ impl PointCloudRenderer {
       (1, 2)
     };
 
-    let (lower_range, upper_range)  = (0, 2);
+    //let (lower_range, upper_range)  = (0, 2);
 
     //for i in 0 .. self.num_cameras  {
     for i in lower_range .. upper_range {
-
-      let color_image = color_images.get(i).unwrap();
-      let point_cloud_texture = point_cloud_textures.get(i).unwrap();
-
-      // NB: This experiment demonstrates that only one set of texture (colors) seem to be updated.
-      // let i = if seconds % 10 > 4 {
-      //   j // primary camera first
-      // } else {
-      //   1 - j // secondary camera first
-      // };
-
-      // EXPERIMENTAL RESULTS TABLE.
-      // The first camera index is the one that gets the color
-      //let i = j; // geometry1, cameratexture1, (below is i=j)
-      //let i = 1 - j; //geometry2, cameratexture2 (below is i=j)
-      //let i = j; // geometry2, cameratexture1, (below is i=1-j)
-      //let i = 1 - j; //geometry1, cameratexture2 (below is i=1-j)
-      //let i = if swap { j } else { 1 - j }; // swaps which image data is used
-
       let vertex_array_object = self.vertex_array_objects.get(i).unwrap();
       let vertex_color_buffer_object = self.vertex_color_buffer_objects.get(i).unwrap();
       let mut vertex_array_size_bytes = self.vertex_arrays_size_bytes.get_mut(i).unwrap();
@@ -353,62 +345,123 @@ impl PointCloudRenderer {
         gl::BindBuffer(gl::ARRAY_BUFFER, vertex_color_buffer_object.id());
       }
 
-      let color_image_size_bytes = color_image.get_size() as i32;
+      if let Some(debug_color_image) = self.debug_static_color_frames.get(i) {
+        let color_image_bytes = debug_color_image.get_bytes();
+        let color_image_size_bytes = color_image_bytes.len() as i32;
 
-      if *vertex_array_size_bytes != color_image_size_bytes {
-        println!("Establishing buffer");
-        *vertex_array_size_bytes = color_image_size_bytes;
+        if *vertex_array_size_bytes != color_image_size_bytes {
+          println!("Establishing buffer");
+          *vertex_array_size_bytes = color_image_size_bytes;
 
-        unsafe {
-          gl::BufferData(
+          unsafe {
+            gl::BufferData(
+              gl::ARRAY_BUFFER,
+              *vertex_array_size_bytes as isize,
+              null(),
+              gl::STREAM_DRAW
+            );
+          }
+        }
+
+        let vertex_mapped_buffer = unsafe {
+          gl::MapBufferRange(
             gl::ARRAY_BUFFER,
-            *vertex_array_size_bytes as isize,
-            null(),
-            gl::STREAM_DRAW
-          );
+            0,
+            color_image_size_bytes as isize,
+            gl::MAP_WRITE_BIT | gl::MAP_INVALIDATE_BUFFER_BIT
+          ) as *mut u8
+        };
+
+        if vertex_mapped_buffer as usize == 0 {
+          let error = gl_get_error().expect_err("should be map buffer range error");
+          return Err(PointCloudRendererError::OpenGlError(error));
+        }
+
+        let typed_color_src = color_image_bytes.as_ptr();
+
+        let result = unsafe {
+          /*if i == 9 {
+            // TODO TESTING - writing pure white changes the color of the final output "line" to white:
+            std::ptr::copy::<u8>(color_src, vertex_mapped_buffer as *mut u8, color_image_size_bytes as usize);
+            std::ptr::write_bytes(vertex_mapped_buffer, 255, color_image_size_bytes as usize);
+          } else {
+          }*/
+
+          // NB: This is the working texturing:
+          std::ptr::copy_nonoverlapping::<u8>(typed_color_src,
+            vertex_mapped_buffer,
+            color_image_size_bytes as usize);
+
+          gl::UnmapBuffer(gl::ARRAY_BUFFER)
+        };
+
+        if result == gl::FALSE {
+          let error = gl_get_error().expect_err("should be unmap buffer error");
+          return Err(PointCloudRendererError::OpenGlError(error));
+        }
+
+      } else {
+        let color_image = color_images.get(i).unwrap();
+        let color_image_size_bytes = color_image.get_size() as i32;
+
+        if *vertex_array_size_bytes != color_image_size_bytes {
+          println!("Establishing buffer");
+          *vertex_array_size_bytes = color_image_size_bytes;
+
+          unsafe {
+            gl::BufferData(
+              gl::ARRAY_BUFFER,
+              *vertex_array_size_bytes as isize,
+              null(),
+              gl::STREAM_DRAW
+            );
+          }
+        }
+
+        let vertex_mapped_buffer = unsafe {
+          gl::MapBufferRange(
+            gl::ARRAY_BUFFER,
+            0,
+            color_image_size_bytes as isize,
+            gl::MAP_WRITE_BIT | gl::MAP_INVALIDATE_BUFFER_BIT
+          ) as *mut u8
+        };
+
+        if vertex_mapped_buffer as usize == 0 {
+          let error = gl_get_error().expect_err("should be map buffer range error");
+          return Err(PointCloudRendererError::OpenGlError(error));
+        }
+
+        let color_src = color_image.get_buffer();
+        let typed_color_src = color_src as *const u8;
+
+        //let filename = format!("output/color_src_{}", i);
+        //write_file_from_byte_ptr(&filename, color_src, color_image_size_bytes as usize).unwrap();
+
+        let result = unsafe {
+          /*if i == 9 {
+            // TODO TESTING - writing pure white changes the color of the final output "line" to white:
+            std::ptr::copy::<u8>(color_src, vertex_mapped_buffer as *mut u8, color_image_size_bytes as usize);
+            std::ptr::write_bytes(vertex_mapped_buffer, 255, color_image_size_bytes as usize);
+          } else {
+          }*/
+
+          // NB: This is the working texturing:
+          std::ptr::copy_nonoverlapping::<u8>(typed_color_src,
+            vertex_mapped_buffer,
+            color_image_size_bytes as usize);
+
+          gl::UnmapBuffer(gl::ARRAY_BUFFER)
+        };
+
+        if result == gl::FALSE {
+          let error = gl_get_error().expect_err("should be unmap buffer error");
+          return Err(PointCloudRendererError::OpenGlError(error));
         }
       }
 
-      let vertex_mapped_buffer = unsafe {
-        gl::MapBufferRange(
-          gl::ARRAY_BUFFER,
-          0,
-          color_image_size_bytes as isize,
-          gl::MAP_WRITE_BIT | gl::MAP_INVALIDATE_BUFFER_BIT
-        ) as *mut u8
-      };
 
-      if vertex_mapped_buffer as usize == 0 {
-        let error = gl_get_error().expect_err("should be map buffer range error");
-        return Err(PointCloudRendererError::OpenGlError(error));
-      }
-
-      let color_src = color_image.get_buffer();
-      let typed_color_src = color_src as *const u8;
-
-      let filename = format!("output/color_src_{}", i);
-      write_file_from_byte_ptr(&filename, color_src, color_image_size_bytes as usize).unwrap();
-
-      let result = unsafe {
-        /*if i == 9 {
-          // TODO TESTING - writing pure white changes the color of the final output "line" to white:
-          std::ptr::copy::<u8>(color_src, vertex_mapped_buffer as *mut u8, color_image_size_bytes as usize);
-          std::ptr::write_bytes(vertex_mapped_buffer, 255, color_image_size_bytes as usize);
-        } else {
-        }*/
-
-        // NB: This is the working texturing:
-        std::ptr::copy_nonoverlapping::<u8>(typed_color_src,
-          vertex_mapped_buffer,
-          color_image_size_bytes as usize);
-
-        gl::UnmapBuffer(gl::ARRAY_BUFFER)
-      };
-
-      if result == gl::FALSE {
-        let error = gl_get_error().expect_err("should be unmap buffer error");
-        return Err(PointCloudRendererError::OpenGlError(error));
-      }
+      let point_cloud_texture = point_cloud_textures.get(i).unwrap();
 
       // NB: This controls which geometry gets the texture/color data. If we hardcode it to
       // a single index, only one of the camera geometries gets shaded.
@@ -510,7 +563,7 @@ impl PointCloudRenderer {
         (1, 2)
       };
 
-      let (lower_range, upper_range) = (0, 2);
+      //let (lower_range, upper_range) = (0, 2);
 
       // Render point cloud
       //for i in 0 .. self.num_cameras {
