@@ -62,8 +62,12 @@ pub static POINT_CLOUD_VERTEX_SHADER : &'static str = "\
 #version 430
 
 // NB: It appears that locations need to be wide enough apart, or the colors bleed across locations.
-layout(location=0) in vec4 inColor0;
-layout(location=10) in vec4 inColor1;
+//layout(location=0) in vec4 inColor0;
+//layout(location=10) in vec4 inColor1;
+//in vec4 inColor0;
+//in vec4 inColor1;
+layout(location=10) in vec4 inColor0;
+layout(location=0) in vec4 inColor1;
 
 out vec4 vertexColor;
 
@@ -113,8 +117,7 @@ void main()
       vertexPosition = imageLoad(pointCloudTexture0, currentDepthPixelCoordinates).xyz;
 
       colorOut = vec4(
-        100,
-        //inColor0.r,
+        inColor0.r,
         inColor0.g,
         inColor0.b,
         255
@@ -138,8 +141,7 @@ void main()
       colorOut = vec4(
         inColor1.r,
         inColor1.g,
-        //inColor1.b,
-        100,
+        inColor1.b,
         255
       );
     }
@@ -503,19 +505,20 @@ impl PointCloudRenderer {
     let time = SystemTime::now();
     let time_since_epoch = time.duration_since(UNIX_EPOCH).unwrap();
     let seconds = time_since_epoch.as_secs();
-    let swap = if seconds % 10 > 4 {
-      false
-    } else {
-      true
-    };
 
-    let do_break = swap;
+    let (lower_range, upper_range)= if seconds % 10 > 4 {
+      (0, 1)
+    } else {
+      (1, 2)
+    };
 
     unsafe {
       gl::UseProgram(self.shader_program_id);
     }
 
-    for i in 0 .. self.num_cameras {
+    //for i in 0 .. self.num_cameras  {
+    for i in lower_range .. upper_range {
+
       let color_image = color_images.get(i).unwrap();
       let point_cloud_texture = point_cloud_textures.get(i).unwrap();
 
@@ -578,16 +581,17 @@ impl PointCloudRenderer {
       let typed_color_src = color_src as *const u8;
 
       let result = unsafe {
-        if i == 9 {
+        /*if i == 9 {
           // TODO TESTING - writing pure white changes the color of the final output "line" to white:
           std::ptr::copy::<u8>(color_src, vertex_mapped_buffer as *mut u8, color_image_size_bytes as usize);
           std::ptr::write_bytes(vertex_mapped_buffer, 255, color_image_size_bytes as usize);
         } else {
-          // NB: This is the working texturing:
-          std::ptr::copy_nonoverlapping::<u8>(typed_color_src,
-            vertex_mapped_buffer,
-            color_image_size_bytes as usize);
-        }
+        }*/
+
+        // NB: This is the working texturing:
+        std::ptr::copy_nonoverlapping::<u8>(typed_color_src,
+          vertex_mapped_buffer,
+          color_image_size_bytes as usize);
 
         gl::UnmapBuffer(gl::ARRAY_BUFFER)
       };
@@ -691,8 +695,15 @@ impl PointCloudRenderer {
       let time_since_epoch = time.duration_since(UNIX_EPOCH).unwrap();
       let seconds = time_since_epoch.as_secs();
 
+      let (lower_range, upper_range)= if seconds % 10 > 4 {
+        (0, 1)
+      } else {
+        (1, 2)
+      };
+
       // Render point cloud
-      for j in 0 .. self.num_cameras {
+      //for i in 0 .. self.num_cameras {
+      for i in lower_range .. upper_range {
         // NB: Changing the order here impacts which camera gets shaded. For some reason only one
         // camera is actually getting real texture data.
         // let i = if seconds % 5 > 2 {
@@ -701,7 +712,6 @@ impl PointCloudRenderer {
         //   1 - j // secondary camera first
         // };
 
-        let i = j;
 
         let vertex_array_object = self.vertex_array_objects.get(i).unwrap();
         let vertex_array_size_bytes = self.vertex_arrays_size_bytes.get(i).unwrap();
