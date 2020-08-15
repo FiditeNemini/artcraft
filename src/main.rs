@@ -31,10 +31,11 @@ use kinect::k4a_sys_wrapper::Device;
 use kinect::sensor_control::{capture_thread, CaptureProvider};
 use kinect::multi_device_capturer::{MultiDeviceCapturer, start_capture_thread};
 
-pub mod image_debug;
 pub mod core_types;
+pub mod files;
 pub mod graphics_imgui;
 pub mod gui;
+pub mod image_debug;
 pub mod imgui_support;
 pub mod kinect;
 pub mod opengl;

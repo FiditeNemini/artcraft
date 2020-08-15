@@ -27,6 +27,7 @@ use std::fs::{File, OpenOptions};
 use std::io::{Read, Write};
 use opengl::link_program::link_shader_program;
 use point_cloud::debug::color_image_bytes::ColorImageBytes;
+use files::read_file_string_contents::read_file_string_contents;
 
 pub type Result<T> = std::result::Result<T, PointCloudRendererError>;
 
@@ -170,8 +171,8 @@ impl PointCloudRenderer {
 
     let program_id = unsafe { gl::CreateProgram() };
 
-    let mut point_cloud_vertex_shader = read_file_contents("src/point_cloud/shaders/point_cloud_vertex_shader.glsl").unwrap();
-    let mut point_cloud_fragment_shader = read_file_contents("src/point_cloud/shaders/point_cloud_fragment_shader.glsl").unwrap();
+    let mut point_cloud_vertex_shader = read_file_string_contents("src/point_cloud/shaders/point_cloud_vertex_shader.glsl").unwrap();
+    let mut point_cloud_fragment_shader = read_file_string_contents("src/point_cloud/shaders/point_cloud_fragment_shader.glsl").unwrap();
 
     let vertex_shader_id = compile_shader(&point_cloud_vertex_shader, gl::VERTEX_SHADER);
     let fragment_shader_id = compile_shader(&point_cloud_fragment_shader, gl::FRAGMENT_SHADER);
@@ -268,8 +269,8 @@ impl PointCloudRenderer {
 
     let mut debug_static_color_frames = Vec::new();
 
-    //debug_static_color_frames.push(ColorImageBytes::from_file("output/color_src_0").unwrap());
-    //debug_static_color_frames.push(ColorImageBytes::from_file("output/color_src_1").unwrap());
+    debug_static_color_frames.push(ColorImageBytes::from_file("output/color_src_0").unwrap());
+    debug_static_color_frames.push(ColorImageBytes::from_file("output/color_src_1").unwrap());
 
     Self {
       num_cameras,
@@ -555,13 +556,6 @@ impl PointCloudRenderer {
   pub fn set_enable_shading(&mut self, enable_shading: bool) {
     self.enable_shading = enable_shading;
   }
-}
-
-fn read_file_contents(filename: &str) -> AnyhowResult<String> {
-  let mut file = File::open(filename)?;
-  let mut contents = String::new();
-  file.read_to_string(&mut contents)?;
-  Ok(contents)
 }
 
 /// Raw memory copy into a file
