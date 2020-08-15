@@ -126,14 +126,16 @@ void main()
       // Camera #1
       ivec2 currentDepthPixelCoordinates = ivec2(gl_VertexID % pointCloudSize1.x, gl_VertexID / pointCloudSize1.x);
 
-      vec3 originalPosition = imageLoad(pointCloudTexture1, currentDepthPixelCoordinates).xyz;
+      // vec3 originalPosition = imageLoad(pointCloudTexture1, currentDepthPixelCoordinates).xyz;
 
-      // Let's move the model away a bit.
-      vertexPosition = vec3(
-        originalPosition.x - 1.5,
-        originalPosition.y,
-        originalPosition.z
-      );
+      // // Let's move the model away a bit.
+      // vertexPosition = vec3(
+      //   originalPosition.x - 1.5,
+      //   originalPosition.y,
+      //   originalPosition.z
+      // );
+
+      vertexPosition = imageLoad(pointCloudTexture1, currentDepthPixelCoordinates).xyz;
 
       // MAJOR PROBLEM HERE!
       // While we appear to have geometry data from both cameras, we do NOT have the color/texture
@@ -674,14 +676,11 @@ impl PointCloudRenderer {
       gl::UseProgram(self.shader_program_id);
 
       // Update view/projection matrices in shader
-      //gl::UniformMatrix4fv(self.view_index, 1, gl::FALSE, self.view.as_ptr());
-      //gl::UniformMatrix4fv(self.projection_index, 1, gl::FALSE, self.projection.as_ptr());
       let typed_projection = self.projection_matrix.as_ptr() as *const GLfloat;
       gl::UniformMatrix4fv(self.projection_index, 1, gl::FALSE, typed_projection);
 
       let typed_view = self.view_matrix.as_ptr() as *const GLfloat;
       gl::UniformMatrix4fv(self.view_index, 1, gl::FALSE, typed_view);
-      //gl::UniformMatrix4fv(self.projection_index, 1, gl::FALSE, typed_view);
 
       // Update render settings in shader
       let _enable_shading = if self.enable_shading { 1 } else { 0 };
@@ -699,6 +698,8 @@ impl PointCloudRenderer {
         (1, 2)
       };
 
+      //let (lower_range, upper_range) = (0, 2);
+
       // Render point cloud
       //for i in 0 .. self.num_cameras {
       for i in lower_range .. upper_range {
@@ -709,7 +710,6 @@ impl PointCloudRenderer {
         // } else {
         //   1 - j // secondary camera first
         // };
-
 
         let vertex_array_object = self.vertex_array_objects.get(i).unwrap();
         let vertex_array_size_bytes = self.vertex_arrays_size_bytes.get(i).unwrap();
