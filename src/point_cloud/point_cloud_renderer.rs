@@ -512,9 +512,7 @@ impl PointCloudRenderer {
       (1, 2)
     };
 
-    unsafe {
-      gl::UseProgram(self.shader_program_id);
-    }
+    //let (lower_range, upper_range)  = (0, 2);
 
     //for i in 0 .. self.num_cameras  {
     for i in lower_range .. upper_range {

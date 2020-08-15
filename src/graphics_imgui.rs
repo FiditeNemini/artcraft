@@ -58,7 +58,7 @@ pub fn run(capture_provider: Arc<MultiDeviceCaptureProvider>, calibration_data: 
 
   let colorization_strategy = ColorizationStrategy::Color;
 
-  let clear_color = RgbaF32::black();
+  let clear_color = RgbaF32::gray(0.5);
 
   let mut visualizer = PointCloudVisualizer::new(
     capture_provider.get_num_cameras(),
