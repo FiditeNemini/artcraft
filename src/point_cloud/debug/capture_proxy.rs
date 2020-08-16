@@ -50,7 +50,7 @@ impl CaptureProxy {
         .map(|image| ImageProxy::consume_k4a_image(image))
         .ok();
 
-    let depth_image = capture.get_color_image()
+    let depth_image = capture.get_depth_image()
         .map(|image| ImageProxy::consume_k4a_image(image))
         .ok();
 

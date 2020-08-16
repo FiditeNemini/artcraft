@@ -105,7 +105,10 @@ impl ImageProxy {
 
   pub fn get_handle(&self) -> k4a_sys::k4a_image_t {
     match &self.storage {
-      UnderlyingStorage::Bytes { height, .. } => unimplemented!("no k4a_image_t"),
+      UnderlyingStorage::Bytes { .. } => {
+        println!("NO K4A_IMAGE_T!");
+        panic!("no k4a_image_t")
+      },
       UnderlyingStorage::K4aImage(image) => image.get_handle(),
     }
   }
