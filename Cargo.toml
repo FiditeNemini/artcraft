@@ -12,6 +12,7 @@ path = "src/main.rs"
 anyhow = "1.0.32"
 arcball = "1.0.0" # camera
 cgmath = "0.17.0" # for arcball, but probably good for matrices, vecs, etc.
+clap = "3.0.0-beta.1"
 clipboard = "0.5" # to support imgui...
 gl = "0.14.0" # this looks like bare bones OpenGL
 glfw = "0.37.0" # GL framework - windows, contexts, devices

@@ -341,6 +341,7 @@ impl Calibration {
     Self(calibration)
   }
 
+  // TODO: Make this the `Debug` trait output instead.
   pub fn debug_print(&self) {
     println!("===== CALIBRATION =====");
     println!("\t Color resolution: {}", self.0.color_resolution);

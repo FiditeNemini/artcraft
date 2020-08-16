@@ -1,5 +1,9 @@
 #![allow(warnings)]
 
+#[macro_use] extern crate clap;
+#[macro_use] extern crate glium;
+#[macro_use] extern crate imgui;
+
 extern crate anyhow;
 extern crate arcball;
 extern crate cgmath;
@@ -7,9 +11,7 @@ extern crate clipboard;
 extern crate gl;
 extern crate glfw;
 extern crate glfw_sys;
-#[macro_use] extern crate glium;
 extern crate image;
-#[macro_use] extern crate imgui;
 extern crate imgui_glium_renderer;
 extern crate imgui_opengl_renderer;
 extern crate imgui_sdl2;
@@ -32,6 +34,7 @@ use kinect::sensor_control::capture_thread;
 use kinect::capture::multi_device_capturer::{MultiDeviceCapturer, start_capture_thread};
 use kinect::capture::fake_device_capturer::FakeDeviceCaptureProvider;
 use kinect::capture::device_capturer::CaptureProvider;
+use clap::{Clap};
 
 pub mod core_types;
 pub mod files;
@@ -50,12 +53,28 @@ const PRIMARY_DEVICE_SERIAL : &'static str = "000513594512";
 /// This is a second device
 const SECONDARY_DEVICE_SERIAL : &'static str = "000886694512";
 
-const ENABLE_WEBCAM : bool = false;
+#[derive(Clap, Debug)]
+struct Opts {
+  #[clap(long, parse(try_from_str = true_or_false), default_value = "true")]
+  pub enable_cameras: bool,
+  #[clap(long, parse(try_from_str = true_or_false), default_value = "false")]
+  pub enable_webcam: bool,
+}
+
+fn true_or_false(s: &str) -> Result<bool, &'static str> {
+  match s {
+    "true" => Ok(true),
+    "false" => Ok(false),
+    _ => Err("expected `true` or `false`"),
+  }
+}
 
 pub fn main() {
-  let start_cameras = false;
+  let opts = Opts::parse();
 
-  let capture_provider: Arc<dyn CaptureProvider> = if start_cameras {
+  println!("opts: {:?}", opts);
+
+  let capture_provider: Arc<dyn CaptureProvider> = if opts.enable_cameras {
     let multi_device = MultiDeviceCapturer::new(2, Some(1))
         .expect("multi-device create");
 
@@ -70,9 +89,8 @@ pub fn main() {
     Arc::new(FakeDeviceCaptureProvider::new().unwrap())
   };
 
-
   let calibration = capture_provider.get_calibration().clone();
-  calibration.debug_print();
+  //calibration.debug_print();
 
-  graphics_imgui::run(capture_provider, calibration, ENABLE_WEBCAM);
+  graphics_imgui::run(capture_provider, calibration, opts.enable_webcam);
 }
