@@ -17,7 +17,6 @@ use gl::types::*;
 use gl;
 
 use gui::mouse_camera_arcball::MouseCameraArcball;
-use kinect::k4a_sys_wrapper;
 use opengl::compile_shader::compile_shader;
 use opengl::opengl_wrapper::Texture;
 use opengl::opengl_wrapper::{Buffer, gl_get_error, OpenGlError, VertexArray};

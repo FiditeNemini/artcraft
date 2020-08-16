@@ -126,8 +126,8 @@ pub struct PointCloudVisualizer {
   /// Format is XYZA, where A (the alpha channel) is unused.
   pub xyz_textures: Vec<Texture>,
 
-  color_xy_tables: Vec<Image>,
-  depth_xy_tables: Vec<Image>,
+  color_xy_tables: Vec<ImageProxy>,
+  depth_xy_tables: Vec<ImageProxy>,
 
   /// Near and far minima/maxima for the current depth sensor mode.
   depth_value_range: ValueRange,
@@ -205,8 +205,8 @@ impl PointCloudVisualizer {
         k4a_sys::k4a_calibration_type_t_K4A_CALIBRATION_TYPE_DEPTH,
       ).unwrap();
 
-      color_xy_tables.push(color_xy_table);
-      depth_xy_tables.push(depth_xy_table);
+      color_xy_tables.push(ImageProxy::consume_k4a_image(color_xy_table));
+      depth_xy_tables.push(ImageProxy::consume_k4a_image(depth_xy_table));
     }
 
     let mut debug_static_color_frames = Vec::new();
@@ -524,7 +524,8 @@ impl PointCloudVisualizer {
       }
 
       for point_cloud_converter in self.point_cloud_converters.iter_mut() {
-        point_cloud_converter.set_active_xy_table(&self.depth_xy_tables.get(camera_index).unwrap())?; // TODO: TEMP MULTI-CAMERA SUPPORT
+        let xy_table = self.depth_xy_tables.get(camera_index).unwrap();
+        point_cloud_converter.set_active_xy_table(&xy_table)?;
       }
     }
 
