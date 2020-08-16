@@ -120,7 +120,7 @@ pub struct PointCloudVisualizer {
 
   /// In color mode, this is just a shallow copy of the latest color image.
   /// In depth mode, this is a buffer that holds the colorization of the depth image.
-  point_cloud_colorizations: Vec<Option<Image>>,
+  point_cloud_colorizations: Vec<Option<ImageProxy>>,
 
   /// Holds the XYZ point cloud as a texture.
   /// Format is XYZA, where A (the alpha channel) is unused.
@@ -354,7 +354,6 @@ impl PointCloudVisualizer {
       //  Hope it's not ref leaking.)
       let colorizations: Vec<ImageProxy>  = self.point_cloud_colorizations.iter()
           .map(|img| img.as_ref().map(|img| img.clone()).unwrap()) // Potential ref leak #1
-          .map(|image| ImageProxy::from_k4a_image(&image)) // Potential ref leak #2
           .collect();
 
       color_captures = colorizations;
@@ -435,7 +434,7 @@ impl PointCloudVisualizer {
       let color_image = maybe_color_image.expect("logic above should ensure present");
       // TODO: TEMP MULTI CAMERA SUPPORT
       if let Some(mut inner) = self.point_cloud_colorizations.get_mut(camera_index) {
-        *inner = Some(color_image);
+        *inner = Some(ImageProxy::consume_k4a_image(color_image));
       }
 
     } else {
@@ -515,12 +514,12 @@ impl PointCloudVisualizer {
 
       // TODO: TEMP MULTI-CAMERA SUPPORT
       if let Some(mut point_cloud_colorization) = self.point_cloud_colorizations.get_mut(camera_index) {
-        *point_cloud_colorization = Some(Image::create(
+        *point_cloud_colorization = Some(ImageProxy::consume_k4a_image(Image::create(
           ImageFormat::ColorBgra32,
           width,
           height,
           stride as u32,
-        ).expect("Construction should work FIXME"));
+        ).expect("Construction should work FIXME")));
       }
 
       for point_cloud_converter in self.point_cloud_converters.iter_mut() {
