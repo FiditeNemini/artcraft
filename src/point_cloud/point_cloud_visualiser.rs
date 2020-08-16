@@ -116,7 +116,7 @@ pub struct PointCloudVisualizer {
 
   /// Buffer that holds the depth image transformed to the color coordinate space.
   /// Used in color mode only.
-  transformed_depth_images: Vec<Option<Image>>,
+  transformed_depth_images: Vec<Option<ImageProxy>>,
 
   /// In color mode, this is just a shallow copy of the latest color image.
   /// In depth mode, this is a buffer that holds the colorization of the depth image.
@@ -403,7 +403,7 @@ impl PointCloudVisualizer {
               return Err(PointCloudVisualizerError::DepthToColorConversionFailed);
             }
 
-            depth_image = ImageProxy::from_k4a_image(transformed_depth_image);
+            depth_image = transformed_depth_image.clone();
           }
         }
       }
@@ -447,8 +447,10 @@ impl PointCloudVisualizer {
         let src_pixel_buffer = use_depth_image.get_buffer();
         let typed_src_pixel_buffer = src_pixel_buffer as *const DepthPixel;
 
+        // TODO TEMP MULTI-CAMERA SUPPORT
         // dst: BgraPixel
-        let dst_pixel_buffer = self.point_cloud_colorizations.get_mut(camera_index).unwrap() // TODO TEMP MULTI-CAMERA SUPPORT
+        let dst_pixel_buffer = self.point_cloud_colorizations.get_mut(camera_index)
+            .unwrap()
             .as_ref()
             .expect("point cloud color image must be set")
             .get_buffer();
@@ -494,12 +496,12 @@ impl PointCloudVisualizer {
 
       // TODO: TEMP MULTI-CAMERA SUPPORT
       if let Some(mut transformed_depth_image) = self.transformed_depth_images.get_mut(camera_index) {
-        *transformed_depth_image = Some(Image::create(
+        *transformed_depth_image = Some(ImageProxy::consume_k4a_image(Image::create(
           ImageFormat::Depth16,
           width as u32,
           height as u32,
           stride as u32,
-        ).expect("Construction should work FIXME"));
+        ).expect("Construction should work FIXME")));
       }
 
       for point_cloud_converter in self.point_cloud_converters.iter_mut() {
