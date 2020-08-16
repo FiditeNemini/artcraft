@@ -29,6 +29,8 @@ use std::thread;
 
 use opencv::prelude::*;
 
+use anyhow::Result as AnyhowResult;
+use anyhow::bail;
 use kinect::k4a_sys_wrapper::{Device, Calibration};
 use kinect::sensor_control::capture_thread;
 use kinect::capture::multi_device_capturer::{MultiDeviceCapturer, start_capture_thread};
@@ -59,6 +61,8 @@ struct Opts {
   pub enable_cameras: bool,
   #[clap(long, parse(try_from_str = true_or_false), default_value = "false")]
   pub enable_webcam: bool,
+  #[clap(long, parse(try_from_str = true_or_false), default_value = "false")]
+  pub save_captures: bool,
 }
 
 fn true_or_false(s: &str) -> Result<bool, &'static str> {
@@ -69,10 +73,26 @@ fn true_or_false(s: &str) -> Result<bool, &'static str> {
   }
 }
 
-pub fn main() {
+/// Arguments to pass through the program
+pub struct ProgramArgs {
+  pub save_captures: bool,
+  pub enable_webcam_output_writing: bool,
+}
+
+pub fn main() -> AnyhowResult<()> {
   let opts = Opts::parse();
 
   println!("opts: {:?}", opts);
+
+  // Validate args.
+  if opts.save_captures && !opts.enable_cameras {
+    bail!("Can't save captures without cameras enabled.");
+  }
+
+  let program_args = ProgramArgs {
+    enable_webcam_output_writing: opts.enable_webcam,
+    save_captures: opts.save_captures,
+  };
 
   let capture_provider: Arc<dyn CaptureProvider> = if opts.enable_cameras {
     let multi_device = MultiDeviceCapturer::new(2, Some(1))
@@ -92,5 +112,7 @@ pub fn main() {
   let calibration = capture_provider.get_calibration().clone();
   //calibration.debug_print();
 
-  graphics_imgui::run(capture_provider, calibration, opts.enable_webcam);
+  graphics_imgui::run(capture_provider, calibration, program_args);
+
+  Ok(())
 }

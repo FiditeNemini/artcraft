@@ -2,6 +2,8 @@ use std::path::Path;
 use std::sync::{Arc, Mutex, PoisonError, MutexGuard};
 use std::time::{Instant, Duration};
 
+use crate::ProgramArgs;
+
 use gl;
 use imgui::*;
 use imgui::Image;
@@ -16,10 +18,10 @@ use point_cloud::point_cloud_visualiser::{ColorizationStrategy, PointCloudVisual
 use point_cloud::viewer_image::ViewerImage;
 use webcam::WebcamWriter;
 
-pub fn run(capture_provider: Arc<CaptureProvider>, calibration_data: Calibration, enable_webcam: bool) {
+pub fn run(capture_provider: Arc<CaptureProvider>, calibration_data: Calibration, program_args: ProgramArgs) {
   let mut webcam_writer = None;
 
-  if enable_webcam {
+  if program_args.enable_webcam_output_writing {
     webcam_writer = Some(WebcamWriter::open_file("/dev/video0", 1280, 720, 3)
         .expect("should be able to create webcamwriter"));
   }
@@ -213,10 +215,13 @@ pub fn run(capture_provider: Arc<CaptureProvider>, calibration_data: Calibration
     window.gl_swap_window();
 
     if let Some(mut captures) = capture_provider.get_captures() {
-      /*for (i, capture) in captures.iter().enumerate() {
-        let suffix = format!("{}", i);
-        capture.debug_save_files(Path::new("output/"), &suffix).unwrap();
-      }*/
+      if program_args.save_captures {
+        // Only save the last frame (for now)
+        for (i, capture) in captures.iter().enumerate() {
+          let suffix = format!("{}", i);
+          capture.debug_save_files(Path::new("output/"), &suffix).unwrap();
+        }
+      }
 
       visualizer.update_texture_id(texture.texture_id(), captures)
           .map(|_| {})
