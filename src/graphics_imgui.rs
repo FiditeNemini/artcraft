@@ -138,14 +138,16 @@ pub fn run(capture_provider: Arc<MultiDeviceCaptureProvider>, calibration_data: 
     const window_height : f32 = 760.0;
 
     if imgui_visualizer_xyz_texture_0.is_none() {
-      if visualizer.xyz_textures.get(0).unwrap().id() != 0 { // TODO: TEMP SUPPORT MULTI-CAMERA
-        imgui_visualizer_xyz_texture_0 = Some(TextureId::from(visualizer.xyz_textures.get(0).unwrap().id() as usize)); // TODO: TEMP SUPPORT MULTI-CAMERA
+      // TODO: TEMPORARY MESS TO SUPPORT MULTI-CAMERA
+      if visualizer.xyz_textures.get(0).unwrap().id() != 0 {
+        imgui_visualizer_xyz_texture_0 = Some(TextureId::from(visualizer.xyz_textures.get(0).unwrap().id() as usize));
       }
     }
 
     if imgui_visualizer_xyz_texture_1.is_none() {
-      if visualizer.xyz_textures.get(1).unwrap().id() != 0 { // TODO: TEMP SUPPORT MULTI-CAMERA
-        imgui_visualizer_xyz_texture_1 = Some(TextureId::from(visualizer.xyz_textures.get(1).unwrap().id() as usize)); // TODO: TEMP SUPPORT MULTI-CAMERA
+      // TODO: TEMPORARY MESS TO SUPPORT MULTI-CAMERA
+      if visualizer.xyz_textures.get(1).unwrap().id() != 0 {
+        imgui_visualizer_xyz_texture_1 = Some(TextureId::from(visualizer.xyz_textures.get(1).unwrap().id() as usize));
       }
     }
 

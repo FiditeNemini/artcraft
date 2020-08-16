@@ -109,10 +109,6 @@ pub struct PointCloudRenderer {
   vertex_color_buffer_objects: Vec<Buffer>,
 
   vertex_attrib_locations: Vec<GLint>,
-
-  /// For debugging
-  /// If present, use these for color images instead of camera captures.
-  debug_static_color_frames: Vec<CameraImageBytes>,
 }
 
 const fn translation_matrix_4x4(x: f32, y: f32, z: f32) -> [f32; 16] {
@@ -268,10 +264,6 @@ impl PointCloudRenderer {
       [0.0,        0.0,      -0.2002,  0.0],
     ];
 
-    let mut debug_static_color_frames = Vec::new();
-    debug_static_color_frames.push(CameraImageBytes::from_file("output/color_src_0", 0, 0).unwrap());
-    debug_static_color_frames.push(CameraImageBytes::from_file("output/color_src_1", 0, 0).unwrap());
-
     Self {
       num_cameras,
       arcball_camera: arcball,
@@ -292,7 +284,6 @@ impl PointCloudRenderer {
       vertex_array_objects,
       vertex_color_buffer_objects,
       vertex_attrib_locations,
-      debug_static_color_frames,
     }
   }
 
@@ -319,9 +310,10 @@ impl PointCloudRenderer {
   ///
   ///
   ///
-  pub fn update_point_clouds(&mut self, color_images: &Vec<k4a_sys_wrapper::Image>,
-                             point_cloud_textures: &Vec<Texture>) -> Result<()>
-  {
+  pub fn update_point_clouds(&mut self,
+                             color_images: &Vec<CameraImageBytes>,
+                             point_cloud_textures: &Vec<Texture>
+  ) -> Result<()> {
     let time = SystemTime::now();
     let time_since_epoch = time.duration_since(UNIX_EPOCH).unwrap();
     let seconds = time_since_epoch.as_secs();
@@ -346,22 +338,7 @@ impl PointCloudRenderer {
         gl::BindBuffer(gl::ARRAY_BUFFER, vertex_color_buffer_object.id());
       }
 
-      // Hack to hold onto the K4A ColorImageBytes wrapper.
-      let mut color_image_storage : Option<CameraImageBytes> = None;
-
-      let color_image_bytes = if let Some(debug_color_image) = self.debug_static_color_frames.get(i) {
-        debug_color_image
-      } else {
-        let color_image = color_images.get(i).unwrap();
-        let color_image_bytes = CameraImageBytes::from_k4a_image(&color_image);
-
-        //let filename = format!("output/color_src_{}", i);
-        //write_to_file_from_byte_ptr(&filename, color_image_bytes.as_ptr(), color_image_bytes.len()).unwrap();
-
-        color_image_storage = Some(color_image_bytes);
-        color_image_storage.as_ref().unwrap()
-      };
-
+      let color_image_bytes = color_images.get(i).unwrap();
       let color_image_size_bytes = color_image_bytes.len() as i32;
 
       if *vertex_array_size_bytes != color_image_size_bytes {

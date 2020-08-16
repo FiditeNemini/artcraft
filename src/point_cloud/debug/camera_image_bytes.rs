@@ -5,18 +5,21 @@ use std::io::Read;
 use kinect::k4a_sys_wrapper;
 
 /// Store either raw bytes, or wrap a k4a::Image
+/// This is meant to be plumbed through the system instead of a k4a::Image (depth or color image)
+pub struct CameraImageBytes {
+  storage: UnderlyingStorage,
+}
+
+/// The underlying data store
 enum UnderlyingStorage {
+  /// Our own serialization
   Bytes {
     bytes: Vec<u8>,
     width: usize,
     height: usize
   },
+  /// From the Kinect camera
   K4aImage(k4a_sys_wrapper::Image),
-}
-
-/// Loaded images from the filesystem
-pub struct CameraImageBytes {
-  storage: UnderlyingStorage,
 }
 
 impl CameraImageBytes {
@@ -45,6 +48,13 @@ impl CameraImageBytes {
     let storage = UnderlyingStorage::K4aImage(image);
     Self {
       storage,
+    }
+  }
+
+  pub fn is_k4a(&self) -> bool {
+    match &self.storage {
+      UnderlyingStorage::Bytes { .. } => false,
+      UnderlyingStorage::K4aImage(_) => true,
     }
   }
 

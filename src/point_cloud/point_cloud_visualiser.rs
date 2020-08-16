@@ -136,7 +136,8 @@ pub struct PointCloudVisualizer {
   clear_color: RgbaF32,
 
   /// For debugging
-  /// If present, use these for depth images instead of camera captures.
+  /// If present, use these instead of camera captures.
+  debug_static_color_frames: Vec<CameraImageBytes>,
   debug_static_depth_frames: Vec<CameraImageBytes>,
 }
 
@@ -208,6 +209,10 @@ impl PointCloudVisualizer {
       depth_xy_tables.push(depth_xy_table);
     }
 
+    let mut debug_static_color_frames = Vec::new();
+    debug_static_color_frames.push(CameraImageBytes::from_file("output/color_src_0", 0, 0).unwrap());
+    debug_static_color_frames.push(CameraImageBytes::from_file("output/color_src_1", 0, 0).unwrap());
+
     let mut debug_static_depth_frames = Vec::new();
     debug_static_depth_frames.push(CameraImageBytes::from_file("output/depth_src_0", 3840, 2160).unwrap());
     debug_static_depth_frames.push(CameraImageBytes::from_file("output/depth_src_1", 3840, 2160).unwrap());
@@ -233,6 +238,7 @@ impl PointCloudVisualizer {
       xyz_textures,
       depth_value_range: expected_value_range,
       clear_color,
+      debug_static_color_frames,
       debug_static_depth_frames,
     };
 
@@ -339,14 +345,24 @@ impl PointCloudVisualizer {
       self.update_point_clouds_for_camera(camera_index, capture)?;
     }
 
-    // TODO: wrt k4a::Image.clone(), k4a should use ref counting. (I did this one other place a few commits ago.
-    //  Hope it's not ref leaking.)
-    let colorizations: Vec<Image>  = self.point_cloud_colorizations.iter()
-        .map(|img| img.as_ref().map(|img| img.clone()).unwrap())
-        .collect();
+    let mut color_captures = Vec::new();
+
+    let color_frames = if self.debug_static_color_frames.len() > 0 {
+      &self.debug_static_color_frames
+    } else {
+      // TODO: wrt k4a::Image.clone(), k4a should use ref counting. (I did this one other place a few commits ago.
+      //  Hope it's not ref leaking.)
+      let colorizations: Vec<CameraImageBytes>  = self.point_cloud_colorizations.iter()
+          .map(|img| img.as_ref().map(|img| img.clone()).unwrap()) // Potential ref leak #1
+          .map(|image| CameraImageBytes::from_k4a_image(&image)) // Potential ref leak #2
+          .collect();
+
+      color_captures = colorizations;
+      &color_captures
+    };
 
     self.point_cloud_renderer.update_point_clouds(
-      &colorizations,
+      &color_frames,
       &self.xyz_textures
     ).map_err(|err| PointCloudVisualizerError::PointCloudRendererError(err))
   }
