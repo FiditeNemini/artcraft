@@ -281,7 +281,6 @@ pub struct Calibration(pub k4a_sys::k4a_calibration_t);
 
 impl Calibration {
   pub fn default() -> Self {
-    // TODO: k4a_sys::k4a_calibration_type_t_K4A_CALIBRATION_TYPE_UNKNOWN
     let extrinsics = k4a_sys::_k4a_calibration_extrinsics_t {
       rotation: [0.0f32, 0.0f32, 0.0f32, 0.0f32, 0.0f32, 0.0f32, 0.0f32, 0.0f32, 0.0f32],
       translation: [0.0f32, 0.0f32, 0.0f32],
@@ -338,7 +337,65 @@ impl Calibration {
       depth_mode: 0,
       extrinsics: extrinsics_4_4,
     };
+
     Self(calibration)
+  }
+
+  pub fn debug_print(&self) {
+    println!("===== CALIBRATION =====");
+    println!("\t Color resolution: {}", self.0.color_resolution);
+    println!("\t Depth mode: {}", self.0.depth_mode);
+    println!("\t Extrinsics: {:?}", self.0.extrinsics);
+
+    println!("\t depth.resolution_width: {}", self.0.depth_camera_calibration.resolution_width);
+    println!("\t depth.resolution_height: {}", self.0.depth_camera_calibration.resolution_height);
+    println!("\t depth.metric_radius: {}", self.0.depth_camera_calibration.metric_radius);
+    println!("\t depth.extrinsics: {:?}", self.0.depth_camera_calibration.extrinsics);
+    println!("\t depth.intrinsics.type: {}", self.0.depth_camera_calibration.intrinsics.type_);
+    println!("\t depth.intrinsics.parameter_count: {}", self.0.depth_camera_calibration.intrinsics.parameter_count);
+    unsafe {
+      // NB: This is a union field, so we have to use unsafe access
+      println!("\t depth.intrinsics.parameters.param.cx: {}", self.0.depth_camera_calibration.intrinsics.parameters.param.cx);
+      println!("\t depth.intrinsics.parameters.param.cy: {}", self.0.depth_camera_calibration.intrinsics.parameters.param.cy);
+      println!("\t depth.intrinsics.parameters.param.fx: {}", self.0.depth_camera_calibration.intrinsics.parameters.param.fx);
+      println!("\t depth.intrinsics.parameters.param.fy: {}", self.0.depth_camera_calibration.intrinsics.parameters.param.fy);
+      println!("\t depth.intrinsics.parameters.param.k1: {}", self.0.depth_camera_calibration.intrinsics.parameters.param.k1);
+      println!("\t depth.intrinsics.parameters.param.k2: {}", self.0.depth_camera_calibration.intrinsics.parameters.param.k2);
+      println!("\t depth.intrinsics.parameters.param.k3: {}", self.0.depth_camera_calibration.intrinsics.parameters.param.k3);
+      println!("\t depth.intrinsics.parameters.param.k4: {}", self.0.depth_camera_calibration.intrinsics.parameters.param.k4);
+      println!("\t depth.intrinsics.parameters.param.k5: {}", self.0.depth_camera_calibration.intrinsics.parameters.param.k5);
+      println!("\t depth.intrinsics.parameters.param.k6: {}", self.0.depth_camera_calibration.intrinsics.parameters.param.k6);
+      println!("\t depth.intrinsics.parameters.param.codx: {}", self.0.depth_camera_calibration.intrinsics.parameters.param.codx);
+      println!("\t depth.intrinsics.parameters.param.cody: {}", self.0.depth_camera_calibration.intrinsics.parameters.param.cody);
+      println!("\t depth.intrinsics.parameters.param.p2: {}", self.0.depth_camera_calibration.intrinsics.parameters.param.p2);
+      println!("\t depth.intrinsics.parameters.param.p1: {}", self.0.depth_camera_calibration.intrinsics.parameters.param.p1);
+      println!("\t depth.intrinsics.parameters.param.metric_radius: {}", self.0.depth_camera_calibration.intrinsics.parameters.param.metric_radius);
+    }
+    println!("\t color.resolution_width: {}", self.0.color_camera_calibration.resolution_width);
+    println!("\t color.resolution_height: {}", self.0.color_camera_calibration.resolution_height);
+    println!("\t color.metric_radius: {}", self.0.color_camera_calibration.metric_radius);
+    println!("\t color.extrinsics: {:?}", self.0.color_camera_calibration.extrinsics);
+    println!("\t color.intrinsics.type: {}", self.0.color_camera_calibration.intrinsics.type_);
+    println!("\t color.intrinsics.parameter_count: {}", self.0.color_camera_calibration.intrinsics.parameter_count);
+    unsafe {
+      // NB: This is a union field, so we have to use unsafe access
+      println!("\t color.intrinsics.parameters.param.cx: {}", self.0.color_camera_calibration.intrinsics.parameters.param.cx);
+      println!("\t color.intrinsics.parameters.param.cy: {}", self.0.color_camera_calibration.intrinsics.parameters.param.cy);
+      println!("\t color.intrinsics.parameters.param.fx: {}", self.0.color_camera_calibration.intrinsics.parameters.param.fx);
+      println!("\t color.intrinsics.parameters.param.fy: {}", self.0.color_camera_calibration.intrinsics.parameters.param.fy);
+      println!("\t color.intrinsics.parameters.param.k1: {}", self.0.color_camera_calibration.intrinsics.parameters.param.k1);
+      println!("\t color.intrinsics.parameters.param.k2: {}", self.0.color_camera_calibration.intrinsics.parameters.param.k2);
+      println!("\t color.intrinsics.parameters.param.k3: {}", self.0.color_camera_calibration.intrinsics.parameters.param.k3);
+      println!("\t color.intrinsics.parameters.param.k4: {}", self.0.color_camera_calibration.intrinsics.parameters.param.k4);
+      println!("\t color.intrinsics.parameters.param.k5: {}", self.0.color_camera_calibration.intrinsics.parameters.param.k5);
+      println!("\t color.intrinsics.parameters.param.k6: {}", self.0.color_camera_calibration.intrinsics.parameters.param.k6);
+      println!("\t color.intrinsics.parameters.param.codx: {}", self.0.color_camera_calibration.intrinsics.parameters.param.codx);
+      println!("\t color.intrinsics.parameters.param.cody: {}", self.0.color_camera_calibration.intrinsics.parameters.param.cody);
+      println!("\t color.intrinsics.parameters.param.p2: {}", self.0.color_camera_calibration.intrinsics.parameters.param.p2);
+      println!("\t color.intrinsics.parameters.param.p1: {}", self.0.color_camera_calibration.intrinsics.parameters.param.p1);
+      println!("\t color.intrinsics.parameters.param.metric_radius: {}", self.0.color_camera_calibration.intrinsics.parameters.param.metric_radius);
+    }
+    println!("==========");
   }
 }
 

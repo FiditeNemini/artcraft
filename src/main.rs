@@ -27,7 +27,7 @@ use std::thread;
 
 use opencv::prelude::*;
 
-use kinect::k4a_sys_wrapper::Device;
+use kinect::k4a_sys_wrapper::{Device, Calibration};
 use kinect::sensor_control::{capture_thread, CaptureProvider};
 use kinect::capture::multi_device_capturer::{MultiDeviceCapturer, start_capture_thread};
 use kinect::capture::fake_device_capturer::FakeDeviceCaptureProvider;
@@ -63,11 +63,15 @@ pub fn main() {
   let primary_device = &multi_device.primary_device;
   let calibration = primary_device.get_calibration(depth_mode, color_format).unwrap();
 
-  let capture_provider = multi_device.get_sync_capture_provider();
+  calibration.debug_print();
+
+  //let capture_provider = multi_device.get_sync_capture_provider();
 
   thread::spawn(move || start_capture_thread(multi_device));
 
-  //let capture_provider = Arc::new(FakeDeviceCaptureProvider::new().unwrap());
+  //let calibration = Calibration::default();
+  let capture_provider = Arc::new(FakeDeviceCaptureProvider::new().unwrap());
+  let calibration = capture_provider.get_calibration().clone();
 
   graphics_imgui::run(capture_provider, calibration, ENABLE_WEBCAM);
 }
