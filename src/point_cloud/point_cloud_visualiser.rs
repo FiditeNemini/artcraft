@@ -9,7 +9,7 @@ use gl::types::*;
 
 use core_types::RgbaF32;
 use gui::mouse_camera_arcball::MouseCameraArcball;
-use kinect::k4a_sys_wrapper::Image;
+use kinect::k4a_sys_wrapper::{Image, Calibration};
 use kinect::k4a_sys_wrapper::ImageFormat;
 use kinect::k4a_sys_wrapper::{Capture, Transformation};
 use opengl::opengl_wrapper::OpenGlError;
@@ -107,7 +107,7 @@ pub struct PointCloudVisualizer {
   pub point_cloud_renderer: PointCloudRenderer,
   pub point_cloud_converters: Vec<GpuPointCloudConverter>,
 
-  calibration_data: k4a_sys::k4a_calibration_t,
+  calibration_data: Calibration,
   transformation: Transformation, // TODO: WAT k4a_sys::k4a_transformation_t
 
   frame_buffer: Framebuffer,
@@ -161,7 +161,7 @@ impl PointCloudVisualizer {
   pub fn new(num_cameras: usize,
              enable_color_point_cloud: bool,
              initial_colorization_strategy: ColorizationStrategy,
-             calibration_data: k4a_sys::k4a_calibration_t,
+             calibration_data: Calibration,
              clear_color: RgbaF32,
              arcball_camera: Arc<Mutex<MouseCameraArcball>>) -> Self
   {
@@ -177,7 +177,7 @@ impl PointCloudVisualizer {
       gl::RenderbufferStorage(gl::RENDERBUFFER, gl::DEPTH_COMPONENT, width, height);
     }
 
-    let expected_value_range = get_depth_mode_range(calibration_data.depth_mode)
+    let expected_value_range = get_depth_mode_range(calibration_data.0.depth_mode)
         .expect("Should be in correct depth sensor mode.");
 
     let mut point_cloud_converters = Vec::with_capacity(num_cameras);
@@ -197,12 +197,12 @@ impl PointCloudVisualizer {
 
       // TODO: generate color xytable only on `enable_color_point_cloud`.
       let color_xy_table = GpuPointCloudConverter::generate_xy_table(
-        calibration_data.clone(),
+        &calibration_data,
         k4a_sys::k4a_calibration_type_t_K4A_CALIBRATION_TYPE_COLOR,
       ).unwrap();
 
       let depth_xy_table = GpuPointCloudConverter::generate_xy_table(
-        calibration_data.clone(),
+        &calibration_data,
         k4a_sys::k4a_calibration_type_t_K4A_CALIBRATION_TYPE_DEPTH,
       ).unwrap();
 
@@ -393,35 +393,6 @@ impl PointCloudVisualizer {
             .as_mut() {
           unsafe {
 
-            /*
-            BROKEN FAKE DEVICE CAPTURE:
-           Depth image: 3840x2160 stride 7680 format Depth16
-           Transformed depth image: 3840x2160 stride 7680 format Depth16
-           [2020-08-16 02:32:59.296] [error] [t=22196] /__w/1/s/extern/Azure-Kinect-Sensor-SDK/src/transformation/rgbz.c (85): transformation_compare_image_descriptors().
-              Unexpected image descriptor.
-              Expected width_pixels: 3840, height_pixels: 2160, stride_bytes: 7680, format: 4.
-              Actual width_pixels: 640, height_pixels: 576, stride_bytes: 1280, format: 4.
-
-
-            WORKING
-            Depth image: 640x576 stride 1280 format Depth16
-            Transformed depth image: 3840x2160 stride 7680 format Depth16
-
-             */
-
-            println!("Depth image: {}x{} stride {} format {:?}",
-              depth_image.get_width_pixels(),
-              depth_image.get_height_pixels(),
-              depth_image.get_stride_bytes(),
-              depth_image.get_format());
-
-            // TODO: It's going to mutate this handle -- even if we fix the bug, that seems bad...
-            println!("Transformed depth image: {}x{} stride {} format {:?}",
-              transformed_depth_image.get_width_pixels(),
-              transformed_depth_image.get_height_pixels(),
-              transformed_depth_image.get_stride_bytes(),
-              transformed_depth_image.get_format());
-
             let result = k4a_sys::k4a_transformation_depth_image_to_color_camera(
               self.transformation.get_handle(),
               depth_image.get_handle(),
@@ -429,7 +400,6 @@ impl PointCloudVisualizer {
             );
 
             if result != k4a_sys::k4a_buffer_result_t_K4A_BUFFER_RESULT_SUCCEEDED {
-              println!(">>> THIS FAILS <<<");
               return Err(PointCloudVisualizerError::DepthToColorConversionFailed);
             }
 
@@ -520,8 +490,8 @@ impl PointCloudVisualizer {
     self.point_cloud_renderer.set_enable_shading(strategy == ColorizationStrategy::Shaded);
 
     if strategy == ColorizationStrategy::Color {
-      let width = self.calibration_data.color_camera_calibration.resolution_width;
-      let height = self.calibration_data.color_camera_calibration.resolution_height;
+      let width = self.calibration_data.0.color_camera_calibration.resolution_width;
+      let height = self.calibration_data.0.color_camera_calibration.resolution_height;
       let stride = width * size_of::<DepthPixel>() as i32;
 
       // TODO: TEMP MULTI-CAMERA SUPPORT
@@ -539,8 +509,8 @@ impl PointCloudVisualizer {
       }
 
     } else {
-      let width = self.calibration_data.depth_camera_calibration.resolution_width as u32;
-      let height = self.calibration_data.depth_camera_calibration.resolution_height as u32;
+      let width = self.calibration_data.0.depth_camera_calibration.resolution_width as u32;
+      let height = self.calibration_data.0.depth_camera_calibration.resolution_height as u32;
       let stride = width as i32 * size_of::<BgraPixel>() as i32;
 
       // TODO: TEMP MULTI-CAMERA SUPPORT

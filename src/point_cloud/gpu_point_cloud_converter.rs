@@ -12,7 +12,7 @@ use std::str;
 use gl;
 use gl::types::*;
 
-use kinect::k4a_sys_wrapper::Image;
+use kinect::k4a_sys_wrapper::{Image, Calibration};
 use kinect::k4a_sys_wrapper::ImageFormat;
 use kinect::k4a_sys_wrapper;
 use opengl::compile_shader::compile_shader;
@@ -403,13 +403,13 @@ impl GpuPointCloudConverter {
   /// Conversion is done by multiplying the depth pixel value by the XY table values - i.e. the result
   /// pixel will be (xyTable[p].x * depthImage[p], xyTable[p].y * depthImage[p], depthImage[p]), where
   /// p is the index of a given pixel.
-  pub fn generate_xy_table(calibration: k4a_sys::k4a_calibration_t,
+  pub fn generate_xy_table(calibration: &Calibration,
                            calibration_type: k4a_sys::k4a_calibration_type_t)
     -> Result<Image>
   {
     let camera_calibration :  k4a_sys::k4a_calibration_camera_t = match calibration_type {
-      k4a_sys::k4a_calibration_type_t_K4A_CALIBRATION_TYPE_COLOR => calibration.color_camera_calibration,
-      k4a_sys::k4a_calibration_type_t_K4A_CALIBRATION_TYPE_DEPTH => calibration.depth_camera_calibration,
+      k4a_sys::k4a_calibration_type_t_K4A_CALIBRATION_TYPE_COLOR => calibration.0.color_camera_calibration,
+      k4a_sys::k4a_calibration_type_t_K4A_CALIBRATION_TYPE_DEPTH => calibration.0.depth_camera_calibration,
       _ => return Err(PointCloudComputeError::UnknownError),
     };
 
@@ -475,7 +475,7 @@ impl GpuPointCloudConverter {
           let result = unsafe {
             // https://docs.rs/k4a-sys/0.2.0/k4a_sys/fn.k4a_calibration_2d_to_3d.html
             k4a_sys::k4a_calibration_2d_to_3d(
-              &calibration,
+              &calibration.0,
               &p, // source point 2d
               1.0, // source depth mm
               calibration_type, // source camera

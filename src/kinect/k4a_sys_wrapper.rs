@@ -197,7 +197,7 @@ impl Device {
   pub fn get_calibration(&self,
                           depth_mode: k4a_sys::k4a_depth_mode_t,
                           color_resolution: k4a_sys::k4a_color_resolution_t)
-    -> Result<k4a_sys::k4a_calibration_t, GetCalibrationError>
+    -> Result<Calibration, GetCalibrationError>
   {
     // TODO: Why isn't the way I've been using to init structures before still working?
     //let mut calibration_buffer: k4a_sys::k4a_calibration_t = ptr::null_mut();
@@ -210,7 +210,8 @@ impl Device {
     };*/
 
     unsafe {
-      let mut calibration_buffer = MaybeUninit::uninit();
+      let mut calibration_buffer: MaybeUninit<k4a_sys::k4a_calibration_t> = MaybeUninit::uninit();
+
       let result =  k4a_sys::k4a_device_get_calibration(
         self.device_pointer,
         depth_mode,
@@ -228,7 +229,10 @@ impl Device {
         },
       }
 
-      Ok(calibration_buffer.assume_init())
+      let handle = calibration_buffer.assume_init();
+      let calibration = Calibration(handle);
+
+      Ok(calibration)
     }
   }
 }
@@ -272,6 +276,71 @@ pub enum GetCalibrationError {
   UnknownError(u32),
 }
 
+#[derive(Clone)]
+pub struct Calibration(pub k4a_sys::k4a_calibration_t);
+
+impl Calibration {
+  pub fn default() -> Self {
+    // TODO: k4a_sys::k4a_calibration_type_t_K4A_CALIBRATION_TYPE_UNKNOWN
+    let extrinsics = k4a_sys::_k4a_calibration_extrinsics_t {
+      rotation: [0.0f32, 0.0f32, 0.0f32, 0.0f32, 0.0f32, 0.0f32, 0.0f32, 0.0f32, 0.0f32],
+      translation: [0.0f32, 0.0f32, 0.0f32],
+    };
+
+    let extrinsics_4 = [
+      extrinsics.clone(),
+      extrinsics.clone(),
+      extrinsics.clone(),
+      extrinsics.clone(),
+    ];
+
+    let extrinsics_4_4 = [
+      extrinsics_4.clone(),
+      extrinsics_4.clone(),
+      extrinsics_4.clone(),
+      extrinsics_4.clone(),
+    ];
+
+    let camera_calibration = k4a_sys::_k4a_calibration_camera_t {
+      resolution_width: 0,
+      resolution_height: 0,
+      metric_radius: 0.0f32,
+      extrinsics: extrinsics.clone(),
+      intrinsics: k4a_sys::_k4a_calibration_intrinsics_t {
+        type_: 0,
+        parameter_count: 0,
+        parameters: k4a_sys::k4a_calibration_intrinsic_parameters_t {
+          param: k4a_sys::k4a_calibration_intrinsic_parameters_t__param {
+            cx: 0.0f32,
+            cy: 0.0f32,
+            fx: 0.0f32,
+            fy: 0.0f32,
+            k1: 0.0f32,
+            k2: 0.0f32,
+            k3: 0.0f32,
+            k4: 0.0f32,
+            k5: 0.0f32,
+            k6: 0.0f32,
+            codx: 0.0f32,
+            cody: 0.0f32,
+            p2: 0.0f32,
+            p1: 0.0f32,
+            metric_radius: 0.0f32,
+          },
+        },
+      },
+    };
+
+    let mut calibration = k4a_sys::k4a_calibration_t {
+      color_camera_calibration: camera_calibration.clone(),
+      depth_camera_calibration: camera_calibration.clone(),
+      color_resolution: 0,
+      depth_mode: 0,
+      extrinsics: extrinsics_4_4,
+    };
+    Self(calibration)
+  }
+}
 
 /// Adapted from k4a-sys. Represents a capture.
 #[derive(Debug)]
@@ -603,19 +672,19 @@ pub struct Transformation {
 
 impl Transformation {
   /// Creates a transformation associated with a calibration
-  pub fn from_calibration(calibration: &k4a_sys::k4a_calibration_t) -> Self {
+  pub fn from_calibration(calibration: &Calibration) -> Self {
     let transformation = unsafe {
-      k4a_sys::k4a_transformation_create(calibration)
+      k4a_sys::k4a_transformation_create(&calibration.0)
     };
     Self {
       transformation,
       color_resolution: Resolution {
-        width: calibration.color_camera_calibration.resolution_width,
-        height: calibration.color_camera_calibration.resolution_height,
+        width: calibration.0.color_camera_calibration.resolution_width,
+        height: calibration.0.color_camera_calibration.resolution_height,
       },
       depth_resolution: Resolution {
-        width: calibration.depth_camera_calibration.resolution_width,
-        height: calibration.depth_camera_calibration.resolution_height,
+        width: calibration.0.depth_camera_calibration.resolution_width,
+        height: calibration.0.depth_camera_calibration.resolution_height,
       },
     }
   }
