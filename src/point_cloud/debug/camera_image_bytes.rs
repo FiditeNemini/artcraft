@@ -6,11 +6,13 @@ use kinect::k4a_sys_wrapper;
 
 /// Store either raw bytes, or wrap a k4a::Image
 /// This is meant to be plumbed through the system instead of a k4a::Image (depth or color image)
+#[derive(Clone)]
 pub struct CameraImageBytes {
   storage: UnderlyingStorage,
 }
 
 /// The underlying data store
+#[derive(Clone)]
 enum UnderlyingStorage {
   /// Our own serialization
   Bytes {
@@ -45,6 +47,13 @@ impl CameraImageBytes {
     // NB: We need to increase the refcount.
     // K4a manages the memory under the hood.
     let image = image.clone();
+    let storage = UnderlyingStorage::K4aImage(image);
+    Self {
+      storage,
+    }
+  }
+
+  pub fn consume_k4a_image(image: k4a_sys_wrapper::Image) -> Self {
     let storage = UnderlyingStorage::K4aImage(image);
     Self {
       storage,
@@ -91,6 +100,13 @@ impl CameraImageBytes {
     match &self.storage {
       UnderlyingStorage::Bytes { height, .. } => *height,
       UnderlyingStorage::K4aImage(image) => image.get_height_pixels(),
+    }
+  }
+
+  pub fn get_handle(&self) -> k4a_sys::k4a_image_t {
+    match &self.storage {
+      UnderlyingStorage::Bytes { height, .. } => unimplemented!("no k4a_image_t"),
+      UnderlyingStorage::K4aImage(image) => image.get_handle(),
     }
   }
 }

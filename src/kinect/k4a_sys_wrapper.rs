@@ -3,10 +3,12 @@
 //! but it's in a bad state and won't compile against any version of 'k4a-sys'.
 
 use std::mem::MaybeUninit;
-use std::ptr;
+use std::{ptr, fmt};
 use std::ptr::null_mut;
 
 use k4a_sys;
+use std::error::Error;
+use std::fmt::Formatter;
 
 /*pub fn device_open() {
 
@@ -249,6 +251,18 @@ pub enum GetCaptureError {
 #[derive(Debug)]
 pub enum CaptureError {
   NullCapture,
+}
+
+impl fmt::Display for CaptureError {
+  fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+    write!(f, "CaptureError")
+  }
+}
+
+impl Error for CaptureError {
+  fn source(&self) -> Option<&(dyn Error + 'static)> {
+    None
+  }
 }
 
 /// Errors for GetCalibration
