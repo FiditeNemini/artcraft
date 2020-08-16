@@ -158,12 +158,6 @@ impl FakeDeviceCaptureProvider {
   }
 }
 
-impl FakeDeviceCaptureProvider {
-  pub fn get_calibration(&self) -> &Calibration {
-    &self.calibration
-  }
-}
-
 impl CaptureProvider for FakeDeviceCaptureProvider {
   fn get_num_cameras(&self) -> usize {
     self.num_cameras
@@ -174,5 +168,9 @@ impl CaptureProvider for FakeDeviceCaptureProvider {
         .map(|capture| capture.clone())
         .collect();
     Some(capture_clones)
+  }
+
+  fn get_calibration(&self) -> &Calibration {
+    &self.calibration
   }
 }

@@ -1,4 +1,5 @@
 use point_cloud::debug::capture_proxy::CaptureProxy;
+use kinect::k4a_sys_wrapper::Calibration;
 
 pub trait CaptureProvider {
 
@@ -10,4 +11,7 @@ pub trait CaptureProvider {
    * This leaves the mutex holding an empty vec.
    */
   fn get_captures(&self) -> Option<Vec<CaptureProxy>>;
+
+  /** Get device calibration (from one of the cameras). */
+  fn get_calibration(&self) -> &Calibration;
 }

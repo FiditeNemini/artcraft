@@ -28,9 +28,10 @@ use std::thread;
 use opencv::prelude::*;
 
 use kinect::k4a_sys_wrapper::{Device, Calibration};
-use kinect::sensor_control::{capture_thread, CaptureProvider};
+use kinect::sensor_control::capture_thread;
 use kinect::capture::multi_device_capturer::{MultiDeviceCapturer, start_capture_thread};
 use kinect::capture::fake_device_capturer::FakeDeviceCaptureProvider;
+use kinect::capture::device_capturer::CaptureProvider;
 
 pub mod core_types;
 pub mod files;
@@ -52,26 +53,26 @@ const SECONDARY_DEVICE_SERIAL : &'static str = "000886694512";
 const ENABLE_WEBCAM : bool = false;
 
 pub fn main() {
-  let multi_device = MultiDeviceCapturer::new(2, Some(1))
-      .expect("multi-device create");
+  let start_cameras = false;
 
-  multi_device.start_cameras().expect("start cameras");
+  let capture_provider: Arc<dyn CaptureProvider> = if start_cameras {
+    let multi_device = MultiDeviceCapturer::new(2, Some(1))
+        .expect("multi-device create");
 
-  let depth_mode : k4a_sys::k4a_depth_mode_t = 2; //k4a_sys::K4A_DEPTH_MODE_NFOV_UNBINNED;
-  let color_format: k4a_sys::k4a_color_resolution_t = k4a_sys::k4a_color_resolution_t_K4A_COLOR_RESOLUTION_2160P;
+    multi_device.start_cameras().expect("start cameras");
 
-  let primary_device = &multi_device.primary_device;
-  let calibration = primary_device.get_calibration(depth_mode, color_format).unwrap();
+    let capture_provider = multi_device.get_sync_capture_provider();
 
-  calibration.debug_print();
+    thread::spawn(move || start_capture_thread(multi_device));
 
-  //let capture_provider = multi_device.get_sync_capture_provider();
+    capture_provider
+  } else {
+    Arc::new(FakeDeviceCaptureProvider::new().unwrap())
+  };
 
-  thread::spawn(move || start_capture_thread(multi_device));
 
-  //let calibration = Calibration::default();
-  let capture_provider = Arc::new(FakeDeviceCaptureProvider::new().unwrap());
   let calibration = capture_provider.get_calibration().clone();
+  calibration.debug_print();
 
   graphics_imgui::run(capture_provider, calibration, ENABLE_WEBCAM);
 }

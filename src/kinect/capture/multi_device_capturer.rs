@@ -1,4 +1,4 @@
-use kinect::k4a_sys_wrapper::{Device, KinectError, Capture, CaptureError, GetCaptureError};
+use kinect::k4a_sys_wrapper::{Device, KinectError, Capture, CaptureError, GetCaptureError, Calibration};
 use std::sync::Arc;
 use std::sync::Mutex;
 use kinect::capture::device_capturer::CaptureProvider;
@@ -11,11 +11,13 @@ pub struct MultiDeviceCapturer {
   num_cameras: usize,
   pub primary_device: Device,  // TODO: Temporary public viz
   secondary_devices: Vec<Device>,
+  calibration: Calibration,
   capture_provider: Arc<MultiDeviceCaptureProvider>,
 }
 
 pub struct MultiDeviceCaptureProvider {
   num_cameras: usize,
+  calibration: Calibration,
   captures: Arc<Mutex<Vec<Capture>>>, // TODO: Shouldn't need to wrap in mutex if we wrap struct instead.
 }
 
@@ -57,11 +59,19 @@ impl MultiDeviceCapturer {
 
     let num_cameras = 1 + secondary_devices.len();
 
+    let depth_mode : k4a_sys::k4a_depth_mode_t = 2; //k4a_sys::K4A_DEPTH_MODE_NFOV_UNBINNED;
+    let color_format: k4a_sys::k4a_color_resolution_t = k4a_sys::k4a_color_resolution_t_K4A_COLOR_RESOLUTION_2160P;
+
+    let primary = primary_device.expect("There must be a primary device");
+    let calibration = primary.get_calibration(depth_mode, color_format).unwrap();
+    let calibration2 = calibration.clone();
+
     Ok(Self {
       num_cameras,
-      primary_device: primary_device.expect("There must be a primary device"),
+      primary_device: primary,
       secondary_devices,
-      capture_provider: Arc::new(MultiDeviceCaptureProvider::new(num_cameras)),
+      calibration,
+      capture_provider: Arc::new(MultiDeviceCaptureProvider::new(num_cameras, calibration2)),
     })
   }
 
@@ -118,9 +128,10 @@ impl MultiDeviceCapturer {
 }
 
 impl MultiDeviceCaptureProvider {
-  pub fn new(num_cameras: usize) -> Self {
+  pub fn new(num_cameras: usize, calibration: Calibration) -> Self {
     Self {
       num_cameras,
+      calibration,
       captures: Arc::new(Mutex::new(Vec::new())),
     }
   }
@@ -156,6 +167,10 @@ impl CaptureProvider for MultiDeviceCaptureProvider {
         .map(|mut captures| captures.into_iter()
             .map(|capture| CaptureProxy::consume_k4a_capture(capture))
             .collect())
+  }
+
+  fn get_calibration(&self) -> &Calibration {
+    &self.calibration
   }
 }
 
