@@ -29,7 +29,8 @@ use opencv::prelude::*;
 
 use kinect::k4a_sys_wrapper::Device;
 use kinect::sensor_control::{capture_thread, CaptureProvider};
-use kinect::multi_device_capturer::{MultiDeviceCapturer, start_capture_thread};
+use kinect::capture::multi_device_capturer::{MultiDeviceCapturer, start_capture_thread};
+use kinect::capture::fake_device_capturer::FakeDeviceCaptureProvider;
 
 pub mod core_types;
 pub mod files;
@@ -68,6 +69,8 @@ pub fn main() {
 
   //thread::spawn(move || capture_thread(capture_provider, Some(primary_device), false));
   thread::spawn(move || start_capture_thread(multi_device));
+
+  //let capture_provider = Arc::new(FakeDeviceCaptureProvider::new().unwrap());
 
   graphics_imgui::run(capture_provider, calibration, ENABLE_WEBCAM);
 }

@@ -211,12 +211,12 @@ impl PointCloudVisualizer {
     }
 
     let mut debug_static_color_frames = Vec::new();
-    //debug_static_color_frames.push(ImageProxy::from_file("output/color_src_0", 0, 0).unwrap());
-    //debug_static_color_frames.push(ImageProxy::from_file("output/color_src_1", 0, 0).unwrap());
+    //debug_static_color_frames.push(ImageProxy::from_file("output/color_src_0", 0, 0, 0, ImageFormat::ColorBgra32).unwrap());
+    //debug_static_color_frames.push(ImageProxy::from_file("output/color_src_1", 0, 0, 0, ImageFormat::ColorBgra32).unwrap());
 
     let mut debug_static_depth_frames = Vec::new();
-    //debug_static_depth_frames.push(ImageProxy::from_file("output/depth_src_0", 3840, 2160).unwrap());
-    //debug_static_depth_frames.push(ImageProxy::from_file("output/depth_src_1", 3840, 2160).unwrap());
+    //debug_static_depth_frames.push(ImageProxy::from_file("output/depth_src_0", 3840, 2160, 7680, ImageFormat::Depth16).unwrap());
+    //debug_static_depth_frames.push(ImageProxy::from_file("output/depth_src_1", 3840, 2160, 7680, ImageFormat::Depth16).unwrap());
 
     let mut visualizer = Self {
       num_cameras,
@@ -258,7 +258,7 @@ impl PointCloudVisualizer {
   ///
   ///
   ///
-  pub fn update_texture(&mut self, texture: &ViewerImage, mut captures: Vec<Capture>) -> Result<()> {
+  pub fn update_texture(&mut self, texture: &ViewerImage, mut captures: Vec<CaptureProxy>) -> Result<()> {
     self.update_texture_id(texture.texture_id(), captures)
   }
 
@@ -266,11 +266,7 @@ impl PointCloudVisualizer {
   /// Take the latest capture, calculate updates to the xyz texture, then render the point cloud to
   /// the output texture.
   ///
-  pub fn update_texture_id(&mut self, texture_id: GLuint, mut captures: Vec<Capture>) -> Result<()> {
-    let captures = captures.into_iter()
-        .map(|capture| CaptureProxy::consume_k4a_capture(capture))
-        .collect();
-
+  pub fn update_texture_id(&mut self, texture_id: GLuint, mut captures: Vec<CaptureProxy>) -> Result<()> {
     // Update the point cloud renderer with the latest point data
     self.update_point_clouds(captures)?;
 

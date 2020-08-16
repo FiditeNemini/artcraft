@@ -1,6 +1,8 @@
 use kinect::k4a_sys_wrapper::{Device, KinectError, Capture, CaptureError, GetCaptureError};
 use std::sync::Arc;
 use std::sync::Mutex;
+use kinect::capture::device_capturer::CaptureProvider;
+use point_cloud::debug::capture_proxy::CaptureProxy;
 
 // Allowing at least 160 microseconds between depth cameras should ensure they do not interfere with one another.
 const MIN_TIME_BETWEEN_DEPTH_CAMERA_PICTURES_USEC : libc::int32_t = 160;
@@ -123,21 +125,6 @@ impl MultiDeviceCaptureProvider {
     }
   }
 
-  /** Return the number of cameras. */
-  pub fn get_num_cameras(&self) -> usize {
-    self.num_cameras
-  }
-
-  /**
-   * Take the latest captures, if available, through interior mutability.
-   * This leaves the mutex holding an empty vec.
-   */
-  pub fn get_captures(&self) -> Option<Vec<Capture>> {
-    self.captures.lock()
-        .ok()
-        .map(|mut v| (*v).split_off(0))
-  }
-
   /**
    * Consume captures and replace whatever we currently hold.
    */
@@ -148,6 +135,27 @@ impl MultiDeviceCaptureProvider {
       },
       Err(_) => {},
     }
+  }
+}
+
+impl CaptureProvider for MultiDeviceCaptureProvider {
+
+  /** Return the number of cameras. */
+  fn get_num_cameras(&self) -> usize {
+    self.num_cameras
+  }
+
+  /**
+   * Take the latest captures, if available, through interior mutability.
+   * This leaves the mutex holding an empty vec.
+   */
+  fn get_captures(&self) -> Option<Vec<CaptureProxy>> {
+    self.captures.lock()
+        .ok()
+        .map(|mut v| (*v).split_off(0))
+        .map(|mut captures| captures.into_iter()
+            .map(|capture| CaptureProxy::consume_k4a_capture(capture))
+            .collect())
   }
 }
 

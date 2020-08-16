@@ -525,6 +525,23 @@ pub enum ImageFormat {
   UnknownFormatError, // FIXME: Just return Result<T>?
 }
 
+impl ImageFormat {
+  pub fn to_k4a(&self) -> k4a_sys::k4a_image_format_t {
+    match self {
+      ImageFormat::ColorMjpg => 0,
+      ImageFormat::ColorNv12 => 1,
+      ImageFormat::ColorYuy2 => 2,
+      ImageFormat::ColorBgra32 => 3,
+      ImageFormat::Depth16 => 4,
+      ImageFormat::Ir16 => 5,
+      ImageFormat::Custom8 => 6,
+      ImageFormat::Custom16 => 7,
+      ImageFormat::Custom => 8,
+      ImageFormat::UnknownFormatError => 255, // TODO: Better handling?
+    }
+  }
+}
+
 impl From<k4a_sys::k4a_image_format_t> for ImageFormat {
   fn from(format: k4a_sys::k4a_image_format_t) -> Self {
     match format {
