@@ -4,6 +4,7 @@ use point_cloud::debug::image_proxy::ImageProxy;
 use std::sync::{RwLock, Mutex, PoisonError, MutexGuard, Arc};
 use winit::event::VirtualKeyCode::Mute;
 use kinect::k4a_sys_wrapper::CaptureError;
+use std::path::Path;
 
 /// Store either a wrapped capture, or a k4a Capture.
 /// Useful for debugging.
@@ -96,6 +97,26 @@ impl CaptureProxy {
     match &self.storage {
       UnderlyingStorage::CameraImageBytes{ .. } => unimplemented!("Cannot get capture for non-k4a"),
       UnderlyingStorage::K4aCapture { capture, .. } => capture.clone(),
+    }
+  }
+
+  pub fn debug_save_files(&self, path_prefix: &Path, suffix: &str) -> AnyhowResult<()> {
+    match &self.storage {
+      UnderlyingStorage::CameraImageBytes{ .. } => unimplemented!("No need to debug save for raw bytes"),
+      UnderlyingStorage::K4aCapture { maybe_color_image, maybe_depth_image, .. } => {
+
+        if let Some(color_image) = maybe_color_image {
+          let filename = path_prefix.join(format!("./color_frame_{}", suffix));
+          color_image.debug_save_file(filename.to_str().unwrap())?;
+        }
+
+        if let Some(depth_image) = maybe_depth_image {
+          let filename = path_prefix.join(format!("./depth_frame_{}", suffix));
+          depth_image.debug_save_file(filename.to_str().unwrap())?;
+        }
+
+        Ok(())
+      },
     }
   }
 }

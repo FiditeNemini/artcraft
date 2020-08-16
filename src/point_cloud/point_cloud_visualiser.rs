@@ -393,6 +393,35 @@ impl PointCloudVisualizer {
             .as_mut() {
           unsafe {
 
+            /*
+            BROKEN FAKE DEVICE CAPTURE:
+           Depth image: 3840x2160 stride 7680 format Depth16
+           Transformed depth image: 3840x2160 stride 7680 format Depth16
+           [2020-08-16 02:32:59.296] [error] [t=22196] /__w/1/s/extern/Azure-Kinect-Sensor-SDK/src/transformation/rgbz.c (85): transformation_compare_image_descriptors().
+              Unexpected image descriptor.
+              Expected width_pixels: 3840, height_pixels: 2160, stride_bytes: 7680, format: 4.
+              Actual width_pixels: 640, height_pixels: 576, stride_bytes: 1280, format: 4.
+
+
+            WORKING
+            Depth image: 640x576 stride 1280 format Depth16
+            Transformed depth image: 3840x2160 stride 7680 format Depth16
+
+             */
+
+            println!("Depth image: {}x{} stride {} format {:?}",
+              depth_image.get_width_pixels(),
+              depth_image.get_height_pixels(),
+              depth_image.get_stride_bytes(),
+              depth_image.get_format());
+
+            // TODO: It's going to mutate this handle -- even if we fix the bug, that seems bad...
+            println!("Transformed depth image: {}x{} stride {} format {:?}",
+              transformed_depth_image.get_width_pixels(),
+              transformed_depth_image.get_height_pixels(),
+              transformed_depth_image.get_stride_bytes(),
+              transformed_depth_image.get_format());
+
             let result = k4a_sys::k4a_transformation_depth_image_to_color_camera(
               self.transformation.get_handle(),
               depth_image.get_handle(),
@@ -400,6 +429,7 @@ impl PointCloudVisualizer {
             );
 
             if result != k4a_sys::k4a_buffer_result_t_K4A_BUFFER_RESULT_SUCCEEDED {
+              println!(">>> THIS FAILS <<<");
               return Err(PointCloudVisualizerError::DepthToColorConversionFailed);
             }
 

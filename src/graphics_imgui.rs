@@ -13,6 +13,7 @@ use point_cloud::point_cloud_visualiser::{ColorizationStrategy, PointCloudVisual
 use point_cloud::viewer_image::ViewerImage;
 use webcam::WebcamWriter;
 use kinect::capture::device_capturer::CaptureProvider;
+use std::path::Path;
 
 pub fn run(capture_provider: Arc<CaptureProvider>, calibration_data: k4a_sys::k4a_calibration_t, enable_webcam: bool) {
   let mut webcam_writer = None;
@@ -211,6 +212,11 @@ pub fn run(capture_provider: Arc<CaptureProvider>, calibration_data: k4a_sys::k4
     window.gl_swap_window();
 
     if let Some(mut captures) = capture_provider.get_captures() {
+      /*for (i, capture) in captures.iter().enumerate() {
+        let suffix = format!("{}", i);
+        capture.debug_save_files(Path::new("output/"), &suffix).unwrap();
+      }*/
+
       visualizer.update_texture_id(texture.texture_id(), captures)
           .map(|_| {})
           .map_err(|err| {

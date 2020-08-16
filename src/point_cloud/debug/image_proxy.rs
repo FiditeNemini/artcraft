@@ -6,6 +6,7 @@ use std::fs;
 use std::io::Read;
 use kinect::k4a_sys_wrapper::ImageFormat;
 use std::ptr::null_mut;
+use files::write_to_file_from_byte_ptr::write_to_file_from_byte_ptr;
 
 /// Store either raw bytes, or wrap a k4a::Image
 /// This is meant to be plumbed through the system instead of a k4a::Image (depth or color image)
@@ -22,7 +23,7 @@ enum UnderlyingStorage {
     bytes: Vec<u8>,
     width: usize,
     height: usize,
-    stride_bytes: i32,
+    stride_bytes: usize,
     format: ImageFormat,
   },
   /// From the Kinect camera
@@ -35,7 +36,7 @@ impl ImageProxy {
     filename: &str,
     width: usize,
     height: usize,
-    stride_bytes: i32,
+    stride_bytes: usize,
     format: ImageFormat) -> AnyhowResult<Self>
   {
     let mut file = File::open(filename)?;
@@ -117,6 +118,20 @@ impl ImageProxy {
     }
   }
 
+  pub fn get_stride_bytes(&self) -> usize {
+    match &self.storage {
+      UnderlyingStorage::Bytes { stride_bytes, .. } => *stride_bytes,
+      UnderlyingStorage::K4aImage(image) => image.get_stride_bytes(),
+    }
+  }
+
+  pub fn get_format(&self) -> ImageFormat {
+    match &self.storage {
+      UnderlyingStorage::Bytes { format, .. } => *format,
+      UnderlyingStorage::K4aImage(image) => image.get_format(),
+    }
+  }
+
   pub fn get_handle(&self) -> k4a_sys::k4a_image_t {
     match &self.storage {
       UnderlyingStorage::Bytes { bytes, width, height, stride_bytes, format } => {
@@ -131,7 +146,7 @@ impl ImageProxy {
             format.to_k4a(),
             *width as i32,
             *height as i32,
-            *stride_bytes,
+            *stride_bytes as i32,
             bytes.as_ptr() as *mut u8, // TODO: Technically we won't write.
             bytes.len(),
             None,
@@ -146,6 +161,17 @@ impl ImageProxy {
         //println!("real.get_handle(): {:?}, {}, {}x{}", image.get_format(), image.get_stride_bytes(), image.get_width_pixels(), image.get_height_pixels());
         image.get_handle()
       },
+    }
+  }
+
+  pub fn debug_save_file(&self, filename: &str) -> AnyhowResult<()> {
+    match &self.storage {
+      UnderlyingStorage::Bytes { .. } => unimplemented!("No need to debug save raw bytes"),
+      UnderlyingStorage::K4aImage(image) => {
+        let byte_src = image.get_buffer();
+        let size_bytes = image.get_size();
+        write_to_file_from_byte_ptr(filename, byte_src, size_bytes)
+      }
     }
   }
 }

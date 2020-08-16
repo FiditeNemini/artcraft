@@ -70,7 +70,7 @@ pub fn main() {
   //thread::spawn(move || capture_thread(capture_provider, Some(primary_device), false));
   thread::spawn(move || start_capture_thread(multi_device));
 
-  //let capture_provider = Arc::new(FakeDeviceCaptureProvider::new().unwrap());
+  let capture_provider = Arc::new(FakeDeviceCaptureProvider::new().unwrap());
 
   graphics_imgui::run(capture_provider, calibration, ENABLE_WEBCAM);
 }
