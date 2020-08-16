@@ -373,7 +373,7 @@ impl PointCloudVisualizer {
     //
 
     let mut depth_image = match capture.get_depth_image() {
-      Ok(img) => img,
+      Ok(img) => ImageProxy::consume_k4a_image(img),
       Err(_e) => {
         // Capture doesn't have depth info. Drop the capture.
         return Err(PointCloudVisualizerError::MissingDepthImage);
@@ -387,7 +387,10 @@ impl PointCloudVisualizer {
         return Err(PointCloudVisualizerError::MissingColorImage);
       }
       if self.colorization_strategy == ColorizationStrategy::Color {
-        if let Some(transformed_depth_image) = self.transformed_depth_images.get_mut(camera_index).unwrap().as_mut() { // TODO: TEMP SUPPORT MULTI-CAMERA
+        // TODO: TEMP SUPPORT MULTI-CAMERA
+        if let Some(transformed_depth_image) = self.transformed_depth_images.get_mut(camera_index)
+            .unwrap()
+            .as_mut() {
           unsafe {
 
             let result = k4a_sys::k4a_transformation_depth_image_to_color_camera(
@@ -400,7 +403,7 @@ impl PointCloudVisualizer {
               return Err(PointCloudVisualizerError::DepthToColorConversionFailed);
             }
 
-            depth_image = transformed_depth_image.clone();
+            depth_image = ImageProxy::from_k4a_image(transformed_depth_image);
           }
         }
       }
@@ -410,19 +413,11 @@ impl PointCloudVisualizer {
     // Convert depth image to depth texture
     //
 
-    // Hack to hold onto the K4A ColorImageBytes wrapper.
-    let mut depth_image_storage : Option<ImageProxy> = None;
-
-    let depth_image = if let Some(image) = self.debug_static_depth_frames.get(camera_index) {
-      image
-    } else {
-      let camera_image = ImageProxy::from_k4a_image(&depth_image);
-      depth_image_storage = Some(camera_image);
-      depth_image_storage.as_ref().unwrap()
-    };
+    let use_depth_image = self.debug_static_depth_frames.get(camera_index)
+        .unwrap_or(&depth_image);
 
     let result = self.point_cloud_converters.get(camera_index).unwrap().convert(
-      &depth_image,
+      &use_depth_image,
       &mut self.xyz_textures.get_mut(camera_index).unwrap(), // TODO: TEMP MULTI CAMERA SUPPORT
       camera_index
     );
@@ -445,11 +440,11 @@ impl PointCloudVisualizer {
 
     } else {
       // This creates a color spectrum based on depth.
-      let dst_length = depth_image.get_width_pixels() * depth_image.get_height_pixels();
+      let dst_length = use_depth_image.get_width_pixels() * use_depth_image.get_height_pixels();
 
       unsafe {
         // src: DepthPixel
-        let src_pixel_buffer = depth_image.get_buffer();
+        let src_pixel_buffer = use_depth_image.get_buffer();
         let typed_src_pixel_buffer = src_pixel_buffer as *const DepthPixel;
 
         // dst: BgraPixel
