@@ -21,6 +21,7 @@ use point_cloud::point_cloud_renderer::{PointCloudRenderer, PointCloudRendererEr
 use point_cloud::util::{colorize_depth_blue_to_red, get_depth_mode_range, ValueRange};
 use point_cloud::viewer_image::ViewerImage;
 use point_cloud::debug::image_proxy::ImageProxy;
+use point_cloud::debug::capture_proxy::CaptureProxy;
 
 pub type Result<T> = std::result::Result<T, PointCloudVisualizerError>;
 
@@ -266,6 +267,11 @@ impl PointCloudVisualizer {
   /// the output texture.
   ///
   pub fn update_texture_id(&mut self, texture_id: GLuint, mut captures: Vec<Capture>) -> Result<()> {
+    // TODO: This is a challenge -
+    // let captures = captures.iter()
+    //     .map(|capture| CaptureProxy::from_k4a_image(capture))
+    //     .collect();
+
     // Update the point cloud renderer with the latest point data
     self.update_point_clouds(captures)?;
 
@@ -531,7 +537,10 @@ impl PointCloudVisualizer {
     self.xyz_textures.get_mut(0).unwrap().reset(); // TODO: TEMP MULTI-CAMERA SUPPORT
 
     // TODO: TEMP MULTI-CAMERA SUPPORT
-    if let Some(capture) = self.last_captures.get_mut(camera_index).unwrap().as_ref() {
+    if let Some(capture) = self.last_captures.get_mut(camera_index)
+        .unwrap()
+        .as_ref()
+    {
       let capture = (*capture).clone();
       // TODO: TEMP MULTI-CAMERA SUPPORT
       let mut captures = Vec::new();
