@@ -113,7 +113,7 @@ pub struct PointCloudVisualizer {
   frame_buffer: Framebuffer,
   depth_buffer: Renderbuffer,
 
-  last_captures: Vec<Option<Capture>>,
+  last_captures: Vec<Option<CaptureProxy>>,
 
   /// Buffer that holds the depth image transformed to the color coordinate space.
   /// Used in color mode only.
@@ -211,12 +211,12 @@ impl PointCloudVisualizer {
     }
 
     let mut debug_static_color_frames = Vec::new();
-    debug_static_color_frames.push(ImageProxy::from_file("output/color_src_0", 0, 0).unwrap());
-    debug_static_color_frames.push(ImageProxy::from_file("output/color_src_1", 0, 0).unwrap());
+    //debug_static_color_frames.push(ImageProxy::from_file("output/color_src_0", 0, 0).unwrap());
+    //debug_static_color_frames.push(ImageProxy::from_file("output/color_src_1", 0, 0).unwrap());
 
     let mut debug_static_depth_frames = Vec::new();
-    debug_static_depth_frames.push(ImageProxy::from_file("output/depth_src_0", 3840, 2160).unwrap());
-    debug_static_depth_frames.push(ImageProxy::from_file("output/depth_src_1", 3840, 2160).unwrap());
+    //debug_static_depth_frames.push(ImageProxy::from_file("output/depth_src_0", 3840, 2160).unwrap());
+    //debug_static_depth_frames.push(ImageProxy::from_file("output/depth_src_1", 3840, 2160).unwrap());
 
     let mut visualizer = Self {
       num_cameras,
@@ -267,10 +267,9 @@ impl PointCloudVisualizer {
   /// the output texture.
   ///
   pub fn update_texture_id(&mut self, texture_id: GLuint, mut captures: Vec<Capture>) -> Result<()> {
-    // TODO: This is a challenge -
-    // let captures = captures.iter()
-    //     .map(|capture| CaptureProxy::from_k4a_image(capture))
-    //     .collect();
+    let captures = captures.into_iter()
+        .map(|capture| CaptureProxy::consume_k4a_capture(capture))
+        .collect();
 
     // Update the point cloud renderer with the latest point data
     self.update_point_clouds(captures)?;
@@ -339,7 +338,7 @@ impl PointCloudVisualizer {
   ///
   ///
   ///
-  fn update_point_clouds(&mut self, mut captures: Vec<Capture>) -> Result<()> {
+  fn update_point_clouds(&mut self, mut captures: Vec<CaptureProxy>) -> Result<()> {
     if captures.len() != self.num_cameras {
       println!("Length of captures in insufficient (unplug the cameras from USB and retry): {}", captures.len());
       return Ok(());
@@ -372,13 +371,13 @@ impl PointCloudVisualizer {
     ).map_err(|err| PointCloudVisualizerError::PointCloudRendererError(err))
   }
 
-  fn update_point_clouds_for_camera(&mut self, camera_index: usize, capture: Capture) -> Result<()> {
+  fn update_point_clouds_for_camera(&mut self, camera_index: usize, capture: CaptureProxy) -> Result<()> {
     //
     // Depth Image extractor
     //
 
     let mut depth_image = match capture.get_depth_image() {
-      Ok(img) => ImageProxy::consume_k4a_image(img),
+      Ok(img) => img,
       Err(_e) => {
         // Capture doesn't have depth info. Drop the capture.
         return Err(PointCloudVisualizerError::MissingDepthImage);
@@ -408,7 +407,7 @@ impl PointCloudVisualizer {
               return Err(PointCloudVisualizerError::DepthToColorConversionFailed);
             }
 
-            depth_image = transformed_depth_image.clone();
+            depth_image = transformed_depth_image;
           }
         }
       }
@@ -433,14 +432,14 @@ impl PointCloudVisualizer {
 
     // TODO: TEMP MULTI CAMERA SUPPORT
     if let Some(mut inner) = self.last_captures.get_mut(camera_index) {
-      *inner = Some(capture);
+      *inner = Some(capture.clone());
     }
 
     if self.colorization_strategy == ColorizationStrategy::Color {
       let color_image = maybe_color_image.expect("logic above should ensure present");
       // TODO: TEMP MULTI CAMERA SUPPORT
       if let Some(mut inner) = self.point_cloud_colorizations.get_mut(camera_index) {
-        *inner = Some(ImageProxy::consume_k4a_image(color_image));
+        *inner = Some(color_image.clone());
       }
 
     } else {

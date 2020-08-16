@@ -36,14 +36,14 @@ impl CaptureProxy {
     }
   }
 
-  pub fn from_k4a_image(capture: &k4a_sys_wrapper::Capture) -> Self {
+  pub fn from_k4a_capture(capture: &k4a_sys_wrapper::Capture) -> Self {
     // NB: We need to increase the refcount.
     // K4a manages the memory under the hood.
     let capture = capture.clone();
-    Self::consume_k4a_image(capture)
+    Self::consume_k4a_capture(capture)
   }
 
-  pub fn consume_k4a_image(capture: k4a_sys_wrapper::Capture) -> Self {
+  pub fn consume_k4a_capture(capture: k4a_sys_wrapper::Capture) -> Self {
     // NB: I tried to lazily unpack these, but interior mutability Sync/Send was a nightmare.
     // The poor ergonomics were not worth it.
     let color_image = capture.get_color_image()
@@ -89,6 +89,13 @@ impl CaptureProxy {
             .ok_or(CaptureError::NullCapture)?;
         Ok(inner)
       }
+    }
+  }
+
+  pub fn debug_get_capture(&self) -> k4a_sys_wrapper::Capture {
+    match &self.storage {
+      UnderlyingStorage::CameraImageBytes{ .. } => unimplemented!("Cannot get capture for non-k4a"),
+      UnderlyingStorage::K4aCapture { capture, .. } => capture.clone(),
     }
   }
 }
