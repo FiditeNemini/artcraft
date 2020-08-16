@@ -7,7 +7,7 @@ use kinect::k4a_sys_wrapper;
 /// Store either raw bytes, or wrap a k4a::Image
 /// This is meant to be plumbed through the system instead of a k4a::Image (depth or color image)
 #[derive(Clone)]
-pub struct CameraImageBytes {
+pub struct ImageProxy {
   storage: UnderlyingStorage,
 }
 
@@ -24,7 +24,7 @@ enum UnderlyingStorage {
   K4aImage(k4a_sys_wrapper::Image),
 }
 
-impl CameraImageBytes {
+impl ImageProxy {
   pub fn from_file(filename: &str, width: usize, height: usize) -> AnyhowResult<Self> {
     let mut file = File::open(filename)?;
     let metadata = fs::metadata(&filename)?;

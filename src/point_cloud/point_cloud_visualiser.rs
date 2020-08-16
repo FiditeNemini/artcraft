@@ -20,7 +20,7 @@ use point_cloud::pixel_structs::DepthPixel;
 use point_cloud::point_cloud_renderer::{PointCloudRenderer, PointCloudRendererError};
 use point_cloud::util::{colorize_depth_blue_to_red, get_depth_mode_range, ValueRange};
 use point_cloud::viewer_image::ViewerImage;
-use point_cloud::debug::camera_image_bytes::CameraImageBytes;
+use point_cloud::debug::image_proxy::ImageProxy;
 
 pub type Result<T> = std::result::Result<T, PointCloudVisualizerError>;
 
@@ -137,8 +137,8 @@ pub struct PointCloudVisualizer {
 
   /// For debugging
   /// If present, use these instead of camera captures.
-  debug_static_color_frames: Vec<CameraImageBytes>,
-  debug_static_depth_frames: Vec<CameraImageBytes>,
+  debug_static_color_frames: Vec<ImageProxy>,
+  debug_static_depth_frames: Vec<ImageProxy>,
 }
 
 // TODO: Dedup
@@ -210,12 +210,12 @@ impl PointCloudVisualizer {
     }
 
     let mut debug_static_color_frames = Vec::new();
-    debug_static_color_frames.push(CameraImageBytes::from_file("output/color_src_0", 0, 0).unwrap());
-    debug_static_color_frames.push(CameraImageBytes::from_file("output/color_src_1", 0, 0).unwrap());
+    debug_static_color_frames.push(ImageProxy::from_file("output/color_src_0", 0, 0).unwrap());
+    debug_static_color_frames.push(ImageProxy::from_file("output/color_src_1", 0, 0).unwrap());
 
     let mut debug_static_depth_frames = Vec::new();
-    debug_static_depth_frames.push(CameraImageBytes::from_file("output/depth_src_0", 3840, 2160).unwrap());
-    debug_static_depth_frames.push(CameraImageBytes::from_file("output/depth_src_1", 3840, 2160).unwrap());
+    debug_static_depth_frames.push(ImageProxy::from_file("output/depth_src_0", 3840, 2160).unwrap());
+    debug_static_depth_frames.push(ImageProxy::from_file("output/depth_src_1", 3840, 2160).unwrap());
 
     let mut visualizer = Self {
       num_cameras,
@@ -352,9 +352,9 @@ impl PointCloudVisualizer {
     } else {
       // TODO: wrt k4a::Image.clone(), k4a should use ref counting. (I did this one other place a few commits ago.
       //  Hope it's not ref leaking.)
-      let colorizations: Vec<CameraImageBytes>  = self.point_cloud_colorizations.iter()
+      let colorizations: Vec<ImageProxy>  = self.point_cloud_colorizations.iter()
           .map(|img| img.as_ref().map(|img| img.clone()).unwrap()) // Potential ref leak #1
-          .map(|image| CameraImageBytes::from_k4a_image(&image)) // Potential ref leak #2
+          .map(|image| ImageProxy::from_k4a_image(&image)) // Potential ref leak #2
           .collect();
 
       color_captures = colorizations;
@@ -411,12 +411,12 @@ impl PointCloudVisualizer {
     //
 
     // Hack to hold onto the K4A ColorImageBytes wrapper.
-    let mut depth_image_storage : Option<CameraImageBytes> = None;
+    let mut depth_image_storage : Option<ImageProxy> = None;
 
     let depth_image = if let Some(image) = self.debug_static_depth_frames.get(camera_index) {
       image
     } else {
-      let camera_image = CameraImageBytes::from_k4a_image(&depth_image);
+      let camera_image = ImageProxy::from_k4a_image(&depth_image);
       depth_image_storage = Some(camera_image);
       depth_image_storage.as_ref().unwrap()
     };

@@ -26,7 +26,7 @@ use std::time::{SystemTime, UNIX_EPOCH};
 use std::fs::{File, OpenOptions};
 use std::io::{Read, Write};
 use opengl::link_program::link_shader_program;
-use point_cloud::debug::camera_image_bytes::CameraImageBytes;
+use point_cloud::debug::image_proxy::ImageProxy;
 use files::read_file_string_contents::read_file_string_contents;
 use files::write_to_file_from_byte_ptr::write_to_file_from_byte_ptr;
 
@@ -311,7 +311,7 @@ impl PointCloudRenderer {
   ///
   ///
   pub fn update_point_clouds(&mut self,
-                             color_images: &Vec<CameraImageBytes>,
+                             color_images: &Vec<ImageProxy>,
                              point_cloud_textures: &Vec<Texture>
   ) -> Result<()> {
     let time = SystemTime::now();
