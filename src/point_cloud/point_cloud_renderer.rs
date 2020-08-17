@@ -318,10 +318,12 @@ impl PointCloudRenderer {
     let seconds = time_since_epoch.as_secs();
 
     let (lower_range, upper_range)= if seconds % 10 > 4 {
-      (0, 1)
-    } else {
       (1, 2)
+    } else {
+      (0, 1)
     };
+
+    //let (lower_range, upper_range)  = (1, 2);
 
     let (lower_range, upper_range)  = (0, 2);
 
@@ -487,24 +489,43 @@ impl PointCloudRenderer {
       let seconds = time_since_epoch.as_secs();
 
       let (lower_range, upper_range)= if seconds % 10 > 4 {
-        (0, 1)
-      } else {
         (1, 2)
+      } else {
+        (0, 1)
       };
 
+      //let (lower_range, upper_range) = (0, 2);
+
+      // Experiment: Only draw camera0_color (toggles between setup above)
+      // First image: blank
+      // Second image: perfect camera0
+      // Third image: ZEBRA STRIPED camera1_geo, camera0_color
+      let (lower_range, upper_range) = (0, 1);
+
+      // Experiment: Only draw camera1_color (toggles between setup above)
+      // First image blank
+      // Second image: ZEBRA STRIPED camera1_geo + camera1_color
+      // Third image: BLACK camera0_geo
+      let (lower_range, upper_range) = (1, 2);
+
+
+      // Experiment: Only draw camera1_color (both are setup above)
+      // Only image: camera0_geo is present, but black; camera1_geo + camera1_color are perfect
+      let (lower_range, upper_range) = (1, 2);
+
+
+      // Experiment: Only draw camera0_color (both are setup above)
+      // Only image: camera0_geo + camera0_color are perfect; camera1_geo is present, but black
+      let (lower_range, upper_range) = (0, 1);
+
+
+      // Experiment: Draw camera0_color and camera1_color (both are setup above)
+      // SAME RESULTS, DAMN IT.
       let (lower_range, upper_range) = (0, 2);
 
       // Render point cloud
       //for i in 0 .. self.num_cameras {
-      for i in lower_range .. upper_range {
-        // NB: Changing the order here impacts which camera gets shaded. For some reason only one
-        // camera is actually getting real texture data.
-        // let i = if seconds % 5 > 2 {
-        //   j // primary camera first
-        // } else {
-        //   1 - j // secondary camera first
-        // };
-
+      /*for i in lower_range .. upper_range {
         //
         // THIS IS THE COLOR IMAGE
         //
@@ -522,7 +543,26 @@ impl PointCloudRenderer {
         gl::DrawArrays(gl::POINTS, 0, size);
 
         gl::BindVertexArray(0);
-      }
+      }*/
+
+      let vertex_array_object = self.vertex_array_objects.get(1).unwrap();
+      let vertex_array_size_bytes = self.vertex_arrays_size_bytes.get(1).unwrap();
+
+      gl::BindVertexArray(vertex_array_object.id());
+      let size = vertex_array_size_bytes / size_of::<BgraPixel>() as i32;
+
+      gl::DrawArrays(gl::POINTS, 0, size);
+      gl::BindVertexArray(0);
+
+      let vertex_array_object = self.vertex_array_objects.get(0).unwrap();
+      let vertex_array_size_bytes = self.vertex_arrays_size_bytes.get(0).unwrap();
+
+      gl::BindVertexArray(vertex_array_object.id());
+      let size = vertex_array_size_bytes / size_of::<BgraPixel>() as i32;
+
+      gl::DrawArrays(gl::POINTS, 0, size);
+      gl::BindVertexArray(0);
+
 
       gl_get_error()
           .map_err(|err| PointCloudRendererError::OpenGlError(err))

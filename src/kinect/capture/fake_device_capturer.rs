@@ -13,8 +13,8 @@ pub struct FakeDeviceCaptureProvider {
 impl FakeDeviceCaptureProvider {
   pub fn new() -> AnyhowResult<Self> {
     // TODO: Color dimension stride is wrong (and maybe others)
-    let color = ImageProxy::from_file("output/color_frame_1", 3840, 2160, 0, ImageFormat::ColorBgra32)?;
-    let depth = ImageProxy::from_file("output/depth_frame_1", 640, 576, 1280, ImageFormat::Depth16)?;
+    let color = ImageProxy::from_file("output/color_frame_0", 3840, 2160, 0, ImageFormat::ColorBgra32)?;
+    let depth = ImageProxy::from_file("output/depth_frame_0", 640, 576, 1280, ImageFormat::Depth16)?;
     let frame_1 = CaptureProxy::from_image_proxy_pair(color, depth);
 
     // TODO: Color dimension stride is wrong (and maybe others)
