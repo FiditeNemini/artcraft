@@ -245,8 +245,11 @@ impl PointCloudRenderer {
     // TODO: Holy crap, this might be the problem - not binding after create of VAO
     // TODO: Holy crap, this might be the problem - not binding after create of VAO
     for _ in 0 .. num_cameras {
-      vertex_array_objects.push(VertexArray::new_initialized());
-      vertex_color_buffer_objects.push(Buffer::new_initialized());
+      let vao = VertexArray::new_initialized();
+      vao.bind();
+      vertex_array_objects.push(vao);
+      let buffer = Buffer::new_initialized();
+      vertex_color_buffer_objects.push(buffer);
       vertex_arrays_size_bytes.push(0);
     }
 
@@ -254,13 +257,23 @@ impl PointCloudRenderer {
 
     unsafe {
       let location_0 = gl::GetAttribLocation(program_id, ATTRIB_LOCATION_0_PTR);
-      //let location_1 = gl::GetAttribLocation(program_id, ATTRIB_LOCATION_1_PTR);
-
       println!("Location0: {}", location_0);
-      //println!("Location1: {}", location_1);
-
       vertex_attrib_locations.push(location_0);
+
+      //let location_1 = gl::GetAttribLocation(program_id, ATTRIB_LOCATION_1_PTR);
+      //println!("Location1: {}", location_1);
       //vertex_attrib_locations.push(location_1);
+
+      // Perhaps it only needs to be configured once...
+      gl::EnableVertexAttribArray(location_0 as u32);
+      gl::VertexAttribPointer(
+        location_0 as u32,
+        gl::BGRA as i32,
+        gl::UNSIGNED_BYTE,
+        gl::TRUE,
+        0 as i32,
+        0 as *const c_void,
+      );
     }
 
     let initial_view = [
@@ -493,21 +506,6 @@ impl PointCloudRenderer {
       //let i = if !swap { j } else { 1 - j }; // (in isolation) PUTS THE IMAGES ON BOTH POINTCLOUD GEOS!?
 
       unsafe {
-        let vertex_attrib_location = self.vertex_attrib_locations.get(0).unwrap();
-
-        // NB: Controling these indices change where the color bytes are uploaded
-        gl::EnableVertexAttribArray(*vertex_attrib_location as u32);
-
-        //let location = i;
-        gl::VertexAttribPointer(
-          *vertex_attrib_location as u32,
-          gl::BGRA as i32,
-          gl::UNSIGNED_BYTE,
-          gl::TRUE,
-          0 as i32,
-          0 as *const c_void,
-        );
-
         // NB: I believe these point cloud textures are the geometry itself. Not the color data.
         // I think the code here is *fine* because the point cloud structures are in-tact.
 
@@ -540,6 +538,20 @@ impl PointCloudRenderer {
           gl::READ_ONLY, // access
           gl::RGBA32F, //POINT_CLOUD_TEXTURE_FORMAT,
         );
+
+        let vertex_attrib_location = self.vertex_attrib_locations.get(0).unwrap();
+
+        gl::EnableVertexAttribArray(*vertex_attrib_location as u32);
+
+        gl::VertexAttribPointer(
+          *vertex_attrib_location as u32,
+          gl::BGRA as i32,
+          gl::UNSIGNED_BYTE,
+          gl::TRUE,
+          0 as i32,
+          0 as *const c_void,
+        );
+
       }
     }
 
@@ -637,24 +649,22 @@ impl PointCloudRenderer {
         gl::BindVertexArray(0);
       }*/
 
-      let vertex_array_object = self.vertex_array_objects.get(1).unwrap();
-      let vertex_array_size_bytes = self.vertex_arrays_size_bytes.get(1).unwrap();
-      let size = vertex_array_size_bytes / size_of::<BgraPixel>() as i32;
-
-      gl::BindVertexArray(vertex_array_object.id());
-
-      gl::DrawArrays(gl::POINTS, 0, size);
-      gl::BindVertexArray(0);
-
       let vertex_array_object = self.vertex_array_objects.get(0).unwrap();
       let vertex_array_size_bytes = self.vertex_arrays_size_bytes.get(0).unwrap();
       let size = vertex_array_size_bytes / size_of::<BgraPixel>() as i32;
 
       gl::BindVertexArray(vertex_array_object.id());
-
       gl::DrawArrays(gl::POINTS, 0, size);
       gl::BindVertexArray(0);
 
+
+      let vertex_array_object = self.vertex_array_objects.get(1).unwrap();
+      let vertex_array_size_bytes = self.vertex_arrays_size_bytes.get(1).unwrap();
+      let size = vertex_array_size_bytes / size_of::<BgraPixel>() as i32;
+
+      gl::BindVertexArray(vertex_array_object.id());
+      gl::DrawArrays(gl::POINTS, 0, size);
+      gl::BindVertexArray(0);
 
       /*for obj in self.renderable_objects.iter() {
         gl::BindVertexArray(obj.vao);

@@ -255,6 +255,12 @@ impl VertexArray {
     }
   }
 
+  pub fn bind(&self) {
+    unsafe {
+      gl::BindVertexArray(self.id);
+    }
+  }
+
   fn gen(&mut self) {
     unsafe {
       gl::GenVertexArrays(1, &mut self.id);

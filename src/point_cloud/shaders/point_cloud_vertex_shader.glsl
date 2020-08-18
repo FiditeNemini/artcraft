@@ -36,10 +36,7 @@ uniform bool enableShading;
 void main()
 {
     ivec2 pointCloudSize0 = imageSize(pointCloudTexture0);
-    ivec2 pointCloudSize1 = imageSize(pointCloudTexture1);
-
     int pointCloudLength0 = pointCloudSize0.x * pointCloudSize0.y;
-    int pointCloudLength1 = pointCloudSize1.x * pointCloudSize1.y;
 
     vec3 vertexPosition;
     vec4 colorOut;
@@ -47,25 +44,28 @@ void main()
     // We're having to multiplex on gl_VertexID, and I don't think we get double the range for two
     // cameras. This effectively 'downsamples' each camera. We need to find a way to double this.
     // I hate drawing like this
-    if (gl_VertexID % 2 == 0) {
+    if (gl_VertexID < pointCloudLength0) { // TODO - this is the one to enable
+    //if (gl_VertexID %2 == 0) {
       // Camera #0
       ivec2 currentDepthPixelCoordinates = ivec2(gl_VertexID % pointCloudSize0.x, gl_VertexID / pointCloudSize0.x);
 
       vertexPosition = imageLoad(pointCloudTexture0, currentDepthPixelCoordinates).xyz;
 
       colorOut = vec4(
-        inColor0.r,
+        127,
         inColor0.g,
         inColor0.b,
         255
       );
     } else {
       // Camera #1
+      ivec2 pointCloudSize1 = imageSize(pointCloudTexture1);
+      int pointCloudLength1 = pointCloudSize1.x * pointCloudSize1.y;
+
       ivec2 currentDepthPixelCoordinates = ivec2(gl_VertexID % pointCloudSize1.x, gl_VertexID / pointCloudSize1.x);
 
-      // vec3 originalPosition = imageLoad(pointCloudTexture1, currentDepthPixelCoordinates).xyz;
-
       // // Let's move the model away a bit.
+      // vec3 originalPosition = imageLoad(pointCloudTexture1, currentDepthPixelCoordinates).xyz;
       // vertexPosition = vec3(
       //   originalPosition.x - 1.5,
       //   originalPosition.y,
@@ -74,13 +74,10 @@ void main()
 
       vertexPosition = imageLoad(pointCloudTexture1, currentDepthPixelCoordinates).xyz;
 
-      // MAJOR PROBLEM HERE!
-      // While we appear to have geometry data from both cameras, we do NOT have the color/texture
-      // data from the second camera. That's annoying.
       colorOut = vec4(
         inColor0.r,
         inColor0.g,
-        inColor0.b,
+        127,
         255
       );
     }
@@ -107,10 +104,10 @@ void main()
 
     // Pass along the 'invalid pixel' flag as the alpha channel
     //
-    if (vertexPosition.z == 0.0f)
-    {
-        vertexColor.a = 0.0f;
-    }
+    // if (vertexPosition.z == 0.0f)
+    // {
+    //     vertexColor.a = 0.0f;
+    // }
 
     // NB: This is affecting the second camera. Disabling for now.
     // if (enableShading)
