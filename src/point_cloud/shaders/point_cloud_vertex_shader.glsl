@@ -3,7 +3,7 @@
 #version 430
 
 // NB: It appears that locations need to be wide enough apart, or the colors bleed across locations.
-layout(location=0) in vec4 inColor0;
+layout(location=0) in vec4 inColor;
 //layout(location=10) in vec4 inColor1; // TODO: Get rid of this!
 
 out vec4 vertexColor;
@@ -53,8 +53,8 @@ void main()
 
       colorOut = vec4(
         127,
-        inColor0.g,
-        inColor0.b,
+        inColor.g,
+        inColor.b,
         255
       );
     } else {
@@ -75,8 +75,8 @@ void main()
       vertexPosition = imageLoad(pointCloudTexture1, currentDepthPixelCoordinates).xyz;
 
       colorOut = vec4(
-        inColor0.r,
-        inColor0.g,
+        inColor.r,
+        inColor.g,
         127,
         255
       );

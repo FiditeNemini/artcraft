@@ -43,6 +43,12 @@ impl Buffer {
     }
   }
 
+  pub fn bind_as_array_buffer(&self) {
+    unsafe {
+      gl::BindBuffer(gl::ARRAY_BUFFER, self.id);
+    }
+  }
+
   pub fn gen(&mut self) {
     unsafe {
       gl::GenBuffers(1, &mut self.id);
