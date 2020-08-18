@@ -12,17 +12,18 @@ use std::str;
 use gl;
 use gl::types::*;
 
-use kinect::k4a_sys_wrapper::{Image, Calibration};
-use kinect::k4a_sys_wrapper::ImageFormat;
-use kinect::k4a_sys_wrapper;
-use opengl::compile_shader::compile_shader;
-use opengl::opengl_wrapper::OpenGlError;
-use opengl::opengl_wrapper::Texture;
-use opengl::opengl_wrapper::{Buffer, gl_get_error};
-use point_cloud::pixel_structs::DepthPixel;
 use files::read_file_string_contents::read_file_string_contents;
 use files::write_to_file_from_byte_ptr::write_to_file_from_byte_ptr;
+use kinect::k4a_sys_wrapper::ImageFormat;
+use kinect::k4a_sys_wrapper::{Image, Calibration};
+use kinect::k4a_sys_wrapper;
+use opengl::compile_shader::compile_shader;
+use opengl::wrapper::buffer::Buffer;
+use opengl::wrapper::other_misc_wrapper::OpenGlError;
+use opengl::wrapper::other_misc_wrapper::gl_get_error;
+use opengl::wrapper::texture::Texture;
 use point_cloud::debug::image_proxy::ImageProxy;
+use point_cloud::pixel_structs::DepthPixel;
 
 pub type Result<T> = std::result::Result<T, PointCloudComputeError>;
 

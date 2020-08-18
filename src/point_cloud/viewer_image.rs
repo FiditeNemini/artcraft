@@ -5,9 +5,10 @@ use gl;
 use gl::types::*;
 use libc::uint8_t;
 
-use opengl::opengl_wrapper::OpenGlError;
-use opengl::opengl_wrapper::Texture;
-use opengl::opengl_wrapper::{Buffer, gl_get_error};
+use opengl::wrapper::buffer::Buffer;
+use opengl::wrapper::other_misc_wrapper::OpenGlError;
+use opengl::wrapper::other_misc_wrapper::gl_get_error;
+use opengl::wrapper::texture::Texture;
 use point_cloud::pixel_structs::BgraPixel;
 
 pub type Result<T> = std::result::Result<T, ViewerImageError>;

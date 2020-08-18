@@ -9,19 +9,20 @@ use gl::types::*;
 
 use core_types::RgbaF32;
 use gui::mouse_camera_arcball::MouseCameraArcball;
-use kinect::k4a_sys_wrapper::{Image, Calibration};
 use kinect::k4a_sys_wrapper::ImageFormat;
 use kinect::k4a_sys_wrapper::{Capture, Transformation};
-use opengl::opengl_wrapper::OpenGlError;
-use opengl::opengl_wrapper::{Framebuffer, Renderbuffer, Texture};
+use kinect::k4a_sys_wrapper::{Image, Calibration};
+use opengl::wrapper::other_misc_wrapper::OpenGlError;
+use opengl::wrapper::other_misc_wrapper::{Framebuffer, Renderbuffer};
+use opengl::wrapper::texture::Texture;
+use point_cloud::debug::capture_proxy::CaptureProxy;
+use point_cloud::debug::image_proxy::ImageProxy;
 use point_cloud::gpu_point_cloud_converter::{GpuPointCloudConverter, PointCloudComputeError};
 use point_cloud::pixel_structs::BgraPixel;
 use point_cloud::pixel_structs::DepthPixel;
 use point_cloud::point_cloud_renderer::{PointCloudRenderer, PointCloudRendererError};
 use point_cloud::util::{colorize_depth_blue_to_red, get_depth_mode_range, ValueRange};
 use point_cloud::viewer_image::ViewerImage;
-use point_cloud::debug::image_proxy::ImageProxy;
-use point_cloud::debug::capture_proxy::CaptureProxy;
 
 pub type Result<T> = std::result::Result<T, PointCloudVisualizerError>;
 

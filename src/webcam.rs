@@ -8,7 +8,7 @@ use std::path::Path;
 use gl;
 use gl::types::*;
 
-use opengl::opengl_wrapper::{gl_get_error, OpenGlError};
+use opengl::wrapper::other_misc_wrapper::{gl_get_error, OpenGlError};
 
 /// WebcamWriter uses Webcamoid's akvcam kernel driver to stream output to a /dev/video*
 /// file. Their wiki contains all of the setup instructions, and I'm checked in some example

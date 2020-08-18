@@ -16,18 +16,20 @@ use arcball::ArcballCamera;
 use gl::types::*;
 use gl;
 
-use gui::mouse_camera_arcball::MouseCameraArcball;
-use opengl::compile_shader::compile_shader;
-use opengl::opengl_wrapper::Texture;
-use opengl::opengl_wrapper::{Buffer, gl_get_error, OpenGlError, VertexArray};
-use point_cloud::pixel_structs::BgraPixel;
-use std::time::{SystemTime, UNIX_EPOCH};
-use std::fs::{File, OpenOptions};
-use std::io::{Read, Write};
-use opengl::link_program::link_shader_program;
-use point_cloud::debug::image_proxy::ImageProxy;
 use files::read_file_string_contents::read_file_string_contents;
 use files::write_to_file_from_byte_ptr::write_to_file_from_byte_ptr;
+use gui::mouse_camera_arcball::MouseCameraArcball;
+use opengl::compile_shader::compile_shader;
+use opengl::link_program::link_shader_program;
+use opengl::wrapper::buffer::Buffer;
+use opengl::wrapper::other_misc_wrapper::{gl_get_error, OpenGlError};
+use opengl::wrapper::texture::Texture;
+use opengl::wrapper::vertex_array::VertexArray;
+use point_cloud::debug::image_proxy::ImageProxy;
+use point_cloud::pixel_structs::BgraPixel;
+use std::fs::{File, OpenOptions};
+use std::io::{Read, Write};
+use std::time::{SystemTime, UNIX_EPOCH};
 
 pub type Result<T> = std::result::Result<T, PointCloudRendererError>;
 
