@@ -4,9 +4,7 @@
 
 // NB: It appears that locations need to be wide enough apart, or the colors bleed across locations.
 layout(location=0) in vec4 inColor0;
-layout(location=10) in vec4 inColor1;
-//in vec4 inColor0;
-//in vec4 inColor1;
+//layout(location=10) in vec4 inColor1; // TODO: Get rid of this!
 
 out vec4 vertexColor;
 
@@ -80,9 +78,9 @@ void main()
       // While we appear to have geometry data from both cameras, we do NOT have the color/texture
       // data from the second camera. That's annoying.
       colorOut = vec4(
-        inColor1.r,
-        inColor1.g,
-        inColor1.b,
+        inColor0.r,
+        inColor0.g,
+        inColor0.b,
         255
       );
     }

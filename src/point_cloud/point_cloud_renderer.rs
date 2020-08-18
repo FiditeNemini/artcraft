@@ -6,7 +6,7 @@ use std::fmt::Formatter;
 use std::mem::size_of;
 use std::os::raw::{c_char, c_void};
 use std::path::Path;
-use std::ptr::null;
+use std::ptr::{null, null_mut};
 use std::ptr;
 use std::str;
 use std::sync::{Arc, Mutex};
@@ -63,6 +63,14 @@ impl std::error::Error for PointCloudRendererError {
   }
 }
 
+// TODO: Going to experiment with rendering more things.
+pub struct RenderableObject {
+  vao : GLuint,
+  color_buffer : GLuint,
+  buffered: bool,
+}
+
+
 pub struct PointCloudRenderer {
   num_cameras: usize,
 
@@ -108,6 +116,8 @@ pub struct PointCloudRenderer {
   vertex_color_buffer_objects: Vec<Buffer>,
 
   vertex_attrib_locations: Vec<GLint>,
+
+  renderable_objects: Vec<RenderableObject>,
 }
 
 const fn translation_matrix_4x4(x: f32, y: f32, z: f32) -> [f32; 16] {
@@ -230,6 +240,10 @@ impl PointCloudRenderer {
     let mut vertex_color_buffer_objects = Vec::with_capacity(num_cameras);
     let mut vertex_arrays_size_bytes = Vec::with_capacity(num_cameras);
 
+    // TODO: Holy crap, this might be the problem - not binding after create of VAO
+    // TODO: Holy crap, this might be the problem - not binding after create of VAO
+    // TODO: Holy crap, this might be the problem - not binding after create of VAO
+    // TODO: Holy crap, this might be the problem - not binding after create of VAO
     for _ in 0 .. num_cameras {
       vertex_array_objects.push(VertexArray::new_initialized());
       vertex_color_buffer_objects.push(Buffer::new_initialized());
@@ -240,13 +254,13 @@ impl PointCloudRenderer {
 
     unsafe {
       let location_0 = gl::GetAttribLocation(program_id, ATTRIB_LOCATION_0_PTR);
-      let location_1 = gl::GetAttribLocation(program_id, ATTRIB_LOCATION_1_PTR);
+      //let location_1 = gl::GetAttribLocation(program_id, ATTRIB_LOCATION_1_PTR);
 
       println!("Location0: {}", location_0);
-      println!("Location1: {}", location_1);
+      //println!("Location1: {}", location_1);
 
       vertex_attrib_locations.push(location_0);
-      vertex_attrib_locations.push(location_1);
+      //vertex_attrib_locations.push(location_1);
     }
 
     let initial_view = [
@@ -275,6 +289,7 @@ impl PointCloudRenderer {
       fragment_shader_id,
       point_size: 1,
       enable_shading: false,
+      renderable_objects: Vec::new(),
       vertex_arrays_size_bytes,
       view_index,
       projection_index,
@@ -284,6 +299,41 @@ impl PointCloudRenderer {
       vertex_color_buffer_objects,
       vertex_attrib_locations,
     }
+  }
+
+  ///
+  /// Run once to set up initial rendering
+  ///
+  pub fn setup_rendering(&mut self) {
+
+    /*unsafe {
+      gl::UseProgram(self.shader_program_id);
+
+      for i in 0..self.num_cameras {
+
+        let mut vao: u32  = 0;
+        gl::GenVertexArrays(1, &mut vao);
+
+        println!("Gen Vao: {:?}", vao);
+
+        gl::BindVertexArray(vao);
+
+        let mut color_buffer: u32  = 0;
+        gl::GenBuffers(1, &mut color_buffer);
+
+        println!("Gen Color Buffer: {:?}", color_buffer);
+
+        let renderable_object = RenderableObject {
+          vao,
+          color_buffer,
+          buffered: false,
+        };
+
+        self.renderable_objects.push(renderable_object);
+
+        gl::BindVertexArray(0);
+      }
+    }*/
   }
 
   ///
@@ -313,6 +363,48 @@ impl PointCloudRenderer {
                              color_images: &Vec<ImageProxy>,
                              point_cloud_textures: &Vec<Texture>
   ) -> Result<()> {
+
+    /*
+    for (i, obj) in self.renderable_objects.iter_mut().enumerate() {
+      let color_image_bytes = color_images.get(i).unwrap();
+      let color_image_size_bytes = color_image_bytes.len() as i32;
+
+      unsafe {
+        gl::BindVertexArray(obj.vao);
+        gl::BindBuffer(gl::ARRAY_BUFFER, obj.color_buffer);
+
+        if !obj.buffered {
+          gl::BufferData(
+            gl::ARRAY_BUFFER,
+            color_image_size_bytes as isize,
+            null(),
+            gl::STREAM_DRAW
+          );
+
+          obj.buffered = true;
+        }
+
+        let vertex_mapped_buffer = unsafe {
+          gl::MapBufferRange(
+            gl::ARRAY_BUFFER,
+            0,
+            color_image_size_bytes as isize,
+            gl::MAP_WRITE_BIT | gl::MAP_INVALIDATE_BUFFER_BIT
+          ) as *mut u8
+        };
+
+        std::ptr::copy_nonoverlapping::<u8>(
+          color_image_bytes.as_ptr(),
+          vertex_mapped_buffer,
+          color_image_size_bytes as usize);
+
+        gl::UnmapBuffer(gl::ARRAY_BUFFER);
+        gl::BindBuffer(gl::ARRAY_BUFFER, 0);
+        gl::BindVertexArray(0);
+      }
+    }
+     */
+
     let time = SystemTime::now();
     let time_since_epoch = time.duration_since(UNIX_EPOCH).unwrap();
     let seconds = time_since_epoch.as_secs();
@@ -333,14 +425,14 @@ impl PointCloudRenderer {
       let vertex_color_buffer_object = self.vertex_color_buffer_objects.get(i).unwrap();
       let mut vertex_array_size_bytes = self.vertex_arrays_size_bytes.get_mut(i).unwrap();
 
+      let color_image_bytes = color_images.get(i).unwrap();
+      let color_image_size_bytes = color_image_bytes.len() as i32;
+
       unsafe {
         gl::BindVertexArray(vertex_array_object.id());
         // Vertex Colors
         gl::BindBuffer(gl::ARRAY_BUFFER, vertex_color_buffer_object.id());
       }
-
-      let color_image_bytes = color_images.get(i).unwrap();
-      let color_image_size_bytes = color_image_bytes.len() as i32;
 
       if *vertex_array_size_bytes != color_image_size_bytes {
         println!("Establishing buffer");
@@ -401,7 +493,7 @@ impl PointCloudRenderer {
       //let i = if !swap { j } else { 1 - j }; // (in isolation) PUTS THE IMAGES ON BOTH POINTCLOUD GEOS!?
 
       unsafe {
-        let vertex_attrib_location = self.vertex_attrib_locations.get(i).unwrap();
+        let vertex_attrib_location = self.vertex_attrib_locations.get(0).unwrap();
 
         // NB: Controling these indices change where the color bytes are uploaded
         gl::EnableVertexAttribArray(*vertex_attrib_location as u32);
@@ -547,21 +639,28 @@ impl PointCloudRenderer {
 
       let vertex_array_object = self.vertex_array_objects.get(1).unwrap();
       let vertex_array_size_bytes = self.vertex_arrays_size_bytes.get(1).unwrap();
+      let size = vertex_array_size_bytes / size_of::<BgraPixel>() as i32;
 
       gl::BindVertexArray(vertex_array_object.id());
-      let size = vertex_array_size_bytes / size_of::<BgraPixel>() as i32;
 
       gl::DrawArrays(gl::POINTS, 0, size);
       gl::BindVertexArray(0);
 
       let vertex_array_object = self.vertex_array_objects.get(0).unwrap();
       let vertex_array_size_bytes = self.vertex_arrays_size_bytes.get(0).unwrap();
+      let size = vertex_array_size_bytes / size_of::<BgraPixel>() as i32;
 
       gl::BindVertexArray(vertex_array_object.id());
-      let size = vertex_array_size_bytes / size_of::<BgraPixel>() as i32;
 
       gl::DrawArrays(gl::POINTS, 0, size);
       gl::BindVertexArray(0);
+
+
+      /*for obj in self.renderable_objects.iter() {
+        gl::BindVertexArray(obj.vao);
+        gl::DrawArrays(gl::POINTS, 0, size);
+        gl::BindVertexArray(0);
+      }*/
 
 
       gl_get_error()

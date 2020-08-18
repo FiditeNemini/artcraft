@@ -101,6 +101,8 @@ pub fn run(capture_provider: Arc<CaptureProvider>, calibration_data: Calibration
 
   let mut camera_index = 0;
 
+  visualizer.setup_rendering();
+
   'running: loop {
     use sdl2::event::Event;
     use sdl2::keyboard::Keycode;

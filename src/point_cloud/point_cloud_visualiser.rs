@@ -248,6 +248,12 @@ impl PointCloudVisualizer {
     visualizer
   }
 
+  /// Setup initial rendering
+  ///
+  pub fn setup_rendering(&mut self) {
+    self.point_cloud_renderer.setup_rendering();
+  }
+
   ///
   ///
   ///
