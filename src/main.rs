@@ -18,10 +18,10 @@ extern crate imgui_sdl2;
 extern crate imgui_winit_support;
 extern crate k4a_sys;
 extern crate libc;
-extern crate obj;
 extern crate opencv;
 extern crate rand;
 extern crate sdl2;
+extern crate tobj;
 extern crate winit;
 
 use std::sync::Arc;
@@ -38,6 +38,7 @@ use kinect::capture::fake_device_capturer::FakeDeviceCaptureProvider;
 use kinect::capture::device_capturer::CaptureProvider;
 use clap::{Clap};
 
+pub mod assets;
 pub mod core_types;
 pub mod files;
 pub mod graphics_imgui;

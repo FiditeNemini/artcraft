@@ -28,8 +28,9 @@ use opengl::wrapper::vertex_array::VertexArray;
 use point_cloud::debug::image_proxy::ImageProxy;
 use point_cloud::pixel_structs::BgraPixel;
 use std::fs::{File, OpenOptions};
-use std::io::{Read, Write};
+use std::io::{Read, Write, BufReader};
 use std::time::{SystemTime, UNIX_EPOCH};
+use tobj::load_obj;
 
 pub type Result<T> = std::result::Result<T, PointCloudRendererError>;
 
@@ -286,7 +287,7 @@ impl PointCloudRenderer {
   ///
   /// Run once to set up initial rendering
   ///
-  pub fn setup_rendering(&mut self) {
+  pub fn setup_rendering(&mut self) -> AnyhowResult<()> {
     for _ in 0 .. self.num_cameras {
       let vao = VertexArray::new_initialized();
       vao.bind();
@@ -296,6 +297,24 @@ impl PointCloudRenderer {
       self.vertex_color_buffer_objects.push(buffer);
       self.vertex_arrays_size_bytes.push(0);
     }
+
+    // Extra assets
+
+    // Following model fails in two libraries:
+    //let filename = "/home/bt/dev/storyteller/assets/zelda_oot_n64_logo/N square.obj";
+
+    let filename = "/home/bt/dev/storyteller/assets/n64_smash_bros/pika.obj";
+    let filename = "/home/bt/dev/storyteller/assets/n64_mario64/yoshi.obj";
+
+    // Library 1 (obj-rs)
+    //let bytes = BufReader::new(File::open(filename)?);
+    //let obj: Obj = load_obj_objrs(bytes).unwrap();
+
+    // Library 2 (tobj)
+    //let triangulate_faces = false;
+    //let obj = load_obj(filename, triangulate_faces).unwrap();
+
+    Ok(())
   }
 
   ///

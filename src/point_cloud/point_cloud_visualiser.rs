@@ -7,6 +7,7 @@ use std::sync::{Arc, Mutex};
 
 use gl::types::*;
 
+use anyhow::Result as AnyhowResult;
 use core_types::RgbaF32;
 use gui::mouse_camera_arcball::MouseCameraArcball;
 use kinect::k4a_sys_wrapper::ImageFormat;
@@ -251,8 +252,8 @@ impl PointCloudVisualizer {
 
   /// Setup initial rendering
   ///
-  pub fn setup_rendering(&mut self) {
-    self.point_cloud_renderer.setup_rendering();
+  pub fn setup_rendering(&mut self) -> AnyhowResult<()> {
+    self.point_cloud_renderer.setup_rendering()
   }
 
   ///

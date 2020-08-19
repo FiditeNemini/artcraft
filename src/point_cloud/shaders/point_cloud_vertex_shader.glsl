@@ -44,8 +44,8 @@ void main()
     // We're having to multiplex on gl_VertexID, and I don't think we get double the range for two
     // cameras. This effectively 'downsamples' each camera. We need to find a way to double this.
     // I hate drawing like this
-    if (gl_VertexID < pointCloudLength0) { // TODO - this is the one to enable
-    //if (gl_VertexID %2 == 0) {
+    //if (gl_VertexID < pointCloudLength0) { // TODO - this is the one to enable
+    if (gl_VertexID %2 == 0) {
       // Camera #0
       ivec2 currentDepthPixelCoordinates = ivec2(gl_VertexID % pointCloudSize0.x, gl_VertexID / pointCloudSize0.x);
 
