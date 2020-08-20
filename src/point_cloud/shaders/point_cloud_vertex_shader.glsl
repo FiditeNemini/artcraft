@@ -6,6 +6,11 @@
 layout(location=0) in vec4 inColor;
 //layout(location=10) in vec4 inColor1; // TODO: Get rid of this!
 
+// For use with objects.
+// Might restructure the entire program.
+in vec3 position;
+in vec3 normal;
+
 out vec4 vertexColor;
 
 uniform mat4 view;
@@ -82,12 +87,7 @@ void main()
       );
     }
 
-    //vec3 vertexPosition = imageLoad(pointCloudTexture0, currentDepthPixelCoordinates).xyz;
-    //int pointCloudVertexLength = pointCloudSize.x * pointCloudSize.y;
-
-    //if (gl_VertexID % 2 == 0) {
-    //} else {
-    //}
+    vertexPosition = position;
 
     // Scale up while model view matrices not implemented.
     //vertexPosition.x *= 2.0 + 10.0;
