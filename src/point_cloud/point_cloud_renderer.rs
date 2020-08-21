@@ -32,6 +32,7 @@ use std::io::{Read, Write, BufReader};
 use std::time::{SystemTime, UNIX_EPOCH};
 use tobj::load_obj;
 use assets::obj_loader::{load_wavefront, ExtractedVertex};
+use assets::renderable_object::RenderableObject;
 
 pub type Result<T> = std::result::Result<T, PointCloudRendererError>;
 
@@ -66,96 +67,6 @@ impl std::error::Error for PointCloudRendererError {
     None
   }
 }
-
-// TODO: Going to experiment with rendering more things.
-pub struct RenderableObject {
-  vao : GLuint,
-  color_buffer : GLuint,
-  buffered: bool,
-}
-
-pub struct RenderableObject2 {
-  pub vao: VertexArray,
-  pub vertex_buffer: Buffer,
-  pub normal_buffer: Buffer,
-  pub color_buffer: Buffer,
-  pub texture_coords_buffer: Buffer,
-  pub texture: Texture,
-  pub num_vertices: usize,
-  pub buffered: bool,
-}
-
-impl RenderableObject2 {
-  pub fn new() -> Self {
-    unsafe {
-      let vao = VertexArray::new_initialized();
-      vao.bind();
-
-      let vertex_buffer = Buffer::new_initialized();
-      let normal_buffer = Buffer::new_initialized();
-      let color_buffer = Buffer::new_initialized();
-      let texture_coords_buffer = Buffer::new_initialized();
-      let texture = Texture::new_initialized();
-
-      Self {
-        vao,
-        vertex_buffer,
-        normal_buffer,
-        color_buffer,
-        texture_coords_buffer,
-        texture,
-        num_vertices: 0,
-        buffered: false,
-      }
-    }
-  }
-
-  pub fn load_vertices(&mut self, vertex_data: &Vec<ExtractedVertex>, shader_id: GLuint) {
-    self.vao.bind();
-    self.vertex_buffer.bind_as_array_buffer();
-
-    let size = vertex_data.len() * 3 * size_of::<f32>();
-    let mut vertices : Vec<f32> = Vec::with_capacity(vertex_data.len() * 3);
-
-    for v in vertex_data.into_iter() {
-      vertices.extend(&v.position);
-    }
-
-    self.num_vertices = vertex_data.len();
-
-    println!("Object vertices loaded: {}", vertices.len());
-
-    unsafe {
-      let vertices_ptr = vertices.as_ptr() as *const c_void;
-
-      gl::BufferData(
-        gl::ARRAY_BUFFER,
-        size as isize,
-        vertices_ptr,
-        gl::STATIC_DRAW,
-      );
-
-      let name : CString = CString::new("position").expect("string is correct");
-      let name_ptr : *const c_char = name.as_ptr() as *const c_char;
-
-      let loc = gl::GetAttribLocation(shader_id, name_ptr);
-      println!("Attrib location: {}", loc);
-
-      gl::EnableVertexAttribArray(loc as u32);
-
-      gl::VertexAttribPointer(loc as u32, 3, gl::FLOAT, gl::FALSE, 0, null());
-    }
-  }
-
-  pub fn draw(&self) {
-    self.vao.bind();
-    unsafe {
-      //gl::DrawArrays(gl::TRIANGLES, 0, self.num_vertices as i32);
-      gl::DrawArrays(gl::QUADS, 0, self.num_vertices as i32);
-    }
-  }
-}
-
 
 pub struct PointCloudRenderer {
   num_cameras: usize,
@@ -204,8 +115,7 @@ pub struct PointCloudRenderer {
   /// 'in vec4 inColor'
   color_vertex_attribute_location: GLint,
 
-  renderable_objects: Vec<RenderableObject>,
-  renderable_object: Option<RenderableObject2>
+  renderable_object: Option<RenderableObject>
 }
 
 const fn translation_matrix_4x4(x: f32, y: f32, z: f32) -> [f32; 16] {
@@ -358,7 +268,6 @@ impl PointCloudRenderer {
       fragment_shader_id,
       point_size: 1,
       enable_shading: false,
-      renderable_objects: Vec::new(),
       view_index,
       projection_index,
       enable_shading_index,
@@ -404,7 +313,7 @@ impl PointCloudRenderer {
     let path = Path::new(filename);
     let vertices = load_wavefront(&path)?;
 
-    let mut renderable_object = RenderableObject2::new();
+    let mut renderable_object = RenderableObject::new();
     renderable_object.load_vertices(&vertices, self.shader_program_id);
 
     self.renderable_object = Some(renderable_object);
