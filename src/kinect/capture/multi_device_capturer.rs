@@ -1,8 +1,8 @@
-use kinect::k4a_sys_wrapper::{Device, KinectError, Capture, CaptureError, GetCaptureError, Calibration};
+use crate::kinect::capture::device_capturer::CaptureProvider;
+use crate::kinect::k4a_sys_wrapper::{Device, KinectError, Capture, CaptureError, GetCaptureError, Calibration};
+use crate::point_cloud::debug::capture_proxy::CaptureProxy;
 use std::sync::Arc;
 use std::sync::Mutex;
-use kinect::capture::device_capturer::CaptureProvider;
-use point_cloud::debug::capture_proxy::CaptureProxy;
 
 // Allowing at least 160 microseconds between depth cameras should ensure they do not interfere with one another.
 const MIN_TIME_BETWEEN_DEPTH_CAMERA_PICTURES_USEC : libc::int32_t = 160;

@@ -1,8 +1,8 @@
 use anyhow::Result as AnyhowResult;
-use kinect::capture::device_capturer::CaptureProvider;
-use point_cloud::debug::capture_proxy::CaptureProxy;
-use point_cloud::debug::image_proxy::ImageProxy;
-use kinect::k4a_sys_wrapper::{ImageFormat, Calibration};
+use crate::kinect::capture::device_capturer::CaptureProvider;
+use crate::kinect::k4a_sys_wrapper::{ImageFormat, Calibration};
+use crate::point_cloud::debug::capture_proxy::CaptureProxy;
+use crate::point_cloud::debug::image_proxy::ImageProxy;
 
 pub struct FakeDeviceCaptureProvider {
   num_cameras: usize,

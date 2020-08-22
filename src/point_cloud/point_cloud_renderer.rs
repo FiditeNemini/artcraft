@@ -1,8 +1,28 @@
 //! This is a port of Microsoft's libk4a `k4apointcloudrenderer.cpp`.
 //! This provides the visual output.
 
+use anyhow::Result as AnyhowResult;
+use arcball::ArcballCamera;
+use crate::assets::obj_loader::{load_wavefront, ExtractedVertex};
+use crate::assets::renderable_object::RenderableObject;
+use crate::files::read_file_string_contents::read_file_string_contents;
+use crate::files::write_to_file_from_byte_ptr::write_to_file_from_byte_ptr;
+use crate::gui::mouse_camera_arcball::MouseCameraArcball;
+use crate::opengl::compile_shader::compile_shader;
+use crate::opengl::link_program::link_shader_program;
+use crate::opengl::wrapper::buffer::Buffer;
+use crate::opengl::wrapper::other_misc_wrapper::{gl_get_error, OpenGlError};
+use crate::opengl::wrapper::texture::Texture;
+use crate::opengl::wrapper::vertex_array::VertexArray;
+use crate::point_cloud::debug::image_proxy::ImageProxy;
+use crate::point_cloud::pixel_structs::BgraPixel;
+use gl::types::*;
+use gl;
+use gltf::Gltf;
 use std::ffi::CString;
 use std::fmt::Formatter;
+use std::fs::{File, OpenOptions};
+use std::io::{Read, Write, BufReader};
 use std::mem::size_of;
 use std::os::raw::{c_char, c_void};
 use std::path::Path;
@@ -10,30 +30,8 @@ use std::ptr::{null, null_mut};
 use std::ptr;
 use std::str;
 use std::sync::{Arc, Mutex};
-
-use anyhow::Result as AnyhowResult;
-use arcball::ArcballCamera;
-use gl::types::*;
-use gl;
-
-use files::read_file_string_contents::read_file_string_contents;
-use files::write_to_file_from_byte_ptr::write_to_file_from_byte_ptr;
-use gui::mouse_camera_arcball::MouseCameraArcball;
-use opengl::compile_shader::compile_shader;
-use opengl::link_program::link_shader_program;
-use opengl::wrapper::buffer::Buffer;
-use opengl::wrapper::other_misc_wrapper::{gl_get_error, OpenGlError};
-use opengl::wrapper::texture::Texture;
-use opengl::wrapper::vertex_array::VertexArray;
-use point_cloud::debug::image_proxy::ImageProxy;
-use point_cloud::pixel_structs::BgraPixel;
-use std::fs::{File, OpenOptions};
-use std::io::{Read, Write, BufReader};
 use std::time::{SystemTime, UNIX_EPOCH};
 use tobj::load_obj;
-use assets::obj_loader::{load_wavefront, ExtractedVertex};
-use assets::renderable_object::RenderableObject;
-use gltf::Gltf;
 
 pub type Result<T> = std::result::Result<T, PointCloudRendererError>;
 

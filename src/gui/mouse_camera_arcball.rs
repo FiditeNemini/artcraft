@@ -1,9 +1,9 @@
 use arcball::ArcballCamera;
-use cgmath::{Matrix4, Vector2};
 use cgmath::Vector3;
+use cgmath::{Matrix4, Vector2};
+use crate::gui::enhanced_window::CompleteMouseState;
 use sdl2::event::Event;
 use sdl2::mouse::MouseButton;
-use gui::enhanced_window::CompleteMouseState;
 
 const MIN_ZOOM : f32 = 1.0;
 const MAX_ZOOM : f32 = 120.0;

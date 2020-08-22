@@ -1,10 +1,10 @@
 use anyhow::Result as AnyhowResult;
-use kinect::k4a_sys_wrapper;
-use point_cloud::debug::image_proxy::ImageProxy;
+use crate::kinect::k4a_sys_wrapper::CaptureError;
+use crate::kinect::k4a_sys_wrapper;
+use crate::point_cloud::debug::image_proxy::ImageProxy;
+use std::path::Path;
 use std::sync::{RwLock, Mutex, PoisonError, MutexGuard, Arc};
 use winit::event::VirtualKeyCode::Mute;
-use kinect::k4a_sys_wrapper::CaptureError;
-use std::path::Path;
 
 /// Store either a wrapped capture, or a k4a Capture.
 /// Useful for debugging.

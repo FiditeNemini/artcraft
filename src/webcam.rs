@@ -1,14 +1,12 @@
-use std::{fmt, io};
+use crate::opengl::wrapper::other_misc_wrapper::{gl_get_error, OpenGlError};
+use gl::types::*;
+use gl;
 use std::ffi::c_void;
 use std::fmt::Formatter;
 use std::fs::{File, OpenOptions};
 use std::io::Write;
 use std::path::Path;
-
-use gl;
-use gl::types::*;
-
-use opengl::wrapper::other_misc_wrapper::{gl_get_error, OpenGlError};
+use std::{fmt, io};
 
 /// WebcamWriter uses Webcamoid's akvcam kernel driver to stream output to a /dev/video*
 /// file. Their wiki contains all of the setup instructions, and I'm checked in some example

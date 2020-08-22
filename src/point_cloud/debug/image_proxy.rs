@@ -1,12 +1,12 @@
 use anyhow::Result as AnyhowResult;
+use crate::files::write_to_file_from_byte_ptr::write_to_file_from_byte_ptr;
+use crate::kinect::k4a_sys_wrapper::ImageFormat;
+use crate::kinect::k4a_sys_wrapper;
 use k4a_sys;
-use kinect::k4a_sys_wrapper;
 use std::fs::File;
 use std::fs;
 use std::io::Read;
-use kinect::k4a_sys_wrapper::ImageFormat;
 use std::ptr::null_mut;
-use files::write_to_file_from_byte_ptr::write_to_file_from_byte_ptr;
 
 /// Store either raw bytes, or wrap a k4a::Image
 /// This is meant to be plumbed through the system instead of a k4a::Image (depth or color image)

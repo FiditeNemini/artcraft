@@ -1,11 +1,9 @@
-use std::sync::Arc;
-use std::sync::Mutex;
-
+use crate::image_debug::depth_to_image;
+use crate::kinect::k4a_sys_wrapper::{Capture, Device};
 use image::DynamicImage;
 use opencv::prelude::*;
-
-use image_debug::depth_to_image;
-use kinect::k4a_sys_wrapper::{Capture, Device};
+use std::sync::Arc;
+use std::sync::Mutex;
 
 /** Self-locking holder of Capture objects. */
 pub struct CaptureProvider {

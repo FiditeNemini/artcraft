@@ -1,22 +1,19 @@
-use std::path::Path;
-use std::sync::{Arc, Mutex, PoisonError, MutexGuard};
-use std::time::{Instant, Duration};
-
 use crate::ProgramArgs;
-
+use crate::core_types::RgbaF32;
+use crate::gui::enhanced_window::EnhancedWindow;
+use crate::gui::mouse_camera_arcball::MouseCameraArcball;
+use crate::kinect::capture::device_capturer::CaptureProvider;
+use crate::kinect::k4a_sys_wrapper::Calibration;
+use crate::point_cloud::pixel_structs::BgraPixel;
+use crate::point_cloud::point_cloud_visualiser::{ColorizationStrategy, PointCloudVisualizer, PointCloudVisualizerError};
+use crate::point_cloud::viewer_image::ViewerImage;
+use crate::webcam::WebcamWriter;
 use gl;
 use imgui::*;
 use imgui::Image;
-
-use core_types::RgbaF32;
-use gui::enhanced_window::EnhancedWindow;
-use gui::mouse_camera_arcball::MouseCameraArcball;
-use kinect::capture::device_capturer::CaptureProvider;
-use kinect::k4a_sys_wrapper::Calibration;
-use point_cloud::pixel_structs::BgraPixel;
-use point_cloud::point_cloud_visualiser::{ColorizationStrategy, PointCloudVisualizer, PointCloudVisualizerError};
-use point_cloud::viewer_image::ViewerImage;
-use webcam::WebcamWriter;
+use std::path::Path;
+use std::sync::{Arc, Mutex, PoisonError, MutexGuard};
+use std::time::{Instant, Duration};
 
 pub fn run(capture_provider: Arc<CaptureProvider>, calibration_data: Calibration, program_args: ProgramArgs) {
   let mut webcam_writer = None;

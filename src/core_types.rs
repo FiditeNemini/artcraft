@@ -40,7 +40,7 @@ impl RgbaF32 {
 
 #[cfg(test)]
 mod test {
-  use core_types::RgbaF32;
+  use crate::core_types::RgbaF32;
 
   #[test]
   pub fn test_rgbaf32() {

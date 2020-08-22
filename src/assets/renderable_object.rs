@@ -1,9 +1,9 @@
 use anyhow::Result as AnyhowResult;
-use assets::obj_loader::{ExtractedVertex, load_wavefront};
+use crate::assets::obj_loader::{ExtractedVertex, load_wavefront};
+use crate::opengl::wrapper::buffer::Buffer;
+use crate::opengl::wrapper::texture::Texture;
+use crate::opengl::wrapper::vertex_array::VertexArray;
 use gl::types::*;
-use opengl::wrapper::buffer::Buffer;
-use opengl::wrapper::texture::Texture;
-use opengl::wrapper::vertex_array::VertexArray;
 use std::ffi::{c_void, CString};
 use std::mem::size_of;
 use std::os::raw::c_char;

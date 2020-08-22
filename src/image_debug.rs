@@ -1,23 +1,21 @@
 //! Format conversion
 //! k4a frames, image-rs, opencv, OpenGL textures, etc.
 
-use std::mem::size_of;
-use std::slice;
-
+use crate::kinect::k4a_sys_wrapper::Image;
+use crate::kinect::k4a_sys_wrapper;
+use crate::point_cloud::pixel_structs::{BgraPixel, DepthPixel};
 use glium::texture::RawImage2d;
 use image::DynamicImage;
-use image::error::{ImageFormatHint, UnsupportedError};
-use image::flat::{FlatSamples, SampleLayout};
 use image::GenericImage;
 use image::ImageBuffer;
 use image::ImageError;
 use image::Rgba;
 use image::RgbaImage;
+use image::error::{ImageFormatHint, UnsupportedError};
+use image::flat::{FlatSamples, SampleLayout};
 use opencv::prelude::*;
-
-use kinect::k4a_sys_wrapper;
-use kinect::k4a_sys_wrapper::Image;
-use point_cloud::pixel_structs::{BgraPixel, DepthPixel};
+use std::mem::size_of;
+use std::slice;
 
 // https://docs.rs/image/0.23.2/image/flat/index.html
 pub fn depth_to_image(image: &Image) -> Result<DynamicImage, ImageError> {
