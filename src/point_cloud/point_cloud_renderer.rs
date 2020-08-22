@@ -32,6 +32,7 @@ use std::str;
 use std::sync::{Arc, Mutex};
 use std::time::{SystemTime, UNIX_EPOCH};
 use tobj::load_obj;
+use crate::assets::positionable_object::PositionableObject;
 
 pub type Result<T> = std::result::Result<T, PointCloudRendererError>;
 
@@ -114,7 +115,7 @@ pub struct PointCloudRenderer {
   /// 'in vec4 inColor'
   color_vertex_attribute_location: GLint,
 
-  renderable_object: Option<RenderableObject>
+  renderable_object: Option<PositionableObject>
 }
 
 const fn translation_matrix_4x4(x: f32, y: f32, z: f32) -> [f32; 16] {
@@ -309,7 +310,9 @@ impl PointCloudRenderer {
     let renderable_object = RenderableObject::from_wavefront(
       &path, self.shader_program_id)?;
 
-    self.renderable_object = Some(renderable_object);
+    let mut positionable_object = PositionableObject::new(renderable_object);
+
+    self.renderable_object = Some(positionable_object);
 
     /*let filename = "/home/bt/dev/storyteller/assets/vr_staircase/scene.gltf";
     let gltf = Gltf::open(filename)?;
@@ -477,7 +480,7 @@ impl PointCloudRenderer {
       gl::BindVertexArray(0);
 
       if let Some(ref renderable) = self.renderable_object {
-        renderable.draw();
+        renderable.draw(self.shader_program_id);
       }
 
       gl_get_error()
