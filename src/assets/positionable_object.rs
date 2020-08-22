@@ -52,14 +52,18 @@ impl PositionableObject {
   }
 
   pub fn draw(&self, model_transform_id: Uniform) {
-      let mut transformation = Matrix4::identity();
-      transformation.append_nonuniform_scaling_mut(&self.scale);
-      transformation.append_translation_mut(&self.translation);
+    let mut transformation = Matrix4::identity();
+    let rotation = Matrix4::from_euler_angles(self.rotation.x, self.rotation.y, self.rotation.z);
 
-      //println!("matrix: {:?}", transformation);
-      //println!("translation: {:?}", &self.translation);
+    transformation.append_nonuniform_scaling_mut(&self.scale);
+    transformation = transformation * rotation;
+    transformation.append_translation_mut(&self.translation);
 
-      let mat_ptr = transformation.as_ptr();
+
+    //println!("matrix: {:?}", transformation);
+    //println!("translation: {:?}", &self.translation);
+
+    let mat_ptr = transformation.as_ptr();
 
     unsafe {
       gl::UniformMatrix4fv(model_transform_id.id(), 1, gl::FALSE, mat_ptr);

@@ -324,8 +324,8 @@ impl PointCloudRenderer {
 
     let mut positionable_object = PositionableObject::new(renderable_object);
 
-    positionable_object.translate(0.0, 0.0, 5.0);
-    positionable_object.rotate(180.0, 0.0, 50.0);
+    positionable_object.translate(0.0, 0.0, 15.0);
+    positionable_object.rotate(10.0, 8.0, 50.0);
     positionable_object.scale(2.0, 1.0, 0.5);
 
     self.renderable_object = Some(positionable_object);
