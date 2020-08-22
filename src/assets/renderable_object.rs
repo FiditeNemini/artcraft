@@ -1,4 +1,5 @@
-use assets::obj_loader::ExtractedVertex;
+use anyhow::Result as AnyhowResult;
+use assets::obj_loader::{ExtractedVertex, load_wavefront};
 use gl::types::*;
 use opengl::wrapper::buffer::Buffer;
 use opengl::wrapper::texture::Texture;
@@ -6,6 +7,7 @@ use opengl::wrapper::vertex_array::VertexArray;
 use std::ffi::{c_void, CString};
 use std::mem::size_of;
 use std::os::raw::c_char;
+use std::path::Path;
 use std::ptr::null;
 
 /// A collection of all the graphics-related data to render: vertices, normals, etc.
@@ -43,6 +45,15 @@ impl RenderableObject {
         buffered: false,
       }
     }
+  }
+
+  pub fn from_wavefront(path: &Path, shader_id: GLuint) -> AnyhowResult<Self> {
+    let vertices = load_wavefront(&path)?;
+
+    let mut renderable_object = RenderableObject::new();
+    renderable_object.load_vertices(&vertices, shader_id);
+
+    Ok(renderable_object)
   }
 
   pub fn load_vertices(&mut self, vertex_data: &Vec<ExtractedVertex>, shader_id: GLuint) {
@@ -85,8 +96,7 @@ impl RenderableObject {
   pub fn draw(&self) {
     self.vao.bind();
     unsafe {
-      //gl::DrawArrays(gl::TRIANGLES, 0, self.num_vertices as i32);
-      gl::DrawArrays(gl::QUADS, 0, self.num_vertices as i32);
+      gl::DrawArrays(gl::TRIANGLES, 0, self.num_vertices as i32);
     }
   }
 }

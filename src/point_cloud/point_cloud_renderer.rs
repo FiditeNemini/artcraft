@@ -33,6 +33,7 @@ use std::time::{SystemTime, UNIX_EPOCH};
 use tobj::load_obj;
 use assets::obj_loader::{load_wavefront, ExtractedVertex};
 use assets::renderable_object::RenderableObject;
+use gltf::Gltf;
 
 pub type Result<T> = std::result::Result<T, PointCloudRendererError>;
 
@@ -299,24 +300,27 @@ impl PointCloudRenderer {
     // Following model fails in two libraries:
     //let filename = "/home/bt/dev/storyteller/assets/zelda_oot_n64_logo/N square.obj";
 
-    let filename = "/home/bt/dev/storyteller/assets/n64_smash_bros/pika.obj";
+    //let filename = "/home/bt/dev/storyteller/assets/gamecube_ssbm_pichu/Pichu/pichu.obj"; // CRASH!
+    //let filename = "/home/bt/dev/storyteller/assets/level_n64_mario64_whomps_fortress/WF.obj"; // DOESN'T WORK?
+    let filename = "/home/bt/dev/storyteller/assets/gamecube_ssbm_pichu/Pichu/singletex/pichu.obj";
+    let filename = "/home/bt/dev/storyteller/assets/n64_smash_bros/pika.obj"; // MISSHAPEN!
+    let filename = "/home/bt/dev/storyteller/assets/n64_pokemon_snap_bulbasaur/Bulbasaur/bulbasaur.obj";
     let filename = "/home/bt/dev/storyteller/assets/n64_mario64/yoshi.obj";
 
-    // Library 1 (obj-rs)
-    //let bytes = BufReader::new(File::open(filename)?);
-    //let obj: Obj = load_obj_objrs(bytes).unwrap();
-
-    // Library 2 (tobj)
-    //let triangulate_faces = false;
-    //let obj = load_obj(filename, triangulate_faces).unwrap();
-
     let path = Path::new(filename);
-    let vertices = load_wavefront(&path)?;
-
-    let mut renderable_object = RenderableObject::new();
-    renderable_object.load_vertices(&vertices, self.shader_program_id);
+    let renderable_object = RenderableObject::from_wavefront(
+      &path, self.shader_program_id)?;
 
     self.renderable_object = Some(renderable_object);
+
+    /*let filename = "/home/bt/dev/storyteller/assets/vr_staircase/scene.gltf";
+    let gltf = Gltf::open(filename)?;
+    for ref scene in gltf.scenes() {
+      println!("Scene: {}", scene.index());
+      for ref node in scene.nodes() {
+        println!("Node: {} children: {}", node.index(), node.children().count());
+      }
+    }*/
 
     Ok(())
   }

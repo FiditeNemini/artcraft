@@ -23,6 +23,7 @@ extern crate rand;
 extern crate sdl2;
 extern crate tobj;
 extern crate winit;
+extern crate gltf;
 
 use std::sync::Arc;
 use std::thread;
