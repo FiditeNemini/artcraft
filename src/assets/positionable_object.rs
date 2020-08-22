@@ -15,6 +15,7 @@ pub struct PositionableObject {
 
   pub rotation_typed: Rotation3<f32>,
   pub translation_typed: Translation3<f32>,
+  pub is_transformed: bool,
 }
 
 impl PositionableObject {
@@ -27,6 +28,7 @@ impl PositionableObject {
       translation: Vector3::default(),
       rotation_typed: Rotation3::identity(),
       translation_typed: Translation3::identity(),
+      is_transformed: true,
     }
   }
 
@@ -48,32 +50,40 @@ impl PositionableObject {
     self.translation.z = z;
   }
 
-  pub fn get_transformation(&self) -> Matrix4<f32> {
+  /*pub fn get_transformation(&self) -> Matrix4<f32> {
     let mut transformation = Matrix4::identity();
     //let transformation = transformation * &self.scale;
     //transformation.append_nonuniform_scaling(&self.scale);
     //transformation.append_translation(&self.translation);
     transformation
-  }
+  }*/
 
-  pub fn get_transformation_for_shader(&self) -> *const f32 {
+  /*pub fn get_transformation_for_shader(&self) -> *const GLfloat {
     let transformation = self.get_transformation();
     transformation.as_ptr()
-  }
+  }*/
 
-  pub fn draw(&self, shader_id: GLuint) {
+  pub fn draw(&self, model_view_uniform_id: GLint) {
     unsafe {
-      let name : CString = CString::new("view").expect("string is correct");
-      let name_ptr : *const c_char = name.as_ptr() as *const c_char;
+      //let name : CString = CString::new("view").expect("string is correct");
+      //let name_ptr : *const c_char = name.as_ptr() as *const c_char;
 
-      let loc = gl::GetUniformLocation(shader_id, name_ptr);
-      println!("uniform location: {}", loc);
+      //let loc = gl::GetUniformLocation(shader_id, name_ptr);
+      //println!("uniform location: {}", loc);
 
-      println!("matrix: {:?}", self.get_transformation());
+      //let mat_ptr = self.get_transformation_for_shader();
 
-      let mat_ptr = self.get_transformation_for_shader();
+      //;gl::UniformMatrix4fv(loc, 1, gl::TRUE, mat_ptr);
 
-      //gl::UniformMatrix4fv(loc, 1, gl::TRUE, mat_ptr);
+      let mut transformation = Matrix4::identity();
+      transformation.append_translation_mut(&self.translation);
+
+      println!("matrix: {:?}", transformation);
+      println!("translation: {:?}", &self.translation);
+
+      let mat_ptr = transformation.as_ptr();
+
+      gl::UniformMatrix4fv(model_view_uniform_id, 1, gl::FALSE, mat_ptr);
     }
 
     self.renderable_object.draw();

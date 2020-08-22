@@ -33,6 +33,7 @@ use std::sync::{Arc, Mutex};
 use std::time::{SystemTime, UNIX_EPOCH};
 use tobj::load_obj;
 use crate::assets::positionable_object::PositionableObject;
+use cgmath::{Matrix4, SquareMatrix, Matrix};
 
 pub type Result<T> = std::result::Result<T, PointCloudRendererError>;
 
@@ -88,6 +89,10 @@ pub struct PointCloudRenderer {
   view_matrix: [[f32; 4]; 4],
   projection_matrix: [[f32; 4]; 4],
 
+  /// Matrix applied to each model
+  /// If a model doesn't set its own, it defaults to identity matrix
+  default_model_view_matrix: [[f32; 4]; 4],
+
   /// Renderer setting: size of the rendered points
   point_size: u8,
 
@@ -102,6 +107,9 @@ pub struct PointCloudRenderer {
 
   /// Uniform location in the shader program.
   projection_index: GLint,
+
+  /// Uniform location in the shader program.
+  model_view_index: GLint,
 
   /// Uniform location in the shader program.
   enable_shading_index: GLint,
@@ -193,6 +201,10 @@ impl PointCloudRenderer {
     let PROJECTION_PTR : *const c_char = PROJECTION.as_ptr() as *const c_char;
 
     /// Uniform variable name in OpenGL shader program
+    let MODEL_VIEW : CString = CString::new("modelView").expect("string is correct");
+    let MODEL_VIEW_PTR : *const c_char = MODEL_VIEW.as_ptr() as *const c_char;
+
+    /// Uniform variable name in OpenGL shader program
     let ENABLE_SHADING : CString = CString::new("enableShading").expect("string is correct");
     let ENABLE_SHADING_PTR : *const c_char = ENABLE_SHADING.as_ptr() as *const c_char;
 
@@ -210,6 +222,7 @@ impl PointCloudRenderer {
 
     let mut view_index = 0;
     let mut projection_index = 0;
+    let mut model_view_index = 0;
     let mut enable_shading_index = 0;
 
     unsafe {
@@ -219,6 +232,7 @@ impl PointCloudRenderer {
       // FIXME: THe 'view' and 'projection' uniforms are not binding for some reason.
       view_index = gl::GetUniformLocation(program_id, VIEW_PTR);
       projection_index = gl::GetUniformLocation(program_id, PROJECTION_PTR);
+      model_view_index = gl::GetUniformLocation(program_id, MODEL_VIEW_PTR);
       enable_shading_index = gl::GetUniformLocation(program_id, ENABLE_SHADING_PTR);
       // TODO: This is hardcoded to 2
       point_cloud_texture_indices.push(gl::GetUniformLocation(program_id, POINT_CLOUD_0_PTR));
@@ -256,6 +270,13 @@ impl PointCloudRenderer {
       [0.0,        0.0,      -0.2002,  0.0],
     ];
 
+    let default_model_view_matrix= [
+      [1.0,  0.0,  0.0,  0.0],
+      [0.0,  1.0,  0.0,  0.0],
+      [0.0,  0.0,  1.0,  0.0],
+      [0.0,  0.0,  0.0,  1.0],
+    ];
+
     Self {
       num_cameras,
       arcball_camera: arcball,
@@ -263,6 +284,7 @@ impl PointCloudRenderer {
       projection: initial_projection_matrix_4x4(),
       view_matrix: initial_view,
       projection_matrix: initial_projection,
+      default_model_view_matrix,
       shader_program_id: program_id,
       vertex_shader_id,
       fragment_shader_id,
@@ -270,6 +292,7 @@ impl PointCloudRenderer {
       enable_shading: false,
       view_index,
       projection_index,
+      model_view_index,
       enable_shading_index,
       point_cloud_texture_indices,
       vertex_array_objects: Vec::with_capacity(num_cameras),
@@ -311,6 +334,9 @@ impl PointCloudRenderer {
       &path, self.shader_program_id)?;
 
     let mut positionable_object = PositionableObject::new(renderable_object);
+
+    positionable_object.translate(0.0, 0.0, 50.0);
+    positionable_object.rotate(180.0, 0.0, 50.0);
 
     self.renderable_object = Some(positionable_object);
 
@@ -462,6 +488,24 @@ impl PointCloudRenderer {
       let typed_view = self.view_matrix.as_ptr() as *const GLfloat;
       gl::UniformMatrix4fv(self.view_index, 1, gl::FALSE, typed_view);
 
+
+      let mut use_default_model_view = true;
+
+      if let Some(ref renderable) = self.renderable_object {
+        if renderable.is_transformed {
+          //let mut transformation : Matrix4<f32> = Matrix4::identity();
+          //let typed_model_view = transformation.as_ptr();
+          //gl::UniformMatrix4fv(self.model_view_index, 1, gl::FALSE, typed_model_view);
+
+          use_default_model_view = false;
+        }
+      }
+
+      if use_default_model_view {
+        let typed_model_view = self.default_model_view_matrix.as_ptr() as *const GLfloat;
+        gl::UniformMatrix4fv(self.model_view_index, 1, gl::FALSE, typed_model_view);
+      }
+
       // Update render settings in shader
       let _enable_shading = if self.enable_shading { 1 } else { 0 };
       let enable_shading = 0; // TODO FIXME FIXME FIXME
@@ -480,7 +524,7 @@ impl PointCloudRenderer {
       gl::BindVertexArray(0);
 
       if let Some(ref renderable) = self.renderable_object {
-        renderable.draw(self.shader_program_id);
+        renderable.draw(self.model_view_index);
       }
 
       gl_get_error()
