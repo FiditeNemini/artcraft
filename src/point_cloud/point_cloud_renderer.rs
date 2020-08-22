@@ -202,10 +202,6 @@ impl PointCloudRenderer {
     let PROJECTION_PTR : *const c_char = PROJECTION.as_ptr() as *const c_char;
 
     /// Uniform variable name in OpenGL shader program
-    let MODEL_VIEW : CString = CString::new("modelView").expect("string is correct");
-    let MODEL_VIEW_PTR : *const c_char = MODEL_VIEW.as_ptr() as *const c_char;
-
-    /// Uniform variable name in OpenGL shader program
     let ENABLE_SHADING : CString = CString::new("enableShading").expect("string is correct");
     let ENABLE_SHADING_PTR : *const c_char = ENABLE_SHADING.as_ptr() as *const c_char;
 
@@ -238,7 +234,7 @@ impl PointCloudRenderer {
       point_cloud_texture_indices.push(gl::GetUniformLocation(program_id, POINT_CLOUD_1_PTR));
     }
 
-    let model_transform = Uniform::lookup(program_id, MODEL_VIEW_PTR).unwrap();
+    let model_transform = Uniform::lookup("modelView", program_id).unwrap();
 
     let color_vertex_attribute_location = unsafe {
       let location = gl::GetAttribLocation(program_id, COLOR_LOCATION_PTR);
