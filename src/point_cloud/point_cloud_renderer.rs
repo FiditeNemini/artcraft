@@ -34,6 +34,7 @@ use std::time::{SystemTime, UNIX_EPOCH};
 use tobj::load_obj;
 use crate::assets::positionable_object::PositionableObject;
 use cgmath::{Matrix4, SquareMatrix, Matrix};
+use crate::opengl::wrapper::uniform::Uniform;
 
 pub type Result<T> = std::result::Result<T, PointCloudRendererError>;
 
@@ -109,7 +110,7 @@ pub struct PointCloudRenderer {
   projection_index: GLint,
 
   /// Uniform location in the shader program.
-  model_view_index: GLint,
+  model_transform_id: Uniform,
 
   /// Uniform location in the shader program.
   enable_shading_index: GLint,
@@ -222,7 +223,6 @@ impl PointCloudRenderer {
 
     let mut view_index = 0;
     let mut projection_index = 0;
-    let mut model_view_index = 0;
     let mut enable_shading_index = 0;
 
     unsafe {
@@ -232,12 +232,13 @@ impl PointCloudRenderer {
       // FIXME: THe 'view' and 'projection' uniforms are not binding for some reason.
       view_index = gl::GetUniformLocation(program_id, VIEW_PTR);
       projection_index = gl::GetUniformLocation(program_id, PROJECTION_PTR);
-      model_view_index = gl::GetUniformLocation(program_id, MODEL_VIEW_PTR);
       enable_shading_index = gl::GetUniformLocation(program_id, ENABLE_SHADING_PTR);
       // TODO: This is hardcoded to 2
       point_cloud_texture_indices.push(gl::GetUniformLocation(program_id, POINT_CLOUD_0_PTR));
       point_cloud_texture_indices.push(gl::GetUniformLocation(program_id, POINT_CLOUD_1_PTR));
     }
+
+    let model_transform = Uniform::lookup(program_id, MODEL_VIEW_PTR).unwrap();
 
     let color_vertex_attribute_location = unsafe {
       let location = gl::GetAttribLocation(program_id, COLOR_LOCATION_PTR);
@@ -292,7 +293,7 @@ impl PointCloudRenderer {
       enable_shading: false,
       view_index,
       projection_index,
-      model_view_index,
+      model_transform_id: model_transform,
       enable_shading_index,
       point_cloud_texture_indices,
       vertex_array_objects: Vec::with_capacity(num_cameras),
@@ -503,7 +504,7 @@ impl PointCloudRenderer {
 
       if use_default_model_view {
         let typed_model_view = self.default_model_view_matrix.as_ptr() as *const GLfloat;
-        gl::UniformMatrix4fv(self.model_view_index, 1, gl::FALSE, typed_model_view);
+        gl::UniformMatrix4fv(self.model_transform_id.id(), 1, gl::FALSE, typed_model_view);
       }
 
       // Update render settings in shader
@@ -524,7 +525,7 @@ impl PointCloudRenderer {
       gl::BindVertexArray(0);
 
       if let Some(ref renderable) = self.renderable_object {
-        renderable.draw(self.model_view_index);
+        renderable.draw(self.model_transform_id);
       }
 
       gl_get_error()

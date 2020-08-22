@@ -3,6 +3,7 @@ use gl::types::*;
 use nalgebra::{Vector4, Rotation3, Translation3, Matrix4, Vector3};
 use std::ffi::CString;
 use std::os::raw::c_char;
+use crate::opengl::wrapper::uniform::Uniform;
 
 pub struct PositionableObject {
   pub renderable_object: RenderableObject,
@@ -63,8 +64,7 @@ impl PositionableObject {
     transformation.as_ptr()
   }*/
 
-  pub fn draw(&self, model_view_uniform_id: GLint) {
-    unsafe {
+  pub fn draw(&self, model_transform_id: Uniform) {
       //let name : CString = CString::new("view").expect("string is correct");
       //let name_ptr : *const c_char = name.as_ptr() as *const c_char;
 
@@ -83,7 +83,8 @@ impl PositionableObject {
 
       let mat_ptr = transformation.as_ptr();
 
-      gl::UniformMatrix4fv(model_view_uniform_id, 1, gl::FALSE, mat_ptr);
+    unsafe {
+      gl::UniformMatrix4fv(model_transform_id.id(), 1, gl::FALSE, mat_ptr);
     }
 
     self.renderable_object.draw();
