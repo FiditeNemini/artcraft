@@ -225,7 +225,7 @@ impl PointCloudVisualizer {
       m_dimensions_width: width,
       m_dimensions_height: height,
       enable_color_point_cloud,
-      point_cloud_renderer: PointCloudRenderer::new(num_cameras, arcball_camera.clone()),
+      point_cloud_renderer: PointCloudRenderer::new(num_cameras, arcball_camera.clone()).expect("should build"),
       point_cloud_converters,
       frame_buffer: Framebuffer::new_initialized(),
       depth_buffer,

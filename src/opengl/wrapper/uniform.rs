@@ -1,4 +1,5 @@
 use anyhow::Result as AnyhowResult;
+use anyhow::bail;
 use gl::types::*;
 use std::os::raw::c_char;
 use std::ffi::CString;
@@ -17,6 +18,10 @@ impl Uniform {
     let mut loc = -1;
     unsafe {
       loc = gl::GetUniformLocation(opengl_program_id, id_cstr_ptr);
+    }
+
+    if loc < 0 {
+      bail!("Couldn't find uniform named '{}' in OpenGL program {}.", identifier, opengl_program_id);
     }
 
     Ok(Self {

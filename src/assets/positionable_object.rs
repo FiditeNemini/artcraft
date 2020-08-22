@@ -24,7 +24,7 @@ impl PositionableObject {
   pub fn new(renderable_object: RenderableObject) -> Self {
     Self {
       renderable_object,
-      scale: Vector3::default(),
+      scale: Vector3::new(1.0, 1.0, 1.0),
       rotation: Vector4::default(),
       translation: Vector3::default(),
       rotation_typed: Rotation3::identity(),
@@ -51,35 +51,13 @@ impl PositionableObject {
     self.translation.z = z;
   }
 
-  /*pub fn get_transformation(&self) -> Matrix4<f32> {
-    let mut transformation = Matrix4::identity();
-    //let transformation = transformation * &self.scale;
-    //transformation.append_nonuniform_scaling(&self.scale);
-    //transformation.append_translation(&self.translation);
-    transformation
-  }*/
-
-  /*pub fn get_transformation_for_shader(&self) -> *const GLfloat {
-    let transformation = self.get_transformation();
-    transformation.as_ptr()
-  }*/
-
   pub fn draw(&self, model_transform_id: Uniform) {
-      //let name : CString = CString::new("view").expect("string is correct");
-      //let name_ptr : *const c_char = name.as_ptr() as *const c_char;
-
-      //let loc = gl::GetUniformLocation(shader_id, name_ptr);
-      //println!("uniform location: {}", loc);
-
-      //let mat_ptr = self.get_transformation_for_shader();
-
-      //;gl::UniformMatrix4fv(loc, 1, gl::TRUE, mat_ptr);
-
       let mut transformation = Matrix4::identity();
+      transformation.append_nonuniform_scaling_mut(&self.scale);
       transformation.append_translation_mut(&self.translation);
 
-      println!("matrix: {:?}", transformation);
-      println!("translation: {:?}", &self.translation);
+      //println!("matrix: {:?}", transformation);
+      //println!("translation: {:?}", &self.translation);
 
       let mat_ptr = transformation.as_ptr();
 

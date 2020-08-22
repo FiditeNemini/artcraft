@@ -104,10 +104,10 @@ pub struct PointCloudRenderer {
   vertex_arrays_size_bytes: Vec<GLsizei>,
 
   /// Uniform location in the shader program.
-  view_index: GLint,
+  view_transform_id: Uniform,
 
   /// Uniform location in the shader program.
-  projection_index: GLint,
+  projection_transform_id: Uniform,
 
   /// Uniform location in the shader program.
   model_transform_id: Uniform,
@@ -176,7 +176,7 @@ const fn initial_projection_matrix_4x4() -> [f32; 16] {
 
 impl PointCloudRenderer {
 
-  pub fn new(num_cameras: usize, arcball: Arc<Mutex<MouseCameraArcball>>) -> Self {
+  pub fn new(num_cameras: usize, arcball: Arc<Mutex<MouseCameraArcball>>) -> AnyhowResult<Self> {
     unsafe {
       gl::Enable(gl::PROGRAM_POINT_SIZE);
     }
@@ -192,14 +192,6 @@ impl PointCloudRenderer {
     let fragment_shader_id = compile_shader(&point_cloud_fragment_shader, gl::FRAGMENT_SHADER);
 
     link_shader_program(program_id, vertex_shader_id, fragment_shader_id);
-
-    /// Uniform variable name in OpenGL shader program
-    let VIEW : CString = CString::new("view").expect("string is correct");
-    let VIEW_PTR : *const c_char = VIEW.as_ptr() as *const c_char;
-
-    /// Uniform variable name in OpenGL shader program
-    let PROJECTION : CString = CString::new("projection").expect("string is correct");
-    let PROJECTION_PTR : *const c_char = PROJECTION.as_ptr() as *const c_char;
 
     /// Uniform variable name in OpenGL shader program
     let ENABLE_SHADING : CString = CString::new("enableShading").expect("string is correct");
@@ -226,15 +218,15 @@ impl PointCloudRenderer {
       // program, if name starts with the reserved prefix "gl_", or if name is associated with an
       // atomic counter or a named uniform block.
       // FIXME: THe 'view' and 'projection' uniforms are not binding for some reason.
-      view_index = gl::GetUniformLocation(program_id, VIEW_PTR);
-      projection_index = gl::GetUniformLocation(program_id, PROJECTION_PTR);
       enable_shading_index = gl::GetUniformLocation(program_id, ENABLE_SHADING_PTR);
       // TODO: This is hardcoded to 2
       point_cloud_texture_indices.push(gl::GetUniformLocation(program_id, POINT_CLOUD_0_PTR));
       point_cloud_texture_indices.push(gl::GetUniformLocation(program_id, POINT_CLOUD_1_PTR));
     }
 
-    let model_transform = Uniform::lookup("modelView", program_id).unwrap();
+    let model_transform = Uniform::lookup("model", program_id)?;
+    let view_transform = Uniform::lookup("view", program_id)?;
+    let projection_transform = Uniform::lookup("projection", program_id)?;
 
     let color_vertex_attribute_location = unsafe {
       let location = gl::GetAttribLocation(program_id, COLOR_LOCATION_PTR);
@@ -274,7 +266,7 @@ impl PointCloudRenderer {
       [0.0,  0.0,  0.0,  1.0],
     ];
 
-    Self {
+    Ok(Self {
       num_cameras,
       arcball_camera: arcball,
       view: initial_view_matrix_4x4(),
@@ -287,8 +279,8 @@ impl PointCloudRenderer {
       fragment_shader_id,
       point_size: 1,
       enable_shading: false,
-      view_index,
-      projection_index,
+      view_transform_id: view_transform,
+      projection_transform_id: projection_transform,
       model_transform_id: model_transform,
       enable_shading_index,
       point_cloud_texture_indices,
@@ -297,7 +289,7 @@ impl PointCloudRenderer {
       vertex_color_buffer_objects: Vec::with_capacity(num_cameras),
       color_vertex_attribute_location,
       renderable_object: None,
-    }
+    })
   }
 
   ///
@@ -332,8 +324,9 @@ impl PointCloudRenderer {
 
     let mut positionable_object = PositionableObject::new(renderable_object);
 
-    positionable_object.translate(0.0, 0.0, 50.0);
+    positionable_object.translate(0.0, 0.0, 5.0);
     positionable_object.rotate(180.0, 0.0, 50.0);
+    positionable_object.scale(2.0, 1.0, 0.5);
 
     self.renderable_object = Some(positionable_object);
 
@@ -480,11 +473,10 @@ impl PointCloudRenderer {
 
       // Update view/projection matrices in shader
       let typed_projection = self.projection_matrix.as_ptr() as *const GLfloat;
-      gl::UniformMatrix4fv(self.projection_index, 1, gl::FALSE, typed_projection);
+      gl::UniformMatrix4fv(self.projection_transform_id.id(), 1, gl::FALSE, typed_projection);
 
       let typed_view = self.view_matrix.as_ptr() as *const GLfloat;
-      gl::UniformMatrix4fv(self.view_index, 1, gl::FALSE, typed_view);
-
+      gl::UniformMatrix4fv(self.view_transform_id.id(), 1, gl::FALSE, typed_view);
 
       let mut use_default_model_view = true;
 

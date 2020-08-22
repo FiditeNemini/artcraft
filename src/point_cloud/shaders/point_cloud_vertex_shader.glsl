@@ -13,7 +13,8 @@ in vec3 normal;
 
 out vec4 vertexColor;
 
-uniform mat4 modelView;
+// Transformation matrices
+uniform mat4 model;
 uniform mat4 view;
 uniform mat4 projection;
 
@@ -100,7 +101,7 @@ void main()
       vertexPosition.y -= 2.0;
     }
 
-    gl_Position = projection * view * modelView * vec4(vertexPosition, 1);
+    gl_Position = projection * view * model * vec4(vertexPosition, 1);
     vertexColor = colorOut;
 
     // Pass along the 'invalid pixel' flag as the alpha channel
