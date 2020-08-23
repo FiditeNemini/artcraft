@@ -35,6 +35,7 @@ use tobj::load_obj;
 use crate::assets::positionable_object::PositionableObject;
 use cgmath::{Matrix4, SquareMatrix, Matrix};
 use crate::opengl::wrapper::uniform::Uniform;
+use crate::opengl::matrices::{initial_projection_matrix_4x4_flat, initial_view_matrix_4x4_flat, identity_matrix_4x4, initial_view_matrix_4x4, initial_projection_matrix_4x4};
 
 pub type Result<T> = std::result::Result<T, PointCloudRendererError>;
 
@@ -127,52 +128,6 @@ pub struct PointCloudRenderer {
   renderable_objects: Vec<PositionableObject>
 }
 
-const fn translation_matrix_4x4(x: f32, y: f32, z: f32) -> [f32; 16] {
-  return [
-    1.0, 0.0, 0.0, x,
-    0.0, 1.0, 0.0, y,
-    0.0, 0.0, 1.0, z,
-    0.0, 0.0, 0.0, 1.0,
-  ];
-}
-
-const fn identity_matrix_4x4() -> [f32; 16] {
-  return [
-    1.0, 0.0, 0.0, 0.0,
-    0.0, 1.0, 0.0, 0.0,
-    0.0, 0.0, 1.0, 0.0,
-    0.0, 0.0, 0.0, 1.0,
-  ];
-}
-
-const fn zero_matrix_4x4() -> [f32; 16] {
-  return [
-    0.0, 0.0, 0.0, 0.0,
-    0.0, 0.0, 0.0, 0.0,
-    0.0, 0.0, 0.0, 0.0,
-    0.0, 0.0, 0.0, 0.0,
-  ];
-}
-
-/// This is the view matrix k4aviewer starts with
-const fn initial_view_matrix_4x4() -> [f32; 16] {
-  return [
-    -1.0,         0.0,    8.74228e-08, 0.0,
-    0.0,          1.0,    0.0,         0.0,
-    -8.74228e-08, 0.0,    -1.0,        0.0,
-    2.62268e-07,  1.0,    -5.0,        1.0,
-  ];
-}
-
-/// This is the projection matrix k4aviewer starts with
-const fn initial_projection_matrix_4x4() -> [f32; 16] {
-  return [
-    1.41272,    0.0,      0.0,      0.0,
-    0.0,        1.56969,  0.0,      0.0,
-    0.0,        0.0,      -1.002,   -1.0,
-    0.0,        0.0,      -0.2002,  0.0,
-  ];
-}
 
 impl PointCloudRenderer {
 
@@ -245,35 +200,14 @@ impl PointCloudRenderer {
       location
     };
 
-    let initial_view = [
-      [-1.0,         0.0,    8.74228e-08, 0.0],
-      [0.0,          1.0,    0.0,         0.0],
-      [-8.74228e-08, 0.0,    -1.0,        0.0],
-      [2.62268e-07,  1.0,    -5.0,        1.0],
-    ];
-
-    let initial_projection = [
-      [1.41272,    0.0,      0.0,      0.0],
-      [0.0,        1.56969,  0.0,      0.0],
-      [0.0,        0.0,      -1.002,   -1.0],
-      [0.0,        0.0,      -0.2002,  0.0],
-    ];
-
-    let default_model_view_matrix= [
-      [1.0,  0.0,  0.0,  0.0],
-      [0.0,  1.0,  0.0,  0.0],
-      [0.0,  0.0,  1.0,  0.0],
-      [0.0,  0.0,  0.0,  1.0],
-    ];
-
     Ok(Self {
       num_cameras,
       arcball_camera: arcball,
-      view: initial_view_matrix_4x4(),
-      projection: initial_projection_matrix_4x4(),
-      view_matrix: initial_view,
-      projection_matrix: initial_projection,
-      default_model_view_matrix,
+      view: initial_view_matrix_4x4_flat(),
+      projection: initial_projection_matrix_4x4_flat(),
+      view_matrix: initial_view_matrix_4x4(),
+      projection_matrix: initial_projection_matrix_4x4(),
+      default_model_view_matrix: identity_matrix_4x4(),
       shader_program_id: program_id,
       vertex_shader_id,
       fragment_shader_id,
@@ -365,19 +299,7 @@ impl PointCloudRenderer {
   ///
   pub fn update_view_projection(&mut self, view: [[f32; 4]; 4], _projection: [[f32; 4]; 4]) {
     self.view_matrix = view;
-    //self.projection_matrix = projection;
-
-    let initial_projection = [
-      [1.41272,    0.0,      0.0,      0.0],
-      [0.0,        1.56969,  0.0,      0.0],
-      [0.0,        0.0,      -1.002,   -1.0],
-      [0.0,        0.0,      -0.2002,  0.0],
-    ];
-
-    // Initial: [[1.41272,    0.0, 0.0, 0.0], [0.0, 1.56969,   0.0, 0.0], [0.0, 0.0, -1.002,    -1.0],       [0.0, 0.0, -0.2002, 0.0]]
-    // Updated: [[0.88294804, 0.0, 0.0, 0.0], [0.0, 1.5696855, 0.0, 0.0], [0.0, 0.0, -1.002002, -0.2002002], [0.0, 0.0, -1.0,    0.0]]
-
-    self.projection_matrix = initial_projection;
+    self.projection_matrix = initial_projection_matrix_4x4();
   }
 
   ///
