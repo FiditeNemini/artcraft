@@ -320,8 +320,13 @@ impl PointCloudRenderer {
       let filename = "/home/bt/dev/storyteller/assets/gamecube_ssbm_pichu/Pichu/singletex/pichu.obj";
 
       let path = Path::new(filename);
-      let renderable_object = RenderableObject::from_wavefront(
+      let mut renderable_object = RenderableObject::from_wavefront(
         &path, self.shader_program_id)?;
+
+      let filename = "/home/bt/dev/storyteller/assets/gamecube_ssbm_pichu/Pichu/singletex/pichu.png";
+
+      renderable_object.load_texture(filename, &self.object_texture_uniform)?;
+
 
       let mut positionable_object = PositionableObject::new(renderable_object);
 

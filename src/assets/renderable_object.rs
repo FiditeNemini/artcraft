@@ -137,11 +137,7 @@ impl RenderableObject {
   pub fn load_texture(&mut self, filename: &str, texture_uniform: &Uniform) -> AnyhowResult<()> {
     let img = image::open(&filename)?;
 
-    let rgba_image = if let DynamicImage::ImageRgba8(img) = img {
-      img
-    } else {
-      bail!("Wrong image format.");
-    };
+    let rgba_image= img.to_rgba();
 
     let width = rgba_image.width();
     let height = rgba_image.height();
@@ -150,6 +146,8 @@ impl RenderableObject {
     let pixel_data = flat_samples.samples.as_ptr() as *const c_void;
 
     self.texture.bind_as_texture_2d();
+
+    println!("Loading texture into OpenGL {}x{}...", width, height);
 
     unsafe {
       gl::TexParameteri(gl::TEXTURE_2D, gl::TEXTURE_MIN_FILTER, gl::LINEAR as i32);
@@ -171,6 +169,7 @@ impl RenderableObject {
 
       println!("texture uniform: {}", texture_uniform.id());
 
+      // TODO: This is in my OpenGL program, but is broken here.
       //gl::Uniform1i(texture_uniform.id(), 0);
 
       gl::ActiveTexture(gl::TEXTURE0);
