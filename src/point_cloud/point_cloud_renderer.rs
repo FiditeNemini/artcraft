@@ -124,7 +124,7 @@ pub struct PointCloudRenderer {
   /// 'in vec4 inColor'
   color_vertex_attribute_location: GLint,
 
-  renderable_object: Option<PositionableObject>
+  renderable_objects: Vec<PositionableObject>
 }
 
 const fn translation_matrix_4x4(x: f32, y: f32, z: f32) -> [f32; 16] {
@@ -288,7 +288,7 @@ impl PointCloudRenderer {
       vertex_arrays_size_bytes : Vec::with_capacity(num_cameras),
       vertex_color_buffer_objects: Vec::with_capacity(num_cameras),
       color_vertex_attribute_location,
-      renderable_object: None,
+      renderable_objects: Vec::new(),
     })
   }
 
@@ -316,19 +316,37 @@ impl PointCloudRenderer {
     let filename = "/home/bt/dev/storyteller/assets/gamecube_ssbm_pichu/Pichu/singletex/pichu.obj";
     let filename = "/home/bt/dev/storyteller/assets/n64_smash_bros/pika.obj"; // MISSHAPEN!
     let filename = "/home/bt/dev/storyteller/assets/n64_pokemon_snap_bulbasaur/Bulbasaur/bulbasaur.obj";
-    let filename = "/home/bt/dev/storyteller/assets/n64_mario64/yoshi.obj";
 
-    let path = Path::new(filename);
-    let renderable_object = RenderableObject::from_wavefront(
-      &path, self.shader_program_id)?;
+    {
+      let filename = "/home/bt/dev/storyteller/assets/n64_mario64/yoshi.obj";
 
-    let mut positionable_object = PositionableObject::new(renderable_object);
+      let path = Path::new(filename);
+      let renderable_object = RenderableObject::from_wavefront(
+        &path, self.shader_program_id)?;
 
-    positionable_object.translate(0.0, 0.0, 15.0);
-    positionable_object.rotate(10.0, 8.0, 50.0);
-    positionable_object.scale(2.0, 1.0, 0.5);
+      let mut positionable_object = PositionableObject::new(renderable_object);
 
-    self.renderable_object = Some(positionable_object);
+      positionable_object.translate(0.0, 0.0, 15.0);
+      positionable_object.rotate(10.0, 8.0, 50.0);
+      positionable_object.scale_nonuniform(2.0, 1.0, 0.5);
+
+      self.renderable_objects.push(positionable_object);
+    }
+
+    {
+      let filename = "/home/bt/dev/storyteller/assets/gamecube_ssbm_pichu/Pichu/singletex/pichu.obj";
+
+      let path = Path::new(filename);
+      let renderable_object = RenderableObject::from_wavefront(
+        &path, self.shader_program_id)?;
+
+      let mut positionable_object = PositionableObject::new(renderable_object);
+
+      positionable_object.translate(6.0, 6.0, 20.0);
+      positionable_object.scale(0.05);
+
+      self.renderable_objects.push(positionable_object);
+    }
 
     /*let filename = "/home/bt/dev/storyteller/assets/vr_staircase/scene.gltf";
     let gltf = Gltf::open(filename)?;
@@ -478,22 +496,9 @@ impl PointCloudRenderer {
       let typed_view = self.view_matrix.as_ptr() as *const GLfloat;
       gl::UniformMatrix4fv(self.view_transform_id.id(), 1, gl::FALSE, typed_view);
 
-      let mut use_default_model_view = true;
-
-      if let Some(ref renderable) = self.renderable_object {
-        if renderable.is_transformed {
-          //let mut transformation : Matrix4<f32> = Matrix4::identity();
-          //let typed_model_view = transformation.as_ptr();
-          //gl::UniformMatrix4fv(self.model_view_index, 1, gl::FALSE, typed_model_view);
-
-          use_default_model_view = false;
-        }
-      }
-
-      if use_default_model_view {
-        let typed_model_view = self.default_model_view_matrix.as_ptr() as *const GLfloat;
-        gl::UniformMatrix4fv(self.model_transform_id.id(), 1, gl::FALSE, typed_model_view);
-      }
+      // Default model transform
+      let typed_model_view = self.default_model_view_matrix.as_ptr() as *const GLfloat;
+      gl::UniformMatrix4fv(self.model_transform_id.id(), 1, gl::FALSE, typed_model_view);
 
       // Update render settings in shader
       let _enable_shading = if self.enable_shading { 1 } else { 0 };
@@ -512,9 +517,10 @@ impl PointCloudRenderer {
 
       gl::BindVertexArray(0);
 
-      if let Some(ref renderable) = self.renderable_object {
-        renderable.draw(self.model_transform_id);
+      for positionable in self.renderable_objects.iter() {
+        positionable.draw(self.model_transform_id);
       }
+
 
       gl_get_error()
           .map_err(|err| PointCloudRendererError::OpenGlError(err))

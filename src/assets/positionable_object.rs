@@ -39,15 +39,45 @@ impl PositionableObject {
     self.rotation.z = z;
   }
 
-  pub fn scale(&mut self, x: f32, y: f32, z: f32) {
+  pub fn rotate_x(&mut self, x: f32) {
+    self.rotation.x = x;
+  }
+
+  pub fn rotate_y(&mut self, y: f32) {
+    self.rotation.y = y;
+  }
+
+  pub fn rotate_z(&mut self, z: f32) {
+    self.rotation.z = z;
+  }
+
+  pub fn scale_nonuniform(&mut self, x: f32, y: f32, z: f32) {
     self.scale.x = x;
     self.scale.y = y;
     self.scale.z = z;
   }
 
+  pub fn scale(&mut self, scale: f32) {
+    self.scale.x = scale;
+    self.scale.y = scale;
+    self.scale.z = scale;
+  }
+
   pub fn translate(&mut self, x: f32, y: f32, z: f32) {
     self.translation.x = x;
     self.translation.y = y;
+    self.translation.z = z;
+  }
+
+  pub fn translate_x(&mut self, x: f32) {
+    self.translation.x = x;
+  }
+
+  pub fn translate_y(&mut self, y: f32) {
+    self.translation.y = y;
+  }
+
+  pub fn translate_z(&mut self, z: f32) {
     self.translation.z = z;
   }
 
@@ -58,7 +88,6 @@ impl PositionableObject {
     transformation.append_nonuniform_scaling_mut(&self.scale);
     transformation = transformation * rotation;
     transformation.append_translation_mut(&self.translation);
-
 
     //println!("matrix: {:?}", transformation);
     //println!("translation: {:?}", &self.translation);
