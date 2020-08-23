@@ -43,6 +43,12 @@ impl Texture {
     }
   }
 
+  pub fn bind_as_texture_2d(&self) {
+    unsafe {
+      gl::BindTexture(gl::TEXTURE_2D, self.id);
+    }
+  }
+
   fn gen(&mut self) {
     unsafe {
       gl::GenTextures(1, &mut self.id);

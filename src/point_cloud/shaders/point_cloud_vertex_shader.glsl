@@ -11,6 +11,9 @@ layout(location=0) in vec4 inColor;
 in vec3 position;
 in vec3 normal;
 
+in vec2 vTextureCoord;
+out vec2 texCoord;
+
 out vec4 vertexColor;
 
 // Transformation matrices
@@ -103,6 +106,9 @@ void main()
 
     gl_Position = projection * view * model * vec4(vertexPosition, 1);
     vertexColor = colorOut;
+
+
+    texCoord = vTextureCoord;
 
     // Pass along the 'invalid pixel' flag as the alpha channel
     //

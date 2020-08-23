@@ -31,11 +31,13 @@ use std::ptr;
 use std::str;
 use std::sync::{Arc, Mutex};
 use std::time::{SystemTime, UNIX_EPOCH};
-use tobj::load_obj;
+use tobj::{load_obj, load_mtl};
 use crate::assets::positionable_object::PositionableObject;
 use cgmath::{Matrix4, SquareMatrix, Matrix};
 use crate::opengl::wrapper::uniform::Uniform;
 use crate::opengl::matrices::{initial_projection_matrix_4x4_flat, initial_view_matrix_4x4_flat, identity_matrix_4x4, initial_view_matrix_4x4, initial_projection_matrix_4x4};
+use image::DynamicImage;
+use crate::opengl::wrapper::attribute::Attribute;
 
 pub type Result<T> = std::result::Result<T, PointCloudRendererError>;
 
@@ -113,6 +115,12 @@ pub struct PointCloudRenderer {
   /// Uniform location in the shader program.
   model_transform_id: Uniform,
 
+  /// Uniform for object textures in the shader program.
+  object_texture_uniform: Uniform,
+
+  /// Location of the texture coordinate input
+  texture_coordinates_attribute: Attribute,
+
   /// Uniform location in the shader program.
   enable_shading_index: GLint,
 
@@ -183,6 +191,10 @@ impl PointCloudRenderer {
     let view_transform = Uniform::lookup("view", program_id)?;
     let projection_transform = Uniform::lookup("projection", program_id)?;
 
+    let object_texture_uniform = Uniform::lookup("objTexture", program_id)?;
+
+    let texture_coordinate_attribute = Attribute::lookup("vTextureCoord", program_id)?;
+
     let color_vertex_attribute_location = unsafe {
       let location = gl::GetAttribLocation(program_id, COLOR_LOCATION_PTR);
 
@@ -211,6 +223,8 @@ impl PointCloudRenderer {
       shader_program_id: program_id,
       vertex_shader_id,
       fragment_shader_id,
+      object_texture_uniform,
+      texture_coordinates_attribute: texture_coordinate_attribute,
       point_size: 1,
       enable_shading: false,
       view_transform_id: view_transform,
@@ -255,8 +269,13 @@ impl PointCloudRenderer {
       let filename = "/home/bt/dev/storyteller/assets/n64_mario64/yoshi.obj";
 
       let path = Path::new(filename);
-      let renderable_object = RenderableObject::from_wavefront(
+      let mut renderable_object = RenderableObject::from_wavefront(
         &path, self.shader_program_id)?;
+
+
+      let filename = "/home/bt/dev/storyteller/assets/n64_mario64/yoshi_grp.png";
+
+      renderable_object.load_texture(filename, &self.object_texture_uniform)?;
 
       let mut positionable_object = PositionableObject::new(renderable_object);
 
@@ -265,6 +284,36 @@ impl PointCloudRenderer {
       positionable_object.scale_nonuniform(2.0, 1.0, 0.5);
 
       self.renderable_objects.push(positionable_object);
+
+      /*let filename = "/home/bt/dev/storyteller/assets/n64_mario64/yoshi.mtl";
+
+      let (materials, unknown) = load_mtl(filename)?;
+
+      for material in materials.iter() {
+        println!("name {:?}", material.name);
+        println!("am {:?}", material.ambient_texture);
+        println!("norm {:?}", material.normal_texture);
+        println!("dis {:?}", material.dissolve_texture);
+      }
+
+      for (k, v) in unknown.iter() {
+        println!("k: {:?}", k);
+        println!("v: {:?}", v);
+      }*/
+
+      /*let filename = "/home/bt/dev/storyteller/assets/n64_mario64/yoshi_grp.png";
+
+      let img = image::open(&filename)?;
+
+      if let DynamicImage::ImageRgba8(img) = img {
+        println!("Image rgba8");
+
+        let flat_samples = img.into_flat_samples();
+        let ptr = flat_samples.samples.as_ptr();
+      }*/
+
+
+
     }
 
     {

@@ -11,6 +11,7 @@ pub struct ExtractedVertex {
   pub normal: [f32; 3],
   pub color_diffuse: [f32; 3],
   pub color_specular: [f32; 4],
+  pub tex_coords: [f32; 2], // [u, v]
 }
 
 /// Returns a vertex buffer that should be rendered as `TrianglesList`.
@@ -20,7 +21,7 @@ pub fn load_wavefront(path: &Path) -> AnyhowResult<Vec<ExtractedVertex>>
   //-> (VertexBufferAny, f32)
 {
   // TODO: This appears to be one of two hooks for the data to be uploaded to OpenGL
-  implement_vertex!(ExtractedVertex, position, normal, color_diffuse, color_specular);
+  implement_vertex!(ExtractedVertex, position, normal, color_diffuse, color_specular, tex_coords);
 
   let mut min_pos = [f32::INFINITY; 3];
   let mut max_pos = [f32::NEG_INFINITY; 3];
@@ -31,14 +32,17 @@ pub fn load_wavefront(path: &Path) -> AnyhowResult<Vec<ExtractedVertex>>
   // Just upload the first object in the group
   for model in &models {
     let mesh = &model.mesh;
-    println!("Uploading model: {}", model.name);
+    //println!("Uploading model: {}", model.name);
+
     for idx in &mesh.indices {
       let i = *idx as usize;
+
       let pos = [
         mesh.positions[3 * i],
         mesh.positions[3 * i + 1],
         mesh.positions[3 * i + 2],
       ];
+
       let normal = if !mesh.normals.is_empty() {
         [
           mesh.normals[3 * i],
@@ -48,6 +52,17 @@ pub fn load_wavefront(path: &Path) -> AnyhowResult<Vec<ExtractedVertex>>
       } else {
         [0.0, 0.0, 0.0]
       };
+
+      let tex_coords = if !mesh.texcoords.is_empty() {
+        // texcoord = [u, v];
+        [
+          mesh.texcoords[i * 2],
+          mesh.texcoords[i * 2 + 1]
+        ]
+      } else {
+        [0.0, 0.0]
+      };
+
       let (color_diffuse, color_specular) = match mesh.material_id {
         Some(i) => (
           mats[i].diffuse,
@@ -60,12 +75,15 @@ pub fn load_wavefront(path: &Path) -> AnyhowResult<Vec<ExtractedVertex>>
         ),
         None => ([0.8, 0.8, 0.8], [0.15, 0.15, 0.15, 15.0]),
       };
+
       vertex_data.push(ExtractedVertex {
         position: pos,
         normal: normal,
         color_diffuse: color_diffuse,
         color_specular: color_specular,
+        tex_coords: tex_coords,
       });
+
       // Update our min/max pos so we can figure out the bounding box of the object
       // to view it
       for i in 0..3 {

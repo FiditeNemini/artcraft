@@ -22,7 +22,7 @@ glfw = "0.37.0" # GL framework - windows, contexts, devices
 glfw-sys = "3.3.2" # Does this have linear algebra?
 glium = { version = "0.26.0", default-features = true } # high-level OpenGL abstraction (*not* vanilla OpenGL)
 gltf = "0.15.2" # glTF loader (more modern OBJ)
-image = "0.23.2"
+image = "0.23.8" # all the image formats
 imgui = "0.3.0" # OpenGL windowing toolkit (experimental bindings)
 imgui-glium-renderer = "0.3.0"
 imgui-opengl-renderer = "0.7.0"
