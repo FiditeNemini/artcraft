@@ -135,18 +135,20 @@ impl RenderableObject {
     }
   }
 
+  // TODO: Option for 'rgb'/'rgba'
+  // TODO: Option to flip texture on any axis
   pub fn load_texture(&mut self, filename: &str, texture_uniform: &Uniform) -> AnyhowResult<()> {
     let img = image::open(&filename)?;
 
-    let mut rgb_image= img.to_rgb();
+    let mut rgba_image= img.to_rgba();
 
     //let rgb_image : RgbImage = flip_horizontal(&rgb_image);
-    let rgb_image : RgbImage = flip_vertical(&rgb_image);
+    let rgba_image : RgbaImage = flip_vertical(&rgba_image);
 
-    let width = rgb_image.width();
-    let height = rgb_image.height();
+    let width = rgba_image.width();
+    let height = rgba_image.height();
 
-    let img_data = rgb_image.into_raw();
+    let img_data = rgba_image.into_raw();
     let pixel_data = img_data.as_ptr() as *const c_void;
 
     self.texture.bind_as_texture_2d();
@@ -169,11 +171,11 @@ impl RenderableObject {
       gl::TexImage2D(
         gl::TEXTURE_2D,
         0, // image level (mipmap); 0 is base
-        gl::RGB as i32, // internal format
+        gl::RGBA as i32, // internal format
         width as i32,
         height as i32,
         0, // border; "must be 0"
-        gl::RGB, // format of pixels
+        gl::RGBA, // format of pixels
         gl::UNSIGNED_BYTE, // pixel data type
         pixel_data,
       );
@@ -201,9 +203,6 @@ impl RenderableObject {
         pixels_ptr,
       );
       */
-
-
-
 
       gl::GenerateMipmap(gl::TEXTURE_2D);
 
