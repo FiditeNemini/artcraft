@@ -153,6 +153,15 @@ impl RenderableObject {
       gl::TexParameteri(gl::TEXTURE_2D, gl::TEXTURE_MIN_FILTER, gl::LINEAR as i32);
       gl::TexParameteri(gl::TEXTURE_2D, gl::TEXTURE_MAG_FILTER, gl::LINEAR as i32);
 
+      //gl::TexParameteri(gl::TEXTURE_2D, gl::TEXTURE_WRAP_S, gl::REPEAT as i32);
+      //gl::TexParameteri(gl::TEXTURE_2D, gl::TEXTURE_WRAP_T, gl::REPEAT as i32);
+      gl::TexParameteri(gl::TEXTURE_2D, gl::TEXTURE_WRAP_S, gl::CLAMP_TO_BORDER as i32);
+      gl::TexParameteri(gl::TEXTURE_2D, gl::TEXTURE_WRAP_T, gl::CLAMP_TO_BORDER as i32);
+
+      let border_color : Vec<f32> = vec![0.0, 1.0, 0.0, 1.0];
+      let border_color_ptr = border_color.as_ptr() as *const f32;
+      gl::TexParameterfv(gl::TEXTURE_2D, gl::TEXTURE_BORDER_COLOR, border_color_ptr);
+
       gl::TexImage2D(
         gl::TEXTURE_2D,
         0, // image level (mipmap); 0 is base
@@ -164,6 +173,33 @@ impl RenderableObject {
         gl::UNSIGNED_BYTE, // pixel data type
         pixel_data,
       );
+
+      /*
+      // Checkerboard texture.
+      let pixels : Vec<f32> = vec![
+        0.0, 0.0, 0.0, 1.0,
+        1.0, 1.0, 1.0, 1.0,
+        0.0, 0.0, 0.0, 1.0,
+        1.0, 1.0, 1.0, 1.0,
+      ];
+
+      let pixels_ptr = pixels.as_ptr() as *const c_void;
+
+      gl::TexImage2D(
+        gl::TEXTURE_2D,
+        0, // image level (mipmap); 0 is base
+        gl::RGBA as i32, // internal format
+        2,
+        2,
+        0, // border; "must be 0"
+        gl::RGBA, // format of pixels
+        gl::FLOAT, // pixel data type
+        pixels_ptr,
+      );
+      */
+
+
+
 
       gl::GenerateMipmap(gl::TEXTURE_2D);
 
