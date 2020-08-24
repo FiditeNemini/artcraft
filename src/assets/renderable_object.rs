@@ -142,8 +142,11 @@ impl RenderableObject {
     let width = rgba_image.width();
     let height = rgba_image.height();
 
-    let flat_samples = rgba_image.into_flat_samples();
-    let pixel_data = flat_samples.samples.as_ptr() as *const c_void;
+    //let flat_samples = rgba_image.into_flat_samples();
+    //let pixel_data = flat_samples.samples.as_ptr() as *const c_void;
+
+    let img_data = rgba_image.into_raw();
+    let pixel_data = img_data.as_ptr() as *const c_void;
 
     self.texture.bind_as_texture_2d();
 

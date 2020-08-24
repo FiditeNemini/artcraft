@@ -1,6 +1,6 @@
 use crate::assets::renderable_object::RenderableObject;
 use gl::types::*;
-use nalgebra::{Vector4, Rotation3, Translation3, Matrix4, Vector3};
+use nalgebra::{Vector4, Rotation3, Translation3, Matrix4, Vector3, RealField};
 use std::ffi::CString;
 use std::os::raw::c_char;
 use crate::opengl::wrapper::uniform::Uniform;
@@ -49,6 +49,21 @@ impl PositionableObject {
 
   pub fn rotate_z(&mut self, z: f32) {
     self.rotation.z = z;
+  }
+
+  /// Add pi to x rotation
+  pub fn flip_x(&mut self) {
+    self.rotation.x += f32::pi();
+  }
+
+  /// Add pi to y rotation
+  pub fn flip_y(&mut self) {
+    self.rotation.y += f32::pi();
+  }
+
+  /// Add pi to z rotation
+  pub fn flip_z(&mut self) {
+    self.rotation.z += f32::pi();
   }
 
   pub fn scale_nonuniform(&mut self, x: f32, y: f32, z: f32) {

@@ -279,8 +279,9 @@ impl PointCloudRenderer {
 
       let mut positionable_object = PositionableObject::new(renderable_object);
 
-      positionable_object.translate(0.0, 0.0, 15.0);
-      positionable_object.rotate(10.0, 8.0, 50.0);
+      positionable_object.translate(-5.0, 0.0, 15.0);
+      positionable_object.flip_y(); // flipping y and z rights the model.
+      positionable_object.flip_z();
       positionable_object.scale_nonuniform(2.0, 1.0, 0.5);
 
       self.renderable_objects.push(positionable_object);
@@ -330,7 +331,9 @@ impl PointCloudRenderer {
 
       let mut positionable_object = PositionableObject::new(renderable_object);
 
-      positionable_object.translate(6.0, 6.0, 20.0);
+      positionable_object.translate(5.0, 2.0, 20.0);
+      positionable_object.flip_y(); // flipping y and z rights the model.
+      positionable_object.flip_z();
       positionable_object.scale(0.05);
 
       self.renderable_objects.push(positionable_object);
