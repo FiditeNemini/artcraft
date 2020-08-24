@@ -138,25 +138,9 @@ impl RenderableObject {
     let img = image::open(&filename)?;
 
     let mut rgba_image= img.to_rgba();
-    //let mut rgba_image : RgbaImage = ImageBuffer::new(200, 200);
-
-    /*let mut rgba_image = ImageBuffer::from_fn(200, 200, |x, y| {
-      image::Rgba([255u8, 255u8, 0u8, 255u8])
-    });*/
-
-    // This should change the texture to translucent red.
-    /*for pixel in rgba_image.pixels_mut() {
-      pixel.0[0] = 255;
-      pixel.0[1] = 0;
-      pixel.0[2] = 0;
-      pixel.0[3] = 127;
-    }*/
 
     let width = rgba_image.width();
     let height = rgba_image.height();
-
-    //let flat_samples = rgba_image.into_flat_samples();
-    //let pixel_data = flat_samples.samples.as_ptr() as *const c_void;
 
     let img_data = rgba_image.into_raw();
     let pixel_data = img_data.as_ptr() as *const c_void;
@@ -166,8 +150,8 @@ impl RenderableObject {
     println!("Loading texture into OpenGL {}x{}...", width, height);
 
     unsafe {
-      //gl::TexParameteri(gl::TEXTURE_2D, gl::TEXTURE_MIN_FILTER, gl::LINEAR as i32);
-      //gl::TexParameteri(gl::TEXTURE_2D, gl::TEXTURE_MAG_FILTER, gl::LINEAR as i32);
+      gl::TexParameteri(gl::TEXTURE_2D, gl::TEXTURE_MIN_FILTER, gl::LINEAR as i32);
+      gl::TexParameteri(gl::TEXTURE_2D, gl::TEXTURE_MAG_FILTER, gl::LINEAR as i32);
 
       gl::TexImage2D(
         gl::TEXTURE_2D,

@@ -82,10 +82,8 @@ pub struct PointCloudRenderer {
 
   /// The OpenGL program
   shader_program_id: GLuint,
-
   /// The OpenGL vertex shader
   vertex_shader_id: GLuint,
-
   /// The OpenGL fragment shader
   fragment_shader_id: GLuint,
 
@@ -94,46 +92,39 @@ pub struct PointCloudRenderer {
   projection: [f32; 16],
   view_matrix: [[f32; 4]; 4],
   projection_matrix: [[f32; 4]; 4],
-
   /// Matrix applied to each model
   /// If a model doesn't set its own, it defaults to identity matrix
   default_model_view_matrix: [[f32; 4]; 4],
 
   /// Renderer setting: size of the rendered points
   point_size: u8,
-
   /// Renderer setting: shading enabled
   enable_shading: bool,
+  /// Uniform location in the shader program.
+  enable_shading_index: GLint,
 
   /// Point array size
   vertex_arrays_size_bytes: Vec<GLsizei>,
 
   /// Uniform location in the shader program.
   view_transform_id: Uniform,
-
   /// Uniform location in the shader program.
   projection_transform_id: Uniform,
-
   /// Uniform location in the shader program.
   model_transform_id: Uniform,
 
   /// Uniform for object textures in the shader program.
   object_texture_uniform: Uniform,
-
   /// Location of the texture coordinate input
   texture_coordinates_attribute: Attribute,
 
   /// Uniform location in the shader program.
-  enable_shading_index: GLint,
-
-  /// Uniform location in the shader program.
   point_cloud_texture_indices: Vec<GLint>,
+  /// 'in vec4 inColor'
+  color_vertex_attribute_location: GLint,
 
   vertex_array_objects: Vec<VertexArray>,
   vertex_color_buffer_objects: Vec<Buffer>,
-
-  /// 'in vec4 inColor'
-  color_vertex_attribute_location: GLint,
 
   renderable_objects: Vec<PositionableObject>
 }
@@ -275,7 +266,6 @@ impl PointCloudRenderer {
         &path, self.shader_program_id)?;
 
 
-      let filename = "/home/bt/dev/storyteller/assets/gamecube_ssbm_pichu/Pichu/singletex/pichu.png";
       let filename = "/home/bt/dev/storyteller/assets/n64_mario64/yoshi_grp.png";
 
       renderable_object.load_texture(filename, &self.object_texture_uniform)?;
@@ -327,7 +317,6 @@ impl PointCloudRenderer {
       let mut renderable_object = RenderableObject::from_wavefront(
         &path, self.shader_program_id)?;
 
-      let filename = "/home/bt/dev/storyteller/assets/n64_mario64/yoshi_grp.png";
       let filename = "/home/bt/dev/storyteller/assets/gamecube_ssbm_pichu/Pichu/singletex/pichu.png";
 
       renderable_object.load_texture(filename, &self.object_texture_uniform)?;
@@ -466,7 +455,7 @@ impl PointCloudRenderer {
   pub fn render(&mut self) -> Result<()> {
     // Animate the models.
     for obj in self.renderable_objects.iter_mut() {
-      obj.increment_rotation_y(0.15); // TODO: Should be based on wall clock instead
+      obj.increment_rotation_y(0.05); // TODO: Should be based on wall clock instead
     }
 
     unsafe {
