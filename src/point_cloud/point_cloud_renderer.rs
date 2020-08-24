@@ -344,7 +344,7 @@ impl PointCloudRenderer {
 
       positionable_object.translate(5.0, -10.0, 20.0);
       positionable_object.scale(0.1);
-      positionable_object.flip_y(); // flipping y and z rights the model.
+      //positionable_object.flip_y();
       positionable_object.flip_z();
       //positionable_object.scale(0.5);
 
