@@ -28,7 +28,8 @@ imgui-glium-renderer = "0.3.0"
 imgui-opengl-renderer = "0.7.0"
 imgui-sdl2 = "0.9.0" # for imgui-opengl-renderer
 imgui-winit-support = "0.3.1"
-k4a-sys = { path = "/home/bt/dev/3rd/k4a-sys" } # k4a-sys = "0.2.0" TODO: Check these modifications into source control
+#k4a-sys = { path = "/home/bt/dev/3rd/k4a-sys", version = "=0.2.0" } # k4a-sys = "0.2.0" TODO: Check these modifications into source control
+k4a-sys = { path = "/home/bt/dev/3rd/k4a-sys", branch = "working-version" }
 libc = "0.2.68"
 nalgebra = "0.21.1" # linear algebra and matrices, fantastic docs
 nalgebra-glm = "0.7.0" # computer graphics-friendly nalgebra, inspired by C++'s glm
