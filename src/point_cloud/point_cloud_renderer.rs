@@ -344,7 +344,27 @@ impl PointCloudRenderer {
 
       positionable_object.translate(5.0, -10.0, 20.0);
       positionable_object.scale(0.1);
-      //positionable_object.flip_y();
+      positionable_object.flip_z();
+      //positionable_object.scale(0.5);
+
+      self.renderable_objects.push(positionable_object);
+    }
+
+    {
+      let filename = "/home/bt/dev/storyteller/assets/bundled/n64_zelda_oot_poe/poe.obj";
+
+      let path = Path::new(filename);
+      let mut renderable_object = RenderableObject::from_wavefront(
+        &path, self.shader_program_id)?;
+
+      let filename = "/home/bt/dev/storyteller/assets/bundled/n64_zelda_oot_poe/poe_grp.png";
+      renderable_object.load_texture(filename, &self.object_texture_uniform)?;
+
+      let mut positionable_object = PositionableObject::new(renderable_object);
+
+      positionable_object.translate(-5.0, -10.0, 20.0);
+      positionable_object.scale(2.5);
+      positionable_object.flip_y();
       positionable_object.flip_z();
       //positionable_object.scale(0.5);
 
