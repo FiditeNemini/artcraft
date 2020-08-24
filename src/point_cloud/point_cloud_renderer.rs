@@ -275,6 +275,7 @@ impl PointCloudRenderer {
         &path, self.shader_program_id)?;
 
 
+      let filename = "/home/bt/dev/storyteller/assets/gamecube_ssbm_pichu/Pichu/singletex/pichu.png";
       let filename = "/home/bt/dev/storyteller/assets/n64_mario64/yoshi_grp.png";
 
       renderable_object.load_texture(filename, &self.object_texture_uniform)?;
@@ -326,6 +327,7 @@ impl PointCloudRenderer {
       let mut renderable_object = RenderableObject::from_wavefront(
         &path, self.shader_program_id)?;
 
+      let filename = "/home/bt/dev/storyteller/assets/n64_mario64/yoshi_grp.png";
       let filename = "/home/bt/dev/storyteller/assets/gamecube_ssbm_pichu/Pichu/singletex/pichu.png";
 
       renderable_object.load_texture(filename, &self.object_texture_uniform)?;

@@ -18,6 +18,9 @@ void main()
         discard;
     }
 
-    fragmentColor = texture2D(objTexture, texCoord); // * 0.80 + color * 0.20;
+    //fragmentColor = vec4(texCoord.r, texCoord.g, 127, 255);
+    //fragmentColor = texture2D(objTexture, texCoord); // * 0.80 + color * 0.20;
+    //fragmentColor = 0.5 * texture2D(objTexture, texCoord) + 0.01 * vec4(texCoord.r, texCoord.g, 0, 255);
+    fragmentColor = texture2D(objTexture, texCoord);
     //fragmentColor = vertexColor;
 }

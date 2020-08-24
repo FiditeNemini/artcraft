@@ -10,7 +10,7 @@ use std::mem::size_of;
 use std::os::raw::c_char;
 use std::path::Path;
 use std::ptr::null;
-use image::DynamicImage;
+use image::{DynamicImage, Pixel, Rgba, RgbaImage, ImageBuffer};
 use crate::opengl::wrapper::uniform::Uniform;
 
 /// A collection of all the graphics-related data to render: vertices, normals, etc.
@@ -137,7 +137,20 @@ impl RenderableObject {
   pub fn load_texture(&mut self, filename: &str, texture_uniform: &Uniform) -> AnyhowResult<()> {
     let img = image::open(&filename)?;
 
-    let rgba_image= img.to_rgba();
+    let mut rgba_image= img.to_rgba();
+    //let mut rgba_image : RgbaImage = ImageBuffer::new(200, 200);
+
+    /*let mut rgba_image = ImageBuffer::from_fn(200, 200, |x, y| {
+      image::Rgba([255u8, 255u8, 0u8, 255u8])
+    });*/
+
+    // This should change the texture to translucent red.
+    /*for pixel in rgba_image.pixels_mut() {
+      pixel.0[0] = 255;
+      pixel.0[1] = 0;
+      pixel.0[2] = 0;
+      pixel.0[3] = 127;
+    }*/
 
     let width = rgba_image.width();
     let height = rgba_image.height();
@@ -153,18 +166,18 @@ impl RenderableObject {
     println!("Loading texture into OpenGL {}x{}...", width, height);
 
     unsafe {
-      gl::TexParameteri(gl::TEXTURE_2D, gl::TEXTURE_MIN_FILTER, gl::LINEAR as i32);
-      gl::TexParameteri(gl::TEXTURE_2D, gl::TEXTURE_MAG_FILTER, gl::LINEAR as i32);
+      //gl::TexParameteri(gl::TEXTURE_2D, gl::TEXTURE_MIN_FILTER, gl::LINEAR as i32);
+      //gl::TexParameteri(gl::TEXTURE_2D, gl::TEXTURE_MAG_FILTER, gl::LINEAR as i32);
 
       gl::TexImage2D(
         gl::TEXTURE_2D,
-        0,
-        gl::RGBA as i32,
+        0, // image level (mipmap); 0 is base
+        gl::RGBA as i32, // internal format
         width as i32,
         height as i32,
-        0,
-        gl::RGBA,
-        gl::UNSIGNED_BYTE,
+        0, // border; "must be 0"
+        gl::RGBA, // format of pixels
+        gl::UNSIGNED_BYTE, // pixel data type
         pixel_data,
       );
 
@@ -181,9 +194,13 @@ impl RenderableObject {
     Ok(())
   }
 
-  pub fn draw(&self) {
-    self.vao.bind();
+  pub fn draw(&self, vao_already_bound: bool) {
+    if !vao_already_bound {
+      self.vao.bind();
+    }
     unsafe {
+      gl::BindTexture(gl::TEXTURE_2D, self.texture.id());
+
       gl::DrawArrays(gl::TRIANGLES, 0, self.num_vertices as i32);
     }
   }

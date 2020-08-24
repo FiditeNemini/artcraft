@@ -121,10 +121,12 @@ impl PositionableObject {
 
     let mat_ptr = transformation.as_ptr();
 
+    self.renderable_object.vao.bind();
+
     unsafe {
       gl::UniformMatrix4fv(model_transform_id.id(), 1, gl::FALSE, mat_ptr);
     }
 
-    self.renderable_object.draw();
+    self.renderable_object.draw(true);
   }
 }
