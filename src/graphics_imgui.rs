@@ -1,3 +1,4 @@
+use anyhow::Result as AnyhowResult;
 use crate::ProgramArgs;
 use crate::core_types::RgbaF32;
 use crate::gui::enhanced_window::EnhancedWindow;
@@ -15,7 +16,7 @@ use std::path::Path;
 use std::sync::{Arc, Mutex, PoisonError, MutexGuard};
 use std::time::{Instant, Duration};
 
-pub fn run(capture_provider: Arc<CaptureProvider>, calibration_data: Calibration, program_args: ProgramArgs) {
+pub fn run(capture_provider: Arc<CaptureProvider>, calibration_data: Calibration, program_args: ProgramArgs) -> AnyhowResult<()> {
   let mut webcam_writer = None;
 
   if program_args.enable_webcam_output_writing {
@@ -98,7 +99,7 @@ pub fn run(capture_provider: Arc<CaptureProvider>, calibration_data: Calibration
 
   let mut camera_index = 0;
 
-  visualizer.setup_rendering();
+  visualizer.setup_rendering()?;
 
   'running: loop {
     use sdl2::event::Event;
@@ -270,4 +271,6 @@ pub fn run(capture_provider: Arc<CaptureProvider>, calibration_data: Calibration
 
     std::thread::sleep(::std::time::Duration::new(0, 1_000_000_000u32 / 60));
   }
+
+  Ok(())
 }

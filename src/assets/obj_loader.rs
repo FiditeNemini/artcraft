@@ -27,7 +27,9 @@ pub fn load_wavefront(path: &Path) -> AnyhowResult<Vec<ExtractedVertex>>
   let mut max_pos = [f32::NEG_INFINITY; 3];
   let mut vertex_data = Vec::new();
 
+  println!("loading {:?}...", path);
   let (models, mats)  = tobj::load_obj(path)?;
+  println!("loaded {:?}...", path);
 
   // Just upload the first object in the group
   for model in &models {

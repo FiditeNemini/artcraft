@@ -3,6 +3,7 @@
 #[macro_use] extern crate clap;
 #[macro_use] extern crate glium;
 #[macro_use] extern crate imgui;
+#[macro_use] extern crate log;
 
 extern crate anyhow;
 extern crate arcball;
@@ -26,7 +27,7 @@ extern crate winit;
 extern crate gltf;
 
 use std::sync::Arc;
-use std::thread;
+use std::{thread, env};
 
 use opencv::prelude::*;
 
@@ -50,6 +51,9 @@ pub mod kinect;
 pub mod opengl;
 pub mod point_cloud;
 pub mod webcam;
+
+const ENV_RUST_LOG : &'static str = "RUST_LOG";
+const DEFAULT_RUST_LOG: &'static str = "debug,actix_web=info"; // NB: We don't use actix, but this is preserved for syntax ref
 
 /// This is the serial number for the camera I have mounted to the utility wall.
 const PRIMARY_DEVICE_SERIAL : &'static str = "000513594512";
@@ -82,6 +86,18 @@ pub struct ProgramArgs {
 }
 
 pub fn main() -> AnyhowResult<()> {
+  if env::var(ENV_RUST_LOG)
+      .as_ref()
+      .ok()
+      .is_none()
+  {
+    println!("Setting default logging level to \"{}\", override with env var {}.",
+      DEFAULT_RUST_LOG, ENV_RUST_LOG);
+    env::set_var(ENV_RUST_LOG, DEFAULT_RUST_LOG);
+  }
+
+  env_logger::init();
+
   let opts = Opts::parse();
 
   println!("opts: {:?}", opts);
@@ -114,7 +130,7 @@ pub fn main() -> AnyhowResult<()> {
   let calibration = capture_provider.get_calibration().clone();
   //calibration.debug_print();
 
-  graphics_imgui::run(capture_provider, calibration, program_args);
+  graphics_imgui::run(capture_provider, calibration, program_args)?;
 
   Ok(())
 }
