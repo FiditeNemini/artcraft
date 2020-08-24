@@ -38,6 +38,8 @@ use crate::opengl::wrapper::uniform::Uniform;
 use crate::opengl::matrices::{initial_projection_matrix_4x4_flat, initial_view_matrix_4x4_flat, identity_matrix_4x4, initial_view_matrix_4x4, initial_projection_matrix_4x4};
 use image::DynamicImage;
 use crate::opengl::wrapper::attribute::Attribute;
+use nalgebra::RealField;
+use cgmath::num_traits::ToPrimitive;
 
 pub type Result<T> = std::result::Result<T, PointCloudRendererError>;
 
@@ -459,7 +461,12 @@ impl PointCloudRenderer {
   ///
   ///
   ///
-  pub fn render(&self) -> Result<()> {
+  pub fn render(&mut self) -> Result<()> {
+    // Animate the models.
+    for obj in self.renderable_objects.iter_mut() {
+      obj.increment_rotation_y(0.15); // TODO: Should be based on wall clock instead
+    }
+
     unsafe {
       gl::UseProgram(self.shader_program_id);
 

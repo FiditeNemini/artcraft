@@ -66,6 +66,18 @@ impl PositionableObject {
     self.rotation.z += f32::pi();
   }
 
+  pub fn increment_rotation_x(&mut self, x: f32) {
+    self.rotation.x += x;
+  }
+
+  pub fn increment_rotation_y(&mut self, y: f32) {
+    self.rotation.y += y;
+  }
+
+  pub fn increment_rotation_z(&mut self, z: f32) {
+    self.rotation.z += z;
+  }
+
   pub fn scale_nonuniform(&mut self, x: f32, y: f32, z: f32) {
     self.scale.x = x;
     self.scale.y = y;
