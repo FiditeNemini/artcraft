@@ -16,7 +16,6 @@ The configuration I use is as follows:
 - /dev/video0 is the input
 - /dev/video1 is the output
 
-
 Check to see if the driver is okay:
 
 ```
@@ -41,6 +40,9 @@ Test writing random noise:
 cat /dev/urandom > /dev/video0
 ```
 
+This may have the answers for my bugs:
+
+- https://github.com/webcamoid/akvcam/issues/6
 
 Models
 ------
