@@ -110,7 +110,7 @@ void main()
 
         vertexPosition = imageLoad(pointCloudTexture0, currentDepthPixelCoordinates).xyz;
 
-        vertexPosition.x -= 1.0;
+        vertexPosition.x += 1.0; // Camera 0 looks best on the left
 
         colorOut = vec4(
           inColor.r,
@@ -118,6 +118,7 @@ void main()
           inColor.b,
           255
         );
+
       } else if (pointCloudTextureToUse == 1) {
         ivec2 pointCloudSize1 = imageSize(pointCloudTexture1);
         int pointCloudLength1 = pointCloudSize1.x * pointCloudSize1.y;
@@ -126,7 +127,7 @@ void main()
 
         vertexPosition = imageLoad(pointCloudTexture1, currentDepthPixelCoordinates).xyz;
 
-        vertexPosition.x += 1.0;
+        vertexPosition.x -= 1.0; // Camera 1 looks best on the right
 
         colorOut = vec4(
           inColor.r,
@@ -134,6 +135,12 @@ void main()
           inColor.b,
           255
         );
+      }
+
+      if (vertexPosition.z > 1.5) {
+        // Depth threshold
+        // This leads directly to pixel discard
+        colorOut.a = 0.0;
       }
 
       vertexColor = colorOut;
