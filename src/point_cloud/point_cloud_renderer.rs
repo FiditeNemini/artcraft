@@ -251,7 +251,6 @@ impl PointCloudRenderer {
 
     // Following model fails in two libraries:
     //let filename = "/home/bt/dev/storyteller/assets/zelda_oot_n64_logo/N square.obj";
-
     //let filename = "/home/bt/dev/storyteller/assets/gamecube_ssbm_pichu/Pichu/pichu.obj"; // CRASH!
     //let filename = "/home/bt/dev/storyteller/assets/level_n64_mario64_whomps_fortress/WF.obj"; // DOESN'T WORK?
     let filename = "/home/bt/dev/storyteller/assets/gamecube_ssbm_pichu/Pichu/singletex/pichu.obj";
@@ -265,49 +264,18 @@ impl PointCloudRenderer {
       let mut renderable_object = RenderableObject::from_wavefront(
         &path, self.shader_program_id)?;
 
-
       let filename = "/home/bt/dev/storyteller/assets/bundled/objects/n64_mario64_yoshi/yoshi_grp.png";
 
       renderable_object.load_texture(filename, &self.object_texture_uniform)?;
 
       let mut positionable_object = PositionableObject::new(renderable_object);
 
-      positionable_object.translate(-5.0, 0.0, 15.0);
+      positionable_object.translate(-5.0, 0.0, 30.0);
       positionable_object.flip_y(); // flipping y and z rights the model.
       positionable_object.flip_z();
-      positionable_object.scale_nonuniform(2.0, 1.0, 0.5);
+      positionable_object.scale(0.7);
 
       self.renderable_objects.push(positionable_object);
-
-      /*let filename = "/home/bt/dev/storyteller/assets/n64_mario64/yoshi.mtl";
-
-      let (materials, unknown) = load_mtl(filename)?;
-
-      for material in materials.iter() {
-        println!("name {:?}", material.name);
-        println!("am {:?}", material.ambient_texture);
-        println!("norm {:?}", material.normal_texture);
-        println!("dis {:?}", material.dissolve_texture);
-      }
-
-      for (k, v) in unknown.iter() {
-        println!("k: {:?}", k);
-        println!("v: {:?}", v);
-      }*/
-
-      /*let filename = "/home/bt/dev/storyteller/assets/n64_mario64/yoshi_grp.png";
-
-      let img = image::open(&filename)?;
-
-      if let DynamicImage::ImageRgba8(img) = img {
-        println!("Image rgba8");
-
-        let flat_samples = img.into_flat_samples();
-        let ptr = flat_samples.samples.as_ptr();
-      }*/
-
-
-
     }
 
     {
@@ -322,10 +290,10 @@ impl PointCloudRenderer {
 
       let mut positionable_object = PositionableObject::new(renderable_object);
 
-      positionable_object.translate(5.0, 2.0, 20.0);
+      positionable_object.translate(5.0, 2.0, 30.0);
       positionable_object.flip_y(); // flipping y and z rights the model.
       positionable_object.flip_z();
-      positionable_object.scale(0.05);
+      positionable_object.scale(0.03);
 
       self.renderable_objects.push(positionable_object);
     }
@@ -342,8 +310,8 @@ impl PointCloudRenderer {
 
       let mut positionable_object = PositionableObject::new(renderable_object);
 
-      positionable_object.translate(5.0, -10.0, 20.0);
-      positionable_object.scale(0.1);
+      positionable_object.translate(5.0, -10.0, 30.0);
+      positionable_object.scale(0.05);
       positionable_object.flip_z();
       //positionable_object.scale(0.5);
 
@@ -362,7 +330,7 @@ impl PointCloudRenderer {
 
       let mut positionable_object = PositionableObject::new(renderable_object);
 
-      positionable_object.translate(-5.0, -10.0, 20.0);
+      positionable_object.translate(-5.0, -10.0, 30.0);
       positionable_object.scale(2.5);
       positionable_object.flip_y();
       positionable_object.flip_z();
@@ -385,7 +353,7 @@ impl PointCloudRenderer {
 
       positionable_object.object_type = ObjectType::Level;
 
-      positionable_object.translate(0.0, 20.0, 0.0);
+      positionable_object.translate(0.0, 22.0, 25.0);
       positionable_object.scale(0.7);
       positionable_object.flip_y();
       positionable_object.flip_z();
