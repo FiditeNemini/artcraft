@@ -389,6 +389,7 @@ impl PointCloudRenderer {
       positionable_object.scale(0.7);
       positionable_object.flip_y();
       positionable_object.flip_z();
+      positionable_object.increment_rotation_y(f32::pi()/2.0);
       //positionable_object.scale(0.5);
 
       self.renderable_objects.push(positionable_object);
