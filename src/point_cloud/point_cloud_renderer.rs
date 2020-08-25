@@ -259,14 +259,14 @@ impl PointCloudRenderer {
     let filename = "/home/bt/dev/storyteller/assets/n64_pokemon_snap_bulbasaur/Bulbasaur/bulbasaur.obj";
 
     {
-      let filename = "/home/bt/dev/storyteller/assets/bundled/n64_mario64_yoshi/yoshi.obj";
+      let filename = "/home/bt/dev/storyteller/assets/bundled/objects/n64_mario64_yoshi/yoshi.obj";
 
       let path = Path::new(filename);
       let mut renderable_object = RenderableObject::from_wavefront(
         &path, self.shader_program_id)?;
 
 
-      let filename = "/home/bt/dev/storyteller/assets/bundled/n64_mario64_yoshi/yoshi_grp.png";
+      let filename = "/home/bt/dev/storyteller/assets/bundled/objects/n64_mario64_yoshi/yoshi_grp.png";
 
       renderable_object.load_texture(filename, &self.object_texture_uniform)?;
 
@@ -311,13 +311,13 @@ impl PointCloudRenderer {
     }
 
     {
-      let filename = "/home/bt/dev/storyteller/assets/bundled/gamecube_ssbm_pichu/pichu.obj";
+      let filename = "/home/bt/dev/storyteller/assets/bundled/objects/gamecube_ssbm_pichu/pichu.obj";
 
       let path = Path::new(filename);
       let mut renderable_object = RenderableObject::from_wavefront(
         &path, self.shader_program_id)?;
 
-      let filename = "/home/bt/dev/storyteller/assets/bundled/gamecube_ssbm_pichu/pichu.png";
+      let filename = "/home/bt/dev/storyteller/assets/bundled/objects/gamecube_ssbm_pichu/pichu.png";
       renderable_object.load_texture(filename, &self.object_texture_uniform)?;
 
       let mut positionable_object = PositionableObject::new(renderable_object);
@@ -331,13 +331,13 @@ impl PointCloudRenderer {
     }
 
     {
-      let filename = "/home/bt/dev/storyteller/assets/bundled/n64_zelda_oot_king_dodongo/King_Dodongo.obj";
+      let filename = "/home/bt/dev/storyteller/assets/bundled/objects/n64_zelda_oot_king_dodongo/King_Dodongo.obj";
 
       let path = Path::new(filename);
       let mut renderable_object = RenderableObject::from_wavefront(
         &path, self.shader_program_id)?;
 
-      let filename = "/home/bt/dev/storyteller/assets/bundled/n64_zelda_oot_king_dodongo/King_Dodongo_grp.png";
+      let filename = "/home/bt/dev/storyteller/assets/bundled/objects/n64_zelda_oot_king_dodongo/King_Dodongo_grp.png";
       renderable_object.load_texture(filename, &self.object_texture_uniform)?;
 
       let mut positionable_object = PositionableObject::new(renderable_object);
@@ -351,13 +351,13 @@ impl PointCloudRenderer {
     }
 
     {
-      let filename = "/home/bt/dev/storyteller/assets/bundled/n64_zelda_oot_poe/poe.obj";
+      let filename = "/home/bt/dev/storyteller/assets/bundled/objects/n64_zelda_oot_poe/poe.obj";
 
       let path = Path::new(filename);
       let mut renderable_object = RenderableObject::from_wavefront(
         &path, self.shader_program_id)?;
 
-      let filename = "/home/bt/dev/storyteller/assets/bundled/n64_zelda_oot_poe/poe_grp.png";
+      let filename = "/home/bt/dev/storyteller/assets/bundled/objects/n64_zelda_oot_poe/poe_grp.png";
       renderable_object.load_texture(filename, &self.object_texture_uniform)?;
 
       let mut positionable_object = PositionableObject::new(renderable_object);
@@ -370,6 +370,28 @@ impl PointCloudRenderer {
 
       self.renderable_objects.push(positionable_object);
     }
+
+    {
+      let filename = "/home/bt/dev/storyteller/assets/bundled/levels/n64_zelda_oot_kokiri_bridge/bridge.obj";
+
+      let path = Path::new(filename);
+      let mut renderable_object = RenderableObject::from_wavefront(
+        &path, self.shader_program_id)?;
+
+      let filename = "/home/bt/dev/storyteller/assets/bundled/levels/n64_zelda_oot_kokiri_bridge/bridge_grp.png";
+      renderable_object.load_texture(filename, &self.object_texture_uniform)?;
+
+      let mut positionable_object = PositionableObject::new(renderable_object);
+
+      positionable_object.translate(0.0, 20.0, 0.0);
+      positionable_object.scale(0.7);
+      positionable_object.flip_y();
+      positionable_object.flip_z();
+      //positionable_object.scale(0.5);
+
+      self.renderable_objects.push(positionable_object);
+    }
+
 
 
     /*let filename = "/home/bt/dev/storyteller/assets/vr_staircase/scene.gltf";
