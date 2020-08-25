@@ -24,6 +24,10 @@ uniform mat4 projection;
 // 1 = object, 2 = pointCloud
 uniform int vertexType;
 
+// NB: This is not a scalable approach. But it might work for now.
+// 0 = camera0, 1 = camera1
+uniform int pointCloudTextureToUse;
+
 layout(rgba32f, binding=0) readonly uniform image2D pointCloudTexture0;
 layout(rgba32f, binding=1) readonly uniform image2D pointCloudTexture1;
 
@@ -129,16 +133,36 @@ void main()
     } else if (vertexType == 2) {
       // Point cloud mode
 
-      ivec2 currentDepthPixelCoordinates = ivec2(gl_VertexID % pointCloudSize0.x, gl_VertexID / pointCloudSize0.x);
+      if (pointCloudTextureToUse == 0)  {
+        ivec2 currentDepthPixelCoordinates = ivec2(gl_VertexID % pointCloudSize0.x, gl_VertexID / pointCloudSize0.x);
 
-      vertexPosition = imageLoad(pointCloudTexture0, currentDepthPixelCoordinates).xyz;
+        vertexPosition = imageLoad(pointCloudTexture0, currentDepthPixelCoordinates).xyz;
 
-      colorOut = vec4(
-        inColor.r,
-        inColor.g,
-        inColor.b,
-        255
-      );
+        vertexPosition.x -= 1.0;
+
+        colorOut = vec4(
+          inColor.r,
+          inColor.g,
+          inColor.b,
+          255
+        );
+      } else if (pointCloudTextureToUse == 1) {
+        ivec2 pointCloudSize1 = imageSize(pointCloudTexture1);
+        int pointCloudLength1 = pointCloudSize1.x * pointCloudSize1.y;
+
+        ivec2 currentDepthPixelCoordinates = ivec2(gl_VertexID % pointCloudSize1.x, gl_VertexID / pointCloudSize1.x);
+
+        vertexPosition = imageLoad(pointCloudTexture1, currentDepthPixelCoordinates).xyz;
+
+        vertexPosition.x += 1.0;
+
+        colorOut = vec4(
+          inColor.r,
+          inColor.g,
+          inColor.b,
+          255
+        );
+      }
 
       vertexColor = colorOut;
     }

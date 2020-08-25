@@ -119,6 +119,9 @@ pub struct PointCloudRenderer {
   ///    2 = pointCloud
   uniform_vertex_type: Uniform,
 
+  /// Used to signal which camera's point cloud texture is active.
+  uniform_point_cloud_texture_to_use: Uniform,
+
   /// Uniform for object textures in the shader program.
   object_texture_uniform: Uniform,
   /// Location of the texture coordinate input
@@ -196,6 +199,8 @@ impl PointCloudRenderer {
 
     let uniform_vertex_type = Uniform::lookup("vertexType", program_id)?;
 
+    let uniform_point_cloud_texture_to_use = Uniform::lookup("pointCloudTextureToUse", program_id)?;
+
     let color_vertex_attribute_location = unsafe {
       let location = gl::GetAttribLocation(program_id, COLOR_LOCATION_PTR);
 
@@ -227,6 +232,7 @@ impl PointCloudRenderer {
       object_texture_uniform,
       texture_coordinates_attribute: texture_coordinate_attribute,
       uniform_vertex_type,
+      uniform_point_cloud_texture_to_use,
       point_size: 1,
       enable_shading: false,
       view_transform_id: view_transform,
@@ -541,6 +547,9 @@ impl PointCloudRenderer {
         let size = vertex_array_size_bytes / size_of::<BgraPixel>() as i32;
 
         vao.bind();
+
+        gl::Uniform1i(self.uniform_point_cloud_texture_to_use.id() as GLint, i as GLint);
+
         gl::DrawArrays(gl::POINTS, 0, size);
       }
 
