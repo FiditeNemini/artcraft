@@ -25,4 +25,8 @@ void main()
     vec2 coord = texCoord;
     fragmentColor = texture2D(objTexture, coord);
     //fragmentColor = vertexColor;
+
+    if (fragmentColor.a == 0.0f) {
+        discard;
+    }
 }
