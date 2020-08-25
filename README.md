@@ -35,6 +35,12 @@ Playback:
 ffplay /dev/video1
 ```
 
+Test writing random noise:
+
+```
+cat /dev/urandom > /dev/video0
+```
+
 
 Models
 ------
