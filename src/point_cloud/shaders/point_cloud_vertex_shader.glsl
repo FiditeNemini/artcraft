@@ -21,6 +21,9 @@ uniform mat4 model;
 uniform mat4 view;
 uniform mat4 projection;
 
+// 1 = object, 2 = pointCloud
+uniform int vertexType;
+
 layout(rgba32f, binding=0) readonly uniform image2D pointCloudTexture0;
 layout(rgba32f, binding=1) readonly uniform image2D pointCloudTexture1;
 
@@ -55,7 +58,7 @@ void main()
     // cameras. This effectively 'downsamples' each camera. We need to find a way to double this.
     // I hate drawing like this
     //if (gl_VertexID < pointCloudLength0) { // TODO - this is the one to enable
-    if (gl_VertexID %2 == 0) {
+    if (gl_VertexID < 10) {
       // Camera #0
       ivec2 currentDepthPixelCoordinates = ivec2(gl_VertexID % pointCloudSize0.x, gl_VertexID / pointCloudSize0.x);
 
@@ -90,9 +93,19 @@ void main()
         127,
         255
       );
+
+      vertexPosition = position;
     }
 
-    vertexPosition = position;
+    if (vertexType != 0) {
+        colorOut = vec4(
+            127,
+            127,
+            127,
+            0
+        );
+    }
+
 
     // Scale up while model view matrices not implemented.
     //vertexPosition.x *= 2.0 + 10.0;
@@ -105,9 +118,8 @@ void main()
     }
 
     gl_Position = projection * view * model * vec4(vertexPosition, 1);
+
     vertexColor = colorOut;
-
-
     texCoord = vTextureCoord;
 
     // Pass along the 'invalid pixel' flag as the alpha channel

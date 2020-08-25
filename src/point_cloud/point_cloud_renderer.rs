@@ -113,6 +113,12 @@ pub struct PointCloudRenderer {
   /// Uniform location in the shader program.
   model_transform_id: Uniform,
 
+  /// An integer uniform that tells GLSL what type of data it's dealing with.
+  /// This should allow us to mix Point Cloud data and Geometric Objects
+  ///    1 = object
+  ///    2 = pointCloud
+  uniform_vertex_type: Uniform,
+
   /// Uniform for object textures in the shader program.
   object_texture_uniform: Uniform,
   /// Location of the texture coordinate input
@@ -188,6 +194,8 @@ impl PointCloudRenderer {
 
     let texture_coordinate_attribute = Attribute::lookup("vTextureCoord", program_id)?;
 
+    let uniform_vertex_type = Uniform::lookup("vertexType", program_id)?;
+
     let color_vertex_attribute_location = unsafe {
       let location = gl::GetAttribLocation(program_id, COLOR_LOCATION_PTR);
 
@@ -218,6 +226,7 @@ impl PointCloudRenderer {
       fragment_shader_id,
       object_texture_uniform,
       texture_coordinates_attribute: texture_coordinate_attribute,
+      uniform_vertex_type,
       point_size: 1,
       enable_shading: false,
       view_transform_id: view_transform,
@@ -257,7 +266,7 @@ impl PointCloudRenderer {
     let filename = "/home/bt/dev/storyteller/assets/n64_smash_bros/pika.obj"; // MISSHAPEN!
     let filename = "/home/bt/dev/storyteller/assets/n64_pokemon_snap_bulbasaur/Bulbasaur/bulbasaur.obj";
 
-    {
+    if false {
       let filename = "/home/bt/dev/storyteller/assets/bundled/objects/n64_mario64_yoshi/yoshi.obj";
 
       let path = Path::new(filename);
@@ -278,7 +287,7 @@ impl PointCloudRenderer {
       self.renderable_objects.push(positionable_object);
     }
 
-    {
+    if false {
       let filename = "/home/bt/dev/storyteller/assets/bundled/objects/gamecube_ssbm_pichu/pichu.obj";
 
       let path = Path::new(filename);
@@ -298,7 +307,7 @@ impl PointCloudRenderer {
       self.renderable_objects.push(positionable_object);
     }
 
-    {
+    if false {
       let filename = "/home/bt/dev/storyteller/assets/bundled/objects/n64_zelda_oot_king_dodongo/King_Dodongo.obj";
 
       let path = Path::new(filename);
@@ -318,7 +327,7 @@ impl PointCloudRenderer {
       self.renderable_objects.push(positionable_object);
     }
 
-    {
+    if false {
       let filename = "/home/bt/dev/storyteller/assets/bundled/objects/n64_zelda_oot_poe/poe.obj";
 
       let path = Path::new(filename);
@@ -348,6 +357,8 @@ impl PointCloudRenderer {
 
       let filename = "/home/bt/dev/storyteller/assets/bundled/levels/n64_zelda_oot_kokiri_bridge/bridge_grp.png";
       renderable_object.load_texture(filename, &self.object_texture_uniform)?;
+
+      renderable_object.set_vertex_type(&self.uniform_vertex_type);
 
       let mut positionable_object = PositionableObject::new(renderable_object);
 
@@ -521,21 +532,26 @@ impl PointCloudRenderer {
 
       gl::Uniform1i(self.enable_shading_index, enable_shading);
 
-      /*for i in 0 .. self.num_cameras {
+      // Tell GLSL we're doing point clouds
+      gl::Uniform1i(self.uniform_vertex_type.id() as GLint, 1);
+
+      for i in 0 .. self.num_cameras {
         let vao = self.vertex_array_objects.get(i).unwrap();
         let vertex_array_size_bytes = self.vertex_arrays_size_bytes.get(i).unwrap();
         let size = vertex_array_size_bytes / size_of::<BgraPixel>() as i32;
 
         vao.bind();
         gl::DrawArrays(gl::POINTS, 0, size);
-      }*/
+      }
 
       gl::BindVertexArray(0);
+
+      // Now tell GLSL we're doing objects
+      gl::Uniform1i(self.uniform_vertex_type.id() as GLint, 0);
 
       for positionable in self.renderable_objects.iter() {
         positionable.draw(self.model_transform_id);
       }
-
 
       gl_get_error()
           .map_err(|err| PointCloudRendererError::OpenGlError(err))

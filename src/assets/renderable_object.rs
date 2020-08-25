@@ -13,6 +13,7 @@ use std::ptr::null;
 use image::{DynamicImage, Pixel, Rgba, RgbaImage, ImageBuffer, RgbImage};
 use crate::opengl::wrapper::uniform::Uniform;
 use image::imageops::{flip_horizontal, flip_vertical};
+use crate::opengl::wrapper::attribute::Attribute;
 
 /// A collection of all the graphics-related data to render: vertices, normals, etc.
 pub struct RenderableObject {
@@ -97,6 +98,21 @@ impl RenderableObject {
 
       gl::VertexAttribPointer(loc as u32, 3, gl::FLOAT, gl::FALSE, 0, null());
     }
+  }
+
+  pub fn set_vertex_type(&mut self, vertex_type: &Uniform) {
+    /*self.vao.bind();
+    let loc = vertex_type.id();
+    println!("Uniform location: {}", loc);
+
+    unsafe {
+      //gl::EnableVertexAttribArray(loc as u32);
+      //gl::VertexAttribIPointer(loc as u32, 1, gl::UNSIGNED_BYTE, 0, null());
+      //gl::VertexAttribI1ui(loc as u32, 0);
+      //gl::Uniform1i(loc, 1);
+    }*/
+
+    //vertex_type.set_uint(0);
   }
 
   pub fn load_texture_coordinates(&mut self, vertex_data: &Vec<ExtractedVertex>, shader_id: GLuint) {
