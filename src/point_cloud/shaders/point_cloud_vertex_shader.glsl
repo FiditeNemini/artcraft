@@ -68,12 +68,6 @@ void main()
 
       vertexPosition = imageLoad(pointCloudTexture0, currentDepthPixelCoordinates).xyz;
 
-      colorOut = vec4(
-        127,
-        inColor.g,
-        inColor.b,
-        255
-      );
     } else {
       // Camera #1
       ivec2 pointCloudSize1 = imageSize(pointCloudTexture1);
@@ -91,30 +85,8 @@ void main()
 
       vertexPosition = imageLoad(pointCloudTexture1, currentDepthPixelCoordinates).xyz;
 
-      colorOut = vec4(
-        inColor.r,
-        inColor.g,
-        127,
-        255
-      );
-
       vertexPosition = position;
     }
-
-    if (vertexType == 110) {
-        colorOut = vec4(
-            127,
-            127,
-            127,
-            0
-        );
-    }
-
-
-    // Scale up while model view matrices not implemented.
-    //vertexPosition.x *= 2.0 + 10.0;
-    //vertexPosition.y *= 2.0 + 10.0;
-    //vertexPosition.z *= 2.0;
 
     if (view[0][0] > 0.5) {
       vertexPosition.x -= 2.0;
