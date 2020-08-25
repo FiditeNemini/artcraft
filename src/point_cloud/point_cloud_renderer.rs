@@ -266,7 +266,7 @@ impl PointCloudRenderer {
     let filename = "/home/bt/dev/storyteller/assets/n64_smash_bros/pika.obj"; // MISSHAPEN!
     let filename = "/home/bt/dev/storyteller/assets/n64_pokemon_snap_bulbasaur/Bulbasaur/bulbasaur.obj";
 
-    if false {
+    if true {
       let filename = "/home/bt/dev/storyteller/assets/bundled/objects/n64_mario64_yoshi/yoshi.obj";
 
       let path = Path::new(filename);
@@ -287,7 +287,7 @@ impl PointCloudRenderer {
       self.renderable_objects.push(positionable_object);
     }
 
-    if false {
+    if true {
       let filename = "/home/bt/dev/storyteller/assets/bundled/objects/gamecube_ssbm_pichu/pichu.obj";
 
       let path = Path::new(filename);
@@ -307,7 +307,7 @@ impl PointCloudRenderer {
       self.renderable_objects.push(positionable_object);
     }
 
-    if false {
+    if true {
       let filename = "/home/bt/dev/storyteller/assets/bundled/objects/n64_zelda_oot_king_dodongo/King_Dodongo.obj";
 
       let path = Path::new(filename);
@@ -327,7 +327,7 @@ impl PointCloudRenderer {
       self.renderable_objects.push(positionable_object);
     }
 
-    if false {
+    if true {
       let filename = "/home/bt/dev/storyteller/assets/bundled/objects/n64_zelda_oot_poe/poe.obj";
 
       let path = Path::new(filename);

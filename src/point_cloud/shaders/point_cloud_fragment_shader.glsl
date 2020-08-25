@@ -20,37 +20,20 @@ void main()
         discard;
     }
 
-    if (vertexType == 3) {
-        discard;
+    if (vertexType == 1)
+    {
+      // Object mode
+      vec2 coord = texCoord;
+      fragmentColor = texture2D(objTexture, coord);
+    }
+    else if (vertexType == 2)
+    {
+      // Point cloud mode
+      fragmentColor = vertexColor;
     }
 
-    if (vertexColor.a == 0.0f) {
-        fragmentColor = vertexColor;
-    } else {
-
-        //fragmentColor = vec4(texCoord.r, texCoord.g, 127, 255);
-        //fragmentColor = texture2D(objTexture, texCoord); // * 0.80 + color * 0.20;
-        //fragmentColor = 0.5 * texture2D(objTexture, texCoord) + 0.01 * vec4(texCoord.r, texCoord.g, 0, 255);
-        //vec2 coord = vec2(texCoord.g, texCoord.g);
-
-        // Wavefront Objects
-        vec2 coord = texCoord;
-        fragmentColor = texture2D(objTexture, coord);
-
-    }
-
-    if (vertexType == 1) {
-        // Object mode
-        vec2 coord = texCoord;
-        fragmentColor = texture2D(objTexture, coord);
-    } else if (vertexType == 2) {
-        // Point cloud mode
-        fragmentColor = vertexColor;
-    }
-
-
-
-    if (fragmentColor.a == 0.0f) {
+    if (fragmentColor.a == 0.0f)
+    {
         discard;
     }
 }

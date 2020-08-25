@@ -122,26 +122,19 @@ void main()
 
     if (vertexType == 1) {
       // Object mode
-      //gl_Position = projection * view * model * vec4(vertexPosition, 1);
-
-        /*colorOut = vec4(
-          127,
-          inColor.g,
-          inColor.b,
-          0
-        );*/
 
       vertexColor = colorOut;
       texCoord = vTextureCoord;
 
     } else if (vertexType == 2) {
       // Point cloud mode
+
       ivec2 currentDepthPixelCoordinates = ivec2(gl_VertexID % pointCloudSize0.x, gl_VertexID / pointCloudSize0.x);
 
       vertexPosition = imageLoad(pointCloudTexture0, currentDepthPixelCoordinates).xyz;
 
       colorOut = vec4(
-        127,
+        inColor.r,
         inColor.g,
         inColor.b,
         255
