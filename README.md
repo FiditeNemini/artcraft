@@ -6,12 +6,18 @@ A startup, by Brandon Thomas.
 Webcam
 ------
 
+Update:
+
+This seems to work with some combination of reloading the driver (`./webcam/reload_driver.sh`), running VLC
+(maybe it sets the video buffer mode?), killing firefox, and starting random browsers and going to meet. 
+Eventually it seems to work.
+
 Docs and software:
 
 - software: https://github.com/webcamoid/akvcam
 - wiki: https://github.com/webcamoid/akvcam/wiki/Usage-and-examples
 
-The configuration I use is as follows:
+The configuration I use is as follows (this may have changed with the new ini file):
 
 - /dev/video0 is the input
 - /dev/video1 is the output
