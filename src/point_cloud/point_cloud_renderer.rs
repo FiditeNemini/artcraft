@@ -533,7 +533,7 @@ impl PointCloudRenderer {
       gl::Uniform1i(self.enable_shading_index, enable_shading);
 
       // Tell GLSL we're doing point clouds
-      gl::Uniform1i(self.uniform_vertex_type.id() as GLint, 1);
+      gl::Uniform1i(self.uniform_vertex_type.id() as GLint, 2);
 
       for i in 0 .. self.num_cameras {
         let vao = self.vertex_array_objects.get(i).unwrap();
@@ -547,7 +547,7 @@ impl PointCloudRenderer {
       gl::BindVertexArray(0);
 
       // Now tell GLSL we're doing objects
-      gl::Uniform1i(self.uniform_vertex_type.id() as GLint, 0);
+      gl::Uniform1i(self.uniform_vertex_type.id() as GLint, 1);
 
       for positionable in self.renderable_objects.iter() {
         positionable.draw(self.model_transform_id);

@@ -97,7 +97,7 @@ void main()
       vertexPosition = position;
     }
 
-    if (vertexType != 0) {
+    if (vertexType == 110) {
         colorOut = vec4(
             127,
             127,
@@ -117,10 +117,40 @@ void main()
       vertexPosition.y -= 2.0;
     }
 
-    gl_Position = projection * view * model * vec4(vertexPosition, 1);
-
     vertexColor = colorOut;
     texCoord = vTextureCoord;
+
+    if (vertexType == 1) {
+      // Object mode
+      //gl_Position = projection * view * model * vec4(vertexPosition, 1);
+
+        /*colorOut = vec4(
+          127,
+          inColor.g,
+          inColor.b,
+          0
+        );*/
+
+      vertexColor = colorOut;
+      texCoord = vTextureCoord;
+
+    } else if (vertexType == 2) {
+      // Point cloud mode
+      ivec2 currentDepthPixelCoordinates = ivec2(gl_VertexID % pointCloudSize0.x, gl_VertexID / pointCloudSize0.x);
+
+      vertexPosition = imageLoad(pointCloudTexture0, currentDepthPixelCoordinates).xyz;
+
+      colorOut = vec4(
+        127,
+        inColor.g,
+        inColor.b,
+        255
+      );
+
+      vertexColor = colorOut;
+    }
+
+    gl_Position = projection * view * model * vec4(vertexPosition, 1);
 
     // Pass along the 'invalid pixel' flag as the alpha channel
     //
