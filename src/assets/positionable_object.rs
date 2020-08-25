@@ -5,6 +5,14 @@ use std::ffi::CString;
 use std::os::raw::c_char;
 use crate::opengl::wrapper::uniform::Uniform;
 
+#[derive(Copy,Clone,Debug,PartialEq,Eq)]
+pub enum ObjectType {
+  Skybox,
+  Level,
+  Character,
+  Unknown,
+}
+
 pub struct PositionableObject {
   pub renderable_object: RenderableObject,
 
@@ -14,9 +22,10 @@ pub struct PositionableObject {
   pub rotation: Vector4<f32>,
   pub translation: Vector3<f32>,
 
-  pub rotation_typed: Rotation3<f32>,
-  pub translation_typed: Translation3<f32>,
-  pub is_transformed: bool,
+  //pub rotation_typed: Rotation3<f32>,
+  //pub translation_typed: Translation3<f32>,
+  //pub is_transformed: bool,
+  pub object_type: ObjectType,
 }
 
 impl PositionableObject {
@@ -27,9 +36,10 @@ impl PositionableObject {
       scale: Vector3::new(1.0, 1.0, 1.0),
       rotation: Vector4::default(),
       translation: Vector3::default(),
-      rotation_typed: Rotation3::identity(),
-      translation_typed: Translation3::identity(),
-      is_transformed: true,
+      //rotation_typed: Rotation3::identity(),
+      //translation_typed: Translation3::identity(),
+      //is_transformed: true,
+      object_type: ObjectType::Unknown,
     }
   }
 

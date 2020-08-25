@@ -32,7 +32,7 @@ use std::str;
 use std::sync::{Arc, Mutex};
 use std::time::{SystemTime, UNIX_EPOCH};
 use tobj::{load_obj, load_mtl};
-use crate::assets::positionable_object::PositionableObject;
+use crate::assets::positionable_object::{PositionableObject, ObjectType};
 use cgmath::{Matrix4, SquareMatrix, Matrix};
 use crate::opengl::wrapper::uniform::Uniform;
 use crate::opengl::matrices::{initial_projection_matrix_4x4_flat, initial_view_matrix_4x4_flat, identity_matrix_4x4, initial_view_matrix_4x4, initial_projection_matrix_4x4};
@@ -383,6 +383,8 @@ impl PointCloudRenderer {
 
       let mut positionable_object = PositionableObject::new(renderable_object);
 
+      positionable_object.object_type = ObjectType::Level;
+
       positionable_object.translate(0.0, 20.0, 0.0);
       positionable_object.scale(0.7);
       positionable_object.flip_y();
@@ -517,6 +519,11 @@ impl PointCloudRenderer {
   pub fn render(&mut self) -> Result<()> {
     // Animate the models.
     for obj in self.renderable_objects.iter_mut() {
+      match obj.object_type {
+        ObjectType::Level => continue,
+        ObjectType::Skybox => continue,
+        _ => {},
+      }
       obj.increment_rotation_y(0.05); // TODO: Should be based on wall clock instead
     }
 
