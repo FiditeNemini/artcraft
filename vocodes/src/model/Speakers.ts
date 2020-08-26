@@ -82,7 +82,7 @@ const SPEAKERS : Speaker[] = [
     description: "Terminator.",
     avatarUrl: "arnold-schwarzenegger.jpg",
     fullUrl: "arnold-schwarzenegger-full.png",
-    voiceQuality: 2.0,
+    voiceQuality: 8.0,
   }),
   Speaker.fromJson({
     name: "Bart Simpson",
@@ -355,7 +355,7 @@ const SPEAKERS : Speaker[] = [
     description: "Entrepreneur",
     avatarUrl: "sam-altman.jpg",
     fullUrl: "sam-altman-full.png",
-    voiceQuality: 8.0,
+    voiceQuality: 7.0,
   }),
   Speaker.fromJson({
     name: "Sarah Palin",
@@ -387,7 +387,7 @@ const SPEAKERS : Speaker[] = [
     description: "Lives in a sponge under the sea.",
     avatarUrl: "spongebob-squarepants.jpg",
     fullUrl: "spongebob-squarepants-full.png",
-    voiceQuality: 7.0,
+    voiceQuality: 8.0,
   }),
   Speaker.fromJson({
     name: "Tupac Shakur (acapella lyrics)",
