@@ -4,6 +4,7 @@ name = "Current Experiment"
 slug = "experiment"
 model_pipeline = "ArpabetGlowTtsMelgan"
 glow_tts = "glow_tts_single_speaker.torchjit"
+#melgan = "melgan_manyvoice5.0_2020-07-23_12d5838_10760.torchjit"
 #melgan = "melgan_manyvoice2.0_2020-07-08_12d5838_9330.torchjit"
 #melgan = "manyvoice1.0_2020-06-28_12d5838_6610.torchjit"
 melgan = "melgan-vocodes.torchjit"
@@ -89,6 +90,13 @@ melgan = "melgan-vocodes-2.torchjit"
 
 
 # --------------- New ---------------
+
+[[speakers]]
+name = "Homer Simpson"
+slug = "homer-simpson"
+model_pipeline = "ArpabetGlowTtsMelgan"
+glow_tts = "glow-tts_homer_simpson_ljstx_2020.08.21_expr-1_chkpt-7000.torchjit"
+melgan = "melgan_homer-simpson_2020.08.23_04b87e3_16300.torchjit"
 
 [[speakers]]
 name = "SpongeBob SquarePants"
