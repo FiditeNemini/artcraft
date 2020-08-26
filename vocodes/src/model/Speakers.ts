@@ -197,6 +197,15 @@ const SPEAKERS : Speaker[] = [
     voiceQuality: 5.5,
   }),
   Speaker.fromJson({
+    name: "Homer Simpson",
+    slug: "homer-simpson",
+    description: "Naturalist.",
+    avatarUrl: "homer-simpson.jpg",
+    fullUrl: "homer-simpson-full.png",
+    voiceQuality: 8.0,
+    defaultVoice: true,
+  }),
+  Speaker.fromJson({
     name: "J. K. Simmons",
     slug: "j-k-simmons",
     description: "Actor",
@@ -371,7 +380,6 @@ const SPEAKERS : Speaker[] = [
     avatarUrl: "david-attenborough.jpg",
     fullUrl: "david-attenborough-full.png",
     voiceQuality: 8.0,
-    defaultVoice: true,
   }),
   Speaker.fromJson({
     name: "SpongeBob SquarePants",
@@ -380,7 +388,6 @@ const SPEAKERS : Speaker[] = [
     avatarUrl: "spongebob-squarepants.jpg",
     fullUrl: "spongebob-squarepants-full.png",
     voiceQuality: 7.0,
-    defaultVoice: true,
   }),
   Speaker.fromJson({
     name: "Tupac Shakur (acapella lyrics)",
