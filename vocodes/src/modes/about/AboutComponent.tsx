@@ -113,20 +113,20 @@ function AboutComponent(props: Props) {
         &mdash; Learning Machines, LLC
       </p>
 
-      <div className="columns is-mobile">
+      <div className="columns">
         <div className="column">
-          <figure className="image is-square">
+          <figure className="image is-square is-fullwidth">
             <img src="/logos/pytorch.png" alt="models are written in pytorch" />
           </figure>
 
         </div>
         <div className="column">
-          <figure className="image is-square">
+          <figure className="image is-square is-fullwidth">
             <img src="/logos/kubernetes.png" alt="the cluster scales with k8s" />
           </figure>
         </div>
         <div className="column">
-          <figure className="image is-square">
+          <figure className="image is-square is-fullwidth">
             <img src="/logos/rust.png" alt="core server components are written in Rust" />
           </figure>
         </div>
