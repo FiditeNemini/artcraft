@@ -17,6 +17,7 @@ use std::fmt::Display;
 use std::net::SocketAddr;
 use std::str::FromStr;
 use std::sync::Arc;
+use futures::IntoFuture;
 
 /// NB: This much match the shape of SpeakRequest in the 'voder/tts_service' code.
 /// This is used for both /speak and /speak_spectrogram requests.
@@ -31,6 +32,23 @@ pub struct SpeakRequest {
 struct RequestDetails {
   pub request_bytes: Vec<u8>,
   pub speaker: String,
+}
+
+pub fn speak_proxy_with_retry(
+  req: Request<Body>,
+  remote_addr: SocketAddr,
+  router: Arc<Router>,
+  transaction: MaybeNewRelicTransaction,
+  endpoint: &'static str) -> BoxFut
+{
+  speak_proxy(req, remote_addr, router, transaction, endpoint)
+    .then(|result| {
+      match result {
+        Ok(t) => future::ok(t),
+        Err(t) => future::err(t),
+      }
+    })
+    .boxed()
 }
 
 pub fn speak_proxy(

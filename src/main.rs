@@ -7,7 +7,7 @@ pub mod speak_proxy;
 
 use anyhow::Result as AnyhowResult;
 use crate::newrelic_logger::{NewRelicLogger, MaybeNewRelicTransaction};
-use crate::speak_proxy::speak_proxy;
+use crate::speak_proxy::{speak_proxy, speak_proxy_with_retry};
 use futures::future::{self, Future};
 use hyper::Method;
 use hyper::header::HeaderValue;
@@ -179,7 +179,7 @@ fn main() -> AnyhowResult<()> {
       match (req.method(), req.uri().path()) {
         (&Method::POST, "/speak") => {
           let nr_transaction = newrelic_logger3.web_transaction("/speak");
-          speak_proxy(req, remote_addr.clone(), router3, nr_transaction, "/speak")
+          speak_proxy_with_retry(req, remote_addr.clone(), router3, nr_transaction, "/speak")
         },
         (&Method::POST, "/speak_spectrogram") => {
           let nr_transaction = newrelic_logger3.web_transaction("/speak_spectrogram");
