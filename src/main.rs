@@ -3,9 +3,11 @@
 #[macro_use] extern crate serde_derive;
 
 pub mod newrelic_logger;
+pub mod speak_proxy;
 
 use anyhow::Result as AnyhowResult;
 use crate::newrelic_logger::{NewRelicLogger, MaybeNewRelicTransaction};
+use crate::speak_proxy::speak_proxy;
 use futures::future::{self, Future};
 use hyper::Method;
 use hyper::header::HeaderValue;
@@ -57,16 +59,6 @@ impl ProxyConfigs {
   }
 }
 
-/// NB: This much match the shape of SpeakRequest in the 'voder/tts_service' code.
-/// This is used for both /speak and /speak_spectrogram requests.
-#[derive(Serialize, Deserialize, Debug)]
-pub struct SpeakRequest {
-  /// Slug for the speaker
-  speaker: String,
-  /// Raw text to be spoken
-  text: String,
-}
-
 fn get_env_string(env_name: &str, default: &str) -> String {
   match env::var(env_name).as_ref().ok() {
     Some(s) => s.to_string(),
@@ -107,12 +99,7 @@ fn health_check_response(_req: Request<Body>) -> BoxFut {
   Box::new(future::ok(response))
 }
 
-struct RequestDetails {
-  pub request_bytes: Vec<u8>,
-  pub speaker: String,
-}
-
-struct Router {
+pub struct Router {
   pub routes: HashMap<String, String>,
   pub default_route: String,
 }
@@ -131,69 +118,6 @@ impl Router {
       .map(|url| url.to_string())
       .unwrap_or(self.default_route.clone())
   }
-}
-
-fn speak_proxy(
-  req: Request<Body>,
-  remote_addr: SocketAddr,
-  router: Arc<Router>,
-  transaction: MaybeNewRelicTransaction,
-  endpoint: &'static str) -> BoxFut
-{
-  let mut headers = req.headers().clone();
-
-  // This is the IP of the Digital Ocean load balancer.
-  let gateway_ip = HeaderValue::from_str(&remote_addr.ip().to_string())
-    .ok()
-    .unwrap_or(HeaderValue::from_static(""));
-
-  // This is the IP of the upstream client browser.
-  let upstream_client_ip = req.headers().get(HeaderName::from_static("x-forwarded-for"))
-    .map(|ip| ip.to_str().unwrap_or(""))
-    .unwrap_or("");
-
-  let upstream_client_ip = HeaderValue::from_str(upstream_client_ip)
-    .ok()
-    .unwrap_or(HeaderValue::from_static(""));
-
-  headers.insert(HeaderName::from_static("forwarded"), upstream_client_ip.clone());
-  headers.insert(HeaderName::from_static("x-forwarded-for"), upstream_client_ip.clone());
-  // Unfortunately it looks like this middleware trounces the standard headers, so
-  // here we put it somewhere it won't be overwritten.
-  headers.insert(HeaderName::from_static("x-voder-proxy-for"), upstream_client_ip.clone());
-  headers.insert(HeaderName::from_static("x-gateway-ip"), gateway_ip);
-
-  Box::new(req.into_body().concat2().map(move |b| { // Builds a BoxedFut to return
-    let request_bytes = b.as_ref();
-
-    let request = serde_json::from_slice::<SpeakRequest>(request_bytes)
-      .unwrap();
-
-    RequestDetails {
-      request_bytes: request_bytes.to_vec(),
-      speaker: request.speaker,
-    }
-  }).and_then(move |request_details: RequestDetails| {
-    let proxy_host = router.get_speaker_host(&request_details.speaker);
-
-    info!("Routing {} for {} to {}", endpoint, &request_details.speaker, &proxy_host);
-
-    transaction.add_attribute("speaker", &request_details.speaker);
-
-    let mut request_builder = Request::builder();
-    request_builder.method(Method::POST)
-      .uri(endpoint);
-
-    for (k, v) in headers.iter() {
-      request_builder.header(k, v);
-    }
-
-    let new_req = request_builder
-      .body(Body::from(request_details.request_bytes))
-      .unwrap();
-
-    hyper_reverse_proxy::call(remote_addr.ip(), &proxy_host, new_req)
-  }))
 }
 
 fn main() -> AnyhowResult<()> {
