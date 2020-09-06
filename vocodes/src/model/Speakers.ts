@@ -283,7 +283,7 @@ const SPEAKERS : Speaker[] = [
     description: "SpongeBob SquarePants",
     avatarUrl: "mr-krabs.jpg",
     fullUrl: "mr-krabs-full.png",
-    voiceQuality: 6.9,
+    voiceQuality: 5.5,
   }),
   Speaker.fromJson({
     name: "Neil deGrasse Tyson",
