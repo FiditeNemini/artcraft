@@ -1,4 +1,32 @@
 [[speakers]]
+name = "Tucker Carlson"
+slug = "tucker-carlson"
+model_pipeline = "ArpabetGlowTtsMelgan"
+glow_tts = "glow-tts_tucker-carlson_ljstx_2020.09.04_expr-1_chkpt-4570.torchjit"
+melgan = "melgan_manyvoice5.0_2020-07-23_12d5838_10760.torchjit"
+
+[[speakers]]
+name = "Lisa Simpson"
+slug = "lisa-simpson"
+model_pipeline = "ArpabetGlowTtsMelgan"
+glow_tts = "glow-tts_lisa-simpson_ljstx_2020.09.04_expr-1_chkpt-5000.torchjit"
+melgan = "melgan_lisa-simpson_2020.09.05_d3b9647_15000.torchjit"
+
+[[speakers]]
+name = "Squidward"
+slug = "squidward"
+model_pipeline = "ArpabetGlowTtsMelgan"
+glow_tts = "glow-tts_squidward_ljstx_2020.09.03_expr-1_chkpt-4500.torchjit"
+melgan = "melgan_squidward_2020.09.05_d3b9647_14000.torchjit"
+
+[[speakers]]
+name = "Mr. Krabs"
+slug = "mr-krabs"
+model_pipeline = "ArpabetGlowTtsMelgan"
+glow_tts = "glow-tts_mr_krabs_ljstx_2020.09.03_expr-1_chkpt-4500.torchjit"
+melgan = "melgan_mr-krabs_2020.09.05_d3b9647_14000.torchjit"
+
+[[speakers]]
 name = "Homer Simpson"
 slug = "homer-simpson"
 model_pipeline = "ArpabetGlowTtsMelgan"
