@@ -254,6 +254,14 @@ const SPEAKERS : Speaker[] = [
     voiceQuality: 5.9,
   }),
   Speaker.fromJson({
+    name: "Lisa Simpson",
+    slug: "lisa-simpson",
+    description: "The Simpsons",
+    avatarUrl: "lisa-simpson.jpg",
+    fullUrl: "lisa-simpson-full.png",
+    voiceQuality: 6.5,
+  }),
+  Speaker.fromJson({
     name: "Mark Zuckerberg",
     slug: "mark-zuckerberg",
     description: "Facebook.",
@@ -268,6 +276,14 @@ const SPEAKERS : Speaker[] = [
     avatarUrl: "fred-rogers.jpg",
     fullUrl: "fred-rogers-full.png",
     voiceQuality: 4.9,
+  }),
+  Speaker.fromJson({
+    name: "Mr. Krabs",
+    slug: "mr-krabs",
+    description: "SpongeBob SquarePants",
+    avatarUrl: "mr-krabs.jpg",
+    fullUrl: "mr-krabs-full.png",
+    voiceQuality: 6.9,
   }),
   Speaker.fromJson({
     name: "Neil deGrasse Tyson",
@@ -388,6 +404,22 @@ const SPEAKERS : Speaker[] = [
     avatarUrl: "spongebob-squarepants.jpg",
     fullUrl: "spongebob-squarepants-full.png",
     voiceQuality: 8.0,
+  }),
+  Speaker.fromJson({
+    name: "Squidward Tentacles",
+    slug: "squidward",
+    description: "SpongeBob SquarePants",
+    avatarUrl: "squidward.jpg",
+    fullUrl: "squidward-full.png",
+    voiceQuality: 6.5,
+  }),
+  Speaker.fromJson({
+    name: "Tucker Carlson",
+    slug: "tucker-carlson",
+    description: "TV news personality",
+    avatarUrl: "tucker-carlson.jpg",
+    fullUrl: "tucker-carlson-full.png",
+    voiceQuality: 7.5,
   }),
   Speaker.fromJson({
     name: "Tupac Shakur (acapella lyrics)",
