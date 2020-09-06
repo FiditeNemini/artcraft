@@ -411,7 +411,7 @@ const SPEAKERS : Speaker[] = [
     description: "SpongeBob SquarePants",
     avatarUrl: "squidward.jpg",
     fullUrl: "squidward-full.png",
-    voiceQuality: 6.5,
+    voiceQuality: 4.5,
   }),
   Speaker.fromJson({
     name: "Tucker Carlson",
