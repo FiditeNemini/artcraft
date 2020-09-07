@@ -10,8 +10,12 @@ use std::fs::File;
 use std::path::{PathBuf, Path};
 use std::{fs, io, env};
 use std::str::FromStr;
+use std::io::BufWriter;
 
 const ENV_RUST_LOG : &'static str = "RUST_LOG";
+
+// NB: 8*1024 is the same default size used by std::io, but we make it explicit.
+const DEFAULT_BUF_SIZE : usize = 8 * 1024;
 
 struct BucketDownloader {
   bucket: Bucket,
@@ -131,9 +135,10 @@ impl BucketDownloader {
 
     debug!("Downloading object to temp: {} (as {:?})", object.key, temp_file_path);
 
-    let mut temp_file = File::create(temp_file_path)?;
+    let temp_file = File::create(temp_file_path)?;
+    let mut buffer = BufWriter::with_capacity(DEFAULT_BUF_SIZE, temp_file);
 
-    let code = self.bucket.get_object_stream_blocking(&object.key, &mut temp_file)?;
+    let code = self.bucket.get_object_stream_blocking(&object.key, &mut buffer)?;
     if code != 200 {
       bail!("Couldn't download object to temp. Code = {}", code);
     }
@@ -231,7 +236,6 @@ pub fn main() -> AnyhowResult<()> {
   let download_dir = get_env(ENV_DOWNLOAD_DIR)?;
   let temp_dir = get_env(ENV_TEMP_DIR)?;
   let match_path = get_env(ENV_MATCH_PATH)?;
-
 
   let credentials = Credentials::new_blocking(
     Some(&access_key),
