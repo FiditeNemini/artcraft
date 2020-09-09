@@ -270,6 +270,14 @@ const SPEAKERS : Speaker[] = [
     voiceQuality: 4.9,
   }),
   Speaker.fromJson({
+    name: "Michael Rosen",
+    slug: "michael-rosen",
+    description: "Writer.",
+    avatarUrl: "michael-rosen.jpg",
+    fullUrl: "michael-rosen-full.png",
+    voiceQuality: 6.5,
+  }),
+  Speaker.fromJson({
     name: "Mr. Fred Rogers",
     slug: "fred-rogers",
     description: "Educator and amazing human being.",
@@ -436,6 +444,14 @@ const SPEAKERS : Speaker[] = [
     avatarUrl: "wilford-brimley.jpg",
     fullUrl: "wilford-brimley-full.png",
     voiceQuality: 7.4,
+  }),
+  Speaker.fromJson({
+    name: "Wizard (Death Battle!)",
+    slug: "wizard",
+    description: "Rooster Teeth YouTube Show",
+    avatarUrl: "wizard.jpg",
+    fullUrl: "wizard-full.png",
+    voiceQuality: 5.4,
   }),
 ];
 
