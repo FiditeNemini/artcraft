@@ -8,6 +8,7 @@ use actix_web::HttpRequest;
 use crate::endpoints::helpers::ip_address::get_request_ip;
 use actix_web::http::header::HeaderMap;
 use actix_web::http::HeaderName;
+use crate::endpoints::speak::api::SpeakRequest;
 
 const RATE_LIMIT_BYPASS_HEADER : &'static str = "limitless";
 
@@ -71,9 +72,19 @@ impl RedisRateLimiter {
 }
 
 impl RateLimiter for RedisRateLimiter {
-  fn maybe_ratelimit_request(&self, ip_address: &str, headers: &HeaderMap) -> Result<(), RateLimiterError> {
+  fn maybe_ratelimit_request(&self, ip_address: &str, headers: &HeaderMap, speak_request: &SpeakRequest) -> Result<(), RateLimiterError> {
+    if speak_request.skip_rate_limiter {
+      info!("Bypassing rate limiter with request param.");
+      return Ok(());
+    }
+
     if headers.contains_key(&self.rate_limit_bypass_header) {
-      info!("Bypassing rate limiter");
+      info!("Bypassing rate limiter with admin debug header.");
+      return Ok(());
+    }
+
+    if speak_request.retry_attempt_number > 0 {
+      info!("Retries bypass the rate limiter.");
       return Ok(());
     }
 

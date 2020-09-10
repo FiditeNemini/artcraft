@@ -55,7 +55,7 @@ pub async fn post_speak_with_spectrogram(request: HttpRequest,
 
   let ip_address = get_request_ip(&request);
 
-  if let Err(_err) = app_state.rate_limiter.maybe_ratelimit_request(&ip_address, &request.headers()) {
+  if let Err(_err) = app_state.rate_limiter.maybe_ratelimit_request(&ip_address, &request.headers(), &query) {
     return Err(SpeakError::rate_limited());
   }
 

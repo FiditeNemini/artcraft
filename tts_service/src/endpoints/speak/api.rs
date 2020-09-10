@@ -8,8 +8,19 @@ use std::fmt;
 pub struct SpeakRequest {
   /// Slug for the speaker
   pub speaker: String,
+
   /// Raw text to be spoken
   pub text: String,
+
+  /// Retry attempt.
+  /// The first request is "0", and all subsequent requests are incremented.
+  /// Subsequent requests do not trigger the rate limiter.
+  #[serde(default)]
+  pub retry_attempt_number: u8,
+
+  /// Admin/debug requests get to skip the rate limiter.
+  #[serde(default)]
+  pub skip_rate_limiter: bool,
 }
 
 #[derive(Serialize,Debug)]

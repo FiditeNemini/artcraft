@@ -1,4 +1,18 @@
 [[speakers]]
+name = "Michael Rosen"
+slug = "michael-rosen"
+model_pipeline = "ArpabetGlowTtsMelgan"
+glow_tts = "glow-tts_michael-rosen_ljstx_2020.09.05_expr-1_chkpt-5682.torchjit"
+melgan = "melgan_manyvoice5.0_2020-07-23_12d5838_10760.torchjit"
+
+[[speakers]]
+name = "Wizard (Death Battle!)"
+slug = "wizard"
+model_pipeline = "ArpabetGlowTtsMelgan"
+glow_tts = "glow-tts_wiz_ljstx_2020.09.05_expr-1_chkpt-4500.torchjit"
+melgan = "melgan_wiz_2020.09.07_d3b9647_17000.torchjit"
+
+[[speakers]]
 name = "Tucker Carlson"
 slug = "tucker-carlson"
 model_pipeline = "ArpabetGlowTtsMelgan"
