@@ -9,10 +9,10 @@ pub mod speak_proxy;
 use anyhow::Result as AnyhowResult;
 use crate::newrelic_logger::NewRelicLogger;
 use crate::speak_proxy::speak_proxy_with_retry;
-use hyper::StatusCode;
 use hyper::server::conn::AddrStream;
 use hyper::service::{service_fn, make_service_fn};
 use hyper::{Body, Request, Response, Server};
+use hyper::{StatusCode, Method};
 use rand::seq::IteratorRandom;
 use std::collections::HashMap;
 use std::convert::Infallible;
@@ -125,8 +125,8 @@ pub async fn handle(
   newrelic_logger: Arc<NewRelicLogger>,
   server_params: ServerParams) -> Result<Response<Body>, Infallible>
 {
-  match req.uri().path() {
-    "/speak" => {
+  match (req.method(), req.uri().path()) {
+    (&Method::POST, "/speak") => {
       let nr_transaction = newrelic_logger.web_transaction("/speak");
       let result = speak_proxy_with_retry(
         client_ip,
@@ -141,7 +141,7 @@ pub async fn handle(
         Err(error) => Ok(error.to_response()),
       }
     },
-    "/speak_spectrogram" => {
+    (&Method::POST, "/speak_spectrogram") => {
       let nr_transaction = newrelic_logger.web_transaction("/speak_spectrogram");
       let result = speak_proxy_with_retry(
         client_ip,
@@ -156,7 +156,7 @@ pub async fn handle(
         Err(error) => Ok(error.to_response()),
       }
     },
-    "/proxy_health" => {
+    (&Method::GET, "/proxy_health") => {
       let _droppable_transaction = newrelic_logger.web_transaction("/proxy_health");
       health_check_response(req)
     },
