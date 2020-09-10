@@ -2,7 +2,6 @@ use anyhow::Result as AnyhowResult;
 use futures::TryStreamExt;
 use hyper::http::HeaderValue;
 use hyper::{Body, Request, HeaderMap, Response, StatusCode};
-use hyper::body::Bytes;
 
 /// NB: This much match the shape of SpeakRequest in the 'voder/tts_service' code.
 /// This is used for both /speak and /speak_spectrogram requests.

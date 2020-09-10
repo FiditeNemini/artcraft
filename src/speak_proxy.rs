@@ -1,26 +1,15 @@
-use anyhow::Result as AnyhowResult;
 use crate::Router;
-use crate::api::{ExternalSpeakRequest, ExternalHttpRequest, InternalSpeakRequest, ErrorResponse, ErrorType};
-use crate::newrelic_logger::{NewRelicLogger, MaybeNewRelicTransaction};
-use futures::TryStreamExt;
-use futures::future::{self, Future};
+use crate::api::{ExternalHttpRequest, InternalSpeakRequest, ErrorResponse, ErrorType};
+use crate::newrelic_logger::{MaybeNewRelicTransaction};
+use hyper::Method;
 use hyper::header::HeaderValue;
 use hyper::http::header::HeaderName;
-use hyper::server::conn::AddrStream;
-use hyper::service::{service_fn, make_service_fn};
-use hyper::{Body, Request, Response, Server, HeaderMap};
-use hyper::{Method, StatusCode};
-use hyper_reverse_proxy::ProxyError;
-use rand::seq::IteratorRandom;
-use std::collections::HashMap;
-use std::convert::Infallible;
+use hyper::{Body, Request, Response, HeaderMap};
 use std::fmt::Debug;
-use std::fmt::Display;
-use std::net::{SocketAddr, IpAddr};
-use std::str::FromStr;
+use std::net::IpAddr;
 use std::sync::Arc;
+use std::thread;
 use std::time::Duration;
-use std::{env, thread};
 
 pub async fn speak_proxy_with_retry(
   ip_addr: IpAddr,

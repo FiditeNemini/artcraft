@@ -1,5 +1,3 @@
-#![feature(toowned_clone_into)]
-
 #[macro_use] extern crate anyhow;
 #[macro_use] extern crate log;
 #[macro_use] extern crate serde_derive;
@@ -9,22 +7,19 @@ pub mod newrelic_logger;
 pub mod speak_proxy;
 
 use anyhow::Result as AnyhowResult;
-use crate::newrelic_logger::{NewRelicLogger, MaybeNewRelicTransaction};
+use crate::newrelic_logger::NewRelicLogger;
 use crate::speak_proxy::speak_proxy_with_retry;
-use futures::future::{self, Future};
-use hyper::header::HeaderValue;
-use hyper::http::header::HeaderName;
+use hyper::StatusCode;
 use hyper::server::conn::AddrStream;
 use hyper::service::{service_fn, make_service_fn};
 use hyper::{Body, Request, Response, Server};
-use hyper::{Method, StatusCode};
 use rand::seq::IteratorRandom;
 use std::collections::HashMap;
 use std::convert::Infallible;
 use std::env;
 use std::fmt::Debug;
 use std::fmt::Display;
-use std::net::{SocketAddr, IpAddr};
+use std::net::IpAddr;
 use std::str::FromStr;
 use std::sync::Arc;
 
@@ -114,10 +109,10 @@ impl Router {
   }
 }
 
-fn debug_request(req: Request<Body>) -> Result<Response<Body>, Infallible>  {
-  let body_str = format!("{:?}", req);
-  Ok(Response::new(Body::from(body_str)))
-}
+// fn debug_request(req: Request<Body>) -> Result<Response<Body>, Infallible>  {
+//   let body_str = format!("{:?}", req);
+//   Ok(Response::new(Body::from(body_str)))
+// }
 
 fn health_check_response(_req: Request<Body>) -> Result<Response<Body>, Infallible> {
   Ok(Response::new(Body::from("healthy")))
