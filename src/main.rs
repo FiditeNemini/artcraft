@@ -29,14 +29,18 @@ use std::str::FromStr;
 use std::sync::Arc;
 
 const ENV_DEFAULT_ROUTE : &'static str = "DEFAULT_ROUTE";
+const ENV_MAX_RETRIES : &'static str = "MAX_RETRIES";
 const ENV_NEWRELIC_API_KEY : &'static str = "NEWRELIC_API_KEY";
 const ENV_PROXY_CONFIG_FILE : &'static str = "PROXY_CONFIG_FILE";
+const ENV_RETRY_WAIT_MS : &'static str = "RETRY_WAIT_MS";
 const ENV_RUST_LOG : &'static str = "RUST_LOG";
 const ENV_SERVICE_PORT : &'static str = "SERVICE_PORT";
 
 const DEFAULT_DEFAULT_ROUTE : &'static str = "http://127.0.0.1:12345";
+const DEFAULT_MAX_RETRIES : u8 = 3;
 const DEFAULT_NEWRELIC_API_KEY : &'static str = "";
 const DEFAULT_PROXY_CONFIG_FILE : &'static str = "proxy_configs.toml";
+const DEFAULT_RETRY_WAIT_MS : u64 = 400;
 const DEFAULT_RUST_LOG : &'static str = "tokio_reactor=warn,hyper=info,debug";
 const DEFAULT_SERVICE_PORT : u16 = 5555;
 
@@ -123,12 +127,20 @@ pub async fn handle(
   client_ip: IpAddr,
   req: Request<Body>,
   router: Arc<Router>,
-  newrelic_logger: Arc<NewRelicLogger>) -> Result<Response<Body>, Infallible>
+  newrelic_logger: Arc<NewRelicLogger>,
+  server_params: ServerParams) -> Result<Response<Body>, Infallible>
 {
   match req.uri().path() {
     "/speak" => {
       let nr_transaction = newrelic_logger.web_transaction("/speak");
-      let result = speak_proxy_with_retry(client_ip, req, router, nr_transaction, "/speak").await;
+      let result = speak_proxy_with_retry(
+        client_ip,
+        req,
+        router,
+        nr_transaction,
+        server_params.max_retries,
+        server_params.retry_wait_ms,
+        "/speak").await;
       match result {
         Ok(response) => Ok(response),
         Err(error) => Ok(error.to_response()),
@@ -136,7 +148,14 @@ pub async fn handle(
     },
     "/speak_spectrogram" => {
       let nr_transaction = newrelic_logger.web_transaction("/speak_spectrogram");
-      let result = speak_proxy_with_retry(client_ip, req, router, nr_transaction, "/speak_spectrogram").await;
+      let result = speak_proxy_with_retry(
+        client_ip,
+        req,
+        router,
+        nr_transaction,
+        server_params.max_retries,
+        server_params.retry_wait_ms,
+        "/speak_spectrogram").await;
       match result {
         Ok(response) => Ok(response),
         Err(error) => Ok(error.to_response()),
@@ -168,6 +187,12 @@ pub async fn handle(
   }
 }
 
+#[derive(Debug, Clone)]
+pub struct ServerParams {
+  pub max_retries: u8,
+  pub retry_wait_ms: u64,
+}
+
 #[tokio::main]
 async fn main() {
   if env::var(ENV_RUST_LOG)
@@ -184,7 +209,7 @@ async fn main() {
 
   let default_route = get_env_string(ENV_DEFAULT_ROUTE, DEFAULT_DEFAULT_ROUTE);
   let service_port = get_env_num::<u16>(ENV_SERVICE_PORT, DEFAULT_SERVICE_PORT)
-    .expect("should have env var");
+    .expect("should have service port env var");
   let newrelic_api_key = get_env_string(ENV_NEWRELIC_API_KEY, DEFAULT_NEWRELIC_API_KEY);
 
   info!("Default route: {}", default_route);
@@ -192,9 +217,25 @@ async fn main() {
   let proxy_configs_file = get_env_string(ENV_PROXY_CONFIG_FILE, DEFAULT_PROXY_CONFIG_FILE);
   info!("Proxy config file: {}", proxy_configs_file);
 
+  let max_retries = get_env_num::<u8>(ENV_MAX_RETRIES, DEFAULT_MAX_RETRIES)
+    .expect("should have max retries env var");
+
+  info!("Max retries: {}", max_retries);
+
+  let retry_wait_ms = get_env_num::<u64>(ENV_RETRY_WAIT_MS, DEFAULT_RETRY_WAIT_MS)
+    .expect("should have retry wait ms env var");
+
+  info!("Retry wait: {}", retry_wait_ms);
+
   let proxy_configs = ProxyConfigs::load_from_file(&proxy_configs_file)
     .expect("should have configs");
+
   info!("Proxy configs: {:?}", proxy_configs);
+
+  let server_params = ServerParams {
+    max_retries,
+    retry_wait_ms,
+  };
 
   let mut route_map = HashMap::new();
 
@@ -220,15 +261,17 @@ async fn main() {
     let remote_addr = conn.remote_addr().ip();
     let router2 = router.clone();
     let newrelic_logger2 = newrelic_logger.clone();
+    let server_params = server_params.clone();
 
     async move {
       let router3 = router2.clone();
       let newrelic_logger3 = newrelic_logger2.clone();
+      let server_params = server_params.clone();
 
       Ok::<_, Infallible>(service_fn(move |req| {
         let router4 = router3.clone();
         let newrelic_logger4 = newrelic_logger3.clone();
-        handle(remote_addr, req, router4, newrelic_logger4)
+        handle(remote_addr, req, router4, newrelic_logger4, server_params.clone())
       }))
     }
   });

@@ -27,6 +27,8 @@ pub async fn speak_proxy_with_retry(
   request: Request<Body>,
   router: Arc<Router>,
   _transaction: MaybeNewRelicTransaction,
+  max_retries: u8,
+  retry_wait_ms: u64,
   endpoint: &'static str) -> Result<Response<Body>, ErrorResponse>
 {
   let mut attempt : u8 = 0;
@@ -87,9 +89,9 @@ pub async fn speak_proxy_with_retry(
 
     attempt += 1;
 
-    thread::sleep(Duration::from_millis(400)); // TODO: Needs backoff + jitter
+    thread::sleep(Duration::from_millis(retry_wait_ms)); // TODO: Needs backoff + jitter
 
-    if attempt > 2 {
+    if attempt >= max_retries {
       return Err(ErrorResponse {
         error_type: ErrorType::ProxyError,
         error_description: "max internal retry attempts reached".to_string(),
