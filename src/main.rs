@@ -127,10 +127,10 @@ pub fn main() -> AnyhowResult<()> {
     Arc::new(FakeDeviceCaptureProvider::new().unwrap())
   };
 
-  let calibration = capture_provider.get_calibration().clone();
+  //let calibration = capture_provider.get_calibration().clone();
   //calibration.debug_print();
 
-  graphics_imgui::run(capture_provider, calibration, program_args)?;
+  graphics_imgui::run(capture_provider, program_args)?;
 
   Ok(())
 }

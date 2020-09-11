@@ -12,6 +12,6 @@ pub trait CaptureProvider {
    */
   fn get_captures(&self) -> Option<Vec<CaptureProxy>>;
 
-  /** Get device calibration (from one of the cameras). */
-  fn get_calibration(&self) -> &Calibration;
+  /** Get device calibrations for all cameras. */
+  fn get_calibrations(&self) -> &Vec<Calibration>;
 }

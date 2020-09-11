@@ -23,6 +23,7 @@ use crate::point_cloud::pixel_structs::DepthPixel;
 use crate::point_cloud::point_cloud_renderer::{PointCloudRenderer, PointCloudRendererError};
 use crate::point_cloud::util::{colorize_depth_blue_to_red, get_depth_mode_range, ValueRange};
 use crate::point_cloud::viewer_image::ViewerImage;
+use crate::kinect::sensor_control::CaptureProvider;
 
 pub type Result<T> = std::result::Result<T, PointCloudVisualizerError>;
 
@@ -108,8 +109,15 @@ pub struct PointCloudVisualizer {
   pub point_cloud_renderer: PointCloudRenderer,
   pub point_cloud_converters: Vec<GpuPointCloudConverter>,
 
-  calibration_data: Calibration,
-  transformation: Transformation, // TODO: WAT k4a_sys::k4a_transformation_t
+  /// Calibration data for all cameras
+  all_device_calibrations: Vec<Calibration>,
+
+  /// Transformations are constructed from camera calibrations
+  transformations: Vec<Transformation>,
+
+  /// Near and far minima/maxima for the current depth sensor mode.
+  /// These are constructed  for each camera from the camera calibrations.
+  expected_depth_value_ranges: Vec<ValueRange>,
 
   frame_buffer: Framebuffer,
   depth_buffer: Renderbuffer,
@@ -130,9 +138,6 @@ pub struct PointCloudVisualizer {
 
   color_xy_tables: Vec<ImageProxy>,
   depth_xy_tables: Vec<ImageProxy>,
-
-  /// Near and far minima/maxima for the current depth sensor mode.
-  depth_value_range: ValueRange,
 
   /// Background clear color for OpenGL.
   clear_color: RgbaF32,
@@ -160,9 +165,9 @@ impl PointCloudVisualizer {
   /// CTOR
   ///
   pub fn new(num_cameras: usize,
+             all_device_calibrations: &Vec<Calibration>,
              enable_color_point_cloud: bool,
              initial_colorization_strategy: ColorizationStrategy,
-             calibration_data: Calibration,
              clear_color: RgbaF32,
              arcball_camera: Arc<Mutex<MouseCameraArcball>>) -> Self
   {
@@ -178,8 +183,17 @@ impl PointCloudVisualizer {
       gl::RenderbufferStorage(gl::RENDERBUFFER, gl::DEPTH_COMPONENT, width, height);
     }
 
-    let expected_value_range = get_depth_mode_range(calibration_data.0.depth_mode)
-        .expect("Should be in correct depth sensor mode.");
+    let mut expected_depth_value_ranges = Vec::new();
+    let mut transformations = Vec::new();
+
+    for calibration in all_device_calibrations {
+      let value_range = get_depth_mode_range(calibration.0.depth_mode)
+          .expect("Should be in correct depth sensor mode.");
+      expected_depth_value_ranges.push(value_range);
+
+      let transformation = Transformation::from_calibration(&calibration);
+      transformations.push(transformation);
+    }
 
     let mut point_cloud_converters = Vec::with_capacity(num_cameras);
     let mut transformed_depth_images = Vec::with_capacity(num_cameras);
@@ -189,21 +203,23 @@ impl PointCloudVisualizer {
     let mut color_xy_tables = Vec::with_capacity(num_cameras);
     let mut depth_xy_tables = Vec::with_capacity(num_cameras);
 
-    for _ in 0 .. num_cameras {
+    for i in 0 .. num_cameras {
       point_cloud_converters.push(GpuPointCloudConverter::new());
       transformed_depth_images.push(None);
       point_cloud_colorizations.push(None);
       last_captures.push(None);
       xyz_textures.push(Texture::new());
 
+      let calibration = all_device_calibrations.get(i).unwrap();
+
       // TODO: generate color xytable only on `enable_color_point_cloud`.
       let color_xy_table = GpuPointCloudConverter::generate_xy_table(
-        &calibration_data,
+        &calibration,
         k4a_sys::k4a_calibration_type_t_K4A_CALIBRATION_TYPE_COLOR,
       ).unwrap();
 
       let depth_xy_table = GpuPointCloudConverter::generate_xy_table(
-        &calibration_data,
+        &calibration,
         k4a_sys::k4a_calibration_type_t_K4A_CALIBRATION_TYPE_DEPTH,
       ).unwrap();
 
@@ -232,16 +248,16 @@ impl PointCloudVisualizer {
       color_xy_tables,
       depth_xy_tables,
       colorization_strategy: initial_colorization_strategy,
-      calibration_data: calibration_data.clone(),
-      transformation: Transformation::from_calibration(&calibration_data),
+      transformations,
       last_captures,
       transformed_depth_images,
       point_cloud_colorizations,
       xyz_textures,
-      depth_value_range: expected_value_range,
+      expected_depth_value_ranges,
       clear_color,
       debug_static_color_frames,
       debug_static_depth_frames,
+      all_device_calibrations: all_device_calibrations.clone(),
     };
 
     visualizer.set_colorization_strategy(initial_colorization_strategy).expect("Should work");
@@ -379,6 +395,8 @@ impl PointCloudVisualizer {
     // Depth Image extractor
     //
 
+    let transformation = self.transformations.get(camera_index).unwrap();
+
     let mut depth_image = match capture.get_depth_image() {
       Ok(img) => img,
       Err(_e) => {
@@ -401,7 +419,7 @@ impl PointCloudVisualizer {
           unsafe {
 
             let result = k4a_sys::k4a_transformation_depth_image_to_color_camera(
-              self.transformation.get_handle(),
+              transformation.get_handle(),
               depth_image.get_handle(),
               transformed_depth_image.get_handle(),
             );
@@ -449,6 +467,8 @@ impl PointCloudVisualizer {
       // This creates a color spectrum based on depth.
       let dst_length = use_depth_image.get_width_pixels() * use_depth_image.get_height_pixels();
 
+      let depth_value_range = self.expected_depth_value_ranges.get(camera_index).unwrap();
+
       unsafe {
         // src: DepthPixel
         let src_pixel_buffer = use_depth_image.get_buffer();
@@ -466,7 +486,7 @@ impl PointCloudVisualizer {
 
         for i in 0 .. dst_length as isize {
           let src_pixel = *typed_src_pixel_buffer.offset(i);
-          let pixel = colorize_depth_blue_to_red(src_pixel, &self.depth_value_range);
+          let pixel = colorize_depth_blue_to_red(src_pixel, depth_value_range);
           (*typed_dst_pixel_buffer.offset(i)).red = pixel.red;
           (*typed_dst_pixel_buffer.offset(i)).green = pixel.green;
           (*typed_dst_pixel_buffer.offset(i)).blue = pixel.blue;
@@ -493,12 +513,14 @@ impl PointCloudVisualizer {
       return Err(PointCloudVisualizerError::UnsupportedMode);
     }
 
+    let calibration = self.all_device_calibrations.get(camera_index).unwrap();
+
     self.colorization_strategy = strategy;
     self.point_cloud_renderer.set_enable_shading(strategy == ColorizationStrategy::Shaded);
 
     if strategy == ColorizationStrategy::Color {
-      let width = self.calibration_data.0.color_camera_calibration.resolution_width;
-      let height = self.calibration_data.0.color_camera_calibration.resolution_height;
+      let width = calibration.0.color_camera_calibration.resolution_width;
+      let height = calibration.0.color_camera_calibration.resolution_height;
       let stride = width * size_of::<DepthPixel>() as i32;
 
       // TODO: TEMP MULTI-CAMERA SUPPORT
@@ -516,8 +538,8 @@ impl PointCloudVisualizer {
       }
 
     } else {
-      let width = self.calibration_data.0.depth_camera_calibration.resolution_width as u32;
-      let height = self.calibration_data.0.depth_camera_calibration.resolution_height as u32;
+      let width = calibration.0.depth_camera_calibration.resolution_width as u32;
+      let height = calibration.0.depth_camera_calibration.resolution_height as u32;
       let stride = width as i32 * size_of::<BgraPixel>() as i32;
 
       // TODO: TEMP MULTI-CAMERA SUPPORT

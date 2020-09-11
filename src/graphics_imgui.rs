@@ -16,7 +16,7 @@ use std::path::Path;
 use std::sync::{Arc, Mutex, PoisonError, MutexGuard};
 use std::time::{Instant, Duration};
 
-pub fn run(capture_provider: Arc<CaptureProvider>, calibration_data: Calibration, program_args: ProgramArgs) -> AnyhowResult<()> {
+pub fn run(capture_provider: Arc<CaptureProvider>, program_args: ProgramArgs) -> AnyhowResult<()> {
   let mut webcam_writer = None;
 
   if program_args.enable_webcam_output_writing {
@@ -63,9 +63,9 @@ pub fn run(capture_provider: Arc<CaptureProvider>, calibration_data: Calibration
 
   let mut visualizer = PointCloudVisualizer::new(
     capture_provider.get_num_cameras(),
+    capture_provider.get_calibrations(),
     true,
     colorization_strategy,
-    calibration_data,
     clear_color,
     sdl_arcball.clone(),
   );

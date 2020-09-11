@@ -7,7 +7,7 @@ use crate::point_cloud::debug::image_proxy::ImageProxy;
 pub struct FakeDeviceCaptureProvider {
   num_cameras: usize,
   captures: Vec<CaptureProxy>,
-  calibration: Calibration,
+  all_device_calibrations: Vec<Calibration>,
 }
 
 impl FakeDeviceCaptureProvider {
@@ -151,10 +151,15 @@ impl FakeDeviceCaptureProvider {
       ]
     ];
 
+    let mut all_device_calibrations = Vec::new();
+    for _ in 0 .. 2 {
+      all_device_calibrations.push(calibration.clone());
+    }
+
     Ok(Self {
       num_cameras: 2,
       captures,
-      calibration,
+      all_device_calibrations,
     })
   }
 }
@@ -171,7 +176,7 @@ impl CaptureProvider for FakeDeviceCaptureProvider {
     Some(capture_clones)
   }
 
-  fn get_calibration(&self) -> &Calibration {
-    &self.calibration
+  fn get_calibrations(&self) -> &Vec<Calibration> {
+    &self.all_device_calibrations
   }
 }

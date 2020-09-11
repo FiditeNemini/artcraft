@@ -11,13 +11,15 @@ pub struct MultiDeviceCapturer {
   num_cameras: usize,
   pub primary_device: Device,  // TODO: Temporary public viz
   secondary_devices: Vec<Device>,
-  calibration: Calibration,
+  /// Calibrations for primary + all secondaries in order.
+  all_device_calibrations: Vec<Calibration>,
   capture_provider: Arc<MultiDeviceCaptureProvider>,
 }
 
 pub struct MultiDeviceCaptureProvider {
   num_cameras: usize,
-  calibration: Calibration,
+  /// Calibrations for primary + all secondaries in order.
+  all_device_calibrations: Vec<Calibration>,
   captures: Arc<Mutex<Vec<Capture>>>, // TODO: Shouldn't need to wrap in mutex if we wrap struct instead.
 }
 
@@ -28,6 +30,10 @@ impl MultiDeviceCapturer {
   pub fn new(num_devices: u32, limit_secondary_devices: Option<usize>) -> Result<Self, KinectError> {
     let mut primary_device = None;
     let mut secondary_devices = Vec::new();
+    let mut calibrations = Vec::new();
+
+    let depth_mode : k4a_sys::k4a_depth_mode_t = 2; //k4a_sys::K4A_DEPTH_MODE_NFOV_UNBINNED;
+    let color_format: k4a_sys::k4a_color_resolution_t = k4a_sys::k4a_color_resolution_t_K4A_COLOR_RESOLUTION_2160P;
 
     for i in 0..num_devices {
       let mut device = Device::open(i)?;
@@ -38,7 +44,12 @@ impl MultiDeviceCapturer {
           // NB: This assumes a daisy chain topology.
           panic!("We already one primary device. We can't have two.");
         }
+
+        let calibration = device.get_calibration(depth_mode, color_format).unwrap();
+
+        calibrations.push(calibration);
         primary_device = Some(device);
+
         continue;
       }
 
@@ -46,7 +57,10 @@ impl MultiDeviceCapturer {
         panic!("Secondary device does not have 'in' jack connected!");
       }
 
+      let calibration = device.get_calibration(depth_mode, color_format).unwrap();
+
       secondary_devices.push(device);
+      calibrations.push(calibration);
     }
 
     if primary_device.is_none() {
@@ -59,19 +73,16 @@ impl MultiDeviceCapturer {
 
     let num_cameras = 1 + secondary_devices.len();
 
-    let depth_mode : k4a_sys::k4a_depth_mode_t = 2; //k4a_sys::K4A_DEPTH_MODE_NFOV_UNBINNED;
-    let color_format: k4a_sys::k4a_color_resolution_t = k4a_sys::k4a_color_resolution_t_K4A_COLOR_RESOLUTION_2160P;
-
     let primary = primary_device.expect("There must be a primary device");
-    let calibration = primary.get_calibration(depth_mode, color_format).unwrap();
-    let calibration2 = calibration.clone();
+
+    let calibrations2 = calibrations.clone();
 
     Ok(Self {
       num_cameras,
       primary_device: primary,
       secondary_devices,
-      calibration,
-      capture_provider: Arc::new(MultiDeviceCaptureProvider::new(num_cameras, calibration2)),
+      all_device_calibrations: calibrations,
+      capture_provider: Arc::new(MultiDeviceCaptureProvider::new(num_cameras, calibrations2)),
     })
   }
 
@@ -128,10 +139,10 @@ impl MultiDeviceCapturer {
 }
 
 impl MultiDeviceCaptureProvider {
-  pub fn new(num_cameras: usize, calibration: Calibration) -> Self {
+  pub fn new(num_cameras: usize, all_device_calibrations: Vec<Calibration>) -> Self {
     Self {
       num_cameras,
-      calibration,
+      all_device_calibrations,
       captures: Arc::new(Mutex::new(Vec::new())),
     }
   }
@@ -169,8 +180,8 @@ impl CaptureProvider for MultiDeviceCaptureProvider {
             .collect())
   }
 
-  fn get_calibration(&self) -> &Calibration {
-    &self.calibration
+  fn get_calibrations(&self) -> &Vec<Calibration> {
+    &self.all_device_calibrations
   }
 }
 
