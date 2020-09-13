@@ -75,26 +75,7 @@ pub async fn speak_proxy_with_retry(
     match result {
       Ok(good_response) => {
         // All we want to do is add our special header
-        let proxy_hostname_header = HeaderValue::from_str(proxy_hostname)
-          .ok()
-          .unwrap_or(HeaderValue::from_static("proxy-unknown"));
-
-        let status = good_response.status();
-
-        let mut response_headers = good_response.headers().clone();
-        response_headers.append(HeaderName::from_static("x-proxy-hostname"), proxy_hostname_header);
-
-        let (_parts, body) = good_response.into_parts();
-
-        let mut response_builder = Response::builder()
-          .status(status);
-
-        for header in response_headers {
-          response_builder = response_builder.header(header.0.unwrap(), header.1);
-        }
-
-        return Ok(response_builder.body(body)
-          .unwrap());
+        return modify_response(good_response, proxy_hostname, attempt);
       },
       Err(_) => {},
     }
@@ -146,4 +127,43 @@ async fn speak_proxy(
     Ok(result) => Ok(result),
     Err(_result) => Err(()), // TODO: Surface this?
   }
+}
+
+fn modify_response(response: Response<Body>, proxy_hostname: &str, retry_count: u8)
+  -> Result<Response<Body>, ErrorResponse>
+{
+  let status = response.status();
+
+  let response_headers = {
+    let mut response_headers = response.headers().clone();
+
+    let proxy_hostname = HeaderValue::from_str(proxy_hostname)
+      .ok()
+      .unwrap_or(HeaderValue::from_static("proxy-unknown"));
+
+    let retry_count = HeaderValue::from_str(&retry_count.to_string())
+      .ok()
+      .unwrap_or(HeaderValue::from_static("unknown"));
+
+    response_headers.append(HeaderName::from_static("x-proxy-hostname"), proxy_hostname);
+    response_headers.append(HeaderName::from_static("x-retry-count"), retry_count);
+    response_headers
+  };
+
+  let (_parts, body) = response.into_parts();
+
+  let mut response_builder = Response::builder()
+    .status(status);
+
+  for header in response_headers {
+    if let Some(header_name) = header.0.as_ref() {
+      response_builder = response_builder.header(header_name, header.1);
+    }
+  }
+
+  response_builder.body(body)
+    .map_err(|_| ErrorResponse {
+      error_type: ErrorType::ProxyError,
+      error_description: "could not modify response".to_string()
+    })
 }
