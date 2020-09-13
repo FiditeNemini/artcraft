@@ -135,6 +135,7 @@ pub async fn handle(
         nr_transaction,
         server_params.max_retries,
         server_params.retry_wait_ms,
+        &server_params.server_hostname,
         "/speak").await;
       match result {
         Ok(response) => Ok(response),
@@ -150,6 +151,7 @@ pub async fn handle(
         nr_transaction,
         server_params.max_retries,
         server_params.retry_wait_ms,
+        &server_params.server_hostname,
         "/speak_spectrogram").await;
       match result {
         Ok(response) => Ok(response),
@@ -186,6 +188,7 @@ pub async fn handle(
 pub struct ServerParams {
   pub max_retries: u8,
   pub retry_wait_ms: u64,
+  pub server_hostname: String,
 }
 
 #[tokio::main]
@@ -227,9 +230,15 @@ async fn main() {
 
   info!("Proxy configs: {:?}", proxy_configs);
 
+  let server_hostname = hostname::get()
+    .ok()
+    .and_then(|h| h.into_string().ok())
+    .unwrap_or("proxy-unknown".to_string());
+
   let server_params = ServerParams {
     max_retries,
     retry_wait_ms,
+    server_hostname,
   };
 
   let mut route_map = HashMap::new();

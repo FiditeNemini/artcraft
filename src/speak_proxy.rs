@@ -18,6 +18,7 @@ pub async fn speak_proxy_with_retry(
   _transaction: MaybeNewRelicTransaction,
   max_retries: u8,
   retry_wait_ms: u64,
+  proxy_hostname: &str,
   endpoint: &'static str) -> Result<Response<Body>, ErrorResponse>
 {
   let mut attempt : u8 = 0;
@@ -72,7 +73,29 @@ pub async fn speak_proxy_with_retry(
       endpoint).await;
 
     match result {
-      Ok(good_response) => return Ok(good_response),
+      Ok(good_response) => {
+        // All we want to do is add our special header
+        let proxy_hostname_header = HeaderValue::from_str(proxy_hostname)
+          .ok()
+          .unwrap_or(HeaderValue::from_static("proxy-unknown"));
+
+        let status = good_response.status();
+
+        let mut response_headers = good_response.headers().clone();
+        response_headers.append(HeaderName::from_static("x-proxy-hostname"), proxy_hostname_header);
+
+        let (_parts, body) = good_response.into_parts();
+
+        let mut response_builder = Response::builder()
+          .status(status);
+
+        for header in response_headers {
+          response_builder = response_builder.header(header.0.unwrap(), header.1);
+        }
+
+        return Ok(response_builder.body(body)
+          .unwrap());
+      },
       Err(_) => {},
     }
 

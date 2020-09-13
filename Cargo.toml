@@ -16,6 +16,7 @@ path = "src/main.rs"
 anyhow = "1.0.31"
 env_logger = "0.7.1"
 futures = "0.3"
+hostname = "0.3.1"
 hyper = "0.13"
 hyper-reverse-proxy = { git = "https://github.com/felipenoris/hyper-reverse-proxy.git", commit = "d109fcbd629c62eeb5c34bec1074d737e7b58529" }
 log = "0.4.8"
