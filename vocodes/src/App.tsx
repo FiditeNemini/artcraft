@@ -54,6 +54,14 @@ interface State {
   textCharacterLimit: number,
 }
 
+// Responses from the `/service_settings` endpoint.
+interface ServiceSettingsResponse {
+  // Minimum characters to be sent in a request
+  text_character_limit_min?: number,
+  // Maximum characters to be sent in a request
+  text_character_limit_max?: number,
+}
+
 class App extends React.Component<Props, State> {
 
   constructor(props: Props) {
@@ -70,6 +78,26 @@ class App extends React.Component<Props, State> {
       currentText: '',
       textCharacterLimit: TEXT_CHARACTER_LIMIT_DEFAULT,
     };
+  }
+
+  componentDidMount() {
+    const url = 'https://mumble.stream/service_settings';
+    fetch(url, {
+      method: 'GET',
+      headers: {
+        'Accept': 'application/json',
+      },
+    })
+    .then(res => res.json())
+    .then(response => {
+      const settings : ServiceSettingsResponse = response;
+
+      // TODO: We're only handling the max limit for now.
+      if (settings.text_character_limit_max !== undefined) {
+        this.setState({ textCharacterLimit: settings.text_character_limit_max });
+      }
+    })
+    .catch(e => { /* Ignore. We'll just operate with the defaults. */ });
   }
 
   switchMode = (mode: Mode) => {
