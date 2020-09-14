@@ -28,6 +28,7 @@ interface Props {
   currentSpectrogram?: Spectrogram,
   spectrogramMode: SpectrogramMode,
   currentText: string,
+  textCharacterLimit: number,
   changeSpeakerCallback: (slug: string) => void,
   changeSpectrogramCallback: (spectrogram: Spectrogram) => void,
   changeExtrasModeCallback: (extrasMode: ExtrasMode) => void,
@@ -250,6 +251,7 @@ class SpeakComponent extends React.Component<Props, State> {
         <Form 
           currentSpeaker={this.props.currentSpeaker}
           currentText={this.props.currentText}
+          textCharacterLimit={this.props.textCharacterLimit}
           clearStatusCallback={this.clearMessage}
           setHintMessage={this.setHintMessage}
           spectrogramMode={this.props.spectrogramMode}

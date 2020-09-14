@@ -41,6 +41,8 @@ enum SpectrogramMode {
   COOL,
 }
 
+const TEXT_CHARACTER_LIMIT_DEFAULT = 500;
+
 interface State {
   mode: Mode,
   extrasMode: ExtrasMode,
@@ -49,6 +51,7 @@ interface State {
   spectrogramMode: SpectrogramMode,
   utterances: Utterance[],
   currentText: string,
+  textCharacterLimit: number,
 }
 
 class App extends React.Component<Props, State> {
@@ -65,6 +68,7 @@ class App extends React.Component<Props, State> {
       spectrogramMode: SpectrogramMode.VIRIDIS,
       utterances: [],
       currentText: '',
+      textCharacterLimit: TEXT_CHARACTER_LIMIT_DEFAULT,
     };
   }
 
@@ -138,6 +142,7 @@ class App extends React.Component<Props, State> {
           currentSpeaker={this.state.speaker} 
           currentSpectrogram={this.state.currentSpectrogram}
           currentText={this.state.currentText}
+          textCharacterLimit={this.state.textCharacterLimit}
           changeSpeakerCallback={this.setSpeakerBySlug} 
           changeSpectrogramCallback={this.updateSpectrogram} 
           changeExtrasModeCallback={this.switchExtrasMode}

@@ -12,6 +12,7 @@ interface Props {
   currentSpeaker: Speaker,
   spectrogramMode: SpectrogramMode,
   currentText: string,
+  textCharacterLimit: number,
   enableSpectrograms: boolean,
   clearStatusCallback: () => void,
   setHintMessage: (message: string) => void,
@@ -222,6 +223,16 @@ class Form extends React.Component<Props, State> {
   }
 
   public render() {
+    let remainingCharacters = this.props.textCharacterLimit - this.props.currentText.length;
+
+    let remainingCharactersButtonDisabled = false;
+    let remainingCharactersClassName = "";
+
+    if (remainingCharacters < 0) {
+      remainingCharactersButtonDisabled= true;
+      remainingCharactersClassName = "has-text-danger";
+    }
+
     return (
       <div>
         <form onSubmit={this.handleFormSubmit}>
@@ -233,11 +244,12 @@ class Form extends React.Component<Props, State> {
             value={this.props.currentText} 
             ref={(textarea) => { this.textarea = textarea; }} 
             />
+          <span className={remainingCharactersClassName}>{remainingCharacters}</span>
 
           <div className="button-group">
             <div className="columns is-mobile">
               <div className="column has-text-centered">
-                <button className="button is-info is-large">Speak</button>
+                <button className="button is-info is-large" disabled={remainingCharactersButtonDisabled}>Speak</button>
               </div>
               <div className="column has-text-centered">
                 <button className="button is-info is-light is-large" onClick={this.handleCancelClick}>Cancel</button>
