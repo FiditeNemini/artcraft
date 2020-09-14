@@ -4,7 +4,9 @@
 # so Kubernetes won't CrashLoopBackOff us.
 while :; do
   # local: ../target/release/tts_service
+  echo "> starting tts_service"
   ./tts_service
-  sleep 2
+  echo "> tts_service exited; sleeping before restart"
+  sleep 1
 done
 

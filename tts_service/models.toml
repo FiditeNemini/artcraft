@@ -4,10 +4,18 @@ name = "Current Experiment"
 slug = "experiment"
 model_pipeline = "ArpabetGlowTtsMelgan"
 glow_tts = "glow_tts_single_speaker.torchjit"
-#melgan = "melgan_manyvoice5.0_2020-07-23_12d5838_10760.torchjit"
+melgan = "melgan_manyvoice5.0_2020-07-23_12d5838_10760.torchjit"
 #melgan = "melgan_manyvoice2.0_2020-07-08_12d5838_9330.torchjit"
 #melgan = "manyvoice1.0_2020-06-28_12d5838_6610.torchjit"
-melgan = "melgan-vocodes.torchjit"
+#melgan = "melgan-vocodes.torchjit"
+
+[[speakers]]
+name = "John Oliver"
+slug = "john-oliver"
+model_pipeline = "ArpabetGlowTtsMelgan"
+glow_tts = "glow-tts_john_oliver_ljstx_2020.07.26_expr-3_chkpt-4789.torchjit"
+# TODO: John Oliver only has 15 minutes of Melgan contribution
+melgan = "melgan_manyvoice5.0_2020-07-23_12d5838_10760.torchjit"
 
 [[speakers]]
 name = "Michael Rosen"
@@ -195,14 +203,6 @@ name = "Sam Altman"
 slug = "sam-altman"
 model_pipeline = "ArpabetGlowTtsMelgan"
 glow_tts = "glow-tts_sam_altman_ljstx_2020.07.20_expr-2_chkpt-4871.torchjit"
-melgan = "melgan_manyvoice5.0_2020-07-23_12d5838_10760.torchjit"
-
-[[speakers]]
-name = "John Oliver"
-slug = "john-oliver"
-model_pipeline = "ArpabetGlowTtsMelgan"
-glow_tts = "glow-tts_john_oliver_ljstx_2020.07.26_expr-3_chkpt-4789.torchjit"
-# TODO: John Oliver only has 15 minutes of Melgan contribution
 melgan = "melgan_manyvoice5.0_2020-07-23_12d5838_10760.torchjit"
 
 [[speakers]]
