@@ -55,6 +55,7 @@ use limitation::Limiter;
 use std::time::Duration;
 use crate::endpoints::helpers::stats_recorder::StatsRecorder;
 use grapheme_to_phoneme::Model;
+use crate::endpoints::service_settings::get_service_settings;
 
 const ENV_ARPABET_EXTRAS_FILE : &'static str = "ARPABET_EXTRAS_FILE";
 const ENV_ASSET_DIRECTORY: &'static str = "ASSET_DIRECTORY";
@@ -396,12 +397,13 @@ async fn run_server(app_state: AppState, server_args: ServerArgs) -> std::io::Re
             .route(web::post().to(post_speak_with_spectrogram))
             .route(web::head().to(|| HttpResponse::Ok()))
       )
-      .service(get_root)
-      .service(get_readiness)
       .service(get_liveness)
       .service(get_models)
-      .service(get_speakers)
+      .service(get_readiness)
+      .service(get_root)
       .service(get_sentences)
+      .service(get_service_settings)
+      .service(get_speakers)
       .service(get_words)
       .app_data(arc.clone())
     )

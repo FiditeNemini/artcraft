@@ -35,6 +35,14 @@ impl TextChecker {
     }
   }
 
+  pub fn get_max_character_length(&self) -> Option<usize> {
+    self.max_character_length
+  }
+
+  pub fn get_min_character_length(&self) -> Option<usize> {
+    self.min_character_length
+  }
+
   pub fn set_max_character_length(&mut self, max_character_length: Option<usize>) {
     self.max_character_length = max_character_length;
   }
