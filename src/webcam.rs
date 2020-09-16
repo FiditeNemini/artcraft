@@ -37,6 +37,9 @@ impl WebcamWriter {
 
     let buffer_size = width * height * bit_depth;
 
+    info!("Webcam writer buffer size: {} (width: {}, height: {}, bit depth: {}",
+      buffer_size, width, height, bit_depth);
+
     let mut buffer = Vec::with_capacity(buffer_size);
     buffer.resize(buffer_size, 0);
 
