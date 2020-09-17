@@ -93,6 +93,14 @@ const SPEAKERS : Speaker[] = [
     voiceQuality: 7.2,
   }),
   Speaker.fromJson({
+    name: "Ben Shapiro",
+    slug: "ben-shapiro",
+    description: "Commentator",
+    avatarUrl: "ben-shapiro.jpg",
+    fullUrl: "ben-shapiro-full.png",
+    voiceQuality: 6.8,
+  }),
+  Speaker.fromJson({
     name: "Ben Stein",
     slug: "ben-stein",
     description: "Actor and commentator.",
@@ -123,6 +131,14 @@ const SPEAKERS : Speaker[] = [
     avatarUrl: "bill-nye.jpg",
     fullUrl: "bill-nye-full.png",
     voiceQuality: 6.7,
+  }),
+  Speaker.fromJson({
+    name: "Boomstick (Death Battle!)",
+    slug: "boomstick",
+    description: "Rooster Teeth YouTube Show",
+    avatarUrl: "boomstick.jpg",
+    fullUrl: "boomstick-full.png",
+    voiceQuality: 5.2,
   }),
   Speaker.fromJson({
     name: "Bryan Cranston",
@@ -203,7 +219,6 @@ const SPEAKERS : Speaker[] = [
     avatarUrl: "homer-simpson.jpg",
     fullUrl: "homer-simpson-full.png",
     voiceQuality: 8.0,
-    defaultVoice: true,
   }),
   Speaker.fromJson({
     name: "J. K. Simmons",
@@ -374,6 +389,14 @@ const SPEAKERS : Speaker[] = [
     voiceQuality: 4.2,
   }),
   Speaker.fromJson({
+    name: "Richard Ayoade",
+    slug: "richard-ayoade",
+    description: "Actor and comedian",
+    avatarUrl: "moss-fire.webp",
+    fullUrl: "richard-ayoade-full.png",
+    voiceQuality: 6.5,
+  }),
+  Speaker.fromJson({
     name: "Sam Altman",
     slug: "sam-altman",
     description: "Entrepreneur",
@@ -404,6 +427,15 @@ const SPEAKERS : Speaker[] = [
     avatarUrl: "david-attenborough.jpg",
     fullUrl: "david-attenborough-full.png",
     voiceQuality: 8.0,
+  }),
+  Speaker.fromJson({
+    name: "Sonic",
+    slug: "sonic",
+    description: "Gotta go fast",
+    avatarUrl: "sonic.jpg",
+    fullUrl: "sonic-full.png",
+    voiceQuality: 8.5,
+    defaultVoice: true,
   }),
   Speaker.fromJson({
     name: "SpongeBob SquarePants",
