@@ -41,8 +41,6 @@ use std::borrow::Cow;
 use std::env;
 use std::sync::Arc;
 
-const SPEAKER_NAME : &'static str = "david-attenborough";
-
 #[group]
 struct General;
 
@@ -65,20 +63,61 @@ impl EventHandler for Handler {
       return;
     }
 
-    let replaced_message = if new_message.content.starts_with("vocode ") {
-      new_message.content.replacen("vocode ", "", 1)
+    let (speaker, filename, replaced_message) = if new_message.content.starts_with("vocode ") {
+      let speaker = "david-attenborough";
+      let filename = "a wild sound appeared.wav";
+      let message = new_message.content.replacen("vocode ", "", 1);
+      (speaker, filename, message)
     } else if new_message.content.starts_with("!vocode ") {
-      new_message.content.replacen("!vocode ", "", 1)
+      let speaker = "david-attenborough";
+      let filename = "a wild sound appeared.wav";
+      let message = new_message.content.replacen("!vocode ", "", 1);
+      (speaker, filename, message)
+    } else if new_message.content.starts_with("!sonic ") {
+      let speaker = "sonic";
+      let filename = "gotta go fast.wav";
+      let message = new_message.content.replacen("!sonic ", "", 1);
+      (speaker, filename, message)
+    } else if new_message.content.starts_with("!spongebob ") {
+      let speaker = "spongebob-squarepants";
+      let filename = "three hours later.wav";
+      let message = new_message.content.replacen("!spongebob ", "", 1);
+      (speaker, filename, message)
+    } else if new_message.content.starts_with("!gilbert ") {
+      let speaker = "gilbert-gottfried";
+      let filename = "a lovely voice.wav";
+      let message = new_message.content.replacen("!gilbert ", "", 1);
+      (speaker, filename, message)
+    } else if new_message.content.starts_with("!help") {
+      let msg = new_message.channel_id.send_message(&ctx.http, |m| {
+        m.content(
+          "The following commands are available:\n\
+            ```\n\
+            !help (this help message)\n\
+            !vocode (David Attenborough)\n\
+            !gilbert (Gilbert Gottfried)\n\
+            !sonic (the Hedgehog)\n\
+            !spongebob (the SquarePants)\n\
+            ```"
+        );
+        m
+      }).await;
+
+      if let Err(reason) = msg {
+        warn!("Error sending help message: {:?}", reason);
+      }
+
+      return
     } else {
       return;
     };
 
     info!("Replaced message: {}", replaced_message);
 
-    if let Ok(response) = fetch(&replaced_message, SPEAKER_NAME).await {
+    if let Ok(response) = fetch(&replaced_message, speaker).await {
       let msg = new_message.channel_id.send_message(&ctx.http, |m| {
         m.content(replaced_message);
-        m.add_file(AttachmentType::Bytes { data: Cow::from(&response), filename: "a wild sound appeared.wav".to_string() });
+        m.add_file(AttachmentType::Bytes { data: Cow::from(&response), filename: filename.to_string() });
         m
       }).await;
 
