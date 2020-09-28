@@ -1,0 +1,32 @@
+[package]
+name = "twitter-vocodes-bot"
+edition = "2018"
+version = "0.0.1"
+authors = [
+  "Brandon Thomas <bt@brand.io>",
+  "Brandon Thomas <echelon@gmail.com>",
+]
+publish = false
+
+[[bin]]
+name = "twitter-vocodes-bot"
+path = "src/main.rs"
+
+[dependencies]
+anyhow = "1.0.31"
+chrono = { version = "0.4", features = ["serde"] }
+crossbeam = "0.7.3"
+easyenv = "0.0.2"
+egg-mode = "0.15"
+env_logger = "0.7.1"
+futures = "0.3"
+log = "0.4.11"
+serde = "1.0.104"
+serde_derive = "1.0.104"
+serde_json = "1.0.55"
+subprocess = "0.2.6"
+tokio = { version = "0.2.8", features = ["time", "rt-core", "macros", "blocking", "rt-threaded"] }
+
+# From egg-mode
+yansi = "0.5.0"
+structopt = "0.3.13"
