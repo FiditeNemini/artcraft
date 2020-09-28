@@ -5,18 +5,16 @@ use std::thread;
 use tokio::time::Duration;
 use std::path::PathBuf;
 use egg_mode::media::{MediaHandle, media_types, upload_media, set_metadata, get_status, ProgressInfo};
-use egg_mode::tweet::DraftTweet;
+use egg_mode::tweet::{DraftTweet, Tweet};
 use anyhow::Error;
 use tokio::runtime::Handle;
 
 pub struct Workload {
-  pub info: String,
+  pub tweet: Tweet,
 }
 
 
 pub async fn spawn_workers(config: common::Config, receiver: Receiver<Workload>, num_workers: usize) {
-  //thread::sleep(Duration::from_secs(5));
-
   for i in 0 .. num_workers {
     let conf = config.clone();
     let recv = receiver.clone();
@@ -25,18 +23,12 @@ pub async fn spawn_workers(config: common::Config, receiver: Receiver<Workload>,
 
     let handle = Handle::current();
 
-    //tokio::task::spawn(async move {});
     handle.spawn(async move {
       info!("a");
       start_worker(conf, recv, i).await;
       info!("b");
     });
-
-
-    //thread::spawn(move || start_worker(conf, recv, i));
   }
-
-  //joinables.iter().map(|j| j.join());
 }
 
 async fn start_worker(config: common::Config, receiver: Receiver<Workload>, worker_id: usize) {
@@ -52,11 +44,11 @@ async fn start_worker(config: common::Config, receiver: Receiver<Workload>, work
       Ok(workload) => workload,
     };
 
-    info!("Worker {} got tweet: {}", worker_id, &workload.info);
+    info!("Worker {} got tweet: {}", worker_id, &workload.tweet.text);
 
     let path = PathBuf::from("/home/bt/dev/voice/ffmpeg-server/output/out.mp4");
 
-    let r = respond_with_media(&config, "generic response", path, "media");
+    let r = respond_with_media(&config, &workload.tweet, path, "media").await;
 
     match r {
       Ok(_) => info!("Responded to tweet successfully"),
@@ -65,13 +57,30 @@ async fn start_worker(config: common::Config, receiver: Receiver<Workload>, work
   }
 }
 
-fn respond_with_media(
+async fn respond_with_media(
   config: &common::Config,
-  tweet_text: &str,
+  original_tweet: &Tweet,
   media_path: PathBuf,
   media_alt_text: &str) -> AnyhowResult<()>
 {
+  let user_id = original_tweet.user
+    .as_ref()
+    .map(|u| u.id)
+    .unwrap_or(0);
 
+  info!("From user id: {}", user_id);
+
+  let mut response_tweet = DraftTweet::new("This is a test response")
+    .in_reply_to(original_tweet.id)
+    .auto_populate_reply_metadata(true)
+    .coordinates(33.753746, -84.386330, true); // Atlanta
+
+  //let handle = upload_media_to_twitter(config, media_path, media_alt_text).await?;
+  //response_tweet.add_media(handle.id.clone());
+
+  response_tweet.send(&config.token).await;
+
+  //   tweet.send(&config.token).await
   // let rt = tokio::runtime::Runtime::new().unwrap();
   // let mut executor = rt.executor();
 

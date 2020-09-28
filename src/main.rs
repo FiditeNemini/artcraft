@@ -23,6 +23,8 @@ use tokio::runtime::Builder;
 
 pub type AnyhowResult<T> = anyhow::Result<T>;
 
+const VOCODES_BOT_USER_ID : u64 = 1310037441441599488;
+
 #[derive(Clone)]
 pub struct Secrets {
   pub api_key: String,
@@ -88,8 +90,6 @@ async fn main_2() -> AnyhowResult<()> {
 
   info!("Streaming tweets...");
 
-  //thread::sleep(Duration::from_secs(10));
-
   let stream = egg_mode::stream::filter()
     .track(&["vocodesbot"])
     .language(&["en"])
@@ -98,20 +98,25 @@ async fn main_2() -> AnyhowResult<()> {
       info!("WITHIN THE STREAM.");
 
       if let StreamMessage::Tweet(tweet) = m {
+        let user_id = tweet.user
+          .as_ref()
+          .map(|u| u.id)
+          .unwrap_or(0);
+
+        let user_name = tweet.user
+          .as_ref()
+          .map(|u| u.screen_name.clone())
+          .unwrap_or("unnamed".to_string());
+
+        if user_id == VOCODES_BOT_USER_ID {
+          info!("Tweet originated from VocodesBot ({}); skipping.", &user_name);
+          return futures::future::ok(());
+        }
+
         common::print_tweet(&tweet);
         println!("──────────────────────────────────────");
 
-        sender.send(Workload { info: tweet.text.clone() });
-
-        info!("Responding...");
-        let fut = async {
-          let path = PathBuf::from("/home/bt/dev/voice/ffmpeg-server/output/out.mp4");
-
-          match respond_with_media(&config, "Hello, this is a response.", path, "some media").await {
-            Err(e) => warn!("An error: {:?}", e),
-            Ok(e) => info!("Response posted."),
-          }
-        };
+        sender.send(Workload { tweet: tweet.clone() });
 
       } else {
         println!("Not a message: {:?}", m);
@@ -119,8 +124,6 @@ async fn main_2() -> AnyhowResult<()> {
 
       futures::future::ok(())
     });
-
-  info!("About to await...");
 
   if let Err(e) = stream.await {
     let e : egg_mode::error::Error = e;
@@ -147,8 +150,6 @@ async fn main_2() -> AnyhowResult<()> {
     }
     error!("Disconnected")
   }
-
-  info!("Awaited!");
 
   Ok(())
 }
