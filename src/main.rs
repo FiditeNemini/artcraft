@@ -127,6 +127,10 @@ async fn start_bot(program_args: ProgramArgs) -> AnyhowResult<()> {
           .map(|u| u.screen_name.clone())
           .unwrap_or("unnamed".to_string());
 
+        common::print_tweet(&tweet);
+
+        info!("New tweet (username = {}) : {}", &user_name, &tweet.text);
+
         if user_id == VOCODES_BOT_USER_ID {
           info!("Tweet originated from VocodesBot ({}); skipping.", &user_name);
           return futures::future::ok(());
@@ -137,12 +141,16 @@ async fn start_bot(program_args: ProgramArgs) -> AnyhowResult<()> {
           return futures::future::ok(());
         }
 
-        if tweet.in_reply_to_user_id.is_some() {
-          info!("Tweet has 'in_reply_to_user_id'; skipping. Username: {}", &user_name);
+        if tweet.text.matches("@").count() > 1 {
+          info!("Tweet has more than one '@'; skipping. Username: {}", &user_name);
           return futures::future::ok(());
         }
 
-        common::print_tweet(&tweet);
+        // if tweet.in_reply_to_user_id.is_some() {
+        //   info!("Tweet has 'in_reply_to_user_id'; skipping. Username: {}", &user_name);
+        //   return futures::future::ok(());
+        // }
+
 
         sender.send(Workload { tweet: tweet.clone() });
 
