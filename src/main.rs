@@ -64,7 +64,7 @@ fn main() -> AnyhowResult<()> {
     .build()
     .unwrap();
 
-  runtime.block_on(main_2());
+  runtime.block_on(async { main_2().await });
 
 
   Ok(())
@@ -84,17 +84,19 @@ async fn main_2() -> AnyhowResult<()> {
   info!("Configs loaded. Spawning workers...");
 
   let (sender, receiver) = crossbeam::bounded(5);
-  spawn_workers(config.clone(), receiver, 5).await;
+  spawn_workers(config.clone(), receiver, 2).await;
 
   info!("Streaming tweets...");
 
-  thread::sleep(Duration::from_secs(10));
+  //thread::sleep(Duration::from_secs(10));
 
   let stream = egg_mode::stream::filter()
     .track(&["vocodesbot"])
     .language(&["en"])
     .start(&config.token)
     .try_for_each(|m| {
+      info!("WITHIN THE STREAM.");
+
       if let StreamMessage::Tweet(tweet) = m {
         common::print_tweet(&tweet);
         println!("──────────────────────────────────────");
@@ -118,6 +120,7 @@ async fn main_2() -> AnyhowResult<()> {
       futures::future::ok(())
     });
 
+  info!("About to await...");
 
   if let Err(e) = stream.await {
     let e : egg_mode::error::Error = e;
@@ -144,6 +147,8 @@ async fn main_2() -> AnyhowResult<()> {
     }
     error!("Disconnected")
   }
+
+  info!("Awaited!");
 
   Ok(())
 }
