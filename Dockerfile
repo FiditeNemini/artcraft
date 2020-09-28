@@ -2,12 +2,13 @@ FROM ubuntu:focal as build
 
 ARG DEBIAN_FRONTEND=noninteractive
 
-WORKDIR /tmp
+WORKDIR /build
 
 RUN apt-get update \
     && apt-get install -y \
         build-essential \
         curl \
+        ffmpeg \
         gdb \
         libssl-dev \
         libssl1.1 \
@@ -31,13 +32,17 @@ RUN $HOME/.cargo/bin/cargo fetch
 RUN set -x \
   && mkdir -p src \
   && echo 'fn main() { println!("rebuild me!"); }' > src/main.rs \
-  && $HOME/.cargo/bin/cargo build
+  && $HOME/.cargo/bin/cargo build --release
 
+# Static image assets
+COPY assets/ assets/
+
+# Code
 COPY src/ src/
 
 # If the timestamps are older on actual src/ files than
 # cached "fake build" above, nothing gets built.
 RUN touch src/main.rs
 
-RUN $HOME/.cargo/bin/cargo build
+RUN $HOME/.cargo/bin/cargo build --release
 
