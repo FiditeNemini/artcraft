@@ -20,11 +20,14 @@ easyenv = "0.0.2"
 egg-mode = "0.15"
 env_logger = "0.7.1"
 futures = "0.3"
+hyper = "0.13"
+hyper-tls = "0.4.3"
 log = "0.4.11"
 serde = "1.0.104"
 serde_derive = "1.0.104"
 serde_json = "1.0.55"
 subprocess = "0.2.6"
+tempfile = "3.1.0"
 tokio = { version = "0.2.8", features = ["time", "rt-core", "macros", "blocking", "rt-threaded"] }
 
 # From egg-mode

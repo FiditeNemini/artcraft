@@ -1,6 +1,8 @@
 use anyhow::Error;
 use anyhow::bail;
-use crate::{common, AnyhowResult};
+use crate::movie_maker::create_movie;
+use crate::vocodes_api::vocodes_fetch;
+use crate::{common, AnyhowResult, ProgramArgs};
 use crossbeam::Receiver;
 use egg_mode::media::{MediaHandle, media_types, upload_media, set_metadata, get_status, ProgressInfo};
 use egg_mode::tweet::{DraftTweet, Tweet};
@@ -14,30 +16,27 @@ pub struct Workload {
   pub tweet: Tweet,
 }
 
-pub async fn spawn_workers(config: common::Config, receiver: Receiver<Workload>, num_workers: usize) {
-  for i in 0 .. num_workers {
+pub async fn spawn_workers(config: common::Config, receiver: Receiver<Workload>, program_args: ProgramArgs) {
+  for i in 0 .. program_args.worker_count {
     let conf = config.clone();
     let recv = receiver.clone();
+    let args = program_args.clone();
 
     info!("Spawning worker {}", i);
 
     let handle = Handle::current();
 
     handle.spawn(async move {
-      info!("a");
-      start_worker(conf, recv, i).await;
-      info!("b");
+      start_worker(conf, recv, i, args).await;
     });
   }
 }
 
-async fn start_worker(config: common::Config, receiver: Receiver<Workload>, worker_id: usize) {
+async fn start_worker(config: common::Config, receiver: Receiver<Workload>, worker_id: usize, program_args: ProgramArgs) {
   loop {
-    info!("Worker thread loop - listening: {}", worker_id);
-
     let workload = match receiver.recv() {
       Err(e) => {
-        warn!("Error receiving from queue: {}", e);
+        warn!("Error receiving from queue: {} (worker {})", e, worker_id);
         thread::sleep(Duration::from_millis(500));
         continue;
       },
@@ -46,7 +45,23 @@ async fn start_worker(config: common::Config, receiver: Receiver<Workload>, work
 
     info!("Worker {} got tweet: {}", worker_id, &workload.tweet.text);
 
-    let path = PathBuf::from("/home/bt/dev/voice/ffmpeg-server/output/out.mp4");
+    let wav_bytes = match vocodes_fetch(&workload.tweet.text, "sonic").await {
+      Ok(wav) => wav,
+      Err(e) => {
+        warn!("Couldn't fetch wav: {} (worker {})", e, worker_id);
+        continue;
+      }
+    };
+
+    let movie_path = match create_movie(wav_bytes, &program_args) {
+      Ok(file) => file,
+      Err(e) => {
+        warn!("Couldn't create movie: {} (worker {})", e, worker_id);
+        continue;
+      }
+    };
+
+    let path = PathBuf::from(movie_path.path().to_str().unwrap());
 
     let r = respond_with_media(&config, &workload.tweet, path, "media").await;
 
@@ -70,7 +85,7 @@ async fn respond_with_media(
 
   info!("From user id: {}", user_id);
 
-  let mut response_tweet = DraftTweet::new("This is a test response")
+  let mut response_tweet = DraftTweet::new("")
     .in_reply_to(original_tweet.id)
     .auto_populate_reply_metadata(true)
     .coordinates(33.753746, -84.386330, true); // Atlanta
@@ -80,24 +95,6 @@ async fn respond_with_media(
 
   response_tweet.send(&config.token).await;
 
-  //   tweet.send(&config.token).await
-  // let rt = tokio::runtime::Runtime::new().unwrap();
-  // let mut executor = rt.executor();
-
-  // executor.spawn(async {
-  //   let mut tweet = DraftTweet::new(tweet_text.to_string());
-
-  //   //let handle = upload_media_to_twitter(config, media_path, media_alt_text).await?;
-  //   //tweet.add_media(handle.id.clone());
-
-  //   tweet.send(&config.token).await
-  // });
-
-  // tokio::task::spawn_blocking({
-  //   fut
-  // })?;
-  //futures::executor::block_on(fut)?;
-
   Ok(())
 }
 
@@ -106,39 +103,21 @@ async fn upload_media_to_twitter(
   media_path: PathBuf,
   media_alt_text: &str) -> AnyhowResult<MediaHandle>
 {
-  println!("Uploading media from '{}'", media_path.display());
+  info!("Uploading media from '{}'", media_path.display());
 
-  let typ = match media_path.extension().and_then(|os| os.to_str()).unwrap_or("") {
-    "jpg" | "jpeg" => media_types::image_jpg(),
-    "gif" => media_types::image_gif(),
-    "png" => media_types::image_png(),
-    "webp" => media_types::image_webp(),
-    "mp4" => media_types::video_mp4(),
-    _ => {
-      eprintln!("Format not recognized, must be one of [jpg, jpeg, gif, png, webp, mp4]");
-      std::process::exit(1);
-    }
-  };
+  let typ = media_types::video_mp4();
 
   let bytes = std::fs::read(media_path)?;
   let handle = upload_media(&bytes, &typ, &config.token).await?;
 
   set_metadata(&handle.id, media_alt_text, &config.token).await?;
 
-  println!("Media uploaded");
-
-  // Wait 60 seconds for processing
-  println!("Waiting for media to finish processing...");
-
   for ct in 0..=60u32 {
     match get_status(handle.id.clone(), &config.token).await?.progress {
       None | Some(ProgressInfo::Success) => {
-        println!("\nMedia sucessfully processed");
         break;
       }
       Some(ProgressInfo::Pending(_)) | Some(ProgressInfo::InProgress(_)) => {
-        print!(".");
-        //stdout().flush()?;
         delay_for(Duration::from_secs(1)).await;
       }
       Some(ProgressInfo::Failed(err)) => Err(err)?,
