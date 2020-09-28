@@ -1,18 +1,18 @@
+use anyhow::Error;
+use anyhow::bail;
 use crate::{common, AnyhowResult};
 use crossbeam::Receiver;
-use log::{info, error, warn};
-use std::thread;
-use tokio::time::Duration;
-use std::path::PathBuf;
 use egg_mode::media::{MediaHandle, media_types, upload_media, set_metadata, get_status, ProgressInfo};
 use egg_mode::tweet::{DraftTweet, Tweet};
-use anyhow::Error;
+use log::{info, error, warn};
+use std::path::PathBuf;
+use std::thread;
 use tokio::runtime::Handle;
+use tokio::time::{Duration, delay_for};
 
 pub struct Workload {
   pub tweet: Tweet,
 }
-
 
 pub async fn spawn_workers(config: common::Config, receiver: Receiver<Workload>, num_workers: usize) {
   for i in 0 .. num_workers {
@@ -75,8 +75,8 @@ async fn respond_with_media(
     .auto_populate_reply_metadata(true)
     .coordinates(33.753746, -84.386330, true); // Atlanta
 
-  //let handle = upload_media_to_twitter(config, media_path, media_alt_text).await?;
-  //response_tweet.add_media(handle.id.clone());
+  let handle = upload_media_to_twitter(config, media_path, media_alt_text).await?;
+  response_tweet.add_media(handle.id.clone());
 
   response_tweet.send(&config.token).await;
 
@@ -101,7 +101,7 @@ async fn respond_with_media(
   Ok(())
 }
 
-/*fn upload_media_to_twitter(
+async fn upload_media_to_twitter(
   config: &common::Config,
   media_path: PathBuf,
   media_alt_text: &str) -> AnyhowResult<MediaHandle>
@@ -138,7 +138,7 @@ async fn respond_with_media(
       }
       Some(ProgressInfo::Pending(_)) | Some(ProgressInfo::InProgress(_)) => {
         print!(".");
-        stdout().flush()?;
+        //stdout().flush()?;
         delay_for(Duration::from_secs(1)).await;
       }
       Some(ProgressInfo::Failed(err)) => Err(err)?,
@@ -150,4 +150,3 @@ async fn respond_with_media(
 
   Ok(handle)
 }
-*/
