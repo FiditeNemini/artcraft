@@ -132,6 +132,16 @@ async fn start_bot(program_args: ProgramArgs) -> AnyhowResult<()> {
           return futures::future::ok(());
         }
 
+        if tweet.text.contains("deepfake response") {
+          info!("Tweet contains \"deepfake response\"; skipping. Username: {}", &user_name);
+          return futures::future::ok(());
+        }
+
+        if tweet.in_reply_to_user_id.is_some() {
+          info!("Tweet has 'in_reply_to_user_id'; skipping. Username: {}", &user_name);
+          return futures::future::ok(());
+        }
+
         common::print_tweet(&tweet);
 
         sender.send(Workload { tweet: tweet.clone() });
