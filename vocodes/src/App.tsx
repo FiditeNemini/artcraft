@@ -145,7 +145,7 @@ class App extends React.Component<Props, State> {
     let selectedSpeaker = undefined;
 
     speakers.forEach(speaker => {
-      if (speaker.getSlug() == this.state.speaker.getSlug()) {
+      if (speaker.getSlug() === this.state.speaker.getSlug()) {
         selectedSpeaker = speaker;
       }
     })

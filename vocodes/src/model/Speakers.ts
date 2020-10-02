@@ -129,7 +129,7 @@ const SPEAKERS : Speaker[] = [
     avatarUrl: "anderson-cooper.jpg",
     fullUrl: "anderson-cooper-full.png",
     voiceQuality: 4.9,
-    categories: ["politics", "news"],
+    categories: ["news"],
   }),
   Speaker.fromJson({
     name: "Arnold Schwarzenegger",
@@ -156,7 +156,7 @@ const SPEAKERS : Speaker[] = [
     avatarUrl: "ben-shapiro.jpg",
     fullUrl: "ben-shapiro-full.png",
     voiceQuality: 6.8,
-    categories: ["politics"],
+    categories: ["politics", "news"],
   }),
   Speaker.fromJson({
     name: "Ben Stein",

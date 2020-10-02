@@ -23,7 +23,7 @@ class SpeakerDropdown extends React.Component<Props, State> {
   }
 
   public render() {
-    if (this.props.currentSpeakerCategory.getSlug() == 'all') {
+    if (this.props.currentSpeakerCategory.getSlug() === 'all') {
       return this.renderAllByQuality();
     } else {
       return this.renderSortedCategory();
