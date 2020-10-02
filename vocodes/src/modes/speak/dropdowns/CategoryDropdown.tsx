@@ -41,12 +41,14 @@ class CategoryDropdown extends React.Component<Props, State> {
     });
 
     return (
-      <div className="column">
-        <div className="control is-expanded">
-          <div className="select is-fullwidth">
-            <select onChange={this.changeCategory}>
-              {options.map(option => option)}
-            </select>
+      <div className="columns is-gapless">
+        <div className="column is-full">
+          <div className="control is-expanded">
+            <div className="select is-fullwidth">
+              <select onChange={this.changeCategory}>
+                {options.map(option => option)}
+              </select>
+            </div>
           </div>
         </div>
       </div>
