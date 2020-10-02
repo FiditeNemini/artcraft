@@ -8,7 +8,7 @@ import { Footer } from './navigation/Footer';
 import { HistoryComponent } from './modes/history/HistoryComponent';
 import { Mode } from './AppMode';
 import { SpeakComponent } from './modes/speak/SpeakComponent';
-import { Speaker, SPEAKERS } from './model/Speakers';
+import { Speaker, SpeakerCategory, SPEAKERS, SPEAKER_CATEGORIES, CATEGORY_ALL, SPEAKERS_BY_CATEGORY } from './model/Speakers';
 import { Spectrogram } from './modes/speak/extras/Spectrogram';
 import { TermsComponent } from './modes/terms/TermsComponent';
 import { TopNav } from './navigation/TopNav';
@@ -48,6 +48,7 @@ interface State {
   extrasMode: ExtrasMode,
   speaker: Speaker,
   currentSpectrogram?: Spectrogram,
+  currentSpeakerCategory: SpeakerCategory,
   spectrogramMode: SpectrogramMode,
   utterances: Utterance[],
   currentText: string,
@@ -77,6 +78,7 @@ class App extends React.Component<Props, State> {
       utterances: [],
       currentText: '',
       textCharacterLimit: TEXT_CHARACTER_LIMIT_DEFAULT,
+      currentSpeakerCategory: CATEGORY_ALL,
     };
   }
 
@@ -117,6 +119,45 @@ class App extends React.Component<Props, State> {
 
   setSpeaker = (speaker: Speaker) : void => {
     this.setState({ speaker: speaker });
+  }
+
+  setSpeakerCategoryBySlug = (speakerCategorySlug: string) : void => {
+    let selectedSpeakerCategory = undefined;
+
+    SPEAKER_CATEGORIES.forEach(category => {
+      if (category.getSlug() === speakerCategorySlug) {
+        selectedSpeakerCategory = category;
+      }
+    })
+
+    if (selectedSpeakerCategory === undefined) {
+      console.warn(`Invalid category: ${speakerCategorySlug}`)
+      return;
+    }
+
+    const speakers = SPEAKERS_BY_CATEGORY.get(selectedSpeakerCategory);
+
+    if (speakers === undefined || speakers.length === 0) {
+      console.warn(`No speakers for category: ${speakerCategorySlug}`)
+      return;
+    }
+
+    let selectedSpeaker = undefined;
+
+    speakers.forEach(speaker => {
+      if (speaker.getSlug() == this.state.speaker.getSlug()) {
+        selectedSpeaker = speaker;
+      }
+    })
+
+    if (selectedSpeaker === undefined) {
+      selectedSpeaker = speakers[0];
+    }
+
+    this.setState({ 
+      speaker: selectedSpeaker,
+      currentSpeakerCategory: selectedSpeakerCategory 
+    });
   }
 
   setSpeakerBySlug = (speakerSlug: string) : void => {
@@ -168,10 +209,12 @@ class App extends React.Component<Props, State> {
           enableSpectrograms={this.props.enableSpectrograms}
           extrasMode={this.state.extrasMode}
           currentSpeaker={this.state.speaker} 
+          currentSpeakerCategory={this.state.currentSpeakerCategory}
           currentSpectrogram={this.state.currentSpectrogram}
           currentText={this.state.currentText}
           textCharacterLimit={this.state.textCharacterLimit}
           changeSpeakerCallback={this.setSpeakerBySlug} 
+          changeSpeakerCategoryCallback={this.setSpeakerCategoryBySlug} 
           changeSpectrogramCallback={this.updateSpectrogram} 
           changeExtrasModeCallback={this.switchExtrasMode}
           spectrogramMode={this.state.spectrogramMode}

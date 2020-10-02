@@ -1,3 +1,35 @@
+class SpeakerCategory {
+  name: string;
+  slug: string;
+
+  constructor(name: string, slug: string) {
+    this.name = name;
+    this.slug = slug;
+  }
+
+  getName(): string {
+    return this.name;
+  }
+
+  getSlug(): string {
+    return this.slug;
+  }
+}
+
+const CATEGORY_ALL: SpeakerCategory = new SpeakerCategory("All Voices", "all");
+
+const SPEAKER_CATEGORIES : Map<String, SpeakerCategory> = new Map([
+  ["all", CATEGORY_ALL],
+  ["cartoons", new SpeakerCategory("Cartoons", "cartoons")],
+  ["celebrities", new SpeakerCategory("Celebrities", "celebrities")],
+  ["games", new SpeakerCategory("Video Games", "games")],
+  ["politics", new SpeakerCategory("Politics", "politics")],
+  ["musicians", new SpeakerCategory("Musicians", "musicians")],
+  ["streamers", new SpeakerCategory("Streamers and YouTubers", "streamers")],
+  ["science", new SpeakerCategory("Science", "science")],
+  ["tech", new SpeakerCategory("Technology", "tech")],
+  ["news", new SpeakerCategory("News and Commentary", "news")],
+]);
 
 class Speaker {
   name: string;
@@ -7,8 +39,9 @@ class Speaker {
   avatarUrl?: string;
   fullUrl?: string;
   voiceQuality?: number;
+  categories: SpeakerCategory[];
 
-  constructor(name: string, slug: string, description: string, avatarUrl?: string, fullUrl?: string, voiceQuality?: number, defaultVoice?: boolean) {
+  constructor(name: string, slug: string, description: string, categories: SpeakerCategory[], avatarUrl?: string, fullUrl?: string, voiceQuality?: number, defaultVoice?: boolean) {
     this.name = name;
     this.slug = slug;
     this.description = description;
@@ -16,10 +49,26 @@ class Speaker {
     this.fullUrl = fullUrl;
     this.voiceQuality = voiceQuality;
     this.defaultVoice = defaultVoice !== undefined && defaultVoice;
+    this.categories = categories;
   }
 
   static fromJson(json: any) : Speaker {
-    return new Speaker(json.name, json.slug, json.description, json.avatarUrl, json.fullUrl, json.voiceQuality, json.defaultVoice);
+    let categories : SpeakerCategory[] = [];
+
+    let inputCategories = json.categories || [];
+    inputCategories.push('all');
+
+    if (inputCategories) {
+      inputCategories.forEach((categoryName : string) => {
+        let category = SPEAKER_CATEGORIES.get(categoryName);
+        if (category === undefined) {
+          throw new Error(`Category not found: ${categoryName}`);
+        }
+        categories.push(category);
+      });
+    }
+
+    return new Speaker(json.name, json.slug, json.description, categories, json.avatarUrl, json.fullUrl, json.voiceQuality, json.defaultVoice);
   }
 
   getName() : string {
@@ -57,6 +106,10 @@ class Speaker {
   isDefaultVoice(): boolean {
     return this.defaultVoice;
   }
+
+  getCategories(): SpeakerCategory[] {
+    return [...this.categories];
+  }
 }
 
 const SPEAKERS : Speaker[] = [
@@ -67,6 +120,7 @@ const SPEAKERS : Speaker[] = [
     avatarUrl: "snape.jpg",
     fullUrl: "alan-rickman-full.png",
     voiceQuality: 6.0,
+    categories: ["celebrities"],
   }),
   Speaker.fromJson({
     name: "Anderson Cooper",
@@ -75,6 +129,7 @@ const SPEAKERS : Speaker[] = [
     avatarUrl: "anderson-cooper.jpg",
     fullUrl: "anderson-cooper-full.png",
     voiceQuality: 4.9,
+    categories: ["politics", "news"],
   }),
   Speaker.fromJson({
     name: "Arnold Schwarzenegger",
@@ -83,6 +138,7 @@ const SPEAKERS : Speaker[] = [
     avatarUrl: "arnold-schwarzenegger.jpg",
     fullUrl: "arnold-schwarzenegger-full.png",
     voiceQuality: 8.0,
+    categories: ["celebrities", "politics"],
   }),
   Speaker.fromJson({
     name: "Bart Simpson",
@@ -91,6 +147,7 @@ const SPEAKERS : Speaker[] = [
     avatarUrl: "bart-simpson.jpg",
     fullUrl: "bart-simpson-full.png",
     voiceQuality: 7.2,
+    categories: ["cartoons"],
   }),
   Speaker.fromJson({
     name: "Ben Shapiro",
@@ -99,6 +156,7 @@ const SPEAKERS : Speaker[] = [
     avatarUrl: "ben-shapiro.jpg",
     fullUrl: "ben-shapiro-full.png",
     voiceQuality: 6.8,
+    categories: ["politics"],
   }),
   Speaker.fromJson({
     name: "Ben Stein",
@@ -107,6 +165,7 @@ const SPEAKERS : Speaker[] = [
     avatarUrl: "ben-stein.jpg",
     fullUrl: "ben-stein-full.png",
     voiceQuality: 5.0,
+    categories: ["celebrities", "news"],
   }),
   Speaker.fromJson({
     name: "Betty White",
@@ -115,6 +174,7 @@ const SPEAKERS : Speaker[] = [
     avatarUrl: "betty-white.jpg",
     fullUrl: "betty-white-full.png",
     voiceQuality: 7.3,
+    categories: ["celebrities"],
   }),
   Speaker.fromJson({
     name: "Bill Gates",
@@ -123,6 +183,7 @@ const SPEAKERS : Speaker[] = [
     avatarUrl: "bill-gates.jpg",
     fullUrl: "bill-gates-full.png",
     voiceQuality: 6.3,
+    categories: ["tech"],
   }),
   Speaker.fromJson({
     name: "Bill Nye",
@@ -131,6 +192,7 @@ const SPEAKERS : Speaker[] = [
     avatarUrl: "bill-nye.jpg",
     fullUrl: "bill-nye-full.png",
     voiceQuality: 6.7,
+    categories: ["science"],
   }),
   Speaker.fromJson({
     name: "Boomstick (Death Battle!)",
@@ -139,6 +201,7 @@ const SPEAKERS : Speaker[] = [
     avatarUrl: "boomstick.jpg",
     fullUrl: "boomstick-full.png",
     voiceQuality: 5.2,
+    categories: ["streamers"],
   }),
   Speaker.fromJson({
     name: "Bryan Cranston",
@@ -147,6 +210,7 @@ const SPEAKERS : Speaker[] = [
     avatarUrl: "bryan-cranston.jpg",
     fullUrl: "bryan-cranston-full.png",
     voiceQuality: 7.1,
+    categories: ["celebrities"],
   }),
   Speaker.fromJson({
     name: "Christopher Lee",
@@ -155,6 +219,7 @@ const SPEAKERS : Speaker[] = [
     avatarUrl: "christopher-lee.jpg",
     fullUrl: "christopher-lee-full.png",
     voiceQuality: 6.5,
+    categories: ["celebrities"],
   }),
   Speaker.fromJson({
     name: "Craig Ferguson",
@@ -163,6 +228,7 @@ const SPEAKERS : Speaker[] = [
     avatarUrl: "craig-ferguson.jpg",
     fullUrl: "craig-ferguson-full.png",
     voiceQuality: 7.9,
+    categories: ["celebrities"],
   }),
   Speaker.fromJson({
     name: "Danny Devito",
@@ -179,6 +245,7 @@ const SPEAKERS : Speaker[] = [
     avatarUrl: "david-cross.jpg",
     fullUrl: "david-cross-full.png",
     voiceQuality: 5.8,
+    categories: ["celebrities"],
   }),
   Speaker.fromJson({
     name: "Dr. Phil McGraw",
@@ -187,6 +254,7 @@ const SPEAKERS : Speaker[] = [
     avatarUrl: "dr-phil-mcgraw.jpg",
     fullUrl: "dr-phil-mcgraw-full.png",
     voiceQuality: 6.1,
+    categories: ["celebrities"],
   }),
   Speaker.fromJson({
     name: "George Takei",
@@ -195,6 +263,7 @@ const SPEAKERS : Speaker[] = [
     avatarUrl: "george-takei.jpg",
     fullUrl: "george-takei-full.png",
     voiceQuality: 0.0,
+    categories: ["celebrities"],
   }),
   Speaker.fromJson({
     name: "Gilbert Gottfried",
@@ -203,6 +272,7 @@ const SPEAKERS : Speaker[] = [
     avatarUrl: "gilbert-gottfried.jpg",
     fullUrl: "gilbert-gottfried-full.png",
     voiceQuality: 7.8,
+    categories: ["celebrities"],
   }),
   Speaker.fromJson({
     name: "Hillary Clinton",
@@ -211,6 +281,7 @@ const SPEAKERS : Speaker[] = [
     avatarUrl: "hillary-clinton.jpg",
     fullUrl: "hillary-clinton-full.png",
     voiceQuality: 5.5,
+    categories: ["politics"],
   }),
   Speaker.fromJson({
     name: "Homer Simpson",
@@ -219,6 +290,7 @@ const SPEAKERS : Speaker[] = [
     avatarUrl: "homer-simpson.jpg",
     fullUrl: "homer-simpson-full.png",
     voiceQuality: 8.0,
+    categories: ["cartoons"],
   }),
   Speaker.fromJson({
     name: "J. K. Simmons",
@@ -227,6 +299,7 @@ const SPEAKERS : Speaker[] = [
     avatarUrl: "j-k-simmons.jpg",
     fullUrl: "j-k-simmons-full.png",
     voiceQuality: 6.2,
+    categories: ["celebrities"],
   }),
   Speaker.fromJson({
     name: "James Earl Jones",
@@ -235,6 +308,7 @@ const SPEAKERS : Speaker[] = [
     avatarUrl: "darth-vader.jpg",
     fullUrl: "james-earl-jones-full.png",
     voiceQuality: 5.5,
+    categories: ["celebrities"],
   }),
   Speaker.fromJson({
     name: "John Oliver",
@@ -243,6 +317,7 @@ const SPEAKERS : Speaker[] = [
     avatarUrl: "john-oliver.jpg",
     fullUrl: "john-oliver-full.png",
     voiceQuality: 5.2,
+    categories: ["news", "politics"],
   }),
   Speaker.fromJson({
     name: "Judi Dench",
@@ -251,6 +326,7 @@ const SPEAKERS : Speaker[] = [
     avatarUrl: "judi-dench.jpg",
     fullUrl: "judi-dench-full.png",
     voiceQuality: 6.3,
+    categories: ["celebrities"],
   }),
   Speaker.fromJson({
     name: "Larry King",
@@ -259,6 +335,7 @@ const SPEAKERS : Speaker[] = [
     avatarUrl: "larry-king.jpg",
     fullUrl: "larry-king-full.png",
     voiceQuality: 4.8,
+    categories: ["news"],
   }),
   Speaker.fromJson({
     name: "Leonard Nimoy",
@@ -267,6 +344,7 @@ const SPEAKERS : Speaker[] = [
     avatarUrl: "spock.jpg",
     fullUrl: "leonard-nimoy-full.png",
     voiceQuality: 5.9,
+    categories: ["celebrities"],
   }),
   Speaker.fromJson({
     name: "Lisa Simpson",
@@ -275,6 +353,7 @@ const SPEAKERS : Speaker[] = [
     avatarUrl: "lisa-simpson.jpg",
     fullUrl: "lisa-simpson-full.png",
     voiceQuality: 6.5,
+    categories: ["cartoons"],
   }),
   Speaker.fromJson({
     name: "Mark Zuckerberg",
@@ -283,6 +362,7 @@ const SPEAKERS : Speaker[] = [
     avatarUrl: "mark-zuckerberg.jpg",
     fullUrl: "mark-zuckerberg-full.png",
     voiceQuality: 4.9,
+    categories: ["tech"],
   }),
   Speaker.fromJson({
     name: "Michael Rosen",
@@ -291,6 +371,7 @@ const SPEAKERS : Speaker[] = [
     avatarUrl: "michael-rosen.jpg",
     fullUrl: "michael-rosen-full.png",
     voiceQuality: 6.5,
+    categories: ["celebrities"],
   }),
   Speaker.fromJson({
     name: "Mr. Fred Rogers",
@@ -299,6 +380,7 @@ const SPEAKERS : Speaker[] = [
     avatarUrl: "fred-rogers.jpg",
     fullUrl: "fred-rogers-full.png",
     voiceQuality: 4.9,
+    categories: ["celebrities"],
   }),
   Speaker.fromJson({
     name: "Mr. Krabs",
@@ -307,6 +389,7 @@ const SPEAKERS : Speaker[] = [
     avatarUrl: "mr-krabs.jpg",
     fullUrl: "mr-krabs-full.png",
     voiceQuality: 5.5,
+    categories: ["cartoons"],
   }),
   Speaker.fromJson({
     name: "Neil deGrasse Tyson",
@@ -315,6 +398,7 @@ const SPEAKERS : Speaker[] = [
     avatarUrl: "neil-degrasse-tyson.jpg",
     fullUrl: "neil-degrasse-tyson-full.png",
     voiceQuality: 6.4,
+    categories: ["science"],
   }),
   Speaker.fromJson({
     name: "Palmer Luckey",
@@ -323,6 +407,7 @@ const SPEAKERS : Speaker[] = [
     avatarUrl: "palmer-luckey.jpg",
     fullUrl: "palmer-luckey-full.png",
     voiceQuality: 6.3,
+    categories: ["tech"],
   }),
   Speaker.fromJson({
     name: "Paul Graham",
@@ -331,6 +416,7 @@ const SPEAKERS : Speaker[] = [
     avatarUrl: "paul-graham.jpg",
     fullUrl: "paul-graham-full.png",
     voiceQuality: 2.0,
+    categories: ["tech"],
   }),
   Speaker.fromJson({
     name: "Peter Thiel",
@@ -339,6 +425,7 @@ const SPEAKERS : Speaker[] = [
     avatarUrl: "peter-thiel.jpg",
     fullUrl: "peter-thiel-full.png",
     voiceQuality: 7.0,
+    categories: ["tech"],
   }),
   Speaker.fromJson({
     name: "President #37 Richard Nixon",
@@ -347,6 +434,7 @@ const SPEAKERS : Speaker[] = [
     avatarUrl: "richard-nixon.jpg",
     fullUrl: "richard-nixon-full.png",
     voiceQuality: 6.0,
+    categories: ["politics"],
   }),
   Speaker.fromJson({
     name: "President #39 Jimmy Carter",
@@ -355,6 +443,7 @@ const SPEAKERS : Speaker[] = [
     avatarUrl: "jimmy-carter.jpg",
     fullUrl: "jimmy-carter-full.png",
     voiceQuality: 6.3,
+    categories: ["politics"],
   }),
   Speaker.fromJson({
     name: "President #40 Ronald Reagan",
@@ -363,6 +452,7 @@ const SPEAKERS : Speaker[] = [
     avatarUrl: "ronald-reagan.jpg",
     fullUrl: "ronald-reagan-full.png",
     voiceQuality: 6.4,
+    categories: ["politics"],
   }),
   Speaker.fromJson({
     name: "President #42 Bill Clinton",
@@ -371,6 +461,7 @@ const SPEAKERS : Speaker[] = [
     avatarUrl: "bill-clinton.jpg",
     fullUrl: "bill-clinton-full.png",
     voiceQuality: 6.5,
+    categories: ["politics"],
   }),
   Speaker.fromJson({
     name: "President #43 George W. Bush",
@@ -379,6 +470,7 @@ const SPEAKERS : Speaker[] = [
     avatarUrl: "george-w-bush.jpg",
     fullUrl: "george-w-bush-full.png",
     voiceQuality: 7.4,
+    categories: ["politics"],
   }),
   Speaker.fromJson({
     name: "President #44 Barack Obama",
@@ -387,6 +479,7 @@ const SPEAKERS : Speaker[] = [
     avatarUrl: "barack-obama.jpg",
     fullUrl: "barack-obama-full.png",
     voiceQuality: 4.2,
+    categories: ["politics"],
   }),
   Speaker.fromJson({
     name: "Richard Ayoade",
@@ -395,6 +488,7 @@ const SPEAKERS : Speaker[] = [
     avatarUrl: "moss-fire.webp",
     fullUrl: "richard-ayoade-full.png",
     voiceQuality: 6.5,
+    categories: ["celebrities"],
   }),
   Speaker.fromJson({
     name: "Sam Altman",
@@ -403,6 +497,7 @@ const SPEAKERS : Speaker[] = [
     avatarUrl: "sam-altman.jpg",
     fullUrl: "sam-altman-full.png",
     voiceQuality: 7.0,
+    categories: ["tech"],
   }),
   Speaker.fromJson({
     name: "Sarah Palin",
@@ -411,6 +506,7 @@ const SPEAKERS : Speaker[] = [
     avatarUrl: "sarah-palin.jpg",
     fullUrl: "sarah-palin-full.png",
     voiceQuality: 5.3,
+    categories: ["politics"],
   }),
   Speaker.fromJson({
     name: "Shohreh Aghdashloo",
@@ -419,6 +515,7 @@ const SPEAKERS : Speaker[] = [
     avatarUrl: "shohreh-aghdashloo.jpg",
     fullUrl: "shohreh-aghdashloo-full.png",
     voiceQuality: 6.7,
+    categories: ["celebrities"],
   }),
   Speaker.fromJson({
     name: "Sir David Attenborough",
@@ -427,6 +524,7 @@ const SPEAKERS : Speaker[] = [
     avatarUrl: "david-attenborough.jpg",
     fullUrl: "david-attenborough-full.png",
     voiceQuality: 8.0,
+    categories: ["celebrities", "science"],
   }),
   Speaker.fromJson({
     name: "Sonic",
@@ -436,6 +534,7 @@ const SPEAKERS : Speaker[] = [
     fullUrl: "sonic-full.png",
     voiceQuality: 8.5,
     defaultVoice: true,
+    categories: ["games"],
   }),
   Speaker.fromJson({
     name: "SpongeBob SquarePants",
@@ -444,6 +543,7 @@ const SPEAKERS : Speaker[] = [
     avatarUrl: "spongebob-squarepants.jpg",
     fullUrl: "spongebob-squarepants-full.png",
     voiceQuality: 8.0,
+    categories: ["cartoons"],
   }),
   Speaker.fromJson({
     name: "Squidward Tentacles",
@@ -452,6 +552,7 @@ const SPEAKERS : Speaker[] = [
     avatarUrl: "squidward.jpg",
     fullUrl: "squidward-full.png",
     voiceQuality: 4.5,
+    categories: ["cartoons"],
   }),
   Speaker.fromJson({
     name: "Tucker Carlson",
@@ -460,6 +561,7 @@ const SPEAKERS : Speaker[] = [
     avatarUrl: "tucker-carlson.jpg",
     fullUrl: "tucker-carlson-full.png",
     voiceQuality: 7.5,
+    categories: ["politics", "news"],
   }),
   Speaker.fromJson({
     name: "Tupac Shakur (acapella lyrics)",
@@ -468,6 +570,7 @@ const SPEAKERS : Speaker[] = [
     avatarUrl: "tupac-shakur.jpg",
     fullUrl: "tupac-shakur-full.png",
     voiceQuality: 5.0,
+    categories: ["musicians"],
   }),
   Speaker.fromJson({
     name: "Wilford Brimley",
@@ -476,6 +579,7 @@ const SPEAKERS : Speaker[] = [
     avatarUrl: "wilford-brimley.jpg",
     fullUrl: "wilford-brimley-full.png",
     voiceQuality: 7.4,
+    categories: ["celebrities"],
   }),
   Speaker.fromJson({
     name: "Wizard (Death Battle!)",
@@ -484,7 +588,31 @@ const SPEAKERS : Speaker[] = [
     avatarUrl: "wizard.jpg",
     fullUrl: "wizard-full.png",
     voiceQuality: 5.4,
+    categories: ["streamers"],
   }),
 ];
 
-export { Speaker, SPEAKERS };
+const SPEAKERS_BY_CATEGORY : Map<SpeakerCategory, Array<Speaker>> = new Map();
+
+SPEAKER_CATEGORIES.forEach(category => {
+  SPEAKERS_BY_CATEGORY.set(category, []);
+});
+
+SPEAKERS.forEach(speaker => {
+  speaker.getCategories().forEach((category: SpeakerCategory) => {
+    let categoryList = SPEAKERS_BY_CATEGORY.get(category);
+    if (categoryList === undefined) {
+      throw new Error(`No such category: ${category.getName()}`);
+    }
+    categoryList.push(speaker);
+  });
+});
+
+export { 
+  Speaker, 
+  SpeakerCategory,
+  SPEAKERS,
+  SPEAKER_CATEGORIES,
+  SPEAKERS_BY_CATEGORY,
+  CATEGORY_ALL,
+};

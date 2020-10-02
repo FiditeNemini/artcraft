@@ -1,6 +1,8 @@
 import React from 'react';
+import { CategoryDropdown } from './dropdowns/CategoryDropdown';
 import { Form } from './Form';
-import { Speaker, SPEAKERS } from '../../model/Speakers';
+import { Speaker, SpeakerCategory } from '../../model/Speakers';
+import { SpeakerDropdown } from './dropdowns/SpeakerDropdown';
 import { SpeakerInfo } from './extras/SpeakerInfo';
 import { Spectrogram } from './extras/Spectrogram';
 import { SpectrogramComponent } from './extras/SpectrogramComponent';
@@ -25,11 +27,13 @@ interface Props {
   enableSpectrograms: boolean,
   extrasMode: ExtrasMode,
   currentSpeaker: Speaker,
+  currentSpeakerCategory: SpeakerCategory,
   currentSpectrogram?: Spectrogram,
   spectrogramMode: SpectrogramMode,
   currentText: string,
   textCharacterLimit: number,
   changeSpeakerCallback: (slug: string) => void,
+  changeSpeakerCategoryCallback: (speakerCategorySlug: string) => void,
   changeSpectrogramCallback: (spectrogram: Spectrogram) => void,
   changeExtrasModeCallback: (extrasMode: ExtrasMode) => void,
   changeSpectrogramMode: (spectrogramMode: SpectrogramMode) => void,
@@ -136,11 +140,6 @@ class SpeakComponent extends React.Component<Props, State> {
     }
   }
 
-  changeSpeaker = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    let slug = event.target.value;
-    this.props.changeSpeakerCallback(slug);
-  }
-
   public render() {
     let speakerPictureOrSpectrogram;
     switch (this.props.extrasMode) {
@@ -173,66 +172,20 @@ class SpeakComponent extends React.Component<Props, State> {
         onClick={this.toggleMode}>{modeText}</button>
     }
 
-    let bestSpeakerOptions : any[] = [];
-    let goodSpeakerOptions : any[] = [];
-    let badSpeakerOptions : any[] = [];
-    let terribleSpeakerOptions : any[] = [];
-
-    SPEAKERS.forEach(speaker => {
-      const quality = speaker.getVoiceQuality();
-      const slug = speaker.getSlug();
-      let selected = undefined;
-      if (this.props.currentSpeaker.slug === speaker.slug) {
-        selected = true;
-      }
-      const option = <option 
-        key={slug} 
-        value={speaker.getSlug()} 
-        selected={selected}>{speaker.getName()}</option>;
-
-      if (quality >= 7.5) {
-        bestSpeakerOptions.push(option);
-      } else if (quality >= 5.9) {
-        goodSpeakerOptions.push(option);
-      } else if (quality >= 4.5) {
-        badSpeakerOptions.push(option);
-      } else {
-        terribleSpeakerOptions.push(option);
-      }
-    });
-
     return (
       <section>
-
+        <CategoryDropdown 
+          currentSpeakerCategory={this.props.currentSpeakerCategory}
+          changeSpeakerCategoryCallback={this.props.changeSpeakerCategoryCallback}
+          />
+        
         <div className="columns is-mobile is-gapless">
-          <div className="column is-two-thirds">
-            <div className="control is-expanded">
-              <div className="select is-fullwidth">
-                <select onChange={this.changeSpeaker}>
-                  <optgroup label="&mdash; Highest Quality Voices &mdash;">
-                    {bestSpeakerOptions.map(option => {
-                      return option;
-                    })}
-                  </optgroup>
-                  <optgroup label="&mdash; Decent Quality Voices &mdash;">
-                    {goodSpeakerOptions.map(option => {
-                      return option;
-                    })}
-                  </optgroup>
-                  <optgroup label="&mdash; Poor Quality Voices (need cleanup) &mdash;">
-                    {badSpeakerOptions.map(option => {
-                      return option;
-                    })}
-                  </optgroup>
-                  <optgroup label="&mdash; Terrible Quality Voices (need rework) &mdash;">
-                    {terribleSpeakerOptions.map(option => {
-                      return option;
-                    })}
-                  </optgroup>
-                </select>
-              </div>
-            </div>
-          </div>
+
+          <SpeakerDropdown
+            currentSpeaker={this.props.currentSpeaker}
+            currentSpeakerCategory={this.props.currentSpeakerCategory}
+            changeSpeakerCallback={this.props.changeSpeakerCallback}
+            />
 
           <div className="column">
             {switchButton}
