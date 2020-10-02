@@ -482,6 +482,15 @@ const SPEAKERS : Speaker[] = [
     categories: ["politics"],
   }),
   Speaker.fromJson({
+    name: "President #45 Donald Trump",
+    slug: "donald-trump",
+    description: "The 45th President of the United States.",
+    avatarUrl: "donald-trump.jpg",
+    fullUrl: "donald-trump-full.png",
+    voiceQuality: 5.2,
+    categories: ["politics"],
+  }),
+  Speaker.fromJson({
     name: "Richard Ayoade",
     slug: "richard-ayoade",
     description: "Actor and comedian",
