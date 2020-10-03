@@ -122,6 +122,12 @@ pub async fn post_speak(request: HttpRequest,
       info!("Melgan Model: {}", melgan_model);
       info!("Text: {}", text);
 
+      if query.reload_model && app_state.allow_model_reload {
+        warn!("Forgetting models for reload.");
+        app_state.model_cache.forget_arpabet_glow_tts(&glow_tts_model);
+        app_state.model_cache.forget_melgan(&melgan_model);
+      }
+
       let glow_tts = app_state.model_cache.get_or_load_arbabet_glow_tts(&glow_tts_model)
           .expect(&format!("Couldn't load glow-tts model: {}", glow_tts_model));
 

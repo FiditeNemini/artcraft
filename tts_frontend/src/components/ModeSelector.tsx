@@ -48,7 +48,7 @@ class ModeSelector extends React.Component<Props, State> {
           onClick={() => this.props.switchModeCallback(Mode.SPEAKER_SPECTROGRAM)}>
             Speaker + Spectrogram
         </button>
-        <button 
+        {/*<button 
           disabled={advancedDisabled}
           onClick={() => this.props.switchModeCallback(Mode.ADVANCED)}>
             Advanced
@@ -57,7 +57,7 @@ class ModeSelector extends React.Component<Props, State> {
           disabled={sentencesDisabled}
           onClick={() => this.props.switchModeCallback(Mode.SENTENCE)}>
             Sentences
-        </button>
+        </button>*/}
       </nav>
     );
   }

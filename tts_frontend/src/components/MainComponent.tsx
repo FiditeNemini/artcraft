@@ -13,7 +13,9 @@ interface Props {
   apiConfig: ApiConfig,
   mode: Mode,
   text: string,
+  reloadModel: boolean,
   updateTextCallback: (text: string) => void,
+  updateReloadCheckboxCallback: (reload: boolean) => void,
 }
 
 interface State {
@@ -84,7 +86,9 @@ class MainComponent extends React.Component<Props, State> {
         <SpeakerModeComponent 
           apiConfig={this.props.apiConfig}
           text={this.props.text}
+          reloadModel={this.props.reloadModel}
           updateTextCallback={this.props.updateTextCallback}
+          updateReloadCheckboxCallback={this.props.updateReloadCheckboxCallback}
           />
       </div>
     );

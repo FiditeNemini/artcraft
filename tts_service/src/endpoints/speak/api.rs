@@ -21,6 +21,10 @@ pub struct SpeakRequest {
   /// Admin/debug requests get to skip the rate limiter.
   #[serde(default)]
   pub skip_rate_limiter: bool,
+
+  /// Admin/debug requests can reload the model (as long as server is configured for it at startup).
+  #[serde(default)]
+  pub reload_model: bool,
 }
 
 #[derive(Serialize,Debug)]

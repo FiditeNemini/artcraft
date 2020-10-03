@@ -7,7 +7,9 @@ import ApiConfig from '../../../ApiConfig';
 interface Props {
   apiConfig: ApiConfig,
   text: string,
+  reloadModel: boolean,
   updateTextCallback: (text: string) => void,
+  updateReloadCheckboxCallback: (reload: boolean) => void,
 }
 
 interface State {
@@ -71,7 +73,9 @@ class SpeakerModeComponent extends React.Component<Props, State> {
           speaker={this.state.speaker_slug!} 
           apiConfig={this.props.apiConfig}
           text={this.props.text}
+          reloadModel={this.props.reloadModel}
           updateTextCallback={this.props.updateTextCallback}
+          updateReloadCheckboxCallback={this.props.updateReloadCheckboxCallback}
           />
       </div>
     );

@@ -82,6 +82,13 @@ impl ModelCache {
     }
   }
 
+  /// Purge the model if it exists.
+  pub fn forget_arpabet_glow_tts(&self, filename: &str) {
+    let mut lock = self.arpabet_glow_tts_models.lock()
+        .expect("should unlock");
+    let _r = lock.remove(filename);
+  }
+
   pub fn get_or_load_arbabet_glow_tts(&self, filename: &str) -> Option<Arc<ArpabetGlowTtsModel>> {
     let mut lock = self.arpabet_glow_tts_models.lock()
         .expect("should unlock");
@@ -154,6 +161,13 @@ impl ModelCache {
         None
       }
     }
+  }
+
+  /// Purge the model if it exists.
+  pub fn forget_melgan(&self, filename: &str) {
+    let mut lock = self.melgan_models.lock()
+        .expect("should unlock");
+    let _r = lock.remove(filename);
   }
 
   pub fn get_or_load_melgan(&self, filename: &str) -> Option<Arc<MelganModel>> {

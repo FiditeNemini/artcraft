@@ -19,6 +19,7 @@ interface Props {
 interface State {
   mode: Mode,
   text: string,
+  reloadModel: boolean,
 }
 
 class ModalComponent extends React.Component<Props, State> {
@@ -28,6 +29,7 @@ class ModalComponent extends React.Component<Props, State> {
     this.state = {
       mode: Mode.SPEAKER,
       text: '',
+      reloadModel: false,
     };
   }
 
@@ -37,6 +39,10 @@ class ModalComponent extends React.Component<Props, State> {
 
   updateText = (text: string) => {
     this.setState({ text: text });
+  }
+
+  updateReloadCheckbox = (reload: boolean) => {
+    this.setState({ reloadModel: reload });
   }
 
   public render() {
@@ -51,13 +57,19 @@ class ModalComponent extends React.Component<Props, State> {
           apiConfig={this.props.apiConfig}
           mode={this.state.mode }
           text={this.state.text}
-          updateTextCallback={this.updateText} />;
+          reloadModel={this.state.reloadModel}
+          updateTextCallback={this.updateText} 
+          updateReloadCheckboxCallback={this.updateReloadCheckbox}
+          />;
         break;
       case Mode.SPEAKER_SPECTROGRAM:
         component = <SpeakerSpectrogramModeComponent
           apiConfig={this.props.apiConfig}
           text={this.state.text}
-          updateTextCallback={this.updateText} />;
+          reloadModel={this.state.reloadModel}
+          updateTextCallback={this.updateText}
+          updateReloadCheckboxCallback={this.updateReloadCheckbox}
+          />;
         break;
       case Mode.SENTENCE:
         component = <SentencesComponent apiConfig={this.props.apiConfig} />;

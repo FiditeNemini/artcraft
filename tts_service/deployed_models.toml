@@ -1,4 +1,32 @@
 [[speakers]]
+name = "Boomstick (Death Battle!)"
+slug = "boomstick"
+model_pipeline = "ArpabetGlowTtsMelgan"
+glow_tts = "glow-tts_boomstick_ljstx_2020.09.13_expr-1_chkpt-4500.torchjit"
+melgan = "melgan_boomstick_2020.09.15_d3b9647_13750.torchjit"
+
+[[speakers]]
+name = "Sonic"
+slug = "sonic"
+model_pipeline = "ArpabetGlowTtsMelgan"
+glow_tts = "glow-tts_sonic_ljstx_2020.09.12_expr-1_chkpt-3750.torchjit"
+melgan = "melgan_sonic_2020.09.15_d3b9647_11000.torchjit"
+
+[[speakers]]
+name = "Richard Ayoade"
+slug = "richard-ayoade"
+model_pipeline = "ArpabetGlowTtsMelgan"
+glow_tts = "glow-tts_richard_ayoade_ljstx_2020.09.12_expr-1_chkpt-4500.torchjit"
+melgan = "melgan_richard-ayoade_2020.09.15_d3b9647_11500.torchjit"
+
+[[speakers]]
+name = "Ben Shapiro"
+slug = "ben-shapiro"
+model_pipeline = "ArpabetGlowTtsMelgan"
+glow_tts = "glow-tts_ben_shapiro_ljstx_2020.09.13_expr-1_chkpt-4250.torchjit"
+melgan = "melgan_ben-shapiro_2020.09.15_d3b9647_11250.torchjit"
+
+[[speakers]]
 name = "Michael Rosen"
 slug = "michael-rosen"
 model_pipeline = "ArpabetGlowTtsMelgan"

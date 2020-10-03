@@ -7,7 +7,9 @@ interface Props {
   apiConfig: ApiConfig,
   speaker?: String,
   text: string,
+  reloadModel: boolean,
   updateTextCallback: (text: string) => void,
+  updateReloadCheckboxCallback: (reload: boolean) => void,
 }
 
 interface State {
@@ -33,6 +35,11 @@ class SpeakerAudioForm extends React.Component<Props, State> {
     this.props.updateTextCallback(text);
   }
 
+  handleReloadCheckboxChange = (ev: React.FormEvent<HTMLInputElement>) => {
+    const checked = (ev.target as HTMLInputElement).checked;
+    this.props.updateReloadCheckboxCallback(checked);
+  }
+
   makeRequest = (ev: React.FormEvent<HTMLFormElement>) => {
     console.log("Form Submit");
 
@@ -41,6 +48,10 @@ class SpeakerAudioForm extends React.Component<Props, State> {
     }
 
     let request = new SpeakRequest(this.props.text, this.props.speaker!);
+
+    if (this.props.reloadModel) {
+      request.setReloadModel(true);
+    }
 
     const url = this.props.apiConfig.getEndpoint('/speak');
 
@@ -54,9 +65,10 @@ class SpeakerAudioForm extends React.Component<Props, State> {
     })
     .then(res => res.blob())
     .then(blob => {
-      console.log(blob);
-
+      //console.log(blob);
       const url = window.URL.createObjectURL(blob);
+
+      console.log('download at the audio url:');
       console.log(url);
 
       const sound = new Howl.Howl({
@@ -78,6 +90,9 @@ class SpeakerAudioForm extends React.Component<Props, State> {
     return (
       <form onSubmit={this.makeRequest}>
         <input onChange={this.handleTextChange} value={this.props.text} />
+        <div>
+          <input type="checkbox" onChange={this.handleReloadCheckboxChange} defaultChecked={this.props.reloadModel} /> <label>Reload model</label>
+        </div>
         <button>Submit</button>
       </form>
     );

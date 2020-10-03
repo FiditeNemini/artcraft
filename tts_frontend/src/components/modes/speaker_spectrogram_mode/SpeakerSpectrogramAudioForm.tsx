@@ -9,7 +9,9 @@ interface Props {
   apiConfig: ApiConfig,
   speaker?: String,
   text: string,
+  reloadModel: boolean,
   updateTextCallback: (text: string) => void,
+  updateReloadCheckboxCallback: (reload: boolean) => void,
 }
 
 interface State {
@@ -44,6 +46,11 @@ class SpeakerSpectrogramAudioForm extends React.Component<Props, State> {
     this.props.updateTextCallback(text);
   }
 
+  handleReloadCheckboxChange = (ev: React.FormEvent<HTMLInputElement>) => {
+    const checked = (ev.target as HTMLInputElement).checked;
+    this.props.updateReloadCheckboxCallback(checked);
+  }
+
   makeRequest = (ev: React.FormEvent<HTMLFormElement>) => {
     console.log("Form Submit");
 
@@ -52,6 +59,10 @@ class SpeakerSpectrogramAudioForm extends React.Component<Props, State> {
     }
 
     let request = new SpeakRequest(this.props.text, this.props.speaker!);
+
+    if (this.props.reloadModel) {
+      request.setReloadModel(true);
+    }
 
     const url = this.props.apiConfig.getEndpoint('/speak_spectrogram');
 
@@ -66,10 +77,8 @@ class SpeakerSpectrogramAudioForm extends React.Component<Props, State> {
     .then(res => res.json())
     .then(res => {
       const data = `data:audio/wav;base64,${res.audio_base64}`;
-      console.log(data);
       
       const audioUrl = new URL(data);
-      console.log(audioUrl);
 
       // var image = new Image();
       // image.src = `data:image/bmp;base64,${res.spectrogram.bytes_base64}`;
@@ -167,6 +176,9 @@ class SpeakerSpectrogramAudioForm extends React.Component<Props, State> {
 
         <form onSubmit={this.makeRequest}>
           <input onChange={this.handleTextChange} value={this.props.text} />
+          <div>
+            <input type="checkbox" onChange={this.handleReloadCheckboxChange} defaultChecked={this.props.reloadModel} /> <label>Reload model</label>
+          </div>
           <button>Submit</button>
         </form>
       </div>

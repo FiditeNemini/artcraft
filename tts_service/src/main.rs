@@ -57,6 +57,7 @@ use crate::endpoints::helpers::stats_recorder::StatsRecorder;
 use grapheme_to_phoneme::Model;
 use crate::endpoints::service_settings::get_service_settings;
 
+const ENV_ALLOW_MODEL_RELOAD : &'static str = "ALLOW_MODEL_RELOAD";
 const ENV_ARPABET_EXTRAS_FILE : &'static str = "ARPABET_EXTRAS_FILE";
 const ENV_ASSET_DIRECTORY: &'static str = "ASSET_DIRECTORY";
 const ENV_BIND_ADDRESS: &'static str = "BIND_ADDRESS";
@@ -78,6 +79,7 @@ const ENV_RUST_LOG : &'static str = "RUST_LOG";
 const ENV_STATS_MICROSERVICE_ENABLED : &'static str = "STATS_MICROSERVICE_ENABLED";
 const ENV_STATS_MICROSERVICE_ENDPOINT : &'static str = "STATS_MICROSERVICE_ENDPOINT";
 
+const DEFAULT_ALLOW_MODEL_RELOAD : bool = true;
 const DEFAULT_ASSET_DIRECTORY : &'static str = "/home/bt/dev/voice/voder/tts_frontend/build";
 const DEFAULT_BIND_ADDRESS : &'static str = "0.0.0.0:12345";
 const DEFAULT_DATABASE_ENABLED : bool = false;
@@ -108,6 +110,7 @@ pub struct AppState {
   pub default_sample_rate_hz: u32,
   pub rate_limiter: Box<dyn RateLimiter>,
   pub stats_recorder: StatsRecorder,
+  pub allow_model_reload: bool,
 }
 
 /** Startup parameters for the server. */
@@ -219,6 +222,7 @@ pub fn main() -> AnyhowResult<()> {
   let limiter_max_requests = get_env_num::<usize>(ENV_RATE_LIMITER_MAX_REQUESTS, DEFAULT_RATE_LIMITER_MAX_REQUESTS)?;
   let limiter_window_seconds = get_env_num::<u64>(ENV_RATE_LIMITER_WINDOW_SECONDS, DEFAULT_RATE_LIMITER_WINDOW_SECONDS)?;
 
+  let allow_model_reload = get_env_bool(ENV_ALLOW_MODEL_RELOAD, DEFAULT_ALLOW_MODEL_RELOAD)?;
   let stats_recorder_enabled = get_env_bool(ENV_STATS_MICROSERVICE_ENABLED, DEFAULT_STATS_MICROSERVICE_ENABLED)?;
   let stats_recorder_endpoint = get_env_string(ENV_STATS_MICROSERVICE_ENDPOINT, DEFAULT_STATS_MICROSERVICE_ENDPOINT);
 
@@ -323,6 +327,7 @@ pub fn main() -> AnyhowResult<()> {
     default_sample_rate_hz,
     rate_limiter,
     stats_recorder,
+    allow_model_reload,
   };
 
   let server_args = ServerArgs {
