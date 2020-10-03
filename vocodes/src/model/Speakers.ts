@@ -569,7 +569,6 @@ const SPEAKERS : Speaker[] = [
     avatarUrl: "sonic.jpg",
     fullUrl: "sonic-full.png",
     voiceQuality: 8.5,
-    defaultVoice: true,
     categories: ["games"],
   }),
   Speaker.fromJson({
@@ -650,8 +649,9 @@ const SPEAKERS : Speaker[] = [
     description: "You've activated my trap card.",
     avatarUrl: "yami-yugi.jpg",
     fullUrl: "yami-yugi-full.png",
-    voiceQuality: 6.5,
+    voiceQuality: 8.5,
     categories: ["cartoons"],
+    defaultVoice: true,
   }),
 ];
 
