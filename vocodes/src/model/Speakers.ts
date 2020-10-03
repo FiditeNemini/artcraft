@@ -20,7 +20,7 @@ const CATEGORY_ALL: SpeakerCategory = new SpeakerCategory("All Voices", "all");
 
 const SPEAKER_CATEGORIES : Map<String, SpeakerCategory> = new Map([
   ["all", CATEGORY_ALL],
-  ["cartoons", new SpeakerCategory("Cartoons", "cartoons")],
+  ["cartoons", new SpeakerCategory("Cartoons and Anime", "cartoons")],
   ["celebrities", new SpeakerCategory("Celebrities", "celebrities")],
   ["games", new SpeakerCategory("Video Games", "games")],
   ["politics", new SpeakerCategory("Politics", "politics")],
@@ -202,6 +202,15 @@ const SPEAKERS : Speaker[] = [
     fullUrl: "boomstick-full.png",
     voiceQuality: 5.2,
     categories: ["streamers"],
+  }),
+  Speaker.fromJson({
+    name: "The Boss",
+    slug: "the-boss",
+    description: "Metal Gear",
+    avatarUrl: "the-boss-virgil.jpg",
+    fullUrl: "the-boss-full.png",
+    voiceQuality: 5.5,
+    categories: ["games"],
   }),
   Speaker.fromJson({
     name: "Bryan Cranston",
@@ -518,6 +527,15 @@ const SPEAKERS : Speaker[] = [
     categories: ["politics"],
   }),
   Speaker.fromJson({
+    name: "Scout",
+    slug: "scout",
+    description: "TF2",
+    avatarUrl: "scout.jpg",
+    fullUrl: "scout-full.png",
+    voiceQuality: 4.5,
+    categories: ["games"],
+  }),
+  Speaker.fromJson({
     name: "Shohreh Aghdashloo",
     slug: "shohreh-aghdashloo",
     description: "Politician",
@@ -534,6 +552,15 @@ const SPEAKERS : Speaker[] = [
     fullUrl: "david-attenborough-full.png",
     voiceQuality: 8.0,
     categories: ["celebrities", "science"],
+  }),
+  Speaker.fromJson({
+    name: "Snake",
+    slug: "solid-snake",
+    description: "Metal Gear",
+    avatarUrl: "snake.png",
+    fullUrl: "snake-full.png",
+    voiceQuality: 5.5,
+    categories: ["games"],
   }),
   Speaker.fromJson({
     name: "Sonic",
@@ -564,6 +591,15 @@ const SPEAKERS : Speaker[] = [
     categories: ["cartoons"],
   }),
   Speaker.fromJson({
+    name: "Trevor Philips",
+    slug: "trevor-philips",
+    description: "GTAV",
+    avatarUrl: "trevor-philips.jpg",
+    fullUrl: "trevor-philips-full.png",
+    voiceQuality: 5.5,
+    categories: ["games"],
+  }),
+  Speaker.fromJson({
     name: "Tucker Carlson",
     slug: "tucker-carlson",
     description: "TV news personality",
@@ -582,6 +618,15 @@ const SPEAKERS : Speaker[] = [
     categories: ["musicians"],
   }),
   Speaker.fromJson({
+    name: "Vegeta",
+    slug: "vegeta",
+    description: "It's over 9000.",
+    avatarUrl: "vegeta-9000.webp",
+    fullUrl: "vegeta-full.png",
+    voiceQuality: 5.5,
+    categories: ["cartoons"],
+  }),
+  Speaker.fromJson({
     name: "Wilford Brimley",
     slug: "wilford-brimley",
     description: "Actor",
@@ -598,6 +643,15 @@ const SPEAKERS : Speaker[] = [
     fullUrl: "wizard-full.png",
     voiceQuality: 5.4,
     categories: ["streamers"],
+  }),
+  Speaker.fromJson({
+    name: "Yami Yugi",
+    slug: "yami-yugi",
+    description: "You've activated my trap card.",
+    avatarUrl: "yami-yugi.jpg",
+    fullUrl: "yami-yugi-full.png",
+    voiceQuality: 6.5,
+    categories: ["cartoons"],
   }),
 ];
 
