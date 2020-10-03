@@ -10,6 +10,50 @@ melgan = "melgan_manyvoice5.0_2020-07-23_12d5838_10760.torchjit"
 #melgan = "melgan_manyvoice2.0_2020-07-08_12d5838_9330.torchjit"
 #melgan = "manyvoice1.0_2020-06-28_12d5838_6610.torchjit"
 
+
+[[speakers]]
+name = "Yami Yugi"
+slug = "yami-yugi"
+model_pipeline = "ArpabetGlowTtsMelgan"
+glow_tts = "glow-tts_yami-yugi_ljstx_2020.10.02_expr-2_chkpt-4500.torchjit"
+melgan = "melgan_manyvoice5.0_2020-07-23_12d5838_10760.torchjit" # TODO: Needs custom vocoder
+
+[[speakers]]
+name = "Scout"
+slug = "scout"
+model_pipeline = "ArpabetGlowTtsMelgan"
+glow_tts = "glow-tts_scout_ljstx_2020.10.02_expr-1_chkpt-3800.torchjit"
+melgan = "melgan_manyvoice5.0_2020-07-23_12d5838_10760.torchjit" # TODO: Needs custom vocoder
+
+[[speakers]]
+name = "Solid Snake"
+slug = "solid-snake"
+model_pipeline = "ArpabetGlowTtsMelgan"
+glow_tts = "glow-tts_solid-snake_ljstx_2020.09.21_expr-1_chkpt-4500.torchjit"
+melgan = "melgan_manyvoice5.0_2020-07-23_12d5838_10760.torchjit" # TODO: Needs custom vocoder
+
+[[speakers]]
+name = "The Boss"
+slug = "the-boss"
+model_pipeline = "ArpabetGlowTtsMelgan"
+glow_tts = "glow-tts_the-boss_ljstx_2020.10.02_expr-1_chkpt-4500.torchjit"
+melgan = "melgan_manyvoice5.0_2020-07-23_12d5838_10760.torchjit" # TODO: Needs custom vocoder
+
+[[speakers]]
+name = "Trevor Philips"
+slug = "trevor-philips"
+model_pipeline = "ArpabetGlowTtsMelgan"
+glow_tts = "glow-tts_trevor-philips_ljstx_2020.10.02_expr-1_chkpt-4500.torchjit"
+melgan = "melgan_manyvoice5.0_2020-07-23_12d5838_10760.torchjit" # TODO: Needs custom vocoder
+
+[[speakers]]
+name = "Vegeta"
+slug = "vegeta"
+model_pipeline = "ArpabetGlowTtsMelgan"
+glow_tts = "glow-tts_vegeta_ljstx_2020.09.21_expr-1_chkpt-4500.torchjit"
+melgan = "melgan_manyvoice5.0_2020-07-23_12d5838_10760.torchjit" # TODO: Needs custom vocoder
+
+
 [[speakers]]
 name = "Boomstick (Death Battle!)"
 slug = "boomstick"
