@@ -156,7 +156,8 @@ class App extends React.Component<Props, State> {
 
     this.setState({ 
       speaker: selectedSpeaker,
-      currentSpeakerCategory: selectedSpeakerCategory 
+      currentSpeakerCategory: selectedSpeakerCategory,
+      extrasMode: ExtrasMode.SPEAKER_INFO,
     });
   }
 
@@ -179,7 +180,7 @@ class App extends React.Component<Props, State> {
 
   updateSpectrogram = (spectrogram: Spectrogram) => {
     if (!this.props.enableSpectrograms) {
-      return; // unsupported
+      return; // unsupported in iOS
     }
     this.setState({ 
       currentSpectrogram: spectrogram,

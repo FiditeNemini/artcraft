@@ -209,7 +209,7 @@ const SPEAKERS : Speaker[] = [
     description: "Metal Gear",
     avatarUrl: "the-boss-virgil.jpg",
     fullUrl: "the-boss-full.png",
-    voiceQuality: 5.5,
+    voiceQuality: 8.5,
     categories: ["games"],
   }),
   Speaker.fromJson({
