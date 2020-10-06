@@ -175,6 +175,7 @@ nav {
 /** RESPONSIVENESS **/
 
 /** Hide footer when using onscreen keyboard. */
+/* Actually, let's not do that because people filed bug reports.
 @media screen and (max-height: 550px) {
   footer {
     display: none;
@@ -183,6 +184,7 @@ nav {
     display: none;
   }
 }
+*/
 
 @media screen and (max-height: 740px) {
   footer p {
