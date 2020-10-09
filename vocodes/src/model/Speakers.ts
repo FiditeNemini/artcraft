@@ -29,6 +29,7 @@ const SPEAKER_CATEGORIES : Map<String, SpeakerCategory> = new Map([
   ["science", new SpeakerCategory("Science", "science")],
   ["tech", new SpeakerCategory("Technology", "tech")],
   ["news", new SpeakerCategory("News and Commentary", "news")],
+  ["fantasy", new SpeakerCategory("Science Fiction and Fantasy", "fantasy")],
 ]);
 
 class Speaker {
@@ -287,7 +288,7 @@ const SPEAKERS : Speaker[] = [
     avatarUrl: "darth-vader.jpg",
     fullUrl: "darth-vader-full.png",
     voiceQuality: 5.5,
-    categories: ["celebrities"],
+    categories: ["fantasy"],
   }),
   Speaker.fromJson({
     name: "David Cross",
@@ -567,6 +568,16 @@ const SPEAKERS : Speaker[] = [
     fullUrl: "sarah-palin-full.png",
     voiceQuality: 5.3,
     categories: ["politics"],
+  }),
+  Speaker.fromJson({
+    name: "Saruman",
+    slug: "saruman",
+    apiSlugOverride: "christopher-lee",
+    description: "Lord of the Rings",
+    avatarUrl: "saruman.jpg",
+    fullUrl: "saruman-full.png",
+    voiceQuality: 6.5,
+    categories: ["fantasy"],
   }),
   Speaker.fromJson({
     name: "Scout",
