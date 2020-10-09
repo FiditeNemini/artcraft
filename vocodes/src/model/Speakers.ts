@@ -45,7 +45,17 @@ class Speaker {
   voiceQuality?: number;
   categories: SpeakerCategory[];
 
-  constructor(name: string, slug: string, description: string, categories: SpeakerCategory[], avatarUrl?: string, fullUrl?: string, voiceQuality?: number, defaultVoice?: boolean, apiSlugOverride?: string) {
+  constructor(
+    name: string,
+    slug: string,
+    description: string,
+    categories: SpeakerCategory[],
+    avatarUrl?: string,
+    fullUrl?: string,
+    voiceQuality?: number,
+    defaultVoice?: boolean,
+    apiSlugOverride?: string)
+  {
     this.name = name;
     this.slug = slug;
     this.description = description;
@@ -73,7 +83,17 @@ class Speaker {
       });
     }
 
-    return new Speaker(json.name, json.slug, json.description, categories, json.avatarUrl, json.fullUrl, json.voiceQuality, json.defaultVoice);
+    return new Speaker(
+      json.name,
+      json.slug,
+      json.description,
+      categories,
+      json.avatarUrl,
+      json.fullUrl,
+      json.voiceQuality,
+      json.defaultVoice,
+      json.apiSlugOverride
+    );
   }
 
   getName() : string {
@@ -693,8 +713,8 @@ SPEAKERS.forEach(speaker => {
   });
 });
 
-export { 
-  Speaker, 
+export {
+  Speaker,
   SpeakerCategory,
   SPEAKERS,
   SPEAKER_CATEGORIES,
