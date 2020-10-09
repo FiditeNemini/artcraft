@@ -40,7 +40,7 @@ class Form extends React.Component<Props, State> {
   }
 
   public speak(sentence: string, speaker: Speaker) {
-    let request = new SpeakRequest(sentence, speaker.getSlug());
+    let request = new SpeakRequest(sentence, speaker.getApiSlug());
 
     console.log("Making SpeakRequest:", request);
 

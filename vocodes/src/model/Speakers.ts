@@ -34,6 +34,10 @@ const SPEAKER_CATEGORIES : Map<String, SpeakerCategory> = new Map([
 class Speaker {
   name: string;
   slug: string;
+
+  // Used for speakers like "darth-vader" who are backed by "james-earl-jones".
+  apiSlugOverride?: string;
+
   defaultVoice: boolean;
   description: string;
   avatarUrl?: string;
@@ -41,7 +45,7 @@ class Speaker {
   voiceQuality?: number;
   categories: SpeakerCategory[];
 
-  constructor(name: string, slug: string, description: string, categories: SpeakerCategory[], avatarUrl?: string, fullUrl?: string, voiceQuality?: number, defaultVoice?: boolean) {
+  constructor(name: string, slug: string, description: string, categories: SpeakerCategory[], avatarUrl?: string, fullUrl?: string, voiceQuality?: number, defaultVoice?: boolean, apiSlugOverride?: string) {
     this.name = name;
     this.slug = slug;
     this.description = description;
@@ -50,6 +54,7 @@ class Speaker {
     this.voiceQuality = voiceQuality;
     this.defaultVoice = defaultVoice !== undefined && defaultVoice;
     this.categories = categories;
+    this.apiSlugOverride = apiSlugOverride;
   }
 
   static fromJson(json: any) : Speaker {
@@ -73,6 +78,13 @@ class Speaker {
 
   getName() : string {
     return this.name;
+  }
+
+  getApiSlug(): string {
+    if (this.apiSlugOverride !== undefined) {
+      return this.apiSlugOverride;
+    }
+    return this.slug;
   }
 
   getSlug() : string {
@@ -248,6 +260,16 @@ const SPEAKERS : Speaker[] = [
     voiceQuality: 6.9,
   }),
   Speaker.fromJson({
+    name: "Darth Vader",
+    slug: "darth-vader",
+    apiSlugOverride: "james-earl-jones",
+    description: "Star Wars",
+    avatarUrl: "darth-vader.jpg",
+    fullUrl: "darth-vader-full.png",
+    voiceQuality: 5.5,
+    categories: ["celebrities"],
+  }),
+  Speaker.fromJson({
     name: "David Cross",
     slug: "david-cross",
     description: "Actor.",
@@ -314,7 +336,7 @@ const SPEAKERS : Speaker[] = [
     name: "James Earl Jones",
     slug: "james-earl-jones",
     description: "Actor and voice actor.",
-    avatarUrl: "darth-vader.jpg",
+    avatarUrl: "james-earl-jones.jpg",
     fullUrl: "james-earl-jones-full.png",
     voiceQuality: 5.5,
     categories: ["celebrities"],
