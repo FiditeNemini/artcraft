@@ -68,7 +68,10 @@ class App extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props);
 
-    let defaultSpeaker : Speaker = SPEAKERS.find(speaker => speaker.isDefaultVoice())!;
+    // Random speaker marked as "default"
+    const defaultSpeakers = SPEAKERS.filter(speaker => speaker.isDefaultVoice());
+    const index = Math.floor(Math.random() * defaultSpeakers.length);
+    const defaultSpeaker = defaultSpeakers[index]!;
 
     this.state = {
       mode: Mode.SPEAK_MODE,

@@ -39,7 +39,9 @@ class Speaker {
   // Used for speakers like "darth-vader" who are backed by "james-earl-jones".
   apiSlugOverride?: string;
 
+  // Whether the voice is shown when the page first loads. If multiple, it's random.
   defaultVoice: boolean;
+
   description: string;
   avatarUrl?: string;
   fullUrl?: string;
@@ -172,6 +174,7 @@ const SPEAKERS : Speaker[] = [
     fullUrl: "arnold-schwarzenegger-full.png",
     voiceQuality: 8.0,
     categories: ["celebrities", "politics"],
+    defaultVoice: true,
   }),
   Speaker.fromJson({
     name: "Bart Simpson",
@@ -343,6 +346,7 @@ const SPEAKERS : Speaker[] = [
     fullUrl: "homer-simpson-full.png",
     voiceQuality: 8.0,
     categories: ["cartoons"],
+    defaultVoice: true,
   }),
   Speaker.fromJson({
     name: "J. K. Simmons",
@@ -623,6 +627,7 @@ const SPEAKERS : Speaker[] = [
     fullUrl: "sonic-full.png",
     voiceQuality: 8.5,
     categories: ["games"],
+    defaultVoice: true,
   }),
   Speaker.fromJson({
     name: "SpongeBob SquarePants",
@@ -702,7 +707,7 @@ const SPEAKERS : Speaker[] = [
     description: "You've activated my trap card.",
     avatarUrl: "yami-yugi.jpg",
     fullUrl: "yami-yugi-full.png",
-    voiceQuality: 8.5,
+    voiceQuality: 7.2,
     categories: ["cartoons"],
     defaultVoice: true,
   }),
