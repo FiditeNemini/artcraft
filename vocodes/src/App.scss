@@ -202,3 +202,12 @@ nav {
     }
   }
 }
+
+// Prevent Android devices from horizontal scrolling
+// Mine is 412x846.
+@media screen and (max-width: 412px) {
+  #root {
+    max-width: 380px;
+    margin: auto;
+  }
+}
