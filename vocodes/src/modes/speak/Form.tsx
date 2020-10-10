@@ -222,11 +222,24 @@ class Form extends React.Component<Props, State> {
     this.textarea?.focus();
   }
 
+  nonSpaceCharacterCount() : number {
+    return this.props.currentText.trim().length;
+  }
+
+  remainingCharacterCount() : number {
+    return this.props.textCharacterLimit - this.props.currentText.length;
+  }
+
   public render() {
-    let remainingCharacters = this.props.textCharacterLimit - this.props.currentText.length;
+    const nonWhitespaceCharacters = this.nonSpaceCharacterCount();
+    const remainingCharacters = this.remainingCharacterCount();
 
     let remainingCharactersButtonDisabled = false;
     let remainingCharactersClassName = "";
+
+    if (nonWhitespaceCharacters === 0) {
+      remainingCharactersButtonDisabled= true;
+    }
 
     if (remainingCharacters < 0) {
       remainingCharactersButtonDisabled= true;
