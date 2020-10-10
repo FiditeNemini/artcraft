@@ -35,7 +35,7 @@ class HistoryComponent extends React.Component<Props, State> {
       ];
     } else {
       utterances.unshift(
-        <div className="content">
+        <div className="content is-size-4">
           <p>Note: these will disappear when you leave the website.</p>
         </div>
       );
@@ -44,7 +44,7 @@ class HistoryComponent extends React.Component<Props, State> {
       <div>
         {utterances}
 
-        <div className="content">
+        <div className="content is-size-4">
           <p>
             Please cite <strong><u>vocodes.com</u></strong> if you make YouTube videos,
             post on social media, or find this project useful.

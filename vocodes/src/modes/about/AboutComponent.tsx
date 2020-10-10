@@ -6,7 +6,7 @@ interface Props {
 
 function AboutComponent(props: Props) {
   return (
-    <div id="usage" className="content is-4">
+    <div id="usage" className="content is-4 is-size-5">
       <h1 className="title is-4"> What is this? </h1>
 
       <p>
@@ -23,18 +23,6 @@ function AboutComponent(props: Props) {
         better time throughout all history to be a creative than now.
       </p>
 
-      <p>
-        Vocodes is not my startup, it's just a fun project that illustrates the kind of deep work I do.
-      </p>
-
-      <p>
-        If you're dead set in helping me build something truly impressive that will challenge a giant industry
-        and replace it with something several orders of magnitue cheaper, more accessible, and more equitable,
-        consider buying Vocodes.com (technology) so that I can in turn buy all the expensive equipment I need.
-        I'm by no means relying on nor anticipating this, but I'll be able to speed up my work dramatically.
-        It's not low hanging CRUD fruit, but it is important and transformative and I believe in it wholeheartedly.
-      </p>
-
       <h1 className="title is-4"> Technology disclosure </h1>
 
       <p>
@@ -45,7 +33,7 @@ function AboutComponent(props: Props) {
       </p>
 
       <p>
-        The technology to clone voices is already out in the open, and 13 year olds are replicating
+        The technology to clone voices is already out in the open, and 13 year olds are already replicating
         these results on thier own at home. People are making voices from all sorts of public figures
         (independent of me and my work) and posting them on YouTube and social media.
       </p>
@@ -75,11 +63,8 @@ function AboutComponent(props: Props) {
 
       <h1 className="title is-4"> Usage recommendations </h1>
 
-      <h2 className="subtitle is-5">
-        Short sentences don't work
-      </h2>
-
       <p>
+        <b>Short sentences don't work.&nbsp;</b>
         Don't say things like "hello" or "hi". They're too short for the model
         to generate good audio from. This may improve in the future, but it's
         low on the list of priorities.
