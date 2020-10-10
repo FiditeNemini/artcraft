@@ -25,7 +25,7 @@ class HistoryComponent extends React.Component<Props, State> {
 
     if (utterances.length === 0) {
       utterances = [
-        <div className="content">
+        <div className="content is-size-4">
           <p>
             Nothing yet! Utterances will show up here once you've submitted 
             something to the text to speech engine. You'll be able to replay
