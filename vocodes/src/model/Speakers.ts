@@ -447,7 +447,6 @@ const SPEAKERS : Speaker[] = [
     fullUrl: "mr-krabs-full.png",
     voiceQuality: 5.5,
     categories: ["cartoons"],
-    defaultVoice: true,
   }),
   Speaker.fromJson({
     name: "Neil deGrasse Tyson",
@@ -639,6 +638,7 @@ const SPEAKERS : Speaker[] = [
     fullUrl: "spongebob-squarepants-full.png",
     voiceQuality: 8.0,
     categories: ["cartoons"],
+    defaultVoice: true,
   }),
   Speaker.fromJson({
     name: "Squidward Tentacles",
