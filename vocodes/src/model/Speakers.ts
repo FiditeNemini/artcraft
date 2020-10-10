@@ -328,6 +328,7 @@ const SPEAKERS : Speaker[] = [
     fullUrl: "gilbert-gottfried-full.png",
     voiceQuality: 7.8,
     categories: ["celebrities"],
+    defaultVoice: true,
   }),
   Speaker.fromJson({
     name: "Hillary Clinton",
@@ -446,6 +447,7 @@ const SPEAKERS : Speaker[] = [
     fullUrl: "mr-krabs-full.png",
     voiceQuality: 5.5,
     categories: ["cartoons"],
+    defaultVoice: true,
   }),
   Speaker.fromJson({
     name: "Neil deGrasse Tyson",
