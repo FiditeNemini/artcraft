@@ -88,6 +88,26 @@ function AboutComponent(props: Props) {
         instead of "Fortnite".
       </p>
 
+      <h1 className="title is-4">Thanks</h1>
+
+      <p>
+        Thanks to the following individuals (in no particular order) for help with data
+        gathering and annotation, Discord moderation, etc.
+      </p>
+
+      <p>
+        Vegito1089,
+        Shin,
+        Ashurath,
+        MakaveliGH,
+        Blutarch Mann,
+        Yahia,
+        Tim Squid,
+        Seuneramet,
+        Matt,
+        Seth
+      </p>
+
       <h1 className="title is-4">Contact</h1>
 
       <p>
