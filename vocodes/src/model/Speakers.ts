@@ -456,7 +456,7 @@ const SPEAKERS : Speaker[] = [
     description: "YouTuber.",
     avatarUrl: "moist.jpg",
     fullUrl: "moist-full.png",
-    voiceQuality: 3.0,
+    voiceQuality: 5.5,
     categories: ["streamers", "new"],
   }),
   Speaker.fromJson({
