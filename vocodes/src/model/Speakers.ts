@@ -30,6 +30,7 @@ const SPEAKER_CATEGORIES : Map<String, SpeakerCategory> = new Map([
   ["tech", new SpeakerCategory("Technology", "tech")],
   ["news", new SpeakerCategory("News and Commentary", "news")],
   ["fantasy", new SpeakerCategory("Science Fiction and Fantasy", "fantasy")],
+  ["new", new SpeakerCategory("Newly Added Voices", "new")],
 ]);
 
 class Speaker {
@@ -312,6 +313,15 @@ const SPEAKERS : Speaker[] = [
     categories: ["celebrities"],
   }),
   Speaker.fromJson({
+    name: "Etika",
+    slug: "etika",
+    description: "YouTuber.",
+    avatarUrl: "etika-shock.webp",
+    fullUrl: "etika-full.png",
+    voiceQuality: 3.0,
+    categories: ["streamers", "new"],
+  }),
+  Speaker.fromJson({
     name: "George Takei",
     slug: "george-takei",
     description: "Actor.",
@@ -431,6 +441,24 @@ const SPEAKERS : Speaker[] = [
     categories: ["celebrities"],
   }),
   Speaker.fromJson({
+    name: "Mitch McConnell",
+    slug: "mitch-mcconnell",
+    description: "Politician.",
+    avatarUrl: "mitch-mcconnell.jpg",
+    fullUrl: "mitch-mcconnel-full.png",
+    voiceQuality: 8.5,
+    categories: ["politics", "new"],
+  }),
+  Speaker.fromJson({
+    name: "moistcr1tikal",
+    slug: "moistcr1tikal",
+    description: "YouTuber.",
+    avatarUrl: "moist.jpg",
+    fullUrl: "moist-full.png",
+    voiceQuality: 3.0,
+    categories: ["streamers", "new"],
+  }),
+  Speaker.fromJson({
     name: "Mr. Fred Rogers",
     slug: "fred-rogers",
     description: "Educator and amazing human being.",
@@ -474,6 +502,15 @@ const SPEAKERS : Speaker[] = [
     fullUrl: "paul-graham-full.png",
     voiceQuality: 2.0,
     categories: ["tech"],
+  }),
+  Speaker.fromJson({
+    name: "Paula Deen",
+    slug: "paula-deen",
+    description: "Cook",
+    avatarUrl: "paula-deen.jpg",
+    fullUrl: "paula-deen-full.png",
+    voiceQuality: 8.4,
+    categories: ["celebrities", "new"],
   }),
   Speaker.fromJson({
     name: "Peter Thiel",
@@ -648,6 +685,15 @@ const SPEAKERS : Speaker[] = [
     fullUrl: "squidward-full.png",
     voiceQuality: 4.5,
     categories: ["cartoons"],
+  }),
+  Speaker.fromJson({
+    name: "Tommy Wiseau",
+    slug: "tommy-wiseau",
+    description: "The Room.",
+    avatarUrl: "tommy-wiseau-laugh.webp",
+    fullUrl: "tommy-wiseau-full.png",
+    voiceQuality: 4.6,
+    categories: ["celebrities", "new"],
   }),
   Speaker.fromJson({
     name: "Trevor Philips",
