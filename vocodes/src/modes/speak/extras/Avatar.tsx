@@ -12,8 +12,7 @@ class Avatar extends React.Component<Props, State> {
 
   constructor(props: Props) {
     super(props);
-    this.state = {
-    };
+    this.state = {};
   }
 
   public render() {
@@ -24,7 +23,6 @@ class Avatar extends React.Component<Props, State> {
     } else {
       source = `https://via.placeholder.com/300x300/FF0000/FFFFFF?text=${this.props.currentSpeaker.getSlug()}`;
     }
-    console.log('test', source, this.props.currentSpeaker.getAvatar());
 
     return (
       <div>
