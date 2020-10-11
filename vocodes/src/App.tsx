@@ -165,7 +165,7 @@ class App extends React.Component<Props, State> {
   }
 
   setSpeakerBySlug = (speakerSlug: string) : void => {
-    let selectedSpeaker = undefined;
+    let selectedSpeaker : Speaker | undefined = undefined;
 
     SPEAKERS.forEach(speaker => {
       if (speaker.slug === speakerSlug) {
@@ -173,12 +173,24 @@ class App extends React.Component<Props, State> {
       }
     })
 
-    if (selectedSpeaker !== undefined) {
-      this.setState({ 
-        speaker: selectedSpeaker,
-        extrasMode: ExtrasMode.SPEAKER_INFO,
-      });
+    if (selectedSpeaker === undefined) {
+      return;
     }
+
+    const speakers = SPEAKERS_BY_CATEGORY.get(this.state.currentSpeakerCategory) || [];
+
+    let isCategoryCorrect = speakers.find(speaker =>
+      speaker.getSlug() === selectedSpeaker!.getSlug()) !== undefined;
+
+    let category = isCategoryCorrect
+      ? this.state.currentSpeakerCategory
+      : CATEGORY_ALL;
+
+    this.setState({
+      speaker: selectedSpeaker,
+      extrasMode: ExtrasMode.SPEAKER_INFO,
+      currentSpeakerCategory: category,
+    });
   }
 
   updateSpectrogram = (spectrogram: Spectrogram) => {

@@ -1,7 +1,7 @@
 import React from 'react';
 import { CategoryDropdown } from './dropdowns/CategoryDropdown';
 import { Form } from './Form';
-import { Speaker, SpeakerCategory } from '../../model/Speakers';
+import { Speaker, SpeakerCategory, SPEAKERS } from '../../model/Speakers';
 import { SpeakerDropdown } from './dropdowns/SpeakerDropdown';
 import { SpeakerInfo } from './extras/SpeakerInfo';
 import { Spectrogram } from './extras/Spectrogram';
@@ -140,6 +140,12 @@ class SpeakComponent extends React.Component<Props, State> {
     }
   }
 
+  selectRandomSpeaker = () => {
+    const index = Math.floor(Math.random() * SPEAKERS.length);
+    const speaker = SPEAKERS[index]!;
+    this.props.changeSpeakerCallback(speaker.getSlug());
+  }
+
   public render() {
     let speakerPictureOrSpectrogram;
     switch (this.props.extrasMode) {
@@ -174,11 +180,22 @@ class SpeakComponent extends React.Component<Props, State> {
 
     return (
       <section>
-        <CategoryDropdown 
-          currentSpeakerCategory={this.props.currentSpeakerCategory}
-          changeSpeakerCategoryCallback={this.props.changeSpeakerCategoryCallback}
-          />
+        <div className="columns is-mobile is-gapless">
+          <div className="column">
+            <CategoryDropdown
+              currentSpeakerCategory={this.props.currentSpeakerCategory}
+              changeSpeakerCategoryCallback={this.props.changeSpeakerCategoryCallback}
+              />
+          </div>
         
+          <div className="column">
+            <button
+              className="button is-light is-info"
+              onClick={this.selectRandomSpeaker}
+              >Random Speaker</button>
+          </div>
+        </div>
+
         <div className="columns is-mobile is-gapless">
 
           <SpeakerDropdown
