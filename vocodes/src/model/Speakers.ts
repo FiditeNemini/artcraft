@@ -30,6 +30,7 @@ const SPEAKER_CATEGORIES : Map<String, SpeakerCategory> = new Map([
   ["tech", new SpeakerCategory("Technology", "tech")],
   ["news", new SpeakerCategory("News and Commentary", "news")],
   ["fantasy", new SpeakerCategory("Science Fiction and Fantasy", "fantasy")],
+  ["meme", new SpeakerCategory("Popular Meme Voices", "meme")],
   ["new", new SpeakerCategory("Newly Added Voices", "new")],
 ]);
 
@@ -310,7 +311,7 @@ const SPEAKERS : Speaker[] = [
     avatarUrl: "dr-phil-mcgraw.jpg",
     fullUrl: "dr-phil-mcgraw-full.png",
     voiceQuality: 6.1,
-    categories: ["celebrities"],
+    categories: ["celebrities", "meme"],
   }),
   //Speaker.fromJson({
   //  name: "Etika",
@@ -438,7 +439,7 @@ const SPEAKERS : Speaker[] = [
     avatarUrl: "michael-rosen.jpg",
     fullUrl: "michael-rosen-full.png",
     voiceQuality: 6.5,
-    categories: ["celebrities"],
+    categories: ["celebrities", "meme"],
   }),
   Speaker.fromJson({
     name: "Mitch McConnell",
@@ -693,7 +694,7 @@ const SPEAKERS : Speaker[] = [
     avatarUrl: "tommy-wiseau-laugh.webp",
     fullUrl: "tommy-wiseau-full.png",
     voiceQuality: 4.6,
-    categories: ["celebrities", "new"],
+    categories: ["celebrities", "new", "meme"],
   }),
   Speaker.fromJson({
     name: "Trevor Philips",
