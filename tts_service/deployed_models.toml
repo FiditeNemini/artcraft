@@ -1,4 +1,39 @@
 [[speakers]]
+name = "Etika"
+slug = "etika"
+model_pipeline = "ArpabetGlowTtsMelgan"
+glow_tts = "glow-tts_etika_ljstx_2020.10.09_expr-1_chkpt-4594.torchjit"
+melgan = "melgan_manyvoice5.0_2020-07-23_12d5838_10760.torchjit" # TODO: Needs custom vocoder
+
+[[speakers]]
+name = "Mitch McConnell"
+slug = "mitch-mcconnell"
+model_pipeline = "ArpabetGlowTtsMelgan"
+glow_tts = "glow-tts_mitch-mcconnell_ljstx_2020.10.09_expr-1_chkpt-3700.torchjit"
+melgan = "melgan_manyvoice5.0_2020-07-23_12d5838_10760.torchjit"
+
+[[speakers]]
+name = "Moistcr1tikal"
+slug = "moistcr1tikal"
+model_pipeline = "ArpabetGlowTtsMelgan"
+glow_tts = "glow-tts_moistcr1tikal_ljstx_2020.10.09_expr-1_chkpt-4858.torchjit"
+melgan = "melgan_manyvoice5.0_2020-07-23_12d5838_10760.torchjit" # TODO: Needs custom vocoder
+
+[[speakers]]
+name = "Paula Deen"
+slug = "paula-deen"
+model_pipeline = "ArpabetGlowTtsMelgan"
+glow_tts = "glow-tts_paula-deen_ljstx_2020.10.09_expr-1_chkpt-3900.torchjit"
+melgan = "melgan_manyvoice5.0_2020-07-23_12d5838_10760.torchjit"
+
+[[speakers]]
+name = "Tommy Wiseau"
+slug = "tommy-wiseau"
+model_pipeline = "ArpabetGlowTtsMelgan"
+glow_tts = "glow-tts_tommy-wiseau_ljstx_2020.08.11_expr-1_chkpt-5448.torchjit"
+melgan = "melgan_manyvoice5.0_2020-07-23_12d5838_10760.torchjit"
+
+[[speakers]]
 name = "Yami Yugi"
 slug = "yami-yugi"
 model_pipeline = "ArpabetGlowTtsMelgan"
