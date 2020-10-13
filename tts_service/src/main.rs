@@ -32,6 +32,8 @@ use anyhow::Result as AnyhowResult;
 
 use actix::{Addr, SyncArbiter, Context};
 use arpabet::Arpabet;
+use arpabet::load_cmudict;
+use arpabet::load_from_file as arpabet_load_from_file;
 use crate::database::connector::DatabaseConnector;
 use crate::database::sentence_recorder::SentenceRecorder;
 use crate::endpoints::index::get_root;
@@ -295,15 +297,15 @@ pub fn main() -> AnyhowResult<()> {
       info!("Loading default CMUdict Arpabet...");
       // Here we introduce silly internet words such as "lulz".
       // NB: The extras file takes precedence for any dictionary collisions.
-      let cmu_dict = Arpabet::load_cmudict();
+      let cmu_dict = load_cmudict();
       info!("Loading Arpabet extensions...");
-      let extra_arpabet = Arpabet::load_from_file(&extras_filename)?;
+      let extra_arpabet = arpabet_load_from_file(&extras_filename)?;
       let arpabet = cmu_dict.combine(&extra_arpabet);
       arpabet.clone()
     },
     None => {
       info!("Loading default CMUdict Arpabet...");
-      Arpabet::load_cmudict().clone()
+      load_cmudict().clone()
     },
   };
 

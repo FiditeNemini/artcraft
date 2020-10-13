@@ -40,7 +40,7 @@ toml = "0.5.6"
 #rusty_redis_rate_limiting = { git = "https://github.com/tinrab/rusty-redis-rate-limiting", rev = "46d95040708df92d46cef22d319d0182e12a2c0c" }
 
 # My libraries
-arpabet = "1.0.0"
-grapheme_to_phoneme = "0.0.3"
+arpabet = "2.0.0"
+grapheme_to_phoneme = "0.1.0"
 numerics = "0.0.1"
 sentence = "0.0.2"

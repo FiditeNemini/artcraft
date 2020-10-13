@@ -9,7 +9,7 @@ use actix_web::{
   Result as ActixResult,
 };
 
-use arpabet::Arpabet;
+use arpabet;
 use crate::AppState;
 use crate::database::model::NewSentence;
 use crate::endpoints::helpers::ip_address::get_request_ip;
@@ -78,8 +78,8 @@ pub async fn post_speak(request: HttpRequest,
       info!("Melgan Model: {}", melgan_model);
       info!("Text: {}", text);
 
-      let arpabet = Arpabet::load_cmudict();
-      let encoded = text_to_arpabet_encoding(arpabet, &cleaned_text);
+      let cmudict = arpabet::load_cmudict();
+      let encoded = text_to_arpabet_encoding(cmudict, &cleaned_text);
 
       let tacotron = app_state.model_cache.get_or_load_arbabet_tacotron(&tacotron_model)
           .expect(&format!("Couldn't load tacotron model: {}", tacotron_model));

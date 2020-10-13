@@ -8,7 +8,7 @@ use actix_web::{
   HttpResponse,
 };
 
-use arpabet::Arpabet;
+use arpabet;
 use crate::AppState;
 use crate::model::old_model::TacoMelModel;
 use crate::text::arpabet::text_to_arpabet_encoding;
@@ -48,8 +48,8 @@ pub async fn post_tts(_request: HttpRequest,
 
   let cleaned_text = clean_text(&text);
 
-  let arpabet = Arpabet::load_cmudict();
-  let encoded = text_to_arpabet_encoding(arpabet, &cleaned_text);
+  let cmudict = arpabet::load_cmudict();
+  let encoded = text_to_arpabet_encoding(cmudict, &cleaned_text);
 
   let sample_rate_hz = app_state.default_sample_rate_hz;
 
