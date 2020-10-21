@@ -34,7 +34,7 @@ function AboutComponent(props: Props) {
 
       <p>
         The technology to clone voices is already out in the open, and 13 year olds are already replicating
-        these results on thier own at home. People are making voices from all sorts of public figures
+        these results on their own at home. People are making voices from all sorts of public figures
         (independent of me and my work) and posting them on YouTube and social media.
       </p>
 
