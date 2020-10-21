@@ -118,7 +118,7 @@ class SpeakComponent extends React.Component<Props, State> {
 
   onSpeakError = () => {
     this.setMessage(StatusState.ERROR, 
-      "There was an error. You retry your request again. It should be fine to keep trying. Please report this error in our Discord if you see it frequently.");
+      "There was an error, probably due to the volume of requests we're getting. You can retry your request again. Each voice is backed by different machines, so try other voices too. Please report this error in our Discord if you see it too frequently.");
   }
 
   onPlay = () => {
