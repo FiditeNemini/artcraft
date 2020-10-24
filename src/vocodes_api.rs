@@ -6,7 +6,7 @@ use hyper::Request;
 use hyper_tls::HttpsConnector;
 use log::{error, debug, info, warn};
 
-const VOCODES_SPEAK_ENDPOINT : &'static str = "http://mumble.stream/speak";
+const VOCODES_SPEAK_ENDPOINT : &'static str = "https://mumble.stream/speak";
 
 pub async fn fetch(text: &str, speaker: &str) -> AnyhowResult<Vec<u8>> {
   let mut request = format!("{{\"speaker\": \"{}\", \"text\": \"{}\"}}", speaker, text);

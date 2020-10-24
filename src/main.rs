@@ -40,6 +40,7 @@ use serenity::http::AttachmentType;
 use std::borrow::Cow;
 use std::env;
 use std::sync::Arc;
+use anyhow::Error;
 
 #[group]
 struct General;
@@ -114,17 +115,27 @@ impl EventHandler for Handler {
 
     info!("Replaced message: {}", replaced_message);
 
-    if let Ok(response) = fetch(&replaced_message, speaker).await {
-      let msg = new_message.channel_id.send_message(&ctx.http, |m| {
-        m.content(replaced_message);
-        m.add_file(AttachmentType::Bytes { data: Cow::from(&response), filename: filename.to_string() });
-        m
-      }).await;
-
-      if let Err(reason) = msg {
-        warn!("Error sending message: {:?}", reason);
-      }
+    match fetch(&replaced_message, speaker).await {
+      Err(err) => {
+        warn!("Error fetching from vocodes TTS: {:?}", err);
+      },
+      Ok(response) => {
+        let discord_result = new_message.channel_id.send_message(&ctx.http, |m| {
+          m.content(replaced_message);
+          m.add_file(AttachmentType::Bytes { data: Cow::from(&response), filename: filename.to_string() });
+          m
+        }).await;
+        match discord_result {
+          Err(reason) => {
+            warn!("Error sending message: {:?}", reason);
+          },
+          Ok(_) => {
+            info!("Message posted to discord successfully!");
+          },
+        }
+      },
     }
+
   }
 }
 
@@ -142,6 +153,7 @@ async fn main() {
     .configure(|c| c.prefix("~")) // set the bot prefix to "~"
     .group(&GENERAL_GROUP);
 
+  info!("Initializing app...");
   let secret_token = env::var("DISCORD_TOKEN").expect("token");
 
   let mut client = Client::new(secret_token)
@@ -155,6 +167,7 @@ async fn main() {
     data.insert::<ShardManagerContainer>(client.shard_manager.clone());
   }
 
+  info!("Starting Discord client...");
   if let Err(reason) = client.start().await {
     error!("An error occurred while running the client: {:?}", reason);
   }
