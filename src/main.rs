@@ -74,6 +74,16 @@ impl EventHandler for Handler {
       let filename = "a wild sound appeared.wav";
       let message = new_message.content.replacen("!vocode ", "", 1);
       (speaker, filename, message)
+    } else if new_message.content.starts_with("!donald") {
+      let speaker = "donald-trump";
+      let filename = "billions and billions.wav";
+      let message = new_message.content.replacen("!donald", "", 1);
+      (speaker, filename, message)
+    } else if new_message.content.starts_with("!snake ") {
+      let speaker = "solid-snake";
+      let filename = "hiding in a box.wav";
+      let message = new_message.content.replacen("!snake ", "", 1);
+      (speaker, filename, message)
     } else if new_message.content.starts_with("!sonic ") {
       let speaker = "sonic";
       let filename = "gotta go fast.wav";
@@ -96,7 +106,9 @@ impl EventHandler for Handler {
             ```\n\
             !help (this help message)\n\
             !vocode (David Attenborough)\n\
+            !donald (Yuge)\n\
             !gilbert (Gilbert Gottfried)\n\
+            !snake (in a box)\n\
             !sonic (the Hedgehog)\n\
             !spongebob (the SquarePants)\n\
             ```"
