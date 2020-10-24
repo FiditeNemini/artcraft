@@ -28,11 +28,22 @@ RUN $HOME/.cargo/bin/cargo build --release
 # Final image
 FROM ubuntu:xenial
 WORKDIR /
+
+# CURL
+RUN apt-get update \
+    && apt-get install -y \
+        build-essential \
+        curl \
+        libsodium-dev \
+        libssl-dev \
+        libssl1.0.0 \
+    && apt-get clean
+
 # SSL certs are required to make requests
 COPY --from=build /etc/ssl /etc/ssl
 # Shared libs are necessary
-COPY --from=build /lib/x86_64-linux-gnu/libssl.so.1.0.0 /lib/x86_64-linux-gnu
-COPY --from=build /lib/x86_64-linux-gnu/libcrypto.so.1.0.0 /lib/x86_64-linux-gnu
+#COPY --from=build /lib/x86_64-linux-gnu/libssl.so.1.0.0 /lib/x86_64-linux-gnu
+#COPY --from=build /lib/x86_64-linux-gnu/libcrypto.so.1.0.0 /lib/x86_64-linux-gnu
 #COPY --from=build /tmp/target/debug/discord-vocodes /
 COPY --from=build /tmp/target/release/discord-vocodes /
 COPY --from=build /tmp/script /
