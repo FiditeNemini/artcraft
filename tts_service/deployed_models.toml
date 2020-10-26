@@ -1,4 +1,32 @@
 [[speakers]]
+name = "Bob Barker"
+slug = "bob-barker"
+model_pipeline = "ArpabetGlowTtsMelgan"
+glow_tts = "glow-tts_bob-barker_ljstx_2020.10.21_expr-1_chkpt-5470.torchjit"
+melgan = "melgan_manyvoice5.0_2020-07-23_12d5838_10760.torchjit" # TODO: Needs custom vocoder
+
+[[speakers]]
+name = "Jim Cramer"
+slug = "jim-cramer"
+model_pipeline = "ArpabetGlowTtsMelgan"
+glow_tts = "glow-tts_jim-cramer_ljstx_2020.10.21_expr-1_chkpt-5554.torchjit"
+melgan = "melgan_manyvoice5.0_2020-07-23_12d5838_10760.torchjit" # TODO: Needs custom vocoder
+
+[[speakers]]
+name = "Crypt Keeper"
+slug = "crypt-keeper"
+model_pipeline = "ArpabetGlowTtsMelgan"
+glow_tts = "glow-tts_crypt-keeper_ljstx_2020.10.24_expr-1_chkpt-10000.torchjit"
+melgan = "melgan_manyvoice5.0_2020-07-23_12d5838_10760.torchjit" # TODO: Needs custom vocoder
+
+[[speakers]]
+name = "Paz"
+slug = "paz"
+model_pipeline = "ArpabetGlowTtsMelgan"
+glow_tts = "glow-tts_paz_ljstx_2020.10.24_expr-1_chkpt-6500.torchjit"
+melgan = "melgan_manyvoice5.0_2020-07-23_12d5838_10760.torchjit" # TODO: Needs custom vocoder
+
+[[speakers]]
 name = "Etika"
 slug = "etika"
 model_pipeline = "ArpabetGlowTtsMelgan"
