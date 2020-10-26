@@ -233,6 +233,15 @@ const SPEAKERS : Speaker[] = [
     categories: ["science"],
   }),
   Speaker.fromJson({
+    name: "Bob Barker",
+    slug: "bob-barker",
+    description: "Price is right",
+    avatarUrl: "happy-gilmore.webp",
+    fullUrl: "bob-barker-full.png",
+    voiceQuality: 8.5,
+    categories: ["new", "celebrities"],
+  }),
+  Speaker.fromJson({
     name: "Boomstick (Death Battle!)",
     slug: "boomstick",
     description: "Rooster Teeth YouTube Show",
@@ -276,6 +285,15 @@ const SPEAKERS : Speaker[] = [
     fullUrl: "craig-ferguson-full.png",
     voiceQuality: 7.9,
     categories: ["celebrities"],
+  }),
+  Speaker.fromJson({
+    name: "Crypt Keeper",
+    slug: "crypt-keeper",
+    description: "Spooky",
+    avatarUrl: "crypt-keeper.jpg",
+    fullUrl: "crypt-keeper-full.png",
+    voiceQuality: 6.5,
+    categories: ["new", "fantasy"],
   }),
   Speaker.fromJson({
     name: "Danny Devito",
@@ -377,6 +395,15 @@ const SPEAKERS : Speaker[] = [
     fullUrl: "james-earl-jones-full.png",
     voiceQuality: 5.5,
     categories: ["celebrities"],
+  }),
+  Speaker.fromJson({
+    name: "Jim Cramer",
+    slug: "jim-cramer",
+    description: "Stonks.",
+    avatarUrl: "jim-cramer.jpg",
+    fullUrl: "jim-cramer-full.png",
+    voiceQuality: 8.5,
+    categories: ["meme", "new", "news"],
   }),
   Speaker.fromJson({
     name: "John Oliver",
