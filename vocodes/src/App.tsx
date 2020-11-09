@@ -13,6 +13,7 @@ import { Spectrogram } from './modes/speak/extras/Spectrogram';
 import { TermsComponent } from './modes/terms/TermsComponent';
 import { TopNav } from './navigation/TopNav';
 import { Utterance } from './model/utterance';
+import { VideoComponent } from './modes/video/VideoComponent';
 
 interface Props {
   // Certan browsers (iPhone) have pitiful support for drawing APIs. Worse yet,
@@ -238,6 +239,10 @@ class App extends React.Component<Props, State> {
           appendUtteranceCallback={this.appendUtterance}
           setTextCallback={this.setText}
           />;
+        break;
+      case Mode.VIDEO_MODE:
+        component = <VideoComponent
+          />
         break;
       case Mode.HISTORY_MODE:
         component = <HistoryComponent 
