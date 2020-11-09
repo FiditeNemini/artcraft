@@ -1,6 +1,7 @@
 import React from 'react';
 import { VIDEO_TEMPLATES, VideoTemplate } from './Videos';
 import axios from 'axios';
+import { VideoStatsComponent } from './VideoStatsComponent';
 
 interface Props {
 }
@@ -151,6 +152,8 @@ class VideoComponent extends React.Component<Props, State> {
     return (
       <div className="content is-4 is-size-5">
         <h1 className="title is-3"> Deep Fake Video Beta </h1>
+
+        <VideoStatsComponent />
 
         <div className="content is-size-4">
           <p>
