@@ -161,9 +161,19 @@ nav {
   min-height: 1.5em;
 }
 
-.video-thumbnail {
-  max-width: 250px;
-  padding: 1em;
+.video-template-selector {
+
+  .video-thumbnail {
+    max-width: 250px;
+    padding: 0em;
+    margin: 1em;
+    filter: brightness(70%) grayscale(1);
+  }
+
+  .selected {
+    filter: brightness(100%) grayscale(0);
+    box-shadow: 0px 0px 25px #209CEE
+  }
 }
 
 #usage,
