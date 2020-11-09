@@ -60,7 +60,7 @@ class VideoComponent extends React.Component<Props, State> {
     .then(function (res) {
       if (res.ok) {
         alert("Perfect! ");
-      } else if (res.status == 401) {
+      } else if (res.status === 401) {
         alert("Oops! ");
       }
     }, function (e) {
@@ -80,9 +80,10 @@ class VideoComponent extends React.Component<Props, State> {
       }
       let className = `video-thumbnail ${selectedName}`
       let thumbnail = <img
-        className={className}
         src={videoTemplate.getThumbnailUrl()}
+        className={className}
         onClick={() => this.selectVideoTemplate(videoTemplate) }
+        alt={videoTemplate.name}
         />
 
       thumbnails.push(thumbnail);
@@ -151,7 +152,7 @@ class VideoComponent extends React.Component<Props, State> {
 
         <div className="content is-size-4">
           <p>
-            This is a brand new, beta feature. It might break. 
+            This is an extremely rough cut of a brand new, beta feature. /It might break. 
             I need to reach out to Google Cloud sales engineers to get more GPUs as I'm 
             currently on a limited trial account (I was previously on Digital Ocean).
             Expect this to lag during peak traffic until I get more GPUs.
