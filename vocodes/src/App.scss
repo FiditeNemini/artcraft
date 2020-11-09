@@ -168,6 +168,9 @@ nav {
     padding: 0em;
     margin: 1em;
     filter: brightness(70%) grayscale(1);
+    user-select: none;
+    -moz-user-select: none;
+    -webkit-user-select: none;
   }
 
   .selected {

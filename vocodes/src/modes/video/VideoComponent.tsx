@@ -1,12 +1,16 @@
 import React from 'react';
 import { VIDEO_TEMPLATES, VideoTemplate } from './Videos';
+import axios from 'axios';
 
 interface Props {
 }
 
 interface State {
+  // Before upload
   audioFile?: File,
   selectedVideoTemplate: VideoTemplate,
+  // After upload
+  jobUuid?: string,
 }
 
 class VideoComponent extends React.Component<Props, State> {
@@ -14,8 +18,11 @@ class VideoComponent extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props);
     this.state = {
+      // Before upload
       audioFile: undefined,
       selectedVideoTemplate: VIDEO_TEMPLATES[0],
+      // After upload
+      jobUuid: undefined,
     };
   }
 
@@ -35,6 +42,10 @@ class VideoComponent extends React.Component<Props, State> {
     });
   }
 
+  getResultVideoUrl = (uuid: string) : string => {
+    return `https://storage.googleapis.com/vocodes-audio-uploads/uploads/${uuid}/output.mp4`;
+  }
+
   selectVideoTemplate = (videoTemplate: VideoTemplate) => {
     this.setState({
       selectedVideoTemplate: videoTemplate,
@@ -52,20 +63,35 @@ class VideoComponent extends React.Component<Props, State> {
     formData.append( 'audio', this.state.audioFile!);
     formData.append('video-template', this.state.selectedVideoTemplate.slug);
 
-    fetch("http://34.95.89.220/upload", {
+    //axios.post("http://34.95.89.220/upload", {
+    /*fetch("http://localhost:12345/upload", {
       mode: 'no-cors',
-      method: "POST",
+      method: 'POST',
+      headers: {
+        'Accept': 'application/json',
+        //'Content-Type': 'multipart/form-data',
+      },
       body: formData,
-    })
-    .then(function (res) {
+    })*/
+    axios.post("http://34.95.89.220/upload", formData) 
+    //axios.post("http://localhost:12345/upload", formData)
+    .then(res => res.data)
+    .then(res => {
+      if (res.uuid !== undefined) {
+        this.setState({
+          jobUuid: res.uuid
+        });
+      }
+    });
+    /*.then(function (res) {
       if (res.ok) {
-        alert("Perfect! ");
+        res.body
       } else if (res.status === 401) {
-        alert("Oops! ");
+        // TODO
       }
     }, function (e) {
-      alert("Error submitting form!");
-    });
+      // TODO
+    });*/
 
     return false;
   }
@@ -81,6 +107,7 @@ class VideoComponent extends React.Component<Props, State> {
       let className = `video-thumbnail ${selectedName}`
       let thumbnail = <img
         src={videoTemplate.getThumbnailUrl()}
+        key={videoTemplate.slug}
         className={className}
         onClick={() => this.selectVideoTemplate(videoTemplate) }
         alt={videoTemplate.name}
@@ -95,6 +122,27 @@ class VideoComponent extends React.Component<Props, State> {
       audioFilename = this.state.audioFile.name;
     }
 
+    let videoResults = <div></div>;
+
+    if (this.state.jobUuid !== undefined) {
+      let downloadUrl = this.getResultVideoUrl(this.state.jobUuid) || "";
+      videoResults = (
+        <article className="message is-warning">
+          <div className="message-body">
+            <p>Your results are currently processing and may take awhile.
+            Once complete, you can find your video at:</p>
+            <p><a 
+              href={downloadUrl} 
+              rel="noopener noreferrer"
+              target="_blank">{downloadUrl}</a></p>
+
+            <p>Please note that this will look like an error message at first. 
+              Refresh it again later. I'm still working on the frontend code.</p>
+          </div>
+        </article>
+      );
+    }
+
     return (
       <div className="content is-4 is-size-5">
         <h1 className="title is-3"> Deep Fake Video Beta </h1>
@@ -105,6 +153,8 @@ class VideoComponent extends React.Component<Props, State> {
             below.
           </p>
         </div>
+
+        {videoResults}
 
         <form onSubmit={this.handleFormSubmit}>
 
@@ -140,7 +190,7 @@ class VideoComponent extends React.Component<Props, State> {
             <p>
               Hundreds of additional templates will be added in the future. 
               Feel free to send some to us. As always, check Discord or 
-              like/subscribe Twitter for updates.
+              Twitter for updates.
             </p>
           </div>
 
@@ -152,10 +202,15 @@ class VideoComponent extends React.Component<Props, State> {
 
         <div className="content is-size-4">
           <p>
-            This is an extremely rough cut of a brand new, beta feature. /It might break. 
+            This is an extremely rough cut of a brand new, beta feature. It might&nbsp;
+            <em>(probably will)</em>&nbsp;break. 
             I need to reach out to Google Cloud sales engineers to get more GPUs as I'm 
             currently on a limited trial account (I was previously on Digital Ocean).
             Expect this to lag during peak traffic until I get more GPUs.
+          </p>
+          <p>
+            This would normally be more polished, but I've had a rough few weeks and 
+            I just want to get something out the door. It will improve.
           </p>
           <p>
             Do not defame, defraud, or use for commercial purposes. Deep fakes
@@ -164,6 +219,8 @@ class VideoComponent extends React.Component<Props, State> {
             deep fakes. Have fun, go crazy.
           </p>
         </div>
+
+        <br />
       </div>
     )
   }
