@@ -73,7 +73,7 @@ class VideoComponent extends React.Component<Props, State> {
       },
       body: formData,
     })*/
-    axios.post("http://34.95.89.220/upload", formData) 
+    axios.post("https://grumble.works/upload", formData) 
     //axios.post("http://localhost:12345/upload", formData)
     .then(res => res.data)
     .then(res => {
@@ -130,14 +130,19 @@ class VideoComponent extends React.Component<Props, State> {
         <article className="message is-warning">
           <div className="message-body">
             <p>Your results are currently processing and may take awhile.
-            Once complete, you can find your video at:</p>
+            Open this URL in a new tab and keep it open:</p>
             <p><a 
               href={downloadUrl} 
               rel="noopener noreferrer"
               target="_blank">{downloadUrl}</a></p>
 
-            <p>Please note that this will look like an error message at first. 
-              Refresh it again later. I'm still working on the frontend code.</p>
+            <p>Please note that this will look like an error message ("The 
+              specified key does not exist.") at first. 
+              Refresh it again later. I'm still working on the frontend code 
+              that will include a progress bar.</p>
+
+            <p>If there are a lot of people using the service, it may take 
+              an hour. I'll need to allocate more GPUs.</p>
           </div>
         </article>
       );
