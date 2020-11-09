@@ -20,10 +20,6 @@ class VideoComponent extends React.Component<Props, State> {
   }
 
   handleFileChange = (fileList: FileList|null) => {
-    //const text = (ev.target as ).value;
-    //ev.preventDefault();
-    //return false;
-
     if (fileList === null 
         || fileList === undefined
         || fileList.length < 1) {
