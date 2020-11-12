@@ -44,6 +44,11 @@ const VIDEO_TEMPLATES : VideoTemplate[] = [
     slug: "moistcr1tikal.mp4",
     thumbnail: "moistcr1tikal.webp",
   }),
+  VideoTemplate.fromJson({
+    name: "Tucker Carlson",
+    slug: "tucker-carlson.mp4",
+    thumbnail: "tucker-carlson.webp",
+  }),
 ];
 
 export { VideoTemplate, VIDEO_TEMPLATES }

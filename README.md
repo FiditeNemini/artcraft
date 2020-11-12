@@ -45,4 +45,9 @@ https://ezgif.com/
 
 * webp, 500x300px (~100kb each)
 
+Reverse clips:
+
+```
+ffmpeg -i input.mp4 -vf reverse reversed.mp4
+```
 
