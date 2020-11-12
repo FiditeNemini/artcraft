@@ -38,3 +38,11 @@ fugaz one, 110, #209CEE
 Transparent Images
 ------------------
 https://www.remove.bg (pretty cheap)
+
+Video Thumbnails
+----------------
+https://ezgif.com/
+
+* webp, 500x300px (~100kb each)
+
+

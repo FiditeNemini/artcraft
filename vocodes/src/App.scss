@@ -162,11 +162,13 @@ nav {
 }
 
 .video-template-selector {
+  margin: 1.5em 0 1.5em 0;
+  text-align: center;
 
   .video-thumbnail {
-    max-width: 250px;
+    max-width: 220px;
     padding: 0em;
-    margin: 1em;
+    margin: 5px;
     filter: brightness(70%) grayscale(1);
     user-select: none;
     -moz-user-select: none;
