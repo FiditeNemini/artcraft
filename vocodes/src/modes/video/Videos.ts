@@ -40,6 +40,11 @@ const VIDEO_TEMPLATES : VideoTemplate[] = [
     thumbnail: "dr-phil.webp",
   }),
   VideoTemplate.fromJson({
+    name: "Mark Zuckerberg",
+    slug: "mark-zuckerberg-tophat.mp4",
+    thumbnail: "mark-zuckerberg-tophat.webp",
+  }),
+  VideoTemplate.fromJson({
     name: "moistcr1tikal",
     slug: "moistcr1tikal.mp4",
     thumbnail: "moistcr1tikal.webp",
