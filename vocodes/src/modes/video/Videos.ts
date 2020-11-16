@@ -30,6 +30,16 @@ class VideoTemplate {
 
 const VIDEO_TEMPLATES : VideoTemplate[] = [
   VideoTemplate.fromJson({
+    name: "Ben Shapiro",
+    slug: "ben-shapiro-baby.mp4",
+    thumbnail: "ben-shapiro-baby.webp",
+  }),
+  VideoTemplate.fromJson({
+    name: "Bill Clinton",
+    slug: "bill-clinton-dnc.mp4",
+    thumbnail: "bill-clinton-dnc.webp",
+  }),
+  VideoTemplate.fromJson({
     name: "Donald Trump",
     slug: "trump-election-night.mp4",
     thumbnail: "donald-trump.webp",
@@ -48,6 +58,11 @@ const VIDEO_TEMPLATES : VideoTemplate[] = [
     name: "moistcr1tikal",
     slug: "moistcr1tikal.mp4",
     thumbnail: "moistcr1tikal.webp",
+  }),
+  VideoTemplate.fromJson({
+    name: "Paul Graham",
+    slug: "paul-graham-2010.mp4",
+    thumbnail: "paul-graham-2010.webp",
   }),
   VideoTemplate.fromJson({
     name: "Terminator",
