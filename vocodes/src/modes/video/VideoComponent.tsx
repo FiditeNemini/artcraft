@@ -228,7 +228,6 @@ class VideoComponent extends React.Component<Props, State> {
             deep fakes. Have fun, go crazy.
           </p>
         </div>
-
         <br />
       </div>
     )
