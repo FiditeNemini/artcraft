@@ -125,6 +125,7 @@ class VideoComponent extends React.Component<Props, State> {
 
       let statusTitle = "Waiting";
       let statusClassName = "message is-primary";
+      let videoPlayer = <div></div>;
 
       switch (videoJob.jobStatus) {
         case VideoJobStatus.Pending:
@@ -135,13 +136,23 @@ class VideoComponent extends React.Component<Props, State> {
           statusTitle = "Now Processing";
           statusClassName = "message is-info"; // light blue
           break;
-        case VideoJobStatus.Completed:
-          statusTitle = "Success!";
-          statusClassName = "message is-success"; // green
-          break;
         case VideoJobStatus.Failed:
           statusTitle = "Failed :(";
           statusClassName = "message is-danger"; // red
+          break;
+        case VideoJobStatus.Completed:
+          statusTitle = "Success!";
+          statusClassName = "message is-success"; // green
+          videoPlayer = (
+            <div className="video-wrapper">
+              <video controls width="80%">
+                <source src={downloadUrl}
+                        type="video/webm" />
+                Your browser doesn't support video
+              </video>
+            </div>
+          );
+
           break;
       }
 
@@ -154,6 +165,8 @@ class VideoComponent extends React.Component<Props, State> {
             <p>Your results are currently processing and may take awhile.
             Open this URL in a new tab and keep it open:</p>
 
+            {videoPlayer}
+
             <p><a 
               href={downloadUrl} 
               rel="noopener noreferrer"
@@ -163,9 +176,6 @@ class VideoComponent extends React.Component<Props, State> {
               specified key does not exist.") at first. 
               Refresh it again later. I'm still working on the frontend code 
               that will include a progress bar.</p>
-
-            <p>If there are a lot of people using the service, it may take 
-              an hour. I'll need to allocate more GPUs.</p>
           </div>
         </article>
       );
