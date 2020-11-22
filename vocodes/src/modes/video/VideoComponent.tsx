@@ -1,9 +1,13 @@
 import React from 'react';
-import { VIDEO_TEMPLATES, VideoTemplate } from './Videos';
+import { VIDEO_TEMPLATES, VideoTemplate } from './VideoTemplates';
 import axios from 'axios';
-import { VideoStatsComponent } from './VideoStatsComponent';
+import { VideoStatsComponent } from './VideoQueueStatsComponent';
+import { VideoJob, VideoJobStatus } from './VideoJob';
 
 interface Props {
+  currentVideoJob?: VideoJob,
+  startVideoJobCallback: (job: VideoJob) => void,
+  updateVideoJobCallback: (job: VideoJob) => void,
 }
 
 interface State {
@@ -43,10 +47,6 @@ class VideoComponent extends React.Component<Props, State> {
     });
   }
 
-  getResultVideoUrl = (uuid: string) : string => {
-    return `https://storage.googleapis.com/vocodes-audio-uploads/uploads/${uuid}/output.mp4`;
-  }
-
   selectVideoTemplate = (videoTemplate: VideoTemplate) => {
     this.setState({
       selectedVideoTemplate: videoTemplate,
@@ -61,29 +61,23 @@ class VideoComponent extends React.Component<Props, State> {
     }
 
     let formData = new FormData();
-    formData.append( 'audio', this.state.audioFile!);
+    formData.append('audio', this.state.audioFile!);
     formData.append('video-template', this.state.selectedVideoTemplate.slug);
 
-    //axios.post("http://34.95.89.220/upload", {
-    /*fetch("http://localhost:12345/upload", {
-      mode: 'no-cors',
-      method: 'POST',
-      headers: {
-        'Accept': 'application/json',
-        //'Content-Type': 'multipart/form-data',
-      },
-      body: formData,
-    })*/
+    // NB: Using 'axios' because 'fetch' was having problems with form-multipart
+    // and then interpreting the resultant JSON. Maybe I didn't try hard enough?
     axios.post("https://grumble.works/upload", formData) 
-    //axios.post("http://localhost:12345/upload", formData)
-    .then(res => res.data)
-    .then(res => {
-      if (res.uuid !== undefined) {
-        this.setState({
-          jobUuid: res.uuid
-        });
-      }
-    });
+      .then(res => res.data)
+      .then(res => {
+        if (res.uuid !== undefined) {
+          this.setState({
+            jobUuid: res.uuid
+          });
+
+          let job = new VideoJob(res.uuid, VideoJobStatus.Pending);
+          this.props.startVideoJobCallback(job);
+        }
+      });
     /*.then(function (res) {
       if (res.ok) {
         res.body
@@ -125,8 +119,8 @@ class VideoComponent extends React.Component<Props, State> {
 
     let videoResults = <div></div>;
 
-    if (this.state.jobUuid !== undefined) {
-      let downloadUrl = this.getResultVideoUrl(this.state.jobUuid) || "";
+    if (this.props.currentVideoJob !== undefined) {
+      let downloadUrl = this.props.currentVideoJob.getVideoDownloadUrl() || "";
       videoResults = (
         <article className="message is-warning">
           <div className="message-body">

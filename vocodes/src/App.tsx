@@ -14,6 +14,9 @@ import { TermsComponent } from './modes/terms/TermsComponent';
 import { TopNav } from './navigation/TopNav';
 import { Utterance } from './model/utterance';
 import { VideoComponent } from './modes/video/VideoComponent';
+import { VideoJob, VideoJobStatus } from './modes/video/VideoJob';
+import { VideoJobPoller } from './modes/video/VideoJobPoller';
+import { VideoQueuePoller } from './modes/video/VideoQueuePoller';
 
 interface Props {
   // Certan browsers (iPhone) have pitiful support for drawing APIs. Worse yet,
@@ -45,15 +48,29 @@ enum SpectrogramMode {
 const TEXT_CHARACTER_LIMIT_DEFAULT = 500;
 
 interface State {
+  // UI Primary Mode
   mode: Mode,
-  extrasMode: ExtrasMode,
+
+  // TTS Mode State
   speaker: Speaker,
+  extrasMode: ExtrasMode,
   currentSpectrogram?: Spectrogram,
   currentSpeakerCategory: SpeakerCategory,
   spectrogramMode: SpectrogramMode,
-  utterances: Utterance[],
   currentText: string,
+
+  // Video Mode State
+  currentVideoJob?: VideoJob,
+
+  // Dynamic config
   textCharacterLimit: number,
+
+  // Pollers
+  videoQueuePoller: VideoQueuePoller,
+  videoJobPoller: VideoJobPoller,
+
+  // History
+  utterances: Utterance[],
 }
 
 // Responses from the `/service_settings` endpoint.
@@ -83,6 +100,8 @@ class App extends React.Component<Props, State> {
       currentText: '',
       textCharacterLimit: TEXT_CHARACTER_LIMIT_DEFAULT,
       currentSpeakerCategory: CATEGORY_ALL,
+      videoQueuePoller: new VideoQueuePoller(),
+      videoJobPoller: new VideoJobPoller(this.updateVideoJob),
     };
   }
 
@@ -104,6 +123,14 @@ class App extends React.Component<Props, State> {
       }
     })
     .catch(e => { /* Ignore. We'll just operate with the defaults. */ });
+
+    //this.state.videoJobPoller.start();
+    //this.state.videoQueuePoller.start();
+  }
+
+  componentWillUnmount() {
+    this.state.videoJobPoller.stop();
+    this.state.videoQueuePoller.stop();
   }
 
   switchMode = (mode: Mode) => {
@@ -218,6 +245,28 @@ class App extends React.Component<Props, State> {
     this.setState({ currentText : text });
   }
 
+  // Call this once when starting a brand new job.
+  startVideoJob = (videoJob: VideoJob) => {
+    this.state.videoJobPoller.setCurrentVideoJob(videoJob);
+    this.state.videoJobPoller.start();
+    this.setState({ currentVideoJob: videoJob });
+  }
+
+  // Call this on incremental job update ticks.
+  updateVideoJob = (videoJob: VideoJob) => {
+    switch (videoJob.jobStatus) {
+      case VideoJobStatus.Completed:
+      case VideoJobStatus.Failed:
+        console.log('job done');
+        this.state.videoJobPoller.stop();
+        break;
+      default:
+        break;
+    }
+
+    this.setState({ currentVideoJob: videoJob });
+  }
+
   public render() {
     let component;
     switch (this.state.mode) {
@@ -242,6 +291,9 @@ class App extends React.Component<Props, State> {
         break;
       case Mode.VIDEO_MODE:
         component = <VideoComponent
+          currentVideoJob={this.state.currentVideoJob}
+          startVideoJobCallback={this.startVideoJob}
+          updateVideoJobCallback={this.updateVideoJob}
           />
         break;
       case Mode.HISTORY_MODE:

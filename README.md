@@ -6,42 +6,26 @@ Frontend website for https://vo.codes/
 Hosted with netlify.
 
 
-Favicon
--------
-A bunch of different interesting fonts:
+Logo, Favicon, Font
+-------------------
+Font: fugaz one, 110, #209CEE
 
-aclonica
-acme
-aladin
-allerta stencil
-amarante
-amita
-anton
-chewy
-croissant one
-faster one
-fredoka one
-fugaz one
-mrs sheppards
-oleo script swash caps
-poller one
-rubik mono one
-yeseva one
-yesteryear
-
-Using
-
-https://favicon.io/favicon-generator/
-
-fugaz one, 110, #209CEE
+Using https://favicon.io/favicon-generator/
 
 Transparent Images
 ------------------
-https://www.remove.bg (pretty cheap)
+https://www.remove.bg (pretty cheap)gt
+
+
+Social Icons
+------------
+Taken from subscription service https://www.flaticon.com
+
+This pack: https://www.flaticon.com/packs/social-logo-1
 
 Video Thumbnails
 ----------------
-https://ezgif.com/
+Generated with https://ezgif.com/
 
 * webp, 500x300px (~100kb each)
 
