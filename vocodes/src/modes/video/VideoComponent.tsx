@@ -181,9 +181,8 @@ class VideoComponent extends React.Component<Props, State> {
 
         <div className="content is-size-4">
           <p>
-            Upload audio from vo.codes or any other source and pick a video template 
-            below. The audio shouldn't be too long or it will fail (I'll set a proper 
-            limit later.)
+            Upload audio from vo.codes or any other source (music, other websites) and pick 
+            a video template below. The audio shouldn't be too long or it will fail.
           </p>
         </div>
 
@@ -203,7 +202,7 @@ class VideoComponent extends React.Component<Props, State> {
                     <i className="fas fa-upload"></i>
                   </span>
                   <span className="file-label">
-                    Choose a file&hellip;
+                    Choose audio file&hellip;
                   </span>
                 </span>
                 <span className="file-name">
@@ -217,37 +216,15 @@ class VideoComponent extends React.Component<Props, State> {
             {thumbnails.map(v => v)}
           </div>
 
-          <div className="content is-size-4">
-            <p>
-              Hundreds of additional templates will be added in the future. 
-              Feel free to send some to us. As always, check Discord or 
-              Twitter for updates.
-            </p>
-          </div>
-
           <button className="button is-large is-success">Submit</button>
 
         </form>
 
-        <h1 className="title is-4"> Notes </h1>
+        <br/>
 
-        <div className="content is-size-4">
+        <div className="content is-size-5">
           <p>
-            This is an extremely rough cut of a brand new, beta feature. It might&nbsp;
-            <em>(probably will)</em>&nbsp;break. 
-            I need to reach out to Google Cloud sales engineers to get more GPUs as I'm 
-            currently on a limited trial account (I was previously on Digital Ocean).
-            Expect this to lag during peak traffic until I get more GPUs.
-          </p>
-          <p>
-            This would normally be more polished, but I've had a rough few weeks and 
-            I just want to get something out the door. It will improve.
-          </p>
-          <p>
-            Do not defame, defraud, or use for commercial purposes. Deep fakes
-            are for memes. The more people see deep fakes, the more they learn to
-            recognize them. It's your privilege to help educate the world about 
-            deep fakes. Have fun, go crazy.
+            <strong>Disclaimer:</strong> Do not defame, defraud, or use for commercial purposes.
           </p>
         </div>
         <br />
