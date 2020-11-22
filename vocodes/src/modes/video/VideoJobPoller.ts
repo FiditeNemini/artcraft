@@ -1,5 +1,5 @@
 import { AbstractPoller } from "../../poller/AbstractPoller";
-import { VideoJob, VideoJobStatus, parseVideoJobStatus } from "./VideoJob";
+import { VideoJob, parseVideoJobStatus } from "./VideoJob";
 
 class VideoJobPoller extends AbstractPoller {
 
