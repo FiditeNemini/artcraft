@@ -3,6 +3,7 @@ abstract class AbstractPoller {
 
   private isCurrentlyPolling: boolean;
   private pollingIntervalMillis: number;
+  private timeoutRef?: ReturnType<typeof setTimeout>;
 
   constructor(pollingIntervalMillis: number) {
     this.isCurrentlyPolling = false;
@@ -13,12 +14,16 @@ abstract class AbstractPoller {
   abstract performPollAction() : void;
 
   start() {
+    if (this.isPolling()) return;
     this.isCurrentlyPolling = true;
-    setTimeout(() => this.dispatchPoll(), this.pollingIntervalMillis);
+    this.timeoutRef = setTimeout(() => this.dispatchPoll(), this.pollingIntervalMillis);
   }
 
   stop() {
     this.isCurrentlyPolling = false;
+    if (this.timeoutRef !== undefined) {
+      clearTimeout(this.timeoutRef);
+    }
   }
 
   isPolling() : boolean {
@@ -26,12 +31,11 @@ abstract class AbstractPoller {
   }
 
   private dispatchPoll(): void {
-    if (this.isPolling()) {
-      this.performPollAction();
-    }
-    if (this.isPolling()) {
-      setTimeout(() => this.dispatchPoll(), this.pollingIntervalMillis);
-    }
+    if (!this.isPolling()) return;
+    this.performPollAction();
+
+    if (!this.isPolling()) return;
+    this.timeoutRef = setTimeout(() => this.dispatchPoll(), this.pollingIntervalMillis);
   }
 }
 

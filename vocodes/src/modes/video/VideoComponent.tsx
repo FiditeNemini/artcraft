@@ -120,12 +120,40 @@ class VideoComponent extends React.Component<Props, State> {
     let videoResults = <div></div>;
 
     if (this.props.currentVideoJob !== undefined) {
-      let downloadUrl = this.props.currentVideoJob.getVideoDownloadUrl() || "";
+      let videoJob = this.props.currentVideoJob!;
+      let downloadUrl = videoJob.getVideoDownloadUrl() || "";
+
+      let statusTitle = "Waiting";
+      let statusClassName = "message is-primary";
+
+      switch (videoJob.jobStatus) {
+        case VideoJobStatus.Pending:
+          statusTitle = "Waiting In Line";
+          statusClassName = "message is-warning"; // yellow
+          break;
+        case VideoJobStatus.Started:
+          statusTitle = "Now Processing";
+          statusClassName = "message is-info"; // light blue
+          break;
+        case VideoJobStatus.Completed:
+          statusTitle = "Success!";
+          statusClassName = "message is-success"; // green
+          break;
+        case VideoJobStatus.Failed:
+          statusTitle = "Failed :(";
+          statusClassName = "message is-danger"; // red
+          break;
+      }
+
       videoResults = (
-        <article className="message is-warning">
+        <article className={statusClassName}>
+          <div className="message-header">
+            <p>{statusTitle}</p>
+          </div>
           <div className="message-body">
             <p>Your results are currently processing and may take awhile.
             Open this URL in a new tab and keep it open:</p>
+
             <p><a 
               href={downloadUrl} 
               rel="noopener noreferrer"
@@ -149,6 +177,8 @@ class VideoComponent extends React.Component<Props, State> {
 
         <VideoStatsComponent />
 
+        {videoResults}
+
         <div className="content is-size-4">
           <p>
             Upload audio from vo.codes or any other source and pick a video template 
@@ -157,12 +187,10 @@ class VideoComponent extends React.Component<Props, State> {
           </p>
         </div>
 
-        {videoResults}
-
         <form onSubmit={this.handleFormSubmit}>
 
           <div className="upload-box">
-            <div className="file has-name is-boxed is-large">
+            <div className="file has-name is-large">
               <label className="file-label">
                 <input 
                   type="file" 
@@ -175,7 +203,7 @@ class VideoComponent extends React.Component<Props, State> {
                     <i className="fas fa-upload"></i>
                   </span>
                   <span className="file-label">
-                    Choose a file…
+                    Choose a file&hellip;
                   </span>
                 </span>
                 <span className="file-name">
