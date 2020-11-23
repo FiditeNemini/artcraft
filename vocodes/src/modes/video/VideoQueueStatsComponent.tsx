@@ -43,11 +43,10 @@ class VideoStatsComponent extends React.Component<Props, State> {
   public render() {
     let queueLength = this.state.queueLength;
     return (
-      <div>
-        <p><strong>Queue Length: {queueLength}</strong> (Each takes ~3-5 minutes) 
-        Once you submit your request, you don't have to wait on the page for it to finish.
-        You can copy the URL and check back later.</p>
-        <hr />
+      <div className="content is-size-4">
+        <p>
+          <strong>Queue Length: {queueLength}</strong> (Each takes ~1-5 minutes) 
+        </p>
       </div>
     )
   }

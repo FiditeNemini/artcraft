@@ -183,18 +183,17 @@ class VideoComponent extends React.Component<Props, State> {
 
     return (
       <div className="content is-4 is-size-5">
-        <h1 className="title is-3"> Deep Fake Video Beta </h1>
-
-        <VideoStatsComponent />
-
-        {videoResults}
+        <h1 className="title is-3"> Lipsync Video Beta </h1>
 
         <div className="content is-size-4">
           <p>
-            Upload audio from vo.codes or any other source (music, other websites) and pick 
-            a video template below. The audio shouldn't be too long or it will fail.
+            Upload audio from vo.codes or any other source (music, other websites), 
+            then pick a video template below. The audio shouldn't be too long or it 
+            will fail.
           </p>
         </div>
+
+        {videoResults}
 
         <form onSubmit={this.handleFormSubmit}>
 
@@ -228,9 +227,13 @@ class VideoComponent extends React.Component<Props, State> {
 
           <button className="button is-large is-success">Submit</button>
 
-        </form>
 
+        </form>
+        
         <br/>
+
+        <VideoStatsComponent />
+
 
         <div className="content is-size-5">
           <p>
