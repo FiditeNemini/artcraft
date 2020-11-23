@@ -76,6 +76,9 @@ class VideoComponent extends React.Component<Props, State> {
 
           let job = new VideoJob(res.uuid, VideoJobStatus.Pending);
           this.props.startVideoJobCallback(job);
+
+          // Make sure we show the processing status modal
+          window.scrollTo(0, document.body.scrollHeight);
         }
       });
     /*.then(function (res) {
@@ -205,8 +208,6 @@ class VideoComponent extends React.Component<Props, State> {
           </p>
         </div>
 
-        {videoResults}
-
         <form onSubmit={this.handleFormSubmit}>
 
           <div className="upload-box">
@@ -238,14 +239,13 @@ class VideoComponent extends React.Component<Props, State> {
           </div>
 
           <button className="button is-large is-success">Submit</button>
-
-
         </form>
         
         <br/>
 
         <VideoStatsComponent />
 
+        {videoResults}
 
         <div className="content is-size-5">
           <p>
