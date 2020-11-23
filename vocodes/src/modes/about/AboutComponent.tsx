@@ -113,15 +113,15 @@ function AboutComponent(props: Props) {
       <p>
         The following papers, models, and resources were used:
 
-        <a href="https://github.com/NVIDIA/tacotron2" target="_blank" rel="noopener noreferrer">Tacotron2</a>,
-        <a href="https://github.com/jaywalnut310/glow-tts" target="_blank" rel="noopener noreferrer">glow-tts</a>, {/* MIT */}
-        <a href="https://github.com/seungwonpark/melgan" target="_blank" rel="noopener noreferrer">MelGAN</a>, {/* BSD3 */}
-        <a href="https://arxiv.org/pdf/2005.05106.pdf" target="_blank" rel="noopener noreferrer">Multi-band MelGAN</a>,
-        <a href="https://arxiv.org/abs/2010.05646" target="_blank" rel="noopener noreferrer">HiFi-GAN</a>,
-        <a href="https://github.com/Rudrabha/Wav2Lip" target="_blank" rel="noopener noreferrer">Wav2Lip</a>, {/* Non-commercial */}
-        <a href="http://www.speech.cs.cmu.edu/cgi-bin/cmudict" target="_blank" rel="noopener noreferrer">CMUDict</a>,
-        <a href="https://keithito.com/LJ-Speech-Dataset/" target="_blank" rel="noopener noreferrer">LJSpeech</a>,
-        <a href="https://datashare.is.ed.ac.uk/handle/10283/3443" target="_blank" rel="noopener noreferrer">VCTK</a>.
+        <a href="https://github.com/NVIDIA/tacotron2" target="_blank" rel="noopener noreferrer">Tacotron2</a> (BSD-3 license),
+        <a href="https://github.com/jaywalnut310/glow-tts" target="_blank" rel="noopener noreferrer">glow-tts</a> (MIT license), {/* MIT */}
+        <a href="https://github.com/seungwonpark/melgan" target="_blank" rel="noopener noreferrer">MelGAN</a> (BSD-3 license), {/* BSD3 */}
+        <a href="https://arxiv.org/pdf/2005.05106.pdf" target="_blank" rel="noopener noreferrer">Multi-band MelGAN</a> (paper),
+        <a href="https://arxiv.org/abs/2010.05646" target="_blank" rel="noopener noreferrer">HiFi-GAN</a> (paper),
+        <a href="https://github.com/Rudrabha/Wav2Lip" target="_blank" rel="noopener noreferrer">Wav2Lip</a> (MIT license), {/* Non-commercial */}
+        <a href="http://www.speech.cs.cmu.edu/cgi-bin/cmudict" target="_blank" rel="noopener noreferrer">CMUDict</a> (BSD-2 license),
+        <a href="https://keithito.com/LJ-Speech-Dataset/" target="_blank" rel="noopener noreferrer">LJSpeech</a> (public domain),
+        <a href="https://datashare.is.ed.ac.uk/handle/10283/3443" target="_blank" rel="noopener noreferrer">VCTK</a> (CC BY 4.0).
       </p>
 
       <h1 className="title is-4">Contact</h1>
