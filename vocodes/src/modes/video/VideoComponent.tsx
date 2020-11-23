@@ -123,26 +123,40 @@ class VideoComponent extends React.Component<Props, State> {
       let videoJob = this.props.currentVideoJob!;
       let downloadUrl = videoJob.getVideoDownloadUrl() || "";
 
+      // Variable components
       let statusTitle = "Waiting";
       let statusClassName = "message is-primary";
+      let statusMessage = "";
+      let preLinkText = "If you would like to walk away and come back later, copy the "
+          + "following URL. Your results will be posted here later:"
+      let postLinkText = 'Please note that this will look like an error message ("The '
+          + 'specified key does not exist.") at first. Refresh it again later.'
       let videoPlayer = <div></div>;
 
       switch (videoJob.jobStatus) {
         case VideoJobStatus.Pending:
           statusTitle = "Waiting In Line";
           statusClassName = "message is-warning"; // yellow
+          statusMessage = "Your request has been submitted and is waiting in line for processing. This may take awhile.";
           break;
         case VideoJobStatus.Started:
           statusTitle = "Now Processing";
           statusClassName = "message is-info"; // light blue
+          statusMessage = "Your request is currently being processed. We're almost done, but it might take up to a few minutes.";
           break;
         case VideoJobStatus.Failed:
           statusTitle = "Failed :(";
           statusClassName = "message is-danger"; // red
+          statusMessage = "There was a problem processing your request. Either the audio is bad (too long, corrupt, etc.) or there was a problem with the video.";
+          preLinkText = "";
+          postLinkText = "";
           break;
         case VideoJobStatus.Completed:
           statusTitle = "Success!";
           statusClassName = "message is-success"; // green
+          statusMessage = "Your video is complete!";
+          preLinkText = "Download your video here:";
+          postLinkText = "";
           videoPlayer = (
             <div className="video-wrapper">
               <video controls width="80%">
@@ -150,9 +164,9 @@ class VideoComponent extends React.Component<Props, State> {
                         type="video/webm" />
                 Your browser doesn't support video
               </video>
+              <br />
             </div>
           );
-
           break;
       }
 
@@ -162,20 +176,18 @@ class VideoComponent extends React.Component<Props, State> {
             <p>{statusTitle}</p>
           </div>
           <div className="message-body">
-            <p>Your results are currently processing and may take awhile.
-            Open this URL in a new tab and keep it open:</p>
+            <p>{statusMessage}</p>
 
             {videoPlayer}
+
+            <p>{preLinkText}</p>
 
             <p><a 
               href={downloadUrl} 
               rel="noopener noreferrer"
               target="_blank">{downloadUrl}</a></p>
 
-            <p>Please note that this will look like an error message ("The 
-              specified key does not exist.") at first. 
-              Refresh it again later. I'm still working on the frontend code 
-              that will include a progress bar.</p>
+            <p>{postLinkText}</p>
           </div>
         </article>
       );
