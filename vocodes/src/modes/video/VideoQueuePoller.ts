@@ -1,9 +1,14 @@
 import { AbstractPoller } from "../../poller/AbstractPoller";
+import { VideoQueueStats } from "./VideoQueueStats";
+
 
 class VideoQueuePoller extends AbstractPoller {
 
-  constructor() {
+  updateCallback: (stats: VideoQueueStats) => void;
+
+  constructor(updateCallback: (stats: VideoQueueStats) => void) {
     super(5000);
+    this.updateCallback = updateCallback;
   }
 
   performPollAction(): void {
@@ -12,6 +17,8 @@ class VideoQueuePoller extends AbstractPoller {
       .then(
         (result) => {
           console.log(result);
+          let videoQueueStats = VideoQueueStats.fromJson(result);
+          this.updateCallback(videoQueueStats);
         }
       );
   }

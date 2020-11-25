@@ -17,6 +17,7 @@ import { VideoComponent } from './modes/video/VideoComponent';
 import { VideoJob, VideoJobStatus } from './modes/video/VideoJob';
 import { VideoJobPoller } from './modes/video/VideoJobPoller';
 import { VideoQueuePoller } from './modes/video/VideoQueuePoller';
+import { VideoQueueStats } from './modes/video/VideoQueueStats';
 
 interface Props {
   // Certan browsers (iPhone) have pitiful support for drawing APIs. Worse yet,
@@ -61,6 +62,7 @@ interface State {
 
   // Video Mode State
   currentVideoJob?: VideoJob,
+  videoQueueStats: VideoQueueStats,
 
   // Dynamic config
   textCharacterLimit: number,
@@ -100,8 +102,9 @@ class App extends React.Component<Props, State> {
       currentText: '',
       textCharacterLimit: TEXT_CHARACTER_LIMIT_DEFAULT,
       currentSpeakerCategory: CATEGORY_ALL,
-      videoQueuePoller: new VideoQueuePoller(),
+      videoQueuePoller: new VideoQueuePoller(this.updateVideoQueueStats),
       videoJobPoller: new VideoJobPoller(this.updateVideoJob),
+      videoQueueStats: VideoQueueStats.default(),
     };
   }
 
@@ -267,6 +270,10 @@ class App extends React.Component<Props, State> {
     this.setState({ currentVideoJob: videoJob });
   }
 
+  updateVideoQueueStats = (videoQueueStats: VideoQueueStats) => {
+    this.setState({ videoQueueStats: videoQueueStats });
+  }
+
   public render() {
     let component;
     switch (this.state.mode) {
@@ -292,8 +299,11 @@ class App extends React.Component<Props, State> {
       case Mode.VIDEO_MODE:
         component = <VideoComponent
           currentVideoJob={this.state.currentVideoJob}
+          videoQueuePoller={this.state.videoQueuePoller}
+          videoQueueStats={this.state.videoQueueStats}
           startVideoJobCallback={this.startVideoJob}
           updateVideoJobCallback={this.updateVideoJob}
+          updateVideoQueueStatsCallback={this.updateVideoQueueStats}
           />
         break;
       case Mode.HISTORY_MODE:

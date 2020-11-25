@@ -1,13 +1,17 @@
 import React from 'react';
 import { VIDEO_TEMPLATES, VideoTemplate } from './VideoTemplates';
 import axios from 'axios';
-import { VideoStatsComponent } from './VideoQueueStatsComponent';
 import { VideoJob, VideoJobStatus } from './VideoJob';
+import { VideoQueuePoller } from './VideoQueuePoller';
+import { VideoQueueStats } from './VideoQueueStats';
 
 interface Props {
   currentVideoJob?: VideoJob,
+  videoQueueStats: VideoQueueStats,
+  videoQueuePoller: VideoQueuePoller,
   startVideoJobCallback: (job: VideoJob) => void,
   updateVideoJobCallback: (job: VideoJob) => void,
+  updateVideoQueueStatsCallback: (stats: VideoQueueStats) => void,
 }
 
 interface State {
@@ -29,6 +33,14 @@ class VideoComponent extends React.Component<Props, State> {
       // After upload
       jobUuid: undefined,
     };
+  }
+
+  componentDidMount() {
+    this.props.videoQueuePoller.start();
+  }
+
+  componentWillUnmount() {
+    this.props.videoQueuePoller.stop();
   }
 
   handleFileChange = (fileList: FileList|null) => {
@@ -243,7 +255,11 @@ class VideoComponent extends React.Component<Props, State> {
         
         <br/>
 
-        <VideoStatsComponent />
+        <div className="content is-size-4">
+          <p>
+            <strong>Queue Length: {this.props.videoQueueStats.queueLength}</strong> (Each takes ~30 seconds.) 
+          </p>
+        </div>
 
         {videoResults}
 
