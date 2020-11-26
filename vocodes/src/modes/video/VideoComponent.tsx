@@ -134,7 +134,7 @@ class VideoComponent extends React.Component<Props, State> {
       if (selectedTemplateSlug === imageTemplate.slug) {
         selectedName = 'selected';
       }
-      let className = `video-thumbnail ${selectedName}`
+      let className = `thumbnail ${selectedName}`
       let thumbnail = <img
         src={imageTemplate.getThumbnailUrl()}
         key={imageTemplate.slug}
@@ -158,7 +158,7 @@ class VideoComponent extends React.Component<Props, State> {
       if (selectedTemplateSlug === videoTemplate.slug) {
         selectedName = 'selected';
       }
-      let className = `video-thumbnail ${selectedName}`
+      let className = `thumbnail ${selectedName}`
       let thumbnail = <img
         src={videoTemplate.getThumbnailUrl()}
         key={videoTemplate.slug}
@@ -266,8 +266,8 @@ class VideoComponent extends React.Component<Props, State> {
         <div className="content is-size-4">
           <p>
             Upload audio from vo.codes or any other source (music, other websites), 
-            then pick a video template below. The audio shouldn't be too long or it 
-            will fail.
+            then pick a template below. The audio shouldn't be too long or it will
+            fail.
           </p>
         </div>
 
@@ -298,11 +298,13 @@ class VideoComponent extends React.Component<Props, State> {
           </div>
 
           <h4 className="title is-4"> Video Templates </h4>
+
           <div className="video-template-selector">
             {videoThumbnails.map(v => v)}
           </div>
 
           <h4 className="title is-4"> Image Templates </h4>
+
           <div className="video-template-selector">
             {imageThumbnails.map(v => v)}
           </div>

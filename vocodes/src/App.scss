@@ -161,11 +161,15 @@ nav {
   min-height: 1.5em;
 }
 
+.upload-box {
+  padding: 0 0 1em;
+}
+
 .video-template-selector {
   margin: 1.5em 0 1.5em 0;
   text-align: center;
 
-  .video-thumbnail {
+  .thumbnail {
     max-width: 220px;
     padding: 0em;
     margin: 5px;
