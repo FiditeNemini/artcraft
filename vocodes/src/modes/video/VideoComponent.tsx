@@ -20,6 +20,7 @@ interface State {
   audioFile?: File,
   selectedVideoTemplate?: VideoTemplate,
   selectedImageTemplate?: ImageTemplate,
+  imageFile?: File,
   // After upload
   jobUuid?: string,
 }
@@ -33,6 +34,7 @@ class VideoComponent extends React.Component<Props, State> {
       audioFile: undefined,
       selectedVideoTemplate: VIDEO_TEMPLATES[0],
       selectedImageTemplate: undefined,
+      imageFile: undefined,
       // After upload
       jobUuid: undefined,
     };
@@ -46,7 +48,7 @@ class VideoComponent extends React.Component<Props, State> {
     this.props.videoQueuePoller.stop();
   }
 
-  handleFileChange = (fileList: FileList|null) => {
+  handleAudioFileChange = (fileList: FileList|null) => {
     if (fileList === null 
         || fileList === undefined
         || fileList.length < 1) {
@@ -62,10 +64,31 @@ class VideoComponent extends React.Component<Props, State> {
     });
   }
 
+  handleImageFileChange = (fileList: FileList|null) => {
+    if (fileList === null 
+        || fileList === undefined
+        || fileList.length < 1) {
+      this.setState({
+        selectedVideoTemplate: VIDEO_TEMPLATES[0], // Return to old default for now.
+        selectedImageTemplate: undefined,
+        imageFile: undefined,
+      });
+    }
+
+    let file = fileList![0];
+
+    this.setState({
+      imageFile: file,
+      selectedVideoTemplate: undefined,
+      selectedImageTemplate: undefined,
+    });
+  }
+
   selectVideoTemplate = (videoTemplate: VideoTemplate) => {
     this.setState({
       selectedVideoTemplate: videoTemplate,
       selectedImageTemplate: undefined,
+      imageFile: undefined,
     });
   }
 
@@ -73,6 +96,7 @@ class VideoComponent extends React.Component<Props, State> {
     this.setState({
       selectedImageTemplate: imageTemplate,
       selectedVideoTemplate: undefined,
+      imageFile: undefined,
     });
   }
 
@@ -93,6 +117,10 @@ class VideoComponent extends React.Component<Props, State> {
 
     if (this.state.selectedImageTemplate !== undefined) {
       formData.append('image-template', this.state.selectedImageTemplate.slug);
+    }
+
+    if (this.state.imageFile !== undefined) {
+      formData.append('image', this.state.imageFile);
     }
 
     // NB: Using 'axios' because 'fetch' was having problems with form-multipart
@@ -178,9 +206,14 @@ class VideoComponent extends React.Component<Props, State> {
     let videoThumbnails = this.getVideoThumbnails();
 
     let audioFilename = '(select a file)';
+    let imageFilename = '(select a file)';
 
     if (this.state.audioFile !== undefined) {
       audioFilename = this.state.audioFile.name;
+    }
+
+    if (this.state.imageFile !== undefined) {
+      imageFilename = this.state.imageFile.name;
     }
 
     let videoResults = <div></div>;
@@ -280,7 +313,7 @@ class VideoComponent extends React.Component<Props, State> {
                   type="file" 
                   name="audio" 
                   className="file-input" 
-                  onChange={ (e) => this.handleFileChange(e.target.files) }
+                  onChange={ (e) => this.handleAudioFileChange(e.target.files) }
                   />
                 <span className="file-cta">
                   <span className="file-icon">
@@ -308,6 +341,34 @@ class VideoComponent extends React.Component<Props, State> {
           <div className="video-template-selector">
             {imageThumbnails.map(v => v)}
           </div>
+
+          <h4 className="title is-4"> Or Upload Your Own Image </h4>
+          <p>Only images are supported at this time due to server capacity.</p>
+
+          <div className="upload-box">
+            <div className="file has-name is-large">
+              <label className="file-label">
+                <input 
+                  type="file" 
+                  name="image" 
+                  className="file-input" 
+                  onChange={ (e) => this.handleImageFileChange(e.target.files) }
+                  />
+                <span className="file-cta">
+                  <span className="file-icon">
+                    <i className="fas fa-upload"></i>
+                  </span>
+                  <span className="file-label">
+                    Choose image file&hellip;
+                  </span>
+                </span>
+                <span className="file-name">
+                  {imageFilename}
+                </span>
+              </label>
+            </div>
+          </div>
+
 
           <button className="button is-large is-success">Submit</button>
         </form>
