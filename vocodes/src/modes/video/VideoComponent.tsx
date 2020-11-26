@@ -4,6 +4,7 @@ import axios from 'axios';
 import { VideoJob, VideoJobStatus } from './VideoJob';
 import { VideoQueuePoller } from './VideoQueuePoller';
 import { VideoQueueStats } from './VideoQueueStats';
+import { IMAGE_TEMPLATES, ImageTemplate } from './ImageTemplates';
 
 interface Props {
   currentVideoJob?: VideoJob,
@@ -17,7 +18,8 @@ interface Props {
 interface State {
   // Before upload
   audioFile?: File,
-  selectedVideoTemplate: VideoTemplate,
+  selectedVideoTemplate?: VideoTemplate,
+  selectedImageTemplate?: ImageTemplate,
   // After upload
   jobUuid?: string,
 }
@@ -30,6 +32,7 @@ class VideoComponent extends React.Component<Props, State> {
       // Before upload
       audioFile: undefined,
       selectedVideoTemplate: VIDEO_TEMPLATES[0],
+      selectedImageTemplate: undefined,
       // After upload
       jobUuid: undefined,
     };
@@ -62,8 +65,17 @@ class VideoComponent extends React.Component<Props, State> {
   selectVideoTemplate = (videoTemplate: VideoTemplate) => {
     this.setState({
       selectedVideoTemplate: videoTemplate,
+      selectedImageTemplate: undefined,
     });
   }
+
+  selectImageTemplate = (imageTemplate: ImageTemplate) => {
+    this.setState({
+      selectedImageTemplate: imageTemplate,
+      selectedVideoTemplate: undefined,
+    });
+  }
+
 
   handleFormSubmit = (ev: React.FormEvent<HTMLFormElement>) : boolean => {
     ev.preventDefault();
@@ -74,7 +86,14 @@ class VideoComponent extends React.Component<Props, State> {
 
     let formData = new FormData();
     formData.append('audio', this.state.audioFile!);
-    formData.append('video-template', this.state.selectedVideoTemplate.slug);
+
+    if (this.state.selectedVideoTemplate !== undefined) {
+      formData.append('video-template', this.state.selectedVideoTemplate.slug);
+    }
+
+    if (this.state.selectedImageTemplate !== undefined) {
+      formData.append('image-template', this.state.selectedImageTemplate.slug);
+    }
 
     // NB: Using 'axios' because 'fetch' was having problems with form-multipart
     // and then interpreting the resultant JSON. Maybe I didn't try hard enough?
@@ -106,12 +125,37 @@ class VideoComponent extends React.Component<Props, State> {
     return false;
   }
 
-  public render() {
-    let thumbnails : any[] = [];
+  public getImageThumbnails() : any[] {
+    let imageThumbnails : any[] = [];
+    let selectedTemplateSlug = this.state.selectedImageTemplate?.slug || '';
+
+    IMAGE_TEMPLATES.forEach(imageTemplate => {
+      let selectedName = '';
+      if (selectedTemplateSlug === imageTemplate.slug) {
+        selectedName = 'selected';
+      }
+      let className = `video-thumbnail ${selectedName}`
+      let thumbnail = <img
+        src={imageTemplate.getThumbnailUrl()}
+        key={imageTemplate.slug}
+        className={className}
+        onClick={() => this.selectImageTemplate(imageTemplate) }
+        alt={imageTemplate.name}
+        />
+
+      imageThumbnails.push(thumbnail);
+    });
+
+    return imageThumbnails;
+  }
+
+  public getVideoThumbnails() : any[] {
+    let videoThumbnails : any[] = [];
+    let selectedTemplateSlug = this.state.selectedVideoTemplate?.slug || '';
 
     VIDEO_TEMPLATES.forEach(videoTemplate => {
       let selectedName = '';
-      if (this.state.selectedVideoTemplate.slug === videoTemplate.slug) {
+      if (selectedTemplateSlug === videoTemplate.slug) {
         selectedName = 'selected';
       }
       let className = `video-thumbnail ${selectedName}`
@@ -123,8 +167,15 @@ class VideoComponent extends React.Component<Props, State> {
         alt={videoTemplate.name}
         />
 
-      thumbnails.push(thumbnail);
+      videoThumbnails.push(thumbnail);
     });
+
+    return videoThumbnails;
+  }
+
+  public render() {
+    let imageThumbnails = this.getImageThumbnails();
+    let videoThumbnails = this.getVideoThumbnails();
 
     let audioFilename = '(select a file)';
 
@@ -246,8 +297,14 @@ class VideoComponent extends React.Component<Props, State> {
             </div>
           </div>
 
+          <h4 className="title is-4"> Video Templates </h4>
           <div className="video-template-selector">
-            {thumbnails.map(v => v)}
+            {videoThumbnails.map(v => v)}
+          </div>
+
+          <h4 className="title is-4"> Image Templates </h4>
+          <div className="video-template-selector">
+            {imageThumbnails.map(v => v)}
           </div>
 
           <button className="button is-large is-success">Submit</button>
