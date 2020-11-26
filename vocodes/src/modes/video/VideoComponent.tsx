@@ -246,7 +246,10 @@ class VideoComponent extends React.Component<Props, State> {
         case VideoJobStatus.Failed:
           statusTitle = "Failed :(";
           statusClassName = "message is-danger"; // red
-          statusMessage = "There was a problem processing your request. Either the audio is bad (too long, corrupt, etc.) or there was a problem with the video.";
+          statusMessage = "There was a problem processing your request. Either the audio is bad (too long, "
+            + "corrupt, etc.), there was a problem with face detection, or the video itself is corrupt. Cartoon "
+            + "images are known to frequently fail face detection. If you're using a cartoon image, it "
+            + "probably won't work.";
           preLinkText = "";
           postLinkText = "";
           break;
@@ -343,7 +346,9 @@ class VideoComponent extends React.Component<Props, State> {
           </div>
 
           <h4 className="title is-4"> Or Upload Your Own Image </h4>
-          <p>Only images are supported at this time due to server capacity.</p>
+          <p><strong>Note:</strong> cartoon images typically do not work since the 
+          faces aren't always detected. Video is not supported at this time due to 
+          limited server capacity.</p>
 
           <div className="upload-box">
             <div className="file has-name is-large">
@@ -368,7 +373,6 @@ class VideoComponent extends React.Component<Props, State> {
               </label>
             </div>
           </div>
-
 
           <button className="button is-large is-success">Submit</button>
         </form>
