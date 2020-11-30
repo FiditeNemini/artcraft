@@ -73,6 +73,7 @@ interface State {
 
   // History
   utterances: Utterance[],
+  isHistoryCountBadgeVisible: boolean,
 }
 
 // Responses from the `/service_settings` endpoint.
@@ -99,6 +100,7 @@ class App extends React.Component<Props, State> {
       speaker: defaultSpeaker,
       spectrogramMode: SpectrogramMode.VIRIDIS,
       utterances: [],
+      isHistoryCountBadgeVisible: false,
       currentText: '',
       textCharacterLimit: TEXT_CHARACTER_LIMIT_DEFAULT,
       currentSpeakerCategory: CATEGORY_ALL,
@@ -241,7 +243,10 @@ class App extends React.Component<Props, State> {
   appendUtterance = (utterance: Utterance) => {
     let utterances = this.state.utterances.slice();
     utterances.unshift(utterance);
-    this.setState({ utterances: utterances });
+    this.setState({ 
+      utterances: utterances,
+      isHistoryCountBadgeVisible: true,
+    });
   }
 
   setText = (text: string) => {
@@ -272,6 +277,10 @@ class App extends React.Component<Props, State> {
 
   updateVideoQueueStats = (videoQueueStats: VideoQueueStats) => {
     this.setState({ videoQueueStats: videoQueueStats });
+  }
+
+  clearHistoryCountBadge = () => {
+    this.setState({ isHistoryCountBadgeVisible: false });
   }
 
   public render() {
@@ -310,6 +319,7 @@ class App extends React.Component<Props, State> {
         component = <HistoryComponent 
           utterances={this.state.utterances} 
           resetModeCallback={this.resetMode}
+          clearHistoryCountBadgeCallback={this.clearHistoryCountBadge}
           />
         break;
       case Mode.ABOUT_MODE:
@@ -322,7 +332,12 @@ class App extends React.Component<Props, State> {
     return (
       <div id="main" className="mainwrap">
         <div id="viewable">
-          <TopNav mode={this.state.mode} switchModeCallback={this.switchMode} />
+          <TopNav 
+            mode={this.state.mode} 
+            historyBadgeCount={this.state.utterances.length}
+            isHistoryCountBadgeVisible={this.state.isHistoryCountBadgeVisible}
+            switchModeCallback={this.switchMode}
+            />
           {component}
         </div>
         <Footer mode={this.state.mode} switchModeCallback={this.switchMode} />

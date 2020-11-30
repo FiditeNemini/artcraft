@@ -5,6 +5,7 @@ import { PastUtterance } from './PastUtterance';
 interface Props {
   utterances: Utterance[],
   resetModeCallback: () => void,
+  clearHistoryCountBadgeCallback: () => void,
 }
 
 interface State {
@@ -16,6 +17,10 @@ class HistoryComponent extends React.Component<Props, State> {
     super(props);
     this.state = {
     };
+  }
+
+  componentDidMount() {
+    this.props.clearHistoryCountBadgeCallback();
   }
 
   public render() {
