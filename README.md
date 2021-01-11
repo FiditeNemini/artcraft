@@ -3,6 +3,23 @@ Storyteller
 
 A startup, by Brandon Thomas.
 
+Installation / Requirements
+---------------------------
+Install the following packages on Linux:
+
+* clang
+* cmake
+* libopencv-dev
+* libsdl2-dev
+* libxcb-xfixes0-dev
+* GLFW build requirements:
+  * libpthread (eg. libpthread-stubs0-dev)
+  * libx11-dev
+  * libxcursor-dev
+  * libxi-dev
+  * libxinerama-dev
+  * libxrandr-dev
+
 Webcam
 ------
 
