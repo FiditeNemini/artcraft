@@ -108,8 +108,8 @@ This may have the answers for my bugs:
 
 - https://github.com/webcamoid/akvcam/issues/6
 
-Models
-------
+3D Models / Assets
+------------------
 Models are sourced from the following websites:
 
 * https://www.models-resource.com/
