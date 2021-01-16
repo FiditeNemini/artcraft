@@ -55,6 +55,13 @@ Then modify this directive to add the following:
 GRUB_CMDLINE_LINUX_DEFAULT="[KEEP EXISTING PARTS THE SAME] usbcore.usbfs_memory_mb=2047"
 ```
 
+Then
+
+```
+sudo update-grub
+```
+
+(Reboot)
 
 Ubuntu 20.04 LTS Support
 ------------------------
