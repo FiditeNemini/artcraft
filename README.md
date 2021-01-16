@@ -9,7 +9,6 @@ Install the following packages on Linux:
 
 * clang
 * cmake
-* libopencv-dev
 * libsdl2-dev
 * libxcb-xfixes0-dev
 * GLFW build requirements:
@@ -19,6 +18,26 @@ Install the following packages on Linux:
   * libxi-dev
   * libxinerama-dev
   * libxrandr-dev
+
+Ubuntu 18.04 Installation
+-------------------------
+
+Configure the Microsoft PPA:
+
+```
+curl -sSL https://packages.microsoft.com/keys/microsoft.asc | sudo apt-key add -
+sudo apt-add-repository https://packages.microsoft.com/ubuntu/18.04/prod
+sudo apt-get update
+```
+
+Install packages:
+
+```
+sudo apt install k4a-tools
+sudo apt install libk4a1.1-dev
+```
+
+
 
 Ubuntu 20.04 LTS Support
 ------------------------

@@ -19,7 +19,6 @@ extern crate imgui_sdl2;
 extern crate imgui_winit_support;
 extern crate k4a_sys;
 extern crate libc;
-extern crate opencv;
 extern crate rand;
 extern crate sdl2;
 extern crate tobj;
@@ -28,8 +27,6 @@ extern crate gltf;
 
 use std::sync::Arc;
 use std::{thread, env};
-
-use opencv::prelude::*;
 
 use anyhow::Result as AnyhowResult;
 use anyhow::bail;

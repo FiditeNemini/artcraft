@@ -13,7 +13,7 @@ use image::Rgba;
 use image::RgbaImage;
 use image::error::{ImageFormatHint, UnsupportedError};
 use image::flat::{FlatSamples, SampleLayout};
-use opencv::prelude::*;
+//use opencv::prelude::*;
 use std::mem::size_of;
 use std::slice;
 
