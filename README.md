@@ -37,6 +37,23 @@ sudo apt install k4a-tools
 sudo apt install libk4a1.1-dev
 ```
 
+Modify this:
+
+```
+sudo sh -c 'echo 2047 > /sys/module/usbcore/parameters/usbfs_memory_mb'
+```
+
+Grub bootloader modifications:
+
+```
+sudo vi /etc/default/grub
+```
+
+Then modify this directive to add the following:
+
+```
+GRUB_CMDLINE_LINUX_DEFAULT="[KEEP EXISTING PARTS THE SAME] usbcore.usbfs_memory_mb=2047"
+```
 
 
 Ubuntu 20.04 LTS Support

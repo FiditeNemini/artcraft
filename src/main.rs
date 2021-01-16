@@ -110,7 +110,7 @@ pub fn main() -> AnyhowResult<()> {
   };
 
   let capture_provider: Arc<dyn CaptureProvider> = if opts.enable_cameras {
-    let multi_device = MultiDeviceCapturer::new(2, Some(1))
+    let multi_device = MultiDeviceCapturer::new(1, Some(1))
         .expect("multi-device create");
 
     multi_device.start_cameras().expect("start cameras");
