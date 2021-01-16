@@ -19,23 +19,10 @@ Install the following packages on Linux:
   * libxinerama-dev
   * libxrandr-dev
 
-Ubuntu 18.04 Installation
--------------------------
-
-Configure the Microsoft PPA:
-
-```
-curl -sSL https://packages.microsoft.com/keys/microsoft.asc | sudo apt-key add -
-sudo apt-add-repository https://packages.microsoft.com/ubuntu/18.04/prod
-sudo apt-get update
-```
-
-Install packages:
-
-```
-sudo apt install k4a-tools
-sudo apt install libk4a1.1-dev
-```
+Supporting devices over USB in Linux
+------------------------------------
+Sometimes the cameras just won't work. We need to increase USB memory and
+copy a device config file.
 
 Modify this:
 
@@ -62,6 +49,33 @@ sudo update-grub
 ```
 
 (Reboot)
+
+If `sudo k4aviewer` works but non-sudo doesn't,
+
+```
+git clone git@github.com:microsoft/Azure-Kinect-Sensor-SDK.git
+cd Azure-Kinect-Sensor-SDK/
+sudo cp scripts/99-k4a.rules /etc/udev/rules.d/
+```
+
+Then disconnect and reconnect the USB device. It should work now.
+
+Ubuntu 18.04 Installation
+-------------------------
+
+Configure the Microsoft PPA and install the packages:
+
+```
+# Configure PPA
+curl -sSL https://packages.microsoft.com/keys/microsoft.asc | sudo apt-key add -
+sudo apt-add-repository https://packages.microsoft.com/ubuntu/18.04/prod
+sudo apt-get update
+
+#Install packages:
+sudo apt install k4a-tools
+sudo apt install libk4a1.1-dev
+```
+
 
 Ubuntu 20.04 LTS Support
 ------------------------
