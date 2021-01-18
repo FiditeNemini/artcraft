@@ -6,8 +6,12 @@ authors = [ "Brandon Thomas <bt@brand.io>",
             "Brandon Thomas <echelon@gmail.com>" ]
 
 [[bin]]
+name = "cloudcam_visualizer"
+path = "src/main_opencv.rs"
+
+[[bin]]
 name = "cloudcam"
-path = "src/main.rs"
+path = "src/main_zeromq.rs"
 
 [dependencies]
 anyhow = "1.0.32"
