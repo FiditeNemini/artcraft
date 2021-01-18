@@ -14,9 +14,6 @@ use gl::types::*;
 
 use crate::files::read_file_string_contents::read_file_string_contents;
 use crate::files::write_to_file_from_byte_ptr::write_to_file_from_byte_ptr;
-use crate::kinect::k4a_sys_wrapper::ImageFormat;
-use crate::kinect::k4a_sys_wrapper::{Image, Calibration};
-use crate::kinect::k4a_sys_wrapper;
 use crate::opengl::compile_shader::compile_shader;
 use crate::opengl::wrapper::buffer::Buffer;
 use crate::opengl::wrapper::other_misc_wrapper::OpenGlError;
@@ -24,6 +21,9 @@ use crate::opengl::wrapper::other_misc_wrapper::gl_get_error;
 use crate::opengl::wrapper::texture::Texture;
 use crate::point_cloud::debug::image_proxy::ImageProxy;
 use crate::point_cloud::pixel_structs::DepthPixel;
+use k4a_sys_temp as k4a_sys;
+use kinect::{Image, Calibration, ImageFormat};
+use kinect;
 
 pub type Result<T> = std::result::Result<T, PointCloudComputeError>;
 
@@ -150,7 +150,7 @@ impl GpuPointCloudConverter {
   /// sized texture.
   ///
   pub fn convert(&self,
-                 //depth_image: &k4a_sys_wrapper::Image,
+                 //depth_image: &kinect::Image,
                  depth_image: &ImageProxy,
                  output_texture: &mut Texture,
                  camera_index: usize

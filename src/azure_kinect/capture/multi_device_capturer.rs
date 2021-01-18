@@ -1,6 +1,7 @@
-use crate::kinect::capture::device_capturer::CaptureProvider;
-use crate::kinect::k4a_sys_wrapper::{Device, KinectError, Capture, CaptureError, GetCaptureError, Calibration};
+use crate::azure_kinect::capture::device_capturer::CaptureProvider;
 use crate::point_cloud::debug::capture_proxy::CaptureProxy;
+use k4a_sys_temp as k4a_sys;
+use kinect::{Device, KinectError, Capture, CaptureError, GetCaptureError, Calibration};
 use std::sync::Arc;
 use std::sync::Mutex;
 

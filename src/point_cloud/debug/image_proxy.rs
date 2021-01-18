@@ -1,8 +1,8 @@
 use anyhow::Result as AnyhowResult;
 use crate::files::write_to_file_from_byte_ptr::write_to_file_from_byte_ptr;
-use crate::kinect::k4a_sys_wrapper::ImageFormat;
-use crate::kinect::k4a_sys_wrapper;
-use k4a_sys;
+use k4a_sys_temp as k4a_sys;
+use kinect::ImageFormat;
+use kinect;
 use std::fs::File;
 use std::fs;
 use std::io::Read;
@@ -27,7 +27,7 @@ enum UnderlyingStorage {
     format: ImageFormat,
   },
   /// From the Kinect camera
-  K4aImage(k4a_sys_wrapper::Image),
+  K4aImage(kinect::Image),
 }
 
 impl ImageProxy {
@@ -58,7 +58,7 @@ impl ImageProxy {
     })
   }
 
-  pub fn from_k4a_image(image: &k4a_sys_wrapper::Image) -> Self {
+  pub fn from_k4a_image(image: &kinect::Image) -> Self {
     // NB: We need to increase the refcount.
     // K4a manages the memory under the hood.
     let image = image.clone();
@@ -68,7 +68,7 @@ impl ImageProxy {
     }
   }
 
-  pub fn consume_k4a_image(image: k4a_sys_wrapper::Image) -> Self {
+  pub fn consume_k4a_image(image: kinect::Image) -> Self {
     let storage = UnderlyingStorage::K4aImage(image);
     Self {
       storage,

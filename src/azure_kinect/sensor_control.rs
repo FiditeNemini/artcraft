@@ -1,7 +1,6 @@
 use crate::image_debug::depth_to_image;
-use crate::kinect::k4a_sys_wrapper::{Capture, Device};
 use image::DynamicImage;
-//use opencv::prelude::*;
+use kinect::{Capture, Device};
 use std::sync::Arc;
 use std::sync::Mutex;
 

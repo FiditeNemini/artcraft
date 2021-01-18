@@ -1,5 +1,5 @@
-use crate::kinect::k4a_sys_wrapper::Calibration;
 use crate::point_cloud::debug::capture_proxy::CaptureProxy;
+use kinect::Calibration;
 
 pub trait CaptureProvider {
 

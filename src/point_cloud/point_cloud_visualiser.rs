@@ -8,10 +8,9 @@ use std::sync::{Arc, Mutex};
 use gl::types::*;
 
 use anyhow::Result as AnyhowResult;
+use crate::azure_kinect::sensor_control::CaptureProvider;
 use crate::core_types::RgbaF32;
 use crate::gui::mouse_camera_arcball::MouseCameraArcball;
-use crate::kinect::k4a_sys_wrapper::{Capture, Transformation};
-use crate::kinect::k4a_sys_wrapper::{Image, Calibration, ImageFormat};
 use crate::opengl::wrapper::other_misc_wrapper::OpenGlError;
 use crate::opengl::wrapper::other_misc_wrapper::{Framebuffer, Renderbuffer};
 use crate::opengl::wrapper::texture::Texture;
@@ -23,7 +22,8 @@ use crate::point_cloud::pixel_structs::DepthPixel;
 use crate::point_cloud::point_cloud_renderer::{PointCloudRenderer, PointCloudRendererError};
 use crate::point_cloud::util::{colorize_depth_blue_to_red, get_depth_mode_range, ValueRange};
 use crate::point_cloud::viewer_image::ViewerImage;
-use crate::kinect::sensor_control::CaptureProvider;
+use k4a_sys_temp as k4a_sys;
+use kinect::{Image, Calibration, ImageFormat, Capture, Transformation};
 
 pub type Result<T> = std::result::Result<T, PointCloudVisualizerError>;
 

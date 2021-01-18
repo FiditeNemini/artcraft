@@ -1,7 +1,8 @@
 use anyhow::Result as AnyhowResult;
-use crate::kinect::k4a_sys_wrapper::CaptureError;
-use crate::kinect::k4a_sys_wrapper;
 use crate::point_cloud::debug::image_proxy::ImageProxy;
+use k4a_sys_temp as k4a_sys;
+use kinect::CaptureError;
+use kinect;
 use std::path::Path;
 use std::sync::{RwLock, Mutex, PoisonError, MutexGuard, Arc};
 use winit::event::VirtualKeyCode::Mute;
@@ -20,7 +21,7 @@ enum UnderlyingStorage {
     depth_image: ImageProxy,
   },
   K4aCapture {
-    capture: k4a_sys_wrapper::Capture,
+    capture: kinect::Capture,
     maybe_color_image: Option<ImageProxy>,
     maybe_depth_image: Option<ImageProxy>,
   }
@@ -37,14 +38,14 @@ impl CaptureProxy {
     }
   }
 
-  pub fn from_k4a_capture(capture: &k4a_sys_wrapper::Capture) -> Self {
+  pub fn from_k4a_capture(capture: &kinect::Capture) -> Self {
     // NB: We need to increase the refcount.
     // K4a manages the memory under the hood.
     let capture = capture.clone();
     Self::consume_k4a_capture(capture)
   }
 
-  pub fn consume_k4a_capture(capture: k4a_sys_wrapper::Capture) -> Self {
+  pub fn consume_k4a_capture(capture: kinect::Capture) -> Self {
     // NB: I tried to lazily unpack these, but interior mutability Sync/Send was a nightmare.
     // The poor ergonomics were not worth it.
     let color_image = capture.get_color_image()
@@ -93,7 +94,7 @@ impl CaptureProxy {
     }
   }
 
-  pub fn debug_get_capture(&self) -> k4a_sys_wrapper::Capture {
+  pub fn debug_get_capture(&self) -> kinect::Capture {
     match &self.storage {
       UnderlyingStorage::CameraImageBytes{ .. } => unimplemented!("Cannot get capture for non-k4a"),
       UnderlyingStorage::K4aCapture { capture, .. } => capture.clone(),

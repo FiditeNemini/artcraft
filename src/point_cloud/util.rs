@@ -1,6 +1,6 @@
-use crate::kinect::k4a_sys_wrapper;
 use crate::point_cloud::pixel_structs::{DepthPixel, BgraPixel};
 use imgui::sys::igColorConvertHSVtoRGB;
+use k4a_sys_temp as k4a_sys;
 
 /// Ranges of values we can expect from the depth sensor, depending on its current configuration.
 pub struct ValueRange {

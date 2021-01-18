@@ -1,8 +1,9 @@
 use anyhow::Result as AnyhowResult;
-use crate::kinect::capture::device_capturer::CaptureProvider;
-use crate::kinect::k4a_sys_wrapper::{ImageFormat, Calibration};
+use crate::azure_kinect::capture::device_capturer::CaptureProvider;
 use crate::point_cloud::debug::capture_proxy::CaptureProxy;
 use crate::point_cloud::debug::image_proxy::ImageProxy;
+use k4a_sys_temp as k4a_sys;
+use kinect::{ImageFormat, Calibration};
 
 pub struct FakeDeviceCaptureProvider {
   num_cameras: usize,

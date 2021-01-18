@@ -1,8 +1,6 @@
 //! Format conversion
 //! k4a frames, image-rs, opencv, OpenGL textures, etc.
 
-use crate::kinect::k4a_sys_wrapper::Image;
-use crate::kinect::k4a_sys_wrapper;
 use crate::point_cloud::pixel_structs::{BgraPixel, DepthPixel};
 use glium::texture::RawImage2d;
 use image::DynamicImage;
@@ -13,7 +11,9 @@ use image::Rgba;
 use image::RgbaImage;
 use image::error::{ImageFormatHint, UnsupportedError};
 use image::flat::{FlatSamples, SampleLayout};
-//use opencv::prelude::*;
+use k4a_sys_temp as k4a_sys;
+use kinect::Image;
+use kinect::ImageFormat;
 use std::mem::size_of;
 use std::slice;
 
@@ -60,7 +60,7 @@ pub fn k4a_image_to_rust_image_for_debug(image: &Image) -> Result<RgbaImage, Ima
   let mut offset = 0;
 
   match image_format {
-    k4a_sys_wrapper::ImageFormat::Depth16 => {
+    ImageFormat::Depth16 => {
       let typed_buffer = image_buffer as *const DepthPixel;
       for y in 0 .. height {
         for x in 0 .. width {
@@ -72,7 +72,7 @@ pub fn k4a_image_to_rust_image_for_debug(image: &Image) -> Result<RgbaImage, Ima
         }
       }
     },
-    k4a_sys_wrapper::ImageFormat::ColorBgra32 => {
+    ImageFormat::ColorBgra32 => {
       let typed_buffer = image_buffer as *const BgraPixel;
       for y in 0 .. height {
         for x in 0 .. width {
@@ -83,7 +83,7 @@ pub fn k4a_image_to_rust_image_for_debug(image: &Image) -> Result<RgbaImage, Ima
         }
       }
     },
-    k4a_sys_wrapper::ImageFormat::Custom => {
+    ImageFormat::Custom => {
       // Stride is image_width * bytes_per_pixel, so we solve for bytes_per_pixel
       let stride = image.get_stride_bytes();
       let image_width = image.get_width_pixels();

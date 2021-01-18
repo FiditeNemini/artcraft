@@ -1,10 +1,10 @@
 use anyhow::Result as AnyhowResult;
+use kinect::Calibration;
 use crate::ProgramArgs;
 use crate::core_types::RgbaF32;
 use crate::gui::enhanced_window::EnhancedWindow;
 use crate::gui::mouse_camera_arcball::MouseCameraArcball;
-use crate::kinect::capture::device_capturer::CaptureProvider;
-use crate::kinect::k4a_sys_wrapper::Calibration;
+use crate::azure_kinect::capture::device_capturer::CaptureProvider;
 use crate::point_cloud::pixel_structs::BgraPixel;
 use crate::point_cloud::point_cloud_visualiser::{ColorizationStrategy, PointCloudVisualizer, PointCloudVisualizerError};
 use crate::point_cloud::viewer_image::ViewerImage;
