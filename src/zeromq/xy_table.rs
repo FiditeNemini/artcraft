@@ -26,10 +26,7 @@ pub fn create_xy_table(calibration: &Calibration) -> AnyhowResult<Image> {
         width as u32 * size_of::<k4a_sys::k4a_float2_t>() as u32,
     )?;
 
-    let typed_buffer = unsafe {
-        let buffer = image.get_buffer();
-        buffer as *mut k4a_sys::k4a_float2_t
-    };
+    let typed_buffer = image.get_buffer() as *mut k4a_sys::k4a_float2_t;
 
     let mut p = k4a_sys::k4a_float2_t {
         xy: k4a_sys::k4a_float2_t__xy {
