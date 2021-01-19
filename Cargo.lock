@@ -1011,9 +1011,9 @@ dependencies = [
 
 [[package]]
 name = "k4a-sys-temp"
-version = "0.2.1"
+version = "0.2.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "6486cebd2ab0f62e6f18a880ae606a0e568d4b72d1c0323a050b1c5c1c663d94"
+checksum = "2eec91eee878aa31ccb81b902102102f29d5b649640a57d4ebb7ce4ce7e891ff"
 dependencies = [
  "bindgen",
 ]
@@ -1042,9 +1042,9 @@ checksum = "e2db585e1d738fc771bf08a151420d3ed193d9d895a36df7f6f8a9456b911ddc"
 
 [[package]]
 name = "kinect"
-version = "0.0.3"
+version = "0.0.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a91a0a6f7c066eccd110a4fdfe03438ff52316a3442e26567637e0337d63f8d0"
+checksum = "a21ff6dd8d49e9bf52cf7702b339a6c19d25c90edd1eea217df280f46e7bcfe5"
 dependencies = [
  "k4a-sys-temp",
 ]
