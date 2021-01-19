@@ -21,13 +21,15 @@ use zmq::{Error, Socket, Context, DONTWAIT};
 const SOCKET_ADDRESS : &'static str = "tcp://127.0.0.1:8888";
 
 const DATA_LENGTH_COMMAND : u32 = 1; // Denotes the command that sends the data length
-const POINT_DATA_PAYLOAD_COMMAND : u32 = 2; // Denotes the command that sends the variable-length data
+const POINT_DATA_BEGIN_PAYLOAD_COMMAND : u32 = 2; // Denotes the command that sends the variable-length data
+const POINT_DATA_CONTINUE_PAYLOAD_COMMAND : u32 = 3; // Denotes the command that sends the variable-length data
 
 enum MessagingState {
   Sending_DataLength,
-  Receiving_DataLengthAck,
-  Sending_PointData,
-  Receiving_PointDataAck,
+  //Receiving_DataLengthAck,
+  Sending_PointDataBegin,
+  //Receiving_PointDataAck,
+  Sending_PointDataContinue,
   GrabPointCloud,
 }
 
@@ -61,31 +63,47 @@ fn main() -> AnyhowResult<()> {
 
   let mut points = get_point_cloud(&device, &xy_table)?;
 
+  let mut packet_number = 0;
+
   loop {
     match messaging_state {
       MessagingState::Sending_DataLength => {
-        println!("Sending data length: {}", points.len());
-        let message = encode_data_length(&points);
+        //println!("Sending DATA LENGTH: {}", points.len());
+        //let message = encode_data_length(&points);
+        //send_message(&socket, &message)?;
+        messaging_state = MessagingState::Sending_PointDataBegin;
+      },
+      MessagingState::Sending_PointDataBegin => {
+        println!("Begin Sending PCD (points: {})", points.len());
+        let message = encode_point_data(&mut points, true);
         send_message(&socket, &message)?;
-        messaging_state = MessagingState::Receiving_DataLengthAck;
+
+        if points.is_empty() {
+          messaging_state = MessagingState::GrabPointCloud;
+        } else {
+          messaging_state = MessagingState::Sending_PointDataContinue;
+        }
+
       },
-      MessagingState::Receiving_DataLengthAck => {
-        //println!("Reading datalength ack");
-        //receive_ack(&socket)?;
-        //println!("ACK READ DONE");
-        messaging_state = MessagingState::Sending_PointData;
-      },
-      MessagingState::Sending_PointData => {
-        println!("Sending PCD (points: {})", points.len());
-        let message = encode_point_data(&points);
+      MessagingState::Sending_PointDataContinue => {
+        if packet_number > 3 {
+          println!("Packet elapsed");
+          packet_number = 0;
+          messaging_state = MessagingState::GrabPointCloud;
+          continue;
+        }
+
+        println!("Continue Sending PCD (points: {})", points.len());
+        let message = encode_point_data(&mut points, false);
         send_message(&socket, &message)?;
-        messaging_state = MessagingState::Receiving_PointDataAck;
-      },
-      MessagingState::Receiving_PointDataAck => {
-        //println!("Reading PCD ack");
-        //receive_ack(&socket)?;
-        //println!("ACK READ DONE");
-        messaging_state = MessagingState::GrabPointCloud;
+
+        if points.is_empty() {
+          messaging_state = MessagingState::GrabPointCloud;
+        } else {
+          messaging_state = MessagingState::Sending_PointDataContinue;
+        }
+
+        packet_number += 1;
       },
       MessagingState::GrabPointCloud => {
         println!("Grabbing another frame...");
@@ -107,8 +125,6 @@ fn get_point_cloud(device: &Device, xy_table: &Image) -> AnyhowResult<Vec<Point>
 
   let mut points = calculate_point_cloud2(&depth_image, &xy_table)?;
 
-  points.truncate(3000);
-
   Ok(points)
 }
 
@@ -120,15 +136,33 @@ fn encode_data_length(points: &Vec<Point>) -> Vec<u8> {
   buf
 }
 
-/// Returns the variable length point data payload.
-fn encode_point_data(points: &Vec<Point>) -> Vec<u8> {
-  let point_bytes = 32 * points.len();
+/// Returns a variable length point data payload.
+fn encode_point_data(points: &mut Vec<Point>, is_beginning: bool) -> Vec<u8> {
+  //let point_bytes = 32 * points.len();
+  let SEND_POINTS = 3000;
+  let point_bytes = 32 * SEND_POINTS;
+
   let mut buf = Vec::with_capacity(4 + point_bytes);
-  buf.write_u32::<LittleEndian>(POINT_DATA_PAYLOAD_COMMAND);
-  for point in points {
+
+  if is_beginning {
+    buf.write_u32::<LittleEndian>(POINT_DATA_BEGIN_PAYLOAD_COMMAND); // COMMAND #
+  } else {
+    buf.write_u32::<LittleEndian>(POINT_DATA_CONTINUE_PAYLOAD_COMMAND); // COMMAND #
+  }
+
+  let subset = if points.len() > SEND_POINTS {
+    points.drain(0..SEND_POINTS).collect::<Vec<Point>>()
+  } else {
+    points.drain(0..points.len()).collect::<Vec<Point>>()
+  };
+
+  buf.write_u32::<LittleEndian>(subset.len() as u32); // LENGTH
+
+  for point in subset {
     let bytes = point.to_bytes();
     buf.write_all(&bytes);
   }
+
   buf
 }
 
