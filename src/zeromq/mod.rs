@@ -1,2 +1,4 @@
 pub mod calculate_point_cloud;
+pub mod color;
+pub mod point;
 pub mod xy_table;
