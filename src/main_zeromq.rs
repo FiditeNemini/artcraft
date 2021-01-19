@@ -86,7 +86,7 @@ fn main() -> AnyhowResult<()> {
 
       },
       MessagingState::Sending_PointDataContinue => {
-        if packet_number > 3 {
+        if packet_number > 10 {
           println!("Packet elapsed");
           packet_number = 0;
           messaging_state = MessagingState::GrabPointCloud;
