@@ -48,8 +48,8 @@ fn main() -> AnyhowResult<()> {
 
   let context = zmq::Context::new();
 
-  //let socket = ctx.socket(zmq::PUSH).unwrap();
-  let mut socket = context.socket(zmq::REQ).unwrap();
+  let mut socket = context.socket(zmq::PUSH).unwrap();
+  //let mut socket = context.socket(zmq::REQ).unwrap();
 
   //socket.bind(SOCKET_ADDRESS).unwrap();
   socket.connect(SOCKET_ADDRESS).unwrap();
@@ -70,9 +70,9 @@ fn main() -> AnyhowResult<()> {
         messaging_state = MessagingState::Receiving_DataLengthAck;
       },
       MessagingState::Receiving_DataLengthAck => {
-        println!("Reading datalength ack");
-        receive_ack(&socket)?;
-        println!("ACK READ DONE");
+        //println!("Reading datalength ack");
+        //receive_ack(&socket)?;
+        //println!("ACK READ DONE");
         messaging_state = MessagingState::Sending_PointData;
       },
       MessagingState::Sending_PointData => {
@@ -82,9 +82,9 @@ fn main() -> AnyhowResult<()> {
         messaging_state = MessagingState::Receiving_PointDataAck;
       },
       MessagingState::Receiving_PointDataAck => {
-        println!("Reading PCD ack");
-        receive_ack(&socket)?;
-        println!("ACK READ DONE");
+        //println!("Reading PCD ack");
+        //receive_ack(&socket)?;
+        //println!("ACK READ DONE");
         messaging_state = MessagingState::GrabPointCloud;
       },
       MessagingState::GrabPointCloud => {
