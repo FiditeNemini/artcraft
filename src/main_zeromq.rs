@@ -4,7 +4,7 @@ mod zeromq;
 
 use anyhow::Result as AnyhowResult;
 use anyhow::anyhow;
-use byteorder::{WriteBytesExt, LittleEndian};
+use byteorder::{WriteBytesExt, LittleEndian, BigEndian};
 use k4a_sys_temp as k4a_sys;
 use kinect::{Device, DeviceConfiguration, Image};
 use std::io::Write;
@@ -20,8 +20,8 @@ use zmq::{Error, Socket, Context, DONTWAIT};
 
 const SOCKET_ADDRESS : &'static str = "tcp://127.0.0.1:8888";
 
-const DATA_LENGTH_COMMAND : u8 = 1; // Denotes the command that sends the data length
-const POINT_DATA_PAYLOAD_COMMAND : u8 = 2; // Denotes the command that sends the variable-length data
+const DATA_LENGTH_COMMAND : u32 = 1; // Denotes the command that sends the data length
+const POINT_DATA_PAYLOAD_COMMAND : u32 = 2; // Denotes the command that sends the variable-length data
 
 enum MessagingState {
   Sending_DataLength,
@@ -64,24 +64,31 @@ fn main() -> AnyhowResult<()> {
   loop {
     match messaging_state {
       MessagingState::Sending_DataLength => {
+        println!("Sending data length: {}", points.len());
         let message = encode_data_length(&points);
         send_message(&socket, &message)?;
         messaging_state = MessagingState::Receiving_DataLengthAck;
       },
       MessagingState::Receiving_DataLengthAck => {
+        println!("Reading datalength ack");
         receive_ack(&socket)?;
+        println!("ACK READ DONE");
         messaging_state = MessagingState::Sending_PointData;
       },
       MessagingState::Sending_PointData => {
+        println!("Sending PCD (points: {})", points.len());
         let message = encode_point_data(&points);
         send_message(&socket, &message)?;
         messaging_state = MessagingState::Receiving_PointDataAck;
       },
       MessagingState::Receiving_PointDataAck => {
+        println!("Reading PCD ack");
         receive_ack(&socket)?;
+        println!("ACK READ DONE");
         messaging_state = MessagingState::GrabPointCloud;
       },
       MessagingState::GrabPointCloud => {
+        println!("Grabbing another frame...");
         points = get_point_cloud(&device, &xy_table)?;
         messaging_state = MessagingState::Sending_DataLength;
         continue;
@@ -98,14 +105,17 @@ fn get_point_cloud(device: &Device, xy_table: &Image) -> AnyhowResult<Vec<Point>
   let depth_image = capture.get_depth_image()
       .ok_or(anyhow!("capture not present"))?;
 
-  let points = calculate_point_cloud2(&depth_image, &xy_table)?;
+  let mut points = calculate_point_cloud2(&depth_image, &xy_table)?;
+
+  points.truncate(10);
+
   Ok(points)
 }
 
-/// Returns the five byte data length command.
+/// Returns the fixed size data length command.
 fn encode_data_length(points: &Vec<Point>) -> Vec<u8> {
-  let mut buf = Vec::with_capacity(5);
-  buf.write_u8(DATA_LENGTH_COMMAND);
+  let mut buf = Vec::with_capacity(8);
+  buf.write_u32::<LittleEndian>(DATA_LENGTH_COMMAND);
   buf.write_u32::<LittleEndian>(points.len() as u32);
   buf
 }
@@ -113,8 +123,8 @@ fn encode_data_length(points: &Vec<Point>) -> Vec<u8> {
 /// Returns the variable length point data payload.
 fn encode_point_data(points: &Vec<Point>) -> Vec<u8> {
   let point_bytes = 32 * points.len();
-  let mut buf = Vec::with_capacity(1 + point_bytes);
-  buf.write_u8(POINT_DATA_PAYLOAD_COMMAND);
+  let mut buf = Vec::with_capacity(4 + point_bytes);
+  buf.write_u32::<LittleEndian>(POINT_DATA_PAYLOAD_COMMAND);
   for point in points {
     let bytes = point.to_bytes();
     buf.write_all(&bytes);
