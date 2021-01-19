@@ -2,37 +2,141 @@
 
 mod zeromq;
 
+use anyhow::Result as AnyhowResult;
+use anyhow::anyhow;
+use byteorder::{WriteBytesExt, LittleEndian};
+use k4a_sys_temp as k4a_sys;
+use kinect::{Device, DeviceConfiguration, Image};
+use std::io::Write;
 use std::thread;
 use std::time::{Duration, SystemTime, UNIX_EPOCH};
+use zeromq::calculate_point_cloud::PointCloudResult;
+use zeromq::calculate_point_cloud::calculate_point_cloud2;
+use zeromq::calculate_point_cloud::calculate_point_cloud;
 use zeromq::color::Color;
 use zeromq::point::Point;
+use zeromq::xy_table::create_xy_table;
 use zmq::{Error, Socket, Context, DONTWAIT};
-
-use anyhow::Result as AnyhowResult;
 
 const SOCKET_ADDRESS : &'static str = "tcp://127.0.0.1:8888";
 
+const DATA_LENGTH_COMMAND : u8 = 1; // Denotes the command that sends the data length
+const POINT_DATA_PAYLOAD_COMMAND : u8 = 2; // Denotes the command that sends the variable-length data
+
 enum MessagingState {
-  Sending,
-  Receiving,
+  Sending_DataLength,
+  Receiving_DataLengthAck,
+  Sending_PointData,
+  Receiving_PointDataAck,
+  GrabPointCloud,
 }
 
-fn main() {
+fn main() -> AnyhowResult<()> {
+  let device = Device::open(0)?;
+
+  let mut config = DeviceConfiguration::init_disable_all();
+  config.0.depth_mode = k4a_sys::k4a_depth_mode_t_K4A_DEPTH_MODE_WFOV_2X2BINNED;
+  config.0.camera_fps = k4a_sys::k4a_fps_t_K4A_FRAMES_PER_SECOND_30;
+
+  let calibration = device.get_calibration(config.0.depth_mode, config.0.color_resolution)?;
+
+  let xy_table = create_xy_table(&calibration)?;
+
+  device.start_cameras(&config)?;
+
+  // ===============================================================
+
   let context = zmq::Context::new();
 
   //let socket = ctx.socket(zmq::PUSH).unwrap();
   let mut socket = context.socket(zmq::REQ).unwrap();
 
-  //socket.connect("tcp://127.0.0.1:5555").unwrap();
-  //socket.bind("tcp://127.0.0.1:5555").unwrap();
+  //socket.bind(SOCKET_ADDRESS).unwrap();
   socket.connect(SOCKET_ADDRESS).unwrap();
 
-  let mut reconnect =  false;
+  let mut reconnect = false;
   let mut fail_count = 0;
-  let mut messaging_state = MessagingState::Sending;
+  let mut messaging_state = MessagingState::Sending_DataLength;
   let mut color = Color::Blue;
 
+  let mut points = get_point_cloud(&device, &xy_table)?;
+
   loop {
+    match messaging_state {
+      MessagingState::Sending_DataLength => {
+        let message = encode_data_length(&points);
+        send_message(&socket, &message)?;
+        messaging_state = MessagingState::Receiving_DataLengthAck;
+      },
+      MessagingState::Receiving_DataLengthAck => {
+        receive_ack(&socket)?;
+        messaging_state = MessagingState::Sending_PointData;
+      },
+      MessagingState::Sending_PointData => {
+        let message = encode_point_data(&points);
+        send_message(&socket, &message)?;
+        messaging_state = MessagingState::Receiving_PointDataAck;
+      },
+      MessagingState::Receiving_PointDataAck => {
+        receive_ack(&socket)?;
+        messaging_state = MessagingState::GrabPointCloud;
+      },
+      MessagingState::GrabPointCloud => {
+        points = get_point_cloud(&device, &xy_table)?;
+        messaging_state = MessagingState::Sending_DataLength;
+        continue;
+      },
+    }
+  }
+
+  Ok(())
+}
+
+fn get_point_cloud(device: &Device, xy_table: &Image) -> AnyhowResult<Vec<Point>> {
+  let capture = device.get_capture(500)?;
+
+  let depth_image = capture.get_depth_image()
+      .ok_or(anyhow!("capture not present"))?;
+
+  let points = calculate_point_cloud2(&depth_image, &xy_table)?;
+  Ok(points)
+}
+
+/// Returns the five byte data length command.
+fn encode_data_length(points: &Vec<Point>) -> Vec<u8> {
+  let mut buf = Vec::with_capacity(5);
+  buf.write_u8(DATA_LENGTH_COMMAND);
+  buf.write_u32::<LittleEndian>(points.len() as u32);
+  buf
+}
+
+/// Returns the variable length point data payload.
+fn encode_point_data(points: &Vec<Point>) -> Vec<u8> {
+  let point_bytes = 32 * points.len();
+  let mut buf = Vec::with_capacity(1 + point_bytes);
+  buf.write_u8(POINT_DATA_PAYLOAD_COMMAND);
+  for point in points {
+    let bytes = point.to_bytes();
+    buf.write_all(&bytes);
+  }
+  buf
+}
+
+/// Send data over the socket
+fn send_message(socket: &Socket, data_bytes: &Vec<u8>) -> AnyhowResult<()> {
+  socket.send(&data_bytes, 0)?;
+  Ok(())
+}
+
+/// Receive ack from server
+fn receive_ack(socket: &Socket) -> AnyhowResult<()> {
+  let _result = socket.recv_bytes(DONTWAIT)?;
+  Ok(())
+}
+
+
+
+/*
     let color = get_color();
     let point = Point::at_random_range(-1000.0f32, 1000.0f32, color);
     let bytes = point.to_bytes();
@@ -88,8 +192,7 @@ fn main() {
       fail_count = 0;
       //thread::sleep(Duration::from_millis(2000));
     }
-  }
-}
+*/
 
 fn reconnect_socket(context: &Context, socket: Socket, address: &str) -> Socket {
   //println!("[reconnect] Creating new socket...");
