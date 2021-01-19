@@ -107,7 +107,7 @@ fn get_point_cloud(device: &Device, xy_table: &Image) -> AnyhowResult<Vec<Point>
 
   let mut points = calculate_point_cloud2(&depth_image, &xy_table)?;
 
-  points.truncate(10);
+  points.truncate(3000);
 
   Ok(points)
 }
