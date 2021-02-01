@@ -4,6 +4,7 @@ use crate::zeromq::color::Color;
 use rand::Rng;
 use rand::distributions::Uniform;
 
+#[derive(Debug)]
 pub struct Point {
   pub x: f32,
   pub y: f32,

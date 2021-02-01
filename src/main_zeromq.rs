@@ -17,6 +17,7 @@ use zeromq::color::Color;
 use zeromq::point::Point;
 use zeromq::xy_table::create_xy_table;
 use zmq::{Error, Socket, Context, DONTWAIT};
+use cgmath::num_traits::Float;
 
 const SOCKET_ADDRESS : &'static str = "tcp://127.0.0.1:8888";
 
@@ -62,6 +63,11 @@ fn main() -> AnyhowResult<()> {
   let mut color = Color::Blue;
 
   let mut points = get_point_cloud(&device, &xy_table)?;
+  if !points.is_empty() {
+    //print_pointcloud_maxima(&points);
+  } else {
+    println!("> No points?");
+  }
 
   let mut packet_number = 0;
 
@@ -74,7 +80,7 @@ fn main() -> AnyhowResult<()> {
         messaging_state = MessagingState::Sending_PointDataBegin;
       },
       MessagingState::Sending_PointDataBegin => {
-        println!("Begin Sending PCD (points: {})", points.len());
+        //println!("Begin Sending PCD (points: {})", points.len());
         let message = encode_point_data(&mut points, true);
         send_message(&socket, &message)?;
 
@@ -87,13 +93,13 @@ fn main() -> AnyhowResult<()> {
       },
       MessagingState::Sending_PointDataContinue => {
         if packet_number > 20 {
-          println!("Packet elapsed");
+          //println!("Packet elapsed");
           packet_number = 0;
           messaging_state = MessagingState::GrabPointCloud;
           continue;
         }
 
-        println!("Continue Sending PCD (points: {})", points.len());
+        //println!("Continue Sending PCD (points: {})", points.len());
         let message = encode_point_data(&mut points, false);
         send_message(&socket, &message)?;
 
@@ -108,6 +114,12 @@ fn main() -> AnyhowResult<()> {
       MessagingState::GrabPointCloud => {
         println!("Grabbing another frame...");
         points = get_point_cloud(&device, &xy_table)?;
+
+        if !points.is_empty() {
+          //print_pointcloud_maxima(&points);
+        } else {
+          println!("No points?");
+        }
         messaging_state = MessagingState::Sending_DataLength;
         continue;
       },
@@ -176,6 +188,40 @@ fn send_message(socket: &Socket, data_bytes: &Vec<u8>) -> AnyhowResult<()> {
 fn receive_ack(socket: &Socket) -> AnyhowResult<()> {
   let _result = socket.recv_bytes(DONTWAIT)?;
   Ok(())
+}
+
+fn print_pointcloud_maxima(points: &Vec<Point>) {
+  let mut max_x = f32::min_value();
+  let mut min_x = f32::max_value();
+  let mut max_y = f32::min_value();
+  let mut min_y = f32::max_value();
+  let mut max_z = f32::min_value();
+  let mut min_z = f32::max_value();
+
+  for pt in points.iter() {
+    if pt.x < min_x {
+      min_x = pt.x;
+    }
+    if pt.x > max_x {
+      max_x = pt.x;
+    }
+    if pt.y < min_y {
+      min_y = pt.y;
+    }
+    if pt.y > max_y {
+      max_y = pt.y;
+    }
+    if pt.z < min_z {
+      min_z = pt.z;
+    }
+    if pt.z > max_z {
+      max_z = pt.z;
+    }
+  }
+
+  // minmax x : -2612.5303, 4902.1655 | y: -3491.938, 1000.92487 | z: 163, 5494
+  // minmax x : -2615.739, 4918.527 | y: -3507.2483, 1007.1275 | z: 163, 5518
+  println!("minmax x : {}, {} | y: {}, {} | z: {}, {}", min_x, max_x, min_y, max_y, min_z, max_z);
 }
 
 

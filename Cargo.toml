@@ -14,7 +14,7 @@ name = "cloudcam_points"
 path = "src/main_points.rs"
 
 [[bin]]
-name = "cloudcam"
+name = "cloudcam_zeromq"
 path = "src/main_zeromq.rs"
 
 [dependencies]
