@@ -5,6 +5,9 @@ pub enum Color {
   Red,
   Green,
   Blue,
+  Yellow, // Red + Green
+  Teal, // Green + Blue
+  Purple, // Red + Blue
   Custom { r: u8, g: u8, b: u8, a: u8 },
 }
 
@@ -16,6 +19,9 @@ impl Color {
       Color::Red => 255,
       Color::Green => 0,
       Color::Blue => 0,
+      Color::Yellow => 255,
+      Color::Teal => 0,
+      Color::Purple => 255,
       Color::Custom {r, g, b, a} => *r,
     }
   }
@@ -27,6 +33,9 @@ impl Color {
       Color::Red => 0,
       Color::Green => 255,
       Color::Blue => 0,
+      Color::Yellow => 255,
+      Color::Teal => 255,
+      Color::Purple => 0,
       Color::Custom {r, g, b, a} => *g,
     }
   }
@@ -38,6 +47,9 @@ impl Color {
       Color::Red => 0,
       Color::Green => 0,
       Color::Blue => 255,
+      Color::Yellow => 0,
+      Color::Teal => 255,
+      Color::Purple => 255,
       Color::Custom {r, g, b, a} => *b,
     }
   }
@@ -49,6 +61,9 @@ impl Color {
       Color::Red => 255,
       Color::Green => 255,
       Color::Blue => 255,
+      Color::Yellow => 255,
+      Color::Teal => 255,
+      Color::Purple => 255,
       Color::Custom {r, g, b, a} => *a,
     }
   }
