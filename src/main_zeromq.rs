@@ -12,7 +12,6 @@ use std::thread;
 use std::time::{Duration, SystemTime, UNIX_EPOCH};
 use zeromq::calculate_point_cloud::PointCloudResult;
 use zeromq::calculate_point_cloud::calculate_point_cloud2;
-use zeromq::calculate_point_cloud::calculate_point_cloud;
 use zeromq::color::Color;
 use zeromq::color::get_time_based_color;
 use zeromq::point::Point;
@@ -24,6 +23,10 @@ const SOCKET_ADDRESS : &'static str = "tcp://127.0.0.1:8888";
 const DATA_LENGTH_COMMAND : u32 = 1; // Denotes the command that sends the data length
 const POINT_DATA_BEGIN_PAYLOAD_COMMAND : u32 = 2; // Denotes the command that sends the variable-length data
 const POINT_DATA_CONTINUE_PAYLOAD_COMMAND : u32 = 3; // Denotes the command that sends the variable-length data
+
+/// The maximum number of points to send per ZeroMQ "packet".
+/// This is also defined in C++, so it needs to be adjusted in multiple places.
+const MAX_SEND_POINTS_PER_PACKET : usize = 3000;
 
 enum MessagingState {
   Sending_DataLength,
@@ -57,8 +60,6 @@ fn main() -> AnyhowResult<()> {
   //socket.bind(SOCKET_ADDRESS).unwrap();
   socket.connect(SOCKET_ADDRESS).unwrap();
 
-  let mut reconnect = false;
-  let mut fail_count = 0;
   let mut messaging_state = MessagingState::Sending_DataLength;
   let mut color = get_time_based_color();
 
@@ -94,8 +95,8 @@ fn main() -> AnyhowResult<()> {
       },
       MessagingState::Sending_PointDataContinue => {
         // NB: Unfortunately the C++ program has difficulty with all points.
-        if packet_number > 20 {
-          //println!("Packet elapsed");
+        if packet_number > 2000000 {
+          println!("Packet elapsed");
           packet_number = 0;
           messaging_state = MessagingState::GrabPointCloud;
           continue;
@@ -141,6 +142,8 @@ fn get_point_cloud(device: &Device, xy_table: &Image, color: Color) -> AnyhowRes
   let mut points =
       calculate_point_cloud2(&depth_image, &xy_table, color)?;
 
+  println!("Points: {}", points.len());
+
   Ok(points)
 }
 
@@ -154,19 +157,20 @@ fn encode_data_length(points: &Vec<Point>) -> Vec<u8> {
 
 /// Returns a variable length point data payload.
 fn encode_point_data(points: &mut Vec<Point>, is_beginning: bool) -> Vec<u8> {
-  let SEND_POINTS = 3000;
-  let point_bytes = Point::size_bytes() * SEND_POINTS;
+  let point_bytes = Point::size_bytes() * MAX_SEND_POINTS_PER_PACKET;
 
   let mut buf = Vec::with_capacity(4 + point_bytes);
 
   if is_beginning {
+    println!("begin");
     buf.write_u32::<LittleEndian>(POINT_DATA_BEGIN_PAYLOAD_COMMAND); // COMMAND #
   } else {
+    println!("continue");
     buf.write_u32::<LittleEndian>(POINT_DATA_CONTINUE_PAYLOAD_COMMAND); // COMMAND #
   }
 
-  let subset = if points.len() > SEND_POINTS {
-    points.drain(0..SEND_POINTS).collect::<Vec<Point>>()
+  let subset = if points.len() > MAX_SEND_POINTS_PER_PACKET {
+    points.drain(0..MAX_SEND_POINTS_PER_PACKET).collect::<Vec<Point>>()
   } else {
     points.drain(0..points.len()).collect::<Vec<Point>>()
   };
@@ -192,66 +196,6 @@ fn receive_ack(socket: &Socket) -> AnyhowResult<()> {
   let _result = socket.recv_bytes(DONTWAIT)?;
   Ok(())
 }
-
-
-
-/*
-    let color = get_color();
-    let point = Point::at_random_range(-1000.0f32, 1000.0f32, color);
-    let bytes = point.to_bytes();
-    //println!("Point : {}", point.debug_string());
-
-    if reconnect {
-      socket = reconnect_socket(&context, socket, SOCKET_ADDRESS);
-      reconnect = false;
-      messaging_state = MessagingState::Sending;
-    }
-
-    match messaging_state {
-      MessagingState::Sending => {
-        //println!("Sending request...");
-        //let result = socket.send("hello world!", 0);
-        let result = socket.send(&bytes, 0);
-
-        match result {
-          Ok(_) => {
-            //println!("Sent!");
-            //thread::sleep(Duration::from_millis(250));
-            messaging_state = MessagingState::Receiving;
-          },
-          Err(e) => {
-            //eprintln!("Send Error ({}): {:?}", e.to_raw(), e);
-            //thread::sleep(Duration::from_millis(250));
-            fail_count += 1;
-          },
-        }
-
-      },
-      MessagingState::Receiving => {
-        //println!("Awaiting response...");
-        let result = socket.recv_bytes(DONTWAIT);
-
-        match result {
-          Ok(_) => {
-            //println!("Response received!");
-            messaging_state = MessagingState::Sending;
-          },
-          Err(e) => {
-            //eprintln!("Recv Error ({}): {:?}", e.to_raw(), e);
-            //thread::sleep(Duration::from_millis(250));
-            fail_count += 1;
-          },
-        }
-
-      },
-    }
-
-    if fail_count > 5 {
-      reconnect = true;
-      fail_count = 0;
-      //thread::sleep(Duration::from_millis(2000));
-    }
-*/
 
 fn reconnect_socket(context: &Context, socket: Socket, address: &str) -> Socket {
   //println!("[reconnect] Creating new socket...");
@@ -279,4 +223,3 @@ fn reconnect_socket(context: &Context, socket: Socket, address: &str) -> Socket 
 
   return socket;
 }
-
