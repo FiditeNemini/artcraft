@@ -14,10 +14,10 @@ use zeromq::calculate_point_cloud::PointCloudResult;
 use zeromq::calculate_point_cloud::calculate_point_cloud2;
 use zeromq::calculate_point_cloud::calculate_point_cloud;
 use zeromq::color::Color;
+use zeromq::color::get_time_based_color;
 use zeromq::point::Point;
 use zeromq::xy_table::create_xy_table;
 use zmq::{Error, Socket, Context, DONTWAIT};
-use cgmath::num_traits::Float;
 
 const SOCKET_ADDRESS : &'static str = "tcp://127.0.0.1:8888";
 
@@ -60,9 +60,10 @@ fn main() -> AnyhowResult<()> {
   let mut reconnect = false;
   let mut fail_count = 0;
   let mut messaging_state = MessagingState::Sending_DataLength;
-  let mut color = Color::Blue;
+  let mut color = get_time_based_color();
 
-  let mut points = get_point_cloud(&device, &xy_table)?;
+  let mut points = get_point_cloud(&device, &xy_table, color)?;
+
   if !points.is_empty() {
     //print_pointcloud_maxima(&points);
   } else {
@@ -114,7 +115,8 @@ fn main() -> AnyhowResult<()> {
       },
       MessagingState::GrabPointCloud => {
         println!("Grabbing another frame...");
-        points = get_point_cloud(&device, &xy_table)?;
+        color = get_time_based_color();
+        points = get_point_cloud(&device, &xy_table, color)?;
 
         if !points.is_empty() {
           //print_pointcloud_maxima(&points);
@@ -130,13 +132,14 @@ fn main() -> AnyhowResult<()> {
   Ok(())
 }
 
-fn get_point_cloud(device: &Device, xy_table: &Image) -> AnyhowResult<Vec<Point>> {
+fn get_point_cloud(device: &Device, xy_table: &Image, color: Color) -> AnyhowResult<Vec<Point>> {
   let capture = device.get_capture(500)?;
 
   let depth_image = capture.get_depth_image()
       .ok_or(anyhow!("capture not present"))?;
 
-  let mut points = calculate_point_cloud2(&depth_image, &xy_table)?;
+  let mut points =
+      calculate_point_cloud2(&depth_image, &xy_table, color)?;
 
   Ok(points)
 }
@@ -188,40 +191,6 @@ fn send_message(socket: &Socket, data_bytes: &Vec<u8>) -> AnyhowResult<()> {
 fn receive_ack(socket: &Socket) -> AnyhowResult<()> {
   let _result = socket.recv_bytes(DONTWAIT)?;
   Ok(())
-}
-
-fn print_pointcloud_maxima(points: &Vec<Point>) {
-  let mut max_x = f32::min_value();
-  let mut min_x = f32::max_value();
-  let mut max_y = f32::min_value();
-  let mut min_y = f32::max_value();
-  let mut max_z = f32::min_value();
-  let mut min_z = f32::max_value();
-
-  for pt in points.iter() {
-    if pt.x < min_x {
-      min_x = pt.x;
-    }
-    if pt.x > max_x {
-      max_x = pt.x;
-    }
-    if pt.y < min_y {
-      min_y = pt.y;
-    }
-    if pt.y > max_y {
-      max_y = pt.y;
-    }
-    if pt.z < min_z {
-      min_z = pt.z;
-    }
-    if pt.z > max_z {
-      max_z = pt.z;
-    }
-  }
-
-  // minmax x : -2612.5303, 4902.1655 | y: -3491.938, 1000.92487 | z: 163, 5494
-  // minmax x : -2615.739, 4918.527 | y: -3507.2483, 1007.1275 | z: 163, 5518
-  println!("minmax x : {}, {} | y: {}, {} | z: {}, {}", min_x, max_x, min_y, max_y, min_z, max_z);
 }
 
 
@@ -311,20 +280,3 @@ fn reconnect_socket(context: &Context, socket: Socket, address: &str) -> Socket 
   return socket;
 }
 
-fn get_color() -> Color {
-  let start = SystemTime::now();
-  let timestamp = start
-      .duration_since(UNIX_EPOCH)
-      .expect("Time should work.");
-
-  let seconds = timestamp.as_secs();
-
-  match seconds % 10 {
-    0 | 1 => Color::Black,
-    2 | 3 => Color::Blue,
-    4 | 5 => Color::Red,
-    6 | 7 => Color::Green,
-    8 | 9 => Color::White,
-    _ => Color::White,
-  }
-}

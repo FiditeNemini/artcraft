@@ -56,7 +56,7 @@ pub fn calculate_point_cloud(depth_image: &Image, xy_table_image: &Image) -> Any
 }
 
 // Directly return as a vector.
-pub fn calculate_point_cloud2(depth_image: &Image, xy_table_image: &Image) -> AnyhowResult<Vec<Point>> {
+pub fn calculate_point_cloud2(depth_image: &Image, xy_table_image: &Image, color: Color) -> AnyhowResult<Vec<Point>> {
     let width = depth_image.get_width_pixels();
     let height = depth_image.get_height_pixels();
 
@@ -75,7 +75,7 @@ pub fn calculate_point_cloud2(depth_image: &Image, xy_table_image: &Image) -> An
                 let x = (*xy_table_data.offset(i)).xy.x * ((*depth_data.offset(i)) as f32);
                 let y = (*xy_table_data.offset(i)).xy.y * ((*depth_data.offset(i)) as f32);
                 let z = (*depth_data.offset(i)) as f32;
-                points.push(Point::at(x, y, z, Color::Yellow));
+                points.push(Point::at(x, y, z, color));
             }
         }
     }

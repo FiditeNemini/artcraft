@@ -1,3 +1,5 @@
+use std::time::{UNIX_EPOCH, SystemTime};
+
 #[derive(Copy, Clone, Debug)]
 pub enum Color {
   Black,
@@ -66,5 +68,24 @@ impl Color {
       Color::Purple => 255,
       Color::Custom {r, g, b, a} => *a,
     }
+  }
+}
+
+/// Fun function to retrieve a color based on the time.
+pub fn get_time_based_color() -> Color {
+  let start = SystemTime::now();
+  let timestamp = start
+      .duration_since(UNIX_EPOCH)
+      .expect("Time should work.");
+
+  let seconds = timestamp.as_secs();
+
+  match seconds % 10 {
+    0 | 1 => Color::Purple, //Color::Black,
+    2 | 3 => Color::Blue,
+    4 | 5 => Color::Red,
+    6 | 7 => Color::Green,
+    8 | 9 => Color::White,
+    _ => Color::White,
   }
 }
