@@ -6,28 +6,32 @@ use rand::distributions::Uniform;
 
 #[derive(Debug)]
 pub struct Point {
+  // Position
   pub x: f32,
   pub y: f32,
   pub z: f32,
-  _unused: f32,
-  pub r: f32,
-  pub g: f32,
-  pub b: f32,
-  pub a: f32,
+  // Color
+  pub r: u8,
+  pub g: u8,
+  pub b: u8,
+  pub a: u8,
 }
 
 impl Point {
+
+  pub fn size_bytes() -> usize {
+    16 // 3xf32, 4xu8
+  }
 
   pub fn at(x: f32, y: f32, z: f32, color: Color) -> Self {
     Point {
       x,
       y,
       z,
-      _unused: 0.0f32,
-      r: color.get_f32_r(),
-      g: color.get_f32_g(),
-      b: color.get_f32_b(),
-      a: 1.0f32,
+      r: color.get_u8_r(),
+      g: color.get_u8_g(),
+      b: color.get_u8_b(),
+      a: color.get_u8_a(),
     }
   }
 
@@ -43,25 +47,22 @@ impl Point {
       x,
       y,
       z,
-      _unused: 0.0f32,
-      r: color.get_f32_r(),
-      g: color.get_f32_g(),
-      b: color.get_f32_b(),
-      a: 1.0f32,
+      r: color.get_u8_r(),
+      g: color.get_u8_g(),
+      b: color.get_u8_b(),
+      a: color.get_u8_a(),
     }
   }
-
 
   pub fn to_bytes(&self) -> Vec<u8> {
     let mut buf = Vec::with_capacity(32);
     buf.write_f32::<LittleEndian>(self.x);
     buf.write_f32::<LittleEndian>(self.y);
     buf.write_f32::<LittleEndian>(self.z);
-    buf.write_f32::<LittleEndian>(0.0f32);
-    buf.write_f32::<LittleEndian>(self.r);
-    buf.write_f32::<LittleEndian>(self.g);
-    buf.write_f32::<LittleEndian>(self.b);
-    buf.write_f32::<LittleEndian>(self.a);
+    buf.write_u8(self.r);
+    buf.write_u8(self.g);
+    buf.write_u8(self.b);
+    buf.write_u8(self.a);
     buf
   }
 

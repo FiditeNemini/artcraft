@@ -151,9 +151,8 @@ fn encode_data_length(points: &Vec<Point>) -> Vec<u8> {
 
 /// Returns a variable length point data payload.
 fn encode_point_data(points: &mut Vec<Point>, is_beginning: bool) -> Vec<u8> {
-  //let point_bytes = 32 * points.len();
   let SEND_POINTS = 3000;
-  let point_bytes = 32 * SEND_POINTS;
+  let point_bytes = Point::size_bytes() * SEND_POINTS;
 
   let mut buf = Vec::with_capacity(4 + point_bytes);
 
