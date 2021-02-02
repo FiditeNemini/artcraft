@@ -75,7 +75,7 @@ pub fn calculate_point_cloud2(depth_image: &Image, xy_table_image: &Image) -> An
                 let x = (*xy_table_data.offset(i)).xy.x * ((*depth_data.offset(i)) as f32);
                 let y = (*xy_table_data.offset(i)).xy.y * ((*depth_data.offset(i)) as f32);
                 let z = (*depth_data.offset(i)) as f32;
-                points.push(Point::at(x, y, z, Color::Blue));
+                points.push(Point::at(x, y, z, Color::White));
             }
         }
     }

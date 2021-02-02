@@ -1,7 +1,19 @@
-Storyteller
-===========
+Cloudcam (WIP)
+==============
 
-A startup, by Brandon Thomas.
+This is a Rust server that polls Kinect camera(s) and sends
+streaming point clouds to Unreal Engine or some other consumer.
+
+Right now the implementation is incredibly naive, but in the
+future we may be able to implement compression, keyframes, and
+other advanced features.
+
+This was forked from my original "rust-experiments" repo, so it
+has a lot of dead code that needs to be culled. Once this is ready
+it will simply be code that interfaces with Kinect and talks to
+consumers.
+
+The binary of interest is `main_zeromq.rs` (`cloudcam_zeromq`).
 
 Installation / Requirements
 ---------------------------

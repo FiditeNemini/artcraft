@@ -92,6 +92,7 @@ fn main() -> AnyhowResult<()> {
 
       },
       MessagingState::Sending_PointDataContinue => {
+        // NB: Unfortunately the C++ program has difficulty with all points.
         if packet_number > 20 {
           //println!("Packet elapsed");
           packet_number = 0;
