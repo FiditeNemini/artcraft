@@ -115,7 +115,7 @@ fn main() -> AnyhowResult<()> {
         packet_number += 1;
       },
       MessagingState::GrabPointCloud => {
-        println!("Grabbing another frame...");
+        //println!("Grabbing another frame...");
         color = get_time_based_color();
         points = get_point_cloud(&device, &xy_table, color)?;
 
@@ -142,7 +142,7 @@ fn get_point_cloud(device: &Device, xy_table: &Image, color: Color) -> AnyhowRes
   let mut points =
       calculate_point_cloud2(&depth_image, &xy_table, color)?;
 
-  println!("Points: {}", points.len());
+  //println!("Points: {}", points.len());
 
   Ok(points)
 }
@@ -162,10 +162,10 @@ fn encode_point_data(points: &mut Vec<Point>, is_beginning: bool) -> Vec<u8> {
   let mut buf = Vec::with_capacity(4 + point_bytes);
 
   if is_beginning {
-    println!("begin");
+    //println!("begin");
     buf.write_u32::<LittleEndian>(POINT_DATA_BEGIN_PAYLOAD_COMMAND); // COMMAND #
   } else {
-    println!("continue");
+    //println!("continue");
     buf.write_u32::<LittleEndian>(POINT_DATA_CONTINUE_PAYLOAD_COMMAND); // COMMAND #
   }
 
