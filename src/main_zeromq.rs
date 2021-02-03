@@ -54,14 +54,14 @@ fn main() -> AnyhowResult<()> {
 
   // NB: Similar to NFOV_UNBINNED, but less dense (faster).
   // Not used by any program I'm aware of.
-  config.0.depth_mode = k4a_sys::k4a_depth_mode_t_K4A_DEPTH_MODE_NFOV_2X2BINNED;
+  config.0.depth_mode = k4a_sys::k4a_depth_mode_t_K4A_DEPTH_MODE_NFOV_2X2BINNED; // 320x228
 
   // NB: WFOV_2X2BINNED was used by the original 'cloudcam_zeromq'.
   // It's less dense, and wider. Much more performant. Fast on CPU.
   //config.0.depth_mode = k4a_sys::k4a_depth_mode_t_K4A_DEPTH_MODE_WFOV_2X2BINNED;
 
   config.0.color_format = k4a_sys::k4a_image_format_t_K4A_IMAGE_FORMAT_COLOR_BGRA32;
-  config.0.color_resolution = k4a_sys::k4a_color_resolution_t_K4A_COLOR_RESOLUTION_720P;
+  config.0.color_resolution = k4a_sys::k4a_color_resolution_t_K4A_COLOR_RESOLUTION_720P; // 1280x721
   //config.0.color_resolution = k4a_sys::k4a_color_resolution_t_K4A_COLOR_RESOLUTION_2160P; // 4K, what the original program did
 
   let calibration = device.get_calibration(config.0.depth_mode, config.0.color_resolution)?;
@@ -164,10 +164,10 @@ fn get_point_cloud(device: &Device, xy_table: &Image, color: Color, transformer:
   let depth_image = capture.get_depth_image()
       .ok_or(anyhow!("capture not present"))?;
 
-  //let depth_image2 = transformer.transform(&depth_image)?;
+  let depth_image2 = transformer.transform(&depth_image)?;
 
   let mut points =
-      calculate_point_cloud2(&depth_image, &xy_table, color)?;
+      calculate_point_cloud2(&depth_image2, &xy_table, color)?;
 
   //println!("Points: {}", points.len());
 

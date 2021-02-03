@@ -1,11 +1,12 @@
+use anyhow::anyhow;
 use cgmath::num_traits::Float;
 use crate::AnyhowResult;
+use crate::zeromq::color::Color;
 use crate::zeromq::point::Point;
 use k4a_sys_temp as k4a_sys;
 use kinect::Image;
 use kinect::ImageFormat;
 use std::mem::size_of;
-use crate::zeromq::color::Color;
 
 pub struct PointCloudResult {
     pub point_cloud_image: Image,
@@ -59,6 +60,15 @@ pub fn calculate_point_cloud(depth_image: &Image, xy_table_image: &Image) -> Any
 pub fn calculate_point_cloud2(depth_image: &Image, xy_table_image: &Image, color: Color) -> AnyhowResult<Vec<Point>> {
     let width = depth_image.get_width_pixels();
     let height = depth_image.get_height_pixels();
+
+    {
+        let xy_width = xy_table_image.get_width_pixels();
+        let xy_height = xy_table_image.get_height_pixels();
+        if width != xy_width || height != xy_height {
+            return Err(anyhow!("Depth image ({}x{}) and XY table ({}x{}) dimensions are not equal!",
+                width, height, xy_width, xy_height));
+        }
+    }
 
     let xy_table_data = xy_table_image.get_buffer() as *mut k4a_sys::k4a_float2_t;
     let depth_data = depth_image.get_buffer() as *mut u16; // uint16_t
