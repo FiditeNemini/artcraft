@@ -51,23 +51,26 @@ fn main() -> AnyhowResult<()> {
 
   // TODO: Pick correct binning + FOV.
 
-  // NB: NFOV_UNBINNED was used by original Rust experiment.
-  // This appears to be much denser, and is a tighter angle. Slow on CPU.
-  //config.0.depth_mode = k4a_sys::k4a_depth_mode_t_K4A_DEPTH_MODE_NFOV_UNBINNED;
-
   // NB: Similar to NFOV_UNBINNED, but less dense (faster).
   // Not used by any program I'm aware of.
-  config.0.depth_mode = k4a_sys::k4a_depth_mode_t_K4A_DEPTH_MODE_NFOV_2X2BINNED; // 320x228
+  //config.0.depth_mode = k4a_sys::k4a_depth_mode_t_K4A_DEPTH_MODE_NFOV_2X2BINNED; // 320x228
+
+  // NB: NFOV_UNBINNED was used by original Rust experiment.
+  // This appears to be much denser, and is a tighter angle. Slow on CPU.
+  //config.0.depth_mode = k4a_sys::k4a_depth_mode_t_K4A_DEPTH_MODE_NFOV_UNBINNED; // looks good w/ 720P
 
   // NB: WFOV_2X2BINNED was used by the original 'cloudcam_zeromq'.
   // It's less dense, and wider. Much more performant. Fast on CPU.
-  //config.0.depth_mode = k4a_sys::k4a_depth_mode_t_K4A_DEPTH_MODE_WFOV_2X2BINNED;
+  //config.0.depth_mode = k4a_sys::k4a_depth_mode_t_K4A_DEPTH_MODE_WFOV_2X2BINNED; // DISTORTED w/ 720P
 
   // Not used by anything, AFAICT.
-  config.0.depth_mode = k4a_sys::k4a_depth_mode_t_K4A_DEPTH_MODE_WFOV_UNBINNED; // 1024x1024
+  // I got this working in Rust + Color Camera
+  config.0.depth_mode = k4a_sys::k4a_depth_mode_t_K4A_DEPTH_MODE_WFOV_UNBINNED; // 1024x1024 (looks good w/ 720P)
+
 
   config.0.color_format = k4a_sys::k4a_image_format_t_K4A_IMAGE_FORMAT_COLOR_BGRA32;
   config.0.color_resolution = k4a_sys::k4a_color_resolution_t_K4A_COLOR_RESOLUTION_720P; // 1280x721
+  //config.0.color_resolution = k4a_sys::k4a_color_resolution_t_K4A_COLOR_RESOLUTION_1080P; // 1920x1080 (this gets truncated.)
   //config.0.color_resolution = k4a_sys::k4a_color_resolution_t_K4A_COLOR_RESOLUTION_2160P; // 4K, what the original program did
 
   let calibration = device.get_calibration(config.0.depth_mode, config.0.color_resolution)?;

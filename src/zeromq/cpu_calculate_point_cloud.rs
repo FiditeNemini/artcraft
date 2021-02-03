@@ -119,7 +119,6 @@ pub fn calculate_point_cloud3(depth_image: &Image, xy_table_image: &Image, color
     let xy_table_data = xy_table_image.get_buffer() as *mut k4a_sys::k4a_float2_t;
     let depth_data = depth_image.get_buffer() as *mut u16; // uint16_t
     let color_data = color_image.get_buffer() as *mut ColorCameraPoint;
-    //let color_data = color_image.get_buffer() as *mut u32;
 
     let depth_data_length = (width * height) as isize;
 
