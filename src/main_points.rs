@@ -7,7 +7,7 @@ use k4a_sys_temp as k4a_sys;
 use kinect::{Device, DeviceConfiguration};
 use std::thread;
 use std::time::Duration;
-use crate::zeromq::calculate_point_cloud::calculate_point_cloud;
+use crate::zeromq::cpu_calculate_point_cloud::calculate_point_cloud;
 
 fn main() -> AnyhowResult<()> {
     let device = Device::open(0)?;

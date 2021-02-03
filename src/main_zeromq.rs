@@ -10,11 +10,14 @@ use kinect::{Device, DeviceConfiguration, Image};
 use std::io::Write;
 use std::thread;
 use std::time::{Duration, SystemTime, UNIX_EPOCH};
-use zeromq::calculate_point_cloud::PointCloudResult;
-use zeromq::calculate_point_cloud::calculate_point_cloud2;
+use zeromq::cpu_calculate_point_cloud::PointCloudResult;
+use zeromq::cpu_calculate_point_cloud::calculate_point_cloud2;
 use zeromq::color::Color;
+use zeromq::cpu_transformation::DepthTransformer;
 use zeromq::point::Point;
 use zeromq::xy_table::create_xy_table;
+use zeromq::xy_table::create_xy_table_from_depth_calibration;
+use zeromq::xy_table::create_xy_table_from_color_calibration;
 use zmq::{Error, Socket, Context, DONTWAIT};
 
 const SOCKET_ADDRESS : &'static str = "tcp://127.0.0.1:8888";
@@ -41,11 +44,25 @@ fn main() -> AnyhowResult<()> {
 
   let mut config = DeviceConfiguration::init_disable_all();
   config.0.depth_mode = k4a_sys::k4a_depth_mode_t_K4A_DEPTH_MODE_WFOV_2X2BINNED;
-  config.0.camera_fps = k4a_sys::k4a_fps_t_K4A_FRAMES_PER_SECOND_30;
+  //config.0.camera_fps = k4a_sys::k4a_fps_t_K4A_FRAMES_PER_SECOND_30;
+  config.0.camera_fps = k4a_sys::k4a_fps_t_K4A_FRAMES_PER_SECOND_15;
+
+  config.0.color_resolution = k4a_sys::k4a_color_resolution_t_K4A_COLOR_RESOLUTION_2160P;
+  config.0.color_format = k4a_sys::k4a_image_format_t_K4A_IMAGE_FORMAT_COLOR_BGRA32;
+
+  // TODO:
+  //  config.0.depth_mode = k4a_sys::k4a_depth_mode_t_K4A_DEPTH_MODE_NFOV_UNBINNED;
 
   let calibration = device.get_calibration(config.0.depth_mode, config.0.color_resolution)?;
 
-  let xy_table = create_xy_table(&calibration)?;
+  // TODO: Temporary.
+  let width = 3840;
+  let height = 2160;
+
+  //let xy_table = create_xy_table_from_depth_calibration(&calibration)?;
+  let xy_table = create_xy_table_from_color_calibration(&calibration)?;
+
+  let transformer = DepthTransformer::new(&calibration);
 
   device.start_cameras(&config)?;
 
@@ -62,7 +79,7 @@ fn main() -> AnyhowResult<()> {
   let mut messaging_state = MessagingState::Sending_DataLength;
   let mut color = Color::get_random_rgb_color();
 
-  let mut points = get_point_cloud(&device, &xy_table, color)?;
+  let mut points = get_point_cloud(&device, &xy_table, color, &transformer)?;
 
   if !points.is_empty() {
     //print_pointcloud_maxima(&points);
@@ -116,7 +133,7 @@ fn main() -> AnyhowResult<()> {
       MessagingState::GrabPointCloud => {
         //println!("Grabbing another frame...");
         color = Color::get_random_rgb_color();
-        points = get_point_cloud(&device, &xy_table, color)?;
+        points = get_point_cloud(&device, &xy_table, color, &transformer)?;
 
         if !points.is_empty() {
           //print_pointcloud_maxima(&points);
@@ -132,14 +149,18 @@ fn main() -> AnyhowResult<()> {
   Ok(())
 }
 
-fn get_point_cloud(device: &Device, xy_table: &Image, color: Color) -> AnyhowResult<Vec<Point>> {
-  let capture = device.get_capture(500)?;
+fn get_point_cloud(device: &Device, xy_table: &Image, color: Color, transformer: &DepthTransformer)
+  -> AnyhowResult<Vec<Point>>
+{
+  let capture = device.get_capture(5000)?;
 
   let depth_image = capture.get_depth_image()
       .ok_or(anyhow!("capture not present"))?;
 
+  let depth_image2 = transformer.transform(&depth_image)?;
+
   let mut points =
-      calculate_point_cloud2(&depth_image, &xy_table, color)?;
+      calculate_point_cloud2(&depth_image2, &xy_table, color)?;
 
   //println!("Points: {}", points.len());
 

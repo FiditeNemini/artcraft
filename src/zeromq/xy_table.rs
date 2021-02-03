@@ -15,10 +15,19 @@ use std::os::raw::c_int;
  * This method represents an alternative to calling k4a_transformation_depth_image_to_point_cloud() and lends itself
  * to efficient implementation on the GPU.
  */
-pub fn create_xy_table(calibration: &Calibration) -> AnyhowResult<Image> {
-    let width = calibration.depth_camera_resolution_width();
-    let height = calibration.depth_camera_resolution_height();
+pub fn create_xy_table_from_depth_calibration(calibration: &Calibration) -> AnyhowResult<Image> {
+  let width = calibration.depth_camera_resolution_width();
+  let height = calibration.depth_camera_resolution_height();
+  create_xy_table(calibration, width, height)
+}
 
+pub fn create_xy_table_from_color_calibration(calibration: &Calibration) -> AnyhowResult<Image> {
+    let width = calibration.color_camera_resolution_width();
+    let height = calibration.color_camera_resolution_height();
+    create_xy_table(calibration, width, height)
+}
+
+pub fn create_xy_table(calibration: &Calibration, width: i32, height: i32) -> AnyhowResult<Image> {
     let image = Image::create(
         ImageFormat::Custom,
         width as u32,

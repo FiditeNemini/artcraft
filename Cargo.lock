@@ -1042,9 +1042,9 @@ checksum = "e2db585e1d738fc771bf08a151420d3ed193d9d895a36df7f6f8a9456b911ddc"
 
 [[package]]
 name = "kinect"
-version = "0.0.4"
+version = "0.0.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a21ff6dd8d49e9bf52cf7702b339a6c19d25c90edd1eea217df280f46e7bcfe5"
+checksum = "f185ce99cfd26fb71672096f68709eabc8a20d20f42fece762fe7dd104b4fc40"
 dependencies = [
  "k4a-sys-temp",
 ]
