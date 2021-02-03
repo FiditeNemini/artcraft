@@ -1,5 +1,7 @@
 //! Generate random points to send over ZeroMQ to a consumer
 
+#[allow(unused_imports)]
+
 mod zeromq;
 
 use anyhow::Result as AnyhowResult;
@@ -60,14 +62,17 @@ fn main() -> AnyhowResult<()> {
   // It's less dense, and wider. Much more performant. Fast on CPU.
   //config.0.depth_mode = k4a_sys::k4a_depth_mode_t_K4A_DEPTH_MODE_WFOV_2X2BINNED;
 
+  // Not used by anything, AFAICT.
+  config.0.depth_mode = k4a_sys::k4a_depth_mode_t_K4A_DEPTH_MODE_WFOV_UNBINNED; // 1024x1024
+
   config.0.color_format = k4a_sys::k4a_image_format_t_K4A_IMAGE_FORMAT_COLOR_BGRA32;
   config.0.color_resolution = k4a_sys::k4a_color_resolution_t_K4A_COLOR_RESOLUTION_720P; // 1280x721
   //config.0.color_resolution = k4a_sys::k4a_color_resolution_t_K4A_COLOR_RESOLUTION_2160P; // 4K, what the original program did
 
   let calibration = device.get_calibration(config.0.depth_mode, config.0.color_resolution)?;
 
-  let xy_table = create_xy_table_from_depth_calibration(&calibration)?;
-  //let xy_table = create_xy_table_from_color_calibration(&calibration)?;
+  //let xy_table = create_xy_table_from_depth_calibration(&calibration)?;
+  let xy_table = create_xy_table_from_color_calibration(&calibration)?;
 
   let transformer = DepthTransformer::new(&calibration);
 
