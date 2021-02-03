@@ -96,9 +96,9 @@ pub fn calculate_point_cloud2(depth_image: &Image, xy_table_image: &Image, color
 #[repr(C, packed)]
 #[derive(Copy, Clone)]
 struct ColorCameraPoint {
-    pub r: u8,
-    pub g: u8,
     pub b: u8,
+    pub g: u8,
+    pub r: u8,
     pub a: u8,
 }
 
