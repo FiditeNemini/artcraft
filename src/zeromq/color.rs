@@ -1,4 +1,6 @@
 use std::time::{UNIX_EPOCH, SystemTime};
+use rand::distributions::Uniform;
+use rand::Rng;
 
 #[derive(Copy, Clone, Debug)]
 pub enum Color {
@@ -14,6 +16,35 @@ pub enum Color {
 }
 
 impl Color {
+  pub fn get_time_based_color() -> Self {
+    let start = SystemTime::now();
+    let timestamp = start
+        .duration_since(UNIX_EPOCH)
+        .expect("Time should work.");
+
+    let seconds = timestamp.as_secs();
+
+    match seconds % 10 {
+      0 | 1 => Color::Purple, //Color::Black,
+      2 | 3 => Color::Blue,
+      4 | 5 => Color::Red,
+      6 | 7 => Color::Green,
+      8 | 9 => Color::White,
+      _ => Color::White,
+    }
+  }
+
+  pub fn get_random_rgb_color() -> Self {
+    let mut rng = rand::thread_rng();
+    let range = Uniform::new_inclusive(0u8, 255u8);
+
+    let r = rng.sample(&range);
+    let g = rng.sample(&range);
+    let b = rng.sample(&range);
+
+    Color::Custom { r, g, b, a: 255 }
+  }
+
   pub fn get_u8_r(&self) -> u8 {
     match &self {
       Color::Black => 0,
@@ -71,21 +102,3 @@ impl Color {
   }
 }
 
-/// Fun function to retrieve a color based on the time.
-pub fn get_time_based_color() -> Color {
-  let start = SystemTime::now();
-  let timestamp = start
-      .duration_since(UNIX_EPOCH)
-      .expect("Time should work.");
-
-  let seconds = timestamp.as_secs();
-
-  match seconds % 10 {
-    0 | 1 => Color::Purple, //Color::Black,
-    2 | 3 => Color::Blue,
-    4 | 5 => Color::Red,
-    6 | 7 => Color::Green,
-    8 | 9 => Color::White,
-    _ => Color::White,
-  }
-}

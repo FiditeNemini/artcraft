@@ -13,7 +13,6 @@ use std::time::{Duration, SystemTime, UNIX_EPOCH};
 use zeromq::calculate_point_cloud::PointCloudResult;
 use zeromq::calculate_point_cloud::calculate_point_cloud2;
 use zeromq::color::Color;
-use zeromq::color::get_time_based_color;
 use zeromq::point::Point;
 use zeromq::xy_table::create_xy_table;
 use zmq::{Error, Socket, Context, DONTWAIT};
@@ -61,7 +60,7 @@ fn main() -> AnyhowResult<()> {
   socket.connect(SOCKET_ADDRESS).unwrap();
 
   let mut messaging_state = MessagingState::Sending_DataLength;
-  let mut color = get_time_based_color();
+  let mut color = Color::get_random_rgb_color();
 
   let mut points = get_point_cloud(&device, &xy_table, color)?;
 
@@ -116,7 +115,7 @@ fn main() -> AnyhowResult<()> {
       },
       MessagingState::GrabPointCloud => {
         //println!("Grabbing another frame...");
-        color = get_time_based_color();
+        color = Color::get_random_rgb_color();
         points = get_point_cloud(&device, &xy_table, color)?;
 
         if !points.is_empty() {
