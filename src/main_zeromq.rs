@@ -14,6 +14,7 @@ use std::thread;
 use std::time::{Duration, SystemTime, UNIX_EPOCH};
 use zeromq::cpu_calculate_point_cloud::PointCloudResult;
 use zeromq::cpu_calculate_point_cloud::calculate_point_cloud2;
+use zeromq::cpu_calculate_point_cloud::calculate_point_cloud3;
 use zeromq::color::Color;
 use zeromq::cpu_transformation::DepthTransformer;
 use zeromq::point::Point;
@@ -91,7 +92,20 @@ fn main() -> AnyhowResult<()> {
   let mut messaging_state = MessagingState::Sending_DataLength;
   let mut color = Color::get_time_based_color();
 
-  let mut points = get_point_cloud(&device, &xy_table, color, &transformer)?;
+  let mut points : Vec<Point> = Vec::new();
+
+  loop {
+    let maybe_points = get_point_cloud(&device, &xy_table, color, &transformer);
+    points = match maybe_points {
+      Err(e) => {
+        println!("Error: {:?}", e);
+        thread::sleep(Duration::from_millis(5000));
+        continue;
+      },
+      Ok(points) => points,
+    };
+    break;
+  };
 
   if !points.is_empty() {
     //print_pointcloud_maxima(&points);
@@ -167,12 +181,21 @@ fn get_point_cloud(device: &Device, xy_table: &Image, color: Color, transformer:
   let capture = device.get_capture(5000)?;
 
   let depth_image = capture.get_depth_image()
-      .ok_or(anyhow!("capture not present"))?;
+      .ok_or(anyhow!("depth image not present"))?;
+
+  let color_image = capture.get_color_image()
+      .ok_or(anyhow!("color image not present"))?;
+
 
   let depth_image2 = transformer.transform(&depth_image)?;
 
   let mut points =
-      calculate_point_cloud2(&depth_image2, &xy_table, color)?;
+      calculate_point_cloud3(
+        &depth_image2,
+        &xy_table,
+        //color,
+        &color_image
+      )?;
 
   //println!("Points: {}", points.len());
 

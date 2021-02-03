@@ -92,3 +92,60 @@ pub fn calculate_point_cloud2(depth_image: &Image, xy_table_image: &Image, color
 
     Ok(points)
 }
+
+#[repr(C, packed)]
+#[derive(Copy, Clone)]
+struct ColorCameraPoint {
+    pub r: u8,
+    pub g: u8,
+    pub b: u8,
+    pub a: u8,
+}
+
+// Directly return as a vector.
+pub fn calculate_point_cloud3(depth_image: &Image, xy_table_image: &Image, color_image: &Image) -> AnyhowResult<Vec<Point>> {
+    let width = depth_image.get_width_pixels();
+    let height = depth_image.get_height_pixels();
+
+    {
+        let xy_width = xy_table_image.get_width_pixels();
+        let xy_height = xy_table_image.get_height_pixels();
+        if width != xy_width || height != xy_height {
+            return Err(anyhow!("Depth image ({}x{}) and XY table ({}x{}) dimensions are not equal!",
+                width, height, xy_width, xy_height));
+        }
+    }
+
+    let xy_table_data = xy_table_image.get_buffer() as *mut k4a_sys::k4a_float2_t;
+    let depth_data = depth_image.get_buffer() as *mut u16; // uint16_t
+    let color_data = color_image.get_buffer() as *mut ColorCameraPoint;
+    //let color_data = color_image.get_buffer() as *mut u32;
+
+    let depth_data_length = (width * height) as isize;
+
+    let mut points = Vec::new();
+
+    for i in 0 .. depth_data_length {
+        unsafe {
+            // TODO: This is missing `isnan` checks.
+            //  if (depth_data[i] != 0 && !isnan(xy_table_data[i].xy.x) && !isnan(xy_table_data[i].xy.y))
+            if (*depth_data.offset(i)) != 0 {
+                let x = (*xy_table_data.offset(i)).xy.x * ((*depth_data.offset(i)) as f32);
+                let y = (*xy_table_data.offset(i)).xy.y * ((*depth_data.offset(i)) as f32);
+                let z = (*depth_data.offset(i)) as f32;
+                let color = (*color_data.offset(i)) as ColorCameraPoint;
+
+                let point_color = Color::Custom {
+                    r: color.r,
+                    b: color.b,
+                    g: color.g,
+                    a: 255
+                };
+
+                points.push(Point::at(x, y, z, point_color));
+            }
+        }
+    }
+
+    Ok(points)
+}
