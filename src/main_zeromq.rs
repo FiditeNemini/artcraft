@@ -47,7 +47,8 @@ fn main() -> AnyhowResult<()> {
   //config.0.camera_fps = k4a_sys::k4a_fps_t_K4A_FRAMES_PER_SECOND_30;
   config.0.camera_fps = k4a_sys::k4a_fps_t_K4A_FRAMES_PER_SECOND_15;
 
-  config.0.color_resolution = k4a_sys::k4a_color_resolution_t_K4A_COLOR_RESOLUTION_2160P;
+  config.0.color_resolution = k4a_sys::k4a_color_resolution_t_K4A_COLOR_RESOLUTION_720P;
+  //config.0.color_resolution = k4a_sys::k4a_color_resolution_t_K4A_COLOR_RESOLUTION_2160P; // 4K, what the original program did
   config.0.color_format = k4a_sys::k4a_image_format_t_K4A_IMAGE_FORMAT_COLOR_BGRA32;
 
   // TODO:
@@ -55,12 +56,8 @@ fn main() -> AnyhowResult<()> {
 
   let calibration = device.get_calibration(config.0.depth_mode, config.0.color_resolution)?;
 
-  // TODO: Temporary.
-  let width = 3840;
-  let height = 2160;
-
-  //let xy_table = create_xy_table_from_depth_calibration(&calibration)?;
-  let xy_table = create_xy_table_from_color_calibration(&calibration)?;
+  let xy_table = create_xy_table_from_depth_calibration(&calibration)?;
+  //let xy_table = create_xy_table_from_color_calibration(&calibration)?;
 
   let transformer = DepthTransformer::new(&calibration);
 
@@ -77,7 +74,7 @@ fn main() -> AnyhowResult<()> {
   socket.connect(SOCKET_ADDRESS).unwrap();
 
   let mut messaging_state = MessagingState::Sending_DataLength;
-  let mut color = Color::get_random_rgb_color();
+  let mut color = Color::get_time_based_color();
 
   let mut points = get_point_cloud(&device, &xy_table, color, &transformer)?;
 
@@ -132,7 +129,7 @@ fn main() -> AnyhowResult<()> {
       },
       MessagingState::GrabPointCloud => {
         //println!("Grabbing another frame...");
-        color = Color::get_random_rgb_color();
+        color = Color::get_time_based_color();
         points = get_point_cloud(&device, &xy_table, color, &transformer)?;
 
         if !points.is_empty() {
@@ -157,10 +154,10 @@ fn get_point_cloud(device: &Device, xy_table: &Image, color: Color, transformer:
   let depth_image = capture.get_depth_image()
       .ok_or(anyhow!("capture not present"))?;
 
-  let depth_image2 = transformer.transform(&depth_image)?;
+  //let depth_image2 = transformer.transform(&depth_image)?;
 
   let mut points =
-      calculate_point_cloud2(&depth_image2, &xy_table, color)?;
+      calculate_point_cloud2(&depth_image, &xy_table, color)?;
 
   //println!("Points: {}", points.len());
 

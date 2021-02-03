@@ -18,8 +18,10 @@ impl DepthTransformer {
     let transformation = Transformation::from_calibration(&calibration);
 
     // TODO(bt): Temporary hardcoding for K4A_COLOR_RESOLUTION_2160P
-    let output_width = 3840; //transformation.color_resolution.width as u32;
-    let output_height = 2160; //transformation.color_resolution.height as u32;
+    let output_width = transformation.color_resolution.width as u32;
+    let output_height = transformation.color_resolution.height as u32;
+    //let output_width = 3840; //transformation.color_resolution.width as u32;
+    //let output_height = 2160; //transformation.color_resolution.height as u32;
     let output_stride_bytes = output_width * size_of::<libc::uint16_t>() as u32; // NB: Depth pixel
 
     Self {
