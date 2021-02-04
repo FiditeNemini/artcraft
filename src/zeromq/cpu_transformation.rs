@@ -36,7 +36,7 @@ impl DepthTransformer {
     let transform_h = self.transformation.get_handle();
     let depth_image_h = depth_image.get_handle();
 
-    println!("Width, height, stride: {}, {}, {}", self.output_width, self.output_height, self.output_stride_bytes);
+    //println!("Width, height, stride: {}, {}, {}", self.output_width, self.output_height, self.output_stride_bytes);
 
     let output_image = Image::create(
       ImageFormat::Depth16,
@@ -45,10 +45,10 @@ impl DepthTransformer {
       self.output_stride_bytes,
     ).map_err(|e| anyhow!("Can't create the image: {:?}", e))?;
 
-    println!("Image created");
+    //println!("Image created");
 
     let output_image_h = output_image.get_handle();
-    println!("About to transform...");
+    //println!("About to transform...");
 
     let result = unsafe {
       k4a_sys_temp::k4a_transformation_depth_image_to_color_camera(
@@ -57,7 +57,7 @@ impl DepthTransformer {
         output_image_h,
       )
     };
-    println!("Transformed");
+    //println!("Transformed");
 
     if result != k4a_sys_temp::k4a_buffer_result_t_K4A_BUFFER_RESULT_SUCCEEDED {
       return Err(anyhow!("Depth transformation failed."));

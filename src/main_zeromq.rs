@@ -23,7 +23,8 @@ use zeromq::xy_table::create_xy_table_from_depth_calibration;
 use zeromq::xy_table::create_xy_table_from_color_calibration;
 use zmq::{Error, Socket, Context, DONTWAIT};
 
-const SOCKET_ADDRESS : &'static str = "tcp://127.0.0.1:8888";
+//const SOCKET_ADDRESS : &'static str = "tcp://127.0.0.1:8888";
+const SOCKET_ADDRESS : &'static str = "tcp://192.168.50.3:8888";
 
 const DATA_LENGTH_COMMAND : u32 = 1; // Denotes the command that sends the data length
 const POINT_DATA_BEGIN_PAYLOAD_COMMAND : u32 = 2; // Denotes the command that sends the variable-length data
@@ -34,10 +35,7 @@ const POINT_DATA_CONTINUE_PAYLOAD_COMMAND : u32 = 3; // Denotes the command that
 const MAX_SEND_POINTS_PER_PACKET : usize = 3000;
 
 enum MessagingState {
-  Sending_DataLength,
-  //Receiving_DataLengthAck,
   Sending_PointDataBegin,
-  //Receiving_PointDataAck,
   Sending_PointDataContinue,
   GrabPointCloud,
 }
@@ -57,7 +55,7 @@ fn main() -> AnyhowResult<()> {
 
   // NB: NFOV_UNBINNED was used by original Rust experiment.
   // This appears to be much denser, and is a tighter angle. Slow on CPU.
-  //config.0.depth_mode = k4a_sys::k4a_depth_mode_t_K4A_DEPTH_MODE_NFOV_UNBINNED; // looks good w/ 720P
+  config.0.depth_mode = k4a_sys::k4a_depth_mode_t_K4A_DEPTH_MODE_NFOV_UNBINNED; // looks good w/ 720P
 
   // NB: WFOV_2X2BINNED was used by the original 'cloudcam_zeromq'.
   // It's less dense, and wider. Much more performant. Fast on CPU.
@@ -65,7 +63,7 @@ fn main() -> AnyhowResult<()> {
 
   // Not used by anything, AFAICT.
   // I got this working in Rust + Color Camera
-  config.0.depth_mode = k4a_sys::k4a_depth_mode_t_K4A_DEPTH_MODE_WFOV_UNBINNED; // 1024x1024 (looks good w/ 720P)
+  //config.0.depth_mode = k4a_sys::k4a_depth_mode_t_K4A_DEPTH_MODE_WFOV_UNBINNED; // 1024x1024 (looks good w/ 720P)
 
 
   config.0.color_format = k4a_sys::k4a_image_format_t_K4A_IMAGE_FORMAT_COLOR_BGRA32;
@@ -92,7 +90,8 @@ fn main() -> AnyhowResult<()> {
   //socket.bind(SOCKET_ADDRESS).unwrap();
   socket.connect(SOCKET_ADDRESS).unwrap();
 
-  let mut messaging_state = MessagingState::Sending_DataLength;
+  let mut messaging_state = MessagingState::GrabPointCloud;
+
   let mut color = Color::get_time_based_color();
 
   let mut points : Vec<Point> = Vec::new();
@@ -120,14 +119,7 @@ fn main() -> AnyhowResult<()> {
 
   loop {
     match messaging_state {
-      MessagingState::Sending_DataLength => {
-        //println!("Sending DATA LENGTH: {}", points.len());
-        //let message = encode_data_length(&points);
-        //send_message(&socket, &message)?;
-        messaging_state = MessagingState::Sending_PointDataBegin;
-      },
       MessagingState::Sending_PointDataBegin => {
-        //println!("Begin Sending PCD (points: {})", points.len());
         let message = encode_point_data(&mut points, true);
         send_message(&socket, &message)?;
 
@@ -136,7 +128,6 @@ fn main() -> AnyhowResult<()> {
         } else {
           messaging_state = MessagingState::Sending_PointDataContinue;
         }
-
       },
       MessagingState::Sending_PointDataContinue => {
         // NB: Unfortunately the C++ program has difficulty with all points.
@@ -164,12 +155,7 @@ fn main() -> AnyhowResult<()> {
         color = Color::get_time_based_color();
         points = get_point_cloud(&device, &xy_table, color, &transformer)?;
 
-        if !points.is_empty() {
-          //print_pointcloud_maxima(&points);
-        } else {
-          println!("No points?");
-        }
-        messaging_state = MessagingState::Sending_DataLength;
+        messaging_state = MessagingState::Sending_PointDataBegin;
         continue;
       },
     }
@@ -200,7 +186,7 @@ fn get_point_cloud(device: &Device, xy_table: &Image, color: Color, transformer:
         &color_image
       )?;
 
-  //println!("Points: {}", points.len());
+  println!("Points: {}", points.len());
 
   Ok(points)
 }
