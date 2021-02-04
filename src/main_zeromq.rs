@@ -2,26 +2,30 @@
 
 #[allow(unused_imports)]
 
+#[macro_use] extern crate clap;
+
 mod zeromq;
 
 use anyhow::Result as AnyhowResult;
 use anyhow::anyhow;
 use byteorder::{WriteBytesExt, LittleEndian, BigEndian};
+use clap::Clap;
 use k4a_sys_temp as k4a_sys;
 use kinect::{Device, DeviceConfiguration, Image};
 use std::io::Write;
 use std::thread;
 use std::time::{Duration, SystemTime, UNIX_EPOCH};
+use zeromq::color::Color;
 use zeromq::cpu_calculate_point_cloud::PointCloudResult;
 use zeromq::cpu_calculate_point_cloud::calculate_point_cloud2;
 use zeromq::cpu_calculate_point_cloud::calculate_point_cloud3;
-use zeromq::color::Color;
 use zeromq::cpu_transformation::DepthTransformer;
 use zeromq::point::Point;
 use zeromq::xy_table::create_xy_table;
-use zeromq::xy_table::create_xy_table_from_depth_calibration;
 use zeromq::xy_table::create_xy_table_from_color_calibration;
+use zeromq::xy_table::create_xy_table_from_depth_calibration;
 use zmq::{Error, Socket, Context, DONTWAIT};
+
 
 const SOCKET_ADDRESS : &'static str = "tcp://127.0.0.1:8888";
 //const SOCKET_ADDRESS : &'static str = "tcp://192.168.50.3:8888";
@@ -34,6 +38,26 @@ const POINT_DATA_CONTINUE_PAYLOAD_COMMAND : u32 = 3; // Denotes the command that
 /// This is also defined in C++, so it needs to be adjusted in multiple places.
 const MAX_SEND_POINTS_PER_PACKET : usize = 3000;
 
+/// The command line args for the program.
+#[derive(Clap, Debug)]
+pub struct CommandArgs {
+  /// Set a wide FOV in the depth camera
+  #[clap(long, parse(try_from_str = true_or_false), default_value = "false")]
+  pub wide: bool,
+
+  /// Set the depth culling point
+  #[clap(long, default_value = "0")]
+  pub depth_cull: i32,
+}
+
+fn true_or_false(s: &str) -> Result<bool, &'static str> {
+  match s {
+    "true" => Ok(true),
+    "false" => Ok(false),
+    _ => Err("expected `true` or `false`"),
+  }
+}
+
 enum MessagingState {
   Sending_PointDataBegin,
   Sending_PointDataContinue,
@@ -41,25 +65,28 @@ enum MessagingState {
 }
 
 fn main() -> AnyhowResult<()> {
+  println!("Starting...");
+  let args = CommandArgs::parse();
+
+  println!("Command args: {:?}", args);
+
   println!("Opening device...");
   thread::sleep(Duration::from_millis(100));
 
   let device = Device::open(0)?;
 
   let mut config = DeviceConfiguration::init_disable_all();
-  config.0.camera_fps = k4a_sys::k4a_fps_t_K4A_FRAMES_PER_SECOND_15;
-  //config.0.camera_fps = k4a_sys::k4a_fps_t_K4A_FRAMES_PER_SECOND_30;
+  //config.0.camera_fps = k4a_sys::k4a_fps_t_K4A_FRAMES_PER_SECOND_15;
+  config.0.camera_fps = k4a_sys::k4a_fps_t_K4A_FRAMES_PER_SECOND_30;
 
-  // TODO: Pick correct binning + FOV.
+  // NB: The "binned" modes must pack data; they're distorted.
+  let depth_mode_fov = if args.wide {
+    k4a_sys::k4a_depth_mode_t_K4A_DEPTH_MODE_WFOV_UNBINNED
+  } else {
+    k4a_sys::k4a_depth_mode_t_K4A_DEPTH_MODE_NFOV_UNBINNED
+  };
 
-  //config.0.depth_mode = k4a_sys::k4a_depth_mode_t_K4A_DEPTH_MODE_NFOV_2X2BINNED; // DISTORTED (320x228)
-  //config.0.depth_mode = k4a_sys::k4a_depth_mode_t_K4A_DEPTH_MODE_WFOV_2X2BINNED; // DISTORTED
-
-  // NB: NFOV_UNBINNED was used by original Rust experiment.
-  // This appears to be much denser, and is a tighter angle. Slow on CPU.
-  //config.0.depth_mode = k4a_sys::k4a_depth_mode_t_K4A_DEPTH_MODE_NFOV_UNBINNED; // looks good w/ 720P
-  config.0.depth_mode = k4a_sys::k4a_depth_mode_t_K4A_DEPTH_MODE_WFOV_UNBINNED; // 1024x1024 (looks good w/ 720P)
-
+  config.0.depth_mode = depth_mode_fov;
   config.0.color_format = k4a_sys::k4a_image_format_t_K4A_IMAGE_FORMAT_COLOR_BGRA32;
 
   config.0.color_resolution = k4a_sys::k4a_color_resolution_t_K4A_COLOR_RESOLUTION_720P; // 1280x721
