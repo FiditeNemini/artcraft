@@ -39,7 +39,7 @@ const POINT_DATA_CONTINUE_PAYLOAD_COMMAND : u32 = 3; // Denotes the command that
 const MAX_SEND_POINTS_PER_PACKET : usize = 3000;
 
 /// The command line args for the program.
-#[derive(Clap, Debug)]
+#[derive(Clap, Debug, Clone)]
 pub struct CommandArgs {
   /// Set a wide FOV in the depth camera
   #[clap(long, parse(try_from_str = true_or_false), default_value = "false")]
@@ -48,6 +48,18 @@ pub struct CommandArgs {
   /// Set the depth culling point
   #[clap(long, default_value = "0")]
   pub depth_cull: i32,
+
+  /// X offset.
+  #[clap(long, default_value = "0", allow_hyphen_values = true)]
+  pub xoff: i32,
+
+  /// Y offset.
+  #[clap(long, default_value = "0", allow_hyphen_values = true)]
+  pub yoff: i32,
+
+  /// Z offset.
+  #[clap(long, default_value = "0", allow_hyphen_values = true)]
+  pub zoff: i32,
 }
 
 fn true_or_false(s: &str) -> Result<bool, &'static str> {
@@ -126,7 +138,7 @@ fn main() -> AnyhowResult<()> {
 
   println!("Grabbing first frame...");
   loop {
-    let maybe_points = get_point_cloud(&device, &xy_table, color, &transformer);
+    let maybe_points = get_point_cloud(&device, &xy_table, color, &transformer, &args);
     points = match maybe_points {
       Err(e) => {
         println!("Error: {:?}", e);
@@ -146,7 +158,7 @@ fn main() -> AnyhowResult<()> {
       MessagingState::GrabPointCloud => {
         //println!("Grabbing another frame...");
         color = Color::get_time_based_color();
-        points = get_point_cloud(&device, &xy_table, color, &transformer)?;
+        points = get_point_cloud(&device, &xy_table, color, &transformer, &args)?;
 
         messaging_state = MessagingState::Sending_PointDataBegin;
         frame_number += 1;
@@ -193,8 +205,13 @@ fn main() -> AnyhowResult<()> {
   Ok(())
 }
 
-fn get_point_cloud(device: &Device, xy_table: &Image, color: Color, transformer: &DepthTransformer)
-  -> AnyhowResult<Vec<Point>>
+fn get_point_cloud(
+  device: &Device,
+  xy_table: &Image,
+  color: Color,
+  transformer: &DepthTransformer,
+  command_args: &CommandArgs
+) -> AnyhowResult<Vec<Point>>
 {
   let capture = device.get_capture(5000)?;
 
@@ -211,7 +228,8 @@ fn get_point_cloud(device: &Device, xy_table: &Image, color: Color, transformer:
         &depth_image2,
         &xy_table,
         //color,
-        &color_image
+        &color_image,
+        command_args,
       )?;
 
   //println!("Points: {}", points.len());

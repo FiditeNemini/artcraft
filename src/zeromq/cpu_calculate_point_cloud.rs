@@ -1,6 +1,7 @@
 use anyhow::anyhow;
 use cgmath::num_traits::Float;
 use crate::AnyhowResult;
+use crate::CommandArgs;
 use crate::zeromq::color::Color;
 use crate::zeromq::point::Point;
 use k4a_sys_temp as k4a_sys;
@@ -103,7 +104,13 @@ struct ColorCameraPoint {
 }
 
 // Directly return as a vector.
-pub fn calculate_point_cloud3(depth_image: &Image, xy_table_image: &Image, color_image: &Image) -> AnyhowResult<Vec<Point>> {
+pub fn calculate_point_cloud3(
+    depth_image: &Image,
+    xy_table_image: &Image,
+    color_image: &Image,
+    command_args: &CommandArgs
+) -> AnyhowResult<Vec<Point>>
+{
     let width = depth_image.get_width_pixels();
     let height = depth_image.get_height_pixels();
 
@@ -129,10 +136,21 @@ pub fn calculate_point_cloud3(depth_image: &Image, xy_table_image: &Image, color
             // TODO: This is missing `isnan` checks.
             //  if (depth_data[i] != 0 && !isnan(xy_table_data[i].xy.x) && !isnan(xy_table_data[i].xy.y))
             if (*depth_data.offset(i)) != 0 {
-                let x = (*xy_table_data.offset(i)).xy.x * ((*depth_data.offset(i)) as f32);
-                let y = (*xy_table_data.offset(i)).xy.y * ((*depth_data.offset(i)) as f32);
-                let z = (*depth_data.offset(i)) as f32;
+                let mut x = (*xy_table_data.offset(i)).xy.x * ((*depth_data.offset(i)) as f32);
+                let mut y = (*xy_table_data.offset(i)).xy.y * ((*depth_data.offset(i)) as f32);
+                let mut z = (*depth_data.offset(i)) as f32;
+
                 let color = (*color_data.offset(i)) as ColorCameraPoint;
+
+                if command_args.xoff != 0 {
+                    x += command_args.xoff as f32;
+                }
+                if command_args.yoff != 0 {
+                    y += command_args.yoff as f32;
+                }
+                if command_args.zoff != 0 {
+                    z += command_args.zoff as f32;
+                }
 
                 let point_color = Color::Custom {
                     r: color.r,
