@@ -101,7 +101,7 @@ fn main() -> AnyhowResult<()> {
     points = match maybe_points {
       Err(e) => {
         println!("Error: {:?}", e);
-        thread::sleep(Duration::from_millis(5000));
+        thread::sleep(Duration::from_millis(1000));
         continue;
       },
       Ok(points) => points,
@@ -109,19 +109,13 @@ fn main() -> AnyhowResult<()> {
     break;
   };
 
-  if !points.is_empty() {
-    //print_pointcloud_maxima(&points);
-  } else {
-    println!("> No points?");
-  }
-
   let mut packet_number = 0;
   let mut frame_number : u64 = 0;
 
   loop {
     match messaging_state {
       MessagingState::GrabPointCloud => {
-        println!("Grabbing another frame...");
+        //println!("Grabbing another frame...");
         color = Color::get_time_based_color();
         points = get_point_cloud(&device, &xy_table, color, &transformer)?;
 
@@ -181,7 +175,6 @@ fn get_point_cloud(device: &Device, xy_table: &Image, color: Color, transformer:
   let color_image = capture.get_color_image()
       .ok_or(anyhow!("color image not present"))?;
 
-
   let depth_image2 = transformer.transform(&depth_image)?;
 
   let mut points =
@@ -192,7 +185,7 @@ fn get_point_cloud(device: &Device, xy_table: &Image, color: Color, transformer:
         &color_image
       )?;
 
-  println!("Points: {}", points.len());
+  //println!("Points: {}", points.len());
 
   Ok(points)
 }
@@ -241,35 +234,3 @@ fn send_message(socket: &Socket, data_bytes: &Vec<u8>) -> AnyhowResult<()> {
   Ok(())
 }
 
-/// Receive ack from server
-fn receive_ack(socket: &Socket) -> AnyhowResult<()> {
-  let _result = socket.recv_bytes(DONTWAIT)?;
-  Ok(())
-}
-
-fn reconnect_socket(context: &Context, socket: Socket, address: &str) -> Socket {
-  //println!("[reconnect] Creating new socket...");
-
-  let mut socket = match context.socket(zmq::REQ) {
-    Ok(s) => {
-      //println!("New socket created.");
-      s
-    },
-    Err(e) => {
-      //println!("Error creating new socket: {:?}", e);
-      return socket;
-    },
-  };
-
-  //println!("Connecting new socket...");
-  match socket.connect(address) {
-    Ok(_) => {
-      //println!("New socket connected.");
-    },
-    Err(err) => {
-      //println!("Error connecting new socket: {:?}", err);
-    },
-  }
-
-  return socket;
-}

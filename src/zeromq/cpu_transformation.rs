@@ -10,6 +10,9 @@ pub struct DepthTransformer {
   output_width: u32,
   output_height: u32,
   output_stride_bytes: u32,
+
+  // In-place memory buffer
+  reusable_buffer: Image,
 }
 
 impl DepthTransformer {
