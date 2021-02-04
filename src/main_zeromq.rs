@@ -23,8 +23,8 @@ use zeromq::xy_table::create_xy_table_from_depth_calibration;
 use zeromq::xy_table::create_xy_table_from_color_calibration;
 use zmq::{Error, Socket, Context, DONTWAIT};
 
-//const SOCKET_ADDRESS : &'static str = "tcp://127.0.0.1:8888";
-const SOCKET_ADDRESS : &'static str = "tcp://192.168.50.3:8888";
+const SOCKET_ADDRESS : &'static str = "tcp://127.0.0.1:8888";
+//const SOCKET_ADDRESS : &'static str = "tcp://192.168.50.3:8888";
 
 const DATA_LENGTH_COMMAND : u32 = 1; // Denotes the command that sends the data length
 const POINT_DATA_BEGIN_PAYLOAD_COMMAND : u32 = 2; // Denotes the command that sends the variable-length data
@@ -41,6 +41,9 @@ enum MessagingState {
 }
 
 fn main() -> AnyhowResult<()> {
+  println!("Opening device...");
+  thread::sleep(Duration::from_millis(100));
+
   let device = Device::open(0)?;
 
   let mut config = DeviceConfiguration::init_disable_all();
@@ -49,24 +52,16 @@ fn main() -> AnyhowResult<()> {
 
   // TODO: Pick correct binning + FOV.
 
-  // NB: Similar to NFOV_UNBINNED, but less dense (faster).
-  // Not used by any program I'm aware of.
-  //config.0.depth_mode = k4a_sys::k4a_depth_mode_t_K4A_DEPTH_MODE_NFOV_2X2BINNED; // 320x228
+  //config.0.depth_mode = k4a_sys::k4a_depth_mode_t_K4A_DEPTH_MODE_NFOV_2X2BINNED; // DISTORTED (320x228)
+  //config.0.depth_mode = k4a_sys::k4a_depth_mode_t_K4A_DEPTH_MODE_WFOV_2X2BINNED; // DISTORTED
 
   // NB: NFOV_UNBINNED was used by original Rust experiment.
   // This appears to be much denser, and is a tighter angle. Slow on CPU.
-  config.0.depth_mode = k4a_sys::k4a_depth_mode_t_K4A_DEPTH_MODE_NFOV_UNBINNED; // looks good w/ 720P
-
-  // NB: WFOV_2X2BINNED was used by the original 'cloudcam_zeromq'.
-  // It's less dense, and wider. Much more performant. Fast on CPU.
-  //config.0.depth_mode = k4a_sys::k4a_depth_mode_t_K4A_DEPTH_MODE_WFOV_2X2BINNED; // DISTORTED w/ 720P
-
-  // Not used by anything, AFAICT.
-  // I got this working in Rust + Color Camera
-  //config.0.depth_mode = k4a_sys::k4a_depth_mode_t_K4A_DEPTH_MODE_WFOV_UNBINNED; // 1024x1024 (looks good w/ 720P)
-
+  //config.0.depth_mode = k4a_sys::k4a_depth_mode_t_K4A_DEPTH_MODE_NFOV_UNBINNED; // looks good w/ 720P
+  config.0.depth_mode = k4a_sys::k4a_depth_mode_t_K4A_DEPTH_MODE_WFOV_UNBINNED; // 1024x1024 (looks good w/ 720P)
 
   config.0.color_format = k4a_sys::k4a_image_format_t_K4A_IMAGE_FORMAT_COLOR_BGRA32;
+
   config.0.color_resolution = k4a_sys::k4a_color_resolution_t_K4A_COLOR_RESOLUTION_720P; // 1280x721
   //config.0.color_resolution = k4a_sys::k4a_color_resolution_t_K4A_COLOR_RESOLUTION_1080P; // 1920x1080 (this gets truncated.)
   //config.0.color_resolution = k4a_sys::k4a_color_resolution_t_K4A_COLOR_RESOLUTION_2160P; // 4K, what the original program did
@@ -78,12 +73,16 @@ fn main() -> AnyhowResult<()> {
 
   let transformer = DepthTransformer::new(&calibration);
 
+  println!("Starting cameras with supplied config...");
+  thread::sleep(Duration::from_millis(100));
+
   device.start_cameras(&config)?;
 
   // ===============================================================
 
   let context = zmq::Context::new();
 
+  println!("Connecting ZeroMQ socket...");
   let mut socket = context.socket(zmq::PUSH).unwrap();
   //let mut socket = context.socket(zmq::REQ).unwrap();
 
@@ -96,6 +95,7 @@ fn main() -> AnyhowResult<()> {
 
   let mut points : Vec<Point> = Vec::new();
 
+  println!("Grabbing first frame...");
   loop {
     let maybe_points = get_point_cloud(&device, &xy_table, color, &transformer);
     points = match maybe_points {
@@ -116,10 +116,24 @@ fn main() -> AnyhowResult<()> {
   }
 
   let mut packet_number = 0;
+  let mut frame_number : u64 = 0;
 
   loop {
     match messaging_state {
+      MessagingState::GrabPointCloud => {
+        println!("Grabbing another frame...");
+        color = Color::get_time_based_color();
+        points = get_point_cloud(&device, &xy_table, color, &transformer)?;
+
+        messaging_state = MessagingState::Sending_PointDataBegin;
+        frame_number += 1;
+        continue;
+      },
       MessagingState::Sending_PointDataBegin => {
+        if frame_number == 1 || frame_number % 10 == 0 {
+          println!("Sending frame number: {}", frame_number);
+        }
+
         let message = encode_point_data(&mut points, true);
         send_message(&socket, &message)?;
 
@@ -149,14 +163,6 @@ fn main() -> AnyhowResult<()> {
         }
 
         packet_number += 1;
-      },
-      MessagingState::GrabPointCloud => {
-        //println!("Grabbing another frame...");
-        color = Color::get_time_based_color();
-        points = get_point_cloud(&device, &xy_table, color, &transformer)?;
-
-        messaging_state = MessagingState::Sending_PointDataBegin;
-        continue;
       },
     }
   }
