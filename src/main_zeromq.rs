@@ -76,16 +76,18 @@ fn main() -> AnyhowResult<()> {
   let device = Device::open(0)?;
 
   let mut config = DeviceConfiguration::init_disable_all();
-  //config.0.camera_fps = k4a_sys::k4a_fps_t_K4A_FRAMES_PER_SECOND_15;
-  config.0.camera_fps = k4a_sys::k4a_fps_t_K4A_FRAMES_PER_SECOND_30;
 
-  // NB: The "binned" modes must pack data; they're distorted.
+  let mut camera_fps = k4a_sys::k4a_fps_t_K4A_FRAMES_PER_SECOND_30;
+
   let depth_mode_fov = if args.wide {
+    // NB: Wide FOV lowers the possible frame rate.
+    camera_fps = k4a_sys::k4a_fps_t_K4A_FRAMES_PER_SECOND_15;
     k4a_sys::k4a_depth_mode_t_K4A_DEPTH_MODE_WFOV_UNBINNED
   } else {
     k4a_sys::k4a_depth_mode_t_K4A_DEPTH_MODE_NFOV_UNBINNED
   };
 
+  config.0.camera_fps = camera_fps;
   config.0.depth_mode = depth_mode_fov;
   config.0.color_format = k4a_sys::k4a_image_format_t_K4A_IMAGE_FORMAT_COLOR_BGRA32;
 
