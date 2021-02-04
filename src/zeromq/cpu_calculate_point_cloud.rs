@@ -142,6 +142,22 @@ pub fn calculate_point_cloud3(
 
                 let color = (*color_data.offset(i)) as ColorCameraPoint;
 
+                // The z-direction moves directly towards and away from the camera
+                if command_args.depth_cull != 0
+                    && z > command_args.depth_cull as f32 {
+                    continue;
+                }
+
+                if command_args.left_cull != 0
+                    && x > command_args.left_cull as f32 {
+                    continue;
+                }
+
+                if command_args.right_cull != 0
+                    && x < command_args.right_cull as f32 {
+                    continue;
+                }
+
                 if command_args.xoff != 0 {
                     x += command_args.xoff as f32;
                 }

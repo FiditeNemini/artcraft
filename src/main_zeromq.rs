@@ -46,8 +46,19 @@ pub struct CommandArgs {
   pub wide: bool,
 
   /// Set the depth culling point
+  /// A good value for my office with a NFOV camera approximately located
+  /// parallel to where my desktop computer is located would be "3000"
   #[clap(long, default_value = "0")]
   pub depth_cull: i32,
+
+  /// Cull everything to the right of this point
+  /// "Right" is when the camera is inverted
+  /// A value of "500" is reasonable
+  #[clap(long, default_value = "0")]
+  pub right_cull: i32,
+
+  #[clap(long, default_value = "0")]
+  pub left_cull: i32,
 
   /// X offset.
   #[clap(long, default_value = "0", allow_hyphen_values = true)]
@@ -142,7 +153,7 @@ fn main() -> AnyhowResult<()> {
     points = match maybe_points {
       Err(e) => {
         println!("Error: {:?}", e);
-        thread::sleep(Duration::from_millis(1000));
+        thread::sleep(Duration::from_millis(100));
         continue;
       },
       Ok(points) => points,
@@ -166,7 +177,7 @@ fn main() -> AnyhowResult<()> {
       },
       MessagingState::Sending_PointDataBegin => {
         if frame_number == 1 || frame_number % 10 == 0 {
-          println!("Sending frame number: {}", frame_number);
+          println!("Sending frame number: {} (points: {})", frame_number, points.len());
         }
 
         let message = encode_point_data(&mut points, true);
