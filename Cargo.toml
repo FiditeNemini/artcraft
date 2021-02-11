@@ -6,14 +6,6 @@ authors = [ "Brandon Thomas <bt@brand.io>",
             "Brandon Thomas <echelon@gmail.com>" ]
 
 [[bin]]
-name = "cloudcam_visualizer"
-path = "src/main_opencv.rs"
-
-[[bin]]
-name = "cloudcam_points"
-path = "src/main_points.rs"
-
-[[bin]]
 name = "cloudcam_zeromq"
 path = "src/main_zeromq.rs"
 
