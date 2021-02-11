@@ -80,8 +80,8 @@ pub fn create_xy_table(calibration: &Calibration, width: i32, height: i32) -> An
                 }
             } else {
                 unsafe {
-                    (*typed_buffer.offset(idx)).xy.x = 0.0;
-                    (*typed_buffer.offset(idx)).xy.y = 0.0;
+                    (*typed_buffer.offset(idx)).xy.x = f32::NAN;
+                    (*typed_buffer.offset(idx)).xy.y = f32::NAN;
                 }
             }
 

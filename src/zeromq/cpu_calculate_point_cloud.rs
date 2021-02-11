@@ -136,8 +136,15 @@ pub fn calculate_point_cloud3(
             // TODO: This is missing `isnan` checks.
             //  if (depth_data[i] != 0 && !isnan(xy_table_data[i].xy.x) && !isnan(xy_table_data[i].xy.y))
             if (*depth_data.offset(i)) != 0 {
-                let mut x = (*xy_table_data.offset(i)).xy.x * ((*depth_data.offset(i)) as f32);
-                let mut y = (*xy_table_data.offset(i)).xy.y * ((*depth_data.offset(i)) as f32);
+                let x_lut = (*xy_table_data.offset(i)).xy.x;
+                let y_lut = (*xy_table_data.offset(i)).xy.y;
+
+                if x_lut.is_nan() || y_lut.is_nan() {
+                    continue;
+                }
+
+                let mut x = x_lut * ((*depth_data.offset(i)) as f32);
+                let mut y = y_lut * ((*depth_data.offset(i)) as f32);
                 let mut z = (*depth_data.offset(i)) as f32;
 
                 let color = (*color_data.offset(i)) as ColorCameraPoint;
