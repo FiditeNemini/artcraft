@@ -1,5 +1,5 @@
-use cgmath::num_traits::Float;
 use crate::zeromq::point::Point;
+use num_traits::Float;
 
 /// Print the minima and maxima along each dimension.
 pub fn print_pointcloud_maxima(points: &Vec<Point>) {

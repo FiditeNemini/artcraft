@@ -1,5 +1,4 @@
 use anyhow::anyhow;
-use cgmath::num_traits::Float;
 use crate::AnyhowResult;
 use crate::CommandArgs;
 use crate::zeromq::color::Color;
@@ -7,6 +6,7 @@ use crate::zeromq::point::Point;
 use k4a_sys_temp as k4a_sys;
 use kinect::Image;
 use kinect::ImageFormat;
+use num_traits::Float;
 use std::mem::size_of;
 
 pub struct PointCloudResult {
