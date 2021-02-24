@@ -3,7 +3,12 @@ use std::io::Read;
 
 #[derive(Deserialize)]
 pub struct Secrets {
-  pub twitch_key: String,
+  /// From the creator dashboard of Twitch
+  pub twitch_stream_key: String,
+  /// Identifies our application uniquely; cannot be reassigned.
+  pub application_client_id: String,
+  /// Application secret (generated)
+  pub application_client_secret: String,
 }
 
 impl Secrets {
