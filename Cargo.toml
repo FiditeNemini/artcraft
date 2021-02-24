@@ -2,8 +2,10 @@
 name = "twitch-gateway"
 version = "0.0.0"
 edition = "2018"
-authors = [ "Brandon Thomas <bt@brand.io>",
-    "Brandon Thomas <echelon@gmail.com>" ]
+authors = [
+  "Brandon Thomas <bt@brand.io>",
+  "Brandon Thomas <echelon@gmail.com>"
+]
 
 [[bin]]
 name = "twitch-gateway"
@@ -11,9 +13,16 @@ path = "src/main.rs"
 
 [dependencies]
 anyhow = "1.0.38"
+rustls = "0.18"
 serde = "1.0.123"
 serde_derive = "1.0.123"
+smol = "1.2.5"
 tokio = { version = "0.2", features = ["full"] }
 toml = "0.5.8"
+
+# Twitch Helix etc. API, but no PubSub just yet
 twitch_api2 = "0.4.1"
 twitch_oauth2 = "0.4.1"
+
+# Fairly mature and robust Twitch chat library
+twitchchat = { version = "0.14.8", features = ["async", "async-tls", "smol"] }

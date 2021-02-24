@@ -14,7 +14,6 @@ fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync + 'static>> {
   println!("Twitch Gateway");
   let twitch_secrets = Secrets::from_file("secrets.toml").expect("unable to parse secrets");
 
-
   use std::error::Error;
   if let Err(err) = run(&twitch_secrets) {
     println!("Error: {}", err);
