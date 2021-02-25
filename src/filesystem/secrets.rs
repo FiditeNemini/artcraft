@@ -9,6 +9,8 @@ pub struct Secrets {
   pub application_client_id: String,
   /// Application secret (generated)
   pub application_client_secret: String,
+  /// OAuth access token generated with URL handshake
+  pub oauth_access_token: String,
 }
 
 impl Secrets {
