@@ -1,3 +1,6 @@
+#[macro_use]
+extern crate serde_derive;
+
 // NOTE: this demo requires `--features="tokio/full tokio-util"`.
 use twitchchat::{
   commands, connector, messages,
@@ -9,7 +12,11 @@ use twitchchat::{
 mod include;
 use crate::include::{channels_to_join, get_user_config, main_loop};
 
+pub type AnyhowResult<T> = anyhow::Result<T>;
+
 mod filesystem;
+
+use crate::filesystem::secrets::Secrets;
 
 async fn connect(user_config: &UserConfig, channels: &[String]) -> anyhow::Result<AsyncRunner> {
   // create a connector using ``tokio``, this connects to Twitch.
@@ -39,8 +46,10 @@ async fn connect(user_config: &UserConfig, channels: &[String]) -> anyhow::Resul
 
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
+  let secrets = Secrets::from_file("secrets.toml")?;
+
   // create a user configuration
-  let user_config = get_user_config()?;
+  let user_config = get_user_config(&secrets)?;
   // get some channels to join from the environment
   let channels = channels_to_join()?;
 
@@ -70,8 +79,8 @@ async fn main() -> anyhow::Result<()> {
       }
 
 
-      println!("in 100 seconds we'll exit");
-      tokio::time::delay_for(std::time::Duration::from_secs(100)).await;
+      println!("in 1000 seconds we'll exit");
+      tokio::time::delay_for(std::time::Duration::from_secs(1000)).await;
 
       // send one final message to all channels
       for channel in &channels {
@@ -101,5 +110,5 @@ async fn main() -> anyhow::Result<()> {
 
   println!("starting main loop");
   // your 'main loop'. you'll just call next_message() until you're done
-  main_loop(runner).await
+  main_loop(runner, &secrets).await
 }

@@ -2,6 +2,8 @@
 use anyhow::Context as _;
 use twitchchat::{messages, AsyncRunner, Status, UserConfig};
 use crate::filesystem::secrets::Secrets;
+use redis::aio::Connection;
+use redis::AsyncCommands;
 
 // some helpers for the demo
 // fn get_env_var(key: &str) -> anyhow::Result<String> {
@@ -35,13 +37,20 @@ pub fn channels_to_join() -> anyhow::Result<Vec<String>> {
 }
 
 // a 'main loop'
-pub async fn main_loop(mut runner: AsyncRunner) -> anyhow::Result<()> {
+pub async fn main_loop(mut runner: AsyncRunner, secrets: &Secrets) -> anyhow::Result<()> {
+  println!("Connect to redis");
+  let client = redis::Client::open(secrets.redis_url())?;
+  let mut connection = client.get_async_connection().await?;
+
+  //let mut con = client.get_connection()?;
+  //let mut pubsub = con.as_pubsub();
+
   loop {
     match runner.next_message().await? {
       // this is the parsed message -- across all channels (and notifications from Twitch)
       Status::Message(msg) => {
         println!("Handle message time!");
-        handle_message(msg).await;
+        handle_message(msg , &mut connection ).await;
       }
 
       // you signaled a quit
@@ -61,12 +70,16 @@ pub async fn main_loop(mut runner: AsyncRunner) -> anyhow::Result<()> {
 }
 
 // you can generally ignore the lifetime for these types.
-async fn handle_message(msg: messages::Commands<'_>) {
+async fn handle_message(msg: messages::Commands<'_> , connection: &mut Connection  ) {
   use messages::Commands::*;
   // All sorts of messages
   match msg {
     // This is the one users send to channels
-    Privmsg(msg) => println!("[{}] {}: {}", msg.channel(), msg.name(), msg.data()),
+    Privmsg(msg) => {
+      println!("[{}] {}: {}", msg.channel(), msg.name(), msg.data());
+      //connection.publish("vocode", msg.data()).await;
+
+    },
 
     // This one is special, if twitch adds any new message
     // types, this will catch it until future releases of

@@ -11,6 +11,12 @@ pub struct Secrets {
   pub application_client_secret: String,
   /// OAuth access token generated with URL handshake
   pub oauth_access_token: String,
+
+  /// Redis
+  pub redis_username: String,
+  pub redis_password: String,
+  pub redis_host: String,
+  pub redis_port: u32,
 }
 
 impl Secrets {
@@ -20,5 +26,10 @@ impl Secrets {
     file.read_to_string(&mut buffer)?;
     let secrets = toml::from_str(&buffer)?;
     Ok(secrets)
+  }
+
+  pub fn redis_url(&self) -> String {
+    format!("rediss://{}:{}@{}:{}",
+            self.redis_username, self.redis_password, self.redis_host, self.redis_port)
   }
 }

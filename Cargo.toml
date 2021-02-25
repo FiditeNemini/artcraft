@@ -25,6 +25,11 @@ tokio = { version = "0.2", features = ["full"] }
 #tokio = { version = "1.2.0", features = ["full"] }
 toml = "0.5.8"
 
+#redis = { version = "0.20.0", features = ["tokio", "tokio-native-tls-comp", "aio"] }
+#redis = { version = "0.20.0", features = [] }
+#redis = { version = "0.17.0", features = ["tokio", "tokio-util", "tokio-tls", "tls", "native-tls", "async-native-tls", "aio"] }
+redis = { version = "0.17.0", features = ["tls", "async-std-tls-comp", "tokio-tls-comp"] }
+
 # Twitch Helix etc. API, but no PubSub just yet
 #twitch_api2 = "0.4.1"
 #twitch_oauth2 = "0.4.1"
