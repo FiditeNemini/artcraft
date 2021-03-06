@@ -52,6 +52,9 @@ interface State {
   // UI Primary Mode
   mode: Mode,
 
+  // News Popup
+  showNewsNotice: boolean,
+
   // TTS Mode State
   speaker: Speaker,
   extrasMode: ExtrasMode,
@@ -96,6 +99,7 @@ class App extends React.Component<Props, State> {
 
     this.state = {
       mode: Mode.SPEAK_MODE,
+      showNewsNotice: true,
       extrasMode: ExtrasMode.SPEAKER_INFO,
       speaker: defaultSpeaker,
       spectrogramMode: SpectrogramMode.VIRIDIS,
@@ -283,6 +287,11 @@ class App extends React.Component<Props, State> {
     this.setState({ isHistoryCountBadgeVisible: false });
   }
 
+  toggleNewsNotice = () => {
+    let show = !this.state.showNewsNotice;
+    this.setState({ showNewsNotice: show });
+  }
+
   public render() {
     let component;
     switch (this.state.mode) {
@@ -295,6 +304,7 @@ class App extends React.Component<Props, State> {
           currentSpectrogram={this.state.currentSpectrogram}
           currentText={this.state.currentText}
           textCharacterLimit={this.state.textCharacterLimit}
+          showNewsNotice={this.state.showNewsNotice}
           changeSpeakerCallback={this.setSpeakerBySlug} 
           changeSpeakerCategoryCallback={this.setSpeakerCategoryBySlug} 
           changeSpectrogramCallback={this.updateSpectrogram} 
@@ -303,6 +313,7 @@ class App extends React.Component<Props, State> {
           changeSpectrogramMode={this.setSpectrogramMode}
           appendUtteranceCallback={this.appendUtterance}
           setTextCallback={this.setText}
+          toggleNewsNoticeCallback={this.toggleNewsNotice}
           />;
         break;
       case Mode.VIDEO_MODE:

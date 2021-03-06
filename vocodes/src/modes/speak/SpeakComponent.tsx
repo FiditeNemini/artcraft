@@ -32,6 +32,7 @@ interface Props {
   spectrogramMode: SpectrogramMode,
   currentText: string,
   textCharacterLimit: number,
+  showNewsNotice: boolean,
   changeSpeakerCallback: (slug: string) => void,
   changeSpeakerCategoryCallback: (speakerCategorySlug: string) => void,
   changeSpectrogramCallback: (spectrogram: Spectrogram) => void,
@@ -39,6 +40,7 @@ interface Props {
   changeSpectrogramMode: (spectrogramMode: SpectrogramMode) => void,
   appendUtteranceCallback: (utterance: Utterance) => void,
   setTextCallback: (text: string) => void,
+  toggleNewsNoticeCallback: () => void,
 }
 
 interface State {
@@ -178,8 +180,43 @@ class SpeakComponent extends React.Component<Props, State> {
         onClick={this.toggleMode}>{modeText}</button>
     }
 
+    let newsNotice= <article />;
+
+    if (this.props.showNewsNotice) {
+      newsNotice = (
+        <article className="message is-info">
+          <div className="message-header">
+            <p>Make the Best Vocodes Meme, win $100.</p>
+            <button className="delete" aria-label="delete" onClick={() => this.props.toggleNewsNoticeCallback()}></button>
+          </div>
+          <div className="message-body">
+            <p>We'll be holding a competition for best Vo.codes videos once a week
+            and judging the entries on Sunday. Upload your videos to YouTube and
+            put a link to vocodes in the description. Let us know by submitting your
+            video entry to us
+            on <a href="https://twitter.com/vocodes" target="_blank" rel="noopener noreferrer">Twitter</a> or
+            our <a href="https://discord.gg/H72KFXm" target="_blank" rel="noopener noreferrer">Discord</a> server.
+            </p>
+            <br />
+            <p>
+            The best video each week will win $100. Winners will also be featured on our
+            upcoming <a href="https://twitch.tv/vocodes" target="_blank" rel="noopener noreferrer">Twitch</a> stream,
+            featuring real-time deepfake tools for Streamers and VTubers.
+            </p>
+            <br />
+
+            <p>We'll be releasing new voices and features soon.</p>
+
+          </div>
+        </article>
+      );
+    }
+
     return (
       <section>
+
+        {newsNotice}
+
         <div className="columns is-mobile is-gapless">
           <div className="column">
             <CategoryDropdown
