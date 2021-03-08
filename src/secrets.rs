@@ -8,7 +8,7 @@ pub struct Secrets {
   pub twitch: TwitchSecrets,
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Clone)]
 pub struct RedisSecrets {
   pub username: String,
   pub password: String,

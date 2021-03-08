@@ -16,13 +16,16 @@ use redis::{AsyncCommands, RedisResult};
 
 pub type AnyhowResult<T> = anyhow::Result<T>;
 
-mod filesystem;
-mod twitch_client;
-
-use crate::filesystem::secrets::Secrets;
-use crate::twitch_client::TwitchClient;
 use std::thread;
 use std::time::Duration;
+
+mod redis_client;
+mod secrets;
+mod twitch_client;
+
+use crate::twitch_client::TwitchClient;
+use crate::secrets::Secrets;
+use crate::redis_client::RedisClient;
 
 async fn connect(user_config: &UserConfig, channels: &[String]) -> anyhow::Result<AsyncRunner> {
   let connector = connector::tokio::Connector::twitch()?;
@@ -50,7 +53,8 @@ async fn connect(user_config: &UserConfig, channels: &[String]) -> anyhow::Resul
 async fn main() -> anyhow::Result<()> {
   let secrets = Secrets::from_file("secrets.toml")?;
 
-  let mut twitch_client = TwitchClient::new(&secrets.twitch);
+  let mut redis_client = RedisClient::new(&secrets.redis);
+  let mut twitch_client = TwitchClient::new(&secrets.twitch, redis_client);
 
   loop {
     match twitch_client.main_loop().await {

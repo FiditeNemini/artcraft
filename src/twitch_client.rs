@@ -1,13 +1,15 @@
-use crate::filesystem::secrets::TwitchSecrets;
+use crate::secrets::TwitchSecrets;
 use twitchchat::{AsyncRunner, Status};
 use twitchchat::messages::Commands::*;
 use std::thread;
 use std::time::Duration;
 use crate::AnyhowResult;
+use crate::redis_client::RedisClient;
 
 pub struct TwitchClient {
   secrets: TwitchSecrets,
   channels_to_join: Vec<String>,
+  redis_client: RedisClient,
 
   /// This manages our connection.
   /// It's meant to be absent when not connected.
@@ -17,9 +19,10 @@ pub struct TwitchClient {
 
 impl TwitchClient {
 
-  pub fn new(secrets: &TwitchSecrets) -> Self {
+  pub fn new(secrets: &TwitchSecrets, redis_client: RedisClient) -> Self {
     Self {
       secrets: secrets.clone(),
+      redis_client,
       channels_to_join: secrets.watch_channels.clone(), // TODO: Configure these elsewhere.
       runner: None,
     }
@@ -64,7 +67,7 @@ impl TwitchClient {
       match runner.next_message().await? {
         Status::Message(message) => {
           // NB: Handles across all channels (and notifications from Twitch)
-          self.handle_message(message)
+          self.handle_message(message).await
         },
         Status::Quit => {
           // we signaled a quit
@@ -78,11 +81,12 @@ impl TwitchClient {
     Ok(())
   }
 
-  pub fn handle_message(&self, message: twitchchat::messages::Commands<'_>) {
+  pub async fn handle_message(&mut self, message: twitchchat::messages::Commands<'_>) {
     match message {
       // This is the one users send to channels
       Privmsg(msg) => {
         println!("[{}] {}: {}", msg.channel(), msg.name(), msg.data());
+        let _r = self.redis_client.publish("foo", "bar").await;
       },
 
       // This one is special, if twitch adds any new message
