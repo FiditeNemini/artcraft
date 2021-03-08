@@ -1,5 +1,6 @@
 use crate::AnyhowResult;
 use std::io::Read;
+use twitchchat::UserConfig;
 
 #[derive(Deserialize)]
 pub struct Secrets {
@@ -17,11 +18,15 @@ pub struct RedisSecrets {
 
 #[derive(Deserialize)]
 pub struct TwitchSecrets {
+  /// Twitch username
+  pub username: String,
+
   /// From the creator dashboard of Twitch
   pub stream_key: String,
 
   /// Identifies our application uniquely; cannot be reassigned.
   pub application_client_id: String,
+
   /// Application secret (generated)
   pub application_client_secret: String,
 
@@ -37,6 +42,9 @@ pub struct TwitchSecrets {
   /// Which will redirect to 'localhost' per the redirect_uri.
   /// The oauth token will be "access_token" prepended with "oauth:" (which isn't included)
   pub oauth_access_token: String,
+
+  /// Channels to join and monitor.
+  pub watch_channels: Vec<String>,
 }
 
 impl Secrets {
@@ -52,5 +60,16 @@ impl Secrets {
 impl RedisSecrets {
   pub fn connection_url(&self) -> String {
     format!("rediss://{}:{}@{}:{}", self.username, self.password, self.host, self.port)
+  }
+}
+
+impl TwitchSecrets {
+  pub fn get_user_config(&self) -> AnyhowResult<UserConfig> {
+    let config = UserConfig::builder()
+        .name(self.username.to_string())
+        .token(self.oauth_access_token.to_string())
+        .enable_all_capabilities()
+        .build()?;
+    Ok(config)
   }
 }
