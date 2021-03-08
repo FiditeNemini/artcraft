@@ -16,7 +16,7 @@ pub struct RedisSecrets {
   pub port: u32,
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Clone)]
 pub struct TwitchSecrets {
   /// Twitch username
   pub username: String,

@@ -17,6 +17,7 @@ use redis::{AsyncCommands, RedisResult};
 pub type AnyhowResult<T> = anyhow::Result<T>;
 
 mod filesystem;
+mod twitch_client;
 
 use crate::filesystem::secrets::Secrets;
 
@@ -53,7 +54,7 @@ async fn main() -> anyhow::Result<()> {
   let runner = connect(&user_config, &channels).await?;
 
   // you can get a handle to shutdown the runner
-  let quit_handle = runner.quit_handle();
+  /*let quit_handle = runner.quit_handle();
 
   // you can get a clonable writer
   let mut writer = runner.writer();
@@ -87,10 +88,10 @@ async fn main() -> anyhow::Result<()> {
       println!("sending quit signal");
       quit_handle.notify().await;
     }
-  });
+  });*/
 
   // you can encode all sorts of 'commands'
-  for channel in &channels {
+  /*for channel in &channels {
     println!("> SENDING HELLO WORLD");
     writer
         .encode(commands::privmsg(channel, "hello world!"))
@@ -102,7 +103,7 @@ async fn main() -> anyhow::Result<()> {
     writer
         .encode(commands::privmsg(channel, "hello world again!"))
         .await?;
-  }
+  }*/
 
   println!("starting main loop");
   // your 'main loop'. you'll just call next_message() until you're done
