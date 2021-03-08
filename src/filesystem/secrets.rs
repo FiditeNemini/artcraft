@@ -3,20 +3,40 @@ use std::io::Read;
 
 #[derive(Deserialize)]
 pub struct Secrets {
+  pub redis: RedisSecrets,
+  pub twitch: TwitchSecrets,
+}
+
+#[derive(Deserialize)]
+pub struct RedisSecrets {
+  pub username: String,
+  pub password: String,
+  pub host: String,
+  pub port: u32,
+}
+
+#[derive(Deserialize)]
+pub struct TwitchSecrets {
   /// From the creator dashboard of Twitch
-  pub twitch_stream_key: String,
+  pub stream_key: String,
+
   /// Identifies our application uniquely; cannot be reassigned.
   pub application_client_id: String,
   /// Application secret (generated)
   pub application_client_secret: String,
-  /// OAuth access token generated with URL handshake
-  pub oauth_access_token: String,
 
-  /// Redis
-  pub redis_username: String,
-  pub redis_password: String,
-  pub redis_host: String,
-  pub redis_port: u32,
+  /// OAuth access token generated with URL handshake
+  /// NB: This changes frequently and must be regenerated.
+  /// Go to this URL:
+  ///
+  /// https://id.twitch.tv/oauth2/authorize?response_type=token
+  ///   &client_id=___APPLICATION_CLIENT_ID___
+  ///   &redirect_uri=http://localhost&scope=viewing_activity_read%20user_read%20channel_read%20chat:read
+  ///   &state=randomUUID
+  ///
+  /// Which will redirect to 'localhost' per the redirect_uri.
+  /// The oauth token will be "access_token" prepended with "oauth:" (which isn't included)
+  pub oauth_access_token: String,
 }
 
 impl Secrets {
@@ -27,9 +47,10 @@ impl Secrets {
     let secrets = toml::from_str(&buffer)?;
     Ok(secrets)
   }
+}
 
-  pub fn redis_url(&self) -> String {
-    format!("rediss://{}:{}@{}:{}",
-            self.redis_username, self.redis_password, self.redis_host, self.redis_port)
+impl RedisSecrets {
+  pub fn connection_url(&self) -> String {
+    format!("rediss://{}:{}@{}:{}", self.username, self.password, self.host, self.port)
   }
 }

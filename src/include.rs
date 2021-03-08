@@ -14,7 +14,7 @@ use crate::AnyhowResult;
 
 pub fn get_user_config(secrets: &Secrets) -> anyhow::Result<twitchchat::UserConfig> {
   let name = "testytest512".to_string(); //get_env_var("TWITCH_NAME")?;
-  let token = secrets.oauth_access_token.to_string();
+  let token = secrets.twitch.oauth_access_token.to_string();
 
   // you need a `UserConfig` to connect to Twitch
   let config = UserConfig::builder()
@@ -40,8 +40,8 @@ pub fn channels_to_join() -> anyhow::Result<Vec<String>> {
 
 // a 'main loop'
 pub async fn main_loop(mut runner: AsyncRunner, secrets: &Secrets) -> anyhow::Result<()> {
-  println!("Connect to redis: {}", secrets.redis_url());
-  let client = redis::Client::open(secrets.redis_url())?;
+  println!("Connect to redis: {}", secrets.redis.connection_url());
+  let client = redis::Client::open(secrets.redis.connection_url())?;
   let mut connection = client.get_async_connection().await?;
 
   //let mut con = client.get_connection()?;

@@ -19,18 +19,14 @@ mod filesystem;
 use crate::filesystem::secrets::Secrets;
 
 async fn connect(user_config: &UserConfig, channels: &[String]) -> anyhow::Result<AsyncRunner> {
-  // create a connector using ``tokio``, this connects to Twitch.
-  // you can provide a different address with `custom`
   let connector = connector::tokio::Connector::twitch()?;
 
-  println!("we're connecting!");
-  // create a new runner. this is a provided async 'main loop'
-  // this method will block until you're ready
+  println!("Connecting...");
   let mut runner = AsyncRunner::connect(connector, user_config).await?;
-  println!("..and we're connected");
 
-  // and the identity Twitch gave you
-  println!("our identity: {:#?}", runner.identity);
+  println!("Connected.");
+
+  println!("Our Twitch identity: {:#?}", runner.identity);
 
   for channel in channels {
     // the runner itself has 'blocking' join/part to ensure you join/leave a channel.
