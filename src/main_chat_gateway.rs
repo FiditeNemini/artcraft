@@ -8,7 +8,7 @@ use twitchchat::{
   UserConfig,
 };
 
-use anyhow::Context as _;
+use anyhow::{Context, Error};
 use anyhow::anyhow;
 
 use redis::aio::Connection;
@@ -20,6 +20,9 @@ mod filesystem;
 mod twitch_client;
 
 use crate::filesystem::secrets::Secrets;
+use crate::twitch_client::TwitchClient;
+use std::thread;
+use std::time::Duration;
 
 async fn connect(user_config: &UserConfig, channels: &[String]) -> anyhow::Result<AsyncRunner> {
   let connector = connector::tokio::Connector::twitch()?;
@@ -47,67 +50,23 @@ async fn connect(user_config: &UserConfig, channels: &[String]) -> anyhow::Resul
 async fn main() -> anyhow::Result<()> {
   let secrets = Secrets::from_file("secrets.toml")?;
 
-  let user_config = secrets.twitch.get_user_config()?;
-  let channels = secrets.twitch.watch_channels.clone();
+  let mut twitch_client = TwitchClient::new(&secrets.twitch);
 
-  // connect and join the provided channels
-  let runner = connect(&user_config, &channels).await?;
-
-  // you can get a handle to shutdown the runner
-  /*let quit_handle = runner.quit_handle();
-
-  // you can get a clonable writer
-  let mut writer = runner.writer();
-
-  // spawn something off in the background that'll exit in 10 seconds
-  tokio::spawn({
-    let mut writer = writer.clone();
-    let channels = channels.clone();
-    async move {
-
-      for channel in &channels {
-        println!("> SENDING HELLO");
-        let cmd = commands::privmsg(&channel, "hello! testing from Rust");
-        writer.encode(cmd).await.unwrap();
-
-        println!("> SENDING HELLO #2");
-        let cmd = commands::me(&channel, "hello! testing from Rust");
-        writer.encode(cmd).await.unwrap();
+  loop {
+    match twitch_client.main_loop().await {
+      Ok(_) => {
+        println!("Early exit? Restarting...");
+        thread::sleep(Duration::from_secs(5));
+      },
+      Err(e) => {
+        println!("There was an error: {:?}", e);
+        thread::sleep(Duration::from_secs(5));
+        println!("Restarting client...");
       }
-
-
-      println!("in 1000 seconds we'll exit");
-      tokio::time::delay_for(std::time::Duration::from_secs(1000)).await;
-
-      // send one final message to all channels
-      for channel in &channels {
-        let cmd = commands::privmsg(&channel, "goodbye, world");
-        writer.encode(cmd).await.unwrap();
-      }
-
-      println!("sending quit signal");
-      quit_handle.notify().await;
     }
-  });*/
-
-  // you can encode all sorts of 'commands'
-  /*for channel in &channels {
-    println!("> SENDING HELLO WORLD");
-    writer
-        .encode(commands::privmsg(channel, "hello world!"))
-        .await?;
   }
 
-  for channel in &channels {
-    println!("> SENDING HELLO AGAIN");
-    writer
-        .encode(commands::privmsg(channel, "hello world again!"))
-        .await?;
-  }*/
-
-  println!("starting main loop");
-  // your 'main loop'. you'll just call next_message() until you're done
-  main_loop(runner, &secrets).await
+  Ok(())
 }
 
 pub async fn main_loop(mut runner: AsyncRunner, secrets: &Secrets) -> anyhow::Result<()> {

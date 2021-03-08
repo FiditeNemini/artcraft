@@ -5,10 +5,13 @@ use std::thread;
 use std::time::Duration;
 use crate::AnyhowResult;
 
-struct TwitchClient {
+pub struct TwitchClient {
   secrets: TwitchSecrets,
   channels_to_join: Vec<String>,
 
+  /// This manages our connection.
+  /// It's meant to be absent when not connected.
+  /// TODO: Probably need to reset this when we disconnect.
   runner: Option<AsyncRunner>,
 }
 
@@ -17,7 +20,7 @@ impl TwitchClient {
   pub fn new(secrets: &TwitchSecrets) -> Self {
     Self {
       secrets: secrets.clone(),
-      channels_to_join: Vec::new(),
+      channels_to_join: secrets.watch_channels.clone(), // TODO: Configure these elsewhere.
       runner: None,
     }
   }
@@ -41,6 +44,8 @@ impl TwitchClient {
       println!("joined '{}'!", channel);
     }
 
+    self.runner = Some(runner);
+
     Ok(())
   }
 
@@ -57,18 +62,15 @@ impl TwitchClient {
       };
 
       match runner.next_message().await? {
-        Status::Message(msg) => {
-          // this is the parsed message -- across all channels (and notifications from Twitch)
-          //handle_message(msg , &mut connection ).await;
-          continue;
+        Status::Message(message) => {
+          // NB: Handles across all channels (and notifications from Twitch)
+          self.handle_message(message)
         },
         Status::Quit => {
           // we signaled a quit
-          continue;
         },
         Status::Eof => {
           // the connection closed normally
-          continue;
         },
       }
     }
