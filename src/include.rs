@@ -1,9 +1,11 @@
 #![allow(dead_code)]
 use anyhow::Context as _;
+use anyhow::anyhow;
 use twitchchat::{messages, AsyncRunner, Status, UserConfig};
 use crate::filesystem::secrets::Secrets;
 use redis::aio::Connection;
-use redis::AsyncCommands;
+use redis::{AsyncCommands, RedisResult};
+use crate::AnyhowResult;
 
 // some helpers for the demo
 // fn get_env_var(key: &str) -> anyhow::Result<String> {
@@ -38,7 +40,7 @@ pub fn channels_to_join() -> anyhow::Result<Vec<String>> {
 
 // a 'main loop'
 pub async fn main_loop(mut runner: AsyncRunner, secrets: &Secrets) -> anyhow::Result<()> {
-  println!("Connect to redis");
+  println!("Connect to redis: {}", secrets.redis_url());
   let client = redis::Client::open(secrets.redis_url())?;
   let mut connection = client.get_async_connection().await?;
 
@@ -69,6 +71,16 @@ pub async fn main_loop(mut runner: AsyncRunner, secrets: &Secrets) -> anyhow::Re
   Ok(())
 }
 
+
+// Oh my god I'm lazy
+// https://stackoverflow.com/a/41517340
+fn split_once(in_string: &str) -> AnyhowResult<(&str, &str)> {
+  let mut splitter = in_string.splitn(2, ' ');
+  let first = splitter.next().ok_or(anyhow!("no match"))?;
+  let second = splitter.next().ok_or(anyhow!("no match"))?;
+  Ok((first, second))
+}
+
 // you can generally ignore the lifetime for these types.
 async fn handle_message(msg: messages::Commands<'_> , connection: &mut Connection  ) {
   use messages::Commands::*;
@@ -77,8 +89,13 @@ async fn handle_message(msg: messages::Commands<'_> , connection: &mut Connectio
     // This is the one users send to channels
     Privmsg(msg) => {
       println!("[{}] {}: {}", msg.channel(), msg.name(), msg.data());
-      //connection.publish("vocode", msg.data()).await;
 
+      if let Ok((command, message)) = split_once(msg.data()) {
+        println!("Command: {} message: {}", command, message);
+
+        let result : RedisResult<u32> = connection.publish(command, message).await;
+        result.expect("Should work");
+      }
     },
 
     // This one is special, if twitch adds any new message

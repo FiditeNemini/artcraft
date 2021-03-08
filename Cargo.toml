@@ -7,9 +7,9 @@ authors = [
   "Brandon Thomas <echelon@gmail.com>"
 ]
 
-[[bin]]
-name = "twitch-helix-demo"
-path = "src/main_helix_demo.rs"
+#[[bin]]
+#name = "twitch-helix-demo"
+#path = "src/main_helix_demo.rs"
 
 [[bin]]
 name = "twitch-chat-gateway"
