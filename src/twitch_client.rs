@@ -1,8 +1,10 @@
-use crate::secrets::TwitchSecrets;
+use anyhow::anyhow;
 use twitchchat::{AsyncRunner, Status};
 use twitchchat::messages::Commands::*;
 use std::thread;
 use std::time::Duration;
+
+use crate::secrets::TwitchSecrets;
 use crate::AnyhowResult;
 use crate::redis_client::RedisClient;
 
@@ -86,7 +88,14 @@ impl TwitchClient {
       // This is the one users send to channels
       Privmsg(msg) => {
         println!("[{}] {}: {}", msg.channel(), msg.name(), msg.data());
-        let _r = self.redis_client.publish("foo", "bar").await;
+
+        if let Ok((command, remaining_message)) = split_once(msg.data()) {
+          let channel = command.to_lowercase();
+          let username = msg.name().trim();
+          let command_payload= format!("{}|{}", username, remaining_message); // Payload: USERNAME|DATA
+          println!("Publish: {} - {}", channel, command_payload);
+          let _r = self.redis_client.publish(&channel, &command_payload).await;
+        }
       },
 
       // This one is special, if twitch adds any new message
@@ -117,4 +126,13 @@ impl TwitchClient {
       _ => {}
     }
   }
+}
+
+// Oh my god I'm lazy
+// https://stackoverflow.com/a/41517340
+fn split_once(in_string: &str) -> AnyhowResult<(&str, &str)> {
+  let mut splitter = in_string.trim().splitn(2, ' ');
+  let first = splitter.next().ok_or(anyhow!("no match"))?;
+  let second = splitter.next().ok_or(anyhow!("no match"))?;
+  Ok((first, second))
 }
