@@ -41,6 +41,10 @@ const MAX_SEND_POINTS_PER_PACKET : usize = 3000;
 /// The command line args for the program.
 #[derive(Clap, Debug, Clone)]
 pub struct CommandArgs {
+  /// Render axes
+  #[clap(long, parse(try_from_str = true_or_false), default_value = "false")]
+  pub debug: bool,
+
   /// Set a wide FOV in the depth camera
   #[clap(long, parse(try_from_str = true_or_false), default_value = "false")]
   pub wide: bool,

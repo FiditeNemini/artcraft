@@ -187,5 +187,14 @@ pub fn calculate_point_cloud3(
         }
     }
 
+    if command_args.debug {
+        // TODO/FIXME: Make this a constant allocation + append.
+        for i in -1000 .. 1000 {
+            points.push(Point::at(i as f32, 0.0, 0.0, Color::Red));
+            points.push(Point::at(0.0, i as f32, 0.0, Color::Green));
+            points.push(Point::at(0.0, 0.0, i as f32, Color::Blue));
+        }
+    }
+
     Ok(points)
 }
