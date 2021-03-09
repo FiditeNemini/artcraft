@@ -32,6 +32,8 @@ async fn main() -> anyhow::Result<()> {
   let secrets = Secrets::from_file("secrets.toml")?;
 
   let mut redis_client = RedisClient::new(&secrets.redis);
+  redis_client.connect().await?;
+
   let mut twitch_client = TwitchClient::new(&secrets.twitch, redis_client);
 
   loop {
