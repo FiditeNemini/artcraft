@@ -2,6 +2,8 @@ use crate::AnyhowResult;
 use crate::secrets::RedisSecrets;
 
 use anyhow::anyhow;
+use std::thread;
+use std::time::Duration;
 use redis::AsyncCommands;
 use redis::aio::Connection;
 use redis;
@@ -13,6 +15,8 @@ pub struct RedisClient {
   /// It's meant to be absent when not connected.
   /// TODO: Probably need to reset this when we disconnect.
   connection: Option<Connection>,
+
+  connection_failure_count: u32,
 }
 
 impl RedisClient {
@@ -20,6 +24,7 @@ impl RedisClient {
     Self {
       secrets: secrets.clone(),
       connection: None,
+      connection_failure_count: 0,
     }
   }
 
@@ -28,7 +33,22 @@ impl RedisClient {
     let mut connection = client.get_async_connection().await?;
 
     self.connection = Some(connection);
+    self.connection_failure_count = 0;
 
+    Ok(())
+  }
+
+  pub async fn failure_notify_maybe_reconnect(&mut self) -> AnyhowResult<()> {
+    self.connection_failure_count += 1;
+
+    if self.connection_failure_count > 5 {
+      println!("Attempting Redis Reconnect in 3 sec...");
+      thread::sleep(Duration::from_secs(3));
+      self.connect().await?;
+      self.connection_failure_count = 0;
+    } else {
+      println!("Not ready to reconnect. Fail Count = {}", self.connection_failure_count);
+    }
     Ok(())
   }
 

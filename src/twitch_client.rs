@@ -94,7 +94,15 @@ impl TwitchClient {
           let username = msg.name().trim();
           let command_payload= format!("{}|{}", username, remaining_message); // Payload: USERNAME|DATA
           println!("Publish: '{}' - '{}'", channel, command_payload);
-          let _r = self.redis_client.publish(&channel, &command_payload).await.expect("Should work");
+
+          let redis_result = self.redis_client.publish(&channel, &command_payload).await;
+          match redis_result {
+            Ok(_) => {},
+            Err(e) => {
+              println!("Redis error: {:?}", e);
+              self.redis_client.failure_notify_maybe_reconnect().await;
+            }
+          }
         }
       },
 
