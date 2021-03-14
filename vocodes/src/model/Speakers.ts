@@ -541,6 +541,16 @@ const SPEAKERS : Speaker[] = [
     categories: ["celebrities", "new"],
   }),
   Speaker.fromJson({
+    name: "Peter Griffin",
+    slug: "peter-griffin",
+    description: "Entrepreneur",
+    avatarUrl: "peter-griffin.webp",
+    fullUrl: "peter-griffin-full.png",
+    voiceQuality: 7.0,
+    categories: ["cartoons"],
+    defaultVoice: true,
+  }),
+  Speaker.fromJson({
     name: "Peter Thiel",
     slug: "peter-thiel",
     description: "Entrepreneur",
