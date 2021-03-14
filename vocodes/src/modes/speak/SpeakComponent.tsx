@@ -186,27 +186,18 @@ class SpeakComponent extends React.Component<Props, State> {
       newsNotice = (
         <article className="message is-info">
           <div className="message-header">
-            <p>Make the Best Vocodes Meme, win $100.</p>
+            <p>Join our Twitch for a chance to win a PlayStation 5</p>
             <button className="delete" aria-label="delete" onClick={() => this.props.toggleNewsNoticeCallback()}></button>
           </div>
           <div className="message-body">
-            <p>We'll be holding a competition for best Vo.codes videos once a week
-            and judging the entries on Sunday. Upload your videos to YouTube and
-            put a link to vocodes in the description. Let us know by submitting your
-            video entry to us
-            on <a href="https://twitter.com/vocodes" target="_blank" rel="noopener noreferrer">Twitter</a> or
-            our <a href="https://discord.gg/H72KFXm" target="_blank" rel="noopener noreferrer">Discord</a> server.
-            </p>
-            <br />
             <p>
-            The best video each week will win $100. Winners will also be featured on our
-            upcoming <a href="https://twitch.tv/vocodes" target="_blank" rel="noopener noreferrer">Twitch</a> stream,
-            featuring real-time deepfake tools for Streamers and VTubers.
+              <a href="https://twitch.tv/vocodes" target="_blank" rel="noopener noreferrer">Follow us on Twitch!</a> We're
+              building streaming tools that will incorporate deep fake technology and audience interaction. You'll be able
+              to use this for your streams, too.
             </p>
-            <br />
-
-            <p>We'll be releasing new voices and features soon.</p>
-
+            <p>
+              We're giving away prizes with every stream. Please check us out!
+            </p>
           </div>
         </article>
       );
