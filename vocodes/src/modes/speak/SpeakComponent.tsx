@@ -186,7 +186,7 @@ class SpeakComponent extends React.Component<Props, State> {
       newsNotice = (
         <article className="message is-info">
           <div className="message-header">
-            <p>Join our Twitch for a chance to win a PlayStation 5</p>
+            <p>Join our Twitch for New Voices to win a PlayStation 5</p>
             <button className="delete" aria-label="delete" onClick={() => this.props.toggleNewsNoticeCallback()}></button>
           </div>
           <div className="message-body">
@@ -196,7 +196,8 @@ class SpeakComponent extends React.Component<Props, State> {
               to use this for your streams, too.
             </p>
             <p>
-              We're giving away prizes with every stream. Please check us out!
+              You get early and exclusive access to new voices. We're also giving away $100 in prizes with every stream. 
+              Please check us out! <a href="https://twitch.tv/vocodes" target="_blank" rel="noopener noreferrer">Follow for notifications!</a> 
             </p>
           </div>
         </article>

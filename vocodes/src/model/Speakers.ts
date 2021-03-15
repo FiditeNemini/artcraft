@@ -239,7 +239,7 @@ const SPEAKERS : Speaker[] = [
     avatarUrl: "happy-gilmore.webp",
     fullUrl: "bob-barker-full.png",
     voiceQuality: 8.5,
-    categories: ["new", "celebrities"],
+    categories: ["celebrities"],
   }),
   Speaker.fromJson({
     name: "Boomstick (Death Battle!)",
@@ -293,7 +293,7 @@ const SPEAKERS : Speaker[] = [
     avatarUrl: "crypt-keeper.jpg",
     fullUrl: "crypt-keeper-full.png",
     voiceQuality: 6.5,
-    categories: ["new", "fantasy"],
+    categories: ["fantasy"],
   }),
   Speaker.fromJson({
     name: "Danny Devito",
@@ -330,6 +330,15 @@ const SPEAKERS : Speaker[] = [
     fullUrl: "dr-phil-mcgraw-full.png",
     voiceQuality: 6.1,
     categories: ["celebrities", "meme"],
+  }),
+  Speaker.fromJson({
+    name: "Eric Cartman",
+    slug: "eric-cartman",
+    description: "Obnoxious.",
+    avatarUrl: "eric-cartman.webp",
+    fullUrl: "eric-cartman-full.png",
+    voiceQuality: 6.6,
+    categories: ["cartoons", "new"],
   }),
   //Speaker.fromJson({
   //  name: "Etika",
@@ -475,7 +484,7 @@ const SPEAKERS : Speaker[] = [
     avatarUrl: "mitch-mcconnell.jpg",
     fullUrl: "mitch-mcconnel-full.png",
     voiceQuality: 8.5,
-    categories: ["politics", "new"],
+    categories: ["politics"],
   }),
   Speaker.fromJson({
     name: "moistcr1tikal",
@@ -538,16 +547,16 @@ const SPEAKERS : Speaker[] = [
     avatarUrl: "paula-deen.jpg",
     fullUrl: "paula-deen-full.png",
     voiceQuality: 8.4,
-    categories: ["celebrities", "new"],
+    categories: ["celebrities"],
   }),
   Speaker.fromJson({
     name: "Peter Griffin",
     slug: "peter-griffin",
-    description: "Entrepreneur",
+    description: "Family Guy.",
     avatarUrl: "peter-griffin.webp",
     fullUrl: "peter-griffin-full.png",
     voiceQuality: 7.0,
-    categories: ["cartoons"],
+    categories: ["cartoons", "new"],
     defaultVoice: true,
   }),
   Speaker.fromJson({
@@ -741,7 +750,7 @@ const SPEAKERS : Speaker[] = [
     avatarUrl: "tommy-wiseau-laugh.webp",
     fullUrl: "tommy-wiseau-full.png",
     voiceQuality: 4.6,
-    categories: ["celebrities", "new", "meme"],
+    categories: ["celebrities", "meme"],
   }),
   Speaker.fromJson({
     name: "Trevor Philips",
