@@ -339,6 +339,7 @@ const SPEAKERS : Speaker[] = [
     fullUrl: "eric-cartman-full.png",
     voiceQuality: 6.6,
     categories: ["cartoons", "new"],
+    defaultVoice: true,
   }),
   //Speaker.fromJson({
   //  name: "Etika",
