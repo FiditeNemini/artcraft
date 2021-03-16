@@ -1,4 +1,11 @@
 [[speakers]]
+name = "Goku"
+slug = "goku"
+model_pipeline = "ArpabetGlowTtsMelgan"
+glow_tts = "glow-tts_goku_ljstx_2021.03.14_expr-1_chkpt-5300.torchjit"
+melgan = "melgan_manyvoice5.0_2020-07-23_12d5838_10760.torchjit" # TODO: Needs custom vocoder
+
+[[speakers]]
 name = "Peter Griffin"
 slug = "peter-griffin"
 model_pipeline = "ArpabetGlowTtsMelgan"
