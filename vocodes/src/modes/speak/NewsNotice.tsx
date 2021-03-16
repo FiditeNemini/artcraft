@@ -29,7 +29,7 @@ class NewsNotice extends React.Component<Props, State> {
         </div>
         <div className="message-body">
 
-          <div className="columns is-mobile is-centered is-vcentered">
+          <div className="columns is-centered is-vcentered">
             <div className="column is-one-third">
               <a href="https://twitch.tv/vocodes" target="_blank" rel="noopener noreferrer"><img 
                 src="/banner/banner.webp" alt="Follow us on Twitch!" /></a>
