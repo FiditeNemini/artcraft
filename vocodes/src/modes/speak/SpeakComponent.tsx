@@ -10,6 +10,7 @@ import { SpectrogramMode } from '../../App';
 import { StatusText } from './StatusText';
 import { Utterance } from '../../model/utterance';
 import { getRandomInt } from '../../Utils';
+import { NewsNotice } from './NewsNotice';
 
 enum StatusState {
   NONE,
@@ -180,34 +181,12 @@ class SpeakComponent extends React.Component<Props, State> {
         onClick={this.toggleMode}>{modeText}</button>
     }
 
-    let newsNotice= <article />;
-
-    if (this.props.showNewsNotice) {
-      newsNotice = (
-        <article className="message is-info">
-          <div className="message-header">
-            <p>Join our Twitch for New Voices to win a PlayStation 5</p>
-            <button className="delete" aria-label="delete" onClick={() => this.props.toggleNewsNoticeCallback()}></button>
-          </div>
-          <div className="message-body">
-            <p>
-              <a href="https://twitch.tv/vocodes" target="_blank" rel="noopener noreferrer">Follow us on Twitch!</a> We're
-              building streaming tools that will incorporate deep fake technology and audience interaction. You'll be able
-              to use this for your streams, too.
-            </p>
-            <p>
-              You get early and exclusive access to new voices. We're also giving away $100 in prizes with every stream. 
-              Please check us out! <a href="https://twitch.tv/vocodes" target="_blank" rel="noopener noreferrer">Follow for notifications!</a> 
-            </p>
-          </div>
-        </article>
-      );
-    }
-
     return (
       <section>
-
-        {newsNotice}
+        <NewsNotice 
+          showNewsNotice={this.props.showNewsNotice}
+          toggleNewsNoticeCallback={this.props.toggleNewsNoticeCallback}
+          />
 
         <div className="columns is-mobile is-gapless">
           <div className="column">
