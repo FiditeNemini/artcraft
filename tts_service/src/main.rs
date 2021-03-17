@@ -419,11 +419,15 @@ async fn run_server(app_state: AppState, server_args: ServerArgs) -> std::io::Re
           .exclude("/liveness")
           .exclude("/readiness"))
       .wrap(DefaultHeaders::new().header("X-Backend-Hostname", &server_hostname))
+      // Admin UI & old frontend
       .service(Files::new("/frontend", admin_asset_directory.clone())
+          .index_file("FAKE_INDEX.HTML"))
+      .service(Files::new("/adminui", admin_asset_directory.clone())
           .index_file("index.html"))
-      .service(Files::new("/admin", admin_asset_directory.clone())
-          .index_file("index.html"))
-      .service(Files::new("/patreon", patreon_asset_directory.clone())
+      // Twitch and patreon
+      .service(Files::new("/early_access", patreon_asset_directory.clone())
+          .index_file("FAKE_INDEX.HTML"))
+      .service(Files::new("/patreon-thanks", patreon_asset_directory.clone())
           .index_file("index.html"))
       .service(Files::new("/twitch", twitch_asset_directory.clone())
           .index_file("index.html"))

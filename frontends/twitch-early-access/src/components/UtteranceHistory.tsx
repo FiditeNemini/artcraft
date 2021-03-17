@@ -29,7 +29,7 @@ class UtteranceHistory extends React.Component<Props, State> {
                   {utterance.text}
                 </p>
                 <p>
-                  <a href="#" onClick={() => utterance.howl.play()}>Play</a>
+                  <a onClick={() => utterance.howl.play()}>Play</a>
                 </p>
                 <p>
                   <a href={utterance.url} target="_blank" download="vocodes-early-access.wav">Download</a>
