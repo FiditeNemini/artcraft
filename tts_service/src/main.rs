@@ -21,6 +21,8 @@ pub mod text;
 use std::env;
 use std::fmt::Debug;
 use std::fmt::Display;
+use std::path::Path;
+use std::path::PathBuf;
 use std::str::FromStr;
 use std::sync::Arc;
 
@@ -63,6 +65,9 @@ use crate::endpoints::service_settings::get_service_settings;
 const ENV_ALLOW_MODEL_RELOAD : &'static str = "ALLOW_MODEL_RELOAD";
 const ENV_ARPABET_EXTRAS_FILE : &'static str = "ARPABET_EXTRAS_FILE";
 const ENV_ASSET_DIRECTORY: &'static str = "ASSET_DIRECTORY";
+const ENV_ASSET_SUBDIRECTORY_ADMIN: &'static str = "ASSET_SUBDIRECTORY_ADMIN";
+const ENV_ASSET_SUBDIRECTORY_PATREON: &'static str = "ASSET_SUBDIRECTORY_PATREON";
+const ENV_ASSET_SUBDIRECTORY_TWITCH: &'static str = "ASSET_SUBDIRECTORY_TWITCH";
 const ENV_BIND_ADDRESS: &'static str = "BIND_ADDRESS";
 const ENV_DATABASE_ENABLED : &'static str = "DATABASE_ENABLED";
 const ENV_DATABASE_URL : &'static str = "DATABASE_URL";
@@ -83,7 +88,10 @@ const ENV_STATS_MICROSERVICE_ENABLED : &'static str = "STATS_MICROSERVICE_ENABLE
 const ENV_STATS_MICROSERVICE_ENDPOINT : &'static str = "STATS_MICROSERVICE_ENDPOINT";
 
 const DEFAULT_ALLOW_MODEL_RELOAD : bool = true;
-const DEFAULT_ASSET_DIRECTORY : &'static str = "/home/bt/dev/voice/voder/tts_frontend/build";
+const DEFAULT_ASSET_DIRECTORY : &'static str = "/home/bt/dev/voice/voder/frontends";
+const DEFAULT_ASSET_SUBDIRECTORY_ADMIN : &'static str = "admin/build";
+const DEFAULT_ASSET_SUBDIRECTORY_PATREON : &'static str = "twitch-early-access/build";
+const DEFAULT_ASSET_SUBDIRECTORY_TWITCH : &'static str = "twitch-early-access/build";
 const DEFAULT_BIND_ADDRESS : &'static str = "0.0.0.0:12345";
 const DEFAULT_DATABASE_ENABLED : bool = false;
 const DEFAULT_DATABASE_URL : &'static str = "mysql://root:root@localhost/mumble";
@@ -121,7 +129,12 @@ pub struct ServerArgs {
   pub bind_address: String,
   pub hostname: String,
   pub num_workers: usize,
-  pub asset_directory: String,
+
+  // Directories for web assets
+  pub root_asset_directory: PathBuf,
+  pub patreon_asset_directory: PathBuf,
+  pub twitch_asset_directory: PathBuf,
+  pub admin_asset_directory: PathBuf,
 }
 
 fn get_env_string_optional(env_name: &str) -> Option<String> {
@@ -211,7 +224,6 @@ pub fn main() -> AnyhowResult<()> {
 
   let arpabet_extras_file = get_env_string_optional(ENV_ARPABET_EXTRAS_FILE);
   let bind_address = get_env_string(ENV_BIND_ADDRESS, DEFAULT_BIND_ADDRESS);
-  let asset_directory = get_env_string(ENV_ASSET_DIRECTORY, DEFAULT_ASSET_DIRECTORY);
   let model_config_file = get_env_string(ENV_MODEL_CONFIG_FILE, DEFAULT_MODEL_CONFIG_FILE);
   let num_workers = get_env_num::<usize>(ENV_NUM_WORKERS, DEFAULT_NUM_WORKERS)?;
   let database_enabled = get_env_bool(ENV_DATABASE_ENABLED, DEFAULT_DATABASE_ENABLED)?;
@@ -229,13 +241,27 @@ pub fn main() -> AnyhowResult<()> {
   let stats_recorder_enabled = get_env_bool(ENV_STATS_MICROSERVICE_ENABLED, DEFAULT_STATS_MICROSERVICE_ENABLED)?;
   let stats_recorder_endpoint = get_env_string(ENV_STATS_MICROSERVICE_ENDPOINT, DEFAULT_STATS_MICROSERVICE_ENDPOINT);
 
+  let asset_directory = get_env_string(ENV_ASSET_DIRECTORY, DEFAULT_ASSET_DIRECTORY);
+  let asset_subdirectory_admin = get_env_string(ENV_ASSET_DIRECTORY, DEFAULT_ASSET_SUBDIRECTORY_ADMIN);
+  let asset_subdirectory_patreon = get_env_string(ENV_ASSET_DIRECTORY, DEFAULT_ASSET_SUBDIRECTORY_PATREON);
+  let asset_subdirectory_twitch = get_env_string(ENV_ASSET_DIRECTORY, DEFAULT_ASSET_SUBDIRECTORY_TWITCH);
+
   let server_hostname = hostname::get()
       .ok()
       .and_then(|h| h.into_string().ok())
       .unwrap_or("tts-unknown".to_string());
 
+  let root_asset_directory = Path::new(&asset_directory).to_path_buf();
+  let admin_asset_directory = root_asset_directory.join(asset_subdirectory_admin);
+  let patreon_asset_directory = root_asset_directory.join(asset_subdirectory_patreon);
+  let twitch_asset_directory = root_asset_directory.join(asset_subdirectory_twitch);
+
   info!("Arpabet extras file: {:?}", arpabet_extras_file);
   info!("Asset directory: {}", asset_directory);
+  info!("Admin asset directory: {:?}", admin_asset_directory);
+  info!("Patreon asset directory: {:?}", patreon_asset_directory);
+  info!("Twitch asset directory: {:?}", twitch_asset_directory);
+
   info!("Bind address: {}", bind_address);
   info!("Using model config file: {}", model_config_file);
   info!("Max character length: {}", max_char_len);
@@ -337,7 +363,10 @@ pub fn main() -> AnyhowResult<()> {
     bind_address,
     hostname: server_hostname,
     num_workers,
-    asset_directory,
+    root_asset_directory,
+    twitch_asset_directory,
+    patreon_asset_directory,
+    admin_asset_directory,
   };
 
   run_server(app_state, server_args)?;
@@ -352,7 +381,10 @@ async fn run_server(app_state: AppState, server_args: ServerArgs) -> std::io::Re
 
   let log_format = "[%{HOSTNAME}e] %a \"%r\" %s %b \"%{Referer}i\" \"%{User-Agent}i\" %T";
 
-  let asset_directory = server_args.asset_directory.clone();
+  let admin_asset_directory = server_args.admin_asset_directory.clone();
+  let patreon_asset_directory = server_args.patreon_asset_directory.clone();
+  let twitch_asset_directory = server_args.twitch_asset_directory.clone();
+
   let bind_address = server_args.bind_address.clone();
   let server_hostname = server_args.hostname.clone();
 
@@ -387,14 +419,14 @@ async fn run_server(app_state: AppState, server_args: ServerArgs) -> std::io::Re
           .exclude("/liveness")
           .exclude("/readiness"))
       .wrap(DefaultHeaders::new().header("X-Backend-Hostname", &server_hostname))
-      .service(Files::new("/frontend", asset_directory.clone())
+      .service(Files::new("/frontend", admin_asset_directory.clone())
           .index_file("index.html"))
-      .service(Files::new("/admin", asset_directory.clone())
-          .index_file("index_admin.html"))
-      .service(Files::new("/patreon", asset_directory.clone())
-          .index_file("index_patreon.html"))
-      .service(Files::new("/twitch", asset_directory.clone())
-          .index_file("index_twitch.html"))
+      .service(Files::new("/admin", admin_asset_directory.clone())
+          .index_file("index.html"))
+      .service(Files::new("/patreon", patreon_asset_directory.clone())
+          .index_file("index.html"))
+      .service(Files::new("/twitch", twitch_asset_directory.clone())
+          .index_file("index.html"))
       .service(
         web::resource("/advanced_tts")
             .route(web::post().to(post_tts))
