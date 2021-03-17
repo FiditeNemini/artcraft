@@ -242,9 +242,9 @@ pub fn main() -> AnyhowResult<()> {
   let stats_recorder_endpoint = get_env_string(ENV_STATS_MICROSERVICE_ENDPOINT, DEFAULT_STATS_MICROSERVICE_ENDPOINT);
 
   let asset_directory = get_env_string(ENV_ASSET_DIRECTORY, DEFAULT_ASSET_DIRECTORY);
-  let asset_subdirectory_admin = get_env_string(ENV_ASSET_DIRECTORY, DEFAULT_ASSET_SUBDIRECTORY_ADMIN);
-  let asset_subdirectory_patreon = get_env_string(ENV_ASSET_DIRECTORY, DEFAULT_ASSET_SUBDIRECTORY_PATREON);
-  let asset_subdirectory_twitch = get_env_string(ENV_ASSET_DIRECTORY, DEFAULT_ASSET_SUBDIRECTORY_TWITCH);
+  let asset_subdirectory_admin = get_env_string(ENV_ASSET_SUBDIRECTORY_ADMIN, DEFAULT_ASSET_SUBDIRECTORY_ADMIN);
+  let asset_subdirectory_patreon = get_env_string(ENV_ASSET_SUBDIRECTORY_PATREON, DEFAULT_ASSET_SUBDIRECTORY_PATREON);
+  let asset_subdirectory_twitch = get_env_string(ENV_ASSET_SUBDIRECTORY_TWITCH, DEFAULT_ASSET_SUBDIRECTORY_TWITCH);
 
   let server_hostname = hostname::get()
       .ok()
