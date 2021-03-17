@@ -1,3 +1,9 @@
+early_access_voices = [
+    "goku",
+    "peter-griffin",
+    "eric-cartman",
+]
+
 # --------------- Experimental Speakers ---------------
 [[speakers]]
 name = "Current Experiment (glow only + pretrained melgan)"

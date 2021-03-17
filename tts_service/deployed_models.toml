@@ -1,3 +1,9 @@
+early_access_voices = [
+    "goku",
+    "peter-griffin",
+    "eric-cartman",
+]
+
 [[speakers]]
 name = "Goku"
 slug = "goku"

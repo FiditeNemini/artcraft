@@ -46,6 +46,7 @@ use crate::endpoints::speak::legacy_tts::post_tts;
 use crate::endpoints::speak::speak::post_speak;
 use crate::endpoints::speak::speak_with_spectrogram::post_speak_with_spectrogram;
 use crate::endpoints::speakers::get_speakers;
+use crate::endpoints::speakers::get_early_access_speakers;
 use crate::endpoints::words::get_words;
 use crate::model::model_cache::ModelCache;
 use crate::model::model_config::ModelConfigs;
@@ -386,8 +387,12 @@ async fn run_server(app_state: AppState, server_args: ServerArgs) -> std::io::Re
           .exclude("/liveness")
           .exclude("/readiness"))
       .wrap(DefaultHeaders::new().header("X-Backend-Hostname", &server_hostname))
-      .service(Files::new("/frontend", asset_directory.clone())
-          .index_file("index.html"))
+      .service(Files::new("/hidden_admin", asset_directory.clone())
+          .index_file("hidden_admin.html"))
+      .service(Files::new("/patreon_thanks", asset_directory.clone())
+          .index_file("patreon_thanks.html"))
+      .service(Files::new("/stream5", asset_directory.clone())
+          .index_file("twitch_stream.html"))
       .service(
         web::resource("/advanced_tts")
             .route(web::post().to(post_tts))
@@ -411,6 +416,7 @@ async fn run_server(app_state: AppState, server_args: ServerArgs) -> std::io::Re
       .service(get_sentences)
       .service(get_service_settings)
       .service(get_speakers)
+      .service(get_early_access_speakers)
       .service(get_words)
       .app_data(arc.clone())
     )

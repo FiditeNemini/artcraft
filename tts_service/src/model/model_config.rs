@@ -5,6 +5,7 @@ use std::path::Path;
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct ModelConfigs {
   pub speakers: Vec<Speaker>,
+  pub early_access_voices: Option<Vec<String>>,
   pub model_locations: Vec<ModelLocation>,
 }
 
@@ -62,9 +63,9 @@ pub enum ModelPipeline {
 impl ModelConfigs {
   pub fn load_from_file(filename: &str) -> Self {
     let contents = fs::read_to_string(filename)
-        .expect("Couldn't read file");
+        .expect(&format!("Couldn't read file: {}", filename));
     toml::from_str(&contents)
-        .expect("Couldn't parse toml")
+        .expect(&format!("Couldn't parse toml: {}", filename))
   }
 
   pub fn find_speaker_by_slug(&self, slug: &str) -> Option<&Speaker> {
