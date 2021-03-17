@@ -1,0 +1,68 @@
+import React from 'react';
+import { Speaker } from '../model/Speaker';
+
+interface Props {
+  currentText: string,
+  currentSpeaker?: Speaker,
+  speakers: Speaker[],
+  changeSpeakerBySlug: (speakerSlug: string) => void,
+  changeText: (text: string) => void,
+}
+
+interface State {
+}
+
+class Form extends React.Component<Props, State> {
+
+  constructor(props: Props) {
+    super(props);
+    this.state = {
+    };
+  }
+
+  changeSpeaker = (ev: React.FormEvent<HTMLSelectElement>) => {
+    const speakerSlug = (ev.target as HTMLInputElement).value;
+    this.props.changeSpeakerBySlug(speakerSlug);
+  }
+
+  changeText = (ev: React.FormEvent<HTMLInputElement>) => {
+    const value = (ev.target as HTMLInputElement).value;
+    this.props.changeText(value);
+  }
+
+  public render() {
+    let speakerOptions : any = [];
+
+    this.props.speakers.forEach((speaker) => {
+      speakerOptions.push(<option value={speaker.slug} key={speaker.slug}>{speaker.name}</option>)
+    });
+
+    return (
+      <div className="box">
+        <div className="field">
+          <label className="label">Speaker</label>
+          <div className="control">
+            <div className="select">
+              <select onChange={this.changeSpeaker}>
+                {speakerOptions}
+              </select>
+            </div>
+          </div>
+        </div>
+        <div className="field">
+          <label className="label">Text</label>
+          <div className="control">
+            <input 
+              onChange={this.changeText}
+              className="input is-large" 
+              type="text" 
+              placeholder="TTS" 
+              />
+          </div>
+        </div>
+      </div>
+    );
+  }
+}
+
+export { Form };

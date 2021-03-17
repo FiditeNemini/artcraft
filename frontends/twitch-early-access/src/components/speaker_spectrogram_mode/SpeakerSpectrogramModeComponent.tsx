@@ -24,8 +24,6 @@ class SpeakerSpectrogramModeComponent extends React.Component<Props, State> {
   public render() {
     return (
       <div>
-        <b>SpeakerSpectrogramMode</b>
-
         <SpeakerSpectrogramAudioForm 
           apiConfig={this.props.apiConfig}
           currentText={this.props.currentText}

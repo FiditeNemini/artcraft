@@ -24,7 +24,6 @@ class SpeakerModeComponent extends React.Component<Props, State> {
   public render() {
     return (
       <div>
-        <b>SpeakerMode</b>
         <SpeakerAudioForm 
           apiConfig={this.props.apiConfig}
           currentText={this.props.currentText}

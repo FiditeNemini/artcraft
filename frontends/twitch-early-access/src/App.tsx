@@ -1,3 +1,4 @@
+import 'bulma/css/bulma.css'
 import './App.css';
 
 import React from 'react';
@@ -5,7 +6,7 @@ import { ComponentFrame, ShowComponent } from './components/ComponentFrame';
 import ApiConfig from './api/ApiConfig';
 import ModeButtons from './components/ModeButtons';
 import { SpeakerDetails } from './api/ApiDefinition';
-import { SpeakerDropdown } from './components/SpeakerDropdown';
+import { Form } from './components/Form';
 import { Speaker } from './model/Speaker';
 
 interface Props {
@@ -86,11 +87,24 @@ class App extends React.Component<Props, State> {
   public render() {
     return (
       <div>
+        <section className="hero is-info">
+          <div className="hero-body">
+            <p className="title">
+              Vo.codes Early Access
+            </p>
+            <p className="subtitle">
+              Thanks for being awesome! Use these before anyone else :)
+            </p>
+          </div>
+        </section>
+
         <ModeButtons
           showComponent={this.state.showComponent}
           switchShowComponentCallback={this.switchComponent}
           />
+
         <hr />
+
         <ComponentFrame 
           showComponent={this.state.showComponent}
           apiConfig={this.state.apiConfig}
@@ -98,10 +112,12 @@ class App extends React.Component<Props, State> {
           currentSpeaker={this.state.currentSpeaker}
           updateTextCallback={this.updateText}
           />
-        <SpeakerDropdown
+        <Form
           speakers={this.state.speakers}
           currentSpeaker={this.state.currentSpeaker}
+          currentText={this.state.currentText}
           changeSpeakerBySlug={this.updateSpeakerBySlug}
+          changeText={this.updateText}
           />
       </div>
     );

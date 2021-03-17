@@ -35,13 +35,16 @@ class ModeButtons extends React.Component<Props, State> {
 
     return (
       <div>
+
         <button 
+          className="button is-primary is-large"
           onClick={() => this.props.switchShowComponentCallback(ShowComponent.SPEAK)}
           disabled={speakDisabled}
           >
           Speak
         </button>
         <button 
+          className="button is-primary is-large"
           onClick={() => this.props.switchShowComponentCallback(ShowComponent.SPEAK_SPECTROGRAM)}
           disabled={spectrogramDisabled}
           >
