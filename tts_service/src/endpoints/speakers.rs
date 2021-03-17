@@ -16,7 +16,7 @@ pub struct SpeakersResult {
   speakers: Vec<Speaker>,
 }
 
-#[get("/speakers")]
+#[get("/early_access_speakers")]
 pub async fn get_speakers(
   _request: HttpRequest,
   app_state: Data<Arc<AppState>>
@@ -29,7 +29,7 @@ pub async fn get_speakers(
   }))
 }
 
-#[get("/early_access_speakers")]
+#[get("/speakers")]
 pub async fn get_early_access_speakers(
   _request: HttpRequest,
   app_state: Data<Arc<AppState>>
