@@ -2,6 +2,8 @@ early_access_voices = [
     "goku",
     "peter-griffin",
     "eric-cartman",
+    "tails",
+    "knuckles",
 ]
 
 # --------------- Experimental Speakers ---------------
@@ -29,6 +31,28 @@ melgan = "melgan-vocodes.torchjit"
 #  melgan = "melgan_manyvoice5.0_2020-07-23_12d5838_10760.torchjit"
 #  #melgan = "melgan_manyvoice2.0_2020-07-08_12d5838_9330.torchjit"
 #  #melgan = "manyvoice1.0_2020-06-28_12d5838_6610.torchjit"
+
+[[speakers]]
+name = "Michael Jackson"
+slug = "michael-jackson"
+model_pipeline = "ArpabetGlowTtsMelgan"
+glow_tts = "glow-tts_michael-jackson_ljstx_2020.00.00_expr-1_chkpt-6400.torchjit"
+melgan = "melgan_manyvoice5.0_2020-07-23_12d5838_10760.torchjit" # TODO: Needs custom vocoder
+
+[[speakers]]
+name = "Knuckles"
+slug = "knuckles"
+model_pipeline = "ArpabetGlowTtsMelgan"
+glow_tts = "glow-tts_knuckles_ljstx_2021.03.15_expr-1_chkpt-5040.torchjit"
+melgan = "melgan_manyvoice5.0_2020-07-23_12d5838_10760.torchjit" # TODO: Needs custom vocoder
+
+[[speakers]]
+name = "Tails"
+slug = "tails"
+model_pipeline = "ArpabetGlowTtsMelgan"
+glow_tts = "glow-tts_tails_ljstx_2021.03.15_expr-1_chkpt-5020.torchjit"
+melgan = "melgan_manyvoice5.0_2020-07-23_12d5838_10760.torchjit" # TODO: Needs custom vocoder
+
 
 [[speakers]]
 name = "Goku"
