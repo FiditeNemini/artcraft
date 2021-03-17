@@ -2,6 +2,7 @@ import React from 'react';
 import ApiConfig from '../api/ApiConfig';
 import { SpeakerSpectrogramModeComponent } from './speaker_spectrogram_mode/SpeakerSpectrogramModeComponent';
 import { SpeakerModeComponent } from './speaker_mode/SpeakerModeComponent';
+import { Speaker } from '../model/Speaker';
 
 enum ShowComponent {
   SPEAK,
@@ -11,7 +12,8 @@ enum ShowComponent {
 interface Props {
   showComponent: ShowComponent,
   apiConfig: ApiConfig,
-  text: string,
+  currentText: string,
+  currentSpeaker?: Speaker,
   updateTextCallback: (text: string) => void,
 }
 
@@ -32,14 +34,16 @@ class ComponentFrame extends React.Component<Props, State> {
       case ShowComponent.SPEAK_SPECTROGRAM:
         return <SpeakerSpectrogramModeComponent 
           apiConfig={this.props.apiConfig}
-          text={this.props.text}
+          currentText={this.props.currentText}
+          currentSpeaker={this.props.currentSpeaker}
           updateTextCallback={this.props.updateTextCallback}
           />;
       case ShowComponent.SPEAK:
       default:
         return <SpeakerModeComponent 
           apiConfig={this.props.apiConfig}
-          text={this.props.text}
+          currentText={this.props.currentText}
+          currentSpeaker={this.props.currentSpeaker}
           updateTextCallback={this.props.updateTextCallback}
           />;
     }

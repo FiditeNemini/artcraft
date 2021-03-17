@@ -4,11 +4,12 @@ import ApiConfig from '../../api/ApiConfig';
 import { createColorMap, linearScale } from "@colormap/core";
 import { magma } from "@colormap/presets";
 import { SpeakRequest } from '../../api/ApiDefinition'
+import { Speaker } from '../../model/Speaker';
 
 interface Props {
   apiConfig: ApiConfig,
-  speaker?: String,
-  text: string,
+  currentSpeaker?: Speaker,
+  currentText: string,
   updateTextCallback: (text: string) => void,
 }
 
@@ -47,11 +48,15 @@ class SpeakerSpectrogramAudioForm extends React.Component<Props, State> {
   makeRequest = (ev: React.FormEvent<HTMLFormElement>) => {
     console.log("Form Submit");
 
-    if (!this.props.text) {
+    if (!this.props.currentText) {
+      return;
+    }
+    
+    if (this.props.currentSpeaker === undefined) {
       return;
     }
 
-    let request = new SpeakRequest(this.props.text, this.props.speaker!);
+    let request = new SpeakRequest(this.props.currentText, this.props.currentSpeaker!.slug);
 
     const url = this.props.apiConfig.getEndpoint('/speak_spectrogram');
 
@@ -104,7 +109,7 @@ class SpeakerSpectrogramAudioForm extends React.Component<Props, State> {
 
       const sound = new Howl.Howl({
         src: [data],
-        //format: 'wav',
+        format: ['wav'],
       });
       
       this.setState({
@@ -164,7 +169,7 @@ class SpeakerSpectrogramAudioForm extends React.Component<Props, State> {
         {canvas}
 
         <form onSubmit={this.makeRequest}>
-          <input onChange={this.handleTextChange} value={this.props.text} />
+          <input onChange={this.handleTextChange} value={this.props.currentText} />
           <button>Submit</button>
         </form>
       </div>

@@ -2,11 +2,12 @@ import React from 'react';
 import Howl from 'howler';
 import ApiConfig from '../../api/ApiConfig';
 import { SpeakRequest } from '../../api/ApiDefinition'
+import { Speaker } from '../../model/Speaker';
 
 interface Props {
   apiConfig: ApiConfig,
-  speaker?: String,
-  text: string,
+  currentSpeaker?: Speaker,
+  currentText: string,
   updateTextCallback: (text: string) => void,
 }
 
@@ -24,10 +25,6 @@ class SpeakerAudioForm extends React.Component<Props, State> {
     };
   }
 
-  componentDidMount() {
-    // OnMount events. An async CTOR, essentially.
-  }
-
   handleTextChange = (ev: React.FormEvent<HTMLInputElement>) => {
     const text = (ev.target as HTMLInputElement).value;
     this.props.updateTextCallback(text);
@@ -36,11 +33,15 @@ class SpeakerAudioForm extends React.Component<Props, State> {
   makeRequest = (ev: React.FormEvent<HTMLFormElement>) => {
     console.log("Form Submit");
 
-    if (!this.props.text) {
+    if (!this.props.currentText) {
       return;
     }
 
-    let request = new SpeakRequest(this.props.text, this.props.speaker!);
+    if (this.props.currentSpeaker === undefined) {
+      return;
+    }
+
+    let request = new SpeakRequest(this.props.currentText, this.props.currentSpeaker!.slug);
 
     const url = this.props.apiConfig.getEndpoint('/speak');
 
@@ -54,7 +55,6 @@ class SpeakerAudioForm extends React.Component<Props, State> {
     })
     .then(res => res.blob())
     .then(blob => {
-      //console.log(blob);
       const url = window.URL.createObjectURL(blob);
 
       console.log('download at the audio url:');
@@ -62,7 +62,7 @@ class SpeakerAudioForm extends React.Component<Props, State> {
 
       const sound = new Howl.Howl({
         src: [url],
-        //format: 'wav',
+        format: ['wav'],
       });
       
       this.setState({howl: sound});
@@ -78,7 +78,7 @@ class SpeakerAudioForm extends React.Component<Props, State> {
   public render() {
     return (
       <form onSubmit={this.makeRequest}>
-        <input onChange={this.handleTextChange} value={this.props.text} />
+        <input onChange={this.handleTextChange} value={this.props.currentText} />
         <button>Submit</button>
       </form>
     );

@@ -27,8 +27,9 @@ class ApiConfig {
         break;
       case "localhost":
         switch (url.port) {
-          case "8080":
+          case "3000":
           case "7000":
+          case "8080":
             console.log('environment', 'localhost_js');
             environment = Environment.LOCALHOST_JS;
             break;
