@@ -3,6 +3,7 @@ import './App.css';
 import React from 'react';
 import { ComponentFrame, ShowComponent } from './components/ComponentFrame';
 import ApiConfig from './api/ApiConfig';
+import ModeButtons from './components/ModeButtons';
 
 interface Props {
 }
@@ -24,16 +25,34 @@ class App extends React.Component<Props, State> {
     };
   }
 
-  public updateText(text: string) {
+  updateText = (text: string) => {
+    this.setState({
+      text: text,
+    });
+  }
+
+  switchComponent = (showComponent: ShowComponent) => {
+    this.setState({
+      showComponent: showComponent,
+    });
   }
 
   public render() {
-    return <ComponentFrame 
-      showComponent={this.state.showComponent}
-      apiConfig={this.state.apiConfig}
-      text={this.state.text}
-      updateTextCallback={this.updateText}
-      />
+    return (
+      <div>
+        <ModeButtons
+          showComponent={this.state.showComponent}
+          switchShowComponentCallback={this.switchComponent}
+          />
+        <hr />
+        <ComponentFrame 
+          showComponent={this.state.showComponent}
+          apiConfig={this.state.apiConfig}
+          text={this.state.text}
+          updateTextCallback={this.updateText}
+          />
+      </div>
+    );
   }
 }
 
