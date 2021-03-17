@@ -68,6 +68,15 @@ class App extends React.Component<Props, State> {
     })
   }
 
+  updateSpeakerBySlug = (speakerSlug: string) => {
+    const maybeSpeaker = this.state.speakers.find(speaker => {
+      return speaker.slug === speakerSlug;
+    })
+    this.setState({
+      currentSpeaker: maybeSpeaker,
+    })
+  }
+
   switchComponent = (showComponent: ShowComponent) => {
     this.setState({
       showComponent: showComponent,
@@ -92,6 +101,7 @@ class App extends React.Component<Props, State> {
         <SpeakerDropdown
           speakers={this.state.speakers}
           currentSpeaker={this.state.currentSpeaker}
+          changeSpeakerBySlug={this.updateSpeakerBySlug}
           />
       </div>
     );

@@ -4,6 +4,7 @@ import { Speaker } from '../model/Speaker';
 interface Props {
   currentSpeaker?: Speaker,
   speakers: Speaker[],
+  changeSpeakerBySlug: (speakerSlug: string) => void,
 }
 
 interface State {
@@ -17,7 +18,9 @@ class SpeakerDropdown extends React.Component<Props, State> {
     };
   }
 
-  public updateText(text: string) {
+  changeSpeaker = (ev: React.FormEvent<HTMLSelectElement>) => {
+    const speakerSlug = (ev.target as HTMLInputElement).value;
+    this.props.changeSpeakerBySlug(speakerSlug);
   }
 
   public render() {
@@ -28,7 +31,7 @@ class SpeakerDropdown extends React.Component<Props, State> {
     });
 
     return (
-      <select>
+      <select onChange={this.changeSpeaker}>
         {speakerOptions}
       </select>
     );
