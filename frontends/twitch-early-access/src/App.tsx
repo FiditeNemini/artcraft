@@ -2,12 +2,13 @@ import 'bulma/css/bulma.css'
 import './App.css';
 
 import React from 'react';
-import { ComponentFrame, ShowComponent } from './components/ComponentFrame';
+import { ShowComponent } from './components/ComponentFrame';
 import ApiConfig from './api/ApiConfig';
-import ModeButtons from './components/ModeButtons';
 import { SpeakerDetails } from './api/ApiDefinition';
 import { Form } from './components/Form';
 import { Speaker } from './model/Speaker';
+import { Utterance } from './model/Utterance';
+import { UtteranceHistory } from './components/UtteranceHistory';
 
 interface Props {
 }
@@ -18,6 +19,7 @@ interface State {
   speakers: Speaker[],
   currentText: string,
   currentSpeaker?: Speaker;
+  pastUtterances: Utterance[],
 }
 
 class App extends React.Component<Props, State> {
@@ -29,6 +31,7 @@ class App extends React.Component<Props, State> {
       apiConfig: new ApiConfig(),
       speakers: [],
       currentText: "",
+      pastUtterances: [],
     };
   }
 
@@ -37,7 +40,7 @@ class App extends React.Component<Props, State> {
   }
 
   public loadSpeakers() {
-    const url = this.state.apiConfig.getEndpoint('/speakers');
+    const url = this.state.apiConfig.getEndpoint('/voices');
 
     fetch(url)
       .then(res => res.json())
@@ -84,6 +87,13 @@ class App extends React.Component<Props, State> {
     });
   }
 
+  addUtterance = (utterance: Utterance) => {
+    let utterances = this.state.pastUtterances.concat(utterance);
+    this.setState({
+      pastUtterances: utterances,
+    })
+  }
+
   public render() {
     return (
       <div>
@@ -98,11 +108,12 @@ class App extends React.Component<Props, State> {
           </div>
         </section>
 
+        {/* 
+         === TODO ===
         <ModeButtons
           showComponent={this.state.showComponent}
           switchShowComponentCallback={this.switchComponent}
           />
-
         <hr />
 
         <ComponentFrame 
@@ -112,13 +123,27 @@ class App extends React.Component<Props, State> {
           currentSpeaker={this.state.currentSpeaker}
           updateTextCallback={this.updateText}
           />
+        */}
         <Form
+          apiConfig={this.state.apiConfig}
           speakers={this.state.speakers}
           currentSpeaker={this.state.currentSpeaker}
           currentText={this.state.currentText}
           changeSpeakerBySlug={this.updateSpeakerBySlug}
           changeText={this.updateText}
+          addUtteranceCallback={this.addUtterance}
           />
+          <section className="section is-small">
+            <h1 className="title">Results</h1>
+            <h2 className="subtitle">
+              Your results will go here. 
+              Please make make lots of YouTube videos before anyone else has access!
+            </h2>
+          </section>
+
+          <UtteranceHistory 
+            utterances={this.state.pastUtterances}
+            />
       </div>
     );
   }

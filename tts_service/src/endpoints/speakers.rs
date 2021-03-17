@@ -29,7 +29,7 @@ pub async fn get_speakers(
   }))
 }
 
-#[get("/early_access_speakers")]
+#[get("/voices")]
 pub async fn get_early_access_speakers(
   _request: HttpRequest,
   app_state: Data<Arc<AppState>>
