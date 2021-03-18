@@ -5,6 +5,7 @@
 #[macro_use] extern crate clap;
 
 mod pointcloud;
+mod zeromq;
 
 use anyhow::Result as AnyhowResult;
 use anyhow::anyhow;
@@ -25,18 +26,11 @@ use pointcloud::xy_table::create_xy_table;
 use pointcloud::xy_table::create_xy_table_from_color_calibration;
 use pointcloud::xy_table::create_xy_table_from_depth_calibration;
 use zmq::{Error, Socket, Context, DONTWAIT};
+use crate::zeromq::protocol::{encode_point_data, send_message};
 
 
 const SOCKET_ADDRESS : &'static str = "tcp://127.0.0.1:8888";
 //const SOCKET_ADDRESS : &'static str = "tcp://192.168.50.3:8888";
-
-const DATA_LENGTH_COMMAND : u32 = 1; // Denotes the command that sends the data length
-const POINT_DATA_BEGIN_PAYLOAD_COMMAND : u32 = 2; // Denotes the command that sends the variable-length data
-const POINT_DATA_CONTINUE_PAYLOAD_COMMAND : u32 = 3; // Denotes the command that sends the variable-length data
-
-/// The maximum number of points to send per ZeroMQ "packet".
-/// This is also defined in C++, so it needs to be adjusted in multiple places.
-const MAX_SEND_POINTS_PER_PACKET : usize = 3000;
 
 /// The command line args for the program.
 #[derive(Clap, Debug, Clone)]
@@ -254,49 +248,5 @@ fn get_point_cloud(
   //println!("Points: {}", points.len());
 
   Ok(points)
-}
-
-/// Returns the fixed size data length command.
-fn encode_data_length(points: &Vec<Point>) -> Vec<u8> {
-  let mut buf = Vec::with_capacity(8);
-  buf.write_u32::<LittleEndian>(DATA_LENGTH_COMMAND);
-  buf.write_u32::<LittleEndian>(points.len() as u32);
-  buf
-}
-
-/// Returns a variable length point data payload.
-fn encode_point_data(points: &mut Vec<Point>, is_beginning: bool) -> Vec<u8> {
-  let point_bytes = Point::size_bytes() * MAX_SEND_POINTS_PER_PACKET;
-
-  let mut buf = Vec::with_capacity(4 + point_bytes);
-
-  if is_beginning {
-    //println!("begin");
-    buf.write_u32::<LittleEndian>(POINT_DATA_BEGIN_PAYLOAD_COMMAND); // COMMAND #
-  } else {
-    //println!("continue");
-    buf.write_u32::<LittleEndian>(POINT_DATA_CONTINUE_PAYLOAD_COMMAND); // COMMAND #
-  }
-
-  let subset = if points.len() > MAX_SEND_POINTS_PER_PACKET {
-    points.drain(0..MAX_SEND_POINTS_PER_PACKET).collect::<Vec<Point>>()
-  } else {
-    points.drain(0..points.len()).collect::<Vec<Point>>()
-  };
-
-  buf.write_u32::<LittleEndian>(subset.len() as u32); // LENGTH
-
-  for point in subset {
-    let bytes = point.to_bytes();
-    buf.write_all(&bytes);
-  }
-
-  buf
-}
-
-/// Send data over the socket
-fn send_message(socket: &Socket, data_bytes: &Vec<u8>) -> AnyhowResult<()> {
-  socket.send(&data_bytes, 0)?;
-  Ok(())
 }
 
