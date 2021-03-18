@@ -1,4 +1,4 @@
-use crate::zeromq::point::Point;
+use crate::pointcloud::point::Point;
 use num_traits::Float;
 
 /// Print the minima and maxima along each dimension.

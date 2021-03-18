@@ -1,8 +1,8 @@
 use anyhow::anyhow;
 use crate::AnyhowResult;
 use crate::CommandArgs;
-use crate::zeromq::color::Color;
-use crate::zeromq::point::Point;
+use crate::pointcloud::color::Color;
+use crate::pointcloud::point::Point;
 use k4a_sys_temp as k4a_sys;
 use kinect::Image;
 use kinect::ImageFormat;

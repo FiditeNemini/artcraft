@@ -4,7 +4,7 @@
 
 #[macro_use] extern crate clap;
 
-mod zeromq;
+mod pointcloud;
 
 use anyhow::Result as AnyhowResult;
 use anyhow::anyhow;
@@ -15,15 +15,15 @@ use kinect::{Device, DeviceConfiguration, Image};
 use std::io::Write;
 use std::thread;
 use std::time::{Duration, SystemTime, UNIX_EPOCH};
-use zeromq::color::Color;
-use zeromq::cpu_calculate_point_cloud::PointCloudResult;
-use zeromq::cpu_calculate_point_cloud::calculate_point_cloud2;
-use zeromq::cpu_calculate_point_cloud::calculate_point_cloud3;
-use zeromq::cpu_transformation::DepthTransformer;
-use zeromq::point::Point;
-use zeromq::xy_table::create_xy_table;
-use zeromq::xy_table::create_xy_table_from_color_calibration;
-use zeromq::xy_table::create_xy_table_from_depth_calibration;
+use pointcloud::color::Color;
+use pointcloud::cpu_calculate_point_cloud::PointCloudResult;
+use pointcloud::cpu_calculate_point_cloud::calculate_point_cloud2;
+use pointcloud::cpu_calculate_point_cloud::calculate_point_cloud3;
+use pointcloud::cpu_transformation::DepthTransformer;
+use pointcloud::point::Point;
+use pointcloud::xy_table::create_xy_table;
+use pointcloud::xy_table::create_xy_table_from_color_calibration;
+use pointcloud::xy_table::create_xy_table_from_depth_calibration;
 use zmq::{Error, Socket, Context, DONTWAIT};
 
 
@@ -41,6 +41,10 @@ const MAX_SEND_POINTS_PER_PACKET : usize = 3000;
 /// The command line args for the program.
 #[derive(Clap, Debug, Clone)]
 pub struct CommandArgs {
+  /// Number cameras
+  #[clap(long, default_value = "1")]
+  pub num_cameras: i32,
+
   /// Render axes
   #[clap(long, parse(try_from_str = true_or_false), default_value = "false")]
   pub debug: bool,
@@ -100,7 +104,7 @@ fn main() -> AnyhowResult<()> {
   println!("Opening device...");
   thread::sleep(Duration::from_millis(100));
 
-  let device = Device::open(0)?;
+  let device = Device::open(1)?;
 
   let mut config = DeviceConfiguration::init_disable_all();
 

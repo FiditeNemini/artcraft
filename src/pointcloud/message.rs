@@ -1,4 +1,4 @@
-use crate::zeromq::point::Point;
+use crate::pointcloud::point::Point;
 use byteorder::{WriteBytesExt, LittleEndian};
 use std::io::Write;
 
