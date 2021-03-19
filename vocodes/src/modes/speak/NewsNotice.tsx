@@ -46,7 +46,10 @@ class NewsNotice extends React.Component<Props, State> {
                   Please check us out! <a href="https://twitch.tv/vocodes" target="_blank" rel="noopener noreferrer">Follow for notifications!</a> 
                 </p>
                 <br />
-                <p>Early access voices: Goku, Tails, Knuckles, MJ, and more...</p>
+                <p>
+                  Early access voices: Goku, Tails, Knuckles, MJ, and more. We'll have Mario, more of the Griffin family, and 
+                  even new video features. We have trivia with cash prizes, and the chance to win a brand new PS5!
+                </p>
             </div>
           </div>
 
