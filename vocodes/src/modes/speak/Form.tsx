@@ -219,7 +219,8 @@ class Form extends React.Component<Props, State> {
   }
   
   componentDidMount() {
-    this.textarea?.focus();
+    // NB(bt,2021-03-17): Turning off focusing for now since we're running the ad campaign
+    //this.textarea?.focus();
   }
 
   nonSpaceCharacterCount() : number {
