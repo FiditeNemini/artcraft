@@ -73,53 +73,62 @@
 
   
 
-<!--
-Fixed Navigation
-==================================== -->
-<section class="header  navigation">
-   <div class="container">
-      <div class="row">
-         <div class="col-md-12">
-            <nav class="navbar navbar-expand-md">
-               <a class="navbar-brand" href="index.html">
-                  <img src="images/logo.png" alt="logo">
-               </a>  
-            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-               <span class="tf-ion-android-menu"></span>
-            </button>
-         <div class="collapse navbar-collapse" id="navbarSupportedContent">
-            <ul class="navbar-nav ml-auto">
-               <li class="nav-item active">
-                  <a class="nav-link" href="index.html">Home <span class="sr-only">(current)</span></a>
-               </li>
-               <li class="nav-item">
-                  <a class="nav-link" href="about.html">About</a>
-               </li>
-               <li class="nav-item">
-                  <a class="nav-link" href="service.html">Service</a>
-               </li>
-               <li class="nav-item">
-                  <a class="nav-link" href="portfolio.html">Portfolio</a>
-               </li>
-               <li class="nav-item">
-                  <a class="nav-link" href="contact.html">Contact</a>
-               </li>
-               <li class="nav-item dropdown">
-                  <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                     Pages
-                  </a>
-                  <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                     <a class="dropdown-item" href="404.html">404 Page</a>
-                  </div>
-               </li>
-            </ul>
-         </div>
-      </nav>
-      
-   </div>
-</div>
-</div>
-</section>
+<!-- 
+  Fixed Navigation
+  ==================================== -->
+  <header class="navigation navbar navbar-fixed-top">
+    <div class="container">
+      <div class="navbar-header">
+        <!-- responsive nav button -->
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+          <span class="sr-only">Toggle navigation</span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <!-- /responsive nav button -->
+
+        <!-- logo -->
+        <a class="navbar-brand logo" href="index.html">
+          <img class="logo-default" src="images/logo.png" alt="logo" />
+          <img class="logo-white" src="images/logo-white.png" alt="logo" />
+        </a>
+        <!-- /logo -->
+      </div>
+
+      <!-- main nav -->
+      <nav class="collapse navbar-collapse navbar-right" >
+        <ul id="nav" class="nav navbar-nav menu">
+            <li class="current"><a data-scroll href="#body">Home</a></li>
+            <li><a data-scroll href="#about">About Us</a></li>
+            <li><a data-scroll href="#services">Services</a></li>
+            <li><a data-scroll href="#skills">Skills</a></li>
+            <li><a data-scroll href="#team">Team</a></li>
+            <li><a data-scroll href="#portfolio">Portfolio</a></li>
+            <li><a data-scroll href="#pricing">Pricing</a></li>
+            <li><a data-scroll href="#blog">Blog</a></li>
+            <li><a data-scroll href="#contact">Contact</a></li>
+            <li class="dropdown">
+               <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Pages <span class="caret"></span></a>
+               <ul class="dropdown-menu">
+                  <li><a href="index-slider.html">Homepage</a></li>
+                  <li><a href="index.html">Homepage 2</a></li>
+                  <li><a href="onepage-slider.html">Onepage</a></li>
+                  <li><a href="onepage-text.html">Onepage 2</a></li>
+                  <li><a href="404.html">404 Page</a></li>
+                  <li><a href="blog.html">Blog Page</a></li>
+
+               </ul>
+            </li>
+        </ul>
+    </nav>
+      <!-- /main nav -->
+
+    </div>
+  </header>
+  <!--
+  End Fixed Navigation
+  ==================================== -->
 
  <!--
 Welcome Slider
@@ -151,20 +160,50 @@ Welcome Slider
 	</div>
 </section>	
 
+<section class="about section-sm" id="about">
+	<div class="container">
+		<div class="row mb-50 justify-content-center">
+			<div class="col-md-5 col-sm-12 text-center offset-md-1">
+				<img src="images/about/about-1.jpg" class="img-fluid rounded shadow" alt="">
+			</div>
+			<div class="col-md-5 col-sm-12">
+				<div class="content">
+					<h2>Creativity is in our <br> blood</h2>
+					<p>Curabitur felis nibh, imperdiet eu erat non, luctus cursus lectus. Donec maximus diam leo, sed fringilla nisl auctor eget. Donec dictum neque est, ac faucibus ex blandit a
+					Lorem ipsum dolor sit amet, consectetur adipisicing elit. Recusandae quo minima ab aperiam molestiae natus repellendus neque culpa iure, nemo veritatis explicabo facilis, officia, saepe! Et corrupti odit, non deserunt.
+				</div>
+				
+				</p>
+			</div>
+		</div> 		<!-- End row -->
+		<div class="row mt-50 justify-content-center">
+			<div class="col-12 col-md-5 offset-md-1 col-md-5 col-sm-12">
+				<div class="content">
+					<h2>We think out of the <br> Box</h2>
+					<p>Curabitur felis nibh, imperdiet eu erat non, luctus cursus lectus. Donec maximus diam leo, sed fringilla nisl auctor eget. Donec dictum neque est, ac faucibus ex blandit a
+					Lorem ipsum dolor sit amet, consectetur adipisicing elit. Recusandae quo minima ab aperiam molestiae natus repellendus neque culpa iure, nemo veritatis explicabo facilis, officia, saepe! Et corrupti odit, non deserunt.
+				</div>
+				
+				</p>
+			</div>
+			<div class="col-12 col-md-5 col-sm-12 text-center">
+				<img src="images/about/about-2.jpg" class="img-fluid rounded shadow" alt="">
+			</div>
+		</div> 		<!-- End row -->
+	</div>   	<!-- End container -->
+</section>   <!-- End section -->
+
 <!--
-Start About Section
+Start Call To Action
 ==================================== -->
-<section class="about-2 section bg-gray" id="about">
+<section class="call-to-action section">
 	<div class="container">
 		<div class="row">
-			<div class="col-12 col-md-5">
-				<h2>We have explored the digital landscape with passion for a long time</h2>
+			<div class="col-md-12 text-center">
+				<h2>Let's Create Something Together</h2>
+				<p>Proin gravida nibh vel velit auctor aliquet. Aenean sollicudin bibendum auctor, <br> nisi elit consequat ipsum, nesagittis sem nid elit. Duis sed odio sitain elit.</p>
+				<a href="" class="btn btn-main">Contact Us</a>
 			</div>
-			<div class="col-12 col-md-7">
-				<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Quae deleniti ipsa labore necessitatibus culpa veritatis quo accusantium, neque enim ea ad eaque iure, quas tempore velit, quibusdam dolor illo! Explicabo.</p>
-				<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Aliquid quisquam maiores iste soluta, nihil dolorem?</p>
-			</div>
-			
 		</div> 		<!-- End row -->
 	</div>   	<!-- End container -->
 </section>   <!-- End section -->
@@ -213,91 +252,101 @@ Start About Section
 			
 			
 
-<section class="about section-sm" id="about">
+<!--
+Start Call To Action
+==================================== -->
+<section class="call-to-action section">
 	<div class="container">
-		<div class="row mb-50 justify-content-center">
-			<div class="col-md-5 col-sm-12 text-center offset-md-1">
-				<img src="images/about/about-1.jpg" class="img-fluid rounded shadow" alt="">
-			</div>
-			<div class="col-md-5 col-sm-12">
-				<div class="content">
-					<h2>Creativity is in our <br> blood</h2>
-					<p>Curabitur felis nibh, imperdiet eu erat non, luctus cursus lectus. Donec maximus diam leo, sed fringilla nisl auctor eget. Donec dictum neque est, ac faucibus ex blandit a
-					Lorem ipsum dolor sit amet, consectetur adipisicing elit. Recusandae quo minima ab aperiam molestiae natus repellendus neque culpa iure, nemo veritatis explicabo facilis, officia, saepe! Et corrupti odit, non deserunt.
-				</div>
-				
-				</p>
-			</div>
-		</div> 		<!-- End row -->
-		<div class="row mt-50 justify-content-center">
-			<div class="col-12 col-md-5 offset-md-1 col-md-5 col-sm-12">
-				<div class="content">
-					<h2>We think out of the <br> Box</h2>
-					<p>Curabitur felis nibh, imperdiet eu erat non, luctus cursus lectus. Donec maximus diam leo, sed fringilla nisl auctor eget. Donec dictum neque est, ac faucibus ex blandit a
-					Lorem ipsum dolor sit amet, consectetur adipisicing elit. Recusandae quo minima ab aperiam molestiae natus repellendus neque culpa iure, nemo veritatis explicabo facilis, officia, saepe! Et corrupti odit, non deserunt.
-				</div>
-				
-				</p>
-			</div>
-			<div class="col-12 col-md-5 col-sm-12 text-center">
-				<img src="images/about/about-2.jpg" class="img-fluid rounded shadow" alt="">
+		<div class="row">
+			<div class="col-md-12 text-center">
+				<h2>Let's Create Something Together</h2>
+				<p>Proin gravida nibh vel velit auctor aliquet. Aenean sollicudin bibendum auctor, <br> nisi elit consequat ipsum, nesagittis sem nid elit. Duis sed odio sitain elit.</p>
+				<a href="" class="btn btn-main">Contact Us</a>
 			</div>
 		</div> 		<!-- End row -->
 	</div>   	<!-- End container -->
 </section>   <!-- End section -->
 
-<!--
-Start About Section
-==================================== -->
-<section class="service-2 section bg-gray">
-  <div class="container">
-    <div class="row">
-      <div class="col">
-        <div class="title text-center">
-          <h4>How We Works</h4>
-          <h2>Our work process</h2>
-          <span class="border"></span>
-          <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Illum reiciendis quasi itaque, obcaecati atque sit!</p>
-        </div>
-      </div>
-    </div>
-    <div class="row justify-content-center">
-      <div class="col-md-4 col-sm-6 p-0">
-        <div class="service-item text-center">
-            <span class="count">1.</span>
-            <i class="tf-ion-ios-briefcase-outline"></i>
-            <h4>Project Analysis</h4>
-            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce vitae risus nec dui venenatis.</p>
-        </div>
-      </div>
-      <div class="col-md-4 col-sm-6 p-0">
-        <div class="service-item text-center">
-          <span class="count">2.</span>
-          <i class="tf-ion-ios-alarm-outline"></i>
-          <h4>Time Management</h4>
-          <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce vitae risus nec dui venenatis.</p>
-        </div>
-      </div>
-      <div class="w-100"></div>
-      <div class="col-md-4 col-sm-6 p-0">
-        <div class="service-item text-center">
-          <span class="count">3.</span>
-          <i class="tf-ion-ios-email-outline"></i>
-          <h4>Mail Support</h4>
-          <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce vitae risus nec dui venenatis.</p>
-        </div>
-      </div>
-      <div class="col-md-4 col-sm-6 p-0">
-        <div class="service-item text-center">
-          <span class="count">4.</span>
-          <i class="tf-ion-ios-locked-outline"></i>
-          <h4>Secure System</h4>
-          <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce vitae risus nec dui venenatis.</p>
-        </div>
-      </div>
-    </div>    <!-- End row -->
-  </div>    <!-- End container -->
-</section>   <!-- End section -->
+<!-- Start Team Skills
+		=========================================== -->
+		
+		<section class="team-skills section-sm" id="skills">
+			<div class="container">
+				<div class="row">
+					<div class="col">
+						<div class="title text-center">
+							<h4>We are good at</h4>
+							<h2>Skills.</h2>
+							<span class="border"></span>
+							<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Illum reiciendis quasi itaque, obcaecati atque sit!</p>
+						</div>
+					</div>
+				</div>
+				<div class="row">
+				
+					
+					<div class="col-md-5">
+						<div class="team-skills-content">
+							<h2>Simple To Start</h2>
+							<p>Vestibulum nisl tortor, consectetur quis imperdiet bium, letcu. Sedndime ntumiaculis ex, in faucibus lorem accumsan non. Donec mattis tin unt metuorbi sed tort Igor aman luctus dignissim. Vestibulum nisl tortor, consectetur quis imperdiet bium, letcu. Sedndime ntumiaculis ex, in faucibus lorem accumsan non.</p>
+							<a href="" class="btn btn-main mt-20">Contact Us</a>
+						</div>
+					</div>
+					<div class="col-md-6 col-md-offset-1">
+						<div class="progress-block">
+							<ul>
+								<li>
+									<span>Photoshop</span>
+									<div class="progress">
+										<div class="progress-bar" style="width: 90%;">
+									    </div>
+									</div>
+								</li>
+								<li>
+									<span>Web Application</span>
+									<div class="progress">
+										<div class="progress-bar" style="width: 85%;">
+									    </div>
+									</div>
+								</li>
+								<li>
+									<span>Andriod Application</span>
+									<div class="progress">
+										<div class="progress-bar" style="width: 92%;">
+									    </div>
+									</div>
+								</li>
+								<li>
+									<span>IOS Development</span>
+									<div class="progress">
+										<div class="progress-bar" style="width: 78%;">
+									    </div>
+									</div>
+								</li>
+							</ul>
+							
+						</div>
+					</div>
+				</div>  		<!-- End row -->
+				<div class="row">
+					<div class="col-md-12">
+						<div id="clients-slider" class="clients-logo-slider">
+							<img src="images/client-logo/logo1.png" alt="">
+							<img src="images/client-logo/logo-2.png" alt="">
+							<img src="images/client-logo/logo-3.png" alt="">
+							<img src="images/client-logo/logo-4.png" alt="">
+							<img src="images/client-logo/logo-5.png" alt="">
+							<img src="images/client-logo/logo1.png" alt="">
+							<img src="images/client-logo/logo-2.png" alt="">
+							<img src="images/client-logo/logo-3.png" alt="">
+							<img src="images/client-logo/logo-4.png" alt="">
+							<img src="images/client-logo/logo-5.png" alt="">
+						</div>
+						
+					</div>
+				</div>
+			</div>   	<!-- End container -->
+		</section>   <!-- End section -->
 
 <!-- Start Portfolio Section
 =========================================== -->
