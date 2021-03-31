@@ -9,12 +9,14 @@ function AboutComponent(props: Props) {
     <div id="usage" className="content is-4 is-size-5">
       <h1 className="title is-4"> What is this? </h1>
 
+      {/*
       <p>
         This is Brandon's this pandemic side project. When he's not
         <a href="https://www.youtube.com/watch?v=x034jVB1avs" target="_blank" rel="noopener noreferrer">building
         games to play on the side of skyscrapers</a>, or working to replace a slow quadratic time industry with
         something linear and automated, he's doing crazy stuff like this.
       </p>
+      */}
 
       <p>
         Your brain was already capable of imagining things spoken in other people's voices. This is
@@ -26,16 +28,13 @@ function AboutComponent(props: Props) {
       <h1 className="title is-4"> Technology disclosure </h1>
 
       <p>
-        <em>I'll be happy to remove any of the voices featured here for any reason.</em>
-        &nbsp;
-        I'm not a jerk, and I don't want anything in return. I don't mean to offend any parties, and my hope
-        is that everyone will think this is really cool (like the laser video I linked above).
+        <em>We'll be happy to remove any of the voices featured here for any reason.</em>
       </p>
 
       <p>
         The technology to clone voices is already out in the open, and 13 year olds are already replicating
         these results on their own at home. People are making voices from all sorts of public figures
-        (independent of me and my work) and posting them on YouTube and social media.
+        (independent of our work) and posting them on YouTube and social media.
       </p>
 
       <p>
@@ -51,7 +50,7 @@ function AboutComponent(props: Props) {
       </p>
 
       <p>
-        As an interesting asside, the voices you are actually hearing are Linda Johnson or myself with a little
+        As an interesting aside, the voices you are actually hearing are Linda Johnson with a little
         bit layered on top. All voices have the same fundamental behavior and representation and only vary in
         a few paramenters.
       </p>
@@ -134,12 +133,12 @@ function AboutComponent(props: Props) {
       <h1 className="title is-4">Contact</h1>
 
       <p>
-        I'm "echelon" on Gmail, <a href="https://twitter.com/echelon" target="_blank" rel="noopener noreferrer">Twitter</a>, 
+        Reach out to "echelon" on <a href="https://twitter.com/echelon" target="_blank" rel="noopener noreferrer">Twitter</a>
         and Hacker News. Say hi.
       </p>
 
       <p>
-        &mdash; Learning Machines, LLC
+        &mdash; Storyteller (registered as Learning Machines, LLC)
       </p>
 
       <div className="columns is-mobile is-gapless">
