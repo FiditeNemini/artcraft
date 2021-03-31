@@ -133,7 +133,7 @@ function AboutComponent(props: Props) {
       <h1 className="title is-4">Contact</h1>
 
       <p>
-        Reach out to "echelon" on <a href="https://twitter.com/echelon" target="_blank" rel="noopener noreferrer">Twitter</a>
+        Reach out to "echelon" on <a href="https://twitter.com/echelon" target="_blank" rel="noopener noreferrer">Twitter</a>&nbsp;
         and Hacker News. Say hi.
       </p>
 
