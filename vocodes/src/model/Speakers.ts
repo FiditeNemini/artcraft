@@ -843,6 +843,12 @@ SPEAKERS.forEach(speaker => {
     }
     categoryList.push(speaker);
   });
+
+  // TODO(bt): April fools
+  speaker.slug = "goku";
+  //speaker.name = "Goku";
+  speaker.avatarUrl = "goku.webp";
+  speaker.fullUrl = "goku-full.png";
 });
 
 export {
