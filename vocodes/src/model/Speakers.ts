@@ -370,6 +370,16 @@ const SPEAKERS : Speaker[] = [
     defaultVoice: true,
   }),
   Speaker.fromJson({
+    name: "Goku",
+    slug: "goku",
+    description: "Over 9000",
+    avatarUrl: "goku.webp",
+    fullUrl: "goku-full.png",
+    voiceQuality: 7.8,
+    categories: ["cartoons", "new"],
+    defaultVoice: true,
+  }),
+  Speaker.fromJson({
     name: "Hillary Clinton",
     slug: "hillary-clinton",
     description: "Politics.",
