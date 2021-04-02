@@ -835,8 +835,6 @@ SPEAKER_CATEGORIES.forEach(category => {
   SPEAKERS_BY_CATEGORY.set(category, []);
 });
 
-let i = 0;
-
 SPEAKERS.forEach(speaker => {
   speaker.getCategories().forEach((category: SpeakerCategory) => {
     let categoryList = SPEAKERS_BY_CATEGORY.get(category);
@@ -845,34 +843,6 @@ SPEAKERS.forEach(speaker => {
     }
     categoryList.push(speaker);
   });
-
-  // TODO(bt): April fools
-  speaker.slug = "goku";
-  speaker.name = "Goku";
-  speaker.avatarUrl = "goku.webp";
-  speaker.fullUrl = "goku-full.png";
-
-  i += 1;
-
-  if (i % 5 === 0) {
-    speaker.name = "Other Goku";
-  }  else if (i % 3 === 0) {
-    speaker.name = "GOKU";
-  } else if (i % 6 === 0) {
-    speaker.name = "GoKu";
-  }
-
-  if (i % 7 === 0) {
-    speaker.name = "Different Goku";
-  } else if (i % 20 === 0) {
-    speaker.name = "More Different Goku";
-  } 
-  
-  if (i % 11 === 0) {
-    speaker.name = "Did somebody say Goku?";
-  } 
-
-
 });
 
 export {
