@@ -72,6 +72,7 @@ const ENV_BIND_ADDRESS: &'static str = "BIND_ADDRESS";
 const ENV_DATABASE_ENABLED : &'static str = "DATABASE_ENABLED";
 const ENV_DATABASE_URL : &'static str = "DATABASE_URL";
 const ENV_DEFAULT_SAMPLE_RATE_HZ : &'static str = "DEFAULT_SAMPLE_RATE_HZ";
+const ENV_EARLY_ACCESS_URL : &'static str = "EARLY_ACCESS_URL";
 const ENV_MAX_CHAR_LEN : &'static str = "MAX_CHAR_LEN";
 const ENV_MIN_CHAR_LEN : &'static str = "MIN_CHAR_LEN";
 const ENV_MODEL_CONFIG_FILE: &'static str = "MODEL_CONFIG_FILE";
@@ -96,6 +97,7 @@ const DEFAULT_BIND_ADDRESS : &'static str = "0.0.0.0:12345";
 const DEFAULT_DATABASE_ENABLED : bool = false;
 const DEFAULT_DATABASE_URL : &'static str = "mysql://root:root@localhost/mumble";
 const DEFAULT_DEFAULT_SAMPLE_RATE_HZ : u32 = 22050;
+const DEFAULT_EARLY_ACCESS_URL : &'static str = "/hidden_early_access";
 const DEFAULT_MAX_CHAR_LEN : usize = 255;
 const DEFAULT_MIN_CHAR_LEN : usize = 0;
 const DEFAULT_MODEL_CONFIG_FILE: &'static str = "models.toml";
@@ -125,6 +127,7 @@ pub struct AppState {
 }
 
 /** Startup parameters for the server. */
+#[derive(Clone)]
 pub struct ServerArgs {
   pub bind_address: String,
   pub hostname: String,
@@ -135,6 +138,9 @@ pub struct ServerArgs {
   pub patreon_asset_directory: PathBuf,
   pub twitch_asset_directory: PathBuf,
   pub admin_asset_directory: PathBuf,
+
+  // Location of the Twitch "early access" endpoint
+  pub early_access_url: String,
 }
 
 fn get_env_string_optional(env_name: &str) -> Option<String> {
@@ -245,6 +251,8 @@ pub fn main() -> AnyhowResult<()> {
   let asset_subdirectory_admin = get_env_string(ENV_ASSET_SUBDIRECTORY_ADMIN, DEFAULT_ASSET_SUBDIRECTORY_ADMIN);
   let asset_subdirectory_patreon = get_env_string(ENV_ASSET_SUBDIRECTORY_PATREON, DEFAULT_ASSET_SUBDIRECTORY_PATREON);
   let asset_subdirectory_twitch = get_env_string(ENV_ASSET_SUBDIRECTORY_TWITCH, DEFAULT_ASSET_SUBDIRECTORY_TWITCH);
+
+  let early_access_url = get_env_string(ENV_EARLY_ACCESS_URL, DEFAULT_EARLY_ACCESS_URL);
 
   let server_hostname = hostname::get()
       .ok()
@@ -367,6 +375,7 @@ pub fn main() -> AnyhowResult<()> {
     twitch_asset_directory,
     patreon_asset_directory,
     admin_asset_directory,
+    early_access_url,
   };
 
   run_server(app_state, server_args)?;
@@ -387,6 +396,8 @@ async fn run_server(app_state: AppState, server_args: ServerArgs) -> std::io::Re
 
   let bind_address = server_args.bind_address.clone();
   let server_hostname = server_args.hostname.clone();
+
+  let early_access_url = server_args.early_access_url.clone();
 
   HttpServer::new(move || App::new()
       .wrap(Cors::new()
@@ -429,7 +440,7 @@ async fn run_server(app_state: AppState, server_args: ServerArgs) -> std::io::Re
           .index_file("FAKE_INDEX.HTML"))
       .service(Files::new("/patreon-thanks", patreon_asset_directory.clone())
           .index_file("index.html"))
-      .service(Files::new("/twitch", twitch_asset_directory.clone())
+      .service(Files::new(&early_access_url, twitch_asset_directory.clone())
           .index_file("index.html"))
       .service(
         web::resource("/advanced_tts")

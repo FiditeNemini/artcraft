@@ -4,6 +4,10 @@ early_access_voices = [
     "eric-cartman",
     "tails",
     "knuckles",
+    "samuel-l-jackson",
+    "sailor-moon",
+    "tom-hanks",
+    "hank-hill",
 ]
 
 # --------------- Experimental Speakers ---------------
@@ -31,6 +35,34 @@ melgan = "melgan-vocodes.torchjit"
 #  melgan = "melgan_manyvoice5.0_2020-07-23_12d5838_10760.torchjit"
 #  #melgan = "melgan_manyvoice2.0_2020-07-08_12d5838_9330.torchjit"
 #  #melgan = "manyvoice1.0_2020-06-28_12d5838_6610.torchjit"
+
+[[speakers]]
+name = "Tom Hanks"
+slug = "tom-hanks"
+model_pipeline = "ArpabetGlowTtsMelgan"
+glow_tts = "glow-tts_hank_hill_ljstx_2021.03.29_expr-1_chkpt-6000.torchjit"
+melgan = "melgan_manyvoice5.0_2020-07-23_12d5838_10760.torchjit"
+
+[[speakers]]
+name = "Tom Hanks"
+slug = "tom-hanks"
+model_pipeline = "ArpabetGlowTtsMelgan"
+glow_tts = "glow-tts_tom_hanks_ljstx_2020.07.10_expr-1_chkpt-3686.torchjit"
+melgan = "melgan_manyvoice5.0_2020-07-23_12d5838_10760.torchjit"
+
+[[speakers]]
+name = "Sailor Moon"
+slug = "sailor-moon"
+model_pipeline = "ArpabetGlowTtsMelgan"
+glow_tts = "glow-tts_sailor_moon_ljstx_2021.03.15_expr-1_chkpt-4750.torchjit"
+melgan = "melgan_manyvoice5.0_2020-07-23_12d5838_10760.torchjit" # TODO: Needs custom vocoder
+
+[[speakers]]
+name = "Samuel L. Jackson"
+slug = "samuel-l-jackson"
+model_pipeline = "ArpabetGlowTtsMelgan"
+glow_tts = "glow-tts_samuel_l_jackson_ljstx_2020.07.05_expr-1_chkpt-2444.torchjit"
+melgan = "melgan_manyvoice5.0_2020-07-23_12d5838_10760.torchjit" # TODO: Needs custom vocoder
 
 [[speakers]]
 name = "Michael Jackson"
