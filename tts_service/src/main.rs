@@ -410,15 +410,8 @@ async fn run_server(app_state: AppState, server_args: ServerArgs) -> std::io::Re
         .service(Files::new("/adminui", admin_asset_directory.clone())
             .index_file("index.html"))
         // Early access static path for assets
-        .service(Files::new("/early_access", patreon_asset_directory.clone())
-            .index_file("FAKE_INDEX.HTML"))
         .service(Files::new("/static", static_asset_directory.clone())
             .index_file("FAKE_INDEX.HTML"))
-        // Twitch and patreon
-        .service(Files::new("/patreon-thanks", patreon_asset_directory.clone())
-            .index_file("index.html"))
-        .service(Files::new(&early_access_url, twitch_asset_directory.clone())
-            .index_file("index.html"))
         .service(
           web::resource("/advanced_tts")
               .route(web::post().to(post_tts))
@@ -446,7 +439,6 @@ async fn run_server(app_state: AppState, server_args: ServerArgs) -> std::io::Re
         .service(get_dynamic_early_access_speakers)
         .service(get_words);
 
-      println!("{:?}", &twitch_asset_directory);
       for key in bonus_urls.iter() {
         let url = format!("/{}", key);
         app = app.service(Files::new(&url, twitch_asset_directory.clone())
