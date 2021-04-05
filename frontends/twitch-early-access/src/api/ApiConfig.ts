@@ -66,6 +66,19 @@ class ApiConfig {
     baseUrl.pathname = path;
     return baseUrl.toString();
   }
+
+  public getEarlyAccessJsonEndpoint() : string {
+    const regex = new RegExp('([\\w\\-\\.]+)/?$')
+    const matches = regex.exec(window.location.pathname);
+
+    if (matches === undefined || matches!.length < 2) {
+      return '/bad_url';
+    }
+
+    const url_key = matches![1];
+
+    return this.getEndpoint('/access/' + url_key);
+  }
 }
 
 export default ApiConfig;

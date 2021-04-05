@@ -40,7 +40,8 @@ class App extends React.Component<Props, State> {
   }
 
   public loadSpeakers() {
-    const url = this.state.apiConfig.getEndpoint('/voices');
+    const url = this.state.apiConfig.getEarlyAccessJsonEndpoint();
+    console.log("API Endpoint: ", url);
 
     fetch(url)
       .then(res => res.json())
