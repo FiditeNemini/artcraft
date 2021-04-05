@@ -40,7 +40,9 @@ use actix::{Addr, SyncArbiter, Context};
 use arpabet::Arpabet;
 use arpabet::load_cmudict;
 use arpabet::load_from_file as arpabet_load_from_file;
+use crate::bonus_voices::config::BonusEndpointMappings;
 use crate::bonus_voices::config::BonusEndpoints;
+use crate::bonus_voices::endpoints::get_dynamic_early_access_speakers;
 use crate::database::connector::DatabaseConnector;
 use crate::database::sentence_recorder::SentenceRecorder;
 use crate::endpoints::helpers::stats_recorder::StatsRecorder;
@@ -136,6 +138,9 @@ pub struct AppState {
   pub rate_limiter: Box<dyn RateLimiter>,
   pub stats_recorder: StatsRecorder,
   pub allow_model_reload: bool,
+
+  // Bonus voices for "early access" and rewards.
+  pub bonus_endpoint_mappings: BonusEndpointMappings,
 }
 
 /** Startup parameters for the server. */
@@ -240,6 +245,8 @@ pub fn main() -> AnyhowResult<()> {
 
   info!("Bonus endpoints: {:?}", bonus_endpoints);
 
+  let bonus_endpoint_mappings = bonus_endpoints.to_mappings()?;
+
   let model_cache = ModelCache::new(&model_configs.model_locations);
 
   let rate_limiter : Box<dyn RateLimiter> = if limiter_enabled {
@@ -317,6 +324,7 @@ pub fn main() -> AnyhowResult<()> {
     rate_limiter,
     stats_recorder,
     allow_model_reload,
+    bonus_endpoint_mappings,
   };
 
   let server_args = ServerArgs {
@@ -418,6 +426,7 @@ async fn run_server(app_state: AppState, server_args: ServerArgs) -> std::io::Re
       .service(get_service_settings)
       .service(get_speakers)
       .service(get_early_access_speakers)
+      .service(get_dynamic_early_access_speakers)
       .service(get_words)
       .app_data(arc.clone())
     )

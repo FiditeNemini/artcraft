@@ -595,13 +595,6 @@ glow_tts = "glow-tts_neil_degrasse_tyson_ljstx_2020.07.05_expr-1_chkpt-2482.torc
 melgan = "melgan_manyvoice2.0_2020-07-08_12d5838_9330.torchjit"
 
 [[speakers]]
-name = "Samuel L. Jackson"
-slug = "samuel-l-jackson"
-model_pipeline = "ArpabetGlowTtsMelgan"
-glow_tts = "glow-tts_samuel_l_jackson_ljstx_2020.07.05_expr-1_chkpt-2444.torchjit"
-melgan = "melgan_manyvoice2.0_2020-07-08_12d5838_9330.torchjit"
-
-[[speakers]]
 name = "Bill Nye"
 slug = "bill-nye"
 model_pipeline = "ArpabetGlowTtsMelgan"

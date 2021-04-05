@@ -1,3 +1,4 @@
+use anyhow::anyhow;
 use crate::AnyhowResult;
 use std::collections::HashMap;
 use std::fs;
@@ -19,6 +20,7 @@ pub struct BonusEndpoint {
 }
 
 /// Mapping of all the voices.
+#[derive(Clone)]
 pub struct BonusEndpointMappings {
   pub url_slug_to_voices: HashMap<String, Vec<String>>
 }
@@ -34,6 +36,9 @@ impl BonusEndpoints {
     let mut mappings = HashMap::new();
 
     for endpoint in self.bonus_endpoints.iter() {
+      if mappings.contains_key(&endpoint.http_endpoint) {
+        return Err(anyhow!("Endpoint already present in mappings: {}", &endpoint.http_endpoint));
+      }
       mappings.insert(endpoint.http_endpoint.to_string(), endpoint.voices.clone());
     }
 

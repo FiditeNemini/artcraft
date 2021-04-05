@@ -1,31 +1,33 @@
 use actix_web::web::{
   Data,
   Json,
+  Path,
 };
 use actix_web::{
   HttpRequest,
   get,
 };
 
-use std::sync::Arc;
 use crate::AppState;
+use crate::endpoints::speakers::SpeakersResult;
 use crate::model::model_config::Speaker;
+use std::sync::Arc;
 
-/*#[get("/access/{key}")]
+#[get("/access/{key}")]
 pub async fn get_dynamic_early_access_speakers(
   _request: HttpRequest,
-  path_data: web::Path<(String,)>,
+  path_data: Path<(String,)>,
   app_state: Data<Arc<AppState>>
 ) -> std::io::Result<Json<SpeakersResult>> {
 
-  println!("GET /access");
-
+  let url_key = path_data.into_inner().0;
   let app_state = app_state.into_inner();
+  let mappings = &app_state.bonus_endpoint_mappings;
 
   let early_access_voices =
-      app_state.model_configs.early_access_voices
+      mappings.url_slug_to_voices.get(&url_key)
           .as_ref()
-          .map_or(Vec::new(), |list| list.clone());
+          .map_or(Vec::new(), |list| list.to_vec());
 
   let mut early_access_speakers : Vec<Speaker> = Vec::new();
 
@@ -39,4 +41,3 @@ pub async fn get_dynamic_early_access_speakers(
     speakers: early_access_speakers,
   }))
 }
-*/

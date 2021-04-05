@@ -13,7 +13,7 @@ use crate::model::model_config::Speaker;
 
 #[derive(Serialize, Debug, Clone)]
 pub struct SpeakersResult {
-  speakers: Vec<Speaker>,
+  pub speakers: Vec<Speaker>,
 }
 
 #[get("/speakers")]
