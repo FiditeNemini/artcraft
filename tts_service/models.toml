@@ -37,8 +37,8 @@ melgan = "melgan-vocodes.torchjit"
 #  #melgan = "manyvoice1.0_2020-06-28_12d5838_6610.torchjit"
 
 [[speakers]]
-name = "Tom Hanks"
-slug = "tom-hanks"
+name = "Hank Hill"
+slug = "hank-hill"
 model_pipeline = "ArpabetGlowTtsMelgan"
 glow_tts = "glow-tts_hank_hill_ljstx_2021.03.29_expr-1_chkpt-6000.torchjit"
 melgan = "melgan_manyvoice5.0_2020-07-23_12d5838_10760.torchjit"
