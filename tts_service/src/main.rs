@@ -79,6 +79,7 @@ const ENV_ARPABET_EXTRAS_FILE : &'static str = "ARPABET_EXTRAS_FILE";
 const ENV_ASSET_DIRECTORY: &'static str = "ASSET_DIRECTORY";
 const ENV_ASSET_SUBDIRECTORY_ADMIN: &'static str = "ASSET_SUBDIRECTORY_ADMIN";
 const ENV_ASSET_SUBDIRECTORY_PATREON: &'static str = "ASSET_SUBDIRECTORY_PATREON";
+const ENV_ASSET_SUBDIRECTORY_STATIC: &'static str = "ASSET_SUBDIRECTORY_STATIC";
 const ENV_ASSET_SUBDIRECTORY_TWITCH: &'static str = "ASSET_SUBDIRECTORY_TWITCH";
 const ENV_BIND_ADDRESS: &'static str = "BIND_ADDRESS";
 const ENV_BONUS_VOICES_CONFIG_FILE: &'static str = "BONUS_VOICES_CONFIG_FILE";
@@ -105,6 +106,7 @@ const DEFAULT_ALLOW_MODEL_RELOAD : bool = true;
 const DEFAULT_ASSET_DIRECTORY : &'static str = "/home/bt/dev/voice/voder/frontends";
 const DEFAULT_ASSET_SUBDIRECTORY_ADMIN : &'static str = "admin/build";
 const DEFAULT_ASSET_SUBDIRECTORY_PATREON : &'static str = "twitch-early-access/build";
+const DEFAULT_ASSET_SUBDIRECTORY_STATIC : &'static str = "twitch-early-access/build/static";
 const DEFAULT_ASSET_SUBDIRECTORY_TWITCH : &'static str = "twitch-early-access/build";
 const DEFAULT_BIND_ADDRESS : &'static str = "0.0.0.0:12345";
 const DEFAULT_BONUS_VOICES_CONFIG_FILE: &'static str = "bonus_voices.toml";
@@ -155,6 +157,7 @@ pub struct ServerArgs {
   pub patreon_asset_directory: PathBuf,
   pub twitch_asset_directory: PathBuf,
   pub admin_asset_directory: PathBuf,
+  pub static_asset_directory: PathBuf, // Subdirectory of the above (TODO: cleanup all of this)
 
   // Location of the Twitch "early access" endpoint
   pub early_access_url: String,
@@ -203,6 +206,7 @@ pub fn main() -> AnyhowResult<()> {
   let asset_subdirectory_admin = get_env_string_or_default(ENV_ASSET_SUBDIRECTORY_ADMIN, DEFAULT_ASSET_SUBDIRECTORY_ADMIN);
   let asset_subdirectory_patreon = get_env_string_or_default(ENV_ASSET_SUBDIRECTORY_PATREON, DEFAULT_ASSET_SUBDIRECTORY_PATREON);
   let asset_subdirectory_twitch = get_env_string_or_default(ENV_ASSET_SUBDIRECTORY_TWITCH, DEFAULT_ASSET_SUBDIRECTORY_TWITCH);
+  let asset_subdirectory_static = get_env_string_or_default(ENV_ASSET_SUBDIRECTORY_STATIC, DEFAULT_ASSET_SUBDIRECTORY_STATIC);
 
   let early_access_url = get_env_string_or_default(ENV_EARLY_ACCESS_URL, DEFAULT_EARLY_ACCESS_URL);
 
@@ -215,12 +219,14 @@ pub fn main() -> AnyhowResult<()> {
   let admin_asset_directory = root_asset_directory.join(asset_subdirectory_admin);
   let patreon_asset_directory = root_asset_directory.join(asset_subdirectory_patreon);
   let twitch_asset_directory = root_asset_directory.join(asset_subdirectory_twitch);
+  let static_asset_directory = root_asset_directory.join(asset_subdirectory_static);
 
   info!("Arpabet extras file: {:?}", arpabet_extras_file);
   info!("Asset directory: {}", asset_directory);
   info!("Admin asset directory: {:?}", admin_asset_directory);
   info!("Patreon asset directory: {:?}", patreon_asset_directory);
   info!("Twitch asset directory: {:?}", twitch_asset_directory);
+  info!("Static asset directory: {:?}", static_asset_directory);
 
   info!("Bind address: {}", bind_address);
   info!("Using model config file: {}", model_config_file);
@@ -333,6 +339,7 @@ pub fn main() -> AnyhowResult<()> {
     num_workers,
     root_asset_directory,
     twitch_asset_directory,
+    static_asset_directory,
     patreon_asset_directory,
     admin_asset_directory,
     early_access_url,
@@ -358,6 +365,7 @@ async fn run_server(app_state: AppState, server_args: ServerArgs) -> std::io::Re
   let admin_asset_directory = server_args.admin_asset_directory.clone();
   let patreon_asset_directory = server_args.patreon_asset_directory.clone();
   let twitch_asset_directory = server_args.twitch_asset_directory.clone();
+  let static_asset_directory = server_args.static_asset_directory.clone();
 
   let bind_address = server_args.bind_address.clone();
   let server_hostname = server_args.hostname.clone();
@@ -404,13 +412,13 @@ async fn run_server(app_state: AppState, server_args: ServerArgs) -> std::io::Re
         // Early access static path for assets
         .service(Files::new("/early_access", patreon_asset_directory.clone())
             .index_file("FAKE_INDEX.HTML"))
-        .service(Files::new("/static", patreon_asset_directory.clone())
+        .service(Files::new("/static", static_asset_directory.clone())
             .index_file("FAKE_INDEX.HTML"))
         // Twitch and patreon
-        //.service(Files::new("/patreon-thanks", patreon_asset_directory.clone())
-        //    .index_file("index.html"))
-        //.service(Files::new(&early_access_url, twitch_asset_directory.clone())
-        //    .index_file("index.html"))
+        .service(Files::new("/patreon-thanks", patreon_asset_directory.clone())
+            .index_file("index.html"))
+        .service(Files::new(&early_access_url, twitch_asset_directory.clone())
+            .index_file("index.html"))
         .service(
           web::resource("/advanced_tts")
               .route(web::post().to(post_tts))
@@ -438,6 +446,7 @@ async fn run_server(app_state: AppState, server_args: ServerArgs) -> std::io::Re
         .service(get_dynamic_early_access_speakers)
         .service(get_words);
 
+      println!("{:?}", &twitch_asset_directory);
       for key in bonus_urls.iter() {
         let url = format!("/{}", key);
         app = app.service(Files::new(&url, twitch_asset_directory.clone())
