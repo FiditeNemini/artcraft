@@ -32,7 +32,7 @@ voices = [
 
 # Patreon Gets Everything
 [[bonus_endpoints]]
-http_endpoint = "patreon_thanks"
+http_endpoint = "patreon-thanks"
 voices = [
     "hank-hill",
     "knuckles",

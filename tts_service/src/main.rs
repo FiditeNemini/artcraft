@@ -343,7 +343,12 @@ pub fn main() -> AnyhowResult<()> {
 }
 
 #[actix_rt::main]
-async fn run_server(app_state: AppState, server_args: ServerArgs) -> std::io::Result<()> {
+async fn run_server(app_state: AppState, server_args: ServerArgs) -> std::io::Result<()>
+{
+  let bonus_urls : Vec<String> = app_state.bonus_endpoint_mappings.url_slug_to_voices.keys()
+      .map(|k| k.clone())
+      .collect();
+
   let arc = web::Data::new(Arc::new(app_state));
 
   info!("Starting HTTP service.");
@@ -359,77 +364,88 @@ async fn run_server(app_state: AppState, server_args: ServerArgs) -> std::io::Re
 
   let early_access_url = server_args.early_access_url.clone();
 
-  HttpServer::new(move || App::new()
-      .wrap(Cors::new()
-          .allowed_origin("http://localhost:12345")
-          .allowed_origin("http://localhost:3000")
-          .allowed_origin("http://localhost:5555")
-          .allowed_origin("http://localhost:8080")
-          .allowed_origin("http://localhost:8000")
-          .allowed_origin("http://localhost:7000")
-          .allowed_origin("http://jungle.horse")
-          .allowed_origin("https://jungle.horse")
-          .allowed_origin("http://mumble.stream")
-          .allowed_origin("https://mumble.stream")
-          .allowed_origin("http://trumped.com")
-          .allowed_origin("https://trumped.com")
-          .allowed_origin("http://vo.codes")
-          .allowed_origin("https://vo.codes")
-          .allowed_origin("http://vocodes.com")
-          .allowed_origin("https://vocodes.com")
-          .allowed_methods(vec!["GET", "POST", "OPTIONS"])
-          .allowed_headers(vec![
-            http::header::ACCEPT,
-            http::header::ACCESS_CONTROL_ALLOW_ORIGIN, // Tabulator Ajax
-            http::header::CONTENT_TYPE,
-            http::header::HeaderName::from_static("x-requested-with") // Tabulator Ajax sends
-          ])
-          .max_age(3600)
-          .finish())
-      .wrap(Logger::new(&log_format)
-          .exclude("/liveness")
-          .exclude("/readiness"))
-      .wrap(DefaultHeaders::new().header("X-Backend-Hostname", &server_hostname))
-      // Admin UI & old frontend
-      .service(Files::new("/frontend", admin_asset_directory.clone())
-          .index_file("FAKE_INDEX.HTML"))
-      .service(Files::new("/adminui", admin_asset_directory.clone())
-          .index_file("index.html"))
-      // Twitch and patreon
-      .service(Files::new("/early_access", patreon_asset_directory.clone())
-          .index_file("FAKE_INDEX.HTML"))
-      .service(Files::new("/patreon-thanks", patreon_asset_directory.clone())
-          .index_file("index.html"))
-      .service(Files::new(&early_access_url, twitch_asset_directory.clone())
-          .index_file("index.html"))
-      .service(
-        web::resource("/advanced_tts")
-            .route(web::post().to(post_tts))
-            .route(web::head().to(|| HttpResponse::Ok()))
-      )
-      .service(
-        web::resource("/speak")
-            .route(web::post().to(post_speak))
-            .route(web::get().to(legacy_get_speak))
-            .route(web::head().to(|| HttpResponse::Ok()))
-      )
-      .service(
-        web::resource("/speak_spectrogram")
-            .route(web::post().to(post_speak_with_spectrogram))
-            .route(web::head().to(|| HttpResponse::Ok()))
-      )
-      .service(get_liveness)
-      .service(get_models)
-      .service(get_readiness)
-      .service(get_root)
-      .service(get_sentences)
-      .service(get_service_settings)
-      .service(get_speakers)
-      .service(get_early_access_speakers)
-      .service(get_dynamic_early_access_speakers)
-      .service(get_words)
-      .app_data(arc.clone())
-    )
+  HttpServer::new(move || {
+    let mut app = App::new()
+        .wrap(Cors::new()
+            .allowed_origin("http://localhost:12345")
+            .allowed_origin("http://localhost:3000")
+            .allowed_origin("http://localhost:5555")
+            .allowed_origin("http://localhost:8080")
+            .allowed_origin("http://localhost:8000")
+            .allowed_origin("http://localhost:7000")
+            .allowed_origin("http://jungle.horse")
+            .allowed_origin("https://jungle.horse")
+            .allowed_origin("http://mumble.stream")
+            .allowed_origin("https://mumble.stream")
+            .allowed_origin("http://trumped.com")
+            .allowed_origin("https://trumped.com")
+            .allowed_origin("http://vo.codes")
+            .allowed_origin("https://vo.codes")
+            .allowed_origin("http://vocodes.com")
+            .allowed_origin("https://vocodes.com")
+            .allowed_methods(vec!["GET", "POST", "OPTIONS"])
+            .allowed_headers(vec![
+              http::header::ACCEPT,
+              http::header::ACCESS_CONTROL_ALLOW_ORIGIN, // Tabulator Ajax
+              http::header::CONTENT_TYPE,
+              http::header::HeaderName::from_static("x-requested-with") // Tabulator Ajax sends
+            ])
+            .max_age(3600)
+            .finish())
+        .wrap(Logger::new(&log_format)
+            .exclude("/liveness")
+            .exclude("/readiness"))
+        .wrap(DefaultHeaders::new().header("X-Backend-Hostname", &server_hostname))
+        // Admin UI & old frontend
+        .service(Files::new("/frontend", admin_asset_directory.clone())
+            .index_file("FAKE_INDEX.HTML"))
+        .service(Files::new("/adminui", admin_asset_directory.clone())
+            .index_file("index.html"))
+        // Early access static path for assets
+        .service(Files::new("/early_access", patreon_asset_directory.clone())
+            .index_file("FAKE_INDEX.HTML"))
+        .service(Files::new("/static", patreon_asset_directory.clone())
+            .index_file("FAKE_INDEX.HTML"))
+        // Twitch and patreon
+        //.service(Files::new("/patreon-thanks", patreon_asset_directory.clone())
+        //    .index_file("index.html"))
+        //.service(Files::new(&early_access_url, twitch_asset_directory.clone())
+        //    .index_file("index.html"))
+        .service(
+          web::resource("/advanced_tts")
+              .route(web::post().to(post_tts))
+              .route(web::head().to(|| HttpResponse::Ok()))
+        )
+        .service(
+          web::resource("/speak")
+              .route(web::post().to(post_speak))
+              .route(web::get().to(legacy_get_speak))
+              .route(web::head().to(|| HttpResponse::Ok()))
+        )
+        .service(
+          web::resource("/speak_spectrogram")
+              .route(web::post().to(post_speak_with_spectrogram))
+              .route(web::head().to(|| HttpResponse::Ok()))
+        )
+        .service(get_liveness)
+        .service(get_models)
+        .service(get_readiness)
+        .service(get_root)
+        .service(get_sentences)
+        .service(get_service_settings)
+        .service(get_speakers)
+        .service(get_early_access_speakers)
+        .service(get_dynamic_early_access_speakers)
+        .service(get_words);
+
+      for key in bonus_urls.iter() {
+        let url = format!("/{}", key);
+        app = app.service(Files::new(&url, twitch_asset_directory.clone())
+            .index_file("index.html"));
+      }
+
+      app.app_data(arc.clone())
+    })
     .bind(bind_address)?
     .workers(server_args.num_workers)
     .run()
