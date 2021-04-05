@@ -24,6 +24,7 @@ anyhow = "1.0.30"
 base64 = "0.12.2"
 chrono = { version = "0.4.11", features = ["serde"] }
 diesel = { version = "1.4.4", features = ["mysql", "r2d2", "chrono"] }
+easyenv = "0.0.4" # my own simple env bootstrapping
 env_logger = "0.7.1"
 futures = "0.1.29"
 hostname = "0.3.1"

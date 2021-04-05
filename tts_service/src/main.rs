@@ -1,17 +1,20 @@
+#![allow(warnings, unused)]
+
 #[macro_use] extern crate anyhow;
 #[macro_use] extern crate diesel;
 #[macro_use] extern crate log;
 #[macro_use] extern crate serde_derive;
 
-extern crate actix_web;
 extern crate actix_files;
+extern crate actix_web;
 extern crate arpabet;
+extern crate easyenv;
 extern crate hound;
 extern crate serde;
 extern crate tch;
 
+pub mod bonus_voices;
 pub mod database;
-pub mod early_access;
 pub mod endpoints;
 pub mod inference;
 pub mod model;
@@ -37,19 +40,22 @@ use actix::{Addr, SyncArbiter, Context};
 use arpabet::Arpabet;
 use arpabet::load_cmudict;
 use arpabet::load_from_file as arpabet_load_from_file;
+use crate::bonus_voices::config::BonusEndpoints;
 use crate::database::connector::DatabaseConnector;
 use crate::database::sentence_recorder::SentenceRecorder;
+use crate::endpoints::helpers::stats_recorder::StatsRecorder;
 use crate::endpoints::index::get_root;
 use crate::endpoints::liveness::get_liveness;
 use crate::endpoints::models::get_models;
 use crate::endpoints::readiness::get_readiness;
 use crate::endpoints::sentences::get_sentences;
+use crate::endpoints::service_settings::get_service_settings;
 use crate::endpoints::speak::legacy_speak::legacy_get_speak;
 use crate::endpoints::speak::legacy_tts::post_tts;
 use crate::endpoints::speak::speak::post_speak;
 use crate::endpoints::speak::speak_with_spectrogram::post_speak_with_spectrogram;
-use crate::endpoints::speakers::get_speakers;
 use crate::endpoints::speakers::get_early_access_speakers;
+use crate::endpoints::speakers::get_speakers;
 use crate::endpoints::words::get_words;
 use crate::model::model_cache::ModelCache;
 use crate::model::model_config::ModelConfigs;
@@ -57,11 +63,14 @@ use crate::rate_limiter::noop_rate_limiter::NoOpRateLimiter;
 use crate::rate_limiter::rate_limiter::RateLimiter;
 use crate::rate_limiter::redis_rate_limiter::RedisRateLimiter;
 use crate::text::checker::TextChecker;
+use easyenv::get_env_bool_or_default;
+use easyenv::get_env_num;
+use easyenv::get_env_string_optional;
+use easyenv::get_env_string_or_default;
+use easyenv::init_env_logger;
+use grapheme_to_phoneme::Model;
 use limitation::Limiter;
 use std::time::Duration;
-use crate::endpoints::helpers::stats_recorder::StatsRecorder;
-use grapheme_to_phoneme::Model;
-use crate::endpoints::service_settings::get_service_settings;
 
 const ENV_ALLOW_MODEL_RELOAD : &'static str = "ALLOW_MODEL_RELOAD";
 const ENV_ARPABET_EXTRAS_FILE : &'static str = "ARPABET_EXTRAS_FILE";
@@ -70,6 +79,7 @@ const ENV_ASSET_SUBDIRECTORY_ADMIN: &'static str = "ASSET_SUBDIRECTORY_ADMIN";
 const ENV_ASSET_SUBDIRECTORY_PATREON: &'static str = "ASSET_SUBDIRECTORY_PATREON";
 const ENV_ASSET_SUBDIRECTORY_TWITCH: &'static str = "ASSET_SUBDIRECTORY_TWITCH";
 const ENV_BIND_ADDRESS: &'static str = "BIND_ADDRESS";
+const ENV_BONUS_VOICES_CONFIG_FILE: &'static str = "BONUS_VOICES_CONFIG_FILE";
 const ENV_DATABASE_ENABLED : &'static str = "DATABASE_ENABLED";
 const ENV_DATABASE_URL : &'static str = "DATABASE_URL";
 const ENV_DEFAULT_SAMPLE_RATE_HZ : &'static str = "DEFAULT_SAMPLE_RATE_HZ";
@@ -95,6 +105,7 @@ const DEFAULT_ASSET_SUBDIRECTORY_ADMIN : &'static str = "admin/build";
 const DEFAULT_ASSET_SUBDIRECTORY_PATREON : &'static str = "twitch-early-access/build";
 const DEFAULT_ASSET_SUBDIRECTORY_TWITCH : &'static str = "twitch-early-access/build";
 const DEFAULT_BIND_ADDRESS : &'static str = "0.0.0.0:12345";
+const DEFAULT_BONUS_VOICES_CONFIG_FILE: &'static str = "bonus_voices.toml";
 const DEFAULT_DATABASE_ENABLED : bool = false;
 const DEFAULT_DATABASE_URL : &'static str = "mysql://root:root@localhost/mumble";
 const DEFAULT_DEFAULT_SAMPLE_RATE_HZ : u32 = 22050;
@@ -144,63 +155,8 @@ pub struct ServerArgs {
   pub early_access_url: String,
 }
 
-fn get_env_string_optional(env_name: &str) -> Option<String> {
-  match env::var(env_name).as_ref().ok() {
-    Some(s) => Some(s.to_string()),
-    None => {
-      warn!("Env var '{}' not supplied.", env_name);
-      None
-    },
-  }
-}
-
-fn get_env_string(env_name: &str, default: &str) -> String {
-  match env::var(env_name).as_ref().ok() {
-    Some(s) => s.to_string(),
-    None => {
-      warn!("Env var '{}' not supplied. Using default '{}'.", env_name, default);
-      default.to_string()
-    },
-  }
-}
-
-fn get_env_bool(env_name: &str, default: bool) -> AnyhowResult<bool> {
-  match env::var(env_name).as_ref().ok() {
-    None => {
-      warn!("Env var '{}' not supplied. Using default '{}'.", env_name, default);
-      Ok(default)
-    },
-    Some(val) => match val.as_ref() {
-      "TRUE" => Ok(true),
-      "true" => Ok(true),
-      "FALSE" => Ok(false),
-      "false" => Ok(false),
-      _ => bail!("Invalid boolean value: {:?}", val),
-    }
-  }
-}
-
-// the trait `std::error::Error` is not implemented for `<T as std::str::FromStr>::Err`
-fn get_env_num<T>(env_name: &str, default: T) -> AnyhowResult<T>
-  where T: FromStr + Display,
-        T::Err: Debug
-{
-  match env::var(env_name).as_ref().ok() {
-    None => {
-      warn!("Env var '{}' not supplied. Using default '{}'.", env_name, default);
-      Ok(default)
-    },
-    Some(val) => {
-      match val.parse::<T>() {
-        Err(e) => bail!("Can't parse value '{:?}'. Error: {:?}", val, e),
-        Ok(val) => Ok(val),
-      }
-    },
-  }
-}
-
 pub fn get_rate_limiter_redis() -> AnyhowResult<String> {
-  let redis_host = get_env_string(ENV_RATE_LIMITER_REDIS_HOST, DEFAULT_RATE_LIMITER_REDIS_HOST);
+  let redis_host = get_env_string_or_default(ENV_RATE_LIMITER_REDIS_HOST, DEFAULT_RATE_LIMITER_REDIS_HOST);
   let redis_port = get_env_num::<u16>(ENV_RATE_LIMITER_REDIS_PORT, DEFAULT_RATE_LIMITER_REDIS_PORT)?;
 
   let address = if let Some(redis_user) = get_env_string_optional(ENV_RATE_LIMITER_REDIS_USER) {
@@ -217,43 +173,33 @@ pub fn get_rate_limiter_redis() -> AnyhowResult<String> {
 }
 
 pub fn main() -> AnyhowResult<()> {
-  if env::var(ENV_RUST_LOG)
-      .as_ref()
-      .ok()
-      .is_none()
-  {
-    println!("Setting default logging level to \"{}\", override with env var {}.",
-      DEFAULT_RUST_LOG, ENV_RUST_LOG);
-    std::env::set_var(ENV_RUST_LOG, DEFAULT_RUST_LOG);
-  }
-
-  env_logger::init();
+  init_env_logger(Some(DEFAULT_RUST_LOG));
 
   let arpabet_extras_file = get_env_string_optional(ENV_ARPABET_EXTRAS_FILE);
-  let bind_address = get_env_string(ENV_BIND_ADDRESS, DEFAULT_BIND_ADDRESS);
-  let model_config_file = get_env_string(ENV_MODEL_CONFIG_FILE, DEFAULT_MODEL_CONFIG_FILE);
+  let bind_address = get_env_string_or_default(ENV_BIND_ADDRESS, DEFAULT_BIND_ADDRESS);
+  let model_config_file = get_env_string_or_default(ENV_MODEL_CONFIG_FILE, DEFAULT_MODEL_CONFIG_FILE);
+  let bonus_voices_config_file = get_env_string_or_default(ENV_BONUS_VOICES_CONFIG_FILE, DEFAULT_BONUS_VOICES_CONFIG_FILE);
   let num_workers = get_env_num::<usize>(ENV_NUM_WORKERS, DEFAULT_NUM_WORKERS)?;
-  let database_enabled = get_env_bool(ENV_DATABASE_ENABLED, DEFAULT_DATABASE_ENABLED)?;
-  let database_url = get_env_string(ENV_DATABASE_URL, DEFAULT_DATABASE_URL);
+  let database_enabled = get_env_bool_or_default(ENV_DATABASE_ENABLED, DEFAULT_DATABASE_ENABLED);
+  let database_url = get_env_string_or_default(ENV_DATABASE_URL, DEFAULT_DATABASE_URL);
   let max_char_len = get_env_num::<usize>(ENV_MAX_CHAR_LEN, DEFAULT_MAX_CHAR_LEN)?;
   let min_char_len = get_env_num::<usize>(ENV_MIN_CHAR_LEN, DEFAULT_MIN_CHAR_LEN)?;
-  let default_sample_rate_hz = get_env_num::<u32>(ENV_DEFAULT_SAMPLE_RATE_HZ,
-    DEFAULT_DEFAULT_SAMPLE_RATE_HZ)?;
+  let default_sample_rate_hz = get_env_num::<u32>(ENV_DEFAULT_SAMPLE_RATE_HZ, DEFAULT_DEFAULT_SAMPLE_RATE_HZ)?;
 
-  let limiter_enabled = get_env_bool(ENV_RATE_LIMITER_ENABLED, DEFAULT_RATE_LIMITER_ENABLED)?;
+  let limiter_enabled = get_env_bool_or_default(ENV_RATE_LIMITER_ENABLED, DEFAULT_RATE_LIMITER_ENABLED);
   let limiter_max_requests = get_env_num::<usize>(ENV_RATE_LIMITER_MAX_REQUESTS, DEFAULT_RATE_LIMITER_MAX_REQUESTS)?;
   let limiter_window_seconds = get_env_num::<u64>(ENV_RATE_LIMITER_WINDOW_SECONDS, DEFAULT_RATE_LIMITER_WINDOW_SECONDS)?;
 
-  let allow_model_reload = get_env_bool(ENV_ALLOW_MODEL_RELOAD, DEFAULT_ALLOW_MODEL_RELOAD)?;
-  let stats_recorder_enabled = get_env_bool(ENV_STATS_MICROSERVICE_ENABLED, DEFAULT_STATS_MICROSERVICE_ENABLED)?;
-  let stats_recorder_endpoint = get_env_string(ENV_STATS_MICROSERVICE_ENDPOINT, DEFAULT_STATS_MICROSERVICE_ENDPOINT);
+  let allow_model_reload = get_env_bool_or_default(ENV_ALLOW_MODEL_RELOAD, DEFAULT_ALLOW_MODEL_RELOAD);
+  let stats_recorder_enabled = get_env_bool_or_default(ENV_STATS_MICROSERVICE_ENABLED, DEFAULT_STATS_MICROSERVICE_ENABLED);
+  let stats_recorder_endpoint = get_env_string_or_default(ENV_STATS_MICROSERVICE_ENDPOINT, DEFAULT_STATS_MICROSERVICE_ENDPOINT);
 
-  let asset_directory = get_env_string(ENV_ASSET_DIRECTORY, DEFAULT_ASSET_DIRECTORY);
-  let asset_subdirectory_admin = get_env_string(ENV_ASSET_SUBDIRECTORY_ADMIN, DEFAULT_ASSET_SUBDIRECTORY_ADMIN);
-  let asset_subdirectory_patreon = get_env_string(ENV_ASSET_SUBDIRECTORY_PATREON, DEFAULT_ASSET_SUBDIRECTORY_PATREON);
-  let asset_subdirectory_twitch = get_env_string(ENV_ASSET_SUBDIRECTORY_TWITCH, DEFAULT_ASSET_SUBDIRECTORY_TWITCH);
+  let asset_directory = get_env_string_or_default(ENV_ASSET_DIRECTORY, DEFAULT_ASSET_DIRECTORY);
+  let asset_subdirectory_admin = get_env_string_or_default(ENV_ASSET_SUBDIRECTORY_ADMIN, DEFAULT_ASSET_SUBDIRECTORY_ADMIN);
+  let asset_subdirectory_patreon = get_env_string_or_default(ENV_ASSET_SUBDIRECTORY_PATREON, DEFAULT_ASSET_SUBDIRECTORY_PATREON);
+  let asset_subdirectory_twitch = get_env_string_or_default(ENV_ASSET_SUBDIRECTORY_TWITCH, DEFAULT_ASSET_SUBDIRECTORY_TWITCH);
 
-  let early_access_url = get_env_string(ENV_EARLY_ACCESS_URL, DEFAULT_EARLY_ACCESS_URL);
+  let early_access_url = get_env_string_or_default(ENV_EARLY_ACCESS_URL, DEFAULT_EARLY_ACCESS_URL);
 
   let server_hostname = hostname::get()
       .ok()
@@ -273,6 +219,7 @@ pub fn main() -> AnyhowResult<()> {
 
   info!("Bind address: {}", bind_address);
   info!("Using model config file: {}", model_config_file);
+  info!("Using bonus voices config file: {}", bonus_voices_config_file);
   info!("Max character length: {}", max_char_len);
   info!("Min character length: {}", min_char_len);
   info!("Hostname: {}", server_hostname);
@@ -288,6 +235,10 @@ pub fn main() -> AnyhowResult<()> {
   let model_configs = ModelConfigs::load_from_file(&model_config_file);
 
   info!("Model configs: {:?}", model_configs);
+
+  let bonus_endpoints = BonusEndpoints::load_from_file(&bonus_voices_config_file)?;
+
+  info!("Bonus endpoints: {:?}", bonus_endpoints);
 
   let model_cache = ModelCache::new(&model_configs.model_locations);
 

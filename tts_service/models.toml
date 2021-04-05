@@ -10,14 +10,6 @@ early_access_voices = [
     "hank-hill",
 ]
 
-[[early_access_voices]]
-http_endpoint = "/sonic_voices"
-voices = ["tails", "knuckles"]
-
-[[early_access_voices]]
-http_endpoint = "/hold_on_to_your_butts"
-voices = ["samuel-l-jackson"]
-
 # --------------- Experimental Speakers ---------------
 [[speakers]]
 name = "Current Experiment (glow only + pretrained melgan)"

@@ -11,12 +11,15 @@ use std::sync::Arc;
 use crate::AppState;
 use crate::model::model_config::Speaker;
 
-#[get("/voices")]
-pub async fn get_early_access_speakers(
+/*#[get("/access/{key}")]
+pub async fn get_dynamic_early_access_speakers(
   _request: HttpRequest,
+  path_data: web::Path<(String,)>,
   app_state: Data<Arc<AppState>>
 ) -> std::io::Result<Json<SpeakersResult>> {
-  println!("GET /early_access_speakers");
+
+  println!("GET /access");
+
   let app_state = app_state.into_inner();
 
   let early_access_voices =
@@ -36,3 +39,4 @@ pub async fn get_early_access_speakers(
     speakers: early_access_speakers,
   }))
 }
+*/
