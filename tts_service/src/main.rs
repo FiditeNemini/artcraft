@@ -11,6 +11,7 @@ extern crate serde;
 extern crate tch;
 
 pub mod database;
+pub mod early_access;
 pub mod endpoints;
 pub mod inference;
 pub mod model;
