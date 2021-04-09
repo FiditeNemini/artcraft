@@ -51,17 +51,29 @@ pub async fn post_speak_with_spectrogram(request: HttpRequest,
   app_state: Data<Arc<AppState>>)
   -> ActixResult<Json<SpeakSpectrogramResponse>, SpeakError>
 {
+  debug!("post_speak_with_spectrogram(): request start");
+
   let app_state = app_state.into_inner();
 
   let ip_address = get_request_ip(&request);
+
+  debug!("post_speak_with_spectrogram(): acquiring rate limiter for ip = {:?}", ip_address);
 
   if let Err(_err) = app_state.rate_limiter.maybe_ratelimit_request(&ip_address, &request.headers(), &query) {
     return Err(SpeakError::rate_limited());
   }
 
+  debug!("post_speak_with_spectrogram(): rate limiter acquired for ip = {:?}", ip_address);
+
+  debug!("post_speak_with_spectrogram(): calling stats recorder for ip = {:?}, speaker = {}", ip_address, &query.speaker);
+
   app_state.stats_recorder.record_stats(&query.speaker, &query.text, &ip_address);
 
+  debug!("post_speak_with_spectrogram(): stats recorder called for ip = {:?}, speaker = {}", ip_address, &query.speaker);
+
   let speaker_slug = query.speaker.to_string();
+
+  debug!("post_speak_with_spectrogram(): getting speaker by slug = {}", &speaker_slug);
 
   let speaker = match app_state.model_configs.find_speaker_by_slug(&speaker_slug) {
     Some(speaker) => speaker,
@@ -69,6 +81,8 @@ pub async fn post_speak_with_spectrogram(request: HttpRequest,
       return Err(SpeakError::unknown_speaker());
     },
   };
+
+  debug!("post_speak_with_spectrogram(): speaker = {}", &speaker.name);
 
   let sample_rate_hz = speaker.sample_rate_hz.unwrap_or(app_state.default_sample_rate_hz);
 
@@ -78,7 +92,11 @@ pub async fn post_speak_with_spectrogram(request: HttpRequest,
     return Err(SpeakError::generic_bad_request("Request has empty text."));
   }
 
+  debug!("post_speak_with_spectrogram(): calling sentence recorder for ip = {:?}, speaker = {}", ip_address, &query.speaker);
+
   app_state.sentence_recorder.record_sentence(&speaker_slug, &text, &ip_address);
+
+  debug!("post_speak_with_spectrogram(): sentence recorder called for ip = {:?}, speaker = {}", ip_address, &query.speaker);
 
   let pipeline : Box<dyn InferencePipelineStart<TtsModel = Arc<dyn TtsModelT>, VocoderModel = Arc<dyn VocoderModelT>>> = match speaker.model_pipeline {
     ModelPipeline::ArpabetGlowTtsMelgan => {
@@ -144,6 +162,8 @@ pub async fn post_speak_with_spectrogram(request: HttpRequest,
   };
 
   let speaker_id = speaker.speaker_id.unwrap_or(-1);
+
+  debug!("post_speak_with_spectrogram(): Executing pipeline");
 
   // TODO: Error handling for rich API errors
   let pipeline_done = pipeline.clean_text(&text)

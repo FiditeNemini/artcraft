@@ -72,7 +72,11 @@ pub async fn post_speak(request: HttpRequest,
     return Err(SpeakError::generic_bad_request("Request has empty text."));
   }
 
+  debug!("post_speak(): calling sentence recorder for ip = {:?}, speaker = {}", ip_address, &query.speaker);
+
   app_state.sentence_recorder.record_sentence(&speaker_slug, &text, &ip_address);
+
+  debug!("post_speak(): sentence recorder called for ip = {:?}, speaker = {}", ip_address, &query.speaker);
 
   let cleaned_text = clean_text(&text);
 
