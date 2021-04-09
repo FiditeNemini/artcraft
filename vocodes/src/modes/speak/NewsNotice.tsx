@@ -22,16 +22,17 @@ class NewsNotice extends React.Component<Props, State> {
     }
 
     return (
-      <article className="message is-danger news-alert">
+      <article className="message is-info news-alert">
         <div className="message-header">
-          {/*<p>Join our Twitch for Early Access</p>*/}
-          <p>Vo.codes is currently down</p>
+          <p>Join our Twitch for Early Access</p>
+          {/*<p>Vo.codes is currently down</p>*/}
           <button className="delete" aria-label="delete" onClick={() => this.props.toggleNewsNoticeCallback()}></button>
         </div>
         <div className="message-body">
 
           <div className="columns is-centered is-vcentered">
-            {/*<div className="column is-one-third">
+            {/*<p>We'll be back shortly!</p>*/}
+            <div className="column is-one-third">
               <a href="https://twitch.tv/vocodes" target="_blank" rel="noopener noreferrer"><img 
                 src="/banner/banner.webp" alt="Follow us on Twitch!" /></a>
             </div>
@@ -51,8 +52,7 @@ class NewsNotice extends React.Component<Props, State> {
                   Early access voices: Goku, Tails, Knuckles, MJ, and more. We'll have Mario, more of the Griffin family, and 
                   even new video features. We have trivia with cash prizes, and the chance to win a brand new PS5!
                 </p>
-            </div>*/}
-            <p>We'll be back shortly!</p>
+            </div>
           </div>
 
         </div>
