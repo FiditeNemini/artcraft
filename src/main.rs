@@ -1,4 +1,5 @@
 use anyhow::Result as AnyhowResult;
+use anyhow::anyhow;
 use anyhow::bail;
 use log::{info, warn, debug};
 use md5::{Md5, Digest};
@@ -7,10 +8,11 @@ use s3::creds::Credentials;
 use s3::region::Region;
 use s3::serde_types::Object;
 use std::fs::File;
-use std::path::{PathBuf, Path};
-use std::{fs, io, env};
-use std::str::FromStr;
 use std::io::BufWriter;
+use std::path::{PathBuf, Path};
+use std::str::FromStr;
+use std::time::Duration;
+use std::{fs, io, env, thread};
 
 const ENV_RUST_LOG : &'static str = "RUST_LOG";
 
@@ -139,11 +141,20 @@ impl BucketDownloader {
     let mut buffer = BufWriter::with_capacity(DEFAULT_BUF_SIZE, temp_file);
 
     let code = self.bucket.get_object_stream_blocking(&object.key, &mut buffer)?;
-    if code != 200 {
-      bail!("Couldn't download object to temp. Code = {}", code);
-    }
 
-    Ok(())
+    match code {
+      200 => Ok(()),
+      503 => {
+        // NB: This is a rate limiting pushback.
+        // TODO: Handle this in a better place and way.
+        warn!("Received a 503, which is likely rate limiting; waiting five minutes before crashing.");
+        thread::sleep(Duration::from_secs(60 * 5)); // Waiting five minutes.
+        Err(anyhow!("Couldn't download object to temp. Code = {}", code))
+      },
+      _ => {
+        Err(anyhow!("Couldn't download object to temp. Code = {}", code))
+      }
+    }
   }
 
   fn move_temp_to_downloads(&self, object: &Object) -> AnyhowResult<()> {
