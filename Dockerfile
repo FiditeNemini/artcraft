@@ -38,6 +38,13 @@ RUN LD_LIBRARY_PATH=/usr/lib:${LD_LIBRARY_PATH} $HOME/.cargo/bin/cargo build --r
 FROM ubuntu:xenial
 WORKDIR /
 
+# NB: Comment this out for non-debug images
+# TODO: Figure out how this is done elsewhere with just the static binaries
+RUN apt-get update \
+    && apt-get install -y \
+        curl \
+        wget
+
 #COPY --from=build /tmp/target/debug/tts_service /
 COPY --from=build /tmp/target/release/tts_service /
 COPY --from=build /tmp/libtorch/lib /usr/lib
