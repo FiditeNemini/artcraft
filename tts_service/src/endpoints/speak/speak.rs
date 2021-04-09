@@ -31,17 +31,29 @@ pub async fn post_speak(request: HttpRequest,
   app_state: Data<Arc<AppState>>)
   -> ActixResult<HttpResponse, SpeakError>
 {
+  debug!("post_speak(): request start");
+
   let app_state = app_state.into_inner();
 
   let ip_address = get_request_ip(&request);
+
+  debug!("post_speak(): acquiring rate limiter for ip = {:?}", ip_address);
 
   if let Err(_err) = app_state.rate_limiter.maybe_ratelimit_request(&ip_address, &request.headers(), &query) {
     return Err(SpeakError::rate_limited());
   }
 
+  debug!("post_speak(): rate limiter acquired for ip = {:?}", ip_address);
+
+  debug!("post_speak(): calling stats recorder for ip = {:?}, speaker = {}", ip_address, &query.speaker);
+
   app_state.stats_recorder.record_stats(&query.speaker, &query.text, &ip_address);
 
+  debug!("post_speak(): stats recorder called for ip = {:?}, speaker = {}", ip_address, &query.speaker);
+
   let speaker_slug = query.speaker.to_string();
+
+  debug!("post_speak(): getting speaker by slug = {}", &speaker_slug);
 
   let speaker = match app_state.model_configs.find_speaker_by_slug(&speaker_slug) {
     Some(speaker) => speaker,
@@ -49,6 +61,8 @@ pub async fn post_speak(request: HttpRequest,
       return Err(SpeakError::unknown_speaker());
     },
   };
+
+  debug!("post_speak(): speaker = {}", &speaker.name);
 
   let sample_rate_hz = speaker.sample_rate_hz.unwrap_or(app_state.default_sample_rate_hz);
 
@@ -62,8 +76,12 @@ pub async fn post_speak(request: HttpRequest,
 
   let cleaned_text = clean_text(&text);
 
+  debug!("post_speak(): cleaned text = {}", &cleaned_text);
+
   match speaker.model_pipeline {
     ModelPipeline::ArpabetTacotronMelgan => {
+      debug!("post_speak(): ArpabetTacotronMelgan pipeline");
+
       let tacotron_model = speaker.tacotron
           .as_ref()
           .map(|s| s.clone())
@@ -108,6 +126,8 @@ pub async fn post_speak(request: HttpRequest,
       }
     },
     ModelPipeline::ArpabetGlowTtsMelgan => {
+      debug!("post_speak(): ArpabetGlowTtsMelgan pipeline");
+
       let glow_tts_model = speaker.glow_tts
           .as_ref()
           .map(|s| s.clone())
@@ -152,6 +172,8 @@ pub async fn post_speak(request: HttpRequest,
           .body(wav_data))
     },
     ModelPipeline::ArpabetGlowTtsMultiSpeakerMelgan=> {
+      debug!("post_speak(): ArpabetGlowTtsMultiSpeakerMelgan pipeline");
+
       let glow_tts_multi_speaker_model = speaker.glow_tts_multi_speaker
           .as_ref()
           .map(|s| s.clone())

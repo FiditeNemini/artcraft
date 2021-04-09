@@ -19,6 +19,13 @@ glow_tts = "glow_tts_single_speaker.torchjit"
 melgan = "melgan_manyvoice5.0_2020-07-23_12d5838_10760.torchjit"
 
 [[speakers]]
+name = "BAD: NON-EXISTING VOCODER"
+slug = "bad-1"
+model_pipeline = "ArpabetGlowTtsMelgan"
+glow_tts = "glow_tts_single_speaker.torchjit"
+melgan = "does-not-exist"
+
+[[speakers]]
 name = "Current Experiment (glow + melgan)"
 slug = "experiment-2"
 model_pipeline = "ArpabetGlowTtsMelgan"
