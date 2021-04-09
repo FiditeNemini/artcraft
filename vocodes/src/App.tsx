@@ -99,7 +99,7 @@ class App extends React.Component<Props, State> {
 
     this.state = {
       mode: Mode.SPEAK_MODE,
-      showNewsNotice: false, // TODO(2021-04-06): Temporarily hiding
+      showNewsNotice: true,
       extrasMode: ExtrasMode.SPEAKER_INFO,
       speaker: defaultSpeaker,
       spectrogramMode: SpectrogramMode.VIRIDIS,
