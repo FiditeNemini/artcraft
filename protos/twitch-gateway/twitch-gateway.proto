@@ -1,0 +1,9 @@
+
+package storyteller.twitchgateway;
+
+message TwitchMessage {
+  optional string username = 1;
+  optional string channel = 2;
+  optional string message_contents = 3;
+}
+
