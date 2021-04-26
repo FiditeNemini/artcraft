@@ -13,7 +13,7 @@ authors = [
 
 [[bin]]
 name = "twitch-chat-gateway"
-path = "src/main_chat_gateway.rs"
+path = "src/main.rs"
 
 [dependencies]
 anyhow = "1.0.38"
