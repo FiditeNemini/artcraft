@@ -15,7 +15,6 @@ path = "src/main.rs"
 anyhow = "1.0.38"
 easyenv = "0.0.4"
 prost = "0.7.0"
-prost-build = "0.7.0"
 rustls = "0.18"
 serde = "1.0.123"
 serde_derive = "1.0.123"
@@ -30,3 +29,7 @@ redis = { version = "0.17.0", features = ["tls", "async-std-tls-comp", "tokio-tl
 
 # Fairly mature and robust Twitch chat library
 twitchchat = { version = "0.14.8", features = ["tokio", "tokio-util", "async", "webpki-roots", "tokio-rustls"] }
+
+[build-dependencies]
+anyhow = "1.0.38"
+prost-build = "0.7.0"

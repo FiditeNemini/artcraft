@@ -19,6 +19,7 @@ pub type AnyhowResult<T> = anyhow::Result<T>;
 use std::thread;
 use std::time::Duration;
 
+mod protos;
 mod redis_client;
 mod secrets;
 mod twitch_client;

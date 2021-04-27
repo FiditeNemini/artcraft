@@ -1,12 +1,13 @@
 use anyhow::anyhow;
-use twitchchat::{AsyncRunner, Status};
-use twitchchat::messages::Commands::*;
 use std::thread;
 use std::time::Duration;
+use twitchchat::messages::Commands::*;
+use twitchchat::messages::Privmsg;
+use twitchchat::{AsyncRunner, Status};
 
-use crate::secrets::TwitchSecrets;
 use crate::AnyhowResult;
 use crate::redis_client::RedisClient;
+use crate::secrets::TwitchSecrets;
 
 pub struct TwitchClient {
   secrets: TwitchSecrets,
@@ -83,28 +84,10 @@ impl TwitchClient {
     Ok(())
   }
 
-  pub async fn handle_message(&mut self, message: twitchchat::messages::Commands<'_>) {
+  pub async fn handle_message<'a>(&mut self, message: twitchchat::messages::Commands<'a>) {
     match message {
       // This is the one users send to channels
-      Privmsg(msg) => {
-        println!("[{}] {}: {}", msg.channel(), msg.name(), msg.data());
-
-        if let Ok((command, remaining_message)) = split_once(msg.data()) {
-          let channel = command.to_lowercase();
-          let username = msg.name().trim();
-          let command_payload= format!("{}|{}", username, remaining_message); // Payload: USERNAME|DATA
-          println!("Publish: '{}' - '{}'", channel, command_payload);
-
-          let redis_result = self.redis_client.publish(&channel, &command_payload).await;
-          match redis_result {
-            Ok(_) => {},
-            Err(e) => {
-              println!("Redis error: {:?}", e);
-              self.redis_client.failure_notify_maybe_reconnect().await;
-            }
-          }
-        }
-      },
+      Privmsg(msg) => self.handle_privmsg(&msg).await,
 
       // This one is special, if twitch adds any new message
       // types, this will catch it until future releases of
@@ -132,6 +115,32 @@ impl TwitchClient {
       UserState(_) => {}
       Whisper(_) => {}
       _ => {}
+    }
+  }
+
+  async fn handle_privmsg<'a>(&mut self, message: &Privmsg<'a>) {
+    println!("\nMessage: {:?}", message);
+    println!("[{}] {}: {}", message.channel(), message.name(), message.data());
+
+    let username = message.name().trim();
+
+    if let Ok((command, remaining_message)) = split_once(message.data()) {
+      let command_payload = format!("{}|{}", username, remaining_message); // Payload: USERNAME|DATA
+      let channel = command.to_lowercase();
+
+      println!("Publish: '{}' - '{}'", channel, command_payload);
+
+      // New protocol
+
+      // Old protocol
+      let redis_result = self.redis_client.publish(&channel, &command_payload).await;
+      match redis_result {
+        Ok(_) => {},
+        Err(e) => {
+          println!("Redis error: {:?}", e);
+          self.redis_client.failure_notify_maybe_reconnect().await;
+        }
+      }
     }
   }
 }
