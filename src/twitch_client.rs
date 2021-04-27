@@ -136,6 +136,8 @@ impl TwitchClient {
     // New protocol
     let message_proto = message_to_proto(&message);
 
+    info!("Proto: {:?}", message_proto);
+
     let mut buffer : Vec<u8> = Vec::with_capacity(message_proto.encoded_len());
     let encode_result = message_proto.encode(&mut buffer);
     match encode_result {
@@ -181,6 +183,9 @@ impl TwitchClient {
 fn message_to_proto<'a>(message: &Privmsg<'a>) -> protos::TwitchMessage {
   let mut message_proto = protos::TwitchMessage::default();
   message_proto.username = Some(message.name().trim().to_string());
+  message_proto.user_id = message.user_id().map(|unsigned| unsigned as i64);
+  message_proto.is_mod = Some(message.is_moderator());
+  message_proto.is_subscribed = Some(message.is_subscriber());
   message_proto.channel = Some(message.channel().trim().to_string());
   message_proto.message_contents = Some(message.data().trim().to_string());
   message_proto
