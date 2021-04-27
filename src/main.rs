@@ -17,7 +17,7 @@ mod redis_client;
 mod secrets;
 
 use crate::secrets::Secrets;
-use crate::redis_client::RedisClient;
+use crate::redis_client::{RedisClient, RedisSubscribeClient};
 
 const ENV_SUBSCRIBE_TOPIC : &'static str = "SUBSCRIBE_TOPIC";
 const ENV_SUBSCRIBE_TOPIC_DEFAULT : &'static str = "twitch";
@@ -31,21 +31,13 @@ async fn main() -> anyhow::Result<()> {
 
   let secrets = Secrets::from_file("secrets.toml")?;
 
-  let mut redis_client = RedisClient::new(&secrets.redis);
+  let mut redis_client = RedisSubscribeClient::new(&secrets.redis);
   redis_client.connect().await?;
 
   loop {
-    /*match twitch_client.main_loop().await {
-      Ok(_) => {
-        println!("Early exit? Restarting...");
-        thread::sleep(Duration::from_secs(5));
-      },
-      Err(e) => {
-        println!("There was an error: {:?}", e);
-        thread::sleep(Duration::from_secs(5));
-        println!("Restarting client...");
-      }
-    }*/
+    redis_client.connect().await?;
+    redis_client.subscribe(&redis_publish_topic).await?;
+    redis_client.start_stream().await?;
     thread::sleep(Duration::from_secs(5));
   }
 
