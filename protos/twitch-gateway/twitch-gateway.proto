@@ -2,8 +2,14 @@
 package storyteller.twitchgateway;
 
 message TwitchMessage {
-  optional string username = 1;
-  optional string channel = 2;
-  optional string message_contents = 3;
+  optional int64 user_id = 1;
+  optional string username = 2;
+  optional bool is_mod = 3;
+  optional bool is_subscribed = 4;
+
+  optional string channel = 5;
+
+  // Actual message. Doesn't need to be trimmed.
+  optional string message_contents = 6;
 }
 
