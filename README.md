@@ -1,4 +1,4 @@
-twitch-gateway
+twitch-firehose
 ==============
 Service to interact with Twitch.
 

@@ -1379,7 +1379,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "twitch-gateway"
+name = "twitch-firehose"
 version = "0.0.0"
 dependencies = [
  "anyhow",

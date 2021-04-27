@@ -1,5 +1,5 @@
 [package]
-name = "twitch-gateway"
+name = "twitch-firehose"
 version = "0.0.0"
 edition = "2018"
 authors = [
@@ -8,7 +8,7 @@ authors = [
 ]
 
 [[bin]]
-name = "twitch-chat-gateway"
+name = "twitch-firehose"
 path = "src/main.rs"
 
 [dependencies]
