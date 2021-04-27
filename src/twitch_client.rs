@@ -1,4 +1,6 @@
 use anyhow::anyhow;
+use log::{info, warn};
+use prost::Message;
 use std::thread;
 use std::time::Duration;
 use twitchchat::messages::Commands::*;
@@ -8,11 +10,15 @@ use twitchchat::{AsyncRunner, Status};
 use crate::AnyhowResult;
 use crate::redis_client::RedisClient;
 use crate::secrets::TwitchSecrets;
+use crate::protos::protos;
 
 pub struct TwitchClient {
   secrets: TwitchSecrets,
   channels_to_join: Vec<String>,
   redis_client: RedisClient,
+
+  /// Redis topic to publish pubsub events to.
+  redis_publish_topic: String,
 
   /// This manages our connection.
   /// It's meant to be absent when not connected.
@@ -22,12 +28,13 @@ pub struct TwitchClient {
 
 impl TwitchClient {
 
-  pub fn new(secrets: &TwitchSecrets, redis_client: RedisClient) -> Self {
+  pub fn new(secrets: &TwitchSecrets, redis_client: RedisClient, redis_publish_topic: &str) -> Self {
     Self {
       secrets: secrets.clone(),
       redis_client,
       channels_to_join: secrets.watch_channels.clone(), // TODO: Configure these elsewhere.
       runner: None,
+      redis_publish_topic: redis_publish_topic.to_string(),
     }
   }
 
@@ -118,21 +125,47 @@ impl TwitchClient {
     }
   }
 
+  /// Handle user messages.
+  /// The "privmsg" type is for normal in-channel messages.
   async fn handle_privmsg<'a>(&mut self, message: &Privmsg<'a>) {
     println!("\nMessage: {:?}", message);
     println!("[{}] {}: {}", message.channel(), message.name(), message.data());
 
-    let username = message.name().trim();
+    info!("Logging under new protocol...");
 
+    // New protocol
+    let message_proto = message_to_proto(&message);
+
+    let mut buffer : Vec<u8> = Vec::with_capacity(message_proto.encoded_len());
+    let encode_result = message_proto.encode(&mut buffer);
+    match encode_result {
+      Err(e) => {
+        warn!("Proto encode result: {:?}", e);
+      }
+      Ok(_) => {
+        let redis_result = self.redis_client.publish_bytes(
+          &self.redis_publish_topic, &buffer).await;
+
+        match redis_result {
+          Ok(_) => {},
+          Err(e) => {
+            warn!("Redis error: {:?}", e);
+            self.redis_client.failure_notify_maybe_reconnect().await;
+          }
+        }
+      },
+    }
+
+    info!("Logging under OLD protocol...");
+
+    // Old protocol
     if let Ok((command, remaining_message)) = split_once(message.data()) {
+      let username = message.name().trim();
       let command_payload = format!("{}|{}", username, remaining_message); // Payload: USERNAME|DATA
       let channel = command.to_lowercase();
 
       println!("Publish: '{}' - '{}'", channel, command_payload);
 
-      // New protocol
-
-      // Old protocol
       let redis_result = self.redis_client.publish(&channel, &command_payload).await;
       match redis_result {
         Ok(_) => {},
@@ -143,6 +176,14 @@ impl TwitchClient {
       }
     }
   }
+}
+
+fn message_to_proto<'a>(message: &Privmsg<'a>) -> protos::TwitchMessage {
+  let mut message_proto = protos::TwitchMessage::default();
+  message_proto.username = Some(message.name().trim().to_string());
+  message_proto.channel = Some(message.channel().trim().to_string());
+  message_proto.message_contents = Some(message.data().trim().to_string());
+  message_proto
 }
 
 // Oh my god I'm lazy

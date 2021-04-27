@@ -28,14 +28,26 @@ use crate::twitch_client::TwitchClient;
 use crate::secrets::Secrets;
 use crate::redis_client::RedisClient;
 
+const ENV_PUBLISH_TOPIC : &'static str = "PUBLISH_TOPIC";
+const ENV_PUBLISH_TOPIC_DEFAULT : &'static str = "twitch";
+
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
+  easyenv::init_env_logger(None);
+
+  let redis_publish_topic = easyenv::get_env_string_or_default(
+    ENV_PUBLISH_TOPIC, ENV_PUBLISH_TOPIC_DEFAULT);
+
   let secrets = Secrets::from_file("secrets.toml")?;
 
   let mut redis_client = RedisClient::new(&secrets.redis);
   redis_client.connect().await?;
 
-  let mut twitch_client = TwitchClient::new(&secrets.twitch, redis_client);
+  let mut twitch_client = TwitchClient::new(
+    &secrets.twitch,
+    redis_client,
+    &redis_publish_topic
+  );
 
   loop {
     match twitch_client.main_loop().await {
