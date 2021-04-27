@@ -7,6 +7,7 @@ message TwitchMessage {
   optional bool is_mod = 3;
   optional bool is_subscribed = 4;
 
+  // Name of the channel, prefixed with hash. eg. `#vocodes`.
   optional string channel = 5;
 
   // Actual message. Doesn't need to be trimmed.
