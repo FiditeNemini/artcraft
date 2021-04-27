@@ -1,0 +1,29 @@
+[package]
+name = "pubsub-enricher"
+version = "0.0.0"
+edition = "2018"
+authors = [
+  "Brandon Thomas <bt@brand.io>",
+  "Brandon Thomas <echelon@gmail.com>"
+]
+
+[[bin]]
+name = "pubsub-enricher"
+path = "src/main.rs"
+
+[dependencies]
+anyhow = "1.0.38"
+easyenv = "0.0.4"
+log = "0.4.14"
+prost = "0.7.0"
+rustls = "0.18"
+serde = "1.0.123"
+serde_derive = "1.0.123"
+tokio = { version = "0.2", features = ["full"] }
+toml = "0.5.8"
+
+redis = { version = "0.17.0", features = ["tls", "async-std-tls-comp", "tokio-tls-comp"] }
+
+[build-dependencies]
+anyhow = "1.0.38"
+prost-build = "0.7.0"
