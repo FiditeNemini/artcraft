@@ -16,11 +16,14 @@ anyhow = "1.0.38"
 easyenv = "0.0.4"
 log = "0.4.14"
 prost = "0.7.0"
+regex = "1.4.6"
 rustls = "0.18"
 serde = "1.0.123"
 serde_derive = "1.0.123"
 tokio = { version = "0.2", features = ["full"] }
 toml = "0.5.8"
+
+google_maps = "1.0.3"
 
 redis = { version = "0.17.0", features = ["tls", "async-std-tls-comp", "tokio-tls-comp"] }
 

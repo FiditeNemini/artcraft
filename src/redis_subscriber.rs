@@ -1,29 +1,26 @@
+use anyhow::anyhow;
 use crate::AnyhowResult;
 use crate::protos::protos;
 use crate::secrets::RedisSecrets;
-
-use anyhow::anyhow;
 use log::{info, warn};
 use prost::Message;
-use redis::aio::{Connection, PubSub};
-use redis::{AsyncCommands, Msg, PubSubCommands};
-use redis;
+use redis::aio::PubSub;
 use std::thread;
 use std::time::Duration;
 use tokio::stream::{Stream, StreamExt};
 
-pub struct RedisClient {
+pub struct RedisSubscribeClient {
   secrets: RedisSecrets,
 
   /// This manages our connection.
   /// It's meant to be absent when not connected.
   /// TODO: Probably need to reset this when we disconnect.
-  connection: Option<Connection>,
+  connection: Option<PubSub>,
 
   connection_failure_count: u32,
 }
 
-impl RedisClient {
+impl RedisSubscribeClient {
   pub fn new(secrets: &RedisSecrets) -> Self {
     Self {
       secrets: secrets.clone(),
@@ -34,7 +31,7 @@ impl RedisClient {
 
   pub async fn connect(&mut self) -> AnyhowResult<()> {
     let client = redis::Client::open(self.secrets.connection_url())?;
-    let mut connection = client.get_async_connection().await?;
+    let mut connection = client.get_async_connection().await?.into_pubsub();
 
     self.connection = Some(connection);
     self.connection_failure_count = 0;
@@ -56,31 +53,19 @@ impl RedisClient {
     Ok(())
   }
 
-  pub async fn publish(&mut self, channel: &str, message: &str) -> AnyhowResult<u32> {
-    let connection = match &mut self.connection {
+  pub async fn subscribe(&mut self, topic: &str) -> AnyhowResult<()> {
+    let mut connection = match &mut self.connection {
       None => {
         return Err(anyhow!("Not connected"));
       },
       Some(connection) => connection,
     };
 
-    // TODO: Smart reconnect
-    /*let result = connection.publish(channel, message).await?;
-    let result = match result {
-      Ok(r) => r,
-      Err(err) => {
-        match err.kind() {
-          IoError |  TryAgain | ClusterDown | MasterDown => {},
-          _ => return Err(anyhow!("Redis error: {:?}", err)),
-        }
-      }
-    };*/
-
-    let result = connection.publish(channel, message).await?;
-    Ok(result)
+    connection.subscribe(topic).await?;
+    Ok(())
   }
 
-  pub async fn publish_bytes(&mut self, channel: &str, message: &[u8]) -> AnyhowResult<u32> {
+  pub async fn start_stream(&mut self) -> AnyhowResult<()> {
     let connection = match &mut self.connection {
       None => {
         return Err(anyhow!("Not connected"));
@@ -88,20 +73,24 @@ impl RedisClient {
       Some(connection) => connection,
     };
 
-    // TODO: Smart reconnect
-    /*let result = connection.publish(channel, message).await?;
-    let result = match result {
-      Ok(r) => r,
-      Err(err) => {
-        match err.kind() {
-          IoError |  TryAgain | ClusterDown | MasterDown => {},
-          _ => return Err(anyhow!("Redis error: {:?}", err)),
-        }
-      }
-    };*/
+    loop {
+      for message in connection.on_message().next().await {
+        let bytes = message.get_payload_bytes();
 
-    let result = connection.publish(channel, message).await?;
-    Ok(result)
+        let mut message_proto = match protos::TwitchMessage::decode(bytes) {
+          Ok(m) => m,
+          Err(e) => {
+            warn!("Error decoding proto: {:?}", e);
+            continue;
+          },
+        };
+
+        info!("Proto: {:?}", message_proto);
+      }
+
+      thread::sleep(Duration::from_millis(250));
+    }
+
+    Ok(())
   }
 }
-

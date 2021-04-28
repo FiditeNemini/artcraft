@@ -14,10 +14,12 @@ use std::time::Duration;
 
 mod protos;
 mod redis_client;
+mod redis_subscriber;
 mod secrets;
 
 use crate::secrets::Secrets;
-use crate::redis_client::{RedisClient, RedisSubscribeClient};
+use crate::redis_client::RedisClient;
+use crate::redis_subscriber::RedisSubscribeClient;
 
 const ENV_SUBSCRIBE_TOPIC : &'static str = "SUBSCRIBE_TOPIC";
 const ENV_SUBSCRIBE_TOPIC_DEFAULT : &'static str = "twitch";

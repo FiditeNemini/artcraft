@@ -5,6 +5,7 @@ use std::io::Read;
 pub struct Secrets {
   pub redis: RedisSecrets,
   pub twitch: TwitchSecrets,
+  pub google: GoogleSecrets,
 }
 
 #[derive(Deserialize, Clone)]
@@ -13,6 +14,11 @@ pub struct RedisSecrets {
   pub password: String,
   pub host: String,
   pub port: u32,
+}
+
+#[derive(Deserialize, Clone)]
+pub struct GoogleSecrets {
+  pub api_key: String,
 }
 
 #[derive(Deserialize, Clone)]
