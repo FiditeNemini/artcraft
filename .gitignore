@@ -1,4 +1,5 @@
+*~
+.idea/
 secrets.toml
 secrets.yaml
 target/
-.idea/
