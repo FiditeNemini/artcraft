@@ -42,7 +42,6 @@ async fn main() -> anyhow::Result<()> {
 
   dispatcher.add_handler("goto", Box::new(coord_geo_handler));
 
-
   let mut redis_client = RedisSubscribeClient::new(
     &secrets.redis,
     dispatcher
