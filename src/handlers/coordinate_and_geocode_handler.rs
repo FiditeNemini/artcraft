@@ -34,10 +34,10 @@ pub struct LatLong {
 ///   * "34.0659° N, 84.6769° W"
 ///   * "33.753746, -84.386330"
 pub fn parse_lat_long(input: &str) -> Option<LatLong> {
-  const NUMERAL : &'static str = r"(\-?\d+\.?\d*)\s*([NSEW])?";
+  const NUMERAL : &'static str = r"(\-?\d+\.?\d*)\s*°?\s*([NSEW])?";
   lazy_static! {
       static ref COORDINATE_REGEX: Regex =
-        Regex::new(&format!(r"^({})\s*,\s*({})$", NUMERAL, NUMERAL)).expect("Regex should work");
+        Regex::new(&format!(r"^({})\s*,?\s*({})$", NUMERAL, NUMERAL)).expect("Regex should work");
     }
 
   println!("{}", input);
@@ -149,6 +149,21 @@ mod tests {
       be_eq(Some(LatLong {
         latitude: -123.0,
         longitude: 456.0,
+      })));
+  }
+
+  #[test]
+  fn parse_lat_long_directions_degrees() {
+    expect!(parse_lat_long("34.0659°  N, 84.6769° W")).to(
+      be_eq(Some(LatLong {
+        latitude: 34.0659,
+        longitude: -84.6769,
+      })));
+
+    expect!(parse_lat_long("123°S, 777° E")).to(
+      be_eq(Some(LatLong {
+        latitude: -123.0,
+        longitude: 777.0,
       })));
   }
 }
