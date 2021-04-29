@@ -34,7 +34,7 @@ pub struct LatLong {
 ///   * "34.0659° N, 84.6769° W"
 ///   * "33.753746, -84.386330"
 pub fn parse_lat_long(input: &str) -> Option<LatLong> {
-  const NUMERAL : &'static str = r"(\-?\d+\.?\d*)\s*[NSEW]?";
+  const NUMERAL : &'static str = r"(\-?\d+\.?\d*)\s*([NSEW])?";
   lazy_static! {
       static ref COORDINATE_REGEX: Regex =
         Regex::new(&format!(r"^({})\s*,\s*({})$", NUMERAL, NUMERAL)).expect("Regex should work");
@@ -54,7 +54,13 @@ pub fn parse_lat_long(input: &str) -> Option<LatLong> {
     })
     .and_then(|s| s.parse::<f64>().ok());
 
-  let maybe_long = captures.get(4)
+  let maybe_lat_dir = captures.get(3)
+    .map(|m| {
+      println!("{:?}", m);
+      m.as_str()
+    });
+
+  let maybe_long = captures.get(5)
     //.map(|m| m.as_str())
     .map(|m| {
       println!("{:?}", m);
@@ -62,18 +68,36 @@ pub fn parse_lat_long(input: &str) -> Option<LatLong> {
     })
     .and_then(|s| s.parse::<f64>().ok());
 
+  let maybe_long_dir = captures.get(6)
+    .map(|m| {
+      println!("{:?}", m);
+      m.as_str()
+    });
+
   println!("{:?}", maybe_lat);
   println!("{:?}", maybe_long);
+  println!("{:?}", maybe_lat_dir);
+  println!("{:?}", maybe_long_dir);
 
-  let latitude = match maybe_lat {
+  let mut latitude = match maybe_lat {
     None => return None,
     Some(lat) => lat,
   };
 
-  let longitude = match maybe_long {
+  let mut longitude = match maybe_long {
     None => return None,
     Some(long) => long,
   };
+
+  match maybe_lat_dir {
+    Some("S") => latitude *= -1.0,
+    _ => {},
+  }
+
+  match maybe_long_dir {
+    Some("W") => longitude *= -1.0,
+    _ => {},
+  }
 
   Some(LatLong {
     latitude,
@@ -115,6 +139,16 @@ mod tests {
 
   #[test]
   fn parse_lat_long_directions() {
-  }
+    expect!(parse_lat_long("34.0659 N, 84.6769 W")).to(
+      be_eq(Some(LatLong {
+        latitude: 34.0659,
+        longitude: -84.6769,
+      })));
 
+    expect!(parse_lat_long("123 S, 456 E")).to(
+      be_eq(Some(LatLong {
+        latitude: -123.0,
+        longitude: 456.0,
+      })));
+  }
 }
