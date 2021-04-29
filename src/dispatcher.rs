@@ -2,32 +2,53 @@ use crate::protos::protos;
 use lazy_static::lazy_static;
 use log::{info, warn};
 use regex::Regex;
+use std::collections::HashMap;
+
+pub trait Handler {
+  fn handle_message(&self,
+                    command: &str,
+                    unparsed_command_args: &str,
+                    twitch_message: protos::TwitchMessage);
+}
 
 pub struct Dispatcher {
+  handlers: HashMap<String, Box<dyn Handler>>,
 }
 
 impl Dispatcher {
   pub fn new() -> Self {
-    Self {}
+    Self {
+      handlers: HashMap::new(),
+    }
   }
 
-  pub fn handle_message(&self, message: protos::TwitchMessage) {
+  pub fn add_handler(&mut self, command: &str, handler: Box<dyn Handler>) {
+    self.handlers.insert(command.to_string(), handler);
+  }
+
+  pub fn handle_message(&self, twitch_message: protos::TwitchMessage) {
     lazy_static! {
       static ref COMMAND_REGEX : Regex = Regex::new(r"^\s*(\w+)\s+(.*)$").expect("Regex should work");
     }
-    info!("Handling Proto: {:?}", message);
+    info!("Handling Proto: {:?}", twitch_message);
 
-    //for cap in re.captures_iter(text) {
-    //  println!("Month: {} Day: {} Year: {}", &cap[2], &cap[3], &cap[1]);
-    //}
-
-    let message_ref = match message.message_contents {
+    let message = match twitch_message.message_contents {
       None => return,
-      Some(ref m) => m,
+      Some(ref m) => m.clone(),
     };
 
-    let captures = COMMAND_REGEX.captures(&message_ref).unwrap();
+    let captures = match COMMAND_REGEX.captures(&message) {
+      None => return,
+      Some(caps) => caps,
+    };
+
     info!("Captures: {:?}", captures);
+
+    if let Some(ref handler) = self.handlers.get(&captures[0]) {
+      info!("Captures: {:?}", captures);
+      handler.handle_message(&captures[0], &captures[1], twitch_message);
+    }
+
   }
 }
 
