@@ -8,14 +8,11 @@ use twitchchat::{
   UserConfig,
 };
 
-use anyhow::{Context, Error};
 use anyhow::anyhow;
-
+use anyhow::{Context, Error};
+use log::{info, warn};
 use redis::aio::Connection;
 use redis::{AsyncCommands, RedisResult};
-
-pub type AnyhowResult<T> = anyhow::Result<T>;
-
 use std::thread;
 use std::time::Duration;
 
@@ -27,6 +24,8 @@ mod twitch_client;
 use crate::twitch_client::TwitchClient;
 use crate::secrets::Secrets;
 use crate::redis_client::RedisClient;
+
+pub type AnyhowResult<T> = anyhow::Result<T>;
 
 const ENV_PUBLISH_TOPIC : &'static str = "PUBLISH_TOPIC";
 const ENV_PUBLISH_TOPIC_DEFAULT : &'static str = "twitch";
@@ -52,13 +51,13 @@ async fn main() -> anyhow::Result<()> {
   loop {
     match twitch_client.main_loop().await {
       Ok(_) => {
-        println!("Early exit? Restarting...");
+        warn!("Twitch early exit? Restarting...");
         thread::sleep(Duration::from_secs(5));
       },
       Err(e) => {
-        println!("There was an error: {:?}", e);
+        warn!("There was an error with Twitch: {:?}", e);
         thread::sleep(Duration::from_secs(5));
-        println!("Restarting client...");
+        warn!("Restarting Twitch client...");
       }
     }
   }
