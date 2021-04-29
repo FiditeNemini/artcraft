@@ -42,19 +42,19 @@ impl TwitchClient {
     let user_config = self.secrets.get_user_config()?;
     let connector = twitchchat::connector::tokio::Connector::twitch()?;
 
-    println!("Connecting...");
+    info!("Connecting to Twitch...");
     let mut runner = AsyncRunner::connect(connector, &user_config).await?;
 
-    println!("Connected. Our Twitch identity: {:#?}", runner.identity);
+    info!("Connected. Our Twitch identity: {:#?}", runner.identity);
 
     for channel in self.channels_to_join.iter() {
       // the runner itself has 'blocking' join/part to ensure you join/leave a channel.
       // these two methods return whether the connection was closed early.
       // we'll ignore it for this demo
-      println!("attempting to join '{}'", channel);
+      info!("attempting to join '{}'", channel);
 
       let _ = runner.join(&channel).await?;
-      println!("joined '{}'!", channel);
+      info!("joined '{}'!", channel);
     }
 
     self.runner = Some(runner);
@@ -67,7 +67,7 @@ impl TwitchClient {
       let runner = match &mut self.runner {
         None => {
           thread::sleep(Duration::from_secs(5));
-          println!("Connecting...");
+          info!("Connecting to Twitch...");
           self.connect().await?;
           continue;
         },
@@ -128,8 +128,8 @@ impl TwitchClient {
   /// Handle user messages.
   /// The "privmsg" type is for normal in-channel messages.
   async fn handle_privmsg<'a>(&mut self, message: &Privmsg<'a>) {
-    println!("\nMessage: {:?}", message);
-    println!("[{}] {}: {}", message.channel(), message.name(), message.data());
+    info!("\nMessage: {:?}", message);
+    info!("[{}] {}: {}", message.channel(), message.name(), message.data());
 
     info!("Logging under new protocol...");
 
@@ -166,13 +166,13 @@ impl TwitchClient {
       let command_payload = format!("{}|{}", username, remaining_message); // Payload: USERNAME|DATA
       let channel = command.to_lowercase();
 
-      println!("Publish: '{}' - '{}'", channel, command_payload);
+      info!("Publish: '{}' - '{}'", channel, command_payload);
 
       let redis_result = self.redis_client.publish(&channel, &command_payload).await;
       match redis_result {
         Ok(_) => {},
         Err(e) => {
-          println!("Redis error: {:?}", e);
+          info!("Redis error: {:?}", e);
           self.redis_client.failure_notify_maybe_reconnect().await;
         }
       }
