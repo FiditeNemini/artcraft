@@ -1,25 +1,25 @@
 #[macro_use]
 extern crate serde_derive;
 
-use anyhow::{Context, Error};
-use anyhow::anyhow;
-
-use redis::aio::Connection;
-use redis::{AsyncCommands, RedisResult};
-
-pub type AnyhowResult<T> = anyhow::Result<T>;
-
-use std::thread;
-use std::time::Duration;
-
+mod dispatcher;
 mod protos;
 mod redis_client;
 mod redis_subscriber;
 mod secrets;
+use anyhow::anyhow;
+use anyhow::{Context, Error};
+use log::{warn, info};
+use redis::aio::Connection;
+use redis::{AsyncCommands, RedisResult};
+use std::thread;
+use std::time::Duration;
 
 use crate::secrets::Secrets;
 use crate::redis_client::RedisClient;
 use crate::redis_subscriber::RedisSubscribeClient;
+use crate::dispatcher::Dispatcher;
+
+pub type AnyhowResult<T> = anyhow::Result<T>;
 
 const ENV_SUBSCRIBE_TOPIC : &'static str = "SUBSCRIBE_TOPIC";
 const ENV_SUBSCRIBE_TOPIC_DEFAULT : &'static str = "twitch";
@@ -33,7 +33,13 @@ async fn main() -> anyhow::Result<()> {
 
   let secrets = Secrets::from_file("secrets.toml")?;
 
-  let mut redis_client = RedisSubscribeClient::new(&secrets.redis);
+  let dispatcher = Dispatcher::new();
+
+  let mut redis_client = RedisSubscribeClient::new(
+    &secrets.redis,
+    dispatcher
+  );
+
   redis_client.connect().await?;
 
   loop {

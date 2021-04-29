@@ -1158,6 +1158,7 @@ dependencies = [
  "anyhow",
  "easyenv",
  "google_maps",
+ "lazy_static",
  "log",
  "prost",
  "prost-build",

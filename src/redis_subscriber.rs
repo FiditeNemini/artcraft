@@ -1,5 +1,6 @@
 use anyhow::anyhow;
 use crate::AnyhowResult;
+use crate::dispatcher::Dispatcher;
 use crate::protos::protos;
 use crate::secrets::RedisSecrets;
 use log::{info, warn};
@@ -18,14 +19,18 @@ pub struct RedisSubscribeClient {
   connection: Option<PubSub>,
 
   connection_failure_count: u32,
+
+  /// Event dispatcher that handles routing and passing to handlers.
+  dispatcher: Dispatcher,
 }
 
 impl RedisSubscribeClient {
-  pub fn new(secrets: &RedisSecrets) -> Self {
+  pub fn new(secrets: &RedisSecrets, dispatcher: Dispatcher) -> Self {
     Self {
       secrets: secrets.clone(),
       connection: None,
       connection_failure_count: 0,
+      dispatcher,
     }
   }
 
@@ -85,7 +90,7 @@ impl RedisSubscribeClient {
           },
         };
 
-        info!("Proto: {:?}", message_proto);
+        self.dispatcher.handle_message(message_proto);
       }
 
       thread::sleep(Duration::from_millis(250));
