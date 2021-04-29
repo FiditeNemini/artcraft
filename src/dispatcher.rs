@@ -42,13 +42,19 @@ impl Dispatcher {
       Some(caps) => caps,
     };
 
-    info!("Captures: {:?}", captures);
+    let command = match captures.get(1) {
+      None => return,
+      Some(cmd) => cmd.as_str().trim().to_lowercase(),
+    };
 
-    if let Some(ref handler) = self.handlers.get(&captures[0]) {
-      info!("Captures: {:?}", captures);
-      handler.handle_message(&captures[0], &captures[1], twitch_message);
+    let unparsed_payload = match captures.get(2) {
+      None => return,
+      Some(p) => p.as_str().trim(),
+    };
+
+    if let Some(ref handler) = self.handlers.get(&command) {
+      handler.handle_message(&command, unparsed_payload, twitch_message);
     }
-
   }
 }
 

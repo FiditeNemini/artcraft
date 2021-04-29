@@ -2,10 +2,12 @@
 extern crate serde_derive;
 
 mod dispatcher;
+mod handlers;
 mod protos;
 mod redis_client;
 mod redis_subscriber;
 mod secrets;
+
 use anyhow::anyhow;
 use anyhow::{Context, Error};
 use log::{warn, info};
@@ -18,6 +20,7 @@ use crate::secrets::Secrets;
 use crate::redis_client::RedisClient;
 use crate::redis_subscriber::RedisSubscribeClient;
 use crate::dispatcher::Dispatcher;
+use crate::handlers::coordinate_and_geocode_handler::CoordinateAndGeocodeHandler;
 
 pub type AnyhowResult<T> = anyhow::Result<T>;
 
@@ -33,7 +36,12 @@ async fn main() -> anyhow::Result<()> {
 
   let secrets = Secrets::from_file("secrets.toml")?;
 
-  let dispatcher = Dispatcher::new();
+  let mut dispatcher = Dispatcher::new();
+
+  let coord_geo_handler = CoordinateAndGeocodeHandler::new();
+
+  dispatcher.add_handler("goto", Box::new(coord_geo_handler));
+
 
   let mut redis_client = RedisSubscribeClient::new(
     &secrets.redis,
