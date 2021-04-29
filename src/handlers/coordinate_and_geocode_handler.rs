@@ -36,11 +36,9 @@ pub struct LatLong {
 pub fn parse_lat_long(input: &str) -> Option<LatLong> {
   const NUMERAL : &'static str = r"(\-?\d+\.?\d*)\s*°?\s*([NSEW])?";
   lazy_static! {
-      static ref COORDINATE_REGEX: Regex =
-        Regex::new(&format!(r"^({})\s*,?\s*({})$", NUMERAL, NUMERAL)).expect("Regex should work");
-    }
-
-  println!("{}", input);
+    static ref COORDINATE_REGEX: Regex =
+      Regex::new(&format!(r"^({})\s*,?\s*({})$", NUMERAL, NUMERAL)).expect("Regex should work");
+  }
 
   let captures = match COORDINATE_REGEX.captures(&input) {
     None => return None,
@@ -48,36 +46,18 @@ pub fn parse_lat_long(input: &str) -> Option<LatLong> {
   };
 
   let maybe_lat = captures.get(2)
-    .map(|m| {
-      println!("{:?}", m);
-      m.as_str()
-    })
+    .map(|m| m.as_str())
     .and_then(|s| s.parse::<f64>().ok());
 
   let maybe_lat_dir = captures.get(3)
-    .map(|m| {
-      println!("{:?}", m);
-      m.as_str()
-    });
+    .map(|m| m.as_str());
 
   let maybe_long = captures.get(5)
-    //.map(|m| m.as_str())
-    .map(|m| {
-      println!("{:?}", m);
-      m.as_str()
-    })
+    .map(|m| m.as_str())
     .and_then(|s| s.parse::<f64>().ok());
 
   let maybe_long_dir = captures.get(6)
-    .map(|m| {
-      println!("{:?}", m);
-      m.as_str()
-    });
-
-  println!("{:?}", maybe_lat);
-  println!("{:?}", maybe_long);
-  println!("{:?}", maybe_lat_dir);
-  println!("{:?}", maybe_long_dir);
+    .map(|m| m.as_str());
 
   let mut latitude = match maybe_lat {
     None => return None,
