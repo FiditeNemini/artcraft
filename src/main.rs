@@ -21,6 +21,7 @@ use crate::redis_client::RedisClient;
 use crate::redis_subscriber::RedisSubscribeClient;
 use crate::dispatcher::Dispatcher;
 use crate::handlers::coordinate_and_geocode_handler::CoordinateAndGeocodeHandler;
+use std::sync::{Arc, Mutex};
 
 pub type AnyhowResult<T> = anyhow::Result<T>;
 
@@ -38,21 +39,25 @@ async fn main() -> anyhow::Result<()> {
 
   let mut dispatcher = Dispatcher::new();
 
-  let coord_geo_handler = CoordinateAndGeocodeHandler::new();
+  let redis_client = Arc::new(Mutex::new(RedisClient::new(
+    &secrets.redis,
+  )));
+
+  let coord_geo_handler = CoordinateAndGeocodeHandler::new(redis_client);
 
   dispatcher.add_handler("goto", Box::new(coord_geo_handler));
 
-  let mut redis_client = RedisSubscribeClient::new(
+  let mut redis_pubsub_client = RedisSubscribeClient::new(
     &secrets.redis,
     dispatcher
   );
 
-  redis_client.connect().await?;
+  redis_pubsub_client.connect().await?;
 
   loop {
-    redis_client.connect().await?;
-    redis_client.subscribe(&redis_publish_topic).await?;
-    redis_client.start_stream().await?;
+    redis_pubsub_client.connect().await?;
+    redis_pubsub_client.subscribe(&redis_publish_topic).await?;
+    redis_pubsub_client.start_stream().await?;
     thread::sleep(Duration::from_secs(5));
   }
 

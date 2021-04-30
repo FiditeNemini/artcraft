@@ -1,14 +1,31 @@
 use crate::dispatcher::Handler;
+use futures::executor::block_on;
 use crate::protos::protos;
 use lazy_static::lazy_static;
 use regex::Regex;
+use crate::redis_client::RedisClient;
+use std::sync::{RwLock, Arc, Mutex};
 
 pub struct CoordinateAndGeocodeHandler {
+  redis_client: Arc<Mutex<RedisClient>>,
 }
 
 impl CoordinateAndGeocodeHandler {
-  pub fn new() -> Self {
-    Self {}
+  pub fn new(redis_client: Arc<Mutex<RedisClient>>) -> Self {
+    Self {
+      redis_client,
+    }
+  }
+
+  fn handle_lat_long(&self, lat_long: LatLong, twitch_message: protos::TwitchMessage) {
+
+    match self.redis_client.lock() {
+      Ok(mut redis_client) => {
+        let future = redis_client.publish("goto", "");
+        block_on(future);
+      },
+      Err(_) => {},
+    }
   }
 }
 
@@ -20,6 +37,13 @@ impl Handler for CoordinateAndGeocodeHandler {
   ///   * "Obihiro, Hokkaido, Japan"
   ///   * "Daytona, FL"
   fn handle_message(&self, command: &str, unparsed_command_args: &str, twitch_message: protos::TwitchMessage) {
+    let maybe_lat_long = parse_lat_long(unparsed_command_args);
+
+    if let Some(lat_long) = maybe_lat_long {
+      self.handle_lat_long(lat_long, twitch_message);
+      return;
+    }
+
     todo!()
   }
 }
