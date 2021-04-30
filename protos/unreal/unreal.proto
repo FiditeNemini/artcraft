@@ -1,3 +1,4 @@
+package storyteller.unreal;
 
 // The payloads delivered to unreal engine over the pubsub bus.
 message UnrealEventPayloadV1 {
