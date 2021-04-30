@@ -1,9 +1,10 @@
 use crate::dispatcher::Handler;
-use futures::executor::block_on;
 use crate::protos::protos;
-use lazy_static::lazy_static;
-use regex::Regex;
 use crate::redis_client::RedisClient;
+use futures::executor::block_on;
+use lazy_static::lazy_static;
+use log::{info, warn};
+use regex::Regex;
 use std::sync::{RwLock, Arc, Mutex};
 
 pub struct CoordinateAndGeocodeHandler {
@@ -18,6 +19,22 @@ impl CoordinateAndGeocodeHandler {
   }
 
   fn handle_lat_long(&self, lat_long: LatLong, twitch_message: protos::TwitchMessage) {
+    let mut cesium_proto = protos::CesiumWarpRequest::default();
+
+    // Cesium
+    cesium_proto.latitude = Some(lat_long.latitude);
+    cesium_proto.longitude = Some(lat_long.longitude);
+
+    // Twitch
+    cesium_proto.twitch_username = twitch_message.username.clone();
+    cesium_proto.twitch_user_id = twitch_message.user_id.clone();
+    cesium_proto.twitch_user_is_mod = twitch_message.is_mod.clone();
+    cesium_proto.twitch_user_is_subscribed = twitch_message.is_subscribed.clone();
+
+    let mut unreal_proto = protos::UnrealEventPayloadV1::default();
+    unreal_proto.payload_type = Some(protos::unreal_event_payload_v1::PayloadType::CesiumWarp as i32);
+
+    info!("Proto: {:?}", cesium_proto);
 
     match self.redis_client.lock() {
       Ok(mut redis_client) => {
