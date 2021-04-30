@@ -4,6 +4,7 @@ use crate::redis_client::RedisClient;
 use futures::executor::block_on;
 use lazy_static::lazy_static;
 use log::{info, warn};
+use prost::Message;
 use regex::Regex;
 use std::sync::{RwLock, Arc, Mutex};
 
@@ -33,6 +34,18 @@ impl CoordinateAndGeocodeHandler {
 
     let mut unreal_proto = protos::UnrealEventPayloadV1::default();
     unreal_proto.payload_type = Some(protos::unreal_event_payload_v1::PayloadType::CesiumWarp as i32);
+
+    let mut buffer : Vec<u8> = Vec::with_capacity(cesium_proto.encoded_len());
+    let encode_result = cesium_proto.encode(&mut buffer);
+    match encode_result {
+      Err(e) => {
+        warn!("Proto encode result: {:?}", e);
+        return;
+      }
+      Ok(_) => {
+        unreal_proto.payload = Some(buffer);
+      }
+    }
 
     info!("Proto: {:?}", cesium_proto);
 
