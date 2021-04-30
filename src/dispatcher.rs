@@ -47,10 +47,14 @@ impl Dispatcher {
       Some(cmd) => cmd.as_str().trim().to_lowercase(),
     };
 
+    info!("Command: {}", command);
+
     let unparsed_payload = match captures.get(2) {
       None => return,
       Some(p) => p.as_str().trim(),
     };
+
+    info!("Unparsed payload: {}", unparsed_payload);
 
     if let Some(ref handler) = self.handlers.get(&command) {
       handler.handle_message(&command, unparsed_payload, twitch_message);

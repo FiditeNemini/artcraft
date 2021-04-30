@@ -27,10 +27,13 @@ impl CoordinateAndGeocodeHandler {
     cesium_proto.longitude = Some(lat_long.longitude);
 
     // Twitch
+    cesium_proto.twitch_channel = twitch_message.channel.clone();
     cesium_proto.twitch_username = twitch_message.username.clone();
     cesium_proto.twitch_user_id = twitch_message.user_id.clone();
     cesium_proto.twitch_user_is_mod = twitch_message.is_mod.clone();
     cesium_proto.twitch_user_is_subscribed = twitch_message.is_subscribed.clone();
+
+    info!("Proto: {:?}", cesium_proto);
 
     let mut unreal_proto = protos::UnrealEventPayloadV1::default();
     unreal_proto.payload_type = Some(protos::unreal_event_payload_v1::PayloadType::CesiumWarp as i32);
@@ -46,8 +49,6 @@ impl CoordinateAndGeocodeHandler {
         unreal_proto.payload = Some(buffer);
       }
     }
-
-    info!("Proto: {:?}", cesium_proto);
 
     match self.redis_client.lock() {
       Ok(mut redis_client) => {
@@ -74,7 +75,8 @@ impl Handler for CoordinateAndGeocodeHandler {
       return;
     }
 
-    todo!()
+    // TODO: Geocoding.
+
   }
 }
 
