@@ -1,0 +1,38 @@
+
+// The payloads delivered to unreal engine over the pubsub bus.
+message UnrealEventPayloadV1 {
+  enum PayloadType {
+    DO_NOT_USE = 0;
+    VOCODES_TTS = 1;
+    LEVEL_WARP = 2;
+    CESIUM_WARP = 3;
+    CESIUM_TIME_CHANGE = 4;
+    SPAWN_CREATURE = 5;
+    CHANGE_MUSIC = 6;
+  }
+
+  // Type of the payload.
+  optional PayloadType payload_type = 1;
+
+  // A binary-encoded proto whose type is based on the above value.
+  optional bytes payload = 2;
+}
+
+// Warp within a Cesium geospatial world.
+message CesiumWarpRequest {
+  // Required
+  optional double latitude = 1;
+
+  // Required
+  optional double longitude = 2;
+
+  // Optional. Fields describing the user that sent the message.
+  optional int64 twitch_user_id = 3;
+  optional string twitch_username = 4;
+  optional bool twitch_user_is_mod = 5;
+  optional bool twitch_user_is_subscribed = 6;
+
+  // Optional. Name of the channel, prefixed with hash. eg. `#vocodes`.
+  optional string twitch_channel = 7;
+}
+
