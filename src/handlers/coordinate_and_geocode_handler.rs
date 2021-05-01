@@ -23,37 +23,58 @@ impl CoordinateAndGeocodeHandler {
     let mut cesium_proto = protos::CesiumWarpRequest::default();
 
     // Cesium
-    cesium_proto.latitude = Some(lat_long.latitude);
-    cesium_proto.longitude = Some(lat_long.longitude);
+    cesium_proto.latitude = lat_long.latitude;
+    cesium_proto.longitude = lat_long.longitude;
 
     // Twitch
-    cesium_proto.twitch_channel = twitch_message.channel.clone();
-    cesium_proto.twitch_username = twitch_message.username.clone();
-    cesium_proto.twitch_user_id = twitch_message.user_id.clone();
-    cesium_proto.twitch_user_is_mod = twitch_message.is_mod.clone();
-    cesium_proto.twitch_user_is_subscribed = twitch_message.is_subscribed.clone();
+    cesium_proto.twitch_channel = twitch_message.channel.clone().unwrap_or("".to_string());
+    cesium_proto.twitch_username = twitch_message.username.clone().unwrap_or("".to_string());
+    cesium_proto.twitch_user_id = twitch_message.user_id.clone().unwrap_or(0);
+    cesium_proto.twitch_user_is_mod = twitch_message.is_mod.unwrap_or(false);
+    cesium_proto.twitch_user_is_subscribed = twitch_message.is_subscribed.unwrap_or(false);
 
     info!("Proto: {:?}", cesium_proto);
 
     let mut unreal_proto = protos::UnrealEventPayloadV1::default();
-    unreal_proto.payload_type = Some(protos::unreal_event_payload_v1::PayloadType::CesiumWarp as i32);
+    unreal_proto.payload_type = protos::unreal_event_payload_v1::PayloadType::CesiumWarp as i32;
 
     let mut buffer : Vec<u8> = Vec::with_capacity(cesium_proto.encoded_len());
     let encode_result = cesium_proto.encode(&mut buffer);
+
+    info!("Encoding outer proto");
+
     match encode_result {
       Err(e) => {
-        warn!("Proto encode result: {:?}", e);
+        warn!("Inner proto encode result: {:?}", e);
         return;
       }
       Ok(_) => {
-        unreal_proto.payload = Some(buffer);
+        unreal_proto.payload = buffer;
       }
     }
 
+    info!("Encoding inner proto");
+
+    let mut buffer : Vec<u8> = Vec::with_capacity(unreal_proto.encoded_len());
+    let encode_result = unreal_proto.encode(&mut buffer);
+
+    match encode_result {
+      Err(e) => {
+        warn!("Outer proto encode result: {:?}", e);
+        return;
+      }
+      Ok(_) => {}
+    }
+
+    info!("Sending to Redis (1)");
     match self.redis_client.lock() {
       Ok(mut redis_client) => {
-        let future = redis_client.publish("goto", "");
+        //let future = redis_client.publish("goto", "");
+        info!("Sending to Redis (2)");
+        let future = redis_client.publish_bytes("unreal", &buffer);
+        info!("Sending to Redis (3)");
         block_on(future);
+        info!("Sending to Redis (4)");
       },
       Err(_) => {},
     }
