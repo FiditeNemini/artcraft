@@ -38,6 +38,8 @@ impl CoordinateAndGeocodeHandler {
     let mut unreal_proto = protos::UnrealEventPayloadV1::default();
     unreal_proto.payload_type = protos::unreal_event_payload_v1::PayloadType::CesiumWarp as i32;
 
+    unreal_proto.debug_message = "Hello from Rust!".to_string();
+
     let mut buffer : Vec<u8> = Vec::with_capacity(cesium_proto.encoded_len());
     let encode_result = cesium_proto.encode(&mut buffer);
 
