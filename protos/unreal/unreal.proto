@@ -19,6 +19,9 @@ message UnrealEventPayloadV1 {
 
   // A binary-encoded proto whose type is based on the above value.
   bytes payload = 2;
+
+  // An optional debug message.
+  string debug_message = 3;
 }
 
 // Warp within a Cesium geospatial world.
