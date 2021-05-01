@@ -39,9 +39,10 @@ async fn main() -> anyhow::Result<()> {
 
   let mut dispatcher = Dispatcher::new();
 
-  let redis_client = Arc::new(Mutex::new(RedisClient::new(
-    &secrets.redis,
-  )));
+  let mut redis_client = RedisClient::new(&secrets.redis);
+  redis_client.connect().await?;
+
+  let redis_client = Arc::new(Mutex::new(redis_client));
 
   let coord_geo_handler = CoordinateAndGeocodeHandler::new(redis_client);
 
