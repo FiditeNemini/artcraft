@@ -83,6 +83,7 @@ impl RedisClient {
   pub async fn publish_bytes(&mut self, channel: &str, message: &[u8]) -> AnyhowResult<u32> {
     let connection = match &mut self.connection {
       None => {
+        warn!("Not connected to redis!");
         return Err(anyhow!("Not connected"));
       },
       Some(connection) => connection,
@@ -100,6 +101,7 @@ impl RedisClient {
       }
     };*/
 
+    info!("Publishing to redis pubsub channel: {}", channel);
     let result = connection.publish(channel, message).await?;
     Ok(result)
   }
