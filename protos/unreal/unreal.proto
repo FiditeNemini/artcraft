@@ -7,7 +7,7 @@ message UnrealEventPayloadV1 {
 
   // If people Retweet us or mention us, we should show that in the engine!
   enum SourceType {
-    DO_NOT_USE = 0;
+    ST_DO_NOT_USE = 0;
     TWITCH = 1;
     TWITTER = 2;
     DISCORD = 3;
@@ -17,7 +17,7 @@ message UnrealEventPayloadV1 {
   }
 
   enum PayloadType {
-    DO_NOT_USE = 0;
+    PT_DO_NOT_USE = 0;
 
     // Game events. These can come from many sources (control panel, Twitch, Discord)
     VOCODES_TTS = 1;
