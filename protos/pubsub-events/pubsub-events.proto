@@ -56,6 +56,15 @@ message PubsubEventPayloadV1 {
   // Source of the event.
   IngestionSourceType ingestion_source_type = 1;
   IngestionPayloadType ingestion_payload_type = 2;
+
+  // A binary-encoded proto whose type is based on IngestionSourceType
+  bytes ingestion_source_data = 3;
+
+  // A binary-encoded proto whose type is based on IngestionPayloadType
+  bytes ingestion_payload_data = 4;
+
+  // An optional debug message.
+  string debug_message = 5;
 }
 
 // ============================== SOURCE PROTOS ============================== //
