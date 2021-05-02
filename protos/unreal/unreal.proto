@@ -3,17 +3,20 @@ syntax = 'proto3';
 package storyteller.unreal;
 
 // The payloads delivered to unreal engine over the pubsub bus.
+// These are the "enriched" events.
 message UnrealEventPayloadV1 {
 
   // If people Retweet us or mention us, we should show that in the engine!
   enum SourceType {
     ST_DO_NOT_USE = 0;
-    TWITCH = 1;
-    TWITTER = 2;
-    DISCORD = 3;
-    YOUTUBE = 4;
-    REDDIT = 5;
-    TIKTOK = 6;
+    ST_ADMIN_PANEL = 1;
+    ST_VOCODES_WEBSITE = 2;
+    ST_TWITCH = 3;
+    ST_TWITTER = 4;
+    ST_DISCORD = 5;
+    ST_YOUTUBE = 6;
+    ST_REDDIT = 7;
+    ST_TIKTOK = 8;
   }
 
   enum PayloadType {
@@ -47,11 +50,11 @@ message UnrealEventPayloadV1 {
   // Type of the payload.
   PayloadType payload_type = 2;
 
-  // A binary-encoded proto whose type is based on PayloadType
-  bytes payload_data = 3;
-
   // A binary-encoded proto whose type is based on SourceType
-  bytes source_data = 4;
+  bytes source_data = 3;
+
+  // A binary-encoded proto whose type is based on PayloadType
+  bytes payload_data = 4;
 
   // An optional debug message.
   string debug_message = 5;
@@ -69,7 +72,7 @@ message TwitchMetadata {
   bool user_is_subscribed = 4;
 
   // Optional. Name of the channel, prefixed with hash. eg. `#vocodes`.
-  string ch_channel = 5;
+  string channel = 5;
 }
 
 
