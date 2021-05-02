@@ -28,7 +28,7 @@ use crate::redis_client::RedisClient;
 pub type AnyhowResult<T> = anyhow::Result<T>;
 
 const ENV_PUBLISH_TOPIC : &'static str = "PUBLISH_TOPIC";
-const ENV_PUBLISH_TOPIC_DEFAULT : &'static str = "twitch";
+const ENV_PUBLISH_TOPIC_DEFAULT : &'static str = "firehose";
 
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
