@@ -100,7 +100,7 @@ message IngestionYoutubeMetadata {
 }
 
 
-message RedditMetadata {
+message IngestionRedditMetadata {
   // Optional. Fields describing the user that sent the message.
   optional string username = 1;
 }
