@@ -54,17 +54,17 @@ message PubsubEventPayloadV1 {
   }
 
   // Source of the event.
-  IngestionSourceType ingestion_source_type = 1;
-  IngestionPayloadType ingestion_payload_type = 2;
+  optional IngestionSourceType ingestion_source_type = 1;
+  optional IngestionPayloadType ingestion_payload_type = 2;
 
   // A binary-encoded proto whose type is based on IngestionSourceType
-  bytes ingestion_source_data = 3;
+  optional bytes ingestion_source_data = 3;
 
   // A binary-encoded proto whose type is based on IngestionPayloadType
-  bytes ingestion_payload_data = 4;
+  optional bytes ingestion_payload_data = 4;
 
   // An optional debug message.
-  string debug_message = 5;
+  optional string debug_message = 5;
 }
 
 // ============================== SOURCE PROTOS ============================== //
@@ -72,43 +72,43 @@ message PubsubEventPayloadV1 {
 
 message IngestionTwitchMetadata {
   // Optional. Fields describing the user that sent the message.
-  int64 user_id = 1;
-  string username = 2;
-  bool user_is_mod = 3;
-  bool user_is_subscribed = 4;
+  optional int64 user_id = 1;
+  optional string username = 2;
+  optional bool user_is_mod = 3;
+  optional bool user_is_subscribed = 4;
 
   // Optional. Name of the channel, prefixed with hash. eg. `#vocodes`.
-  string channel = 5;
+  optional string channel = 5;
 }
 
 
 message IngestionTwitterMetadata {
   // Optional. Fields describing the user that sent the message.
-  string username = 1;
+  optional string username = 1;
 }
 
 
 message IngestionDiscordMetadata {
   // Optional. Fields describing the user that sent the message.
-  string username = 1;
+  optional string username = 1;
 }
 
 
 message IngestionYoutubeMetadata {
   // Optional. Fields describing the user that sent the message.
-  string username = 1;
+  optional string username = 1;
 }
 
 
 message RedditMetadata {
   // Optional. Fields describing the user that sent the message.
-  string username = 1;
+  optional string username = 1;
 }
 
 
 message IngestionTikTokMetadata {
   // Optional. Fields describing the user that sent the message.
-  string username = 1;
+  optional string username = 1;
 }
 
 
