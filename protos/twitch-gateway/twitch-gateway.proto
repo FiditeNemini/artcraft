@@ -1,6 +1,7 @@
 
 package storyteller.twitchgateway;
 
+// These are raw messages from Twitch that we send to the PubSub enricher.
 message TwitchMessage {
   optional int64 user_id = 1;
   optional string username = 2;

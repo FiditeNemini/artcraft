@@ -4,25 +4,119 @@ package storyteller.unreal;
 
 // The payloads delivered to unreal engine over the pubsub bus.
 message UnrealEventPayloadV1 {
+
+  // If people Retweet us or mention us, we should show that in the engine!
+  enum SourceType {
+    DO_NOT_USE = 0;
+    TWITCH = 1;
+    TWITTER = 2;
+    DISCORD = 3;
+    YOUTUBE = 4;
+    REDDIT = 5;
+    TIKTOK = 6;
+  }
+
   enum PayloadType {
     DO_NOT_USE = 0;
+
+    // Game events. These can come from many sources (control panel, Twitch, Discord)
     VOCODES_TTS = 1;
     LEVEL_WARP = 2;
     CESIUM_WARP = 3;
     CESIUM_TIME_CHANGE = 4;
     SPAWN_CREATURE = 5;
-    CHANGE_MUSIC = 6;
+    //CHANGE_MUSIC = 6;
+
+    // Twitter-specific events.
+    TWITTER_FOLLOW = 200;
+    TWITTER_RETWEET = 201;
+    TWITTER_MENTION = 202;
+
+    // Discord-specific events.
+    DISCORD_JOINED = 300;
+
+    // YouTube-specific events.
+    YOUTUBE_SUBSCRIBED = 400;
+
+    // Are there non-chat Reddit events?
   }
 
-  // Type of the payload.
-  PayloadType payload_type = 1;
+  // Source of the event.
+  SourceType source_type = 1;
 
-  // A binary-encoded proto whose type is based on the above value.
-  bytes payload = 2;
+  // Type of the payload.
+  PayloadType payload_type = 2;
+
+  // A binary-encoded proto whose type is based on PayloadType
+  bytes payload_data = 3;
+
+  // A binary-encoded proto whose type is based on SourceType
+  bytes source_data = 4;
 
   // An optional debug message.
-  string debug_message = 3;
+  string debug_message = 5;
 }
+
+
+// ============================== SOURCE PROTOS ============================== //
+
+message TwitchMetadata {
+  // Optional. Fields describing the user that sent the message.
+  int64 user_id = 1;
+  string username = 2;
+  bool user_is_mod = 3;
+  bool user_is_subscribed = 4;
+
+  // Optional. Name of the channel, prefixed with hash. eg. `#vocodes`.
+  string ch_channel = 5;
+}
+
+
+message TwitterMetadata {
+  // Optional. Fields describing the user that sent the message.
+  string username = 1;
+}
+
+
+message YoutubeMetadata {
+  // Optional. Fields describing the user that sent the message.
+  string username = 1;
+}
+
+
+message DiscordMetadata {
+  // Optional. Fields describing the user that sent the message.
+  string username = 1;
+}
+
+
+message YoutubeMetadata {
+  // Optional. Fields describing the user that sent the message.
+  string username = 1;
+}
+
+
+message RedditMetadata {
+  // Optional. Fields describing the user that sent the message.
+  string username = 1;
+}
+
+
+message TikTokMetadata {
+  // Optional. Fields describing the user that sent the message.
+  string username = 1;
+}
+
+
+// ============================== GAME EVENT PROTOS ============================== //
+
+
+// Change time in Cesium.
+message CesiumTimeChangeRequest {
+  // Required
+  int64 hour = 1;
+}
+
 
 // Warp within a Cesium geospatial world.
 message CesiumWarpRequest {
@@ -32,13 +126,67 @@ message CesiumWarpRequest {
   // Required
   double longitude = 2;
 
+  // TODO: Remove these.
   // Optional. Fields describing the user that sent the message.
   int64 twitch_user_id = 3;
   string twitch_username = 4;
   bool twitch_user_is_mod = 5;
   bool twitch_user_is_subscribed = 6;
 
+  // TODO: Remove these.
   // Optional. Name of the channel, prefixed with hash. eg. `#vocodes`.
   string twitch_channel = 7;
+}
+
+
+// Change the level
+message LevelWarpRequest {
+  // Required. Level to warp to.
+  string level_slug = 1;
+}
+
+
+// Spawn a creature
+message SpawnCreatureRequest {
+  // Required. Name of the creature.
+  int64 name_slug = 1;
+}
+
+
+// Do text to speech
+message VocodesTtsRequest {
+  // Required. Speaker to use.
+  string voice_slug = 1;
+  // Required. Text to speak.
+  double text = 2;
+}
+
+
+// ============================== TWITTER EVENT PROTOS ============================== //
+
+
+message TwitterFollow {
+  // Intentionally blank
+}
+
+message TwitterRetweet {
+  // Intentionally blank
+}
+
+message TwitterMention {
+  // Intentionally blank
+}
+
+
+// ============================== DISCORD EVENT PROTOS ============================== //
+
+message DiscordJoined {
+  // Intentionally blank
+}
+
+// ============================== YOUTUBE EVENT PROTOS ============================== //
+
+message YoutubeSubscribed {
+  // Intentionally blank
 }
 
