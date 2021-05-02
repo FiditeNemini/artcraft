@@ -60,6 +60,7 @@ message UnrealEventPayloadV1 {
 
 // ============================== SOURCE PROTOS ============================== //
 
+
 message TwitchMetadata {
   // Optional. Fields describing the user that sent the message.
   int64 user_id = 1;
@@ -73,12 +74,6 @@ message TwitchMetadata {
 
 
 message TwitterMetadata {
-  // Optional. Fields describing the user that sent the message.
-  string username = 1;
-}
-
-
-message YoutubeMetadata {
   // Optional. Fields describing the user that sent the message.
   string username = 1;
 }
