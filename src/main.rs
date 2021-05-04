@@ -3,6 +3,7 @@ extern crate serde_derive;
 
 mod dispatcher;
 mod handlers;
+mod message_to_command_parser;
 mod protos;
 mod redis_client;
 mod redis_subscriber;
@@ -26,13 +27,16 @@ use std::sync::{Arc, Mutex};
 pub type AnyhowResult<T> = anyhow::Result<T>;
 
 const ENV_SUBSCRIBE_TOPIC : &'static str = "SUBSCRIBE_TOPIC";
-const ENV_SUBSCRIBE_TOPIC_DEFAULT : &'static str = "twitch";
+const ENV_SUBSCRIBE_TOPIC_DEFAULT : &'static str = "firehose";
+
+const ENV_PUBLISH_TOPIC : &'static str = "PUBLISH_TOPIC";
+const ENV_PUBLISH_TOPIC_DEFAULT : &'static str = "unreal";
 
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
   easyenv::init_env_logger(None);
 
-  let redis_publish_topic = easyenv::get_env_string_or_default(
+  let redis_subscribe_topic = easyenv::get_env_string_or_default(
     ENV_SUBSCRIBE_TOPIC, ENV_SUBSCRIBE_TOPIC_DEFAULT);
 
   let secrets = Secrets::from_file("secrets.toml")?;
@@ -57,7 +61,7 @@ async fn main() -> anyhow::Result<()> {
 
   loop {
     redis_pubsub_client.connect().await?;
-    redis_pubsub_client.subscribe(&redis_publish_topic).await?;
+    redis_pubsub_client.subscribe(&redis_subscribe_topic).await?;
     redis_pubsub_client.start_stream().await?;
     thread::sleep(Duration::from_secs(5));
   }

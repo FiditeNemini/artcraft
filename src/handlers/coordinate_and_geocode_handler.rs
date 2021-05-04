@@ -19,7 +19,7 @@ impl CoordinateAndGeocodeHandler {
     }
   }
 
-  fn handle_lat_long(&self, lat_long: LatLong, twitch_message: protos::TwitchMessage) {
+  /*fn handle_lat_long(&self, lat_long: LatLong, twitch_message: protos::TwitchMessage) {
     let mut cesium_proto = protos::CesiumWarpRequest::default();
 
     // Cesium
@@ -51,7 +51,7 @@ impl CoordinateAndGeocodeHandler {
         return;
       }
       Ok(_) => {
-        unreal_proto.payload = buffer;
+        unreal_proto.payload_data = buffer;
       }
     }
 
@@ -80,12 +80,12 @@ impl CoordinateAndGeocodeHandler {
       },
       Err(_) => {},
     }
-  }
+  }*/
 }
 
 impl Handler for CoordinateAndGeocodeHandler {
 
-  /// Command payload contains the following example instruction:
+  /*/// Command payload contains the following example instruction:
   ///   * "34.0659° N, 84.6769° W"
   ///   * "33.753746, -84.386330"
   ///   * "Obihiro, Hokkaido, Japan"
@@ -100,7 +100,7 @@ impl Handler for CoordinateAndGeocodeHandler {
 
     // TODO: Geocoding.
 
-  }
+  }*/
 }
 
 #[derive(Clone,Debug,PartialEq)]

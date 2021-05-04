@@ -5,10 +5,10 @@ use regex::Regex;
 use std::collections::HashMap;
 
 pub trait Handler {
-  fn handle_message(&self,
+  /*fn handle_message(&self,
                     command: &str,
                     unparsed_command_args: &str,
-                    twitch_message: protos::TwitchMessage);
+                    twitch_message: protos::TwitchMessage);*/
 }
 
 pub struct Dispatcher {
@@ -26,13 +26,28 @@ impl Dispatcher {
     self.handlers.insert(command.to_string(), handler);
   }
 
-  pub fn handle_message(&self, twitch_message: protos::TwitchMessage) {
-    lazy_static! {
-      static ref COMMAND_REGEX : Regex = Regex::new(r"^\s*(\w+)\s+(.*)$").expect("Regex should work");
-    }
-    info!("Handling Proto: {:?}", twitch_message);
+  pub fn handle_pubsub_event(&self, message: protos::PubsubEventPayloadV1) {
+    info!("Handling Proto: {:?}", message);
 
-    let message = match twitch_message.message_contents {
+    let payload_type = message.ingestion_payload_type
+      .and_then(|num| protos::pubsub_event_payload_v1::IngestionPayloadType::from_i32(num));
+
+    let payload_type = match payload_type {
+      Some(p) => p,
+      None => {
+        warn!("No payload type; skipping.");
+        return;
+      }
+    };
+
+    match payload_type {
+      protos::pubsub_event_payload_v1::IngestionPayloadType::TwitchMessage => {
+
+      },
+      _ => {},
+    }
+
+    /*let message = match twitch_message.message_contents {
       None => return,
       Some(ref m) => m.clone(),
     };
@@ -58,7 +73,15 @@ impl Dispatcher {
 
     if let Some(ref handler) = self.handlers.get(&command) {
       handler.handle_message(&command, unparsed_payload, twitch_message);
+    }*/
+  }
+
+  fn parse_message(&self, message: &str) -> String {
+    lazy_static! {
+      static ref COMMAND_REGEX : Regex = Regex::new(r"^\s*(\w+)\s+(.*)$").expect("Regex should work");
     }
+
+
   }
 }
 

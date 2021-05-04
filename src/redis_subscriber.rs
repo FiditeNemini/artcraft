@@ -82,7 +82,7 @@ impl RedisSubscribeClient {
       for message in connection.on_message().next().await {
         let bytes = message.get_payload_bytes();
 
-        let mut message_proto = match protos::TwitchMessage::decode(bytes) {
+        let mut message_proto = match protos::PubsubEventPayloadV1::decode(bytes) {
           Ok(m) => m,
           Err(e) => {
             warn!("Error decoding proto: {:?}", e);
@@ -90,7 +90,7 @@ impl RedisSubscribeClient {
           },
         };
 
-        self.dispatcher.handle_message(message_proto);
+        self.dispatcher.handle_pubsub_event(message_proto);
       }
 
       thread::sleep(Duration::from_millis(250));
