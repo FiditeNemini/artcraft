@@ -160,6 +160,16 @@ const SPEAKERS : Speaker[] = [
     categories: ["celebrities"],
   }),
   Speaker.fromJson({
+    name: "Anakin Skywalker",
+    slug: "anakin-skywalker",
+    description: "sand",
+    avatarUrl: "anakin-skywalker.webp",
+    fullUrl: "anakin-skywalker-full.webp",
+    voiceQuality: 5.2,
+    categories: ["cartoons", "fantasy", "new"],
+    defaultVoice: true,
+  }),
+  Speaker.fromJson({
     name: "Anderson Cooper",
     slug: "anderson-cooper",
     description: "Reporter",
@@ -176,7 +186,7 @@ const SPEAKERS : Speaker[] = [
     fullUrl: "arnold-schwarzenegger-full.png",
     voiceQuality: 8.0,
     categories: ["celebrities", "politics"],
-    defaultVoice: true,
+    //defaultVoice: true,
   }),
   Speaker.fromJson({
     name: "Bart Simpson",
@@ -339,7 +349,7 @@ const SPEAKERS : Speaker[] = [
     fullUrl: "eric-cartman-full.png",
     voiceQuality: 6.6,
     categories: ["cartoons", "new"],
-    defaultVoice: true,
+    //defaultVoice: true,
   }),
   //Speaker.fromJson({
   //  name: "Etika",
@@ -367,7 +377,7 @@ const SPEAKERS : Speaker[] = [
     fullUrl: "gilbert-gottfried-full.png",
     voiceQuality: 7.8,
     categories: ["celebrities"],
-    defaultVoice: true,
+    //defaultVoice: true,
   }),
   Speaker.fromJson({
     name: "Goku",
@@ -377,7 +387,7 @@ const SPEAKERS : Speaker[] = [
     fullUrl: "goku-full.png",
     voiceQuality: 7.8,
     categories: ["cartoons", "new"],
-    defaultVoice: true,
+    //defaultVoice: true,
   }),
   Speaker.fromJson({
     name: "Hillary Clinton",
@@ -396,7 +406,7 @@ const SPEAKERS : Speaker[] = [
     fullUrl: "homer-simpson-full.png",
     voiceQuality: 8.0,
     categories: ["cartoons"],
-    defaultVoice: true,
+    //defaultVoice: true,
   }),
   Speaker.fromJson({
     name: "J. K. Simmons",
@@ -534,6 +544,16 @@ const SPEAKERS : Speaker[] = [
     categories: ["science"],
   }),
   Speaker.fromJson({
+    name: "Obi-Wan Kenobi",
+    slug: "obi-wan-kenobi",
+    description: "Higher ground",
+    avatarUrl: "obi-wan-kenobi.webp",
+    fullUrl: "obi-wan-kenobi-full.webp",
+    voiceQuality: 7.2,
+    categories: ["cartoons", "fantasy", "new"],
+    defaultVoice: true,
+  }),
+  Speaker.fromJson({
     name: "Palmer Luckey",
     slug: "palmer-luckey",
     description: "Inventor, Entrepreneur",
@@ -568,7 +588,7 @@ const SPEAKERS : Speaker[] = [
     fullUrl: "peter-griffin-full.png",
     voiceQuality: 7.0,
     categories: ["cartoons", "new"],
-    defaultVoice: true,
+    //defaultVoice: true,
   }),
   Speaker.fromJson({
     name: "Peter Thiel",
@@ -733,7 +753,7 @@ const SPEAKERS : Speaker[] = [
     fullUrl: "sonic-full.png",
     voiceQuality: 8.5,
     categories: ["games"],
-    defaultVoice: true,
+    //defaultVoice: true,
   }),
   Speaker.fromJson({
     name: "SpongeBob SquarePants",
@@ -743,7 +763,7 @@ const SPEAKERS : Speaker[] = [
     fullUrl: "spongebob-squarepants-full.png",
     voiceQuality: 8.0,
     categories: ["cartoons"],
-    defaultVoice: true,
+    //defaultVoice: true,
   }),
   Speaker.fromJson({
     name: "Squidward Tentacles",
@@ -825,6 +845,16 @@ const SPEAKERS : Speaker[] = [
     fullUrl: "yami-yugi-full.png",
     voiceQuality: 7.2,
     categories: ["cartoons"],
+    //defaultVoice: true,
+  }),
+  Speaker.fromJson({
+    name: "Yoda",
+    slug: "yoda",
+    description: "reverse grammar it is",
+    avatarUrl: "yoda.webp",
+    fullUrl: "yoda-full.webp",
+    voiceQuality: 7.2,
+    categories: ["cartoons", "fantasy", "new"],
     defaultVoice: true,
   }),
 ];
