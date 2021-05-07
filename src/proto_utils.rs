@@ -10,6 +10,39 @@ use prost::Message;
 
 // TODO: add some type safety w/ generics and type bounds
 
+/// Sources of events
+pub enum InboundEventSource {
+  Twitch(IngestionTwitchMetadata),
+}
+
+/// Events
+pub enum InboundEvent {
+  TwitchMessage(IngestionTwitchMessage),
+}
+
+impl InboundEventSource {
+  pub fn parse_from_payload(event_payload: &PubsubEventPayloadV1)
+    -> AnyhowResult<Self>
+  {
+    match Self::parse_type_proto(event_payload) {
+      Some(IngestionSourceType::IstTwitch) => {
+        IngestionTwitchMetadata::decode(event_payload.ingestion_source_data())
+          .map(|m| Self::Twitch(m))
+          .map_err(|_| anyhow!("error decoding source proto"))
+      },
+      None => Err(anyhow!("invalid source type")),
+      Some(_) => Err(anyhow!("type is not yet handled")),
+    }
+  }
+
+  fn parse_type_proto(event_payload: &PubsubEventPayloadV1)
+    -> Option<IngestionSourceType>
+  {
+    event_payload.ingestion_payload_type
+      .and_then(|num| IngestionSourceType::from_i32(num))
+  }
+}
+
 pub fn get_source_type(event_payload: &PubsubEventPayloadV1)
   -> Option<IngestionSourceType>
 {
