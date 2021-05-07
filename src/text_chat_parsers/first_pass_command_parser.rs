@@ -4,7 +4,7 @@ use lazy_static::lazy_static;
 use log::debug;
 use regex::Regex;
 
-struct FirstPassParsedCommand {
+pub struct FirstPassParsedCommand {
   /// The first "word" / "verb" of a sentence.
   /// This is all-lowercase, no spaces, `[\w\-]+`
   pub command: String,

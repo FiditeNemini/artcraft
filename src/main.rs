@@ -53,7 +53,7 @@ async fn main() -> anyhow::Result<()> {
 
   let coord_geo_handler = CoordinateAndGeocodeHandler::new(redis_client);
 
-  dispatcher.add_handler("goto", Box::new(coord_geo_handler));
+  dispatcher.add_text_command_handler("goto", Box::new(coord_geo_handler));
 
   let mut redis_pubsub_client = RedisSubscribeClient::new(
     &secrets.redis,

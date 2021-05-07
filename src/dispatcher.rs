@@ -1,59 +1,71 @@
 use crate::protos::protos;
 use lazy_static::lazy_static;
 use anyhow::anyhow;
-use log::{info, warn};
+use log::{info, warn, debug};
 use regex::Regex;
 use std::collections::HashMap;
-use crate::proto_utils::{get_payload_type, get_twitch_message, get_twitch_metadata};
-use crate::AnyhowResult;
 
-pub trait Handler {
-  /*fn handle_message(&self,
-                    command: &str,
-                    unparsed_command_args: &str,
-                    twitch_message: protos::TwitchMessage);*/
+use crate::proto_utils::{InboundEventSource, InboundEvent};
+use crate::AnyhowResult;
+use crate::handlers::coordinate_and_geocode_handler::CoordinateAndGeocodeHandler;
+use crate::text_chat_parsers::first_pass_command_parser::FirstPassParsedCommand;
+
+pub trait TextCommandHandler {
+  fn handle_text_command(&self,
+                         command: &FirstPassParsedCommand,
+                         event: &InboundEvent,
+                         event_source: &InboundEventSource) -> AnyhowResult<()>;
 }
 
 pub struct Dispatcher {
-  handlers: HashMap<String, Box<dyn Handler>>,
+  text_command_handlers: HashMap<String, Box<dyn TextCommandHandler>>,
 }
 
 impl Dispatcher {
   pub fn new() -> Self {
     Self {
-      handlers: HashMap::new(),
+      text_command_handlers: HashMap::new(),
     }
   }
 
-  pub fn add_handler(&mut self, command: &str, handler: Box<dyn Handler>) {
-    self.handlers.insert(command.to_string(), handler);
+  pub fn add_text_command_handler(&mut self, command: &str, handler: Box<dyn TextCommandHandler>) {
+    self.text_command_handlers.insert(command.to_string(), handler);
   }
 
   pub fn handle_pubsub_event(&self, message: protos::PubsubEventPayloadV1) -> AnyhowResult<()> {
     info!("Handling Proto: {:?}", message);
 
-    let maybe_payload_type = get_payload_type(&message);
+    let event_source = InboundEventSource::parse_from_payload(&message)?;
+    let event = InboundEvent::parse_from_payload(&message)?;
 
-    let payload_type = match maybe_payload_type {
-      Some(p) => p,
-      None => {
-        warn!("No payload type; skipping.");
-        return Err(anyhow!("No payload type; skipping."));
+    info!("Source: {:?}", event_source);
+    info!("Event: {:?}", event);
+
+    match event {
+      InboundEvent::TwitchMessage(ref message) => {
+        let command = FirstPassParsedCommand::try_parse(&message.message_contents())?;
+        self.handle_text_command(&command, &event, &event_source)?;
       }
     };
 
-    match payload_type {
-      protos::pubsub_event_payload_v1::IngestionPayloadType::TwitchMessage => {
-        let twitch_metadata = get_twitch_metadata(&message)?;
-        info!("Twitch metadata: {:?}", twitch_metadata);
-
-        let twitch_message = get_twitch_message(&message)?;
-        info!("Twitch message: {:?}", twitch_message);
-      },
-      _ => {},
-    }
-
     Ok(())
+  }
+
+  fn handle_text_command(&self,
+                         command: &FirstPassParsedCommand,
+                         event: &InboundEvent,
+                         event_source: &InboundEventSource)
+    -> AnyhowResult<()>
+  {
+    let handler = match self.text_command_handlers.get(&command.command) {
+      Some(h) => h,
+      None => {
+        debug!("No handler for command: {}", &command.command);
+        return Ok(());
+      }
+    };
+
+    handler.handle_text_command(command, event, event_source)
   }
 }
 

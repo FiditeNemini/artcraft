@@ -1,4 +1,4 @@
-use crate::dispatcher::Handler;
+use crate::dispatcher::TextCommandHandler;
 use crate::protos::protos;
 use crate::redis_client::RedisClient;
 use futures::executor::block_on;
@@ -7,7 +7,12 @@ use log::{info, warn};
 use prost::Message;
 use regex::Regex;
 use std::sync::{RwLock, Arc, Mutex};
+use crate::text_chat_parsers::first_pass_command_parser::FirstPassParsedCommand;
+use crate::proto_utils::{InboundEvent, InboundEventSource};
+use crate::AnyhowResult;
 
+// TODO: maybe separate text command handling and data source concerns
+//  like this? Though maybe it's too early to optimize this.
 pub struct CoordinateAndGeocodeHandler {
   redis_client: Arc<Mutex<RedisClient>>,
 }
@@ -83,24 +88,23 @@ impl CoordinateAndGeocodeHandler {
   }*/
 }
 
-impl Handler for CoordinateAndGeocodeHandler {
-
-  /*/// Command payload contains the following example instruction:
-  ///   * "34.0659° N, 84.6769° W"
-  ///   * "33.753746, -84.386330"
-  ///   * "Obihiro, Hokkaido, Japan"
-  ///   * "Daytona, FL"
-  fn handle_message(&self, command: &str, unparsed_command_args: &str, twitch_message: protos::TwitchMessage) {
-    let maybe_lat_long = parse_lat_long(unparsed_command_args);
+impl TextCommandHandler for CoordinateAndGeocodeHandler {
+  fn handle_text_command(&self,
+                         command: &FirstPassParsedCommand,
+                         event: &InboundEvent,
+                         event_source: &InboundEventSource)
+    -> AnyhowResult<()>
+  {
+    let maybe_lat_long = parse_lat_long(&command.unparsed_arguments);
 
     if let Some(lat_long) = maybe_lat_long {
-      self.handle_lat_long(lat_long, twitch_message);
-      return;
+      //self.handle_lat_long(lat_long, twitch_message);
     }
 
     // TODO: Geocoding.
 
-  }*/
+    Ok(())
+  }
 }
 
 #[derive(Clone,Debug,PartialEq)]
