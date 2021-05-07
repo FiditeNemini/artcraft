@@ -1,5 +1,7 @@
 #[macro_use]
 extern crate serde_derive;
+#[macro_use]
+extern crate lazy_static;
 
 mod dispatcher;
 mod handlers;
@@ -8,6 +10,7 @@ mod protos;
 mod redis_client;
 mod redis_subscriber;
 mod secrets;
+mod text_chat_parsers;
 
 use anyhow::anyhow;
 use anyhow::{Context, Error};

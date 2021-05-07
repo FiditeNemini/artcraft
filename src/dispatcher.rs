@@ -81,6 +81,8 @@ impl Dispatcher {
       static ref COMMAND_REGEX : Regex = Regex::new(r"^\s*(\w+)\s+(.*)$").expect("Regex should work");
     }
 
+    "".to_string()
+
 
   }
 }
