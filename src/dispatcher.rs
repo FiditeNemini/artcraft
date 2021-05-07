@@ -1,9 +1,11 @@
 use crate::protos::protos;
 use lazy_static::lazy_static;
+use anyhow::anyhow;
 use log::{info, warn};
 use regex::Regex;
 use std::collections::HashMap;
-use crate::proto_utils::get_payload_type;
+use crate::proto_utils::{get_payload_type, get_twitch_message, get_twitch_metadata};
+use crate::AnyhowResult;
 
 pub trait Handler {
   /*fn handle_message(&self,
@@ -27,7 +29,7 @@ impl Dispatcher {
     self.handlers.insert(command.to_string(), handler);
   }
 
-  pub fn handle_pubsub_event(&self, message: protos::PubsubEventPayloadV1) {
+  pub fn handle_pubsub_event(&self, message: protos::PubsubEventPayloadV1) -> AnyhowResult<()> {
     info!("Handling Proto: {:?}", message);
 
     let maybe_payload_type = get_payload_type(&message);
@@ -36,16 +38,22 @@ impl Dispatcher {
       Some(p) => p,
       None => {
         warn!("No payload type; skipping.");
-        return;
+        return Err(anyhow!("No payload type; skipping."));
       }
     };
 
     match payload_type {
       protos::pubsub_event_payload_v1::IngestionPayloadType::TwitchMessage => {
-        info!("TWITCH MESSAGE!!!");
+        let twitch_metadata = get_twitch_metadata(&message)?;
+        info!("Twitch metadata: {:?}", twitch_metadata);
+
+        let twitch_message = get_twitch_message(&message)?;
+        info!("Twitch message: {:?}", twitch_message);
       },
       _ => {},
     }
+
+    Ok(())
   }
 }
 
