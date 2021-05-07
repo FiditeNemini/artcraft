@@ -1,7 +1,7 @@
 use anyhow::anyhow;
-use log::debug;
-use lazy_static::lazy_static;
 use crate::AnyhowResult;
+use lazy_static::lazy_static;
+use log::debug;
 use regex::Regex;
 
 struct FirstPassParsedCommand {
@@ -17,7 +17,7 @@ impl FirstPassParsedCommand {
 
   pub fn try_parse(message: &str) -> AnyhowResult<Self> {
     lazy_static! {
-      static ref COMMAND_REGEX : Regex = Regex::new(r"^\s*([\w\-]+)\s+(.*)$").expect("should parse");
+      static ref COMMAND_REGEX : Regex = Regex::new(r"^\s*([\w\-]+)\s+(.*)\s*$").expect("should parse");
     }
 
     let captures = match COMMAND_REGEX.captures(&message) {
@@ -30,18 +30,18 @@ impl FirstPassParsedCommand {
       Some(cmd) => cmd.as_str().trim().to_lowercase(),
     };
 
-    debug!("Command: {}", command);
+    debug!("Command: {}", &command);
 
     let unparsed_payload = match captures.get(2) {
       None => return Err(anyhow!("could not get second capture group")),
-      Some(p) => p.as_str().trim(),
+      Some(p) => p.as_str().trim().to_string(),
     };
 
-    debug!("Unparsed payload: {}", unparsed_payload);
+    debug!("Unparsed payload: {}", &unparsed_payload);
 
     Ok(Self {
-      command: "".to_string(),
-      unparsed_arguments: "".to_string()
+      command: command,
+      unparsed_arguments: unparsed_payload,
     })
   }
 }
@@ -78,6 +78,10 @@ mod tests {
 
   #[test]
   fn parse_hyphenated_command() {
-    todo!();
+    let r = FirstPassParsedCommand::try_parse("foo-bar baz");
+    assert!(r.is_ok());
+    let r = r.expect("Is okay");
+    assert_eq!(&r.command, "foo-bar");
+    assert_eq!(&r.unparsed_arguments, "baz");
   }
 }
