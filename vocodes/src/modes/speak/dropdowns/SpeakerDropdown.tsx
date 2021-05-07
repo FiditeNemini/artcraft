@@ -1,5 +1,5 @@
 import React from 'react';
-import { Speaker, SpeakerCategory, SPEAKERS_BY_CATEGORY } from "../../../model/Speakers";
+import { Speaker, SpeakerCategory, SPEAKERS_BY_CATEGORY, CATEGORY_ALL_BY_QUALITY } from "../../../model/Speakers";
 
 interface Props {
   currentSpeaker: Speaker,
@@ -23,7 +23,7 @@ class SpeakerDropdown extends React.Component<Props, State> {
   }
 
   public render() {
-    if (this.props.currentSpeakerCategory.getSlug() === 'all') {
+    if (this.props.currentSpeakerCategory.getSlug() === CATEGORY_ALL_BY_QUALITY.getSlug()) {
       return this.renderAllByQuality();
     } else {
       return this.renderSortedCategory();

@@ -8,7 +8,7 @@ import { Footer } from './navigation/Footer';
 import { HistoryComponent } from './modes/history/HistoryComponent';
 import { Mode } from './AppMode';
 import { SpeakComponent } from './modes/speak/SpeakComponent';
-import { Speaker, SpeakerCategory, SPEAKERS, SPEAKER_CATEGORIES, CATEGORY_ALL, SPEAKERS_BY_CATEGORY } from './model/Speakers';
+import { Speaker, SpeakerCategory, SPEAKERS, SPEAKER_CATEGORIES, CATEGORY_ALL_BY_NAME, SPEAKERS_BY_CATEGORY } from './model/Speakers';
 import { Spectrogram } from './modes/speak/extras/Spectrogram';
 import { TermsComponent } from './modes/terms/TermsComponent';
 import { TopNav } from './navigation/TopNav';
@@ -107,7 +107,7 @@ class App extends React.Component<Props, State> {
       isHistoryCountBadgeVisible: false,
       currentText: '',
       textCharacterLimit: TEXT_CHARACTER_LIMIT_DEFAULT,
-      currentSpeakerCategory: CATEGORY_ALL,
+      currentSpeakerCategory: CATEGORY_ALL_BY_NAME,
       videoQueuePoller: new VideoQueuePoller(this.updateVideoQueueStats),
       videoJobPoller: new VideoJobPoller(this.updateVideoJob),
       videoQueueStats: VideoQueueStats.default(),
@@ -221,7 +221,7 @@ class App extends React.Component<Props, State> {
 
     let category = isCategoryCorrect
       ? this.state.currentSpeakerCategory
-      : CATEGORY_ALL;
+      : CATEGORY_ALL_BY_NAME;
 
     this.setState({
       speaker: selectedSpeaker,

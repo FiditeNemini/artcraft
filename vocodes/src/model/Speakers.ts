@@ -16,10 +16,13 @@ class SpeakerCategory {
   }
 }
 
-const CATEGORY_ALL: SpeakerCategory = new SpeakerCategory("All Voices", "all");
+const CATEGORY_ALL_BY_NAME: SpeakerCategory = new SpeakerCategory("All Voices (ordered by name)", "all");
+
+const CATEGORY_ALL_BY_QUALITY: SpeakerCategory = new SpeakerCategory("All Voices (ordered by quality)", "all-quality");
 
 const SPEAKER_CATEGORIES : Map<String, SpeakerCategory> = new Map([
-  ["all", CATEGORY_ALL],
+  ["all", CATEGORY_ALL_BY_NAME],
+  ["all-quality", CATEGORY_ALL_BY_QUALITY],
   ["cartoons", new SpeakerCategory("Cartoons and Anime", "cartoons")],
   ["celebrities", new SpeakerCategory("Celebrities", "celebrities")],
   ["games", new SpeakerCategory("Video Games", "games")],
@@ -77,7 +80,9 @@ class Speaker {
     let categories : SpeakerCategory[] = [];
 
     let inputCategories = json.categories || [];
-    inputCategories.push('all');
+
+    inputCategories.push(CATEGORY_ALL_BY_NAME.getSlug());
+    inputCategories.push(CATEGORY_ALL_BY_QUALITY.getSlug());
 
     if (inputCategories) {
       inputCategories.forEach((categoryName : string) => {
@@ -880,5 +885,6 @@ export {
   SPEAKERS,
   SPEAKER_CATEGORIES,
   SPEAKERS_BY_CATEGORY,
-  CATEGORY_ALL,
+  CATEGORY_ALL_BY_NAME,
+  CATEGORY_ALL_BY_QUALITY,
 };
