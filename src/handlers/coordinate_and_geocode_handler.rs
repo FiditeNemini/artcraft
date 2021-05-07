@@ -110,7 +110,7 @@ impl TextCommandHandler for CoordinateAndGeocodeHandler {
     let maybe_lat_long = parse_lat_long(&command.unparsed_arguments);
 
     if let Some(lat_long) = maybe_lat_long {
-      //self.handle_lat_long(lat_long, twitch_message);
+      self.handle_lat_long(lat_long, event, event_source);
     }
 
     // TODO: Geocoding.

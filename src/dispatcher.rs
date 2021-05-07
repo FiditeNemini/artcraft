@@ -60,6 +60,8 @@ impl Dispatcher {
                          event_source: &InboundEventSource)
     -> AnyhowResult<()>
   {
+    info!("Handle command: {}", &command.command);
+
     let handler = match self.text_command_handlers.get(&command.command) {
       Some(h) => h,
       None => {
@@ -68,6 +70,7 @@ impl Dispatcher {
       }
     };
 
+    info!("Dispatching handler...");
     handler.handle_text_command(command, event, event_source)
   }
 }
