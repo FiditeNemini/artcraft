@@ -5,7 +5,7 @@ use log::{info, warn, debug};
 use regex::Regex;
 use std::collections::HashMap;
 
-use crate::proto_utils::{InboundEventSource, InboundEvent};
+use crate::inbound_proto_utils::{InboundEventSource, InboundEvent};
 use crate::AnyhowResult;
 use crate::handlers::coordinate_and_geocode_handler::CoordinateAndGeocodeHandler;
 use crate::text_chat_parsers::first_pass_command_parser::FirstPassParsedCommand;
@@ -48,9 +48,12 @@ impl Dispatcher {
       }
     };
 
+    // TODO... other event types, including non-text commands.
+
     Ok(())
   }
 
+  /// Handle text-based commands.
   fn handle_text_command(&self,
                          command: &FirstPassParsedCommand,
                          event: &InboundEvent,
@@ -68,4 +71,3 @@ impl Dispatcher {
     handler.handle_text_command(command, event, event_source)
   }
 }
-

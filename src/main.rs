@@ -5,7 +5,8 @@ extern crate serde_derive;
 
 mod dispatcher;
 mod handlers;
-mod proto_utils;
+mod inbound_proto_utils;
+mod outbound_proto_utils;
 mod protos;
 mod redis_client;
 mod redis_subscriber;

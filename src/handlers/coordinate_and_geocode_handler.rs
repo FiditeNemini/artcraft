@@ -8,7 +8,7 @@ use prost::Message;
 use regex::Regex;
 use std::sync::{RwLock, Arc, Mutex};
 use crate::text_chat_parsers::first_pass_command_parser::FirstPassParsedCommand;
-use crate::proto_utils::{InboundEvent, InboundEventSource};
+use crate::inbound_proto_utils::{InboundEvent, InboundEventSource};
 use crate::AnyhowResult;
 
 // TODO: maybe separate text command handling and data source concerns
@@ -24,25 +24,35 @@ impl CoordinateAndGeocodeHandler {
     }
   }
 
-  /*fn handle_lat_long(&self, lat_long: LatLong, twitch_message: protos::TwitchMessage) {
+  fn handle_lat_long(&self,
+                     lat_long: LatLong,
+                     event: &InboundEvent,
+                     event_source: &InboundEventSource)
+    -> AnyhowResult<()> {
+
     let mut cesium_proto = protos::CesiumWarpRequest::default();
 
     // Cesium
     cesium_proto.latitude = lat_long.latitude;
     cesium_proto.longitude = lat_long.longitude;
 
-    // Twitch
-    cesium_proto.twitch_channel = twitch_message.channel.clone().unwrap_or("".to_string());
-    cesium_proto.twitch_username = twitch_message.username.clone().unwrap_or("".to_string());
-    cesium_proto.twitch_user_id = twitch_message.user_id.clone().unwrap_or(0);
-    cesium_proto.twitch_user_is_mod = twitch_message.is_mod.unwrap_or(false);
-    cesium_proto.twitch_user_is_subscribed = twitch_message.is_subscribed.unwrap_or(false);
+    match event_source {
+      InboundEventSource::Twitch(ref twitch_source) => {
+        // Twitch
+        cesium_proto.twitch_channel = twitch_source.username().to_string();
+        //cesium_proto.twitch_username = twitch_message.username.clone().unwrap_or("".to_string());
+        //cesium_proto.twitch_user_id = twitch_message.user_id.clone().unwrap_or(0);
+        //cesium_proto.twitch_user_is_mod = twitch_message.is_mod.unwrap_or(false);
+        //cesium_proto.twitch_user_is_subscribed = twitch_message.is_subscribed.unwrap_or(false);
+      }
+    }
+
+    // TODO: Populate source data
 
     info!("Proto: {:?}", cesium_proto);
 
     let mut unreal_proto = protos::UnrealEventPayloadV1::default();
     unreal_proto.payload_type = protos::unreal_event_payload_v1::PayloadType::CesiumWarp as i32;
-
     unreal_proto.debug_message = "Hello from Rust!".to_string();
 
     let mut buffer : Vec<u8> = Vec::with_capacity(cesium_proto.encoded_len());
@@ -53,7 +63,7 @@ impl CoordinateAndGeocodeHandler {
     match encode_result {
       Err(e) => {
         warn!("Inner proto encode result: {:?}", e);
-        return;
+        return Ok(());
       }
       Ok(_) => {
         unreal_proto.payload_data = buffer;
@@ -68,7 +78,7 @@ impl CoordinateAndGeocodeHandler {
     match encode_result {
       Err(e) => {
         warn!("Outer proto encode result: {:?}", e);
-        return;
+        return Ok(());
       }
       Ok(_) => {}
     }
@@ -85,7 +95,9 @@ impl CoordinateAndGeocodeHandler {
       },
       Err(_) => {},
     }
-  }*/
+
+    Ok(())
+  }
 }
 
 impl TextCommandHandler for CoordinateAndGeocodeHandler {
