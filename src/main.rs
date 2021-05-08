@@ -8,6 +8,11 @@
 #[macro_use]
 extern crate serde_derive;
 
+mod protos;
+mod redis_client;
+mod secrets;
+mod twitch_client;
+
 // NOTE: this demo requires `--features="tokio/full tokio-util"`.
 use twitchchat::{
   commands, connector, messages,
@@ -17,20 +22,14 @@ use twitchchat::{
 
 use anyhow::anyhow;
 use anyhow::{Context, Error};
+use crate::redis_client::RedisClient;
+use crate::secrets::Secrets;
+use crate::twitch_client::TwitchClient;
 use log::{info, warn};
 use redis::aio::Connection;
 use redis::{AsyncCommands, RedisResult};
 use std::thread;
 use std::time::Duration;
-
-mod protos;
-mod redis_client;
-mod secrets;
-mod twitch_client;
-
-use crate::twitch_client::TwitchClient;
-use crate::secrets::Secrets;
-use crate::redis_client::RedisClient;
 
 pub type AnyhowResult<T> = anyhow::Result<T>;
 
@@ -67,17 +66,9 @@ async fn main() -> anyhow::Result<()> {
   );
 
   loop {
-    match twitch_client.main_loop().await {
-      Ok(_) => {
-        warn!("Twitch early exit? Restarting...");
-        thread::sleep(Duration::from_secs(5));
-      },
-      Err(e) => {
-        warn!("There was an error with Twitch: {:?}", e);
-        thread::sleep(Duration::from_secs(5));
-        warn!("Restarting Twitch client...");
-      }
-    }
+    twitch_client.main_loop().await; // NB: Doesn't return.
+    thread::sleep(Duration::from_secs(5));
+    warn!("Restarting Twitch client...");
   }
 
   Ok(())
