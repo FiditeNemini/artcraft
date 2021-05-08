@@ -1,7 +1,12 @@
 extern crate anyhow; // TODO: No!
 extern crate prost_build;
 
+use std::env;
+
 fn main() -> anyhow::Result<()> {
+  // NB: Control prost output dir with env var
+  env::set_var("OUT_DIR", "src/proto_codegen");
+
   prost_build::compile_protos(
     &[
       // TODO: This needs to respect glob
