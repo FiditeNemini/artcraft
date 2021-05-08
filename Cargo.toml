@@ -22,7 +22,7 @@ serde_derive = "1.0.123"
 tokio = { version = "0.2", features = ["full"] }
 toml = "0.5.8"
 
-redis = { version = "0.17.0", features = ["tls", "async-std-tls-comp", "tokio-tls-comp"] }
+redis = { version = "0.17.0", features = ["tls", "async-std-tls-comp", "tokio-tls-comp", "connection-manager"] }
 
 # Twitch Helix etc. API, but no PubSub just yet
 #twitch_api2 = "0.4.1"

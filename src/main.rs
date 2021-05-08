@@ -1,3 +1,10 @@
+#![allow(dead_code)]
+#![allow(unused_mut)]
+#![allow(unused_imports)]
+#![warn(unused_must_use)]
+//#![allow(warnings)]
+
+
 #[macro_use]
 extern crate serde_derive;
 
