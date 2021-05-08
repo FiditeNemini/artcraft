@@ -1,16 +1,16 @@
 use anyhow::anyhow;
-use log::{info, warn};
+use crate::AnyhowResult;
+use crate::clients::redis_client::RedisClient;
+use crate::message_adapters::privmsg::privmsg_to_proto;
+use crate::protos::{protos, binary_encode_proto};
+use crate::secrets::TwitchSecrets;
+use log::{info, warn, debug};
 use prost::Message;
 use std::thread;
 use std::time::Duration;
 use twitchchat::messages::Commands::*;
 use twitchchat::messages::Privmsg;
 use twitchchat::{AsyncRunner, Status};
-
-use crate::AnyhowResult;
-use crate::redis_client::RedisClient;
-use crate::secrets::TwitchSecrets;
-use crate::protos::protos;
 
 pub struct TwitchClient {
   secrets: TwitchSecrets,
@@ -152,9 +152,9 @@ impl TwitchClient {
   /// The "privmsg" type is for normal in-channel messages.
   async fn handle_privmsg<'a>(&mut self, message: &Privmsg<'a>) -> AnyhowResult<()> {
     info!("[{}] {}: {}", message.channel(), message.name(), message.data());
-    info!("Full Message: {:?}", message);
+    debug!("Full Message: {:?}", message);
 
-    let message_proto = message_to_proto(&message)?;
+    let message_proto = privmsg_to_proto(&message)?;
     let message_proto_binary = binary_encode_proto(message_proto)?;
 
     let _ = self.redis_client.publish_bytes(
@@ -162,73 +162,4 @@ impl TwitchClient {
 
     Ok(())
   }
-}
-
-fn message_to_proto<'a>(message: &Privmsg<'a>) -> AnyhowResult<protos::PubsubEventPayloadV1> {
-  let mut payload_proto = protos::PubsubEventPayloadV1::default();
-
-  payload_proto.ingestion_source_type =
-    Some(protos::pubsub_event_payload_v1::IngestionSourceType::IstTwitch as i32);
-
-  let binary_twitch_metadata = {
-    let mut twitch_metadata = protos::IngestionTwitchMetadata::default();
-    twitch_metadata.username = Some(message.name().trim().to_string());
-    twitch_metadata.user_id = message.user_id().map(|unsigned| unsigned as i64);
-    twitch_metadata.user_is_mod = Some(message.is_moderator());
-    twitch_metadata.user_is_subscribed = Some(message.is_subscriber());
-    twitch_metadata.channel = Some(message.channel().trim().to_string());
-
-    info!("Twitch Metadata Proto: {:?}", twitch_metadata);
-
-    binary_encode_proto(twitch_metadata)
-  }?;
-
-  payload_proto.ingestion_source_data = Some(binary_twitch_metadata);
-
-  payload_proto.ingestion_payload_type =
-    Some(protos::pubsub_event_payload_v1::IngestionPayloadType::TwitchMessage as i32);
-
-  let binary_twitch_message = {
-    let mut twitch_message = protos::IngestionTwitchMessage::default();
-    twitch_message.message_contents = Some(message.data().trim().to_string());
-
-    // TODO: DEPRECATED
-    twitch_message.username = Some(message.name().trim().to_string());
-    twitch_message.user_id = message.user_id().map(|unsigned| unsigned as i64);
-    twitch_message.is_mod = Some(message.is_moderator());
-    twitch_message.is_subscribed = Some(message.is_subscriber());
-    twitch_message.channel = Some(message.channel().trim().to_string());
-
-    info!("Twitch Message Proto: {:?}", twitch_message);
-
-    binary_encode_proto(twitch_message)
-  }?;
-
-  payload_proto.ingestion_payload_data = Some(binary_twitch_message);
-
-  Ok(payload_proto)
-}
-
-// Binary encode a proto.
-fn binary_encode_proto(proto: impl prost::Message) -> AnyhowResult<Vec<u8>> {
-  let mut buffer : Vec<u8> = Vec::with_capacity(proto.encoded_len());
-  let encode_result = proto.encode(&mut buffer);
-
-  match encode_result {
-    Err(e) => {
-      Err(anyhow!("Inner proto encode result: {:?}", e))
-    }
-    Ok(_) => {
-      Ok(buffer)
-    }
-  }
-}
-
-// Oh my god I'm lazy
-// https://stackoverflow.com/a/41517340
-fn split_once(in_string: &str) -> AnyhowResult<(&str, &str)> {
-  let mut splitter = in_string.trim().splitn(2, ' ');
-  let first = splitter.next().ok_or(anyhow!("no match"))?;
-  let second = splitter.next().ok_or(anyhow!("no match"))?;
-  Ok((first, second))
 }

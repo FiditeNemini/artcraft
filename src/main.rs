@@ -8,10 +8,10 @@
 #[macro_use]
 extern crate serde_derive;
 
+mod clients;
+mod message_adapters;
 mod protos;
-mod redis_client;
 mod secrets;
-mod twitch_client;
 
 // NOTE: this demo requires `--features="tokio/full tokio-util"`.
 use twitchchat::{
@@ -22,9 +22,9 @@ use twitchchat::{
 
 use anyhow::anyhow;
 use anyhow::{Context, Error};
-use crate::redis_client::RedisClient;
+use crate::clients::redis_client::RedisClient;
+use crate::clients::twitch_client::TwitchClient;
 use crate::secrets::Secrets;
-use crate::twitch_client::TwitchClient;
 use log::{info, warn};
 use redis::aio::Connection;
 use redis::{AsyncCommands, RedisResult};
