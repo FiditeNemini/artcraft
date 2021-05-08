@@ -3,13 +3,12 @@ extern crate lazy_static;
 #[macro_use]
 extern crate serde_derive;
 
+mod clients;
 mod dispatcher;
 mod handlers;
 mod inbound_proto_utils;
 mod outbound_proto_utils;
 mod protos;
-mod redis_client;
-mod redis_subscriber;
 mod secrets;
 mod text_chat_parsers;
 
@@ -21,11 +20,11 @@ use redis::{AsyncCommands, RedisResult};
 use std::thread;
 use std::time::Duration;
 
-use crate::secrets::Secrets;
-use crate::redis_client::RedisClient;
-use crate::redis_subscriber::RedisSubscribeClient;
+use crate::clients::redis_client::RedisClient;
+use crate::clients::redis_subscriber::RedisSubscribeClient;
 use crate::dispatcher::Dispatcher;
 use crate::handlers::coordinate_and_geocode_handler::CoordinateAndGeocodeHandler;
+use crate::secrets::Secrets;
 use std::sync::{Arc, Mutex};
 
 pub type AnyhowResult<T> = anyhow::Result<T>;

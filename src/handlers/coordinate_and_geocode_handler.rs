@@ -1,15 +1,15 @@
+use crate::AnyhowResult;
+use crate::clients::redis_client::RedisClient;
 use crate::dispatcher::TextCommandHandler;
+use crate::inbound_proto_utils::{InboundEvent, InboundEventSource};
 use crate::protos::protos;
-use crate::redis_client::RedisClient;
+use crate::text_chat_parsers::first_pass_command_parser::FirstPassParsedCommand;
 use futures::executor::block_on;
 use lazy_static::lazy_static;
 use log::{info, warn};
 use prost::Message;
 use regex::Regex;
 use std::sync::{RwLock, Arc, Mutex};
-use crate::text_chat_parsers::first_pass_command_parser::FirstPassParsedCommand;
-use crate::inbound_proto_utils::{InboundEvent, InboundEventSource};
-use crate::AnyhowResult;
 
 // TODO: maybe separate text command handling and data source concerns
 //  like this? Though maybe it's too early to optimize this.
