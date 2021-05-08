@@ -1,11 +1,10 @@
+use anyhow::anyhow;
 use crate::AnyhowResult;
 use crate::protos::protos;
 use crate::secrets::RedisSecrets;
-
-use anyhow::anyhow;
-use log::{info, warn};
+use log::{info, warn, debug};
 use prost::Message;
-use redis::aio::{Connection, PubSub};
+use redis::aio::{Connection, PubSub, ConnectionManager};
 use redis::{AsyncCommands, Msg, PubSubCommands};
 use redis;
 use std::thread;
@@ -17,93 +16,53 @@ pub struct RedisClient {
 
   /// This manages our connection.
   /// It's meant to be absent when not connected.
-  /// TODO: Probably need to reset this when we disconnect.
-  connection: Option<Connection>,
+  connection_manager: Option<ConnectionManager>,
 
-  connection_failure_count: u32,
+  /// Attempts to retry a Redis command.
+  max_retry_count: u32,
 }
 
 impl RedisClient {
-  pub fn new(secrets: &RedisSecrets) -> Self {
+  pub fn new(secrets: &RedisSecrets, retry_count: u32) -> Self {
     Self {
       secrets: secrets.clone(),
-      connection: None,
-      connection_failure_count: 0,
+      connection_manager: None,
+      max_retry_count: retry_count,
     }
   }
 
   pub async fn connect(&mut self) -> AnyhowResult<()> {
     let client = redis::Client::open(self.secrets.connection_url())?;
-    let mut connection = client.get_async_connection().await?;
 
-    self.connection = Some(connection);
-    self.connection_failure_count = 0;
+    let connection_manager = client.get_tokio_connection_manager().await?;
+    self.connection_manager = Some(connection_manager);
 
     Ok(())
-  }
-
-  pub async fn failure_notify_maybe_reconnect(&mut self) -> AnyhowResult<()> {
-    self.connection_failure_count += 1;
-
-    if self.connection_failure_count > 5 {
-      println!("Attempting Redis Reconnect in 3 sec...");
-      thread::sleep(Duration::from_secs(3));
-      self.connect().await?;
-      self.connection_failure_count = 0;
-    } else {
-      println!("Not ready to reconnect. Fail Count = {}", self.connection_failure_count);
-    }
-    Ok(())
-  }
-
-  pub async fn publish(&mut self, channel: &str, message: &str) -> AnyhowResult<u32> {
-    let connection = match &mut self.connection {
-      None => {
-        return Err(anyhow!("Not connected"));
-      },
-      Some(connection) => connection,
-    };
-
-    // TODO: Smart reconnect
-    /*let result = connection.publish(channel, message).await?;
-    let result = match result {
-      Ok(r) => r,
-      Err(err) => {
-        match err.kind() {
-          IoError |  TryAgain | ClusterDown | MasterDown => {},
-          _ => return Err(anyhow!("Redis error: {:?}", err)),
-        }
-      }
-    };*/
-
-    let result = connection.publish(channel, message).await?;
-    Ok(result)
   }
 
   pub async fn publish_bytes(&mut self, channel: &str, message: &[u8]) -> AnyhowResult<u32> {
-    let connection = match &mut self.connection {
+    for i in 0 .. self.max_retry_count {
+      match self.try_publish_bytes(channel, message).await {
+        Ok(r) => return Ok(r),
+        Err(_) => {
+          debug!("Redis publish_bytes failed; retrying (attempt {})", i);
+          continue;
+        },
+      }
+    }
+    Err(anyhow!("Retry count elapsed."))
+  }
+
+  async fn try_publish_bytes(&mut self, channel: &str, message: &[u8]) -> AnyhowResult<u32> {
+    let connection_manager = match &mut self.connection_manager {
       None => {
-        warn!("Not connected to redis!");
+        self.connect().await?;
         return Err(anyhow!("Not connected"));
       },
-      Some(connection) => connection,
+      Some(cm) => cm,
     };
 
-    // TODO: Smart reconnect
-    /*let result = connection.publish(channel, message).await?;
-    let result = match result {
-      Ok(r) => r,
-      Err(err) => {
-        match err.kind() {
-          IoError |  TryAgain | ClusterDown | MasterDown => {},
-          _ => return Err(anyhow!("Redis error: {:?}", err)),
-        }
-      }
-    };*/
-
-    info!("Publishing to redis pubsub channel: {}", channel);
-    let result = connection.publish(channel, message).await?;
+    let result = connection_manager.publish(channel, message).await?;
     Ok(result)
   }
 }
-

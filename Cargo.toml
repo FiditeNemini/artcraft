@@ -27,7 +27,7 @@ toml = "0.5.8"
 
 google_maps = "1.0.3"
 
-redis = { version = "0.17.0", features = ["tls", "async-std-tls-comp", "tokio-tls-comp"] }
+redis = { version = "0.17.0", features = ["tls", "async-std-tls-comp", "tokio-tls-comp", "connection-manager"] }
 
 [build-dependencies]
 anyhow = "1.0.38"

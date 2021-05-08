@@ -35,6 +35,9 @@ const ENV_SUBSCRIBE_TOPIC_DEFAULT : &'static str = "firehose";
 const ENV_PUBLISH_TOPIC : &'static str = "PUBLISH_TOPIC";
 const ENV_PUBLISH_TOPIC_DEFAULT : &'static str = "unreal";
 
+const ENV_REDIS_MAX_RETRY_COUNT : &'static str = "REDIS_MAX_RETRY_COUNT";
+const ENV_REDIS_MAX_RETRY_COUNT_DEFAULT : u32 = 3;
+
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
   easyenv::init_env_logger(None);
@@ -42,11 +45,18 @@ async fn main() -> anyhow::Result<()> {
   let redis_subscribe_topic = easyenv::get_env_string_or_default(
     ENV_SUBSCRIBE_TOPIC, ENV_SUBSCRIBE_TOPIC_DEFAULT);
 
+  let redis_max_retry_count = easyenv::get_env_num(
+    ENV_REDIS_MAX_RETRY_COUNT,
+    ENV_REDIS_MAX_RETRY_COUNT_DEFAULT)?;
+
   let secrets = Secrets::from_file("secrets.toml")?;
 
   let mut dispatcher = Dispatcher::new();
 
-  let mut redis_client = RedisClient::new(&secrets.redis);
+  let mut redis_client = RedisClient::new(
+    &secrets.redis,
+    redis_max_retry_count
+  );
   redis_client.connect().await?;
 
   let redis_client = Arc::new(Mutex::new(redis_client));
