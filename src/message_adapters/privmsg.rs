@@ -19,7 +19,7 @@ pub fn privmsg_to_proto<'a>(message: &Privmsg<'a>) -> AnyhowResult<protos::Pubsu
     twitch_metadata.user_is_subscribed = Some(message.is_subscriber());
     twitch_metadata.channel = Some(message.channel().trim().to_string());
 
-    info!("Twitch Metadata Proto: {:?}", twitch_metadata);
+    debug!("Twitch Metadata Proto: {:?}", twitch_metadata);
 
     binary_encode_proto(twitch_metadata)
   }?;
@@ -40,7 +40,7 @@ pub fn privmsg_to_proto<'a>(message: &Privmsg<'a>) -> AnyhowResult<protos::Pubsu
     twitch_message.is_subscribed = Some(message.is_subscriber());
     twitch_message.channel = Some(message.channel().trim().to_string());
 
-    info!("Twitch Message Proto: {:?}", twitch_message);
+    debug!("Twitch Message Proto: {:?}", twitch_message);
 
     binary_encode_proto(twitch_message)
   }?;

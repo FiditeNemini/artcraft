@@ -9,6 +9,7 @@ use prost::Message;
 use std::thread;
 use std::time::Duration;
 use twitchchat::messages::Commands::*;
+use twitchchat::messages::Join;
 use twitchchat::messages::Privmsg;
 use twitchchat::{AsyncRunner, Status};
 
@@ -121,26 +122,37 @@ impl TwitchClient {
       // This is the one users send to channels
       Privmsg(msg) => self.handle_privmsg(&msg).await?,
 
+      // This is when a user joins the channel
+      // NB: These messages are delayed about 15-30 seconds.
+      // Doesn't appear to work...?
+      Join(msg) => info!("Join: {:?}", msg),
+
+      // This should happen on subscription, etc.
+      // Doesn't appear to work...?
+      UserNotice(msg) => info!("UserNotice: {:?}", msg),
+
+      // This should happen when a user joins, etc.
+      // Doesn't appear to work...?
+      // https://dev.twitch.tv/docs/irc/tags#userstate-twitch-tags
+      UserState(msg) => info!("UserState: {:?}", msg),
+
       // and a bunch of other messages you may be interested in
-      ClearChat(_) => {}
-      ClearMsg(_) => {}
-      GlobalUserState(_) => {}
-      HostTarget(_) => {}
-      Join(_) => {}
-      Notice(_) => {}
-      Part(_) => {}
+      ClearChat(msg) => debug!("ClearChat: {:?}", msg),
+      ClearMsg(msg) => debug!("ClearMsg: {:?}", msg),
+      GlobalUserState(msg) => debug!("GlobalUserState: {:?}", msg),
+      HostTarget(msg) => debug!("HostTarget: {:?}", msg),
+      Notice(msg) => debug!("Notice: {:?}", msg),
+      Part(msg) => debug!("Part: {:?}", msg),
       Ping(_) => {}
       Pong(_) => {}
       Reconnect(_) => {}
-      RoomState(_) => {}
-      UserNotice(_) => {}
-      UserState(_) => {}
-      Whisper(_) => {}
+      RoomState(msg) => debug!("RoomState: {:?}", msg),
+      Whisper(msg) => debug!("Whisper: {:?}", msg),
 
       // This one is special, if twitch adds any new message
       // types, this will catch it until future releases of
       // this crate add them.
-      Raw(_) => {}
+      Raw(msg) => debug!("Raw: {:?}", msg),
 
       _ => {}
     }
