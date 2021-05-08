@@ -1,12 +1,12 @@
+use anyhow::anyhow;
 use crate::AnyhowResult;
 use crate::secrets::RedisSecrets;
-
-use anyhow::anyhow;
-use std::thread;
-use std::time::Duration;
+use log::{debug, info};
 use redis::AsyncCommands;
 use redis::aio::{Connection, ConnectionManager};
 use redis;
+use std::thread;
+use std::time::Duration;
 
 pub struct RedisClient {
   secrets: RedisSecrets,
@@ -15,15 +15,16 @@ pub struct RedisClient {
   /// It's meant to be absent when not connected.
   connection_manager: Option<ConnectionManager>,
 
-  connection_failure_count: u32,
+  /// Attempts to retry a Redis command.
+  max_retry_count: u32,
 }
 
 impl RedisClient {
-  pub fn new(secrets: &RedisSecrets) -> Self {
+  pub fn new(secrets: &RedisSecrets, retry_count: u32) -> Self {
     Self {
       secrets: secrets.clone(),
       connection_manager: None,
-      connection_failure_count: 0,
+      max_retry_count: retry_count,
     }
   }
 
@@ -33,68 +34,30 @@ impl RedisClient {
     let connection_manager = client.get_tokio_connection_manager().await?;
     self.connection_manager = Some(connection_manager);
 
-    self.connection_failure_count = 0;
-
     Ok(())
-  }
-
-  pub async fn failure_notify_maybe_reconnect(&mut self) -> AnyhowResult<()> {
-    self.connection_failure_count += 1;
-
-    if self.connection_failure_count > 5 {
-      println!("Attempting Redis Reconnect in 3 sec...");
-      thread::sleep(Duration::from_secs(3));
-      self.connect().await?;
-      self.connection_failure_count = 0;
-    } else {
-      println!("Not ready to reconnect. Fail Count = {}", self.connection_failure_count);
-    }
-    Ok(())
-  }
-
-  pub async fn publish(&mut self, channel: &str, message: &str) -> AnyhowResult<u32> {
-    let connection_manager = match &mut self.connection_manager {
-      None => {
-        return Err(anyhow!("Not connected"));
-      },
-      Some(cm) => cm,
-    };
-
-    // // TODO: Smart reconnect
-    // /*let result = connection.publish(channel, message).await?;
-    // let result = match result {
-    //   Ok(r) => r,
-    //   Err(err) => {
-    //     match err.kind() {
-    //       IoError |  TryAgain | ClusterDown | MasterDown => {},
-    //       _ => return Err(anyhow!("Redis error: {:?}", err)),
-    //     }
-    //   }
-    // };*/
-
-    let result = connection_manager.publish(channel, message).await?;
-    Ok(result)
   }
 
   pub async fn publish_bytes(&mut self, channel: &str, message: &[u8]) -> AnyhowResult<u32> {
+    for i in 0 .. self.max_retry_count {
+      match self.try_publish_bytes(channel, message).await {
+        Ok(r) => return Ok(r),
+        Err(_) => {
+          debug!("Redis publish_bytes failed; retrying (attempt {})", i);
+          continue;
+        },
+      }
+    }
+    Err(anyhow!("Retry count elapsed."))
+  }
+
+  async fn try_publish_bytes(&mut self, channel: &str, message: &[u8]) -> AnyhowResult<u32> {
     let connection_manager = match &mut self.connection_manager {
       None => {
+        self.connect().await?;
         return Err(anyhow!("Not connected"));
       },
       Some(cm) => cm,
     };
-
-    // TODO: Smart reconnect
-    /*let result = connection.publish(channel, message).await?;
-    let result = match result {
-      Ok(r) => r,
-      Err(err) => {
-        match err.kind() {
-          IoError |  TryAgain | ClusterDown | MasterDown => {},
-          _ => return Err(anyhow!("Redis error: {:?}", err)),
-        }
-      }
-    };*/
 
     let result = connection_manager.publish(channel, message).await?;
     Ok(result)

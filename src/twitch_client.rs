@@ -147,16 +147,8 @@ impl TwitchClient {
       }
     };
 
-    let redis_result = self.redis_client.publish_bytes(
+    let _redis_result = self.redis_client.publish_bytes(
       &self.redis_publish_topic, &message_proto_binary).await;
-
-    match redis_result {
-      Ok(_) => {},
-      Err(e) => {
-        warn!("Redis error: {:?}", e);
-        self.redis_client.failure_notify_maybe_reconnect().await;
-      }
-    }
   }
 }
 
