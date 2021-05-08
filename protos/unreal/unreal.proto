@@ -147,7 +147,7 @@ message LevelWarpRequest {
 // Spawn a creature
 message SpawnCreatureRequest {
   // Required. Name of the creature.
-  int64 name_slug = 1;
+  string name_slug = 1;
 }
 
 
@@ -156,7 +156,7 @@ message VocodesTtsRequest {
   // Required. Speaker to use.
   string voice_slug = 1;
   // Required. Text to speak.
-  double text = 2;
+  string text = 2;
 }
 
 
