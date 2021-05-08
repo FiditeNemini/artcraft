@@ -146,8 +146,8 @@ pub struct LevelWarpRequest {
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct SpawnCreatureRequest {
     /// Required. Name of the creature.
-    #[prost(int64, tag="1")]
-    pub name_slug: i64,
+    #[prost(string, tag="1")]
+    pub name_slug: ::prost::alloc::string::String,
 }
 /// Do text to speech
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -156,8 +156,8 @@ pub struct VocodesTtsRequest {
     #[prost(string, tag="1")]
     pub voice_slug: ::prost::alloc::string::String,
     /// Required. Text to speak.
-    #[prost(double, tag="2")]
-    pub text: f64,
+    #[prost(string, tag="2")]
+    pub text: ::prost::alloc::string::String,
 }
 // ============================== TWITTER EVENT PROTOS ============================== //
 

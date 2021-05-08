@@ -1,3 +1,9 @@
+#![allow(dead_code)]
+#![allow(unused_mut)]
+#![allow(unused_imports)]
+#![warn(unused_must_use)]
+//#![allow(warnings)]
+
 #[macro_use]
 extern crate lazy_static;
 #[macro_use]
@@ -26,6 +32,7 @@ use crate::dispatcher::Dispatcher;
 use crate::handlers::coordinate_and_geocode_handler::CoordinateAndGeocodeHandler;
 use crate::secrets::Secrets;
 use std::sync::{Arc, Mutex};
+use crate::handlers::spawn_handler::SpawnHandler;
 
 pub type AnyhowResult<T> = anyhow::Result<T>;
 
@@ -61,9 +68,12 @@ async fn main() -> anyhow::Result<()> {
 
   let redis_client = Arc::new(Mutex::new(redis_client));
 
-  let coord_geo_handler = CoordinateAndGeocodeHandler::new(redis_client);
-
-  dispatcher.add_text_command_handler("goto", Box::new(coord_geo_handler));
+  dispatcher.add_text_command_handler(
+    "goto",
+    Box::new(CoordinateAndGeocodeHandler::new(redis_client.clone())));
+  dispatcher.add_text_command_handler(
+    "spawn",
+    Box::new(SpawnHandler::new(redis_client.clone())));
 
   let mut redis_pubsub_client = RedisSubscribeClient::new(
     &secrets.redis,
