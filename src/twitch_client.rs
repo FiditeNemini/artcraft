@@ -48,13 +48,10 @@ impl TwitchClient {
     info!("Connected. Our Twitch identity: {:#?}", runner.identity);
 
     for channel in self.channels_to_join.iter() {
-      // the runner itself has 'blocking' join/part to ensure you join/leave a channel.
-      // these two methods return whether the connection was closed early.
-      // we'll ignore it for this demo
-      info!("attempting to join '{}'", channel);
-
+      info!("Attempting to join channel '{}'", channel);
       let _ = runner.join(&channel).await?;
-      info!("joined '{}'!", channel);
+
+      info!("Joined channel '{}'!", channel);
     }
 
     self.runner = Some(runner);
@@ -66,9 +63,10 @@ impl TwitchClient {
     loop {
       let runner = match &mut self.runner {
         None => {
-          thread::sleep(Duration::from_secs(5));
           info!("Connecting to Twitch...");
           self.connect().await?;
+
+          thread::sleep(Duration::from_secs(5));
           continue;
         },
         Some(runner) => runner,
