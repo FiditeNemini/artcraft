@@ -1,11 +1,5 @@
-use crate::AnyhowResult;
 use anyhow::anyhow;
-
-// Include the protos
-pub mod protos {
-  include!("proto_codegen/storyteller.pubsub.rs");
-  include!("proto_codegen/storyteller.unreal.rs");
-}
+use crate::AnyhowResult;
 
 // Binary encode a proto.
 pub fn binary_encode_proto(proto: impl prost::Message) -> AnyhowResult<Vec<u8>> {

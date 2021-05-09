@@ -1,15 +1,17 @@
 use crate::AnyhowResult;
 use crate::clients::redis_client::RedisClient;
 use crate::dispatcher::TextCommandHandler;
-use crate::inbound_proto_utils::{InboundEvent, InboundEventSource};
-use crate::protos::protos;
 use crate::text_chat_parsers::first_pass_command_parser::FirstPassParsedCommand;
 use futures::executor::block_on;
 use lazy_static::lazy_static;
-use log::{info, warn};
+use log::{info, warn, debug};
 use prost::Message;
 use regex::Regex;
 use std::sync::{RwLock, Arc, Mutex};
+use crate::protos::inbound_proto_utils::{InboundEvent, InboundEventSource};
+use crate::protos::populate_source::populate_source;
+use crate::protos::protos;
+use crate::protos::binary_encode_proto::binary_encode_proto;
 
 // TODO: maybe separate text command handling and data source concerns
 //  like this? Though maybe it's too early to optimize this.
@@ -27,71 +29,31 @@ impl CoordinateAndGeocodeHandler {
   fn handle_lat_long(&self,
                      lat_long: LatLong,
                      event: &InboundEvent,
-                     event_source: &InboundEventSource)
-    -> AnyhowResult<()> {
-
-    let mut cesium_proto = protos::CesiumWarpRequest::default();
+                     event_source: &InboundEventSource) -> AnyhowResult<()>
+  {
+    let mut unreal_proto = protos::UnrealEventPayloadV1::default();
 
     // Cesium
+    let mut cesium_proto = protos::CesiumWarpRequest::default();
     cesium_proto.latitude = lat_long.latitude;
     cesium_proto.longitude = lat_long.longitude;
 
-    match event_source {
-      InboundEventSource::Twitch(ref twitch_source) => {
-        // Twitch
-        cesium_proto.twitch_channel = twitch_source.username().to_string();
-        //cesium_proto.twitch_username = twitch_message.username.clone().unwrap_or("".to_string());
-        //cesium_proto.twitch_user_id = twitch_message.user_id.clone().unwrap_or(0);
-        //cesium_proto.twitch_user_is_mod = twitch_message.is_mod.unwrap_or(false);
-        //cesium_proto.twitch_user_is_subscribed = twitch_message.is_subscribed.unwrap_or(false);
-      }
-    }
+    debug!("Payload Proto: {:?}", cesium_proto);
 
-    // TODO: Populate source data
-
-    info!("Proto: {:?}", cesium_proto);
-
-    let mut unreal_proto = protos::UnrealEventPayloadV1::default();
     unreal_proto.payload_type = protos::unreal_event_payload_v1::PayloadType::CesiumWarp as i32;
+    unreal_proto.payload_data = binary_encode_proto(cesium_proto)?;
     unreal_proto.debug_message = "Hello from Rust!".to_string();
 
-    let mut buffer : Vec<u8> = Vec::with_capacity(cesium_proto.encoded_len());
-    let encode_result = cesium_proto.encode(&mut buffer);
+    populate_source(&mut unreal_proto, event_source)?;
 
-    info!("Encoding outer proto");
+    let final_binary = binary_encode_proto(unreal_proto)?;
 
-    match encode_result {
-      Err(e) => {
-        warn!("Inner proto encode result: {:?}", e);
-        return Ok(());
-      }
-      Ok(_) => {
-        unreal_proto.payload_data = buffer;
-      }
-    }
-
-    info!("Encoding inner proto");
-
-    let mut buffer : Vec<u8> = Vec::with_capacity(unreal_proto.encoded_len());
-    let encode_result = unreal_proto.encode(&mut buffer);
-
-    match encode_result {
-      Err(e) => {
-        warn!("Outer proto encode result: {:?}", e);
-        return Ok(());
-      }
-      Ok(_) => {}
-    }
-
-    info!("Sending to Redis (1)");
     match self.redis_client.lock() {
       Ok(mut redis_client) => {
-        //let future = redis_client.publish("goto", "");
-        info!("Sending to Redis (2)");
-        let future = redis_client.publish_bytes("unreal", &buffer);
-        info!("Sending to Redis (3)");
+        debug!("Publishing to Redis...");
+        let future = redis_client.publish_bytes("unreal", &final_binary);
         block_on(future);
-        info!("Sending to Redis (4)");
+        info!("Published to redis.");
       },
       Err(_) => {},
     }

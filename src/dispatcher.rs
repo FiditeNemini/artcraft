@@ -5,10 +5,10 @@ use log::{info, warn, debug};
 use regex::Regex;
 use std::collections::HashMap;
 
-use crate::inbound_proto_utils::{InboundEventSource, InboundEvent};
 use crate::AnyhowResult;
 use crate::handlers::coordinate_and_geocode_handler::CoordinateAndGeocodeHandler;
 use crate::text_chat_parsers::first_pass_command_parser::FirstPassParsedCommand;
+use crate::protos::inbound_proto_utils::{InboundEvent, InboundEventSource};
 
 pub trait TextCommandHandler {
   fn handle_text_command(&self,

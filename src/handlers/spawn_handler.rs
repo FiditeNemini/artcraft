@@ -1,8 +1,9 @@
 use crate::AnyhowResult;
 use crate::clients::redis_client::RedisClient;
 use crate::dispatcher::TextCommandHandler;
-use crate::inbound_proto_utils::{InboundEvent, InboundEventSource};
-use crate::protos::{protos, binary_encode_proto};
+use crate::protos::binary_encode_proto::binary_encode_proto;
+use crate::protos::inbound_proto_utils::{InboundEvent, InboundEventSource};
+use crate::protos::protos;
 use crate::text_chat_parsers::first_pass_command_parser::FirstPassParsedCommand;
 use futures::executor::block_on;
 use lazy_static::lazy_static;
@@ -10,6 +11,7 @@ use log::{info, warn, debug};
 use prost::Message;
 use regex::Regex;
 use std::sync::{RwLock, Arc, Mutex};
+use crate::protos::populate_source::populate_source;
 
 // TODO: maybe separate text command handling and data source concerns
 //  like this? Though maybe it's too early to optimize this.
@@ -42,29 +44,14 @@ impl SpawnHandler {
     unreal_proto.payload_data = binary_encode_proto(spawn_proto)?;
     unreal_proto.debug_message = "Hello from Rust!".to_string();
 
-    // Source data
-    match event_source {
-      InboundEventSource::Twitch(ref twitch_source) => {
-        let mut twitch_metadata = protos::TwitchMetadata::default();
-        twitch_metadata.username = twitch_source.username.clone().unwrap_or("".to_string());
-        twitch_metadata.user_id = twitch_source.user_id.clone().unwrap_or(0);
-        twitch_metadata.user_is_mod = twitch_source.user_is_mod.unwrap_or(false);
-        twitch_metadata.user_is_subscribed = twitch_source.user_is_subscribed.unwrap_or(false);
-        twitch_metadata.channel = twitch_source.channel.clone().unwrap_or("".to_string());
+    populate_source(&mut unreal_proto, event_source)?;
 
-        debug!("Source Proto: {:?}", twitch_metadata);
-
-        unreal_proto.source_type = protos::unreal_event_payload_v1::SourceType::StTwitch as i32;
-        unreal_proto.source_data = binary_encode_proto(twitch_metadata)?;
-      }
-    }
-
-    let publish_binary = binary_encode_proto(unreal_proto)?;
+    let final_binary = binary_encode_proto(unreal_proto)?;
 
     match self.redis_client.lock() {
       Ok(mut redis_client) => {
         debug!("Publishing to Redis...");
-        let future = redis_client.publish_bytes("unreal", &publish_binary);
+        let future = redis_client.publish_bytes("unreal", &final_binary);
         block_on(future);
         debug!("Published to redis");
       },

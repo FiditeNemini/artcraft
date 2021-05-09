@@ -12,8 +12,6 @@ extern crate serde_derive;
 mod clients;
 mod dispatcher;
 mod handlers;
-mod inbound_proto_utils;
-mod outbound_proto_utils;
 mod protos;
 mod secrets;
 mod text_chat_parsers;
