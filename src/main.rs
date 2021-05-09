@@ -31,6 +31,7 @@ use crate::handlers::coordinate_and_geocode_handler::CoordinateAndGeocodeHandler
 use crate::secrets::Secrets;
 use std::sync::{Arc, Mutex};
 use crate::handlers::spawn_handler::SpawnHandler;
+use crate::handlers::vocode_handler::TtsHandler;
 
 pub type AnyhowResult<T> = anyhow::Result<T>;
 
@@ -72,6 +73,9 @@ async fn main() -> anyhow::Result<()> {
   dispatcher.add_text_command_handler(
     "spawn",
     Box::new(SpawnHandler::new(redis_client.clone())));
+  dispatcher.add_text_command_handler(
+    "tts",
+    Box::new(TtsHandler::new(redis_client.clone())));
 
   let mut redis_pubsub_client = RedisSubscribeClient::new(
     &secrets.redis,

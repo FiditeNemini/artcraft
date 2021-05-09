@@ -53,7 +53,7 @@ impl CoordinateAndGeocodeHandler {
         debug!("Publishing to Redis...");
         let future = redis_client.publish_bytes("unreal", &final_binary);
         block_on(future);
-        info!("Published to redis.");
+        debug!("Published to redis.");
       },
       Err(_) => {},
     }
