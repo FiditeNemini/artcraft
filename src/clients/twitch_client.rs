@@ -102,9 +102,11 @@ impl TwitchClient {
         },
         Status::Quit => {
           // we signaled a quit
+          warn!("Status: Quit.");
         },
         Status::Eof => {
           // the connection closed normally
+          warn!("Status: EOF.");
         },
       }
     }

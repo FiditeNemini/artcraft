@@ -5,6 +5,7 @@ use std::env;
 
 fn main() -> anyhow::Result<()> {
   // NB: Control prost output dir with env var
+  // Typically these land in `target/`, but I want to source control these.
   env::set_var("OUT_DIR", "src/proto_codegen");
 
   prost_build::compile_protos(

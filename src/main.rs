@@ -4,7 +4,6 @@
 #![warn(unused_must_use)]
 //#![allow(warnings)]
 
-
 #[macro_use]
 extern crate serde_derive;
 
@@ -70,6 +69,4 @@ async fn main() -> anyhow::Result<()> {
     thread::sleep(Duration::from_secs(5));
     warn!("Restarting Twitch client...");
   }
-
-  Ok(())
 }
