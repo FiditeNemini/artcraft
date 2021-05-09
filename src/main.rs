@@ -24,9 +24,12 @@ const ENV_PUBLISH_TOPIC_DEFAULT : &'static str = "firehose";
 const ENV_REDIS_MAX_RETRY_COUNT : &'static str = "REDIS_MAX_RETRY_COUNT";
 const ENV_REDIS_MAX_RETRY_COUNT_DEFAULT : u32 = 3;
 
+/// Monitor Twitter for interesting events against our account.
+/// With this implementation, we can capture: Mentions, Retweets, Replies.
+/// We cannot capture: Follows.
 #[tokio::main]
-async fn main() -> anyhow::Result<()> {
-
+async fn main() -> anyhow::Result<()>
+{
   easyenv::init_env_logger(None);
 
   let redis_publish_topic = easyenv::get_env_string_or_default(
@@ -45,12 +48,10 @@ async fn main() -> anyhow::Result<()> {
 
   redis_client.connect().await?;
 
-  // We can capture: Mentions, Retweets, Replies.
-  // We cannot capture: Follows.
 
-  /*let config = common::Config::load().await;
-  println!("Streaming tweets containing popular programming languages (and also Rust)");
-  println!("Ctrl-C to quit\n");
+  //let config = common::Config::load().await;
+  //println!("Streaming tweets containing popular programming languages (and also Rust)");
+  //println!("Ctrl-C to quit\n");
 
   let stream = egg_mode::stream::filter()
       .follow(&[1297106371238932481]) // vocodes
@@ -66,11 +67,11 @@ async fn main() -> anyhow::Result<()> {
           }
           futures::future::ok(())
       });
+
   if let Err(e) = stream.await {
       println!("Stream error: {}", e);
       println!("Disconnected")
   }
-*/
 
   Ok(())
 }
