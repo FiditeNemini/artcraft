@@ -11,10 +11,11 @@ mod clients;
 mod secrets;
 //mod util;
 
-//use futures::TryStreamExt;
+use futures::TryStreamExt;
 use egg_mode::stream::StreamMessage;
 use crate::secrets::Secrets;
 use crate::clients::redis_client::RedisClient;
+use log::{info, warn, debug};
 
 pub type AnyhowResult<T> = anyhow::Result<T>;
 
@@ -48,29 +49,27 @@ async fn main() -> anyhow::Result<()>
 
   redis_client.connect().await?;
 
+  info!("Verifying Twitter access token...");
+  let twitter_access_token = secrets.twitter.verify_access_token().await?;
 
-  //let config = common::Config::load().await;
-  //println!("Streaming tweets containing popular programming languages (and also Rust)");
-  //println!("Ctrl-C to quit\n");
-
+  info!("Streaming...");
+  
   let stream = egg_mode::stream::filter()
-      .follow(&[1297106371238932481]) // vocodes
-      //.track(&["rustlang", "python", "java", "javascript"])
-      .language(&["en"])
-      .start(&config.token)
-      .try_for_each(|m| {
-          if let StreamMessage::Tweet(tweet) = m {
-              common::print_tweet(&tweet);
-              println!("──────────────────────────────────────");
-          } else {
-              println!("{:?}", m);
-          }
-          futures::future::ok(())
-      });
+    .follow(&[1297106371238932481]) // vocodes
+    .track(&["vocodes"])
+    //.language(&["en"])
+    .start(&twitter_access_token)
+    .try_for_each(|m| {
+      if let StreamMessage::Tweet(tweet) = m {
+        info!("Tweet: {:?}", &tweet);
+      } else {
+        info!("Other: {:?}", &m);
+      }
+      futures::future::ok(())
+    });
 
   if let Err(e) = stream.await {
-      println!("Stream error: {}", e);
-      println!("Disconnected")
+    warn!("Disconnected. Stream error: {:?}", e);
   }
 
   Ok(())

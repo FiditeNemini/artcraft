@@ -1773,6 +1773,7 @@ dependencies = [
  "anyhow",
  "easyenv",
  "egg-mode",
+ "futures",
  "log",
  "prost",
  "prost-build",

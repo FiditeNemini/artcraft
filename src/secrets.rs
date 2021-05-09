@@ -45,7 +45,7 @@ impl RedisSecrets {
 
 impl TwitterSecrets {
   /// This assumes we have a valid pair of access (key, secret).
-  pub async fn get_access_token(&self) -> AnyhowResult<egg_mode::Token> {
+  pub async fn verify_access_token(&self) -> AnyhowResult<egg_mode::Token> {
     let consumer_keypair = self.make_consumer_keypair();
     let access_keypair = self.make_access_keypair()?;
 
@@ -89,8 +89,8 @@ impl TwitterSecrets {
         access: ref access,
         ..
       } => {
-        warn!("access_token_key = {:?}", access.key);
-        warn!("access_token_secret = {:?}", access.secret);
+        warn!("access_key = {:?}", access.key);
+        warn!("access_secret = {:?}", access.secret);
       }
       _ => unreachable!(),
     }
