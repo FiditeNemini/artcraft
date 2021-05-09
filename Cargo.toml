@@ -11,6 +11,10 @@ authors = [
 name = "twitter-firehose"
 path = "src/main.rs"
 
+[[bin]]
+name = "twitter-get-acccess-token"
+path = "src/main_get_access_token.rs"
+
 [dependencies]
 anyhow = "1.0.38"
 easyenv = "0.0.4"

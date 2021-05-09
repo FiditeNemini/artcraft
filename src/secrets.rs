@@ -1,5 +1,7 @@
 use crate::AnyhowResult;
 use std::io::Read;
+use log::{info, warn, debug};
+use anyhow::anyhow;
 
 #[derive(Deserialize)]
 pub struct Secrets {
@@ -42,26 +44,9 @@ impl RedisSecrets {
 }
 
 impl TwitterSecrets {
-
-  pub fn make_consumer_keypair(&self) -> egg_mode::KeyPair {
-    egg_mode::KeyPair::new(self.api_key.to_string(), self.api_secret_key.to_string())
-  }
-
-  pub fn make_access_keypair(&self) -> AnyhowResult<egg_mode::KeyPair> {
-    let access_key = self.access_key
-      .map(|s| s.clone())
-      .ok_or(anyhow!("No access key!"))?;
-
-    let access_secret = self.access_secret
-      .map(|s| s.clone())
-      .ok_or(anyhow!("No access secret!"))?;
-
-    Ok(egg_mode::KeyPair::new(access_key, access_secret))
-  }
-
-  pub fn get_access_token(&self) -> AnyhowResult<egg_mode::Token::AccessToken> {
+  /// This assumes we have a valid pair of access (key, secret).
+  pub async fn get_access_token(&self) -> AnyhowResult<egg_mode::Token> {
     let consumer_keypair = self.make_consumer_keypair();
-
     let access_keypair = self.make_access_keypair()?;
 
     let access_token = egg_mode::Token::Access {
@@ -75,11 +60,10 @@ impl TwitterSecrets {
   }
 
   /// Call this to get an access token.
-  pub fn request_access_token(&self) -> AnyhowResult<()> {
-
-    let connection_token = egg_mode::KeyPair::new(consumer_key, consumer_secret);
-
-    let request_token = egg_mode::auth::request_token(&connection_token, "oob")
+  /// This is an interactive flow that requests input from stdin.
+  pub async fn request_access_token(&self) -> AnyhowResult<()> {
+    let consumer_keypair = self.make_consumer_keypair();
+    let request_token = egg_mode::auth::request_token(&consumer_keypair, "oob")
       .await?;
 
     warn!("Go to the following URL, sign in, and paste the PIN that comes back:");
@@ -88,29 +72,47 @@ impl TwitterSecrets {
     let mut pin = String::new();
     std::io::stdin().read_line(&mut pin)?;
 
-    let token_result = egg_mode::auth::access_token(connection_token, &request_token, pin)
+    let token_result = egg_mode::auth::access_token(consumer_keypair, &request_token, pin)
       .await?;
 
-    token = token_result.0;
-    user_id = token_result.1;
-    username = token_result.2;
+    let access_token = token_result.0;
+    let user_id = token_result.1;
+    let username = token_result.2;
 
-    /*match token {
+    warn!("Ordinarily these should not be logged, but there is no log aggregator installed.");
+    warn!("In any event, it is best to do this locally before creating k8s secrets.");
+    warn!("user_id = {:?}", user_id);
+    warn!("username = {:?}", username);
+
+    match access_token {
       egg_mode::Token::Access {
-        access: ref access_token,
+        access: ref access,
         ..
       } => {
-        config.push_str(&username);
-        config.push('\n');
-        config.push_str(&format!("{}", user_id));
-        config.push('\n');
-        config.push_str(&access_token.key);
-        config.push('\n');
-        config.push_str(&access_token.secret);
+        warn!("access_token_key = {:?}", access.key);
+        warn!("access_token_secret = {:?}", access.secret);
       }
       _ => unreachable!(),
-    }*/
+    }
 
     Ok(())
+  }
+
+  pub fn make_consumer_keypair(&self) -> egg_mode::KeyPair {
+    egg_mode::KeyPair::new(self.api_key.to_string(), self.api_secret_key.to_string())
+  }
+
+  pub fn make_access_keypair(&self) -> AnyhowResult<egg_mode::KeyPair> {
+    let access_key = self.access_key
+      .as_ref()
+      .ok_or(anyhow!("No access key!"))?
+      .clone();
+
+    let access_secret = self.access_secret
+      .as_ref()
+      .ok_or(anyhow!("No access secret!"))?
+      .clone();
+
+    Ok(egg_mode::KeyPair::new(access_key, access_secret))
   }
 }
