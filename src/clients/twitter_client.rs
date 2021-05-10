@@ -1,22 +1,43 @@
 use crate::AnyhowResult;
-use log::{info, debug, warn};
-use futures::TryStreamExt;
+use anyhow::anyhow;
 use egg_mode::stream::StreamMessage;
-use std::time::Duration;
-use std::thread;
 use egg_mode::tweet::Tweet;
+use futures::TryStreamExt;
+use log::{info, debug, warn};
+use std::thread;
+use std::time::Duration;
+use crate::clients::redis_client::RedisClient;
+use futures::executor::block_on;
 
 const VOCODES_USER_ID : u64 = 1297106371238932481;
 
+/// The client logic
 pub struct TwitterClient {
   access_token: egg_mode::Token,
+  redis_client: RedisClient,
+}
+
+/// The parts of tweets we care about
+#[derive(Clone, Debug)]
+pub struct TweetDetails {
+  pub tweet_text: String,
+
+  pub has_mention: bool,
+  pub is_retweet: bool,
+  pub retweeted_text: Option<String>,
+
+  pub user_id : Option<u64>,
+  pub username : Option<String>,
+  pub display_name : Option<String>,
+  pub profile_image_url : Option<String>,
 }
 
 impl TwitterClient {
 
-  pub fn new(access_token: egg_mode::Token) -> Self {
+  pub fn new(access_token: egg_mode::Token, redis_client: RedisClient) -> Self {
     Self {
       access_token,
+      redis_client,
     }
   }
 
@@ -37,19 +58,43 @@ impl TwitterClient {
       .track(&["vocodes"])
       .start(&self.access_token)
       .try_for_each(|m| {
+        // NB: Odd implementation is due to future type juggling.
+        // I should fix this, but I'm too lazy and have more work to do.
         if let StreamMessage::Tweet(tweet) = m {
-          self.handle_tweet(tweet);
+          self.handle_tweet_mapping_errors(Some(tweet))
         } else {
           info!("Other (non-Tweet) message: {:?}", &m);
+          self.handle_tweet_mapping_errors(None)
         }
-        futures::future::ok(())
       });
 
-    Ok(stream.await?)
+    match stream.await {
+      Ok(_) => Ok(()),
+      Err(_) => Err(anyhow!("Stream error")), // NB: loss of error due to shenanigans
+    }
   }
 
-  fn handle_tweet(&self, tweet: Tweet) -> AnyhowResult<()> {
-    info!("Tweet: {:?}", &tweet);
+  // NB: This is some nonsense to satisfy type requirements.
+  // I'm too lazy to figure out why try_for_each demands egg_mode's Error.
+  async fn handle_tweet_mapping_errors(&self, tweet: Option<Tweet>)
+    -> Result<(), egg_mode::error::Error>
+  {
+    // NB: This is horrible.
+    self.handle_tweet(tweet)
+      .await
+      .map_err(|e| {
+        warn!("Error during stream: {:?}", e);
+        egg_mode::error::Error::BadUrl
+      })
+  }
+
+  async fn handle_tweet(&self, tweet: Option<Tweet>) -> AnyhowResult<()> {
+    let tweet = match tweet {
+      None => return Ok(()),
+      Some(tweet) => tweet,
+    };
+
+    debug!("Tweet: {:?}", &tweet);
 
     let mut user_id : Option<u64> = None;
     let mut username : Option<String> = None;
@@ -101,22 +146,14 @@ impl TwitterClient {
       tweet_text,
     };
 
-    info!("\n\nTweet Details: {:?}", tweet_details);
+    info!("Tweet Details: {:?}", tweet_details);
+    self.publish_tweet(tweet_details).await?;
 
+    Ok(())
+  }
+
+  async fn publish_tweet(&self, tweet_details: TweetDetails) -> AnyhowResult<()> {
     Ok(())
   }
 }
 
-#[derive(Clone, Debug)]
-pub struct TweetDetails {
-  tweet_text: String,
-
-  has_mention: bool,
-  is_retweet: bool,
-  retweeted_text: Option<String>,
-
-  user_id : Option<u64>,
-  username : Option<String>,
-  display_name : Option<String>,
-  profile_image_url : Option<String>,
-}

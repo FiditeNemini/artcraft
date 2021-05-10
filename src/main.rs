@@ -8,6 +8,7 @@
 extern crate serde_derive;
 
 mod clients;
+mod protos;
 mod secrets;
 
 use futures::TryStreamExt;
@@ -54,7 +55,10 @@ async fn main() -> anyhow::Result<()>
 
   info!("Streaming...");
 
-  let twitter_client = TwitterClient::new(twitter_access_token);
+  let twitter_client = TwitterClient::new(
+    twitter_access_token,
+    redis_client,
+  );
 
   twitter_client.main_loop().await;
   Ok(())
