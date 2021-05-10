@@ -78,7 +78,10 @@ message TwitchMetadata {
 
 message TwitterMetadata {
   // Optional. Fields describing the user that sent the message.
-  int64 user_id = 1;
+
+  // TODO: This is a u64. We need to be careful with math to assure non-overflow.
+  //int64 user_id = 1;
+
   string username = 2;
   string display_name = 3;
   string avatar_url = 4;

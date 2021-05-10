@@ -84,7 +84,10 @@ message IngestionTwitchMetadata {
 
 message IngestionTwitterMetadata {
   // Optional. Fields describing the user that sent the message.
-  optional int64 user_id = 1;
+
+  // TODO: This is a u64. We need to be careful with math to assure non-overflow.
+  //optional int64 user_id = 1;
+
   optional string username = 2;
   optional string display_name = 3;
   optional string avatar_url = 4;
