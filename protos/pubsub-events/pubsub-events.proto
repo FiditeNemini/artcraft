@@ -84,7 +84,10 @@ message IngestionTwitchMetadata {
 
 message IngestionTwitterMetadata {
   // Optional. Fields describing the user that sent the message.
-  optional string username = 1;
+  optional int64 user_id = 1;
+  optional string username = 2;
+  optional string display_name = 3;
+  optional string avatar_url = 4;
 }
 
 
@@ -145,9 +148,11 @@ message IngestionTwitterFollow {
 }
 message IngestionTwitterRetweet {
   // Intentionally blank for now
+  optional string original_text = 1;
 }
 message IngestionTwitterMention {
   // Intentionally blank for now
+  optional string text = 1;
 }
 
 

@@ -78,7 +78,10 @@ message TwitchMetadata {
 
 message TwitterMetadata {
   // Optional. Fields describing the user that sent the message.
-  string username = 1;
+  int64 user_id = 1;
+  string username = 2;
+  string display_name = 3;
+  string avatar_url = 4;
 }
 
 
@@ -168,11 +171,11 @@ message TwitterFollow {
 }
 
 message TwitterRetweet {
-  // Intentionally blank
+  string original_text = 1;
 }
 
 message TwitterMention {
-  // Intentionally blank
+  string text = 1;
 }
 
 
