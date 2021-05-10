@@ -98,9 +98,9 @@ async fn main() -> anyhow::Result<()>
   in_reply_to_user_id: None, in_reply_to_screen_name: None, in_reply_to_status_id: None, lang: Some("en"), place: None,
   possibly_sensitive: None, quoted_status_id: None, quoted_status: None, retweet_count: 0, retweeted: Some(false),
 
-  retweeted_status: Some(Tweet { coordinates: None, created_at: 2021-04-25T02:49:40Z, current_user_retweet: None, display_text_range: Some((0, 140)),
+  retweeted_status: Some(Tweet { coordinates: None, created_at: 2021-04-25T02:49:40Z,
+  current_user_retweet: None, display_text_range: Some((0, 140)),
   entities: TweetEntities { hashtags: [], symbols: [], urls: [UrlEntity { display_url: "twitter.com/i/web/status/1…",
-
   expanded_url: Some("https://twitter.com/i/web/status/1386150388873715712"), range: (117, 140),
   url: "https://t.co/x5JPIBKr3x" }], user_mentions: [], media: None }, extended_entities: None,
   favorite_count: 17, favorited: Some(false), filter_level: Some(Low), id: 1386150388873715712,
