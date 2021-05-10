@@ -8,13 +8,16 @@ use std::thread;
 use std::time::Duration;
 use crate::clients::redis_client::RedisClient;
 use futures::executor::block_on;
+use crate::protos::{mention_to_proto, binary_encode_proto};
+use std::sync::{RwLock, Arc};
 
 const VOCODES_USER_ID : u64 = 1297106371238932481;
 
 /// The client logic
 pub struct TwitterClient {
   access_token: egg_mode::Token,
-  redis_client: RedisClient,
+  redis_client: RedisClientWrapper,
+  redis_publish_topic: String,
 }
 
 /// The parts of tweets we care about
@@ -32,16 +35,41 @@ pub struct TweetDetails {
   pub profile_image_url : Option<String>,
 }
 
+// NB: We're using interior mutability.
+struct RedisClientWrapper {
+  redis_client: Arc::<RwLock<RedisClient>>,
+}
+
+impl RedisClientWrapper {
+  pub fn new(redis_client: RedisClient) -> Self {
+    Self {
+      redis_client: Arc::new(RwLock::new(redis_client))
+    }
+  }
+  pub async fn publish_bytes(&self, channel: &str, message: &[u8]) -> AnyhowResult<u32> {
+    let mut redis_client = match self.redis_client.write() {
+      Ok(rc) => rc,
+      Err(e) => return Err(anyhow!("Error: {:?}", )),
+    };
+    redis_client.publish_bytes(channel, message).await
+  }
+}
+
 impl TwitterClient {
 
-  pub fn new(access_token: egg_mode::Token, redis_client: RedisClient) -> Self {
+  pub fn new(
+    access_token: egg_mode::Token,
+    redis_client: RedisClient,
+    redis_publish_topic: String) -> Self
+  {
     Self {
       access_token,
-      redis_client,
+      redis_client: RedisClientWrapper::new(redis_client),
+      redis_publish_topic,
     }
   }
 
-  pub async fn main_loop(&self) {
+  pub async fn main_loop(&mut self) {
     loop {
       info!("Connecting to twitter stream...");
       if let Err(e) = self.run_stream().await {
@@ -52,20 +80,23 @@ impl TwitterClient {
     }
   }
 
-  pub async fn run_stream(&self) -> AnyhowResult<()> {
+  pub async fn run_stream(&mut self) -> AnyhowResult<()> {
     let stream = egg_mode::stream::filter()
       .follow(&[VOCODES_USER_ID]) // vocodes
       .track(&["vocodes"])
       .start(&self.access_token)
+      //.fold(&self)
       .try_for_each(|m| {
         // NB: Odd implementation is due to future type juggling.
         // I should fix this, but I'm too lazy and have more work to do.
         if let StreamMessage::Tweet(tweet) = m {
-          self.handle_tweet_mapping_errors(Some(tweet))
+          self.handle_tweet_mapping_errors(Some(tweet));
         } else {
           info!("Other (non-Tweet) message: {:?}", &m);
-          self.handle_tweet_mapping_errors(None)
+          self.handle_tweet_mapping_errors(None);
         }
+
+        futures::future::ok(())
       });
 
     match stream.await {
@@ -76,7 +107,7 @@ impl TwitterClient {
 
   // NB: This is some nonsense to satisfy type requirements.
   // I'm too lazy to figure out why try_for_each demands egg_mode's Error.
-  async fn handle_tweet_mapping_errors(&self, tweet: Option<Tweet>)
+  async fn handle_tweet_mapping_errors(&mut self, tweet: Option<Tweet>)
     -> Result<(), egg_mode::error::Error>
   {
     // NB: This is horrible.
@@ -88,7 +119,7 @@ impl TwitterClient {
       })
   }
 
-  async fn handle_tweet(&self, tweet: Option<Tweet>) -> AnyhowResult<()> {
+  async fn handle_tweet(&mut self, tweet: Option<Tweet>) -> AnyhowResult<()> {
     let tweet = match tweet {
       None => return Ok(()),
       Some(tweet) => tweet,
@@ -152,7 +183,23 @@ impl TwitterClient {
     Ok(())
   }
 
-  async fn publish_tweet(&self, tweet_details: TweetDetails) -> AnyhowResult<()> {
+  async fn publish_tweet(&mut self, tweet_details: TweetDetails) -> AnyhowResult<()> {
+    let binary_proto = if !tweet_details.is_retweet && tweet_details.has_mention {
+      // NB: Retweets can have mentions of the target user.
+      let proto = mention_to_proto(tweet_details)?;
+      binary_encode_proto(proto)?
+    } else if tweet_details.is_retweet {
+      let proto = mention_to_proto(tweet_details)?;
+      binary_encode_proto(proto)?
+    } else {
+      return Ok(());
+    };
+
+    self.redis_client.publish_bytes(
+      &self.redis_publish_topic,
+      &binary_proto
+    ).await?;
+
     Ok(())
   }
 }

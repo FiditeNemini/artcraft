@@ -45,7 +45,7 @@ async fn main() -> anyhow::Result<()>
 
   let mut redis_client = RedisClient::new(
     &secrets.redis,
-    redis_max_retry_count
+    redis_max_retry_count,
   );
 
   redis_client.connect().await?;
@@ -55,9 +55,10 @@ async fn main() -> anyhow::Result<()>
 
   info!("Streaming...");
 
-  let twitter_client = TwitterClient::new(
+  let mut twitter_client = TwitterClient::new(
     twitter_access_token,
     redis_client,
+    redis_publish_topic,
   );
 
   twitter_client.main_loop().await;
