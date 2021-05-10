@@ -86,17 +86,21 @@ impl TwitterClient {
       .track(&["vocodes"])
       .start(&self.access_token)
       //.fold(&self)
-      .try_for_each(|m| {
+      .try_for_each(|m: StreamMessage| {
         // NB: Odd implementation is due to future type juggling.
         // I should fix this, but I'm too lazy and have more work to do.
-        if let StreamMessage::Tweet(tweet) = m {
-          self.handle_tweet_mapping_errors(Some(tweet));
+        let future = if let StreamMessage::Tweet(tweet) = m {
+          self.handle_tweet_mapping_errors(Some(tweet))
         } else {
           info!("Other (non-Tweet) message: {:?}", &m);
-          self.handle_tweet_mapping_errors(None);
+          self.handle_tweet_mapping_errors(None)
+        };
+
+        match block_on(future) {
+          Ok(x) => futures::future::ok(x),
+          Err(e) => futures::future::err(e),
         }
 
-        futures::future::ok(())
       });
 
     match stream.await {
