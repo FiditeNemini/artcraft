@@ -16,6 +16,7 @@ use egg_mode::stream::StreamMessage;
 use crate::secrets::Secrets;
 use crate::clients::redis_client::RedisClient;
 use log::{info, warn, debug};
+use crate::clients::twitter_client::TwitterClient;
 
 pub type AnyhowResult<T> = anyhow::Result<T>;
 
@@ -146,6 +147,7 @@ async fn main() -> anyhow::Result<()>
 
    */
 
+  /*
   let stream = egg_mode::stream::filter()
     .follow(&[1297106371238932481]) // vocodes
     .track(&["vocodes"])
@@ -164,5 +166,10 @@ async fn main() -> anyhow::Result<()>
     warn!("Disconnected. Stream error: {:?}", e);
   }
 
+  Ok(())*/
+
+  let twitter_client = TwitterClient::new(twitter_access_token);
+
+  twitter_client.main_loop().await;
   Ok(())
 }
