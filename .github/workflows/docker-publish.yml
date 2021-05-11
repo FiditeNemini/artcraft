@@ -10,19 +10,15 @@ on:
 env:
   IMAGE_NAME: twitch-ingestion-client
 
-permissions:
-  packages: write
-  contents: read
-
 jobs:
   # Push image to GitHub Packages.
   # See also https://docs.docker.com/docker-hub/builds/
   push:
     runs-on: ubuntu-latest
     if: github.event_name == 'push'
-    #    permissions:
-    #      packages: write
-    #      contents: read
+    permissions:
+      packages: write
+      contents: read
 
     steps:
       - uses: actions/checkout@v2

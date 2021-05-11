@@ -1,4 +1,6 @@
 # Custom base image
+# Make sure to add this repository so it has read acces to the base image:
+# https://github.com/orgs/storytold/packages/container/docker-base-images-rust-ssl/settings/actions_access
 FROM ghcr.io/storytold/docker-base-images-rust-ssl:latest as build
 WORKDIR /tmp
 
