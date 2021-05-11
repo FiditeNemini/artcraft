@@ -1,5 +1,5 @@
 [package]
-name = "twitter-firehose"
+name = "twitter-ingestion-client"
 version = "0.0.0"
 edition = "2018"
 authors = [
@@ -8,7 +8,7 @@ authors = [
 ]
 
 [[bin]]
-name = "twitter-firehose"
+name = "twitter-ingestion-client"
 path = "src/main.rs"
 
 [[bin]]
@@ -35,3 +35,4 @@ egg-mode = "0.15.0"
 [build-dependencies]
 anyhow = "1.0.38"
 prost-build = "0.7.0"
+
