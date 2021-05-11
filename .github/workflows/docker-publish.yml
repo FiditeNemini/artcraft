@@ -37,7 +37,9 @@ jobs:
           #        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
 
       - name: Pull image
-        run: docker pull ghcr.io/storytold/docker-base-images-rust-ssl:latest
+        run: |
+          echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+          docker pull ghcr.io/storytold/docker-base-images-rust-ssl:latest
 
       - name: Build image
         #run: docker build . --file Dockerfile --tag $IMAGE_NAME
