@@ -1,5 +1,5 @@
-twitter-firehose
-================
+twitter-ingestion-client
+========================
 
 Ingest events from Twitter and send them to Redis PubSub
 
