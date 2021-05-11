@@ -29,6 +29,11 @@ RUN LD_LIBRARY_PATH=/usr/lib:${LD_LIBRARY_PATH} $HOME/.cargo/bin/cargo build --r
 FROM ubuntu:xenial
 WORKDIR /
 
+LABEL org.opencontainers.image.authors='bt@brand.io, echelon@gmail.com'
+LABEL org.opencontainers.image.url='https://github.com/storytold/twitch-ingestion-client'
+LABEL org.opencontainers.image.documentation='https://github.com/storytold/twitch-ingestion-client'
+LABEL org.opencontainers.image.source='https://github.com/storytold/twitch-ingestion-client'
+
 # NB: Comment this out for non-debug images
 # TODO: Figure out how this is done elsewhere with just the static binaries
 RUN apt-get update \
