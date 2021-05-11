@@ -26,7 +26,7 @@ RUN $HOME/.cargo/bin/cargo fetch
 RUN LD_LIBRARY_PATH=/usr/lib:${LD_LIBRARY_PATH} $HOME/.cargo/bin/cargo build --release
 
 # Final image
-#FROM ubuntu:xenial
+FROM ubuntu:xenial
 WORKDIR /
 
 # NB: Comment this out for non-debug images
@@ -36,8 +36,8 @@ RUN apt-get update \
         curl \
         wget
 
-#COPY --from=build /tmp/target/debug/twitch-firehose /
-COPY --from=build /tmp/target/release/twitch-firehose /
+#COPY --from=build /tmp/target/debug/twitch-ingestion-client /
+COPY --from=build /tmp/target/release/twitch-ingestion-client /
 
 # SSL certs are required for crypto
 COPY --from=build /etc/ssl /etc/ssl
@@ -47,8 +47,8 @@ COPY --from=build /lib/x86_64-linux-gnu/libssl.*             /lib/x86_64-linux-g
 COPY --from=build /lib/x86_64-linux-gnu/libcrypto.*          /lib/x86_64-linux-gnu/
 
 # Make sure all the links resolve
-RUN ldd twitch-firehose
+RUN ldd twitch-ingestion-client
 
 EXPOSE 8080
-CMD LD_LIBRARY_PATH=/usr/lib /twitch-firehose
+CMD LD_LIBRARY_PATH=/usr/lib /twitch-ingestion-client
 
