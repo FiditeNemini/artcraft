@@ -1,10 +1,12 @@
 # Adapted from
 # https://github.com/actions/starter-workflows/ci/docker-publish.yml
+# If using base images, don't forget to add READ access, eg. from a package settings page like:
+# https://github.com/orgs/storytold/packages/container/docker-base-images-rust-ssl/settings/actions_access
 name: Publish Docker Container to GHCR
 on:
   push:
-    # Publish `$default-branch` as Docker `latest` image.
     branches:
+      # NB: Default-branch doesn't work, despite Github's documentation.
       #- $default-branch
       - master
 env:
@@ -31,18 +33,7 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }} 
 
-          #      - name: Log into GitHub Container Registry
-          #        # NB: We no longer use PATs for auth as they grant broad access.
-          #        #run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login https://ghcr.io -u ${{ github.actor }} --password-stdin
-          #        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
-
-      - name: Pull image
-        run: |
-          echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
-          docker pull ghcr.io/storytold/docker-base-images-rust-ssl:latest
-
       - name: Build image
-        #run: docker build . --file Dockerfile --tag $IMAGE_NAME
         run: docker build . --file Dockerfile --tag $IMAGE_NAME --label "runnumber=${GITHUB_RUN_ID}"
 
       - name: Push image to GitHub Container Registry
