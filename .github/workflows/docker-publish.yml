@@ -8,7 +8,7 @@ on:
       #- $default-branch
       - master
 env:
-  IMAGE_NAME: twitch-firehose
+  IMAGE_NAME: twitch-ingestion-client
 
 jobs:
   # Push image to GitHub Packages.
@@ -25,7 +25,7 @@ jobs:
 
       - name: Log into GitHub Container Registry
       # TODO: Create a PAT with `read:packages` and `write:packages` scopes and save it as an Actions secret `CR_PAT`
-        run: echo "${{ secrets.CR_PAT }}" | docker login https://ghcr.io -u ${{ github.actor }} --password-stdin
+        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login https://ghcr.io -u ${{ github.actor }} --password-stdin
 
       - name: Push image to GitHub Container Registry
         run: |
