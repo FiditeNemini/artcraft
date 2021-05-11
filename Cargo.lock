@@ -1442,7 +1442,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "twitch-firehose"
+name = "twitch-ingestion-client"
 version = "0.0.0"
 dependencies = [
  "anyhow",
