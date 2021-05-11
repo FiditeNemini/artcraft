@@ -1,5 +1,5 @@
-twitch-firehose
-==============
+twitch-ingestion-client
+=======================
 Service to interact with Twitch.
 
 Protos
