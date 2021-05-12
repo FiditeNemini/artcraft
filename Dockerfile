@@ -1,19 +1,8 @@
-# Unsure if I want to create minimal images yet that run under Alpine Linux.
-# I have instructions for that here: https://hub.docker.com/r/echelon/testcontainer/dockerfile
-FROM ubuntu:xenial as build
+# Custom base image
+# Make sure to add this repository so it has read acces to the base image:
+# https://github.com/orgs/storytold/packages/container/docker-base-images-rust-ssl/settings/actions_access
+FROM ghcr.io/storytold/docker-base-images-rust-ssl:latest as build
 WORKDIR /tmp
-
-RUN apt-get update \
-    && apt-get install -y \
-        build-essential \
-        curl \
-        libssl-dev \
-        libssl1.0.0 \
-        pkg-config \
-        unzip \
-        wget
-RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs \
-    | sh  -s -- --default-toolchain stable -y
 
 COPY Cargo.lock . 
 COPY Cargo.toml .
@@ -23,11 +12,17 @@ COPY protos/ ./protos
 RUN $HOME/.cargo/bin/cargo fetch
 
 #RUN LD_LIBRARY_PATH=/usr/lib:${LD_LIBRARY_PATH} $HOME/.cargo/bin/cargo build
-RUN LD_LIBRARY_PATH=/usr/lib:${LD_LIBRARY_PATH} $HOME/.cargo/bin/cargo build --release
+RUN LD_LIBRARY_PATH=/usr/lib:${LD_LIBRARY_PATH} $HOME/.cargo/bin/cargo build --release --bin twitter-ingestion-client
 
 # Final image
 FROM ubuntu:xenial
 WORKDIR /
+
+# See: https://github.com/opencontainers/image-spec/blob/master/annotations.md
+LABEL org.opencontainers.image.authors='bt@brand.io, echelon@gmail.com'
+LABEL org.opencontainers.image.url='https://github.com/storytold/twitter-ingestion-client'
+LABEL org.opencontainers.image.documentation='https://github.com/storytold/twitter-ingestion-client'
+LABEL org.opencontainers.image.source='https://github.com/storytold/twitter-ingestion-client'
 
 # NB: Comment this out for non-debug images
 # TODO: Figure out how this is done elsewhere with just the static binaries

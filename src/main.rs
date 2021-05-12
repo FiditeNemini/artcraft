@@ -32,7 +32,7 @@ const ENV_REDIS_MAX_RETRY_COUNT_DEFAULT : u32 = 3;
 #[tokio::main]
 async fn main() -> anyhow::Result<()>
 {
-  easyenv::init_env_logger(None);
+  easyenv::init_all_with_default_logging(None);
 
   let redis_publish_topic = easyenv::get_env_string_or_default(
     ENV_PUBLISH_TOPIC, ENV_PUBLISH_TOPIC_DEFAULT);
