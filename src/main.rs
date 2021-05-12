@@ -28,7 +28,7 @@ use crate::clients::redis_client::RedisClient;
 use crate::clients::redis_subscriber::RedisSubscribeClient;
 use crate::dispatcher::Dispatcher;
 use crate::handlers::coordinate_and_geocode_handler::CoordinateAndGeocodeHandler;
-use crate::secrets::Secrets;
+use crate::secrets::{Secrets, RedisSecrets};
 use std::sync::{Arc, Mutex};
 use crate::handlers::spawn_handler::SpawnHandler;
 use crate::handlers::vocode_handler::TtsHandler;
@@ -46,7 +46,9 @@ const ENV_REDIS_MAX_RETRY_COUNT_DEFAULT : u32 = 3;
 
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
-  easyenv::init_env_logger(None);
+  easyenv::init_all_with_default_logging(None);
+
+  info!("Reading env config...");
 
   let redis_subscribe_topic = easyenv::get_env_string_or_default(
     ENV_SUBSCRIBE_TOPIC, ENV_SUBSCRIBE_TOPIC_DEFAULT);
@@ -55,14 +57,19 @@ async fn main() -> anyhow::Result<()> {
     ENV_REDIS_MAX_RETRY_COUNT,
     ENV_REDIS_MAX_RETRY_COUNT_DEFAULT)?;
 
-  let secrets = Secrets::from_file("secrets.toml")?;
+  //let secrets = Secrets::from_file("secrets.toml")?;
+
+  let redis_secrets = get_redis_secrets()?;
 
   let mut dispatcher = Dispatcher::new();
 
   let mut redis_client = RedisClient::new(
-    &secrets.redis,
+    &redis_secrets,
     redis_max_retry_count
   );
+
+  info!("Connecting to Redis...");
+
   redis_client.connect().await?;
 
   let redis_client = Arc::new(Mutex::new(redis_client));
@@ -78,13 +85,16 @@ async fn main() -> anyhow::Result<()> {
     Box::new(TtsHandler::new(redis_client.clone())));
 
   let mut redis_pubsub_client = RedisSubscribeClient::new(
-    &secrets.redis,
+    &redis_secrets,
     dispatcher
   );
+
+  info!("Initial connect to PubSub Redis...");
 
   redis_pubsub_client.connect().await?;
 
   loop {
+    info!("Main loop iter... (redis pubsub connect, subscribe, start stream...)");
     redis_pubsub_client.connect().await?;
     redis_pubsub_client.subscribe(&redis_subscribe_topic).await?;
     redis_pubsub_client.start_stream().await?;
@@ -93,3 +103,19 @@ async fn main() -> anyhow::Result<()> {
 
   Ok(())
 }
+
+fn get_redis_secrets() -> AnyhowResult<RedisSecrets> {
+  Ok(RedisSecrets::new(
+    &easyenv::get_env_string_or_default(
+      "REDIS_USERNAME", ""),
+    &easyenv::get_env_string_or_default(
+      "REDIS_PASSWORD", ""),
+    &easyenv::get_env_string_or_default(
+      "REDIS_HOST", ""),
+    easyenv::get_env_num::<u32>(
+      "REDIS_PORT", 6379)?,
+    easyenv::get_env_bool_or_default(
+      "REDIS_USES_TLS", false),
+  ))
+}
+

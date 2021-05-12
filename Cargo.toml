@@ -13,7 +13,7 @@ path = "src/main.rs"
 
 [dependencies]
 anyhow = "1.0.38"
-easyenv = "0.0.4"
+easyenv = "0.0.5"
 futures = "0.3.14"
 lazy_static = "1.4.0"
 log = "0.4.14"
