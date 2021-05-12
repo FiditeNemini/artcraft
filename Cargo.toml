@@ -13,7 +13,7 @@ path = "src/main.rs"
 
 [dependencies]
 anyhow = "1.0.38"
-easyenv = "0.0.4"
+easyenv = "0.0.5"
 log = "0.4.14"
 prost = "0.7.0"
 rustls = "0.18"

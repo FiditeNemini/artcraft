@@ -321,6 +321,12 @@ dependencies = [
 ]
 
 [[package]]
+name = "dotenv"
+version = "0.15.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "77c90badedccf4105eca100756a0b1289e191f6fcbdadd3cee1d2f614f97da8f"
+
+[[package]]
 name = "dtoa"
 version = "0.4.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -328,10 +334,11 @@ checksum = "88d7ed2934d741c6b37e33e3832298e8850b53fd2d2bea03873375596c7cea4e"
 
 [[package]]
 name = "easyenv"
-version = "0.0.4"
+version = "0.0.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "516fc6eb3e59cee34859122f05f0c94e28266c76b2ed0efe8d6611ed9c2082c1"
+checksum = "852054bee794f364fbe890bd947cbf678c35226b81ede17720d6a17fc687a0d4"
 dependencies = [
+ "dotenv",
  "env_logger",
  "log",
 ]

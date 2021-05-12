@@ -57,7 +57,7 @@ const ENV_REDIS_MAX_RETRY_COUNT_DEFAULT : u32 = 3;
 
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
-  easyenv::init_env_logger(None);
+  easyenv::init_all_with_default_logging(None);
 
   info!("Reading env configs...");
 
