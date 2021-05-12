@@ -114,7 +114,8 @@ fn get_redis_secrets() -> AnyhowResult<RedisSecrets> {
     &redis_username,
     &redis_password,
     &redis_hostname,
-    redis_port
+    redis_port,
+    easyenv::get_env_bool_or_default("REDIS_USES_TLS", false),
   ))
 }
 

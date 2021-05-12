@@ -14,6 +14,7 @@ pub struct RedisSecrets {
   pub password: String,
   pub host: String,
   pub port: u32,
+  pub uses_tls: bool,
 }
 
 #[derive(Deserialize, Clone)]
@@ -58,17 +59,31 @@ impl Secrets {
 }
 
 impl RedisSecrets {
-  pub fn new(username: &str, password: &str, host: &str, port: u32) -> Self {
+  pub fn new(username: &str, password: &str, host: &str, port: u32, uses_tls: bool) -> Self {
     Self {
       username: username.to_string(),
       password: password.to_string(),
       host: host.to_string(),
       port,
+      uses_tls,
     }
   }
 
   pub fn connection_url(&self) -> String {
-    format!("rediss://{}:{}@{}:{}", self.username, self.password, self.host, self.port)
+    let protocol = if self.uses_tls { "rediss" } else { "redis" };
+    let mut auth = "".to_string();
+
+    if !self.username.is_empty() {
+      if !self.password.is_empty() {
+        auth = format!("{}:{}@", self.username, self.password);
+      } else {
+        auth = format!("{}@", self.username);
+      }
+    } else if !self.password.is_empty() {
+      auth = format!("default:{}@", self.password);
+    }
+
+    format!("{}://{}{}:{}", protocol, auth, self.host, self.port)
   }
 }
 
