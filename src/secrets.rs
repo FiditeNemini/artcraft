@@ -58,12 +58,38 @@ impl Secrets {
 }
 
 impl RedisSecrets {
+  pub fn new(username: &str, password: &str, host: &str, port: u32) -> Self {
+    Self {
+      username: username.to_string(),
+      password: password.to_string(),
+      host: host.to_string(),
+      port,
+    }
+  }
+
   pub fn connection_url(&self) -> String {
     format!("rediss://{}:{}@{}:{}", self.username, self.password, self.host, self.port)
   }
 }
 
 impl TwitchSecrets {
+  pub fn new(username: &str,
+             stream_key: &str,
+             application_client_id: &str,
+             application_client_secret: &str,
+             oauth_access_token: &str,
+             watch_channels: &Vec<String>) -> Self {
+
+    Self {
+      username: username.to_string(),
+      stream_key: stream_key.to_string(),
+      application_client_id: application_client_id.to_string(),
+      application_client_secret: application_client_secret.to_string(),
+      oauth_access_token: oauth_access_token.to_string(),
+      watch_channels: watch_channels.clone(),
+    }
+  }
+
   pub fn get_user_config(&self) -> AnyhowResult<UserConfig> {
     let config = UserConfig::builder()
         .name(self.username.to_string())
