@@ -42,6 +42,8 @@ const ENV_REDIS_MAX_RETRY_COUNT_DEFAULT : u32 = 3;
 async fn main() -> anyhow::Result<()> {
   easyenv::init_env_logger(None);
 
+  info!("Reading env configs...");
+
   let redis_publish_topic = easyenv::get_env_string_or_default(
     ENV_PUBLISH_TOPIC, ENV_PUBLISH_TOPIC_DEFAULT);
 
@@ -56,6 +58,8 @@ async fn main() -> anyhow::Result<()> {
     redis_max_retry_count
   );
 
+  info!("Connecting Redis client...");
+
   redis_client.connect().await?;
 
   let mut twitch_client = TwitchClient::new(
@@ -63,6 +67,8 @@ async fn main() -> anyhow::Result<()> {
     redis_client,
     &redis_publish_topic
   );
+
+  info!("Beginning Twitch main loop...");
 
   loop {
     twitch_client.main_loop().await; // NB: Doesn't return.
