@@ -15,6 +15,7 @@ pub struct RedisSecrets {
   pub password: String,
   pub host: String,
   pub port: u32,
+  pub uses_tls: bool,
 }
 
 #[derive(Deserialize, Clone)]
@@ -38,12 +39,48 @@ impl Secrets {
 }
 
 impl RedisSecrets {
+  pub fn new(username: &str, password: &str, host: &str, port: u32, uses_tls: bool) -> Self {
+    Self {
+      username: username.to_string(),
+      password: password.to_string(),
+      host: host.to_string(),
+      port,
+      uses_tls,
+    }
+  }
+
   pub fn connection_url(&self) -> String {
-    format!("rediss://{}:{}@{}:{}", self.username, self.password, self.host, self.port)
+    let protocol = if self.uses_tls { "rediss" } else { "redis" };
+    let mut auth = "".to_string();
+
+    if !self.username.is_empty() {
+      if !self.password.is_empty() {
+        auth = format!("{}:{}@", self.username, self.password);
+      } else {
+        auth = format!("{}@", self.username);
+      }
+    } else if !self.password.is_empty() {
+      auth = format!("default:{}@", self.password);
+    }
+
+    format!("{}://{}{}:{}", protocol, auth, self.host, self.port)
   }
 }
 
 impl TwitterSecrets {
+  pub fn new(api_key: &str,
+             api_secret_key: &str,
+             access_key: &Option<String>,
+             access_secret: &Option<String>) -> Self {
+
+    Self {
+      api_key: api_key.to_string(),
+      api_secret_key: api_secret_key.to_string(),
+      access_key: access_key.clone(),
+      access_secret: access_secret.clone(),
+    }
+  }
+
   /// This assumes we have a valid pair of access (key, secret).
   pub async fn verify_access_token(&self) -> AnyhowResult<egg_mode::Token> {
     let consumer_keypair = self.make_consumer_keypair();
