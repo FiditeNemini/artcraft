@@ -1,0 +1,46 @@
+[package]
+name = "storyteller-web"
+edition = "2018"
+version = "0.0.1"
+authors = [
+  "Brandon Thomas <bt@brand.io>",
+  "Brandon Thomas <echelon@gmail.com>",
+]
+publish = false
+
+[[bin]]
+name = "storyteller-web"
+path = "src/main.rs"
+
+[dependencies]
+anyhow = "1.0.40"
+base64 = "0.13.0"
+chrono = { version = "0.4.19", features = ["serde"] }
+easyenv = "0.0.5"
+futures = "0.3.15"
+hostname = "0.3.1"
+log = "0.4.14"
+rand = "0.8.3"
+
+# Database
+sqlx = { version = "0.5.0", features = ["mysql", "runtime-tokio-rustls"] }
+#diesel = { version = "1.4.4", features = ["mysql", "r2d2", "chrono"] }
+#diesel-derive-enum = { version = "1.0.0", features = ["mysql"] }
+
+# Web
+actix-cors = "0.5.4"
+actix-files= "0.5"
+actix-http = "2.2.0"
+actix-rt = "2.2.0"
+actix-utils = "3.0.0"
+actix-web = "3.3.2"
+
+# Serialization
+serde = "1.0.125"
+serde_derive = "1.0.125"
+serde_json = "1.0.64"
+toml = "0.5.8"
+
+[build-dependencies]
+# NB: Only using diesel for migrations support
+diesel = { version = "1.4.6", features = ["mysql"] }
