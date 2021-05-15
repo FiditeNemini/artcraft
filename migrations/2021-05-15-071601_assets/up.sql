@@ -84,7 +84,8 @@ CREATE TABLE tts_models (
   deleted_at TIMESTAMP NULL,
 
   -- INDICES --
-  PRIMARY KEY (id)
+  PRIMARY KEY (id),
+  UNIQUE KEY (token)
 
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin;
 
@@ -139,7 +140,8 @@ CREATE TABLE w2l_templates (
   deleted_at TIMESTAMP NULL,
 
   -- INDICES --
-  PRIMARY KEY (id)
+  PRIMARY KEY (id),
+  UNIQUE KEY (token)
 
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin;
 
