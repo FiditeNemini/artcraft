@@ -8,6 +8,16 @@ CREATE TABLE tts_model_upload_jobs (
   -- Foreign key to user
   creator_user_token CHAR(16) NOT NULL,
 
+  -- Users can upload their own private models.
+  -- They can choose to make them public later.
+  is_private_for_creator BOOLEAN NOT NULL DEFAULT FALSE,
+
+  -- The name of the voice
+  voice_name VARCHAR(255) NOT NULL,
+
+  -- The speaker (in the case of cartoon characters)
+  voice_actor_name VARCHAR(255) DEFAULT NULL,
+
   -- Jobs begin as "pending", then transition to other states.
   -- Pending -> Started -> Complete
   --                    \-> Failed -> Started -> { Complete, Failed, Dead }
@@ -16,7 +26,7 @@ CREATE TABLE tts_model_upload_jobs (
   -- We can track this against a "max_attempt_count"
   attempt_count INT(3) NOT NULL DEFAULT 0,
 
-  -- NB: DO NOT SORT!
+  -- NB: DO NOT CHANGE ORDER; APPEND ONLY!
   -- THIS MUST MATCH THE RESPECTIVE JOBS TABLE.
   tts_model_type ENUM(
     'not-set',
@@ -48,6 +58,10 @@ CREATE TABLE w2l_template_upload_jobs (
 
   -- Foreign key to user
   creator_user_token CHAR(16) NOT NULL,
+
+  -- Users can upload their own private templates.
+  -- They can choose to make them public later.
+  is_private_for_creator BOOLEAN NOT NULL DEFAULT FALSE,
 
   -- Jobs begin as "pending", then transition to other states.
   -- Pending -> Started -> Complete

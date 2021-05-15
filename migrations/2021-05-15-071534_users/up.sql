@@ -8,11 +8,12 @@ CREATE TABLE users (
   -- Effective "primary key"
   token CHAR(16) NOT NULL UNIQUE,
 
+  email_address VARCHAR(255) NOT NULL UNIQUE,
+  email_confirmed BOOLEAN NOT NULL DEFAULT false,
+
   -- Username is a lookup key; display_name allows the user to add custom case.
   username VARCHAR(20) NOT NULL UNIQUE,
   display_name VARCHAR(20) NOT NULL,
-
-  email_address VARCHAR(255) NOT NULL UNIQUE,
 
   -- The role assigned to the user confers permissions.
   user_role_slug VARCHAR(16) NOT NULL,
@@ -108,5 +109,32 @@ CREATE TABLE user_sessions (
 
   -- deletion = session termination
   deleted_at TIMESTAMP DEFAULT NULL
+
+) ENGINE=INNODB;
+
+-- We only allow the most recent record for any given user to be redeemed.
+CREATE TABLE email_verifications (
+  -- Not used for anything except replication.
+  id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+
+  verification_type ENUM(
+    'email-verification',
+    'password-reset'
+  ) NOT NULL,
+
+  -- The redemption secret
+  verification_code VARCHAR(32) NOT NULL,
+
+  -- Whether the attempt worked
+  successful BOOLEAN NOT NULL DEFAULT false,
+
+    -- Foreign key to user
+  user_token CHAR(16) NOT NULL,
+
+  -- Cannot be redeemed after this date
+  expires_at TIMESTAMP NOT NULL,
+
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 
 ) ENGINE=INNODB;
