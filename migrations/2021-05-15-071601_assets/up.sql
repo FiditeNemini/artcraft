@@ -19,7 +19,7 @@ CREATE TABLE tts_models (
   mod_disabled BOOLEAN NOT NULL DEFAULT FALSE,
 
   -- A combination of ['username' + 'voice-name']
-  -- There can be public aliases for voices.
+  -- There can be public aliases for voices, eg. a voice's default model.
   slug CHAR(64) NOT NULL UNIQUE,
 
   -- NB: DO NOT CHANGE ORDER; APPEND ONLY!
@@ -31,13 +31,19 @@ CREATE TABLE tts_models (
     'glowtts-vocodes'
   ) NOT NULL DEFAULT 'not-set',
 
-  -- The name of the voice
+  -- Can be linked to a well-known voice
+  voice_token CHAR(16) DEFAULT NULL,
+
+  -- The name of the voice.
+  -- If voice_token is set, it's authoritative.
   voice_name VARCHAR(255) NOT NULL,
 
   -- If the voice is "happy" or a singer "a-capella", etc.
+  -- If voice_token is set, it's authoritative.
   voice_characteristic VARCHAR(255) DEFAULT NULL,
 
   -- The speaker (in the case of cartoon characters)
+  -- If voice_token is set, it's authoritative.
   voice_actor_name VARCHAR(255) DEFAULT NULL,
 
   -- Users can upload their own private models.
@@ -116,6 +122,46 @@ CREATE TABLE w2l_templates (
 
   -- For the thumbnail we show.
   public_bucket_hash CHAR(32) NOT NULL UNIQUE,
+
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+
+  -- If this is removed by a mod.
+  deleted_at TIMESTAMP DEFAULT NULL
+
+) ENGINE=INNODB;
+
+CREATE TABLE voices (
+  -- Not used for anything except replication.
+  id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+
+  -- Effective "primary key" (PUBLIC)
+  token CHAR(16) NOT NULL UNIQUE,
+
+  -- The URL we access the voice at.
+  slug CHAR(16) NOT NULL UNIQUE,
+
+  -- We can assign an exemplary model to the voice
+  default_model_token CHAR(16) DEFAULT NULL,
+
+  -- If a moderator author disables it.
+  -- This should prevent the voice from showing up in lists.
+  mod_disabled BOOLEAN NOT NULL DEFAULT FALSE,
+
+  -- The name of the voice
+  voice_name VARCHAR(255) NOT NULL,
+
+  -- If the voice is "happy" or a singer "a-capella", etc.
+  voice_characteristic VARCHAR(255) DEFAULT NULL,
+
+  -- The speaker (in the case of cartoon characters)
+  voice_actor_name VARCHAR(255) DEFAULT NULL,
+
+  -- The 800x600 image
+  image_banner_public_bucket_hash CHAR(32) DEFAULT NULL,
+
+  -- The square avatar image
+  image_square_public_bucket_hash CHAR(32) DEFAULT NULL,
 
   created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
