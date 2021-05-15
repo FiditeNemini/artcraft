@@ -8,6 +8,20 @@ CREATE TABLE tts_models (
   -- Effective "primary key" (PUBLIC)
   token CHAR(16) NOT NULL UNIQUE,
 
+  -- Optional Pointer to a newer version of the voice
+  -- If there's a newer version, we can disable this one.
+  updated_model_token CHAR(16) DEFAULT NULL,
+
+  -- We an disable a voice for a variety of reasons
+  -- In this case, the original author disables it.
+  user_disabled BOOLEAN NOT NULL DEFAULT FALSE,
+  -- In this case, a moderator author disables it.
+  mod_disabled BOOLEAN NOT NULL DEFAULT FALSE,
+
+  -- A combination of ['username' + 'voice-name']
+  -- There can be public aliases for voices.
+  slug CHAR(64) NOT NULL UNIQUE,
+
   -- NB: DO NOT CHANGE ORDER; APPEND ONLY!
   -- THIS MUST MATCH THE RESPECTIVE JOBS TABLE.
   tts_model_type ENUM(
@@ -19,6 +33,9 @@ CREATE TABLE tts_models (
 
   -- The name of the voice
   voice_name VARCHAR(255) NOT NULL,
+
+  -- If the voice is "happy" or a singer "a-capella", etc.
+  voice_characteristic VARCHAR(255) DEFAULT NULL,
 
   -- The speaker (in the case of cartoon characters)
   voice_actor_name VARCHAR(255) DEFAULT NULL,
@@ -46,10 +63,15 @@ CREATE TABLE tts_models (
   -- For the thumbnail we show.
   public_bucket_hash CHAR(32) NOT NULL UNIQUE,
 
+  -- Calculated average, on a scale of 0-100
+  -- Null with zero ratings.
+  calculated_average_score INT(3) DEFAULT NULL,
+  calculated_score_count INT(10) NOT NULL DEFAULT 0,
+
   created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 
-  -- If this is removed.
+  -- If this is removed by a mod.
   deleted_at TIMESTAMP DEFAULT NULL
 
 ) ENGINE=INNODB;
@@ -98,7 +120,7 @@ CREATE TABLE w2l_templates (
   created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 
-  -- If this is removed.
+  -- If this is removed by a mod.
   deleted_at TIMESTAMP DEFAULT NULL
 
 ) ENGINE=INNODB;

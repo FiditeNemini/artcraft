@@ -8,6 +8,9 @@ CREATE TABLE tts_model_upload_jobs (
   -- Foreign key to user
   creator_user_token CHAR(16) NOT NULL,
 
+  -- For abuse tracking.
+  creator_ip_address CHAR(16) NOT NULL,
+
   -- Users can upload their own private models.
   -- They can choose to make them public later.
   is_private_for_creator BOOLEAN NOT NULL DEFAULT FALSE,
@@ -58,6 +61,9 @@ CREATE TABLE w2l_template_upload_jobs (
 
   -- Foreign key to user
   creator_user_token CHAR(16) NOT NULL,
+
+  -- For abuse tracking.
+  creator_ip_address CHAR(16) NOT NULL,
 
   -- Users can upload their own private templates.
   -- They can choose to make them public later.
