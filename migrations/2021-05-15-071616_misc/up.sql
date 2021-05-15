@@ -21,7 +21,9 @@ CREATE TABLE badges (
   updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 
   -- INDICES --
-  PRIMARY KEY (id)
+  PRIMARY KEY (id),
+  UNIQUE KEY (token),
+  UNIQUE KEY (slug)
 
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin;
 
@@ -33,6 +35,8 @@ CREATE TABLE user_badges (
   badge_token CHAR(16) NOT NULL UNIQUE,
 
   -- INDICES --
-  PRIMARY KEY (id)
+  PRIMARY KEY (id),
+  KEY fk_user_token (user_token),
+  KEY fk_badge_token (badge_token)
 
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin;

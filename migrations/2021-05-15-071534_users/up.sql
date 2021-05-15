@@ -6,9 +6,9 @@ CREATE TABLE users (
   id BIGINT(20) NOT NULL AUTO_INCREMENT,
 
   -- Effective "primary key"
-  token CHAR(16) NOT NULL UNIQUE,
+  token CHAR(16) NOT NULL,
 
-  email_address VARCHAR(255) NOT NULL UNIQUE,
+  email_address VARCHAR(255) NOT NULL,
   email_confirmed BOOLEAN NOT NULL DEFAULT false,
 
   -- Username is a lookup key; display_name allows the user to add custom case.
@@ -76,7 +76,10 @@ CREATE TABLE users (
   deleted_at TIMESTAMP NULL,
 
   -- INDICES --
-  PRIMARY KEY (id)
+  PRIMARY KEY (id),
+  UNIQUE KEY (token),
+  UNIQUE KEY (email_address),
+  KEY fk_user_role_slug (user_role_slug)
 
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin;
 
@@ -85,7 +88,7 @@ CREATE TABLE user_roles (
   id BIGINT(20) NOT NULL AUTO_INCREMENT,
 
   -- Effective "primary key"
-  slug CHAR(16) NOT NULL UNIQUE,
+  slug CHAR(16) NOT NULL,
 
   name VARCHAR(255) NOT NULL,
 
@@ -105,7 +108,8 @@ CREATE TABLE user_roles (
   updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 
   -- INDICES --
-  PRIMARY KEY (id)
+  PRIMARY KEY (id),
+  UNIQUE KEY (slug)
 
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin;
 
@@ -129,7 +133,10 @@ CREATE TABLE user_sessions (
   deleted_at TIMESTAMP NULL,
 
   -- INDICES --
-  PRIMARY KEY (id)
+  PRIMARY KEY (id),
+  UNIQUE KEY (token),
+  KEY fk_user_token (user_token),
+  KEY index_ip_address_creation (ip_address_creation)
 
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin;
 
@@ -159,6 +166,8 @@ CREATE TABLE email_verifications (
   updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 
   -- INDICES --
-  PRIMARY KEY (id)
+  PRIMARY KEY (id),
+  KEY fk_user_token (user_token),
+  KEY index_verification_type (verification_type)
 
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin;
