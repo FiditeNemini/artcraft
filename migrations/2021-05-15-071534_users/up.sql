@@ -3,7 +3,7 @@
 
 CREATE TABLE users (
   -- Not used for anything except replication.
-  id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  id BIGINT(20) NOT NULL AUTO_INCREMENT,
 
   -- Effective "primary key"
   token CHAR(16) NOT NULL UNIQUE,
@@ -73,13 +73,16 @@ CREATE TABLE users (
 
   -- If the user is deleted, we set this.
   -- This is different than banned. These users won't show up at all.
-  deleted_at TIMESTAMP NULL
+  deleted_at TIMESTAMP NULL,
+
+  -- INDICES --
+  PRIMARY KEY (id)
 
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin;
 
 CREATE TABLE user_roles (
   -- Not used for anything except replication.
-  id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  id BIGINT(20) NOT NULL AUTO_INCREMENT,
 
   -- Effective "primary key"
   slug CHAR(16) NOT NULL UNIQUE,
@@ -99,13 +102,16 @@ CREATE TABLE user_roles (
   version INT NOT NULL DEFAULT 0,
 
   created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+  updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+
+  -- INDICES --
+  PRIMARY KEY (id)
 
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin;
 
 CREATE TABLE user_sessions (
   -- Not used for anything except replication.
-  id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  id BIGINT(20) NOT NULL AUTO_INCREMENT,
 
   -- Session entropy
   token CHAR(32) NOT NULL,
@@ -120,14 +126,17 @@ CREATE TABLE user_sessions (
   updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 
   -- deletion = session termination
-  deleted_at TIMESTAMP NULL
+  deleted_at TIMESTAMP NULL,
+
+  -- INDICES --
+  PRIMARY KEY (id)
 
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin;
 
 -- We only allow the most recent record for any given user to be redeemed.
 CREATE TABLE email_verifications (
   -- Not used for anything except replication.
-  id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  id BIGINT(20) NOT NULL AUTO_INCREMENT,
 
   verification_type ENUM(
     'email-verification',
@@ -147,6 +156,9 @@ CREATE TABLE email_verifications (
   expires_at TIMESTAMP NOT NULL,
 
   created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+  updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+
+  -- INDICES --
+  PRIMARY KEY (id)
 
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin;

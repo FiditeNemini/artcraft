@@ -3,7 +3,7 @@
 
 CREATE TABLE tts_models (
   -- Not used for anything except replication.
-  id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  id BIGINT(20) NOT NULL AUTO_INCREMENT,
 
   -- Effective "primary key" (PUBLIC)
   token CHAR(16) NOT NULL UNIQUE,
@@ -81,13 +81,16 @@ CREATE TABLE tts_models (
   updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 
   -- If this is removed by a mod.
-  deleted_at TIMESTAMP NULL
+  deleted_at TIMESTAMP NULL,
+
+  -- INDICES --
+  PRIMARY KEY (id)
 
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin;
 
 CREATE TABLE w2l_templates (
   -- Not used for anything except replication.
-  id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  id BIGINT(20) NOT NULL AUTO_INCREMENT,
 
   -- Effective "primary key" (PUBLIC)
   token CHAR(16) NOT NULL UNIQUE,
@@ -133,13 +136,16 @@ CREATE TABLE w2l_templates (
   updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 
   -- If this is removed by a mod.
-  deleted_at TIMESTAMP NULL
+  deleted_at TIMESTAMP NULL,
+
+  -- INDICES --
+  PRIMARY KEY (id)
 
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin;
 
 CREATE TABLE voices (
   -- Not used for anything except replication.
-  id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  id BIGINT(20) NOT NULL AUTO_INCREMENT,
 
   -- Effective "primary key" (PUBLIC)
   token CHAR(16) NOT NULL UNIQUE,
@@ -173,6 +179,9 @@ CREATE TABLE voices (
   updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 
   -- If this is removed by a mod.
-  deleted_at TIMESTAMP NULL
+  deleted_at TIMESTAMP NULL,
+
+  -- INDICES --
+  PRIMARY KEY (id)
 
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin;

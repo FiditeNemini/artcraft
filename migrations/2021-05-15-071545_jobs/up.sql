@@ -3,7 +3,7 @@
 
 -- TTS MODELS
 CREATE TABLE tts_model_upload_jobs (
-  id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  id BIGINT(20) NOT NULL AUTO_INCREMENT,
 
   -- Foreign key to user
   creator_user_token CHAR(16) NOT NULL,
@@ -51,13 +51,16 @@ CREATE TABLE tts_model_upload_jobs (
   -- Subsequent tries can increase the timeout.
   -- Failures because of permissions require human intervention => [retry_at=null].
   -- Failures because of invalid files are dead => [status=dead].
-  retry_at TIMESTAMP NULL
+  retry_at TIMESTAMP NULL,
+
+  -- INDICES --
+  PRIMARY KEY (id)
 
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin;
 
 -- WAV2LIP TEMPLATES
 CREATE TABLE w2l_template_upload_jobs (
-  id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  id BIGINT(20) NOT NULL AUTO_INCREMENT,
 
   -- Foreign key to user
   creator_user_token CHAR(16) NOT NULL,
@@ -97,7 +100,10 @@ CREATE TABLE w2l_template_upload_jobs (
   -- Subsequent tries can increase the timeout.
   -- Failures because of permissions require human intervention => [retry_at=null].
   -- Failures because of invalid files are dead => [status=dead].
-  retry_at TIMESTAMP NULL
+  retry_at TIMESTAMP NULL,
+
+  -- INDICES --
+  PRIMARY KEY (id)
 
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin;
 
