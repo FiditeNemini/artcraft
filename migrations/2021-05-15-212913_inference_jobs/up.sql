@@ -66,16 +66,16 @@ CREATE TABLE w2l_inference_jobs (
   -- The W2L template to use
   -- Can be an image or video.
   -- This is null if we're using a custom uploaded image.
-  w2l_template_token CHAR(16) DEFAULT NULL,
+  maybe_w2l_template_token CHAR(16) DEFAULT NULL,
 
   -- If we're using TTS results, this will be present
-  tts_inference_result_token CHAR(16) DEFAULT NULL,
+  maybe_tts_inference_result_token CHAR(16) DEFAULT NULL,
 
   -- If we're using custom uploaded audio, this will be present.
-  audio_bucket_location CHAR(16) DEFAULT NULL,
+  maybe_audio_bucket_location CHAR(16) DEFAULT NULL,
 
   -- If we're using a custom uploaded image, this will be present.
-  image_bucket_location CHAR(16) DEFAULT NULL,
+  maybe_image_bucket_location CHAR(16) DEFAULT NULL,
 
   -- Jobs begin as "pending", then transition to other states.
   -- Pending -> Started -> Complete
@@ -100,8 +100,8 @@ CREATE TABLE w2l_inference_jobs (
   -- INDICES --
   PRIMARY KEY (id),
   KEY fk_maybe_creator_user_token (maybe_creator_user_token),
-  KEY fk_w2l_template_token (w2l_template_token),
-  KEY fk_tts_inference_result_token (tts_inference_result_token),
+  KEY fk_maybe_w2l_template_token (maybe_w2l_template_token),
+  KEY fk_maybe_tts_inference_result_token (maybe_tts_inference_result_token),
   KEY index_status (status),
   KEY index_creator_ip_address (creator_ip_address)
 

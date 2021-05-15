@@ -94,7 +94,7 @@ CREATE TABLE w2l_templates (
   id BIGINT(20) NOT NULL AUTO_INCREMENT,
 
   -- Effective "primary key" (PUBLIC)
-  token CHAR(16) NOT NULL UNIQUE,
+  token CHAR(16) NOT NULL,
 
   template_type ENUM(
     'not-set',
@@ -103,7 +103,7 @@ CREATE TABLE w2l_templates (
   ) NOT NULL DEFAULT 'not-set',
 
   -- The title of the template.
-  title CHAR(255) NOT NULL UNIQUE,
+  title CHAR(255) NOT NULL,
 
   -- Users can upload their own private templates.
   -- They can choose to make them public later.
