@@ -65,6 +65,12 @@ CREATE TABLE users (
   -- If the URLs are shared, they'll be visible.
   hide_results_preference BOOLEAN NOT NULL DEFAULT false,
 
+  -- Social media usernames
+  -- These are not confirmed. We'll need to build an OAuth system to handle that.
+  discord_username VARCHAR(36) DEFAULT NULL,
+  twitter_username VARCHAR(36) DEFAULT NULL,
+  twitch_username VARCHAR(36) DEFAULT NULL,
+
   -- Incremented with every update.
   version INT NOT NULL DEFAULT 0,
 

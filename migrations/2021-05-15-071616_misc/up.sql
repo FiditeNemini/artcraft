@@ -7,10 +7,7 @@ CREATE TABLE badges (
   id BIGINT(20) NOT NULL AUTO_INCREMENT,
 
   -- Effective "primary key"
-  token CHAR(16) NOT NULL UNIQUE,
-
-  -- Effective "primary key"
-  slug CHAR(16) NOT NULL UNIQUE,
+  slug CHAR(16) NOT NULL,
 
   -- Description
   title VARCHAR(255) NOT NULL,
@@ -22,7 +19,6 @@ CREATE TABLE badges (
 
   -- INDICES --
   PRIMARY KEY (id),
-  UNIQUE KEY (token),
   UNIQUE KEY (slug)
 
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin;
@@ -31,12 +27,12 @@ CREATE TABLE badges (
 CREATE TABLE user_badges (
   id BIGINT(20) NOT NULL AUTO_INCREMENT,
 
-  user_token CHAR(16) NOT NULL UNIQUE,
-  badge_token CHAR(16) NOT NULL UNIQUE,
+  user_token CHAR(16) NOT NULL,
+  badge_slug CHAR(16) NOT NULL,
 
   -- INDICES --
   PRIMARY KEY (id),
   KEY fk_user_token (user_token),
-  KEY fk_badge_token (badge_token)
+  KEY fk_badge_slug (badge_slug)
 
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin;
