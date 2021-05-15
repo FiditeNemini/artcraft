@@ -51,7 +51,7 @@ CREATE TABLE tts_model_upload_jobs (
   -- Subsequent tries can increase the timeout.
   -- Failures because of permissions require human intervention => [retry_at=null].
   -- Failures because of invalid files are dead => [status=dead].
-  retry_at TIMESTAMP DEFAULT NULL
+  retry_at TIMESTAMP NULL
 
 ) ENGINE=INNODB;
 
@@ -97,7 +97,7 @@ CREATE TABLE w2l_template_upload_jobs (
   -- Subsequent tries can increase the timeout.
   -- Failures because of permissions require human intervention => [retry_at=null].
   -- Failures because of invalid files are dead => [status=dead].
-  retry_at TIMESTAMP DEFAULT NULL
+  retry_at TIMESTAMP NULL
 
 ) ENGINE=INNODB;
 

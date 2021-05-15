@@ -15,6 +15,12 @@ CREATE TABLE users (
   username VARCHAR(20) NOT NULL UNIQUE,
   display_name VARCHAR(20) NOT NULL,
 
+  -- The profile of the user in markdown (user editable).
+  profile_markdown TEXT NOT NULL,
+
+  -- Generated HTML (not user-editable).
+  profile_rendered_html TEXT NOT NULL,
+
   -- The role assigned to the user confers permissions.
   user_role_slug VARCHAR(16) NOT NULL,
 
@@ -26,9 +32,14 @@ CREATE TABLE users (
   -- Incremented with every update to the password.
   password_version INT NOT NULL DEFAULT 0,
 
+  -- Different than deleted.
+  -- Users still show up, but can't do anything.
+  banned BOOLEAN NOT NULL DEFAULT false,
+
   -- For abuse tracking.
   ip_address_creation VARCHAR(20) NOT NULL,
   ip_address_last_login VARCHAR(20) NOT NULL,
+  ip_address_last_update VARCHAR(20) NOT NULL,
 
   -- For tracking stats.
   -- The "cached" values are updated by a background job.
@@ -52,7 +63,7 @@ CREATE TABLE users (
   -- Hide results from others (ie. won't show up in the wall)
   -- Moderators will still see them.
   -- If the URLs are shared, they'll be visible.
-  hide_results BOOLEAN NOT NULL DEFAULT false,
+  hide_results_preference BOOLEAN NOT NULL DEFAULT false,
 
   -- Incremented with every update.
   version INT NOT NULL DEFAULT 0,
@@ -60,8 +71,9 @@ CREATE TABLE users (
   created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 
-  -- If the user is deleted (banned, etc.), we set this.
-  deleted_at TIMESTAMP DEFAULT NULL
+  -- If the user is deleted, we set this.
+  -- This is different than banned. These users won't show up at all.
+  deleted_at TIMESTAMP NULL
 
 ) ENGINE=INNODB;
 
@@ -108,7 +120,7 @@ CREATE TABLE user_sessions (
   updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 
   -- deletion = session termination
-  deleted_at TIMESTAMP DEFAULT NULL
+  deleted_at TIMESTAMP NULL
 
 ) ENGINE=INNODB;
 

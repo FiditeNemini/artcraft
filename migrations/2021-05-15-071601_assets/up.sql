@@ -50,8 +50,11 @@ CREATE TABLE tts_models (
   -- They can choose to make them public later.
   is_private_for_creator BOOLEAN NOT NULL DEFAULT FALSE,
 
-  -- The description of the template.
-  description CHAR(512) NOT NULL UNIQUE,
+  -- The description of the model in markdown.
+  description_markdown TEXT NOT NULL,
+
+  -- Generated HTML (not user-editable).
+  description_rendered_html TEXT NOT NULL,
 
   -- The person that created the template.
   creator_user_token CHAR(16) NOT NULL,
@@ -78,7 +81,7 @@ CREATE TABLE tts_models (
   updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 
   -- If this is removed by a mod.
-  deleted_at TIMESTAMP DEFAULT NULL
+  deleted_at TIMESTAMP NULL
 
 ) ENGINE=INNODB;
 
@@ -102,8 +105,11 @@ CREATE TABLE w2l_templates (
   -- They can choose to make them public later.
   is_private_for_creator BOOLEAN NOT NULL DEFAULT FALSE,
 
-  -- The description of the template.
-  description CHAR(512) NOT NULL UNIQUE,
+  -- The description of the template in markdown.
+  description_markdown TEXT NOT NULL,
+
+  -- Generated HTML (not user-editable).
+  description_rendered_html TEXT NOT NULL,
 
   -- The person that created the template.
   creator_user_token CHAR(16) NOT NULL,
@@ -127,7 +133,7 @@ CREATE TABLE w2l_templates (
   updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 
   -- If this is removed by a mod.
-  deleted_at TIMESTAMP DEFAULT NULL
+  deleted_at TIMESTAMP NULL
 
 ) ENGINE=INNODB;
 
@@ -167,6 +173,6 @@ CREATE TABLE voices (
   updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 
   -- If this is removed by a mod.
-  deleted_at TIMESTAMP DEFAULT NULL
+  deleted_at TIMESTAMP NULL
 
 ) ENGINE=INNODB;
