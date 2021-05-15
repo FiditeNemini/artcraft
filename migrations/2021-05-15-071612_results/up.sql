@@ -1,3 +1,0 @@
-# noinspection SqlNoDataSourceInspectionForFile
-# noinspection SqlResolveForFile
-
