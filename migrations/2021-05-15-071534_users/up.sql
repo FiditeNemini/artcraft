@@ -75,7 +75,7 @@ CREATE TABLE users (
   -- This is different than banned. These users won't show up at all.
   deleted_at TIMESTAMP NULL
 
-) ENGINE=INNODB;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin;
 
 CREATE TABLE user_roles (
   -- Not used for anything except replication.
@@ -101,7 +101,7 @@ CREATE TABLE user_roles (
   created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 
-) ENGINE=INNODB;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin;
 
 CREATE TABLE user_sessions (
   -- Not used for anything except replication.
@@ -122,7 +122,7 @@ CREATE TABLE user_sessions (
   -- deletion = session termination
   deleted_at TIMESTAMP NULL
 
-) ENGINE=INNODB;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin;
 
 -- We only allow the most recent record for any given user to be redeemed.
 CREATE TABLE email_verifications (
@@ -149,4 +149,4 @@ CREATE TABLE email_verifications (
   created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 
-) ENGINE=INNODB;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin;

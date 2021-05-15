@@ -53,7 +53,7 @@ CREATE TABLE tts_model_upload_jobs (
   -- Failures because of invalid files are dead => [status=dead].
   retry_at TIMESTAMP NULL
 
-) ENGINE=INNODB;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin;
 
 -- WAV2LIP TEMPLATES
 CREATE TABLE w2l_template_upload_jobs (
@@ -99,5 +99,5 @@ CREATE TABLE w2l_template_upload_jobs (
   -- Failures because of invalid files are dead => [status=dead].
   retry_at TIMESTAMP NULL
 
-) ENGINE=INNODB;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin;
 

@@ -19,3 +19,11 @@ To undo migrations at the current step:
 
 ```diesel migration redo```
 
+TODO
+----
+
+* Make all "token" types correct
+* Use correct collation for all tables
+* Install indexes on all foreign keys
+* Make sure unique indexes are correct
+

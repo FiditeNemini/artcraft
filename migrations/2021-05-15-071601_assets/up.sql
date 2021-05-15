@@ -83,7 +83,7 @@ CREATE TABLE tts_models (
   -- If this is removed by a mod.
   deleted_at TIMESTAMP NULL
 
-) ENGINE=INNODB;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin;
 
 CREATE TABLE w2l_templates (
   -- Not used for anything except replication.
@@ -135,7 +135,7 @@ CREATE TABLE w2l_templates (
   -- If this is removed by a mod.
   deleted_at TIMESTAMP NULL
 
-) ENGINE=INNODB;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin;
 
 CREATE TABLE voices (
   -- Not used for anything except replication.
@@ -175,4 +175,4 @@ CREATE TABLE voices (
   -- If this is removed by a mod.
   deleted_at TIMESTAMP NULL
 
-) ENGINE=INNODB;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin;
