@@ -23,7 +23,8 @@ CREATE TABLE tts_results (
   maybe_creator_user_token CHAR(16) DEFAULT NULL,
 
   -- For abuse tracking.
-  creator_ip_address CHAR(16) NOT NULL,
+  -- Wide enough for IPv4/6
+  creator_ip_address VARCHAR(40) NOT NULL,
 
   -- Where the wav, spectrogram, and etc. are located.
   public_bucket_hash CHAR(32) NOT NULL UNIQUE,
@@ -65,7 +66,8 @@ CREATE TABLE w2l_results (
   maybe_creator_user_token CHAR(16) DEFAULT NULL,
 
   -- For abuse tracking.
-  creator_ip_address CHAR(16) NOT NULL,
+  -- Wide enough for IPv4/6
+  creator_ip_address VARCHAR(40) NOT NULL,
 
   -- Where the wav, spectrogram, and etc. are located.
   public_bucket_hash CHAR(32) NOT NULL UNIQUE,

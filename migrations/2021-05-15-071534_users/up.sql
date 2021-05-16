@@ -37,9 +37,10 @@ CREATE TABLE users (
   banned BOOLEAN NOT NULL DEFAULT false,
 
   -- For abuse tracking.
-  ip_address_creation VARCHAR(20) NOT NULL,
-  ip_address_last_login VARCHAR(20) NOT NULL,
-  ip_address_last_update VARCHAR(20) NOT NULL,
+  -- Wide enough for IPv4/6
+  ip_address_creation VARCHAR(40) NOT NULL,
+  ip_address_last_login VARCHAR(40) NOT NULL,
+  ip_address_last_update VARCHAR(40) NOT NULL,
 
   -- For tracking stats.
   -- The "cached" values are updated by a background job.
@@ -130,7 +131,8 @@ CREATE TABLE user_sessions (
   user_token CHAR(16) NOT NULL,
 
   -- Track each session's creation IP.
-  ip_address_creation VARCHAR(20) NOT NULL,
+  -- Wide enough for IPv4/6
+  ip_address_creation VARCHAR(40) NOT NULL,
 
   created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,

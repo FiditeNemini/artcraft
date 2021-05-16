@@ -60,7 +60,8 @@ CREATE TABLE tts_models (
   creator_user_token CHAR(16) NOT NULL,
 
   -- For abuse tracking.
-  creator_ip_address CHAR(16) NOT NULL,
+  -- Wide enough for IPv4/6
+  creator_ip_address VARCHAR(40) NOT NULL,
 
   -- The filename that was used at upload time.
   original_filename CHAR(255) NOT NULL UNIQUE,
@@ -119,7 +120,8 @@ CREATE TABLE w2l_templates (
   creator_user_token CHAR(16) NOT NULL,
 
   -- For abuse tracking.
-  creator_ip_address CHAR(16) NOT NULL,
+  -- Wide enough for IPv4/6
+  creator_ip_address VARCHAR(40) NOT NULL,
 
   -- The filename that was used at upload time.
   original_filename CHAR(255) NOT NULL UNIQUE,

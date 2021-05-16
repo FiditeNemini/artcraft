@@ -9,7 +9,8 @@ CREATE TABLE tts_model_upload_jobs (
   creator_user_token CHAR(16) NOT NULL,
 
   -- For abuse tracking.
-  creator_ip_address CHAR(16) NOT NULL,
+  -- Wide enough for IPv4/6
+  creator_ip_address VARCHAR(40) NOT NULL,
 
   -- Users can upload their own private models.
   -- They can choose to make them public later.
@@ -69,7 +70,8 @@ CREATE TABLE w2l_template_upload_jobs (
   creator_user_token CHAR(16) NOT NULL,
 
   -- For abuse tracking.
-  creator_ip_address CHAR(16) NOT NULL,
+  -- Wide enough for IPv4/6
+  creator_ip_address VARCHAR(40) NOT NULL,
 
   -- Users can upload their own private templates.
   -- They can choose to make them public later.
