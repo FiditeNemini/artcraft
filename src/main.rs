@@ -1,4 +1,5 @@
 pub mod server_state;
+pub mod queries;
 
 use actix_cors::Cors;
 use actix_http::http;
@@ -9,6 +10,7 @@ use std::sync::Arc;
 use crate::server_state::{ServerState, EnvConfig};
 use sqlx::MySqlPool;
 use sqlx::mysql::MySqlPoolOptions;
+use crate::queries::badges::NewBadge;
 
 const DEFAULT_BIND_ADDRESS : &'static str = "0.0.0.0:12345";
 const DEFAULT_RUST_LOG: &'static str = "debug,actix_web=info";
@@ -80,9 +82,26 @@ pub async fn serve(server_state: ServerState) -> AnyhowResult<()>
    */
 
   //create_user(&pool).await?;
-  let id = create_badge(&pool, "slug", "this is title", "decr", "img").await?;
+
+  let badge = NewBadge {
+    slug: "slug2".to_string(),
+    title: "title".to_string(),
+    description: "description".to_string(),
+    image_url: "url".to_string()
+  };
+
+  let id = badge.insert(&pool).await?;
   println!("Created id: {}", id);
 
+  let badge = NewBadge {
+    slug: "slug3".to_string(),
+    title: "title".to_string(),
+    description: "description".to_string(),
+    image_url: "url".to_string()
+  };
+
+  let id = badge.insert(&pool).await?;
+  println!("Created id: {}", id);
 
   let server_state_arc = web::Data::new(Arc::new(server_state));
 
@@ -164,25 +183,6 @@ pub async fn serve(server_state: ServerState) -> AnyhowResult<()>
     .await?;
 
   Ok(())
-}
-
-pub async fn create_badge(pool: &MySqlPool, slug: &str, title: &str, description: &str, image_url: &str) -> AnyhowResult<u64> {
-  // Insert the task, then obtain the ID of this row
-  let todo_id = sqlx::query!(
-        r#"
-INSERT INTO badges ( slug, title, description, image_url )
-VALUES ( ?, ?, ?, ? )
-        "#,
-        slug,
-        title,
-        description,
-        image_url,
-    )
-    .execute(pool)
-    .await?
-    .last_insert_id();
-
-  Ok(todo_id)
 }
 
 pub async fn create_user(pool: &MySqlPool) -> AnyhowResult<()> {
