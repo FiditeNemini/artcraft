@@ -27,6 +27,11 @@ TODO
 * Install indexes on all foreign keys
 * Make sure unique indexes are correct
 
+Notes / TODOs:
 
-* Tests: https://stackoverflow.com/questions/65370752/how-do-i-create-an-actix-web-server-that-accepts-both-sqlx-database-pools-and-tr
+* Examples for good Actix+Sqlx Tests: 
+  https://stackoverflow.com/questions/65370752/how-do-i-create-an-actix-web-server-that-accepts-both-sqlx-database-pools-and-tr
+  
+* Actix/sqlx runtime compat:
+  https://github.com/launchbadge/sqlx/issues/1117#issuecomment-801237734
 

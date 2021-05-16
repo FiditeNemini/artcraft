@@ -8,7 +8,7 @@ use actix_web::{HttpServer, web, HttpResponse, App};
 use std::sync::Arc;
 use crate::server_state::{ServerState, EnvConfig};
 use sqlx::MySqlPool;
-//use sqlx::mysql::MySqlPoolOptions;
+use sqlx::mysql::MySqlPoolOptions;
 
 const DEFAULT_BIND_ADDRESS : &'static str = "0.0.0.0:12345";
 const DEFAULT_RUST_LOG: &'static str = "debug,actix_web=info";
@@ -52,16 +52,22 @@ pub async fn serve(server_state: ServerState) -> AnyhowResult<()>
   let db_connection_string = "mysql://root:root@localhost/storyteller";
 
   //let pool = MySqlPool::connect(db_connection_string).await?;
-  /*let pool = MySqlPoolOptions::new()
+
+
+
+  let pool = MySqlPoolOptions::new()
     .max_connections(5)
     .connect(db_connection_string)
-    .await?;*/
+    .await?;
+  let row: (i64,) = sqlx::query_as("SELECT 1")
+    //.bind(150_i64)
+    .fetch_one(&pool).await?;
+
+  println!("Result: {:?}", row);
+
+  /*
+  // Working example in 0.3 sqlx
   let pool = MySqlPool::new(db_connection_string).await?;
-
-  /*let row: (i64,) = sqlx::query_as("SELECT $1")
-    .bind(150_i64)
-    .fetch_one(&pool).await?;*/
-
   let recs = sqlx::query!(
             r#"
                 SELECT id, username
@@ -71,6 +77,7 @@ pub async fn serve(server_state: ServerState) -> AnyhowResult<()>
         )
     .fetch_all(&pool)
     .await?;
+   */
 
 
   let server_state_arc = web::Data::new(Arc::new(server_state));
