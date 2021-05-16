@@ -7,13 +7,21 @@ use actix_web::middleware::{Logger, DefaultHeaders};
 use actix_web::{HttpServer, web, HttpResponse, App};
 use std::sync::Arc;
 use crate::server_state::{ServerState, EnvConfig};
+use sqlx::MySqlPool;
+//use sqlx::mysql::MySqlPoolOptions;
 
 const DEFAULT_BIND_ADDRESS : &'static str = "0.0.0.0:12345";
 const DEFAULT_RUST_LOG: &'static str = "debug,actix_web=info";
 
 pub type AnyhowResult<T> = anyhow::Result<T>;
 
-pub fn main() -> AnyhowResult<()> {
+//pub async fn main() -> AnyhowResult<()> {
+//#[tokio::main]
+//#[async_std::main]
+//#[actix_web::main]
+//pub async fn main() -> std::io::Result<()> {
+#[actix_web::main]
+async fn main() -> AnyhowResult<()> {
   easyenv::init_all_with_default_logging(Some(DEFAULT_RUST_LOG));
 
   let server_hostname = hostname::get()
@@ -29,16 +37,41 @@ pub fn main() -> AnyhowResult<()> {
     hostname: server_hostname,
   };
 
-  serve(server_state)?;
+  serve(server_state)
+    .await?;
   Ok(())
 }
 
-#[actix_web::main]
-pub async fn serve(server_state: ServerState) -> std::io::Result<()>
+//#[actix_web::main]
+pub async fn serve(server_state: ServerState) -> AnyhowResult<()>
 {
   let bind_address = server_state.env_config.bind_address.clone();
   let num_workers = server_state.env_config.num_workers.clone();
   let hostname = server_state.hostname.clone();
+
+  let db_connection_string = "mysql://root:root@localhost/storyteller";
+
+  //let pool = MySqlPool::connect(db_connection_string).await?;
+  /*let pool = MySqlPoolOptions::new()
+    .max_connections(5)
+    .connect(db_connection_string)
+    .await?;*/
+  let pool = MySqlPool::new(db_connection_string).await?;
+
+  /*let row: (i64,) = sqlx::query_as("SELECT $1")
+    .bind(150_i64)
+    .fetch_one(&pool).await?;*/
+
+  let recs = sqlx::query!(
+            r#"
+                SELECT id, username
+                    FROM users
+                ORDER BY id
+            "#
+        )
+    .fetch_all(&pool)
+    .await?;
+
 
   let server_state_arc = web::Data::new(Arc::new(server_state));
 
@@ -117,5 +150,7 @@ pub async fn serve(server_state: ServerState) -> std::io::Result<()>
     .bind(bind_address)?
     .workers(num_workers)
     .run()
-    .await
+    .await?;
+
+  Ok(())
 }
