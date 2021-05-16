@@ -6,7 +6,13 @@ CREATE TABLE tts_models (
   id BIGINT(20) NOT NULL AUTO_INCREMENT,
 
   -- Effective "primary key" (PUBLIC)
-  token VARCHAR(32) NOT NULL UNIQUE,
+  token VARCHAR(32) NOT NULL,
+
+  -- A combination of ['username' + 'voice-name']
+  -- There can be public aliases for voices, eg. a voice's default model.
+  -- A user can change this.
+  -- As such, these should not be foreign keys.
+  updatable_slug VARCHAR(64) NOT NULL,
 
   -- Optional Pointer to a newer version of the voice
   -- If there's a newer version, we can disable this one.
@@ -17,10 +23,6 @@ CREATE TABLE tts_models (
   user_disabled BOOLEAN NOT NULL DEFAULT FALSE,
   -- In this case, a moderator author disables it.
   mod_disabled BOOLEAN NOT NULL DEFAULT FALSE,
-
-  -- A combination of ['username' + 'voice-name']
-  -- There can be public aliases for voices, eg. a voice's default model.
-  slug CHAR(64) NOT NULL UNIQUE,
 
   -- NB: DO NOT CHANGE ORDER; APPEND ONLY!
   -- THIS MUST MATCH THE RESPECTIVE JOBS TABLE.
@@ -64,14 +66,11 @@ CREATE TABLE tts_models (
   creator_ip_address VARCHAR(40) NOT NULL,
 
   -- The filename that was used at upload time.
-  original_filename CHAR(255) NOT NULL UNIQUE,
+  original_filename CHAR(255) NOT NULL,
 
   -- The pytorch model
   -- For now, this will be a hash of the file contents.
-  private_bucket_hash CHAR(32) NOT NULL UNIQUE,
-
-  -- For the thumbnail we show.
-  public_bucket_hash CHAR(32) NOT NULL UNIQUE,
+  private_bucket_hash CHAR(32) NOT NULL,
 
   -- Calculated average, on a scale of 0-100
   -- Null with zero ratings.
@@ -86,7 +85,9 @@ CREATE TABLE tts_models (
 
   -- INDICES --
   PRIMARY KEY (id),
-  UNIQUE KEY (token)
+  UNIQUE KEY (token),
+  UNIQUE KEY (updatable_slug),
+  KEY index_private_bucket_hash (private_bucket_hash)
 
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin;
 
@@ -96,6 +97,12 @@ CREATE TABLE w2l_templates (
 
   -- Effective "primary key" (PUBLIC)
   token VARCHAR(32) NOT NULL,
+
+  -- A combination of ['username' + 'template-name']
+  -- There can be public aliases for voices, eg. a voice's default model.
+  -- A user can change this.
+  -- As such, these should not be foreign keys.
+  updatable_slug VARCHAR(64) NOT NULL,
 
   template_type ENUM(
     'not-set',
@@ -124,16 +131,13 @@ CREATE TABLE w2l_templates (
   creator_ip_address VARCHAR(40) NOT NULL,
 
   -- The filename that was used at upload time.
-  original_filename CHAR(255) NOT NULL UNIQUE,
+  original_filename CHAR(255) NOT NULL,
 
-  -- The original source image/video
-  private_bucket_hash_original CHAR(32) NOT NULL UNIQUE,
-
-  -- The "precomputed" faces.
-  private_bucket_hash_precomputed CHAR(32) NOT NULL UNIQUE,
+  -- The original source image/video and the "precomputed" faces
+  private_bucket_hash CHAR(32) NOT NULL,
 
   -- For the thumbnail we show.
-  public_bucket_hash CHAR(32) NOT NULL UNIQUE,
+  public_bucket_hash CHAR(32) NOT NULL,
 
   created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
@@ -143,7 +147,10 @@ CREATE TABLE w2l_templates (
 
   -- INDICES --
   PRIMARY KEY (id),
-  UNIQUE KEY (token)
+  UNIQUE KEY (token),
+  UNIQUE KEY (updatable_slug),
+  KEY index_private_bucket_hash (private_bucket_hash),
+  KEY index_public_bucket_hash (public_bucket_hash)
 
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin;
 
@@ -152,10 +159,12 @@ CREATE TABLE voices (
   id BIGINT(20) NOT NULL AUTO_INCREMENT,
 
   -- Effective "primary key" (PUBLIC)
-  token VARCHAR(32) NOT NULL UNIQUE,
+  token VARCHAR(32) NOT NULL,
 
   -- The URL we access the voice at.
-  slug CHAR(16) NOT NULL UNIQUE,
+  -- These should be stable, but could be changed if necessary.
+  -- As such, these should not be foreign keys.
+  updatable_slug VARCHAR(64) NOT NULL,
 
   -- We can assign an exemplary model to the voice
   default_model_token VARCHAR(32) DEFAULT NULL,
@@ -186,6 +195,8 @@ CREATE TABLE voices (
   deleted_at TIMESTAMP NULL,
 
   -- INDICES --
-  PRIMARY KEY (id)
+  PRIMARY KEY (id),
+  UNIQUE KEY (token),
+  UNIQUE KEY (updatable_slug)
 
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin;

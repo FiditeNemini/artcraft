@@ -27,7 +27,7 @@ CREATE TABLE tts_results (
   creator_ip_address VARCHAR(40) NOT NULL,
 
   -- Where the wav, spectrogram, and etc. are located.
-  public_bucket_hash CHAR(32) NOT NULL UNIQUE,
+  public_bucket_hash CHAR(32) NOT NULL,
 
   created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
@@ -70,7 +70,7 @@ CREATE TABLE w2l_results (
   creator_ip_address VARCHAR(40) NOT NULL,
 
   -- Where the wav, spectrogram, and etc. are located.
-  public_bucket_hash CHAR(32) NOT NULL UNIQUE,
+  public_bucket_hash CHAR(32) NOT NULL,
 
   created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,

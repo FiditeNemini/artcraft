@@ -3,6 +3,10 @@
 CREATE TABLE tts_inference_jobs (
   id BIGINT(20) NOT NULL AUTO_INCREMENT,
 
+  -- The model to use.
+  -- This also determines which architecture we're using.
+  model_token VARCHAR(32) NOT NULL,
+
   -- Foreign key to user
   -- If no user is logged in, this is null.
   maybe_creator_user_token CHAR(16) DEFAULT NULL,
@@ -14,10 +18,6 @@ CREATE TABLE tts_inference_jobs (
   -- Users can upload their own private models.
   -- They can choose to make them public later.
   is_private_for_creator BOOLEAN NOT NULL DEFAULT FALSE,
-
-  -- The model to use.
-  -- This also determines which architecture we're using.
-  model_token VARCHAR(32) NOT NULL,
 
   -- The raw, unprocessed user input.
   inference_text TEXT NOT NULL,
@@ -44,6 +44,7 @@ CREATE TABLE tts_inference_jobs (
 
   -- INDICES --
   PRIMARY KEY (id),
+  KEY fk_model_token (model_token),
   KEY fk_maybe_creator_user_token (maybe_creator_user_token),
   KEY index_status (status),
   KEY index_creator_ip_address (creator_ip_address)
@@ -52,18 +53,6 @@ CREATE TABLE tts_inference_jobs (
 
 CREATE TABLE w2l_inference_jobs (
   id BIGINT(20) NOT NULL AUTO_INCREMENT,
-
-  -- Foreign key to user
-  -- If no user is logged in, this is null.
-  maybe_creator_user_token VARCHAR(32) DEFAULT NULL,
-
-  -- For abuse tracking.
-  -- Wide enough for IPv4/6
-  creator_ip_address VARCHAR(40) NOT NULL,
-
-  -- Users can upload their own private models.
-  -- They can choose to make them public later.
-  is_private_for_creator BOOLEAN NOT NULL DEFAULT FALSE,
 
   -- The W2L template to use
   -- Can be an image or video.
@@ -79,7 +68,19 @@ CREATE TABLE w2l_inference_jobs (
   -- If we're using a custom uploaded image, this will be present.
   maybe_image_bucket_location CHAR(16) DEFAULT NULL,
 
-  -- Jobs begin as "pending", then transition to other states.
+  -- Foreign key to user
+  -- If no user is logged in, this is null.
+  maybe_creator_user_token VARCHAR(32) DEFAULT NULL,
+
+  -- For abuse tracking.
+  -- Wide enough for IPv4/6
+  creator_ip_address VARCHAR(40) NOT NULL,
+
+  -- Users can upload their own private models.
+  -- They can choose to make them public later.
+  is_private_for_creator BOOLEAN NOT NULL DEFAULT FALSE,
+
+    -- Jobs begin as "pending", then transition to other states.
   -- Pending -> Started -> Complete
   --                    \-> Failed -> Started -> { Complete, Failed, Dead }
   status ENUM('pending', 'started', 'complete', 'failed', 'dead') NOT NULL DEFAULT 'pending',
@@ -101,9 +102,9 @@ CREATE TABLE w2l_inference_jobs (
 
   -- INDICES --
   PRIMARY KEY (id),
-  KEY fk_maybe_creator_user_token (maybe_creator_user_token),
   KEY fk_maybe_w2l_template_token (maybe_w2l_template_token),
   KEY fk_maybe_tts_inference_result_token (maybe_tts_inference_result_token),
+  KEY fk_maybe_creator_user_token (maybe_creator_user_token),
   KEY index_status (status),
   KEY index_creator_ip_address (creator_ip_address)
 
