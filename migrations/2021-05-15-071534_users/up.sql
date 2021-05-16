@@ -8,12 +8,12 @@ CREATE TABLE users (
   -- Effective "primary key"
   token VARCHAR(32) NOT NULL,
 
+  -- Username is a lookup key; display_name allows the user to add custom case.
+  username VARCHAR(20) NOT NULL,
+  display_name VARCHAR(20) NOT NULL,
+
   email_address VARCHAR(255) NOT NULL,
   email_confirmed BOOLEAN NOT NULL DEFAULT false,
-
-  -- Username is a lookup key; display_name allows the user to add custom case.
-  username VARCHAR(20) NOT NULL UNIQUE,
-  display_name VARCHAR(20) NOT NULL,
 
   -- The profile of the user in markdown (user editable).
   profile_markdown TEXT NOT NULL,
@@ -85,6 +85,7 @@ CREATE TABLE users (
   -- INDICES --
   PRIMARY KEY (id),
   UNIQUE KEY (token),
+  UNIQUE KEY (username),
   UNIQUE KEY (email_address),
   KEY fk_user_role_slug (user_role_slug)
 

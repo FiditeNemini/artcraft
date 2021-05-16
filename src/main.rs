@@ -79,6 +79,10 @@ pub async fn serve(server_state: ServerState) -> AnyhowResult<()>
     .await?;
    */
 
+  //create_user(&pool).await?;
+  let id = create_badge(&pool, "slug", "this is title", "decr", "img").await?;
+  println!("Created id: {}", id);
+
 
   let server_state_arc = web::Data::new(Arc::new(server_state));
 
@@ -158,6 +162,40 @@ pub async fn serve(server_state: ServerState) -> AnyhowResult<()>
     .workers(num_workers)
     .run()
     .await?;
+
+  Ok(())
+}
+
+pub async fn create_badge(pool: &MySqlPool, slug: &str, title: &str, description: &str, image_url: &str) -> AnyhowResult<u64> {
+  // Insert the task, then obtain the ID of this row
+  let todo_id = sqlx::query!(
+        r#"
+INSERT INTO badges ( slug, title, description, image_url )
+VALUES ( ?, ?, ?, ? )
+        "#,
+        slug,
+        title,
+        description,
+        image_url,
+    )
+    .execute(pool)
+    .await?
+    .last_insert_id();
+
+  Ok(todo_id)
+}
+
+pub async fn create_user(pool: &MySqlPool) -> AnyhowResult<()> {
+  let mut tx = pool.begin().await?;
+  let todo = sqlx::query("INSERT INTO badges (slug, title, description, image_url) VALUES ($1, $2, $3, $4)")
+    .bind("foo")
+    .bind("bar")
+    .bind("baz")
+    .bind("bin")
+    .fetch_one(&mut tx)
+    .await?;
+
+  tx.commit().await?;
 
   Ok(())
 }
