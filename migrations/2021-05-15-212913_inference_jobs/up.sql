@@ -17,7 +17,7 @@ CREATE TABLE tts_inference_jobs (
 
   -- The model to use.
   -- This also determines which architecture we're using.
-  model_token CHAR(16) NOT NULL,
+  model_token VARCHAR(32) NOT NULL,
 
   -- The raw, unprocessed user input.
   inference_text TEXT NOT NULL,
@@ -55,7 +55,7 @@ CREATE TABLE w2l_inference_jobs (
 
   -- Foreign key to user
   -- If no user is logged in, this is null.
-  maybe_creator_user_token CHAR(16) DEFAULT NULL,
+  maybe_creator_user_token VARCHAR(32) DEFAULT NULL,
 
   -- For abuse tracking.
   -- Wide enough for IPv4/6
@@ -68,10 +68,10 @@ CREATE TABLE w2l_inference_jobs (
   -- The W2L template to use
   -- Can be an image or video.
   -- This is null if we're using a custom uploaded image.
-  maybe_w2l_template_token CHAR(16) DEFAULT NULL,
+  maybe_w2l_template_token VARCHAR(32) DEFAULT NULL,
 
   -- If we're using TTS results, this will be present
-  maybe_tts_inference_result_token CHAR(16) DEFAULT NULL,
+  maybe_tts_inference_result_token VARCHAR(32) DEFAULT NULL,
 
   -- If we're using custom uploaded audio, this will be present.
   maybe_audio_bucket_location CHAR(16) DEFAULT NULL,

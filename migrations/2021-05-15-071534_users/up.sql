@@ -6,7 +6,7 @@ CREATE TABLE users (
   id BIGINT(20) NOT NULL AUTO_INCREMENT,
 
   -- Effective "primary key"
-  token CHAR(16) NOT NULL,
+  token VARCHAR(32) NOT NULL,
 
   email_address VARCHAR(255) NOT NULL,
   email_confirmed BOOLEAN NOT NULL DEFAULT false,
@@ -125,10 +125,10 @@ CREATE TABLE user_sessions (
   id BIGINT(20) NOT NULL AUTO_INCREMENT,
 
   -- Session entropy
-  token CHAR(32) NOT NULL,
+  token VARCHAR(32) NOT NULL,
 
   -- Foreign key to user
-  user_token CHAR(16) NOT NULL,
+  user_token VARCHAR(32) NOT NULL,
 
   -- Track each session's creation IP.
   -- Wide enough for IPv4/6
@@ -165,7 +165,7 @@ CREATE TABLE email_verifications (
   successful BOOLEAN NOT NULL DEFAULT false,
 
     -- Foreign key to user
-  user_token CHAR(16) NOT NULL,
+  user_token VARCHAR(32) NOT NULL,
 
   -- Cannot be redeemed after this date
   expires_at TIMESTAMP NOT NULL,

@@ -6,7 +6,7 @@ CREATE TABLE tts_model_upload_jobs (
   id BIGINT(20) NOT NULL AUTO_INCREMENT,
 
   -- Foreign key to user
-  creator_user_token CHAR(16) NOT NULL,
+  creator_user_token VARCHAR(32) NOT NULL,
 
   -- For abuse tracking.
   -- Wide enough for IPv4/6
@@ -67,7 +67,7 @@ CREATE TABLE w2l_template_upload_jobs (
   id BIGINT(20) NOT NULL AUTO_INCREMENT,
 
   -- Foreign key to user
-  creator_user_token CHAR(16) NOT NULL,
+  creator_user_token VARCHAR(32) NOT NULL,
 
   -- For abuse tracking.
   -- Wide enough for IPv4/6

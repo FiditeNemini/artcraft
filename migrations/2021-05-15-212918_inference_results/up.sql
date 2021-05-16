@@ -6,10 +6,10 @@ CREATE TABLE tts_results (
   id BIGINT(20) NOT NULL AUTO_INCREMENT,
 
   -- Effective "primary key" (PUBLIC)
-  token CHAR(32) NOT NULL,
+  token VARCHAR(32) NOT NULL,
 
   -- The TTS model that was used
-  model_token CHAR(16) NOT NULL,
+  model_token VARCHAR(32) NOT NULL,
 
   -- The original raw, unprocessed user input.
   inference_text TEXT NOT NULL,
@@ -20,7 +20,7 @@ CREATE TABLE tts_results (
 
   -- The person that created the template.
   -- If the user wasn't logged in, this is null
-  maybe_creator_user_token CHAR(16) DEFAULT NULL,
+  maybe_creator_user_token VARCHAR(32) DEFAULT NULL,
 
   -- For abuse tracking.
   -- Wide enough for IPv4/6
@@ -49,13 +49,13 @@ CREATE TABLE w2l_results (
   id BIGINT(20) NOT NULL AUTO_INCREMENT,
 
   -- Effective "primary key" (PUBLIC)
-  token CHAR(32) NOT NULL,
+  token VARCHAR(32) NOT NULL,
 
   -- The w2l template that was used (if set)
-  maybe_w2l_template_token CHAR(16) NOT NULL,
+  maybe_w2l_template_token VARCHAR(32) NOT NULL,
 
   -- The inference result, if we're using them.
-  maybe_tts_inference_result_token CHAR(16) DEFAULT NULL,
+  maybe_tts_inference_result_token VARCHAR(32) DEFAULT NULL,
 
   -- Users can upload their own private templates.
   -- They can choose to make them public later.
@@ -63,7 +63,7 @@ CREATE TABLE w2l_results (
 
   -- The person that created the template.
   -- If the user wasn't logged in, this is null
-  maybe_creator_user_token CHAR(16) DEFAULT NULL,
+  maybe_creator_user_token VARCHAR(32) DEFAULT NULL,
 
   -- For abuse tracking.
   -- Wide enough for IPv4/6

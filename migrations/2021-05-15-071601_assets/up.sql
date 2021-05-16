@@ -6,11 +6,11 @@ CREATE TABLE tts_models (
   id BIGINT(20) NOT NULL AUTO_INCREMENT,
 
   -- Effective "primary key" (PUBLIC)
-  token CHAR(16) NOT NULL UNIQUE,
+  token VARCHAR(32) NOT NULL UNIQUE,
 
   -- Optional Pointer to a newer version of the voice
   -- If there's a newer version, we can disable this one.
-  updated_model_token CHAR(16) DEFAULT NULL,
+  updated_model_token VARCHAR(32) DEFAULT NULL,
 
   -- We an disable a voice for a variety of reasons
   -- In this case, the original author disables it.
@@ -32,7 +32,7 @@ CREATE TABLE tts_models (
   ) NOT NULL DEFAULT 'not-set',
 
   -- Can be linked to a well-known voice
-  voice_token CHAR(16) DEFAULT NULL,
+  voice_token VARCHAR(32) DEFAULT NULL,
 
   -- The name of the voice.
   -- If voice_token is set, it's authoritative.
@@ -57,7 +57,7 @@ CREATE TABLE tts_models (
   description_rendered_html TEXT NOT NULL,
 
   -- The person that created the template.
-  creator_user_token CHAR(16) NOT NULL,
+  creator_user_token VARCHAR(32) NOT NULL,
 
   -- For abuse tracking.
   -- Wide enough for IPv4/6
@@ -95,7 +95,7 @@ CREATE TABLE w2l_templates (
   id BIGINT(20) NOT NULL AUTO_INCREMENT,
 
   -- Effective "primary key" (PUBLIC)
-  token CHAR(16) NOT NULL,
+  token VARCHAR(32) NOT NULL,
 
   template_type ENUM(
     'not-set',
@@ -117,7 +117,7 @@ CREATE TABLE w2l_templates (
   description_rendered_html TEXT NOT NULL,
 
   -- The person that created the template.
-  creator_user_token CHAR(16) NOT NULL,
+  creator_user_token VARCHAR(32) NOT NULL,
 
   -- For abuse tracking.
   -- Wide enough for IPv4/6
@@ -152,13 +152,13 @@ CREATE TABLE voices (
   id BIGINT(20) NOT NULL AUTO_INCREMENT,
 
   -- Effective "primary key" (PUBLIC)
-  token CHAR(16) NOT NULL UNIQUE,
+  token VARCHAR(32) NOT NULL UNIQUE,
 
   -- The URL we access the voice at.
   slug CHAR(16) NOT NULL UNIQUE,
 
   -- We can assign an exemplary model to the voice
-  default_model_token CHAR(16) DEFAULT NULL,
+  default_model_token VARCHAR(32) DEFAULT NULL,
 
   -- If a moderator author disables it.
   -- This should prevent the voice from showing up in lists.

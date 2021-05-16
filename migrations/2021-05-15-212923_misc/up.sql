@@ -7,7 +7,7 @@ CREATE TABLE badges (
   id BIGINT(20) NOT NULL AUTO_INCREMENT,
 
   -- Effective "primary key"
-  slug CHAR(16) NOT NULL,
+  slug VARCHAR(32) NOT NULL,
 
   -- Description
   title VARCHAR(255) NOT NULL,
@@ -27,8 +27,8 @@ CREATE TABLE badges (
 CREATE TABLE user_badges (
   id BIGINT(20) NOT NULL AUTO_INCREMENT,
 
-  user_token CHAR(16) NOT NULL,
-  badge_slug CHAR(16) NOT NULL,
+  user_token VARCHAR(32) NOT NULL,
+  badge_slug VARCHAR(32) NOT NULL,
 
   -- INDICES --
   PRIMARY KEY (id),
