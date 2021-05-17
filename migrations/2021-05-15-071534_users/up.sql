@@ -138,6 +138,10 @@ CREATE TABLE user_sessions (
   created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 
+  -- Session termination time.
+  -- This must be set by the server code, or the session is invalid
+  expires_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
   -- deletion = session termination
   deleted_at TIMESTAMP NULL,
 

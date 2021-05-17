@@ -16,6 +16,8 @@ use sqlx::error::Error::Database;
 use sqlx::mysql::MySqlDatabaseError;
 use std::sync::Arc;
 use crate::validations::username::validate_username;
+use crate::validations::passwords::validate_passwords;
+use actix_web::cookie::Cookie;
 
 const NEW_USER_ROLE: &'static str = "new-user";
 
@@ -89,20 +91,15 @@ pub async fn create_account_handler(
     return Err(CreateAccountError::BadInput(reason));
   }
 
-  if request.password.len() < 6 {
-    return Err(CreateAccountError::BadInput("password is too short".to_string()));
-  }
-
-  if request.password != request.password_confirmation {
-    return Err(CreateAccountError::BadInput("passwords do not match".to_string()));
+  if let Err(reason) = validate_passwords(&request.password, &request.password_confirmation) {
+    return Err(CreateAccountError::BadInput(reason));
   }
 
   if !request.email_address.contains("@") {
     return Err(CreateAccountError::BadInput("invalid email address".to_string()));
   }
 
-  //let token = random_token(32);
-  let token = random_token(15);
+  let user_token = random_token(15);
 
   let password_hash = match bcrypt::hash(&request.password, bcrypt::DEFAULT_COST) {
     Ok(hash) => hash,
@@ -112,11 +109,14 @@ pub async fn create_account_handler(
     }
   };
 
+  let username = request.username.to_lowercase();
+  let display_name = request.username.to_string();
+
   let profile_markdown = "";
   let profile_rendered_html = "";
   let ip_address = get_request_ip(&http_request);
 
-  let result = sqlx::query!(
+  let query_result = sqlx::query!(
         r#"
 INSERT INTO users (
   token,
@@ -133,9 +133,9 @@ INSERT INTO users (
 )
 VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? )
         "#,
-        token.to_string(),
-        request.username.to_string(),
-        request.username.to_string(),
+        user_token.to_string(),
+        username,
+        display_name,
         request.email_address.to_string(),
         profile_markdown,
         profile_rendered_html,
@@ -148,12 +148,12 @@ VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? )
     .execute(&server_state.mysql_pool)
     .await;
 
-  let record_id = match result {
+  let record_id = match query_result {
     Ok(res) => {
       res.last_insert_id()
     },
     Err(err) => {
-      warn!("Query error: {:?}", err);
+      warn!("New user creation DB error: {:?}", err);
 
       // NB: SQLSTATE[23000]: Integrity constraint violation
       // NB: MySQL Error Code 1062: Duplicate key insertion (this is harder to access)
@@ -179,10 +179,43 @@ VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? )
 
   info!("new user id: {}", record_id);
 
+  let session_token = random_token(32);
 
+  let query_result = sqlx::query!(
+        r#"
+INSERT INTO user_sessions (
+  token,
+  user_token,
+  ip_address_creation,
+  expires_at
+)
+VALUES ( ?, ?, ?, NOW() + interval 1 year )
+        "#,
+        session_token.to_string(),
+        user_token.to_string(),
+        ip_address.to_string(),
+    )
+    .execute(&server_state.mysql_pool)
+    .await;
 
+  let record_id = match query_result {
+    Ok(res) => {
+      res.last_insert_id()
+    },
+    Err(err) => {
+      warn!("New user session creation DB error: {:?}", err);
+      return Err(ServerError);
+    }
+  };
 
+  info!("new user session created");
 
+  let session_cookie = Cookie::build("session", session_token)
+    .domain(".vo.codes")
+    .path("/")
+    .secure(true) // HTTPS-only
+    .http_only(true) // Not exposed to Javascript
+    .finish();
 
   let response = CreateAccountSuccessResponse {
     success: true,
@@ -192,6 +225,7 @@ VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? )
     .map_err(|e| BadInput("".to_string()))?;
 
   Ok(HttpResponse::Ok()
+    .cookie(session_cookie)
     .content_type("application/json")
     .body(body))
 }
