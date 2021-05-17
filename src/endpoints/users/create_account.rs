@@ -20,6 +20,12 @@ pub struct CreateAccountResponse {
 
 }
 
+#[derive(Serialize)]
+pub struct ErrorResponse {
+  pub success: bool,
+  pub error_reason: String,
+}
+
 #[derive(Debug, Display, Error)]
 pub enum CreateAccountResponseError {
   #[display(fmt = "internal error")]
@@ -46,12 +52,21 @@ impl ResponseError for CreateAccountError {
   }
 
   fn error_response(&self) -> HttpResponse {
+    let response = ErrorResponse {
+      success: false,
+      error_reason: "there was a problem".to_string()
+    };
+
+    let body = match serde_json::to_string(&response) {
+      Ok(json) => json,
+      Err(_) => "{}".to_string(),
+    };
+
     HttpResponseBuilder::new(self.status_code())
-      .set_header(header::CONTENT_TYPE, "text/html; charset=utf-8")
-      .body("bad")
+      .set_header(header::CONTENT_TYPE, "application/json")
+      .body(body)
   }
 }
-
 
 impl ResponseError for CreateAccountResponseError {
   fn status_code(&self) -> StatusCode {
