@@ -1,4 +1,7 @@
+#[macro_use] extern crate serde_derive;
+
 pub mod server_state;
+pub mod endpoints;
 pub mod queries;
 
 use actix_cors::Cors;
@@ -11,6 +14,7 @@ use crate::server_state::{ServerState, EnvConfig};
 use sqlx::MySqlPool;
 use sqlx::mysql::MySqlPoolOptions;
 use crate::queries::badges::NewBadge;
+use crate::endpoints::users::create_account::create_account_handler;
 
 const DEFAULT_BIND_ADDRESS : &'static str = "0.0.0.0:12345";
 const DEFAULT_RUST_LOG: &'static str = "debug,actix_web=info";
@@ -31,12 +35,20 @@ async fn main() -> AnyhowResult<()> {
     .and_then(|h| h.into_string().ok())
     .unwrap_or("storyteller-web-unknown".to_string());
 
+  let db_connection_string = "mysql://root:root@localhost/storyteller";
+
+  let pool = MySqlPoolOptions::new()
+    .max_connections(5)
+    .connect(db_connection_string)
+    .await?;
+
   let server_state = ServerState {
     env_config: EnvConfig {
       num_workers: 4,
       bind_address: DEFAULT_BIND_ADDRESS.to_string(),
     },
     hostname: server_hostname,
+    mysql_pool: pool,
   };
 
   serve(server_state)
@@ -50,58 +62,6 @@ pub async fn serve(server_state: ServerState) -> AnyhowResult<()>
   let bind_address = server_state.env_config.bind_address.clone();
   let num_workers = server_state.env_config.num_workers.clone();
   let hostname = server_state.hostname.clone();
-
-  let db_connection_string = "mysql://root:root@localhost/storyteller";
-
-  //let pool = MySqlPool::connect(db_connection_string).await?;
-
-
-
-  let pool = MySqlPoolOptions::new()
-    .max_connections(5)
-    .connect(db_connection_string)
-    .await?;
-  let row: (i64,) = sqlx::query_as("SELECT 1")
-    //.bind(150_i64)
-    .fetch_one(&pool).await?;
-
-  println!("Result: {:?}", row);
-
-  /*
-  // Working example in 0.3 sqlx
-  let pool = MySqlPool::new(db_connection_string).await?;
-  let recs = sqlx::query!(
-            r#"
-                SELECT id, username
-                    FROM users
-                ORDER BY id
-            "#
-        )
-    .fetch_all(&pool)
-    .await?;
-   */
-
-  //create_user(&pool).await?;
-
-  let badge = NewBadge {
-    slug: "slug2".to_string(),
-    title: "title".to_string(),
-    description: "description".to_string(),
-    image_url: "url".to_string()
-  };
-
-  let id = badge.insert(&pool).await?;
-  println!("Created id: {}", id);
-
-  let badge = NewBadge {
-    slug: "slug3".to_string(),
-    title: "title".to_string(),
-    description: "description".to_string(),
-    image_url: "url".to_string()
-  };
-
-  let id = badge.insert(&pool).await?;
-  println!("Created id: {}", id);
 
   let server_state_arc = web::Data::new(Arc::new(server_state));
 
@@ -141,6 +101,11 @@ pub async fn serve(server_state: ServerState) -> AnyhowResult<()>
         .exclude("/liveness")
         .exclude("/readiness"))
       .wrap(DefaultHeaders::new().header("X-Backend-Hostname", &hostname))
+      .service(
+        web::resource("/create_account")
+          .route(web::post().to(create_account_handler))
+          .route(web::head().to(|| HttpResponse::Ok()))
+      )
       .service(
         web::resource("/test")
           .route(web::get().to(|| HttpResponse::Ok()))
