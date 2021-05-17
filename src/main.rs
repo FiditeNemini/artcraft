@@ -1,9 +1,11 @@
+#[macro_use] extern crate lazy_static;
 #[macro_use] extern crate serde_derive;
 
 pub mod server_state;
 pub mod endpoints;
 pub mod queries;
 pub mod util;
+pub mod validations;
 
 use actix_cors::Cors;
 use actix_http::http;

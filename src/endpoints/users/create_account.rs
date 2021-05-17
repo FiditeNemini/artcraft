@@ -6,14 +6,16 @@ use actix_web::http::StatusCode;
 use actix_web::{Responder, web, HttpResponse, error, HttpRequest};
 use crate::endpoints::users::create_account::CreateAccountError::{BadInput, ServerError, UsernameTaken, EmailTaken};
 use crate::server_state::ServerState;
+use crate::util::ip_address::get_request_ip;
 use crate::util::random::random_token;
 use derive_more::{Display, Error};
 use log::{info, warn, log};
-use std::sync::Arc;
-use crate::util::ip_address::get_request_ip;
-use sqlx::mysql::MySqlDatabaseError;
+use regex::Regex;
 use sqlx::error::DatabaseError;
 use sqlx::error::Error::Database;
+use sqlx::mysql::MySqlDatabaseError;
+use std::sync::Arc;
+use crate::validations::username::validate_username;
 
 const NEW_USER_ROLE: &'static str = "new-user";
 
@@ -83,8 +85,8 @@ pub async fn create_account_handler(
   request: web::Json<CreateAccountRequest>,
   server_state: web::Data<Arc<ServerState>>) -> Result<HttpResponse, CreateAccountError>
 {
-  if request.username.len() < 3 {
-    return Err(CreateAccountError::BadInput("username is too short".to_string()));
+  if let Err(reason) = validate_username(&request.username) {
+    return Err(CreateAccountError::BadInput(reason));
   }
 
   if request.password.len() < 6 {
@@ -176,6 +178,11 @@ VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? )
   };
 
   info!("new user id: {}", record_id);
+
+
+
+
+
 
   let response = CreateAccountSuccessResponse {
     success: true,

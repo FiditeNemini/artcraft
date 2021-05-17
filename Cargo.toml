@@ -21,8 +21,10 @@ derive_more = "0.99.14"
 easyenv = "0.0.5"
 futures = "0.3.15"
 hostname = "0.3.1"
+lazy_static = "1.4.0"
 log = "0.4.14"
 rand = "0.8.3"
+regex = "1.5.4"
 
 # Database
 #sqlx = { version = "0.5.0", features = ["mysql", "runtime-tokio-rustls", "chrono"] }
