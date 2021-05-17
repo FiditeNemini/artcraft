@@ -71,7 +71,8 @@ pub async fn serve(server_state: ServerState) -> AnyhowResult<()>
   let log_format = "[%{HOSTNAME}e] %a \"%r\" %s %b \"%{Referer}i\" \"%{User-Agent}i\" %T";
 
   HttpServer::new(move || {
-    let mut app = App::new()
+    App::new()
+      .app_data(server_state_arc.clone())
       .wrap(Cors::default()
         .allowed_origin("http://api.vo.codes")
         .allowed_origin("http://jungle.horse")
@@ -132,42 +133,41 @@ pub async fn serve(server_state: ServerState) -> AnyhowResult<()>
               .route(web::get().to(|| HttpResponse::Ok()))
               .route(web::head().to(|| HttpResponse::Ok()))
           )
-      );
-      // Admin UI & old frontend
-      //.service(Files::new("/frontend", admin_asset_directory.clone())
-      //  .index_file("FAKE_INDEX.HTML"))
-      //.service(Files::new("/adminui", admin_asset_directory.clone())
-      //  .index_file("index.html"))
-      // Early access static path for assets
-      //.service(Files::new("/static", static_asset_directory.clone())
-      //  .index_file("FAKE_INDEX.HTML"))
-      /*.service(
-        web::resource("/login")
-          .route(web::post().to(login_handler))
-          .route(web::head().to(|| HttpResponse::Ok()))
       )
-      .service(
-        web::resource("/logout")
-          .route(web::post().to(logout_handler))
-          .route(web::head().to(|| HttpResponse::Ok()))
-      )
-      .service(get_liveness)
-      .service(get_models)
-      .service(get_readiness)
-      .service(get_root)
-      .service(get_sentences)
-      .service(get_service_settings)
-      .service(get_speakers)
-      .service(get_early_access_speakers)
-      .service(get_dynamic_early_access_speakers)
-      .service(get_words);*/
-
-    app.app_data(server_state_arc.clone())
   })
-    .bind(bind_address)?
-    .workers(num_workers)
-    .run()
-    .await?;
+  .bind(bind_address)?
+  .workers(num_workers)
+  .run()
+  .await?;
+
+  // Admin UI & old frontend
+  //.service(Files::new("/frontend", admin_asset_directory.clone())
+  //  .index_file("FAKE_INDEX.HTML"))
+  //.service(Files::new("/adminui", admin_asset_directory.clone())
+  //  .index_file("index.html"))
+  // Early access static path for assets
+  //.service(Files::new("/static", static_asset_directory.clone())
+  //  .index_file("FAKE_INDEX.HTML"))
+  /*.service(
+    web::resource("/login")
+      .route(web::post().to(login_handler))
+      .route(web::head().to(|| HttpResponse::Ok()))
+  )
+  .service(
+    web::resource("/logout")
+      .route(web::post().to(logout_handler))
+      .route(web::head().to(|| HttpResponse::Ok()))
+  )
+  .service(get_liveness)
+  .service(get_models)
+  .service(get_readiness)
+  .service(get_root)
+  .service(get_sentences)
+  .service(get_service_settings)
+  .service(get_speakers)
+  .service(get_early_access_speakers)
+  .service(get_dynamic_early_access_speakers)
+  .service(get_words);*/
 
   Ok(())
 }

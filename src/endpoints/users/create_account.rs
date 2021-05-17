@@ -5,9 +5,11 @@ use actix_web::error::ResponseError;
 use actix_web::http::StatusCode;
 use actix_web::{Responder, web, HttpResponse, error};
 use crate::endpoints::users::create_account::CreateAccountError::BadInput;
+use crate::server_state::ServerState;
+use crate::util::random::random_token;
 use derive_more::{Display, Error};
 use log::{info, warn, log};
-use crate::server_state::ServerState;
+use std::sync::Arc;
 
 const NEW_USER_ROLE: &'static str = "new-user";
 
@@ -68,7 +70,7 @@ impl ResponseError for CreateAccountError {
 
 pub async fn create_account_handler(
   request: web::Json<CreateAccountRequest>,
-  server_state: web::Data<ServerState>) -> Result<HttpResponse, CreateAccountError>
+  server_state: web::Data<Arc<ServerState>>) -> Result<HttpResponse, CreateAccountError>
 {
   if request.username.len() < 3 {
     return Err(CreateAccountError::BadInput("username is too short".to_string()));
@@ -86,7 +88,7 @@ pub async fn create_account_handler(
     return Err(CreateAccountError::BadInput("invalid email address".to_string()));
   }
 
-  let token = "token";
+  let token = random_token(32);
   let password_hash = "temp";
   let profile_markdown = "";
   let profile_rendered_html = "";
@@ -123,7 +125,10 @@ VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? )
     )
     .execute(&server_state.mysql_pool)
     .await
-    .map_err(|_| CreateAccountError::ServerError)?
+    .map_err(|e| {
+      warn!("Query error: {:?}", e);
+      return CreateAccountError::ServerError;
+    })?
     .last_insert_id();
 
   info!("new user id: {}", record_id);
