@@ -3,6 +3,7 @@
 pub mod server_state;
 pub mod endpoints;
 pub mod queries;
+pub mod util;
 
 use actix_cors::Cors;
 use actix_http::http;

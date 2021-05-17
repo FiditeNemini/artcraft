@@ -56,7 +56,7 @@ CREATE TABLE users (
   ) NOT NULL DEFAULT 'light-mode',
 
   -- An uploaded avatar. Public hash in our bucket.
-  avatar_public_bucket_hash CHAR(32) NOT NULL UNIQUE,
+  avatar_public_bucket_hash CHAR(32) NOT NULL,
 
   -- If the user doesn't want to use gravatar and doesn't have an uploaded avatar.
   disable_gravatar BOOLEAN NOT NULL DEFAULT false,
