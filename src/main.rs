@@ -107,9 +107,30 @@ pub async fn serve(server_state: ServerState) -> AnyhowResult<()>
           .route(web::head().to(|| HttpResponse::Ok()))
       )
       .service(
-        web::resource("/test")
-          .route(web::get().to(|| HttpResponse::Ok()))
-          .route(web::head().to(|| HttpResponse::Ok()))
+        web::scope("/foo")
+          .service(
+            web::resource("/bar")
+              .route(web::get().to(|| HttpResponse::Ok()))
+              .route(web::head().to(|| HttpResponse::Ok()))
+          )
+          .service(
+            web::resource("/bin")
+              .route(web::get().to(|| HttpResponse::Ok()))
+              .route(web::head().to(|| HttpResponse::Ok()))
+          )
+      )
+      .service(
+        web::scope("/a")
+          .service(
+            web::resource("/b")
+              .route(web::get().to(|| HttpResponse::Ok()))
+              .route(web::head().to(|| HttpResponse::Ok()))
+          )
+          .service(
+            web::resource("/c")
+              .route(web::get().to(|| HttpResponse::Ok()))
+              .route(web::head().to(|| HttpResponse::Ok()))
+          )
       );
       // Admin UI & old frontend
       //.service(Files::new("/frontend", admin_asset_directory.clone())
