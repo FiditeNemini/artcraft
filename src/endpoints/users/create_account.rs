@@ -3,13 +3,17 @@ use actix_http::http::header;
 use actix_web::dev::HttpResponseBuilder;
 use actix_web::error::ResponseError;
 use actix_web::http::StatusCode;
-use actix_web::{Responder, web, HttpResponse, error};
-use crate::endpoints::users::create_account::CreateAccountError::BadInput;
+use actix_web::{Responder, web, HttpResponse, error, HttpRequest};
+use crate::endpoints::users::create_account::CreateAccountError::{BadInput, ServerError, UsernameTaken, EmailTaken};
 use crate::server_state::ServerState;
 use crate::util::random::random_token;
 use derive_more::{Display, Error};
 use log::{info, warn, log};
 use std::sync::Arc;
+use crate::util::ip_address::get_request_ip;
+use sqlx::mysql::MySqlDatabaseError;
+use sqlx::error::DatabaseError;
+use sqlx::error::Error::Database;
 
 const NEW_USER_ROLE: &'static str = "new-user";
 
@@ -35,6 +39,8 @@ pub struct ErrorResponse {
 #[derive(Debug, Display)]
 pub enum CreateAccountError {
   BadInput(String),
+  UsernameTaken,
+  EmailTaken,
   ServerError,
 }
 
@@ -42,6 +48,8 @@ impl ResponseError for CreateAccountError {
   fn status_code(&self) -> StatusCode {
     match *self {
       CreateAccountError::BadInput(_) => StatusCode::BAD_REQUEST,
+      CreateAccountError::UsernameTaken => StatusCode::BAD_REQUEST,
+      CreateAccountError::EmailTaken => StatusCode::BAD_REQUEST,
       CreateAccountError::ServerError => StatusCode::INTERNAL_SERVER_ERROR,
     }
   }
@@ -49,6 +57,8 @@ impl ResponseError for CreateAccountError {
   fn error_response(&self) -> HttpResponse {
     let error_reason = match self {
       BadInput(reason) => reason.to_string(),
+      CreateAccountError::UsernameTaken => "username already taken".to_string(),
+      CreateAccountError::EmailTaken => "email already taken".to_string(),
       CreateAccountError::ServerError => "server error".to_string(),
     };
 
@@ -69,6 +79,7 @@ impl ResponseError for CreateAccountError {
 }
 
 pub async fn create_account_handler(
+  http_request: HttpRequest,
   request: web::Json<CreateAccountRequest>,
   server_state: web::Data<Arc<ServerState>>) -> Result<HttpResponse, CreateAccountError>
 {
@@ -88,13 +99,22 @@ pub async fn create_account_handler(
     return Err(CreateAccountError::BadInput("invalid email address".to_string()));
   }
 
-  let token = random_token(32);
-  let password_hash = "temp";
+  //let token = random_token(32);
+  let token = random_token(15);
+
+  let password_hash = match bcrypt::hash(&request.password, bcrypt::DEFAULT_COST) {
+    Ok(hash) => hash,
+    Err(err) => {
+      warn!("Bcrypt error: {:?}", err);
+      return Err(ServerError);
+    }
+  };
+
   let profile_markdown = "";
   let profile_rendered_html = "";
-  let ip_address = "1.1.1.1";
+  let ip_address = get_request_ip(&http_request);
 
-  let record_id = sqlx::query!(
+  let result = sqlx::query!(
         r#"
 INSERT INTO users (
   token,
@@ -124,25 +144,39 @@ VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? )
         ip_address.to_string(),
     )
     .execute(&server_state.mysql_pool)
-    .await
-    .map_err(|e| {
-      warn!("Query error: {:?}", e);
-      return CreateAccountError::ServerError;
-    })?
-    .last_insert_id();
+    .await;
+
+  let record_id = match result {
+    Ok(res) => {
+      res.last_insert_id()
+    },
+    Err(err) => {
+      warn!("Query error: {:?}", err);
+
+      // NB: SQLSTATE[23000]: Integrity constraint violation
+      // NB: MySQL Error Code 1062: Duplicate key insertion (this is harder to access)
+      match err {
+        Database(err) => {
+          let maybe_code = err.code().map(|c| c.into_owned());
+          match maybe_code.as_deref() {
+            Some("23000") => {
+              if err.message().contains("username") {
+                return Err(UsernameTaken);
+              } else if err.message().contains("email_address") {
+                return Err(EmailTaken);
+              }
+            }
+            _ => {},
+          }
+        },
+        _ => {},
+      }
+      return Err(ServerError);
+    }
+  };
 
   info!("new user id: {}", record_id);
 
-  //Ok(record_id)
-  /*Ok(web::Json())*/
-
-  if true {
-    //return Err(error::ErrorBadRequest(CreateAccountResponse { success: false } ));
-    //return Err(CreateAccountResponseError::UsernameExists("foo".to_string()));
-  }
-
-  // .map_err(error::ErrorInternalServerError)?;
-  // error::ErrorBadRequest(msg)
   let response = CreateAccountSuccessResponse {
     success: true,
   };
