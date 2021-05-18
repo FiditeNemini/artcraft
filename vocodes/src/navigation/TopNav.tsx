@@ -25,6 +25,7 @@ function TopNav(props: Props) {
 
   // Vo.codes 2.0
   let loginManagement = <span />;
+  let extendedFeatures = <span />;
 
   if (props.enableAlpha) {
     if (props.loggedIn) {
@@ -42,6 +43,19 @@ function TopNav(props: Props) {
         </span>
       );
     }
+
+    extendedFeatures = (
+      <div className="notification is-info is-light">
+          <strong>NEW:</strong>
+          <a href="#community_tts" onClick={() => props.switchModeCallback(Mode.COMMUNITY_TTS_MODE)}>Community TTS</a>
+          <a href="#community_video" onClick={() => props.switchModeCallback(Mode.COMMUNITY_VIDEO_MODE)}>Community Video</a>
+          <a href="#upload_voices" onClick={() => props.switchModeCallback(Mode.UPLOAD_VOICES_MODE)}>Upload Voices</a>
+          <a href="#upload_video" onClick={() => props.switchModeCallback(Mode.UPLOAD_VIDEO_MODE)}>Upload Voices</a>
+          <a href="#my_data" onClick={() => props.switchModeCallback(Mode.MY_DATA_MODE)}>My Data</a>
+          <br />
+          <p>(Yes, this needs a redesign!)</p>
+      </div>
+    );
   }
 
   return (
@@ -56,6 +70,7 @@ function TopNav(props: Props) {
       <a href="#use" onClick={() => props.switchModeCallback(Mode.ABOUT_MODE)}>About</a>
 
       {loginManagement}
+      {extendedFeatures}
       <hr />
     </nav>
   )
