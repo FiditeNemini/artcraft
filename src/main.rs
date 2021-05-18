@@ -18,17 +18,14 @@ use sqlx::MySqlPool;
 use sqlx::mysql::MySqlPoolOptions;
 use crate::queries::badges::NewBadge;
 use crate::endpoints::users::create_account::create_account_handler;
+//use crate::endpoints::users::login::login_handler;
+use crate::util::cookies::CookieManager;
 
 const DEFAULT_BIND_ADDRESS : &'static str = "0.0.0.0:12345";
 const DEFAULT_RUST_LOG: &'static str = "debug,actix_web=info";
 
 pub type AnyhowResult<T> = anyhow::Result<T>;
 
-//pub async fn main() -> AnyhowResult<()> {
-//#[tokio::main]
-//#[async_std::main]
-//#[actix_web::main]
-//pub async fn main() -> std::io::Result<()> {
 #[actix_web::main]
 async fn main() -> AnyhowResult<()> {
   easyenv::init_all_with_default_logging(Some(DEFAULT_RUST_LOG));
@@ -45,6 +42,9 @@ async fn main() -> AnyhowResult<()> {
     .connect(db_connection_string)
     .await?;
 
+  let hmac_secret = easyenv::get_env_string_or_default("COOKIE_SECRET", "notsecret");
+  let cookie_manager = CookieManager::new(".vo.codes", &hmac_secret);
+
   let server_state = ServerState {
     env_config: EnvConfig {
       num_workers: 4,
@@ -52,6 +52,7 @@ async fn main() -> AnyhowResult<()> {
     },
     hostname: server_hostname,
     mysql_pool: pool,
+    cookie_manager,
   };
 
   serve(server_state)
@@ -59,7 +60,6 @@ async fn main() -> AnyhowResult<()> {
   Ok(())
 }
 
-//#[actix_web::main]
 pub async fn serve(server_state: ServerState) -> AnyhowResult<()>
 {
   let bind_address = server_state.env_config.bind_address.clone();
@@ -110,6 +110,11 @@ pub async fn serve(server_state: ServerState) -> AnyhowResult<()>
           .route(web::post().to(create_account_handler))
           .route(web::head().to(|| HttpResponse::Ok()))
       )
+      /*.service(
+        web::resource("/login")
+          .route(web::post().to(login_handler))
+          .route(web::head().to(|| HttpResponse::Ok()))
+      )*/
       .service(
         web::scope("/foo")
           .service(

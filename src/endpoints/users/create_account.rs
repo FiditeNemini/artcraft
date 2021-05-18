@@ -7,7 +7,7 @@ use actix_web::{Responder, web, HttpResponse, error, HttpRequest};
 use crate::endpoints::users::create_account::CreateAccountError::{BadInput, ServerError, UsernameTaken, EmailTaken};
 use crate::server_state::ServerState;
 use crate::util::ip_address::get_request_ip;
-use crate::util::random::random_token;
+use crate::util::tokens::random_token;
 use derive_more::{Display, Error};
 use log::{info, warn, log};
 use regex::Regex;
@@ -210,12 +210,10 @@ VALUES ( ?, ?, ?, NOW() + interval 1 year )
 
   info!("new user session created");
 
-  let session_cookie = Cookie::build("session", session_token)
-    .domain(".vo.codes")
-    .path("/")
-    .secure(true) // HTTPS-only
-    .http_only(true) // Not exposed to Javascript
-    .finish();
+  let session_cookie = match server_state.cookie_manager.create_cookie(&session_token) {
+    Ok(cookie) => cookie,
+    Err(_) => return Err(ServerError),
+  };
 
   let response = CreateAccountSuccessResponse {
     success: true,
