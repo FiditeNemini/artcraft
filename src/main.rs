@@ -1,9 +1,9 @@
 #[macro_use] extern crate lazy_static;
 #[macro_use] extern crate serde_derive;
 
-pub mod server_state;
+pub mod common_queries;
 pub mod endpoints;
-pub mod queries;
+pub mod server_state;
 pub mod util;
 pub mod validations;
 
@@ -16,9 +16,8 @@ use std::sync::Arc;
 use crate::server_state::{ServerState, EnvConfig};
 use sqlx::MySqlPool;
 use sqlx::mysql::MySqlPoolOptions;
-use crate::queries::badges::NewBadge;
 use crate::endpoints::users::create_account::create_account_handler;
-//use crate::endpoints::users::login::login_handler;
+use crate::endpoints::users::login::login_handler;
 use crate::util::cookies::CookieManager;
 
 const DEFAULT_BIND_ADDRESS : &'static str = "0.0.0.0:12345";
@@ -110,11 +109,11 @@ pub async fn serve(server_state: ServerState) -> AnyhowResult<()>
           .route(web::post().to(create_account_handler))
           .route(web::head().to(|| HttpResponse::Ok()))
       )
-      /*.service(
+      .service(
         web::resource("/login")
           .route(web::post().to(login_handler))
           .route(web::head().to(|| HttpResponse::Ok()))
-      )*/
+      )
       .service(
         web::scope("/foo")
           .service(

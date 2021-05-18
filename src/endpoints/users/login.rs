@@ -18,6 +18,9 @@ use std::sync::Arc;
 use crate::validations::username::validate_username;
 use crate::validations::passwords::validate_passwords;
 use actix_web::cookie::Cookie;
+use sqlx::MySqlPool;
+use crate::AnyhowResult;
+use crate::common_queries::sessions::create_session_for_user;
 
 #[derive(Deserialize)]
 pub struct LoginRequest {
@@ -37,29 +40,23 @@ pub struct ErrorResponse {
 }
 
 #[derive(Debug, Display)]
-pub enum CreateAccountError {
-  BadInput(String),
-  UsernameTaken,
-  EmailTaken,
+pub enum LoginError {
+  WrongCredentials,
   ServerError,
 }
 
-impl ResponseError for CreateAccountError {
+impl ResponseError for LoginError {
   fn status_code(&self) -> StatusCode {
     match *self {
-      CreateAccountError::BadInput(_) => StatusCode::BAD_REQUEST,
-      CreateAccountError::UsernameTaken => StatusCode::BAD_REQUEST,
-      CreateAccountError::EmailTaken => StatusCode::BAD_REQUEST,
-      CreateAccountError::ServerError => StatusCode::INTERNAL_SERVER_ERROR,
+      LoginError::WrongCredentials => StatusCode::BAD_REQUEST,
+      LoginError::ServerError=> StatusCode::INTERNAL_SERVER_ERROR,
     }
   }
 
   fn error_response(&self) -> HttpResponse {
     let error_reason = match self {
-      BadInput(reason) => reason.to_string(),
-      CreateAccountError::UsernameTaken => "username already taken".to_string(),
-      CreateAccountError::EmailTaken => "email already taken".to_string(),
-      CreateAccountError::ServerError => "server error".to_string(),
+      LoginError::WrongCredentials => "wrong credentials".to_string(),
+      LoginError::ServerError => "server error".to_string(),
     };
 
     let response = ErrorResponse {
@@ -81,96 +78,119 @@ impl ResponseError for CreateAccountError {
 pub async fn login_handler(
   http_request: HttpRequest,
   request: web::Json<LoginRequest>,
-  server_state: web::Data<Arc<ServerState>>) -> Result<HttpResponse, CreateAccountError>
+  server_state: web::Data<Arc<ServerState>>) -> Result<HttpResponse, LoginError>
 {
-  let try_password_hash = match bcrypt::hash(&request.password, bcrypt::DEFAULT_COST) {
+  let check_username_or_email = request.username_or_email.to_lowercase();
+
+  let maybe_user = if check_username_or_email.contains("@") {
+    lookup_by_email(&check_username_or_email, &server_state.mysql_pool).await
+  } else {
+    lookup_by_username(&check_username_or_email, &server_state.mysql_pool).await
+  };
+
+  let user = match maybe_user {
+    Ok(user) => user,
+    Err(e) =>  {
+      warn!("Login lookup error: {:?}", e);
+      return Err(LoginError::WrongCredentials); // TODO: This isn't necessarily user error.
+    }
+  };
+
+  info!("login user found");
+
+  let actual_hash = match String::from_utf8(user.password_hash.clone()) {
     Ok(hash) => hash,
-    Err(err) => {
-      warn!("Bcrypt error: {:?}", err);
-      return Err(ServerError);
+    Err(e) => {
+      warn!("Login hash hydration error: {:?}", e);
+      return Err(LoginError::ServerError);
     }
   };
 
-  let query_result = sqlx::query!(
-        r#"
-INSERT INTO users (
-  token,
-  username,
-  display_name,
-  email_address,
-  profile_markdown,
-  profile_rendered_html,
-  user_role_slug,
-  password_hash,
-  ip_address_creation,
-  ip_address_last_login,
-  ip_address_last_update
-)
-VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? )
-        "#,
-        user_token.to_string(),
-        username,
-        display_name,
-        request.email_address.to_string(),
-        profile_markdown,
-        profile_rendered_html,
-        NEW_USER_ROLE,
-        password_hash,
-        ip_address.to_string(),
-        ip_address.to_string(),
-        ip_address.to_string(),
-    )
-    .execute(&server_state.mysql_pool)
-    .await;
-
-  let record_id = match query_result {
-    Ok(res) => {
-      res.last_insert_id()
-    },
-    Err(err) => {
-      warn!("New user creation DB error: {:?}", err);
-
-      // NB: SQLSTATE[23000]: Integrity constraint violation
-      // NB: MySQL Error Code 1062: Duplicate key insertion (this is harder to access)
-      match err {
-        Database(err) => {
-          let maybe_code = err.code().map(|c| c.into_owned());
-          match maybe_code.as_deref() {
-            Some("23000") => {
-              if err.message().contains("username") {
-                return Err(UsernameTaken);
-              } else if err.message().contains("email_address") {
-                return Err(EmailTaken);
-              }
-            }
-            _ => {},
-          }
-        },
-        _ => {},
+  let is_valid = match bcrypt::verify(&request.password, &actual_hash) {
+    Ok(is_valid) => {
+      if !is_valid {
+        info!("invalid credentials");
+        return Err(LoginError::WrongCredentials);
       }
-      return Err(ServerError);
+    },
+    Err(e) => {
+      warn!("Login hash comparison error: {:?}", e);
+      return Err(LoginError::ServerError);
     }
   };
 
+  let ip_address = get_request_ip(&http_request);
 
-  info!("login session created");
+  let create_session_result =
+    create_session_for_user(&user.token, &ip_address, &server_state.mysql_pool).await;
 
-  let session_cookie = Cookie::build("session", session_token)
-    .domain(".vo.codes")
-    .path("/")
-    .secure(true) // HTTPS-only
-    .http_only(true) // Not exposed to Javascript
-    .finish();
+  let session_token = match create_session_result {
+    Ok(token) => token,
+    Err(e) => {
+      warn!("login create session error : {:?}", e);
+      return Err(LoginError::ServerError);
+    }
+  };
 
-  let response = CreateAccountSuccessResponse {
+  let session_cookie = match server_state.cookie_manager.create_cookie(&session_token) {
+    Ok(cookie) => cookie,
+    Err(_) => return Err(LoginError::ServerError),
+  };
+
+  let response = LoginSuccessResponse {
     success: true,
   };
 
   let body = serde_json::to_string(&response)
-    .map_err(|e| BadInput("".to_string()))?;
+    .map_err(|e| LoginError::ServerError)?;
 
   Ok(HttpResponse::Ok()
     .cookie(session_cookie)
     .content_type("application/json")
     .body(body))
+}
+
+#[derive(Debug)]
+pub struct UserRecordForLogin {
+  token: String,
+  username: String,
+  email_address: String,
+  password_hash: Vec<u8>,
+}
+
+async fn lookup_by_username(username: &str, pool: &MySqlPool) -> AnyhowResult<UserRecordForLogin>
+{
+  // NB: Lookup failure is Err(RowNotFound).
+  let record = sqlx::query_as!(
+    UserRecordForLogin,
+        r#"
+SELECT token, username, email_address, password_hash
+FROM users
+WHERE username = ?
+LIMIT 1
+        "#,
+        username.to_string(),
+    )
+    .fetch_one(pool)
+    .await?;
+
+  Ok(record)
+}
+
+async fn lookup_by_email(email: &str, pool: &MySqlPool) -> AnyhowResult<UserRecordForLogin> {
+  // NB: Lookup failure is Err(RowNotFound).
+  let record = sqlx::query_as!(
+    UserRecordForLogin,
+        r#"
+SELECT token, username, email_address, password_hash
+FROM users
+WHERE email_address = ?
+LIMIT 1
+        "#,
+        email.to_string(),
+    )
+    .fetch_one(pool)
+    .await?;
+
+  Ok(record)
 }

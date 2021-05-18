@@ -112,8 +112,11 @@ pub async fn create_account_handler(
   let username = request.username.to_lowercase();
   let display_name = request.username.to_string();
 
+  let email_address = request.email_address.to_lowercase();
+
   let profile_markdown = "";
   let profile_rendered_html = "";
+
   let ip_address = get_request_ip(&http_request);
 
   let query_result = sqlx::query!(
@@ -136,7 +139,7 @@ VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? )
         user_token.to_string(),
         username,
         display_name,
-        request.email_address.to_string(),
+        email_address,
         profile_markdown,
         profile_rendered_html,
         NEW_USER_ROLE,
