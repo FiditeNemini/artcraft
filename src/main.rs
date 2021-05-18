@@ -27,6 +27,7 @@ use crate::endpoints::users::login::login_handler;
 use crate::util::cookies::CookieManager;
 use crate::endpoints::users::logout::logout_handler;
 use crate::util::session_checker::SessionChecker;
+use crate::endpoints::users::session_info::session_info_handler;
 
 const DEFAULT_BIND_ADDRESS : &'static str = "0.0.0.0:12345";
 const DEFAULT_RUST_LOG: &'static str = "debug,actix_web=info";
@@ -134,6 +135,11 @@ pub async fn serve(server_state: ServerState) -> AnyhowResult<()>
       .service(
         web::resource("/logout")
           .route(web::post().to(logout_handler))
+          .route(web::head().to(|| HttpResponse::Ok()))
+      )
+      .service(
+        web::resource("/session")
+          .route(web::get().to(session_info_handler))
           .route(web::head().to(|| HttpResponse::Ok()))
       )
       .service(

@@ -1,7 +1,10 @@
-use crate::util::cookies::CookieManager;
-use sqlx::MySqlPool;
-use crate::AnyhowResult;
 use actix_web::HttpRequest;
+use anyhow::anyhow;
+use crate::AnyhowResult;
+use crate::util::cookies::CookieManager;
+use log::{info, warn};
+use sqlx::MySqlPool;
+use sqlx::error::Error::RowNotFound;
 
 #[derive(Clone)]
 pub struct SessionChecker {
@@ -9,8 +12,8 @@ pub struct SessionChecker {
 }
 
 pub struct SessionRecord {
-  session_token: String,
-  user_token: String,
+  pub session_token: String,
+  pub user_token: String,
 }
 
 pub struct SessionUserRecord {
@@ -38,7 +41,7 @@ impl SessionChecker {
     };
 
     // NB: Lookup failure is Err(RowNotFound).
-    let session_record = sqlx::query_as!(
+    let maybe_session_record = sqlx::query_as!(
       SessionRecord,
         r#"
 SELECT
@@ -51,9 +54,25 @@ AND deleted_at IS NULL
         session_token.to_string(),
     )
       .fetch_one(pool)
-      .await?; // TODO: This will return error if it doesn't exist
+      .await; // TODO: This will return error if it doesn't exist
 
-    Ok(Some(session_record))
+    match maybe_session_record {
+      Ok(session_record) => {
+        Ok(Some(session_record))
+      },
+      Err(err) => {
+        match err {
+          RowNotFound => {
+            warn!("Valid cookie; invalid session: {}", session_token);
+            Ok(None)
+          },
+          _ => {
+            warn!("Session query error: {:?}", err);
+            Err(anyhow!("session query error: {:?}", err))
+          }
+        }
+      }
+    }
   }
 
   /*pub async fn maybe_get_user(request: &HttpRequest, pool: &MySqlPool)
