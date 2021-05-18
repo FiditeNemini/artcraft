@@ -1,10 +1,12 @@
 use actix_web::cookie::Cookie;
+use actix_web::{HttpRequest, HttpMessage};
 use anyhow::anyhow;
 use crate::AnyhowResult;
 use hmac::Hmac;
 use hmac::NewMac;
 use jwt::SignWithKey;
 use jwt::VerifyWithKey;
+use log::{info, warn};
 use sha2::Sha256;
 use std::collections::BTreeMap;
 use std::ops::Sub;
@@ -65,6 +67,23 @@ impl CookieManager {
     let session_token = claims["session_token"].clone();
 
     Ok(session_token)
+  }
+
+  pub fn decode_session_token_from_request(&self, request: &HttpRequest)
+    -> AnyhowResult<Option<String>>
+  {
+    let cookie = match request.cookie(SESSION_COOKIE_NAME) {
+      None => return Ok(None),
+      Some(cookie) => cookie,
+    };
+
+    match self.decode_session_token(&cookie) {
+      Err(e) => {
+        warn!("Session cookie decode error: {:?}", e);
+        Err(anyhow!("Could not decode session cookie: {:?}", e))
+      },
+      Ok(payload) => Ok(Some(payload)),
+    }
   }
 }
 

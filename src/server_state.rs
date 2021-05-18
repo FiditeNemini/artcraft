@@ -1,5 +1,6 @@
 use sqlx::MySqlPool;
 use crate::util::cookies::CookieManager;
+use crate::util::session_checker::SessionChecker;
 
 /// State that is injected into every endpoint.
 #[derive(Clone)]
@@ -12,6 +13,8 @@ pub struct ServerState {
   pub mysql_pool: MySqlPool,
 
   pub cookie_manager: CookieManager,
+
+  pub session_checker: SessionChecker,
 }
 
 #[derive(Clone)]

@@ -1,3 +1,9 @@
+#![allow(dead_code)]
+#![allow(unused_mut)]
+#![allow(unused_imports)]
+#![warn(unused_must_use)]
+//#![allow(warnings)]
+
 #[macro_use] extern crate lazy_static;
 #[macro_use] extern crate serde_derive;
 
@@ -20,6 +26,7 @@ use crate::endpoints::users::create_account::create_account_handler;
 use crate::endpoints::users::login::login_handler;
 use crate::util::cookies::CookieManager;
 use crate::endpoints::users::logout::logout_handler;
+use crate::util::session_checker::SessionChecker;
 
 const DEFAULT_BIND_ADDRESS : &'static str = "0.0.0.0:12345";
 const DEFAULT_RUST_LOG: &'static str = "debug,actix_web=info";
@@ -35,15 +42,21 @@ async fn main() -> AnyhowResult<()> {
     .and_then(|h| h.into_string().ok())
     .unwrap_or("storyteller-web-unknown".to_string());
 
-  let db_connection_string = "mysql://root:root@localhost/storyteller";
+  let db_connection_string =
+    easyenv::get_env_string_or_default(
+      "MYSQL_URL",
+      "mysql://root:root@localhost/storyteller");
 
   let pool = MySqlPoolOptions::new()
     .max_connections(5)
-    .connect(db_connection_string)
+    .connect(&db_connection_string)
     .await?;
 
   let hmac_secret = easyenv::get_env_string_or_default("COOKIE_SECRET", "notsecret");
-  let cookie_manager = CookieManager::new(".vo.codes", &hmac_secret);
+  let cookie_domain = easyenv::get_env_string_or_default("COOKIE_DOMAIN", ".vo.codes");
+
+  let cookie_manager = CookieManager::new(&cookie_domain, &hmac_secret);
+  let session_checker = SessionChecker::new(&cookie_manager);
 
   let server_state = ServerState {
     env_config: EnvConfig {
@@ -53,6 +66,7 @@ async fn main() -> AnyhowResult<()> {
     hostname: server_hostname,
     mysql_pool: pool,
     cookie_manager,
+    session_checker,
   };
 
   serve(server_state)

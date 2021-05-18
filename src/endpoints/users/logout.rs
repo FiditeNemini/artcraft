@@ -108,6 +108,7 @@ async fn delete_session(session_token: &str, mysql_pool: &MySqlPool) -> AnyhowRe
 UPDATE user_sessions
 SET deleted_at = CURRENT_TIMESTAMP()
 WHERE token = ?
+AND deleted_at IS NULL
         "#,
         session_token.to_string(),
     )
