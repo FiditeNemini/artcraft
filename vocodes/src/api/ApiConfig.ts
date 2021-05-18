@@ -4,7 +4,8 @@ class ApiConfig {
   isLocalDev: boolean;
 
   constructor() {
-    if (document.location.host.includes("localhost")) {
+    if (document.location.host.includes("localhost") ||
+        document.location.host.includes("jungle.horse")) {
       this.isLocalDev = true;
     } else {
       this.isLocalDev = false;
@@ -41,7 +42,9 @@ class ApiConfig {
   }
 
   private getHost() : string {
-    return this.isLocalDev ? "localhost:12345" : "mumble.stream";
+    // NB: `localhost` seems to have problems with cookies. 
+    // I've added jungle.horse as a localhost mapped domain in /etc/hosts
+    return this.isLocalDev ? "api.jungle.horse" : "mumble.stream";
   }
 }
 

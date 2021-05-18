@@ -19,6 +19,8 @@ import { VideoJobPoller } from './modes/video/VideoJobPoller';
 import { VideoQueuePoller } from './modes/video/VideoQueuePoller';
 import { VideoQueueStats } from './modes/video/VideoQueueStats';
 import { SignupComponent } from './modes/signup/SignupComponent';
+import { ApiConfig } from './api/ApiConfig';
+import { SessionStateResponse } from './api/SessionState';
 
 interface Props {
   // Certan browsers (iPhone) have pitiful support for drawing APIs. Worse yet,
@@ -82,6 +84,7 @@ interface State {
   // Rollout of vocodes 2.0
   enableAlpha: boolean,
   loggedIn: boolean,
+  sessionState?: SessionStateResponse,
 }
 
 // Responses from the `/service_settings` endpoint.
@@ -131,8 +134,22 @@ class App extends React.Component<Props, State> {
   }
 
   componentDidMount() {
+    this.startupQueryServiceSettings();
+    this.startupQuerySession();
+    //this.state.videoJobPoller.start();
+    //this.state.videoQueuePoller.start();
+  }
+
+  startupQueryServiceSettings() {
     const url = 'https://mumble.stream/service_settings';
     fetch(url, {
+      /*
+            xhrFields: {
+           withCredentials: true
+      },
+      crossDomain: true,
+
+      */
       method: 'GET',
       headers: {
         'Accept': 'application/json',
@@ -140,6 +157,8 @@ class App extends React.Component<Props, State> {
     })
     .then(res => res.json())
     .then(response => {
+      console.log('response', response);
+
       const settings : ServiceSettingsResponse = response;
 
       // TODO: We're only handling the max limit for now.
@@ -148,9 +167,40 @@ class App extends React.Component<Props, State> {
       }
     })
     .catch(e => { /* Ignore. We'll just operate with the defaults. */ });
+  }
 
-    //this.state.videoJobPoller.start();
-    //this.state.videoQueuePoller.start();
+  startupQuerySession() {
+    this.pollSession();
+    setInterval(() => this.pollSession, 10000);
+  }
+
+  pollSession() {
+    if (!this.state.enableAlpha) {
+      return;
+    }
+
+    const api = new ApiConfig();
+    const endpointUrl = api.sessionDetails();
+
+    fetch(endpointUrl, {
+      method: 'GET',
+      credentials: 'include',
+      headers: {
+        'Accept': 'application/json',
+      },
+    })
+    .then(res => res.json())
+    .then(response => {
+      const session : SessionStateResponse = response;
+
+      if (session !== undefined) {
+        this.setState({ 
+          sessionState : session,
+          loggedIn: session.logged_in,
+        });
+      }
+    })
+    .catch(e => { /* Ignore. */ });
   }
 
   componentWillUnmount() {

@@ -207,6 +207,7 @@ class SignupComponent extends React.Component<Props, State> {
         'Accept': 'application/json',
         'Content-Type': 'application/json',
       },
+      credentials: 'include',
       body: JSON.stringify(request),
     })
     .then(res => res.json())
