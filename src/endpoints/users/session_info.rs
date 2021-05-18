@@ -27,6 +27,8 @@ use crate::util::session_checker::SessionRecord;
 #[derive(Serialize)]
 pub struct UserInfo {
   pub user_token: String,
+  pub username: String,
+  pub display_name: String,
 }
 
 #[derive(Serialize)]
@@ -79,7 +81,9 @@ pub async fn session_info_handler(
   http_request: HttpRequest,
   server_state: web::Data<Arc<ServerState>>) -> Result<HttpResponse, SessionInfoError>
 {
-  let maybe_session = server_state.session_checker.maybe_get_session(&http_request, &server_state.mysql_pool)
+  let maybe_user_session = server_state
+    .session_checker
+    .maybe_get_user_session(&http_request, &server_state.mysql_pool)
     .await
     .map_err(|e| {
       warn!("Session checker error: {:?}", e);
@@ -89,12 +93,14 @@ pub async fn session_info_handler(
   let mut logged_in = false;
   let mut user_info = None;
 
-  match maybe_session {
+  match maybe_user_session {
     None => {}
     Some(session_data) => {
       logged_in = true;
       user_info = Some(UserInfo {
         user_token: session_data.user_token.clone(),
+        username: session_data.username.to_string(),
+        display_name: session_data.display_name.to_string()
       });
     }
   }

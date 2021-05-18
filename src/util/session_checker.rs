@@ -17,11 +17,22 @@ pub struct SessionRecord {
 }
 
 pub struct SessionUserRecord {
-  pub token: String,
+  pub user_token: String,
   pub username: String,
   pub display_name: String,
   pub email_address: String,
-  pub banned: bool,
+  pub email_confirmed: i8,
+  pub profile_markdown: String,
+  pub profile_rendered_html: String,
+  pub user_role_slug: String,
+  pub banned: i8,
+  pub dark_mode: String,
+  pub avatar_public_bucket_hash: Option<String>,
+  pub disable_gravatar: i8,
+  pub hide_results_preference: i8,
+  pub discord_username: Option<String>,
+  pub twitch_username: Option<String>,
+  pub twitter_username: Option<String>,
 }
 
 impl SessionChecker {
@@ -75,11 +86,83 @@ AND deleted_at IS NULL
     }
   }
 
-  /*pub async fn maybe_get_user(request: &HttpRequest, pool: &MySqlPool)
-    -> AnyhowResult<SessionUserRecord>
+  pub async fn maybe_get_user_session(&self, request: &HttpRequest, pool: &MySqlPool)
+    -> AnyhowResult<Option<SessionUserRecord>>
   {
-    Ok(SessionUserRecord {
 
-    })
-  }*/
+    let session_token = match self.cookie_manager.decode_session_token_from_request(request)? {
+      None => return Ok(None),
+      Some(session_token) => session_token,
+    };
+
+    /*
+
+  pub token: String,
+  pub username: String,
+  pub display_name: String,
+  pub email_address: String,
+  pub email_confirmed: bool,
+  pub profile_markdown: String,
+  pub profile_rendered_html: String,
+  pub user_role_slug: String,
+  pub banned: bool,
+  pub dark_mode: String,
+  pub avatar_public_bucket_hash: Option<String>,
+  pub disable_gravatar: bool,
+  pub hide_results_preference: bool,
+  pub discord_username: Option<String>,
+  pub twitch_username: Option<String>,
+  pub twitter_username: Option<String>,
+     */
+    // NB: Lookup failure is Err(RowNotFound).
+    let maybe_user_record = sqlx::query_as!(
+      SessionUserRecord,
+        r#"
+SELECT
+    users.token as user_token,
+    username,
+    display_name,
+    email_address,
+    email_confirmed,
+    profile_markdown,
+    profile_rendered_html,
+    user_role_slug,
+    banned,
+    dark_mode,
+    avatar_public_bucket_hash,
+    disable_gravatar,
+    hide_results_preference,
+    discord_username,
+    twitch_username,
+    twitter_username
+FROM users
+LEFT OUTER JOIN user_sessions
+ON users.token = user_sessions.user_token
+WHERE user_sessions.token = ?
+AND user_sessions.deleted_at IS NULL
+AND users.deleted_at IS NULL
+        "#,
+        session_token.to_string(),
+    )
+      .fetch_one(pool)
+      .await; // TODO: This will return error if it doesn't exist
+
+    match maybe_user_record {
+      Ok(user_record) => {
+        Ok(Some(user_record))
+      },
+      Err(err) => {
+        match err {
+          RowNotFound => {
+            warn!("Valid cookie; invalid session: {}", session_token);
+            Ok(None)
+          },
+          _ => {
+            warn!("Session query error: {:?}", err);
+            Err(anyhow!("session query error: {:?}", err))
+          }
+        }
+      }
+    }
+  }
 }
