@@ -1,6 +1,7 @@
 *~
 .env
 .idea/
+_ignored_schema.rs
 secrets.toml
 secrets.yaml
 target/
