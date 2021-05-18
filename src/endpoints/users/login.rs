@@ -132,6 +132,8 @@ pub async fn login_handler(
     }
   };
 
+  info!("login session created");
+
   let session_cookie = match server_state.cookie_manager.create_cookie(&session_token) {
     Ok(cookie) => cookie,
     Err(_) => return Err(LoginError::ServerError),

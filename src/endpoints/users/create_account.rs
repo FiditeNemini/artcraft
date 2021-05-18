@@ -18,6 +18,7 @@ use std::sync::Arc;
 use crate::validations::username::validate_username;
 use crate::validations::passwords::validate_passwords;
 use actix_web::cookie::Cookie;
+use crate::common_queries::sessions::create_session_for_user;
 
 const NEW_USER_ROLE: &'static str = "new-user";
 
@@ -182,32 +183,15 @@ VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? )
 
   info!("new user id: {}", record_id);
 
-  let session_token = random_token(32);
 
-  let query_result = sqlx::query!(
-        r#"
-INSERT INTO user_sessions (
-  token,
-  user_token,
-  ip_address_creation,
-  expires_at
-)
-VALUES ( ?, ?, ?, NOW() + interval 1 year )
-        "#,
-        session_token.to_string(),
-        user_token.to_string(),
-        ip_address.to_string(),
-    )
-    .execute(&server_state.mysql_pool)
-    .await;
+  let create_session_result =
+    create_session_for_user(&user_token, &ip_address, &server_state.mysql_pool).await;
 
-  let record_id = match query_result {
-    Ok(res) => {
-      res.last_insert_id()
-    },
-    Err(err) => {
-      warn!("New user session creation DB error: {:?}", err);
-      return Err(ServerError);
+  let session_token = match create_session_result {
+    Ok(token) => token,
+    Err(e) => {
+      warn!("create account session creation error : {:?}", e);
+      return Err(CreateAccountError::ServerError);
     }
   };
 
