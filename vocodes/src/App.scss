@@ -89,6 +89,21 @@ nav {
   font-family: "Fugaz One";
   margin: 0.2em 0 0 0;
   padding: 0;
+
+  .signup {
+    font-weight: bold;
+    font-size: 1.2em;
+  }
+  a:link.signup,
+  a:visited.signup {
+    color: #da4f18;
+  }
+  a:hover.signup,
+  a:active.signup{
+    color: #da4f18;
+    text-decoration: underlinegt;
+  }
+
   #logo_text {
     font-family: "Fugaz One";
     font-size: 1.5em;

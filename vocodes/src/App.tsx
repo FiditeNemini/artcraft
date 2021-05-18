@@ -18,6 +18,7 @@ import { VideoJob, VideoJobStatus } from './modes/video/VideoJob';
 import { VideoJobPoller } from './modes/video/VideoJobPoller';
 import { VideoQueuePoller } from './modes/video/VideoQueuePoller';
 import { VideoQueueStats } from './modes/video/VideoQueueStats';
+import { SignupComponent } from './modes/signup/SignupComponent';
 
 interface Props {
   // Certan browsers (iPhone) have pitiful support for drawing APIs. Worse yet,
@@ -77,6 +78,10 @@ interface State {
   // History
   utterances: Utterance[],
   isHistoryCountBadgeVisible: boolean,
+
+  // Rollout of vocodes 2.0
+  enableAlpha: boolean,
+  loggedIn: boolean,
 }
 
 // Responses from the `/service_settings` endpoint.
@@ -97,9 +102,20 @@ class App extends React.Component<Props, State> {
     const index = Math.floor(Math.random() * defaultSpeakers.length);
     const defaultSpeaker = defaultSpeakers[index]!;
 
+    // TODO: This is temporary!
+    const enableAlpha = document.cookie.includes("enablealpha");
+    const loggedIn = false;
+
+    let showNewsNotice = true; // TODO(2021-04-06): Temporarily hiding (2021-05-10: Reenable.)
+    if (enableAlpha) {
+      showNewsNotice = false;
+    }
+
     this.state = {
+      enableAlpha: enableAlpha,
+      loggedIn: loggedIn,
       mode: Mode.SPEAK_MODE,
-      showNewsNotice: true, // TODO(2021-04-06): Temporarily hiding (2021-05-10: Reenable.)
+      showNewsNotice: showNewsNotice, 
       extrasMode: ExtrasMode.SPEAKER_INFO,
       speaker: defaultSpeaker,
       spectrogramMode: SpectrogramMode.VIRIDIS,
@@ -339,11 +355,19 @@ class App extends React.Component<Props, State> {
       case Mode.TERMS_MODE:
         component = <TermsComponent resetModeCallback={this.resetMode} />;
         break;
+
+      case Mode.SIGNUP_MODE:
+        component = <SignupComponent
+          loggedIn={this.state.loggedIn}
+          />
+        break;
     }
     return (
       <div id="main" className="mainwrap">
         <div id="viewable">
           <TopNav 
+            enableAlpha={this.state.enableAlpha}
+            loggedIn={this.state.loggedIn}
             mode={this.state.mode} 
             historyBadgeCount={this.state.utterances.length}
             isHistoryCountBadgeVisible={this.state.isHistoryCountBadgeVisible}

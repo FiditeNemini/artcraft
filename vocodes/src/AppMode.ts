@@ -4,6 +4,12 @@ enum Mode {
   HISTORY_MODE,
   ABOUT_MODE,
   TERMS_MODE,
+
+  // New
+  SIGNUP_MODE,
+  LOGIN_MODE,
+  LOGOUT_MODE,
+  PROFILE_MODE,
 }
 
 export { Mode };
