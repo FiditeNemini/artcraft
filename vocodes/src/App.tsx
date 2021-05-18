@@ -359,6 +359,7 @@ class App extends React.Component<Props, State> {
       case Mode.SIGNUP_MODE:
         component = <SignupComponent
           loggedIn={this.state.loggedIn}
+          switchModeCallback={this.switchMode}
           />
         break;
     }

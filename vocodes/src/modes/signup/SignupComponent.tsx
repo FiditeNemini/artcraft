@@ -1,4 +1,6 @@
 import React from 'react';
+import { ApiConfig } from '../../api/ApiConfig';
+import { Mode } from '../../AppMode';
 
 enum FieldTriState {
   EMPTY_FALSE,
@@ -8,6 +10,7 @@ enum FieldTriState {
 
 interface Props {
   loggedIn: boolean,
+  switchModeCallback: (mode: Mode) => void,
 }
 
 interface State {
@@ -26,8 +29,6 @@ interface State {
   passwordConfirmation: string,
   passwordConfirmationValid: FieldTriState,
   passwordConfirmationInvalidReason: string,
-
-  formValid: boolean,
 }
 
 class SignupComponent extends React.Component<Props, State> {
@@ -50,8 +51,6 @@ class SignupComponent extends React.Component<Props, State> {
       passwordConfirmation: "",
       passwordConfirmationValid: FieldTriState.EMPTY_FALSE,
       passwordConfirmationInvalidReason: "",
-
-      formValid: false,
     };
   }
 
@@ -182,10 +181,46 @@ class SignupComponent extends React.Component<Props, State> {
     return false;
   }
 
-
-
   handleFormSubmit = (ev: React.FormEvent<HTMLFormElement>) : boolean => {
     ev.preventDefault();
+
+    if (!this.state.usernameValid || 
+      !this.state.emailValid || 
+      !this.state.passwordValid || 
+      !this.state.passwordConfirmationValid) {
+        return false;
+    }
+
+    const api = new ApiConfig();
+    const endpointUrl = api.createAccount();
+    
+    const request = {
+      username: this.state.username,
+      email_address: this.state.email,
+      password: this.state.password,
+      password_confirmation: this.state.passwordConfirmation,
+    }
+
+    fetch(endpointUrl, {
+      method: 'POST',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(request),
+    })
+    .then(res => res.json())
+    .then(res => {
+      console.log('create account response', res)
+      if (res.success) {
+        this.props.switchModeCallback(Mode.SPEAK_MODE);
+        return;
+      }
+    })
+    .catch(e => {
+      //this.props.onSpeakErrorCallback();
+    });
+
     return false;
   }
 
