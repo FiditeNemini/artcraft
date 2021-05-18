@@ -1,4 +1,4 @@
-use actix_web::cookie::Cookie;
+use actix_web::cookie::{Cookie, SameSite};
 use actix_web::{HttpRequest, HttpMessage};
 use anyhow::anyhow;
 use crate::AnyhowResult;
@@ -11,6 +11,7 @@ use sha2::Sha256;
 use std::collections::BTreeMap;
 use std::ops::Sub;
 use time::OffsetDateTime;
+use log::LevelFilter::Off;
 
 const COOKIE_VERSION : u32 = 1;
 
@@ -42,11 +43,17 @@ impl CookieManager {
 
     let jwt_string = claims.sign_with_key(&key)?;
 
+    let make_secure = !self.cookie_domain.to_lowercase().contains("jungle.horse")
+      && !self.cookie_domain.to_lowercase().contains("localhost");
+
     Ok(Cookie::build(SESSION_COOKIE_NAME, jwt_string)
-      .domain(&self.cookie_domain)
-      .path("/")
-      .secure(true) // HTTPS-only
-      .http_only(true) // Not exposed to Javascript
+      //.domain(&self.cookie_domain)
+      .secure(make_secure) // HTTPS-only
+      //.path("/")
+      //.http_only(true) // Not exposed to Javascript
+      //.expires(OffsetDateTime::now_utc() + time::Duration::days(365))
+      .permanent()
+      //.same_site(SameSite::Lax)
       .finish())
   }
 
