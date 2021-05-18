@@ -24,6 +24,7 @@ lazy_static = "1.4.0"
 log = "0.4.14"
 rand = "0.8.3"
 regex = "1.5.4"
+time = "0.2.26"
 
 # Database
 #sqlx = { version = "0.5.0", features = ["mysql", "runtime-tokio-rustls", "chrono"] }

@@ -3,11 +3,16 @@ use anyhow::anyhow;
 use crate::AnyhowResult;
 use hmac::Hmac;
 use hmac::NewMac;
-use std::collections::BTreeMap;
-use sha2::Sha256;
 use jwt::SignWithKey;
+use jwt::VerifyWithKey;
+use sha2::Sha256;
+use std::collections::BTreeMap;
+use std::ops::Sub;
+use time::OffsetDateTime;
 
 const COOKIE_VERSION : u32 = 1;
+
+const SESSION_COOKIE_NAME : &'static str = "session";
 
 #[derive(Clone)]
 pub struct CookieManager {
@@ -35,12 +40,31 @@ impl CookieManager {
 
     let jwt_string = claims.sign_with_key(&key)?;
 
-    Ok(Cookie::build("session", jwt_string)
+    Ok(Cookie::build(SESSION_COOKIE_NAME, jwt_string)
       .domain(&self.cookie_domain)
       .path("/")
       .secure(true) // HTTPS-only
       .http_only(true) // Not exposed to Javascript
       .finish())
+  }
+
+  pub fn delete_cookie(&self) -> Cookie {
+    Cookie::build(SESSION_COOKIE_NAME, "DELETED")
+      .expires(OffsetDateTime::unix_epoch())
+      .finish()
+  }
+
+  pub fn decode_session_token(&self, session_cookie: &Cookie) -> AnyhowResult<String> {
+    let key: Hmac<Sha256> = Hmac::new_varkey(self.hmac_secret.as_bytes())
+      .map_err(|e| anyhow!("invalid hmac: {:?}", e))?;
+
+    let cookie_contents = session_cookie.value().to_string();
+
+    let claims: BTreeMap<String, String> = cookie_contents.verify_with_key(&key)?;
+
+    let session_token = claims["session_token"].clone();
+
+    Ok(session_token)
   }
 }
 

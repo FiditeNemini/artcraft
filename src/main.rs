@@ -19,6 +19,7 @@ use sqlx::mysql::MySqlPoolOptions;
 use crate::endpoints::users::create_account::create_account_handler;
 use crate::endpoints::users::login::login_handler;
 use crate::util::cookies::CookieManager;
+use crate::endpoints::users::logout::logout_handler;
 
 const DEFAULT_BIND_ADDRESS : &'static str = "0.0.0.0:12345";
 const DEFAULT_RUST_LOG: &'static str = "debug,actix_web=info";
@@ -103,7 +104,9 @@ pub async fn serve(server_state: ServerState) -> AnyhowResult<()>
       .wrap(Logger::new(&log_format)
         .exclude("/liveness")
         .exclude("/readiness"))
-      .wrap(DefaultHeaders::new().header("X-Backend-Hostname", &hostname))
+      .wrap(DefaultHeaders::new()
+        .header("X-Backend-Hostname", &hostname)
+        .header("X-Build-Sha", ""))
       .service(
         web::resource("/create_account")
           .route(web::post().to(create_account_handler))
@@ -112,6 +115,11 @@ pub async fn serve(server_state: ServerState) -> AnyhowResult<()>
       .service(
         web::resource("/login")
           .route(web::post().to(login_handler))
+          .route(web::head().to(|| HttpResponse::Ok()))
+      )
+      .service(
+        web::resource("/logout")
+          .route(web::post().to(logout_handler))
           .route(web::head().to(|| HttpResponse::Ok()))
       )
       .service(
@@ -154,17 +162,7 @@ pub async fn serve(server_state: ServerState) -> AnyhowResult<()>
   // Early access static path for assets
   //.service(Files::new("/static", static_asset_directory.clone())
   //  .index_file("FAKE_INDEX.HTML"))
-  /*.service(
-    web::resource("/login")
-      .route(web::post().to(login_handler))
-      .route(web::head().to(|| HttpResponse::Ok()))
-  )
-  .service(
-    web::resource("/logout")
-      .route(web::post().to(logout_handler))
-      .route(web::head().to(|| HttpResponse::Ok()))
-  )
-  .service(get_liveness)
+  /*.service(get_liveness)
   .service(get_models)
   .service(get_readiness)
   .service(get_root)
@@ -174,21 +172,6 @@ pub async fn serve(server_state: ServerState) -> AnyhowResult<()>
   .service(get_early_access_speakers)
   .service(get_dynamic_early_access_speakers)
   .service(get_words);*/
-
-  Ok(())
-}
-
-pub async fn create_user(pool: &MySqlPool) -> AnyhowResult<()> {
-  let mut tx = pool.begin().await?;
-  let todo = sqlx::query("INSERT INTO badges (slug, title, description, image_url) VALUES ($1, $2, $3, $4)")
-    .bind("foo")
-    .bind("bar")
-    .bind("baz")
-    .bind("bin")
-    .fetch_one(&mut tx)
-    .await?;
-
-  tx.commit().await?;
 
   Ok(())
 }
