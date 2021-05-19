@@ -148,56 +148,11 @@ pub async fn serve(server_state: ServerState) -> AnyhowResult<()>
           .route(web::get().to(session_info_handler))
           .route(web::head().to(|| HttpResponse::Ok()))
       )
-      .service(
-        web::scope("/foo")
-          .service(
-            web::resource("/bar")
-              .route(web::get().to(|| HttpResponse::Ok()))
-              .route(web::head().to(|| HttpResponse::Ok()))
-          )
-          .service(
-            web::resource("/bin")
-              .route(web::get().to(|| HttpResponse::Ok()))
-              .route(web::head().to(|| HttpResponse::Ok()))
-          )
-      )
-      .service(
-        web::scope("/a")
-          .service(
-            web::resource("/b")
-              .route(web::get().to(|| HttpResponse::Ok()))
-              .route(web::head().to(|| HttpResponse::Ok()))
-          )
-          .service(
-            web::resource("/c")
-              .route(web::get().to(|| HttpResponse::Ok()))
-              .route(web::head().to(|| HttpResponse::Ok()))
-          )
-      )
   })
   .bind(bind_address)?
   .workers(num_workers)
   .run()
   .await?;
-
-  // Admin UI & old frontend
-  //.service(Files::new("/frontend", admin_asset_directory.clone())
-  //  .index_file("FAKE_INDEX.HTML"))
-  //.service(Files::new("/adminui", admin_asset_directory.clone())
-  //  .index_file("index.html"))
-  // Early access static path for assets
-  //.service(Files::new("/static", static_asset_directory.clone())
-  //  .index_file("FAKE_INDEX.HTML"))
-  /*.service(get_liveness)
-  .service(get_models)
-  .service(get_readiness)
-  .service(get_root)
-  .service(get_sentences)
-  .service(get_service_settings)
-  .service(get_speakers)
-  .service(get_early_access_speakers)
-  .service(get_dynamic_early_access_speakers)
-  .service(get_words);*/
 
   Ok(())
 }
