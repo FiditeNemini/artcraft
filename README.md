@@ -19,6 +19,10 @@ To undo migrations at the current step:
 
 ```diesel migration redo```
 
+To save sqlx database state to cache file (necessary for builds):
+
+```SQLX_OFFLINE=true cargo sqlx prepare```
+
 Actix notes
 -----------
 
