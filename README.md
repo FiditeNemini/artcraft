@@ -60,3 +60,10 @@ Notes / TODOs:
   https://github.com/launchbadge/sqlx/issues/1117#issuecomment-801237734
 
 
+Docker builds
+-------------
+
+The repository needs to be given read access to the base docker image:
+
+https://github.com/orgs/storytold/packages/container/docker-base-images-rust-ssl/settings
+
