@@ -38,10 +38,16 @@ pub type AnyhowResult<T> = anyhow::Result<T>;
 async fn main() -> AnyhowResult<()> {
   easyenv::init_all_with_default_logging(Some(DEFAULT_RUST_LOG));
 
+  info!("Obtaining hostname...");
+
   let server_hostname = hostname::get()
     .ok()
     .and_then(|h| h.into_string().ok())
     .unwrap_or("storyteller-web-unknown".to_string());
+
+  info!("Hostname: {}", &server_hostname);
+
+  info!("Connecting to database...");
 
   let db_connection_string =
     easyenv::get_env_string_or_default(
@@ -52,6 +58,8 @@ async fn main() -> AnyhowResult<()> {
     .max_connections(5)
     .connect(&db_connection_string)
     .await?;
+
+  info!("Reading env vars and setting up utils...");
 
   let hmac_secret = easyenv::get_env_string_or_default("COOKIE_SECRET", "notsecret");
   let cookie_domain = easyenv::get_env_string_or_default("COOKIE_DOMAIN", ".vo.codes");
