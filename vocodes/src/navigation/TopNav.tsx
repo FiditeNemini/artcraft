@@ -31,7 +31,8 @@ function TopNav(props: Props) {
   if (props.sessionState !== undefined) {
     console.log('sessionstate', props.sessionState);
     loggedIn = props.sessionState.logged_in;
-    if (props.sessionState.user !== undefined) {
+    if (props.sessionState.user !== undefined && 
+        props.sessionState.user !== null) {
       displayName = props.sessionState.user.display_name;
     }
   }

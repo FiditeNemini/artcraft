@@ -163,7 +163,7 @@ class App extends React.Component<Props, State> {
     .catch(e => { /* Ignore. We'll just operate with the defaults. */ });
   }
 
-  querySession() {
+  querySession = () => {
     if (!this.state.enableAlpha) {
       return;
     }
@@ -419,6 +419,7 @@ class App extends React.Component<Props, State> {
       case Mode.SIGNUP_MODE:
         component = <SignupComponent
           loggedIn={this.state.loggedIn}
+          querySessionCallback={this.querySession}
           switchModeCallback={this.switchMode}
           />
         break;
