@@ -1,9 +1,10 @@
 import React from 'react';
 import { Mode } from '../AppMode'
+import { SessionStateResponse } from '../api/SessionState';
 
 interface Props {
   enableAlpha: boolean,
-  loggedIn: boolean,
+  sessionState?: SessionStateResponse,
   mode: Mode,
   historyBadgeCount: number,
   isHistoryCountBadgeVisible: boolean,
@@ -24,15 +25,26 @@ function TopNav(props: Props) {
     badge = <span className={className}>{props.historyBadgeCount}</span>;
   }
 
+  let loggedIn = false;
+  let displayName = "My Account";
+
+  if (props.sessionState !== undefined) {
+    console.log('sessionstate', props.sessionState);
+    loggedIn = props.sessionState.logged_in;
+    if (props.sessionState.user !== undefined) {
+      displayName = props.sessionState.user.display_name;
+    }
+  }
+
   // Vo.codes 2.0
   let loginManagement = <span />;
   let extendedFeatures = <span />;
 
   if (props.enableAlpha) {
-    if (props.loggedIn) {
+    if (loggedIn) {
       loginManagement = (
         <span>
-          <a href="#profile" onClick={() => props.switchModeCallback(Mode.PROFILE_MODE)}>username</a>
+          <a href="#profile" onClick={() => props.switchModeCallback(Mode.PROFILE_MODE)}>{displayName}</a>
           <a href="#logout" onClick={() => props.logoutHandler()}>Log Out</a>
         </span>
       );

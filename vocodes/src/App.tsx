@@ -134,8 +134,8 @@ class App extends React.Component<Props, State> {
   }
 
   componentDidMount() {
-    this.startupQueryServiceSettings();
     this.querySession();
+    this.startupQueryServiceSettings();
     setInterval(() => this.querySession, 10000);
     //this.state.videoJobPoller.start();
     //this.state.videoQueuePoller.start();
@@ -428,7 +428,7 @@ class App extends React.Component<Props, State> {
         <div id="viewable">
           <TopNav 
             enableAlpha={this.state.enableAlpha}
-            loggedIn={this.state.loggedIn}
+            sessionState={this.state.sessionState}
             mode={this.state.mode} 
             historyBadgeCount={this.state.utterances.length}
             isHistoryCountBadgeVisible={this.state.isHistoryCountBadgeVisible}
