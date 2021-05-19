@@ -135,7 +135,8 @@ class App extends React.Component<Props, State> {
 
   componentDidMount() {
     this.startupQueryServiceSettings();
-    this.startupQuerySession();
+    this.querySession();
+    setInterval(() => this.querySession, 10000);
     //this.state.videoJobPoller.start();
     //this.state.videoQueuePoller.start();
   }
@@ -143,13 +144,6 @@ class App extends React.Component<Props, State> {
   startupQueryServiceSettings() {
     const url = 'https://mumble.stream/service_settings';
     fetch(url, {
-      /*
-            xhrFields: {
-           withCredentials: true
-      },
-      crossDomain: true,
-
-      */
       method: 'GET',
       headers: {
         'Accept': 'application/json',
@@ -169,12 +163,7 @@ class App extends React.Component<Props, State> {
     .catch(e => { /* Ignore. We'll just operate with the defaults. */ });
   }
 
-  startupQuerySession() {
-    this.pollSession();
-    setInterval(() => this.pollSession, 10000);
-  }
-
-  pollSession() {
+  querySession() {
     if (!this.state.enableAlpha) {
       return;
     }
@@ -199,6 +188,27 @@ class App extends React.Component<Props, State> {
           loggedIn: session.logged_in,
         });
       }
+    })
+    .catch(e => { /* Ignore. */ });
+  }
+
+  logoutSession = () => {
+    if (!this.state.enableAlpha) {
+      return;
+    }
+
+    const api = new ApiConfig();
+    const endpointUrl = api.logout();
+
+    fetch(endpointUrl, {
+      method: 'POST',
+      credentials: 'include',
+      headers: {
+        'Accept': 'application/json',
+      },
+    })
+    .then(_raw_response => {
+      this.querySession();
     })
     .catch(e => { /* Ignore. */ });
   }
@@ -423,6 +433,7 @@ class App extends React.Component<Props, State> {
             historyBadgeCount={this.state.utterances.length}
             isHistoryCountBadgeVisible={this.state.isHistoryCountBadgeVisible}
             switchModeCallback={this.switchMode}
+            logoutHandler={this.logoutSession}
             />
           {component}
         </div>

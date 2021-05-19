@@ -8,6 +8,7 @@ interface Props {
   historyBadgeCount: number,
   isHistoryCountBadgeVisible: boolean,
   switchModeCallback: (mode: Mode) => void,
+  logoutHandler: () => void,
 }
 
 function TopNav(props: Props) {
@@ -32,7 +33,7 @@ function TopNav(props: Props) {
       loginManagement = (
         <span>
           <a href="#profile" onClick={() => props.switchModeCallback(Mode.PROFILE_MODE)}>username</a>
-          <a href="#logout" onClick={() => props.switchModeCallback(Mode.LOGOUT_MODE)}>Log Out</a>
+          <a href="#logout" onClick={() => props.logoutHandler()}>Log Out</a>
         </span>
       );
     } else {
