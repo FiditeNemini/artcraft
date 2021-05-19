@@ -6,8 +6,9 @@ WORKDIR /tmp
 
 COPY Cargo.lock . 
 COPY Cargo.toml .
+COPY sqlx-data.json .
 COPY src/ ./src
-COPY protos/ ./protos
+COPY migrations/ ./migrations
 
 RUN $HOME/.cargo/bin/cargo fetch
 
