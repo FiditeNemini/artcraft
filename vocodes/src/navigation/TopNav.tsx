@@ -64,7 +64,7 @@ function TopNav(props: Props) {
           <a href="#community_tts" onClick={() => props.switchModeCallback(Mode.COMMUNITY_TTS_MODE)}>Community TTS</a>
           <a href="#community_video" onClick={() => props.switchModeCallback(Mode.COMMUNITY_VIDEO_MODE)}>Community Video</a>
           <a href="#upload_voices" onClick={() => props.switchModeCallback(Mode.UPLOAD_VOICES_MODE)}>Upload Voices</a>
-          <a href="#upload_video" onClick={() => props.switchModeCallback(Mode.UPLOAD_VIDEO_MODE)}>Upload Voices</a>
+          <a href="#upload_video" onClick={() => props.switchModeCallback(Mode.UPLOAD_VIDEO_MODE)}>Upload Video</a>
           <a href="#my_data" onClick={() => props.switchModeCallback(Mode.MY_DATA_MODE)}>My Data</a>
           <br />
           <p>(Yes, this needs a redesign!)</p>
