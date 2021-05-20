@@ -30,6 +30,7 @@ use crate::util::session_checker::SessionChecker;
 use crate::endpoints::users::session_info::session_info_handler;
 use crate::endpoints::root_index::get_root_index;
 use crate::endpoints::default_route_404::default_route_404;
+use crate::endpoints::misc::enable_alpha::enable_alpha;
 
 const DEFAULT_BIND_ADDRESS : &'static str = "0.0.0.0:12345";
 const DEFAULT_RUST_LOG: &'static str = "debug,actix_web=info";
@@ -64,16 +65,22 @@ async fn main() -> AnyhowResult<()> {
   info!("Reading env vars and setting up utils...");
 
   let bind_address = easyenv::get_env_string_or_default("BIND_ADDRESS", DEFAULT_BIND_ADDRESS);
+  let num_workers = easyenv::get_env_num("NUM_WORKERS", 4)?;
   let hmac_secret = easyenv::get_env_string_or_default("COOKIE_SECRET", "notsecret");
   let cookie_domain = easyenv::get_env_string_or_default("COOKIE_DOMAIN", ".vo.codes");
+  let cookie_secure = easyenv::get_env_bool_or_default("COOKIE_SECURE", true);
+  let cookie_http_only = easyenv::get_env_bool_or_default("COOKIE_HTTP_ONLY", true);
 
   let cookie_manager = CookieManager::new(&cookie_domain, &hmac_secret);
   let session_checker = SessionChecker::new(&cookie_manager);
 
   let server_state = ServerState {
     env_config: EnvConfig {
-      num_workers: 4,
+      num_workers,
       bind_address,
+      cookie_domain,
+      cookie_secure,
+      cookie_http_only,
     },
     hostname: server_hostname,
     mysql_pool: pool,
@@ -160,6 +167,7 @@ pub async fn serve(server_state: ServerState) -> AnyhowResult<()>
           .route(web::head().to(|| HttpResponse::Ok()))
       )
       .service(get_root_index)
+      .service(enable_alpha)
       .default_service( web::route().to(default_route_404))
   })
   .bind(bind_address)?

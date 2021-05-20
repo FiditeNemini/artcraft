@@ -22,4 +22,7 @@ pub struct EnvConfig {
   // Number of thread workers.
   pub num_workers: usize,
   pub bind_address: String,
+  pub cookie_domain: String,
+  pub cookie_secure: bool,
+  pub cookie_http_only: bool,
 }
