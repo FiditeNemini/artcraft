@@ -107,7 +107,7 @@ class App extends React.Component<Props, State> {
     const defaultSpeaker = defaultSpeakers[index]!;
 
     // TODO: This is temporary!
-    const enableAlpha = document.cookie.includes("enablealpha");
+    const enableAlpha = document.cookie.includes("enable-alpha");
     const loggedIn = false;
 
     let showNewsNotice = true; // TODO(2021-04-06): Temporarily hiding (2021-05-10: Reenable.)
