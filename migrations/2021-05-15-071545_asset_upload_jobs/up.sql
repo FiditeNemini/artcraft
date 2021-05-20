@@ -14,33 +14,55 @@ CREATE TABLE tts_model_upload_jobs (
 
   -- Users can upload their own private models.
   -- They can choose to make them public later.
+  -- NB: Not sure I'm going to use this at first (or at all)
   is_private_for_creator BOOLEAN NOT NULL DEFAULT FALSE,
 
   -- The name of the voice
   voice_name VARCHAR(255) NOT NULL,
-
-  -- The speaker (in the case of cartoon characters)
+  -- The voice actor (in the case of cartoon characters)
   voice_actor_name VARCHAR(255) DEFAULT NULL,
-
-  -- Jobs begin as "pending", then transition to other states.
-  -- Pending -> Started -> Complete
-  --                    \-> Failed -> Started -> { Complete, Failed, Dead }
-  status ENUM('pending', 'started', 'complete', 'failed', 'dead') NOT NULL DEFAULT 'pending',
-
-  -- We can track this against a "max_attempt_count"
-  attempt_count INT(3) NOT NULL DEFAULT 0,
 
   -- NB: DO NOT CHANGE ORDER; APPEND ONLY!
   -- THIS MUST MATCH THE RESPECTIVE JOBS TABLE.
   tts_model_type ENUM(
-    'not-set',
-    'tacotron2',
-    'glowtts',
-    'glowtts-vocodes'
+      'not-set',
+      'tacotron2',
+      'glowtts',
+      'glowtts-vocodes'
   ) NOT NULL DEFAULT 'not-set',
 
   -- If we need to download the file from Google Drive.
-  google_drive_url VARCHAR(512) DEFAULT NULL,
+  download_url VARCHAR(512) DEFAULT NULL,
+
+  -- NB: DO NOT SORT!
+  download_url_type ENUM(
+      'not-set',
+      'google-drive',
+      'web'
+      ) NOT NULL DEFAULT 'not-set',
+
+  -- Jobs begin as "pending", then transition to other states.
+  --
+  --  * Pending = job is ready to go
+  --  * Started = job is running
+  --  * Complete_Success = job is done (success)
+  --  * Complete_Failure = job is done (failure)
+  --  * Attempt_Failed = job failed but may retry.
+  --  * Dead = job failed permanently.
+  --
+  -- Pending -> Started -> Complete_Success
+  --                    |-> Complete_Failure
+  --                    \-> Attempt_Failed -> Started -> { Complete, Failed, Dead }
+  status ENUM(
+      'pending',
+      'started',
+      'complete_success',
+      'complete_failure',
+      'attempt_failed',
+      'dead') NOT NULL DEFAULT 'pending',
+
+  -- We can track this against a "max_attempt_count"
+  attempt_count INT(3) NOT NULL DEFAULT 0,
 
   -- If there is a failure, tell the user why.
   failure_reason VARCHAR(512) DEFAULT NULL,
@@ -75,15 +97,8 @@ CREATE TABLE w2l_template_upload_jobs (
 
   -- Users can upload their own private templates.
   -- They can choose to make them public later.
+  -- NB: Not sure I'm going to use this at first (or at all); would be separate from mod approval.
   is_private_for_creator BOOLEAN NOT NULL DEFAULT FALSE,
-
-  -- Jobs begin as "pending", then transition to other states.
-  -- Pending -> Started -> Complete
-  --                    \-> Failed -> Started -> { Complete, Failed, Dead }
-  status ENUM('pending', 'started', 'complete', 'failed', 'dead') NOT NULL DEFAULT 'pending',
-
-  -- We can track this against a "max_attempt_count"
-  attempt_count INT(3) NOT NULL DEFAULT 0,
 
   -- NB: DO NOT SORT!
   -- THIS MUST MATCH THE RESPECTIVE JOBS TABLE.
@@ -93,7 +108,37 @@ CREATE TABLE w2l_template_upload_jobs (
   ) NOT NULL,
 
   -- If we need to download the file from Google Drive.
-  google_drive_url VARCHAR(512) DEFAULT NULL,
+  download_url VARCHAR(512) DEFAULT NULL,
+
+  -- NB: DO NOT SORT!
+  download_url_type ENUM(
+      'not-set',
+      'google-drive',
+      'web'
+      ) NOT NULL DEFAULT 'not-set',
+
+  -- Jobs begin as "pending", then transition to other states.
+  --
+  --  * Pending = job is ready to go
+  --  * Started = job is running
+  --  * Complete_Success = job is done (success)
+  --  * Complete_Failure = job is done (failure)
+  --  * Attempt_Failed = job failed but may retry.
+  --  * Dead = job failed permanently.
+  --
+  -- Pending -> Started -> Complete_Success
+  --                    |-> Complete_Failure
+  --                    \-> Attempt_Failed -> Started -> { Complete, Failed, Dead }
+  status ENUM(
+      'pending',
+      'started',
+      'complete_success',
+      'complete_failure',
+      'attempt_failed',
+      'dead') NOT NULL DEFAULT 'pending',
+
+  -- We can track this against a "max_attempt_count"
+  attempt_count INT(3) NOT NULL DEFAULT 0,
 
   -- If there is a failure, tell the user why.
   failure_reason VARCHAR(512) DEFAULT NULL,

@@ -8,7 +8,14 @@ CREATE TABLE tts_models (
   -- Effective "primary key" (PUBLIC)
   token VARCHAR(32) NOT NULL,
 
-  -- A combination of ['username' + 'voice-name']
+  -- The person that created the template.
+  creator_user_token VARCHAR(32) NOT NULL,
+
+  -- For abuse tracking.
+  -- Wide enough for IPv4/6
+  creator_ip_address VARCHAR(40) NOT NULL,
+
+  -- We can set as a combination of ['username' + 'voice-name']
   -- There can be public aliases for voices, eg. a voice's default model.
   -- A user can change this.
   -- As such, these should not be foreign keys.
@@ -16,13 +23,28 @@ CREATE TABLE tts_models (
 
   -- Optional Pointer to a newer version of the voice
   -- If there's a newer version, we can disable this one.
-  updated_model_token VARCHAR(32) DEFAULT NULL,
+  maybe_updated_model_token VARCHAR(32) DEFAULT NULL,
 
-  -- We an disable a voice for a variety of reasons
-  -- In this case, the original author disables it.
-  user_disabled BOOLEAN NOT NULL DEFAULT FALSE,
-  -- In this case, a moderator author disables it.
-  mod_disabled BOOLEAN NOT NULL DEFAULT FALSE,
+  -- (Maybe) users can upload their own private models.
+  -- They can choose to make them public later.
+  is_private_for_creator BOOLEAN NOT NULL DEFAULT FALSE,
+
+  -- (THIS MIGHT NOT BE USED)
+  -- NB: DO NOT SORT!
+  -- THIS MUST MATCH THE RESPECTIVE JOBS TABLE.
+  creator_set_visibility ENUM(
+      'public',
+      'hidden',
+      'private'
+  ) NOT NULL DEFAULT 'public',
+
+  -- In this case, a moderator disables it.
+  is_mod_disabled BOOLEAN NOT NULL DEFAULT FALSE,
+
+  -- If a moderator has comments.
+  maybe_mod_comments VARCHAR(255) DEFAULT NULL,
+  -- The last moderator that made changes.
+  maybe_mod_user_token VARCHAR(32) DEFAULT NULL,
 
   -- NB: DO NOT CHANGE ORDER; APPEND ONLY!
   -- THIS MUST MATCH THE RESPECTIVE JOBS TABLE.
@@ -34,10 +56,10 @@ CREATE TABLE tts_models (
   ) NOT NULL DEFAULT 'not-set',
 
   -- Can be linked to a well-known voice
-  voice_token VARCHAR(32) DEFAULT NULL,
+  maybe_voice_token VARCHAR(32) DEFAULT NULL,
 
   -- The name of the voice.
-  -- If voice_token is set, it's authoritative.
+  -- If voice_token is set, then it's authoritative instead.
   voice_name VARCHAR(255) NOT NULL,
 
   -- If the voice is "happy" or a singer "a-capella", etc.
@@ -48,46 +70,45 @@ CREATE TABLE tts_models (
   -- If voice_token is set, it's authoritative.
   voice_actor_name VARCHAR(255) DEFAULT NULL,
 
-  -- Users can upload their own private models.
-  -- They can choose to make them public later.
-  is_private_for_creator BOOLEAN NOT NULL DEFAULT FALSE,
-
   -- The description of the model in markdown.
   description_markdown TEXT NOT NULL,
 
   -- Generated HTML (not user-editable).
   description_rendered_html TEXT NOT NULL,
 
-  -- The person that created the template.
-  creator_user_token VARCHAR(32) NOT NULL,
-
-  -- For abuse tracking.
-  -- Wide enough for IPv4/6
-  creator_ip_address VARCHAR(40) NOT NULL,
-
   -- The filename that was used at upload time.
   original_filename CHAR(255) NOT NULL,
 
   -- The pytorch model
   -- For now, this will be a hash of the file contents.
+  -- NB: NOT UNIQUE! We can allow duplicate uploads.
   private_bucket_hash CHAR(32) NOT NULL,
 
   -- Calculated average, on a scale of 0-100
   -- Null with zero ratings.
   calculated_average_score INT(3) DEFAULT NULL,
-  calculated_score_count INT(10) NOT NULL DEFAULT 0,
+  -- Other metrics
+  calculated_total_ratings_submitted_count INT(10) NOT NULL DEFAULT 0,
+  calculated_total_uses_count BIGINT(10) NOT NULL DEFAULT 0,
 
   created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 
   -- If this is removed by a mod.
+  -- It completely disappears from the system.
   deleted_at TIMESTAMP NULL,
 
   -- INDICES --
   PRIMARY KEY (id),
   UNIQUE KEY (token),
   UNIQUE KEY (updatable_slug),
-  KEY index_private_bucket_hash (private_bucket_hash)
+  KEY fk_maybe_updated_model_token (maybe_updated_model_token),
+  KEY fk_creator_user_token (creator_user_token),
+  KEY fk_maybe_mod_user_token (maybe_mod_user_token),
+  KEY fk_maybe_voice_token (maybe_voice_token),
+  KEY index_creator_ip_address (creator_ip_address),
+  KEY index_private_bucket_hash (private_bucket_hash),
+  KEY index_maybe_mod_user_token (maybe_mod_user_token)
 
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin;
 
