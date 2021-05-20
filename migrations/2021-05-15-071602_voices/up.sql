@@ -92,49 +92,49 @@ CREATE TABLE subjects (
 
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin;
 
-CREATE TABLE voices (
-  -- Not used for anything except replication.
-  id BIGINT(20) NOT NULL AUTO_INCREMENT,
-
-  -- Effective "primary key" (PUBLIC)
-  token VARCHAR(32) NOT NULL,
-
-  -- The URL we access the voice at.
-  -- These should be stable, but could be changed if necessary.
-  -- As such, these should not be foreign keys.
-  updatable_slug VARCHAR(64) NOT NULL,
-
-  -- We can assign an exemplary model to the voice
-  default_model_token VARCHAR(32) DEFAULT NULL,
-
-  -- If a moderator author disables it.
-  -- This should prevent the voice from showing up in lists.
-  mod_disabled BOOLEAN NOT NULL DEFAULT FALSE,
-
-  -- The name of the voice
-  voice_name VARCHAR(255) NOT NULL,
-
-  -- If the voice is "happy" or a singer "a-capella", etc.
-  voice_characteristic VARCHAR(255) DEFAULT NULL,
-
-  -- The speaker (in the case of cartoon characters)
-  voice_actor_name VARCHAR(255) DEFAULT NULL,
-
-  -- The 800x600 image
-  image_banner_public_bucket_hash CHAR(32) DEFAULT NULL,
-
-  -- The square avatar image
-  image_square_public_bucket_hash CHAR(32) DEFAULT NULL,
-
-  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-
-  -- If this is removed by a mod.
-  deleted_at TIMESTAMP NULL,
-
-  -- INDICES --
-  PRIMARY KEY (id),
-  UNIQUE KEY (token),
-  UNIQUE KEY (updatable_slug)
-
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin;
+-- CREATE TABLE voices (
+--   -- Not used for anything except replication.
+--   id BIGINT(20) NOT NULL AUTO_INCREMENT,
+-- 
+--   -- Effective "primary key" (PUBLIC)
+--   token VARCHAR(32) NOT NULL,
+-- 
+--   -- The URL we access the voice at.
+--   -- These should be stable, but could be changed if necessary.
+--   -- As such, these should not be foreign keys.
+--   updatable_slug VARCHAR(64) NOT NULL,
+-- 
+--   -- We can assign an exemplary model to the voice
+--   default_model_token VARCHAR(32) DEFAULT NULL,
+-- 
+--   -- If a moderator author disables it.
+--   -- This should prevent the voice from showing up in lists.
+--   mod_disabled BOOLEAN NOT NULL DEFAULT FALSE,
+-- 
+--   -- The name of the voice
+--   voice_name VARCHAR(255) NOT NULL,
+-- 
+--   -- If the voice is "happy" or a singer "a-capella", etc.
+--   voice_characteristic VARCHAR(255) DEFAULT NULL,
+-- 
+--   -- The speaker (in the case of cartoon characters)
+--   voice_actor_name VARCHAR(255) DEFAULT NULL,
+-- 
+--   -- The 800x600 image
+--   image_banner_public_bucket_hash CHAR(32) DEFAULT NULL,
+-- 
+--   -- The square avatar image
+--   image_square_public_bucket_hash CHAR(32) DEFAULT NULL,
+-- 
+--   created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+--   updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+-- 
+--   -- If this is removed by a mod.
+--   deleted_at TIMESTAMP NULL,
+-- 
+--   -- INDICES --
+--   PRIMARY KEY (id),
+--   UNIQUE KEY (token),
+--   UNIQUE KEY (updatable_slug)
+-- 
+-- ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin;

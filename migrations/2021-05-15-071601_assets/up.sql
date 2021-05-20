@@ -25,15 +25,6 @@ CREATE TABLE tts_models (
   -- If there's a newer version, we can disable this one.
   maybe_updated_model_token VARCHAR(32) DEFAULT NULL,
 
-  -- (THIS MIGHT NOT BE USED)
-  -- NB: DO NOT SORT!
-  -- THIS MUST MATCH THE RESPECTIVE JOBS TABLE.
-  creator_set_visibility ENUM(
-      'public',
-      'hidden',
-      'private'
-  ) NOT NULL DEFAULT 'public',
-
   -- NB: DO NOT CHANGE ORDER; APPEND ONLY!
   -- THIS MUST MATCH THE RESPECTIVE JOBS TABLE.
   tts_model_type ENUM(
@@ -46,6 +37,15 @@ CREATE TABLE tts_models (
   -- Can be linked to a well-known voice
   maybe_subject_token VARCHAR(32) DEFAULT NULL,
   maybe_actor_subject_token VARCHAR(32) DEFAULT NULL,
+
+  -- (THIS MIGHT NOT BE USED)
+  -- NB: DO NOT SORT!
+  -- THIS MUST MATCH THE RESPECTIVE JOBS TABLE.
+  creator_set_visibility ENUM(
+    'public',
+    'hidden',
+    'private'
+   ) NOT NULL DEFAULT 'public',
 
   -- The name of the voice.
   -- If voice_token is set, then it's authoritative instead.
@@ -127,6 +127,10 @@ CREATE TABLE w2l_templates (
   -- As such, these should not be foreign keys.
   updatable_slug VARCHAR(64) NOT NULL,
 
+  -- Optional Pointer to a newer version of the template
+  -- If there's a newer version, we can disable this one.
+  maybe_updated_template_token VARCHAR(32) DEFAULT NULL,
+
   template_type ENUM(
     'not-set',
     'image',
@@ -137,9 +141,6 @@ CREATE TABLE w2l_templates (
   maybe_subject_token VARCHAR(32) DEFAULT NULL,
   maybe_actor_subject_token VARCHAR(32) DEFAULT NULL,
 
-    -- The title of the template.
-  title CHAR(255) NOT NULL,
-
   -- (THIS MIGHT NOT BE USED)
   -- NB: DO NOT SORT!
   -- THIS MUST MATCH THE RESPECTIVE JOBS TABLE.
@@ -148,6 +149,9 @@ CREATE TABLE w2l_templates (
     'hidden',
     'private'
   ) NOT NULL DEFAULT 'public',
+
+  -- The title of the template.
+  title CHAR(255) NOT NULL,
 
   -- The description of the template in markdown.
   description_markdown TEXT NOT NULL,
@@ -190,15 +194,16 @@ CREATE TABLE w2l_templates (
   PRIMARY KEY (id),
   UNIQUE KEY (token),
   UNIQUE KEY (updatable_slug),
+  KEY fk_maybe_updated_template_token (maybe_updated_template_token),
   KEY fk_creator_user_token (creator_user_token),
   KEY fk_maybe_mod_user_token (maybe_mod_user_token),
   KEY fk_maybe_subject_token (maybe_subject_token),
   KEY fk_maybe_actor_subject_token (maybe_actor_subject_token),
   KEY index_template_type (template_type),
   KEY index_creator_ip_address (creator_ip_address),
+  KEY index_creator_set_visibility (creator_set_visibility),
   KEY index_private_bucket_hash (private_bucket_hash),
   KEY index_public_bucket_hash (public_bucket_hash),
-  KEY index_creator_set_visibility (creator_set_visibility),
   KEY index_is_mod_disabled (is_mod_disabled)
 
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin;
