@@ -106,11 +106,12 @@ class App extends React.Component<Props, State> {
     const index = Math.floor(Math.random() * defaultSpeakers.length);
     const defaultSpeaker = defaultSpeakers[index]!;
 
+    let showNewsNotice = true; // TODO(2021-04-06): Temporarily hiding (2021-05-10: Reenable.)
+
     // TODO: This is temporary!
     const enableAlpha = document.cookie.includes("enable-alpha");
     const loggedIn = false;
 
-    let showNewsNotice = true; // TODO(2021-04-06): Temporarily hiding (2021-05-10: Reenable.)
     if (enableAlpha) {
       showNewsNotice = false;
     }
