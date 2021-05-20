@@ -1,0 +1,10 @@
+use actix_http::http::StatusCode;
+use actix_web::{HttpResponse, HttpRequest, Responder, get};
+use log::warn;
+
+pub async fn default_route_404() -> impl Responder {
+  warn!("404 not found");
+  HttpResponse::NotFound()
+    .content_type("text/html; charset=utf-8")
+    .body("<h1>nope</h1>")
+}

@@ -29,6 +29,7 @@ use crate::endpoints::users::logout::logout_handler;
 use crate::util::session_checker::SessionChecker;
 use crate::endpoints::users::session_info::session_info_handler;
 use crate::endpoints::root_index::get_root_index;
+use crate::endpoints::default_route_404::default_route_404;
 
 const DEFAULT_BIND_ADDRESS : &'static str = "0.0.0.0:12345";
 const DEFAULT_RUST_LOG: &'static str = "debug,actix_web=info";
@@ -158,6 +159,7 @@ pub async fn serve(server_state: ServerState) -> AnyhowResult<()>
           .route(web::head().to(|| HttpResponse::Ok()))
       )
       .service(get_root_index)
+      .default_service( web::route().to(default_route_404))
   })
   .bind(bind_address)?
   .workers(num_workers)
