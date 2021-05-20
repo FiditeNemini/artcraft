@@ -27,16 +27,10 @@ regex = "1.5.4"
 time = "0.2.26"
 
 # Database
-#sqlx = { version = "0.5.0", features = ["mysql", "runtime-tokio-rustls", "chrono"] }
-
-#error: one of the features ['runtime-actix-native-tls', 'runtime-async-std-native-tls', 'runtime-tokio-native-tls', 'runtime-actix-rustls', 'runtime-async-std-rustls', 'runtime-tokio-rustls'] must be enabled
-
-#sqlx = { version = "0.5", features = [ "mysql", "runtime-actix-native-tls" ] }
-sqlx = { version = "0.5", features = [ "mysql", "runtime-async-std-native-tls", "offline" ] }
-
-#sqlx = { version = "0.5.0", features = ["mysql", "runtime-actix-rustls", "chrono"] }
-#diesel = { version = "1.4.4", features = ["mysql", "r2d2", "chrono"] }
-#diesel-derive-enum = { version = "1.0.0", features = ["mysql"] }
+# "offline" supports typesafe builds without a live database
+# "rustls" doesn't appear to work with IP addresses, per:
+# https://github.com/launchbadge/sqlx/issues/1095#issuecomment-798050828
+sqlx = { version = "0.5", features = [ "mysql", "runtime-async-std-native-tls", "offline", "chrono" ] }
 
 # Web
 actix-cors = "0.5.4"

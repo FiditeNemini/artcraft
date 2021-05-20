@@ -3,6 +3,7 @@
 .env
 .idea/
 _ignored_schema.rs
+production_database_secret_connect.sh
 secrets.toml
 secrets.yaml
 target/

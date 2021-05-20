@@ -9,19 +9,35 @@ Local development
 
 To reset the entire database (drop, migrate), run:
 
-```diesel database reset```
+```
+diesel database reset
+```
 
 To migrate at the current step and beyond: 
 
-```diesel migration run```
+```
+diesel migration run
+```
 
 To undo migrations at the current step: 
 
-```diesel migration redo```
+```
+diesel migration redo
+```
 
 To save sqlx database state to cache file (necessary for builds):
 
-```SQLX_OFFLINE=true cargo sqlx prepare```
+```
+SQLX_OFFLINE=true cargo sqlx prepare
+```
+
+Production
+----------
+
+### Database migrations
+
+1. Set `DATABASE_URL` in `.env`
+2. Run `diesel migration run`
 
 Actix notes
 -----------
