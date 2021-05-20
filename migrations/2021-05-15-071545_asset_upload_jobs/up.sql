@@ -12,13 +12,18 @@ CREATE TABLE tts_model_upload_jobs (
   -- Wide enough for IPv4/6
   creator_ip_address VARCHAR(40) NOT NULL,
 
-  -- Users can upload their own private models.
-  -- They can choose to make them public later.
-  -- NB: Not sure I'm going to use this at first (or at all)
-  is_private_for_creator BOOLEAN NOT NULL DEFAULT FALSE,
+  -- (THIS MIGHT NOT BE USED)
+  -- NB: DO NOT SORT!
+  -- THIS MUST MATCH THE RESPECTIVE JOBS TABLE.
+  creator_set_visibility ENUM(
+      'public',
+      'hidden',
+      'private'
+  ) NOT NULL DEFAULT 'public',
 
   -- The name of the voice
   voice_name VARCHAR(255) NOT NULL,
+
   -- The voice actor (in the case of cartoon characters)
   voice_actor_name VARCHAR(255) DEFAULT NULL,
 
@@ -30,6 +35,10 @@ CREATE TABLE tts_model_upload_jobs (
       'glowtts',
       'glowtts-vocodes'
   ) NOT NULL DEFAULT 'not-set',
+
+  -- Can be linked to a well-known voice
+  maybe_subject_token VARCHAR(32) DEFAULT NULL,
+  maybe_actor_subject_token VARCHAR(32) DEFAULT NULL,
 
   -- If we need to download the file from Google Drive.
   download_url VARCHAR(512) DEFAULT NULL,
@@ -79,6 +88,8 @@ CREATE TABLE tts_model_upload_jobs (
   -- INDICES --
   PRIMARY KEY (id),
   KEY fk_creator_user_token (creator_user_token),
+  KEY fk_maybe_subject_token (maybe_subject_token),
+  KEY fk_maybe_actor_subject_token (maybe_actor_subject_token),
   KEY index_status (status),
   KEY index_creator_ip_address (creator_ip_address)
 
