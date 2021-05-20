@@ -63,6 +63,7 @@ async fn main() -> AnyhowResult<()> {
 
   info!("Reading env vars and setting up utils...");
 
+  let bind_address = easyenv::get_env_string_or_default("BIND_ADDRESS", DEFAULT_BIND_ADDRESS);
   let hmac_secret = easyenv::get_env_string_or_default("COOKIE_SECRET", "notsecret");
   let cookie_domain = easyenv::get_env_string_or_default("COOKIE_DOMAIN", ".vo.codes");
 
@@ -72,7 +73,7 @@ async fn main() -> AnyhowResult<()> {
   let server_state = ServerState {
     env_config: EnvConfig {
       num_workers: 4,
-      bind_address: DEFAULT_BIND_ADDRESS.to_string(),
+      bind_address,
     },
     hostname: server_hostname,
     mysql_pool: pool,
