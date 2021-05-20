@@ -27,6 +27,7 @@ LABEL org.opencontainers.image.source='https://github.com/storytold/storyteller-
 
 # NB: Comment this out for non-debug images
 # TODO: Figure out how this is done elsewhere with just the static binaries
+# Others: `mysql-client`
 RUN apt-get update \
     && apt-get install -y \
         curl \

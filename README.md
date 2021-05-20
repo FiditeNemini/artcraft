@@ -67,4 +67,31 @@ The repository needs to be given read access to the base docker image:
 
 https://github.com/orgs/storytold/packages/container/docker-base-images-rust-ssl/settings
 
+Local Nginx Proxy 
+-----------------
+Set up a local nginx to proxy to the frontend and backend so cookie issues aren't annoying
+
+Edit, `/etc/nginx/sites-enabled/storyteller`
+
+```
+server {
+    listen 80; 
+    server_name api.jungle.horse;
+    location / { 
+        proxy_set_header Host $host;
+        proxy_pass http://127.0.0.1:12345;
+        proxy_redirect off;
+    }   
+}
+server {
+    listen 80; 
+    server_name jungle.horse;
+    location / { 
+        proxy_set_header Host $host;
+        proxy_pass http://127.0.0.1:7000;
+        proxy_redirect off;
+    }   
+}
+
+```
 
