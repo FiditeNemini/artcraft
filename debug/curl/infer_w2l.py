@@ -4,7 +4,7 @@ import requests
 import re
 
 login_url = 'http://localhost:12345/login'
-upload_url = 'http://localhost:12345/w2l/upload'
+inference_url = 'http://localhost:12345/w2l/inference'
 
 payload = {
   'username_or_email': 'echelon',
@@ -27,16 +27,16 @@ m = re.match(r'session=([^;\s]+);', raw_set_cookie_header)
 session_cookie = m.group(1)
 
 
-print("===== Upload W2L =====")
+print("===== Infer W2L =====")
 
 cookies = { 'session': session_cookie }
 
 payload = {
-  'title': 'this is a new text to W2L template',
-  'download_url': 'https://video.com',
+  'w2l_template_token': 'W2L_TOKEN',
+  'tts_inference_result_token': 'TTS_TOKEN',
 }
 
-r = requests.post(upload_url, cookies=cookies, json=payload)
+r = requests.post(inference_url, cookies=cookies, json=payload)
 
 print('Status: {}'.format(r.status_code))
 print(r.content)
