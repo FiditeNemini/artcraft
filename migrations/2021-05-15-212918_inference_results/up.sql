@@ -38,6 +38,17 @@ CREATE TABLE tts_results (
   -- Where the wav, spectrogram, and etc. are located.
   public_bucket_hash CHAR(32) NOT NULL,
 
+  -- ========== MODERATION DETAILS ==========
+
+  -- In this case, a moderator hides it from public.
+  is_mod_hidden_from_public BOOLEAN NOT NULL DEFAULT FALSE,
+
+  -- If a moderator has comments.
+  maybe_mod_comments VARCHAR(255) DEFAULT NULL,
+
+  -- The last moderator that made changes.
+  maybe_mod_user_token VARCHAR(32) DEFAULT NULL,
+
   created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 
@@ -49,6 +60,7 @@ CREATE TABLE tts_results (
   UNIQUE KEY (token),
   KEY fk_model_token (model_token),
   KEY fk_maybe_creator_user_token (maybe_creator_user_token),
+  KEY fk_maybe_mod_user_token (maybe_mod_user_token),
   KEY index_creator_ip_address (creator_ip_address)
 
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin;
@@ -90,6 +102,17 @@ CREATE TABLE w2l_results (
   -- Where the wav, spectrogram, and etc. are located.
   public_bucket_hash CHAR(32) NOT NULL,
 
+  -- ========== MODERATION DETAILS ==========
+
+  -- In this case, a moderator hides it from public.
+  is_mod_hidden_from_public BOOLEAN NOT NULL DEFAULT FALSE,
+
+  -- If a moderator has comments.
+  maybe_mod_comments VARCHAR(255) DEFAULT NULL,
+
+  -- The last moderator that made changes.
+  maybe_mod_user_token VARCHAR(32) DEFAULT NULL,
+
   created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 
@@ -102,6 +125,7 @@ CREATE TABLE w2l_results (
   KEY fk_maybe_creator_user_token (maybe_creator_user_token),
   KEY fk_maybe_w2l_template_token (maybe_w2l_template_token),
   KEY fk_maybe_tts_inference_result_token (maybe_tts_inference_result_token),
+  KEY fk_maybe_mod_user_token (maybe_mod_user_token),
   KEY index_creator_ip_address (creator_ip_address)
 
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin;

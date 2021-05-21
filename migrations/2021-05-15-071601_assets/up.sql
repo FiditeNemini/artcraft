@@ -194,6 +194,8 @@ CREATE TABLE w2l_templates (
   calculated_total_ratings_submitted_count INT(10) NOT NULL DEFAULT 0,
   calculated_total_uses_count BIGINT(10) NOT NULL DEFAULT 0,
 
+  -- ========== MODERATION DETAILS ==========
+
   -- In this case, a moderator disables it.
   -- This also disables it for the creator.
   is_mod_disabled BOOLEAN NOT NULL DEFAULT FALSE,
