@@ -131,6 +131,9 @@ CREATE TABLE w2l_templates (
     'video'
   ) NOT NULL DEFAULT 'not-set',
 
+  -- Mods have to approve of w2l templates.
+  is_mod_approved BOOLEAN NOT NULL DEFAULT FALSE,
+
   -- Optional Pointer to a newer version of the template
   -- If there's a newer version, we can disable this one.
   maybe_updated_template_token VARCHAR(32) DEFAULT NULL,
@@ -192,6 +195,7 @@ CREATE TABLE w2l_templates (
   calculated_total_uses_count BIGINT(10) NOT NULL DEFAULT 0,
 
   -- In this case, a moderator disables it.
+  -- This also disables it for the creator.
   is_mod_disabled BOOLEAN NOT NULL DEFAULT FALSE,
 
   -- If a moderator has comments.
@@ -204,6 +208,7 @@ CREATE TABLE w2l_templates (
   updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 
   -- If this is removed by a mod.
+  -- It shows up nowhere if deleted.
   deleted_at TIMESTAMP NULL,
 
   -- INDICES --
