@@ -4,7 +4,7 @@ import requests
 import re
 
 login_url = 'http://localhost:12345/login'
-upload_url = 'http://localhost:12345/upload_tts'
+upload_url = 'http://localhost:12345/tts/upload'
 
 payload = {
   'username_or_email': 'echelon',

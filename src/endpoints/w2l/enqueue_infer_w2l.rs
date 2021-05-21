@@ -103,6 +103,7 @@ pub async fn infer_w2l_handler(
       return Err(InferW2lError::BadInput("w2l token is required".to_string()));
     },
     Some(t) => {
+      // TODO: CHECK DATABASE!
       t.to_string()
     },
   };
@@ -112,7 +113,10 @@ pub async fn infer_w2l_handler(
       // TODO: Allow audio uploads.
       return Err(InferW2lError::BadInput("tts token is required".to_string()));
     },
-    Some(t) => t.to_string(),
+    Some(t) => {
+      // TODO: CHECK DATABASE!
+      t.to_string()
+    },
   };
 
   let ip_address = get_request_ip(&http_request);

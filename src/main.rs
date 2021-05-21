@@ -19,14 +19,14 @@ use actix_http::http;
 use actix_web::middleware::{Logger, DefaultHeaders};
 use actix_web::{HttpServer, web, HttpResponse, App};
 use crate::endpoints::default_route_404::default_route_404;
-use crate::endpoints::enqueue_uploads::upload_tts_model::upload_tts_model_handler;
-use crate::endpoints::enqueue_uploads::upload_w2l_template::upload_w2l_template_handler;
 use crate::endpoints::misc::enable_alpha::enable_alpha;
 use crate::endpoints::root_index::get_root_index;
 use crate::endpoints::users::create_account::create_account_handler;
 use crate::endpoints::users::login::login_handler;
 use crate::endpoints::users::logout::logout_handler;
 use crate::endpoints::users::session_info::session_info_handler;
+use crate::endpoints::w2l::enqueue_infer_w2l::infer_w2l_handler;
+use crate::endpoints::w2l::enqueue_upload_w2l_template::upload_w2l_template_handler;
 use crate::server_state::{ServerState, EnvConfig};
 use crate::util::cookies::CookieManager;
 use crate::util::session_checker::SessionChecker;
@@ -34,7 +34,7 @@ use log::{info};
 use sqlx::MySqlPool;
 use sqlx::mysql::MySqlPoolOptions;
 use std::sync::Arc;
-use crate::endpoints::enqueue_inference::infer_w2l::infer_w2l_handler;
+use crate::endpoints::tts::enqueue_upload_tts_model::upload_tts_model_handler;
 
 const DEFAULT_BIND_ADDRESS : &'static str = "0.0.0.0:12345";
 const DEFAULT_RUST_LOG: &'static str = "debug,actix_web=info";
@@ -171,9 +171,17 @@ pub async fn serve(server_state: ServerState) -> AnyhowResult<()>
           .route(web::head().to(|| HttpResponse::Ok()))
       )
       .service(
-        web::resource("/upload_tts")
-          .route(web::post().to(upload_tts_model_handler))
-          .route(web::head().to(|| HttpResponse::Ok()))
+        web::scope("/tts")
+          .service(
+            web::resource("/upload")
+              .route(web::post().to(upload_tts_model_handler))
+              .route(web::head().to(|| HttpResponse::Ok()))
+          )
+          //.service(
+          //  web::resource("/inference")
+          //    .route(web::post().to())
+          //    .route(web::head().to(|| HttpResponse::Ok()))
+          //)
       )
       .service(
         web::scope("/w2l")
