@@ -44,10 +44,9 @@ CREATE TABLE tts_model_upload_jobs (
 
   -- NB: DO NOT SORT!
   download_url_type ENUM(
-      'not-set',
       'google-drive',
       'web'
-  ) NOT NULL DEFAULT 'not-set',
+  ) NOT NULL DEFAULT 'web',
 
   -- Jobs begin as "pending", then transition to other states.
   --
@@ -120,10 +119,10 @@ CREATE TABLE w2l_template_upload_jobs (
   -- NB: DO NOT SORT!
   -- THIS MUST MATCH THE RESPECTIVE JOBS TABLE.
   template_type ENUM(
-    'not-set',
+    'unknown',
     'video',
     'image'
-  ) NOT NULL DEFAULT 'not-set',
+  ) NOT NULL DEFAULT 'unknown',
 
   -- Can be linked to a well-known subject
   maybe_subject_token VARCHAR(32) DEFAULT NULL,
@@ -134,10 +133,9 @@ CREATE TABLE w2l_template_upload_jobs (
 
   -- NB: DO NOT SORT!
   download_url_type ENUM(
-      'not-set',
       'google-drive',
       'web'
-  ) NOT NULL DEFAULT 'not-set',
+  ) NOT NULL DEFAULT 'web',
 
   -- Jobs begin as "pending", then transition to other states.
   --

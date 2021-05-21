@@ -95,25 +95,6 @@ AND deleted_at IS NULL
       Some(session_token) => session_token,
     };
 
-    /*
-
-  pub token: String,
-  pub username: String,
-  pub display_name: String,
-  pub email_address: String,
-  pub email_confirmed: bool,
-  pub profile_markdown: String,
-  pub profile_rendered_html: String,
-  pub user_role_slug: String,
-  pub banned: bool,
-  pub dark_mode: String,
-  pub avatar_public_bucket_hash: Option<String>,
-  pub disable_gravatar: bool,
-  pub hide_results_preference: bool,
-  pub discord_username: Option<String>,
-  pub twitch_username: Option<String>,
-  pub twitter_username: Option<String>,
-     */
     // NB: Lookup failure is Err(RowNotFound).
     let maybe_user_record = sqlx::query_as!(
       SessionUserRecord,
