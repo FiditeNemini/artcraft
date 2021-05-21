@@ -2,6 +2,7 @@
 
 import requests
 import re
+import uuid
 
 login_url = 'http://localhost:12345/login'
 upload_url = 'http://localhost:12345/tts/upload'
@@ -32,6 +33,7 @@ print("===== Upload TTS=====")
 cookies = { 'session': session_cookie }
 
 payload = {
+  'idempotency_token': str(uuid.uuid4()),
   'title': 'this is a new text to speech model',
   'download_url': 'https://website.com',
 }

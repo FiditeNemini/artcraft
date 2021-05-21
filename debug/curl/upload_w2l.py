@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 
-import requests
 import re
+import requests
+import uuid
 
 login_url = 'http://localhost:12345/login'
 upload_url = 'http://localhost:12345/w2l/upload'
@@ -32,6 +33,7 @@ print("===== Upload W2L =====")
 cookies = { 'session': session_cookie }
 
 payload = {
+  'idempotency_token': str(uuid.uuid4()),
   'title': 'this is a new text to W2L template',
   'download_url': 'https://video.com',
 }

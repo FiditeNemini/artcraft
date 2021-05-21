@@ -5,6 +5,9 @@
 CREATE TABLE tts_model_upload_jobs (
   id BIGINT(20) NOT NULL AUTO_INCREMENT,
 
+  -- Idempotency token
+  uuid_idempotency_token VARCHAR(36) NOT NULL,
+
   -- Foreign key to user
   creator_user_token VARCHAR(32) NOT NULL,
 
@@ -85,6 +88,7 @@ CREATE TABLE tts_model_upload_jobs (
 
   -- INDICES --
   PRIMARY KEY (id),
+  UNIQUE KEY (uuid_idempotency_token),
   KEY fk_creator_user_token (creator_user_token),
   KEY fk_maybe_subject_token (maybe_subject_token),
   KEY fk_maybe_actor_subject_token (maybe_actor_subject_token),
@@ -97,7 +101,10 @@ CREATE TABLE tts_model_upload_jobs (
 CREATE TABLE w2l_template_upload_jobs (
   id BIGINT(20) NOT NULL AUTO_INCREMENT,
 
-  -- Foreign key to user
+  -- Idempotency token
+  uuid_idempotency_token VARCHAR(36) NOT NULL,
+
+    -- Foreign key to user
   creator_user_token VARCHAR(32) NOT NULL,
 
   -- For abuse tracking.
@@ -174,6 +181,7 @@ CREATE TABLE w2l_template_upload_jobs (
 
   -- INDICES --
   PRIMARY KEY (id),
+  UNIQUE KEY (uuid_idempotency_token),
   KEY fk_creator_user_token (creator_user_token),
   KEY fk_maybe_subject_token (maybe_subject_token),
   KEY fk_maybe_actor_subject_token (maybe_actor_subject_token),

@@ -24,6 +24,7 @@ const NEW_USER_ROLE: &'static str = "new-user";
 
 #[derive(Deserialize)]
 pub struct UploadW2lTemplateRequest {
+  idempotency_token: String,
   title: String,
   download_url: String,
   download_url_type: Option<DownloadUrlType>,
@@ -105,12 +106,17 @@ pub async fn upload_w2l_template_handler(
     }
   };
 
+  if let Err(reason) = validate_idempotency_token(&request.idempotency_token) {
+    return Err(UploadW2lTemplateError::BadInput(reason));
+  }
+
   if let Err(reason) = validate_model_title(&request.title) {
     return Err(UploadW2lTemplateError::BadInput(reason));
   }
 
   let ip_address = get_request_ip(&http_request);
 
+  let uuid = request.idempotency_token.to_string();
   let title = request.title.to_string();
   let download_url = request.download_url.to_string();
 
@@ -124,6 +130,7 @@ pub async fn upload_w2l_template_handler(
         r#"
 INSERT INTO w2l_template_upload_jobs
 SET
+  uuid_idempotency_token = ?,
   creator_user_token = ?,
   creator_ip_address = ?,
   creator_set_visibility = ?,
@@ -135,6 +142,7 @@ SET
   download_url_type = ?,
   status = "pending"
         "#,
+        uuid.to_string(),
         user_session.user_token.to_string(),
         ip_address.to_string(),
         creator_set_visibility.to_string(),
@@ -189,4 +197,12 @@ SET
   Ok(HttpResponse::Ok()
     .content_type("application/json")
     .body(body))
+}
+
+fn validate_idempotency_token(token: &str) -> Result<(), String> {
+  if token.len() != 36 {
+    return Err("idempotency token should be 36 characters".to_string());
+  }
+
+  Ok(())
 }
