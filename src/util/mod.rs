@@ -1,4 +1,4 @@
-pub mod cookies;
+pub mod cookie_manager;
 pub mod ip_address;
-pub mod tokens;
+pub mod random_token;
 pub mod session_checker;

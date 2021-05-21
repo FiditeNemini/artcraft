@@ -6,7 +6,7 @@ use actix_web::http::StatusCode;
 use actix_web::{Responder, web, HttpResponse, error, HttpRequest};
 use crate::server_state::ServerState;
 use crate::util::ip_address::get_request_ip;
-use crate::util::tokens::random_token;
+use crate::util::random_token::random_token;
 use derive_more::{Display, Error};
 use log::{info, warn, log};
 use regex::Regex;

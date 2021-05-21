@@ -1,7 +1,7 @@
 use anyhow::anyhow;
 use log::{info, warn};
 use crate::AnyhowResult;
-use crate::util::tokens::random_token;
+use crate::util::random_token::random_token;
 use sqlx::MySqlPool;
 
 pub async fn create_session_for_user(user_token: &str, ip_address: &str, mysql_pool: &MySqlPool)

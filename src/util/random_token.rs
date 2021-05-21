@@ -18,7 +18,7 @@ pub fn random_token(length: usize) -> String {
 
 #[cfg(test)]
 mod tests {
-  use crate::util::tokens::random_token;
+  use crate::util::random_token::random_token;
 
   #[test]
   fn random_token_length() {

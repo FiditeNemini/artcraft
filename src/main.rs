@@ -28,7 +28,7 @@ use crate::endpoints::users::session_info::session_info_handler;
 use crate::endpoints::w2l::enqueue_infer_w2l::infer_w2l_handler;
 use crate::endpoints::w2l::enqueue_upload_w2l_template::upload_w2l_template_handler;
 use crate::server_state::{ServerState, EnvConfig};
-use crate::util::cookies::CookieManager;
+use crate::util::cookie_manager::CookieManager;
 use crate::util::session_checker::SessionChecker;
 use log::{info};
 use sqlx::MySqlPool;
