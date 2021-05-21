@@ -8,15 +8,15 @@ CREATE TABLE tts_results (
   -- Effective "primary key" (PUBLIC)
   token VARCHAR(32) NOT NULL,
 
+  -- ========== INFERENCE DETAILS ==========
+
   -- The TTS model that was used
   model_token VARCHAR(32) NOT NULL,
 
   -- The original raw, unprocessed user input.
   inference_text TEXT NOT NULL,
 
-  -- Users can upload their own private templates.
-  -- They can choose to make them public later.
-  is_private_for_creator BOOLEAN NOT NULL DEFAULT FALSE,
+  -- ========== CREATOR DETAILS ==========
 
   -- The person that created the template.
   -- If the user wasn't logged in, this is null
@@ -25,6 +25,15 @@ CREATE TABLE tts_results (
   -- For abuse tracking.
   -- Wide enough for IPv4/6
   creator_ip_address VARCHAR(40) NOT NULL,
+
+  -- (THIS MIGHT NOT BE USED)
+  -- NB: DO NOT SORT!
+  -- THIS MUST MATCH THE RESPECTIVE JOBS TABLE.
+  creator_set_visibility ENUM(
+    'public',
+    'hidden',
+    'private'
+  ) NOT NULL DEFAULT 'public',
 
   -- Where the wav, spectrogram, and etc. are located.
   public_bucket_hash CHAR(32) NOT NULL,
@@ -51,15 +60,15 @@ CREATE TABLE w2l_results (
   -- Effective "primary key" (PUBLIC)
   token VARCHAR(32) NOT NULL,
 
+  -- ========== INFERENCE DETAILS ==========
+
   -- The w2l template that was used (if set)
   maybe_w2l_template_token VARCHAR(32) NOT NULL,
 
   -- The inference result, if we're using them.
   maybe_tts_inference_result_token VARCHAR(32) DEFAULT NULL,
 
-  -- Users can upload their own private templates.
-  -- They can choose to make them public later.
-  is_private_for_creator BOOLEAN NOT NULL DEFAULT FALSE,
+  -- ========== CREATOR DETAILS ==========
 
   -- The person that created the template.
   -- If the user wasn't logged in, this is null
@@ -68,6 +77,15 @@ CREATE TABLE w2l_results (
   -- For abuse tracking.
   -- Wide enough for IPv4/6
   creator_ip_address VARCHAR(40) NOT NULL,
+
+  -- (THIS MIGHT NOT BE USED)
+  -- NB: DO NOT SORT!
+  -- THIS MUST MATCH THE RESPECTIVE JOBS TABLE.
+  creator_set_visibility ENUM(
+    'public',
+    'hidden',
+    'private'
+  ) NOT NULL DEFAULT 'public',
 
   -- Where the wav, spectrogram, and etc. are located.
   public_bucket_hash CHAR(32) NOT NULL,

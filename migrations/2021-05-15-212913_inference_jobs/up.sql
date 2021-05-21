@@ -3,9 +3,16 @@
 CREATE TABLE tts_inference_jobs (
   id BIGINT(20) NOT NULL AUTO_INCREMENT,
 
+  -- ========== INFERENCE DETAILS ==========
+
   -- The model to use.
   -- This also determines which architecture we're using.
   model_token VARCHAR(32) NOT NULL,
+
+  -- The raw, unprocessed user input.
+  inference_text TEXT NOT NULL,
+
+  -- ========== CREATOR DETAILS ==========
 
   -- Foreign key to user
   -- If no user is logged in, this is null.
@@ -15,12 +22,16 @@ CREATE TABLE tts_inference_jobs (
   -- Wide enough for IPv4/6
   creator_ip_address VARCHAR(40) NOT NULL,
 
-  -- Users can upload their own private models.
-  -- They can choose to make them public later.
-  is_private_for_creator BOOLEAN NOT NULL DEFAULT FALSE,
+  -- (THIS MIGHT NOT BE USED)
+  -- NB: DO NOT SORT!
+  -- THIS MUST MATCH THE RESPECTIVE JOBS TABLE.
+  creator_set_visibility ENUM(
+    'public',
+    'hidden',
+    'private'
+  ) NOT NULL DEFAULT 'public',
 
-  -- The raw, unprocessed user input.
-  inference_text TEXT NOT NULL,
+  -- ========== JOB SYSTEM DETAILS ==========
 
   -- Jobs begin as "pending", then transition to other states.
   -- Pending -> Started -> Complete
@@ -54,6 +65,8 @@ CREATE TABLE tts_inference_jobs (
 CREATE TABLE w2l_inference_jobs (
   id BIGINT(20) NOT NULL AUTO_INCREMENT,
 
+  -- ========== INFERENCE DETAILS ==========
+
   -- The W2L template to use
   -- Can be an image or video.
   -- This is null if we're using a custom uploaded image.
@@ -68,6 +81,8 @@ CREATE TABLE w2l_inference_jobs (
   -- If we're using a custom uploaded image, this will be present.
   maybe_image_bucket_location CHAR(16) DEFAULT NULL,
 
+  -- ========== CREATOR DETAILS ==========
+
   -- Foreign key to user
   -- If no user is logged in, this is null.
   maybe_creator_user_token VARCHAR(32) DEFAULT NULL,
@@ -76,11 +91,18 @@ CREATE TABLE w2l_inference_jobs (
   -- Wide enough for IPv4/6
   creator_ip_address VARCHAR(40) NOT NULL,
 
-  -- Users can upload their own private models.
-  -- They can choose to make them public later.
-  is_private_for_creator BOOLEAN NOT NULL DEFAULT FALSE,
+  -- (THIS MIGHT NOT BE USED)
+  -- NB: DO NOT SORT!
+  -- THIS MUST MATCH THE RESPECTIVE JOBS TABLE.
+  creator_set_visibility ENUM(
+      'public',
+      'hidden',
+      'private'
+  ) NOT NULL DEFAULT 'public',
 
-    -- Jobs begin as "pending", then transition to other states.
+  -- ========== JOB SYSTEM DETAILS ==========
+
+  -- Jobs begin as "pending", then transition to other states.
   -- Pending -> Started -> Complete
   --                    \-> Failed -> Started -> { Complete, Failed, Dead }
   status ENUM('pending', 'started', 'complete', 'failed', 'dead') NOT NULL DEFAULT 'pending',
