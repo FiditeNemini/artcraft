@@ -31,3 +31,13 @@ pub enum DownloadUrlType {
   /// web
   Web,
 }
+
+#[derive(Deserialize)]
+pub enum W2lTemplateType {
+  /// unknown
+  Unknown,
+  /// video
+  Video,
+  /// image
+  Image,
+}

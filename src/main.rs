@@ -33,6 +33,7 @@ use crate::endpoints::root_index::get_root_index;
 use crate::endpoints::default_route_404::default_route_404;
 use crate::endpoints::misc::enable_alpha::enable_alpha;
 use crate::endpoints::uploads::upload_tts_model::upload_tts_model_handler;
+use crate::endpoints::uploads::upload_w2l_template::upload_w2l_template_handler;
 
 const DEFAULT_BIND_ADDRESS : &'static str = "0.0.0.0:12345";
 const DEFAULT_RUST_LOG: &'static str = "debug,actix_web=info";
@@ -173,11 +174,11 @@ pub async fn serve(server_state: ServerState) -> AnyhowResult<()>
           .route(web::post().to(upload_tts_model_handler))
           .route(web::head().to(|| HttpResponse::Ok()))
       )
-      /*.service(
+      .service(
         web::resource("/upload_w2l")
-          .route(web::post().to())
+          .route(web::post().to(upload_w2l_template_handler))
           .route(web::head().to(|| HttpResponse::Ok()))
-      )*/
+      )
       .service(get_root_index)
       .service(enable_alpha)
       .default_service( web::route().to(default_route_404))
