@@ -37,6 +37,14 @@ class ApiConfig {
     return `${this.getScheme()}://${this.getNewApiHost()}/session`;
   }
 
+  uploadTts() : string {
+    return `${this.getScheme()}://${this.getNewApiHost()}/tts/upload`;
+  }
+
+  uploadW2l() : string {
+    return `${this.getScheme()}://${this.getNewApiHost()}/w2l/upload`;
+  }
+
   private getScheme() : string {
     return this.isLocalDev ? "http" : "https";
   }

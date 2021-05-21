@@ -22,6 +22,7 @@ import { SignupComponent } from './modes/signup/SignupComponent';
 import { ApiConfig } from './api/ApiConfig';
 import { SessionStateResponse } from './api/SessionState';
 import { LoginComponent } from './modes/login/LoginComponent';
+import { UploadComponent } from './modes/upload/UploadComponent';
 
 interface Props {
   // Certan browsers (iPhone) have pitiful support for drawing APIs. Worse yet,
@@ -427,6 +428,13 @@ class App extends React.Component<Props, State> {
         break;
       case Mode.LOGIN_MODE:
         component = <LoginComponent
+          loggedIn={this.state.loggedIn}
+          querySessionCallback={this.querySession}
+          switchModeCallback={this.switchMode}
+          />
+        break;
+      case Mode.UPLOAD_MODE:
+        component = <UploadComponent
           loggedIn={this.state.loggedIn}
           querySessionCallback={this.querySession}
           switchModeCallback={this.switchMode}
