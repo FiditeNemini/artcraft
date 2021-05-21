@@ -16,24 +16,25 @@ pub mod validations;
 
 use actix_cors::Cors;
 use actix_http::http;
-use log::{info};
 use actix_web::middleware::{Logger, DefaultHeaders};
 use actix_web::{HttpServer, web, HttpResponse, App};
-use std::sync::Arc;
-use crate::server_state::{ServerState, EnvConfig};
-use sqlx::MySqlPool;
-use sqlx::mysql::MySqlPoolOptions;
+use crate::endpoints::default_route_404::default_route_404;
+use crate::endpoints::enqueue_uploads::upload_tts_model::upload_tts_model_handler;
+use crate::endpoints::enqueue_uploads::upload_w2l_template::upload_w2l_template_handler;
+use crate::endpoints::misc::enable_alpha::enable_alpha;
+use crate::endpoints::root_index::get_root_index;
 use crate::endpoints::users::create_account::create_account_handler;
 use crate::endpoints::users::login::login_handler;
-use crate::util::cookies::CookieManager;
 use crate::endpoints::users::logout::logout_handler;
-use crate::util::session_checker::SessionChecker;
 use crate::endpoints::users::session_info::session_info_handler;
-use crate::endpoints::root_index::get_root_index;
-use crate::endpoints::default_route_404::default_route_404;
-use crate::endpoints::misc::enable_alpha::enable_alpha;
-use crate::endpoints::uploads::upload_tts_model::upload_tts_model_handler;
-use crate::endpoints::uploads::upload_w2l_template::upload_w2l_template_handler;
+use crate::server_state::{ServerState, EnvConfig};
+use crate::util::cookies::CookieManager;
+use crate::util::session_checker::SessionChecker;
+use log::{info};
+use sqlx::MySqlPool;
+use sqlx::mysql::MySqlPoolOptions;
+use std::sync::Arc;
+use crate::endpoints::enqueue_inference::infer_w2l::infer_w2l_handler;
 
 const DEFAULT_BIND_ADDRESS : &'static str = "0.0.0.0:12345";
 const DEFAULT_RUST_LOG: &'static str = "debug,actix_web=info";
@@ -175,9 +176,17 @@ pub async fn serve(server_state: ServerState) -> AnyhowResult<()>
           .route(web::head().to(|| HttpResponse::Ok()))
       )
       .service(
-        web::resource("/upload_w2l")
-          .route(web::post().to(upload_w2l_template_handler))
-          .route(web::head().to(|| HttpResponse::Ok()))
+        web::scope("/w2l")
+          .service(
+            web::resource("/upload")
+              .route(web::post().to(upload_w2l_template_handler))
+              .route(web::head().to(|| HttpResponse::Ok()))
+          )
+          .service(
+            web::resource("/inference")
+              .route(web::post().to(infer_w2l_handler))
+              .route(web::head().to(|| HttpResponse::Ok()))
+          )
       )
       .service(get_root_index)
       .service(enable_alpha)
