@@ -43,7 +43,6 @@ pub struct ErrorResponse {
 #[derive(Debug, Display)]
 pub enum InferW2lError {
   BadInput(String),
-  MustBeLoggedIn,
   ServerError,
 }
 
@@ -51,7 +50,6 @@ impl ResponseError for InferW2lError {
   fn status_code(&self) -> StatusCode {
     match *self {
       InferW2lError::BadInput(_) => StatusCode::BAD_REQUEST,
-      InferW2lError::MustBeLoggedIn => StatusCode::UNAUTHORIZED,
       InferW2lError::ServerError => StatusCode::INTERNAL_SERVER_ERROR,
     }
   }
@@ -59,7 +57,6 @@ impl ResponseError for InferW2lError {
   fn error_response(&self) -> HttpResponse {
     let error_reason = match self {
       InferW2lError::BadInput(reason) => reason.to_string(),
-      InferW2lError::MustBeLoggedIn => "user must be logged in".to_string(),
       InferW2lError::ServerError => "server error".to_string(),
     };
 

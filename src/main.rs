@@ -35,6 +35,7 @@ use sqlx::MySqlPool;
 use sqlx::mysql::MySqlPoolOptions;
 use std::sync::Arc;
 use crate::endpoints::tts::enqueue_upload_tts_model::upload_tts_model_handler;
+use crate::endpoints::tts::enqueue_infer_tts::infer_tts_handler;
 
 const DEFAULT_BIND_ADDRESS : &'static str = "0.0.0.0:12345";
 const DEFAULT_RUST_LOG: &'static str = "debug,actix_web=info";
@@ -177,11 +178,11 @@ pub async fn serve(server_state: ServerState) -> AnyhowResult<()>
               .route(web::post().to(upload_tts_model_handler))
               .route(web::head().to(|| HttpResponse::Ok()))
           )
-          //.service(
-          //  web::resource("/inference")
-          //    .route(web::post().to())
-          //    .route(web::head().to(|| HttpResponse::Ok()))
-          //)
+          .service(
+            web::resource("/inference")
+              .route(web::post().to(infer_tts_handler))
+              .route(web::head().to(|| HttpResponse::Ok()))
+          )
       )
       .service(
         web::scope("/w2l")

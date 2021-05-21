@@ -1,0 +1,43 @@
+#!/usr/bin/env python3
+
+import requests
+import re
+
+login_url = 'http://localhost:12345/login'
+inference_url = 'http://localhost:12345/tts/inference'
+
+payload = {
+  'username_or_email': 'echelon',
+  'password': 'testing',
+}
+
+r = requests.post(login_url, json=payload)
+
+print("===== Login =====")
+print('Status: {}'.format(r.status_code))
+print(r.content)
+for k, v in r.headers.items():
+  print('  {}: {}'.format(k, v))
+
+# NB: May not be set due to cookie domain:
+#r.cookies['session']
+
+raw_set_cookie_header = r.headers['set-cookie']
+m = re.match(r'session=([^;\s]+);', raw_set_cookie_header)
+session_cookie = m.group(1)
+
+
+print("===== Infer TTS =====")
+
+cookies = { 'session': session_cookie }
+
+payload = {
+  'tts_model_token': 'TTS_TOKEN',
+  'inference_text': 'this is the text to generate',
+}
+
+r = requests.post(inference_url, cookies=cookies, json=payload)
+
+print('Status: {}'.format(r.status_code))
+print(r.content)
+
