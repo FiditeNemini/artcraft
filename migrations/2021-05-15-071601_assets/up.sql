@@ -75,7 +75,7 @@ CREATE TABLE tts_models (
   -- The pytorch model
   -- For now, this will be a hash of the file contents.
   -- NB: NOT UNIQUE! We can allow duplicate uploads.
-  private_bucket_hash CHAR(32) NOT NULL,
+  private_bucket_hash CHAR(64) NOT NULL,
 
   -- Calculated average, on a scale of 0-100
   -- Null with zero ratings.
@@ -181,10 +181,10 @@ CREATE TABLE w2l_templates (
   original_filename CHAR(255) NOT NULL,
 
   -- The original source image/video and the "precomputed" faces
-  private_bucket_hash CHAR(32) NOT NULL,
+  private_bucket_hash CHAR(64) NOT NULL,
 
   -- For the thumbnail we show.
-  public_bucket_hash CHAR(32) NOT NULL,
+  public_bucket_hash CHAR(64) NOT NULL,
 
   -- Calculated average, on a scale of 0-100
   -- Null with zero ratings.

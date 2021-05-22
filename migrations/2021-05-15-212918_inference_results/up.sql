@@ -36,7 +36,7 @@ CREATE TABLE tts_results (
   ) NOT NULL DEFAULT 'public',
 
   -- Where the wav, spectrogram, and etc. are located.
-  public_bucket_hash CHAR(32) NOT NULL,
+  public_bucket_hash CHAR(64) NOT NULL,
 
   -- ========== MODERATION DETAILS ==========
 
@@ -100,7 +100,7 @@ CREATE TABLE w2l_results (
   ) NOT NULL DEFAULT 'public',
 
   -- Where the wav, spectrogram, and etc. are located.
-  public_bucket_hash CHAR(32) NOT NULL,
+  public_bucket_hash CHAR(64) NOT NULL,
 
   -- ========== MODERATION DETAILS ==========
 

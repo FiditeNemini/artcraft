@@ -24,6 +24,11 @@ use sqlx::mysql::MySqlPoolOptions;
 use std::path::PathBuf;
 use std::process::Command;
 use std::time::Duration;
+use tempdir::TempDir;
+use std::fs::File;
+use std::io::{BufReader, Read};
+use ring::digest::{Context, Digest, SHA256};
+use data_encoding::{HEXUPPER, HEXLOWER, HEXLOWER_PERMISSIVE};
 
 const DEFAULT_RUST_LOG: &'static str = "debug,actix_web=info";
 const DEFAULT_TEMP_DIR: &'static str = "/tmp";
@@ -143,13 +148,29 @@ async fn process_jobs(downloader: &Downloader, jobs: Vec<TtsUploadJobRecord>) ->
   Ok(())
 }
 
-async fn call_script(downloader: &Downloader, job: &TtsUploadJobRecord) -> AnyhowResult<()> {
+async fn download_file(downloader: &Downloader,
+                       job: &TtsUploadJobRecord,
+                       temp_dir: &TempDir) -> AnyhowResult<String>
+{
 
-  let url = job.download_url.as_ref().map(|c| c.to_string()).unwrap_or("".to_string());
+  let temp_dir_path = temp_dir.path()
+    .to_str()
+    .unwrap_or("/tmp")
+    .to_string();
+
+  let filename = random_token(10);
+  let filename = format!("{}/{}.bin", temp_dir_path, filename);
+
+  info!("Downloading to: {}", filename);
+
+  let url = job.download_url.as_ref()
+    .map(|c| c.to_string())
+    .unwrap_or("".to_string());
+
   let command = format!("{} --url {} --output_file {}",
                         downloader.download_script,
                         &url,
-                        "filename.txt");
+                        &filename);
 
   info!("Running command: {}", command);
 
@@ -165,20 +186,50 @@ async fn call_script(downloader: &Downloader, job: &TtsUploadJobRecord) -> Anyho
     return Err(anyhow!("Failure to execute command: {:?}", reason))
   }
 
-  Ok(())
+  Ok(filename)
+}
+
+
+fn sha256_digest<R: Read>(mut reader: R) -> AnyhowResult<Digest> {
+  let mut context = Context::new(&SHA256);
+  let mut buffer = [0; 1024];
+
+  loop {
+    let count = reader.read(&mut buffer)?;
+    if count == 0 {
+      break;
+    }
+    context.update(&buffer[..count]);
+  }
+
+  Ok(context.finish())
+}
+
+fn get_file_hash(filename: &str) -> AnyhowResult<String> {
+  let input = File::open(filename)?;
+  let reader = BufReader::new(input);
+  let digest = sha256_digest(reader)?;
+
+  let hash = HEXLOWER_PERMISSIVE.encode(digest.as_ref());
+  Ok(hash)
 }
 
 async fn process_job(downloader: &Downloader, job: &TtsUploadJobRecord) -> AnyhowResult<()> {
   // TODO: 1. Mark processing.
-  // TODO: 2. Download.
+  // TODO: 2. Download. (DONE)
   // TODO: 3. Upload.
   // TODO: 4. Save record. (DONE)
   // TODO: 5. Mark job done. (DONE)
 
-  let private_bucket_hash = random_token(32); // TODO: Use sha2/sha256 instead.
+  let temp_dir = format!("temp_{}", job.id);
+  let temp_dir = TempDir::new(&temp_dir)?;
 
   info!("Calling downloader...");
-  call_script(downloader, job).await?;
+  let download_filename = download_file(downloader, job, &temp_dir).await?;
+
+  let private_bucket_hash = get_file_hash(&download_filename)?;
+
+  info!("File hash: {}", private_bucket_hash);
 
   info!("Saving model record...");
   let id = insert_tts_model(&downloader.mysql_pool, job, &private_bucket_hash).await?;
