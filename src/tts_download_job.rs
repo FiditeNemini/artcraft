@@ -8,6 +8,7 @@
 pub mod job;
 pub mod util;
 
+use anyhow::anyhow;
 use chrono::Utc;
 use crate::job::job_queries::TtsUploadJobRecord;
 use crate::job::job_queries::insert_tts_model;
@@ -21,8 +22,8 @@ use log::{warn, info};
 use sqlx::MySqlPool;
 use sqlx::mysql::MySqlPoolOptions;
 use std::path::PathBuf;
-use std::time::Duration;
 use std::process::Command;
+use std::time::Duration;
 
 const DEFAULT_RUST_LOG: &'static str = "debug,actix_web=info";
 const DEFAULT_TEMP_DIR: &'static str = "/tmp";
@@ -158,6 +159,11 @@ async fn call_script(downloader: &Downloader, job: &TtsUploadJobRecord) -> Anyho
     .output()?;
 
   info!("Downloader Result: {:?}", result);
+
+  if !result.status.success() {
+    let reason = String::from_utf8(result.stderr).unwrap_or("UNKNOWN".to_string());
+    return Err(anyhow!("Failure to execute command: {:?}", reason))
+  }
 
   Ok(())
 }

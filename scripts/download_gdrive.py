@@ -20,6 +20,10 @@ def normalize_url(url):
     This attempts to fix URLs in the wrong format.
     """
     matches = re.match(r"^https:\/\/drive\.google\.com\/file\/d\/([^\/]+)\/", url)
+
+    if not matches:
+        return url
+
     match_groups = matches.groups()
 
     if not match_groups or not len(match_groups) == 1:
