@@ -1,3 +1,4 @@
+pub mod anyhow_result;
 pub mod cookie_manager;
 pub mod ip_address;
 pub mod random_token;

@@ -12,6 +12,22 @@ publish = false
 name = "storyteller-web"
 path = "src/main.rs"
 
+[[bin]]
+name = "tts-download-job"
+path = "src/tts_download_job.rs"
+
+[[bin]]
+name = "tts-inference-job"
+path = "src/tts_inference_job.rs"
+
+[[bin]]
+name = "w2l-download-job"
+path = "src/w2l_download_job.rs"
+
+[[bin]]
+name = "w2l-inference-job"
+path = "src/w2l_inference_job.rs"
+
 [dependencies]
 anyhow = "1.0.40"
 base64 = "0.13.0"

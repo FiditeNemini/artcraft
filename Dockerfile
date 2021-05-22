@@ -12,8 +12,36 @@ COPY migrations/ ./migrations
 
 RUN $HOME/.cargo/bin/cargo fetch
 
-#RUN SQLX_OFFLINE=true LD_LIBRARY_PATH=/usr/lib:${LD_LIBRARY_PATH} $HOME/.cargo/bin/cargo build
-RUN SQLX_OFFLINE=true LD_LIBRARY_PATH=/usr/lib:${LD_LIBRARY_PATH} $HOME/.cargo/bin/cargo build --release
+# Build all the binaries.
+RUN SQLX_OFFLINE=true \
+  LD_LIBRARY_PATH=/usr/lib:${LD_LIBRARY_PATH} \
+  $HOME/.cargo/bin/cargo build \
+  --release \
+  --bin storyteller-web
+
+RUN SQLX_OFFLINE=true \
+  LD_LIBRARY_PATH=/usr/lib:${LD_LIBRARY_PATH} \
+  $HOME/.cargo/bin/cargo build \
+  --release \
+  --bin tts-download-job
+
+RUN SQLX_OFFLINE=true \
+  LD_LIBRARY_PATH=/usr/lib:${LD_LIBRARY_PATH} \
+  $HOME/.cargo/bin/cargo build \
+  --release \
+  --bin w2l-download-job
+
+RUN SQLX_OFFLINE=true \
+  LD_LIBRARY_PATH=/usr/lib:${LD_LIBRARY_PATH} \
+  $HOME/.cargo/bin/cargo build \
+  --release \
+  --bin tts-inference-job
+
+RUN SQLX_OFFLINE=true \
+  LD_LIBRARY_PATH=/usr/lib:${LD_LIBRARY_PATH} \
+  $HOME/.cargo/bin/cargo build \
+  --release \
+  --bin w2l-inference-job
 
 # Final image
 FROM ubuntu:xenial
@@ -33,8 +61,12 @@ RUN apt-get update \
         curl \
         wget
 
-#COPY --from=build /tmp/target/debug/storyteller-web /
+# Copy all the binaries.
 COPY --from=build /tmp/target/release/storyteller-web /
+COPY --from=build /tmp/target/release/tts-download-job /
+COPY --from=build /tmp/target/release/tts-inference-job /
+COPY --from=build /tmp/target/release/w2l-download-job /
+COPY --from=build /tmp/target/release/w2l-inference-job /
 
 # SSL certs are required for crypto
 COPY --from=build /etc/ssl /etc/ssl
