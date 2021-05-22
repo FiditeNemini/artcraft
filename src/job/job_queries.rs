@@ -129,7 +129,7 @@ SET
   description_rendered_html = '',
   creator_user_token = ?,
   creator_ip_address = ?,
-  original_filename = "TODO",
+  original_download_url = ?,
   private_bucket_hash = ?
         "#,
       model_token,
@@ -137,6 +137,7 @@ SET
       job.title.to_string(),
       job.creator_user_token.clone(),
       job.creator_ip_address.clone(),
+      job.download_url.clone(),
       private_bucket_hash.to_string(),
     )
     .execute(pool)

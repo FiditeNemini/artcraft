@@ -651,16 +651,6 @@
       ]
     }
   },
-  "b4fa3ec3e2f65f217ef8a08f54f1366b537d0e99497cd7e2882e8e5a96c4c4ab": {
-    "query": "\nINSERT INTO tts_models\nSET\n  token = ?,\n  tts_model_type = \"tacotron2\",\n  updatable_slug = ?,\n  title = ?,\n  description_markdown = '',\n  description_rendered_html = '',\n  creator_user_token = ?,\n  creator_ip_address = ?,\n  original_filename = \"TODO\",\n  private_bucket_hash = ?\n        ",
-    "describe": {
-      "columns": [],
-      "parameters": {
-        "Right": 6
-      },
-      "nullable": []
-    }
-  },
   "bf489cf419d342d144f072c310d6d70c9073b092b5721f489eaf2ffc8ad3915e": {
     "query": "\nUPDATE tts_model_upload_jobs\nSET\n  status = ?,\n  failure_reason = ?,\n  retry_at = NOW() + interval 2 minute\nWHERE id = ?\n        ",
     "describe": {
@@ -687,6 +677,16 @@
       "columns": [],
       "parameters": {
         "Right": 4
+      },
+      "nullable": []
+    }
+  },
+  "d1c8e0f9c5600fd7c296558cdb3525a2678b3e775f9e2bee0f1da979d4a82d70": {
+    "query": "\nINSERT INTO tts_models\nSET\n  token = ?,\n  tts_model_type = \"tacotron2\",\n  updatable_slug = ?,\n  title = ?,\n  description_markdown = '',\n  description_rendered_html = '',\n  creator_user_token = ?,\n  creator_ip_address = ?,\n  original_download_url = ?,\n  private_bucket_hash = ?\n        ",
+    "describe": {
+      "columns": [],
+      "parameters": {
+        "Right": 7
       },
       "nullable": []
     }

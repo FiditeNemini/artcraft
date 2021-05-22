@@ -70,7 +70,10 @@ CREATE TABLE tts_models (
    ) NOT NULL DEFAULT 'public',
 
   -- The filename that was used at upload time.
-  original_filename VARCHAR(255) NOT NULL,
+  original_filename VARCHAR(255) DEFAULT NULL,
+
+  -- Where the file was originally downloaded (if it was downloaded)
+  original_download_url VARCHAR(512) DEFAULT NULL,
 
   -- The pytorch model
   -- For now, this will be a hash of the file contents.
@@ -178,7 +181,10 @@ CREATE TABLE w2l_templates (
   ) NOT NULL DEFAULT 'public',
 
   -- The filename that was used at upload time.
-  original_filename CHAR(255) NOT NULL,
+  original_filename CHAR(255) DEFAULT NULL,
+
+  -- Where the file was originally downloaded (if it was downloaded)
+  original_download_url VARCHAR(512) DEFAULT NULL,
 
   -- The original source image/video and the "precomputed" faces
   private_bucket_hash CHAR(64) NOT NULL,
