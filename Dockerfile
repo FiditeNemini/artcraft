@@ -65,12 +65,10 @@ RUN apt-get update \
     && apt-get install -y \
         curl \
         python3-pip \
-        python3.7 \
-        python3.7-dev \
-        python3.7-venv \
+        python3 \
         wget
 
-RUN python3.7 --version
+RUN python3 --version
 #RUN python3.7 -m venv python
 #RUN . python/bin/activate \
 #  && pip install --upgrade pip \
