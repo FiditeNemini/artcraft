@@ -14,6 +14,9 @@ pub mod server_state;
 pub mod util;
 pub mod validations;
 
+// NB: This is included so sqlx can generate all the queries.
+mod job;
+
 use actix_cors::Cors;
 use actix_http::http;
 use actix_web::middleware::{Logger, DefaultHeaders};
