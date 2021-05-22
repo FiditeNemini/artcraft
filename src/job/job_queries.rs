@@ -82,3 +82,27 @@ WHERE id = ?
 
   Ok(())
 }
+pub async fn mark_tts_upload_job_done(pool: &MySqlPool,
+                                      job: &TtsUploadJobRecord,
+                                      success: bool)
+                                      -> AnyhowResult<()>
+{
+  let status = if success { "complete_success" } else { "complete_failure" };
+
+  let query_result = sqlx::query!(
+        r#"
+UPDATE tts_model_upload_jobs
+SET
+  status = ?,
+  failure_reason = NULL,
+  retry_at = NULL
+WHERE id = ?
+        "#,
+        status,
+        job.id,
+    )
+    .execute(pool)
+    .await?;
+
+  Ok(())
+}

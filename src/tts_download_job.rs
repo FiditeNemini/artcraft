@@ -1,3 +1,4 @@
+#![deny(unused_must_use)]
 #![allow(dead_code)]
 #![allow(unused_mut)]
 #![allow(unused_imports)]
@@ -9,8 +10,9 @@ pub mod util;
 
 use chrono::Utc;
 use crate::job::job_queries::TtsUploadJobRecord;
-use crate::job::job_queries::query_tts_upload_job_records;
+use crate::job::job_queries::mark_tts_upload_job_done;
 use crate::job::job_queries::mark_tts_upload_job_failure;
+use crate::job::job_queries::query_tts_upload_job_records;
 use crate::util::anyhow_result::AnyhowResult;
 use log::{warn, info};
 use sqlx::MySqlPool;
@@ -44,7 +46,7 @@ async fn main() -> AnyhowResult<()> {
     .connect(&db_connection_string)
     .await?;
 
-  main_loop(pool);
+  main_loop(pool).await;
 
   Ok(())
 }
@@ -69,6 +71,12 @@ async fn main_loop(pool: MySqlPool) {
       }
     };
 
+    if jobs.is_empty() {
+      info!("No jobs!");
+      std::thread::sleep(Duration::from_millis(1500));
+      continue;
+    }
+
     let result = process_jobs(&pool, jobs).await;
 
     match result {
@@ -89,7 +97,7 @@ async fn main_loop(pool: MySqlPool) {
 
 async fn process_jobs(pool: &MySqlPool, jobs: Vec<TtsUploadJobRecord>) -> AnyhowResult<()> {
   for job in jobs.into_iter() {
-    let result = process_job(&job).await;
+    let result = process_job(pool, &job).await;
     match result {
       Ok(_) => {},
       Err(e) => {
@@ -103,12 +111,15 @@ async fn process_jobs(pool: &MySqlPool, jobs: Vec<TtsUploadJobRecord>) -> Anyhow
   Ok(())
 }
 
-async fn process_job(job: &TtsUploadJobRecord) -> AnyhowResult<()> {
+async fn process_job(pool: &MySqlPool, job: &TtsUploadJobRecord) -> AnyhowResult<()> {
   // TODO: 1. Mark processing.
   // TODO: 2. Download.
   // TODO: 3. Upload.
   // TODO: 4. Save record.
   // TODO: 5. Mark job done.
+
+  info!("Job done: {}", job.id);
+  mark_tts_upload_job_done(pool, job, true).await?;
 
   Ok(())
 }
