@@ -47,6 +47,9 @@ RUN SQLX_OFFLINE=true \
 FROM ubuntu:xenial
 WORKDIR /
 
+
+COPY scripts/ ./scripts
+
 # See: https://github.com/opencontainers/image-spec/blob/master/annotations.md
 LABEL org.opencontainers.image.authors='bt@brand.io, echelon@gmail.com'
 LABEL org.opencontainers.image.url='https://github.com/storytold/storyteller-web'
@@ -59,7 +62,12 @@ LABEL org.opencontainers.image.source='https://github.com/storytold/storyteller-
 RUN apt-get update \
     && apt-get install -y \
         curl \
+        python3 \
+        python3-pip \
         wget
+
+# TODO: Use venv to do this instead.
+RUN pip install gdown
 
 # Copy all the binaries.
 COPY --from=build /tmp/target/release/storyteller-web /
