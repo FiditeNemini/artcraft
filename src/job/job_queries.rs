@@ -2,8 +2,10 @@
 //! Sqlx's prepare needs a *single* binary to work against, so we need to
 //! include these in the main binary to generate all the queries.
 
+use anyhow::anyhow;
 use chrono::Utc;
 use crate::util::anyhow_result::AnyhowResult;
+use crate::util::random_token::random_token;
 use sqlx::MySqlPool;
 
 /// table: tts_model_upload_jobs
@@ -105,4 +107,50 @@ WHERE id = ?
     .await?;
 
   Ok(())
+}
+
+pub async fn insert_tts_model(pool: &MySqlPool,
+                              job: &TtsUploadJobRecord,
+                              private_bucket_hash: &str)
+  -> AnyhowResult<u64>
+{
+  let model_token = random_token(32);
+  let updatable_slug = model_token.clone();
+
+  let query_result = sqlx::query!(
+        r#"
+INSERT INTO tts_models
+SET
+  token = ?,
+  tts_model_type = "tacotron2",
+  updatable_slug = ?,
+  title = ?,
+  description_markdown = '',
+  description_rendered_html = '',
+  creator_user_token = ?,
+  creator_ip_address = ?,
+  original_filename = "TODO",
+  private_bucket_hash = ?
+        "#,
+      model_token,
+      updatable_slug,
+      job.title.to_string(),
+      job.creator_user_token.clone(),
+      job.creator_ip_address.clone(),
+      private_bucket_hash.to_string(),
+    )
+    .execute(pool)
+    .await;
+
+  let record_id = match query_result {
+    Ok(res) => {
+      res.last_insert_id()
+    },
+    Err(err) => {
+      // TODO: handle better
+      return Err(anyhow!("Mysql error: {:?}", err));
+    }
+  };
+
+  Ok(record_id)
 }

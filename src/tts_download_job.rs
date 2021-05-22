@@ -10,10 +10,12 @@ pub mod util;
 
 use chrono::Utc;
 use crate::job::job_queries::TtsUploadJobRecord;
+use crate::job::job_queries::insert_tts_model;
 use crate::job::job_queries::mark_tts_upload_job_done;
 use crate::job::job_queries::mark_tts_upload_job_failure;
 use crate::job::job_queries::query_tts_upload_job_records;
 use crate::util::anyhow_result::AnyhowResult;
+use crate::util::random_token::random_token;
 use log::{warn, info};
 use sqlx::MySqlPool;
 use sqlx::mysql::MySqlPoolOptions;
@@ -116,7 +118,14 @@ async fn process_job(pool: &MySqlPool, job: &TtsUploadJobRecord) -> AnyhowResult
   // TODO: 2. Download.
   // TODO: 3. Upload.
   // TODO: 4. Save record.
-  // TODO: 5. Mark job done.
+  // TODO: 5. Mark job done. (DONE)
+
+  let private_bucket_hash = random_token(32); // TODO: Use sha2/sha256 instead.
+
+  info!("Saving model record...");
+  let id = insert_tts_model(pool, job, &private_bucket_hash).await?;
+
+  info!("Saved model record: {}", id);
 
   info!("Job done: {}", job.id);
   mark_tts_upload_job_done(pool, job, true).await?;
