@@ -94,8 +94,8 @@
       ]
     }
   },
-  "7c7df8a39f420dd88ec1575ca6ef11344e58777dacb87120327325d00fd48f24": {
-    "query": "\nSELECT *\nFROM tts_model_upload_jobs\nWHERE\n  (\n    status IN (\"pending\", \"attempt_failed\")\n  )\n  AND\n  (\n    retry_at IS NULL\n    OR\n    retry_at < CURRENT_TIMESTAMP\n  )\n  LIMIT 20\n        ",
+  "7ab54466ca3021d90e0feb234acba56bf53d415dde69bc1c35120ed0c8dd1858": {
+    "query": "\nSELECT *\nFROM tts_model_upload_jobs\nWHERE\n  (\n    status IN (\"pending\", \"attempt_failed\")\n  )\n  AND\n  (\n    retry_at IS NULL\n    OR\n    retry_at < CURRENT_TIMESTAMP\n  )\n  LIMIT ?\n        ",
     "describe": {
       "columns": [
         {
@@ -304,7 +304,7 @@
         }
       ],
       "parameters": {
-        "Right": 0
+        "Right": 1
       },
       "nullable": [
         false,
@@ -649,6 +649,36 @@
         true,
         true
       ]
+    }
+  },
+  "b4fa3ec3e2f65f217ef8a08f54f1366b537d0e99497cd7e2882e8e5a96c4c4ab": {
+    "query": "\nINSERT INTO tts_models\nSET\n  token = ?,\n  tts_model_type = \"tacotron2\",\n  updatable_slug = ?,\n  title = ?,\n  description_markdown = '',\n  description_rendered_html = '',\n  creator_user_token = ?,\n  creator_ip_address = ?,\n  original_filename = \"TODO\",\n  private_bucket_hash = ?\n        ",
+    "describe": {
+      "columns": [],
+      "parameters": {
+        "Right": 6
+      },
+      "nullable": []
+    }
+  },
+  "bf489cf419d342d144f072c310d6d70c9073b092b5721f489eaf2ffc8ad3915e": {
+    "query": "\nUPDATE tts_model_upload_jobs\nSET\n  status = ?,\n  failure_reason = ?,\n  retry_at = NOW() + interval 2 minute\nWHERE id = ?\n        ",
+    "describe": {
+      "columns": [],
+      "parameters": {
+        "Right": 3
+      },
+      "nullable": []
+    }
+  },
+  "c11318a1a944cd74f1210b211e19dfaa12652bad2a5d79b010f6efa62f3fa8a9": {
+    "query": "\nUPDATE tts_model_upload_jobs\nSET\n  status = ?,\n  failure_reason = NULL,\n  retry_at = NULL\nWHERE id = ?\n        ",
+    "describe": {
+      "columns": [],
+      "parameters": {
+        "Right": 2
+      },
+      "nullable": []
     }
   },
   "ca5efc3be0f09649df2add5270c06544133288a95ffcb9a0589efd4fe345efe7": {
