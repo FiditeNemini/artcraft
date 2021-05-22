@@ -28,7 +28,9 @@ pub struct TtsUploadJobRecord {
   pub retry_at: Option<chrono::DateTime<Utc>>,
 }
 
-pub async fn query_tts_upload_job_records(pool: &MySqlPool) -> AnyhowResult<Vec<TtsUploadJobRecord>> {
+pub async fn query_tts_upload_job_records(pool: &MySqlPool, num_records: u32)
+  -> AnyhowResult<Vec<TtsUploadJobRecord>>
+{
   let job_records = sqlx::query_as!(
       TtsUploadJobRecord,
         r#"
@@ -44,11 +46,39 @@ WHERE
     OR
     retry_at < CURRENT_TIMESTAMP
   )
-  LIMIT 20
+  LIMIT ?
         "#,
+      num_records,
     )
     .fetch_all(pool)
     .await?;
 
   Ok(job_records)
+}
+
+pub async fn mark_tts_upload_job_failure(pool: &MySqlPool,
+                                         job: &TtsUploadJobRecord,
+                                         failure_reason: &str)
+  -> AnyhowResult<()>
+{
+  // statuses: "attempt_failed", "complete_failure", "dead"
+  let status = "attempt_failed";
+
+  let query_result = sqlx::query!(
+        r#"
+UPDATE tts_model_upload_jobs
+SET
+  status = ?,
+  failure_reason = ?,
+  retry_at = NOW() + interval 2 minute
+WHERE id = ?
+        "#,
+        status,
+        failure_reason.to_string(),
+        job.id,
+    )
+    .execute(pool)
+    .await?;
+
+  Ok(())
 }

@@ -10,8 +10,9 @@ pub mod util;
 use chrono::Utc;
 use crate::job::job_queries::TtsUploadJobRecord;
 use crate::job::job_queries::query_tts_upload_job_records;
+use crate::job::job_queries::mark_tts_upload_job_failure;
 use crate::util::anyhow_result::AnyhowResult;
-use log::info;
+use log::{warn, info};
 use sqlx::MySqlPool;
 use sqlx::mysql::MySqlPoolOptions;
 use std::time::Duration;
@@ -43,13 +44,71 @@ async fn main() -> AnyhowResult<()> {
     .connect(&db_connection_string)
     .await?;
 
+  main_loop(pool);
+
+  Ok(())
+}
+
+const START_TIMEOUT_MILLIS : u64 = 500;
+const INCREASE_TIMEOUT_MILLIS : u64 = 1000;
+
+async fn main_loop(pool: MySqlPool) {
+  let mut timeout_millis = START_TIMEOUT_MILLIS;
+
   loop {
-    let jobs = query_tts_upload_job_records(&pool).await;
-    for job in jobs {
-      info!("Job: {:?}", job);
+    let num_records = 1;
+    let query_result = query_tts_upload_job_records(&pool, num_records).await;
+
+    let jobs = match query_result {
+      Ok(jobs) => jobs,
+      Err(e) => {
+        warn!("Error querying jobs: {:?}", e);
+        std::thread::sleep(Duration::from_millis(timeout_millis));
+        timeout_millis += INCREASE_TIMEOUT_MILLIS;
+        continue;
+      }
+    };
+
+    let result = process_jobs(&pool, jobs).await;
+
+    match result {
+      Ok(_) => {},
+      Err(e) => {
+        warn!("Error querying jobs: {:?}", e);
+        std::thread::sleep(Duration::from_millis(timeout_millis));
+        timeout_millis += INCREASE_TIMEOUT_MILLIS;
+        continue;
+      }
     }
+
+    timeout_millis = START_TIMEOUT_MILLIS; // reset
+
     std::thread::sleep(Duration::from_millis(500));
   }
+}
+
+async fn process_jobs(pool: &MySqlPool, jobs: Vec<TtsUploadJobRecord>) -> AnyhowResult<()> {
+  for job in jobs.into_iter() {
+    let result = process_job(&job).await;
+    match result {
+      Ok(_) => {},
+      Err(e) => {
+        warn!("Failure to process job: {:?}", e);
+        let failure_reason = "";
+        let _r = mark_tts_upload_job_failure(pool, &job, failure_reason).await;
+      }
+    }
+  }
+
+  Ok(())
+}
+
+async fn process_job(job: &TtsUploadJobRecord) -> AnyhowResult<()> {
+  // TODO: 1. Mark processing.
+  // TODO: 2. Download.
+  // TODO: 3. Upload.
+  // TODO: 4. Save record.
+  // TODO: 5. Mark job done.
 
   Ok(())
 }

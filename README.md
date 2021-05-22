@@ -31,6 +31,14 @@ To save sqlx database state to cache file (necessary for builds):
 SQLX_OFFLINE=true cargo sqlx prepare
 ```
 
+Now that we have multiple binaries, it's required to include all the queries in the main
+binary so we can generate the cached queries as a single target. That's then executed
+with:
+
+```
+SQLX_OFFLINE=true cargo sqlx prepare -- --bin storyteller-web
+```
+
 Production
 ----------
 
