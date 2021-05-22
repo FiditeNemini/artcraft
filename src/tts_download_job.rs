@@ -17,7 +17,6 @@ use crate::job::job_queries::query_tts_upload_job_records;
 use crate::util::anyhow_result::AnyhowResult;
 use crate::util::filesystem::check_directory_exists;
 use crate::util::random_token::random_token;
-use google_drive3::DriveHub;
 use log::{warn, info};
 use sqlx::MySqlPool;
 use sqlx::mysql::MySqlPoolOptions;
@@ -29,7 +28,6 @@ const DEFAULT_TEMP_DIR: &'static str = "/tmp";
 
 struct Downloader {
   pub download_temp_directory: PathBuf,
-  pub gdrive_client: DriveHub,
   pub mysql_pool: MySqlPool,
 }
 
@@ -54,8 +52,6 @@ async fn main() -> AnyhowResult<()> {
 
   check_directory_exists(&temp_directory)?;
 
-  let gdrive_client = build_gdrive_client().await?;
-
   let db_connection_string =
     easyenv::get_env_string_or_default(
       "MYSQL_URL",
@@ -71,27 +67,11 @@ async fn main() -> AnyhowResult<()> {
   let downloader = Downloader {
     download_temp_directory: temp_directory,
     mysql_pool,
-    gdrive_client,
   };
 
   main_loop(downloader).await;
 
   Ok(())
-}
-
-async fn build_gdrive_client() -> AnyhowResult<DriveHub> {
-  // https://docs.rs/google-drive3/2.0.5+20210322/google_drive3/api/struct.FileGetCall.html
-  let secret: yup_oauth2::ApplicationSecret = Default::default();
-
-  let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
-    secret,
-    yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect)
-    .build()
-    .await?;
-
-  Ok(DriveHub::new(
-    hyper::Client::builder()
-      .build(hyper_rustls::HttpsConnector::with_native_roots()), auth))
 }
 
 const START_TIMEOUT_MILLIS : u64 = 500;
@@ -160,18 +140,6 @@ async fn process_job(downloader: &Downloader, job: &TtsUploadJobRecord) -> Anyho
   // TODO: 3. Upload.
   // TODO: 4. Save record. (DONE)
   // TODO: 5. Mark job done. (DONE)
-
-  let result = downloader.gdrive_client
-    .files()
-    .get("fileId")
-    .supports_team_drives(true)
-    .supports_all_drives(false)
-    .include_permissions_for_view("accusam")
-    .acknowledge_abuse(true)
-    .doit()
-    .await;
-
-  info!("Download result: {:?}", result);
 
   let private_bucket_hash = random_token(32); // TODO: Use sha2/sha256 instead.
 

@@ -53,12 +53,7 @@ time = "0.2.26"
 sqlx = { version = "0.5", features = [ "mysql", "runtime-async-std-native-tls", "offline", "chrono" ] }
 
 # Files
-google-drive = "0.1.18"
-google-drive3 = "2.0.5+20210322"
-hyper = { version = "0.14.7", features = [""] }
-hyper-rustls = "0.22.1"
 rust-s3 = "0.27.0-rc4"
-yup-oauth2 = "5.1.0" # for google-drive3
 
 # Web
 actix-cors = "0.5.4"
