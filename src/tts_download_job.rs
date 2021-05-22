@@ -22,6 +22,7 @@ use sqlx::MySqlPool;
 use sqlx::mysql::MySqlPoolOptions;
 use std::path::PathBuf;
 use std::time::Duration;
+use std::process::Command;
 
 const DEFAULT_RUST_LOG: &'static str = "debug,actix_web=info";
 const DEFAULT_TEMP_DIR: &'static str = "/tmp";
@@ -29,6 +30,8 @@ const DEFAULT_TEMP_DIR: &'static str = "/tmp";
 struct Downloader {
   pub download_temp_directory: PathBuf,
   pub mysql_pool: MySqlPool,
+  // Command to run
+  pub download_script: String,
 }
 
 #[async_std::main]
@@ -47,6 +50,10 @@ async fn main() -> AnyhowResult<()> {
   let temp_directory = easyenv::get_env_string_or_default(
     "DOWNLOAD_TEMP_DIR",
     DEFAULT_TEMP_DIR);
+
+  let download_script = easyenv::get_env_string_or_default(
+    "DOWNLOAD_SCRIPT",
+    "./scripts/download_gdrive.py");
 
   let temp_directory = PathBuf::from(temp_directory);
 
@@ -67,6 +74,7 @@ async fn main() -> AnyhowResult<()> {
   let downloader = Downloader {
     download_temp_directory: temp_directory,
     mysql_pool,
+    download_script,
   };
 
   main_loop(downloader).await;
@@ -134,6 +142,26 @@ async fn process_jobs(downloader: &Downloader, jobs: Vec<TtsUploadJobRecord>) ->
   Ok(())
 }
 
+async fn call_script(downloader: &Downloader, job: &TtsUploadJobRecord) -> AnyhowResult<()> {
+
+  let url = job.download_url.as_ref().map(|c| c.to_string()).unwrap_or("".to_string());
+  let command = format!("{} --url {} --output_file {}",
+                        downloader.download_script,
+                        &url,
+                        "filename.txt");
+
+  info!("Running command: {}", command);
+
+  let result = Command::new("sh")
+    .arg("-c")
+    .arg(command)
+    .output()?;
+
+  info!("Downloader Result: {:?}", result);
+
+  Ok(())
+}
+
 async fn process_job(downloader: &Downloader, job: &TtsUploadJobRecord) -> AnyhowResult<()> {
   // TODO: 1. Mark processing.
   // TODO: 2. Download.
@@ -142,6 +170,9 @@ async fn process_job(downloader: &Downloader, job: &TtsUploadJobRecord) -> Anyho
   // TODO: 5. Mark job done. (DONE)
 
   let private_bucket_hash = random_token(32); // TODO: Use sha2/sha256 instead.
+
+  info!("Calling downloader...");
+  call_script(downloader, job).await?;
 
   info!("Saving model record...");
   let id = insert_tts_model(&downloader.mysql_pool, job, &private_bucket_hash).await?;
