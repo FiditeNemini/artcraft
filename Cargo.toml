@@ -8,10 +8,12 @@ authors = [
 ]
 publish = false
 
+# Main server monolith
 [[bin]]
 name = "storyteller-web"
 path = "src/main.rs"
 
+# Jobs for managing downloads and inference
 [[bin]]
 name = "tts-download-job"
 path = "src/tts_download_job.rs"
@@ -30,11 +32,13 @@ path = "src/w2l_inference_job.rs"
 
 [dependencies]
 anyhow = "1.0.40"
+async-std = { version = "1.6", features = [ "attributes" ] }
 base64 = "0.13.0"
 chrono = { version = "0.4.19", features = ["serde"] }
 derive_more = "0.99.14"
 easyenv = "0.0.5"
 futures = "0.3.15"
+hex = "0.4.3"
 hostname = "0.3.1"
 lazy_static = "1.4.0"
 log = "0.4.14"
@@ -48,6 +52,10 @@ time = "0.2.26"
 # https://github.com/launchbadge/sqlx/issues/1095#issuecomment-798050828
 sqlx = { version = "0.5", features = [ "mysql", "runtime-async-std-native-tls", "offline", "chrono" ] }
 
+# Files
+google-drive = "0.1.18"
+rust-s3 = "0.27.0-rc4"
+
 # Web
 actix-cors = "0.5.4"
 actix-files= "0.5"
@@ -60,6 +68,7 @@ jwt = "0.13.0"
 # Crypto
 bcrypt = "0.8"
 hmac = "0.10.0"
+md-5 = "0.9.1"
 sha2 = "0.9.5"
 
 # Serialization
