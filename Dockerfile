@@ -45,6 +45,8 @@ RUN SQLX_OFFLINE=true \
 
 # Final image
 FROM ubuntu:xenial
+#RUN mkdir /storyteller
+#WORKDIR /storyteller
 WORKDIR /
 
 
@@ -62,12 +64,21 @@ LABEL org.opencontainers.image.source='https://github.com/storytold/storyteller-
 RUN apt-get update \
     && apt-get install -y \
         curl \
-        python3 \
         python3-pip \
+        python3.7 \
+        python3.7-dev \
+        python3.7-venv \
         wget
 
+RUN python3.7 --version
+#RUN python3.7 -m venv python
+#RUN . python/bin/activate \
+#  && pip install --upgrade pip \
+#  && pip install -r requirements.txt
+
+
 # TODO: Use venv to do this instead.
-RUN pip install gdown
+RUN pip3 install gdown
 
 # Copy all the binaries.
 COPY --from=build /tmp/target/release/storyteller-web /
