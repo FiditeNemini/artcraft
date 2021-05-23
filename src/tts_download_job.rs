@@ -255,28 +255,12 @@ async fn process_job(downloader: &Downloader, job: &TtsUploadJobRecord) -> Anyho
 
   info!("File hash: {}", private_bucket_hash);
 
-  /*let object_name = format!(
+  let object_name = format!(
     "/user_uploaded_tts_models/{}/{}/{}/{}.bin",
     &private_bucket_hash[0..1],
     &private_bucket_hash[1..2],
     &private_bucket_hash[2..3],
     &private_bucket_hash,
-  );*/
-
-  //"/dev-vocodes-private-uploads/user_uploaded_tts_models/foobarbaz.bin",
-  //"/dev-vocodes-private-uploads/foobarbaz.bin",
-  //"/user_uploaded_tts_models/foobarbaz",
-
-  // [2021-05-23T08:38:48Z DEBUG hyper::proto::h1::conn] incoming body is empty
-  // [2021-05-23T08:38:48Z DEBUG hyper::client::pool] pooling idle connection
-  //     for ("https", dev-vocodes-private-uploads.storage.googleapis.com)
-  // [2021-05-23T08:38:48Z DEBUG reqwest::async_impl::client] response '200 OK'
-  //     for https://dev-vocodes-private-uploads.storage.googleapis.com/95497399bf361e032cee4e180ee605b9dd5e1baa5ff31faefa42119fe19a6664
-  // [2021-05-23T08:38:48Z INFO  tts_download_job::util::bucket_client] upload code: 200
-  let object_name = format!(
-    //"uploads/{}", private_bucket_hash
-    //"/uploads/{}", private_bucket_hash
-    "/uploads/foobarbaz_test.bin",
   );
 
   info!("Destination bucket path: {}", object_name);
