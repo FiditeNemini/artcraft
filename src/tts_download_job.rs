@@ -276,7 +276,7 @@ async fn process_job(downloader: &Downloader, job: &TtsUploadJobRecord) -> Anyho
   let object_name = format!(
     //"uploads/{}", private_bucket_hash
     //"/uploads/{}", private_bucket_hash
-    "/dev-vocodes-private-uploads/foobarbaz_test.bin",
+    "/uploads/foobarbaz_test.bin",
   );
 
   info!("Destination bucket path: {}", object_name);
