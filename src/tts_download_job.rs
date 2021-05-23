@@ -269,7 +269,7 @@ async fn process_job(downloader: &Downloader, job: &TtsUploadJobRecord) -> Anyho
   downloader.bucket_client.upload_filename(&object_name, &file_path).await?;
 
   info!("Saving model record...");
-  let id = insert_tts_model(&downloader.mysql_pool, job, &private_bucket_hash).await?;
+  let id = insert_tts_model(&downloader.mysql_pool, job, &private_bucket_hash, &object_name).await?;
 
   info!("Saved model record: {}", id);
 

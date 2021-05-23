@@ -111,7 +111,8 @@ WHERE id = ?
 
 pub async fn insert_tts_model(pool: &MySqlPool,
                               job: &TtsUploadJobRecord,
-                              private_bucket_hash: &str)
+                              private_bucket_hash: &str,
+                              private_bucket_object_name: &str)
   -> AnyhowResult<u64>
 {
   let model_token = random_token(32);
@@ -130,7 +131,8 @@ SET
   creator_user_token = ?,
   creator_ip_address = ?,
   original_download_url = ?,
-  private_bucket_hash = ?
+  private_bucket_hash = ?,
+  private_bucket_object_name = ?
         "#,
       model_token,
       updatable_slug,
@@ -139,6 +141,7 @@ SET
       job.creator_ip_address.clone(),
       job.download_url.clone(),
       private_bucket_hash.to_string(),
+      private_bucket_object_name.to_string()
     )
     .execute(pool)
     .await;

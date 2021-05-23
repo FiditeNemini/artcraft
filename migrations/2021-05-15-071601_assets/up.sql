@@ -79,6 +79,8 @@ CREATE TABLE tts_models (
   -- For now, this will be a hash of the file contents.
   -- NB: NOT UNIQUE! We can allow duplicate uploads.
   private_bucket_hash CHAR(64) NOT NULL,
+  -- The "full url" version of the path
+  private_bucket_object_name VARCHAR(255) NOT NULL,
 
   -- Calculated average, on a scale of 0-100
   -- Null with zero ratings.
@@ -188,9 +190,13 @@ CREATE TABLE w2l_templates (
 
   -- The original source image/video and the "precomputed" faces
   private_bucket_hash CHAR(64) NOT NULL,
+  -- The "full url" version of the path
+  private_bucket_object_name VARCHAR(255) NOT NULL,
 
   -- For the thumbnail we show.
   public_bucket_hash CHAR(64) NOT NULL,
+  -- The "full url" version of the path
+  public_bucket_object_name VARCHAR(255) NOT NULL,
 
   -- Calculated average, on a scale of 0-100
   -- Null with zero ratings.
