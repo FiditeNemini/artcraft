@@ -43,9 +43,13 @@ impl BucketClient {
   pub async fn upload_file(&self, object_name: &str, bytes: &[u8]) -> anyhow::Result<()> {
     info!("Filename for bucket: {}", object_name);
 
-    let (_, code) = self.bucket.put_object(object_name, bytes).await?;
+    let (body_bytes, code) = self.bucket.put_object(object_name, bytes).await?;
 
     info!("upload code: {}", code);
+
+    let body = String::from_utf8(body_bytes)?;
+
+    info!("upload body: {}", body);
 
     Ok(())
   }

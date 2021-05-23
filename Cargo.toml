@@ -57,7 +57,7 @@ sqlx = { version = "0.5", features = [ "mysql", "runtime-async-std-native-tls", 
 data-encoding = "2.3.2"
 ring = "0.17.0-alpha.10"
 #rust-s3 = "0.27.0-rc4"
-rust-s3 = { version = "0.27.0-rc4", features = ["with-async-std"], default-features = false }
+rust-s3 = { version = "=0.27.0-beta5", features = ["with-async-std"], default-features = false }
 
 tempdir = "0.3.7"
 

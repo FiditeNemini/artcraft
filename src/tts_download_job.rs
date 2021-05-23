@@ -262,6 +262,10 @@ async fn process_job(downloader: &Downloader, job: &TtsUploadJobRecord) -> Anyho
     &private_bucket_hash[2..3],
     &private_bucket_hash,
   );
+  let object_name = format!(
+    "{}.bin",
+    &private_bucket_hash,
+  );
 
   info!("Destination bucket path: {}", object_name);
 

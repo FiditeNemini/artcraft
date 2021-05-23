@@ -1943,15 +1943,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "minidom"
-version = "0.13.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "332592c2149fc7dd40a64fc9ef6f0d65607284b474cef9817d1fc8c7e7b3608e"
-dependencies = [
- "quick-xml",
-]
-
-[[package]]
 name = "miniz_oxide"
 version = "0.4.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2408,15 +2399,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "a1d01941d82fa2ab50be1e79e6714289dd7cde78eba4c074bc5a4374f650dfe0"
 
 [[package]]
-name = "quick-xml"
-version = "0.20.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "26aab6b48e2590e4a64d1ed808749ba06257882b461d01ca71baeb747074a6dd"
-dependencies = [
- "memchr",
-]
-
-[[package]]
 name = "quote"
 version = "1.0.9"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2651,9 +2633,9 @@ dependencies = [
 
 [[package]]
 name = "rust-s3"
-version = "0.27.0-rc4"
+version = "0.27.0-beta5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "5c93272c1d654d492f8ab30b94cd43d98f2700b1db55b2576aff7712ce40e3ef"
+checksum = "caa667e2c2460cad8e10d8d20ae32b2d8ed6e965e22418d6a984a594871013d2"
 dependencies = [
  "anyhow",
  "async-std",
@@ -2670,14 +2652,12 @@ dependencies = [
  "log",
  "maybe-async",
  "md5",
- "minidom",
  "percent-encoding 2.1.0",
  "serde",
  "serde-xml-rs",
  "serde_derive",
  "sha2",
  "surf",
- "tokio-stream",
  "url 2.2.2",
 ]
 
@@ -3356,17 +3336,6 @@ dependencies = [
  "pin-project-lite 0.2.6",
  "signal-hook-registry",
  "winapi 0.3.9",
-]
-
-[[package]]
-name = "tokio-stream"
-version = "0.1.6"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "f8864d706fdb3cc0843a49647ac892720dac98a6eeb818b77190592cf4994066"
-dependencies = [
- "futures-core",
- "pin-project-lite 0.2.6",
- "tokio 1.5.0",
 ]
 
 [[package]]
