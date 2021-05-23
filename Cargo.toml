@@ -32,7 +32,6 @@ path = "src/w2l_inference_job.rs"
 
 [dependencies]
 anyhow = "1.0.40"
-async-std = { version = "1.6", features = [ "attributes" ] }
 base64 = "0.13.0"
 chrono = { version = "0.4.19", features = ["serde"] }
 derive_more = "0.99.14"
@@ -47,17 +46,23 @@ rand = "0.8.3"
 regex = "1.5.4"
 time = "0.2.26"
 
+# Runtime
+#async-std = { version = "1.6", features = [ "attributes" ] }
+tokio = { version = "1.6.0", features = ["macros"] }
+
 # Database
 # "offline" supports typesafe builds without a live database
 # "rustls" doesn't appear to work with IP addresses, per:
 # https://github.com/launchbadge/sqlx/issues/1095#issuecomment-798050828
-sqlx = { version = "0.5", features = [ "mysql", "runtime-async-std-native-tls", "offline", "chrono" ] }
+#sqlx = { version = "0.5", features = [ "mysql", "runtime-async-std-native-tls", "offline", "chrono" ] }
+sqlx = { version = "0.5", features = [ "mysql", "runtime-actix-native-tls", "offline", "chrono" ] }
 
 # Files
 data-encoding = "2.3.2"
 ring = "0.17.0-alpha.10"
-#rust-s3 = "0.27.0-rc4"
-rust-s3 = { version = "=0.27.0-beta5", features = ["with-async-std"], default-features = false }
+rust-s3 = "0.27.0-rc4"
+#rust-s3 = { version = "0.27.0-rc4", features = ["with-async-std"], default-features = false }
+#rust-s3 = { version = "0.26" }
 
 tempdir = "0.3.7"
 

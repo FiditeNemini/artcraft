@@ -1,12 +1,13 @@
 use anyhow::bail;
 use log::info;
+use log::warn;
 use s3::bucket::Bucket;
 use s3::creds::Credentials;
 use s3::region::Region;
-use std::path::{PathBuf, Path};
-use std::str::FromStr;
 use std::fs::File;
 use std::io::Read;
+use std::path::{PathBuf, Path};
+use std::str::FromStr;
 
 #[derive(Clone)]
 pub struct BucketClient {
@@ -33,7 +34,10 @@ impl BucketClient {
       region: region_name.to_owned(),
       endpoint: "https://storage.googleapis.com".to_owned(),
     };
-    let bucket = Bucket::new(&bucket_name, region, credentials)?;
+    let mut bucket = Bucket::new(&bucket_name, region, credentials)?;
+
+    //bucket.set_path_style();
+    //bucket.set_subdomain_style();
 
     Ok(Self {
       bucket,
@@ -43,13 +47,14 @@ impl BucketClient {
   pub async fn upload_file(&self, object_name: &str, bytes: &[u8]) -> anyhow::Result<()> {
     info!("Filename for bucket: {}", object_name);
 
-    let (body_bytes, code) = self.bucket.put_object(object_name, bytes).await?;
+    let (body_bytes, code) = self.bucket.put_object_with_content_type(object_name, bytes, "application/zip").await?;
 
     info!("upload code: {}", code);
 
-    let body = String::from_utf8(body_bytes)?;
-
-    info!("upload body: {}", body);
+    if code != 200 {
+      let body = String::from_utf8(body_bytes)?;
+      warn!("upload body: {}", body);
+    }
 
     Ok(())
   }
