@@ -1,4 +1,5 @@
 pub mod anyhow_result;
+pub mod bucket_client;
 pub mod cookie_manager;
 pub mod filesystem;
 pub mod ip_address;

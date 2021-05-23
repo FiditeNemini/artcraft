@@ -10,6 +10,7 @@ pub mod util;
 
 use anyhow::anyhow;
 use chrono::Utc;
+use crate::util::bucket_client::BucketClient;
 use crate::job::job_queries::TtsUploadJobRecord;
 use crate::job::job_queries::insert_tts_model;
 use crate::job::job_queries::mark_tts_upload_job_done;
@@ -21,7 +22,7 @@ use crate::util::random_token::random_token;
 use log::{warn, info};
 use sqlx::MySqlPool;
 use sqlx::mysql::MySqlPoolOptions;
-use std::path::PathBuf;
+use std::path::{PathBuf, Path};
 use std::process::Command;
 use std::time::Duration;
 use tempdir::TempDir;
@@ -30,12 +31,19 @@ use std::io::{BufReader, Read};
 use ring::digest::{Context, Digest, SHA256};
 use data_encoding::{HEXUPPER, HEXLOWER, HEXLOWER_PERMISSIVE};
 
+// Buckets
+const ENV_ACCESS_KEY : &'static str = "ACCESS_KEY";
+const ENV_SECRET_KEY : &'static str = "SECRET_KEY";
+const ENV_REGION_NAME : &'static str = "REGION_NAME";
+const ENV_BUCKET_NAME : &'static str = "BUCKET_NAME";
+
 const DEFAULT_RUST_LOG: &'static str = "debug,actix_web=info";
 const DEFAULT_TEMP_DIR: &'static str = "/tmp";
 
 struct Downloader {
   pub download_temp_directory: PathBuf,
   pub mysql_pool: MySqlPool,
+  pub bucket_client: BucketClient,
   // Command to run
   pub download_script: String,
 }
@@ -43,6 +51,8 @@ struct Downloader {
 #[async_std::main]
 async fn main() -> AnyhowResult<()> {
   easyenv::init_all_with_default_logging(Some(DEFAULT_RUST_LOG));
+
+  let _ = dotenv::from_filename(".env-secrets").ok();
 
   info!("Obtaining hostname...");
 
@@ -52,6 +62,19 @@ async fn main() -> AnyhowResult<()> {
     .unwrap_or("tts-download-job".to_string());
 
   info!("Hostname: {}", &server_hostname);
+
+  // Bucket stuff
+  let access_key = easyenv::get_env_string_required(ENV_ACCESS_KEY)?;
+  let secret_key = easyenv::get_env_string_required(ENV_SECRET_KEY)?;
+  let region_name = easyenv::get_env_string_required(ENV_REGION_NAME)?;
+  let bucket_name = easyenv::get_env_string_required(ENV_BUCKET_NAME)?;
+
+  let bucket_client = BucketClient::create(
+    &access_key,
+    &secret_key,
+    &region_name,
+    &bucket_name,
+  )?;
 
   let temp_directory = easyenv::get_env_string_or_default(
     "DOWNLOAD_TEMP_DIR",
@@ -80,6 +103,7 @@ async fn main() -> AnyhowResult<()> {
   let downloader = Downloader {
     download_temp_directory: temp_directory,
     mysql_pool,
+    bucket_client,
     download_script,
   };
 
@@ -230,6 +254,19 @@ async fn process_job(downloader: &Downloader, job: &TtsUploadJobRecord) -> Anyho
   let private_bucket_hash = get_file_hash(&download_filename)?;
 
   info!("File hash: {}", private_bucket_hash);
+
+  let object_name = format!(
+    "user_uploaded_tts_models/{}/{}/{}/{}.bin",
+    &private_bucket_hash[0..1],
+    &private_bucket_hash[1..2],
+    &private_bucket_hash[2..3],
+    &private_bucket_hash,
+  );
+
+  info!("Destination bucket path: {}", object_name);
+
+  let file_path = PathBuf::from(download_filename);
+  downloader.bucket_client.upload_filename(&object_name, &file_path).await?;
 
   info!("Saving model record...");
   let id = insert_tts_model(&downloader.mysql_pool, job, &private_bucket_hash).await?;
