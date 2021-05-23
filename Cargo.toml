@@ -47,22 +47,30 @@ regex = "1.5.4"
 time = "0.2.26"
 
 # Runtime
+# NB(1): We switched to Tokio from `async-std` for broader ecosystem support.
 #async-std = { version = "1.6", features = [ "attributes" ] }
-tokio = { version = "1.6.0", features = ["macros"] }
+# NB(2): Really unfortunate. We can't use Tokio 1.x due to a bug in `rust-s3` that I filed:
+# https://github.com/durch/rust-s3/issues/198
+#tokio = { version = "1.6.0", features = ["macros"] }
+tokio = { version = "0.2.25", features = ["macros"] }
 
 # Database
 # "offline" supports typesafe builds without a live database
 # "rustls" doesn't appear to work with IP addresses, per:
 # https://github.com/launchbadge/sqlx/issues/1095#issuecomment-798050828
 #sqlx = { version = "0.5", features = [ "mysql", "runtime-async-std-native-tls", "offline", "chrono" ] }
-sqlx = { version = "0.5", features = [ "mysql", "runtime-actix-native-tls", "offline", "chrono" ] }
+# NB: We can't use `sqlx` 0.5 due to the `rust-s3` bug that requires a Tokio 1.x -> 0.2 downgrade
+#sqlx = { version = "0.5", features = [ "mysql", "runtime-actix-native-tls", "offline", "chrono" ] }
+sqlx = { version = "0.4", features = [ "mysql", "runtime-tokio-native-tls", "offline", "chrono" ] }
 
 # Files
 data-encoding = "2.3.2"
 ring = "0.17.0-alpha.10"
-rust-s3 = "0.27.0-rc4"
+# NB: This is the source of all of our problems. `rust-s3` can't upload to object names with directories
+# in the 0.27.* series, so we have to downgrade to 0.26, which includes a broad downgrade from Tokio 1.0 -> 0.2
+#rust-s3 = "0.27.0-rc4"
 #rust-s3 = { version = "0.27.0-rc4", features = ["with-async-std"], default-features = false }
-#rust-s3 = { version = "0.26" }
+rust-s3 = { version = "0.26" }
 
 tempdir = "0.3.7"
 
