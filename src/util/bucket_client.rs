@@ -4,10 +4,12 @@ use log::warn;
 use s3::bucket::Bucket;
 use s3::creds::Credentials;
 use s3::region::Region;
-use std::fs::File;
 use std::io::Read;
 use std::path::{PathBuf, Path};
 use std::str::FromStr;
+use tokio::io::{AsyncBufRead, BufReader, AsyncReadExt};
+use tokio::io::AsyncBufReadExt;
+use tokio::fs::File;
 
 #[derive(Clone)]
 pub struct BucketClient {
@@ -36,8 +38,8 @@ impl BucketClient {
     };
     let mut bucket = Bucket::new(&bucket_name, region, credentials)?;
 
-    //bucket.set_path_style();
-    //bucket.set_subdomain_style();
+    bucket.set_path_style();
+    bucket.set_subdomain_style();
 
     Ok(Self {
       bucket,
@@ -47,7 +49,7 @@ impl BucketClient {
   pub async fn upload_file(&self, object_name: &str, bytes: &[u8]) -> anyhow::Result<()> {
     info!("Filename for bucket: {}", object_name);
 
-    let (body_bytes, code) = self.bucket.put_object_with_content_type(object_name, bytes, "application/zip").await?;
+    let (body_bytes, code) = self.bucket.put_object(object_name, bytes).await?;
 
     info!("upload code: {}", code);
 
@@ -71,10 +73,24 @@ impl BucketClient {
   // }
 
   pub async fn upload_filename(&self, object_name: &str, filename: &Path) -> anyhow::Result<()> {
+    /*let mut file = File::open(filename).await?;
+    let mut reader = BufReader::new(file);
+
+    info!("Uploading...");
+
+    let code = self.bucket.put_object_stream(&mut reader, object_name).await?;
+
+    info!("upload code: {}", code);
+
+    Ok(())
+    */
+
     // TODO: does a newer version of this crate handle streaming/buffering file contents?
-    let mut file = File::open(filename)?;
+    let mut file = File::open(filename).await?;
     let mut buffer : Vec<u8> = Vec::new();
-    file.read_to_end(&mut buffer)?;
+    file.read_to_end(&mut buffer).await?;
+
+    info!("Uploading...");
 
     self.upload_file(object_name, &buffer).await
   }

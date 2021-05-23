@@ -274,7 +274,9 @@ async fn process_job(downloader: &Downloader, job: &TtsUploadJobRecord) -> Anyho
   //     for https://dev-vocodes-private-uploads.storage.googleapis.com/95497399bf361e032cee4e180ee605b9dd5e1baa5ff31faefa42119fe19a6664
   // [2021-05-23T08:38:48Z INFO  tts_download_job::util::bucket_client] upload code: 200
   let object_name = format!(
-    "/{}", private_bucket_hash
+    //"uploads/{}", private_bucket_hash
+    //"/uploads/{}", private_bucket_hash
+    "/dev-vocodes-private-uploads/foobarbaz_test.bin",
   );
 
   info!("Destination bucket path: {}", object_name);
