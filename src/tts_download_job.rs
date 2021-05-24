@@ -12,6 +12,8 @@ pub mod util;
 use anyhow::anyhow;
 use chrono::Utc;
 use crate::buckets::bucket_client::BucketClient;
+use crate::buckets::bucket_paths::hash_to_bucket_path;
+use crate::buckets::file_hashing::get_file_hash;
 use crate::job::job_queries::TtsUploadJobRecord;
 use crate::job::job_queries::insert_tts_model;
 use crate::job::job_queries::mark_tts_upload_job_done;
@@ -48,6 +50,8 @@ struct Downloader {
   pub bucket_client: BucketClient,
   // Command to run
   pub download_script: String,
+  // Root to store TTS results
+  pub bucket_root_tts_model_uploads: String,
 }
 
 #[tokio::main]
@@ -77,7 +81,7 @@ async fn main() -> AnyhowResult<()> {
     &secret_key,
     &region_name,
     &bucket_name,
-    Some(&bucket_root),
+    None,
   )?;
 
   let temp_directory = easyenv::get_env_string_or_default(
@@ -109,6 +113,7 @@ async fn main() -> AnyhowResult<()> {
     mysql_pool,
     bucket_client,
     download_script,
+    bucket_root_tts_model_uploads: bucket_root.to_string(),
   };
 
   main_loop(downloader).await;
@@ -217,31 +222,6 @@ async fn download_file(downloader: &Downloader,
   Ok(filename)
 }
 
-
-fn sha256_digest<R: Read>(mut reader: R) -> AnyhowResult<Digest> {
-  let mut context = Context::new(&SHA256);
-  let mut buffer = [0; 1024];
-
-  loop {
-    let count = reader.read(&mut buffer)?;
-    if count == 0 {
-      break;
-    }
-    context.update(&buffer[..count]);
-  }
-
-  Ok(context.finish())
-}
-
-fn get_file_hash(filename: &str) -> AnyhowResult<String> {
-  let input = File::open(filename)?;
-  let reader = BufReader::new(input);
-  let digest = sha256_digest(reader)?;
-
-  let hash = HEXLOWER_PERMISSIVE.encode(digest.as_ref());
-  Ok(hash)
-}
-
 async fn process_job(downloader: &Downloader, job: &TtsUploadJobRecord) -> AnyhowResult<()> {
   // TODO: 1. Mark processing.
   // TODO: 2. Download. (DONE)
@@ -260,13 +240,9 @@ async fn process_job(downloader: &Downloader, job: &TtsUploadJobRecord) -> Anyho
   info!("File hash: {}", private_bucket_hash);
 
   // NB: /.../a/b/c/d/abcdefg.bin
-  let object_name = format!(
-    "/user_uploaded_tts_models/{}/{}/{}/{}.bin",
-    &private_bucket_hash[0..1],
-    &private_bucket_hash[1..2],
-    &private_bucket_hash[2..3],
+  let object_name = hash_to_bucket_path(
     &private_bucket_hash,
-  );
+    Some(&downloader.bucket_root_tts_model_uploads))?;
 
   info!("Destination bucket path: {}", object_name);
 

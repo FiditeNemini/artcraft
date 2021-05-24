@@ -12,6 +12,7 @@ pub mod util;
 use anyhow::anyhow;
 use chrono::Utc;
 use crate::buckets::bucket_client::BucketClient;
+use crate::buckets::file_hashing::get_file_hash;
 use crate::job::job_queries::TtsUploadJobRecord;
 use crate::job::job_queries::insert_tts_model;
 use crate::job::job_queries::mark_tts_upload_job_done;
@@ -20,17 +21,17 @@ use crate::job::job_queries::query_tts_upload_job_records;
 use crate::util::anyhow_result::AnyhowResult;
 use crate::util::filesystem::check_directory_exists;
 use crate::util::random_token::random_token;
+use data_encoding::{HEXUPPER, HEXLOWER, HEXLOWER_PERMISSIVE};
 use log::{warn, info};
+use ring::digest::{Context, Digest, SHA256};
 use sqlx::MySqlPool;
 use sqlx::mysql::MySqlPoolOptions;
+use std::fs::File;
+use std::io::{BufReader, Read};
 use std::path::{PathBuf, Path};
 use std::process::Command;
 use std::time::Duration;
 use tempdir::TempDir;
-use std::fs::File;
-use std::io::{BufReader, Read};
-use ring::digest::{Context, Digest, SHA256};
-use data_encoding::{HEXUPPER, HEXLOWER, HEXLOWER_PERMISSIVE};
 
 // Buckets
 const ENV_ACCESS_KEY : &'static str = "ACCESS_KEY";
@@ -214,31 +215,6 @@ async fn download_file(downloader: &Downloader,
   }
 
   Ok(filename)
-}
-
-
-fn sha256_digest<R: Read>(mut reader: R) -> AnyhowResult<Digest> {
-  let mut context = Context::new(&SHA256);
-  let mut buffer = [0; 1024];
-
-  loop {
-    let count = reader.read(&mut buffer)?;
-    if count == 0 {
-      break;
-    }
-    context.update(&buffer[..count]);
-  }
-
-  Ok(context.finish())
-}
-
-fn get_file_hash(filename: &str) -> AnyhowResult<String> {
-  let input = File::open(filename)?;
-  let reader = BufReader::new(input);
-  let digest = sha256_digest(reader)?;
-
-  let hash = HEXLOWER_PERMISSIVE.encode(digest.as_ref());
-  Ok(hash)
 }
 
 async fn process_job(downloader: &Downloader, job: &TtsUploadJobRecord) -> AnyhowResult<()> {
