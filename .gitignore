@@ -3,6 +3,7 @@
 .env
 .env-secrets
 .idea/
+__pycache__/
 _ignored_schema.rs
 production_database_secret_connect.sh
 secrets.toml
