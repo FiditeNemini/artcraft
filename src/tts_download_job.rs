@@ -225,7 +225,7 @@ async fn download_file(downloader: &Downloader,
 async fn process_job(downloader: &Downloader, job: &TtsUploadJobRecord) -> AnyhowResult<()> {
   // TODO: 1. Mark processing.
   // TODO: 2. Download. (DONE)
-  // TODO: 3. Upload.
+  // TODO: 3. Upload. (DONE)
   // TODO: 4. Save record. (DONE)
   // TODO: 5. Mark job done. (DONE)
 

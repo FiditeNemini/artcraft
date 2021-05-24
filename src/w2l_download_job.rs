@@ -12,12 +12,13 @@ pub mod util;
 use anyhow::anyhow;
 use chrono::Utc;
 use crate::buckets::bucket_client::BucketClient;
+use crate::buckets::bucket_paths::hash_to_bucket_path;
 use crate::buckets::file_hashing::get_file_hash;
-use crate::job::job_queries::TtsUploadJobRecord;
-use crate::job::job_queries::insert_tts_model;
-use crate::job::job_queries::mark_tts_upload_job_done;
-use crate::job::job_queries::mark_tts_upload_job_failure;
-use crate::job::job_queries::query_tts_upload_job_records;
+use crate::job::w2l_download_job_queries::W2lTemplateUploadJobRecord;
+use crate::job::w2l_download_job_queries::insert_w2l_template;
+use crate::job::w2l_download_job_queries::mark_w2l_template_upload_job_done;
+use crate::job::w2l_download_job_queries::mark_w2l_template_upload_job_failure;
+use crate::job::w2l_download_job_queries::query_w2l_template_upload_job_records;
 use crate::util::anyhow_result::AnyhowResult;
 use crate::util::filesystem::check_directory_exists;
 use crate::util::random_token::random_token;
@@ -38,7 +39,7 @@ const ENV_ACCESS_KEY : &'static str = "ACCESS_KEY";
 const ENV_SECRET_KEY : &'static str = "SECRET_KEY";
 const ENV_REGION_NAME : &'static str = "REGION_NAME";
 const ENV_BUCKET_NAME : &'static str = "W2L_DOWNLOAD_BUCKET_NAME";
-const ENV_BUCKET_PATH: &'static str = "W2L_DOWNLOAD_BUCKET_PATH";
+const ENV_BUCKET_ROOT : &'static str = "W2L_DOWNLOAD_BUCKET_ROOT";
 
 const DEFAULT_RUST_LOG: &'static str = "debug,actix_web=info";
 const DEFAULT_TEMP_DIR: &'static str = "/tmp";
@@ -49,6 +50,8 @@ struct Downloader {
   pub bucket_client: BucketClient,
   // Command to run
   pub download_script: String,
+  // Root to store W2L templates
+  pub bucket_root_w2l_template_uploads: String,
 }
 
 #[tokio::main]
@@ -62,7 +65,7 @@ async fn main() -> AnyhowResult<()> {
   let server_hostname = hostname::get()
     .ok()
     .and_then(|h| h.into_string().ok())
-    .unwrap_or("tts-download-job".to_string());
+    .unwrap_or("w2l-download-job".to_string());
 
   info!("Hostname: {}", &server_hostname);
 
@@ -71,6 +74,7 @@ async fn main() -> AnyhowResult<()> {
   let secret_key = easyenv::get_env_string_required(ENV_SECRET_KEY)?;
   let region_name = easyenv::get_env_string_required(ENV_REGION_NAME)?;
   let bucket_name = easyenv::get_env_string_required(ENV_BUCKET_NAME)?;
+  let bucket_root = easyenv::get_env_string_required(ENV_BUCKET_ROOT)?;
 
   let bucket_client = BucketClient::create(
     &access_key,
@@ -109,6 +113,7 @@ async fn main() -> AnyhowResult<()> {
     mysql_pool,
     bucket_client,
     download_script,
+    bucket_root_w2l_template_uploads: bucket_root.to_string(),
   };
 
   main_loop(downloader).await;
@@ -124,7 +129,11 @@ async fn main_loop(downloader: Downloader) {
 
   loop {
     let num_records = 1;
-    let query_result = query_tts_upload_job_records(&downloader.mysql_pool, num_records).await;
+
+    let query_result = query_w2l_template_upload_job_records(
+      &downloader.mysql_pool,
+      num_records)
+      .await;
 
     let jobs = match query_result {
       Ok(jobs) => jobs,
@@ -160,7 +169,7 @@ async fn main_loop(downloader: Downloader) {
   }
 }
 
-async fn process_jobs(downloader: &Downloader, jobs: Vec<TtsUploadJobRecord>) -> AnyhowResult<()> {
+async fn process_jobs(downloader: &Downloader, jobs: Vec<W2lTemplateUploadJobRecord>) -> AnyhowResult<()> {
   for job in jobs.into_iter() {
     let result = process_job(downloader, &job).await;
     match result {
@@ -168,7 +177,11 @@ async fn process_jobs(downloader: &Downloader, jobs: Vec<TtsUploadJobRecord>) ->
       Err(e) => {
         warn!("Failure to process job: {:?}", e);
         let failure_reason = "";
-        let _r = mark_tts_upload_job_failure(&downloader.mysql_pool, &job, failure_reason).await;
+        let _r = mark_w2l_template_upload_job_failure(
+          &downloader.mysql_pool,
+          &job,
+          failure_reason)
+          .await;
       }
     }
   }
@@ -177,7 +190,7 @@ async fn process_jobs(downloader: &Downloader, jobs: Vec<TtsUploadJobRecord>) ->
 }
 
 async fn download_file(downloader: &Downloader,
-                       job: &TtsUploadJobRecord,
+                       job: &W2lTemplateUploadJobRecord,
                        temp_dir: &TempDir) -> AnyhowResult<String>
 {
 
@@ -217,12 +230,14 @@ async fn download_file(downloader: &Downloader,
   Ok(filename)
 }
 
-async fn process_job(downloader: &Downloader, job: &TtsUploadJobRecord) -> AnyhowResult<()> {
+async fn process_job(downloader: &Downloader, job: &W2lTemplateUploadJobRecord) -> AnyhowResult<()> {
   // TODO: 1. Mark processing.
   // TODO: 2. Download. (DONE)
-  // TODO: 3. Upload.
-  // TODO: 4. Save record. (DONE)
-  // TODO: 5. Mark job done. (DONE)
+  // TODO: 3. Process template with face detection
+  // TODO: 4. Take a screenshot/gif
+  // TODO: 5. Upload all (partially done).
+  // TODO: 6. Save record. (DONE)
+  // TODO: 7. Mark job done. (DONE)
 
   let temp_dir = format!("temp_{}", job.id);
   let temp_dir = TempDir::new(&temp_dir)?;
@@ -235,22 +250,22 @@ async fn process_job(downloader: &Downloader, job: &TtsUploadJobRecord) -> Anyho
   info!("File hash: {}", private_bucket_hash);
 
   // NB: /.../a/b/c/d/abcdefg.bin
-  let object_name = format!(
-    "/user_uploaded_tts_models/{}/{}/{}/{}.bin",
-    &private_bucket_hash[0..1],
-    &private_bucket_hash[1..2],
-    &private_bucket_hash[2..3],
+  let object_name = hash_to_bucket_path(
     &private_bucket_hash,
-  );
+    Some(&downloader.bucket_root_w2l_template_uploads))?;
 
   info!("Destination bucket path: {}", object_name);
 
   let file_path = PathBuf::from(download_filename);
   downloader.bucket_client.upload_filename(&object_name, &file_path).await?;
 
+  // TODO:
+  let template_type = "image";
+
   info!("Saving model record...");
-  let id = insert_tts_model(
+  let id = insert_w2l_template(
     &downloader.mysql_pool,
+    template_type,
     job,
     &private_bucket_hash,
     &object_name)
@@ -259,7 +274,7 @@ async fn process_job(downloader: &Downloader, job: &TtsUploadJobRecord) -> Anyho
   info!("Saved model record: {}", id);
 
   info!("Job done: {}", job.id);
-  mark_tts_upload_job_done(&downloader.mysql_pool, job, true).await?;
+  mark_w2l_template_upload_job_done(&downloader.mysql_pool, job, true).await?;
 
   Ok(())
 }
