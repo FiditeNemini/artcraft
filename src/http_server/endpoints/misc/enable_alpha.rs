@@ -1,10 +1,10 @@
-use actix_http::http::StatusCode;
-use actix_web::{HttpResponse, HttpRequest, Responder, get, web, HttpMessage};
-use log::info;
 use actix_http::cookie::Cookie;
-use crate::server_state::ServerState;
-use std::sync::Arc;
+use actix_http::http::StatusCode;
 use actix_web::web::Query;
+use actix_web::{HttpResponse, HttpRequest, Responder, get, web, HttpMessage};
+use crate::server_state::ServerState;
+use log::info;
+use std::sync::Arc;
 
 const ALPHA_COOKIE_NAME : &'static str = "enable-alpha";
 const CONTENT_TYPE : &'static str = "text/html; charset=utf-8";

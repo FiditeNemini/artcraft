@@ -1,12 +1,17 @@
 use actix_http::Error;
 use actix_http::http::header;
+use actix_web::cookie::Cookie;
 use actix_web::dev::HttpResponseBuilder;
 use actix_web::error::ResponseError;
 use actix_web::http::StatusCode;
 use actix_web::{Responder, web, HttpResponse, error, HttpRequest};
+use crate::database_helpers::enums::{DownloadUrlType, CreatorSetVisibility, W2lTemplateType};
 use crate::server_state::ServerState;
 use crate::util::ip_address::get_request_ip;
 use crate::util::random_token::random_token;
+use crate::validations::model_uploads::validate_model_title;
+use crate::validations::passwords::validate_passwords;
+use crate::validations::username::validate_username;
 use derive_more::{Display, Error};
 use log::{info, warn, log};
 use regex::Regex;
@@ -14,11 +19,6 @@ use sqlx::error::DatabaseError;
 use sqlx::error::Error::Database;
 use sqlx::mysql::MySqlDatabaseError;
 use std::sync::Arc;
-use crate::validations::username::validate_username;
-use crate::validations::passwords::validate_passwords;
-use actix_web::cookie::Cookie;
-use crate::database_helpers::enums::{DownloadUrlType, CreatorSetVisibility, W2lTemplateType};
-use crate::validations::model_uploads::validate_model_title;
 
 const NEW_USER_ROLE: &'static str = "new-user";
 

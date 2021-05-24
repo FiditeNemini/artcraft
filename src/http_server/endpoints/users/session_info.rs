@@ -1,28 +1,28 @@
 use actix_http::Error;
 use actix_http::http::header;
+use actix_web::cookie::Cookie;
 use actix_web::dev::HttpResponseBuilder;
 use actix_web::error::ResponseError;
 use actix_web::http::StatusCode;
 use actix_web::{Responder, web, HttpResponse, error, HttpRequest, HttpMessage};
-use crate::endpoints::users::create_account::CreateAccountError::{BadInput, ServerError, UsernameTaken, EmailTaken};
+use crate::AnyhowResult;
+use crate::common_queries::sessions::create_session_for_user;
+use crate::http_server::endpoints::users::create_account::CreateAccountError::{BadInput, ServerError, UsernameTaken, EmailTaken};
+use crate::http_server::endpoints::users::login::LoginSuccessResponse;
 use crate::server_state::ServerState;
 use crate::util::ip_address::get_request_ip;
 use crate::util::random_token::random_token;
+use crate::util::session_checker::SessionRecord;
+use crate::validations::passwords::validate_passwords;
+use crate::validations::username::validate_username;
 use derive_more::{Display, Error};
 use log::{info, warn, log};
 use regex::Regex;
+use sqlx::MySqlPool;
 use sqlx::error::DatabaseError;
 use sqlx::error::Error::Database;
 use sqlx::mysql::MySqlDatabaseError;
 use std::sync::Arc;
-use crate::validations::username::validate_username;
-use crate::validations::passwords::validate_passwords;
-use actix_web::cookie::Cookie;
-use sqlx::MySqlPool;
-use crate::AnyhowResult;
-use crate::common_queries::sessions::create_session_for_user;
-use crate::endpoints::users::login::LoginSuccessResponse;
-use crate::util::session_checker::SessionRecord;
 
 #[derive(Serialize)]
 pub struct UserInfo {
