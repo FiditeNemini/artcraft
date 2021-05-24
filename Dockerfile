@@ -1,7 +1,67 @@
+# ==================== Python Build Base ====================
+
+FROM nvidia/cuda:10.1-devel-ubuntu18.04 as pybuild-base
+
+# NB: https://github.com/NVIDIA/nvidia-docker/issues/864#issuecomment-439848887
+# NB: We do not install ffmpeg, since the version is 3.8.* series and we need 4.2.*
+RUN apt-get update \
+    && apt-get install -y \
+        build-essential \
+        curl \
+        g++-7 \
+        gcc-7 \
+        git \
+        htop \
+        libc++-7-dev \
+        libffi-dev \
+        libgcc-7-dev \
+        libsm6 \
+        libsndfile1 \
+        libssl-dev \
+        libxext6 \
+        libxrender-dev \
+        netcat \
+        python-dev \
+        python3-pip \
+        python3.6 \
+        python3.6-dev \
+        python3.6-venv\
+        redis-tools \
+        silversearcher-ag \
+        sox \
+        tmux \
+        vim \
+        wget
+
+# We need ffmpeg version >= 4.2 (https://superuser.com/a/579110)
+# http://ubuntuhandbook.org/index.php/2020/06/install-ffmpeg-4-3-via-ppa-ubuntu-18-04-16-04/
+
+RUN apt-get install -y software-properties-common \
+    && add-apt-repository ppa:jonathonf/ffmpeg-4 \
+    && apt-get update \
+    && apt-get install -y ffmpeg
+
+RUN ffmpeg -version
+
+# ==================== Python Build Step 2: Wav2Lip Requirements ====================
+
+FROM pybuild-base as pybuild-requirements
+
+COPY models/Wav2Lip ./models/Wav2Lip
+WORKDIR models/Wav2Lip
+
+RUN python3.6 --version
+RUN python3.6 -m venv python
+RUN . python/bin/activate \
+  && pip install --upgrade pip \
+  && pip install -r requirements.txt
+
+# ==================== Rust Build Base ====================
+
 # Custom base image
 # Make sure to add this repository so it has read acces to the base image:
 # https://github.com/orgs/storytold/packages/container/docker-base-images-rust-ssl/settings/actions_access
-FROM ghcr.io/storytold/docker-base-images-rust-ssl:latest as build
+FROM ghcr.io/storytold/docker-base-images-rust-ssl:latest as rust-build
 WORKDIR /tmp
 
 COPY Cargo.lock . 
@@ -44,7 +104,8 @@ RUN SQLX_OFFLINE=true \
   --bin w2l-inference-job
 
 # Final image
-FROM ubuntu:xenial
+#  FROM ubuntu:xenial
+FROM pybuild-requirements as final
 #RUN mkdir /storyteller
 #WORKDIR /storyteller
 WORKDIR /
@@ -79,22 +140,78 @@ RUN python3 --version
 RUN pip3 install gdown
 
 # Copy all the binaries.
-COPY --from=build /tmp/target/release/storyteller-web /
-COPY --from=build /tmp/target/release/tts-download-job /
-COPY --from=build /tmp/target/release/tts-inference-job /
-COPY --from=build /tmp/target/release/w2l-download-job /
-COPY --from=build /tmp/target/release/w2l-inference-job /
+COPY --from=rust-build /tmp/target/release/storyteller-web /
+COPY --from=rust-build /tmp/target/release/tts-download-job /
+COPY --from=rust-build /tmp/target/release/tts-inference-job /
+COPY --from=rust-build /tmp/target/release/w2l-download-job /
+COPY --from=rust-build /tmp/target/release/w2l-inference-job /
 
 # SSL certs are required for crypto
-COPY --from=build /etc/ssl /etc/ssl
+COPY --from=rust-build /etc/ssl /etc/ssl
 
 # Required dynamically linked libraries
-COPY --from=build /lib/x86_64-linux-gnu/libssl.*             /lib/x86_64-linux-gnu/
-COPY --from=build /lib/x86_64-linux-gnu/libcrypto.*          /lib/x86_64-linux-gnu/
+COPY --from=rust-build /lib/x86_64-linux-gnu/libssl.*             /lib/x86_64-linux-gnu/
+COPY --from=rust-build /lib/x86_64-linux-gnu/libcrypto.*          /lib/x86_64-linux-gnu/
 
 # Make sure all the links resolve
 RUN ldd storyteller-web
 
+# Without a .env file, Rust crashes "mysteriously" (ugh)
+RUN touch .env
+RUN touch .env-secrets
+
 EXPOSE 8080
 CMD LD_LIBRARY_PATH=/usr/lib /storyteller-web
+
+# ===================================================================================================
+# WAV2LIP WORKER
+
+# ==================== Rust Build Base ====================
+
+#  #FROM ubuntu:xenial as rustbuild-base
+#  WORKDIR /tmp
+#  RUN apt-get update \
+#      && apt-get install -y \
+#          build-essential \
+#          curl \
+#          libssl-dev \
+#          libssl1.0.0 \
+#          pkg-config \
+#          unzip \
+#          wget
+#  RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs \
+#      | sh  -s -- --default-toolchain stable -y
+
+
+
+# ==================== Rust Build Binary ====================
+
+#  FROM rustbuild-base as rustbuild-binary
+#
+#  COPY Cargo.lock .
+#  COPY Cargo.toml .
+#  COPY w2l_server ./w2l_server
+#  COPY w2l_shared ./w2l_shared
+#  COPY w2l_worker ./w2l_worker
+#
+#  RUN $HOME/.cargo/bin/cargo fetch
+#  RUN LD_LIBRARY_PATH=/usr/lib:${LD_LIBRARY_PATH} $HOME/.cargo/bin/cargo build --release --bin wav2lip_worker
+
+# ==================== Final Image ====================
+
+#  FROM pybuild-requirements as final
+#  WORKDIR /
+#
+#  COPY --from=rustbuild-binary /tmp/target/release/wav2lip_worker     /
+#  COPY --from=rustbuild-binary /etc/ssl                               /etc/ssl
+#  COPY --from=rustbuild-binary /lib/x86_64-linux-gnu/libssl.*         /lib/x86_64-linux-gnu/
+#  COPY --from=rustbuild-binary /lib/x86_64-linux-gnu/libcrypto.*      /lib/x86_64-linux-gnu/
+#
+#  # Without a .env file, Rust crashes "mysteriously" (ugh)
+#  RUN touch .env
+#
+#  RUN ldd wav2lip_worker
+#
+#  EXPOSE 8080
+#  CMD LD_LIBRARY_PATH=/usr/lib /wav2lip_worker
 
