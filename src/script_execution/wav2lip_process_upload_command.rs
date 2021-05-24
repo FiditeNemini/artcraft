@@ -46,7 +46,7 @@ impl Wav2LipPreprocessClient {
     command.push_str(&self.checkpoint_path);
     command.push_str(" --image_or_video_filename ");
     command.push_str(image_or_video_filename);
-    command.push_str(" --output_cached_faces_filename");
+    command.push_str(" --output_cached_faces_filename ");
     command.push_str(output_cached_faces_filename);
 
     if is_image {

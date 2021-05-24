@@ -135,7 +135,9 @@ SET
   original_download_url = ?,
   private_bucket_hash = ?,
   private_bucket_object_name = ?,
-  private_bucket_cached_faces_object_name = ?
+  private_bucket_cached_faces_object_name = ?,
+  public_bucket_hash = 'TODO',
+  public_bucket_object_name = 'TODO'
         "#,
       model_token,
       template_type,

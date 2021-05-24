@@ -241,7 +241,7 @@ async fn process_job(downloader: &Downloader, job: &W2lTemplateUploadJobRecord) 
 
   let cached_faces_filename = format!("{}_detected_faces.pickle", &download_filename);
   let is_image = false; // TODO: Don't always treat as video.
-  let spawn_process = true;
+  let spawn_process = false;
 
   downloader.w2l_processor.execute(
     &download_filename,
