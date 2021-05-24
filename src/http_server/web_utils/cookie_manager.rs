@@ -6,12 +6,12 @@ use hmac::Hmac;
 use hmac::NewMac;
 use jwt::SignWithKey;
 use jwt::VerifyWithKey;
+use log::LevelFilter::Off;
 use log::{info, warn};
 use sha2::Sha256;
 use std::collections::BTreeMap;
 use std::ops::Sub;
 use time::OffsetDateTime;
-use log::LevelFilter::Off;
 
 const COOKIE_VERSION : u32 = 1;
 

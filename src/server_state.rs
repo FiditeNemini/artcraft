@@ -1,6 +1,6 @@
+use crate::http_server::web_utils::cookie_manager::CookieManager;
+use crate::http_server::web_utils::session_checker::SessionChecker;
 use sqlx::MySqlPool;
-use crate::util::cookie_manager::CookieManager;
-use crate::util::session_checker::SessionChecker;
 
 /// State that is injected into every endpoint.
 #[derive(Clone)]

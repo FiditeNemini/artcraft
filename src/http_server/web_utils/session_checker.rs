@@ -1,7 +1,7 @@
 use actix_web::HttpRequest;
 use anyhow::anyhow;
 use crate::AnyhowResult;
-use crate::util::cookie_manager::CookieManager;
+use crate::http_server::web_utils::cookie_manager::CookieManager;
 use log::{info, warn};
 use sqlx::MySqlPool;
 use sqlx::error::Error::RowNotFound;
