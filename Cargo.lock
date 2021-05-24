@@ -2996,6 +2996,7 @@ dependencies = [
  "serde_json",
  "sha2",
  "sqlx",
+ "subprocess",
  "tempdir",
  "time 0.2.26",
  "tokio 0.2.25",
@@ -3010,6 +3011,16 @@ checksum = "8ee348cb74b87454fff4b551cbf727025810a004f88aeacae7f85b87f4e9a1c1"
 dependencies = [
  "unicode-bidi",
  "unicode-normalization",
+]
+
+[[package]]
+name = "subprocess"
+version = "0.2.7"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "334b801f9ca2529ba9605109f1d2835f15aff94cd6cfe5afe6ce8cf71e5fd3c4"
+dependencies = [
+ "libc",
+ "winapi 0.3.9",
 ]
 
 [[package]]

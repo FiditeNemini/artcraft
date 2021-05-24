@@ -72,6 +72,7 @@ ring = "0.17.0-alpha.10"
 #rust-s3 = { version = "0.27.0-rc4", features = ["with-async-std"], default-features = false }
 rust-s3 = { version = "0.26" }
 
+subprocess = "0.2.6"
 tempdir = "0.3.7"
 
 # Web
