@@ -52,10 +52,14 @@ parser.add_argument('--checkpoint_path', type=str,
 
 parser.add_argument('--face', type=str,
                     help='Filepath of video/image that contains faces to use', required=True)
-parser.add_argument('--audio', type=str,
-                    help='Filepath of video/audio file to use as raw audio source', required=True)
-parser.add_argument('--outfile', type=str, help='Video path to save result. See default for an e.g.',
-                                default='results/result_voice.mp4')
+
+# NB: Not needed for processing the upload file for faces:
+#
+# parser.add_argument('--audio', type=str,
+#                     help='Filepath of video/audio file to use as raw audio source', required=True)
+# parser.add_argument('--outfile', type=str, help='Video path to save result. See default for an e.g.',
+#                                 default='results/result_voice.mp4')
+#
 
 parser.add_argument('--static', type=bool,
                     help='If True, then use only first video frame for inference', default=False)
@@ -252,85 +256,9 @@ def load_model(path):
     model = model.to(device)
     return model.eval()
 
-def maybe_pad_audio_file(tempdir, args):
-    if not args.audio_start_pad_millis and not args.audio_end_pad_millis:
-        return
-
-    print('Padding audio with {} millis at start, {} millis at end.'.format(
-        args.audio_start_pad_millis, args.audio_end_pad_millis), flush=True)
-
-    padded_wav_filename = os.path.join(tempdir, 'padded_audio.wav')
-    # ffmpeg padding: https://superuser.com/a/579110
-    # Structure of filters: https://stackoverflow.com/a/55463101
-    command = ' '.join([
-        'ffmpeg',
-        '-i {}'.format(args.audio),
-        '-filter_complex "[0] adelay={}ms:all=true [a] ; [a] apad=pad_dur={}ms"'.format(args.audio_start_pad_millis, args.audio_end_pad_millis),
-        '{}'.format(padded_wav_filename)
-    ])
-    print('command:', command, flush=True)
-    subprocess.call(command, shell=True)
-    args.audio = padded_wav_filename
-
-
-def maybe_concatenate_end_bump(tempdir, args, frame_w, frame_h):
-    if not args.end_bump_file:
-        print('No end bump file.', flush=True)
-        return
-
-    print('Adding end bump file: {}'.format(args.end_bump_file), flush=True)
-
-    bumpfile = args.end_bump_file
-
-    # May need to resize our bump file...
-    # After many attempts to get this into the same ffmpeg pipeline,
-    # I'm giving up and just adding another step.
-    #
-    # NOTE: The FPS of the bump needs to match the video. Especially
-    # important for videos generated from still photos, because that defaults
-    # to the odd choice of "25 fps".
-    if frame_w is not 1920 or frame_h is not 1080:
-        print('Need to resize bump.', flush=True)
-        bumpfile = os.path.join(tempdir, 'end_bump_resized.mp4')
-
-        # Scale / aspect ratio / sar / resizing / padding:
-        # https://stackoverflow.com/a/51946719
-        command = ' '.join([
-            'ffmpeg',
-            '-i {}'.format(args.end_bump_file),
-            '-vf "scale={}:{}:force_original_aspect_ratio=decrease,pad={}:{}:(ow-iw)/2:(oh-ih)/2,setsar=1"'.format(frame_w, frame_h, frame_w, frame_h),
-            '{}'.format(bumpfile)
-        ])
-        print('command:', command, flush=True)
-        failure_code = subprocess.call(command, shell=True)
-
-        if failure_code:
-            print('Failed to resize end bump')
-            return
-
-    padded_wav_filename = os.path.join(tempdir, 'output_with_end_bump.mp4')
-    # ffmpeg video concatenation: https://stackoverflow.com/a/11175851
-    # Structure of filters: https://stackoverflow.com/a/55463101
-    # More info on filters: https://stackoverflow.com/a/22958746
-    command = ' '.join([
-        'ffmpeg',
-        '-i {}'.format(args.outfile),
-        '-i {}'.format(bumpfile),
-        '-filter_complex "concat=n=2:v=1:a=1"',
-        '{}'.format(padded_wav_filename)
-    ])
-    print('command:', command, flush=True)
-    failure_code = subprocess.call(command, shell=True)
-
-    if failure_code:
-        print('Failed to concatenate end bump')
-    else:
-        print('Done concatenating end bump; renaming file...', flush=True)
-        os.rename(padded_wav_filename, args.outfile)
-
 
 def main(tempdir):
-    video_faces_pickle_file = args.face + '.faces'
+    video_faces_pickle_file = args.face + '.faces.pickle'
     print('Video faces pickle file: {}'.format(video_faces_pickle_file), flush=True)
 
     frame_w = 0
@@ -376,98 +304,16 @@ def main(tempdir):
     print("Number of frames available for inference: "+str(len(full_frames)), flush=True)
     print("Frame dimensions: {}x{}".format(frame_w, frame_h), flush=True)
 
-    if not args.audio.endswith('.wav'):
-        print('Extracting raw audio...')
-        temp_wav_filename = os.path.join(tempdir, 'temp.wav') # previously 'temp/temp.wav'
-        command = 'ffmpeg -y -i {} -strict -2 {}'.format(args.audio, temp_wav_filename)
+    # NB: Instead of truncating, let's detect the entire file.
+    # full_frames = full_frames[:len(mel_chunks)]
 
-        print('command:', command, flush=True)
-        subprocess.call(command, shell=True)
-        args.audio = temp_wav_filename
-
-    maybe_pad_audio_file(tempdir, args)
-
-    wav = audio.load_wav(args.audio, 16000)
-    mel = audio.melspectrogram(wav)
-    print(mel.shape)
-
-    if np.isnan(mel.reshape(-1)).sum() > 0:
-        raise ValueError('Mel contains nan! Using a TTS voice? Add a small epsilon noise to the wav file and try again')
-
-    mel_chunks = []
-    mel_idx_multiplier = 80./fps
-    i = 0
-    while 1:
-        start_idx = int(i * mel_idx_multiplier)
-        if start_idx + mel_step_size > len(mel[0]):
-            mel_chunks.append(mel[:, len(mel[0]) - mel_step_size:])
-            break
-        mel_chunks.append(mel[:, start_idx : start_idx + mel_step_size])
-        i += 1
-
-    print("Length of mel chunks: {}".format(len(mel_chunks)), flush=True)
-
-    if len(mel_chunks) > 2000:
-        # TODO: Catch that the file is too long earlier on.
-        raise Exception("Too many mel chunks: {}".format(len(mel_chunks)))
-
-    full_frames = full_frames[:len(mel_chunks)]
-
-    # TODO: Do this offline.
     print('Face detection time...', flush=True)
-    if not os.path.isfile(video_faces_pickle_file):
-        print('Detecting faces...', flush=True)
-        face_det_results = detect_faces_in_frames(full_frames, video_faces_pickle_file)
-    else:
-        with open(video_faces_pickle_file, 'rb') as f:
-            face_det_results = pickle.load(f)
-        if len(face_det_results) < len(full_frames):
-            print("Face detect results have {} frames, but we need {}".format(len(face_det_results), len(full_frames)))
-            print('Detecting faces again...', flush=True)
-            face_det_results = detect_faces_in_frames(full_frames, video_faces_pickle_file)
-        else:
-            print("We don't need to find faces! Woo!", flush=True)
+    print('Number of frames to detect faces in: {}'.format(len(full_frames)), flush=True)
 
-    face_det_results = face_det_results[:len(mel_chunks)]
+    print('Detecting faces...', flush=True)
+    _face_det_results = detect_faces_in_frames(full_frames, video_faces_pickle_file)
 
-    batch_size = args.wav2lip_batch_size
-    #gen = datagen(full_frames.copy(), mel_chunks)
-    gen = datagen(full_frames.copy(), face_det_results.copy(), mel_chunks)
-
-    output_video_filename = os.path.join(tempdir, 'result.avi') # previously 'temp/result.avi'
-
-    for i, (img_batch, mel_batch, frames, coords) in enumerate(tqdm(gen,
-                                            total=int(np.ceil(float(len(mel_chunks))/batch_size)))):
-        if i == 0:
-            model = load_model(args.checkpoint_path)
-            print ("Model loaded")
-
-            #frame_h, frame_w = full_frames[0].shape[:-1]
-            out = cv2.VideoWriter(output_video_filename,
-                                    cv2.VideoWriter_fourcc(*'DIVX'), fps, (frame_w, frame_h))
-
-        img_batch = torch.FloatTensor(np.transpose(img_batch, (0, 3, 1, 2))).to(device)
-        mel_batch = torch.FloatTensor(np.transpose(mel_batch, (0, 3, 1, 2))).to(device)
-
-        with torch.no_grad():
-            pred = model(mel_batch, img_batch)
-
-        pred = pred.cpu().numpy().transpose(0, 2, 3, 1) * 255.
-
-        for p, f, c in zip(pred, frames, coords):
-            y1, y2, x1, x2 = c
-            p = cv2.resize(p.astype(np.uint8), (x2 - x1, y2 - y1))
-
-            f[y1:y2, x1:x2] = p
-            out.write(f)
-
-    out.release()
-
-    command = 'ffmpeg -y -i {} -i {} -strict -2 -q:v 1 {}'.format(args.audio, output_video_filename, args.outfile)
-    print('command:', command, flush=True)
-    subprocess.call(command, shell=True)
-
-    maybe_concatenate_end_bump(tempdir, args, frame_w, frame_h)
+    print('Done detecting faces!', flush=True)
 
 if __name__ == '__main__':
     tempdir = tempfile.mkdtemp()

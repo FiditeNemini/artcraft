@@ -48,10 +48,10 @@ impl Wav2LipPreprocessClient {
     command.push_str(&self.checkpoint_path);
     command.push_str(" --face ");
     command.push_str(image_or_video_filename);
-    command.push_str(" --audio ");
-    command.push_str(audio_filename);
-    command.push_str(" --outfile ");
-    command.push_str(output_video_filename);
+    //command.push_str(" --audio ");
+    //command.push_str(audio_filename);
+    //command.push_str(" --outfile ");
+    //command.push_str(output_video_filename);
 
     if is_image {
       command.push_str(" --is_image ");
