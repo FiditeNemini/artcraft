@@ -11,10 +11,6 @@ pub struct Wav2LipPreprocessClient {
   w2l_directory: String,
   script_name: String,
   checkpoint_path: String,
-  temp_directory: String,
-  audio_start_pad_millis: Option<u32>,
-  audio_end_pad_millis: Option<u32>,
-  end_bump_filename: Option<String>,
 }
 
 impl Wav2LipPreprocessClient {
@@ -22,19 +18,11 @@ impl Wav2LipPreprocessClient {
     w2l_directory: &str,
     script_name: &str,
     checkpoint_path: &str,
-    temp_directory: &str,
-    audio_start_pad_millis: Option<u32>,
-    audio_end_pad_millis: Option<u32>,
-    end_bump_filename: Option<String>,
   ) -> Self {
     Self {
       w2l_directory: w2l_directory.to_string(),
       script_name: script_name.to_string(),
       checkpoint_path: checkpoint_path.to_string(),
-      temp_directory: temp_directory.to_string(),
-      audio_start_pad_millis,
-      audio_end_pad_millis,
-      end_bump_filename,
     }
   }
 
@@ -64,23 +52,6 @@ impl Wav2LipPreprocessClient {
     command.push_str(audio_filename);
     command.push_str(" --outfile ");
     command.push_str(output_video_filename);
-
-    if let Some(millis) = self.audio_start_pad_millis {
-      command.push_str(" --audio_start_pad_millis ");
-      command.push_str(&millis.to_string());
-    }
-
-    if let Some(millis) = self.audio_end_pad_millis {
-      command.push_str(" --audio_end_pad_millis ");
-      command.push_str(&millis.to_string());
-    }
-
-    if !disable_end_bump {
-      if let Some(end_bump_filename) = self.end_bump_filename.as_ref() {
-        command.push_str(" --end_bump_file ");
-        command.push_str(end_bump_filename);
-      }
-    }
 
     if is_image {
       command.push_str(" --is_image ");
