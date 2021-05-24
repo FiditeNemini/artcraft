@@ -7,6 +7,7 @@
 
 pub mod buckets;
 pub mod job_queries;
+pub mod script_execution;
 pub mod util;
 
 use anyhow::anyhow;
