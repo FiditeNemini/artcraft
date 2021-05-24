@@ -16,7 +16,7 @@ pub mod util;
 pub mod validations;
 
 // NB: This is included so sqlx can generate all the queries.
-mod job;
+mod job_queries;
 
 use actix_cors::Cors;
 use actix_http::http;

@@ -6,7 +6,7 @@
 //#![allow(warnings)]
 
 pub mod buckets;
-pub mod job;
+pub mod job_queries;
 pub mod util;
 
 use anyhow::anyhow;
@@ -14,11 +14,11 @@ use chrono::Utc;
 use crate::buckets::bucket_client::BucketClient;
 use crate::buckets::bucket_paths::hash_to_bucket_path;
 use crate::buckets::file_hashing::get_file_hash;
-use crate::job::job_queries::TtsUploadJobRecord;
-use crate::job::job_queries::insert_tts_model;
-use crate::job::job_queries::mark_tts_upload_job_done;
-use crate::job::job_queries::mark_tts_upload_job_failure;
-use crate::job::job_queries::query_tts_upload_job_records;
+use crate::job_queries::tts_download_job_queries::TtsUploadJobRecord;
+use crate::job_queries::tts_download_job_queries::insert_tts_model;
+use crate::job_queries::tts_download_job_queries::mark_tts_upload_job_done;
+use crate::job_queries::tts_download_job_queries::mark_tts_upload_job_failure;
+use crate::job_queries::tts_download_job_queries::query_tts_upload_job_records;
 use crate::util::anyhow_result::AnyhowResult;
 use crate::util::filesystem::check_directory_exists;
 use crate::util::random_token::random_token;
