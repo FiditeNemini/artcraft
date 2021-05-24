@@ -20,6 +20,7 @@ use crate::job_queries::w2l_download_job_queries::insert_w2l_template;
 use crate::job_queries::w2l_download_job_queries::mark_w2l_template_upload_job_done;
 use crate::job_queries::w2l_download_job_queries::mark_w2l_template_upload_job_failure;
 use crate::job_queries::w2l_download_job_queries::query_w2l_template_upload_job_records;
+use crate::script_execution::google_drive_download_command::GoogleDriveDownloadCommand;
 use crate::util::anyhow_result::AnyhowResult;
 use crate::util::filesystem::check_directory_exists;
 use crate::util::random_token::random_token;
@@ -49,6 +50,7 @@ struct Downloader {
   pub download_temp_directory: PathBuf,
   pub mysql_pool: MySqlPool,
   pub bucket_client: BucketClient,
+  pub google_drive_downloader: GoogleDriveDownloadCommand,
   // Command to run
   pub download_script: String,
   // Root to store W2L templates
@@ -93,6 +95,8 @@ async fn main() -> AnyhowResult<()> {
     "DOWNLOAD_SCRIPT",
     "./scripts/download_gdrive.py");
 
+  let google_drive_downloader = GoogleDriveDownloadCommand::new(&download_script);
+
   let temp_directory = PathBuf::from(temp_directory);
 
   check_directory_exists(&temp_directory)?;
@@ -114,6 +118,7 @@ async fn main() -> AnyhowResult<()> {
     mysql_pool,
     bucket_client,
     download_script,
+    google_drive_downloader,
     bucket_root_w2l_template_uploads: bucket_root.to_string(),
   };
 
@@ -190,47 +195,6 @@ async fn process_jobs(downloader: &Downloader, jobs: Vec<W2lTemplateUploadJobRec
   Ok(())
 }
 
-async fn download_file(downloader: &Downloader,
-                       job: &W2lTemplateUploadJobRecord,
-                       temp_dir: &TempDir) -> AnyhowResult<String>
-{
-
-  let temp_dir_path = temp_dir.path()
-    .to_str()
-    .unwrap_or("/tmp")
-    .to_string();
-
-  let filename = random_token(10);
-  let filename = format!("{}/{}.bin", temp_dir_path, filename);
-
-  info!("Downloading to: {}", filename);
-
-  let url = job.download_url.as_ref()
-    .map(|c| c.to_string())
-    .unwrap_or("".to_string());
-
-  let command = format!("{} --url {} --output_file {}",
-                        downloader.download_script,
-                        &url,
-                        &filename);
-
-  info!("Running command: {}", command);
-
-  let result = Command::new("sh")
-    .arg("-c")
-    .arg(command)
-    .output()?;
-
-  info!("Downloader Result: {:?}", result);
-
-  if !result.status.success() {
-    let reason = String::from_utf8(result.stderr).unwrap_or("UNKNOWN".to_string());
-    return Err(anyhow!("Failure to execute command: {:?}", reason))
-  }
-
-  Ok(filename)
-}
-
 async fn process_job(downloader: &Downloader, job: &W2lTemplateUploadJobRecord) -> AnyhowResult<()> {
   // TODO: 1. Mark processing.
   // TODO: 2. Download. (DONE)
@@ -243,8 +207,13 @@ async fn process_job(downloader: &Downloader, job: &W2lTemplateUploadJobRecord) 
   let temp_dir = format!("temp_{}", job.id);
   let temp_dir = TempDir::new(&temp_dir)?;
 
+  let download_url = job.download_url.as_ref()
+    .map(|c| c.to_string())
+    .unwrap_or("".to_string());
+
   info!("Calling downloader...");
-  let download_filename = download_file(downloader, job, &temp_dir).await?;
+  let download_filename = downloader.google_drive_downloader
+    .download_file(&download_url, &temp_dir).await?;
 
   let private_bucket_hash = get_file_hash(&download_filename)?;
 
