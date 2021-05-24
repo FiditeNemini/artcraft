@@ -1,0 +1,125 @@
+use crate::AnyhowResult;
+use log::{info,warn};
+use std::process::{Command, Stdio};
+use subprocess::{Popen, PopenConfig, Redirection};
+use std::fs::OpenOptions;
+
+/// This command is used to preprocess the face detection frames from user-submitted video.
+/// This should only ever need to run once. The frames can then be uploaded to Buckets and saved.
+#[derive(Clone)]
+pub struct Wav2LipInferenceCommand {
+  w2l_directory: String,
+  script_name: String,
+  checkpoint_path: String,
+}
+
+impl Wav2LipInferenceCommand {
+  pub fn new(
+    w2l_directory: &str,
+    script_name: &str,
+    checkpoint_path: &str,
+  ) -> Self {
+    Self {
+      w2l_directory: w2l_directory.to_string(),
+      script_name: script_name.to_string(),
+      checkpoint_path: checkpoint_path.to_string(),
+    }
+  }
+
+  pub fn execute(&self,
+                 audio_filename: &str,
+                 image_or_video_filename: &str,
+                 output_video_filename: &str,
+                 is_image: bool,
+                 disable_end_bump: bool,
+                 spawn_process: bool) -> AnyhowResult<()>
+  {
+    let mut command = String::new();
+
+    command.push_str("echo 'test'");
+    command.push_str(" && ");
+    command.push_str(&format!("cd {}", self.w2l_directory));
+    command.push_str(" && ");
+    command.push_str("source python/bin/activate");
+    command.push_str(" && ");
+    command.push_str("python ");
+    command.push_str(&self.script_name);
+    command.push_str(" --checkpoint_path ");
+    command.push_str(&self.checkpoint_path);
+    command.push_str(" --face ");
+    command.push_str(image_or_video_filename);
+    command.push_str(" --audio ");
+    command.push_str(audio_filename);
+    command.push_str(" --outfile ");
+    command.push_str(output_video_filename);
+
+    if is_image {
+      command.push_str(" --is_image ");
+    }
+
+    info!("Command: {:?}", command);
+
+    let command_parts = [
+      "bash",
+      "-c",
+      &command
+    ];
+
+    if spawn_process {
+      // NB: This forks and returns immediately.
+      //let _child_pid = command_builder.spawn()?;
+
+      let stdout_file = OpenOptions::new()
+        .read(true)
+        .write(true)
+        .create(true)
+        .truncate(true)
+        .open("/tmp/stdout.txt")?;
+
+      let stderr_file = OpenOptions::new()
+        .read(true)
+        .write(true)
+        .create(true)
+        .truncate(true)
+        .open("/tmp/stderr.txt")?;
+
+      let mut p = Popen::create(&command_parts, PopenConfig {
+        //stdout: Redirection::Pipe,
+        //stderr: Redirection::Pipe,
+        stdout: Redirection::File(stdout_file),
+        stderr: Redirection::File(stderr_file),
+        ..Default::default()
+      })?;
+
+      info!("Pid : {:?}", p.pid());
+
+      p.detach();
+
+    } else {
+      // NB: This is a blocking call.
+      /*let output = command_builder.output()?;
+
+      info!("Output status: {}", output.status);
+      info!("Stdout: {:?}", String::from_utf8(output.stdout));
+      error!("Stderr: {:?}", String::from_utf8(output.stderr));
+
+      if !output.status.success() {
+        bail!("Bad error code: {:?}", output.status);
+      }*/
+
+      let mut p = Popen::create(&command_parts, PopenConfig {
+        //stdout: Redirection::Pipe,
+        //stderr: Redirection::Pipe,
+        ..Default::default()
+      })?;
+
+      info!("Pid : {:?}", p.pid());
+
+      let exit_status = p.wait()?;
+
+      info!("Exit status: {:?}", exit_status);
+    }
+
+    Ok(())
+  }
+}
