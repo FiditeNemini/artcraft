@@ -7,6 +7,7 @@
 #[macro_use] extern crate lazy_static;
 #[macro_use] extern crate serde_derive;
 
+pub mod buckets;
 pub mod common_queries;
 pub mod database_helpers;
 pub mod endpoints;

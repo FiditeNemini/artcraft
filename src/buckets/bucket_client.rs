@@ -14,6 +14,9 @@ use tokio::fs::File;
 #[derive(Clone)]
 pub struct BucketClient {
   bucket: Bucket,
+
+  /// If set, put all files under this root path.
+  optional_bucket_root: Option<String>,
 }
 
 impl BucketClient {
@@ -22,7 +25,8 @@ impl BucketClient {
     access_key: &str,
     secret_key: &str,
     region_name: &str,
-    bucket_name: &str) -> anyhow::Result<Self>
+    bucket_name: &str,
+    optional_bucket_root: Option<&str>) -> anyhow::Result<Self>
   {
     let credentials = Credentials::new(
       Some(&access_key),
@@ -41,15 +45,28 @@ impl BucketClient {
     bucket.set_path_style();
     bucket.set_subdomain_style();
 
+    let optional_bucket_root = optional_bucket_root.map(|s| s.to_string());
+
     Ok(Self {
       bucket,
+      optional_bucket_root,
     })
+  }
+
+  fn get_rooted_object_name(&self, object_name: &str) -> String {
+    match &self.optional_bucket_root {
+      None => object_name.to_string(),
+      Some(root) => format!("{}/{}", root, object_name),
+    }
   }
 
   pub async fn upload_file(&self, object_name: &str, bytes: &[u8]) -> anyhow::Result<()> {
     info!("Filename for bucket: {}", object_name);
 
-    let (body_bytes, code) = self.bucket.put_object(object_name, bytes).await?;
+    let object_name = self.get_rooted_object_name(object_name);
+    info!("Rooted filename for bucket: {}", object_name);
+
+    let (body_bytes, code) = self.bucket.put_object(&object_name, bytes).await?;
 
     info!("upload code: {}", code);
 

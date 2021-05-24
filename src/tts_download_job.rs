@@ -5,12 +5,13 @@
 #![warn(unused_must_use)]
 //#![allow(warnings)]
 
+pub mod buckets;
 pub mod job;
 pub mod util;
 
 use anyhow::anyhow;
 use chrono::Utc;
-use crate::util::bucket_client::BucketClient;
+use crate::buckets::bucket_client::BucketClient;
 use crate::job::job_queries::TtsUploadJobRecord;
 use crate::job::job_queries::insert_tts_model;
 use crate::job::job_queries::mark_tts_upload_job_done;
@@ -19,23 +20,24 @@ use crate::job::job_queries::query_tts_upload_job_records;
 use crate::util::anyhow_result::AnyhowResult;
 use crate::util::filesystem::check_directory_exists;
 use crate::util::random_token::random_token;
+use data_encoding::{HEXUPPER, HEXLOWER, HEXLOWER_PERMISSIVE};
 use log::{warn, info};
+use ring::digest::{Context, Digest, SHA256};
 use sqlx::MySqlPool;
 use sqlx::mysql::MySqlPoolOptions;
+use std::fs::File;
+use std::io::{BufReader, Read};
 use std::path::{PathBuf, Path};
 use std::process::Command;
 use std::time::Duration;
 use tempdir::TempDir;
-use std::fs::File;
-use std::io::{BufReader, Read};
-use ring::digest::{Context, Digest, SHA256};
-use data_encoding::{HEXUPPER, HEXLOWER, HEXLOWER_PERMISSIVE};
 
 // Buckets
 const ENV_ACCESS_KEY : &'static str = "ACCESS_KEY";
 const ENV_SECRET_KEY : &'static str = "SECRET_KEY";
 const ENV_REGION_NAME : &'static str = "REGION_NAME";
-const ENV_BUCKET_NAME : &'static str = "BUCKET_NAME";
+const ENV_BUCKET_NAME : &'static str = "TTS_DOWNLOAD_BUCKET_NAME";
+const ENV_BUCKET_ROOT : &'static str = "TTS_DOWNLOAD_BUCKET_ROOT";
 
 const DEFAULT_RUST_LOG: &'static str = "debug,actix_web=info";
 const DEFAULT_TEMP_DIR: &'static str = "/tmp";
@@ -68,12 +70,14 @@ async fn main() -> AnyhowResult<()> {
   let secret_key = easyenv::get_env_string_required(ENV_SECRET_KEY)?;
   let region_name = easyenv::get_env_string_required(ENV_REGION_NAME)?;
   let bucket_name = easyenv::get_env_string_required(ENV_BUCKET_NAME)?;
+  let bucket_root = easyenv::get_env_string_required(ENV_BUCKET_ROOT)?;
 
   let bucket_client = BucketClient::create(
     &access_key,
     &secret_key,
     &region_name,
     &bucket_name,
+    Some(&bucket_root),
   )?;
 
   let temp_directory = easyenv::get_env_string_or_default(
@@ -255,6 +259,7 @@ async fn process_job(downloader: &Downloader, job: &TtsUploadJobRecord) -> Anyho
 
   info!("File hash: {}", private_bucket_hash);
 
+  // NB: /.../a/b/c/d/abcdefg.bin
   let object_name = format!(
     "/user_uploaded_tts_models/{}/{}/{}/{}.bin",
     &private_bucket_hash[0..1],
@@ -269,7 +274,12 @@ async fn process_job(downloader: &Downloader, job: &TtsUploadJobRecord) -> Anyho
   downloader.bucket_client.upload_filename(&object_name, &file_path).await?;
 
   info!("Saving model record...");
-  let id = insert_tts_model(&downloader.mysql_pool, job, &private_bucket_hash, &object_name).await?;
+  let id = insert_tts_model(
+    &downloader.mysql_pool,
+    job,
+    &private_bucket_hash,
+    &object_name)
+    .await?;
 
   info!("Saved model record: {}", id);
 
@@ -278,4 +288,3 @@ async fn process_job(downloader: &Downloader, job: &TtsUploadJobRecord) -> Anyho
 
   Ok(())
 }
-
