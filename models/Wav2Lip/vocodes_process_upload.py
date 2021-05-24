@@ -50,8 +50,11 @@ parser = argparse.ArgumentParser(description='Inference code to lip-sync videos 
 parser.add_argument('--checkpoint_path', type=str,
                     help='Name of saved checkpoint to load weights from', required=True)
 
-parser.add_argument('--face', type=str,
+parser.add_argument('--image_or_video_filename', type=str,
                     help='Filepath of video/image that contains faces to use', required=True)
+
+parser.add_argument('--output_cached_faces_filename', type=str,
+                    help='Output filename for the cached faces file', required=True)
 
 # NB: Not needed for processing the upload file for faces:
 #
@@ -114,7 +117,8 @@ parser.add_argument('--preserve_tempdir', default=False, action='store_true',
 args = parser.parse_args()
 args.img_size = 96
 
-if os.path.isfile(args.face) and os.path.splitext(args.face)[1] in ['.jpg', '.png', '.jpeg']:
+if os.path.isfile(args.image_or_video_filename) \
+        and os.path.splitext(args.image_or_video_filename)[1] in ['.jpg', '.png', '.jpeg']:
     args.static = True
 elif args.is_image:
     args.static = True
@@ -258,23 +262,23 @@ def load_model(path):
 
 
 def main(tempdir):
-    video_faces_pickle_file = args.face + '.faces.pickle'
+    video_faces_pickle_file = args.output_cached_faces_filename
     print('Video faces pickle file: {}'.format(video_faces_pickle_file), flush=True)
 
     frame_w = 0
     frame_h = 0
 
-    if not os.path.isfile(args.face):
-        raise ValueError('--face argument must be a valid path to video/image file')
+    if not os.path.isfile(args.image_or_video_filename):
+        raise ValueError('--image_or_video_filename argument must be a valid path to video/image file')
 
-    elif os.path.splitext(args.face)[1] in ['.jpg', '.png', '.jpeg'] \
+    elif os.path.splitext(args.image_or_video_filename)[1] in ['.jpg', '.png', '.jpeg'] \
             or args.is_image:
-        full_frames = [cv2.imread(args.face)]
+        full_frames = [cv2.imread(args.image_or_video_filename)]
         fps = args.fps
         frame_h, frame_w = full_frames[0].shape[:-1]
 
     else:
-        video_stream = cv2.VideoCapture(args.face)
+        video_stream = cv2.VideoCapture(args.image_or_video_filename)
         fps = video_stream.get(cv2.CAP_PROP_FPS)
 
         print('Reading video frames...')

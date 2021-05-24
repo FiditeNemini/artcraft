@@ -35,6 +35,7 @@ use std::path::{PathBuf, Path};
 use std::process::Command;
 use std::time::Duration;
 use tempdir::TempDir;
+use crate::script_execution::wav2lip_process_upload_command::Wav2LipPreprocessClient;
 
 // Buckets
 const ENV_ACCESS_KEY : &'static str = "ACCESS_KEY";
@@ -42,6 +43,11 @@ const ENV_SECRET_KEY : &'static str = "SECRET_KEY";
 const ENV_REGION_NAME : &'static str = "REGION_NAME";
 const ENV_BUCKET_NAME : &'static str = "W2L_DOWNLOAD_BUCKET_NAME";
 const ENV_BUCKET_ROOT : &'static str = "W2L_DOWNLOAD_BUCKET_ROOT";
+
+// Python code
+const ENV_CODE_DIRECTORY : &'static str = "W2L_CODE_DIRECTORY";
+const ENV_MODEL_CHECKPOINT : &'static str = "W2L_MODEL_CHECKPOINT";
+const ENV_SCRIPT_NAME : &'static str = "W2L_SCRIPT_NAME";
 
 const DEFAULT_RUST_LOG: &'static str = "debug,actix_web=info";
 const DEFAULT_TEMP_DIR: &'static str = "/tmp";
@@ -51,6 +57,7 @@ struct Downloader {
   pub mysql_pool: MySqlPool,
   pub bucket_client: BucketClient,
   pub google_drive_downloader: GoogleDriveDownloadCommand,
+  pub w2l_processor: Wav2LipPreprocessClient,
   // Command to run
   pub download_script: String,
   // Root to store W2L templates
@@ -87,6 +94,16 @@ async fn main() -> AnyhowResult<()> {
     None,
   )?;
 
+  let py_code_directory = easyenv::get_env_string_required(ENV_CODE_DIRECTORY)?;
+  let py_script_name = easyenv::get_env_string_required(ENV_SCRIPT_NAME)?;
+  let py_model_checkpoint = easyenv::get_env_string_required(ENV_MODEL_CHECKPOINT)?;
+
+  let w2l_preprecess_command = Wav2LipPreprocessClient::new(
+    &py_code_directory,
+    &py_script_name,
+    &py_model_checkpoint,
+  );
+
   let temp_directory = easyenv::get_env_string_or_default(
     "DOWNLOAD_TEMP_DIR",
     DEFAULT_TEMP_DIR);
@@ -119,6 +136,7 @@ async fn main() -> AnyhowResult<()> {
     bucket_client,
     download_script,
     google_drive_downloader,
+    w2l_processor: w2l_preprecess_command,
     bucket_root_w2l_template_uploads: bucket_root.to_string(),
   };
 
@@ -211,23 +229,52 @@ async fn process_job(downloader: &Downloader, job: &W2lTemplateUploadJobRecord) 
     .map(|c| c.to_string())
     .unwrap_or("".to_string());
 
+  // ==================== DOWNLOAD FILE ==================== //
+
   info!("Calling downloader...");
   let download_filename = downloader.google_drive_downloader
     .download_file(&download_url, &temp_dir).await?;
+
+  let file_path = PathBuf::from(&download_filename);
+
+  // ==================== PROCESS FACES ==================== //
+
+  let cached_faces_filename = format!("{}_detected_faces.pickle", &download_filename);
+  let is_image = false; // TODO: Don't always treat as video.
+  let spawn_process = true;
+
+  downloader.w2l_processor.execute(
+    &download_filename,
+    &cached_faces_filename,
+    is_image,
+    spawn_process)?;
+
+
+  // ==================== UPLOAD TO BUCKET ==================== //
 
   let private_bucket_hash = get_file_hash(&download_filename)?;
 
   info!("File hash: {}", private_bucket_hash);
 
-  // NB: /.../a/b/c/d/abcdefg.bin
-  let object_name = hash_to_bucket_path(
+  // Full path to video/image
+  let full_object_path = hash_to_bucket_path(
     &private_bucket_hash,
     Some(&downloader.bucket_root_w2l_template_uploads))?;
 
-  info!("Destination bucket path: {}", object_name);
+  info!("Image/video destination bucket path: {}", full_object_path);
 
-  let file_path = PathBuf::from(download_filename);
-  downloader.bucket_client.upload_filename(&object_name, &file_path).await?;
+  // Full path to cached faces
+  let full_object_path_cached_faces = format!("{}_detected_faces.pickle", full_object_path);
+
+  info!("Cached faces destination bucket path: {}", full_object_path_cached_faces);
+
+  info!("Uploading image/video...");
+  downloader.bucket_client.upload_filename(&full_object_path, &file_path).await?;
+
+  let cached_faces_path = PathBuf::from(&cached_faces_filename);
+
+  info!("Uploading cached faces...");
+  downloader.bucket_client.upload_filename(&full_object_path_cached_faces, &cached_faces_path).await?;
 
   // TODO:
   let template_type = "image";
@@ -238,7 +285,8 @@ async fn process_job(downloader: &Downloader, job: &W2lTemplateUploadJobRecord) 
     template_type,
     job,
     &private_bucket_hash,
-    &object_name)
+    &full_object_path,
+    &full_object_path_cached_faces)
     .await?;
 
   info!("Saved model record: {}", id);

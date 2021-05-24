@@ -113,7 +113,8 @@ pub async fn insert_w2l_template(pool: &MySqlPool,
                                  template_type: &str, // TODO: ENUM!
                                  job: &W2lTemplateUploadJobRecord,
                                  private_bucket_hash: &str,
-                                 private_bucket_object_name: &str)
+                                 private_bucket_object_name: &str,
+                                 private_bucket_cached_faces_object_name: &str)
   -> AnyhowResult<u64>
 {
   let model_token = random_token(32);
@@ -133,7 +134,8 @@ SET
   creator_ip_address = ?,
   original_download_url = ?,
   private_bucket_hash = ?,
-  private_bucket_object_name = ?
+  private_bucket_object_name = ?,
+  private_bucket_cached_faces_object_name = ?
         "#,
       model_token,
       template_type,
@@ -143,7 +145,8 @@ SET
       job.creator_ip_address.clone(),
       job.download_url.clone(),
       private_bucket_hash.to_string(),
-      private_bucket_object_name.to_string()
+      private_bucket_object_name.to_string(),
+      private_bucket_cached_faces_object_name.to_string()
     )
     .execute(pool)
     .await;

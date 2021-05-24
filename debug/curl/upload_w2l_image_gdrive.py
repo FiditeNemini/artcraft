@@ -32,10 +32,15 @@ print("===== Upload W2L =====")
 
 cookies = { 'session': session_cookie }
 
+# mario.zip
+#download_url = 'https://drive.google.com/file/d/15-tkgblTZpa0ifmvvyr_kgWy2cguTpAe/view?usp=sharing'
+# elon_integration_test.jpg
+download_url = 'https://drive.google.com/file/d/1yoBSb6nwFUZVI4CD-nM2BSofGdBjC8Nn/view?usp=sharing'
+
 payload = {
   'idempotency_token': str(uuid.uuid4()),
   'title': 'this is a new image template',
-  'download_url': 'https://drive.google.com/file/d/15-tkgblTZpa0ifmvvyr_kgWy2cguTpAe/view?usp=sharing',
+  'download_url': download_url,
 }
 
 r = requests.post(upload_url, cookies=cookies, json=payload)

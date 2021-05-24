@@ -192,6 +192,8 @@ CREATE TABLE w2l_templates (
   private_bucket_hash CHAR(64) NOT NULL,
   -- The "full url" version of the path
   private_bucket_object_name VARCHAR(255) NOT NULL,
+  -- The "full url" of the cached faces object
+  private_bucket_cached_faces_object_name VARCHAR(255) NOT NULL,
 
   -- For the thumbnail we show.
   public_bucket_hash CHAR(64) NOT NULL,

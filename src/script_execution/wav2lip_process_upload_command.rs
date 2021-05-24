@@ -27,11 +27,9 @@ impl Wav2LipPreprocessClient {
   }
 
   pub fn execute(&self,
-                 audio_filename: &str,
                  image_or_video_filename: &str,
-                 output_video_filename: &str,
+                 output_cached_faces_filename: &str,
                  is_image: bool,
-                 disable_end_bump: bool,
                  spawn_process: bool) -> AnyhowResult<()>
   {
     let mut command = String::new();
@@ -46,12 +44,10 @@ impl Wav2LipPreprocessClient {
     command.push_str(&self.script_name);
     command.push_str(" --checkpoint_path ");
     command.push_str(&self.checkpoint_path);
-    command.push_str(" --face ");
+    command.push_str(" --image_or_video_filename ");
     command.push_str(image_or_video_filename);
-    //command.push_str(" --audio ");
-    //command.push_str(audio_filename);
-    //command.push_str(" --outfile ");
-    //command.push_str(output_video_filename);
+    command.push_str(" --output_cached_faces_filename");
+    command.push_str(output_cached_faces_filename);
 
     if is_image {
       command.push_str(" --is_image ");
@@ -74,14 +70,14 @@ impl Wav2LipPreprocessClient {
         .write(true)
         .create(true)
         .truncate(true)
-        .open("/tmp/stdout.txt")?;
+        .open("/tmp/wav2lip_upload_stdout.txt")?;
 
       let stderr_file = OpenOptions::new()
         .read(true)
         .write(true)
         .create(true)
         .truncate(true)
-        .open("/tmp/stderr.txt")?;
+        .open("/tmp/wav2lip_upload_stderr.txt")?;
 
       let mut p = Popen::create(&command_parts, PopenConfig {
         //stdout: Redirection::Pipe,
