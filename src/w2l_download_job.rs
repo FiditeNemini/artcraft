@@ -50,7 +50,8 @@ const ENV_CODE_DIRECTORY : &'static str = "W2L_CODE_DIRECTORY";
 const ENV_MODEL_CHECKPOINT : &'static str = "W2L_MODEL_CHECKPOINT";
 const ENV_SCRIPT_NAME : &'static str = "W2L_SCRIPT_NAME";
 
-const DEFAULT_RUST_LOG: &'static str = "debug,actix_web=info";
+// NB: sqlx::query is spammy and logs all queries as "info"-level
+const DEFAULT_RUST_LOG: &'static str = "debug,actix_web=info,sqlx::query=warn";
 const DEFAULT_TEMP_DIR: &'static str = "/tmp";
 
 struct Downloader {
@@ -297,9 +298,9 @@ async fn process_job(downloader: &Downloader, job: &W2lTemplateUploadJobRecord) 
     &full_object_path_cached_faces)
     .await?;
 
-  info!("Saved model record: {}", id);
+  info!("Job {} complete success! Downloaded, processed, and uploaded. Saved model record: {}",
+        job.id, id);
 
-  info!("Job done: {}", job.id);
   mark_w2l_template_upload_job_done(&downloader.mysql_pool, job, true).await?;
 
   Ok(())
