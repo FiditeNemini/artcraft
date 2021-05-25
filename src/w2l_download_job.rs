@@ -39,6 +39,7 @@ use std::process::Command;
 use std::time::Duration;
 use tempdir::TempDir;
 use crate::script_execution::wav2lip_process_upload_command::Wav2LipPreprocessClient;
+use crate::script_execution::ffmpeg_generate_preview_video_command::FfmpegGeneratePreviewVideoCommand;
 
 // Buckets
 const ENV_ACCESS_KEY : &'static str = "ACCESS_KEY";
@@ -62,6 +63,7 @@ struct Downloader {
   pub bucket_client: BucketClient,
   pub google_drive_downloader: GoogleDriveDownloadCommand,
   pub w2l_processor: Wav2LipPreprocessClient,
+  pub ffmpeg_preview_generator: FfmpegGeneratePreviewVideoCommand,
   // Command to run
   pub download_script: String,
   // Root to store W2L templates
@@ -140,6 +142,7 @@ async fn main() -> AnyhowResult<()> {
     bucket_client,
     download_script,
     google_drive_downloader,
+    ffmpeg_preview_generator: FfmpegGeneratePreviewVideoCommand {},
     w2l_processor: w2l_preprecess_command,
     bucket_root_w2l_template_uploads: bucket_root.to_string(),
   };
@@ -289,7 +292,7 @@ async fn process_job(downloader: &Downloader, job: &W2lTemplateUploadJobRecord) 
 
   let file_metadata = read_metadata_file(&output_metadata_filename)?;
 
-  // ==================== UPLOAD TO BUCKET ==================== //
+  // ==================== BASE OBJECT NAMES BASED ON HASH ==================== //
 
   let private_bucket_hash = get_file_hash(&download_filename)?;
 
@@ -299,6 +302,38 @@ async fn process_job(downloader: &Downloader, job: &W2lTemplateUploadJobRecord) 
   let full_object_path = hash_to_bucket_path(
     &private_bucket_hash,
     Some(&downloader.bucket_root_w2l_template_uploads))?;
+
+  // ==================== GENERATE VIDEO PREVIEWS ==================== //
+
+  let mut maybe_image_preview_filename : Option<PathBuf> = None;
+  let mut maybe_image_preview_object_name : Option<String> = None;
+
+  let mut maybe_video_preview_filename : Option<PathBuf> = None;
+  let mut maybe_video_preview_object_name : Option<String> = None;
+
+  if file_metadata.is_video {
+    let preview_filename = format!("{}_preview.webp", &download_filename);
+
+    downloader.ffmpeg_preview_generator.execute(
+      &download_filename,
+      &preview_filename,
+      500,
+      500,
+      false
+    )?;
+
+    let video_preview_path = PathBuf::from(&preview_filename);
+    check_file_exists(&video_preview_path)?;
+
+    let preview_object_path = format!("{}_preview.webp", full_object_path);
+    maybe_video_preview_object_name = Some(preview_object_path);
+    maybe_video_preview_filename = Some(video_preview_path);
+
+  } else {
+    // TODO
+  }
+
+  // ==================== UPLOAD TO BUCKET ==================== //
 
   info!("Image/video destination bucket path: {}", full_object_path);
 
@@ -317,6 +352,18 @@ async fn process_job(downloader: &Downloader, job: &W2lTemplateUploadJobRecord) 
     &full_object_path_cached_faces,
     &cached_faces_path).await?;
 
+  // TODO: Fix this ugh.
+  if let Some(video_preview_filename) = maybe_video_preview_filename.as_deref() {
+    if let Some(video_preview_object_name) = maybe_video_preview_object_name.as_deref() {
+      info!("Uploading video preview...");
+      downloader.bucket_client.upload_filename(
+        &video_preview_object_name,
+        video_preview_filename).await?;
+    }
+  }
+
+  // ==================== SAVE RECORDS ==================== //
+
   let template_type = if file_metadata.is_video { "video" } else { "image" };
 
   info!("Saving model record...");
@@ -327,6 +374,8 @@ async fn process_job(downloader: &Downloader, job: &W2lTemplateUploadJobRecord) 
     &private_bucket_hash,
     &full_object_path,
     &full_object_path_cached_faces,
+    maybe_image_preview_object_name.as_deref(),
+    maybe_video_preview_object_name.as_deref(),
     file_metadata.width,
     file_metadata.height,
     file_metadata.num_frames,

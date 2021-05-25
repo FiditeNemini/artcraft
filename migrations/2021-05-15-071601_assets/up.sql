@@ -201,6 +201,10 @@ CREATE TABLE w2l_templates (
   -- The "full url" of the cached faces object
   private_bucket_cached_faces_object_name VARCHAR(255) NOT NULL,
 
+  -- The "full url" of the preview image and/or video
+  maybe_private_bucket_preview_image_object_name VARCHAR(255) DEFAULT NULL,
+  maybe_private_bucket_preview_video_object_name VARCHAR(255) DEFAULT NULL,
+
   -- For the thumbnail we show.
   public_bucket_hash CHAR(64) NOT NULL,
   -- The "full url" version of the path
