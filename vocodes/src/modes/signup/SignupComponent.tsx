@@ -11,7 +11,7 @@ enum FieldTriState {
 interface Props {
   loggedIn: boolean,
   querySessionCallback : () => void,
-  switchModeCallback: (mode: Mode) => void,
+  switchModeCallback?: (mode: Mode) => void,
 }
 
 interface State {
@@ -217,7 +217,10 @@ class SignupComponent extends React.Component<Props, State> {
       if (res.success) {
         console.log('querying new session');
         this.props.querySessionCallback();
-        this.props.switchModeCallback(Mode.SPEAK_MODE);
+
+        if (this.props.switchModeCallback !== undefined) {
+          this.props.switchModeCallback(Mode.SPEAK_MODE);
+        }
         return;
       }
     })
@@ -295,7 +298,7 @@ class SignupComponent extends React.Component<Props, State> {
 
     return (
       <div>
-        <h2> Sign Up </h2>
+        <h1 className="title is-1"> Sign Up </h1>
 
         <form onSubmit={this.handleFormSubmit}>
           <div className="field">

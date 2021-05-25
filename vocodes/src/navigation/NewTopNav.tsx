@@ -80,13 +80,13 @@ function NewTopNav(props: Props) {
         <div className="column">
           <button 
             className="button is-link is-large is-inverted"
-            onClick={() => props.switchModeCallback(NewMode.COMMUNITY_TTS_MODE)}
+            onClick={() => props.switchModeCallback(NewMode.SIGNUP_MODE)}
             >Sign Up</button>
         </div>
         <div className="column">
           <button 
             className="button is-link is-large is-inverted"
-            onClick={() => props.switchModeCallback(NewMode.COMMUNITY_TTS_MODE)}
+            onClick={() => props.switchModeCallback(NewMode.LOGIN_MODE)}
             >Login</button>
         </div>
         <div className="column">

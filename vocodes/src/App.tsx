@@ -5,6 +5,8 @@ import React from 'react';
 import { NewOldVocodesSwitch } from './migration/NewOldVocodesSwitch';
 import { OldVocodesContainer } from './migration/OldVocodesContainer';
 import { NewVocodesContainer } from './migration/NewVocodesContainer';
+import { ApiConfig } from './api/ApiConfig';
+import { SessionStateResponse } from './api/SessionState';
 
 enum MigrationMode {
   NEW_VOCODES,
@@ -25,6 +27,8 @@ interface State {
 
   // Rollout of vocodes 2.0
   enableAlpha: boolean,
+  loggedIn: boolean,
+  sessionState?: SessionStateResponse,
 }
 
 class App extends React.Component<Props, State> {
@@ -39,7 +43,65 @@ class App extends React.Component<Props, State> {
     this.state = {
       enableAlpha: enableAlpha,
       migrationMode: migrationMode,
+      loggedIn: false,
     }
+  }
+
+  componentDidMount() {
+    this.querySession();
+    setInterval(() => this.querySession, 10000);
+    //this.state.videoJobPoller.start();
+    //this.state.videoQueuePoller.start();
+  }
+
+  querySession = () => {
+    if (!this.state.enableAlpha) {
+      return;
+    }
+
+    const api = new ApiConfig();
+    const endpointUrl = api.sessionDetails();
+
+    fetch(endpointUrl, {
+      method: 'GET',
+      credentials: 'include',
+      headers: {
+        'Accept': 'application/json',
+      },
+    })
+    .then(res => res.json())
+    .then(response => {
+      const session : SessionStateResponse = response;
+
+      if (session !== undefined) {
+        this.setState({ 
+          sessionState : session,
+          loggedIn: session.logged_in,
+        });
+      }
+    })
+    .catch(e => { /* Ignore. */ });
+  }
+
+  logoutSession = () => {
+    if (!this.state.enableAlpha) {
+      return;
+    }
+
+    const api = new ApiConfig();
+    const endpointUrl = api.logout();
+
+    fetch(endpointUrl, {
+      method: 'POST',
+      credentials: 'include',
+      headers: {
+        'Accept': 'application/json',
+      },
+    })
+    .then(_raw_response => {
+      this.querySession();
+    })
+    .catch(e => { /* Ignore. */ });
   }
 
   setMigrationMode = (mode: MigrationMode) => {
@@ -54,6 +116,7 @@ class App extends React.Component<Props, State> {
         innerComponent = (
           <div>
             <NewVocodesContainer
+              sessionState={this.state.sessionState}
               />
           </div>
         );
