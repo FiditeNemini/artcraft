@@ -39,6 +39,8 @@ function NewTopNav(props: Props) {
   // Vo.codes 2.0
   let loginManagement = <span />;
   let extendedFeatures = <span />;
+  let column1 = <div></div>;
+  let column2 = <div></div>;
 
   if (true) {
     if (loggedIn) {
@@ -48,12 +50,36 @@ function NewTopNav(props: Props) {
           <a href="#logout" onClick={() => props.logoutHandler()}>Log Out</a>
         </span>
       );
+      column1 = (
+        <div className="column">
+          <button 
+            className="button is-link is-large is-inverted"
+            onClick={() => props.switchModeCallback(NewMode.MY_PROFILE_MODE)}
+            >{displayName}</button>
+        </div>
+      );
     } else {
       loginManagement = (
         <span>
           <a href="#login" onClick={() => props.switchModeCallback(NewMode.LOGIN_MODE)}>Login</a>
           <a href="#signup" onClick={() => props.switchModeCallback(NewMode.SIGNUP_MODE)} className="signup">Sign Up</a>
         </span>
+      );
+      column1 = (
+        <div className="column">
+          <button 
+            className="button is-link is-large is-inverted"
+            onClick={() => props.switchModeCallback(NewMode.SIGNUP_MODE)}
+            >Sign Up</button>
+        </div>
+      );
+      column2 = (
+        <div className="column">
+          <button 
+            className="button is-link is-large is-inverted"
+            onClick={() => props.switchModeCallback(NewMode.LOGIN_MODE)}
+            >Login</button>
+        </div>
       );
     }
 
@@ -70,25 +96,12 @@ function NewTopNav(props: Props) {
     );
   }
 
+
   return (
     <nav>
-      {/*<span id="logo_text">
-        <a href="#speak" onClick={() => props.switchModeCallback(NewMode.SIGNUP_MODE)}><span 
-          className="vo">Vo</span><span className="codes">codes</span></a>
-        </span>*/}
       <div className="columns">
-        <div className="column">
-          <button 
-            className="button is-link is-large is-inverted"
-            onClick={() => props.switchModeCallback(NewMode.SIGNUP_MODE)}
-            >Sign Up</button>
-        </div>
-        <div className="column">
-          <button 
-            className="button is-link is-large is-inverted"
-            onClick={() => props.switchModeCallback(NewMode.LOGIN_MODE)}
-            >Login</button>
-        </div>
+        {column1}
+        {column2}
         <div className="column">
           <button 
             className="button is-link is-large is-inverted"
