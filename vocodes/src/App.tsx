@@ -23,6 +23,7 @@ import { ApiConfig } from './api/ApiConfig';
 import { SessionStateResponse } from './api/SessionState';
 import { LoginComponent } from './modes/login/LoginComponent';
 import { UploadComponent } from './modes/upload/UploadComponent';
+import { NewOldVocodesSwitch } from './navigation/NewOldVocodesSwitch';
 
 interface Props {
   // Certan browsers (iPhone) have pitiful support for drawing APIs. Worse yet,
@@ -444,6 +445,9 @@ class App extends React.Component<Props, State> {
     return (
       <div id="main" className="mainwrap">
         <div id="viewable">
+          <NewOldVocodesSwitch 
+            enableAlpha={this.state.enableAlpha}
+          />
           <TopNav 
             enableAlpha={this.state.enableAlpha}
             sessionState={this.state.sessionState}

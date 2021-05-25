@@ -218,6 +218,9 @@ class UploadComponent extends React.Component<Props, State> {
             <p className="help">{this.state.titleInvalidReason}</p>
           </div>
 
+          {/* 
+          https://drive.google.com/file/d/{TOKEN}/view?usp=sharing
+          */}
           <div className="field">
             <label className="label">Download URL</label>
             <div className="control has-icons-left has-icons-right">
