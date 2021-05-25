@@ -5,6 +5,8 @@
 #![warn(unused_must_use)]
 //#![allow(warnings)]
 
+#[macro_use] extern crate serde_derive;
+
 pub mod buckets;
 pub mod job_queries;
 pub mod script_execution;
@@ -215,6 +217,22 @@ async fn process_jobs(downloader: &Downloader, jobs: Vec<W2lTemplateUploadJobRec
   Ok(())
 }
 
+#[derive(Deserialize)]
+struct FileMetadata {
+  pub is_video: bool,
+  pub width: u32,
+  pub height: u32,
+  pub num_frames: u64,
+  pub fps: Option<f32>,
+}
+
+fn read_metadata_file(filename: &str) -> AnyhowResult<FileMetadata> {
+  let mut file = File::open(filename)?;
+  let mut buffer = String::new();
+  file.read_to_string(&mut buffer)?;
+  Ok(serde_json::from_str(&buffer)?)
+}
+
 async fn process_job(downloader: &Downloader, job: &W2lTemplateUploadJobRecord) -> AnyhowResult<()> {
   // TODO: 1. Mark processing.
   // TODO: 2. Download. (DONE)
@@ -240,25 +258,38 @@ async fn process_job(downloader: &Downloader, job: &W2lTemplateUploadJobRecord) 
 
   // ==================== PROCESS FACES ==================== //
 
+  // This is the Python Pickle file with all the face frames.
+  // We'll retain it forever since it's expensive to compute.
   let cached_faces_filename = format!("{}_detected_faces.pickle", &download_filename);
+
+  // This is a file that we'll use to determine if the file is an image or video.
+  let output_metadata_filename = format!("{}_metadata.json", &download_filename);
+
   let is_image = false; // TODO: Don't always treat as video.
   let spawn_process = false;
 
   downloader.w2l_processor.execute(
     &download_filename,
     &cached_faces_filename,
+    &output_metadata_filename,
     is_image,
     spawn_process)?;
 
-  // ==================== UPLOAD TO BUCKET ==================== //
+  // ==================== CHECK ALL FILES EXIST AND GET METADATA ==================== //
 
   let video_or_image_path = PathBuf::from(&download_filename);
   let cached_faces_path = &PathBuf::from(&cached_faces_filename);
+  let output_metadata_path = &PathBuf::from(&output_metadata_filename);
 
   info!("Checking that both files exist (original source + cached faces) ...");
 
   check_file_exists(&video_or_image_path)?;
   check_file_exists(&cached_faces_path)?;
+  check_file_exists(&output_metadata_path)?;
+
+  let file_metadata = read_metadata_file(&output_metadata_filename)?;
+
+  // ==================== UPLOAD TO BUCKET ==================== //
 
   let private_bucket_hash = get_file_hash(&download_filename)?;
 
@@ -286,8 +317,7 @@ async fn process_job(downloader: &Downloader, job: &W2lTemplateUploadJobRecord) 
     &full_object_path_cached_faces,
     &cached_faces_path).await?;
 
-  // TODO:
-  let template_type = "image";
+  let template_type = if file_metadata.is_video { "video" } else { "image" };
 
   info!("Saving model record...");
   let id = insert_w2l_template(
@@ -296,7 +326,11 @@ async fn process_job(downloader: &Downloader, job: &W2lTemplateUploadJobRecord) 
     job,
     &private_bucket_hash,
     &full_object_path,
-    &full_object_path_cached_faces)
+    &full_object_path_cached_faces,
+    file_metadata.width,
+    file_metadata.height,
+    file_metadata.num_frames,
+    file_metadata.fps.unwrap_or(0.0f32))
     .await?;
 
   info!("Job {} complete success! Downloaded, processed, and uploaded. Saved model record: {}",

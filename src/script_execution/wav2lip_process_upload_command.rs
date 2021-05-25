@@ -29,6 +29,7 @@ impl Wav2LipPreprocessClient {
   pub fn execute(&self,
                  image_or_video_filename: &str,
                  output_cached_faces_filename: &str,
+                 output_metadata_filename: &str,
                  is_image: bool,
                  spawn_process: bool) -> AnyhowResult<()>
   {
@@ -48,6 +49,8 @@ impl Wav2LipPreprocessClient {
     command.push_str(image_or_video_filename);
     command.push_str(" --output_cached_faces_filename ");
     command.push_str(output_cached_faces_filename);
+    command.push_str(" --output_metadata_filename ");
+    command.push_str(output_metadata_filename);
 
     if is_image {
       command.push_str(" --is_image ");

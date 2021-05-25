@@ -114,7 +114,11 @@ pub async fn insert_w2l_template(pool: &MySqlPool,
                                  job: &W2lTemplateUploadJobRecord,
                                  private_bucket_hash: &str,
                                  private_bucket_object_name: &str,
-                                 private_bucket_cached_faces_object_name: &str)
+                                 private_bucket_cached_faces_object_name: &str,
+                                 frame_width: u32,
+                                 frame_height: u32,
+                                 frame_count: u64,
+                                 fps: f32)
   -> AnyhowResult<u64>
 {
   let model_token = random_token(32);
@@ -137,7 +141,11 @@ SET
   private_bucket_object_name = ?,
   private_bucket_cached_faces_object_name = ?,
   public_bucket_hash = 'TODO',
-  public_bucket_object_name = 'TODO'
+  public_bucket_object_name = 'TODO',
+  frame_width = ?,
+  frame_height = ?,
+  frame_count = ?,
+  fps = ?
         "#,
       model_token,
       template_type,
@@ -148,7 +156,11 @@ SET
       job.download_url.clone(),
       private_bucket_hash.to_string(),
       private_bucket_object_name.to_string(),
-      private_bucket_cached_faces_object_name.to_string()
+      private_bucket_cached_faces_object_name.to_string(),
+      frame_width,
+      frame_height,
+      frame_count,
+      fps
     )
     .execute(pool)
     .await;

@@ -56,6 +56,9 @@ parser.add_argument('--image_or_video_filename', type=str,
 parser.add_argument('--output_cached_faces_filename', type=str,
                     help='Output filename for the cached faces file', required=True)
 
+parser.add_argument('--output_metadata_filename', type=str,
+                    help='Output filename for the JSON containing width, height, etc.', required=True)
+
 # NB: Not needed for processing the upload file for faces:
 #
 # parser.add_argument('--audio', type=str,
@@ -265,8 +268,10 @@ def main(tempdir):
     video_faces_pickle_file = args.output_cached_faces_filename
     print('Video faces pickle file: {}'.format(video_faces_pickle_file), flush=True)
 
+    is_video = False
     frame_w = 0
     frame_h = 0
+    fps = 0
 
     if not os.path.isfile(args.image_or_video_filename):
         raise ValueError('--image_or_video_filename argument must be a valid path to video/image file')
@@ -276,6 +281,7 @@ def main(tempdir):
         full_frames = [cv2.imread(args.image_or_video_filename)]
         fps = args.fps
         frame_h, frame_w = full_frames[0].shape[:-1]
+        is_video = False
 
     else:
         video_stream = cv2.VideoCapture(args.image_or_video_filename)
@@ -305,6 +311,11 @@ def main(tempdir):
 
         frame_h, frame_w = full_frames[0].shape[:-1]
 
+        if len(full_frames) < 2:
+            is_video = False
+        else:
+            is_video = True
+
     print("Number of frames available for inference: "+str(len(full_frames)), flush=True)
     print("Frame dimensions: {}x{}".format(frame_w, frame_h), flush=True)
 
@@ -318,6 +329,19 @@ def main(tempdir):
     _face_det_results = detect_faces_in_frames(full_frames, video_faces_pickle_file)
 
     print('Done detecting faces!', flush=True)
+
+    metadata = {
+        'is_video': is_video,
+        'width': frame_w,
+        'height': frame_h,
+        'num_frames': len(full_frames),
+    }
+
+    if is_video:
+        metadata['fps'] = fps
+
+    with open(args.output_metadata_filename, 'w') as json_file:
+        json.dump(metadata, json_file)
 
 if __name__ == '__main__':
     tempdir = tempfile.mkdtemp()

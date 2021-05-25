@@ -185,6 +185,12 @@ CREATE TABLE w2l_templates (
   -- The filename that was used at upload time.
   original_filename CHAR(255) DEFAULT NULL,
 
+  -- Dimensions and other characteristics
+  frame_width INT(10) NOT NULL DEFAULT 0,
+  frame_height INT(10) NOT NULL DEFAULT 0,
+  frame_count INT(10) NOT NULL DEFAULT 0,
+  fps FLOAT NOT NULL DEFAULT 0.0,
+
   -- Where the file was originally downloaded (if it was downloaded)
   original_download_url VARCHAR(512) DEFAULT NULL,
 
