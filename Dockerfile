@@ -12,6 +12,7 @@ RUN apt-get update \
         gcc-7 \
         git \
         htop \
+        imagemagick \
         libc++-7-dev \
         libffi-dev \
         libgcc-7-dev \
