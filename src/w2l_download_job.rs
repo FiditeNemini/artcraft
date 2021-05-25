@@ -41,6 +41,7 @@ use tempdir::TempDir;
 use crate::script_execution::wav2lip_process_upload_command::Wav2LipPreprocessClient;
 use crate::script_execution::ffmpeg_generate_preview_video_command::FfmpegGeneratePreviewVideoCommand;
 use crate::script_execution::ffmpeg_generate_preview_image_command::FfmpegGeneratePreviewImageCommand;
+use crate::script_execution::imagemagick_generate_preview_image_command::ImagemagickGeneratePreviewImageCommand;
 
 // Buckets
 const ENV_ACCESS_KEY : &'static str = "ACCESS_KEY";
@@ -66,6 +67,7 @@ struct Downloader {
   pub w2l_processor: Wav2LipPreprocessClient,
   pub ffmpeg_image_preview_generator: FfmpegGeneratePreviewImageCommand,
   pub ffmpeg_video_preview_generator: FfmpegGeneratePreviewVideoCommand,
+  pub imagemagick_image_preview_generator: ImagemagickGeneratePreviewImageCommand,
   // Command to run
   pub download_script: String,
   // Root to store W2L templates
@@ -146,6 +148,7 @@ async fn main() -> AnyhowResult<()> {
     google_drive_downloader,
     ffmpeg_image_preview_generator: FfmpegGeneratePreviewImageCommand {},
     ffmpeg_video_preview_generator: FfmpegGeneratePreviewVideoCommand {},
+    imagemagick_image_preview_generator: ImagemagickGeneratePreviewImageCommand {},
     w2l_processor: w2l_preprecess_command,
     bucket_root_w2l_template_uploads: bucket_root.to_string(),
   };
@@ -337,7 +340,7 @@ async fn process_job(downloader: &Downloader, job: &W2lTemplateUploadJobRecord) 
   } else {
     let preview_filename = format!("{}_preview.webp", &download_filename);
 
-    downloader.ffmpeg_image_preview_generator.execute(
+    downloader.imagemagick_image_preview_generator.execute(
       &download_filename,
       &preview_filename,
       500,
