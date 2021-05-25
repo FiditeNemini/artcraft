@@ -43,7 +43,8 @@ const ENV_REGION_NAME : &'static str = "REGION_NAME";
 const ENV_BUCKET_NAME : &'static str = "TTS_DOWNLOAD_BUCKET_NAME";
 const ENV_BUCKET_ROOT : &'static str = "TTS_DOWNLOAD_BUCKET_ROOT";
 
-const DEFAULT_RUST_LOG: &'static str = "debug,actix_web=info";
+// NB: sqlx::query is spammy and logs all queries as "info"-level
+const DEFAULT_RUST_LOG: &'static str = "debug,actix_web=info,sqlx::query=warn";
 const DEFAULT_TEMP_DIR: &'static str = "/tmp";
 
 struct Downloader {

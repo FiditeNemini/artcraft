@@ -42,7 +42,9 @@ use sqlx::mysql::MySqlPoolOptions;
 use std::sync::Arc;
 
 const DEFAULT_BIND_ADDRESS : &'static str = "0.0.0.0:12345";
-const DEFAULT_RUST_LOG: &'static str = "debug,actix_web=info";
+
+// NB: sqlx::query is spammy and logs all queries as "info"-level
+const DEFAULT_RUST_LOG: &'static str = "debug,actix_web=info,sqlx::query=warn";
 
 pub type AnyhowResult<T> = anyhow::Result<T>;
 
