@@ -40,6 +40,7 @@ use std::time::Duration;
 use tempdir::TempDir;
 use crate::script_execution::wav2lip_process_upload_command::Wav2LipPreprocessClient;
 use crate::script_execution::ffmpeg_generate_preview_video_command::FfmpegGeneratePreviewVideoCommand;
+use crate::script_execution::ffmpeg_generate_preview_image_command::FfmpegGeneratePreviewImageCommand;
 
 // Buckets
 const ENV_ACCESS_KEY : &'static str = "ACCESS_KEY";
@@ -63,7 +64,8 @@ struct Downloader {
   pub bucket_client: BucketClient,
   pub google_drive_downloader: GoogleDriveDownloadCommand,
   pub w2l_processor: Wav2LipPreprocessClient,
-  pub ffmpeg_preview_generator: FfmpegGeneratePreviewVideoCommand,
+  pub ffmpeg_image_preview_generator: FfmpegGeneratePreviewImageCommand,
+  pub ffmpeg_video_preview_generator: FfmpegGeneratePreviewVideoCommand,
   // Command to run
   pub download_script: String,
   // Root to store W2L templates
@@ -142,7 +144,8 @@ async fn main() -> AnyhowResult<()> {
     bucket_client,
     download_script,
     google_drive_downloader,
-    ffmpeg_preview_generator: FfmpegGeneratePreviewVideoCommand {},
+    ffmpeg_image_preview_generator: FfmpegGeneratePreviewImageCommand {},
+    ffmpeg_video_preview_generator: FfmpegGeneratePreviewVideoCommand {},
     w2l_processor: w2l_preprecess_command,
     bucket_root_w2l_template_uploads: bucket_root.to_string(),
   };
@@ -315,7 +318,7 @@ async fn process_job(downloader: &Downloader, job: &W2lTemplateUploadJobRecord) 
   if file_metadata.is_video {
     let preview_filename = format!("{}_preview.webp", &download_filename);
 
-    downloader.ffmpeg_preview_generator.execute(
+    downloader.ffmpeg_video_preview_generator.execute(
       &download_filename,
       &preview_filename,
       500,
@@ -332,7 +335,22 @@ async fn process_job(downloader: &Downloader, job: &W2lTemplateUploadJobRecord) 
     maybe_video_preview_filename = Some(video_preview_path);
 
   } else {
-    // TODO
+    let preview_filename = format!("{}_preview.webp", &download_filename);
+
+    downloader.ffmpeg_image_preview_generator.execute(
+      &download_filename,
+      &preview_filename,
+      500,
+      500,
+      false
+    )?;
+
+    let image_preview_path = PathBuf::from(&preview_filename);
+    check_file_exists(&image_preview_path)?;
+
+    let preview_object_path = format!("{}_preview.webp", full_object_path);
+    maybe_image_preview_object_name = Some(preview_object_path);
+    maybe_image_preview_filename = Some(image_preview_path);
   }
 
   // ==================== UPLOAD TO BUCKET ==================== //
@@ -353,6 +371,17 @@ async fn process_job(downloader: &Downloader, job: &W2lTemplateUploadJobRecord) 
   downloader.bucket_client.upload_filename(
     &full_object_path_cached_faces,
     &cached_faces_path).await?;
+
+  // TODO: Fix this ugh.
+  if let Some(image_preview_filename) = maybe_image_preview_filename.as_deref() {
+    if let Some(image_preview_object_name) = maybe_image_preview_object_name.as_deref() {
+      info!("Uploading image preview...");
+      downloader.bucket_client.upload_filename_with_content_type(
+        &image_preview_object_name,
+        image_preview_filename,
+        "image/webp").await?;
+    }
+  }
 
   // TODO: Fix this ugh.
   if let Some(video_preview_filename) = maybe_video_preview_filename.as_deref() {
