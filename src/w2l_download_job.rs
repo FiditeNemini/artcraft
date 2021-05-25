@@ -23,6 +23,7 @@ use crate::job_queries::w2l_download_job_queries::query_w2l_template_upload_job_
 use crate::script_execution::google_drive_download_command::GoogleDriveDownloadCommand;
 use crate::util::anyhow_result::AnyhowResult;
 use crate::util::filesystem::check_directory_exists;
+use crate::util::filesystem::check_file_exists;
 use crate::util::random_token::random_token;
 use data_encoding::{HEXUPPER, HEXLOWER, HEXLOWER_PERMISSIVE};
 use log::{warn, info};
@@ -235,8 +236,6 @@ async fn process_job(downloader: &Downloader, job: &W2lTemplateUploadJobRecord) 
   let download_filename = downloader.google_drive_downloader
     .download_file(&download_url, &temp_dir).await?;
 
-  let file_path = PathBuf::from(&download_filename);
-
   // ==================== PROCESS FACES ==================== //
 
   let cached_faces_filename = format!("{}_detected_faces.pickle", &download_filename);
@@ -249,8 +248,15 @@ async fn process_job(downloader: &Downloader, job: &W2lTemplateUploadJobRecord) 
     is_image,
     spawn_process)?;
 
-
   // ==================== UPLOAD TO BUCKET ==================== //
+
+  let video_or_image_path = PathBuf::from(&download_filename);
+  let cached_faces_path = &PathBuf::from(&cached_faces_filename);
+
+  info!("Checking that both files exist (original source + cached faces) ...");
+
+  check_file_exists(&video_or_image_path)?;
+  check_file_exists(&cached_faces_path)?;
 
   let private_bucket_hash = get_file_hash(&download_filename)?;
 
@@ -269,12 +275,14 @@ async fn process_job(downloader: &Downloader, job: &W2lTemplateUploadJobRecord) 
   info!("Cached faces destination bucket path: {}", full_object_path_cached_faces);
 
   info!("Uploading image/video...");
-  downloader.bucket_client.upload_filename(&full_object_path, &file_path).await?;
-
-  let cached_faces_path = PathBuf::from(&cached_faces_filename);
+  downloader.bucket_client.upload_filename(
+    &full_object_path,
+    &video_or_image_path).await?;
 
   info!("Uploading cached faces...");
-  downloader.bucket_client.upload_filename(&full_object_path_cached_faces, &cached_faces_path).await?;
+  downloader.bucket_client.upload_filename(
+    &full_object_path_cached_faces,
+    &cached_faces_path).await?;
 
   // TODO:
   let template_type = "image";
