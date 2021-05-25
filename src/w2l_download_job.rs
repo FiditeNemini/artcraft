@@ -319,6 +319,7 @@ async fn process_job(downloader: &Downloader, job: &W2lTemplateUploadJobRecord) 
       &preview_filename,
       500,
       500,
+      true,
       false
     )?;
 
@@ -356,9 +357,10 @@ async fn process_job(downloader: &Downloader, job: &W2lTemplateUploadJobRecord) 
   if let Some(video_preview_filename) = maybe_video_preview_filename.as_deref() {
     if let Some(video_preview_object_name) = maybe_video_preview_object_name.as_deref() {
       info!("Uploading video preview...");
-      downloader.bucket_client.upload_filename(
+      downloader.bucket_client.upload_filename_with_content_type(
         &video_preview_object_name,
-        video_preview_filename).await?;
+        video_preview_filename,
+        "image/webp").await?;
     }
   }
 

@@ -20,6 +20,7 @@ impl FfmpegGeneratePreviewVideoCommand {
                  output_video_filename: &str,
                  output_width: u32,
                  output_height: u32,
+                 looping: bool,
                  spawn_process: bool) -> AnyhowResult<()>
   {
     let mut command = String::new();
@@ -36,6 +37,11 @@ impl FfmpegGeneratePreviewVideoCommand {
     command.push_str(" -t 00:00:03 ");
     command.push_str(" -s ");
     command.push_str(&dimensions);
+
+    if looping {
+      command.push_str(" -loop 0 "); // NB: -loop 1 disables looping
+    }
+
     command.push_str(" "); // NB: no arg flag for output filename
     command.push_str(&output_video_filename);
 

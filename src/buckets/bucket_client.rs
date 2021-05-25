@@ -78,6 +78,24 @@ impl BucketClient {
     Ok(())
   }
 
+  pub async fn upload_file_with_content_type(&self, object_name: &str, bytes: &[u8], content_type: &str) -> anyhow::Result<()> {
+    info!("Filename for bucket: {}", object_name);
+
+    let object_name = self.get_rooted_object_name(object_name);
+    info!("Rooted filename for bucket: {}", object_name);
+
+    let (body_bytes, code) = self.bucket.put_object_with_content_type(&object_name, bytes, content_type).await?;
+
+    info!("upload code: {}", code);
+
+    if code != 200 {
+      let body = String::from_utf8(body_bytes)?;
+      warn!("upload body: {}", body);
+    }
+
+    Ok(())
+  }
+
   // NB: New version has blocking client rather than blocking calls.
   // pub fn upload_file_blocking(&self, object_name: &str, bytes: &[u8]) -> anyhow::Result<()> {
   //   info!("Filename for bucket: {}", object_name);
@@ -110,6 +128,17 @@ impl BucketClient {
     info!("Uploading...");
 
     self.upload_file(object_name, &buffer).await
+  }
+
+  pub async fn upload_filename_with_content_type(&self, object_name: &str, filename: &Path, content_type: &str) -> anyhow::Result<()> {
+    // TODO: does a newer version of this crate handle streaming/buffering file contents?
+    let mut file = File::open(filename).await?;
+    let mut buffer : Vec<u8> = Vec::new();
+    file.read_to_end(&mut buffer).await?;
+
+    info!("Uploading with content type...");
+
+    self.upload_file_with_content_type(object_name, &buffer, content_type).await
   }
 
   // NB: New version has blocking client rather than blocking calls.
