@@ -24,7 +24,8 @@ impl ImagemagickGeneratePreviewImageCommand {
   {
     let mut command = String::new();
 
-    let dimensions = format!("{}x{}", output_width, output_height);
+    // NB: `\!` ignores aspect ratio preservation
+    let dimensions = format!("{}x{}\\!", output_width, output_height);
 
     //     magick wizard.png -quality 50 -define webp:lossless=true wizard.webp
     command.push_str("echo 'test'");
@@ -32,7 +33,7 @@ impl ImagemagickGeneratePreviewImageCommand {
     //command.push_str("magick");
     command.push_str("convert ");
     command.push_str(&input_image_filename);
-    command.push_str(" -size ");
+    command.push_str(" -resize ");
     command.push_str(&dimensions);
     command.push_str(" -quality 50 ");
     command.push_str(" -define webp:loseless=false ");

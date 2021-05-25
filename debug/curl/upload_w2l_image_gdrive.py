@@ -37,6 +37,8 @@ cookies = { 'session': session_cookie }
 # elon_integration_test.jpg
 download_url = 'https://drive.google.com/file/d/1yoBSb6nwFUZVI4CD-nM2BSofGdBjC8Nn/view?usp=sharing'
 
+#download_url = 'https://i.imgur.com/...'
+
 payload = {
   'idempotency_token': str(uuid.uuid4()),
   'title': 'this is a new image template',
