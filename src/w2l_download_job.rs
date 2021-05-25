@@ -218,11 +218,12 @@ async fn process_jobs(downloader: &Downloader, jobs: Vec<W2lTemplateUploadJobRec
 async fn process_job(downloader: &Downloader, job: &W2lTemplateUploadJobRecord) -> AnyhowResult<()> {
   // TODO: 1. Mark processing.
   // TODO: 2. Download. (DONE)
-  // TODO: 3. Process template with face detection
-  // TODO: 4. Take a screenshot/gif
-  // TODO: 5. Upload all (partially done).
-  // TODO: 6. Save record. (DONE)
-  // TODO: 7. Mark job done. (DONE)
+  // TODO: 3. Process template with face detection (DONE)
+  // TODO: 4. Determine if picture or video
+  // TODO: 5. Take a screenshot/gif
+  // TODO: 6. Upload all (partially done).
+  // TODO: 7. Save record. (DONE)
+  // TODO: 8. Mark job done. (DONE)
 
   let temp_dir = format!("temp_{}", job.id);
   let temp_dir = TempDir::new(&temp_dir)?;
