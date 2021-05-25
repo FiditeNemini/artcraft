@@ -140,6 +140,7 @@ class App extends React.Component<Props, State> {
             enableAlpha={this.state.enableAlpha}
             migrationMode={this.state.migrationMode}
             setMigrationModeCallback={this.setMigrationMode}
+            sessionState={this.state.sessionState}
             />
 
         <div className="migrationComponentWrapper">
