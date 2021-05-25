@@ -9,6 +9,11 @@ use std::sync::Arc;
 const ALPHA_COOKIE_NAME : &'static str = "enable-alpha";
 const CONTENT_TYPE : &'static str = "text/html; charset=utf-8";
 
+const ENABLE_LINK : &'static str = "<a href=\"/alpha?enable=true\">enable</a>";
+const DISABLE_LINK : &'static str = "<a href=\"/alpha?enable=false\">disable</a>";
+const STATUS_LINK : &'static str = "<a href=\"/alpha\">status</a>";
+
+
 #[derive(Deserialize)]
 struct QueryFields {
   enable: Option<bool>,
@@ -34,20 +39,22 @@ pub async fn enable_alpha(http_request: HttpRequest,
 
       HttpResponse::build(StatusCode::OK)
         .content_type(CONTENT_TYPE)
-        .body(format!("<h1>use ?enable={{true, false}}; current `{}` cookie state = {}</h1>",
-                      ALPHA_COOKIE_NAME, cookie_exists))
+        .body(format!("<h1>Alpha mode.</h1><h2>Current `{}` cookie state = {}</h2> {} | {} | {}",
+                      ALPHA_COOKIE_NAME, cookie_exists, ENABLE_LINK, DISABLE_LINK, STATUS_LINK))
     }
     Some(true) => {
       HttpResponse::build(StatusCode::OK)
         .content_type(CONTENT_TYPE)
         .cookie(cookie)
-        .body(format!("<h1>?enable=true; setting `{}` cookie</h1>", ALPHA_COOKIE_NAME))
+        .body(format!("<h1>Alpha mode</h1><h2>setting `{}` cookie</h2> {} | {} | {}",
+                      ALPHA_COOKIE_NAME, ENABLE_LINK, DISABLE_LINK, STATUS_LINK))
     }
     Some(false) => {
       HttpResponse::build(StatusCode::OK)
         .content_type(CONTENT_TYPE)
         .del_cookie(&cookie)
-        .body(format!("<h1>?enable=false; unsetting `{}` mode cookie</h1>", ALPHA_COOKIE_NAME))
+        .body(format!("<h1>Alpha mode</h1><h2>unsetting `{}` cookie</h2> {} | {} | {}",
+                      ALPHA_COOKIE_NAME, ENABLE_LINK, DISABLE_LINK, STATUS_LINK))
     }
   }
 }
