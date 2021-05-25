@@ -4,6 +4,7 @@ import './App.scss';
 import React from 'react';
 import { NewOldVocodesSwitch } from './migration/NewOldVocodesSwitch';
 import { OldVocodesContainer } from './migration/OldVocodesContainer';
+import { NewVocodesContainer } from './migration/NewVocodesContainer';
 
 enum MigrationMode {
   NEW_VOCODES,
@@ -50,6 +51,12 @@ class App extends React.Component<Props, State> {
 
     switch (this.state.migrationMode) {
       case MigrationMode.NEW_VOCODES:
+        innerComponent = (
+          <div>
+            <NewVocodesContainer
+              />
+          </div>
+        );
         break;
 
       case MigrationMode.OLD_VOCODES:
@@ -72,8 +79,9 @@ class App extends React.Component<Props, State> {
             setMigrationModeCallback={this.setMigrationMode}
             />
 
-        {innerComponent}
-
+        <div className="migrationComponentWrapper">
+          {innerComponent}
+        </div>
 
         </div>
       </div>
