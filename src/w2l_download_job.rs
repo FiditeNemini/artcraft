@@ -32,7 +32,7 @@ use log::{warn, info};
 use ring::digest::{Context, Digest, SHA256};
 use sqlx::MySqlPool;
 use sqlx::mysql::MySqlPoolOptions;
-use std::fs::File;
+use std::fs::{File, metadata};
 use std::io::{BufReader, Read};
 use std::path::{PathBuf, Path};
 use std::process::Command;
@@ -234,6 +234,7 @@ struct FileMetadata {
   pub num_frames: u64,
   pub fps: Option<f32>,
   pub duration_millis: Option<u64>,
+  pub mimetype: Option<String>,
 }
 
 fn read_metadata_file(filename: &str) -> AnyhowResult<FileMetadata> {
@@ -366,9 +367,15 @@ async fn process_job(downloader: &Downloader, job: &W2lTemplateUploadJobRecord) 
   info!("Cached faces destination bucket path: {}", full_object_path_cached_faces);
 
   info!("Uploading image/video...");
-  downloader.bucket_client.upload_filename(
+
+  let original_mime_type = file_metadata.mimetype
+    .as_deref()
+    .unwrap_or("application/octet-stream");
+
+  downloader.bucket_client.upload_filename_with_content_type(
     &full_object_path,
-    &video_or_image_path).await?;
+    &video_or_image_path,
+    original_mime_type).await?;
 
   info!("Uploading cached faces...");
   downloader.bucket_client.upload_filename(
@@ -411,6 +418,7 @@ async fn process_job(downloader: &Downloader, job: &W2lTemplateUploadJobRecord) 
     &full_object_path_cached_faces,
     maybe_image_preview_object_name.as_deref(),
     maybe_video_preview_object_name.as_deref(),
+    file_metadata.mimetype.as_deref(),
     file_metadata.width,
     file_metadata.height,
     file_metadata.num_frames,

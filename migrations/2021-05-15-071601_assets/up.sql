@@ -186,6 +186,7 @@ CREATE TABLE w2l_templates (
   original_filename CHAR(255) DEFAULT NULL,
 
   -- Dimensions and other characteristics
+  mime_type VARCHAR(32) NOT NULL DEFAULT '',
   frame_width INT(10) NOT NULL DEFAULT 0,
   frame_height INT(10) NOT NULL DEFAULT 0,
   frame_count INT(10) NOT NULL DEFAULT 0,

@@ -10,6 +10,7 @@ import tempfile
 import shutil
 import datetime
 import pickle
+import magic
 from PIL import Image
 
 """
@@ -337,11 +338,14 @@ def main(tempdir):
 
     print('Done detecting faces!', flush=True)
 
+    mime_type = magic.from_file(args.image_or_video_filename, mime=True)
+
     metadata = {
         'is_video': is_video,
         'width': frame_w,
         'height': frame_h,
         'num_frames': len(full_frames),
+        'mimetype': mime_type,
     }
 
     if is_video:

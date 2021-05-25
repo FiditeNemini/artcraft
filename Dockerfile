@@ -16,6 +16,7 @@ RUN apt-get update \
         libc++-7-dev \
         libffi-dev \
         libgcc-7-dev \
+        libmagic1 \
         libsm6 \
         libsndfile1 \
         libssl-dev \
