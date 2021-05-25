@@ -271,7 +271,9 @@ def main(tempdir):
     is_video = False
     frame_w = 0
     frame_h = 0
-    fps = 0
+    frame_count = 0
+    fps = 0.0
+    duration_millis = 0.0
 
     if not os.path.isfile(args.image_or_video_filename):
         raise ValueError('--image_or_video_filename argument must be a valid path to video/image file')
@@ -282,6 +284,7 @@ def main(tempdir):
         fps = args.fps
         frame_h, frame_w = full_frames[0].shape[:-1]
         is_video = False
+        frame_count = len(full_frames)
 
     else:
         video_stream = cv2.VideoCapture(args.image_or_video_filename)
@@ -313,8 +316,12 @@ def main(tempdir):
 
         if len(full_frames) < 2:
             is_video = False
+            frame_count = len(full_frames)
         else:
             is_video = True
+            frame_count = len(full_frames)
+            duration_seconds = frame_count / fps
+            duration_millis = int(duration_seconds * 1000)
 
     print("Number of frames available for inference: "+str(len(full_frames)), flush=True)
     print("Frame dimensions: {}x{}".format(frame_w, frame_h), flush=True)
@@ -339,6 +346,7 @@ def main(tempdir):
 
     if is_video:
         metadata['fps'] = fps
+        metadata['duration_millis'] = duration_millis
 
     with open(args.output_metadata_filename, 'w') as json_file:
         json.dump(metadata, json_file)

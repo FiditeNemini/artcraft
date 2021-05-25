@@ -227,6 +227,7 @@ struct FileMetadata {
   pub height: u32,
   pub num_frames: u64,
   pub fps: Option<f32>,
+  pub duration_millis: Option<u64>,
 }
 
 fn read_metadata_file(filename: &str) -> AnyhowResult<FileMetadata> {
@@ -381,7 +382,8 @@ async fn process_job(downloader: &Downloader, job: &W2lTemplateUploadJobRecord) 
     file_metadata.width,
     file_metadata.height,
     file_metadata.num_frames,
-    file_metadata.fps.unwrap_or(0.0f32))
+    file_metadata.fps.unwrap_or(0.0f32),
+    file_metadata.duration_millis.unwrap_or(0))
     .await?;
 
   info!("Job {} complete success! Downloaded, processed, and uploaded. Saved model record: {}",

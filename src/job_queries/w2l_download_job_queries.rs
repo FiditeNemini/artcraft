@@ -120,7 +120,8 @@ pub async fn insert_w2l_template(pool: &MySqlPool,
                                  frame_width: u32,
                                  frame_height: u32,
                                  frame_count: u64,
-                                 fps: f32)
+                                 fps: f32,
+                                 duration_millis: u64)
   -> AnyhowResult<u64>
 {
   let model_token = random_token(32);
@@ -149,7 +150,8 @@ SET
   frame_width = ?,
   frame_height = ?,
   frame_count = ?,
-  fps = ?
+  fps = ?,
+  duration_millis = ?
         "#,
       model_token,
       template_type,
@@ -166,7 +168,8 @@ SET
       frame_width,
       frame_height,
       frame_count,
-      fps
+      fps,
+      duration_millis
     )
     .execute(pool)
     .await;
