@@ -43,12 +43,16 @@ use crate::script_execution::ffmpeg_generate_preview_video_command::FfmpegGenera
 use crate::script_execution::ffmpeg_generate_preview_image_command::FfmpegGeneratePreviewImageCommand;
 use crate::script_execution::imagemagick_generate_preview_image_command::ImagemagickGeneratePreviewImageCommand;
 
-// Buckets
+// Buckets (shared config)
 const ENV_ACCESS_KEY : &'static str = "ACCESS_KEY";
 const ENV_SECRET_KEY : &'static str = "SECRET_KEY";
 const ENV_REGION_NAME : &'static str = "REGION_NAME";
-const ENV_BUCKET_NAME : &'static str = "W2L_DOWNLOAD_BUCKET_NAME";
 const ENV_BUCKET_ROOT : &'static str = "W2L_DOWNLOAD_BUCKET_ROOT";
+
+// Buckets (private data)
+const ENV_PRIVATE_BUCKET_NAME : &'static str = "W2L_PRIVATE_DOWNLOAD_BUCKET_NAME";
+// Buckets (public data)
+const ENV_PUBLIC_BUCKET_NAME : &'static str = "W2L_PUBLIC_DOWNLOAD_BUCKET_NAME";
 
 // Python code
 const ENV_CODE_DIRECTORY : &'static str = "W2L_CODE_DIRECTORY";
@@ -62,15 +66,20 @@ const DEFAULT_TEMP_DIR: &'static str = "/tmp";
 struct Downloader {
   pub download_temp_directory: PathBuf,
   pub mysql_pool: MySqlPool,
-  pub bucket_client: BucketClient,
+
+  pub private_bucket_client: BucketClient,
+  pub public_bucket_client: BucketClient,
+
   pub google_drive_downloader: GoogleDriveDownloadCommand,
   pub w2l_processor: Wav2LipPreprocessClient,
   pub ffmpeg_image_preview_generator: FfmpegGeneratePreviewImageCommand,
   pub ffmpeg_video_preview_generator: FfmpegGeneratePreviewVideoCommand,
   pub imagemagick_image_preview_generator: ImagemagickGeneratePreviewImageCommand,
+
   // Command to run
   pub download_script: String,
-  // Root to store W2L templates
+
+  // Root to store W2L templates (public and private)
   pub bucket_root_w2l_template_uploads: String,
 }
 
@@ -89,18 +98,29 @@ async fn main() -> AnyhowResult<()> {
 
   info!("Hostname: {}", &server_hostname);
 
-  // Bucket stuff
+  // Bucket stuff (shared)
   let access_key = easyenv::get_env_string_required(ENV_ACCESS_KEY)?;
   let secret_key = easyenv::get_env_string_required(ENV_SECRET_KEY)?;
   let region_name = easyenv::get_env_string_required(ENV_REGION_NAME)?;
-  let bucket_name = easyenv::get_env_string_required(ENV_BUCKET_NAME)?;
   let bucket_root = easyenv::get_env_string_required(ENV_BUCKET_ROOT)?;
 
-  let bucket_client = BucketClient::create(
+  // Private and Public Buckets
+  let private_bucket_name = easyenv::get_env_string_required(ENV_PRIVATE_BUCKET_NAME)?;
+  let public_bucket_name = easyenv::get_env_string_required(ENV_PUBLIC_BUCKET_NAME)?;
+
+  let private_bucket_client = BucketClient::create(
     &access_key,
     &secret_key,
     &region_name,
-    &bucket_name,
+    &private_bucket_name,
+    None,
+  )?;
+
+  let public_bucket_client = BucketClient::create(
+    &access_key,
+    &secret_key,
+    &region_name,
+    &public_bucket_name,
     None,
   )?;
 
@@ -143,7 +163,8 @@ async fn main() -> AnyhowResult<()> {
   let downloader = Downloader {
     download_temp_directory: temp_directory,
     mysql_pool,
-    bucket_client,
+    public_bucket_client,
+    private_bucket_client,
     download_script,
     google_drive_downloader,
     ffmpeg_image_preview_generator: FfmpegGeneratePreviewImageCommand {},
@@ -357,7 +378,7 @@ async fn process_job(downloader: &Downloader, job: &W2lTemplateUploadJobRecord) 
     maybe_image_preview_filename = Some(image_preview_path);
   }
 
-  // ==================== UPLOAD TO BUCKET ==================== //
+  // ==================== UPLOAD TO BUCKETS ==================== //
 
   info!("Image/video destination bucket path: {}", full_object_path);
 
@@ -372,13 +393,18 @@ async fn process_job(downloader: &Downloader, job: &W2lTemplateUploadJobRecord) 
     .as_deref()
     .unwrap_or("application/octet-stream");
 
-  downloader.bucket_client.upload_filename_with_content_type(
+  downloader.private_bucket_client.upload_filename_with_content_type(
+    &full_object_path,
+    &video_or_image_path,
+    original_mime_type).await?;
+
+  downloader.public_bucket_client.upload_filename_with_content_type(
     &full_object_path,
     &video_or_image_path,
     original_mime_type).await?;
 
   info!("Uploading cached faces...");
-  downloader.bucket_client.upload_filename(
+  downloader.private_bucket_client.upload_filename(
     &full_object_path_cached_faces,
     &cached_faces_path).await?;
 
@@ -386,7 +412,13 @@ async fn process_job(downloader: &Downloader, job: &W2lTemplateUploadJobRecord) 
   if let Some(image_preview_filename) = maybe_image_preview_filename.as_deref() {
     if let Some(image_preview_object_name) = maybe_image_preview_object_name.as_deref() {
       info!("Uploading image preview...");
-      downloader.bucket_client.upload_filename_with_content_type(
+      downloader.private_bucket_client.upload_filename_with_content_type(
+        &image_preview_object_name,
+        image_preview_filename,
+        "image/webp").await?;
+
+      info!("Uploading image preview...");
+      downloader.public_bucket_client.upload_filename_with_content_type(
         &image_preview_object_name,
         image_preview_filename,
         "image/webp").await?;
@@ -397,7 +429,13 @@ async fn process_job(downloader: &Downloader, job: &W2lTemplateUploadJobRecord) 
   if let Some(video_preview_filename) = maybe_video_preview_filename.as_deref() {
     if let Some(video_preview_object_name) = maybe_video_preview_object_name.as_deref() {
       info!("Uploading video preview...");
-      downloader.bucket_client.upload_filename_with_content_type(
+      downloader.private_bucket_client.upload_filename_with_content_type(
+        &video_preview_object_name,
+        video_preview_filename,
+        "image/webp").await?;
+
+      info!("Uploading video preview...");
+      downloader.public_bucket_client.upload_filename_with_content_type(
         &video_preview_object_name,
         video_preview_filename,
         "image/webp").await?;
