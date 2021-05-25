@@ -5,7 +5,7 @@ import { Speaker } from '../../model/Speakers';
 import { createColorMap, linearScale } from "@colormap/core";
 import { MAGMA } from "@colormap/presets";
 import { Spectrogram } from './extras/Spectrogram';
-import { SpectrogramMode } from '../../App';
+import { SpectrogramMode } from '../../migration/OldVocodesContainer';
 import { Utterance } from '../../model/utterance';
 
 interface Props {

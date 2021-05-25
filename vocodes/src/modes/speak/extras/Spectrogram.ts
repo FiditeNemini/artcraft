@@ -1,5 +1,5 @@
 import { ColorMap, createColorMap, linearScale, RGBColor } from "@colormap/core";
-import { SpectrogramMode } from "../../../App";
+import { SpectrogramMode } from "../../../migration/OldVocodesContainer";
 import { VIRIDIS, INFERNO, MAGMA, BLACK_WHITE, CIVIDIS, PLASMA,  } from "@colormap/presets";
 import { BONE } from "../../../extra_colormaps/colormap-bone";
 import { COPPER } from "../../../extra_colormaps/colormap-copper";

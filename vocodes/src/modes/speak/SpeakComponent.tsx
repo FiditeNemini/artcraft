@@ -6,7 +6,7 @@ import { SpeakerDropdown } from './dropdowns/SpeakerDropdown';
 import { SpeakerInfo } from './extras/SpeakerInfo';
 import { Spectrogram } from './extras/Spectrogram';
 import { SpectrogramComponent } from './extras/SpectrogramComponent';
-import { SpectrogramMode } from '../../App';
+import { SpectrogramMode } from '../../migration/OldVocodesContainer';
 import { StatusText } from './StatusText';
 import { Utterance } from '../../model/utterance';
 import { getRandomInt } from '../../Utils';
