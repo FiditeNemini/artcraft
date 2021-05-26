@@ -26,11 +26,14 @@ use sqlx::error::Error::Database;
 use sqlx::mysql::MySqlDatabaseError;
 use std::sync::Arc;
 use chrono::{DateTime, Utc};
+use md5::{Md5, Digest};
 
 #[derive(Serialize)]
 pub struct UserProfileRecord {
   pub user_token: String,
   pub username: String,
+  /// DO NOT LEAK THE EMAIL!
+  pub email_address: String,
   pub display_name: String,
   pub profile_markdown: String,
   pub profile_rendered_html: String,
@@ -46,10 +49,37 @@ pub struct UserProfileRecord {
   pub created_at: DateTime<Utc>,
 }
 
+/// This changes the record:
+///  - removes email address
+///  - adds gravatar_hash
+///  - changes banned to bool
+///  - changes hide_results_preference to bool
+///  - changes disable_gravatar to bool
+#[derive(Serialize)]
+pub struct UserProfileRecordForResponse {
+  pub user_token: String,
+  pub username: String,
+  pub display_name: String,
+  /// Gravatar hash was added
+  pub gravatar_hash: String,
+  pub profile_markdown: String,
+  pub profile_rendered_html: String,
+  pub user_role_slug: String,
+  pub banned: bool,
+  pub dark_mode: String,
+  pub avatar_public_bucket_hash: Option<String>,
+  pub disable_gravatar: bool,
+  pub hide_results_preference: bool,
+  pub discord_username: Option<String>,
+  pub twitch_username: Option<String>,
+  pub twitter_username: Option<String>,
+  pub created_at: DateTime<Utc>,
+}
+
 #[derive(Serialize)]
 pub struct ProfileSuccessResponse {
   pub success: bool,
-  pub user: Option<UserProfileRecord>,
+  pub user: Option<UserProfileRecordForResponse>,
 }
 
 #[derive(Serialize)]
@@ -113,6 +143,7 @@ pub async fn get_profile_handler(
 SELECT
     users.token as user_token,
     username,
+    email_address,
     display_name,
     profile_markdown,
     profile_rendered_html,
@@ -135,7 +166,7 @@ AND users.deleted_at IS NULL
     .fetch_one(&server_state.mysql_pool)
     .await; // TODO: This will return error if it doesn't exist
 
-  let profile_record = match maybe_profile_record {
+  let profile_record : UserProfileRecord = match maybe_profile_record {
     Ok(profile_record) => profile_record,
     Err(err) => {
       match err {
@@ -151,9 +182,35 @@ AND users.deleted_at IS NULL
     }
   };
 
+  let email = profile_record.email_address.trim().to_lowercase();
+
+  let mut hasher = Md5::new();
+  hasher.update(email);
+  let hash = hasher.finalize();
+  let gravatar_hash = format!("{:x}", hash);
+
+  let profile_for_response = UserProfileRecordForResponse {
+    user_token: profile_record.user_token.clone(),
+    username: profile_record.username.clone(),
+    display_name: profile_record.display_name.clone(),
+    gravatar_hash: gravatar_hash,
+    profile_markdown: profile_record.profile_markdown.clone(),
+    profile_rendered_html: profile_record.profile_rendered_html.clone(),
+    user_role_slug: profile_record.user_role_slug.clone(),
+    banned: if profile_record.banned == 0 { false } else { true },
+    dark_mode: profile_record.dark_mode.clone(),
+    avatar_public_bucket_hash: profile_record.avatar_public_bucket_hash.clone(),
+    disable_gravatar: if profile_record.disable_gravatar == 0 { false } else { true },
+    hide_results_preference: if profile_record.hide_results_preference == 0 { false } else { true },
+    discord_username: None,
+    twitch_username: None,
+    twitter_username: None,
+    created_at: profile_record.created_at.clone(),
+  };
+
   let response = ProfileSuccessResponse {
     success: true,
-    user: Some(profile_record),
+    user: Some(profile_for_response),
   };
 
   let body = serde_json::to_string(&response)
