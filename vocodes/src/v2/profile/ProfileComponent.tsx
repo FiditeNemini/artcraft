@@ -3,10 +3,29 @@ import { ApiConfig } from '../../v1/api/ApiConfig';
 import { SessionWrapper } from '../../session/SessionWrapper';
 import { RouteProps } from 'react-router-dom';
 
-enum FieldTriState {
-  EMPTY_FALSE,
-  FALSE,
-  TRUE,
+interface ProfileResponsePayload {
+  success: boolean,
+  error_reason?: string,
+  user?: UserPayload,
+}
+
+interface UserPayload {
+  user_token: string,
+  username: string,
+  display_name: string,
+  gravatar_hash: string,
+  profile_markdown: string,
+  profile_rendered_html: string,
+  user_role_slug: string,
+  banned: boolean,
+  dark_mode: string,
+  avatar_public_bucket_hash: string,
+  disable_gravatar: boolean,
+  hide_results_preference: boolean,
+  discord_username?: string,
+  twitch_username?: string,
+  twitter_username?: string,
+  created_at: string,
 }
 
 interface Props {
@@ -16,7 +35,18 @@ interface Props {
 }
 
 interface State {
+  user?: UserPayload,
 }
+
+/*
+{"success":true,"user":
+  {"user_token":"3MJ09S2TQZ7CC5F","username":"echelon",
+  "display_name":"echelon","profile_markdown":"","profile_rendered_html":"",
+  "user_role_slug":"new-user","banned":0,"dark_mode":"light-mode",
+  "avatar_public_bucket_hash":null,"disable_gravatar":0,"hide_results_preference":0,
+  "discord_username":null,"twitch_username":null,"twitter_username":null,
+  "created_at":"2021-05-25T06:38:46Z"}}
+*/
 
 class ProfileComponent extends React.Component<Props, State> {
 
@@ -41,10 +71,20 @@ class ProfileComponent extends React.Component<Props, State> {
     .then(res => res.json())
     .then(res => {
       console.log('response', res)
-      if (res.success) {
-        console.log('success');
+
+      const profileResponse : ProfileResponsePayload = res;
+
+      if (profileResponse === undefined) {
+        return; // Endpoint error?
+      }
+
+      if (!profileResponse.success) {
         return;
       }
+
+      this.setState({
+        user: profileResponse.user
+      });
     })
     .catch(e => {
       //this.props.onSpeakErrorCallback();
@@ -57,9 +97,24 @@ class ProfileComponent extends React.Component<Props, State> {
   }
 
   public render() {
+    if (this.state.user === undefined) {
+      return (
+        <div></div>
+      );
+    }
+
+    let gravatar = <span />;
+    if (this.state.user!.gravatar_hash !== undefined) {
+      const hash = this.state.user!.gravatar_hash;
+      const size = 50;
+      const gravatarUrl = `https://www.gravatar.com/avatar/${hash}?s=${size}`
+      gravatar = <img alt="gravatar" src={gravatarUrl} />
+    }
+
     return (
       <div>
-        <h1 className="title is-1"> Profile </h1>
+        <h1 className="title is-1"> {gravatar} {this.state.user!.display_name} </h1>
+        <p>Profiles are a work in progress.</p>
       </div>
     )
   }
