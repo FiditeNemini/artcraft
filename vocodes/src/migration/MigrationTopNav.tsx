@@ -19,10 +19,7 @@ function MigrationTopNav(props: Props) {
   return (
     <nav>
       <MigrationTopNav_VersionSwitch
-        sessionWrapper={props.sessionWrapper}
         enableAlpha={props.enableAlpha}
-        migrationMode={props.migrationMode}
-        setMigrationModeCallback={props.setMigrationModeCallback}
         />
       <MigrationTopNav_Session
         sessionWrapper={props.sessionWrapper}

@@ -2,10 +2,11 @@ import 'bulma/css/bulma.css'
 import './App.scss';
 
 import React from 'react';
-import { MigrationTopNav } from './migration/MigrationTopNav';
-import { OldVocodesContainer } from './v1/OldVocodesContainer';
-import { NewVocodesContainer } from './v2/NewVocodesContainer';
 import { ApiConfig } from './v1/api/ApiConfig';
+import { BrowserRouter, Route, Link, Switch } from "react-router-dom";
+import { MigrationTopNav } from './migration/MigrationTopNav';
+import { NewVocodesContainer } from './v2/NewVocodesContainer';
+import { OldVocodesContainer } from './v1/OldVocodesContainer';
 import { SessionStateResponse } from './v1/api/SessionState';
 import { SessionWrapper } from './session/SessionWrapper';
 
@@ -111,46 +112,36 @@ class App extends React.Component<Props, State> {
   }
 
   public render() {
-    let innerComponent = <div />;
-
-    switch (this.state.migrationMode) {
-      case MigrationMode.NEW_VOCODES:
-        innerComponent = (
-          <div>
-            {/*<NewVocodesContainer
-              sessionState={this.state.sessionState}
-            />*/}
-          </div>
-        );
-        break;
-
-      case MigrationMode.OLD_VOCODES:
-        innerComponent = (
-          <div>
-            <OldVocodesContainer
-              enableSpectrograms={this.props.enableSpectrograms}
-              />
-          </div>
-        );
-        break;
-    }
 
     return (
-      <div id="main" className="mainwrap">
-        <div id="viewable">
-          <MigrationTopNav
-            enableAlpha={this.state.enableAlpha}
-            migrationMode={this.state.migrationMode}
-            setMigrationModeCallback={this.setMigrationMode}
-            sessionWrapper={this.state.sessionWrapper}
-            />
+      <BrowserRouter>
+        <div id="main" className="mainwrap">
+          <div id="viewable">
+            <MigrationTopNav
+              enableAlpha={this.state.enableAlpha}
+              migrationMode={this.state.migrationMode}
+              setMigrationModeCallback={this.setMigrationMode}
+              sessionWrapper={this.state.sessionWrapper}
+              />
 
-          <div className="migrationComponentWrapper">
-            {innerComponent}
+            <div className="migrationComponentWrapper">
+
+              <Switch>
+                <Route path="/old">
+                  <OldVocodesContainer
+                    enableSpectrograms={this.props.enableSpectrograms}
+                    />
+                </Route>
+                <Route path="/">
+                  <h1>New Vocodes</h1>
+                </Route>
+              </Switch>
+
+            </div>
+
           </div>
-
         </div>
-      </div>
+      </BrowserRouter>
     )
   }
 }
