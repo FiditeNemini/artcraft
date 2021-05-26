@@ -13,6 +13,7 @@ import { ProfileDataComponent } from './profile_data/ProfileDataComponent';
 
 interface Props {
   sessionWrapper: SessionWrapper,
+  querySessionAction: () => void,
 }
 
 interface State {
@@ -50,8 +51,8 @@ class NewVocodesContainer extends React.Component<Props, State> {
 
             <Route path="/login">
               <LoginComponent 
-                querySessionCallback={()=>{}}
                 sessionWrapper={this.props.sessionWrapper}
+                querySessionAction={this.props.querySessionAction}
               />
             </Route>
 

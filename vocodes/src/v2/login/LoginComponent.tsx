@@ -11,8 +11,7 @@ enum FieldTriState {
 
 interface Props {
   sessionWrapper: SessionWrapper,
-  querySessionCallback : () => void,
-  switchModeCallback?: (mode: Mode) => void,
+  querySessionAction: () => void,
 }
 
 interface State {
@@ -89,12 +88,7 @@ class LoginComponent extends React.Component<Props, State> {
       console.log('login response', res)
       if (res.success) {
         console.log('querying new session');
-        this.props.querySessionCallback();
-
-        if (this.props.switchModeCallback !== undefined) {
-          this.props.switchModeCallback(Mode.SPEAK_MODE);
-        }
-        return;
+        this.props.querySessionAction();
       }
     })
     .catch(e => {

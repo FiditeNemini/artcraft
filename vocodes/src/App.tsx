@@ -7,7 +7,7 @@ import { BrowserRouter, Route, Link, Switch } from "react-router-dom";
 import { MigrationTopNav } from './migration/MigrationTopNav';
 import { NewVocodesContainer } from './v2/NewVocodesContainer';
 import { OldVocodesContainer } from './v1/OldVocodesContainer';
-import { SessionStateResponse } from './v1/api/SessionState';
+import { SessionStateResponse } from './session/SessionState';
 import { SessionWrapper } from './session/SessionWrapper';
 
 enum MigrationMode {
@@ -134,6 +134,7 @@ class App extends React.Component<Props, State> {
                 <Route path="/">
                   <NewVocodesContainer
                     sessionWrapper={this.state.sessionWrapper}
+                    querySessionAction={this.querySession}
                     />
                 </Route>
               </Switch>
