@@ -13,7 +13,7 @@ interface UserPayload {
   user_token: string,
   username: string,
   display_name: string,
-  gravatar_hash: string,
+  email_gravatar_hash: string,
   profile_markdown: string,
   profile_rendered_html: string,
   user_role_slug: string,
@@ -37,16 +37,6 @@ interface Props {
 interface State {
   user?: UserPayload,
 }
-
-/*
-{"success":true,"user":
-  {"user_token":"3MJ09S2TQZ7CC5F","username":"echelon",
-  "display_name":"echelon","profile_markdown":"","profile_rendered_html":"",
-  "user_role_slug":"new-user","banned":0,"dark_mode":"light-mode",
-  "avatar_public_bucket_hash":null,"disable_gravatar":0,"hide_results_preference":0,
-  "discord_username":null,"twitch_username":null,"twitter_username":null,
-  "created_at":"2021-05-25T06:38:46Z"}}
-*/
 
 class ProfileComponent extends React.Component<Props, State> {
 
@@ -104,8 +94,8 @@ class ProfileComponent extends React.Component<Props, State> {
     }
 
     let gravatar = <span />;
-    if (this.state.user!.gravatar_hash !== undefined) {
-      const hash = this.state.user!.gravatar_hash;
+    if (this.state.user!.email_gravatar_hash !== undefined) {
+      const hash = this.state.user!.email_gravatar_hash;
       const size = 50;
       const gravatarUrl = `https://www.gravatar.com/avatar/${hash}?s=${size}`
       gravatar = <img alt="gravatar" src={gravatarUrl} />

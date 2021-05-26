@@ -14,9 +14,18 @@ function MigrationTopNav_Session(props: Props) {
 
   let loggedIn = props.sessionWrapper.isLoggedIn();
   let displayName = props.sessionWrapper.getDisplayName();
+  let gravatarHash = props.sessionWrapper.getEmailGravatarHash();
+  let gravatar = <span />;
 
-  if (displayName === 'undefined') {
+  if (displayName === undefined) {
     displayName = 'My Account';
+  }
+
+  if (gravatarHash !== undefined) {
+    const hash = gravatarHash;
+    const size = 15;
+    const gravatarUrl = `https://www.gravatar.com/avatar/${hash}?s=${size}`
+    gravatar = <img alt="gravatar" src={gravatarUrl} />
   }
 
   let sessionLink = <p />;
@@ -27,7 +36,7 @@ function MigrationTopNav_Session(props: Props) {
       <Link
         to={url}
         className="button is-alert is-inverted is-pulled-right"
-        >{displayName}</Link>
+        > {gravatar}&nbsp; {displayName}</Link>
     );
   } else {
     sessionLink = (

@@ -15,4 +15,5 @@ export interface UserInfo {
   user_token: string,
   username: string,
   display_name: string,
+  email_gravatar_hash: string,
 }

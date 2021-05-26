@@ -36,4 +36,8 @@ export class SessionWrapper {
   public getDisplayName() : string | undefined {
     return this.sessionStateResponse?.user?.display_name;
   }
+
+  public getEmailGravatarHash() : string | undefined {
+    return this.sessionStateResponse?.user?.email_gravatar_hash;
+  }
 }
