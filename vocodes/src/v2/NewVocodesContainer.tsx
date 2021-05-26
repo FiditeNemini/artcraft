@@ -1,5 +1,5 @@
 import React from 'react';
-import { NewTopNav } from '../v1/navigation/NewTopNav';
+import { NewTopNav } from './NewTopNav';
 import { LoginComponent } from './login/LoginComponent';
 import { SignupComponent } from './signup/SignupComponent';
 import { Switch, Route } from 'react-router-dom';
