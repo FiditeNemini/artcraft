@@ -32,8 +32,7 @@ use md5::{Md5, Digest};
 pub struct UserProfileRecord {
   pub user_token: String,
   pub username: String,
-  /// DO NOT LEAK THE EMAIL!
-  pub email_address: String,
+  pub email_gravatar_hash: String,
   pub display_name: String,
   pub profile_markdown: String,
   pub profile_rendered_html: String,
@@ -50,8 +49,6 @@ pub struct UserProfileRecord {
 }
 
 /// This changes the record:
-///  - removes email address
-///  - adds gravatar_hash
 ///  - changes banned to bool
 ///  - changes hide_results_preference to bool
 ///  - changes disable_gravatar to bool
@@ -60,8 +57,7 @@ pub struct UserProfileRecordForResponse {
   pub user_token: String,
   pub username: String,
   pub display_name: String,
-  /// Gravatar hash was added
-  pub gravatar_hash: String,
+  pub email_gravatar_hash: String,
   pub profile_markdown: String,
   pub profile_rendered_html: String,
   pub user_role_slug: String,
@@ -143,8 +139,8 @@ pub async fn get_profile_handler(
 SELECT
     users.token as user_token,
     username,
-    email_address,
     display_name,
+    email_gravatar_hash,
     profile_markdown,
     profile_rendered_html,
     user_role_slug,
@@ -182,18 +178,11 @@ AND users.deleted_at IS NULL
     }
   };
 
-  let email = profile_record.email_address.trim().to_lowercase();
-
-  let mut hasher = Md5::new();
-  hasher.update(email);
-  let hash = hasher.finalize();
-  let gravatar_hash = format!("{:x}", hash);
-
   let profile_for_response = UserProfileRecordForResponse {
     user_token: profile_record.user_token.clone(),
     username: profile_record.username.clone(),
     display_name: profile_record.display_name.clone(),
-    gravatar_hash: gravatar_hash,
+    email_gravatar_hash: profile_record.email_gravatar_hash.clone(),
     profile_markdown: profile_record.profile_markdown.clone(),
     profile_rendered_html: profile_record.profile_rendered_html.clone(),
     user_role_slug: profile_record.user_role_slug.clone(),

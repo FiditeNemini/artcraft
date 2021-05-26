@@ -19,6 +19,7 @@ use sqlx::error::DatabaseError;
 use sqlx::error::Error::Database;
 use sqlx::mysql::MySqlDatabaseError;
 use std::sync::Arc;
+use crate::util::email_to_gravatar::email_to_gravatar;
 
 const NEW_USER_ROLE: &'static str = "new-user";
 
@@ -110,10 +111,12 @@ pub async fn create_account_handler(
     }
   };
 
-  let username = request.username.to_lowercase();
-  let display_name = request.username.to_string();
+  let username = request.username.trim().to_lowercase();
+  let display_name = request.username.trim().to_string();
 
-  let email_address = request.email_address.to_lowercase();
+  let email_address = request.email_address.trim().to_lowercase();
+
+  let email_gravatar_hash = email_to_gravatar(&email_address);
 
   let profile_markdown = "";
   let profile_rendered_html = "";
@@ -127,6 +130,7 @@ INSERT INTO users (
   username,
   display_name,
   email_address,
+  email_gravatar_hash,
   profile_markdown,
   profile_rendered_html,
   user_role_slug,
@@ -135,12 +139,13 @@ INSERT INTO users (
   ip_address_last_login,
   ip_address_last_update
 )
-VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? )
+VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? )
         "#,
         user_token.to_string(),
         username,
         display_name,
         email_address,
+        email_gravatar_hash,
         profile_markdown,
         profile_rendered_html,
         NEW_USER_ROLE,

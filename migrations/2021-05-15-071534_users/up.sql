@@ -15,6 +15,9 @@ CREATE TABLE users (
   email_address VARCHAR(255) NOT NULL,
   email_confirmed BOOLEAN NOT NULL DEFAULT false,
 
+  -- Gravatar image hashes are precomputed.
+  email_gravatar_hash CHAR(32) NOT NULL,
+
   -- The profile of the user in markdown (user editable).
   profile_markdown TEXT NOT NULL,
 
