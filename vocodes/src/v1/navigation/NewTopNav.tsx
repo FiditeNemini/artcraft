@@ -1,13 +1,12 @@
 import React from 'react';
-import { NewMode } from '../../v2/NewVocodesContainer'
 import { SessionStateResponse } from '../api/SessionState';
+import { SessionWrapper } from '../../session/SessionWrapper';
 
 interface Props {
   sessionState?: SessionStateResponse,
-  mode: NewMode,
+  sessionWrapper: SessionWrapper,
   ///historyBadgeCount: number,
   //isHistoryCountBadgeVisible: boolean,
-  switchModeCallback: (mode: NewMode ) => void,
   logoutHandler: () => void,
 }
 
@@ -46,30 +45,30 @@ function NewTopNav(props: Props) {
     if (loggedIn) {
       loginManagement = (
         <span>
-          <a href="#profile" onClick={() => props.switchModeCallback(NewMode.MY_PROFILE_MODE)}>{displayName}</a>
-          <a href="#logout" onClick={() => props.logoutHandler()}>Log Out</a>
+          <a href="#profile" onClick={() => {}}>{displayName}</a>
+          <a href="#logout" onClick={() => {}}>Log Out</a>
         </span>
       );
       column1 = (
         <div className="column">
           <button 
             className="button is-link is-large is-inverted"
-            onClick={() => props.switchModeCallback(NewMode.MY_PROFILE_MODE)}
+            onClick={() => {}}
             >Firehose</button>
         </div>
       );
     } else {
       loginManagement = (
         <span>
-          <a href="#login" onClick={() => props.switchModeCallback(NewMode.LOGIN_MODE)}>Login</a>
-          <a href="#signup" onClick={() => props.switchModeCallback(NewMode.SIGNUP_MODE)} className="signup">Sign Up</a>
+          <a href="#login" onClick={() => {}}>Login</a>
+          <a href="#signup" onClick={() => {}} className="signup">Sign Up</a>
         </span>
       );
       column1 = (
         <div className="column">
           <button 
             className="button is-link is-large is-inverted"
-            onClick={() => props.switchModeCallback(NewMode.SIGNUP_MODE)}
+            onClick={() => {}}
             >Sign Up</button>
         </div>
       );
@@ -77,7 +76,7 @@ function NewTopNav(props: Props) {
         <div className="column">
           <button 
             className="button is-link is-large is-inverted"
-            onClick={() => props.switchModeCallback(NewMode.LOGIN_MODE)}
+            onClick={() => {}}
             >Login</button>
         </div>
       );
@@ -88,10 +87,10 @@ function NewTopNav(props: Props) {
           <strong>NEW Community Features let you use Your Own Voices and Video:</strong>
           <br />
           <br />
-          <a href="#community_tts" onClick={() => props.switchModeCallback(NewMode.COMMUNITY_TTS_MODE)}>TTS</a>
-          <a href="#community_video" onClick={() => props.switchModeCallback(NewMode.COMMUNITY_W2L_MODE)}>Video</a>
-          <a href="#upload" onClick={() => props.switchModeCallback(NewMode.UPLOAD_MODE)}>Upload</a>
-          <a href="#my_data" onClick={() => props.switchModeCallback(NewMode.MY_DATA_MODE)}>My Data</a>
+          <a href="#community_tts" onClick={() => {}}>TTS</a>
+          <a href="#community_video" onClick={() => {}}>Video</a>
+          <a href="#upload" onClick={() => {}}>Upload</a>
+          <a href="#my_data" onClick={() => {}}>My Data</a>
       </div>
     );
   }
@@ -105,13 +104,13 @@ function NewTopNav(props: Props) {
         <div className="column">
           <button 
             className="button is-link is-large is-inverted"
-            onClick={() => props.switchModeCallback(NewMode.COMMUNITY_TTS_MODE)}
+            onClick={() => {}}
             >Text to Speech 🗣️</button>
         </div>
         <div className="column">
           <button 
             className="button is-link is-large is-inverted"
-            onClick={() => props.switchModeCallback(NewMode.COMMUNITY_TTS_MODE)}
+            onClick={() => {}}
             >Video 🎥</button>
         </div>
       </div>
@@ -119,19 +118,19 @@ function NewTopNav(props: Props) {
         <div className="column">
           <button 
             className="button is-link is-large is-inverted"
-            onClick={() => props.switchModeCallback(NewMode.COMMUNITY_TTS_MODE)}
+            onClick={() => {}}
             >Upload TTS ⬆️</button>
         </div>
         <div className="column">
           <button 
             className="button is-link is-large is-inverted"
-            onClick={() => props.switchModeCallback(NewMode.COMMUNITY_TTS_MODE)}
+            onClick={() => {}}
             >Upload Video ⬆️</button>
         </div>
         <div className="column">
           <button 
             className="button is-link is-large is-inverted"
-            onClick={() => props.switchModeCallback(NewMode.COMMUNITY_TTS_MODE)}
+            onClick={() => {}}
             >My Data</button>
         </div>
       </div>

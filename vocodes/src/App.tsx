@@ -133,7 +133,9 @@ class App extends React.Component<Props, State> {
                     />
                 </Route>
                 <Route path="/">
-                  <h1>New Vocodes</h1>
+                  <NewVocodesContainer
+                    sessionWrapper={this.state.sessionWrapper}
+                    />
                 </Route>
               </Switch>
 

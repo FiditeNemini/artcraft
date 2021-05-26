@@ -1,6 +1,7 @@
 import React from 'react';
 import { ApiConfig } from '../../v1/api/ApiConfig';
 import { Mode } from '../../AppMode';
+import { SessionWrapper } from '../../session/SessionWrapper';
 
 enum FieldTriState {
   EMPTY_FALSE,
@@ -9,7 +10,7 @@ enum FieldTriState {
 }
 
 interface Props {
-  loggedIn: boolean,
+  sessionWrapper: SessionWrapper,
   querySessionCallback : () => void,
   switchModeCallback?: (mode: Mode) => void,
 }
@@ -104,7 +105,7 @@ class LoginComponent extends React.Component<Props, State> {
   }
 
   public render() {
-    if (this.props.loggedIn) {
+    if (this.props.sessionWrapper.isLoggedIn()) {
       return <div>Invalid view for logged in users.</div>;
     }
 

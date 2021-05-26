@@ -1,5 +1,12 @@
 import { SessionStateResponse } from "./SessionState";
 
+/**
+ * SessionWrapper can wrap each of the following states:
+ * 
+ *   1) non-existing session
+ *   2) logged-out session
+ *   3) logged-in session
+ */
 export class SessionWrapper {
   sessionStateResponse?: SessionStateResponse;
 

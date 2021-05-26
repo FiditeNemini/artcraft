@@ -1,6 +1,7 @@
 import React from 'react';
 import { MigrationMode } from '../App'
 import { SessionWrapper } from '../session/SessionWrapper';
+import { Link } from 'react-router-dom';
 
 interface Props {
   sessionWrapper: SessionWrapper,
@@ -29,10 +30,11 @@ function MigrationTopNav_Session(props: Props) {
           onClick={() => props.setMigrationModeCallback(MigrationMode.OLD_VOCODES)}
           >{displayName}</button>
   } else {
-    sessionLink = <button
+    sessionLink = <Link
+          to="/signup"
           className="button is-danger is-pulled-right"
           onClick={() => props.setMigrationModeCallback(MigrationMode.OLD_VOCODES)}
-          >Sign Up / Login</button>
+          >Sign Up / Login</Link>
   }
 
   return sessionLink;

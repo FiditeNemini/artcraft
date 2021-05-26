@@ -15,10 +15,10 @@ import { VideoJob, VideoJobStatus } from './modes/video/VideoJob';
 import { VideoJobPoller } from './modes/video/VideoJobPoller';
 import { VideoQueuePoller } from './modes/video/VideoQueuePoller';
 import { VideoQueueStats } from './modes/video/VideoQueueStats';
-import { SignupComponent } from './modes/signup/SignupComponent';
+import { SignupComponent } from '../v2/signup/SignupComponent';
 import { ApiConfig } from './api/ApiConfig';
 import { SessionStateResponse } from './api/SessionState';
-import { LoginComponent } from './modes/login/LoginComponent';
+import { LoginComponent } from '../v2/login/LoginComponent';
 import { UploadComponent } from './modes/upload/UploadComponent';
 
 interface Props {
