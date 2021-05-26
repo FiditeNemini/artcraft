@@ -29,6 +29,7 @@ pub struct UserInfo {
   pub user_token: String,
   pub username: String,
   pub display_name: String,
+  pub email_gravatar_hash: String,
 }
 
 #[derive(Serialize)]
@@ -100,7 +101,8 @@ pub async fn session_info_handler(
       user_info = Some(UserInfo {
         user_token: session_data.user_token.clone(),
         username: session_data.username.to_string(),
-        display_name: session_data.display_name.to_string()
+        display_name: session_data.display_name.to_string(),
+        email_gravatar_hash: session_data.email_gravatar_hash.to_string(),
       });
     }
   }
