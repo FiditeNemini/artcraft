@@ -45,6 +45,10 @@ class ApiConfig {
     return `${this.getScheme()}://${this.getNewApiHost()}/w2l/upload`;
   }
 
+  getProfile(username: string) : string {
+    return `${this.getScheme()}://${this.getNewApiHost()}/profile/${username}`;
+  }
+
   private getScheme() : string {
     return this.isLocalDev ? "http" : "https";
   }

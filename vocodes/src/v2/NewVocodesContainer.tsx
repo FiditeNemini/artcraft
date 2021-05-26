@@ -2,7 +2,7 @@ import React from 'react';
 import { NewTopNav } from './NewTopNav';
 import { LoginComponent } from './login/LoginComponent';
 import { SignupComponent } from './signup/SignupComponent';
-import { Switch, Route } from 'react-router-dom';
+import { Switch, Route, RouteProps } from 'react-router-dom';
 import { SessionWrapper } from '../session/SessionWrapper';
 import { UploadComponent } from './upload/UploadComponent';
 import { FirehoseComponent } from './firehose/FirehoseComponent';
@@ -55,19 +55,26 @@ class NewVocodesContainer extends React.Component<Props, State> {
               />
             </Route>
 
-            <Route path="/profile/:username/data">
-              <ProfileDataComponent
-                querySessionCallback={()=>{}}
-                sessionWrapper={this.props.sessionWrapper}
-              />
-            </Route>
 
-            <Route path="/profile">
-              <ProfileComponent
-                querySessionCallback={()=>{}}
-                sessionWrapper={this.props.sessionWrapper}
-              />
-            </Route>
+            <Route path="/profile/:username/data"
+              render={(routeProps: RouteProps) => (
+                <ProfileDataComponent
+                  querySessionCallback={()=>{}}
+                  sessionWrapper={this.props.sessionWrapper}
+                  routeProps={routeProps}
+                />
+              )}
+            />
+
+            <Route path="/profile/:username"
+              render={(routeProps: RouteProps) => (
+                <ProfileComponent
+                  querySessionCallback={()=>{}}
+                  sessionWrapper={this.props.sessionWrapper}
+                  routeProps={routeProps}
+                />
+              )}
+            />
 
             <Route path="/signup">
               <SignupComponent
