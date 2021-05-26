@@ -2,6 +2,7 @@ import React from 'react';
 import { ApiConfig } from '../../v1/api/ApiConfig';
 import { Mode } from '../../AppMode';
 import { SessionWrapper } from '../../session/SessionWrapper';
+import { Link } from 'react-router-dom';
 
 enum FieldTriState {
   EMPTY_FALSE,
@@ -300,6 +301,10 @@ class SignupComponent extends React.Component<Props, State> {
     return (
       <div>
         <h1 className="title is-1"> Sign Up </h1>
+
+        <Link to="/login"
+          className="button is-danger is-inverted"
+          >Already have an account? Log in instead!</Link>
 
         <form onSubmit={this.handleFormSubmit}>
           <div className="field">
