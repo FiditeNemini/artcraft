@@ -1,6 +1,7 @@
 import React from 'react';
 import { ApiConfig } from '../../v1/api/ApiConfig';
-import { Mode } from '../../AppMode';
+import { useHistory, withRouter } from "react-router-dom";
+import { History } from 'history'
 import { SessionWrapper } from '../../session/SessionWrapper';
 
 enum FieldTriState {
@@ -12,6 +13,7 @@ enum FieldTriState {
 interface Props {
   sessionWrapper: SessionWrapper,
   querySessionAction: () => void,
+  history: History
 }
 
 interface State {
@@ -37,6 +39,15 @@ class LoginComponent extends React.Component<Props, State> {
       passwordValid: FieldTriState.EMPTY_FALSE,
       passwordInvalidReason: "",
     };
+  }
+
+  // react-router with stateful components
+  // https://stackoverflow.com/a/60335152
+  routingFunction = (param: any) => {
+    this.props.history.push({
+        pathname: `/target-path`,
+        state: param
+    });
   }
 
   handleUsernameOrEmailChange = (ev: React.FormEvent<HTMLInputElement>) => {
@@ -89,6 +100,13 @@ class LoginComponent extends React.Component<Props, State> {
       if (res.success) {
         console.log('querying new session');
         this.props.querySessionAction();
+
+        console.log('..... go home')
+        //const history = useHistory();
+        //history.push("/");
+        //history.push("/");
+
+        this.routingFunction(undefined);
       }
     })
     .catch(e => {

@@ -10,6 +10,7 @@ import { ProfileComponent } from './profile/ProfileComponent';
 import { TtsModelListComponent } from './tts_model/TtsModelListComponent';
 import { W2lTemplateListComponent } from './w2l_template_list/W2lTemplateListComponent';
 import { ProfileDataComponent } from './profile_data/ProfileDataComponent';
+import { LoginFunctionalComponent } from './login/LoginFunctionalComponent';
 
 interface Props {
   sessionWrapper: SessionWrapper,
@@ -50,7 +51,7 @@ class NewVocodesContainer extends React.Component<Props, State> {
             </Route>
 
             <Route path="/login">
-              <LoginComponent 
+              <LoginFunctionalComponent
                 sessionWrapper={this.props.sessionWrapper}
                 querySessionAction={this.props.querySessionAction}
               />

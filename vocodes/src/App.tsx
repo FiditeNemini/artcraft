@@ -3,7 +3,7 @@ import './App.scss';
 
 import React from 'react';
 import { ApiConfig } from './v1/api/ApiConfig';
-import { BrowserRouter, Route, Link, Switch } from "react-router-dom";
+import { BrowserRouter, Route, Link, Switch, useHistory } from "react-router-dom";
 import { MigrationTopNav } from './migration/MigrationTopNav';
 import { NewVocodesContainer } from './v2/NewVocodesContainer';
 import { OldVocodesContainer } from './v1/OldVocodesContainer';
