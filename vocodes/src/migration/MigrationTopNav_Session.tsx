@@ -1,13 +1,10 @@
 import React from 'react';
-import { MigrationMode } from '../App'
 import { SessionWrapper } from '../session/SessionWrapper';
 import { Link } from 'react-router-dom';
 
 interface Props {
   sessionWrapper: SessionWrapper,
   enableAlpha: boolean,
-  migrationMode: MigrationMode,
-  setMigrationModeCallback: (mode: MigrationMode) => void,
 }
 
 function MigrationTopNav_Session(props: Props) {
@@ -25,16 +22,20 @@ function MigrationTopNav_Session(props: Props) {
   let sessionLink = <p />;
 
   if (loggedIn) {
-    sessionLink = <button
-          className="button is-alert is-inverted is-pulled-right"
-          onClick={() => props.setMigrationModeCallback(MigrationMode.OLD_VOCODES)}
-          >{displayName}</button>
+    let url = `/profile/${displayName}`;
+    sessionLink = (
+      <Link
+        to={url}
+        className="button is-alert is-inverted is-pulled-right"
+        >{displayName}</Link>
+    );
   } else {
-    sessionLink = <Link
-          to="/signup"
-          className="button is-danger is-pulled-right"
-          onClick={() => props.setMigrationModeCallback(MigrationMode.OLD_VOCODES)}
-          >Sign Up / Login</Link>
+    sessionLink = (
+      <Link
+        to="/signup"
+        className="button is-danger is-pulled-right"
+        >Sign Up / Login</Link>
+    );
   }
 
   return sessionLink;

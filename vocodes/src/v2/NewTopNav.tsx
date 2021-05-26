@@ -96,6 +96,7 @@ function NewTopNav(props: Props) {
     );
   }
 
+  let myDataLink = `/profile/${displayName}/data`;
 
   return (
     <nav>
@@ -116,7 +117,7 @@ function NewTopNav(props: Props) {
             >Upload</Link>
         </div>
         <div className="column">
-          <Link to="/upload"
+          <Link to={myDataLink}
             className="button is-link is-medium is-inverted"
             >My Data</Link>
         </div>

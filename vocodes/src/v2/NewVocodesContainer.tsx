@@ -9,6 +9,7 @@ import { FirehoseComponent } from './firehose/FirehoseComponent';
 import { ProfileComponent } from './profile/ProfileComponent';
 import { TtsModelListComponent } from './tts_model/TtsModelListComponent';
 import { W2lTemplateListComponent } from './w2l_template_list/W2lTemplateListComponent';
+import { ProfileDataComponent } from './profile_data/ProfileDataComponent';
 
 interface Props {
   sessionWrapper: SessionWrapper,
@@ -49,6 +50,13 @@ class NewVocodesContainer extends React.Component<Props, State> {
 
             <Route path="/login">
               <LoginComponent 
+                querySessionCallback={()=>{}}
+                sessionWrapper={this.props.sessionWrapper}
+              />
+            </Route>
+
+            <Route path="/profile/:username/data">
+              <ProfileDataComponent
                 querySessionCallback={()=>{}}
                 sessionWrapper={this.props.sessionWrapper}
               />

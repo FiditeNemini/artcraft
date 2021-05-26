@@ -117,10 +117,9 @@ class App extends React.Component<Props, State> {
       <BrowserRouter>
         <div id="main" className="mainwrap">
           <div id="viewable">
+
             <MigrationTopNav
               enableAlpha={this.state.enableAlpha}
-              migrationMode={this.state.migrationMode}
-              setMigrationModeCallback={this.setMigrationMode}
               sessionWrapper={this.state.sessionWrapper}
               />
 
