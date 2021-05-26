@@ -102,30 +102,28 @@ function NewTopNav(props: Props) {
       <div className="columns">
         <div className="column">
           <Link to="/tts"
-            className="button is-link is-large is-inverted"
-            >Text to Speech 🗣️</Link>
+            className="button is-link is-medium is-inverted"
+            >Text to Speech️</Link>
         </div>
         <div className="column">
           <Link to="/video"
-            className="button is-link is-large is-inverted"
-            >Video 🎥</Link>
-        </div>
-      </div>
-      <div className="columns">
-        <div className="column">
-          <Link to="/upload"
-            className="button is-link is-inverted"
-            >Upload TTS ⬆</Link>
+            className="button is-link is-medium is-inverted"
+            >Video</Link>
         </div>
         <div className="column">
           <Link to="/upload"
-            className="button is-link is-inverted"
-            >Upload Video ⬆</Link>
+            className="button is-link is-medium is-inverted"
+            >Upload</Link>
         </div>
         <div className="column">
           <Link to="/upload"
-            className="button is-link is-inverted"
+            className="button is-link is-medium is-inverted"
             >My Data</Link>
+        </div>
+        <div className="column">
+          <Link to="/firehose"
+            className="button is-link is-medium is-inverted"
+            >Firehose</Link>
         </div>
       </div>
       <hr />
