@@ -19,7 +19,7 @@ import { SignupComponent } from '../v2/signup/SignupComponent';
 import { ApiConfig } from './api/ApiConfig';
 import { SessionStateResponse } from './api/SessionState';
 import { LoginComponent } from '../v2/login/LoginComponent';
-import { UploadComponent } from './modes/upload/UploadComponent';
+import { UploadComponent } from '../v2/upload/UploadComponent';
 
 interface Props {
   // Certan browsers (iPhone) have pitiful support for drawing APIs. Worse yet,
@@ -414,28 +414,6 @@ class OldVocodesContainer extends React.Component<Props, State> {
         break;
       case Mode.TERMS_MODE:
         component = <TermsComponent resetModeCallback={this.resetMode} />;
-        break;
-
-      case Mode.SIGNUP_MODE:
-        component = <SignupComponent
-          loggedIn={this.state.loggedIn}
-          querySessionCallback={this.querySession}
-          switchModeCallback={this.switchMode}
-          />
-        break;
-      case Mode.LOGIN_MODE:
-        component = <LoginComponent
-          loggedIn={this.state.loggedIn}
-          querySessionCallback={this.querySession}
-          switchModeCallback={this.switchMode}
-          />
-        break;
-      case Mode.UPLOAD_MODE:
-        component = <UploadComponent
-          loggedIn={this.state.loggedIn}
-          querySessionCallback={this.querySession}
-          switchModeCallback={this.switchMode}
-          />
         break;
     }
     return (

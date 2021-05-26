@@ -113,17 +113,17 @@ function NewTopNav(props: Props) {
       </div>
       <div className="columns">
         <div className="column">
-          <Link to="/upload_tts"
+          <Link to="/upload"
             className="button is-link is-inverted"
             >Upload TTS ⬆</Link>
         </div>
         <div className="column">
-          <Link to="/upload_video"
+          <Link to="/upload"
             className="button is-link is-inverted"
             >Upload Video ⬆</Link>
         </div>
         <div className="column">
-          <Link to="/upload_video"
+          <Link to="/upload"
             className="button is-link is-inverted"
             >My Data</Link>
         </div>

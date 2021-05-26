@@ -84,7 +84,6 @@ class NewVocodesContainer extends React.Component<Props, State> {
 
             <Route path="/upload">
               <UploadComponent
-                querySessionCallback={()=>{}}
                 sessionWrapper={this.props.sessionWrapper}
               />
             </Route>
