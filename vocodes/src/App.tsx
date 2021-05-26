@@ -2,11 +2,12 @@ import 'bulma/css/bulma.css'
 import './App.scss';
 
 import React from 'react';
-import { NewOldVocodesSwitch } from './migration/NewOldVocodesSwitch';
-import { OldVocodesContainer } from './migration/OldVocodesContainer';
-import { NewVocodesContainer } from './migration/NewVocodesContainer';
-import { ApiConfig } from './api/ApiConfig';
-import { SessionStateResponse } from './api/SessionState';
+import { MigrationTopNav } from './migration/MigrationTopNav';
+import { OldVocodesContainer } from './v1/OldVocodesContainer';
+import { NewVocodesContainer } from './v2/NewVocodesContainer';
+import { ApiConfig } from './v1/api/ApiConfig';
+import { SessionStateResponse } from './v1/api/SessionState';
+import { SessionWrapper } from './session/SessionWrapper';
 
 enum MigrationMode {
   NEW_VOCODES,
@@ -27,8 +28,7 @@ interface State {
 
   // Rollout of vocodes 2.0
   enableAlpha: boolean,
-  loggedIn: boolean,
-  sessionState?: SessionStateResponse,
+  sessionWrapper: SessionWrapper,
 }
 
 class App extends React.Component<Props, State> {
@@ -43,7 +43,7 @@ class App extends React.Component<Props, State> {
     this.state = {
       enableAlpha: enableAlpha,
       migrationMode: migrationMode,
-      loggedIn: false,
+      sessionWrapper: SessionWrapper.emptySession(),
     }
   }
 
@@ -71,14 +71,16 @@ class App extends React.Component<Props, State> {
     })
     .then(res => res.json())
     .then(response => {
-      const session : SessionStateResponse = response;
+      const sessionResponse : SessionStateResponse = response;
 
-      if (session !== undefined) {
-        this.setState({ 
-          sessionState : session,
-          loggedIn: session.logged_in,
-        });
+      if (sessionResponse === undefined) {
+        return; // Endpoint error?
       }
+
+      const sessionWrapper = SessionWrapper.wrapResponse(sessionResponse);
+      this.setState({ 
+        sessionWrapper: sessionWrapper,
+      });
     })
     .catch(e => { /* Ignore. */ });
   }
@@ -115,9 +117,9 @@ class App extends React.Component<Props, State> {
       case MigrationMode.NEW_VOCODES:
         innerComponent = (
           <div>
-            <NewVocodesContainer
+            {/*<NewVocodesContainer
               sessionState={this.state.sessionState}
-              />
+            />*/}
           </div>
         );
         break;
@@ -136,16 +138,16 @@ class App extends React.Component<Props, State> {
     return (
       <div id="main" className="mainwrap">
         <div id="viewable">
-          <NewOldVocodesSwitch
+          <MigrationTopNav
             enableAlpha={this.state.enableAlpha}
             migrationMode={this.state.migrationMode}
             setMigrationModeCallback={this.setMigrationMode}
-            sessionState={this.state.sessionState}
+            sessionWrapper={this.state.sessionWrapper}
             />
 
-        <div className="migrationComponentWrapper">
-          {innerComponent}
-        </div>
+          <div className="migrationComponentWrapper">
+            {innerComponent}
+          </div>
 
         </div>
       </div>

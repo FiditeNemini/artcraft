@@ -1,5 +1,5 @@
 import React from 'react';
-import { NewMode } from '../migration/NewVocodesContainer'
+import { NewMode } from '../../v2/NewVocodesContainer'
 import { SessionStateResponse } from '../api/SessionState';
 
 interface Props {
@@ -55,7 +55,7 @@ function NewTopNav(props: Props) {
           <button 
             className="button is-link is-large is-inverted"
             onClick={() => props.switchModeCallback(NewMode.MY_PROFILE_MODE)}
-            >{displayName}</button>
+            >Firehose</button>
         </div>
       );
     } else {

@@ -1,8 +1,8 @@
 import React from 'react';
-import { NewTopNav } from '../navigation/NewTopNav';
-import { SessionStateResponse } from '../api/SessionState';
-import { LoginComponent } from '../modes/login/LoginComponent';
-import { SignupComponent } from '../modes/signup/SignupComponent';
+import { NewTopNav } from '../v1/navigation/NewTopNav';
+import { SessionStateResponse } from '../v1/api/SessionState';
+import { LoginComponent } from '../v1/modes/login/LoginComponent';
+import { SignupComponent } from '../v1/modes/signup/SignupComponent';
 
 
 enum NewMode {

@@ -1,25 +1,25 @@
 import React from 'react';
-import { AboutComponent } from '../modes/about/AboutComponent';
-import { ExtrasMode } from '../modes/speak/SpeakComponent';
-import { Footer } from '../navigation/Footer';
-import { HistoryComponent } from '../modes/history/HistoryComponent';
+import { AboutComponent } from './modes/about/AboutComponent';
+import { ExtrasMode } from './modes/speak/SpeakComponent';
+import { Footer } from './navigation/Footer';
+import { HistoryComponent } from './modes/history/HistoryComponent';
 import { Mode } from '../AppMode';
-import { SpeakComponent } from '../modes/speak/SpeakComponent';
-import { Speaker, SpeakerCategory, SPEAKERS, SPEAKER_CATEGORIES, CATEGORY_ALL_BY_NAME, SPEAKERS_BY_CATEGORY } from '../model/Speakers';
-import { Spectrogram } from '../modes/speak/extras/Spectrogram';
-import { TermsComponent } from '../modes/terms/TermsComponent';
-import { TopNav } from '../navigation/TopNav';
-import { Utterance } from '../model/utterance';
-import { VideoComponent } from '../modes/video/VideoComponent';
-import { VideoJob, VideoJobStatus } from '../modes/video/VideoJob';
-import { VideoJobPoller } from '../modes/video/VideoJobPoller';
-import { VideoQueuePoller } from '../modes/video/VideoQueuePoller';
-import { VideoQueueStats } from '../modes/video/VideoQueueStats';
-import { SignupComponent } from '../modes/signup/SignupComponent';
-import { ApiConfig } from '../api/ApiConfig';
-import { SessionStateResponse } from '../api/SessionState';
-import { LoginComponent } from '../modes/login/LoginComponent';
-import { UploadComponent } from '../modes/upload/UploadComponent';
+import { SpeakComponent } from './modes/speak/SpeakComponent';
+import { Speaker, SpeakerCategory, SPEAKERS, SPEAKER_CATEGORIES, CATEGORY_ALL_BY_NAME, SPEAKERS_BY_CATEGORY } from './model/Speakers';
+import { Spectrogram } from './modes/speak/extras/Spectrogram';
+import { TermsComponent } from './modes/terms/TermsComponent';
+import { TopNav } from './navigation/TopNav';
+import { Utterance } from './model/utterance';
+import { VideoComponent } from './modes/video/VideoComponent';
+import { VideoJob, VideoJobStatus } from './modes/video/VideoJob';
+import { VideoJobPoller } from './modes/video/VideoJobPoller';
+import { VideoQueuePoller } from './modes/video/VideoQueuePoller';
+import { VideoQueueStats } from './modes/video/VideoQueueStats';
+import { SignupComponent } from './modes/signup/SignupComponent';
+import { ApiConfig } from './api/ApiConfig';
+import { SessionStateResponse } from './api/SessionState';
+import { LoginComponent } from './modes/login/LoginComponent';
+import { UploadComponent } from './modes/upload/UploadComponent';
 
 interface Props {
   // Certan browsers (iPhone) have pitiful support for drawing APIs. Worse yet,

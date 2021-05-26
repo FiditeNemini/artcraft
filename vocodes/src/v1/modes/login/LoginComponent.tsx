@@ -1,6 +1,6 @@
 import React from 'react';
 import { ApiConfig } from '../../api/ApiConfig';
-import { Mode } from '../../AppMode';
+import { Mode } from '../../../AppMode';
 
 enum FieldTriState {
   EMPTY_FALSE,

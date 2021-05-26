@@ -1,6 +1,6 @@
 import React from 'react';
 import { ApiConfig } from '../../api/ApiConfig';
-import { Mode } from '../../AppMode';
+import { Mode } from '../../../AppMode';
 import { v4 } from 'uuid';
 
 enum UploadType {

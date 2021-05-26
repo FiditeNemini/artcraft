@@ -1,5 +1,5 @@
 import React from 'react';
-import { Mode } from '../AppMode'
+import { Mode } from '../../AppMode'
 
 interface Props {
   mode: Mode,

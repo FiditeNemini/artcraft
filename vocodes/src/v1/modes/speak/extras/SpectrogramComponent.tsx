@@ -1,6 +1,6 @@
 import React from 'react';
 import { Spectrogram, nextSpectrogramMode } from './Spectrogram';
-import { SpectrogramMode } from '../../../migration/OldVocodesContainer';
+import { SpectrogramMode } from '../../../OldVocodesContainer';
 
 interface Props {
   currentSpectrogram?: Spectrogram,

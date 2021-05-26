@@ -1,5 +1,5 @@
 import React from 'react';
-import { Mode } from '../AppMode'
+import { Mode } from '../../AppMode'
 import { SessionStateResponse } from '../api/SessionState';
 
 interface Props {
