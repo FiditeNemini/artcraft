@@ -39,7 +39,6 @@ function TopNav(props: Props) {
 
   // Vo.codes 2.0
   let loginManagement = <span />;
-  let extendedFeatures = <span />;
 
   if (props.enableAlpha) {
     if (loggedIn) {
@@ -57,18 +56,6 @@ function TopNav(props: Props) {
         </span>
       );
     }
-
-    extendedFeatures = (
-      <div className="notification is-info is-light">
-          <strong>NEW Community Features let you use Your Own Voices and Video:</strong>
-          <br />
-          <br />
-          <a href="#community_tts" onClick={() => props.switchModeCallback(Mode.COMMUNITY_TTS_MODE)}>TTS</a>
-          <a href="#community_video" onClick={() => props.switchModeCallback(Mode.COMMUNITY_VIDEO_MODE)}>Video</a>
-          <a href="#upload" onClick={() => props.switchModeCallback(Mode.UPLOAD_MODE)}>Upload</a>
-          <a href="#my_data" onClick={() => props.switchModeCallback(Mode.MY_DATA_MODE)}>My Data</a>
-      </div>
-    );
   }
 
   return (
@@ -83,7 +70,6 @@ function TopNav(props: Props) {
       <a href="#use" onClick={() => props.switchModeCallback(Mode.ABOUT_MODE)}>About</a>
 
       {loginManagement}
-      {extendedFeatures}
       <hr />
     </nav>
   )
