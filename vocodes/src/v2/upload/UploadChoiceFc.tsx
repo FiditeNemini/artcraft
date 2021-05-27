@@ -5,7 +5,6 @@ import { ApiConfig } from '../../v1/api/ApiConfig';
 
 interface Props {
   sessionWrapper: SessionWrapper,
-  querySessionAction: () => void,
 }
 
 function UploadChoiceFc(props: Props) {
@@ -42,7 +41,7 @@ function UploadChoiceFc(props: Props) {
       <br />
 
       <Link
-        to="/upload/tts"
+        to="/upload/w2l_video"
         className="button is-link is-large is-fullwidth is-outlined"
         onClick={() => {}}
         >Upload lipsync video (w2l)</Link>
@@ -50,11 +49,10 @@ function UploadChoiceFc(props: Props) {
       <br />
 
       <Link
-        to="/upload/tts"
+        to="/upload/w2l_photo"
         className="button is-info is-large is-fullwidth is-outlined"
         onClick={() => {}}
         >Upload lipsync photo (w2l)</Link>
-
 
     </div>
   )
