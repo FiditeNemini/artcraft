@@ -59,7 +59,7 @@ function W2lTemplateListFc(props: Props) {
     .catch(e => {
       //this.props.onSpeakErrorCallback();
     });
-  });
+  }, []); // NB: Empty array dependency sets to run ONLY on mount
 
   let templateElements : Array<JSX.Element> = [];
 
@@ -95,7 +95,7 @@ function W2lTemplateListFc(props: Props) {
   let allRowsOfTemplateElements : Array<JSX.Element> = [];
   let rowOfTemplateElements : Array<JSX.Element> = [];
 
-  let nextRowSize = 4;
+  let nextRowSize = getRandomInt(3, 4);
 
   templateElements.forEach(el => {
     rowOfTemplateElements.push(el);
@@ -107,7 +107,12 @@ function W2lTemplateListFc(props: Props) {
         </div>
       );
       rowOfTemplateElements = [];
-      nextRowSize = getRandomInt(1, 4);
+
+      // Don't have the same number on each row.
+      let lastRowSize = nextRowSize;
+      while (lastRowSize === nextRowSize) {
+        nextRowSize = getRandomInt(2, 5);
+      }
     }
   });
 
