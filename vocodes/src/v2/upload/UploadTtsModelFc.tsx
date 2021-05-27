@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
+import { ApiConfig } from '../../v1/api/ApiConfig';
 import { SessionWrapper } from '../../session/SessionWrapper';
 import { useHistory, Link } from "react-router-dom";
-import { ApiConfig } from '../../v1/api/ApiConfig';
+import { v1 as uuidv1 } from 'uuid';
 
 interface Props {
   sessionWrapper: SessionWrapper,
@@ -37,11 +38,14 @@ function UploadTtsModelFc(props: Props) {
     ev.preventDefault();
 
     const api = new ApiConfig();
-    const endpointUrl = api.login();
+    const endpointUrl = api.uploadTts();
     
-    /*const request = {
-      username_or_email: usernameOrEmail,
-      password: password,
+    let idempotencyToken = uuidv1(); // Time-based UUID
+
+    const request = {
+      idempotency_token: idempotencyToken,
+      title: title,
+      download_url: downloadUrl,
     }
 
     fetch(endpointUrl, {
@@ -55,16 +59,13 @@ function UploadTtsModelFc(props: Props) {
     })
     .then(res => res.json())
     .then(res => {
-      console.log('login response', res)
       if (res.success) {
-        console.log('querying new session');
-        props.querySessionAction();
         history.push('/');
       }
     })
     .catch(e => {
       //this.props.onSpeakErrorCallback();
-    });*/
+    });
 
     return false;
   }
