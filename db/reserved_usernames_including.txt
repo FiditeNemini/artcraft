@@ -2,4 +2,5 @@
 # Any of the substrings may not be used.
 # You should check string.remove('_') as well.
 storyteller
+test
 vocodes
