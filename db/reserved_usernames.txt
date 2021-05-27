@@ -496,6 +496,7 @@ root
 rss
 ruby
 rule
+rust
 sag
 sale
 sales
@@ -614,6 +615,8 @@ tutorial
 tux
 tv
 twitter
+type
+typescript
 undef
 unfollow
 unsubscribe
@@ -661,6 +664,8 @@ www4
 www5
 www6
 www7
+www8
+www9
 wwws
 wwww
 xfn
