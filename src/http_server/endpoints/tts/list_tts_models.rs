@@ -41,7 +41,7 @@ pub struct TtsModelRecordForResponse {
 #[derive(Serialize)]
 pub struct ListTtsModelsSuccessResponse {
   pub success: bool,
-  pub templates: Vec<TtsModelRecordForResponse>,
+  pub models: Vec<TtsModelRecordForResponse>,
 }
 
 #[derive(Serialize)]
@@ -102,7 +102,7 @@ pub async fn list_tts_models_handler(
 {
   // NB: Lookup failure is Err(RowNotFound).
   // NB: Since this is publicly exposed, we don't query sensitive data.
-  let maybe_templates = sqlx::query_as!(
+  let maybe_models = sqlx::query_as!(
       TtsModelRecord,
         r#"
 SELECT
@@ -124,40 +124,40 @@ WHERE tts.deleted_at IS NULL
     .fetch_all(&server_state.mysql_pool)
     .await; // TODO: This will return error if it doesn't exist
 
-  let templates : Vec<TtsModelRecord> = match maybe_templates {
-    Ok(templates) => templates,
+  let models : Vec<TtsModelRecord> = match maybe_models {
+    Ok(models) => models,
     Err(err) => {
       match err {
         RowNotFound => {
           return Err(ListTtsModelsError::ServerError);
         },
         _ => {
-          warn!("w2l template list query error: {:?}", err);
+          warn!("tts models list query error: {:?}", err);
           return Err(ListTtsModelsError::ServerError);
         }
       }
     }
   };
 
-  let templates_for_response = templates.into_iter()
-    .map(|template| {
+  let models_for_response = models.into_iter()
+    .map(|model| {
       TtsModelRecordForResponse {
-        model_token: template.model_token.clone(),
-        tts_model_type: template.tts_model_type.clone(),
-        creator_user_token: template.creator_user_token.clone(),
-        creator_username: template.creator_username.clone(),
-        creator_display_name: template.creator_display_name.clone(),
-        updatable_slug: template.updatable_slug.clone(),
-        title: template.title.clone(),
-        created_at: template.created_at.clone(),
-        updated_at: template.updated_at.clone(),
+        model_token: model.model_token.clone(),
+        tts_model_type: model.tts_model_type.clone(),
+        creator_user_token: model.creator_user_token.clone(),
+        creator_username: model.creator_username.clone(),
+        creator_display_name: model.creator_display_name.clone(),
+        updatable_slug: model.updatable_slug.clone(),
+        title: model.title.clone(),
+        created_at: model.created_at.clone(),
+        updated_at: model.updated_at.clone(),
       }
     })
     .collect::<Vec<TtsModelRecordForResponse>>();
 
   let response = ListTtsModelsSuccessResponse {
     success: true,
-    templates: templates_for_response,
+    models: models_for_response,
   };
 
   let body = serde_json::to_string(&response)
