@@ -20,6 +20,7 @@ use sqlx::error::Error::Database;
 use sqlx::mysql::MySqlDatabaseError;
 use std::sync::Arc;
 use crate::util::email_to_gravatar::email_to_gravatar;
+use crate::validations::username_reservations::is_reserved_username;
 
 const NEW_USER_ROLE: &'static str = "new-user";
 
@@ -46,6 +47,7 @@ pub struct ErrorResponse {
 pub enum CreateAccountError {
   BadInput(String),
   UsernameTaken,
+  ReservedUsername,
   EmailTaken,
   ServerError,
 }
@@ -55,6 +57,7 @@ impl ResponseError for CreateAccountError {
     match *self {
       CreateAccountError::BadInput(_) => StatusCode::BAD_REQUEST,
       CreateAccountError::UsernameTaken => StatusCode::BAD_REQUEST,
+      CreateAccountError::ReservedUsername => StatusCode::BAD_REQUEST,
       CreateAccountError::EmailTaken => StatusCode::BAD_REQUEST,
       CreateAccountError::ServerError => StatusCode::INTERNAL_SERVER_ERROR,
     }
@@ -64,6 +67,7 @@ impl ResponseError for CreateAccountError {
     let error_reason = match self {
       BadInput(reason) => reason.to_string(),
       CreateAccountError::UsernameTaken => "username already taken".to_string(),
+      CreateAccountError::ReservedUsername => "username is reserved".to_string(),
       CreateAccountError::EmailTaken => "email already taken".to_string(),
       CreateAccountError::ServerError => "server error".to_string(),
     };
@@ -95,6 +99,10 @@ pub async fn create_account_handler(
 
   if let Err(reason) = validate_passwords(&request.password, &request.password_confirmation) {
     return Err(CreateAccountError::BadInput(reason));
+  }
+
+  if is_reserved_username(&request.username) {
+    return Err(CreateAccountError::ReservedUsername);
   }
 
   if !request.email_address.contains("@") {
