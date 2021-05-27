@@ -96,7 +96,7 @@ pub enum ProfileError {
 
 /// For the URL PathInfo
 #[derive(Deserialize)]
-pub struct PathInfo {
+pub struct GetProfilePathInfo {
   username: String,
 }
 
@@ -132,7 +132,7 @@ impl ResponseError for ProfileError {
 
 pub async fn get_profile_handler(
   http_request: HttpRequest,
-  path: Path<PathInfo>,
+  path: Path<GetProfilePathInfo>,
   server_state: web::Data<Arc<ServerState>>) -> Result<HttpResponse, ProfileError>
 {
   // NB: Lookup failure is Err(RowNotFound).

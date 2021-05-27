@@ -42,6 +42,7 @@ use sqlx::mysql::MySqlPoolOptions;
 use std::sync::Arc;
 use crate::http_server::endpoints::users::get_profile::get_profile_handler;
 use crate::http_server::endpoints::w2l::list_w2l_templates::list_w2l_templates_handler;
+use crate::http_server::endpoints::w2l::get_w2l_template::get_w2l_template_handler;
 
 const DEFAULT_BIND_ADDRESS : &'static str = "0.0.0.0:12345";
 
@@ -207,6 +208,11 @@ pub async fn serve(server_state: ServerState) -> AnyhowResult<()>
           .service(
             web::resource("/list")
               .route(web::get().to(list_w2l_templates_handler))
+              .route(web::head().to(|| HttpResponse::Ok()))
+          )
+          .service(
+            web::resource("/template/{slug}")
+              .route(web::get().to(get_w2l_template_handler))
               .route(web::head().to(|| HttpResponse::Ok()))
           )
       )
