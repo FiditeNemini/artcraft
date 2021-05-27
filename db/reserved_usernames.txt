@@ -5,7 +5,13 @@
 # https://github.com/Mottie/github-reserved-names
 
 # Stuff we care about
+storied
+stories
+story
 storyteller
+tell
+teller
+vocode
 vocodes
 
 # Companies we'd love to have use our service
