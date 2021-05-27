@@ -50,14 +50,6 @@ CREATE TABLE users (
   cached_tts_rendered_counter INT(10) NOT NULL DEFAULT 0,
   cached_w2l_rendered_counter INT(10) NOT NULL DEFAULT 0,
 
-  -- Settings
-  -- DO NOT REORDER.
-  dark_mode ENUM(
-    'light-mode',
-    'dark-mode',
-    'use-clock'
-  ) NOT NULL DEFAULT 'light-mode',
-
   -- An uploaded avatar. Public hash in our bucket.
   avatar_public_bucket_hash CHAR(32) DEFAULT NULL,
 
@@ -69,11 +61,31 @@ CREATE TABLE users (
   -- If the URLs are shared, they'll be visible.
   hide_results_preference BOOLEAN NOT NULL DEFAULT false,
 
+  -- Auto play preferences
+  auto_play_audio_preference BOOLEAN NOT NULL DEFAULT false,
+  auto_play_video_preference BOOLEAN NOT NULL DEFAULT false,
+
+  -- Favorite TTS voice to use by default
+  maybe_preferred_tts_model_token VARCHAR(32) DEFAULT NULL,
+
+  -- Favorite W2L model to use by default
+  maybe_preferred_w2l_template_token VARCHAR(32) DEFAULT NULL,
+
+  -- Settings
+  -- DO NOT REORDER.
+  dark_mode_preference ENUM(
+    'light-mode',
+    'dark-mode',
+    'use-clock'
+   ) NOT NULL DEFAULT 'light-mode',
+
   -- Social media usernames
   -- These are not confirmed. We'll need to build an OAuth system to handle that.
   discord_username VARCHAR(36) DEFAULT NULL,
   twitter_username VARCHAR(36) DEFAULT NULL,
   twitch_username VARCHAR(36) DEFAULT NULL,
+  patreon_username VARCHAR(36) DEFAULT NULL,
+  github_username VARCHAR(36) DEFAULT NULL,
 
   -- Incremented with every update.
   version INT NOT NULL DEFAULT 0,

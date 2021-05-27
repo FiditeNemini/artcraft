@@ -27,13 +27,19 @@ pub struct SessionUserRecord {
   pub profile_rendered_html: String,
   pub user_role_slug: String,
   pub banned: i8,
-  pub dark_mode: String,
   pub avatar_public_bucket_hash: Option<String>,
   pub disable_gravatar: i8,
   pub hide_results_preference: i8,
+  pub auto_play_audio_preference: i8,
+  pub auto_play_video_preference: i8,
+  pub dark_mode_preference: String,
+  pub maybe_preferred_tts_model_token: Option<String>,
+  pub maybe_preferred_w2l_template_token: Option<String>,
   pub discord_username: Option<String>,
   pub twitch_username: Option<String>,
   pub twitter_username: Option<String>,
+  pub patreon_username: Option<String>,
+  pub github_username: Option<String>,
 }
 
 impl SessionChecker {
@@ -111,13 +117,19 @@ SELECT
     profile_rendered_html,
     user_role_slug,
     banned,
-    dark_mode,
+    dark_mode_preference,
     avatar_public_bucket_hash,
     disable_gravatar,
     hide_results_preference,
+    auto_play_audio_preference,
+    auto_play_video_preference,
+    maybe_preferred_tts_model_token,
+    maybe_preferred_w2l_template_token,
     discord_username,
     twitch_username,
-    twitter_username
+    twitter_username,
+    patreon_username,
+    github_username
 FROM users
 LEFT OUTER JOIN user_sessions
 ON users.token = user_sessions.user_token
