@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { ApiConfig } from '../../v1/api/ApiConfig';
 import { SessionWrapper } from '../../session/SessionWrapper';
 import { useHistory, Link } from "react-router-dom";
+import { getRandomInt } from '../../Utils';
 
 interface W2lTemplateListResponsePayload {
   success: boolean,
@@ -76,14 +77,49 @@ function W2lTemplateListFc(props: Props) {
 
     let url = `https://storage.googleapis.com/dev-vocodes-public${object}`;
 
-    templateElements.push((
+    /*
       <div>
-        <img src={url} width="250" height="250" />
         {t.template_token}
       </div>
+    */
+    templateElements.push((
+      <div className="tile is-parent">
+        <article className="tile is-child box">
+          {/*<p className="title">One</p>*/}
+          <img src={url} />
+        </article>
+      </div>
     ));
-  })
+  });
 
+  let allRowsOfTemplateElements : Array<JSX.Element> = [];
+  let rowOfTemplateElements : Array<JSX.Element> = [];
+
+  let nextRowSize = 4;
+
+  templateElements.forEach(el => {
+    rowOfTemplateElements.push(el);
+
+    if (rowOfTemplateElements.length === nextRowSize) {
+      allRowsOfTemplateElements.push(
+        <div className="tile is-ancestor">
+          {rowOfTemplateElements.map(el => el)}
+        </div>
+      );
+      rowOfTemplateElements = [];
+      nextRowSize = getRandomInt(1, 4);
+    }
+  });
+
+  // Make sure last row is built.
+  if (rowOfTemplateElements.length !== 0) {
+    allRowsOfTemplateElements.push(
+      <div className="tile is-ancestor">
+        {rowOfTemplateElements.map(el => el)}
+      </div>
+    );
+    rowOfTemplateElements = [];
+  }
 
   return (
     <div>
@@ -95,8 +131,7 @@ function W2lTemplateListFc(props: Props) {
 
       <br />
 
-      {templateElements.map(el => el)}
-      
+      {allRowsOfTemplateElements.map(el => el)}
 
     </div>
   )
