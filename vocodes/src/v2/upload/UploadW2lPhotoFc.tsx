@@ -18,6 +18,12 @@ function UploadW2lPhotoFc(props: Props) {
     <div>
       <h1 className="title is-1"> Upload Photo (w2l template) </h1>
 
+      <br />
+      <Link
+        to="/upload"
+        className="button is-link is-fullwidth is-outlined"
+        onClick={() => {}}
+        >&lt; Back to upload type selection</Link>
 
     </div>
   )

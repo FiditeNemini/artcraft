@@ -18,6 +18,12 @@ function UploadTtsModelFc(props: Props) {
     <div>
       <h1 className="title is-1"> Upload Voice (TTS Model) </h1>
 
+      <br />
+      <Link
+        to="/upload"
+        className="button is-link is-fullwidth is-outlined"
+        onClick={() => {}}
+        >&lt; Back to upload type selection</Link>
 
     </div>
   )
