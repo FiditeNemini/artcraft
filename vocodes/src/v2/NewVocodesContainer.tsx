@@ -12,7 +12,7 @@ import { TtsModelListComponent } from './tts_model/TtsModelListComponent';
 import { UploadChoiceFc } from './upload/UploadChoiceFc';
 import { UploadW2lPhotoFc } from './upload/UploadW2lPhotoFc';
 import { UploadW2lVideoFc } from './upload/UploadW2lVideoFc';
-import { W2lTemplateListComponent } from './w2l_template_list/W2lTemplateListComponent';
+import { W2lTemplateListFc } from './w2l_template_list/W2lTemplateListFc';
 import { UploadTtsModelFc } from './upload/UploadTtsModelFc';
 import { UploadComponent } from './upload/UploadComponent';
 
@@ -96,9 +96,8 @@ class NewVocodesContainer extends React.Component<Props, State> {
               />
             </Route>
 
-            <Route path="/w2l">
-              <W2lTemplateListComponent
-                querySessionCallback={()=>{}}
+            <Route path="/video">
+              <W2lTemplateListFc
                 sessionWrapper={this.props.sessionWrapper}
               />
             </Route>
@@ -126,7 +125,7 @@ class NewVocodesContainer extends React.Component<Props, State> {
                 sessionWrapper={this.props.sessionWrapper}
               />
             </Route>
-            
+
             <Route path="/upload2">
               <UploadComponent
                 sessionWrapper={this.props.sessionWrapper}

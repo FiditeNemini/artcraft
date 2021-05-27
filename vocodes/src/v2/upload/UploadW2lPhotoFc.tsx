@@ -100,7 +100,7 @@ function UploadW2lPhotoFc(props: Props) {
         https://drive.google.com/file/d/{TOKEN}/view?usp=sharing
         */}
         <div className="field">
-          <label className="label">Download URL, eg. Google Drive link</label>
+          <label className="label">Download URL, eg. <code>https://i.imgur.com/lKaQ4Er.jpg</code></label>
           <div className="control has-icons-left has-icons-right">
             <input className="input" type="text" placeholder="Download URL" value={downloadUrl} onChange={handleDownloadUrlChange} />
             <span className="icon is-small is-left">

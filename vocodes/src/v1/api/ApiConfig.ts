@@ -45,6 +45,10 @@ class ApiConfig {
     return `${this.getScheme()}://${this.getNewApiHost()}/w2l/upload`;
   }
 
+  listW2l() : string {
+    return `${this.getScheme()}://${this.getNewApiHost()}/w2l/list`;
+  }
+
   getProfile(username: string) : string {
     return `${this.getScheme()}://${this.getNewApiHost()}/profile/${username}`;
   }
