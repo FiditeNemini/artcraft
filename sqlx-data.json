@@ -451,8 +451,8 @@
       ]
     }
   },
-  "b0de8ae0637ed5c77d4c697aaf68e89e30a0542a619dd68dd43851c2f701b503": {
-    "query": "\nINSERT INTO w2l_templates\nSET\n  token = ?,\n  template_type = ?,\n  updatable_slug = ?,\n  title = ?,\n  description_markdown = '',\n  description_rendered_html = '',\n  creator_user_token = ?,\n  creator_ip_address = ?,\n  original_download_url = ?,\n  private_bucket_hash = ?,\n  private_bucket_object_name = ?,\n  private_bucket_cached_faces_object_name = ?,\n  public_bucket_hash = 'TODO',\n  public_bucket_object_name = 'TODO',\n  maybe_private_bucket_preview_image_object_name = ?,\n  maybe_private_bucket_preview_video_object_name = ?,\n  file_size_bytes = ?,\n  mime_type = ?,\n  frame_width = ?,\n  frame_height = ?,\n  frame_count = ?,\n  fps = ?,\n  duration_millis = ?\n        ",
+  "ab78a81f85310750668e2c7de920c067290f2b004561ab706a5edfd893fd06fe": {
+    "query": "\nINSERT INTO w2l_templates\nSET\n  token = ?,\n  template_type = ?,\n  updatable_slug = ?,\n  title = ?,\n  description_markdown = '',\n  description_rendered_html = '',\n  creator_user_token = ?,\n  creator_ip_address = ?,\n  original_download_url = ?,\n  private_bucket_hash = ?,\n  private_bucket_object_name = ?,\n  private_bucket_cached_faces_object_name = ?,\n  maybe_public_bucket_preview_image_object_name = ?,\n  maybe_public_bucket_preview_video_object_name = ?,\n  file_size_bytes = ?,\n  mime_type = ?,\n  frame_width = ?,\n  frame_height = ?,\n  frame_count = ?,\n  fps = ?,\n  duration_millis = ?\n        ",
     "describe": {
       "columns": [],
       "parameters": {

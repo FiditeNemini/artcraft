@@ -93,6 +93,8 @@ CREATE TABLE tts_models (
   calculated_total_ratings_submitted_count INT(10) NOT NULL DEFAULT 0,
   calculated_total_uses_count BIGINT(10) NOT NULL DEFAULT 0,
 
+  -- ========== MODERATION DETAILS ==========
+
   -- In this case, a moderator disables it.
   is_mod_disabled BOOLEAN NOT NULL DEFAULT FALSE,
 
@@ -100,6 +102,8 @@ CREATE TABLE tts_models (
   maybe_mod_comments VARCHAR(255) DEFAULT NULL,
   -- The last moderator that made changes.
   maybe_mod_user_token VARCHAR(32) DEFAULT NULL,
+
+  -- ========== TIMESTAMPS ==========
 
   created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
@@ -138,9 +142,6 @@ CREATE TABLE w2l_templates (
     'image',
     'video'
   ) NOT NULL DEFAULT 'not-set',
-
-  -- Mods have to approve of w2l templates.
-  is_mod_approved BOOLEAN NOT NULL DEFAULT FALSE,
 
   -- Optional Pointer to a newer version of the template
   -- If there's a newer version, we can disable this one.
@@ -200,21 +201,17 @@ CREATE TABLE w2l_templates (
   fps FLOAT NOT NULL DEFAULT 0.0,
   duration_millis INT(1) NOT NULL DEFAULT 0,
 
-  -- The original source image/video and the "precomputed" faces
+  -- The hash of the original source image/video
   private_bucket_hash CHAR(64) NOT NULL,
-  -- The "full url" version of the path
+
+  -- The "full path" version of the path. Contains the hash.
   private_bucket_object_name VARCHAR(255) NOT NULL,
-  -- The "full url" of the cached faces object
+  -- The "full path" of the cached faces object. Contains the hash.
   private_bucket_cached_faces_object_name VARCHAR(255) NOT NULL,
 
-  -- The "full url" of the preview image and/or video
-  maybe_private_bucket_preview_image_object_name VARCHAR(255) DEFAULT NULL,
-  maybe_private_bucket_preview_video_object_name VARCHAR(255) DEFAULT NULL,
-
-  -- For the thumbnail we show.
-  public_bucket_hash CHAR(64) NOT NULL,
-  -- The "full url" version of the path
-  public_bucket_object_name VARCHAR(255) NOT NULL,
+  -- The "full url" of the preview image and/or video. Contains the hash.
+  maybe_public_bucket_preview_image_object_name VARCHAR(255) DEFAULT NULL,
+  maybe_public_bucket_preview_video_object_name VARCHAR(255) DEFAULT NULL,
 
   -- Calculated average, on a scale of 0-100
   -- Null with zero ratings.
@@ -226,6 +223,9 @@ CREATE TABLE w2l_templates (
 
   -- ========== MODERATION DETAILS ==========
 
+  -- Mods have to approve of w2l templates.
+  is_mod_approved BOOLEAN NOT NULL DEFAULT FALSE,
+
   -- In this case, a moderator disables it.
   -- This also disables it for the creator.
   is_mod_disabled BOOLEAN NOT NULL DEFAULT FALSE,
@@ -235,6 +235,8 @@ CREATE TABLE w2l_templates (
 
   -- The last moderator that made changes.
   maybe_mod_user_token VARCHAR(32) DEFAULT NULL,
+
+  -- ========== TIMESTAMPS ==========
 
   created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
@@ -256,7 +258,6 @@ CREATE TABLE w2l_templates (
   KEY index_creator_ip_address (creator_ip_address),
   KEY index_creator_set_visibility (creator_set_visibility),
   KEY index_private_bucket_hash (private_bucket_hash),
-  KEY index_public_bucket_hash (public_bucket_hash),
   KEY index_is_mod_disabled (is_mod_disabled)
 
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin;
