@@ -339,6 +339,7 @@ def main(tempdir):
     print('Done detecting faces!', flush=True)
 
     mime_type = magic.from_file(args.image_or_video_filename, mime=True)
+    file_size_bytes = os.path.getsize(args.image_or_video_filename)
 
     metadata = {
         'is_video': is_video,
@@ -346,6 +347,7 @@ def main(tempdir):
         'height': frame_h,
         'num_frames': len(full_frames),
         'mimetype': mime_type,
+        'file_size_bytes': file_size_bytes,
     }
 
     if is_video:

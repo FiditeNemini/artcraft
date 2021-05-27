@@ -50,16 +50,6 @@
       "nullable": []
     }
   },
-  "4db1b60fd29489e897d958db8eb5818ba80cf198277b7e8e8095f0d34b93fc76": {
-    "query": "\nINSERT INTO w2l_templates\nSET\n  token = ?,\n  template_type = ?,\n  updatable_slug = ?,\n  title = ?,\n  description_markdown = '',\n  description_rendered_html = '',\n  creator_user_token = ?,\n  creator_ip_address = ?,\n  original_download_url = ?,\n  private_bucket_hash = ?,\n  private_bucket_object_name = ?,\n  private_bucket_cached_faces_object_name = ?,\n  public_bucket_hash = 'TODO',\n  public_bucket_object_name = 'TODO',\n  maybe_private_bucket_preview_image_object_name = ?,\n  maybe_private_bucket_preview_video_object_name = ?,\n  mime_type = ?,\n  frame_width = ?,\n  frame_height = ?,\n  frame_count = ?,\n  fps = ?,\n  duration_millis = ?\n        ",
-    "describe": {
-      "columns": [],
-      "parameters": {
-        "Right": 18
-      },
-      "nullable": []
-    }
-  },
   "53d77ee58e9b1f7fb900914895c25bcccb9297378ff018c1e553b187d1956e92": {
     "query": "\nSELECT token, username, email_address, password_hash\nFROM users\nWHERE username = ?\nLIMIT 1\n        ",
     "describe": {
@@ -459,6 +449,16 @@
         false,
         false
       ]
+    }
+  },
+  "b0de8ae0637ed5c77d4c697aaf68e89e30a0542a619dd68dd43851c2f701b503": {
+    "query": "\nINSERT INTO w2l_templates\nSET\n  token = ?,\n  template_type = ?,\n  updatable_slug = ?,\n  title = ?,\n  description_markdown = '',\n  description_rendered_html = '',\n  creator_user_token = ?,\n  creator_ip_address = ?,\n  original_download_url = ?,\n  private_bucket_hash = ?,\n  private_bucket_object_name = ?,\n  private_bucket_cached_faces_object_name = ?,\n  public_bucket_hash = 'TODO',\n  public_bucket_object_name = 'TODO',\n  maybe_private_bucket_preview_image_object_name = ?,\n  maybe_private_bucket_preview_video_object_name = ?,\n  file_size_bytes = ?,\n  mime_type = ?,\n  frame_width = ?,\n  frame_height = ?,\n  frame_count = ?,\n  fps = ?,\n  duration_millis = ?\n        ",
+    "describe": {
+      "columns": [],
+      "parameters": {
+        "Right": 19
+      },
+      "nullable": []
     }
   },
   "b7535ecf2e63b7f02b5b96f833fd8cd28285b24473df6f89795ff360c1723215": {

@@ -256,6 +256,7 @@ struct FileMetadata {
   pub fps: Option<f32>,
   pub duration_millis: Option<u64>,
   pub mimetype: Option<String>,
+  pub file_size_bytes: u64,
 }
 
 fn read_metadata_file(filename: &str) -> AnyhowResult<FileMetadata> {
@@ -456,6 +457,7 @@ async fn process_job(downloader: &Downloader, job: &W2lTemplateUploadJobRecord) 
     &full_object_path_cached_faces,
     maybe_image_preview_object_name.as_deref(),
     maybe_video_preview_object_name.as_deref(),
+    file_metadata.file_size_bytes,
     file_metadata.mimetype.as_deref(),
     file_metadata.width,
     file_metadata.height,
