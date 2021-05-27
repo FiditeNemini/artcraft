@@ -128,13 +128,35 @@ function W2lTemplateListFc(props: Props) {
     rowOfTemplateElements = [];
   }
 
+  let extraDetails = <p />;
+
+  if (props.sessionWrapper.isLoggedIn()) {
+    extraDetails = (
+      <p>
+        Pick a template, then you can make it lip sync.
+        If you want to use your own video or image, you can
+        <Link to="/upload">upload it as a template</Link>.
+        You'll then be able to use it whenever you want!
+      </p>
+    );
+
+  } else {
+    extraDetails = (
+      <p>
+        Pick a template, then you can make it lip sync.
+        If you want to use your own video or image, you'll
+        need to <Link to="/signup">create an account</Link>.
+        You'll then be able to upload and reuse your templates 
+        whenever you want!
+      </p>
+    );
+  }
+
   return (
     <div>
       <h1 className="title is-1"> Video lip sync templates </h1>
 
-      <p>
-        Pick a template, then you can make it lip sync.
-      </p>
+      {extraDetails}
 
       <br />
 
