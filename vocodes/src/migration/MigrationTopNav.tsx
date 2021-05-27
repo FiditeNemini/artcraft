@@ -6,6 +6,7 @@ import { SessionWrapper } from '../session/SessionWrapper';
 interface Props {
   sessionWrapper: SessionWrapper,
   enableAlpha: boolean,
+  querySessionAction: () => void,
 }
 
 function MigrationTopNav(props: Props) {
@@ -21,6 +22,7 @@ function MigrationTopNav(props: Props) {
       <MigrationTopNav_Session
         sessionWrapper={props.sessionWrapper}
         enableAlpha={props.enableAlpha}
+        querySessionAction={props.querySessionAction}
         />
     </nav>
   )

@@ -1,15 +1,41 @@
 import React from 'react';
 import { SessionWrapper } from '../session/SessionWrapper';
-import { Link } from 'react-router-dom';
+import { Link, useHistory } from 'react-router-dom';
+import { ApiConfig } from '../v1/api/ApiConfig';
 
 interface Props {
   sessionWrapper: SessionWrapper,
   enableAlpha: boolean,
+  querySessionAction: () => void,
 }
 
 function MigrationTopNav_Session(props: Props) {
+  let history = useHistory();
+
   if (!props.enableAlpha) {
     return <nav />
+  }
+
+  const logoutHandler = () => {
+    if (!props.enableAlpha) {
+      return;
+    }
+
+    const api = new ApiConfig();
+    const endpointUrl = api.logout();
+
+    fetch(endpointUrl, {
+      method: 'POST',
+      credentials: 'include',
+      headers: {
+        'Accept': 'application/json',
+      },
+    })
+    .then(_raw_response => {
+      props.querySessionAction();
+      history.push('/');
+    })
+    .catch(e => { /* Ignore. */ });
   }
 
   let loggedIn = props.sessionWrapper.isLoggedIn();
@@ -28,7 +54,8 @@ function MigrationTopNav_Session(props: Props) {
     gravatar = <img alt="gravatar" src={gravatarUrl} />
   }
 
-  let sessionLink = <p />;
+  let sessionLink = <span />;
+  let logoutLink = <span />;
 
   if (loggedIn) {
     let url = `/profile/${displayName}`;
@@ -38,6 +65,10 @@ function MigrationTopNav_Session(props: Props) {
         className="button is-alert is-inverted is-pulled-right"
         > {gravatar}&nbsp; {displayName}</Link>
     );
+    logoutLink = <button
+        className="button is-alert is-inverted is-pulled-right"
+        onClick={logoutHandler}
+      >Logout</button>;
   } else {
     sessionLink = (
       <Link
@@ -47,7 +78,12 @@ function MigrationTopNav_Session(props: Props) {
     );
   }
 
-  return sessionLink;
+  return (
+    <span>
+      {logoutLink}
+      {sessionLink}
+    </span>
+  );
 }
 
 export { MigrationTopNav_Session };
