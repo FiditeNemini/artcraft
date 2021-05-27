@@ -63,7 +63,7 @@ function ProfileDataFc(props: Props) {
 
   return (
     <div>
-      <h1 className="title is-1"> Profile Data </h1>
+      <h1 className="title is-1"> My Data (Models, Results, etc.) </h1>
     </div>
   )
 }

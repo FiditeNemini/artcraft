@@ -37,6 +37,10 @@ class ApiConfig {
     return `${this.getScheme()}://${this.getNewApiHost()}/session`;
   }
 
+  listTts() : string {
+    return `${this.getScheme()}://${this.getNewApiHost()}/tts/list`;
+  }
+
   uploadTts() : string {
     return `${this.getScheme()}://${this.getNewApiHost()}/tts/upload`;
   }

@@ -16,6 +16,7 @@ import { UploadTtsModelFc } from './upload/UploadTtsModelFc';
 import { UploadComponent } from './upload/UploadComponent';
 import { W2lTemplateViewFc } from './w2l_template_view/W2lTemplateViewFc';
 import { ProfileDataFc } from './profile_data/ProfileDataFc';
+import { TtsModelFormFc } from './tts_model/TtsModelFormFc';
 
 interface Props {
   sessionWrapper: SessionWrapper,
@@ -133,6 +134,12 @@ class NewVocodesContainer extends React.Component<Props, State> {
 
             <Route path="/upload2">
               <UploadComponent
+                sessionWrapper={this.props.sessionWrapper}
+              />
+            </Route>
+
+            <Route path="/">
+              <TtsModelFormFc
                 sessionWrapper={this.props.sessionWrapper}
               />
             </Route>

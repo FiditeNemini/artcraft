@@ -20,7 +20,7 @@ function NewTopNavFc(props: Props) {
     <nav>
       <div className="columns">
         <div className="column">
-          <Link to="/tts"
+          <Link to="/"
             className="button is-link is-medium is-inverted"
             >Text to Speech️</Link>
         </div>
