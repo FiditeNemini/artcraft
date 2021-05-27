@@ -1,8 +1,7 @@
 import React from 'react';
 import { FirehoseComponent } from './firehose/FirehoseComponent';
-import { LoginComponent } from './login/LoginComponent';
-import { LoginFunctionalComponent } from './login/LoginFunctionalComponent';
-import { NewTopNav } from './NewTopNav';
+import { LoginFc } from './login/LoginFc';
+import { NewTopNavFc } from './NewTopNavFc';
 import { ProfileComponent } from './profile/ProfileComponent';
 import { ProfileDataComponent } from './profile_data/ProfileDataComponent';
 import { SessionWrapper } from '../session/SessionWrapper';
@@ -16,6 +15,7 @@ import { W2lTemplateListFc } from './w2l_template_list/W2lTemplateListFc';
 import { UploadTtsModelFc } from './upload/UploadTtsModelFc';
 import { UploadComponent } from './upload/UploadComponent';
 import { W2lTemplateViewFc } from './w2l_template_view/W2lTemplateViewFc';
+import { ProfileDataFc } from './profile_data/ProfileDataFc';
 
 interface Props {
   sessionWrapper: SessionWrapper,
@@ -42,7 +42,7 @@ class NewVocodesContainer extends React.Component<Props, State> {
       <div id="main" className="mainwrap">
         <div id="viewable">
 
-          <NewTopNav
+          <NewTopNavFc
             logoutHandler={this.logout}
             sessionWrapper={this.props.sessionWrapper}
             />
@@ -56,7 +56,7 @@ class NewVocodesContainer extends React.Component<Props, State> {
             </Route>
 
             <Route path="/login">
-              <LoginFunctionalComponent
+              <LoginFc
                 sessionWrapper={this.props.sessionWrapper}
                 querySessionAction={this.props.querySessionAction}
               />
@@ -65,10 +65,8 @@ class NewVocodesContainer extends React.Component<Props, State> {
 
             <Route path="/profile/:username/data"
               render={(routeProps: RouteProps) => (
-                <ProfileDataComponent
-                  querySessionCallback={()=>{}}
+                <ProfileDataFc
                   sessionWrapper={this.props.sessionWrapper}
-                  routeProps={routeProps}
                 />
               )}
             />

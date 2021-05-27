@@ -14,7 +14,7 @@ interface Props {
   querySessionAction: () => void,
 }
 
-function LoginFunctionalComponent(props: Props) {
+function LoginFc(props: Props) {
   let history = useHistory();
 
   const [password, setPassword] = useState('')
@@ -123,4 +123,4 @@ function LoginFunctionalComponent(props: Props) {
   )
 }
 
-export { LoginFunctionalComponent };
+export { LoginFc };

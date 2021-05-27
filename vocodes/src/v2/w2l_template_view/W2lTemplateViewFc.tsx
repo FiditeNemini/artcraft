@@ -108,8 +108,6 @@ function W2lTemplateViewFc(props: Props) {
           </tr>
         </tbody>
       </table>
-
-
     </div>
   )
 }
