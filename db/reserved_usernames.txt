@@ -5,6 +5,7 @@
 # https://github.com/Mottie/github-reserved-names
 
 # Stuff we care about
+monogatari
 storied
 stories
 story
@@ -12,11 +13,26 @@ storyteller
 tell
 teller
 vocode
+vocoder
+vocoders
 vocodes
+
+# Types of models
+first_order_model
+fom
+hifigan
+melgan
+tacotron
+tt2
+tts
+w2l
 
 # Companies we'd love to have use our service
 # so we'll reserve them to be safe
+amazon
 apple
+cash
+cashapp
 epic
 epicgames
 facebook
@@ -24,8 +40,21 @@ github
 google
 microsoft
 netflix
+nintendo
+paypal
+reddit
+snap
+snapchat
+softbank
+sony
+square
+stripe
+tiktok
+twitch
 twitter
 unreal
+venmo
+youtube
 
 # Top 50 languages by speaking population
 chinese
@@ -343,6 +372,7 @@ free
 friend
 friends
 ftp
+ftps
 gadget
 gadgets
 game
@@ -401,6 +431,9 @@ information
 inquiry
 instagram
 integration
+integration-test
+integration_test
+integrationtest
 interfaces
 intranet
 introduction
@@ -682,6 +715,7 @@ sessions
 setting
 settings
 setup
+sftp
 share
 shared
 shareholders
@@ -702,6 +736,8 @@ slug
 smartphone
 smtp
 soporte
+sort
+sorted
 source
 spam
 spec
@@ -801,6 +837,7 @@ true
 tutorial
 tux
 tv
+tweet
 twitter
 type
 typescript
@@ -825,6 +862,8 @@ ver
 version
 video
 videos
+view
+viewer
 visitor
 visualization
 w
