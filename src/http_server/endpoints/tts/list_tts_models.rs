@@ -26,27 +26,22 @@ use std::sync::Arc;
 use chrono::{DateTime, Utc};
 
 #[derive(Serialize)]
-pub struct W2lTemplateRecordForResponse {
-  pub template_token: String,
-  pub template_type: String,
+pub struct TtsModelRecordForResponse {
+  pub model_token: String,
+  pub tts_model_type: String,
   pub creator_user_token: String,
   pub creator_username: String,
   pub creator_display_name: String,
   pub updatable_slug: String,
   pub title: String,
-  pub frame_width: u32,
-  pub frame_height: u32,
-  pub duration_millis: u32,
-  pub maybe_image_object_name: Option<String>,
-  pub maybe_video_object_name: Option<String>,
   pub created_at: DateTime<Utc>,
   pub updated_at: DateTime<Utc>,
 }
 
 #[derive(Serialize)]
-pub struct ListW2lTemplatesSuccessResponse {
+pub struct ListTtsModelsSuccessResponse {
   pub success: bool,
-  pub templates: Vec<W2lTemplateRecordForResponse>,
+  pub templates: Vec<TtsModelRecordForResponse>,
 }
 
 #[derive(Serialize)]
@@ -56,38 +51,33 @@ pub struct ErrorResponse {
 }
 
 #[derive(Debug, Display)]
-pub enum ListW2lTemplatesError {
+pub enum ListTtsModelsError {
   ServerError,
 }
 
 #[derive(Serialize)]
-pub struct W2lTemplateRecord {
-  pub template_token: String,
-  pub template_type: String,
+pub struct TtsModelRecord {
+  pub model_token: String,
+  pub tts_model_type: String,
   pub creator_user_token: String,
   pub creator_username: String,
   pub creator_display_name: String,
   pub updatable_slug: String,
   pub title: String,
-  pub frame_width: i32,
-  pub frame_height: i32,
-  pub duration_millis: i32,
-  pub maybe_public_bucket_preview_image_object_name: Option<String>,
-  pub maybe_public_bucket_preview_video_object_name: Option<String>,
   pub created_at: DateTime<Utc>,
   pub updated_at: DateTime<Utc>,
 }
 
-impl ResponseError for ListW2lTemplatesError {
+impl ResponseError for ListTtsModelsError {
   fn status_code(&self) -> StatusCode {
     match *self {
-      ListW2lTemplatesError::ServerError=> StatusCode::INTERNAL_SERVER_ERROR,
+      ListTtsModelsError::ServerError=> StatusCode::INTERNAL_SERVER_ERROR,
     }
   }
 
   fn error_response(&self) -> HttpResponse {
     let error_reason = match self {
-      ListW2lTemplatesError::ServerError => "server error".to_string(),
+      ListTtsModelsError::ServerError => "server error".to_string(),
     };
 
     let response = ErrorResponse {
@@ -106,49 +96,44 @@ impl ResponseError for ListW2lTemplatesError {
   }
 }
 
-pub async fn list_w2l_templates_handler(
+pub async fn list_tts_models_handler(
   http_request: HttpRequest,
-  server_state: web::Data<Arc<ServerState>>) -> Result<HttpResponse, ListW2lTemplatesError>
+  server_state: web::Data<Arc<ServerState>>) -> Result<HttpResponse, ListTtsModelsError>
 {
   // NB: Lookup failure is Err(RowNotFound).
   // NB: Since this is publicly exposed, we don't query sensitive data.
   let maybe_templates = sqlx::query_as!(
-      W2lTemplateRecord,
+      TtsModelRecord,
         r#"
 SELECT
-    w2l.token as template_token,
-    w2l.template_type,
-    w2l.creator_user_token,
+    tts.token as model_token,
+    tts.tts_model_type,
+    tts.creator_user_token,
     users.username as creator_username,
     users.display_name as creator_display_name,
-    w2l.updatable_slug,
-    w2l.title,
-    w2l.frame_width,
-    w2l.frame_height,
-    w2l.duration_millis,
-    w2l.maybe_public_bucket_preview_image_object_name,
-    w2l.maybe_public_bucket_preview_video_object_name,
-    w2l.created_at,
-    w2l.updated_at
-FROM w2l_templates as w2l
+    tts.updatable_slug,
+    tts.title,
+    tts.created_at,
+    tts.updated_at
+FROM tts_models as tts
 JOIN users
-ON users.token = w2l.creator_user_token
-WHERE w2l.deleted_at IS NULL
+ON users.token = tts.creator_user_token
+WHERE tts.deleted_at IS NULL
         "#,
     )
     .fetch_all(&server_state.mysql_pool)
     .await; // TODO: This will return error if it doesn't exist
 
-  let templates : Vec<W2lTemplateRecord> = match maybe_templates {
+  let templates : Vec<TtsModelRecord> = match maybe_templates {
     Ok(templates) => templates,
     Err(err) => {
       match err {
         RowNotFound => {
-          return Err(ListW2lTemplatesError::ServerError);
+          return Err(ListTtsModelsError::ServerError);
         },
         _ => {
           warn!("w2l template list query error: {:?}", err);
-          return Err(ListW2lTemplatesError::ServerError);
+          return Err(ListTtsModelsError::ServerError);
         }
       }
     }
@@ -156,32 +141,27 @@ WHERE w2l.deleted_at IS NULL
 
   let templates_for_response = templates.into_iter()
     .map(|template| {
-      W2lTemplateRecordForResponse {
-        template_token: template.template_token.clone(),
-        template_type: template.template_type.clone(),
+      TtsModelRecordForResponse {
+        model_token: template.model_token.clone(),
+        tts_model_type: template.tts_model_type.clone(),
         creator_user_token: template.creator_user_token.clone(),
         creator_username: template.creator_username.clone(),
         creator_display_name: template.creator_display_name.clone(),
         updatable_slug: template.updatable_slug.clone(),
         title: template.title.clone(),
-        frame_width: if template.frame_width > 0 { template.frame_width as u32 } else { 0 },
-        frame_height: if template.frame_height  > 0 { template.frame_height as u32 } else { 0 },
-        duration_millis: if template.duration_millis > 0 { template.duration_millis as u32 } else { 0 },
-        maybe_image_object_name: template.maybe_public_bucket_preview_image_object_name.clone(),
-        maybe_video_object_name: template.maybe_public_bucket_preview_video_object_name.clone(),
         created_at: template.created_at.clone(),
         updated_at: template.updated_at.clone(),
       }
     })
-    .collect::<Vec<W2lTemplateRecordForResponse>>();
+    .collect::<Vec<TtsModelRecordForResponse>>();
 
-  let response = ListW2lTemplatesSuccessResponse {
+  let response = ListTtsModelsSuccessResponse {
     success: true,
     templates: templates_for_response,
   };
 
   let body = serde_json::to_string(&response)
-    .map_err(|e| ListW2lTemplatesError::ServerError)?;
+    .map_err(|e| ListTtsModelsError::ServerError)?;
 
   Ok(HttpResponse::Ok()
     .content_type("application/json")
