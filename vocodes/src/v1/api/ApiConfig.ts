@@ -49,6 +49,11 @@ class ApiConfig {
     return `${this.getScheme()}://${this.getNewApiHost()}/w2l/list`;
   }
 
+  viewW2l(templateSlug: string) : string {
+    return `${this.getScheme()}://${this.getNewApiHost()}/w2l/template/${templateSlug}`;
+  }
+
+
   getProfile(username: string) : string {
     return `${this.getScheme()}://${this.getNewApiHost()}/profile/${username}`;
   }

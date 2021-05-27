@@ -77,16 +77,18 @@ function W2lTemplateListFc(props: Props) {
 
     let url = `https://storage.googleapis.com/dev-vocodes-public${object}`;
 
+    let link = `/w2l/${t.updatable_slug}`;
     /*
       <div>
         {t.template_token}
       </div>
     */
+  
     templateElements.push((
       <div className="tile is-parent">
         <article className="tile is-child box">
           {/*<p className="title">One</p>*/}
-          <img src={url} />
+          <Link to={link}><img src={url} /></Link>
         </article>
       </div>
     ));
