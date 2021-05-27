@@ -1,16 +1,17 @@
 import React from 'react';
-import { NewTopNav } from './NewTopNav';
+import { FirehoseComponent } from './firehose/FirehoseComponent';
 import { LoginComponent } from './login/LoginComponent';
+import { LoginFunctionalComponent } from './login/LoginFunctionalComponent';
+import { NewTopNav } from './NewTopNav';
+import { ProfileComponent } from './profile/ProfileComponent';
+import { ProfileDataComponent } from './profile_data/ProfileDataComponent';
+import { SessionWrapper } from '../session/SessionWrapper';
 import { SignupComponent } from './signup/SignupComponent';
 import { Switch, Route, RouteProps } from 'react-router-dom';
-import { SessionWrapper } from '../session/SessionWrapper';
-import { UploadComponent } from './upload/UploadComponent';
-import { FirehoseComponent } from './firehose/FirehoseComponent';
-import { ProfileComponent } from './profile/ProfileComponent';
 import { TtsModelListComponent } from './tts_model/TtsModelListComponent';
+import { UploadChoiceFc } from './upload/UploadChoiceFc';
+import { UploadComponent } from './upload/UploadComponent';
 import { W2lTemplateListComponent } from './w2l_template_list/W2lTemplateListComponent';
-import { ProfileDataComponent } from './profile_data/ProfileDataComponent';
-import { LoginFunctionalComponent } from './login/LoginFunctionalComponent';
 
 interface Props {
   sessionWrapper: SessionWrapper,
@@ -100,6 +101,18 @@ class NewVocodesContainer extends React.Component<Props, State> {
             </Route>
 
             <Route path="/upload">
+              <UploadChoiceFc
+                sessionWrapper={this.props.sessionWrapper}
+              />
+            </Route>
+
+            <Route path="/upload/w2l">
+              <UploadComponent
+                sessionWrapper={this.props.sessionWrapper}
+              />
+            </Route>
+
+            <Route path="/upload/tts">
               <UploadComponent
                 sessionWrapper={this.props.sessionWrapper}
               />
