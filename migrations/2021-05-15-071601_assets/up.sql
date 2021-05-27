@@ -199,7 +199,7 @@ CREATE TABLE w2l_templates (
   frame_height INT(10) NOT NULL DEFAULT 0,
   frame_count INT(10) NOT NULL DEFAULT 0,
   fps FLOAT NOT NULL DEFAULT 0.0,
-  duration_millis INT(1) NOT NULL DEFAULT 0,
+  duration_millis INT(10) NOT NULL DEFAULT 0,
 
   -- The hash of the original source image/video
   private_bucket_hash CHAR(64) NOT NULL,
