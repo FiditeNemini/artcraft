@@ -128,10 +128,10 @@ function W2lTemplateListFc(props: Props) {
 
   return (
     <div>
-      <h1 className="title is-1"> Video Lipsync Templates </h1>
+      <h1 className="title is-1"> Video lip sync templates </h1>
 
       <p>
-        Instructions go here.
+        Pick a template, then you can make it lip sync.
       </p>
 
       <br />
