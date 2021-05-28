@@ -47,6 +47,7 @@ use crate::http_server::endpoints::users::get_profile::get_profile_handler;
 use crate::http_server::endpoints::w2l::list_w2l_templates::list_w2l_templates_handler;
 use crate::http_server::endpoints::w2l::get_w2l_template::get_w2l_template_handler;
 use crate::http_server::endpoints::tts::list_tts_models::list_tts_models_handler;
+use crate::http_server::endpoints::w2l::enqueue_infer_w2l_with_uploads::enqueue_infer_w2l_with_uploads;
 
 const DEFAULT_BIND_ADDRESS : &'static str = "0.0.0.0:12345";
 
@@ -211,7 +212,7 @@ pub async fn serve(server_state: ServerState) -> AnyhowResult<()>
           )
           .service(
             web::resource("/inference")
-              .route(web::post().to(infer_w2l_handler))
+              .route(web::post().to(enqueue_infer_w2l_with_uploads))
               .route(web::head().to(|| HttpResponse::Ok()))
           )
           .service(

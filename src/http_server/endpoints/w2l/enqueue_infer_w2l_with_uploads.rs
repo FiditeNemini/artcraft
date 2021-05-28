@@ -127,36 +127,56 @@ pub async fn enqueue_infer_w2l_with_uploads(
 
   // ==================== READ MULTIPART REQUEST ==================== //
 
+  info!("Reading multipart request...");
+
   let mut maybe_uuid_idempotency_token: Option<String> = None;
   let mut maybe_template_token: Option<String> = None;
   let mut maybe_audio_file_name : Option<String> = None;
 
   while let Ok(Some(mut field)) = payload.try_next().await {
-    let content_disposition: ContentDisposition = field.content_disposition().unwrap();
-    let field_name = content_disposition.get_name().unwrap_or("");
-    let filename = content_disposition.get_filename().unwrap_or("");
+    let mut field_name = "".to_string();
+    let mut filename = "".to_string();
 
-    match field_name {
+    if let Some(content_disposition) = field.content_disposition() {
+      field_name = content_disposition.get_name()
+        .map(|s| s.to_string())
+        .unwrap_or("".to_string());
+      filename = content_disposition.get_filename()
+        .map(|s| s.to_string())
+        .unwrap_or("".to_string());
+    }
+
+    match field_name.as_ref() {
       "uuid_idempotency_token" => {
         // Form text field.
         maybe_uuid_idempotency_token = read_multipart_field_as_text(&mut field).await
-          .map_err(|_| InferW2lWithUploadError::ServerError)?;
+          .map_err(|e| {
+            warn!("Error reading idempotency token: {:}", e);
+            InferW2lWithUploadError::ServerError
+          })?;
       },
       "template_token" => {
         // Form text field.
         maybe_template_token = read_multipart_field_as_text(&mut field).await
-          .map_err(|_| InferW2lWithUploadError::ServerError)?;
+          .map_err(|e| {
+            warn!("Error reading template token: {:}", e);
+            InferW2lWithUploadError::ServerError
+          })?;
       },
       "audio" => {
         // Form binary data.
         maybe_audio_file_name = Some(filename.to_string());
 
         let maybe_bytes = checked_read_multipart_bytes(&mut field).await
-          .map_err(|_| InferW2lWithUploadError::ServerError)?;
+          .map_err(|e| {
+            warn!("Error reading audio upload: {:}", e);
+            InferW2lWithUploadError::ServerError
+          })?;
 
         let bytes = match maybe_bytes {
           Some(bytes) => bytes,
           None => {
+            warn!("Empty file uploaded");
             return Err(InferW2lWithUploadError::EmptyFileUploaded); // Nothing was uploaded!
           },
         };
@@ -220,6 +240,8 @@ pub async fn enqueue_infer_w2l_with_uploads(
     warn!("Hash bucket path error: {:?}", e);
     InferW2lWithUploadError::ServerError
   })?;
+
+  let audio_upload_bucket_path = "todo".to_string(); // TODO TODO
 
   // TODO: Upload audio to bucket!
 
