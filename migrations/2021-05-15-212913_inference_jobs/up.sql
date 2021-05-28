@@ -79,12 +79,18 @@ CREATE TABLE w2l_inference_jobs (
   -- Idempotency token from client
   uuid_idempotency_token VARCHAR(36) NOT NULL,
 
-  -- ========== INFERENCE DETAILS ==========
+  -- ========== INFERENCE DETAILS : FACE TEMPLATE ==========
 
   -- The W2L template to use
   -- Can be an image or video.
   -- This is null if we're using a custom uploaded image.
   maybe_w2l_template_token VARCHAR(32) DEFAULT NULL,
+
+  -- If we're using a custom uploaded image, this will be present.
+  -- NOTE: This may never be supported.
+  maybe_public_image_bucket_location VARCHAR(255) DEFAULT NULL,
+
+  -- ========== INFERENCE DETAILS : AUDIO SOURCE ==========
 
   -- If we're using TTS results, this will be present
   maybe_tts_inference_result_token VARCHAR(32) DEFAULT NULL,
@@ -92,8 +98,13 @@ CREATE TABLE w2l_inference_jobs (
   -- If we're using custom uploaded audio, this will be present.
   maybe_public_audio_bucket_location VARCHAR(255) DEFAULT NULL,
 
-  -- If we're using a custom uploaded image, this will be present.
-  maybe_public_image_bucket_location VARCHAR(255) DEFAULT NULL,
+  -- The filename that was used at upload time (if available)
+  maybe_original_audio_filename CHAR(255) DEFAULT NULL,
+
+  -- Where the audio file was originally downloaded (if it was downloaded)
+  maybe_original_audio_download_url VARCHAR(512) DEFAULT NULL,
+
+  maybe_audio_mime_type VARCHAR(32) DEFAULT NULL,
 
   -- ========== CREATOR DETAILS ==========
 

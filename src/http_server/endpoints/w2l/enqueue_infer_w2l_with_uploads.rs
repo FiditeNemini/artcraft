@@ -230,7 +230,13 @@ pub async fn enqueue_infer_w2l_with_uploads(
     .map(|user_session| user_session.user_token.to_string());
 
 
-  // ==================== TODO: UPLOAD AUDIO FILE ==================== //
+  // ==================== ANALYZE AND UPLOAD AUDIO FILE ==================== //
+
+  let mut audio_type = "application/octet-stream".to_string();
+
+  if let Some(maybe_type) = infer::get(audio_bytes.as_ref()) {
+    audio_type = maybe_type.mime_type().to_string();
+  }
 
   let upload_uuid = generate_random_uuid();
 
@@ -243,9 +249,11 @@ pub async fn enqueue_infer_w2l_with_uploads(
   })?;
 
   info!("Uploading audio to bucket...");
-  server_state.private_bucket_client.upload_file(
+  server_state.private_bucket_client.upload_file_with_content_type(
     &audio_upload_bucket_path,
-    audio_bytes.as_ref()).await
+    audio_bytes.as_ref(),
+    &audio_type)
+    .await
     .map_err(|e| {
       warn!("Upload audio bytes to bucket error: {:?}", e);
       InferW2lWithUploadError::ServerError
@@ -254,7 +262,7 @@ pub async fn enqueue_infer_w2l_with_uploads(
   // ==================== SAVE JOB RECORD ==================== //
 
   // This token is returned to the client.
-  let job_token = random_prefix_crockford_token("W2L_INFER:", 32)
+  let job_token = random_prefix_crockford_token("W2L_INF:", 32)
     .map_err(|e| {
       warn!("Error creating token");
       InferW2lWithUploadError::ServerError
@@ -272,6 +280,9 @@ SET
   maybe_w2l_template_token = ?,
   maybe_public_audio_bucket_location = ?,
 
+  maybe_original_audio_filename = ?,
+  maybe_audio_mime_type = ?,
+
   maybe_creator_user_token = ?,
   creator_ip_address = ?,
   disable_end_bump = false,
@@ -282,6 +293,8 @@ SET
         uuid_idempotency_token.to_string(),
         maybe_template_token.clone(),
         Some(audio_upload_bucket_path.clone()),
+        maybe_audio_file_name.clone(),
+        Some(audio_type.clone()),
         maybe_user_token.clone(),
         ip_address.to_string()
     )
