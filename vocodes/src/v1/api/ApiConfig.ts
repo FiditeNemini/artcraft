@@ -57,6 +57,9 @@ class ApiConfig {
     return `${this.getScheme()}://${this.getNewApiHost()}/w2l/template/${templateSlug}`;
   }
 
+  inferW2l() : string {
+    return `${this.getScheme()}://${this.getNewApiHost()}/w2l/inference`;
+  }
 
   getProfile(username: string) : string {
     return `${this.getScheme()}://${this.getNewApiHost()}/profile/${username}`;
