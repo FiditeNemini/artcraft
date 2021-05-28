@@ -21,6 +21,7 @@ use sqlx::mysql::MySqlDatabaseError;
 use std::sync::Arc;
 use crate::util::email_to_gravatar::email_to_gravatar;
 use crate::validations::username_reservations::is_reserved_username;
+use crate::util::random_prefix_crockford_token::random_prefix_crockford_token;
 
 const NEW_USER_ROLE: &'static str = "new-user";
 
@@ -109,7 +110,11 @@ pub async fn create_account_handler(
     return Err(CreateAccountError::BadInput("invalid email address".to_string()));
   }
 
-  let user_token = random_crockford_token(15);
+  let user_token = random_prefix_crockford_token("U:", 15)
+    .map_err(|e| {
+      warn!("Bad crockford token: {:?}", e);
+      CreateAccountError::ServerError
+    })?;
 
   let password_hash = match bcrypt::hash(&request.password, bcrypt::DEFAULT_COST) {
     Ok(hash) => hash,

@@ -7,6 +7,7 @@ use chrono::Utc;
 use crate::util::anyhow_result::AnyhowResult;
 use crate::util::random_crockford_token::random_crockford_token;
 use sqlx::MySqlPool;
+use crate::util::random_prefix_crockford_token::random_prefix_crockford_token;
 
 /// table: w2l_template_upload_jobs
 #[derive(Debug)]
@@ -126,7 +127,7 @@ pub async fn insert_w2l_template(pool: &MySqlPool,
                                  duration_millis: u64)
   -> AnyhowResult<u64>
 {
-  let model_token = random_crockford_token(32);
+  let model_token = random_prefix_crockford_token("W2L_TPL:", 32)?;
   let updatable_slug = model_token.clone();
 
   let query_result = sqlx::query!(

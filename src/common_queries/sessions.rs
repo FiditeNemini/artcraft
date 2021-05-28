@@ -3,11 +3,12 @@ use log::{info, warn};
 use crate::AnyhowResult;
 use crate::util::random_crockford_token::random_crockford_token;
 use sqlx::MySqlPool;
+use crate::util::random_prefix_crockford_token::random_prefix_crockford_token;
 
 pub async fn create_session_for_user(user_token: &str, ip_address: &str, mysql_pool: &MySqlPool)
   -> AnyhowResult<String>
 {
-  let session_token = random_crockford_token(32);
+  let session_token = random_prefix_crockford_token("SESSION:", 32)?;
 
   let query_result = sqlx::query!(
         r#"
