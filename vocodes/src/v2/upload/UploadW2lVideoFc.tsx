@@ -17,7 +17,7 @@ function UploadW2lVideoFc(props: Props) {
   const [titleInvalidReason, setTitleInvalidReason] = useState('')
 
   if (!props.sessionWrapper.isLoggedIn()) {
-    history.push('/');
+    history.push('/signup');
   }
 
   const handleDownloadUrlChange = (ev: React.FormEvent<HTMLInputElement>) => {

@@ -11,7 +11,7 @@ function UploadChoiceFc(props: Props) {
   let history = useHistory();
 
   if (!props.sessionWrapper.isLoggedIn()) {
-    history.push('/');
+    history.push('/signup');
   }
 
   return (
