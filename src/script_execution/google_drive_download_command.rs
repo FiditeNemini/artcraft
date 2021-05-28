@@ -1,6 +1,6 @@
 use anyhow::anyhow;
 use crate::util::anyhow_result::AnyhowResult;
-use crate::util::random_token::random_token;
+use crate::util::random_crockford_token::random_crockford_token;
 use log::{info, warn};
 use std::io::{BufReader, Read};
 use std::path::{PathBuf, Path};
@@ -37,7 +37,7 @@ impl GoogleDriveDownloadCommand {
       .unwrap_or("/tmp")
       .to_string();
 
-    let temp_filename = random_token(10);
+    let temp_filename = random_crockford_token(10);
     let temp_filename = format!("{}/{}.bin", temp_dir_path, temp_filename);
 
     info!("Downloading {} to: {}", download_url, temp_filename);

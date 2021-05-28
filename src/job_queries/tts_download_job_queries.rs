@@ -5,7 +5,7 @@
 use anyhow::anyhow;
 use chrono::Utc;
 use crate::util::anyhow_result::AnyhowResult;
-use crate::util::random_token::random_token;
+use crate::util::random_crockford_token::random_crockford_token;
 use sqlx::MySqlPool;
 
 /// table: tts_model_upload_jobs
@@ -115,7 +115,7 @@ pub async fn insert_tts_model(pool: &MySqlPool,
                               private_bucket_object_name: &str)
   -> AnyhowResult<u64>
 {
-  let model_token = random_token(32);
+  let model_token = random_crockford_token(32);
   let updatable_slug = model_token.clone();
 
   let query_result = sqlx::query!(

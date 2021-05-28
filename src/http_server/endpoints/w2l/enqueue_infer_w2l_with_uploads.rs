@@ -18,7 +18,7 @@ use crate::http_server::web_utils::read_multipart_field_bytes::read_multipart_fi
 use crate::server_state::ServerState;
 use crate::util::anyhow_result::AnyhowResult;
 use crate::util::random_prefix_crockford_token::random_prefix_crockford_token;
-use crate::util::random_token::random_token;
+use crate::util::random_crockford_token::random_crockford_token;
 use crate::util::random_uuid::generate_random_uuid;
 use derive_more::{Display, Error};
 use futures::{StreamExt, TryStreamExt};
@@ -254,7 +254,7 @@ pub async fn enqueue_infer_w2l_with_uploads(
   // ==================== SAVE JOB RECORD ==================== //
 
   // This token is returned to the client.
-  let job_token = random_prefix_crockford_token("TIJ:", 32)
+  let job_token = random_prefix_crockford_token("W2L_INFER:", 32)
     .map_err(|e| {
       warn!("Error creating token");
       InferW2lWithUploadError::ServerError

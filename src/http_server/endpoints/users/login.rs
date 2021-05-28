@@ -10,7 +10,7 @@ use crate::common_queries::sessions::create_session_for_user;
 use crate::http_server::endpoints::users::create_account::CreateAccountError::{BadInput, ServerError, UsernameTaken, EmailTaken};
 use crate::http_server::web_utils::ip_address::get_request_ip;
 use crate::server_state::ServerState;
-use crate::util::random_token::random_token;
+use crate::util::random_crockford_token::random_crockford_token;
 use crate::validations::passwords::validate_passwords;
 use crate::validations::username::validate_username;
 use derive_more::{Display, Error};

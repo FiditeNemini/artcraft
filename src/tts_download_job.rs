@@ -23,7 +23,7 @@ use crate::job_queries::tts_download_job_queries::query_tts_upload_job_records;
 use crate::script_execution::google_drive_download_command::GoogleDriveDownloadCommand;
 use crate::util::anyhow_result::AnyhowResult;
 use crate::util::filesystem::check_directory_exists;
-use crate::util::random_token::random_token;
+use crate::util::random_crockford_token::random_crockford_token;
 use data_encoding::{HEXUPPER, HEXLOWER, HEXLOWER_PERMISSIVE};
 use log::{warn, info};
 use ring::digest::{Context, Digest, SHA256};

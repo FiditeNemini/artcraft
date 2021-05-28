@@ -59,19 +59,19 @@ mod tests {
 
   #[test]
   fn starts_with() {
-    assert_eq!(random_prefix_crockford_token("w", 10).unwrap().starts_with("w:"));
-    assert_eq!(random_prefix_crockford_token("w", 10).unwrap().starts_with("w:"));
-    assert_eq!(random_prefix_crockford_token("prefix", 16).unwrap().starts_with("prefix:"));
-    assert_eq!(random_prefix_crockford_token("prefix:", 16).unwrap().starts_with("prefix:"));
+    assert!(random_prefix_crockford_token("w", 10).unwrap().starts_with("w:"));
+    assert!(random_prefix_crockford_token("w", 10).unwrap().starts_with("w:"));
+    assert!(random_prefix_crockford_token("prefix", 16).unwrap().starts_with("prefix:"));
+    assert!(random_prefix_crockford_token("prefix:", 16).unwrap().starts_with("prefix:"));
   }
 
   #[test]
   fn length() {
-    assert_eq!(random_prefix_crockford_token("w", 10).len(), 10);
-    assert_eq!(random_prefix_crockford_token("w:", 10).len(), 10);
-    assert_eq!(random_prefix_crockford_token("prefix", 16).len(), 16);
-    assert_eq!(random_prefix_crockford_token("prefix:", 16).len(), 16);
-    assert_eq!(random_prefix_crockford_token("asdf:", 32).len(), 32);
-    assert_eq!(random_prefix_crockford_token("asdf", 32).len(), 32);
+    assert_eq!(random_prefix_crockford_token("w", 10).unwrap().len(), 10);
+    assert_eq!(random_prefix_crockford_token("w:", 10).unwrap().len(), 10);
+    assert_eq!(random_prefix_crockford_token("prefix", 16).unwrap().len(), 16);
+    assert_eq!(random_prefix_crockford_token("prefix:", 16).unwrap().len(), 16);
+    assert_eq!(random_prefix_crockford_token("asdf:", 32).unwrap().len(), 32);
+    assert_eq!(random_prefix_crockford_token("asdf", 32).unwrap().len(), 32);
   }
 }
