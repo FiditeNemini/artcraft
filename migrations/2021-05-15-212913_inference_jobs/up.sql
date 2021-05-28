@@ -3,6 +3,12 @@
 CREATE TABLE tts_inference_jobs (
   id BIGINT(20) NOT NULL AUTO_INCREMENT,
 
+  -- Effective "primary key" (PUBLIC)
+  token VARCHAR(32) NOT NULL,
+
+  -- Idempotency token from client
+  uuid_idempotency_token VARCHAR(36) NOT NULL,
+
   -- ========== INFERENCE DETAILS ==========
 
   -- The model to use.
@@ -55,6 +61,8 @@ CREATE TABLE tts_inference_jobs (
 
   -- INDICES --
   PRIMARY KEY (id),
+  UNIQUE KEY (token),
+  UNIQUE KEY (uuid_idempotency_token),
   KEY fk_model_token (model_token),
   KEY fk_maybe_creator_user_token (maybe_creator_user_token),
   KEY index_status (status),
@@ -64,6 +72,12 @@ CREATE TABLE tts_inference_jobs (
 
 CREATE TABLE w2l_inference_jobs (
   id BIGINT(20) NOT NULL AUTO_INCREMENT,
+
+  -- Effective "primary key" (PUBLIC)
+  token VARCHAR(32) NOT NULL,
+
+  -- Idempotency token from client
+  uuid_idempotency_token VARCHAR(36) NOT NULL,
 
   -- ========== INFERENCE DETAILS ==========
 
@@ -100,6 +114,10 @@ CREATE TABLE w2l_inference_jobs (
       'private'
   ) NOT NULL DEFAULT 'public',
 
+  -- Flags to disable branding
+  disable_end_bump BOOL NOT NULL DEFAULT false,
+  disable_watermark BOOL NOT NULL DEFAULT false,
+
   -- ========== JOB SYSTEM DETAILS ==========
 
   -- Jobs begin as "pending", then transition to other states.
@@ -124,6 +142,8 @@ CREATE TABLE w2l_inference_jobs (
 
   -- INDICES --
   PRIMARY KEY (id),
+  UNIQUE KEY (token),
+  UNIQUE KEY (uuid_idempotency_token),
   KEY fk_maybe_w2l_template_token (maybe_w2l_template_token),
   KEY fk_maybe_tts_inference_result_token (maybe_tts_inference_result_token),
   KEY fk_maybe_creator_user_token (maybe_creator_user_token),

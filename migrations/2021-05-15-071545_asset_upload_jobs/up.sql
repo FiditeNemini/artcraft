@@ -104,7 +104,7 @@ CREATE TABLE w2l_template_upload_jobs (
   -- Idempotency token
   uuid_idempotency_token VARCHAR(36) NOT NULL,
 
-    -- Foreign key to user
+  -- Foreign key to user
   creator_user_token VARCHAR(32) NOT NULL,
 
   -- For abuse tracking.
