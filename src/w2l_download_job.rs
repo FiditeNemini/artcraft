@@ -87,6 +87,8 @@ struct Downloader {
 async fn main() -> AnyhowResult<()> {
   easyenv::init_all_with_default_logging(Some(DEFAULT_RUST_LOG));
 
+  // NB: Do not check this secrets-containing dotenv file into VCS.
+  // This file should only contain *development* secrets, never production.
   let _ = dotenv::from_filename(".env-secrets").ok();
 
   info!("Obtaining hostname...");

@@ -48,17 +48,35 @@ use crate::http_server::endpoints::w2l::list_w2l_templates::list_w2l_templates_h
 use crate::http_server::endpoints::w2l::get_w2l_template::get_w2l_template_handler;
 use crate::http_server::endpoints::tts::list_tts_models::list_tts_models_handler;
 use crate::http_server::endpoints::w2l::enqueue_infer_w2l_with_uploads::enqueue_infer_w2l_with_uploads;
+use crate::buckets::bucket_client::BucketClient;
 
 const DEFAULT_BIND_ADDRESS : &'static str = "0.0.0.0:12345";
 
 // NB: sqlx::query is spammy and logs all queries as "info"-level
 const DEFAULT_RUST_LOG: &'static str = "debug,actix_web=info,sqlx::query=warn";
 
+// Buckets (shared config)
+const ENV_ACCESS_KEY : &'static str = "ACCESS_KEY";
+const ENV_SECRET_KEY : &'static str = "SECRET_KEY";
+const ENV_REGION_NAME : &'static str = "REGION_NAME";
+
+// Buckets (private data)
+const ENV_PRIVATE_BUCKET_NAME : &'static str = "W2L_PRIVATE_DOWNLOAD_BUCKET_NAME";
+// Buckets (public data)
+const ENV_PUBLIC_BUCKET_NAME : &'static str = "W2L_PUBLIC_DOWNLOAD_BUCKET_NAME";
+
+// Various bucket roots
+const ENV_AUDIO_UPLOADS_BUCKET_ROOT : &'static str = "AUDIO_UPLOADS_BUCKET_ROOT";
+
 pub type AnyhowResult<T> = anyhow::Result<T>;
 
 #[actix_web::main]
 async fn main() -> AnyhowResult<()> {
   easyenv::init_all_with_default_logging(Some(DEFAULT_RUST_LOG));
+
+  // NB: Do not check this secrets-containing dotenv file into VCS.
+  // This file should only contain *development* secrets, never production.
+  let _ = dotenv::from_filename(".env-secrets").ok();
 
   info!("Obtaining hostname...");
 
@@ -93,6 +111,33 @@ async fn main() -> AnyhowResult<()> {
   let cookie_manager = CookieManager::new(&cookie_domain, &hmac_secret);
   let session_checker = SessionChecker::new(&cookie_manager);
 
+  let access_key = easyenv::get_env_string_required(ENV_ACCESS_KEY)?;
+  let secret_key = easyenv::get_env_string_required(ENV_SECRET_KEY)?;
+  let region_name = easyenv::get_env_string_required(ENV_REGION_NAME)?;
+
+  // Private and Public Buckets
+  let private_bucket_name = easyenv::get_env_string_required(ENV_PRIVATE_BUCKET_NAME)?;
+  let public_bucket_name = easyenv::get_env_string_required(ENV_PUBLIC_BUCKET_NAME)?;
+
+  // Bucket roots
+  let audio_uploads_bucket_root= easyenv::get_env_string_required(ENV_AUDIO_UPLOADS_BUCKET_ROOT)?;
+
+  let private_bucket_client = BucketClient::create(
+    &access_key,
+    &secret_key,
+    &region_name,
+    &private_bucket_name,
+    None,
+  )?;
+
+  let public_bucket_client = BucketClient::create(
+    &access_key,
+    &secret_key,
+    &region_name,
+    &public_bucket_name,
+    None,
+  )?;
+
   let server_state = ServerState {
     env_config: EnvConfig {
       num_workers,
@@ -105,6 +150,9 @@ async fn main() -> AnyhowResult<()> {
     mysql_pool: pool,
     cookie_manager,
     session_checker,
+    private_bucket_client,
+    public_bucket_client,
+    audio_uploads_bucket_root,
   };
 
   serve(server_state)

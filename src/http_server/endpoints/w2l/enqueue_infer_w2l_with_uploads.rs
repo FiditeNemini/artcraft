@@ -132,6 +132,7 @@ pub async fn enqueue_infer_w2l_with_uploads(
   let mut maybe_uuid_idempotency_token: Option<String> = None;
   let mut maybe_template_token: Option<String> = None;
   let mut maybe_audio_file_name : Option<String> = None;
+  let mut audio_bytes = BytesMut::with_capacity(0);
 
   while let Ok(Some(mut field)) = payload.try_next().await {
     let mut field_name = "".to_string();
@@ -173,7 +174,7 @@ pub async fn enqueue_infer_w2l_with_uploads(
             InferW2lWithUploadError::ServerError
           })?;
 
-        let bytes = match maybe_bytes {
+        audio_bytes = match maybe_bytes {
           Some(bytes) => bytes,
           None => {
             warn!("Empty file uploaded");
@@ -235,13 +236,20 @@ pub async fn enqueue_infer_w2l_with_uploads(
 
   let audio_upload_bucket_path = hash_to_bucket_path(
     &upload_uuid,
-    Some("/audio_uploads") // TODO: pull from configs
+    Some(&server_state.audio_uploads_bucket_root)
   ).map_err(|e| {
     warn!("Hash bucket path error: {:?}", e);
     InferW2lWithUploadError::ServerError
   })?;
 
-  // TODO: Upload audio to bucket!
+  info!("Uploading audio to bucket...");
+  server_state.private_bucket_client.upload_file(
+    &audio_upload_bucket_path,
+    audio_bytes.as_ref()).await
+    .map_err(|e| {
+      warn!("Upload audio bytes to bucket error: {:?}", e);
+      InferW2lWithUploadError::ServerError
+    })?;
 
   // ==================== SAVE JOB RECORD ==================== //
 
