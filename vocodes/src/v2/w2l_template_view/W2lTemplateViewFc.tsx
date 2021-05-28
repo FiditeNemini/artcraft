@@ -12,8 +12,8 @@ interface W2lTemplate {
   template_token: string,
   template_type: string,
   creator_user_token: string,
-  username: string,
-  display_name: string,
+  creator_username: string,
+  creator_display_name: string,
   updatable_slug: string,
   title: string,
   frame_width: number,
@@ -61,7 +61,7 @@ function W2lTemplateViewFc(props: Props) {
     });
   }, []); // NB: Empty array dependency sets to run ONLY on mount
 
-  let creatorLink=`/profile/${w2lTemplate?.display_name}`;
+  let creatorLink=`/profile/${w2lTemplate?.creator_username}`;
 
   let object : string|undefined = undefined;
   
@@ -74,9 +74,75 @@ function W2lTemplateViewFc(props: Props) {
 
   let url = `https://storage.googleapis.com/dev-vocodes-public${object}`;
 
+  const handleAudioFileChange = (fileList: FileList|null) => {
+    if (fileList === null 
+        || fileList === undefined
+        || fileList.length < 1) {
+      //this.setState({
+      //  audioFile: undefined,
+      //});
+    }
+
+    let file = fileList![0];
+
+    //this.setState({
+    //  audioFile: file,
+    //});
+  };
+
+  const handleFormSubmit = (ev: React.FormEvent<HTMLFormElement>) : boolean => {
+    ev.preventDefault();
+    return false;
+  };
+
+  const audioFilename = 'filename.todo';
+
+
   return (
     <div>
       <h1 className="title is-1"> Video lip sync template </h1>
+
+      <div className="content is-size-4">
+        <p>
+          Upload audio from vo.codes or any other source (music, other websites), 
+          then pick a template below. The audio shouldn't be too long or it will
+          fail.
+        </p>
+      </div>
+
+      <form onSubmit={handleFormSubmit}>
+
+        <div className="upload-box">
+          <div className="file has-name is-large">
+            <label className="file-label">
+              <input 
+                type="file" 
+                name="audio" 
+                className="file-input" 
+                onChange={ (e) => handleAudioFileChange(e.target.files) }
+                />
+              <span className="file-cta">
+                <span className="file-icon">
+                  <i className="fas fa-upload"></i>
+                </span>
+                <span className="file-label">
+                  Choose audio file&hellip;
+                </span>
+              </span>
+              <span className="file-name">
+                {audioFilename}
+              </span>
+            </label>
+          </div>
+        </div>
+
+        <button className="button is-large is-fullwidth is-success">Submit</button>
+
+      </form>
+
+      <br />
+
+      <h3 className="title is-3"> Template Details </h3>
 
       <img src={url} alt="template preview" />
 
@@ -91,7 +157,7 @@ function W2lTemplateViewFc(props: Props) {
           <tr>
             <th>Creator</th>
             <td>
-              <Link to={creatorLink}>{w2lTemplate?.display_name}</Link>
+              <Link to={creatorLink}>{w2lTemplate?.creator_display_name}</Link>
             </td>
           </tr>
           <tr>

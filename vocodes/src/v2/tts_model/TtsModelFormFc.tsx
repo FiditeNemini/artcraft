@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { ApiConfig } from '../../v1/api/ApiConfig';
 import { SessionWrapper } from '../../session/SessionWrapper';
 import { useHistory, Link } from "react-router-dom";
-import { getRandomInt } from '../../Utils';
 
 interface TtsModelListResponsePayload {
   success: boolean,
@@ -106,7 +105,16 @@ function TtsModelFormFc(props: Props) {
   }
 
   let remainingCharactersButtonDisabled = false;
-  let handleCancelClick = (a: any) => { return false; };
+
+  const handleFormSubmit = (ev: React.FormEvent<HTMLFormElement>) => { 
+    ev.preventDefault();
+    return false;
+  };
+
+  const handleCancelClick = (ev: React.FormEvent<HTMLButtonElement>) => { 
+    ev.preventDefault();
+    return false;
+  };
 
   return (
     <div>
@@ -116,7 +124,7 @@ function TtsModelFormFc(props: Props) {
 
       <br />
 
-      <form>
+      <form onSubmit={handleFormSubmit}>
         <div className={selectClasses}>
           <select>
             {listItems}
