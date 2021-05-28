@@ -125,8 +125,8 @@ INSERT INTO w2l_inference_jobs
 SET
   maybe_w2l_template_token = ?,
   maybe_tts_inference_result_token = ?,
-  maybe_audio_bucket_location = NULL,
-  maybe_image_bucket_location = NULL,
+  maybe_public_audio_bucket_location = NULL,
+  maybe_public_image_bucket_location = NULL,
   maybe_creator_user_token = ?,
   creator_ip_address = ?,
   creator_set_visibility = ?,

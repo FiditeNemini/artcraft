@@ -241,8 +241,6 @@ pub async fn enqueue_infer_w2l_with_uploads(
     InferW2lWithUploadError::ServerError
   })?;
 
-  let audio_upload_bucket_path = "todo".to_string(); // TODO TODO
-
   // TODO: Upload audio to bucket!
 
   // ==================== SAVE JOB RECORD ==================== //
@@ -264,7 +262,7 @@ SET
   uuid_idempotency_token = ?,
 
   maybe_w2l_template_token = ?,
-  maybe_audio_bucket_location = ?,
+  maybe_public_audio_bucket_location = ?,
 
   maybe_creator_user_token = ?,
   creator_ip_address = ?,
@@ -275,7 +273,7 @@ SET
         job_token.to_string(),
         uuid_idempotency_token.to_string(),
         maybe_template_token.clone(),
-        Some(audio_upload_bucket_path.clone()), // TODO THIS ISN'T WIDE ENOUGH
+        Some(audio_upload_bucket_path.clone()),
         maybe_user_token.clone(),
         ip_address.to_string()
     )

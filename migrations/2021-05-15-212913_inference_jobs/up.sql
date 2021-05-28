@@ -90,10 +90,10 @@ CREATE TABLE w2l_inference_jobs (
   maybe_tts_inference_result_token VARCHAR(32) DEFAULT NULL,
 
   -- If we're using custom uploaded audio, this will be present.
-  maybe_audio_bucket_location CHAR(16) DEFAULT NULL,
+  maybe_public_audio_bucket_location VARCHAR(255) DEFAULT NULL,
 
   -- If we're using a custom uploaded image, this will be present.
-  maybe_image_bucket_location CHAR(16) DEFAULT NULL,
+  maybe_public_image_bucket_location VARCHAR(255) DEFAULT NULL,
 
   -- ========== CREATOR DETAILS ==========
 
