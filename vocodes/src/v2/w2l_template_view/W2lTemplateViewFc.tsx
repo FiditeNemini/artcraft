@@ -98,7 +98,7 @@ function W2lTemplateViewFc(props: Props) {
 
     // NB: Using 'axios' because 'fetch' was having problems with form-multipart
     // and then interpreting the resultant JSON. Maybe I didn't try hard enough?
-    axios.post(endpointUrl, formData) 
+    axios.post(endpointUrl, formData, { withCredentials: true }) 
       .then(res => res.data)
       .then(res => {
         /*if (res.uuid !== undefined) {

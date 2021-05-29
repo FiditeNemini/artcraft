@@ -106,7 +106,7 @@ function ProfileData_W2lTemplateListFc(props: Props) {
       // Don't have the same number on each row.
       let lastRowSize = nextRowSize;
       while (lastRowSize === nextRowSize) {
-        nextRowSize = getRandomInt(2, 5);
+        nextRowSize = getRandomInt(3, 6);
       }
     }
   });
