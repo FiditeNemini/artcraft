@@ -50,6 +50,7 @@ use crate::http_server::endpoints::w2l::get_w2l_template::get_w2l_template_handl
 use crate::http_server::endpoints::tts::list_tts_models::list_tts_models_handler;
 use crate::http_server::endpoints::w2l::enqueue_infer_w2l_with_uploads::enqueue_infer_w2l_with_uploads;
 use crate::buckets::bucket_client::BucketClient;
+use crate::http_server::endpoints::users::list_user_w2l_templates::list_user_w2l_templates_handler;
 
 ///
 ///  TODO TODO TODO TODO
@@ -60,7 +61,8 @@ use crate::buckets::bucket_client::BucketClient;
 const DEFAULT_BIND_ADDRESS : &'static str = "0.0.0.0:12345";
 
 // NB: sqlx::query is spammy and logs all queries as "info"-level
-const DEFAULT_RUST_LOG: &'static str = "debug,actix_web=info,sqlx::query=warn";
+//const DEFAULT_RUST_LOG: &'static str = "debug,actix_web=info,sqlx::query=warn";
+const DEFAULT_RUST_LOG: &'static str = "debug,actix_web=info";
 
 // Buckets (shared config)
 const ENV_ACCESS_KEY : &'static str = "ACCESS_KEY";
@@ -285,6 +287,14 @@ pub async fn serve(server_state: ServerState) -> AnyhowResult<()>
         web::resource("/profile/{username}")
           .route(web::get().to(get_profile_handler))
           .route(web::head().to(|| HttpResponse::Ok()))
+      )
+      .service(
+        web::scope("/user")
+          .service(
+            web::resource("/{username}/w2l_templates")
+              .route(web::get().to(list_user_w2l_templates_handler))
+              .route(web::head().to(|| HttpResponse::Ok()))
+          )
       )
       .service(get_root_index)
       .service(enable_alpha)
