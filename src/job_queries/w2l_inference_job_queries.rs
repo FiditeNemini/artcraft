@@ -3,11 +3,12 @@
 //! include these in the main binary to generate all the queries.
 
 use anyhow::anyhow;
-use chrono::Utc;
+use chrono::{Utc, DateTime};
 use crate::util::anyhow_result::AnyhowResult;
 use crate::util::random_crockford_token::random_crockford_token;
-use sqlx::MySqlPool;
 use crate::util::random_prefix_crockford_token::random_prefix_crockford_token;
+use log::{warn, info};
+use sqlx::MySqlPool;
 
 /// table: w2l_template_upload_jobs
 #[derive(Debug)]
@@ -228,4 +229,75 @@ SET
 
   Ok(record_id)*/
   return Err(anyhow!("TODO"));
+}
+
+#[derive(Serialize)]
+pub struct W2lTemplateRecord2 {
+  pub template_token: String,
+  pub template_type: String,
+  pub creator_user_token: String,
+  pub creator_username: String,
+  pub private_bucket_hash: String,
+  pub creator_display_name: String,
+  pub updatable_slug: String,
+  pub title: String,
+  pub frame_width: i32,
+  pub frame_height: i32,
+  pub duration_millis: i32,
+  pub maybe_public_bucket_preview_image_object_name: Option<String>,
+  pub maybe_public_bucket_preview_video_object_name: Option<String>,
+  pub created_at: DateTime<Utc>,
+  pub updated_at: DateTime<Utc>,
+}
+
+pub async fn get_w2l_template_by_token(pool: &MySqlPool, template_token: &str)
+  -> AnyhowResult<Option<W2lTemplateRecord2>>
+{
+
+  // NB: Lookup failure is Err(RowNotFound).
+  // NB: Since this is publicly exposed, we don't query sensitive data.
+  let maybe_template = sqlx::query_as!(
+      W2lTemplateRecord2,
+        r#"
+SELECT
+    w2l.token as template_token,
+    w2l.template_type,
+    w2l.creator_user_token,
+    users.username as creator_username,
+    users.display_name as creator_display_name,
+    w2l.updatable_slug,
+    w2l.title,
+    w2l.frame_width,
+    w2l.frame_height,
+    w2l.duration_millis,
+    w2l.private_bucket_hash,
+    w2l.maybe_public_bucket_preview_image_object_name,
+    w2l.maybe_public_bucket_preview_video_object_name,
+    w2l.created_at,
+    w2l.updated_at
+FROM w2l_templates as w2l
+JOIN users
+ON users.token = w2l.creator_user_token
+WHERE w2l.token = ?
+AND w2l.deleted_at IS NULL
+        "#,
+      &template_token
+    )
+    .fetch_one(pool)
+    .await; // TODO: This will return error if it doesn't exist
+
+  match maybe_template {
+    Ok(template) => Ok(Some(template)),
+    Err(err) => {
+      match err {
+        RowNotFound => {
+          Ok(None)
+        },
+        _ => {
+          warn!("w2l template query error: {:?}", err);
+          Err(anyhow!("Mysql error: {:?}", err))
+        }
+      }
+    }
+  }
 }

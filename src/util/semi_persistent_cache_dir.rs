@@ -59,12 +59,17 @@ impl SemiPersistentCacheDir {
 
   /// We cache W2L faces here.
   /// We'll likely need to LRU cache them.
-  pub fn w2l_face_templates_path(&self) -> &Path {
+  pub fn w2l_face_template_path(&self, template_private_bucket_hash: &str) -> PathBuf {
+    self.w2l_face_templates_root.join(template_private_bucket_hash)
+  }
+
+  pub fn w2l_face_template_directory(&self) -> &Path {
     &self.w2l_face_templates_root
   }
 
-  pub fn create_w2l_face_templates_path(&self) -> AnyhowResult<()> {
-    let _ = fs::create_dir_all(self.w2l_face_templates_path())?;
+
+  pub fn create_w2l_face_template_path(&self) -> AnyhowResult<()> {
+    let _ = fs::create_dir_all(self.w2l_face_template_directory())?;
     Ok(())
   }
 

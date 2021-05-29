@@ -19,6 +19,7 @@ use crate::buckets::bucket_path_unifier::BucketPathUnifier;
 use crate::buckets::bucket_paths::hash_to_bucket_path;
 use crate::buckets::file_hashing::get_file_hash;
 use crate::job_queries::w2l_inference_job_queries::W2lInferenceJobRecord;
+use crate::job_queries::w2l_inference_job_queries::get_w2l_template_by_token;
 use crate::job_queries::w2l_inference_job_queries::insert_w2l_result;
 use crate::job_queries::w2l_inference_job_queries::mark_w2l_inference_job_done;
 use crate::job_queries::w2l_inference_job_queries::mark_w2l_inference_job_failure;
@@ -177,7 +178,7 @@ async fn main() -> AnyhowResult<()> {
 
   info!("Creating pod semi-persistent cache dirs...");
   semi_persistent_cache.create_w2l_model_path()?;
-  semi_persistent_cache.create_w2l_face_templates_path()?;
+  semi_persistent_cache.create_w2l_face_template_path()?;
   semi_persistent_cache.create_w2l_model_path()?;
 
   let w2l_model_filename = easyenv::get_env_string_or_default(
@@ -295,7 +296,7 @@ async fn process_job(inferencer: &Inferencer, job: &W2lInferenceJobRecord) -> An
 
   // TODO 1. Mark Processing
   //
-  // TODO: 2. Check if w2l model is downloaded / download it to a stable cache location
+  // TODO: 2. Check if w2l model is downloaded / download it to a stable cache location (DONE)
   // TODO: 3. Check if w2l template faces are downloaded and download it
   // TODO: 4. Download user audio
 
@@ -324,6 +325,53 @@ async fn process_job(inferencer: &Inferencer, job: &W2lInferenceJobRecord) -> An
     ).await?;
 
     info!("Downloaded model from bucket!");
+  }
+
+  // ==================== CONFIRM OR DOWNLOAD W2L TEMPLATE FACE ==================== //
+
+  // Template is based on the `private_bucket_hash`:
+  //  - private_bucket_hash: 1519edf86e6975fdcd0a56a5953d84948db79f2b9ce588818d7fa544d5cb38b2
+  //  - private_bucket_object_name: /user_uploaded_w2l_templates/1/5/1/1519edf86e6975fdcd0a56a5953d84948db79f2b9ce588818d7fa544d5cb38b2
+  //  - private_bucket_cached_faces_object_name: /user_uploaded_w2l_templates/1/5/1/1519edf86e6975fdcd0a56a5953d84948db79f2b9ce588818d7fa544d5cb38b2_detected_faces.pickle
+  //  - maybe_public_bucket_preview_image_object_name: /user_uploaded_w2l_templates/1/5/1/1519edf86e6975fdcd0a56a5953d84948db79f2b9ce588818d7fa544d5cb38b2_preview.webp
+
+  let template_token = match &job.maybe_w2l_template_token {
+    Some(token) => token.to_string(),
+    None => {
+      warn!("non-template token based inference not yet supported");
+      return Err(anyhow!("non-template token based inference not yet supported"))
+    },
+  };
+
+  info!("Looking up w2l template by token: {}", &template_token);
+
+  let query_result = get_w2l_template_by_token(&inferencer.mysql_pool, &template_token).await?;
+
+  let w2l_template = match query_result {
+    Some(template) => template,
+    None => {
+      warn!("W2L Template not found: {}", &template_token);
+      return Err(anyhow!("Template not found!"))
+    },
+  };
+
+  let face_template_fs_path = inferencer.semi_persistent_cache.w2l_face_template_path(
+    &w2l_template.private_bucket_hash);
+
+  if !face_template_fs_path.exists() {
+    info!("W2L face template file does not exist: {:?}", &face_template_fs_path);
+
+    let template_object_path = inferencer.bucket_path_unifier
+      .precomputed_faces_for_w2l_path(&w2l_template.private_bucket_hash);
+
+    info!("Download from face template path: {:?}", &template_object_path);
+
+    inferencer.private_bucket_client.download_file_to_disk(
+      &template_object_path,
+      &face_template_fs_path
+    ).await?;
+
+    info!("Downloaded face template from bucket!");
   }
 
 

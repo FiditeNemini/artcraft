@@ -157,7 +157,7 @@ AND w2l.deleted_at IS NULL
           return Err(GetW2lTemplateError::ServerError);
         },
         _ => {
-          warn!("w2l template list query error: {:?}", err);
+          warn!("w2l template query error: {:?}", err);
           return Err(GetW2lTemplateError::ServerError);
         }
       }
