@@ -10,6 +10,7 @@ pub struct BucketPathUnifier {
   pub tts_inference_output_root: PathBuf,
   pub w2l_inference_output_root: PathBuf,
   pub w2l_model_root: PathBuf,
+  pub w2l_end_bump_root: PathBuf,
 }
 
 impl BucketPathUnifier {
@@ -29,16 +30,18 @@ impl BucketPathUnifier {
       tts_inference_output_root: PathBuf::from("/tts_inference_output"),
       w2l_inference_output_root: PathBuf::from("/w2l_inference_output"),
       w2l_model_root: PathBuf::from("/w2l_pretrained_models"),
+      w2l_end_bump_root: PathBuf::from("/w2l_end_bumps"),
     }
-  }
-
-  pub fn end_bump_video_for_w2l_path(&self, end_bump_filename: &str) -> String {
-    "".to_string()
   }
 
   // W2L pretrained models. There are only two.
   pub fn w2l_pretrained_models_path(&self, w2l_model_name: &str) -> PathBuf {
     self.w2l_model_root.join(w2l_model_name)
+  }
+
+  // W2L "end bumps" are videos added at the end.
+  pub fn end_bump_video_for_w2l_path(&self, end_bump_filename: &str) -> PathBuf {
+    self.w2l_end_bump_root.join(end_bump_filename)
   }
 
   // The video or images uploaded as templates
@@ -79,6 +82,7 @@ impl BucketPathUnifier {
         let video_filename = format!("vocodes_video_{}.mp4", video_filename);
 
         let hashed_path = Self::hashed_directory_path(token);
+        let hashed_path = hashed_path.to_lowercase();
 
         return self.w2l_inference_output_root
           .join(hashed_path)
@@ -119,6 +123,7 @@ mod tests {
       tts_inference_output_root: PathBuf::from("/test_path_tts_output"),
       w2l_inference_output_root: PathBuf::from("/test_path_w2l_output"),
       w2l_model_root: PathBuf::from("/test_path_w2l_pretrained_models"),
+      w2l_end_bump_root: PathBuf::from("/test_path_w2l_end_bumps"),
     }
   }
 
@@ -127,6 +132,13 @@ mod tests {
     let paths = get_instance();
     assert_eq!(paths.w2l_pretrained_models_path("model.pth").to_str().unwrap(),
                "/test_path_w2l_pretrained_models/model.pth");
+  }
+
+  #[test]
+  fn test_end_bump_video_for_w2l_path() {
+    let paths = get_instance();
+    assert_eq!(paths.end_bump_video_for_w2l_path("logo.mp4").to_str().unwrap(),
+               "/test_path_w2l_end_bumps/logo.mp4");
   }
 
   #[test]
@@ -153,12 +165,19 @@ mod tests {
   #[test]
   fn test_w2l_inference_video_output_path() {
     let paths = get_instance();
+
+    // Case 1: Tokens without a "token type"
     assert_eq!(paths.w2l_inference_video_output_path("foobar").to_str().unwrap(),
                "/test_path_w2l_output/f/o/o/vocodes_video_foobar.mp4");
 
-    // Note: it also removes the token type from dir path and handles the colon:
+    // Case 2: Tokens with a "token type"
+    // Note: that it removes the token type from dir path and handles the colon:
     assert_eq!(paths.w2l_inference_video_output_path("type:abcdef").to_str().unwrap(),
                "/test_path_w2l_output/a/b/c/vocodes_video_typeabcdef.mp4");
+
+    // It also handles capitalization
+    assert_eq!(paths.w2l_inference_video_output_path("TYPE:ABCDEF").to_str().unwrap(),
+               "/test_path_w2l_output/a/b/c/vocodes_video_TYPEABCDEF.mp4");
   }
 
   #[test]

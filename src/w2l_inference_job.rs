@@ -89,6 +89,7 @@ struct Inferencer {
   // Command to run
   pub inference_script: String,
   pub w2l_model_filename: String,
+  pub w2l_end_bump_filename: String,
 }
 
 #[tokio::main]
@@ -179,12 +180,15 @@ async fn main() -> AnyhowResult<()> {
 
   info!("Creating pod semi-persistent cache dirs...");
   semi_persistent_cache.create_w2l_model_path()?;
+  semi_persistent_cache.create_w2l_end_bump_path()?;
   semi_persistent_cache.create_w2l_face_template_path()?;
   semi_persistent_cache.create_w2l_template_media_path()?;
-  semi_persistent_cache.create_w2l_model_path()?;
 
   let w2l_model_filename = easyenv::get_env_string_or_default(
     "W2L_MODEL_FILENAME", "wav2lip_gan.pth");
+
+  let w2l_end_bump_filename = easyenv::get_env_string_or_default(
+    "W2L_END_BUMP_FILENAME", "vocodes-short-end-bump.mp4");
 
   let inferencer = Inferencer {
     download_temp_directory: temp_directory,
@@ -200,6 +204,7 @@ async fn main() -> AnyhowResult<()> {
     bucket_path_unifier: BucketPathUnifier::default_paths(),
     semi_persistent_cache,
     w2l_model_filename,
+    w2l_end_bump_filename,
   };
 
   main_loop(inferencer).await;
@@ -314,7 +319,7 @@ async fn process_job(inferencer: &Inferencer, job: &W2lInferenceJobRecord) -> An
   let model_fs_path = inferencer.semi_persistent_cache.w2l_model_path(&model_filename);
 
   if !model_fs_path.exists() {
-    info!("Model file does not exist: {:?}", &model_fs_path);
+    warn!("Model file does not exist: {:?}", &model_fs_path);
 
     let model_object_path = inferencer.bucket_path_unifier
       .w2l_pretrained_models_path(&model_filename);
@@ -327,6 +332,27 @@ async fn process_job(inferencer: &Inferencer, job: &W2lInferenceJobRecord) -> An
     ).await?;
 
     info!("Downloaded model from bucket!");
+  }
+
+  // ==================== CONFIRM OR DOWNLOAD W2L END BUMP ==================== //
+
+  let end_bump_filename = inferencer.w2l_end_bump_filename.clone();
+  let end_bump_fs_path = inferencer.semi_persistent_cache.w2l_end_bump_path(&end_bump_filename);
+
+  if !end_bump_fs_path.exists() {
+    warn!("End bump file does not exist: {:?}", &end_bump_fs_path);
+
+    let end_bump_object_path = inferencer.bucket_path_unifier
+      .end_bump_video_for_w2l_path(&end_bump_filename);
+
+    info!("Download from bucket path: {:?}", &end_bump_object_path);
+
+    inferencer.private_bucket_client.download_file_to_disk(
+      &end_bump_object_path,
+      &end_bump_fs_path
+    ).await?;
+
+    info!("Downloaded end bump from bucket!");
   }
 
   // ==================== LOOK UP TEMPLATE RECORD ==================== //
@@ -442,6 +468,7 @@ async fn process_job(inferencer: &Inferencer, job: &W2lInferenceJobRecord) -> An
   inferencer.w2l_inference.execute(
     &model_fs_path,
     &audio_fs_path,
+    &end_bump_fs_path,
     &template_media_fs_path,
     &face_template_fs_path,
     &output_metadata_fs_path,

@@ -8,6 +8,7 @@ pub struct SemiPersistentCacheDir {
   cache_root: PathBuf,
   tts_model_root: PathBuf,
   w2l_model_root: PathBuf,
+  w2l_end_bump_root: PathBuf,
   w2l_face_templates_root: PathBuf,
   w2l_templates_media_root: PathBuf,
   video_asset_root: PathBuf, // end bump, etc.
@@ -28,6 +29,7 @@ impl SemiPersistentCacheDir {
       cache_root: cache_root.clone(),
       tts_model_root: cache_root.join("tts/models/"),
       w2l_model_root: cache_root.join("w2l/models/"),
+      w2l_end_bump_root: cache_root.join("w2l/end_bumps/"),
       w2l_face_templates_root: cache_root.join("w2l/face_templates/"),
       w2l_templates_media_root: cache_root.join("w2l/template_media/"),
       video_asset_root: cache_root.join("static_video_assets/"),
@@ -55,6 +57,21 @@ impl SemiPersistentCacheDir {
 
   pub fn create_w2l_model_path(&self) -> AnyhowResult<()> {
     let _ = fs::create_dir_all(self.w2l_model_directory())?;
+    Ok(())
+  }
+
+  // ==================== W2L END BUMPS (short video logos) ====================
+
+  pub fn w2l_end_bump_path(&self, end_bump_filename: &str) -> PathBuf {
+    self.w2l_end_bump_root.join(end_bump_filename)
+  }
+
+  pub fn w2l_end_bump_directory(&self) -> &Path {
+    &self.w2l_end_bump_root
+  }
+
+  pub fn create_w2l_end_bump_path(&self) -> AnyhowResult<()> {
+    let _ = fs::create_dir_all(self.w2l_end_bump_directory())?;
     Ok(())
   }
 

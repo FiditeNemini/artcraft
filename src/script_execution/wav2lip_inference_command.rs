@@ -27,16 +27,18 @@ impl Wav2LipInferenceCommand {
     }
   }
 
-  pub fn execute<P: AsRef<Path>>(&self,
-                 checkpoint_path: P,
-                 audio_filename: P,
-                 media_template_filename: P,
-                 cached_faces_filename: P,
-                 output_metadata_filename: P,
-                 output_video_filename: P,
-                 is_image: bool,
-                 spawn_process: bool) -> AnyhowResult<()>
-  {
+  pub fn execute<P: AsRef<Path>>(
+    &self,
+    checkpoint_path: P,
+    audio_filename: P,
+    end_bump_video_filename: P,
+    media_template_filename: P,
+    cached_faces_filename: P,
+    output_metadata_filename: P,
+    output_video_filename: P,
+    is_image: bool,
+    spawn_process: bool
+  ) -> AnyhowResult<()> {
     let mut command = String::new();
 
     command.push_str("echo 'test'");
@@ -53,6 +55,8 @@ impl Wav2LipInferenceCommand {
     command.push_str(&media_template_filename.as_ref().display().to_string());
     command.push_str(" --audio_filename ");
     command.push_str(&audio_filename.as_ref().display().to_string());
+    command.push_str(" --end_bump_file ");
+    command.push_str(&end_bump_video_filename.as_ref().display().to_string());
     command.push_str(" --cached_faces_filename ");
     command.push_str(&cached_faces_filename.as_ref().display().to_string());
     command.push_str(" --output_video_filename ");

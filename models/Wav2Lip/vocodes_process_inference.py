@@ -48,6 +48,9 @@ parser.add_argument('--cached_faces_filename', type=str,
 parser.add_argument('--audio_filename', type=str,
                     help='Filepath of video/audio file to use as raw audio source', required=True)
 
+parser.add_argument('--end_bump_file', type=str,
+                    help='Video file to concatenate at the end')
+
 parser.add_argument('--output_video_filename', type=str,
                     help='Output filename for the final video', required=True)
 
@@ -94,10 +97,6 @@ parser.add_argument('--audio_start_pad_millis', default=0, type=int,
 
 parser.add_argument('--audio_end_pad_millis', default=0, type=int,
                     help='Seconds to pad the end of the audio')
-
-parser.add_argument('--end_bump_file', type=str,
-                    help='Video file to concatenate at the end')
-
 
 # Purely for debugging on the host machine:
 parser.add_argument('--preserve_tempdir', default=False, action='store_true',
