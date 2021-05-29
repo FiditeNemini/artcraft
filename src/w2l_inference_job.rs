@@ -431,21 +431,32 @@ async fn process_job(inferencer: &Inferencer, job: &W2lInferenceJobRecord) -> An
 
   // ==================== RUN INFERENCE ==================== //
 
+  let output_video_fs_path = temp_dir.path().join("output.mp4");
+  let output_metadata_fs_path = temp_dir.path().join("metadata.json");
+
+  let is_image = w2l_template.template_type.contains("image");
+
+  // Metadata is wrong:
+  // {"is_video": true, "width": 1024, "height": 768,
+  // "num_frames": 1, -- wrong
+  // "fps": 25.0, -- wrong??
+  // "duration_millis": 40, -- wrong
+  // "mimetype": "video/mp4", "file_size_bytes": 1024594}
   inferencer.w2l_inference.execute(
     &audio_fs_path,
     &template_media_fs_path,
     &face_template_fs_path,
-    &PathBuf::from("todo"),
-    &PathBuf::from("todo"),
+    &output_metadata_fs_path,
+    &output_video_fs_path,
     false,
     false
   )?;
 
-  let output_video_fs_path = temp_dir.path().join(&audio_bucket_hash);
+  info!("Output filename: {:?}", &output_video_fs_path);
 
   if true {
     info!("FAKE DONE");
-    thread::sleep(Duration::from_millis(5000));
+    thread::sleep(Duration::from_millis(50000));
     return Ok(());
   }
 

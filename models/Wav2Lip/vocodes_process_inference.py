@@ -10,6 +10,7 @@ import tempfile
 import shutil
 import datetime
 import pickle
+import magic
 from PIL import Image
 
 if 'PRINT_ENV' in os.environ and os.environ['PRINT_ENV']:
@@ -334,6 +335,7 @@ def main(tempdir):
 
     frame_w = 0
     frame_h = 0
+    fps = 0
 
     if not os.path.isfile(args.image_or_video_filename):
         raise ValueError('image_or_video_filename is not a file')
@@ -484,6 +486,28 @@ def main(tempdir):
     subprocess.call(command, shell=True)
 
     maybe_concatenate_end_bump(tempdir, args, frame_w, frame_h)
+
+    # ==== METADATA ====
+    mime_type = magic.from_file(args.output_video_filename, mime=True)
+    file_size_bytes = os.path.getsize(args.output_video_filename)
+
+    frame_count = len(full_frames)
+    duration_seconds = frame_count / fps
+    duration_millis = int(duration_seconds * 1000)
+
+    metadata = {
+        'is_video': True,
+        'width': frame_w,
+        'height': frame_h,
+        'num_frames': frame_count,
+        'fps': fps,
+        'duration_millis': duration_millis,
+        'mimetype': mime_type,
+        'file_size_bytes': file_size_bytes,
+    }
+
+    with open(args.output_metadata_filename, 'w') as json_file:
+        json.dump(metadata, json_file)
 
 if __name__ == '__main__':
     tempdir = tempfile.mkdtemp()
