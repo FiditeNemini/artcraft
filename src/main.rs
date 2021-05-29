@@ -53,12 +53,6 @@ use crate::buckets::bucket_client::BucketClient;
 use crate::http_server::endpoints::users::list_user_w2l_templates::list_user_w2l_templates_handler;
 use crate::http_server::endpoints::users::list_user_w2l_inference_results::list_user_w2l_inference_results_handler;
 
-///
-///  TODO TODO TODO TODO
-///  TODO TODO TODO TODO
-///       Make a central class that configures which bucket root paths things live in.
-///
-
 const DEFAULT_BIND_ADDRESS : &'static str = "0.0.0.0:12345";
 
 // NB: sqlx::query is spammy and logs all queries as "info"-level

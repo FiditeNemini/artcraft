@@ -242,7 +242,7 @@ WHERE
       .fetch_all(mysql_pool)
       .await?
   } else {
-    info!("listing w2l inference results for user; all");
+    info!("listing w2l inference results for user `{}`; all", scope_creator_username);
     sqlx::query_as!(
       RawW2lInferenceRecordForList,
         r#"

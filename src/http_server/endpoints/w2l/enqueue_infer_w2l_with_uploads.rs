@@ -126,6 +126,23 @@ pub async fn enqueue_infer_w2l_with_uploads(
     return Err(HttpResponse::TooManyRequests().body("you already have pending requests").into())
   }*/
 
+  // ==================== READ SESSION ==================== //
+
+  let maybe_session = server_state
+    .session_checker
+    .maybe_get_session(&http_request, &server_state.mysql_pool)
+    .await
+    .map_err(|e| {
+      warn!("Session checker error: {:?}", e);
+      InferW2lWithUploadError::ServerError
+    })?;
+
+  let mut maybe_user_token : Option<String> = maybe_session
+    .as_ref()
+    .map(|user_session| user_session.user_token.to_string());
+
+  info!("Enqueue infer w2l by user token: {:?}", maybe_user_token);
+
   // ==================== READ MULTIPART REQUEST ==================== //
 
   info!("Reading multipart request...");
@@ -214,22 +231,6 @@ pub async fn enqueue_infer_w2l_with_uploads(
   if !exists {
     return Err(InferW2lWithUploadError::BadInput("Template does not exist".to_string()));
   }
-
-  // ==================== READ SESSION ==================== //
-
-  let maybe_user_session = server_state
-    .session_checker
-    .maybe_get_user_session(&http_request, &server_state.mysql_pool)
-    .await
-    .map_err(|e| {
-      warn!("Session checker error: {:?}", e);
-      InferW2lWithUploadError::ServerError
-    })?;
-
-  let mut maybe_user_token : Option<String> = maybe_user_session
-    .as_ref()
-    .map(|user_session| user_session.user_token.to_string());
-
 
   // ==================== ANALYZE AND UPLOAD AUDIO FILE ==================== //
 

@@ -81,18 +81,20 @@ pub async fn infer_w2l_handler(
   request: web::Json<InferW2lRequest>,
   server_state: web::Data<Arc<ServerState>>) -> Result<HttpResponse, InferW2lError>
 {
-  let maybe_user_session = server_state
+  let maybe_session = server_state
     .session_checker
-    .maybe_get_user_session(&http_request, &server_state.mysql_pool)
+    .maybe_get_session(&http_request, &server_state.mysql_pool)
     .await
     .map_err(|e| {
       warn!("Session checker error: {:?}", e);
       InferW2lError::ServerError
     })?;
 
-  let mut maybe_user_token : Option<String> = maybe_user_session
+  let mut maybe_user_token : Option<String> = maybe_session
     .as_ref()
     .map(|user_session| user_session.user_token.to_string());
+
+  info!("Enqueue infer w2l by user token: {:?}", maybe_user_token);
 
   let w2l_template_token = match &request.w2l_template_token {
     None => {
