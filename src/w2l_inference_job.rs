@@ -319,8 +319,8 @@ async fn process_job(inferencer: &Inferencer, job: &W2lInferenceJobRecord) -> An
     info!("Download from bucket path: {:?}", &model_object_path);
 
     inferencer.private_bucket_client.download_file_to_disk(
-      model_object_path.to_str().ok_or(anyhow!("invalid path"))?,
-      &model_fs_path.to_str().ok_or(anyhow!("invalid path"))?
+      &model_object_path,
+      &model_fs_path
     ).await?;
 
     info!("Downloaded model from bucket!");

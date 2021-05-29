@@ -1,3 +1,4 @@
+use anyhow::anyhow;
 use anyhow::bail;
 use log::info;
 use log::warn;
@@ -7,9 +8,9 @@ use s3::region::Region;
 use std::io::Read;
 use std::path::{PathBuf, Path};
 use std::str::FromStr;
-use tokio::io::{AsyncBufRead, BufReader, AsyncReadExt};
-use tokio::io::AsyncBufReadExt;
 use tokio::fs::File;
+use tokio::io::AsyncBufReadExt;
+use tokio::io::{AsyncBufRead, BufReader, AsyncReadExt};
 
 #[derive(Clone)]
 pub struct BucketClient {
@@ -164,16 +165,24 @@ impl BucketClient {
     Ok(bytes)
   }
 
-  pub async fn download_file_to_disk(&self, object_path: &str, filesystem_path: &str)
-    -> anyhow::Result<()>
-  {
-    info!("downloading from bucket: {}", object_path);
+  pub async fn download_file_to_disk<P: AsRef<Path>>(
+    &self,
+    object_path: P,
+    filesystem_path: P,
+  ) -> anyhow::Result<()> {
+    let object_path_str = object_path.as_ref()
+      .to_str()
+      .map(|s| s.to_string())
+      .ok_or(anyhow!("could not convert object path to string"))?;
+
+    info!("downloading from bucket: {:?}", &object_path_str);
 
     let mut output_file = std::fs::File::create(filesystem_path)?;
-    let status_code = self.bucket.get_object_stream(object_path, &mut output_file).await?;
+
+    let status_code = self.bucket.get_object_stream(&object_path_str, &mut output_file).await?;
 
     match status_code {
-      404 => bail!("File not found in bucket: {}", object_path),
+      404 => bail!("File not found in bucket: {}", &object_path_str),
       _ => {},
     }
 
