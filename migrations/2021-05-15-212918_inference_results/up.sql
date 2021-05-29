@@ -61,7 +61,10 @@ CREATE TABLE tts_results (
   KEY fk_model_token (model_token),
   KEY fk_maybe_creator_user_token (maybe_creator_user_token),
   KEY fk_maybe_mod_user_token (maybe_mod_user_token),
-  KEY index_creator_ip_address (creator_ip_address)
+  KEY index_creator_ip_address (creator_ip_address),
+  KEY index_is_mod_hidden_from_public(is_mod_hidden_from_public),
+  KEY index_deleted_at(deleted_at),
+  KEY index_deleted_at_and_is_mod_hidden_from_public(deleted_at, is_mod_hidden_from_public)
 
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin;
 
@@ -134,6 +137,9 @@ CREATE TABLE w2l_results (
   KEY fk_maybe_w2l_template_token (maybe_w2l_template_token),
   KEY fk_maybe_tts_inference_result_token (maybe_tts_inference_result_token),
   KEY fk_maybe_mod_user_token (maybe_mod_user_token),
-  KEY index_creator_ip_address (creator_ip_address)
+  KEY index_creator_ip_address (creator_ip_address),
+  KEY index_is_mod_hidden_from_public(is_mod_hidden_from_public),
+  KEY index_deleted_at(deleted_at),
+  KEY index_deleted_at_and_is_mod_hidden_from_public(deleted_at, is_mod_hidden_from_public)
 
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin;
