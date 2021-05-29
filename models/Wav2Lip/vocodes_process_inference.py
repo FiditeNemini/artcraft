@@ -47,11 +47,14 @@ parser.add_argument('--cached_faces_filename', type=str,
 parser.add_argument('--audio_filename', type=str,
                     help='Filepath of video/audio file to use as raw audio source', required=True)
 
+parser.add_argument('--output_video_filename', type=str,
+                    help='Output filename for the final video', required=True)
+
 parser.add_argument('--output_metadata_filename', type=str,
                     help='Output filename for the JSON containing width, height, etc.', required=True)
 
-parser.add_argument('--outfile', type=str, help='Video path to save result. See default for an e.g.',
-                                default='results/result_voice.mp4')
+#parser.add_argument('--outfile', type=str, help='Video path to save result. See default for an e.g.',
+#                                default='results/result_voice.mp4')
 
 parser.add_argument('--static', type=bool,
                     help='If True, then use only first video frame for inference', default=False)
@@ -309,7 +312,7 @@ def maybe_concatenate_end_bump(tempdir, args, frame_w, frame_h):
     # More info on filters: https://stackoverflow.com/a/22958746
     command = ' '.join([
         'ffmpeg',
-        '-i {}'.format(args.outfile),
+        '-i {}'.format(args.output_video_filename),
         '-i {}'.format(bumpfile),
         '-filter_complex "concat=n=2:v=1:a=1"',
         '{}'.format(padded_wav_filename)
@@ -321,7 +324,7 @@ def maybe_concatenate_end_bump(tempdir, args, frame_w, frame_h):
         print('Failed to concatenate end bump')
     else:
         print('Done concatenating end bump; renaming file...', flush=True)
-        os.rename(padded_wav_filename, args.outfile)
+        os.rename(padded_wav_filename, args.output_video_filename)
 
 
 def main(tempdir):
@@ -476,7 +479,7 @@ def main(tempdir):
 
     out.release()
 
-    command = 'ffmpeg -y -i {} -i {} -strict -2 -q:v 1 {}'.format(args.audio_filename, output_video_filename, args.outfile)
+    command = 'ffmpeg -y -i {} -i {} -strict -2 -q:v 1 {}'.format(args.audio_filename, output_video_filename, args.output_video_filename)
     print('command:', command, flush=True)
     subprocess.call(command, shell=True)
 

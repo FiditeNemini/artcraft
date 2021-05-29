@@ -441,6 +441,8 @@ async fn process_job(inferencer: &Inferencer, job: &W2lInferenceJobRecord) -> An
     false
   )?;
 
+  let output_video_fs_path = temp_dir.path().join(&audio_bucket_hash);
+
   if true {
     info!("FAKE DONE");
     thread::sleep(Duration::from_millis(5000));

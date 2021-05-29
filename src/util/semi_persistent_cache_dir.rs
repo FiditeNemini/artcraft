@@ -1,6 +1,7 @@
 use std::path::{PathBuf, Path};
 use std::fs;
 use crate::util::anyhow_result::AnyhowResult;
+use tempdir::TempDir;
 
 /// These are for files on the worker filesystems
 pub struct SemiPersistentCacheDir {
@@ -102,5 +103,36 @@ impl SemiPersistentCacheDir {
   pub fn create_video_asset_path(&self) -> AnyhowResult<()> {
     let _ = fs::create_dir_all(self.video_asset_path())?;
     Ok(())
+  }
+
+  // ==================== W2L OUTPUT RESULTS ====================
+
+  /// We cache W2L faces here.
+  /// We'll likely need to LRU cache them.
+  pub fn w2l_output_results_path(&self, temp_dir: &TempDir, inference_job_token: &str) -> PathBuf {
+    // NB: We don't want colons from the token in the filename.
+    let filename = inference_job_token.replace(":", "");
+    let filename = format!("{}_result.mp4", filename);
+
+    temp_dir.path().join(&filename)
+  }
+}
+
+#[cfg(test)]
+mod tests {
+  use crate::util::semi_persistent_cache_dir::SemiPersistentCacheDir;
+  use tempdir::TempDir;
+
+  #[test]
+  fn test_w2l_output_results_path() {
+    let dirs = SemiPersistentCacheDir::default_paths();
+    let temp_dir = TempDir::new("test").unwrap();
+
+    let filename = dirs.w2l_output_results_path(&temp_dir, "TYPE:TOKEN")
+      .to_str()
+      .map(|s| s.to_string())
+      .unwrap();
+
+    assert!(&filename.ends_with("TYPETOKEN_result.mp4"));
   }
 }

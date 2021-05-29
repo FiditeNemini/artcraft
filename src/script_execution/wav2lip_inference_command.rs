@@ -32,7 +32,7 @@ impl Wav2LipInferenceCommand {
                  media_template_filename: P,
                  cached_faces_filename: P,
                  output_metadata_filename: P,
-                 output_media_filename: P,
+                 output_video_filename: P,
                  is_image: bool,
                  spawn_process: bool) -> AnyhowResult<()>
   {
@@ -54,6 +54,8 @@ impl Wav2LipInferenceCommand {
     command.push_str(&audio_filename.as_ref().display().to_string());
     command.push_str(" --cached_faces_filename ");
     command.push_str(&cached_faces_filename.as_ref().display().to_string());
+    command.push_str(" --output_video_filename ");
+    command.push_str(&output_video_filename.as_ref().display().to_string());
     command.push_str(" --output_metadata_filename ");
     command.push_str(&output_metadata_filename.as_ref().display().to_string());
 
