@@ -1,7 +1,8 @@
+#![deny(unused_must_use)]
 #![allow(dead_code)]
-#![allow(unused_mut)]
 #![allow(unused_imports)]
-#![warn(unused_must_use)]
+#![allow(unused_mut)]
+#![allow(unused_variables)]
 //#![allow(warnings)]
 
 #[macro_use] extern crate lazy_static;

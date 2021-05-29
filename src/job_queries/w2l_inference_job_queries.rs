@@ -43,7 +43,7 @@ pub struct W2lInferenceJobRecord {
 pub async fn query_w2l_inference_job_records(pool: &MySqlPool, num_records: u32)
                                                    -> AnyhowResult<Vec<W2lInferenceJobRecord>>
 {
-  let job_records = sqlx::query_as!(
+  /*let job_records = sqlx::query_as!(
       W2lInferenceJobRecord,
         r#"
 SELECT
@@ -67,7 +67,9 @@ WHERE
     .fetch_all(pool)
     .await?;
 
-  Ok(job_records)
+  Ok(job_records)*/
+
+  return Err(anyhow!("TODO"));
 }
 
 pub async fn mark_w2l_inference_job_failure(pool: &MySqlPool,
@@ -138,7 +140,7 @@ pub async fn insert_w2l_result(pool: &MySqlPool,
                                duration_millis: u64)
                                -> AnyhowResult<u64>
 {
-  let model_token = random_prefix_crockford_token("W2L_TPL:", 32)?;
+  /*let model_token = random_prefix_crockford_token("W2L_TPL:", 32)?;
   let updatable_slug = model_token.clone();
 
   let query_result = sqlx::query!(
@@ -170,10 +172,7 @@ SET
       model_token,
       template_type,
       updatable_slug,
-      job.title.to_string(),
-      job.creator_user_token.clone(),
       job.creator_ip_address.clone(),
-      job.download_url.clone(),
       private_bucket_hash.to_string(),
       private_bucket_object_name.to_string(),
       private_bucket_cached_faces_object_name.to_string(),
@@ -200,5 +199,6 @@ SET
     }
   };
 
-  Ok(record_id)
+  Ok(record_id)*/
+  return Err(anyhow!("TODO"));
 }

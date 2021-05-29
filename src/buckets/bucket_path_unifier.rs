@@ -1,25 +1,75 @@
+use crate::buckets::bucket_paths::hash_to_bucket_path;
+use std::path::PathBuf;
 
 /// This is designed to make it centrally configurable where
 /// different types of objects are stored.
 pub struct BucketPathUnifier {
-
+  pub user_uploaded_w2l_templates_root: PathBuf,
 }
 
 impl BucketPathUnifier {
 
-  pub fn user_audio_for_w2l_inference_path(audio_token: &str) -> String {
+  pub fn user_audio_for_w2l_inference_path(&self, audio_token: &str) -> String {
     "".to_string()
   }
 
-  pub fn end_bump_video_for_w2l_path(end_bump_filename: &str) -> String {
+  pub fn end_bump_video_for_w2l_path(&self, end_bump_filename: &str) -> String {
     "".to_string()
   }
 
-  pub fn precomputed_faces_for_w2l_path(token: &str) -> String {
+  // eg. /user_uploaded_w2l_templates/1/5/1/151a[...60]_detected_faces.pickle
+  pub fn precomputed_faces_for_w2l_path(&self, template_file_hash: &str) -> PathBuf {
+    let faces_filename = format!("{}_detected_faces.pickle", &template_file_hash);
+    let hashed_path = Self::hashed_directory_path(template_file_hash);
+
+    self.user_uploaded_w2l_templates_root
+      .join(hashed_path)
+      .join(faces_filename)
+  }
+
+  pub fn pretrained_w2l_model_path(&self, model_name: &str) -> String {
     "".to_string()
   }
 
-  pub fn pretrained_w2l_model_path(model_name: &str) -> String {
-    "".to_string()
+  pub fn hashed_directory_path(file_hash: &str) -> String {
+    match file_hash.len() {
+      0 => "".to_string(),
+      1 => file_hash.to_string(),
+      2 => format!("{}/", &file_hash[0..1]),
+      3 => format!("{}/{}/", &file_hash[0..1], &file_hash[1..2]),
+      _ => format!("{}/{}/{}/", &file_hash[0..1], &file_hash[1..2], &file_hash[2..3]),
+    }
+  }
+}
+
+#[cfg(test)]
+mod tests {
+  use crate::buckets::bucket_path_unifier::BucketPathUnifier;
+
+  #[test]
+  fn hashed_directory_path_length_zero() {
+    assert_eq!(&BucketPathUnifier::hashed_directory_path(""), "");
+  }
+
+  #[test]
+  fn hashed_directory_path_length_one() {
+    assert_eq!(&BucketPathUnifier::hashed_directory_path("a"), "");
+  }
+
+  #[test]
+  fn hashed_directory_path_length_two() {
+    assert_eq!(&BucketPathUnifier::hashed_directory_path("ab"), "a/");
+  }
+
+  #[test]
+  fn hashed_directory_path_length_three() {
+    assert_eq!(&BucketPathUnifier::hashed_directory_path("abc"), "a/b/");
+  }
+
+  #[test]
+  fn hashed_directory_path_length_more() {
+    assert_eq!(&BucketPathUnifier::hashed_directory_path("abcd"), "a/b/c/");
+    assert_eq!(&BucketPathUnifier::hashed_directory_path("abcde"), "a/b/c/");
+    assert_eq!(&BucketPathUnifier::hashed_directory_path("abcdef01234"), "a/b/c/");
   }
 }

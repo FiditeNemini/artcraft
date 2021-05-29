@@ -1,8 +1,8 @@
 #![deny(unused_must_use)]
 #![allow(dead_code)]
-#![allow(unused_mut)]
 #![allow(unused_imports)]
-#![warn(unused_must_use)]
+#![allow(unused_mut)]
+#![allow(unused_variables)]
 //#![allow(warnings)]
 
 #[macro_use] extern crate serde_derive;
@@ -153,11 +153,10 @@ async fn main() -> AnyhowResult<()> {
     DEFAULT_TEMP_DIR);
 
   // TODO: In the future, we may want to enable downloading images or audio files.
-  //let download_script = easyenv::get_env_string_or_default(
-  //  "DOWNLOAD_SCRIPT",
-  //  "./scripts/download_gdrive.py");
-  //
-  //let google_drive_downloader = GoogleDriveDownloadCommand::new(&download_script);
+  let download_script = easyenv::get_env_string_or_default(
+    "DOWNLOAD_SCRIPT",
+    "./scripts/download_gdrive.py");
+  let google_drive_downloader = GoogleDriveDownloadCommand::new(&download_script);
 
   let temp_directory = PathBuf::from(temp_directory);
 
@@ -174,6 +173,8 @@ async fn main() -> AnyhowResult<()> {
     .max_connections(5)
     .connect(&db_connection_string)
     .await?;
+
+  let inference_script = "TODO".to_string();
 
   let inferencer = Inferencer {
     download_temp_directory: temp_directory,
@@ -205,7 +206,7 @@ async fn main_loop(inferencer: Inferencer) {
   loop {
     let num_records = 1;
 
-    let query_result = query_w2l_template_upload_job_records(
+    let query_result = query_w2l_inference_job_records(
       &inferencer.mysql_pool,
       num_records)
       .await;
@@ -302,15 +303,16 @@ async fn process_job(inferencer: &Inferencer, job: &W2lInferenceJobRecord) -> An
   let temp_dir = format!("temp_{}", job.id);
   let temp_dir = TempDir::new(&temp_dir)?;
 
-  let download_url = job.download_url.as_ref()
-    .map(|c| c.to_string())
-    .unwrap_or("".to_string());
+  //let download_url = job.download_url.as_ref()
+  //  .map(|c| c.to_string())
+  //  .unwrap_or("".to_string());
 
   // ==================== DOWNLOAD FILE ==================== //
 
   info!("Calling downloader...");
-  let download_filename = inferencer.google_drive_downloader
-    .download_file(&download_url, &temp_dir).await?;
+  //let download_filename = inferencer.google_drive_downloader
+  //  .download_file(&download_url, &temp_dir).await?;
+  let download_filename = "TODO";
 
   // ==================== PROCESS FACES ==================== //
 
@@ -324,12 +326,12 @@ async fn process_job(inferencer: &Inferencer, job: &W2lInferenceJobRecord) -> An
   let is_image = false; // TODO: Don't always treat as video.
   let spawn_process = false;
 
-  inferencer.w2l_processor.execute(
+  /*inferencer.w2l_processor.execute(
     &download_filename,
     &cached_faces_filename,
     &output_metadata_filename,
     is_image,
-    spawn_process)?;
+    spawn_process)?;*/
 
   // ==================== CHECK ALL FILES EXIST AND GET METADATA ==================== //
 
@@ -364,7 +366,7 @@ async fn process_job(inferencer: &Inferencer, job: &W2lInferenceJobRecord) -> An
   let mut maybe_video_preview_filename : Option<PathBuf> = None;
   let mut maybe_video_preview_object_name : Option<String> = None;
 
-  if file_metadata.is_video {
+  /*if file_metadata.is_video {
     let preview_filename = format!("{}_preview.webp", &download_filename);
 
     inferencer.ffmpeg_video_preview_generator.execute(
@@ -400,7 +402,7 @@ async fn process_job(inferencer: &Inferencer, job: &W2lInferenceJobRecord) -> An
     let preview_object_path = format!("{}_preview.webp", full_object_path);
     maybe_image_preview_object_name = Some(preview_object_path);
     maybe_image_preview_filename = Some(image_preview_path);
-  }
+  }*/
 
   // ==================== UPLOAD TO BUCKETS ==================== //
 

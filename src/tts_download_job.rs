@@ -1,7 +1,8 @@
 #![deny(unused_must_use)]
 #![allow(dead_code)]
-#![allow(unused_mut)]
 #![allow(unused_imports)]
+#![allow(unused_mut)]
+#![allow(unused_variables)]
 #![warn(unused_must_use)]
 //#![allow(warnings)]
 

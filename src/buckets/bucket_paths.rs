@@ -11,7 +11,7 @@ pub fn hash_to_bucket_path(file_hash: &str,
     bail!("File length is too short");
   }
 
-  let optional_directory = optional_root_directory
+  let root_directory = optional_root_directory
     .map(|root| PathBuf::from(root.to_string()))
     .unwrap_or(PathBuf::from("/"));
 
@@ -23,7 +23,7 @@ pub fn hash_to_bucket_path(file_hash: &str,
     &file_hash,
   );
 
-  let maybe_path = optional_directory
+  let maybe_path = root_directory
     .join(file_path)
     .to_str()
     .map(|s| s.to_string());
