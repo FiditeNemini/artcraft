@@ -3,6 +3,7 @@ use log::{info,warn};
 use std::process::{Command, Stdio};
 use subprocess::{Popen, PopenConfig, Redirection};
 use std::fs::OpenOptions;
+use std::path::Path;
 
 /// This command is used to run inference.
 /// It uses preprocessed face files so that it's much faster.
@@ -26,10 +27,10 @@ impl Wav2LipInferenceCommand {
     }
   }
 
-  pub fn execute(&self,
-                 audio_filename: &str,
-                 output_cached_faces_filename: &str,
-                 output_metadata_filename: &str,
+  pub fn execute<P: AsRef<Path>>(&self,
+                 audio_filename: P,
+                 output_cached_faces_filename: P,
+                 output_metadata_filename: P,
                  is_image: bool,
                  spawn_process: bool) -> AnyhowResult<()>
   {
@@ -46,11 +47,11 @@ impl Wav2LipInferenceCommand {
     command.push_str(" --checkpoint_path ");
     command.push_str(&self.checkpoint_path);
     command.push_str(" --audio_filename");
-    command.push_str(audio_filename);
+    command.push_str(&audio_filename.as_ref().display().to_string());
     command.push_str(" --cached_faces_filename ");
-    command.push_str(output_cached_faces_filename);
+    command.push_str(&output_cached_faces_filename.as_ref().display().to_string());
     command.push_str(" --output_metadata_filename ");
-    command.push_str(output_metadata_filename);
+    command.push_str(&output_metadata_filename.as_ref().display().to_string());
 
     if is_image {
       command.push_str(" --is_image ");
