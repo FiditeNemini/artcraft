@@ -487,20 +487,36 @@ def main(tempdir):
 
     maybe_concatenate_end_bump(tempdir, args, frame_w, frame_h)
 
+    command = [
+        "ffprobe",
+        "-loglevel",  "quiet",
+        "-print_format", "json",
+        "-show_format",
+        "-show_streams",
+        args.output_video_filename
+    ]
+
+    pipe = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+    out, err = pipe.communicate()
+    ffmpeg_metadata = json.loads(out)
+
     # ==== METADATA ====
     mime_type = magic.from_file(args.output_video_filename, mime=True)
     file_size_bytes = os.path.getsize(args.output_video_filename)
 
-    frame_count = len(full_frames)
-    duration_seconds = frame_count / fps
-    duration_millis = int(duration_seconds * 1000)
+    print(ffmpeg_metadata)
+    print(ffmpeg_metadata['format'])
+    print(ffmpeg_metadata['format']['duration'])
+    #frame_count = len(full_frames)
+    #duration_seconds = frame_count / fps
+    duration_millis = int(float(ffmpeg_metadata['format']['duration']) * 1000)
 
     metadata = {
         'is_video': True,
         'width': frame_w,
         'height': frame_h,
-        'num_frames': frame_count,
-        'fps': fps,
+        #'num_frames': frame_count,
+        #'fps': fps,
         'duration_millis': duration_millis,
         'mimetype': mime_type,
         'file_size_bytes': file_size_bytes,
