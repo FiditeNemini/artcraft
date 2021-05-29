@@ -47,17 +47,19 @@ use crate::script_execution::imagemagick_generate_preview_image_command::Imagema
 const ENV_ACCESS_KEY : &'static str = "ACCESS_KEY";
 const ENV_SECRET_KEY : &'static str = "SECRET_KEY";
 const ENV_REGION_NAME : &'static str = "REGION_NAME";
-const ENV_BUCKET_ROOT : &'static str = "W2L_DOWNLOAD_BUCKET_ROOT";
 
 // Buckets (private data)
 const ENV_PRIVATE_BUCKET_NAME : &'static str = "W2L_PRIVATE_DOWNLOAD_BUCKET_NAME";
 // Buckets (public data)
 const ENV_PUBLIC_BUCKET_NAME : &'static str = "W2L_PUBLIC_DOWNLOAD_BUCKET_NAME";
 
+// Various bucket roots
+const ENV_DOWNLOAD_BUCKET_ROOT : &'static str = "W2L_DOWNLOAD_BUCKET_ROOT";
+
 // Python code
 const ENV_CODE_DIRECTORY : &'static str = "W2L_CODE_DIRECTORY";
 const ENV_MODEL_CHECKPOINT : &'static str = "W2L_MODEL_CHECKPOINT";
-const ENV_SCRIPT_NAME : &'static str = "W2L_SCRIPT_NAME";
+const ENV_DOWNLOAD_SCRIPT_NAME : &'static str = "W2L_DOWNLOAD_SCRIPT_NAME";
 
 // NB: sqlx::query is spammy and logs all queries as "info"-level
 const DEFAULT_RUST_LOG: &'static str = "debug,actix_web=info,sqlx::query=warn";
@@ -104,11 +106,13 @@ async fn main() -> AnyhowResult<()> {
   let access_key = easyenv::get_env_string_required(ENV_ACCESS_KEY)?;
   let secret_key = easyenv::get_env_string_required(ENV_SECRET_KEY)?;
   let region_name = easyenv::get_env_string_required(ENV_REGION_NAME)?;
-  let bucket_root = easyenv::get_env_string_required(ENV_BUCKET_ROOT)?;
 
   // Private and Public Buckets
   let private_bucket_name = easyenv::get_env_string_required(ENV_PRIVATE_BUCKET_NAME)?;
   let public_bucket_name = easyenv::get_env_string_required(ENV_PUBLIC_BUCKET_NAME)?;
+
+  // Bucket roots
+  let bucket_root = easyenv::get_env_string_required(ENV_DOWNLOAD_BUCKET_ROOT)?;
 
   let private_bucket_client = BucketClient::create(
     &access_key,
@@ -127,7 +131,7 @@ async fn main() -> AnyhowResult<()> {
   )?;
 
   let py_code_directory = easyenv::get_env_string_required(ENV_CODE_DIRECTORY)?;
-  let py_script_name = easyenv::get_env_string_required(ENV_SCRIPT_NAME)?;
+  let py_script_name = easyenv::get_env_string_required(ENV_DOWNLOAD_SCRIPT_NAME)?;
   let py_model_checkpoint = easyenv::get_env_string_required(ENV_MODEL_CHECKPOINT)?;
 
   let w2l_preprecess_command = Wav2LipPreprocessClient::new(

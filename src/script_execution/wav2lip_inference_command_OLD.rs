@@ -3,18 +3,17 @@ use log::{info,warn};
 use std::process::{Command, Stdio};
 use subprocess::{Popen, PopenConfig, Redirection};
 use std::fs::OpenOptions;
-use crate::script_execution::wav2lip_inference_command_OLD::Wav2LipInferenceCommand;
 
-/// This command is used to run inference.
-/// It uses preprocessed face files so that it's much faster.
+/// This command is used to preprocess the face detection frames from user-submitted video.
+/// This should only ever need to run once. The frames can then be uploaded to Buckets and saved.
 #[derive(Clone)]
-pub struct Wav2LipInferenceCommand {
+pub struct Wav2LipInferenceCommandOLD {
   w2l_directory: String,
   script_name: String,
   checkpoint_path: String,
 }
 
-impl Wav2LipInferenceCommand {
+impl Wav2LipInferenceCommandOLD {
   pub fn new(
     w2l_directory: &str,
     script_name: &str,
@@ -29,9 +28,10 @@ impl Wav2LipInferenceCommand {
 
   pub fn execute(&self,
                  audio_filename: &str,
-                 output_cached_faces_filename: &str,
-                 output_metadata_filename: &str,
+                 image_or_video_filename: &str,
+                 output_video_filename: &str,
                  is_image: bool,
+                 disable_end_bump: bool,
                  spawn_process: bool) -> AnyhowResult<()>
   {
     let mut command = String::new();
@@ -46,12 +46,12 @@ impl Wav2LipInferenceCommand {
     command.push_str(&self.script_name);
     command.push_str(" --checkpoint_path ");
     command.push_str(&self.checkpoint_path);
-    command.push_str(" --audio_filename");
+    command.push_str(" --face ");
+    command.push_str(image_or_video_filename);
+    command.push_str(" --audio ");
     command.push_str(audio_filename);
-    command.push_str(" --cached_faces_filename ");
-    command.push_str(output_cached_faces_filename);
-    command.push_str(" --output_metadata_filename ");
-    command.push_str(output_metadata_filename);
+    command.push_str(" --outfile ");
+    command.push_str(output_video_filename);
 
     if is_image {
       command.push_str(" --is_image ");
@@ -74,14 +74,14 @@ impl Wav2LipInferenceCommand {
         .write(true)
         .create(true)
         .truncate(true)
-        .open("/tmp/wav2lip_upload_stdout.txt")?;
+        .open("/tmp/stdout.txt")?;
 
       let stderr_file = OpenOptions::new()
         .read(true)
         .write(true)
         .create(true)
         .truncate(true)
-        .open("/tmp/wav2lip_upload_stderr.txt")?;
+        .open("/tmp/stderr.txt")?;
 
       let mut p = Popen::create(&command_parts, PopenConfig {
         //stdout: Redirection::Pipe,

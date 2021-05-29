@@ -50,6 +50,12 @@ use crate::http_server::endpoints::tts::list_tts_models::list_tts_models_handler
 use crate::http_server::endpoints::w2l::enqueue_infer_w2l_with_uploads::enqueue_infer_w2l_with_uploads;
 use crate::buckets::bucket_client::BucketClient;
 
+///
+///  TODO TODO TODO TODO
+///  TODO TODO TODO TODO
+///       Make a central class that configures which bucket root paths things live in.
+///
+
 const DEFAULT_BIND_ADDRESS : &'static str = "0.0.0.0:12345";
 
 // NB: sqlx::query is spammy and logs all queries as "info"-level
