@@ -24,6 +24,7 @@ use sqlx::error::Error::Database;
 use sqlx::mysql::MySqlDatabaseError;
 use std::sync::Arc;
 use chrono::{DateTime, Utc};
+use crate::common_queries::list_w2l_templates::{list_w2l_templates, W2lTemplateRecordForList};
 
 #[derive(Serialize)]
 pub struct W2lTemplateRecordForResponse {
@@ -46,7 +47,7 @@ pub struct W2lTemplateRecordForResponse {
 #[derive(Serialize)]
 pub struct ListW2lTemplatesSuccessResponse {
   pub success: bool,
-  pub templates: Vec<W2lTemplateRecordForResponse>,
+  pub templates: Vec<W2lTemplateRecordForList>,
 }
 
 #[derive(Serialize)]
@@ -110,74 +111,24 @@ pub async fn list_w2l_templates_handler(
   http_request: HttpRequest,
   server_state: web::Data<Arc<ServerState>>) -> Result<HttpResponse, ListW2lTemplatesError>
 {
-  // NB: Lookup failure is Err(RowNotFound).
-  // NB: Since this is publicly exposed, we don't query sensitive data.
-  let maybe_templates = sqlx::query_as!(
-      W2lTemplateRecord,
-        r#"
-SELECT
-    w2l.token as template_token,
-    w2l.template_type,
-    w2l.creator_user_token,
-    users.username as creator_username,
-    users.display_name as creator_display_name,
-    w2l.updatable_slug,
-    w2l.title,
-    w2l.frame_width,
-    w2l.frame_height,
-    w2l.duration_millis,
-    w2l.maybe_public_bucket_preview_image_object_name,
-    w2l.maybe_public_bucket_preview_video_object_name,
-    w2l.created_at,
-    w2l.updated_at
-FROM w2l_templates as w2l
-JOIN users
-ON users.token = w2l.creator_user_token
-WHERE w2l.deleted_at IS NULL
-        "#,
-    )
-    .fetch_all(&server_state.mysql_pool)
-    .await; // TODO: This will return error if it doesn't exist
+  let scope_creator = None;
+  let query_results = list_w2l_templates(
+    &server_state.mysql_pool,
+    scope_creator,
+    false,
+  ).await;
 
-  let templates : Vec<W2lTemplateRecord> = match maybe_templates {
-    Ok(templates) => templates,
-    Err(err) => {
-      match err {
-        RowNotFound => {
-          return Err(ListW2lTemplatesError::ServerError);
-        },
-        _ => {
-          warn!("w2l template list query error: {:?}", err);
-          return Err(ListW2lTemplatesError::ServerError);
-        }
-      }
+  let templates = match query_results {
+    Ok(results) => results,
+    Err(e) => {
+      warn!("w2l template list query error: {:?}", e);
+      return Err(ListW2lTemplatesError::ServerError);
     }
   };
 
-  let templates_for_response = templates.into_iter()
-    .map(|template| {
-      W2lTemplateRecordForResponse {
-        template_token: template.template_token.clone(),
-        template_type: template.template_type.clone(),
-        creator_user_token: template.creator_user_token.clone(),
-        creator_username: template.creator_username.clone(),
-        creator_display_name: template.creator_display_name.clone(),
-        updatable_slug: template.updatable_slug.clone(),
-        title: template.title.clone(),
-        frame_width: if template.frame_width > 0 { template.frame_width as u32 } else { 0 },
-        frame_height: if template.frame_height  > 0 { template.frame_height as u32 } else { 0 },
-        duration_millis: if template.duration_millis > 0 { template.duration_millis as u32 } else { 0 },
-        maybe_image_object_name: template.maybe_public_bucket_preview_image_object_name.clone(),
-        maybe_video_object_name: template.maybe_public_bucket_preview_video_object_name.clone(),
-        created_at: template.created_at.clone(),
-        updated_at: template.updated_at.clone(),
-      }
-    })
-    .collect::<Vec<W2lTemplateRecordForResponse>>();
-
   let response = ListW2lTemplatesSuccessResponse {
     success: true,
-    templates: templates_for_response,
+    templates,
   };
 
   let body = serde_json::to_string(&response)

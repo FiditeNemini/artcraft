@@ -102,7 +102,7 @@ pub async fn list_user_w2l_templates_handler(
 
   let response = ListW2lTemplatesForUserSuccessResponse {
     success: true,
-    templates: templates,
+    templates,
   };
 
   let body = serde_json::to_string(&response)
