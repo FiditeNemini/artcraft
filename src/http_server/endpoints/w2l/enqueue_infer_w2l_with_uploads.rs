@@ -240,6 +240,8 @@ pub async fn enqueue_infer_w2l_with_uploads(
 
   let upload_uuid = generate_random_uuid();
 
+  let audio_upload_bucket_hash = upload_uuid.clone();
+
   let audio_upload_bucket_path = hash_to_bucket_path(
     &upload_uuid,
     Some(&server_state.audio_uploads_bucket_root)
@@ -278,6 +280,7 @@ SET
   uuid_idempotency_token = ?,
 
   maybe_w2l_template_token = ?,
+  maybe_public_audio_bucket_hash = ?,
   maybe_public_audio_bucket_location = ?,
 
   maybe_original_audio_filename = ?,
@@ -292,6 +295,7 @@ SET
         job_token.to_string(),
         uuid_idempotency_token.to_string(),
         maybe_template_token.clone(),
+        Some(audio_upload_bucket_hash.clone()),
         Some(audio_upload_bucket_path.clone()),
         maybe_audio_file_name.clone(),
         Some(audio_type.clone()),

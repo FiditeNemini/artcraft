@@ -297,7 +297,7 @@ async fn process_job(inferencer: &Inferencer, job: &W2lInferenceJobRecord) -> An
   // TODO 1. Mark Processing
   //
   // TODO: 2. Check if w2l model is downloaded / download it to a stable cache location (DONE)
-  // TODO: 3. Check if w2l template faces are downloaded and download it
+  // TODO: 3. Check if w2l template faces are downloaded and download it (done)
   // TODO: 4. Download user audio
 
   // TODO: 5. Process Inference
@@ -374,9 +374,29 @@ async fn process_job(inferencer: &Inferencer, job: &W2lInferenceJobRecord) -> An
     info!("Downloaded face template from bucket!");
   }
 
+  // ==================== DOWNLOAD USER AUDIO ==================== //
 
   let temp_dir = format!("temp_{}", job.id);
   let temp_dir = TempDir::new(&temp_dir)?;
+
+  let audio_bucket_hash = match &job.maybe_public_audio_bucket_hash {
+    Some(l) => l.clone(),
+    None => {
+      warn!("Only W2L jobs with user-uploaded audio are supported right now");
+      return Err(anyhow!("Only W2L jobs with user-uploaded audio are supported right now"))
+    },
+  };
+
+  let audio_fs_path = temp_dir.path().join(&audio_bucket_hash);
+
+  let audio_object_path = inferencer.bucket_path_unifier
+    .user_audio_for_w2l_inference_path(&audio_bucket_hash);
+
+  inferencer.private_bucket_client.download_file_to_disk(
+    &audio_object_path,
+    &audio_fs_path
+  ).await?;
+
 
   if true {
     info!("FAKE DONE");

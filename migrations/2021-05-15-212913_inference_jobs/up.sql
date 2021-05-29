@@ -96,6 +96,7 @@ CREATE TABLE w2l_inference_jobs (
   maybe_tts_inference_result_token VARCHAR(32) DEFAULT NULL,
 
   -- If we're using custom uploaded audio, this will be present.
+  maybe_public_audio_bucket_hash VARCHAR(64) DEFAULT NULL,
   maybe_public_audio_bucket_location VARCHAR(255) DEFAULT NULL,
 
   -- The filename that was used at upload time (if available)

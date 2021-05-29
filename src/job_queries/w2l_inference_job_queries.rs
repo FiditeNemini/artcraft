@@ -23,6 +23,7 @@ pub struct W2lInferenceJobRecord {
 
   // ===== AUDIO SOURCE OPTIONS =====
   pub maybe_tts_inference_result_token: Option<String>,
+  pub maybe_public_audio_bucket_hash: Option<String>,
   pub maybe_public_audio_bucket_location: Option<String>,
 
   pub maybe_original_audio_filename: Option<String>,
@@ -60,6 +61,7 @@ SELECT
   maybe_w2l_template_token,
   maybe_public_image_bucket_location,
   maybe_tts_inference_result_token,
+  maybe_public_audio_bucket_hash,
   maybe_public_audio_bucket_location,
 
   maybe_original_audio_filename,
@@ -231,7 +233,6 @@ SET
   return Err(anyhow!("TODO"));
 }
 
-#[derive(Serialize)]
 pub struct W2lTemplateRecord2 {
   pub template_token: String,
   pub template_type: String,
