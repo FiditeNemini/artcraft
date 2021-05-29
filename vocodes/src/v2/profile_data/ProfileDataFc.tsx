@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { ApiConfig } from '../../v1/api/ApiConfig';
 import { SessionWrapper } from '../../session/SessionWrapper';
 import { RouteProps, useHistory, useParams, Link } from 'react-router-dom';
+import { ProfileData_W2lTemplateListFc } from './ProfileData_W2lTemplateListFc';
 
 interface W2lTemplateViewResponsePayload {
   success: boolean,
@@ -30,40 +31,16 @@ interface Props {
 }
 
 function ProfileDataFc(props: Props) {
-  //let history = useHistory();
-  //let { templateSlug } = useParams();
-
-  //const [w2lTemplate, setW2lTemplate] = useState<W2lTemplate|undefined>(undefined);
-
-  useEffect(() => {
-    /*const api = new ApiConfig();
-    const endpointUrl = api.viewW2l(templateSlug);
-
-    fetch(endpointUrl, {
-      method: 'GET',
-      headers: {
-        'Accept': 'application/json',
-      },
-      credentials: 'include',
-    })
-    .then(res => res.json())
-    .then(res => {
-      console.log('list', res);
-      const templatesResponse : W2lTemplateViewResponsePayload = res;
-      if (!templatesResponse.success) {
-        return;
-      }
-
-      setW2lTemplate(templatesResponse.template)
-    })
-    .catch(e => {
-      //this.props.onSpeakErrorCallback();
-    });*/
-  }, []); // NB: Empty array dependency sets to run ONLY on mount
+  let { username } = useParams();
 
   return (
     <div>
       <h1 className="title is-1"> My Data (Models, Results, etc.) </h1>
+
+      <h3 className="title is-3"> Uploaded Templates </h3>
+
+      <ProfileData_W2lTemplateListFc username={username} />
+      
     </div>
   )
 }

@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { ApiConfig } from '../../v1/api/ApiConfig';
-import { SessionWrapper } from '../../session/SessionWrapper';
 import { Link } from "react-router-dom";
 import { getRandomInt } from '../../Utils';
 
@@ -27,15 +26,15 @@ interface W2lTemplate {
 }
 
 interface Props {
-  sessionWrapper: SessionWrapper,
+  username: string,
 }
 
-function W2lTemplateListFc(props: Props) {
+function ProfileData_W2lTemplateListFc(props: Props) {
   const [w2lTemplates, setW2lTemplates] = useState<Array<W2lTemplate>>([]);
 
   useEffect(() => {
     const api = new ApiConfig();
-    const endpointUrl = api.listW2l();
+    const endpointUrl = api.listW2lForUser(props.username);
 
     fetch(endpointUrl, {
       method: 'GET',
@@ -122,42 +121,11 @@ function W2lTemplateListFc(props: Props) {
     rowOfTemplateElements = [];
   }
 
-  let extraDetails = <p />;
-
-  if (props.sessionWrapper.isLoggedIn()) {
-    extraDetails = (
-      <p>
-        Pick a template, then you can make it lip sync.
-        If you want to use your own video or image, you can
-        <Link to="/upload">upload it as a template</Link>.
-        You'll then be able to use it whenever you want!
-      </p>
-    );
-
-  } else {
-    extraDetails = (
-      <p>
-        Pick a template, then you can make it lip sync.
-        If you want to use your own video or image, you'll
-        need to <Link to="/signup">create an account</Link>.
-        You'll then be able to upload and reuse your templates 
-        whenever you want!
-      </p>
-    );
-  }
-
   return (
     <div>
-      <h1 className="title is-1"> Video lip sync templates </h1>
-
-      {extraDetails}
-
-      <br />
-
       {allRowsOfTemplateElements.map(el => el)}
-
     </div>
   )
 }
 
-export { W2lTemplateListFc };
+export { ProfileData_W2lTemplateListFc };

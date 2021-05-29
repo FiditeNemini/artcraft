@@ -1,7 +1,8 @@
 import React from 'react';
 import { ApiConfig } from '../../v1/api/ApiConfig';
-import { SessionWrapper } from '../../session/SessionWrapper';
+import { Profile_W2lTemplateListFc } from './Profile_W2lTemplateListFc';
 import { RouteProps } from 'react-router-dom';
+import { SessionWrapper } from '../../session/SessionWrapper';
 
 interface ProfileResponsePayload {
   success: boolean,
@@ -93,6 +94,8 @@ class ProfileComponent extends React.Component<Props, State> {
       );
     }
 
+    let username = this.state.user.username;
+
     let gravatar = <span />;
     if (this.state.user!.email_gravatar_hash !== undefined) {
       const hash = this.state.user!.email_gravatar_hash;
@@ -105,6 +108,13 @@ class ProfileComponent extends React.Component<Props, State> {
       <div>
         <h1 className="title is-1"> {gravatar} {this.state.user!.display_name} </h1>
         <p>Profiles are a work in progress.</p>
+
+        <br />
+        <br />
+
+        <h3 className="title is-3"> Uploaded Templates </h3>
+        <Profile_W2lTemplateListFc username={username} />
+
       </div>
     )
   }

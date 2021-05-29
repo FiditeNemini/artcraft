@@ -94,7 +94,7 @@ function W2lTemplateViewFc(props: Props) {
     formData.append('uuid_idempotency_token', uuidv1()!);
 
     const api = new ApiConfig();
-    const endpointUrl = api.inferW2l(templateToken);
+    const endpointUrl = api.inferW2l();
 
     // NB: Using 'axios' because 'fetch' was having problems with form-multipart
     // and then interpreting the resultant JSON. Maybe I didn't try hard enough?
