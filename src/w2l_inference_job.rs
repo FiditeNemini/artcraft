@@ -63,8 +63,9 @@ const ENV_CODE_DIRECTORY : &'static str = "W2L_CODE_DIRECTORY";
 const ENV_MODEL_CHECKPOINT : &'static str = "W2L_MODEL_CHECKPOINT";
 const ENV_INFERENCE_SCRIPT_NAME : &'static str = "W2L_INFERENCE_SCRIPT_NAME";
 
-// NB: sqlx::query is spammy and logs all queries as "info"-level
-const DEFAULT_RUST_LOG: &'static str = "debug,actix_web=info,sqlx::query=warn";
+/// NB: `sqlx::query` is spammy and logs all queries as "info"-level
+/// NB: `hyper::proto::h1::io` is incredibly spammy and logs every chunk of bytes in very large files being downloaded
+const DEFAULT_RUST_LOG: &'static str = "debug,actix_web=info,sqlx::query=warn,hyper::proto::h1::io=warn";
 const DEFAULT_TEMP_DIR: &'static str = "/tmp";
 
 struct Inferencer {
@@ -319,7 +320,8 @@ async fn process_job(inferencer: &Inferencer, job: &W2lInferenceJobRecord) -> An
 
     inferencer.private_bucket_client.download_file_to_disk(
       model_object_path.to_str().ok_or(anyhow!("invalid path"))?,
-      &model_filename).await?;
+      &model_fs_path.to_str().ok_or(anyhow!("invalid path"))?
+    ).await?;
 
     info!("Downloaded model from bucket!");
   }
@@ -327,6 +329,11 @@ async fn process_job(inferencer: &Inferencer, job: &W2lInferenceJobRecord) -> An
 
   let temp_dir = format!("temp_{}", job.id);
   let temp_dir = TempDir::new(&temp_dir)?;
+
+  if true {
+    info!("FAKE DONE");
+    return Ok(());
+  }
 
   //let download_url = job.download_url.as_ref()
   //  .map(|c| c.to_string())

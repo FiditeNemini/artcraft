@@ -24,12 +24,17 @@ pub struct W2lInferenceJobRecord {
   pub maybe_tts_inference_result_token: Option<String>,
   pub maybe_public_audio_bucket_location: Option<String>,
 
+  pub maybe_original_audio_filename: Option<String>,
+  pub maybe_original_audio_download_url: Option<String>,
+  pub maybe_audio_mime_type: Option<String>,
+
   pub creator_ip_address: String,
   pub maybe_creator_user_token: Option<String>,
-  pub creator_set_visibility: String, // TODO
 
-  pub disable_end_bump: bool,
-  pub disable_watermark: bool,
+  pub creator_set_visibility: String, // TODO
+  pub disable_end_bump: i8, // bool
+  pub disable_watermark: i8, // bool
+
   //pub maybe_subject_token: Option<String>,
   //pub maybe_actor_subject_token: Option<String>,
   pub status: String, // TODO
@@ -43,12 +48,36 @@ pub struct W2lInferenceJobRecord {
 pub async fn query_w2l_inference_job_records(pool: &MySqlPool, num_records: u32)
                                                    -> AnyhowResult<Vec<W2lInferenceJobRecord>>
 {
-  /*let job_records = sqlx::query_as!(
+  let job_records = sqlx::query_as!(
       W2lInferenceJobRecord,
         r#"
 SELECT
+  id,
   token AS inference_job_token,
-  *
+  uuid_idempotency_token,
+
+  maybe_w2l_template_token,
+  maybe_public_image_bucket_location,
+  maybe_tts_inference_result_token,
+  maybe_public_audio_bucket_location,
+
+  maybe_original_audio_filename,
+  maybe_original_audio_download_url,
+  maybe_audio_mime_type,
+
+  creator_ip_address,
+  maybe_creator_user_token,
+
+  creator_set_visibility,
+  disable_end_bump,
+  disable_watermark,
+
+  status,
+  attempt_count,
+  failure_reason,
+  created_at,
+  updated_at,
+  retry_at
 FROM w2l_inference_jobs
 WHERE
   (
@@ -67,9 +96,7 @@ WHERE
     .fetch_all(pool)
     .await?;
 
-  Ok(job_records)*/
-
-  return Err(anyhow!("TODO"));
+  Ok(job_records)
 }
 
 pub async fn mark_w2l_inference_job_failure(pool: &MySqlPool,
