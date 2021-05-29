@@ -15,6 +15,7 @@ pub mod util;
 use anyhow::anyhow;
 use chrono::Utc;
 use crate::buckets::bucket_client::BucketClient;
+use crate::buckets::bucket_path_unifier::BucketPathUnifier;
 use crate::buckets::bucket_paths::hash_to_bucket_path;
 use crate::buckets::file_hashing::get_file_hash;
 use crate::job_queries::w2l_inference_job_queries::W2lInferenceJobRecord;
@@ -22,11 +23,16 @@ use crate::job_queries::w2l_inference_job_queries::insert_w2l_result;
 use crate::job_queries::w2l_inference_job_queries::mark_w2l_inference_job_done;
 use crate::job_queries::w2l_inference_job_queries::mark_w2l_inference_job_failure;
 use crate::job_queries::w2l_inference_job_queries::query_w2l_inference_job_records;
+use crate::script_execution::ffmpeg_generate_preview_image_command::FfmpegGeneratePreviewImageCommand;
+use crate::script_execution::ffmpeg_generate_preview_video_command::FfmpegGeneratePreviewVideoCommand;
 use crate::script_execution::google_drive_download_command::GoogleDriveDownloadCommand;
+use crate::script_execution::imagemagick_generate_preview_image_command::ImagemagickGeneratePreviewImageCommand;
+use crate::script_execution::wav2lip_inference_command::Wav2LipInferenceCommand;
 use crate::util::anyhow_result::AnyhowResult;
 use crate::util::filesystem::check_directory_exists;
 use crate::util::filesystem::check_file_exists;
 use crate::util::random_crockford_token::random_crockford_token;
+use crate::util::semi_persistent_cache_dir::SemiPersistentCacheDir;
 use data_encoding::{HEXUPPER, HEXLOWER, HEXLOWER_PERMISSIVE};
 use log::{warn, info};
 use ring::digest::{Context, Digest, SHA256};
@@ -38,10 +44,6 @@ use std::path::{PathBuf, Path};
 use std::process::Command;
 use std::time::Duration;
 use tempdir::TempDir;
-use crate::script_execution::wav2lip_inference_command::Wav2LipInferenceCommand;
-use crate::script_execution::ffmpeg_generate_preview_video_command::FfmpegGeneratePreviewVideoCommand;
-use crate::script_execution::ffmpeg_generate_preview_image_command::FfmpegGeneratePreviewImageCommand;
-use crate::script_execution::imagemagick_generate_preview_image_command::ImagemagickGeneratePreviewImageCommand;
 
 // Buckets (shared config)
 const ENV_ACCESS_KEY : &'static str = "ACCESS_KEY";
@@ -53,10 +55,8 @@ const ENV_PRIVATE_BUCKET_NAME : &'static str = "W2L_PRIVATE_DOWNLOAD_BUCKET_NAME
 // Buckets (public data)
 const ENV_PUBLIC_BUCKET_NAME : &'static str = "W2L_PUBLIC_DOWNLOAD_BUCKET_NAME";
 
-// Various bucket roots
-const ENV_DOWNLOAD_BUCKET_ROOT : &'static str = "W2L_DOWNLOAD_BUCKET_ROOT";
-const ENV_AUDIO_UPLOADS_BUCKET_ROOT : &'static str = "AUDIO_UPLOADS_BUCKET_ROOT";
-const ENV_INFERENCE_OUTPUT_BUCKET_ROOT : &'static str = "W2L_INFERENCE_OUTPUT_BUCKET_ROOT";
+// Where models and other assets get downloaded to.
+const ENV_SEMIPERSISTENT_CACHE_DIR : &'static str = "SEMIPERSISTENT_CACHE_DIR";
 
 // Python code
 const ENV_CODE_DIRECTORY : &'static str = "W2L_CODE_DIRECTORY";
@@ -74,6 +74,9 @@ struct Inferencer {
   pub private_bucket_client: BucketClient,
   pub public_bucket_client: BucketClient,
 
+  pub bucket_path_unifier: BucketPathUnifier,
+  pub semi_persistent_cache: SemiPersistentCacheDir,
+
   pub google_drive_downloader: GoogleDriveDownloadCommand,
   pub w2l_inference: Wav2LipInferenceCommand,
   //pub ffmpeg_image_preview_generator: FfmpegGeneratePreviewImageCommand,
@@ -82,13 +85,6 @@ struct Inferencer {
 
   // Command to run
   pub inference_script: String,
-
-  // Root to retrieve W2L templates (public and private)
-  pub w2l_template_uploads_bucket_root: String,
-  // Root to retrieve uploaded audio (public and private)
-  pub audio_uploads_bucket_root: String,
-  // Root to upload inference output
-  pub inference_output_bucket_root: String,
 }
 
 #[tokio::main]
@@ -116,11 +112,6 @@ async fn main() -> AnyhowResult<()> {
   // Private and Public Buckets
   let private_bucket_name = easyenv::get_env_string_required(ENV_PRIVATE_BUCKET_NAME)?;
   let public_bucket_name = easyenv::get_env_string_required(ENV_PUBLIC_BUCKET_NAME)?;
-
-  // Bucket roots
-  let w2l_template_bucket_root = easyenv::get_env_string_required(ENV_DOWNLOAD_BUCKET_ROOT)?;
-  let audio_bucket_root = easyenv::get_env_string_required(ENV_AUDIO_UPLOADS_BUCKET_ROOT)?;
-  let inference_output_bucket_root = easyenv::get_env_string_required(ENV_INFERENCE_OUTPUT_BUCKET_ROOT)?;
 
   let private_bucket_client = BucketClient::create(
     &access_key,
@@ -176,6 +167,17 @@ async fn main() -> AnyhowResult<()> {
 
   let inference_script = "TODO".to_string();
 
+  let persistent_cache_path = easyenv::get_env_string_or_default(
+    ENV_SEMIPERSISTENT_CACHE_DIR,
+    "/tmp");
+
+  let semi_persistent_cache = SemiPersistentCacheDir::configured_root(&persistent_cache_path);
+
+  info!("Creating pod semi-persistent cache dirs...");
+  semi_persistent_cache.create_w2l_model_path()?;
+  semi_persistent_cache.create_w2l_face_templates_path()?;
+  semi_persistent_cache.create_w2l_model_path()?;
+
   let inferencer = Inferencer {
     download_temp_directory: temp_directory,
     mysql_pool,
@@ -187,9 +189,8 @@ async fn main() -> AnyhowResult<()> {
     //ffmpeg_video_preview_generator: FfmpegGeneratePreviewVideoCommand {},
     //imagemagick_image_preview_generator: ImagemagickGeneratePreviewImageCommand {},
     w2l_inference: w2l_inference_command,
-    w2l_template_uploads_bucket_root: w2l_template_bucket_root.to_string(),
-    audio_uploads_bucket_root: audio_bucket_root.to_string(),
-    inference_output_bucket_root: inference_output_bucket_root.to_string(),
+    bucket_path_unifier: BucketPathUnifier::default_paths(),
+    semi_persistent_cache,
   };
 
   main_loop(inferencer).await;
@@ -286,19 +287,17 @@ fn read_metadata_file(filename: &str) -> AnyhowResult<FileMetadata> {
 
 async fn process_job(inferencer: &Inferencer, job: &W2lInferenceJobRecord) -> AnyhowResult<()> {
 
-  // TODO: 1. Check if w2l model is downloaded and download it
-  // TODO: 2. Check if w2l template faces are downloaded and download it
-  // TODO: 3. Download audio
+  // TODO 1. Mark Processing
+  //
+  // TODO: 2. Check if w2l model is downloaded / download it to a stable cache location
+  // TODO: 3. Check if w2l template faces are downloaded and download it
+  // TODO: 4. Download user audio
 
+  // TODO: 5. Process Inference
 
-  // TODO: 1. Mark processing.
-  // TODO: 2. Download. (DONE)
-  // TODO: 3. Process template with face detection (DONE)
-  // TODO: 4. Determine if picture or video
-  // TODO: 5. Take a screenshot/gif
-  // TODO: 6. Upload all (partially done).
-  // TODO: 7. Save record. (DONE)
-  // TODO: 8. Mark job done. (DONE)
+  // TODO 6. Upload result
+  // TODO 7. Save record
+  // TODO 8. Mark job done
 
   let temp_dir = format!("temp_{}", job.id);
   let temp_dir = TempDir::new(&temp_dir)?;
@@ -354,9 +353,11 @@ async fn process_job(inferencer: &Inferencer, job: &W2lInferenceJobRecord) -> An
   info!("File hash: {}", private_bucket_hash);
 
   // Full path to video/image
-  let full_object_path = hash_to_bucket_path(
-    &private_bucket_hash,
-    Some(&inferencer.w2l_template_uploads_bucket_root))?;
+  //let full_object_path = hash_to_bucket_path(
+  //  &private_bucket_hash,
+  //  Some(&inferencer.w2l_template_uploads_bucket_root))?;
+
+  let full_object_path = "TODO";
 
   // ==================== GENERATE VIDEO PREVIEWS ==================== //
 
