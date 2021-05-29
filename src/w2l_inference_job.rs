@@ -45,6 +45,7 @@ use std::path::{PathBuf, Path};
 use std::process::Command;
 use std::time::Duration;
 use tempdir::TempDir;
+use std::thread;
 
 // Buckets (shared config)
 const ENV_ACCESS_KEY : &'static str = "ACCESS_KEY";
@@ -377,7 +378,6 @@ async fn process_job(inferencer: &Inferencer, job: &W2lInferenceJobRecord) -> An
     info!("Downloaded template media from bucket!");
   }
 
-
   // ==================== CONFIRM OR DOWNLOAD W2L TEMPLATE FACE ==================== //
 
   // Template is based on the `private_bucket_hash`:
@@ -433,7 +433,9 @@ async fn process_job(inferencer: &Inferencer, job: &W2lInferenceJobRecord) -> An
 
   inferencer.w2l_inference.execute(
     &audio_fs_path,
+    &template_media_fs_path,
     &face_template_fs_path,
+    &PathBuf::from("todo"),
     &PathBuf::from("todo"),
     false,
     false
@@ -441,6 +443,7 @@ async fn process_job(inferencer: &Inferencer, job: &W2lInferenceJobRecord) -> An
 
   if true {
     info!("FAKE DONE");
+    thread::sleep(Duration::from_millis(5000));
     return Ok(());
   }
 

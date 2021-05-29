@@ -44,8 +44,12 @@ parser.add_argument('--cached_faces_filename', type=str,
 
 #parser.add_argument('--face', type=str,
 #                    help='Filepath of video/image that contains faces to use', required=True)
-parser.add_argument('--audio', type=str,
+parser.add_argument('--audio_filename', type=str,
                     help='Filepath of video/audio file to use as raw audio source', required=True)
+
+parser.add_argument('--output_metadata_filename', type=str,
+                    help='Output filename for the JSON containing width, height, etc.', required=True)
+
 parser.add_argument('--outfile', type=str, help='Video path to save result. See default for an e.g.',
                                 default='results/result_voice.mp4')
 
@@ -101,7 +105,7 @@ parser.add_argument('--preserve_tempdir', default=False, action='store_true',
 args = parser.parse_args()
 args.img_size = 96
 
-#if os.path.isfile(args.face) and os.path.splitext(args.face)[1] in ['.jpg', '.png', '.jpeg']:
+#if os.path.isfile(args.image_or_video_filename) and os.path.splitext(args.image_or_video_filename)[1] in ['.jpg', '.png', '.jpeg']:
 #    args.static = True
 #elif args.is_image:
 #    args.static = True
@@ -255,13 +259,13 @@ def maybe_pad_audio_file(tempdir, args):
     # Structure of filters: https://stackoverflow.com/a/55463101
     command = ' '.join([
         'ffmpeg',
-        '-i {}'.format(args.audio),
+        '-i {}'.format(args.audio_filename),
         '-filter_complex "[0] adelay={}ms:all=true [a] ; [a] apad=pad_dur={}ms"'.format(args.audio_start_pad_millis, args.audio_end_pad_millis),
         '{}'.format(padded_wav_filename)
     ])
     print('command:', command, flush=True)
     subprocess.call(command, shell=True)
-    args.audio = padded_wav_filename
+    args.audio_filename = padded_wav_filename
 
 
 def maybe_concatenate_end_bump(tempdir, args, frame_w, frame_h):
@@ -322,23 +326,29 @@ def maybe_concatenate_end_bump(tempdir, args, frame_w, frame_h):
 
 def main(tempdir):
     video_faces_pickle_file = args.cached_faces_filename
-    #video_faces_pickle_file = args.face + '.faces'
+    #video_faces_pickle_file = args.image_or_video_filename + '.faces'
     #print('Video faces pickle file: {}'.format(video_faces_pickle_file), flush=True)
 
     frame_w = 0
     frame_h = 0
 
-    if not os.path.isfile(args.face):
-        raise ValueError('--face argument must be a valid path to video/image file')
+    if not os.path.isfile(args.image_or_video_filename):
+        raise ValueError('image_or_video_filename is not a file')
 
-    elif os.path.splitext(args.face)[1] in ['.jpg', '.png', '.jpeg'] \
+    if not os.path.isfile(args.cached_faces_filename):
+        raise ValueError('cached_faces_filename is not a file')
+
+    if not os.path.isfile(args.audio_filename):
+        raise ValueError('audio_filename is not a file')
+
+    if os.path.splitext(args.image_or_video_filename)[1] in ['.jpg', '.png', '.jpeg'] \
             or args.is_image:
-        full_frames = [cv2.imread(args.face)]
+        full_frames = [cv2.imread(args.image_or_video_filename)]
         fps = args.fps
         frame_h, frame_w = full_frames[0].shape[:-1]
 
     else:
-        video_stream = cv2.VideoCapture(args.face)
+        video_stream = cv2.VideoCapture(args.image_or_video_filename)
         fps = video_stream.get(cv2.CAP_PROP_FPS)
 
         print('Reading video frames...')
@@ -372,19 +382,19 @@ def main(tempdir):
     print("Frame dimensions: {}x{}".format(frame_w, frame_h), flush=True)
 
     # TODO(bt): This could be more efficient
-    if not args.audio.endswith('.wav'):
+    if not args.audio_filename.endswith('.wav'):
         print('Extracting raw audio...')
         temp_wav_filename = os.path.join(tempdir, 'temp.wav') # previously 'temp/temp.wav'
-        command = 'ffmpeg -y -i {} -strict -2 {}'.format(args.audio, temp_wav_filename)
+        command = 'ffmpeg -y -i {} -strict -2 {}'.format(args.audio_filename, temp_wav_filename)
 
         print('command:', command, flush=True)
         subprocess.call(command, shell=True)
-        args.audio = temp_wav_filename
+        args.audio_filename = temp_wav_filename
 
     maybe_pad_audio_file(tempdir, args)
 
     # TODO(bt): Save the spectrogram?
-    wav = audio.load_wav(args.audio, 16000)
+    wav = audio.load_wav(args.audio_filename, 16000)
     mel = audio.melspectrogram(wav)
     print(mel.shape)
 
@@ -466,7 +476,7 @@ def main(tempdir):
 
     out.release()
 
-    command = 'ffmpeg -y -i {} -i {} -strict -2 -q:v 1 {}'.format(args.audio, output_video_filename, args.outfile)
+    command = 'ffmpeg -y -i {} -i {} -strict -2 -q:v 1 {}'.format(args.audio_filename, output_video_filename, args.outfile)
     print('command:', command, flush=True)
     subprocess.call(command, shell=True)
 
