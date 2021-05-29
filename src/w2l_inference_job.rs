@@ -461,14 +461,6 @@ async fn process_job(inferencer: &Inferencer, job: &W2lInferenceJobRecord) -> An
 
   let file_metadata = read_metadata_file(&output_metadata_fs_path)?;
 
-  if true {
-    info!("FAKE DONE");
-    thread::sleep(Duration::from_millis(50000));
-    return Ok(());
-  }
-
-
-
   // ==================== UPLOAD TO BUCKETS ==================== //
 
   let result_object_path = inferencer.bucket_path_unifier.w2l_inference_video_output_path(
@@ -484,34 +476,25 @@ async fn process_job(inferencer: &Inferencer, job: &W2lInferenceJobRecord) -> An
 
   inferencer.public_bucket_client.upload_filename_with_content_type(
     &result_object_path,
-    &video_or_image_path,
+    &output_video_fs_path,
     original_mime_type)
     .await?;
 
   // ==================== SAVE RECORDS ==================== //
 
-  let template_type = if file_metadata.is_video { "video" } else { "image" };
-
   info!("Saving w2l inference record...");
   let id = insert_w2l_result(
     &inferencer.mysql_pool,
-    template_type,
     job,
-    &private_bucket_hash,
-    &full_object_path,
-    &full_object_path_cached_faces,
-    maybe_image_preview_object_name.as_deref(),
-    maybe_video_preview_object_name.as_deref(),
+    &result_object_path,
     file_metadata.file_size_bytes,
     file_metadata.mimetype.as_deref(),
     file_metadata.width,
     file_metadata.height,
-    file_metadata.num_frames,
-    file_metadata.fps.unwrap_or(0.0f32),
     file_metadata.duration_millis.unwrap_or(0))
     .await?;
 
-  info!("Job {} complete success! Downloaded, processed, and uploaded. Saved model record: {}",
+  info!("Job {} complete success! Downloaded, ran inference, and uploaded. Saved model record: {}",
         job.id, id);
 
   mark_w2l_inference_job_done(&inferencer.mysql_pool, job, true).await?;

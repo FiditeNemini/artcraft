@@ -134,7 +134,7 @@ impl BucketClient {
   pub async fn upload_filename_with_content_type<P: AsRef<Path>>(
     &self,
     object_path: P,
-    filename: P,
+    filename: &Path,
     content_type: &str
   ) -> anyhow::Result<()> {
     let object_path_str = object_path.as_ref()
