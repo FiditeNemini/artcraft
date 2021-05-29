@@ -5,24 +5,15 @@
 CREATE TABLE tts_model_upload_jobs (
   id BIGINT(20) NOT NULL AUTO_INCREMENT,
 
+  -- Effective "primary key" (PUBLIC)
+  -- This is so the in-progress results can be looked up by the UI.
+  token VARCHAR(32) NOT NULL,
+
   -- Idempotency token
+  -- This is so the frontend client doesn't submit duplicate jobs.
   uuid_idempotency_token VARCHAR(36) NOT NULL,
 
-  -- Foreign key to user
-  creator_user_token VARCHAR(32) NOT NULL,
-
-  -- For abuse tracking.
-  -- Wide enough for IPv4/6
-  creator_ip_address VARCHAR(40) NOT NULL,
-
-  -- (THIS MIGHT NOT BE USED)
-  -- NB: DO NOT SORT!
-  -- THIS MUST MATCH THE RESPECTIVE JOBS TABLE.
-  creator_set_visibility ENUM(
-      'public',
-      'hidden',
-      'private'
-  ) NOT NULL DEFAULT 'public',
+  -- ========== UPLOAD DETAILS ==========
 
   -- The name of the voice
   -- The "name" of the voice model, which might be complicated.
@@ -51,6 +42,26 @@ CREATE TABLE tts_model_upload_jobs (
       'web'
   ) NOT NULL DEFAULT 'web',
 
+  -- ========== CREATOR DETAILS AND PREFERENCES ==========
+
+  -- Foreign key to user
+  creator_user_token VARCHAR(32) NOT NULL,
+
+  -- For abuse tracking.
+  -- Wide enough for IPv4/6
+  creator_ip_address VARCHAR(40) NOT NULL,
+
+  -- (THIS MIGHT NOT BE USED)
+  -- NB: DO NOT SORT!
+  -- THIS MUST MATCH THE RESPECTIVE JOBS TABLE.
+  creator_set_visibility ENUM(
+      'public',
+      'hidden',
+      'private'
+  ) NOT NULL DEFAULT 'public',
+
+  -- ========== JOB SYSTEM DETAILS ==========
+
   -- Jobs begin as "pending", then transition to other states.
   --
   --  * Pending = job is ready to go
@@ -88,6 +99,7 @@ CREATE TABLE tts_model_upload_jobs (
 
   -- INDICES --
   PRIMARY KEY (id),
+  UNIQUE KEY (token),
   UNIQUE KEY (uuid_idempotency_token),
   KEY fk_creator_user_token (creator_user_token),
   KEY fk_maybe_subject_token (maybe_subject_token),
@@ -101,24 +113,15 @@ CREATE TABLE tts_model_upload_jobs (
 CREATE TABLE w2l_template_upload_jobs (
   id BIGINT(20) NOT NULL AUTO_INCREMENT,
 
+  -- Effective "primary key" (PUBLIC)
+  -- This is so the in-progress results can be looked up by the UI.
+  token VARCHAR(32) NOT NULL,
+
   -- Idempotency token
+  -- This is so the frontend client doesn't submit duplicate jobs.
   uuid_idempotency_token VARCHAR(36) NOT NULL,
 
-  -- Foreign key to user
-  creator_user_token VARCHAR(32) NOT NULL,
-
-  -- For abuse tracking.
-  -- Wide enough for IPv4/6
-  creator_ip_address VARCHAR(40) NOT NULL,
-
-  -- (THIS MIGHT NOT BE USED)
-  -- NB: DO NOT SORT!
-  -- THIS MUST MATCH THE RESPECTIVE JOBS TABLE.
-  creator_set_visibility ENUM(
-      'public',
-      'hidden',
-      'private'
-  ) NOT NULL DEFAULT 'public',
+  -- ========== UPLOAD DETAILS ==========
 
   -- The title of the template
   title VARCHAR(255) NOT NULL,
@@ -144,6 +147,26 @@ CREATE TABLE w2l_template_upload_jobs (
       'web'
   ) NOT NULL DEFAULT 'web',
 
+  -- ========== CREATOR DETAILS AND PREFERENCES ==========
+
+  -- Foreign key to user
+  creator_user_token VARCHAR(32) NOT NULL,
+
+  -- For abuse tracking.
+  -- Wide enough for IPv4/6
+  creator_ip_address VARCHAR(40) NOT NULL,
+
+  -- (THIS MIGHT NOT BE USED)
+  -- NB: DO NOT SORT!
+  -- THIS MUST MATCH THE RESPECTIVE JOBS TABLE.
+  creator_set_visibility ENUM(
+      'public',
+      'hidden',
+      'private'
+  ) NOT NULL DEFAULT 'public',
+
+  -- ========== JOB SYSTEM DETAILS ==========
+
   -- Jobs begin as "pending", then transition to other states.
   --
   --  * Pending = job is ready to go
@@ -181,6 +204,7 @@ CREATE TABLE w2l_template_upload_jobs (
 
   -- INDICES --
   PRIMARY KEY (id),
+  UNIQUE KEY (token),
   UNIQUE KEY (uuid_idempotency_token),
   KEY fk_creator_user_token (creator_user_token),
   KEY fk_maybe_subject_token (maybe_subject_token),

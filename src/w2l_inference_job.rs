@@ -494,10 +494,11 @@ async fn process_job(inferencer: &Inferencer, job: &W2lInferenceJobRecord) -> An
     file_metadata.duration_millis.unwrap_or(0))
     .await?;
 
+  info!("Marking job complete...");
+  mark_w2l_inference_job_done(&inferencer.mysql_pool, job, true).await?;
+
   info!("Job {} complete success! Downloaded, ran inference, and uploaded. Saved model record: {}",
         job.id, id);
-
-  mark_w2l_inference_job_done(&inferencer.mysql_pool, job, true).await?;
 
   Ok(())
 }

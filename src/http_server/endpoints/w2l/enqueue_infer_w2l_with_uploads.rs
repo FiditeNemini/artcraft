@@ -47,6 +47,7 @@ pub struct W2lTemplateExistenceRecord {
 #[derive(Serialize)]
 pub struct InferW2lWithUploadSuccessResponse {
   pub success: bool,
+  /// This is how frontend clients can request the job execution status.
   pub job_token: String,
 }
 

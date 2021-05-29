@@ -19,6 +19,7 @@ use sqlx::error::DatabaseError;
 use sqlx::error::Error::Database;
 use sqlx::mysql::MySqlDatabaseError;
 use std::sync::Arc;
+use crate::util::random_prefix_crockford_token::random_prefix_crockford_token;
 
 const NEW_USER_ROLE: &'static str = "new-user";
 
@@ -37,6 +38,8 @@ pub struct UploadTtsModelRequest {
 #[derive(Serialize)]
 pub struct UploadTtsModelSuccessResponse {
   pub success: bool,
+  /// This is how frontend clients can request the job execution status.
+  pub job_token: String,
 }
 
 #[derive(Serialize)]
@@ -126,10 +129,19 @@ pub async fn upload_tts_model_handler(
   let maybe_subject_token : Option<String> = None;
   let maybe_actor_subject_token : Option<String> = None;
 
+  // This token is returned to the client.
+  let job_token = random_prefix_crockford_token("TTS_UP:", 32)
+    .map_err(|e| {
+      warn!("Error creating token");
+      UploadTtsModelError::ServerError
+    })?;
+
+
   let query_result = sqlx::query!(
         r#"
 INSERT INTO tts_model_upload_jobs
 SET
+  token = ?,
   uuid_idempotency_token = ?,
   creator_user_token = ?,
   creator_ip_address = ?,
@@ -142,6 +154,7 @@ SET
   download_url_type = ?,
   status = "pending"
         "#,
+        job_token.to_string(),
         uuid.to_string(),
         user_session.user_token.to_string(),
         ip_address.to_string(),
@@ -189,6 +202,7 @@ SET
 
   let response = UploadTtsModelSuccessResponse {
     success: true,
+    job_token: job_token.to_string(),
   };
 
   let body = serde_json::to_string(&response)

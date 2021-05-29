@@ -4,9 +4,11 @@ CREATE TABLE tts_inference_jobs (
   id BIGINT(20) NOT NULL AUTO_INCREMENT,
 
   -- Effective "primary key" (PUBLIC)
+  -- This is so the in-progress results can be looked up by the UI.
   token VARCHAR(32) NOT NULL,
 
   -- Idempotency token from client
+  -- This is so the frontend client doesn't submit duplicate jobs.
   uuid_idempotency_token VARCHAR(36) NOT NULL,
 
   -- ========== INFERENCE DETAILS ==========
@@ -40,11 +42,26 @@ CREATE TABLE tts_inference_jobs (
   -- ========== JOB SYSTEM DETAILS ==========
 
   -- Jobs begin as "pending", then transition to other states.
-  -- Pending -> Started -> Complete
-  --                    \-> Failed -> Started -> { Complete, Failed, Dead }
-  status ENUM('pending', 'started', 'complete', 'failed', 'dead') NOT NULL DEFAULT 'pending',
+  --
+  --  * Pending = job is ready to go
+  --  * Started = job is running
+  --  * Complete_Success = job is done (success)
+  --  * Complete_Failure = job is done (failure)
+  --  * Attempt_Failed = job failed but may retry.
+  --  * Dead = job failed permanently.
+  --
+  -- Pending -> Started -> Complete_Success
+  --                    |-> Complete_Failure
+  --                    \-> Attempt_Failed -> Started -> { Complete, Failed, Dead }
+  status ENUM(
+      'pending',
+      'started',
+      'complete_success',
+      'complete_failure',
+      'attempt_failed',
+      'dead') NOT NULL DEFAULT 'pending',
 
-  -- We can track this against a "max_attempt_count"
+    -- We can track this against a "max_attempt_count"
   attempt_count INT(3) NOT NULL DEFAULT 0,
 
   -- If there is a failure, tell the user why.
@@ -74,9 +91,11 @@ CREATE TABLE w2l_inference_jobs (
   id BIGINT(20) NOT NULL AUTO_INCREMENT,
 
   -- Effective "primary key" (PUBLIC)
+  -- This is so the in-progress results can be looked up by the UI.
   token VARCHAR(32) NOT NULL,
 
   -- Idempotency token from client
+  -- This is so the frontend client doesn't submit duplicate jobs.
   uuid_idempotency_token VARCHAR(36) NOT NULL,
 
   -- ========== INFERENCE DETAILS : FACE TEMPLATE ==========
@@ -107,7 +126,7 @@ CREATE TABLE w2l_inference_jobs (
 
   maybe_audio_mime_type VARCHAR(32) DEFAULT NULL,
 
-  -- ========== CREATOR DETAILS ==========
+  -- ========== CREATOR DETAILS AND PREFERENCES ==========
 
   -- Foreign key to user
   -- If no user is logged in, this is null.
@@ -133,9 +152,24 @@ CREATE TABLE w2l_inference_jobs (
   -- ========== JOB SYSTEM DETAILS ==========
 
   -- Jobs begin as "pending", then transition to other states.
-  -- Pending -> Started -> Complete
-  --                    \-> Failed -> Started -> { Complete, Failed, Dead }
-  status ENUM('pending', 'started', 'complete', 'failed', 'dead') NOT NULL DEFAULT 'pending',
+  --
+  --  * Pending = job is ready to go
+  --  * Started = job is running
+  --  * Complete_Success = job is done (success)
+  --  * Complete_Failure = job is done (failure)
+  --  * Attempt_Failed = job failed but may retry.
+  --  * Dead = job failed permanently.
+  --
+  -- Pending -> Started -> Complete_Success
+  --                    |-> Complete_Failure
+  --                    \-> Attempt_Failed -> Started -> { Complete, Failed, Dead }
+  status ENUM(
+      'pending',
+      'started',
+      'complete_success',
+      'complete_failure',
+      'attempt_failed',
+      'dead') NOT NULL DEFAULT 'pending',
 
   -- We can track this against a "max_attempt_count"
   attempt_count INT(3) NOT NULL DEFAULT 0,

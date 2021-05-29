@@ -13,6 +13,7 @@ use crate::util::random_prefix_crockford_token::random_prefix_crockford_token;
 #[derive(Debug)]
 pub struct TtsUploadJobRecord {
   pub id: i64,
+  pub token: String,
   pub uuid_idempotency_token: String,
   pub creator_user_token: String,
   pub creator_ip_address: String,
