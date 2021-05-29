@@ -31,34 +31,48 @@ impl SemiPersistentCacheDir {
     }
   }
 
+  // ==================== TTS MODELS ====================
+
   /// We cache TTS models here.
+  /// We'll likely need to LRU cache them.
   pub fn tts_model_path(&self) -> &Path {
     &self.tts_model_root
   }
 
-  /// We cache W2L models here.
-  pub fn w2l_model_path(&self) -> &Path {
+  // ==================== W2L MODELS (there are only two of them) ====================
+
+  /// There are only two pretrained W2L models, so we won't run out of space.
+  pub fn w2l_model_path(&self, model_filename: &str) -> PathBuf {
+    self.w2l_model_root.join(model_filename)
+  }
+
+  pub fn w2l_model_directory(&self) -> &Path {
     &self.w2l_model_root
   }
 
-  /// Face templates go here.
+  pub fn create_w2l_model_path(&self) -> AnyhowResult<()> {
+    let _ = fs::create_dir_all(self.w2l_model_directory())?;
+    Ok(())
+  }
+
+  // ==================== W2L FACES ====================
+
+  /// We cache W2L faces here.
+  /// We'll likely need to LRU cache them.
   pub fn w2l_face_templates_path(&self) -> &Path {
     &self.w2l_face_templates_root
-  }
-
-  /// End bump, etc.
-  pub fn video_asset_path(&self) -> &Path {
-    &self.video_asset_root
-  }
-
-  pub fn create_w2l_model_path(&self) -> AnyhowResult<()> {
-    let _ = fs::create_dir_all(self.w2l_model_path())?;
-    Ok(())
   }
 
   pub fn create_w2l_face_templates_path(&self) -> AnyhowResult<()> {
     let _ = fs::create_dir_all(self.w2l_face_templates_path())?;
     Ok(())
+  }
+
+  // ==================== VIDEO ASSETS (End bump, etc) ====================
+
+  /// There is only a single end bump, and we'll add a watermark file.
+  pub fn video_asset_path(&self) -> &Path {
+    &self.video_asset_root
   }
 
   pub fn create_video_asset_path(&self) -> AnyhowResult<()> {

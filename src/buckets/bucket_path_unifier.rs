@@ -9,6 +9,7 @@ pub struct BucketPathUnifier {
   pub user_uploaded_audio_for_w2l_root: PathBuf,
   pub tts_inference_output_root: PathBuf,
   pub w2l_inference_output_root: PathBuf,
+  pub w2l_model_root: PathBuf,
 }
 
 impl BucketPathUnifier {
@@ -27,11 +28,17 @@ impl BucketPathUnifier {
       user_uploaded_w2l_templates_root: PathBuf::from("/user_uploaded_w2l_templates"),
       tts_inference_output_root: PathBuf::from("/tts_inference_output"),
       w2l_inference_output_root: PathBuf::from("/w2l_inference_output"),
+      w2l_model_root: PathBuf::from("/w2l_pretrained_models"),
     }
   }
 
   pub fn end_bump_video_for_w2l_path(&self, end_bump_filename: &str) -> String {
     "".to_string()
+  }
+
+  // W2L pretrained models. There are only two.
+  pub fn w2l_pretrained_models_path(&self, w2l_model_name: &str) -> PathBuf {
+    self.w2l_model_root.join(w2l_model_name)
   }
 
   // These share the same directory as the uploaded w2l template media.
@@ -64,10 +71,6 @@ impl BucketPathUnifier {
       .join(video_filename)
   }
 
-  //pub fn pretrained_w2l_model_path(&self, model_name: &str) -> String {
-  //  "".to_string()
-  //}
-
   pub fn hashed_directory_path(file_hash: &str) -> String {
     match file_hash.len() {
       0 | 1=> "".to_string(),
@@ -89,7 +92,15 @@ mod tests {
       user_uploaded_audio_for_w2l_root: PathBuf::from("/test_path_w2l_audio"),
       tts_inference_output_root: PathBuf::from("/test_path_tts_output"),
       w2l_inference_output_root: PathBuf::from("/test_path_w2l_output"),
+      w2l_model_root: PathBuf::from("/test_path_w2l_pretrained_models"),
     }
+  }
+
+  #[test]
+  fn test_w2l_pretrained_models_path() {
+    let paths = get_instance();
+    assert_eq!(paths.w2l_pretrained_models_path("model.pth").to_str().unwrap(),
+               "/test_path_w2l_pretrained_models/model.pth");
   }
 
   #[test]

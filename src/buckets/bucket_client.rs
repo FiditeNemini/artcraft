@@ -164,6 +164,25 @@ impl BucketClient {
     Ok(bytes)
   }
 
+  pub async fn download_file_to_disk(&self, object_path: &str, filesystem_path: &str)
+    -> anyhow::Result<()>
+  {
+    info!("downloading from bucket: {}", object_path);
+
+    let mut output_file = std::fs::File::create(filesystem_path)?;
+    let status_code = self.bucket.get_object_stream(object_path, &mut output_file).await?;
+
+    match status_code {
+      404 => bail!("File not found in bucket: {}", object_path),
+      _ => {},
+    }
+
+    info!("download code: {}", status_code);
+
+    Ok(())
+  }
+
+
   // NB: New version has blocking client rather than blocking calls.
   // pub fn download_file_blocking(&self, path: &str) -> anyhow::Result<Vec<u8>> {
   //   info!("downloading from bucket: {}", path);

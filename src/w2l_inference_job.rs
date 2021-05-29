@@ -85,6 +85,7 @@ struct Inferencer {
 
   // Command to run
   pub inference_script: String,
+  pub w2l_model_filename: String,
 }
 
 #[tokio::main]
@@ -178,6 +179,9 @@ async fn main() -> AnyhowResult<()> {
   semi_persistent_cache.create_w2l_face_templates_path()?;
   semi_persistent_cache.create_w2l_model_path()?;
 
+  let w2l_model_filename = easyenv::get_env_string_or_default(
+    "W2L_MODEL_FILENAME", "wav2lip_gan.pth");
+
   let inferencer = Inferencer {
     download_temp_directory: temp_directory,
     mysql_pool,
@@ -191,6 +195,7 @@ async fn main() -> AnyhowResult<()> {
     w2l_inference: w2l_inference_command,
     bucket_path_unifier: BucketPathUnifier::default_paths(),
     semi_persistent_cache,
+    w2l_model_filename,
   };
 
   main_loop(inferencer).await;
@@ -298,6 +303,27 @@ async fn process_job(inferencer: &Inferencer, job: &W2lInferenceJobRecord) -> An
   // TODO 6. Upload result
   // TODO 7. Save record
   // TODO 8. Mark job done
+
+  // ==================== CONFIRM OR DOWNLOAD W2L MODEL ==================== //
+
+  let model_filename = inferencer.w2l_model_filename.clone();
+  let model_fs_path = inferencer.semi_persistent_cache.w2l_model_path(&model_filename);
+
+  if !model_fs_path.exists() {
+    info!("Model file does not exist: {:?}", &model_fs_path);
+
+    let model_object_path = inferencer.bucket_path_unifier
+      .w2l_pretrained_models_path(&model_filename);
+
+    info!("Download from bucket path: {:?}", &model_object_path);
+
+    inferencer.private_bucket_client.download_file_to_disk(
+      model_object_path.to_str().ok_or(anyhow!("invalid path"))?,
+      &model_filename).await?;
+
+    info!("Downloaded model from bucket!");
+  }
+
 
   let temp_dir = format!("temp_{}", job.id);
   let temp_dir = TempDir::new(&temp_dir)?;
