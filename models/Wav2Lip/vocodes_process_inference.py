@@ -28,8 +28,22 @@ parser = argparse.ArgumentParser(description='Inference code to lip-sync videos 
 parser.add_argument('--checkpoint_path', type=str,
                     help='Name of saved checkpoint to load weights from', required=True)
 
-parser.add_argument('--face', type=str,
+parser.add_argument('--image_or_video_filename', type=str,
                     help='Filepath of video/image that contains faces to use', required=True)
+
+#parser.add_argument('--image_or_video_type', type=str,
+#                    help='either "image" or "video', required=True)
+
+# This is a little more deliberate than "static" and causes us to pick an FPS, etc.
+# This is useful when the filename doesn't have an extension.
+parser.add_argument('--is_image', default=False, action='store_true',
+                    help='Denote that the input is a single-frame image, not a video')
+
+parser.add_argument('--cached_faces_filename', type=str,
+                    help='Filename for the cached faces file to use', required=True)
+
+#parser.add_argument('--face', type=str,
+#                    help='Filepath of video/image that contains faces to use', required=True)
 parser.add_argument('--audio', type=str,
                     help='Filepath of video/audio file to use as raw audio source', required=True)
 parser.add_argument('--outfile', type=str, help='Video path to save result. See default for an e.g.',
@@ -76,93 +90,92 @@ parser.add_argument('--audio_end_pad_millis', default=0, type=int,
 parser.add_argument('--end_bump_file', type=str,
                     help='Video file to concatenate at the end')
 
-# This is a little more deliberate than "static" and causes us to pick an FPS, etc.
-# This is useful when the filename doesn't have an extension.
-parser.add_argument('--is_image', default=False, action='store_true',
-                    help='Denote that the input is a single-frame image, not a video')
 
 # Purely for debugging on the host machine:
 parser.add_argument('--preserve_tempdir', default=False, action='store_true',
                     help='Keep the tempdir arround for debugging')
 
+#parser.add_argument('--frame_width', type=int, help='Width of the frame')
+#parser.add_argument('--frame_height', type=int, help='Height of the frame')
+
 args = parser.parse_args()
 args.img_size = 96
 
-if os.path.isfile(args.face) and os.path.splitext(args.face)[1] in ['.jpg', '.png', '.jpeg']:
-    args.static = True
-elif args.is_image:
-    args.static = True
+#if os.path.isfile(args.face) and os.path.splitext(args.face)[1] in ['.jpg', '.png', '.jpeg']:
+#    args.static = True
+#elif args.is_image:
+#    args.static = True
 
-def get_smoothened_boxes(boxes, T):
-    for i in range(len(boxes)):
-        if i + T > len(boxes):
-            window = boxes[len(boxes) - T:]
-        else:
-            window = boxes[i : i + T]
-        boxes[i] = np.mean(window, axis=0)
-    return boxes
+#def get_smoothened_boxes(boxes, T):
+#    for i in range(len(boxes)):
+#        if i + T > len(boxes):
+#            window = boxes[len(boxes) - T:]
+#        else:
+#            window = boxes[i : i + T]
+#        boxes[i] = np.mean(window, axis=0)
+#    return boxes
 
-def face_detect(images):
-    detector = face_detection.FaceAlignment(face_detection.LandmarksType._2D,
-                                            flip_input=False, device=device)
+#def face_detect(images):
+#    detector = face_detection.FaceAlignment(face_detection.LandmarksType._2D,
+#                                            flip_input=False, device=device)
+#
+#    batch_size = args.face_det_batch_size
+#
+#    while 1:
+#        predictions = []
+#        try:
+#            for i in tqdm(range(0, len(images), batch_size)):
+#                predictions.extend(detector.get_detections_for_batch(np.array(images[i:i + batch_size])))
+#        except RuntimeError:
+#            if batch_size == 1:
+#                raise RuntimeError('Image too big to run face detection on GPU. Please use the --resize_factor argument')
+#            batch_size //= 2
+#            print('Recovering from OOM error; New batch size: {}'.format(batch_size))
+#            continue
+#        break
+#
+#    results = []
+#    pady1, pady2, padx1, padx2 = args.pads
+#    for rect, image in zip(predictions, images):
+#        if rect is None:
+#            cv2.imwrite('temp/faulty_frame.jpg', image) # check this frame where the face was not detected.
+#            raise ValueError('Face not detected! Ensure the video contains a face in all the frames.')
+#
+#        y1 = max(0, rect[1] - pady1)
+#        y2 = min(image.shape[0], rect[3] + pady2)
+#        x1 = max(0, rect[0] - padx1)
+#        x2 = min(image.shape[1], rect[2] + padx2)
+#
+#        results.append([x1, y1, x2, y2])
+#
+#    boxes = np.array(results)
+#    if not args.nosmooth: boxes = get_smoothened_boxes(boxes, T=5)
+#    results = [[image[y1: y2, x1:x2], (y1, y2, x1, x2)] for image, (x1, y1, x2, y2) in zip(images, boxes)]
+#
+#    del detector
+#    return results
 
-    batch_size = args.face_det_batch_size
-
-    while 1:
-        predictions = []
-        try:
-            for i in tqdm(range(0, len(images), batch_size)):
-                predictions.extend(detector.get_detections_for_batch(np.array(images[i:i + batch_size])))
-        except RuntimeError:
-            if batch_size == 1:
-                raise RuntimeError('Image too big to run face detection on GPU. Please use the --resize_factor argument')
-            batch_size //= 2
-            print('Recovering from OOM error; New batch size: {}'.format(batch_size))
-            continue
-        break
-
-    results = []
-    pady1, pady2, padx1, padx2 = args.pads
-    for rect, image in zip(predictions, images):
-        if rect is None:
-            cv2.imwrite('temp/faulty_frame.jpg', image) # check this frame where the face was not detected.
-            raise ValueError('Face not detected! Ensure the video contains a face in all the frames.')
-
-        y1 = max(0, rect[1] - pady1)
-        y2 = min(image.shape[0], rect[3] + pady2)
-        x1 = max(0, rect[0] - padx1)
-        x2 = min(image.shape[1], rect[2] + padx2)
-
-        results.append([x1, y1, x2, y2])
-
-    boxes = np.array(results)
-    if not args.nosmooth: boxes = get_smoothened_boxes(boxes, T=5)
-    results = [[image[y1: y2, x1:x2], (y1, y2, x1, x2)] for image, (x1, y1, x2, y2) in zip(images, boxes)]
-
-    del detector
-    return results
-
-def detect_faces_in_frames(frames, video_faces_pickle_file):
-    t0 = datetime.datetime.now()
-    if args.box[0] == -1:
-        if not args.static:
-            face_det_results = face_detect(frames) # BGR2RGB for CNN face detection
-        else:
-            face_det_results = face_detect([frames[0]])
-    else:
-        print('Using the specified bounding box instead of face detection...')
-        y1, y2, x1, x2 = args.box
-        face_det_results = [[f[y1: y2, x1:x2], (y1, y2, x1, x2)] for f in frames]
-    t1 = datetime.datetime.now()
-
-    d = t1 - t0
-    print('Total seconds to detect faces in {} frames: {}'.format(len(frames), d.total_seconds()))
-
-    with open(video_faces_pickle_file, 'wb') as f:
-        print('Saving pickle file: {}'.format(video_faces_pickle_file))
-        pickle.dump(face_det_results, f)
-
-    return face_det_results
+#def detect_faces_in_frames(frames, video_faces_pickle_file):
+#    t0 = datetime.datetime.now()
+#    if args.box[0] == -1:
+#        if not args.static:
+#            face_det_results = face_detect(frames) # BGR2RGB for CNN face detection
+#        else:
+#            face_det_results = face_detect([frames[0]])
+#    else:
+#        print('Using the specified bounding box instead of face detection...')
+#        y1, y2, x1, x2 = args.box
+#        face_det_results = [[f[y1: y2, x1:x2], (y1, y2, x1, x2)] for f in frames]
+#    t1 = datetime.datetime.now()
+#
+#    d = t1 - t0
+#    print('Total seconds to detect faces in {} frames: {}'.format(len(frames), d.total_seconds()))
+#
+#    with open(video_faces_pickle_file, 'wb') as f:
+#        print('Saving pickle file: {}'.format(video_faces_pickle_file))
+#        pickle.dump(face_det_results, f)
+#
+#    return face_det_results
 
 #def datagen(frames, mels):
 def datagen(frames, face_det_results, mels):
@@ -308,8 +321,9 @@ def maybe_concatenate_end_bump(tempdir, args, frame_w, frame_h):
 
 
 def main(tempdir):
-    video_faces_pickle_file = args.face + '.faces'
-    print('Video faces pickle file: {}'.format(video_faces_pickle_file), flush=True)
+    video_faces_pickle_file = args.cached_faces_filename
+    #video_faces_pickle_file = args.face + '.faces'
+    #print('Video faces pickle file: {}'.format(video_faces_pickle_file), flush=True)
 
     frame_w = 0
     frame_h = 0
@@ -351,9 +365,13 @@ def main(tempdir):
 
         frame_h, frame_w = full_frames[0].shape[:-1]
 
+    #frame_w = args.frame_width
+    #frame_h = args.frame_height
+
     print("Number of frames available for inference: "+str(len(full_frames)), flush=True)
     print("Frame dimensions: {}x{}".format(frame_w, frame_h), flush=True)
 
+    # TODO(bt): This could be more efficient
     if not args.audio.endswith('.wav'):
         print('Extracting raw audio...')
         temp_wav_filename = os.path.join(tempdir, 'temp.wav') # previously 'temp/temp.wav'
@@ -365,6 +383,7 @@ def main(tempdir):
 
     maybe_pad_audio_file(tempdir, args)
 
+    # TODO(bt): Save the spectrogram?
     wav = audio.load_wav(args.audio, 16000)
     mel = audio.melspectrogram(wav)
     print(mel.shape)
@@ -386,26 +405,32 @@ def main(tempdir):
     print("Length of mel chunks: {}".format(len(mel_chunks)), flush=True)
 
     if len(mel_chunks) > 2000:
-        # TODO: Catch that the file is too long earlier on.
+        # TODO(bt): Catch that the file is too long earlier on.
         raise Exception("Too many mel chunks: {}".format(len(mel_chunks)))
 
     full_frames = full_frames[:len(mel_chunks)]
 
-    # TODO: Do this offline.
-    print('Face detection time...', flush=True)
-    if not os.path.isfile(video_faces_pickle_file):
-        print('Detecting faces...', flush=True)
-        face_det_results = detect_faces_in_frames(full_frames, video_faces_pickle_file)
-    else:
-        with open(video_faces_pickle_file, 'rb') as f:
-            face_det_results = pickle.load(f)
-        if len(face_det_results) < len(full_frames):
-            print("Face detect results have {} frames, but we need {}".format(len(face_det_results), len(full_frames)))
-            print('Detecting faces again...', flush=True)
-            face_det_results = detect_faces_in_frames(full_frames, video_faces_pickle_file)
-        else:
-            print("We don't need to find faces! Woo!", flush=True)
+    #print('Face detection time...', flush=True)
+    #if not os.path.isfile(video_faces_pickle_file):
+    #    print('Detecting faces...', flush=True)
+    #    face_det_results = detect_faces_in_frames(full_frames, video_faces_pickle_file)
+    #else:
+    #    with open(video_faces_pickle_file, 'rb') as f:
+    #        face_det_results = pickle.load(f)
+    #    if len(face_det_results) < len(full_frames):
+    #        print("Face detect results have {} frames, but we need {}".format(len(face_det_results), len(full_frames)))
+    #        print('Detecting faces again...', flush=True)
+    #        face_det_results = detect_faces_in_frames(full_frames, video_faces_pickle_file)
+    #    else:
+    #        print("We don't need to find faces! Woo!", flush=True)
 
+
+    # Load face detection results from pickle file
+    video_faces_pickle_file = args.cached_faces_filename
+    with open(video_faces_pickle_file, 'rb') as f:
+        face_det_results = pickle.load(f)
+
+    #face_det_results = pickle.load(args.cached_faces_filename)
     face_det_results = face_det_results[:len(mel_chunks)]
 
     batch_size = args.wav2lip_batch_size

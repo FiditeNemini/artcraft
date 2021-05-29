@@ -8,6 +8,7 @@ pub struct SemiPersistentCacheDir {
   tts_model_root: PathBuf,
   w2l_model_root: PathBuf,
   w2l_face_templates_root: PathBuf,
+  w2l_templates_media_root: PathBuf,
   video_asset_root: PathBuf, // end bump, etc.
 }
 
@@ -27,6 +28,7 @@ impl SemiPersistentCacheDir {
       tts_model_root: cache_root.join("tts/models/"),
       w2l_model_root: cache_root.join("w2l/models/"),
       w2l_face_templates_root: cache_root.join("w2l/face_templates/"),
+      w2l_templates_media_root: cache_root.join("w2l/template_media/"),
       video_asset_root: cache_root.join("static_video_assets/"),
     }
   }
@@ -55,7 +57,24 @@ impl SemiPersistentCacheDir {
     Ok(())
   }
 
-  // ==================== W2L FACES ====================
+  // ==================== W2L MEDIA ====================
+
+  /// We cache W2L media here.
+  /// We'll likely need to LRU cache them.
+  pub fn w2l_template_media_path(&self, template_private_bucket_hash: &str) -> PathBuf {
+    self.w2l_templates_media_root.join(template_private_bucket_hash)
+  }
+
+  pub fn w2l_template_media_directory(&self) -> &Path {
+    &self.w2l_templates_media_root
+  }
+
+  pub fn create_w2l_template_media_path(&self) -> AnyhowResult<()> {
+    let _ = fs::create_dir_all(self.w2l_template_media_directory())?;
+    Ok(())
+  }
+
+  // ==================== W2L CACHED FACES ====================
 
   /// We cache W2L faces here.
   /// We'll likely need to LRU cache them.

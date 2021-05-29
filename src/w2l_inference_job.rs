@@ -179,6 +179,7 @@ async fn main() -> AnyhowResult<()> {
   info!("Creating pod semi-persistent cache dirs...");
   semi_persistent_cache.create_w2l_model_path()?;
   semi_persistent_cache.create_w2l_face_template_path()?;
+  semi_persistent_cache.create_w2l_template_media_path()?;
   semi_persistent_cache.create_w2l_model_path()?;
 
   let w2l_model_filename = easyenv::get_env_string_or_default(
@@ -327,13 +328,7 @@ async fn process_job(inferencer: &Inferencer, job: &W2lInferenceJobRecord) -> An
     info!("Downloaded model from bucket!");
   }
 
-  // ==================== CONFIRM OR DOWNLOAD W2L TEMPLATE FACE ==================== //
-
-  // Template is based on the `private_bucket_hash`:
-  //  - private_bucket_hash: 1519edf86e6975fdcd0a56a5953d84948db79f2b9ce588818d7fa544d5cb38b2
-  //  - private_bucket_object_name: /user_uploaded_w2l_templates/1/5/1/1519edf86e6975fdcd0a56a5953d84948db79f2b9ce588818d7fa544d5cb38b2
-  //  - private_bucket_cached_faces_object_name: /user_uploaded_w2l_templates/1/5/1/1519edf86e6975fdcd0a56a5953d84948db79f2b9ce588818d7fa544d5cb38b2_detected_faces.pickle
-  //  - maybe_public_bucket_preview_image_object_name: /user_uploaded_w2l_templates/1/5/1/1519edf86e6975fdcd0a56a5953d84948db79f2b9ce588818d7fa544d5cb38b2_preview.webp
+  // ==================== LOOK UP TEMPLATE RECORD ==================== //
 
   let template_token = match &job.maybe_w2l_template_token {
     Some(token) => token.to_string(),
@@ -355,19 +350,55 @@ async fn process_job(inferencer: &Inferencer, job: &W2lInferenceJobRecord) -> An
     },
   };
 
+  // ==================== CONFIRM OR DOWNLOAD W2L TEMPLATE AUDIO OR VIDEO ==================== //
+
+  // Template is based on the `private_bucket_hash`:
+  //  - private_bucket_hash: 1519edf86e6975fdcd0a56a5953d84948db79f2b9ce588818d7fa544d5cb38b2
+  //  - private_bucket_object_name: /user_uploaded_w2l_templates/1/5/1/1519edf86e6975fdcd0a56a5953d84948db79f2b9ce588818d7fa544d5cb38b2
+  //  - private_bucket_cached_faces_object_name: /user_uploaded_w2l_templates/1/5/1/1519edf86e6975fdcd0a56a5953d84948db79f2b9ce588818d7fa544d5cb38b2_detected_faces.pickle
+  //  - maybe_public_bucket_preview_image_object_name: /user_uploaded_w2l_templates/1/5/1/1519edf86e6975fdcd0a56a5953d84948db79f2b9ce588818d7fa544d5cb38b2_preview.webp
+
+  let template_media_fs_path = inferencer.semi_persistent_cache.w2l_template_media_path(
+    &w2l_template.private_bucket_hash);
+
+  if !template_media_fs_path.exists() {
+    info!("W2L template media file does not exist: {:?}", &template_media_fs_path);
+
+    let template_media_object_path = inferencer.bucket_path_unifier
+      .media_templates_for_w2l_path(&w2l_template.private_bucket_hash);
+
+    info!("Download from template media path: {:?}", &template_media_object_path);
+
+    inferencer.private_bucket_client.download_file_to_disk(
+      &template_media_object_path,
+      &template_media_fs_path
+    ).await?;
+
+    info!("Downloaded template media from bucket!");
+  }
+
+
+  // ==================== CONFIRM OR DOWNLOAD W2L TEMPLATE FACE ==================== //
+
+  // Template is based on the `private_bucket_hash`:
+  //  - private_bucket_hash: 1519edf86e6975fdcd0a56a5953d84948db79f2b9ce588818d7fa544d5cb38b2
+  //  - private_bucket_object_name: /user_uploaded_w2l_templates/1/5/1/1519edf86e6975fdcd0a56a5953d84948db79f2b9ce588818d7fa544d5cb38b2
+  //  - private_bucket_cached_faces_object_name: /user_uploaded_w2l_templates/1/5/1/1519edf86e6975fdcd0a56a5953d84948db79f2b9ce588818d7fa544d5cb38b2_detected_faces.pickle
+  //  - maybe_public_bucket_preview_image_object_name: /user_uploaded_w2l_templates/1/5/1/1519edf86e6975fdcd0a56a5953d84948db79f2b9ce588818d7fa544d5cb38b2_preview.webp
+
   let face_template_fs_path = inferencer.semi_persistent_cache.w2l_face_template_path(
     &w2l_template.private_bucket_hash);
 
   if !face_template_fs_path.exists() {
     info!("W2L face template file does not exist: {:?}", &face_template_fs_path);
 
-    let template_object_path = inferencer.bucket_path_unifier
+    let face_template_object_path = inferencer.bucket_path_unifier
       .precomputed_faces_for_w2l_path(&w2l_template.private_bucket_hash);
 
-    info!("Download from face template path: {:?}", &template_object_path);
+    info!("Download from face template path: {:?}", &face_template_object_path);
 
     inferencer.private_bucket_client.download_file_to_disk(
-      &template_object_path,
+      &face_template_object_path,
       &face_template_fs_path
     ).await?;
 

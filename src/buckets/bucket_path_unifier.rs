@@ -41,6 +41,15 @@ impl BucketPathUnifier {
     self.w2l_model_root.join(w2l_model_name)
   }
 
+  // The video or images uploaded as templates
+  // eg. /user_uploaded_w2l_templates/1/5/1/151a[...60]...
+  pub fn media_templates_for_w2l_path(&self, template_file_hash: &str) -> PathBuf {
+    let hashed_path = Self::hashed_directory_path(template_file_hash);
+    self.user_uploaded_w2l_templates_root
+      .join(hashed_path)
+      .join(template_file_hash)
+  }
+
   // These share the same directory as the uploaded w2l template media.
   // eg. /user_uploaded_w2l_templates/1/5/1/151a[...60]_detected_faces.pickle
   pub fn precomputed_faces_for_w2l_path(&self, template_file_hash: &str) -> PathBuf {
@@ -108,6 +117,13 @@ mod tests {
     let paths = get_instance();
     assert_eq!(paths.user_audio_for_w2l_inference_path("foobar").to_str().unwrap(),
                "/test_path_w2l_audio/f/o/o/foobar");
+  }
+
+  #[test]
+  fn test_media_templates_for_w2l_path() {
+    let paths = get_instance();
+    assert_eq!(paths.media_templates_for_w2l_path("foobar").to_str().unwrap(),
+               "/test_path_w2l_templates/f/o/o/foobar");
   }
 
   #[test]
