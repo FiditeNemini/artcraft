@@ -71,9 +71,26 @@ impl BucketPathUnifier {
   }
 
   // W2L inference output videos
-  pub fn w2l_inference_video_output_path(&self, w2l_inference_token: &str) -> PathBuf {
-    let hashed_path = Self::hashed_directory_path(w2l_inference_token);
-    let video_filename = format!("{}_video.mp4", &w2l_inference_token);
+  pub fn w2l_inference_video_output_path(&self, w2l_inference_job_token: &str) -> PathBuf {
+    // NB: We don't want colons from the token in the filename.
+    if w2l_inference_job_token.contains(":") {
+      if let Some((token_type, token)) = w2l_inference_job_token.split_once(":") {
+        let video_filename = w2l_inference_job_token.replace(":", "");
+        let video_filename = format!("vocodes_video_{}.mp4", video_filename);
+
+        let hashed_path = Self::hashed_directory_path(token);
+
+        return self.w2l_inference_output_root
+          .join(hashed_path)
+          .join(video_filename);
+      }
+    }
+
+
+    let video_filename = w2l_inference_job_token.replace(":", "");
+    let video_filename = format!("vocodes_video_{}.mp4", video_filename);
+
+    let hashed_path = Self::hashed_directory_path(w2l_inference_job_token);
 
     self.w2l_inference_output_root
       .join(hashed_path)
@@ -137,7 +154,11 @@ mod tests {
   fn test_w2l_inference_video_output_path() {
     let paths = get_instance();
     assert_eq!(paths.w2l_inference_video_output_path("foobar").to_str().unwrap(),
-               "/test_path_w2l_output/f/o/o/foobar_video.mp4");
+               "/test_path_w2l_output/f/o/o/vocodes_video_foobar.mp4");
+
+    // Note: it also removes the token type from dir path and handles the colon:
+    assert_eq!(paths.w2l_inference_video_output_path("type:abcdef").to_str().unwrap(),
+               "/test_path_w2l_output/a/b/c/vocodes_video_typeabcdef.mp4");
   }
 
   #[test]

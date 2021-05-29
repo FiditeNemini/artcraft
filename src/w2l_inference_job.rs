@@ -280,14 +280,14 @@ struct FileMetadata {
   pub is_video: bool,
   pub width: u32,
   pub height: u32,
-  pub num_frames: u64,
-  pub fps: Option<f32>,
+  //pub num_frames: u64,
+  //pub fps: Option<f32>,
   pub duration_millis: Option<u64>,
   pub mimetype: Option<String>,
   pub file_size_bytes: u64,
 }
 
-fn read_metadata_file(filename: &str) -> AnyhowResult<FileMetadata> {
+fn read_metadata_file(filename: &PathBuf) -> AnyhowResult<FileMetadata> {
   let mut file = File::open(filename)?;
   let mut buffer = String::new();
   file.read_to_string(&mut buffer)?;
@@ -436,13 +436,11 @@ async fn process_job(inferencer: &Inferencer, job: &W2lInferenceJobRecord) -> An
 
   let is_image = w2l_template.template_type.contains("image");
 
-  // Metadata is wrong:
-  // {"is_video": true, "width": 1024, "height": 768,
-  // "num_frames": 1, -- wrong
-  // "fps": 25.0, -- wrong??
-  // "duration_millis": 40, -- wrong
-  // "mimetype": "video/mp4", "file_size_bytes": 1024594}
+  info!("Is image? {}", is_image);
+  info!("Running W2L inference...");
+
   inferencer.w2l_inference.execute(
+    &model_fs_path,
     &audio_fs_path,
     &template_media_fs_path,
     &face_template_fs_path,
@@ -454,123 +452,29 @@ async fn process_job(inferencer: &Inferencer, job: &W2lInferenceJobRecord) -> An
 
   info!("Output filename: {:?}", &output_video_fs_path);
 
+  // ==================== CHECK ALL FILES EXIST AND GET METADATA ==================== //
+
+  info!("Checking that output files exist...");
+
+  check_file_exists(&output_video_fs_path)?;
+  check_file_exists(&output_metadata_fs_path)?;
+
+  let file_metadata = read_metadata_file(&output_metadata_fs_path)?;
+
   if true {
     info!("FAKE DONE");
     thread::sleep(Duration::from_millis(50000));
     return Ok(());
   }
 
-  //let download_url = job.download_url.as_ref()
-  //  .map(|c| c.to_string())
-  //  .unwrap_or("".to_string());
 
-  // ==================== DOWNLOAD FILE ==================== //
-
-  info!("Calling downloader...");
-  //let download_filename = inferencer.google_drive_downloader
-  //  .download_file(&download_url, &temp_dir).await?;
-  let download_filename = "TODO";
-
-  // ==================== PROCESS FACES ==================== //
-
-  // This is the Python Pickle file with all the face frames.
-  // We'll retain it forever since it's expensive to compute.
-  let cached_faces_filename = format!("{}_detected_faces.pickle", &download_filename);
-
-  // This is a file that we'll use to determine if the file is an image or video.
-  let output_metadata_filename = format!("{}_metadata.json", &download_filename);
-
-  let is_image = false; // TODO: Don't always treat as video.
-  let spawn_process = false;
-
-  /*inferencer.w2l_processor.execute(
-    &download_filename,
-    &cached_faces_filename,
-    &output_metadata_filename,
-    is_image,
-    spawn_process)?;*/
-
-  // ==================== CHECK ALL FILES EXIST AND GET METADATA ==================== //
-
-  let video_or_image_path = PathBuf::from(&download_filename);
-  let cached_faces_path = &PathBuf::from(&cached_faces_filename);
-  let output_metadata_path = &PathBuf::from(&output_metadata_filename);
-
-  info!("Checking that both files exist (original source + cached faces) ...");
-
-  check_file_exists(&video_or_image_path)?;
-  check_file_exists(&cached_faces_path)?;
-  check_file_exists(&output_metadata_path)?;
-
-  let file_metadata = read_metadata_file(&output_metadata_filename)?;
-
-  // ==================== BASE OBJECT NAMES BASED ON HASH ==================== //
-
-  let private_bucket_hash = get_file_hash(&download_filename)?;
-
-  info!("File hash: {}", private_bucket_hash);
-
-  // Full path to video/image
-  //let full_object_path = hash_to_bucket_path(
-  //  &private_bucket_hash,
-  //  Some(&inferencer.w2l_template_uploads_bucket_root))?;
-
-  let full_object_path = "TODO";
-
-  // ==================== GENERATE VIDEO PREVIEWS ==================== //
-
-  let mut maybe_image_preview_filename : Option<PathBuf> = None;
-  let mut maybe_image_preview_object_name : Option<String> = None;
-
-  let mut maybe_video_preview_filename : Option<PathBuf> = None;
-  let mut maybe_video_preview_object_name : Option<String> = None;
-
-  /*if file_metadata.is_video {
-    let preview_filename = format!("{}_preview.webp", &download_filename);
-
-    inferencer.ffmpeg_video_preview_generator.execute(
-      &download_filename,
-      &preview_filename,
-      500,
-      500,
-      true,
-      false
-    )?;
-
-    let video_preview_path = PathBuf::from(&preview_filename);
-    check_file_exists(&video_preview_path)?;
-
-    let preview_object_path = format!("{}_preview.webp", full_object_path);
-    maybe_video_preview_object_name = Some(preview_object_path);
-    maybe_video_preview_filename = Some(video_preview_path);
-
-  } else {
-    let preview_filename = format!("{}_preview.webp", &download_filename);
-
-    inferencer.imagemagick_image_preview_generator.execute(
-      &download_filename,
-      &preview_filename,
-      500,
-      500,
-      false
-    )?;
-
-    let image_preview_path = PathBuf::from(&preview_filename);
-    check_file_exists(&image_preview_path)?;
-
-    let preview_object_path = format!("{}_preview.webp", full_object_path);
-    maybe_image_preview_object_name = Some(preview_object_path);
-    maybe_image_preview_filename = Some(image_preview_path);
-  }*/
 
   // ==================== UPLOAD TO BUCKETS ==================== //
 
-  info!("Image/video destination bucket path: {}", full_object_path);
+  let result_object_path = inferencer.bucket_path_unifier.w2l_inference_video_output_path(
+    &job.inference_job_token);
 
-  // Full path to cached faces
-  let full_object_path_cached_faces = format!("{}_detected_faces.pickle", full_object_path);
-
-  info!("Cached faces destination bucket path: {}", full_object_path_cached_faces);
+  info!("Image/video destination bucket path: {:?}", &result_object_path);
 
   info!("Uploading image/video...");
 
@@ -578,54 +482,11 @@ async fn process_job(inferencer: &Inferencer, job: &W2lInferenceJobRecord) -> An
     .as_deref()
     .unwrap_or("application/octet-stream");
 
-  inferencer.private_bucket_client.upload_filename_with_content_type(
-    &full_object_path,
-    &video_or_image_path,
-    original_mime_type).await?;
-
   inferencer.public_bucket_client.upload_filename_with_content_type(
-    &full_object_path,
+    &result_object_path,
     &video_or_image_path,
-    original_mime_type).await?;
-
-  info!("Uploading cached faces...");
-  inferencer.private_bucket_client.upload_filename(
-    &full_object_path_cached_faces,
-    &cached_faces_path).await?;
-
-  // TODO: Fix this ugh.
-  if let Some(image_preview_filename) = maybe_image_preview_filename.as_deref() {
-    if let Some(image_preview_object_name) = maybe_image_preview_object_name.as_deref() {
-      info!("Uploading image preview...");
-      inferencer.private_bucket_client.upload_filename_with_content_type(
-        &image_preview_object_name,
-        image_preview_filename,
-        "image/webp").await?;
-
-      info!("Uploading image preview...");
-      inferencer.public_bucket_client.upload_filename_with_content_type(
-        &image_preview_object_name,
-        image_preview_filename,
-        "image/webp").await?;
-    }
-  }
-
-  // TODO: Fix this ugh.
-  if let Some(video_preview_filename) = maybe_video_preview_filename.as_deref() {
-    if let Some(video_preview_object_name) = maybe_video_preview_object_name.as_deref() {
-      info!("Uploading video preview...");
-      inferencer.private_bucket_client.upload_filename_with_content_type(
-        &video_preview_object_name,
-        video_preview_filename,
-        "image/webp").await?;
-
-      info!("Uploading video preview...");
-      inferencer.public_bucket_client.upload_filename_with_content_type(
-        &video_preview_object_name,
-        video_preview_filename,
-        "image/webp").await?;
-    }
-  }
+    original_mime_type)
+    .await?;
 
   // ==================== SAVE RECORDS ==================== //
 

@@ -28,6 +28,7 @@ impl Wav2LipInferenceCommand {
   }
 
   pub fn execute<P: AsRef<Path>>(&self,
+                 checkpoint_path: P,
                  audio_filename: P,
                  media_template_filename: P,
                  cached_faces_filename: P,
@@ -47,7 +48,7 @@ impl Wav2LipInferenceCommand {
     command.push_str("python ");
     command.push_str(&self.script_name);
     command.push_str(" --checkpoint_path ");
-    command.push_str(&self.checkpoint_path);
+    command.push_str(&checkpoint_path.as_ref().display().to_string());
     command.push_str(" --image_or_video_filename ");
     command.push_str(&media_template_filename.as_ref().display().to_string());
     command.push_str(" --audio_filename ");

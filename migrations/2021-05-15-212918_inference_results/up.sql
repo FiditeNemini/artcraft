@@ -100,7 +100,15 @@ CREATE TABLE w2l_results (
   ) NOT NULL DEFAULT 'public',
 
   -- Where the wav, spectrogram, and etc. are located.
-  public_bucket_hash CHAR(64) NOT NULL,
+  public_bucket_video_path VARCHAR(255) NOT NULL,
+
+  -- ========== METADATA ==========
+
+  file_size_bytes INT(10) NOT NULL DEFAULT 0,
+  mime_type VARCHAR(32) NOT NULL DEFAULT '',
+  frame_width INT(10) NOT NULL DEFAULT 0,
+  frame_height INT(10) NOT NULL DEFAULT 0,
+  duration_millis INT(10) NOT NULL DEFAULT 0,
 
   -- ========== MODERATION DETAILS ==========
 

@@ -9,6 +9,7 @@ use crate::util::random_crockford_token::random_crockford_token;
 use crate::util::random_prefix_crockford_token::random_prefix_crockford_token;
 use log::{warn, info};
 use sqlx::MySqlPool;
+use std::path::Path;
 
 /// table: w2l_template_upload_jobs
 #[derive(Debug)]
@@ -153,67 +154,53 @@ WHERE id = ?
   Ok(())
 }
 
-pub async fn insert_w2l_result(pool: &MySqlPool,
-                               template_type: &str, // TODO: ENUM!
-                               job: &W2lInferenceJobRecord,
-                               private_bucket_hash: &str,
-                               private_bucket_object_name: &str,
-                               private_bucket_cached_faces_object_name: &str,
-                               maybe_image_preview_object_name: Option<&str>,
-                               maybe_video_preview_object_name: Option<&str>,
-                               file_size_bytes: u64,
-                               maybe_mime_type: Option<&str>,
-                               frame_width: u32,
-                               frame_height: u32,
-                               frame_count: u64,
-                               fps: f32,
-                               duration_millis: u64)
-                               -> AnyhowResult<u64>
+pub async fn insert_w2l_result<P: AsRef<Path>>(
+  pool: &MySqlPool,
+  job: &W2lInferenceJobRecord,
+  bucket_video_results_path: P,
+  file_size_bytes: u64,
+  maybe_mime_type: Option<&str>,
+  frame_width: u32,
+  frame_height: u32,
+  duration_millis: u64
+) -> AnyhowResult<u64>
 {
-  /*let model_token = random_prefix_crockford_token("W2L_TPL:", 32)?;
-  let updatable_slug = model_token.clone();
+  let inference_result_token = random_prefix_crockford_token("W2L_RES:", 32)?;
+
+  let bucket_video_result_path = &bucket_video_results_path
+    .as_ref()
+    .display()
+    .to_string();
 
   let query_result = sqlx::query!(
         r#"
-INSERT INTO w2l_templates
+INSERT INTO w2l_results
 SET
   token = ?,
-  template_type = ?,
-  updatable_slug = ?,
-  title = ?,
-  description_markdown = '',
-  description_rendered_html = '',
-  creator_user_token = ?,
+  maybe_w2l_template_token = ?,
+  maybe_creator_user_token = ?,
   creator_ip_address = ?,
-  original_download_url = ?,
-  private_bucket_hash = ?,
-  private_bucket_object_name = ?,
-  private_bucket_cached_faces_object_name = ?,
-  maybe_public_bucket_preview_image_object_name = ?,
-  maybe_public_bucket_preview_video_object_name = ?,
+  creator_set_visibility = 'public',
+
+  public_bucket_video_path = ?,
+
   file_size_bytes = ?,
   mime_type = ?,
   frame_width = ?,
   frame_height = ?,
-  frame_count = ?,
-  fps = ?,
   duration_millis = ?
         "#,
-      model_token,
-      template_type,
-      updatable_slug,
+      inference_result_token,
+      job.maybe_w2l_template_token.clone(),
+      job.maybe_creator_user_token.clone(),
       job.creator_ip_address.clone(),
-      private_bucket_hash.to_string(),
-      private_bucket_object_name.to_string(),
-      private_bucket_cached_faces_object_name.to_string(),
-      maybe_image_preview_object_name,
-      maybe_video_preview_object_name,
+
+      bucket_video_result_path,
+
       file_size_bytes,
       maybe_mime_type.unwrap_or(""),
       frame_width,
       frame_height,
-      frame_count,
-      fps,
       duration_millis
     )
     .execute(pool)
@@ -229,8 +216,7 @@ SET
     }
   };
 
-  Ok(record_id)*/
-  return Err(anyhow!("TODO"));
+  Ok(record_id)
 }
 
 pub struct W2lTemplateRecord2 {

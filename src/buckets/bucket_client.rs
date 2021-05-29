@@ -131,7 +131,17 @@ impl BucketClient {
     self.upload_file(object_name, &buffer).await
   }
 
-  pub async fn upload_filename_with_content_type(&self, object_name: &str, filename: &Path, content_type: &str) -> anyhow::Result<()> {
+  pub async fn upload_filename_with_content_type<P: AsRef<Path>>(
+    &self,
+    object_path: P,
+    filename: P,
+    content_type: &str
+  ) -> anyhow::Result<()> {
+    let object_path_str = object_path.as_ref()
+      .to_str()
+      .map(|s| s.to_string())
+      .ok_or(anyhow!("could not convert object path to string"))?;
+
     // TODO: does a newer version of this crate handle streaming/buffering file contents?
     let mut file = File::open(filename).await?;
     let mut buffer : Vec<u8> = Vec::new();
@@ -139,7 +149,7 @@ impl BucketClient {
 
     info!("Uploading with content type...");
 
-    self.upload_file_with_content_type(object_name, &buffer, content_type).await
+    self.upload_file_with_content_type(&object_path_str, &buffer, content_type).await
   }
 
   // NB: New version has blocking client rather than blocking calls.

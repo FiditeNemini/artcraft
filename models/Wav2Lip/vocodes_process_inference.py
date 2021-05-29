@@ -505,10 +505,12 @@ def main(tempdir):
     file_size_bytes = os.path.getsize(args.output_video_filename)
 
     print(ffmpeg_metadata)
-    print(ffmpeg_metadata['format'])
-    print(ffmpeg_metadata['format']['duration'])
+
+    # We can't really get frame count anymore. The original source is invalid.
+    # ffmpeg reports fps, but it's a ratio, eg. 25/1
     #frame_count = len(full_frames)
     #duration_seconds = frame_count / fps
+
     duration_millis = int(float(ffmpeg_metadata['format']['duration']) * 1000)
 
     metadata = {
