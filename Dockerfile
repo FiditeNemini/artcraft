@@ -60,7 +60,7 @@ RUN python3.6 --version
 RUN python3.6 -m venv python
 RUN . python/bin/activate \
   && pip install --upgrade pip \
-  && pip install -r requirements.txt
+  && pip install -r requirements.txt \
   && deactivate
 
 COPY models/tacotron2 ./models/tacotron2
@@ -69,7 +69,7 @@ WORKDIR models/tacotron2
 RUN python3.6 -m venv python
 RUN . python/bin/activate \
   && pip install --upgrade pip \
-  && pip install -r requirements.txt
+  && pip install -r requirements.txt \
   && deactivate
 
 # ==================== Rust Build Base ====================
