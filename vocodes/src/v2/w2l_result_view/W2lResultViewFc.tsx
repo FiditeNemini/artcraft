@@ -66,6 +66,16 @@ function W2lResultViewFc(props: Props) {
   }
 
   let videoLink = `https://storage.googleapis.com/dev-vocodes-public${w2lInferenceResult?.public_bucket_video_path}`; 
+  let templateLink = `/w2l/${w2lInferenceResult.maybe_w2l_template_token}`;
+
+  let creatorDetails = <span>Anonymous user</span>;
+  let durationSeconds = w2lInferenceResult?.duration_millis / 1000;
+
+  let templateName = w2lInferenceResult.template_title;
+
+  if (w2lInferenceResult.template_title.length < 5) {
+    templateName = `Template: ${w2lInferenceResult.template_title}`;
+  }
 
   return (
     <div>
@@ -75,6 +85,39 @@ function W2lResultViewFc(props: Props) {
         <source src={videoLink} />
         Your device doesn't support video.
       </video> 
+
+      <table className="table">
+        <thead>
+          <tr>
+            <th><abbr title="Detail">Detail</abbr></th>
+            <th><abbr title="Value">Value</abbr></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <th>Creator</th>
+            <td>
+              {creatorDetails}
+            </td>
+          </tr>
+          <tr>
+            <th>Template used</th>
+            <td>
+              <Link to={templateLink}>
+                {templateName}
+              </Link>
+            </td>
+          </tr>
+          <tr>
+            <th>Dimensions</th>
+            <td>{w2lInferenceResult?.frame_width} x {w2lInferenceResult?.frame_height}</td>
+          </tr>
+          <tr>
+            <th>Duration</th>
+            <td>{durationSeconds} seconds</td>
+          </tr>
+        </tbody>
+      </table>
 
     </div>
   )

@@ -65,13 +65,15 @@ function Profile_W2lInferenceResultsListFc(props: Props) {
   
   w2lResults.forEach(result => {
     let duration_seconds = result.duration_millis / 1000;
-    let title = result.template_title.length < 5 ? `Title: ${result.template_title}` : result.template_title;
+    let templateTitle = result.template_title.length < 5 ? `Title: ${result.template_title}` : result.template_title;
 
     let inferenceLink = `/w2l/result/${result.w2l_result_token}`;
+    let templateLink = `/w2l/${result.maybe_w2l_template_token}`;
 
     rows.push(
       <tr>
-        <th><Link to={inferenceLink}>{title}</Link></th>
+        <th><Link to={inferenceLink}>Result</Link></th>
+        <th><Link to={templateLink}>{templateTitle}</Link></th>
         <td>(custom audio)</td>
         <td>{duration_seconds} s</td>
         <td>{result.created_at} s</td>
@@ -84,6 +86,7 @@ function Profile_W2lInferenceResultsListFc(props: Props) {
       <table className="table">
         <thead>
           <tr>
+            <th><abbr title="Detail">Result Link</abbr></th>
             <th><abbr title="Detail">Template</abbr></th>
             <th><abbr title="Detail">Audio Source</abbr></th>
             <th><abbr title="Detail">Duration</abbr></th>
