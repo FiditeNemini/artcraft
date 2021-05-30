@@ -16,6 +16,7 @@ import { UploadW2lPhotoFc } from './upload/UploadW2lPhotoFc';
 import { UploadW2lVideoFc } from './upload/UploadW2lVideoFc';
 import { W2lTemplateListFc } from './w2l_template_list/W2lTemplateListFc';
 import { W2lTemplateViewFc } from './w2l_template_view/W2lTemplateViewFc';
+import { ProfileFc } from './profile/ProfileFc';
 
 interface Props {
   sessionWrapper: SessionWrapper,
@@ -73,10 +74,8 @@ class NewVocodesContainer extends React.Component<Props, State> {
 
             <Route path="/profile/:username"
               render={(routeProps: RouteProps) => (
-                <ProfileComponent
-                  querySessionCallback={()=>{}}
+                <ProfileFc
                   sessionWrapper={this.props.sessionWrapper}
-                  routeProps={routeProps}
                 />
               )}
             />
