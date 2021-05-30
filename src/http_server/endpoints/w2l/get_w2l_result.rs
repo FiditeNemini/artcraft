@@ -38,6 +38,8 @@ pub struct W2lResultRecordForResponse {
   pub maybe_w2l_template_token: Option<String>,
   pub maybe_tts_inference_result_token: Option<String>,
 
+  pub public_bucket_video_path: String,
+
   pub template_type: Option<String>,
   pub template_title: Option<String>,
 
@@ -80,6 +82,8 @@ pub struct RawW2lResultRecord {
 
   pub maybe_w2l_template_token: Option<String>,
   pub maybe_tts_inference_result_token: Option<String>,
+
+  pub public_bucket_video_path: String,
 
   pub template_type: Option<String>,
   pub template_title: Option<String>, // from field `w2l_templates.title`
@@ -143,6 +147,8 @@ SELECT
     w2l_results.token as w2l_result_token,
     w2l_results.maybe_tts_inference_result_token,
 
+    w2l_results.public_bucket_video_path,
+
     w2l_templates.token as maybe_w2l_template_token,
     w2l_templates.template_type,
     w2l_templates.title as template_title,
@@ -191,6 +197,8 @@ WHERE
     w2l_result_token: ir.w2l_result_token.clone(),
     maybe_w2l_template_token: ir.maybe_w2l_template_token.clone(),
     maybe_tts_inference_result_token: ir.maybe_tts_inference_result_token.clone(),
+
+    public_bucket_video_path: ir.public_bucket_video_path.clone(),
 
     template_type: ir.template_type.clone(),
     template_title: ir.template_title.clone(),
