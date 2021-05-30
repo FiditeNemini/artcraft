@@ -2,7 +2,6 @@ import React from 'react';
 import { FirehoseComponent } from './firehose/FirehoseComponent';
 import { LoginFc } from './login/LoginFc';
 import { NewTopNavFc } from './NewTopNavFc';
-import { ProfileComponent } from './profile/ProfileComponent';
 import { ProfileDataFc } from './profile_data/ProfileDataFc';
 import { SessionWrapper } from '../session/SessionWrapper';
 import { SignupComponent } from './signup/SignupComponent';
