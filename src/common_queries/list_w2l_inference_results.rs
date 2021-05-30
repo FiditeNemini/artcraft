@@ -100,9 +100,9 @@ pub async fn list_w2l_inference_results(
 
         template_type: ir.template_type.clone(),
 
-        maybe_creator_user_token: None,
-        maybe_creator_username: None,
-        maybe_creator_display_name: None,
+        maybe_creator_user_token: ir.maybe_creator_user_token.clone(),
+        maybe_creator_username: ir.maybe_creator_username.clone(),
+        maybe_creator_display_name: ir.maybe_creator_display_name.clone(),
         //is_mod_hidden_from_public: if ir.is_mod_hidden_from_public == 0 { false } else { true },
         //template_is_mod_approved: if ir.template_is_mod_approved == 0 { false } else { true },
 
@@ -205,7 +205,7 @@ async fn list_w2l_inference_results_creator_scoped(
   // TODO: There has to be a better way.
   //  Sqlx doesn't like anything except string literals.
   let maybe_results = if require_mod_approved_templates {
-    info!("listing w2l inference results for user; mod-approved only");
+    info!("listing w2l inference results for user `{}`; mod-approved only", scope_creator_username);
     sqlx::query_as!(
       RawW2lInferenceRecordForList,
         r#"
