@@ -11,6 +11,7 @@ pub struct W2lInferenceRecordForList {
   pub maybe_tts_inference_result_token: Option<String>,
 
   pub template_type: Option<String>,
+  pub template_title: Option<String>,
 
   pub maybe_creator_user_token: Option<String>,
   pub maybe_creator_username: Option<String>,
@@ -30,12 +31,13 @@ pub struct W2lInferenceRecordForList {
 }
 
 struct RawW2lInferenceRecordForList {
-  pub w2l_result_token: String,
+  pub w2l_result_token: String, // from field `w2l_results.token`
 
   pub maybe_w2l_template_token: Option<String>,
   pub maybe_tts_inference_result_token: Option<String>,
 
   pub template_type: Option<String>,
+  pub template_title: Option<String>, // from field `w2l_templates.title`
 
   pub maybe_creator_user_token: Option<String>,
   pub maybe_creator_username: Option<String>,
@@ -99,6 +101,7 @@ pub async fn list_w2l_inference_results(
         maybe_tts_inference_result_token: ir.maybe_tts_inference_result_token.clone(),
 
         template_type: ir.template_type.clone(),
+        template_title: ir.template_title.clone(),
 
         maybe_creator_user_token: ir.maybe_creator_user_token.clone(),
         maybe_creator_username: ir.maybe_creator_username.clone(),
@@ -135,6 +138,7 @@ SELECT
 
     w2l_templates.token as maybe_w2l_template_token,
     w2l_templates.template_type,
+    w2l_templates.title as template_title,
 
     users.token as maybe_creator_user_token,
     users.username as maybe_creator_username,
@@ -170,6 +174,7 @@ SELECT
 
     w2l_templates.token as maybe_w2l_template_token,
     w2l_templates.template_type,
+    w2l_templates.title as template_title,
 
     users.token as maybe_creator_user_token,
     users.username as maybe_creator_username,
@@ -215,6 +220,7 @@ SELECT
 
     w2l_templates.token as maybe_w2l_template_token,
     w2l_templates.template_type,
+    w2l_templates.title as template_title,
 
     users.token as maybe_creator_user_token,
     users.username as maybe_creator_username,
@@ -252,6 +258,7 @@ SELECT
 
     w2l_templates.token as maybe_w2l_template_token,
     w2l_templates.template_type,
+    w2l_templates.title as template_title,
 
     users.token as maybe_creator_user_token,
     users.username as maybe_creator_username,
