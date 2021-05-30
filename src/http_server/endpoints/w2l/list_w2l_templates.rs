@@ -27,24 +27,6 @@ use chrono::{DateTime, Utc};
 use crate::common_queries::list_w2l_templates::{list_w2l_templates, W2lTemplateRecordForList};
 
 #[derive(Serialize)]
-pub struct W2lTemplateRecordForResponse {
-  pub template_token: String,
-  pub template_type: String,
-  pub creator_user_token: String,
-  pub creator_username: String,
-  pub creator_display_name: String,
-  pub updatable_slug: String,
-  pub title: String,
-  pub frame_width: u32,
-  pub frame_height: u32,
-  pub duration_millis: u32,
-  pub maybe_image_object_name: Option<String>,
-  pub maybe_video_object_name: Option<String>,
-  pub created_at: DateTime<Utc>,
-  pub updated_at: DateTime<Utc>,
-}
-
-#[derive(Serialize)]
 pub struct ListW2lTemplatesSuccessResponse {
   pub success: bool,
   pub templates: Vec<W2lTemplateRecordForList>,
@@ -59,24 +41,6 @@ pub struct ErrorResponse {
 #[derive(Debug, Display)]
 pub enum ListW2lTemplatesError {
   ServerError,
-}
-
-#[derive(Serialize)]
-pub struct W2lTemplateRecord {
-  pub template_token: String,
-  pub template_type: String,
-  pub creator_user_token: String,
-  pub creator_username: String,
-  pub creator_display_name: String,
-  pub updatable_slug: String,
-  pub title: String,
-  pub frame_width: i32,
-  pub frame_height: i32,
-  pub duration_millis: i32,
-  pub maybe_public_bucket_preview_image_object_name: Option<String>,
-  pub maybe_public_bucket_preview_video_object_name: Option<String>,
-  pub created_at: DateTime<Utc>,
-  pub updated_at: DateTime<Utc>,
 }
 
 impl ResponseError for ListW2lTemplatesError {

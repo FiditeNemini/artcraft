@@ -52,6 +52,7 @@ use crate::http_server::endpoints::w2l::enqueue_infer_w2l_with_uploads::enqueue_
 use crate::buckets::bucket_client::BucketClient;
 use crate::http_server::endpoints::users::list_user_w2l_templates::list_user_w2l_templates_handler;
 use crate::http_server::endpoints::users::list_user_w2l_inference_results::list_user_w2l_inference_results_handler;
+use crate::http_server::endpoints::w2l::get_w2l_result::get_w2l_inference_result_handler;
 
 const DEFAULT_BIND_ADDRESS : &'static str = "0.0.0.0:12345";
 
@@ -275,6 +276,11 @@ pub async fn serve(server_state: ServerState) -> AnyhowResult<()>
           .service(
             web::resource("/template/{slug}")
               .route(web::get().to(get_w2l_template_handler))
+              .route(web::head().to(|| HttpResponse::Ok()))
+          )
+          .service(
+            web::resource("/result/{token}")
+              .route(web::get().to(get_w2l_inference_result_handler))
               .route(web::head().to(|| HttpResponse::Ok()))
           )
       )
