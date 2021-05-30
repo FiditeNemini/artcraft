@@ -1,5 +1,11 @@
 # ==================== Python Build Base ====================
 
+# Authenticating with GHCR locally:
+# https://docs.github.com/en/packages/working-with-a-github-packages-registry/migrating-to-the-container-registry-from-the-docker-registry
+#   ```
+#   export CR_PAT=YOUR_TOKEN
+#   echo $CR_PAT | docker login ghcr.io -u USERNAME --password-stdin
+#   ```
 
 #FROM nvidia/cuda:10.1-devel-ubuntu18.04 as pybuild-base
 FROM nvidia/cuda:11.3.0-devel-ubuntu20.04 as pybuild-base
