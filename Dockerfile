@@ -1,11 +1,11 @@
 # ==================== Python Build Base ====================
 
-FROM nvidia/cuda:10.1-devel-ubuntu18.04 as pybuild-base
+#FROM nvidia/cuda:10.1-devel-ubuntu18.04 as pybuild-base
 
 # NB(2021-05-30): This is the image that Tacotron 2's Dockerfile specifies.
 # I have not tried this, but it might be necessary.
-# FROM pytorch/pytorch:nightly-devel-cuda10.0-cudnn7
-# ENV PATH /usr/local/nvidia/bin:/usr/local/cuda/bin:${PATH}
+FROM pytorch/pytorch:nightly-devel-cuda10.0-cudnn7
+ENV PATH /usr/local/nvidia/bin:/usr/local/cuda/bin:${PATH}
 
 # NB: https://github.com/NVIDIA/nvidia-docker/issues/864#issuecomment-439848887
 # NB: We do not install ffmpeg, since the version is 3.8.* series and we need 4.2.*
