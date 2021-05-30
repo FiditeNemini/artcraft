@@ -27,6 +27,7 @@ use actix_http::http;
 use actix_web::middleware::{Logger, DefaultHeaders};
 use actix_web::{HttpServer, web, HttpResponse, App};
 use crate::http_server::endpoints::default_route_404::default_route_404;
+use crate::http_server::endpoints::events::list_events::list_events_handler;
 use crate::http_server::endpoints::misc::enable_alpha::enable_alpha;
 use crate::http_server::endpoints::root_index::get_root_index;
 use crate::http_server::endpoints::tts::enqueue_infer_tts::infer_tts_handler;
@@ -307,6 +308,11 @@ pub async fn serve(server_state: ServerState) -> AnyhowResult<()>
               .route(web::get().to(list_user_w2l_inference_results_handler))
               .route(web::head().to(|| HttpResponse::Ok()))
           )
+      )
+      .service(
+        web::resource("/events")
+          .route(web::get().to(list_events_handler))
+          .route(web::head().to(|| HttpResponse::Ok()))
       )
       .service(get_root_index)
       .service(enable_alpha)
