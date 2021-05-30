@@ -29,6 +29,10 @@ RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 RUN apt-get update
 #RUN apt-cache search python3.8
 
+# NB: Here we install nvidia drivers
+# NB: Avoid keyboard prompt
+RUN DEBIAN_FRONTEND=noninteractive apt-get install -y nvidia-384 --no-install-recommends
+
 # ffmpeg version 4.2.4-1ubuntu0.1 Copyright (c) 2000-2020 the FFmpeg developers
 #RUN apt-get install -y ffmpeg
 #RUN ffmpeg -version
