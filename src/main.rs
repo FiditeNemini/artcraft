@@ -56,6 +56,16 @@ use crate::http_server::endpoints::users::list_user_w2l_inference_results::list_
 use crate::http_server::endpoints::w2l::get_w2l_result::get_w2l_inference_result_handler;
 use crate::common_queries::firehose_publisher::FirehosePublisher;
 
+// TODO TODO TODO TODO
+// TODO TODO TODO TODO
+// TODO TODO TODO TODO
+// https://github.com/TensorSpeech/TensorFlowTTS (MAYBE USE THIS)
+// TODO TODO TODO TODO
+// TODO TODO TODO TODO
+// TODO TODO TODO TODO
+
+
+
 const DEFAULT_BIND_ADDRESS : &'static str = "0.0.0.0:12345";
 
 // NB: sqlx::query is spammy and logs all queries as "info"-level
