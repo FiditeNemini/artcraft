@@ -22,10 +22,17 @@ RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 #     && apt-get install -y \
 RUN apt-get update
 #RUN apt-cache search python3.8
+
+# ffmpeg version 4.2.4-1ubuntu0.1 Copyright (c) 2000-2020 the FFmpeg developers
+#RUN apt-get install -y ffmpeg
+#RUN ffmpeg -version
+#RUN sleep 100
+
 RUN apt-get install -y \
         build-essential \
         curl \
         cython3 \
+        ffmpeg \
         g++-7 \
         gcc-7 \
         git \
@@ -56,12 +63,11 @@ RUN apt-get install -y \
 # We need ffmpeg version >= 4.2 (https://superuser.com/a/579110)
 # http://ubuntuhandbook.org/index.php/2020/06/install-ffmpeg-4-3-via-ppa-ubuntu-18-04-16-04/
 
-RUN apt-get install -y software-properties-common \
-    && add-apt-repository ppa:jonathonf/ffmpeg-4 \
-    && apt-get update \
-    && apt-get install -y ffmpeg
-
-RUN ffmpeg -version
+#RUN apt-get install -y software-properties-common \
+#    && add-apt-repository ppa:jonathonf/ffmpeg-4 \
+#    && apt-get update \
+#    && apt-get install -y ffmpeg
+#
 
 # ==================== Python Build Step 2: Wav2Lip Requirements ====================
 
