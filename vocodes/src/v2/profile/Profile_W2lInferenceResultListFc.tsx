@@ -72,7 +72,7 @@ function Profile_W2lInferenceResultsListFc(props: Props) {
 
     rows.push(
       <tr>
-        <th><Link to={inferenceLink}>Result</Link></th>
+        <th><Link to={inferenceLink}>▶️ Result</Link></th>
         <th><Link to={templateLink}>{templateTitle}</Link></th>
         <td>(custom audio)</td>
         <td>{duration_seconds} s</td>
