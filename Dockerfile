@@ -105,6 +105,8 @@ FROM ghcr.io/storytold/docker-base-images-nvidia-cuda-experimental:080f96bc7087 
 
 FROM pybuild-base as pybuild-requirements
 
+WORKDIR /
+
 COPY models/Wav2Lip ./models/Wav2Lip
 WORKDIR models/Wav2Lip
 
@@ -115,6 +117,8 @@ RUN . python/bin/activate \
   && pip install --upgrade pip \
   && pip install -r requirements.txt \
   && deactivate
+
+WORKDIR /
 
 COPY models/tacotron2 ./models/tacotron2
 WORKDIR models/tacotron2
