@@ -28,6 +28,8 @@ RUN apt-get update
 #RUN ffmpeg -version
 #RUN sleep 100
 
+# Notes on packages:
+#  * software-properties-common - needed for `apt-add-repository`
 RUN apt-get install -y \
         build-essential \
         curl \
@@ -48,6 +50,7 @@ RUN apt-get install -y \
         libxext6 \
         libxrender-dev \
         netcat \
+        software-properties-common \
         python-dev \
         python3-pip \
         python3.8 \
@@ -59,6 +62,21 @@ RUN apt-get install -y \
         tmux \
         vim \
         wget
+
+
+# Wav2Lip needs Python3.6
+# NB: we install python3-virtualenv as `python3.6 -m venv` won't work anymore
+RUN add-apt-repository ppa:deadsnakes/ppa
+RUN apt-get update
+RUN apt-get install -y python3.6
+RUN apt-get install -y python3-virtualenv
+RUN apt-get install -y python3.6-venv
+RUN apt-get install -y python3.6-dev
+#RUN apt-get install python3-virtualenv
+
+
+RUN python3.6 --version
+RUN python3.8 --version
 
 # We need ffmpeg version >= 4.2 (https://superuser.com/a/579110)
 # http://ubuntuhandbook.org/index.php/2020/06/install-ffmpeg-4-3-via-ppa-ubuntu-18-04-16-04/
@@ -76,9 +94,9 @@ FROM pybuild-base as pybuild-requirements
 COPY models/Wav2Lip ./models/Wav2Lip
 WORKDIR models/Wav2Lip
 
-RUN python3.8 --version
-RUN python3.8 -m venv python
-
+# NB: We need Python3.6
+RUN python3.6 -m venv python
+#RUN virtualenv -p /usr/bin/python3.6  ... wait
 RUN . python/bin/activate \
   && pip install --upgrade pip \
   && pip install -r requirements.txt \
