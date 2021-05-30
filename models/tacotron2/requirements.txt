@@ -3,7 +3,7 @@ scipy
 matplotlib
 librosa==0.6.0
 #tensorflow
-#tensorboardX
+tensorboardX
 inflect==0.2.5
 Unidecode==1.0.22
 pillow
@@ -23,4 +23,4 @@ numpy==1.14.3
 # TypeError: create_target_machine() got an unexpected keyword argument 'jitdebug'
 llvmlite==0.32.1
 
-tensorboardX==1.15
+#tensorboardX==1.15
