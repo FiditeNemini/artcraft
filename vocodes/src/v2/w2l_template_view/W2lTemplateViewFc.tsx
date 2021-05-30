@@ -201,6 +201,10 @@ function W2lTemplateViewFc(props: Props) {
             </td>
           </tr>
           <tr>
+            <th>Title</th>
+            <td>{w2lTemplate?.title}</td>
+          </tr>
+          <tr>
             <th>Media Type</th>
             <td>{w2lTemplate?.template_type}</td>
           </tr>
