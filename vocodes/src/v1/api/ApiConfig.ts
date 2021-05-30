@@ -77,6 +77,9 @@ class ApiConfig {
     return `${this.getScheme()}://${this.getNewApiHost()}/user/${username}/w2l_results`;
   }
 
+  firehoseEvents() : string {
+    return `${this.getScheme()}://${this.getNewApiHost()}/events`;
+  }
 
   private getScheme() : string {
     return this.isLocalDev ? "http" : "https";

@@ -1,5 +1,4 @@
 import React from 'react';
-import { FirehoseComponent } from './firehose/FirehoseComponent';
 import { LoginFc } from './login/LoginFc';
 import { NewTopNavFc } from './NewTopNavFc';
 import { ProfileDataFc } from './profile_data/ProfileDataFc';
@@ -17,6 +16,7 @@ import { W2lTemplateListFc } from './w2l_template_list/W2lTemplateListFc';
 import { W2lTemplateViewFc } from './w2l_template_view/W2lTemplateViewFc';
 import { ProfileFc } from './profile/ProfileFc';
 import { W2lResultViewFc } from './w2l_result_view/W2lResultViewFc';
+import { FirehoseEventListFc } from './firehose/FirehoseEventListFc';
 
 interface Props {
   sessionWrapper: SessionWrapper,
@@ -50,8 +50,7 @@ class NewVocodesContainer extends React.Component<Props, State> {
 
           <Switch>
             <Route path="/firehose">
-              <FirehoseComponent
-                querySessionCallback={()=>{}}
+              <FirehoseEventListFc
                 sessionWrapper={this.props.sessionWrapper}
               />
             </Route>
