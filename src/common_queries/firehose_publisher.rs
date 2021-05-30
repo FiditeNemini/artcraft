@@ -59,43 +59,51 @@ pub struct FirehosePublisher {
 impl FirehosePublisher {
 
   pub async fn publish_user_sign_up(&self, user_token: &str) -> AnyhowResult<()> {
-    let token = random_prefix_crockford_token("EV", 32)?;
-    let event_type = FirehoseEvent::UserSignUp;
-
     let _record_id = self.insert(
-      event_type,
+    FirehoseEvent::UserSignUp,
       Some(user_token),
       Some(user_token)
     ).await?;
-
     Ok(())
   }
 
-  pub async fn publish_w2l_template_upload_enqueue(&self, user_token: &str, job_token: &str) -> AnyhowResult<()> {
-    let token = random_prefix_crockford_token("EV", 32)?;
-    let event_type = FirehoseEvent::W2lTemplateUploadStarted;
-
+  pub async fn enqueue_w2l_template_upload(&self, user_token: &str, job_token: &str) -> AnyhowResult<()> {
     let _record_id = self.insert(
-      event_type,
+      FirehoseEvent::W2lTemplateUploadStarted,
       Some(user_token),
       Some(job_token)
     ).await?;
+    Ok(())
+  }
 
+  pub async fn enqueue_w2l_inference(&self, maybe_user_token: Option<&str>, job_token: &str) -> AnyhowResult<()> {
+    let _record_id = self.insert(
+      FirehoseEvent::W2lInferenceStarted,
+      maybe_user_token,
+      Some(job_token)
+    ).await?;
     Ok(())
   }
 
   pub async fn publish_w2l_template_upload_finished(&self, user_token: &str, template_token: &str) -> AnyhowResult<()> {
-    let token = random_prefix_crockford_token("EV", 32)?;
-    let event_type = FirehoseEvent::W2lTemplateUploadCompleted;
-
     let _record_id = self.insert(
-      event_type,
+    FirehoseEvent::W2lTemplateUploadCompleted,
       Some(user_token),
       Some(template_token)
     ).await?;
-
     Ok(())
   }
+
+  pub async fn w2l_inference_finished(&self, maybe_user_token: Option<&str>, job_token: &str) -> AnyhowResult<()> {
+    let _record_id = self.insert(
+      FirehoseEvent::W2lInferenceCompleted,
+      maybe_user_token,
+      Some(job_token)
+    ).await?;
+    Ok(())
+  }
+
+  // =======================================================================
 
   async fn insert(
     &self,

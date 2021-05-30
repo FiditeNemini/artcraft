@@ -8,6 +8,7 @@
 #[macro_use] extern crate serde_derive;
 
 pub mod buckets;
+pub mod common_queries;
 pub mod job_queries;
 pub mod script_execution;
 pub mod util;
@@ -18,6 +19,7 @@ use crate::buckets::bucket_client::BucketClient;
 use crate::buckets::bucket_path_unifier::BucketPathUnifier;
 use crate::buckets::bucket_paths::hash_to_bucket_path;
 use crate::buckets::file_hashing::get_file_hash;
+use crate::common_queries::firehose_publisher::FirehosePublisher;
 use crate::job_queries::w2l_inference_job_queries::W2lInferenceJobRecord;
 use crate::job_queries::w2l_inference_job_queries::get_w2l_template_by_token;
 use crate::job_queries::w2l_inference_job_queries::insert_w2l_result;
@@ -43,9 +45,9 @@ use std::fs::{File, metadata};
 use std::io::{BufReader, Read};
 use std::path::{PathBuf, Path};
 use std::process::Command;
+use std::thread;
 use std::time::Duration;
 use tempdir::TempDir;
-use std::thread;
 
 // Buckets (shared config)
 const ENV_ACCESS_KEY : &'static str = "ACCESS_KEY";
@@ -76,6 +78,8 @@ struct Inferencer {
 
   pub private_bucket_client: BucketClient,
   pub public_bucket_client: BucketClient,
+
+  pub firehose_publisher: FirehosePublisher,
 
   pub bucket_path_unifier: BucketPathUnifier,
   pub semi_persistent_cache: SemiPersistentCacheDir,
@@ -190,6 +194,10 @@ async fn main() -> AnyhowResult<()> {
   let w2l_end_bump_filename = easyenv::get_env_string_or_default(
     "W2L_END_BUMP_FILENAME", "vocodes-short-end-bump.mp4");
 
+  let firehose_publisher = FirehosePublisher {
+    mysql_pool: mysql_pool.clone(), // NB: MySqlPool is clone/send/sync safe
+  };
+
   let inferencer = Inferencer {
     download_temp_directory: temp_directory,
     mysql_pool,
@@ -203,6 +211,7 @@ async fn main() -> AnyhowResult<()> {
     w2l_inference: w2l_inference_command,
     bucket_path_unifier: BucketPathUnifier::default_paths(),
     semi_persistent_cache,
+    firehose_publisher,
     w2l_model_filename,
     w2l_end_bump_filename,
   };
@@ -510,7 +519,7 @@ async fn process_job(inferencer: &Inferencer, job: &W2lInferenceJobRecord) -> An
   // ==================== SAVE RECORDS ==================== //
 
   info!("Saving w2l inference record...");
-  let id = insert_w2l_result(
+  let (id, inference_result_token) = insert_w2l_result(
     &inferencer.mysql_pool,
     job,
     &result_object_path,
@@ -523,6 +532,15 @@ async fn process_job(inferencer: &Inferencer, job: &W2lInferenceJobRecord) -> An
 
   info!("Marking job complete...");
   mark_w2l_inference_job_done(&inferencer.mysql_pool, job, true).await?;
+
+  inferencer.firehose_publisher.w2l_inference_finished(
+    job.maybe_creator_user_token.as_deref(),
+    &inference_result_token)
+    .await
+    .map_err(|e| {
+      warn!("error publishing event: {:?}", e);
+      anyhow!("error publishing event")
+    })?;
 
   info!("Job {} complete success! Downloaded, ran inference, and uploaded. Saved model record: {}",
         job.id, id);

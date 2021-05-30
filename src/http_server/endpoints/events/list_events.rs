@@ -5,7 +5,9 @@ use actix_web::dev::HttpResponseBuilder;
 use actix_web::error::ResponseError;
 use actix_web::http::StatusCode;
 use actix_web::{Responder, web, HttpResponse, error, HttpRequest, HttpMessage};
+use chrono::{DateTime, Utc};
 use crate::AnyhowResult;
+use crate::common_queries::list_w2l_templates::{list_w2l_templates, W2lTemplateRecordForList};
 use crate::common_queries::sessions::create_session_for_user;
 use crate::http_server::endpoints::users::create_account::CreateAccountError::{BadInput, ServerError, UsernameTaken, EmailTaken};
 use crate::http_server::endpoints::users::login::LoginSuccessResponse;
@@ -23,8 +25,6 @@ use sqlx::error::DatabaseError;
 use sqlx::error::Error::Database;
 use sqlx::mysql::MySqlDatabaseError;
 use std::sync::Arc;
-use chrono::{DateTime, Utc};
-use crate::common_queries::list_w2l_templates::{list_w2l_templates, W2lTemplateRecordForList};
 
 #[derive(Serialize)]
 pub struct EventRecord {

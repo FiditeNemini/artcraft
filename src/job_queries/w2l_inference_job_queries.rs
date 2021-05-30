@@ -163,7 +163,7 @@ pub async fn insert_w2l_result<P: AsRef<Path>>(
   frame_width: u32,
   frame_height: u32,
   duration_millis: u64
-) -> AnyhowResult<u64>
+) -> AnyhowResult<(u64, String)>
 {
   let inference_result_token = random_prefix_crockford_token("W2L_RES:", 32)?;
 
@@ -216,7 +216,7 @@ SET
     }
   };
 
-  Ok(record_id)
+  Ok((record_id, inference_result_token.clone()))
 }
 
 pub struct W2lTemplateRecord2 {

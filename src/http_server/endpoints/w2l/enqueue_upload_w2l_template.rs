@@ -200,13 +200,12 @@ SET
 
   info!("new w2l template upload job id: {}", record_id);
 
-  server_state.firehose_publisher.publish_w2l_template_upload_enqueue(&user_session.user_token, &job_token)
+  server_state.firehose_publisher.enqueue_w2l_template_upload(&user_session.user_token, &job_token)
     .await
     .map_err(|e| {
       warn!("error publishing event: {:?}", e);
       UploadW2lTemplateError::ServerError
     })?;
-
 
   let response = UploadW2lTemplateSuccessResponse {
     success: true,
