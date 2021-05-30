@@ -109,7 +109,7 @@ function W2lResultViewFc(props: Props) {
         <GravatarFc 
           size={15}
           username={w2lInferenceResult.maybe_template_creator_display_name} 
-          email_hash={w2lInferenceResult.maybe_creator_gravatar_hash} 
+          email_hash={w2lInferenceResult.maybe_template_creator_gravatar_hash} 
           />
         &nbsp;
         <Link to={templateCreatorLink}>{w2lInferenceResult.maybe_template_creator_display_name}</Link>
