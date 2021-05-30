@@ -85,10 +85,13 @@ function FirehoseEventListFc(props: Props) {
 
   firehoseEvents.forEach(event => {
     let inner = <span />;
-    let userLink = undefined;
-    let gravatar = undefined;
+    let userLink = <span>Anonymous user</span>;
+    let gravatar = <span />;
 
-    if (event.maybe_target_username !== undefined) {
+    if (event.maybe_target_username !== undefined
+      && event.maybe_target_username !== null
+      && event.maybe_target_user_token !== undefined
+      && event.maybe_target_user_token !== null) {
       let link = `/profile/${event.maybe_target_username}`;
       userLink = (
         <Link to={link}>
