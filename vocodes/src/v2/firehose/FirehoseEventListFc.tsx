@@ -74,24 +74,12 @@ function FirehoseEventListFc(props: Props) {
     }
   }
 
-
   useEffect(() => {
     doSetTimeout();
     return () => {
       componentIsMounted.current = false
     }
   }, []) // NB: Empty array dependency sets to run ONLY on mount
-
-  //const pollingAsync = useCallback(()=> {
-  //  async () => {
-  //    try {
-  //      //await someLongRunningProcess()
-  //      if (componentIsMounted.current) {
-  //      }
-  //    } catch (err) {
-  //    }
-  //  }
-  //}, [setFirehoseEvents])
 
   let eventItems : Array<JSX.Element> = [];
 
@@ -297,6 +285,7 @@ function FirehoseEventListFc(props: Props) {
       <h1 className="title is-1"> Firehose events </h1>
 
       <div className="content is-large">
+        <p>Slightly slow until I do some infrastructure magic.</p>
         <ul>
           {eventItems}
         </ul>
