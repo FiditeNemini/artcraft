@@ -10,6 +10,7 @@
 pub mod buckets;
 pub mod job_queries;
 pub mod script_execution;
+pub mod common_queries;
 pub mod util;
 
 use anyhow::anyhow;
@@ -17,12 +18,17 @@ use chrono::Utc;
 use crate::buckets::bucket_client::BucketClient;
 use crate::buckets::bucket_paths::hash_to_bucket_path;
 use crate::buckets::file_hashing::get_file_hash;
+use crate::common_queries::firehose_publisher::FirehosePublisher;
 use crate::job_queries::w2l_download_job_queries::W2lTemplateUploadJobRecord;
 use crate::job_queries::w2l_download_job_queries::insert_w2l_template;
 use crate::job_queries::w2l_download_job_queries::mark_w2l_template_upload_job_done;
 use crate::job_queries::w2l_download_job_queries::mark_w2l_template_upload_job_failure;
 use crate::job_queries::w2l_download_job_queries::query_w2l_template_upload_job_records;
+use crate::script_execution::ffmpeg_generate_preview_image_command::FfmpegGeneratePreviewImageCommand;
+use crate::script_execution::ffmpeg_generate_preview_video_command::FfmpegGeneratePreviewVideoCommand;
 use crate::script_execution::google_drive_download_command::GoogleDriveDownloadCommand;
+use crate::script_execution::imagemagick_generate_preview_image_command::ImagemagickGeneratePreviewImageCommand;
+use crate::script_execution::wav2lip_process_upload_command::Wav2LipPreprocessClient;
 use crate::util::anyhow_result::AnyhowResult;
 use crate::util::filesystem::check_directory_exists;
 use crate::util::filesystem::check_file_exists;
@@ -38,10 +44,6 @@ use std::path::{PathBuf, Path};
 use std::process::Command;
 use std::time::Duration;
 use tempdir::TempDir;
-use crate::script_execution::wav2lip_process_upload_command::Wav2LipPreprocessClient;
-use crate::script_execution::ffmpeg_generate_preview_video_command::FfmpegGeneratePreviewVideoCommand;
-use crate::script_execution::ffmpeg_generate_preview_image_command::FfmpegGeneratePreviewImageCommand;
-use crate::script_execution::imagemagick_generate_preview_image_command::ImagemagickGeneratePreviewImageCommand;
 
 // Buckets (shared config)
 const ENV_ACCESS_KEY : &'static str = "ACCESS_KEY";
@@ -71,6 +73,8 @@ struct Downloader {
 
   pub private_bucket_client: BucketClient,
   pub public_bucket_client: BucketClient,
+
+  pub firehose_publisher: FirehosePublisher,
 
   pub google_drive_downloader: GoogleDriveDownloadCommand,
   pub w2l_processor: Wav2LipPreprocessClient,
@@ -165,6 +169,10 @@ async fn main() -> AnyhowResult<()> {
     .max_connections(5)
     .connect(&db_connection_string)
     .await?;
+  
+  let firehose_publisher = FirehosePublisher {
+    mysql_pool: mysql_pool.clone(), // NB: Pool is sync/send/clone-safe
+  };
 
   let downloader = Downloader {
     download_temp_directory: temp_directory,
@@ -173,6 +181,7 @@ async fn main() -> AnyhowResult<()> {
     private_bucket_client,
     download_script,
     google_drive_downloader,
+    firehose_publisher,
     ffmpeg_image_preview_generator: FfmpegGeneratePreviewImageCommand {},
     ffmpeg_video_preview_generator: FfmpegGeneratePreviewVideoCommand {},
     imagemagick_image_preview_generator: ImagemagickGeneratePreviewImageCommand {},
@@ -454,7 +463,7 @@ async fn process_job(downloader: &Downloader, job: &W2lTemplateUploadJobRecord) 
   let template_type = if file_metadata.is_video { "video" } else { "image" };
 
   info!("Saving model record...");
-  let id = insert_w2l_template(
+  let (id, model_token) = insert_w2l_template(
     &downloader.mysql_pool,
     template_type,
     job,
@@ -474,6 +483,14 @@ async fn process_job(downloader: &Downloader, job: &W2lTemplateUploadJobRecord) 
 
   info!("Job {} complete success! Downloaded, processed, and uploaded. Saved model record: {}",
         job.id, id);
+
+  downloader.firehose_publisher.publish_w2l_template_upload_finished(&job.creator_user_token, &model_token)
+    .await
+    .map_err(|e| {
+      warn!("error publishing event: {:?}", e);
+      anyhow!("error publishing event")
+    })?;
+
 
   mark_w2l_template_upload_job_done(&downloader.mysql_pool, job, true).await?;
 

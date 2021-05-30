@@ -126,7 +126,7 @@ pub async fn insert_w2l_template(pool: &MySqlPool,
                                  frame_count: u64,
                                  fps: f32,
                                  duration_millis: u64)
-  -> AnyhowResult<u64>
+  -> AnyhowResult<(u64, String)>
 {
   let model_token = random_prefix_crockford_token("W2L_TPL:", 32)?;
   let updatable_slug = model_token.clone();
@@ -190,5 +190,5 @@ SET
     }
   };
 
-  Ok(record_id)
+  Ok((record_id, model_token.clone()))
 }

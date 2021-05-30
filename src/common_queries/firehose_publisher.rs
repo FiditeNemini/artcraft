@@ -5,15 +5,48 @@ use log::{warn,info};
 use sqlx::{MySqlPool};
 use std::sync::Arc;
 use sqlx::error::Error::Database;
+use sqlx::mysql::MySqlDone;
 
+#[derive(Debug, Clone, Copy)]
 enum FirehoseEvent {
   UserSignUp,
+
+  TtsModelUploadStarted,
+  TtsModelUploadCompleted,
+  TtsInferenceStarted,
+  TtsInferenceCompleted,
+
+  W2lTemplateUploadStarted,
+  W2lTemplateUploadCompleted,
+  W2lInferenceStarted,
+  W2lInferenceCompleted,
+
+  TwitterMention,
+  TwitterRetweet,
+  DiscordJoin,
+  DiscordMessage,
+  TwitchSubscribe,
+  TwitchFollow,
 }
 
 impl FirehoseEvent {
   pub fn to_db_value(&self) -> &'static str {
     match self {
       FirehoseEvent::UserSignUp => "user_sign_up",
+      FirehoseEvent::TtsModelUploadStarted => "tts_model_upload_started",
+      FirehoseEvent::TtsModelUploadCompleted => "tts_model_upload_completed",
+      FirehoseEvent::TtsInferenceStarted => "tts_inference_started",
+      FirehoseEvent::TtsInferenceCompleted => "tts_inference_completed",
+      FirehoseEvent::W2lTemplateUploadStarted => "w2l_template_upload_started",
+      FirehoseEvent::W2lTemplateUploadCompleted => "w2l_template_upload_completed",
+      FirehoseEvent::W2lInferenceStarted => "w2l_inference_started",
+      FirehoseEvent::W2lInferenceCompleted => "w2l_inference_completed",
+      FirehoseEvent::TwitterMention => "twitter_mention",
+      FirehoseEvent::TwitterRetweet => "twitter_retweet",
+      FirehoseEvent::DiscordJoin => "discord_join",
+      FirehoseEvent::DiscordMessage => "discord_message",
+      FirehoseEvent::TwitchSubscribe => "twitch_subscribe",
+      FirehoseEvent::TwitchFollow => "twitch_follow",
     }
   }
 }
@@ -29,6 +62,49 @@ impl FirehosePublisher {
     let token = random_prefix_crockford_token("EV", 32)?;
     let event_type = FirehoseEvent::UserSignUp;
 
+    let _record_id = self.insert(
+      event_type,
+      Some(user_token),
+      Some(user_token)
+    ).await?;
+
+    Ok(())
+  }
+
+  pub async fn publish_w2l_template_upload_enqueue(&self, user_token: &str, job_token: &str) -> AnyhowResult<()> {
+    let token = random_prefix_crockford_token("EV", 32)?;
+    let event_type = FirehoseEvent::W2lTemplateUploadStarted;
+
+    let _record_id = self.insert(
+      event_type,
+      Some(user_token),
+      Some(job_token)
+    ).await?;
+
+    Ok(())
+  }
+
+  pub async fn publish_w2l_template_upload_finished(&self, user_token: &str, template_token: &str) -> AnyhowResult<()> {
+    let token = random_prefix_crockford_token("EV", 32)?;
+    let event_type = FirehoseEvent::W2lTemplateUploadCompleted;
+
+    let _record_id = self.insert(
+      event_type,
+      Some(user_token),
+      Some(template_token)
+    ).await?;
+
+    Ok(())
+  }
+
+  async fn insert(
+    &self,
+    event_type: FirehoseEvent,
+    user_token: Option<&str>,
+    entity_token: Option<&str>
+  ) -> AnyhowResult<u64> {
+    let token = random_prefix_crockford_token("EV", 32)?;
+
     let query_result = sqlx::query!(
         r#"
 INSERT INTO firehose_entries
@@ -41,11 +117,16 @@ SET
       token,
       event_type.to_db_value(),
       user_token,
-      user_token,
+      entity_token,
     )
       .execute(&self.mysql_pool)
       .await;
 
+    let record_id = Self::handle_results(query_result)?;
+    Ok(record_id)
+  }
+
+  fn handle_results(query_result: Result<MySqlDone, sqlx::Error>) -> AnyhowResult<u64> {
     let record_id = match query_result {
       Ok(res) => {
         res.last_insert_id()
@@ -75,7 +156,6 @@ SET
       }
     };
 
-
-    Ok(())
+    Ok(record_id)
   }
 }
