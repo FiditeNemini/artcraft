@@ -46,6 +46,12 @@ pub struct W2lResultRecordForResponse {
   pub maybe_creator_user_token: Option<String>,
   pub maybe_creator_username: Option<String>,
   pub maybe_creator_display_name: Option<String>,
+  pub maybe_creator_gravatar_hash: Option<String>,
+
+  pub maybe_template_creator_user_token: Option<String>,
+  pub maybe_template_creator_username: Option<String>,
+  pub maybe_template_creator_display_name: Option<String>,
+  pub maybe_template_creator_gravatar_hash: Option<String>,
 
   pub file_size_bytes: u32,
   pub frame_width: u32,
@@ -91,6 +97,12 @@ pub struct RawW2lResultRecord {
   pub maybe_creator_user_token: Option<String>,
   pub maybe_creator_username: Option<String>,
   pub maybe_creator_display_name: Option<String>,
+  pub maybe_creator_gravatar_hash: Option<String>,
+
+  pub maybe_template_creator_user_token: Option<String>,
+  pub maybe_template_creator_username: Option<String>,
+  pub maybe_template_creator_display_name: Option<String>,
+  pub maybe_template_creator_gravatar_hash: Option<String>,
 
   pub file_size_bytes: i32,
   pub frame_width: i32,
@@ -156,6 +168,12 @@ SELECT
     users.token as maybe_creator_user_token,
     users.username as maybe_creator_username,
     users.display_name as maybe_creator_display_name,
+    users.email_gravatar_hash as maybe_creator_gravatar_hash,
+
+    template_users.token as maybe_template_creator_user_token,
+    template_users.username as maybe_template_creator_username,
+    template_users.display_name as maybe_template_creator_display_name,
+    template_users.email_gravatar_hash as maybe_template_creator_gravatar_hash,
 
     w2l_results.file_size_bytes,
     w2l_results.frame_width,
@@ -169,6 +187,8 @@ LEFT OUTER JOIN w2l_templates
   ON w2l_results.maybe_w2l_template_token = w2l_templates.token
 LEFT OUTER JOIN users
   ON w2l_results.maybe_creator_user_token = users.token
+LEFT OUTER JOIN users as template_users
+  ON w2l_templates.creator_user_token = template_users.token
 WHERE
     w2l_results.deleted_at IS NULL
     AND w2l_results.token = ?
@@ -206,6 +226,13 @@ WHERE
     maybe_creator_user_token: ir.maybe_creator_user_token.clone(),
     maybe_creator_username: ir.maybe_creator_username.clone(),
     maybe_creator_display_name: ir.maybe_creator_display_name.clone(),
+    maybe_creator_gravatar_hash: ir.maybe_creator_gravatar_hash.clone(),
+
+    maybe_template_creator_user_token: ir.maybe_template_creator_user_token.clone(),
+    maybe_template_creator_username: ir.maybe_template_creator_username.clone(),
+    maybe_template_creator_display_name: ir.maybe_template_creator_display_name.clone(),
+    maybe_template_creator_gravatar_hash: ir.maybe_template_creator_gravatar_hash.clone(),
+
     //is_mod_hidden_from_public: if ir.is_mod_hidden_from_public == 0 { false } else { true },
     //template_is_mod_approved: if ir.template_is_mod_approved == 0 { false } else { true },
 
