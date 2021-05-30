@@ -67,9 +67,11 @@ function Profile_W2lInferenceResultsListFc(props: Props) {
     let duration_seconds = result.duration_millis / 1000;
     let title = result.template_title.length < 5 ? `Title: ${result.template_title}` : result.template_title;
 
+    let inferenceLink = `/w2l/result/${result.w2l_result_token}`;
+
     rows.push(
       <tr>
-        <th><Link to="/">{title}</Link></th>
+        <th><Link to={inferenceLink}>{title}</Link></th>
         <td>(custom audio)</td>
         <td>{duration_seconds} s</td>
         <td>{result.created_at} s</td>

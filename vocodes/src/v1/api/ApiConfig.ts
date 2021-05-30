@@ -57,6 +57,10 @@ class ApiConfig {
     return `${this.getScheme()}://${this.getNewApiHost()}/w2l/template/${templateSlug}`;
   }
 
+  viewW2lInferenceResult(token: string) : string {
+    return `${this.getScheme()}://${this.getNewApiHost()}/w2l/result/${token}`;
+  }
+
   inferW2l() : string {
     return `${this.getScheme()}://${this.getNewApiHost()}/w2l/inference`;
   }

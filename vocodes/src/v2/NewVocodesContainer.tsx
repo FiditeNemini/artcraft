@@ -17,6 +17,7 @@ import { UploadW2lVideoFc } from './upload/UploadW2lVideoFc';
 import { W2lTemplateListFc } from './w2l_template_list/W2lTemplateListFc';
 import { W2lTemplateViewFc } from './w2l_template_view/W2lTemplateViewFc';
 import { ProfileFc } from './profile/ProfileFc';
+import { W2lResultViewFc } from './w2l_result_view/W2lResultViewFc';
 
 interface Props {
   sessionWrapper: SessionWrapper,
@@ -94,12 +95,18 @@ class NewVocodesContainer extends React.Component<Props, State> {
               />
             </Route>
 
+            <Route path="/w2l/result/:token">
+              <W2lResultViewFc
+                sessionWrapper={this.props.sessionWrapper}
+              />
+            </Route>
+
             <Route path="/w2l/:templateSlug">
               <W2lTemplateViewFc
                 sessionWrapper={this.props.sessionWrapper}
               />
-
             </Route>
+
             <Route path="/video">
               <W2lTemplateListFc
                 sessionWrapper={this.props.sessionWrapper}
