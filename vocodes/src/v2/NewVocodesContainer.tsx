@@ -3,20 +3,19 @@ import { FirehoseComponent } from './firehose/FirehoseComponent';
 import { LoginFc } from './login/LoginFc';
 import { NewTopNavFc } from './NewTopNavFc';
 import { ProfileComponent } from './profile/ProfileComponent';
-import { ProfileDataComponent } from './profile_data/ProfileDataComponent';
+import { ProfileDataFc } from './profile_data/ProfileDataFc';
 import { SessionWrapper } from '../session/SessionWrapper';
 import { SignupComponent } from './signup/SignupComponent';
 import { Switch, Route, RouteProps } from 'react-router-dom';
+import { TtsModelFormFc } from './tts_model/TtsModelFormFc';
 import { TtsModelListComponent } from './tts_model/TtsModelListComponent';
 import { UploadChoiceFc } from './upload/UploadChoiceFc';
+import { UploadComponent } from './upload/UploadComponent';
+import { UploadTtsModelFc } from './upload/UploadTtsModelFc';
 import { UploadW2lPhotoFc } from './upload/UploadW2lPhotoFc';
 import { UploadW2lVideoFc } from './upload/UploadW2lVideoFc';
 import { W2lTemplateListFc } from './w2l_template_list/W2lTemplateListFc';
-import { UploadTtsModelFc } from './upload/UploadTtsModelFc';
-import { UploadComponent } from './upload/UploadComponent';
 import { W2lTemplateViewFc } from './w2l_template_view/W2lTemplateViewFc';
-import { ProfileDataFc } from './profile_data/ProfileDataFc';
-import { TtsModelFormFc } from './tts_model/TtsModelFormFc';
 
 interface Props {
   sessionWrapper: SessionWrapper,
