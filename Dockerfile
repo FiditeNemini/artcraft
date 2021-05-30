@@ -4,10 +4,14 @@ FROM nvidia/cuda:10.1-devel-ubuntu18.04 as pybuild-base
 
 # NB: https://github.com/NVIDIA/nvidia-docker/issues/864#issuecomment-439848887
 # NB: We do not install ffmpeg, since the version is 3.8.* series and we need 4.2.*
+#
+# NB(2021-05-30): We need to install `cython3` for building modern Tacotron 2
+# dependencies (ie. protoc) on old Ubuntu
 RUN apt-get update \
     && apt-get install -y \
         build-essential \
         curl \
+        cython3 \
         g++-7 \
         gcc-7 \
         git \
@@ -57,6 +61,16 @@ RUN python3.6 -m venv python
 RUN . python/bin/activate \
   && pip install --upgrade pip \
   && pip install -r requirements.txt
+  && deactivate
+
+COPY models/tacotron2 ./models/tacotron2
+WORKDIR models/tacotron2
+
+RUN python3.6 -m venv python
+RUN . python/bin/activate \
+  && pip install --upgrade pip \
+  && pip install -r requirements.txt
+  && deactivate
 
 # ==================== Rust Build Base ====================
 

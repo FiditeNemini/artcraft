@@ -6,6 +6,7 @@
 __pycache__/
 _ignored_schema.rs
 models/Wav2Lip/python/
+models/tacotron2/python/
 production_database_secret_connect.sh
 secrets.toml
 secrets.yaml
