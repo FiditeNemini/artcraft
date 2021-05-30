@@ -215,6 +215,13 @@ VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? )
 
   info!("new user session created");
 
+  server_state.firehose_publisher.publish_user_sign_up(&user_token)
+    .await
+    .map_err(|e| {
+      warn!("error publishing event: {:?}", e);
+      CreateAccountError::ServerError
+    })?;
+
   let session_cookie = match server_state.cookie_manager.create_cookie(&session_token) {
     Ok(cookie) => cookie,
     Err(_) => return Err(ServerError),

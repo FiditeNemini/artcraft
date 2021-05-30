@@ -53,6 +53,7 @@ use crate::buckets::bucket_client::BucketClient;
 use crate::http_server::endpoints::users::list_user_w2l_templates::list_user_w2l_templates_handler;
 use crate::http_server::endpoints::users::list_user_w2l_inference_results::list_user_w2l_inference_results_handler;
 use crate::http_server::endpoints::w2l::get_w2l_result::get_w2l_inference_result_handler;
+use crate::common_queries::firehose_publisher::FirehosePublisher;
 
 const DEFAULT_BIND_ADDRESS : &'static str = "0.0.0.0:12345";
 
@@ -104,6 +105,10 @@ async fn main() -> AnyhowResult<()> {
     .connect(&db_connection_string)
     .await?;
 
+  let firehose_publisher = FirehosePublisher {
+    mysql_pool: pool.clone(), // NB: Pool is clone/sync/send-safe
+  };
+
   info!("Reading env vars and setting up utils...");
 
   let bind_address = easyenv::get_env_string_or_default("BIND_ADDRESS", DEFAULT_BIND_ADDRESS);
@@ -153,6 +158,7 @@ async fn main() -> AnyhowResult<()> {
     },
     hostname: server_hostname,
     mysql_pool: pool,
+    firehose_publisher,
     cookie_manager,
     session_checker,
     private_bucket_client,

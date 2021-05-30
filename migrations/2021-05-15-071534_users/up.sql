@@ -5,7 +5,7 @@ CREATE TABLE users (
   -- Not used for anything except replication.
   id BIGINT(20) NOT NULL AUTO_INCREMENT,
 
-  -- Effective "primary key"
+  -- Visible "primary key"
   token VARCHAR(32) NOT NULL,
 
   -- Username is a lookup key; display_name allows the user to add custom case.
