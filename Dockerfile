@@ -36,6 +36,7 @@ RUN apt-get update
 
 # Notes on packages:
 #  * software-properties-common - needed for `apt-add-repository`
+#  * pciutils - needed for `lspci | grep -i nvidia`
 RUN apt-get install -y \
         build-essential \
         curl \
@@ -56,7 +57,7 @@ RUN apt-get install -y \
         libxext6 \
         libxrender-dev \
         netcat \
-        software-properties-common \
+        pciutils \
         python-dev \
         python3-pip \
         python3.8 \
@@ -64,6 +65,7 @@ RUN apt-get install -y \
         python3.8-venv\
         redis-tools \
         silversearcher-ag \
+        software-properties-common \
         sox \
         tmux \
         vim \
