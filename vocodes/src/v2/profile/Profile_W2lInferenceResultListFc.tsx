@@ -70,6 +70,7 @@ function Profile_W2lInferenceResultsListFc(props: Props) {
     rows.push(
       <tr>
         <th><Link to="/">{title}</Link></th>
+        <td>(custom audio)</td>
         <td>{duration_seconds} s</td>
         <td>{result.created_at} s</td>
       </tr>
@@ -81,7 +82,8 @@ function Profile_W2lInferenceResultsListFc(props: Props) {
       <table className="table">
         <thead>
           <tr>
-            <th><abbr title="Detail">Title</abbr></th>
+            <th><abbr title="Detail">Template</abbr></th>
+            <th><abbr title="Detail">Audio Source</abbr></th>
             <th><abbr title="Detail">Duration</abbr></th>
             <th><abbr title="Value">Creation Date (UTC)</abbr></th>
           </tr>
