@@ -1,19 +1,28 @@
 # ==================== Python Build Base ====================
 
+
 #FROM nvidia/cuda:10.1-devel-ubuntu18.04 as pybuild-base
+FROM nvidia/cuda:11.3.0-devel-ubuntu20.04 as pybuild-base
+
+# tzdata install hangs without presetting the time zone
+ENV TZ=UTC
+RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
 # NB(2021-05-30): This is the image that Tacotron 2's Dockerfile specifies.
 # I have not tried this, but it might be necessary.
-FROM pytorch/pytorch:nightly-devel-cuda10.0-cudnn7
-ENV PATH /usr/local/nvidia/bin:/usr/local/cuda/bin:${PATH}
+#FROM pytorch/pytorch:nightly-devel-cuda10.0-cudnn7
+#ENV PATH /usr/local/nvidia/bin:/usr/local/cuda/bin:${PATH}
 
 # NB: https://github.com/NVIDIA/nvidia-docker/issues/864#issuecomment-439848887
 # NB: We do not install ffmpeg, since the version is 3.8.* series and we need 4.2.*
 #
 # NB(2021-05-30): We need to install `cython3` for building modern Tacotron 2
 # dependencies (ie. protoc) on old Ubuntu
-RUN apt-get update \
-    && apt-get install -y \
+# RUN apt-get update \
+#     && apt-get install -y \
+RUN apt-get update
+#RUN apt-cache search python3.8
+RUN apt-get install -y \
         build-essential \
         curl \
         cython3 \
@@ -34,9 +43,9 @@ RUN apt-get update \
         netcat \
         python-dev \
         python3-pip \
-        python3.6 \
-        python3.6-dev \
-        python3.6-venv\
+        python3.8 \
+        python3.8-dev \
+        python3.8-venv\
         redis-tools \
         silversearcher-ag \
         sox \
@@ -61,8 +70,9 @@ FROM pybuild-base as pybuild-requirements
 COPY models/Wav2Lip ./models/Wav2Lip
 WORKDIR models/Wav2Lip
 
-RUN python3.6 --version
-RUN python3.6 -m venv python
+RUN python3.8 --version
+RUN python3.8 -m venv python
+
 RUN . python/bin/activate \
   && pip install --upgrade pip \
   && pip install -r requirements.txt \
@@ -71,7 +81,7 @@ RUN . python/bin/activate \
 COPY models/tacotron2 ./models/tacotron2
 WORKDIR models/tacotron2
 
-RUN python3.6 -m venv python
+RUN python3.8 -m venv python
 RUN . python/bin/activate \
   && pip install --upgrade pip \
   && pip install -r requirements.txt \
