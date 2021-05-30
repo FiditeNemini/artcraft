@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { ApiConfig } from '../../v1/api/ApiConfig';
 import { SessionWrapper } from '../../session/SessionWrapper';
 import { Link } from "react-router-dom";
@@ -39,7 +39,7 @@ interface Props {
 function FirehoseEventListFc(props: Props) {
   const [firehoseEvents, setFirehoseEvents] = useState<Array<FirehoseEvent>>([]);
 
-  useEffect(() => {
+  const fetchEvents = () => {
     const api = new ApiConfig();
     const endpointUrl = api.firehoseEvents();
 
@@ -63,7 +63,35 @@ function FirehoseEventListFc(props: Props) {
     .catch(e => {
       // ignored
     });
-  }, []); // NB: Empty array dependency sets to run ONLY on mount
+  };
+
+  const componentIsMounted = useRef(true)
+
+  const doSetTimeout = () => {
+    fetchEvents()
+    if (componentIsMounted.current) {
+      setTimeout(doSetTimeout, 5000);
+    }
+  }
+
+
+  useEffect(() => {
+    doSetTimeout();
+    return () => {
+      componentIsMounted.current = false
+    }
+  }, []) // NB: Empty array dependency sets to run ONLY on mount
+
+  //const pollingAsync = useCallback(()=> {
+  //  async () => {
+  //    try {
+  //      //await someLongRunningProcess()
+  //      if (componentIsMounted.current) {
+  //      }
+  //    } catch (err) {
+  //    }
+  //  }
+  //}, [setFirehoseEvents])
 
   let eventItems : Array<JSX.Element> = [];
 
