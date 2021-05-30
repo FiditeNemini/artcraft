@@ -33,6 +33,7 @@ pub struct EventRecord {
   pub maybe_target_user_token: Option<String>,
   pub maybe_target_username: Option<String>,
   pub maybe_target_display_name: Option<String>,
+  pub maybe_target_user_gravatar_hash: Option<String>,
   pub maybe_target_entity_token: Option<String>,
   pub created_at: DateTime<Utc>,
   pub updated_at: DateTime<Utc>,
@@ -98,6 +99,7 @@ SELECT
     events.maybe_target_user_token,
     users.username as maybe_target_username,
     users.display_name as maybe_target_display_name,
+    users.email_gravatar_hash as maybe_target_user_gravatar_hash,
     events.maybe_target_entity_token,
     events.created_at,
     events.updated_at
