@@ -34,7 +34,7 @@ function Profile_W2lTemplateListFc(props: Props) {
 
   useEffect(() => {
     const api = new ApiConfig();
-    const endpointUrl = api.listW2lForUser(props.username);
+    const endpointUrl = api.listW2lTemplatesForUser(props.username);
 
     fetch(endpointUrl, {
       method: 'GET',

@@ -65,9 +65,14 @@ class ApiConfig {
     return `${this.getScheme()}://${this.getNewApiHost()}/profile/${username}`;
   }
 
-  listW2lForUser(username: string) : string {
+  listW2lTemplatesForUser(username: string) : string {
     return `${this.getScheme()}://${this.getNewApiHost()}/user/${username}/w2l_templates`;
   }
+
+  listW2lInferenceResultsForUser(username: string) : string {
+    return `${this.getScheme()}://${this.getNewApiHost()}/user/${username}/w2l_results`;
+  }
+
 
   private getScheme() : string {
     return this.isLocalDev ? "http" : "https";

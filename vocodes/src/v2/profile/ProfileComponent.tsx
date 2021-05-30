@@ -3,6 +3,7 @@ import { ApiConfig } from '../../v1/api/ApiConfig';
 import { Profile_W2lTemplateListFc } from './Profile_W2lTemplateListFc';
 import { RouteProps } from 'react-router-dom';
 import { SessionWrapper } from '../../session/SessionWrapper';
+import { Profile_W2lInferenceResultsListFc } from './Profile_W2lInferenceResultListFc';
 
 interface ProfileResponsePayload {
   success: boolean,
@@ -114,6 +115,12 @@ class ProfileComponent extends React.Component<Props, State> {
 
         <h3 className="title is-3"> Uploaded Templates </h3>
         <Profile_W2lTemplateListFc username={username} />
+
+        <br />
+        <br />
+
+        <h3 className="title is-3"> Lipsync Results </h3>
+        <Profile_W2lInferenceResultsListFc username={username} />
 
       </div>
     )
