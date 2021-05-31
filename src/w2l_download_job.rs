@@ -44,6 +44,7 @@ use std::path::{PathBuf, Path};
 use std::process::Command;
 use std::time::Duration;
 use tempdir::TempDir;
+use std::thread;
 
 // Buckets (shared config)
 const ENV_ACCESS_KEY : &'static str = "ACCESS_KEY";
@@ -87,6 +88,12 @@ struct Downloader {
 
   // Root to store W2L templates (public and private)
   pub bucket_root_w2l_template_uploads: String,
+
+  // Temporary for debugging
+  // Arbitrary timeouts can be inserted so we can exec in and poke around.
+  pub debug_download_sleep_millis: u64,
+  pub debug_face_detect_sleep_millis: u64,
+  pub debug_job_end_sleep_millis: u64,
 }
 
 #[tokio::main]
@@ -187,6 +194,9 @@ async fn main() -> AnyhowResult<()> {
     imagemagick_image_preview_generator: ImagemagickGeneratePreviewImageCommand {},
     w2l_processor: w2l_preprecess_command,
     bucket_root_w2l_template_uploads: bucket_root.to_string(),
+    debug_download_sleep_millis: easyenv::get_env_num("DEBUG_DOWNLOAD_SLEEP_MILLIS", 0)?,
+    debug_face_detect_sleep_millis: easyenv::get_env_num("DEBUG_FACE_DETECT_SLEEP_MILLIS", 0)?,
+    debug_job_end_sleep_millis: easyenv::get_env_num("DEBUG_JOB_END_SLEEP_MILLIS", 0)?,
   };
 
   main_loop(downloader).await;
@@ -304,6 +314,11 @@ async fn process_job(downloader: &Downloader, job: &W2lTemplateUploadJobRecord) 
   let download_filename = downloader.google_drive_downloader
     .download_file(&download_url, &temp_dir).await?;
 
+  if downloader.debug_download_sleep_millis != 0 {
+    warn!("Debug sleep after download: {} ms", downloader.debug_download_sleep_millis);
+    thread::sleep(Duration::from_millis(downloader.debug_download_sleep_millis));
+  }
+
   // ==================== PROCESS FACES ==================== //
 
   // This is the Python Pickle file with all the face frames.
@@ -322,6 +337,11 @@ async fn process_job(downloader: &Downloader, job: &W2lTemplateUploadJobRecord) 
     &output_metadata_filename,
     is_image,
     spawn_process)?;
+
+  if downloader.debug_face_detect_sleep_millis != 0 {
+    warn!("Debug sleep after face detect: {} ms", downloader.debug_face_detect_sleep_millis);
+    thread::sleep(Duration::from_millis(downloader.debug_face_detect_sleep_millis));
+  }
 
   // ==================== CHECK ALL FILES EXIST AND GET METADATA ==================== //
 
@@ -491,8 +511,12 @@ async fn process_job(downloader: &Downloader, job: &W2lTemplateUploadJobRecord) 
       anyhow!("error publishing event")
     })?;
 
-
   mark_w2l_template_upload_job_done(&downloader.mysql_pool, job, true).await?;
+
+  if downloader.debug_job_end_sleep_millis != 0 {
+    warn!("Debug sleep after job end: {} ms", downloader.debug_job_end_sleep_millis);
+    thread::sleep(Duration::from_millis(downloader.debug_job_end_sleep_millis));
+  }
 
   Ok(())
 }
