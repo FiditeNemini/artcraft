@@ -29,7 +29,7 @@ interface Props {
   username: string,
 }
 
-function ProfileData_W2lTemplateListFc(props: Props) {
+function ProfileDataW2lTemplateListFc(props: Props) {
   const [w2lTemplates, setW2lTemplates] = useState<Array<W2lTemplate>>([]);
 
   useEffect(() => {
@@ -127,4 +127,4 @@ function ProfileData_W2lTemplateListFc(props: Props) {
   )
 }
 
-export { ProfileData_W2lTemplateListFc };
+export { ProfileDataW2lTemplateListFc };

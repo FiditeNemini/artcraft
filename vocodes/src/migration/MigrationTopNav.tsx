@@ -1,6 +1,6 @@
 import React from 'react';
-import { MigrationTopNav_Session } from './MigrationTopNav_Session';
-import { MigrationTopNav_VersionSwitch } from './MigrationTopNav_VersionSwitch';
+import { MigrationTopNavSession } from './MigrationTopNav_Session';
+import { MigrationTopNavVersionSwitch } from './MigrationTopNav_VersionSwitch';
 import { SessionWrapper } from '../session/SessionWrapper';
 
 interface Props {
@@ -16,10 +16,10 @@ function MigrationTopNav(props: Props) {
 
   return (
     <nav>
-      <MigrationTopNav_VersionSwitch
+      <MigrationTopNavVersionSwitch
         enableAlpha={props.enableAlpha}
         />
-      <MigrationTopNav_Session
+      <MigrationTopNavSession
         sessionWrapper={props.sessionWrapper}
         enableAlpha={props.enableAlpha}
         querySessionAction={props.querySessionAction}

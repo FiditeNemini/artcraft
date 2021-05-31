@@ -1,8 +1,8 @@
 import React, { useEffect, useState }  from 'react';
 import { SessionWrapper } from '../../session/SessionWrapper';
 import { useParams } from 'react-router-dom';
-import { Profile_W2lTemplateListFc } from './Profile_W2lTemplateListFc';
-import { Profile_W2lInferenceResultsListFc } from './Profile_W2lInferenceResultListFc';
+import { ProfileW2lTemplateListFc } from './Profile_W2lTemplateListFc';
+import { ProfileW2lInferenceResultsListFc } from './Profile_W2lInferenceResultListFc';
 import { GravatarFc } from '../common/GravatarFc';
 import { ApiConfig } from '../../v1/api/ApiConfig';
 
@@ -90,13 +90,13 @@ function ProfileFc(props: Props) {
       <br />
 
       <h3 className="title is-3"> Uploaded Templates </h3>
-      <Profile_W2lTemplateListFc username={username} />
+      <ProfileW2lTemplateListFc username={username} />
 
       <br />
       <br />
 
       <h3 className="title is-3"> Lipsync Results </h3>
-      <Profile_W2lInferenceResultsListFc username={username} />
+      <ProfileW2lInferenceResultsListFc username={username} />
 
     </div>
   )

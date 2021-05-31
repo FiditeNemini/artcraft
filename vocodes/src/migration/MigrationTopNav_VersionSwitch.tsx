@@ -5,7 +5,7 @@ interface Props {
   enableAlpha: boolean,
 }
 
-function MigrationTopNav_VersionSwitch(props: Props) {
+function MigrationTopNavVersionSwitch(props: Props) {
   if (!props.enableAlpha) {
     return <nav />
   }
@@ -26,4 +26,4 @@ function MigrationTopNav_VersionSwitch(props: Props) {
   );
 }
 
-export { MigrationTopNav_VersionSwitch };
+export { MigrationTopNavVersionSwitch };

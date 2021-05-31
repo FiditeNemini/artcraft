@@ -9,7 +9,7 @@ interface Props {
   querySessionAction: () => void,
 }
 
-function MigrationTopNav_Session(props: Props) {
+function MigrationTopNavSession(props: Props) {
   let history = useHistory();
 
   if (!props.enableAlpha) {
@@ -86,4 +86,4 @@ function MigrationTopNav_Session(props: Props) {
   );
 }
 
-export { MigrationTopNav_Session };
+export { MigrationTopNavSession };

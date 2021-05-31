@@ -32,7 +32,7 @@ interface Props {
   username: string,
 }
 
-function Profile_W2lInferenceResultsListFc(props: Props) {
+function ProfileW2lInferenceResultsListFc(props: Props) {
   const [w2lResults, setW2lResults] = useState<Array<W2lInferenceResult>>([]);
 
   useEffect(() => {
@@ -100,4 +100,4 @@ function Profile_W2lInferenceResultsListFc(props: Props) {
   )
 }
 
-export { Profile_W2lInferenceResultsListFc };
+export { ProfileW2lInferenceResultsListFc };
