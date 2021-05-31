@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { ApiConfig } from '../../v1/api/ApiConfig';
 import { SessionWrapper } from '../../session/SessionWrapper';
-import { useHistory, useParams, Link } from 'react-router-dom';
+import { useParams, Link } from 'react-router-dom';
 import { GravatarFc } from '../common/GravatarFc';
 
 interface W2lInferenceResultResponsePayload {
@@ -40,7 +40,6 @@ interface Props {
 }
 
 function W2lResultViewFc(props: Props) {
-  let history = useHistory();
   let { token } = useParams();
 
   const [w2lInferenceResult, setW2lInferenceResult] = useState<W2lInferenceResult|undefined>(undefined);
@@ -68,7 +67,7 @@ function W2lResultViewFc(props: Props) {
     .catch(e => {
       //this.props.onSpeakErrorCallback();
     });
-  }, []); // NB: Empty array dependency sets to run ONLY on mount
+  }, [token]); // NB: Empty array dependency sets to run ONLY on mount
 
   if (w2lInferenceResult === undefined) {
     return <div />;

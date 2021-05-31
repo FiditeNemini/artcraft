@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { ApiConfig } from '../../v1/api/ApiConfig';
-import { RouteProps, useHistory, useParams, Link } from 'react-router-dom';
+import { useParams, Link } from 'react-router-dom';
 import { SessionWrapper } from '../../session/SessionWrapper';
 import { v1 as uuidv1 } from 'uuid';
 
@@ -32,7 +32,6 @@ interface Props {
 }
 
 function W2lTemplateViewFc(props: Props) {
-  let history = useHistory();
   let { templateSlug } = useParams();
 
   const [w2lTemplate, setW2lTemplate] = useState<W2lTemplate|undefined>(undefined);
@@ -51,7 +50,6 @@ function W2lTemplateViewFc(props: Props) {
     })
     .then(res => res.json())
     .then(res => {
-      console.log('list', res);
       const templatesResponse : W2lTemplateViewResponsePayload = res;
       if (!templatesResponse.success) {
         return;
@@ -62,7 +60,7 @@ function W2lTemplateViewFc(props: Props) {
     .catch(e => {
       //this.props.onSpeakErrorCallback();
     });
-  }, []); // NB: Empty array dependency sets to run ONLY on mount
+  }, [templateSlug]); // NB: Empty array dependency sets to run ONLY on mount
 
   const handleAudioFileChange = (fileList: FileList|null) => {
     if (fileList === null 
