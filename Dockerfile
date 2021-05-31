@@ -101,6 +101,9 @@ FROM ghcr.io/storytold/docker-base-images-nvidia-cuda-experimental:080f96bc7087 
 #    && apt-get install -y ffmpeg
 #
 
+# The downloader needs youtube-dl as a python library
+RUN pip3 install --upgrade youtube-dl
+
 # ==================== Python Build Step 2: Wav2Lip Requirements ====================
 
 FROM pybuild-base as pybuild-requirements
