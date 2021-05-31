@@ -22,7 +22,9 @@ from text import text_to_sequence
 # NB(bt, 2021-05-31): Trying to get everything on the same device
 torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-from vocodes_wav_images import render_histogram
+# NB(bt, 2021-05-31): This is just a utility for testing mel output
+# The outputs look good so far...
+#from vocodes_wav_images import render_histogram
 
 # 2
 def plot_data(data, figsize=(16, 4)):
@@ -37,7 +39,9 @@ hparams.sampling_rate = 22050
 
 # Fix bug running on CPU?
 #torch.set_default_dtype(torch.float16)
-torch.set_default_tensor_type('torch.DoubleTensor')
+# NB(bt, 2021-05-31): Perhaps this is blocking waveglow? It complains of the wrong tensor type.
+#torch.set_default_tensor_type('torch.DoubleTensor') # 2021-05-31 commented out
+torch.set_default_tensor_type('torch.HalfTensor') # 2021-05-31 added
 
 # 4
 checkpoint_path = "/home/bt/models/tacotron2-nvidia/tacotron2_statedict.pt"
@@ -60,9 +64,11 @@ model = model.to(device)
 _ = model.cuda().eval()
 
 # 5
-#waveglow_path = 'waveglow_256channels.pt'
-#waveglow = torch.load(waveglow_path)['model']
-#waveglow.cuda().eval().half()
+#waveglow_path = '/home/bt/models/waveglow_256channels.pt'
+waveglow_path = '/home/bt/models/waveglow/waveglow_256channels_v4_uberduck.pt'
+waveglow_path = '/home/bt/models/waveglow/waveglow_256channels_universal_v5.pt'
+waveglow = torch.load(waveglow_path)['model']
+waveglow.cuda().eval().half()
 #for k in waveglow.convinv:
 #    k.float()
 #denoiser = Denoiser(waveglow)
@@ -118,12 +124,20 @@ torch.save(mel_outputs, 'mel_outputs.mel')
 torch.save(mel_outputs_postnet, 'mel_outputs_postnet.mel')
 
 #print('Rendering histograms')
-render_histogram(mel_outputs, 'mel_outputs.png')
-render_histogram(mel_outputs_postnet, 'mel_outputs_postnet.png')
+#render_histogram(mel_outputs, 'mel_outputs.png')
+#render_histogram(mel_outputs_postnet, 'mel_outputs_postnet.png')
 
 # 8
 with torch.no_grad():
-    #audio = waveglow.infer(mel_outputs_postnet, sigma=0.666)
+    audio = waveglow.infer(mel_outputs_postnet, sigma=0.666)
     pass
+
+
 #ipd.Audio(audio[0].data.cpu().numpy(), rate=hparams.sampling_rate)
+
+# https://pytorch.org/hub/nvidia_deeplearningexamples_waveglow/
+audio_numpy = audio[0].data.cpu().numpy()
+rate = 22050
+from scipy.io.wavfile import write
+write("audio.wav", rate, audio_numpy)
 
