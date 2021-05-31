@@ -1,1 +1,10 @@
+# We can't redirect everything until legacy vocodes is dead
+/firehose*   /index.html   200
+/login*   /index.html   200
+/old*   /index.html   200
 /profile*   /index.html   200
+/signup*   /index.html   200
+/tts*   /index.html   200
+/upload*   /index.html   200
+/video*   /index.html   200
+/w2l*   /index.html   200
