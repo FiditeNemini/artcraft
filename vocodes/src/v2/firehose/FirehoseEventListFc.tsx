@@ -78,6 +78,8 @@ function FirehoseEventListFc(props: Props) {
     return () => {
       componentIsMounted.current = false
     }
+    // NB: This is a valid use case
+    // eslint-disable-next-line
   }, []) // NB: Empty array dependency sets to run ONLY on mount
 
   let eventItems : Array<JSX.Element> = [];
