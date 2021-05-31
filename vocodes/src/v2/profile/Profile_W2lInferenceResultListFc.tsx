@@ -48,7 +48,6 @@ function Profile_W2lInferenceResultsListFc(props: Props) {
     })
     .then(res => res.json())
     .then(res => {
-      console.log('list', res);
       const templatesResponse : W2lInferenceResultListResponsePayload  = res;
       if (!templatesResponse.success) {
         return;
@@ -59,7 +58,7 @@ function Profile_W2lInferenceResultsListFc(props: Props) {
     .catch(e => {
       //this.props.onSpeakErrorCallback();
     });
-  }, []); // NB: Empty array dependency sets to run ONLY on mount
+  }, [props.username]); // NB: Empty array dependency sets to run ONLY on mount
 
   let rows : Array<JSX.Element> = [];
   
@@ -71,8 +70,8 @@ function Profile_W2lInferenceResultsListFc(props: Props) {
     let templateLink = `/w2l/${result.maybe_w2l_template_token}`;
 
     rows.push(
-      <tr>
-        <th><Link to={inferenceLink}>▶️ Result</Link></th>
+      <tr key={result.w2l_result_token}>
+          <th><Link to={inferenceLink}><span role="img" aria-label="result link">▶️</span> Result</Link></th>
         <th><Link to={templateLink}>{templateTitle}</Link></th>
         <td>(custom audio)</td>
         <td>{duration_seconds} s</td>

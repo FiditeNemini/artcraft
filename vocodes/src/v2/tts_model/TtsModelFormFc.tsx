@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { ApiConfig } from '../../v1/api/ApiConfig';
 import { SessionWrapper } from '../../session/SessionWrapper';
-import { useHistory, Link } from "react-router-dom";
+import { Link } from "react-router-dom";
 
 interface TtsModelListResponsePayload {
   success: boolean,
@@ -25,10 +25,8 @@ interface Props {
 }
 
 function TtsModelFormFc(props: Props) {
-  let history = useHistory();
-
   const [ttsModels, setTtsModels] = useState<Array<TtsModel>>([]);
-  const [selectedTtsModel, setSelectedTtsModel] = useState<TtsModel|undefined>(undefined);
+  //const [selectedTtsModel, setSelectedTtsModel] = useState<TtsModel|undefined>(undefined);
 
   useEffect(() => {
     const api = new ApiConfig();
@@ -50,10 +48,10 @@ function TtsModelFormFc(props: Props) {
       }
 
       setTtsModels(ttsModelResponse.models)
-    })
-    .catch(e => {
-      //this.props.onSpeakErrorCallback();
     });
+    //.catch(e => {
+    //  //this.props.onSpeakErrorCallback();
+    //});
   }, []); // NB: Empty array dependency sets to run ONLY on mount
 
   let listItems: Array<JSX.Element> = [];

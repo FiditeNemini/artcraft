@@ -45,7 +45,6 @@ function ProfileData_W2lTemplateListFc(props: Props) {
     })
     .then(res => res.json())
     .then(res => {
-      console.log('list', res);
       const templatesResponse : W2lTemplateListResponsePayload  = res;
       if (!templatesResponse.success) {
         return;
@@ -56,7 +55,7 @@ function ProfileData_W2lTemplateListFc(props: Props) {
     .catch(e => {
       //this.props.onSpeakErrorCallback();
     });
-  }, []); // NB: Empty array dependency sets to run ONLY on mount
+  }, [props.username]); // NB: Empty array dependency sets to run ONLY on mount
 
   
   let templateElements : Array<JSX.Element> = [];
@@ -81,7 +80,7 @@ function ProfileData_W2lTemplateListFc(props: Props) {
       <div className="tile is-parent">
         <article className="tile is-child box">
           {/*<p className="title">One</p>*/}
-          <Link to={link}><img src={url} /></Link>
+          <Link to={link}><img src={url} alt="template thumbnail" /></Link>
         </article>
       </div>
     ));

@@ -1,8 +1,7 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { ApiConfig } from '../../v1/api/ApiConfig';
 import { SessionWrapper } from '../../session/SessionWrapper';
 import { Link } from "react-router-dom";
-import { getRandomInt } from '../../Utils';
 import { GravatarFc } from '../common/GravatarFc';
 
 interface FirehoseEventListResponsePayload {
@@ -278,7 +277,7 @@ function FirehoseEventListFc(props: Props) {
     }
 
     eventItems.push((
-      <li>{inner}</li>
+      <li key={event.event_token}>{inner}</li>
     ));
   });
 

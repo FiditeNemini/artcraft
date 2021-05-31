@@ -13,8 +13,8 @@ function UploadTtsModelFc(props: Props) {
 
   const [downloadUrl, setDownloadUrl] = useState('')
   const [title, setTitle] = useState('')
-  const [downloadUrlInvalidReason, setDownloadUrlInvalidReason] = useState('')
-  const [titleInvalidReason, setTitleInvalidReason] = useState('')
+  const [downloadUrlInvalidReason] = useState('')
+  const [titleInvalidReason] = useState('')
 
   if (!props.sessionWrapper.isLoggedIn()) {
     history.push('/signup');

@@ -46,7 +46,6 @@ function W2lTemplateListFc(props: Props) {
     })
     .then(res => res.json())
     .then(res => {
-      console.log('list', res);
       const templatesResponse : W2lTemplateListResponsePayload  = res;
       if (!templatesResponse.success) {
         return;
@@ -79,10 +78,9 @@ function W2lTemplateListFc(props: Props) {
     let link = `/w2l/${t.updatable_slug}`;
   
     templateElements.push((
-      <div className="tile is-parent">
+      <div className="tile is-parent" key={t.template_token}>
         <article className="tile is-child box">
-          {/*<p className="title">One</p>*/}
-          <Link to={link}><img src={url} /></Link>
+          <Link to={link}><img src={url} alt="template" /></Link>
         </article>
       </div>
     ));
@@ -91,6 +89,10 @@ function W2lTemplateListFc(props: Props) {
   let allRowsOfTemplateElements : Array<JSX.Element> = [];
   let rowOfTemplateElements : Array<JSX.Element> = [];
 
+  // NB: To prevent React spamming about children having unique key props
+  let rowKey = "row0";
+  let rowIndex = 0;
+
   let nextRowSize = getRandomInt(3, 4);
 
   templateElements.forEach(el => {
@@ -98,11 +100,13 @@ function W2lTemplateListFc(props: Props) {
 
     if (rowOfTemplateElements.length === nextRowSize) {
       allRowsOfTemplateElements.push(
-        <div className="tile is-ancestor">
+        <div className="tile is-ancestor" key={rowKey}>
           {rowOfTemplateElements.map(el => el)}
         </div>
       );
       rowOfTemplateElements = [];
+      rowIndex += 1;
+      rowKey = `row${rowIndex}`;
 
       // Don't have the same number on each row.
       let lastRowSize = nextRowSize;
@@ -115,7 +119,7 @@ function W2lTemplateListFc(props: Props) {
   // Make sure last row is built.
   if (rowOfTemplateElements.length !== 0) {
     allRowsOfTemplateElements.push(
-      <div className="tile is-ancestor">
+      <div className="tile is-ancestor" key={rowKey}>
         {rowOfTemplateElements.map(el => el)}
       </div>
     );

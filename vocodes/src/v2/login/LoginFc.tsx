@@ -1,13 +1,13 @@
 import React, { useState } from 'react';
 import { SessionWrapper } from '../../session/SessionWrapper';
-import { useHistory, withRouter } from "react-router-dom";
+import { useHistory } from "react-router-dom";
 import { ApiConfig } from '../../v1/api/ApiConfig';
 
-enum FieldTriState {
-  EMPTY_FALSE,
-  FALSE,
-  TRUE,
-}
+//enum FieldTriState {
+//  EMPTY_FALSE,
+//  FALSE,
+//  TRUE,
+//}
 
 interface Props {
   sessionWrapper: SessionWrapper,
@@ -19,8 +19,8 @@ function LoginFc(props: Props) {
 
   const [password, setPassword] = useState('')
   const [usernameOrEmail, setUsernameOrEmail] = useState('')
-  const [usernameOrEmailValid, setUsernameOrEmailValid] = useState(FieldTriState.EMPTY_FALSE)
-  const [usernameOrEmailInvalidReason, setUsernameOrEmailInvalidReason] = useState('')
+  //const [usernameOrEmailValid, setUsernameOrEmailValid] = useState(FieldTriState.EMPTY_FALSE)
+  //const [usernameOrEmailInvalidReason, setUsernameOrEmailInvalidReason] = useState('')
 
   if (props.sessionWrapper.isLoggedIn()) {
     history.push('/');
@@ -69,9 +69,8 @@ function LoginFc(props: Props) {
         history.push('/');
       }
     })
-    .catch(e => {
-      //this.props.onSpeakErrorCallback();
-    });
+    //.catch(e => {
+    //});
 
     return false;
   }

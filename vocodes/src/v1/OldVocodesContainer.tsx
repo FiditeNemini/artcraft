@@ -15,11 +15,8 @@ import { VideoJob, VideoJobStatus } from './modes/video/VideoJob';
 import { VideoJobPoller } from './modes/video/VideoJobPoller';
 import { VideoQueuePoller } from './modes/video/VideoQueuePoller';
 import { VideoQueueStats } from './modes/video/VideoQueueStats';
-import { SignupComponent } from '../v2/signup/SignupComponent';
 import { ApiConfig } from './api/ApiConfig';
 import { SessionStateResponse } from './api/SessionState';
-import { LoginComponent } from '../v2/login/LoginComponent';
-import { UploadComponent } from '../v2/upload/UploadComponent';
 
 interface Props {
   // Certan browsers (iPhone) have pitiful support for drawing APIs. Worse yet,

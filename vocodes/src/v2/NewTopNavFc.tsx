@@ -1,5 +1,4 @@
 import React from 'react';
-import { SessionStateResponse } from '../v1/api/SessionState';
 import { SessionWrapper } from '../session/SessionWrapper';
 import { Link } from 'react-router-dom';
 

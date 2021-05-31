@@ -54,8 +54,6 @@ function ProfileFc(props: Props) {
     })
     .then(res => res.json())
     .then(res => {
-      console.log('list', res);
-
       const profileResponse : ProfileResponsePayload = res;
 
       if (profileResponse === undefined ||
@@ -69,7 +67,7 @@ function ProfileFc(props: Props) {
       //this.props.onSpeakErrorCallback();
     });
 
-  }, []); // NB: Empty array dependency sets to run ONLY on mount
+  }, [username]); // NB: Empty array dependency sets to run ONLY on mount
 
   let userEmailHash = "dne";
   if (userData !== undefined) {
