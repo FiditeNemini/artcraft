@@ -22,7 +22,7 @@ from text import text_to_sequence
 # NB(bt, 2021-05-31): Trying to get everything on the same device
 torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-#from wav_images import render_histogram
+from vocodes_wav_images import render_histogram
 
 # 2
 def plot_data(data, figsize=(16, 4)):
@@ -118,8 +118,8 @@ torch.save(mel_outputs, 'mel_outputs.mel')
 torch.save(mel_outputs_postnet, 'mel_outputs_postnet.mel')
 
 #print('Rendering histograms')
-#render_histogram(mel_outputs, 'mel_outputs.png')
-#render_histogram(mel_outputs_postnet, 'mel_outputs_postnet.png')
+render_histogram(mel_outputs, 'mel_outputs.png')
+render_histogram(mel_outputs_postnet, 'mel_outputs_postnet.png')
 
 # 8
 with torch.no_grad():
