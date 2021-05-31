@@ -39,13 +39,15 @@ torch.set_default_tensor_type('torch.DoubleTensor')
 # 4
 checkpoint_path = "/home/bt/models/tacotron2-nvidia/tacotron2_statedict.pt"
 #checkpoint_path = "/home/bt/models/tigger_tt_model.pt"
-checkpoint_path = "/home/bt/models/uber_test_2.pt"
+#checkpoint_path = "/home/bt/models/uber_test_2.pt"
+checkpoint_path = "/home/bt/models/tacotron2/tacotron2_uberduck_JorgenVonStrangle"
 model = load_model(hparams)
-model.load_state_dict(torch.load(checkpoint_path, map_location=torch.device('cpu'))['state_dict'])
+#model.load_state_dict(torch.load(checkpoint_path, map_location=torch.device('cpu'))['state_dict'])
+model.load_state_dict(torch.load(checkpoint_path)['state_dict'])
 #model.load_state_dict(torch.jit.load(checkpoint_path, map_location=torch.device('cpu'))['state_dict'])
 #_ = model.cuda().eval().half()
 #_ = model.eval().half()
-_ = model.eval()
+_ = model.cuda().eval()
 
 # 5
 #waveglow_path = 'waveglow_256channels.pt'
