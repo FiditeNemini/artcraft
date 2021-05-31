@@ -11,9 +11,9 @@ use tempdir::TempDir;
 /// We're using this because it's a hack that gets around OAuth gateways. All the Rust
 /// crates require OAuth permissions. Ugh.
 ///
-/// Filename: `download_gdrive.py`
+/// Filename: `download_internet_file.py`
 /// Arguments:
-///   --url (google drive url)
+///   --url (google drive, web, or youtube url)
 ///   --output_file (local download filename)
 pub struct GoogleDriveDownloadCommand {
   command: String,

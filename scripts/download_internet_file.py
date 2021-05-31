@@ -13,8 +13,8 @@ import youtube_dl
 
 parser = argparse.ArgumentParser(description='Download Google Drive files, Youtube videos, or web urls')
 
-parser.add_argument('--url', type=str, help='the web url, google drive link, or youtube url')
-parser.add_argument('--output_filename', type=str, help='the output filename')
+parser.add_argument('--url', type=str, help='the web url, google drive link, or youtube url', required=True)
+parser.add_argument('--output_filename', type=str, help='the output filename', required=True)
 
 # This URL format gets an OAuth screen!! UGH!!
 # 'https://drive.google.com/file/d/15-tkgblTZpa0ifmvvyr_kgWy2cguTpAe/view?usp=sharing'

@@ -155,7 +155,7 @@ async fn main() -> AnyhowResult<()> {
   // TODO: In the future, we may want to enable downloading images or audio files.
   let download_script = easyenv::get_env_string_or_default(
     "DOWNLOAD_SCRIPT",
-    "./scripts/download_gdrive.py");
+    "./scripts/download_internet_file.py");
   let google_drive_downloader = GoogleDriveDownloadCommand::new(&download_script);
 
   let temp_directory = PathBuf::from(temp_directory);

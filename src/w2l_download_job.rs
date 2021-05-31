@@ -150,7 +150,7 @@ async fn main() -> AnyhowResult<()> {
 
   let download_script = easyenv::get_env_string_or_default(
     "DOWNLOAD_SCRIPT",
-    "./scripts/download_gdrive.py");
+    "./scripts/download_internet_file.py");
 
   let google_drive_downloader = GoogleDriveDownloadCommand::new(&download_script);
 
