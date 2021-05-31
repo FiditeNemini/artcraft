@@ -13,8 +13,8 @@ function UploadW2lVideoFc(props: Props) {
 
   const [downloadUrl, setDownloadUrl] = useState('')
   const [title, setTitle] = useState('')
-  const [downloadUrlInvalidReason, setDownloadUrlInvalidReason] = useState('')
-  const [titleInvalidReason, setTitleInvalidReason] = useState('')
+  const [downloadUrlInvalidReason, _setDownloadUrlInvalidReason] = useState('')
+  const [titleInvalidReason, _setTitleInvalidReason] = useState('')
 
   if (!props.sessionWrapper.isLoggedIn()) {
     history.push('/signup');
