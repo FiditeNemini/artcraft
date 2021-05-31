@@ -112,6 +112,13 @@ class App extends React.Component<Props, State> {
   }
 
   public render() {
+    if (this.state.migrationMode === MigrationMode.OLD_VOCODES) {
+      return (
+        <OldVocodesContainer
+          enableSpectrograms={this.props.enableSpectrograms}
+          />
+      );
+    }
 
     return (
       <BrowserRouter>
