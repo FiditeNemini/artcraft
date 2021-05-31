@@ -9,6 +9,6 @@ npm run-script build
 
 popd
 
-echo "Copying redirects configuration to build dir..."
-cp _redirects /vocodes/build
+echo "Copying redirects configuration to Netlify build dir..."
+cp _redirects vocodes/build
 
