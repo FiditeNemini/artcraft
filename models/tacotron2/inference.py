@@ -19,6 +19,9 @@ from train import load_model
 from text import text_to_sequence
 #from denoiser import Denoiser
 
+# NB(bt, 2021-05-31): Trying to get everything on the same device
+torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
 #from wav_images import render_histogram
 
 # 2
@@ -47,6 +50,13 @@ model.load_state_dict(torch.load(checkpoint_path)['state_dict'])
 #model.load_state_dict(torch.jit.load(checkpoint_path, map_location=torch.device('cpu'))['state_dict'])
 #_ = model.cuda().eval().half()
 #_ = model.eval().half()
+
+
+# NB(bt, 2021-05-31): Trying to get everything on the same device
+device = "cuda:0"
+model = model.to(device)
+
+
 _ = model.cuda().eval()
 
 # 5
@@ -79,10 +89,15 @@ sequence = torch.autograd.Variable(sequence).long()
 
 print("Sequence torch autograd: {}".format(sequence))
 
-print('Saving text sequence tensor')
-torch.save(sequence, 'text_sequence.pt')
+# NB(bt, 2021-05-31): This works. Don't need to do it.
+#print('Saving text sequence tensor')
+#torch.save(sequence, 'text_sequence.pt')
 
 print("\n\n===END TEXT===\n")
+
+
+# NB(bt, 2021-05-31): Trying to get everything to the same device
+sequence = sequence.to(device)
 
 # 7
 mel_outputs, mel_outputs_postnet, _, alignments = model.inference(sequence)
