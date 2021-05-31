@@ -48,6 +48,7 @@ checkpoint_path = "/home/bt/models/tacotron2-nvidia/tacotron2_statedict.pt"
 #checkpoint_path = "/home/bt/models/tigger_tt_model.pt"
 #checkpoint_path = "/home/bt/models/uber_test_2.pt"
 checkpoint_path = "/home/bt/models/tacotron2/tacotron2_uberduck_JorgenVonStrangle"
+checkpoint_path = "/home/bt/models/tacotron2/tacotron2_uberduck_Noire.pt"
 model = load_model(hparams)
 #model.load_state_dict(torch.load(checkpoint_path, map_location=torch.device('cpu'))['state_dict'])
 model.load_state_dict(torch.load(checkpoint_path)['state_dict'])
@@ -65,8 +66,8 @@ _ = model.cuda().eval()
 
 # 5
 #waveglow_path = '/home/bt/models/waveglow_256channels.pt'
-waveglow_path = '/home/bt/models/waveglow/waveglow_256channels_v4_uberduck.pt'
 waveglow_path = '/home/bt/models/waveglow/waveglow_256channels_universal_v5.pt'
+waveglow_path = '/home/bt/models/waveglow/waveglow_256channels_v4_uberduck.pt'
 waveglow = torch.load(waveglow_path)['model']
 waveglow.cuda().eval().half()
 #for k in waveglow.convinv:
