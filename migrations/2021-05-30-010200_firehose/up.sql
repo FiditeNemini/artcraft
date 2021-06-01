@@ -1,5 +1,6 @@
-# noinspection SqlResolveForFile
-# noinspection SqlNoDataSourceInspectionForFile
+-- noinspection SqlDialectInspectionForFile
+-- noinspection SqlNoDataSourceInspectionForFile
+-- noinspection SqlResolveForFile
 
 CREATE TABLE firehose_entries (
     -- Not used for anything except replication.
@@ -9,18 +10,6 @@ CREATE TABLE firehose_entries (
     token VARCHAR(32) NOT NULL,
 
     -- The type of the event
-    event_type VARCHAR(32) NOT NULL,
-
-    -- The target user
-    maybe_target_user_token VARCHAR(32) DEFAULT NULL,
-
-    -- The target "entity", which varies by event type.
-    maybe_target_entity_token VARCHAR(32) DEFAULT NULL,
-
-    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-
-    -- Settings
     -- DO NOT REORDER.
     -- event_type ENUM(
     --    'not-set',
@@ -40,12 +29,28 @@ CREATE TABLE firehose_entries (
     --    'twitch_subscribe',
     --    'twitch_follow'
     -- ) NOT NULL DEFAULT 'not-set',
+    event_type VARCHAR(32) NOT NULL,
+
+    -- The target user
+    maybe_target_user_token VARCHAR(32) DEFAULT NULL,
+
+    -- The target "entity", which varies by event type.
+    -- eg. a model token or template token
+    maybe_target_entity_token VARCHAR(32) DEFAULT NULL,
+
+    -- If something was created, this might be the token (if we know it)
+    -- eg. an inference job's token
+    maybe_created_entity_token VARCHAR(32) DEFAULT NULL,
+
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 
     -- INDICES --
     PRIMARY KEY (id),
     UNIQUE KEY (token),
     KEY fk_maybe_target_user_token (maybe_target_user_token),
     KEY fk_maybe_target_entity_token (maybe_target_entity_token),
+    KEY fk_maybe_created_entity_token (maybe_created_entity_token),
     KEY index_event_type (event_type)
 
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin;

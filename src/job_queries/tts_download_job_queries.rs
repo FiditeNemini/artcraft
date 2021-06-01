@@ -115,7 +115,7 @@ pub async fn insert_tts_model(pool: &MySqlPool,
                               job: &TtsUploadJobRecord,
                               private_bucket_hash: &str,
                               private_bucket_object_name: &str)
-  -> AnyhowResult<u64>
+  -> AnyhowResult<(u64, String)>
 {
   let model_token = random_prefix_crockford_token("TTS_MDL:", 32)?;
   let updatable_slug = model_token.clone();
@@ -136,7 +136,7 @@ SET
   private_bucket_hash = ?,
   private_bucket_object_name = ?
         "#,
-      model_token,
+      &model_token,
       updatable_slug,
       job.title.to_string(),
       job.creator_user_token.clone(),
@@ -158,5 +158,5 @@ SET
     }
   };
 
-  Ok(record_id)
+  Ok((record_id, model_token))
 }

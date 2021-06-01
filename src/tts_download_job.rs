@@ -6,7 +6,10 @@
 #![warn(unused_must_use)]
 //#![allow(warnings)]
 
+#[macro_use] extern crate serde_derive;
+
 pub mod buckets;
+pub mod common_queries;
 pub mod job_queries;
 pub mod script_execution;
 pub mod shared_constants;
@@ -17,6 +20,7 @@ use chrono::Utc;
 use crate::buckets::bucket_client::BucketClient;
 use crate::buckets::bucket_paths::hash_to_bucket_path;
 use crate::buckets::file_hashing::get_file_hash;
+use crate::common_queries::firehose_publisher::FirehosePublisher;
 use crate::job_queries::tts_download_job_queries::TtsUploadJobRecord;
 use crate::job_queries::tts_download_job_queries::insert_tts_model;
 use crate::job_queries::tts_download_job_queries::mark_tts_upload_job_done;
@@ -53,6 +57,7 @@ struct Downloader {
   pub download_temp_directory: PathBuf,
   pub mysql_pool: MySqlPool,
   pub bucket_client: BucketClient,
+  pub firehose_publisher: FirehosePublisher,
   pub google_drive_downloader: GoogleDriveDownloadCommand,
   // Command to run
   pub download_script: String,
@@ -116,6 +121,10 @@ async fn main() -> AnyhowResult<()> {
     .connect(&db_connection_string)
     .await?;
 
+  let firehose_publisher = FirehosePublisher {
+    mysql_pool: mysql_pool.clone(), // NB: Pool is sync/send/clone-safe
+  };
+
   let downloader = Downloader {
     download_temp_directory: temp_directory,
     mysql_pool,
@@ -123,6 +132,7 @@ async fn main() -> AnyhowResult<()> {
     download_script,
     google_drive_downloader,
     bucket_root_tts_model_uploads: bucket_root.to_string(),
+    firehose_publisher,
   };
 
   main_loop(downloader).await;
@@ -223,7 +233,7 @@ async fn process_job(downloader: &Downloader, job: &TtsUploadJobRecord) -> Anyho
   downloader.bucket_client.upload_filename(&object_name, &file_path).await?;
 
   info!("Saving model record...");
-  let id = insert_tts_model(
+  let (id, model_token) = insert_tts_model(
     &downloader.mysql_pool,
     job,
     &private_bucket_hash,
@@ -231,6 +241,13 @@ async fn process_job(downloader: &Downloader, job: &TtsUploadJobRecord) -> Anyho
     .await?;
 
   info!("Saved model record: {}", id);
+
+  downloader.firehose_publisher.publish_tts_model_upload_finished(&job.creator_user_token, &model_token)
+      .await
+      .map_err(|e| {
+        warn!("error publishing event: {:?}", e);
+        anyhow!("error publishing event")
+      })?;
 
   info!("Job done: {}", job.id);
   mark_tts_upload_job_done(&downloader.mysql_pool, job, true).await?;

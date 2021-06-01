@@ -535,6 +535,7 @@ async fn process_job(inferencer: &Inferencer, job: &W2lInferenceJobRecord) -> An
 
   inferencer.firehose_publisher.w2l_inference_finished(
     job.maybe_creator_user_token.as_deref(),
+    &job.inference_job_token,
     &inference_result_token)
     .await
     .map_err(|e| {

@@ -62,7 +62,43 @@ impl FirehosePublisher {
     let _record_id = self.insert(
     FirehoseEvent::UserSignUp,
       Some(user_token),
-      Some(user_token)
+      Some(user_token),
+    Some(user_token)
+    ).await?;
+    Ok(())
+  }
+
+  pub async fn enqueue_tts_model_upload(&self, user_token: &str, job_token: &str) -> AnyhowResult<()> {
+    let _record_id = self.insert(
+      FirehoseEvent::TtsModelUploadStarted,
+      Some(user_token),
+      None,
+      Some(job_token)
+    ).await?;
+    Ok(())
+  }
+
+  pub async fn publish_tts_model_upload_finished(&self, user_token: &str, model_token: &str) -> AnyhowResult<()> {
+    let _record_id = self.insert(
+      FirehoseEvent::TtsModelUploadCompleted,
+      Some(user_token),
+      Some(model_token),
+      Some(model_token)
+    ).await?;
+    Ok(())
+  }
+
+  pub async fn enqueue_tts_inference(
+    &self,
+    maybe_user_token: Option<&str>,
+    job_token: &str,
+    model_token: &str
+  ) -> AnyhowResult<()> {
+    let _record_id = self.insert(
+      FirehoseEvent::TtsInferenceStarted,
+      maybe_user_token,
+      Some(model_token),
+      Some(job_token)
     ).await?;
     Ok(())
   }
@@ -71,15 +107,17 @@ impl FirehosePublisher {
     let _record_id = self.insert(
       FirehoseEvent::W2lTemplateUploadStarted,
       Some(user_token),
+      None,
       Some(job_token)
     ).await?;
     Ok(())
   }
 
-  pub async fn enqueue_w2l_inference(&self, maybe_user_token: Option<&str>, job_token: &str) -> AnyhowResult<()> {
+  pub async fn enqueue_w2l_inference(&self, maybe_user_token: Option<&str>, job_token: &str, template_token: &str) -> AnyhowResult<()> {
     let _record_id = self.insert(
       FirehoseEvent::W2lInferenceStarted,
       maybe_user_token,
+      Some(template_token),
       Some(job_token)
     ).await?;
     Ok(())
@@ -89,16 +127,18 @@ impl FirehosePublisher {
     let _record_id = self.insert(
     FirehoseEvent::W2lTemplateUploadCompleted,
       Some(user_token),
-      Some(template_token)
+      Some(template_token),
+    Some(template_token)
     ).await?;
     Ok(())
   }
 
-  pub async fn w2l_inference_finished(&self, maybe_user_token: Option<&str>, job_token: &str) -> AnyhowResult<()> {
+  pub async fn w2l_inference_finished(&self, maybe_user_token: Option<&str>, job_token: &str, result_token: &str) -> AnyhowResult<()> {
     let _record_id = self.insert(
       FirehoseEvent::W2lInferenceCompleted,
       maybe_user_token,
-      Some(job_token)
+      Some(job_token), // TODO: This could be template_token
+      Some(result_token)
     ).await?;
     Ok(())
   }
@@ -109,7 +149,8 @@ impl FirehosePublisher {
     &self,
     event_type: FirehoseEvent,
     user_token: Option<&str>,
-    entity_token: Option<&str>
+    entity_token: Option<&str>,
+    created_entity_token: Option<&str>
   ) -> AnyhowResult<u64> {
     let token = random_prefix_crockford_token("EV", 32)?;
 
@@ -120,12 +161,14 @@ SET
   token = ?,
   event_type = ?,
   maybe_target_user_token = ?,
-  maybe_target_entity_token = ?
+  maybe_target_entity_token = ?,
+  maybe_created_entity_token = ?
         "#,
       token,
       event_type.to_db_value(),
       user_token,
       entity_token,
+      created_entity_token
     )
       .execute(&self.mysql_pool)
       .await;

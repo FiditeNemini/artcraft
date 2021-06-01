@@ -200,6 +200,13 @@ SET
 
   info!("new model upload job id: {}", record_id);
 
+  server_state.firehose_publisher.enqueue_tts_model_upload(&user_session.user_token, &job_token)
+      .await
+      .map_err(|e| {
+        warn!("error publishing event: {:?}", e);
+        UploadTtsModelError::ServerError
+      })?;
+
   let response = UploadTtsModelSuccessResponse {
     success: true,
     job_token: job_token.to_string(),

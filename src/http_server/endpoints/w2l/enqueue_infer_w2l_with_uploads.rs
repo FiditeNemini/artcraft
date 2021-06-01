@@ -341,7 +341,7 @@ SET
   //  .map_err(|err| HttpResponse::InternalServerError()
   //    .body(format!("Redis Err: {:?}", err)))?;
 
-  server_state.firehose_publisher.enqueue_w2l_inference(maybe_user_token.as_deref(), &job_token)
+  server_state.firehose_publisher.enqueue_w2l_inference(maybe_user_token.as_deref(), &job_token, &template_token)
     .await
     .map_err(|e| {
       warn!("error publishing event: {:?}", e);

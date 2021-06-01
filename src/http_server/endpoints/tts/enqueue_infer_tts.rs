@@ -130,7 +130,7 @@ SET
   creator_set_visibility = ?,
   status = "pending"
         "#,
-      job_token,
+      &job_token,
       request.uuid_idempotency_token.clone(),
       model_token,
       inference_text,
@@ -171,6 +171,13 @@ SET
   };
 
   info!("new w2l inference job id: {}", record_id);
+
+  server_state.firehose_publisher.enqueue_tts_inference(maybe_user_token.as_deref(), &job_token, &model_token)
+      .await
+      .map_err(|e| {
+        warn!("error publishing event: {:?}", e);
+        InferTtsError::ServerError
+      })?;
 
   let response = InferTtsSuccessResponse {
     success: true,
