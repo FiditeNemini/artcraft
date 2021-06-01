@@ -109,7 +109,7 @@ async fn main() -> AnyhowResult<()> {
   let db_connection_string =
     easyenv::get_env_string_or_default(
       "MYSQL_URL",
-      "mysql://root:root@localhost/storyteller");
+      "mysql://storyteller:password@localhost/storyteller");
 
   let pool = MySqlPoolOptions::new()
     .max_connections(5)
