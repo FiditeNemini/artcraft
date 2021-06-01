@@ -5,7 +5,6 @@
 use anyhow::anyhow;
 use chrono::{Utc, DateTime};
 use crate::util::anyhow_result::AnyhowResult;
-use crate::util::random_crockford_token::random_crockford_token;
 use crate::util::random_prefix_crockford_token::random_prefix_crockford_token;
 use log::{warn, info};
 use sqlx::MySqlPool;
@@ -33,9 +32,11 @@ pub struct TtsInferenceJobRecord {
   pub retry_at: Option<chrono::DateTime<Utc>>,
 }
 
-pub async fn query_tts_inference_job_records(pool: &MySqlPool, num_records: u32)
-                                             -> AnyhowResult<Vec<TtsInferenceJobRecord>>
-{
+pub async fn query_tts_inference_job_records(
+  pool: &MySqlPool,
+  num_records: u32
+) -> AnyhowResult<Vec<TtsInferenceJobRecord>> {
+
   let job_records = sqlx::query_as!(
       TtsInferenceJobRecord,
         r#"
@@ -78,11 +79,12 @@ WHERE
   Ok(job_records)
 }
 
-pub async fn mark_tts_inference_job_failure(pool: &MySqlPool,
-                                            job: &TtsInferenceJobRecord,
-                                            failure_reason: &str)
-                                            -> AnyhowResult<()>
-{
+pub async fn mark_tts_inference_job_failure(
+  pool: &MySqlPool,
+  job: &TtsInferenceJobRecord,
+  failure_reason: &str
+) -> AnyhowResult<()> {
+
   // statuses: "attempt_failed", "complete_failure", "dead"
   let status = "attempt_failed";
 
@@ -104,11 +106,11 @@ WHERE id = ?
 
   Ok(())
 }
-pub async fn mark_tts_inference_job_done(pool: &MySqlPool,
-                                         job: &TtsInferenceJobRecord,
-                                         success: bool)
-                                         -> AnyhowResult<()>
-{
+pub async fn mark_tts_inference_job_done(
+  pool: &MySqlPool,
+  job: &TtsInferenceJobRecord,
+  success: bool
+) -> AnyhowResult<()> {
   let status = if success { "complete_success" } else { "complete_failure" };
 
   let query_result = sqlx::query!(
@@ -167,7 +169,7 @@ SET
       inference_result_token,
       job.model_token.clone(),
       job.inference_text.clone(),
-    
+
       job.maybe_creator_user_token.clone(),
       job.creator_ip_address.clone(),
 
@@ -208,10 +210,11 @@ pub struct TtsModelRecord2 {
   pub updated_at: DateTime<Utc>,
 }
 
-pub async fn get_tts_model_by_token(pool: &MySqlPool, model_token: &str)
-                                       -> AnyhowResult<Option<TtsModelRecord2>>
+pub async fn get_tts_model_by_token(
+  pool: &MySqlPool,
+  model_token: &str
+) -> AnyhowResult<Option<TtsModelRecord2>>
 {
-
   // NB: Lookup failure is Err(RowNotFound).
   // NB: Since this is publicly exposed, we don't query sensitive data.
   let maybe_model = sqlx::query_as!(

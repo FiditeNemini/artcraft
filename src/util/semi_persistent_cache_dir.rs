@@ -6,7 +6,10 @@ use tempdir::TempDir;
 /// These are for files on the worker filesystems
 pub struct SemiPersistentCacheDir {
   cache_root: PathBuf,
-  tts_model_root: PathBuf,
+
+  tts_synthesizer_model_root: PathBuf,
+  tts_vocoder_model_root: PathBuf,
+
   w2l_model_root: PathBuf,
   w2l_end_bump_root: PathBuf,
   w2l_face_templates_root: PathBuf,
@@ -27,7 +30,10 @@ impl SemiPersistentCacheDir {
     let cache_root = PathBuf::from(root_path);
     Self {
       cache_root: cache_root.clone(),
-      tts_model_root: cache_root.join("tts/models/"),
+
+      tts_synthesizer_model_root: cache_root.join("tts/synthesizer_models/"),
+      tts_vocoder_model_root: cache_root.join("tts/vocoder_models/"),
+
       w2l_model_root: cache_root.join("w2l/models/"),
       w2l_end_bump_root: cache_root.join("w2l/end_bumps/"),
       w2l_face_templates_root: cache_root.join("w2l/face_templates/"),
@@ -36,12 +42,37 @@ impl SemiPersistentCacheDir {
     }
   }
 
-  // ==================== TTS MODELS ====================
+  // ==================== TTS SYNTHESIZER MODELS ====================
 
-  /// We cache TTS models here.
+  /// We cache TTS synthesizer models here.
   /// We'll likely need to LRU cache them.
-  pub fn tts_model_path(&self) -> &Path {
-    &self.tts_model_root
+  pub fn tts_synthesizer_model_path(&self, model_filename: &str) -> PathBuf {
+    self.tts_synthesizer_model_root.join(model_filename)
+  }
+
+  pub fn tts_synthesizer_model_directory(&self) -> &Path {
+    &self.tts_synthesizer_model_root
+  }
+
+  pub fn create_tts_synthesizer_model_path(&self) -> AnyhowResult<()> {
+    let _ = fs::create_dir_all(self.tts_synthesizer_model_directory())?;
+    Ok(())
+  }
+
+  // ==================== TTS VOCODER MODELS ====================
+
+  /// We'll start with just a few vocoders, but this may grow.
+  pub fn tts_vocoder_model_path(&self, model_filename: &str) -> PathBuf {
+    self.tts_vocoder_model_root.join(model_filename)
+  }
+
+  pub fn tts_vocoder_model_directory(&self) -> &Path {
+    &self.tts_vocoder_model_root
+  }
+
+  pub fn create_tts_vocoder_model_path(&self) -> AnyhowResult<()> {
+    let _ = fs::create_dir_all(self.tts_vocoder_model_directory())?;
+    Ok(())
   }
 
   // ==================== W2L MODELS (there are only two of them) ====================

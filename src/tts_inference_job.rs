@@ -21,15 +21,12 @@ use crate::buckets::bucket_path_unifier::BucketPathUnifier;
 use crate::buckets::bucket_paths::hash_to_bucket_path;
 use crate::buckets::file_hashing::get_file_hash;
 use crate::common_queries::firehose_publisher::FirehosePublisher;
-use crate::job_queries::w2l_inference_job_queries::W2lInferenceJobRecord;
-use crate::job_queries::w2l_inference_job_queries::get_w2l_template_by_token;
-use crate::job_queries::w2l_inference_job_queries::insert_w2l_result;
-use crate::job_queries::w2l_inference_job_queries::mark_w2l_inference_job_done;
-use crate::job_queries::w2l_inference_job_queries::mark_w2l_inference_job_failure;
-use crate::job_queries::w2l_inference_job_queries::query_w2l_inference_job_records;
-use crate::script_execution::ffmpeg_generate_preview_image_command::FfmpegGeneratePreviewImageCommand;
-use crate::script_execution::ffmpeg_generate_preview_video_command::FfmpegGeneratePreviewVideoCommand;
-use crate::script_execution::imagemagick_generate_preview_image_command::ImagemagickGeneratePreviewImageCommand;
+use crate::job_queries::tts_inference_job_queries::TtsInferenceJobRecord;
+use crate::job_queries::tts_inference_job_queries::get_tts_model_by_token;
+use crate::job_queries::tts_inference_job_queries::insert_tts_result;
+use crate::job_queries::tts_inference_job_queries::mark_tts_inference_job_done;
+use crate::job_queries::tts_inference_job_queries::mark_tts_inference_job_failure;
+use crate::job_queries::tts_inference_job_queries::query_tts_inference_job_records;
 use crate::script_execution::tacotron_inference_command::TacotronInferenceCommand;
 use crate::util::anyhow_result::AnyhowResult;
 use crate::util::filesystem::check_directory_exists;
@@ -83,13 +80,9 @@ struct Inferencer {
   pub bucket_path_unifier: BucketPathUnifier,
   pub semi_persistent_cache: SemiPersistentCacheDir,
 
-  pub w2l_inference: Wav2LipInferenceCommand,
-  //pub ffmpeg_image_preview_generator: FfmpegGeneratePreviewImageCommand,
-  //pub ffmpeg_video_preview_generator: FfmpegGeneratePreviewVideoCommand,
-  //pub imagemagick_image_preview_generator: ImagemagickGeneratePreviewImageCommand,
+  pub tts_inference: TacotronInferenceCommand,
 
   // Command to run
-  pub inference_script: String,
   pub w2l_model_filename: String,
   pub w2l_end_bump_filename: String,
 }
@@ -165,8 +158,6 @@ async fn main() -> AnyhowResult<()> {
       .connect(&db_connection_string)
       .await?;
 
-  let inference_script = "TODO".to_string();
-
   let persistent_cache_path = easyenv::get_env_string_or_default(
     ENV_SEMIPERSISTENT_CACHE_DIR,
     "/tmp");
@@ -192,7 +183,6 @@ async fn main() -> AnyhowResult<()> {
     mysql_pool,
     public_bucket_client,
     private_bucket_client,
-    inference_script,
     //ffmpeg_image_preview_generator: FfmpegGeneratePreviewImageCommand {},
     //ffmpeg_video_preview_generator: FfmpegGeneratePreviewVideoCommand {},
     //imagemagick_image_preview_generator: ImagemagickGeneratePreviewImageCommand {},
@@ -298,22 +288,24 @@ fn read_metadata_file(filename: &PathBuf) -> AnyhowResult<FileMetadata> {
 
 async fn process_job(inferencer: &Inferencer, job: &W2lInferenceJobRecord) -> AnyhowResult<()> {
 
-  // TODO 1. Mark Processing
-  //
-  // TODO: 2. Check if w2l model is downloaded / download it to a stable cache location (DONE)
-  // TODO: 3. Check if w2l template faces are downloaded and download it (done)
-  // TODO: 4. Download user audio (done)
+  // TODO 1. Mark processing
 
-  // TODO: 5. Process Inference
+  // TODO 2. Check if vocoder model is downloaded / download to stable location
 
-  // TODO 6. Upload result
+  // TODO 3. Query model by token.
+  // TODO 4. Check if model is downloaded, otherwise download to stable location
+
+  // TODO 5. Process Inference
+
+  // TODO 6. Upload Result
   // TODO 7. Save record
   // TODO 8. Mark job done
 
-  // ==================== CONFIRM OR DOWNLOAD W2L MODEL ==================== //
 
-  let model_filename = inferencer.w2l_model_filename.clone();
-  let model_fs_path = inferencer.semi_persistent_cache.w2l_model_path(&model_filename);
+  // ==================== CONFIRM OR DOWNLOAD TTS VOCODER MODEL ==================== //
+
+  let tts_vocoder_model_filename = inferencer.tts_vocoder_model_filename.clone();
+  let tts_vocoder_model_fs_path = inferencer.semi_persistent_cache.tts_vocoder_model_path(&tts_vocoder_model_filename);
 
   if !model_fs_path.exists() {
     warn!("Model file does not exist: {:?}", &model_fs_path);
