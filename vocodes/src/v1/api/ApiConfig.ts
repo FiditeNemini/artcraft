@@ -61,6 +61,10 @@ class ApiConfig {
     return `${this.getScheme()}://${this.getNewApiHost()}/w2l/result/${token}`;
   }
 
+  inferTts() : string {
+    return `${this.getScheme()}://${this.getNewApiHost()}/tts/inference`;
+  }
+
   inferW2l() : string {
     return `${this.getScheme()}://${this.getNewApiHost()}/w2l/inference`;
   }

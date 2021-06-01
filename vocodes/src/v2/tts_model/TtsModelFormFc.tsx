@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { ApiConfig } from '../../v1/api/ApiConfig';
 import { SessionWrapper } from '../../session/SessionWrapper';
-import { Link } from "react-router-dom";
+import { v1 as uuidv1 } from 'uuid';
 
 interface TtsModelListResponsePayload {
   success: boolean,
@@ -26,7 +26,9 @@ interface Props {
 
 function TtsModelFormFc(props: Props) {
   const [ttsModels, setTtsModels] = useState<Array<TtsModel>>([]);
-  //const [selectedTtsModel, setSelectedTtsModel] = useState<TtsModel|undefined>(undefined);
+
+  const [selectedTtsModel, setSelectedTtsModel] = useState<TtsModel|undefined>(undefined);
+  const [text, setText] = useState<string>("");
 
   useEffect(() => {
     const api = new ApiConfig();
@@ -47,29 +49,37 @@ function TtsModelFormFc(props: Props) {
         return;
       }
 
-      setTtsModels(ttsModelResponse.models)
+      setTtsModels(ttsModelResponse.models);
+      if (ttsModelResponse.models.length > 0) {
+        setSelectedTtsModel(ttsModelResponse.models[0]);
+      }
+    })
+    .catch(e => {
+      // NO-OP
     });
-    //.catch(e => {
-    //  //this.props.onSpeakErrorCallback();
-    //});
   }, []); // NB: Empty array dependency sets to run ONLY on mount
 
   let listItems: Array<JSX.Element> = [];
-  let doSelect = true;
+
+  let defaultSelectValue = '';
 
   ttsModels.forEach(m => {
     let option = (
       <option 
+        key={m.model_token} 
         value={m.model_token} 
-        selected={doSelect}>{m.title} (by {m.creator_username})</option>
+        >{m.title} (by {m.creator_username})</option>
     );
 
+    if (defaultSelectValue === '') {
+      defaultSelectValue = m.model_token;
+    }
+
     listItems.push(option);
-    doSelect = false;
   });
 
 
-  let extraDetails = <p />;
+  /*let extraDetails = <p />;
 
   if (props.sessionWrapper.isLoggedIn()) {
     extraDetails = (
@@ -91,21 +101,85 @@ function TtsModelFormFc(props: Props) {
         whenever you want!
       </p>
     );
-  }
+  }*/
 
   let selectClasses = 'select is-large';
 
   if (listItems.length === 0) {
     selectClasses = 'select is-large is-loading';
     listItems.push((
-      <option value="" disabled={true}>Loading...</option>
+      <option key="waiting" value="" disabled={true}>Loading...</option>
     ))
   }
 
   let remainingCharactersButtonDisabled = false;
 
+  const handleChangeVoice = (ev: React.FormEvent<HTMLSelectElement>) => { 
+    ev.preventDefault();
+    const selectVoiceValue = (ev.target as HTMLSelectElement).value;
+
+    // TODO: Inefficient.
+    ttsModels.forEach(model => {
+      if (model.model_token === selectVoiceValue) {
+        console.log('voice', model);
+        setSelectedTtsModel(model);
+      }
+    });
+
+    return false;
+  };
+
+  const handleChangeText = (ev: React.FormEvent<HTMLTextAreaElement>) => { 
+    ev.preventDefault();
+    const textValue = (ev.target as HTMLTextAreaElement).value;
+
+    setText(textValue);
+
+    return false;
+  };
+
+
   const handleFormSubmit = (ev: React.FormEvent<HTMLFormElement>) => { 
     ev.preventDefault();
+
+    if (selectedTtsModel === undefined) {
+      return false;
+    }
+
+    if (text === undefined) {
+      return false;
+    }
+
+    const modelToken = selectedTtsModel!.model_token;
+
+    const api = new ApiConfig();
+    const endpointUrl = api.inferTts();
+    
+    // TODO: Idempotency token.
+    const request = {
+      uuid_idempotency_token: uuidv1(),
+      tts_model_token: modelToken,
+      inference_text: text,
+    }
+
+    fetch(endpointUrl, {
+      method: 'POST',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+      },
+      credentials: 'include',
+      body: JSON.stringify(request),
+    })
+    .then(res => res.json())
+    .then(res => {
+      console.log('tts infer response', res)
+      if (res.success) {
+      }
+    })
+    .catch(e => {
+    });
+
     return false;
   };
 
@@ -117,14 +191,24 @@ function TtsModelFormFc(props: Props) {
   return (
     <div>
       <h1 className="title is-1"> Deep Fake Text to Speech </h1>
+      <h4 className="subtitle is-5">
+        This is a beta release and temporarily sounds not-great. 
+        I'll update the vocoder and allow you to set your own.
+      </h4>
 
-      {extraDetails}
+      {/*
+      <div className="content is-large">
+        {extraDetails}
+      </div>
+      */}
 
       <br />
 
       <form onSubmit={handleFormSubmit}>
         <div className={selectClasses}>
-          <select>
+          <select 
+            onChange={handleChangeVoice} 
+            defaultValue={defaultSelectValue}>
             {listItems}
           </select>
         </div>
@@ -134,7 +218,10 @@ function TtsModelFormFc(props: Props) {
 
         <div className="field">
           <div className="control">
-            <textarea className="textarea is-large" placeholder="Textual shenanigans go here..."></textarea>
+            <textarea 
+              onChange={handleChangeText}
+              className="textarea is-large" 
+              placeholder="Textual shenanigans go here..."></textarea>
           </div>
         </div>
 
