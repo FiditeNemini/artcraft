@@ -198,6 +198,8 @@ sudo mysql -u root -p
 
 # but now I have to use "sudo" !?!?
 
+use mysql;
+
 CREATE USER 'storyteller'@'localhost' IDENTIFIED BY 'password';
 GRANT ALL PRIVILEGES ON storyteller.* TO 'storyteller'@'localhost';
 ```

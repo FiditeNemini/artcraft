@@ -160,7 +160,7 @@ SET
   creator_set_visibility = 'public',
 
   public_bucket_hash = 'TODO',
-  public_bucket_audio_path = ?,
+  inference_public_bucket_uuid = ?,
 
   file_size_bytes = ?,
   mime_type = ?,
