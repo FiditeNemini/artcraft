@@ -11,7 +11,7 @@ use log::{warn, info};
 use sqlx::MySqlPool;
 use std::path::Path;
 
-/// table: w2l_template_upload_jobs
+/// table: w2l_inference_jobs
 #[derive(Debug)]
 pub struct W2lInferenceJobRecord {
   pub id: i64,

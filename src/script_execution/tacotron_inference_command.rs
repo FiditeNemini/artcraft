@@ -3,59 +3,56 @@ use log::{info,warn};
 use std::process::{Command, Stdio};
 use subprocess::{Popen, PopenConfig, Redirection};
 use std::fs::OpenOptions;
+use std::path::Path;
 
-/// This command is used to preprocess the face detection frames from user-submitted video.
-/// This should only ever need to run once. The frames can then be uploaded to Buckets and saved.
+/// This command is used to run inference.
+/// It uses preprocessed face files so that it's much faster.
 #[derive(Clone)]
-pub struct Wav2LipInferenceCommandOLD {
-  w2l_directory: String,
-  script_name: String,
-  checkpoint_path: String,
+pub struct TacotronInferenceCommand {
+  tacotron_directory: String,
+  inference_script_name: String,
 }
 
-impl Wav2LipInferenceCommandOLD {
+impl TacotronInferenceCommand {
   pub fn new(
-    w2l_directory: &str,
-    script_name: &str,
-    checkpoint_path: &str,
+    tacotron_directory: &str,
+    inference_script_name: &str,
   ) -> Self {
     Self {
-      w2l_directory: w2l_directory.to_string(),
-      script_name: script_name.to_string(),
-      checkpoint_path: checkpoint_path.to_string(),
+    tacotron_directory: tacotron_directory.to_string(),
+    inference_script_name: inference_script_name.to_string(),
     }
   }
 
-  pub fn execute(&self,
-                 audio_filename: &str,
-                 image_or_video_filename: &str,
-                 output_video_filename: &str,
-                 is_image: bool,
-                 disable_end_bump: bool,
-                 spawn_process: bool) -> AnyhowResult<()>
-  {
+  pub fn execute<P: AsRef<Path>>(
+    &self,
+    synthesizer_checkpoint_path: P,
+    vocoder_checkpoint_path: P,
+    input_text_filename: P,
+    output_metadata_filename: P,
+    output_audio_filename: P,
+    spawn_process: bool
+  ) -> AnyhowResult<()> {
     let mut command = String::new();
 
     command.push_str("echo 'test'");
     command.push_str(" && ");
-    command.push_str(&format!("cd {}", self.w2l_directory));
+    command.push_str(&format!("cd {}", self.tacotron_directory));
     command.push_str(" && ");
     command.push_str("source python/bin/activate");
     command.push_str(" && ");
     command.push_str("python ");
-    command.push_str(&self.script_name);
-    command.push_str(" --checkpoint_path ");
-    command.push_str(&self.checkpoint_path);
-    command.push_str(" --face ");
-    command.push_str(image_or_video_filename);
-    command.push_str(" --audio ");
-    command.push_str(audio_filename);
-    command.push_str(" --outfile ");
-    command.push_str(output_video_filename);
-
-    if is_image {
-      command.push_str(" --is_image ");
-    }
+    command.push_str(&self.inference_script_name);
+    command.push_str(" --synthesizer_checkpoint_path ");
+    command.push_str(&synthesizer_checkpoint_path.as_ref().display().to_string());
+    command.push_str(" --vocoder_checkpoint_path ");
+    command.push_str(&vocoder_checkpoint_path.as_ref().display().to_string());
+    command.push_str(" --input_text_filename ");
+    command.push_str(&input_text_filename.as_ref().display().to_string());
+    command.push_str(" --output_audio_filename ");
+    command.push_str(&output_audio_filename.as_ref().display().to_string());
+    command.push_str(" --output_metadata_filename ");
+    command.push_str(&output_metadata_filename.as_ref().display().to_string());
 
     info!("Command: {:?}", command);
 
@@ -74,14 +71,14 @@ impl Wav2LipInferenceCommandOLD {
         .write(true)
         .create(true)
         .truncate(true)
-        .open("/tmp/stdout.txt")?;
+        .open("/tmp/tacotron_upload_stdout.txt")?;
 
       let stderr_file = OpenOptions::new()
         .read(true)
         .write(true)
         .create(true)
         .truncate(true)
-        .open("/tmp/stderr.txt")?;
+        .open("/tmp/tacotron_upload_stderr.txt")?;
 
       let mut p = Popen::create(&command_parts, PopenConfig {
         //stdout: Redirection::Pipe,

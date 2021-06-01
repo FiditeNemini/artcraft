@@ -1,5 +1,6 @@
-# noinspection SqlNoDataSourceInspectionForFile
-# noinspection SqlResolveForFile
+-- noinspection SqlDialectInspectionForFile
+-- noinspection SqlNoDataSourceInspectionForFile
+-- noinspection SqlResolveForFile
 
 CREATE TABLE tts_models (
   -- Not used for anything except replication.

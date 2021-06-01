@@ -1,5 +1,6 @@
-# noinspection SqlResolveForFile
-# noinspection SqlNoDataSourceInspectionForFile
+-- noinspection SqlDialectInspectionForFile
+-- noinspection SqlNoDataSourceInspectionForFile
+-- noinspection SqlResolveForFile
 
 CREATE TABLE tts_results (
   -- Not used for anything except replication.
@@ -37,6 +38,15 @@ CREATE TABLE tts_results (
 
   -- Where the wav, spectrogram, and etc. are located.
   public_bucket_hash CHAR(64) NOT NULL,
+
+  -- Where the wav, spectrogram, and etc. are located.
+  public_bucket_audio_path VARCHAR(255) NOT NULL,
+
+  -- ========== METADATA ==========
+
+  file_size_bytes INT(10) NOT NULL DEFAULT 0,
+  mime_type VARCHAR(32) NOT NULL DEFAULT '',
+  duration_millis INT(10) NOT NULL DEFAULT 0,
 
   -- ========== MODERATION DETAILS ==========
 
