@@ -3,6 +3,10 @@
 import requests
 import re
 import uuid
+import socket
+
+# There are some things here that will cause my laptop to freeze!
+hostname = socket.gethostname()
 
 def print_response(response):
   print('\tStatus: {}'.format(response.status_code))
@@ -50,7 +54,7 @@ session_echelon = login('echelon', 'testing')
 session_nanashi = login('nanashi', 'nanashi')
 session_brandon = login('brandon', 'testing')
 
-# ==================== UPLOAD DATA ====================
+# ==================== UPLOAD W2L TEMPLATES ====================
 
 def upload_w2l_template(content_url, title, session_cookie):
   print('Upload W2L template')
@@ -73,4 +77,25 @@ upload_w2l_template('https://i.imgur.com/lKaQ4Er.jpg', 'hasta la vista', session
 upload_w2l_template('https://i.imgur.com/uoGuTJo.jpeg', 'what do you mean vern?', session_brandon)
 upload_w2l_template('https://i.imgur.com/v8k9yau.jpeg', 'Miyamoto-san', session_brandon)
 
+
+if hostname == 'halide':
+  upload_w2l_template('https://www.youtube.com/watch?v=a7mS9ZdU6k4', 'Steve Jobs talks', session_echelon)
+
+# ==================== UPLOAD TTS MODELS ====================
+
+def upload_tts_model(content_url, title, session_cookie):
+  print('Upload TTS model')
+  upload_url = 'http://localhost:12345/tts/upload'
+  cookies = { 'session': session_cookie }
+  payload = {
+    'idempotency_token': str(uuid.uuid4()),
+    'title': title,
+    'download_url': content_url,
+  }
+  r = requests.post(upload_url, cookies=cookies, json=payload)
+  print_response(r)
+
+
+upload_tts_model('https://drive.google.com/file/d/1grwDGbAsPwCMVfye071TZ6PLUub1KGyR/view?usp=sharing', 'Jorgen', session_nanashi)
+upload_tts_model('https://drive.google.com/file/d/1w3oBk5vzyHurqYwP95UEQv-_NeMNu6pt/view?usp=sharing', 'Noire', session_echelon)
 
