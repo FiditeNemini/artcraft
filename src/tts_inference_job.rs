@@ -361,15 +361,15 @@ async fn process_job(inferencer: &Inferencer, job: &TtsInferenceJobRecord) -> An
   let temp_dir = format!("temp_tts_inference_{}", job.id);
   let temp_dir = TempDir::new(&temp_dir)?; // NB: Exists until it goes out of scope.
 
-  let text_input_fs_path = None;
+  let text_input_fs_path = temp_dir.path().join("inference_input.txt");
+
+  std::fs::write(&text_input_fs_path, &job.inference_text)?;
 
   // ==================== RUN INFERENCE ==================== //
 
   let output_audio_fs_path = temp_dir.path().join("output.mp4");
   let output_metadata_fs_path = temp_dir.path().join("metadata.json");
   let output_spectrogram_fs_path = temp_dir.path().join("spectrogram.json");
-
-  let is_image = w2l_template.template_type.contains("image");
 
   info!("Running TTS inference...");
 
