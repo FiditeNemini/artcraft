@@ -5,6 +5,8 @@ To install on a new machine, simply run `npm install` in this directory.
 
 Then `npm run-script start7000` to see the frontend.
 
+This should fix Visual Studio Code's syntax issues. (You should also install typescript plugin support.)
+
 
 Brandon's Notes
 ---------------
