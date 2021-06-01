@@ -1,7 +1,7 @@
 #!/bin/bash
 # ONLY FOR LOCAL DEV
-mysql -u root \
-  -proot \
+mysql -u storyteller \
+  -ppassword \
   -h localhost \
   -D storyteller \
   -e "select * from tts_inference_jobs\G"

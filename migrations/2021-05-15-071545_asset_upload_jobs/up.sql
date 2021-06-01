@@ -1,5 +1,6 @@
-# noinspection SqlNoDataSourceInspectionForFile
-# noinspection SqlResolveForFile
+-- noinspection SqlDialectInspectionForFile
+-- noinspection SqlNoDataSourceInspectionForFile
+-- noinspection SqlResolveForFile
 
 -- TTS MODELS
 CREATE TABLE tts_model_upload_jobs (

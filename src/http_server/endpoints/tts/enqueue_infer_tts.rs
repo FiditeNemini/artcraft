@@ -8,7 +8,7 @@ use actix_web::{Responder, web, HttpResponse, error, HttpRequest};
 use crate::database_helpers::enums::{DownloadUrlType, CreatorSetVisibility, W2lTemplateType};
 use crate::http_server::web_utils::ip_address::get_request_ip;
 use crate::server_state::ServerState;
-use crate::util::random_crockford_token::random_crockford_token;
+use crate::util::random_prefix_crockford_token::random_prefix_crockford_token;
 use crate::validations::model_uploads::validate_model_title;
 use crate::validations::passwords::validate_passwords;
 use crate::validations::username::validate_username;
@@ -24,6 +24,7 @@ const NEW_USER_ROLE: &'static str = "new-user";
 
 #[derive(Deserialize)]
 pub struct InferTtsRequest {
+  uuid_idempotency_token: String,
   tts_model_token: String,
   inference_text: String,
   creator_set_visibility: Option<CreatorSetVisibility>,
@@ -100,16 +101,28 @@ pub async fn infer_tts_handler(
     return Err(InferTtsError::BadInput(reason));
   }
 
-  // TODO: CHECK DATABASE!
+  // TODO(bt): CHECK DATABASE!
   let model_token = request.tts_model_token.to_string();
 
   let ip_address = get_request_ip(&http_request);
   let creator_set_visibility = "public".to_string();
 
+  // This token is returned to the client.
+  let job_token = random_prefix_crockford_token("TTS_INF:", 32)
+      .map_err(|e| {
+        warn!("Error creating token");
+        InferTtsError::ServerError
+      })?;
+
+  info!("Creating w2l inference job record...");
+
   let query_result = sqlx::query!(
         r#"
 INSERT INTO tts_inference_jobs
 SET
+  token = ?,
+  uuid_idempotency_token = ?,
+
   model_token = ?,
   inference_text = ?,
   maybe_creator_user_token = ?,
@@ -117,6 +130,8 @@ SET
   creator_set_visibility = ?,
   status = "pending"
         "#,
+      job_token,
+      request.uuid_idempotency_token.clone(),
       model_token,
       inference_text,
       maybe_user_token,
