@@ -38,6 +38,9 @@ CREATE TABLE tts_results (
 
   -- Where the wav, spectrogram, and etc. are located.
   public_bucket_hash CHAR(64) NOT NULL,
+  -- Where the wav, spectrogram, and etc. are located.
+  public_bucket_wav_audio_path VARCHAR(255) NOT NULL,
+  public_bucket_spectrogram_path VARCHAR(255) NOT NULL,
 
   -- Where the wav, spectrogram, and etc. are located.
   inference_public_bucket_uuid VARCHAR(36) NOT NULL,
@@ -45,7 +48,6 @@ CREATE TABLE tts_results (
   -- ========== METADATA ==========
 
   file_size_bytes INT(10) NOT NULL DEFAULT 0,
-  mime_type VARCHAR(32) NOT NULL DEFAULT '',
   duration_millis INT(10) NOT NULL DEFAULT 0,
 
   -- ========== MODERATION DETAILS ==========

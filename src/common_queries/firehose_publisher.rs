@@ -103,6 +103,21 @@ impl FirehosePublisher {
     Ok(())
   }
 
+  pub async fn tts_inference_finished(
+    &self,
+    maybe_user_token: Option<&str>,
+    model_token: &str,
+    result_token: &str
+  ) -> AnyhowResult<()> {
+    let _record_id = self.insert(
+      FirehoseEvent::TtsInferenceCompleted,
+      maybe_user_token,
+      Some(model_token),
+      Some(result_token)
+    ).await?;
+    Ok(())
+  }
+
   pub async fn enqueue_w2l_template_upload(&self, user_token: &str, job_token: &str) -> AnyhowResult<()> {
     let _record_id = self.insert(
       FirehoseEvent::W2lTemplateUploadStarted,

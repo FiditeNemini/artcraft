@@ -135,14 +135,19 @@ pub async fn insert_tts_result<P: AsRef<Path>>(
   pool: &MySqlPool,
   job: &TtsInferenceJobRecord,
   bucket_audio_results_path: P,
+  bucket_spectrogram_results_path: P,
   file_size_bytes: u64,
-  maybe_mime_type: Option<&str>,
   duration_millis: u64
 ) -> AnyhowResult<(u64, String)>
 {
   let inference_result_token = random_prefix_crockford_token("TTS_RES:", 32)?;
 
   let bucket_audio_result_path = &bucket_audio_results_path
+      .as_ref()
+      .display()
+      .to_string();
+
+  let bucket_spectrogram_result_path = &bucket_audio_results_path
       .as_ref()
       .display()
       .to_string();
@@ -160,10 +165,10 @@ SET
   creator_set_visibility = 'public',
 
   public_bucket_hash = 'TODO',
-  public_bucket_audio_path = ?,
+  public_bucket_wav_audio_path = ?,
+  public_bucket_spectrogram_path = ?,
 
   file_size_bytes = ?,
-  mime_type = ?,
   duration_millis = ?
         "#,
       inference_result_token,
@@ -174,9 +179,9 @@ SET
       job.creator_ip_address.clone(),
 
       bucket_audio_result_path,
+      bucket_spectrogram_result_path,
 
       file_size_bytes,
-      maybe_mime_type.unwrap_or(""),
       duration_millis
     )
       .execute(pool)

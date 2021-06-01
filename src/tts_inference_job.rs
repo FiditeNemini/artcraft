@@ -244,7 +244,7 @@ async fn main_loop(inferencer: Inferencer) {
   }
 }
 
-async fn process_jobs(inferencer: &Inferencer, jobs: Vec<W2lInferenceJobRecord>) -> AnyhowResult<()> {
+async fn process_jobs(inferencer: &Inferencer, jobs: Vec<TtsInferenceJobRecord>) -> AnyhowResult<()> {
   for job in jobs.into_iter() {
     let result = process_job(inferencer, &job).await;
     match result {
@@ -252,7 +252,7 @@ async fn process_jobs(inferencer: &Inferencer, jobs: Vec<W2lInferenceJobRecord>)
       Err(e) => {
         warn!("Failure to process job: {:?}", e);
         let failure_reason = "";
-        let _r = mark_w2l_inference_job_failure(
+        let _r = mark_tts_inference_job_failure(
           &inferencer.mysql_pool,
           &job,
           failure_reason)
@@ -278,20 +278,21 @@ fn read_metadata_file(filename: &PathBuf) -> AnyhowResult<FileMetadata> {
   Ok(serde_json::from_str(&buffer)?)
 }
 
-async fn process_job(inferencer: &Inferencer, job: &W2lInferenceJobRecord) -> AnyhowResult<()> {
+async fn process_job(inferencer: &Inferencer, job: &TtsInferenceJobRecord) -> AnyhowResult<()> {
 
   // TODO 1. Mark processing
 
-  // TODO 2. Check if vocoder model is downloaded / download to stable location
+  // TODO 2. Check if vocoder model is downloaded / download to stable location (DONE)
 
-  // TODO 3. Query model by token.
-  // TODO 4. Check if model is downloaded, otherwise download to stable location
+  // TODO 3. Query model by token. (DONE)
+  // TODO 4. Check if model is downloaded, otherwise download to stable location (DONE)
 
-  // TODO 5. Process Inference
+  // TODO 5. Write text to file
+  // TODO 6. Process Inference
 
-  // TODO 6. Upload Result
-  // TODO 7. Save record
-  // TODO 8. Mark job done
+  // TODO 7. Upload Result
+  // TODO 8. Save record
+  // TODO 9. Mark job done
 
 
   // ==================== CONFIRM OR DOWNLOAD TTS VOCODER MODEL ==================== //
@@ -302,212 +303,148 @@ async fn process_job(inferencer: &Inferencer, job: &W2lInferenceJobRecord) -> An
   if !tts_vocoder_model_fs_path.exists() {
     warn!("Vocoder model file does not exist: {:?}", &tts_vocoder_model_fs_path);
 
-    let model_object_path = inferencer.bucket_path_unifier
-        .w2l_pretrained_models_path(&model_filename);
+    let tts_vocoder_model_object_path = inferencer.bucket_path_unifier
+        .tts_pretrained_vocoders_path(&tts_vocoder_model_filename);
 
-    info!("Download from bucket path: {:?}", &model_object_path);
-
-    inferencer.private_bucket_client.download_file_to_disk(
-      &model_object_path,
-      &model_fs_path
-    ).await?;
-
-    info!("Downloaded model from bucket!");
-  }
-
-  // ==================== CONFIRM OR DOWNLOAD W2L END BUMP ==================== //
-
-  let end_bump_filename = inferencer.w2l_end_bump_filename.clone();
-  let end_bump_fs_path = inferencer.semi_persistent_cache.w2l_end_bump_path(&end_bump_filename);
-
-  if !end_bump_fs_path.exists() {
-    warn!("End bump file does not exist: {:?}", &end_bump_fs_path);
-
-    let end_bump_object_path = inferencer.bucket_path_unifier
-        .end_bump_video_for_w2l_path(&end_bump_filename);
-
-    info!("Download from bucket path: {:?}", &end_bump_object_path);
+    info!("Download vocoder from bucket path: {:?}", &tts_vocoder_model_object_path);
 
     inferencer.private_bucket_client.download_file_to_disk(
-      &end_bump_object_path,
-      &end_bump_fs_path
+      &tts_vocoder_model_object_path,
+      &tts_vocoder_model_fs_path
     ).await?;
 
-    info!("Downloaded end bump from bucket!");
+    info!("Downloaded tts vocoder model from bucket!");
   }
 
-  // ==================== LOOK UP TEMPLATE RECORD ==================== //
+  // ==================== LOOK UP TTS SYNTHESIZER RECORD (WHICH CONTAINS ITS BUCKET PATH) ==================== //
 
-  let template_token = match &job.maybe_w2l_template_token {
-    Some(token) => token.to_string(),
+  info!("Looking up TTS model by token: {}", &job.model_token);
+
+  let query_result = get_tts_model_by_token(
+    &inferencer.mysql_pool,
+    &job.model_token).await?;
+
+  let tts_model = match query_result {
+    Some(model) => model,
     None => {
-      warn!("non-template token based inference not yet supported");
-      return Err(anyhow!("non-template token based inference not yet supported"))
+      warn!("TTS model not found: {}", &job.model_token);
+      return Err(anyhow!("Model not found!"))
     },
   };
 
-  info!("Looking up w2l template by token: {}", &template_token);
+  // ==================== CONFIRM OR DOWNLOAD TTS SYNTHESIZER MODEL ==================== //
 
-  let query_result = get_w2l_template_by_token(&inferencer.mysql_pool, &template_token).await?;
+  // TODO: Let's just put paths in the db
+  // TODO: We'll probably need to LRU cache these.
 
-  let w2l_template = match query_result {
-    Some(template) => template,
-    None => {
-      warn!("W2L Template not found: {}", &template_token);
-      return Err(anyhow!("Template not found!"))
-    },
-  };
+  let tts_synthesizer_fs_path = inferencer.semi_persistent_cache.tts_synthesizer_model_path(
+    &tts_model.model_token);
 
-  // ==================== CONFIRM OR DOWNLOAD W2L TEMPLATE AUDIO OR VIDEO ==================== //
+  if !tts_synthesizer_fs_path.exists() {
+    info!("TTS synthesizer model file does not exist: {:?}", &tts_synthesizer_fs_path);
 
-  // Template is based on the `private_bucket_hash`:
-  //  - private_bucket_hash: 1519edf86e6975fdcd0a56a5953d84948db79f2b9ce588818d7fa544d5cb38b2
-  //  - private_bucket_object_name: /user_uploaded_w2l_templates/1/5/1/1519edf86e6975fdcd0a56a5953d84948db79f2b9ce588818d7fa544d5cb38b2
-  //  - private_bucket_cached_faces_object_name: /user_uploaded_w2l_templates/1/5/1/1519edf86e6975fdcd0a56a5953d84948db79f2b9ce588818d7fa544d5cb38b2_detected_faces.pickle
-  //  - maybe_public_bucket_preview_image_object_name: /user_uploaded_w2l_templates/1/5/1/1519edf86e6975fdcd0a56a5953d84948db79f2b9ce588818d7fa544d5cb38b2_preview.webp
+    let tts_synthesizer_object_path  = inferencer.bucket_path_unifier
+        .tts_synthesizer_path(&tts_model.private_bucket_hash);
 
-  let template_media_fs_path = inferencer.semi_persistent_cache.w2l_template_media_path(
-    &w2l_template.private_bucket_hash);
-
-  if !template_media_fs_path.exists() {
-    info!("W2L template media file does not exist: {:?}", &template_media_fs_path);
-
-    let template_media_object_path = inferencer.bucket_path_unifier
-        .media_templates_for_w2l_path(&w2l_template.private_bucket_hash);
-
-    info!("Download from template media path: {:?}", &template_media_object_path);
+    info!("Download from template media path: {:?}", &tts_synthesizer_object_path);
 
     inferencer.private_bucket_client.download_file_to_disk(
-      &template_media_object_path,
-      &template_media_fs_path
+      &tts_synthesizer_object_path,
+      &tts_synthesizer_fs_path
     ).await?;
 
     info!("Downloaded template media from bucket!");
   }
 
-  // ==================== CONFIRM OR DOWNLOAD W2L TEMPLATE FACE ==================== //
+  // ==================== WRITE TEXT TO FILE ==================== //
 
-  // Template is based on the `private_bucket_hash`:
-  //  - private_bucket_hash: 1519edf86e6975fdcd0a56a5953d84948db79f2b9ce588818d7fa544d5cb38b2
-  //  - private_bucket_object_name: /user_uploaded_w2l_templates/1/5/1/1519edf86e6975fdcd0a56a5953d84948db79f2b9ce588818d7fa544d5cb38b2
-  //  - private_bucket_cached_faces_object_name: /user_uploaded_w2l_templates/1/5/1/1519edf86e6975fdcd0a56a5953d84948db79f2b9ce588818d7fa544d5cb38b2_detected_faces.pickle
-  //  - maybe_public_bucket_preview_image_object_name: /user_uploaded_w2l_templates/1/5/1/1519edf86e6975fdcd0a56a5953d84948db79f2b9ce588818d7fa544d5cb38b2_preview.webp
-
-  let face_template_fs_path = inferencer.semi_persistent_cache.w2l_face_template_path(
-    &w2l_template.private_bucket_hash);
-
-  if !face_template_fs_path.exists() {
-    info!("W2L face template file does not exist: {:?}", &face_template_fs_path);
-
-    let face_template_object_path = inferencer.bucket_path_unifier
-        .precomputed_faces_for_w2l_path(&w2l_template.private_bucket_hash);
-
-    info!("Download from face template path: {:?}", &face_template_object_path);
-
-    inferencer.private_bucket_client.download_file_to_disk(
-      &face_template_object_path,
-      &face_template_fs_path
-    ).await?;
-
-    info!("Downloaded face template from bucket!");
-  }
-
-  // ==================== DOWNLOAD USER AUDIO ==================== //
-
-  let temp_dir = format!("temp_{}", job.id);
+  let temp_dir = format!("temp_tts_inference_{}", job.id);
   let temp_dir = TempDir::new(&temp_dir)?; // NB: Exists until it goes out of scope.
 
-  let audio_bucket_hash = match &job.maybe_public_audio_bucket_hash {
-    Some(l) => l.clone(),
-    None => {
-      warn!("Only W2L jobs with user-uploaded audio are supported right now");
-      return Err(anyhow!("Only W2L jobs with user-uploaded audio are supported right now"))
-    },
-  };
-
-  let audio_fs_path = temp_dir.path().join(&audio_bucket_hash);
-
-  let audio_object_path = inferencer.bucket_path_unifier
-      .user_audio_for_w2l_inference_path(&audio_bucket_hash);
-
-  inferencer.private_bucket_client.download_file_to_disk(
-    &audio_object_path,
-    &audio_fs_path
-  ).await?;
-
+  let text_input_fs_path = None;
 
   // ==================== RUN INFERENCE ==================== //
 
-  let output_video_fs_path = temp_dir.path().join("output.mp4");
+  let output_audio_fs_path = temp_dir.path().join("output.mp4");
   let output_metadata_fs_path = temp_dir.path().join("metadata.json");
+  let output_spectrogram_fs_path = temp_dir.path().join("spectrogram.json");
 
   let is_image = w2l_template.template_type.contains("image");
 
-  info!("Is image? {}", is_image);
-  info!("Running W2L inference...");
+  info!("Running TTS inference...");
 
-  inferencer.w2l_inference.execute(
-    &model_fs_path,
-    &audio_fs_path,
-    &end_bump_fs_path,
-    &template_media_fs_path,
-    &face_template_fs_path,
+  info!("Expected output audio filename: {:?}", &output_audio_fs_path);
+  info!("Expected output spectrogram filename: {:?}", &output_spectrogram_fs_path);
+  info!("Expected output metadata filename: {:?}", &output_metadata_fs_path);
+
+  inferencer.tts_inference.execute(
+    &tts_synthesizer_fs_path,
+    &tts_vocoder_model_fs_path,
+    &text_input_fs_path,
+    &output_audio_fs_path,
+    &output_spectrogram_fs_path,
     &output_metadata_fs_path,
-    &output_video_fs_path,
     false,
-    false
   )?;
-
-  info!("Output filename: {:?}", &output_video_fs_path);
 
   // ==================== CHECK ALL FILES EXIST AND GET METADATA ==================== //
 
   info!("Checking that output files exist...");
 
-  check_file_exists(&output_video_fs_path)?;
+  check_file_exists(&output_audio_fs_path)?;
+  check_file_exists(&output_spectrogram_fs_path)?;
   check_file_exists(&output_metadata_fs_path)?;
 
   let file_metadata = read_metadata_file(&output_metadata_fs_path)?;
 
-  // ==================== UPLOAD TO BUCKETS ==================== //
+  // ==================== UPLOAD AUDIO TO BUCKET ==================== //
 
-  let result_object_path = inferencer.bucket_path_unifier.w2l_inference_video_output_path(
+  let audio_result_object_path = inferencer.bucket_path_unifier.tts_inference_wav_audio_output_path(
     &job.inference_job_token);
 
-  info!("Image/video destination bucket path: {:?}", &result_object_path);
+  info!("Audio destination bucket path: {:?}", &audio_result_object_path);
 
-  info!("Uploading image/video...");
-
-  let original_mime_type = file_metadata.mimetype
-      .as_deref()
-      .unwrap_or("application/octet-stream");
+  info!("Uploading audio...");
 
   inferencer.public_bucket_client.upload_filename_with_content_type(
-    &result_object_path,
-    &output_video_fs_path,
-    original_mime_type)
+    &audio_result_object_path,
+    &output_audio_fs_path,
+    "audio/wav")
+      .await?;
+
+  // ==================== UPLOAD SPECTROGRAM TO BUCKETS ==================== //
+
+  let spectrogram_result_object_path = inferencer.bucket_path_unifier.tts_inference_spectrogram_output_path(
+    &job.inference_job_token);
+
+  info!("Spectrogram destination bucket path: {:?}", &spectrogram_result_object_path);
+
+  info!("Uploading spectrogram...");
+
+  inferencer.public_bucket_client.upload_filename_with_content_type(
+    &spectrogram_result_object_path,
+    &output_spectrogram_fs_path,
+    "application/json")
       .await?;
 
   // ==================== SAVE RECORDS ==================== //
 
-  info!("Saving w2l inference record...");
-  let (id, inference_result_token) = insert_w2l_result(
+  info!("Saving tts inference record...");
+  let (id, inference_result_token) = insert_tts_result(
     &inferencer.mysql_pool,
     job,
-    &result_object_path,
+    &audio_result_object_path,
+    &spectrogram_result_object_path,
     file_metadata.file_size_bytes,
-    file_metadata.mimetype.as_deref(),
-    file_metadata.width,
-    file_metadata.height,
     file_metadata.duration_millis.unwrap_or(0))
       .await?;
 
   info!("Marking job complete...");
-  mark_w2l_inference_job_done(&inferencer.mysql_pool, job, true).await?;
+  mark_tts_inference_job_done(&inferencer.mysql_pool, job, true).await?;
 
-  inferencer.firehose_publisher.w2l_inference_finished(
+  inferencer.firehose_publisher.tts_inference_finished(
     job.maybe_creator_user_token.as_deref(),
-    &job.inference_job_token,
+    &tts_model.model_token,
     &inference_result_token)
       .await
       .map_err(|e| {

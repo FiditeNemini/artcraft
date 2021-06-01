@@ -29,8 +29,9 @@ impl TacotronInferenceCommand {
     synthesizer_checkpoint_path: P,
     vocoder_checkpoint_path: P,
     input_text_filename: P,
-    output_metadata_filename: P,
     output_audio_filename: P,
+    output_spectrogram_filename: P,
+    output_metadata_filename: P,
     spawn_process: bool
   ) -> AnyhowResult<()> {
     let mut command = String::new();
@@ -51,6 +52,8 @@ impl TacotronInferenceCommand {
     command.push_str(&input_text_filename.as_ref().display().to_string());
     command.push_str(" --output_audio_filename ");
     command.push_str(&output_audio_filename.as_ref().display().to_string());
+    command.push_str(" --output_spectrogram_filename ");
+    command.push_str(&output_spectrogram_filename.as_ref().display().to_string());
     command.push_str(" --output_metadata_filename ");
     command.push_str(&output_metadata_filename.as_ref().display().to_string());
 
