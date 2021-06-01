@@ -5,9 +5,13 @@ use crate::util::anyhow_result::AnyhowResult;
 /// This is designed to make it centrally configurable where
 /// different types of objects are stored.
 pub struct BucketPathUnifier {
+  // TTS
+  pub tts_pretrained_vocoder_model_root: PathBuf,
+  pub tts_synthesizer_model_root: PathBuf,
+  pub tts_inference_output_root: PathBuf,
+  // W2L
   pub user_uploaded_w2l_templates_root: PathBuf,
   pub user_uploaded_audio_for_w2l_root: PathBuf,
-  pub tts_inference_output_root: PathBuf,
   pub w2l_inference_output_root: PathBuf,
   pub w2l_model_root: PathBuf,
   pub w2l_end_bump_root: PathBuf,
@@ -25,14 +29,57 @@ impl BucketPathUnifier {
 
   pub fn default_paths() -> Self {
     Self {
+      // TTS
+      tts_pretrained_vocoder_model_root: PathBuf::from("/tts_pretrained_vocoders"),
+      tts_synthesizer_model_root: PathBuf::from("/user_uploaded_tts_synthesizers"),
+      tts_inference_output_root: PathBuf::from("/tts_inference_output"),
+      // W2L
       user_uploaded_audio_for_w2l_root: PathBuf::from("/user_uploaded_w2l_audio"),
       user_uploaded_w2l_templates_root: PathBuf::from("/user_uploaded_w2l_templates"),
-      tts_inference_output_root: PathBuf::from("/tts_inference_output"),
       w2l_inference_output_root: PathBuf::from("/w2l_inference_output"),
       w2l_model_root: PathBuf::from("/w2l_pretrained_models"),
       w2l_end_bump_root: PathBuf::from("/w2l_end_bumps"),
     }
   }
+
+  // ==================== TTS MODELS (SYNTHESIZER + VOCODER) ==================== //
+
+  // TTS pretrained vocoder models.
+  // For now this will be limited, but once they're user-uploadable, we'll add more.
+  pub fn tts_pretrained_vocoders_path(&self, tts_vocoder_model_name: &str) -> PathBuf {
+    self.tts_pretrained_vocoder_model_root.join(tts_vocoder_model_name)
+  }
+
+  pub fn tts_synthesizer_path(&self, tts_synthesizer_file_hash: &str) -> PathBuf {
+    let hashed_path = Self::hashed_directory_path(tts_synthesizer_file_hash);
+    let model_filename = format!("{}.pt", &tts_synthesizer_file_hash);
+
+    self.tts_synthesizer_model_root
+      .join(hashed_path)
+      .join(model_filename)
+  }
+
+  // ==================== TTS INFERENCE OUTPUT ==================== //
+
+  pub fn tts_inference_wav_audio_output_path(&self, tts_inference_output_uuid: &str) -> PathBuf {
+    let hashed_path = Self::hashed_directory_path(tts_inference_output_uuid);
+    let audio_filename = format!("{}.wav", &tts_inference_output_uuid);
+
+    self.tts_inference_output_root
+        .join(hashed_path)
+        .join(audio_filename)
+  }
+
+  pub fn tts_inference_spectrogram_output_path(&self, tts_inference_output_uuid: &str) -> PathBuf {
+    let hashed_path = Self::hashed_directory_path(tts_inference_output_uuid);
+    let json_filename = format!("{}.json", &tts_inference_output_uuid);
+
+    self.tts_inference_output_root
+        .join(hashed_path)
+        .join(json_filename)
+  }
+
+  // ==================== W2L STATIC RESOURCES ==================== //
 
   // W2L pretrained models. There are only two.
   pub fn w2l_pretrained_models_path(&self, w2l_model_name: &str) -> PathBuf {
@@ -43,6 +90,8 @@ impl BucketPathUnifier {
   pub fn end_bump_video_for_w2l_path(&self, end_bump_filename: &str) -> PathBuf {
     self.w2l_end_bump_root.join(end_bump_filename)
   }
+
+  // ==================== W2L USER-UPLOADED RESOURCES ==================== //
 
   // The video or images uploaded as templates
   // eg. /user_uploaded_w2l_templates/1/5/1/151a[...60]...
@@ -73,6 +122,8 @@ impl BucketPathUnifier {
       .join(audio_uuid)
   }
 
+  // ==================== W2L INFERENCE OUTPUT ==================== //
+
   // W2L inference output videos
   pub fn w2l_inference_video_output_path(&self, w2l_inference_job_token: &str) -> PathBuf {
     // NB: We don't want colons from the token in the filename.
@@ -89,7 +140,6 @@ impl BucketPathUnifier {
           .join(video_filename);
       }
     }
-
 
     let video_filename = w2l_inference_job_token.replace(":", "");
     let video_filename = format!("vocodes_video_{}.mp4", video_filename);
@@ -118,13 +168,45 @@ mod tests {
 
   fn get_instance() -> BucketPathUnifier {
     BucketPathUnifier {
+      // TTS
+      tts_pretrained_vocoder_model_root: PathBuf::from("/test_path_tts_vocoders"),
+      tts_synthesizer_model_root: PathBuf::from("/test_path_synthesizers"),
+      tts_inference_output_root: PathBuf::from("/test_path_tts_output"),
+      // W2L
       user_uploaded_w2l_templates_root: PathBuf::from("/test_path_w2l_templates"),
       user_uploaded_audio_for_w2l_root: PathBuf::from("/test_path_w2l_audio"),
-      tts_inference_output_root: PathBuf::from("/test_path_tts_output"),
       w2l_inference_output_root: PathBuf::from("/test_path_w2l_output"),
       w2l_model_root: PathBuf::from("/test_path_w2l_pretrained_models"),
       w2l_end_bump_root: PathBuf::from("/test_path_w2l_end_bumps"),
     }
+  }
+
+  #[test]
+  fn test_tts_pretrained_vocoders_path() {
+    let paths = get_instance();
+    assert_eq!(paths.tts_pretrained_vocoders_path("melgan.pth").to_str().unwrap(),
+      "/test_path_tts_vocoders/melgan.pth");
+  }
+
+  #[test]
+  fn test_tts_synthesizer_path() {
+    let paths = get_instance();
+    assert_eq!(paths.tts_synthesizer_path("foobar").to_str().unwrap(),
+      "/test_path_synthesizers/f/o/o/foobar.pth");
+  }
+
+  #[test]
+  fn test_tts_inference_wav_audio_output_path() {
+    let paths = get_instance();
+    assert_eq!(paths.tts_inference_wav_audio_output_path("foobar").to_str().unwrap(),
+      "/test_path_tts_output/f/o/o/foobar.wav");
+  }
+
+  #[test]
+  fn test_tts_inference_spectrogram_output_path() {
+    let paths = get_instance();
+    assert_eq!(paths.tts_inference_spectrogram_output_path("foobar").to_str().unwrap(),
+      "/test_path_tts_output/f/o/o/foobar.json");
   }
 
   #[test]

@@ -40,7 +40,7 @@ CREATE TABLE tts_results (
   public_bucket_hash CHAR(64) NOT NULL,
 
   -- Where the wav, spectrogram, and etc. are located.
-  public_bucket_audio_path VARCHAR(255) NOT NULL,
+  inference_public_bucket_uuid VARCHAR(36) NOT NULL,
 
   -- ========== METADATA ==========
 

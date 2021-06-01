@@ -83,8 +83,7 @@ struct Inferencer {
   pub tts_inference: TacotronInferenceCommand,
 
   // Command to run
-  pub w2l_model_filename: String,
-  pub w2l_end_bump_filename: String,
+  pub tts_vocoder_model_filename: String,
 }
 
 #[tokio::main]
@@ -133,7 +132,7 @@ async fn main() -> AnyhowResult<()> {
   let py_script_name = easyenv::get_env_string_required(ENV_INFERENCE_SCRIPT_NAME)?;
   //let py_model_checkpoint = easyenv::get_env_string_required(ENV_MODEL_CHECKPOINT)?;
 
-  let w2l_inference_command = TacotronInferenceCommand::new(
+  let tts_inference_command = TacotronInferenceCommand::new(
     &py_code_directory,
     &py_script_name,
   );
@@ -154,7 +153,7 @@ async fn main() -> AnyhowResult<()> {
   info!("Connecting to database...");
 
   let mysql_pool = MySqlPoolOptions::new()
-      .max_connections(5)
+      .max_connections(2)
       .connect(&db_connection_string)
       .await?;
 
@@ -162,17 +161,16 @@ async fn main() -> AnyhowResult<()> {
     ENV_SEMIPERSISTENT_CACHE_DIR,
     "/tmp");
 
-  let semi_persistent_cache = SemiPersistentCacheDir::configured_root(&persistent_cache_path);
+  let semi_persistent_cache =
+      SemiPersistentCacheDir::configured_root(&persistent_cache_path);
 
   info!("Creating pod semi-persistent cache dirs...");
   semi_persistent_cache.create_tts_synthesizer_model_path()?;
   semi_persistent_cache.create_tts_vocoder_model_path()?;
 
-  let w2l_model_filename = easyenv::get_env_string_or_default(
-    "W2L_MODEL_FILENAME", "wav2lip_gan.pth");
+  let tts_vocoder_model_filename = easyenv::get_env_string_or_default(
+    "TTS_VOCODER_MODEL_FILENAME", "waveglow.pth");
 
-  let w2l_end_bump_filename = easyenv::get_env_string_or_default(
-    "W2L_END_BUMP_FILENAME", "vocodes-short-end-bump.mp4");
 
   let firehose_publisher = FirehosePublisher {
     mysql_pool: mysql_pool.clone(), // NB: MySqlPool is clone/send/sync safe
@@ -186,12 +184,11 @@ async fn main() -> AnyhowResult<()> {
     //ffmpeg_image_preview_generator: FfmpegGeneratePreviewImageCommand {},
     //ffmpeg_video_preview_generator: FfmpegGeneratePreviewVideoCommand {},
     //imagemagick_image_preview_generator: ImagemagickGeneratePreviewImageCommand {},
-    w2l_inference: w2l_inference_command,
+    tts_inference: tts_inference_command,
     bucket_path_unifier: BucketPathUnifier::default_paths(),
     semi_persistent_cache,
     firehose_publisher,
-    w2l_model_filename,
-    w2l_end_bump_filename,
+    tts_vocoder_model_filename,
   };
 
   main_loop(inferencer).await;
@@ -269,11 +266,6 @@ async fn process_jobs(inferencer: &Inferencer, jobs: Vec<W2lInferenceJobRecord>)
 
 #[derive(Deserialize)]
 struct FileMetadata {
-  pub is_video: bool,
-  pub width: u32,
-  pub height: u32,
-  //pub num_frames: u64,
-  //pub fps: Option<f32>,
   pub duration_millis: Option<u64>,
   pub mimetype: Option<String>,
   pub file_size_bytes: u64,
@@ -307,8 +299,8 @@ async fn process_job(inferencer: &Inferencer, job: &W2lInferenceJobRecord) -> An
   let tts_vocoder_model_filename = inferencer.tts_vocoder_model_filename.clone();
   let tts_vocoder_model_fs_path = inferencer.semi_persistent_cache.tts_vocoder_model_path(&tts_vocoder_model_filename);
 
-  if !model_fs_path.exists() {
-    warn!("Model file does not exist: {:?}", &model_fs_path);
+  if !tts_vocoder_model_fs_path.exists() {
+    warn!("Vocoder model file does not exist: {:?}", &tts_vocoder_model_fs_path);
 
     let model_object_path = inferencer.bucket_path_unifier
         .w2l_pretrained_models_path(&model_filename);
