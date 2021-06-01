@@ -53,18 +53,16 @@ const ENV_ACCESS_KEY : &'static str = "ACCESS_KEY";
 const ENV_SECRET_KEY : &'static str = "SECRET_KEY";
 const ENV_REGION_NAME : &'static str = "REGION_NAME";
 
-// Buckets (private data)
-const ENV_PRIVATE_BUCKET_NAME : &'static str = "W2L_PRIVATE_DOWNLOAD_BUCKET_NAME";
-// Buckets (public data)
-const ENV_PUBLIC_BUCKET_NAME : &'static str = "W2L_PUBLIC_DOWNLOAD_BUCKET_NAME";
+// Bucket names
+const ENV_PRIVATE_BUCKET_NAME : &'static str = "PRIVATE_BUCKET_NAME";
+const ENV_PUBLIC_BUCKET_NAME : &'static str = "PUBLIC_BUCKET_NAME";
 
 // Where models and other assets get downloaded to.
 const ENV_SEMIPERSISTENT_CACHE_DIR : &'static str = "SEMIPERSISTENT_CACHE_DIR";
 
 // Python code
-const ENV_CODE_DIRECTORY : &'static str = "W2L_CODE_DIRECTORY";
-const ENV_MODEL_CHECKPOINT : &'static str = "W2L_MODEL_CHECKPOINT";
-const ENV_INFERENCE_SCRIPT_NAME : &'static str = "W2L_INFERENCE_SCRIPT_NAME";
+const ENV_CODE_DIRECTORY : &'static str = "TTS_CODE_DIRECTORY";
+const ENV_INFERENCE_SCRIPT_NAME : &'static str = "TTS_INFERENCE_SCRIPT_NAME";
 
 const DEFAULT_TEMP_DIR: &'static str = "/tmp";
 
@@ -130,7 +128,6 @@ async fn main() -> AnyhowResult<()> {
 
   let py_code_directory = easyenv::get_env_string_required(ENV_CODE_DIRECTORY)?;
   let py_script_name = easyenv::get_env_string_required(ENV_INFERENCE_SCRIPT_NAME)?;
-  //let py_model_checkpoint = easyenv::get_env_string_required(ENV_MODEL_CHECKPOINT)?;
 
   let tts_inference_command = TacotronInferenceCommand::new(
     &py_code_directory,
