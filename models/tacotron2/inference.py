@@ -19,6 +19,13 @@ from train import load_model
 from text import text_to_sequence
 #from denoiser import Denoiser
 
+print('========================================')
+print('Python interpreter', sys.executable)
+print('PyTorch version', torch.__version__)
+print('CUDA Available?', torch.cuda.is_available())
+print('CUDA Device count', torch.cuda.device_count())
+print('========================================', flush=True)
+
 # NB(bt, 2021-05-31): Trying to get everything on the same device
 torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
