@@ -5,12 +5,23 @@ This is our main user account monolith that we'll also bake other pieces into.
 Local development
 -----------------
 
-### Setup
+### Setup development
 
-Install diesel,
+Install the following libraries, and see the notes further below about MySQL on Ubuntu 20.04.
+
+```
+mysql-server
+imagemagick
+```
+
+To manage the database and perform migrations, install the Rust tools diesel and sqlx.
+
+We'll be using diesel to manage the migrations, but sqlx within the app to actually perform queries.
+Diesel is an ORM, which is dumb, so we use sqlx as at-compile-time typesafe SQL.
 
 ```
 sudo apt-get install libmysqlclient-dev
+cargo install sqlx-cli --no-default-features --features mysql
 cargo install diesel_cli --no-default-features --features mysql
 ```
 
@@ -57,7 +68,7 @@ Production
 
 ### Database migrations
 
-1. Set `DATABASE_URL` in `.env`
+1. Set `DATABASE_URL` in `.env` to the production secrets (DO NOT COMMIT!)
 2. Run `diesel migration run`
 
 Actix notes
