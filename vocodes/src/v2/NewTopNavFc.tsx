@@ -36,7 +36,7 @@ function NewTopNavFc(props: Props) {
         <div className="column">
           <Link to={myDataLink}
             className="button is-link is-medium is-inverted"
-            >My Data</Link>
+            >Pending</Link>
         </div>
         <div className="column">
           <Link to="/firehose"
