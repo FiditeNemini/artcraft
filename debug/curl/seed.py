@@ -80,6 +80,7 @@ upload_w2l_template('https://i.imgur.com/v8k9yau.jpeg', 'Miyamoto-san', session_
 
 if hostname == 'halide':
   upload_w2l_template('https://www.youtube.com/watch?v=a7mS9ZdU6k4', 'Steve Jobs talks', session_echelon)
+  upload_w2l_template('https://www.youtube.com/watch?v=6fg8SxgEUYI', 'Paul Graham lectures', session_echelon)
 
 # ==================== UPLOAD TTS MODELS ====================
 
