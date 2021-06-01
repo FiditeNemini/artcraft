@@ -1,3 +1,17 @@
+vocodes-frontend
+================
+
+To install on a new machine, simply run `npm install` in this directory.
+
+Then `npm run-script start7000` to see the frontend.
+
+
+Brandon's Notes
+---------------
+
+Old Readme From Codegen
+-----------------------
+
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
 ## Available Scripts
