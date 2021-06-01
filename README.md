@@ -132,6 +132,14 @@ server {
 
 ```
 
+And in /etc/hosts,
+
+```
+127.0.0.1  jungle.horse
+127.0.0.1  api.jungle.horse
+
+```
+
 Fixing dev MySql on Ubuntu 20.04
 --------------------------------
 

@@ -11,6 +11,7 @@ pub mod buckets;
 pub mod common_queries;
 pub mod job_queries;
 pub mod script_execution;
+pub mod shared_constants;
 pub mod util;
 
 use anyhow::anyhow;
@@ -39,6 +40,8 @@ use crate::util::semi_persistent_cache_dir::SemiPersistentCacheDir;
 use data_encoding::{HEXUPPER, HEXLOWER, HEXLOWER_PERMISSIVE};
 use log::{warn, info};
 use ring::digest::{Context, Digest, SHA256};
+use shared_constants::DEFAULT_MYSQL_PASSWORD;
+use shared_constants::DEFAULT_RUST_LOG;
 use sqlx::MySqlPool;
 use sqlx::mysql::MySqlPoolOptions;
 use std::fs::{File, metadata};
@@ -67,9 +70,6 @@ const ENV_CODE_DIRECTORY : &'static str = "W2L_CODE_DIRECTORY";
 const ENV_MODEL_CHECKPOINT : &'static str = "W2L_MODEL_CHECKPOINT";
 const ENV_INFERENCE_SCRIPT_NAME : &'static str = "W2L_INFERENCE_SCRIPT_NAME";
 
-/// NB: `sqlx::query` is spammy and logs all queries as "info"-level
-/// NB: `hyper::proto::h1::io` is incredibly spammy and logs every chunk of bytes in very large files being downloaded
-const DEFAULT_RUST_LOG: &'static str = "debug,actix_web=info,sqlx::query=warn,hyper::proto::h1::io=warn";
 const DEFAULT_TEMP_DIR: &'static str = "/tmp";
 
 struct Inferencer {
@@ -165,7 +165,7 @@ async fn main() -> AnyhowResult<()> {
   let db_connection_string =
     easyenv::get_env_string_or_default(
       "MYSQL_URL",
-      "mysql://root:root@localhost/storyteller");
+      DEFAULT_MYSQL_PASSWORD);
 
   info!("Connecting to database...");
 

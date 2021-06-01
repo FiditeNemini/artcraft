@@ -8,9 +8,10 @@
 #[macro_use] extern crate serde_derive;
 
 pub mod buckets;
+pub mod common_queries;
 pub mod job_queries;
 pub mod script_execution;
-pub mod common_queries;
+pub mod shared_constants;
 pub mod util;
 
 use anyhow::anyhow;
@@ -36,15 +37,17 @@ use crate::util::random_crockford_token::random_crockford_token;
 use data_encoding::{HEXUPPER, HEXLOWER, HEXLOWER_PERMISSIVE};
 use log::{warn, info};
 use ring::digest::{Context, Digest, SHA256};
+use shared_constants::DEFAULT_MYSQL_PASSWORD;
+use shared_constants::DEFAULT_RUST_LOG;
 use sqlx::MySqlPool;
 use sqlx::mysql::MySqlPoolOptions;
 use std::fs::{File, metadata};
 use std::io::{BufReader, Read};
 use std::path::{PathBuf, Path};
 use std::process::Command;
+use std::thread;
 use std::time::Duration;
 use tempdir::TempDir;
-use std::thread;
 
 // Buckets (shared config)
 const ENV_ACCESS_KEY : &'static str = "ACCESS_KEY";
@@ -64,8 +67,6 @@ const ENV_CODE_DIRECTORY : &'static str = "W2L_CODE_DIRECTORY";
 const ENV_MODEL_CHECKPOINT : &'static str = "W2L_MODEL_CHECKPOINT";
 const ENV_DOWNLOAD_SCRIPT_NAME : &'static str = "W2L_DOWNLOAD_SCRIPT_NAME";
 
-// NB: sqlx::query is spammy and logs all queries as "info"-level
-const DEFAULT_RUST_LOG: &'static str = "debug,actix_web=info,sqlx::query=warn";
 const DEFAULT_TEMP_DIR: &'static str = "/tmp";
 
 struct Downloader {
@@ -168,7 +169,7 @@ async fn main() -> AnyhowResult<()> {
   let db_connection_string =
     easyenv::get_env_string_or_default(
       "MYSQL_URL",
-      "mysql://root:root@localhost/storyteller");
+      DEFAULT_MYSQL_PASSWORD);
 
   info!("Connecting to database...");
 

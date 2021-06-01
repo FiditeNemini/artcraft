@@ -16,6 +16,7 @@ pub mod common_queries;
 pub mod database_helpers;
 pub mod http_server;
 pub mod server_state;
+pub mod shared_constants;
 pub mod util;
 pub mod validations;
 
@@ -26,35 +27,36 @@ use actix_cors::Cors;
 use actix_http::http;
 use actix_web::middleware::{Logger, DefaultHeaders};
 use actix_web::{HttpServer, web, HttpResponse, App};
+use crate::buckets::bucket_client::BucketClient;
+use crate::common_queries::firehose_publisher::FirehosePublisher;
 use crate::http_server::endpoints::default_route_404::default_route_404;
 use crate::http_server::endpoints::events::list_events::list_events_handler;
 use crate::http_server::endpoints::misc::enable_alpha::enable_alpha;
 use crate::http_server::endpoints::root_index::get_root_index;
 use crate::http_server::endpoints::tts::enqueue_infer_tts::infer_tts_handler;
 use crate::http_server::endpoints::tts::enqueue_upload_tts_model::upload_tts_model_handler;
+use crate::http_server::endpoints::tts::list_tts_models::list_tts_models_handler;
 use crate::http_server::endpoints::users::create_account::create_account_handler;
+use crate::http_server::endpoints::users::get_profile::get_profile_handler;
+use crate::http_server::endpoints::users::list_user_w2l_inference_results::list_user_w2l_inference_results_handler;
+use crate::http_server::endpoints::users::list_user_w2l_templates::list_user_w2l_templates_handler;
 use crate::http_server::endpoints::users::login::login_handler;
 use crate::http_server::endpoints::users::logout::logout_handler;
 use crate::http_server::endpoints::users::session_info::session_info_handler;
 use crate::http_server::endpoints::w2l::enqueue_infer_w2l::infer_w2l_handler;
+use crate::http_server::endpoints::w2l::enqueue_infer_w2l_with_uploads::enqueue_infer_w2l_with_uploads;
 use crate::http_server::endpoints::w2l::enqueue_upload_w2l_template::upload_w2l_template_handler;
+use crate::http_server::endpoints::w2l::get_w2l_result::get_w2l_inference_result_handler;
+use crate::http_server::endpoints::w2l::get_w2l_template::get_w2l_template_handler;
+use crate::http_server::endpoints::w2l::list_w2l_templates::list_w2l_templates_handler;
 use crate::http_server::web_utils::cookie_manager::CookieManager;
 use crate::http_server::web_utils::session_checker::SessionChecker;
 use crate::server_state::{ServerState, EnvConfig};
+use crate::shared_constants::{DEFAULT_RUST_LOG, DEFAULT_MYSQL_PASSWORD};
 use log::{info};
 use sqlx::MySqlPool;
 use sqlx::mysql::MySqlPoolOptions;
 use std::sync::Arc;
-use crate::http_server::endpoints::users::get_profile::get_profile_handler;
-use crate::http_server::endpoints::w2l::list_w2l_templates::list_w2l_templates_handler;
-use crate::http_server::endpoints::w2l::get_w2l_template::get_w2l_template_handler;
-use crate::http_server::endpoints::tts::list_tts_models::list_tts_models_handler;
-use crate::http_server::endpoints::w2l::enqueue_infer_w2l_with_uploads::enqueue_infer_w2l_with_uploads;
-use crate::buckets::bucket_client::BucketClient;
-use crate::http_server::endpoints::users::list_user_w2l_templates::list_user_w2l_templates_handler;
-use crate::http_server::endpoints::users::list_user_w2l_inference_results::list_user_w2l_inference_results_handler;
-use crate::http_server::endpoints::w2l::get_w2l_result::get_w2l_inference_result_handler;
-use crate::common_queries::firehose_publisher::FirehosePublisher;
 
 // TODO TODO TODO TODO
 // TODO TODO TODO TODO
@@ -67,10 +69,6 @@ use crate::common_queries::firehose_publisher::FirehosePublisher;
 
 
 const DEFAULT_BIND_ADDRESS : &'static str = "0.0.0.0:12345";
-
-// NB: sqlx::query is spammy and logs all queries as "info"-level
-const DEFAULT_RUST_LOG: &'static str = "debug,actix_web=info,sqlx::query=warn";
-//const DEFAULT_RUST_LOG: &'static str = "debug,actix_web=info";
 
 // Buckets (shared config)
 const ENV_ACCESS_KEY : &'static str = "ACCESS_KEY";
@@ -109,7 +107,7 @@ async fn main() -> AnyhowResult<()> {
   let db_connection_string =
     easyenv::get_env_string_or_default(
       "MYSQL_URL",
-      "mysql://storyteller:password@localhost/storyteller");
+      DEFAULT_MYSQL_PASSWORD);
 
   let pool = MySqlPoolOptions::new()
     .max_connections(5)
