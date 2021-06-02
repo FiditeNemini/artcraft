@@ -18,6 +18,7 @@ pub mod util;
 use anyhow::anyhow;
 use chrono::Utc;
 use crate::buckets::bucket_client::BucketClient;
+use crate::buckets::bucket_path_unifier::BucketPathUnifier;
 use crate::buckets::bucket_paths::hash_to_bucket_path;
 use crate::buckets::file_hashing::get_file_hash;
 use crate::common_queries::firehose_publisher::FirehosePublisher;
@@ -59,6 +60,9 @@ struct Downloader {
   pub bucket_client: BucketClient,
   pub firehose_publisher: FirehosePublisher,
   pub google_drive_downloader: GoogleDriveDownloadCommand,
+
+  pub bucket_path_unifier: BucketPathUnifier,
+
   // Command to run
   pub download_script: String,
   // Root to store TTS results
@@ -131,6 +135,7 @@ async fn main() -> AnyhowResult<()> {
     bucket_client,
     download_script,
     google_drive_downloader,
+    bucket_path_unifier: BucketPathUnifier::default_paths(),
     bucket_root_tts_model_uploads: bucket_root.to_string(),
     firehose_publisher,
   };
@@ -222,22 +227,25 @@ async fn process_job(downloader: &Downloader, job: &TtsUploadJobRecord) -> Anyho
 
   info!("File hash: {}", private_bucket_hash);
 
-  // NB: /.../a/b/c/d/abcdefg.bin
-  let object_name = hash_to_bucket_path(
-    &private_bucket_hash,
-    Some(&downloader.bucket_root_tts_model_uploads))?;
+  //// NB: /.../a/b/c/d/abcdefg.bin
+  //let object_name = hash_to_bucket_path(
+  //  &private_bucket_hash,
+  //  Some(&downloader.bucket_root_tts_model_uploads))?;
 
-  info!("Destination bucket path: {}", object_name);
+  let synthesizer_model_bucket_path = downloader.bucket_path_unifier.tts_synthesizer_path(
+    &private_bucket_hash);
+
+  info!("Destination bucket path: {:?}", &synthesizer_model_bucket_path);
 
   let file_path = PathBuf::from(download_filename);
-  downloader.bucket_client.upload_filename(&object_name, &file_path).await?;
+  downloader.bucket_client.upload_filename(&synthesizer_model_bucket_path, &file_path).await?;
 
   info!("Saving model record...");
   let (id, model_token) = insert_tts_model(
     &downloader.mysql_pool,
     job,
     &private_bucket_hash,
-    &object_name)
+    synthesizer_model_bucket_path.as_path().to_str().unwrap_or(""))
     .await?;
 
   info!("Saved model record: {}", id);

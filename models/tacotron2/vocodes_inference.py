@@ -48,9 +48,11 @@ hparams.sampling_rate = 22050
 torch.set_default_tensor_type('torch.HalfTensor') # 2021-05-31 added
 
 # Load synthesizer
-checkpoint_path = args.synthesizer_checkpoint_path
 
+checkpoint_path = args.synthesizer_checkpoint_path
 model = load_model(hparams)
+
+print('Loading synthesizer at path: {}'.format(checkpoint_path))
 model.load_state_dict(torch.load(checkpoint_path)['state_dict'])
 
 # NB(bt, 2021-05-31): Trying to get everything on the same device

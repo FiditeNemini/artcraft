@@ -108,18 +108,15 @@ impl BucketClient {
   //   Ok(())
   // }
 
-  pub async fn upload_filename(&self, object_name: &str, filename: &Path) -> anyhow::Result<()> {
-    /*let mut file = File::open(filename).await?;
-    let mut reader = BufReader::new(file);
-
-    info!("Uploading...");
-
-    let code = self.bucket.put_object_stream(&mut reader, object_name).await?;
-
-    info!("upload code: {}", code);
-
-    Ok(())
-    */
+  pub async fn upload_filename<P: AsRef<Path>>(
+    &self,
+    object_path: P,
+    filename: P
+  ) -> anyhow::Result<()> {
+    let object_path_str = object_path.as_ref()
+        .to_str()
+        .map(|s| s.to_string())
+        .ok_or(anyhow!("could not convert object path to string"))?;
 
     // TODO: does a newer version of this crate handle streaming/buffering file contents?
     let mut file = File::open(filename).await?;
@@ -128,7 +125,7 @@ impl BucketClient {
 
     info!("Uploading...");
 
-    self.upload_file(object_name, &buffer).await
+    self.upload_file(&object_path_str, &buffer).await
   }
 
   pub async fn upload_filename_with_content_type<P: AsRef<Path>>(
