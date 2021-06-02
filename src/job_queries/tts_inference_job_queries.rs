@@ -167,6 +167,7 @@ SET
   public_bucket_hash = 'TODO',
   public_bucket_wav_audio_path = ?,
   public_bucket_spectrogram_path = ?,
+  inference_public_bucket_uuid = 'TODO',
 
   file_size_bytes = ?,
   duration_millis = ?

@@ -232,6 +232,18 @@ async fn process_job(downloader: &Downloader, job: &TtsUploadJobRecord) -> Anyho
   //  &private_bucket_hash,
   //  Some(&downloader.bucket_root_tts_model_uploads))?;
 
+  // [2021-06-02T04:38:28Z INFO  tts_download_job::buckets::bucket_client] Uploading...
+  // [2021-06-02T04:38:28Z INFO  tts_download_job::buckets::bucket_client]
+  // Filename for bucket: /user_uploaded_tts_synthesizers/9/5/7/957dfe3f2fcf36ebcf13a6e3bc52fb2905ccd7b1834076bd6c3c41ace272640a.pt
+  // [2021-06-02T04:38:28Z INFO  tts_download_job::buckets::bucket_client]
+  // Rooted filename for bucket: /user_uploaded_tts_synthesizers/9/5/7/957dfe3f2fcf36ebcf13a6e3bc52fb2905ccd7b1834076bd6c3c41ace272640a.pt
+
+  // 2021-06-02T04:40:24Z INFO  tts_inference_job] TTS synthesizer model file does not exist:
+  // "/tmp/tts/synthesizer_models/TTS_MDL:BSBQ48NWNFJFH5PSD3MCSCF2"
+  // [2021-06-02T04:40:24Z INFO  tts_inference_job]
+  // Download from template media path: "/user_uploaded_tts_synthesizers/9/5/7/957dfe3f2fcf36ebcf13a6e3bc52fb2905ccd7b1834076bd6c3c41ace272640a.pt"
+  // [2021-06-02T04:40:24Z INFO  tts_inference_job::buckets::bucket_client] downloading from bucket:
+  // "/user_uploaded_tts_synthesizers/9/5/7/957dfe3f2fcf36ebcf13a6e3bc52fb2905ccd7b1834076bd6c3c41ace272640a.pt"
   let synthesizer_model_bucket_path = downloader.bucket_path_unifier.tts_synthesizer_path(
     &private_bucket_hash);
 

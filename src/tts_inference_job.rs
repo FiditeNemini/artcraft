@@ -261,7 +261,7 @@ async fn process_jobs(inferencer: &Inferencer, jobs: Vec<TtsInferenceJobRecord>)
   Ok(())
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Default)]
 struct FileMetadata {
   pub duration_millis: Option<u64>,
   pub mimetype: Option<String>,
@@ -389,10 +389,11 @@ async fn process_job(inferencer: &Inferencer, job: &TtsInferenceJobRecord) -> An
   info!("Checking that output files exist...");
 
   check_file_exists(&output_audio_fs_path)?;
-  check_file_exists(&output_spectrogram_fs_path)?;
-  check_file_exists(&output_metadata_fs_path)?;
+  //check_file_exists(&output_spectrogram_fs_path)?;
+  //check_file_exists(&output_metadata_fs_path)?;
 
-  let file_metadata = read_metadata_file(&output_metadata_fs_path)?;
+  let file_metadata = FileMetadata::default();
+  //let file_metadata = read_metadata_file(&output_metadata_fs_path)?;
 
   // ==================== UPLOAD AUDIO TO BUCKET ==================== //
 
@@ -414,6 +415,7 @@ async fn process_job(inferencer: &Inferencer, job: &TtsInferenceJobRecord) -> An
   let spectrogram_result_object_path = inferencer.bucket_path_unifier.tts_inference_spectrogram_output_path(
     &job.inference_job_token);
 
+  /*
   info!("Spectrogram destination bucket path: {:?}", &spectrogram_result_object_path);
 
   info!("Uploading spectrogram...");
@@ -423,6 +425,7 @@ async fn process_job(inferencer: &Inferencer, job: &TtsInferenceJobRecord) -> An
     &output_spectrogram_fs_path,
     "application/json")
       .await?;
+   */
 
   // ==================== SAVE RECORDS ==================== //
 
