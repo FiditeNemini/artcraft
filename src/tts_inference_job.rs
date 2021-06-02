@@ -398,7 +398,7 @@ async fn process_job(inferencer: &Inferencer, job: &TtsInferenceJobRecord) -> An
   // ==================== UPLOAD AUDIO TO BUCKET ==================== //
 
   let audio_result_object_path = inferencer.bucket_path_unifier.tts_inference_wav_audio_output_path(
-    &job.inference_job_token);
+    &job.uuid_idempotency_token); // TODO: Don't use this!
 
   info!("Audio destination bucket path: {:?}", &audio_result_object_path);
 
