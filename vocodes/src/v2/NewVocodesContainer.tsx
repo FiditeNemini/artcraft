@@ -18,6 +18,7 @@ import { UploadW2lVideoFc } from './upload/UploadW2lVideoFc';
 import { W2lResultViewFc } from './w2l_result_view/W2lResultViewFc';
 import { W2lTemplateListFc } from './w2l_template_list/W2lTemplateListFc';
 import { W2lTemplateViewFc } from './w2l_template_view/W2lTemplateViewFc';
+import { NewFooterNavFc } from './NewFooterNavFc';
 
 interface Props {
   sessionWrapper: SessionWrapper,
@@ -157,6 +158,10 @@ class NewVocodesContainer extends React.Component<Props, State> {
             </Route>
 
           </Switch>
+
+          <NewFooterNavFc
+            sessionWrapper={this.props.sessionWrapper}
+            />
 
         </div>
       </div>
