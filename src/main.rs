@@ -57,6 +57,10 @@ use log::{info};
 use sqlx::MySqlPool;
 use sqlx::mysql::MySqlPoolOptions;
 use std::sync::Arc;
+use crate::http_server::endpoints::users::list_user_tts_inference_results::list_user_tts_inference_results_handler;
+use crate::http_server::endpoints::users::list_user_tts_models::list_user_tts_models_handler;
+use crate::http_server::endpoints::tts::get_tts_result::get_tts_inference_result_handler;
+use crate::http_server::endpoints::tts::get_tts_model::get_tts_model_handler;
 
 // TODO TODO TODO TODO
 // TODO TODO TODO TODO
@@ -270,6 +274,16 @@ pub async fn serve(server_state: ServerState) -> AnyhowResult<()>
               .route(web::get().to(list_tts_models_handler))
               .route(web::head().to(|| HttpResponse::Ok()))
           )
+          .service(
+            web::resource("/model/{slug}")
+              .route(web::get().to(get_tts_model_handler))
+              .route(web::head().to(|| HttpResponse::Ok()))
+          )
+          .service(
+          web::resource("/result/{token}")
+              .route(web::get().to(get_tts_inference_result_handler))
+              .route(web::head().to(|| HttpResponse::Ok()))
+          )
       )
       .service(
         web::scope("/w2l")
@@ -307,14 +321,24 @@ pub async fn serve(server_state: ServerState) -> AnyhowResult<()>
       .service(
         web::scope("/user")
           .service(
-            web::resource("/{username}/w2l_templates")
-              .route(web::get().to(list_user_w2l_templates_handler))
+            web::resource("/{username}/tts_models")
+              .route(web::get().to(list_user_tts_models_handler))
               .route(web::head().to(|| HttpResponse::Ok()))
           )
           .service(
-            web::resource("/{username}/w2l_results")
-              .route(web::get().to(list_user_w2l_inference_results_handler))
+            web::resource("/{username}/tts_results")
+              .route(web::get().to(list_user_tts_inference_results_handler))
               .route(web::head().to(|| HttpResponse::Ok()))
+          )
+          .service(
+            web::resource("/{username}/w2l_templates")
+                .route(web::get().to(list_user_w2l_templates_handler))
+                .route(web::head().to(|| HttpResponse::Ok()))
+          )
+          .service(
+            web::resource("/{username}/w2l_results")
+                .route(web::get().to(list_user_w2l_inference_results_handler))
+                .route(web::head().to(|| HttpResponse::Ok()))
           )
       )
       .service(
