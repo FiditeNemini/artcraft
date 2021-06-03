@@ -8,8 +8,8 @@ import { ProfileFc } from './profile/ProfileFc';
 import { SessionWrapper } from '../session/SessionWrapper';
 import { SignupComponent } from './signup/SignupComponent';
 import { Switch, Route, RouteProps } from 'react-router-dom';
-import { TtsModelFormFc } from './tts_model/TtsModelFormFc';
-import { TtsModelListComponent } from './tts_model/TtsModelListComponent';
+import { TtsModelFormFc } from './tts_model_list/TtsModelFormFc';
+import { TtsModelListComponent } from './tts_model_list/TtsModelListComponent';
 import { UploadChoiceFc } from './upload/UploadChoiceFc';
 import { UploadComponent } from './upload/UploadComponent';
 import { UploadTtsModelFc } from './upload/UploadTtsModelFc';
@@ -19,6 +19,7 @@ import { W2lResultViewFc } from './w2l_result_view/W2lResultViewFc';
 import { W2lTemplateListFc } from './w2l_template_list/W2lTemplateListFc';
 import { W2lTemplateViewFc } from './w2l_template_view/W2lTemplateViewFc';
 import { NewFooterNavFc } from './NewFooterNavFc';
+import { TtsModelViewFc } from './tts_model_view/TtsModelViewFc';
 
 interface Props {
   sessionWrapper: SessionWrapper,
@@ -92,6 +93,18 @@ class NewVocodesContainer extends React.Component<Props, State> {
             <Route path="/signup">
               <SignupComponent
                 querySessionCallback={()=>{}}
+                sessionWrapper={this.props.sessionWrapper}
+              />
+            </Route>
+
+            {/*<Route path="/tts/result/:token">
+              <TtsResultViewFc
+                sessionWrapper={this.props.sessionWrapper}
+              />
+              </Route>*/}
+
+            <Route path="/tts/:token">
+              <TtsModelViewFc
                 sessionWrapper={this.props.sessionWrapper}
               />
             </Route>

@@ -40,6 +40,10 @@ class ApiConfig {
     return `${this.getScheme()}://${this.getNewApiHost()}/tts/list`;
   }
 
+  viewTtsModel(templateSlug: string) : string {
+    return `${this.getScheme()}://${this.getNewApiHost()}/tts/model/${templateSlug}`;
+  }
+
   listTtsModelsForUser(username: string) : string {
     return `${this.getScheme()}://${this.getNewApiHost()}/user/${username}/tts_models`;
   }
