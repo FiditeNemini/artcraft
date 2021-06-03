@@ -1496,16 +1496,6 @@
       "nullable": []
     }
   },
-  "7529fc02fff368b36f2dc630ec3c041384fb3d0ce8f87a8fbbd7ce06dc7f43bb": {
-    "query": "\nINSERT INTO tts_results\nSET\n  token = ?,\n  model_token = ?,\n  inference_text = ?,\n\n  maybe_creator_user_token = ?,\n  creator_ip_address = ?,\n  creator_set_visibility = 'public',\n\n  public_bucket_hash = 'TODO',\n  public_bucket_audio_path = ?,\n\n  file_size_bytes = ?,\n  mime_type = ?,\n  duration_millis = ?\n        ",
-    "describe": {
-      "columns": [],
-      "parameters": {
-        "Right": 9
-      },
-      "nullable": []
-    }
-  },
   "7ab54466ca3021d90e0feb234acba56bf53d415dde69bc1c35120ed0c8dd1858": {
     "query": "\nSELECT *\nFROM tts_model_upload_jobs\nWHERE\n  (\n    status IN (\"pending\", \"attempt_failed\")\n  )\n  AND\n  (\n    retry_at IS NULL\n    OR\n    retry_at < CURRENT_TIMESTAMP\n  )\n  LIMIT ?\n        ",
     "describe": {
@@ -2185,6 +2175,16 @@
       "columns": [],
       "parameters": {
         "Right": 5
+      },
+      "nullable": []
+    }
+  },
+  "9e2a2897058a40d0b27b3afddf515fd9e458a7bec824de902a673362617e8987": {
+    "query": "\nINSERT INTO tts_results\nSET\n  token = ?,\n\n  model_token = ?,\n  inference_text = ?,\n  inference_text_hash_sha2 = ?,\n\n  maybe_creator_user_token = ?,\n  creator_ip_address = ?,\n  creator_set_visibility = 'public',\n\n  public_bucket_hash = 'TODO',\n  public_bucket_wav_audio_path = ?,\n  public_bucket_spectrogram_path = ?,\n  inference_public_bucket_uuid = 'TODO',\n\n  file_size_bytes = ?,\n  duration_millis = ?\n        ",
+    "describe": {
+      "columns": [],
+      "parameters": {
+        "Right": 10
       },
       "nullable": []
     }
