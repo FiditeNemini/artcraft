@@ -2,6 +2,8 @@ import React, { useEffect, useState }  from 'react';
 import { ApiConfig } from '../../v1/api/ApiConfig';
 import { GravatarFc } from '../common/GravatarFc';
 import { Link } from 'react-router-dom';
+import { ProfileTtsInferenceResultsListFc } from './Profile_TtsInferenceResultListFc';
+import { ProfileTtsModelListFc } from './Profile_TtsModelListFc';
 import { ProfileW2lInferenceResultsListFc } from './Profile_W2lInferenceResultListFc';
 import { ProfileW2lTemplateListFc } from './Profile_W2lTemplateListFc';
 import { SessionWrapper } from '../../session/SessionWrapper';
@@ -97,8 +99,9 @@ function ProfileFc(props: Props) {
       <br />
       <br />
 
-      <h3 className="title is-3"> Uploaded Templates </h3>
-      <ProfileW2lTemplateListFc username={username} />
+      <h3 className="title is-3"> TTS Results </h3>
+      <ProfileTtsInferenceResultsListFc username={username} />
+
 
       <br />
       <br />
@@ -106,6 +109,24 @@ function ProfileFc(props: Props) {
       <h3 className="title is-3"> Lipsync Results </h3>
       <ProfileW2lInferenceResultsListFc username={username} />
 
+      <br />
+      <br />
+
+      <h3 className="title is-3"> Uploaded TTS Models </h3>
+      <ProfileTtsModelListFc username={username} />
+
+      <br />
+      <br />
+
+      <h3 className="title is-3"> Uploaded Templates </h3>
+      <ProfileW2lTemplateListFc username={username} />
+
+      <br />
+      <br />
+      <h3 className="title is-3"> Badges </h3>
+      EARLY USER ! ! 
+      <br />
+      <br />
     </div>
   )
 }
