@@ -25,9 +25,11 @@ import torch
 import shutil
 import json
 
+from model import Tacotron2
 from hparams import create_hparams
 from train import load_model
 from text import text_to_sequence
+from denoiser import Denoiser
 
 print('========================================')
 print('Python interpreter', sys.executable)
@@ -37,41 +39,54 @@ print('CUDA Device count', torch.cuda.device_count())
 print('========================================', flush=True)
 
 # NB(bt, 2021-05-31): Trying to get everything on the same device
-torch.device("cuda" if torch.cuda.is_available() else "cpu")
+#torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 hparams = create_hparams()
 hparams.sampling_rate = 22050
+hparams.sampling_rate = 22050 # Don't change this
+hparams.max_decoder_steps = 1000 # How long the audio will be before it cuts off (1000 is about 11 seconds)
+hparams.gate_threshold = 0.1 # Model must be 90% sure the clip is over before ending generation (the higher this number is, the more likely that the AI will keep generating until it reaches the Max Decoder Steps)
 
 # Fix bug running on CPU?
 #torch.set_default_dtype(torch.float16)
 # NB(bt, 2021-05-31): Perhaps this is blocking waveglow? It complains of the wrong tensor type.
 #torch.set_default_tensor_type('torch.DoubleTensor') # 2021-05-31 commented out
-torch.set_default_tensor_type('torch.HalfTensor') # 2021-05-31 added
+#torch.set_default_tensor_type('torch.HalfTensor') # 2021-05-31 added
 
 # Load synthesizer
 
 checkpoint_path = args.synthesizer_checkpoint_path
-model = load_model(hparams)
+
+#model = load_model(hparams)
+model = Tacotron2(hparams)
 
 print('Loading synthesizer at path: {}'.format(checkpoint_path))
 model.load_state_dict(torch.load(checkpoint_path)['state_dict'])
+_ = model.cuda().eval().half()
+
 
 # NB(bt, 2021-05-31): Trying to get everything on the same device
 device = "cuda:0"
 model = model.to(device)
-
-_ = model.cuda().eval()
+#_ = model.cuda().eval()
 
 # Load vocoder
 waveglow_path = args.vocoder_checkpoint_path
 
-waveglow = torch.load(waveglow_path)['model']
-waveglow.cuda().eval().half()
 #for k in waveglow.convinv:
 #    k.float()
 #denoiser = Denoiser(waveglow)
 
+
+waveglow = torch.load(waveglow_path)['model']
+waveglow.cuda().eval().half()
+for k in waveglow.convinv:
+    k.float()
+denoiser = Denoiser(waveglow)
+
 text = open(args.input_text_filename, 'r').read()
+
+"""
 seq = text_to_sequence(text, ['english_cleaners'])
 
 sequence = np.array(seq)[None, :]
@@ -91,8 +106,32 @@ print("Sequence torch autograd: {}".format(sequence))
 
 # NB(bt, 2021-05-31): Trying to get everything to the same device
 sequence = sequence.to(device)
+"""
 
-mel_outputs, mel_outputs_postnet, _, alignments = model.inference(sequence)
+
+
+raw_input = True
+sequence = None
+
+for i in text.split("\n"):
+    if len(i) < 1:
+        continue
+    print(i)
+    if raw_input:
+        if i[-1] != ";":
+            i = i+";"
+    else:
+        #i = ARPA(i)
+        pass
+    print(i)
+    with torch.no_grad():
+        # save VRAM by not including gradients
+        sequence = np.array(text_to_sequence(i, ['english_cleaners']))[None, :]
+        sequence = torch.autograd.Variable(torch.from_numpy(sequence)).cuda().long()
+        break # TODO: Handle multiple lines.
+
+with torch.no_grad():
+    mel_outputs, mel_outputs_postnet, _, alignments = model.inference(sequence)
 
 print("Mel outputs:")
 print(mel_outputs)
@@ -120,16 +159,22 @@ class NumpyEncoder(json.JSONEncoder):
 #render_histogram(mel_outputs_postnet, 'mel_outputs_postnet.png')
 
 with torch.no_grad():
-    audio = waveglow.infer(mel_outputs_postnet, sigma=0.666)
-    pass
+    # This was from Tacotron 2's repo:
+    #audio = waveglow.infer(mel_outputs_postnet, sigma=0.666)
+
+    # This is from the colab:
+    sigma = 0.8
+    audio = waveglow.infer(mel_outputs_postnet, sigma=sigma)
+    #print("")
+    #ipd.display(ipd.Audio(audio[0].data.cpu().numpy(), rate=hparams.sampling_rate))
 
 #ipd.Audio(audio[0].data.cpu().numpy(), rate=hparams.sampling_rate)
 
 # https://pytorch.org/hub/nvidia_deeplearningexamples_waveglow/
 audio_numpy = audio[0].data.cpu().numpy()
-rate = 22050
+#rate = 22050
 from scipy.io.wavfile import write
-write(args.output_audio_filename, rate, audio_numpy)
+write(args.output_audio_filename, hparams.sampling_rate, audio_numpy)
 
 try:
     debug_location = "/home/bt/dev/storyteller/storyteller-web/test"
@@ -141,3 +186,31 @@ except Exception as e:
     print(e)
     pass
 
+"""
+#@markdown # **Synthesis**
+#@markdown # Enter your desired text here, the graph and audio will show up.
+
+text = "And so he ran across the street to measure the absence of being." #@param {type:"string"}
+sigma = 0.8
+denoise_strength = 0.324
+
+#@markdown #### Optional if you want automatic ARPA convertion.
+
+raw_input = True #@param {type:"boolean"}
+
+for i in text.split("\n"):
+    if len(i) < 1: 
+        sys.exit()
+    print(i)
+    if raw_input:
+        if i[-1] != ";": i=i+";"
+    else: 
+        i = ARPA(i)
+    print(i)
+    with torch.no_grad(): # save VRAM by not including gradients
+        sequence = np.array(text_to_sequence(i, ['english_cleaners']))[None, :]
+        sequence = torch.autograd.Variable(torch.from_numpy(sequence)).cuda().long()
+        mel_outputs, mel_outputs_postnet, _, alignments = model.inference(sequence)
+        plot_data((mel_outputs_postnet.float().data.cpu().numpy()[0],
+                   alignments.float().data.cpu().numpy()[0].T))
+"""
