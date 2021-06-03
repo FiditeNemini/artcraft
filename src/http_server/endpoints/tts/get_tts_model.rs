@@ -35,17 +35,15 @@ pub struct GetTtsModelPathInfo {
 #[derive(Serialize)]
 pub struct TtsModelRecordForResponse {
   pub model_token: String,
-  pub model_type: String,
+  pub tts_model_type: String,
+
   pub creator_user_token: String,
   pub creator_username: String,
   pub creator_display_name: String,
+
   pub updatable_slug: String,
   pub title: String,
-  pub frame_width: u32,
-  pub frame_height: u32,
-  pub duration_millis: u32,
-  pub maybe_image_object_name: Option<String>,
-  pub maybe_video_object_name: Option<String>,
+
   pub created_at: DateTime<Utc>,
   pub updated_at: DateTime<Utc>,
 }
@@ -70,17 +68,15 @@ pub enum GetTtsModelError {
 #[derive(Serialize)]
 pub struct TtsModelRecord {
   pub model_token: String,
-  pub model_type: String,
+  pub tts_model_type: String,
+
   pub creator_user_token: String,
   pub creator_username: String,
   pub creator_display_name: String,
+
   pub updatable_slug: String,
   pub title: String,
-  pub frame_width: i32,
-  pub frame_height: i32,
-  pub duration_millis: i32,
-  pub maybe_public_bucket_preview_image_object_name: Option<String>,
-  pub maybe_public_bucket_preview_video_object_name: Option<String>,
+
   pub created_at: DateTime<Utc>,
   pub updated_at: DateTime<Utc>,
 }
@@ -125,17 +121,15 @@ pub async fn get_tts_model_handler(
         r#"
 SELECT
     tts.token as model_token,
-    tts.model_type,
+    tts.tts_model_type,
+
     tts.creator_user_token,
     users.username as creator_username,
     users.display_name as creator_display_name,
+
     tts.updatable_slug,
     tts.title,
-    tts.frame_width,
-    tts.frame_height,
-    tts.duration_millis,
-    tts.maybe_public_bucket_preview_image_object_name,
-    tts.maybe_public_bucket_preview_video_object_name,
+
     tts.created_at,
     tts.updated_at
 FROM tts_models as tts
@@ -166,17 +160,12 @@ AND tts.deleted_at IS NULL
 
   let model_for_response = TtsModelRecordForResponse {
     model_token: template.model_token.clone(),
-    model_type: template.model_type.clone(),
+    tts_model_type: template.tts_model_type.clone(),
     creator_user_token: template.creator_user_token.clone(),
     creator_username: template.creator_username.clone(),
     creator_display_name: template.creator_display_name.clone(),
     updatable_slug: template.updatable_slug.clone(),
     title: template.title.clone(),
-    frame_width: if template.frame_width > 0 { template.frame_width as u32 } else { 0 },
-    frame_height: if template.frame_height  > 0 { template.frame_height as u32 } else { 0 },
-    duration_millis: if template.duration_millis > 0 { template.duration_millis as u32 } else { 0 },
-    maybe_image_object_name: template.maybe_public_bucket_preview_image_object_name.clone(),
-    maybe_video_object_name: template.maybe_public_bucket_preview_video_object_name.clone(),
     created_at: template.created_at.clone(),
     updated_at: template.updated_at.clone(),
   };
