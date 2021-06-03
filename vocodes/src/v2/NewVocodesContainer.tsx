@@ -1,7 +1,10 @@
 import React from 'react';
+import { FirehoseEventListFc } from './firehose/FirehoseEventListFc';
 import { LoginFc } from './login/LoginFc';
 import { NewTopNavFc } from './NewTopNavFc';
 import { ProfileDataFc } from './profile_data/ProfileDataFc';
+import { ProfileEditFc } from './profile_edit/ProfileEditFc';
+import { ProfileFc } from './profile/ProfileFc';
 import { SessionWrapper } from '../session/SessionWrapper';
 import { SignupComponent } from './signup/SignupComponent';
 import { Switch, Route, RouteProps } from 'react-router-dom';
@@ -12,11 +15,9 @@ import { UploadComponent } from './upload/UploadComponent';
 import { UploadTtsModelFc } from './upload/UploadTtsModelFc';
 import { UploadW2lPhotoFc } from './upload/UploadW2lPhotoFc';
 import { UploadW2lVideoFc } from './upload/UploadW2lVideoFc';
+import { W2lResultViewFc } from './w2l_result_view/W2lResultViewFc';
 import { W2lTemplateListFc } from './w2l_template_list/W2lTemplateListFc';
 import { W2lTemplateViewFc } from './w2l_template_view/W2lTemplateViewFc';
-import { ProfileFc } from './profile/ProfileFc';
-import { W2lResultViewFc } from './w2l_result_view/W2lResultViewFc';
-import { FirehoseEventListFc } from './firehose/FirehoseEventListFc';
 
 interface Props {
   sessionWrapper: SessionWrapper,
@@ -66,6 +67,14 @@ class NewVocodesContainer extends React.Component<Props, State> {
             <Route path="/profile/:username/data"
               render={(routeProps: RouteProps) => (
                 <ProfileDataFc
+                  sessionWrapper={this.props.sessionWrapper}
+                />
+              )}
+            />
+
+            <Route path="/profile/:username/edit"
+              render={(routeProps: RouteProps) => (
+                <ProfileEditFc
                   sessionWrapper={this.props.sessionWrapper}
                 />
               )}

@@ -1,10 +1,11 @@
 import React, { useEffect, useState }  from 'react';
+import { ApiConfig } from '../../v1/api/ApiConfig';
+import { GravatarFc } from '../common/GravatarFc';
+import { Link } from 'react-router-dom';
+import { ProfileW2lInferenceResultsListFc } from './Profile_W2lInferenceResultListFc';
+import { ProfileW2lTemplateListFc } from './Profile_W2lTemplateListFc';
 import { SessionWrapper } from '../../session/SessionWrapper';
 import { useParams } from 'react-router-dom';
-import { ProfileW2lTemplateListFc } from './Profile_W2lTemplateListFc';
-import { ProfileW2lInferenceResultsListFc } from './Profile_W2lInferenceResultListFc';
-import { GravatarFc } from '../common/GravatarFc';
-import { ApiConfig } from '../../v1/api/ApiConfig';
 
 interface Props {
   sessionWrapper: SessionWrapper,
@@ -74,15 +75,22 @@ function ProfileFc(props: Props) {
     userEmailHash = userData!.email_gravatar_hash;
   }
 
+  let editLinkUrl = `/profile/${username}/edit`;
+
   return (
     <div>
-      <h1 className="title is-1"> 
+      <h1 className="title is-1">
         <GravatarFc 
-          size={50} 
+          size={45} 
           username={username}
           email_hash={userEmailHash} />
         {username} 
       </h1>
+
+      <Link 
+        to={editLinkUrl}>Edit</Link>
+
+      <br />
 
       <p>Profiles are a work in progress.</p>
 
