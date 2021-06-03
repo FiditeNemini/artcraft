@@ -5,22 +5,16 @@ import { getRandomInt } from '../../Utils';
 
 interface TtsModelListResponsePayload {
   success: boolean,
-  templates: Array<TtsModel>,
+  models: Array<TtsModel>,
 }
 
 interface TtsModel {
-  template_token: string,
-  template_type: string,
-  creator_user_token: string,
-  username: string,
-  display_name: string,
-  updatable_slug: string,
+  model_token: string,
+  tts_model_type: string,
   title: string,
-  frame_width: number,
-  frame_height: number,
-  duration_millis: number,
-  maybe_image_object_name: string,
-  maybe_video_object_name: string,
+  updatable_slug: string,
+  // TODO: No need for "creator_*" fields. Remove them from backend.
+  is_mod_disabled: boolean,
   created_at: string,
   updated_at: string,
 }
@@ -30,11 +24,11 @@ interface Props {
 }
 
 function ProfileTtsModelListFc(props: Props) {
-  const [w2lTemplates, setTtsModels] = useState<Array<TtsModel>>([]);
+  const [ttsModels, setTtsModels] = useState<Array<TtsModel>>([]);
 
   useEffect(() => {
     const api = new ApiConfig();
-    const endpointUrl = api.listW2lTemplatesForUser(props.username);
+    const endpointUrl = api.listTtsModelsForUser(props.username);
 
     fetch(endpointUrl, {
       method: 'GET',
@@ -45,90 +39,46 @@ function ProfileTtsModelListFc(props: Props) {
     })
     .then(res => res.json())
     .then(res => {
-      const templatesResponse : TtsModelListResponsePayload  = res;
-      if (!templatesResponse.success) {
+      const modelsResponse : TtsModelListResponsePayload  = res;
+      if (!modelsResponse.success) {
         return;
       }
 
-      setTtsModels(templatesResponse.templates)
+      setTtsModels(modelsResponse.models)
     })
     .catch(e => {
       //this.props.onSpeakErrorCallback();
     });
   }, [props.username]); // NB: Empty array dependency sets to run ONLY on mount
 
+  let rows : Array<JSX.Element> = [];
   
-  let templateElements : Array<JSX.Element> = [];
+  ttsModels.forEach(model => {
+    let modelTitle = model.title.length < 5 ? `Model: ${model.title}` : model.title;
 
-  w2lTemplates.forEach(t => {
-    let object = null;
-    
-    if (t.maybe_image_object_name !== undefined && t.maybe_image_object_name !== null) {
-      object = t.maybe_image_object_name;
-    } else if (t.maybe_video_object_name !== undefined && t.maybe_video_object_name !== null) {
-      object = t.maybe_video_object_name;
-    } else {
-      console.warn(`No image for template ${t.template_token}`);
-      return;
-    }
+    let modelLink = `/tts/${model.model_token}`;
 
-    let url = `https://storage.googleapis.com/dev-vocodes-public${object}`;
-
-    let link = `/w2l/${t.updatable_slug}`;
-  
-    templateElements.push((
-      <div className="tile is-parent" key={t.template_token}>
-        <article className="tile is-child box">
-          {/*<p className="title">One</p>*/}
-          <Link to={link}><img src={url} alt="" /></Link>
-        </article>
-      </div>
-    ));
-  });
-
-  let allRowsOfTemplateElements : Array<JSX.Element> = [];
-  let rowOfTemplateElements : Array<JSX.Element> = [];
-
-  let nextRowSize = getRandomInt(3, 4);
-
-  // NB: To prevent React spamming about children having unique key props
-  let rowKey = "row0";
-  let rowIndex = 0;
-
-  templateElements.forEach(el => {
-    rowOfTemplateElements.push(el);
-
-    if (rowOfTemplateElements.length === nextRowSize) {
-      allRowsOfTemplateElements.push(
-        <div className="tile is-ancestor" key={rowKey}>
-          {rowOfTemplateElements.map(el => el)}
-        </div>
-      );
-      rowOfTemplateElements = [];
-      rowIndex += 1;
-      rowKey = `row${rowIndex}`;
-
-      // Don't have the same number on each row.
-      let lastRowSize = nextRowSize;
-      while (lastRowSize === nextRowSize) {
-        nextRowSize = getRandomInt(3, 6);
-      }
-    }
-  });
-
-  // Make sure last row is built.
-  if (rowOfTemplateElements.length !== 0) {
-    allRowsOfTemplateElements.push(
-      <div className="tile is-ancestor" key={rowKey}>
-        {rowOfTemplateElements.map(el => el)}
-      </div>
+    rows.push(
+      <tr key={model.model_token}>
+        <th><Link to={modelLink}>{modelTitle}</Link></th>
+        <td>{model.created_at} s</td>
+      </tr>
     );
-    rowOfTemplateElements = [];
-  }
+  });
 
   return (
     <div>
-      {allRowsOfTemplateElements.map(el => el)}
+      <table className="table">
+        <thead>
+          <tr>
+            <th><abbr title="Model Name">Model Name</abbr></th>
+            <th><abbr title="Creation Date">Creation Date (UTC)</abbr></th>
+          </tr>
+        </thead>
+        <tbody>
+          {rows}
+        </tbody>
+      </table>
     </div>
   )
 }
