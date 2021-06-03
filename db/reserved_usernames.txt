@@ -183,7 +183,9 @@ sindhi
 511
 5xx
 7xx
+a
 about
+about_us
 aboutus
 abuse
 access
@@ -232,6 +234,7 @@ authentication
 autoconfig
 avatar
 avatars
+b
 backup
 balancer-manager
 ban
@@ -324,6 +327,7 @@ css
 customer
 customer-stories
 customers
+d
 dashboard
 dashboards
 data
@@ -364,10 +368,12 @@ docker
 docs
 document
 documentation
+documents
 domain
 download
 downloads
 downtime
+e
 ecommerce
 edit
 editor
@@ -390,6 +396,7 @@ exit
 explore
 explorer
 export
+f
 facebook
 false
 faq
@@ -431,6 +438,7 @@ friend
 friends
 ftp
 ftps
+g
 gadget
 gadgets
 game
@@ -454,6 +462,7 @@ guests
 guid
 guide
 guides
+h
 help
 help-wanted
 home
@@ -517,6 +526,7 @@ issues
 it
 item
 items
+j
 java
 javascript
 job
@@ -528,10 +538,12 @@ journals
 js
 json
 jump
+k
 key
 keys
 keyserver
 knowledgebase
+l
 lab
 labels
 labs
@@ -627,6 +639,7 @@ musicas
 mx
 my
 mysql
+n
 name
 named
 names
@@ -668,6 +681,7 @@ ns7
 ns8
 ns9
 null
+o
 oauth
 oauth_clients
 offer
@@ -689,6 +703,7 @@ outbox
 overview
 owner
 owners
+p
 package
 page
 pager
@@ -763,7 +778,9 @@ put
 pvp
 pw
 python
+q
 query
+r
 random
 ranking
 raw
@@ -772,6 +789,9 @@ readme
 receive
 recent
 recommendations
+recover
+recover_email
+recovery
 recruit
 recruitment
 recycle
@@ -799,8 +819,10 @@ req
 request
 requests
 res
+resend
 reset
 reset-password
+reset_email
 reset_password
 resetpassword
 resource
@@ -814,6 +836,7 @@ ruby
 rule
 rules
 rust
+s
 sag
 sale
 sales
@@ -923,6 +946,7 @@ sys
 sysadmin
 sysadministrator
 system
+t
 table
 tablet
 tablets
@@ -994,6 +1018,7 @@ tweets
 twitter
 type
 typescript
+u
 undef
 unfollow
 unsubscribe
@@ -1014,6 +1039,7 @@ usuario
 util
 uucp
 uuid
+v
 value
 vanity
 vanity_url
@@ -1069,17 +1095,21 @@ www8
 www9
 wwws
 wwww
+x
 xfn
 xml
 xmpp
 xpg
 xxx
+y
 yaml
 year
 yml
 you
+your
 yourdomain
 yourname
+yours
 yoursite
 yourusername
-
+z
