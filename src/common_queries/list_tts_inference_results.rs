@@ -122,7 +122,7 @@ async fn list_tts_inference_results_for_all_creators(
 SELECT
     tts_results.token as tts_result_token,
 
-    tts_models.token as tts_model_token,
+    tts_results.model_token as tts_model_token,
     tts_results.inference_text as inference_text,
 
     users.token as maybe_creator_user_token,
@@ -154,7 +154,7 @@ WHERE
 SELECT
     tts_results.token as tts_result_token,
 
-    tts_models.token as tts_model_token,
+    tts_results.model_token as tts_model_token,
     tts_results.inference_text as inference_text,
 
     users.token as maybe_creator_user_token,
@@ -196,7 +196,7 @@ async fn list_tts_inference_results_creator_scoped(
 SELECT
     tts_results.token as tts_result_token,
 
-    tts_models.token as tts_model_token,
+    tts_results.model_token as tts_model_token,
     tts_results.inference_text as inference_text,
 
     users.token as maybe_creator_user_token,
@@ -230,7 +230,7 @@ WHERE
 SELECT
     tts_results.token as tts_result_token,
 
-    tts_models.token as tts_model_token,
+    tts_results.model_token as tts_model_token,
     tts_results.inference_text as inference_text,
 
     users.token as maybe_creator_user_token,
