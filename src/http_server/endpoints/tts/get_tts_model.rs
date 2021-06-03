@@ -51,7 +51,7 @@ pub struct TtsModelRecordForResponse {
 #[derive(Serialize)]
 pub struct GetTtsModelSuccessResponse {
   pub success: bool,
-  pub template: TtsModelRecordForResponse,
+  pub model: TtsModelRecordForResponse,
 }
 
 #[derive(Serialize)]
@@ -172,7 +172,7 @@ AND tts.deleted_at IS NULL
 
   let response = GetTtsModelSuccessResponse {
     success: true,
-    template: model_for_response,
+    model: model_for_response,
   };
 
   let body = serde_json::to_string(&response)
