@@ -70,6 +70,8 @@ use crate::http_server::endpoints::tts::get_tts_model::get_tts_model_handler;
 // TODO TODO TODO TODO
 // TODO TODO TODO TODO
 
+// TODO TODO TODO -- ON signup, add an "early adopter" badge. And a tool for making it easy to add badges.
+// TODO - badge for uploading template, badge for uploading model, etc.
 
 
 const DEFAULT_BIND_ADDRESS : &'static str = "0.0.0.0:12345";
