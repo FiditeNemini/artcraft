@@ -28,11 +28,12 @@ def create_user_account(username, password, email):
   r = requests.post(signup_url, json=payload)
   print_response(r)
 
-create_user_account('brandon', 'testing', 'brandon@storyteller.company')
 create_user_account('echelon', 'testing', 'echelon@gmail.com')
+create_user_account('brandon', 'testing', 'brandon@storyteller.company')
 create_user_account('nanashi', 'nanashi', 'somebody@somewhere.com')
-create_user_account('ryu', 'testing', 'ryu@storyteller.company')
+create_user_account('other', 'testing', 'ryu@storyteller.company')
 create_user_account('raptor9', 'testing', 'raptor9@storyteller.company')
+create_user_account('ryu', 'testing', 'ryu@storyteller.company')
 
 # ==================== LOGIN ====================
 
