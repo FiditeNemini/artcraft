@@ -9,9 +9,9 @@ interface Props {
 function UploadChoiceFc(props: Props) {
   let history = useHistory();
 
-  if (!props.sessionWrapper.isLoggedIn()) {
-    history.push('/signup');
-  }
+  //if (!props.sessionWrapper.isLoggedIn()) {
+  //  history.push('/signup');
+  //}
 
   return (
     <div>
@@ -52,6 +52,10 @@ function UploadChoiceFc(props: Props) {
         className="button is-info is-large is-fullwidth is-outlined"
         onClick={() => {}}
         >Upload lipsync photo (w2l)</Link>
+
+      <br />
+
+      <p> Want to contribute code? We're hiring! </p>
 
     </div>
   )
