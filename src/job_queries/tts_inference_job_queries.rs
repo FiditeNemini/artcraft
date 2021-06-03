@@ -134,6 +134,7 @@ WHERE id = ?
 pub async fn insert_tts_result<P: AsRef<Path>>(
   pool: &MySqlPool,
   job: &TtsInferenceJobRecord,
+  text_hash: &str,
   bucket_audio_results_path: P,
   bucket_spectrogram_results_path: P,
   file_size_bytes: u64,
@@ -157,8 +158,10 @@ pub async fn insert_tts_result<P: AsRef<Path>>(
 INSERT INTO tts_results
 SET
   token = ?,
+
   model_token = ?,
   inference_text = ?,
+  inference_text_hash_sha2 = ?,
 
   maybe_creator_user_token = ?,
   creator_ip_address = ?,
@@ -175,6 +178,7 @@ SET
       inference_result_token,
       job.model_token.clone(),
       job.inference_text.clone(),
+      text_hash,
 
       job.maybe_creator_user_token.clone(),
       job.creator_ip_address.clone(),

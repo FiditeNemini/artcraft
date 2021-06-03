@@ -17,6 +17,9 @@ CREATE TABLE tts_results (
   -- The original raw, unprocessed user input.
   inference_text TEXT NOT NULL,
 
+  -- SHA2 hash of the text [SHA2 = CHAR(64), SHA1 = CHAR(4)]
+  inference_text_hash_sha2 CHAR(64) NOT NULL,
+
   -- ========== CREATOR DETAILS ==========
 
   -- The person that created the template.
@@ -36,8 +39,10 @@ CREATE TABLE tts_results (
     'private'
   ) NOT NULL DEFAULT 'public',
 
+  -- SHA2.
   -- Where the wav, spectrogram, and etc. are located.
   public_bucket_hash CHAR(64) NOT NULL,
+
   -- Where the wav, spectrogram, and etc. are located.
   public_bucket_wav_audio_path VARCHAR(255) NOT NULL,
   public_bucket_spectrogram_path VARCHAR(255) NOT NULL,

@@ -88,10 +88,10 @@ actix-web = "3.3.2"
 jwt = "0.13.0"
 
 # Crypto
-bcrypt = "0.8"
-hmac = "0.10.0"
-md-5 = "0.9.1"
-sha2 = "0.9.5"
+bcrypt = "0.8" # password hashes
+hmac = "0.10.0" # cookies
+md-5 = "0.9.1" # gravatar
+sha2 = "0.9.5" # file hashes, inference text hashes, etc.
 
 # Serialization
 serde = "1.0.125"

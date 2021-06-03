@@ -20,7 +20,7 @@ use chrono::Utc;
 use crate::buckets::bucket_client::BucketClient;
 use crate::buckets::bucket_path_unifier::BucketPathUnifier;
 use crate::buckets::bucket_paths::hash_to_bucket_path;
-use crate::buckets::file_hashing::get_file_hash;
+use w2l_inference_job::util::hashing::file_hashing::get_file_hash;
 use crate::common_queries::firehose_publisher::FirehosePublisher;
 use crate::job_queries::tts_download_job_queries::TtsUploadJobRecord;
 use crate::job_queries::tts_download_job_queries::insert_tts_model;

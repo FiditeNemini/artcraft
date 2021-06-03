@@ -53,6 +53,7 @@ def login(username, password):
 session_echelon = login('echelon', 'testing')
 session_nanashi = login('nanashi', 'nanashi')
 session_brandon = login('brandon', 'testing')
+session_other = login('other', 'testing')
 
 # ==================== UPLOAD W2L TEMPLATES ====================
 
@@ -97,6 +98,22 @@ def upload_tts_model(content_url, title, session_cookie):
   print_response(r)
 
 
-upload_tts_model('https://drive.google.com/file/d/1grwDGbAsPwCMVfye071TZ6PLUub1KGyR/view?usp=sharing', 'Jorgen', session_nanashi)
-upload_tts_model('https://drive.google.com/file/d/1w3oBk5vzyHurqYwP95UEQv-_NeMNu6pt/view?usp=sharing', 'Noire', session_echelon)
+# From others' Google Drives
+#upload_tts_model('https://drive.google.com/file/d/1grwDGbAsPwCMVfye071TZ6PLUub1KGyR/view?usp=sharing', 'Jorgen', session_nanashi)
+#upload_tts_model('https://drive.google.com/file/d/1w3oBk5vzyHurqYwP95UEQv-_NeMNu6pt/view?usp=sharing', 'Noire', session_echelon)
+
+# Copied into Storyteller Google Drive
+upload_tts_model('https://drive.google.com/file/d/1d8KPwYqbRsGiYx1c4TCW4xCtcRLdIU1s/view?usp=sharing', 'Zephyr', session_echelon)
+upload_tts_model('https://drive.google.com/file/d/1yhoamPz1NOMy403gu2v8sIx5hPj3LQWs/view?usp=sharing', 'Wakko Warner', session_other)
+upload_tts_model('https://drive.google.com/file/d/1I6KGQZFMMB2ZvCzWEqy9xTgGl0L5cmfP/view?usp=sharing', 'Turret-192', session_echelon)
+upload_tts_model('https://drive.google.com/file/d/1T_hvgGcNOfofhNmDWUqpVtYDdSXQrWdE/view?usp=sharing', 'technoblade-324', session_brandon)
+upload_tts_model('https://drive.google.com/file/d/1NKyRiex3K1J0QyIv2np17D_H0rE98HyK/view?usp=sharing', 'Noire', session_other)
+upload_tts_model('https://drive.google.com/file/d/1VDHDOpsUR8C-MD07vEsnUf1Lpcf8hXg4/view?usp=sharing', 'MatPat80', session_other)
+upload_tts_model('https://drive.google.com/file/d/1atFn4vm7mjkufXNK9TZS6J8WzISrAn3-/view?usp=sharing', 'King Julien-70', session_other)
+upload_tts_model('https://drive.google.com/file/d/1-rlJpi2jAsagn-UCStcCc_ITNycXgn2F/view?usp=sharing', 'Jorgen', session_other)
+upload_tts_model('https://drive.google.com/file/d/1togTNOEKnaarqWWrbZLSwIbZIZ8IT_qw/view?usp=sharing', 'edsheeransinging', session_nanashi)
+
+#upload_tts_model('', '', session_other)
+#upload_tts_model('', '', session_other)
+#upload_tts_model('', '', session_other)
 

@@ -19,7 +19,6 @@ use chrono::Utc;
 use crate::buckets::bucket_client::BucketClient;
 use crate::buckets::bucket_path_unifier::BucketPathUnifier;
 use crate::buckets::bucket_paths::hash_to_bucket_path;
-use crate::buckets::file_hashing::get_file_hash;
 use crate::common_queries::firehose_publisher::FirehosePublisher;
 use crate::job_queries::tts_inference_job_queries::TtsInferenceJobRecord;
 use crate::job_queries::tts_inference_job_queries::get_tts_model_by_token;
@@ -31,6 +30,8 @@ use crate::script_execution::tacotron_inference_command::TacotronInferenceComman
 use crate::util::anyhow_result::AnyhowResult;
 use crate::util::filesystem::check_directory_exists;
 use crate::util::filesystem::check_file_exists;
+use crate::util::hashing::hash_file_sha2::hash_file_sha2;
+use crate::util::hashing::hash_string_sha2::hash_string_sha2;
 use crate::util::random_crockford_token::random_crockford_token;
 use crate::util::semi_persistent_cache_dir::SemiPersistentCacheDir;
 use data_encoding::{HEXUPPER, HEXLOWER, HEXLOWER_PERMISSIVE};
@@ -429,10 +430,13 @@ async fn process_job(inferencer: &Inferencer, job: &TtsInferenceJobRecord) -> An
 
   // ==================== SAVE RECORDS ==================== //
 
+  let text_hash = hash_string_sha2(&job.inference_text)?;
+
   info!("Saving tts inference record...");
   let (id, inference_result_token) = insert_tts_result(
     &inferencer.mysql_pool,
     job,
+    &text_hash,
     &audio_result_object_path,
     &spectrogram_result_object_path,
     file_metadata.file_size_bytes,

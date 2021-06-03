@@ -19,7 +19,7 @@ use chrono::Utc;
 use crate::buckets::bucket_client::BucketClient;
 use crate::buckets::bucket_path_unifier::BucketPathUnifier;
 use crate::buckets::bucket_paths::hash_to_bucket_path;
-use crate::buckets::file_hashing::get_file_hash;
+use util::hashing::hash_file_sha2::hash_file_sha2;
 use crate::common_queries::firehose_publisher::FirehosePublisher;
 use crate::job_queries::w2l_inference_job_queries::W2lInferenceJobRecord;
 use crate::job_queries::w2l_inference_job_queries::get_w2l_template_by_token;
