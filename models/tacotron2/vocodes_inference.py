@@ -20,14 +20,16 @@ args = parser.parse_args()
 
 import sys
 sys.path.append('waveglow/')
-import numpy as np
-import torch
 import shutil
 import json
 
-from model import Tacotron2
+import numpy as np
+import torch
+
 from hparams import create_hparams
-from train import load_model
+from model import Tacotron2
+from layers import TacotronSTFT
+from audio_processing import griffin_lim
 from text import text_to_sequence
 from denoiser import Denoiser
 
@@ -41,20 +43,18 @@ print('========================================', flush=True)
 # NB(bt, 2021-05-31): Trying to get everything on the same device
 #torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-hparams = create_hparams()
-hparams.sampling_rate = 22050
-hparams.sampling_rate = 22050 # Don't change this
-hparams.max_decoder_steps = 1000 # How long the audio will be before it cuts off (1000 is about 11 seconds)
-hparams.gate_threshold = 0.1 # Model must be 90% sure the clip is over before ending generation (the higher this number is, the more likely that the AI will keep generating until it reaches the Max Decoder Steps)
-
 # Fix bug running on CPU?
 #torch.set_default_dtype(torch.float16)
 # NB(bt, 2021-05-31): Perhaps this is blocking waveglow? It complains of the wrong tensor type.
 #torch.set_default_tensor_type('torch.DoubleTensor') # 2021-05-31 commented out
 #torch.set_default_tensor_type('torch.HalfTensor') # 2021-05-31 added
 
-# Load synthesizer
+hparams = create_hparams()
+hparams.sampling_rate = 22050 # Don't change this
+hparams.max_decoder_steps = 1000 # How long the audio will be before it cuts off (1000 is about 11 seconds)
+hparams.gate_threshold = 0.1 # Model must be 90% sure the clip is over before ending generation (the higher this number is, the more likely that the AI will keep generating until it reaches the Max Decoder Steps)
 
+# Load synthesizer
 checkpoint_path = args.synthesizer_checkpoint_path
 
 #model = load_model(hparams)

@@ -114,6 +114,8 @@ upload_tts_model('https://drive.google.com/file/d/1atFn4vm7mjkufXNK9TZS6J8WzISrA
 upload_tts_model('https://drive.google.com/file/d/1-rlJpi2jAsagn-UCStcCc_ITNycXgn2F/view?usp=sharing', 'Jorgen', session_other)
 upload_tts_model('https://drive.google.com/file/d/1togTNOEKnaarqWWrbZLSwIbZIZ8IT_qw/view?usp=sharing', 'edsheeransinging', session_nanashi)
 
+upload_tts_model('https://drive.google.com/file/d/1OAiu0cZDyUJMemyLc0Btqw7zEQgiN81D/view?usp=sharing', 'Wakko Warner v2 ST21', session_nanashi)
+
 #upload_tts_model('', '', session_other)
 #upload_tts_model('', '', session_other)
 #upload_tts_model('', '', session_other)
