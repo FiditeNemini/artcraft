@@ -8,20 +8,15 @@ interface TtsInferenceResultListResponsePayload {
 }
 
 interface TtsInferenceResult {
-  w2l_result_token: string,
-  maybe_w2l_template_token?: string,
-  maybe_tts_inference_result_token?: string,
-
-  template_type: string,
-  template_title: string,
+  tts_result_token: string,
+  tts_model_token: string,
+  inference_text: string,
 
   maybe_creator_user_token?: string,
   maybe_creator_username?: string,
   maybe_creator_display_name?: string,
 
   file_size_bytes: number,
-  frame_width: number,
-  frame_height: number,
   duration_millis: number,
 
   created_at: string,
@@ -37,7 +32,7 @@ function ProfileTtsInferenceResultsListFc(props: Props) {
 
   useEffect(() => {
     const api = new ApiConfig();
-    const endpointUrl = api.listW2lInferenceResultsForUser(props.username);
+    const endpointUrl = api.listTtsInferenceResultsForUser(props.username);
 
     fetch(endpointUrl, {
       method: 'GET',
@@ -64,18 +59,16 @@ function ProfileTtsInferenceResultsListFc(props: Props) {
   
   w2lResults.forEach(result => {
     let duration_seconds = result.duration_millis / 1000;
-    let templateTitle = result.template_title.length < 5 ? `Title: ${result.template_title}` : result.template_title;
 
-    let inferenceLink = `/w2l/result/${result.w2l_result_token}`;
-    let templateLink = `/w2l/${result.maybe_w2l_template_token}`;
+    let inferenceLink = `/tts/result/${result.tts_result_token}`;
+    let modelLink = `/tts/model/${result.tts_model_token}`;
 
     rows.push(
-      <tr key={result.w2l_result_token}>
+      <tr key={result.tts_result_token}>
           <th><Link to={inferenceLink}><span role="img" aria-label="result link">▶️</span> Result</Link></th>
-        <th><Link to={templateLink}>{templateTitle}</Link></th>
-        <td>(custom audio)</td>
+        <th><Link to={modelLink}>Model</Link></th>
         <td>{duration_seconds} s</td>
-        <td>{result.created_at} s</td>
+        <td>{result.created_at}</td>
       </tr>
     );
   });
@@ -87,7 +80,6 @@ function ProfileTtsInferenceResultsListFc(props: Props) {
           <tr>
             <th><abbr title="Detail">Result Link</abbr></th>
             <th><abbr title="Detail">Template</abbr></th>
-            <th><abbr title="Detail">Audio Source</abbr></th>
             <th><abbr title="Detail">Duration</abbr></th>
             <th><abbr title="Value">Creation Date (UTC)</abbr></th>
           </tr>

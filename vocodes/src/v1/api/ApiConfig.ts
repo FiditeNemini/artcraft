@@ -20,7 +20,6 @@ class ApiConfig {
     return 'https://mumble.stream/speak_spectrogram';
   }
 
-
   createAccount() : string {
     return `${this.getScheme()}://${this.getNewApiHost()}/create_account`;
   }
@@ -39,6 +38,14 @@ class ApiConfig {
 
   listTts() : string {
     return `${this.getScheme()}://${this.getNewApiHost()}/tts/list`;
+  }
+
+  listTtsModelsForUser(username: string) : string {
+    return `${this.getScheme()}://${this.getNewApiHost()}/user/${username}/tts_models`;
+  }
+
+  listTtsInferenceResultsForUser(username: string) : string {
+    return `${this.getScheme()}://${this.getNewApiHost()}/user/${username}/tts_results`;
   }
 
   uploadTts() : string {
