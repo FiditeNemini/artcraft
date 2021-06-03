@@ -61,7 +61,7 @@ function ProfileTtsInferenceResultsListFc(props: Props) {
     let duration_seconds = result.duration_millis / 1000;
 
     let inferenceLink = `/tts/result/${result.tts_result_token}`;
-    let modelLink = `/tts/model/${result.tts_model_token}`;
+    let modelLink = `/tts/${result.tts_model_token}`;
 
     rows.push(
       <tr key={result.tts_result_token}>
