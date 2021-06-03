@@ -365,7 +365,7 @@ async fn process_job(inferencer: &Inferencer, job: &TtsInferenceJobRecord) -> An
 
   // ==================== RUN INFERENCE ==================== //
 
-  let output_audio_fs_path = temp_dir.path().join("output.mp4");
+  let output_audio_fs_path = temp_dir.path().join("output.wav");
   let output_metadata_fs_path = temp_dir.path().join("metadata.json");
   let output_spectrogram_fs_path = temp_dir.path().join("spectrogram.json");
 

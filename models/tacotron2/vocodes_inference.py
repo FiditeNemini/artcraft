@@ -22,6 +22,7 @@ import sys
 sys.path.append('waveglow/')
 import numpy as np
 import torch
+import shutil
 import json
 
 from hparams import create_hparams
@@ -129,4 +130,14 @@ audio_numpy = audio[0].data.cpu().numpy()
 rate = 22050
 from scipy.io.wavfile import write
 write(args.output_audio_filename, rate, audio_numpy)
+
+try:
+    debug_location = "/home/bt/dev/storyteller/storyteller-web/test"
+    print('Writing to debug location: {}'.format(debug_location))
+    shutil.copy(args.output_audio_filename, debug_location)
+
+except Exception as e:
+    print("Error with saving file for local debugging.")
+    print(e)
+    pass
 
