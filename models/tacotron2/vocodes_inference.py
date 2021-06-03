@@ -171,10 +171,19 @@ with torch.no_grad():
 #ipd.Audio(audio[0].data.cpu().numpy(), rate=hparams.sampling_rate)
 
 # https://pytorch.org/hub/nvidia_deeplearningexamples_waveglow/
-audio_numpy = audio[0].data.cpu().numpy()
-#rate = 22050
+
+
+#audio_numpy = audio[0].data.cpu().numpy()
+#audio = audio[0].data.cpu().numpy()
+#audio_numpy = audio.astype('int16')
+
 from scipy.io.wavfile import write
-write(args.output_audio_filename, hparams.sampling_rate, audio_numpy)
+
+output_audio = audio[0].data.cpu().numpy().astype(np.float32)
+
+#audio.export('output.mp3', format="mp3", bitrate="64k")
+#sf.write('bira.wav', audio[0].data.cpu().numpy().astype(np.float32), hparams.sampling_rate)
+write(args.output_audio_filename, hparams.sampling_rate, output_audio)
 
 try:
     debug_location = "/home/bt/dev/storyteller/storyteller-web/test"
