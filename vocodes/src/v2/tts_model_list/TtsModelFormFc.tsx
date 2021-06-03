@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { ApiConfig } from '../../v1/api/ApiConfig';
 import { SessionWrapper } from '../../session/SessionWrapper';
 import { v1 as uuidv1 } from 'uuid';
+import { Link } from 'react-router-dom';
 
 interface TtsModelListResponsePayload {
   success: boolean,
@@ -188,6 +189,15 @@ function TtsModelFormFc(props: Props) {
     return false;
   };
 
+  let directViewLink = <span />;
+
+  if (selectedTtsModel !== undefined) {
+    let modelLink = `/tts/${selectedTtsModel!.model_token}`;
+    directViewLink = (
+      <Link to={modelLink}>See more details about the "{selectedTtsModel!.title}" model</Link>
+    );
+  }
+
   return (
     <div>
       <h1 className="title is-1"> Deep Fake Text to Speech </h1>
@@ -237,6 +247,11 @@ function TtsModelFormFc(props: Props) {
         </div>
 
       </form>
+      <br />
+      <br />
+
+      {directViewLink}
+
 
     </div>
   )

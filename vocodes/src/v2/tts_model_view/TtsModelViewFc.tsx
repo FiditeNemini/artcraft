@@ -146,6 +146,10 @@ function TtsModelViewFc(props: Props) {
             <th>Model Type</th>
             <td>{ttsModel?.tts_model_type}</td>
           </tr>
+          <tr>
+            <th>Upload Date (UTC)</th>
+            <td>{ttsModel?.created_at}</td>
+          </tr>
         </tbody>
       </table>
 
@@ -160,7 +164,12 @@ function TtsModelViewFc(props: Props) {
 
         <button className="button is-large is-fullwidth is-success">Submit</button>
       </form>
+    
+      <br />
+      <br />
+      <Link to="/">&lt; Back to all models</Link>
 
+      <br />
     </div>
   )
 }
