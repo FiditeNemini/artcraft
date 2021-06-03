@@ -20,7 +20,6 @@ use chrono::Utc;
 use crate::buckets::bucket_client::BucketClient;
 use crate::buckets::bucket_path_unifier::BucketPathUnifier;
 use crate::buckets::bucket_paths::hash_to_bucket_path;
-use w2l_inference_job::util::hashing::file_hashing::get_file_hash;
 use crate::common_queries::firehose_publisher::FirehosePublisher;
 use crate::job_queries::tts_download_job_queries::TtsUploadJobRecord;
 use crate::job_queries::tts_download_job_queries::insert_tts_model;
@@ -30,6 +29,7 @@ use crate::job_queries::tts_download_job_queries::query_tts_upload_job_records;
 use crate::script_execution::google_drive_download_command::GoogleDriveDownloadCommand;
 use crate::util::anyhow_result::AnyhowResult;
 use crate::util::filesystem::check_directory_exists;
+use crate::util::hashing::hash_file_sha2::hash_file_sha2;
 use crate::util::random_crockford_token::random_crockford_token;
 use data_encoding::{HEXUPPER, HEXLOWER, HEXLOWER_PERMISSIVE};
 use log::{warn, info};
@@ -223,7 +223,7 @@ async fn process_job(downloader: &Downloader, job: &TtsUploadJobRecord) -> Anyho
   let download_filename = downloader.google_drive_downloader
     .download_file(&download_url, &temp_dir).await?;
 
-  let private_bucket_hash = get_file_hash(&download_filename)?;
+  let private_bucket_hash = hash_file_sha2(&download_filename)?;
 
   info!("File hash: {}", private_bucket_hash);
 

@@ -108,10 +108,10 @@ impl BucketClient {
   //   Ok(())
   // }
 
-  pub async fn upload_filename<P: AsRef<Path>>(
+  pub async fn upload_filename<P: AsRef<Path>, Q: AsRef<Path>>(
     &self,
     object_path: P,
-    filename: P
+    filename: Q
   ) -> anyhow::Result<()> {
     let object_path_str = object_path.as_ref()
         .to_str()
@@ -128,10 +128,10 @@ impl BucketClient {
     self.upload_file(&object_path_str, &buffer).await
   }
 
-  pub async fn upload_filename_with_content_type<P: AsRef<Path>>(
+  pub async fn upload_filename_with_content_type<P: AsRef<Path>, Q: AsRef<Path>>(
     &self,
     object_path: P,
-    filename: &Path,
+    filename: Q,
     content_type: &str
   ) -> anyhow::Result<()> {
     let object_path_str = object_path.as_ref()
@@ -172,10 +172,10 @@ impl BucketClient {
     Ok(bytes)
   }
 
-  pub async fn download_file_to_disk<P: AsRef<Path>>(
+  pub async fn download_file_to_disk<P: AsRef<Path>, Q: AsRef<Path>>(
     &self,
     object_path: P,
-    filesystem_path: P,
+    filesystem_path: Q,
   ) -> anyhow::Result<()> {
     let object_path_str = object_path.as_ref()
       .to_str()

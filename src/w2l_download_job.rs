@@ -18,7 +18,6 @@ use anyhow::anyhow;
 use chrono::Utc;
 use crate::buckets::bucket_client::BucketClient;
 use crate::buckets::bucket_paths::hash_to_bucket_path;
-use w2l_inference_job::util::hashing::file_hashing::get_file_hash;
 use crate::common_queries::firehose_publisher::FirehosePublisher;
 use crate::job_queries::w2l_download_job_queries::W2lTemplateUploadJobRecord;
 use crate::job_queries::w2l_download_job_queries::insert_w2l_template;
@@ -33,6 +32,7 @@ use crate::script_execution::wav2lip_process_upload_command::Wav2LipPreprocessCl
 use crate::util::anyhow_result::AnyhowResult;
 use crate::util::filesystem::check_directory_exists;
 use crate::util::filesystem::check_file_exists;
+use crate::util::hashing::hash_file_sha2::hash_file_sha2;
 use crate::util::random_crockford_token::random_crockford_token;
 use data_encoding::{HEXUPPER, HEXLOWER, HEXLOWER_PERMISSIVE};
 use log::{warn, info};
@@ -347,8 +347,8 @@ async fn process_job(downloader: &Downloader, job: &W2lTemplateUploadJobRecord) 
   // ==================== CHECK ALL FILES EXIST AND GET METADATA ==================== //
 
   let video_or_image_path = PathBuf::from(&download_filename);
-  let cached_faces_path = &PathBuf::from(&cached_faces_filename);
-  let output_metadata_path = &PathBuf::from(&output_metadata_filename);
+  let cached_faces_path = PathBuf::from(&cached_faces_filename);
+  let output_metadata_path = PathBuf::from(&output_metadata_filename);
 
   info!("Checking that both files exist (original source + cached faces) ...");
 
@@ -360,7 +360,7 @@ async fn process_job(downloader: &Downloader, job: &W2lTemplateUploadJobRecord) 
 
   // ==================== BASE OBJECT NAMES BASED ON HASH ==================== //
 
-  let private_bucket_hash = get_file_hash(&download_filename)?;
+  let private_bucket_hash = hash_file_sha2(&download_filename)?;
 
   info!("File hash: {}", private_bucket_hash);
 
@@ -441,9 +441,10 @@ async fn process_job(downloader: &Downloader, job: &W2lTemplateUploadJobRecord) 
     original_mime_type).await?;
 
   info!("Uploading cached faces...");
+  let path_copy: PathBuf = cached_faces_path.clone();
   downloader.private_bucket_client.upload_filename(
     &full_object_path_cached_faces,
-    &cached_faces_path).await?;
+    &path_copy).await?;
 
   // TODO: Fix this ugh.
   if let Some(image_preview_filename) = maybe_image_preview_filename.as_deref() {
