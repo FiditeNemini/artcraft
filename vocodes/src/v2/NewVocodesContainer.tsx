@@ -20,6 +20,7 @@ import { W2lTemplateListFc } from './w2l_template_list/W2lTemplateListFc';
 import { W2lTemplateViewFc } from './w2l_template_view/W2lTemplateViewFc';
 import { NewFooterNavFc } from './NewFooterNavFc';
 import { TtsModelViewFc } from './tts_model_view/TtsModelViewFc';
+import { TtsResultViewFc } from './tts_result_view/TtsResultViewFc';
 
 interface Props {
   sessionWrapper: SessionWrapper,
@@ -97,11 +98,11 @@ class NewVocodesContainer extends React.Component<Props, State> {
               />
             </Route>
 
-            {/*<Route path="/tts/result/:token">
+            <Route path="/tts/result/:token">
               <TtsResultViewFc
                 sessionWrapper={this.props.sessionWrapper}
               />
-              </Route>*/}
+              </Route>
 
             <Route path="/tts/:token">
               <TtsModelViewFc

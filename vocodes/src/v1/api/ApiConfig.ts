@@ -40,8 +40,12 @@ class ApiConfig {
     return `${this.getScheme()}://${this.getNewApiHost()}/tts/list`;
   }
 
-  viewTtsModel(templateSlug: string) : string {
-    return `${this.getScheme()}://${this.getNewApiHost()}/tts/model/${templateSlug}`;
+  viewTtsModel(modelSlug: string) : string {
+    return `${this.getScheme()}://${this.getNewApiHost()}/tts/model/${modelSlug}`;
+  }
+
+  viewTtsInferenceResult(token: string) : string {
+    return `${this.getScheme()}://${this.getNewApiHost()}/tts/result/${token}`;
   }
 
   listTtsModelsForUser(username: string) : string {
