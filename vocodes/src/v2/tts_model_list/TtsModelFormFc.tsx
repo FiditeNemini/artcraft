@@ -23,7 +23,7 @@ interface TtsModel {
   updated_at: string,
 }
 
-interface EnqueueJobResponsePayload {
+export interface EnqueueJobResponsePayload {
   success: boolean,
   inference_job_token?: string,
 }
@@ -87,31 +87,6 @@ function TtsModelFormFc(props: Props) {
 
     listItems.push(option);
   });
-
-
-  /*let extraDetails = <p />;
-
-  if (props.sessionWrapper.isLoggedIn()) {
-    extraDetails = (
-      <p>
-        Pick a template, then you can make it lip sync.
-        If you want to use your own video or image, you can
-        <Link to="/upload">upload it as a template</Link>.
-        You'll then be able to use it whenever you want!
-      </p>
-    );
-
-  } else {
-    extraDetails = (
-      <p>
-        Pick a template, then you can make it lip sync.
-        If you want to use your own video or image, you'll
-        need to <Link to="/signup">create an account</Link>.
-        You'll then be able to upload and reuse your templates 
-        whenever you want!
-      </p>
-    );
-  }*/
 
   let selectClasses = 'select is-large';
 
@@ -267,6 +242,7 @@ function TtsModelFormFc(props: Props) {
         </div>
 
       </form>
+
       <br />
       <br />
       <TtsInferenceResultListFc ttsInferenceJobs={props.ttsInferenceJobs} />

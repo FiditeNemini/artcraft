@@ -110,6 +110,8 @@ class NewVocodesContainer extends React.Component<Props, State> {
             <Route path="/tts/:token">
               <TtsModelViewFc
                 sessionWrapper={this.props.sessionWrapper}
+                enqueueTtsJob={this.props.enqueueTtsJob}
+                ttsInferenceJobs={this.props.ttsInferenceJobs}
               />
             </Route>
 

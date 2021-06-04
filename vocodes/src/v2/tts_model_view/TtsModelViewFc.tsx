@@ -4,7 +4,10 @@ import React, { useState, useEffect } from 'react';
 import { ApiConfig } from '../../v1/api/ApiConfig';
 import { useParams, Link } from 'react-router-dom';
 import { SessionWrapper } from '../../session/SessionWrapper';
-//import { v1 as uuidv1 } from 'uuid';
+import { TtsInferenceJob } from '../../App';
+import { v1 as uuidv1 } from 'uuid';
+import { EnqueueJobResponsePayload } from '../tts_model_list/TtsModelFormFc';
+import { TtsInferenceResultListFc } from '../tts_model_list/TtsInferenceResultsListFc';
 
 interface TtsModelViewResponsePayload {
   success: boolean,
@@ -15,6 +18,7 @@ interface TtsModel {
   model_token: string,
   title: string,
   tts_model_type: string,
+  text_preprocessing_algorithm: string,
   creator_user_token: string,
   creator_username: string,
   creator_display_name: string,
@@ -25,12 +29,15 @@ interface TtsModel {
 
 interface Props {
   sessionWrapper: SessionWrapper,
+  enqueueTtsJob: (jobToken: string) => void,
+  ttsInferenceJobs: Array<TtsInferenceJob>,
 }
 
 function TtsModelViewFc(props: Props) {
   let { token } = useParams();
 
   const [ttsModel, setTtsModel] = useState<TtsModel|undefined>(undefined);
+  const [text, setText] = useState<string>("");
 
   useEffect(() => {
     const api = new ApiConfig();
@@ -68,48 +75,69 @@ function TtsModelViewFc(props: Props) {
     setAudioFile(file);
   };*/
 
-  const handleFormSubmit = (ev: React.FormEvent<HTMLFormElement>) : boolean => {
-    ev.preventDefault();
 
-    /*if (audioFile === undefined) {
-      return false;
-    }
+  const handleChangeText = (ev: React.FormEvent<HTMLTextAreaElement>) => { 
+    ev.preventDefault();
+    const textValue = (ev.target as HTMLTextAreaElement).value;
+
+    setText(textValue);
+
+    return false;
+  };
+
+
+  const handleFormSubmit = (ev: React.FormEvent<HTMLFormElement>) => { 
+    ev.preventDefault();
 
     if (ttsModel === undefined) {
       return false;
     }
 
+    if (text === undefined) {
+      return false;
+    }
+
     const modelToken = ttsModel!.model_token;
 
-    let formData = new FormData();
-    formData.append('audio', audioFile!);
-    formData.append('model_token', modelToken);
-    formData.append('uuid_idempotency_token', uuidv1()!);
-
     const api = new ApiConfig();
-    const endpointUrl = api.inferW2l();
+    const endpointUrl = api.inferTts();
+    
+    // TODO: Idempotency token.
+    const request = {
+      uuid_idempotency_token: uuidv1(),
+      tts_model_token: modelToken,
+      inference_text: text,
+    }
 
-    // NB: Using 'axios' because 'fetch' was having problems with form-multipart
-    // and then interpreting the resultant JSON. Maybe I didn't try hard enough?
-    axios.post(endpointUrl, formData, { withCredentials: true }) 
-      .then(res => res.data)
-      .then(res => {
-        //if (res.uuid !== undefined) {
-        //  this.setState({
-        //    jobUuid: res.uuid
-        //  });
+    fetch(endpointUrl, {
+      method: 'POST',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+      },
+      credentials: 'include',
+      body: JSON.stringify(request),
+    })
+    .then(res => res.json())
+    .then(res => {
+      console.log('handleFormSubmit response:', res);
+      let response : EnqueueJobResponsePayload = res;
+      if (!response.success || response.inference_job_token === undefined) {
+        return;
+      }
 
-        //  //let job = new VideoJob(res.uuid, VideoJobStatus.Pending);
-        //  //this.props.startVideoJobCallback(job);
+      console.log('enqueuing...')
 
-        //  // Make sure we show the processing status modal
-        //  window.scrollTo(0, document.body.scrollHeight);
-        //}
+      props.enqueueTtsJob(response.inference_job_token);
+    })
+    .catch(e => {
+    });
 
-        //console.log(res);
-      });*/
+    return false;
+  };
 
-
+  const handleCancelClick = (ev: React.FormEvent<HTMLButtonElement>) => { 
+    ev.preventDefault();
     return false;
   };
 
@@ -147,6 +175,10 @@ function TtsModelViewFc(props: Props) {
             <td>{ttsModel?.tts_model_type}</td>
           </tr>
           <tr>
+            <th>Text Preprocessing Algorithm</th>
+            <td>{ttsModel?.text_preprocessing_algorithm}</td>
+          </tr>
+          <tr>
             <th>Upload Date (UTC)</th>
             <td>{ttsModel?.created_at}</td>
           </tr>
@@ -159,6 +191,7 @@ function TtsModelViewFc(props: Props) {
 
       <form onSubmit={handleFormSubmit}>
         <textarea 
+            onChange={handleChangeText}
             className="textarea is-large" 
             placeholder="Textual shenanigans go here..."></textarea>
 
@@ -169,6 +202,12 @@ function TtsModelViewFc(props: Props) {
       <br />
       <Link to="/">&lt; Back to all models</Link>
 
+      <br />
+
+      <br />
+      <br />
+      
+      <TtsInferenceResultListFc ttsInferenceJobs={props.ttsInferenceJobs} />
       <br />
     </div>
   )
