@@ -148,9 +148,11 @@ class NumpyEncoder(json.JSONEncoder):
         return json.JSONEncoder.default(self, obj)
 
 
+# squeeze(0) -> 3D to 2D (by removing the singular 1-length "wrapper" dimension)
+# transpose() -> originally 80x{N}, we turn to {N}x80
 json_data = {
-    'mel': mel_outputs.cpu().numpy(),
-    'mel_postnet': mel_outputs_postnet.cpu().numpy()
+    'mel': mel_outputs.cpu().numpy().squeeze(0).transpose(),
+    'mel_postnet': mel_outputs_postnet.cpu().numpy().squeeze(0).transpose(),
 }
 
 #json_dump = json.dumps(json_data, cls=NumpyEncoder)
