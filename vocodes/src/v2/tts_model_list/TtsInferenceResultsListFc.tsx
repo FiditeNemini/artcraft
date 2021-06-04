@@ -14,7 +14,7 @@ function TtsInferenceResultListFc(props: Props) {
 
     if (job.maybeResultToken === undefined || job.maybeResultToken === null) {
       results.push(
-        <div key={job.jobToken}>Pending&ellip;</div>
+        <div key={job.jobToken}>Pending&#8230;</div>
       );
     } else {
 

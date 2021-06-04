@@ -11,7 +11,9 @@ interface TtsInferenceResultResponsePayload {
 
 interface TtsInferenceResult {
   tts_result_token: string,
+
   tts_model_token: string,
+  tts_model_title: string,
 
   inference_text: string,
 
@@ -77,8 +79,7 @@ function TtsResultViewFc(props: Props) {
 
   let durationSeconds = ttsInferenceResult?.duration_millis / 1000;
 
-  // TODO
-  //let modelName = ttsInferenceResult.model_name;
+  let modelName = ttsInferenceResult.tts_model_title;
 
   let creatorDetails = <span>Anonymous user</span>;
   if (ttsInferenceResult.maybe_creator_user_token !== undefined) {
@@ -132,21 +133,27 @@ function TtsResultViewFc(props: Props) {
         </thead>
         <tbody>
           <tr>
-            <th>Creator</th>
+            <th>Original Text</th>
+            <td>
+              {ttsInferenceResult.inference_text}
+            </td>
+          </tr>
+          <tr>
+            <th>Audio Creator</th>
             <td>
               {creatorDetails}
             </td>
           </tr>
           <tr>
-            <th>Template used</th>
+            <th>Model used</th>
             <td>
-              {/*<Link to={modelLink}>
+              <Link to={modelLink}>
                 {modelName}
-  </Link>*/}
+              </Link>
             </td>
           </tr>
           <tr>
-            <th>Template creator</th>
+            <th>Model creator</th>
             <td>
               {modelCreatorDetails}
             </td>
