@@ -1,5 +1,6 @@
-# noinspection SqlNoDataSourceInspectionForFile
-# noinspection SqlResolveForFile
+-- noinspection SqlDialectInspectionForFile
+-- noinspection SqlNoDataSourceInspectionForFile
+-- noinspection SqlResolveForFile
 
 -- Badges are rewards for loyalty
 CREATE TABLE badges (

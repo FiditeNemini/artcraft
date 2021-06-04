@@ -1,5 +1,6 @@
-# noinspection SqlNoDataSourceInspectionForFile
-# noinspection SqlResolveForFile
+-- noinspection SqlDialectInspectionForFile
+-- noinspection SqlNoDataSourceInspectionForFile
+-- noinspection SqlResolveForFile
 
 CREATE TABLE users (
   -- Not used for anything except replication.

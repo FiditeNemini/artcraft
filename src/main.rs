@@ -61,6 +61,7 @@ use crate::http_server::endpoints::users::list_user_tts_inference_results::list_
 use crate::http_server::endpoints::users::list_user_tts_models::list_user_tts_models_handler;
 use crate::http_server::endpoints::tts::get_tts_result::get_tts_inference_result_handler;
 use crate::http_server::endpoints::tts::get_tts_model::get_tts_model_handler;
+use crate::http_server::endpoints::tts::get_tts_inference_job_status::get_tts_inference_job_status_handler;
 
 // TODO TODO TODO TODO
 // TODO TODO TODO TODO
@@ -284,6 +285,11 @@ pub async fn serve(server_state: ServerState) -> AnyhowResult<()>
           .service(
           web::resource("/result/{token}")
               .route(web::get().to(get_tts_inference_result_handler))
+              .route(web::head().to(|| HttpResponse::Ok()))
+          )
+          .service(
+          web::resource("/job/{token}")
+              .route(web::get().to(get_tts_inference_job_status_handler))
               .route(web::head().to(|| HttpResponse::Ok()))
           )
       )

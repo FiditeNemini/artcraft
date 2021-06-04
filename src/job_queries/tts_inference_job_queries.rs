@@ -109,7 +109,8 @@ WHERE id = ?
 pub async fn mark_tts_inference_job_done(
   pool: &MySqlPool,
   job: &TtsInferenceJobRecord,
-  success: bool
+  success: bool,
+  maybe_result_token: Option<&str>
 ) -> AnyhowResult<()> {
   let status = if success { "complete_success" } else { "complete_failure" };
 
@@ -118,12 +119,14 @@ pub async fn mark_tts_inference_job_done(
 UPDATE tts_inference_jobs
 SET
   status = ?,
+  on_success_result_token = ?,
   failure_reason = NULL,
   retry_at = NULL
 WHERE id = ?
         "#,
         status,
-        job.id,
+        maybe_result_token,
+        job.id
     )
       .execute(pool)
       .await?;

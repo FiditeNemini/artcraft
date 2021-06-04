@@ -33,6 +33,7 @@ pub struct InferTtsRequest {
 #[derive(Serialize)]
 pub struct InferTtsSuccessResponse {
   pub success: bool,
+  pub inference_job_token: String,
 }
 
 #[derive(Serialize)]
@@ -181,6 +182,7 @@ SET
 
   let response = InferTtsSuccessResponse {
     success: true,
+    inference_job_token: job_token.to_string(),
   };
 
   let body = serde_json::to_string(&response)

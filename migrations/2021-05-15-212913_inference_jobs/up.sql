@@ -13,6 +13,12 @@ CREATE TABLE tts_inference_jobs (
   -- This is so the frontend client doesn't submit duplicate jobs.
   uuid_idempotency_token VARCHAR(36) NOT NULL,
 
+  -- ========== SUCCESS CASE ==========
+
+  -- If the job completes successfully, this is the result token.
+  -- This is only populated on a successful result.
+  on_success_result_token VARCHAR(32) DEFAULT NULL,
+
   -- ========== INFERENCE DETAILS ==========
 
   -- The model to use.
@@ -82,6 +88,7 @@ CREATE TABLE tts_inference_jobs (
   PRIMARY KEY (id),
   UNIQUE KEY (token),
   UNIQUE KEY (uuid_idempotency_token),
+  KEY fk_on_success_result_token (on_success_result_token),
   KEY fk_model_token (model_token),
   KEY fk_maybe_creator_user_token (maybe_creator_user_token),
   KEY index_status (status),
@@ -99,6 +106,12 @@ CREATE TABLE w2l_inference_jobs (
   -- Idempotency token from client
   -- This is so the frontend client doesn't submit duplicate jobs.
   uuid_idempotency_token VARCHAR(36) NOT NULL,
+
+  -- ========== SUCCESS CASE ==========
+
+  -- If the job completes successfully, this is the result token.
+  -- This is only populated on a successful result.
+  on_success_result_token VARCHAR(32) DEFAULT NULL,
 
   -- ========== INFERENCE DETAILS : FACE TEMPLATE ==========
 
@@ -192,6 +205,7 @@ CREATE TABLE w2l_inference_jobs (
   PRIMARY KEY (id),
   UNIQUE KEY (token),
   UNIQUE KEY (uuid_idempotency_token),
+  KEY fk_on_success_result_token (on_success_result_token),
   KEY fk_maybe_w2l_template_token (maybe_w2l_template_token),
   KEY fk_maybe_tts_inference_result_token (maybe_tts_inference_result_token),
   KEY fk_maybe_creator_user_token (maybe_creator_user_token),
