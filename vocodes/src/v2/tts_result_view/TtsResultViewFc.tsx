@@ -113,9 +113,17 @@ function TtsResultViewFc(props: Props) {
     );
   }
 
+  let headingTitle = 'TTS Result';
+  let subtitle = <span />;
+  if (ttsInferenceResult.tts_model_title !== undefined && ttsInferenceResult.tts_model_title !== null) {
+    headingTitle = `${ttsInferenceResult.tts_model_title}`;
+    subtitle = <h3 className="subtitle is-3"> TTS Result</h3>;
+  }
+
   return (
     <div>
-      <h1 className="title is-1"> TTS Result </h1>
+      <h1 className="title is-1"> {headingTitle} </h1>
+      {subtitle}
 
       <audio
         controls

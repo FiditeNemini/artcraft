@@ -29,7 +29,10 @@ function TtsInferenceResultListFc(props: Props) {
               <code>audio</code> element.
           </audio>
 
-          <Link to={ttsPermalink}>Permalink &amp; download</Link>
+          <Link 
+            to={ttsPermalink}
+            className="button is-normal is-outlined is-info"
+            >Permalink &amp; download</Link>
         </div>
       );
     }

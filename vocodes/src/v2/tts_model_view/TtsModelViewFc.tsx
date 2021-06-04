@@ -7,7 +7,7 @@ import { SessionWrapper } from '../../session/SessionWrapper';
 import { TtsInferenceJob } from '../../App';
 import { v1 as uuidv1 } from 'uuid';
 import { EnqueueJobResponsePayload } from '../tts_model_list/TtsModelFormFc';
-import { TtsInferenceResultListFc } from '../tts_model_list/TtsInferenceResultsListFc';
+import { TtsInferenceResultListFc } from '../common/TtsInferenceResultsListFc';
 
 interface TtsModelViewResponsePayload {
   success: boolean,
@@ -206,7 +206,7 @@ function TtsModelViewFc(props: Props) {
 
       <br />
       <br />
-      
+
       <TtsInferenceResultListFc ttsInferenceJobs={props.ttsInferenceJobs} />
       <br />
     </div>

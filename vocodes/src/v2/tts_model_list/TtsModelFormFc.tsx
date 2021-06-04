@@ -4,7 +4,7 @@ import { SessionWrapper } from '../../session/SessionWrapper';
 import { v1 as uuidv1 } from 'uuid';
 import { Link } from 'react-router-dom';
 import { TtsInferenceJob } from '../../App';
-import { TtsInferenceResultListFc } from './TtsInferenceResultsListFc';
+import { TtsInferenceResultListFc } from '../common/TtsInferenceResultsListFc';
 
 interface TtsModelListResponsePayload {
   success: boolean,
