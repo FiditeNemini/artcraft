@@ -3,6 +3,7 @@ import { ApiConfig } from '../../v1/api/ApiConfig';
 import { SessionWrapper } from '../../session/SessionWrapper';
 import { useParams, Link } from 'react-router-dom';
 import { GravatarFc } from '../common/GravatarFc';
+import { SpectrogramFc } from './SpectrogramFc';
 
 interface TtsInferenceResultResponsePayload {
   success: boolean,
@@ -77,6 +78,9 @@ function TtsResultViewFc(props: Props) {
   let audioLink = `https://storage.googleapis.com/dev-vocodes-public${ttsInferenceResult?.public_bucket_wav_audio_path}`; 
   let modelLink = `/tts/${ttsInferenceResult.tts_model_token}`;
 
+  let spectrogramLink = `https://storage.googleapis.com/dev-vocodes-public${ttsInferenceResult?.public_bucket_wav_audio_path}`.replace(".wav", ".json"); 
+
+
   let durationSeconds = ttsInferenceResult?.duration_millis / 1000;
 
   let modelName = ttsInferenceResult.tts_model_title;
@@ -124,6 +128,8 @@ function TtsResultViewFc(props: Props) {
     <div>
       <h1 className="title is-1"> {headingTitle} </h1>
       {subtitle}
+
+      <SpectrogramFc spectrogramJsonLink={spectrogramLink} />
 
       <audio
         controls

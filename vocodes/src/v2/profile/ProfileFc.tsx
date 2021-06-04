@@ -124,17 +124,14 @@ function ProfileFc(props: Props) {
         </tbody>
       </table>
 
-      <br />
-      <br />
-
-      <h3 className="title is-3"> Badges </h3>
+      {/*<h3 className="title is-3"> Badges </h3>
       - EARLY USER !
       <br />
       - Uploaded a model
       <br />
       - Uploaded a template 
       <br />
-      <br />
+      <br />*/}
 
       <h3 className="title is-3"> TTS Results </h3>
       <ProfileTtsInferenceResultsListFc username={username} />
