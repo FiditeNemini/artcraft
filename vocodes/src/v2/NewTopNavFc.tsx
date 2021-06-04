@@ -27,7 +27,7 @@ function NewTopNavFc(props: Props) {
         <div className="column">
           <Link to="/video"
             className="button is-link is-medium is-inverted"
-            >Video</Link>
+            >Lip Sync Video</Link>
         </div>
         <div className="column">
           <Link to="/upload"
@@ -45,7 +45,7 @@ function NewTopNavFc(props: Props) {
         <div className="column">
           <Link to="/firehose"
             className="button is-link is-medium is-inverted"
-            >Firehose</Link>
+            >Feed</Link>
         </div>
       </div>
       <hr />

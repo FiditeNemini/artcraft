@@ -158,6 +158,11 @@ function W2lTemplateListFc(props: Props) {
 
       <br />
 
+      <p>This feature is based on Wav2Lip by by Prajwal, K R and Mukhopadhyay, 
+        Rudrabha and Namboodiri, Vinay P. and Jawahar, C.V.</p>
+
+      <br />
+
       {allRowsOfTemplateElements.map(el => el)}
 
     </div>
