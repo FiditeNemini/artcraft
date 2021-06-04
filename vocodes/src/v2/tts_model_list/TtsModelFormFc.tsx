@@ -241,6 +241,11 @@ function TtsModelFormFc(props: Props) {
         <br />
         <br />
 
+        {directViewLink}
+
+        <br />
+        <br />
+
         <div className="field">
           <div className="control">
             <textarea 
@@ -264,9 +269,6 @@ function TtsModelFormFc(props: Props) {
       </form>
       <br />
       <br />
-
-      {directViewLink}
-
       <TtsInferenceResultListFc ttsInferenceJobs={props.ttsInferenceJobs} />
 
 

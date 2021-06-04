@@ -12,13 +12,25 @@ function TtsInferenceResultListFc(props: Props) {
 
   props.ttsInferenceJobs.forEach(job => {
 
-    if (job.maybeResultToken === undefined) {
+    if (job.maybeResultToken === undefined || job.maybeResultToken === null) {
       results.push(
-        <div>Pending</div>
+        <div key={job.jobToken}>Pending&ellip;</div>
       );
     } else {
+
+      let audioLink = `https://storage.googleapis.com/dev-vocodes-public${job.maybePublicBucketWavAudioPath}`; 
+      let ttsPermalink = `/tts/result/${job.maybeResultToken}`
       results.push(
-        <div>Done</div>
+        <div key={job.jobToken}>
+          <audio
+            controls
+            src={audioLink}>
+              Your browser does not support the
+              <code>audio</code> element.
+          </audio>
+
+          <Link to={ttsPermalink}>Permalink &amp; download</Link>
+        </div>
       );
     }
   });

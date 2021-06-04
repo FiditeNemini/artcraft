@@ -21,6 +21,7 @@ class TtsInferenceJob {
   status: string;
   title?: string;
   maybeResultToken?: string;
+  maybePublicBucketWavAudioPath?: string;
 
   constructor(
     jobToken: string, 
@@ -28,12 +29,14 @@ class TtsInferenceJob {
     modelToken: string | undefined = undefined,
     title: string | undefined = undefined,
     maybeResulToken: string | undefined = undefined,
+    maybePublicBucketWavAudioPath: string | undefined = undefined,
   ) {
     this.status = status;
     this.jobToken = jobToken;
     this.maybeResultToken = maybeResulToken;
     this.modelToken = modelToken;
     this.title = title;
+    this.maybePublicBucketWavAudioPath = maybePublicBucketWavAudioPath;
   }
 
   static fromResponse(response: TtsInferenceJobState) :  TtsInferenceJob {
@@ -42,7 +45,8 @@ class TtsInferenceJob {
       response.status,
       response.model_token,
       response.title,
-      response.maybe_result_token
+      response.maybe_result_token,
+      response.maybe_public_bucket_wav_audio_path
     );
   }
 }
@@ -56,6 +60,7 @@ interface TtsInferenceJobState {
   job_token: string,
   status: string,
   maybe_result_token?: string,
+  maybe_public_bucket_wav_audio_path?: string,
   model_token: string,
   tts_model_type: string,
   title: string,
