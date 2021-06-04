@@ -8,6 +8,7 @@ import { ProfileW2lInferenceResultsListFc } from './Profile_W2lInferenceResultLi
 import { ProfileW2lTemplateListFc } from './Profile_W2lTemplateListFc';
 import { SessionWrapper } from '../../session/SessionWrapper';
 import { useParams } from 'react-router-dom';
+import { profile } from 'console';
 
 interface Props {
   sessionWrapper: SessionWrapper,
@@ -79,6 +80,26 @@ function ProfileFc(props: Props) {
 
   let editLinkUrl = `/profile/${username}/edit`;
 
+  let profileRows : Array<JSX.Element> = [];
+
+  if (userData !== undefined && userData.twitch_username) {
+    profileRows.push(
+      <tr key="twitch">
+        <th>Twitch</th>
+        <td>{userData.twitch_username}</td>
+      </tr>
+    )
+  }
+
+  if (userData !== undefined && userData.twitter_username) {
+    profileRows.push(
+      <tr key="twitter">
+        <th>Twitter</th>
+        <td>{userData.twitter_username}</td>
+      </tr>
+    )
+  }
+
   return (
     <div>
       <h1 className="title is-1">
@@ -95,6 +116,14 @@ function ProfileFc(props: Props) {
       <br />
 
       <p>Profiles are a work in progress.</p>
+
+      <br />
+
+      <table className="table">
+        <tbody>
+          {profileRows}
+        </tbody>
+      </table>
 
       <br />
       <br />

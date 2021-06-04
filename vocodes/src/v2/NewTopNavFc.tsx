@@ -12,7 +12,8 @@ function NewTopNavFc(props: Props) {
 
   if (props.sessionWrapper.isLoggedIn()) {
     let username = props.sessionWrapper.getUsername();
-    myDataLink = `/profile/${username}/data`;
+    //myDataLink = `/profile/${username}/data`;
+    myDataLink = `/profile/${username}`;
   }
 
   return (
@@ -34,9 +35,12 @@ function NewTopNavFc(props: Props) {
             >Upload</Link>
         </div>
         <div className="column">
+          {/*<Link to={myDataLink}
+            className="button is-link is-medium is-inverted"
+            >Pending</Link>*/}
           <Link to={myDataLink}
             className="button is-link is-medium is-inverted"
-            >Pending</Link>
+            >My Data</Link>
         </div>
         <div className="column">
           <Link to="/firehose"
