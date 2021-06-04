@@ -204,3 +204,18 @@ CREATE USER 'storyteller'@'localhost' IDENTIFIED BY 'password';
 GRANT ALL PRIVILEGES ON storyteller.* TO 'storyteller'@'localhost';
 ```
 
+Production
+----------
+
+### Public buckets without list permission
+
+Public buckets that deny the `list` action should use the following Role:
+
+`roles/storage.legacyObjectReader`
+
+See:
+
+* https://stackoverflow.com/a/56354633
+* https://cloud.google.com/storage/docs/access-control/making-data-public#buckets
+
+
