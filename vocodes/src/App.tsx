@@ -79,6 +79,7 @@ interface State {
   enableAlpha: boolean,
   sessionWrapper: SessionWrapper,
 
+  // Jobs enqueued during this browser session.
   ttsInferenceJobs: Array<TtsInferenceJob>,
 }
 
@@ -277,6 +278,7 @@ class App extends React.Component<Props, State> {
                     sessionWrapper={this.state.sessionWrapper}
                     querySessionAction={this.querySession}
                     enqueueTtsJob={this.enqueueTtsJob}
+                    ttsInferenceJobs={this.state.ttsInferenceJobs}
                     />
                 </Route>
               </Switch>
@@ -290,4 +292,4 @@ class App extends React.Component<Props, State> {
   }
 }
 
-export { App, MigrationMode }
+export { App, MigrationMode, TtsInferenceJob }

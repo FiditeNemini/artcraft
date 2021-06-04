@@ -3,6 +3,8 @@ import { ApiConfig } from '../../v1/api/ApiConfig';
 import { SessionWrapper } from '../../session/SessionWrapper';
 import { v1 as uuidv1 } from 'uuid';
 import { Link } from 'react-router-dom';
+import { TtsInferenceJob } from '../../App';
+import { TtsInferenceResultListFc } from './TtsInferenceResultsListFc';
 
 interface TtsModelListResponsePayload {
   success: boolean,
@@ -29,6 +31,7 @@ interface EnqueueJobResponsePayload {
 interface Props {
   sessionWrapper: SessionWrapper,
   enqueueTtsJob: (jobToken: string) => void,
+  ttsInferenceJobs: Array<TtsInferenceJob>,
 }
 
 function TtsModelFormFc(props: Props) {
@@ -263,6 +266,8 @@ function TtsModelFormFc(props: Props) {
       <br />
 
       {directViewLink}
+
+      <TtsInferenceResultListFc ttsInferenceJobs={props.ttsInferenceJobs} />
 
 
     </div>

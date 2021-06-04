@@ -21,11 +21,13 @@ import { W2lTemplateViewFc } from './w2l_template_view/W2lTemplateViewFc';
 import { NewFooterNavFc } from './NewFooterNavFc';
 import { TtsModelViewFc } from './tts_model_view/TtsModelViewFc';
 import { TtsResultViewFc } from './tts_result_view/TtsResultViewFc';
+import { TtsInferenceJob } from '../App';
 
 interface Props {
   sessionWrapper: SessionWrapper,
   querySessionAction: () => void,
   enqueueTtsJob: (jobToken: string) => void,
+  ttsInferenceJobs: Array<TtsInferenceJob>,
 }
 
 interface State {
@@ -171,6 +173,7 @@ class NewVocodesContainer extends React.Component<Props, State> {
               <TtsModelFormFc
                 sessionWrapper={this.props.sessionWrapper}
                 enqueueTtsJob={this.props.enqueueTtsJob}
+                ttsInferenceJobs={this.props.ttsInferenceJobs}
               />
             </Route>
 
