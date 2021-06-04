@@ -202,13 +202,18 @@ class App extends React.Component<Props, State> {
         return;
       }
 
+      console.log('polled job state ---', jobResponse.state);
+
       let updatedJobs : Array<TtsInferenceJob> = [];
       this.state.ttsInferenceJobs.forEach(job => {
         if (job.jobToken !== jobResponse.state!.job_token ||
-            job.maybeResultToken !== undefined) { // NB: Already done querying, no need to update again.
+            jobResponse.state!.maybe_result_token === undefined) { // NB: Already done querying, no need to update again.
+          console.log('<<<<SKIPPING>>>', job.jobToken, jobResponse.state!.job_token)
           updatedJobs.push(job);
           return;
         }
+
+        console.log('updated job', jobResponse.state);
 
         let updatedJob = TtsInferenceJob.fromResponse(jobResponse.state!);
         updatedJobs.push(updatedJob);
@@ -221,13 +226,12 @@ class App extends React.Component<Props, State> {
     .catch(e => { /* Ignore. */ });
   }
 
-  pollJobs () {
-    console.log('pollJobs()')
+  pollJobs = () => {
     this.state.ttsInferenceJobs.forEach(job => {
-      console.log('poll job:', job.jobToken)
       switch (job.status) {
         case 'unknown':
         case 'pending':
+          console.log('need to poll job', job);
           this.checkTtsJob(job.jobToken);
           break;
         default:
