@@ -147,9 +147,15 @@ class NumpyEncoder(json.JSONEncoder):
             return obj.tolist()
         return json.JSONEncoder.default(self, obj)
 
-#json_dump = json.dumps({'mel': mel_outputs, 'mel_postnet': mel_outputs_postnet}, cls=NumpyEncoder)
-#with open(args.output_spectrogram_filename, 'w') as outfile:
-#    json.dump(data, outfile)
+
+json_data = {
+    'mel': mel_outputs.cpu().numpy(),
+    'mel_postnet': mel_outputs_postnet.cpu().numpy()
+}
+
+#json_dump = json.dumps(json_data, cls=NumpyEncoder)
+with open(args.output_spectrogram_filename, 'w') as outfile:
+    json.dump(json_data, outfile, cls=NumpyEncoder)
 
 #torch.save(mel_outputs, 'mel_outputs.mel')
 #torch.save(mel_outputs_postnet, 'mel_outputs_postnet.mel')

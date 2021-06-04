@@ -390,7 +390,7 @@ async fn process_job(inferencer: &Inferencer, job: &TtsInferenceJobRecord) -> An
   info!("Checking that output files exist...");
 
   check_file_exists(&output_audio_fs_path)?;
-  //check_file_exists(&output_spectrogram_fs_path)?;
+  check_file_exists(&output_spectrogram_fs_path)?;
   //check_file_exists(&output_metadata_fs_path)?;
 
   let file_metadata = FileMetadata::default();
@@ -414,9 +414,8 @@ async fn process_job(inferencer: &Inferencer, job: &TtsInferenceJobRecord) -> An
   // ==================== UPLOAD SPECTROGRAM TO BUCKETS ==================== //
 
   let spectrogram_result_object_path = inferencer.bucket_path_unifier.tts_inference_spectrogram_output_path(
-    &job.inference_job_token);
+    &job.uuid_idempotency_token); // TODO: Don't use this!
 
-  /*
   info!("Spectrogram destination bucket path: {:?}", &spectrogram_result_object_path);
 
   info!("Uploading spectrogram...");
@@ -426,7 +425,6 @@ async fn process_job(inferencer: &Inferencer, job: &TtsInferenceJobRecord) -> An
     &output_spectrogram_fs_path,
     "application/json")
       .await?;
-   */
 
   // ==================== SAVE RECORDS ==================== //
 
