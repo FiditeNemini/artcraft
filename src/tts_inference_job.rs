@@ -444,7 +444,12 @@ async fn process_job(inferencer: &Inferencer, job: &TtsInferenceJobRecord) -> An
       .await?;
 
   info!("Marking job complete...");
-  mark_tts_inference_job_done(&inferencer.mysql_pool, job, true, Some(&inference_result_token)).await?;
+  mark_tts_inference_job_done(
+    &inferencer.mysql_pool,
+    job,
+    true,
+    Some(&inference_result_token)
+  ).await?;
 
   inferencer.firehose_publisher.tts_inference_finished(
     job.maybe_creator_user_token.as_deref(),

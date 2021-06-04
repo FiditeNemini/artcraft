@@ -129,11 +129,12 @@ WHERE id = ?
 
   Ok(())
 }
-pub async fn mark_w2l_inference_job_done(pool: &MySqlPool,
-                                               job: &W2lInferenceJobRecord,
-                                               success: bool)
-                                               -> AnyhowResult<()>
-{
+pub async fn mark_w2l_inference_job_done(
+  pool: &MySqlPool,
+  job: &W2lInferenceJobRecord,
+  success: bool,
+  maybe_result_token: Option<&str>
+) -> AnyhowResult<()> {
   let status = if success { "complete_success" } else { "complete_failure" };
 
   let query_result = sqlx::query!(
@@ -141,11 +142,13 @@ pub async fn mark_w2l_inference_job_done(pool: &MySqlPool,
 UPDATE w2l_inference_jobs
 SET
   status = ?,
+  on_success_result_token = ?,
   failure_reason = NULL,
   retry_at = NULL
 WHERE id = ?
         "#,
         status,
+        maybe_result_token,
         job.id,
     )
     .execute(pool)
