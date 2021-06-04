@@ -38,6 +38,7 @@ pub struct TtsInferenceJobStatusForResponse {
 
   pub status: String,
   pub maybe_result_token: Option<String>,
+  pub maybe_public_bucket_wav_audio_path: Option<String>,
 
   pub model_token: String,
   pub tts_model_type: String,
@@ -70,6 +71,7 @@ pub struct TtsInferenceJobStatusRecord {
 
   pub status: String,
   pub maybe_result_token: Option<String>,
+  pub maybe_public_bucket_wav_audio_path: Option<String>,
 
   pub model_token: String,
   pub tts_model_type: String,
@@ -123,6 +125,7 @@ SELECT
 
     jobs.status,
     jobs.on_success_result_token as maybe_result_token,
+    results.public_bucket_wav_audio_path as maybe_public_bucket_wav_audio_path,
 
     jobs.model_token,
     tts.tts_model_type,
@@ -130,9 +133,13 @@ SELECT
 
     jobs.created_at,
     jobs.updated_at
+
 FROM tts_inference_jobs as jobs
 JOIN tts_models as tts
-ON tts.token = jobs.model_token
+    ON tts.token = jobs.model_token
+LEFT OUTER JOIN tts_results as results
+    ON jobs.on_success_result_token = results.token
+
 WHERE jobs.token = ?
         "#,
       &path.token
@@ -159,6 +166,7 @@ WHERE jobs.token = ?
     job_token: record.job_token.clone(),
     status: record.status.clone(),
     maybe_result_token: record.maybe_result_token.clone(),
+    maybe_public_bucket_wav_audio_path: record.maybe_public_bucket_wav_audio_path.clone(),
     model_token: record.model_token.clone(),
     tts_model_type: record.tts_model_type.clone(),
     title: record.title.clone(),
