@@ -48,7 +48,7 @@ pub struct W2lTemplateExistenceRecord {
 pub struct InferW2lWithUploadSuccessResponse {
   pub success: bool,
   /// This is how frontend clients can request the job execution status.
-  pub job_token: String,
+  pub inference_job_token: String,
 }
 
 #[derive(Serialize)]
@@ -351,7 +351,7 @@ SET
 
   let response = InferW2lWithUploadSuccessResponse {
     success: true,
-    job_token: job_token.to_string(),
+    inference_job_token: job_token.to_string(),
   };
 
   let body = serde_json::to_string(&response)
