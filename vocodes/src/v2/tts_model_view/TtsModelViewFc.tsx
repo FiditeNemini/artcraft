@@ -2,12 +2,12 @@
 import React, { useState, useEffect } from 'react';
 //import axios from 'axios';
 import { ApiConfig } from '../../v1/api/ApiConfig';
-import { useParams, Link } from 'react-router-dom';
+import { EnqueueJobResponsePayload } from '../tts_model_list/TtsModelFormFc';
+import { SessionTtsInferenceResultListFc } from '../common/SessionTtsInferenceResultsListFc';
 import { SessionWrapper } from '../../session/SessionWrapper';
 import { TtsInferenceJob } from '../../App';
+import { useParams, Link } from 'react-router-dom';
 import { v1 as uuidv1 } from 'uuid';
-import { EnqueueJobResponsePayload } from '../tts_model_list/TtsModelFormFc';
-import { TtsInferenceResultListFc } from '../common/TtsInferenceResultsListFc';
 
 interface TtsModelViewResponsePayload {
   success: boolean,
@@ -120,13 +120,10 @@ function TtsModelViewFc(props: Props) {
     })
     .then(res => res.json())
     .then(res => {
-      console.log('handleFormSubmit response:', res);
       let response : EnqueueJobResponsePayload = res;
       if (!response.success || response.inference_job_token === undefined) {
         return;
       }
-
-      console.log('enqueuing...')
 
       props.enqueueTtsJob(response.inference_job_token);
     })
@@ -207,7 +204,7 @@ function TtsModelViewFc(props: Props) {
       <br />
       <br />
 
-      <TtsInferenceResultListFc ttsInferenceJobs={props.ttsInferenceJobs} />
+      <SessionTtsInferenceResultListFc ttsInferenceJobs={props.ttsInferenceJobs} />
       <br />
     </div>
   )

@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { ApiConfig } from '../../v1/api/ApiConfig';
+import { GravatarFc } from '../common/GravatarFc';
 import { SessionWrapper } from '../../session/SessionWrapper';
 import { useParams, Link } from 'react-router-dom';
-import { GravatarFc } from '../common/GravatarFc';
 
 interface W2lInferenceResultResponsePayload {
   success: boolean,

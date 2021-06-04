@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { ApiConfig } from '../../v1/api/ApiConfig';
-import { useParams, Link } from 'react-router-dom';
 import { SessionWrapper } from '../../session/SessionWrapper';
+import { W2lInferenceJob } from '../../App';
+import { useParams, Link } from 'react-router-dom';
 import { v1 as uuidv1 } from 'uuid';
+import { SessionW2lInferenceResultListFc } from '../common/SessionW2lInferenceResultsListFc';
 
 interface W2lTemplateViewResponsePayload {
   success: boolean,
@@ -27,8 +29,15 @@ interface W2lTemplate {
   updated_at: string,
 }
 
+interface EnqueueJobResponsePayload {
+  success: boolean,
+  inference_job_token?: string,
+}
+
 interface Props {
   sessionWrapper: SessionWrapper,
+  enqueueW2lJob: (jobToken: string) => void,
+  w2lInferenceJobs: Array<W2lInferenceJob>,
 }
 
 function W2lTemplateViewFc(props: Props) {
@@ -99,19 +108,13 @@ function W2lTemplateViewFc(props: Props) {
     axios.post(endpointUrl, formData, { withCredentials: true }) 
       .then(res => res.data)
       .then(res => {
-        /*if (res.uuid !== undefined) {
-          this.setState({
-            jobUuid: res.uuid
-          });
-
-          //let job = new VideoJob(res.uuid, VideoJobStatus.Pending);
-          //this.props.startVideoJobCallback(job);
-
-          // Make sure we show the processing status modal
-          window.scrollTo(0, document.body.scrollHeight);
-        }*/
-
-        console.log(res);
+        console.log('w2l submitted');
+        let response : EnqueueJobResponsePayload = res;
+        if (!response.success || response.inference_job_token === undefined) {
+          return;
+        }
+        console.log('w2l enqueueing');
+        props.enqueueW2lJob(response.inference_job_token);
       });
 
 
@@ -216,6 +219,9 @@ function W2lTemplateViewFc(props: Props) {
           </tr>
         </tbody>
       </table>
+
+      <SessionW2lInferenceResultListFc w2lInferenceJobs={props.w2lInferenceJobs} />
+      <br />
     </div>
   )
 }

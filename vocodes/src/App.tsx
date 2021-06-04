@@ -68,6 +68,61 @@ interface TtsInferenceJobState {
   updated_at: string,
 }
 
+
+class W2lInferenceJob {
+  jobToken: string;
+  maybeW2lTemplateToken?: string;
+  status: string;
+  title?: string;
+  maybeResultToken?: string;
+  maybePublicBucketVideoPath?: string;
+
+  constructor(
+    jobToken: string, 
+    status: string = 'unknown',
+    maybeW2lTemplateToken: string | undefined = undefined,
+    title: string | undefined = undefined,
+    maybeResulToken: string | undefined = undefined,
+    maybePublicBucketVideoPath: string | undefined = undefined,
+  ) {
+    this.status = status;
+    this.jobToken = jobToken;
+    this.maybeResultToken = maybeResulToken;
+    this.maybeW2lTemplateToken = maybeW2lTemplateToken;
+    this.title = title;
+    this.maybePublicBucketVideoPath = maybePublicBucketVideoPath;
+  }
+
+  static fromResponse(response: W2lInferenceJobState) :  TtsInferenceJob {
+    return new TtsInferenceJob(
+      response.job_token,
+      response.status,
+      response.maybe_w2l_template_token,
+      response.title,
+      response.maybe_result_token,
+      response.maybe_public_bucket_video_path
+    );
+  }
+}
+
+interface W2lInferenceJobStateResponsePayload {
+  success: boolean,
+  state?: W2lInferenceJobState,
+}
+
+interface W2lInferenceJobState {
+  job_token: string,
+  status: string,
+  maybe_result_token?: string,
+  maybe_public_bucket_video_path?: string,
+  maybe_w2l_template_token?: string,
+  w2l_template_type: string,
+  title: string,
+  created_at: string,
+  updated_at: string,
+}
+
+
 interface Props {
   // Certan browsers (iPhone) have pitiful support for drawing APIs. Worse yet,
   // they seem to lose the "touch event sandboxing" that allows for audio to be 
@@ -86,6 +141,7 @@ interface State {
 
   // Jobs enqueued during this browser session.
   ttsInferenceJobs: Array<TtsInferenceJob>,
+  w2lInferenceJobs: Array<W2lInferenceJob>,
 }
 
 class App extends React.Component<Props, State> {
@@ -103,6 +159,7 @@ class App extends React.Component<Props, State> {
       sessionWrapper: SessionWrapper.emptySession(),
 
       ttsInferenceJobs: [],
+      w2lInferenceJobs: [],
     }
   }
 
@@ -232,13 +289,76 @@ class App extends React.Component<Props, State> {
     .catch(e => { /* Ignore. */ });
   }
 
+  enqueueW2lJob = (jobToken: string) => {
+    if (!this.state.enableAlpha) {
+      return;
+    }
+    const newJob = new W2lInferenceJob(jobToken);
+    let inferenceJobs = this.state.w2lInferenceJobs.concat([newJob]);
+
+    this.setState({
+      w2lInferenceJobs: inferenceJobs
+    })
+  }
+
+  checkW2lJob = (jobToken: string) => {
+    if (!this.state.enableAlpha) {
+      return;
+    }
+
+    const api = new ApiConfig();
+    const endpointUrl = api.getW2lInferenceJobState(jobToken);
+
+    fetch(endpointUrl, {
+      method: 'GET',
+      credentials: 'include',
+      headers: {
+        'Accept': 'application/json',
+      },
+    })
+    .then(res => res.json())
+    .then(response => {
+      const jobResponse : W2lInferenceJobStateResponsePayload = response;
+
+      if (jobResponse === undefined || jobResponse.state === undefined) {
+        return;
+      }
+
+      let updatedJobs : Array<W2lInferenceJob> = [];
+      this.state.w2lInferenceJobs.forEach(job => {
+        if (job.jobToken !== jobResponse.state!.job_token ||
+            jobResponse.state!.maybe_result_token === undefined) { // NB: Already done querying, no need to update again.
+          updatedJobs.push(job);
+          return;
+        }
+
+        let updatedJob = W2lInferenceJob.fromResponse(jobResponse.state!);
+        updatedJobs.push(updatedJob);
+      });
+ 
+      this.setState({
+        w2lInferenceJobs: updatedJobs,
+      })
+    })
+    .catch(e => { /* Ignore. */ });
+  }
+
   pollJobs = () => {
     this.state.ttsInferenceJobs.forEach(job => {
       switch (job.status) {
         case 'unknown':
         case 'pending':
-          console.log('need to poll job', job);
           this.checkTtsJob(job.jobToken);
+          break;
+        default:
+          return;
+      }
+    });
+    this.state.w2lInferenceJobs.forEach(job => {
+      switch (job.status) {
+        case 'unknown':
+        case 'pending':
+          this.checkW2lJob(job.jobToken);
           break;
         default:
           return;
@@ -282,8 +402,12 @@ class App extends React.Component<Props, State> {
                   <NewVocodesContainer
                     sessionWrapper={this.state.sessionWrapper}
                     querySessionAction={this.querySession}
+
                     enqueueTtsJob={this.enqueueTtsJob}
                     ttsInferenceJobs={this.state.ttsInferenceJobs}
+
+                    enqueueW2lJob={this.enqueueW2lJob}
+                    w2lInferenceJobs={this.state.w2lInferenceJobs}
                     />
                 </Route>
               </Switch>
@@ -297,4 +421,4 @@ class App extends React.Component<Props, State> {
   }
 }
 
-export { App, MigrationMode, TtsInferenceJob }
+export { App, MigrationMode, TtsInferenceJob, W2lInferenceJob }

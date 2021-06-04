@@ -21,13 +21,17 @@ import { W2lTemplateViewFc } from './w2l_template_view/W2lTemplateViewFc';
 import { NewFooterNavFc } from './NewFooterNavFc';
 import { TtsModelViewFc } from './tts_model_view/TtsModelViewFc';
 import { TtsResultViewFc } from './tts_result_view/TtsResultViewFc';
-import { TtsInferenceJob } from '../App';
+import { TtsInferenceJob, W2lInferenceJob } from '../App';
 
 interface Props {
   sessionWrapper: SessionWrapper,
   querySessionAction: () => void,
+
   enqueueTtsJob: (jobToken: string) => void,
   ttsInferenceJobs: Array<TtsInferenceJob>,
+
+  enqueueW2lJob: (jobToken: string) => void,
+  w2lInferenceJobs: Array<W2lInferenceJob>,
 }
 
 interface State {
@@ -132,6 +136,8 @@ class NewVocodesContainer extends React.Component<Props, State> {
             <Route path="/w2l/:templateSlug">
               <W2lTemplateViewFc
                 sessionWrapper={this.props.sessionWrapper}
+                enqueueW2lJob={this.props.enqueueW2lJob}
+                w2lInferenceJobs={this.props.w2lInferenceJobs}
               />
             </Route>
 

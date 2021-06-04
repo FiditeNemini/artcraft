@@ -96,6 +96,10 @@ class ApiConfig {
     return `${this.getScheme()}://${this.getNewApiHost()}/user/${username}/w2l_templates`;
   }
 
+  getW2lInferenceJobState(jobToken: string) : string {
+    return `${this.getScheme()}://${this.getNewApiHost()}/w2l/job/${jobToken}`;
+  }
+
   listW2lInferenceResultsForUser(username: string) : string {
     return `${this.getScheme()}://${this.getNewApiHost()}/user/${username}/w2l_results`;
   }

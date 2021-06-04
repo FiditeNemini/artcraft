@@ -6,7 +6,7 @@ interface Props {
   ttsInferenceJobs: Array<TtsInferenceJob>,
 }
 
-function TtsInferenceResultListFc(props: Props) {
+function SessionTtsInferenceResultListFc(props: Props) {
 
   let results : Array<JSX.Element> = [];
 
@@ -51,4 +51,4 @@ function TtsInferenceResultListFc(props: Props) {
   );
 }
 
-export { TtsInferenceResultListFc };
+export { SessionTtsInferenceResultListFc };

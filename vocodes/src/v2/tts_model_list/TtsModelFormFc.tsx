@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { ApiConfig } from '../../v1/api/ApiConfig';
-import { SessionWrapper } from '../../session/SessionWrapper';
-import { v1 as uuidv1 } from 'uuid';
 import { Link } from 'react-router-dom';
+import { SessionTtsInferenceResultListFc } from '../common/SessionTtsInferenceResultsListFc';
+import { SessionWrapper } from '../../session/SessionWrapper';
 import { TtsInferenceJob } from '../../App';
-import { TtsInferenceResultListFc } from '../common/TtsInferenceResultsListFc';
+import { v1 as uuidv1 } from 'uuid';
 
 interface TtsModelListResponsePayload {
   success: boolean,
@@ -245,7 +245,7 @@ function TtsModelFormFc(props: Props) {
 
       <br />
       <br />
-      <TtsInferenceResultListFc ttsInferenceJobs={props.ttsInferenceJobs} />
+      <SessionTtsInferenceResultListFc ttsInferenceJobs={props.ttsInferenceJobs} />
 
 
     </div>

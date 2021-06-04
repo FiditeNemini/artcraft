@@ -8,7 +8,6 @@ import { ProfileW2lInferenceResultsListFc } from './Profile_W2lInferenceResultLi
 import { ProfileW2lTemplateListFc } from './Profile_W2lTemplateListFc';
 import { SessionWrapper } from '../../session/SessionWrapper';
 import { useParams } from 'react-router-dom';
-import { profile } from 'console';
 
 interface Props {
   sessionWrapper: SessionWrapper,
