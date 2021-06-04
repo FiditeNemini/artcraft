@@ -21,8 +21,14 @@ interface TtsModel {
   updated_at: string,
 }
 
+interface EnqueueJobResponsePayload {
+  success: boolean,
+  inference_job_token?: string,
+}
+
 interface Props {
   sessionWrapper: SessionWrapper,
+  enqueueTtsJob: (jobToken: string) => void,
 }
 
 function TtsModelFormFc(props: Props) {
@@ -174,9 +180,15 @@ function TtsModelFormFc(props: Props) {
     })
     .then(res => res.json())
     .then(res => {
-      console.log('tts infer response', res)
-      if (res.success) {
+      console.log('handleFormSubmit response:', res);
+      let response : EnqueueJobResponsePayload = res;
+      if (!response.success || response.inference_job_token === undefined) {
+        return;
       }
+
+      console.log('enqueuing...')
+
+      props.enqueueTtsJob(response.inference_job_token);
     })
     .catch(e => {
     });

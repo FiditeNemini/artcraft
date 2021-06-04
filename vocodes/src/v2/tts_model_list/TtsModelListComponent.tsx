@@ -13,6 +13,7 @@ interface Props {
   sessionWrapper: SessionWrapper,
   querySessionCallback : () => void,
   switchModeCallback?: (mode: Mode) => void,
+  enqueueTtsJob: (jobToken: string) => void,
 }
 
 interface State {

@@ -15,6 +15,54 @@ enum MigrationMode {
   OLD_VOCODES,
 }
 
+class TtsInferenceJob {
+  jobToken: string;
+  modelToken?: string;
+  status: string;
+  title?: string;
+  maybeResultToken?: string;
+
+  constructor(
+    jobToken: string, 
+    status: string = 'unknown',
+    modelToken: string | undefined = undefined,
+    title: string | undefined = undefined,
+    maybeResulToken: string | undefined = undefined,
+  ) {
+    this.status = status;
+    this.jobToken = jobToken;
+    this.maybeResultToken = maybeResulToken;
+    this.modelToken = modelToken;
+    this.title = title;
+  }
+
+  static fromResponse(response: TtsInferenceJobState) :  TtsInferenceJob {
+    return new TtsInferenceJob(
+      response.job_token,
+      response.status,
+      response.model_token,
+      response.title,
+      response.maybe_result_token
+    );
+  }
+}
+
+interface TtsInferenceJobStateResponsePayload {
+  success: boolean,
+  state?: TtsInferenceJobState,
+}
+
+interface TtsInferenceJobState {
+  job_token: string,
+  status: string,
+  maybe_result_token?: string,
+  model_token: string,
+  tts_model_type: string,
+  title: string,
+  created_at: string,
+  updated_at: string,
+}
+
 interface Props {
   // Certan browsers (iPhone) have pitiful support for drawing APIs. Worse yet,
   // they seem to lose the "touch event sandboxing" that allows for audio to be 
@@ -30,6 +78,8 @@ interface State {
   // Rollout of vocodes 2.0
   enableAlpha: boolean,
   sessionWrapper: SessionWrapper,
+
+  ttsInferenceJobs: Array<TtsInferenceJob>,
 }
 
 class App extends React.Component<Props, State> {
@@ -45,12 +95,17 @@ class App extends React.Component<Props, State> {
       enableAlpha: enableAlpha,
       migrationMode: migrationMode,
       sessionWrapper: SessionWrapper.emptySession(),
+
+      ttsInferenceJobs: [],
     }
   }
 
   componentDidMount() {
     this.querySession();
-    setInterval(() => this.querySession, 10000);
+
+    setInterval(() => { this.querySession() }, 10000);
+    // TODO: Use websockets, this is dumb
+    setInterval(() => { this.pollJobs() }, 1000);
     //this.state.videoJobPoller.start();
     //this.state.videoQueuePoller.start();
   }
@@ -107,6 +162,80 @@ class App extends React.Component<Props, State> {
     .catch(e => { /* Ignore. */ });
   }
 
+  enqueueTtsJob = (jobToken: string) => {
+    console.log('enqueueTtsJob()')
+    if (!this.state.enableAlpha) {
+      console.log('enqueueTtsJob() disabled!')
+      return;
+    }
+    const newJob = new TtsInferenceJob(jobToken);
+    let inferenceJobs = this.state.ttsInferenceJobs.concat([newJob]);
+
+      console.log('setting state!!')
+    this.setState({
+      ttsInferenceJobs: inferenceJobs
+    })
+
+    console.log('inference jobs:', inferenceJobs.length);
+  }
+
+  checkTtsJob = (jobToken: string) => {
+    if (!this.state.enableAlpha) {
+      return;
+    }
+
+    const api = new ApiConfig();
+    const endpointUrl = api.getTtsInferenceJobState(jobToken);
+
+    fetch(endpointUrl, {
+      method: 'GET',
+      credentials: 'include',
+      headers: {
+        'Accept': 'application/json',
+      },
+    })
+    .then(res => res.json())
+    .then(response => {
+      const jobResponse : TtsInferenceJobStateResponsePayload = response;
+
+      if (jobResponse === undefined || jobResponse.state === undefined) {
+        return;
+      }
+
+      let updatedJobs : Array<TtsInferenceJob> = [];
+      this.state.ttsInferenceJobs.forEach(job => {
+        if (job.jobToken !== jobResponse.state!.job_token ||
+            job.maybeResultToken !== undefined) { // NB: Already done querying, no need to update again.
+          updatedJobs.push(job);
+          return;
+        }
+
+        let updatedJob = TtsInferenceJob.fromResponse(jobResponse.state!);
+        updatedJobs.push(updatedJob);
+      });
+ 
+      this.setState({
+        ttsInferenceJobs: updatedJobs,
+      })
+    })
+    .catch(e => { /* Ignore. */ });
+  }
+
+  pollJobs () {
+    console.log('pollJobs()')
+    this.state.ttsInferenceJobs.forEach(job => {
+      console.log('poll job:', job.jobToken)
+      switch (job.status) {
+        case 'unknown':
+        case 'pending':
+          this.checkTtsJob(job.jobToken);
+          break;
+        default:
+          return;
+      }
+    });
+  }
+
   setMigrationMode = (mode: MigrationMode) => {
     this.setState({migrationMode: mode});
   }
@@ -143,6 +272,7 @@ class App extends React.Component<Props, State> {
                   <NewVocodesContainer
                     sessionWrapper={this.state.sessionWrapper}
                     querySessionAction={this.querySession}
+                    enqueueTtsJob={this.enqueueTtsJob}
                     />
                 </Route>
               </Switch>

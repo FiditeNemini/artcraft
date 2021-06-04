@@ -56,6 +56,10 @@ class ApiConfig {
     return `${this.getScheme()}://${this.getNewApiHost()}/user/${username}/tts_results`;
   }
 
+  getTtsInferenceJobState(jobToken: string) : string {
+    return `${this.getScheme()}://${this.getNewApiHost()}/tts/job/${jobToken}`;
+  }
+
   uploadTts() : string {
     return `${this.getScheme()}://${this.getNewApiHost()}/tts/upload`;
   }

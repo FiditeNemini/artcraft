@@ -25,6 +25,7 @@ import { TtsResultViewFc } from './tts_result_view/TtsResultViewFc';
 interface Props {
   sessionWrapper: SessionWrapper,
   querySessionAction: () => void,
+  enqueueTtsJob: (jobToken: string) => void,
 }
 
 interface State {
@@ -114,6 +115,7 @@ class NewVocodesContainer extends React.Component<Props, State> {
               <TtsModelListComponent
                 querySessionCallback={()=>{}}
                 sessionWrapper={this.props.sessionWrapper}
+                enqueueTtsJob={this.props.enqueueTtsJob}
               />
             </Route>
 
@@ -168,6 +170,7 @@ class NewVocodesContainer extends React.Component<Props, State> {
             <Route path="/">
               <TtsModelFormFc
                 sessionWrapper={this.props.sessionWrapper}
+                enqueueTtsJob={this.props.enqueueTtsJob}
               />
             </Route>
 
