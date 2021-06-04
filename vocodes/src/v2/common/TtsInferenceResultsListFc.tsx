@@ -38,8 +38,14 @@ function TtsInferenceResultListFc(props: Props) {
     }
   });
 
+  let title = <span />;
+  if  (results.length !== 0) {
+      title = <h4 className="title is-4">Session TTS Results</h4>;
+  }
+
   return (
     <div>
+      {title}
       {results}
     </div>
   );
