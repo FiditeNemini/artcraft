@@ -65,11 +65,38 @@ function SpectrogramFc(props: Props) {
 
   let draw = (ctx: any, frameCount: any) => {
 
-        ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height)
-        ctx.fillStyle = '#000000'
-        ctx.beginPath()
-        ctx.arc(50, 100, 20*Math.sin(frameCount*0.05)**2, 0, 2*Math.PI)
-        ctx.fill()
+        //ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height)
+        //ctx.fillStyle = '#000000'
+        //ctx.beginPath()
+        //ctx.arc(50, 100, 20*Math.sin(frameCount*0.05)**2, 0, 2*Math.PI)
+        //ctx.fill()
+
+
+        //let img = new Image();
+        //ctx.drawImage(img, 0, 0);
+
+        //////const imageData = ctx.getImageData(0, 0, width, height);
+        //////const data = imageData.data;
+
+        //////for (var i = 0; i < data.length; i += 4) {
+        //////    data[i]     = 255; // red
+        //////    data[i + 1] = 0; // green
+        //////    data[i + 2] = 155; // blue
+        //////}
+        //////ctx.putImageData(imageData, 0, 0);
+
+        let r = 0;
+        let g = 200;
+        let b = 250;
+        let a = 100;
+        ctx.fillStyle = "rgba("+r+","+g+","+b+","+(a/255)+")";
+
+        for(let x = 0; x < width; x++) {
+            for(let y = 0; y < height; y++) {
+                ctx.fillRect( x, y, 1, 1 );
+            }
+        }
+
   }
 
   useEffect(() => {
@@ -86,40 +113,45 @@ function SpectrogramFc(props: Props) {
     .then(res => {
       console.log('got spectrogram', res);
       //updateCanvas();
+
+
+
+        const canvas = canvasRef.current as any;
+        const context = canvas.getContext('2d')
+
+        let frameCount = 0
+        let animationFrameId : any = undefined;
+        
+        const render = () => {
+        //console.log('render');
+        frameCount++
+        draw(context, frameCount)
+
+            //let pixels = calculatePixels();
+            //var image = new ImageData(pixels, width, height);
+
+
+            //console.log('creating color bitmap...')
+            //createImageBitmap(image).then(renderer => {
+            //    context.drawImage(renderer, 0, 0, width * 3, height * 3)
+            //});
+
+
+        animationFrameId = window.requestAnimationFrame(render)
+        }
+        render()
+        
+        return () => {
+        window.cancelAnimationFrame(animationFrameId)
+        }
+
+
+
+
     })
     .catch(e => {
       //this.props.onSpeakErrorCallback();
     });
-
-    const canvas = canvasRef.current as any;
-    const context = canvas.getContext('2d')
-
-    let frameCount = 0
-    let animationFrameId : any = undefined;
-    
-    const render = () => {
-      //console.log('render');
-      frameCount++
-      draw(context, frameCount)
-
-        //let pixels = calculatePixels();
-        //var image = new ImageData(pixels, width, height);
-
-
-        //console.log('creating color bitmap...')
-        //createImageBitmap(image).then(renderer => {
-        //    context.drawImage(renderer, 0, 0, width * 3, height * 3)
-        //});
-
-
-      animationFrameId = window.requestAnimationFrame(render)
-    }
-    render()
-    
-    return () => {
-      window.cancelAnimationFrame(animationFrameId)
-    }
-
 
 
   }, []); // NB: Empty array dependency sets to run ONLY on mount
