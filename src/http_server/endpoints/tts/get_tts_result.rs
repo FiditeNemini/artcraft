@@ -35,9 +35,10 @@ pub struct GetTtsResultPathInfo {
 #[derive(Serialize)]
 pub struct TtsResultRecordForResponse {
   pub tts_result_token: String,
+  pub inference_text: String,
 
   pub tts_model_token: String,
-  pub inference_text: String,
+  pub tts_model_title: Option<String>, // TODO: Shouldn't be Option.
 
   pub maybe_creator_user_token: Option<String>,
   pub maybe_creator_username: Option<String>,
@@ -82,9 +83,10 @@ pub enum GetTtsResultError {
 
 pub struct RawTtsResultRecord {
   pub tts_result_token: String, // from field `tts_results.token`
+  pub inference_text: String,
 
   pub tts_model_token: String,
-  pub inference_text: String,
+  pub tts_model_title: Option<String>,
 
   pub maybe_creator_user_token: Option<String>,
   pub maybe_creator_username: Option<String>,
@@ -151,8 +153,10 @@ pub async fn get_tts_inference_result_handler(
 SELECT
     tts_results.token as tts_result_token,
 
-    tts_results.model_token as tts_model_token,
     tts_results.inference_text,
+
+    tts_results.model_token as tts_model_token,
+    tts_models.title as tts_model_title,
 
     users.token as maybe_creator_user_token,
     users.username as maybe_creator_username,
@@ -206,8 +210,10 @@ WHERE
   let result_for_response = TtsResultRecordForResponse {
     tts_result_token: ir.tts_result_token.clone(),
 
-    tts_model_token: ir.tts_model_token.clone(),
     inference_text: ir.inference_text.clone(),
+
+    tts_model_token: ir.tts_model_token.clone(),
+    tts_model_title: ir.tts_model_title.clone(),
 
     maybe_creator_user_token: ir.maybe_creator_user_token.clone(),
     maybe_creator_username: ir.maybe_creator_username.clone(),

@@ -18,6 +18,13 @@ CREATE TABLE tts_models (
       'glowtts-vocodes'
   ) NOT NULL DEFAULT 'not-set',
 
+  -- NB: DO NOT CHANGE ORDER; APPEND ONLY!
+  -- How text should be handled.
+  text_preprocessing_algorithm ENUM(
+      'basic-preprocess',
+      'arpabet-preprocess'
+  ) NOT NULL DEFAULT 'basic-preprocess',
+
   -- Optional Pointer to a newer version of the voice
   -- If there's a newer version, we can disable this one.
   maybe_updated_model_token VARCHAR(32) DEFAULT NULL,

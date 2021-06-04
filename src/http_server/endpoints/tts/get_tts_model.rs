@@ -36,6 +36,7 @@ pub struct GetTtsModelPathInfo {
 pub struct TtsModelRecordForResponse {
   pub model_token: String,
   pub tts_model_type: String,
+  pub text_preprocessing_algorithm: String,
 
   pub creator_user_token: String,
   pub creator_username: String,
@@ -69,6 +70,7 @@ pub enum GetTtsModelError {
 pub struct TtsModelRecord {
   pub model_token: String,
   pub tts_model_type: String,
+  pub text_preprocessing_algorithm: String,
 
   pub creator_user_token: String,
   pub creator_username: String,
@@ -122,6 +124,7 @@ pub async fn get_tts_model_handler(
 SELECT
     tts.token as model_token,
     tts.tts_model_type,
+    tts.text_preprocessing_algorithm,
 
     tts.creator_user_token,
     users.username as creator_username,
@@ -161,6 +164,7 @@ AND tts.deleted_at IS NULL
   let model_for_response = TtsModelRecordForResponse {
     model_token: template.model_token.clone(),
     tts_model_type: template.tts_model_type.clone(),
+    text_preprocessing_algorithm: template.text_preprocessing_algorithm.clone(),
     creator_user_token: template.creator_user_token.clone(),
     creator_username: template.creator_username.clone(),
     creator_display_name: template.creator_display_name.clone(),
