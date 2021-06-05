@@ -19,6 +19,7 @@ use sqlx::error::DatabaseError;
 use sqlx::error::Error::Database;
 use sqlx::mysql::MySqlDatabaseError;
 use std::sync::Arc;
+use crate::validations::check_for_slurs::contains_slurs;
 
 const NEW_USER_ROLE: &'static str = "new-user";
 
@@ -100,6 +101,10 @@ pub async fn infer_tts_handler(
 
   if let Err(reason) = validate_inference_text(&inference_text) {
     return Err(InferTtsError::BadInput(reason));
+  }
+
+  if contains_slurs(&inference_text) {
+    return Err(InferTtsError::BadInput("text contains slurs".to_string()));
   }
 
   // TODO(bt): CHECK DATABASE!

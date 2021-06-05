@@ -192,7 +192,7 @@ mod tests {
   fn test_tts_synthesizer_path() {
     let paths = get_instance();
     assert_eq!(paths.tts_synthesizer_path("foobar").to_str().unwrap(),
-      "/test_path_synthesizers/f/o/o/foobar.pth");
+      "/test_path_synthesizers/f/o/o/foobar.pt");
   }
 
   #[test]
