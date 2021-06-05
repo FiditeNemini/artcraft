@@ -8,15 +8,13 @@ interface Props {
 
 function NewFooterNavFc(props: Props) {
   return (
-    <footer>
+    <div>
       <hr />
       <p>
         We're trying to build a democratized <a href="https://the.storyteller.company">future of creativity, filmmaking and storytelling</a>.
-      </p>
-      <p>
         Contact <Link to="/profile/echelon">@echelon</Link> for more information.
       </p>
-    </footer>
+    </div>
   )
 }
 
