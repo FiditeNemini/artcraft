@@ -14,6 +14,12 @@ CREATE TABLE tts_model_upload_jobs (
   -- This is so the frontend client doesn't submit duplicate jobs.
   uuid_idempotency_token VARCHAR(36) NOT NULL,
 
+  -- ========== SUCCESS CASE ==========
+
+  -- If the job completes successfully, this is the result token.
+  -- This is only populated on a successful result.
+  on_success_result_token VARCHAR(32) DEFAULT NULL,
+
   -- ========== UPLOAD DETAILS ==========
 
   -- The name of the voice
@@ -102,6 +108,7 @@ CREATE TABLE tts_model_upload_jobs (
   PRIMARY KEY (id),
   UNIQUE KEY (token),
   UNIQUE KEY (uuid_idempotency_token),
+  KEY fk_on_success_result_token (on_success_result_token),
   KEY fk_creator_user_token (creator_user_token),
   KEY fk_maybe_subject_token (maybe_subject_token),
   KEY fk_maybe_actor_subject_token (maybe_actor_subject_token),
@@ -121,6 +128,12 @@ CREATE TABLE w2l_template_upload_jobs (
   -- Idempotency token
   -- This is so the frontend client doesn't submit duplicate jobs.
   uuid_idempotency_token VARCHAR(36) NOT NULL,
+
+  -- ========== SUCCESS CASE ==========
+
+  -- If the job completes successfully, this is the result token.
+  -- This is only populated on a successful result.
+  on_success_result_token VARCHAR(32) DEFAULT NULL,
 
   -- ========== UPLOAD DETAILS ==========
 
@@ -207,6 +220,7 @@ CREATE TABLE w2l_template_upload_jobs (
   PRIMARY KEY (id),
   UNIQUE KEY (token),
   UNIQUE KEY (uuid_idempotency_token),
+  KEY fk_on_success_result_token (on_success_result_token),
   KEY fk_creator_user_token (creator_user_token),
   KEY fk_maybe_subject_token (maybe_subject_token),
   KEY fk_maybe_actor_subject_token (maybe_actor_subject_token),
@@ -214,4 +228,3 @@ CREATE TABLE w2l_template_upload_jobs (
   KEY index_creator_ip_address (creator_ip_address)
 
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin;
-

@@ -15,6 +15,7 @@ pub struct TtsUploadJobRecord {
   pub id: i64,
   pub token: String,
   pub uuid_idempotency_token: String,
+  pub on_success_result_token: Option<String>,
   pub creator_user_token: String,
   pub creator_ip_address: String,
   pub creator_set_visibility: String, // TODO
@@ -86,10 +87,12 @@ WHERE id = ?
 
   Ok(())
 }
-pub async fn mark_tts_upload_job_done(pool: &MySqlPool,
-                                      job: &TtsUploadJobRecord,
-                                      success: bool)
-                                      -> AnyhowResult<()>
+pub async fn mark_tts_upload_job_done(
+  pool: &MySqlPool,
+  job: &TtsUploadJobRecord,
+  success: bool,
+  maybe_model_token: Option<&str>,
+) -> AnyhowResult<()>
 {
   let status = if success { "complete_success" } else { "complete_failure" };
 
@@ -98,11 +101,13 @@ pub async fn mark_tts_upload_job_done(pool: &MySqlPool,
 UPDATE tts_model_upload_jobs
 SET
   status = ?,
+  on_success_result_token = ?,
   failure_reason = NULL,
   retry_at = NULL
 WHERE id = ?
         "#,
         status,
+        maybe_model_token,
         job.id,
     )
     .execute(pool)

@@ -503,6 +503,15 @@ async fn process_job(downloader: &Downloader, job: &W2lTemplateUploadJobRecord) 
     file_metadata.duration_millis.unwrap_or(0))
     .await?;
 
+  info!("Marking job complete...");
+
+  mark_w2l_template_upload_job_done(
+    &downloader.mysql_pool,
+    job,
+    true,
+    Some(&model_token)
+  ).await?;
+
   info!("Job {} complete success! Downloaded, processed, and uploaded. Saved model record: {}",
         job.id, id);
 
@@ -512,8 +521,6 @@ async fn process_job(downloader: &Downloader, job: &W2lTemplateUploadJobRecord) 
       warn!("error publishing event: {:?}", e);
       anyhow!("error publishing event")
     })?;
-
-  mark_w2l_template_upload_job_done(&downloader.mysql_pool, job, true).await?;
 
   if downloader.debug_job_end_sleep_millis != 0 {
     warn!("Debug sleep after job end: {} ms", downloader.debug_job_end_sleep_millis);
