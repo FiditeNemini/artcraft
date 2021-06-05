@@ -1,4 +1,7 @@
-import React, { useEffect, useRef, useState }  from 'react';
+import React, { useEffect, useRef }  from 'react';
+import { VIRIDIS, MAGMA } from "@colormap/presets";
+import { createColorMap, linearScale } from "@colormap/core";
+import { getRandomArrayValue } from "../../Utils";
 
 interface Props {
   spectrogramJsonLink: string  
@@ -9,6 +12,15 @@ interface SpectrogramResponse {
   mel_postnet: Array<Array<number>>,
   mel_for_scaling: Array<Array<number>>,
 }
+
+const COLOR_MAP_PRESETS = [
+  VIRIDIS, 
+  MAGMA,
+  //CIVIDIS,
+  //BLACK_WHITE,
+  //INFERNO,
+  //PLASMA,  
+];
 
 function SpectrogramFc(props: Props) {
 
@@ -23,13 +35,19 @@ function SpectrogramFc(props: Props) {
 
     let k = 0;
 
+    let colorMapScale = linearScale([0, 255], [0, 1]);
+    let colorMapColors = getRandomArrayValue(COLOR_MAP_PRESETS);
+    let colorMap = createColorMap(colorMapColors, colorMapScale);
+
     for (let j = 0; j < height; j++) {
       for (let i = 0; i < width; i++) {
         let value = image[i][j];
 
-        bytes[k] = value;
-        bytes[k+1] = value;
-        bytes[k+2] = value;
+        let mapped = colorMap(value);
+
+        bytes[k] = Math.floor(mapped[0] * 255);
+        bytes[k+1] = Math.floor(mapped[1] * 255);
+        bytes[k+2] = Math.floor(mapped[2] * 255);
         bytes[k+3] = 255;
 
         k += 4;

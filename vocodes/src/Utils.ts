@@ -5,4 +5,9 @@ function getRandomInt(min: number, max: number) : number {
   return Math.floor(Math.random() * (max - min)) + min;
 }
 
-export { getRandomInt }
+function getRandomArrayValue<T>(array: Array<T>) : T {
+  let index = getRandomInt(0, array.length);
+  return array[index];
+}
+
+export { getRandomInt, getRandomArrayValue }
