@@ -148,11 +148,44 @@ class NumpyEncoder(json.JSONEncoder):
         return json.JSONEncoder.default(self, obj)
 
 
+mel_for_scaling = mel_outputs_postnet.cpu().numpy().squeeze(0).transpose()
+
+"""
+max_value = -10000.0
+min_value = 10000.0
+for i in range(len(mel_for_scaling)):
+    for j in range(len(mel_for_scaling[i])):
+        value = mel_for_scaling[i][j]
+        if value > max_value:
+            max_value = value
+        if value < min_value:
+            min_value = value
+"""
+
+max_value = np.amax(mel_for_scaling)
+min_value = np.amin(mel_for_scaling)
+mel_range = max_value - min_value
+
+
+print('max', max_value)
+print('min', min_value)
+
+# https://stackoverflow.com/a/1735122
+#mel_for_scaling /= np.amax(np.abs(mel_for_scaling))
+#mel_for_scaling *= (255.0/np.amax(mel_for_scaling))
+
+mel_for_scaling -= min_value
+mel_for_scaling *= (255.0 / mel_range)
+mel_for_scaling = mel_for_scaling.astype('int32')
+
 # squeeze(0) -> 3D to 2D (by removing the singular 1-length "wrapper" dimension)
 # transpose() -> originally 80x{N}, we turn to {N}x80
 json_data = {
     'mel': mel_outputs.cpu().numpy().squeeze(0).transpose(),
     'mel_postnet': mel_outputs_postnet.cpu().numpy().squeeze(0).transpose(),
+    'mel_for_scaling': mel_for_scaling,
+    'max_value': float(max_value),
+    'min_value': float(min_value),
 }
 
 #json_dump = json.dumps(json_data, cls=NumpyEncoder)
