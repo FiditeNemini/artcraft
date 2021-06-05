@@ -102,93 +102,11 @@ parser.add_argument('--audio_end_pad_millis', default=0, type=int,
 parser.add_argument('--preserve_tempdir', default=False, action='store_true',
                     help='Keep the tempdir arround for debugging')
 
-#parser.add_argument('--frame_width', type=int, help='Width of the frame')
-#parser.add_argument('--frame_height', type=int, help='Height of the frame')
-
 args = parser.parse_args()
 args.img_size = 96
 
-#if os.path.isfile(args.image_or_video_filename) and os.path.splitext(args.image_or_video_filename)[1] in ['.jpg', '.png', '.jpeg']:
-#    args.static = True
-#elif args.is_image:
-#    args.static = True
-
-#def get_smoothened_boxes(boxes, T):
-#    for i in range(len(boxes)):
-#        if i + T > len(boxes):
-#            window = boxes[len(boxes) - T:]
-#        else:
-#            window = boxes[i : i + T]
-#        boxes[i] = np.mean(window, axis=0)
-#    return boxes
-
-#def face_detect(images):
-#    detector = face_detection.FaceAlignment(face_detection.LandmarksType._2D,
-#                                            flip_input=False, device=device)
-#
-#    batch_size = args.face_det_batch_size
-#
-#    while 1:
-#        predictions = []
-#        try:
-#            for i in tqdm(range(0, len(images), batch_size)):
-#                predictions.extend(detector.get_detections_for_batch(np.array(images[i:i + batch_size])))
-#        except RuntimeError:
-#            if batch_size == 1:
-#                raise RuntimeError('Image too big to run face detection on GPU. Please use the --resize_factor argument')
-#            batch_size //= 2
-#            print('Recovering from OOM error; New batch size: {}'.format(batch_size))
-#            continue
-#        break
-#
-#    results = []
-#    pady1, pady2, padx1, padx2 = args.pads
-#    for rect, image in zip(predictions, images):
-#        if rect is None:
-#            cv2.imwrite('temp/faulty_frame.jpg', image) # check this frame where the face was not detected.
-#            raise ValueError('Face not detected! Ensure the video contains a face in all the frames.')
-#
-#        y1 = max(0, rect[1] - pady1)
-#        y2 = min(image.shape[0], rect[3] + pady2)
-#        x1 = max(0, rect[0] - padx1)
-#        x2 = min(image.shape[1], rect[2] + padx2)
-#
-#        results.append([x1, y1, x2, y2])
-#
-#    boxes = np.array(results)
-#    if not args.nosmooth: boxes = get_smoothened_boxes(boxes, T=5)
-#    results = [[image[y1: y2, x1:x2], (y1, y2, x1, x2)] for image, (x1, y1, x2, y2) in zip(images, boxes)]
-#
-#    del detector
-#    return results
-
-#def detect_faces_in_frames(frames, video_faces_pickle_file):
-#    t0 = datetime.datetime.now()
-#    if args.box[0] == -1:
-#        if not args.static:
-#            face_det_results = face_detect(frames) # BGR2RGB for CNN face detection
-#        else:
-#            face_det_results = face_detect([frames[0]])
-#    else:
-#        print('Using the specified bounding box instead of face detection...')
-#        y1, y2, x1, x2 = args.box
-#        face_det_results = [[f[y1: y2, x1:x2], (y1, y2, x1, x2)] for f in frames]
-#    t1 = datetime.datetime.now()
-#
-#    d = t1 - t0
-#    print('Total seconds to detect faces in {} frames: {}'.format(len(frames), d.total_seconds()))
-#
-#    with open(video_faces_pickle_file, 'wb') as f:
-#        print('Saving pickle file: {}'.format(video_faces_pickle_file))
-#        pickle.dump(face_det_results, f)
-#
-#    return face_det_results
-
-#def datagen(frames, mels):
 def datagen(frames, face_det_results, mels):
     img_batch, mel_batch, frame_batch, coords_batch = [], [], [], []
-
-    #face_det_results = detect_faces_in_frames(frames)
 
     for i, m in enumerate(mels):
         idx = 0 if args.static else i%len(frames)
@@ -328,10 +246,6 @@ def maybe_concatenate_end_bump(tempdir, args, frame_w, frame_h):
 
 
 def main(tempdir):
-    video_faces_pickle_file = args.cached_faces_filename
-    #video_faces_pickle_file = args.image_or_video_filename + '.faces'
-    #print('Video faces pickle file: {}'.format(video_faces_pickle_file), flush=True)
-
     frame_w = 0
     frame_h = 0
     fps = 0
@@ -379,9 +293,6 @@ def main(tempdir):
 
         frame_h, frame_w = full_frames[0].shape[:-1]
 
-    #frame_w = args.frame_width
-    #frame_h = args.frame_height
-
     print("Number of frames available for inference: "+str(len(full_frames)), flush=True)
     print("Frame dimensions: {}x{}".format(frame_w, frame_h), flush=True)
 
@@ -424,31 +335,14 @@ def main(tempdir):
 
     full_frames = full_frames[:len(mel_chunks)]
 
-    #print('Face detection time...', flush=True)
-    #if not os.path.isfile(video_faces_pickle_file):
-    #    print('Detecting faces...', flush=True)
-    #    face_det_results = detect_faces_in_frames(full_frames, video_faces_pickle_file)
-    #else:
-    #    with open(video_faces_pickle_file, 'rb') as f:
-    #        face_det_results = pickle.load(f)
-    #    if len(face_det_results) < len(full_frames):
-    #        print("Face detect results have {} frames, but we need {}".format(len(face_det_results), len(full_frames)))
-    #        print('Detecting faces again...', flush=True)
-    #        face_det_results = detect_faces_in_frames(full_frames, video_faces_pickle_file)
-    #    else:
-    #        print("We don't need to find faces! Woo!", flush=True)
-
-
     # Load face detection results from pickle file
     video_faces_pickle_file = args.cached_faces_filename
     with open(video_faces_pickle_file, 'rb') as f:
         face_det_results = pickle.load(f)
 
-    #face_det_results = pickle.load(args.cached_faces_filename)
     face_det_results = face_det_results[:len(mel_chunks)]
 
     batch_size = args.wav2lip_batch_size
-    #gen = datagen(full_frames.copy(), mel_chunks)
     gen = datagen(full_frames.copy(), face_det_results.copy(), mel_chunks)
 
     output_video_filename = os.path.join(tempdir, 'result.avi') # previously 'temp/result.avi'
@@ -486,6 +380,8 @@ def main(tempdir):
 
     maybe_concatenate_end_bump(tempdir, args, frame_w, frame_h)
 
+    # ==== METADATA (1) ====
+
     command = [
         "ffprobe",
         "-loglevel",  "quiet",
@@ -499,7 +395,7 @@ def main(tempdir):
     out, err = pipe.communicate()
     ffmpeg_metadata = json.loads(out)
 
-    # ==== METADATA ====
+    # ==== METADATA (2) ====
     mime_type = magic.from_file(args.output_video_filename, mime=True)
     file_size_bytes = os.path.getsize(args.output_video_filename)
 

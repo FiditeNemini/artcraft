@@ -391,10 +391,9 @@ async fn process_job(inferencer: &Inferencer, job: &TtsInferenceJobRecord) -> An
 
   check_file_exists(&output_audio_fs_path)?;
   check_file_exists(&output_spectrogram_fs_path)?;
-  //check_file_exists(&output_metadata_fs_path)?;
+  check_file_exists(&output_metadata_fs_path)?;
 
-  let file_metadata = FileMetadata::default();
-  //let file_metadata = read_metadata_file(&output_metadata_fs_path)?;
+  let file_metadata = read_metadata_file(&output_metadata_fs_path)?;
 
   // ==================== UPLOAD AUDIO TO BUCKET ==================== //
 

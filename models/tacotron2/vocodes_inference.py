@@ -33,6 +33,11 @@ from audio_processing import griffin_lim
 from text import text_to_sequence
 from denoiser import Denoiser
 
+# For metadata
+import subprocess
+import magic
+import os
+
 print('========================================')
 print('Python interpreter', sys.executable)
 print('PyTorch version', torch.__version__)
@@ -192,3 +197,36 @@ except Exception as e:
     print(e)
     pass
 """
+
+# ==== METADATA (1) ====
+
+command = [
+    "ffprobe",
+    "-loglevel",  "quiet",
+    "-print_format", "json",
+    "-show_format",
+    "-show_streams",
+    args.output_audio_filename
+]
+
+pipe = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+out, err = pipe.communicate()
+ffmpeg_metadata = json.loads(out)
+
+# ==== METADATA (2) ====
+mime_type = magic.from_file(args.output_audio_filename, mime=True)
+file_size_bytes = os.path.getsize(args.output_audio_filename)
+
+print(ffmpeg_metadata)
+
+duration_millis = int(float(ffmpeg_metadata['format']['duration']) * 1000)
+
+metadata = {
+    'duration_millis': duration_millis,
+    'mimetype': mime_type,
+    'file_size_bytes': file_size_bytes,
+}
+
+with open(args.output_metadata_filename, 'w') as json_file:
+    json.dump(metadata, json_file)
+
