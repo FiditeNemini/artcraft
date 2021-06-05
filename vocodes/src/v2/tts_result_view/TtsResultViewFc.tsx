@@ -139,7 +139,10 @@ function TtsResultViewFc(props: Props) {
             <code>audio</code> element.
       </audio>
 
-      <a className="button is-medium" 
+      <br />
+      <br />
+
+      <a className="button is-medium is-primary"
           href={audioLink}
           download={audioDownloadFilename}>Download File</a>
 
@@ -147,13 +150,13 @@ function TtsResultViewFc(props: Props) {
       <br />
 
 
-      <h3 className="title is-3"> Spectrogram </h3>
+      <h4 className="title is-4"> Spectrogram </h4>
       <SpectrogramFc spectrogramJsonLink={spectrogramLink} />
 
       <br />
       <br />
 
-      <h3 className="title is-3"> Details </h3>
+      <h4 className="title is-4"> Spectrogram </h4>
       <table className="table">
         <thead>
           <tr>

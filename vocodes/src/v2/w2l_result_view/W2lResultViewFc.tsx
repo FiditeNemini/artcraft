@@ -75,6 +75,7 @@ function W2lResultViewFc(props: Props) {
 
   let videoLink = `https://storage.googleapis.com/dev-vocodes-public${w2lInferenceResult?.public_bucket_video_path}`; 
   let templateLink = `/w2l/${w2lInferenceResult.maybe_w2l_template_token}`;
+  let videoDownloadFilename = `vocodes-${w2lInferenceResult.w2l_result_token.replace(':', '')}.mp4`;
 
   let durationSeconds = w2lInferenceResult?.duration_millis / 1000;
 
@@ -124,6 +125,19 @@ function W2lResultViewFc(props: Props) {
         <source src={videoLink} />
         Your device doesn't support video.
       </video> 
+
+      <br />
+      <br />
+
+      <a className="button is-medium is-primary" 
+          href={videoLink}
+          download={videoDownloadFilename}>Download File</a>
+
+
+      <br />
+      <br />
+
+      <h4 className="title is-4"> Details </h4>
 
       <table className="table">
         <thead>

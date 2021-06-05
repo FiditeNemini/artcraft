@@ -9,8 +9,7 @@ interface Props {
 
 interface SpectrogramResponse {
   mel: Array<Array<number>>,
-  mel_postnet: Array<Array<number>>,
-  mel_for_scaling: Array<Array<number>>,
+  mel_scaled: Array<Array<number>>,
 }
 
 const COLOR_MAP_PRESETS = [
@@ -65,10 +64,10 @@ function SpectrogramFc(props: Props) {
       console.log('got spectrogram', res);
       let spectrograms = res as SpectrogramResponse;
 
-      let width = spectrograms.mel_for_scaling.length;
-      let height = spectrograms.mel_for_scaling[0].length;
+      let width = spectrograms.mel_scaled.length;
+      let height = spectrograms.mel_scaled[0].length;
 
-      let pixels = linearizeImage(spectrograms.mel_for_scaling);
+      let pixels = linearizeImage(spectrograms.mel_scaled);
       var image = new ImageData(pixels, width, height);
 
       const canvas = canvasRef.current as any;
