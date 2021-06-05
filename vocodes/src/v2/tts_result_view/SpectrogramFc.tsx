@@ -16,10 +16,6 @@ interface SpectrogramResponse {
 const COLOR_MAP_PRESETS = [
   VIRIDIS, 
   MAGMA,
-  //CIVIDIS,
-  //BLACK_WHITE,
-  //INFERNO,
-  //PLASMA,  
 ];
 
 function SpectrogramFc(props: Props) {
@@ -33,11 +29,11 @@ function SpectrogramFc(props: Props) {
 
     let bytes = new Uint8ClampedArray(size);
 
-    let k = 0;
-
     let colorMapScale = linearScale([0, 255], [0, 1]);
     let colorMapColors = getRandomArrayValue(COLOR_MAP_PRESETS);
     let colorMap = createColorMap(colorMapColors, colorMapScale);
+
+    let k = 0;
 
     for (let j = 0; j < height; j++) {
       for (let i = 0; i < width; i++) {
@@ -58,9 +54,6 @@ function SpectrogramFc(props: Props) {
   }
 
   useEffect(() => {
-    //const api = new ApiConfig();
-    //const endpointUrl = api.viewTtsInferenceResult(token);
-
     fetch(props.spectrogramJsonLink, {
       method: 'GET',
       headers: {
@@ -95,7 +88,6 @@ function SpectrogramFc(props: Props) {
   let width = 150 * 3;
   let height = 80 * 3;
 
-  //onClick={() => this.props.changeSpectrogramMode(nextMode)}
   let canvas = <canvas 
     ref={canvasRef} 
     width={width}
@@ -106,7 +98,6 @@ function SpectrogramFc(props: Props) {
   return (
     <div>
       {canvas}
-      <p>(Click or tap to change spectrogram theme.)</p>
     </div>
   )
 }

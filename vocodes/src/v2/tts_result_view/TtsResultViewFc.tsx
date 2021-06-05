@@ -78,6 +78,9 @@ function TtsResultViewFc(props: Props) {
   let audioLink = `https://storage.googleapis.com/dev-vocodes-public${ttsInferenceResult?.public_bucket_wav_audio_path}`; 
   let modelLink = `/tts/${ttsInferenceResult.tts_model_token}`;
 
+  // NB: Not respected in firefox: https://stackoverflow.com/a/28468261
+  let audioDownloadFilename = `vocodes-${ttsInferenceResult.tts_model_token.replace(':', '')}.wav`;
+
   let spectrogramLink = `https://storage.googleapis.com/dev-vocodes-public${ttsInferenceResult?.public_bucket_wav_audio_path}`.replace(".wav", ".json"); 
 
 
@@ -129,8 +132,6 @@ function TtsResultViewFc(props: Props) {
       <h1 className="title is-1"> {headingTitle} </h1>
       {subtitle}
 
-      <SpectrogramFc spectrogramJsonLink={spectrogramLink} />
-
       <audio
         controls
         src={audioLink}>
@@ -138,6 +139,21 @@ function TtsResultViewFc(props: Props) {
             <code>audio</code> element.
       </audio>
 
+      <a className="button is-medium" 
+          href={audioLink}
+          download={audioDownloadFilename}>Download File</a>
+
+      <br />
+      <br />
+
+
+      <h3 className="title is-3"> Spectrogram </h3>
+      <SpectrogramFc spectrogramJsonLink={spectrogramLink} />
+
+      <br />
+      <br />
+
+      <h3 className="title is-3"> Details </h3>
       <table className="table">
         <thead>
           <tr>
