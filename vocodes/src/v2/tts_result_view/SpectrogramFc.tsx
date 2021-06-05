@@ -1,12 +1,20 @@
-import React, { useEffect, useRef }  from 'react';
+import React, { useEffect, useRef, useState }  from 'react';
 
 interface Props {
   spectrogramJsonLink: string  
 }
 
+interface SpectrogramResponse {
+  mel: Array<Array<number>>,
+  mel_postnet: Array<Array<number>>,
+  mel_for_scaling: Array<Array<number>>,
+}
+
 function SpectrogramFc(props: Props) {
 
   const canvasRef = useRef(null);
+  const [maxSpectrogramValue, setMaxSpectrogramValue] = useState(-1000000.0);
+  const [minSpectrogramValue, setMinSpectrogramValue] = useState(1000000.0);
 
   let width = 150 * 3;
   let height = 80 * 3;
@@ -63,7 +71,7 @@ function SpectrogramFc(props: Props) {
     });
   }
 
-  let draw = (ctx: any, frameCount: any) => {
+  let draw = (ctx: any, data: any) => {
 
         //ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height)
         //ctx.fillStyle = '#000000'
@@ -91,12 +99,36 @@ function SpectrogramFc(props: Props) {
         let a = 100;
         ctx.fillStyle = "rgba("+r+","+g+","+b+","+(a/255)+")";
 
-        for(let x = 0; x < width; x++) {
-            for(let y = 0; y < height; y++) {
+        for(let x = 0; x < data.length; x++) {
+            for(let y = 0; y < data[0].length; y++) {
+                let value = data[x][y] as any;
+                console.log(value);
                 ctx.fillRect( x, y, 1, 1 );
             }
         }
 
+  }
+
+  let linearizeImage = (image: Array<Array<number>>) : Uint8ClampedArray => {
+    let width = image.length;
+    let height = image[0].length;
+    let size = width * height * 4;
+
+    let bytes = new Uint8ClampedArray(size);
+
+    for (let i = 0; i < width; i++) {
+      for (let j = 0; j < height; j++) {
+        let value = image[i][j];
+        let k = i * width  + j;
+
+        bytes[k] = value;
+        bytes[k+1] = value;
+        bytes[k+2] = value;
+        bytes[k+3] = 255;
+      }
+    }
+
+    return bytes;
   }
 
   useEffect(() => {
@@ -112,39 +144,70 @@ function SpectrogramFc(props: Props) {
     .then(res => res.json())
     .then(res => {
       console.log('got spectrogram', res);
-      //updateCanvas();
+      let spectrograms = res as SpectrogramResponse;
+
+//      for (let i = 0; i < spectrograms.mel_postnet.length; i++) {
+//        for (let j = 0; j < spectrograms.mel_postnet[i].length; j++) {
+//          let value = spectrograms.mel_postnet[i][j];
+//          if (value > maxSpectrogramValue) {
+//            console.log('set max to', value);
+//            setMaxSpectrogramValue(value);
+//          } else if (value < minSpectrogramValue) {
+//            console.log('set to', value);
+//            setMinSpectrogramValue(value);
+//          }
+//        }
+//      }
+//
+      console.log('min value:', minSpectrogramValue);
+      let width = spectrograms.mel_for_scaling.length;
+      let height = spectrograms.mel_for_scaling[0].length;
+
+      let pixels = linearizeImage(spectrograms.mel_for_scaling);
+      
+      console.log('max value:', maxSpectrogramValue);
+
+      var image = new ImageData(pixels, width, height);
+
+      const canvas = canvasRef.current as any;
+      const context = canvas.getContext('2d')
+
+      createImageBitmap(image).then(renderer => {
+        context.drawImage(renderer, 0, 0, width * 3, height * 3)
+      });
 
 
 
-        const canvas = canvasRef.current as any;
-        const context = canvas.getContext('2d')
 
-        let frameCount = 0
-        let animationFrameId : any = undefined;
-        
-        const render = () => {
-        //console.log('render');
-        frameCount++
-        draw(context, frameCount)
-
-            //let pixels = calculatePixels();
-            //var image = new ImageData(pixels, width, height);
-
-
-            //console.log('creating color bitmap...')
-            //createImageBitmap(image).then(renderer => {
-            //    context.drawImage(renderer, 0, 0, width * 3, height * 3)
-            //});
-
-
-        animationFrameId = window.requestAnimationFrame(render)
-        }
-        render()
-        
-        return () => {
-        window.cancelAnimationFrame(animationFrameId)
-        }
-
+//        const canvas = canvasRef.current as any;
+//        const context = canvas.getContext('2d')
+//
+//        let frameCount = 0
+//        let animationFrameId : any = undefined;
+//        
+//        const render = () => {
+//        //console.log('render');
+//        frameCount++
+//        draw(context, data)
+//
+//            //let pixels = calculatePixels();
+//            //var image = new ImageData(pixels, width, height);
+//
+//
+//            //console.log('creating color bitmap...')
+//            //createImageBitmap(image).then(renderer => {
+//            //    context.drawImage(renderer, 0, 0, width * 3, height * 3)
+//            //});
+//
+//
+//        animationFrameId = window.requestAnimationFrame(render)
+//        }
+//        render()
+//        
+//        return () => {
+//        window.cancelAnimationFrame(animationFrameId)
+//        }
+//
 
 
 
