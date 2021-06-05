@@ -133,13 +133,13 @@ for i in text.split("\n"):
 with torch.no_grad():
     mel_outputs, mel_outputs_postnet, _, alignments = model.inference(sequence)
 
-print("Mel outputs:")
-print(mel_outputs)
-print(mel_outputs.shape)
-print(mel_outputs_postnet)
-print(mel_outputs_postnet.shape)
+#print("Mel outputs:")
+#print(mel_outputs)
+#print(mel_outputs.shape)
+#print(mel_outputs_postnet)
+#print(mel_outputs_postnet.shape)
 
-print('Saving mels')
+print('Saving mel as JSON...')
 
 class NumpyEncoder(json.JSONEncoder):
     def default(self, obj):
@@ -148,84 +148,40 @@ class NumpyEncoder(json.JSONEncoder):
         return json.JSONEncoder.default(self, obj)
 
 
-mel_for_scaling = mel_outputs_postnet.cpu().numpy().squeeze(0).transpose()
-
-"""
-max_value = -10000.0
-min_value = 10000.0
-for i in range(len(mel_for_scaling)):
-    for j in range(len(mel_for_scaling[i])):
-        value = mel_for_scaling[i][j]
-        if value > max_value:
-            max_value = value
-        if value < min_value:
-            min_value = value
-"""
+# squeeze(0) -> 3D to 2D (by removing the singular 1-length "wrapper" dimension)
+# transpose() -> originally 80x{N}, we turn to {N}x80
+mel_for_json = mel_outputs_postnet.cpu().numpy().squeeze(0).transpose()
+mel_for_scaling = mel_for_json.copy()
 
 max_value = np.amax(mel_for_scaling)
 min_value = np.amin(mel_for_scaling)
 mel_range = max_value - min_value
 
-
-print('max', max_value)
-print('min', min_value)
-
-# https://stackoverflow.com/a/1735122
-#mel_for_scaling /= np.amax(np.abs(mel_for_scaling))
-#mel_for_scaling *= (255.0/np.amax(mel_for_scaling))
-
 mel_for_scaling -= min_value
 mel_for_scaling *= (255.0 / mel_range)
 mel_for_scaling = mel_for_scaling.astype('int32')
 
-# squeeze(0) -> 3D to 2D (by removing the singular 1-length "wrapper" dimension)
-# transpose() -> originally 80x{N}, we turn to {N}x80
 json_data = {
-    'mel': mel_outputs.cpu().numpy().squeeze(0).transpose(),
-    'mel_postnet': mel_outputs_postnet.cpu().numpy().squeeze(0).transpose(),
-    'mel_for_scaling': mel_for_scaling,
-    'max_value': float(max_value),
-    'min_value': float(min_value),
+    'mel': mel_for_json,
+    'mel_scaled': mel_for_scaling,
 }
 
-#json_dump = json.dumps(json_data, cls=NumpyEncoder)
 with open(args.output_spectrogram_filename, 'w') as outfile:
     json.dump(json_data, outfile, cls=NumpyEncoder)
 
-#torch.save(mel_outputs, 'mel_outputs.mel')
-#torch.save(mel_outputs_postnet, 'mel_outputs_postnet.mel')
-
-#print('Rendering histograms')
-#render_histogram(mel_outputs, 'mel_outputs.png')
-#render_histogram(mel_outputs_postnet, 'mel_outputs_postnet.png')
+print('Encoding and saving audio...')
 
 with torch.no_grad():
-    # This was from Tacotron 2's repo:
-    #audio = waveglow.infer(mel_outputs_postnet, sigma=0.666)
-
-    # This is from the colab:
     sigma = 0.8
     audio = waveglow.infer(mel_outputs_postnet, sigma=sigma)
-    #print("")
-    #ipd.display(ipd.Audio(audio[0].data.cpu().numpy(), rate=hparams.sampling_rate))
-
-#ipd.Audio(audio[0].data.cpu().numpy(), rate=hparams.sampling_rate)
-
-# https://pytorch.org/hub/nvidia_deeplearningexamples_waveglow/
-
-
-#audio_numpy = audio[0].data.cpu().numpy()
-#audio = audio[0].data.cpu().numpy()
-#audio_numpy = audio.astype('int16')
 
 from scipy.io.wavfile import write
 
 output_audio = audio[0].data.cpu().numpy().astype(np.float32)
 
-#audio.export('output.mp3', format="mp3", bitrate="64k")
-#sf.write('bira.wav', audio[0].data.cpu().numpy().astype(np.float32), hparams.sampling_rate)
 write(args.output_audio_filename, hparams.sampling_rate, output_audio)
 
+"""
 try:
     debug_location = "/home/bt/dev/storyteller/storyteller-web/test"
     print('Writing to debug location: {}'.format(debug_location))
@@ -235,32 +191,4 @@ except Exception as e:
     print("Error with saving file for local debugging.")
     print(e)
     pass
-
-"""
-#@markdown # **Synthesis**
-#@markdown # Enter your desired text here, the graph and audio will show up.
-
-text = "And so he ran across the street to measure the absence of being." #@param {type:"string"}
-sigma = 0.8
-denoise_strength = 0.324
-
-#@markdown #### Optional if you want automatic ARPA convertion.
-
-raw_input = True #@param {type:"boolean"}
-
-for i in text.split("\n"):
-    if len(i) < 1: 
-        sys.exit()
-    print(i)
-    if raw_input:
-        if i[-1] != ";": i=i+";"
-    else: 
-        i = ARPA(i)
-    print(i)
-    with torch.no_grad(): # save VRAM by not including gradients
-        sequence = np.array(text_to_sequence(i, ['english_cleaners']))[None, :]
-        sequence = torch.autograd.Variable(torch.from_numpy(sequence)).cuda().long()
-        mel_outputs, mel_outputs_postnet, _, alignments = model.inference(sequence)
-        plot_data((mel_outputs_postnet.float().data.cpu().numpy()[0],
-                   alignments.float().data.cpu().numpy()[0].T))
 """
