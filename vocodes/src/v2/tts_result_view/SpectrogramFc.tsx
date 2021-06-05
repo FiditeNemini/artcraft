@@ -116,15 +116,41 @@ function SpectrogramFc(props: Props) {
 
     let bytes = new Uint8ClampedArray(size);
 
-    for (let i = 0; i < width; i++) {
-      for (let j = 0; j < height; j++) {
+
+    // This works and makes a red rectangle
+    //for (let k = 0; k < size; k += 4) {
+    //    bytes[k] = 255;
+    //    bytes[k+1] = 0;
+    //    bytes[k+2] = 0;
+    //    bytes[k+3] = 255;
+    //}
+
+    // origin is bottom left
+    //for (let k = 0; k < size; k += 4) {
+    //    let value = (k % 255);
+    //    bytes[k] = k;
+    //    bytes[k+1] = k;
+    //    bytes[k+2] = k;
+    //    bytes[k+3] = 255;
+    //}
+
+
+    let k = 0;
+
+    for (let j = 0; j < height; j++) {
+      for (let i = 0; i < width; i++) {
         let value = image[i][j];
-        let k = i * width  + j;
+
+        //let k = i * width + j; // Blue vertical line at end
+        //let k = j * height + i;
+
 
         bytes[k] = value;
         bytes[k+1] = value;
         bytes[k+2] = value;
         bytes[k+3] = 255;
+
+        k += 4;
       }
     }
 
