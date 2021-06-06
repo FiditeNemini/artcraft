@@ -11,6 +11,8 @@ import { SessionStateResponse } from './session/SessionState';
 import { SessionWrapper } from './session/SessionWrapper';
 import { TtsInferenceJob, TtsInferenceJobStateResponsePayload } from './jobs/TtsInferenceJobs';
 import { W2lInferenceJob, W2lInferenceJobStateResponsePayload } from './jobs/W2lInferenceJobs';
+import { TtsModelUploadJob, TtsModelUploadJobStateResponsePayload } from './jobs/TtsModelUploadJobs';
+import { W2lTemplateUploadJob, W2lTemplateUploadJobStateResponsePayload } from './jobs/W2lTemplateUploadJobs';
 
 enum MigrationMode {
   NEW_VOCODES,
@@ -37,6 +39,8 @@ interface State {
   // Jobs enqueued during this browser session.
   ttsInferenceJobs: Array<TtsInferenceJob>,
   w2lInferenceJobs: Array<W2lInferenceJob>,
+  ttsModelUploadJobs: Array<TtsModelUploadJob>,
+  w2lTemplateUploadJobs: Array<W2lTemplateUploadJob>,
 }
 
 class App extends React.Component<Props, State> {
@@ -55,6 +59,8 @@ class App extends React.Component<Props, State> {
 
       ttsInferenceJobs: [],
       w2lInferenceJobs: [],
+      ttsModelUploadJobs: [],
+      w2lTemplateUploadJobs: [],
     }
   }
 
@@ -184,6 +190,70 @@ class App extends React.Component<Props, State> {
     .catch(e => { /* Ignore. */ });
   }
 
+  enqueueTtsModelUploadJob = (jobToken: string) => {
+    console.log('enqueueTtsModelUploadJob()')
+    if (!this.state.enableAlpha) {
+      console.log('enqueueTtsModelUploadJob() disabled!')
+      return;
+    }
+    const newJob = new TtsModelUploadJob(jobToken);
+    let modelUploadJobs = this.state.ttsModelUploadJobs.concat([newJob]);
+
+    this.setState({
+      ttsModelUploadJobs: modelUploadJobs
+    })
+
+    console.log('model upload jobs:', modelUploadJobs.length);
+  }
+
+  checkTtsModelUploadJob = (jobToken: string) => {
+    if (!this.state.enableAlpha) {
+      return;
+    }
+
+    const api = new ApiConfig();
+    const endpointUrl = api.getTtsModelUploadJobState(jobToken);
+
+    fetch(endpointUrl, {
+      method: 'GET',
+      credentials: 'include',
+      headers: {
+        'Accept': 'application/json',
+      },
+    })
+    .then(res => res.json())
+    .then(response => {
+      const jobResponse : TtsModelUploadJobStateResponsePayload = response;
+
+      if (jobResponse === undefined || jobResponse.state === undefined) {
+        return;
+      }
+
+      console.log('polled job state ---', jobResponse.state);
+
+      let updatedJobs : Array<TtsModelUploadJob> = [];
+      this.state.ttsModelUploadJobs.forEach(job => {
+        if (job.jobToken !== jobResponse.state!.job_token ||
+            jobResponse.state!.maybe_model_token === undefined) { // NB: Already done querying, no need to update again.
+          console.log('<<<<SKIPPING>>>', job.jobToken, jobResponse.state!.job_token)
+          updatedJobs.push(job);
+          return;
+        }
+
+        console.log('updated job', jobResponse.state);
+
+        let updatedJob = TtsModelUploadJob.fromResponse(jobResponse.state!);
+        updatedJobs.push(updatedJob);
+      });
+ 
+      this.setState({
+        ttsModelUploadJobs: updatedJobs,
+      })
+    })
+    .catch(e => { /* Ignore. */ });
+  }
+
+
   enqueueW2lJob = (jobToken: string) => {
     if (!this.state.enableAlpha) {
       return;
@@ -238,6 +308,60 @@ class App extends React.Component<Props, State> {
     .catch(e => { /* Ignore. */ });
   }
 
+  enqueueW2lTemplateUploadJob = (jobToken: string) => {
+    if (!this.state.enableAlpha) {
+      return;
+    }
+    const newJob = new W2lTemplateUploadJob(jobToken);
+    let inferenceJobs = this.state.w2lTemplateUploadJobs.concat([newJob]);
+
+    this.setState({
+      w2lTemplateUploadJobs: inferenceJobs
+    })
+  }
+
+  checkW2lTemplateUploadJob = (jobToken: string) => {
+    if (!this.state.enableAlpha) {
+      return;
+    }
+
+    const api = new ApiConfig();
+    const endpointUrl = api.getW2lTemplateUploadJobState(jobToken);
+
+    fetch(endpointUrl, {
+      method: 'GET',
+      credentials: 'include',
+      headers: {
+        'Accept': 'application/json',
+      },
+    })
+    .then(res => res.json())
+    .then(response => {
+      const jobResponse : W2lTemplateUploadJobStateResponsePayload = response;
+
+      if (jobResponse === undefined || jobResponse.state === undefined) {
+        return;
+      }
+
+      let updatedJobs : Array<W2lTemplateUploadJob> = [];
+      this.state.w2lTemplateUploadJobs.forEach(job => {
+        if (job.jobToken !== jobResponse.state!.job_token ||
+            jobResponse.state!.maybe_w2l_template_token === undefined) { // NB: Already done querying, no need to update again.
+          updatedJobs.push(job);
+          return;
+        }
+
+        let updatedJob = W2lTemplateUploadJob.fromResponse(jobResponse.state!);
+        updatedJobs.push(updatedJob);
+      });
+ 
+      this.setState({
+        w2lTemplateUploadJobs: updatedJobs,
+      })
+    })
+    .catch(e => { /* Ignore. */ });
+  }
+
   pollJobs = () => {
     this.state.ttsInferenceJobs.forEach(job => {
       switch (job.status) {
@@ -254,6 +378,26 @@ class App extends React.Component<Props, State> {
         case 'unknown':
         case 'pending':
           this.checkW2lJob(job.jobToken);
+          break;
+        default:
+          return;
+      }
+    });
+    this.state.ttsModelUploadJobs.forEach(job => {
+      switch (job.status) {
+        case 'unknown':
+        case 'pending':
+          this.checkTtsModelUploadJob(job.jobToken);
+          break;
+        default:
+          return;
+      }
+    });
+    this.state.w2lTemplateUploadJobs.forEach(job => {
+      switch (job.status) {
+        case 'unknown':
+        case 'pending':
+          this.checkW2lTemplateUploadJob(job.jobToken);
           break;
         default:
           return;

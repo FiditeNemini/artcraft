@@ -60,6 +60,10 @@ class ApiConfig {
     return `${this.getScheme()}://${this.getNewApiHost()}/tts/job/${jobToken}`;
   }
 
+  getTtsModelUploadJobState(jobToken: string) : string {
+    return `${this.getScheme()}://${this.getNewApiHost()}/tts/upload_model_job/${jobToken}`;
+  }
+
   uploadTts() : string {
     return `${this.getScheme()}://${this.getNewApiHost()}/tts/upload`;
   }
@@ -98,6 +102,10 @@ class ApiConfig {
 
   getW2lInferenceJobState(jobToken: string) : string {
     return `${this.getScheme()}://${this.getNewApiHost()}/w2l/job/${jobToken}`;
+  }
+
+  getW2lTemplateUploadJobState(jobToken: string) : string {
+    return `${this.getScheme()}://${this.getNewApiHost()}/w2l/upload_template_job/${jobToken}`;
   }
 
   listW2lInferenceResultsForUser(username: string) : string {
