@@ -346,7 +346,7 @@ class App extends React.Component<Props, State> {
       let updatedJobs : Array<W2lTemplateUploadJob> = [];
       this.state.w2lTemplateUploadJobs.forEach(job => {
         if (job.jobToken !== jobResponse.state!.job_token ||
-            jobResponse.state!.maybe_w2l_template_token === undefined) { // NB: Already done querying, no need to update again.
+            jobResponse.state!.maybe_template_token === undefined) { // NB: Already done querying, no need to update again.
           updatedJobs.push(job);
           return;
         }

@@ -21,7 +21,7 @@ export class W2lTemplateUploadJob {
     return new W2lTemplateUploadJob(
       response.job_token,
       response.status,
-      response.maybe_w2l_template_token,
+      response.maybe_template_token,
     );
   }
 }
@@ -33,7 +33,7 @@ export interface W2lTemplateUploadJobStateResponsePayload {
 
 export interface W2lTemplateUploadJobState {
   job_token: string,
-  maybe_w2l_template_token?: string,
+  maybe_template_token?: string,
   status: string,
   created_at: string,
   updated_at: string,
