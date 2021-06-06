@@ -21,8 +21,6 @@ use sqlx::mysql::MySqlDatabaseError;
 use std::sync::Arc;
 use crate::validations::check_for_slurs::contains_slurs;
 
-const NEW_USER_ROLE: &'static str = "new-user";
-
 #[derive(Deserialize)]
 pub struct InferTtsRequest {
   uuid_idempotency_token: String,

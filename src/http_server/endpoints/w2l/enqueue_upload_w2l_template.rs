@@ -21,8 +21,6 @@ use sqlx::mysql::MySqlDatabaseError;
 use std::sync::Arc;
 use crate::util::random_prefix_crockford_token::random_prefix_crockford_token;
 
-const NEW_USER_ROLE: &'static str = "new-user";
-
 #[derive(Deserialize)]
 pub struct UploadW2lTemplateRequest {
   idempotency_token: String,

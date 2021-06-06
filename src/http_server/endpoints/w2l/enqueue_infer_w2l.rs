@@ -20,8 +20,6 @@ use sqlx::error::Error::Database;
 use sqlx::mysql::MySqlDatabaseError;
 use std::sync::Arc;
 
-const NEW_USER_ROLE: &'static str = "new-user";
-
 #[derive(Deserialize)]
 pub struct InferW2lRequest {
   w2l_template_token: Option<String>,

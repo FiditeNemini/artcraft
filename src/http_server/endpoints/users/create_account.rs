@@ -23,7 +23,7 @@ use crate::util::email_to_gravatar::email_to_gravatar;
 use crate::validations::username_reservations::is_reserved_username;
 use crate::util::random_prefix_crockford_token::random_prefix_crockford_token;
 
-const NEW_USER_ROLE: &'static str = "new-user";
+const NEW_USER_ROLE: &'static str = "user";
 
 #[derive(Deserialize)]
 pub struct CreateAccountRequest {
