@@ -30,6 +30,19 @@ pub struct UserInfo {
   pub username: String,
   pub display_name: String,
   pub email_gravatar_hash: String,
+
+  // Usage permissions:
+  pub can_use_tts: bool,
+  pub can_use_w2l: bool,
+
+  // Contribution permissions:
+  pub can_upload_tts_models: bool,
+  pub can_upload_w2l_templates: bool,
+
+  // Moderation permissions:
+  pub can_ban_users: bool,
+  pub can_edit_other_users_data: bool,
+  pub can_approve_w2l_templates: bool,
 }
 
 #[derive(Serialize)]
@@ -103,6 +116,19 @@ pub async fn session_info_handler(
         username: session_data.username.to_string(),
         display_name: session_data.display_name.to_string(),
         email_gravatar_hash: session_data.email_gravatar_hash.to_string(),
+
+        // Usage permissions:
+        can_use_tts: session_data.can_use_tts,
+        can_use_w2l: session_data.can_use_w2l,
+
+        // Contribution permissions:
+        can_upload_tts_models: session_data.can_upload_tts_models,
+        can_upload_w2l_templates: session_data.can_upload_w2l_templates,
+
+        // Moderation permissions:
+        can_ban_users: session_data.can_ban_users,
+        can_edit_other_users_data: session_data.can_edit_other_users_data,
+        can_approve_w2l_templates: session_data.can_approve_w2l_templates,
       });
     }
   }
