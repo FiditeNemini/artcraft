@@ -4,7 +4,7 @@ use regex::Regex;
 pub fn validate_website_url(website_url: &str) -> Result<(), String> {
   lazy_static! {
     static ref WEBSITE_URL_REGEX: Regex = {
-      Regex::new(r"^(https?:\/\/)?.*$").expect("should be valid regex")
+      Regex::new(r"^(https?:\\/\\/)?.*$").expect("should be valid regex")
     };
   }
 
@@ -31,6 +31,7 @@ mod tests {
   fn valid_cases() {
     assert!(validate_website_url("http://vo.codes").is_ok());
     assert!(validate_website_url("https://vocodes.com").is_ok());
+    assert!(validate_website_url("www.zombo.com").is_ok());
   }
 
   #[test]
