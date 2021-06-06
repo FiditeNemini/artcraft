@@ -9,117 +9,12 @@ import { NewVocodesContainer } from './v2/NewVocodesContainer';
 import { OldVocodesContainer } from './v1/OldVocodesContainer';
 import { SessionStateResponse } from './session/SessionState';
 import { SessionWrapper } from './session/SessionWrapper';
+import { TtsInferenceJob, TtsInferenceJobStateResponsePayload } from './jobs/TtsInferenceJobs';
+import { W2lInferenceJob, W2lInferenceJobStateResponsePayload } from './jobs/W2lInferenceJobs';
 
 enum MigrationMode {
   NEW_VOCODES,
   OLD_VOCODES,
-}
-
-class TtsInferenceJob {
-  jobToken: string;
-  modelToken?: string;
-  status: string;
-  title?: string;
-  maybeResultToken?: string;
-  maybePublicBucketWavAudioPath?: string;
-
-  constructor(
-    jobToken: string, 
-    status: string = 'unknown',
-    modelToken: string | undefined = undefined,
-    title: string | undefined = undefined,
-    maybeResulToken: string | undefined = undefined,
-    maybePublicBucketWavAudioPath: string | undefined = undefined,
-  ) {
-    this.status = status;
-    this.jobToken = jobToken;
-    this.maybeResultToken = maybeResulToken;
-    this.modelToken = modelToken;
-    this.title = title;
-    this.maybePublicBucketWavAudioPath = maybePublicBucketWavAudioPath;
-  }
-
-  static fromResponse(response: TtsInferenceJobState) :  TtsInferenceJob {
-    return new TtsInferenceJob(
-      response.job_token,
-      response.status,
-      response.model_token,
-      response.title,
-      response.maybe_result_token,
-      response.maybe_public_bucket_wav_audio_path
-    );
-  }
-}
-
-interface TtsInferenceJobStateResponsePayload {
-  success: boolean,
-  state?: TtsInferenceJobState,
-}
-
-interface TtsInferenceJobState {
-  job_token: string,
-  status: string,
-  maybe_result_token?: string,
-  maybe_public_bucket_wav_audio_path?: string,
-  model_token: string,
-  tts_model_type: string,
-  title: string,
-  created_at: string,
-  updated_at: string,
-}
-
-
-class W2lInferenceJob {
-  jobToken: string;
-  maybeW2lTemplateToken?: string;
-  status: string;
-  title?: string;
-  maybeResultToken?: string;
-  maybePublicBucketVideoPath?: string;
-
-  constructor(
-    jobToken: string, 
-    status: string = 'unknown',
-    maybeW2lTemplateToken: string | undefined = undefined,
-    title: string | undefined = undefined,
-    maybeResulToken: string | undefined = undefined,
-    maybePublicBucketVideoPath: string | undefined = undefined,
-  ) {
-    this.status = status;
-    this.jobToken = jobToken;
-    this.maybeResultToken = maybeResulToken;
-    this.maybeW2lTemplateToken = maybeW2lTemplateToken;
-    this.title = title;
-    this.maybePublicBucketVideoPath = maybePublicBucketVideoPath;
-  }
-
-  static fromResponse(response: W2lInferenceJobState) :  TtsInferenceJob {
-    return new TtsInferenceJob(
-      response.job_token,
-      response.status,
-      response.maybe_w2l_template_token,
-      response.title,
-      response.maybe_result_token,
-      response.maybe_public_bucket_video_path
-    );
-  }
-}
-
-interface W2lInferenceJobStateResponsePayload {
-  success: boolean,
-  state?: W2lInferenceJobState,
-}
-
-interface W2lInferenceJobState {
-  job_token: string,
-  status: string,
-  maybe_result_token?: string,
-  maybe_public_bucket_video_path?: string,
-  maybe_w2l_template_token?: string,
-  w2l_template_type: string,
-  title: string,
-  created_at: string,
-  updated_at: string,
 }
 
 
