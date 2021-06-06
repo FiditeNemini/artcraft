@@ -1,7 +1,9 @@
 import React from 'react';
 import { ApiConfig } from '../../common/ApiConfig';
-import { v4 } from 'uuid';
 import { SessionWrapper } from '../../session/SessionWrapper';
+import { TtsModelUploadJob } from '../../jobs/TtsModelUploadJobs';
+import { W2lTemplateUploadJob } from '../../jobs/W2lTemplateUploadJobs';
+import { v4 } from 'uuid';
 
 enum UploadType {
   TTS_MODEL,
@@ -16,6 +18,12 @@ enum FieldTriState {
 
 interface Props {
   sessionWrapper : SessionWrapper,
+
+  enqueueTtsModelUploadJob: (jobToken: string) => void,
+  ttsModelUploadJobs: Array<TtsModelUploadJob>,
+
+  enqueueW2lTemplateUploadJob: (jobToken: string) => void,
+  w2lTemplateUploadJobs: Array<W2lTemplateUploadJob>,
 }
 
 interface State {

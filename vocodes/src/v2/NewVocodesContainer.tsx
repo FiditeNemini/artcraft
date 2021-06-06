@@ -1,6 +1,7 @@
 import React from 'react';
 import { FirehoseEventListFc } from './firehose/FirehoseEventListFc';
 import { LoginFc } from './login/LoginFc';
+import { NewFooterNavFc } from './NewFooterNavFc';
 import { NewTopNavFc } from './NewTopNavFc';
 import { ProfileDataFc } from './profile_data/ProfileDataFc';
 import { ProfileEditFc } from './profile_edit/ProfileEditFc';
@@ -8,8 +9,12 @@ import { ProfileFc } from './profile/ProfileFc';
 import { SessionWrapper } from '../session/SessionWrapper';
 import { SignupComponent } from './signup/SignupComponent';
 import { Switch, Route, RouteProps } from 'react-router-dom';
+import { TtsInferenceJob, W2lInferenceJob } from '../App';
 import { TtsModelFormFc } from './tts_model_list/TtsModelFormFc';
 import { TtsModelListComponent } from './tts_model_list/TtsModelListComponent';
+import { TtsModelUploadJob } from '../jobs/TtsModelUploadJobs';
+import { TtsModelViewFc } from './tts_model_view/TtsModelViewFc';
+import { TtsResultViewFc } from './tts_result_view/TtsResultViewFc';
 import { UploadChoiceFc } from './upload/UploadChoiceFc';
 import { UploadComponent } from './upload/UploadComponent';
 import { UploadTtsModelFc } from './upload/UploadTtsModelFc';
@@ -17,11 +22,8 @@ import { UploadW2lPhotoFc } from './upload/UploadW2lPhotoFc';
 import { UploadW2lVideoFc } from './upload/UploadW2lVideoFc';
 import { W2lResultViewFc } from './w2l_result_view/W2lResultViewFc';
 import { W2lTemplateListFc } from './w2l_template_list/W2lTemplateListFc';
+import { W2lTemplateUploadJob } from '../jobs/W2lTemplateUploadJobs';
 import { W2lTemplateViewFc } from './w2l_template_view/W2lTemplateViewFc';
-import { NewFooterNavFc } from './NewFooterNavFc';
-import { TtsModelViewFc } from './tts_model_view/TtsModelViewFc';
-import { TtsResultViewFc } from './tts_result_view/TtsResultViewFc';
-import { TtsInferenceJob, W2lInferenceJob } from '../App';
 
 interface Props {
   sessionWrapper: SessionWrapper,
@@ -32,6 +34,12 @@ interface Props {
 
   enqueueW2lJob: (jobToken: string) => void,
   w2lInferenceJobs: Array<W2lInferenceJob>,
+
+  enqueueTtsModelUploadJob: (jobToken: string) => void,
+  ttsModelUploadJobs: Array<TtsModelUploadJob>,
+
+  enqueueW2lTemplateUploadJob: (jobToken: string) => void,
+  w2lTemplateUploadJobs: Array<W2lTemplateUploadJob>,
 }
 
 interface State {
@@ -150,29 +158,29 @@ class NewVocodesContainer extends React.Component<Props, State> {
             <Route path="/upload/w2l_photo">
               <UploadW2lPhotoFc
                 sessionWrapper={this.props.sessionWrapper}
+                w2lTemplateUploadJobs={this.props.w2lTemplateUploadJobs}
+                enqueueW2lTemplateUploadJob={this.props.enqueueW2lTemplateUploadJob}
               />
             </Route>
 
             <Route path="/upload/w2l_video">
               <UploadW2lVideoFc
                 sessionWrapper={this.props.sessionWrapper}
+                w2lTemplateUploadJobs={this.props.w2lTemplateUploadJobs}
+                enqueueW2lTemplateUploadJob={this.props.enqueueW2lTemplateUploadJob}
               />
             </Route>
 
             <Route path="/upload/tts">
               <UploadTtsModelFc
                 sessionWrapper={this.props.sessionWrapper}
+                ttsModelUploadJobs={this.props.ttsModelUploadJobs}
+                enqueueTtsModelUploadJob={this.props.enqueueTtsModelUploadJob}
               />
             </Route>
 
             <Route path="/upload">
               <UploadChoiceFc
-                sessionWrapper={this.props.sessionWrapper}
-              />
-            </Route>
-
-            <Route path="/upload2">
-              <UploadComponent
                 sessionWrapper={this.props.sessionWrapper}
               />
             </Route>

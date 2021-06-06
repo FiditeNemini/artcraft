@@ -53,7 +53,6 @@ function TtsModelFormFc(props: Props) {
     })
     .then(res => res.json())
     .then(res => {
-      console.log('list', res);
       const ttsModelResponse : TtsModelListResponsePayload  = res;
       if (!ttsModelResponse.success) {
         return;
@@ -106,7 +105,6 @@ function TtsModelFormFc(props: Props) {
     // TODO: Inefficient.
     ttsModels.forEach(model => {
       if (model.model_token === selectVoiceValue) {
-        console.log('voice', model);
         setSelectedTtsModel(model);
       }
     });

@@ -447,6 +447,12 @@ class App extends React.Component<Props, State> {
 
                     enqueueW2lJob={this.enqueueW2lJob}
                     w2lInferenceJobs={this.state.w2lInferenceJobs}
+
+                    enqueueTtsModelUploadJob={this.enqueueTtsModelUploadJob}
+                    ttsModelUploadJobs={this.state.ttsModelUploadJobs}
+
+                    enqueueW2lTemplateUploadJob={this.enqueueW2lTemplateUploadJob}
+                    w2lTemplateUploadJobs={this.state.w2lTemplateUploadJobs}
                     />
                 </Route>
               </Switch>

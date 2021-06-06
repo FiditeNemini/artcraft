@@ -1,11 +1,19 @@
 import React, { useState } from 'react';
 import { ApiConfig } from '../../common/ApiConfig';
 import { SessionWrapper } from '../../session/SessionWrapper';
+import { TtsModelUploadJob } from '../../jobs/TtsModelUploadJobs';
 import { useHistory, Link } from "react-router-dom";
 import { v1 as uuidv1 } from 'uuid';
 
 interface Props {
   sessionWrapper: SessionWrapper,
+  enqueueTtsModelUploadJob: (jobToken: string) => void,
+  ttsModelUploadJobs: Array<TtsModelUploadJob>,
+}
+
+interface TtsModelUploadJobResponsePayload {
+  success: boolean,
+  job_token?: string,
 }
 
 function UploadTtsModelFc(props: Props) {
@@ -59,9 +67,17 @@ function UploadTtsModelFc(props: Props) {
     })
     .then(res => res.json())
     .then(res => {
-      if (res.success) {
-        history.push('/');
+      let response : TtsModelUploadJobResponsePayload = res;
+      
+      if (!response.success || response.job_token === undefined) {
+        return;
       }
+
+      console.log('enqueuing...')
+
+      props.enqueueTtsModelUploadJob(response.job_token);
+
+      history.push('/');
     })
     .catch(e => {
       //this.props.onSpeakErrorCallback();

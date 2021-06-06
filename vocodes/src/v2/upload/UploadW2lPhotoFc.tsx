@@ -1,11 +1,19 @@
 import React, { useState } from 'react';
 import { ApiConfig } from '../../common/ApiConfig';
 import { SessionWrapper } from '../../session/SessionWrapper';
+import { W2lTemplateUploadJob } from '../../jobs/W2lTemplateUploadJobs';
 import { useHistory, Link } from "react-router-dom";
 import { v1 as uuidv1 } from 'uuid';
 
+interface W2lTemplateUploadJobResponsePayload {
+  success: boolean,
+  job_token?: string,
+}
+
 interface Props {
   sessionWrapper: SessionWrapper,
+  enqueueW2lTemplateUploadJob: (jobToken: string) => void,
+  w2lTemplateUploadJobs: Array<W2lTemplateUploadJob>,
 }
 
 function UploadW2lPhotoFc(props: Props) {
@@ -59,9 +67,16 @@ function UploadW2lPhotoFc(props: Props) {
     })
     .then(res => res.json())
     .then(res => {
-      if (res.success) {
-        history.push('/');
+      let response : W2lTemplateUploadJobResponsePayload = res;
+      
+      if (!response.success || response.job_token === undefined) {
+        return;
       }
+
+      console.log('enqueuing...')
+
+      props.enqueueW2lTemplateUploadJob(response.job_token);
+      history.push('/');
     })
     .catch(e => {
       //this.props.onSpeakErrorCallback();
