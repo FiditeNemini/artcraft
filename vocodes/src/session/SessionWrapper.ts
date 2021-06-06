@@ -11,7 +11,9 @@ export class SessionWrapper {
   sessionStateResponse?: SessionStateResponse;
 
   private constructor(sessionStateResponse?: SessionStateResponse) {
-    this.sessionStateResponse = sessionStateResponse;
+    if (sessionStateResponse !== undefined) {
+      this.sessionStateResponse = sessionStateResponse;
+    }
   }
 
   public static emptySession() : SessionWrapper {
@@ -39,5 +41,61 @@ export class SessionWrapper {
 
   public getEmailGravatarHash() : string | undefined {
     return this.sessionStateResponse?.user?.email_gravatar_hash;
+  }
+
+  public canEditUser(username: string) : boolean {
+    if (this.getUsername() === username) {
+      return true;
+    }
+    return this.canEditOtherUsersData();
+  }
+
+  public canUseTts() : boolean {
+    if (this.sessionStateResponse === undefined || this.sessionStateResponse.user === undefined) {
+      return true; // NB: Default true.
+    }
+    return this.sessionStateResponse.user.can_use_tts;
+  }
+
+  public canUseW2l() : boolean {
+    if (this.sessionStateResponse === undefined || this.sessionStateResponse.user === undefined) {
+      return true; // NB: Default true.
+    }
+    return this.sessionStateResponse.user.can_use_w2l;
+  }
+
+  public canUploadTtsModels() : boolean {
+    if (this.sessionStateResponse === undefined || this.sessionStateResponse.user === undefined) {
+      return false;
+    }
+    return this.sessionStateResponse.user.can_upload_tts_models;
+  }
+
+  public canUploadW2lTemplates() : boolean {
+    if (this.sessionStateResponse === undefined || this.sessionStateResponse.user === undefined) {
+      return false;
+    }
+    return this.sessionStateResponse.user.can_upload_w2l_templates;
+  }
+
+  public canBanUsers() : boolean {
+    if (this.sessionStateResponse === undefined || this.sessionStateResponse.user === undefined) {
+      return false;
+    }
+    return this.sessionStateResponse.user.can_ban_users;
+  }
+
+  public canEditOtherUsersData() : boolean {
+    if (this.sessionStateResponse === undefined || this.sessionStateResponse.user === undefined) {
+      return false;
+    }
+    return this.sessionStateResponse.user.can_edit_other_users_data;
+  }
+
+  public canApproveW2lTemplates() : boolean {
+    if (this.sessionStateResponse === undefined || this.sessionStateResponse.user === undefined) {
+      return false;
+    }
+    return this.sessionStateResponse.user.can_approve_w2l_templates;
   }
 }

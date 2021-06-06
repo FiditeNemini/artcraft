@@ -77,7 +77,16 @@ function ProfileFc(props: Props) {
     userEmailHash = userData!.email_gravatar_hash;
   }
 
-  let editLinkUrl = `/profile/${username}/edit`;
+  let editProfileButton = <span />
+
+  if (props.sessionWrapper.canEditUser(username)) {
+    let editLinkUrl = `/profile/${username}/edit`;
+    editProfileButton = (
+        <Link 
+          className={"button is-medium is-info"}
+          to={editLinkUrl}>Edit</Link>
+    );
+  }
 
   let profileRows : Array<JSX.Element> = [];
 
@@ -109,8 +118,7 @@ function ProfileFc(props: Props) {
         {username} 
       </h1>
 
-      <Link 
-        to={editLinkUrl}>Edit</Link>
+      {editProfileButton}
 
       <br />
 

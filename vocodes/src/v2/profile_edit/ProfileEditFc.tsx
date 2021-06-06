@@ -1,7 +1,7 @@
 import React, { useEffect, useState }  from 'react';
 import { ApiConfig } from '../../common/ApiConfig';
 import { GravatarFc } from '../common/GravatarFc';
-import { Link } from 'react-router-dom';
+import { Link, useHistory } from 'react-router-dom';
 import { SessionWrapper } from '../../session/SessionWrapper';
 import { useParams } from 'react-router-dom';
 
@@ -37,6 +37,7 @@ interface UserPayload {
 
 function ProfileEditFc(props: Props) {
   const { username } = useParams();
+  const history = useHistory();
 
   const [userData, setUserData] = useState<UserPayload|undefined>(undefined);
 
@@ -67,6 +68,10 @@ function ProfileEditFc(props: Props) {
     });
 
   }, [username]); // NB: Empty array dependency sets to run ONLY on mount
+
+  if (!props.sessionWrapper.canEditUser(username)) {
+    history.push('/');
+  }
 
   let userEmailHash = "dne";
   if (userData !== undefined) {
