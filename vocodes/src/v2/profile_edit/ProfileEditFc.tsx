@@ -28,18 +28,35 @@ interface UserPayload {
   avatar_public_bucket_hash: string,
   disable_gravatar: boolean,
   hide_results_preference: boolean,
+  website_url?: string,
   discord_username?: string,
   twitch_username?: string,
   twitter_username?: string,
+  github_username?: string,
+  patreon_username?: string,
+  cashapp_username?: string,
   created_at: string,
 }
 
 
 function ProfileEditFc(props: Props) {
   const { username } = useParams();
+  const userProfilePage = `/profile/${username}`;
+
   const history = useHistory();
 
+  // From endpoint
   const [userData, setUserData] = useState<UserPayload|undefined>(undefined);
+
+  // Form values
+  const [profileMarkdown, setProfileMarkdown] = useState<string>("");
+  const [discord, setDiscord] = useState<string>("");
+  const [twitter, setTwitter] = useState<string>("");
+  const [twitch, setTwitch] = useState<string>("");
+  const [patreon, setPatreon] = useState<string>("");
+  const [github, setGithub] = useState<string>("");
+  const [cashApp, setCashApp] = useState<string>("");
+  const [websiteUrl, setWebsiteUrl] = useState<string>("");
 
   useEffect(() => {
     const api = new ApiConfig();
@@ -61,7 +78,15 @@ function ProfileEditFc(props: Props) {
         return; // Endpoint error?
       }
 
-      setUserData(profileResponse.user)
+      setUserData(profileResponse.user);
+      setProfileMarkdown(profileResponse.user?.profile_markdown || "");
+      setTwitter(profileResponse.user?.twitter_username || "");
+      setTwitch(profileResponse.user?.twitch_username || "");
+      setDiscord(profileResponse.user?.discord_username || "");
+      setCashApp(profileResponse.user?.cashapp_username || "");
+      setPatreon(profileResponse.user?.patreon_username || "");
+      setGithub(profileResponse.user?.github_username || "");
+      setWebsiteUrl(profileResponse.user?.website_url || "");
     })
     .catch(e => {
       //this.props.onSpeakErrorCallback();
@@ -70,15 +95,83 @@ function ProfileEditFc(props: Props) {
   }, [username]); // NB: Empty array dependency sets to run ONLY on mount
 
   if (!props.sessionWrapper.canEditUser(username)) {
-    history.push('/');
+    history.push(userProfilePage);
   }
 
-  let userEmailHash = "dne";
-  if (userData !== undefined) {
-    userEmailHash = userData!.email_gravatar_hash;
+  const handleProfileMarkdownChange = (ev: React.FormEvent<HTMLTextAreaElement>) => {
+    setProfileMarkdown((ev.target as HTMLTextAreaElement).value)
+  };
+
+  const handleTwitterChange = (ev: React.FormEvent<HTMLInputElement>) => {
+    setTwitter((ev.target as HTMLInputElement).value)
+  };
+
+  const handleTwitchChange = (ev: React.FormEvent<HTMLInputElement>) => {
+    setTwitch((ev.target as HTMLInputElement).value)
+  };
+
+  const handleGithubChange = (ev: React.FormEvent<HTMLInputElement>) => {
+    setGithub((ev.target as HTMLInputElement).value)
+  };
+
+  const handleDiscordChange = (ev: React.FormEvent<HTMLInputElement>) => {
+    setDiscord((ev.target as HTMLInputElement).value)
+  };
+
+  const handlePatreonChange = (ev: React.FormEvent<HTMLInputElement>) => {
+    setPatreon((ev.target as HTMLInputElement).value)
+  };
+
+  const handleCashAppChange = (ev: React.FormEvent<HTMLInputElement>) => {
+    setCashApp((ev.target as HTMLInputElement).value)
+  };
+
+  const handleWebsiteUrlChange = (ev: React.FormEvent<HTMLInputElement>) => {
+    setWebsiteUrl((ev.target as HTMLInputElement).value)
+  };
+
+  const handleFormSubmit = (ev: React.FormEvent<HTMLFormElement>) : boolean => {
+    ev.preventDefault();
+
+    const api = new ApiConfig();
+    const endpointUrl = api.editProfile(username);
+
+    const request = {
+      profile_markdown: profileMarkdown,
+      twitter_username: twitter,
+      twitch_username: twitch,
+      discord_username: discord,
+      cashapp_username: cashApp,
+      github_username: github,
+      patreon_username: patreon,
+      website_url: websiteUrl,
+    }
+
+    fetch(endpointUrl, {
+      method: 'POST',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+      },
+      credentials: 'include',
+      body: JSON.stringify(request),
+    })
+    .then(res => res.json())
+    .then(res => {
+      if (res.success) {
+        history.push(userProfilePage);
+      }
+    })
+    //.catch(e => {
+    //});
+
+    return false;
   }
+
 
   let viewLinkUrl = `/profile/${username}`;
+
+  let isDisabled = userData === undefined;
 
   return (
     <div>
@@ -95,105 +188,189 @@ function ProfileEditFc(props: Props) {
         We're going to make amazing and hilarious content together!
       </p>
 
+      {userData?.profile_markdown}
       <br />
 
-      <form>
-        <div className="field">
-          <label className="label">Profile (supports Markdown)</label>
-          <div className="control">
-            <textarea 
-              className="textarea is-large" 
-              placeholder="Profile (about you)"></textarea>
+      <form onSubmit={handleFormSubmit}>
+        <fieldset disabled={isDisabled}>
+          <div className="field">
+            <label className="label">Profile (supports Markdown)</label>
+            <div className="control">
+              <textarea 
+                onChange={handleProfileMarkdownChange}
+                className="textarea is-large" 
+                placeholder="Profile (about you)"
+                value={profileMarkdown} 
+                />
+            </div>
           </div>
-        </div>
 
-        <div className="field">
-          <label className="label">Vo.codes Display Name</label>
-          <div className="control has-icons-left has-icons-right">
-            {/*value={downloadUrl} onChange={handleDownloadUrlChange}*/}
-            <input className="input" type="text" placeholder="Display Name" />
-            <span className="icon is-small is-left">
-              <i className="fas fa-user"></i>
-            </span>
-            <span className="icon is-small is-right">
-              <i className="fas fa-check"></i>
-            </span>
+          {/*<div className="field">
+            <label className="label">Vo.codes Display Name</label>
+            <div className="control has-icons-left has-icons-right">
+              //value={downloadUrl} onChange={handleDownloadUrlChange}
+              <input 
+                className="input" 
+                type="text" 
+                placeholder="Display Name" 
+                value={userData?.profile_markdown || ""} 
+                />
+              <span className="icon is-small is-left">
+                <i className="fas fa-user"></i>
+              </span>
+              <span className="icon is-small is-right">
+                <i className="fas fa-check"></i>
+              </span>
+            </div>
+            //<p className="help">{titleInvalidReason}</p>
+          </div>*/}
+
+          <div className="field">
+            <label className="label">Twitter Username</label>
+            <div className="control has-icons-left has-icons-right">
+              <input 
+                onChange={handleTwitterChange}
+                className="input" 
+                type="text" 
+                placeholder="Twitter" 
+                value={twitter}
+                />
+              <span className="icon is-small is-left">
+                <i className="fas fa-envelope"></i>
+              </span>
+              <span className="icon is-small is-right">
+                <i className="fas fa-exclamation-triangle"></i>
+              </span>
+            </div>
+            {/*<p className="help">{downloadUrlInvalidReason}</p>*/}
           </div>
-          {/*<p className="help">{titleInvalidReason}</p>*/}
-        </div>
 
-        {/* 
-        https://drive.google.com/file/d/{TOKEN}/view?usp=sharing
-        */}
-        <div className="field">
-          <label className="label">Twitter Username</label>
-          <div className="control has-icons-left has-icons-right">
-            {/*value={downloadUrl} onChange={handleDownloadUrlChange}*/}
-            <input className="input" type="text" placeholder="Twitter" />
-            <span className="icon is-small is-left">
-              <i className="fas fa-envelope"></i>
-            </span>
-            <span className="icon is-small is-right">
-              <i className="fas fa-exclamation-triangle"></i>
-            </span>
+          <div className="field">
+            <label className="label">Discord Username (don't forget the #0000)</label>
+            <div className="control has-icons-left has-icons-right">
+              <input 
+                onChange={handleDiscordChange}
+                className="input" 
+                type="text" 
+                placeholder="Discord" 
+                value={discord}
+                />
+              <span className="icon is-small is-left">
+                <i className="fas fa-envelope"></i>
+              </span>
+              <span className="icon is-small is-right">
+                <i className="fas fa-exclamation-triangle"></i>
+              </span>
+            </div>
+            {/*<p className="help">{downloadUrlInvalidReason}</p>*/}
           </div>
-          {/*<p className="help">{downloadUrlInvalidReason}</p>*/}
-        </div>
 
-        <div className="field">
-          <label className="label">Discord Username</label>
-          <div className="control has-icons-left has-icons-right">
-            {/*value={downloadUrl} onChange={handleDownloadUrlChange}*/}
-            <input className="input" type="text" placeholder="Discord" />
-            <span className="icon is-small is-left">
-              <i className="fas fa-envelope"></i>
-            </span>
-            <span className="icon is-small is-right">
-              <i className="fas fa-exclamation-triangle"></i>
-            </span>
+          <div className="field">
+            <label className="label">Twitch Username</label>
+            <div className="control has-icons-left has-icons-right">
+              <input 
+                onChange={handleTwitchChange}
+                className="input" 
+                type="text" 
+                placeholder="Twitch" 
+                value={twitch}
+                />
+              <span className="icon is-small is-left">
+                <i className="fas fa-envelope"></i>
+              </span>
+              <span className="icon is-small is-right">
+                <i className="fas fa-exclamation-triangle"></i>
+              </span>
+            </div>
+            {/*<p className="help">{downloadUrlInvalidReason}</p>*/}
           </div>
-          {/*<p className="help">{downloadUrlInvalidReason}</p>*/}
-        </div>
 
-        <div className="field">
-          <label className="label">Twitch Username</label>
-          <div className="control has-icons-left has-icons-right">
-            {/*value={downloadUrl} onChange={handleDownloadUrlChange}*/}
-            <input className="input" type="text" placeholder="Twitch" />
-            <span className="icon is-small is-left">
-              <i className="fas fa-envelope"></i>
-            </span>
-            <span className="icon is-small is-right">
-              <i className="fas fa-exclamation-triangle"></i>
-            </span>
+          <div className="field">
+            <label className="label">CashApp $CashTag (for reward payouts)</label>
+            <div className="control has-icons-left has-icons-right">
+              <input 
+                onChange={handleCashAppChange}
+                className="input" 
+                type="text" 
+                placeholder="CashApp" 
+                value={cashApp}
+                />
+              <span className="icon is-small is-left">
+                <i className="fas fa-envelope"></i>
+              </span>
+              <span className="icon is-small is-right">
+                <i className="fas fa-exclamation-triangle"></i>
+              </span>
+            </div>
+            {/*<p className="help">{downloadUrlInvalidReason}</p>*/}
           </div>
-          {/*<p className="help">{downloadUrlInvalidReason}</p>*/}
-        </div>
 
-        <div className="field">
-          <label className="label">CashApp $CashTag (for reward payouts)</label>
-          <div className="control has-icons-left has-icons-right">
-            {/*value={downloadUrl} onChange={handleDownloadUrlChange}*/}
-            <input className="input" type="text" placeholder="$CashTag" />
-            <span className="icon is-small is-left">
-              <i className="fas fa-envelope"></i>
-            </span>
-            <span className="icon is-small is-right">
-              <i className="fas fa-exclamation-triangle"></i>
-            </span>
+
+          <div className="field">
+            <label className="label">Github Username (I'm hiring engineers and data scientists!)</label>
+            <div className="control has-icons-left has-icons-right">
+              <input 
+                onChange={handleGithubChange}
+                className="input" 
+                type="text" 
+                placeholder="Github" 
+                value={github}
+                />
+              <span className="icon is-small is-left">
+                <i className="fas fa-envelope"></i>
+              </span>
+              <span className="icon is-small is-right">
+                <i className="fas fa-exclamation-triangle"></i>
+              </span>
+            </div>
+            {/*<p className="help">{downloadUrlInvalidReason}</p>*/}
           </div>
-          {/*<p className="help">{downloadUrlInvalidReason}</p>*/}
-        </div>
 
-
-        <br />
-
-        <button className="button is-link is-large is-fullwidth">Update</button>
-        {/*<div className="field is-grouped">
-          <div className="control">
-            <button className="button is-link is-large is-fullwidth">Upload</button>
+          <div className="field">
+            <label className="label">Patreon Username (to unlock vo.codes rewards)</label>
+            <div className="control has-icons-left has-icons-right">
+              <input 
+                onChange={handlePatreonChange}
+                className="input" 
+                type="text" 
+                placeholder="Patreon" 
+                value={patreon}
+                />
+              <span className="icon is-small is-left">
+                <i className="fas fa-envelope"></i>
+              </span>
+              <span className="icon is-small is-right">
+                <i className="fas fa-exclamation-triangle"></i>
+              </span>
+            </div>
+            {/*<p className="help">{downloadUrlInvalidReason}</p>*/}
           </div>
-        </div>*/}
+
+          <div className="field">
+            <label className="label">Personal Website URL</label>
+            <div className="control has-icons-left has-icons-right">
+              <input 
+                onChange={handleWebsiteUrlChange}
+                className="input" 
+                type="text" 
+                placeholder="Website URL" 
+                value={websiteUrl}
+                />
+              <span className="icon is-small is-left">
+                <i className="fas fa-envelope"></i>
+              </span>
+              <span className="icon is-small is-right">
+                <i className="fas fa-exclamation-triangle"></i>
+              </span>
+            </div>
+            {/*<p className="help">{downloadUrlInvalidReason}</p>*/}
+          </div>
+
+          <br />
+
+          <button className="button is-link is-large is-fullwidth">Update</button>
+
+        </fieldset>
       </form>
 
       <br />

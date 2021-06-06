@@ -96,6 +96,10 @@ class ApiConfig {
     return `${this.getScheme()}://${this.getNewApiHost()}/user/${username}/profile`;
   }
 
+  editProfile(username: string) : string {
+    return `${this.getScheme()}://${this.getNewApiHost()}/user/${username}/edit_profile`;
+  }
+
   listW2lTemplatesForUser(username: string) : string {
     return `${this.getScheme()}://${this.getNewApiHost()}/user/${username}/w2l_templates`;
   }

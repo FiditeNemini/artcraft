@@ -8,6 +8,7 @@ import { ProfileW2lInferenceResultsListFc } from './Profile_W2lInferenceResultLi
 import { ProfileW2lTemplateListFc } from './Profile_W2lTemplateListFc';
 import { SessionWrapper } from '../../session/SessionWrapper';
 import { useParams } from 'react-router-dom';
+import { profile } from 'console';
 
 interface Props {
   sessionWrapper: SessionWrapper,
@@ -32,9 +33,13 @@ interface UserPayload {
   avatar_public_bucket_hash: string,
   disable_gravatar: boolean,
   hide_results_preference: boolean,
+  website_url?: string,
   discord_username?: string,
   twitch_username?: string,
   twitter_username?: string,
+  github_username?: string,
+  patreon_username?: string,
+  cashapp_username?: string,
   created_at: string,
 }
 
@@ -90,6 +95,15 @@ function ProfileFc(props: Props) {
 
   let profileRows : Array<JSX.Element> = [];
 
+  if (userData !== undefined && userData.website_url) {
+    profileRows.push(
+      <tr key="website">
+        <th>Website</th>
+        <td>{userData.website_url}</td>
+      </tr>
+    )
+  }
+
   if (userData !== undefined && userData.twitch_username) {
     profileRows.push(
       <tr key="twitch">
@@ -108,6 +122,42 @@ function ProfileFc(props: Props) {
     )
   }
 
+  if (userData !== undefined && userData.discord_username) {
+    profileRows.push(
+      <tr key="discord">
+        <th>Discord</th>
+        <td>{userData.discord_username}</td>
+      </tr>
+    )
+  }
+
+  if (userData !== undefined && userData.github_username) {
+    profileRows.push(
+      <tr key="github">
+        <th>Github</th>
+        <td>{userData.github_username}</td>
+      </tr>
+    )
+  }
+
+  if (userData !== undefined && userData.cashapp_username) {
+    profileRows.push(
+      <tr key="cashapp">
+        <th>CashApp</th>
+        <td>{userData.cashapp_username}</td>
+      </tr>
+    )
+  }
+
+  if (userData !== undefined && userData.patreon_username) {
+    profileRows.push(
+      <tr key="patreon">
+        <th>Patreon</th>
+        <td>{userData.patreon_username}</td>
+      </tr>
+    )
+  }
+
   return (
     <div>
       <h1 className="title is-1">
@@ -122,7 +172,10 @@ function ProfileFc(props: Props) {
 
       <br />
 
-      <p>Profiles are a work in progress.</p>
+      <div 
+        className="profile content is-medium" 
+        dangerouslySetInnerHTML={{__html: userData?.profile_rendered_html || ""}}
+        />
 
       <br />
 
