@@ -4,6 +4,7 @@ import { SessionWrapper } from '../../session/SessionWrapper';
 import { W2lTemplateUploadJob } from '../../jobs/W2lTemplateUploadJobs';
 import { useHistory, Link } from "react-router-dom";
 import { v1 as uuidv1 } from 'uuid';
+import { SessionW2lTemplateUploadResultListFc } from '../common/SessionW2lTemplateUploadResultsListFc';
 
 interface W2lTemplateUploadJobResponsePayload {
   success: boolean,
@@ -145,6 +146,13 @@ function UploadW2lPhotoFc(props: Props) {
         className="button is-link is-fullwidth is-outlined"
         onClick={() => {}}
         >&lt; Back to upload type selection</Link>
+      
+      <br />
+      <br />
+
+      <SessionW2lTemplateUploadResultListFc
+        w2lTemplateUploadJobs={props.w2lTemplateUploadJobs}
+        />
 
     </div>
   )

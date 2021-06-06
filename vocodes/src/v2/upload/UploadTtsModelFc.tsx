@@ -4,6 +4,7 @@ import { SessionWrapper } from '../../session/SessionWrapper';
 import { TtsModelUploadJob } from '../../jobs/TtsModelUploadJobs';
 import { useHistory, Link } from "react-router-dom";
 import { v1 as uuidv1 } from 'uuid';
+import { SessionTtsModelUploadResultListFc } from '../common/SessionTtsModelUploadResultsListFc';
 
 interface Props {
   sessionWrapper: SessionWrapper,
@@ -153,6 +154,10 @@ function UploadTtsModelFc(props: Props) {
         onClick={() => {}}
         >&lt; Back to upload type selection</Link>
 
+
+      <SessionTtsModelUploadResultListFc
+        modelUploadJobs={props.ttsModelUploadJobs}
+        />
     </div>
   )
 }

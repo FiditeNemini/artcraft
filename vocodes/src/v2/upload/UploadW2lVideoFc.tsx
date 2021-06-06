@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { ApiConfig } from '../../common/ApiConfig';
+import { SessionW2lTemplateUploadResultListFc } from '../common/SessionW2lTemplateUploadResultsListFc';
 import { SessionWrapper } from '../../session/SessionWrapper';
 import { W2lTemplateUploadJob } from '../../jobs/W2lTemplateUploadJobs';
 import { useHistory, Link } from "react-router-dom";
@@ -139,13 +140,20 @@ function UploadW2lVideoFc(props: Props) {
       </form>
 
       <br />
-
       <br />
+
       <Link
         to="/upload"
         className="button is-link is-fullwidth is-outlined"
         onClick={() => {}}
         >&lt; Back to upload type selection</Link>
+
+      <br />
+      <br />
+
+      <SessionW2lTemplateUploadResultListFc
+        w2lTemplateUploadJobs={props.w2lTemplateUploadJobs}
+        />
 
     </div>
   )
