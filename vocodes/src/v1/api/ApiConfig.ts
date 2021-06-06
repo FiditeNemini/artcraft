@@ -89,7 +89,7 @@ class ApiConfig {
   }
 
   getProfile(username: string) : string {
-    return `${this.getScheme()}://${this.getNewApiHost()}/profile/${username}`;
+    return `${this.getScheme()}://${this.getNewApiHost()}/user/${username}/profile`;
   }
 
   listW2lTemplatesForUser(username: string) : string {
