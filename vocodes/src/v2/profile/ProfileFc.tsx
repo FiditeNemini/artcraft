@@ -45,7 +45,7 @@ interface UserPayload {
 
 
 function ProfileFc(props: Props) {
-  const { username } = useParams();
+  const { username } = useParams() as { username: string };
 
   const [userData, setUserData] = useState<UserPayload|undefined>(undefined);
 
@@ -95,11 +95,22 @@ function ProfileFc(props: Props) {
 
   let profileRows : Array<JSX.Element> = [];
 
-  if (userData !== undefined && userData.website_url) {
+  if (userData !== undefined && userData.website_url !== undefined) {
+    let websiteUrl = <span>{userData.website_url}</span>;
+    if (userData.website_url.startsWith("http://") || userData.website_url.startsWith("https://")) {
+      websiteUrl = (
+        <a 
+          href={userData.website_url} 
+          target="_blank"
+          rel="noopener noreferrer nofollow" 
+          >{userData.website_url}</a>
+      );
+    }
+
     profileRows.push(
       <tr key="website">
         <th>Website</th>
-        <td>{userData.website_url}</td>
+        <td>{websiteUrl}</td>
       </tr>
     )
   }
