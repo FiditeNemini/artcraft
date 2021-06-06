@@ -129,6 +129,83 @@
       ]
     }
   },
+  "0fc26cb6ab34ee6cd9d0cd8fac8bae7bd6f25bbf7c785cd5dc8888d08099b88b": {
+    "query": "\nSELECT\n    jobs.token as job_token,\n\n    jobs.status,\n    jobs.on_success_result_token as maybe_template_token,\n\n    jobs.created_at,\n    jobs.updated_at\n\nFROM w2l_template_upload_jobs as jobs\n\nWHERE jobs.token = ?\n        ",
+    "describe": {
+      "columns": [
+        {
+          "ordinal": 0,
+          "name": "job_token",
+          "type_info": {
+            "type": "VarString",
+            "flags": {
+              "bits": 4229
+            },
+            "char_set": 224,
+            "max_size": 128
+          }
+        },
+        {
+          "ordinal": 1,
+          "name": "status",
+          "type_info": {
+            "type": "String",
+            "flags": {
+              "bits": 393
+            },
+            "char_set": 224,
+            "max_size": 64
+          }
+        },
+        {
+          "ordinal": 2,
+          "name": "maybe_template_token",
+          "type_info": {
+            "type": "VarString",
+            "flags": {
+              "bits": 136
+            },
+            "char_set": 224,
+            "max_size": 128
+          }
+        },
+        {
+          "ordinal": 3,
+          "name": "created_at",
+          "type_info": {
+            "type": "Timestamp",
+            "flags": {
+              "bits": 1153
+            },
+            "char_set": 63,
+            "max_size": 19
+          }
+        },
+        {
+          "ordinal": 4,
+          "name": "updated_at",
+          "type_info": {
+            "type": "Timestamp",
+            "flags": {
+              "bits": 9345
+            },
+            "char_set": 63,
+            "max_size": 19
+          }
+        }
+      ],
+      "parameters": {
+        "Right": 1
+      },
+      "nullable": [
+        false,
+        false,
+        true,
+        false,
+        false
+      ]
+    }
+  },
   "10d2e4544e7ee74c3c394f1305e281cbc4003df207183ceaa18384c2e77baa61": {
     "query": "\nSELECT\n    tts.token as model_token,\n    tts.tts_model_type,\n    tts.creator_user_token,\n    users.username as creator_username,\n    users.display_name as creator_display_name,\n    tts.updatable_slug,\n    tts.title,\n    tts.is_mod_disabled,\n    tts.created_at,\n    tts.updated_at\nFROM tts_models as tts\nJOIN users\nON\n    users.token = tts.creator_user_token\nWHERE\n    tts.deleted_at IS NULL\n    AND users.username = ?\n        ",
     "describe": {
@@ -1349,6 +1426,83 @@
         false,
         false,
         true
+      ]
+    }
+  },
+  "3de0e9c442ae0d4ca2f1da19357ac7685084e2843216313d7836ea60bc3dcfe0": {
+    "query": "\nSELECT\n    jobs.token as job_token,\n\n    jobs.status,\n    jobs.on_success_result_token as maybe_model_token,\n\n    jobs.created_at,\n    jobs.updated_at\n\nFROM tts_model_upload_jobs as jobs\n\nWHERE jobs.token = ?\n        ",
+    "describe": {
+      "columns": [
+        {
+          "ordinal": 0,
+          "name": "job_token",
+          "type_info": {
+            "type": "VarString",
+            "flags": {
+              "bits": 4229
+            },
+            "char_set": 224,
+            "max_size": 128
+          }
+        },
+        {
+          "ordinal": 1,
+          "name": "status",
+          "type_info": {
+            "type": "String",
+            "flags": {
+              "bits": 393
+            },
+            "char_set": 224,
+            "max_size": 64
+          }
+        },
+        {
+          "ordinal": 2,
+          "name": "maybe_model_token",
+          "type_info": {
+            "type": "VarString",
+            "flags": {
+              "bits": 136
+            },
+            "char_set": 224,
+            "max_size": 128
+          }
+        },
+        {
+          "ordinal": 3,
+          "name": "created_at",
+          "type_info": {
+            "type": "Timestamp",
+            "flags": {
+              "bits": 1153
+            },
+            "char_set": 63,
+            "max_size": 19
+          }
+        },
+        {
+          "ordinal": 4,
+          "name": "updated_at",
+          "type_info": {
+            "type": "Timestamp",
+            "flags": {
+              "bits": 9345
+            },
+            "char_set": 63,
+            "max_size": 19
+          }
+        }
+      ],
+      "parameters": {
+        "Right": 1
+      },
+      "nullable": [
+        false,
+        false,
+        true,
+        false,
+        false
       ]
     }
   },
