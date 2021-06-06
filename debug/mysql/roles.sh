@@ -4,4 +4,4 @@ mysql -u storyteller \
   -ppassword \
   -h localhost \
   -D storyteller \
-  -e "select * from firehose_entries\G"
+  -e "select * from user_roles\G"
