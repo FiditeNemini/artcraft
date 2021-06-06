@@ -242,6 +242,7 @@ pub async fn serve(server_state: ServerState) -> AnyhowResult<()>
       .wrap(DefaultHeaders::new()
         .header("X-Backend-Hostname", &hostname)
         .header("X-Build-Sha", ""))
+      // ==================== ACCOUNT CREATION / SESSION MANAGEMENT ====================
       .service(
         web::resource("/create_account")
           .route(web::post().to(create_account_handler))
@@ -262,6 +263,7 @@ pub async fn serve(server_state: ServerState) -> AnyhowResult<()>
           .route(web::get().to(session_info_handler))
           .route(web::head().to(|| HttpResponse::Ok()))
       )
+      // ==================== TTS ====================
       .service(
         web::scope("/tts")
           .service(
@@ -295,6 +297,7 @@ pub async fn serve(server_state: ServerState) -> AnyhowResult<()>
               .route(web::head().to(|| HttpResponse::Ok()))
           )
       )
+      // ==================== WAV2LIP ====================
       .service(
         web::scope("/w2l")
           .service(
@@ -328,13 +331,14 @@ pub async fn serve(server_state: ServerState) -> AnyhowResult<()>
               .route(web::head().to(|| HttpResponse::Ok()))
           )
       )
-      .service(
-        web::resource("/profile/{username}")
-          .route(web::get().to(get_profile_handler))
-          .route(web::head().to(|| HttpResponse::Ok()))
-      )
+      // ==================== USER DATA ====================
       .service(
         web::scope("/user")
+          .service(
+            web::resource("/{username}/profile")
+              .route(web::get().to(get_profile_handler))
+              .route(web::head().to(|| HttpResponse::Ok()))
+          )
           .service(
             web::resource("/{username}/tts_models")
               .route(web::get().to(list_user_tts_models_handler))
