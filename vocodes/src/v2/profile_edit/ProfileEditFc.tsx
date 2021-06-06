@@ -33,7 +33,7 @@ interface UserPayload {
   twitch_username?: string,
   twitter_username?: string,
   github_username?: string,
-  patreon_username?: string,
+  //patreon_username?: string,
   cashapp_username?: string,
   created_at: string,
 }
@@ -53,7 +53,7 @@ function ProfileEditFc(props: Props) {
   const [discord, setDiscord] = useState<string>("");
   const [twitter, setTwitter] = useState<string>("");
   const [twitch, setTwitch] = useState<string>("");
-  const [patreon, setPatreon] = useState<string>("");
+  //const [patreon, setPatreon] = useState<string>("");
   const [github, setGithub] = useState<string>("");
   const [cashApp, setCashApp] = useState<string>("");
   const [websiteUrl, setWebsiteUrl] = useState<string>("");
@@ -84,7 +84,7 @@ function ProfileEditFc(props: Props) {
       setTwitch(profileResponse.user?.twitch_username || "");
       setDiscord(profileResponse.user?.discord_username || "");
       setCashApp(profileResponse.user?.cashapp_username || "");
-      setPatreon(profileResponse.user?.patreon_username || "");
+      //setPatreon(profileResponse.user?.patreon_username || "");
       setGithub(profileResponse.user?.github_username || "");
       setWebsiteUrl(profileResponse.user?.website_url || "");
     })
@@ -118,10 +118,6 @@ function ProfileEditFc(props: Props) {
     setDiscord((ev.target as HTMLInputElement).value)
   };
 
-  const handlePatreonChange = (ev: React.FormEvent<HTMLInputElement>) => {
-    setPatreon((ev.target as HTMLInputElement).value)
-  };
-
   const handleCashAppChange = (ev: React.FormEvent<HTMLInputElement>) => {
     setCashApp((ev.target as HTMLInputElement).value)
   };
@@ -143,7 +139,7 @@ function ProfileEditFc(props: Props) {
       discord_username: discord,
       cashapp_username: cashApp,
       github_username: github,
-      patreon_username: patreon,
+      //patreon_username: patreon,
       website_url: websiteUrl,
     }
 
@@ -315,26 +311,6 @@ function ProfileEditFc(props: Props) {
                 type="text" 
                 placeholder="Github" 
                 value={github}
-                />
-              <span className="icon is-small is-left">
-                <i className="fas fa-envelope"></i>
-              </span>
-              <span className="icon is-small is-right">
-                <i className="fas fa-exclamation-triangle"></i>
-              </span>
-            </div>
-            {/*<p className="help">{downloadUrlInvalidReason}</p>*/}
-          </div>
-
-          <div className="field">
-            <label className="label">Patreon Username (to unlock vo.codes rewards)</label>
-            <div className="control has-icons-left has-icons-right">
-              <input 
-                onChange={handlePatreonChange}
-                className="input" 
-                type="text" 
-                placeholder="Patreon" 
-                value={patreon}
                 />
               <span className="icon is-small is-left">
                 <i className="fas fa-envelope"></i>

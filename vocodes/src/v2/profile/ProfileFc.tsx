@@ -38,7 +38,7 @@ interface UserPayload {
   twitch_username?: string,
   twitter_username?: string,
   github_username?: string,
-  patreon_username?: string,
+  //patreon_username?: string,
   cashapp_username?: string,
   created_at: string,
 }
@@ -145,15 +145,6 @@ function ProfileFc(props: Props) {
       <tr key="cashapp">
         <th>CashApp</th>
         <td>{userData.cashapp_username}</td>
-      </tr>
-    )
-  }
-
-  if (userData !== undefined && userData.patreon_username) {
-    profileRows.push(
-      <tr key="patreon">
-        <th>Patreon</th>
-        <td>{userData.patreon_username}</td>
       </tr>
     )
   }
