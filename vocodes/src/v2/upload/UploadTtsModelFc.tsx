@@ -154,6 +154,8 @@ function UploadTtsModelFc(props: Props) {
         onClick={() => {}}
         >&lt; Back to upload type selection</Link>
 
+      <br />
+      <br />
 
       <SessionTtsModelUploadResultListFc
         modelUploadJobs={props.ttsModelUploadJobs}

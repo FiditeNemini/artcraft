@@ -18,7 +18,7 @@ function SessionTtsModelUploadResultListFc(props: Props) {
       );
     } else {
 
-      let ttsPermalink = `/w2l/${job.maybeModelToken}`
+      let ttsPermalink = `/tts/${job.maybeModelToken}`
 
       results.push(
         <div key={job.jobToken}>
