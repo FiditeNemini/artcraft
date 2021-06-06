@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { ApiConfig } from '../../common/ApiConfig';
 import { Link } from "react-router-dom";
-import { getRandomInt } from '../../Utils';
+import { getRandomInt } from '../../v1/api/Utils';
 
 interface TtsModelListResponsePayload {
   success: boolean,

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { ApiConfig } from '../../common/ApiConfig';
 import { SessionWrapper } from '../../session/SessionWrapper';
 import { Link } from "react-router-dom";
-import { getRandomInt } from '../../Utils';
+import { getRandomInt } from '../../v1/api/Utils';
 
 interface W2lTemplateListResponsePayload {
   success: boolean,

@@ -9,7 +9,7 @@ import { SpectrogramComponent } from './extras/SpectrogramComponent';
 import { SpectrogramMode } from '../../OldVocodesContainer';
 import { StatusText } from './StatusText';
 import { Utterance } from '../../model/utterance';
-import { getRandomInt } from '../../../Utils';
+import { getRandomInt } from '../../api/Utils';
 import { NewsNotice } from './NewsNotice';
 
 enum StatusState {
