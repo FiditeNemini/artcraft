@@ -66,6 +66,7 @@ use crate::http_server::endpoints::tts::get_tts_inference_job_status::get_tts_in
 use crate::http_server::endpoints::w2l::get_w2l_inference_job_status::get_w2l_inference_job_status_handler;
 use crate::http_server::endpoints::tts::get_tts_upload_model_job_status::get_tts_upload_model_job_status_handler;
 use crate::http_server::endpoints::w2l::get_w2l_upload_template_job_status::get_w2l_upload_template_job_status_handler;
+use crate::http_server::endpoints::users::edit_profile::edit_profile_handler;
 
 // TODO TODO TODO TODO
 // TODO TODO TODO TODO
@@ -349,6 +350,11 @@ pub async fn serve(server_state: ServerState) -> AnyhowResult<()>
           .service(
             web::resource("/{username}/profile")
               .route(web::get().to(get_profile_handler))
+              .route(web::head().to(|| HttpResponse::Ok()))
+          )
+          .service(
+            web::resource("/{username}/edit_profile")
+              .route(web::post().to(edit_profile_handler))
               .route(web::head().to(|| HttpResponse::Ok()))
           )
           .service(

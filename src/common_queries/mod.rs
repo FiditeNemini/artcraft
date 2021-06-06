@@ -4,5 +4,5 @@ pub mod list_tts_inference_results;
 pub mod list_tts_models;
 pub mod list_w2l_inference_results;
 pub mod list_w2l_templates;
+pub mod query_user_profile;
 pub mod sessions;
-pub mod users;

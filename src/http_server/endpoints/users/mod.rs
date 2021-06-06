@@ -1,4 +1,5 @@
 pub mod create_account;
+pub mod edit_profile;
 pub mod get_profile;
 pub mod list_user_tts_inference_results;
 pub mod list_user_tts_models;

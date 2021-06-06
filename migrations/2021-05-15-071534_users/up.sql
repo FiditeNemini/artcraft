@@ -87,6 +87,8 @@ CREATE TABLE users (
   twitch_username VARCHAR(36) DEFAULT NULL,
   patreon_username VARCHAR(36) DEFAULT NULL,
   github_username VARCHAR(36) DEFAULT NULL,
+  cashapp_username VARCHAR(36) DEFAULT NULL,
+  website_url VARCHAR(255) DEFAULT NULL,
 
   -- Incremented with every update.
   version INT NOT NULL DEFAULT 0,
@@ -118,6 +120,7 @@ CREATE TABLE user_roles (
 
   can_ban_users BOOLEAN NOT NULL DEFAULT FALSE,
   can_edit_other_users_data BOOLEAN NOT NULL DEFAULT FALSE,
+  can_approve_w2l_templates BOOLEAN NOT NULL DEFAULT FALSE,
 
   can_upload_tts_models BOOLEAN NOT NULL DEFAULT FALSE,
   can_upload_w2l_templates BOOLEAN NOT NULL DEFAULT FALSE,

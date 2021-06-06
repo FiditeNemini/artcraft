@@ -1,22 +1,5 @@
-use actix_http::Error;
-use actix_http::http::header;
-use actix_web::cookie::Cookie;
-use actix_web::dev::HttpResponseBuilder;
-use actix_web::error::ResponseError;
-use actix_web::http::StatusCode;
-use actix_web::web::Path;
-use actix_web::{Responder, web, HttpResponse, error, HttpRequest, HttpMessage};
 use anyhow::anyhow;
 use crate::AnyhowResult;
-use crate::common_queries::sessions::create_session_for_user;
-use crate::http_server::endpoints::users::create_account::CreateAccountError::{BadInput, ServerError, UsernameTaken, EmailTaken};
-use crate::http_server::endpoints::users::login::LoginSuccessResponse;
-use crate::http_server::web_utils::ip_address::get_request_ip;
-use crate::http_server::web_utils::session_checker::SessionRecord;
-use crate::server_state::ServerState;
-use crate::util::random_crockford_token::random_crockford_token;
-use crate::validations::passwords::validate_passwords;
-use crate::validations::username::validate_username;
 use derive_more::{Display, Error};
 use log::{info, warn, log};
 use regex::Regex;
@@ -28,10 +11,10 @@ use std::sync::Arc;
 use chrono::{DateTime, Utc};
 use md5::{Md5, Digest};
 
-// TODO: This is duplicated in query_user_profile
+// TODO: This duplicates the get_profile_handler.
 
 #[derive(Serialize)]
-pub struct UserProfileRecord {
+pub struct RawUserProfileRecord {
   pub user_token: String,
   pub username: String,
   pub email_gravatar_hash: String,
@@ -78,69 +61,13 @@ pub struct UserProfileRecordForResponse {
   pub created_at: DateTime<Utc>,
 }
 
-#[derive(Serialize)]
-pub struct ProfileSuccessResponse {
-  pub success: bool,
-  pub user: Option<UserProfileRecordForResponse>,
-}
-
-#[derive(Serialize)]
-pub struct ErrorResponse {
-  pub success: bool,
-  pub error_reason: String,
-}
-
-#[derive(Debug, Display)]
-pub enum ProfileError {
-  ServerError,
-  NotFound,
-}
-
-/// For the URL PathInfo
-#[derive(Deserialize)]
-pub struct GetProfilePathInfo {
-  username: String,
-}
-
-impl ResponseError for ProfileError {
-  fn status_code(&self) -> StatusCode {
-    match *self {
-      ProfileError::ServerError=> StatusCode::INTERNAL_SERVER_ERROR,
-      ProfileError::NotFound => StatusCode::NOT_FOUND,
-    }
-  }
-
-  fn error_response(&self) -> HttpResponse {
-    let error_reason = match self {
-      ProfileError::ServerError => "server error".to_string(),
-      ProfileError::NotFound => "not found error".to_string(),
-    };
-
-    let response = ErrorResponse {
-      success: false,
-      error_reason,
-    };
-
-    let body = match serde_json::to_string(&response) {
-      Ok(json) => json,
-      Err(_) => "{}".to_string(),
-    };
-
-    HttpResponseBuilder::new(self.status_code())
-      .set_header(header::CONTENT_TYPE, "application/json")
-      .body(body)
-  }
-}
-
-pub async fn get_profile_handler(
-  http_request: HttpRequest,
-  path: Path<GetProfilePathInfo>,
-  server_state: web::Data<Arc<ServerState>>) -> Result<HttpResponse, ProfileError>
-{
+pub async fn select_user_profile_by_username(
+  username: &str,
+  mysql_pool: &MySqlPool
+) -> AnyhowResult<UserProfileRecordForResponse> {
   // NB: Lookup failure is Err(RowNotFound).
-  // NB: Since this is publicly exposed, we don't query sensitive data.
   let maybe_profile_record = sqlx::query_as!(
-      UserProfileRecord,
+      RawUserProfileRecord,
         r#"
 SELECT
     users.token as user_token,
@@ -165,22 +92,22 @@ FROM users
 WHERE users.username = ?
 AND users.deleted_at IS NULL
         "#,
-        &path.username,
+        username,
     )
-    .fetch_one(&server_state.mysql_pool)
-    .await; // TODO: This will return error if it doesn't exist
+      .fetch_one(mysql_pool)
+      .await; // TODO: This will return error if it doesn't exist
 
-  let profile_record : UserProfileRecord = match maybe_profile_record {
+  let profile_record : RawUserProfileRecord = match maybe_profile_record {
     Ok(profile_record) => profile_record,
     Err(err) => {
       match err {
         RowNotFound => {
           warn!("Invalid user");
-          return Err(ProfileError::NotFound);
+          return Err(anyhow!("could not find user"));
         },
         _ => {
           warn!("User profile query error: {:?}", err);
-          return Err(ProfileError::ServerError);
+          return Err(anyhow!("query error"));
         }
       }
     }
@@ -207,15 +134,5 @@ AND users.deleted_at IS NULL
     created_at: profile_record.created_at.clone(),
   };
 
-  let response = ProfileSuccessResponse {
-    success: true,
-    user: Some(profile_for_response),
-  };
-
-  let body = serde_json::to_string(&response)
-    .map_err(|e| ProfileError::ServerError)?;
-
-  Ok(HttpResponse::Ok()
-    .content_type("application/json")
-    .body(body))
+  Ok(profile_for_response)
 }
