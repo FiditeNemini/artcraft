@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { ApiConfig } from '../../v1/api/ApiConfig';
+import { ApiConfig } from '../../common/ApiConfig';
 import { Link } from 'react-router-dom';
 import { SessionTtsInferenceResultListFc } from '../common/SessionTtsInferenceResultsListFc';
 import { SessionWrapper } from '../../session/SessionWrapper';

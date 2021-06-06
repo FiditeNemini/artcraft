@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ApiConfig } from '../../v1/api/ApiConfig';
+import { ApiConfig } from '../../common/ApiConfig';
 import { SessionWrapper } from '../../session/SessionWrapper';
 import { useHistory, Link } from "react-router-dom";
 import { v1 as uuidv1 } from 'uuid';

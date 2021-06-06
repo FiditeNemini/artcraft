@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { ApiConfig } from '../../v1/api/ApiConfig';
+import { ApiConfig } from '../../common/ApiConfig';
 import { GravatarFc } from '../common/GravatarFc';
 import { SessionWrapper } from '../../session/SessionWrapper';
 import { useParams, Link } from 'react-router-dom';

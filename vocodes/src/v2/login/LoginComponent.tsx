@@ -1,5 +1,5 @@
 import React from 'react';
-import { ApiConfig } from '../../v1/api/ApiConfig';
+import { ApiConfig } from '../../common/ApiConfig';
 import { useHistory, withRouter } from "react-router-dom";
 import { History } from 'history'
 import { SessionWrapper } from '../../session/SessionWrapper';

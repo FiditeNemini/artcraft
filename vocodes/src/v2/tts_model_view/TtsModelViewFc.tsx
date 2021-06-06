@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
 //import axios from 'axios';
-import { ApiConfig } from '../../v1/api/ApiConfig';
+import { ApiConfig } from '../../common/ApiConfig';
 import { EnqueueJobResponsePayload } from '../tts_model_list/TtsModelFormFc';
 import { SessionTtsInferenceResultListFc } from '../common/SessionTtsInferenceResultsListFc';
 import { SessionWrapper } from '../../session/SessionWrapper';

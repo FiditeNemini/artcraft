@@ -2,7 +2,7 @@ import 'bulma/css/bulma.css'
 import './App.scss';
 
 import React from 'react';
-import { ApiConfig } from './v1/api/ApiConfig';
+import { ApiConfig } from './common/ApiConfig';
 import { BrowserRouter, Route, Switch } from "react-router-dom";
 import { MigrationTopNav } from './migration/MigrationTopNav';
 import { NewVocodesContainer } from './v2/NewVocodesContainer';

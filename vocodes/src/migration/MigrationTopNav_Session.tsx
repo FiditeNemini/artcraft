@@ -1,7 +1,7 @@
 import React from 'react';
 import { SessionWrapper } from '../session/SessionWrapper';
 import { Link, useHistory } from 'react-router-dom';
-import { ApiConfig } from '../v1/api/ApiConfig';
+import { ApiConfig } from '../common/ApiConfig';
 
 interface Props {
   sessionWrapper: SessionWrapper,

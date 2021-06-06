@@ -15,7 +15,7 @@ import { VideoJob, VideoJobStatus } from './modes/video/VideoJob';
 import { VideoJobPoller } from './modes/video/VideoJobPoller';
 import { VideoQueuePoller } from './modes/video/VideoQueuePoller';
 import { VideoQueueStats } from './modes/video/VideoQueueStats';
-import { ApiConfig } from './api/ApiConfig';
+import { ApiConfig } from '../common/ApiConfig';
 import { SessionStateResponse } from './api/SessionState';
 
 interface Props {

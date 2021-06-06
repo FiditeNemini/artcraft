@@ -1,5 +1,5 @@
 import React from 'react';
-import { ApiConfig } from '../../v1/api/ApiConfig';
+import { ApiConfig } from '../../common/ApiConfig';
 import { Mode } from '../../AppMode';
 import { SessionWrapper } from '../../session/SessionWrapper';
 
