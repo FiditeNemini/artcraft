@@ -49,6 +49,8 @@ pub struct UserProfileRecord {
   pub twitter_username: Option<String>,
   pub patreon_username: Option<String>,
   pub github_username: Option<String>,
+  pub cashapp_username: Option<String>,
+  pub website_url: Option<String>,
   pub created_at: DateTime<Utc>,
 }
 
@@ -75,6 +77,8 @@ pub struct UserProfileRecordForResponse {
   pub twitter_username: Option<String>,
   pub patreon_username: Option<String>,
   pub github_username: Option<String>,
+  pub cashapp_username: Option<String>,
+  pub website_url: Option<String>,
   pub created_at: DateTime<Utc>,
 }
 
@@ -160,6 +164,8 @@ SELECT
     twitter_username,
     patreon_username,
     github_username,
+    cashapp_username,
+    website_url,
     created_at
 FROM users
 WHERE users.username = ?
@@ -204,6 +210,8 @@ AND users.deleted_at IS NULL
     twitter_username: profile_record.twitter_username.clone(),
     patreon_username: profile_record.patreon_username.clone(),
     github_username: profile_record.github_username.clone(),
+    cashapp_username: profile_record.cashapp_username.clone(),
+    website_url: profile_record.website_url.clone(),
     created_at: profile_record.created_at.clone(),
   };
 
