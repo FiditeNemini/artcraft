@@ -500,6 +500,16 @@
       "nullable": []
     }
   },
+  "22a52ac04d4a53d48d5134fc929d39d8b13617bf62a2267be7bde0ac54ec38e2": {
+    "query": "\nUPDATE w2l_templates\nSET\n  deleted_at = NULL,\n  maybe_mod_user_token = ?\nWHERE\n  token = ?\nLIMIT 1\n        ",
+    "describe": {
+      "columns": [],
+      "parameters": {
+        "Right": 2
+      },
+      "nullable": []
+    }
+  },
   "2537264be5f06db65bb9faa4b1a3e3fe97a18e8247d85cb8b10ea6f3b72b942b": {
     "query": "\nSELECT\n    w2l.token as template_token,\n    w2l.template_type,\n    w2l.creator_user_token,\n    users.username as creator_username,\n    users.display_name as creator_display_name,\n    w2l.updatable_slug,\n    w2l.title,\n    w2l.frame_width,\n    w2l.frame_height,\n    w2l.duration_millis,\n    w2l.maybe_public_bucket_preview_image_object_name,\n    w2l.maybe_public_bucket_preview_video_object_name,\n    w2l.is_mod_public_listing_approved,\n    w2l.created_at,\n    w2l.updated_at\nFROM w2l_templates as w2l\nJOIN users\nON\n    users.token = w2l.creator_user_token\nWHERE\n    w2l.deleted_at IS NULL\n    AND users.username = ?\n        ",
     "describe": {
@@ -1021,6 +1031,395 @@
       "nullable": []
     }
   },
+  "2cebfec1341bb1066357b77440f36b3b7b7d292c64354912f21f7af6975de6fa": {
+    "query": "\nSELECT\n    users.token as user_token,\n    users.username,\n    users.display_name,\n\n    users.email_address,\n    users.email_confirmed,\n    users.email_gravatar_hash,\n    users.avatar_public_bucket_hash,\n\n    users.dark_mode_preference,\n    users.disable_gravatar,\n    users.hide_results_preference,\n    users.auto_play_audio_preference,\n    users.auto_play_video_preference,\n    users.maybe_preferred_tts_model_token,\n    users.maybe_preferred_w2l_template_token,\n\n    users.user_role_slug,\n    users.banned,\n\n    user_roles.can_use_tts,\n    user_roles.can_use_w2l,\n\n    user_roles.can_upload_tts_models,\n    user_roles.can_upload_w2l_templates,\n    user_roles.can_delete_own_tts_models,\n    user_roles.can_delete_own_w2l_templates,\n\n    user_roles.can_approve_w2l_templates,\n    user_roles.can_edit_other_users_profiles,\n    user_roles.can_edit_other_users_tts_models,\n    user_roles.can_edit_other_users_w2l_templates,\n    user_roles.can_delete_other_users_tts_models,\n    user_roles.can_delete_other_users_w2l_templates,\n    user_roles.can_ban_users\n\nFROM users\nLEFT OUTER JOIN user_sessions\n    ON users.token = user_sessions.user_token\nLEFT OUTER JOIN user_roles\n    ON users.user_role_slug = user_roles.slug\nWHERE user_sessions.token = ?\n    AND user_sessions.deleted_at IS NULL\n    AND users.deleted_at IS NULL\n        ",
+    "describe": {
+      "columns": [
+        {
+          "ordinal": 0,
+          "name": "user_token",
+          "type_info": {
+            "type": "VarString",
+            "flags": {
+              "bits": 4229
+            },
+            "char_set": 224,
+            "max_size": 128
+          }
+        },
+        {
+          "ordinal": 1,
+          "name": "username",
+          "type_info": {
+            "type": "VarString",
+            "flags": {
+              "bits": 4229
+            },
+            "char_set": 224,
+            "max_size": 80
+          }
+        },
+        {
+          "ordinal": 2,
+          "name": "display_name",
+          "type_info": {
+            "type": "VarString",
+            "flags": {
+              "bits": 4225
+            },
+            "char_set": 224,
+            "max_size": 80
+          }
+        },
+        {
+          "ordinal": 3,
+          "name": "email_address",
+          "type_info": {
+            "type": "VarString",
+            "flags": {
+              "bits": 4229
+            },
+            "char_set": 224,
+            "max_size": 1020
+          }
+        },
+        {
+          "ordinal": 4,
+          "name": "email_confirmed",
+          "type_info": {
+            "type": "Tiny",
+            "flags": {
+              "bits": 1
+            },
+            "char_set": 63,
+            "max_size": 1
+          }
+        },
+        {
+          "ordinal": 5,
+          "name": "email_gravatar_hash",
+          "type_info": {
+            "type": "String",
+            "flags": {
+              "bits": 4225
+            },
+            "char_set": 224,
+            "max_size": 128
+          }
+        },
+        {
+          "ordinal": 6,
+          "name": "avatar_public_bucket_hash",
+          "type_info": {
+            "type": "String",
+            "flags": {
+              "bits": 128
+            },
+            "char_set": 224,
+            "max_size": 128
+          }
+        },
+        {
+          "ordinal": 7,
+          "name": "dark_mode_preference",
+          "type_info": {
+            "type": "String",
+            "flags": {
+              "bits": 385
+            },
+            "char_set": 224,
+            "max_size": 40
+          }
+        },
+        {
+          "ordinal": 8,
+          "name": "disable_gravatar",
+          "type_info": {
+            "type": "Tiny",
+            "flags": {
+              "bits": 1
+            },
+            "char_set": 63,
+            "max_size": 1
+          }
+        },
+        {
+          "ordinal": 9,
+          "name": "hide_results_preference",
+          "type_info": {
+            "type": "Tiny",
+            "flags": {
+              "bits": 1
+            },
+            "char_set": 63,
+            "max_size": 1
+          }
+        },
+        {
+          "ordinal": 10,
+          "name": "auto_play_audio_preference",
+          "type_info": {
+            "type": "Tiny",
+            "flags": {
+              "bits": 1
+            },
+            "char_set": 63,
+            "max_size": 1
+          }
+        },
+        {
+          "ordinal": 11,
+          "name": "auto_play_video_preference",
+          "type_info": {
+            "type": "Tiny",
+            "flags": {
+              "bits": 1
+            },
+            "char_set": 63,
+            "max_size": 1
+          }
+        },
+        {
+          "ordinal": 12,
+          "name": "maybe_preferred_tts_model_token",
+          "type_info": {
+            "type": "VarString",
+            "flags": {
+              "bits": 128
+            },
+            "char_set": 224,
+            "max_size": 128
+          }
+        },
+        {
+          "ordinal": 13,
+          "name": "maybe_preferred_w2l_template_token",
+          "type_info": {
+            "type": "VarString",
+            "flags": {
+              "bits": 128
+            },
+            "char_set": 224,
+            "max_size": 128
+          }
+        },
+        {
+          "ordinal": 14,
+          "name": "user_role_slug",
+          "type_info": {
+            "type": "VarString",
+            "flags": {
+              "bits": 4233
+            },
+            "char_set": 224,
+            "max_size": 64
+          }
+        },
+        {
+          "ordinal": 15,
+          "name": "banned",
+          "type_info": {
+            "type": "Tiny",
+            "flags": {
+              "bits": 1
+            },
+            "char_set": 63,
+            "max_size": 1
+          }
+        },
+        {
+          "ordinal": 16,
+          "name": "can_use_tts",
+          "type_info": {
+            "type": "Tiny",
+            "flags": {
+              "bits": 0
+            },
+            "char_set": 63,
+            "max_size": 1
+          }
+        },
+        {
+          "ordinal": 17,
+          "name": "can_use_w2l",
+          "type_info": {
+            "type": "Tiny",
+            "flags": {
+              "bits": 0
+            },
+            "char_set": 63,
+            "max_size": 1
+          }
+        },
+        {
+          "ordinal": 18,
+          "name": "can_upload_tts_models",
+          "type_info": {
+            "type": "Tiny",
+            "flags": {
+              "bits": 0
+            },
+            "char_set": 63,
+            "max_size": 1
+          }
+        },
+        {
+          "ordinal": 19,
+          "name": "can_upload_w2l_templates",
+          "type_info": {
+            "type": "Tiny",
+            "flags": {
+              "bits": 0
+            },
+            "char_set": 63,
+            "max_size": 1
+          }
+        },
+        {
+          "ordinal": 20,
+          "name": "can_delete_own_tts_models",
+          "type_info": {
+            "type": "Tiny",
+            "flags": {
+              "bits": 0
+            },
+            "char_set": 63,
+            "max_size": 1
+          }
+        },
+        {
+          "ordinal": 21,
+          "name": "can_delete_own_w2l_templates",
+          "type_info": {
+            "type": "Tiny",
+            "flags": {
+              "bits": 0
+            },
+            "char_set": 63,
+            "max_size": 1
+          }
+        },
+        {
+          "ordinal": 22,
+          "name": "can_approve_w2l_templates",
+          "type_info": {
+            "type": "Tiny",
+            "flags": {
+              "bits": 0
+            },
+            "char_set": 63,
+            "max_size": 1
+          }
+        },
+        {
+          "ordinal": 23,
+          "name": "can_edit_other_users_profiles",
+          "type_info": {
+            "type": "Tiny",
+            "flags": {
+              "bits": 0
+            },
+            "char_set": 63,
+            "max_size": 1
+          }
+        },
+        {
+          "ordinal": 24,
+          "name": "can_edit_other_users_tts_models",
+          "type_info": {
+            "type": "Tiny",
+            "flags": {
+              "bits": 0
+            },
+            "char_set": 63,
+            "max_size": 1
+          }
+        },
+        {
+          "ordinal": 25,
+          "name": "can_edit_other_users_w2l_templates",
+          "type_info": {
+            "type": "Tiny",
+            "flags": {
+              "bits": 0
+            },
+            "char_set": 63,
+            "max_size": 1
+          }
+        },
+        {
+          "ordinal": 26,
+          "name": "can_delete_other_users_tts_models",
+          "type_info": {
+            "type": "Tiny",
+            "flags": {
+              "bits": 0
+            },
+            "char_set": 63,
+            "max_size": 1
+          }
+        },
+        {
+          "ordinal": 27,
+          "name": "can_delete_other_users_w2l_templates",
+          "type_info": {
+            "type": "Tiny",
+            "flags": {
+              "bits": 0
+            },
+            "char_set": 63,
+            "max_size": 1
+          }
+        },
+        {
+          "ordinal": 28,
+          "name": "can_ban_users",
+          "type_info": {
+            "type": "Tiny",
+            "flags": {
+              "bits": 0
+            },
+            "char_set": 63,
+            "max_size": 1
+          }
+        }
+      ],
+      "parameters": {
+        "Right": 1
+      },
+      "nullable": [
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        true,
+        false,
+        false,
+        false,
+        false,
+        false,
+        true,
+        true,
+        false,
+        false,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true
+      ]
+    }
+  },
   "34364f9bc851971f8291f5f9942dd23d10718ccb210a93a236d96d0591f65f35": {
     "query": "\nINSERT INTO users (\n  token,\n  username,\n  display_name,\n  email_address,\n  email_gravatar_hash,\n  profile_markdown,\n  profile_rendered_html,\n  user_role_slug,\n  password_hash,\n  ip_address_creation,\n  ip_address_last_login,\n  ip_address_last_update\n)\nVALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? )\n        ",
     "describe": {
@@ -1526,317 +1925,6 @@
         true,
         false,
         false
-      ]
-    }
-  },
-  "420adb2abc58bde084116a82f1e96d4394a6faf51e591b5ab4d560df0d547ff9": {
-    "query": "\nSELECT\n    users.token as user_token,\n    users.username,\n    users.display_name,\n\n    users.email_address,\n    users.email_confirmed,\n    users.email_gravatar_hash,\n    users.avatar_public_bucket_hash,\n\n    users.dark_mode_preference,\n    users.disable_gravatar,\n    users.hide_results_preference,\n    users.auto_play_audio_preference,\n    users.auto_play_video_preference,\n    users.maybe_preferred_tts_model_token,\n    users.maybe_preferred_w2l_template_token,\n\n    users.user_role_slug,\n    users.banned,\n\n    user_roles.can_ban_users,\n    user_roles.can_edit_other_users_data,\n    user_roles.can_approve_w2l_templates,\n\n    user_roles.can_upload_tts_models,\n    user_roles.can_upload_w2l_templates,\n\n    user_roles.can_use_tts,\n    user_roles.can_use_w2l\n\nFROM users\nLEFT OUTER JOIN user_sessions\n    ON users.token = user_sessions.user_token\nLEFT OUTER JOIN user_roles\n    ON users.user_role_slug = user_roles.slug\nWHERE user_sessions.token = ?\n    AND user_sessions.deleted_at IS NULL\n    AND users.deleted_at IS NULL\n        ",
-    "describe": {
-      "columns": [
-        {
-          "ordinal": 0,
-          "name": "user_token",
-          "type_info": {
-            "type": "VarString",
-            "flags": {
-              "bits": 4229
-            },
-            "char_set": 224,
-            "max_size": 128
-          }
-        },
-        {
-          "ordinal": 1,
-          "name": "username",
-          "type_info": {
-            "type": "VarString",
-            "flags": {
-              "bits": 4229
-            },
-            "char_set": 224,
-            "max_size": 80
-          }
-        },
-        {
-          "ordinal": 2,
-          "name": "display_name",
-          "type_info": {
-            "type": "VarString",
-            "flags": {
-              "bits": 4225
-            },
-            "char_set": 224,
-            "max_size": 80
-          }
-        },
-        {
-          "ordinal": 3,
-          "name": "email_address",
-          "type_info": {
-            "type": "VarString",
-            "flags": {
-              "bits": 4229
-            },
-            "char_set": 224,
-            "max_size": 1020
-          }
-        },
-        {
-          "ordinal": 4,
-          "name": "email_confirmed",
-          "type_info": {
-            "type": "Tiny",
-            "flags": {
-              "bits": 1
-            },
-            "char_set": 63,
-            "max_size": 1
-          }
-        },
-        {
-          "ordinal": 5,
-          "name": "email_gravatar_hash",
-          "type_info": {
-            "type": "String",
-            "flags": {
-              "bits": 4225
-            },
-            "char_set": 224,
-            "max_size": 128
-          }
-        },
-        {
-          "ordinal": 6,
-          "name": "avatar_public_bucket_hash",
-          "type_info": {
-            "type": "String",
-            "flags": {
-              "bits": 128
-            },
-            "char_set": 224,
-            "max_size": 128
-          }
-        },
-        {
-          "ordinal": 7,
-          "name": "dark_mode_preference",
-          "type_info": {
-            "type": "String",
-            "flags": {
-              "bits": 385
-            },
-            "char_set": 224,
-            "max_size": 40
-          }
-        },
-        {
-          "ordinal": 8,
-          "name": "disable_gravatar",
-          "type_info": {
-            "type": "Tiny",
-            "flags": {
-              "bits": 1
-            },
-            "char_set": 63,
-            "max_size": 1
-          }
-        },
-        {
-          "ordinal": 9,
-          "name": "hide_results_preference",
-          "type_info": {
-            "type": "Tiny",
-            "flags": {
-              "bits": 1
-            },
-            "char_set": 63,
-            "max_size": 1
-          }
-        },
-        {
-          "ordinal": 10,
-          "name": "auto_play_audio_preference",
-          "type_info": {
-            "type": "Tiny",
-            "flags": {
-              "bits": 1
-            },
-            "char_set": 63,
-            "max_size": 1
-          }
-        },
-        {
-          "ordinal": 11,
-          "name": "auto_play_video_preference",
-          "type_info": {
-            "type": "Tiny",
-            "flags": {
-              "bits": 1
-            },
-            "char_set": 63,
-            "max_size": 1
-          }
-        },
-        {
-          "ordinal": 12,
-          "name": "maybe_preferred_tts_model_token",
-          "type_info": {
-            "type": "VarString",
-            "flags": {
-              "bits": 128
-            },
-            "char_set": 224,
-            "max_size": 128
-          }
-        },
-        {
-          "ordinal": 13,
-          "name": "maybe_preferred_w2l_template_token",
-          "type_info": {
-            "type": "VarString",
-            "flags": {
-              "bits": 128
-            },
-            "char_set": 224,
-            "max_size": 128
-          }
-        },
-        {
-          "ordinal": 14,
-          "name": "user_role_slug",
-          "type_info": {
-            "type": "VarString",
-            "flags": {
-              "bits": 4233
-            },
-            "char_set": 224,
-            "max_size": 64
-          }
-        },
-        {
-          "ordinal": 15,
-          "name": "banned",
-          "type_info": {
-            "type": "Tiny",
-            "flags": {
-              "bits": 1
-            },
-            "char_set": 63,
-            "max_size": 1
-          }
-        },
-        {
-          "ordinal": 16,
-          "name": "can_ban_users",
-          "type_info": {
-            "type": "Tiny",
-            "flags": {
-              "bits": 0
-            },
-            "char_set": 63,
-            "max_size": 1
-          }
-        },
-        {
-          "ordinal": 17,
-          "name": "can_edit_other_users_data",
-          "type_info": {
-            "type": "Tiny",
-            "flags": {
-              "bits": 0
-            },
-            "char_set": 63,
-            "max_size": 1
-          }
-        },
-        {
-          "ordinal": 18,
-          "name": "can_approve_w2l_templates",
-          "type_info": {
-            "type": "Tiny",
-            "flags": {
-              "bits": 0
-            },
-            "char_set": 63,
-            "max_size": 1
-          }
-        },
-        {
-          "ordinal": 19,
-          "name": "can_upload_tts_models",
-          "type_info": {
-            "type": "Tiny",
-            "flags": {
-              "bits": 0
-            },
-            "char_set": 63,
-            "max_size": 1
-          }
-        },
-        {
-          "ordinal": 20,
-          "name": "can_upload_w2l_templates",
-          "type_info": {
-            "type": "Tiny",
-            "flags": {
-              "bits": 0
-            },
-            "char_set": 63,
-            "max_size": 1
-          }
-        },
-        {
-          "ordinal": 21,
-          "name": "can_use_tts",
-          "type_info": {
-            "type": "Tiny",
-            "flags": {
-              "bits": 0
-            },
-            "char_set": 63,
-            "max_size": 1
-          }
-        },
-        {
-          "ordinal": 22,
-          "name": "can_use_w2l",
-          "type_info": {
-            "type": "Tiny",
-            "flags": {
-              "bits": 0
-            },
-            "char_set": 63,
-            "max_size": 1
-          }
-        }
-      ],
-      "parameters": {
-        "Right": 1
-      },
-      "nullable": [
-        false,
-        false,
-        false,
-        false,
-        false,
-        false,
-        true,
-        false,
-        false,
-        false,
-        false,
-        false,
-        true,
-        true,
-        false,
-        false,
-        true,
-        true,
-        true,
-        true,
-        true,
-        true,
-        true
       ]
     }
   },
@@ -4193,6 +4281,16 @@
         false,
         true
       ]
+    }
+  },
+  "9710f22f2579903571f71726585bb7de66b8a7fa9540b851c6ace30c51d29c69": {
+    "query": "\nUPDATE w2l_templates\nSET\n  deleted_at = CURRENT_TIMESTAMP,\n  maybe_mod_user_token = ?\nWHERE\n  token = ?\nLIMIT 1\n        ",
+    "describe": {
+      "columns": [],
+      "parameters": {
+        "Right": 2
+      },
+      "nullable": []
     }
   },
   "9c352e6fe6166ee18326908ef02dd61866d926ec63599aedf9f91a9d05d5c630": {
