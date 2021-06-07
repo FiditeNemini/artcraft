@@ -68,6 +68,7 @@ use crate::http_server::endpoints::w2l::get_w2l_inference_job_status::get_w2l_in
 use crate::http_server::endpoints::tts::get_tts_upload_model_job_status::get_tts_upload_model_job_status_handler;
 use crate::http_server::endpoints::w2l::get_w2l_upload_template_job_status::get_w2l_upload_template_job_status_handler;
 use crate::http_server::endpoints::users::edit_profile::edit_profile_handler;
+use crate::http_server::endpoints::w2l::set_w2l_template_mod_approval::set_w2l_template_mod_approval_handler;
 
 // TODO TODO TODO TODO
 // TODO TODO TODO TODO
@@ -327,6 +328,11 @@ pub async fn serve(server_state: ServerState) -> AnyhowResult<()>
           .service(
             web::resource("/template/{slug}")
               .route(web::get().to(get_w2l_template_handler))
+              .route(web::head().to(|| HttpResponse::Ok()))
+          )
+          .service(
+          web::resource("/template/{slug}/moderate")
+              .route(web::post().to(set_w2l_template_mod_approval_handler))
               .route(web::head().to(|| HttpResponse::Ok()))
           )
           .service(
