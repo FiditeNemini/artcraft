@@ -155,48 +155,92 @@ pub async fn edit_profile_handler(
     editor_is_moderator = true;
   }
 
+  // Fields to set
+  let mut twitter_username = None;
+  let mut twitch_username = None;
+  let mut discord_username = None;
+  let mut cashapp_username = None;
+  let mut github_username = None;
+  let mut website_url = None;
+  let mut profile_markdown = None;
+  let mut profile_html = None;
+
   if !editor_is_original_user && !editor_is_moderator {
     return Err(EditProfileError::NotAuthorized);
   }
 
-  if let Some(twitter_username) = request.twitter_username.as_deref() {
-    if let Err(reason) = validate_twitter_username(twitter_username) {
-      return Err(EditProfileError::BadInput(reason));
+  if let Some(twitter) = request.twitter_username.as_deref() {
+    let trimmed = twitter.trim();
+    if trimmed.is_empty() {
+      twitter_username = None;
+    } else {
+      if let Err(reason) = validate_twitter_username(trimmed) {
+        return Err(EditProfileError::BadInput(reason));
+      }
+      twitter_username = Some(trimmed);
     }
   }
 
-  if let Some(twitch_username) = request.twitch_username.as_deref() {
-    if let Err(reason) = validate_twitch_username(twitch_username) {
-      return Err(EditProfileError::BadInput(reason));
+  if let Some(twitch) = request.twitch_username.as_deref() {
+    let trimmed = twitch.trim();
+    if trimmed.is_empty() {
+      twitch_username = None;
+    } else {
+      if let Err(reason) = validate_twitch_username(trimmed) {
+        return Err(EditProfileError::BadInput(reason));
+      }
+      twitch_username = Some(trimmed);
     }
   }
 
-  if let Some(discord_username) = request.discord_username.as_deref() {
-    if let Err(reason) = validate_discord_username(discord_username) {
-      return Err(EditProfileError::BadInput(reason));
+  if let Some(discord) = request.discord_username.as_deref() {
+    let trimmed = discord.trim();
+    if trimmed.is_empty() {
+      discord_username = None;
+    } else {
+      if let Err(reason) = validate_discord_username(trimmed) {
+        return Err(EditProfileError::BadInput(reason));
+      }
+      discord_username = Some(trimmed);
     }
   }
 
-  if let Some(github_username) = request.github_username.as_deref() {
-    if let Err(reason) = validate_github_username(github_username) {
-      return Err(EditProfileError::BadInput(reason));
+  if let Some(github) = request.github_username.as_deref() {
+    let trimmed = github.trim();
+    if trimmed.is_empty() {
+      github_username = None;
+    } else {
+      if let Err(reason) = validate_github_username(trimmed) {
+        return Err(EditProfileError::BadInput(reason));
+      }
+      github_username = Some(trimmed);
     }
   }
 
-  if let Some(cashapp_username) = request.cashapp_username.as_deref() {
-    if let Err(reason) = validate_cashapp_username(cashapp_username) {
-      return Err(EditProfileError::BadInput(reason));
+  if let Some(cashapp) = request.cashapp_username.as_deref() {
+    let trimmed = cashapp.trim();
+    if trimmed.is_empty() {
+      cashapp_username = None;
+    } else {
+      if let Err(reason) = validate_cashapp_username(trimmed) {
+        return Err(EditProfileError::BadInput(reason));
+      }
+      cashapp_username = Some(trimmed);
     }
   }
 
-  if let Some(website_url) = request.website_url.as_deref() {
-    if let Err(reason) = validate_website_url(website_url) {
-      return Err(EditProfileError::BadInput(reason));
+  if let Some(website) = request.website_url.as_deref() {
+    let trimmed = website.trim();
+    if trimmed.is_empty() {
+      website_url = None;
+    } else {
+      if let Err(reason) = validate_website_url(trimmed) {
+        return Err(EditProfileError::BadInput(reason));
+      }
+      website_url = Some(trimmed);
     }
   }
 
-  let mut profile_markdown = None;
-  let mut profile_html = None;
 
   if let Some(markdown) = request.profile_markdown.as_deref() {
     if contains_slurs(markdown) {
@@ -234,12 +278,12 @@ LIMIT 1
         "#,
       profile_markdown,
       profile_html,
-      request.discord_username.clone(),
-      request.twitter_username.clone(),
-      request.twitch_username.clone(),
-      request.github_username.clone(),
-      request.cashapp_username.clone(),
-      request.website_url.clone(),
+      discord_username,
+      twitter_username,
+      twitch_username,
+      github_username,
+      cashapp_username,
+      website_url,
       ip_address.clone(),
       user_record.user_token.clone(),
     )
