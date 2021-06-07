@@ -25,6 +25,7 @@ interface W2lTemplate {
   duration_millis: number,
   maybe_image_object_name: string,
   maybe_video_object_name: string,
+  is_mod_approved: boolean | null,
   created_at: string,
   updated_at: string,
 }
@@ -82,7 +83,7 @@ function W2lTemplateViewFc(props: Props) {
     setAudioFile(file);
   };
 
-  const handleFormSubmit = (ev: React.FormEvent<HTMLFormElement>) : boolean => {
+  const handleInferenceFormSubmit = (ev: React.FormEvent<HTMLFormElement>) : boolean => {
     ev.preventDefault();
 
     if (audioFile === undefined) {
@@ -121,6 +122,11 @@ function W2lTemplateViewFc(props: Props) {
     return false;
   };
 
+  const handleModApprovalFormSubmit = (ev: React.FormEvent<HTMLFormElement>) : boolean => {
+    ev.preventDefault();
+    return false;
+  }
+
 
   let creatorLink=`/profile/${w2lTemplate?.creator_username}`;
   let object : string|undefined = undefined;
@@ -139,6 +145,51 @@ function W2lTemplateViewFc(props: Props) {
     audioFilename = audioFile?.name;
   }
 
+  let modApprovalStatus = '';
+  let defaultModValue = 'true';
+
+  switch (w2lTemplate?.is_mod_approved) {
+    case null:
+      modApprovalStatus = 'Not yet seen (ask for approval in our Discord)';
+      break;
+    case true:
+      modApprovalStatus = 'Approved';
+      break;
+    case false:
+      modApprovalStatus = 'Not Approved';
+      defaultModValue = 'false';
+      break;
+  }
+
+  let modOnlyApprovalForm = <span />;
+
+  if (props.sessionWrapper.canApproveW2lTemplates()) {
+    modOnlyApprovalForm = (
+      <form onSubmit={handleModApprovalFormSubmit}>
+        <label className="label">Mod Approval (sets public list visibility)</label>
+
+        <div className="field is-grouped">
+          <div className="control">
+
+            <div className="select is-info is-large">
+              <select name="approve" defaultValue={defaultModValue}>
+                <option value="true">Approve</option>
+                <option value="false">Disapprove</option>
+              </select>
+            </div>
+          </div>
+
+          <p className="control">
+            <button className="button is-info is-large">
+              Cancel
+            </button>
+          </p>
+
+        </div>
+      </form>
+    );
+  }
+
   return (
     <div>
       <h1 className="title is-1"> Video lip sync template </h1>
@@ -151,7 +202,7 @@ function W2lTemplateViewFc(props: Props) {
         </p>
       </div>
 
-      <form onSubmit={handleFormSubmit}>
+      <form onSubmit={handleInferenceFormSubmit}>
 
         <div className="upload-box">
           <div className="file has-name is-large">
@@ -206,6 +257,10 @@ function W2lTemplateViewFc(props: Props) {
             <td>{w2lTemplate?.title}</td>
           </tr>
           <tr>
+            <th>Is Moderator Approved?</th>
+            <td>{modApprovalStatus}</td>
+          </tr>
+          <tr>
             <th>Media Type</th>
             <td>{w2lTemplate?.template_type}</td>
           </tr>
@@ -219,6 +274,8 @@ function W2lTemplateViewFc(props: Props) {
           </tr>
         </tbody>
       </table>
+
+      {modOnlyApprovalForm}
 
       <SessionW2lInferenceResultListFc w2lInferenceJobs={props.w2lInferenceJobs} />
       <br />
