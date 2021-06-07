@@ -12,8 +12,6 @@ use sqlx::error::Error::Database;
 use sqlx::mysql::MySqlDatabaseError;
 use std::sync::Arc;
 
-// TODO: This duplicates the get_w2l_template_handler.
-
 #[derive(Serialize)]
 pub struct W2lTemplateRecordForResponse {
   pub template_token: String,
@@ -55,7 +53,6 @@ pub struct W2lTemplateRecordRaw {
   pub updated_at: DateTime<Utc>,
   pub deleted_at: Option<DateTime<Utc>>,
 }
-
 
 pub async fn select_w2l_template_by_token(
   w2l_template_token: &str,
