@@ -1,6 +1,7 @@
 import React from 'react';
 import { ApiConfig } from '../../common/ApiConfig';
 import { SessionWrapper } from '../../session/SessionWrapper';
+import { useHistory } from 'react-router-dom';
 
 interface Props {
   sessionWrapper: SessionWrapper,
@@ -9,6 +10,7 @@ interface Props {
 }
 
 function W2lTemplateViewDeleteFc(props: Props) {
+  const history = useHistory();
 
   const handleDeleteFormSubmit = (ev: React.FormEvent<HTMLFormElement>) : boolean => {
     ev.preventDefault();
