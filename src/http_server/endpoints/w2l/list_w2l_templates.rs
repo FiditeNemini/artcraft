@@ -75,11 +75,14 @@ pub async fn list_w2l_templates_handler(
   http_request: HttpRequest,
   server_state: web::Data<Arc<ServerState>>) -> Result<HttpResponse, ListW2lTemplatesError>
 {
-  let scope_creator = None;
+  let no_scope_creator = None;
+
+  // TODO(bt): Ideally we show users their own W2L templates here before they're mod approved.
+
   let query_results = list_w2l_templates(
     &server_state.mysql_pool,
-    scope_creator,
-    false,
+    no_scope_creator,
+    true,
   ).await;
 
   let templates = match query_results {

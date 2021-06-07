@@ -98,7 +98,8 @@ pub async fn get_w2l_template_handler(
 
   if let Some(user_session) = maybe_user_session {
     // NB: Moderators can see deleted templates.
-    show_deleted_templates = user_session.can_approve_w2l_templates;
+    // Original creators cannot see them (unless they're moderators!)
+    show_deleted_templates = user_session.can_delete_other_users_w2l_templates;
   }
 
   let template_query_result = select_w2l_template_by_token(
