@@ -51,51 +51,30 @@ export class SessionWrapper {
   }
 
   public canUseTts() : boolean {
-    if (this.sessionStateResponse === undefined || this.sessionStateResponse.user === undefined) {
-      return true; // NB: Default true.
-    }
-    return this.sessionStateResponse.user.can_use_tts;
+    return this.sessionStateResponse?.user?.can_use_tts || true; // NB: Default true.
   }
 
   public canUseW2l() : boolean {
-    if (this.sessionStateResponse === undefined || this.sessionStateResponse.user === undefined) {
-      return true; // NB: Default true.
-    }
-    return this.sessionStateResponse.user.can_use_w2l;
+    return this.sessionStateResponse?.user?.can_use_w2l || true; // NB: Default true
   }
 
   public canUploadTtsModels() : boolean {
-    if (this.sessionStateResponse === undefined || this.sessionStateResponse.user === undefined) {
-      return false;
-    }
-    return this.sessionStateResponse.user.can_upload_tts_models;
+    return this.sessionStateResponse?.user?.can_upload_tts_models || false;
   }
 
   public canUploadW2lTemplates() : boolean {
-    if (this.sessionStateResponse === undefined || this.sessionStateResponse.user === undefined) {
-      return false;
-    }
-    return this.sessionStateResponse.user.can_upload_w2l_templates;
+    return this.sessionStateResponse?.user?.can_upload_w2l_templates || false;
   }
 
   public canBanUsers() : boolean {
-    if (this.sessionStateResponse === undefined || this.sessionStateResponse.user === undefined) {
-      return false;
-    }
-    return this.sessionStateResponse.user.can_ban_users;
+    return this.sessionStateResponse?.user?.can_ban_users || false;
   }
 
   public canEditOtherUsersData() : boolean {
-    if (this.sessionStateResponse === undefined || this.sessionStateResponse.user === undefined) {
-      return false;
-    }
-    return this.sessionStateResponse.user.can_edit_other_users_data;
+    return this.sessionStateResponse?.user?.can_edit_other_users_data || false;
   }
 
   public canApproveW2lTemplates() : boolean {
-    if (this.sessionStateResponse === undefined || this.sessionStateResponse.user === undefined) {
-      return false;
-    }
-    return this.sessionStateResponse.user.can_approve_w2l_templates;
+    return this.sessionStateResponse?.user?.can_approve_w2l_templates || false;
   }
 }

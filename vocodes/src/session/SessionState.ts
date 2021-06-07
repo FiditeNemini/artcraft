@@ -8,7 +8,7 @@ export interface SessionStateResponse {
   logged_in: boolean,
 
   // Extended user details (only if logged in)
-  user?: UserInfo,
+  user: UserInfo | undefined | null,
 }
 
 export interface UserInfo {
