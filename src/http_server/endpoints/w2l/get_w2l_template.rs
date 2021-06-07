@@ -25,6 +25,7 @@ use sqlx::error::DatabaseError;
 use sqlx::error::Error::Database;
 use sqlx::mysql::MySqlDatabaseError;
 use std::sync::Arc;
+use crate::database_helpers::boolean_converters::nullable_i8_to_optional_bool;
 
 /// For the URL PathInfo
 #[derive(Deserialize)]
@@ -46,6 +47,7 @@ pub struct W2lTemplateRecordForResponse {
   pub duration_millis: u32,
   pub maybe_image_object_name: Option<String>,
   pub maybe_video_object_name: Option<String>,
+  pub is_mod_approved: Option<bool>,
   pub created_at: DateTime<Utc>,
   pub updated_at: DateTime<Utc>,
 }
@@ -81,6 +83,7 @@ pub struct W2lTemplateRecord {
   pub duration_millis: i32,
   pub maybe_public_bucket_preview_image_object_name: Option<String>,
   pub maybe_public_bucket_preview_video_object_name: Option<String>,
+  pub is_mod_approved: Option<i8>,
   pub created_at: DateTime<Utc>,
   pub updated_at: DateTime<Utc>,
 }
@@ -136,6 +139,7 @@ SELECT
     w2l.duration_millis,
     w2l.maybe_public_bucket_preview_image_object_name,
     w2l.maybe_public_bucket_preview_video_object_name,
+    w2l.is_mod_approved,
     w2l.created_at,
     w2l.updated_at
 FROM w2l_templates as w2l
@@ -177,6 +181,7 @@ AND w2l.deleted_at IS NULL
     duration_millis: if template.duration_millis > 0 { template.duration_millis as u32 } else { 0 },
     maybe_image_object_name: template.maybe_public_bucket_preview_image_object_name.clone(),
     maybe_video_object_name: template.maybe_public_bucket_preview_video_object_name.clone(),
+    is_mod_approved: nullable_i8_to_optional_bool(template.is_mod_approved),
     created_at: template.created_at.clone(),
     updated_at: template.updated_at.clone(),
   };

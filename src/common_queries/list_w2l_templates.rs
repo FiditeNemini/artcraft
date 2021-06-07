@@ -18,7 +18,7 @@ pub struct W2lTemplateRecordForList {
   pub duration_millis: u32,
   pub maybe_image_object_name: Option<String>,
   pub maybe_video_object_name: Option<String>,
-  pub is_mod_approved: bool, // converted
+  pub is_mod_approved: Option<bool>, // converted
   pub created_at: DateTime<Utc>,
   pub updated_at: DateTime<Utc>,
 }
@@ -36,7 +36,7 @@ struct RawW2lTemplateRecordForList {
   pub duration_millis: i32,
   pub maybe_public_bucket_preview_image_object_name: Option<String>,
   pub maybe_public_bucket_preview_video_object_name: Option<String>,
-  pub is_mod_approved: i8, // NB: needs conversion
+  pub is_mod_approved: Option<i8>, // NB: needs conversion
   pub created_at: DateTime<Utc>,
   pub updated_at: DateTime<Utc>,
 }
@@ -93,7 +93,7 @@ pub async fn list_w2l_templates(
         duration_millis: if template.duration_millis > 0 { template.duration_millis as u32 } else { 0 },
         maybe_image_object_name: template.maybe_public_bucket_preview_image_object_name.clone(),
         maybe_video_object_name: template.maybe_public_bucket_preview_video_object_name.clone(),
-        is_mod_approved: if template.is_mod_approved == 0 { false } else { true },
+        is_mod_approved: template.is_mod_approved.map(|v| if v == 0 { false } else { true }),
         created_at: template.created_at.clone(),
         updated_at: template.updated_at.clone(),
       }
