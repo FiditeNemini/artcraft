@@ -125,20 +125,15 @@ class App extends React.Component<Props, State> {
   }
 
   enqueueTtsJob = (jobToken: string) => {
-    console.log('enqueueTtsJob()')
     if (!this.state.enableAlpha) {
-      console.log('enqueueTtsJob() disabled!')
       return;
     }
     const newJob = new TtsInferenceJob(jobToken);
     let inferenceJobs = this.state.ttsInferenceJobs.concat([newJob]);
 
-      console.log('setting state!!')
     this.setState({
       ttsInferenceJobs: inferenceJobs
     })
-
-    console.log('inference jobs:', inferenceJobs.length);
   }
 
   checkTtsJob = (jobToken: string) => {
@@ -164,18 +159,13 @@ class App extends React.Component<Props, State> {
         return;
       }
 
-      console.log('polled job state ---', jobResponse.state);
-
       let updatedJobs : Array<TtsInferenceJob> = [];
       this.state.ttsInferenceJobs.forEach(job => {
         if (job.jobToken !== jobResponse.state!.job_token ||
             jobResponse.state!.maybe_result_token === undefined) { // NB: Already done querying, no need to update again.
-          console.log('<<<<SKIPPING>>>', job.jobToken, jobResponse.state!.job_token)
           updatedJobs.push(job);
           return;
         }
-
-        console.log('updated job', jobResponse.state);
 
         let updatedJob = TtsInferenceJob.fromResponse(jobResponse.state!);
         updatedJobs.push(updatedJob);
@@ -189,9 +179,7 @@ class App extends React.Component<Props, State> {
   }
 
   enqueueTtsModelUploadJob = (jobToken: string) => {
-    console.log('enqueueTtsModelUploadJob()')
     if (!this.state.enableAlpha) {
-      console.log('enqueueTtsModelUploadJob() disabled!')
       return;
     }
     const newJob = new TtsModelUploadJob(jobToken);
@@ -200,8 +188,6 @@ class App extends React.Component<Props, State> {
     this.setState({
       ttsModelUploadJobs: modelUploadJobs
     })
-
-    console.log('model upload jobs:', modelUploadJobs.length);
   }
 
   checkTtsModelUploadJob = (jobToken: string) => {
@@ -227,18 +213,13 @@ class App extends React.Component<Props, State> {
         return;
       }
 
-      console.log('polled job state ---', jobResponse.state);
-
       let updatedJobs : Array<TtsModelUploadJob> = [];
       this.state.ttsModelUploadJobs.forEach(job => {
         if (job.jobToken !== jobResponse.state!.job_token ||
             jobResponse.state!.maybe_model_token === undefined) { // NB: Already done querying, no need to update again.
-          console.log('<<<<SKIPPING>>>', job.jobToken, jobResponse.state!.job_token)
           updatedJobs.push(job);
           return;
         }
-
-        console.log('updated job', jobResponse.state);
 
         let updatedJob = TtsModelUploadJob.fromResponse(jobResponse.state!);
         updatedJobs.push(updatedJob);
