@@ -3,7 +3,7 @@ import axios from 'axios';
 import { ApiConfig } from '../../common/ApiConfig';
 import { SessionWrapper } from '../../session/SessionWrapper';
 import { W2lInferenceJob } from '../../App';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useHistory } from 'react-router-dom';
 import { v1 as uuidv1 } from 'uuid';
 import { SessionW2lInferenceResultListFc } from '../common/SessionW2lInferenceResultsListFc';
 
@@ -44,8 +44,16 @@ interface Props {
 function W2lTemplateViewFc(props: Props) {
   let { templateSlug } = useParams() as { templateSlug: string };
 
+  const history = useHistory();
+
+  // Ajax
   const [w2lTemplate, setW2lTemplate] = useState<W2lTemplate|undefined>(undefined);
+
+  // Inference
   const [audioFile, setAudioFile] = useState<File|undefined>(undefined);
+
+  // Moderation
+  const [modApprovedFormValue, setModApprovedFormValue] = useState<boolean>(true);
 
   useEffect(() => {
     const api = new ApiConfig();
@@ -66,6 +74,13 @@ function W2lTemplateViewFc(props: Props) {
       }
 
       setW2lTemplate(templatesResponse.template)
+
+      let modApprovalState = templatesResponse?.template?.is_mod_public_listing_approved;
+      if (modApprovedFormValue === undefined || modApprovalState === null) {
+        modApprovalState = true;
+      }
+
+      setModApprovedFormValue(modApprovalState);
     })
     .catch(e => {
       //this.props.onSpeakErrorCallback();
@@ -122,11 +137,41 @@ function W2lTemplateViewFc(props: Props) {
     return false;
   };
 
+  const handleModApprovalChange= (ev: React.FormEvent<HTMLSelectElement>) => {
+    const value = (ev.target as HTMLSelectElement).value;
+    const updatedValue = value === "true" ? true : false;
+    setModApprovedFormValue(updatedValue)
+  };
+
   const handleModApprovalFormSubmit = (ev: React.FormEvent<HTMLFormElement>) : boolean => {
     ev.preventDefault();
+
+    const api = new ApiConfig();
+    const endpointUrl = api.moderateW2l(templateSlug);
+
+    const request = {
+      is_approved: modApprovedFormValue,
+    }
+
+    fetch(endpointUrl, {
+      method: 'POST',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+      },
+      credentials: 'include',
+      body: JSON.stringify(request),
+    })
+    .then(res => res.json())
+    .then(res => {
+      if (res.success) {
+        history.go(0); // force reload
+      }
+    })
+    .catch(e => {
+    });
     return false;
   }
-
 
   let creatorLink=`/profile/${w2lTemplate?.creator_username}`;
   let object : string|undefined = undefined;
@@ -146,7 +191,7 @@ function W2lTemplateViewFc(props: Props) {
   }
 
   let modApprovalStatus = '';
-  let defaultModValue = 'true';
+  let defaultModValue = modApprovedFormValue ? "true" : "false";
 
   switch (w2lTemplate?.is_mod_public_listing_approved) {
     case null:
@@ -157,11 +202,12 @@ function W2lTemplateViewFc(props: Props) {
       break;
     case false:
       modApprovalStatus = 'Not Approved';
-      defaultModValue = 'false';
       break;
   }
 
   let modOnlyApprovalForm = <span />;
+
+  console.log('default mod value', defaultModValue);
 
   if (props.sessionWrapper.canApproveW2lTemplates()) {
     modOnlyApprovalForm = (
@@ -172,7 +218,7 @@ function W2lTemplateViewFc(props: Props) {
           <div className="control">
 
             <div className="select is-info is-large">
-              <select name="approve" defaultValue={defaultModValue}>
+              <select name="approve" value={defaultModValue} onChange={handleModApprovalChange}>
                 <option value="true">Approve</option>
                 <option value="false">Disapprove</option>
               </select>
@@ -181,7 +227,7 @@ function W2lTemplateViewFc(props: Props) {
 
           <p className="control">
             <button className="button is-info is-large">
-              Cancel
+              Moderate
             </button>
           </p>
 

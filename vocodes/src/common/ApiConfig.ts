@@ -80,6 +80,10 @@ class ApiConfig {
     return `${this.getScheme()}://${this.getNewApiHost()}/w2l/template/${templateSlug}`;
   }
 
+  moderateW2l(templateSlug: string) : string {
+    return `${this.getScheme()}://${this.getNewApiHost()}/w2l/template/${templateSlug}/moderate`;
+  }
+
   viewW2lInferenceResult(token: string) : string {
     return `${this.getScheme()}://${this.getNewApiHost()}/w2l/result/${token}`;
   }
