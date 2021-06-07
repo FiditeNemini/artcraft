@@ -173,6 +173,36 @@ function W2lTemplateViewFc(props: Props) {
     return false;
   }
 
+  const handleDeleteFormSubmit = (ev: React.FormEvent<HTMLFormElement>) : boolean => {
+    ev.preventDefault();
+
+    const api = new ApiConfig();
+    const endpointUrl = api.deleteW2l(templateSlug);
+
+    const request = {
+      set_delete: true,
+    }
+
+    fetch(endpointUrl, {
+      method: 'POST',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+      },
+      credentials: 'include',
+      body: JSON.stringify(request),
+    })
+    .then(res => res.json())
+    .then(res => {
+      if (res.success) {
+        history.go(0); // force reload
+      }
+    })
+    .catch(e => {
+    });
+    return false;
+  }
+
   let creatorLink=`/profile/${w2lTemplate?.creator_username}`;
   let object : string|undefined = undefined;
   
@@ -232,6 +262,25 @@ function W2lTemplateViewFc(props: Props) {
           </p>
 
         </div>
+      </form>
+    );
+  }
+
+  let deletionForm = <span />;
+
+  if (props.sessionWrapper.canDeleteOtherUsersW2lTemplates()) {
+    deletionForm = (
+      <form onSubmit={handleDeleteFormSubmit}>
+        
+        <br />
+        <label className="label">Delete W2L Template (hides from everyone but mods)</label>
+
+        <p className="control">
+          <button className="button is-danger is-large is-fullwidth">
+            Delete
+          </button>
+        </p>
+
       </form>
     );
   }
@@ -322,6 +371,8 @@ function W2lTemplateViewFc(props: Props) {
       </table>
 
       {modOnlyApprovalForm}
+
+      {deletionForm}
 
       <SessionW2lInferenceResultListFc w2lInferenceJobs={props.w2lInferenceJobs} />
       <br />

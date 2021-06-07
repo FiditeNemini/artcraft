@@ -67,11 +67,15 @@ export class SessionWrapper {
     return this.sessionStateResponse?.user?.can_ban_users || false;
   }
 
+  public canApproveW2lTemplates() : boolean {
+    return this.sessionStateResponse?.user?.can_approve_w2l_templates || false;
+  }
+
   public canEditOtherUsersProfiles() : boolean {
     return this.sessionStateResponse?.user?.can_edit_other_users_profiles || false;
   }
 
-  public canApproveW2lTemplates() : boolean {
-    return this.sessionStateResponse?.user?.can_approve_w2l_templates || false;
+  public canDeleteOtherUsersW2lTemplates() : boolean {
+    return this.sessionStateResponse?.user?.can_delete_other_users_w2l_templates || false;
   }
 }
