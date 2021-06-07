@@ -25,7 +25,7 @@ interface W2lTemplate {
   duration_millis: number,
   maybe_image_object_name: string,
   maybe_video_object_name: string,
-  is_mod_approved: boolean | null,
+  is_mod_public_listing_approved: boolean | null,
   created_at: string,
   updated_at: string,
 }
@@ -42,7 +42,7 @@ interface Props {
 }
 
 function W2lTemplateViewFc(props: Props) {
-  let { templateSlug } = useParams();
+  let { templateSlug } = useParams() as { templateSlug: string };
 
   const [w2lTemplate, setW2lTemplate] = useState<W2lTemplate|undefined>(undefined);
   const [audioFile, setAudioFile] = useState<File|undefined>(undefined);
@@ -148,9 +148,9 @@ function W2lTemplateViewFc(props: Props) {
   let modApprovalStatus = '';
   let defaultModValue = 'true';
 
-  switch (w2lTemplate?.is_mod_approved) {
+  switch (w2lTemplate?.is_mod_public_listing_approved) {
     case null:
-      modApprovalStatus = 'Not yet seen (ask for approval in our Discord)';
+      modApprovalStatus = 'Not yet (ask for approval in our Discord)';
       break;
     case true:
       modApprovalStatus = 'Approved';
@@ -257,7 +257,7 @@ function W2lTemplateViewFc(props: Props) {
             <td>{w2lTemplate?.title}</td>
           </tr>
           <tr>
-            <th>Is Moderator Approved?</th>
+            <th>Is Public Listing Approved?</th>
             <td>{modApprovalStatus}</td>
           </tr>
           <tr>

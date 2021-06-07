@@ -40,7 +40,7 @@ interface UserPayload {
 
 
 function ProfileEditFc(props: Props) {
-  const { username } = useParams();
+  const { username } = useParams() as { username: string };
   const userProfilePage = `/profile/${username}`;
 
   const history = useHistory();
