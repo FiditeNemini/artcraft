@@ -118,15 +118,24 @@ CREATE TABLE user_roles (
 
   name VARCHAR(255) NOT NULL,
 
-  can_ban_users BOOLEAN NOT NULL DEFAULT FALSE,
-  can_edit_other_users_data BOOLEAN NOT NULL DEFAULT FALSE,
-  can_approve_w2l_templates BOOLEAN NOT NULL DEFAULT FALSE,
-
-  can_upload_tts_models BOOLEAN NOT NULL DEFAULT FALSE,
-  can_upload_w2l_templates BOOLEAN NOT NULL DEFAULT FALSE,
-
+  -- Usage
   can_use_tts BOOLEAN NOT NULL DEFAULT FALSE,
   can_use_w2l BOOLEAN NOT NULL DEFAULT FALSE,
+
+  -- Contribution
+  can_upload_tts_models BOOLEAN NOT NULL DEFAULT FALSE,
+  can_upload_w2l_templates BOOLEAN NOT NULL DEFAULT FALSE,
+  can_delete_own_tts_models BOOLEAN NOT NULL DEFAULT FALSE,
+  can_delete_own_w2l_templates BOOLEAN NOT NULL DEFAULT FALSE,
+
+  -- Moderation
+  can_approve_w2l_templates BOOLEAN NOT NULL DEFAULT FALSE,
+  can_edit_other_users_profiles BOOLEAN NOT NULL DEFAULT FALSE,
+  can_edit_other_users_tts_models BOOLEAN NOT NULL DEFAULT FALSE,
+  can_edit_other_users_w2l_templates BOOLEAN NOT NULL DEFAULT FALSE,
+  can_delete_other_users_tts_models BOOLEAN NOT NULL DEFAULT FALSE,
+  can_delete_other_users_w2l_templates BOOLEAN NOT NULL DEFAULT FALSE,
+  can_ban_users BOOLEAN NOT NULL DEFAULT FALSE,
 
   -- Incremented with every update.
   version INT NOT NULL DEFAULT 0,

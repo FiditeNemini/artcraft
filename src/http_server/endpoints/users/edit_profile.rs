@@ -151,7 +151,7 @@ pub async fn edit_profile_handler(
     editor_is_original_user = true;
   }
 
-  if user_session.can_edit_other_users_data {
+  if user_session.can_edit_other_users_profiles {
     editor_is_moderator = true;
   }
 

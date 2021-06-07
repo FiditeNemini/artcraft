@@ -43,15 +43,24 @@ pub struct SessionUserRecord {
 
   // ===== PERMISSIONS FLAGS ===== //
 
-  pub can_ban_users: bool,
-  pub can_edit_other_users_data: bool,
-  pub can_approve_w2l_templates: bool,
-
-  pub can_upload_tts_models: bool,
-  pub can_upload_w2l_templates: bool,
-
+  // Usage
   pub can_use_tts: bool,
   pub can_use_w2l: bool,
+
+  // Contribution
+  pub can_upload_tts_models: bool,
+  pub can_upload_w2l_templates: bool,
+  pub can_delete_own_tts_models: bool,
+  pub can_delete_own_w2l_templates: bool,
+
+  // Moderation
+  pub can_approve_w2l_templates: bool,
+  pub can_edit_other_users_profiles: bool,
+  pub can_edit_other_users_tts_models: bool,
+  pub can_edit_other_users_w2l_templates: bool,
+  pub can_delete_other_users_tts_models: bool,
+  pub can_delete_other_users_w2l_templates: bool,
+  pub can_ban_users: bool,
 }
 
 pub struct SessionUserRawDbRecord {
@@ -75,15 +84,25 @@ pub struct SessionUserRawDbRecord {
   pub user_role_slug: String,
   pub banned: i8,
 
-  pub can_ban_users: Option<i8>,
-  pub can_edit_other_users_data: Option<i8>,
-  pub can_approve_w2l_templates: Option<i8>,
-
-  pub can_upload_tts_models: Option<i8>,
-  pub can_upload_w2l_templates: Option<i8>,
-
+  // NB: These are `Option` due to the JOIN not being compile-time assured.
+  // Usage
   pub can_use_tts: Option<i8>,
   pub can_use_w2l: Option<i8>,
+
+  // Contribution
+  pub can_upload_tts_models: Option<i8>,
+  pub can_upload_w2l_templates: Option<i8>,
+  pub can_delete_own_tts_models: Option<i8>,
+  pub can_delete_own_w2l_templates: Option<i8>,
+
+  // Moderation
+  pub can_approve_w2l_templates: Option<i8>,
+  pub can_edit_other_users_profiles: Option<i8>,
+  pub can_edit_other_users_tts_models: Option<i8>,
+  pub can_edit_other_users_w2l_templates: Option<i8>,
+  pub can_delete_other_users_tts_models: Option<i8>,
+  pub can_delete_other_users_w2l_templates: Option<i8>,
+  pub can_ban_users: Option<i8>,
 }
 
 impl SessionChecker {
@@ -171,15 +190,21 @@ SELECT
     users.user_role_slug,
     users.banned,
 
-    user_roles.can_ban_users,
-    user_roles.can_edit_other_users_data,
-    user_roles.can_approve_w2l_templates,
+    user_roles.can_use_tts,
+    user_roles.can_use_w2l,
 
     user_roles.can_upload_tts_models,
     user_roles.can_upload_w2l_templates,
+    user_roles.can_delete_own_tts_models,
+    user_roles.can_delete_own_w2l_templates,
 
-    user_roles.can_use_tts,
-    user_roles.can_use_w2l
+    user_roles.can_approve_w2l_templates,
+    user_roles.can_edit_other_users_profiles,
+    user_roles.can_edit_other_users_tts_models,
+    user_roles.can_edit_other_users_w2l_templates,
+    user_roles.can_delete_other_users_tts_models,
+    user_roles.can_delete_other_users_w2l_templates,
+    user_roles.can_ban_users
 
 FROM users
 LEFT OUTER JOIN user_sessions
@@ -214,13 +239,23 @@ WHERE user_sessions.token = ?
           maybe_preferred_w2l_template_token: raw_user_record.maybe_preferred_w2l_template_token.clone(),
           user_role_slug: raw_user_record.user_role_slug.clone(),
           banned: if raw_user_record.banned == 0 { false } else { true },
-          can_ban_users: convert_optional_db_bool_default_false(raw_user_record.can_ban_users),
-          can_edit_other_users_data: convert_optional_db_bool_default_false(raw_user_record.can_edit_other_users_data),
-          can_approve_w2l_templates: convert_optional_db_bool_default_false(raw_user_record.can_approve_w2l_templates),
-          can_upload_tts_models: convert_optional_db_bool_default_false(raw_user_record.can_upload_tts_models),
-          can_upload_w2l_templates: convert_optional_db_bool_default_false(raw_user_record.can_upload_w2l_templates),
+
+          // Usage
           can_use_tts: convert_optional_db_bool_default_false(raw_user_record.can_use_tts),
           can_use_w2l: convert_optional_db_bool_default_false(raw_user_record.can_use_w2l),
+          // Contribution
+          can_upload_tts_models: convert_optional_db_bool_default_false(raw_user_record.can_upload_tts_models),
+          can_upload_w2l_templates: convert_optional_db_bool_default_false(raw_user_record.can_upload_w2l_templates),
+          can_delete_own_tts_models: convert_optional_db_bool_default_false(raw_user_record.can_delete_own_tts_models),
+          can_delete_own_w2l_templates: convert_optional_db_bool_default_false(raw_user_record.can_delete_own_w2l_templates),
+          // Moderation
+          can_approve_w2l_templates: convert_optional_db_bool_default_false(raw_user_record.can_approve_w2l_templates),
+          can_edit_other_users_profiles: convert_optional_db_bool_default_false(raw_user_record.can_edit_other_users_profiles),
+          can_edit_other_users_tts_models: convert_optional_db_bool_default_false(raw_user_record.can_edit_other_users_tts_models),
+          can_edit_other_users_w2l_templates: convert_optional_db_bool_default_false(raw_user_record.can_edit_other_users_w2l_templates),
+          can_delete_other_users_tts_models: convert_optional_db_bool_default_false(raw_user_record.can_delete_other_users_tts_models),
+          can_delete_other_users_w2l_templates: convert_optional_db_bool_default_false(raw_user_record.can_delete_other_users_w2l_templates),
+          can_ban_users: convert_optional_db_bool_default_false(raw_user_record.can_ban_users),
         };
 
         Ok(Some(result_user_record))

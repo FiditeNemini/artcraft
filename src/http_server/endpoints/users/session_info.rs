@@ -38,11 +38,17 @@ pub struct UserInfo {
   // Contribution permissions:
   pub can_upload_tts_models: bool,
   pub can_upload_w2l_templates: bool,
+  pub can_delete_own_tts_models: bool,
+  pub can_delete_own_w2l_templates: bool,
 
   // Moderation permissions:
-  pub can_ban_users: bool,
-  pub can_edit_other_users_data: bool,
   pub can_approve_w2l_templates: bool,
+  pub can_edit_other_users_profiles: bool,
+  pub can_edit_other_users_tts_models: bool,
+  pub can_edit_other_users_w2l_templates: bool,
+  pub can_delete_other_users_tts_models: bool,
+  pub can_delete_other_users_w2l_templates: bool,
+  pub can_ban_users: bool,
 }
 
 #[derive(Serialize)]
@@ -124,11 +130,17 @@ pub async fn session_info_handler(
         // Contribution permissions:
         can_upload_tts_models: session_data.can_upload_tts_models,
         can_upload_w2l_templates: session_data.can_upload_w2l_templates,
+        can_delete_own_tts_models: session_data.can_delete_own_tts_models,
+        can_delete_own_w2l_templates: session_data.can_delete_own_w2l_templates,
 
         // Moderation permissions:
-        can_ban_users: session_data.can_ban_users,
-        can_edit_other_users_data: session_data.can_edit_other_users_data,
         can_approve_w2l_templates: session_data.can_approve_w2l_templates,
+        can_edit_other_users_profiles: session_data.can_edit_other_users_profiles,
+        can_edit_other_users_tts_models: session_data.can_edit_other_users_tts_models,
+        can_edit_other_users_w2l_templates: session_data.can_edit_other_users_w2l_templates,
+        can_delete_other_users_tts_models: session_data.can_delete_other_users_tts_models,
+        can_delete_other_users_w2l_templates: session_data.can_delete_other_users_w2l_templates,
+        can_ban_users: session_data.can_ban_users,
       });
     }
   }
