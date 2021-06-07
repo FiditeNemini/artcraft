@@ -33,13 +33,13 @@ interface UserPayload {
   avatar_public_bucket_hash: string,
   disable_gravatar: boolean,
   hide_results_preference: boolean,
-  website_url?: string,
-  discord_username?: string,
-  twitch_username?: string,
-  twitter_username?: string,
-  github_username?: string,
+  website_url: string | undefined | null,
+  discord_username: string | undefined | null,
+  twitch_username: string | undefined | null,
+  twitter_username: string | undefined | null,
+  github_username: string | undefined | null,
   //patreon_username?: string,
-  cashapp_username?: string,
+  cashapp_username: string | undefined | null,
   created_at: string,
 }
 
@@ -95,9 +95,9 @@ function ProfileFc(props: Props) {
 
   let profileRows : Array<JSX.Element> = [];
 
-  if (userData !== undefined && userData.website_url !== undefined) {
+  if (userData !== undefined && userData.website_url !== undefined && userData.website_url !== null) {
     let websiteUrl = <span>{userData.website_url}</span>;
-    if (userData.website_url.startsWith("http://") || userData.website_url.startsWith("https://")) {
+    if (userData?.website_url?.startsWith("http://") || userData?.website_url?.startsWith("https://")) {
       websiteUrl = (
         <a 
           href={userData.website_url} 
