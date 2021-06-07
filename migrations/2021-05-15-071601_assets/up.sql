@@ -236,7 +236,7 @@ CREATE TABLE w2l_templates (
   -- they're approved, but unapproved templates won't show up in public indices.
   -- This is independent of other visibility controls (is_mod_disabled, deleted_at,
   -- and creator_set_visibility)
-  is_mod_approved BOOLEAN DEFAULT NULL,
+  is_mod_public_listing_approved BOOLEAN DEFAULT NULL,
 
   -- In this case, a moderator disables it.
   -- This also disables it for the creator.

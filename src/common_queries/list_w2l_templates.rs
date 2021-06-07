@@ -3,6 +3,7 @@ use chrono::{DateTime, Utc};
 use crate::util::anyhow_result::AnyhowResult;
 use log::{warn, info};
 use sqlx::MySqlPool;
+use crate::database_helpers::boolean_converters::nullable_i8_to_optional_bool;
 
 #[derive(Serialize)]
 pub struct W2lTemplateRecordForList {
@@ -18,7 +19,7 @@ pub struct W2lTemplateRecordForList {
   pub duration_millis: u32,
   pub maybe_image_object_name: Option<String>,
   pub maybe_video_object_name: Option<String>,
-  pub is_mod_approved: Option<bool>, // converted
+  pub is_mod_public_listing_approved: Option<bool>, // converted
   pub created_at: DateTime<Utc>,
   pub updated_at: DateTime<Utc>,
 }
@@ -36,7 +37,7 @@ struct RawW2lTemplateRecordForList {
   pub duration_millis: i32,
   pub maybe_public_bucket_preview_image_object_name: Option<String>,
   pub maybe_public_bucket_preview_video_object_name: Option<String>,
-  pub is_mod_approved: Option<i8>, // NB: needs conversion
+  pub is_mod_public_listing_approved: Option<i8>, // NB: needs conversion
   pub created_at: DateTime<Utc>,
   pub updated_at: DateTime<Utc>,
 }
@@ -93,7 +94,7 @@ pub async fn list_w2l_templates(
         duration_millis: if template.duration_millis > 0 { template.duration_millis as u32 } else { 0 },
         maybe_image_object_name: template.maybe_public_bucket_preview_image_object_name.clone(),
         maybe_video_object_name: template.maybe_public_bucket_preview_video_object_name.clone(),
-        is_mod_approved: template.is_mod_approved.map(|v| if v == 0 { false } else { true }),
+        is_mod_public_listing_approved: nullable_i8_to_optional_bool(template.is_mod_public_listing_approved),
         created_at: template.created_at.clone(),
         updated_at: template.updated_at.clone(),
       }
@@ -125,7 +126,7 @@ SELECT
     w2l.duration_millis,
     w2l.maybe_public_bucket_preview_image_object_name,
     w2l.maybe_public_bucket_preview_video_object_name,
-    w2l.is_mod_approved,
+    w2l.is_mod_public_listing_approved,
     w2l.created_at,
     w2l.updated_at
 FROM w2l_templates as w2l
@@ -133,7 +134,7 @@ JOIN users
 ON users.token = w2l.creator_user_token
 WHERE
     w2l.deleted_at IS NULL
-    AND w2l.is_mod_approved IS TRUE
+    AND w2l.is_mod_public_listing_approved IS TRUE
         "#)
       .fetch_all(mysql_pool)
       .await?
@@ -155,7 +156,7 @@ SELECT
     w2l.duration_millis,
     w2l.maybe_public_bucket_preview_image_object_name,
     w2l.maybe_public_bucket_preview_video_object_name,
-    w2l.is_mod_approved,
+    w2l.is_mod_public_listing_approved,
     w2l.created_at,
     w2l.updated_at
 FROM w2l_templates as w2l
@@ -196,7 +197,7 @@ SELECT
     w2l.duration_millis,
     w2l.maybe_public_bucket_preview_image_object_name,
     w2l.maybe_public_bucket_preview_video_object_name,
-    w2l.is_mod_approved,
+    w2l.is_mod_public_listing_approved,
     w2l.created_at,
     w2l.updated_at
 FROM w2l_templates as w2l
@@ -205,7 +206,7 @@ ON
     users.token = w2l.creator_user_token
 WHERE
     w2l.deleted_at IS NULL
-    AND w2l.is_mod_approved IS TRUE
+    AND w2l.is_mod_public_listing_approved IS TRUE
     AND users.username = ?
         "#,
       scope_creator_username)
@@ -229,7 +230,7 @@ SELECT
     w2l.duration_millis,
     w2l.maybe_public_bucket_preview_image_object_name,
     w2l.maybe_public_bucket_preview_video_object_name,
-    w2l.is_mod_approved,
+    w2l.is_mod_public_listing_approved,
     w2l.created_at,
     w2l.updated_at
 FROM w2l_templates as w2l

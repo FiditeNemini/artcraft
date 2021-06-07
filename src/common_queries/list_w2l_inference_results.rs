@@ -159,7 +159,7 @@ LEFT OUTER JOIN users
 WHERE
     w2l_results.deleted_at IS NULL
     AND w2l_results.is_mod_hidden_from_public IS FALSE
-    AND w2l_templates.is_mod_approved IS TRUE
+    AND w2l_templates.is_mod_public_listing_approved IS TRUE
         "#)
       .fetch_all(mysql_pool)
       .await?
@@ -241,7 +241,7 @@ LEFT OUTER JOIN users
 WHERE
     w2l_results.deleted_at IS NULL
     AND w2l_results.is_mod_hidden_from_public IS FALSE
-    AND w2l_templates.is_mod_approved IS TRUE
+    AND w2l_templates.is_mod_public_listing_approved IS TRUE
     AND users.username = ?
         "#,
     scope_creator_username)

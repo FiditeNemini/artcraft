@@ -135,7 +135,7 @@ pub async fn set_w2l_template_mod_approval_handler(
         r#"
 UPDATE w2l_templates
 SET
-  is_mod_approved = ?,
+  is_mod_public_listing_approved = ?,
   maybe_mod_user_token = ?
 WHERE
   token = ?
