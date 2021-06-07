@@ -40,11 +40,11 @@ export class SessionWrapper {
     return this.sessionStateResponse?.user?.email_gravatar_hash;
   }
 
-  public canEditUser(username: string) : boolean {
+  public canEditUserProfile(username: string) : boolean {
     if (this.getUsername() === username) {
       return true;
     }
-    return this.canEditOtherUsersData();
+    return this.canEditOtherUsersProfiles();
   }
 
   public canUseTts() : boolean {
@@ -67,8 +67,8 @@ export class SessionWrapper {
     return this.sessionStateResponse?.user?.can_ban_users || false;
   }
 
-  public canEditOtherUsersData() : boolean {
-    return this.sessionStateResponse?.user?.can_edit_other_users_data || false;
+  public canEditOtherUsersProfiles() : boolean {
+    return this.sessionStateResponse?.user?.can_edit_other_users_profiles || false;
   }
 
   public canApproveW2lTemplates() : boolean {

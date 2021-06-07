@@ -84,7 +84,7 @@ function ProfileFc(props: Props) {
 
   let editProfileButton = <span />
 
-  if (props.sessionWrapper.canEditUser(username)) {
+  if (props.sessionWrapper.canEditUserProfile(username)) {
     let editLinkUrl = `/profile/${username}/edit`;
     editProfileButton = (
         <Link 

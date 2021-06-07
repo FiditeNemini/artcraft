@@ -84,6 +84,10 @@ class ApiConfig {
     return `${this.getScheme()}://${this.getNewApiHost()}/w2l/template/${templateSlug}/moderate`;
   }
 
+  deleteW2l(templateSlug: string) : string {
+    return `${this.getScheme()}://${this.getNewApiHost()}/w2l/template/${templateSlug}/delete`;
+  }
+
   viewW2lInferenceResult(token: string) : string {
     return `${this.getScheme()}://${this.getNewApiHost()}/w2l/result/${token}`;
   }

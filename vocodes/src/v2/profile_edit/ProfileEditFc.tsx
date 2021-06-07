@@ -94,7 +94,7 @@ function ProfileEditFc(props: Props) {
 
   }, [username]); // NB: Empty array dependency sets to run ONLY on mount
 
-  if (!props.sessionWrapper.canEditUser(username)) {
+  if (!props.sessionWrapper.canEditUserProfile(username)) {
     history.push(userProfilePage);
   }
 
@@ -158,8 +158,8 @@ function ProfileEditFc(props: Props) {
         history.push(userProfilePage);
       }
     })
-    //.catch(e => {
-    //});
+    .catch(e => {
+    });
 
     return false;
   }
