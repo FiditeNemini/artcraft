@@ -27,6 +27,8 @@ use sqlx::mysql::MySqlDatabaseError;
 use std::sync::Arc;
 use crate::database_helpers::boolean_converters::nullable_i8_to_optional_bool;
 
+// TODO: This is duplicated in query_w2l_template
+
 /// For the URL PathInfo
 #[derive(Deserialize)]
 pub struct GetW2lTemplatePathInfo {

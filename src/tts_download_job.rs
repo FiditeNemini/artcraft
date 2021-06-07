@@ -10,6 +10,7 @@
 
 pub mod buckets;
 pub mod common_queries;
+pub mod database_helpers;
 pub mod job_queries;
 pub mod script_execution;
 pub mod shared_constants;
