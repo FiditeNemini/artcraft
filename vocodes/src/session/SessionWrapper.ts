@@ -25,10 +25,7 @@ export class SessionWrapper {
   }
 
   public isLoggedIn() : boolean {
-    if (this.sessionStateResponse === undefined) {
-      return false;
-    }
-    return this.sessionStateResponse.logged_in;
+    return this.sessionStateResponse?.logged_in || false;
   }
 
   public getUsername() : string | undefined {

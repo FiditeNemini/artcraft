@@ -70,8 +70,6 @@ class App extends React.Component<Props, State> {
     setInterval(() => { this.querySession() }, 60000);
     // TODO: Use websockets, this is dumb
     setInterval(() => { this.pollJobs() }, 1000);
-    //this.state.videoJobPoller.start();
-    //this.state.videoQueuePoller.start();
   }
 
   querySession = () => {
