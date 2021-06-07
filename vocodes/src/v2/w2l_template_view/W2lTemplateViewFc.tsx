@@ -270,6 +270,17 @@ function W2lTemplateViewFc(props: Props) {
 
   const currentlyDeleted = w2lTemplate?.deleted_at !== undefined && w2lTemplate.deleted_at !== null;
 
+  let deletedAtRow = null;
+
+  if (currentlyDeleted) {
+    deletedAtRow = (
+      <tr>
+        <th>Deleted At (UTC)</th>
+        <td>{w2lTemplate?.deleted_at}</td>
+      </tr>
+    );
+  }
+
   return (
     <div>
       <h1 className="title is-1"> Video lip sync template </h1>
@@ -352,6 +363,17 @@ function W2lTemplateViewFc(props: Props) {
             <th>Duration (milliseconds)</th>
             <td>{w2lTemplate?.duration_millis}</td>
           </tr>
+          <tr>
+            <th>Created At (UTC)</th>
+            <td>{w2lTemplate?.created_at}</td>
+          </tr>
+          <tr>
+            <th>Updated At (UTC)</th>
+            <td>{w2lTemplate?.updated_at}</td>
+          </tr>
+
+          {deletedAtRow}
+
         </tbody>
       </table>
 
