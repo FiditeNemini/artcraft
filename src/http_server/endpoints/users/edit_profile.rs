@@ -310,12 +310,12 @@ LIMIT 1
         "#,
       profile_markdown,
       profile_html,
-      request.discord_username.clone(),
-      request.twitter_username.clone(),
-      request.twitch_username.clone(),
-      request.github_username.clone(),
-      request.cashapp_username.clone(),
-      request.website_url.clone(),
+      discord_username,
+      twitter_username,
+      twitch_username,
+      github_username,
+      cashapp_username,
+      website_url,
       user_record.user_token.clone(),
     )
     .execute(&server_state.mysql_pool)
