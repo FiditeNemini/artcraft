@@ -6,6 +6,7 @@ import { W2lInferenceJob } from '../../App';
 import { useParams, Link, useHistory } from 'react-router-dom';
 import { v1 as uuidv1 } from 'uuid';
 import { SessionW2lInferenceResultListFc } from '../common/SessionW2lInferenceResultsListFc';
+import { W2lTemplateViewDeleteFc } from './W2lTemplateView_DeleteFc';
 
 interface W2lTemplateViewResponsePayload {
   success: boolean,
@@ -28,6 +29,7 @@ interface W2lTemplate {
   is_mod_public_listing_approved: boolean | null,
   created_at: string,
   updated_at: string,
+  deleted_at: string | undefined | null,
 }
 
 interface EnqueueJobResponsePayload {
@@ -266,24 +268,7 @@ function W2lTemplateViewFc(props: Props) {
     );
   }
 
-  let deletionForm = <span />;
-
-  if (props.sessionWrapper.canDeleteOtherUsersW2lTemplates()) {
-    deletionForm = (
-      <form onSubmit={handleDeleteFormSubmit}>
-        
-        <br />
-        <label className="label">Delete W2L Template (hides from everyone but mods)</label>
-
-        <p className="control">
-          <button className="button is-danger is-large is-fullwidth">
-            Delete
-          </button>
-        </p>
-
-      </form>
-    );
-  }
+  const currentlyDeleted = w2lTemplate?.deleted_at !== undefined && w2lTemplate.deleted_at !== null;
 
   return (
     <div>
@@ -372,7 +357,11 @@ function W2lTemplateViewFc(props: Props) {
 
       {modOnlyApprovalForm}
 
-      {deletionForm}
+      <W2lTemplateViewDeleteFc
+        sessionWrapper={props.sessionWrapper}
+        templateSlug={templateSlug}
+        currentlyDeleted={currentlyDeleted}
+        />
 
       <SessionW2lInferenceResultListFc w2lInferenceJobs={props.w2lInferenceJobs} />
       <br />
