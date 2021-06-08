@@ -12,7 +12,7 @@ function SessionTtsModelUploadResultListFc(props: Props) {
 
   props.modelUploadJobs.forEach(job => {
 
-    if (job.maybeModelToken === undefined || job.maybeModelToken === null) {
+    if (!job.maybeModelToken) {
       results.push(
         <div key={job.jobToken}>Pending&#8230;</div>
       );

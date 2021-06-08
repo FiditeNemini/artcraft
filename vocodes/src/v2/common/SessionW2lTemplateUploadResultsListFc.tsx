@@ -12,7 +12,7 @@ function SessionW2lTemplateUploadResultListFc(props: Props) {
 
   props.w2lTemplateUploadJobs.forEach(job => {
 
-    if (job.maybeW2lTemplateToken === undefined || job.maybeW2lTemplateToken === null) {
+    if (!job.maybeW2lTemplateToken) {
       results.push(
         <div key={job.jobToken}>Pending&#8230;</div>
       );

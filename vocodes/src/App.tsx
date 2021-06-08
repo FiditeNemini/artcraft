@@ -199,7 +199,7 @@ class App extends React.Component<Props, State> {
       let updatedJobs : Array<TtsModelUploadJob> = [];
       this.state.ttsModelUploadJobs.forEach(job => {
         if (job.jobToken !== jobResponse.state!.job_token ||
-            jobResponse.state!.maybe_model_token === undefined) { // NB: Already done querying, no need to update again.
+            !jobResponse.state!.maybe_model_token) { // NB: Don't replace until we're done.
           updatedJobs.push(job);
           return;
         }
@@ -247,7 +247,7 @@ class App extends React.Component<Props, State> {
       let updatedJobs : Array<W2lInferenceJob> = [];
       this.state.w2lInferenceJobs.forEach(job => {
         if (job.jobToken !== jobResponse.state!.job_token ||
-            jobResponse.state!.maybe_result_token === undefined) { // NB: Already done querying, no need to update again.
+            !jobResponse.state!.maybe_result_token) { // NB: Don't replace until we're done.
           updatedJobs.push(job);
           return;
         }
@@ -292,9 +292,10 @@ class App extends React.Component<Props, State> {
       }
 
       let updatedJobs : Array<W2lTemplateUploadJob> = [];
+
       this.state.w2lTemplateUploadJobs.forEach(job => {
         if (job.jobToken !== jobResponse.state!.job_token ||
-            jobResponse.state!.maybe_template_token === undefined) { // NB: Already done querying, no need to update again.
+            !jobResponse.state!.maybe_template_token) { // NB: Don't replace until we're done
           updatedJobs.push(job);
           return;
         }

@@ -12,7 +12,7 @@ function SessionW2lInferenceResultListFc(props: Props) {
 
   props.w2lInferenceJobs.forEach(job => {
 
-    if (job.maybeResultToken === undefined || job.maybeResultToken === null) {
+    if (!job.maybeResultToken) {
       results.push(
         <div key={job.jobToken}>Pending&#8230;</div>
       );
