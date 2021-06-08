@@ -8,6 +8,7 @@ use crate::util::anyhow_result::AnyhowResult;
 use crate::util::random_crockford_token::random_crockford_token;
 use sqlx::MySqlPool;
 use crate::util::random_prefix_crockford_token::random_prefix_crockford_token;
+use std::path::Path;
 
 /// table: tts_model_upload_jobs
 #[derive(Debug)]
@@ -116,14 +117,21 @@ WHERE id = ?
   Ok(())
 }
 
-pub async fn insert_tts_model(pool: &MySqlPool,
-                              job: &TtsUploadJobRecord,
-                              private_bucket_hash: &str,
-                              private_bucket_object_name: &str)
-  -> AnyhowResult<(u64, String)>
-{
+pub async fn insert_tts_model<P: AsRef<Path>>(
+  pool: &MySqlPool,
+  job: &TtsUploadJobRecord,
+  private_bucket_hash: &str,
+  private_bucket_object_name: P,
+  file_size_bytes: u64
+) -> AnyhowResult<(u64, String)> {
+
   let model_token = random_prefix_crockford_token("TTS_MDL:", 32)?;
   let updatable_slug = model_token.clone();
+
+  let private_bucket_object_name = &private_bucket_object_name
+      .as_ref()
+      .display()
+      .to_string();
 
   let query_result = sqlx::query!(
         r#"
@@ -139,7 +147,8 @@ SET
   creator_ip_address = ?,
   original_download_url = ?,
   private_bucket_hash = ?,
-  private_bucket_object_name = ?
+  private_bucket_object_name = ?,
+  file_size_bytes = ?
         "#,
       &model_token,
       updatable_slug,
@@ -148,7 +157,8 @@ SET
       job.creator_ip_address.clone(),
       job.download_url.clone(),
       private_bucket_hash.to_string(),
-      private_bucket_object_name.to_string()
+      private_bucket_object_name.to_string(),
+      file_size_bytes
     )
     .execute(pool)
     .await;

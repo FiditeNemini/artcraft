@@ -28,8 +28,9 @@ use crate::job_queries::tts_download_job_queries::mark_tts_upload_job_done;
 use crate::job_queries::tts_download_job_queries::mark_tts_upload_job_failure;
 use crate::job_queries::tts_download_job_queries::query_tts_upload_job_records;
 use crate::script_execution::google_drive_download_command::GoogleDriveDownloadCommand;
+use crate::script_execution::tacotron_model_check_command::TacotronModelCheckCommand;
 use crate::util::anyhow_result::AnyhowResult;
-use crate::util::filesystem::check_directory_exists;
+use crate::util::filesystem::{check_directory_exists, check_file_exists};
 use crate::util::hashing::hash_file_sha2::hash_file_sha2;
 use crate::util::random_crockford_token::random_crockford_token;
 use data_encoding::{HEXUPPER, HEXLOWER, HEXLOWER_PERMISSIVE};
@@ -55,6 +56,10 @@ const ENV_BUCKET_ROOT : &'static str = "TTS_DOWNLOAD_BUCKET_ROOT";
 
 const DEFAULT_TEMP_DIR: &'static str = "/tmp";
 
+// Python code
+const ENV_CODE_DIRECTORY : &'static str = "TTS_CODE_DIRECTORY";
+const ENV_MODEL_CHECK_SCRIPT_NAME : &'static str = "TTS_MODEL_CHECK_SCRIPT_NAME";
+
 struct Downloader {
   pub download_temp_directory: PathBuf,
   pub mysql_pool: MySqlPool,
@@ -63,6 +68,8 @@ struct Downloader {
   pub google_drive_downloader: GoogleDriveDownloadCommand,
 
   pub bucket_path_unifier: BucketPathUnifier,
+
+  pub tts_check: TacotronModelCheckCommand,
 
   // Command to run
   pub download_script: String,
@@ -130,6 +137,14 @@ async fn main() -> AnyhowResult<()> {
     mysql_pool: mysql_pool.clone(), // NB: Pool is sync/send/clone-safe
   };
 
+  let py_code_directory = easyenv::get_env_string_required(ENV_CODE_DIRECTORY)?;
+  let py_script_name = easyenv::get_env_string_required(ENV_MODEL_CHECK_SCRIPT_NAME)?;
+
+  let tts_model_check_command= TacotronModelCheckCommand::new(
+    &py_code_directory,
+    &py_script_name,
+  );
+
   let downloader = Downloader {
     download_temp_directory: temp_directory,
     mysql_pool,
@@ -139,6 +154,7 @@ async fn main() -> AnyhowResult<()> {
     bucket_path_unifier: BucketPathUnifier::default_paths(),
     bucket_root_tts_model_uploads: bucket_root.to_string(),
     firehose_publisher,
+    tts_check: tts_model_check_command,
   };
 
   main_loop(downloader).await;
@@ -206,6 +222,18 @@ async fn process_jobs(downloader: &Downloader, jobs: Vec<TtsUploadJobRecord>) ->
   Ok(())
 }
 
+#[derive(Deserialize)]
+struct FileMetadata {
+  pub file_size_bytes: u64,
+}
+
+fn read_metadata_file(filename: &PathBuf) -> AnyhowResult<FileMetadata> {
+  let mut file = File::open(filename)?;
+  let mut buffer = String::new();
+  file.read_to_string(&mut buffer)?;
+  Ok(serde_json::from_str(&buffer)?)
+}
+
 async fn process_job(downloader: &Downloader, job: &TtsUploadJobRecord) -> AnyhowResult<()> {
   // TODO: 1. Mark processing.
   // TODO: 2. Download. (DONE)
@@ -215,6 +243,8 @@ async fn process_job(downloader: &Downloader, job: &TtsUploadJobRecord) -> Anyho
 
   let temp_dir = format!("temp_{}", job.id);
   let temp_dir = TempDir::new(&temp_dir)?;
+
+  // ==================== DOWNLOAD MODEL FILE ==================== //
 
   let download_url = job.download_url.as_ref()
     .map(|c| c.to_string())
@@ -233,15 +263,44 @@ async fn process_job(downloader: &Downloader, job: &TtsUploadJobRecord) -> Anyho
 
   info!("Destination bucket path: {:?}", &synthesizer_model_bucket_path);
 
+
+  // ==================== RUN MODEL CHECK ==================== //
+
+  info!("Checking that model is valid...");
+
   let file_path = PathBuf::from(download_filename);
+
+  let output_metadata_fs_path = temp_dir.path().join("metadata.json");
+
+  downloader.tts_check.execute(
+    &file_path,
+    &output_metadata_fs_path,
+    false,
+  )?;
+
+  // ==================== CHECK ALL FILES EXIST AND GET METADATA ==================== //
+
+  info!("Checking that metadata output file exists...");
+
+  check_file_exists(&output_metadata_fs_path)?;
+
+  let file_metadata = read_metadata_file(&output_metadata_fs_path)?;
+
+  // ==================== UPLOAD MODEL FILE ==================== //
+
+  info!("Uploading model to GCS...");
+
   downloader.bucket_client.upload_filename(&synthesizer_model_bucket_path, &file_path).await?;
+
+  // ==================== SAVE RECORDS ==================== //
 
   info!("Saving model record...");
   let (id, model_token) = insert_tts_model(
     &downloader.mysql_pool,
     job,
     &private_bucket_hash,
-    synthesizer_model_bucket_path.as_path().to_str().unwrap_or(""))
+    synthesizer_model_bucket_path,
+    file_metadata.file_size_bytes)
     .await?;
 
   info!("Marking job complete...");

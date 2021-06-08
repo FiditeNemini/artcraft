@@ -5,31 +5,27 @@ use subprocess::{Popen, PopenConfig, Redirection};
 use std::fs::OpenOptions;
 use std::path::Path;
 
-/// This command is used to run inference.
+/// This command is used to check tacotron for being a real model
 #[derive(Clone)]
-pub struct TacotronInferenceCommand {
+pub struct TacotronModelCheckCommand {
   tacotron_directory: String,
-  inference_script_name: String,
+  check_model_script_name: String,
 }
 
-impl TacotronInferenceCommand {
+impl TacotronModelCheckCommand {
   pub fn new(
     tacotron_directory: &str,
-    inference_script_name: &str,
+    check_model_script_name: &str,
   ) -> Self {
     Self {
-    tacotron_directory: tacotron_directory.to_string(),
-    inference_script_name: inference_script_name.to_string(),
+      tacotron_directory: tacotron_directory.to_string(),
+      check_model_script_name: check_model_script_name.to_string(),
     }
   }
 
   pub fn execute<P: AsRef<Path>>(
     &self,
     synthesizer_checkpoint_path: P,
-    vocoder_checkpoint_path: P,
-    input_text_filename: P,
-    output_audio_filename: P,
-    output_spectrogram_filename: P,
     output_metadata_filename: P,
     spawn_process: bool
   ) -> AnyhowResult<()> {
@@ -42,17 +38,9 @@ impl TacotronInferenceCommand {
     command.push_str("source python/bin/activate");
     command.push_str(" && ");
     command.push_str("python ");
-    command.push_str(&self.inference_script_name);
+    command.push_str(&self.check_model_script_name);
     command.push_str(" --synthesizer_checkpoint_path ");
     command.push_str(&synthesizer_checkpoint_path.as_ref().display().to_string());
-    command.push_str(" --vocoder_checkpoint_path ");
-    command.push_str(&vocoder_checkpoint_path.as_ref().display().to_string());
-    command.push_str(" --input_text_filename ");
-    command.push_str(&input_text_filename.as_ref().display().to_string());
-    command.push_str(" --output_audio_filename ");
-    command.push_str(&output_audio_filename.as_ref().display().to_string());
-    command.push_str(" --output_spectrogram_filename ");
-    command.push_str(&output_spectrogram_filename.as_ref().display().to_string());
     command.push_str(" --output_metadata_filename ");
     command.push_str(&output_metadata_filename.as_ref().display().to_string());
 
@@ -69,18 +57,18 @@ impl TacotronInferenceCommand {
       //let _child_pid = command_builder.spawn()?;
 
       let stdout_file = OpenOptions::new()
-        .read(true)
-        .write(true)
-        .create(true)
-        .truncate(true)
-        .open("/tmp/tacotron_upload_stdout.txt")?;
+          .read(true)
+          .write(true)
+          .create(true)
+          .truncate(true)
+          .open("/tmp/tacotron_upload_stdout.txt")?;
 
       let stderr_file = OpenOptions::new()
-        .read(true)
-        .write(true)
-        .create(true)
-        .truncate(true)
-        .open("/tmp/tacotron_upload_stderr.txt")?;
+          .read(true)
+          .write(true)
+          .create(true)
+          .truncate(true)
+          .open("/tmp/tacotron_upload_stderr.txt")?;
 
       let mut p = Popen::create(&command_parts, PopenConfig {
         //stdout: Redirection::Pipe,
