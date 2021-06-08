@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { TtsInferenceJob } from '../../App'
+import { JobState } from '../../jobs/JobStates';
 
 interface Props {
   ttsInferenceJobs: Array<TtsInferenceJob>,
@@ -11,10 +12,33 @@ function SessionTtsInferenceResultListFc(props: Props) {
   let results : Array<JSX.Element> = [];
 
   props.ttsInferenceJobs.forEach(job => {
+    console.log('state', job.jobState);
 
     if (!job.maybeResultToken) {
+      let stateDescription = "Pending...";
+
+      switch (job.jobState) {
+        case JobState.PENDING:
+        case JobState.UNKNOWN:
+          stateDescription = "Pending..."
+          break;
+        case JobState.STARTED:
+          stateDescription = "Started...";
+          break;
+        case JobState.ATTEMPT_FAILED:
+          stateDescription = `Failed ${job.attemptCount} attempt(s). Will retry...`;
+          break;
+        case JobState.COMPLETE_FAILURE:
+        case JobState.DEAD:
+          stateDescription = "Failed Permanently. Please tell us in Discord so we can fix. :(";
+          break;
+        case JobState.COMPLETE_SUCCESS:
+          stateDescription = "Success!"; // Not sure why we're here instead of other branch!
+          break;
+      }
+
       results.push(
-        <div key={job.jobToken}>Pending&#8230;</div>
+        <div key={job.jobToken}>{stateDescription}</div>
       );
     } else {
 

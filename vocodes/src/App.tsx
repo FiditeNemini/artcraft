@@ -13,6 +13,7 @@ import { TtsInferenceJob, TtsInferenceJobStateResponsePayload } from './jobs/Tts
 import { W2lInferenceJob, W2lInferenceJobStateResponsePayload } from './jobs/W2lInferenceJobs';
 import { TtsModelUploadJob, TtsModelUploadJobStateResponsePayload } from './jobs/TtsModelUploadJobs';
 import { W2lTemplateUploadJob, W2lTemplateUploadJobStateResponsePayload } from './jobs/W2lTemplateUploadJobs';
+import { JobState, jobStateCanChange } from './jobs/JobStates';
 
 enum MigrationMode {
   NEW_VOCODES,
@@ -152,7 +153,7 @@ class App extends React.Component<Props, State> {
 
       this.state.ttsInferenceJobs.forEach(existingJob => {
         if (existingJob.jobToken !== jobResponse.state!.job_token ||
-            !jobResponse.state!.maybe_result_token) { // NB: Don't replace until we're done.
+            !jobStateCanChange(existingJob.jobState)) {
           updatedJobs.push(existingJob);
           return;
         }
@@ -313,13 +314,9 @@ class App extends React.Component<Props, State> {
 
   pollJobs = () => {
     this.state.ttsInferenceJobs.forEach(job => {
-      switch (job.status) {
-        case 'unknown':
-        case 'pending':
-          this.checkTtsJob(job.jobToken);
-          break;
-        default:
-          return;
+      if (jobStateCanChange(job.jobState)) {
+        console.log('state can change');
+        this.checkTtsJob(job.jobToken);
       }
     });
     this.state.w2lInferenceJobs.forEach(job => {
