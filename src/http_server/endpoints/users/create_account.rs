@@ -22,6 +22,7 @@ use std::sync::Arc;
 use crate::util::email_to_gravatar::email_to_gravatar;
 use crate::validations::username_reservations::is_reserved_username;
 use crate::util::random_prefix_crockford_token::random_prefix_crockford_token;
+use crate::validations::check_for_slurs::contains_slurs;
 
 const NEW_USER_ROLE: &'static str = "user";
 
@@ -104,6 +105,10 @@ pub async fn create_account_handler(
 
   if is_reserved_username(&request.username) {
     return Err(CreateAccountError::ReservedUsername);
+  }
+
+  if contains_slurs(&request.username) {
+    return Err(CreateAccountError::BadInput("username contains slurs".to_string()));
   }
 
   if !request.email_address.contains("@") {

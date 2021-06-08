@@ -20,6 +20,7 @@ use sqlx::error::Error::Database;
 use sqlx::mysql::MySqlDatabaseError;
 use std::sync::Arc;
 use crate::util::random_prefix_crockford_token::random_prefix_crockford_token;
+use crate::validations::check_for_slurs::contains_slurs;
 
 #[derive(Deserialize)]
 pub struct UploadW2lTemplateRequest {
@@ -113,6 +114,10 @@ pub async fn upload_w2l_template_handler(
 
   if let Err(reason) = validate_model_title(&request.title) {
     return Err(UploadW2lTemplateError::BadInput(reason));
+  }
+
+  if contains_slurs(&request.title) {
+    return Err(UploadW2lTemplateError::BadInput("title contains slurs".to_string()));
   }
 
   let ip_address = get_request_ip(&http_request);
