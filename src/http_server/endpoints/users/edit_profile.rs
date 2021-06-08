@@ -241,7 +241,6 @@ pub async fn edit_profile_handler(
     }
   }
 
-
   if let Some(markdown) = request.profile_markdown.as_deref() {
     if contains_slurs(markdown) {
       return Err(EditProfileError::BadInput("profile contains slurs".to_string()));

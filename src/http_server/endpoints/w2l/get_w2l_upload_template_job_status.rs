@@ -37,6 +37,7 @@ pub struct W2lUploadTemplateJobStatusForResponse {
   pub job_token: String,
 
   pub status: String,
+  pub attempt_count: u8,
   pub maybe_template_token: Option<String>,
 
   pub created_at: DateTime<Utc>,
@@ -65,6 +66,7 @@ pub struct W2lUploadTemplateJobStatusRecord {
   pub job_token: String,
 
   pub status: String,
+  pub attempt_count: i32,
   pub maybe_template_token: Option<String>,
 
   pub created_at: DateTime<Utc>,
@@ -113,6 +115,7 @@ SELECT
     jobs.token as job_token,
 
     jobs.status,
+    jobs.attempt_count,
     jobs.on_success_result_token as maybe_template_token,
 
     jobs.created_at,
@@ -145,6 +148,7 @@ WHERE jobs.token = ?
   let template_for_response = W2lUploadTemplateJobStatusForResponse {
     job_token: record.job_token.clone(),
     status: record.status.clone(),
+    attempt_count: record.attempt_count as u8,
     maybe_template_token: record.maybe_template_token.clone(),
     created_at: record.created_at.clone(),
     updated_at: record.updated_at.clone(),

@@ -37,6 +37,7 @@ pub struct TtsUploadModelJobStatusForResponse {
   pub job_token: String,
 
   pub status: String,
+  pub attempt_count: u8,
   pub maybe_model_token: Option<String>,
 
   pub created_at: DateTime<Utc>,
@@ -65,6 +66,7 @@ pub struct TtsUploadModelJobStatusRecord {
   pub job_token: String,
 
   pub status: String,
+  pub attempt_count: i32,
   pub maybe_model_token: Option<String>,
 
   pub created_at: DateTime<Utc>,
@@ -113,6 +115,7 @@ SELECT
     jobs.token as job_token,
 
     jobs.status,
+    jobs.attempt_count,
     jobs.on_success_result_token as maybe_model_token,
 
     jobs.created_at,
@@ -145,6 +148,7 @@ WHERE jobs.token = ?
   let model_for_response = TtsUploadModelJobStatusForResponse {
     job_token: record.job_token.clone(),
     status: record.status.clone(),
+    attempt_count: record.attempt_count as u8,
     maybe_model_token: record.maybe_model_token.clone(),
     created_at: record.created_at.clone(),
     updated_at: record.updated_at.clone(),

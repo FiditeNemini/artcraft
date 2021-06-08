@@ -37,6 +37,7 @@ pub struct W2lInferenceJobStatusForResponse {
   pub job_token: String,
 
   pub status: String,
+  pub attempt_count: u8,
   pub maybe_result_token: Option<String>,
   pub maybe_public_bucket_video_path: Option<String>,
 
@@ -70,6 +71,7 @@ pub struct W2lInferenceJobStatusRecord {
   pub job_token: String,
 
   pub status: String,
+  pub attempt_count: i32,
   pub maybe_result_token: Option<String>,
   pub maybe_public_bucket_video_path: Option<String>,
 
@@ -124,6 +126,7 @@ SELECT
     jobs.token as job_token,
 
     jobs.status,
+    jobs.attempt_count,
     jobs.on_success_result_token as maybe_result_token,
     results.public_bucket_video_path as maybe_public_bucket_video_path,
 
@@ -165,6 +168,7 @@ WHERE jobs.token = ?
   let template_for_response = W2lInferenceJobStatusForResponse {
     job_token: record.job_token.clone(),
     status: record.status.clone(),
+    attempt_count: record.attempt_count as u8,
     maybe_result_token: record.maybe_result_token.clone(),
     maybe_public_bucket_video_path: record.maybe_public_bucket_video_path.clone(),
     maybe_w2l_template_token: record.maybe_w2l_template_token.clone(),
