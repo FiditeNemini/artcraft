@@ -25,6 +25,7 @@ use util::hashing::hash_file_sha2::hash_file_sha2;
 use crate::common_queries::firehose_publisher::FirehosePublisher;
 use crate::job_queries::w2l_inference_job_queries::W2lInferenceJobRecord;
 use crate::job_queries::w2l_inference_job_queries::get_w2l_template_by_token;
+use crate::job_queries::w2l_inference_job_queries::grab_job_lock_and_mark_pending;
 use crate::job_queries::w2l_inference_job_queries::insert_w2l_result;
 use crate::job_queries::w2l_inference_job_queries::mark_w2l_inference_job_done;
 use crate::job_queries::w2l_inference_job_queries::mark_w2l_inference_job_failure;
@@ -323,6 +324,15 @@ async fn process_job(inferencer: &Inferencer, job: &W2lInferenceJobRecord) -> An
   // TODO 6. Upload result
   // TODO 7. Save record
   // TODO 8. Mark job done
+
+  // ==================== ATTEMPT TO GRAB JOB LOCK ==================== //
+
+  let lock_acquired = grab_job_lock_and_mark_pending(&inferencer.mysql_pool, job).await?;
+
+  if !lock_acquired {
+    warn!("Could not acquire job lock for: {}", &job.id);
+    return Ok(())
+  }
 
   // ==================== CONFIRM OR DOWNLOAD W2L MODEL ==================== //
 
