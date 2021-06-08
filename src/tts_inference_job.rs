@@ -23,8 +23,8 @@ use crate::buckets::bucket_path_unifier::BucketPathUnifier;
 use crate::buckets::bucket_paths::hash_to_bucket_path;
 use crate::common_queries::firehose_publisher::FirehosePublisher;
 use crate::job_queries::tts_inference_job_queries::TtsInferenceJobRecord;
-use crate::job_queries::tts_inference_job_queries::can_grab_job_lock;
 use crate::job_queries::tts_inference_job_queries::get_tts_model_by_token;
+use crate::job_queries::tts_inference_job_queries::grab_job_lock_and_mark_pending;
 use crate::job_queries::tts_inference_job_queries::insert_tts_result;
 use crate::job_queries::tts_inference_job_queries::mark_tts_inference_job_done;
 use crate::job_queries::tts_inference_job_queries::mark_tts_inference_job_failure;
@@ -281,7 +281,7 @@ fn read_metadata_file(filename: &PathBuf) -> AnyhowResult<FileMetadata> {
 
 async fn process_job(inferencer: &Inferencer, job: &TtsInferenceJobRecord) -> AnyhowResult<()> {
 
-  // TODO 1. Mark processing
+  // TODO 1. Mark processing (DONE)
 
   // TODO 2. Check if vocoder model is downloaded / download to stable location (DONE)
 
@@ -297,7 +297,7 @@ async fn process_job(inferencer: &Inferencer, job: &TtsInferenceJobRecord) -> An
 
   // ==================== ATTEMPT TO GRAB JOB LOCK ==================== //
 
-  let lock_acquired = can_grab_job_lock(&inferencer.mysql_pool, job).await?;
+  let lock_acquired = grab_job_lock_and_mark_pending(&inferencer.mysql_pool, job).await?;
 
   if !lock_acquired {
     warn!("Could not acquire job lock for: {}", &job.id);

@@ -62,12 +62,12 @@ WHERE
   Ok(job_records)
 }
 
-/*pub struct TtsLockRecord {
+pub struct TtsUploadLockRecord {
   id: i64,
   status: String,
 }
 
-pub async fn can_grab_job_lock(
+pub async fn grab_job_lock_and_mark_pending(
   pool: &MySqlPool,
   job: &TtsUploadJobRecord
 ) -> AnyhowResult<bool> {
@@ -76,23 +76,21 @@ pub async fn can_grab_job_lock(
   let mut transaction = pool.begin().await?;
 
   let maybe_record = sqlx::query_as!(
-    TtsLockRecord,
+    TtsUploadLockRecord,
         r#"
 SELECT
   id,
   status
 FROM tts_model_upload_jobs
-FOR UPDATE
 WHERE id = ?
+FOR UPDATE
         "#,
-        status,
-        failure_reason.to_string(),
         job.id,
     )
       .fetch_one(&mut transaction)
-      .await?;
+      .await;
 
-  let record : TtsLockRecord = match maybe_record {
+  let record : TtsUploadLockRecord = match maybe_record {
     Ok(record) => record,
     Err(err) => {
       match err {
@@ -117,6 +115,7 @@ WHERE id = ?
   };
 
   if !can_transact {
+    transaction.rollback().await?;
     return Ok(false);
   }
 
@@ -130,12 +129,13 @@ WHERE id = ?
         "#,
         job.id,
     )
-    .execute(&mut transaction)
-    .await?;
+      .execute(&mut transaction)
+      .await?;
 
+  transaction.commit().await?;
 
   Ok(true)
-}*/
+}
 
 pub async fn mark_tts_upload_job_failure(
   pool: &MySqlPool,

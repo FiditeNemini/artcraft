@@ -85,7 +85,7 @@ pub struct TtsInferenceLockRecord {
   status: String,
 }
 
-pub async fn can_grab_job_lock(
+pub async fn grab_job_lock_and_mark_pending(
   pool: &MySqlPool,
   job: &TtsInferenceJobRecord
 ) -> AnyhowResult<bool> {
@@ -154,7 +154,6 @@ WHERE id = ?
 
   Ok(true)
 }
-
 
 pub async fn mark_tts_inference_job_failure(
   pool: &MySqlPool,

@@ -23,6 +23,7 @@ use crate::buckets::bucket_path_unifier::BucketPathUnifier;
 use crate::buckets::bucket_paths::hash_to_bucket_path;
 use crate::common_queries::firehose_publisher::FirehosePublisher;
 use crate::job_queries::tts_download_job_queries::TtsUploadJobRecord;
+use crate::job_queries::tts_download_job_queries::grab_job_lock_and_mark_pending;
 use crate::job_queries::tts_download_job_queries::insert_tts_model;
 use crate::job_queries::tts_download_job_queries::mark_tts_upload_job_done;
 use crate::job_queries::tts_download_job_queries::mark_tts_upload_job_failure;
@@ -241,10 +242,19 @@ async fn process_job(downloader: &Downloader, job: &TtsUploadJobRecord) -> Anyho
   // TODO: 4. Save record. (DONE)
   // TODO: 5. Mark job done. (DONE)
 
-  let temp_dir = format!("temp_{}", job.id);
-  let temp_dir = TempDir::new(&temp_dir)?;
+  // ==================== ATTEMPT TO GRAB JOB LOCK ==================== //
+
+  let lock_acquired = grab_job_lock_and_mark_pending(&downloader.mysql_pool, job).await?;
+
+  if !lock_acquired {
+    warn!("Could not acquire job lock for: {}", &job.id);
+    return Ok(())
+  }
 
   // ==================== DOWNLOAD MODEL FILE ==================== //
+
+  let temp_dir = format!("temp_{}", job.id);
+  let temp_dir = TempDir::new(&temp_dir)?;
 
   let download_url = job.download_url.as_ref()
     .map(|c| c.to_string())
