@@ -62,10 +62,86 @@ WHERE
   Ok(job_records)
 }
 
-pub async fn mark_tts_upload_job_failure(pool: &MySqlPool,
-                                         job: &TtsUploadJobRecord,
-                                         failure_reason: &str)
-  -> AnyhowResult<()>
+/*pub struct TtsLockRecord {
+  id: i64,
+  status: String,
+}
+
+pub async fn can_grab_job_lock(
+  pool: &MySqlPool,
+  job: &TtsUploadJobRecord
+) -> AnyhowResult<bool> {
+
+  // NB: We use transactions and "SELECT ... FOR UPDATE" to simulate mutexes.
+  let mut transaction = pool.begin().await?;
+
+  let maybe_record = sqlx::query_as!(
+    TtsLockRecord,
+        r#"
+SELECT
+  id,
+  status
+FROM tts_model_upload_jobs
+FOR UPDATE
+WHERE id = ?
+        "#,
+        status,
+        failure_reason.to_string(),
+        job.id,
+    )
+      .fetch_one(&mut transaction)
+      .await?;
+
+  let record : TtsLockRecord = match maybe_record {
+    Ok(record) => record,
+    Err(err) => {
+      match err {
+        RowNotFound => {
+          return Err(anyhow!("could not job"));
+        },
+        _ => {
+          return Err(anyhow!("query error"));
+        }
+      }
+    }
+  };
+
+  let can_transact = match record.status.as_ref() {
+    "pending" => true, // It's okay for us to take the lock.
+    "attempt_failed" => true, // We can retry.
+    "started" => false, // Job in progress (another job beat us, and we can't take the lock)
+    "complete_success" => false, // Job already complete
+    "complete_failure" => false, // Job already complete (permanently dead; no need to retry)
+    "dead" => false, // Job already complete (permanently dead; retries exhausted)
+    _ => false, // Future-proof
+  };
+
+  if !can_transact {
+    return Ok(false);
+  }
+
+  let _acquire_lock = sqlx::query!(
+        r#"
+UPDATE tts_model_upload_jobs
+SET
+  status = 'started',
+  retry_at = NOW() + interval 2 minute
+WHERE id = ?
+        "#,
+        job.id,
+    )
+    .execute(&mut transaction)
+    .await?;
+
+
+  Ok(true)
+}*/
+
+pub async fn mark_tts_upload_job_failure(
+  pool: &MySqlPool,
+  job: &TtsUploadJobRecord,
+  failure_reason: &str
+) -> AnyhowResult<()>
 {
   // statuses: "attempt_failed", "complete_failure", "dead"
   let status = "attempt_failed";
@@ -88,6 +164,7 @@ WHERE id = ?
 
   Ok(())
 }
+
 pub async fn mark_tts_upload_job_done(
   pool: &MySqlPool,
   job: &TtsUploadJobRecord,
