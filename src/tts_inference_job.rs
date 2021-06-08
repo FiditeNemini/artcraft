@@ -91,6 +91,10 @@ struct Inferencer {
 
   // Sleep between batches
   pub job_batch_wait_millis: u64,
+
+  // Max job attempts before failure.
+  // NB: This is an i32 so we don't need to convert to db column type.
+  pub job_max_attempts: i32,
 }
 
 #[tokio::main]
@@ -198,6 +202,7 @@ async fn main() -> AnyhowResult<()> {
     firehose_publisher,
     tts_vocoder_model_filename,
     job_batch_wait_millis: common_env.job_batch_wait_millis,
+    job_max_attempts: common_env.job_max_attempts as i32,
   };
 
   main_loop(inferencer).await;
@@ -264,7 +269,8 @@ async fn process_jobs(inferencer: &Inferencer, jobs: Vec<TtsInferenceJobRecord>)
         let _r = mark_tts_inference_job_failure(
           &inferencer.mysql_pool,
           &job,
-          failure_reason)
+          failure_reason,
+          inferencer.job_max_attempts)
             .await;
       }
     }
