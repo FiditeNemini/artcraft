@@ -236,7 +236,7 @@ fn read_metadata_file(filename: &PathBuf) -> AnyhowResult<FileMetadata> {
 }
 
 async fn process_job(downloader: &Downloader, job: &TtsUploadJobRecord) -> AnyhowResult<()> {
-  // TODO: 1. Mark processing.
+  // TODO: 1. Mark processing. (DONE)
   // TODO: 2. Download. (DONE)
   // TODO: 3. Upload. (DONE)
   // TODO: 4. Save record. (DONE)
@@ -251,10 +251,12 @@ async fn process_job(downloader: &Downloader, job: &TtsUploadJobRecord) -> Anyho
     return Ok(())
   }
 
-  // ==================== DOWNLOAD MODEL FILE ==================== //
+  // ==================== SETUP TEMP DIRS ==================== //
 
   let temp_dir = format!("temp_{}", job.id);
   let temp_dir = TempDir::new(&temp_dir)?;
+
+  // ==================== DOWNLOAD MODEL FILE ==================== //
 
   let download_url = job.download_url.as_ref()
     .map(|c| c.to_string())

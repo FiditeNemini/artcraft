@@ -61,6 +61,81 @@ WHERE
   Ok(job_records)
 }
 
+pub struct W2lDownloadLockRecord {
+  id: i64,
+  status: String,
+}
+
+pub async fn grab_job_lock_and_mark_pending(
+  pool: &MySqlPool,
+  job: &W2lTemplateUploadJobRecord
+) -> AnyhowResult<bool> {
+
+  // NB: We use transactions and "SELECT ... FOR UPDATE" to simulate mutexes.
+  let mut transaction = pool.begin().await?;
+
+  let maybe_record = sqlx::query_as!(
+    W2lDownloadLockRecord,
+        r#"
+SELECT
+  id,
+  status
+FROM w2l_template_upload_jobs
+WHERE id = ?
+FOR UPDATE
+        "#,
+        job.id,
+    )
+      .fetch_one(&mut transaction)
+      .await;
+
+  let record : W2lDownloadLockRecord = match maybe_record {
+    Ok(record) => record,
+    Err(err) => {
+      match err {
+        RowNotFound => {
+          return Err(anyhow!("could not job"));
+        },
+        _ => {
+          return Err(anyhow!("query error"));
+        }
+      }
+    }
+  };
+
+  let can_transact = match record.status.as_ref() {
+    "pending" => true, // It's okay for us to take the lock.
+    "attempt_failed" => true, // We can retry.
+    "started" => false, // Job in progress (another job beat us, and we can't take the lock)
+    "complete_success" => false, // Job already complete
+    "complete_failure" => false, // Job already complete (permanently dead; no need to retry)
+    "dead" => false, // Job already complete (permanently dead; retries exhausted)
+    _ => false, // Future-proof
+  };
+
+  if !can_transact {
+    transaction.rollback().await?;
+    return Ok(false);
+  }
+
+  let _acquire_lock = sqlx::query!(
+        r#"
+UPDATE w2l_template_upload_jobs
+SET
+  status = 'started',
+  retry_at = NOW() + interval 2 minute
+WHERE id = ?
+        "#,
+        job.id,
+    )
+      .execute(&mut transaction)
+      .await?;
+
+  transaction.commit().await?;
+
+  Ok(true)
+}
+
 pub async fn mark_w2l_template_upload_job_failure(pool: &MySqlPool,
                                                   job: &W2lTemplateUploadJobRecord,
                                                   failure_reason: &str)

@@ -22,6 +22,7 @@ use crate::buckets::bucket_client::BucketClient;
 use crate::buckets::bucket_paths::hash_to_bucket_path;
 use crate::common_queries::firehose_publisher::FirehosePublisher;
 use crate::job_queries::w2l_download_job_queries::W2lTemplateUploadJobRecord;
+use crate::job_queries::w2l_download_job_queries::grab_job_lock_and_mark_pending;
 use crate::job_queries::w2l_download_job_queries::insert_w2l_template;
 use crate::job_queries::w2l_download_job_queries::mark_w2l_template_upload_job_done;
 use crate::job_queries::w2l_download_job_queries::mark_w2l_template_upload_job_failure;
@@ -304,14 +305,25 @@ async fn process_job(downloader: &Downloader, job: &W2lTemplateUploadJobRecord) 
   // TODO: 7. Save record. (DONE)
   // TODO: 8. Mark job done. (DONE)
 
+  // ==================== ATTEMPT TO GRAB JOB LOCK ==================== //
+
+  let lock_acquired = grab_job_lock_and_mark_pending(&downloader.mysql_pool, job).await?;
+
+  if !lock_acquired {
+    warn!("Could not acquire job lock for: {}", &job.id);
+    return Ok(())
+  }
+
+  // ==================== SETUP TEMP DIRS ==================== //
+
   let temp_dir = format!("temp_{}", job.id);
   let temp_dir = TempDir::new(&temp_dir)?;
 
-  let download_url = job.download_url.as_ref()
-    .map(|c| c.to_string())
-    .unwrap_or("".to_string());
-
   // ==================== DOWNLOAD FILE ==================== //
+
+  let download_url = job.download_url.as_ref()
+      .map(|c| c.to_string())
+      .unwrap_or("".to_string());
 
   info!("Calling downloader...");
   let download_filename = downloader.google_drive_downloader
