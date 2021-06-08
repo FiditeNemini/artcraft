@@ -132,13 +132,7 @@ FOR UPDATE
     _ => false, // Future-proof
   };
 
-  info!("Can acquire lock??? {}", can_transact);
-  info!("Can acquire lock??? {}", can_transact);
-  info!("Can acquire lock??? {}", can_transact);
-  info!("Can acquire lock??? {}", can_transact);
-
   if !can_transact {
-    info!("returning");
     transaction.rollback().await?;
     return Ok(false);
   }
