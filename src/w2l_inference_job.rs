@@ -9,6 +9,7 @@
 #[macro_use] extern crate serde_derive;
 
 pub mod buckets;
+pub mod common_env;
 pub mod common_queries;
 pub mod database_helpers;
 pub mod job_queries;
@@ -54,6 +55,7 @@ use std::process::Command;
 use std::thread;
 use std::time::Duration;
 use tempdir::TempDir;
+use crate::common_env::CommonEnv;
 
 // Buckets (shared config)
 const ENV_ACCESS_KEY : &'static str = "ACCESS_KEY";
@@ -97,6 +99,9 @@ struct Inferencer {
   pub inference_script: String,
   pub w2l_model_filename: String,
   pub w2l_end_bump_filename: String,
+
+  // Sleep between batches
+  pub job_batch_wait_millis: u64,
 }
 
 #[tokio::main]
@@ -200,6 +205,8 @@ async fn main() -> AnyhowResult<()> {
   let firehose_publisher = FirehosePublisher {
     mysql_pool: mysql_pool.clone(), // NB: MySqlPool is clone/send/sync safe
   };
+  
+  let common_env = CommonEnv::read_from_env()?;
 
   let inferencer = Inferencer {
     download_temp_directory: temp_directory,
@@ -217,6 +224,7 @@ async fn main() -> AnyhowResult<()> {
     firehose_publisher,
     w2l_model_filename,
     w2l_end_bump_filename,
+    job_batch_wait_millis: common_env.job_batch_wait_millis,
   };
 
   main_loop(inferencer).await;
@@ -228,7 +236,7 @@ const START_TIMEOUT_MILLIS : u64 = 500;
 const INCREASE_TIMEOUT_MILLIS : u64 = 1000;
 
 async fn main_loop(inferencer: Inferencer) {
-  let mut timeout_millis = START_TIMEOUT_MILLIS;
+  let mut error_timeout_millis = START_TIMEOUT_MILLIS;
 
   loop {
     let num_records = 1;
@@ -242,15 +250,15 @@ async fn main_loop(inferencer: Inferencer) {
       Ok(jobs) => jobs,
       Err(e) => {
         warn!("Error querying jobs: {:?}", e);
-        std::thread::sleep(Duration::from_millis(timeout_millis));
-        timeout_millis += INCREASE_TIMEOUT_MILLIS;
+        std::thread::sleep(Duration::from_millis(error_timeout_millis));
+        error_timeout_millis += INCREASE_TIMEOUT_MILLIS;
         continue;
       }
     };
 
     if jobs.is_empty() {
       info!("No jobs!");
-      std::thread::sleep(Duration::from_millis(1500));
+      std::thread::sleep(Duration::from_millis(inferencer.job_batch_wait_millis));
       continue;
     }
 
@@ -260,15 +268,15 @@ async fn main_loop(inferencer: Inferencer) {
       Ok(_) => {},
       Err(e) => {
         warn!("Error querying jobs: {:?}", e);
-        std::thread::sleep(Duration::from_millis(timeout_millis));
-        timeout_millis += INCREASE_TIMEOUT_MILLIS;
+        std::thread::sleep(Duration::from_millis(error_timeout_millis));
+        error_timeout_millis += INCREASE_TIMEOUT_MILLIS;
         continue;
       }
     }
 
-    timeout_millis = START_TIMEOUT_MILLIS; // reset
+    error_timeout_millis = START_TIMEOUT_MILLIS; // reset
 
-    std::thread::sleep(Duration::from_millis(500));
+    std::thread::sleep(Duration::from_millis(inferencer.job_batch_wait_millis));
   }
 }
 

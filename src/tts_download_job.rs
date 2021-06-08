@@ -9,6 +9,7 @@
 #[macro_use] extern crate serde_derive;
 
 pub mod buckets;
+pub mod common_env;
 pub mod common_queries;
 pub mod database_helpers;
 pub mod job_queries;
@@ -21,6 +22,7 @@ use chrono::Utc;
 use crate::buckets::bucket_client::BucketClient;
 use crate::buckets::bucket_path_unifier::BucketPathUnifier;
 use crate::buckets::bucket_paths::hash_to_bucket_path;
+use crate::common_env::CommonEnv;
 use crate::common_queries::firehose_publisher::FirehosePublisher;
 use crate::job_queries::tts_download_job_queries::TtsUploadJobRecord;
 use crate::job_queries::tts_download_job_queries::grab_job_lock_and_mark_pending;
@@ -76,6 +78,9 @@ struct Downloader {
   pub download_script: String,
   // Root to store TTS results
   pub bucket_root_tts_model_uploads: String,
+
+  // Sleep between batches
+  pub job_batch_wait_millis: u64,
 }
 
 #[tokio::main]
@@ -146,6 +151,8 @@ async fn main() -> AnyhowResult<()> {
     &py_script_name,
   );
 
+  let common_env = CommonEnv::read_from_env()?;
+
   let downloader = Downloader {
     download_temp_directory: temp_directory,
     mysql_pool,
@@ -156,6 +163,7 @@ async fn main() -> AnyhowResult<()> {
     bucket_root_tts_model_uploads: bucket_root.to_string(),
     firehose_publisher,
     tts_check: tts_model_check_command,
+    job_batch_wait_millis: common_env.job_batch_wait_millis,
   };
 
   main_loop(downloader).await;
@@ -167,7 +175,7 @@ const START_TIMEOUT_MILLIS : u64 = 500;
 const INCREASE_TIMEOUT_MILLIS : u64 = 1000;
 
 async fn main_loop(downloader: Downloader) {
-  let mut timeout_millis = START_TIMEOUT_MILLIS;
+  let mut error_timeout_millis = START_TIMEOUT_MILLIS;
 
   loop {
     let num_records = 1;
@@ -177,15 +185,15 @@ async fn main_loop(downloader: Downloader) {
       Ok(jobs) => jobs,
       Err(e) => {
         warn!("Error querying jobs: {:?}", e);
-        std::thread::sleep(Duration::from_millis(timeout_millis));
-        timeout_millis += INCREASE_TIMEOUT_MILLIS;
+        std::thread::sleep(Duration::from_millis(error_timeout_millis));
+        error_timeout_millis += INCREASE_TIMEOUT_MILLIS;
         continue;
       }
     };
 
     if jobs.is_empty() {
       info!("No jobs!");
-      std::thread::sleep(Duration::from_millis(1500));
+      std::thread::sleep(Duration::from_millis(downloader.job_batch_wait_millis));
       continue;
     }
 
@@ -195,15 +203,15 @@ async fn main_loop(downloader: Downloader) {
       Ok(_) => {},
       Err(e) => {
         warn!("Error querying jobs: {:?}", e);
-        std::thread::sleep(Duration::from_millis(timeout_millis));
-        timeout_millis += INCREASE_TIMEOUT_MILLIS;
+        std::thread::sleep(Duration::from_millis(error_timeout_millis));
+        error_timeout_millis += INCREASE_TIMEOUT_MILLIS;
         continue;
       }
     }
 
-    timeout_millis = START_TIMEOUT_MILLIS; // reset
+    error_timeout_millis = START_TIMEOUT_MILLIS; // reset
 
-    std::thread::sleep(Duration::from_millis(500));
+    std::thread::sleep(Duration::from_millis(downloader.job_batch_wait_millis));
   }
 }
 

@@ -9,6 +9,7 @@
 #[macro_use] extern crate serde_derive;
 
 pub mod buckets;
+pub mod common_env;
 pub mod common_queries;
 pub mod database_helpers;
 pub mod job_queries;
@@ -21,6 +22,7 @@ use chrono::Utc;
 use crate::buckets::bucket_client::BucketClient;
 use crate::buckets::bucket_path_unifier::BucketPathUnifier;
 use crate::buckets::bucket_paths::hash_to_bucket_path;
+use crate::common_env::CommonEnv;
 use crate::common_queries::firehose_publisher::FirehosePublisher;
 use crate::job_queries::tts_inference_job_queries::TtsInferenceJobRecord;
 use crate::job_queries::tts_inference_job_queries::get_tts_model_by_token;
@@ -86,6 +88,9 @@ struct Inferencer {
 
   // Command to run
   pub tts_vocoder_model_filename: String,
+
+  // Sleep between batches
+  pub job_batch_wait_millis: u64,
 }
 
 #[tokio::main]
@@ -177,6 +182,8 @@ async fn main() -> AnyhowResult<()> {
     mysql_pool: mysql_pool.clone(), // NB: MySqlPool is clone/send/sync safe
   };
 
+  let common_env = CommonEnv::read_from_env()?;
+
   let inferencer = Inferencer {
     download_temp_directory: temp_directory,
     mysql_pool,
@@ -190,6 +197,7 @@ async fn main() -> AnyhowResult<()> {
     semi_persistent_cache,
     firehose_publisher,
     tts_vocoder_model_filename,
+    job_batch_wait_millis: common_env.job_batch_wait_millis,
   };
 
   main_loop(inferencer).await;
@@ -201,7 +209,7 @@ const START_TIMEOUT_MILLIS : u64 = 500;
 const INCREASE_TIMEOUT_MILLIS : u64 = 1000;
 
 async fn main_loop(inferencer: Inferencer) {
-  let mut timeout_millis = START_TIMEOUT_MILLIS;
+  let mut error_timeout_millis = START_TIMEOUT_MILLIS;
 
   loop {
     let num_records = 1;
@@ -215,15 +223,15 @@ async fn main_loop(inferencer: Inferencer) {
       Ok(jobs) => jobs,
       Err(e) => {
         warn!("Error querying jobs: {:?}", e);
-        std::thread::sleep(Duration::from_millis(timeout_millis));
-        timeout_millis += INCREASE_TIMEOUT_MILLIS;
+        std::thread::sleep(Duration::from_millis(error_timeout_millis));
+        error_timeout_millis += INCREASE_TIMEOUT_MILLIS;
         continue;
       }
     };
 
     if jobs.is_empty() {
       info!("No jobs!");
-      std::thread::sleep(Duration::from_millis(20));
+      std::thread::sleep(Duration::from_millis(inferencer.job_batch_wait_millis));
       continue;
     }
 
@@ -233,15 +241,15 @@ async fn main_loop(inferencer: Inferencer) {
       Ok(_) => {},
       Err(e) => {
         warn!("Error querying jobs: {:?}", e);
-        std::thread::sleep(Duration::from_millis(timeout_millis));
-        timeout_millis += INCREASE_TIMEOUT_MILLIS;
+        std::thread::sleep(Duration::from_millis(error_timeout_millis));
+        error_timeout_millis += INCREASE_TIMEOUT_MILLIS;
         continue;
       }
     }
 
-    timeout_millis = START_TIMEOUT_MILLIS; // reset
+    error_timeout_millis = START_TIMEOUT_MILLIS; // reset
 
-    std::thread::sleep(Duration::from_millis(20));
+    std::thread::sleep(Duration::from_millis(inferencer.job_batch_wait_millis));
   }
 }
 
