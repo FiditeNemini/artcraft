@@ -270,8 +270,8 @@ async fn process_jobs(inferencer: &Inferencer, jobs: Vec<TtsInferenceJobRecord>)
           &inferencer.mysql_pool,
           &job,
           failure_reason,
-          inferencer.job_max_attempts)
-            .await;
+          inferencer.job_max_attempts
+        ).await;
       }
     }
   }

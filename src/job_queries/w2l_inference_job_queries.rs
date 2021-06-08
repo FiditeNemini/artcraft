@@ -165,6 +165,7 @@ FOR UPDATE
 UPDATE w2l_inference_jobs
 SET
   status = 'started',
+  attempt_count = attempt_count + 1,
   retry_at = NOW() + interval 2 minute
 WHERE id = ?
         "#,
@@ -179,13 +180,20 @@ WHERE id = ?
 }
 
 
-pub async fn mark_w2l_inference_job_failure(pool: &MySqlPool,
-                                                  job: &W2lInferenceJobRecord,
-                                                  failure_reason: &str)
-                                                  -> AnyhowResult<()>
-{
+pub async fn mark_w2l_inference_job_failure(
+  pool: &MySqlPool,
+  job: &W2lInferenceJobRecord,
+  failure_reason: &str,
+  max_attempts: i32
+) -> AnyhowResult<()> {
+
   // statuses: "attempt_failed", "complete_failure", "dead"
-  let status = "attempt_failed";
+  let mut next_status = "attempt_failed";
+
+  if job.attempt_count >= max_attempts {
+    // NB: Job attempt count is incremented at start
+    next_status = "dead";
+  }
 
   let query_result = sqlx::query!(
         r#"
@@ -196,7 +204,7 @@ SET
   retry_at = NOW() + interval 2 minute
 WHERE id = ?
         "#,
-        status,
+        next_status,
         failure_reason.to_string(),
         job.id,
     )

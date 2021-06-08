@@ -102,6 +102,10 @@ struct Inferencer {
 
   // Sleep between batches
   pub job_batch_wait_millis: u64,
+
+  // Max job attempts before failure.
+  // NB: This is an i32 so we don't need to convert to db column type.
+  pub job_max_attempts: i32,
 }
 
 #[tokio::main]
@@ -225,6 +229,7 @@ async fn main() -> AnyhowResult<()> {
     w2l_model_filename,
     w2l_end_bump_filename,
     job_batch_wait_millis: common_env.job_batch_wait_millis,
+    job_max_attempts: common_env.job_max_attempts as i32,
   };
 
   main_loop(inferencer).await;
@@ -291,8 +296,9 @@ async fn process_jobs(inferencer: &Inferencer, jobs: Vec<W2lInferenceJobRecord>)
         let _r = mark_w2l_inference_job_failure(
           &inferencer.mysql_pool,
           &job,
-          failure_reason)
-          .await;
+          failure_reason,
+          inferencer.job_max_attempts
+        ).await;
       }
     }
   }

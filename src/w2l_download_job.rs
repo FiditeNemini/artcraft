@@ -103,6 +103,10 @@ struct Downloader {
 
   // Sleep between batches
   pub job_batch_wait_millis: u64,
+
+  // Max job attempts before failure.
+  // NB: This is an i32 so we don't need to convert to db column type.
+  pub job_max_attempts: i32,
 }
 
 #[tokio::main]
@@ -209,6 +213,7 @@ async fn main() -> AnyhowResult<()> {
     debug_face_detect_sleep_millis: easyenv::get_env_num("DEBUG_FACE_DETECT_SLEEP_MILLIS", 0)?,
     debug_job_end_sleep_millis: easyenv::get_env_num("DEBUG_JOB_END_SLEEP_MILLIS", 0)?,
     job_batch_wait_millis: common_env.job_batch_wait_millis,
+    job_max_attempts: common_env.job_max_attempts as i32,
   };
 
   main_loop(downloader).await;
@@ -275,8 +280,9 @@ async fn process_jobs(downloader: &Downloader, jobs: Vec<W2lTemplateUploadJobRec
         let _r = mark_w2l_template_upload_job_failure(
           &downloader.mysql_pool,
           &job,
-          failure_reason)
-          .await;
+          failure_reason,
+          downloader.job_max_attempts
+        ).await;
       }
     }
   }
