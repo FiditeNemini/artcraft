@@ -19,8 +19,12 @@ export class TtsInferenceJob {
     this.status = status;
     this.jobToken = jobToken;
     this.maybeResultToken = maybeResulToken;
-    this.modelToken = modelToken;
-    this.title = title;
+    if (!!modelToken) {
+      this.modelToken = modelToken;
+    }
+    if (!!title) {
+      this.title = title;
+    }
     this.maybePublicBucketWavAudioPath = maybePublicBucketWavAudioPath;
   }
 

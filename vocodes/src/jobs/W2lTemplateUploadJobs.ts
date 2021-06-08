@@ -3,16 +3,16 @@
 export class W2lTemplateUploadJob {
   jobToken: string;
   status: string;
-  maybeW2lTemplateToken?: string;
+  maybeW2lTemplateToken: string | undefined | null;
 
   constructor(
     jobToken: string, 
     status: string = 'unknown',
-    maybeW2lTemplateToken?: string
+    maybeW2lTemplateToken: string | undefined | null = null
   ) {
     this.status = status;
     this.jobToken = jobToken;
-    if (maybeW2lTemplateToken !== undefined) {
+    if (!!maybeW2lTemplateToken) {
       this.maybeW2lTemplateToken = maybeW2lTemplateToken;
     }
   }
@@ -33,7 +33,7 @@ export interface W2lTemplateUploadJobStateResponsePayload {
 
 export interface W2lTemplateUploadJobState {
   job_token: string,
-  maybe_template_token?: string,
+  maybe_template_token: string | null,
   status: string,
   created_at: string,
   updated_at: string,
