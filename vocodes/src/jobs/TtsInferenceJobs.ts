@@ -5,16 +5,16 @@ export class TtsInferenceJob {
   modelToken?: string;
   status: string;
   title?: string;
-  maybeResultToken?: string;
-  maybePublicBucketWavAudioPath?: string;
+  maybeResultToken: string | undefined | null;
+  maybePublicBucketWavAudioPath: string | undefined | null;
 
   constructor(
     jobToken: string, 
     status: string = 'unknown',
     modelToken: string | undefined = undefined,
     title: string | undefined = undefined,
-    maybeResulToken: string | undefined = undefined,
-    maybePublicBucketWavAudioPath: string | undefined = undefined,
+    maybeResulToken: string | undefined | null = null,
+    maybePublicBucketWavAudioPath: string | undefined | null = null,
   ) {
     this.status = status;
     this.jobToken = jobToken;
@@ -44,8 +44,8 @@ export interface TtsInferenceJobStateResponsePayload {
 export interface TtsInferenceJobState {
   job_token: string,
   status: string,
-  maybe_result_token?: string,
-  maybe_public_bucket_wav_audio_path?: string,
+  maybe_result_token: string | null,
+  maybe_public_bucket_wav_audio_path: string | null,
   model_token: string,
   tts_model_type: string,
   title: string,

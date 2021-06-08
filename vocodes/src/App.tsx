@@ -104,10 +104,6 @@ class App extends React.Component<Props, State> {
   }
 
   logoutSession = () => {
-    if (!this.state.enableAlpha) {
-      return;
-    }
-
     const api = new ApiConfig();
     const endpointUrl = api.logout();
 
@@ -125,9 +121,6 @@ class App extends React.Component<Props, State> {
   }
 
   enqueueTtsJob = (jobToken: string) => {
-    if (!this.state.enableAlpha) {
-      return;
-    }
     const newJob = new TtsInferenceJob(jobToken);
     let inferenceJobs = this.state.ttsInferenceJobs.concat([newJob]);
 
@@ -137,10 +130,6 @@ class App extends React.Component<Props, State> {
   }
 
   checkTtsJob = (jobToken: string) => {
-    if (!this.state.enableAlpha) {
-      return;
-    }
-
     const api = new ApiConfig();
     const endpointUrl = api.getTtsInferenceJobState(jobToken);
 
@@ -160,10 +149,11 @@ class App extends React.Component<Props, State> {
       }
 
       let updatedJobs : Array<TtsInferenceJob> = [];
-      this.state.ttsInferenceJobs.forEach(job => {
-        if (job.jobToken !== jobResponse.state!.job_token ||
-            jobResponse.state!.maybe_result_token === undefined) { // NB: Already done querying, no need to update again.
-          updatedJobs.push(job);
+
+      this.state.ttsInferenceJobs.forEach(existingJob => {
+        if (existingJob.jobToken !== jobResponse.state!.job_token ||
+            !jobResponse.state!.maybe_result_token) { // NB: Don't replace until we're done.
+          updatedJobs.push(existingJob);
           return;
         }
 
@@ -179,9 +169,6 @@ class App extends React.Component<Props, State> {
   }
 
   enqueueTtsModelUploadJob = (jobToken: string) => {
-    if (!this.state.enableAlpha) {
-      return;
-    }
     const newJob = new TtsModelUploadJob(jobToken);
     let modelUploadJobs = this.state.ttsModelUploadJobs.concat([newJob]);
 
@@ -191,10 +178,6 @@ class App extends React.Component<Props, State> {
   }
 
   checkTtsModelUploadJob = (jobToken: string) => {
-    if (!this.state.enableAlpha) {
-      return;
-    }
-
     const api = new ApiConfig();
     const endpointUrl = api.getTtsModelUploadJobState(jobToken);
 
@@ -234,9 +217,6 @@ class App extends React.Component<Props, State> {
 
 
   enqueueW2lJob = (jobToken: string) => {
-    if (!this.state.enableAlpha) {
-      return;
-    }
     const newJob = new W2lInferenceJob(jobToken);
     let inferenceJobs = this.state.w2lInferenceJobs.concat([newJob]);
 
@@ -246,10 +226,6 @@ class App extends React.Component<Props, State> {
   }
 
   checkW2lJob = (jobToken: string) => {
-    if (!this.state.enableAlpha) {
-      return;
-    }
-
     const api = new ApiConfig();
     const endpointUrl = api.getW2lInferenceJobState(jobToken);
 
@@ -288,9 +264,6 @@ class App extends React.Component<Props, State> {
   }
 
   enqueueW2lTemplateUploadJob = (jobToken: string) => {
-    if (!this.state.enableAlpha) {
-      return;
-    }
     const newJob = new W2lTemplateUploadJob(jobToken);
     let inferenceJobs = this.state.w2lTemplateUploadJobs.concat([newJob]);
 
@@ -300,10 +273,6 @@ class App extends React.Component<Props, State> {
   }
 
   checkW2lTemplateUploadJob = (jobToken: string) => {
-    if (!this.state.enableAlpha) {
-      return;
-    }
-
     const api = new ApiConfig();
     const endpointUrl = api.getW2lTemplateUploadJobState(jobToken);
 
