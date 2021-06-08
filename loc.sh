@@ -7,4 +7,5 @@ wc -l \
 	src/*/*.rs \
 	src/*/*/*.rs \
 	src/*/*/*/*.rs \
-	src/*/*/*/*/*.rs
+	src/*/*/*/*/*.rs \
+	| sort -n
