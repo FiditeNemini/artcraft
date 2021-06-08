@@ -1,5 +1,43 @@
 {
   "db": "MySQL",
+  "02060ab9b8ca472a2bd4d4fa3120743e90148ccd6a4cb13bc491d00f36ed7a8f": {
+    "query": "\nSELECT\n  id,\n  status\nFROM w2l_inference_jobs\nWHERE id = ?\nFOR UPDATE\n        ",
+    "describe": {
+      "columns": [
+        {
+          "ordinal": 0,
+          "name": "id",
+          "type_info": {
+            "type": "LongLong",
+            "flags": {
+              "bits": 515
+            },
+            "char_set": 63,
+            "max_size": 20
+          }
+        },
+        {
+          "ordinal": 1,
+          "name": "status",
+          "type_info": {
+            "type": "String",
+            "flags": {
+              "bits": 393
+            },
+            "char_set": 224,
+            "max_size": 64
+          }
+        }
+      ],
+      "parameters": {
+        "Right": 1
+      },
+      "nullable": [
+        false,
+        false
+      ]
+    }
+  },
   "0c32927e9292e0cf4aeb169ee3ed0ec122712a66a6850eb9e9da31d5a97e6e72": {
     "query": "\nSELECT\n    jobs.token as job_token,\n\n    jobs.status,\n    jobs.on_success_result_token as maybe_result_token,\n    results.public_bucket_video_path as maybe_public_bucket_video_path,\n\n    jobs.maybe_w2l_template_token,\n    w2l.template_type as w2l_template_type,\n    w2l.title,\n\n    jobs.created_at,\n    jobs.updated_at\n\nFROM w2l_inference_jobs as jobs\nJOIN w2l_templates as w2l\n    ON w2l.token = jobs.maybe_w2l_template_token\nLEFT OUTER JOIN w2l_results as results\n    ON jobs.on_success_result_token = results.token\n\nWHERE jobs.token = ?\n        ",
     "describe": {
@@ -124,6 +162,44 @@
         true,
         false,
         false,
+        false,
+        false
+      ]
+    }
+  },
+  "0caed749627ff22ae1cea52621a375156259a731e8070459593082b80d463491": {
+    "query": "\nSELECT\n  id,\n  status\nFROM tts_model_upload_jobs\nWHERE id = ?\nFOR UPDATE\n        ",
+    "describe": {
+      "columns": [
+        {
+          "ordinal": 0,
+          "name": "id",
+          "type_info": {
+            "type": "LongLong",
+            "flags": {
+              "bits": 515
+            },
+            "char_set": 63,
+            "max_size": 20
+          }
+        },
+        {
+          "ordinal": 1,
+          "name": "status",
+          "type_info": {
+            "type": "String",
+            "flags": {
+              "bits": 393
+            },
+            "char_set": 224,
+            "max_size": 64
+          }
+        }
+      ],
+      "parameters": {
+        "Right": 1
+      },
+      "nullable": [
         false,
         false
       ]
@@ -1851,6 +1927,16 @@
       "nullable": []
     }
   },
+  "3bc397a1157c4564562138dbef80cf89d2185943f5f925228936f0b5c67e1b95": {
+    "query": "\nUPDATE tts_inference_jobs\nSET\n  status = 'started',\n  retry_at = NOW() + interval 2 minute\nWHERE id = ?\n        ",
+    "describe": {
+      "columns": [],
+      "parameters": {
+        "Right": 1
+      },
+      "nullable": []
+    }
+  },
   "3de0e9c442ae0d4ca2f1da19357ac7685084e2843216313d7836ea60bc3dcfe0": {
     "query": "\nSELECT\n    jobs.token as job_token,\n\n    jobs.status,\n    jobs.on_success_result_token as maybe_model_token,\n\n    jobs.created_at,\n    jobs.updated_at\n\nFROM tts_model_upload_jobs as jobs\n\nWHERE jobs.token = ?\n        ",
     "describe": {
@@ -2065,6 +2151,44 @@
         true,
         false,
         false,
+        false,
+        false
+      ]
+    }
+  },
+  "4f61f621682ba255814f8a55455ea2b7fba9b6c85affaf87abfe2f81e11322f0": {
+    "query": "\nSELECT\n  id,\n  status\nFROM tts_inference_jobs\nWHERE id = ?\nFOR UPDATE\n        ",
+    "describe": {
+      "columns": [
+        {
+          "ordinal": 0,
+          "name": "id",
+          "type_info": {
+            "type": "LongLong",
+            "flags": {
+              "bits": 515
+            },
+            "char_set": 63,
+            "max_size": 20
+          }
+        },
+        {
+          "ordinal": 1,
+          "name": "status",
+          "type_info": {
+            "type": "String",
+            "flags": {
+              "bits": 393
+            },
+            "char_set": 224,
+            "max_size": 64
+          }
+        }
+      ],
+      "parameters": {
+        "Right": 1
+      },
+      "nullable": [
         false,
         false
       ]
@@ -2855,6 +2979,16 @@
       "columns": [],
       "parameters": {
         "Right": 10
+      },
+      "nullable": []
+    }
+  },
+  "79e6cc7829521ba8b26b5a97d3c8ab4e371945fa581e1632440c05658a2731ef": {
+    "query": "\nUPDATE w2l_inference_jobs\nSET\n  status = 'started',\n  retry_at = NOW() + interval 2 minute\nWHERE id = ?\n        ",
+    "describe": {
+      "columns": [],
+      "parameters": {
+        "Right": 1
       },
       "nullable": []
     }
@@ -5261,6 +5395,16 @@
       ]
     }
   },
+  "b4582bc4d8865cc82bf1e0fe15209db07d1922a29c274b872cd5f5eaee4b261d": {
+    "query": "\nUPDATE w2l_template_upload_jobs\nSET\n  status = 'started',\n  retry_at = NOW() + interval 2 minute\nWHERE id = ?\n        ",
+    "describe": {
+      "columns": [],
+      "parameters": {
+        "Right": 1
+      },
+      "nullable": []
+    }
+  },
   "b62d4ca915206b8f956a2664c72e02832d38ab34fb3be50d9a77cf8145297689": {
     "query": "\nSELECT\n    w2l.token as template_token,\n    w2l.template_type,\n    w2l.creator_user_token,\n    users.username as creator_username,\n    users.display_name as creator_display_name,\n    w2l.updatable_slug,\n    w2l.title,\n    w2l.frame_width,\n    w2l.frame_height,\n    w2l.duration_millis,\n    w2l.maybe_public_bucket_preview_image_object_name,\n    w2l.maybe_public_bucket_preview_video_object_name,\n    w2l.is_mod_public_listing_approved,\n    w2l.created_at,\n    w2l.updated_at\nFROM w2l_templates as w2l\nJOIN users\nON\n    users.token = w2l.creator_user_token\nWHERE\n    w2l.deleted_at IS NULL\n    AND w2l.is_mod_public_listing_approved IS TRUE\n    AND users.username = ?\n        ",
     "describe": {
@@ -5727,12 +5871,12 @@
       ]
     }
   },
-  "b8e0f7961f7b339e4a81b7fd47f99d0cd07567b33f0d093b449586154dc16235": {
-    "query": "\nINSERT INTO tts_models\nSET\n  token = ?,\n  tts_model_type = \"tacotron2\",\n  updatable_slug = ?,\n  title = ?,\n  description_markdown = '',\n  description_rendered_html = '',\n  creator_user_token = ?,\n  creator_ip_address = ?,\n  original_download_url = ?,\n  private_bucket_hash = ?,\n  private_bucket_object_name = ?\n        ",
+  "bd151e17d1dd65c25ebc689a1d321ac14b8d5d8f1c9e8426c0c92ed278595de2": {
+    "query": "\nINSERT INTO tts_models\nSET\n  token = ?,\n  tts_model_type = \"tacotron2\",\n  updatable_slug = ?,\n  title = ?,\n  description_markdown = '',\n  description_rendered_html = '',\n  creator_user_token = ?,\n  creator_ip_address = ?,\n  original_download_url = ?,\n  private_bucket_hash = ?,\n  private_bucket_object_name = ?,\n  file_size_bytes = ?\n        ",
     "describe": {
       "columns": [],
       "parameters": {
-        "Right": 8
+        "Right": 9
       },
       "nullable": []
     }
@@ -6088,6 +6232,44 @@
         false,
         false,
         false,
+        false,
+        false
+      ]
+    }
+  },
+  "d12757abef811cd6951e0e1427fdb496a8931b547519d320f5ade56007d3eb5d": {
+    "query": "\nSELECT\n  id,\n  status\nFROM w2l_template_upload_jobs\nWHERE id = ?\nFOR UPDATE\n        ",
+    "describe": {
+      "columns": [
+        {
+          "ordinal": 0,
+          "name": "id",
+          "type_info": {
+            "type": "LongLong",
+            "flags": {
+              "bits": 515
+            },
+            "char_set": 63,
+            "max_size": 20
+          }
+        },
+        {
+          "ordinal": 1,
+          "name": "status",
+          "type_info": {
+            "type": "String",
+            "flags": {
+              "bits": 393
+            },
+            "char_set": 224,
+            "max_size": 64
+          }
+        }
+      ],
+      "parameters": {
+        "Right": 1
+      },
+      "nullable": [
         false,
         false
       ]
@@ -6518,6 +6700,16 @@
         false,
         false
       ]
+    }
+  },
+  "d5d3e1bd935d32639ad7398936f4c8ee9f3caff6c0789db29b45a81555d1bdce": {
+    "query": "\nUPDATE tts_model_upload_jobs\nSET\n  status = 'started',\n  retry_at = NOW() + interval 2 minute\nWHERE id = ?\n        ",
+    "describe": {
+      "columns": [],
+      "parameters": {
+        "Right": 1
+      },
+      "nullable": []
     }
   },
   "e73192a3e763a287d5737821443c5a81649f17e39978497b99c52e1e896a75f6": {
