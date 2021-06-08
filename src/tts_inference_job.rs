@@ -223,7 +223,7 @@ async fn main_loop(inferencer: Inferencer) {
 
     if jobs.is_empty() {
       info!("No jobs!");
-      std::thread::sleep(Duration::from_millis(1500));
+      std::thread::sleep(Duration::from_millis(20));
       continue;
     }
 
@@ -241,7 +241,7 @@ async fn main_loop(inferencer: Inferencer) {
 
     timeout_millis = START_TIMEOUT_MILLIS; // reset
 
-    std::thread::sleep(Duration::from_millis(500));
+    std::thread::sleep(Duration::from_millis(20));
   }
 }
 

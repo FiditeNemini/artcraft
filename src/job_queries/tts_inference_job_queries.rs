@@ -138,6 +138,8 @@ FOR UPDATE
   info!("Can acquire lock??? {}", can_transact);
 
   if !can_transact {
+    info!("returning");
+    transaction.rollback().await?;
     return Ok(false);
   }
 
