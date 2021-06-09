@@ -3,10 +3,12 @@ import { ApiConfig } from '../../common/ApiConfig';
 import { Link } from 'react-router-dom';
 import { SessionTtsInferenceResultListFc } from '../common/SessionTtsInferenceResultsListFc';
 import { SessionTtsModelUploadResultListFc } from '../common/SessionTtsModelUploadResultsListFc';
+import { SessionW2lInferenceResultListFc } from '../common/SessionW2lInferenceResultsListFc';
 import { SessionW2lTemplateUploadResultListFc } from '../common/SessionW2lTemplateUploadResultsListFc';
 import { SessionWrapper } from '../../session/SessionWrapper';
 import { TtsInferenceJob } from '../../App';
 import { TtsModelUploadJob } from '../../jobs/TtsModelUploadJobs';
+import { W2lInferenceJob } from '../../jobs/W2lInferenceJobs';
 import { W2lTemplateUploadJob } from '../../jobs/W2lTemplateUploadJobs';
 import { v1 as uuidv1 } from 'uuid';
 
@@ -37,6 +39,7 @@ interface Props {
   enqueueTtsJob: (jobToken: string) => void,
   ttsInferenceJobs: Array<TtsInferenceJob>,
   ttsModelUploadJobs: Array<TtsModelUploadJob>,
+  w2lInferenceJobs: Array<W2lInferenceJob>,
   w2lTemplateUploadJobs: Array<W2lTemplateUploadJob>,
 }
 
@@ -251,6 +254,12 @@ function TtsModelFormFc(props: Props) {
       <br />
       <SessionTtsInferenceResultListFc ttsInferenceJobs={props.ttsInferenceJobs} />
 
+      <br />
+      <br />
+
+      <SessionW2lInferenceResultListFc
+        w2lInferenceJobs={props.w2lInferenceJobs}
+        />
       <br />
       <br />
 

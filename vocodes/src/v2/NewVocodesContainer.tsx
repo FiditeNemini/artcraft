@@ -191,6 +191,7 @@ class NewVocodesContainer extends React.Component<Props, State> {
                 enqueueTtsJob={this.props.enqueueTtsJob}
                 ttsInferenceJobs={this.props.ttsInferenceJobs}
                 ttsModelUploadJobs={this.props.ttsModelUploadJobs}
+                w2lInferenceJobs={this.props.w2lInferenceJobs}
                 w2lTemplateUploadJobs={this.props.w2lTemplateUploadJobs}
               />
             </Route>
