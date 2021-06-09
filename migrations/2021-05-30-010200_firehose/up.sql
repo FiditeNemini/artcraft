@@ -10,25 +10,6 @@ CREATE TABLE firehose_entries (
     token VARCHAR(32) NOT NULL,
 
     -- The type of the event
-    -- DO NOT REORDER.
-    -- event_type ENUM(
-    --    'not-set',
-    --    'user_sign_up',
-    --    'tts_model_upload_started',
-    --    'tts_model_upload_completed',
-    --    'tts_inference_started',
-    --    'tts_inference_completed',
-    --    'w2l_template_upload_started',
-    --    'w2l_template_upload_completed',
-    --    'w2l_inference_started',
-    --    'w2l_inference_completed',
-    --    'twitter_mention',
-    --    'twitter_retweet',
-    --    'discord_join',
-    --    'discord_message',
-    --    'twitch_subscribe',
-    --    'twitch_follow'
-    -- ) NOT NULL DEFAULT 'not-set',
     event_type VARCHAR(32) NOT NULL,
 
     -- The target user
