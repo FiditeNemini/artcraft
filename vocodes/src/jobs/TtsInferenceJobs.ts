@@ -43,21 +43,6 @@ export class TtsInferenceJob {
       response.maybe_public_bucket_wav_audio_path
     );
   }
-
-  public jobStateCanChange() : boolean {
-    switch (this.jobState) {
-      case JobState.UNKNOWN:
-      case JobState.PENDING:
-      case JobState.STARTED:
-      case JobState.ATTEMPT_FAILED:
-        return true;
-      case JobState.COMPLETE_SUCCESS:
-      case JobState.COMPLETE_FAILURE:
-      case JobState.DEAD:
-      default:
-        return false;
-    }
-  }
 }
 
 export interface TtsInferenceJobStateResponsePayload {
