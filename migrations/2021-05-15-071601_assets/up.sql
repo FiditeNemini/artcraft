@@ -106,6 +106,9 @@ CREATE TABLE tts_models (
   -- In this case, a moderator disables it.
   is_mod_disabled BOOLEAN NOT NULL DEFAULT FALSE,
 
+  -- Extremely popular models may be locked from deletion or modification by users.
+  is_locked_from_user_modification BOOLEAN NOT NULL DEFAULT FALSE,
+
   -- If a moderator has comments.
   maybe_mod_comments VARCHAR(255) DEFAULT NULL,
   -- The last moderator that made changes.
@@ -242,6 +245,9 @@ CREATE TABLE w2l_templates (
   -- In this case, a moderator disables it.
   -- This also disables it for the creator.
   is_mod_disabled BOOLEAN NOT NULL DEFAULT FALSE,
+
+  -- Extremely popular models may be locked from deletion or modification by users.
+  is_locked_from_user_modification BOOLEAN NOT NULL DEFAULT FALSE,
 
   -- If a moderator has comments.
   maybe_mod_comments VARCHAR(255) DEFAULT NULL,
