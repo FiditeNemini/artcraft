@@ -198,10 +198,10 @@ class App extends React.Component<Props, State> {
       }
 
       let updatedJobs : Array<TtsModelUploadJob> = [];
-      this.state.ttsModelUploadJobs.forEach(job => {
-        if (job.jobToken !== jobResponse.state!.job_token ||
-            !jobResponse.state!.maybe_model_token) { // NB: Don't replace until we're done.
-          updatedJobs.push(job);
+      this.state.ttsModelUploadJobs.forEach(existingJob => {
+        if (existingJob.jobToken !== jobResponse.state!.job_token ||
+            !jobStateCanChange(existingJob.jobState)) {
+          updatedJobs.push(existingJob);
           return;
         }
 
@@ -246,10 +246,10 @@ class App extends React.Component<Props, State> {
       }
 
       let updatedJobs : Array<W2lInferenceJob> = [];
-      this.state.w2lInferenceJobs.forEach(job => {
-        if (job.jobToken !== jobResponse.state!.job_token ||
-            !jobResponse.state!.maybe_result_token) { // NB: Don't replace until we're done.
-          updatedJobs.push(job);
+      this.state.w2lInferenceJobs.forEach(existingJob => {
+        if (existingJob.jobToken !== jobResponse.state!.job_token ||
+            !jobStateCanChange(existingJob.jobState)) {
+          updatedJobs.push(existingJob);
           return;
         }
 
@@ -294,10 +294,10 @@ class App extends React.Component<Props, State> {
 
       let updatedJobs : Array<W2lTemplateUploadJob> = [];
 
-      this.state.w2lTemplateUploadJobs.forEach(job => {
-        if (job.jobToken !== jobResponse.state!.job_token ||
-            !jobResponse.state!.maybe_template_token) { // NB: Don't replace until we're done
-          updatedJobs.push(job);
+      this.state.w2lTemplateUploadJobs.forEach(existingJob => {
+        if (existingJob.jobToken !== jobResponse.state!.job_token ||
+            !jobStateCanChange(existingJob.jobState)) {
+          updatedJobs.push(existingJob);
           return;
         }
 
@@ -315,38 +315,22 @@ class App extends React.Component<Props, State> {
   pollJobs = () => {
     this.state.ttsInferenceJobs.forEach(job => {
       if (jobStateCanChange(job.jobState)) {
-        console.log('state can change');
         this.checkTtsJob(job.jobToken);
       }
     });
     this.state.w2lInferenceJobs.forEach(job => {
-      switch (job.status) {
-        case 'unknown':
-        case 'pending':
-          this.checkW2lJob(job.jobToken);
-          break;
-        default:
-          return;
+      if (jobStateCanChange(job.jobState)) {
+        this.checkW2lJob(job.jobToken);
       }
     });
     this.state.ttsModelUploadJobs.forEach(job => {
-      switch (job.status) {
-        case 'unknown':
-        case 'pending':
-          this.checkTtsModelUploadJob(job.jobToken);
-          break;
-        default:
-          return;
+      if (jobStateCanChange(job.jobState)) {
+        this.checkTtsModelUploadJob(job.jobToken);
       }
     });
     this.state.w2lTemplateUploadJobs.forEach(job => {
-      switch (job.status) {
-        case 'unknown':
-        case 'pending':
-          this.checkW2lTemplateUploadJob(job.jobToken);
-          break;
-        default:
-          return;
+      if (jobStateCanChange(job.jobState)) {
+        this.checkW2lTemplateUploadJob(job.jobToken);
       }
     });
   }

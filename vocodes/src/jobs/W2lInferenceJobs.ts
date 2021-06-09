@@ -1,8 +1,10 @@
+import { JobState, jobStateFromString } from "./JobStates";
 
 export class W2lInferenceJob {
   jobToken: string;
   maybeW2lTemplateToken: string | undefined | null;
-  status: string;
+  jobState: JobState;
+  attemptCount: number;
   title?: string;
   maybeResultToken: string | undefined | null;
   maybePublicBucketVideoPath: string | undefined | null;
@@ -10,12 +12,14 @@ export class W2lInferenceJob {
   constructor(
     jobToken: string, 
     status: string = 'unknown',
+    attemptCount: number = 0,
     maybeW2lTemplateToken: string | undefined | null = undefined,
     title: string | undefined = undefined,
     maybeResulToken: string | undefined | null = undefined,
     maybePublicBucketVideoPath: string | undefined | null = undefined,
   ) {
-    this.status = status;
+    this.jobState = jobStateFromString(status);
+    this.attemptCount = attemptCount;
     this.jobToken = jobToken;
     this.maybeResultToken = maybeResulToken;
     this.maybeW2lTemplateToken = maybeW2lTemplateToken;
@@ -29,6 +33,7 @@ export class W2lInferenceJob {
     return new W2lInferenceJob(
       response.job_token,
       response.status,
+      response.attempt_count || 0,
       response.maybe_w2l_template_token,
       response.title,
       response.maybe_result_token,
@@ -45,6 +50,7 @@ export interface W2lInferenceJobStateResponsePayload {
 export interface W2lInferenceJobState {
   job_token: string,
   status: string,
+  attempt_count: number | null,
   maybe_result_token: string | undefined | null,
   maybe_public_bucket_video_path: string | undefined | null,
   maybe_w2l_template_token: string | undefined | null,
