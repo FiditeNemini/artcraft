@@ -70,7 +70,8 @@ CREATE TABLE tts_results (
   updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 
   -- If this is removed by a mod or the creator.
-  deleted_at TIMESTAMP NULL,
+  user_deleted_at TIMESTAMP NULL,
+  mod_deleted_at TIMESTAMP NULL,
 
   -- INDICES --
   PRIMARY KEY (id),
@@ -80,8 +81,8 @@ CREATE TABLE tts_results (
   KEY fk_maybe_mod_user_token (maybe_mod_user_token),
   KEY index_creator_ip_address (creator_ip_address),
   KEY index_is_mod_hidden_from_public(is_mod_hidden_from_public),
-  KEY index_deleted_at(deleted_at),
-  KEY index_deleted_at_and_is_mod_hidden_from_public(deleted_at, is_mod_hidden_from_public)
+  KEY index_user_deleted_at(user_deleted_at),
+  KEY index_mod_deleted_at(mod_deleted_at)
 
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin;
 
@@ -145,7 +146,8 @@ CREATE TABLE w2l_results (
   updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 
   -- If this is removed by a mod or the creator.
-  deleted_at TIMESTAMP NULL,
+  user_deleted_at TIMESTAMP NULL,
+  mod_deleted_at TIMESTAMP NULL,
 
   -- INDICES --
   PRIMARY KEY (id),
@@ -156,7 +158,7 @@ CREATE TABLE w2l_results (
   KEY fk_maybe_mod_user_token (maybe_mod_user_token),
   KEY index_creator_ip_address (creator_ip_address),
   KEY index_is_mod_hidden_from_public(is_mod_hidden_from_public),
-  KEY index_deleted_at(deleted_at),
-  KEY index_deleted_at_and_is_mod_hidden_from_public(deleted_at, is_mod_hidden_from_public)
+  KEY index_user_deleted_at(user_deleted_at),
+  KEY index_mod_deleted_at(mod_deleted_at)
 
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin;

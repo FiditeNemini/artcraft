@@ -98,7 +98,8 @@ CREATE TABLE users (
 
   -- If the user is deleted, we set this.
   -- This is different than banned. These users won't show up at all.
-  deleted_at TIMESTAMP NULL,
+  user_deleted_at TIMESTAMP NULL,
+  mod_deleted_at TIMESTAMP NULL,
 
   -- INDICES --
   PRIMARY KEY (id),
@@ -171,6 +172,9 @@ CREATE TABLE user_sessions (
   expires_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
   -- deletion = session termination
+  -- Typically these are destroyed by users, but if in the future we allow mods to
+  -- delete them, it doesn't really matter who did the deletion: sessions are not
+  -- designed to be recoverable.
   deleted_at TIMESTAMP NULL,
 
   -- INDICES --
@@ -178,37 +182,5 @@ CREATE TABLE user_sessions (
   UNIQUE KEY (token),
   KEY fk_user_token (user_token),
   KEY index_ip_address_creation (ip_address_creation)
-
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin;
-
--- We only allow the most recent record for any given user to be redeemed.
-CREATE TABLE email_verifications (
-  -- Not used for anything except replication.
-  id BIGINT(20) NOT NULL AUTO_INCREMENT,
-
-  verification_type ENUM(
-    'email-verification',
-    'password-reset'
-  ) NOT NULL,
-
-  -- The redemption secret
-  verification_code VARCHAR(32) NOT NULL,
-
-  -- Whether the attempt worked
-  successful BOOLEAN NOT NULL DEFAULT false,
-
-    -- Foreign key to user
-  user_token VARCHAR(32) NOT NULL,
-
-  -- Cannot be redeemed after this date
-  expires_at TIMESTAMP NOT NULL,
-
-  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-
-  -- INDICES --
-  PRIMARY KEY (id),
-  KEY fk_user_token (user_token),
-  KEY index_verification_type (verification_type)
 
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin;

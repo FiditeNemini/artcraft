@@ -118,7 +118,8 @@ CREATE TABLE tts_models (
 
   -- If this is removed by a mod.
   -- It completely disappears from the system.
-  deleted_at TIMESTAMP NULL,
+  user_deleted_at TIMESTAMP NULL,
+  mod_deleted_at TIMESTAMP NULL,
 
   -- INDICES --
   PRIMARY KEY (id),
@@ -255,7 +256,8 @@ CREATE TABLE w2l_templates (
 
   -- If this is removed by a mod.
   -- It shows up nowhere if deleted.
-  deleted_at TIMESTAMP NULL,
+  user_deleted_at TIMESTAMP NULL,
+  mod_deleted_at TIMESTAMP NULL,
 
   -- INDICES --
   PRIMARY KEY (id),
