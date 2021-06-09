@@ -1,5 +1,6 @@
 import React from 'react';
 import { Link, } from 'react-router-dom';
+import { JobState } from '../../jobs/JobStates';
 import { TtsModelUploadJob } from '../../jobs/TtsModelUploadJobs';
 
 interface Props {
@@ -13,8 +14,30 @@ function SessionTtsModelUploadResultListFc(props: Props) {
   props.modelUploadJobs.forEach(job => {
 
     if (!job.maybeModelToken) {
+      let stateDescription = "Pending...";
+
+      switch (job.jobState) {
+        case JobState.PENDING:
+        case JobState.UNKNOWN:
+          stateDescription = "Pending..."
+          break;
+        case JobState.STARTED:
+          stateDescription = "Started...";
+          break;
+        case JobState.ATTEMPT_FAILED:
+          stateDescription = `Failed ${job.attemptCount} attempt(s). Will retry...`;
+          break;
+        case JobState.COMPLETE_FAILURE:
+        case JobState.DEAD:
+          stateDescription = "Failed Permanently. Please tell us in Discord so we can fix. :(";
+          break;
+        case JobState.COMPLETE_SUCCESS:
+          stateDescription = "Success!"; // Not sure why we're here instead of other branch!
+          break;
+      }
+
       results.push(
-        <div key={job.jobToken}>Pending&#8230;</div>
+        <div key={job.jobToken}>{stateDescription}</div>
       );
     } else {
 

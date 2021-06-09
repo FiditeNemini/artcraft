@@ -12,7 +12,6 @@ function SessionTtsInferenceResultListFc(props: Props) {
   let results : Array<JSX.Element> = [];
 
   props.ttsInferenceJobs.forEach(job => {
-    console.log('state', job.jobState);
 
     if (!job.maybeResultToken) {
       let stateDescription = "Pending...";
