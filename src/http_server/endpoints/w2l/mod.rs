@@ -1,3 +1,4 @@
+pub mod delete_w2l_result;
 pub mod delete_w2l_template;
 pub mod edit_w2l_template;
 pub mod enqueue_infer_w2l;

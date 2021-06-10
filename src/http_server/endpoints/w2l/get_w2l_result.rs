@@ -8,6 +8,8 @@ use actix_web::web::Path;
 use actix_web::{Responder, web, HttpResponse, error, HttpRequest, HttpMessage};
 use chrono::{DateTime, Utc};
 use crate::AnyhowResult;
+use crate::common_queries::query_w2l_result::W2lResultRecordForResponse;
+use crate::common_queries::query_w2l_result::select_w2l_result_by_token;
 use crate::common_queries::sessions::create_session_for_user;
 use crate::http_server::endpoints::users::create_account::CreateAccountError::{BadInput, ServerError, UsernameTaken, EmailTaken};
 use crate::http_server::endpoints::users::login::LoginSuccessResponse;
@@ -25,45 +27,12 @@ use sqlx::error::DatabaseError;
 use sqlx::error::Error::Database;
 use sqlx::mysql::MySqlDatabaseError;
 use std::sync::Arc;
+use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 
 /// For the URL PathInfo
 #[derive(Deserialize)]
 pub struct GetW2lResultPathInfo {
   token: String,
-}
-
-#[derive(Serialize)]
-pub struct W2lResultRecordForResponse {
-  pub w2l_result_token: String,
-  pub maybe_w2l_template_token: Option<String>,
-  pub maybe_tts_inference_result_token: Option<String>,
-
-  pub public_bucket_video_path: String,
-
-  pub template_type: Option<String>,
-  pub template_title: Option<String>,
-
-  pub maybe_creator_user_token: Option<String>,
-  pub maybe_creator_username: Option<String>,
-  pub maybe_creator_display_name: Option<String>,
-  pub maybe_creator_gravatar_hash: Option<String>,
-
-  pub maybe_template_creator_user_token: Option<String>,
-  pub maybe_template_creator_username: Option<String>,
-  pub maybe_template_creator_display_name: Option<String>,
-  pub maybe_template_creator_gravatar_hash: Option<String>,
-
-  pub file_size_bytes: u32,
-  pub frame_width: u32,
-  pub frame_height: u32,
-  pub duration_millis: u32,
-
-  //pub is_mod_hidden_from_public: bool, // converted
-  //pub template_is_mod_approved: bool, // converted
-  //pub maybe_mod_user_token: Option<String>,
-
-  pub created_at: DateTime<Utc>,
-  pub updated_at: DateTime<Utc>,
 }
 
 #[derive(Serialize)]
@@ -81,174 +50,67 @@ pub struct ErrorResponse {
 #[derive(Debug, Display)]
 pub enum GetW2lResultError {
   ServerError,
-}
-
-pub struct RawW2lResultRecord {
-  pub w2l_result_token: String, // from field `w2l_results.token`
-
-  pub maybe_w2l_template_token: Option<String>,
-  pub maybe_tts_inference_result_token: Option<String>,
-
-  pub public_bucket_video_path: String,
-
-  pub template_type: Option<String>,
-  pub template_title: Option<String>, // from field `w2l_templates.title`
-
-  pub maybe_creator_user_token: Option<String>,
-  pub maybe_creator_username: Option<String>,
-  pub maybe_creator_display_name: Option<String>,
-  pub maybe_creator_gravatar_hash: Option<String>,
-
-  pub maybe_template_creator_user_token: Option<String>,
-  pub maybe_template_creator_username: Option<String>,
-  pub maybe_template_creator_display_name: Option<String>,
-  pub maybe_template_creator_gravatar_hash: Option<String>,
-
-  pub file_size_bytes: i32,
-  pub frame_width: i32,
-  pub frame_height: i32,
-  pub duration_millis: i32,
-
-  //pub is_mod_hidden_from_public: i8, // needs convert
-  //pub template_is_mod_approved: i8, // needs convert
-  //pub maybe_mod_user_token: Option<String>,
-
-  pub created_at: DateTime<Utc>,
-  pub updated_at: DateTime<Utc>,
+  NotFound,
 }
 
 impl ResponseError for GetW2lResultError {
   fn status_code(&self) -> StatusCode {
     match *self {
-      GetW2lResultError::ServerError=> StatusCode::INTERNAL_SERVER_ERROR,
+      GetW2lResultError::ServerError => StatusCode::INTERNAL_SERVER_ERROR,
+      GetW2lResultError::NotFound => StatusCode::NOT_FOUND,
     }
   }
 
   fn error_response(&self) -> HttpResponse {
     let error_reason = match self {
       GetW2lResultError::ServerError => "server error".to_string(),
+      GetW2lResultError::NotFound => "not founnd".to_string(),
     };
 
-    let response = ErrorResponse {
-      success: false,
-      error_reason,
-    };
-
-    let body = match serde_json::to_string(&response) {
-      Ok(json) => json,
-      Err(_) => "{}".to_string(),
-    };
-
-    HttpResponseBuilder::new(self.status_code())
-      .set_header(header::CONTENT_TYPE, "application/json")
-      .body(body)
+    to_simple_json_error(&error_reason, self.status_code())
   }
 }
 
 pub async fn get_w2l_inference_result_handler(
   http_request: HttpRequest,
   path: Path<GetW2lResultPathInfo>,
-  server_state: web::Data<Arc<ServerState>>) -> Result<HttpResponse, GetW2lResultError>
-{
-  // NB: Lookup failure is Err(RowNotFound).
-  // NB: Since this is publicly exposed, we don't query sensitive data.
-  let maybe_result = sqlx::query_as!(
-      RawW2lResultRecord,
-        r#"
-SELECT
-    w2l_results.token as w2l_result_token,
-    w2l_results.maybe_tts_inference_result_token,
+  server_state: web::Data<Arc<ServerState>>
+) -> Result<HttpResponse, GetW2lResultError> {
+  let maybe_user_session = server_state
+      .session_checker
+      .maybe_get_user_session(&http_request, &server_state.mysql_pool)
+      .await
+      .map_err(|e| {
+        warn!("Session checker error: {:?}", e);
+        GetW2lResultError::ServerError
+      })?;
 
-    w2l_results.public_bucket_video_path,
+  let mut show_deleted_results = false;
 
-    w2l_templates.token as maybe_w2l_template_token,
-    w2l_templates.template_type,
-    w2l_templates.title as template_title,
+  if let Some(user_session) = maybe_user_session {
+    // NB: Moderators can see deleted templates.
+    // Original creators cannot see them (unless they're moderators!)
+    show_deleted_results = user_session.can_delete_other_users_w2l_results;
+  }
 
-    users.token as maybe_creator_user_token,
-    users.username as maybe_creator_username,
-    users.display_name as maybe_creator_display_name,
-    users.email_gravatar_hash as maybe_creator_gravatar_hash,
+  let inference_result_query_result = select_w2l_result_by_token(
+    &path.token,
+    show_deleted_results,
+    &server_state.mysql_pool
+  ).await;
 
-    template_users.token as maybe_template_creator_user_token,
-    template_users.username as maybe_template_creator_username,
-    template_users.display_name as maybe_template_creator_display_name,
-    template_users.email_gravatar_hash as maybe_template_creator_gravatar_hash,
-
-    w2l_results.file_size_bytes,
-    w2l_results.frame_width,
-    w2l_results.frame_height,
-    w2l_results.duration_millis,
-    w2l_results.created_at,
-    w2l_results.updated_at
-
-FROM w2l_results
-LEFT OUTER JOIN w2l_templates
-  ON w2l_results.maybe_w2l_template_token = w2l_templates.token
-LEFT OUTER JOIN users
-  ON w2l_results.maybe_creator_user_token = users.token
-LEFT OUTER JOIN users as template_users
-  ON w2l_templates.creator_user_token = template_users.token
-WHERE
-    w2l_results.token = ?
-    AND w2l_results.user_deleted_at IS NULL
-    AND w2l_results.mod_deleted_at IS NULL
-        "#,
-      &path.token
-    )
-    .fetch_one(&server_state.mysql_pool)
-    .await; // TODO: This will return error if it doesn't exist
-
-  let ir : RawW2lResultRecord = match maybe_result {
-    Ok(result) => result,
-    Err(err) => {
-      match err {
-        RowNotFound => {
-          return Err(GetW2lResultError::ServerError);
-        },
-        _ => {
-          warn!("w2l inference result query error: {:?}", err);
-          return Err(GetW2lResultError::ServerError);
-        }
-      }
+  let inference_result = match inference_result_query_result {
+    Err(e) => {
+      warn!("query error: {:?}", e);
+      return Err(GetW2lResultError::ServerError);
     }
-  };
-
-  let result_for_response = W2lResultRecordForResponse {
-    w2l_result_token: ir.w2l_result_token.clone(),
-    maybe_w2l_template_token: ir.maybe_w2l_template_token.clone(),
-    maybe_tts_inference_result_token: ir.maybe_tts_inference_result_token.clone(),
-
-    public_bucket_video_path: ir.public_bucket_video_path.clone(),
-
-    template_type: ir.template_type.clone(),
-    template_title: ir.template_title.clone(),
-
-    maybe_creator_user_token: ir.maybe_creator_user_token.clone(),
-    maybe_creator_username: ir.maybe_creator_username.clone(),
-    maybe_creator_display_name: ir.maybe_creator_display_name.clone(),
-    maybe_creator_gravatar_hash: ir.maybe_creator_gravatar_hash.clone(),
-
-    maybe_template_creator_user_token: ir.maybe_template_creator_user_token.clone(),
-    maybe_template_creator_username: ir.maybe_template_creator_username.clone(),
-    maybe_template_creator_display_name: ir.maybe_template_creator_display_name.clone(),
-    maybe_template_creator_gravatar_hash: ir.maybe_template_creator_gravatar_hash.clone(),
-
-    //is_mod_hidden_from_public: if ir.is_mod_hidden_from_public == 0 { false } else { true },
-    //template_is_mod_approved: if ir.template_is_mod_approved == 0 { false } else { true },
-
-    file_size_bytes: if ir.file_size_bytes > 0 { ir.file_size_bytes as u32 } else { 0 },
-    frame_width: if ir.frame_width > 0 { ir.frame_width as u32 } else { 0 },
-    frame_height: if ir.frame_height  > 0 { ir.frame_height as u32 } else { 0 },
-    duration_millis: if ir.duration_millis > 0 { ir.duration_millis as u32 } else { 0 },
-
-    created_at: ir.created_at.clone(),
-    updated_at: ir.updated_at.clone(),
+    Ok(None) => return Err(GetW2lResultError::NotFound),
+    Ok(Some(inference_result)) => inference_result,
   };
 
   let response = GetW2lResultSuccessResponse {
     success: true,
-    result: result_for_response,
+    result: inference_result,
   };
 
   let body = serde_json::to_string(&response)

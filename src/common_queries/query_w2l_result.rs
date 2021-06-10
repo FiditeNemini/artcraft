@@ -1,0 +1,259 @@
+use anyhow::anyhow;
+use chrono::{DateTime, Utc};
+use crate::AnyhowResult;
+use crate::database_helpers::boolean_converters::i8_to_bool;
+use crate::database_helpers::boolean_converters::nullable_i8_to_optional_bool;
+use derive_more::{Display, Error};
+use log::{info, warn, log};
+use regex::Regex;
+use sqlx::MySqlPool;
+use sqlx::error::DatabaseError;
+use sqlx::error::Error::Database;
+use sqlx::mysql::MySqlDatabaseError;
+use std::sync::Arc;
+
+#[derive(Serialize)]
+pub struct W2lResultRecordForResponse {
+  pub w2l_result_token: String,
+  pub maybe_w2l_template_token: Option<String>,
+  pub maybe_tts_inference_result_token: Option<String>,
+
+  pub public_bucket_video_path: String,
+
+  pub template_type: Option<String>,
+  pub template_title: Option<String>,
+
+  pub maybe_creator_user_token: Option<String>,
+  pub maybe_creator_username: Option<String>,
+  pub maybe_creator_display_name: Option<String>,
+  pub maybe_creator_gravatar_hash: Option<String>,
+
+  pub maybe_template_creator_user_token: Option<String>,
+  pub maybe_template_creator_username: Option<String>,
+  pub maybe_template_creator_display_name: Option<String>,
+  pub maybe_template_creator_gravatar_hash: Option<String>,
+
+  pub file_size_bytes: u32,
+  pub frame_width: u32,
+  pub frame_height: u32,
+  pub duration_millis: u32,
+
+  //pub is_mod_hidden_from_public: bool, // converted
+  //pub template_is_mod_approved: bool, // converted
+  //pub maybe_mod_user_token: Option<String>,
+
+  pub created_at: DateTime<Utc>,
+  pub updated_at: DateTime<Utc>,
+
+  pub user_deleted_at: Option<DateTime<Utc>>,
+  pub mod_deleted_at: Option<DateTime<Utc>>,
+}
+
+#[derive(Serialize)]
+pub struct W2lResultRecordRaw {
+  pub w2l_result_token: String, // from field `w2l_results.token`
+
+  pub maybe_w2l_template_token: Option<String>,
+  pub maybe_tts_inference_result_token: Option<String>,
+
+  pub public_bucket_video_path: String,
+
+  pub template_type: Option<String>,
+  pub template_title: Option<String>, // from field `w2l_templates.title`
+
+  pub maybe_creator_user_token: Option<String>,
+  pub maybe_creator_username: Option<String>,
+  pub maybe_creator_display_name: Option<String>,
+  pub maybe_creator_gravatar_hash: Option<String>,
+
+  pub maybe_template_creator_user_token: Option<String>,
+  pub maybe_template_creator_username: Option<String>,
+  pub maybe_template_creator_display_name: Option<String>,
+  pub maybe_template_creator_gravatar_hash: Option<String>,
+
+  pub file_size_bytes: i32,
+  pub frame_width: i32,
+  pub frame_height: i32,
+  pub duration_millis: i32,
+
+  //pub is_mod_hidden_from_public: i8, // needs convert
+  //pub template_is_mod_approved: i8, // needs convert
+  //pub maybe_mod_user_token: Option<String>,
+
+  pub created_at: DateTime<Utc>,
+  pub updated_at: DateTime<Utc>,
+
+  pub user_deleted_at: Option<DateTime<Utc>>,
+  pub mod_deleted_at: Option<DateTime<Utc>>,
+}
+
+pub async fn select_w2l_result_by_token(
+  w2l_result_token: &str,
+  can_see_deleted: bool,
+  mysql_pool: &MySqlPool
+) -> AnyhowResult<Option<W2lResultRecordForResponse>> {
+
+  let maybe_record = if can_see_deleted {
+    select_including_deleted(w2l_result_token, mysql_pool).await
+  } else {
+    select_without_deleted(w2l_result_token, mysql_pool).await
+  };
+
+  let ir : W2lResultRecordRaw = match maybe_record {
+    Ok(inference_result) => inference_result,
+    Err(ref err) => {
+      match err {
+        RowNotFound => {
+          warn!("w2l result not found: {:?}", &err);
+          return Ok(None);
+        },
+        _ => {
+          warn!("w2l result query error: {:?}", &err);
+          return Err(anyhow!("database error"));
+        }
+      }
+    }
+  };
+
+  let ir_for_response = W2lResultRecordForResponse {
+    w2l_result_token: ir.w2l_result_token.clone(),
+    maybe_w2l_template_token: ir.maybe_w2l_template_token.clone(),
+    maybe_tts_inference_result_token: ir.maybe_tts_inference_result_token.clone(),
+
+    public_bucket_video_path: ir.public_bucket_video_path.clone(),
+
+    template_type: ir.template_type.clone(),
+    template_title: ir.template_title.clone(),
+
+    maybe_creator_user_token: ir.maybe_creator_user_token.clone(),
+    maybe_creator_username: ir.maybe_creator_username.clone(),
+    maybe_creator_display_name: ir.maybe_creator_display_name.clone(),
+    maybe_creator_gravatar_hash: ir.maybe_creator_gravatar_hash.clone(),
+
+    maybe_template_creator_user_token: ir.maybe_template_creator_user_token.clone(),
+    maybe_template_creator_username: ir.maybe_template_creator_username.clone(),
+    maybe_template_creator_display_name: ir.maybe_template_creator_display_name.clone(),
+    maybe_template_creator_gravatar_hash: ir.maybe_template_creator_gravatar_hash.clone(),
+
+    //is_mod_hidden_from_public: if ir.is_mod_hidden_from_public == 0 { false } else { true },
+    //template_is_mod_approved: if ir.template_is_mod_approved == 0 { false } else { true },
+
+    file_size_bytes: if ir.file_size_bytes > 0 { ir.file_size_bytes as u32 } else { 0 },
+    frame_width: if ir.frame_width > 0 { ir.frame_width as u32 } else { 0 },
+    frame_height: if ir.frame_height  > 0 { ir.frame_height as u32 } else { 0 },
+    duration_millis: if ir.duration_millis > 0 { ir.duration_millis as u32 } else { 0 },
+
+    created_at: ir.created_at.clone(),
+    updated_at: ir.updated_at.clone(),
+    user_deleted_at: ir.user_deleted_at.clone(),
+    mod_deleted_at: ir.mod_deleted_at.clone(),
+  };
+
+  Ok(Some(ir_for_response))
+}
+
+async fn select_including_deleted(
+  w2l_result_token: &str,
+  mysql_pool: &MySqlPool
+) -> Result<W2lResultRecordRaw, sqlx::Error> {
+  sqlx::query_as!(
+      W2lResultRecordRaw,
+        r#"
+SELECT
+    w2l_results.token as w2l_result_token,
+    w2l_results.maybe_tts_inference_result_token,
+
+    w2l_results.public_bucket_video_path,
+
+    w2l_templates.token as maybe_w2l_template_token,
+    w2l_templates.template_type,
+    w2l_templates.title as template_title,
+
+    users.token as maybe_creator_user_token,
+    users.username as maybe_creator_username,
+    users.display_name as maybe_creator_display_name,
+    users.email_gravatar_hash as maybe_creator_gravatar_hash,
+
+    template_users.token as maybe_template_creator_user_token,
+    template_users.username as maybe_template_creator_username,
+    template_users.display_name as maybe_template_creator_display_name,
+    template_users.email_gravatar_hash as maybe_template_creator_gravatar_hash,
+
+    w2l_results.file_size_bytes,
+    w2l_results.frame_width,
+    w2l_results.frame_height,
+    w2l_results.duration_millis,
+    w2l_results.created_at,
+    w2l_results.updated_at,
+    w2l_results.user_deleted_at,
+    w2l_results.mod_deleted_at
+
+FROM w2l_results
+LEFT OUTER JOIN w2l_templates
+    ON w2l_results.maybe_w2l_template_token = w2l_templates.token
+LEFT OUTER JOIN users
+    ON w2l_results.maybe_creator_user_token = users.token
+LEFT OUTER JOIN users as template_users
+    ON w2l_templates.creator_user_token = template_users.token
+WHERE
+    w2l_results.token = ?
+        "#,
+      w2l_result_token
+    )
+    .fetch_one(mysql_pool)
+    .await // TODO: This will return error if it doesn't exist
+}
+
+async fn select_without_deleted(
+  w2l_result_token: &str,
+  mysql_pool: &MySqlPool
+) -> Result<W2lResultRecordRaw, sqlx::Error> {
+  sqlx::query_as!(
+      W2lResultRecordRaw,
+        r#"
+SELECT
+    w2l_results.token as w2l_result_token,
+    w2l_results.maybe_tts_inference_result_token,
+
+    w2l_results.public_bucket_video_path,
+
+    w2l_templates.token as maybe_w2l_template_token,
+    w2l_templates.template_type,
+    w2l_templates.title as template_title,
+
+    users.token as maybe_creator_user_token,
+    users.username as maybe_creator_username,
+    users.display_name as maybe_creator_display_name,
+    users.email_gravatar_hash as maybe_creator_gravatar_hash,
+
+    template_users.token as maybe_template_creator_user_token,
+    template_users.username as maybe_template_creator_username,
+    template_users.display_name as maybe_template_creator_display_name,
+    template_users.email_gravatar_hash as maybe_template_creator_gravatar_hash,
+
+    w2l_results.file_size_bytes,
+    w2l_results.frame_width,
+    w2l_results.frame_height,
+    w2l_results.duration_millis,
+    w2l_results.created_at,
+    w2l_results.updated_at,
+    w2l_results.user_deleted_at,
+    w2l_results.mod_deleted_at
+
+FROM w2l_results
+LEFT OUTER JOIN w2l_templates
+    ON w2l_results.maybe_w2l_template_token = w2l_templates.token
+LEFT OUTER JOIN users
+    ON w2l_results.maybe_creator_user_token = users.token
+LEFT OUTER JOIN users as template_users
+    ON w2l_templates.creator_user_token = template_users.token
+WHERE
+    w2l_results.token = ?
+    AND w2l_results.user_deleted_at IS NULL
+    AND w2l_results.mod_deleted_at IS NULL
+        "#,
+      w2l_result_token
+    )
+    .fetch_one(mysql_pool)
+    .await // TODO: This will return error if it doesn't exist
+}

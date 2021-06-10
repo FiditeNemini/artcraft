@@ -58,6 +58,7 @@ CREATE TABLE tts_results (
   -- ========== MODERATION DETAILS ==========
 
   -- In this case, a moderator hides it from public.
+  -- It won't appear in lists on profiles or otherwise.
   is_mod_hidden_from_public BOOLEAN NOT NULL DEFAULT FALSE,
 
   -- If a moderator has comments.
@@ -134,6 +135,7 @@ CREATE TABLE w2l_results (
   -- ========== MODERATION DETAILS ==========
 
   -- In this case, a moderator hides it from public.
+  -- It won't appear in lists on profiles or otherwise.
   is_mod_hidden_from_public BOOLEAN NOT NULL DEFAULT FALSE,
 
   -- If a moderator has comments.
