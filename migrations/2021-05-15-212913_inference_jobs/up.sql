@@ -26,13 +26,17 @@ CREATE TABLE tts_inference_jobs (
   model_token VARCHAR(32) NOT NULL,
 
   -- The raw, unprocessed user input.
-  inference_text TEXT NOT NULL,
+  raw_inference_text TEXT NOT NULL,
 
   -- ========== CREATOR DETAILS ==========
 
   -- Foreign key to user
   -- If no user is logged in, this is null.
-  maybe_creator_user_token CHAR(16) DEFAULT NULL,
+  maybe_creator_user_token VARCHAR(32) DEFAULT NULL,
+
+  -- Based on a cookie sent by the frontend.
+  -- We'll save this even if the user is logged in.
+  maybe_creator_anonymous_visitor_token VARCHAR(32) DEFAULT NULL,
 
   -- For abuse tracking.
   -- Wide enough for IPv4/6
@@ -146,6 +150,10 @@ CREATE TABLE w2l_inference_jobs (
   -- Foreign key to user
   -- If no user is logged in, this is null.
   maybe_creator_user_token VARCHAR(32) DEFAULT NULL,
+
+  -- Based on a cookie sent by the frontend.
+  -- We'll save this even if the user is logged in.
+  maybe_creator_anonymous_visitor_token VARCHAR(32) DEFAULT NULL,
 
   -- For abuse tracking.
   -- Wide enough for IPv4/6

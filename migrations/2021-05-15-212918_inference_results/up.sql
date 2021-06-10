@@ -15,16 +15,27 @@ CREATE TABLE tts_results (
   model_token VARCHAR(32) NOT NULL,
 
   -- The original raw, unprocessed user input.
-  inference_text TEXT NOT NULL,
+  raw_inference_text TEXT NOT NULL,
 
-  -- SHA2 hash of the text [SHA2 = CHAR(64), SHA1 = CHAR(4)]
-  inference_text_hash_sha2 CHAR(64) NOT NULL,
+  -- SHA2 hash of the text [SHA2 = CHAR(64), SHA1 = CHAR(40), MD5 = CHAR(32)]
+  raw_inference_text_hash_sha2 CHAR(64) NOT NULL,
+
+  -- First pass at text normalization.
+  -- eg. 14th -> fourteenth, etc.
+  normalized_inference_text TEXT NOT NULL,
+
+  -- If the model uses arpabet, we'll save the arpabet we used.
+  maybe_arpabet_text TEXT DEFAULT NULL,
 
   -- ========== CREATOR DETAILS ==========
 
   -- The person that created the template.
   -- If the user wasn't logged in, this is null
   maybe_creator_user_token VARCHAR(32) DEFAULT NULL,
+
+  -- Based on a cookie sent by the frontend.
+  -- We'll save this even if the user is logged in.
+  maybe_creator_anonymous_visitor_token VARCHAR(32) DEFAULT NULL,
 
   -- For abuse tracking.
   -- Wide enough for IPv4/6
@@ -38,6 +49,8 @@ CREATE TABLE tts_results (
     'hidden',
     'private'
   ) NOT NULL DEFAULT 'public',
+
+  -- ========== BUCKET STORAGE ==========
 
   -- SHA2.
   -- Where the wav, spectrogram, and etc. are located.
@@ -67,6 +80,8 @@ CREATE TABLE tts_results (
   -- The last moderator that made changes.
   maybe_mod_user_token VARCHAR(32) DEFAULT NULL,
 
+  -- ========== TIMESTAMPS ==========
+
   created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 
@@ -79,6 +94,7 @@ CREATE TABLE tts_results (
   UNIQUE KEY (token),
   KEY fk_model_token (model_token),
   KEY fk_maybe_creator_user_token (maybe_creator_user_token),
+  KEY fk_maybe_creator_anonymous_visitor_token (maybe_creator_anonymous_visitor_token),
   KEY fk_maybe_mod_user_token (maybe_mod_user_token),
   KEY index_creator_ip_address (creator_ip_address),
   KEY index_is_mod_hidden_from_public(is_mod_hidden_from_public),
@@ -108,6 +124,10 @@ CREATE TABLE w2l_results (
   -- If the user wasn't logged in, this is null
   maybe_creator_user_token VARCHAR(32) DEFAULT NULL,
 
+  -- Based on a cookie sent by the frontend.
+  -- We'll save this even if the user is logged in.
+  maybe_creator_anonymous_visitor_token VARCHAR(32) DEFAULT NULL,
+
   -- For abuse tracking.
   -- Wide enough for IPv4/6
   creator_ip_address VARCHAR(40) NOT NULL,
@@ -120,6 +140,8 @@ CREATE TABLE w2l_results (
     'hidden',
     'private'
   ) NOT NULL DEFAULT 'public',
+
+  -- ========== BUCKET STORAGE ==========
 
   -- Where the wav, spectrogram, and etc. are located.
   public_bucket_video_path VARCHAR(255) NOT NULL,
@@ -144,6 +166,8 @@ CREATE TABLE w2l_results (
   -- The last moderator that made changes.
   maybe_mod_user_token VARCHAR(32) DEFAULT NULL,
 
+  -- ========== TIMESTAMPS ==========
+
   created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 
@@ -155,6 +179,7 @@ CREATE TABLE w2l_results (
   PRIMARY KEY (id),
   UNIQUE KEY (token),
   KEY fk_maybe_creator_user_token (maybe_creator_user_token),
+  KEY fk_maybe_creator_anonymous_visitor_token (maybe_creator_anonymous_visitor_token),
   KEY fk_maybe_w2l_template_token (maybe_w2l_template_token),
   KEY fk_maybe_tts_inference_result_token (maybe_tts_inference_result_token),
   KEY fk_maybe_mod_user_token (maybe_mod_user_token),
