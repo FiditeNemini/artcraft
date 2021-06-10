@@ -117,8 +117,10 @@ SELECT
     tts.updated_at
 FROM tts_models as tts
 JOIN users
-ON users.token = tts.creator_user_token
-WHERE tts.deleted_at IS NULL
+    ON users.token = tts.creator_user_token
+WHERE
+    tts.user_deleted_at IS NULL
+    AND tts.mod_deleted_at IS NULL
         "#,
     )
     .fetch_all(&server_state.mysql_pool)

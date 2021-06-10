@@ -118,10 +118,11 @@ SELECT
     tts.updated_at
 FROM tts_models as tts
 JOIN users
-ON users.token = tts.creator_user_token
+    ON users.token = tts.creator_user_token
 WHERE
-    tts.deleted_at IS NULL
-    AND tts.is_mod_disabled IS FALSE
+    tts.is_mod_disabled IS FALSE
+    AND tts.user_deleted_at IS NULL
+    AND tts.mod_deleted_at IS NULL
         "#)
       .fetch_all(mysql_pool)
       .await?
@@ -143,9 +144,10 @@ SELECT
     tts.updated_at
 FROM tts_models as tts
 JOIN users
-ON users.token = tts.creator_user_token
+    ON users.token = tts.creator_user_token
 WHERE
-    tts.deleted_at IS NULL
+    tts.user_deleted_at IS NULL
+    AND tts.mod_deleted_at IS NULL
         "#)
       .fetch_all(mysql_pool)
       .await?
@@ -182,9 +184,10 @@ JOIN users
 ON
     users.token = tts.creator_user_token
 WHERE
-    tts.deleted_at IS NULL
+    users.username = ?
     AND tts.is_mod_disabled IS FALSE
-    AND users.username = ?
+    AND tts.user_deleted_at IS NULL
+    AND tts.mod_deleted_at IS NULL
         "#,
       scope_creator_username)
       .fetch_all(mysql_pool)
@@ -210,8 +213,9 @@ JOIN users
 ON
     users.token = tts.creator_user_token
 WHERE
-    tts.deleted_at IS NULL
-    AND users.username = ?
+    users.username = ?
+    AND tts.user_deleted_at IS NULL
+    AND tts.mod_deleted_at IS NULL
         "#,
       scope_creator_username)
       .fetch_all(mysql_pool)

@@ -184,8 +184,9 @@ LEFT OUTER JOIN users
 LEFT OUTER JOIN users as model_users
   ON tts_models.creator_user_token = model_users.token
 WHERE
-    tts_results.deleted_at IS NULL
-    AND tts_results.token = ?
+    tts_results.token = ?
+    AND tts_results.user_deleted_at IS NULL
+    AND tts_results.mod_deleted_at IS NULL
         "#,
       &path.token
     )

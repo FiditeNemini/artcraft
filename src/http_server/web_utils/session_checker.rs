@@ -213,7 +213,8 @@ LEFT OUTER JOIN user_roles
     ON users.user_role_slug = user_roles.slug
 WHERE user_sessions.token = ?
     AND user_sessions.deleted_at IS NULL
-    AND users.deleted_at IS NULL
+    AND users.user_deleted_at IS NULL
+    AND users.mod_deleted_at IS NULL
         "#,
         session_token.to_string(),
     )

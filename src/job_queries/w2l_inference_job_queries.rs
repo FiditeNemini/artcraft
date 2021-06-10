@@ -353,7 +353,8 @@ FROM w2l_templates as w2l
 JOIN users
 ON users.token = w2l.creator_user_token
 WHERE w2l.token = ?
-AND w2l.deleted_at IS NULL
+AND w2l.user_deleted_at IS NULL
+AND w2l.mod_deleted_at IS NULL
         "#,
       &template_token
     )

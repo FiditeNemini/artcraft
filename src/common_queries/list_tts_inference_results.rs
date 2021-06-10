@@ -136,13 +136,14 @@ SELECT
 
 FROM tts_results
 LEFT OUTER JOIN tts_models
-  ON tts_results.model_token = tts_models.token
+    ON tts_results.model_token = tts_models.token
 LEFT OUTER JOIN users
-  ON tts_results.maybe_creator_user_token = users.token
+    ON tts_results.maybe_creator_user_token = users.token
 WHERE
-    tts_results.deleted_at IS NULL
-    AND tts_results.is_mod_hidden_from_public IS FALSE
+    tts_results.is_mod_hidden_from_public IS FALSE
     AND tts_models.is_mod_disabled IS FALSE
+    AND tts_results.user_deleted_at IS NULL
+    AND tts_results.mod_deleted_at IS NULL
         "#)
       .fetch_all(mysql_pool)
       .await?
@@ -168,11 +169,12 @@ SELECT
 
 FROM tts_results
 LEFT OUTER JOIN tts_models
-  ON tts_results.model_token = tts_models.token
+    ON tts_results.model_token = tts_models.token
 LEFT OUTER JOIN users
-  ON tts_results.maybe_creator_user_token = users.token
+    ON tts_results.maybe_creator_user_token = users.token
 WHERE
-    tts_results.deleted_at IS NULL
+    tts_results.user_deleted_at IS NULL
+    AND tts_results.mod_deleted_at IS NULL
         "#)
       .fetch_all(mysql_pool)
       .await?
@@ -210,14 +212,15 @@ SELECT
 
 FROM tts_results
 LEFT OUTER JOIN tts_models
-  ON tts_results.model_token = tts_models.token
+    ON tts_results.model_token = tts_models.token
 LEFT OUTER JOIN users
-  ON tts_results.maybe_creator_user_token = users.token
+    ON tts_results.maybe_creator_user_token = users.token
 WHERE
-    tts_results.deleted_at IS NULL
+    users.username = ?
     AND tts_results.is_mod_hidden_from_public IS FALSE
     AND tts_models.is_mod_disabled IS FALSE
-    AND users.username = ?
+    AND tts_results.user_deleted_at IS NULL
+    AND tts_results.mod_deleted_at IS NULL
         "#,
     scope_creator_username)
       .fetch_all(mysql_pool)
@@ -244,12 +247,13 @@ SELECT
 
 FROM tts_results
 LEFT OUTER JOIN tts_models
-  ON tts_results.model_token = tts_models.token
+    ON tts_results.model_token = tts_models.token
 LEFT OUTER JOIN users
-  ON tts_results.maybe_creator_user_token = users.token
+    ON tts_results.maybe_creator_user_token = users.token
 WHERE
-    tts_results.deleted_at IS NULL
-    AND users.username = ?
+    users.username = ?
+    AND tts_results.user_deleted_at IS NULL
+    AND tts_results.mod_deleted_at IS NULL
         "#,
     scope_creator_username)
       .fetch_all(mysql_pool)

@@ -131,10 +131,11 @@ SELECT
     w2l.updated_at
 FROM w2l_templates as w2l
 JOIN users
-ON users.token = w2l.creator_user_token
+    ON users.token = w2l.creator_user_token
 WHERE
-    w2l.deleted_at IS NULL
-    AND w2l.is_mod_public_listing_approved IS TRUE
+    w2l.is_mod_public_listing_approved IS TRUE
+    AND w2l.user_deleted_at IS NULL
+    AND w2l.mod_deleted_at IS NULL
         "#)
       .fetch_all(mysql_pool)
       .await?
@@ -161,9 +162,10 @@ SELECT
     w2l.updated_at
 FROM w2l_templates as w2l
 JOIN users
-ON users.token = w2l.creator_user_token
+    ON users.token = w2l.creator_user_token
 WHERE
-    w2l.deleted_at IS NULL
+    w2l.user_deleted_at IS NULL
+    AND w2l.mod_deleted_at IS NULL
         "#)
       .fetch_all(mysql_pool)
       .await?
@@ -205,9 +207,10 @@ JOIN users
 ON
     users.token = w2l.creator_user_token
 WHERE
-    w2l.deleted_at IS NULL
+    users.username = ?
     AND w2l.is_mod_public_listing_approved IS TRUE
-    AND users.username = ?
+    AND w2l.user_deleted_at IS NULL
+    AND w2l.mod_deleted_at IS NULL
         "#,
       scope_creator_username)
       .fetch_all(mysql_pool)
@@ -238,8 +241,9 @@ JOIN users
 ON
     users.token = w2l.creator_user_token
 WHERE
-    w2l.deleted_at IS NULL
-    AND users.username = ?
+    users.username = ?
+    AND w2l.user_deleted_at IS NULL
+    AND w2l.mod_deleted_at IS NULL
         "#,
       scope_creator_username)
       .fetch_all(mysql_pool)

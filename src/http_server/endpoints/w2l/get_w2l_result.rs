@@ -190,8 +190,9 @@ LEFT OUTER JOIN users
 LEFT OUTER JOIN users as template_users
   ON w2l_templates.creator_user_token = template_users.token
 WHERE
-    w2l_results.deleted_at IS NULL
-    AND w2l_results.token = ?
+    w2l_results.token = ?
+    AND w2l_results.user_deleted_at IS NULL
+    AND w2l_results.mod_deleted_at IS NULL
         "#,
       &path.token
     )

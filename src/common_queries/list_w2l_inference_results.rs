@@ -153,13 +153,14 @@ SELECT
 
 FROM w2l_results
 LEFT OUTER JOIN w2l_templates
-  ON w2l_results.maybe_w2l_template_token = w2l_templates.token
+    ON w2l_results.maybe_w2l_template_token = w2l_templates.token
 LEFT OUTER JOIN users
-  ON w2l_results.maybe_creator_user_token = users.token
+    ON w2l_results.maybe_creator_user_token = users.token
 WHERE
-    w2l_results.deleted_at IS NULL
-    AND w2l_results.is_mod_hidden_from_public IS FALSE
+    w2l_results.is_mod_hidden_from_public IS FALSE
     AND w2l_templates.is_mod_public_listing_approved IS TRUE
+    AND w2l_results.user_deleted_at IS NULL
+    AND w2l_results.mod_deleted_at IS NULL
         "#)
       .fetch_all(mysql_pool)
       .await?
@@ -189,11 +190,12 @@ SELECT
 
 FROM w2l_results
 LEFT OUTER JOIN w2l_templates
-  ON w2l_results.maybe_w2l_template_token = w2l_templates.token
+    ON w2l_results.maybe_w2l_template_token = w2l_templates.token
 LEFT OUTER JOIN users
-  ON w2l_results.maybe_creator_user_token = users.token
+    ON w2l_results.maybe_creator_user_token = users.token
 WHERE
-    w2l_results.deleted_at IS NULL
+    w2l_results.user_deleted_at IS NULL
+    AND w2l_results.mod_deleted_at IS NULL
         "#)
       .fetch_all(mysql_pool)
       .await?
@@ -235,14 +237,15 @@ SELECT
 
 FROM w2l_results
 LEFT OUTER JOIN w2l_templates
-  ON w2l_results.maybe_w2l_template_token = w2l_templates.token
+    ON w2l_results.maybe_w2l_template_token = w2l_templates.token
 LEFT OUTER JOIN users
-  ON w2l_results.maybe_creator_user_token = users.token
+    ON w2l_results.maybe_creator_user_token = users.token
 WHERE
-    w2l_results.deleted_at IS NULL
+    users.username = ?
     AND w2l_results.is_mod_hidden_from_public IS FALSE
     AND w2l_templates.is_mod_public_listing_approved IS TRUE
-    AND users.username = ?
+    AND w2l_results.user_deleted_at IS NULL
+    AND w2l_results.mod_deleted_at IS NULL
         "#,
     scope_creator_username)
       .fetch_all(mysql_pool)
@@ -273,12 +276,13 @@ SELECT
 
 FROM w2l_results
 LEFT OUTER JOIN w2l_templates
-  ON w2l_results.maybe_w2l_template_token = w2l_templates.token
+    ON w2l_results.maybe_w2l_template_token = w2l_templates.token
 LEFT OUTER JOIN users
-  ON w2l_results.maybe_creator_user_token = users.token
+    ON w2l_results.maybe_creator_user_token = users.token
 WHERE
-    w2l_results.deleted_at IS NULL
-    AND users.username = ?
+    users.username = ?
+    AND w2l_results.user_deleted_at IS NULL
+    AND w2l_results.mod_deleted_at IS NULL
         "#,
     scope_creator_username)
       .fetch_all(mysql_pool)

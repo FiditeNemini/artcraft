@@ -138,8 +138,10 @@ SELECT
 FROM tts_models as tts
 JOIN users
 ON users.token = tts.creator_user_token
-WHERE tts.updatable_slug = ?
-AND tts.deleted_at IS NULL
+WHERE
+    tts.updatable_slug = ?
+    AND tts.user_deleted_at IS NULL
+    AND tts.mod_deleted_at IS NULL
         "#,
       &path.slug
     )

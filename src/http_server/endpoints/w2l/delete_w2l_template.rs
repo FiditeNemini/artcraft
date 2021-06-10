@@ -110,11 +110,6 @@ pub async fn delete_w2l_template_handler(
     }
   };
 
-  if !user_session.can_delete_other_users_w2l_templates {
-    warn!("user is not allowed to delete templates: {}", user_session.user_token);
-    return Err(DeleteW2lTemplateError::NotAuthorized);
-  }
-
   let template_query_result = select_w2l_template_by_token(
     &path.slug,
     true, // Only mods can perform this action
@@ -130,20 +125,44 @@ pub async fn delete_w2l_template_handler(
     Ok(Some(template)) => template,
   };
 
+  let is_author = w2l_template.creator_user_token == user_session.user_token;
+  let is_mod = user_session.can_delete_other_users_w2l_templates;
+
+  if !is_author && !is_mod {
+    warn!("user is not allowed to delete templates: {}", user_session.user_token);
+    return Err(DeleteW2lTemplateError::NotAuthorized);
+  }
+
   let ip_address = get_request_ip(&http_request);
 
   let query_result = if request.set_delete {
-    delete_template(
-      &path.slug,
-      &user_session.user_token,
-      &server_state.mysql_pool
-    ).await
+    if is_author {
+      user_delete_template(
+        &path.slug,
+        &user_session.user_token,
+        &server_state.mysql_pool
+      ).await
+    } else {
+      mod_delete_template(
+        &path.slug,
+        &user_session.user_token,
+        &server_state.mysql_pool
+      ).await
+    }
   } else {
-    undelete_template(
-      &path.slug,
-      &user_session.user_token,
-      &server_state.mysql_pool
-    ).await
+    if is_author {
+      user_undelete_template(
+        &path.slug,
+        &user_session.user_token,
+        &server_state.mysql_pool
+      ).await
+    } else {
+      mod_undelete_template(
+        &path.slug,
+        &user_session.user_token,
+        &server_state.mysql_pool
+      ).await
+    }
   };
 
   match query_result {
@@ -166,7 +185,7 @@ pub async fn delete_w2l_template_handler(
       .body(body))
 }
 
-async fn delete_template(
+async fn user_delete_template(
   template_token: &str,
   mod_user_token: &str,
   mysql_pool: &MySqlPool
@@ -175,7 +194,30 @@ async fn delete_template(
         r#"
 UPDATE w2l_templates
 SET
-  deleted_at = CURRENT_TIMESTAMP,
+  user_deleted_at = CURRENT_TIMESTAMP,
+  maybe_mod_user_token = ?
+WHERE
+  token = ?
+LIMIT 1
+        "#,
+      mod_user_token,
+      template_token,
+    )
+      .execute(mysql_pool)
+      .await?;
+  Ok(())
+}
+
+async fn mod_delete_template(
+  template_token: &str,
+  mod_user_token: &str,
+  mysql_pool: &MySqlPool
+) -> Result<(), sqlx::Error> {
+  let _r = sqlx::query!(
+        r#"
+UPDATE w2l_templates
+SET
+  mod_deleted_at = CURRENT_TIMESTAMP,
   maybe_mod_user_token = ?
 WHERE
   token = ?
@@ -189,7 +231,7 @@ LIMIT 1
   Ok(())
 }
 
-async fn undelete_template(
+async fn user_undelete_template(
   template_token: &str,
   mod_user_token: &str,
   mysql_pool: &MySqlPool
@@ -199,7 +241,7 @@ async fn undelete_template(
         r#"
 UPDATE w2l_templates
 SET
-  deleted_at = NULL,
+  user_deleted_at = NULL,
   maybe_mod_user_token = ?
 WHERE
   token = ?
@@ -210,5 +252,29 @@ LIMIT 1
     )
     .execute(mysql_pool)
     .await?;
+  Ok(())
+}
+
+async fn mod_undelete_template(
+  template_token: &str,
+  mod_user_token: &str,
+  mysql_pool: &MySqlPool
+) -> Result<(), sqlx::Error> {
+
+  let _r = sqlx::query!(
+        r#"
+UPDATE w2l_templates
+SET
+  mod_deleted_at = NULL,
+  maybe_mod_user_token = ?
+WHERE
+  token = ?
+LIMIT 1
+        "#,
+      mod_user_token,
+      template_token,
+    )
+      .execute(mysql_pool)
+      .await?;
   Ok(())
 }

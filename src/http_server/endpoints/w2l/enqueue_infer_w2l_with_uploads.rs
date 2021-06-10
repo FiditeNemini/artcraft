@@ -372,8 +372,10 @@ async fn check_template_exists(template_token: &str, mysql_pool: &MySqlPool) -> 
 SELECT
     token as template_token
 FROM w2l_templates
-WHERE token = ?
-AND deleted_at IS NULL
+WHERE
+    token = ?
+    AND user_deleted_at IS NULL
+    AND mod_deleted_at IS NULL
         "#,
       &template_token
     )

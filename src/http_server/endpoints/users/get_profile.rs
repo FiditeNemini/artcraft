@@ -168,8 +168,10 @@ SELECT
     website_url,
     created_at
 FROM users
-WHERE users.username = ?
-AND users.deleted_at IS NULL
+WHERE
+    users.username = ?
+    AND users.user_deleted_at IS NULL
+    AND users.mod_deleted_at IS NULL
         "#,
         &path.username,
     )

@@ -30,7 +30,8 @@ pub struct W2lTemplateRecordForResponse {
   pub is_mod_disabled: bool,
   pub created_at: DateTime<Utc>,
   pub updated_at: DateTime<Utc>,
-  pub deleted_at: Option<DateTime<Utc>>,
+  pub user_deleted_at: Option<DateTime<Utc>>,
+  pub mod_deleted_at: Option<DateTime<Utc>>,
 }
 
 #[derive(Serialize)]
@@ -51,7 +52,8 @@ pub struct W2lTemplateRecordRaw {
   pub is_mod_disabled: i8,
   pub created_at: DateTime<Utc>,
   pub updated_at: DateTime<Utc>,
-  pub deleted_at: Option<DateTime<Utc>>,
+  pub user_deleted_at: Option<DateTime<Utc>>,
+  pub mod_deleted_at: Option<DateTime<Utc>>,
 }
 
 pub async fn select_w2l_template_by_token(
@@ -99,7 +101,8 @@ pub async fn select_w2l_template_by_token(
     is_mod_disabled: i8_to_bool(template.is_mod_disabled),
     created_at: template.created_at.clone(),
     updated_at: template.updated_at.clone(),
-    deleted_at: template.deleted_at.clone(),
+    user_deleted_at: template.user_deleted_at.clone(),
+    mod_deleted_at: template.mod_deleted_at.clone(),
   };
 
   Ok(Some(template_for_response))
@@ -129,10 +132,11 @@ SELECT
     w2l.is_mod_disabled,
     w2l.created_at,
     w2l.updated_at,
-    w2l.deleted_at
+    w2l.user_deleted_at,
+    w2l.mod_deleted_at
 FROM w2l_templates as w2l
 JOIN users
-ON users.token = w2l.creator_user_token
+    ON users.token = w2l.creator_user_token
 WHERE w2l.token = ?
         "#,
       w2l_template_token
@@ -165,12 +169,15 @@ SELECT
     w2l.is_mod_disabled,
     w2l.created_at,
     w2l.updated_at,
-    w2l.deleted_at
+    w2l.user_deleted_at,
+    w2l.mod_deleted_at
 FROM w2l_templates as w2l
 JOIN users
-ON users.token = w2l.creator_user_token
-WHERE w2l.token = ?
-AND w2l.deleted_at IS NULL
+    ON users.token = w2l.creator_user_token
+WHERE
+    w2l.token = ?
+    AND w2l.user_deleted_at IS NULL
+    AND w2l.mod_deleted_at IS NULL
         "#,
       w2l_template_token
     )
