@@ -18,7 +18,7 @@ pub struct TtsInferenceJobRecord {
   pub uuid_idempotency_token: String,
 
   pub model_token: String,
-  pub inference_text: String,
+  pub raw_inference_text: String,
 
   pub creator_ip_address: String,
   pub maybe_creator_user_token: Option<String>,
@@ -46,7 +46,7 @@ SELECT
   uuid_idempotency_token,
 
   model_token,
-  inference_text,
+  raw_inference_text,
 
   creator_ip_address,
   maybe_creator_user_token,
@@ -239,6 +239,8 @@ pub async fn insert_tts_result<P: AsRef<Path>>(
       .display()
       .to_string();
 
+  let normalized_inference_text = job.raw_inference_text.clone(); // TODO
+
   let query_result = sqlx::query!(
         r#"
 INSERT INTO tts_results
@@ -246,8 +248,9 @@ SET
   token = ?,
 
   model_token = ?,
-  inference_text = ?,
-  inference_text_hash_sha2 = ?,
+  raw_inference_text = ?,
+  raw_inference_text_hash_sha2 = ?,
+  normalized_inference_text = ?,
 
   maybe_creator_user_token = ?,
   creator_ip_address = ?,
@@ -263,7 +266,8 @@ SET
         "#,
       inference_result_token,
       job.model_token.clone(),
-      job.inference_text.clone(),
+      job.raw_inference_text.clone(),
+      normalized_inference_text,
       text_hash,
 
       job.maybe_creator_user_token.clone(),
@@ -300,7 +304,6 @@ pub struct TtsModelRecord2 {
   pub creator_display_name: String,
 
   pub title: String,
-  pub updatable_slug: String,
   pub private_bucket_hash: String,
   pub created_at: DateTime<Utc>,
   pub updated_at: DateTime<Utc>,
@@ -323,7 +326,6 @@ SELECT
     users.username as creator_username,
     users.display_name as creator_display_name,
     tts.title,
-    tts.updatable_slug,
     tts.private_bucket_hash,
     tts.created_at,
     tts.updated_at

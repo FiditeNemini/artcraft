@@ -29,7 +29,7 @@ use std::sync::Arc;
 /// For the URL PathInfo
 #[derive(Deserialize)]
 pub struct GetW2lTemplatePathInfo {
-  slug: String,
+  token: String,
 }
 
 #[derive(Serialize)]
@@ -103,7 +103,7 @@ pub async fn get_w2l_template_handler(
   }
 
   let template_query_result = select_w2l_template_by_token(
-    &path.slug,
+    &path.token,
     show_deleted_templates,
     &server_state.mysql_pool
   ).await;

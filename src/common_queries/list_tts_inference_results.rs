@@ -9,7 +9,7 @@ pub struct TtsInferenceRecordForList {
   pub tts_result_token: String,
 
   pub tts_model_token: String,
-  pub inference_text: String,
+  pub raw_inference_text: String,
 
   pub maybe_creator_user_token: Option<String>,
   pub maybe_creator_username: Option<String>,
@@ -30,7 +30,7 @@ struct RawTtsInferenceRecordForList {
   pub tts_result_token: String, // from field `tts_results.token`
 
   pub tts_model_token: String,
-  pub inference_text: String,
+  pub raw_inference_text: String,
 
   pub maybe_creator_user_token: Option<String>,
   pub maybe_creator_username: Option<String>,
@@ -90,7 +90,7 @@ pub async fn list_tts_inference_results(
         tts_result_token: ir.tts_result_token.clone(),
 
         tts_model_token: ir.tts_model_token.clone(),
-        inference_text: ir.inference_text.clone(),
+        raw_inference_text: ir.raw_inference_text.clone(),
 
         maybe_creator_user_token: ir.maybe_creator_user_token.clone(),
         maybe_creator_username: ir.maybe_creator_username.clone(),
@@ -123,7 +123,7 @@ SELECT
     tts_results.token as tts_result_token,
 
     tts_results.model_token as tts_model_token,
-    tts_results.inference_text as inference_text,
+    tts_results.raw_inference_text as raw_inference_text,
 
     users.token as maybe_creator_user_token,
     users.username as maybe_creator_username,
@@ -156,7 +156,7 @@ SELECT
     tts_results.token as tts_result_token,
 
     tts_results.model_token as tts_model_token,
-    tts_results.inference_text as inference_text,
+    tts_results.raw_inference_text as raw_inference_text,
 
     users.token as maybe_creator_user_token,
     users.username as maybe_creator_username,
@@ -199,7 +199,7 @@ SELECT
     tts_results.token as tts_result_token,
 
     tts_results.model_token as tts_model_token,
-    tts_results.inference_text as inference_text,
+    tts_results.raw_inference_text as raw_inference_text,
 
     users.token as maybe_creator_user_token,
     users.username as maybe_creator_username,
@@ -234,7 +234,7 @@ SELECT
     tts_results.token as tts_result_token,
 
     tts_results.model_token as tts_model_token,
-    tts_results.inference_text as inference_text,
+    tts_results.raw_inference_text as raw_inference_text,
 
     users.token as maybe_creator_user_token,
     users.username as maybe_creator_username,

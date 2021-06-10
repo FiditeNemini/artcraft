@@ -15,7 +15,7 @@ use std::sync::Arc;
 #[derive(Serialize)]
 pub struct TtsResultRecordForResponse {
   pub tts_result_token: String,
-  pub inference_text: String,
+  pub raw_inference_text: String,
 
   pub tts_model_token: String,
   pub tts_model_title: Option<String>, // TODO: Shouldn't be Option.
@@ -50,7 +50,7 @@ pub struct TtsResultRecordForResponse {
 #[derive(Serialize)]
 pub struct TtsResultRecordRaw {
   pub tts_result_token: String, // from field `tts_results.token`
-  pub inference_text: String,
+  pub raw_inference_text: String,
 
   pub tts_model_token: String,
   pub tts_model_title: Option<String>,
@@ -113,7 +113,7 @@ pub async fn select_tts_result_by_token(
   let ir_for_response = TtsResultRecordForResponse {
     tts_result_token: ir.tts_result_token.clone(),
 
-    inference_text: ir.inference_text.clone(),
+    raw_inference_text: ir.raw_inference_text.clone(),
 
     tts_model_token: ir.tts_model_token.clone(),
     tts_model_title: ir.tts_model_title.clone(),
@@ -156,7 +156,7 @@ async fn select_including_deleted(
 SELECT
     tts_results.token as tts_result_token,
 
-    tts_results.inference_text,
+    tts_results.raw_inference_text,
 
     tts_results.model_token as tts_model_token,
     tts_models.title as tts_model_title,
@@ -207,7 +207,7 @@ async fn select_without_deleted(
 SELECT
     tts_results.token as tts_result_token,
 
-    tts_results.inference_text,
+    tts_results.raw_inference_text,
 
     tts_results.model_token as tts_model_token,
     tts_models.title as tts_model_title,

@@ -1,12 +1,12 @@
 #![forbid(private_in_public)]
 #![forbid(unused_must_use)]
+//#![forbid(warnings)]
 
 #![allow(dead_code)]
 #![allow(non_snake_case)]
 #![allow(unused_imports)]
 #![allow(unused_mut)]
 #![allow(unused_variables)]
-//#![allow(warnings)]
 
 #[macro_use] extern crate lazy_static;
 #[macro_use] extern crate serde_derive;
@@ -294,7 +294,7 @@ pub async fn serve(server_state: ServerState) -> AnyhowResult<()>
               .route(web::head().to(|| HttpResponse::Ok()))
           )
           .service(
-            web::resource("/model/{slug}")
+            web::resource("/model/{token}")
               .route(web::get().to(get_tts_model_handler))
               .route(web::head().to(|| HttpResponse::Ok()))
           )
@@ -343,7 +343,7 @@ pub async fn serve(server_state: ServerState) -> AnyhowResult<()>
               .route(web::head().to(|| HttpResponse::Ok()))
           )
           .service(
-            web::resource("/template/{slug}")
+            web::resource("/template/{token}")
               .route(web::get().to(get_w2l_template_handler))
               .route(web::head().to(|| HttpResponse::Ok()))
           )
@@ -353,12 +353,12 @@ pub async fn serve(server_state: ServerState) -> AnyhowResult<()>
               .route(web::head().to(|| HttpResponse::Ok()))
           )
           .service(
-          web::resource("/template/{slug}/moderate")
+          web::resource("/template/{token}/moderate")
               .route(web::post().to(set_w2l_template_mod_approval_handler))
               .route(web::head().to(|| HttpResponse::Ok()))
           )
           .service(
-            web::resource("/template/{slug}/delete")
+            web::resource("/template/{token}/delete")
               .route(web::post().to(delete_w2l_template_handler))
               .route(web::head().to(|| HttpResponse::Ok()))
           )

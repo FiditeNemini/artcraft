@@ -21,10 +21,7 @@ pub struct W2lTemplateUploadJobRecord {
   pub creator_set_visibility: String, // TODO
   pub title: String,
   pub template_type: String, // TODO
-  pub maybe_subject_token: Option<String>,
-  pub maybe_actor_subject_token: Option<String>,
   pub download_url: Option<String>,
-  pub download_url_type: String, // TODO
   pub status: String, // TODO
   pub attempt_count: i32,
   pub failure_reason: Option<String>,
@@ -218,7 +215,6 @@ pub async fn insert_w2l_template(
 ) -> AnyhowResult<(u64, String)> {
 
   let model_token = random_prefix_crockford_token("W2L_TPL:", 32)?;
-  let updatable_slug = model_token.clone();
 
   let query_result = sqlx::query!(
         r#"
@@ -226,7 +222,6 @@ INSERT INTO w2l_templates
 SET
   token = ?,
   template_type = ?,
-  updatable_slug = ?,
   title = ?,
   description_markdown = '',
   description_rendered_html = '',
@@ -248,7 +243,6 @@ SET
         "#,
       model_token,
       template_type,
-      updatable_slug,
       job.title.to_string(),
       job.creator_user_token.clone(),
       job.creator_ip_address.clone(),

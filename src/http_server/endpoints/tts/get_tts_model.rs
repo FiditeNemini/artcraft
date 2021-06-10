@@ -29,7 +29,7 @@ use std::sync::Arc;
 /// For the URL PathInfo
 #[derive(Deserialize)]
 pub struct GetTtsModelPathInfo {
-  slug: String,
+  token: String,
 }
 
 #[derive(Serialize)]
@@ -42,7 +42,6 @@ pub struct TtsModelRecordForResponse {
   pub creator_username: String,
   pub creator_display_name: String,
 
-  pub updatable_slug: String,
   pub title: String,
 
   pub created_at: DateTime<Utc>,
@@ -76,7 +75,6 @@ pub struct TtsModelRecord {
   pub creator_username: String,
   pub creator_display_name: String,
 
-  pub updatable_slug: String,
   pub title: String,
 
   pub created_at: DateTime<Utc>,
@@ -130,7 +128,6 @@ SELECT
     users.username as creator_username,
     users.display_name as creator_display_name,
 
-    tts.updatable_slug,
     tts.title,
 
     tts.created_at,
@@ -139,11 +136,11 @@ FROM tts_models as tts
 JOIN users
 ON users.token = tts.creator_user_token
 WHERE
-    tts.updatable_slug = ?
+    tts.token = ?
     AND tts.user_deleted_at IS NULL
     AND tts.mod_deleted_at IS NULL
         "#,
-      &path.slug
+      &path.token
     )
     .fetch_one(&server_state.mysql_pool)
     .await; // TODO: This will return error if it doesn't exist
@@ -170,7 +167,6 @@ WHERE
     creator_user_token: template.creator_user_token.clone(),
     creator_username: template.creator_username.clone(),
     creator_display_name: template.creator_display_name.clone(),
-    updatable_slug: template.updatable_slug.clone(),
     title: template.title.clone(),
     created_at: template.created_at.clone(),
     updated_at: template.updated_at.clone(),

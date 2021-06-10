@@ -128,7 +128,7 @@ SET
   uuid_idempotency_token = ?,
 
   model_token = ?,
-  inference_text = ?,
+  raw_inference_text = ?,
   maybe_creator_user_token = ?,
   creator_ip_address = ?,
   creator_set_visibility = ?,

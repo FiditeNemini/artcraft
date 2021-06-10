@@ -1,12 +1,12 @@
 #![forbid(private_in_public)]
 #![forbid(unused_must_use)]
+//#![forbid(warnings)]
 
 #![allow(dead_code)]
 #![allow(non_snake_case)]
 #![allow(unused_imports)]
 #![allow(unused_mut)]
 #![allow(unused_variables)]
-//#![allow(warnings)]
 
 #[macro_use] extern crate serde_derive;
 
@@ -388,7 +388,7 @@ async fn process_job(inferencer: &Inferencer, job: &TtsInferenceJobRecord) -> An
 
   let text_input_fs_path = temp_dir.path().join("inference_input.txt");
 
-  std::fs::write(&text_input_fs_path, &job.inference_text)?;
+  std::fs::write(&text_input_fs_path, &job.raw_inference_text)?;
 
   // ==================== RUN INFERENCE ==================== //
 
@@ -454,7 +454,7 @@ async fn process_job(inferencer: &Inferencer, job: &TtsInferenceJobRecord) -> An
 
   // ==================== SAVE RECORDS ==================== //
 
-  let text_hash = hash_string_sha2(&job.inference_text)?;
+  let text_hash = hash_string_sha2(&job.raw_inference_text)?;
 
   info!("Saving tts inference record...");
   let (id, inference_result_token) = insert_tts_result(

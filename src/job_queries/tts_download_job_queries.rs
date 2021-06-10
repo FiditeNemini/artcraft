@@ -22,10 +22,7 @@ pub struct TtsUploadJobRecord {
   pub creator_set_visibility: String, // TODO
   pub title: String,
   pub tts_model_type: String, // TODO
-  pub maybe_subject_token: Option<String>,
-  pub maybe_actor_subject_token: Option<String>,
   pub download_url: Option<String>,
-  pub download_url_type: String, // TODO
   pub status: String, // TODO
   pub attempt_count: i32,
   pub failure_reason: Option<String>,
@@ -210,7 +207,6 @@ pub async fn insert_tts_model<P: AsRef<Path>>(
 ) -> AnyhowResult<(u64, String)> {
 
   let model_token = random_prefix_crockford_token("TTS_MDL:", 32)?;
-  let updatable_slug = model_token.clone();
 
   let private_bucket_object_name = &private_bucket_object_name
       .as_ref()
@@ -223,7 +219,6 @@ INSERT INTO tts_models
 SET
   token = ?,
   tts_model_type = "tacotron2",
-  updatable_slug = ?,
   title = ?,
   description_markdown = '',
   description_rendered_html = '',
@@ -235,7 +230,6 @@ SET
   file_size_bytes = ?
         "#,
       &model_token,
-      updatable_slug,
       job.title.to_string(),
       job.creator_user_token.clone(),
       job.creator_ip_address.clone(),

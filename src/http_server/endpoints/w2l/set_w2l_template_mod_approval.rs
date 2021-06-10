@@ -25,7 +25,7 @@ use std::sync::Arc;
 /// For the URL PathInfo
 #[derive(Deserialize)]
 pub struct SetW2lTemplateModApprovalPathInfo {
-  slug: String,
+  token: String,
 }
 
 #[derive(Deserialize)]
@@ -115,7 +115,7 @@ pub async fn set_w2l_template_mod_approval_handler(
   }
 
   let template_query_result = select_w2l_template_by_token(
-    &path.slug,
+    &path.token,
     true, // Only mods can perform this action
     &server_state.mysql_pool,
   ).await;
@@ -144,7 +144,7 @@ LIMIT 1
 
       &request.is_approved,
       &user_session.user_token,
-      &path.slug,
+      &path.token,
     )
       .execute(&server_state.mysql_pool)
       .await;

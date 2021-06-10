@@ -10,7 +10,6 @@ pub struct TtsModelRecordForList {
   pub tts_model_type: String,
 
   pub title: String,
-  pub updatable_slug: String,
 
   pub creator_user_token: String,
   pub creator_username: String,
@@ -27,7 +26,6 @@ struct RawTtsModelRecordForList {
   pub tts_model_type: String,
 
   pub title: String,
-  pub updatable_slug: String,
 
   pub creator_user_token: String,
   pub creator_username: String,
@@ -84,7 +82,6 @@ pub async fn list_tts_models(
         creator_user_token: model.creator_user_token.clone(),
         creator_username: model.creator_username.clone(),
         creator_display_name: model.creator_display_name.clone(),
-        updatable_slug: model.updatable_slug.clone(),
         title: model.title.clone(),
         is_mod_disabled: if model.is_mod_disabled == 0 { false } else { true },
         created_at: model.created_at.clone(),
@@ -111,7 +108,6 @@ SELECT
     tts.creator_user_token,
     users.username as creator_username,
     users.display_name as creator_display_name,
-    tts.updatable_slug,
     tts.title,
     tts.is_mod_disabled,
     tts.created_at,
@@ -137,7 +133,6 @@ SELECT
     tts.creator_user_token,
     users.username as creator_username,
     users.display_name as creator_display_name,
-    tts.updatable_slug,
     tts.title,
     tts.is_mod_disabled,
     tts.created_at,
@@ -174,7 +169,6 @@ SELECT
     tts.creator_user_token,
     users.username as creator_username,
     users.display_name as creator_display_name,
-    tts.updatable_slug,
     tts.title,
     tts.is_mod_disabled,
     tts.created_at,
@@ -203,7 +197,6 @@ SELECT
     tts.creator_user_token,
     users.username as creator_username,
     users.display_name as creator_display_name,
-    tts.updatable_slug,
     tts.title,
     tts.is_mod_disabled,
     tts.created_at,

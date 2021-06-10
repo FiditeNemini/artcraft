@@ -10,6 +10,7 @@ use sqlx::mysql::MySqlDatabaseError;
 use std::sync::Arc;
 use chrono::{DateTime, Utc};
 use md5::{Md5, Digest};
+use crate::database_helpers::boolean_converters::i8_to_bool;
 
 // TODO: This duplicates the get_profile_handler.
 
@@ -22,11 +23,8 @@ pub struct RawUserProfileRecord {
   pub profile_markdown: String,
   pub profile_rendered_html: String,
   pub user_role_slug: String,
-  pub banned: i8,
-  pub avatar_public_bucket_hash: Option<String>,
+  pub is_banned: i8,
   pub disable_gravatar: i8,
-  pub maybe_preferred_tts_model_token: Option<String>,
-  pub maybe_preferred_w2l_template_token: Option<String>,
   pub discord_username: Option<String>,
   pub twitch_username: Option<String>,
   pub twitter_username: Option<String>,
@@ -48,11 +46,8 @@ pub struct UserProfileRecordForResponse {
   pub profile_markdown: String,
   pub profile_rendered_html: String,
   pub user_role_slug: String,
-  pub banned: bool,
-  pub avatar_public_bucket_hash: Option<String>,
+  pub is_banned: bool,
   pub disable_gravatar: bool,
-  pub maybe_preferred_tts_model_token: Option<String>,
-  pub maybe_preferred_w2l_template_token: Option<String>,
   pub discord_username: Option<String>,
   pub twitch_username: Option<String>,
   pub twitter_username: Option<String>,
@@ -77,11 +72,8 @@ SELECT
     profile_markdown,
     profile_rendered_html,
     user_role_slug,
-    banned,
-    avatar_public_bucket_hash,
+    is_banned,
     disable_gravatar,
-    maybe_preferred_tts_model_token,
-    maybe_preferred_w2l_template_token,
     discord_username,
     twitch_username,
     twitter_username,
@@ -123,11 +115,8 @@ WHERE
     profile_markdown: profile_record.profile_markdown.clone(),
     profile_rendered_html: profile_record.profile_rendered_html.clone(),
     user_role_slug: profile_record.user_role_slug.clone(),
-    banned: if profile_record.banned == 0 { false } else { true },
-    avatar_public_bucket_hash: profile_record.avatar_public_bucket_hash.clone(),
+    is_banned: i8_to_bool(profile_record.is_banned),
     disable_gravatar: if profile_record.disable_gravatar == 0 { false } else { true },
-    maybe_preferred_tts_model_token: profile_record.maybe_preferred_tts_model_token.clone(),
-    maybe_preferred_w2l_template_token: profile_record.maybe_preferred_w2l_template_token.clone(),
     discord_username: profile_record.discord_username.clone(),
     twitch_username: profile_record.twitch_username.clone(),
     twitter_username: profile_record.twitter_username.clone(),

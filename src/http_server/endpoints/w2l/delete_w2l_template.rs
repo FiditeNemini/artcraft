@@ -28,7 +28,7 @@ use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 /// For the URL PathInfo
 #[derive(Deserialize)]
 pub struct DeleteW2lTemplatePathInfo {
-  slug: String,
+  token: String,
 }
 
 #[derive(Deserialize)]
@@ -94,7 +94,7 @@ pub async fn delete_w2l_template_handler(
   let is_mod_that_can_see_deleted = user_session.can_delete_other_users_w2l_templates;
 
   let template_query_result = select_w2l_template_by_token(
-    &path.slug,
+    &path.token,
     is_mod_that_can_see_deleted,
     &server_state.mysql_pool,
   ).await;
@@ -128,13 +128,13 @@ pub async fn delete_w2l_template_handler(
   let query_result = if request.set_delete {
     if is_author {
       user_delete_template(
-        &path.slug,
+        &path.token,
         &user_session.user_token,
         &server_state.mysql_pool
       ).await
     } else {
       mod_delete_template(
-        &path.slug,
+        &path.token,
         &user_session.user_token,
         &server_state.mysql_pool
       ).await
@@ -143,13 +143,13 @@ pub async fn delete_w2l_template_handler(
     if is_author {
       // NB: Technically only mods can see their own templates here
       user_undelete_template(
-        &path.slug,
+        &path.token,
         &user_session.user_token,
         &server_state.mysql_pool
       ).await
     } else {
       mod_undelete_template(
-        &path.slug,
+        &path.token,
         &user_session.user_token,
         &server_state.mysql_pool
       ).await

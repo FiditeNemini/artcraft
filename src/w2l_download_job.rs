@@ -1,12 +1,12 @@
 #![forbid(private_in_public)]
 #![forbid(unused_must_use)]
+//#![forbid(warnings)]
 
 #![allow(dead_code)]
 #![allow(non_snake_case)]
 #![allow(unused_imports)]
 #![allow(unused_mut)]
 #![allow(unused_variables)]
-//#![allow(warnings)]
 
 #[macro_use] extern crate serde_derive;
 

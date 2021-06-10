@@ -27,11 +27,8 @@ pub struct UploadW2lTemplateRequest {
   idempotency_token: String,
   title: String,
   download_url: String,
-  download_url_type: Option<DownloadUrlType>,
   template_type: Option<W2lTemplateType>,
   creator_set_visibility: Option<CreatorSetVisibility>,
-  maybe_subject_token: Option<String>,
-  maybe_actor_subject_token: Option<String>,
 }
 
 #[derive(Serialize)]
@@ -127,10 +124,7 @@ pub async fn upload_w2l_template_handler(
   let download_url = request.download_url.to_string();
 
   let template_type = "unknown".to_string();
-  let download_url_type = "google-drive".to_string();
   let creator_set_visibility = "public".to_string();
-  let maybe_subject_token : Option<String> = None;
-  let maybe_actor_subject_token : Option<String> = None;
 
   // This token is returned to the client.
   let job_token = random_prefix_crockford_token("W2L_UP:", 32)
@@ -151,10 +145,7 @@ SET
   creator_set_visibility = ?,
   title = ?,
   template_type = ?,
-  maybe_subject_token = ?,
-  maybe_actor_subject_token = ?,
   download_url = ?,
-  download_url_type = ?,
   status = "pending"
         "#,
         job_token.to_string(),
@@ -164,10 +155,7 @@ SET
         creator_set_visibility.to_string(),
         title.to_string(),
         template_type,
-        maybe_subject_token,
-        maybe_actor_subject_token,
         download_url,
-        download_url_type
     )
     .execute(&server_state.mysql_pool)
     .await;

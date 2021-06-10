@@ -1,6 +1,7 @@
 use actix_web::HttpRequest;
 use anyhow::anyhow;
 use crate::AnyhowResult;
+use crate::database_helpers::boolean_converters::{i8_to_bool, nullable_i8_to_optional_bool};
 use crate::http_server::web_utils::cookie_manager::CookieManager;
 use log::{info, warn};
 use sqlx::MySqlPool;
@@ -24,22 +25,17 @@ pub struct SessionUserRecord {
   pub email_address: String,
   pub email_confirmed: bool,
   pub email_gravatar_hash: String,
-  pub avatar_public_bucket_hash: Option<String>,
 
   // ===== PREFERENCES ===== //
 
-  pub dark_mode_preference: String,
   pub disable_gravatar: bool,
-  pub hide_results_preference: bool,
-  pub auto_play_audio_preference: bool,
-  pub auto_play_video_preference: bool,
-  pub maybe_preferred_tts_model_token: Option<String>,
-  pub maybe_preferred_w2l_template_token: Option<String>,
+  pub auto_play_audio_preference: Option<bool>,
+  pub auto_play_video_preference: Option<bool>,
 
   // ===== ROLE ===== //
 
   pub user_role_slug: String,
-  pub banned: bool,
+  pub is_banned: bool,
 
   // ===== PERMISSIONS FLAGS ===== //
 
@@ -77,18 +73,13 @@ pub struct SessionUserRawDbRecord {
   pub email_address: String,
   pub email_confirmed: i8,
   pub email_gravatar_hash: String,
-  pub avatar_public_bucket_hash: Option<String>,
 
-  pub dark_mode_preference: String,
   pub disable_gravatar: i8,
-  pub hide_results_preference: i8,
-  pub auto_play_audio_preference: i8,
-  pub auto_play_video_preference: i8,
-  pub maybe_preferred_tts_model_token: Option<String>,
-  pub maybe_preferred_w2l_template_token: Option<String>,
+  pub auto_play_audio_preference: Option<i8>,
+  pub auto_play_video_preference: Option<i8>,
 
   pub user_role_slug: String,
-  pub banned: i8,
+  pub is_banned: i8,
 
   // NB: These are `Option` due to the JOIN not being compile-time assured.
   // Usage
@@ -189,18 +180,13 @@ SELECT
     users.email_address,
     users.email_confirmed,
     users.email_gravatar_hash,
-    users.avatar_public_bucket_hash,
 
-    users.dark_mode_preference,
     users.disable_gravatar,
-    users.hide_results_preference,
     users.auto_play_audio_preference,
     users.auto_play_video_preference,
-    users.maybe_preferred_tts_model_token,
-    users.maybe_preferred_w2l_template_token,
 
     users.user_role_slug,
-    users.banned,
+    users.is_banned,
 
     user_roles.can_use_tts,
     user_roles.can_use_w2l,
@@ -246,18 +232,13 @@ WHERE user_sessions.token = ?
           username: raw_user_record.username.clone(),
           display_name: raw_user_record.display_name.clone(),
           email_address: raw_user_record.email_address.clone(),
-          email_confirmed: if raw_user_record.email_confirmed == 0 { false } else { true },
+          email_confirmed: i8_to_bool(raw_user_record.email_confirmed),
           email_gravatar_hash: raw_user_record.email_gravatar_hash.clone(),
-          avatar_public_bucket_hash: raw_user_record.avatar_public_bucket_hash.clone(),
-          dark_mode_preference: raw_user_record.dark_mode_preference.clone(),
-          disable_gravatar: if raw_user_record.disable_gravatar == 0 { false } else { true },
-          hide_results_preference: if raw_user_record.hide_results_preference == 0 { false } else { true },
-          auto_play_audio_preference: if raw_user_record.auto_play_audio_preference == 0 { false } else { true },
-          auto_play_video_preference: if raw_user_record.auto_play_video_preference == 0 { false } else { true },
-          maybe_preferred_tts_model_token: raw_user_record.maybe_preferred_tts_model_token.clone(),
-          maybe_preferred_w2l_template_token: raw_user_record.maybe_preferred_w2l_template_token.clone(),
+          disable_gravatar: i8_to_bool(raw_user_record.disable_gravatar),
+          auto_play_audio_preference: nullable_i8_to_optional_bool(raw_user_record.auto_play_audio_preference),
+          auto_play_video_preference: nullable_i8_to_optional_bool(raw_user_record.auto_play_video_preference),
           user_role_slug: raw_user_record.user_role_slug.clone(),
-          banned: if raw_user_record.banned == 0 { false } else { true },
+          is_banned: i8_to_bool(raw_user_record.is_banned),
 
           // Usage
           can_use_tts: convert_optional_db_bool_default_false(raw_user_record.can_use_tts),
