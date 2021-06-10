@@ -37,8 +37,8 @@ CREATE TABLE tts_model_upload_jobs (
   ) NOT NULL DEFAULT 'not-set',
 
   -- Can be linked to a well-known voice
-  maybe_subject_token VARCHAR(32) DEFAULT NULL,
-  maybe_actor_subject_token VARCHAR(32) DEFAULT NULL,
+  -- maybe_subject_token VARCHAR(32) DEFAULT NULL,
+  -- maybe_actor_subject_token VARCHAR(32) DEFAULT NULL,
 
   -- If we need to download the file from Google Drive.
   download_url VARCHAR(512) DEFAULT NULL,
@@ -149,8 +149,8 @@ CREATE TABLE w2l_template_upload_jobs (
   ) NOT NULL DEFAULT 'unknown',
 
   -- Can be linked to a well-known subject
-  maybe_subject_token VARCHAR(32) DEFAULT NULL,
-  maybe_actor_subject_token VARCHAR(32) DEFAULT NULL,
+  -- maybe_subject_token VARCHAR(32) DEFAULT NULL,
+  -- maybe_actor_subject_token VARCHAR(32) DEFAULT NULL,
 
   -- If we need to download the file from Google Drive.
   download_url VARCHAR(512) DEFAULT NULL,
