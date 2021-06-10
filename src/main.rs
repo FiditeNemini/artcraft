@@ -71,6 +71,7 @@ use crate::http_server::endpoints::users::edit_profile::edit_profile_handler;
 use crate::http_server::endpoints::w2l::set_w2l_template_mod_approval::set_w2l_template_mod_approval_handler;
 use crate::http_server::endpoints::w2l::delete_w2l_template::delete_w2l_template_handler;
 use crate::http_server::endpoints::w2l::edit_w2l_template::edit_w2l_template_handler;
+use crate::http_server::endpoints::tts::edit_tts_model::edit_tts_model_handler;
 
 // TODO TODO TODO TODO
 // TODO TODO TODO TODO
@@ -294,6 +295,11 @@ pub async fn serve(server_state: ServerState) -> AnyhowResult<()>
               .route(web::head().to(|| HttpResponse::Ok()))
           )
           .service(
+            web::resource("/model/{model_token}/edit")
+              .route(web::post().to(edit_tts_model_handler))
+              .route(web::head().to(|| HttpResponse::Ok()))
+          )
+          .service(
           web::resource("/result/{token}")
               .route(web::get().to(get_tts_inference_result_handler))
               .route(web::head().to(|| HttpResponse::Ok()))
@@ -333,7 +339,7 @@ pub async fn serve(server_state: ServerState) -> AnyhowResult<()>
               .route(web::head().to(|| HttpResponse::Ok()))
           )
           .service(
-          web::resource("/template/{template_token}/edit")
+           web::resource("/template/{template_token}/edit")
               .route(web::post().to(edit_w2l_template_handler))
               .route(web::head().to(|| HttpResponse::Ok()))
           )
