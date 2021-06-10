@@ -39,7 +39,7 @@ pub struct EditW2lTemplateRequest {
   //pub updatable_slug: Option<String>,
   //pub creator_set_visibility: Option<String>,
 
-  //pub is_mod_disabled: Option<bool>,
+  //pub is_locked_from_use: Option<bool>,
   //pub is_locked_from_user_modification: Option<bool>,
   //pub maybe_mod_comments: Option<String>,
 }
@@ -138,7 +138,7 @@ pub async fn edit_w2l_template_handler(
   }
 
   if !editor_is_moderator {
-    if template_record.is_locked_from_user_modification || template_record.is_mod_disabled {
+    if template_record.is_locked_from_user_modification || template_record.is_locked_from_use {
       return Err(EditW2lTemplateError::NotAuthorized);
     }
   }

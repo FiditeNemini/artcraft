@@ -18,7 +18,6 @@ pub struct TtsInferenceRecordForList {
   pub file_size_bytes: u32,
   pub duration_millis: u32,
 
-  //pub is_mod_hidden_from_public: bool, // converted
   //pub model_is_mod_approved: bool, // converted
   //pub maybe_mod_user_token: Option<String>,
 
@@ -39,7 +38,6 @@ struct RawTtsInferenceRecordForList {
   pub file_size_bytes: i32,
   pub duration_millis: i32,
 
-  //pub is_mod_hidden_from_public: i8, // needs convert
   //pub model_is_mod_approved: i8, // needs convert
   //pub maybe_mod_user_token: Option<String>,
 
@@ -95,7 +93,6 @@ pub async fn list_tts_inference_results(
         maybe_creator_user_token: ir.maybe_creator_user_token.clone(),
         maybe_creator_username: ir.maybe_creator_username.clone(),
         maybe_creator_display_name: ir.maybe_creator_display_name.clone(),
-        //is_mod_hidden_from_public: if ir.is_mod_hidden_from_public == 0 { false } else { true },
         //model_is_mod_approved: if ir.model_is_mod_approved == 0 { false } else { true },
 
         file_size_bytes: if ir.file_size_bytes > 0 { ir.file_size_bytes as u32 } else { 0 },
@@ -140,8 +137,7 @@ LEFT OUTER JOIN tts_models
 LEFT OUTER JOIN users
     ON tts_results.maybe_creator_user_token = users.token
 WHERE
-    tts_results.is_mod_hidden_from_public IS FALSE
-    AND tts_models.is_mod_disabled IS FALSE
+    tts_models.is_locked_from_use IS FALSE
     AND tts_results.user_deleted_at IS NULL
     AND tts_results.mod_deleted_at IS NULL
         "#)
@@ -217,8 +213,7 @@ LEFT OUTER JOIN users
     ON tts_results.maybe_creator_user_token = users.token
 WHERE
     users.username = ?
-    AND tts_results.is_mod_hidden_from_public IS FALSE
-    AND tts_models.is_mod_disabled IS FALSE
+    AND tts_models.is_locked_from_use IS FALSE
     AND tts_results.user_deleted_at IS NULL
     AND tts_results.mod_deleted_at IS NULL
         "#,

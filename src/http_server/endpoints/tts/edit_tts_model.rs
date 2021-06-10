@@ -43,7 +43,7 @@ pub struct EditTtsModelRequest {
   //pub text_preprocessing_algorithm: Option<String>,
   //pub vocoder_token: Option<String>,
 
-  //pub is_mod_disabled: Option<bool>,
+  //pub is_locked_from_use: Option<bool>,
   //pub is_locked_from_user_modification: Option<bool>,
   //pub maybe_mod_comments: Option<String>,
 }
@@ -135,7 +135,7 @@ pub async fn edit_tts_model_handler(
   }
 
   if !is_mod {
-    if model_record.is_locked_from_user_modification || model_record.is_mod_disabled {
+    if model_record.is_locked_from_user_modification || model_record.is_locked_from_use {
       return Err(EditTtsModelError::NotAuthorized);
     }
   }

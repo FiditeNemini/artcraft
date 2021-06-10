@@ -118,7 +118,7 @@ pub async fn delete_w2l_template_handler(
   }
 
   if !is_mod {
-    if w2l_template.is_locked_from_user_modification || w2l_template.is_mod_disabled {
+    if w2l_template.is_locked_from_user_modification || w2l_template.is_locked_from_use {
       return Err(DeleteW2lTemplateError::NotAuthorized);
     }
   }

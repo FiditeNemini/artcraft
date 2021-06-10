@@ -36,7 +36,6 @@ pub struct TtsResultRecordForResponse {
   pub file_size_bytes: u32,
   pub duration_millis: u32,
 
-  //pub is_mod_hidden_from_public: bool, // converted
   //pub model_is_mod_approved: bool, // converted
   //pub maybe_mod_user_token: Option<String>,
 
@@ -71,7 +70,6 @@ pub struct TtsResultRecordRaw {
   pub file_size_bytes: i32,
   pub duration_millis: i32,
 
-  //pub is_mod_hidden_from_public: i8, // needs convert
   //pub model_is_mod_approved: i8, // needs convert
   //pub maybe_mod_user_token: Option<String>,
 
@@ -128,7 +126,6 @@ pub async fn select_tts_result_by_token(
     maybe_model_creator_display_name: ir.maybe_model_creator_display_name.clone(),
     maybe_model_creator_gravatar_hash: ir.maybe_model_creator_gravatar_hash.clone(),
 
-    //is_mod_hidden_from_public: if ir.is_mod_hidden_from_public == 0 { false } else { true },
     //model_is_mod_approved: if ir.model_is_mod_approved == 0 { false } else { true },
 
     public_bucket_wav_audio_path: ir.public_bucket_wav_audio_path.clone(),

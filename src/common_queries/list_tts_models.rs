@@ -3,6 +3,7 @@ use chrono::{DateTime, Utc};
 use crate::util::anyhow_result::AnyhowResult;
 use log::{warn, info};
 use sqlx::MySqlPool;
+use crate::database_helpers::boolean_converters::i8_to_bool;
 
 #[derive(Serialize)]
 pub struct TtsModelRecordForList {
@@ -15,7 +16,7 @@ pub struct TtsModelRecordForList {
   pub creator_username: String,
   pub creator_display_name: String,
 
-  pub is_mod_disabled: bool, // converted
+  pub is_locked_from_use: bool, // converted
 
   pub created_at: DateTime<Utc>,
   pub updated_at: DateTime<Utc>,
@@ -31,7 +32,7 @@ struct RawTtsModelRecordForList {
   pub creator_username: String,
   pub creator_display_name: String,
 
-  pub is_mod_disabled: i8, // NB: needs conversion
+  pub is_locked_from_use: i8, // NB: needs conversion
 
   pub created_at: DateTime<Utc>,
   pub updated_at: DateTime<Utc>,
@@ -83,7 +84,7 @@ pub async fn list_tts_models(
         creator_username: model.creator_username.clone(),
         creator_display_name: model.creator_display_name.clone(),
         title: model.title.clone(),
-        is_mod_disabled: if model.is_mod_disabled == 0 { false } else { true },
+        is_locked_from_use: i8_to_bool(model.is_locked_from_use),
         created_at: model.created_at.clone(),
         updated_at: model.updated_at.clone(),
       }
@@ -109,14 +110,14 @@ SELECT
     users.username as creator_username,
     users.display_name as creator_display_name,
     tts.title,
-    tts.is_mod_disabled,
+    tts.is_locked_from_use,
     tts.created_at,
     tts.updated_at
 FROM tts_models as tts
 JOIN users
     ON users.token = tts.creator_user_token
 WHERE
-    tts.is_mod_disabled IS FALSE
+    tts.is_locked_from_use IS FALSE
     AND tts.user_deleted_at IS NULL
     AND tts.mod_deleted_at IS NULL
         "#)
@@ -134,7 +135,7 @@ SELECT
     users.username as creator_username,
     users.display_name as creator_display_name,
     tts.title,
-    tts.is_mod_disabled,
+    tts.is_locked_from_use,
     tts.created_at,
     tts.updated_at
 FROM tts_models as tts
@@ -170,7 +171,7 @@ SELECT
     users.username as creator_username,
     users.display_name as creator_display_name,
     tts.title,
-    tts.is_mod_disabled,
+    tts.is_locked_from_use,
     tts.created_at,
     tts.updated_at
 FROM tts_models as tts
@@ -179,7 +180,7 @@ ON
     users.token = tts.creator_user_token
 WHERE
     users.username = ?
-    AND tts.is_mod_disabled IS FALSE
+    AND tts.is_locked_from_use IS FALSE
     AND tts.user_deleted_at IS NULL
     AND tts.mod_deleted_at IS NULL
         "#,
@@ -198,7 +199,7 @@ SELECT
     users.username as creator_username,
     users.display_name as creator_display_name,
     tts.title,
-    tts.is_mod_disabled,
+    tts.is_locked_from_use,
     tts.created_at,
     tts.updated_at
 FROM tts_models as tts

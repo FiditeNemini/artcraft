@@ -38,7 +38,6 @@ pub struct W2lResultRecordForResponse {
   pub frame_height: u32,
   pub duration_millis: u32,
 
-  //pub is_mod_hidden_from_public: bool, // converted
   //pub template_is_mod_approved: bool, // converted
   //pub maybe_mod_user_token: Option<String>,
 
@@ -76,7 +75,6 @@ pub struct W2lResultRecordRaw {
   pub frame_height: i32,
   pub duration_millis: i32,
 
-  //pub is_mod_hidden_from_public: i8, // needs convert
   //pub template_is_mod_approved: i8, // needs convert
   //pub maybe_mod_user_token: Option<String>,
 
@@ -135,7 +133,6 @@ pub async fn select_w2l_result_by_token(
     maybe_template_creator_display_name: ir.maybe_template_creator_display_name.clone(),
     maybe_template_creator_gravatar_hash: ir.maybe_template_creator_gravatar_hash.clone(),
 
-    //is_mod_hidden_from_public: if ir.is_mod_hidden_from_public == 0 { false } else { true },
     //template_is_mod_approved: if ir.template_is_mod_approved == 0 { false } else { true },
 
     file_size_bytes: if ir.file_size_bytes > 0 { ir.file_size_bytes as u32 } else { 0 },
