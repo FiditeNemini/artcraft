@@ -199,23 +199,24 @@ WHERE id = ?
   Ok(())
 }
 
-pub async fn insert_w2l_template(pool: &MySqlPool,
-                                 template_type: &str, // TODO: ENUM!
-                                 job: &W2lTemplateUploadJobRecord,
-                                 private_bucket_hash: &str,
-                                 private_bucket_object_name: &str,
-                                 private_bucket_cached_faces_object_name: &str,
-                                 maybe_image_preview_object_name: Option<&str>,
-                                 maybe_video_preview_object_name: Option<&str>,
-                                 file_size_bytes: u64,
-                                 maybe_mime_type: Option<&str>,
-                                 frame_width: u32,
-                                 frame_height: u32,
-                                 frame_count: u64,
-                                 fps: f32,
-                                 duration_millis: u64)
-  -> AnyhowResult<(u64, String)>
-{
+pub async fn insert_w2l_template(
+  pool: &MySqlPool,
+  template_type: &str, // TODO: ENUM!
+  job: &W2lTemplateUploadJobRecord,
+  private_bucket_hash: &str,
+  private_bucket_object_name: &str,
+  private_bucket_cached_faces_object_name: &str,
+  maybe_image_preview_object_name: Option<&str>,
+  maybe_video_preview_object_name: Option<&str>,
+  file_size_bytes: u64,
+  maybe_mime_type: Option<&str>,
+  frame_width: u32,
+  frame_height: u32,
+  frame_count: u64,
+  fps: f32,
+  duration_millis: u64
+) -> AnyhowResult<(u64, String)> {
+
   let model_token = random_prefix_crockford_token("W2L_TPL:", 32)?;
   let updatable_slug = model_token.clone();
 
@@ -230,7 +231,7 @@ SET
   description_markdown = '',
   description_rendered_html = '',
   creator_user_token = ?,
-  creator_ip_address = ?,
+  creator_ip_address_creation = ?,
   original_download_url = ?,
   private_bucket_hash = ?,
   private_bucket_object_name = ?,

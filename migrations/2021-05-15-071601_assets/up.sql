@@ -66,7 +66,8 @@ CREATE TABLE tts_models (
 
   -- For abuse tracking.
   -- Wide enough for IPv4/6
-  creator_ip_address VARCHAR(40) NOT NULL,
+  creator_ip_address_creation VARCHAR(40) NOT NULL,
+  creator_ip_address_last_update VARCHAR(40) NOT NULL,
 
   -- (THIS MIGHT NOT BE USED)
   -- NB: DO NOT SORT!
@@ -114,6 +115,11 @@ CREATE TABLE tts_models (
   -- The last moderator that made changes.
   maybe_mod_user_token VARCHAR(32) DEFAULT NULL,
 
+  -- ========== VECTOR CLOCK ==========
+
+  -- Incremented with every update.
+  version INT NOT NULL DEFAULT 0,
+
   -- ========== TIMESTAMPS ==========
 
   created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -133,7 +139,8 @@ CREATE TABLE tts_models (
   KEY fk_maybe_mod_user_token (maybe_mod_user_token),
   KEY fk_maybe_subject_token (maybe_subject_token),
   KEY fk_maybe_actor_subject_token (maybe_actor_subject_token),
-  KEY index_creator_ip_address (creator_ip_address),
+  KEY index_creator_ip_address_creation (creator_ip_address_creation),
+  KEY index_creator_ip_address_last_update (creator_ip_address_last_update),
   KEY index_creator_set_visibility (creator_set_visibility),
   KEY index_private_bucket_hash (private_bucket_hash),
   KEY index_is_mod_disabled (is_mod_disabled)
@@ -187,7 +194,8 @@ CREATE TABLE w2l_templates (
 
   -- For abuse tracking.
   -- Wide enough for IPv4/6
-  creator_ip_address VARCHAR(40) NOT NULL,
+  creator_ip_address_creation VARCHAR(40) NOT NULL,
+  creator_ip_address_last_update VARCHAR(40) NOT NULL,
 
   -- (THIS MIGHT NOT BE USED)
   -- NB: DO NOT SORT!
@@ -244,6 +252,7 @@ CREATE TABLE w2l_templates (
 
   -- In this case, a moderator disables it.
   -- This also disables it for the creator.
+  -- Unlike deletion, it remains "visible" to those that have access.
   is_mod_disabled BOOLEAN NOT NULL DEFAULT FALSE,
 
   -- Extremely popular models may be locked from deletion or modification by users.
@@ -254,6 +263,11 @@ CREATE TABLE w2l_templates (
 
   -- The last moderator that made changes.
   maybe_mod_user_token VARCHAR(32) DEFAULT NULL,
+
+  -- ========== VECTOR CLOCK ==========
+
+  -- Incremented with every update.
+  version INT NOT NULL DEFAULT 0,
 
   -- ========== TIMESTAMPS ==========
 
@@ -275,10 +289,10 @@ CREATE TABLE w2l_templates (
   KEY fk_maybe_subject_token (maybe_subject_token),
   KEY fk_maybe_actor_subject_token (maybe_actor_subject_token),
   KEY index_template_type (template_type),
-  KEY index_creator_ip_address (creator_ip_address),
+  KEY index_creator_ip_address_creation (creator_ip_address_creation),
+  KEY index_creator_ip_address_last_update (creator_ip_address_last_update),
   KEY index_creator_set_visibility (creator_set_visibility),
   KEY index_private_bucket_hash (private_bucket_hash),
   KEY index_is_mod_disabled (is_mod_disabled)
 
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin;
-

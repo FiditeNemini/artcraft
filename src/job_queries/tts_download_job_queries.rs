@@ -228,7 +228,7 @@ SET
   description_markdown = '',
   description_rendered_html = '',
   creator_user_token = ?,
-  creator_ip_address = ?,
+  creator_ip_address_creation = ?,
   original_download_url = ?,
   private_bucket_hash = ?,
   private_bucket_object_name = ?,
