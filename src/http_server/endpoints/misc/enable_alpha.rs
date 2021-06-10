@@ -15,7 +15,7 @@ const STATUS_LINK : &'static str = "<a href=\"/alpha\">status</a>";
 
 
 #[derive(Deserialize)]
-struct QueryFields {
+pub struct QueryFields {
   enable: Option<bool>,
 }
 

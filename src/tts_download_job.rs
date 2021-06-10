@@ -1,4 +1,6 @@
-#![deny(unused_must_use)]
+#![forbid(private_in_public)]
+#![forbid(unused_must_use)]
+
 #![allow(dead_code)]
 #![allow(non_snake_case)]
 #![allow(unused_imports)]
