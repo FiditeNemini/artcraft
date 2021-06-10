@@ -16,17 +16,10 @@ CREATE TABLE users (
   email_address VARCHAR(255) NOT NULL,
   email_confirmed BOOLEAN NOT NULL DEFAULT false,
 
-  -- Gravatar image hashes are precomputed.
-  email_gravatar_hash CHAR(32) NOT NULL,
-
-  -- The profile of the user in markdown (user editable).
-  profile_markdown TEXT NOT NULL,
-
-  -- Generated HTML (not user-editable).
-  profile_rendered_html TEXT NOT NULL,
-
   -- The role assigned to the user confers permissions.
   user_role_slug VARCHAR(16) NOT NULL,
+
+  -- ========== CREDENTIALS ==========
 
   -- Bcrypt password hash. Granted, there are newer methods:
   -- https://cheatsheetseries.owasp.org/cheatsheets/Password_Storage_Cheat_Sheet.html
@@ -36,9 +29,7 @@ CREATE TABLE users (
   -- Incremented with every update to the password.
   password_version INT NOT NULL DEFAULT 0,
 
-  -- Different than deleted.
-  -- Users still show up, but can't do anything.
-  banned BOOLEAN NOT NULL DEFAULT false,
+  -- ========== ABUSE TRACKING ==========
 
   -- For abuse tracking.
   -- Wide enough for IPv4/6
@@ -46,13 +37,21 @@ CREATE TABLE users (
   ip_address_last_login VARCHAR(40) NOT NULL,
   ip_address_last_update VARCHAR(40) NOT NULL,
 
-  -- For tracking stats.
-  -- The "cached" values are updated by a background job.
-  cached_tts_rendered_counter INT(10) NOT NULL DEFAULT 0,
-  cached_w2l_rendered_counter INT(10) NOT NULL DEFAULT 0,
+  -- ========== DISPLAY / PROFILE ==========
+
+  -- Gravatar image hashes are precomputed.
+  email_gravatar_hash CHAR(32) NOT NULL,
+
+  -- The profile of the user in markdown (user editable).
+  profile_markdown TEXT NOT NULL,
+
+  -- Generated HTML (not user-editable).
+  profile_rendered_html TEXT NOT NULL,
 
   -- An uploaded avatar. Public hash in our bucket.
   avatar_public_bucket_hash CHAR(32) DEFAULT NULL,
+
+  -- ========== USER PREFERENCES ==========
 
   -- If the user doesn't want to use gravatar and doesn't have an uploaded avatar.
   disable_gravatar BOOLEAN NOT NULL DEFAULT false,
@@ -80,6 +79,15 @@ CREATE TABLE users (
     'use-clock'
    ) NOT NULL DEFAULT 'light-mode',
 
+  -- ========== STATS ==========
+
+  -- For tracking stats.
+  -- The "cached" values are updated by a background job.
+  -- cached_tts_rendered_counter INT(10) NOT NULL DEFAULT 0,
+  -- cached_w2l_rendered_counter INT(10) NOT NULL DEFAULT 0,
+
+  -- ========== SOCIAL MEDIA ==========
+
   -- Social media usernames
   -- These are not confirmed. We'll need to build an OAuth system to handle that.
   discord_username VARCHAR(36) DEFAULT NULL,
@@ -90,8 +98,24 @@ CREATE TABLE users (
   cashapp_username VARCHAR(36) DEFAULT NULL,
   website_url VARCHAR(255) DEFAULT NULL,
 
+  -- ========== MODERATION DETAILS ==========
+
+  -- Different than deleted.
+  -- Users still show up, but can't do anything.
+  is_banned BOOLEAN NOT NULL DEFAULT false,
+
+  -- If a moderator has comments.
+  maybe_mod_comments VARCHAR(255) DEFAULT NULL,
+
+  -- The last moderator that made changes.
+  maybe_mod_user_token VARCHAR(32) DEFAULT NULL,
+
+  -- ========== VECTOR CLOCK ==========
+
   -- Incremented with every update.
   version INT NOT NULL DEFAULT 0,
+
+  -- ========== TIMESTAMPS ==========
 
   created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
