@@ -2,7 +2,7 @@
 -- noinspection SqlNoDataSourceInspectionForFile
 -- noinspection SqlResolveForFile
 
-CREATE TABLE moderator_audit_logs_entries (
+CREATE TABLE moderator_audit_log_entries (
   -- Not used for anything except replication.
   id BIGINT(20) NOT NULL AUTO_INCREMENT,
 

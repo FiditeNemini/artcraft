@@ -127,7 +127,10 @@ CREATE TABLE user_roles (
   can_upload_tts_models BOOLEAN NOT NULL DEFAULT FALSE,
   can_upload_w2l_templates BOOLEAN NOT NULL DEFAULT FALSE,
   can_delete_own_tts_models BOOLEAN NOT NULL DEFAULT FALSE,
+  can_delete_own_tts_results BOOLEAN NOT NULL DEFAULT FALSE,
   can_delete_own_w2l_templates BOOLEAN NOT NULL DEFAULT FALSE,
+  can_delete_own_w2l_results BOOLEAN NOT NULL DEFAULT FALSE,
+  can_delete_own_account BOOLEAN NOT NULL DEFAULT FALSE,
 
   -- Moderation
   can_approve_w2l_templates BOOLEAN NOT NULL DEFAULT FALSE,
@@ -135,8 +138,11 @@ CREATE TABLE user_roles (
   can_edit_other_users_tts_models BOOLEAN NOT NULL DEFAULT FALSE,
   can_edit_other_users_w2l_templates BOOLEAN NOT NULL DEFAULT FALSE,
   can_delete_other_users_tts_models BOOLEAN NOT NULL DEFAULT FALSE,
+  can_delete_other_users_tts_results BOOLEAN NOT NULL DEFAULT FALSE,
   can_delete_other_users_w2l_templates BOOLEAN NOT NULL DEFAULT FALSE,
+  can_delete_other_users_w2l_results BOOLEAN NOT NULL DEFAULT FALSE,
   can_ban_users BOOLEAN NOT NULL DEFAULT FALSE,
+  can_delete_users BOOLEAN NOT NULL DEFAULT FALSE,
 
   -- Incremented with every update.
   version INT NOT NULL DEFAULT 0,
