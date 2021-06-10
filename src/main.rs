@@ -75,6 +75,7 @@ use crate::http_server::endpoints::w2l::delete_w2l_template::delete_w2l_template
 use crate::http_server::endpoints::w2l::edit_w2l_template::edit_w2l_template_handler;
 use crate::http_server::endpoints::tts::edit_tts_model::edit_tts_model_handler;
 use crate::http_server::endpoints::w2l::delete_w2l_result::delete_w2l_inference_result_handler;
+use crate::http_server::endpoints::tts::delete_tts_result::delete_tts_inference_result_handler;
 
 // TODO TODO TODO TODO
 // TODO TODO TODO TODO
@@ -305,6 +306,11 @@ pub async fn serve(server_state: ServerState) -> AnyhowResult<()>
           .service(
           web::resource("/result/{token}")
               .route(web::get().to(get_tts_inference_result_handler))
+              .route(web::head().to(|| HttpResponse::Ok()))
+          )
+          .service(
+            web::resource("/result/{token}/delete")
+              .route(web::get().to(delete_tts_inference_result_handler))
               .route(web::head().to(|| HttpResponse::Ok()))
           )
           .service(
