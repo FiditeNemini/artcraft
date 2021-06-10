@@ -88,7 +88,7 @@ pub async fn get_w2l_inference_result_handler(
   let mut show_deleted_results = false;
 
   if let Some(user_session) = maybe_user_session {
-    // NB: Moderators can see deleted templates.
+    // NB: Moderators can see deleted results.
     // Original creators cannot see them (unless they're moderators!)
     show_deleted_results = user_session.can_delete_other_users_w2l_results;
   }
