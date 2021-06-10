@@ -110,8 +110,6 @@ CREATE TABLE tts_model_upload_jobs (
   UNIQUE KEY (uuid_idempotency_token),
   KEY fk_on_success_result_token (on_success_result_token),
   KEY fk_creator_user_token (creator_user_token),
-  KEY fk_maybe_subject_token (maybe_subject_token),
-  KEY fk_maybe_actor_subject_token (maybe_actor_subject_token),
   KEY index_status (status),
   KEY index_creator_ip_address (creator_ip_address)
 
@@ -222,8 +220,6 @@ CREATE TABLE w2l_template_upload_jobs (
   UNIQUE KEY (uuid_idempotency_token),
   KEY fk_on_success_result_token (on_success_result_token),
   KEY fk_creator_user_token (creator_user_token),
-  KEY fk_maybe_subject_token (maybe_subject_token),
-  KEY fk_maybe_actor_subject_token (maybe_actor_subject_token),
   KEY index_status (status),
   KEY index_creator_ip_address (creator_ip_address)
 
