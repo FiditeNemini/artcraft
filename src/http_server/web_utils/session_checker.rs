@@ -46,6 +46,9 @@ pub struct SessionUserRecord {
   // Usage
   pub can_use_tts: bool,
   pub can_use_w2l: bool,
+  pub can_delete_own_tts_results: bool,
+  pub can_delete_own_w2l_results: bool,
+  pub can_delete_own_account: bool,
 
   // Contribution
   pub can_upload_tts_models: bool,
@@ -59,8 +62,11 @@ pub struct SessionUserRecord {
   pub can_edit_other_users_tts_models: bool,
   pub can_edit_other_users_w2l_templates: bool,
   pub can_delete_other_users_tts_models: bool,
+  pub can_delete_other_users_tts_results: bool,
   pub can_delete_other_users_w2l_templates: bool,
+  pub can_delete_other_users_w2l_results: bool,
   pub can_ban_users: bool,
+  pub can_delete_users: bool,
 }
 
 pub struct SessionUserRawDbRecord {
@@ -88,6 +94,9 @@ pub struct SessionUserRawDbRecord {
   // Usage
   pub can_use_tts: Option<i8>,
   pub can_use_w2l: Option<i8>,
+  pub can_delete_own_tts_results: Option<i8>,
+  pub can_delete_own_w2l_results: Option<i8>,
+  pub can_delete_own_account: Option<i8>,
 
   // Contribution
   pub can_upload_tts_models: Option<i8>,
@@ -101,8 +110,11 @@ pub struct SessionUserRawDbRecord {
   pub can_edit_other_users_tts_models: Option<i8>,
   pub can_edit_other_users_w2l_templates: Option<i8>,
   pub can_delete_other_users_tts_models: Option<i8>,
+  pub can_delete_other_users_tts_results: Option<i8>,
   pub can_delete_other_users_w2l_templates: Option<i8>,
+  pub can_delete_other_users_w2l_results: Option<i8>,
   pub can_ban_users: Option<i8>,
+  pub can_delete_users: Option<i8>,
 }
 
 impl SessionChecker {
@@ -192,6 +204,9 @@ SELECT
 
     user_roles.can_use_tts,
     user_roles.can_use_w2l,
+    user_roles.can_delete_own_tts_results,
+    user_roles.can_delete_own_w2l_results,
+    user_roles.can_delete_own_account,
 
     user_roles.can_upload_tts_models,
     user_roles.can_upload_w2l_templates,
@@ -203,8 +218,11 @@ SELECT
     user_roles.can_edit_other_users_tts_models,
     user_roles.can_edit_other_users_w2l_templates,
     user_roles.can_delete_other_users_tts_models,
+    user_roles.can_delete_other_users_tts_results,
     user_roles.can_delete_other_users_w2l_templates,
-    user_roles.can_ban_users
+    user_roles.can_delete_other_users_w2l_results,
+    user_roles.can_ban_users,
+    user_roles.can_delete_users
 
 FROM users
 LEFT OUTER JOIN user_sessions
@@ -244,6 +262,9 @@ WHERE user_sessions.token = ?
           // Usage
           can_use_tts: convert_optional_db_bool_default_false(raw_user_record.can_use_tts),
           can_use_w2l: convert_optional_db_bool_default_false(raw_user_record.can_use_w2l),
+          can_delete_own_tts_results: convert_optional_db_bool_default_false(raw_user_record.can_delete_own_tts_results),
+          can_delete_own_w2l_results: convert_optional_db_bool_default_false(raw_user_record.can_delete_own_w2l_results),
+          can_delete_own_account: convert_optional_db_bool_default_false(raw_user_record.can_delete_own_account),
           // Contribution
           can_upload_tts_models: convert_optional_db_bool_default_false(raw_user_record.can_upload_tts_models),
           can_upload_w2l_templates: convert_optional_db_bool_default_false(raw_user_record.can_upload_w2l_templates),
@@ -255,8 +276,11 @@ WHERE user_sessions.token = ?
           can_edit_other_users_tts_models: convert_optional_db_bool_default_false(raw_user_record.can_edit_other_users_tts_models),
           can_edit_other_users_w2l_templates: convert_optional_db_bool_default_false(raw_user_record.can_edit_other_users_w2l_templates),
           can_delete_other_users_tts_models: convert_optional_db_bool_default_false(raw_user_record.can_delete_other_users_tts_models),
+          can_delete_other_users_tts_results: convert_optional_db_bool_default_false(raw_user_record.can_delete_other_users_tts_results),
           can_delete_other_users_w2l_templates: convert_optional_db_bool_default_false(raw_user_record.can_delete_other_users_w2l_templates),
+          can_delete_other_users_w2l_results: convert_optional_db_bool_default_false(raw_user_record.can_delete_other_users_w2l_results),
           can_ban_users: convert_optional_db_bool_default_false(raw_user_record.can_ban_users),
+          can_delete_users: convert_optional_db_bool_default_false(raw_user_record.can_delete_users) ,
         };
 
         Ok(Some(result_user_record))

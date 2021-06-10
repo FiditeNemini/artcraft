@@ -122,15 +122,15 @@ CREATE TABLE user_roles (
   -- Usage
   can_use_tts BOOLEAN NOT NULL DEFAULT FALSE,
   can_use_w2l BOOLEAN NOT NULL DEFAULT FALSE,
+  can_delete_own_tts_results BOOLEAN NOT NULL DEFAULT FALSE,
+  can_delete_own_w2l_results BOOLEAN NOT NULL DEFAULT FALSE,
+  can_delete_own_account BOOLEAN NOT NULL DEFAULT FALSE,
 
   -- Contribution
   can_upload_tts_models BOOLEAN NOT NULL DEFAULT FALSE,
   can_upload_w2l_templates BOOLEAN NOT NULL DEFAULT FALSE,
   can_delete_own_tts_models BOOLEAN NOT NULL DEFAULT FALSE,
-  can_delete_own_tts_results BOOLEAN NOT NULL DEFAULT FALSE,
   can_delete_own_w2l_templates BOOLEAN NOT NULL DEFAULT FALSE,
-  can_delete_own_w2l_results BOOLEAN NOT NULL DEFAULT FALSE,
-  can_delete_own_account BOOLEAN NOT NULL DEFAULT FALSE,
 
   -- Moderation
   can_approve_w2l_templates BOOLEAN NOT NULL DEFAULT FALSE,
