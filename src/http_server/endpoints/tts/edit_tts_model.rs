@@ -126,22 +126,15 @@ pub async fn edit_tts_model_handler(
   };
 
   // NB: Second set of permission checks
-  let mut editor_is_original_user = false;
-  let mut editor_is_moderator = false;
+  let is_author = model_record.creator_user_token == user_session.user_token;
+  let is_mod = user_session.can_edit_other_users_tts_models ;
 
-  if model_record.creator_user_token == user_session.user_token {
-    editor_is_original_user = true;
-  }
-
-  if user_session.can_edit_other_users_tts_models {
-    editor_is_moderator = true;
-  }
-
-  if !editor_is_original_user && !editor_is_moderator {
+  if !is_author && !is_mod {
+    warn!("user is not allowed to edit model: {}", user_session.user_token);
     return Err(EditTtsModelError::NotAuthorized);
   }
 
-  if !editor_is_moderator {
+  if !is_mod {
     if model_record.is_locked_from_user_modification || model_record.is_mod_disabled {
       return Err(EditTtsModelError::NotAuthorized);
     }
@@ -174,7 +167,7 @@ pub async fn edit_tts_model_handler(
 
   let ip_address = get_request_ip(&http_request);
 
-  let query_result = if editor_is_original_user {
+  let query_result = if is_author {
     // We need to store the IP address details.
     sqlx::query!(
         r#"

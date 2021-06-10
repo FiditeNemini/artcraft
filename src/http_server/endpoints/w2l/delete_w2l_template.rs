@@ -110,9 +110,13 @@ pub async fn delete_w2l_template_handler(
     }
   };
 
+  // NB: First permission check.
+  // Only mods should see deleted models (both user_* and mod_* deleted).
+  let is_mod_that_can_see_deleted = user_session.can_delete_other_users_w2l_templates;
+
   let template_query_result = select_w2l_template_by_token(
     &path.slug,
-    true, // Only mods can perform this action
+    is_mod_that_can_see_deleted,
     &server_state.mysql_pool,
   ).await;
 
@@ -125,12 +129,19 @@ pub async fn delete_w2l_template_handler(
     Ok(Some(template)) => template,
   };
 
+  // NB: Second set of permission checks
   let is_author = w2l_template.creator_user_token == user_session.user_token;
   let is_mod = user_session.can_delete_other_users_w2l_templates;
 
   if !is_author && !is_mod {
     warn!("user is not allowed to delete templates: {}", user_session.user_token);
     return Err(DeleteW2lTemplateError::NotAuthorized);
+  }
+
+  if !is_mod {
+    if w2l_template.is_locked_from_user_modification || w2l_template.is_mod_disabled {
+      return Err(DeleteW2lTemplateError::NotAuthorized);
+    }
   }
 
   let ip_address = get_request_ip(&http_request);
@@ -151,6 +162,7 @@ pub async fn delete_w2l_template_handler(
     }
   } else {
     if is_author {
+      // NB: Technically only mods can see their own templates here
       user_undelete_template(
         &path.slug,
         &user_session.user_token,
