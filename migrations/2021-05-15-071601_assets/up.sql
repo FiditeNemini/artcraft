@@ -121,7 +121,9 @@ CREATE TABLE tts_models (
   -- and creator_set_visibility)
   is_mod_public_listing_approved BOOLEAN DEFAULT NULL,
 
-  -- In this case, a moderator disables it.
+  -- In this case, a moderator disables it from being used for inference.
+  -- This also disables it for the creator.
+  -- Unlike deletion, it remains "visible" to those that have access.
   is_mod_disabled BOOLEAN NOT NULL DEFAULT FALSE,
 
   -- Extremely popular models may be locked from deletion or modification by users.
@@ -275,7 +277,7 @@ CREATE TABLE w2l_templates (
   -- and creator_set_visibility)
   is_mod_public_listing_approved BOOLEAN DEFAULT NULL,
 
-  -- In this case, a moderator disables it.
+  -- In this case, a moderator disables it from being used for inference.
   -- This also disables it for the creator.
   -- Unlike deletion, it remains "visible" to those that have access.
   is_mod_disabled BOOLEAN NOT NULL DEFAULT FALSE,

@@ -9,14 +9,14 @@ CREATE TABLE ip_address_bans (
   -- The IP address to ban
   ip_address VARCHAR(40) DEFAULT NULL,
 
-  -- Mod who created or last edited the ban.
-  mod_user_token VARCHAR(32) NOT NULL,
-
   -- Maybe the target user.
   maybe_target_user_token VARCHAR(32) DEFAULT NULL,
 
+  -- Mod who created or last edited the ban.
+  mod_user_token VARCHAR(32) NOT NULL,
+
   -- Optional notes about the ban.
-  notes TEXT DEFAULT NULL,
+  mod_notes TEXT DEFAULT NULL,
 
   -- Moderator can set an expire time (optional).
   -- If not set, the ban is indefinite

@@ -44,10 +44,10 @@ CREATE TABLE tts_model_upload_jobs (
   download_url VARCHAR(512) DEFAULT NULL,
 
   -- NB: DO NOT SORT!
-  download_url_type ENUM(
-      'google-drive',
-      'web'
-  ) NOT NULL DEFAULT 'web',
+  -- download_url_type ENUM(
+  --     'google-drive',
+  --     'web'
+  -- ) NOT NULL DEFAULT 'web',
 
   -- ========== CREATOR DETAILS AND PREFERENCES ==========
 
@@ -156,10 +156,10 @@ CREATE TABLE w2l_template_upload_jobs (
   download_url VARCHAR(512) DEFAULT NULL,
 
   -- NB: DO NOT SORT!
-  download_url_type ENUM(
-      'google-drive',
-      'web'
-  ) NOT NULL DEFAULT 'web',
+  -- download_url_type ENUM(
+  --     'google-drive',
+  --     'web'
+  -- ) NOT NULL DEFAULT 'web',
 
   -- ========== CREATOR DETAILS AND PREFERENCES ==========
 
