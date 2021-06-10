@@ -70,10 +70,6 @@ CREATE TABLE tts_results (
 
   -- ========== MODERATION DETAILS ==========
 
-  -- In this case, a moderator hides it from public.
-  -- It won't appear in lists on profiles or otherwise.
-  is_mod_hidden_from_public BOOLEAN NOT NULL DEFAULT FALSE,
-
   -- If a moderator has comments.
   maybe_mod_comments VARCHAR(255) DEFAULT NULL,
 
@@ -97,7 +93,6 @@ CREATE TABLE tts_results (
   KEY fk_maybe_creator_anonymous_visitor_token (maybe_creator_anonymous_visitor_token),
   KEY fk_maybe_mod_user_token (maybe_mod_user_token),
   KEY index_creator_ip_address (creator_ip_address),
-  KEY index_is_mod_hidden_from_public(is_mod_hidden_from_public),
   KEY index_user_deleted_at(user_deleted_at),
   KEY index_mod_deleted_at(mod_deleted_at)
 
@@ -156,10 +151,6 @@ CREATE TABLE w2l_results (
 
   -- ========== MODERATION DETAILS ==========
 
-  -- In this case, a moderator hides it from public.
-  -- It won't appear in lists on profiles or otherwise.
-  is_mod_hidden_from_public BOOLEAN NOT NULL DEFAULT FALSE,
-
   -- If a moderator has comments.
   maybe_mod_comments VARCHAR(255) DEFAULT NULL,
 
@@ -184,7 +175,6 @@ CREATE TABLE w2l_results (
   KEY fk_maybe_tts_inference_result_token (maybe_tts_inference_result_token),
   KEY fk_maybe_mod_user_token (maybe_mod_user_token),
   KEY index_creator_ip_address (creator_ip_address),
-  KEY index_is_mod_hidden_from_public(is_mod_hidden_from_public),
   KEY index_user_deleted_at(user_deleted_at),
   KEY index_mod_deleted_at(mod_deleted_at)
 

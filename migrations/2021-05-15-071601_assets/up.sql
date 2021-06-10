@@ -119,15 +119,15 @@ CREATE TABLE tts_models (
   -- they're approved, but unapproved models won't show up in public indices.
   -- This is independent of other visibility controls (is_mod_disabled, deleted_at,
   -- and creator_set_visibility)
-  is_mod_public_listing_approved BOOLEAN DEFAULT NULL,
+  is_public_listing_approved BOOLEAN DEFAULT NULL,
+
+  -- Extremely popular models may be locked from deletion or modification by users.
+  is_locked_from_user_modification BOOLEAN NOT NULL DEFAULT FALSE,
 
   -- In this case, a moderator disables it from being used for inference.
   -- This also disables it for the creator.
   -- Unlike deletion, it remains "visible" to those that have access.
-  is_mod_disabled BOOLEAN NOT NULL DEFAULT FALSE,
-
-  -- Extremely popular models may be locked from deletion or modification by users.
-  is_locked_from_user_modification BOOLEAN NOT NULL DEFAULT FALSE,
+  is_locked_from_use BOOLEAN NOT NULL DEFAULT FALSE,
 
   -- If a moderator has comments.
   maybe_mod_comments VARCHAR(255) DEFAULT NULL,
@@ -159,8 +159,9 @@ CREATE TABLE tts_models (
   KEY index_creator_ip_address_last_update (creator_ip_address_last_update),
   KEY index_creator_set_visibility (creator_set_visibility),
   KEY index_private_bucket_hash (private_bucket_hash),
-  KEY index_is_mod_public_listing_approved (is_mod_public_listing_approved),
-  KEY index_is_mod_disabled (is_mod_disabled)
+  KEY index_is_public_listing_approved (is_public_listing_approved),
+  KEY index_is_locked_from_user_modification (is_locked_from_user_modification),
+  KEY index_is_locked_from_use (is_locked_from_use)
 
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin;
 
@@ -271,15 +272,15 @@ CREATE TABLE w2l_templates (
   -- they're approved, but unapproved templates won't show up in public indices.
   -- This is independent of other visibility controls (is_mod_disabled, deleted_at,
   -- and creator_set_visibility)
-  is_mod_public_listing_approved BOOLEAN DEFAULT NULL,
+  is_public_listing_approved BOOLEAN DEFAULT NULL,
+
+  -- Extremely popular models may be locked from deletion or modification by users.
+  is_locked_from_user_modification BOOLEAN NOT NULL DEFAULT FALSE,
 
   -- In this case, a moderator disables it from being used for inference.
   -- This also disables it for the creator.
   -- Unlike deletion, it remains "visible" to those that have access.
-  is_mod_disabled BOOLEAN NOT NULL DEFAULT FALSE,
-
-  -- Extremely popular models may be locked from deletion or modification by users.
-  is_locked_from_user_modification BOOLEAN NOT NULL DEFAULT FALSE,
+  is_locked_from_use BOOLEAN NOT NULL DEFAULT FALSE,
 
   -- If a moderator has comments.
   maybe_mod_comments VARCHAR(255) DEFAULT NULL,
@@ -312,7 +313,8 @@ CREATE TABLE w2l_templates (
   KEY index_creator_ip_address_last_update (creator_ip_address_last_update),
   KEY index_creator_set_visibility (creator_set_visibility),
   KEY index_private_bucket_hash (private_bucket_hash),
-  KEY index_is_mod_public_listing_approved (is_mod_public_listing_approved),
-  KEY index_is_mod_disabled (is_mod_disabled)
+  KEY index_is_public_listing_approved (is_public_listing_approved),
+  KEY index_is_locked_from_user_modification (is_locked_from_user_modification),
+  KEY index_is_locked_from_use (is_locked_from_use)
 
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin;
