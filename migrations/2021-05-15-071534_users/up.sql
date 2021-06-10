@@ -49,42 +49,7 @@ CREATE TABLE users (
   profile_rendered_html TEXT NOT NULL,
 
   -- An uploaded avatar. Public hash in our bucket.
-  avatar_public_bucket_hash CHAR(32) DEFAULT NULL,
-
-  -- ========== USER PREFERENCES ==========
-
-  -- If the user doesn't want to use gravatar and doesn't have an uploaded avatar.
-  disable_gravatar BOOLEAN NOT NULL DEFAULT false,
-
-  -- Hide results from others (ie. won't show up in the wall)
-  -- Moderators will still see them.
-  -- If the URLs are shared, they'll be visible.
-  hide_results_preference BOOLEAN NOT NULL DEFAULT false,
-
-  -- Auto play preferences
-  auto_play_audio_preference BOOLEAN NOT NULL DEFAULT false,
-  auto_play_video_preference BOOLEAN NOT NULL DEFAULT false,
-
-  -- Favorite TTS voice to use by default
-  maybe_preferred_tts_model_token VARCHAR(32) DEFAULT NULL,
-
-  -- Favorite W2L model to use by default
-  maybe_preferred_w2l_template_token VARCHAR(32) DEFAULT NULL,
-
-  -- Settings
-  -- DO NOT REORDER.
-  dark_mode_preference ENUM(
-    'light-mode',
-    'dark-mode',
-    'use-clock'
-   ) NOT NULL DEFAULT 'light-mode',
-
-  -- ========== STATS ==========
-
-  -- For tracking stats.
-  -- The "cached" values are updated by a background job.
-  -- cached_tts_rendered_counter INT(10) NOT NULL DEFAULT 0,
-  -- cached_w2l_rendered_counter INT(10) NOT NULL DEFAULT 0,
+  -- avatar_public_bucket_hash CHAR(32) DEFAULT NULL,
 
   -- ========== SOCIAL MEDIA ==========
 
@@ -97,6 +62,59 @@ CREATE TABLE users (
   github_username VARCHAR(36) DEFAULT NULL,
   cashapp_username VARCHAR(36) DEFAULT NULL,
   website_url VARCHAR(255) DEFAULT NULL,
+
+  -- ========== USER PREFERENCES ==========
+
+  -- If the user doesn't want to use gravatar and doesn't have an uploaded avatar.
+  disable_gravatar BOOLEAN NOT NULL DEFAULT false,
+
+  -- (THIS MIGHT NOT BE USED)
+  -- NB: DO NOT SORT!
+  -- THIS MUST MATCH THE RESPECTIVE JOBS TABLE.
+  -- Visibility preference used at TTS inference time (which can be changed on the result itself).
+  -- Moderators will still see them.
+  preferred_tts_result_visibility ENUM(
+    'public',
+    'hidden',
+    'private'
+  ) NOT NULL DEFAULT 'public',
+
+  -- (THIS MIGHT NOT BE USED)
+  -- NB: DO NOT SORT!
+  -- THIS MUST MATCH THE RESPECTIVE JOBS TABLE.
+  -- Visibility preference used at TTS inference time (which can be changed on the result itself).
+  -- Moderators will still see them.
+  preferred_w2l_result_visibility ENUM(
+    'public',
+    'hidden',
+    'private'
+  ) NOT NULL DEFAULT 'public',
+
+  -- Auto play preferences
+  -- Tri-state because we want to potentially change the default behavior.
+  auto_play_audio_preference BOOLEAN DEFAULT NULL,
+  auto_play_video_preference BOOLEAN DEFAULT NULL,
+
+  -- Favorite TTS voice to use by default
+  -- maybe_preferred_tts_model_token VARCHAR(32) DEFAULT NULL,
+
+  -- Favorite W2L model to use by default
+  -- maybe_preferred_w2l_template_token VARCHAR(32) DEFAULT NULL,
+
+  -- Settings
+  -- DO NOT REORDER.
+  -- dark_mode_preference ENUM(
+  --   'light-mode',
+  --   'dark-mode',
+  --   'use-clock'
+  --  ) NOT NULL DEFAULT 'light-mode',
+
+  -- ========== STATS ==========
+
+  -- For tracking stats.
+  -- The "cached" values are updated by a background job.
+  -- cached_tts_rendered_counter INT(10) NOT NULL DEFAULT 0,
+  -- cached_w2l_rendered_counter INT(10) NOT NULL DEFAULT 0,
 
   -- ========== MODERATION DETAILS ==========
 
