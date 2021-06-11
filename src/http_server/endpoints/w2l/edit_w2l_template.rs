@@ -4,7 +4,7 @@ use actix_web::cookie::Cookie;
 use actix_web::dev::HttpResponseBuilder;
 use actix_web::error::ResponseError;
 use actix_web::http::StatusCode;
-use actix_web::web::Path;
+use actix_web::web::{Path, Json};
 use actix_web::{Responder, web, HttpResponse, error, HttpRequest};
 use crate::common_queries::query_w2l_template::select_w2l_template_by_token;
 use crate::common_queries::sessions::create_session_for_user;
@@ -24,6 +24,7 @@ use sqlx::error::DatabaseError;
 use sqlx::error::Error::Database;
 use sqlx::mysql::MySqlDatabaseError;
 use std::sync::Arc;
+use sqlx::MySqlPool;
 
 /// For the URL PathInfo
 #[derive(Deserialize)]
@@ -33,15 +34,18 @@ pub struct EditW2lTemplatePathInfo {
 
 #[derive(Deserialize)]
 pub struct EditW2lTemplateRequest {
+  // ========== Author + Moderator options ==========
   pub title: Option<String>,
   pub description_markdown: Option<String>,
-
   //pub updatable_slug: Option<String>,
   //pub creator_set_visibility: Option<String>,
 
-  //pub is_locked_from_use: Option<bool>,
-  //pub is_locked_from_user_modification: Option<bool>,
-  //pub maybe_mod_comments: Option<String>,
+  // ========== Moderator options ==========
+
+  pub is_public_listing_approved: Option<bool>,
+  pub is_locked_from_user_modification: Option<bool>,
+  pub is_locked_from_use: Option<bool>,
+  pub maybe_mod_comments: Option<String>,
 }
 
 #[derive(Debug, Display)]
@@ -122,28 +126,21 @@ pub async fn edit_w2l_template_handler(
   };
 
   // NB: Second set of permission checks
-  let mut editor_is_original_user = false;
-  let mut editor_is_moderator = false;
+  let is_author = template_record.creator_user_token == user_session.user_token;
+  let is_mod = user_session.can_edit_other_users_w2l_templates ;
 
-  if template_record.creator_user_token == user_session.user_token {
-    editor_is_original_user = true;
-  }
-
-  if user_session.can_edit_other_users_w2l_templates {
-    editor_is_moderator = true;
-  }
-
-  if !editor_is_original_user && !editor_is_moderator {
+  if !is_author && !is_mod {
     return Err(EditW2lTemplateError::NotAuthorized);
   }
 
-  if !editor_is_moderator {
+  if !is_mod {
     if template_record.is_locked_from_user_modification || template_record.is_locked_from_use {
       return Err(EditW2lTemplateError::NotAuthorized);
     }
   }
 
-  // Fields to set
+  // Author + Mod fields.
+  // These fields must be present on all requests.
   let mut title = None;
   let mut description_markdown = None;
   let mut description_html = None;
@@ -170,7 +167,7 @@ pub async fn edit_w2l_template_handler(
 
   let ip_address = get_request_ip(&http_request);
 
-  let query_result = if editor_is_original_user {
+  let query_result = if is_author {
     // We need to store the IP address details.
     sqlx::query!(
         r#"
@@ -181,8 +178,7 @@ SET
     description_rendered_html = ?,
     creator_ip_address_last_update = ?,
     version = version + 1
-
-WHERE w2l_templates.token = ?
+WHERE token = ?
 LIMIT 1
         "#,
       &title,
@@ -204,8 +200,7 @@ SET
     description_rendered_html = ?,
     maybe_mod_user_token = ?,
     version = version + 1
-
-WHERE w2l_templates.token = ?
+WHERE token = ?
 LIMIT 1
         "#,
       &title,
@@ -226,5 +221,61 @@ LIMIT 1
     }
   };
 
+  // TODO: This is lazy and suboptimal af to query again
+  //  The reason we're doing this is because `sqlx` only does static type checking of queries
+  //  with string literals. It does not support dynamic query building, thus the predicates
+  //  must be held constant. :(
+  if is_mod {
+    update_mod_details(
+      &request,
+      &user_session.user_token,
+      &template_record.template_token,
+      &server_state.mysql_pool
+    ).await?;
+  }
+
   Ok(simple_json_success())
+}
+
+async fn update_mod_details(
+  request: &Json<EditW2lTemplateRequest>,
+  mod_user_token: &str,
+  template_token: &str,
+  mysql_pool: &MySqlPool
+) -> Result<(), EditW2lTemplateError> {
+
+  let is_public_listing_approved= request.is_public_listing_approved.unwrap_or(false);
+  let is_locked_from_user_modification = request.is_locked_from_user_modification.unwrap_or(false);
+  let is_locked_from_use = request.is_locked_from_use.unwrap_or(false);
+
+  let query_result = sqlx::query!(
+        r#"
+UPDATE w2l_templates
+SET
+    is_public_listing_approved = ?,
+    is_locked_from_user_modification = ?,
+    is_locked_from_use = ?,
+    maybe_mod_comments = ?,
+    maybe_mod_user_token = ?,
+    version = version + 1
+WHERE token = ?
+LIMIT 1
+        "#,
+      is_public_listing_approved,
+      is_locked_from_user_modification,
+      is_locked_from_use,
+      request.maybe_mod_comments,
+      mod_user_token,
+      template_token
+    )
+      .execute(mysql_pool)
+      .await;
+
+  match query_result {
+    Ok(_) => Ok(()),
+    Err(err) => {
+      warn!("Update W2L template (mod details) DB error: {:?}", err);
+      Err(EditW2lTemplateError::ServerError)
+    }
+  }
 }

@@ -183,8 +183,7 @@ SET
     description_rendered_html = ?,
     creator_ip_address_last_update = ?,
     version = version + 1
-
-WHERE tts_models.token = ?
+WHERE token = ?
 LIMIT 1
         "#,
       &title,
@@ -206,8 +205,7 @@ SET
     description_rendered_html = ?,
     maybe_mod_user_token = ?,
     version = version + 1
-
-WHERE tts_models.token = ?
+WHERE token = ?
 LIMIT 1
         "#,
       &title,
@@ -265,8 +263,7 @@ SET
     maybe_mod_comments = ?,
     maybe_mod_user_token = ?,
     version = version + 1
-
-WHERE tts_models.token = ?
+WHERE token = ?
 LIMIT 1
         "#,
       is_public_listing_approved,
@@ -282,7 +279,7 @@ LIMIT 1
   match query_result {
     Ok(_) => Ok(()),
     Err(err) => {
-      warn!("Update W2L model edit DB error: {:?}", err);
+      warn!("Update TTS model (mod details) DB error: {:?}", err);
       Err(EditTtsModelError::ServerError)
     }
   }
