@@ -90,6 +90,7 @@ jwt = "0.13.0"
 # Crypto
 bcrypt = "0.8" # password hashes
 hmac = "0.10.0" # cookies
+magic-crypt = "3.1.8" # encrypting sort IDs for the frontend so we don't leak info
 md-5 = "0.9.1" # gravatar
 sha2 = "0.9.5" # file hashes, inference text hashes, etc.
 
