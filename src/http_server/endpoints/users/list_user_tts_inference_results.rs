@@ -33,12 +33,16 @@ use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 #[derive(Deserialize)]
 pub struct GetProfilePathInfo {
   username: String,
+  sort_ascending: Option<bool>,
+  limit: Option<u16>,
+  cursor: Option<String>,
 }
 
 #[derive(Serialize)]
 pub struct ListTtsInferenceResultsForUserSuccessResponse {
   pub success: bool,
   pub results: Vec<TtsInferenceRecordForList>,
+  pub next_cursor: Option<String>,
 }
 
 #[derive(Debug, Display)]
@@ -87,6 +91,7 @@ pub async fn list_user_tts_inference_results_handler(
   let response = ListTtsInferenceResultsForUserSuccessResponse {
     success: true,
     results,
+    next_cursor: Some("".to_string()),
   };
 
   let body = serde_json::to_string(&response)

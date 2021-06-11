@@ -257,3 +257,111 @@ WHERE
 
   Ok(maybe_results)
 }
+
+#[derive(sqlx::FromRow)]
+pub struct RawInternalTtsRecord {
+  pub tts_result_id: i64,
+  pub tts_result_token: String,
+
+  pub tts_model_token: Option<String>,
+  pub raw_inference_text: String,
+
+  pub maybe_creator_user_token : Option<String>,
+  pub maybe_creator_username: Option<String>,
+  pub maybe_creator_display_name: Option<String>,
+
+  pub file_size_bytes : i64,
+  pub duration_millis : i64,
+  pub created_at: DateTime<Utc>,
+  pub updated_at: DateTime<Utc>,
+}
+
+async fn list_tts_inference_results_fixed (
+  mysql_pool: &MySqlPool,
+  scope_creator_username: Option<&str>,
+  sort_ascending: bool,
+  block_mod_disabled : bool,
+  limit: u16,
+  offset: Option<u32>,
+) -> AnyhowResult<Vec<RawInternalTtsRecord>> {
+  info!("listing tts inference results");
+
+  // TODO/NB: Unfortunately SQLx can't statically typecheck this query
+  let mut query = r#"
+SELECT
+    tts_results.id as tts_result_id,
+    tts_results.token as tts_result_token,
+
+    tts_results.model_token as tts_model_token,
+    tts_results.raw_inference_text as raw_inference_text,
+
+    users.token as maybe_creator_user_token,
+    users.username as maybe_creator_username,
+    users.display_name as maybe_creator_display_name,
+
+    tts_results.file_size_bytes,
+    tts_results.duration_millis,
+    tts_results.created_at,
+    tts_results.updated_at
+
+FROM tts_results
+LEFT OUTER JOIN tts_models
+    ON tts_results.model_token = tts_models.token
+LEFT OUTER JOIN users
+    ON tts_results.maybe_creator_user_token = users.token
+  "#.to_string();
+
+  let mut first_predicate_added = false;
+
+  if let Some(offset) = offset {
+    if !first_predicate_added {
+      query.push_str(r#" WHERE tts_results.id < ? "#);
+      first_predicate_added = true;
+    } else {
+      query.push_str(r#" AND tts_results.id < ? "#);
+    }
+  }
+
+  if let Some(username) = scope_creator_username {
+    if !first_predicate_added {
+      query.push_str(r#" WHERE users.username = ? "#);
+      first_predicate_added = true;
+    } else {
+      query.push_str(r#" AND users.username = ? "#);
+    }
+  }
+
+  if block_mod_disabled {
+    if !first_predicate_added {
+      query.push_str(r#"
+        WHERE tts_results.user_deleted_at IS NULL
+        AND tts_results.mod_deleted_at IS NULL
+      "#);
+      first_predicate_added = true;
+    } else {
+      query.push_str(r#"
+        AND tts_results.user_deleted_at IS NULL
+        AND tts_results.mod_deleted_at IS NULL
+      "#);
+    }
+  }
+
+  query.push_str(" LIMIT ? ");
+
+  let mut query = sqlx::query_as::<_, RawInternalTtsRecord>(&query);
+
+  if let Some(offset) = offset {
+    query = query.bind(offset);
+  }
+
+  if let Some(username) = scope_creator_username {
+    query = query.bind(username);
+  }
+
+  query = query.bind(limit);
+
+  let results = query.fetch_all(mysql_pool)
+      .await?;
+
+  Ok(results)
+}
