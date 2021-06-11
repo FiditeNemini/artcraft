@@ -80,6 +80,7 @@ use log::{info};
 use sqlx::MySqlPool;
 use sqlx::mysql::MySqlPoolOptions;
 use std::sync::Arc;
+use crate::http_server::endpoints::moderation::user_roles::list_roles::list_user_roles_handler;
 
 // TODO TODO TODO TODO
 // TODO TODO TODO TODO
@@ -297,6 +298,14 @@ pub async fn serve(server_state: ServerState) -> AnyhowResult<()>
                 .service(
                   web::resource("/{ip_address}/delete")
                       .route(web::post().to(delete_ip_ban_handler))
+                      .route(web::head().to(|| HttpResponse::Ok()))
+                )
+          )
+          .service(
+            web::scope("/roles")
+                .service(
+                  web::resource("/list")
+                      .route(web::get().to(list_user_roles_handler))
                       .route(web::head().to(|| HttpResponse::Ok()))
                 )
           )
