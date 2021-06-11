@@ -7,33 +7,33 @@ use sqlx::MySqlPool;
 
 #[derive(Serialize)]
 pub struct UserRoleForList {
-  slug: String,
-  name: String,
+  pub slug: String,
+  pub name: String,
 
-  can_use_tts: bool,
-  can_use_w2l: bool,
-  can_delete_own_tts_results: bool,
-  can_delete_own_w2l_results: bool,
-  can_delete_own_account: bool,
+  pub can_use_tts: bool,
+  pub can_use_w2l: bool,
+  pub can_delete_own_tts_results: bool,
+  pub can_delete_own_w2l_results: bool,
+  pub can_delete_own_account: bool,
 
-  can_upload_tts_models: bool,
-  can_upload_w2l_templates: bool,
-  can_delete_own_tts_models: bool,
-  can_delete_own_w2l_templates: bool,
+  pub can_upload_tts_models: bool,
+  pub can_upload_w2l_templates: bool,
+  pub can_delete_own_tts_models: bool,
+  pub can_delete_own_w2l_templates: bool,
 
-  can_approve_w2l_templates: bool,
-  can_edit_other_users_profiles: bool,
-  can_edit_other_users_tts_models: bool,
-  can_edit_other_users_w2l_templates: bool,
-  can_delete_other_users_tts_models: bool,
-  can_delete_other_users_tts_results: bool,
-  can_delete_other_users_w2l_templates: bool,
-  can_delete_other_users_w2l_results: bool,
-  can_ban_users: bool,
-  can_delete_users: bool,
+  pub can_approve_w2l_templates: bool,
+  pub can_edit_other_users_profiles: bool,
+  pub can_edit_other_users_tts_models: bool,
+  pub can_edit_other_users_w2l_templates: bool,
+  pub can_delete_other_users_tts_models: bool,
+  pub can_delete_other_users_tts_results: bool,
+  pub can_delete_other_users_w2l_templates: bool,
+  pub can_delete_other_users_w2l_results: bool,
+  pub can_ban_users: bool,
+  pub can_delete_users: bool,
 
-  created_at : DateTime<Utc>,
-  updated_at : DateTime<Utc>,
+  pub created_at : DateTime<Utc>,
+  pub updated_at : DateTime<Utc>,
 }
 
 pub struct RawDbUserRoleForList {

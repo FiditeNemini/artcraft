@@ -82,6 +82,7 @@ use sqlx::mysql::MySqlPoolOptions;
 use std::sync::Arc;
 use crate::http_server::endpoints::moderation::user_roles::list_roles::list_user_roles_handler;
 use crate::http_server::endpoints::moderation::user_roles::list_staff::list_staff_handler;
+use crate::http_server::endpoints::moderation::user_roles::set_user_role::set_user_role_handler;
 
 // TODO TODO TODO TODO
 // TODO TODO TODO TODO
@@ -312,6 +313,11 @@ pub async fn serve(server_state: ServerState) -> AnyhowResult<()>
                 .service(
                   web::resource("/list")
                       .route(web::get().to(list_user_roles_handler))
+                      .route(web::head().to(|| HttpResponse::Ok()))
+                )
+                .service(
+                  web::resource("/{username}/edit")
+                      .route(web::post().to(set_user_role_handler))
                       .route(web::head().to(|| HttpResponse::Ok()))
                 )
           )
