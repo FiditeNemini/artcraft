@@ -259,6 +259,7 @@ async fn update_mod_details(
         r#"
 UPDATE tts_models
 SET
+    is_public_listing_approved = ?,
     is_locked_from_user_modification = ?,
     is_locked_from_use = ?,
     maybe_mod_comments = ?,
@@ -268,11 +269,12 @@ SET
 WHERE tts_models.token = ?
 LIMIT 1
         "#,
-      &is_locked_from_user_modification,
-      &is_locked_from_use,
-      &request.maybe_mod_comments,
-      &mod_user_token,
-      &model_token
+      is_public_listing_approved,
+      is_locked_from_user_modification,
+      is_locked_from_use,
+      request.maybe_mod_comments,
+      mod_user_token,
+      model_token
     )
       .execute(mysql_pool)
       .await;
