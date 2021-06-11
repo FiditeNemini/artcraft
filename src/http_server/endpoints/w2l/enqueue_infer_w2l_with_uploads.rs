@@ -28,6 +28,7 @@ use sqlx::error::Error::Database;
 use std::io::Write;
 use std::sync::Arc;
 use uuid::Uuid;
+use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 
 const BUCKET_AUDIO_FILE_NAME : &'static str = "input_audio_file";
 const BUCKET_IMAGE_FILE_NAME: &'static str = "input_image_file";
@@ -49,12 +50,6 @@ pub struct InferW2lWithUploadSuccessResponse {
   pub success: bool,
   /// This is how frontend clients can request the job execution status.
   pub inference_job_token: String,
-}
-
-#[derive(Serialize)]
-pub struct ErrorResponse {
-  pub success: bool,
-  pub error_reason: String,
 }
 
 #[derive(Debug, Display)]
@@ -80,19 +75,7 @@ impl ResponseError for InferW2lWithUploadError {
       InferW2lWithUploadError::ServerError => "server error".to_string(),
     };
 
-    let response = ErrorResponse {
-      success: false,
-      error_reason,
-    };
-
-    let body = match serde_json::to_string(&response) {
-      Ok(json) => json,
-      Err(_) => "{}".to_string(),
-    };
-
-    HttpResponseBuilder::new(self.status_code())
-      .set_header(header::CONTENT_TYPE, "application/json")
-      .body(body)
+    to_simple_json_error(&error_reason, self.status_code())
   }
 }
 

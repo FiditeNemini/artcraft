@@ -25,6 +25,7 @@ use sqlx::error::DatabaseError;
 use sqlx::error::Error::Database;
 use sqlx::mysql::MySqlDatabaseError;
 use std::sync::Arc;
+use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 
 /// For the URL PathInfo
 #[derive(Deserialize)]
@@ -52,12 +53,6 @@ pub struct TtsModelRecordForResponse {
 pub struct GetTtsModelSuccessResponse {
   pub success: bool,
   pub model: TtsModelRecordForResponse,
-}
-
-#[derive(Serialize)]
-pub struct ErrorResponse {
-  pub success: bool,
-  pub error_reason: String,
 }
 
 #[derive(Debug, Display)]
@@ -93,19 +88,7 @@ impl ResponseError for GetTtsModelError {
       GetTtsModelError::ServerError => "server error".to_string(),
     };
 
-    let response = ErrorResponse {
-      success: false,
-      error_reason,
-    };
-
-    let body = match serde_json::to_string(&response) {
-      Ok(json) => json,
-      Err(_) => "{}".to_string(),
-    };
-
-    HttpResponseBuilder::new(self.status_code())
-      .set_header(header::CONTENT_TYPE, "application/json")
-      .body(body)
+    to_simple_json_error(&error_reason, self.status_code())
   }
 }
 

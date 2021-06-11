@@ -28,6 +28,7 @@ use sqlx::error::DatabaseError;
 use sqlx::error::Error::Database;
 use sqlx::mysql::MySqlDatabaseError;
 use std::sync::Arc;
+use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 
 // TODO: This is duplicated in query_user_profile
 
@@ -83,12 +84,6 @@ pub struct ProfileSuccessResponse {
   pub user: Option<UserProfileRecordForResponse>,
 }
 
-#[derive(Serialize)]
-pub struct ErrorResponse {
-  pub success: bool,
-  pub error_reason: String,
-}
-
 #[derive(Debug, Display)]
 pub enum ProfileError {
   ServerError,
@@ -115,19 +110,7 @@ impl ResponseError for ProfileError {
       ProfileError::NotFound => "not found error".to_string(),
     };
 
-    let response = ErrorResponse {
-      success: false,
-      error_reason,
-    };
-
-    let body = match serde_json::to_string(&response) {
-      Ok(json) => json,
-      Err(_) => "{}".to_string(),
-    };
-
-    HttpResponseBuilder::new(self.status_code())
-      .set_header(header::CONTENT_TYPE, "application/json")
-      .body(body)
+    to_simple_json_error(&error_reason, self.status_code())
   }
 }
 

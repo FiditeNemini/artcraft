@@ -27,6 +27,7 @@ use sqlx::error::Error::Database;
 use sqlx::mysql::MySqlDatabaseError;
 use std::sync::Arc;
 use actix_web::web::Path;
+use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 
 /// For the URL PathInfo
 #[derive(Deserialize)]
@@ -38,12 +39,6 @@ pub struct GetProfilePathInfo {
 pub struct ListW2lInferenceResultsForUserSuccessResponse {
   pub success: bool,
   pub results: Vec<W2lInferenceRecordForList>,
-}
-
-#[derive(Serialize)]
-pub struct ErrorResponse {
-  pub success: bool,
-  pub error_reason: String,
 }
 
 #[derive(Debug, Display)]
@@ -63,19 +58,7 @@ impl ResponseError for ListW2lInferenceResultsForUserError {
       ListW2lInferenceResultsForUserError::ServerError => "server error".to_string(),
     };
 
-    let response = ErrorResponse {
-      success: false,
-      error_reason,
-    };
-
-    let body = match serde_json::to_string(&response) {
-      Ok(json) => json,
-      Err(_) => "{}".to_string(),
-    };
-
-    HttpResponseBuilder::new(self.status_code())
-      .set_header(header::CONTENT_TYPE, "application/json")
-      .body(body)
+    to_simple_json_error(&error_reason, self.status_code())
   }
 }
 

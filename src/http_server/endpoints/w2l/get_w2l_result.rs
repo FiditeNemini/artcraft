@@ -41,12 +41,6 @@ pub struct GetW2lResultSuccessResponse {
   pub result: W2lResultRecordForResponse,
 }
 
-#[derive(Serialize)]
-pub struct ErrorResponse {
-  pub success: bool,
-  pub error_reason: String,
-}
-
 #[derive(Debug, Display)]
 pub enum GetW2lResultError {
   ServerError,

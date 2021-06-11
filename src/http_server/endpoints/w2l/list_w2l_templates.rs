@@ -25,17 +25,12 @@ use sqlx::mysql::MySqlDatabaseError;
 use std::sync::Arc;
 use chrono::{DateTime, Utc};
 use crate::common_queries::list_w2l_templates::{list_w2l_templates, W2lTemplateRecordForList};
+use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 
 #[derive(Serialize)]
 pub struct ListW2lTemplatesSuccessResponse {
   pub success: bool,
   pub templates: Vec<W2lTemplateRecordForList>,
-}
-
-#[derive(Serialize)]
-pub struct ErrorResponse {
-  pub success: bool,
-  pub error_reason: String,
 }
 
 #[derive(Debug, Display)]
@@ -55,19 +50,7 @@ impl ResponseError for ListW2lTemplatesError {
       ListW2lTemplatesError::ServerError => "server error".to_string(),
     };
 
-    let response = ErrorResponse {
-      success: false,
-      error_reason,
-    };
-
-    let body = match serde_json::to_string(&response) {
-      Ok(json) => json,
-      Err(_) => "{}".to_string(),
-    };
-
-    HttpResponseBuilder::new(self.status_code())
-      .set_header(header::CONTENT_TYPE, "application/json")
-      .body(body)
+    to_simple_json_error(&error_reason, self.status_code())
   }
 }
 

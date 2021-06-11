@@ -23,6 +23,7 @@ use crate::util::email_to_gravatar::email_to_gravatar;
 use crate::validations::username_reservations::is_reserved_username;
 use crate::util::random_prefix_crockford_token::random_prefix_crockford_token;
 use crate::validations::check_for_slurs::contains_slurs;
+use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 
 const NEW_USER_ROLE: &'static str = "user";
 
@@ -37,12 +38,6 @@ pub struct CreateAccountRequest {
 #[derive(Serialize)]
 pub struct CreateAccountSuccessResponse {
   pub success: bool,
-}
-
-#[derive(Serialize)]
-pub struct ErrorResponse {
-  pub success: bool,
-  pub error_reason: String,
 }
 
 #[derive(Debug, Display)]
@@ -74,19 +69,7 @@ impl ResponseError for CreateAccountError {
       CreateAccountError::ServerError => "server error".to_string(),
     };
 
-    let response = ErrorResponse {
-      success: false,
-      error_reason,
-    };
-
-    let body = match serde_json::to_string(&response) {
-      Ok(json) => json,
-      Err(_) => "{}".to_string(),
-    };
-
-    HttpResponseBuilder::new(self.status_code())
-      .set_header(header::CONTENT_TYPE, "application/json")
-      .body(body)
+    to_simple_json_error(&error_reason, self.status_code())
   }
 }
 
