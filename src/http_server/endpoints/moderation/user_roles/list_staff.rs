@@ -25,54 +25,53 @@ use sqlx::error::Error::Database;
 use sqlx::mysql::MySqlDatabaseError;
 use std::sync::Arc;
 
+
 #[derive(Serialize)]
-pub struct ListIpBansResponse {
+pub struct ListStaffResponse {
   pub success: bool,
-  pub ip_address_bans: Vec<IpBanRecordForList>,
+  pub staff: Vec<StaffRecordForList>,
 }
 
 #[derive(Serialize)]
-pub struct IpBanRecordForList {
-  pub ip_address: String,
-  pub maybe_target_user_token: Option<String>,
-  pub maybe_target_username: Option<String>,
-  pub mod_user_token: String,
-  pub mod_notes: String,
-  pub created_at: DateTime<Utc>,
-  pub updated_at: DateTime<Utc>,
+pub struct StaffRecordForList {
+  pub user_token: String,
+  pub username: String,
+  pub display_name: String,
+  pub user_role_slug: String,
+  pub user_role_name: String,
 }
 
 #[derive(Debug, Display)]
-pub enum ListIpBansError {
+pub enum ListStaffError {
   BadInput(String),
   ServerError,
   Unauthorized,
 }
 
-impl ResponseError for ListIpBansError {
+impl ResponseError for ListStaffError {
   fn status_code(&self) -> StatusCode {
     match *self {
-      ListIpBansError::BadInput(_) => StatusCode::BAD_REQUEST,
-      ListIpBansError::ServerError => StatusCode::INTERNAL_SERVER_ERROR,
-      ListIpBansError::Unauthorized => StatusCode::UNAUTHORIZED,
+      ListStaffError::BadInput(_) => StatusCode::BAD_REQUEST,
+      ListStaffError::ServerError => StatusCode::INTERNAL_SERVER_ERROR,
+      ListStaffError::Unauthorized => StatusCode::UNAUTHORIZED,
     }
   }
 
   fn error_response(&self) -> HttpResponse {
     let error_reason = match self {
-      ListIpBansError::BadInput(reason) => reason.to_string(),
-      ListIpBansError::ServerError => "server error".to_string(),
-      ListIpBansError::Unauthorized => "unauthorized".to_string(),
+      ListStaffError::BadInput(reason) => reason.to_string(),
+      ListStaffError::ServerError => "server error".to_string(),
+      ListStaffError::Unauthorized => "unauthorized".to_string(),
     };
 
     to_simple_json_error(&error_reason, self.status_code())
   }
 }
 
-pub async fn list_ip_bans_handler(
+pub async fn list_staff_handler(
   http_request: HttpRequest,
   server_state: web::Data<Arc<ServerState>>
-) -> Result<HttpResponse, ListIpBansError> {
+) -> Result<HttpResponse, ListStaffError> {
 
   let maybe_user_session = server_state
       .session_checker
@@ -80,44 +79,45 @@ pub async fn list_ip_bans_handler(
       .await
       .map_err(|e| {
         warn!("Session checker error: {:?}", e);
-        ListIpBansError::ServerError
+        ListStaffError::ServerError
       })?;
 
   let user_session = match maybe_user_session {
     Some(session) => session,
     None => {
       warn!("not logged in");
-      return Err(ListIpBansError::Unauthorized);
+      return Err(ListStaffError::Unauthorized);
     }
   };
 
+  // TODO: This is not the correct permission.
   if !user_session.can_ban_users {
     warn!("user is not allowed to delete bans: {}", user_session.user_token);
-    return Err(ListIpBansError::Unauthorized);
+    return Err(ListStaffError::Unauthorized);
   }
 
   // NB: Lookup failure is Err(RowNotFound).
   let maybe_results = sqlx::query_as!(
-      IpBanRecordForList,
+      StaffRecordForList,
         r#"
 SELECT
-    ip_bans.ip_address,
-    ip_bans.maybe_target_user_token,
-    users.username as maybe_target_username,
-    ip_bans.mod_user_token,
-    ip_bans.mod_notes,
-    ip_bans.created_at,
-    ip_bans.updated_at
+    users.token as user_token,
+    users.username,
+    users.display_name,
+    user_roles.slug as user_role_slug,
+    user_roles.name as user_role_name
 FROM
-    ip_address_bans AS ip_bans
-LEFT OUTER JOIN users
-    ON ip_bans.maybe_target_user_token = users.token
+    users
+JOIN user_roles
+    ON users.user_role_slug = user_roles.slug
+WHERE
+    user_roles.slug != 'user'
         "#,
     )
       .fetch_all(&server_state.mysql_pool)
       .await;
 
-  let results : Vec<IpBanRecordForList> = match maybe_results {
+  let results : Vec<StaffRecordForList> = match maybe_results {
     Ok(results) => {
       info!("Results length: {}", results.len());
       results
@@ -128,20 +128,20 @@ LEFT OUTER JOIN users
           Vec::new()
         },
         _ => {
-          warn!("list ip bans db error: {:?}", err);
-          return Err(ListIpBansError::ServerError);
+          warn!("list staff db error: {:?}", err);
+          return Err(ListStaffError::ServerError);
         }
       }
     }
   };
 
-  let response = ListIpBansResponse {
+  let response = ListStaffResponse {
     success: true,
-    ip_address_bans: results,
+    staff: results,
   };
 
   let body = serde_json::to_string(&response)
-      .map_err(|e| ListIpBansError::ServerError)?;
+      .map_err(|e| ListStaffError::ServerError)?;
 
   Ok(HttpResponse::Ok()
       .content_type("application/json")

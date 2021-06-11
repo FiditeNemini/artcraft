@@ -27,11 +27,6 @@ use sqlx::error::Error::Database;
 use sqlx::mysql::MySqlDatabaseError;
 use std::sync::Arc;
 
-#[derive(Deserialize)]
-pub struct ListUserRolesRequest {
-  delete: bool,
-}
-
 #[derive(Serialize)]
 pub struct ListUserRolesResponse {
   pub success: bool,
@@ -67,7 +62,6 @@ impl ResponseError for ListUserRolesError {
 
 pub async fn list_user_roles_handler(
   http_request: HttpRequest,
-  request: web::Json<ListUserRolesRequest>,
   server_state: web::Data<Arc<ServerState>>
 ) -> Result<HttpResponse, ListUserRolesError> {
 

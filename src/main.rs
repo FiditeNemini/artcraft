@@ -81,6 +81,7 @@ use sqlx::MySqlPool;
 use sqlx::mysql::MySqlPoolOptions;
 use std::sync::Arc;
 use crate::http_server::endpoints::moderation::user_roles::list_roles::list_user_roles_handler;
+use crate::http_server::endpoints::moderation::user_roles::list_staff::list_staff_handler;
 
 // TODO TODO TODO TODO
 // TODO TODO TODO TODO
@@ -283,6 +284,11 @@ pub async fn serve(server_state: ServerState) -> AnyhowResult<()>
       // ==================== MODERATOR ====================
       .service(
         web::scope("/moderation")
+            .service(
+              web::resource("/staff")
+                  .route(web::get().to(list_staff_handler))
+                  .route(web::head().to(|| HttpResponse::Ok()))
+            )
             .service(
             web::scope("/ip_bans")
                 .service(
