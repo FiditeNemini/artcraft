@@ -346,6 +346,12 @@ LEFT OUTER JOIN users
     }
   }
 
+  if sort_ascending {
+    query.push_str(" ORDER BY tts_results.id ASC ");
+  } else {
+    query.push_str(" ORDER BY tts_results.id DESC ");
+  }
+
   query.push_str(" LIMIT ? ");
 
   let mut query = sqlx::query_as::<_, RawInternalTtsRecord>(&query);
