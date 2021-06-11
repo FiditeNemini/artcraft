@@ -79,6 +79,7 @@ use crate::http_server::endpoints::w2l::delete_w2l_result::delete_w2l_inference_
 use crate::http_server::endpoints::tts::delete_tts_result::delete_tts_inference_result_handler;
 use crate::http_server::endpoints::moderation::add_ip_ban::add_ip_ban_handler;
 use crate::http_server::endpoints::moderation::delete_ip_ban::delete_ip_ban_handler;
+use crate::http_server::endpoints::moderation::list_ip_bans::list_ip_bans_handler;
 
 // TODO TODO TODO TODO
 // TODO TODO TODO TODO
@@ -283,6 +284,11 @@ pub async fn serve(server_state: ServerState) -> AnyhowResult<()>
         web::scope("/moderation")
             .service(
             web::scope("/ip_bans")
+                .service(
+                  web::resource("/list")
+                      .route(web::get().to(list_ip_bans_handler))
+                      .route(web::head().to(|| HttpResponse::Ok()))
+                )
                 .service(
                   web::resource("/add")
                       .route(web::post().to(add_ip_ban_handler))

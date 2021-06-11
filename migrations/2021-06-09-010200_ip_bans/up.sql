@@ -7,7 +7,7 @@ CREATE TABLE ip_address_bans (
   id BIGINT(20) NOT NULL AUTO_INCREMENT,
 
   -- The IP address to ban
-  ip_address VARCHAR(40) DEFAULT NULL,
+  ip_address VARCHAR(40) NOT NULL,
 
   -- Maybe the target user.
   maybe_target_user_token VARCHAR(32) DEFAULT NULL,
@@ -16,7 +16,7 @@ CREATE TABLE ip_address_bans (
   mod_user_token VARCHAR(32) NOT NULL,
 
   -- Optional notes about the ban.
-  mod_notes TEXT DEFAULT NULL,
+  mod_notes TEXT NOT NULL,
 
   -- Moderator can set an expire time (optional).
   -- If not set, the ban is indefinite
