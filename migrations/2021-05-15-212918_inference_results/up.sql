@@ -70,9 +70,6 @@ CREATE TABLE tts_results (
 
   -- ========== MODERATION DETAILS ==========
 
-  -- If a moderator has comments.
-  maybe_mod_comments VARCHAR(255) DEFAULT NULL,
-
   -- The last moderator that made changes.
   maybe_mod_user_token VARCHAR(32) DEFAULT NULL,
 
@@ -150,9 +147,6 @@ CREATE TABLE w2l_results (
   duration_millis INT(10) NOT NULL DEFAULT 0,
 
   -- ========== MODERATION DETAILS ==========
-
-  -- If a moderator has comments.
-  maybe_mod_comments VARCHAR(255) DEFAULT NULL,
 
   -- The last moderator that made changes.
   maybe_mod_user_token VARCHAR(32) DEFAULT NULL,

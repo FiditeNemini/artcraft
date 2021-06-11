@@ -20,11 +20,11 @@ use crate::validations::check_for_slurs::contains_slurs;
 use derive_more::{Display, Error};
 use log::{info, warn, log};
 use regex::Regex;
+use sqlx::MySqlPool;
 use sqlx::error::DatabaseError;
 use sqlx::error::Error::Database;
 use sqlx::mysql::MySqlDatabaseError;
 use std::sync::Arc;
-use sqlx::MySqlPool;
 
 /// For the URL PathInfo
 #[derive(Deserialize)]
