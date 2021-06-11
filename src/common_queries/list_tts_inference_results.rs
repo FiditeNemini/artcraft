@@ -5,6 +5,14 @@ use log::{warn, info};
 use sqlx::MySqlPool;
 
 #[derive(Serialize)]
+pub struct TtsInferenceListPage {
+  pub inference_records: Vec<TtsInferenceRecordForList>,
+  pub sort_ascending: bool,
+  pub first_id: Option<i64>,
+  pub last_id: Option<i64>,
+}
+
+#[derive(Serialize)]
 pub struct TtsInferenceRecordForList {
   pub tts_result_token: String,
 
@@ -263,7 +271,7 @@ pub struct RawInternalTtsRecord {
   pub tts_result_id: i64,
   pub tts_result_token: String,
 
-  pub tts_model_token: Option<String>,
+  pub tts_model_token: String,
   pub raw_inference_text: String,
 
   pub maybe_creator_user_token : Option<String>,
@@ -276,7 +284,58 @@ pub struct RawInternalTtsRecord {
   pub updated_at: DateTime<Utc>,
 }
 
-async fn list_tts_inference_results_fixed (
+/// Paginated queries.
+pub async fn list_tts_inference_page(
+  mysql_pool: &MySqlPool,
+  scope_creator_username: Option<&str>,
+  sort_ascending: bool,
+  block_mod_disabled : bool,
+  limit: u16,
+  offset: Option<u32>,
+) -> AnyhowResult<TtsInferenceListPage> {
+
+  let inference_results = list_tts_inference_results_query(
+    mysql_pool,
+    scope_creator_username,
+    sort_ascending,
+    block_mod_disabled,
+    limit,
+    offset
+  ).await?;
+
+  let mut first_id = inference_results.first()
+      .map(|raw_result| raw_result.tts_result_id);
+
+  let mut last_id = inference_results.last()
+      .map(|raw_result| raw_result.tts_result_id);
+
+  let inference_results = inference_results
+      .iter()
+      .map(|r| {
+        TtsInferenceRecordForList {
+          tts_result_token: r.tts_result_token.clone(),
+          tts_model_token: r.tts_model_token.clone(),
+          raw_inference_text: r.raw_inference_text.clone(),
+          maybe_creator_user_token: r.maybe_creator_user_token.clone(),
+          maybe_creator_username: r.maybe_creator_username.clone(),
+          maybe_creator_display_name: r.maybe_creator_display_name.clone(),
+          file_size_bytes: if r.file_size_bytes > 0 { r.file_size_bytes as u32 } else { 0 },
+          duration_millis: if r.duration_millis > 0 { r.duration_millis as u32 } else { 0 },
+          created_at: r.created_at,
+          updated_at: r.updated_at,
+        }
+      })
+      .collect::<Vec<TtsInferenceRecordForList>>();
+
+  Ok(TtsInferenceListPage {
+    inference_records: inference_results,
+    sort_ascending,
+    first_id,
+    last_id,
+  })
+}
+
+async fn list_tts_inference_results_query (
   mysql_pool: &MySqlPool,
   scope_creator_username: Option<&str>,
   sort_ascending: bool,
