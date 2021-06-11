@@ -2,6 +2,7 @@ pub mod cashapp_username;
 pub mod check_for_slurs;
 pub mod discord_username;
 pub mod github_username;
+pub mod ip_addresses;
 pub mod model_uploads;
 pub mod passwords;
 pub mod twitch_username;
