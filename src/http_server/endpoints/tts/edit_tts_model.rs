@@ -4,7 +4,7 @@ use actix_web::cookie::Cookie;
 use actix_web::dev::HttpResponseBuilder;
 use actix_web::error::ResponseError;
 use actix_web::http::StatusCode;
-use actix_web::web::Path;
+use actix_web::web::{Path, Json};
 use actix_web::{Responder, web, HttpResponse, error, HttpRequest};
 use crate::common_queries::query_tts_model::select_tts_model_by_token;
 use crate::common_queries::sessions::create_session_for_user;
@@ -24,6 +24,7 @@ use sqlx::error::DatabaseError;
 use sqlx::error::Error::Database;
 use sqlx::mysql::MySqlDatabaseError;
 use std::sync::Arc;
+use sqlx::MySqlPool;
 
 /// For the URL PathInfo
 #[derive(Deserialize)]
@@ -33,19 +34,22 @@ pub struct EditTtsModelPathInfo {
 
 #[derive(Deserialize)]
 pub struct EditTtsModelRequest {
+  // ========== Author + Moderator options ==========
+
   pub title: Option<String>,
   pub description_markdown: Option<String>,
-
   //pub updatable_slug: Option<String>,
   //pub creator_set_visibility: Option<String>,
-
   //pub tts_model_type: Option<String>,
   //pub text_preprocessing_algorithm: Option<String>,
   //pub vocoder_token: Option<String>,
 
-  //pub is_locked_from_use: Option<bool>,
-  //pub is_locked_from_user_modification: Option<bool>,
-  //pub maybe_mod_comments: Option<String>,
+  // ========== Moderator options ==========
+
+  pub is_public_listing_approved: Option<bool>,
+  pub is_locked_from_user_modification: Option<bool>,
+  pub is_locked_from_use: Option<bool>,
+  pub maybe_mod_comments: Option<String>,
 }
 
 #[derive(Debug, Display)]
@@ -140,7 +144,8 @@ pub async fn edit_tts_model_handler(
     }
   }
 
-  // Fields to set
+  // Author + Mod fields.
+  // These fields must be present on all requests.
   let mut title = None;
   let mut description_markdown = None;
   let mut description_html = None;
@@ -215,6 +220,19 @@ LIMIT 1
         .await
   };
 
+  // TODO: This is lazy and suboptimal af to query again
+  //  The reason we're doing this is because `sqlx` only does static type checking of queries
+  //  with string literals. It does not support dynamic query building, thus the predicates
+  //  must be held constant. :(
+  if is_mod {
+    update_mod_details(
+      &request,
+      &user_session.user_token,
+      &model_record.model_token,
+      &server_state.mysql_pool
+    ).await?;
+  }
+
   match query_result {
     Ok(_) => {},
     Err(err) => {
@@ -224,4 +242,46 @@ LIMIT 1
   };
 
   Ok(simple_json_success())
+}
+
+async fn update_mod_details(
+  request: &Json<EditTtsModelRequest>,
+  mod_user_token: &str,
+  model_token: &str,
+  mysql_pool: &MySqlPool
+) -> Result<(), EditTtsModelError> {
+
+  let is_public_listing_approved= request.is_public_listing_approved.unwrap_or(false);
+  let is_locked_from_user_modification = request.is_locked_from_user_modification.unwrap_or(false);
+  let is_locked_from_use = request.is_locked_from_use.unwrap_or(false);
+
+  let query_result = sqlx::query!(
+        r#"
+UPDATE tts_models
+SET
+    is_locked_from_user_modification = ?,
+    is_locked_from_use = ?,
+    maybe_mod_comments = ?,
+    maybe_mod_user_token = ?,
+    version = version + 1
+
+WHERE tts_models.token = ?
+LIMIT 1
+        "#,
+      &is_locked_from_user_modification,
+      &is_locked_from_use,
+      &request.maybe_mod_comments,
+      &mod_user_token,
+      &model_token
+    )
+      .execute(mysql_pool)
+      .await;
+
+  match query_result {
+    Ok(_) => Ok(()),
+    Err(err) => {
+      warn!("Update W2L model edit DB error: {:?}", err);
+      Err(EditTtsModelError::ServerError)
+    }
+  }
 }

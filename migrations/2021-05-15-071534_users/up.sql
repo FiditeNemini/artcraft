@@ -176,6 +176,7 @@ CREATE TABLE user_roles (
 
   -- Moderation
   can_approve_w2l_templates BOOLEAN NOT NULL DEFAULT FALSE,
+  -- Edit includes "lock_from_use" and "lock_from_modification"
   can_edit_other_users_profiles BOOLEAN NOT NULL DEFAULT FALSE,
   can_edit_other_users_tts_models BOOLEAN NOT NULL DEFAULT FALSE,
   can_edit_other_users_w2l_templates BOOLEAN NOT NULL DEFAULT FALSE,
