@@ -291,7 +291,7 @@ pub async fn list_tts_inference_page(
   sort_ascending: bool,
   block_mod_disabled : bool,
   limit: u16,
-  offset: Option<u32>,
+  offset: Option<u64>,
 ) -> AnyhowResult<TtsInferenceListPage> {
 
   let inference_results = list_tts_inference_results_query(
@@ -341,7 +341,7 @@ async fn list_tts_inference_results_query (
   sort_ascending: bool,
   block_mod_disabled : bool,
   limit: u16,
-  offset: Option<u32>,
+  offset: Option<u64>,
 ) -> AnyhowResult<Vec<RawInternalTtsRecord>> {
   info!("listing tts inference results");
 
