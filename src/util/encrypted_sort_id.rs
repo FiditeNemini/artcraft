@@ -15,6 +15,10 @@ pub struct SortId {
   pub column_id: u64,
 }
 
+/// This exists so that we don't leak our database IDs.
+/// If competitors see our IDs, they'll know how big our database is.
+/// We encrypt our IDs so we don't leak "business secret information".
+#[derive(Clone)]
 pub struct SortKeyCrypto {
   crypt: MagicCrypt256,
 }

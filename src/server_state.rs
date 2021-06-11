@@ -1,8 +1,9 @@
-use crate::http_server::web_utils::cookie_manager::CookieManager;
-use crate::http_server::web_utils::session_checker::SessionChecker;
-use sqlx::MySqlPool;
 use crate::buckets::bucket_client::BucketClient;
 use crate::common_queries::firehose_publisher::FirehosePublisher;
+use crate::http_server::web_utils::cookie_manager::CookieManager;
+use crate::http_server::web_utils::session_checker::SessionChecker;
+use crate::util::encrypted_sort_id::SortKeyCrypto;
+use sqlx::MySqlPool;
 
 /// State that is injected into every endpoint.
 #[derive(Clone)]
@@ -25,6 +26,8 @@ pub struct ServerState {
 
   /// Where to store audio uploads for w2l
   pub audio_uploads_bucket_root: String,
+
+  pub sort_key_crypto: SortKeyCrypto,
 }
 
 #[derive(Clone)]

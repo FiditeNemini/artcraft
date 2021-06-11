@@ -40,6 +40,9 @@ use crate::http_server::endpoints::misc::enable_alpha::enable_alpha;
 use crate::http_server::endpoints::moderation::ip_bans::add_ip_ban::add_ip_ban_handler;
 use crate::http_server::endpoints::moderation::ip_bans::delete_ip_ban::delete_ip_ban_handler;
 use crate::http_server::endpoints::moderation::ip_bans::list_ip_bans::list_ip_bans_handler;
+use crate::http_server::endpoints::moderation::user_roles::list_roles::list_user_roles_handler;
+use crate::http_server::endpoints::moderation::user_roles::list_staff::list_staff_handler;
+use crate::http_server::endpoints::moderation::user_roles::set_user_role::set_user_role_handler;
 use crate::http_server::endpoints::root_index::get_root_index;
 use crate::http_server::endpoints::tts::delete_tts_result::delete_tts_inference_result_handler;
 use crate::http_server::endpoints::tts::edit_tts_model::edit_tts_model_handler;
@@ -76,13 +79,11 @@ use crate::http_server::web_utils::cookie_manager::CookieManager;
 use crate::http_server::web_utils::session_checker::SessionChecker;
 use crate::server_state::{ServerState, EnvConfig};
 use crate::shared_constants::{DEFAULT_RUST_LOG, DEFAULT_MYSQL_PASSWORD};
+use crate::util::encrypted_sort_id::SortKeyCrypto;
 use log::{info};
 use sqlx::MySqlPool;
 use sqlx::mysql::MySqlPoolOptions;
 use std::sync::Arc;
-use crate::http_server::endpoints::moderation::user_roles::list_roles::list_user_roles_handler;
-use crate::http_server::endpoints::moderation::user_roles::list_staff::list_staff_handler;
-use crate::http_server::endpoints::moderation::user_roles::set_user_role::set_user_role_handler;
 
 // TODO TODO TODO TODO
 // TODO TODO TODO TODO
@@ -185,6 +186,12 @@ async fn main() -> AnyhowResult<()> {
     None,
   )?;
 
+  // NB: This secret really isn't too important.
+  // We can even rotate it without too much impact to users.
+  let sort_key_crypto_secret =
+      easyenv::get_env_string_or_default("SORT_KEY_SECRET", "webscale");
+  let sort_key_crypto = SortKeyCrypto::new(&sort_key_crypto_secret);
+
   let server_state = ServerState {
     env_config: EnvConfig {
       num_workers,
@@ -201,6 +208,7 @@ async fn main() -> AnyhowResult<()> {
     private_bucket_client,
     public_bucket_client,
     audio_uploads_bucket_root,
+    sort_key_crypto,
   };
 
   serve(server_state)
