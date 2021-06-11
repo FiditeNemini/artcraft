@@ -5,14 +5,14 @@ use magic_crypt::generic_array::typenum::U256;
 use std::io::Cursor;
 use magic_crypt::new_magic_crypt;
 use crate::util::anyhow_result::AnyhowResult;
+use rand::RngCore;
 
 // TODO: A protobuf would be more compact!
 /// This gets encrypted and sent to the frontend as an opaque handle.
 #[derive(Serialize, Deserialize)]
 pub struct SortId {
-  pub before_entropy: u32,
+  pub entropy: u32,
   pub column_id: u64,
-  pub after_entropy: u32,
 }
 
 pub struct SortKeyCrypto {
@@ -27,10 +27,11 @@ impl SortKeyCrypto {
   }
 
   pub fn encrypt_id(&self, id: u64) -> AnyhowResult<String> {
+    let mut rng = rand::thread_rng();
+
     let payload = SortId {
-      before_entropy: 1234,
+      entropy: rng.next_u32(),
       column_id: id,
-      after_entropy: 1234,
     };
 
     let payload = serde_json::to_string(&payload)?;
@@ -54,6 +55,21 @@ impl SortKeyCrypto {
 #[cfg(test)]
 mod tests {
   use crate::util::encrypted_sort_id::SortKeyCrypto;
+  use std::collections::HashSet;
+
+  #[test]
+  fn encrypt_entropy_means_no_duplicate_values() {
+    let sorter = SortKeyCrypto::new("secret");
+
+    let mut encrypted_tokens = HashSet::new();
+
+    for i in 0 .. 1000 {
+      let encrypted = sorter.encrypt_id(1234).unwrap();
+      encrypted_tokens.insert(encrypted);
+    }
+
+    assert_eq!(encrypted_tokens.len(), 1000);
+  }
 
   #[test]
   fn encrypt_roundtrip() {
