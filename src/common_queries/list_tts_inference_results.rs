@@ -507,6 +507,16 @@ impl QueryBuilder {
     self
   }
 
+  pub fn limit(mut self, limit: u16) -> Self {
+    self.limit = limit;
+    self
+  }
+
+  pub fn cursor_is_reversed(mut self, cursor_is_reversed: bool) -> Self {
+    self.cursor_is_reversed = cursor_is_reversed;
+    self
+  }
+
   pub fn build_predicates(&self) -> String {
     // NB: Reverse cursors require us to invert the sort direction.
     let mut sort_ascending = self.sort_ascending;
@@ -652,6 +662,64 @@ mod tests {
       AND tts_results.user_deleted_at IS NULL \
       AND tts_results.mod_deleted_at IS NULL \
       ORDER BY tts_results.id ASC \
+      LIMIT ?");
+  }
+
+  #[test]
+  fn predicates_limit() {
+    let query_builder = QueryBuilder::new()
+        .limit(15);
+
+    // NB: Does not change the query itself! Just the downstream binding.
+    assert_eq!(&query_builder.build_predicates(),
+      " WHERE tts_results.user_deleted_at IS NULL \
+      AND tts_results.mod_deleted_at IS NULL \
+      ORDER BY tts_results.id DESC \
+      LIMIT ?");
+  }
+
+  #[test]
+  fn predicates_cursor_is_reversed_without_cursor() {
+    let query_builder = QueryBuilder::new()
+        .cursor_is_reversed(true);
+
+    // NB: Without a cursor, nothing happens.
+    assert_eq!(&query_builder.build_predicates(),
+      " WHERE tts_results.user_deleted_at IS NULL \
+      AND tts_results.mod_deleted_at IS NULL \
+      ORDER BY tts_results.id DESC \
+      LIMIT ?");
+  }
+
+  #[test]
+  fn predicates_offset_cursor_is_reversed() {
+    let query_builder = QueryBuilder::new()
+        .offset(Some(100))
+        .cursor_is_reversed(true);
+
+    // NB: This will change the sort order and greater/less than direction!
+    assert_eq!(&query_builder.build_predicates(),
+      " WHERE tts_results.id > ? \
+      AND tts_results.user_deleted_at IS NULL \
+      AND tts_results.mod_deleted_at IS NULL \
+      ORDER BY tts_results.id ASC \
+      LIMIT ?");
+  }
+
+
+  #[test]
+  fn predicates_offset_cursor_is_reversed_sort_ascending() {
+    let query_builder = QueryBuilder::new()
+        .offset(Some(100))
+        .cursor_is_reversed(true)
+        .sort_ascending(true);
+
+    // NB: This will change the sort order and greater/less than direction!
+    assert_eq!(&query_builder.build_predicates(),
+      " WHERE tts_results.id < ? \
+      AND tts_results.user_deleted_at IS NULL \
+      AND tts_results.mod_deleted_at IS NULL \
+      ORDER BY tts_results.id DESC \
       LIMIT ?");
   }
 }
