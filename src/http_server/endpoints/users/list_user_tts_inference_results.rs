@@ -81,6 +81,24 @@ pub async fn list_user_tts_inference_results_handler(
 {
   info!("Fetching inference results for user: {}", &path.username);
 
+  let maybe_user_session = server_state
+      .session_checker
+      .maybe_get_user_session(&http_request, &server_state.mysql_pool)
+      .await
+      .map_err(|e| {
+        warn!("Session checker error: {:?}", e);
+        ListTtsInferenceResultsForUserError::ServerError
+      })?;
+
+  let mut is_mod_that_can_see_deleted = false;
+
+  match maybe_user_session {
+    None => {},
+    Some(session) => {
+      is_mod_that_can_see_deleted = session.can_delete_other_users_tts_results;
+    },
+  };
+
   let limit = query.limit.unwrap_or(25);
   //let limit = std::cmp::max(limit, 100);
 
@@ -98,12 +116,10 @@ pub async fn list_user_tts_inference_results_handler(
     None
   };
 
-  let include_mod_disabled = false; // TODO: Permission check
-
   let mut query_builder = ListTtsResultsQueryBuilder::new()
       .sort_ascending(sort_ascending)
       .scope_creator_username(Some(path.username.as_ref()))
-      .include_mod_disabled_results(include_mod_disabled)
+      .include_mod_disabled_results(is_mod_that_can_see_deleted)
       .limit(limit)
       .cursor_is_reversed(cursor_is_reversed)
       .offset(cursor);
