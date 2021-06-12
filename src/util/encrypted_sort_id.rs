@@ -6,6 +6,7 @@ use std::io::Cursor;
 use magic_crypt::new_magic_crypt;
 use crate::util::anyhow_result::AnyhowResult;
 use rand::RngCore;
+use base64::{Config, CharacterSet};
 
 // TODO: A protobuf would be more compact!
 /// This gets encrypted and sent to the frontend as an opaque handle.
@@ -21,12 +22,16 @@ pub struct SortId {
 #[derive(Clone)]
 pub struct SortKeyCrypto {
   crypt: MagicCrypt256,
+  base64_config: Config,
 }
 
 impl SortKeyCrypto {
   pub fn new(secret: &str) -> Self {
+    let base64_config = Config::new(CharacterSet::UrlSafe, false)
+        .decode_allow_trailing_bits(true);
     Self {
       crypt: new_magic_crypt!(secret, 256),
+      base64_config,
     }
   }
 
@@ -44,14 +49,20 @@ impl SortKeyCrypto {
     let mut writer = Vec::new();
 
     self.crypt.encrypt_reader_to_writer2::<U256>(&mut reader, &mut writer)?;
-    let encoded = base64::encode(&writer);
+    let encoded = base64::encode_config(&writer, self.base64_config.clone());
 
     Ok(encoded)
   }
 
   pub fn decrypt_id(&self, base_64_payload: &str) -> AnyhowResult<u64> {
-    let payload = self.crypt.decrypt_base64_to_string(base_64_payload)?;
+    //let payload = self.crypt.decrypt_base64_to_string(base_64_payload)?;
+
+    let decoded_bytes= base64::decode_config(base_64_payload, self.base64_config)?;
+    let decrypted_bytes = self.crypt.decrypt_bytes_to_bytes(&decoded_bytes)?;
+
+    let payload = String::from_utf8(decrypted_bytes)?;
     let payload = serde_json::from_str::<SortId>(&payload)?;
+
     Ok(payload.column_id)
   }
 }

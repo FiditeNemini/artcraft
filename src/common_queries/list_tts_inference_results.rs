@@ -289,6 +289,7 @@ pub async fn list_tts_inference_page(
   mysql_pool: &MySqlPool,
   scope_creator_username: Option<&str>,
   sort_ascending: bool,
+  cursor_is_previous: bool,
   block_mod_disabled : bool,
   limit: u16,
   offset: Option<u64>,
@@ -298,6 +299,7 @@ pub async fn list_tts_inference_page(
     mysql_pool,
     scope_creator_username,
     sort_ascending,
+    cursor_is_previous,
     block_mod_disabled,
     limit,
     offset
@@ -339,6 +341,7 @@ async fn list_tts_inference_results_query (
   mysql_pool: &MySqlPool,
   scope_creator_username: Option<&str>,
   sort_ascending: bool,
+  cursor_is_previous: bool,
   block_mod_disabled : bool,
   limit: u16,
   offset: Option<u64>,
@@ -370,14 +373,39 @@ LEFT OUTER JOIN users
     ON tts_results.maybe_creator_user_token = users.token
   "#.to_string();
 
+  let mut sort_ascending = sort_ascending; // NB: We may need to change the direction.
+  let mut reverse_results = false;
+
   let mut first_predicate_added = false;
 
   if let Some(offset) = offset {
     if !first_predicate_added {
-      query.push_str(r#" WHERE tts_results.id < ? "#);
+      query.push_str(" WHERE ");
       first_predicate_added = true;
     } else {
-      query.push_str(r#" AND tts_results.id < ? "#);
+      query.push_str(" AND ");
+    }
+
+    // TODO: Cleanup, builder class, tests.
+
+    if sort_ascending {
+      if cursor_is_previous {
+        // NB: We're searching backwards.
+        query.push_str(" tts_results.id < ? ");
+        sort_ascending = !sort_ascending;
+        reverse_results = true;
+      } else {
+        query.push_str(" tts_results.id > ? ");
+      }
+    } else {
+      if cursor_is_previous {
+        // NB: We're searching backwards.
+        query.push_str(" tts_results.id > ? ");
+        sort_ascending = !sort_ascending;
+        reverse_results = true;
+      } else {
+        query.push_str(" tts_results.id < ? ");
+      }
     }
   }
 
@@ -425,8 +453,12 @@ LEFT OUTER JOIN users
 
   query = query.bind(limit);
 
-  let results = query.fetch_all(mysql_pool)
+  let mut results = query.fetch_all(mysql_pool)
       .await?;
+
+  if reverse_results {
+    results.reverse()
+  }
 
   Ok(results)
 }

@@ -40,6 +40,7 @@ pub struct ListTtsInferenceResultsForUserQuery {
   pub sort_ascending: Option<bool>,
   pub limit: Option<u16>,
   pub cursor: Option<String>,
+  pub cursor_is_previous: Option<bool>,
 }
 
 #[derive(Serialize)]
@@ -83,7 +84,11 @@ pub async fn list_user_tts_inference_results_handler(
   let mod_disabled = false;
 
   let limit = query.limit.unwrap_or(25);
-  let limit = std::cmp::max(limit, 100);
+  //let limit = std::cmp::max(limit, 100);
+
+  let sort_ascending = query.sort_ascending.unwrap_or(false);
+
+  let cursor_is_previous = query.cursor_is_previous.unwrap_or(false);
 
   let cursor = if let Some(cursor) = query.cursor.as_deref() {
     let cursor = server_state.sort_key_crypto.decrypt_id(cursor)
@@ -99,7 +104,8 @@ pub async fn list_user_tts_inference_results_handler(
   let query_results = list_tts_inference_page(
     &server_state.mysql_pool,
     Some(path.username.as_ref()),
-    false,
+    sort_ascending,
+    cursor_is_previous,
     mod_disabled,
     limit,
     cursor,
