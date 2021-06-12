@@ -3,6 +3,7 @@ use chrono::{DateTime, Utc};
 use crate::util::anyhow_result::AnyhowResult;
 use log::{warn, info};
 use sqlx::MySqlPool;
+use crate::shared_constants::DEFAULT_MYSQL_QUERY_RESULT_PAGE_SIZE;
 
 #[derive(Serialize)]
 pub struct TtsInferenceListPage {
@@ -471,7 +472,6 @@ pub struct QueryBuilder {
   offset: Option<u64>,
   limit: u16,
   cursor_is_reversed: bool,
-  result_set_requires_reverse_sort: bool,
 }
 
 impl QueryBuilder {
@@ -481,9 +481,8 @@ impl QueryBuilder {
       include_mod_disabled_results: false,
       sort_ascending: false,
       offset: None,
-      limit: 5,
+      limit: DEFAULT_MYSQL_QUERY_RESULT_PAGE_SIZE,
       cursor_is_reversed: false,
-      result_set_requires_reverse_sort: false,
     }
   }
 
@@ -517,11 +516,70 @@ impl QueryBuilder {
     self
   }
 
+  /// Perform the query based on the set predicates.
+  pub async fn perform_query(
+    &self,
+    mysql_pool: &MySqlPool
+  ) -> AnyhowResult<Vec<RawInternalTtsRecord>> {
+
+    let query = self.build_query_string();
+    let mut query = sqlx::query_as::<_, RawInternalTtsRecord>(&query);
+
+    // NB: The following bindings must match the order of the query builder !!
+
+    if let Some(offset) = self.offset {
+      query = query.bind(offset);
+    }
+
+    if let Some(username) = self.scope_creator_username.as_deref() {
+      query = query.bind(username);
+    }
+
+    query = query.bind(self.limit);
+
+    let mut results = query.fetch_all(mysql_pool)
+        .await?;
+
+    if self.cursor_is_reversed {
+      results.reverse()
+    }
+
+    Ok(results)
+  }
+
+  pub fn build_query_string(&self) -> String {
+    // TODO/NB: Unfortunately SQLx can't statically typecheck this query
+    let mut query = r#"
+SELECT
+    tts_results.id as tts_result_id,
+    tts_results.token as tts_result_token,
+
+    tts_results.model_token as tts_model_token,
+    tts_results.raw_inference_text as raw_inference_text,
+
+    users.token as maybe_creator_user_token,
+    users.username as maybe_creator_username,
+    users.display_name as maybe_creator_display_name,
+
+    tts_results.file_size_bytes,
+    tts_results.duration_millis,
+    tts_results.created_at,
+    tts_results.updated_at
+
+FROM tts_results
+LEFT OUTER JOIN tts_models
+    ON tts_results.model_token = tts_models.token
+LEFT OUTER JOIN users
+    ON tts_results.maybe_creator_user_token = users.token
+    "#.to_string();
+
+    query.push_str(&self.build_predicates());
+    query
+  }
+
   pub fn build_predicates(&self) -> String {
     // NB: Reverse cursors require us to invert the sort direction.
     let mut sort_ascending = self.sort_ascending;
-    // NB: If the sort direction is artificially reversed, we'll restore the result order.
-    let mut reverse_results = false;
 
     let mut first_predicate_added = false;
 
@@ -540,7 +598,6 @@ impl QueryBuilder {
           // NB: We're searching backwards.
           query.push_str(" tts_results.id < ?");
           sort_ascending = !sort_ascending;
-          reverse_results = true;
         } else {
           query.push_str(" tts_results.id > ?");
         }
@@ -549,7 +606,6 @@ impl QueryBuilder {
           // NB: We're searching backwards.
           query.push_str(" tts_results.id > ?");
           sort_ascending = !sort_ascending;
-          reverse_results = true;
         } else {
           query.push_str(" tts_results.id < ?");
         }
@@ -706,7 +762,6 @@ mod tests {
       LIMIT ?");
   }
 
-
   #[test]
   fn predicates_offset_cursor_is_reversed_sort_ascending() {
     let query_builder = QueryBuilder::new()
@@ -717,6 +772,25 @@ mod tests {
     // NB: This will change the sort order and greater/less than direction!
     assert_eq!(&query_builder.build_predicates(),
       " WHERE tts_results.id < ? \
+      AND tts_results.user_deleted_at IS NULL \
+      AND tts_results.mod_deleted_at IS NULL \
+      ORDER BY tts_results.id DESC \
+      LIMIT ?");
+  }
+
+  #[test]
+  fn predicates_limit_scope_user_offset_cursor_is_reversed_sort_ascending() {
+    let query_builder = QueryBuilder::new()
+        .limit(1000)
+        .scope_creator_username(Some("pikachu"))
+        .offset(Some(100))
+        .cursor_is_reversed(true)
+        .sort_ascending(true);
+
+    // NB: This will change the sort order and greater/less than direction!
+    assert_eq!(&query_builder.build_predicates(),
+      " WHERE tts_results.id < ? \
+      AND users.username = ? \
       AND tts_results.user_deleted_at IS NULL \
       AND tts_results.mod_deleted_at IS NULL \
       ORDER BY tts_results.id DESC \

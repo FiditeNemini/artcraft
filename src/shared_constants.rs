@@ -7,3 +7,6 @@ pub const DEFAULT_RUST_LOG: &'static str = "debug,actix_web=info,sqlx::query=war
 
 /// The default MySql password for use in development
 pub const DEFAULT_MYSQL_PASSWORD: &'static str = "mysql://storyteller:password@localhost/storyteller";
+
+/// The number of results we return by default for paginated queries.
+pub const DEFAULT_MYSQL_QUERY_RESULT_PAGE_SIZE: u16 = 25;
