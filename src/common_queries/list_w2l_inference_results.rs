@@ -277,7 +277,7 @@ LEFT OUTER JOIN users
 
     if !self.include_mod_deleted_results {
       if !first_predicate_added {
-        query.push_str(" AND w2l_results.mod_deleted_at IS NULL");
+        query.push_str(" WHERE w2l_results.mod_deleted_at IS NULL");
         first_predicate_added = true;
       } else {
         query.push_str(" AND w2l_results.mod_deleted_at IS NULL");
@@ -362,9 +362,80 @@ mod tests {
       LIMIT ?");
   }
 
-  // TODO: Insufficient testing here.
   #[test]
-  fn predicates_including_deleted_and_unapproved() {
+  fn predicates_including_mod_deleted() {
+    let query_builder = ListW2lResultsQueryBuilder::new()
+        .include_mod_deleted_results(true);
+
+    assert_eq!(&query_builder.build_predicates(),
+      " WHERE w2l_templates.is_public_listing_approved IS TRUE \
+      AND w2l_results.user_deleted_at IS NULL \
+      ORDER BY w2l_results.id DESC \
+      LIMIT ?");
+  }
+
+  #[test]
+  fn predicates_including_user_deleted() {
+    let query_builder = ListW2lResultsQueryBuilder::new()
+        .include_user_deleted_results(true);
+
+    assert_eq!(&query_builder.build_predicates(),
+      " WHERE w2l_templates.is_public_listing_approved IS TRUE \
+      AND w2l_results.mod_deleted_at IS NULL \
+      ORDER BY w2l_results.id DESC \
+      LIMIT ?");
+  }
+
+  #[test]
+  fn predicates_including_mod_deleted_and_user_deleted() {
+    let query_builder = ListW2lResultsQueryBuilder::new()
+        .include_mod_deleted_results(true)
+        .include_user_deleted_results(true);
+
+    assert_eq!(&query_builder.build_predicates(),
+      " WHERE w2l_templates.is_public_listing_approved IS TRUE \
+      ORDER BY w2l_results.id DESC \
+      LIMIT ?");
+  }
+
+  #[test]
+  fn predicates_including_unapproved() {
+    let query_builder = ListW2lResultsQueryBuilder::new()
+        .include_templates_not_approved_for_public_listing(true);
+
+    assert_eq!(&query_builder.build_predicates(),
+      " WHERE w2l_results.mod_deleted_at IS NULL \
+      AND w2l_results.user_deleted_at IS NULL \
+      ORDER BY w2l_results.id DESC \
+      LIMIT ?");
+  }
+
+  #[test]
+  fn predicates_including_unapproved_and_mod_deleted() {
+    let query_builder = ListW2lResultsQueryBuilder::new()
+        .include_templates_not_approved_for_public_listing(true)
+        .include_mod_deleted_results(true);
+
+    assert_eq!(&query_builder.build_predicates(),
+      " WHERE w2l_results.user_deleted_at IS NULL \
+      ORDER BY w2l_results.id DESC \
+      LIMIT ?");
+  }
+
+  #[test]
+  fn predicates_including_unapproved_and_user_deleted() {
+    let query_builder = ListW2lResultsQueryBuilder::new()
+        .include_templates_not_approved_for_public_listing(true)
+        .include_user_deleted_results(true);
+
+    assert_eq!(&query_builder.build_predicates(),
+      " WHERE w2l_results.mod_deleted_at IS NULL \
+      ORDER BY w2l_results.id DESC \
+      LIMIT ?");
+  }
+
+  #[test]
+  fn predicates_including_mod_deleted_user_deleted_and_unapproved() {
     let query_builder = ListW2lResultsQueryBuilder::new()
         .include_mod_deleted_results(true)
         .include_user_deleted_results(true)
