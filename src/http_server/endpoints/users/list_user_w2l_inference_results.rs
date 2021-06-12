@@ -8,7 +8,7 @@ use actix_web::{Responder, web, HttpResponse, error, HttpRequest, HttpMessage};
 use chrono::{DateTime, Utc};
 use crate::AnyhowResult;
 use crate::common_queries::list_w2l_inference_results::W2lInferenceRecordForList;
-use crate::common_queries::list_w2l_inference_results::list_w2l_inference_results;
+use crate::common_queries::list_w2l_inference_results::ListW2lResultsQueryBuilder;
 use crate::common_queries::sessions::create_session_for_user;
 use crate::http_server::endpoints::users::create_account::CreateAccountError::{BadInput, ServerError, UsernameTaken, EmailTaken};
 use crate::http_server::endpoints::users::login::LoginSuccessResponse;
@@ -70,7 +70,7 @@ pub async fn list_user_w2l_inference_results_handler(
 {
   info!("Fetching inference results for user: {}", &path.username);
 
-  let query_results = list_w2l_inference_results(
+  /*let query_results = list_w2l_inference_results(
     &server_state.mysql_pool,
     Some(path.username.as_ref()),
     false
@@ -82,7 +82,9 @@ pub async fn list_user_w2l_inference_results_handler(
       warn!("Query error: {:?}", e);
       return Err(ListW2lInferenceResultsForUserError::ServerError);
     }
-  };
+  };*/
+
+  let results = Vec::new();
 
   let response = ListW2lInferenceResultsForUserSuccessResponse {
     success: true,
