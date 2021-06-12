@@ -8,12 +8,13 @@ use actix_web::web::{Path, Query};
 use actix_web::{Responder, web, HttpResponse, error, HttpRequest, HttpMessage};
 use chrono::{DateTime, Utc};
 use crate::AnyhowResult;
+use crate::common_queries::list_tts_inference_results::ListTtsResultsQueryBuilder;
 use crate::common_queries::list_tts_inference_results::TtsInferenceRecordForList;
-use crate::common_queries::list_tts_inference_results::list_tts_inference_page;
 use crate::common_queries::sessions::create_session_for_user;
 use crate::http_server::endpoints::users::create_account::CreateAccountError::{BadInput, ServerError, UsernameTaken, EmailTaken};
 use crate::http_server::endpoints::users::login::LoginSuccessResponse;
 use crate::http_server::web_utils::ip_address::get_request_ip;
+use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 use crate::http_server::web_utils::session_checker::SessionRecord;
 use crate::server_state::ServerState;
 use crate::util::random_crockford_token::random_crockford_token;
@@ -27,7 +28,6 @@ use sqlx::error::DatabaseError;
 use sqlx::error::Error::Database;
 use sqlx::mysql::MySqlDatabaseError;
 use std::sync::Arc;
-use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 
 /// For the URL PathInfo
 #[derive(Deserialize)]
@@ -40,7 +40,7 @@ pub struct ListTtsInferenceResultsForUserQuery {
   pub sort_ascending: Option<bool>,
   pub limit: Option<u16>,
   pub cursor: Option<String>,
-  pub cursor_is_previous: Option<bool>,
+  pub cursor_is_reversed: Option<bool>,
 }
 
 #[derive(Serialize)]
@@ -81,14 +81,11 @@ pub async fn list_user_tts_inference_results_handler(
 {
   info!("Fetching inference results for user: {}", &path.username);
 
-  let mod_disabled = false;
-
   let limit = query.limit.unwrap_or(25);
   //let limit = std::cmp::max(limit, 100);
 
   let sort_ascending = query.sort_ascending.unwrap_or(false);
-
-  let cursor_is_previous = query.cursor_is_previous.unwrap_or(false);
+  let cursor_is_reversed = query.cursor_is_reversed.unwrap_or(false);
 
   let cursor = if let Some(cursor) = query.cursor.as_deref() {
     let cursor = server_state.sort_key_crypto.decrypt_id(cursor)
@@ -101,15 +98,18 @@ pub async fn list_user_tts_inference_results_handler(
     None
   };
 
-  let query_results = list_tts_inference_page(
-    &server_state.mysql_pool,
-    Some(path.username.as_ref()),
-    sort_ascending,
-    cursor_is_previous,
-    mod_disabled,
-    limit,
-    cursor,
-  ).await;
+  let include_mod_disabled = false; // TODO: Permission check
+
+  let mut query_builder = ListTtsResultsQueryBuilder::new()
+      .sort_ascending(sort_ascending)
+      .scope_creator_username(Some(path.username.as_ref()))
+      .include_mod_disabled_results(include_mod_disabled)
+      .limit(limit)
+      .cursor_is_reversed(cursor_is_reversed)
+      .offset(cursor);
+
+  let query_results = query_builder.perform_query_for_page(&server_state.mysql_pool)
+      .await;
 
   let results_page = match query_results {
     Ok(results) => results,
