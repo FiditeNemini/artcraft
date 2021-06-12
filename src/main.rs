@@ -96,6 +96,8 @@ use std::sync::Arc;
 // TODO TODO TODO -- ON signup, add an "early adopter" badge. And a tool for making it easy to add badges.
 // TODO - badge for uploading template, badge for uploading model, etc.
 
+// TODO TODO -- also this: https://material-ui.com
+
 
 const DEFAULT_BIND_ADDRESS : &'static str = "0.0.0.0:12345";
 
