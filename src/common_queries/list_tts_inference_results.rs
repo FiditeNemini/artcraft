@@ -462,3 +462,134 @@ LEFT OUTER JOIN users
 
   Ok(results)
 }
+
+/// These are very difficult queries, so this helps.
+pub struct QueryBuilder {
+  scope_creator_username: Option<String>,
+  include_mod_disabled_results: bool,
+  sort_ascending: bool,
+  offset: Option<u64>,
+  limit: u16,
+  cursor_is_reversed: bool,
+  result_set_requires_reverse_sort: bool,
+}
+
+impl QueryBuilder {
+  pub fn new() -> Self {
+    Self {
+      scope_creator_username: None,
+      include_mod_disabled_results: false,
+      sort_ascending: false,
+      offset: None,
+      limit: 5,
+      cursor_is_reversed: false,
+      result_set_requires_reverse_sort: false,
+    }
+  }
+
+  pub fn scope_creator_username(mut self, scope_creator_username: Option<&str>) -> Self {
+    self.scope_creator_username = scope_creator_username.map(|u| u.to_string());
+    self
+  }
+
+  pub fn include_mod_disabled_results(mut self, include_mod_disabled_results: bool) -> Self {
+    self.include_mod_disabled_results = include_mod_disabled_results;
+    self
+  }
+
+  pub fn build_predicates(&self) -> String {
+    // NB: Reverse cursors require us to invert the sort direction.
+    let mut sort_ascending = self.sort_ascending;
+    // NB: If the sort direction is artificially reversed, we'll restore the result order.
+    let mut reverse_results = false;
+
+    let mut first_predicate_added = false;
+
+    let mut query = "".to_string();
+
+    if let Some(offset) = self.offset {
+      if !first_predicate_added {
+        query.push_str(" WHERE");
+        first_predicate_added = true;
+      } else {
+        query.push_str(" AND");
+      }
+
+      if sort_ascending {
+        if self.cursor_is_reversed {
+          // NB: We're searching backwards.
+          query.push_str(" tts_results.id < ?");
+          sort_ascending = !sort_ascending;
+          reverse_results = true;
+        } else {
+          query.push_str(" tts_results.id > ?");
+        }
+      } else {
+        if self.cursor_is_reversed {
+          // NB: We're searching backwards.
+          query.push_str(" tts_results.id > ?");
+          sort_ascending = !sort_ascending;
+          reverse_results = true;
+        } else {
+          query.push_str(" tts_results.id < ?");
+        }
+      }
+    }
+
+    if let Some(username) = self.scope_creator_username.as_deref() {
+      if !first_predicate_added {
+        query.push_str(" WHERE users.username = ?");
+        first_predicate_added = true;
+      } else {
+        query.push_str(" AND users.username = ?");
+      }
+    }
+
+    if !self.include_mod_disabled_results {
+      if !first_predicate_added {
+        query.push_str(" WHERE tts_results.user_deleted_at IS NULL");
+        query.push_str(" AND tts_results.mod_deleted_at IS NULL");
+        first_predicate_added = true;
+      } else {
+        query.push_str(" AND tts_results.user_deleted_at IS NULL");
+        query.push_str(" AND tts_results.mod_deleted_at IS NULL");
+      }
+    }
+
+    if sort_ascending {
+      query.push_str(" ORDER BY tts_results.id ASC");
+    } else {
+      query.push_str(" ORDER BY tts_results.id DESC");
+    }
+
+    query.push_str(" LIMIT ?");
+
+    query
+  }
+}
+
+#[cfg(test)]
+mod tests {
+  use crate::common_queries::list_tts_inference_results::QueryBuilder;
+
+  #[test]
+  fn predicates_without_scoping() {
+    let query_builder = QueryBuilder::new();
+
+    assert_eq!(&query_builder.build_predicates(),
+      " WHERE tts_results.user_deleted_at IS NULL \
+      AND tts_results.mod_deleted_at IS NULL \
+      ORDER BY tts_results.id DESC \
+      LIMIT ?");
+  }
+
+  #[test]
+  fn predicates_including_deleted() {
+    let query_builder = QueryBuilder::new()
+        .include_mod_disabled_results(true);
+
+    assert_eq!(&query_builder.build_predicates(),
+      " ORDER BY tts_results.id DESC \
+      LIMIT ?");
+  }
+}
