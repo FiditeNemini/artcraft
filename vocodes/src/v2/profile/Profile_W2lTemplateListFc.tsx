@@ -14,7 +14,6 @@ interface W2lTemplate {
   creator_user_token: string,
   username: string,
   display_name: string,
-  updatable_slug: string,
   title: string,
   frame_width: number,
   frame_height: number,
@@ -74,7 +73,7 @@ function ProfileW2lTemplateListFc(props: Props) {
 
     let url = `https://storage.googleapis.com/dev-vocodes-public${object}`;
 
-    let link = `/w2l/${t.updatable_slug}`;
+    let link = `/w2l/${t.template_token}`;
   
     templateElements.push((
       <div className="tile is-parent" key={t.template_token}>

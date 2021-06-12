@@ -3,7 +3,6 @@ import { FirehoseEventListFc } from './firehose/FirehoseEventListFc';
 import { LoginFc } from './login/LoginFc';
 import { NewFooterNavFc } from './NewFooterNavFc';
 import { NewTopNavFc } from './NewTopNavFc';
-import { ProfileDataFc } from './profile_data/ProfileDataFc';
 import { ProfileEditFc } from './profile_edit/ProfileEditFc';
 import { ProfileFc } from './profile/ProfileFc';
 import { SessionWrapper } from '../session/SessionWrapper';
@@ -81,14 +80,6 @@ class NewVocodesContainer extends React.Component<Props, State> {
               />
             </Route>
 
-
-            <Route path="/profile/:username/data"
-              render={(routeProps: RouteProps) => (
-                <ProfileDataFc
-                  sessionWrapper={this.props.sessionWrapper}
-                />
-              )}
-            />
 
             <Route path="/profile/:username/edit"
               render={(routeProps: RouteProps) => (
