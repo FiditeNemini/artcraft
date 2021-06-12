@@ -1,4 +1,11 @@
-import { url } from "inspector";
+
+export interface ListTtsInferenceResultsForUserArgs {
+  username: string, 
+  cursor?: string,
+  cursor_is_reversed?: boolean,
+  sort_ascending?: boolean,
+  limit?: number
+};
 
 class ApiConfig {
   
@@ -53,34 +60,28 @@ class ApiConfig {
     return `${this.getScheme()}://${this.getNewApiHost()}/user/${username}/tts_models`;
   }
 
-  listTtsInferenceResultsForUser(
-    username: string, 
-    cursor?: string,
-    cursor_is_reversed?: boolean,
-    sort_ascending?: boolean,
-    limit?: number,
-  ) : string {
-    const base_url = `${this.getScheme()}://${this.getNewApiHost()}/user/${username}/tts_results`;
+  listTtsInferenceResultsForUser(params: ListTtsInferenceResultsForUserArgs) : string {
+    const base_url = `${this.getScheme()}://${this.getNewApiHost()}/user/${params.username}/tts_results`;
 
     let query = "";
     let query_prepend = "?";
 
-    if (cursor !== undefined) {
-      query += `${query_prepend}cursor=${cursor}`;
+    if (params.cursor !== undefined) {
+      query += `${query_prepend}cursor=${params.cursor}`;
       query_prepend = "&";
 
-      if (cursor_is_reversed !== undefined) {
-        query += `${query_prepend}cursor_is_reversed=${cursor_is_reversed}`;
+      if (params.cursor_is_reversed !== undefined) {
+        query += `${query_prepend}cursor_is_reversed=${params.cursor_is_reversed}`;
       }
     }
 
-    if (sort_ascending !== undefined) {
-      query += `${query_prepend}sort_ascending=${sort_ascending}`;
+    if (params.sort_ascending !== undefined) {
+      query += `${query_prepend}sort_ascending=${params.sort_ascending}`;
       query_prepend = "&";
     }
 
-    if (limit !== undefined) {
-      query += `${query_prepend}limit=${limit}`;
+    if (params.limit !== undefined) {
+      query += `${query_prepend}limit=${params.limit}`;
     }
 
     return base_url + query;

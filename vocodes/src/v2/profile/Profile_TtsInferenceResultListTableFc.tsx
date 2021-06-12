@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { ApiConfig } from '../../common/ApiConfig';
+import { ApiConfig, ListTtsInferenceResultsForUserArgs } from '../../common/ApiConfig';
 import { useTable, usePagination, } from 'react-table';
 
 interface TtsInferenceResultListResponsePayload {
@@ -36,9 +36,10 @@ function Table({
   fetchData,
   loading,
   pageCount: controlledPageCount,
+  nextCursor,
 } : any) {
 
-  console.log(columns, data, fetchData, loading, controlledPageCount);
+  //console.log(columns, data, fetchData, loading, controlledPageCount);
 
   const {
     getTableProps,
@@ -60,20 +61,23 @@ function Table({
     {
       columns,
       data,
-      //initialState: { pageIndex: 0 }, // Pass our hoisted table state
-      //manualPagination: true, // Tell the usePagination
+      initialState: { pageIndex: 0, pageSize: 5 }, // Pass our hoisted table state
+      manualPagination: true, // Tell the usePagination
       // hook that we'll handle our own data fetching
       // This means we'll also have to provide our own
       // pageCount.
-      //pageCount: controlledPageCount,
-    },
+      pageCount: -1,
+    } as any,
     usePagination
   ) as any
 
+  //console.log('nextCursor', nextCursor)
+
   // Listen for changes in pagination and use the state to fetch our new data
   React.useEffect(() => {
-    fetchData({ pageIndex, pageSize })
-  }, [fetchData, pageIndex, pageSize])
+    //console.log('calliong fetchData', nextCursor)
+    fetchData({ pageIndex, pageSize, nextCursor })
+  }, [fetchData, pageIndex, pageSize, nextCursor])
 
 
 
@@ -190,14 +194,18 @@ function Table({
 
 
 function ProfileTtsInferenceResultsListTableFc(props: Props) {
-  const [w2lResults, setW2lResults] = useState<Array<TtsInferenceResult>>([]);
+  const [ttsResults, setTtsResults] = useState<Array<TtsInferenceResult>>([]);
+  const [data, setData] = useState<Array<any>>([])
   const [loading, setLoading] = useState(false);
+
+  const [nextCursor, setNextCursor] = useState<string|undefined>(undefined);
+  const [previousCursor, setPreviousCursor] = useState<string|undefined>(undefined);
 
   
   const columns = React.useMemo(
     () => [
       {
-        Header: 'Result Link',
+        Header: 'RESULT LINK',
         accessor: 'col1', // TODO: Can be function into data
       },
       {
@@ -216,7 +224,7 @@ function ProfileTtsInferenceResultsListTableFc(props: Props) {
     []
   );
 
-  const data = React.useMemo(
+  /*const data = React.useMemo(
     () => [
       {
         col1: 'Hello',
@@ -238,14 +246,31 @@ function ProfileTtsInferenceResultsListTableFc(props: Props) {
       },
     ],
     []
-  );
+  );*/
 
   // TODO: Fix types here.
-  const tableInstance = useTable({ columns : columns as any, data })
+  //const tableInstance = useTable({ columns : columns as any, data })
 
-  const fetchData = React.useCallback(( { pageSize, pageToken } ) => {
+
+  const fetchData = React.useCallback(( { pageSize, pageToken, nextCursor} ) => {
     const api = new ApiConfig();
-    const endpointUrl = api.listTtsInferenceResultsForUser(props.username);
+
+    //console.log('callback args', pageSize, pageToken, nextCursor)
+
+    let args : ListTtsInferenceResultsForUserArgs = {
+      username: props.username,
+      limit: 5,
+    };
+
+    //if (nextCursor !== undefined) {
+    //  args.cursor = nextCursor;
+    //}
+
+    //console.log('nextCursor', nextCursor);
+
+    const endpointUrl = api.listTtsInferenceResultsForUser(args);
+
+    //console.log('url', endpointUrl);
 
     setLoading(true)
 
@@ -258,12 +283,33 @@ function ProfileTtsInferenceResultsListTableFc(props: Props) {
     })
     .then(res => res.json())
     .then(res => {
-      const templatesResponse : TtsInferenceResultListResponsePayload  = res;
-      if (!templatesResponse.success) {
+      const modelResponse : TtsInferenceResultListResponsePayload  = res;
+      if (!modelResponse.success) {
         return;
       }
 
-      setW2lResults(templatesResponse.results)
+      //console.log('response', modelResponse)
+
+      setTtsResults(modelResponse.results);
+
+
+      setNextCursor(modelResponse.cursor_next || undefined);
+      //setPreviousCursor(modelResponse.cursor_previous|| undefined);
+
+      //console.log('callback nextCursor', nextCursor);
+
+      let data : any[] = [];
+
+      modelResponse.results.forEach(result => {
+        data.push({
+          col1: result.raw_inference_text,
+          col2: result.raw_inference_text,
+          col3: result.tts_model_token,
+          col4: result.created_at,
+        });
+      })
+
+      setData(data);
       setLoading(false);
     })
     .catch(e => {
@@ -273,44 +319,30 @@ function ProfileTtsInferenceResultsListTableFc(props: Props) {
   }, []);
 
 
-  useEffect(() => {
-    const api = new ApiConfig();
-    const endpointUrl = api.listTtsInferenceResultsForUser(props.username);
-
-    fetch(endpointUrl, {
-      method: 'GET',
-      headers: {
-        'Accept': 'application/json',
-      },
-      credentials: 'include',
-    })
-    .then(res => res.json())
-    .then(res => {
-      const templatesResponse : TtsInferenceResultListResponsePayload  = res;
-      if (!templatesResponse.success) {
-        return;
-      }
-
-      setW2lResults(templatesResponse.results)
-    })
-    .catch(e => {
-      //this.props.onSpeakErrorCallback();
-    });
-  }, [props.username]); // NB: Empty array dependency sets to run ONLY on mount
-
-
-  const {
-    getTableProps,
-    getTableBodyProps,
-    headerGroups,
-    rows,
-    prepareRow,
-  } = tableInstance;
+//  const {
+//    getTableProps,
+//    getTableBodyProps,
+//    headerGroups,
+//    rows,
+//    prepareRow,
+//  } = tableInstance;
 
   return (
     <div>
-      <Table data={data} columns={columns} loading={loading} fetchData={fetchData} />
+      test
+      <Table 
+        data={data} 
+        columns={columns} 
+        fetchData={fetchData}
+        loading={loading}
+        canNextPage={true}
+        canPreviousPage={true}
+        pageCount={10}
+        nextCursor={nextCursor}
+        />
 
+
+  {/*
       <table {...getTableProps()}>
         <thead>
           {// Loop over the header rows
@@ -328,21 +360,15 @@ function ProfileTtsInferenceResultsListTableFc(props: Props) {
             </tr>
           ))}
         </thead>
-        {/* Apply the table body props */}
         <tbody {...getTableBodyProps()}>
-          {// Loop over the table rows
           rows.map(row => {
             // Prepare the row for display
             prepareRow(row)
             return (
-              // Apply the row props
               <tr {...row.getRowProps()}>
-                {// Loop over the rows cells
                 row.cells.map(cell => {
-                  // Apply the cell props
                   return (
                     <td {...cell.getCellProps()}>
-                      {// Render the cell contents
                       cell.render('Cell')}
                     </td>
                   )
@@ -352,6 +378,7 @@ function ProfileTtsInferenceResultsListTableFc(props: Props) {
           })}
         </tbody>
       </table>
+    */}
 
     </div>
   )

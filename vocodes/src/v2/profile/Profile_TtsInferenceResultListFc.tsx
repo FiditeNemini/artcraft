@@ -32,7 +32,7 @@ function ProfileTtsInferenceResultsListFc(props: Props) {
 
   useEffect(() => {
     const api = new ApiConfig();
-    const endpointUrl = api.listTtsInferenceResultsForUser(props.username);
+    const endpointUrl = api.listTtsInferenceResultsForUser({username: props.username });
 
     fetch(endpointUrl, {
       method: 'GET',
