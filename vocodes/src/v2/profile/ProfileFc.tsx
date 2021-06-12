@@ -3,6 +3,7 @@ import { ApiConfig } from '../../common/ApiConfig';
 import { GravatarFc } from '../common/GravatarFc';
 import { Link } from 'react-router-dom';
 import { ProfileTtsInferenceResultsListFc } from './Profile_TtsInferenceResultListFc';
+import { ProfileTtsInferenceResultsListTableFc } from './Profile_TtsInferenceResultListTableFc';
 import { ProfileTtsModelListFc } from './Profile_TtsModelListFc';
 import { ProfileW2lInferenceResultsListFc } from './Profile_W2lInferenceResultListFc';
 import { ProfileW2lTemplateListFc } from './Profile_W2lTemplateListFc';
@@ -196,9 +197,15 @@ function ProfileFc(props: Props) {
       <br />
       <br />*/}
 
+
+      <h3 className="title is-3"> TTS Results Table </h3>
+      <ProfileTtsInferenceResultsListTableFc username={username} />
+      
+      <br />
+      <br />
+
       <h3 className="title is-3"> TTS Results </h3>
       <ProfileTtsInferenceResultsListFc username={username} />
-
 
       <br />
       <br />

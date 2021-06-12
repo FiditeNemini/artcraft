@@ -1,3 +1,4 @@
+import { url } from "inspector";
 
 class ApiConfig {
   
@@ -52,8 +53,37 @@ class ApiConfig {
     return `${this.getScheme()}://${this.getNewApiHost()}/user/${username}/tts_models`;
   }
 
-  listTtsInferenceResultsForUser(username: string) : string {
-    return `${this.getScheme()}://${this.getNewApiHost()}/user/${username}/tts_results`;
+  listTtsInferenceResultsForUser(
+    username: string, 
+    cursor?: string,
+    cursor_is_reversed?: boolean,
+    sort_ascending?: boolean,
+    limit?: number,
+  ) : string {
+    const base_url = `${this.getScheme()}://${this.getNewApiHost()}/user/${username}/tts_results`;
+
+    let query = "";
+    let query_prepend = "?";
+
+    if (cursor !== undefined) {
+      query += `${query_prepend}cursor=${cursor}`;
+      query_prepend = "&";
+
+      if (cursor_is_reversed !== undefined) {
+        query += `${query_prepend}cursor_is_reversed=${cursor_is_reversed}`;
+      }
+    }
+
+    if (sort_ascending !== undefined) {
+      query += `${query_prepend}sort_ascending=${sort_ascending}`;
+      query_prepend = "&";
+    }
+
+    if (limit !== undefined) {
+      query += `${query_prepend}limit=${limit}`;
+    }
+
+    return base_url + query;
   }
 
   getTtsInferenceJobState(jobToken: string) : string {
