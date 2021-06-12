@@ -497,6 +497,11 @@ impl QueryBuilder {
     self
   }
 
+  pub fn sort_ascending(mut self, sort_ascending: bool) -> Self {
+    self.sort_ascending = sort_ascending;
+    self
+  }
+
   pub fn build_predicates(&self) -> String {
     // NB: Reverse cursors require us to invert the sort direction.
     let mut sort_ascending = self.sort_ascending;
@@ -584,12 +589,37 @@ mod tests {
   }
 
   #[test]
+  fn predicates_scoped_to_user() {
+    let query_builder = QueryBuilder::new()
+        .scope_creator_username(Some("echelon"));
+
+    assert_eq!(&query_builder.build_predicates(),
+      " WHERE users.username = ? \
+      AND tts_results.user_deleted_at IS NULL \
+      AND tts_results.mod_deleted_at IS NULL \
+      ORDER BY tts_results.id DESC \
+      LIMIT ?");
+  }
+
+  #[test]
   fn predicates_including_deleted() {
     let query_builder = QueryBuilder::new()
         .include_mod_disabled_results(true);
 
     assert_eq!(&query_builder.build_predicates(),
       " ORDER BY tts_results.id DESC \
+      LIMIT ?");
+  }
+
+  #[test]
+  fn predicates_sort_ascending() {
+    let query_builder = QueryBuilder::new()
+        .sort_ascending(true);
+
+    assert_eq!(&query_builder.build_predicates(),
+      " WHERE tts_results.user_deleted_at IS NULL \
+      AND tts_results.mod_deleted_at IS NULL \
+      ORDER BY tts_results.id ASC \
       LIMIT ?");
   }
 }
