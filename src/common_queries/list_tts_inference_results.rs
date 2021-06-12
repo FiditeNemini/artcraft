@@ -502,6 +502,11 @@ impl QueryBuilder {
     self
   }
 
+  pub fn offset(mut self, offset: Option<u64>) -> Self {
+    self.offset = offset;
+    self
+  }
+
   pub fn build_predicates(&self) -> String {
     // NB: Reverse cursors require us to invert the sort direction.
     let mut sort_ascending = self.sort_ascending;
@@ -618,6 +623,33 @@ mod tests {
 
     assert_eq!(&query_builder.build_predicates(),
       " WHERE tts_results.user_deleted_at IS NULL \
+      AND tts_results.mod_deleted_at IS NULL \
+      ORDER BY tts_results.id ASC \
+      LIMIT ?");
+  }
+
+  #[test]
+  fn predicates_offset() {
+    let query_builder = QueryBuilder::new()
+        .offset(Some(100));
+
+    assert_eq!(&query_builder.build_predicates(),
+      " WHERE tts_results.id < ? \
+      AND tts_results.user_deleted_at IS NULL \
+      AND tts_results.mod_deleted_at IS NULL \
+      ORDER BY tts_results.id DESC \
+      LIMIT ?");
+  }
+
+  #[test]
+  fn predicates_offset_and_sort_ascending() {
+    let query_builder = QueryBuilder::new()
+        .sort_ascending(true)
+        .offset(Some(100));
+
+    assert_eq!(&query_builder.build_predicates(),
+      " WHERE tts_results.id > ? \
+      AND tts_results.user_deleted_at IS NULL \
       AND tts_results.mod_deleted_at IS NULL \
       ORDER BY tts_results.id ASC \
       LIMIT ?");
