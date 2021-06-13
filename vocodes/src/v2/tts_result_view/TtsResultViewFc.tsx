@@ -16,7 +16,7 @@ interface TtsInferenceResult {
   tts_model_token: string,
   tts_model_title: string,
 
-  inference_text: string,
+  raw_inference_text: string,
 
   maybe_creator_user_token?: string,
   maybe_creator_username?: string,
@@ -42,7 +42,7 @@ interface Props {
 }
 
 function TtsResultViewFc(props: Props) {
-  let { token } = useParams();
+  let { token } : { token: string }= useParams();
 
   const [ttsInferenceResult, setTtsInferenceResult] = useState<TtsInferenceResult|undefined>(undefined);
 
@@ -95,8 +95,8 @@ function TtsResultViewFc(props: Props) {
       <span>
         <GravatarFc 
           size={15}
-          username={ttsInferenceResult.maybe_creator_display_name} 
-          email_hash={ttsInferenceResult.maybe_creator_gravatar_hash} 
+          username={ttsInferenceResult.maybe_creator_display_name || ""} 
+          email_hash={ttsInferenceResult.maybe_creator_gravatar_hash || ""} 
           />
         &nbsp;
         <Link to={creatorLink}>{ttsInferenceResult.maybe_creator_display_name}</Link>
@@ -111,8 +111,8 @@ function TtsResultViewFc(props: Props) {
       <span>
         <GravatarFc 
           size={15}
-          username={ttsInferenceResult.maybe_model_creator_display_name} 
-          email_hash={ttsInferenceResult.maybe_model_creator_gravatar_hash} 
+          username={ttsInferenceResult.maybe_model_creator_display_name || ""} 
+          email_hash={ttsInferenceResult.maybe_model_creator_gravatar_hash || ""} 
           />
         &nbsp;
         <Link to={modelCreatorLink}>{ttsInferenceResult.maybe_model_creator_display_name}</Link>
@@ -168,7 +168,7 @@ function TtsResultViewFc(props: Props) {
           <tr>
             <th>Original Text</th>
             <td>
-              {ttsInferenceResult.inference_text}
+              {ttsInferenceResult.raw_inference_text}
             </td>
           </tr>
           <tr>

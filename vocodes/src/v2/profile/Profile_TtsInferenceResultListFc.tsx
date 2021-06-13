@@ -11,7 +11,10 @@ interface TtsInferenceResultListResponsePayload {
 
 interface TtsInferenceResult {
   tts_result_token: string,
+
   tts_model_token: string,
+  tts_model_title: string,
+
   raw_inference_text: string,
 
   maybe_creator_user_token?: string,
@@ -93,7 +96,7 @@ function ProfileTtsInferenceResultsListFc(props: Props) {
           <Link to={inferenceLink}><span role="img" aria-label="result link">▶️</span> {text}</Link>
           &nbsp;
         </th>
-        <th><Link to={modelLink}>Model</Link></th>
+        <th><Link to={modelLink}>Model: {result.tts_model_title}</Link></th>
         <td>{duration_seconds} s</td>
         <td>{result.created_at}</td>
       </tr>
