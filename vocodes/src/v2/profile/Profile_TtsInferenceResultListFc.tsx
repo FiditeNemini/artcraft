@@ -1,16 +1,18 @@
-import React, { useState, useEffect } from 'react';
-import { ApiConfig } from '../../common/ApiConfig';
+import React, { useState, useEffect, useCallback } from 'react';
+import { ApiConfig, ListTtsInferenceResultsForUserArgs } from '../../common/ApiConfig';
 import { Link } from "react-router-dom";
 
 interface TtsInferenceResultListResponsePayload {
   success: boolean,
   results: Array<TtsInferenceResult>,
+  cursor_next: string | null | undefined,
+  cursor_previous: string | null | undefined,
 }
 
 interface TtsInferenceResult {
   tts_result_token: string,
   tts_model_token: string,
-  inference_text: string,
+  raw_inference_text: string,
 
   maybe_creator_user_token?: string,
   maybe_creator_username?: string,
@@ -28,11 +30,29 @@ interface Props {
 }
 
 function ProfileTtsInferenceResultsListFc(props: Props) {
-  const [w2lResults, setW2lResults] = useState<Array<TtsInferenceResult>>([]);
+  const [ttsResults, setTtsResults] = useState<Array<TtsInferenceResult>>([]);
 
-  useEffect(() => {
+  const [currentCursor, setCurrentCursor] = useState<string|null>(null);
+  const [nextCursor, setNextCursor] = useState<string|null>(null);
+  const [previousCursor, setPreviousCursor] = useState<string|null>(null);
+
+  const getPage = useCallback((cursor : string|null, reverse: boolean) => {
+    console.log('get page', cursor);
+
+    let args : ListTtsInferenceResultsForUserArgs = {
+      username: props.username ,
+      limit: 5,
+    };
+
+    if (cursor !== null) {
+      args.cursor = cursor;
+      if (reverse) {
+        args.cursor_is_reversed = true;
+      }
+    }
+
     const api = new ApiConfig();
-    const endpointUrl = api.listTtsInferenceResultsForUser({username: props.username });
+    const endpointUrl = api.listTtsInferenceResultsForUser(args);
 
     fetch(endpointUrl, {
       method: 'GET',
@@ -43,21 +63,55 @@ function ProfileTtsInferenceResultsListFc(props: Props) {
     })
     .then(res => res.json())
     .then(res => {
-      const templatesResponse : TtsInferenceResultListResponsePayload  = res;
-      if (!templatesResponse.success) {
+      const modelsResponse : TtsInferenceResultListResponsePayload  = res;
+      if (!modelsResponse.success) {
         return;
       }
 
-      setW2lResults(templatesResponse.results)
+      setTtsResults(modelsResponse.results)
+      setNextCursor(modelsResponse.cursor_next || null)
+      setPreviousCursor(modelsResponse.cursor_previous || null)
     })
     .catch(e => {
       //this.props.onSpeakErrorCallback();
     });
-  }, [props.username]); // NB: Empty array dependency sets to run ONLY on mount
+  }, [props.username]);
+
+  useEffect(() => {
+    getPage(null, false);
+//    let args : ListTtsInferenceResultsForUserArgs = {
+//      username: props.username ,
+//      limit: 5,
+//    };
+//
+//    const api = new ApiConfig();
+//    const endpointUrl = api.listTtsInferenceResultsForUser(args);
+//
+//    fetch(endpointUrl, {
+//      method: 'GET',
+//      headers: {
+//        'Accept': 'application/json',
+//      },
+//      credentials: 'include',
+//    })
+//    .then(res => res.json())
+//    .then(res => {
+//      const modelsResponse : TtsInferenceResultListResponsePayload  = res;
+//      if (!modelsResponse.success) {
+//        return;
+//      }
+//
+//      setTtsResults(modelsResponse.results)
+//      setNextCursor(modelsResponse.cursor_next || null)
+//    })
+//    .catch(e => {
+//      //this.props.onSpeakErrorCallback();
+//    });
+  }, [getPage, props.username]); // NB: Empty array dependency sets to run ONLY on mount
 
   let rows : Array<JSX.Element> = [];
   
-  w2lResults.forEach(result => {
+  ttsResults.forEach(result => {
     let duration_seconds = result.duration_millis / 1000;
 
     let inferenceLink = `/tts/result/${result.tts_result_token}`;
@@ -65,7 +119,13 @@ function ProfileTtsInferenceResultsListFc(props: Props) {
 
     rows.push(
       <tr key={result.tts_result_token}>
-          <th><Link to={inferenceLink}><span role="img" aria-label="result link">▶️</span> Result</Link></th>
+        <th>
+          <Link to={inferenceLink}><span role="img" aria-label="result link">▶️</span> Result</Link>
+          &nbsp;
+        </th>
+        <th>
+          {result.raw_inference_text}
+        </th>
         <th><Link to={modelLink}>Model</Link></th>
         <td>{duration_seconds} s</td>
         <td>{result.created_at}</td>
@@ -78,8 +138,9 @@ function ProfileTtsInferenceResultsListFc(props: Props) {
       <table className="table">
         <thead>
           <tr>
-            <th><abbr title="Detail">Result Link</abbr></th>
-            <th><abbr title="Detail">Template</abbr></th>
+            <th><abbr title="Detail">Download &amp; Play Link</abbr></th>
+            <th><abbr title="Detail">Raw Text</abbr></th>
+            <th><abbr title="Detail">Model</abbr></th>
             <th><abbr title="Detail">Duration</abbr></th>
             <th><abbr title="Value">Creation Date (UTC)</abbr></th>
           </tr>
@@ -88,6 +149,9 @@ function ProfileTtsInferenceResultsListFc(props: Props) {
           {rows}
         </tbody>
       </table>
+
+      <button className="button is-info" onClick={() => getPage(previousCursor, true)}>&lt; Get newer</button> &nbsp;
+      <button className="button is-info" onClick={() => getPage(nextCursor, false)}>Get older&gt;</button>
     </div>
   )
 }
