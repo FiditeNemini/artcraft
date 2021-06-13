@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { ApiConfig, ListW2lInferenceResultsForUserArgs } from '../../common/ApiConfig';
-import { Link } from "react-router-dom";
+import { Link } from 'react-router-dom';
+import { formatDistance } from 'date-fns'
 
 interface W2lInferenceResultListResponsePayload {
   success: boolean,
@@ -82,14 +83,20 @@ function ProfileW2lInferenceResultsListFc(props: Props) {
     getPage(null, false);
   }, [getPage, props.username]);
 
+  const now = new Date();
+
   let rows : Array<JSX.Element> = [];
   
   w2lResults.forEach(result => {
-    let duration_seconds = result.duration_millis / 1000;
-    let templateTitle = result.template_title.length < 5 ? `Title: ${result.template_title}` : result.template_title;
+    const duration_seconds = result.duration_millis / 1000;
+    const templateTitle = result.template_title.length < 5 ? `Title: ${result.template_title}` : result.template_title;
 
-    let inferenceLink = `/w2l/result/${result.w2l_result_token}`;
-    let templateLink = `/w2l/${result.maybe_w2l_template_token}`;
+    const inferenceLink = `/w2l/result/${result.w2l_result_token}`;
+    const templateLink = `/w2l/${result.maybe_w2l_template_token}`;
+
+    const createTime = new Date(result.created_at);
+    const relativeCreateTime = formatDistance(createTime, now, { addSuffix: true });
+
 
     rows.push(
       <tr key={result.w2l_result_token}>
@@ -97,7 +104,7 @@ function ProfileW2lInferenceResultsListFc(props: Props) {
         <th><Link to={templateLink}>{templateTitle}</Link></th>
         <td>(custom audio)</td>
         <td>{duration_seconds} s</td>
-        <td>{result.created_at} s</td>
+        <td>{relativeCreateTime}</td>
       </tr>
     );
   });

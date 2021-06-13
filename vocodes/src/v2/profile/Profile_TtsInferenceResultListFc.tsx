@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { ApiConfig, ListTtsInferenceResultsForUserArgs } from '../../common/ApiConfig';
-import { Link } from "react-router-dom";
+import { Link } from 'react-router-dom';
+import { formatDistance } from 'date-fns';
 
 interface TtsInferenceResultListResponsePayload {
   success: boolean,
@@ -80,15 +81,20 @@ function ProfileTtsInferenceResultsListFc(props: Props) {
     getPage(null, false);
   }, [getPage, props.username]);
 
+  const now = new Date();
+
   let rows : Array<JSX.Element> = [];
   
   ttsResults.forEach(result => {
-    let duration_seconds = result.duration_millis / 1000;
+    const duration_seconds = result.duration_millis / 1000;
 
-    let inferenceLink = `/tts/result/${result.tts_result_token}`;
-    let modelLink = `/tts/${result.tts_model_token}`;
+    const inferenceLink = `/tts/result/${result.tts_result_token}`;
+    const modelLink = `/tts/${result.tts_model_token}`;
 
-    let text = result.raw_inference_text.length < 5 ? `Result: ${result.raw_inference_text}` : result.raw_inference_text;
+    const text = result.raw_inference_text.length < 5 ? `Result: ${result.raw_inference_text}` : result.raw_inference_text;
+
+    const createTime = new Date(result.created_at);
+    const relativeCreateTime = formatDistance(createTime, now, { addSuffix: true });
 
     rows.push(
       <tr key={result.tts_result_token}>
@@ -98,7 +104,7 @@ function ProfileTtsInferenceResultsListFc(props: Props) {
         </th>
         <th><Link to={modelLink}>Model: {result.tts_model_title}</Link></th>
         <td>{duration_seconds} s</td>
-        <td>{result.created_at}</td>
+        <td>{relativeCreateTime}</td>
       </tr>
     );
   });
