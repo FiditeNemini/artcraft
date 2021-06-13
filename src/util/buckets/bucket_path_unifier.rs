@@ -1,6 +1,6 @@
-use crate::buckets::bucket_paths::hash_to_bucket_path;
-use std::path::PathBuf;
 use crate::util::anyhow_result::AnyhowResult;
+use crate::util::buckets::bucket_paths::hash_to_bucket_path;
+use std::path::PathBuf;
 
 /// This is designed to make it centrally configurable where
 /// different types of objects are stored.

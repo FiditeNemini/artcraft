@@ -1,7 +1,7 @@
-use crate::buckets::bucket_client::BucketClient;
 use crate::common_queries::firehose_publisher::FirehosePublisher;
 use crate::http_server::web_utils::cookie_manager::CookieManager;
 use crate::http_server::web_utils::session_checker::SessionChecker;
+use crate::util::buckets::bucket_client::BucketClient;
 use crate::util::encrypted_sort_id::SortKeyCrypto;
 use r2d2_redis::{r2d2, RedisConnectionManager};
 use sqlx::MySqlPool;

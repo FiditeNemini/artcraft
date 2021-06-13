@@ -16,7 +16,6 @@ pub const RESERVED_USERNAMES : &'static str = include_str!("../db/reserved_usern
 pub const RESERVED_SUBSTRINGS : &'static str = include_str!("../db/reserved_usernames_including.txt");
 pub const BANNED_SLURS : &'static str = include_str!("../db/banned_slurs.txt");
 
-pub mod buckets;
 pub mod common_queries;
 pub mod database_helpers;
 pub mod http_server;
@@ -32,7 +31,6 @@ use actix_cors::Cors;
 use actix_http::http;
 use actix_web::middleware::{Logger, DefaultHeaders};
 use actix_web::{HttpServer, web, HttpResponse, App};
-use crate::buckets::bucket_client::BucketClient;
 use crate::common_queries::firehose_publisher::FirehosePublisher;
 use crate::http_server::endpoints::default_route_404::default_route_404;
 use crate::http_server::endpoints::events::list_events::list_events_handler;
@@ -81,6 +79,7 @@ use crate::server_state::{ServerState, EnvConfig};
 use crate::shared_constants::DEFAULT_MYSQL_CONNECTION_STRING;
 use crate::shared_constants::DEFAULT_REDIS_CONNECTION_STRING;
 use crate::shared_constants::DEFAULT_RUST_LOG;
+use crate::util::buckets::bucket_client::BucketClient;
 use crate::util::encrypted_sort_id::SortKeyCrypto;
 use log::{info};
 use r2d2_redis::RedisConnectionManager;

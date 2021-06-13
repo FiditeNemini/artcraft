@@ -10,7 +10,6 @@
 
 #[macro_use] extern crate serde_derive;
 
-pub mod buckets;
 pub mod common_env;
 pub mod common_queries;
 pub mod database_helpers;
@@ -21,9 +20,6 @@ pub mod util;
 
 use anyhow::anyhow;
 use chrono::Utc;
-use crate::buckets::bucket_client::BucketClient;
-use crate::buckets::bucket_path_unifier::BucketPathUnifier;
-use crate::buckets::bucket_paths::hash_to_bucket_path;
 use crate::common_env::CommonEnv;
 use crate::common_queries::firehose_publisher::FirehosePublisher;
 use crate::job_queries::tts_inference_job_queries::TtsInferenceJobRecord;
@@ -34,7 +30,12 @@ use crate::job_queries::tts_inference_job_queries::mark_tts_inference_job_done;
 use crate::job_queries::tts_inference_job_queries::mark_tts_inference_job_failure;
 use crate::job_queries::tts_inference_job_queries::query_tts_inference_job_records;
 use crate::script_execution::tacotron_inference_command::TacotronInferenceCommand;
+use crate::shared_constants::DEFAULT_MYSQL_CONNECTION_STRING;
+use crate::shared_constants::DEFAULT_RUST_LOG;
 use crate::util::anyhow_result::AnyhowResult;
+use crate::util::buckets::bucket_client::BucketClient;
+use crate::util::buckets::bucket_path_unifier::BucketPathUnifier;
+use crate::util::buckets::bucket_paths::hash_to_bucket_path;
 use crate::util::filesystem::check_directory_exists;
 use crate::util::filesystem::check_file_exists;
 use crate::util::hashing::hash_file_sha2::hash_file_sha2;
@@ -44,8 +45,6 @@ use crate::util::semi_persistent_cache_dir::SemiPersistentCacheDir;
 use data_encoding::{HEXUPPER, HEXLOWER, HEXLOWER_PERMISSIVE};
 use log::{warn, info};
 use ring::digest::{Context, Digest, SHA256};
-use shared_constants::DEFAULT_MYSQL_CONNECTION_STRING;
-use shared_constants::DEFAULT_RUST_LOG;
 use sqlx::MySqlPool;
 use sqlx::mysql::MySqlPoolOptions;
 use std::fs::{File, metadata};

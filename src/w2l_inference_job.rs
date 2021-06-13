@@ -10,7 +10,6 @@
 
 #[macro_use] extern crate serde_derive;
 
-pub mod buckets;
 pub mod common_env;
 pub mod common_queries;
 pub mod database_helpers;
@@ -21,10 +20,7 @@ pub mod util;
 
 use anyhow::anyhow;
 use chrono::Utc;
-use crate::buckets::bucket_client::BucketClient;
-use crate::buckets::bucket_path_unifier::BucketPathUnifier;
-use crate::buckets::bucket_paths::hash_to_bucket_path;
-use util::hashing::hash_file_sha2::hash_file_sha2;
+use crate::common_env::CommonEnv;
 use crate::common_queries::firehose_publisher::FirehosePublisher;
 use crate::job_queries::w2l_inference_job_queries::W2lInferenceJobRecord;
 use crate::job_queries::w2l_inference_job_queries::get_w2l_template_by_token;
@@ -38,16 +34,20 @@ use crate::script_execution::ffmpeg_generate_preview_video_command::FfmpegGenera
 use crate::script_execution::google_drive_download_command::GoogleDriveDownloadCommand;
 use crate::script_execution::imagemagick_generate_preview_image_command::ImagemagickGeneratePreviewImageCommand;
 use crate::script_execution::wav2lip_inference_command::Wav2LipInferenceCommand;
+use crate::shared_constants::DEFAULT_MYSQL_CONNECTION_STRING;
+use crate::shared_constants::DEFAULT_RUST_LOG;
 use crate::util::anyhow_result::AnyhowResult;
+use crate::util::buckets::bucket_client::BucketClient;
+use crate::util::buckets::bucket_path_unifier::BucketPathUnifier;
+use crate::util::buckets::bucket_paths::hash_to_bucket_path;
 use crate::util::filesystem::check_directory_exists;
 use crate::util::filesystem::check_file_exists;
+use crate::util::hashing::hash_file_sha2::hash_file_sha2;
 use crate::util::random_crockford_token::random_crockford_token;
 use crate::util::semi_persistent_cache_dir::SemiPersistentCacheDir;
 use data_encoding::{HEXUPPER, HEXLOWER, HEXLOWER_PERMISSIVE};
 use log::{warn, info};
 use ring::digest::{Context, Digest, SHA256};
-use shared_constants::DEFAULT_MYSQL_CONNECTION_STRING;
-use shared_constants::DEFAULT_RUST_LOG;
 use sqlx::MySqlPool;
 use sqlx::mysql::MySqlPoolOptions;
 use std::fs::{File, metadata};
@@ -57,7 +57,6 @@ use std::process::Command;
 use std::thread;
 use std::time::Duration;
 use tempdir::TempDir;
-use crate::common_env::CommonEnv;
 
 // Buckets (shared config)
 const ENV_ACCESS_KEY : &'static str = "ACCESS_KEY";
