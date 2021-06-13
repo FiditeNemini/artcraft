@@ -88,6 +88,7 @@ use r2d2_redis::redis::Commands;
 use sqlx::MySqlPool;
 use sqlx::mysql::MySqlPoolOptions;
 use std::sync::Arc;
+use crate::http_server::endpoints::tts::get_tts_model_use_count::get_tts_model_use_count_handler;
 
 // TODO TODO TODO TODO
 // TODO TODO TODO TODO
@@ -368,6 +369,11 @@ pub async fn serve(server_state: ServerState) -> AnyhowResult<()>
           .service(
             web::resource("/model/{token}")
               .route(web::get().to(get_tts_model_handler))
+              .route(web::head().to(|| HttpResponse::Ok()))
+          )
+          .service(
+            web::resource("/model/{model_token}/count")
+              .route(web::get().to(get_tts_model_use_count_handler))
               .route(web::head().to(|| HttpResponse::Ok()))
           )
           .service(
