@@ -81,6 +81,9 @@ use crate::server_state::{ServerState, EnvConfig};
 use crate::shared_constants::{DEFAULT_RUST_LOG, DEFAULT_MYSQL_PASSWORD};
 use crate::util::encrypted_sort_id::SortKeyCrypto;
 use log::{info};
+use r2d2_redis::RedisConnectionManager;
+use r2d2_redis::r2d2;
+use r2d2_redis::redis::Commands;
 use sqlx::MySqlPool;
 use sqlx::mysql::MySqlPoolOptions;
 use std::sync::Arc;
@@ -149,6 +152,11 @@ async fn main() -> AnyhowResult<()> {
     mysql_pool: pool.clone(), // NB: Pool is clone/sync/send-safe
   };
 
+  let redis_manager = RedisConnectionManager::new("redis://localhost")?;
+
+  let redis_pool = r2d2::Pool::builder()
+      .build(redis_manager)?;
+
   info!("Reading env vars and setting up utils...");
 
   let bind_address = easyenv::get_env_string_or_default("BIND_ADDRESS", DEFAULT_BIND_ADDRESS);
@@ -204,6 +212,7 @@ async fn main() -> AnyhowResult<()> {
     },
     hostname: server_hostname,
     mysql_pool: pool,
+    redis_pool,
     firehose_publisher,
     cookie_manager,
     session_checker,

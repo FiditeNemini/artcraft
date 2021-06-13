@@ -7,20 +7,22 @@ use actix_web::http::StatusCode;
 use actix_web::{Responder, web, HttpResponse, error, HttpRequest};
 use crate::database_helpers::enums::{DownloadUrlType, CreatorSetVisibility, W2lTemplateType};
 use crate::http_server::web_utils::ip_address::get_request_ip;
+use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 use crate::server_state::ServerState;
 use crate::util::random_prefix_crockford_token::random_prefix_crockford_token;
+use crate::util::redis_keys::RedisKeys;
+use crate::validations::check_for_slurs::contains_slurs;
 use crate::validations::model_uploads::validate_model_title;
 use crate::validations::passwords::validate_passwords;
 use crate::validations::username::validate_username;
 use derive_more::{Display, Error};
 use log::{info, warn, log};
+use r2d2_redis::redis::Commands;
 use regex::Regex;
 use sqlx::error::DatabaseError;
 use sqlx::error::Error::Database;
 use sqlx::mysql::MySqlDatabaseError;
 use std::sync::Arc;
-use crate::validations::check_for_slurs::contains_slurs;
-use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 
 #[derive(Deserialize)]
 pub struct InferTtsRequest {
@@ -90,6 +92,21 @@ pub async fn infer_tts_handler(
 
   // TODO(bt): CHECK DATABASE!
   let model_token = request.tts_model_token.to_string();
+
+  let mut redis = server_state.redis_pool
+      .get()
+      .map_err(|e| {
+        warn!("redis error: {:?}", e);
+        InferTtsError::ServerError
+      })?;
+
+  let redis_count_key = RedisKeys::tts_model_usage_count(&model_token);
+
+  redis.incr(&redis_count_key, 1)
+      .map_err(|e| {
+        warn!("redis error: {:?}", e);
+        InferTtsError::ServerError
+      })?;
 
   let ip_address = get_request_ip(&http_request);
   let creator_set_visibility = "public".to_string();

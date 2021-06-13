@@ -3,6 +3,7 @@ use crate::common_queries::firehose_publisher::FirehosePublisher;
 use crate::http_server::web_utils::cookie_manager::CookieManager;
 use crate::http_server::web_utils::session_checker::SessionChecker;
 use crate::util::encrypted_sort_id::SortKeyCrypto;
+use r2d2_redis::{r2d2, RedisConnectionManager};
 use sqlx::MySqlPool;
 
 /// State that is injected into every endpoint.
@@ -14,6 +15,8 @@ pub struct ServerState {
   pub hostname: String,
 
   pub mysql_pool: MySqlPool,
+
+  pub redis_pool: r2d2::Pool<RedisConnectionManager>,
 
   pub cookie_manager: CookieManager,
 

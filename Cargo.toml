@@ -55,7 +55,7 @@ uuid = { version = "0.8.2", features = ["v4"] }
 #tokio = { version = "1.6.0", features = ["macros"] }
 tokio = { version = "0.2.25", features = ["macros"] }
 
-# Database
+# MySql Database
 # "offline" supports typesafe builds without a live database
 # "rustls" doesn't appear to work with IP addresses, per:
 # https://github.com/launchbadge/sqlx/issues/1095#issuecomment-798050828
@@ -63,6 +63,9 @@ tokio = { version = "0.2.25", features = ["macros"] }
 # NB: We can't use `sqlx` 0.5 due to the `rust-s3` bug that requires a Tokio 1.x -> 0.2 downgrade
 #sqlx = { version = "0.5", features = [ "mysql", "runtime-actix-native-tls", "offline", "chrono" ] }
 sqlx = { version = "0.4", features = [ "mysql", "runtime-tokio-native-tls", "offline", "chrono" ] }
+
+# Redis Database
+r2d2_redis = "0.14.0"
 
 # Files
 data-encoding = "2.3.2"
