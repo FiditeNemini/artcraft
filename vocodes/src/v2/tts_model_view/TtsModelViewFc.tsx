@@ -198,14 +198,14 @@ function TtsModelViewFc(props: Props) {
         </thead>
         <tbody>
           <tr>
-            <th>Use Count</th>
-            <td>{humanUseCount}</td>
-          </tr>
-          <tr>
             <th>Creator</th>
             <td>
               <Link to={creatorLink}>{ttsModel?.creator_display_name}</Link>
             </td>
+          </tr>
+          <tr>
+            <th>Use Count</th>
+            <td>{humanUseCount}</td>
           </tr>
           <tr>
             <th>Title</th>

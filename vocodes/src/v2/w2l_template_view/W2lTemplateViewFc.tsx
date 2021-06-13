@@ -378,14 +378,14 @@ function W2lTemplateViewFc(props: Props) {
         </thead>
         <tbody>
           <tr>
-            <th>Use Count</th>
-            <td>{humanUseCount}</td>
-          </tr>
-          <tr>
             <th>Creator</th>
             <td>
               <Link to={creatorLink}>{w2lTemplate?.creator_display_name}</Link>
             </td>
+          </tr>
+          <tr>
+            <th>Use Count</th>
+            <td>{humanUseCount}</td>
           </tr>
           <tr>
             <th>Title</th>
