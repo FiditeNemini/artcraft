@@ -31,7 +31,7 @@ interface W2lTemplate {
   duration_millis: number,
   maybe_image_object_name: string,
   maybe_video_object_name: string,
-  is_mod_public_listing_approved: boolean | null,
+  is_public_listing_approved: boolean | null,
   created_at: string,
   updated_at: string,
   deleted_at: string | undefined | null,
@@ -83,7 +83,7 @@ function W2lTemplateViewFc(props: Props) {
 
       setW2lTemplate(templatesResponse.template)
 
-      let modApprovalState = templatesResponse?.template?.is_mod_public_listing_approved;
+      let modApprovalState = templatesResponse?.template?.is_public_listing_approved;
       if (modApprovedFormValue === undefined || modApprovalState === null) {
         modApprovalState = true;
       }
@@ -259,7 +259,7 @@ function W2lTemplateViewFc(props: Props) {
   let modApprovalStatus = '';
   let defaultModValue = modApprovedFormValue ? "true" : "false";
 
-  switch (w2lTemplate?.is_mod_public_listing_approved) {
+  switch (w2lTemplate?.is_public_listing_approved) {
     case null:
       modApprovalStatus = 'Not yet (ask for approval in our Discord)';
       break;
