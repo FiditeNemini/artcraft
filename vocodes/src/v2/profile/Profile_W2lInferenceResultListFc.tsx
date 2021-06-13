@@ -22,6 +22,8 @@ interface W2lInferenceResult {
   maybe_creator_username?: string,
   maybe_creator_display_name?: string,
 
+  maybe_creator_result_id: number | null,
+  
   file_size_bytes: number,
   frame_width: number,
   frame_height: number,
@@ -100,6 +102,7 @@ function ProfileW2lInferenceResultsListFc(props: Props) {
 
     rows.push(
       <tr key={result.w2l_result_token}>
+        <td>{result.maybe_creator_result_id}</td>
           <th><Link to={inferenceLink}><span role="img" aria-label="result link">▶️</span> Result</Link></th>
         <th><Link to={templateLink}>{templateTitle}</Link></th>
         <td>(custom audio)</td>
@@ -120,6 +123,7 @@ function ProfileW2lInferenceResultsListFc(props: Props) {
       <table className="table">
         <thead>
           <tr>
+            <th><abbr title="Detail">#</abbr></th>
             <th><abbr title="Detail">Result Link</abbr></th>
             <th><abbr title="Detail">Template</abbr></th>
             <th><abbr title="Detail">Audio Source</abbr></th>
