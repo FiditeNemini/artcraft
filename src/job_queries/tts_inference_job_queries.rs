@@ -217,6 +217,10 @@ WHERE id = ?
   Ok(())
 }
 
+pub struct SyntheticIdRecord {
+  pub next_id: i64,
+}
+
 pub async fn insert_tts_result<P: AsRef<Path>>(
   pool: &MySqlPool,
   job: &TtsInferenceJobRecord,
@@ -266,6 +270,7 @@ ON DUPLICATE KEY UPDATE
     match query_result {
       Ok(_) => {},
       Err(err) => {
+        //transaction.rollback().await?;
         warn!("Transaction failure: {:?}", err);
       }
     }
@@ -296,7 +301,6 @@ LIMIT 1
     };
 
     let next_id = record.next_id as u64;
-
     maybe_creator_synthetic_id = Some(next_id);
   }
 
@@ -352,6 +356,7 @@ SET
       },
       Err(err) => {
         // TODO: handle better
+        //transaction.rollback().await?;
         return Err(anyhow!("Mysql error: {:?}", err));
       }
     };
@@ -362,10 +367,6 @@ SET
   transaction.commit().await?;
 
   Ok((record_id, inference_result_token.clone()))
-}
-
-pub struct SyntheticIdRecord {
-  pub next_id: i64,
 }
 
 pub struct TtsModelRecord2 {

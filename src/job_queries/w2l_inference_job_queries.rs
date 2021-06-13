@@ -213,6 +213,7 @@ WHERE id = ?
 
   Ok(())
 }
+
 pub async fn mark_w2l_inference_job_done(
   pool: &MySqlPool,
   job: &W2lInferenceJobRecord,
@@ -241,6 +242,10 @@ WHERE id = ?
   Ok(())
 }
 
+pub struct SyntheticIdRecord {
+  pub next_id: i64,
+}
+
 pub async fn insert_w2l_result<P: AsRef<Path>>(
   pool: &MySqlPool,
   job: &W2lInferenceJobRecord,
@@ -259,7 +264,67 @@ pub async fn insert_w2l_result<P: AsRef<Path>>(
     .display()
     .to_string();
 
-  let query_result = sqlx::query!(
+  let maybe_creator_user_token = job.maybe_creator_user_token.clone();
+  let mut maybe_creator_synthetic_id : Option<u64> = None;
+
+  let mut transaction = pool.begin().await?;
+
+  if let Some(creator_user_token) = maybe_creator_user_token.as_deref() {
+    let query_result = sqlx::query!(
+        r#"
+INSERT INTO w2l_result_synthetic_ids
+SET
+  user_token = ?,
+  next_id = 1
+ON DUPLICATE KEY UPDATE
+  user_token = ?,
+  next_id = next_id + 1
+        "#,
+      creator_user_token,
+      creator_user_token
+    )
+        .execute(&mut transaction)
+        .await;
+
+    match query_result {
+      Ok(_) => {},
+      Err(err) => {
+        //transaction.rollback().await?;
+        warn!("Transaction failure: {:?}", err);
+      }
+    }
+
+    let query_result = sqlx::query_as!(
+    SyntheticIdRecord,
+        r#"
+SELECT
+  next_id
+FROM
+  w2l_result_synthetic_ids
+WHERE
+  user_token = ?
+LIMIT 1
+        "#,
+      creator_user_token,
+    )
+        .fetch_one(&mut transaction)
+        .await;
+
+    let record : SyntheticIdRecord = match query_result {
+      Ok(record) => record,
+      Err(err) => {
+        warn!("Transaction failure: {:?}", err);
+        //transaction.rollback().await?;
+        return Err(anyhow!("Transaction failure: {:?}", err));
+      }
+    };
+
+    let next_id = record.next_id as u64;
+    maybe_creator_synthetic_id = Some(next_id);
+  }
+
+  let record_id = {
+    let query_result = sqlx::query!(
         r#"
 INSERT INTO w2l_results
 SET
@@ -268,6 +333,8 @@ SET
   maybe_creator_user_token = ?,
   creator_ip_address = ?,
   creator_set_visibility = 'public',
+
+  maybe_creator_synthetic_id = ?,
 
   public_bucket_video_path = ?,
 
@@ -282,6 +349,8 @@ SET
       job.maybe_creator_user_token.clone(),
       job.creator_ip_address.clone(),
 
+      maybe_creator_synthetic_id,
+
       bucket_video_result_path,
 
       file_size_bytes,
@@ -290,18 +359,24 @@ SET
       frame_height,
       duration_millis
     )
-    .execute(pool)
-    .await;
+        .execute(&mut transaction)
+        .await;
 
-  let record_id = match query_result {
-    Ok(res) => {
-      res.last_insert_id()
-    },
-    Err(err) => {
-      // TODO: handle better
-      return Err(anyhow!("Mysql error: {:?}", err));
-    }
+    let record_id = match query_result {
+      Ok(res) => {
+        res.last_insert_id()
+      },
+      Err(err) => {
+        // TODO: handle better
+        transaction.rollback().await?;
+        return Err(anyhow!("Mysql error: {:?}", err));
+      }
+    };
+
+    record_id
   };
+
+  transaction.commit().await?;
 
   Ok((record_id, inference_result_token.clone()))
 }
