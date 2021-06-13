@@ -76,7 +76,7 @@ function Table({
   // Listen for changes in pagination and use the state to fetch our new data
   React.useEffect(() => {
     //console.log('calliong fetchData', nextCursor)
-    fetchData({ pageIndex, pageSize, nextCursor })
+    //fetchData({ pageIndex, pageSize, nextCursor })
   }, [fetchData, pageIndex, pageSize, nextCursor])
 
 
@@ -142,6 +142,14 @@ function Table({
         This is just a very basic UI implementation:
       */}
       <div className="pagination">
+        <button onClick={() => {
+          console.log('gotoPage', nextCursor)
+          //nextPage()
+          fetchData({ pageIndex, pageSize, nextCursor })
+        }} disabled={!canNextPage}>
+          {'NEXT PAGE WITH CURSOR'}
+        </button>{' '}
+
         <button onClick={() => gotoPage(0)} disabled={!canPreviousPage}>
           {'<<'}
         </button>{' '}
@@ -253,7 +261,7 @@ function ProfileTtsInferenceResultsListTableFc(props: Props) {
 
 
   const fetchData = React.useCallback(( { pageSize, pageToken, nextCursor} ) => {
-    const api = new ApiConfig();
+    console.log('fetchData', pageSize, pageToken, nextCursor);
 
     //console.log('callback args', pageSize, pageToken, nextCursor)
 
@@ -262,12 +270,13 @@ function ProfileTtsInferenceResultsListTableFc(props: Props) {
       limit: 5,
     };
 
-    //if (nextCursor !== undefined) {
-    //  args.cursor = nextCursor;
-    //}
+    if (nextCursor !== undefined) {
+      args.cursor = nextCursor;
+    }
 
     //console.log('nextCursor', nextCursor);
 
+    const api = new ApiConfig();
     const endpointUrl = api.listTtsInferenceResultsForUser(args);
 
     //console.log('url', endpointUrl);
