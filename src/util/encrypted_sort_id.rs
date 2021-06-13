@@ -12,7 +12,8 @@ use base64::{Config, CharacterSet};
 /// This gets encrypted and sent to the frontend as an opaque handle.
 #[derive(Serialize, Deserialize)]
 pub struct SortId {
-  pub entropy: u32,
+  // NB: Entropy is causing React to panic on re-renders
+  //pub entropy: u32,
   pub column_id: u64,
 }
 
@@ -39,7 +40,7 @@ impl SortKeyCrypto {
     let mut rng = rand::thread_rng();
 
     let payload = SortId {
-      entropy: rng.next_u32(),
+      //entropy: rng.next_u32(),
       column_id: id,
     };
 
@@ -72,19 +73,19 @@ mod tests {
   use crate::util::encrypted_sort_id::SortKeyCrypto;
   use std::collections::HashSet;
 
-  #[test]
-  fn encrypt_entropy_means_no_duplicate_values() {
-    let sorter = SortKeyCrypto::new("secret");
-
-    let mut encrypted_tokens = HashSet::new();
-
-    for i in 0 .. 1000 {
-      let encrypted = sorter.encrypt_id(1234).unwrap();
-      encrypted_tokens.insert(encrypted);
-    }
-
-    assert_eq!(encrypted_tokens.len(), 1000);
-  }
+//  #[test]
+//  fn encrypt_entropy_means_no_duplicate_values() {
+//    let sorter = SortKeyCrypto::new("secret");
+//
+//    let mut encrypted_tokens = HashSet::new();
+//
+//    for i in 0 .. 1000 {
+//      let encrypted = sorter.encrypt_id(1234).unwrap();
+//      encrypted_tokens.insert(encrypted);
+//    }
+//
+//    assert_eq!(encrypted_tokens.len(), 1000);
+//  }
 
   #[test]
   fn encrypt_roundtrip() {
