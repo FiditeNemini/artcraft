@@ -22,6 +22,7 @@ pub struct TtsInferenceRecordForList {
   pub tts_result_token: String,
 
   pub tts_model_token: String,
+  pub tts_model_title: String,
   pub raw_inference_text: String,
 
   pub maybe_creator_user_token: Option<String>,
@@ -114,6 +115,7 @@ impl ListTtsResultsQueryBuilder {
           TtsInferenceRecordForList {
             tts_result_token: r.tts_result_token.clone(),
             tts_model_token: r.tts_model_token.clone(),
+            tts_model_title: r.tts_model_title.clone(),
             raw_inference_text: r.raw_inference_text.clone(),
             maybe_creator_user_token: r.maybe_creator_user_token.clone(),
             maybe_creator_username: r.maybe_creator_username.clone(),
@@ -174,6 +176,7 @@ SELECT
     tts_results.token as tts_result_token,
 
     tts_results.model_token as tts_model_token,
+    tts_models.title as tts_model_title,
     tts_results.raw_inference_text as raw_inference_text,
 
     users.token as maybe_creator_user_token,
@@ -269,6 +272,7 @@ pub struct RawInternalTtsRecord {
   pub tts_result_token: String,
 
   pub tts_model_token: String,
+  pub tts_model_title: String,
   pub raw_inference_text: String,
 
   pub maybe_creator_user_token : Option<String>,
