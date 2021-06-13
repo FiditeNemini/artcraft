@@ -22,6 +22,8 @@ interface TtsInferenceResult {
   maybe_creator_username?: string,
   maybe_creator_display_name?: string,
 
+  maybe_creator_result_id: number | null,
+
   file_size_bytes: number,
   duration_millis: number,
 
@@ -98,6 +100,7 @@ function ProfileTtsInferenceResultsListFc(props: Props) {
 
     rows.push(
       <tr key={result.tts_result_token}>
+        <td>{result.maybe_creator_result_id}</td>
         <th>
           <Link to={inferenceLink}><span role="img" aria-label="result link">▶️</span> {text}</Link>
           &nbsp;
@@ -120,6 +123,7 @@ function ProfileTtsInferenceResultsListFc(props: Props) {
       <table className="table">
         <thead>
           <tr>
+            <th><abbr title="Detail">#</abbr></th>
             <th><abbr title="Detail">Download &amp; Play Link</abbr></th>
             <th><abbr title="Detail">Model</abbr></th>
             <th><abbr title="Detail">Duration</abbr></th>
