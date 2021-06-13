@@ -1,10 +1,12 @@
-import React, { useState, useEffect } from 'react';
-import { ApiConfig } from '../../common/ApiConfig';
+import React, { useState, useEffect, useCallback } from 'react';
+import { ApiConfig, ListW2lInferenceResultsForUserArgs } from '../../common/ApiConfig';
 import { Link } from "react-router-dom";
 
 interface W2lInferenceResultListResponsePayload {
   success: boolean,
   results: Array<W2lInferenceResult>,
+  cursor_next: string | null | undefined,
+  cursor_previous: string | null | undefined,
 }
 
 interface W2lInferenceResult {
@@ -35,9 +37,24 @@ interface Props {
 function ProfileW2lInferenceResultsListFc(props: Props) {
   const [w2lResults, setW2lResults] = useState<Array<W2lInferenceResult>>([]);
 
-  useEffect(() => {
+  const [nextCursor, setNextCursor] = useState<string|null>(null);
+  const [previousCursor, setPreviousCursor] = useState<string|null>(null);
+
+  const getPage = useCallback((cursor : string|null, reverse: boolean) => {
+    let args : ListW2lInferenceResultsForUserArgs = {
+      username: props.username,
+      limit: 5,
+    };
+
+    if (cursor !== null) {
+      args.cursor = cursor;
+      if (reverse) {
+        args.cursor_is_reversed = true;
+      }
+    }
+
     const api = new ApiConfig();
-    const endpointUrl = api.listW2lInferenceResultsForUser(props.username);
+    const endpointUrl = api.listW2lInferenceResultsForUser(args);
 
     fetch(endpointUrl, {
       method: 'GET',
@@ -54,11 +71,16 @@ function ProfileW2lInferenceResultsListFc(props: Props) {
       }
 
       setW2lResults(templatesResponse.results)
+      setNextCursor(templatesResponse.cursor_next || null)
+      setPreviousCursor(templatesResponse.cursor_previous || null)
     })
     .catch(e => {
-      //this.props.onSpeakErrorCallback();
     });
-  }, [props.username]); // NB: Empty array dependency sets to run ONLY on mount
+  }, [props.username]);
+
+  useEffect(() => {
+    getPage(null, false);
+  }, [getPage, props.username]);
 
   let rows : Array<JSX.Element> = [];
   
@@ -80,6 +102,12 @@ function ProfileW2lInferenceResultsListFc(props: Props) {
     );
   });
 
+  // Disable if there is no "next" or "previous" cursor.
+  // However, let the buttosn show up if there are no results (empty payload) 
+  // to get unstuck. Come up with a better fix for this.
+  let prevDisabled = !previousCursor && rows.length != 0;
+  let nextDisabled = !nextCursor && rows.length != 0;
+
   return (
     <div>
       <table className="table">
@@ -96,6 +124,9 @@ function ProfileW2lInferenceResultsListFc(props: Props) {
           {rows}
         </tbody>
       </table>
+
+      <button className="button is-info" onClick={() => getPage(previousCursor, true)} disabled={prevDisabled}>&lt; Get newer</button> &nbsp;
+      <button className="button is-info" onClick={() => getPage(nextCursor, false)} disabled={nextDisabled}>Get older&gt;</button>
     </div>
   )
 }

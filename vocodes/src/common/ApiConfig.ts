@@ -7,6 +7,14 @@ export interface ListTtsInferenceResultsForUserArgs {
   limit?: number
 };
 
+export interface ListW2lInferenceResultsForUserArgs {
+  username: string, 
+  cursor?: string,
+  cursor_is_reversed?: boolean,
+  sort_ascending?: boolean,
+  limit?: number
+};
+
 class ApiConfig {
   
   isLocalDev: boolean;
@@ -151,8 +159,31 @@ class ApiConfig {
     return `${this.getScheme()}://${this.getNewApiHost()}/w2l/upload_template_job/${jobToken}`;
   }
 
-  listW2lInferenceResultsForUser(username: string) : string {
-    return `${this.getScheme()}://${this.getNewApiHost()}/user/${username}/w2l_results`;
+  listW2lInferenceResultsForUser(params: ListTtsInferenceResultsForUserArgs) : string {
+    const base_url = `${this.getScheme()}://${this.getNewApiHost()}/user/${params.username}/w2l_results`;
+
+    let query = "";
+    let query_prepend = "?";
+
+    if (params.cursor !== undefined) {
+      query += `${query_prepend}cursor=${params.cursor}`;
+      query_prepend = "&";
+
+      if (params.cursor_is_reversed !== undefined) {
+        query += `${query_prepend}cursor_is_reversed=${params.cursor_is_reversed}`;
+      }
+    }
+
+    if (params.sort_ascending !== undefined) {
+      query += `${query_prepend}sort_ascending=${params.sort_ascending}`;
+      query_prepend = "&";
+    }
+
+    if (params.limit !== undefined) {
+      query += `${query_prepend}limit=${params.limit}`;
+    }
+
+    return base_url + query;
   }
 
   firehoseEvents() : string {

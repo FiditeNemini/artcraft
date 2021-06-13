@@ -70,13 +70,12 @@ function ProfileTtsInferenceResultsListFc(props: Props) {
       setPreviousCursor(modelsResponse.cursor_previous || null)
     })
     .catch(e => {
-      //this.props.onSpeakErrorCallback();
     });
   }, [props.username]);
 
   useEffect(() => {
     getPage(null, false);
-  }, [getPage, props.username]); // NB: Empty array dependency sets to run ONLY on mount
+  }, [getPage, props.username]);
 
   let rows : Array<JSX.Element> = [];
   
@@ -101,6 +100,12 @@ function ProfileTtsInferenceResultsListFc(props: Props) {
     );
   });
 
+  // Disable if there is no "next" or "previous" cursor.
+  // However, let the buttosn show up if there are no results (empty payload) 
+  // to get unstuck. Come up with a better fix for this.
+  let prevDisabled = !previousCursor && rows.length != 0;
+  let nextDisabled = !nextCursor && rows.length != 0;
+
   return (
     <div>
       <table className="table">
@@ -117,8 +122,8 @@ function ProfileTtsInferenceResultsListFc(props: Props) {
         </tbody>
       </table>
 
-      <button className="button is-info" onClick={() => getPage(previousCursor, true)}>&lt; Get newer</button> &nbsp;
-      <button className="button is-info" onClick={() => getPage(nextCursor, false)}>Get older&gt;</button>
+      <button className="button is-info" onClick={() => getPage(previousCursor, true)} disabled={prevDisabled}>&lt; Get newer</button> &nbsp;
+      <button className="button is-info" onClick={() => getPage(nextCursor, false)} disabled={nextDisabled}>Get older&gt;</button>
     </div>
   )
 }
