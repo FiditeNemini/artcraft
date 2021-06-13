@@ -29,6 +29,8 @@ pub struct TtsInferenceRecordForList {
   pub maybe_creator_username: Option<String>,
   pub maybe_creator_display_name: Option<String>,
 
+  pub maybe_creator_result_id: Option<u64>,
+
   pub file_size_bytes: u32,
   pub duration_millis: u32,
 
@@ -120,6 +122,7 @@ impl ListTtsResultsQueryBuilder {
             maybe_creator_user_token: r.maybe_creator_user_token.clone(),
             maybe_creator_username: r.maybe_creator_username.clone(),
             maybe_creator_display_name: r.maybe_creator_display_name.clone(),
+            maybe_creator_result_id: r.maybe_creator_result_id.map(|v| v as u64).clone(),
             file_size_bytes: if r.file_size_bytes > 0 { r.file_size_bytes as u32 } else { 0 },
             duration_millis: if r.duration_millis > 0 { r.duration_millis as u32 } else { 0 },
             created_at: r.created_at,
@@ -182,6 +185,8 @@ SELECT
     users.token as maybe_creator_user_token,
     users.username as maybe_creator_username,
     users.display_name as maybe_creator_display_name,
+
+    tts_results.maybe_creator_synthetic_id as maybe_creator_result_id,
 
     tts_results.file_size_bytes,
     tts_results.duration_millis,
@@ -278,6 +283,8 @@ pub struct RawInternalTtsRecord {
   pub maybe_creator_user_token : Option<String>,
   pub maybe_creator_username: Option<String>,
   pub maybe_creator_display_name: Option<String>,
+
+  pub maybe_creator_result_id: Option<i64>,
 
   pub file_size_bytes : i64,
   pub duration_millis : i64,

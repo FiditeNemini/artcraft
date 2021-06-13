@@ -247,15 +247,6 @@ pub async fn insert_tts_result<P: AsRef<Path>>(
   let mut transaction = pool.begin().await?;
 
   if let Some(creator_user_token) = maybe_creator_user_token.as_deref() {
-
-    info!(">>>>> Creating synthetic for {}", creator_user_token);
-
-    //let synthetic_id = {
-    //  let id = get_incremented_synthetic_id(creator_user_token, &mut transaction).await?;
-    //  id
-    //};
-    //maybe_creator_synthetic_id = Some(synthetic_id);
-
     let query_result = sqlx::query!(
         r#"
 INSERT INTO tts_result_synthetic_ids
@@ -305,8 +296,6 @@ LIMIT 1
     };
 
     let next_id = record.next_id as u64;
-
-    info!(">>>>> synthetic is {}", next_id);
 
     maybe_creator_synthetic_id = Some(next_id);
   }
@@ -378,71 +367,6 @@ SET
 pub struct SyntheticIdRecord {
   pub next_id: i64,
 }
-
-/*async fn get_incremented_synthetic_id<'a>(
-  user_token: &str,
-  transaction: &mut Transaction<'a, MySql>
-) -> AnyhowResult<u64> {
-
-  let do_rollback = {
-    let query_result = sqlx::query!(
-        r#"
-INSERT INTO tts_result_synthetic_ids
-SET
-  user_token = ?,
-  next_id = 1
-ON DUPLICATE KEY UPDATE
-  user_token = ?,
-  next_id = next_id + 1
-        "#,
-      user_token,
-      user_token
-    )
-        .execute(transaction)
-        .await;
-
-    match query_result {
-      Ok(_) => false,
-      Err(err) => {
-        warn!("Transaction failure: {:?}", err);
-        true
-      }
-    }
-  };
-
-  if do_rollback {
-    transaction.rollback().await?;
-    return Err(anyhow!("Transaction failure"));
-  }
-
-  let query_result = sqlx::query_as!(
-    SyntheticIdRecord,
-        r#"
-SELECT
-  next_id
-FROM
-  tts_result_synthetic_ids
-WHERE
-  user_token = ?
-LIMIT 1
-        "#,
-      user_token,
-    )
-      .fetch_one(transaction)
-      .await;
-
-  let record : SyntheticIdRecord = match query_result {
-    Ok(record) => record,
-    Err(err) => {
-      warn!("Transaction failure: {:?}", err);
-      transaction.rollback().await?;
-      return Err(anyhow!("Transaction failure: {:?}", err));
-    }
-  };
-
-  let next_id = record.next_id as u64;
-  Ok(next_id)
-}*/
 
 pub struct TtsModelRecord2 {
   pub model_token: String,
