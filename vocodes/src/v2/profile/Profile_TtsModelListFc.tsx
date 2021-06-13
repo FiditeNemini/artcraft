@@ -47,7 +47,6 @@ function ProfileTtsModelListFc(props: Props) {
       setTtsModels(modelsResponse.models)
     })
     .catch(e => {
-      //this.props.onSpeakErrorCallback();
     });
   }, [props.username]); // NB: Empty array dependency sets to run ONLY on mount
 

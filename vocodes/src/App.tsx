@@ -13,7 +13,7 @@ import { TtsInferenceJob, TtsInferenceJobStateResponsePayload } from './jobs/Tts
 import { W2lInferenceJob, W2lInferenceJobStateResponsePayload } from './jobs/W2lInferenceJobs';
 import { TtsModelUploadJob, TtsModelUploadJobStateResponsePayload } from './jobs/TtsModelUploadJobs';
 import { W2lTemplateUploadJob, W2lTemplateUploadJobStateResponsePayload } from './jobs/W2lTemplateUploadJobs';
-import { JobState, jobStateCanChange } from './jobs/JobStates';
+import { jobStateCanChange } from './jobs/JobStates';
 
 enum MigrationMode {
   NEW_VOCODES,

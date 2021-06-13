@@ -112,8 +112,8 @@ function ProfileW2lInferenceResultsListFc(props: Props) {
   // Disable if there is no "next" or "previous" cursor.
   // However, let the buttosn show up if there are no results (empty payload) 
   // to get unstuck. Come up with a better fix for this.
-  let prevDisabled = !previousCursor && rows.length != 0;
-  let nextDisabled = !nextCursor && rows.length != 0;
+  let prevDisabled = !previousCursor && rows.length !== 0;
+  let nextDisabled = !nextCursor && rows.length !== 0;
 
   return (
     <div>
