@@ -20,9 +20,11 @@ use crate::util::buckets::bucket_paths::hash_to_bucket_path;
 use crate::util::random_crockford_token::random_crockford_token;
 use crate::util::random_prefix_crockford_token::random_prefix_crockford_token;
 use crate::util::random_uuid::generate_random_uuid;
+use crate::util::redis_keys::RedisKeys;
 use derive_more::{Display, Error};
 use futures::{StreamExt, TryStreamExt};
 use log::{warn, info};
+use r2d2_redis::redis::Commands;
 use sqlx::MySqlPool;
 use sqlx::error::Error::Database;
 use std::io::Write;
@@ -213,6 +215,21 @@ pub async fn enqueue_infer_w2l_with_uploads(
   if !exists {
     return Err(InferW2lWithUploadError::BadInput("Template does not exist".to_string()));
   }
+
+  let mut redis = server_state.redis_pool
+      .get()
+      .map_err(|e| {
+        warn!("redis error: {:?}", e);
+        InferW2lWithUploadError::ServerError
+      })?;
+
+  let redis_count_key = RedisKeys::w2l_template_usage_count(&template_token);
+
+  redis.incr(&redis_count_key, 1)
+      .map_err(|e| {
+        warn!("redis error: {:?}", e);
+        InferW2lWithUploadError::ServerError
+      })?;
 
   // ==================== ANALYZE AND UPLOAD AUDIO FILE ==================== //
 

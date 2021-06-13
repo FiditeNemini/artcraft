@@ -89,6 +89,7 @@ use sqlx::MySqlPool;
 use sqlx::mysql::MySqlPoolOptions;
 use std::sync::Arc;
 use crate::http_server::endpoints::tts::get_tts_model_use_count::get_tts_model_use_count_handler;
+use crate::http_server::endpoints::w2l::get_w2l_template_use_count::get_w2l_template_use_count_handler;
 
 // TODO TODO TODO TODO
 // TODO TODO TODO TODO
@@ -423,6 +424,11 @@ pub async fn serve(server_state: ServerState) -> AnyhowResult<()>
           .service(
             web::resource("/template/{token}")
               .route(web::get().to(get_w2l_template_handler))
+              .route(web::head().to(|| HttpResponse::Ok()))
+          )
+          .service(
+            web::resource("/template/{template_token}/count")
+              .route(web::get().to(get_w2l_template_use_count_handler))
               .route(web::head().to(|| HttpResponse::Ok()))
           )
           .service(
