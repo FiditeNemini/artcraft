@@ -60,6 +60,10 @@ class ApiConfig {
     return `${this.getScheme()}://${this.getNewApiHost()}/tts/model/${modelSlug}`;
   }
 
+  getTtsModelUseCount(modelSlug: string) : string {
+    return `${this.getScheme()}://${this.getNewApiHost()}/tts/model/${modelSlug}/count`;
+  }
+
   viewTtsInferenceResult(token: string) : string {
     return `${this.getScheme()}://${this.getNewApiHost()}/tts/result/${token}`;
   }
@@ -117,6 +121,10 @@ class ApiConfig {
 
   viewW2l(templateSlug: string) : string {
     return `${this.getScheme()}://${this.getNewApiHost()}/w2l/template/${templateSlug}`;
+  }
+
+  getW2lTemplateUseCount(templateSlug: string) : string {
+    return `${this.getScheme()}://${this.getNewApiHost()}/w2l/template/${templateSlug}/count`;
   }
 
   moderateW2l(templateSlug: string) : string {

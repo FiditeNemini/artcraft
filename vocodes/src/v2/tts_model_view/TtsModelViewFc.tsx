@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 //import axios from 'axios';
 import { ApiConfig } from '../../common/ApiConfig';
 import { EnqueueJobResponsePayload } from '../tts_model_list/TtsModelFormFc';
@@ -12,6 +12,11 @@ import { v1 as uuidv1 } from 'uuid';
 interface TtsModelViewResponsePayload {
   success: boolean,
   model: TtsModel,
+}
+
+interface TtsModelUseCountResponsePayload {
+  success: boolean,
+  count: number | null | undefined,
 }
 
 interface TtsModel {
@@ -34,12 +39,13 @@ interface Props {
 }
 
 function TtsModelViewFc(props: Props) {
-  let { token } = useParams();
+  let { token } = useParams() as { token : string };
 
   const [ttsModel, setTtsModel] = useState<TtsModel|undefined>(undefined);
+  const [ttsModelUseCount, setTtsModelUseCount] = useState<number|undefined>(undefined);
   const [text, setText] = useState<string>("");
 
-  useEffect(() => {
+  const getModel = useCallback((token) => {
     const api = new ApiConfig();
     const endpointUrl = api.viewTtsModel(token);
 
@@ -59,10 +65,38 @@ function TtsModelViewFc(props: Props) {
 
       setTtsModel(modelsResponse.model)
     })
-    .catch(e => {
-      //this.props.onSpeakErrorCallback();
-    });
+    .catch(e => {});
+  }, [token]);
+
+  const getModelUseCount = useCallback((token) => {
+    const api = new ApiConfig();
+    const endpointUrl = api.getTtsModelUseCount(token);
+
+    fetch(endpointUrl, {
+      method: 'GET',
+      headers: {
+        'Accept': 'application/json',
+      },
+      credentials: 'include',
+    })
+    .then(res => res.json())
+    .then(res => {
+      const modelsResponse : TtsModelUseCountResponsePayload = res;
+      if (!modelsResponse.success) {
+        return;
+      }
+
+      setTtsModelUseCount(modelsResponse.count || undefined)
+    })
+    .catch(e => {});
+  }, [token]);
+
+
+  useEffect(() => {
+    getModel(token);
+    getModelUseCount(token);
   }, [token]); // NB: Empty array dependency sets to run ONLY on mount
+
 
   /*const handleAudioFileChange = (fileList: FileList|null) => {
     if (fileList === null 
@@ -144,6 +178,12 @@ function TtsModelViewFc(props: Props) {
   if (ttsModel?.title !== undefined) {
       title = `${ttsModel.title} model`;
   }
+
+  let humanUseCount : string | number = 'Fetching...';
+
+  if (ttsModelUseCount !== undefined && ttsModelUseCount !== null) {
+    humanUseCount = ttsModelUseCount;
+  }
   
   return (
     <div>
@@ -157,6 +197,10 @@ function TtsModelViewFc(props: Props) {
           </tr>
         </thead>
         <tbody>
+          <tr>
+            <th>Use Count</th>
+            <td>{humanUseCount}</td>
+          </tr>
           <tr>
             <th>Creator</th>
             <td>

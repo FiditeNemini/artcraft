@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
 import { ApiConfig } from '../../common/ApiConfig';
 import { SessionWrapper } from '../../session/SessionWrapper';
@@ -11,6 +11,11 @@ import { W2lTemplateViewDeleteFc } from './W2lTemplateView_DeleteFc';
 interface W2lTemplateViewResponsePayload {
   success: boolean,
   template: W2lTemplate,
+}
+
+interface W2lTemplateUseCountResponsePayload {
+  success: boolean,
+  count: number | null | undefined,
 }
 
 interface W2lTemplate {
@@ -50,6 +55,7 @@ function W2lTemplateViewFc(props: Props) {
 
   // Ajax
   const [w2lTemplate, setW2lTemplate] = useState<W2lTemplate|undefined>(undefined);
+  const [w2lTemplateUseCount, setW2lTemplateUseCount] = useState<number|undefined>(undefined);
 
   // Inference
   const [audioFile, setAudioFile] = useState<File|undefined>(undefined);
@@ -57,7 +63,7 @@ function W2lTemplateViewFc(props: Props) {
   // Moderation
   const [modApprovedFormValue, setModApprovedFormValue] = useState<boolean>(true);
 
-  useEffect(() => {
+  const getTemplate = useCallback((templateSlug: string) => {
     const api = new ApiConfig();
     const endpointUrl = api.viewW2l(templateSlug);
 
@@ -84,9 +90,37 @@ function W2lTemplateViewFc(props: Props) {
 
       setModApprovedFormValue(modApprovalState);
     })
-    .catch(e => {
-      //this.props.onSpeakErrorCallback();
-    });
+    .catch(e => {});
+
+  }, [templateSlug]);
+
+  const getTemplateUseCount = useCallback((templateSlug: string) => {
+    const api = new ApiConfig();
+    const endpointUrl = api.getW2lTemplateUseCount(templateSlug);
+
+    fetch(endpointUrl, {
+      method: 'GET',
+      headers: {
+        'Accept': 'application/json',
+      },
+      credentials: 'include',
+    })
+    .then(res => res.json())
+    .then(res => {
+      const templatesResponse : W2lTemplateUseCountResponsePayload = res;
+      if (!templatesResponse.success) {
+        return;
+      }
+
+      setW2lTemplateUseCount(templatesResponse.count || undefined)
+    })
+    .catch(e => {});
+
+  }, [templateSlug]);
+
+  useEffect(() => {
+    getTemplate(templateSlug);
+    getTemplateUseCount(templateSlug);
   }, [templateSlug]); // NB: Empty array dependency sets to run ONLY on mount
 
   const handleAudioFileChange = (fileList: FileList|null) => {
@@ -281,6 +315,12 @@ function W2lTemplateViewFc(props: Props) {
     );
   }
 
+  let humanUseCount : string | number = 'Fetching...';
+
+  if (w2lTemplateUseCount !== undefined && w2lTemplateUseCount !== null) {
+    humanUseCount = w2lTemplateUseCount;
+  }
+
   return (
     <div>
       <h1 className="title is-1"> Video lip sync template </h1>
@@ -337,6 +377,10 @@ function W2lTemplateViewFc(props: Props) {
           </tr>
         </thead>
         <tbody>
+          <tr>
+            <th>Use Count</th>
+            <td>{humanUseCount}</td>
+          </tr>
           <tr>
             <th>Creator</th>
             <td>
