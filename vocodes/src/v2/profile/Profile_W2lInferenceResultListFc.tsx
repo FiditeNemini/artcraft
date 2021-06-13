@@ -124,7 +124,7 @@ function ProfileW2lInferenceResultsListFc(props: Props) {
             <th><abbr title="Detail">Template</abbr></th>
             <th><abbr title="Detail">Audio Source</abbr></th>
             <th><abbr title="Detail">Duration</abbr></th>
-            <th><abbr title="Value">Creation Date (UTC)</abbr></th>
+            <th><abbr title="Value">Creation Time</abbr></th>
           </tr>
         </thead>
         <tbody>

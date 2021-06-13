@@ -123,7 +123,7 @@ function ProfileTtsInferenceResultsListFc(props: Props) {
             <th><abbr title="Detail">Download &amp; Play Link</abbr></th>
             <th><abbr title="Detail">Model</abbr></th>
             <th><abbr title="Detail">Duration</abbr></th>
-            <th><abbr title="Value">Creation Date (UTC)</abbr></th>
+            <th><abbr title="Value">Creation Time</abbr></th>
           </tr>
         </thead>
         <tbody>

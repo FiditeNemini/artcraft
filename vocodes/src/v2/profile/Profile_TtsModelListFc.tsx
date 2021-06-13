@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { ApiConfig } from '../../common/ApiConfig';
 import { Link } from "react-router-dom";
-import { getRandomInt } from '../../v1/api/Utils';
+import { formatDistance } from 'date-fns';
 
 interface TtsModelListResponsePayload {
   success: boolean,
@@ -51,17 +51,22 @@ function ProfileTtsModelListFc(props: Props) {
     });
   }, [props.username]); // NB: Empty array dependency sets to run ONLY on mount
 
+  const now = new Date();
+
   let rows : Array<JSX.Element> = [];
   
   ttsModels.forEach(model => {
-    let modelTitle = model.title.length < 5 ? `Model: ${model.title}` : model.title;
+    const modelTitle = model.title.length < 5 ? `Model: ${model.title}` : model.title;
 
-    let modelLink = `/tts/${model.model_token}`;
+    const modelLink = `/tts/${model.model_token}`;
+
+    const createTime = new Date(model.created_at);
+    const relativeCreateTime = formatDistance(createTime, now, { addSuffix: true });
 
     rows.push(
       <tr key={model.model_token}>
         <th><Link to={modelLink}>{modelTitle}</Link></th>
-        <td>{model.created_at} s</td>
+        <td>{relativeCreateTime}</td>
       </tr>
     );
   });
@@ -72,7 +77,7 @@ function ProfileTtsModelListFc(props: Props) {
         <thead>
           <tr>
             <th><abbr title="Model Name">Model Name</abbr></th>
-            <th><abbr title="Creation Date">Creation Date (UTC)</abbr></th>
+            <th><abbr title="Creation Date">Creation Time</abbr></th>
           </tr>
         </thead>
         <tbody>
