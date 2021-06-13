@@ -32,16 +32,13 @@ interface Props {
 function ProfileTtsInferenceResultsListFc(props: Props) {
   const [ttsResults, setTtsResults] = useState<Array<TtsInferenceResult>>([]);
 
-  const [currentCursor, setCurrentCursor] = useState<string|null>(null);
   const [nextCursor, setNextCursor] = useState<string|null>(null);
   const [previousCursor, setPreviousCursor] = useState<string|null>(null);
 
   const getPage = useCallback((cursor : string|null, reverse: boolean) => {
-    console.log('get page', cursor);
-
     let args : ListTtsInferenceResultsForUserArgs = {
-      username: props.username ,
-      limit: 5,
+      username: props.username,
+      limit: 25,
     };
 
     if (cursor !== null) {
@@ -79,34 +76,6 @@ function ProfileTtsInferenceResultsListFc(props: Props) {
 
   useEffect(() => {
     getPage(null, false);
-//    let args : ListTtsInferenceResultsForUserArgs = {
-//      username: props.username ,
-//      limit: 5,
-//    };
-//
-//    const api = new ApiConfig();
-//    const endpointUrl = api.listTtsInferenceResultsForUser(args);
-//
-//    fetch(endpointUrl, {
-//      method: 'GET',
-//      headers: {
-//        'Accept': 'application/json',
-//      },
-//      credentials: 'include',
-//    })
-//    .then(res => res.json())
-//    .then(res => {
-//      const modelsResponse : TtsInferenceResultListResponsePayload  = res;
-//      if (!modelsResponse.success) {
-//        return;
-//      }
-//
-//      setTtsResults(modelsResponse.results)
-//      setNextCursor(modelsResponse.cursor_next || null)
-//    })
-//    .catch(e => {
-//      //this.props.onSpeakErrorCallback();
-//    });
   }, [getPage, props.username]); // NB: Empty array dependency sets to run ONLY on mount
 
   let rows : Array<JSX.Element> = [];
@@ -117,14 +86,13 @@ function ProfileTtsInferenceResultsListFc(props: Props) {
     let inferenceLink = `/tts/result/${result.tts_result_token}`;
     let modelLink = `/tts/${result.tts_model_token}`;
 
+    let text = result.raw_inference_text.length < 5 ? `Result: ${result.raw_inference_text}` : result.raw_inference_text;
+
     rows.push(
       <tr key={result.tts_result_token}>
         <th>
-          <Link to={inferenceLink}><span role="img" aria-label="result link">▶️</span> Result</Link>
+          <Link to={inferenceLink}><span role="img" aria-label="result link">▶️</span> {text}</Link>
           &nbsp;
-        </th>
-        <th>
-          {result.raw_inference_text}
         </th>
         <th><Link to={modelLink}>Model</Link></th>
         <td>{duration_seconds} s</td>
@@ -139,7 +107,6 @@ function ProfileTtsInferenceResultsListFc(props: Props) {
         <thead>
           <tr>
             <th><abbr title="Detail">Download &amp; Play Link</abbr></th>
-            <th><abbr title="Detail">Raw Text</abbr></th>
             <th><abbr title="Detail">Model</abbr></th>
             <th><abbr title="Detail">Duration</abbr></th>
             <th><abbr title="Value">Creation Date (UTC)</abbr></th>
