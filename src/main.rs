@@ -78,7 +78,9 @@ use crate::http_server::endpoints::w2l::set_w2l_template_mod_approval::set_w2l_t
 use crate::http_server::web_utils::cookie_manager::CookieManager;
 use crate::http_server::web_utils::session_checker::SessionChecker;
 use crate::server_state::{ServerState, EnvConfig};
-use crate::shared_constants::{DEFAULT_RUST_LOG, DEFAULT_MYSQL_PASSWORD};
+use crate::shared_constants::DEFAULT_MYSQL_CONNECTION_STRING;
+use crate::shared_constants::DEFAULT_REDIS_CONNECTION_STRING;
+use crate::shared_constants::DEFAULT_RUST_LOG;
 use crate::util::encrypted_sort_id::SortKeyCrypto;
 use log::{info};
 use r2d2_redis::RedisConnectionManager;
@@ -141,7 +143,12 @@ async fn main() -> AnyhowResult<()> {
   let db_connection_string =
     easyenv::get_env_string_or_default(
       "MYSQL_URL",
-      DEFAULT_MYSQL_PASSWORD);
+      DEFAULT_MYSQL_CONNECTION_STRING);
+
+  let redis_connection_string =
+      easyenv::get_env_string_or_default(
+        "REDIS_URL",
+        DEFAULT_REDIS_CONNECTION_STRING);
 
   let pool = MySqlPoolOptions::new()
     .max_connections(5)
@@ -152,7 +159,7 @@ async fn main() -> AnyhowResult<()> {
     mysql_pool: pool.clone(), // NB: Pool is clone/sync/send-safe
   };
 
-  let redis_manager = RedisConnectionManager::new("redis://localhost")?;
+  let redis_manager = RedisConnectionManager::new(redis_connection_string)?;
 
   let redis_pool = r2d2::Pool::builder()
       .build(redis_manager)?;

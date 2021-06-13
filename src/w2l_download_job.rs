@@ -44,7 +44,7 @@ use crate::util::random_crockford_token::random_crockford_token;
 use data_encoding::{HEXUPPER, HEXLOWER, HEXLOWER_PERMISSIVE};
 use log::{warn, info};
 use ring::digest::{Context, Digest, SHA256};
-use shared_constants::DEFAULT_MYSQL_PASSWORD;
+use shared_constants::DEFAULT_MYSQL_CONNECTION_STRING;
 use shared_constants::DEFAULT_RUST_LOG;
 use sqlx::MySqlPool;
 use sqlx::mysql::MySqlPoolOptions;
@@ -183,7 +183,7 @@ async fn main() -> AnyhowResult<()> {
   let db_connection_string =
     easyenv::get_env_string_or_default(
       "MYSQL_URL",
-      DEFAULT_MYSQL_PASSWORD);
+      DEFAULT_MYSQL_CONNECTION_STRING);
 
   info!("Connecting to database...");
 
