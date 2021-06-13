@@ -7,7 +7,7 @@ use chrono::{Utc, DateTime};
 use crate::util::anyhow_result::AnyhowResult;
 use crate::util::random_prefix_crockford_token::random_prefix_crockford_token;
 use log::{warn, info};
-use sqlx::MySqlPool;
+use sqlx::{MySqlPool, Transaction, MySql};
 use std::path::Path;
 
 /// table: tts_inference_jobs
@@ -241,7 +241,78 @@ pub async fn insert_tts_result<P: AsRef<Path>>(
 
   let normalized_inference_text = job.raw_inference_text.clone(); // TODO
 
-  let query_result = sqlx::query!(
+  let maybe_creator_user_token = job.maybe_creator_user_token.clone();
+  let mut maybe_creator_synthetic_id : Option<u64> = None;
+
+  let mut transaction = pool.begin().await?;
+
+  if let Some(creator_user_token) = maybe_creator_user_token.as_deref() {
+
+    info!(">>>>> Creating synthetic for {}", creator_user_token);
+
+    //let synthetic_id = {
+    //  let id = get_incremented_synthetic_id(creator_user_token, &mut transaction).await?;
+    //  id
+    //};
+    //maybe_creator_synthetic_id = Some(synthetic_id);
+
+    let query_result = sqlx::query!(
+        r#"
+INSERT INTO tts_result_synthetic_ids
+SET
+  user_token = ?,
+  next_id = 1
+ON DUPLICATE KEY UPDATE
+  user_token = ?,
+  next_id = next_id + 1
+        "#,
+      creator_user_token,
+      creator_user_token
+    )
+        .execute(&mut transaction)
+        .await;
+
+    match query_result {
+      Ok(_) => {},
+      Err(err) => {
+        warn!("Transaction failure: {:?}", err);
+      }
+    }
+
+    let query_result = sqlx::query_as!(
+    SyntheticIdRecord,
+        r#"
+SELECT
+  next_id
+FROM
+  tts_result_synthetic_ids
+WHERE
+  user_token = ?
+LIMIT 1
+        "#,
+      creator_user_token,
+    )
+        .fetch_one(&mut transaction)
+        .await;
+
+    let record : SyntheticIdRecord = match query_result {
+      Ok(record) => record,
+      Err(err) => {
+        warn!("Transaction failure: {:?}", err);
+        transaction.rollback().await?;
+        return Err(anyhow!("Transaction failure: {:?}", err));
+      }
+    };
+
+    let next_id = record.next_id as u64;
+
+    info!(">>>>> synthetic is {}", next_id);
+
+    maybe_creator_synthetic_id = Some(next_id);
+  }
+
+  let record_id = {
+    let query_result = sqlx::query!(
         r#"
 INSERT INTO tts_results
 SET
@@ -253,6 +324,8 @@ SET
   normalized_inference_text = ?,
 
   maybe_creator_user_token = ?,
+  maybe_creator_synthetic_id = ?,
+
   creator_ip_address = ?,
   creator_set_visibility = 'public',
 
@@ -270,7 +343,9 @@ SET
       normalized_inference_text,
       text_hash,
 
-      job.maybe_creator_user_token.clone(),
+      maybe_creator_user_token,
+      maybe_creator_synthetic_id,
+
       job.creator_ip_address.clone(),
 
       bucket_audio_result_path,
@@ -279,21 +354,95 @@ SET
       file_size_bytes,
       duration_millis
     )
-      .execute(pool)
-      .await;
+        .execute(&mut transaction)
+        .await;
 
-  let record_id = match query_result {
-    Ok(res) => {
-      res.last_insert_id()
-    },
-    Err(err) => {
-      // TODO: handle better
-      return Err(anyhow!("Mysql error: {:?}", err));
-    }
+    let record_id = match query_result {
+      Ok(res) => {
+        res.last_insert_id()
+      },
+      Err(err) => {
+        // TODO: handle better
+        return Err(anyhow!("Mysql error: {:?}", err));
+      }
+    };
+
+    record_id
   };
+
+  transaction.commit().await?;
 
   Ok((record_id, inference_result_token.clone()))
 }
+
+pub struct SyntheticIdRecord {
+  pub next_id: i64,
+}
+
+/*async fn get_incremented_synthetic_id<'a>(
+  user_token: &str,
+  transaction: &mut Transaction<'a, MySql>
+) -> AnyhowResult<u64> {
+
+  let do_rollback = {
+    let query_result = sqlx::query!(
+        r#"
+INSERT INTO tts_result_synthetic_ids
+SET
+  user_token = ?,
+  next_id = 1
+ON DUPLICATE KEY UPDATE
+  user_token = ?,
+  next_id = next_id + 1
+        "#,
+      user_token,
+      user_token
+    )
+        .execute(transaction)
+        .await;
+
+    match query_result {
+      Ok(_) => false,
+      Err(err) => {
+        warn!("Transaction failure: {:?}", err);
+        true
+      }
+    }
+  };
+
+  if do_rollback {
+    transaction.rollback().await?;
+    return Err(anyhow!("Transaction failure"));
+  }
+
+  let query_result = sqlx::query_as!(
+    SyntheticIdRecord,
+        r#"
+SELECT
+  next_id
+FROM
+  tts_result_synthetic_ids
+WHERE
+  user_token = ?
+LIMIT 1
+        "#,
+      user_token,
+    )
+      .fetch_one(transaction)
+      .await;
+
+  let record : SyntheticIdRecord = match query_result {
+    Ok(record) => record,
+    Err(err) => {
+      warn!("Transaction failure: {:?}", err);
+      transaction.rollback().await?;
+      return Err(anyhow!("Transaction failure: {:?}", err));
+    }
+  };
+
+  let next_id = record.next_id as u64;
+  Ok(next_id)
+}*/
 
 pub struct TtsModelRecord2 {
   pub model_token: String,

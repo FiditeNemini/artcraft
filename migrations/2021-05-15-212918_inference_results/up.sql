@@ -50,6 +50,11 @@ CREATE TABLE tts_results (
     'private'
   ) NOT NULL DEFAULT 'public',
 
+  -- The synthetic id associated with this result.
+  -- These ids are incremented on a per-user basis to help users
+  -- sequence their own work. They serve no other purpose.
+  maybe_creator_synthetic_id BIGINT(20) DEFAULT NULL,
+
   -- ========== BUCKET STORAGE ==========
 
   -- SHA2.
@@ -132,6 +137,11 @@ CREATE TABLE w2l_results (
     'hidden',
     'private'
   ) NOT NULL DEFAULT 'public',
+
+  -- The synthetic id associated with this result.
+  -- These ids are incremented on a per-user basis to help users
+  -- sequence their own work. They serve no other purpose.
+  maybe_creator_synthetic_id BIGINT(20) DEFAULT NULL,
 
   -- ========== BUCKET STORAGE ==========
 
