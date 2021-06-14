@@ -90,6 +90,7 @@ use sqlx::mysql::MySqlPoolOptions;
 use std::sync::Arc;
 use crate::http_server::endpoints::tts::get_tts_model_use_count::get_tts_model_use_count_handler;
 use crate::http_server::endpoints::w2l::get_w2l_template_use_count::get_w2l_template_use_count_handler;
+use crate::http_server::endpoints::moderation::ip_bans::get_ip_ban::get_ip_ban_handler;
 
 // TODO TODO TODO TODO
 // TODO TODO TODO TODO
@@ -327,6 +328,11 @@ pub async fn serve(server_state: ServerState) -> AnyhowResult<()>
                 .service(
                   web::resource("/add")
                       .route(web::post().to(add_ip_ban_handler))
+                      .route(web::head().to(|| HttpResponse::Ok()))
+                )
+                .service(
+                  web::resource("/{ip_address}")
+                      .route(web::get().to(get_ip_ban_handler))
                       .route(web::head().to(|| HttpResponse::Ok()))
                 )
                 .service(
