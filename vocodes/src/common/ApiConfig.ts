@@ -206,6 +206,10 @@ class ApiConfig {
     return `${this.getScheme()}://${this.getNewApiHost()}/moderation/ip_bans/add`;
   }
 
+  getModerationIpBan(ipAddress: string): string {
+    return `${this.getScheme()}://${this.getNewApiHost()}/moderation/ip_bans/${ipAddress}`;
+  }
+
   deleteModerationIpBan(ipAddress: string): string {
     return `${this.getScheme()}://${this.getNewApiHost()}/moderation/ip_bans/${ipAddress}/delete`;
   }

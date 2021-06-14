@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Link, useHistory } from 'react-router-dom';
 import { ApiConfig } from '../../common/ApiConfig';
 import { SessionWrapper } from '../../session/SessionWrapper';
+import { formatDistance } from 'date-fns';
 
 interface Props {
   sessionWrapper: SessionWrapper,
@@ -103,10 +104,14 @@ function ModerationIpBanListFc(props: Props) {
     return <h1>Unauthorized</h1>;
   }
 
+  const now = new Date();
   let rows : Array<JSX.Element> = [];
 
   ipBanList.forEach(ban => {
     const modUserLink = `/profile/${ban.mod_username}`;
+
+    const createTime = new Date(ban.created_at);
+    const relativeCreateTime = formatDistance(createTime, now, { addSuffix: true });
 
     rows.push(
       <tr key={ban.ip_address}>
@@ -115,7 +120,7 @@ function ModerationIpBanListFc(props: Props) {
           <Link to={modUserLink}>{ban.mod_username}</Link>
         </td>
         <td>{ban.mod_notes}</td>
-        <td>{ban.created_at}</td>
+        <td>{relativeCreateTime}</td>
       </tr>
     )
   });
