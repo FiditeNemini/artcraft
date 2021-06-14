@@ -121,6 +121,8 @@ LEFT OUTER JOIN users as banned_users
     ON ip_bans.maybe_target_user_token = banned_users.token
 JOIN users as mod_users
     ON ip_bans.mod_user_token = mod_users.token
+WHERE
+    ip_bans.deleted_at IS NULL
         "#,
     )
       .fetch_all(&server_state.mysql_pool)
