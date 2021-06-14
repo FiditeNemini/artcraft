@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useHistory } from 'react-router-dom';
+import { Link, useHistory } from 'react-router-dom';
 import { ApiConfig } from '../../common/ApiConfig';
 import { SessionWrapper } from '../../session/SessionWrapper';
 
@@ -18,6 +18,8 @@ interface IpBanListItem {
   maybe_target_username: string,
 
   mod_user_token: string,
+  mod_username: string,
+  mod_display_name: string,
   mod_notes: string,
 
   created_at: string,
@@ -104,10 +106,14 @@ function ModerationIpBanListFc(props: Props) {
   let rows : Array<JSX.Element> = [];
 
   ipBanList.forEach(ban => {
+    const modUserLink = `/profile/${ban.mod_username}`;
 
     rows.push(
       <tr key={ban.ip_address}>
         <td>{ban.ip_address}</td>
+        <td>
+          <Link to={modUserLink}>{ban.mod_username}</Link>
+        </td>
         <td>{ban.mod_notes}</td>
         <td>{ban.created_at}</td>
       </tr>
@@ -177,6 +183,7 @@ function ModerationIpBanListFc(props: Props) {
         <thead>
           <tr>
             <th>IP Address</th>
+            <th>Moderator</th>
             <th>Moderator Notes</th>
             <th>Created At</th>
           </tr>
