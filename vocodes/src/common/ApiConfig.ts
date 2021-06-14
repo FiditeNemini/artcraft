@@ -198,6 +198,18 @@ class ApiConfig {
     return `${this.getScheme()}://${this.getNewApiHost()}/events`;
   }
 
+  getModerationIpBanList(): string {
+    return `${this.getScheme()}://${this.getNewApiHost()}/moderation/ip_bans/list`;
+  }
+
+  createModerationIpBan(): string {
+    return `${this.getScheme()}://${this.getNewApiHost()}/moderation/ip_bans/add`;
+  }
+
+  deleteModerationIpBan(ipAddress: string): string {
+    return `${this.getScheme()}://${this.getNewApiHost()}/moderation/ip_bans/${ipAddress}/delete`;
+  }
+
   private getScheme() : string {
     return this.isLocalDev ? "http" : "https";
   }

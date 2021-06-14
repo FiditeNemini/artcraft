@@ -1,6 +1,8 @@
 import React from 'react';
 import { FirehoseEventListFc } from './firehose/FirehoseEventListFc';
 import { LoginFc } from './login/LoginFc';
+import { ModerationFc } from './moderation/ModerationFc';
+import { ModerationIpBanListFc } from './moderation_ip_ban_list/ModerationIpBanListFc';
 import { NewFooterNavFc } from './NewFooterNavFc';
 import { NewTopNavFc } from './NewTopNavFc';
 import { ProfileEditFc } from './profile_edit/ProfileEditFc';
@@ -15,7 +17,6 @@ import { TtsModelUploadJob } from '../jobs/TtsModelUploadJobs';
 import { TtsModelViewFc } from './tts_model_view/TtsModelViewFc';
 import { TtsResultViewFc } from './tts_result_view/TtsResultViewFc';
 import { UploadChoiceFc } from './upload/UploadChoiceFc';
-import { UploadComponent } from './upload/UploadComponent';
 import { UploadTtsModelFc } from './upload/UploadTtsModelFc';
 import { UploadW2lPhotoFc } from './upload/UploadW2lPhotoFc';
 import { UploadW2lVideoFc } from './upload/UploadW2lVideoFc';
@@ -172,6 +173,18 @@ class NewVocodesContainer extends React.Component<Props, State> {
 
             <Route path="/upload">
               <UploadChoiceFc
+                sessionWrapper={this.props.sessionWrapper}
+              />
+            </Route>
+
+            <Route path="/moderation/ip_bans">
+              <ModerationIpBanListFc
+                sessionWrapper={this.props.sessionWrapper}
+              />
+            </Route>
+
+            <Route path="/moderation">
+              <ModerationFc
                 sessionWrapper={this.props.sessionWrapper}
               />
             </Route>

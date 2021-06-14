@@ -7,9 +7,19 @@ interface Props {
 }
 
 function NewFooterNavFc(props: Props) {
+
+  let moderationLink = <span />;
+
+  if (props.sessionWrapper.canBanUsers()) {
+    moderationLink = (
+      <Link to="/moderation">Mod Controls</Link>
+    );
+  }
+
   return (
     <div>
       <hr />
+      {moderationLink}
       <p>
         We're trying to build a democratized <a href="https://the.storyteller.company">future of creativity, filmmaking and storytelling</a>.
         Contact <Link to="/profile/echelon">@echelon</Link> for more information.
