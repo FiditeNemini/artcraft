@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useHistory } from 'react-router-dom';
 import { ApiConfig } from '../../common/ApiConfig';
 import { SessionWrapper } from '../../session/SessionWrapper';
 
@@ -24,6 +25,8 @@ interface IpBanListItem {
 }
 
 function ModerationIpBanListFc(props: Props) {
+  const history = useHistory();
+
   const [ipBanList, setIpBanList] = useState<Array<IpBanListItem>>([]);
 
   // Form
