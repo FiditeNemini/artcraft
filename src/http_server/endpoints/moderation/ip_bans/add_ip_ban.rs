@@ -22,6 +22,7 @@ use sqlx::error::DatabaseError;
 use sqlx::error::Error::Database;
 use sqlx::mysql::MySqlDatabaseError;
 use std::sync::Arc;
+use crate::validations::ip_addresses::validate_moderator_provided_ip_address;
 
 #[derive(Deserialize)]
 pub struct AddIpBanRequest {
@@ -85,6 +86,13 @@ pub async fn add_ip_ban_handler(
     return Err(AddIpBanError::Unauthorized);
   }
 
+  let ip_address = request.ip_address.trim();
+
+  if let Err(e) = validate_moderator_provided_ip_address(&ip_address) {
+    warn!("Bad ip address: {}", e);
+    return Err(AddIpBanError::BadInput(e.to_string()));
+  }
+
   info!("Creating ban...");
 
   let query_result = sqlx::query!(
@@ -110,7 +118,7 @@ ON DUPLICATE KEY UPDATE
       &user_session.user_token,
       &request.mod_notes,
       // Update
-      &request.ip_address,
+      &ip_address,
       &request.maybe_target_user_token,
       &user_session.user_token,
       &request.mod_notes,
