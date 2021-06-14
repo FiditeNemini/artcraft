@@ -86,7 +86,7 @@ function TtsModelViewFc(props: Props) {
         return;
       }
 
-      setTtsModelUseCount(modelsResponse.count || undefined)
+      setTtsModelUseCount(modelsResponse.count || 0)
     })
     .catch(e => {});
   }, [token]);

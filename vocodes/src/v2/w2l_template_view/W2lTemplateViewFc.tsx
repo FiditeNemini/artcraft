@@ -112,7 +112,7 @@ function W2lTemplateViewFc(props: Props) {
         return;
       }
 
-      setW2lTemplateUseCount(templatesResponse.count || undefined)
+      setW2lTemplateUseCount(templatesResponse.count || 0)
     })
     .catch(e => {});
 
