@@ -37,6 +37,8 @@ pub struct IpBanRecordForList {
   pub maybe_target_user_token: Option<String>,
   pub maybe_target_username: Option<String>,
   pub mod_user_token: String,
+  pub mod_username: String,
+  pub mod_display_name: String,
   pub mod_notes: String,
   pub created_at: DateTime<Utc>,
   pub updated_at: DateTime<Utc>,
@@ -102,16 +104,23 @@ pub async fn list_ip_bans_handler(
         r#"
 SELECT
     ip_bans.ip_address,
+
     ip_bans.maybe_target_user_token,
-    users.username as maybe_target_username,
+    banned_users.username as maybe_target_username,
+
     ip_bans.mod_user_token,
+    mod_users.username as mod_username,
+    mod_users.display_name as mod_display_name,
+
     ip_bans.mod_notes,
     ip_bans.created_at,
     ip_bans.updated_at
 FROM
     ip_address_bans AS ip_bans
-LEFT OUTER JOIN users
-    ON ip_bans.maybe_target_user_token = users.token
+LEFT OUTER JOIN users as banned_users
+    ON ip_bans.maybe_target_user_token = banned_users.token
+JOIN users as mod_users
+    ON ip_bans.mod_user_token = mod_users.token
         "#,
     )
       .fetch_all(&server_state.mysql_pool)
