@@ -1,8 +1,8 @@
 import React from 'react';
 import { FirehoseEventListFc } from './firehose/FirehoseEventListFc';
 import { LoginFc } from './login/LoginFc';
-import { ModerationFc } from './moderation/ModerationFc';
-import { ModerationIpBanListFc } from './moderation_ip_ban_list/ModerationIpBanListFc';
+import { ModerationFc } from './moderation/moderation_main/ModerationFc';
+import { ModerationIpBanListFc } from './moderation/moderation_ip_ban_list/ModerationIpBanListFc';
 import { NewFooterNavFc } from './NewFooterNavFc';
 import { NewTopNavFc } from './NewTopNavFc';
 import { ProfileEditFc } from './profile_edit/ProfileEditFc';

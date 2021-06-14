@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Link, useHistory } from 'react-router-dom';
-import { ApiConfig } from '../../common/ApiConfig';
-import { SessionWrapper } from '../../session/SessionWrapper';
+import { ApiConfig } from '../../../common/ApiConfig';
+import { SessionWrapper } from '../../../session/SessionWrapper';
 import { formatDistance } from 'date-fns';
 
 interface Props {
