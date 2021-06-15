@@ -24,6 +24,7 @@ import { W2lResultViewFc } from './w2l_result_view/W2lResultViewFc';
 import { W2lTemplateListFc } from './w2l_template_list/W2lTemplateListFc';
 import { W2lTemplateUploadJob } from '../jobs/W2lTemplateUploadJobs';
 import { W2lTemplateViewFc } from './w2l_template_view/W2lTemplateViewFc';
+import { ModerationViewIpBanFc } from './moderation/moderation_view_ip_ban/ModerationViewIpBanFc';
 
 interface Props {
   sessionWrapper: SessionWrapper,
@@ -173,6 +174,12 @@ class NewVocodesContainer extends React.Component<Props, State> {
 
             <Route path="/upload">
               <UploadChoiceFc
+                sessionWrapper={this.props.sessionWrapper}
+              />
+            </Route>
+
+            <Route path="/moderation/ip_bans/:ipAddress">
+              <ModerationViewIpBanFc
                 sessionWrapper={this.props.sessionWrapper}
               />
             </Route>

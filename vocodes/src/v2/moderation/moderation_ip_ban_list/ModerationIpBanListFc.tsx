@@ -109,6 +109,7 @@ function ModerationIpBanListFc(props: Props) {
 
   ipBanList.forEach(ban => {
     const modUserLink = `/profile/${ban.mod_username}`;
+    const viewBanLink = `/moderation/ip_bans/${ban.ip_address}`;
 
     const createTime = new Date(ban.created_at);
     const relativeCreateTime = formatDistance(createTime, now, { addSuffix: true });
@@ -121,6 +122,9 @@ function ModerationIpBanListFc(props: Props) {
         </td>
         <td>{ban.mod_notes}</td>
         <td>{relativeCreateTime}</td>
+        <td>
+          <Link to={viewBanLink}>view / edit</Link>
+        </td>
       </tr>
     )
   });
@@ -191,6 +195,7 @@ function ModerationIpBanListFc(props: Props) {
             <th>Moderator</th>
             <th>Moderator Notes</th>
             <th>Created At</th>
+            <th>View / Edit</th>
           </tr>
         </thead>
         <tbody>
