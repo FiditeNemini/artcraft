@@ -92,6 +92,11 @@ use std::sync::Arc;
 use crate::http_server::endpoints::tts::get_tts_model_use_count::get_tts_model_use_count_handler;
 use crate::http_server::endpoints::w2l::get_w2l_template_use_count::get_w2l_template_use_count_handler;
 use crate::http_server::endpoints::moderation::ip_bans::get_ip_ban::get_ip_ban_handler;
+use crate::threads::ip_banlist_set::IpBanlistSet;
+use crate::threads::poll_ip_banlist_thread::poll_ip_bans;
+use tokio::signal::unix::{Signal, signal};
+use tokio::signal::unix::SignalKind;
+use std::sync::atomic::{AtomicBool, Ordering};
 
 // TODO TODO TODO TODO
 // TODO TODO TODO TODO
@@ -212,6 +217,43 @@ async fn main() -> AnyhowResult<()> {
       easyenv::get_env_string_or_default("SORT_KEY_SECRET", "webscale");
   let sort_key_crypto = SortKeyCrypto::new(&sort_key_crypto_secret);
 
+  let ip_banlist = IpBanlistSet::new();
+
+  // Set up signal handlers
+  //let ctrl_c = tokio::task::spawn(tokio::signal::ctrl_c());
+  //let (sighup, sigterm, sigquit) = (
+  //  tokio::task::spawn(hangup()),
+  //  tokio::task::spawn(terminate()),
+  //  tokio::task::spawn(quit()),
+  //);
+
+  //let sigint = SignalKind::interrupt();
+  //let sigterm = SignalKind::terminate();
+  //let sigint = Signal::new(SIGINT).flatten_stream();
+  //let sigterm = Signal::new(SIGTERM).flatten_stream();
+
+
+  //let stream = sigint.select(sigterm);
+
+  let shutdown = Arc::new(AtomicBool::new(false));
+
+  // Start polling thread.
+  let pool2 = pool.clone();
+  let ip_banlist2 = ip_banlist.clone();
+  let shutdown2 = shutdown.clone();
+
+  let join = tokio::task::spawn(async {
+    //poll_ip_bans(ip_banlist2, pool2, ctrl_c, sighup, sigterm, sigquit).await;
+    shutdown_signal(shutdown2).await
+  });
+
+
+  let join2 = tokio::task::spawn(async {
+    //poll_ip_bans(ip_banlist2, pool2, ctrl_c, sighup, sigterm, sigquit).await;
+    poll_ip_bans(ip_banlist2, pool2, shutdown).await;
+  });
+
+
   let server_state = ServerState {
     env_config: EnvConfig {
       num_workers,
@@ -230,11 +272,25 @@ async fn main() -> AnyhowResult<()> {
     public_bucket_client,
     audio_uploads_bucket_root,
     sort_key_crypto,
+    ip_banlist,
   };
 
   serve(server_state)
     .await?;
   Ok(())
+}
+
+async fn shutdown_signal(mut shutdown: Arc<AtomicBool>) {
+  // Wait for the CTRL+C signal
+  info!("Waiting for Ctrl+C");
+  //let mut stream = signal(SignalKind::terminate())?;
+  //stream.recv().await;
+  tokio::signal::ctrl_c()
+      .await
+      .expect("failed to install CTRL+C signal handler");
+
+  info!("Shutdown recieved!");
+  shutdown.store(true, Ordering::SeqCst);
 }
 
 pub async fn serve(server_state: ServerState) -> AnyhowResult<()>
