@@ -1,5 +1,6 @@
 pub mod badges;
 pub mod firehose_publisher;
+pub mod list_ip_bans;
 pub mod list_tts_inference_results;
 pub mod list_tts_models;
 pub mod list_user_roles;
