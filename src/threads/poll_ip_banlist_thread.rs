@@ -13,11 +13,14 @@ use tokio::signal::ctrl_c;
 use tokio::task::JoinHandle;
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::Arc;
+use tokio::sync::oneshot::{Sender, Receiver};
 
 pub async fn poll_ip_bans(
+  name: String,
   ip_banlist_set: IpBanlistSet,
   mysql_pool: MySqlPool,
   shutdown: Arc<AtomicBool>,
+//  mut rx: Receiver<bool>,
 //  ctrl_c: JoinHandle,
 //  sigterm: JoinHandle,
 //  sighup: JoinHandle,
@@ -27,16 +30,18 @@ pub async fn poll_ip_bans(
   //let mut stream = signal(SignalKind::interrupt()).unwrap();
 
   loop {
-    info!("Loop start...");
+    info!("[{}] Loop start...", &name);
+    //let signal = rx.try_recv().unwrap_or(false);
+    //info!("[{}] Signal: {}", &name, signal);
 
     // NB: So we can exit on ctrl-c and other signals.
     //tokio::select! {
     //  _ = background => println!(">>>>>> FOO"),
     //  _ = foreground => println!(">>>>>> BAR"),
-    if shutdown.load(Ordering::SeqCst) {
-      info!("Shutdown received");
-      return;
-    }
+    //if shutdown.load(Ordering::Relaxed) {
+    //  info!("[{}] Shutdown received", &name);
+    //  return;
+    //}
 
     //};
 //    tokio::select! {
@@ -87,15 +92,21 @@ pub async fn poll_ip_bans(
       }
     }
 
-    info!("Sleeping...");
-    for _ in 0..60 {
+    info!("[{}] Sleeping...", &name);
+    for _ in 0..20 {
+      //std::thread::yield_now();
+      tokio::task::yield_now().await;
+
+      //let signal = rx.try_recv().unwrap_or(false);
+      //info!("[{}] Signal: {}", &name, signal);
+      info!("[{}] Sleep.", &name);
       thread::sleep(Duration::from_millis(1_000));
-      if shutdown.load(Ordering::SeqCst) {
-        info!("Shutdown received");
+      if shutdown.load(Ordering::Relaxed) {
+        info!("[{}], Shutdown received", &name);
         return;
       }
     }
 
-    info!("Loop end...");
+    info!("[{}] Loop end...", &name);
   }
 }

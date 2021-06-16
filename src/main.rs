@@ -97,6 +97,11 @@ use crate::threads::poll_ip_banlist_thread::poll_ip_bans;
 use tokio::signal::unix::{Signal, signal};
 use tokio::signal::unix::SignalKind;
 use std::sync::atomic::{AtomicBool, Ordering};
+use tokio::sync::oneshot::{channel, Sender};
+use std::time::Duration;
+use futures::Future;
+use std::thread;
+use futures::executor::ThreadPool;
 
 // TODO TODO TODO TODO
 // TODO TODO TODO TODO
@@ -175,7 +180,7 @@ async fn main() -> AnyhowResult<()> {
   info!("Reading env vars and setting up utils...");
 
   let bind_address = easyenv::get_env_string_or_default("BIND_ADDRESS", DEFAULT_BIND_ADDRESS);
-  let num_workers = easyenv::get_env_num("NUM_WORKERS", 4)?;
+  let num_workers = easyenv::get_env_num("NUM_WORKERS", 8)?;
   let hmac_secret = easyenv::get_env_string_or_default("COOKIE_SECRET", "notsecret");
   let cookie_domain = easyenv::get_env_string_or_default("COOKIE_DOMAIN", ".vo.codes");
   let cookie_secure = easyenv::get_env_bool_or_default("COOKIE_SECURE", true);
@@ -218,6 +223,20 @@ async fn main() -> AnyhowResult<()> {
   let sort_key_crypto = SortKeyCrypto::new(&sort_key_crypto_secret);
 
   let ip_banlist = IpBanlistSet::new();
+  let ip_banlist2 = ip_banlist.clone();
+  let pool3 = pool.clone();
+
+  // Necessary to run our background work.
+  // I tried getting this running with actix, tokio, by other means,
+  // but didn't have much luck. The task didn't respond to ctrl-c
+  // interrupts.
+  let thread_pool = ThreadPool::new()?;
+
+  let shutdown = Arc::new(AtomicBool::new(false));
+
+  thread_pool.spawn_ok(async {
+    poll_ip_bans("".to_string(), ip_banlist2, pool3, shutdown).await;
+  });
 
   // Set up signal handlers
   //let ctrl_c = tokio::task::spawn(tokio::signal::ctrl_c());
@@ -227,31 +246,30 @@ async fn main() -> AnyhowResult<()> {
   //  tokio::task::spawn(quit()),
   //);
 
-  //let sigint = SignalKind::interrupt();
-  //let sigterm = SignalKind::terminate();
-  //let sigint = Signal::new(SIGINT).flatten_stream();
-  //let sigterm = Signal::new(SIGTERM).flatten_stream();
+
+  ////// Start polling thread.
+  ////let pool2 = pool.clone();
+  ////let ip_banlist2 = ip_banlist.clone();
+  //let shutdown2 = shutdown.clone();
+
+  ////let ip_banlist3 = ip_banlist.clone();
+  ////let shutdown3 = shutdown.clone();
+
+  //let join = actix_rt::task::spawn_blocking(async {
+  //  //poll_ip_bans(ip_banlist2, pool2, ctrl_c, sighup, sigterm, sigquit).await;
+  //  shutdown_signal(shutdown2, tx).await
+  //});
 
 
-  //let stream = sigint.select(sigterm);
+  //let join2 = tokio::task::spawn(async {
+  //  //poll_ip_bans(ip_banlist2, pool2, ctrl_c, sighup, sigterm, sigquit).await;
+  //  poll_ip_bans("foo".to_string(), ip_banlist2, pool2, shutdown).await;
+  //});
 
-  let shutdown = Arc::new(AtomicBool::new(false));
-
-  // Start polling thread.
-  let pool2 = pool.clone();
-  let ip_banlist2 = ip_banlist.clone();
-  let shutdown2 = shutdown.clone();
-
-  let join = tokio::task::spawn(async {
-    //poll_ip_bans(ip_banlist2, pool2, ctrl_c, sighup, sigterm, sigquit).await;
-    shutdown_signal(shutdown2).await
-  });
-
-
-  let join2 = tokio::task::spawn(async {
-    //poll_ip_bans(ip_banlist2, pool2, ctrl_c, sighup, sigterm, sigquit).await;
-    poll_ip_bans(ip_banlist2, pool2, shutdown).await;
-  });
+  //let join3 = tokio::task::spawn(async {
+  //  //poll_ip_bans(ip_banlist2, pool2, ctrl_c, sighup, sigterm, sigquit).await;
+  //  poll_ip_bans("bar".to_string(), ip_banlist3, pool3, shutdown3).await;
+  //});
 
 
   let server_state = ServerState {
@@ -280,7 +298,14 @@ async fn main() -> AnyhowResult<()> {
   Ok(())
 }
 
-async fn shutdown_signal(mut shutdown: Arc<AtomicBool>) {
+async fn test_future() {
+  loop {
+    info!("Thread 2");
+    thread::sleep(Duration::from_millis(1000));
+  }
+}
+
+async fn shutdown_signal(mut shutdown: Arc<AtomicBool>, tx: Sender<bool>) {
   // Wait for the CTRL+C signal
   info!("Waiting for Ctrl+C");
   //let mut stream = signal(SignalKind::terminate())?;
@@ -289,8 +314,10 @@ async fn shutdown_signal(mut shutdown: Arc<AtomicBool>) {
       .await
       .expect("failed to install CTRL+C signal handler");
 
+  tx.send(true).unwrap();
+
   info!("Shutdown recieved!");
-  shutdown.store(true, Ordering::SeqCst);
+  shutdown.store(true, Ordering::Relaxed);
 }
 
 pub async fn serve(server_state: ServerState) -> AnyhowResult<()>
