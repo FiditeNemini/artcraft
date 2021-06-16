@@ -27,11 +27,11 @@ impl IpBanlistSet {
     }
   }
 
-  pub fn is_banned(&self, ip_address: String) -> AnyhowResult<bool> {
+  pub fn is_banned<S: AsRef<str>>(&self, ip_address: S) -> AnyhowResult<bool> {
     match self.ip_banlist.read() {
       Err(_) => Err(anyhow!("Can't read lock")),
       Ok(read) => {
-        let result = read.contains(&ip_address);
+        let result = read.contains(ip_address.as_ref());
         Ok(result)
       },
     }

@@ -8,6 +8,8 @@ use futures::Future;
 use crate::threads::ip_banlist_set::IpBanlistSet;
 use log::warn;
 use log::info;
+use crate::http_server::web_utils::ip_address::get_service_request_ip;
+use actix_web::error::ErrorForbidden;
 
 // There are two steps in middleware processing.
 // 1. Middleware initialization, middleware factory gets called with
@@ -69,8 +71,15 @@ impl<S, B> Service for IpFilterMiddleware<S>
   }
 
   fn call(&mut self, req: ServiceRequest) -> Self::Future {
-    println!("Hi from start. You requested: {}", req.path());
-    info!("Checking IP. There are {} bans currently.", self.ip_banlist.num_bans().unwrap_or(0));
+    let ip_address = get_service_request_ip(&req);
+
+    // NB: Fail open.
+    let is_banned = self.ip_banlist.is_banned(&ip_address).unwrap_or(false);
+
+    if is_banned {
+      warn!("Ip is banned: {}", &ip_address);
+      return Box::pin(ok(req.error_response(ErrorForbidden("Forbidden"))))
+    }
 
     let fut = self.service.call(req);
 
