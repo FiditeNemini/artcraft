@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { ApiConfig } from '../../common/ApiConfig';
-import { GravatarFc } from '../common/GravatarFc';
-import { SessionWrapper } from '../../session/SessionWrapper';
+import { ApiConfig } from '../../../common/ApiConfig';
+import { GravatarFc } from '../../common/GravatarFc';
+import { SessionWrapper } from '../../../session/SessionWrapper';
 import { useParams, Link } from 'react-router-dom';
 
 interface W2lInferenceResultResponsePayload {
@@ -40,7 +40,7 @@ interface Props {
 }
 
 function W2lResultViewFc(props: Props) {
-  let { token } = useParams();
+  let { token } = useParams() as { token : string };
 
   const [w2lInferenceResult, setW2lInferenceResult] = useState<W2lInferenceResult|undefined>(undefined);
 
@@ -92,8 +92,8 @@ function W2lResultViewFc(props: Props) {
       <span>
         <GravatarFc 
           size={15}
-          username={w2lInferenceResult.maybe_creator_display_name} 
-          email_hash={w2lInferenceResult.maybe_creator_gravatar_hash} 
+          username={w2lInferenceResult.maybe_creator_display_name || ""} 
+          email_hash={w2lInferenceResult.maybe_creator_gravatar_hash || ""} 
           />
         &nbsp;
         <Link to={creatorLink}>{w2lInferenceResult.maybe_creator_display_name}</Link>
@@ -108,8 +108,8 @@ function W2lResultViewFc(props: Props) {
       <span>
         <GravatarFc 
           size={15}
-          username={w2lInferenceResult.maybe_template_creator_display_name} 
-          email_hash={w2lInferenceResult.maybe_template_creator_gravatar_hash} 
+          username={w2lInferenceResult.maybe_template_creator_display_name || ""} 
+          email_hash={w2lInferenceResult.maybe_template_creator_gravatar_hash || ""} 
           />
         &nbsp;
         <Link to={templateCreatorLink}>{w2lInferenceResult.maybe_template_creator_display_name}</Link>

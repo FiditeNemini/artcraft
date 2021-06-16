@@ -1,15 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import { ApiConfig } from '../../common/ApiConfig';
+import { ApiConfig } from '../../../common/ApiConfig';
 import { Link } from 'react-router-dom';
-import { SessionTtsInferenceResultListFc } from '../common/SessionTtsInferenceResultsListFc';
-import { SessionTtsModelUploadResultListFc } from '../common/SessionTtsModelUploadResultsListFc';
-import { SessionW2lInferenceResultListFc } from '../common/SessionW2lInferenceResultsListFc';
-import { SessionW2lTemplateUploadResultListFc } from '../common/SessionW2lTemplateUploadResultsListFc';
-import { SessionWrapper } from '../../session/SessionWrapper';
-import { TtsInferenceJob } from '../../App';
-import { TtsModelUploadJob } from '../../jobs/TtsModelUploadJobs';
-import { W2lInferenceJob } from '../../jobs/W2lInferenceJobs';
-import { W2lTemplateUploadJob } from '../../jobs/W2lTemplateUploadJobs';
+import { SessionTtsInferenceResultListFc } from '../../common/SessionTtsInferenceResultsListFc';
+import { SessionTtsModelUploadResultListFc } from '../../common/SessionTtsModelUploadResultsListFc';
+import { SessionW2lInferenceResultListFc } from '../../common/SessionW2lInferenceResultsListFc';
+import { SessionW2lTemplateUploadResultListFc } from '../../common/SessionW2lTemplateUploadResultsListFc';
+import { SessionWrapper } from '../../../session/SessionWrapper';
+import { TtsInferenceJob } from '../../../App';
+import { TtsModelUploadJob } from '../../../jobs/TtsModelUploadJobs';
+import { W2lInferenceJob } from '../../../jobs/W2lInferenceJobs';
+import { W2lTemplateUploadJob } from '../../../jobs/W2lTemplateUploadJobs';
 import { v1 as uuidv1 } from 'uuid';
 
 interface TtsModelListResponsePayload {

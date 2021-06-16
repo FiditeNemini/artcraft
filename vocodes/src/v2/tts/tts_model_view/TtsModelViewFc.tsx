@@ -1,11 +1,11 @@
 
 import React, { useState, useEffect, useCallback } from 'react';
 //import axios from 'axios';
-import { ApiConfig } from '../../common/ApiConfig';
+import { ApiConfig } from '../../../common/ApiConfig';
 import { EnqueueJobResponsePayload } from '../tts_model_list/TtsModelFormFc';
-import { SessionTtsInferenceResultListFc } from '../common/SessionTtsInferenceResultsListFc';
-import { SessionWrapper } from '../../session/SessionWrapper';
-import { TtsInferenceJob } from '../../App';
+import { SessionTtsInferenceResultListFc } from '../../common/SessionTtsInferenceResultsListFc';
+import { SessionWrapper } from '../../../session/SessionWrapper';
+import { TtsInferenceJob } from '../../../App';
 import { useParams, Link } from 'react-router-dom';
 import { v1 as uuidv1 } from 'uuid';
 

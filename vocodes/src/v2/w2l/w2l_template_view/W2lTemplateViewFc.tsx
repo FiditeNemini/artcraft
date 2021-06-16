@@ -1,11 +1,11 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
-import { ApiConfig } from '../../common/ApiConfig';
-import { SessionWrapper } from '../../session/SessionWrapper';
-import { W2lInferenceJob } from '../../App';
+import { ApiConfig } from '../../../common/ApiConfig';
+import { SessionWrapper } from '../../../session/SessionWrapper';
+import { W2lInferenceJob } from '../../../App';
 import { useParams, Link, useHistory } from 'react-router-dom';
 import { v1 as uuidv1 } from 'uuid';
-import { SessionW2lInferenceResultListFc } from '../common/SessionW2lInferenceResultsListFc';
+import { SessionW2lInferenceResultListFc } from '../../common/SessionW2lInferenceResultsListFc';
 import { W2lTemplateViewDeleteFc } from './W2lTemplateView_DeleteFc';
 
 interface W2lTemplateViewResponsePayload {

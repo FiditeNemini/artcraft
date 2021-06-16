@@ -1,8 +1,8 @@
 import React, { useEffect, useState }  from 'react';
-import { ApiConfig } from '../../common/ApiConfig';
-import { GravatarFc } from '../common/GravatarFc';
+import { ApiConfig } from '../../../common/ApiConfig';
+import { GravatarFc } from '../../common/GravatarFc';
 import { Link, useHistory } from 'react-router-dom';
-import { SessionWrapper } from '../../session/SessionWrapper';
+import { SessionWrapper } from '../../../session/SessionWrapper';
 import { useParams } from 'react-router-dom';
 
 interface Props {

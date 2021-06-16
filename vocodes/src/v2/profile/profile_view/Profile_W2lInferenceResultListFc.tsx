@@ -1,30 +1,32 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { ApiConfig, ListTtsInferenceResultsForUserArgs } from '../../common/ApiConfig';
+import { ApiConfig, ListW2lInferenceResultsForUserArgs } from '../../../common/ApiConfig';
 import { Link } from 'react-router-dom';
-import { formatDistance } from 'date-fns';
+import { formatDistance } from 'date-fns'
 
-interface TtsInferenceResultListResponsePayload {
+interface W2lInferenceResultListResponsePayload {
   success: boolean,
-  results: Array<TtsInferenceResult>,
+  results: Array<W2lInferenceResult>,
   cursor_next: string | null | undefined,
   cursor_previous: string | null | undefined,
 }
 
-interface TtsInferenceResult {
-  tts_result_token: string,
+interface W2lInferenceResult {
+  w2l_result_token: string,
+  maybe_w2l_template_token?: string,
+  maybe_tts_inference_result_token?: string,
 
-  tts_model_token: string,
-  tts_model_title: string,
-
-  raw_inference_text: string,
+  template_type: string,
+  template_title: string,
 
   maybe_creator_user_token?: string,
   maybe_creator_username?: string,
   maybe_creator_display_name?: string,
 
   maybe_creator_result_id: number | null,
-
+  
   file_size_bytes: number,
+  frame_width: number,
+  frame_height: number,
   duration_millis: number,
 
   created_at: string,
@@ -35,16 +37,16 @@ interface Props {
   username: string,
 }
 
-function ProfileTtsInferenceResultsListFc(props: Props) {
-  const [ttsResults, setTtsResults] = useState<Array<TtsInferenceResult>>([]);
+function ProfileW2lInferenceResultsListFc(props: Props) {
+  const [w2lResults, setW2lResults] = useState<Array<W2lInferenceResult>>([]);
 
   const [nextCursor, setNextCursor] = useState<string|null>(null);
   const [previousCursor, setPreviousCursor] = useState<string|null>(null);
 
   const getPage = useCallback((cursor : string|null, reverse: boolean) => {
-    let args : ListTtsInferenceResultsForUserArgs = {
+    let args : ListW2lInferenceResultsForUserArgs = {
       username: props.username,
-      limit: 25,
+      limit: 5,
     };
 
     if (cursor !== null) {
@@ -55,7 +57,7 @@ function ProfileTtsInferenceResultsListFc(props: Props) {
     }
 
     const api = new ApiConfig();
-    const endpointUrl = api.listTtsInferenceResultsForUser(args);
+    const endpointUrl = api.listW2lInferenceResultsForUser(args);
 
     fetch(endpointUrl, {
       method: 'GET',
@@ -66,14 +68,14 @@ function ProfileTtsInferenceResultsListFc(props: Props) {
     })
     .then(res => res.json())
     .then(res => {
-      const modelsResponse : TtsInferenceResultListResponsePayload  = res;
-      if (!modelsResponse.success) {
+      const templatesResponse : W2lInferenceResultListResponsePayload  = res;
+      if (!templatesResponse.success) {
         return;
       }
 
-      setTtsResults(modelsResponse.results)
-      setNextCursor(modelsResponse.cursor_next || null)
-      setPreviousCursor(modelsResponse.cursor_previous || null)
+      setW2lResults(templatesResponse.results)
+      setNextCursor(templatesResponse.cursor_next || null)
+      setPreviousCursor(templatesResponse.cursor_previous || null)
     })
     .catch(e => {
     });
@@ -87,25 +89,23 @@ function ProfileTtsInferenceResultsListFc(props: Props) {
 
   let rows : Array<JSX.Element> = [];
   
-  ttsResults.forEach(result => {
+  w2lResults.forEach(result => {
     const duration_seconds = result.duration_millis / 1000;
+    const templateTitle = result.template_title.length < 5 ? `Title: ${result.template_title}` : result.template_title;
 
-    const inferenceLink = `/tts/result/${result.tts_result_token}`;
-    const modelLink = `/tts/${result.tts_model_token}`;
-
-    const text = result.raw_inference_text.length < 5 ? `Result: ${result.raw_inference_text}` : result.raw_inference_text;
+    const inferenceLink = `/w2l/result/${result.w2l_result_token}`;
+    const templateLink = `/w2l/${result.maybe_w2l_template_token}`;
 
     const createTime = new Date(result.created_at);
     const relativeCreateTime = formatDistance(createTime, now, { addSuffix: true });
 
+
     rows.push(
-      <tr key={result.tts_result_token}>
+      <tr key={result.w2l_result_token}>
         <td>{result.maybe_creator_result_id}</td>
-        <th>
-          <Link to={inferenceLink}><span role="img" aria-label="result link">▶️</span> {text}</Link>
-          &nbsp;
-        </th>
-        <th><Link to={modelLink}>Model: {result.tts_model_title}</Link></th>
+          <th><Link to={inferenceLink}><span role="img" aria-label="result link">▶️</span> Result</Link></th>
+        <th><Link to={templateLink}>{templateTitle}</Link></th>
+        <td>(custom audio)</td>
         <td>{duration_seconds} s</td>
         <td>{relativeCreateTime}</td>
       </tr>
@@ -124,8 +124,9 @@ function ProfileTtsInferenceResultsListFc(props: Props) {
         <thead>
           <tr>
             <th><abbr title="Detail">#</abbr></th>
-            <th><abbr title="Detail">Download &amp; Play Link</abbr></th>
-            <th><abbr title="Detail">Model</abbr></th>
+            <th><abbr title="Detail">Result Link</abbr></th>
+            <th><abbr title="Detail">Template</abbr></th>
+            <th><abbr title="Detail">Audio Source</abbr></th>
             <th><abbr title="Detail">Duration</abbr></th>
             <th><abbr title="Value">Creation Time</abbr></th>
           </tr>
@@ -141,4 +142,4 @@ function ProfileTtsInferenceResultsListFc(props: Props) {
   )
 }
 
-export { ProfileTtsInferenceResultsListFc };
+export { ProfileW2lInferenceResultsListFc };

@@ -1,12 +1,12 @@
 import React, { useEffect, useState }  from 'react';
-import { ApiConfig } from '../../common/ApiConfig';
-import { GravatarFc } from '../common/GravatarFc';
+import { ApiConfig } from '../../../common/ApiConfig';
+import { GravatarFc } from '../../common/GravatarFc';
 import { Link } from 'react-router-dom';
 import { ProfileTtsInferenceResultsListFc } from './Profile_TtsInferenceResultListFc';
 import { ProfileTtsModelListFc } from './Profile_TtsModelListFc';
 import { ProfileW2lInferenceResultsListFc } from './Profile_W2lInferenceResultListFc';
 import { ProfileW2lTemplateListFc } from './Profile_W2lTemplateListFc';
-import { SessionWrapper } from '../../session/SessionWrapper';
+import { SessionWrapper } from '../../../session/SessionWrapper';
 import { useParams } from 'react-router-dom';
 
 interface Props {

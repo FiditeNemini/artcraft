@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { ApiConfig } from '../../common/ApiConfig';
+import { ApiConfig } from '../../../common/ApiConfig';
+import { SessionWrapper } from '../../../session/SessionWrapper';
 import { Link } from "react-router-dom";
-import { getRandomInt } from '../../v1/api/Utils';
+import { getRandomInt } from '../../../v1/api/Utils';
 
 interface W2lTemplateListResponsePayload {
   success: boolean,
@@ -25,15 +26,15 @@ interface W2lTemplate {
 }
 
 interface Props {
-  username: string,
+  sessionWrapper: SessionWrapper,
 }
 
-function ProfileW2lTemplateListFc(props: Props) {
+function W2lTemplateListFc(props: Props) {
   const [w2lTemplates, setW2lTemplates] = useState<Array<W2lTemplate>>([]);
 
   useEffect(() => {
     const api = new ApiConfig();
-    const endpointUrl = api.listW2lTemplatesForUser(props.username);
+    const endpointUrl = api.listW2l();
 
     fetch(endpointUrl, {
       method: 'GET',
@@ -54,7 +55,7 @@ function ProfileW2lTemplateListFc(props: Props) {
     .catch(e => {
       //this.props.onSpeakErrorCallback();
     });
-  }, [props.username]); // NB: Empty array dependency sets to run ONLY on mount
+  }, []); // NB: Empty array dependency sets to run ONLY on mount
 
   
   let templateElements : Array<JSX.Element> = [];
@@ -78,8 +79,7 @@ function ProfileW2lTemplateListFc(props: Props) {
     templateElements.push((
       <div className="tile is-parent" key={t.template_token}>
         <article className="tile is-child box">
-          {/*<p className="title">One</p>*/}
-          <Link to={link}><img src={url} alt="" /></Link>
+          <Link to={link}><img src={url} alt="template" /></Link>
         </article>
       </div>
     ));
@@ -88,11 +88,11 @@ function ProfileW2lTemplateListFc(props: Props) {
   let allRowsOfTemplateElements : Array<JSX.Element> = [];
   let rowOfTemplateElements : Array<JSX.Element> = [];
 
-  let nextRowSize = getRandomInt(3, 4);
-
   // NB: To prevent React spamming about children having unique key props
   let rowKey = "row0";
   let rowIndex = 0;
+
+  let nextRowSize = getRandomInt(3, 4);
 
   templateElements.forEach(el => {
     rowOfTemplateElements.push(el);
@@ -110,7 +110,7 @@ function ProfileW2lTemplateListFc(props: Props) {
       // Don't have the same number on each row.
       let lastRowSize = nextRowSize;
       while (lastRowSize === nextRowSize) {
-        nextRowSize = getRandomInt(3, 6);
+        nextRowSize = getRandomInt(2, 5);
       }
     }
   });
@@ -125,11 +125,47 @@ function ProfileW2lTemplateListFc(props: Props) {
     rowOfTemplateElements = [];
   }
 
+  let extraDetails = <p />;
+
+  if (props.sessionWrapper.isLoggedIn()) {
+    extraDetails = (
+      <p>
+        Pick a template, then you can make it lip sync.
+        If you want to use your own video or image, you can
+        <Link to="/upload">upload it as a template</Link>.
+        You'll then be able to use it whenever you want!
+      </p>
+    );
+
+  } else {
+    extraDetails = (
+      <p>
+        Pick a template, then you can make it lip sync.
+        If you want to use your own video or image, you'll
+        need to <Link to="/signup">create an account</Link>.
+        You'll then be able to upload and reuse your templates 
+        whenever you want!
+      </p>
+    );
+  }
+
   return (
     <div>
+      <h1 className="title is-1"> Video lip sync templates </h1>
+
+      {extraDetails}
+
+      <br />
+
+      <p>This feature is based on Wav2Lip by by Prajwal, K R and Mukhopadhyay, 
+        Rudrabha and Namboodiri, Vinay P. and Jawahar, C.V.</p>
+
+      <br />
+
       {allRowsOfTemplateElements.map(el => el)}
+
     </div>
   )
 }
 
-export { ProfileW2lTemplateListFc };
+export { W2lTemplateListFc };

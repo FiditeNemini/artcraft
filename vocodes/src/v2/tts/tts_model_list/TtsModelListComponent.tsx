@@ -1,7 +1,7 @@
 import React from 'react';
-import { ApiConfig } from '../../common/ApiConfig';
-import { Mode } from '../../AppMode';
-import { SessionWrapper } from '../../session/SessionWrapper';
+import { ApiConfig } from '../../../common/ApiConfig';
+import { Mode } from '../../../AppMode';
+import { SessionWrapper } from '../../../session/SessionWrapper';
 
 enum FieldTriState {
   EMPTY_FALSE,
@@ -13,6 +13,7 @@ interface Props {
   sessionWrapper: SessionWrapper,
   querySessionCallback : () => void,
   switchModeCallback?: (mode: Mode) => void,
+  enqueueTtsJob: (jobToken: string) => void,
 }
 
 interface State {
@@ -25,7 +26,7 @@ interface State {
   passwordInvalidReason: string,
 }
 
-class TtsModelViewComponent extends React.Component<Props, State> {
+class TtsModelListComponent extends React.Component<Props, State> {
 
   constructor(props: Props) {
     super(props);
@@ -157,4 +158,4 @@ class TtsModelViewComponent extends React.Component<Props, State> {
   }
 }
 
-export { TtsModelViewComponent };
+export { TtsModelListComponent };

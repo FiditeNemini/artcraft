@@ -1,7 +1,7 @@
 import React, { useEffect, useRef }  from 'react';
 import { VIRIDIS, MAGMA } from "@colormap/presets";
 import { createColorMap, linearScale } from "@colormap/core";
-import { getRandomArrayValue } from "../../v1/api/Utils";
+import { getRandomArrayValue } from "../../../v1/api/Utils";
 
 interface Props {
   spectrogramJsonLink: string  

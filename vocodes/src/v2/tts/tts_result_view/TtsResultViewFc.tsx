@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { ApiConfig } from '../../common/ApiConfig';
-import { SessionWrapper } from '../../session/SessionWrapper';
+import { ApiConfig } from '../../../common/ApiConfig';
+import { SessionWrapper } from '../../../session/SessionWrapper';
 import { useParams, Link } from 'react-router-dom';
-import { GravatarFc } from '../common/GravatarFc';
+import { GravatarFc } from '../../common/GravatarFc';
 import { SpectrogramFc } from './SpectrogramFc';
 
 interface TtsInferenceResultResponsePayload {

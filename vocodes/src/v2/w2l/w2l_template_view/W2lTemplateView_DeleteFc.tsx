@@ -1,6 +1,6 @@
 import React from 'react';
-import { ApiConfig } from '../../common/ApiConfig';
-import { SessionWrapper } from '../../session/SessionWrapper';
+import { ApiConfig } from '../../../common/ApiConfig';
+import { SessionWrapper } from '../../../session/SessionWrapper';
 import { useHistory } from 'react-router-dom';
 
 interface Props {
