@@ -5,15 +5,8 @@ use log::info;
 use log::warn;
 use sqlx::MySqlPool;
 use std::collections::HashSet;
-use std::sync::Arc;
-use std::sync::atomic::{AtomicBool, Ordering};
 use std::thread;
 use std::time::Duration;
-use tokio::signal::ctrl_c;
-use tokio::signal::unix::signal;
-use tokio::signal::unix::{SignalKind, Signal};
-use tokio::sync::oneshot::{Sender, Receiver};
-use tokio::task::JoinHandle;
 
 pub async fn poll_ip_bans(
   ip_banlist_set: IpBanlistSet,

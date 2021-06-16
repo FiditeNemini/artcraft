@@ -36,4 +36,14 @@ impl IpBanlistSet {
       },
     }
   }
+
+  pub fn num_bans(&self) -> AnyhowResult<usize> {
+    match self.ip_banlist.read() {
+      Err(_) => Err(anyhow!("Can't read lock")),
+      Ok(read) => {
+        let result = read.len();
+        Ok(result)
+      },
+    }
+  }
 }

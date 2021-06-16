@@ -97,6 +97,7 @@ use sqlx::MySqlPool;
 use sqlx::mysql::MySqlPoolOptions;
 use std::sync::Arc;
 use std::time::Duration;
+use crate::http_server::middleware::ip_filter_middleware::IpFilter;
 
 // TODO TODO TODO TODO
 // TODO TODO TODO TODO
@@ -270,6 +271,9 @@ pub async fn serve(server_state: ServerState) -> AnyhowResult<()>
   let log_format = "[%{HOSTNAME}e] %a \"%r\" %s %b \"%{Referer}i\" \"%{User-Agent}i\" %T";
 
   HttpServer::new(move || {
+    // NB: Safe to clone due to internal arc
+    let ip_banlist = server_state_arc.ip_banlist.clone();
+
     App::new()
       .app_data(server_state_arc.clone())
       .wrap(Cors::default()
@@ -310,6 +314,7 @@ pub async fn serve(server_state: ServerState) -> AnyhowResult<()>
       .wrap(DefaultHeaders::new()
         .header("X-Backend-Hostname", &hostname)
         .header("X-Build-Sha", ""))
+      .wrap(IpFilter::new(ip_banlist))
       // ==================== ACCOUNT CREATION / SESSION MANAGEMENT ====================
       .service(
         web::resource("/create_account")

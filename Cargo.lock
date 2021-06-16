@@ -3168,6 +3168,7 @@ dependencies = [
  "actix-http",
  "actix-multipart",
  "actix-rt 2.2.0",
+ "actix-service",
  "actix-utils 3.0.0",
  "actix-web",
  "anyhow",

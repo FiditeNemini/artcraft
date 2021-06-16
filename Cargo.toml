@@ -86,6 +86,7 @@ actix-files= "0.5"
 actix-http = "2.2.0"
 actix-multipart = "0.3.0" # TODO: Ready for 0.4 upgrade
 actix-rt = "2.2.0"
+actix-service = "1.0.6"
 actix-utils = "3.0.0"
 actix-web = "3.3.2"
 jwt = "0.13.0"
