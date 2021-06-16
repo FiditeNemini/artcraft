@@ -34,7 +34,8 @@ interface W2lTemplate {
   is_public_listing_approved: boolean | null,
   created_at: string,
   updated_at: string,
-  deleted_at: string | undefined | null,
+  mod_deleted_at: string | undefined | null,
+  user_deleted_at: string | undefined | null,
 }
 
 interface EnqueueJobResponsePayload {
@@ -302,16 +303,22 @@ function W2lTemplateViewFc(props: Props) {
     );
   }
 
-  const currentlyDeleted = w2lTemplate?.deleted_at !== undefined && w2lTemplate.deleted_at !== null;
+  const currentlyDeleted = !!w2lTemplate?.mod_deleted_at || !!w2lTemplate?.user_deleted_at;
 
   let deletedAtRow = null;
 
   if (currentlyDeleted) {
     deletedAtRow = (
-      <tr>
-        <th>Deleted At (UTC)</th>
-        <td>{w2lTemplate?.deleted_at}</td>
-      </tr>
+      <>
+        <tr>
+          <th>Mod Deleted At (UTC)</th>
+          <td>{w2lTemplate?.mod_deleted_at || "not deleted"}</td>
+        </tr>
+        <tr>
+          <th>User Deleted At (UTC)</th>
+          <td>{w2lTemplate?.user_deleted_at || "not deleted"}</td>
+        </tr>
+      </>
     );
   }
 
