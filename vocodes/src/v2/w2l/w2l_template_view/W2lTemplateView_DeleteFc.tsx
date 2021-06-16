@@ -6,6 +6,7 @@ import { useHistory } from 'react-router-dom';
 interface Props {
   sessionWrapper: SessionWrapper,
   templateSlug: string,
+  creatorUserToken?: string,
   currentlyDeleted: boolean,
 }
 
@@ -42,17 +43,19 @@ function W2lTemplateViewDeleteFc(props: Props) {
     return false;
   }
 
-  if (!props.sessionWrapper.canDeleteOtherUsersW2lTemplates()) {
+  if (!props.sessionWrapper.canDeleteW2lTemplateByUserToken(props.creatorUserToken)) {
     return <span />;
   }
 
   const buttonTitle = props.currentlyDeleted ? "Undelete" : "Delete";
-  const formLabel = props.currentlyDeleted ? 
-     "Recover the W2L Template (makes it visible and usable again)" : 
-     "Delete W2L Template (hides from everyone but mods)";
+
   const buttonCss = props.currentlyDeleted ? 
     "button is-warning is-large is-fullwidth" :
     "button is-danger is-large is-fullwidth";
+
+  const formLabel = props.currentlyDeleted ? 
+     "Recover the W2L Template (makes it visible and usable again)" : 
+     "Delete W2L Template (hides from everyone but mods)";
 
   return (
     <form onSubmit={handleDeleteFormSubmit}>

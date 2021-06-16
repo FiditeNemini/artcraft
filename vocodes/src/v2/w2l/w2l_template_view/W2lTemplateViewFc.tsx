@@ -434,6 +434,7 @@ function W2lTemplateViewFc(props: Props) {
         sessionWrapper={props.sessionWrapper}
         templateSlug={templateSlug}
         currentlyDeleted={currentlyDeleted}
+        creatorUserToken={w2lTemplate?.creator_user_token}
         />
 
       <SessionW2lInferenceResultListFc w2lInferenceJobs={props.w2lInferenceJobs} />

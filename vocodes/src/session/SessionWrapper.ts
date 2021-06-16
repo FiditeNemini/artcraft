@@ -47,6 +47,10 @@ export class SessionWrapper {
     return this.canEditOtherUsersProfiles();
   }
 
+  public canDeleteW2lTemplateByUserToken(userToken?: string) : boolean {
+    return this.canDeleteOtherUsersW2lTemplates() || this.verifyUserTokenMatch(userToken);
+  }
+
   public canUseTts() : boolean {
     return this.sessionStateResponse?.user?.can_use_tts || true; // NB: Default true.
   }
@@ -77,5 +81,16 @@ export class SessionWrapper {
 
   public canDeleteOtherUsersW2lTemplates() : boolean {
     return this.sessionStateResponse?.user?.can_delete_other_users_w2l_templates || false;
+  }
+
+  private verifyUserTokenMatch(otherUserToken: string | null | undefined) : boolean {
+    if (otherUserToken === null || otherUserToken === undefined || otherUserToken === "") {
+      return false;
+    }
+    const ourUserToken = this.sessionStateResponse?.user?.user_token;
+    if (ourUserToken === undefined || ourUserToken === "") {
+      return false;
+    }
+    return ourUserToken === otherUserToken;
   }
 }
