@@ -38,6 +38,7 @@ use crate::http_server::endpoints::events::list_events::list_events_handler;
 use crate::http_server::endpoints::misc::enable_alpha::enable_alpha;
 use crate::http_server::endpoints::moderation::ip_bans::add_ip_ban::add_ip_ban_handler;
 use crate::http_server::endpoints::moderation::ip_bans::delete_ip_ban::delete_ip_ban_handler;
+use crate::http_server::endpoints::moderation::ip_bans::get_ip_ban::get_ip_ban_handler;
 use crate::http_server::endpoints::moderation::ip_bans::list_ip_bans::list_ip_bans_handler;
 use crate::http_server::endpoints::moderation::user_roles::list_roles::list_user_roles_handler;
 use crate::http_server::endpoints::moderation::user_roles::list_staff::list_staff_handler;
@@ -49,6 +50,7 @@ use crate::http_server::endpoints::tts::enqueue_infer_tts::infer_tts_handler;
 use crate::http_server::endpoints::tts::enqueue_upload_tts_model::upload_tts_model_handler;
 use crate::http_server::endpoints::tts::get_tts_inference_job_status::get_tts_inference_job_status_handler;
 use crate::http_server::endpoints::tts::get_tts_model::get_tts_model_handler;
+use crate::http_server::endpoints::tts::get_tts_model_use_count::get_tts_model_use_count_handler;
 use crate::http_server::endpoints::tts::get_tts_result::get_tts_inference_result_handler;
 use crate::http_server::endpoints::tts::get_tts_upload_model_job_status::get_tts_upload_model_job_status_handler;
 use crate::http_server::endpoints::tts::list_tts_models::list_tts_models_handler;
@@ -71,6 +73,7 @@ use crate::http_server::endpoints::w2l::enqueue_upload_w2l_template::upload_w2l_
 use crate::http_server::endpoints::w2l::get_w2l_inference_job_status::get_w2l_inference_job_status_handler;
 use crate::http_server::endpoints::w2l::get_w2l_result::get_w2l_inference_result_handler;
 use crate::http_server::endpoints::w2l::get_w2l_template::get_w2l_template_handler;
+use crate::http_server::endpoints::w2l::get_w2l_template_use_count::get_w2l_template_use_count_handler;
 use crate::http_server::endpoints::w2l::get_w2l_upload_template_job_status::get_w2l_upload_template_job_status_handler;
 use crate::http_server::endpoints::w2l::list_w2l_templates::list_w2l_templates_handler;
 use crate::http_server::endpoints::w2l::set_w2l_template_mod_approval::set_w2l_template_mod_approval_handler;
@@ -80,8 +83,12 @@ use crate::server_state::{ServerState, EnvConfig};
 use crate::shared_constants::DEFAULT_MYSQL_CONNECTION_STRING;
 use crate::shared_constants::DEFAULT_REDIS_CONNECTION_STRING;
 use crate::shared_constants::DEFAULT_RUST_LOG;
+use crate::threads::ip_banlist_set::IpBanlistSet;
+use crate::threads::poll_ip_banlist_thread::poll_ip_bans;
 use crate::util::buckets::bucket_client::BucketClient;
 use crate::util::encrypted_sort_id::SortKeyCrypto;
+use futures::Future;
+use futures::executor::ThreadPool;
 use log::{info};
 use r2d2_redis::RedisConnectionManager;
 use r2d2_redis::r2d2;
@@ -89,19 +96,7 @@ use r2d2_redis::redis::Commands;
 use sqlx::MySqlPool;
 use sqlx::mysql::MySqlPoolOptions;
 use std::sync::Arc;
-use crate::http_server::endpoints::tts::get_tts_model_use_count::get_tts_model_use_count_handler;
-use crate::http_server::endpoints::w2l::get_w2l_template_use_count::get_w2l_template_use_count_handler;
-use crate::http_server::endpoints::moderation::ip_bans::get_ip_ban::get_ip_ban_handler;
-use crate::threads::ip_banlist_set::IpBanlistSet;
-use crate::threads::poll_ip_banlist_thread::poll_ip_bans;
-use tokio::signal::unix::{Signal, signal};
-use tokio::signal::unix::SignalKind;
-use std::sync::atomic::{AtomicBool, Ordering};
-use tokio::sync::oneshot::{channel, Sender};
 use std::time::Duration;
-use futures::Future;
-use std::thread;
-use futures::executor::ThreadPool;
 
 // TODO TODO TODO TODO
 // TODO TODO TODO TODO
@@ -224,7 +219,7 @@ async fn main() -> AnyhowResult<()> {
 
   let ip_banlist = IpBanlistSet::new();
   let ip_banlist2 = ip_banlist.clone();
-  let pool3 = pool.clone();
+  let mysql_pool3 = pool.clone();
 
   // Necessary to run our background work.
   // I tried getting this running with actix, tokio, by other means,
@@ -232,45 +227,9 @@ async fn main() -> AnyhowResult<()> {
   // interrupts.
   let thread_pool = ThreadPool::new()?;
 
-  let shutdown = Arc::new(AtomicBool::new(false));
-
   thread_pool.spawn_ok(async {
-    poll_ip_bans("".to_string(), ip_banlist2, pool3, shutdown).await;
+    poll_ip_bans(ip_banlist2, mysql_pool3).await;
   });
-
-  // Set up signal handlers
-  //let ctrl_c = tokio::task::spawn(tokio::signal::ctrl_c());
-  //let (sighup, sigterm, sigquit) = (
-  //  tokio::task::spawn(hangup()),
-  //  tokio::task::spawn(terminate()),
-  //  tokio::task::spawn(quit()),
-  //);
-
-
-  ////// Start polling thread.
-  ////let pool2 = pool.clone();
-  ////let ip_banlist2 = ip_banlist.clone();
-  //let shutdown2 = shutdown.clone();
-
-  ////let ip_banlist3 = ip_banlist.clone();
-  ////let shutdown3 = shutdown.clone();
-
-  //let join = actix_rt::task::spawn_blocking(async {
-  //  //poll_ip_bans(ip_banlist2, pool2, ctrl_c, sighup, sigterm, sigquit).await;
-  //  shutdown_signal(shutdown2, tx).await
-  //});
-
-
-  //let join2 = tokio::task::spawn(async {
-  //  //poll_ip_bans(ip_banlist2, pool2, ctrl_c, sighup, sigterm, sigquit).await;
-  //  poll_ip_bans("foo".to_string(), ip_banlist2, pool2, shutdown).await;
-  //});
-
-  //let join3 = tokio::task::spawn(async {
-  //  //poll_ip_bans(ip_banlist2, pool2, ctrl_c, sighup, sigterm, sigquit).await;
-  //  poll_ip_bans("bar".to_string(), ip_banlist3, pool3, shutdown3).await;
-  //});
-
 
   let server_state = ServerState {
     env_config: EnvConfig {
@@ -296,28 +255,6 @@ async fn main() -> AnyhowResult<()> {
   serve(server_state)
     .await?;
   Ok(())
-}
-
-async fn test_future() {
-  loop {
-    info!("Thread 2");
-    thread::sleep(Duration::from_millis(1000));
-  }
-}
-
-async fn shutdown_signal(mut shutdown: Arc<AtomicBool>, tx: Sender<bool>) {
-  // Wait for the CTRL+C signal
-  info!("Waiting for Ctrl+C");
-  //let mut stream = signal(SignalKind::terminate())?;
-  //stream.recv().await;
-  tokio::signal::ctrl_c()
-      .await
-      .expect("failed to install CTRL+C signal handler");
-
-  tx.send(true).unwrap();
-
-  info!("Shutdown recieved!");
-  shutdown.store(true, Ordering::Relaxed);
 }
 
 pub async fn serve(server_state: ServerState) -> AnyhowResult<()>
