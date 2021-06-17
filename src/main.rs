@@ -421,7 +421,7 @@ pub async fn serve(server_state: ServerState) -> AnyhowResult<()>
           )
           .service(
             web::resource("/result/{token}/delete")
-              .route(web::get().to(delete_tts_inference_result_handler))
+              .route(web::post().to(delete_tts_inference_result_handler))
               .route(web::head().to(|| HttpResponse::Ok()))
           )
           .service(
@@ -485,7 +485,7 @@ pub async fn serve(server_state: ServerState) -> AnyhowResult<()>
           )
           .service(
             web::resource("/result/{token}/delete")
-              .route(web::get().to(delete_w2l_inference_result_handler))
+              .route(web::post().to(delete_w2l_inference_result_handler))
               .route(web::head().to(|| HttpResponse::Ok()))
           )
          .service(
