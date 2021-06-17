@@ -42,6 +42,14 @@ pub struct TtsResultRecordForResponse {
   pub created_at: DateTime<Utc>,
   pub updated_at: DateTime<Utc>,
 
+  pub maybe_moderator_fields: Option<TtsResultModeratorFields>,
+}
+
+/// "Moderator-only fields" that we wouldn't want to expose to ordinary users.
+/// It's the web endpoint controller's responsibility to clear these for non-mods.
+#[derive(Serialize)]
+pub struct TtsResultModeratorFields {
+  pub creator_ip_address: String,
   pub user_deleted_at: Option<DateTime<Utc>>,
   pub mod_deleted_at: Option<DateTime<Utc>>,
 }
@@ -76,6 +84,8 @@ pub struct TtsResultRecordRaw {
   pub created_at: DateTime<Utc>,
   pub updated_at: DateTime<Utc>,
 
+  // Moderator fields
+  pub creator_ip_address: String,
   pub user_deleted_at: Option<DateTime<Utc>>,
   pub mod_deleted_at: Option<DateTime<Utc>>,
 }
@@ -136,8 +146,12 @@ pub async fn select_tts_result_by_token(
 
     created_at: ir.created_at.clone(),
     updated_at: ir.updated_at.clone(),
-    user_deleted_at: ir.user_deleted_at.clone(),
-    mod_deleted_at: ir.mod_deleted_at.clone(),
+
+    maybe_moderator_fields: Some(TtsResultModeratorFields {
+      creator_ip_address: ir.creator_ip_address.clone(),
+      user_deleted_at: ir.user_deleted_at.clone(),
+      mod_deleted_at: ir.mod_deleted_at.clone(),
+    }),
   };
 
   Ok(Some(ir_for_response))
@@ -175,6 +189,8 @@ SELECT
     tts_results.duration_millis,
     tts_results.created_at,
     tts_results.updated_at,
+
+    tts_results.creator_ip_address,
     tts_results.user_deleted_at,
     tts_results.mod_deleted_at
 
@@ -226,6 +242,8 @@ SELECT
     tts_results.duration_millis,
     tts_results.created_at,
     tts_results.updated_at,
+
+    tts_results.creator_ip_address,
     tts_results.user_deleted_at,
     tts_results.mod_deleted_at
 

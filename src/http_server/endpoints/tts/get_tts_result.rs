@@ -78,11 +78,15 @@ pub async fn get_tts_inference_result_handler(
       })?;
 
   let mut show_deleted_results = false;
+  let mut is_moderator = false;
 
   if let Some(user_session) = maybe_user_session {
     // NB: Moderators can see deleted results.
     // Original creators cannot see them (unless they're moderators!)
     show_deleted_results = user_session.can_delete_other_users_tts_results;
+    // Moderators get to see all the fields.
+    is_moderator = user_session.can_delete_other_users_tts_results
+        || user_session.can_edit_other_users_tts_models;
   }
 
   let inference_result_query_result = select_tts_result_by_token(
@@ -91,7 +95,7 @@ pub async fn get_tts_inference_result_handler(
     &server_state.mysql_pool
   ).await;
 
-  let inference_result = match inference_result_query_result {
+  let mut inference_result = match inference_result_query_result {
     Err(e) => {
       warn!("query error: {:?}", e);
       return Err(GetTtsResultError::ServerError);
@@ -99,6 +103,10 @@ pub async fn get_tts_inference_result_handler(
     Ok(None) => return Err(GetTtsResultError::NotFound),
     Ok(Some(inference_result)) => inference_result,
   };
+
+  if !is_moderator {
+    inference_result.maybe_moderator_fields = None;
+  }
 
   let response = GetTtsResultSuccessResponse {
     success: true,
