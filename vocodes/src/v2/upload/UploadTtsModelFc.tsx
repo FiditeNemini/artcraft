@@ -4,7 +4,7 @@ import { SessionTtsModelUploadResultListFc } from '../common/SessionTtsModelUplo
 import { SessionWrapper } from '../../session/SessionWrapper';
 import { TtsModelUploadJob } from '../../jobs/TtsModelUploadJobs';
 import { useHistory, Link } from "react-router-dom";
-import { v1 as uuidv1 } from 'uuid';
+import { v4 as uuidv4 } from 'uuid';
 
 interface Props {
   sessionWrapper: SessionWrapper,
@@ -49,7 +49,7 @@ function UploadTtsModelFc(props: Props) {
     const api = new ApiConfig();
     const endpointUrl = api.uploadTts();
     
-    let idempotencyToken = uuidv1(); // Time-based UUID
+    let idempotencyToken = uuidv4();
 
     const request = {
       idempotency_token: idempotencyToken,

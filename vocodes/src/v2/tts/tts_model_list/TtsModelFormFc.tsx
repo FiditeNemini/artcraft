@@ -10,7 +10,7 @@ import { TtsInferenceJob } from '../../../App';
 import { TtsModelUploadJob } from '../../../jobs/TtsModelUploadJobs';
 import { W2lInferenceJob } from '../../../jobs/W2lInferenceJobs';
 import { W2lTemplateUploadJob } from '../../../jobs/W2lTemplateUploadJobs';
-import { v1 as uuidv1 } from 'uuid';
+import { v4 as uuidv4 } from 'uuid';
 
 interface TtsModelListResponsePayload {
   success: boolean,
@@ -147,9 +147,8 @@ function TtsModelFormFc(props: Props) {
     const api = new ApiConfig();
     const endpointUrl = api.inferTts();
     
-    // TODO: Idempotency token.
     const request = {
-      uuid_idempotency_token: uuidv1(),
+      uuid_idempotency_token: uuidv4(),
       tts_model_token: modelToken,
       inference_text: text,
     }

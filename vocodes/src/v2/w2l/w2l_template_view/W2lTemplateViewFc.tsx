@@ -4,7 +4,7 @@ import { ApiConfig } from '../../../common/ApiConfig';
 import { SessionWrapper } from '../../../session/SessionWrapper';
 import { W2lInferenceJob } from '../../../App';
 import { useParams, Link, useHistory } from 'react-router-dom';
-import { v1 as uuidv1 } from 'uuid';
+import { v4 as uuidv4 } from 'uuid';
 import { SessionW2lInferenceResultListFc } from '../../common/SessionW2lInferenceResultsListFc';
 import { W2lTemplateViewDeleteFc } from './W2lTemplateView_DeleteFc';
 import { ReportDiscordLinkFc } from '../../common/DiscordReportLinkFc';
@@ -158,7 +158,7 @@ function W2lTemplateViewFc(props: Props) {
     let formData = new FormData();
     formData.append('audio', audioFile!);
     formData.append('template_token', templateToken);
-    formData.append('uuid_idempotency_token', uuidv1()!);
+    formData.append('uuid_idempotency_token', uuidv4()!);
 
     const api = new ApiConfig();
     const endpointUrl = api.inferW2l();

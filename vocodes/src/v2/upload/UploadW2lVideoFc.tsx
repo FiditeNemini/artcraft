@@ -4,7 +4,7 @@ import { SessionW2lTemplateUploadResultListFc } from '../common/SessionW2lTempla
 import { SessionWrapper } from '../../session/SessionWrapper';
 import { W2lTemplateUploadJob } from '../../jobs/W2lTemplateUploadJobs';
 import { useHistory, Link } from "react-router-dom";
-import { v1 as uuidv1 } from 'uuid';
+import { v4 as uuidv4 } from 'uuid';
 
 interface W2lTemplateUploadJobResponsePayload {
   success: boolean,
@@ -49,7 +49,7 @@ function UploadW2lVideoFc(props: Props) {
     const api = new ApiConfig();
     const endpointUrl = api.uploadW2l();
     
-    let idempotencyToken = uuidv1(); // Time-based UUID
+    let idempotencyToken = uuidv4();
 
     const request = {
       idempotency_token: idempotencyToken,

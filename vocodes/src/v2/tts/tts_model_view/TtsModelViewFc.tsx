@@ -7,7 +7,7 @@ import { SessionTtsInferenceResultListFc } from '../../common/SessionTtsInferenc
 import { SessionWrapper } from '../../../session/SessionWrapper';
 import { TtsInferenceJob } from '../../../App';
 import { useParams, Link } from 'react-router-dom';
-import { v1 as uuidv1 } from 'uuid';
+import { v4 as uuidv4 } from 'uuid';
 
 interface TtsModelViewResponsePayload {
   success: boolean,
@@ -144,9 +144,8 @@ function TtsModelViewFc(props: Props) {
     const api = new ApiConfig();
     const endpointUrl = api.inferTts();
     
-    // TODO: Idempotency token.
     const request = {
-      uuid_idempotency_token: uuidv1(),
+      uuid_idempotency_token: uuidv4(),
       tts_model_token: modelToken,
       inference_text: text,
     }
