@@ -5,6 +5,7 @@ import { useParams, Link } from 'react-router-dom';
 import { GravatarFc } from '../../common/GravatarFc';
 import { SpectrogramFc } from './SpectrogramFc';
 import { TtsResultViewDeleteFc } from './TtsResultView_DeleteFc';
+import { ReportDiscordLinkFc } from '../../common/DiscordReportLinkFc';
 
 interface TtsInferenceResultResponsePayload {
   success: boolean,
@@ -119,7 +120,6 @@ function TtsResultViewFc(props: Props) {
       </>
     );
   }
-
 
   let creatorDetails = <span>Anonymous user</span>;
   if (ttsInferenceResult.maybe_creator_user_token !== undefined) {
@@ -240,6 +240,9 @@ function TtsResultViewFc(props: Props) {
         currentlyDeleted={currentlyDeleted}
         maybeCreatorUserToken={ttsInferenceResult?.maybe_creator_user_token}
         />
+
+      <br />
+      <ReportDiscordLinkFc />
     </div>
   )
 }

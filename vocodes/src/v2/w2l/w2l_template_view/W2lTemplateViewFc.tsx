@@ -7,6 +7,7 @@ import { useParams, Link, useHistory } from 'react-router-dom';
 import { v1 as uuidv1 } from 'uuid';
 import { SessionW2lInferenceResultListFc } from '../../common/SessionW2lInferenceResultsListFc';
 import { W2lTemplateViewDeleteFc } from './W2lTemplateView_DeleteFc';
+import { ReportDiscordLinkFc } from '../../common/DiscordReportLinkFc';
 
 interface W2lTemplateViewResponsePayload {
   success: boolean,
@@ -426,6 +427,7 @@ function W2lTemplateViewFc(props: Props) {
 
       <SessionW2lInferenceResultListFc w2lInferenceJobs={props.w2lInferenceJobs} />
       <br />
+      <ReportDiscordLinkFc />
     </div>
   )
 }

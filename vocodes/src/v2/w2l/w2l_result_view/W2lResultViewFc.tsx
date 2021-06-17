@@ -4,6 +4,7 @@ import { GravatarFc } from '../../common/GravatarFc';
 import { SessionWrapper } from '../../../session/SessionWrapper';
 import { useParams, Link } from 'react-router-dom';
 import { W2lResultViewDeleteFc } from './W2lResultView_DeleteFc';
+import { ReportDiscordLinkFc } from '../../common/DiscordReportLinkFc';
 
 interface W2lInferenceResultResponsePayload {
   success: boolean,
@@ -220,6 +221,8 @@ function W2lResultViewFc(props: Props) {
         maybeCreatorUserToken={w2lInferenceResult?.maybe_creator_user_token}
         />
 
+      <br />
+      <ReportDiscordLinkFc />
     </div>
   )
 }
