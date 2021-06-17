@@ -34,6 +34,12 @@ interface W2lTemplate {
   is_public_listing_approved: boolean | null,
   created_at: string,
   updated_at: string,
+  maybe_moderator_fields: W2lTemplateModeratorFields | null | undefined,
+}
+
+interface W2lTemplateModeratorFields {
+  creator_ip_address_creation: string,
+  creator_ip_address_last_update: string,
   mod_deleted_at: string | undefined | null,
   user_deleted_at: string | undefined | null,
 }
@@ -249,8 +255,6 @@ function W2lTemplateViewFc(props: Props) {
 
   let modOnlyApprovalForm = <span />;
 
-  console.log('default mod value', defaultModValue);
-
   if (props.sessionWrapper.canApproveW2lTemplates()) {
     modOnlyApprovalForm = (
       <form onSubmit={handleModApprovalFormSubmit}>
@@ -278,20 +282,28 @@ function W2lTemplateViewFc(props: Props) {
     );
   }
 
-  const currentlyDeleted = !!w2lTemplate?.mod_deleted_at || !!w2lTemplate?.user_deleted_at;
+  const currentlyDeleted = !!w2lTemplate?.maybe_moderator_fields?.mod_deleted_at || !!w2lTemplate?.maybe_moderator_fields?.user_deleted_at;
 
-  let deletedAtRows = null;
+  let moderatorRows = null;
 
-  if (currentlyDeleted) {
-    deletedAtRows = (
+  if (props.sessionWrapper.canDeleteOtherUsersW2lResults() || props.sessionWrapper.canDeleteOtherUsersW2lTemplates()) {
+    moderatorRows = (
       <>
         <tr>
+          <th>Creator IP Address (Creation)</th>
+          <td>{w2lTemplate?.maybe_moderator_fields?.creator_ip_address_creation || "server error"}</td>
+        </tr>
+        <tr>
+          <th>Creator IP Address (Update)</th>
+          <td>{w2lTemplate?.maybe_moderator_fields?.creator_ip_address_last_update || "server error"}</td>
+        </tr>
+        <tr>
           <th>Mod Deleted At (UTC)</th>
-          <td>{w2lTemplate?.mod_deleted_at || "not deleted"}</td>
+          <td>{w2lTemplate?.maybe_moderator_fields?.mod_deleted_at || "not deleted"}</td>
         </tr>
         <tr>
           <th>User Deleted At (UTC)</th>
-          <td>{w2lTemplate?.user_deleted_at || "not deleted"}</td>
+          <td>{w2lTemplate?.maybe_moderator_fields?.user_deleted_at || "not deleted"}</td>
         </tr>
       </>
     );
@@ -398,7 +410,7 @@ function W2lTemplateViewFc(props: Props) {
             <td>{w2lTemplate?.updated_at}</td>
           </tr>
 
-          {deletedAtRows}
+          {moderatorRows}
 
         </tbody>
       </table>
