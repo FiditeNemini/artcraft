@@ -124,10 +124,18 @@ function ProfileFc(props: Props) {
   }
 
   if (userData !== undefined && userData.twitter_username) {
+    let twitterUrl = `https://twitter.com/${userData.twitter_username}`;
+    let twitterLink = (
+      <a 
+        href={twitterUrl} 
+        target="_blank"
+        rel="noopener noreferrer nofollow" 
+        >@{userData.twitter_username}</a>
+    );
     profileRows.push(
       <tr key="twitter">
         <th>Twitter</th>
-        <td>{userData.twitter_username}</td>
+        <td>{twitterLink}</td>
       </tr>
     )
   }
