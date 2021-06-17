@@ -35,6 +35,11 @@ interface W2lInferenceResult {
   created_at: string,
   updated_at: string,
 
+  maybe_moderator_fields: W2lInferenceResultModeratorFields | null | undefined,
+}
+
+interface W2lInferenceResultModeratorFields {
+  creator_ip_address: string,
   mod_deleted_at: string | undefined | null,
   user_deleted_at: string | undefined | null,
 }
@@ -85,25 +90,28 @@ function W2lResultViewFc(props: Props) {
 
   let templateName = w2lInferenceResult.template_title;
 
-  const currentlyDeleted = !!w2lInferenceResult?.mod_deleted_at || !!w2lInferenceResult?.user_deleted_at;
+  const currentlyDeleted = !!w2lInferenceResult?.maybe_moderator_fields?.mod_deleted_at || !!w2lInferenceResult?.maybe_moderator_fields?.user_deleted_at;
 
-  let deletedAtRows = null;
+  let moderatorRows = null;
 
-  if (currentlyDeleted) {
-    deletedAtRows = (
+  if (props.sessionWrapper.canDeleteOtherUsersW2lResults() || props.sessionWrapper.canDeleteOtherUsersW2lTemplates()) {
+    moderatorRows = (
       <>
         <tr>
+          <th>Creator IP Address (Creation)</th>
+          <td>{w2lInferenceResult?.maybe_moderator_fields?.creator_ip_address || "server error"}</td>
+        </tr>
+        <tr>
           <th>Mod Deleted At (UTC)</th>
-          <td>{w2lInferenceResult?.mod_deleted_at || "not deleted"}</td>
+          <td>{w2lInferenceResult?.maybe_moderator_fields?.mod_deleted_at || "not deleted"}</td>
         </tr>
         <tr>
           <th>User Deleted At (UTC)</th>
-          <td>{w2lInferenceResult?.user_deleted_at || "not deleted"}</td>
+          <td>{w2lInferenceResult?.maybe_moderator_fields?.user_deleted_at || "not deleted"}</td>
         </tr>
       </>
     );
   }
-
 
   if (w2lInferenceResult.template_title.length < 5) {
     templateName = `Template: ${w2lInferenceResult.template_title}`;
@@ -200,7 +208,7 @@ function W2lResultViewFc(props: Props) {
             <td>{durationSeconds} seconds</td>
           </tr>
 
-          {deletedAtRows}
+          {moderatorRows}
 
         </tbody>
       </table>
