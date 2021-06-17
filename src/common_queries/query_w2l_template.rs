@@ -30,7 +30,7 @@ pub struct W2lTemplateRecordForResponse {
   pub is_locked_from_user_modification: bool,
   pub created_at: DateTime<Utc>,
   pub updated_at: DateTime<Utc>,
-  pub moderator_fields: Option<W2lTemplateModeratorFields>,
+  pub maybe_moderator_fields: Option<W2lTemplateModeratorFields>,
 }
 
 /// "Moderator-only fields" that we wouldn't want to expose to ordinary users.
@@ -112,7 +112,7 @@ pub async fn select_w2l_template_by_token(
     is_locked_from_user_modification: i8_to_bool(template.is_locked_from_user_modification),
     created_at: template.created_at.clone(),
     updated_at: template.updated_at.clone(),
-    moderator_fields: Some(W2lTemplateModeratorFields {
+    maybe_moderator_fields: Some(W2lTemplateModeratorFields {
       creator_ip_address_creation: template.creator_ip_address_creation.clone(),
       creator_ip_address_last_update: template.creator_ip_address_last_update.clone(),
       user_deleted_at: template.user_deleted_at.clone(),

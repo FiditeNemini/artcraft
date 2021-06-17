@@ -105,7 +105,7 @@ pub async fn get_w2l_template_handler(
   };
 
   if !is_moderator {
-    template.moderator_fields = None;
+    template.maybe_moderator_fields = None;
   }
 
   let response = GetW2lTemplateSuccessResponse {

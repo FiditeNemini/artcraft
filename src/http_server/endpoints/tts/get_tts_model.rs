@@ -8,6 +8,8 @@ use actix_web::web::Path;
 use actix_web::{Responder, web, HttpResponse, error, HttpRequest, HttpMessage};
 use chrono::{DateTime, Utc};
 use crate::AnyhowResult;
+use crate::common_queries::query_tts_model::TtsModelRecordForResponse;
+use crate::common_queries::query_tts_model::select_tts_model_by_token;
 use crate::common_queries::sessions::create_session_for_user;
 use crate::http_server::endpoints::users::create_account::CreateAccountError::{BadInput, ServerError, UsernameTaken, EmailTaken};
 use crate::http_server::endpoints::users::login::LoginSuccessResponse;
@@ -34,22 +36,6 @@ pub struct GetTtsModelPathInfo {
 }
 
 #[derive(Serialize)]
-pub struct TtsModelRecordForResponse {
-  pub model_token: String,
-  pub tts_model_type: String,
-  pub text_preprocessing_algorithm: String,
-
-  pub creator_user_token: String,
-  pub creator_username: String,
-  pub creator_display_name: String,
-
-  pub title: String,
-
-  pub created_at: DateTime<Utc>,
-  pub updated_at: DateTime<Utc>,
-}
-
-#[derive(Serialize)]
 pub struct GetTtsModelSuccessResponse {
   pub success: bool,
   pub model: TtsModelRecordForResponse,
@@ -58,34 +44,21 @@ pub struct GetTtsModelSuccessResponse {
 #[derive(Debug, Display)]
 pub enum GetTtsModelError {
   ServerError,
-}
-
-#[derive(Serialize)]
-pub struct TtsModelRecord {
-  pub model_token: String,
-  pub tts_model_type: String,
-  pub text_preprocessing_algorithm: String,
-
-  pub creator_user_token: String,
-  pub creator_username: String,
-  pub creator_display_name: String,
-
-  pub title: String,
-
-  pub created_at: DateTime<Utc>,
-  pub updated_at: DateTime<Utc>,
+  NotFound,
 }
 
 impl ResponseError for GetTtsModelError {
   fn status_code(&self) -> StatusCode {
     match *self {
       GetTtsModelError::ServerError=> StatusCode::INTERNAL_SERVER_ERROR,
+      GetTtsModelError::NotFound => StatusCode::NOT_FOUND,
     }
   }
 
   fn error_response(&self) -> HttpResponse {
     let error_reason = match self {
       GetTtsModelError::ServerError => "server error".to_string(),
+      GetTtsModelError::NotFound => "not found".to_string(),
     };
 
     to_simple_json_error(&error_reason, self.status_code())
@@ -97,73 +70,55 @@ pub async fn get_tts_model_handler(
   path: Path<GetTtsModelPathInfo>,
   server_state: web::Data<Arc<ServerState>>) -> Result<HttpResponse, GetTtsModelError>
 {
-  // NB: Lookup failure is Err(RowNotFound).
-  // NB: Since this is publicly exposed, we don't query sensitive data.
-  let maybe_models = sqlx::query_as!(
-      TtsModelRecord,
-        r#"
-SELECT
-    tts.token as model_token,
-    tts.tts_model_type,
-    tts.text_preprocessing_algorithm,
+  let maybe_user_session = server_state
+      .session_checker
+      .maybe_get_user_session(&http_request, &server_state.mysql_pool)
+      .await
+      .map_err(|e| {
+        warn!("Session checker error: {:?}", e);
+        GetTtsModelError::ServerError
+      })?;
 
-    tts.creator_user_token,
-    users.username as creator_username,
-    users.display_name as creator_display_name,
+  let mut show_deleted_models = false;
+  let mut is_moderator = false;
 
-    tts.title,
+  if let Some(user_session) = maybe_user_session {
+    // NB: Moderators can see deleted models
+    // Original creators cannot see them (unless they're moderators!)
+    show_deleted_models = user_session.can_delete_other_users_tts_models;
+    // Moderators get to see all the fields.
+    is_moderator = user_session.can_delete_other_users_tts_results
+        || user_session.can_edit_other_users_tts_models;
+  }
 
-    tts.created_at,
-    tts.updated_at
-FROM tts_models as tts
-JOIN users
-ON users.token = tts.creator_user_token
-WHERE
-    tts.token = ?
-    AND tts.user_deleted_at IS NULL
-    AND tts.mod_deleted_at IS NULL
-        "#,
-      &path.token
-    )
-    .fetch_one(&server_state.mysql_pool)
-    .await; // TODO: This will return error if it doesn't exist
+  let model_query_result = select_tts_model_by_token(
+    &path.token,
+    show_deleted_models,
+    &server_state.mysql_pool
+  ).await;
 
-  let template : TtsModelRecord = match maybe_models {
-    Ok(models) => models,
-    Err(err) => {
-      match err {
-        RowNotFound => {
-          return Err(GetTtsModelError::ServerError);
-        },
-        _ => {
-          warn!("tts template query error: {:?}", err);
-          return Err(GetTtsModelError::ServerError);
-        }
-      }
+  let mut model = match model_query_result {
+    Err(e) => {
+      warn!("query error: {:?}", e);
+      return Err(GetTtsModelError::ServerError);
     }
+    Ok(None) => return Err(GetTtsModelError::NotFound),
+    Ok(Some(model)) => model,
   };
 
-  let model_for_response = TtsModelRecordForResponse {
-    model_token: template.model_token.clone(),
-    tts_model_type: template.tts_model_type.clone(),
-    text_preprocessing_algorithm: template.text_preprocessing_algorithm.clone(),
-    creator_user_token: template.creator_user_token.clone(),
-    creator_username: template.creator_username.clone(),
-    creator_display_name: template.creator_display_name.clone(),
-    title: template.title.clone(),
-    created_at: template.created_at.clone(),
-    updated_at: template.updated_at.clone(),
-  };
+  if !is_moderator {
+    model.maybe_moderator_fields = None;
+  }
 
   let response = GetTtsModelSuccessResponse {
     success: true,
-    model: model_for_response,
+    model,
   };
 
   let body = serde_json::to_string(&response)
-    .map_err(|e| GetTtsModelError::ServerError)?;
+      .map_err(|e| GetTtsModelError::ServerError)?;
 
   Ok(HttpResponse::Ok()
-    .content_type("application/json")
-    .body(body))
+      .content_type("application/json")
+      .body(body))
 }

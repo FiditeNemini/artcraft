@@ -16,16 +16,31 @@ use std::sync::Arc;
 pub struct TtsModelRecordForResponse {
   pub model_token: String,
   pub tts_model_type: String,
+  pub text_preprocessing_algorithm: String,
+
   pub creator_user_token: String,
   pub creator_username: String,
   pub creator_display_name: String,
+
   pub title: String,
   pub description_markdown: String,
   pub description_rendered_html: String,
+
   pub is_locked_from_use: bool,
   pub is_locked_from_user_modification: bool,
+
   pub created_at: DateTime<Utc>,
   pub updated_at: DateTime<Utc>,
+
+  pub maybe_moderator_fields: Option<TtsModelModeratorFields>,
+}
+
+/// "Moderator-only fields" that we wouldn't want to expose to ordinary users.
+/// It's the web endpoint controller's responsibility to clear these for non-mods.
+#[derive(Serialize)]
+pub struct TtsModelModeratorFields {
+  pub creator_ip_address_creation: String,
+  pub creator_ip_address_last_update: String,
   pub user_deleted_at: Option<DateTime<Utc>>,
   pub mod_deleted_at: Option<DateTime<Utc>>,
 }
@@ -34,16 +49,25 @@ pub struct TtsModelRecordForResponse {
 pub struct TtsModelRecordRaw {
   pub model_token: String,
   pub tts_model_type: String,
+  pub text_preprocessing_algorithm: String,
+
   pub creator_user_token: String,
   pub creator_username: String,
   pub creator_display_name: String,
+
   pub title: String,
   pub description_markdown: String,
   pub description_rendered_html: String,
+
   pub is_locked_from_use: i8,
   pub is_locked_from_user_modification: i8,
+
   pub created_at: DateTime<Utc>,
   pub updated_at: DateTime<Utc>,
+
+  // Moderator fields
+  pub creator_ip_address_creation: String,
+  pub creator_ip_address_last_update: String,
   pub user_deleted_at: Option<DateTime<Utc>>,
   pub mod_deleted_at: Option<DateTime<Utc>>,
 }
@@ -79,6 +103,7 @@ pub async fn select_tts_model_by_token(
   let model_for_response = TtsModelRecordForResponse {
     model_token: model.model_token.clone(),
     tts_model_type: model.tts_model_type.clone(),
+    text_preprocessing_algorithm: model.text_preprocessing_algorithm.clone(),
     creator_user_token: model.creator_user_token.clone(),
     creator_username: model.creator_username.clone(),
     creator_display_name: model.creator_display_name.clone(),
@@ -89,8 +114,12 @@ pub async fn select_tts_model_by_token(
     is_locked_from_user_modification: i8_to_bool(model.is_locked_from_user_modification),
     created_at: model.created_at.clone(),
     updated_at: model.updated_at.clone(),
-    user_deleted_at: model.user_deleted_at.clone(),
-    mod_deleted_at: model.mod_deleted_at.clone(),
+    maybe_moderator_fields: Some(TtsModelModeratorFields {
+      creator_ip_address_creation: model.creator_ip_address_creation.clone(),
+      creator_ip_address_last_update: model.creator_ip_address_last_update.clone(),
+      user_deleted_at: model.user_deleted_at.clone(),
+      mod_deleted_at: model.mod_deleted_at.clone(),
+    }),
   };
 
   Ok(Some(model_for_response))
@@ -106,18 +135,27 @@ async fn select_including_deleted(
 SELECT
     tts.token as model_token,
     tts.tts_model_type,
+    tts.text_preprocessing_algorithm,
+
     tts.creator_user_token,
     users.username as creator_username,
     users.display_name as creator_display_name,
+
     tts.title,
     tts.description_markdown,
     tts.description_rendered_html,
+
     tts.is_locked_from_use,
     tts.is_locked_from_user_modification,
+
     tts.created_at,
     tts.updated_at,
-    tts.user_deleted_at,
-    tts.mod_deleted_at
+
+    tts.creator_ip_address_creation,
+    tts.creator_ip_address_last_update,
+    tts.mod_deleted_at,
+    tts.user_deleted_at
+
 FROM tts_models as tts
 JOIN users
     ON users.token = tts.creator_user_token
@@ -139,18 +177,27 @@ async fn select_without_deleted(
 SELECT
     tts.token as model_token,
     tts.tts_model_type,
+    tts.text_preprocessing_algorithm,
+
     tts.creator_user_token,
     users.username as creator_username,
     users.display_name as creator_display_name,
+
     tts.title,
     tts.description_markdown,
     tts.description_rendered_html,
+
     tts.is_locked_from_use,
     tts.is_locked_from_user_modification,
+
     tts.created_at,
     tts.updated_at,
-    tts.user_deleted_at,
-    tts.mod_deleted_at
+
+    tts.creator_ip_address_creation,
+    tts.creator_ip_address_last_update,
+    tts.mod_deleted_at,
+    tts.user_deleted_at
+
 FROM tts_models as tts
 JOIN users
     ON users.token = tts.creator_user_token
