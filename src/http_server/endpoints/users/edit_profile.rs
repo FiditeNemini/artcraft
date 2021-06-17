@@ -19,7 +19,7 @@ use crate::validations::discord_username::validate_discord_username;
 use crate::validations::github_username::validate_github_username;
 use crate::validations::passwords::validate_passwords;
 use crate::validations::twitch_username::validate_twitch_username;
-use crate::validations::twitter_username::validate_twitter_username;
+use crate::validations::twitter_username::{validate_twitter_username, normalize_twitter_username_for_storage};
 use crate::validations::username::validate_username;
 use crate::validations::username_reservations::is_reserved_username;
 use crate::validations::website_url::validate_website_url;
@@ -160,7 +160,8 @@ pub async fn edit_profile_handler(
       if let Err(reason) = validate_twitter_username(trimmed) {
         return Err(EditProfileError::BadInput(reason));
       }
-      twitter_username = Some(trimmed);
+      let normalized = normalize_twitter_username_for_storage(trimmed);
+      twitter_username = Some(normalized);
     }
   }
 

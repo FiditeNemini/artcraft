@@ -33,7 +33,7 @@ pub fn hash_to_bucket_path(file_hash: &str,
 
 #[cfg(test)]
 mod tests {
-  use crate::buckets::bucket_paths::hash_to_bucket_path;
+  use crate::util::buckets::bucket_paths::hash_to_bucket_path;
 
   #[test]
   fn test_bucket_without_root() {

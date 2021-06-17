@@ -163,7 +163,7 @@ impl BucketPathUnifier {
 
 #[cfg(test)]
 mod tests {
-  use crate::buckets::bucket_path_unifier::BucketPathUnifier;
+  use crate::util::buckets::bucket_path_unifier::BucketPathUnifier;
   use std::path::PathBuf;
 
   fn get_instance() -> BucketPathUnifier {
