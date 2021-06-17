@@ -4,6 +4,7 @@ import { SessionWrapper } from '../../../session/SessionWrapper';
 import { useParams, Link } from 'react-router-dom';
 import { GravatarFc } from '../../common/GravatarFc';
 import { SpectrogramFc } from './SpectrogramFc';
+import { TtsResultViewDeleteFc } from './TtsResultView_DeleteFc';
 
 interface TtsInferenceResultResponsePayload {
   success: boolean,
@@ -35,6 +36,9 @@ interface TtsInferenceResult {
   duration_millis: number,
   created_at: string,
   updated_at: string,
+
+  mod_deleted_at: string | undefined | null,
+  user_deleted_at: string | undefined | null,
 }
 
 interface Props {
@@ -87,6 +91,26 @@ function TtsResultViewFc(props: Props) {
   let durationSeconds = ttsInferenceResult?.duration_millis / 1000;
 
   let modelName = ttsInferenceResult.tts_model_title;
+
+  const currentlyDeleted = !!ttsInferenceResult?.mod_deleted_at || !!ttsInferenceResult?.user_deleted_at;
+
+  let deletedAtRows = null;
+
+  if (currentlyDeleted) {
+    deletedAtRows = (
+      <>
+        <tr>
+          <th>Mod Deleted At (UTC)</th>
+          <td>{ttsInferenceResult?.mod_deleted_at || "not deleted"}</td>
+        </tr>
+        <tr>
+          <th>User Deleted At (UTC)</th>
+          <td>{ttsInferenceResult?.user_deleted_at || "not deleted"}</td>
+        </tr>
+      </>
+    );
+  }
+
 
   let creatorDetails = <span>Anonymous user</span>;
   if (ttsInferenceResult.maybe_creator_user_token !== undefined) {
@@ -195,9 +219,18 @@ function TtsResultViewFc(props: Props) {
             <th>Duration</th>
             <td>{durationSeconds} seconds</td>
           </tr>
+
+          {deletedAtRows}
+
         </tbody>
       </table>
 
+      <TtsResultViewDeleteFc
+        sessionWrapper={props.sessionWrapper}
+        resultToken={token}
+        currentlyDeleted={currentlyDeleted}
+        maybeCreatorUserToken={ttsInferenceResult?.maybe_creator_user_token}
+        />
     </div>
   )
 }
