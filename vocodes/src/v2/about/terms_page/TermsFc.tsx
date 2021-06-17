@@ -16,6 +16,16 @@ function TermsFc(props: Props) {
       </p>
 
       <p>
+        This is a research technololgy for fun. You may not use vocodes deepfakes 
+        for commercial use.
+      </p>
+
+      <p>
+        Do not engage in unlawful activity or attempt to impersonate any person,
+        company, or other entity. All published usages must be labled as "deep fake".
+      </p>
+
+      <p>
         We'll be happy to remove any of the voices featured here for any reason.
       </p>
 
