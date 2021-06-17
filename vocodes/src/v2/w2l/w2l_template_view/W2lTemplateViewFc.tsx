@@ -210,36 +210,6 @@ function W2lTemplateViewFc(props: Props) {
     return false;
   }
 
-  const handleDeleteFormSubmit = (ev: React.FormEvent<HTMLFormElement>) : boolean => {
-    ev.preventDefault();
-
-    const api = new ApiConfig();
-    const endpointUrl = api.deleteW2l(templateSlug);
-
-    const request = {
-      set_delete: true,
-    }
-
-    fetch(endpointUrl, {
-      method: 'POST',
-      headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json',
-      },
-      credentials: 'include',
-      body: JSON.stringify(request),
-    })
-    .then(res => res.json())
-    .then(res => {
-      if (res.success) {
-        history.go(0); // force reload
-      }
-    })
-    .catch(e => {
-    });
-    return false;
-  }
-
   let creatorLink=`/profile/${w2lTemplate?.creator_username}`;
   let object : string|undefined = undefined;
   

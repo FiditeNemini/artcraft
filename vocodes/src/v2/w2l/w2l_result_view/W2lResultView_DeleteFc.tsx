@@ -5,19 +5,19 @@ import { useHistory } from 'react-router-dom';
 
 interface Props {
   sessionWrapper: SessionWrapper,
-  templateSlug: string,
-  creatorUserToken: string | undefined | null,
+  resultToken: string,
+  maybeCreatorUserToken: string | undefined | null,
   currentlyDeleted: boolean,
 }
 
-function W2lTemplateViewDeleteFc(props: Props) {
+function W2lResultViewDeleteFc(props: Props) {
   const history = useHistory();
 
   const handleDeleteFormSubmit = (ev: React.FormEvent<HTMLFormElement>) : boolean => {
     ev.preventDefault();
 
     const api = new ApiConfig();
-    const endpointUrl = api.deleteW2lTemplate(props.templateSlug);
+    const endpointUrl = api.deleteW2lInferenceResult(props.resultToken);
 
     const request = {
       set_delete: !props.currentlyDeleted,
@@ -35,7 +35,7 @@ function W2lTemplateViewDeleteFc(props: Props) {
     .then(res => res.json())
     .then(res => {
       if (res.success) {
-        if (props.sessionWrapper.canDeleteOtherUsersW2lTemplates()) {
+        if (props.sessionWrapper.canDeleteOtherUsersW2lResults()) {
           history.go(0); // force reload
         } else {
           history.push('/');
@@ -47,7 +47,7 @@ function W2lTemplateViewDeleteFc(props: Props) {
     return false;
   }
 
-  if (!props.sessionWrapper.canDeleteW2lTemplateByUserToken(props.creatorUserToken)) {
+  if (!props.sessionWrapper.canDeleteW2lResultByUserToken(props.maybeCreatorUserToken)) {
     return <span />;
   }
 
@@ -58,8 +58,8 @@ function W2lTemplateViewDeleteFc(props: Props) {
     "button is-danger is-large is-fullwidth";
 
   const formLabel = props.currentlyDeleted ? 
-     "Recover the W2L Template (makes it visible and usable again)" : 
-     "Delete W2L Template (hides from everyone but mods)";
+     "Recover the W2L Result (makes it visible again)" : 
+     "Delete W2L Result (hides from everyone but mods)";
 
   return (
     <form onSubmit={handleDeleteFormSubmit}>
@@ -77,4 +77,4 @@ function W2lTemplateViewDeleteFc(props: Props) {
   )
 }
 
-export { W2lTemplateViewDeleteFc };
+export { W2lResultViewDeleteFc };

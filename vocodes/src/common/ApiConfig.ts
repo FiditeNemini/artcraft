@@ -60,12 +60,20 @@ class ApiConfig {
     return `${this.getScheme()}://${this.getNewApiHost()}/tts/model/${modelSlug}`;
   }
 
+  deleteTtsModel(modelToken: string) : string {
+    return `${this.getScheme()}://${this.getNewApiHost()}/tts/model/${modelToken}/delete`;
+  }
+
   getTtsModelUseCount(modelSlug: string) : string {
     return `${this.getScheme()}://${this.getNewApiHost()}/tts/model/${modelSlug}/count`;
   }
 
   viewTtsInferenceResult(token: string) : string {
     return `${this.getScheme()}://${this.getNewApiHost()}/tts/result/${token}`;
+  }
+
+  deleteTtsInferenceResult(resultToken: string) : string {
+    return `${this.getScheme()}://${this.getNewApiHost()}/tts/result/${resultToken}/delete`;
   }
 
   listTtsModelsForUser(username: string) : string {
@@ -119,8 +127,12 @@ class ApiConfig {
     return `${this.getScheme()}://${this.getNewApiHost()}/w2l/list`;
   }
 
-  viewW2l(templateSlug: string) : string {
-    return `${this.getScheme()}://${this.getNewApiHost()}/w2l/template/${templateSlug}`;
+  viewW2l(templateToken: string) : string {
+    return `${this.getScheme()}://${this.getNewApiHost()}/w2l/template/${templateToken}`;
+  }
+
+  deleteW2lTemplate(templateToken: string) : string {
+    return `${this.getScheme()}://${this.getNewApiHost()}/w2l/template/${templateToken}/delete`;
   }
 
   getW2lTemplateUseCount(templateSlug: string) : string {
@@ -131,12 +143,12 @@ class ApiConfig {
     return `${this.getScheme()}://${this.getNewApiHost()}/w2l/template/${templateSlug}/moderate`;
   }
 
-  deleteW2l(templateSlug: string) : string {
-    return `${this.getScheme()}://${this.getNewApiHost()}/w2l/template/${templateSlug}/delete`;
-  }
-
   viewW2lInferenceResult(token: string) : string {
     return `${this.getScheme()}://${this.getNewApiHost()}/w2l/result/${token}`;
+  }
+
+  deleteW2lInferenceResult(resultToken: string) : string {
+    return `${this.getScheme()}://${this.getNewApiHost()}/w2l/result/${resultToken}/delete`;
   }
 
   inferTts() : string {

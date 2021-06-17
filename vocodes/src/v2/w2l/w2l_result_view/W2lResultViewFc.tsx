@@ -3,6 +3,7 @@ import { ApiConfig } from '../../../common/ApiConfig';
 import { GravatarFc } from '../../common/GravatarFc';
 import { SessionWrapper } from '../../../session/SessionWrapper';
 import { useParams, Link } from 'react-router-dom';
+import { W2lResultViewDeleteFc } from './W2lResultView_DeleteFc';
 
 interface W2lInferenceResultResponsePayload {
   success: boolean,
@@ -33,6 +34,9 @@ interface W2lInferenceResult {
   duration_millis: number,
   created_at: string,
   updated_at: string,
+
+  mod_deleted_at: string | undefined | null,
+  user_deleted_at: string | undefined | null,
 }
 
 interface Props {
@@ -80,6 +84,8 @@ function W2lResultViewFc(props: Props) {
   let durationSeconds = w2lInferenceResult?.duration_millis / 1000;
 
   let templateName = w2lInferenceResult.template_title;
+
+  const currentlyDeleted = !!w2lInferenceResult?.mod_deleted_at || !!w2lInferenceResult?.user_deleted_at;
 
   if (w2lInferenceResult.template_title.length < 5) {
     templateName = `Template: ${w2lInferenceResult.template_title}`;
@@ -177,6 +183,13 @@ function W2lResultViewFc(props: Props) {
           </tr>
         </tbody>
       </table>
+
+      <W2lResultViewDeleteFc
+        sessionWrapper={props.sessionWrapper}
+        resultToken={token}
+        currentlyDeleted={currentlyDeleted}
+        maybeCreatorUserToken={w2lInferenceResult?.maybe_creator_user_token}
+        />
 
     </div>
   )
