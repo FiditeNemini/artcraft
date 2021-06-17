@@ -81,12 +81,10 @@ impl<S, B> Service for IpFilterMiddleware<S>
       return Box::pin(ok(req.error_response(ErrorForbidden("Forbidden"))))
     }
 
+    // Call endpoint and return results
     let fut = self.service.call(req);
-
     Box::pin(async move {
       let res = fut.await?;
-
-      println!("Hi from response");
       Ok(res)
     })
   }
