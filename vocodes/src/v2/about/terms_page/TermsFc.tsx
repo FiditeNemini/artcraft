@@ -12,7 +12,7 @@ function TermsFc(props: Props) {
         We do not condone the use of vocodes for any type of deception, slur, 
         abuse, or mistreatment of any individual or group. Please report such 
         abuses to our <a href="https://discord.gg/H72KFXm">community staff on Discord</a>. 
-        Bad actors will have their access revoked.
+        Bad actors will have their access revoked and materials deleted.
       </p>
 
       <p>
