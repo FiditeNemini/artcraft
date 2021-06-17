@@ -44,6 +44,14 @@ pub struct W2lResultRecordForResponse {
   pub created_at: DateTime<Utc>,
   pub updated_at: DateTime<Utc>,
 
+  pub maybe_moderator_fields: Option<W2lResultModeratorFields>,
+}
+
+/// "Moderator-only fields" that we wouldn't want to expose to ordinary users.
+/// It's the web endpoint controller's responsibility to clear these for non-mods.
+#[derive(Serialize)]
+pub struct W2lResultModeratorFields {
+  pub creator_ip_address: String,
   pub user_deleted_at: Option<DateTime<Utc>>,
   pub mod_deleted_at: Option<DateTime<Utc>>,
 }
@@ -81,6 +89,7 @@ pub struct W2lResultRecordRaw {
   pub created_at: DateTime<Utc>,
   pub updated_at: DateTime<Utc>,
 
+  pub creator_ip_address: String,
   pub user_deleted_at: Option<DateTime<Utc>>,
   pub mod_deleted_at: Option<DateTime<Utc>>,
 }
@@ -142,8 +151,12 @@ pub async fn select_w2l_result_by_token(
 
     created_at: ir.created_at.clone(),
     updated_at: ir.updated_at.clone(),
-    user_deleted_at: ir.user_deleted_at.clone(),
-    mod_deleted_at: ir.mod_deleted_at.clone(),
+
+    maybe_moderator_fields: Some(W2lResultModeratorFields {
+      creator_ip_address: ir.creator_ip_address.clone(),
+      user_deleted_at: ir.user_deleted_at.clone(),
+      mod_deleted_at: ir.mod_deleted_at.clone(),
+    }),
   };
 
   Ok(Some(ir_for_response))
@@ -182,6 +195,8 @@ SELECT
     w2l_results.duration_millis,
     w2l_results.created_at,
     w2l_results.updated_at,
+
+    w2l_results.creator_ip_address,
     w2l_results.user_deleted_at,
     w2l_results.mod_deleted_at
 
@@ -234,6 +249,8 @@ SELECT
     w2l_results.duration_millis,
     w2l_results.created_at,
     w2l_results.updated_at,
+
+    w2l_results.creator_ip_address,
     w2l_results.user_deleted_at,
     w2l_results.mod_deleted_at
 
