@@ -30,6 +30,15 @@ pub struct W2lTemplateRecordForResponse {
   pub is_locked_from_user_modification: bool,
   pub created_at: DateTime<Utc>,
   pub updated_at: DateTime<Utc>,
+  pub moderator_fields: Option<W2lTemplateModeratorFields>,
+}
+
+/// "Moderator-only fields" that we wouldn't want to expose to ordinary users.
+/// It's the web endpoint controller's responsibility to clear these for non-mods.
+#[derive(Serialize)]
+pub struct W2lTemplateModeratorFields {
+  pub creator_ip_address_creation: String,
+  pub creator_ip_address_last_update: String,
   pub user_deleted_at: Option<DateTime<Utc>>,
   pub mod_deleted_at: Option<DateTime<Utc>>,
 }
@@ -50,6 +59,8 @@ pub struct W2lTemplateRecordRaw {
   pub is_public_listing_approved: Option<i8>,
   pub is_locked_from_use: i8,
   pub is_locked_from_user_modification: i8,
+  pub creator_ip_address_creation: String,
+  pub creator_ip_address_last_update: String,
   pub created_at: DateTime<Utc>,
   pub updated_at: DateTime<Utc>,
   pub user_deleted_at: Option<DateTime<Utc>>,
@@ -101,8 +112,12 @@ pub async fn select_w2l_template_by_token(
     is_locked_from_user_modification: i8_to_bool(template.is_locked_from_user_modification),
     created_at: template.created_at.clone(),
     updated_at: template.updated_at.clone(),
-    user_deleted_at: template.user_deleted_at.clone(),
-    mod_deleted_at: template.mod_deleted_at.clone(),
+    moderator_fields: Some(W2lTemplateModeratorFields {
+      creator_ip_address_creation: template.creator_ip_address_creation.clone(),
+      creator_ip_address_last_update: template.creator_ip_address_last_update.clone(),
+      user_deleted_at: template.user_deleted_at.clone(),
+      mod_deleted_at: template.mod_deleted_at.clone(),
+    }),
   };
 
   Ok(Some(template_for_response))
@@ -130,6 +145,8 @@ SELECT
     w2l.is_public_listing_approved,
     w2l.is_locked_from_use,
     w2l.is_locked_from_user_modification,
+    w2l.creator_ip_address_creation,
+    w2l.creator_ip_address_last_update,
     w2l.created_at,
     w2l.updated_at,
     w2l.user_deleted_at,
@@ -167,6 +184,8 @@ SELECT
     w2l.is_public_listing_approved,
     w2l.is_locked_from_use,
     w2l.is_locked_from_user_modification,
+    w2l.creator_ip_address_creation,
+    w2l.creator_ip_address_last_update,
     w2l.created_at,
     w2l.updated_at,
     w2l.user_deleted_at,

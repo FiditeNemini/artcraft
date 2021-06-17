@@ -78,11 +78,15 @@ pub async fn get_w2l_template_handler(
       })?;
 
   let mut show_deleted_templates = false;
+  let mut is_moderator = false;
 
   if let Some(user_session) = maybe_user_session {
     // NB: Moderators can see deleted templates.
     // Original creators cannot see them (unless they're moderators!)
     show_deleted_templates = user_session.can_delete_other_users_w2l_templates;
+    // Moderators get to see all the fields.
+    is_moderator = user_session.can_delete_other_users_w2l_results
+        || user_session.can_edit_other_users_w2l_templates;
   }
 
   let template_query_result = select_w2l_template_by_token(
@@ -91,7 +95,7 @@ pub async fn get_w2l_template_handler(
     &server_state.mysql_pool
   ).await;
 
-  let template = match template_query_result {
+  let mut template = match template_query_result {
     Err(e) => {
       warn!("query error: {:?}", e);
       return Err(GetW2lTemplateError::ServerError);
@@ -99,6 +103,10 @@ pub async fn get_w2l_template_handler(
     Ok(None) => return Err(GetW2lTemplateError::NotFound),
     Ok(Some(template)) => template,
   };
+
+  if !is_moderator {
+    template.moderator_fields = None;
+  }
 
   let response = GetW2lTemplateSuccessResponse {
     success: true,
