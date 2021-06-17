@@ -227,18 +227,23 @@ function W2lTemplateViewFc(props: Props) {
     audioFilename = audioFile?.name;
   }
 
-  let modApprovalStatus = '';
+  let modApprovalStatus = <span />;
   let defaultModValue = modApprovedFormValue ? "true" : "false";
 
   switch (w2lTemplate?.is_public_listing_approved) {
     case null:
-      modApprovalStatus = 'Not yet (ask for approval in our Discord)';
+      modApprovalStatus = (
+        <span>
+          Not yet (ask for approval in our&nbsp;<a 
+          href="https://discord.gg/H72KFXm" target="_blank">Discord</a>)
+        </span>
+      );
       break;
     case true:
-      modApprovalStatus = 'Approved';
+      modApprovalStatus = <span>Approved</span>;
       break;
     case false:
-      modApprovalStatus = 'Not Approved';
+      modApprovalStatus = <span>Not Approved</span>;
       break;
   }
 
