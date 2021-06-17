@@ -179,13 +179,15 @@ function ProfileEditFc(props: Props) {
       <br />
       <br />
 
-      <p>
-        Profiles help you network with other creatives. 
-        We're going to make amazing and hilarious content together!
-      </p>
+      <div className="content">
 
-      {userData?.profile_markdown}
-      <br />
+        <p>
+          Profiles help you network with other creatives. 
+        </p>
+        <p>
+          We're going to make amazing and hilarious content together!
+        </p>
+      </div>
 
       <form onSubmit={handleFormSubmit}>
         <fieldset disabled={isDisabled}>
@@ -350,12 +352,16 @@ function ProfileEditFc(props: Props) {
       </form>
 
       <br />
-      <p>More features coming soon:</p>
-      <ul>
-        <li>Custom avatars</li>
-        <li>Email change</li>
-        <li>Password change and reset</li>
-      </ul>
+      <div className="content">
+        <p>More profile and account features coming soon:</p>
+        <ul>
+          <li>Fully private models and templates</li>
+          <li>Sharing preferences (private, friends, auto-expire, etc.)</li>
+          <li>Website preferences</li>
+          <li>Custom avatar / profile pic uploads</li>
+          <li>Email change, password change, and password reset</li>
+        </ul>
+      </div>
 
     </div>
   )
