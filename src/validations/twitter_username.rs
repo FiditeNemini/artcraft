@@ -9,15 +9,17 @@ pub fn validate_twitter_username(username: &str) -> Result<(), String> {
     };
   }
 
-  if username.len() < 4 {
-    return Err("twitter username is too short".to_string());
-  }
-
   if username.starts_with("@") {
+    if username.len() < 5 {
+      return Err("twitter username is too short".to_string());
+    }
     if username.len() > 16 {
       return Err("twitter username is too long".to_string());
     }
   } else {
+    if username.len() < 4 {
+      return Err("twitter username is too short".to_string());
+    }
     if username.len() > 15 {
       return Err("twitter username is too long".to_string());
     }
@@ -44,6 +46,7 @@ mod tests {
     assert!(validate_twitter_username("@echelon").is_ok());
     assert!(validate_twitter_username("echelon").is_ok());
     assert!(validate_twitter_username("four").is_ok());
+    assert!(validate_twitter_username("@four").is_ok());
     assert!(validate_twitter_username("123456789012345").is_ok());
     assert!(validate_twitter_username("@123456789012345").is_ok());
     assert!(validate_twitter_username("a_A_b_B_c_C_d_D").is_ok());
