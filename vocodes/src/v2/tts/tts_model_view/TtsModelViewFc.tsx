@@ -30,6 +30,14 @@ interface TtsModel {
   updatable_slug: string,
   created_at: string,
   updated_at: string,
+  maybe_moderator_fields: TtsModelModeratorFields | null | undefined,
+}
+
+interface TtsModelModeratorFields {
+  creator_ip_address_creation: string,
+  creator_ip_address_last_update: string,
+  mod_deleted_at: string | undefined | null,
+  user_deleted_at: string | undefined | null,
 }
 
 interface Props {
@@ -167,11 +175,6 @@ function TtsModelViewFc(props: Props) {
     return false;
   };
 
-  const handleCancelClick = (ev: React.FormEvent<HTMLButtonElement>) => { 
-    ev.preventDefault();
-    return false;
-  };
-
   let creatorLink=`/profile/${ttsModel?.creator_username}`;
 
   let title = 'TTS Model'
@@ -184,6 +187,32 @@ function TtsModelViewFc(props: Props) {
   if (ttsModelUseCount !== undefined && ttsModelUseCount !== null) {
     humanUseCount = ttsModelUseCount;
   }
+
+  let moderatorRows = null;
+
+  if (props.sessionWrapper.canDeleteOtherUsersTtsResults() || props.sessionWrapper.canDeleteOtherUsersTtsModels()) {
+    moderatorRows = (
+      <>
+        <tr>
+          <th>Creator IP Address (Creation)</th>
+          <td>{ttsModel?.maybe_moderator_fields?.creator_ip_address_creation || "server error"}</td>
+        </tr>
+        <tr>
+          <th>Creator IP Address (Update)</th>
+          <td>{ttsModel?.maybe_moderator_fields?.creator_ip_address_last_update || "server error"}</td>
+        </tr>
+        <tr>
+          <th>Mod Deleted At (UTC)</th>
+          <td>{ttsModel?.maybe_moderator_fields?.mod_deleted_at || "not deleted"}</td>
+        </tr>
+        <tr>
+          <th>User Deleted At (UTC)</th>
+          <td>{ttsModel?.maybe_moderator_fields?.user_deleted_at || "not deleted"}</td>
+        </tr>
+      </>
+    );
+  }
+
   
   return (
     <div>
@@ -223,6 +252,9 @@ function TtsModelViewFc(props: Props) {
             <th>Upload Date (UTC)</th>
             <td>{ttsModel?.created_at}</td>
           </tr>
+
+          {moderatorRows}
+
         </tbody>
       </table>
 
