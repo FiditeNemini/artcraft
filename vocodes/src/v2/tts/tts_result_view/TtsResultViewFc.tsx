@@ -37,6 +37,11 @@ interface TtsInferenceResult {
   created_at: string,
   updated_at: string,
 
+  maybe_moderator_fields: TtsInferenceResultModeratorFields | null | undefined,
+}
+
+interface TtsInferenceResultModeratorFields {
+  creator_ip_address: string,
   mod_deleted_at: string | undefined | null,
   user_deleted_at: string | undefined | null,
 }
@@ -92,20 +97,24 @@ function TtsResultViewFc(props: Props) {
 
   let modelName = ttsInferenceResult.tts_model_title;
 
-  const currentlyDeleted = !!ttsInferenceResult?.mod_deleted_at || !!ttsInferenceResult?.user_deleted_at;
+  const currentlyDeleted = !!ttsInferenceResult?.maybe_moderator_fields?.mod_deleted_at || !!ttsInferenceResult?.maybe_moderator_fields?.user_deleted_at;
 
-  let deletedAtRows = null;
+  let moderatorRows = null;
 
-  if (currentlyDeleted) {
-    deletedAtRows = (
+  if (props.sessionWrapper.canDeleteOtherUsersTtsResults() || props.sessionWrapper.canDeleteOtherUsersTtsModels()) {
+    moderatorRows = (
       <>
         <tr>
+          <th>Creator IP Address (Creation)</th>
+          <td>{ttsInferenceResult?.maybe_moderator_fields?.creator_ip_address || "server error"}</td>
+        </tr>
+        <tr>
           <th>Mod Deleted At (UTC)</th>
-          <td>{ttsInferenceResult?.mod_deleted_at || "not deleted"}</td>
+          <td>{ttsInferenceResult?.maybe_moderator_fields?.mod_deleted_at || "not deleted"}</td>
         </tr>
         <tr>
           <th>User Deleted At (UTC)</th>
-          <td>{ttsInferenceResult?.user_deleted_at || "not deleted"}</td>
+          <td>{ttsInferenceResult?.maybe_moderator_fields?.user_deleted_at || "not deleted"}</td>
         </tr>
       </>
     );
@@ -220,7 +229,7 @@ function TtsResultViewFc(props: Props) {
             <td>{durationSeconds} seconds</td>
           </tr>
 
-          {deletedAtRows}
+          {moderatorRows}
 
         </tbody>
       </table>

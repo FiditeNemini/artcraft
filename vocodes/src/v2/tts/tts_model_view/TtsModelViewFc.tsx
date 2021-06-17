@@ -213,7 +213,6 @@ function TtsModelViewFc(props: Props) {
     );
   }
 
-  
   return (
     <div>
       <h1 className="title is-1"> {title} </h1>
