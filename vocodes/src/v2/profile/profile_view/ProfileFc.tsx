@@ -115,10 +115,18 @@ function ProfileFc(props: Props) {
   }
 
   if (userData !== undefined && userData.twitch_username) {
+    let twitchUrl = `https://twitch.com/${userData.twitch_username}`;
+    let twitchLink = (
+      <a 
+        href={twitchUrl} 
+        target="_blank"
+        rel="noopener noreferrer nofollow" 
+        >{userData.twitch_username}</a>
+    );
     profileRows.push(
       <tr key="twitch">
         <th>Twitch</th>
-        <td>{userData.twitch_username}</td>
+        <td>{twitchLink}</td>
       </tr>
     )
   }
@@ -150,19 +158,36 @@ function ProfileFc(props: Props) {
   }
 
   if (userData !== undefined && userData.github_username) {
+    let githubUrl = `https://github.com/${userData.github_username}`;
+    let githubLink = (
+      <a 
+        href={githubUrl} 
+        target="_blank"
+        rel="noopener noreferrer nofollow" 
+        >{userData.github_username}</a>
+    );
     profileRows.push(
       <tr key="github">
         <th>Github</th>
-        <td>{userData.github_username}</td>
+        <td>{githubLink}</td>
       </tr>
     )
   }
 
   if (userData !== undefined && userData.cashapp_username) {
+    // NB: URL includes a dollar sign
+    let cashAppUrl = `https://cash.me/$${userData.cashapp_username}`;
+    let cashAppLink = (
+      <a 
+        href={cashAppUrl} 
+        target="_blank"
+        rel="noopener noreferrer nofollow" 
+        >${userData.cashapp_username}</a>
+    );
     profileRows.push(
       <tr key="cashapp">
         <th>CashApp</th>
-        <td>{userData.cashapp_username}</td>
+        <td>{cashAppLink}</td>
       </tr>
     )
   }
