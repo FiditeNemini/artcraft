@@ -23,10 +23,14 @@ function NewFooterNavFc(props: Props) {
   return (
     <div>
       <hr />
-      <p>
-        We're trying to build a democratized <a href="https://the.storyteller.company">future of creativity, filmmaking and storytelling</a>.
-        Contact <Link to="/profile/echelon">@echelon</Link> for more information.
-      </p>
+
+      <div className="content has-text-centered">
+        <p>
+          Built by <Link to="/profile/echelon">@echelon</Link> in Atlanta.
+          | <Link to="/about">About Us</Link>&nbsp;| <Link to="/terms">Terms of Use</Link>
+        </p>
+
+      </div>
 
       <div className="v2_social">
         <a href="https://discord.gg/H72KFXm" target="_blank" rel="noopener noreferrer"><img src="/social-icons/016-discord.png" alt="Join us on Discord!" /></a>
