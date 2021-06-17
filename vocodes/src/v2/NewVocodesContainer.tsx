@@ -25,6 +25,8 @@ import { W2lTemplateListFc } from './w2l/w2l_template_list/W2lTemplateListFc';
 import { W2lTemplateUploadJob } from '../jobs/W2lTemplateUploadJobs';
 import { W2lTemplateViewFc } from './w2l/w2l_template_view/W2lTemplateViewFc';
 import { ModerationViewIpBanFc } from './moderation/moderation_view_ip_ban/ModerationViewIpBanFc';
+import { AboutFc } from './about/about_page/AboutFc';
+import { TermsFc } from './about/terms_page/TermsFc';
 
 interface Props {
   sessionWrapper: SessionWrapper,
@@ -194,6 +196,14 @@ class NewVocodesContainer extends React.Component<Props, State> {
               <ModerationFc
                 sessionWrapper={this.props.sessionWrapper}
               />
+            </Route>
+
+            <Route path="/about">
+              <AboutFc />
+            </Route>
+
+            <Route path="/terms">
+              <TermsFc />
             </Route>
 
             <Route path="/">
