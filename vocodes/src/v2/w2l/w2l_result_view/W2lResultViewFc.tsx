@@ -87,6 +87,24 @@ function W2lResultViewFc(props: Props) {
 
   const currentlyDeleted = !!w2lInferenceResult?.mod_deleted_at || !!w2lInferenceResult?.user_deleted_at;
 
+  let deletedAtRows = null;
+
+  if (currentlyDeleted) {
+    deletedAtRows = (
+      <>
+        <tr>
+          <th>Mod Deleted At (UTC)</th>
+          <td>{w2lInferenceResult?.mod_deleted_at || "not deleted"}</td>
+        </tr>
+        <tr>
+          <th>User Deleted At (UTC)</th>
+          <td>{w2lInferenceResult?.user_deleted_at || "not deleted"}</td>
+        </tr>
+      </>
+    );
+  }
+
+
   if (w2lInferenceResult.template_title.length < 5) {
     templateName = `Template: ${w2lInferenceResult.template_title}`;
   }
@@ -181,6 +199,9 @@ function W2lResultViewFc(props: Props) {
             <th>Duration</th>
             <td>{durationSeconds} seconds</td>
           </tr>
+
+          {deletedAtRows}
+
         </tbody>
       </table>
 

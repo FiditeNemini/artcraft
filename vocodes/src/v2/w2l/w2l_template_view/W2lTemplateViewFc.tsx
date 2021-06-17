@@ -275,10 +275,10 @@ function W2lTemplateViewFc(props: Props) {
 
   const currentlyDeleted = !!w2lTemplate?.mod_deleted_at || !!w2lTemplate?.user_deleted_at;
 
-  let deletedAtRow = null;
+  let deletedAtRows = null;
 
   if (currentlyDeleted) {
-    deletedAtRow = (
+    deletedAtRows = (
       <>
         <tr>
           <th>Mod Deleted At (UTC)</th>
@@ -393,7 +393,7 @@ function W2lTemplateViewFc(props: Props) {
             <td>{w2lTemplate?.updated_at}</td>
           </tr>
 
-          {deletedAtRow}
+          {deletedAtRows}
 
         </tbody>
       </table>
