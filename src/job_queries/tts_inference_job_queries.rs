@@ -238,7 +238,7 @@ pub async fn insert_tts_result<P: AsRef<Path>>(
       .display()
       .to_string();
 
-  let bucket_spectrogram_result_path = &bucket_audio_results_path
+  let bucket_spectrogram_result_path = &bucket_spectrogram_results_path
       .as_ref()
       .display()
       .to_string();
