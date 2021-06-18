@@ -227,7 +227,6 @@ pub async fn insert_tts_result<P: AsRef<Path>>(
   text_hash: &str,
   bucket_audio_results_path: P,
   bucket_spectrogram_results_path: P,
-  bucket_uuid: &str,
   file_size_bytes: u64,
   duration_millis: u64
 ) -> AnyhowResult<(u64, String)>
@@ -323,10 +322,8 @@ SET
   creator_ip_address = ?,
   creator_set_visibility = 'public',
 
-  public_bucket_hash = 'TODO',
   public_bucket_wav_audio_path = ?,
   public_bucket_spectrogram_path = ?,
-  inference_public_bucket_uuid = ?,
 
   file_size_bytes = ?,
   duration_millis = ?
@@ -344,7 +341,6 @@ SET
 
       bucket_audio_result_path,
       bucket_spectrogram_result_path,
-      bucket_uuid,
 
       file_size_bytes,
       duration_millis

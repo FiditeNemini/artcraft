@@ -38,6 +38,16 @@
       ]
     }
   },
+  "04e4b27791b94ee7232d364089a7a110984e18cf10fd60e3dea7449d53c40c00": {
+    "query": "\nINSERT INTO tts_results\nSET\n  token = ?,\n\n  model_token = ?,\n  raw_inference_text = ?,\n  raw_inference_text_hash_sha2 = ?,\n  normalized_inference_text = ?,\n\n  maybe_creator_user_token = ?,\n  maybe_creator_synthetic_id = ?,\n\n  creator_ip_address = ?,\n  creator_set_visibility = 'public',\n\n  public_bucket_wav_audio_path = ?,\n  public_bucket_spectrogram_path = ?,\n\n  file_size_bytes = ?,\n  duration_millis = ?\n        ",
+    "describe": {
+      "columns": [],
+      "parameters": {
+        "Right": 12
+      },
+      "nullable": []
+    }
+  },
   "05c3ebf54cd8a5374d6f4bbe21b3c6027ce6314917af8acd0ed136d375d53342": {
     "query": "\nSELECT\n    w2l.token as template_token,\n    w2l.template_type,\n    w2l.creator_user_token,\n    users.username as creator_username,\n    users.display_name as creator_display_name,\n    w2l.title,\n    w2l.frame_width,\n    w2l.frame_height,\n    w2l.duration_millis,\n    w2l.maybe_public_bucket_preview_image_object_name,\n    w2l.maybe_public_bucket_preview_video_object_name,\n    w2l.is_public_listing_approved,\n    w2l.created_at,\n    w2l.updated_at\nFROM w2l_templates as w2l\nJOIN users\nON\n    users.token = w2l.creator_user_token\nWHERE\n    users.username = ?\n    AND w2l.user_deleted_at IS NULL\n    AND w2l.mod_deleted_at IS NULL\n        ",
     "describe": {
@@ -1172,16 +1182,6 @@
       "columns": [],
       "parameters": {
         "Right": 3
-      },
-      "nullable": []
-    }
-  },
-  "2d485a1232d1b5bd1ad6a05ed744fe280121903fcebac4b7e9d12b732e0caa21": {
-    "query": "\nINSERT INTO tts_results\nSET\n  token = ?,\n\n  model_token = ?,\n  raw_inference_text = ?,\n  raw_inference_text_hash_sha2 = ?,\n  normalized_inference_text = ?,\n\n  maybe_creator_user_token = ?,\n  maybe_creator_synthetic_id = ?,\n\n  creator_ip_address = ?,\n  creator_set_visibility = 'public',\n\n  public_bucket_hash = 'TODO',\n  public_bucket_wav_audio_path = ?,\n  public_bucket_spectrogram_path = ?,\n  inference_public_bucket_uuid = 'TODO',\n\n  file_size_bytes = ?,\n  duration_millis = ?\n        ",
-    "describe": {
-      "columns": [],
-      "parameters": {
-        "Right": 12
       },
       "nullable": []
     }
