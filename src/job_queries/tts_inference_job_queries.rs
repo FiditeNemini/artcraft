@@ -333,8 +333,8 @@ SET
       inference_result_token,
       job.model_token.clone(),
       job.raw_inference_text.clone(),
-      normalized_inference_text,
       text_hash,
+      normalized_inference_text,
 
       maybe_creator_user_token,
       maybe_creator_synthetic_id,
