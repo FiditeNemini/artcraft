@@ -462,6 +462,7 @@ async fn process_job(inferencer: &Inferencer, job: &TtsInferenceJobRecord) -> An
     &text_hash,
     &audio_result_object_path,
     &spectrogram_result_object_path,
+    &job.uuid_idempotency_token,
     file_metadata.file_size_bytes,
     file_metadata.duration_millis.unwrap_or(0))
       .await?;

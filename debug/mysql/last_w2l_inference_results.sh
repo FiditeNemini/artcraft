@@ -37,8 +37,8 @@ EOF
 
 echo $query
 
-mysql -u root \
-  -proot \
+mysql -u storyteller \
+  -ppassword \
   -h localhost \
   -D storyteller \
   -e "${query}"
