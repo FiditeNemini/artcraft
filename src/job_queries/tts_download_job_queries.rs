@@ -9,6 +9,7 @@ use crate::util::random_crockford_token::random_crockford_token;
 use sqlx::MySqlPool;
 use crate::util::random_prefix_crockford_token::random_prefix_crockford_token;
 use std::path::Path;
+use crate::common_queries::tokens::Tokens;
 
 /// table: tts_model_upload_jobs
 #[derive(Debug)]
@@ -206,7 +207,7 @@ pub async fn insert_tts_model<P: AsRef<Path>>(
   file_size_bytes: u64
 ) -> AnyhowResult<(u64, String)> {
 
-  let model_token = random_prefix_crockford_token("TTS_MDL:", 32)?;
+  let model_token = Tokens::new_tts_model()?;
 
   let private_bucket_object_name = &private_bucket_object_name
       .as_ref()

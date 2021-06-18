@@ -9,6 +9,7 @@ use crate::util::random_prefix_crockford_token::random_prefix_crockford_token;
 use log::{warn, info};
 use sqlx::{MySqlPool, Transaction, MySql};
 use std::path::Path;
+use crate::common_queries::tokens::Tokens;
 
 /// table: tts_inference_jobs
 #[derive(Debug)]
@@ -231,7 +232,7 @@ pub async fn insert_tts_result<P: AsRef<Path>>(
   duration_millis: u64
 ) -> AnyhowResult<(u64, String)>
 {
-  let inference_result_token = random_prefix_crockford_token("TTS_RES:", 32)?;
+  let inference_result_token = Tokens::new_tts_result()?;
 
   let bucket_audio_result_path = &bucket_audio_results_path
       .as_ref()

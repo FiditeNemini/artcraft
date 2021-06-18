@@ -12,3 +12,4 @@ pub mod query_user_profile;
 pub mod query_w2l_result;
 pub mod query_w2l_template;
 pub mod sessions;
+pub mod tokens;

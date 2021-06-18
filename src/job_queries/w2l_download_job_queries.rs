@@ -4,10 +4,11 @@
 
 use anyhow::anyhow;
 use chrono::Utc;
+use crate::common_queries::tokens::Tokens;
 use crate::util::anyhow_result::AnyhowResult;
 use crate::util::random_crockford_token::random_crockford_token;
-use sqlx::MySqlPool;
 use crate::util::random_prefix_crockford_token::random_prefix_crockford_token;
+use sqlx::MySqlPool;
 
 /// table: w2l_template_upload_jobs
 #[derive(Debug)]
@@ -214,7 +215,7 @@ pub async fn insert_w2l_template(
   duration_millis: u64
 ) -> AnyhowResult<(u64, String)> {
 
-  let model_token = random_prefix_crockford_token("W2L_TPL:", 32)?;
+  let model_token = Tokens::new_w2l_template()?;
 
   let query_result = sqlx::query!(
         r#"

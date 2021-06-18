@@ -24,6 +24,7 @@ use crate::validations::username_reservations::is_reserved_username;
 use crate::util::random_prefix_crockford_token::random_prefix_crockford_token;
 use crate::validations::check_for_slurs::contains_slurs;
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
+use crate::common_queries::tokens::Tokens;
 
 const NEW_USER_ROLE: &'static str = "user";
 
@@ -98,7 +99,7 @@ pub async fn create_account_handler(
     return Err(CreateAccountError::BadInput("invalid email address".to_string()));
   }
 
-  let user_token = random_prefix_crockford_token("U:", 15)
+  let user_token = Tokens::new_user()
     .map_err(|e| {
       warn!("Bad crockford token: {:?}", e);
       CreateAccountError::ServerError
