@@ -1,6 +1,6 @@
 storyteller-web
 ===============
-This is our main user account monolith that we'll also bake other pieces into.
+This is the main user account monolith that we'll also bake other pieces into.
 
 Local development
 -----------------
