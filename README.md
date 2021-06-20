@@ -29,6 +29,18 @@ If MySql in local dev can't be connected to, reset the accounts:
 
 https://linuxconfig.org/how-to-reset-root-mysql-mariadb-password-on-ubuntu-20-04-focal-fossa-linux
 
+### Install Diesel
+
+```
+cargo install diesel_cli
+```
+
+Mac [has issues](https://github.com/diesel-rs/diesel/issues/2605) and requires a few dependencies:
+
+```
+brew install libpq
+```
+
 ### Database migrations
 
 To reset the entire database (drop, migrate), run:
