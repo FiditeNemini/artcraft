@@ -9,10 +9,10 @@ Installation in Dev
 -------------------
 
 Normally, `npm install` in the `./vocodes` directory works, but Mac needed
-the following workaround for a [sass build failure](https://stackoverflow.com/a/55494370): 
+the following workaround for a [sass build failure](https://stackoverflow.com/a/67242989): 
 
 ```
-sudo npm install --unsafe-perm -g node-sass
+nvm install 14
 ```
 
 
