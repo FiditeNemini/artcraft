@@ -5,7 +5,7 @@ use crate::util::random_prefix_crockford_token::random_prefix_crockford_token;
 // TODO: Make tokens strongly typed.
 pub struct Tokens {}
 
-TODO TODO TODO
+//TODO TODO TODO
 
 impl Tokens {
 
@@ -39,6 +39,6 @@ impl Tokens {
 
   pub fn new_w2l_result() -> AnyhowResult<String> {
     random_prefix_crockford_token("WR:", 32)
-    TODO TODO TODO
+    //TODO TODO TODO
   }
 }

@@ -230,4 +230,14 @@ See:
 * https://stackoverflow.com/a/56354633
 * https://cloud.google.com/storage/docs/access-control/making-data-public#buckets
 
+### Generating Access Key and Secret Key
+
+https://cloud.telestream.net/tutorials/how-to-setting-up-google-cloud-storage/
+
+1. Go to the GCS page
+2. Click "settings"
+3. Click "interoperability" tab
+4. (enable interoperable access if not already set)
+5. Click "create new key"
+
 
