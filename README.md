@@ -5,6 +5,16 @@ Frontend website for https://vo.codes/
 
 Hosted with netlify.
 
+Installation in Dev
+-------------------
+
+Normally, `npm install` in the `./vocodes` directory works, but Mac needed
+the following workaround for a [sass build failure](https://stackoverflow.com/a/55494370): 
+
+```
+sudo npm install --unsafe-perm -g node-sass
+```
+
 
 Logo, Favicon, Font
 -------------------
