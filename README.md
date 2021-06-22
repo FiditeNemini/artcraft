@@ -29,6 +29,17 @@ If MySql in local dev can't be connected to, reset the accounts:
 
 https://linuxconfig.org/how-to-reset-root-mysql-mariadb-password-on-ubuntu-20-04-focal-fossa-linux
 
+### Python 3.6 on Apple M1 Mac
+
+Python3.6 isn't supported on Apple silicon, and it's not in homebrew. It can be installed with 
+[nix using Rosetta](https://stackoverflow.com/a/65980989):
+
+Download: https://nixos.org/download.html#nix-quick-install
+
+```
+nix run nixpkgs.python36 -c python
+```
+
 ### Install Diesel
 
 ```
