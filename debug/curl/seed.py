@@ -105,7 +105,7 @@ def upload_tts_model(content_url, title, session_cookie):
 
 # Copied into Storyteller Google Drive
 upload_tts_model('https://drive.google.com/file/d/1d8KPwYqbRsGiYx1c4TCW4xCtcRLdIU1s/view?usp=sharing', 'Zephyr', session_echelon)
-# TEMP COMMENT DUE TO RATE LIMIT upload_tts_model('https://drive.google.com/file/d/1yhoamPz1NOMy403gu2v8sIx5hPj3LQWs/view?usp=sharing', 'Wakko Warner', session_other)
+upload_tts_model('https://drive.google.com/file/d/1yhoamPz1NOMy403gu2v8sIx5hPj3LQWs/view?usp=sharing', 'Wakko Warner', session_other)
 # TEMP COMMENT DUE TO RATE LIMIT upload_tts_model('https://drive.google.com/file/d/1I6KGQZFMMB2ZvCzWEqy9xTgGl0L5cmfP/view?usp=sharing', 'Turret-192', session_echelon)
 # TEMP COMMENT DUE TO RATE LIMIT upload_tts_model('https://drive.google.com/file/d/1T_hvgGcNOfofhNmDWUqpVtYDdSXQrWdE/view?usp=sharing', 'technoblade-324', session_brandon)
 # TEMP COMMENT DUE TO RATE LIMIT upload_tts_model('https://drive.google.com/file/d/1NKyRiex3K1J0QyIv2np17D_H0rE98HyK/view?usp=sharing', 'Noire', session_other)

@@ -40,6 +40,18 @@ Download: https://nixos.org/download.html#nix-quick-install
 nix run nixpkgs.python36 -c python
 ```
 
+Install venv:
+
+```
+nix run nixpkgs.python36 -c python -m venv python
+```
+
+Install other packages on Mac that aren't used in venv:
+
+```
+python3 -m pip install --user requests gdown youtube_dl
+```
+
 ### Install Diesel
 
 ```
