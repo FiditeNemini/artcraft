@@ -263,4 +263,3 @@ https://cloud.telestream.net/tutorials/how-to-setting-up-google-cloud-storage/
 4. (enable interoperable access if not already set)
 5. Click "create new key"
 
-
