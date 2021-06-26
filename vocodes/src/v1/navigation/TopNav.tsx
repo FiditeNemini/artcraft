@@ -25,18 +25,6 @@ function TopNav(props: Props) {
     badge = <span className={className}>{props.historyBadgeCount}</span>;
   }
 
-  let loggedIn = false;
-  let displayName = "My Account";
-
-  if (props.sessionState !== undefined) {
-    console.log('sessionstate', props.sessionState);
-    loggedIn = props.sessionState.logged_in;
-    if (props.sessionState.user !== undefined && 
-        props.sessionState.user !== null) {
-      displayName = props.sessionState.user.display_name;
-    }
-  }
-
   return (
     <nav>
       <span id="logo_text">

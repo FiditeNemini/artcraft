@@ -34,10 +34,6 @@ function ModerationViewIpBanFc(props: Props) {
 
   const [ipBan, setIpBan] = useState<IpBan|undefined>(undefined);
 
-  // Form
-  const [newIpAddress, setNewIpAddress] = useState<string>("");
-  const [modNotes, setModNotes] = useState<string>("");
-
   useEffect(() => {
     const api = new ApiConfig();
     const endpointUrl = api.getModerationIpBan(ipAddress);
@@ -61,7 +57,7 @@ function ModerationViewIpBanFc(props: Props) {
     .catch(e => {
       //this.props.onSpeakErrorCallback();
     });
-  }, []); // NB: Empty array dependency sets to run ONLY on mount
+  }, [ipAddress]); // NB: Empty array dependency sets to run ONLY on mount
 
   const handleFormSubmit = (ev: React.FormEvent<HTMLFormElement>) : boolean => {
     ev.preventDefault();

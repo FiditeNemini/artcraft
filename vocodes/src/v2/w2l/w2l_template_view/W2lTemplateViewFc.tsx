@@ -242,7 +242,7 @@ function W2lTemplateViewFc(props: Props) {
       modApprovalStatus = (
         <span>
           Not yet (ask for approval in our&nbsp;<a 
-          href="https://discord.gg/H72KFXm" target="_blank">Discord</a>)
+          href="https://discord.gg/H72KFXm" target="_blank" rel="noopener noreferrer">Discord</a>)
         </span>
       );
       break;
