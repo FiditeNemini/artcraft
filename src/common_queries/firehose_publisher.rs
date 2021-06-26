@@ -1,11 +1,12 @@
 use anyhow::anyhow;
+use crate::common_queries::tokens::Tokens;
 use crate::util::anyhow_result::AnyhowResult;
 use crate::util::random_prefix_crockford_token::random_prefix_crockford_token;
 use log::{warn,info};
-use sqlx::{MySqlPool};
-use std::sync::Arc;
 use sqlx::error::Error::Database;
 use sqlx::mysql::MySqlDone;
+use sqlx::{MySqlPool};
+use std::sync::Arc;
 
 #[derive(Debug, Clone, Copy)]
 enum FirehoseEvent {
@@ -167,7 +168,7 @@ impl FirehosePublisher {
     entity_token: Option<&str>,
     created_entity_token: Option<&str>
   ) -> AnyhowResult<u64> {
-    let token = random_prefix_crockford_token("EV", 32)?;
+    let token = Tokens::new_firehose_event()?;
 
     let query_result = sqlx::query!(
         r#"

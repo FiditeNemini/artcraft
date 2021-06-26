@@ -9,36 +9,51 @@ pub struct Tokens {}
 
 impl Tokens {
 
+  // ========== Tokens with high visibility (make these nice) ==========
+
   pub fn new_user() -> AnyhowResult<String> {
-    random_prefix_crockford_token("U:", 15)
+    random_prefix_crockford_token("U:", 15, false)
   }
 
   pub fn new_tts_model() -> AnyhowResult<String> {
-    random_prefix_crockford_token("TM:", 15)
-  }
-
-  pub fn new_tts_model_upload_job() -> AnyhowResult<String> {
-    random_prefix_crockford_token("JTUP:", 32)
+    random_prefix_crockford_token("TM:", 15, false)
   }
 
   pub fn new_tts_result() -> AnyhowResult<String> {
-    random_prefix_crockford_token("TR:", 32)
-  }
-
-  pub fn new_tts_inference_job() -> AnyhowResult<String> {
-    random_prefix_crockford_token("JTINF:", 32)
+    random_prefix_crockford_token("TR:", 32, false)
   }
 
   pub fn new_w2l_template() -> AnyhowResult<String> {
-    random_prefix_crockford_token("WT:", 32)
-  }
-
-  pub fn new_w2l_template_upload_job() -> AnyhowResult<String> {
-    random_prefix_crockford_token("JTUP:", 32)
+    random_prefix_crockford_token("WT:", 32, false)
   }
 
   pub fn new_w2l_result() -> AnyhowResult<String> {
-    random_prefix_crockford_token("WR:", 32)
-    //TODO TODO TODO
+    random_prefix_crockford_token("WR:", 32, false)
+  }
+
+  // ========== Tokens not typically visible to users ==========
+
+  pub fn new_tts_model_upload_job() -> AnyhowResult<String> {
+    random_prefix_crockford_token("JTUP:", 32, false)
+  }
+
+  pub fn new_tts_inference_job() -> AnyhowResult<String> {
+    random_prefix_crockford_token("JTINF:", 32, false)
+  }
+
+  pub fn new_w2l_template_upload_job() -> AnyhowResult<String> {
+    random_prefix_crockford_token("JWUP:", 32, false)
+  }
+
+  pub fn new_w2l_inference_job() -> AnyhowResult<String> {
+    random_prefix_crockford_token("JWINF:", 32, false)
+  }
+
+  pub fn new_firehose_event() -> AnyhowResult<String> {
+    random_prefix_crockford_token("EV:", 32, false)
+  }
+
+  pub fn new_session() -> AnyhowResult<String> {
+    random_prefix_crockford_token("SESSION:", 32, false)
   }
 }

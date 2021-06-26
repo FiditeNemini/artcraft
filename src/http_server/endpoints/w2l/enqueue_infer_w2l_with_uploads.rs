@@ -7,6 +7,7 @@ use actix_web::http::header::ContentDisposition;
 use actix_web::web::{Data, Json, BytesMut};
 use actix_web::{middleware, web, App, Error, HttpResponse, HttpServer, HttpRequest, Either, ResponseError};
 use anyhow::anyhow;
+use crate::common_queries::tokens::Tokens;
 use crate::http_server::web_utils::ip_address::get_request_ip;
 use crate::http_server::web_utils::read_multipart_field_bytes::checked_read_multipart_bytes;
 use crate::http_server::web_utils::read_multipart_field_bytes::read_multipart_field_as_boolean;
@@ -265,7 +266,7 @@ pub async fn enqueue_infer_w2l_with_uploads(
   // ==================== SAVE JOB RECORD ==================== //
 
   // This token is returned to the client.
-  let job_token = random_prefix_crockford_token("W2L_INF:", 32)
+  let job_token = Tokens::new_w2l_inference_job()
     .map_err(|e| {
       warn!("Error creating token");
       InferW2lWithUploadError::ServerError

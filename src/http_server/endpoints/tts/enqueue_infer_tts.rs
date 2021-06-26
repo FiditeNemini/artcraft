@@ -5,6 +5,7 @@ use actix_web::dev::HttpResponseBuilder;
 use actix_web::error::ResponseError;
 use actix_web::http::StatusCode;
 use actix_web::{Responder, web, HttpResponse, error, HttpRequest};
+use crate::common_queries::tokens::Tokens;
 use crate::database_helpers::enums::{DownloadUrlType, CreatorSetVisibility, W2lTemplateType};
 use crate::http_server::web_utils::ip_address::get_request_ip;
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
@@ -112,7 +113,7 @@ pub async fn infer_tts_handler(
   let creator_set_visibility = "public".to_string();
 
   // This token is returned to the client.
-  let job_token = random_prefix_crockford_token("TTS_INF:", 32)
+  let job_token = Tokens::new_tts_inference_job()
       .map_err(|e| {
         warn!("Error creating token");
         InferTtsError::ServerError

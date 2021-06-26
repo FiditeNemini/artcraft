@@ -64,6 +64,12 @@ pub async fn infer_w2l_handler(
   request: web::Json<InferW2lRequest>,
   server_state: web::Data<Arc<ServerState>>) -> Result<HttpResponse, InferW2lError>
 {
+
+  if true {
+    unimplemented!("this isn't finished");
+  }
+
+
   let maybe_session = server_state
     .session_checker
     .maybe_get_session(&http_request, &server_state.mysql_pool)
@@ -118,6 +124,10 @@ pub async fn infer_w2l_handler(
 
   let ip_address = get_request_ip(&http_request);
   let creator_set_visibility = "public".to_string();
+
+  if true {
+    unimplemented!("this isn't finished");
+  }
 
   let query_result = sqlx::query!(
         r#"
