@@ -91,7 +91,7 @@ function TtsResultViewFc(props: Props) {
   // NB: Not respected in firefox: https://stackoverflow.com/a/28468261
   let audioDownloadFilename = `vocodes-${ttsInferenceResult.tts_model_token.replace(':', '')}.wav`;
 
-  let spectrogramLink = `https://storage.googleapis.com/dev-vocodes-public${ttsInferenceResult?.public_bucket_wav_audio_path}`.replace(".wav", ".json"); 
+  let spectrogramLink = `https://storage.googleapis.com/dev-vocodes-public${ttsInferenceResult?.public_bucket_spectrogram_path}`;
 
 
   let durationSeconds = ttsInferenceResult?.duration_millis / 1000;
@@ -122,7 +122,7 @@ function TtsResultViewFc(props: Props) {
   }
 
   let creatorDetails = <span>Anonymous user</span>;
-  if (ttsInferenceResult.maybe_creator_user_token !== undefined) {
+  if (!!ttsInferenceResult.maybe_creator_user_token) {
     let creatorLink = `/profile/${ttsInferenceResult.maybe_creator_username}`;
     creatorDetails = (
       <span>
