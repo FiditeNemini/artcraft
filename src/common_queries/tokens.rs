@@ -11,10 +11,6 @@ impl Tokens {
 
   // ========== Tokens with high visibility (make these nice) ==========
 
-  pub fn new_user() -> AnyhowResult<String> {
-    random_prefix_crockford_token("U:", 15, false)
-  }
-
   pub fn new_tts_model() -> AnyhowResult<String> {
     random_prefix_crockford_token("TM:", 15, false)
   }
@@ -32,6 +28,14 @@ impl Tokens {
   }
 
   // ========== Tokens not typically visible to users ==========
+
+  pub fn new_user() -> AnyhowResult<String> {
+    random_prefix_crockford_token("U:", 15, true)
+  }
+
+  pub fn new_session() -> AnyhowResult<String> {
+    random_prefix_crockford_token("SESSION:", 32, false)
+  }
 
   pub fn new_tts_model_upload_job() -> AnyhowResult<String> {
     random_prefix_crockford_token("JTUP:", 32, false)
@@ -51,9 +55,5 @@ impl Tokens {
 
   pub fn new_firehose_event() -> AnyhowResult<String> {
     random_prefix_crockford_token("EV:", 32, false)
-  }
-
-  pub fn new_session() -> AnyhowResult<String> {
-    random_prefix_crockford_token("SESSION:", 32, false)
   }
 }

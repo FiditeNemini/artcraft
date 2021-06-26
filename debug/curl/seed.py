@@ -75,6 +75,7 @@ upload_w2l_template('https://drive.google.com/file/d/1yoBSb6nwFUZVI4CD-nM2BSofGd
 upload_w2l_template('https://drive.google.com/file/d/1ysBAdRjlSmfWQPFjGlMJpv_zcGmVw7RC/view?usp=sharing', 'short bill clinton clip', session_brandon)
 upload_w2l_template('https://i.imgur.com/NneE7Eq.jpg', 'itsa me mario!', session_echelon)
 upload_w2l_template('https://i.imgur.com/W1EYiPU.jpg', 'Creepy Sonic does a gasp', session_echelon)
+upload_w2l_template('https://i.imgur.com/8U3IdUa.png', 'Creepy Sonic actually talks', session_echelon)
 upload_w2l_template('https://i.imgur.com/lKaQ4Er.jpg', 'hasta la vista', session_brandon)
 upload_w2l_template('https://i.imgur.com/uoGuTJo.jpeg', 'what do you mean vern?', session_brandon)
 upload_w2l_template('https://i.imgur.com/v8k9yau.jpeg', 'Miyamoto-san', session_brandon)
