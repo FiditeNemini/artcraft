@@ -9,8 +9,8 @@ use std::sync::Arc;
 const ALPHA_COOKIE_NAME : &'static str = "enable-alpha";
 const CONTENT_TYPE : &'static str = "text/html; charset=utf-8";
 
-const ENABLE_LINK : &'static str = "<a href=\"/alpha?enable=true\">enable</a>";
-const DISABLE_LINK : &'static str = "<a href=\"/alpha?enable=false\">disable</a>";
+const ENABLE_LINK : &'static str = "<a href=\"/alpha?enable=true\">I want Vocodes 2.0</a>";
+const DISABLE_LINK : &'static str = "<a href=\"/alpha?enable=false\">I don't want Vocodes 2.0</a>";
 const STATUS_LINK : &'static str = "<a href=\"/alpha\">status</a>";
 
 
@@ -39,21 +39,21 @@ pub async fn enable_alpha(http_request: HttpRequest,
 
       HttpResponse::build(StatusCode::OK)
         .content_type(CONTENT_TYPE)
-        .body(format!("<h1>Alpha mode.</h1><h2>Current `{}` cookie state = {}</h2> {} | {} | {}",
+        .body(format!("<h1>Vocodes 2.0</h1><p>Current `{}` cookie state = {}</p> {} | {} | {}",
                       ALPHA_COOKIE_NAME, cookie_exists, ENABLE_LINK, DISABLE_LINK, STATUS_LINK))
     }
     Some(true) => {
       HttpResponse::build(StatusCode::OK)
         .content_type(CONTENT_TYPE)
         .cookie(cookie)
-        .body(format!("<h1>Alpha mode</h1><h2>setting `{}` cookie</h2> {} | {} | {}",
+        .body(format!("<h1>Vocodes 2.0</h1><h2>setting `{}` cookie</h2> {} | {} | {}",
                       ALPHA_COOKIE_NAME, ENABLE_LINK, DISABLE_LINK, STATUS_LINK))
     }
     Some(false) => {
       HttpResponse::build(StatusCode::OK)
         .content_type(CONTENT_TYPE)
         .del_cookie(&cookie)
-        .body(format!("<h1>Alpha mode</h1><h2>unsetting `{}` cookie</h2> {} | {} | {}",
+        .body(format!("<h1>Vocodes 2.0</h1><h2>unsetting `{}` cookie</h2> {} | {} | {}",
                       ALPHA_COOKIE_NAME, ENABLE_LINK, DISABLE_LINK, STATUS_LINK))
     }
   }
