@@ -100,7 +100,7 @@ function W2lTemplateViewFc(props: Props) {
     })
     .catch(e => {});
 
-  }, [templateSlug]);
+  }, [modApprovedFormValue]);
 
   const getTemplateUseCount = useCallback((templateSlug: string) => {
     const api = new ApiConfig();
@@ -123,13 +123,12 @@ function W2lTemplateViewFc(props: Props) {
       setW2lTemplateUseCount(templatesResponse.count || 0)
     })
     .catch(e => {});
-
-  }, [templateSlug]);
+  }, []);
 
   useEffect(() => {
     getTemplate(templateSlug);
     getTemplateUseCount(templateSlug);
-  }, [templateSlug]); // NB: Empty array dependency sets to run ONLY on mount
+  }, [templateSlug, getTemplate, getTemplateUseCount]);
 
   const handleAudioFileChange = (fileList: FileList|null) => {
     if (fileList === null 

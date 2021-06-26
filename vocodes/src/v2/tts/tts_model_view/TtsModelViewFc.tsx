@@ -74,7 +74,7 @@ function TtsModelViewFc(props: Props) {
       setTtsModel(modelsResponse.model)
     })
     .catch(e => {});
-  }, [token]);
+  }, []);
 
   const getModelUseCount = useCallback((token) => {
     const api = new ApiConfig();
@@ -97,26 +97,13 @@ function TtsModelViewFc(props: Props) {
       setTtsModelUseCount(modelsResponse.count || 0)
     })
     .catch(e => {});
-  }, [token]);
+  }, []);
 
 
   useEffect(() => {
     getModel(token);
     getModelUseCount(token);
-  }, [token]); // NB: Empty array dependency sets to run ONLY on mount
-
-
-  /*const handleAudioFileChange = (fileList: FileList|null) => {
-    if (fileList === null 
-        || fileList === undefined
-        || fileList.length < 1) {
-      setAudioFile(undefined);
-    }
-
-    let file = fileList![0];
-    setAudioFile(file);
-  };*/
-
+  }, [token, getModel, getModelUseCount]);
 
   const handleChangeText = (ev: React.FormEvent<HTMLTextAreaElement>) => { 
     ev.preventDefault();
@@ -126,7 +113,6 @@ function TtsModelViewFc(props: Props) {
 
     return false;
   };
-
 
   const handleFormSubmit = (ev: React.FormEvent<HTMLFormElement>) => { 
     ev.preventDefault();

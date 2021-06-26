@@ -61,7 +61,6 @@ function SpectrogramFc(props: Props) {
     })
     .then(res => res.json())
     .then(res => {
-      console.log('got spectrogram', res);
       let spectrograms = res as SpectrogramResponse;
 
       let width = spectrograms.mel_scaled.length;
@@ -78,11 +77,8 @@ function SpectrogramFc(props: Props) {
       });
     })
     .catch(e => {
-      //this.props.onSpeakErrorCallback();
     });
-
-
-  }, []); // NB: Empty array dependency sets to run ONLY on mount
+  }, [props.spectrogramJsonLink]); // NB: Empty array dependency sets to run ONLY on mount
 
   let width = 150 * 3;
   let height = 80 * 3;
