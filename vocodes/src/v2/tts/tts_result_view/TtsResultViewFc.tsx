@@ -138,7 +138,7 @@ function TtsResultViewFc(props: Props) {
   }
 
   let modelCreatorDetails = <span>Anonymous user</span>;
-  if (ttsInferenceResult.maybe_model_creator_user_token !== undefined) {
+  if (!!ttsInferenceResult.maybe_model_creator_user_token) {
     let modelCreatorLink = `/profile/${ttsInferenceResult.maybe_model_creator_username}`;
     modelCreatorDetails = (
       <span>

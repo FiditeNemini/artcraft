@@ -119,7 +119,7 @@ function W2lResultViewFc(props: Props) {
   }
 
   let creatorDetails = <span>Anonymous user</span>;
-  if (w2lInferenceResult.maybe_creator_user_token !== undefined) {
+  if (!!w2lInferenceResult.maybe_creator_user_token) {
     let creatorLink = `/profile/${w2lInferenceResult.maybe_creator_username}`;
     creatorDetails = (
       <span>
@@ -135,7 +135,7 @@ function W2lResultViewFc(props: Props) {
   }
 
   let templateCreatorDetails = <span>Anonymous user</span>;
-  if (w2lInferenceResult.maybe_template_creator_user_token !== undefined) {
+  if (!!w2lInferenceResult.maybe_template_creator_user_token) {
     let templateCreatorLink = `/profile/${w2lInferenceResult.maybe_template_creator_username}`;
     templateCreatorDetails = (
       <span>
