@@ -242,6 +242,31 @@
       ]
     }
   },
+  "09e655ea4b3504cbb3bc18b92c6c25861c941ba073e3aead414e560b05bd7638": {
+    "query": "\nSELECT count(*) as count\nFROM tts_models\nWHERE\n  creator_user_token = ?\nLIMIT 1\n        ",
+    "describe": {
+      "columns": [
+        {
+          "ordinal": 0,
+          "name": "count",
+          "type_info": {
+            "type": "LongLong",
+            "flags": {
+              "bits": 129
+            },
+            "char_set": 63,
+            "max_size": 21
+          }
+        }
+      ],
+      "parameters": {
+        "Right": 1
+      },
+      "nullable": [
+        false
+      ]
+    }
+  },
   "0caed749627ff22ae1cea52621a375156259a731e8070459593082b80d463491": {
     "query": "\nSELECT\n  id,\n  status\nFROM tts_model_upload_jobs\nWHERE id = ?\nFOR UPDATE\n        ",
     "describe": {
@@ -1184,6 +1209,31 @@
         "Right": 3
       },
       "nullable": []
+    }
+  },
+  "314904656a333caa75a8644e73f4d338b7bd6f68c7ea9e37b5bc7f7b257bf34d": {
+    "query": "\nSELECT 1 as does_exist\nFROM user_badges\nWHERE\n  user_token = ?\nAND\n  badge_slug = ?\nLIMIT 1\n        ",
+    "describe": {
+      "columns": [
+        {
+          "ordinal": 0,
+          "name": "does_exist",
+          "type_info": {
+            "type": "LongLong",
+            "flags": {
+              "bits": 129
+            },
+            "char_set": 63,
+            "max_size": 1
+          }
+        }
+      ],
+      "parameters": {
+        "Right": 2
+      },
+      "nullable": [
+        false
+      ]
     }
   },
   "34364f9bc851971f8291f5f9942dd23d10718ccb210a93a236d96d0591f65f35": {
@@ -5055,6 +5105,31 @@
       "nullable": []
     }
   },
+  "c0f56e2656b566d3a8c869d39b0b56d1fbb75d7d9e817a24b10add44d348092d": {
+    "query": "\nSELECT count(*) as count\nFROM w2l_templates\nWHERE\n  creator_user_token = ?\nLIMIT 1\n        ",
+    "describe": {
+      "columns": [
+        {
+          "ordinal": 0,
+          "name": "count",
+          "type_info": {
+            "type": "LongLong",
+            "flags": {
+              "bits": 129
+            },
+            "char_set": 63,
+            "max_size": 21
+          }
+        }
+      ],
+      "parameters": {
+        "Right": 1
+      },
+      "nullable": [
+        false
+      ]
+    }
+  },
   "c63726afcf8d53a24597aad18bb44285eae8f5d056011811b066226f7db0198a": {
     "query": "\nUPDATE w2l_templates\nSET\n    title = ?,\n    description_markdown = ?,\n    description_rendered_html = ?,\n    maybe_mod_user_token = ?,\n    version = version + 1\nWHERE token = ?\nLIMIT 1\n        ",
     "describe": {
@@ -6568,6 +6643,16 @@
         true,
         true
       ]
+    }
+  },
+  "da3197d279b94817c6c8a6277aff7a0cf44d66e6777f46680b1b07de48875dd5": {
+    "query": "\nINSERT INTO user_badges\nSET\n  user_token = ?,\n  badge_slug = ?\n        ",
+    "describe": {
+      "columns": [],
+      "parameters": {
+        "Right": 2
+      },
+      "nullable": []
     }
   },
   "dbce51eb1c80dded902c9509e50713483c7131f115e8ec10646e99e88110278b": {
