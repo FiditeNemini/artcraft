@@ -40,8 +40,16 @@ interface UserPayload {
   //patreon_username?: string,
   cashapp_username: string | undefined | null,
   created_at: string,
+  badges: ProfileBadge[],
 }
 
+interface ProfileBadge {
+  slug: string,
+  title: string,
+  description: string,
+  image_url: string,
+  granted_at: string,
+}
 
 function ProfileFc(props: Props) {
   const { username } = useParams() as { username: string };
@@ -192,8 +200,24 @@ function ProfileFc(props: Props) {
     )
   }
 
+  let badges = <div>None yet</div>;
+
+  if (userData !== undefined && userData.badges.length !== 0) {
+    let badgeList : Array<JSX.Element> = [];
+    userData.badges.forEach(badge => {
+      badgeList.push((
+        <li>
+          {badge.title}
+        </li>
+      ));
+    })
+    badges = (
+      <ul>{badgeList}</ul>
+    )
+  }
+
   return (
-    <div>
+    <div className="content">
       <h1 className="title is-1">
         <GravatarFc 
           size={45} 
@@ -204,14 +228,10 @@ function ProfileFc(props: Props) {
 
       {editProfileButton}
 
-      <br />
-
       <div 
         className="profile content is-medium" 
         dangerouslySetInnerHTML={{__html: userData?.profile_rendered_html || ""}}
         />
-
-      <br />
 
       <table className="table">
         <tbody>
@@ -219,38 +239,20 @@ function ProfileFc(props: Props) {
         </tbody>
       </table>
 
-      {/*<h3 className="title is-3"> Badges </h3>
-      - EARLY USER !
-      <br />
-      - Uploaded a model
-      <br />
-      - Uploaded a template 
-      <br />
-      <br />*/}
+      <h3 className="title is-3"> Badges </h3>
+      {badges}
 
       <h3 className="title is-3"> TTS Results </h3>
       <ProfileTtsInferenceResultsListFc username={username} />
 
-      <br />
-      <br />
-
       <h3 className="title is-3"> Lipsync Results </h3>
       <ProfileW2lInferenceResultsListFc username={username} />
-
-      <br />
-      <br />
 
       <h3 className="title is-3"> Uploaded TTS Models </h3>
       <ProfileTtsModelListFc username={username} />
 
-      <br />
-      <br />
-
       <h3 className="title is-3"> Uploaded Templates </h3>
       <ProfileW2lTemplateListFc username={username} />
-
-      <br />
-      <br />
 
     </div>
   )
