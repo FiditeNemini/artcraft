@@ -31,6 +31,9 @@ CREATE TABLE user_badges (
   user_token VARCHAR(32) NOT NULL,
   badge_slug VARCHAR(32) NOT NULL,
 
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+
   -- INDICES --
   PRIMARY KEY (id),
   KEY fk_user_token (user_token),

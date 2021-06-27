@@ -12,6 +12,9 @@ use std::sync::Arc;
 enum FirehoseEvent {
   UserSignUp,
 
+  // We don't publish for all badges (eg. early user signup)
+  UserBadgeGranted,
+
   TtsModelUploadStarted,
   TtsModelUploadCompleted,
   TtsInferenceStarted,
@@ -34,6 +37,7 @@ impl FirehoseEvent {
   pub fn to_db_value(&self) -> &'static str {
     match self {
       FirehoseEvent::UserSignUp => "user_sign_up",
+      FirehoseEvent::UserBadgeGranted=> "user_badge_granted",
       FirehoseEvent::TtsModelUploadStarted => "tts_model_upload_started",
       FirehoseEvent::TtsModelUploadCompleted => "tts_model_upload_completed",
       FirehoseEvent::TtsInferenceStarted => "tts_inference_started",
@@ -65,6 +69,16 @@ impl FirehosePublisher {
       Some(user_token),
       Some(user_token),
     Some(user_token)
+    ).await?;
+    Ok(())
+  }
+
+  pub async fn publish_user_badge_granted(&self, user_token: &str, badge_slug: &str) -> AnyhowResult<()> {
+    let _record_id = self.insert(
+      FirehoseEvent::UserBadgeGranted,
+      Some(user_token),
+      Some(badge_slug),
+      None,
     ).await?;
     Ok(())
   }

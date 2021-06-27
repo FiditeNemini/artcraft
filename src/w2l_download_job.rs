@@ -21,6 +21,7 @@ pub mod util;
 use anyhow::anyhow;
 use chrono::Utc;
 use crate::common_env::CommonEnv;
+use crate::common_queries::badge_granter::BadgeGranter;
 use crate::common_queries::firehose_publisher::FirehosePublisher;
 use crate::job_queries::w2l_download_job_queries::W2lTemplateUploadJobRecord;
 use crate::job_queries::w2l_download_job_queries::grab_job_lock_and_mark_pending;
@@ -83,6 +84,7 @@ struct Downloader {
   pub public_bucket_client: BucketClient,
 
   pub firehose_publisher: FirehosePublisher,
+  pub badge_granter: BadgeGranter,
 
   pub google_drive_downloader: GoogleDriveDownloadCommand,
   pub w2l_processor: Wav2LipPreprocessClient,
@@ -195,6 +197,11 @@ async fn main() -> AnyhowResult<()> {
     mysql_pool: mysql_pool.clone(), // NB: Pool is sync/send/clone-safe
   };
 
+  let badge_granter = BadgeGranter {
+    mysql_pool: mysql_pool.clone(), // NB: Pool is sync/send/clone-safe
+    firehose_publisher: firehose_publisher.clone(), // NB: Also safe
+  };
+
   let common_env = CommonEnv::read_from_env()?;
 
   let downloader = Downloader {
@@ -205,6 +212,7 @@ async fn main() -> AnyhowResult<()> {
     download_script,
     google_drive_downloader,
     firehose_publisher,
+    badge_granter,
     ffmpeg_image_preview_generator: FfmpegGeneratePreviewImageCommand {},
     ffmpeg_video_preview_generator: FfmpegGeneratePreviewVideoCommand {},
     imagemagick_image_preview_generator: ImagemagickGeneratePreviewImageCommand {},
@@ -550,6 +558,13 @@ async fn process_job(downloader: &Downloader, job: &W2lTemplateUploadJobRecord) 
       warn!("error publishing event: {:?}", e);
       anyhow!("error publishing event")
     })?;
+
+  downloader.badge_granter.maybe_grant_w2l_template_uploads_badge(&job.creator_user_token)
+      .await
+      .map_err(|e| {
+        warn!("error maybe awarding badge: {:?}", e);
+        anyhow!("error maybe awarding badge")
+      })?;
 
   if downloader.debug_job_end_sleep_millis != 0 {
     warn!("Debug sleep after job end: {} ms", downloader.debug_job_end_sleep_millis);

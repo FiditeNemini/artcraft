@@ -1,3 +1,4 @@
+pub mod badge_granter;
 pub mod badges;
 pub mod firehose_publisher;
 pub mod list_ip_bans;

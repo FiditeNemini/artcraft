@@ -21,6 +21,7 @@ pub mod util;
 use anyhow::anyhow;
 use chrono::Utc;
 use crate::common_env::CommonEnv;
+use crate::common_queries::badge_granter::BadgeGranter;
 use crate::common_queries::firehose_publisher::FirehosePublisher;
 use crate::job_queries::tts_download_job_queries::TtsUploadJobRecord;
 use crate::job_queries::tts_download_job_queries::grab_job_lock_and_mark_pending;
@@ -69,6 +70,7 @@ struct Downloader {
   pub mysql_pool: MySqlPool,
   pub bucket_client: BucketClient,
   pub firehose_publisher: FirehosePublisher,
+  pub badge_granter: BadgeGranter,
   pub google_drive_downloader: GoogleDriveDownloadCommand,
 
   pub bucket_path_unifier: BucketPathUnifier,
@@ -148,6 +150,11 @@ async fn main() -> AnyhowResult<()> {
     mysql_pool: mysql_pool.clone(), // NB: Pool is sync/send/clone-safe
   };
 
+  let badge_granter = BadgeGranter {
+    mysql_pool: mysql_pool.clone(), // NB: Pool is sync/send/clone-safe
+    firehose_publisher: firehose_publisher.clone(), // NB: Also safe
+  };
+
   let py_code_directory = easyenv::get_env_string_required(ENV_CODE_DIRECTORY)?;
   let py_script_name = easyenv::get_env_string_required(ENV_MODEL_CHECK_SCRIPT_NAME)?;
 
@@ -167,6 +174,7 @@ async fn main() -> AnyhowResult<()> {
     bucket_path_unifier: BucketPathUnifier::default_paths(),
     bucket_root_tts_model_uploads: bucket_root.to_string(),
     firehose_publisher,
+    badge_granter,
     tts_check: tts_model_check_command,
     job_batch_wait_millis: common_env.job_batch_wait_millis,
     job_max_attempts: common_env.job_max_attempts as i32,
@@ -349,6 +357,13 @@ async fn process_job(downloader: &Downloader, job: &TtsUploadJobRecord) -> Anyho
       .map_err(|e| {
         warn!("error publishing event: {:?}", e);
         anyhow!("error publishing event")
+      })?;
+
+  downloader.badge_granter.maybe_grant_tts_model_uploads_badge(&job.creator_user_token)
+      .await
+      .map_err(|e| {
+        warn!("error maybe awarding badge: {:?}", e);
+        anyhow!("error maybe awarding badge")
       })?;
 
   info!("Job done: {}", job.id);

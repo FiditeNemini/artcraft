@@ -32,6 +32,7 @@ use actix_cors::Cors;
 use actix_http::http;
 use actix_web::middleware::{Logger, DefaultHeaders};
 use actix_web::{HttpServer, web, HttpResponse, App};
+use crate::common_queries::badge_granter::BadgeGranter;
 use crate::common_queries::firehose_publisher::FirehosePublisher;
 use crate::http_server::endpoints::default_route_404::default_route_404;
 use crate::http_server::endpoints::events::list_events::list_events_handler;
@@ -77,6 +78,7 @@ use crate::http_server::endpoints::w2l::get_w2l_template_use_count::get_w2l_temp
 use crate::http_server::endpoints::w2l::get_w2l_upload_template_job_status::get_w2l_upload_template_job_status_handler;
 use crate::http_server::endpoints::w2l::list_w2l_templates::list_w2l_templates_handler;
 use crate::http_server::endpoints::w2l::set_w2l_template_mod_approval::set_w2l_template_mod_approval_handler;
+use crate::http_server::middleware::ip_filter_middleware::IpFilter;
 use crate::http_server::web_utils::cookie_manager::CookieManager;
 use crate::http_server::web_utils::session_checker::SessionChecker;
 use crate::server_state::{ServerState, EnvConfig};
@@ -97,7 +99,6 @@ use sqlx::MySqlPool;
 use sqlx::mysql::MySqlPoolOptions;
 use std::sync::Arc;
 use std::time::Duration;
-use crate::http_server::middleware::ip_filter_middleware::IpFilter;
 
 // TODO TODO TODO TODO
 // TODO TODO TODO TODO
@@ -166,6 +167,11 @@ async fn main() -> AnyhowResult<()> {
 
   let firehose_publisher = FirehosePublisher {
     mysql_pool: pool.clone(), // NB: Pool is clone/sync/send-safe
+  };
+
+  let badge_granter = BadgeGranter {
+    mysql_pool: pool.clone(), // NB: Pool is clone/sync/send-safe
+    firehose_publisher: firehose_publisher.clone(), // NB: Also safe
   };
 
   let redis_manager = RedisConnectionManager::new(redis_connection_string)?;
@@ -244,6 +250,7 @@ async fn main() -> AnyhowResult<()> {
     mysql_pool: pool,
     redis_pool,
     firehose_publisher,
+    badge_granter,
     cookie_manager,
     session_checker,
     private_bucket_client,
