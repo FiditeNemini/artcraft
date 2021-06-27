@@ -220,10 +220,8 @@ class SignupComponent extends React.Component<Props, State> {
         console.log('querying new session');
         this.props.querySessionCallback();
 
-        if (this.props.switchModeCallback !== undefined) {
-          this.props.switchModeCallback(Mode.SPEAK_MODE);
-        }
-        return;
+        // TODO: Switch to functional component.
+        window.location.href = '/';
       }
     })
     .catch(e => {
