@@ -239,7 +239,7 @@ function ProfileFc(props: Props) {
         </tbody>
       </table>
 
-      <h3 className="title is-3"> Badges </h3>
+      <h3 className="title is-3"> Badges (images coming soon) </h3>
       {badges}
 
       <h3 className="title is-3"> TTS Results </h3>
