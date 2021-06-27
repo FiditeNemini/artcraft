@@ -305,6 +305,83 @@
       ]
     }
   },
+  "10d93ef1350115742d8dddb951f98dfebabf7df3e44577b97b52343f0650eba1": {
+    "query": "\nSELECT\n    badges.slug,\n    badges.title,\n    badges.description,\n    badges.image_url,\n    user_badges.created_at as user_created_at\n\nFROM badges\nJOIN user_badges\nON\n    badges.slug = user_badges.badge_slug\nWHERE\n    user_badges.user_token = ?\n        ",
+    "describe": {
+      "columns": [
+        {
+          "ordinal": 0,
+          "name": "slug",
+          "type_info": {
+            "type": "VarString",
+            "flags": {
+              "bits": 4229
+            },
+            "char_set": 224,
+            "max_size": 128
+          }
+        },
+        {
+          "ordinal": 1,
+          "name": "title",
+          "type_info": {
+            "type": "VarString",
+            "flags": {
+              "bits": 4225
+            },
+            "char_set": 224,
+            "max_size": 1020
+          }
+        },
+        {
+          "ordinal": 2,
+          "name": "description",
+          "type_info": {
+            "type": "VarString",
+            "flags": {
+              "bits": 4225
+            },
+            "char_set": 224,
+            "max_size": 2048
+          }
+        },
+        {
+          "ordinal": 3,
+          "name": "image_url",
+          "type_info": {
+            "type": "VarString",
+            "flags": {
+              "bits": 4225
+            },
+            "char_set": 224,
+            "max_size": 2048
+          }
+        },
+        {
+          "ordinal": 4,
+          "name": "user_created_at",
+          "type_info": {
+            "type": "Timestamp",
+            "flags": {
+              "bits": 1153
+            },
+            "char_set": 63,
+            "max_size": 19
+          }
+        }
+      ],
+      "parameters": {
+        "Right": 1
+      },
+      "nullable": [
+        false,
+        false,
+        false,
+        false,
+        false
+      ]
+    }
+  },
   "1168f39a5ec892d06e941b0dba0e955a27ef976567eeafd6e550bc42ea4c4331": {
     "query": "\nINSERT INTO tts_inference_jobs\nSET\n  token = ?,\n  uuid_idempotency_token = ?,\n\n  model_token = ?,\n  raw_inference_text = ?,\n  maybe_creator_user_token = ?,\n  creator_ip_address = ?,\n  creator_set_visibility = ?,\n  status = \"pending\"\n        ",
     "describe": {
