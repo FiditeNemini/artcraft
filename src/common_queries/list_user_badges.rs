@@ -1,0 +1,76 @@
+use anyhow::anyhow;
+use chrono::{DateTime, Utc};
+use crate::util::anyhow_result::AnyhowResult;
+use log::{warn, info};
+use sqlx::MySqlPool;
+
+#[derive(Serialize)]
+pub struct UserBadgeForList {
+  pub slug: String,
+  pub title: String,
+  pub description: String,
+  pub image_url: String,
+  pub granted_at: DateTime<Utc>,
+}
+
+pub struct RawDbUserBadgeForList {
+  slug: String,
+  title: String,
+  description: String,
+  image_url: String,
+  user_created_at : DateTime<Utc>,
+}
+
+pub async fn list_user_badges(
+  mysql_pool: &MySqlPool,
+  user_token: &str,
+) -> AnyhowResult<Vec<UserBadgeForList>> {
+  info!("listing user badges");
+  let maybe_user_badges = sqlx::query_as!(
+      RawDbUserBadgeForList,
+        r#"
+SELECT
+    badges.slug,
+    badges.title,
+    badges.description,
+    badges.image_url,
+    user_badges.created_at as user_created_at
+
+FROM badges
+JOIN user_badges
+ON
+    badges.slug = user_badges.badge_slug
+WHERE
+    user_badges.user_token = ?
+        "#,
+        user_token
+      )
+      .fetch_all(mysql_pool)
+      .await;
+
+  let user_badges : Vec<RawDbUserBadgeForList> = match maybe_user_badges {
+    Ok(badges) => badges,
+    Err(err) => {
+      warn!("Error: {:?}", err);
+      match err {
+        RowNotFound => Vec::new(),
+        _ => {
+          warn!("user badges query error: {:?}", err);
+          return Err(anyhow!("error querying user badges"));
+        }
+      }
+    }
+  };
+
+  Ok(user_badges.into_iter()
+      .map(|badge| {
+        UserBadgeForList {
+          slug: badge.slug.clone(),
+          title: badge.title.clone(),
+          description: badge.description.clone(),
+          image_url: badge.image_url.clone(),
+          granted_at: badge.user_created_at.clone(),
+        }
+      })
+      .collect::<Vec<UserBadgeForList>>())
+}

@@ -9,11 +9,14 @@ use actix_web::{Responder, web, HttpResponse, error, HttpRequest, HttpMessage};
 use anyhow::anyhow;
 use chrono::{DateTime, Utc};
 use crate::AnyhowResult;
+use crate::common_queries::list_user_badges::UserBadgeForList;
+use crate::common_queries::list_user_badges::list_user_badges;
 use crate::common_queries::sessions::create_session_for_user;
 use crate::database_helpers::boolean_converters::i8_to_bool;
 use crate::http_server::endpoints::users::create_account::CreateAccountError::{BadInput, ServerError, UsernameTaken, EmailTaken};
 use crate::http_server::endpoints::users::login::LoginSuccessResponse;
 use crate::http_server::web_utils::ip_address::get_request_ip;
+use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 use crate::http_server::web_utils::session_checker::SessionRecord;
 use crate::server_state::ServerState;
 use crate::util::random_crockford_token::random_crockford_token;
@@ -28,30 +31,9 @@ use sqlx::error::DatabaseError;
 use sqlx::error::Error::Database;
 use sqlx::mysql::MySqlDatabaseError;
 use std::sync::Arc;
-use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 
 // TODO: This is duplicated in query_user_profile
 
-#[derive(Serialize)]
-pub struct UserProfileRecord {
-  pub user_token: String,
-  pub username: String,
-  pub email_gravatar_hash: String,
-  pub display_name: String,
-  pub profile_markdown: String,
-  pub profile_rendered_html: String,
-  pub user_role_slug: String,
-  pub is_banned: i8,
-  pub disable_gravatar: i8,
-  pub discord_username: Option<String>,
-  pub twitch_username: Option<String>,
-  pub twitter_username: Option<String>,
-  pub patreon_username: Option<String>,
-  pub github_username: Option<String>,
-  pub cashapp_username: Option<String>,
-  pub website_url: Option<String>,
-  pub created_at: DateTime<Utc>,
-}
 
 /// This changes the record:
 ///  - changes banned to bool
@@ -75,6 +57,7 @@ pub struct UserProfileRecordForResponse {
   pub github_username: Option<String>,
   pub cashapp_username: Option<String>,
   pub website_url: Option<String>,
+  pub badges: Vec<UserBadgeForList>,
   pub created_at: DateTime<Utc>,
 }
 
@@ -82,6 +65,27 @@ pub struct UserProfileRecordForResponse {
 pub struct ProfileSuccessResponse {
   pub success: bool,
   pub user: Option<UserProfileRecordForResponse>,
+}
+
+#[derive(Serialize)]
+pub struct RawUserProfileRecord {
+  pub user_token: String,
+  pub username: String,
+  pub email_gravatar_hash: String,
+  pub display_name: String,
+  pub profile_markdown: String,
+  pub profile_rendered_html: String,
+  pub user_role_slug: String,
+  pub is_banned: i8,
+  pub disable_gravatar: i8,
+  pub discord_username: Option<String>,
+  pub twitch_username: Option<String>,
+  pub twitter_username: Option<String>,
+  pub patreon_username: Option<String>,
+  pub github_username: Option<String>,
+  pub cashapp_username: Option<String>,
+  pub website_url: Option<String>,
+  pub created_at: DateTime<Utc>,
 }
 
 #[derive(Debug, Display)]
@@ -122,7 +126,7 @@ pub async fn get_profile_handler(
   // NB: Lookup failure is Err(RowNotFound).
   // NB: Since this is publicly exposed, we don't query sensitive data.
   let maybe_profile_record = sqlx::query_as!(
-      UserProfileRecord,
+      RawUserProfileRecord,
         r#"
 SELECT
     users.token as user_token,
@@ -153,7 +157,7 @@ WHERE
     .fetch_one(&server_state.mysql_pool)
     .await; // TODO: This will return error if it doesn't exist
 
-  let profile_record : UserProfileRecord = match maybe_profile_record {
+  let profile_record : RawUserProfileRecord = match maybe_profile_record {
     Ok(profile_record) => profile_record,
     Err(err) => {
       match err {
@@ -168,6 +172,13 @@ WHERE
       }
     }
   };
+
+  let badges = list_user_badges(&server_state.mysql_pool, &profile_record.user_token)
+      .await
+      .unwrap_or_else(|err| {
+        warn!("Error querying badges: {:?}", err);
+        return Vec::new(); // NB: Fine if this fails. Not sure why it would.
+      });
 
   let profile_for_response = UserProfileRecordForResponse {
     user_token: profile_record.user_token.clone(),
@@ -187,6 +198,7 @@ WHERE
     cashapp_username: profile_record.cashapp_username.clone(),
     website_url: profile_record.website_url.clone(),
     created_at: profile_record.created_at.clone(),
+    badges,
   };
 
   let response = ProfileSuccessResponse {
