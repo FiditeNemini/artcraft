@@ -120,6 +120,17 @@ function FirehoseEventListFc(props: Props) {
           </span>
         );
         break;
+      case 'user_badge_granted':
+        inner = (
+          <span>
+            {gravatar}
+            &nbsp;
+            {userLink}
+            &nbsp;
+            got a badge!
+          </span>
+        );
+        break;
       case 'tts_model_upload_started':
         inner = (
           <span>
