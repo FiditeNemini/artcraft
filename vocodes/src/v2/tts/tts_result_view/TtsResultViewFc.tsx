@@ -6,6 +6,7 @@ import { GravatarFc } from '../../common/GravatarFc';
 import { SpectrogramFc } from './SpectrogramFc';
 import { TtsResultViewDeleteFc } from './TtsResultView_DeleteFc';
 import { ReportDiscordLinkFc } from '../../common/DiscordReportLinkFc';
+import { BucketConfig } from '../../../common/BucketConfig';
 
 interface TtsInferenceResultResponsePayload {
   success: boolean,
@@ -85,14 +86,13 @@ function TtsResultViewFc(props: Props) {
     return <div />;
   }
 
-  let audioLink = `https://storage.googleapis.com/dev-vocodes-public${ttsInferenceResult?.public_bucket_wav_audio_path}`; 
+  let audioLink = new BucketConfig().getGcsUrl(ttsInferenceResult?.public_bucket_wav_audio_path);
   let modelLink = `/tts/${ttsInferenceResult.tts_model_token}`;
 
   // NB: Not respected in firefox: https://stackoverflow.com/a/28468261
   let audioDownloadFilename = `vocodes-${ttsInferenceResult.tts_model_token.replace(':', '')}.wav`;
 
-  let spectrogramLink = `https://storage.googleapis.com/dev-vocodes-public${ttsInferenceResult?.public_bucket_spectrogram_path}`;
-
+  let spectrogramLink = new BucketConfig().getGcsUrl(ttsInferenceResult?.public_bucket_spectrogram_path);
 
   let durationSeconds = ttsInferenceResult?.duration_millis / 1000;
 

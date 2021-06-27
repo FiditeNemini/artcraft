@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { TtsInferenceJob } from '../../App'
+import { BucketConfig } from '../../common/BucketConfig';
 import { JobState } from '../../jobs/JobStates';
 
 interface Props {
@@ -40,8 +41,7 @@ function SessionTtsInferenceResultListFc(props: Props) {
         <div key={job.jobToken}>{stateDescription}</div>
       );
     } else {
-
-      let audioLink = `https://storage.googleapis.com/dev-vocodes-public${job.maybePublicBucketWavAudioPath}`; 
+      let audioLink = new BucketConfig().getGcsUrl(job.maybePublicBucketWavAudioPath);
       let ttsPermalink = `/tts/result/${job.maybeResultToken}`
       results.push(
         <div key={job.jobToken}>

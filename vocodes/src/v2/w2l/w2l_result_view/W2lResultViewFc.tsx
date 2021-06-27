@@ -5,6 +5,7 @@ import { SessionWrapper } from '../../../session/SessionWrapper';
 import { useParams, Link } from 'react-router-dom';
 import { W2lResultViewDeleteFc } from './W2lResultView_DeleteFc';
 import { ReportDiscordLinkFc } from '../../common/DiscordReportLinkFc';
+import { BucketConfig } from '../../../common/BucketConfig';
 
 interface W2lInferenceResultResponsePayload {
   success: boolean,
@@ -83,7 +84,7 @@ function W2lResultViewFc(props: Props) {
     return <div />;
   }
 
-  let videoLink = `https://storage.googleapis.com/dev-vocodes-public${w2lInferenceResult?.public_bucket_video_path}`; 
+  let videoLink = new BucketConfig().getGcsUrl(w2lInferenceResult?.public_bucket_video_path);
   let templateLink = `/w2l/${w2lInferenceResult.maybe_w2l_template_token}`;
   let videoDownloadFilename = `vocodes-${w2lInferenceResult.w2l_result_token.replace(':', '')}.mp4`;
 

@@ -8,6 +8,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { SessionW2lInferenceResultListFc } from '../../common/SessionW2lInferenceResultsListFc';
 import { W2lTemplateViewDeleteFc } from './W2lTemplateView_DeleteFc';
 import { ReportDiscordLinkFc } from '../../common/DiscordReportLinkFc';
+import { BucketConfig } from '../../../common/BucketConfig';
 
 interface W2lTemplateViewResponsePayload {
   success: boolean,
@@ -226,7 +227,7 @@ function W2lTemplateViewFc(props: Props) {
   } else {
   }
 
-  let url = `https://storage.googleapis.com/dev-vocodes-public${object}`;
+  let url = new BucketConfig().getGcsUrl(object);
 
   let audioFilename = '(select a file)';
   if (audioFile !== undefined) {

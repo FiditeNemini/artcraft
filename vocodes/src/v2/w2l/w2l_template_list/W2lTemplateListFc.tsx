@@ -3,6 +3,7 @@ import { ApiConfig } from '../../../common/ApiConfig';
 import { SessionWrapper } from '../../../session/SessionWrapper';
 import { Link } from "react-router-dom";
 import { getRandomInt } from '../../../v1/api/Utils';
+import { BucketConfig } from '../../../common/BucketConfig';
 
 interface W2lTemplateListResponsePayload {
   success: boolean,
@@ -72,7 +73,7 @@ function W2lTemplateListFc(props: Props) {
       return;
     }
 
-    let url = `https://storage.googleapis.com/dev-vocodes-public${object}`;
+    let url = new BucketConfig().getGcsUrl(object);
 
     let link = `/w2l/${t.template_token}`;
   
