@@ -15,7 +15,11 @@ class BucketConfig {
   // TODO: Prevent callers with undefined/null paths
   getGcsUrl(bucketRelativePath: string | undefined | null) : string {
     let bucket = this.getBucket();
-    return `https://storage.googleapis.com/${bucket}/${bucketRelativePath}`; 
+    let path = bucketRelativePath;
+    if (path !== undefined && path !== null && !path.startsWith('/')) {
+      path = '/' + path;
+    }
+    return `https://storage.googleapis.com/${bucket}${path}`; 
   }
 
   private getBucket() : string {
