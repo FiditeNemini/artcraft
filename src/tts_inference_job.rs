@@ -226,7 +226,7 @@ const INCREASE_TIMEOUT_MILLIS : u64 = 1000;
 async fn main_loop(inferencer: Inferencer) {
   let mut error_timeout_millis = START_TIMEOUT_MILLIS;
 
-  let mut noop_logger = NoOpLogger::new(15_000);
+  let mut noop_logger = NoOpLogger::new(inferencer.no_op_logger_millis as i64);
 
   loop {
     let num_records = inferencer.job_batch_size;
