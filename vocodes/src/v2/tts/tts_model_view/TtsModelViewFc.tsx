@@ -8,6 +8,7 @@ import { SessionWrapper } from '../../../session/SessionWrapper';
 import { TtsInferenceJob } from '../../../App';
 import { useParams, Link } from 'react-router-dom';
 import { v4 as uuidv4 } from 'uuid';
+import { FrontendUrlConfig } from '../../../common/FrontendUrlConfig';
 
 interface TtsModelViewResponsePayload {
   success: boolean,
@@ -162,7 +163,14 @@ function TtsModelViewFc(props: Props) {
     return false;
   };
 
-  let creatorLink=`/profile/${ttsModel?.creator_username}`;
+  let creatorLink = <span />;
+
+  if (!!ttsModel?.creator_display_name) {
+    const creatorUrl = FrontendUrlConfig.userProfilePage(ttsModel?.creator_display_name);
+    creatorLink = (
+      <Link to={creatorUrl}>{ttsModel?.creator_display_name}</Link>
+    );
+  }
 
   let title = 'TTS Model'
   if (ttsModel?.title !== undefined) {
@@ -204,7 +212,7 @@ function TtsModelViewFc(props: Props) {
 
   if (!!ttsModel?.creator_user_token) {
     if (props.sessionWrapper.canEditTtsModelByUserToken(ttsModel.creator_user_token)) {
-      let editLinkUrl = `/tts/${token}/edit`;
+      let editLinkUrl = FrontendUrlConfig.ttsModelEditPage(token);
       editModelButton = (
           <Link 
             className={"button is-medium is-info"}
@@ -217,9 +225,11 @@ function TtsModelViewFc(props: Props) {
     <div className="content">
       <h1 className="title is-1"> {title} </h1>
       
-      <Link to="/">&lt; Back to all models</Link>
+      <p>
+        <Link to="/">&lt; Back to all models</Link>
+      </p>
       
-      <h3 className="title is-3"> Use Model </h3>
+      <h4 className="title is-4"> Use Model </h4>
 
       <form onSubmit={handleFormSubmit}>
         <textarea 
@@ -234,7 +244,7 @@ function TtsModelViewFc(props: Props) {
       
       <SessionTtsInferenceResultListFc ttsInferenceJobs={props.ttsInferenceJobs} />
     
-      <h3 className="title is-3"> Model Details </h3>
+      <h4 className="title is-4"> Model Details </h4>
 
       <div 
         className="profile content is-medium" 
@@ -252,7 +262,7 @@ function TtsModelViewFc(props: Props) {
           <tr>
             <th>Creator</th>
             <td>
-              <Link to={creatorLink}>{ttsModel?.creator_display_name}</Link>
+              {creatorLink}
             </td>
           </tr>
           <tr>

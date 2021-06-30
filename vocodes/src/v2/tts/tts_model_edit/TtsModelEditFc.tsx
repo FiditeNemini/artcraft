@@ -5,6 +5,7 @@ import { ApiConfig } from '../../../common/ApiConfig';
 import { SessionWrapper } from '../../../session/SessionWrapper';
 import { TtsInferenceJob } from '../../../App';
 import { useParams, Link, useHistory } from 'react-router-dom';
+import { FrontendUrlConfig } from '../../../common/FrontendUrlConfig';
 
 interface TtsModelViewResponsePayload {
   success: boolean,
@@ -93,7 +94,7 @@ function TtsModelEditFc(props: Props) {
     return false;
   };
 
-  const modelLink = `/tts/${token}`;
+  const modelLink = FrontendUrlConfig.ttsModelPage(token);
 
   const handleFormSubmit = (ev: React.FormEvent<HTMLFormElement>) => { 
     ev.preventDefault();
@@ -143,10 +144,12 @@ function TtsModelEditFc(props: Props) {
   let isDisabled = ttsModel === undefined;
 
   return (
-    <div>
+    <div className="content">
       <h1 className="title is-1"> Edit Model </h1>
 
-      <Link to={modelLink}>Back to model</Link>
+      <p>
+        <Link to={modelLink}>&lt; Back to model</Link>
+      </p>
 
       <form onSubmit={handleFormSubmit}>
         <fieldset disabled={isDisabled}>
