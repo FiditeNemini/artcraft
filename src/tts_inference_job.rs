@@ -22,7 +22,7 @@ use anyhow::anyhow;
 use chrono::{Utc, DateTime, TimeZone};
 use crate::common_env::CommonEnv;
 use crate::common_queries::firehose_publisher::FirehosePublisher;
-use crate::job_queries::tts_inference_job_queries::TtsInferenceJobRecord;
+use crate::job_queries::tts_inference_job_queries::{TtsInferenceJobRecord, TtsModelRecord2};
 use crate::job_queries::tts_inference_job_queries::get_tts_model_by_token;
 use crate::job_queries::tts_inference_job_queries::grab_job_lock_and_mark_pending;
 use crate::job_queries::tts_inference_job_queries::insert_tts_result;
@@ -228,6 +228,8 @@ async fn main_loop(inferencer: Inferencer) {
 
   let mut noop_logger = NoOpLogger::new(inferencer.no_op_logger_millis as i64);
 
+  let mut cold_cache_okay = false;
+
   loop {
     let num_records = inferencer.job_batch_size;
 
@@ -253,27 +255,76 @@ async fn main_loop(inferencer: Inferencer) {
       continue;
     }
 
-    let result = process_jobs(&inferencer, jobs).await;
+    let batch_result = process_jobs(
+      &inferencer,
+      jobs,
+      cold_cache_okay).await;
 
-    match result {
-      Ok(_) => {},
+    let cold_cache_skipped_count = match batch_result {
+      Ok(cold_cache_skipped_count) => cold_cache_skipped_count,
       Err(e) => {
         warn!("Error querying jobs: {:?}", e);
         std::thread::sleep(Duration::from_millis(error_timeout_millis));
         error_timeout_millis += INCREASE_TIMEOUT_MILLIS;
         continue;
       }
-    }
+    };
 
     error_timeout_millis = START_TIMEOUT_MILLIS; // reset
+
+    // We mostly want to ignore a cold cache unless other workers
+    // aren't picking up the slack.
+    if cold_cache_okay {
+      cold_cache_okay = false;
+    } else if cold_cache_skipped_count > 0 {
+      cold_cache_okay = true;
+    }
 
     std::thread::sleep(Duration::from_millis(inferencer.job_batch_wait_millis));
   }
 }
 
-async fn process_jobs(inferencer: &Inferencer, jobs: Vec<TtsInferenceJobRecord>) -> AnyhowResult<()> {
+/// Process a batch of jobs, returning the count of cold-cache skipped jobs.
+async fn process_jobs(
+  inferencer: &Inferencer,
+  jobs: Vec<TtsInferenceJobRecord>,
+  cold_cache_okay: bool
+) -> AnyhowResult<usize> {
+  let mut skipped_for_cold_cache = 0;
+
   for job in jobs.into_iter() {
-    let result = process_job(inferencer, &job).await;
+    let model_state_result = ModelState::query_model_and_check_filesystem(
+      &job,
+      &inferencer.mysql_pool,
+      &inferencer.semi_persistent_cache).await;
+
+    let model_state = match model_state_result {
+      Ok(model_state) => model_state,
+      Err(e) => {
+        warn!("Failure to check model state: {:?}", e);
+
+        let failure_reason = "";
+        let _r = mark_tts_inference_job_failure(
+          &inferencer.mysql_pool,
+          &job,
+          failure_reason,
+          inferencer.job_max_attempts
+        ).await;
+        continue;
+      }
+    };
+
+    if !model_state.is_downloaded_to_filesystem && !cold_cache_okay {
+      // We're going to skip this for now. (Maybe another worker has a warm cache and can continue.)
+      info!("Skipping TTS due to cold cache: {} ({})",
+        model_state.model_record.model_token,
+        model_state.model_record.title);
+
+      skipped_for_cold_cache += 1;
+      continue;
+    }
+
+    let result = process_job(inferencer, &job, &model_state.model_record).await;
     match result {
       Ok(_) => {},
       Err(e) => {
@@ -289,7 +340,7 @@ async fn process_jobs(inferencer: &Inferencer, jobs: Vec<TtsInferenceJobRecord>)
     }
   }
 
-  Ok(())
+  Ok(skipped_for_cold_cache)
 }
 
 #[derive(Deserialize, Default)]
@@ -306,7 +357,51 @@ fn read_metadata_file(filename: &PathBuf) -> AnyhowResult<FileMetadata> {
   Ok(serde_json::from_str(&buffer)?)
 }
 
-async fn process_job(inferencer: &Inferencer, job: &TtsInferenceJobRecord) -> AnyhowResult<()> {
+/// We check both of these in one go so that we can reuse the ModelRecord later
+/// without another DB query.
+struct ModelState {
+  pub model_record: TtsModelRecord2,
+  pub is_downloaded_to_filesystem: bool,
+}
+
+impl ModelState {
+  /// Query the model details and see if the model file is on the filesystem in one go.
+  pub async fn query_model_and_check_filesystem(
+    job: &TtsInferenceJobRecord,
+    mysql_pool: &MySqlPool,
+    semi_persistent_cache: &SemiPersistentCacheDir,
+  ) -> AnyhowResult<Self> {
+    info!("Looking up TTS model by token: {}", &job.model_token);
+
+    let query_result = get_tts_model_by_token(
+      &mysql_pool,
+      &job.model_token).await?;
+
+    let model_record = match query_result {
+      Some(model) => model,
+      None => {
+        warn!("TTS model not found: {}", &job.model_token);
+        return Err(anyhow!("Model not found!"))
+      },
+    };
+
+    let tts_synthesizer_fs_path = semi_persistent_cache.tts_synthesizer_model_path(
+      &model_record.model_token);
+
+    let is_downloaded_to_filesystem = tts_synthesizer_fs_path.exists();
+
+    Ok(Self {
+      model_record,
+      is_downloaded_to_filesystem,
+    })
+  }
+}
+
+async fn process_job(
+  inferencer: &Inferencer,
+  job: &TtsInferenceJobRecord,
+  model_record: &TtsModelRecord2,
+) -> AnyhowResult<()> {
 
   // TODO 1. Mark processing (DONE)
 
@@ -352,21 +447,21 @@ async fn process_job(inferencer: &Inferencer, job: &TtsInferenceJobRecord) -> An
     info!("Downloaded tts vocoder model from bucket!");
   }
 
-  // ==================== LOOK UP TTS SYNTHESIZER RECORD (WHICH CONTAINS ITS BUCKET PATH) ==================== //
-
-  info!("Looking up TTS model by token: {}", &job.model_token);
-
-  let query_result = get_tts_model_by_token(
-    &inferencer.mysql_pool,
-    &job.model_token).await?;
-
-  let tts_model = match query_result {
-    Some(model) => model,
-    None => {
-      warn!("TTS model not found: {}", &job.model_token);
-      return Err(anyhow!("Model not found!"))
-    },
-  };
+//  // ==================== LOOK UP TTS SYNTHESIZER RECORD (WHICH CONTAINS ITS BUCKET PATH) ==================== //
+//
+//  info!("Looking up TTS model by token: {}", &job.model_token);
+//
+//  let query_result = get_tts_model_by_token(
+//    &inferencer.mysql_pool,
+//    &job.model_token).await?;
+//
+//  let tts_model = match query_result {
+//    Some(model) => model,
+//    None => {
+//      warn!("TTS model not found: {}", &job.model_token);
+//      return Err(anyhow!("Model not found!"))
+//    },
+//  };
 
   // ==================== CONFIRM OR DOWNLOAD TTS SYNTHESIZER MODEL ==================== //
 
@@ -374,13 +469,13 @@ async fn process_job(inferencer: &Inferencer, job: &TtsInferenceJobRecord) -> An
   // TODO: We'll probably need to LRU cache these.
 
   let tts_synthesizer_fs_path = inferencer.semi_persistent_cache.tts_synthesizer_model_path(
-    &tts_model.model_token);
+    &model_record.model_token);
 
   if !tts_synthesizer_fs_path.exists() {
     info!("TTS synthesizer model file does not exist: {:?}", &tts_synthesizer_fs_path);
 
     let tts_synthesizer_object_path  = inferencer.bucket_path_unifier
-        .tts_synthesizer_path(&tts_model.private_bucket_hash);
+        .tts_synthesizer_path(&model_record.private_bucket_hash);
 
     info!("Download from template media path: {:?}", &tts_synthesizer_object_path);
 
@@ -488,7 +583,7 @@ async fn process_job(inferencer: &Inferencer, job: &TtsInferenceJobRecord) -> An
 
   inferencer.firehose_publisher.tts_inference_finished(
     job.maybe_creator_user_token.as_deref(),
-    &tts_model.model_token,
+    &model_record.model_token,
     &inference_result_token)
       .await
       .map_err(|e| {
