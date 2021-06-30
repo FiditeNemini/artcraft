@@ -19,7 +19,7 @@ pub mod shared_constants;
 pub mod util;
 
 use anyhow::anyhow;
-use chrono::Utc;
+use chrono::{Utc, DateTime, TimeZone};
 use crate::common_env::CommonEnv;
 use crate::common_queries::firehose_publisher::FirehosePublisher;
 use crate::job_queries::tts_inference_job_queries::TtsInferenceJobRecord;
@@ -40,6 +40,7 @@ use crate::util::filesystem::check_directory_exists;
 use crate::util::filesystem::check_file_exists;
 use crate::util::hashing::hash_file_sha2::hash_file_sha2;
 use crate::util::hashing::hash_string_sha2::hash_string_sha2;
+use crate::util::noop_logger::NoOpLogger;
 use crate::util::random_crockford_token::random_crockford_token;
 use crate::util::semi_persistent_cache_dir::SemiPersistentCacheDir;
 use data_encoding::{HEXUPPER, HEXLOWER, HEXLOWER_PERMISSIVE};
@@ -96,6 +97,12 @@ struct Inferencer {
   // Max job attempts before failure.
   // NB: This is an i32 so we don't need to convert to db column type.
   pub job_max_attempts: i32,
+
+  // Number of jobs to dequeue at once.
+  pub job_batch_size: u32,
+
+  // How long to wait between log lines
+  pub no_op_logger_millis: u64,
 }
 
 #[tokio::main]
@@ -204,6 +211,8 @@ async fn main() -> AnyhowResult<()> {
     tts_vocoder_model_filename,
     job_batch_wait_millis: common_env.job_batch_wait_millis,
     job_max_attempts: common_env.job_max_attempts as i32,
+    job_batch_size: common_env.job_batch_size,
+    no_op_logger_millis: common_env.no_op_logger_millis,
   };
 
   main_loop(inferencer).await;
@@ -217,8 +226,10 @@ const INCREASE_TIMEOUT_MILLIS : u64 = 1000;
 async fn main_loop(inferencer: Inferencer) {
   let mut error_timeout_millis = START_TIMEOUT_MILLIS;
 
+  let mut noop_logger = NoOpLogger::new(15_000);
+
   loop {
-    let num_records = 1;
+    let num_records = inferencer.job_batch_size;
 
     let query_result = query_tts_inference_job_records(
       &inferencer.mysql_pool,
@@ -236,7 +247,8 @@ async fn main_loop(inferencer: Inferencer) {
     };
 
     if jobs.is_empty() {
-      info!("No jobs!");
+      noop_logger.log_after_awhile();
+
       std::thread::sleep(Duration::from_millis(inferencer.job_batch_wait_millis));
       continue;
     }

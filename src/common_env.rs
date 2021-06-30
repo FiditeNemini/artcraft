@@ -15,6 +15,12 @@ pub struct CommonEnv {
   /// The maximum number of retries a job will get.
   /// After a job exhausts these attempts, it will become "dead".
   pub job_max_attempts: u8,
+
+  /// Number of job records to query at once.
+  pub job_batch_size: u32,
+
+  /// Time to wait between no-op logger log lines.
+  pub no_op_logger_millis: u64,
 }
 
 impl CommonEnv {
@@ -23,6 +29,8 @@ impl CommonEnv {
     Ok(Self {
       job_batch_wait_millis: easyenv::get_env_num("JOB_BATCH_WAIT_MILLIS", 100)?,
       job_max_attempts: easyenv::get_env_num("JOB_MAX_ATTEMPTS", 3)?,
+      job_batch_size: easyenv::get_env_num("JOB_BATCH_SIZE", 10)?,
+      no_op_logger_millis: easyenv::get_env_num("NO_OP_LOGGER_MILLIS", 15_000)?,
     })
   }
 }

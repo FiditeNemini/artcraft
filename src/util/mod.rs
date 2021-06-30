@@ -5,6 +5,7 @@ pub mod encrypted_sort_id;
 pub mod filesystem;
 pub mod hashing;
 pub mod markdown_to_html;
+pub mod noop_logger;
 pub mod random_crockford_token;
 pub mod random_prefix_crockford_token;
 pub mod random_uuid;
