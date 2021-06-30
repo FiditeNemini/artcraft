@@ -208,16 +208,38 @@ function TtsModelViewFc(props: Props) {
       editModelButton = (
           <Link 
             className={"button is-medium is-info"}
-            to={editLinkUrl}>Edit</Link>
+            to={editLinkUrl}>Edit Model Details</Link>
       );
     }
   }
 
   return (
-    <div>
+    <div className="content">
       <h1 className="title is-1"> {title} </h1>
       
-      {editModelButton}
+      <Link to="/">&lt; Back to all models</Link>
+      
+      <h3 className="title is-3"> Use Model </h3>
+
+      <form onSubmit={handleFormSubmit}>
+        <textarea 
+            onChange={handleChangeText}
+            className="textarea is-large" 
+            placeholder="Textual shenanigans go here..."></textarea>
+
+        <button className="button is-large is-fullwidth is-success">Submit</button>
+      </form>
+
+      <br />
+      
+      <SessionTtsInferenceResultListFc ttsInferenceJobs={props.ttsInferenceJobs} />
+    
+      <h3 className="title is-3"> Model Details </h3>
+
+      <div 
+        className="profile content is-medium" 
+        dangerouslySetInnerHTML={{__html: ttsModel?.description_rendered_html || ""}}
+        />
 
       <table className="table">
         <thead>
@@ -261,28 +283,11 @@ function TtsModelViewFc(props: Props) {
 
       <br />
 
-      <h3 className="title is-3"> Use Model </h3>
+      {editModelButton}
 
-      <form onSubmit={handleFormSubmit}>
-        <textarea 
-            onChange={handleChangeText}
-            className="textarea is-large" 
-            placeholder="Textual shenanigans go here..."></textarea>
-
-        <button className="button is-large is-fullwidth is-success">Submit</button>
-      </form>
-    
       <br />
       <br />
       <Link to="/">&lt; Back to all models</Link>
-
-      <br />
-
-      <br />
-      <br />
-
-      <SessionTtsInferenceResultListFc ttsInferenceJobs={props.ttsInferenceJobs} />
-      <br />
     </div>
   )
 }
