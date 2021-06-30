@@ -27,6 +27,8 @@ interface TtsModel {
   creator_user_token: string,
   creator_username: string,
   creator_display_name: string,
+  description_markdown: string,
+  description_rendered_html: string,
   updatable_slug: string,
   created_at: string,
   updated_at: string,
@@ -198,9 +200,24 @@ function TtsModelViewFc(props: Props) {
     );
   }
 
+  let editModelButton = <span />
+
+  if (!!ttsModel?.creator_user_token) {
+    if (props.sessionWrapper.canEditTtsModelByUserToken(ttsModel.creator_user_token)) {
+      let editLinkUrl = `/tts/${token}/edit`;
+      editModelButton = (
+          <Link 
+            className={"button is-medium is-info"}
+            to={editLinkUrl}>Edit</Link>
+      );
+    }
+  }
+
   return (
     <div>
       <h1 className="title is-1"> {title} </h1>
+      
+      {editModelButton}
 
       <table className="table">
         <thead>

@@ -51,6 +51,10 @@ export class SessionWrapper {
     return this.canEditOtherUsersProfiles();
   }
 
+  public canEditTtsModelByUserToken(userToken: MaybeString) : boolean {
+    return this.canEditOtherUsersTtsModels() || this.verifyUserTokenMatch(userToken);
+  }
+
   public canDeleteTtsModelByUserToken(userToken: MaybeString) : boolean {
     return this.canDeleteOtherUsersTtsModels() || this.verifyUserTokenMatch(userToken);
   }
@@ -93,6 +97,10 @@ export class SessionWrapper {
 
   public canEditOtherUsersProfiles() : boolean {
     return this.sessionStateResponse?.user?.can_edit_other_users_profiles || false;
+  }
+
+  public canEditOtherUsersTtsModels() : boolean {
+    return this.sessionStateResponse?.user?.can_edit_other_users_tts_models || false;
   }
 
   public canDeleteOtherUsersTtsModels() : boolean {

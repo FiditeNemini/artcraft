@@ -27,6 +27,7 @@ import { W2lTemplateViewFc } from './w2l/w2l_template_view/W2lTemplateViewFc';
 import { ModerationViewIpBanFc } from './moderation/moderation_view_ip_ban/ModerationViewIpBanFc';
 import { AboutFc } from './about/about_page/AboutFc';
 import { TermsFc } from './about/terms_page/TermsFc';
+import { TtsModelEditFc } from './tts/tts_model_edit/TtsModelEditFc';
 
 interface Props {
   sessionWrapper: SessionWrapper,
@@ -113,6 +114,14 @@ class NewVocodesContainer extends React.Component<Props, State> {
                 sessionWrapper={this.props.sessionWrapper}
               />
               </Route>
+
+            <Route path="/tts/:token/edit">
+              <TtsModelEditFc
+                sessionWrapper={this.props.sessionWrapper}
+                enqueueTtsJob={this.props.enqueueTtsJob}
+                ttsInferenceJobs={this.props.ttsInferenceJobs}
+              />
+            </Route>
 
             <Route path="/tts/:token">
               <TtsModelViewFc

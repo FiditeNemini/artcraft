@@ -64,8 +64,12 @@ class ApiConfig {
     return `${this.getScheme()}://${this.getNewApiHost()}/tts/model/${modelToken}/delete`;
   }
 
-  getTtsModelUseCount(modelSlug: string) : string {
-    return `${this.getScheme()}://${this.getNewApiHost()}/tts/model/${modelSlug}/count`;
+  editTtsModel(modelToken: string) : string {
+    return `${this.getScheme()}://${this.getNewApiHost()}/tts/model/${modelToken}/edit`;
+  }
+
+  getTtsModelUseCount(modelToken: string) : string {
+    return `${this.getScheme()}://${this.getNewApiHost()}/tts/model/${modelToken}/count`;
   }
 
   viewTtsInferenceResult(token: string) : string {
