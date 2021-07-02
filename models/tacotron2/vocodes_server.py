@@ -25,10 +25,13 @@ from falcon_multipart.middleware import MultipartMiddleware
 from wsgiref import simple_server
 
 from vocodes_common import TacotronWaveglowPipeline
+from vocodes_common import print_gpu_info
 from vocodes_common import load_tacotron_model
 from vocodes_common import load_waveglow_model
 
 print("TensorFlow version: {}".format(tf.version.VERSION))
+
+print_gpu_info()
 
 INDEX_HTML = '''
 <!doctype html>
@@ -211,9 +214,9 @@ INDEX_HTML = '''
 #model_name_default = 'sf1_tm1.ckpt'
 #converter = Converter(model_dir_default, model_name_default)
 
-tacotron = load_tacotron_model('/home/bt/models/tacotron2/tacotron2_uberduck_Noire.pt')
-waveglow = load_waveglow_model('/home/bt/models/waveglow/waveglow_256channels_universal_v5.pt')
-pipeline = TacotronWaveglowPipeline(tacotron, waveglow)
+#tacotron = load_tacotron_model('/home/bt/models/tacotron2/tacotron2_uberduck_Noire.pt')
+#waveglow = load_waveglow_model('/home/bt/models/waveglow/waveglow_256channels_universal_v5.pt')
+pipeline = TacotronWaveglowPipeline()
 
 class IndexHandler():
     def on_get(self, request, response):
@@ -223,43 +226,33 @@ class IndexHandler():
 class ApiHandler():
     def on_post(self, request, response):
         raw_data = json.load(request.bounded_stream)
+
+        # Request parameters
+        vocoder_checkpoint_path = raw_data.get('vocoder_checkpoint_path')
+        synthesizer_checkpoint_path = raw_data.get('synthesizer_checkpoint_path')
         inference_text = raw_data.get('inference_text')
-        print(inference_text)
+        output_audio_filename = raw_data.get('output_audio_filename')
+        output_spectrogram_filename = raw_data.get('output_spectrogram_filename')
+        output_metadata_filename = raw_data.get('output_metadata_filename')
 
-        pipeline.infer(inference_text)
+        print('vocoder_checkpoint_path: {}'.format(vocoder_checkpoint_path))
+        print('synthesizer_checkpoint_path: {}'.format(synthesizer_checkpoint_path))
+        print('inference_text: {}'.format(inference_text))
+        print('output_audio_filename: {}'.format(output_audio_filename))
+        print('output_spectrogram_filename: {}'.format(output_spectrogram_filename))
+        print('output_metadata_filename: {}'.format(output_metadata_filename))
 
-        ## NB: uses middleware to pull out data.
-        #form_data = request.params['audio_data'].file
-        #data, samplerate = soundfile.read(form_data)
+        pipeline.maybe_load_waveglow_model(vocoder_checkpoint_path)
+        pipeline.maybe_load_tacotron_model(synthesizer_checkpoint_path)
 
-        ## For debugging browser input, uncomment the following line:
-        ## scipy.io.wavfile.write('browser_input_audio.wav', samplerate, data)
+        inference_args = {
+            'raw_text': inference_text,
+            'output_audio_filename': output_audio_filename,
+            'output_spectrogram_filename': output_spectrogram_filename,
+            'output_metadata_filename': output_metadata_filename,
+        }
 
-        ## NB: Convert the input stereo signal into mono.
-        ## In the future the frontend should be responsible for sampling details.
-        #mono = data[:, 0]
-
-        ## NB: We must downsample to the rate that the network is trained on.
-        #downsampled = librosa.resample(mono, samplerate, 16000)
-
-        ## Evaluate the model
-        #print(">>> Converting...")
-        #results = converter.convert(downsampled, conversion_direction = 'A2B')
-
-        #temp_dir = tempfile.TemporaryDirectory(prefix='tmp_ml_audio')
-        #temp_file = tempfile.NamedTemporaryFile(suffix='.wav')
-
-        #temp_file.write(results.read())
-
-        #out_file = temp_dir.name + '/output.ogg'
-
-        ## NB: Browsers have a great deal of trouble decoding WAV files unless they are in the
-        ## narrow slice of the WAV spec expected. None of the {librosa, scipy, soundfile} python
-        ## tools do a good job of this, so here we shell out to ffmpeg and generate OGG.
-        ## It's lazy and messy, but it works for now.
-        ## See https://github.com/librosa/librosa/issues/361 for a survey of the library landscape
-        ## See https://bugzilla.mozilla.org/show_bug.cgi?id=523837 for one of dozens of browser codec bugs
-        #_stdout = subprocess.check_output(['ffmpeg', '-i', temp_file.name, '-acodec', 'libvorbis', out_file])
+        pipeline.infer(inference_args)
 
         #response.content_type = 'audio/ogg'
         #with open(out_file, mode='rb') as f:

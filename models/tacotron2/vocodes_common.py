@@ -1,4 +1,3 @@
-
 import sys
 sys.path.append('waveglow/')
 import shutil
@@ -21,7 +20,7 @@ import subprocess
 import magic
 import os
 
-def print_info():
+def print_gpu_info():
     print('========================================')
     print('Python interpreter', sys.executable)
     print('PyTorch version', torch.__version__)
@@ -52,6 +51,7 @@ def load_waveglow_model(checkpoint_path):
     return waveglow
 
 def preprocess_text(text, raw_input=True):
+    # TODO: Handle ARPAbet
     sequence = None
     for i in text.split("\n"):
         if len(i) < 1:
@@ -71,14 +71,104 @@ def preprocess_text(text, raw_input=True):
             break # TODO: Handle multiple lines.
     return sequence
 
+class NumpyEncoder(json.JSONEncoder):
+    def default(self, obj):
+        if isinstance(obj, np.ndarray):
+            return obj.tolist()
+        return json.JSONEncoder.default(self, obj)
+
+def save_spectorgram_json_file(mel_outputs_postnet, output_spectrogram_filename):
+    # squeeze(0) -> 3D to 2D (by removing the singular 1-length "wrapper" dimension)
+    # transpose() -> originally 80x{N}, we turn to {N}x80
+    mel_for_json = mel_outputs_postnet.cpu().numpy().squeeze(0).transpose()
+    mel_for_scaling = mel_for_json.copy()
+
+    max_value = np.amax(mel_for_scaling)
+    min_value = np.amin(mel_for_scaling)
+    mel_range = max_value - min_value
+
+    mel_for_scaling -= min_value
+    mel_for_scaling *= (255.0 / mel_range)
+    mel_for_scaling = mel_for_scaling.astype('int32')
+
+    json_data = {
+        'mel': mel_for_json,
+        'mel_scaled': mel_for_scaling,
+    }
+
+    with open(output_spectrogram_filename, 'w') as outfile:
+        json.dump(json_data, outfile, cls=NumpyEncoder)
+
+def save_wav_audio_file(audio, output_audio_filename, sampling_rate=22050):
+    output_audio = audio[0].data.cpu().numpy().astype(np.float32)
+    write_wav(output_audio_filename, sampling_rate, output_audio)
+
+def generate_metadata_file(output_audio_filename, output_metadata_filename):
+    # ==== METADATA (1) ====
+    command = [
+        "ffprobe",
+        "-loglevel",  "quiet",
+        "-print_format", "json",
+        "-show_format",
+        "-show_streams",
+        output_audio_filename
+    ]
+
+    pipe = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+    out, err = pipe.communicate()
+    ffmpeg_metadata = json.loads(out)
+
+    print(ffmpeg_metadata)
+
+    # ==== METADATA (2) ====
+    mime_type = magic.from_file(output_audio_filename, mime=True)
+    file_size_bytes = os.path.getsize(output_audio_filename)
+
+    duration_millis = int(float(ffmpeg_metadata['format']['duration']) * 1000)
+
+    metadata = {
+        'duration_millis': duration_millis,
+        'mimetype': mime_type,
+        'file_size_bytes': file_size_bytes,
+    }
+
+    with open(output_metadata_filename, 'w') as json_file:
+        json.dump(metadata, json_file)
+
+
 class TacotronWaveglowPipeline:
 
-    def __init__(self, tacotron: Tacotron2, waveglow: Denoiser):
-        self.tacotron = tacotron
-        self.waveglow = waveglow
+    def __init__(self):
+        self.tacotron = None
+        self.tacotron_filename = None
+        self.waveglow = None
+        self.waveglow_filename = None
 
-    def infer(self, raw_text):
-        sequence = preprocess_text(raw_text)
+    def maybe_load_waveglow_model(self, checkpoint_path):
+        if self.waveglow_filename == checkpoint_path:
+            print('Waveglow model already loaded into memory: {}'.format(checkpoint_path))
+            return
+        print('Dumping previous waveglow model from memory: {}'.format(self.waveglow_filename))
+        print('Loading waveglow model into memory: {}'.format(checkpoint_path), flush=True)
+        self.waveglow = load_waveglow_model(checkpoint_path)
+        self.waveglow_filename = checkpoint_path
+
+    def maybe_load_tacotron_model(self, checkpoint_path):
+        if self.tacotron_filename == checkpoint_path:
+            print('Tacotron model already loaded into memory: {}'.format(checkpoint_path))
+            return
+        print('Dumping previous tacotron model from memory: {}'.format(self.tacotron_filename))
+        print('Loading tacotron model into memory: {}'.format(checkpoint_path), flush=True)
+        self.tacotron = load_tacotron_model(checkpoint_path)
+        self.tacotron_filename = checkpoint_path
+
+    def infer(self, args):
+        assert('raw_text' in args)
+        assert('output_audio_filename' in args)
+        assert('output_spectrogram_filename' in args)
+        assert('output_metadata_filename' in args)
+
+        sequence = preprocess_text(args['raw_text'])
 
         with torch.no_grad():
             mel_outputs, mel_outputs_postnet, _, alignments = self.tacotron.inference(sequence)
@@ -87,10 +177,13 @@ class TacotronWaveglowPipeline:
             sigma = 0.8
             audio = self.waveglow.infer(mel_outputs_postnet, sigma=sigma)
 
-
         output_audio = audio[0].data.cpu().numpy().astype(np.float32)
 
-        print(output_audio)
+        print('Saving spectrogram as JSON...')
+        save_spectorgram_json_file(mel_outputs_postnet, args['output_spectrogram_filename'])
 
-        #write_wav(args.output_audio_filename, hparams.sampling_rate, output_audio)
+        print('Encoding and saving audio...')
+        save_wav_audio_file(output_audio, args['output_audio_filename'])
 
+        print('Generating metadata file...')
+        generate_metadata_file(args['output_audio_filename'], args['output_metadata_filename'])
