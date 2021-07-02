@@ -24,6 +24,10 @@ from falcon_multipart.middleware import MultipartMiddleware
 #from preprocess import *
 from wsgiref import simple_server
 
+from vocodes_common import TacotronWaveglowPipeline
+from vocodes_common import load_tacotron_model
+from vocodes_common import load_waveglow_model
+
 print("TensorFlow version: {}".format(tf.version.VERSION))
 
 INDEX_HTML = '''
@@ -207,6 +211,10 @@ INDEX_HTML = '''
 #model_name_default = 'sf1_tm1.ckpt'
 #converter = Converter(model_dir_default, model_name_default)
 
+tacotron = load_tacotron_model('/home/bt/models/tacotron2/tacotron2_uberduck_Noire.pt')
+waveglow = load_waveglow_model('/home/bt/models/waveglow/waveglow_256channels_universal_v5.pt')
+pipeline = TacotronWaveglowPipeline(tacotron, waveglow)
+
 class IndexHandler():
     def on_get(self, request, response):
         response.content_type = 'text/html'
@@ -217,6 +225,8 @@ class ApiHandler():
         raw_data = json.load(request.bounded_stream)
         inference_text = raw_data.get('inference_text')
         print(inference_text)
+
+        pipeline.infer(inference_text)
 
         ## NB: uses middleware to pull out data.
         #form_data = request.params['audio_data'].file
