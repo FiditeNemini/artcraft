@@ -36,61 +36,41 @@ print_gpu_info()
 INDEX_HTML = '''
 <!doctype html>
 <html>
+  <head>
+    <style>
+      input {
+        width: 600px;
+        margin: 1em;
+        padding: 0.5em;
+      }
+    </style>
+  </head>
   <body>
     <meta charset="utf-8" />
     <h1>TTS Inference</h1>
     <script src="./script/recorder.js" type="application/javascript"></script>
     <script type="application/javascript">
-      var audio_context;
-      var recorder;
-      // NB: Capture code originates from 'recorder.js' demo.
-      function startUserMedia(stream) {
-        var input = audio_context.createMediaStreamSource(stream);
-        window.recorder = new Recorder(input);
-      }
-      function createDownloadLink() {
-        window.recorder && window.recorder.exportWAV(function(blob) {
-          var xhr = new XMLHttpRequest();
-          xhr.responseType = 'blob';
-          xhr.onload=function(e) {
-            console.log('response received');
-            var objectUrl = window.URL.createObjectURL(this.response);
-            console.log('audio URL', objectUrl);
-            var audio = document.getElementById('audio');
-            audio.src = objectUrl;
-            audio.play();
-          };
-          var fd = new FormData();
-          fd.append("audio_data", blob, "audio_file.wav");
-          console.log(blob);
-          console.log('sending...');
-          xhr.open("POST","/upload",true);
-          xhr.send(fd);
-          console.log('sent');
-        });
-      }
-      function startRecording(button) {
-        window.recorder && window.recorder.record();
-        document.getElementById('start').disabled = true;
-        document.getElementById('stop').disabled = false;
-      }
-      function stopRecording(button) {
-        window.recorder && window.recorder.stop();
-        document.getElementById('start').disabled = false;
-        document.getElementById('stop').disabled = true;
-        createDownloadLink();
-        window.recorder.clear();
-      }
       function handleSubmit(ev) {
-        let value = document.getElementById('text').value;
         ev.preventDefault();
-        console.log(value);
-        postInference(value);
+        
+        let inference_text = document.getElementById('inference_text').value;
+        let vocoder_checkpoint_path = document.getElementById('vocoder_checkpoint_path').value;
+        let synthesizer_checkpoint_path = document.getElementById('synthesizer_checkpoint_path').value;
+        
+        console.log(inference_text);
+        
+        postInference(inference_text, synthesizer_checkpoint_path, vocoder_checkpoint_path);
         return false;
       }
-      function postInference(text) {
+      
+      function postInference(inference_text, synthesizer_checkpoint_path, vocoder_checkpoint_path) {
         const request_payload = {
-          'inference_text': text,
+          'inference_text': inference_text,
+          'synthesizer_checkpoint_path': synthesizer_checkpoint_path,
+          'vocoder_checkpoint_path': vocoder_checkpoint_path,
+          'output_audio_filename': 'web_output_audio.wav',
+          'output_spectrogram_filename': 'web_spectrogram.wav',
+          'output_metadata_filename': 'web_metadata.wav',
         };
         
         let xhr = new XMLHttpRequest();
@@ -102,20 +82,20 @@ INDEX_HTML = '''
         document.getElementById('form').addEventListener('submit', (ev) => handleSubmit(ev));
       };
     </script>
-    <button id="start" onclick="startRecording(this);">record</button>
-    <br>
-    <br>
-    <button id="stop" onclick="stopRecording(this);" disabled>stop</button>
-    <br>
-    <br>
-    <audio controls id="audio">
-      <source id="source" src="" type="audio/wav">
-      Your browser does not support the audio element.
-    </audio>
     
-    <hr />
     <form id="form">
-      <input id="text" type="text" name="text" />
+      <label> Inference Text </label>
+      <input id="inference_text" type="text" name="inference_text" />
+      <br />
+      
+      <label> Synthesizer Path </label>
+      <input id="synthesizer_checkpoint_path" type="text" name="synthesizer_checkpoint_path" value="/home/bt/models/tacotron2/tacotron2_uberduck_Noire.pt" />
+      <br />
+      
+      <label> Vocoder Path </label>
+      <input id="vocoder_checkpoint_path" type="text" name="vocoder_checkpoint_path" value="/home/bt/models/waveglow/waveglow_256channels_universal_v5.pt" />
+      <br />
+      
       <button>Submit TTS</button>
     </form>
   </body>

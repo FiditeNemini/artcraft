@@ -177,13 +177,11 @@ class TacotronWaveglowPipeline:
             sigma = 0.8
             audio = self.waveglow.infer(mel_outputs_postnet, sigma=sigma)
 
-        output_audio = audio[0].data.cpu().numpy().astype(np.float32)
-
         print('Saving spectrogram as JSON...')
         save_spectorgram_json_file(mel_outputs_postnet, args['output_spectrogram_filename'])
 
         print('Encoding and saving audio...')
-        save_wav_audio_file(output_audio, args['output_audio_filename'])
+        save_wav_audio_file(audio, args['output_audio_filename'])
 
         print('Generating metadata file...')
         generate_metadata_file(args['output_audio_filename'], args['output_metadata_filename'])
