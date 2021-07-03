@@ -3184,6 +3184,7 @@ dependencies = [
  "hex",
  "hmac 0.10.1",
  "hostname",
+ "hyper",
  "infer",
  "jwt",
  "lazy_static",

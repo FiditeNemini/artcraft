@@ -10,6 +10,7 @@
 
 #[macro_use] extern crate serde_derive;
 
+pub mod clients;
 pub mod common_env;
 pub mod common_queries;
 pub mod database_helpers;
@@ -55,6 +56,7 @@ use std::process::Command;
 use std::thread;
 use std::time::Duration;
 use tempdir::TempDir;
+use crate::clients::tts_inference_sidecar_client::TtsInferenceSidecarClient;
 
 // Buckets (shared config)
 const ENV_ACCESS_KEY : &'static str = "ACCESS_KEY";
@@ -72,6 +74,9 @@ const ENV_SEMIPERSISTENT_CACHE_DIR : &'static str = "SEMIPERSISTENT_CACHE_DIR";
 const ENV_CODE_DIRECTORY : &'static str = "TTS_CODE_DIRECTORY";
 const ENV_INFERENCE_SCRIPT_NAME : &'static str = "TTS_INFERENCE_SCRIPT_NAME";
 
+// HTTP sidecar
+const ENV_TTS_INFERENCE_SIDECAR_HOSTNAME: &'static str = "TTS_INFERENCE_SIDECAR_HOSTNAME";
+
 const DEFAULT_TEMP_DIR: &'static str = "/tmp";
 
 struct Inferencer {
@@ -86,7 +91,8 @@ struct Inferencer {
   pub bucket_path_unifier: BucketPathUnifier,
   pub semi_persistent_cache: SemiPersistentCacheDir,
 
-  pub tts_inference: TacotronInferenceCommand,
+  pub tts_inference_command: TacotronInferenceCommand,
+  pub tts_inference_sidecar_client: TtsInferenceSidecarClient,
 
   // Command to run
   pub tts_vocoder_model_filename: String,
@@ -155,6 +161,12 @@ async fn main() -> AnyhowResult<()> {
     &py_script_name,
   );
 
+  let sidecar_hostname =
+      easyenv::get_env_string_required(ENV_TTS_INFERENCE_SIDECAR_HOSTNAME)?;
+
+  let tts_inference_sidecar_client =
+      TtsInferenceSidecarClient::new(&sidecar_hostname);
+
   let temp_directory = easyenv::get_env_string_or_default(
     "DOWNLOAD_TEMP_DIR",
     DEFAULT_TEMP_DIR);
@@ -204,7 +216,8 @@ async fn main() -> AnyhowResult<()> {
     //ffmpeg_image_preview_generator: FfmpegGeneratePreviewImageCommand {},
     //ffmpeg_video_preview_generator: FfmpegGeneratePreviewVideoCommand {},
     //imagemagick_image_preview_generator: ImagemagickGeneratePreviewImageCommand {},
-    tts_inference: tts_inference_command,
+    tts_inference_command,
+    tts_inference_sidecar_client,
     bucket_path_unifier: BucketPathUnifier::default_paths(),
     semi_persistent_cache,
     firehose_publisher,
@@ -508,15 +521,24 @@ async fn process_job(
   info!("Expected output spectrogram filename: {:?}", &output_spectrogram_fs_path);
   info!("Expected output metadata filename: {:?}", &output_metadata_fs_path);
 
-  inferencer.tts_inference.execute(
+  //inferencer.tts_inference_command.execute(
+  //  &tts_synthesizer_fs_path,
+  //  &tts_vocoder_model_fs_path,
+  //  &text_input_fs_path,
+  //  &output_audio_fs_path,
+  //  &output_spectrogram_fs_path,
+  //  &output_metadata_fs_path,
+  //  false,
+  //)?;
+
+  inferencer.tts_inference_sidecar_client.request_inference(
+    &job.raw_inference_text,
     &tts_synthesizer_fs_path,
     &tts_vocoder_model_fs_path,
-    &text_input_fs_path,
     &output_audio_fs_path,
     &output_spectrogram_fs_path,
     &output_metadata_fs_path,
-    false,
-  )?;
+  ).await?;
 
   // ==================== CHECK ALL FILES EXIST AND GET METADATA ==================== //
 
