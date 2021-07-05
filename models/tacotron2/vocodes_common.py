@@ -160,9 +160,15 @@ class TacotronWaveglowPipeline:
         print('Loading tacotron model into memory: {}'.format(checkpoint_path), flush=True)
         model = load_tacotron_model(checkpoint_path)
         self.tacotron_model_cache[checkpoint_path] = model
+        print('Now {} synthesizer models in memory'.format(len(self.tacotron_model_cache)))
 
     def uncache_tacotron_model(self, checkpoint_path):
+        print('Currently {} synthesizer models in memory'.format(
+            len(self.tacotron_model_cache)))
+        print('Clearing synthesizer from memory: {}'.format(checkpoint_path))
         self.tacotron_model_cache.pop(checkpoint_path, None)
+        print('Now reduced to {} synthesizer models in memory'.format(
+            len(self.tacotron_model_cache)))
 
     def infer(self, args):
         assert('synthesizer_checkpoint_path' in args)

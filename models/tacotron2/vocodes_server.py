@@ -229,7 +229,6 @@ class ApiHandler():
             maybe_clear_synthesizer_checkpoint_path))
 
         if maybe_clear_synthesizer_checkpoint_path:
-            print('Clearing synthesizer: {}'.format(maybe_clear_synthesizer_checkpoint_path))
             pipeline.uncache_tacotron_model(maybe_clear_synthesizer_checkpoint_path)
 
         pipeline.maybe_load_waveglow_model(vocoder_checkpoint_path)

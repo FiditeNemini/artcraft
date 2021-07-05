@@ -20,7 +20,9 @@ struct InferenceRequest {
   pub output_audio_filename : String,
   pub output_spectrogram_filename : String,
   pub output_metadata_filename : String,
-  pub maybe_unload_model_path: Option<String>,
+
+  /// To instruct the sidecar to unload the model from memory
+  pub maybe_clear_synthesizer_checkpoint_path: Option<String>,
 }
 
 impl TtsInferenceSidecarClient {
@@ -82,7 +84,7 @@ impl TtsInferenceSidecarClient {
       output_audio_filename,
       output_spectrogram_filename,
       output_metadata_filename,
-      maybe_unload_model_path,
+      maybe_clear_synthesizer_checkpoint_path: maybe_unload_model_path,
     };
 
     let url = format!("http://{}/infer", self.hostname);

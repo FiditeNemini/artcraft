@@ -532,7 +532,7 @@ async fn process_job(
   info!("Expected output audio filename: {:?}", &output_audio_fs_path);
   info!("Expected output spectrogram filename: {:?}", &output_spectrogram_fs_path);
   info!("Expected output metadata filename: {:?}", &output_metadata_fs_path);
-  info!("Maybe unload model: {:?}", &maybe_unload_model_path);
+  warn!("Maybe unload model: {:?}", &maybe_unload_model_path);
 
   //inferencer.tts_inference_command.execute(
   //  &tts_synthesizer_fs_path,
