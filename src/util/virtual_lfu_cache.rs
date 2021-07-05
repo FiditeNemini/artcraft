@@ -3,6 +3,7 @@ use crate::util::anyhow_result::AnyhowResult;
 use lfu::LFUCache;
 use std::sync::{Arc, RwLock};
 use std::collections::HashSet;
+use std::borrow::Borrow;
 
 /// This stands in front of the python HTTP sidecar and controls which
 /// models get to remain in memory. The Python sidecar keeps multiple
@@ -22,12 +23,12 @@ impl VirtualLfuCache {
     })
   }
 
-  pub fn in_cache<S: AsRef<String>>(&self, model: S) -> bool {
-    self.cache.contains(model.as_ref())
+  pub fn in_cache(&self, model: &String) -> bool {
+    self.cache.contains(model)
   }
 
   /// Returns the evicted entry.
-  pub fn insert(&mut self, path: &str) -> Option<String> {
+  pub fn insert_returning_replaced(&mut self, path: &str) -> Option<String> {
     let initial_keys = self.get_keyset();
 
     self.cache.set(path.to_string(), ());
@@ -62,17 +63,17 @@ pub mod tests {
   fn insert_beyond_capacity() {
     let mut cache = VirtualLfuCache::new(3).unwrap();
     assert_eq!(cache.size(), 0);
-    cache.insert("foo");
+    cache.insert_returning_replaced("foo");
     assert_eq!(cache.size(), 1);
-    cache.insert("bar");
+    cache.insert_returning_replaced("bar");
     assert_eq!(cache.size(), 2);
-    cache.insert("baz");
+    cache.insert_returning_replaced("baz");
     assert_eq!(cache.size(), 3);
-    cache.insert("bin");
+    cache.insert_returning_replaced("bin");
     assert_eq!(cache.size(), 3);
-    cache.insert("bin");
+    cache.insert_returning_replaced("bin");
     assert_eq!(cache.size(), 3);
-    cache.insert("111111111111111111");
+    cache.insert_returning_replaced("111111111111111111");
     assert_eq!(cache.size(), 3);
   }
 
@@ -80,7 +81,7 @@ pub mod tests {
     let mut cache = VirtualLfuCache::new(3).unwrap();
     assert_eq!(cache.size(), 0);
     for _ in 0..10 {
-      cache.insert("foo");
+      cache.insert_returning_replaced("foo");
     }
     assert_eq!(cache.size(), 1);
   }
@@ -88,36 +89,51 @@ pub mod tests {
   #[test]
   fn returns_first_for_eviction_when_all_used_once() {
     let mut cache = VirtualLfuCache::new(3).unwrap();
-    cache.insert("foo");
-    cache.insert("bar");
-    cache.insert("baz");
-    let discarded = cache.insert("bin");
+    cache.insert_returning_replaced("foo");
+    cache.insert_returning_replaced("bar");
+    cache.insert_returning_replaced("baz");
+    let discarded = cache.insert_returning_replaced("bin");
     assert_eq!(discarded, Some("foo".to_string()));
+
+    assert_eq!(false, cache.in_cache(&"foo".to_string()));
+    assert_eq!(true, cache.in_cache(&"bar".to_string()));
+    assert_eq!(true, cache.in_cache(&"baz".to_string()));
+    assert_eq!(true, cache.in_cache(&"bin".to_string()));
   }
 
   #[test]
   fn retains_frequent_value() {
     let mut cache = VirtualLfuCache::new(3).unwrap();
     for _ in 0..10 {
-      cache.insert("foo");
+      cache.insert_returning_replaced("foo");
     }
-    cache.insert("bar");
-    cache.insert("baz");
-    let discarded = cache.insert("bin");
+    cache.insert_returning_replaced("bar");
+    cache.insert_returning_replaced("baz");
+    let discarded = cache.insert_returning_replaced("bin");
     assert_eq!(discarded, Some("bar".to_string()));
+
+    assert_eq!(true, cache.in_cache(&"foo".to_string()));
+    assert_eq!(false, cache.in_cache(&"bar".to_string()));
+    assert_eq!(true, cache.in_cache(&"baz".to_string()));
+    assert_eq!(true, cache.in_cache(&"bin".to_string()));
   }
 
   #[test]
   fn retains_second_frequent_value() {
     let mut cache = VirtualLfuCache::new(3).unwrap();
     for _ in 0..10 {
-      cache.insert("foo");
+      cache.insert_returning_replaced("foo");
     }
     for _ in 0..2 {
-      cache.insert("bar");
+      cache.insert_returning_replaced("bar");
     }
-    cache.insert("baz");
-    let discarded = cache.insert("bin");
+    cache.insert_returning_replaced("baz");
+    let discarded = cache.insert_returning_replaced("bin");
     assert_eq!(discarded, Some("baz".to_string()));
+
+    assert_eq!(true, cache.in_cache(&"foo".to_string()));
+    assert_eq!(true, cache.in_cache(&"bar".to_string()));
+    assert_eq!(false, cache.in_cache(&"baz".to_string()));
+    assert_eq!(true, cache.in_cache(&"bin".to_string()));
   }
 }
