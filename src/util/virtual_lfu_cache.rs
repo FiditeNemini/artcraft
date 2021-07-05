@@ -13,6 +13,12 @@ pub struct VirtualLfuCache {
   cache: LFUCache<String, ()>,
 }
 
+/// And the Sync/Send threadsafe + interior mutability version.
+#[derive(Clone)]
+pub struct SyncVirtualLfuCache {
+  cache: Arc::<RwLock<VirtualLfuCache>>
+}
+
 impl VirtualLfuCache {
 
   pub fn new(capacity: usize) -> AnyhowResult<Self> {
@@ -52,6 +58,49 @@ impl VirtualLfuCache {
       key_set.insert(k.to_string());
     }
     key_set
+  }
+}
+
+impl SyncVirtualLfuCache {
+
+  pub fn new(capacity: usize) -> AnyhowResult<Self> {
+    let cache = VirtualLfuCache::new(capacity)?;
+    Ok(Self {
+      cache: Arc::new(RwLock::new(cache)),
+    })
+  }
+
+  pub fn in_cache(&self, model: &String) -> AnyhowResult<bool> {
+    let exists = self.cache
+        .read()
+        .map(|cache| cache.in_cache(model))
+        .map_err(|err| anyhow!("mutex error: {:?}", err))?;
+    Ok(exists)
+  }
+
+  /// Returns the evicted entry.
+  pub fn insert_returning_replaced(&self, path: &str) -> AnyhowResult<Option<String>> {
+    let maybe_replaced = self.cache
+        .write()
+        .map(|mut cache| cache.insert_returning_replaced(path))
+        .map_err(|err| anyhow!("mutex error: {:?}", err))?;
+    Ok(maybe_replaced)
+  }
+
+  pub fn size(&self) -> AnyhowResult<usize> {
+    let size = self.cache
+        .read()
+        .map(|cache| cache.size())
+        .map_err(|err| anyhow!("mutex error: {:?}", err))?;
+    Ok(size)
+  }
+
+  fn get_keyset(&self) -> AnyhowResult<HashSet<String>> {
+    let key_set = self.cache
+        .read()
+        .map(|cache| cache.get_keyset())
+        .map_err(|err| anyhow!("mutex error: {:?}", err))?;
+    Ok(key_set)
   }
 }
 

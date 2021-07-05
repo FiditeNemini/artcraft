@@ -20,6 +20,7 @@ struct InferenceRequest {
   pub output_audio_filename : String,
   pub output_spectrogram_filename : String,
   pub output_metadata_filename : String,
+  pub maybe_unload_model_path: Option<String>,
 }
 
 impl TtsInferenceSidecarClient {
@@ -41,6 +42,7 @@ impl TtsInferenceSidecarClient {
     output_audio_filename: P,
     output_spectrogram_filename: P,
     output_metadata_filename: P,
+    maybe_unload_model_path: Option<String>,
   ) -> AnyhowResult<()> {
 
     let vocoder_checkpoint_path = vocoder_checkpoint_path
@@ -80,6 +82,7 @@ impl TtsInferenceSidecarClient {
       output_audio_filename,
       output_spectrogram_filename,
       output_metadata_filename,
+      maybe_unload_model_path,
     };
 
     let url = format!("http://{}/infer", self.hostname);

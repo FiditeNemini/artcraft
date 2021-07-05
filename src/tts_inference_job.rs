@@ -44,6 +44,7 @@ use crate::util::hashing::hash_string_sha2::hash_string_sha2;
 use crate::util::noop_logger::NoOpLogger;
 use crate::util::random_crockford_token::random_crockford_token;
 use crate::util::semi_persistent_cache_dir::SemiPersistentCacheDir;
+use crate::util::virtual_lfu_cache::SyncVirtualLfuCache;
 use data_encoding::{HEXUPPER, HEXLOWER, HEXLOWER_PERMISSIVE};
 use log::{warn, info};
 use ring::digest::{Context, Digest, SHA256};
@@ -93,6 +94,9 @@ struct Inferencer {
 
   pub tts_inference_command: TacotronInferenceCommand,
   pub tts_inference_sidecar_client: TtsInferenceSidecarClient,
+
+  // Keep tabs of which models to hold in the sidecar memory with this virtual LRU cache
+  pub virtual_model_lfu: SyncVirtualLfuCache,
 
   // Command to run
   pub tts_vocoder_model_filename: String,
@@ -208,6 +212,8 @@ async fn main() -> AnyhowResult<()> {
 
   let common_env = CommonEnv::read_from_env()?;
 
+  let virtual_lfu_cache = SyncVirtualLfuCache::new(2)?;
+
   let inferencer = Inferencer {
     download_temp_directory: temp_directory,
     mysql_pool,
@@ -218,6 +224,7 @@ async fn main() -> AnyhowResult<()> {
     //imagemagick_image_preview_generator: ImagemagickGeneratePreviewImageCommand {},
     tts_inference_command,
     tts_inference_sidecar_client,
+    virtual_model_lfu: virtual_lfu_cache,
     bucket_path_unifier: BucketPathUnifier::default_paths(),
     semi_persistent_cache,
     firehose_publisher,
@@ -511,6 +518,11 @@ async fn process_job(
 
   // ==================== RUN INFERENCE ==================== //
 
+  // TODO: Fix this.
+  let maybe_unload_model_path = inferencer
+      .virtual_model_lfu
+      .insert_returning_replaced(tts_synthesizer_fs_path.to_str().unwrap_or(""))?;
+
   let output_audio_fs_path = temp_dir.path().join("output.wav");
   let output_metadata_fs_path = temp_dir.path().join("metadata.json");
   let output_spectrogram_fs_path = temp_dir.path().join("spectrogram.json");
@@ -520,6 +532,7 @@ async fn process_job(
   info!("Expected output audio filename: {:?}", &output_audio_fs_path);
   info!("Expected output spectrogram filename: {:?}", &output_spectrogram_fs_path);
   info!("Expected output metadata filename: {:?}", &output_metadata_fs_path);
+  info!("Maybe unload model: {:?}", &maybe_unload_model_path);
 
   //inferencer.tts_inference_command.execute(
   //  &tts_synthesizer_fs_path,
@@ -538,6 +551,7 @@ async fn process_job(
     &output_audio_fs_path,
     &output_spectrogram_fs_path,
     &output_metadata_fs_path,
+    maybe_unload_model_path,
   ).await?;
 
   // ==================== CHECK ALL FILES EXIST AND GET METADATA ==================== //

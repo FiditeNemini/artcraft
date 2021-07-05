@@ -208,25 +208,36 @@ class ApiHandler():
         raw_data = json.load(request.bounded_stream)
 
         # Request parameters
-        vocoder_checkpoint_path = raw_data.get('vocoder_checkpoint_path')
         synthesizer_checkpoint_path = raw_data.get('synthesizer_checkpoint_path')
+        vocoder_checkpoint_path = raw_data.get('vocoder_checkpoint_path')
         inference_text = raw_data.get('inference_text')
         output_audio_filename = raw_data.get('output_audio_filename')
         output_spectrogram_filename = raw_data.get('output_spectrogram_filename')
         output_metadata_filename = raw_data.get('output_metadata_filename')
 
-        print('vocoder_checkpoint_path: {}'.format(vocoder_checkpoint_path))
+        # Optional request parameters
+        maybe_clear_synthesizer_checkpoint_path = \
+            raw_data.get('maybe_clear_synthesizer_checkpoint_path')
+
         print('synthesizer_checkpoint_path: {}'.format(synthesizer_checkpoint_path))
+        print('vocoder_checkpoint_path: {}'.format(vocoder_checkpoint_path))
         print('inference_text: {}'.format(inference_text))
         print('output_audio_filename: {}'.format(output_audio_filename))
         print('output_spectrogram_filename: {}'.format(output_spectrogram_filename))
         print('output_metadata_filename: {}'.format(output_metadata_filename))
+        print('maybe_clear_synthesizer_checkpoint_path: {}'.format(
+            maybe_clear_synthesizer_checkpoint_path))
+
+        if maybe_clear_synthesizer_checkpoint_path:
+            print('Clearing synthesizer: {}'.format(maybe_clear_synthesizer_checkpoint_path))
+            pipeline.uncache_tacotron_model(maybe_clear_synthesizer_checkpoint_path)
 
         pipeline.maybe_load_waveglow_model(vocoder_checkpoint_path)
-        pipeline.maybe_load_tacotron_model(synthesizer_checkpoint_path)
+        pipeline.maybe_load_tacotron_model_to_cache(synthesizer_checkpoint_path)
 
         inference_args = {
             'raw_text': inference_text,
+            'synthesizer_checkpoint_path': synthesizer_checkpoint_path,
             'output_audio_filename': output_audio_filename,
             'output_spectrogram_filename': output_spectrogram_filename,
             'output_metadata_filename': output_metadata_filename,

@@ -139,8 +139,8 @@ def generate_metadata_file(output_audio_filename, output_metadata_filename):
 class TacotronWaveglowPipeline:
 
     def __init__(self):
-        self.tacotron = None
-        self.tacotron_filename = None
+        # Cache of "path" => loaded model
+        self.tacotron_model_cache = {}
         self.waveglow = None
         self.waveglow_filename = None
 
@@ -153,16 +153,19 @@ class TacotronWaveglowPipeline:
         self.waveglow = load_waveglow_model(checkpoint_path)
         self.waveglow_filename = checkpoint_path
 
-    def maybe_load_tacotron_model(self, checkpoint_path):
-        if self.tacotron_filename == checkpoint_path:
+    def maybe_load_tacotron_model_to_cache(self, checkpoint_path):
+        if checkpoint_path in self.tacotron_model_cache:
             print('Tacotron model already loaded into memory: {}'.format(checkpoint_path))
             return
-        print('Dumping previous tacotron model from memory: {}'.format(self.tacotron_filename))
         print('Loading tacotron model into memory: {}'.format(checkpoint_path), flush=True)
-        self.tacotron = load_tacotron_model(checkpoint_path)
-        self.tacotron_filename = checkpoint_path
+        model = load_tacotron_model(checkpoint_path)
+        self.tacotron_model_cache[checkpoint_path] = model
+
+    def uncache_tacotron_model(self, checkpoint_path):
+        self.tacotron_model_cache.pop(checkpoint_path, None)
 
     def infer(self, args):
+        assert('synthesizer_checkpoint_path' in args)
         assert('raw_text' in args)
         assert('output_audio_filename' in args)
         assert('output_spectrogram_filename' in args)
@@ -170,8 +173,10 @@ class TacotronWaveglowPipeline:
 
         sequence = preprocess_text(args['raw_text'])
 
+        tacotron = self.tacotron_model_cache[args['synthesizer_checkpoint_path']]
+
         with torch.no_grad():
-            mel_outputs, mel_outputs_postnet, _, alignments = self.tacotron.inference(sequence)
+            mel_outputs, mel_outputs_postnet, _, alignments = tacotron.inference(sequence)
 
         with torch.no_grad():
             sigma = 0.8
