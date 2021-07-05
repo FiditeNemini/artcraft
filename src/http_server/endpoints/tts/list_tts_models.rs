@@ -106,7 +106,7 @@ WHERE
     .fetch_all(&server_state.mysql_pool)
     .await; // TODO: This will return error if it doesn't exist
 
-  let models : Vec<TtsModelRecord> = match maybe_models {
+  let mut models : Vec<TtsModelRecord> = match maybe_models {
     Ok(models) => models,
     Err(err) => {
       match err {
@@ -120,6 +120,8 @@ WHERE
       }
     }
   };
+
+  models.sort_by(|a, b| (&a.title).cmp(&b.title));
 
   let models_for_response = models.into_iter()
     .map(|model| {
