@@ -322,7 +322,9 @@ async fn process_jobs(
     let model_state_result = ModelState::query_model_and_check_filesystem(
       &job,
       &inferencer.mysql_pool,
-      &inferencer.semi_persistent_cache).await;
+      &inferencer.semi_persistent_cache,
+      &inferencer.virtual_model_lfu,
+    ).await;
 
     let model_state = match model_state_result {
       Ok(model_state) => model_state,
@@ -340,14 +342,20 @@ async fn process_jobs(
       }
     };
 
-    if !model_state.is_downloaded_to_filesystem && !cold_cache_okay {
-      // We're going to skip this for now. (Maybe another worker has a warm cache and can continue.)
-      info!("Skipping TTS due to cold cache: {} ({})",
-        model_state.model_record.model_token,
-        model_state.model_record.title);
+    if !model_state.is_downloaded_to_filesystem || !model_state.is_in_memory_cache {
+      warn!("Model isn't in cache (downloaded = {}), (in memory = {})",
+        model_state.is_downloaded_to_filesystem,
+        model_state.is_in_memory_cache);
 
-      skipped_for_cold_cache += 1;
-      continue;
+      if !cold_cache_okay {
+        // We're going to skip this for now. (Maybe another worker has a warm cache and can continue.)
+        warn!("Skipping TTS due to cold cache: {} ({})",
+          model_state.model_record.model_token,
+          model_state.model_record.title);
+
+        skipped_for_cold_cache += 1;
+        continue;
+      }
     }
 
     let result = process_job(inferencer, &job, &model_state.model_record).await;
@@ -388,6 +396,7 @@ fn read_metadata_file(filename: &PathBuf) -> AnyhowResult<FileMetadata> {
 struct ModelState {
   pub model_record: TtsModelRecord2,
   pub is_downloaded_to_filesystem: bool,
+  pub is_in_memory_cache: bool,
 }
 
 impl ModelState {
@@ -396,6 +405,7 @@ impl ModelState {
     job: &TtsInferenceJobRecord,
     mysql_pool: &MySqlPool,
     semi_persistent_cache: &SemiPersistentCacheDir,
+    virtual_cache: &SyncVirtualLfuCache,
   ) -> AnyhowResult<Self> {
     info!("Looking up TTS model by token: {}", &job.model_token);
 
@@ -416,9 +426,17 @@ impl ModelState {
 
     let is_downloaded_to_filesystem = tts_synthesizer_fs_path.exists();
 
+    let path = tts_synthesizer_fs_path
+        .to_str()
+        .ok_or(anyhow!("could not make path"))?
+        .to_string();
+
+    let is_in_memory_cache = virtual_cache.in_cache(&path)?;
+
     Ok(Self {
       model_record,
       is_downloaded_to_filesystem,
+      is_in_memory_cache,
     })
   }
 }
@@ -538,7 +556,10 @@ async fn process_job(
   info!("Expected output audio filename: {:?}", &output_audio_fs_path);
   info!("Expected output spectrogram filename: {:?}", &output_spectrogram_fs_path);
   info!("Expected output metadata filename: {:?}", &output_metadata_fs_path);
-  warn!("Maybe unload model: {:?}", &maybe_unload_model_path);
+
+  if let Some(model_path) = maybe_unload_model_path.as_deref() {
+    warn!("Unload model from sidecar: {:?}", &model_path);
+  }
 
   //inferencer.tts_inference_command.execute(
   //  &tts_synthesizer_fs_path,
