@@ -113,6 +113,9 @@ struct Inferencer {
 
   // How long to wait between log lines
   pub no_op_logger_millis: u64,
+
+  // Maximum number of synthesizer models to hold in memory.
+  pub sidecar_max_synthesizer_models: u32,
 }
 
 #[tokio::main]
@@ -205,6 +208,8 @@ async fn main() -> AnyhowResult<()> {
   let tts_vocoder_model_filename = easyenv::get_env_string_or_default(
     "TTS_VOCODER_MODEL_FILENAME", "waveglow.pth");
 
+  let sidecar_max_synthesizer_models = easyenv::get_env_num(
+    "SIDECAR_MAX_SYNTHESIZER_MODELS", 3)?;
 
   let firehose_publisher = FirehosePublisher {
     mysql_pool: mysql_pool.clone(), // NB: MySqlPool is clone/send/sync safe
@@ -233,6 +238,7 @@ async fn main() -> AnyhowResult<()> {
     job_max_attempts: common_env.job_max_attempts as i32,
     job_batch_size: common_env.job_batch_size,
     no_op_logger_millis: common_env.no_op_logger_millis,
+    sidecar_max_synthesizer_models,
   };
 
   main_loop(inferencer).await;
