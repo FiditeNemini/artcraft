@@ -11,3 +11,4 @@ pub mod random_prefix_crockford_token;
 pub mod random_uuid;
 pub mod redis_keys;
 pub mod semi_persistent_cache_dir;
+pub mod virtual_lfu_cache;

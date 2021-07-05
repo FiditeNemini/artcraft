@@ -1811,6 +1811,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "lfu"
+version = "0.2.5"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "256290473df5a92218b86e619ab5fe8a831a167b70af720726b565c68b5360d3"
+dependencies = [
+ "linked_hash_set",
+]
+
+[[package]]
 name = "libc"
 version = "0.2.94"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1827,6 +1836,15 @@ name = "linked-hash-map"
 version = "0.5.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "7fb9b38af92608140b86b693604b9ffcc5824240a484d1ecd4795bacb2fe88f3"
+
+[[package]]
+name = "linked_hash_set"
+version = "0.1.4"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "47186c6da4d81ca383c7c47c1bfc80f4b95f4720514d860a5407aaf4233f9588"
+dependencies = [
+ "linked-hash-map",
+]
 
 [[package]]
 name = "local-waker"
@@ -3188,6 +3206,7 @@ dependencies = [
  "infer",
  "jwt",
  "lazy_static",
+ "lfu",
  "log",
  "magic-crypt",
  "md-5",
