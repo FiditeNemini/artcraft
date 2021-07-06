@@ -226,13 +226,21 @@ async fn main() -> AnyhowResult<()> {
 
   let cache_miss_strategizers = {
     let in_memory_strategizer = CacheMissStrategizer::new(
-      chrono::Duration::milliseconds(5_000),
-      chrono::Duration::milliseconds(60_000),
+      chrono::Duration::milliseconds(
+        easyenv::get_env_num("MEMORY_MAX_COLD_DURATION_MILLIS", 5_000)?,
+      ),
+      chrono::Duration::milliseconds(
+        easyenv::get_env_num("MEMORY_CACHE_FORGET_DURATION_MILLIS", 60_000)?,
+      ),
     );
 
     let on_disk_strategizer = CacheMissStrategizer::new(
-      chrono::Duration::milliseconds(20_000),
-      chrono::Duration::milliseconds(120_000),
+      chrono::Duration::milliseconds(
+        easyenv::get_env_num("DISK_MAX_COLD_DURATION_MILLIS", 20_000)?,
+      ),
+      chrono::Duration::milliseconds(
+        easyenv::get_env_num("DISK_CACHE_FORGET_DURATION_MILLIS", 120_000)?,
+      ),
     );
 
     SyncMultiCacheMissStrategizer::new(
