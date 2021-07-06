@@ -166,5 +166,21 @@ mod tests {
     // Now the new ID is also done.
     cache_miss_strategizer.set_time_function(Box::new(|| get_date("2021-07-01T13:00:41+00:00")));
     assert_eq!(cache_miss_strategizer.cache_miss(20), CacheMissStrategy::Proceed);
+
+    // New Invocation
+    cache_miss_strategizer.set_time_function(Box::new(|| get_date("2021-07-01T13:01:00+00:00")));
+    assert_eq!(cache_miss_strategizer.cache_miss(30), CacheMissStrategy::WaitOrSkip);
+    // We waited too long...
+    cache_miss_strategizer.set_time_function(Box::new(|| get_date("2021-07-01T13:02:01+00:00")));
+    assert_eq!(cache_miss_strategizer.cache_miss(30), CacheMissStrategy::WaitOrSkip);
+
+    // New Invocation
+    cache_miss_strategizer.set_time_function(Box::new(|| get_date("2021-07-01T13:04:00+00:00")));
+    assert_eq!(cache_miss_strategizer.cache_miss(30), CacheMissStrategy::WaitOrSkip); // previously seen
+    assert_eq!(cache_miss_strategizer.cache_miss(40), CacheMissStrategy::WaitOrSkip); // new
+    // We waited just long enough before expiry
+    cache_miss_strategizer.set_time_function(Box::new(|| get_date("2021-07-01T13:04:59+00:00")));
+    assert_eq!(cache_miss_strategizer.cache_miss(30), CacheMissStrategy::Proceed);
+    assert_eq!(cache_miss_strategizer.cache_miss(40), CacheMissStrategy::Proceed);
   }
 }
