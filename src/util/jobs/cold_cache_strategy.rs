@@ -12,8 +12,8 @@ pub enum ColdCacheStrategy {
 pub struct ColdCacheLog {
   max_cold_duration: Duration,
   cache_miss_log: HashMap<i64, DateTime<Utc>>,
-  //get_time_function: Box<dyn Fn() -> DateTime<Utc>>,
-  get_time_function: fn() -> DateTime<Utc>,
+  get_time_function: Box<dyn Fn() -> DateTime<Utc>>,
+  //get_time_function: fn() -> DateTime<Utc>,
 
   //pub not_downloaded_model_ids_versus_miss_counts: HashMap<i64, DateTime<Utc>>,
 
@@ -27,14 +27,15 @@ impl ColdCacheLog {
     Self {
       max_cold_duration,
       cache_miss_log: HashMap::new(),
-      get_time_function: || Utc::now(),
+      //get_time_function: || Utc::now(),
+      get_time_function: Box::new(|| Utc::now()),
     }
   }
 
   pub fn new_for_testing(
     max_cold_duration: Duration,
-    //get_time_function: Box<dyn Fn() -> DateTime<Utc>>
-    get_time_function: fn() -> DateTime<Utc>,
+    get_time_function: Box<dyn Fn() -> DateTime<Utc>>
+    //get_time_function: fn() -> DateTime<Utc>,
   ) -> Self {
     Self {
       max_cold_duration,
@@ -64,7 +65,8 @@ impl ColdCacheLog {
   }
 
   // NB: For testing
-  fn set_time_function(&mut self, get_time_function: fn() -> DateTime<Utc>) {
+  //fn set_time_function(&mut self, get_time_function: fn() -> DateTime<Utc>) {
+  fn set_time_function(&mut self, get_time_function: Box<dyn Fn() -> DateTime<Utc>>) {
     self.get_time_function = get_time_function;
   }
 }
@@ -73,14 +75,45 @@ impl ColdCacheLog {
 mod tests {
   use crate::util::jobs::cold_cache_strategy::ColdCacheLog;
   use crate::util::jobs::cold_cache_strategy::ColdCacheStrategy;
-  use chrono::{Duration, Utc};
+  use chrono::{Duration, Utc, DateTime, TimeZone};
+
+  fn get_date(datetime: &str) -> DateTime<Utc> {
+    let datetime = DateTime::parse_from_rfc3339(datetime).unwrap();
+    let utc : DateTime<Utc> = DateTime::from(datetime);
+    utc
+  }
 
   #[test]
-  fn cold_cache_log_cache_miss() {
+  fn cold_cache_cache_miss_algorithm() {
     let mut cold_cache_log = ColdCacheLog::new(Duration::seconds(10));
 
-    cold_cache_log.set_time_function(|| Utc::now());
-
+    // First invocation
+    cold_cache_log.set_time_function(Box::new(|| get_date("2021-07-01T13:00:00+00:00")));
     assert_eq!(cold_cache_log.cache_miss(10), ColdCacheStrategy::WaitOrSkip);
+    cold_cache_log.set_time_function(Box::new(|| get_date("2021-07-01T13:00:01+00:00")));
+    assert_eq!(cold_cache_log.cache_miss(10), ColdCacheStrategy::WaitOrSkip);
+    cold_cache_log.set_time_function(Box::new(|| get_date("2021-07-01T13:00:05+00:00")));
+    assert_eq!(cold_cache_log.cache_miss(10), ColdCacheStrategy::WaitOrSkip);
+    cold_cache_log.set_time_function(Box::new(|| get_date("2021-07-01T13:00:10+00:00")));
+    assert_eq!(cold_cache_log.cache_miss(10), ColdCacheStrategy::WaitOrSkip);
+    // Final invocation after time expires. Proceed.
+    cold_cache_log.set_time_function(Box::new(|| get_date("2021-07-01T13:00:11+00:00")));
+    assert_eq!(cold_cache_log.cache_miss(10), ColdCacheStrategy::Proceed);
+
+    // New invocation.
+    cold_cache_log.set_time_function(Box::new(|| get_date("2021-07-01T13:00:15+00:00")));
+    assert_eq!(cold_cache_log.cache_miss(10), ColdCacheStrategy::WaitOrSkip);
+    cold_cache_log.set_time_function(Box::new(|| get_date("2021-07-01T13:00:25+00:00")));
+    // New ID.
+    assert_eq!(cold_cache_log.cache_miss(20), ColdCacheStrategy::WaitOrSkip);
+    // Old ID (still wait)
+    assert_eq!(cold_cache_log.cache_miss(10), ColdCacheStrategy::WaitOrSkip);
+    // Old ID is done, new ID is still waiting.
+    cold_cache_log.set_time_function(Box::new(|| get_date("2021-07-01T13:00:30+00:00")));
+    assert_eq!(cold_cache_log.cache_miss(10), ColdCacheStrategy::Proceed);
+    assert_eq!(cold_cache_log.cache_miss(20), ColdCacheStrategy::WaitOrSkip);
+    // Now the new ID is also done.
+    cold_cache_log.set_time_function(Box::new(|| get_date("2021-07-01T13:00:41+00:00")));
+    assert_eq!(cold_cache_log.cache_miss(20), ColdCacheStrategy::Proceed);
   }
 }
