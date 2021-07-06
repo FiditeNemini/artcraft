@@ -19,7 +19,7 @@ pub mod script_execution;
 pub mod shared_constants;
 pub mod util;
 
-use anyhow::anyhow;
+use anyhow::{anyhow, Error};
 use chrono::{Utc, DateTime, TimeZone};
 use crate::clients::tts_inference_sidecar_client::TtsInferenceSidecarClient;
 use crate::common_env::CommonEnv;
@@ -42,6 +42,9 @@ use crate::util::filesystem::check_directory_exists;
 use crate::util::filesystem::check_file_exists;
 use crate::util::hashing::hash_file_sha2::hash_file_sha2;
 use crate::util::hashing::hash_string_sha2::hash_string_sha2;
+use crate::util::jobs::cache_miss_strategizer::CacheMissStrategizer;
+use crate::util::jobs::cache_miss_strategizer::CacheMissStrategy;
+use crate::util::jobs::cache_miss_strategizer_multi::SyncMultiCacheMissStrategizer;
 use crate::util::jobs::virtual_lfu_cache::SyncVirtualLfuCache;
 use crate::util::noop_logger::NoOpLogger;
 use crate::util::random_crockford_token::random_crockford_token;
@@ -98,6 +101,7 @@ struct Inferencer {
 
   // Keep tabs of which models to hold in the sidecar memory with this virtual LRU cache
   pub virtual_model_lfu: SyncVirtualLfuCache,
+  pub cache_miss_strategizers: SyncMultiCacheMissStrategizer,
 
   // Command to run
   pub tts_vocoder_model_filename: String,
@@ -220,6 +224,23 @@ async fn main() -> AnyhowResult<()> {
 
   let virtual_lfu_cache = SyncVirtualLfuCache::new(2)?;
 
+  let cache_miss_strategizers = {
+    let in_memory_strategizer = CacheMissStrategizer::new(
+      chrono::Duration::milliseconds(5_000),
+      chrono::Duration::milliseconds(60_000),
+    );
+
+    let on_disk_strategizer = CacheMissStrategizer::new(
+      chrono::Duration::milliseconds(20_000),
+      chrono::Duration::milliseconds(120_000),
+    );
+
+    SyncMultiCacheMissStrategizer::new(
+      in_memory_strategizer,
+      on_disk_strategizer,
+    )
+  };
+
   let inferencer = Inferencer {
     download_temp_directory: temp_directory,
     mysql_pool,
@@ -231,6 +252,7 @@ async fn main() -> AnyhowResult<()> {
     tts_inference_command,
     tts_inference_sidecar_client,
     virtual_model_lfu: virtual_lfu_cache,
+    cache_miss_strategizers,
     bucket_path_unifier: BucketPathUnifier::default_paths(),
     semi_persistent_cache,
     firehose_publisher,
@@ -254,8 +276,6 @@ async fn main_loop(inferencer: Inferencer) {
   let mut error_timeout_millis = START_TIMEOUT_MILLIS;
 
   let mut noop_logger = NoOpLogger::new(inferencer.no_op_logger_millis as i64);
-
-  let mut cold_cache_okay = false;
 
   loop {
     let num_records = inferencer.job_batch_size;
@@ -285,27 +305,19 @@ async fn main_loop(inferencer: Inferencer) {
     let batch_result = process_jobs(
       &inferencer,
       jobs,
-      cold_cache_okay).await;
+    ).await;
 
-    let cold_cache_skipped_count = match batch_result {
-      Ok(cold_cache_skipped_count) => cold_cache_skipped_count,
+    match batch_result {
+      Ok(_) => {},
       Err(e) => {
         warn!("Error querying jobs: {:?}", e);
         std::thread::sleep(Duration::from_millis(error_timeout_millis));
         error_timeout_millis += INCREASE_TIMEOUT_MILLIS;
         continue;
       }
-    };
+    }
 
     error_timeout_millis = START_TIMEOUT_MILLIS; // reset
-
-    // We mostly want to ignore a cold cache unless other workers
-    // aren't picking up the slack.
-    if cold_cache_okay {
-      cold_cache_okay = false;
-    } else if cold_cache_skipped_count > 0 {
-      cold_cache_okay = true;
-    }
 
     std::thread::sleep(Duration::from_millis(inferencer.job_batch_wait_millis));
   }
@@ -315,9 +327,7 @@ async fn main_loop(inferencer: Inferencer) {
 async fn process_jobs(
   inferencer: &Inferencer,
   jobs: Vec<TtsInferenceJobRecord>,
-  cold_cache_okay: bool
-) -> AnyhowResult<usize> {
-  let mut skipped_for_cold_cache = 0;
+) -> AnyhowResult<()> {
 
   for job in jobs.into_iter() {
     let model_state_result = ModelState::query_model_and_check_filesystem(
@@ -344,18 +354,37 @@ async fn process_jobs(
     };
 
     if !model_state.is_downloaded_to_filesystem || !model_state.is_in_memory_cache {
-      warn!("Model isn't in cache (downloaded = {}), (in memory = {})",
+      warn!("Model isn't ready (downloaded = {}), (in memory = {})",
         model_state.is_downloaded_to_filesystem,
         model_state.is_in_memory_cache);
 
-      if !cold_cache_okay {
-        // We're going to skip this for now. (Maybe another worker has a warm cache and can continue.)
-        warn!("Skipping TTS due to cold cache: {} ({})",
-          model_state.model_record.model_token,
-          model_state.model_record.title);
+      let maybe_strategy = if !model_state.is_downloaded_to_filesystem {
+        inferencer.cache_miss_strategizers.disk_cache_miss(&model_state.model_record.model_token)
+      } else {
+        inferencer.cache_miss_strategizers.memory_cache_miss(&model_state.model_record.model_token)
+      };
 
-        skipped_for_cold_cache += 1;
-        continue;
+      match maybe_strategy {
+        Err(err) => {
+          warn!("Failure to process job: {:?}", err);
+          let failure_reason = "";
+          let _r = mark_tts_inference_job_failure(
+            &inferencer.mysql_pool,
+            &job,
+            failure_reason,
+            inferencer.job_max_attempts
+          ).await;
+          continue;
+        },
+        Ok(CacheMissStrategy::WaitOrSkip) => {
+          // We're going to skip this for now.
+          // Maybe another worker has a warm cache and can continue.
+          warn!("Skipping TTS due to cold cache: {} ({})",
+            model_state.model_record.model_token,
+            model_state.model_record.title);
+          continue;
+        },
+        Ok(CacheMissStrategy::Proceed) => {}, // We're going to go ahead...
       }
     }
 
@@ -375,7 +404,7 @@ async fn process_jobs(
     }
   }
 
-  Ok(skipped_for_cold_cache)
+  Ok(())
 }
 
 #[derive(Deserialize, Default)]

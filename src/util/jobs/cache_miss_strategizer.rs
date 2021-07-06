@@ -1,6 +1,7 @@
 use anyhow::anyhow;
 use chrono::{DateTime, Utc, Duration};
 use std::collections::HashMap;
+use std::hash::Hash;
 
 /// How to handle cache miss events, as dictated by the `CacheMissStrategizer`.
 #[derive(Eq, PartialEq, Copy, Clone, Debug)]
@@ -24,7 +25,7 @@ struct CacheMissLog {
 ///
 /// Keep track of a cache and tell the caller when to proceed with work.
 /// If it isn't time yet, skip or wait and let another consumer handle it.
-pub struct CacheMissStrategizer {
+pub struct CacheMissStrategizer<T: Hash + Eq> {
   /// How long it takes after the first cache miss to do work.
   max_cold_duration: Duration,
 
@@ -34,7 +35,7 @@ pub struct CacheMissStrategizer {
   forget_duration: Duration,
 
   /// Log of all cache misses.
-  cache_miss_log: HashMap<i64, CacheMissLog>,
+  cache_miss_log: HashMap<T, CacheMissLog>,
 
   /// Clock can be replaced for testing.
   get_time_function: Box<dyn Fn() -> DateTime<Utc>>,
@@ -56,7 +57,7 @@ impl CacheMissLog {
   }
 }
 
-impl CacheMissStrategizer {
+impl <T: Hash + Eq> CacheMissStrategizer<T> {
   pub fn new(max_cold_duration: Duration, forget_duration: Duration) -> Self {
     Self {
       max_cold_duration,
@@ -81,7 +82,7 @@ impl CacheMissStrategizer {
 
   // NB: Not threadsafe due to multiple operations against hashes!
   #[must_use]
-  pub fn cache_miss(&mut self, id: i64) -> CacheMissStrategy {
+  pub fn cache_miss(&mut self, id: T) -> CacheMissStrategy {
     let now : DateTime<Utc> = (self.get_time_function)();
 
     if let Some((_id, cache_miss_log)) = self.cache_miss_log.get_key_value(&id) {
