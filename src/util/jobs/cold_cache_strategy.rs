@@ -1,28 +1,92 @@
-use std::collections::HashMap;
+use anyhow::anyhow;
 use chrono::{DateTime, Utc, Duration};
+use crate::util::anyhow_result::AnyhowResult;
+use std::collections::HashMap;
+use std::sync::{RwLock, Arc};
 
 #[derive(Eq, PartialEq, Copy, Clone, Debug)]
 pub enum ColdCacheStrategy {
-  /// Don't handle the miss right now. Wait or skip.
+  /// Don't handle the cache miss right now.
+  /// Wait or skip until told otherwise.
   WaitOrSkip,
-  /// Handle the miss now.
+  /// Handle the cache miss now.
+  /// Do the download, calculation, whatever immediately.
   Proceed,
 }
 
+/// Keep track of multiple caches.
+/// This tells the caller when to ignore work or when to pick it up.
+pub struct MultiColdCacheLog {
+  in_memory_log: ColdCacheLog,
+  on_disk_log: ColdCacheLog,
+  // ... future caches ?
+}
+
+/// Keep track of a cache and tell the caller when to proceed with work.
+/// If it isn't time yet, skip or wait and let another consumer handle it.
 pub struct ColdCacheLog {
   max_cold_duration: Duration,
+  //history_expire_duration: Duration,
   cache_miss_log: HashMap<i64, DateTime<Utc>>,
   get_time_function: Box<dyn Fn() -> DateTime<Utc>>,
-  //get_time_function: fn() -> DateTime<Utc>,
+}
 
-  //pub not_downloaded_model_ids_versus_miss_counts: HashMap<i64, DateTime<Utc>>,
+/// And the Sync/Send threadsafe + interior mutability version.
+#[derive(Clone)]
+pub struct SyncMultiColdCacheLog {
+  multi_cache_log: Arc<RwLock<MultiColdCacheLog>>,
+}
 
-  // There should be less of a penalty for cold memory.
-  //pub not_in_memory_model_ids_versus_miss_counts: HashMap<i64, DateTime<Utc>>,
+impl SyncMultiColdCacheLog {
+  pub fn new(memory_max_cold_duration: Duration, disk_max_cold_duration: Duration) -> Self {
+    let multi_cache_log = MultiColdCacheLog::new(
+      memory_max_cold_duration,
+      disk_max_cold_duration,
+    );
+    Self {
+      multi_cache_log: Arc::new(RwLock::new(multi_cache_log)),
+    }
+  }
+
+  #[must_use]
+  pub fn memory_cache_miss(&self, id: i64) -> AnyhowResult<ColdCacheStrategy> {
+    let result = self.multi_cache_log
+        .write()
+        .map(|mut cache_logs| cache_logs.memory_cache_miss(id))
+        .map_err(|err| anyhow!("mutex error: {:?}", err))?;
+    Ok(result)
+  }
+
+  #[must_use]
+  pub fn disk_cache_miss(&self, id: i64) -> AnyhowResult<ColdCacheStrategy> {
+    let result = self.multi_cache_log
+        .write()
+        .map(|mut cache_logs| cache_logs.disk_cache_miss(id))
+        .map_err(|err| anyhow!("mutex error: {:?}", err))?;
+    Ok(result)
+  }
+}
+
+impl MultiColdCacheLog {
+  pub fn new(memory_max_cold_duration: Duration, disk_max_cold_duration: Duration) -> Self {
+    Self {
+      in_memory_log: ColdCacheLog::new(memory_max_cold_duration),
+      on_disk_log: ColdCacheLog::new(disk_max_cold_duration),
+    }
+  }
+
+  #[must_use]
+  pub fn memory_cache_miss(&mut self, id: i64) -> ColdCacheStrategy {
+    self.in_memory_log.cache_miss(id)
+  }
+
+  #[must_use]
+  pub fn disk_cache_miss(&mut self, id: i64) -> ColdCacheStrategy {
+    self.on_disk_log.cache_miss(id)
+  }
 }
 
 impl ColdCacheLog {
-
   pub fn new(max_cold_duration: Duration) -> Self {
     Self {
       max_cold_duration,
@@ -44,8 +108,7 @@ impl ColdCacheLog {
     }
   }
 
-
-  // NB: Not threadsafe!
+  // NB: Not threadsafe due to multiple operations against hashes!
   #[must_use]
   pub fn cache_miss(&mut self, id: i64) -> ColdCacheStrategy {
     let now : DateTime<Utc> = (self.get_time_function)();
