@@ -21,7 +21,7 @@ pub fn nullable_i8_to_optional_bool(value: Option<i8>) -> Option<bool> {
 
 #[cfg(test)]
 mod tests {
-  use crate::database_helpers::boolean_converters::{
+  use crate::database::helpers::boolean_converters::{
     i8_to_bool,
     nullable_i8_to_bool,
     nullable_i8_to_optional_bool
