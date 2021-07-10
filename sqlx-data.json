@@ -1288,6 +1288,16 @@
       "nullable": []
     }
   },
+  "2b80162b8957ac044f245af93d678aee976535d58fe0de0b39087323aa720792": {
+    "query": "\nUPDATE tts_models\nSET\n  maybe_mod_user_token = ?,\n  mod_deleted_at = CURRENT_TIMESTAMP\nWHERE\n  token = ?\nLIMIT 1\n        ",
+    "describe": {
+      "columns": [],
+      "parameters": {
+        "Right": 2
+      },
+      "nullable": []
+    }
+  },
   "314904656a333caa75a8644e73f4d338b7bd6f68c7ea9e37b5bc7f7b257bf34d": {
     "query": "\nSELECT 1 as does_exist\nFROM user_badges\nWHERE\n  user_token = ?\nAND\n  badge_slug = ?\nLIMIT 1\n        ",
     "describe": {
@@ -2833,6 +2843,16 @@
   },
   "68376f750b8421c10d319fa1045a2f3ce8fb1d35a5fe6ec92b2022babafbde80": {
     "query": "\nUPDATE users\nSET\n  user_role_slug = ?\nWHERE\n  token = ?\nLIMIT 1\n        ",
+    "describe": {
+      "columns": [],
+      "parameters": {
+        "Right": 2
+      },
+      "nullable": []
+    }
+  },
+  "6aaa7c04e6984434bd2feb6f42a9014cd45e995b94e4d5e29f2d502f09136691": {
+    "query": "\nUPDATE tts_models\nSET\n  maybe_mod_user_token = ?,\n  mod_deleted_at = NULL\nWHERE\n  token = ?\nLIMIT 1\n        ",
     "describe": {
       "columns": [],
       "parameters": {
@@ -5560,6 +5580,16 @@
       ]
     }
   },
+  "cd8541805f58293d33c30e108dba73a385407dd5546c5b7380da7397b4f6de34": {
+    "query": "\nUPDATE tts_models\nSET\n  user_deleted_at = NULL\nWHERE\n  token = ?\nLIMIT 1\n        ",
+    "describe": {
+      "columns": [],
+      "parameters": {
+        "Right": 1
+      },
+      "nullable": []
+    }
+  },
   "cf0b037e789ee09022b25f3381b0263c5cc6b59f3f328de4aa211bdb23a62629": {
     "query": "\nUPDATE tts_models\nSET\n    title = ?,\n    description_markdown = ?,\n    description_rendered_html = ?,\n    creator_ip_address_last_update = ?,\n    version = version + 1\nWHERE token = ?\nLIMIT 1\n        ",
     "describe": {
@@ -7327,6 +7357,16 @@
         false,
         false
       ]
+    }
+  },
+  "ebd41740a814e311e36a0e0b3ea7ecc829687c7d14ba854c81efa2404bdd77d6": {
+    "query": "\nUPDATE tts_models\nSET\n  user_deleted_at = CURRENT_TIMESTAMP\nWHERE\n  token = ?\nLIMIT 1\n        ",
+    "describe": {
+      "columns": [],
+      "parameters": {
+        "Right": 1
+      },
+      "nullable": []
     }
   },
   "ed67238afe48c159443d215cd1fe2f0264ad840768f789d068527ae542b08194": {
