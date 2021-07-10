@@ -1,5 +1,6 @@
 use anyhow::anyhow;
-use crate::common_queries::tokens::Tokens;
+use crate::database::helpers::tokens::Tokens;
+use crate::database::mediators::firehose_publisher::FirehosePublisher;
 use crate::util::anyhow_result::AnyhowResult;
 use crate::util::random_prefix_crockford_token::random_prefix_crockford_token;
 use log::{warn,info};
@@ -7,7 +8,6 @@ use sqlx::error::Error::Database;
 use sqlx::mysql::MySqlDone;
 use sqlx::{MySqlPool};
 use std::sync::Arc;
-use crate::common_queries::firehose_publisher::FirehosePublisher;
 
 #[derive(Debug, Clone, Copy)]
 pub enum UserBadge {

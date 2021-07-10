@@ -1,5 +1,5 @@
-use crate::common_queries::badge_granter::BadgeGranter;
-use crate::common_queries::firehose_publisher::FirehosePublisher;
+use crate::database::mediators::badge_granter::BadgeGranter;
+use crate::database::mediators::firehose_publisher::FirehosePublisher;
 use crate::http_server::web_utils::cookie_manager::CookieManager;
 use crate::http_server::web_utils::session_checker::SessionChecker;
 use crate::threads::ip_banlist_set::IpBanlistSet;

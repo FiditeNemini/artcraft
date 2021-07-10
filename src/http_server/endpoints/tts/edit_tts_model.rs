@@ -6,8 +6,7 @@ use actix_web::error::ResponseError;
 use actix_web::http::StatusCode;
 use actix_web::web::{Path, Json};
 use actix_web::{Responder, web, HttpResponse, error, HttpRequest};
-use crate::common_queries::query_tts_model::select_tts_model_by_token;
-use crate::common_queries::sessions::create_session_for_user;
+use crate::database::queries::query_tts_model::select_tts_model_by_token;
 use crate::http_server::web_utils::ip_address::get_request_ip;
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 use crate::http_server::web_utils::response_success_helpers::simple_json_success;
@@ -20,11 +19,11 @@ use crate::validations::check_for_slurs::contains_slurs;
 use derive_more::{Display, Error};
 use log::{info, warn, log};
 use regex::Regex;
+use sqlx::MySqlPool;
 use sqlx::error::DatabaseError;
 use sqlx::error::Error::Database;
 use sqlx::mysql::MySqlDatabaseError;
 use std::sync::Arc;
-use sqlx::MySqlPool;
 
 /// For the URL PathInfo
 #[derive(Deserialize)]

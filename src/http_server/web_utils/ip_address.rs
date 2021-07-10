@@ -1,7 +1,7 @@
 use actix_web::HttpRequest;
+use actix_web::dev::ServiceRequest;
 use actix_web::http::HeaderName;
 use log::{info};
-use actix_web::dev::ServiceRequest;
 
 pub fn get_request_ip(request: &HttpRequest) -> String {
   match request.headers().get(HeaderName::from_static("x-voder-proxy-for")) {

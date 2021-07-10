@@ -8,10 +8,10 @@ use actix_web::web::Path;
 use actix_web::{Responder, web, HttpResponse, error, HttpRequest, HttpMessage};
 use chrono::{DateTime, Utc};
 use crate::AnyhowResult;
-use crate::common_queries::query_tts_result::TtsResultRecordForResponse;
-use crate::common_queries::query_tts_result::select_tts_result_by_token;
-use crate::common_queries::sessions::create_session_for_user;
+use crate::database::queries::query_tts_result::TtsResultRecordForResponse;
+use crate::database::queries::query_tts_result::select_tts_result_by_token;
 use crate::http_server::web_utils::ip_address::get_request_ip;
+use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 use crate::http_server::web_utils::session_checker::SessionRecord;
 use crate::server_state::ServerState;
 use crate::util::random_crockford_token::random_crockford_token;
@@ -25,7 +25,6 @@ use sqlx::error::DatabaseError;
 use sqlx::error::Error::Database;
 use sqlx::mysql::MySqlDatabaseError;
 use std::sync::Arc;
-use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 
 /// For the URL PathInfo
 #[derive(Deserialize)]

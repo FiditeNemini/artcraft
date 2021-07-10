@@ -1,5 +1,5 @@
 use anyhow::anyhow;
-use crate::common_queries::tokens::Tokens;
+use crate::database::helpers::tokens::Tokens;
 use crate::util::anyhow_result::AnyhowResult;
 use crate::util::random_prefix_crockford_token::random_prefix_crockford_token;
 use log::{warn,info};

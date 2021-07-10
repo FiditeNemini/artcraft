@@ -17,8 +17,7 @@ pub const RESERVED_SUBSTRINGS : &'static str = include_str!("../db/reserved_user
 pub const BANNED_SLURS : &'static str = include_str!("../db/banned_slurs.txt");
 
 pub mod clients;
-pub mod common_queries;
-pub mod database_helpers;
+pub mod database;
 pub mod http_server;
 pub mod server_state;
 pub mod shared_constants;
@@ -33,8 +32,8 @@ use actix_cors::Cors;
 use actix_http::http;
 use actix_web::middleware::{Logger, DefaultHeaders};
 use actix_web::{HttpServer, web, HttpResponse, App};
-use crate::common_queries::badge_granter::BadgeGranter;
-use crate::common_queries::firehose_publisher::FirehosePublisher;
+use crate::database::mediators::badge_granter::BadgeGranter;
+use crate::database::mediators::firehose_publisher::FirehosePublisher;
 use crate::http_server::endpoints::default_route_404::default_route_404;
 use crate::http_server::endpoints::events::list_events::list_events_handler;
 use crate::http_server::endpoints::misc::enable_alpha::enable_alpha;
@@ -46,6 +45,7 @@ use crate::http_server::endpoints::moderation::user_roles::list_roles::list_user
 use crate::http_server::endpoints::moderation::user_roles::list_staff::list_staff_handler;
 use crate::http_server::endpoints::moderation::user_roles::set_user_role::set_user_role_handler;
 use crate::http_server::endpoints::root_index::get_root_index;
+use crate::http_server::endpoints::tts::delete_tts_model::delete_tts_model_handler;
 use crate::http_server::endpoints::tts::delete_tts_result::delete_tts_inference_result_handler;
 use crate::http_server::endpoints::tts::edit_tts_model::edit_tts_model_handler;
 use crate::http_server::endpoints::tts::enqueue_infer_tts::infer_tts_handler;
@@ -100,7 +100,6 @@ use sqlx::MySqlPool;
 use sqlx::mysql::MySqlPoolOptions;
 use std::sync::Arc;
 use std::time::Duration;
-use crate::http_server::endpoints::tts::delete_tts_model::delete_tts_model_handler;
 
 // TODO TODO TODO TODO
 // TODO TODO TODO TODO

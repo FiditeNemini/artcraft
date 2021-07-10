@@ -1,7 +1,7 @@
 use actix_web::HttpRequest;
 use anyhow::anyhow;
 use crate::AnyhowResult;
-use crate::database_helpers::boolean_converters::{i8_to_bool, nullable_i8_to_optional_bool};
+use crate::database::helpers::boolean_converters::{i8_to_bool, nullable_i8_to_optional_bool};
 use crate::http_server::web_utils::cookie_manager::CookieManager;
 use log::{info, warn};
 use sqlx::MySqlPool;

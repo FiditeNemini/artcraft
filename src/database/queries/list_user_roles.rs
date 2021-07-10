@@ -1,6 +1,6 @@
 use anyhow::anyhow;
 use chrono::{DateTime, Utc};
-use crate::database_helpers::boolean_converters::{nullable_i8_to_optional_bool, i8_to_bool};
+use crate::database::helpers::boolean_converters::{nullable_i8_to_optional_bool, i8_to_bool};
 use crate::util::anyhow_result::AnyhowResult;
 use log::{warn, info};
 use sqlx::MySqlPool;

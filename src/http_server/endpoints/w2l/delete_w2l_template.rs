@@ -6,9 +6,11 @@ use actix_web::error::ResponseError;
 use actix_web::http::StatusCode;
 use actix_web::web::Path;
 use actix_web::{Responder, web, HttpResponse, error, HttpRequest};
-use crate::common_queries::query_w2l_template::select_w2l_template_by_token;
-use crate::database_helpers::enums::{DownloadUrlType, CreatorSetVisibility, W2lTemplateType};
+use crate::database::helpers::enums::{DownloadUrlType, CreatorSetVisibility, W2lTemplateType};
+use crate::database::queries::query_w2l_template::select_w2l_template_by_token;
 use crate::http_server::web_utils::ip_address::get_request_ip;
+use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
+use crate::http_server::web_utils::response_success_helpers::simple_json_success;
 use crate::server_state::ServerState;
 use crate::util::random_crockford_token::random_crockford_token;
 use crate::validations::model_uploads::validate_model_title;
@@ -17,13 +19,11 @@ use crate::validations::username::validate_username;
 use derive_more::{Display, Error};
 use log::{info, warn, log};
 use regex::Regex;
+use sqlx::MySqlPool;
 use sqlx::error::DatabaseError;
 use sqlx::error::Error::Database;
 use sqlx::mysql::MySqlDatabaseError;
 use std::sync::Arc;
-use sqlx::MySqlPool;
-use crate::http_server::web_utils::response_success_helpers::simple_json_success;
-use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 
 /// For the URL PathInfo
 #[derive(Deserialize)]

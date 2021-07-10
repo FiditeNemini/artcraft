@@ -1,11 +1,10 @@
-//use actix_web::client::Client;
 use actix_web::http::header;
 use anyhow::anyhow;
 use crate::util::anyhow_result::AnyhowResult;
 use hyper::client::Client;
+use hyper::{Body, Request};
 use log::info;
 use std::path::Path;
-use hyper::{Body, Request};
 
 pub struct TtsInferenceSidecarClient {
   hostname: String,

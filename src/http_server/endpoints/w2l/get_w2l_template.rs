@@ -8,11 +8,11 @@ use actix_web::web::Path;
 use actix_web::{Responder, web, HttpResponse, error, HttpRequest, HttpMessage};
 use chrono::{DateTime, Utc};
 use crate::AnyhowResult;
-use crate::common_queries::query_w2l_template::W2lTemplateRecordForResponse;
-use crate::common_queries::query_w2l_template::select_w2l_template_by_token;
-use crate::common_queries::sessions::create_session_for_user;
-use crate::database_helpers::boolean_converters::nullable_i8_to_optional_bool;
+use crate::database::helpers::boolean_converters::nullable_i8_to_optional_bool;
+use crate::database::queries::query_w2l_template::W2lTemplateRecordForResponse;
+use crate::database::queries::query_w2l_template::select_w2l_template_by_token;
 use crate::http_server::web_utils::ip_address::get_request_ip;
+use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 use crate::server_state::ServerState;
 use crate::util::random_crockford_token::random_crockford_token;
 use crate::validations::passwords::validate_passwords;
@@ -25,7 +25,6 @@ use sqlx::error::DatabaseError;
 use sqlx::error::Error::Database;
 use sqlx::mysql::MySqlDatabaseError;
 use std::sync::Arc;
-use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 
 /// For the URL PathInfo
 #[derive(Deserialize)]

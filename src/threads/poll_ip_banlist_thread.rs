@@ -1,5 +1,5 @@
 use anyhow::Error;
-use crate::common_queries::list_ip_bans::list_ip_bans;
+use crate::database::queries::list_ip_bans::list_ip_bans;
 use crate::threads::ip_banlist_set::IpBanlistSet;
 use log::info;
 use log::warn;

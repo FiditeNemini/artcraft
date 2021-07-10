@@ -1,7 +1,6 @@
-pub mod badge_granter;
 pub mod badges;
+pub mod create_session;
 pub mod delete_tts_model;
-pub mod firehose_publisher;
 pub mod list_ip_bans;
 pub mod list_tts_inference_results;
 pub mod list_tts_models;
@@ -14,5 +13,3 @@ pub mod query_tts_result;
 pub mod query_user_profile;
 pub mod query_w2l_result;
 pub mod query_w2l_template;
-pub mod sessions;
-pub mod tokens;

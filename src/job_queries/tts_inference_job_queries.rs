@@ -4,12 +4,12 @@
 
 use anyhow::anyhow;
 use chrono::{Utc, DateTime};
+use crate::database::helpers::tokens::Tokens;
 use crate::util::anyhow_result::AnyhowResult;
 use crate::util::random_prefix_crockford_token::random_prefix_crockford_token;
 use log::{warn, info};
 use sqlx::{MySqlPool, Transaction, MySql};
 use std::path::Path;
-use crate::common_queries::tokens::Tokens;
 
 /// table: tts_inference_jobs
 #[derive(Debug)]
