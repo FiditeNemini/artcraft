@@ -100,6 +100,7 @@ use sqlx::MySqlPool;
 use sqlx::mysql::MySqlPoolOptions;
 use std::sync::Arc;
 use std::time::Duration;
+use crate::http_server::endpoints::tts::delete_tts_model::delete_tts_model_handler;
 
 // TODO TODO TODO TODO
 // TODO TODO TODO TODO
@@ -410,6 +411,11 @@ pub async fn serve(server_state: ServerState) -> AnyhowResult<()>
           .service(
             web::resource("/model/{token}")
               .route(web::get().to(get_tts_model_handler))
+              .route(web::head().to(|| HttpResponse::Ok()))
+          )
+          .service(
+            web::resource("/model/{token}/delete")
+              .route(web::post().to(delete_tts_model_handler))
               .route(web::head().to(|| HttpResponse::Ok()))
           )
           .service(

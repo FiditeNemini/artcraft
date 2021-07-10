@@ -1,5 +1,6 @@
 pub mod badge_granter;
 pub mod badges;
+pub mod delete_tts_model;
 pub mod firehose_publisher;
 pub mod list_ip_bans;
 pub mod list_tts_inference_results;

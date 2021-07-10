@@ -1,3 +1,4 @@
+pub mod delete_tts_model;
 pub mod delete_tts_result;
 pub mod edit_tts_model;
 pub mod enqueue_infer_tts;
