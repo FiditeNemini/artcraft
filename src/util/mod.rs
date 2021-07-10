@@ -1,5 +1,6 @@
 pub mod anyhow_result;
 pub mod buckets;
+pub mod delete_request_role_disambiguation;
 pub mod email_to_gravatar;
 pub mod encrypted_sort_id;
 pub mod filesystem;
