@@ -25,7 +25,7 @@ pub fn delete_role_disambiguation(
 
 #[cfg(test)]
 mod tests {
-  use crate::util::delete_request_role_disambiguation::{delete_role_disambiguation, DeleteRole};
+  use crate::util::delete_role_disambiguation::{delete_role_disambiguation, DeleteRole};
 
   #[test]
   fn test_delete_as_mod() {

@@ -16,6 +16,8 @@ use crate::http_server::web_utils::ip_address::get_request_ip;
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 use crate::http_server::web_utils::response_success_helpers::simple_json_success;
 use crate::server_state::ServerState;
+use crate::util::delete_role_disambiguation::DeleteRole;
+use crate::util::delete_role_disambiguation::delete_role_disambiguation;
 use derive_more::{Display, Error};
 use log::{info, warn, log};
 use regex::Regex;
@@ -110,46 +112,54 @@ pub async fn delete_tts_model_handler(
     Ok(Some(model)) => model,
   };
 
-  // NB: Second set of permission checks
-  let is_author = &tts_model.creator_user_token == &user_session.user_token;
-
-  if !is_author && !is_mod {
-    warn!("user is not allowed to delete model: {}", user_session.user_token);
-    return Err(DeleteTtsModelError::NotAuthorized);
-  }
-
   let ip_address = get_request_ip(&http_request);
 
-  let as_mod = delete_as_mod(is_mod, is_author, request.as_mod);
+  // NB: Second set of permission checks
+  let is_author = &tts_model.creator_user_token == &user_session.user_token;
+  let delete_role = delete_role_disambiguation(is_mod, is_author, request.as_mod);
 
   let query_result = if request.set_delete {
-    if as_mod {
-      delete_tts_model_as_mod(
-        &path.token,
-        &user_session.user_token,
-        &server_state.mysql_pool
-      ).await
-    } else {
-      delete_tts_model_as_user(
-        &path.token,
-        &ip_address,
-        &server_state.mysql_pool,
-      ).await
+    match delete_role {
+      DeleteRole::ErrorDoNotDelete => {
+        warn!("user is not allowed to delete model: {}", user_session.user_token);
+        return Err(DeleteTtsModelError::NotAuthorized);
+      }
+      DeleteRole::AsUser => {
+        delete_tts_model_as_user(
+          &path.token,
+          &ip_address,
+          &server_state.mysql_pool,
+        ).await
+      }
+      DeleteRole::AsMod => {
+        delete_tts_model_as_mod(
+          &path.token,
+          &user_session.user_token,
+          &server_state.mysql_pool
+        ).await
+      }
     }
   } else {
-    if as_mod {
-      undelete_tts_model_as_mod(
-        &path.token,
-        &user_session.user_token,
-        &server_state.mysql_pool
-      ).await
-    } else {
-      // NB: Technically only mods can see their own inference_results here
-      undelete_tts_model_as_user(
-        &path.token,
-        &ip_address,
-        &server_state.mysql_pool
-      ).await
+    match delete_role {
+      DeleteRole::ErrorDoNotDelete => {
+        warn!("user is not allowed to delete model: {}", user_session.user_token);
+        return Err(DeleteTtsModelError::NotAuthorized);
+      }
+      DeleteRole::AsUser => {
+        // NB: Technically only mods can see their own inference_results here
+        undelete_tts_model_as_user(
+          &path.token,
+          &ip_address,
+          &server_state.mysql_pool
+        ).await
+      }
+      DeleteRole::AsMod => {
+        undelete_tts_model_as_mod(
+          &path.token,
+          &user_session.user_token,
+          &server_state.mysql_pool
+        ).await
+      }
     }
   };
 
@@ -162,36 +172,4 @@ pub async fn delete_tts_model_handler(
   };
 
   Ok(simple_json_success())
-}
-
-fn delete_as_mod(user_is_mod: bool, user_is_author: bool, as_mod_flag: Option<bool>) -> bool {
-  // NB: Explored this with a truth table.
-  let as_mod_flag_value = as_mod_flag.unwrap_or(false);
-  user_is_mod && !(user_is_author && as_mod_flag.is_some() && !as_mod_flag_value)
-}
-
-#[cfg(test)]
-mod tests {
-  use crate::http_server::endpoints::tts::delete_tts_model::delete_as_mod;
-
-  #[test]
-  fn test_delete_as_mod() {
-    // Deleted as a user
-    assert!(!delete_as_mod(false, false, None));
-    assert!(!delete_as_mod(false, true, None));
-    assert!(!delete_as_mod(false, true, Some(false)));
-    assert!(!delete_as_mod(false, true, Some(true)));
-
-    // Deleted as a mod
-    assert!(delete_as_mod(true, false, None));
-    assert!(delete_as_mod(true, false, Some(false)));
-    assert!(delete_as_mod(true, false, Some(true)));
-
-    // Moderator + Author, deleting as a user
-    assert!(!delete_as_mod(true, true, Some(false)));
-
-    // Moderator + Author, deleting as a mod
-    assert!(delete_as_mod(true, true, None));
-    assert!(delete_as_mod(true, true, Some(true)));
-  }
 }
