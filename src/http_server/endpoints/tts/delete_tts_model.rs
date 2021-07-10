@@ -118,8 +118,7 @@ pub async fn delete_tts_model_handler(
     return Err(DeleteTtsModelError::NotAuthorized);
   }
 
-  // NB: I can't imagine we need to store this.
-  // let ip_address = get_request_ip(&http_request);
+  let ip_address = get_request_ip(&http_request);
 
   let as_mod = delete_as_mod(is_mod, is_author, request.as_mod);
 
@@ -133,7 +132,8 @@ pub async fn delete_tts_model_handler(
     } else {
       delete_tts_model_as_user(
         &path.token,
-        &server_state.mysql_pool
+        &ip_address,
+        &server_state.mysql_pool,
       ).await
     }
   } else {
@@ -147,6 +147,7 @@ pub async fn delete_tts_model_handler(
       // NB: Technically only mods can see their own inference_results here
       undelete_tts_model_as_user(
         &path.token,
+        &ip_address,
         &server_state.mysql_pool
       ).await
     }
