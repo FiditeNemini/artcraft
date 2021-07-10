@@ -11,8 +11,7 @@
 #[macro_use] extern crate serde_derive;
 
 pub mod common_env;
-pub mod common_queries;
-pub mod database_helpers;
+pub mod database;
 pub mod job_queries;
 pub mod script_execution;
 pub mod shared_constants;
@@ -21,7 +20,7 @@ pub mod util;
 use anyhow::anyhow;
 use chrono::Utc;
 use crate::common_env::CommonEnv;
-use crate::common_queries::firehose_publisher::FirehosePublisher;
+use crate::database::mediators::firehose_publisher::FirehosePublisher;
 use crate::job_queries::w2l_inference_job_queries::W2lInferenceJobRecord;
 use crate::job_queries::w2l_inference_job_queries::get_w2l_template_by_token;
 use crate::job_queries::w2l_inference_job_queries::grab_job_lock_and_mark_pending;

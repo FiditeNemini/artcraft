@@ -12,8 +12,7 @@
 
 pub mod clients;
 pub mod common_env;
-pub mod common_queries;
-pub mod database_helpers;
+pub mod database;
 pub mod job_queries;
 pub mod script_execution;
 pub mod shared_constants;
@@ -23,7 +22,7 @@ use anyhow::{anyhow, Error};
 use chrono::{Utc, DateTime, TimeZone};
 use crate::clients::tts_inference_sidecar_client::TtsInferenceSidecarClient;
 use crate::common_env::CommonEnv;
-use crate::common_queries::firehose_publisher::FirehosePublisher;
+use crate::database::mediators::firehose_publisher::FirehosePublisher;
 use crate::job_queries::tts_inference_job_queries::get_tts_model_by_token;
 use crate::job_queries::tts_inference_job_queries::grab_job_lock_and_mark_pending;
 use crate::job_queries::tts_inference_job_queries::insert_tts_result;

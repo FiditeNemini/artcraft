@@ -11,8 +11,7 @@
 #[macro_use] extern crate serde_derive;
 
 pub mod common_env;
-pub mod common_queries;
-pub mod database_helpers;
+pub mod database;
 pub mod job_queries;
 pub mod script_execution;
 pub mod shared_constants;
@@ -21,8 +20,8 @@ pub mod util;
 use anyhow::anyhow;
 use chrono::Utc;
 use crate::common_env::CommonEnv;
-use crate::common_queries::badge_granter::BadgeGranter;
-use crate::common_queries::firehose_publisher::FirehosePublisher;
+use crate::database::mediators::badge_granter::BadgeGranter;
+use crate::database::mediators::firehose_publisher::FirehosePublisher;
 use crate::job_queries::w2l_download_job_queries::W2lTemplateUploadJobRecord;
 use crate::job_queries::w2l_download_job_queries::grab_job_lock_and_mark_pending;
 use crate::job_queries::w2l_download_job_queries::insert_w2l_template;
