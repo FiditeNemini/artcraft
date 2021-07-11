@@ -6,6 +6,7 @@ use actix_web::error::ResponseError;
 use actix_web::http::StatusCode;
 use actix_web::web::Path;
 use actix_web::{Responder, web, HttpResponse, error, HttpRequest};
+use crate::database::enums::record_visibility::RecordVisibility;
 use crate::database::queries::create_session::create_session_for_user;
 use crate::database::queries::query_user_profile::select_user_profile_by_username;
 use crate::http_server::web_utils::ip_address::get_request_ip;
@@ -52,6 +53,9 @@ pub struct EditProfileRequest {
   pub github_username: Option<String>,
   pub cashapp_username: Option<String>,
   pub website_url: Option<String>,
+
+  pub preferred_tts_result_visibility: Option<RecordVisibility>,
+  pub preferred_w2l_result_visibility: Option<RecordVisibility>,
 }
 
 #[derive(Serialize)]
@@ -138,6 +142,10 @@ pub async fn edit_profile_handler(
     editor_is_moderator = true;
   }
 
+  if !editor_is_original_user && !editor_is_moderator {
+    return Err(EditProfileError::NotAuthorized);
+  }
+
   // Fields to set
   let mut twitter_username = None;
   let mut twitch_username = None;
@@ -147,10 +155,6 @@ pub async fn edit_profile_handler(
   let mut website_url = None;
   let mut profile_markdown = None;
   let mut profile_html = None;
-
-  if !editor_is_original_user && !editor_is_moderator {
-    return Err(EditProfileError::NotAuthorized);
-  }
 
   if let Some(twitter) = request.twitter_username.as_deref() {
     let trimmed = twitter.trim();

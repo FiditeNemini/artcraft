@@ -9,6 +9,7 @@ use actix_web::{Responder, web, HttpResponse, error, HttpRequest, HttpMessage};
 use anyhow::anyhow;
 use chrono::{DateTime, Utc};
 use crate::AnyhowResult;
+use crate::database::enums::record_visibility::RecordVisibility;
 use crate::database::helpers::boolean_converters::i8_to_bool;
 use crate::database::queries::list_user_badges::UserBadgeForList;
 use crate::database::queries::list_user_badges::list_user_badges;
@@ -49,6 +50,9 @@ pub struct UserProfileRecordForResponse {
   pub user_role_slug: String,
   pub is_banned: bool,
   pub disable_gravatar: bool,
+  pub preferred_tts_result_visibility: RecordVisibility,
+  //pub preferred_tts_result_visibility: String,
+  //pub preferred_w2l_result_visibility: RecordVisibility,
   pub discord_username: Option<String>,
   pub twitch_username: Option<String>,
   pub twitter_username: Option<String>,
@@ -77,6 +81,9 @@ pub struct RawUserProfileRecord {
   pub user_role_slug: String,
   pub is_banned: i8,
   pub disable_gravatar: i8,
+  pub preferred_tts_result_visibility: RecordVisibility,
+  //pub preferred_tts_result_visibility: String,
+  //pub preferred_w2l_result_visibility: RecordVisibility,
   pub discord_username: Option<String>,
   pub twitch_username: Option<String>,
   pub twitter_username: Option<String>,
@@ -137,6 +144,7 @@ SELECT
     user_role_slug,
     is_banned,
     disable_gravatar,
+    preferred_tts_result_visibility as `preferred_tts_result_visibility: crate::database::enums::record_visibility::RecordVisibility`,
     discord_username,
     twitch_username,
     twitter_username,
@@ -189,6 +197,8 @@ WHERE
     user_role_slug: profile_record.user_role_slug.clone(),
     is_banned: i8_to_bool(profile_record.is_banned),
     disable_gravatar: i8_to_bool(profile_record.disable_gravatar),
+    preferred_tts_result_visibility: profile_record.preferred_tts_result_visibility.clone(),
+    //preferred_w2l_result_visibility: profile_record.preferred_w2l_result_visibility,
     discord_username: profile_record.discord_username.clone(),
     twitch_username: profile_record.twitch_username.clone(),
     twitter_username: profile_record.twitter_username.clone(),
