@@ -31,6 +31,7 @@ use sqlx::error::Error::Database;
 use std::io::Write;
 use std::sync::Arc;
 use uuid::Uuid;
+use crate::database::enums::record_visibility::RecordVisibility;
 
 const BUCKET_AUDIO_FILE_NAME : &'static str = "input_audio_file";
 const BUCKET_IMAGE_FILE_NAME: &'static str = "input_image_file";
@@ -38,8 +39,6 @@ const BUCKET_VIDEO_FILE_NAME : &'static str = "input_video_file";
 
 const MIN_BYTES : usize = 10;
 const MAX_BYTES : usize = 1024 * 1024 * 20;
-
-
 
 /// Just to query for existence
 #[derive(Serialize)]
@@ -115,7 +114,7 @@ pub async fn enqueue_infer_w2l_with_uploads(
 
   let maybe_session = server_state
     .session_checker
-    .maybe_get_session(&http_request, &server_state.mysql_pool)
+    .maybe_get_user_session(&http_request, &server_state.mysql_pool)
     .await
     .map_err(|e| {
       warn!("Session checker error: {:?}", e);
@@ -125,6 +124,13 @@ pub async fn enqueue_infer_w2l_with_uploads(
   let mut maybe_user_token : Option<String> = maybe_session
     .as_ref()
     .map(|user_session| user_session.user_token.to_string());
+
+  let maybe_user_preferred_visibility : Option<RecordVisibility> = maybe_session
+      .as_ref()
+      .map(|user_session| user_session.preferred_tts_result_visibility);
+
+  let set_visibility = maybe_user_preferred_visibility
+      .unwrap_or(RecordVisibility::Public);
 
   info!("Enqueue infer w2l by user token: {:?}", maybe_user_token);
 
@@ -291,7 +297,7 @@ SET
   maybe_creator_user_token = ?,
   creator_ip_address = ?,
   disable_end_bump = false,
-  creator_set_visibility = "public",
+  creator_set_visibility = ?,
   status = "pending"
         "#,
         job_token.to_string(),
@@ -302,7 +308,8 @@ SET
         maybe_audio_file_name.clone(),
         Some(audio_type.clone()),
         maybe_user_token.clone(),
-        ip_address.to_string()
+        ip_address.to_string(),
+        set_visibility,
     )
     .execute(&server_state.mysql_pool)
     .await;

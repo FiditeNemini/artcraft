@@ -5,7 +5,8 @@ use actix_web::dev::HttpResponseBuilder;
 use actix_web::error::ResponseError;
 use actix_web::http::StatusCode;
 use actix_web::{Responder, web, HttpResponse, error, HttpRequest};
-use crate::database::helpers::enums::{DownloadUrlType, CreatorSetVisibility, W2lTemplateType};
+use crate::database::enums::record_visibility::RecordVisibility;
+use crate::database::helpers::enums::{DownloadUrlType, W2lTemplateType};
 use crate::http_server::web_utils::ip_address::get_request_ip;
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 use crate::server_state::ServerState;
@@ -27,7 +28,7 @@ use std::sync::Arc;
 pub struct InferW2lRequest {
   w2l_template_token: Option<String>,
   tts_inference_result_token: Option<String>,
-  creator_set_visibility: Option<CreatorSetVisibility>,
+  creator_set_visibility: Option<RecordVisibility>,
 }
 
 #[derive(Serialize)]
