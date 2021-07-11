@@ -1,5 +1,6 @@
 use anyhow::anyhow;
 use chrono::{DateTime, Utc};
+use crate::database::enums::record_visibility::RecordVisibility;
 use crate::shared_constants::DEFAULT_MYSQL_QUERY_RESULT_PAGE_SIZE;
 use crate::util::anyhow_result::AnyhowResult;
 use log::{warn, info};
@@ -36,6 +37,8 @@ pub struct W2lInferenceRecordForList {
   pub frame_width: u32,
   pub frame_height: u32,
   pub duration_millis: u32,
+
+  pub visibility: RecordVisibility,
 
   //pub template_is_mod_approved: bool, // converted
   //pub maybe_mod_user_token: Option<String>,
@@ -145,6 +148,7 @@ impl ListW2lResultsQueryBuilder {
             frame_width: if r.frame_width > 0 { r.frame_width as u32 } else { 0 },
             frame_height: if r.frame_height > 0 { r.frame_height as u32 } else { 0 },
             duration_millis: if r.duration_millis > 0 { r.duration_millis as u32 } else { 0 },
+            visibility: RecordVisibility::from_str(&r.creator_set_visibility).unwrap_or(RecordVisibility::Public),
             created_at: r.created_at,
             updated_at: r.updated_at,
           }
@@ -192,6 +196,12 @@ impl ListW2lResultsQueryBuilder {
   }
 
   pub fn build_query_string(&self) -> String {
+    // TODO: I haven't figured out how to get field name disambiguation and type coercion working here.
+    //    (1) w2l_results.creator_set_visibility `creator_set_visibility: crate::database::enums::record_visibility::RecordVisibility`,
+    //    Query error: no column found for name: creator_set_visibility
+    //    (2) creator_set_visibility `creator_set_visibility: crate::database::enums::record_visibility::RecordVisibility`,
+    //    Column 'creator_set_visibility' in field list is ambiguous
+
     // TODO/NB: Unfortunately SQLx can't statically typecheck this query
     let mut query = r#"
 SELECT
@@ -213,6 +223,9 @@ SELECT
     w2l_results.frame_width,
     w2l_results.frame_height,
     w2l_results.duration_millis,
+
+    w2l_results.creator_set_visibility,
+
     w2l_results.created_at,
     w2l_results.updated_at
 
@@ -331,6 +344,8 @@ pub struct RawInternalTtsRecord {
   pub frame_width: i32,
   pub frame_height: i32,
   pub duration_millis: i32,
+
+  pub creator_set_visibility: String,
 
   //pub template_is_mod_approved: i8, // needs convert
   //pub maybe_mod_user_token: Option<String>,
