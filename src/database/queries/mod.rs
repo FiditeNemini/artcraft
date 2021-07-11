@@ -1,6 +1,7 @@
 pub mod badges;
 pub mod create_session;
 pub mod delete_tts_model;
+pub mod delete_w2l_template;
 pub mod list_ip_bans;
 pub mod list_tts_inference_results;
 pub mod list_tts_models;

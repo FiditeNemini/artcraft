@@ -7,11 +7,17 @@ use actix_web::http::StatusCode;
 use actix_web::web::Path;
 use actix_web::{Responder, web, HttpResponse, error, HttpRequest};
 use crate::database::helpers::enums::{DownloadUrlType, CreatorSetVisibility, W2lTemplateType};
+use crate::database::queries::delete_w2l_template::delete_w2l_template_as_mod;
+use crate::database::queries::delete_w2l_template::delete_w2l_template_as_user;
+use crate::database::queries::delete_w2l_template::undelete_w2l_template_as_mod;
+use crate::database::queries::delete_w2l_template::undelete_w2l_template_as_user;
 use crate::database::queries::query_w2l_template::select_w2l_template_by_token;
 use crate::http_server::web_utils::ip_address::get_request_ip;
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 use crate::http_server::web_utils::response_success_helpers::simple_json_success;
 use crate::server_state::ServerState;
+use crate::util::delete_role_disambiguation::DeleteRole;
+use crate::util::delete_role_disambiguation::delete_role_disambiguation;
 use crate::util::random_crockford_token::random_crockford_token;
 use crate::validations::model_uploads::validate_model_title;
 use crate::validations::passwords::validate_passwords;
@@ -34,6 +40,8 @@ pub struct DeleteW2lTemplatePathInfo {
 #[derive(Deserialize)]
 pub struct DeleteW2lTemplateRequest {
   set_delete: bool,
+  /// NB: this is only to disambiguate when a user is both a mod and an author.
+  as_mod: Option<bool>,
 }
 
 #[derive(Debug, Display)]
@@ -119,40 +127,57 @@ pub async fn delete_w2l_template_handler(
 
   if !is_mod {
     if w2l_template.is_locked_from_user_modification || w2l_template.is_locked_from_use {
+      warn!("user is not allowed to delete templates (locked): {}", user_session.user_token);
       return Err(DeleteW2lTemplateError::NotAuthorized);
     }
   }
 
   let ip_address = get_request_ip(&http_request);
 
+  let delete_role = delete_role_disambiguation(is_mod, is_author, request.as_mod);
+
   let query_result = if request.set_delete {
-    if is_author {
-      user_delete_template(
-        &path.token,
-        &user_session.user_token,
-        &server_state.mysql_pool
-      ).await
-    } else {
-      mod_delete_template(
-        &path.token,
-        &user_session.user_token,
-        &server_state.mysql_pool
-      ).await
+    match delete_role {
+      DeleteRole::ErrorDoNotDelete => {
+        warn!("user is not allowed to delete template: {}", user_session.user_token);
+        return Err(DeleteW2lTemplateError::NotAuthorized);
+      }
+      DeleteRole::AsUser => {
+        delete_w2l_template_as_user(
+          &path.token,
+          &ip_address,
+          &server_state.mysql_pool
+        ).await
+      }
+      DeleteRole::AsMod => {
+        delete_w2l_template_as_mod(
+          &path.token,
+          &user_session.user_token,
+          &server_state.mysql_pool
+        ).await
+      }
     }
   } else {
-    if is_author {
-      // NB: Technically only mods can see their own templates here
-      user_undelete_template(
-        &path.token,
-        &user_session.user_token,
-        &server_state.mysql_pool
-      ).await
-    } else {
-      mod_undelete_template(
-        &path.token,
-        &user_session.user_token,
-        &server_state.mysql_pool
-      ).await
+    match delete_role {
+      DeleteRole::ErrorDoNotDelete => {
+        warn!("user is not allowed to delete template: {}", user_session.user_token);
+        return Err(DeleteW2lTemplateError::NotAuthorized);
+      }
+      DeleteRole::AsUser => {
+        // NB: Technically only mods can see their own templates here
+        undelete_w2l_template_as_user(
+          &path.token,
+          &ip_address,
+          &server_state.mysql_pool
+        ).await
+      }
+      DeleteRole::AsMod => {
+        undelete_w2l_template_as_mod(
+          &path.token,
+          &user_session.user_token,
+          &server_state.mysql_pool
+        ).await
+      }
     }
   };
 
@@ -167,96 +192,3 @@ pub async fn delete_w2l_template_handler(
   Ok(simple_json_success())
 }
 
-async fn user_delete_template(
-  template_token: &str,
-  mod_user_token: &str,
-  mysql_pool: &MySqlPool
-) -> Result<(), sqlx::Error> {
-  let _r = sqlx::query!(
-        r#"
-UPDATE w2l_templates
-SET
-  user_deleted_at = CURRENT_TIMESTAMP,
-  maybe_mod_user_token = ?
-WHERE
-  token = ?
-LIMIT 1
-        "#,
-      mod_user_token,
-      template_token,
-    )
-      .execute(mysql_pool)
-      .await?;
-  Ok(())
-}
-
-async fn mod_delete_template(
-  template_token: &str,
-  mod_user_token: &str,
-  mysql_pool: &MySqlPool
-) -> Result<(), sqlx::Error> {
-  let _r = sqlx::query!(
-        r#"
-UPDATE w2l_templates
-SET
-  mod_deleted_at = CURRENT_TIMESTAMP,
-  maybe_mod_user_token = ?
-WHERE
-  token = ?
-LIMIT 1
-        "#,
-      mod_user_token,
-      template_token,
-    )
-    .execute(mysql_pool)
-    .await?;
-  Ok(())
-}
-
-async fn user_undelete_template(
-  template_token: &str,
-  mod_user_token: &str,
-  mysql_pool: &MySqlPool
-) -> Result<(), sqlx::Error> {
-
-  let _r = sqlx::query!(
-        r#"
-UPDATE w2l_templates
-SET
-  user_deleted_at = NULL,
-  maybe_mod_user_token = ?
-WHERE
-  token = ?
-LIMIT 1
-        "#,
-      mod_user_token,
-      template_token,
-    )
-    .execute(mysql_pool)
-    .await?;
-  Ok(())
-}
-
-async fn mod_undelete_template(
-  template_token: &str,
-  mod_user_token: &str,
-  mysql_pool: &MySqlPool
-) -> Result<(), sqlx::Error> {
-
-  let _r = sqlx::query!(
-        r#"
-UPDATE w2l_templates
-SET
-  mod_deleted_at = NULL,
-  maybe_mod_user_token = ?
-WHERE
-  token = ?
-LIMIT 1
-        "#,
-      mod_user_token,
-      template_token,
-    )
-      .execute(mysql_pool)
-      .await?;
-  Ok(())
-}

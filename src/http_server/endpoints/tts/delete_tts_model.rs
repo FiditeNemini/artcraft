@@ -112,10 +112,23 @@ pub async fn delete_tts_model_handler(
     Ok(Some(model)) => model,
   };
 
-  let ip_address = get_request_ip(&http_request);
-
   // NB: Second set of permission checks
   let is_author = &tts_model.creator_user_token == &user_session.user_token;
+
+  if !is_author && !is_mod {
+    warn!("user is not allowed to delete models: {}", user_session.user_token);
+    return Err(DeleteTtsModelError::NotAuthorized);
+  }
+
+  if !is_mod {
+    if tts_model.is_locked_from_user_modification || tts_model.is_locked_from_use {
+      warn!("user is not allowed to delete models (locked): {}", user_session.user_token);
+      return Err(DeleteTtsModelError::NotAuthorized);
+    }
+  }
+
+  let ip_address = get_request_ip(&http_request);
+
   let delete_role = delete_role_disambiguation(is_mod, is_author, request.as_mod);
 
   let query_result = if request.set_delete {
@@ -142,7 +155,7 @@ pub async fn delete_tts_model_handler(
   } else {
     match delete_role {
       DeleteRole::ErrorDoNotDelete => {
-        warn!("user is not allowed to delete model: {}", user_session.user_token);
+        warn!("user is not allowed to undelete model: {}", user_session.user_token);
         return Err(DeleteTtsModelError::NotAuthorized);
       }
       DeleteRole::AsUser => {
