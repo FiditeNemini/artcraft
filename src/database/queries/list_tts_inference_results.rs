@@ -1,5 +1,6 @@
 use anyhow::anyhow;
 use chrono::{DateTime, Utc};
+use crate::database::enums::record_visibility::RecordVisibility;
 use crate::shared_constants::DEFAULT_MYSQL_QUERY_RESULT_PAGE_SIZE;
 use crate::util::anyhow_result::AnyhowResult;
 use log::{warn, info};
@@ -33,6 +34,8 @@ pub struct TtsInferenceRecordForList {
 
   pub file_size_bytes: u32,
   pub duration_millis: u32,
+
+  pub visibility: RecordVisibility,
 
   //pub model_is_mod_approved: bool, // converted
   //pub maybe_mod_user_token: Option<String>,
@@ -125,6 +128,7 @@ impl ListTtsResultsQueryBuilder {
             maybe_creator_result_id: r.maybe_creator_result_id.map(|v| v as u64).clone(),
             file_size_bytes: if r.file_size_bytes > 0 { r.file_size_bytes as u32 } else { 0 },
             duration_millis: if r.duration_millis > 0 { r.duration_millis as u32 } else { 0 },
+            visibility: RecordVisibility::from_str(&r.creator_set_visibility).unwrap_or(RecordVisibility::Public),
             created_at: r.created_at,
             updated_at: r.updated_at,
           }
@@ -172,6 +176,12 @@ impl ListTtsResultsQueryBuilder {
   }
 
   pub fn build_query_string(&self) -> String {
+    // TODO: I haven't figured out how to get field name disambiguation and type coercion working here.
+    //    (1) tts_results.creator_set_visibility `creator_set_visibility: crate::database::enums::record_visibility::RecordVisibility`,
+    //    Query error: no column found for name: creator_set_visibility
+    //    (2) creator_set_visibility `creator_set_visibility: crate::database::enums::record_visibility::RecordVisibility`,
+    //    Column 'creator_set_visibility' in field list is ambiguous
+
     // TODO/NB: Unfortunately SQLx can't statically typecheck this query
     let mut query = r#"
 SELECT
@@ -190,6 +200,9 @@ SELECT
 
     tts_results.file_size_bytes,
     tts_results.duration_millis,
+
+    tts_results.creator_set_visibility,
+
     tts_results.created_at,
     tts_results.updated_at
 
@@ -288,6 +301,9 @@ pub struct RawInternalTtsRecord {
 
   pub file_size_bytes : i64,
   pub duration_millis : i64,
+
+  pub creator_set_visibility: String,
+
   pub created_at: DateTime<Utc>,
   pub updated_at: DateTime<Utc>,
 }
