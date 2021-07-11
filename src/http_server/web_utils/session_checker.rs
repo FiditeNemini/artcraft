@@ -1,6 +1,7 @@
 use actix_web::HttpRequest;
 use anyhow::anyhow;
 use crate::AnyhowResult;
+use crate::database::enums::record_visibility::RecordVisibility;
 use crate::database::helpers::boolean_converters::{i8_to_bool, nullable_i8_to_optional_bool};
 use crate::http_server::web_utils::cookie_manager::CookieManager;
 use log::{info, warn};
@@ -30,6 +31,8 @@ pub struct SessionUserRecord {
 
   pub disable_gravatar: bool,
   pub auto_play_audio_preference: Option<bool>,
+  pub preferred_tts_result_visibility: RecordVisibility,
+  pub preferred_w2l_result_visibility: RecordVisibility,
   pub auto_play_video_preference: Option<bool>,
 
   // ===== ROLE ===== //
@@ -77,6 +80,8 @@ pub struct SessionUserRawDbRecord {
   pub disable_gravatar: i8,
   pub auto_play_audio_preference: Option<i8>,
   pub auto_play_video_preference: Option<i8>,
+  pub preferred_tts_result_visibility: RecordVisibility,
+  pub preferred_w2l_result_visibility: RecordVisibility,
 
   pub user_role_slug: String,
   pub is_banned: i8,
@@ -184,6 +189,8 @@ SELECT
     users.disable_gravatar,
     users.auto_play_audio_preference,
     users.auto_play_video_preference,
+    users.preferred_tts_result_visibility as `preferred_tts_result_visibility: crate::database::enums::record_visibility::RecordVisibility`,
+    users.preferred_w2l_result_visibility as `preferred_w2l_result_visibility: crate::database::enums::record_visibility::RecordVisibility`,
 
     users.user_role_slug,
     users.is_banned,
@@ -234,10 +241,14 @@ WHERE user_sessions.token = ?
           email_address: raw_user_record.email_address.clone(),
           email_confirmed: i8_to_bool(raw_user_record.email_confirmed),
           email_gravatar_hash: raw_user_record.email_gravatar_hash.clone(),
+          // Preference
           disable_gravatar: i8_to_bool(raw_user_record.disable_gravatar),
           auto_play_audio_preference: nullable_i8_to_optional_bool(raw_user_record.auto_play_audio_preference),
           auto_play_video_preference: nullable_i8_to_optional_bool(raw_user_record.auto_play_video_preference),
           user_role_slug: raw_user_record.user_role_slug.clone(),
+          preferred_tts_result_visibility: raw_user_record.preferred_tts_result_visibility,
+          preferred_w2l_result_visibility: raw_user_record.preferred_w2l_result_visibility,
+
           is_banned: i8_to_bool(raw_user_record.is_banned),
 
           // Usage

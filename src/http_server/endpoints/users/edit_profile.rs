@@ -54,8 +54,8 @@ pub struct EditProfileRequest {
   pub cashapp_username: Option<String>,
   pub website_url: Option<String>,
 
-  pub preferred_tts_result_visibility: Option<RecordVisibility>,
-  pub preferred_w2l_result_visibility: Option<RecordVisibility>,
+  pub preferred_tts_result_visibility: RecordVisibility,
+  pub preferred_w2l_result_visibility: RecordVisibility,
 }
 
 #[derive(Serialize)]
@@ -285,6 +285,8 @@ UPDATE users
 SET
     profile_markdown = ?,
     profile_rendered_html = ?,
+    preferred_tts_result_visibility = ?,
+    preferred_w2l_result_visibility = ?,
     discord_username = ?,
     twitter_username = ?,
     twitch_username = ?,
@@ -298,6 +300,8 @@ LIMIT 1
         "#,
       profile_markdown,
       profile_html,
+      request.preferred_tts_result_visibility,
+      request.preferred_w2l_result_visibility,
       discord_username,
       twitter_username,
       twitch_username,

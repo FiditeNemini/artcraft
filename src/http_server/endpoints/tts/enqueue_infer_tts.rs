@@ -5,7 +5,8 @@ use actix_web::dev::HttpResponseBuilder;
 use actix_web::error::ResponseError;
 use actix_web::http::StatusCode;
 use actix_web::{Responder, web, HttpResponse, error, HttpRequest};
-use crate::database::helpers::enums::{DownloadUrlType, CreatorSetVisibility, W2lTemplateType};
+use crate::database::enums::record_visibility::RecordVisibility;
+use crate::database::helpers::enums::{DownloadUrlType, W2lTemplateType};
 use crate::database::helpers::tokens::Tokens;
 use crate::http_server::web_utils::ip_address::get_request_ip;
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
@@ -30,7 +31,7 @@ pub struct InferTtsRequest {
   uuid_idempotency_token: String,
   tts_model_token: String,
   inference_text: String,
-  creator_set_visibility: Option<CreatorSetVisibility>,
+  creator_set_visibility: Option<RecordVisibility>,
 }
 
 #[derive(Serialize)]
@@ -110,7 +111,14 @@ pub async fn infer_tts_handler(
       })?;
 
   let ip_address = get_request_ip(&http_request);
-  let creator_set_visibility = "public".to_string();
+
+  let maybe_user_preferred_visibility : Option<RecordVisibility> = maybe_user_session
+      .as_ref()
+      .map(|user_session| user_session.preferred_tts_result_visibility);
+
+  let set_visibility = request.creator_set_visibility
+      .or(maybe_user_preferred_visibility)
+      .unwrap_or(RecordVisibility::Public);
 
   // This token is returned to the client.
   let job_token = Tokens::new_tts_inference_job()
@@ -141,7 +149,7 @@ SET
       inference_text,
       maybe_user_token,
       ip_address,
-      creator_set_visibility
+      set_visibility
     )
     .execute(&server_state.mysql_pool)
     .await;
