@@ -6,11 +6,17 @@ use actix_web::error::ResponseError;
 use actix_web::http::StatusCode;
 use actix_web::web::Path;
 use actix_web::{Responder, web, HttpResponse, error, HttpRequest};
+use crate::database::queries::delete_w2l_result::delete_w2l_inference_result_as_mod;
+use crate::database::queries::delete_w2l_result::delete_w2l_inference_result_as_user;
+use crate::database::queries::delete_w2l_result::undelete_w2l_inference_result_as_mod;
+use crate::database::queries::delete_w2l_result::undelete_w2l_inference_result_as_user;
 use crate::database::queries::query_w2l_result::select_w2l_result_by_token;
 use crate::http_server::web_utils::ip_address::get_request_ip;
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 use crate::http_server::web_utils::response_success_helpers::simple_json_success;
 use crate::server_state::ServerState;
+use crate::util::delete_role_disambiguation::DeleteRole;
+use crate::util::delete_role_disambiguation::delete_role_disambiguation;
 use crate::validations::model_uploads::validate_model_title;
 use crate::validations::passwords::validate_passwords;
 use crate::validations::username::validate_username;
@@ -32,6 +38,8 @@ pub struct DeleteW2lInferenceResultPathInfo {
 #[derive(Deserialize)]
 pub struct DeleteW2lInferenceResultRequest {
   set_delete: bool,
+  /// NB: this is only to disambiguate when a user is both a mod and an author.
+  as_mod: Option<bool>,
 }
 
 #[derive(Debug, Display)]
@@ -119,35 +127,48 @@ pub async fn delete_w2l_inference_result_handler(
     return Err(DeleteW2lInferenceResultError::NotAuthorized);
   }
 
-  // NB: I can't imagine we need to store this.
-  // let ip_address = get_request_ip(&http_request);
+  let delete_role = delete_role_disambiguation(is_mod, is_author, request.as_mod);
 
   let query_result = if request.set_delete {
-    if is_author {
-      user_delete_inference_result(
-        &path.token,
-        &server_state.mysql_pool
-      ).await
-    } else {
-      mod_delete_inference_result(
-        &path.token,
-        &user_session.user_token,
-        &server_state.mysql_pool
-      ).await
+    match delete_role {
+      DeleteRole::ErrorDoNotDelete => {
+        warn!("user is not allowed to delete inference results: {}", user_session.user_token);
+        return Err(DeleteW2lInferenceResultError::NotAuthorized);
+      }
+      DeleteRole::AsUser => {
+        delete_w2l_inference_result_as_user(
+          &path.token,
+          &server_state.mysql_pool
+        ).await
+      }
+      DeleteRole::AsMod => {
+        delete_w2l_inference_result_as_mod(
+          &path.token,
+          &user_session.user_token,
+          &server_state.mysql_pool
+        ).await
+      }
     }
   } else {
-    if is_author {
-      // NB: Technically only mods can see their own inference_results here
-      user_undelete_inference_result(
-        &path.token,
-        &server_state.mysql_pool
-      ).await
-    } else {
-      mod_undelete_inference_result(
-        &path.token,
-        &user_session.user_token,
-        &server_state.mysql_pool
-      ).await
+    match delete_role {
+      DeleteRole::ErrorDoNotDelete => {
+        warn!("user is not allowed to delete inference results: {}", user_session.user_token);
+        return Err(DeleteW2lInferenceResultError::NotAuthorized);
+      }
+      DeleteRole::AsUser => {
+        // NB: Technically only mods can see their own inference_results here
+        undelete_w2l_inference_result_as_user(
+          &path.token,
+          &server_state.mysql_pool
+        ).await
+      }
+      DeleteRole::AsMod => {
+        undelete_w2l_inference_result_as_mod(
+          &path.token,
+          &user_session.user_token,
+          &server_state.mysql_pool
+        ).await
+      }
     }
   };
 
@@ -162,90 +183,3 @@ pub async fn delete_w2l_inference_result_handler(
   Ok(simple_json_success())
 }
 
-async fn user_delete_inference_result(
-  inference_result_token: &str,
-  mysql_pool: &MySqlPool
-) -> Result<(), sqlx::Error> {
-  let _r = sqlx::query!(
-        r#"
-UPDATE w2l_results
-SET
-  user_deleted_at = CURRENT_TIMESTAMP
-WHERE
-  token = ?
-LIMIT 1
-        "#,
-      inference_result_token,
-    )
-      .execute(mysql_pool)
-      .await?;
-  Ok(())
-}
-
-async fn mod_delete_inference_result(
-  inference_result_token: &str,
-  mod_user_token: &str,
-  mysql_pool: &MySqlPool
-) -> Result<(), sqlx::Error> {
-  let _r = sqlx::query!(
-        r#"
-UPDATE w2l_results
-SET
-  mod_deleted_at = CURRENT_TIMESTAMP,
-  maybe_mod_user_token = ?
-WHERE
-  token = ?
-LIMIT 1
-        "#,
-      mod_user_token,
-      inference_result_token,
-    )
-    .execute(mysql_pool)
-    .await?;
-  Ok(())
-}
-
-async fn user_undelete_inference_result(
-  inference_result_token: &str,
-  mysql_pool: &MySqlPool
-) -> Result<(), sqlx::Error> {
-
-  let _r = sqlx::query!(
-        r#"
-UPDATE w2l_results
-SET
-  user_deleted_at = NULL
-WHERE
-  token = ?
-LIMIT 1
-        "#,
-      inference_result_token,
-    )
-    .execute(mysql_pool)
-    .await?;
-  Ok(())
-}
-
-async fn mod_undelete_inference_result(
-  inference_result_token: &str,
-  mod_user_token: &str,
-  mysql_pool: &MySqlPool
-) -> Result<(), sqlx::Error> {
-
-  let _r = sqlx::query!(
-        r#"
-UPDATE w2l_results
-SET
-  mod_deleted_at = NULL,
-  maybe_mod_user_token = ?
-WHERE
-  token = ?
-LIMIT 1
-        "#,
-      mod_user_token,
-      inference_result_token,
-    )
-      .execute(mysql_pool)
-      .await?;
-  Ok(())
-}
