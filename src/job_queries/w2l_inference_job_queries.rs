@@ -4,6 +4,7 @@
 
 use anyhow::anyhow;
 use chrono::{Utc, DateTime};
+use crate::database::enums::record_visibility::RecordVisibility;
 use crate::database::helpers::tokens::Tokens;
 use crate::util::anyhow_result::AnyhowResult;
 use crate::util::random_crockford_token::random_crockford_token;
@@ -35,7 +36,7 @@ pub struct W2lInferenceJobRecord {
   pub creator_ip_address: String,
   pub maybe_creator_user_token: Option<String>,
 
-  pub creator_set_visibility: String, // TODO
+  pub creator_set_visibility: RecordVisibility,
   pub disable_end_bump: i8, // bool
   pub disable_watermark: i8, // bool
 
@@ -73,7 +74,7 @@ SELECT
   creator_ip_address,
   maybe_creator_user_token,
 
-  creator_set_visibility,
+  creator_set_visibility as `creator_set_visibility: crate::database::enums::record_visibility::RecordVisibility`,
   disable_end_bump,
   disable_watermark,
 
@@ -333,7 +334,7 @@ SET
   maybe_w2l_template_token = ?,
   maybe_creator_user_token = ?,
   creator_ip_address = ?,
-  creator_set_visibility = 'public',
+  creator_set_visibility = ?,
 
   maybe_creator_synthetic_id = ?,
 
@@ -349,6 +350,7 @@ SET
       job.maybe_w2l_template_token.clone(),
       job.maybe_creator_user_token.clone(),
       job.creator_ip_address.clone(),
+      job.creator_set_visibility,
 
       maybe_creator_synthetic_id,
 

@@ -4,6 +4,7 @@
 
 use anyhow::anyhow;
 use chrono::{Utc, DateTime};
+use crate::database::enums::record_visibility::RecordVisibility;
 use crate::database::helpers::tokens::Tokens;
 use crate::util::anyhow_result::AnyhowResult;
 use crate::util::random_prefix_crockford_token::random_prefix_crockford_token;
@@ -23,7 +24,7 @@ pub struct TtsInferenceJobRecord {
 
   pub creator_ip_address: String,
   pub maybe_creator_user_token: Option<String>,
-  pub creator_set_visibility: String, // TODO
+  pub creator_set_visibility: RecordVisibility,
 
   pub status: String, // TODO
   pub attempt_count: i32,
@@ -51,7 +52,7 @@ SELECT
 
   creator_ip_address,
   maybe_creator_user_token,
-  creator_set_visibility,
+  creator_set_visibility as `creator_set_visibility: crate::database::enums::record_visibility::RecordVisibility`,
 
   status,
   attempt_count,
@@ -321,7 +322,7 @@ SET
   maybe_creator_synthetic_id = ?,
 
   creator_ip_address = ?,
-  creator_set_visibility = 'public',
+  creator_set_visibility = ?,
 
   public_bucket_wav_audio_path = ?,
   public_bucket_spectrogram_path = ?,
@@ -339,6 +340,7 @@ SET
       maybe_creator_synthetic_id,
 
       job.creator_ip_address.clone(),
+      job.creator_set_visibility,
 
       bucket_audio_result_path,
       bucket_spectrogram_result_path,
