@@ -340,7 +340,7 @@ SET
       maybe_creator_synthetic_id,
 
       job.creator_ip_address.clone(),
-      job.creator_set_visibility,
+      job.creator_set_visibility.to_str(),
 
       bucket_audio_result_path,
       bucket_spectrogram_result_path,

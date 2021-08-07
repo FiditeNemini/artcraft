@@ -149,7 +149,7 @@ SET
       inference_text,
       maybe_user_token,
       ip_address,
-      set_visibility
+      set_visibility.to_str(),
     )
     .execute(&server_state.mysql_pool)
     .await;
