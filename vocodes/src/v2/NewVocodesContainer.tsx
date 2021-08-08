@@ -28,6 +28,7 @@ import { ModerationViewIpBanFc } from './moderation/moderation_view_ip_ban/Moder
 import { AboutFc } from './about/about_page/AboutFc';
 import { TermsFc } from './about/terms_page/TermsFc';
 import { TtsModelEditFc } from './tts/tts_model_edit/TtsModelEditFc';
+import { TtsResultDeleteFc } from './tts/tts_result_delete/TtsResultDeleteFc';
 
 interface Props {
   sessionWrapper: SessionWrapper,
@@ -109,11 +110,17 @@ class NewVocodesContainer extends React.Component<Props, State> {
               />
             </Route>
 
+            <Route path="/tts/result/:token/delete">
+              <TtsResultDeleteFc
+                sessionWrapper={this.props.sessionWrapper}
+              />
+            </Route>
+
             <Route path="/tts/result/:token">
               <TtsResultViewFc
                 sessionWrapper={this.props.sessionWrapper}
               />
-              </Route>
+            </Route>
 
             <Route path="/tts/:token/edit">
               <TtsModelEditFc

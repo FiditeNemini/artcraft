@@ -20,6 +20,10 @@ class FrontendUrlConfig {
     return `/tts/${modelToken}/edit`;
   }
 
+  static ttsResultDeletePage(resultToken: string) : string {
+    return `/tts/result/${resultToken}/delete`;
+  }
+
   // User links
 
   static userProfilePage(userDisplayName: string) : string {

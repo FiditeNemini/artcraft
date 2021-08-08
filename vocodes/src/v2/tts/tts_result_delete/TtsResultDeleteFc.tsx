@@ -1,12 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { ApiConfig } from '../../../common/ApiConfig';
 import { SessionWrapper } from '../../../session/SessionWrapper';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useHistory } from 'react-router-dom';
 import { GravatarFc } from '../../common/GravatarFc';
-import { SpectrogramFc } from './SpectrogramFc';
-import { ReportDiscordLinkFc } from '../../common/DiscordReportLinkFc';
-import { BucketConfig } from '../../../common/BucketConfig';
-import { FrontendUrlConfig } from '../../../common/FrontendUrlConfig';
 
 interface TtsInferenceResultResponsePayload {
   success: boolean,
@@ -52,8 +48,10 @@ interface Props {
   sessionWrapper: SessionWrapper,
 }
 
-function TtsResultViewFc(props: Props) {
-  let { token } : { token: string }= useParams();
+function TtsResultDeleteFc(props: Props) {
+  const history = useHistory();
+
+  let { token } : { token: string } = useParams();
 
   const [ttsInferenceResult, setTtsInferenceResult] = useState<TtsInferenceResult|undefined>(undefined);
 
@@ -82,44 +80,50 @@ function TtsResultViewFc(props: Props) {
     });
   }, [token]); // NB: Empty array dependency sets to run ONLY on mount
 
+  const currentlyDeleted = !!ttsInferenceResult?.maybe_moderator_fields?.mod_deleted_at || !!ttsInferenceResult?.maybe_moderator_fields?.user_deleted_at;
+
+  const handleDeleteFormSubmit = (ev: React.FormEvent<HTMLFormElement>) : boolean => {
+    ev.preventDefault();
+
+    const api = new ApiConfig();
+    const endpointUrl = api.deleteTtsInferenceResult(token);
+
+    const request = {
+      set_delete: !currentlyDeleted,
+      as_mod: props.sessionWrapper.deleteTtsResultAsMod(ttsInferenceResult?.maybe_creator_user_token)
+    }
+
+    fetch(endpointUrl, {
+      method: 'POST',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+      },
+      credentials: 'include',
+      body: JSON.stringify(request),
+    })
+    .then(res => res.json())
+    .then(res => {
+      if (res.success) {
+        if (props.sessionWrapper.canDeleteOtherUsersTtsResults()) {
+          history.go(0); // force reload
+        } else {
+          history.push('/');
+        }
+      }
+    })
+    .catch(e => {
+    });
+    return false;
+  }
+
   if (ttsInferenceResult === undefined) {
     return <div />;
   }
 
-  let audioLink = new BucketConfig().getGcsUrl(ttsInferenceResult?.public_bucket_wav_audio_path);
   let modelLink = `/tts/${ttsInferenceResult.tts_model_token}`;
-
-  // NB: Not respected in firefox: https://stackoverflow.com/a/28468261
-  let audioDownloadFilename = `vocodes-${ttsInferenceResult.tts_model_token.replace(':', '')}.wav`;
-
-  let spectrogramLink = new BucketConfig().getGcsUrl(ttsInferenceResult?.public_bucket_spectrogram_path);
-
   let durationSeconds = ttsInferenceResult?.duration_millis / 1000;
-
   let modelName = ttsInferenceResult.tts_model_title;
-
-  //const currentlyDeleted = !!ttsInferenceResult?.maybe_moderator_fields?.mod_deleted_at || !!ttsInferenceResult?.maybe_moderator_fields?.user_deleted_at;
-
-  let moderatorRows = null;
-
-  if (props.sessionWrapper.canDeleteOtherUsersTtsResults() || props.sessionWrapper.canDeleteOtherUsersTtsModels()) {
-    moderatorRows = (
-      <>
-        <tr>
-          <th>Creator IP Address (Creation)</th>
-          <td>{ttsInferenceResult?.maybe_moderator_fields?.creator_ip_address || "server error"}</td>
-        </tr>
-        <tr>
-          <th>Mod Deleted At (UTC)</th>
-          <td>{ttsInferenceResult?.maybe_moderator_fields?.mod_deleted_at || "not deleted"}</td>
-        </tr>
-        <tr>
-          <th>User Deleted At (UTC)</th>
-          <td>{ttsInferenceResult?.maybe_moderator_fields?.user_deleted_at || "not deleted"}</td>
-        </tr>
-      </>
-    );
-  }
 
   let creatorDetails = <span>Anonymous user</span>;
   if (!!ttsInferenceResult.maybe_creator_user_token) {
@@ -153,43 +157,38 @@ function TtsResultViewFc(props: Props) {
     );
   }
 
-  let headingTitle = 'TTS Result';
-  let subtitle = <span />;
-  if (ttsInferenceResult.tts_model_title !== undefined && ttsInferenceResult.tts_model_title !== null) {
-    headingTitle = `${ttsInferenceResult.tts_model_title}`;
-    subtitle = <h3 className="subtitle is-3"> TTS Result</h3>;
-  }
+  const buttonTitle = currentlyDeleted ? "Undelete" : "Delete";
+
+  const buttonCss = currentlyDeleted ? 
+    "button is-warning is-large is-fullwidth" :
+    "button is-danger is-large is-fullwidth";
+
+  const formLabel = currentlyDeleted ? 
+     "Recover the TTS Result (makes it visible again)" : 
+     "Delete TTS Result (hides from everyone but mods)";
 
   return (
     <div>
-      <h1 className="title is-1"> {headingTitle} </h1>
-      {subtitle}
+      <h1 className="title is-1"> Delete Result ?</h1>
 
-      <audio
-        controls
-        src={audioLink}>
-            Your browser does not support the
-            <code>audio</code> element.
-      </audio>
+      <form onSubmit={handleDeleteFormSubmit}>
+        
+        <br />
+        <label className="label">{formLabel}</label>
 
-      <br />
-      <br />
+        <p className="control">
+          <button className={buttonCss}>
+            {buttonTitle}
+          </button>
+        </p>
 
-      <a className="button is-medium is-primary"
-          href={audioLink}
-          download={audioDownloadFilename}>Download File</a>
+      </form>
 
       <br />
       <br />
 
+      <h3 className="title is-3"> Info </h3>
 
-      <h4 className="title is-4"> Spectrogram </h4>
-      <SpectrogramFc spectrogramJsonLink={spectrogramLink} />
-
-      <br />
-      <br />
-
-      <h4 className="title is-4"> Spectrogram </h4>
       <table className="table">
         <thead>
           <tr>
@@ -229,20 +228,11 @@ function TtsResultViewFc(props: Props) {
             <td>{durationSeconds} seconds</td>
           </tr>
 
-          {moderatorRows}
-
         </tbody>
       </table>
 
-      <Link 
-        className="button is-danger is-large is-fullwidth"
-        to={FrontendUrlConfig.ttsResultDeletePage(token)}
-        >Delete?</Link>
-
-      <br />
-      <ReportDiscordLinkFc />
     </div>
   )
 }
 
-export { TtsResultViewFc };
+export { TtsResultDeleteFc };

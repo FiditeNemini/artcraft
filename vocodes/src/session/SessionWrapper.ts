@@ -118,6 +118,13 @@ export class SessionWrapper {
   public canDeleteOtherUsersW2lResults() : boolean {
     return this.sessionStateResponse?.user?.can_delete_other_users_w2l_results || false;
   }
+  
+  public deleteTtsResultAsMod(creatorUserToken: MaybeString) : boolean {
+    if (this.verifyUserTokenMatch(creatorUserToken)) {
+      return true;
+    }
+    return this.canDeleteOtherUsersTtsResults();
+  }
 
   private verifyUserTokenMatch(otherUserToken: MaybeString) : boolean {
     // Default to false if user token on either side is falsey. 
