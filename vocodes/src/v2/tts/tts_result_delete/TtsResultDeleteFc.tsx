@@ -157,7 +157,9 @@ function TtsResultDeleteFc(props: Props) {
     );
   }
 
-  const buttonTitle = currentlyDeleted ? "Undelete" : "Delete";
+  const h1Title = currentlyDeleted ? "Undelete Result?" : "Delete Result?";
+
+  const buttonTitle = currentlyDeleted ? "Confirm Undelete" : "Confirm Delete";
 
   const buttonCss = currentlyDeleted ? 
     "button is-warning is-large is-fullwidth" :
@@ -169,25 +171,7 @@ function TtsResultDeleteFc(props: Props) {
 
   return (
     <div>
-      <h1 className="title is-1"> Delete Result ?</h1>
-
-      <form onSubmit={handleDeleteFormSubmit}>
-        
-        <br />
-        <label className="label">{formLabel}</label>
-
-        <p className="control">
-          <button className={buttonCss}>
-            {buttonTitle}
-          </button>
-        </p>
-
-      </form>
-
-      <br />
-      <br />
-
-      <h3 className="title is-3"> Info </h3>
+      <h1 className="title is-1"> {h1Title} </h1>
 
       <table className="table">
         <thead>
@@ -230,6 +214,18 @@ function TtsResultDeleteFc(props: Props) {
 
         </tbody>
       </table>
+
+      <br />
+
+      <form onSubmit={handleDeleteFormSubmit}>
+        <label className="label">{formLabel}</label>
+
+        <p className="control">
+          <button className={buttonCss}>
+            {buttonTitle}
+          </button>
+        </p>
+      </form>
 
     </div>
   )

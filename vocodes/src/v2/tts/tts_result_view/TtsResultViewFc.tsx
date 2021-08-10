@@ -160,6 +160,15 @@ function TtsResultViewFc(props: Props) {
     subtitle = <h3 className="subtitle is-3"> TTS Result</h3>;
   }
 
+  const currentlyDeleted = !!ttsInferenceResult?.maybe_moderator_fields?.mod_deleted_at || 
+      !!ttsInferenceResult?.maybe_moderator_fields?.user_deleted_at;
+
+  const deleteButtonTitle = currentlyDeleted ? "Undelete?" : "Delete?";
+
+  const deleteButtonCss = currentlyDeleted ? 
+    "button is-warning is-large is-fullwidth" :
+    "button is-danger is-large is-fullwidth";
+
   return (
     <div>
       <h1 className="title is-1"> {headingTitle} </h1>
@@ -175,7 +184,7 @@ function TtsResultViewFc(props: Props) {
       <br />
       <br />
 
-      <a className="button is-medium is-primary"
+      <a className="button is-large is-primary is-fullwidth"
           href={audioLink}
           download={audioDownloadFilename}>Download File</a>
 
@@ -235,9 +244,9 @@ function TtsResultViewFc(props: Props) {
       </table>
 
       <Link 
-        className="button is-danger is-large is-fullwidth"
+        className={deleteButtonCss}
         to={FrontendUrlConfig.ttsResultDeletePage(token)}
-        >Delete?</Link>
+        >{deleteButtonTitle}</Link>
 
       <br />
       <ReportDiscordLinkFc />

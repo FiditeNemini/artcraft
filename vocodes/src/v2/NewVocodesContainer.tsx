@@ -1,8 +1,10 @@
 import React from 'react';
+import { AboutFc } from './about/about_page/AboutFc';
 import { FirehoseEventListFc } from './firehose/FirehoseEventListFc';
 import { LoginFc } from './login/LoginFc';
 import { ModerationFc } from './moderation/moderation_main/ModerationFc';
 import { ModerationIpBanListFc } from './moderation/moderation_ip_ban_list/ModerationIpBanListFc';
+import { ModerationViewIpBanFc } from './moderation/moderation_view_ip_ban/ModerationViewIpBanFc';
 import { NewFooterNavFc } from './NewFooterNavFc';
 import { NewTopNavFc } from './NewTopNavFc';
 import { ProfileEditFc } from './profile/profile_edit/ProfileEditFc';
@@ -10,11 +12,15 @@ import { ProfileFc } from './profile/profile_view/ProfileFc';
 import { SessionWrapper } from '../session/SessionWrapper';
 import { SignupComponent } from './signup/SignupComponent';
 import { Switch, Route, RouteProps } from 'react-router-dom';
+import { TermsFc } from './about/terms_page/TermsFc';
 import { TtsInferenceJob, W2lInferenceJob } from '../App';
+import { TtsModelDeleteFc } from './tts/tts_model_delete/TtsModelDeleteFc';
+import { TtsModelEditFc } from './tts/tts_model_edit/TtsModelEditFc';
 import { TtsModelFormFc } from './tts/tts_model_list/TtsModelFormFc';
 import { TtsModelListComponent } from './tts/tts_model_list/TtsModelListComponent';
 import { TtsModelUploadJob } from '../jobs/TtsModelUploadJobs';
 import { TtsModelViewFc } from './tts/tts_model_view/TtsModelViewFc';
+import { TtsResultDeleteFc } from './tts/tts_result_delete/TtsResultDeleteFc';
 import { TtsResultViewFc } from './tts/tts_result_view/TtsResultViewFc';
 import { UploadChoiceFc } from './upload/UploadChoiceFc';
 import { UploadTtsModelFc } from './upload/UploadTtsModelFc';
@@ -24,11 +30,6 @@ import { W2lResultViewFc } from './w2l/w2l_result_view/W2lResultViewFc';
 import { W2lTemplateListFc } from './w2l/w2l_template_list/W2lTemplateListFc';
 import { W2lTemplateUploadJob } from '../jobs/W2lTemplateUploadJobs';
 import { W2lTemplateViewFc } from './w2l/w2l_template_view/W2lTemplateViewFc';
-import { ModerationViewIpBanFc } from './moderation/moderation_view_ip_ban/ModerationViewIpBanFc';
-import { AboutFc } from './about/about_page/AboutFc';
-import { TermsFc } from './about/terms_page/TermsFc';
-import { TtsModelEditFc } from './tts/tts_model_edit/TtsModelEditFc';
-import { TtsResultDeleteFc } from './tts/tts_result_delete/TtsResultDeleteFc';
 
 interface Props {
   sessionWrapper: SessionWrapper,
@@ -127,6 +128,12 @@ class NewVocodesContainer extends React.Component<Props, State> {
                 sessionWrapper={this.props.sessionWrapper}
                 enqueueTtsJob={this.props.enqueueTtsJob}
                 ttsInferenceJobs={this.props.ttsInferenceJobs}
+              />
+            </Route>
+
+            <Route path="/tts/:token/delete">
+              <TtsModelDeleteFc
+                sessionWrapper={this.props.sessionWrapper}
               />
             </Route>
 
