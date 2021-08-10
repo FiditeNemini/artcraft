@@ -126,6 +126,13 @@ export class SessionWrapper {
     return this.canDeleteOtherUsersTtsResults();
   }
 
+  public deleteTtsModelAsMod(creatorUserToken: MaybeString) : boolean {
+    if (this.verifyUserTokenMatch(creatorUserToken)) {
+      return true;
+    }
+    return this.canDeleteOtherUsersTtsModels();
+  }
+
   private verifyUserTokenMatch(otherUserToken: MaybeString) : boolean {
     // Default to false if user token on either side is falsey. 
     if (otherUserToken === null || otherUserToken === undefined || otherUserToken === "") {

@@ -1,10 +1,9 @@
 
 import React, { useState, useEffect, useCallback } from 'react';
-//import axios from 'axios';
 import { ApiConfig } from '../../../common/ApiConfig';
-import { SessionWrapper } from '../../../session/SessionWrapper';
-import { useParams, Link } from 'react-router-dom';
 import { FrontendUrlConfig } from '../../../common/FrontendUrlConfig';
+import { SessionWrapper } from '../../../session/SessionWrapper';
+import { useParams, Link, useHistory } from 'react-router-dom';
 
 interface TtsModelViewResponsePayload {
   success: boolean,
@@ -44,6 +43,8 @@ interface Props {
 }
 
 function TtsModelDeleteFc(props: Props) {
+  const history = useHistory();
+
   let { token } = useParams() as { token : string };
 
   const [ttsModel, setTtsModel] = useState<TtsModel|undefined>(undefined);
@@ -101,6 +102,41 @@ function TtsModelDeleteFc(props: Props) {
     getModelUseCount(token);
   }, [token, getModel, getModelUseCount]);
 
+  const handleDeleteFormSubmit = (ev: React.FormEvent<HTMLFormElement>) : boolean => {
+    ev.preventDefault();
+
+    const api = new ApiConfig();
+    const endpointUrl = api.deleteTtsModel(token);
+
+    const request = {
+      set_delete: !currentlyDeleted,
+      as_mod: props.sessionWrapper.deleteTtsResultAsMod(ttsModel?.creator_user_token)
+    }
+
+    fetch(endpointUrl, {
+      method: 'POST',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+      },
+      credentials: 'include',
+      body: JSON.stringify(request),
+    })
+    .then(res => res.json())
+    .then(res => {
+      if (res.success) {
+        if (props.sessionWrapper.canDeleteOtherUsersTtsResults()) {
+          history.go(0); // force reload
+        } else {
+          history.push('/');
+        }
+      }
+    })
+    .catch(e => {
+    });
+    return false;
+  }
+
   let creatorLink = <span />;
 
   if (!!ttsModel?.creator_display_name) {
@@ -110,11 +146,20 @@ function TtsModelDeleteFc(props: Props) {
     );
   }
 
-  let deleted = !!ttsModel?.maybe_moderator_fields?.mod_deleted_at ||
-      !!ttsModel?.maybe_moderator_fields?.user_deleted_at ||
-      false;
+  let currentlyDeleted = !!ttsModel?.maybe_moderator_fields?.mod_deleted_at ||
+      !!ttsModel?.maybe_moderator_fields?.user_deleted_at;
 
-  let title = deleted ? 'Undelete TTS Model' : 'Delete TTS Model';
+  const h1Title = currentlyDeleted ? "Undelete Result?" : "Delete Result?";
+
+  const buttonTitle = currentlyDeleted ? "Confirm Undelete" : "Confirm Delete";
+
+  const buttonCss = currentlyDeleted ? 
+    "button is-warning is-large is-fullwidth" :
+    "button is-danger is-large is-fullwidth";
+
+  const formLabel = currentlyDeleted ? 
+     "Recover the TTS Model (makes it visible again)" : 
+     "Delete TTS Model (hides from everyone but mods)";
 
   let humanUseCount : string | number = 'Fetching...';
 
@@ -147,36 +192,14 @@ function TtsModelDeleteFc(props: Props) {
     );
   }
 
-  let editModelButton = <span />
-
-  if (!!ttsModel?.creator_user_token) {
-    if (props.sessionWrapper.canEditTtsModelByUserToken(ttsModel.creator_user_token)) {
-      let editLinkUrl = FrontendUrlConfig.ttsModelEditPage(token);
-      editModelButton = (
-          <Link 
-            className={"button is-medium is-info"}
-            to={editLinkUrl}>Edit Model Details</Link>
-      );
-    }
-  }
-
   return (
     <div className="content">
-      <h1 className="title is-1"> {title} </h1>
+      <h1 className="title is-1"> {h1Title} </h1>
       
       <p>
         <Link to="/">&lt; Back to all models</Link>
       </p>
       
-      <h4 className="title is-4"> Use Model </h4>
-
-      <h4 className="title is-4"> Model Details </h4>
-
-      <div 
-        className="profile content is-medium" 
-        dangerouslySetInnerHTML={{__html: ttsModel?.description_rendered_html || ""}}
-        />
-
       <table className="table">
         <thead>
           <tr>
@@ -219,7 +242,15 @@ function TtsModelDeleteFc(props: Props) {
 
       <br />
 
-      {editModelButton}
+      <form onSubmit={handleDeleteFormSubmit}>
+        <label className="label">{formLabel}</label>
+
+        <p className="control">
+          <button className={buttonCss}>
+            {buttonTitle}
+          </button>
+        </p>
+      </form>
 
       <br />
       <br />
