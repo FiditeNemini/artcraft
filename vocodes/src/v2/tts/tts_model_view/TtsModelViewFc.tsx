@@ -208,17 +208,42 @@ function TtsModelViewFc(props: Props) {
     );
   }
 
-  let editModelButton = <span />
+  let editModelButton = <span />;
 
-  if (!!ttsModel?.creator_user_token) {
-    if (props.sessionWrapper.canEditTtsModelByUserToken(ttsModel.creator_user_token)) {
-      let editLinkUrl = FrontendUrlConfig.ttsModelEditPage(token);
-      editModelButton = (
-          <Link 
-            className={"button is-medium is-info"}
-            to={editLinkUrl}>Edit Model Details</Link>
-      );
-    }
+  if (props.sessionWrapper.canEditTtsModelByUserToken(ttsModel?.creator_user_token)) {
+    editModelButton = (
+      <>
+        <br />
+        <Link 
+          className={"button is-large is-info is-fullwidth"}
+          to={FrontendUrlConfig.ttsModelEditPage(token)}
+          >Edit Model Details</Link>
+      </>
+    );
+  }
+
+  let deleteModelButton = <span />;
+
+  if (props.sessionWrapper.canDeleteTtsModelByUserToken(ttsModel?.creator_user_token)) {
+
+    const currentlyDeleted = !!ttsModel?.maybe_moderator_fields?.mod_deleted_at || 
+        !!ttsModel?.maybe_moderator_fields?.user_deleted_at;
+
+    const deleteButtonTitle = currentlyDeleted ? "Undelete Model?" : "Delete Model?";
+
+    const deleteButtonCss = currentlyDeleted ? 
+      "button is-warning is-large is-fullwidth" :
+      "button is-danger is-large is-fullwidth";
+
+    deleteModelButton = (
+      <>
+        <br />
+        <Link 
+          className={deleteButtonCss}
+          to={FrontendUrlConfig.ttsModelDeletePage(token)}
+          >{deleteButtonTitle}</Link>
+      </>
+    );
   }
 
   return (
@@ -291,9 +316,9 @@ function TtsModelViewFc(props: Props) {
         </tbody>
       </table>
 
-      <br />
-
       {editModelButton}
+
+      {deleteModelButton}
 
       <br />
       <br />

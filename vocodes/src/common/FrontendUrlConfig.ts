@@ -16,8 +16,8 @@ class FrontendUrlConfig {
     return `/tts/${modelToken}/edit`;
   }
 
-  static ttsModelDeleteConfirmPage(modelToken: string) : string {
-    return `/tts/${modelToken}/edit`;
+  static ttsModelDeletePage(modelToken: string) : string {
+    return `/tts/${modelToken}/delete`;
   }
 
   static ttsResultDeletePage(resultToken: string) : string {
