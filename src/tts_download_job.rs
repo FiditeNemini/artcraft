@@ -38,6 +38,7 @@ use crate::util::buckets::bucket_path_unifier::BucketPathUnifier;
 use crate::util::buckets::bucket_paths::hash_to_bucket_path;
 use crate::util::filesystem::{check_directory_exists, check_file_exists};
 use crate::util::hashing::hash_file_sha2::hash_file_sha2;
+use crate::util::noop_logger::NoOpLogger;
 use crate::util::random_crockford_token::random_crockford_token;
 use data_encoding::{HEXUPPER, HEXLOWER, HEXLOWER_PERMISSIVE};
 use log::{warn, info};
@@ -83,6 +84,9 @@ struct Downloader {
 
   // Sleep between batches
   pub job_batch_wait_millis: u64,
+
+  // How long to wait between log lines
+  pub no_op_logger_millis: u64,
 
   // Max job attempts before failure.
   // NB: This is an i32 so we don't need to convert to db column type.
@@ -177,6 +181,7 @@ async fn main() -> AnyhowResult<()> {
     tts_check: tts_model_check_command,
     job_batch_wait_millis: common_env.job_batch_wait_millis,
     job_max_attempts: common_env.job_max_attempts as i32,
+    no_op_logger_millis: common_env.no_op_logger_millis,
   };
 
   main_loop(downloader).await;
@@ -189,6 +194,8 @@ const INCREASE_TIMEOUT_MILLIS : u64 = 1000;
 
 async fn main_loop(downloader: Downloader) {
   let mut error_timeout_millis = START_TIMEOUT_MILLIS;
+
+  let mut noop_logger = NoOpLogger::new(downloader.no_op_logger_millis as i64);
 
   loop {
     let num_records = 1;
@@ -205,7 +212,8 @@ async fn main_loop(downloader: Downloader) {
     };
 
     if jobs.is_empty() {
-      info!("No jobs!");
+      noop_logger.log_after_awhile();
+      
       std::thread::sleep(Duration::from_millis(downloader.job_batch_wait_millis));
       continue;
     }
