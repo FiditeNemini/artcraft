@@ -4,6 +4,8 @@ import { Link, useHistory } from 'react-router-dom';
 import { SessionWrapper } from '../../../session/SessionWrapper';
 import { useParams } from 'react-router-dom';
 
+const DEFAULT_VISIBILITY = 'public';
+
 interface Props {
   sessionWrapper: SessionWrapper,
 }
@@ -35,8 +37,9 @@ interface UserPayload {
   //patreon_username?: string,
   cashapp_username?: string,
   created_at: string,
+  preferred_tts_result_visibility: string,
+  preferred_w2l_result_visibility: string,
 }
-
 
 function ProfileEditFc(props: Props) {
   const { username } = useParams() as { username: string };
@@ -56,6 +59,8 @@ function ProfileEditFc(props: Props) {
   const [github, setGithub] = useState<string>("");
   const [cashApp, setCashApp] = useState<string>("");
   const [websiteUrl, setWebsiteUrl] = useState<string>("");
+  const [preferredTtsResultVisibility, setPreferredTtsResultVisibility] = useState<string>(DEFAULT_VISIBILITY);
+  const [preferredW2lResultVisibility, setPreferredW2lResultVisibility] = useState<string>(DEFAULT_VISIBILITY);
 
   useEffect(() => {
     const api = new ApiConfig();
@@ -86,6 +91,9 @@ function ProfileEditFc(props: Props) {
       //setPatreon(profileResponse.user?.patreon_username || "");
       setGithub(profileResponse.user?.github_username || "");
       setWebsiteUrl(profileResponse.user?.website_url || "");
+
+      setPreferredTtsResultVisibility(profileResponse.user?.preferred_tts_result_visibility || DEFAULT_VISIBILITY);
+      setPreferredW2lResultVisibility(profileResponse.user?.preferred_w2l_result_visibility || DEFAULT_VISIBILITY);
     })
     .catch(e => {
       //this.props.onSpeakErrorCallback();
@@ -125,6 +133,14 @@ function ProfileEditFc(props: Props) {
     setWebsiteUrl((ev.target as HTMLInputElement).value)
   };
 
+  const handlePreferredTtsResultVisibilityChange = (ev: React.FormEvent<HTMLSelectElement>) => {
+    setPreferredTtsResultVisibility((ev.target as HTMLSelectElement).value)
+  };
+
+  const handlePreferredW2lResultVisibilityChange = (ev: React.FormEvent<HTMLSelectElement>) => {
+    setPreferredW2lResultVisibility((ev.target as HTMLSelectElement).value)
+  };
+
   const handleFormSubmit = (ev: React.FormEvent<HTMLFormElement>) : boolean => {
     ev.preventDefault();
 
@@ -140,6 +156,8 @@ function ProfileEditFc(props: Props) {
       github_username: github,
       //patreon_username: patreon,
       website_url: websiteUrl,
+      preferred_tts_result_visibility: preferredTtsResultVisibility,
+      preferred_w2l_result_visibility: preferredW2lResultVisibility,
     }
 
     fetch(endpointUrl, {
@@ -170,28 +188,65 @@ function ProfileEditFc(props: Props) {
 
   return (
     <div>
-      <h2 className="subtitle is-2">Editing Profile: {username}</h2>
+      <h2 className="subtitle is-2">Profile &amp; Preferences</h2>
 
-      <Link 
-        to={viewLinkUrl}>&lt; Back to profile</Link>
+      <Link to={viewLinkUrl}>&lt; Back to profile</Link>
 
       <br />
       <br />
-
-      <div className="content">
-
-        <p>
-          Profiles help you network with other creatives. 
-        </p>
-        <p>
-          We're going to make amazing and hilarious content together!
-        </p>
-      </div>
 
       <form onSubmit={handleFormSubmit}>
         <fieldset disabled={isDisabled}>
+
+        <h4 className="subtitle is-4">Preferences</h4>
+
+        <div className="content">
+          <p>
+            Control how the site functions.
+          </p>
+        </div>
+
+        <div className="field">
+          <label className="label">Audio Result Privacy</label>
+          <div className="control select">
+            <select 
+              name="preferred_tts_result_visibility"
+              onChange={handlePreferredTtsResultVisibilityChange}
+              value={preferredTtsResultVisibility}
+              >
+              <option value="public">Public (visible from your profile)</option>
+              <option value="hidden">Unlisted (shareable URLs)</option>
+            </select>
+          </div>
+        </div>
+
+        <div className="field">
+          <label className="label">Video Result Privacy</label>
+          <div className="control select">
+            <select 
+              name="preferred_w2l_result_visibility" 
+              onChange={handlePreferredW2lResultVisibilityChange}
+              value={preferredW2lResultVisibility}
+              >
+              <option value="public">Public (visible from your profile)</option>
+              <option value="hidden">Unlisted (shareable URLs)</option>
+            </select>
+          </div>
+        </div>
+
+        <br />
+
+        <h4 className="subtitle is-4">Profile</h4>
+
+        <div className="content">
+          <p>
+            Profiles help you network with other creatives. 
+            We're going to make amazing and hilarious content together!
+          </p>
+        </div>
+
           <div className="field">
-            <label className="label">Profile (supports Markdown)</label>
+            <label className="label">Bio or whatever (supports Markdown)</label>
             <div className="control">
               <textarea 
                 onChange={handleProfileMarkdownChange}

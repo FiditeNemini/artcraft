@@ -11,7 +11,7 @@ import { ProfileEditFc } from './profile/profile_edit/ProfileEditFc';
 import { ProfileFc } from './profile/profile_view/ProfileFc';
 import { SessionWrapper } from '../session/SessionWrapper';
 import { SignupComponent } from './signup/SignupComponent';
-import { Switch, Route, RouteProps } from 'react-router-dom';
+import { Switch, Route } from 'react-router-dom';
 import { TermsFc } from './about/terms_page/TermsFc';
 import { TtsInferenceJob, W2lInferenceJob } from '../App';
 import { TtsModelDeleteFc } from './tts/tts_model_delete/TtsModelDeleteFc';
@@ -88,21 +88,17 @@ class NewVocodesContainer extends React.Component<Props, State> {
             </Route>
 
 
-            <Route path="/profile/:username/edit"
-              render={(routeProps: RouteProps) => (
+            <Route path="/profile/:username/edit">
                 <ProfileEditFc
                   sessionWrapper={this.props.sessionWrapper}
                 />
-              )}
-            />
+            </Route>
 
-            <Route path="/profile/:username"
-              render={(routeProps: RouteProps) => (
+            <Route path="/profile/:username">
                 <ProfileFc
                   sessionWrapper={this.props.sessionWrapper}
                 />
-              )}
-            />
+            </Route>
 
             <Route path="/signup">
               <SignupComponent

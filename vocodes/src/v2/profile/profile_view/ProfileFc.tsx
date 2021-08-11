@@ -94,9 +94,12 @@ function ProfileFc(props: Props) {
   if (props.sessionWrapper.canEditUserProfile(username)) {
     let editLinkUrl = `/profile/${username}/edit`;
     editProfileButton = (
+      <>
         <Link 
-          className={"button is-medium is-info"}
-          to={editLinkUrl}>Edit</Link>
+          className={"button is-large is-fullwidth is-info"}
+          to={editLinkUrl}>Edit Profile</Link>
+        <br />
+      </>
     );
   }
 
