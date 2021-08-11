@@ -1875,6 +1875,16 @@
       "nullable": []
     }
   },
+  "3a2dc0a7e41dcbdf21f91d1a1e54e813f74b0bac7aea052302089cae195eeb53": {
+    "query": "\nUPDATE users\nSET\n    profile_markdown = ?,\n    profile_rendered_html = ?,\n    discord_username = ?,\n    twitter_username = ?,\n    twitch_username = ?,\n    github_username = ?,\n    cashapp_username = ?,\n    website_url = ?,\n    version = version + 1\n\nWHERE users.token = ?\nLIMIT 1\n        ",
+    "describe": {
+      "columns": [],
+      "parameters": {
+        "Right": 9
+      },
+      "nullable": []
+    }
+  },
   "40a3301e9a3201e74d49b6b339f67291e2ae22d315188401708609ac2d28a68c": {
     "query": "\nUPDATE tts_results\nSET\n  mod_deleted_at = NULL,\n  maybe_mod_user_token = ?\nWHERE\n  token = ?\nLIMIT 1\n        ",
     "describe": {
@@ -3198,16 +3208,6 @@
       "columns": [],
       "parameters": {
         "Right": 2
-      },
-      "nullable": []
-    }
-  },
-  "55a75db2d060bd49951db22f6b4ffd1545777b61c256030d59662543adc06ab2": {
-    "query": "\nUPDATE users\nSET\n    profile_markdown = ?,\n    profile_rendered_html = ?,\n    discord_username = ?,\n    twitter_username = ?,\n    twitch_username = ?,\n    github_username = ?,\n    cashapp_username = ?,\n    website_url = ?,\n    ip_address_last_update = ?,\n    version = version + 1\n\nWHERE users.token = ?\nLIMIT 1\n        ",
-    "describe": {
-      "columns": [],
-      "parameters": {
-        "Right": 10
       },
       "nullable": []
     }
@@ -7214,16 +7214,6 @@
       ]
     }
   },
-  "e49c75cab8eadb662ffc67e7cd0ebeec7157c97734a2aa8b238cf2b5e92d9351": {
-    "query": "\nUPDATE users\nSET\n    profile_markdown = ?,\n    profile_rendered_html = ?,\n    preferred_tts_result_visibility = ?,\n    preferred_w2l_result_visibility = ?,\n    discord_username = ?,\n    twitter_username = ?,\n    twitch_username = ?,\n    github_username = ?,\n    cashapp_username = ?,\n    website_url = ?,\n    version = version + 1\n\nWHERE users.token = ?\nLIMIT 1\n        ",
-    "describe": {
-      "columns": [],
-      "parameters": {
-        "Right": 11
-      },
-      "nullable": []
-    }
-  },
   "e4e5be790f087b9aa6bee87e2315140bf621e4919362ebe72ab070163f18e9c8": {
     "query": "\nUPDATE w2l_templates\nSET\n  maybe_mod_user_token = ?,\n  mod_deleted_at = CURRENT_TIMESTAMP\nWHERE\n  token = ?\nLIMIT 1\n        ",
     "describe": {
@@ -7682,6 +7672,16 @@
       "columns": [],
       "parameters": {
         "Right": 3
+      },
+      "nullable": []
+    }
+  },
+  "f75b713d166398ebea2bdbde4e416dc8eb2c48dba4aa9bd164bcf5bc77237ce1": {
+    "query": "\nUPDATE users\nSET\n    profile_markdown = ?,\n    profile_rendered_html = ?,\n    preferred_tts_result_visibility = ?,\n    preferred_w2l_result_visibility = ?,\n    discord_username = ?,\n    twitter_username = ?,\n    twitch_username = ?,\n    github_username = ?,\n    cashapp_username = ?,\n    website_url = ?,\n    ip_address_last_update = ?,\n    version = version + 1\n\nWHERE users.token = ?\nLIMIT 1\n        ",
+    "describe": {
+      "columns": [],
+      "parameters": {
+        "Right": 12
       },
       "nullable": []
     }
