@@ -2,6 +2,8 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { ApiConfig, ListW2lInferenceResultsForUserArgs } from '../../../common/ApiConfig';
 import { Link } from 'react-router-dom';
 import { formatDistance } from 'date-fns'
+import { VisibleIconFc } from '../../../icons/VisibleIconFc';
+import { HiddenIconFc } from '../../../icons/HiddenIconFc';
 
 interface W2lInferenceResultListResponsePayload {
   success: boolean,
@@ -28,6 +30,8 @@ interface W2lInferenceResult {
   frame_width: number,
   frame_height: number,
   duration_millis: number,
+
+  visibility: string,
 
   created_at: string,
   updated_at: string,
@@ -99,10 +103,12 @@ function ProfileW2lInferenceResultsListFc(props: Props) {
     const createTime = new Date(result.created_at);
     const relativeCreateTime = formatDistance(createTime, now, { addSuffix: true });
 
+    const visibilityIcon = (result.visibility === 'public') ? <VisibleIconFc /> : <HiddenIconFc /> ;
 
     rows.push(
       <tr key={result.w2l_result_token}>
         <td>{result.maybe_creator_result_id}</td>
+        <td>{visibilityIcon}</td>
           <th><Link to={inferenceLink}><span role="img" aria-label="result link">▶️</span> Result</Link></th>
         <th><Link to={templateLink}>{templateTitle}</Link></th>
         <td>(custom audio)</td>
@@ -123,12 +129,13 @@ function ProfileW2lInferenceResultsListFc(props: Props) {
       <table className="table">
         <thead>
           <tr>
-            <th><abbr title="Detail">#</abbr></th>
-            <th><abbr title="Detail">Result Link</abbr></th>
-            <th><abbr title="Detail">Template</abbr></th>
-            <th><abbr title="Detail">Audio Source</abbr></th>
-            <th><abbr title="Detail">Duration</abbr></th>
-            <th><abbr title="Value">Creation Time</abbr></th>
+            <th><abbr title="Number">#</abbr></th>
+            <th><abbr title="Visibility"><VisibleIconFc /></abbr></th>
+            <th><abbr title="Result View">Result Link</abbr></th>
+            <th><abbr title="Template">Template</abbr></th>
+            <th><abbr title="Source">Audio Source</abbr></th>
+            <th><abbr title="Duration">Duration</abbr></th>
+            <th><abbr title="Created">Creation Time</abbr></th>
           </tr>
         </thead>
         <tbody>

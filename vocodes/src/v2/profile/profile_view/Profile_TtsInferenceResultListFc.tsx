@@ -2,6 +2,8 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { ApiConfig, ListTtsInferenceResultsForUserArgs } from '../../../common/ApiConfig';
 import { Link } from 'react-router-dom';
 import { formatDistance } from 'date-fns';
+import { VisibleIconFc } from '../../../icons/VisibleIconFc';
+import { HiddenIconFc } from '../../../icons/HiddenIconFc';
 
 interface TtsInferenceResultListResponsePayload {
   success: boolean,
@@ -26,6 +28,8 @@ interface TtsInferenceResult {
 
   file_size_bytes: number,
   duration_millis: number,
+
+  visibility: string,
 
   created_at: string,
   updated_at: string,
@@ -98,9 +102,12 @@ function ProfileTtsInferenceResultsListFc(props: Props) {
     const createTime = new Date(result.created_at);
     const relativeCreateTime = formatDistance(createTime, now, { addSuffix: true });
 
+    const visibilityIcon = (result.visibility === 'public') ? <VisibleIconFc /> : <HiddenIconFc /> ;
+
     rows.push(
       <tr key={result.tts_result_token}>
         <td>{result.maybe_creator_result_id}</td>
+        <td>{visibilityIcon}</td>
         <th>
           <Link to={inferenceLink}><span role="img" aria-label="result link">▶️</span> {text}</Link>
           &nbsp;
@@ -123,11 +130,12 @@ function ProfileTtsInferenceResultsListFc(props: Props) {
       <table className="table">
         <thead>
           <tr>
-            <th><abbr title="Detail">#</abbr></th>
-            <th><abbr title="Detail">Download &amp; Play Link</abbr></th>
-            <th><abbr title="Detail">Model</abbr></th>
-            <th><abbr title="Detail">Duration</abbr></th>
-            <th><abbr title="Value">Creation Time</abbr></th>
+            <th><abbr title="Number">#</abbr></th>
+            <th><abbr title="Visibility"><VisibleIconFc /></abbr></th>
+            <th><abbr title="Download">Download &amp; Play Link</abbr></th>
+            <th><abbr title="Model">Model</abbr></th>
+            <th><abbr title="Duration">Duration</abbr></th>
+            <th><abbr title="Created">Creation Time</abbr></th>
           </tr>
         </thead>
         <tbody>
