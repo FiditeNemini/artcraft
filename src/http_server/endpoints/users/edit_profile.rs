@@ -54,8 +54,8 @@ pub struct EditProfileRequest {
   pub cashapp_username: Option<String>,
   pub website_url: Option<String>,
 
-  pub preferred_tts_result_visibility: RecordVisibility,
-  pub preferred_w2l_result_visibility: RecordVisibility,
+  pub preferred_tts_result_visibility: Option<RecordVisibility>,
+  pub preferred_w2l_result_visibility: Option<RecordVisibility>,
 }
 
 #[derive(Serialize)]
@@ -244,41 +244,14 @@ pub async fn edit_profile_handler(
 
   let ip_address = get_request_ip(&http_request);
 
+  let preferred_tts_result_visibility = request.preferred_tts_result_visibility
+      .unwrap_or(RecordVisibility::Hidden);
+
+  let preferred_w2l_result_visibility = request.preferred_w2l_result_visibility
+      .unwrap_or(RecordVisibility::Hidden);
+
   let query_result = if editor_is_original_user {
     // We need to store the IP address details.
-    sqlx::query!(
-        r#"
-UPDATE users
-SET
-    profile_markdown = ?,
-    profile_rendered_html = ?,
-    discord_username = ?,
-    twitter_username = ?,
-    twitch_username = ?,
-    github_username = ?,
-    cashapp_username = ?,
-    website_url = ?,
-    ip_address_last_update = ?,
-    version = version + 1
-
-WHERE users.token = ?
-LIMIT 1
-        "#,
-      profile_markdown,
-      profile_html,
-      discord_username,
-      twitter_username,
-      twitch_username,
-      github_username,
-      cashapp_username,
-      website_url,
-      ip_address.clone(),
-      user_record.user_token.clone(),
-    )
-    .execute(&server_state.mysql_pool)
-    .await
-  } else {
-    // We need to store the moderator details.
     sqlx::query!(
         r#"
 UPDATE users
@@ -293,6 +266,7 @@ SET
     github_username = ?,
     cashapp_username = ?,
     website_url = ?,
+    ip_address_last_update = ?,
     version = version + 1
 
 WHERE users.token = ?
@@ -300,8 +274,41 @@ LIMIT 1
         "#,
       profile_markdown,
       profile_html,
-      request.preferred_tts_result_visibility,
-      request.preferred_w2l_result_visibility,
+      preferred_tts_result_visibility.to_str(),
+      preferred_w2l_result_visibility.to_str(),
+      discord_username,
+      twitter_username,
+      twitch_username,
+      github_username,
+      cashapp_username,
+      website_url,
+      ip_address.clone(),
+      user_record.user_token.clone(),
+    )
+    .execute(&server_state.mysql_pool)
+    .await
+  } else {
+    // We need to store the moderator details.
+    // Also, mods shouldn't change user preferences.
+    sqlx::query!(
+        r#"
+UPDATE users
+SET
+    profile_markdown = ?,
+    profile_rendered_html = ?,
+    discord_username = ?,
+    twitter_username = ?,
+    twitch_username = ?,
+    github_username = ?,
+    cashapp_username = ?,
+    website_url = ?,
+    version = version + 1
+
+WHERE users.token = ?
+LIMIT 1
+        "#,
+      profile_markdown,
+      profile_html,
       discord_username,
       twitter_username,
       twitch_username,
