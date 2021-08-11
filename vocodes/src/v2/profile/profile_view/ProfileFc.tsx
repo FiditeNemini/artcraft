@@ -8,6 +8,9 @@ import { ProfileW2lInferenceResultsListFc } from './Profile_W2lInferenceResultLi
 import { ProfileW2lTemplateListFc } from './Profile_W2lTemplateListFc';
 import { SessionWrapper } from '../../../session/SessionWrapper';
 import { useParams } from 'react-router-dom';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faDiscord, faFirefox, faGithub, faTwitch, faTwitter } from '@fortawesome/free-brands-svg-icons';
+import { faDollarSign } from '@fortawesome/free-solid-svg-icons';
 
 interface Props {
   sessionWrapper: SessionWrapper,
@@ -119,7 +122,9 @@ function ProfileFc(props: Props) {
 
     profileRows.push(
       <tr key="website">
-        <th>Website</th>
+        <th>
+          Website&nbsp;<FontAwesomeIcon icon={faFirefox} />
+        </th>
         <td>{websiteUrl}</td>
       </tr>
     )
@@ -136,7 +141,9 @@ function ProfileFc(props: Props) {
     );
     profileRows.push(
       <tr key="twitch">
-        <th>Twitch</th>
+        <th>
+          Twitch&nbsp;<FontAwesomeIcon icon={faTwitch} />
+        </th>
         <td>{twitchLink}</td>
       </tr>
     )
@@ -153,7 +160,9 @@ function ProfileFc(props: Props) {
     );
     profileRows.push(
       <tr key="twitter">
-        <th>Twitter</th>
+        <th>
+          Twitter&nbsp;<FontAwesomeIcon icon={faTwitter} />
+        </th>
         <td>{twitterLink}</td>
       </tr>
     )
@@ -162,7 +171,9 @@ function ProfileFc(props: Props) {
   if (userData !== undefined && userData.discord_username) {
     profileRows.push(
       <tr key="discord">
-        <th>Discord</th>
+        <th>
+          Discord&nbsp;<FontAwesomeIcon icon={faDiscord} />
+        </th>
         <td>{userData.discord_username}</td>
       </tr>
     )
@@ -179,7 +190,9 @@ function ProfileFc(props: Props) {
     );
     profileRows.push(
       <tr key="github">
-        <th>Github</th>
+        <th>
+          Github&nbsp;<FontAwesomeIcon icon={faGithub} />
+        </th>
         <td>{githubLink}</td>
       </tr>
     )
@@ -197,7 +210,9 @@ function ProfileFc(props: Props) {
     );
     profileRows.push(
       <tr key="cashapp">
-        <th>CashApp</th>
+        <th>
+          CashApp&nbsp;<FontAwesomeIcon icon={faDollarSign} />
+        </th>
         <td>{cashAppLink}</td>
       </tr>
     )

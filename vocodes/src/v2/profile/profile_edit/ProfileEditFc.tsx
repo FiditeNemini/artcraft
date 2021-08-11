@@ -3,6 +3,8 @@ import { ApiConfig } from '../../../common/ApiConfig';
 import { Link, useHistory } from 'react-router-dom';
 import { SessionWrapper } from '../../../session/SessionWrapper';
 import { useParams } from 'react-router-dom';
+import { VisibleIconFc } from '../../../icons/VisibleIconFc';
+import { HiddenIconFc } from '../../../icons/HiddenIconFc';
 
 const DEFAULT_VISIBILITY = 'public';
 
@@ -186,6 +188,9 @@ function ProfileEditFc(props: Props) {
 
   let isDisabled = userData === undefined;
 
+  const ttsVisibilityIcon = (preferredTtsResultVisibility === 'public') ? <VisibleIconFc /> : <HiddenIconFc />;
+  const w2lVisibilityIcon = (preferredW2lResultVisibility === 'public') ? <VisibleIconFc /> : <HiddenIconFc />;
+
   return (
     <div>
       <h2 className="subtitle is-2">Profile &amp; Preferences</h2>
@@ -207,7 +212,9 @@ function ProfileEditFc(props: Props) {
         </div>
 
         <div className="field">
-          <label className="label">Audio Result Privacy</label>
+          <label className="label">
+            Audio Result Privacy&nbsp;{ttsVisibilityIcon}
+          </label>
           <div className="control select">
             <select 
               name="preferred_tts_result_visibility"
@@ -221,7 +228,9 @@ function ProfileEditFc(props: Props) {
         </div>
 
         <div className="field">
-          <label className="label">Video Result Privacy</label>
+          <label className="label">
+            Video Result Privacy&nbsp;{w2lVisibilityIcon}
+          </label>
           <div className="control select">
             <select 
               name="preferred_w2l_result_visibility" 
