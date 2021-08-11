@@ -5,6 +5,9 @@ import { SessionWrapper } from '../../../session/SessionWrapper';
 import { useParams } from 'react-router-dom';
 import { VisibleIconFc } from '../../../icons/VisibleIconFc';
 import { HiddenIconFc } from '../../../icons/HiddenIconFc';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faDiscord, faFirefox, faGithub, faTwitch, faTwitter } from '@fortawesome/free-brands-svg-icons';
+import { faDollarSign, faUser } from '@fortawesome/free-solid-svg-icons';
 
 const DEFAULT_VISIBILITY = 'public';
 
@@ -255,7 +258,9 @@ function ProfileEditFc(props: Props) {
         </div>
 
           <div className="field">
-            <label className="label">Bio or whatever (supports Markdown)</label>
+            <label className="label">
+              <FontAwesomeIcon icon={faUser} />&nbsp;Bio or whatever (supports Markdown)
+            </label>
             <div className="control">
               <textarea 
                 onChange={handleProfileMarkdownChange}
@@ -287,7 +292,9 @@ function ProfileEditFc(props: Props) {
           </div>*/}
 
           <div className="field">
-            <label className="label">Twitter Username</label>
+            <label className="label">
+              <FontAwesomeIcon icon={faTwitter} />&nbsp;Twitter Username
+            </label>
             <div className="control has-icons-left has-icons-right">
               <input 
                 onChange={handleTwitterChange}
@@ -307,7 +314,9 @@ function ProfileEditFc(props: Props) {
           </div>
 
           <div className="field">
-            <label className="label">Discord Username (don't forget the #0000)</label>
+            <label className="label">
+              <FontAwesomeIcon icon={faDiscord} />&nbsp;Discord Username (don't forget the #0000)
+            </label>
             <div className="control has-icons-left has-icons-right">
               <input 
                 onChange={handleDiscordChange}
@@ -327,7 +336,9 @@ function ProfileEditFc(props: Props) {
           </div>
 
           <div className="field">
-            <label className="label">Twitch Username</label>
+            <label className="label">
+              <FontAwesomeIcon icon={faTwitch} />&nbsp;Twitch Username
+            </label>
             <div className="control has-icons-left has-icons-right">
               <input 
                 onChange={handleTwitchChange}
@@ -347,7 +358,9 @@ function ProfileEditFc(props: Props) {
           </div>
 
           <div className="field">
-            <label className="label">CashApp $CashTag (for reward payouts)</label>
+            <label className="label">
+              <FontAwesomeIcon icon={faDollarSign} />&nbsp;CashApp $CashTag (for reward payouts)
+            </label>
             <div className="control has-icons-left has-icons-right">
               <input 
                 onChange={handleCashAppChange}
@@ -368,7 +381,9 @@ function ProfileEditFc(props: Props) {
 
 
           <div className="field">
-            <label className="label">Github Username (I'm hiring engineers and data scientists!)</label>
+            <label className="label">
+              <FontAwesomeIcon icon={faGithub} />&nbsp;Github Username (I'm hiring engineers and data scientists!)
+            </label>
             <div className="control has-icons-left has-icons-right">
               <input 
                 onChange={handleGithubChange}
@@ -388,7 +403,9 @@ function ProfileEditFc(props: Props) {
           </div>
 
           <div className="field">
-            <label className="label">Personal Website URL</label>
+            <label className="label">
+              <FontAwesomeIcon icon={faFirefox} />&nbsp;Personal Website URL
+            </label>
             <div className="control has-icons-left has-icons-right">
               <input 
                 onChange={handleWebsiteUrlChange}
