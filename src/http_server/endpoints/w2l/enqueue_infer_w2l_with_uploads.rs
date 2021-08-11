@@ -309,7 +309,7 @@ SET
         Some(audio_type.clone()),
         maybe_user_token.clone(),
         ip_address.to_string(),
-        set_visibility,
+        set_visibility.to_str(),
     )
     .execute(&server_state.mysql_pool)
     .await;

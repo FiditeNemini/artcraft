@@ -350,7 +350,7 @@ SET
       job.maybe_w2l_template_token.clone(),
       job.maybe_creator_user_token.clone(),
       job.creator_ip_address.clone(),
-      job.creator_set_visibility,
+      job.creator_set_visibility.to_str(),
 
       maybe_creator_synthetic_id,
 
