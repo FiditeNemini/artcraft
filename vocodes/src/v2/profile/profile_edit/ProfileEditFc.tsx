@@ -106,10 +106,6 @@ function ProfileEditFc(props: Props) {
 
   }, [username]); // NB: Empty array dependency sets to run ONLY on mount
 
-  if (!props.sessionWrapper.canEditUserProfile(username)) {
-    history.push(userProfilePage);
-  }
-
   const handleProfileMarkdownChange = (ev: React.FormEvent<HTMLTextAreaElement>) => {
     setProfileMarkdown((ev.target as HTMLTextAreaElement).value)
   };
@@ -187,7 +183,17 @@ function ProfileEditFc(props: Props) {
   }
 
 
-  let viewLinkUrl = `/profile/${username}`;
+  if (!userData) {
+    // Waiting for load.
+    return <span />;
+  }
+
+  if (!!userData && !props.sessionWrapper.canEditUserProfile(username)) {
+    // Loading and we don't have access.
+    history.push(userProfilePage);
+  }
+
+  let viewLinkUrl = `/profile/${userData?.username}`;
 
   let isDisabled = userData === undefined;
 
