@@ -95,12 +95,17 @@ function ProfileFc(props: Props) {
   let editProfileButton = <span />
 
   if (props.sessionWrapper.canEditUserProfile(username)) {
-    let editLinkUrl = `/profile/${username}/edit`;
+    const editLinkUrl = `/profile/${username}/edit`;
+
+    // Mods shouldn't edit preferences.
+    const buttonLabel = props.sessionWrapper.userTokenMatches(userData?.user_token) ? 
+      "Edit Profile & Preferences" : "Edit Profile";
+
     editProfileButton = (
       <>
         <Link 
           className={"button is-large is-fullwidth is-info"}
-          to={editLinkUrl}>Edit Profile</Link>
+          to={editLinkUrl}>{buttonLabel}</Link>
         <br />
       </>
     );

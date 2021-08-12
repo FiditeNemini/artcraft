@@ -52,23 +52,23 @@ export class SessionWrapper {
   }
 
   public canEditTtsModelByUserToken(userToken: MaybeString) : boolean {
-    return this.canEditOtherUsersTtsModels() || this.verifyUserTokenMatch(userToken);
+    return this.canEditOtherUsersTtsModels() || this.userTokenMatches(userToken);
   }
 
   public canDeleteTtsModelByUserToken(userToken: MaybeString) : boolean {
-    return this.canDeleteOtherUsersTtsModels() || this.verifyUserTokenMatch(userToken);
+    return this.canDeleteOtherUsersTtsModels() || this.userTokenMatches(userToken);
   }
 
   public canDeleteTtsResultByUserToken(userToken: MaybeString) : boolean {
-    return this.canDeleteOtherUsersTtsResults() || this.verifyUserTokenMatch(userToken);
+    return this.canDeleteOtherUsersTtsResults() || this.userTokenMatches(userToken);
   }
 
   public canDeleteW2lTemplateByUserToken(userToken: MaybeString) : boolean {
-    return this.canDeleteOtherUsersW2lTemplates() || this.verifyUserTokenMatch(userToken);
+    return this.canDeleteOtherUsersW2lTemplates() || this.userTokenMatches(userToken);
   }
 
   public canDeleteW2lResultByUserToken(userToken: MaybeString) : boolean {
-    return this.canDeleteOtherUsersW2lResults() || this.verifyUserTokenMatch(userToken);
+    return this.canDeleteOtherUsersW2lResults() || this.userTokenMatches(userToken);
   }
 
   public canUseTts() : boolean {
@@ -120,26 +120,26 @@ export class SessionWrapper {
   }
   
   public deleteTtsResultAsMod(creatorUserToken: MaybeString) : boolean {
-    if (this.verifyUserTokenMatch(creatorUserToken)) {
+    if (this.userTokenMatches(creatorUserToken)) {
       return true;
     }
     return this.canDeleteOtherUsersTtsResults();
   }
 
   public deleteTtsModelAsMod(creatorUserToken: MaybeString) : boolean {
-    if (this.verifyUserTokenMatch(creatorUserToken)) {
+    if (this.userTokenMatches(creatorUserToken)) {
       return true;
     }
     return this.canDeleteOtherUsersTtsModels();
   }
 
-  private verifyUserTokenMatch(otherUserToken: MaybeString) : boolean {
+  public userTokenMatches(otherUserToken: MaybeString) : boolean {
     // Default to false if user token on either side is falsey. 
-    if (otherUserToken === null || otherUserToken === undefined || otherUserToken === "") {
+    if (!otherUserToken) {
       return false;
     }
     const ourUserToken = this.sessionStateResponse?.user?.user_token;
-    if (ourUserToken === null || ourUserToken === undefined || ourUserToken === "") {
+    if (!ourUserToken) {
       return false;
     }
     return ourUserToken === otherUserToken;
