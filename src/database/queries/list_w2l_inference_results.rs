@@ -52,6 +52,7 @@ pub struct W2lInferenceRecordForList {
 /// testability, construction, and correctness.
 pub struct ListW2lResultsQueryBuilder {
   scope_creator_username: Option<String>,
+  include_user_hidden: bool,
   include_mod_deleted_results: bool,
   include_user_deleted_results: bool,
   include_templates_not_approved_for_public_listing: bool,
@@ -65,6 +66,7 @@ impl ListW2lResultsQueryBuilder {
   pub fn new() -> Self {
     Self {
       scope_creator_username: None,
+      include_user_hidden: false,
       include_mod_deleted_results: false,
       include_user_deleted_results: false,
       include_templates_not_approved_for_public_listing: false,
@@ -77,6 +79,11 @@ impl ListW2lResultsQueryBuilder {
 
   pub fn scope_creator_username(mut self, scope_creator_username: Option<&str>) -> Self {
     self.scope_creator_username = scope_creator_username.map(|u| u.to_string());
+    self
+  }
+
+  pub fn include_user_hidden(mut self, include_user_hidden: bool) -> Self {
+    self.include_user_hidden = include_user_hidden;
     self
   }
 
@@ -293,6 +300,15 @@ LEFT OUTER JOIN users
       }
     }
 
+    if !self.include_user_hidden {
+      if !first_predicate_added {
+        query.push_str(" WHERE w2l_results.creator_set_visibility = 'public'");
+        first_predicate_added = true;
+      } else {
+        query.push_str(" AND w2l_results.creator_set_visibility = 'public'");
+      }
+    }
+
     if !self.include_mod_deleted_results {
       if !first_predicate_added {
         query.push_str(" WHERE w2l_results.mod_deleted_at IS NULL");
@@ -364,6 +380,7 @@ mod tests {
 
     assert_eq!(&query_builder.build_predicates(),
       " WHERE w2l_templates.is_public_listing_approved IS TRUE \
+      AND w2l_results.creator_set_visibility = 'public' \
       AND w2l_results.mod_deleted_at IS NULL \
       AND w2l_results.user_deleted_at IS NULL \
       ORDER BY w2l_results.id DESC \
@@ -378,6 +395,20 @@ mod tests {
     assert_eq!(&query_builder.build_predicates(),
       " WHERE users.username = ? \
       AND w2l_templates.is_public_listing_approved IS TRUE \
+      AND w2l_results.creator_set_visibility = 'public' \
+      AND w2l_results.mod_deleted_at IS NULL \
+      AND w2l_results.user_deleted_at IS NULL \
+      ORDER BY w2l_results.id DESC \
+      LIMIT ?");
+  }
+
+  #[test]
+  fn predicates_including_user_hidden() {
+    let query_builder = ListW2lResultsQueryBuilder::new()
+        .include_user_hidden(true);
+
+    assert_eq!(&query_builder.build_predicates(),
+      " WHERE w2l_templates.is_public_listing_approved IS TRUE \
       AND w2l_results.mod_deleted_at IS NULL \
       AND w2l_results.user_deleted_at IS NULL \
       ORDER BY w2l_results.id DESC \
@@ -391,6 +422,7 @@ mod tests {
 
     assert_eq!(&query_builder.build_predicates(),
       " WHERE w2l_templates.is_public_listing_approved IS TRUE \
+      AND w2l_results.creator_set_visibility = 'public' \
       AND w2l_results.user_deleted_at IS NULL \
       ORDER BY w2l_results.id DESC \
       LIMIT ?");
@@ -403,6 +435,7 @@ mod tests {
 
     assert_eq!(&query_builder.build_predicates(),
       " WHERE w2l_templates.is_public_listing_approved IS TRUE \
+      AND w2l_results.creator_set_visibility = 'public' \
       AND w2l_results.mod_deleted_at IS NULL \
       ORDER BY w2l_results.id DESC \
       LIMIT ?");
@@ -416,6 +449,7 @@ mod tests {
 
     assert_eq!(&query_builder.build_predicates(),
       " WHERE w2l_templates.is_public_listing_approved IS TRUE \
+      AND w2l_results.creator_set_visibility = 'public' \
       ORDER BY w2l_results.id DESC \
       LIMIT ?");
   }
@@ -426,7 +460,8 @@ mod tests {
         .include_templates_not_approved_for_public_listing(true);
 
     assert_eq!(&query_builder.build_predicates(),
-      " WHERE w2l_results.mod_deleted_at IS NULL \
+      " WHERE w2l_results.creator_set_visibility = 'public' \
+      AND w2l_results.mod_deleted_at IS NULL \
       AND w2l_results.user_deleted_at IS NULL \
       ORDER BY w2l_results.id DESC \
       LIMIT ?");
@@ -439,7 +474,8 @@ mod tests {
         .include_mod_deleted_results(true);
 
     assert_eq!(&query_builder.build_predicates(),
-      " WHERE w2l_results.user_deleted_at IS NULL \
+      " WHERE w2l_results.creator_set_visibility = 'public' \
+      AND w2l_results.user_deleted_at IS NULL \
       ORDER BY w2l_results.id DESC \
       LIMIT ?");
   }
@@ -451,7 +487,8 @@ mod tests {
         .include_user_deleted_results(true);
 
     assert_eq!(&query_builder.build_predicates(),
-      " WHERE w2l_results.mod_deleted_at IS NULL \
+      " WHERE w2l_results.creator_set_visibility = 'public' \
+      AND w2l_results.mod_deleted_at IS NULL \
       ORDER BY w2l_results.id DESC \
       LIMIT ?");
   }
@@ -464,7 +501,8 @@ mod tests {
         .include_templates_not_approved_for_public_listing(true);
 
     assert_eq!(&query_builder.build_predicates(),
-      " ORDER BY w2l_results.id DESC \
+      " WHERE w2l_results.creator_set_visibility = 'public' \
+      ORDER BY w2l_results.id DESC \
       LIMIT ?");
   }
 
@@ -475,6 +513,7 @@ mod tests {
 
     assert_eq!(&query_builder.build_predicates(),
       " WHERE w2l_templates.is_public_listing_approved IS TRUE \
+      AND w2l_results.creator_set_visibility = 'public' \
       AND w2l_results.mod_deleted_at IS NULL \
       AND w2l_results.user_deleted_at IS NULL \
       ORDER BY w2l_results.id ASC \
@@ -489,6 +528,7 @@ mod tests {
     assert_eq!(&query_builder.build_predicates(),
       " WHERE w2l_results.id < ? \
       AND w2l_templates.is_public_listing_approved IS TRUE \
+      AND w2l_results.creator_set_visibility = 'public' \
       AND w2l_results.mod_deleted_at IS NULL \
       AND w2l_results.user_deleted_at IS NULL \
       ORDER BY w2l_results.id DESC \
@@ -504,6 +544,7 @@ mod tests {
     assert_eq!(&query_builder.build_predicates(),
       " WHERE w2l_results.id > ? \
       AND w2l_templates.is_public_listing_approved IS TRUE \
+      AND w2l_results.creator_set_visibility = 'public' \
       AND w2l_results.mod_deleted_at IS NULL \
       AND w2l_results.user_deleted_at IS NULL \
       ORDER BY w2l_results.id ASC \
@@ -518,6 +559,7 @@ mod tests {
     // NB: Does not change the query itself! Just the downstream binding.
     assert_eq!(&query_builder.build_predicates(),
       " WHERE w2l_templates.is_public_listing_approved IS TRUE \
+      AND w2l_results.creator_set_visibility = 'public' \
       AND w2l_results.mod_deleted_at IS NULL \
       AND w2l_results.user_deleted_at IS NULL \
       ORDER BY w2l_results.id DESC \
@@ -532,6 +574,7 @@ mod tests {
     // NB: Without a cursor, nothing happens.
     assert_eq!(&query_builder.build_predicates(),
       " WHERE w2l_templates.is_public_listing_approved IS TRUE \
+      AND w2l_results.creator_set_visibility = 'public' \
       AND w2l_results.mod_deleted_at IS NULL \
       AND w2l_results.user_deleted_at IS NULL \
       ORDER BY w2l_results.id DESC \
@@ -548,6 +591,7 @@ mod tests {
     assert_eq!(&query_builder.build_predicates(),
       " WHERE w2l_results.id > ? \
       AND w2l_templates.is_public_listing_approved IS TRUE \
+      AND w2l_results.creator_set_visibility = 'public' \
       AND w2l_results.mod_deleted_at IS NULL \
       AND w2l_results.user_deleted_at IS NULL \
       ORDER BY w2l_results.id ASC \
@@ -565,6 +609,7 @@ mod tests {
     assert_eq!(&query_builder.build_predicates(),
       " WHERE w2l_results.id < ? \
       AND w2l_templates.is_public_listing_approved IS TRUE \
+      AND w2l_results.creator_set_visibility = 'public' \
       AND w2l_results.mod_deleted_at IS NULL \
       AND w2l_results.user_deleted_at IS NULL \
       ORDER BY w2l_results.id DESC \
@@ -575,6 +620,28 @@ mod tests {
   fn predicates_limit_scope_user_offset_cursor_is_reversed_sort_ascending() {
     let query_builder = ListW2lResultsQueryBuilder::new()
         .limit(1000)
+        .scope_creator_username(Some("pikachu"))
+        .offset(Some(100))
+        .cursor_is_reversed(true)
+        .sort_ascending(true);
+
+    // NB: This will change the sort order and greater/less than direction!
+    assert_eq!(&query_builder.build_predicates(),
+      " WHERE w2l_results.id < ? \
+      AND users.username = ? \
+      AND w2l_templates.is_public_listing_approved IS TRUE \
+      AND w2l_results.creator_set_visibility = 'public' \
+      AND w2l_results.mod_deleted_at IS NULL \
+      AND w2l_results.user_deleted_at IS NULL \
+      ORDER BY w2l_results.id DESC \
+      LIMIT ?");
+  }
+
+  #[test]
+  fn predicates_limit_scope_user_show_hidden_offset_cursor_is_reversed_sort_ascending() {
+    let query_builder = ListW2lResultsQueryBuilder::new()
+        .limit(1000)
+        .include_user_hidden(true)
         .scope_creator_username(Some("pikachu"))
         .offset(Some(100))
         .cursor_is_reversed(true)

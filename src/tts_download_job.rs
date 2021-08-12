@@ -213,7 +213,7 @@ async fn main_loop(downloader: Downloader) {
 
     if jobs.is_empty() {
       noop_logger.log_after_awhile();
-      
+
       std::thread::sleep(Duration::from_millis(downloader.job_batch_wait_millis));
       continue;
     }

@@ -120,11 +120,13 @@ pub async fn list_user_w2l_inference_results_handler(
     None
   };
 
+  let include_user_hidden = is_author || is_mod_that_can_see_deleted;
   let include_unapproved = is_author || is_mod_that_can_approve_w2l_templates;
 
   let mut query_builder = ListW2lResultsQueryBuilder::new()
       .sort_ascending(sort_ascending)
       .scope_creator_username(Some(path.username.as_ref()))
+      .include_user_hidden(include_user_hidden)
       .include_user_deleted_results(is_mod_that_can_see_deleted)
       .include_mod_deleted_results(is_mod_that_can_see_deleted)
       .include_templates_not_approved_for_public_listing(include_unapproved)

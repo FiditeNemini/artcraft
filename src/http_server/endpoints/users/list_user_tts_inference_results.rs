@@ -90,11 +90,14 @@ pub async fn list_user_tts_inference_results_handler(
         ListTtsInferenceResultsForUserError::ServerError
       })?;
 
+  // Permissions & ACLs
+  let mut viewer_is_user = false;
   let mut is_mod_that_can_see_deleted = false;
 
   match maybe_user_session {
     None => {},
     Some(session) => {
+      viewer_is_user = path.username == session.username;
       is_mod_that_can_see_deleted = session.can_delete_other_users_tts_results;
     },
   };
@@ -117,9 +120,12 @@ pub async fn list_user_tts_inference_results_handler(
     None
   };
 
+  let include_user_hidden = viewer_is_user || is_mod_that_can_see_deleted;
+
   let mut query_builder = ListTtsResultsQueryBuilder::new()
       .sort_ascending(sort_ascending)
       .scope_creator_username(Some(path.username.as_ref()))
+      .include_user_hidden(include_user_hidden)
       .include_mod_disabled_results(is_mod_that_can_see_deleted)
       .limit(limit)
       .cursor_is_reversed(cursor_is_reversed)
