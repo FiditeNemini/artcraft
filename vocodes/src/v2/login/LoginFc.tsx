@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { SessionWrapper } from '../../session/SessionWrapper';
 import { useHistory } from "react-router-dom";
 import { ApiConfig } from '../../common/ApiConfig';
+import { UserIcon } from '../../icons/UserIcon';
+import { EnvelopeIcon } from '../../icons/EnvelopeIcon';
 
 //enum FieldTriState {
 //  EMPTY_FALSE,
@@ -87,10 +89,7 @@ function LoginFc(props: Props) {
           <div className="control has-icons-left has-icons-right">
             <input className="input" type="text" placeholder="Username or Email" value={usernameOrEmail} onChange={handleUsernameOrEmailChange} />
             <span className="icon is-small is-left">
-              <i className="fas fa-user"></i>
-            </span>
-            <span className="icon is-small is-right">
-              <i className="fas fa-check"></i>
+              <UserIcon />
             </span>
           </div>
           {/*<p className="help"></p>*/}
@@ -101,10 +100,7 @@ function LoginFc(props: Props) {
           <div className="control has-icons-left has-icons-right">
             <input className="input" type="password" placeholder="Password" value={password} onChange={handlePasswordChange} />
             <span className="icon is-small is-left">
-              <i className="fas fa-envelope"></i>
-            </span>
-            <span className="icon is-small is-right">
-              <i className="fas fa-exclamation-triangle"></i>
+              <EnvelopeIcon />
             </span>
           </div>
           {/*<p className="help"></p>*/}
@@ -112,11 +108,8 @@ function LoginFc(props: Props) {
 
         <br />
 
-        <div className="field is-grouped">
-          <div className="control">
-            <button className="button is-link is-large">Login</button>
-          </div>
-        </div>
+        <button className="button is-link is-large is-fullwidth">Login</button>
+
       </form>
     </div>
   )

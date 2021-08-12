@@ -9,6 +9,7 @@ import { SessionW2lInferenceResultListFc } from '../../common/SessionW2lInferenc
 import { W2lTemplateViewDeleteFc } from './W2lTemplateView_DeleteFc';
 import { ReportDiscordLinkFc } from '../../common/DiscordReportLinkFc';
 import { BucketConfig } from '../../../common/BucketConfig';
+import { UploadIcon } from '../../../icons/UploadIcon';
 
 interface W2lTemplateViewResponsePayload {
   success: boolean,
@@ -340,9 +341,7 @@ function W2lTemplateViewFc(props: Props) {
                 onChange={ (e) => handleAudioFileChange(e.target.files) }
                 />
               <span className="file-cta">
-                <span className="file-icon">
-                  <i className="fas fa-upload"></i>
-                </span>
+                <UploadIcon />&nbsp;
                 <span className="file-label">
                   Choose audio file&hellip;
                 </span>

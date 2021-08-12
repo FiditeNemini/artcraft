@@ -1,8 +1,11 @@
 import React from 'react';
 import { ApiConfig } from '../../common/ApiConfig';
+import { AsteriskIcon } from '../../icons/AsteriskIcon';
+import { EnvelopeIcon } from '../../icons/EnvelopeIcon';
+import { Link } from 'react-router-dom';
 import { Mode } from '../../AppMode';
 import { SessionWrapper } from '../../session/SessionWrapper';
-import { Link } from 'react-router-dom';
+import { UserIcon } from '../../icons/UserIcon';
 
 enum FieldTriState {
   EMPTY_FALSE,
@@ -300,20 +303,13 @@ class SignupComponent extends React.Component<Props, State> {
       <div>
         <h1 className="title is-1"> Sign Up </h1>
 
-        <Link to="/login"
-          className="button is-danger is-inverted"
-          >Already have an account? Log in instead!</Link>
-
         <form onSubmit={this.handleFormSubmit}>
           <div className="field">
             <label className="label">Username</label>
             <div className="control has-icons-left has-icons-right">
               <input className={usernameInputClass} type="text" placeholder="Username" value={this.state.username} onChange={this.handleUsernameChange} />
               <span className="icon is-small is-left">
-                <i className="fas fa-user"></i>
-              </span>
-              <span className="icon is-small is-right">
-                <i className="fas fa-check"></i>
+                <UserIcon />
               </span>
             </div>
             <p className={usernameHelpClass}>{this.state.usernameInvalidReason}</p>
@@ -324,10 +320,7 @@ class SignupComponent extends React.Component<Props, State> {
             <div className="control has-icons-left has-icons-right">
               <input className={emailInputClass} type="email" placeholder="Email" value={this.state.email} onChange={this.handleEmailChange} />
               <span className="icon is-small is-left">
-                <i className="fas fa-envelope"></i>
-              </span>
-              <span className="icon is-small is-right">
-                <i className="fas fa-exclamation-triangle"></i>
+                <EnvelopeIcon />
               </span>
             </div>
             <p className={emailHelpClass}>{this.state.emailInvalidReason}</p>
@@ -338,10 +331,7 @@ class SignupComponent extends React.Component<Props, State> {
             <div className="control has-icons-left has-icons-right">
               <input className={passwordInputClass} type="password" placeholder="Password" value={this.state.password} onChange={this.handlePasswordChange} />
               <span className="icon is-small is-left">
-                <i className="fas fa-envelope"></i>
-              </span>
-              <span className="icon is-small is-right">
-                <i className="fas fa-exclamation-triangle"></i>
+                <AsteriskIcon />
               </span>
             </div>
             <p className={passwordHelpClass}>{this.state.passwordInvalidReason}</p>
@@ -352,13 +342,12 @@ class SignupComponent extends React.Component<Props, State> {
             <div className="control has-icons-left has-icons-right">
               <input className={passwordConfirmationInputClass} type="password" placeholder="Password confirmation" value={this.state.passwordConfirmation} onChange={this.handlePasswordConfirmationChange} />
               <span className="icon is-small is-left">
-                <i className="fas fa-envelope"></i>
-              </span>
-              <span className="icon is-small is-right">
-                <i className="fas fa-exclamation-triangle"></i>
+                <AsteriskIcon />
               </span>
             </div>
-            <p className={passwordConfirmationHelpClass}>{this.state.passwordConfirmationInvalidReason}</p>
+            <p className={passwordConfirmationHelpClass}>
+              {this.state.passwordConfirmationInvalidReason}
+            </p>
           </div>
 
           <br />
@@ -369,13 +358,14 @@ class SignupComponent extends React.Component<Props, State> {
             password, please let us know in Discord.
           </div>
 
-          <div className="field is-grouped">
-            <div className="control">
-              <button className="button is-link is-large">Sign up</button>
-            </div>
-          </div>
-
+          <button className="button is-link is-large is-fullwidth">Sign up</button>
         </form>
+
+        <br />
+
+        <Link to="/login"
+          className="button is-info is-large is-fullwidth is-inverted"
+          >Already have an account? Log in instead!</Link>
 
       </div>
     )
