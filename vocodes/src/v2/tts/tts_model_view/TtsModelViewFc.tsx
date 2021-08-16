@@ -189,19 +189,25 @@ function TtsModelViewFc(props: Props) {
     moderatorRows = (
       <>
         <tr>
-          <th>Creator IP Address (Creation)</th>
+          <td colSpan={2}>
+            <br />
+            <h4 className="subtitle is-4"> Moderator Details </h4>
+          </td>
+        </tr>
+        <tr>
+          <th>Creation IP address</th>
           <td>{ttsModel?.maybe_moderator_fields?.creator_ip_address_creation || "server error"}</td>
         </tr>
         <tr>
-          <th>Creator IP Address (Update)</th>
+          <th>Update IP address</th>
           <td>{ttsModel?.maybe_moderator_fields?.creator_ip_address_last_update || "server error"}</td>
         </tr>
         <tr>
-          <th>Mod Deleted At (UTC)</th>
+          <th>Mod deleted at (UTC)</th>
           <td>{ttsModel?.maybe_moderator_fields?.mod_deleted_at || "not deleted"}</td>
         </tr>
         <tr>
-          <th>User Deleted At (UTC)</th>
+          <th>User deleted at (UTC)</th>
           <td>{ttsModel?.maybe_moderator_fields?.user_deleted_at || "not deleted"}</td>
         </tr>
       </>
@@ -246,6 +252,20 @@ function TtsModelViewFc(props: Props) {
     );
   }
 
+  let modelDescription = null;
+
+  if (!!ttsModel?.description_rendered_html) {
+    modelDescription = (
+      <>
+        <h4 className="title is-4"> Model Description </h4>
+        <div 
+          className="profile content is-medium" 
+          dangerouslySetInnerHTML={{__html: ttsModel?.description_rendered_html || ""}}
+          />
+      </>
+    );
+  }
+
   return (
     <div className="content">
       <h1 className="title is-1"> {title} </h1>
@@ -269,21 +289,15 @@ function TtsModelViewFc(props: Props) {
       
       <SessionTtsInferenceResultListFc ttsInferenceJobs={props.ttsInferenceJobs} />
     
-      <h4 className="title is-4"> Model Details </h4>
-
-      <div 
-        className="profile content is-medium" 
-        dangerouslySetInnerHTML={{__html: ttsModel?.description_rendered_html || ""}}
-        />
+      {modelDescription}
 
       <table className="table">
-        <thead>
-          <tr>
-            <th><abbr title="Detail">Detail</abbr></th>
-            <th><abbr title="Value">Value</abbr></th>
-          </tr>
-        </thead>
         <tbody>
+          <tr>
+            <td colSpan={2}>
+              <h4 className="subtitle is-4"> Model Details </h4>
+            </td>
+          </tr>
           <tr>
             <th>Creator</th>
             <td>
@@ -291,7 +305,7 @@ function TtsModelViewFc(props: Props) {
             </td>
           </tr>
           <tr>
-            <th>Use Count</th>
+            <th>Use count</th>
             <td>{humanUseCount}</td>
           </tr>
           <tr>
@@ -299,15 +313,15 @@ function TtsModelViewFc(props: Props) {
             <td>{ttsModel?.title}</td>
           </tr>
           <tr>
-            <th>Model Type</th>
+            <th>Model type</th>
             <td>{ttsModel?.tts_model_type}</td>
           </tr>
           <tr>
-            <th>Text Preprocessing Algorithm</th>
+            <th>Text preprocessing algorithm</th>
             <td>{ttsModel?.text_preprocessing_algorithm}</td>
           </tr>
           <tr>
-            <th>Upload Date (UTC)</th>
+            <th>Upload date (UTC)</th>
             <td>{ttsModel?.created_at}</td>
           </tr>
 
