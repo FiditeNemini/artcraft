@@ -291,7 +291,7 @@ function TtsModelViewFc(props: Props) {
     
       {modelDescription}
 
-      <table className="table">
+      <table className="table is-fullwidth">
         <tbody>
           <tr>
             <td colSpan={2}>
