@@ -100,15 +100,21 @@ function W2lResultViewFc(props: Props) {
     moderatorRows = (
       <>
         <tr>
-          <th>Creator IP Address (Creation)</th>
+          <td colSpan={2}>
+            <br />
+            <h4 className="subtitle is-4"> Moderator Details </h4>
+          </td>
+        </tr>
+        <tr>
+          <th>Creator IP address</th>
           <td>{w2lInferenceResult?.maybe_moderator_fields?.creator_ip_address || "server error"}</td>
         </tr>
         <tr>
-          <th>Mod Deleted At (UTC)</th>
+          <th>Mod deleted at (UTC)</th>
           <td>{w2lInferenceResult?.maybe_moderator_fields?.mod_deleted_at || "not deleted"}</td>
         </tr>
         <tr>
-          <th>User Deleted At (UTC)</th>
+          <th>User deleted at (UTC)</th>
           <td>{w2lInferenceResult?.maybe_moderator_fields?.user_deleted_at || "not deleted"}</td>
         </tr>
       </>
@@ -167,24 +173,31 @@ function W2lResultViewFc(props: Props) {
           href={videoLink}
           download={videoDownloadFilename}>Download File</a>
 
-
       <br />
       <br />
 
-      <h4 className="title is-4"> Details </h4>
 
       <table className="table">
-        <thead>
-          <tr>
-            <th><abbr title="Detail">Detail</abbr></th>
-            <th><abbr title="Value">Value</abbr></th>
-          </tr>
-        </thead>
         <tbody>
+          <tr>
+            <td colSpan={2}>
+              <h4 className="subtitle is-4"> Result Details </h4>
+            </td>
+          </tr>
           <tr>
             <th>Creator</th>
             <td>
               {creatorDetails}
+            </td>
+          </tr>
+          <tr>
+            <th>Duration</th>
+            <td>{durationSeconds} seconds</td>
+          </tr>
+          <tr>
+            <td colSpan={2}>
+              <br />
+              <h4 className="subtitle is-4"> Template Details </h4>
             </td>
           </tr>
           <tr>
@@ -204,10 +217,6 @@ function W2lResultViewFc(props: Props) {
           <tr>
             <th>Dimensions</th>
             <td>{w2lInferenceResult?.frame_width} x {w2lInferenceResult?.frame_height}</td>
-          </tr>
-          <tr>
-            <th>Duration</th>
-            <td>{durationSeconds} seconds</td>
           </tr>
 
           {moderatorRows}
