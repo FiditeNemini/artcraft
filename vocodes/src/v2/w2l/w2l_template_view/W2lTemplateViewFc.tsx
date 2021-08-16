@@ -379,6 +379,10 @@ function W2lTemplateViewFc(props: Props) {
             </td>
           </tr>
           <tr>
+            <th>Title</th>
+            <td>{w2lTemplate?.title}</td>
+          </tr>
+          <tr>
             <th>Creator</th>
             <td>
               <Link to={creatorLink}>{w2lTemplate?.creator_display_name}</Link>
@@ -387,10 +391,6 @@ function W2lTemplateViewFc(props: Props) {
           <tr>
             <th>Use count</th>
             <td>{humanUseCount}</td>
-          </tr>
-          <tr>
-            <th>Title</th>
-            <td>{w2lTemplate?.title}</td>
           </tr>
           <tr>
             <th>Is public listing approved?</th>
