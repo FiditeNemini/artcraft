@@ -7,6 +7,8 @@ import { SpectrogramFc } from './SpectrogramFc';
 import { ReportDiscordLinkFc } from '../../common/DiscordReportLinkFc';
 import { BucketConfig } from '../../../common/BucketConfig';
 import { FrontendUrlConfig } from '../../../common/FrontendUrlConfig';
+import { HiddenIconFc } from '../../../icons/HiddenIconFc';
+import { VisibleIconFc } from '../../../icons/VisibleIconFc';
 
 interface TtsInferenceResultResponsePayload {
   success: boolean,
@@ -33,6 +35,8 @@ interface TtsInferenceResult {
 
   public_bucket_wav_audio_path: string,
   public_bucket_spectrogram_path: string,
+
+  creator_set_visibility?: string,
 
   file_size_bytes: number,
   duration_millis: number,
@@ -159,6 +163,11 @@ function TtsResultViewFc(props: Props) {
     );
   }
 
+  let resultVisibility = ttsInferenceResult?.creator_set_visibility === 'hidden' ? 
+    <span>Hidden <HiddenIconFc /></span> :
+    <span>Public <VisibleIconFc /></span> ;
+
+
   let headingTitle = 'TTS Result';
   let subtitle = <span />;
   if (ttsInferenceResult.tts_model_title !== undefined && ttsInferenceResult.tts_model_title !== null) {
@@ -225,6 +234,10 @@ function TtsResultViewFc(props: Props) {
           <tr>
             <th>Audio duration</th>
             <td>{durationSeconds} seconds</td>
+          </tr>
+          <tr>
+            <th>Visibility</th>
+            <td>{resultVisibility}</td>
           </tr>
         </tbody>
         <tr>

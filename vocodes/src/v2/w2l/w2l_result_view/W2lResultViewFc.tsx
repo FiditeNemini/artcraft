@@ -6,6 +6,8 @@ import { useParams, Link } from 'react-router-dom';
 import { W2lResultViewDeleteFc } from './W2lResultView_DeleteFc';
 import { ReportDiscordLinkFc } from '../../common/DiscordReportLinkFc';
 import { BucketConfig } from '../../../common/BucketConfig';
+import { HiddenIconFc } from '../../../icons/HiddenIconFc';
+import { VisibleIconFc } from '../../../icons/VisibleIconFc';
 
 interface W2lInferenceResultResponsePayload {
   success: boolean,
@@ -29,6 +31,8 @@ interface W2lInferenceResult {
   maybe_template_creator_username?: string,
   maybe_template_creator_display_name?: string,
   maybe_template_creator_gravatar_hash?: string,
+
+  creator_set_visibility?: string,
 
   file_size_bytes: number,
   frame_width: number,
@@ -157,6 +161,10 @@ function W2lResultViewFc(props: Props) {
     );
   }
 
+  let resultVisibility = w2lInferenceResult?.creator_set_visibility === 'hidden' ? 
+    <span>Hidden <HiddenIconFc /></span> :
+    <span>Public <VisibleIconFc /></span> ;
+
   return (
     <div>
       <h1 className="title is-1"> Lipsync Result </h1>
@@ -193,6 +201,10 @@ function W2lResultViewFc(props: Props) {
           <tr>
             <th>Duration</th>
             <td>{durationSeconds} seconds</td>
+          </tr>
+          <tr>
+            <th>Visibility</th>
+            <td>{resultVisibility}</td>
           </tr>
           <tr>
             <td colSpan={2}>
