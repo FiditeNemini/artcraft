@@ -292,19 +292,25 @@ function W2lTemplateViewFc(props: Props) {
     moderatorRows = (
       <>
         <tr>
-          <th>Creator IP Address (Creation)</th>
+          <td colSpan={2}>
+            <br />
+            <h4 className="subtitle is-4"> Moderator Details </h4>
+          </td>
+        </tr>
+        <tr>
+          <th>Create IP address</th>
           <td>{w2lTemplate?.maybe_moderator_fields?.creator_ip_address_creation || "server error"}</td>
         </tr>
         <tr>
-          <th>Creator IP Address (Update)</th>
+          <th>Update IP address</th>
           <td>{w2lTemplate?.maybe_moderator_fields?.creator_ip_address_last_update || "server error"}</td>
         </tr>
         <tr>
-          <th>Mod Deleted At (UTC)</th>
+          <th>Mod deleted at (UTC)</th>
           <td>{w2lTemplate?.maybe_moderator_fields?.mod_deleted_at || "not deleted"}</td>
         </tr>
         <tr>
-          <th>User Deleted At (UTC)</th>
+          <th>User deleted at (UTC)</th>
           <td>{w2lTemplate?.maybe_moderator_fields?.user_deleted_at || "not deleted"}</td>
         </tr>
       </>
@@ -359,18 +365,19 @@ function W2lTemplateViewFc(props: Props) {
 
       <br />
 
-      <h3 className="title is-3"> Template Details </h3>
+      <div className="template-preview">
+        <img src={url} alt="template preview" />
+      </div>
 
-      <img src={url} alt="template preview" />
+      <br />
 
-      <table className="table">
-        <thead>
-          <tr>
-            <th><abbr title="Detail">Detail</abbr></th>
-            <th><abbr title="Value">Value</abbr></th>
-          </tr>
-        </thead>
+      <table className="table is-fullwidth">
         <tbody>
+          <tr>
+            <td colSpan={2}>
+              <h4 className="subtitle is-4"> Template Details </h4>
+            </td>
+          </tr>
           <tr>
             <th>Creator</th>
             <td>
@@ -378,7 +385,7 @@ function W2lTemplateViewFc(props: Props) {
             </td>
           </tr>
           <tr>
-            <th>Use Count</th>
+            <th>Use count</th>
             <td>{humanUseCount}</td>
           </tr>
           <tr>
@@ -386,11 +393,11 @@ function W2lTemplateViewFc(props: Props) {
             <td>{w2lTemplate?.title}</td>
           </tr>
           <tr>
-            <th>Is Public Listing Approved?</th>
+            <th>Is public listing approved?</th>
             <td>{modApprovalStatus}</td>
           </tr>
           <tr>
-            <th>Media Type</th>
+            <th>Media type</th>
             <td>{w2lTemplate?.template_type}</td>
           </tr>
           <tr>
@@ -402,11 +409,11 @@ function W2lTemplateViewFc(props: Props) {
             <td>{w2lTemplate?.duration_millis}</td>
           </tr>
           <tr>
-            <th>Created At (UTC)</th>
+            <th>Created at (UTC)</th>
             <td>{w2lTemplate?.created_at}</td>
           </tr>
           <tr>
-            <th>Updated At (UTC)</th>
+            <th>Updated at (UTC)</th>
             <td>{w2lTemplate?.updated_at}</td>
           </tr>
 
