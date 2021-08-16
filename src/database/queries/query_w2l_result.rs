@@ -11,6 +11,7 @@ use sqlx::error::DatabaseError;
 use sqlx::error::Error::Database;
 use sqlx::mysql::MySqlDatabaseError;
 use std::sync::Arc;
+use crate::database::enums::record_visibility::RecordVisibility;
 
 #[derive(Serialize)]
 pub struct W2lResultRecordForResponse {
@@ -32,6 +33,8 @@ pub struct W2lResultRecordForResponse {
   pub maybe_template_creator_username: Option<String>,
   pub maybe_template_creator_display_name: Option<String>,
   pub maybe_template_creator_gravatar_hash: Option<String>,
+
+  pub creator_set_visibility: RecordVisibility,
 
   pub file_size_bytes: u32,
   pub frame_width: u32,
@@ -77,6 +80,8 @@ pub struct W2lResultRecordRaw {
   pub maybe_template_creator_username: Option<String>,
   pub maybe_template_creator_display_name: Option<String>,
   pub maybe_template_creator_gravatar_hash: Option<String>,
+
+  pub creator_set_visibility: String,
 
   pub file_size_bytes: i32,
   pub frame_width: i32,
@@ -142,6 +147,10 @@ pub async fn select_w2l_result_by_token(
     maybe_template_creator_display_name: ir.maybe_template_creator_display_name.clone(),
     maybe_template_creator_gravatar_hash: ir.maybe_template_creator_gravatar_hash.clone(),
 
+    // NB: Fail open/public since we're already looking at it
+    creator_set_visibility: RecordVisibility::from_str(&ir.creator_set_visibility)
+        .unwrap_or(RecordVisibility::Public),
+
     //template_is_mod_approved: if ir.template_is_mod_approved == 0 { false } else { true },
 
     file_size_bytes: if ir.file_size_bytes > 0 { ir.file_size_bytes as u32 } else { 0 },
@@ -188,6 +197,8 @@ SELECT
     template_users.username as maybe_template_creator_username,
     template_users.display_name as maybe_template_creator_display_name,
     template_users.email_gravatar_hash as maybe_template_creator_gravatar_hash,
+
+    w2l_results.creator_set_visibility,
 
     w2l_results.file_size_bytes,
     w2l_results.frame_width,
@@ -242,6 +253,8 @@ SELECT
     template_users.username as maybe_template_creator_username,
     template_users.display_name as maybe_template_creator_display_name,
     template_users.email_gravatar_hash as maybe_template_creator_gravatar_hash,
+
+    w2l_results.creator_set_visibility,
 
     w2l_results.file_size_bytes,
     w2l_results.frame_width,

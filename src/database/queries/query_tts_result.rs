@@ -1,6 +1,7 @@
 use anyhow::anyhow;
 use chrono::{DateTime, Utc};
 use crate::AnyhowResult;
+use crate::database::enums::record_visibility::RecordVisibility;
 use crate::database::helpers::boolean_converters::i8_to_bool;
 use crate::database::helpers::boolean_converters::nullable_i8_to_optional_bool;
 use derive_more::{Display, Error};
@@ -11,8 +12,6 @@ use sqlx::error::DatabaseError;
 use sqlx::error::Error::Database;
 use sqlx::mysql::MySqlDatabaseError;
 use std::sync::Arc;
-use crate::database::helpers::enums::CreatorSetVisibility;
-use crate::database::enums::record_visibility::RecordVisibility;
 
 #[derive(Serialize)]
 pub struct TtsResultRecordForResponse {
