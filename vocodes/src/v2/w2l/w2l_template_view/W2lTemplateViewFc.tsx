@@ -397,6 +397,12 @@ function W2lTemplateViewFc(props: Props) {
             <td>{modApprovalStatus}</td>
           </tr>
           <tr>
+            <td colSpan={2}>
+              <br />
+              <h4 className="subtitle is-4"> Media Details </h4>
+            </td>
+          </tr>
+          <tr>
             <th>Media type</th>
             <td>{w2lTemplate?.template_type}</td>
           </tr>
