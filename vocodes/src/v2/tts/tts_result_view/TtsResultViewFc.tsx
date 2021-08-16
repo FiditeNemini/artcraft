@@ -106,15 +106,21 @@ function TtsResultViewFc(props: Props) {
     moderatorRows = (
       <>
         <tr>
-          <th>Creator IP Address (Creation)</th>
+          <td colSpan={2}>
+            <br />
+            <h4 className="subtitle is-4"> Moderator Details </h4>
+          </td>
+        </tr>
+        <tr>
+          <th>Creator IP address</th>
           <td>{ttsInferenceResult?.maybe_moderator_fields?.creator_ip_address || "server error"}</td>
         </tr>
         <tr>
-          <th>Mod Deleted At (UTC)</th>
+          <th>Mod deleted at (UTC)</th>
           <td>{ttsInferenceResult?.maybe_moderator_fields?.mod_deleted_at || "not deleted"}</td>
         </tr>
         <tr>
-          <th>User Deleted At (UTC)</th>
+          <th>User deleted at (UTC)</th>
           <td>{ttsInferenceResult?.maybe_moderator_fields?.user_deleted_at || "not deleted"}</td>
         </tr>
       </>
@@ -192,35 +198,44 @@ function TtsResultViewFc(props: Props) {
       <br />
 
 
-      <h4 className="title is-4"> Spectrogram </h4>
+      <h4 className="subtitle is-4"> Spectrogram </h4>
       <SpectrogramFc spectrogramJsonLink={spectrogramLink} />
 
       <br />
-      <br />
 
-      <h4 className="title is-4"> Spectrogram </h4>
-      <table className="table">
-        <thead>
-          <tr>
-            <th><abbr title="Detail">Detail</abbr></th>
-            <th><abbr title="Value">Value</abbr></th>
-          </tr>
-        </thead>
+      <table className="table is-fullwidth">
         <tbody>
           <tr>
-            <th>Original Text</th>
+            <td colSpan={2}>
+              <h4 className="subtitle is-4"> Result Details </h4>
+            </td>
+          </tr>
+          <tr>
+            <th>Original text</th>
             <td>
               {ttsInferenceResult.raw_inference_text}
             </td>
           </tr>
           <tr>
-            <th>Audio Creator</th>
+            <th>Audio creator</th>
             <td>
               {creatorDetails}
             </td>
           </tr>
           <tr>
-            <th>Model used</th>
+            <th>Audio duration</th>
+            <td>{durationSeconds} seconds</td>
+          </tr>
+        </tbody>
+        <tr>
+          <td colSpan={2}>
+            <br />
+            <h4 className="subtitle is-4">Model Used</h4>
+          </td>
+        </tr>
+        <tbody>
+          <tr>
+            <th>Model name</th>
             <td>
               <Link to={modelLink}>
                 {modelName}
@@ -233,15 +248,12 @@ function TtsResultViewFc(props: Props) {
               {modelCreatorDetails}
             </td>
           </tr>
-          <tr>
-            <th>Duration</th>
-            <td>{durationSeconds} seconds</td>
-          </tr>
-
+      
           {moderatorRows}
 
         </tbody>
       </table>
+      
 
       <Link 
         className={deleteButtonCss}
