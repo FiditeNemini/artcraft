@@ -149,7 +149,7 @@ function TtsModelDeleteFc(props: Props) {
   let currentlyDeleted = !!ttsModel?.maybe_moderator_fields?.mod_deleted_at ||
       !!ttsModel?.maybe_moderator_fields?.user_deleted_at;
 
-  const h1Title = currentlyDeleted ? "Undelete Result?" : "Delete Result?";
+  const h1Title = currentlyDeleted ? "Undelete Model?" : "Delete Model?";
 
   const buttonTitle = currentlyDeleted ? "Confirm Undelete" : "Confirm Delete";
 
