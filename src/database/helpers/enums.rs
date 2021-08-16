@@ -4,13 +4,17 @@
 
 #![allow(non_camel_case_types)]
 
+#[deprecated(note = "Use `RecordVisibility` instead!")]
 #[derive(Deserialize)]
 pub enum CreatorSetVisibility {
   /// public
+  #[deprecated(note = "Use `RecordVisibility` instead!")]
   Public,
   /// hidden
+  #[deprecated(note = "Use `RecordVisibility` instead!")]
   Hidden,
   /// private
+  #[deprecated(note = "Use `RecordVisibility` instead!")]
   Private,
 }
 

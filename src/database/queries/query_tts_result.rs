@@ -11,6 +11,8 @@ use sqlx::error::DatabaseError;
 use sqlx::error::Error::Database;
 use sqlx::mysql::MySqlDatabaseError;
 use std::sync::Arc;
+use crate::database::helpers::enums::CreatorSetVisibility;
+use crate::database::enums::record_visibility::RecordVisibility;
 
 #[derive(Serialize)]
 pub struct TtsResultRecordForResponse {
@@ -32,6 +34,8 @@ pub struct TtsResultRecordForResponse {
 
   pub public_bucket_wav_audio_path: String,
   pub public_bucket_spectrogram_path: String,
+
+  pub creator_set_visibility: RecordVisibility,
 
   pub file_size_bytes: u32,
   pub duration_millis: u32,
@@ -74,6 +78,8 @@ pub struct TtsResultRecordRaw {
 
   pub public_bucket_wav_audio_path: String,
   pub public_bucket_spectrogram_path: String,
+
+  pub creator_set_visibility: String,
 
   pub file_size_bytes: i32,
   pub duration_millis: i32,
@@ -141,6 +147,10 @@ pub async fn select_tts_result_by_token(
     public_bucket_wav_audio_path: ir.public_bucket_wav_audio_path.clone(),
     public_bucket_spectrogram_path: ir.public_bucket_spectrogram_path.clone(),
 
+    // NB: Fail open/public since we're already looking at it
+    creator_set_visibility: RecordVisibility::from_str(&ir.creator_set_visibility)
+        .unwrap_or(RecordVisibility::Public),
+
     file_size_bytes: if ir.file_size_bytes > 0 { ir.file_size_bytes as u32 } else { 0 },
     duration_millis: if ir.duration_millis > 0 { ir.duration_millis as u32 } else { 0 },
 
@@ -184,6 +194,8 @@ SELECT
 
     tts_results.public_bucket_wav_audio_path,
     tts_results.public_bucket_spectrogram_path,
+
+    tts_results.creator_set_visibility,
 
     tts_results.file_size_bytes,
     tts_results.duration_millis,
@@ -237,6 +249,8 @@ SELECT
 
     tts_results.public_bucket_wav_audio_path,
     tts_results.public_bucket_spectrogram_path,
+
+    tts_results.creator_set_visibility,
 
     tts_results.file_size_bytes,
     tts_results.duration_millis,
