@@ -1,6 +1,7 @@
 use anyhow::anyhow;
 use chrono::{DateTime, Utc};
 use crate::AnyhowResult;
+use crate::database::enums::record_visibility::RecordVisibility;
 use crate::database::helpers::boolean_converters::i8_to_bool;
 use crate::database::helpers::boolean_converters::nullable_i8_to_optional_bool;
 use derive_more::{Display, Error};
@@ -25,6 +26,7 @@ pub struct W2lTemplateRecordForResponse {
   pub duration_millis: u32,
   pub maybe_image_object_name: Option<String>,
   pub maybe_video_object_name: Option<String>,
+  pub creator_set_visibility: RecordVisibility,
   pub is_public_listing_approved: Option<bool>,
   pub is_locked_from_use: bool,
   pub is_locked_from_user_modification: bool,
@@ -56,6 +58,7 @@ pub struct W2lTemplateRecordRaw {
   pub duration_millis: i32,
   pub maybe_public_bucket_preview_image_object_name: Option<String>,
   pub maybe_public_bucket_preview_video_object_name: Option<String>,
+  pub creator_set_visibility: String,
   pub is_public_listing_approved: Option<i8>,
   pub is_locked_from_use: i8,
   pub is_locked_from_user_modification: i8,
@@ -107,6 +110,9 @@ pub async fn select_w2l_template_by_token(
     duration_millis: if template.duration_millis > 0 { template.duration_millis as u32 } else { 0 },
     maybe_image_object_name: template.maybe_public_bucket_preview_image_object_name.clone(),
     maybe_video_object_name: template.maybe_public_bucket_preview_video_object_name.clone(),
+    // NB: Fail open/public with creator_set_visibility since we're already looking at it
+    creator_set_visibility: RecordVisibility::from_str(&template.creator_set_visibility)
+        .unwrap_or(RecordVisibility::Public),
     is_public_listing_approved: nullable_i8_to_optional_bool(template.is_public_listing_approved),
     is_locked_from_use: i8_to_bool(template.is_locked_from_use),
     is_locked_from_user_modification: i8_to_bool(template.is_locked_from_user_modification),
@@ -142,6 +148,7 @@ SELECT
     w2l.duration_millis,
     w2l.maybe_public_bucket_preview_image_object_name,
     w2l.maybe_public_bucket_preview_video_object_name,
+    w2l.creator_set_visibility,
     w2l.is_public_listing_approved,
     w2l.is_locked_from_use,
     w2l.is_locked_from_user_modification,
@@ -181,6 +188,7 @@ SELECT
     w2l.duration_millis,
     w2l.maybe_public_bucket_preview_image_object_name,
     w2l.maybe_public_bucket_preview_video_object_name,
+    w2l.creator_set_visibility,
     w2l.is_public_listing_approved,
     w2l.is_locked_from_use,
     w2l.is_locked_from_user_modification,

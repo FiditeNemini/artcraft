@@ -1,6 +1,7 @@
 use anyhow::anyhow;
 use chrono::{DateTime, Utc};
 use crate::AnyhowResult;
+use crate::database::enums::record_visibility::RecordVisibility;
 use crate::database::helpers::boolean_converters::i8_to_bool;
 use crate::database::helpers::boolean_converters::nullable_i8_to_optional_bool;
 use derive_more::{Display, Error};
@@ -25,6 +26,8 @@ pub struct TtsModelRecordForResponse {
   pub title: String,
   pub description_markdown: String,
   pub description_rendered_html: String,
+
+  pub creator_set_visibility: RecordVisibility,
 
   pub is_locked_from_use: bool,
   pub is_locked_from_user_modification: bool,
@@ -58,6 +61,8 @@ pub struct TtsModelRecordRaw {
   pub title: String,
   pub description_markdown: String,
   pub description_rendered_html: String,
+
+  pub creator_set_visibility: String,
 
   pub is_locked_from_use: i8,
   pub is_locked_from_user_modification: i8,
@@ -110,6 +115,9 @@ pub async fn select_tts_model_by_token(
     title: model.title.clone(),
     description_markdown: model.description_markdown.clone(),
     description_rendered_html: model.description_rendered_html.clone(),
+    // NB: Fail open/public with creator_set_visibility since we're already looking at it
+    creator_set_visibility: RecordVisibility::from_str(&model.creator_set_visibility)
+        .unwrap_or(RecordVisibility::Public),
     is_locked_from_use: i8_to_bool(model.is_locked_from_use),
     is_locked_from_user_modification: i8_to_bool(model.is_locked_from_user_modification),
     created_at: model.created_at.clone(),
@@ -144,6 +152,8 @@ SELECT
     tts.title,
     tts.description_markdown,
     tts.description_rendered_html,
+
+    tts.creator_set_visibility,
 
     tts.is_locked_from_use,
     tts.is_locked_from_user_modification,
@@ -186,6 +196,8 @@ SELECT
     tts.title,
     tts.description_markdown,
     tts.description_rendered_html,
+
+    tts.creator_set_visibility,
 
     tts.is_locked_from_use,
     tts.is_locked_from_user_modification,
