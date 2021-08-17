@@ -56,7 +56,7 @@ pub struct EditTtsModelRequest {
 pub enum EditTtsModelError {
   BadInput(String),
   NotAuthorized,
-  TemplateNotFound,
+  ModelNotFound,
   ServerError,
 }
 
@@ -65,7 +65,7 @@ impl ResponseError for EditTtsModelError {
     match *self {
       EditTtsModelError::BadInput(_) => StatusCode::BAD_REQUEST,
       EditTtsModelError::NotAuthorized => StatusCode::UNAUTHORIZED,
-      EditTtsModelError::TemplateNotFound => StatusCode::NOT_FOUND,
+      EditTtsModelError::ModelNotFound => StatusCode::NOT_FOUND,
       EditTtsModelError::ServerError => StatusCode::INTERNAL_SERVER_ERROR,
     }
   }
@@ -74,7 +74,7 @@ impl ResponseError for EditTtsModelError {
     let error_reason = match self {
       EditTtsModelError::BadInput(reason) => reason.to_string(),
       EditTtsModelError::NotAuthorized=> "unauthorized".to_string(),
-      EditTtsModelError::TemplateNotFound => "not found".to_string(),
+      EditTtsModelError::ModelNotFound => "not found".to_string(),
       EditTtsModelError::ServerError => "server error".to_string(),
     };
 
@@ -121,11 +121,11 @@ pub async fn edit_tts_model_handler(
     },
     Ok(None) => {
       warn!("could not find model");
-      return Err(EditTtsModelError::TemplateNotFound);
+      return Err(EditTtsModelError::ModelNotFound);
     },
     Err(err) => {
       warn!("error looking up model: {:?}", err);
-      return Err(EditTtsModelError::TemplateNotFound);
+      return Err(EditTtsModelError::ModelNotFound);
     },
   };
 
