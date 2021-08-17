@@ -178,12 +178,6 @@ function TtsModelEditFc(props: Props) {
                 placeholder="Model Title" 
                 value={title}
                 />
-              <span className="icon is-small is-left">
-                <i className="fas fa-envelope"></i>
-              </span>
-              <span className="icon is-small is-right">
-                <i className="fas fa-exclamation-triangle"></i>
-              </span>
             </div>
             {/*<p className="help">{invalidReason}</p>*/}
           </div>
