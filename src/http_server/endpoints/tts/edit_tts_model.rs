@@ -6,6 +6,7 @@ use actix_web::error::ResponseError;
 use actix_web::http::StatusCode;
 use actix_web::web::{Path, Json};
 use actix_web::{Responder, web, HttpResponse, error, HttpRequest};
+use crate::database::enums::record_visibility::RecordVisibility;
 use crate::database::queries::query_tts_model::select_tts_model_by_token;
 use crate::http_server::web_utils::ip_address::get_request_ip;
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
@@ -37,8 +38,8 @@ pub struct EditTtsModelRequest {
 
   pub title: Option<String>,
   pub description_markdown: Option<String>,
+  pub creator_set_visibility: Option<String>,
   //pub updatable_slug: Option<String>,
-  //pub creator_set_visibility: Option<String>,
   //pub tts_model_type: Option<String>,
   //pub text_preprocessing_algorithm: Option<String>,
   //pub vocoder_token: Option<String>,
@@ -148,6 +149,7 @@ pub async fn edit_tts_model_handler(
   let mut title = None;
   let mut description_markdown = None;
   let mut description_html = None;
+  let mut creator_set_visibility = RecordVisibility::Public;
 
   if let Some(payload) = request.title.as_deref() {
     if contains_slurs(payload) {
@@ -169,6 +171,11 @@ pub async fn edit_tts_model_handler(
     description_html = Some(html);
   }
 
+  if let Some(visibility) = request.creator_set_visibility.as_deref() {
+    creator_set_visibility = RecordVisibility::from_str(visibility)
+        .map_err(|_| EditTtsModelError::BadInput("bad record visibility".to_string()))?;
+  }
+
   let ip_address = get_request_ip(&http_request);
 
   let query_result = if is_author {
@@ -180,6 +187,7 @@ SET
     title = ?,
     description_markdown = ?,
     description_rendered_html = ?,
+    creator_set_visibility = ?,
     creator_ip_address_last_update = ?,
     version = version + 1
 WHERE token = ?
@@ -188,6 +196,7 @@ LIMIT 1
       &title,
       &description_markdown,
       &description_html,
+      &creator_set_visibility.to_str(),
       &ip_address,
       &model_record.model_token,
     )
@@ -202,6 +211,7 @@ SET
     title = ?,
     description_markdown = ?,
     description_rendered_html = ?,
+    creator_set_visibility = ?,
     maybe_mod_user_token = ?,
     version = version + 1
 WHERE token = ?
@@ -210,6 +220,7 @@ LIMIT 1
       &title,
       &description_markdown,
       &description_html,
+      &creator_set_visibility.to_str(),
       &user_session.user_token,
       &model_record.model_token,
     )
@@ -217,10 +228,10 @@ LIMIT 1
         .await
   };
 
-  // TODO: This is lazy and suboptimal af to query again
+  // TODO: This is lazy and suboptimal af to UPDATE again.
   //  The reason we're doing this is because `sqlx` only does static type checking of queries
-  //  with string literals. It does not support dynamic query building, thus the predicates
-  //  must be held constant. :(
+  //  with string literals. It does not support dynamic query building, thus the PREDICATES
+  //  MUST BE HELD CONSTANT (at least in type signature). :(
   if is_mod {
     update_mod_details(
       &request,
