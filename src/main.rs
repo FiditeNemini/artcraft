@@ -48,6 +48,7 @@ use crate::http_server::endpoints::root_index::get_root_index;
 use crate::http_server::endpoints::tts::delete_tts_model::delete_tts_model_handler;
 use crate::http_server::endpoints::tts::delete_tts_result::delete_tts_inference_result_handler;
 use crate::http_server::endpoints::tts::edit_tts_model::edit_tts_model_handler;
+use crate::http_server::endpoints::tts::edit_tts_result::edit_tts_inference_result_handler;
 use crate::http_server::endpoints::tts::enqueue_infer_tts::infer_tts_handler;
 use crate::http_server::endpoints::tts::enqueue_upload_tts_model::upload_tts_model_handler;
 use crate::http_server::endpoints::tts::get_tts_inference_job_status::get_tts_inference_job_status_handler;
@@ -68,6 +69,7 @@ use crate::http_server::endpoints::users::logout::logout_handler;
 use crate::http_server::endpoints::users::session_info::session_info_handler;
 use crate::http_server::endpoints::w2l::delete_w2l_result::delete_w2l_inference_result_handler;
 use crate::http_server::endpoints::w2l::delete_w2l_template::delete_w2l_template_handler;
+use crate::http_server::endpoints::w2l::edit_w2l_result::edit_w2l_inference_result_handler;
 use crate::http_server::endpoints::w2l::edit_w2l_template::edit_w2l_template_handler;
 use crate::http_server::endpoints::w2l::enqueue_infer_w2l::infer_w2l_handler;
 use crate::http_server::endpoints::w2l::enqueue_infer_w2l_with_uploads::enqueue_infer_w2l_with_uploads;
@@ -100,7 +102,6 @@ use sqlx::MySqlPool;
 use sqlx::mysql::MySqlPoolOptions;
 use std::sync::Arc;
 use std::time::Duration;
-use crate::http_server::endpoints::tts::edit_tts_result::edit_tts_inference_result_handler;
 
 // TODO TODO TODO TODO
 // TODO TODO TODO TODO
@@ -500,6 +501,11 @@ pub async fn serve(server_state: ServerState) -> AnyhowResult<()>
           .service(
             web::resource("/result/{token}")
               .route(web::get().to(get_w2l_inference_result_handler))
+              .route(web::head().to(|| HttpResponse::Ok()))
+          )
+          .service(
+          web::resource("/result/{token}/edit")
+              .route(web::post().to(edit_w2l_inference_result_handler))
               .route(web::head().to(|| HttpResponse::Ok()))
           )
           .service(
