@@ -195,7 +195,7 @@ function TtsResultViewFc(props: Props) {
         <Link 
           className="button is-info is-large is-fullwidth"
           to={FrontendUrlConfig.ttsResultEditPage(token)}
-          >Edit Result</Link>
+          >Edit Result Visibility</Link>
       </>
     );
   }

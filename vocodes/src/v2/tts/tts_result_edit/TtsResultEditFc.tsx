@@ -80,7 +80,8 @@ function TtsResultEditFc(props: Props) {
         return;
       }
 
-      setTtsInferenceResult(modelsResponse.result)
+      setTtsInferenceResult(modelsResponse.result);
+      setVisibility(modelsResponse?.result?.creator_set_visibility || DEFAULT_VISIBILITY);
     })
     .catch(e => {
     });
@@ -142,7 +143,7 @@ function TtsResultEditFc(props: Props) {
 
   return (
     <div className="content">
-      <h1 className="title is-1"> Edit Result </h1>
+      <h1 className="title is-1"> Edit Result Visibility </h1>
 
       <p>
         <Link to={resultLink}>&lt; Back to result </Link>
