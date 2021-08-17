@@ -20,6 +20,14 @@ class FrontendUrlConfig {
     return `/tts/${modelToken}/delete`;
   }
 
+  static ttsResultPage(resultToken: string) : string {
+    return `/tts/result/${resultToken}`;
+  }
+
+  static ttsResultEditPage(resultToken: string) : string {
+    return `/tts/result/${resultToken}/edit`;
+  }
+
   static ttsResultDeletePage(resultToken: string) : string {
     return `/tts/result/${resultToken}/delete`;
   }

@@ -30,6 +30,7 @@ import { W2lResultViewFc } from './w2l/w2l_result_view/W2lResultViewFc';
 import { W2lTemplateListFc } from './w2l/w2l_template_list/W2lTemplateListFc';
 import { W2lTemplateUploadJob } from '../jobs/W2lTemplateUploadJobs';
 import { W2lTemplateViewFc } from './w2l/w2l_template_view/W2lTemplateViewFc';
+import { TtsResultEditFc } from './tts/tts_result_edit/TtsResultEditFc';
 
 interface Props {
   sessionWrapper: SessionWrapper,
@@ -103,6 +104,12 @@ class NewVocodesContainer extends React.Component<Props, State> {
             <Route path="/signup">
               <SignupComponent
                 querySessionCallback={()=>{}}
+                sessionWrapper={this.props.sessionWrapper}
+              />
+            </Route>
+
+            <Route path="/tts/result/:token/edit">
+              <TtsResultEditFc
                 sessionWrapper={this.props.sessionWrapper}
               />
             </Route>

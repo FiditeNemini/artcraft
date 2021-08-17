@@ -80,6 +80,10 @@ class ApiConfig {
     return `${this.getScheme()}://${this.getNewApiHost()}/tts/result/${resultToken}/delete`;
   }
 
+  editTtsInferenceResult(resultToken: string) : string {
+    return `${this.getScheme()}://${this.getNewApiHost()}/tts/result/${resultToken}/edit`;
+  }
+
   listTtsModelsForUser(username: string) : string {
     return `${this.getScheme()}://${this.getNewApiHost()}/user/${username}/tts_models`;
   }

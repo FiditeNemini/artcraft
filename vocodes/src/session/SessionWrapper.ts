@@ -119,6 +119,13 @@ export class SessionWrapper {
     return this.sessionStateResponse?.user?.can_delete_other_users_w2l_results || false;
   }
   
+  public canEditTtsResultAsUserOrMod(creatorUserToken: MaybeString) : boolean {
+    if (this.userTokenMatches(creatorUserToken)) {
+      return true;
+    }
+    return this.canDeleteOtherUsersTtsResults(); // TODO: There is no granular permission for this yet.
+  }
+
   public deleteTtsResultAsMod(creatorUserToken: MaybeString) : boolean {
     if (this.userTokenMatches(creatorUserToken)) {
       return true;

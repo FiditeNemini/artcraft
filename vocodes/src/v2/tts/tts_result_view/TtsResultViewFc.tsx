@@ -178,11 +178,42 @@ function TtsResultViewFc(props: Props) {
   const currentlyDeleted = !!ttsInferenceResult?.maybe_moderator_fields?.mod_deleted_at || 
       !!ttsInferenceResult?.maybe_moderator_fields?.user_deleted_at;
 
-  const deleteButtonTitle = currentlyDeleted ? "Undelete?" : "Delete?";
+  const deleteButtonTitle = currentlyDeleted ? "Undelete Result?" : "Delete Result?";
 
   const deleteButtonCss = currentlyDeleted ? 
     "button is-warning is-large is-fullwidth" :
     "button is-danger is-large is-fullwidth";
+
+  
+  let editButton = null;
+  const canEdit = props.sessionWrapper.canEditTtsResultAsUserOrMod(ttsInferenceResult?.maybe_creator_user_token);
+
+  if (canEdit) {
+    editButton = (
+      <>
+        <br />
+        <Link 
+          className="button is-info is-large is-fullwidth"
+          to={FrontendUrlConfig.ttsResultEditPage(token)}
+          >Edit Result</Link>
+      </>
+    );
+  }
+
+  let deleteButton = null;
+  const canDelete = props.sessionWrapper.deleteTtsResultAsMod(ttsInferenceResult?.maybe_creator_user_token);
+
+  if (canDelete) {
+    deleteButton = (
+      <>
+        <br />
+        <Link 
+          className={deleteButtonCss}
+          to={FrontendUrlConfig.ttsResultDeletePage(token)}
+          >{deleteButtonTitle}</Link>
+      </>
+    );
+  }
 
   return (
     <div>
@@ -267,11 +298,9 @@ function TtsResultViewFc(props: Props) {
         </tbody>
       </table>
       
+      {editButton}
 
-      <Link 
-        className={deleteButtonCss}
-        to={FrontendUrlConfig.ttsResultDeletePage(token)}
-        >{deleteButtonTitle}</Link>
+      {deleteButton}
 
       <br />
       <ReportDiscordLinkFc />
