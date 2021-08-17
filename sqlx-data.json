@@ -888,6 +888,26 @@
       "nullable": []
     }
   },
+  "0efe809b1ce59d68c5e8fb43d42951b02ad7c17da8e7ef3d0812b75db9c73174": {
+    "query": "\nUPDATE tts_models\nSET\n    title = ?,\n    description_markdown = ?,\n    description_rendered_html = ?,\n    creator_set_visibility = ?,\n    maybe_mod_user_token = ?,\n    version = version + 1\nWHERE token = ?\nLIMIT 1\n        ",
+    "describe": {
+      "columns": [],
+      "parameters": {
+        "Right": 6
+      },
+      "nullable": []
+    }
+  },
+  "0ff13b84956c2625050211a5bb2352a489ef8435571c364c8b2d1d21d936cbd4": {
+    "query": "\nUPDATE tts_results\nSET\n    creator_set_visibility = ?,\n    maybe_mod_user_token = ?\nWHERE token = ?\nLIMIT 1\n        ",
+    "describe": {
+      "columns": [],
+      "parameters": {
+        "Right": 3
+      },
+      "nullable": []
+    }
+  },
   "10d93ef1350115742d8dddb951f98dfebabf7df3e44577b97b52343f0650eba1": {
     "query": "\nSELECT\n    badges.slug,\n    badges.title,\n    badges.description,\n    badges.image_url,\n    user_badges.created_at as user_created_at\n\nFROM badges\nJOIN user_badges\nON\n    badges.slug = user_badges.badge_slug\nWHERE\n    user_badges.user_token = ?\n        ",
     "describe": {
@@ -1462,12 +1482,12 @@
       "nullable": []
     }
   },
-  "18ca4c90132288c1dc3d43c6b0e7ee6aa12e990408e314e0038d4a376c9ddfbf": {
-    "query": "\nUPDATE w2l_templates\nSET\n    title = ?,\n    description_markdown = ?,\n    description_rendered_html = ?,\n    creator_ip_address_last_update = ?,\n    version = version + 1\nWHERE token = ?\nLIMIT 1\n        ",
+  "1b1a5d54d20a834c73c7afa3d80681bdf7e0b8ca9767fe7ea0861cc25f10af54": {
+    "query": "\nUPDATE tts_models\nSET\n    title = ?,\n    description_markdown = ?,\n    description_rendered_html = ?,\n    creator_set_visibility = ?,\n    creator_ip_address_last_update = ?,\n    version = version + 1\nWHERE token = ?\nLIMIT 1\n        ",
     "describe": {
       "columns": [],
       "parameters": {
-        "Right": 5
+        "Right": 6
       },
       "nullable": []
     }
@@ -2176,6 +2196,16 @@
         true,
         true
       ]
+    }
+  },
+  "33cd0c0b8eaaf494ef97232ac89775b8eb6a22d310824b7aa7db310dd4fd41b1": {
+    "query": "\nUPDATE w2l_results\nSET\n    creator_set_visibility = ?,\n    maybe_mod_user_token = ?\nWHERE token = ?\nLIMIT 1\n        ",
+    "describe": {
+      "columns": [],
+      "parameters": {
+        "Right": 3
+      },
+      "nullable": []
     }
   },
   "34364f9bc851971f8291f5f9942dd23d10718ccb210a93a236d96d0591f65f35": {
@@ -3519,6 +3549,16 @@
         true,
         false
       ]
+    }
+  },
+  "60c06a507349919addb5d26b1c4a283a04f66fce86e84ed0a51db6001c9fc2b5": {
+    "query": "\nUPDATE w2l_templates\nSET\n    title = ?,\n    description_markdown = ?,\n    description_rendered_html = ?,\n    creator_set_visibility = ?,\n    maybe_mod_user_token = ?,\n    version = version + 1\nWHERE token = ?\nLIMIT 1\n        ",
+    "describe": {
+      "columns": [],
+      "parameters": {
+        "Right": 6
+      },
+      "nullable": []
     }
   },
   "641253d4c621f75037877651bba044a21033f50a5e3f8fed9b06ec967a508853": {
@@ -5047,6 +5087,16 @@
       "nullable": []
     }
   },
+  "9cc5f697350814199344d3d9a0ff026e0d1e09e9097648400d4b63cfcbd31178": {
+    "query": "\nUPDATE w2l_results\nSET\n    creator_set_visibility = ?,\n    creator_ip_address = ?\nWHERE token = ?\nLIMIT 1\n        ",
+    "describe": {
+      "columns": [],
+      "parameters": {
+        "Right": 3
+      },
+      "nullable": []
+    }
+  },
   "9cef4989671fb55d8e732f6f3d5c16aea7a9b3e01fc6a3bc7a56d0b066f07730": {
     "query": "\nINSERT INTO tts_models\nSET\n  token = ?,\n  tts_model_type = \"tacotron2\",\n  title = ?,\n  description_markdown = '',\n  description_rendered_html = '',\n  creator_user_token = ?,\n  creator_ip_address_creation = ?,\n  creator_ip_address_last_update = ?,\n  original_download_url = ?,\n  private_bucket_hash = ?,\n  private_bucket_object_name = ?,\n  file_size_bytes = ?\n        ",
     "describe": {
@@ -5920,16 +5970,6 @@
       "nullable": []
     }
   },
-  "c63726afcf8d53a24597aad18bb44285eae8f5d056011811b066226f7db0198a": {
-    "query": "\nUPDATE w2l_templates\nSET\n    title = ?,\n    description_markdown = ?,\n    description_rendered_html = ?,\n    maybe_mod_user_token = ?,\n    version = version + 1\nWHERE token = ?\nLIMIT 1\n        ",
-    "describe": {
-      "columns": [],
-      "parameters": {
-        "Right": 5
-      },
-      "nullable": []
-    }
-  },
   "c909600af05572fd5febb6aca20c3ae983fc75187587b197717f334f0139527e": {
     "query": "\nSELECT\n    users.token as user_token,\n    username,\n    display_name,\n    email_gravatar_hash,\n    profile_markdown,\n    profile_rendered_html,\n    user_role_slug,\n    is_banned,\n    disable_gravatar,\n    preferred_tts_result_visibility as `preferred_tts_result_visibility: crate::database::enums::record_visibility::RecordVisibility`,\n    preferred_w2l_result_visibility as `preferred_w2l_result_visibility: crate::database::enums::record_visibility::RecordVisibility`,\n    discord_username,\n    twitch_username,\n    twitter_username,\n    patreon_username,\n    github_username,\n    cashapp_username,\n    website_url,\n    created_at\nFROM users\nWHERE\n    users.username = ?\n    AND users.user_deleted_at IS NULL\n    AND users.mod_deleted_at IS NULL\n        ",
     "describe": {
@@ -6199,6 +6239,16 @@
       "nullable": []
     }
   },
+  "cc4372cdd1a65999cbaf008f200683eedc93ab83e17256e47e011667ba8384d8": {
+    "query": "\nUPDATE tts_results\nSET\n    creator_set_visibility = ?,\n    creator_ip_address = ?\nWHERE token = ?\nLIMIT 1\n        ",
+    "describe": {
+      "columns": [],
+      "parameters": {
+        "Right": 3
+      },
+      "nullable": []
+    }
+  },
   "cc51b77e88c2ee5c046ea2f2287b9e9770743d50b0db90481662e5c1118885c5": {
     "query": "\nSELECT\n    tts.token as model_token,\n    tts.tts_model_type,\n    tts.creator_user_token,\n    users.username as creator_username,\n    users.display_name as creator_display_name,\n    tts.title,\n    tts.is_locked_from_use,\n    tts.created_at,\n    tts.updated_at\nFROM tts_models as tts\nJOIN users\nON\n    users.token = tts.creator_user_token\nWHERE\n    users.username = ?\n    AND tts.user_deleted_at IS NULL\n    AND tts.mod_deleted_at IS NULL\n        ",
     "describe": {
@@ -6328,16 +6378,6 @@
       ]
     }
   },
-  "cf0b037e789ee09022b25f3381b0263c5cc6b59f3f328de4aa211bdb23a62629": {
-    "query": "\nUPDATE tts_models\nSET\n    title = ?,\n    description_markdown = ?,\n    description_rendered_html = ?,\n    creator_ip_address_last_update = ?,\n    version = version + 1\nWHERE token = ?\nLIMIT 1\n        ",
-    "describe": {
-      "columns": [],
-      "parameters": {
-        "Right": 5
-      },
-      "nullable": []
-    }
-  },
   "d12757abef811cd6951e0e1427fdb496a8931b547519d320f5ade56007d3eb5d": {
     "query": "\nSELECT\n  id,\n  status\nFROM w2l_template_upload_jobs\nWHERE id = ?\nFOR UPDATE\n        ",
     "describe": {
@@ -6374,6 +6414,16 @@
         false,
         false
       ]
+    }
+  },
+  "d2ef33027abc15b6ec00260f7d30a8c66a3190229ea103ecb571d4957af63525": {
+    "query": "\nUPDATE w2l_templates\nSET\n    title = ?,\n    description_markdown = ?,\n    description_rendered_html = ?,\n    creator_set_visibility = ?,\n    creator_ip_address_last_update = ?,\n    version = version + 1\nWHERE token = ?\nLIMIT 1\n        ",
+    "describe": {
+      "columns": [],
+      "parameters": {
+        "Right": 6
+      },
+      "nullable": []
     }
   },
   "d71ef2cfed337f9e3f9e1c2255bdec6347763910fd589482f0b0e56b794d7bb7": {
@@ -7118,16 +7168,6 @@
         true,
         true
       ]
-    }
-  },
-  "e9b73703961516622f748fa597b62af6b991a7a36acf9901ca6d315ed2440674": {
-    "query": "\nUPDATE tts_models\nSET\n    title = ?,\n    description_markdown = ?,\n    description_rendered_html = ?,\n    maybe_mod_user_token = ?,\n    version = version + 1\nWHERE token = ?\nLIMIT 1\n        ",
-    "describe": {
-      "columns": [],
-      "parameters": {
-        "Right": 5
-      },
-      "nullable": []
     }
   },
   "e9ec861d6eb135370f9baf3a866282ec5686d4b299fc4ec10900ab32ea8577d8": {
