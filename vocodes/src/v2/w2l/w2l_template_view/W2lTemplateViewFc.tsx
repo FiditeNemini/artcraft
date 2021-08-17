@@ -10,6 +10,8 @@ import { W2lTemplateViewDeleteFc } from './W2lTemplateView_DeleteFc';
 import { ReportDiscordLinkFc } from '../../common/DiscordReportLinkFc';
 import { BucketConfig } from '../../../common/BucketConfig';
 import { UploadIcon } from '../../../icons/UploadIcon';
+import { VisibleIconFc } from '../../../icons/VisibleIconFc';
+import { HiddenIconFc } from '../../../icons/HiddenIconFc';
 
 interface W2lTemplateViewResponsePayload {
   success: boolean,
@@ -34,6 +36,7 @@ interface W2lTemplate {
   duration_millis: number,
   maybe_image_object_name: string,
   maybe_video_object_name: string,
+  creator_set_visibility: string,
   is_public_listing_approved: boolean | null,
   created_at: string,
   updated_at: string,
@@ -323,6 +326,10 @@ function W2lTemplateViewFc(props: Props) {
     humanUseCount = w2lTemplateUseCount;
   }
 
+  const resultVisibility = w2lTemplate?.creator_set_visibility === 'hidden' ? 
+    <span>Hidden <HiddenIconFc /></span> :
+    <span>Public <VisibleIconFc /></span> ;
+
   return (
     <div>
       <h1 className="title is-1"> Video lip sync template </h1>
@@ -391,6 +398,10 @@ function W2lTemplateViewFc(props: Props) {
           <tr>
             <th>Use count</th>
             <td>{humanUseCount}</td>
+          </tr>
+          <tr>
+            <th>Visibility</th>
+            <td>{resultVisibility}</td>
           </tr>
           <tr>
             <th>Is public listing approved?</th>

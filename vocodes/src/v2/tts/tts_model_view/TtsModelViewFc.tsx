@@ -9,6 +9,8 @@ import { TtsInferenceJob } from '../../../App';
 import { useParams, Link } from 'react-router-dom';
 import { v4 as uuidv4 } from 'uuid';
 import { FrontendUrlConfig } from '../../../common/FrontendUrlConfig';
+import { HiddenIconFc } from '../../../icons/HiddenIconFc';
+import { VisibleIconFc } from '../../../icons/VisibleIconFc';
 
 interface TtsModelViewResponsePayload {
   success: boolean,
@@ -30,6 +32,7 @@ interface TtsModel {
   creator_display_name: string,
   description_markdown: string,
   description_rendered_html: string,
+  creator_set_visibility: string,
   updatable_slug: string,
   created_at: string,
   updated_at: string,
@@ -266,6 +269,10 @@ function TtsModelViewFc(props: Props) {
     );
   }
 
+  const resultVisibility = ttsModel?.creator_set_visibility === 'hidden' ? 
+    <span>Hidden <HiddenIconFc /></span> :
+    <span>Public <VisibleIconFc /></span> ;
+
   return (
     <div className="content">
       <h1 className="title is-1"> {title} </h1>
@@ -323,6 +330,10 @@ function TtsModelViewFc(props: Props) {
           <tr>
             <th>Upload date (UTC)</th>
             <td>{ttsModel?.created_at}</td>
+          </tr>
+          <tr>
+            <th>Visibility</th>
+            <td>{resultVisibility}</td>
           </tr>
 
           {moderatorRows}
