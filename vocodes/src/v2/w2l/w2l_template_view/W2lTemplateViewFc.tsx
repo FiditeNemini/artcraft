@@ -12,42 +12,11 @@ import { UploadIcon } from '../../../icons/UploadIcon';
 import { VisibleIconFc } from '../../../icons/VisibleIconFc';
 import { HiddenIconFc } from '../../../icons/HiddenIconFc';
 import { FrontendUrlConfig } from '../../../common/FrontendUrlConfig';
-
-interface W2lTemplateViewResponsePayload {
-  success: boolean,
-  template: W2lTemplate,
-}
+import { GetW2lTemplate, W2lTemplate } from '../../api/w2l/GetW2lTemplate';
 
 interface W2lTemplateUseCountResponsePayload {
   success: boolean,
   count: number | null | undefined,
-}
-
-interface W2lTemplate {
-  template_token: string,
-  template_type: string,
-  creator_user_token: string,
-  creator_username: string,
-  creator_display_name: string,
-  updatable_slug: string,
-  title: string,
-  frame_width: number,
-  frame_height: number,
-  duration_millis: number,
-  maybe_image_object_name: string,
-  maybe_video_object_name: string,
-  creator_set_visibility: string,
-  is_public_listing_approved: boolean | null,
-  created_at: string,
-  updated_at: string,
-  maybe_moderator_fields: W2lTemplateModeratorFields | null | undefined,
-}
-
-interface W2lTemplateModeratorFields {
-  creator_ip_address_creation: string,
-  creator_ip_address_last_update: string,
-  mod_deleted_at: string | undefined | null,
-  user_deleted_at: string | undefined | null,
 }
 
 interface EnqueueJobResponsePayload {
@@ -76,34 +45,21 @@ function W2lTemplateViewFc(props: Props) {
   // Moderation
   const [modApprovedFormValue, setModApprovedFormValue] = useState<boolean>(true);
 
-  const getTemplate = useCallback((templateSlug: string) => {
-    const api = new ApiConfig();
-    const endpointUrl = api.viewW2l(templateSlug);
+  const getTemplate = useCallback(async (templateSlug: string) => {
+    const templateResponse = await GetW2lTemplate(templateSlug);
 
-    fetch(endpointUrl, {
-      method: 'GET',
-      headers: {
-        'Accept': 'application/json',
-      },
-      credentials: 'include',
-    })
-    .then(res => res.json())
-    .then(res => {
-      const templatesResponse : W2lTemplateViewResponsePayload = res;
-      if (!templatesResponse.success) {
+      if (!templateResponse) {
         return;
       }
 
-      setW2lTemplate(templatesResponse.template)
+      setW2lTemplate(templateResponse)
 
-      let modApprovalState = templatesResponse?.template?.is_public_listing_approved;
+      let modApprovalState = templateResponse?.is_public_listing_approved;
       if (modApprovedFormValue === undefined || modApprovalState === null) {
         modApprovalState = true;
       }
 
       setModApprovedFormValue(modApprovalState);
-    })
-    .catch(e => {});
 
   }, [modApprovedFormValue]);
 
