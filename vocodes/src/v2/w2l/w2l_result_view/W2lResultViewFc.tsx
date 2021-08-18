@@ -8,6 +8,7 @@ import { BucketConfig } from '../../../common/BucketConfig';
 import { HiddenIconFc } from '../../../icons/HiddenIconFc';
 import { VisibleIconFc } from '../../../icons/VisibleIconFc';
 import { FrontendUrlConfig } from '../../../common/FrontendUrlConfig';
+import { DownloadIcon } from '../../../icons/DownloadIcon';
 
 interface W2lInferenceResultResponsePayload {
   success: boolean,
@@ -207,7 +208,7 @@ function W2lResultViewFc(props: Props) {
     <div>
       <h1 className="title is-1"> Lipsync Result </h1>
 
-      <video width="80%" height="auto" controls={true}>
+      <video width="100%" height="auto" controls={true}>
         <source src={videoLink} />
         Your device doesn't support video.
       </video> 
@@ -215,9 +216,9 @@ function W2lResultViewFc(props: Props) {
       <br />
       <br />
 
-      <a className="button is-medium is-primary" 
+      <a className="button is-large is-primary is-fullwidth" 
           href={videoLink}
-          download={videoDownloadFilename}>Download File</a>
+          download={videoDownloadFilename}> <DownloadIcon />&nbsp;Download File</a>
 
       <br />
       <br />
