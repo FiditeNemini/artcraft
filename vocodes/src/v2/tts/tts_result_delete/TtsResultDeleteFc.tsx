@@ -3,6 +3,7 @@ import { ApiConfig } from '../../../common/ApiConfig';
 import { SessionWrapper } from '../../../session/SessionWrapper';
 import { useParams, Link, useHistory } from 'react-router-dom';
 import { GravatarFc } from '../../common/GravatarFc';
+import { FrontendUrlConfig } from '../../../common/FrontendUrlConfig';
 
 interface TtsInferenceResultResponsePayload {
   success: boolean,
@@ -80,7 +81,10 @@ function TtsResultDeleteFc(props: Props) {
     });
   }, [token]); // NB: Empty array dependency sets to run ONLY on mount
 
-  const currentlyDeleted = !!ttsInferenceResult?.maybe_moderator_fields?.mod_deleted_at || !!ttsInferenceResult?.maybe_moderator_fields?.user_deleted_at;
+  const currentlyDeleted = !!ttsInferenceResult?.maybe_moderator_fields?.mod_deleted_at || 
+    !!ttsInferenceResult?.maybe_moderator_fields?.user_deleted_at;
+
+  const resultLink = FrontendUrlConfig.ttsResultPage(token);
 
   const handleDeleteFormSubmit = (ev: React.FormEvent<HTMLFormElement>) : boolean => {
     ev.preventDefault();
@@ -106,7 +110,7 @@ function TtsResultDeleteFc(props: Props) {
     .then(res => {
       if (res.success) {
         if (props.sessionWrapper.canDeleteOtherUsersTtsResults()) {
-          history.go(0); // force reload
+          history.push(resultLink); // Mods can perform further actions
         } else {
           history.push('/');
         }
@@ -118,10 +122,11 @@ function TtsResultDeleteFc(props: Props) {
   }
 
   if (ttsInferenceResult === undefined) {
-    return <div />;
+    return <div />; // Exit rendering until data loads.
   }
 
-  let modelLink = `/tts/${ttsInferenceResult.tts_model_token}`;
+  const modelLink = FrontendUrlConfig.ttsModelPage(ttsInferenceResult.tts_model_token);
+
   let durationSeconds = ttsInferenceResult?.duration_millis / 1000;
   let modelName = ttsInferenceResult.tts_model_title;
 
