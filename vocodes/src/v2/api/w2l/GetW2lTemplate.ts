@@ -1,6 +1,6 @@
 import { ApiConfig } from "../../../common/ApiConfig";
 
-export interface W2lTemplateViewResponsePayload {
+interface W2lTemplateViewResponsePayload {
   success: boolean,
   template: W2lTemplate,
 }
@@ -32,7 +32,7 @@ export interface W2lTemplateModeratorFields {
   user_deleted_at: string | undefined | null,
 }
 
-export async function GetW2lTemplate(templateToken: string) : Promise<W2lTemplate | undefined | null> {
+export async function GetW2lTemplate(templateToken: string) : Promise<W2lTemplate | undefined> {
     const endpoint = new ApiConfig().viewW2lTemplate(templateToken);
 
     return await fetch(endpoint, {
@@ -48,7 +48,6 @@ export async function GetW2lTemplate(templateToken: string) : Promise<W2lTemplat
       if (!templatesResponse.success) {
         return;
       }
-
       return templatesResponse?.template;
     })
     .catch(e => {

@@ -4,42 +4,12 @@ import { ApiConfig } from '../../../common/ApiConfig';
 import { FrontendUrlConfig } from '../../../common/FrontendUrlConfig';
 import { SessionWrapper } from '../../../session/SessionWrapper';
 import { useParams, Link, useHistory } from 'react-router-dom';
-
-interface W2lTemplateViewResponsePayload {
-  success: boolean,
-  template: W2lTemplate,
-}
+import { GetW2lTemplate, W2lTemplate } from '../../api/w2l/GetW2lTemplate';
+import { GetW2lTemplateUseCount } from '../../api/w2l/GetW2lTemplateUseCount';
 
 interface W2lTemplateUseCountResponsePayload {
   success: boolean,
   count: number | null | undefined,
-}
-
-interface W2lTemplate {
-  template_token: string,
-  template_type: string,
-  creator_user_token: string,
-  creator_username: string,
-  creator_display_name: string,
-  updatable_slug: string,
-  title: string,
-  frame_width: number,
-  frame_height: number,
-  duration_millis: number,
-  maybe_image_object_name: string,
-  maybe_video_object_name: string,
-  creator_set_visibility: string,
-  is_public_listing_approved: boolean | null,
-  created_at: string,
-  updated_at: string,
-  maybe_moderator_fields: W2lTemplateModeratorFields | null | undefined,
-}
-
-interface W2lTemplateModeratorFields {
-  creator_ip_address_creation: string,
-  creator_ip_address_last_update: string,
-  mod_deleted_at: string | undefined | null,
-  user_deleted_at: string | undefined | null,
 }
 
 interface Props {
@@ -54,58 +24,24 @@ function W2lTemplateDeleteFc(props: Props) {
   const [w2lTemplate, setW2lTemplate] = useState<W2lTemplate|undefined>(undefined);
   const [w2lTemplateUseCount, setW2lTemplateUseCount] = useState<number|undefined>(undefined);
 
-  const getModel = useCallback((templateToken) => {
-    const api = new ApiConfig();
-    const endpointUrl = api.viewW2lTemplate(templateToken);
-
-    fetch(endpointUrl, {
-      method: 'GET',
-      headers: {
-        'Accept': 'application/json',
-      },
-      credentials: 'include',
-    })
-    .then(res => res.json())
-    .then(res => {
-      const templateResponse : W2lTemplateViewResponsePayload = res;
-      if (!templateResponse.success) {
-        return;
-      }
-
-      setW2lTemplate(templateResponse.template)
-    })
-    .catch(e => {});
+  const getTemplate = useCallback(async (templateToken) => {
+    const template = await GetW2lTemplate(templateToken);
+    if (template) {
+      setW2lTemplate(template)
+    }
   }, []);
 
-  const getModelUseCount = useCallback((templateToken) => {
-    const api = new ApiConfig();
-    const endpointUrl = api.getW2lTemplateUseCount(templateToken);
-
-    fetch(endpointUrl, {
-      method: 'GET',
-      headers: {
-        'Accept': 'application/json',
-      },
-      credentials: 'include',
-    })
-    .then(res => res.json())
-    .then(res => {
-      const templatesResponse : W2lTemplateUseCountResponsePayload = res;
-      if (!templatesResponse.success) {
-        return;
-      }
-
-      setW2lTemplateUseCount(templatesResponse.count || 0)
-    })
-    .catch(e => {});
+  const getTemplateUseCount = useCallback(async (templateToken) => {
+    const count = await GetW2lTemplateUseCount(templateToken);
+    setW2lTemplateUseCount(count || 0)
   }, []);
 
   const templateLink = FrontendUrlConfig.w2lTemplatePage(templateToken);
 
   useEffect(() => {
-    getModel(templateToken);
-    getModelUseCount(templateToken);
-  }, [templateToken, getModel, getModelUseCount]);
+    getTemplate(templateToken);
+    getTemplateUseCount(templateToken);
+  }, [templateToken, getTemplate, getTemplateUseCount]);
 
   const handleDeleteFormSubmit = (ev: React.FormEvent<HTMLFormElement>) : boolean => {
     ev.preventDefault();

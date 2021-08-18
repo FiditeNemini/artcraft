@@ -13,6 +13,7 @@ import { VisibleIconFc } from '../../../icons/VisibleIconFc';
 import { HiddenIconFc } from '../../../icons/HiddenIconFc';
 import { FrontendUrlConfig } from '../../../common/FrontendUrlConfig';
 import { GetW2lTemplate, W2lTemplate } from '../../api/w2l/GetW2lTemplate';
+import { GetW2lTemplateUseCount } from '../../api/w2l/GetW2lTemplateUseCount';
 
 interface W2lTemplateUseCountResponsePayload {
   success: boolean,
@@ -31,7 +32,7 @@ interface Props {
 }
 
 function W2lTemplateViewFc(props: Props) {
-  let { templateSlug } = useParams() as { templateSlug: string };
+  let { templateSlug } : { templateSlug : string } = useParams();
 
   const history = useHistory();
 
@@ -63,27 +64,9 @@ function W2lTemplateViewFc(props: Props) {
 
   }, [modApprovedFormValue]);
 
-  const getTemplateUseCount = useCallback((templateSlug: string) => {
-    const api = new ApiConfig();
-    const endpointUrl = api.getW2lTemplateUseCount(templateSlug);
-
-    fetch(endpointUrl, {
-      method: 'GET',
-      headers: {
-        'Accept': 'application/json',
-      },
-      credentials: 'include',
-    })
-    .then(res => res.json())
-    .then(res => {
-      const templatesResponse : W2lTemplateUseCountResponsePayload = res;
-      if (!templatesResponse.success) {
-        return;
-      }
-
-      setW2lTemplateUseCount(templatesResponse.count || 0)
-    })
-    .catch(e => {});
+  const getTemplateUseCount = useCallback(async (templateToken) => {
+    const count = await GetW2lTemplateUseCount(templateToken);
+    setW2lTemplateUseCount(count || 0)
   }, []);
 
   useEffect(() => {
