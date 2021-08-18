@@ -34,6 +34,10 @@ class FrontendUrlConfig {
 
   // W2L template links
 
+  static w2lTemplatePage(templateToken: string) : string {
+    return `/w2l/${templateToken}`;
+  }
+
   static w2lResultPage(resultToken: string) : string {
     return `/w2l/result/${resultToken}`;
   }

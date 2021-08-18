@@ -139,6 +139,10 @@ class ApiConfig {
     return `${this.getScheme()}://${this.getNewApiHost()}/w2l/template/${templateToken}`;
   }
 
+  viewW2lTemplate(templateToken: string) : string {
+    return this.viewW2l(templateToken);
+  }
+
   deleteW2lTemplate(templateToken: string) : string {
     return `${this.getScheme()}://${this.getNewApiHost()}/w2l/template/${templateToken}/delete`;
   }

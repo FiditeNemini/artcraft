@@ -5,33 +5,37 @@ import { FrontendUrlConfig } from '../../../common/FrontendUrlConfig';
 import { SessionWrapper } from '../../../session/SessionWrapper';
 import { useParams, Link, useHistory } from 'react-router-dom';
 
-interface TtsModelViewResponsePayload {
+interface W2lTemplateViewResponsePayload {
   success: boolean,
-  model: TtsModel,
+  template: W2lTemplate,
 }
 
-interface TtsModelUseCountResponsePayload {
+interface W2lTemplateUseCountResponsePayload {
   success: boolean,
   count: number | null | undefined,
 }
 
-interface TtsModel {
-  model_token: string,
-  title: string,
-  tts_model_type: string,
-  text_preprocessing_algorithm: string,
+interface W2lTemplate {
+  template_token: string,
+  template_type: string,
   creator_user_token: string,
   creator_username: string,
   creator_display_name: string,
-  description_markdown: string,
-  description_rendered_html: string,
   updatable_slug: string,
+  title: string,
+  frame_width: number,
+  frame_height: number,
+  duration_millis: number,
+  maybe_image_object_name: string,
+  maybe_video_object_name: string,
+  creator_set_visibility: string,
+  is_public_listing_approved: boolean | null,
   created_at: string,
   updated_at: string,
-  maybe_moderator_fields: TtsModelModeratorFields | null | undefined,
+  maybe_moderator_fields: W2lTemplateModeratorFields | null | undefined,
 }
 
-interface TtsModelModeratorFields {
+interface W2lTemplateModeratorFields {
   creator_ip_address_creation: string,
   creator_ip_address_last_update: string,
   mod_deleted_at: string | undefined | null,
@@ -42,17 +46,17 @@ interface Props {
   sessionWrapper: SessionWrapper,
 }
 
-function TtsModelDeleteFc(props: Props) {
+function W2lTemplateDeleteFc(props: Props) {
   const history = useHistory();
 
   let { token } = useParams() as { token : string };
 
-  const [ttsModel, setTtsModel] = useState<TtsModel|undefined>(undefined);
-  const [ttsModelUseCount, setTtsModelUseCount] = useState<number|undefined>(undefined);
+  const [w2lTemplate, setW2lTemplate] = useState<W2lTemplate|undefined>(undefined);
+  const [w2lTemplateUseCount, setW2lTemplateUseCount] = useState<number|undefined>(undefined);
 
   const getModel = useCallback((token) => {
     const api = new ApiConfig();
-    const endpointUrl = api.viewTtsModel(token);
+    const endpointUrl = api.viewW2lTemplate(token);
 
     fetch(endpointUrl, {
       method: 'GET',
@@ -63,19 +67,19 @@ function TtsModelDeleteFc(props: Props) {
     })
     .then(res => res.json())
     .then(res => {
-      const modelsResponse : TtsModelViewResponsePayload = res;
-      if (!modelsResponse.success) {
+      const templateResponse : W2lTemplateViewResponsePayload = res;
+      if (!templateResponse.success) {
         return;
       }
 
-      setTtsModel(modelsResponse.model)
+      setW2lTemplate(templateResponse.template)
     })
     .catch(e => {});
   }, []);
 
   const getModelUseCount = useCallback((token) => {
     const api = new ApiConfig();
-    const endpointUrl = api.getTtsModelUseCount(token);
+    const endpointUrl = api.getW2lTemplateUseCount(token);
 
     fetch(endpointUrl, {
       method: 'GET',
@@ -86,33 +90,32 @@ function TtsModelDeleteFc(props: Props) {
     })
     .then(res => res.json())
     .then(res => {
-      const modelsResponse : TtsModelUseCountResponsePayload = res;
-      if (!modelsResponse.success) {
+      const templatesResponse : W2lTemplateUseCountResponsePayload = res;
+      if (!templatesResponse.success) {
         return;
       }
 
-      setTtsModelUseCount(modelsResponse.count || 0)
+      setW2lTemplateUseCount(templatesResponse.count || 0)
     })
     .catch(e => {});
   }, []);
 
+  const templateLink = FrontendUrlConfig.w2lTemplatePage(token);
 
   useEffect(() => {
     getModel(token);
     getModelUseCount(token);
   }, [token, getModel, getModelUseCount]);
 
-  const modelLink = FrontendUrlConfig.ttsModelPage(token);
-
   const handleDeleteFormSubmit = (ev: React.FormEvent<HTMLFormElement>) : boolean => {
     ev.preventDefault();
 
     const api = new ApiConfig();
-    const endpointUrl = api.deleteTtsModel(token);
+    const endpointUrl = api.deleteW2lTemplate(token);
 
     const request = {
       set_delete: !currentlyDeleted,
-      as_mod: props.sessionWrapper.deleteTtsResultAsMod(ttsModel?.creator_user_token)
+      as_mod: props.sessionWrapper.deleteTtsResultAsMod(w2lTemplate?.creator_user_token)
     }
 
     fetch(endpointUrl, {
@@ -128,7 +131,7 @@ function TtsModelDeleteFc(props: Props) {
     .then(res => {
       if (res.success) {
         if (props.sessionWrapper.canDeleteOtherUsersTtsResults()) {
-          history.push(modelLink); // Mods can perform further actions
+          history.push(templateLink); // Mods can perform further actions
         } else {
           history.push('/');
         }
@@ -141,15 +144,15 @@ function TtsModelDeleteFc(props: Props) {
 
   let creatorLink = <span />;
 
-  if (!!ttsModel?.creator_display_name) {
-    const creatorUrl = FrontendUrlConfig.userProfilePage(ttsModel?.creator_display_name);
+  if (!!w2lTemplate?.creator_display_name) {
+    const creatorUrl = FrontendUrlConfig.userProfilePage(w2lTemplate?.creator_display_name);
     creatorLink = (
-      <Link to={creatorUrl}>{ttsModel?.creator_display_name}</Link>
+      <Link to={creatorUrl}>{w2lTemplate?.creator_display_name}</Link>
     );
   }
 
-  let currentlyDeleted = !!ttsModel?.maybe_moderator_fields?.mod_deleted_at ||
-      !!ttsModel?.maybe_moderator_fields?.user_deleted_at;
+  let currentlyDeleted = !!w2lTemplate?.maybe_moderator_fields?.mod_deleted_at ||
+      !!w2lTemplate?.maybe_moderator_fields?.user_deleted_at;
 
   const h1Title = currentlyDeleted ? "Undelete Model?" : "Delete Model?";
 
@@ -165,30 +168,30 @@ function TtsModelDeleteFc(props: Props) {
 
   let humanUseCount : string | number = 'Fetching...';
 
-  if (ttsModelUseCount !== undefined && ttsModelUseCount !== null) {
-    humanUseCount = ttsModelUseCount;
+  if (w2lTemplateUseCount !== undefined && w2lTemplateUseCount !== null) {
+    humanUseCount = w2lTemplateUseCount;
   }
 
   let moderatorRows = null;
 
-  if (props.sessionWrapper.canDeleteOtherUsersTtsResults() || props.sessionWrapper.canDeleteOtherUsersTtsModels()) {
+  if (props.sessionWrapper.canDeleteOtherUsersTtsResults() || props.sessionWrapper.canDeleteOtherUsersW2lTemplates()) {
     moderatorRows = (
       <>
         <tr>
           <th>Creator IP Address (Creation)</th>
-          <td>{ttsModel?.maybe_moderator_fields?.creator_ip_address_creation || "server error"}</td>
+          <td>{w2lTemplate?.maybe_moderator_fields?.creator_ip_address_creation || "server error"}</td>
         </tr>
         <tr>
           <th>Creator IP Address (Update)</th>
-          <td>{ttsModel?.maybe_moderator_fields?.creator_ip_address_last_update || "server error"}</td>
+          <td>{w2lTemplate?.maybe_moderator_fields?.creator_ip_address_last_update || "server error"}</td>
         </tr>
         <tr>
           <th>Mod Deleted At (UTC)</th>
-          <td>{ttsModel?.maybe_moderator_fields?.mod_deleted_at || "not deleted"}</td>
+          <td>{w2lTemplate?.maybe_moderator_fields?.mod_deleted_at || "not deleted"}</td>
         </tr>
         <tr>
           <th>User Deleted At (UTC)</th>
-          <td>{ttsModel?.maybe_moderator_fields?.user_deleted_at || "not deleted"}</td>
+          <td>{w2lTemplate?.maybe_moderator_fields?.user_deleted_at || "not deleted"}</td>
         </tr>
       </>
     );
@@ -199,7 +202,7 @@ function TtsModelDeleteFc(props: Props) {
       <h1 className="title is-1"> {h1Title} </h1>
       
       <p>
-        <Link to="/">&lt; Back to all models</Link>
+        <Link to="/">&lt; Back to all templates</Link>
       </p>
       
       <table className="table">
@@ -222,19 +225,11 @@ function TtsModelDeleteFc(props: Props) {
           </tr>
           <tr>
             <th>Title</th>
-            <td>{ttsModel?.title}</td>
-          </tr>
-          <tr>
-            <th>Model Type</th>
-            <td>{ttsModel?.tts_model_type}</td>
-          </tr>
-          <tr>
-            <th>Text Preprocessing Algorithm</th>
-            <td>{ttsModel?.text_preprocessing_algorithm}</td>
+            <td>{w2lTemplate?.title}</td>
           </tr>
           <tr>
             <th>Upload Date (UTC)</th>
-            <td>{ttsModel?.created_at}</td>
+            <td>{w2lTemplate?.created_at}</td>
           </tr>
 
           {moderatorRows}
@@ -256,9 +251,9 @@ function TtsModelDeleteFc(props: Props) {
 
       <br />
       <br />
-      <Link to="/">&lt; Back to all models</Link>
+      <Link to="/">&lt; Back to all templates</Link>
     </div>
   )
 }
 
-export { TtsModelDeleteFc };
+export { W2lTemplateDeleteFc };
