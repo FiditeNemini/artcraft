@@ -32,6 +32,20 @@ class FrontendUrlConfig {
     return `/tts/result/${resultToken}/delete`;
   }
 
+  // W2L template links
+
+  static w2lResultPage(resultToken: string) : string {
+    return `/w2l/result/${resultToken}`;
+  }
+
+  static w2lResultEditPage(resultToken: string) : string {
+    return `/w2l/result/${resultToken}/edit`;
+  }
+
+  static w2lResultDeletePage(resultToken: string) : string {
+    return `/w2l/result/${resultToken}/delete`;
+  }
+
   // User links
 
   static userProfilePage(userDisplayName: string) : string {

@@ -3,11 +3,11 @@ import { ApiConfig } from '../../../common/ApiConfig';
 import { GravatarFc } from '../../common/GravatarFc';
 import { SessionWrapper } from '../../../session/SessionWrapper';
 import { useParams, Link } from 'react-router-dom';
-import { W2lResultViewDeleteFc } from './W2lResultView_DeleteFc';
 import { ReportDiscordLinkFc } from '../../common/DiscordReportLinkFc';
 import { BucketConfig } from '../../../common/BucketConfig';
 import { HiddenIconFc } from '../../../icons/HiddenIconFc';
 import { VisibleIconFc } from '../../../icons/VisibleIconFc';
+import { FrontendUrlConfig } from '../../../common/FrontendUrlConfig';
 
 interface W2lInferenceResultResponsePayload {
   success: boolean,
@@ -96,7 +96,6 @@ function W2lResultViewFc(props: Props) {
 
   let templateName = w2lInferenceResult.template_title;
 
-  const currentlyDeleted = !!w2lInferenceResult?.maybe_moderator_fields?.mod_deleted_at || !!w2lInferenceResult?.maybe_moderator_fields?.user_deleted_at;
 
   let moderatorRows = null;
 
@@ -165,6 +164,45 @@ function W2lResultViewFc(props: Props) {
     <span>Hidden <HiddenIconFc /></span> :
     <span>Public <VisibleIconFc /></span> ;
 
+  const currentlyDeleted = !!w2lInferenceResult?.maybe_moderator_fields?.mod_deleted_at || 
+      !!w2lInferenceResult?.maybe_moderator_fields?.user_deleted_at;
+
+  const deleteButtonTitle = currentlyDeleted ? "Undelete Result?" : "Delete Result?";
+
+  const deleteButtonCss = currentlyDeleted ? 
+    "button is-warning is-large is-fullwidth" :
+    "button is-danger is-large is-fullwidth";
+
+
+  let editButton = null;
+  const canEdit = props.sessionWrapper.canEditW2lResultAsUserOrMod(w2lInferenceResult?.maybe_creator_user_token);
+
+  if (canEdit) {
+    editButton = (
+      <>
+        <br />
+        <Link 
+          className="button is-info is-large is-fullwidth"
+          to={FrontendUrlConfig.w2lResultEditPage(token)}
+          >Edit Result Visibility</Link>
+      </>
+    );
+  }
+
+  let deleteButton = null;
+  const canDelete = props.sessionWrapper.canDeleteW2lResultAsUserOrMod(w2lInferenceResult?.maybe_creator_user_token);
+
+  if (canDelete) {
+    deleteButton = (
+      <>
+        <br />
+        <Link 
+          className={deleteButtonCss}
+          to={FrontendUrlConfig.w2lResultDeletePage(token)}
+          >{deleteButtonTitle}</Link>
+      </>
+    );
+  }
   return (
     <div>
       <h1 className="title is-1"> Lipsync Result </h1>
@@ -183,7 +221,6 @@ function W2lResultViewFc(props: Props) {
 
       <br />
       <br />
-
 
       <table className="table is-fullwidth">
         <tbody>
@@ -236,12 +273,9 @@ function W2lResultViewFc(props: Props) {
         </tbody>
       </table>
 
-      <W2lResultViewDeleteFc
-        sessionWrapper={props.sessionWrapper}
-        resultToken={token}
-        currentlyDeleted={currentlyDeleted}
-        maybeCreatorUserToken={w2lInferenceResult?.maybe_creator_user_token}
-        />
+      {editButton}
+
+      {deleteButton}
 
       <br />
       <ReportDiscordLinkFc />

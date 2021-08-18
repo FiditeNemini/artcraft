@@ -140,6 +140,20 @@ export class SessionWrapper {
     return this.canDeleteOtherUsersTtsModels();
   }
 
+  public canEditW2lResultAsUserOrMod(creatorUserToken: MaybeString) : boolean {
+    if (this.userTokenMatches(creatorUserToken)) {
+      return true;
+    }
+    return this.canDeleteOtherUsersW2lResults(); // TODO: There is no granular permission for this yet.
+  }
+
+  public canDeleteW2lResultAsUserOrMod(creatorUserToken: MaybeString) : boolean {
+    if (this.userTokenMatches(creatorUserToken)) {
+      return true;
+    }
+    return this.canDeleteOtherUsersW2lResults();
+  }
+
   public userTokenMatches(otherUserToken: MaybeString) : boolean {
     // Default to false if user token on either side is falsey. 
     if (!otherUserToken) {

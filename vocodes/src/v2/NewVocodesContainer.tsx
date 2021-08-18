@@ -31,6 +31,7 @@ import { W2lTemplateListFc } from './w2l/w2l_template_list/W2lTemplateListFc';
 import { W2lTemplateUploadJob } from '../jobs/W2lTemplateUploadJobs';
 import { W2lTemplateViewFc } from './w2l/w2l_template_view/W2lTemplateViewFc';
 import { TtsResultEditFc } from './tts/tts_result_edit/TtsResultEditFc';
+import { W2lResultEditFc } from './w2l/w2l_result_edit/W2lResultEditFc';
 
 interface Props {
   sessionWrapper: SessionWrapper,
@@ -153,6 +154,12 @@ class NewVocodesContainer extends React.Component<Props, State> {
                 querySessionCallback={()=>{}}
                 sessionWrapper={this.props.sessionWrapper}
                 enqueueTtsJob={this.props.enqueueTtsJob}
+              />
+            </Route>
+
+            <Route path="/w2l/result/:token/edit">
+              <W2lResultEditFc
+                sessionWrapper={this.props.sessionWrapper}
               />
             </Route>
 

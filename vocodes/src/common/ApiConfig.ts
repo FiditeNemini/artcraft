@@ -155,6 +155,10 @@ class ApiConfig {
     return `${this.getScheme()}://${this.getNewApiHost()}/w2l/result/${token}`;
   }
 
+  editW2lInferenceResult(token: string) : string {
+    return `${this.getScheme()}://${this.getNewApiHost()}/w2l/result/${token}/edit`;
+  }
+
   deleteW2lInferenceResult(resultToken: string) : string {
     return `${this.getScheme()}://${this.getNewApiHost()}/w2l/result/${resultToken}/delete`;
   }
