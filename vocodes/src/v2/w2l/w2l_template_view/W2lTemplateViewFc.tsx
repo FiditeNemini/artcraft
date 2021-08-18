@@ -6,12 +6,12 @@ import { W2lInferenceJob } from '../../../App';
 import { useParams, Link, useHistory } from 'react-router-dom';
 import { v4 as uuidv4 } from 'uuid';
 import { SessionW2lInferenceResultListFc } from '../../common/SessionW2lInferenceResultsListFc';
-import { W2lTemplateViewDeleteFc } from './W2lTemplateView_DeleteFc';
 import { ReportDiscordLinkFc } from '../../common/DiscordReportLinkFc';
 import { BucketConfig } from '../../../common/BucketConfig';
 import { UploadIcon } from '../../../icons/UploadIcon';
 import { VisibleIconFc } from '../../../icons/VisibleIconFc';
 import { HiddenIconFc } from '../../../icons/HiddenIconFc';
+import { FrontendUrlConfig } from '../../../common/FrontendUrlConfig';
 
 interface W2lTemplateViewResponsePayload {
   success: boolean,
@@ -287,8 +287,6 @@ function W2lTemplateViewFc(props: Props) {
     );
   }
 
-  const currentlyDeleted = !!w2lTemplate?.maybe_moderator_fields?.mod_deleted_at || !!w2lTemplate?.maybe_moderator_fields?.user_deleted_at;
-
   let moderatorRows = null;
 
   if (props.sessionWrapper.canDeleteOtherUsersW2lResults() || props.sessionWrapper.canDeleteOtherUsersW2lTemplates()) {
@@ -324,6 +322,44 @@ function W2lTemplateViewFc(props: Props) {
 
   if (w2lTemplateUseCount !== undefined && w2lTemplateUseCount !== null) {
     humanUseCount = w2lTemplateUseCount;
+  }
+
+  let editButton = <span />;
+
+  if (props.sessionWrapper.canEditTtsModelByUserToken(w2lTemplate?.creator_user_token)) {
+    editButton = (
+      <>
+        <br />
+        <Link 
+          className={"button is-large is-info is-fullwidth"}
+          to={FrontendUrlConfig.w2lTemplateEditPage(templateSlug)}
+          >Edit Template Details</Link>
+      </>
+    );
+  }
+
+  let deleteButton = <span />;
+
+  if (props.sessionWrapper.canDeleteTtsModelByUserToken(w2lTemplate?.creator_user_token)) {
+
+    const currentlyDeleted = !!w2lTemplate?.maybe_moderator_fields?.mod_deleted_at || 
+        !!w2lTemplate?.maybe_moderator_fields?.user_deleted_at;
+
+    const deleteButtonTitle = currentlyDeleted ? "Undelete Template?" : "Delete Template?";
+
+    const deleteButtonCss = currentlyDeleted ? 
+      "button is-warning is-large is-fullwidth" :
+      "button is-danger is-large is-fullwidth";
+
+    deleteButton = (
+      <>
+        <br />
+        <Link 
+          className={deleteButtonCss}
+          to={FrontendUrlConfig.w2lTemplateDeletePage(templateSlug)}
+          >{deleteButtonTitle}</Link>
+      </>
+    );
   }
 
   const resultVisibility = w2lTemplate?.creator_set_visibility === 'hidden' ? 
@@ -441,13 +477,11 @@ function W2lTemplateViewFc(props: Props) {
 
       {modOnlyApprovalForm}
 
-      <W2lTemplateViewDeleteFc
-        sessionWrapper={props.sessionWrapper}
-        templateSlug={templateSlug}
-        currentlyDeleted={currentlyDeleted}
-        creatorUserToken={w2lTemplate?.creator_user_token}
-        />
+      {editButton}
 
+      {deleteButton}
+
+      <br />
       <SessionW2lInferenceResultListFc w2lInferenceJobs={props.w2lInferenceJobs} />
       <br />
       <ReportDiscordLinkFc />

@@ -38,6 +38,14 @@ class FrontendUrlConfig {
     return `/w2l/${templateToken}`;
   }
 
+  static w2lTemplateEditPage(templateToken: string) : string {
+    return `/w2l/${templateToken}/edit`;
+  }
+
+  static w2lTemplateDeletePage(templateToken: string) : string {
+    return `/w2l/${templateToken}/delete`;
+  }
+
   static w2lResultPage(resultToken: string) : string {
     return `/w2l/result/${resultToken}`;
   }

@@ -49,14 +49,14 @@ interface Props {
 function W2lTemplateDeleteFc(props: Props) {
   const history = useHistory();
 
-  let { token } = useParams() as { token : string };
+  let { templateToken } : { templateToken : string } = useParams();
 
   const [w2lTemplate, setW2lTemplate] = useState<W2lTemplate|undefined>(undefined);
   const [w2lTemplateUseCount, setW2lTemplateUseCount] = useState<number|undefined>(undefined);
 
-  const getModel = useCallback((token) => {
+  const getModel = useCallback((templateToken) => {
     const api = new ApiConfig();
-    const endpointUrl = api.viewW2lTemplate(token);
+    const endpointUrl = api.viewW2lTemplate(templateToken);
 
     fetch(endpointUrl, {
       method: 'GET',
@@ -77,9 +77,9 @@ function W2lTemplateDeleteFc(props: Props) {
     .catch(e => {});
   }, []);
 
-  const getModelUseCount = useCallback((token) => {
+  const getModelUseCount = useCallback((templateToken) => {
     const api = new ApiConfig();
-    const endpointUrl = api.getW2lTemplateUseCount(token);
+    const endpointUrl = api.getW2lTemplateUseCount(templateToken);
 
     fetch(endpointUrl, {
       method: 'GET',
@@ -100,18 +100,18 @@ function W2lTemplateDeleteFc(props: Props) {
     .catch(e => {});
   }, []);
 
-  const templateLink = FrontendUrlConfig.w2lTemplatePage(token);
+  const templateLink = FrontendUrlConfig.w2lTemplatePage(templateToken);
 
   useEffect(() => {
-    getModel(token);
-    getModelUseCount(token);
-  }, [token, getModel, getModelUseCount]);
+    getModel(templateToken);
+    getModelUseCount(templateToken);
+  }, [templateToken, getModel, getModelUseCount]);
 
   const handleDeleteFormSubmit = (ev: React.FormEvent<HTMLFormElement>) : boolean => {
     ev.preventDefault();
 
     const api = new ApiConfig();
-    const endpointUrl = api.deleteW2lTemplate(token);
+    const endpointUrl = api.deleteW2lTemplate(templateToken);
 
     const request = {
       set_delete: !currentlyDeleted,
@@ -154,7 +154,7 @@ function W2lTemplateDeleteFc(props: Props) {
   let currentlyDeleted = !!w2lTemplate?.maybe_moderator_fields?.mod_deleted_at ||
       !!w2lTemplate?.maybe_moderator_fields?.user_deleted_at;
 
-  const h1Title = currentlyDeleted ? "Undelete Model?" : "Delete Model?";
+  const h1Title = currentlyDeleted ? "Undelete Template?" : "Delete Template?";
 
   const buttonTitle = currentlyDeleted ? "Confirm Undelete" : "Confirm Delete";
 
@@ -163,8 +163,8 @@ function W2lTemplateDeleteFc(props: Props) {
     "button is-danger is-large is-fullwidth";
 
   const formLabel = currentlyDeleted ? 
-     "Recover the TTS Model (makes it visible again)" : 
-     "Delete TTS Model (hides from everyone but mods)";
+     "Recover the W2L Template (makes it visible again)" : 
+     "Delete W2L Template (hides from everyone but mods)";
 
   let humanUseCount : string | number = 'Fetching...';
 
@@ -202,7 +202,7 @@ function W2lTemplateDeleteFc(props: Props) {
       <h1 className="title is-1"> {h1Title} </h1>
       
       <p>
-        <Link to="/">&lt; Back to all templates</Link>
+        <Link to={templateLink}>&lt; Back to template</Link>
       </p>
       
       <table className="table">
@@ -251,7 +251,7 @@ function W2lTemplateDeleteFc(props: Props) {
 
       <br />
       <br />
-      <Link to="/">&lt; Back to all templates</Link>
+      <Link to={templateLink}>&lt; Back to template</Link>
     </div>
   )
 }
