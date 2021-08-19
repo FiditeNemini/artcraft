@@ -89,6 +89,8 @@ function W2lResultDeleteFc(props: Props) {
      "Delete W2L Result (hides from everyone but mods)";
 
 
+  const durationSeconds = (w2lInferenceResult?.duration_millis || 0) / 1000;
+
   return (
     <div className="content">
       <h1 className="title is-1"> {h1Title} </h1>
@@ -116,8 +118,8 @@ function W2lResultDeleteFc(props: Props) {
             <td>{w2lInferenceResult?.template_title}</td>
           </tr>
           <tr>
-            <th>Duration (milliseconds)</th>
-            <td>{w2lInferenceResult?.duration_millis}</td>
+            <th>Duration</th>
+            <td>{durationSeconds} seconds</td>
           </tr>
         </tbody>
       </table>

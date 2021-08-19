@@ -178,6 +178,12 @@ function TtsResultDeleteFc(props: Props) {
     <div>
       <h1 className="title is-1"> {h1Title} </h1>
 
+      <div className="content">
+        <p>
+          <Link to={resultLink}>&lt; Back to result</Link>
+        </p>
+      </div>
+
       <table className="table">
         <thead>
           <tr>
@@ -231,6 +237,14 @@ function TtsResultDeleteFc(props: Props) {
           </button>
         </p>
       </form>
+
+      <br />
+      
+      <div className="content">
+        <p>
+          <Link to={resultLink}>&lt; Back to result</Link>
+        </p>
+      </div>
 
     </div>
   )
