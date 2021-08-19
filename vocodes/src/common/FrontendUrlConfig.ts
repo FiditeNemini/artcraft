@@ -34,6 +34,10 @@ class FrontendUrlConfig {
 
   // W2L template links
 
+  static w2lListPage() : string {
+    return '/video';
+  }
+
   static w2lTemplatePage(templateToken: string) : string {
     return `/w2l/${templateToken}`;
   }

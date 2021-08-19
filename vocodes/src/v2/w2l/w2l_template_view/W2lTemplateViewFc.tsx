@@ -318,6 +318,12 @@ function W2lTemplateViewFc(props: Props) {
     <div>
       <h1 className="title is-1"> Video lip sync template </h1>
 
+      <div className="content">
+        <p>
+          <Link to={FrontendUrlConfig.w2lListPage()}>&lt; Back to all templates</Link>
+        </p>
+      </div>
+
       <div className="content is-size-4">
         <p>
           Upload audio from vo.codes or any other source (music, other websites), 
@@ -433,6 +439,13 @@ function W2lTemplateViewFc(props: Props) {
 
       <br />
       <SessionW2lInferenceResultListFc w2lInferenceJobs={props.w2lInferenceJobs} />
+
+      <div className="content">
+        <p>
+          <Link to={FrontendUrlConfig.w2lListPage()}>&lt; Back to all templates</Link>
+        </p>
+      </div>
+
       <br />
       <ReportDiscordLinkFc />
     </div>
