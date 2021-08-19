@@ -5,7 +5,7 @@ import React from 'react';
 import { ApiConfig } from './common/ApiConfig';
 import { BrowserRouter, Route, Switch } from "react-router-dom";
 import { MigrationTopNav } from './migration/MigrationTopNav';
-import { NewVocodesContainer } from './v2/NewVocodesContainer';
+import { NewVocodesContainer } from './v2/view/NewVocodesContainer';
 import { OldVocodesContainer } from './v1/OldVocodesContainer';
 import { SessionStateResponse } from './session/SessionState';
 import { SessionWrapper } from './session/SessionWrapper';
