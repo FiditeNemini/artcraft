@@ -21,12 +21,9 @@ function W2lResultDeleteFc(props: Props) {
 
   const getTemplate = useCallback(async (token) => {
     const templateResponse = await GetW2lResult(token);
-
-    if (!templateResponse) {
-      return;
+    if (templateResponse) {
+      setW2lTemplate(templateResponse)
     }
-
-    setW2lTemplate(templateResponse)
   }, []);
 
   const getTemplateUseCount = useCallback(async (token) => {

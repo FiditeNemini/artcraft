@@ -42,24 +42,24 @@ export interface W2lInferenceResultModeratorFields {
 }
 
 export async function GetW2lResult(resultToken: string) : Promise<W2lResult | undefined> {
-    const endpoint = new ApiConfig().viewW2lInferenceResult(resultToken);
-
-    return await fetch(endpoint, {
-      method: 'GET',
-      headers: {
-        'Accept': 'application/json',
-      },
-      credentials: 'include',
-    })
-    .then(res => res.json())
-    .then(res => {
-      const response : W2lInferenceResultResponsePayload  = res;
-      if (!response.success) {
-        return;
-      }
-      return response?.result;
-    })
-    .catch(e => {
-      return undefined;
-    });
+  const endpoint = new ApiConfig().viewW2lInferenceResult(resultToken);
+  
+  return await fetch(endpoint, {
+    method: 'GET',
+    headers: {
+      'Accept': 'application/json',
+    },
+    credentials: 'include',
+  })
+  .then(res => res.json())
+  .then(res => {
+    const response : W2lInferenceResultResponsePayload  = res;
+    if (!response.success) {
+      return;
+    }
+    return response?.result;
+  })
+  .catch(e => {
+    return undefined;
+  });
 }

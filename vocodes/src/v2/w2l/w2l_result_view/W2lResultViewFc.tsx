@@ -1,5 +1,4 @@
-import React, { useState, useEffect } from 'react';
-import { ApiConfig } from '../../../common/ApiConfig';
+import React, { useState, useEffect, useCallback } from 'react';
 import { GravatarFc } from '../../common/GravatarFc';
 import { SessionWrapper } from '../../../session/SessionWrapper';
 import { useParams, Link } from 'react-router-dom';
@@ -9,47 +8,7 @@ import { HiddenIconFc } from '../../../icons/HiddenIconFc';
 import { VisibleIconFc } from '../../../icons/VisibleIconFc';
 import { FrontendUrlConfig } from '../../../common/FrontendUrlConfig';
 import { DownloadIcon } from '../../../icons/DownloadIcon';
-
-interface W2lInferenceResultResponsePayload {
-  success: boolean,
-  result: W2lInferenceResult,
-}
-
-interface W2lInferenceResult {
-  w2l_result_token: string,
-  maybe_w2l_template_token?: string,
-  maybe_tts_inference_result_token?: string,
-  public_bucket_video_path: string,
-  template_type: string,
-  template_title: string,
-
-  maybe_creator_user_token?: string,
-  maybe_creator_username?: string,
-  maybe_creator_display_name?: string,
-  maybe_creator_gravatar_hash?: string,
-
-  maybe_template_creator_user_token?: string,
-  maybe_template_creator_username?: string,
-  maybe_template_creator_display_name?: string,
-  maybe_template_creator_gravatar_hash?: string,
-
-  creator_set_visibility?: string,
-
-  file_size_bytes: number,
-  frame_width: number,
-  frame_height: number,
-  duration_millis: number,
-  created_at: string,
-  updated_at: string,
-
-  maybe_moderator_fields: W2lInferenceResultModeratorFields | null | undefined,
-}
-
-interface W2lInferenceResultModeratorFields {
-  creator_ip_address: string,
-  mod_deleted_at: string | undefined | null,
-  user_deleted_at: string | undefined | null,
-}
+import { GetW2lResult, W2lResult } from '../../api/w2l/GetW2lResult';
 
 interface Props {
   sessionWrapper: SessionWrapper,
@@ -58,32 +17,18 @@ interface Props {
 function W2lResultViewFc(props: Props) {
   let { token } = useParams() as { token : string };
 
-  const [w2lInferenceResult, setW2lInferenceResult] = useState<W2lInferenceResult|undefined>(undefined);
+  const [w2lInferenceResult, setW2lInferenceResult] = useState<W2lResult|undefined>(undefined);
+
+  const getInferenceResult = useCallback(async (token) => {
+    const templateResponse = await GetW2lResult(token);
+    if (templateResponse) {
+      setW2lInferenceResult(templateResponse)
+    }
+  }, []);
 
   useEffect(() => {
-    const api = new ApiConfig();
-    const endpointUrl = api.viewW2lInferenceResult(token);
-
-    fetch(endpointUrl, {
-      method: 'GET',
-      headers: {
-        'Accept': 'application/json',
-      },
-      credentials: 'include',
-    })
-    .then(res => res.json())
-    .then(res => {
-      const templatesResponse : W2lInferenceResultResponsePayload = res;
-      if (!templatesResponse.success) {
-        return;
-      }
-
-      setW2lInferenceResult(templatesResponse.result)
-    })
-    .catch(e => {
-      //this.props.onSpeakErrorCallback();
-    });
-  }, [token]); // NB: Empty array dependency sets to run ONLY on mount
+    getInferenceResult(token);
+  }, [token, getInferenceResult]); // NB: Empty array dependency sets to run ONLY on mount
 
   if (w2lInferenceResult === undefined) {
     return <div />;
