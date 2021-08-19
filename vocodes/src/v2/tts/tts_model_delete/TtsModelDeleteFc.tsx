@@ -199,7 +199,7 @@ function TtsModelDeleteFc(props: Props) {
       <h1 className="title is-1"> {h1Title} </h1>
       
       <p>
-        <Link to="/">&lt; Back to all models</Link>
+        <Link to={modelLink}>&lt; Back to model</Link>
       </p>
       
       <table className="table">
@@ -256,7 +256,7 @@ function TtsModelDeleteFc(props: Props) {
 
       <br />
       <br />
-      <Link to="/">&lt; Back to all models</Link>
+      <Link to={modelLink}>&lt; Back to model</Link>
     </div>
   )
 }
