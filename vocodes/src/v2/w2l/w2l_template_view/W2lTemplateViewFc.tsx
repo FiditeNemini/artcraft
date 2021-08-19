@@ -15,11 +15,6 @@ import { FrontendUrlConfig } from '../../../common/FrontendUrlConfig';
 import { GetW2lTemplate, W2lTemplate } from '../../api/w2l/GetW2lTemplate';
 import { GetW2lTemplateUseCount } from '../../api/w2l/GetW2lTemplateUseCount';
 
-interface W2lTemplateUseCountResponsePayload {
-  success: boolean,
-  count: number | null | undefined,
-}
-
 interface EnqueueJobResponsePayload {
   success: boolean,
   inference_job_token?: string,
@@ -49,18 +44,18 @@ function W2lTemplateViewFc(props: Props) {
   const getTemplate = useCallback(async (templateSlug: string) => {
     const templateResponse = await GetW2lTemplate(templateSlug);
 
-      if (!templateResponse) {
-        return;
-      }
+    if (!templateResponse) {
+      return;
+    }
 
-      setW2lTemplate(templateResponse)
+    setW2lTemplate(templateResponse)
 
-      let modApprovalState = templateResponse?.is_public_listing_approved;
-      if (modApprovedFormValue === undefined || modApprovalState === null) {
-        modApprovalState = true;
-      }
+    let modApprovalState = templateResponse?.is_public_listing_approved;
+    if (modApprovedFormValue === undefined || modApprovalState === null) {
+      modApprovalState = true;
+    }
 
-      setModApprovedFormValue(modApprovalState);
+    setModApprovedFormValue(modApprovalState);
 
   }, [modApprovedFormValue]);
 
@@ -301,6 +296,20 @@ function W2lTemplateViewFc(props: Props) {
     );
   }
 
+  let templateDescription = null;
+
+  if (!!w2lTemplate?.description_rendered_html) {
+    templateDescription = (
+      <>
+        <h4 className="title is-4"> Model Description </h4>
+        <div 
+          className="profile content is-medium" 
+          dangerouslySetInnerHTML={{__html: w2lTemplate?.description_rendered_html || ""}}
+          />
+      </>
+    );
+  }
+
   const resultVisibility = w2lTemplate?.creator_set_visibility === 'hidden' ? 
     <span>Hidden <HiddenIconFc /></span> :
     <span>Public <VisibleIconFc /></span> ;
@@ -352,6 +361,8 @@ function W2lTemplateViewFc(props: Props) {
       </div>
 
       <br />
+
+      {templateDescription}
 
       <table className="table is-fullwidth">
         <tbody>

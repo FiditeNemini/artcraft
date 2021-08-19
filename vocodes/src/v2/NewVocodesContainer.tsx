@@ -33,6 +33,7 @@ import { W2lTemplateViewFc } from './w2l/w2l_template_view/W2lTemplateViewFc';
 import { TtsResultEditFc } from './tts/tts_result_edit/TtsResultEditFc';
 import { W2lResultEditFc } from './w2l/w2l_result_edit/W2lResultEditFc';
 import { W2lTemplateDeleteFc } from './w2l/w2l_template_delete/W2lTemplateDeleteFc';
+import { W2lTemplateEditFc } from './w2l/w2l_template_edit/W2lTemplateEditFc';
 
 interface Props {
   sessionWrapper: SessionWrapper,
@@ -166,6 +167,12 @@ class NewVocodesContainer extends React.Component<Props, State> {
 
             <Route path="/w2l/result/:token">
               <W2lResultViewFc
+                sessionWrapper={this.props.sessionWrapper}
+              />
+            </Route>
+
+            <Route path="/w2l/:templateToken/edit">
+              <W2lTemplateEditFc
                 sessionWrapper={this.props.sessionWrapper}
               />
             </Route>

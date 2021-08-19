@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useCallback } from 'react';
 import { ApiConfig } from '../../../common/ApiConfig';
 import { FrontendUrlConfig } from '../../../common/FrontendUrlConfig';
@@ -6,11 +5,6 @@ import { SessionWrapper } from '../../../session/SessionWrapper';
 import { useParams, Link, useHistory } from 'react-router-dom';
 import { GetW2lTemplate, W2lTemplate } from '../../api/w2l/GetW2lTemplate';
 import { GetW2lTemplateUseCount } from '../../api/w2l/GetW2lTemplateUseCount';
-
-interface W2lTemplateUseCountResponsePayload {
-  success: boolean,
-  count: number | null | undefined,
-}
 
 interface Props {
   sessionWrapper: SessionWrapper,

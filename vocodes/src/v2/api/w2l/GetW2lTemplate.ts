@@ -13,6 +13,8 @@ export interface W2lTemplate {
   creator_display_name: string,
   updatable_slug: string,
   title: string,
+  description_markdown: string,
+  description_rendered_html: string,
   frame_width: number,
   frame_height: number,
   duration_millis: number,
