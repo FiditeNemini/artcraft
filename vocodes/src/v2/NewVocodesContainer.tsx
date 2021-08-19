@@ -34,6 +34,7 @@ import { TtsResultEditFc } from './tts/tts_result_edit/TtsResultEditFc';
 import { W2lResultEditFc } from './w2l/w2l_result_edit/W2lResultEditFc';
 import { W2lTemplateDeleteFc } from './w2l/w2l_template_delete/W2lTemplateDeleteFc';
 import { W2lTemplateEditFc } from './w2l/w2l_template_edit/W2lTemplateEditFc';
+import { W2lResultDeleteFc } from './w2l/w2l_result_delete/W2lResultDeleteFc';
 
 interface Props {
   sessionWrapper: SessionWrapper,
@@ -161,6 +162,12 @@ class NewVocodesContainer extends React.Component<Props, State> {
 
             <Route path="/w2l/result/:token/edit">
               <W2lResultEditFc
+                sessionWrapper={this.props.sessionWrapper}
+              />
+            </Route>
+
+            <Route path="/w2l/result/:token/delete">
+              <W2lResultDeleteFc
                 sessionWrapper={this.props.sessionWrapper}
               />
             </Route>

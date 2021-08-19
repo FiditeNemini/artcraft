@@ -174,7 +174,6 @@ function W2lResultViewFc(props: Props) {
     "button is-warning is-large is-fullwidth" :
     "button is-danger is-large is-fullwidth";
 
-
   let editButton = null;
   const canEdit = props.sessionWrapper.canEditW2lResultAsUserOrMod(w2lInferenceResult?.maybe_creator_user_token);
 
