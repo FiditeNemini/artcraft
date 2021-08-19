@@ -3,7 +3,7 @@ import axios from 'axios';
 import { ApiConfig } from '../../../common/ApiConfig';
 import { SessionWrapper } from '../../../session/SessionWrapper';
 import { W2lInferenceJob } from '../../../App';
-import { useParams, Link, useHistory } from 'react-router-dom';
+import { useParams, Link } from 'react-router-dom';
 import { v4 as uuidv4 } from 'uuid';
 import { SessionW2lInferenceResultListFc } from '../../common/SessionW2lInferenceResultsListFc';
 import { ReportDiscordLinkFc } from '../../common/DiscordReportLinkFc';
@@ -28,8 +28,6 @@ interface Props {
 
 function W2lTemplateViewFc(props: Props) {
   let { templateSlug } : { templateSlug : string } = useParams();
-
-  const history = useHistory();
 
   // Ajax
   const [w2lTemplate, setW2lTemplate] = useState<W2lTemplate|undefined>(undefined);
@@ -119,42 +117,6 @@ function W2lTemplateViewFc(props: Props) {
     return false;
   };
 
-  const handleModApprovalChange= (ev: React.FormEvent<HTMLSelectElement>) => {
-    const value = (ev.target as HTMLSelectElement).value;
-    const updatedValue = value === "true" ? true : false;
-    setModApprovedFormValue(updatedValue)
-  };
-
-  const handleModApprovalFormSubmit = (ev: React.FormEvent<HTMLFormElement>) : boolean => {
-    ev.preventDefault();
-
-    const api = new ApiConfig();
-    const endpointUrl = api.moderateW2l(templateSlug);
-
-    const request = {
-      is_approved: modApprovedFormValue,
-    }
-
-    fetch(endpointUrl, {
-      method: 'POST',
-      headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json',
-      },
-      credentials: 'include',
-      body: JSON.stringify(request),
-    })
-    .then(res => res.json())
-    .then(res => {
-      if (res.success) {
-        history.go(0); // force reload
-      }
-    })
-    .catch(e => {
-    });
-    return false;
-  }
-
   let creatorLink=`/profile/${w2lTemplate?.creator_username}`;
   let object : string|undefined = undefined;
   
@@ -173,7 +135,6 @@ function W2lTemplateViewFc(props: Props) {
   }
 
   let modApprovalStatus = <span />;
-  let defaultModValue = modApprovedFormValue ? "true" : "false";
 
   switch (w2lTemplate?.is_public_listing_approved) {
     case null:
@@ -190,35 +151,6 @@ function W2lTemplateViewFc(props: Props) {
     case false:
       modApprovalStatus = <span>Not Approved</span>;
       break;
-  }
-
-  let modOnlyApprovalForm = <span />;
-
-  if (props.sessionWrapper.canApproveW2lTemplates()) {
-    modOnlyApprovalForm = (
-      <form onSubmit={handleModApprovalFormSubmit}>
-        <label className="label">Mod Approval (sets public list visibility)</label>
-
-        <div className="field is-grouped">
-          <div className="control">
-
-            <div className="select is-info is-large">
-              <select name="approve" value={defaultModValue} onChange={handleModApprovalChange}>
-                <option value="true">Approve</option>
-                <option value="false">Disapprove</option>
-              </select>
-            </div>
-          </div>
-
-          <p className="control">
-            <button className="button is-info is-large">
-              Moderate
-            </button>
-          </p>
-
-        </div>
-      </form>
-    );
   }
 
   let moderatorRows = null;

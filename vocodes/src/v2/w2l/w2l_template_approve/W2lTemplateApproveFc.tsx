@@ -90,16 +90,6 @@ function W2lTemplateApproveFc(props: Props) {
 
   const h1Title = currentlyApproved ? "Unapprove Template?" : "Approve Template?";
 
-  const buttonTitle = currentlyApproved ? "Confirm Unapprove" : "Confirm Approve";
-
-  const buttonCss = currentlyApproved ? 
-    "button is-warning is-large is-fullwidth" :
-    "button is-danger is-large is-fullwidth";
-
-  const formLabel = currentlyApproved ? 
-     "Recover the W2L Template (makes it visible again)" : 
-     "Approve W2L Template (hides from everyone but mods)";
-
   let humanUseCount : string | number = 'Fetching...';
 
   const approvedFormDefaultState = approvedState ? "true" : "false";
