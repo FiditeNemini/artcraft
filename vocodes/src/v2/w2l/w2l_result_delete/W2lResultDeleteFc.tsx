@@ -4,7 +4,6 @@ import { ApiConfig } from '../../../common/ApiConfig';
 import { FrontendUrlConfig } from '../../../common/FrontendUrlConfig';
 import { SessionWrapper } from '../../../session/SessionWrapper';
 import { useParams, Link, useHistory } from 'react-router-dom';
-import { GetW2lTemplateUseCount } from '../../api/w2l/GetW2lTemplateUseCount';
 import { GetW2lResult, W2lResult } from '../../api/w2l/GetW2lResult';
 
 interface Props {
@@ -16,25 +15,18 @@ function W2lResultDeleteFc(props: Props) {
 
   let { token } = useParams() as { token : string };
 
-  const [w2lTemplate, setW2lTemplate] = useState<W2lResult|undefined>(undefined);
-  const [w2lTemplateUseCount, setW2lTemplateUseCount] = useState<number|undefined>(undefined);
+  const [w2lInferenceResult, setW2lInferenceResult] = useState<W2lResult|undefined>(undefined);
 
-  const getTemplate = useCallback(async (token) => {
+  const getInferenceResult = useCallback(async (token) => {
     const templateResponse = await GetW2lResult(token);
     if (templateResponse) {
-      setW2lTemplate(templateResponse)
+      setW2lInferenceResult(templateResponse)
     }
   }, []);
 
-  const getTemplateUseCount = useCallback(async (token) => {
-    const count = await GetW2lTemplateUseCount(token);
-    setW2lTemplateUseCount(count || 0)
-  }, []);
-
   useEffect(() => {
-    getTemplate(token);
-    getTemplateUseCount(token);
-  }, [token, getTemplate, getTemplateUseCount]);
+    getInferenceResult(token);
+  }, [token, getInferenceResult]);
 
   const templateResultLink = FrontendUrlConfig.w2lResultPage(token);
 
@@ -74,15 +66,15 @@ function W2lResultDeleteFc(props: Props) {
 
   let creatorLink = <span />;
 
-  if (!!w2lTemplate?.maybe_creator_display_name) {
-    const creatorUrl = FrontendUrlConfig.userProfilePage(w2lTemplate?.maybe_creator_display_name);
+  if (!!w2lInferenceResult?.maybe_creator_display_name) {
+    const creatorUrl = FrontendUrlConfig.userProfilePage(w2lInferenceResult?.maybe_creator_display_name);
     creatorLink = (
-      <Link to={creatorUrl}>{w2lTemplate?.maybe_creator_display_name}</Link>
+      <Link to={creatorUrl}>{w2lInferenceResult?.maybe_creator_display_name}</Link>
     );
   }
 
-  let currentlyDeleted = !!w2lTemplate?.maybe_moderator_fields?.mod_deleted_at ||
-      !!w2lTemplate?.maybe_moderator_fields?.user_deleted_at;
+  let currentlyDeleted = !!w2lInferenceResult?.maybe_moderator_fields?.mod_deleted_at ||
+      !!w2lInferenceResult?.maybe_moderator_fields?.user_deleted_at;
 
   const h1Title = currentlyDeleted ? "Undelete Result?" : "Delete Result?";
 
@@ -96,32 +88,6 @@ function W2lResultDeleteFc(props: Props) {
      "Recover the W2L Result (makes it visible again)" : 
      "Delete W2L Result (hides from everyone but mods)";
 
-  let humanUseCount : string | number = 'Fetching...';
-
-  if (w2lTemplateUseCount !== undefined && w2lTemplateUseCount !== null) {
-    humanUseCount = w2lTemplateUseCount;
-  }
-
-  let moderatorRows = null;
-
-  if (props.sessionWrapper.canDeleteOtherUsersW2lResults() || props.sessionWrapper.canDeleteOtherUsersW2lTemplates()) {
-    moderatorRows = (
-      <>
-        <tr>
-          <th>Creator IP address</th>
-          <td>{w2lTemplate?.maybe_moderator_fields?.creator_ip_address || "server error"}</td>
-        </tr>
-        <tr>
-          <th>Mod Deleted At (UTC)</th>
-          <td>{w2lTemplate?.maybe_moderator_fields?.mod_deleted_at || "not deleted"}</td>
-        </tr>
-        <tr>
-          <th>User Deleted At (UTC)</th>
-          <td>{w2lTemplate?.maybe_moderator_fields?.user_deleted_at || "not deleted"}</td>
-        </tr>
-      </>
-    );
-  }
 
   return (
     <div className="content">
@@ -146,20 +112,13 @@ function W2lResultDeleteFc(props: Props) {
             </td>
           </tr>
           <tr>
-            <th>Use Count</th>
-            <td>{humanUseCount}</td>
+            <th>Template title</th>
+            <td>{w2lInferenceResult?.template_title}</td>
           </tr>
           <tr>
-            <th>Title</th>
-            <td>{w2lTemplate?.template_title}</td>
+            <th>Duration (milliseconds)</th>
+            <td>{w2lInferenceResult?.duration_millis}</td>
           </tr>
-          <tr>
-            <th>Upload Date (UTC)</th>
-            <td>{w2lTemplate?.created_at}</td>
-          </tr>
-
-          {moderatorRows}
-
         </tbody>
       </table>
 
