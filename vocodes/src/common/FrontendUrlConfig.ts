@@ -46,6 +46,10 @@ class FrontendUrlConfig {
     return `/w2l/${templateToken}/edit`;
   }
 
+  static w2lTemplateApprovalPage(templateToken: string) : string {
+    return `/w2l/${templateToken}/approval`;
+  }
+
   static w2lTemplateDeletePage(templateToken: string) : string {
     return `/w2l/${templateToken}/delete`;
   }

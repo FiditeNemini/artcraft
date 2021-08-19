@@ -272,6 +272,28 @@ function W2lTemplateViewFc(props: Props) {
     );
   }
 
+  let approveButton = <span />;
+
+  if (props.sessionWrapper.canApproveW2lTemplates()) {
+    const currentlyApproved = w2lTemplate?.is_public_listing_approved;
+
+    const approveButtonTitle = currentlyApproved? "Unapprove Template?" : "Approve Template?";
+
+    const approveButtonCss = currentlyApproved? 
+      "button is-danger is-light is-large is-fullwidth" :
+      "button is-info is-light is-large is-fullwidth";
+
+    approveButton = (
+      <>
+        <br />
+        <Link 
+          className={approveButtonCss}
+          to={FrontendUrlConfig.w2lTemplateApprovalPage(templateSlug)}
+          >{approveButtonTitle}</Link>
+      </>
+    );
+  }
+
   let deleteButton = <span />;
 
   if (props.sessionWrapper.canDeleteTtsModelByUserToken(w2lTemplate?.creator_user_token)) {
@@ -431,9 +453,9 @@ function W2lTemplateViewFc(props: Props) {
         </tbody>
       </table>
 
-      {modOnlyApprovalForm}
-
       {editButton}
+
+      {approveButton}
 
       {deleteButton}
 

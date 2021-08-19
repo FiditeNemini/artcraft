@@ -35,6 +35,7 @@ import { W2lResultEditFc } from './w2l/w2l_result_edit/W2lResultEditFc';
 import { W2lTemplateDeleteFc } from './w2l/w2l_template_delete/W2lTemplateDeleteFc';
 import { W2lTemplateEditFc } from './w2l/w2l_template_edit/W2lTemplateEditFc';
 import { W2lResultDeleteFc } from './w2l/w2l_result_delete/W2lResultDeleteFc';
+import { W2lTemplateApproveFc } from './w2l/w2l_template_approve/W2lTemplateApproveFc';
 
 interface Props {
   sessionWrapper: SessionWrapper,
@@ -180,6 +181,12 @@ class NewVocodesContainer extends React.Component<Props, State> {
 
             <Route path="/w2l/:templateToken/edit">
               <W2lTemplateEditFc
+                sessionWrapper={this.props.sessionWrapper}
+              />
+            </Route>
+
+            <Route path="/w2l/:templateToken/approval">
+              <W2lTemplateApproveFc
                 sessionWrapper={this.props.sessionWrapper}
               />
             </Route>
