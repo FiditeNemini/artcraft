@@ -197,10 +197,9 @@ function TtsModelFormFc(props: Props) {
   return (
     <div>
       <h1 className="title is-1"> Deep Fake Text to Speech </h1>
-      <h4 className="subtitle is-5">
-        This is a beta release and temporarily sounds not-great. 
-        I'll update the vocoder and allow you to set your own.
-      </h4>
+      <h5 className="subtitle is-5">
+        Say stuff with your favorite characters.
+      </h5>
 
       {/*
       <div className="content is-large">
