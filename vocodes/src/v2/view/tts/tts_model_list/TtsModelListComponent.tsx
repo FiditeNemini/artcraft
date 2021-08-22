@@ -135,12 +135,6 @@ class TtsModelListComponent extends React.Component<Props, State> {
             <label className="label">Password</label>
             <div className="control has-icons-left has-icons-right">
               <input className="input" type="password" placeholder="Password" value={this.state.password} onChange={this.handlePasswordChange} />
-              <span className="icon is-small is-left">
-                <i className="fas fa-envelope"></i>
-              </span>
-              <span className="icon is-small is-right">
-                <i className="fas fa-exclamation-triangle"></i>
-              </span>
             </div>
             {/*<p className="help"></p>*/}
           </div>
