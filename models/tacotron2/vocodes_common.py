@@ -329,7 +329,8 @@ class TacotronWaveglowPipeline:
 
             #output_audio = audio[0].data.cpu().numpy().astype(np.float32)
             rate = self.hifigan_super_resolution_h.sampling_rate
-            output_audio = sr_mix.astype(np.float32)
+            #output_audio = sr_mix.astype(np.float32)
+            output_audio = sr_mix.astype(np.int16)
             write_wav(args['output_audio_filename'], rate, output_audio)
 
                 
