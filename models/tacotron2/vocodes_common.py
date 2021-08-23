@@ -20,6 +20,8 @@ from hifigan.env import AttrDict
 from hifigan.models import Generator
 from hifigan.denoiser import Denoiser as HifiDenoiser
 from hifigan.meldataset import mel_spectrogram
+import resampy
+import scipy
 
 # For metadata
 import subprocess
@@ -263,63 +265,64 @@ class TacotronWaveglowPipeline:
         #    plot_data((mel_outputs_postnet.float().data.cpu().numpy()[0],
         #               alignments.float().data.cpu().numpy()[0].T))
 
-        print('Running hifigan...')
-        y_g_hat = self.hifigan(mel_outputs_postnet.float())
+        with torch.no_grad():
+            print('Running hifigan...')
+            y_g_hat = self.hifigan(mel_outputs_postnet.float())
 
-        MAX_WAV_VALUE = 32768.0
-        audio = y_g_hat.squeeze()
-        audio = audio * MAX_WAV_VALUE
-        audio_denoised = self.hifigan_denoiser(audio.view(1, -1), strength=35)[:, 0]
+            MAX_WAV_VALUE = 32768.0
+            audio = y_g_hat.squeeze()
+            audio = audio * MAX_WAV_VALUE
+            audio_denoised = self.hifigan_denoiser(audio.view(1, -1), strength=35)[:, 0]
 
-        # Resample to 32k
-        audio_denoised = audio_denoised.cpu().numpy().reshape(-1)
+            # Resample to 32k
+            audio_denoised = audio_denoised.cpu().numpy().reshape(-1)
 
-        normalize = (MAX_WAV_VALUE / np.max(np.abs(audio_denoised))) ** 0.9
-        audio_denoised = audio_denoised * normalize
-        wave = resampy.resample(
-            audio_denoised,
-            self.hifigan_h.sampling_rate,
-            self.hifigan_super_resolution_h.sampling_rate,
-            filter="sinc_window",
-            window=scipy.signal.windows.hann,
-            num_zeros=8,
-        )
-        wave_out = wave.astype(np.int16)
+            normalize = (MAX_WAV_VALUE / np.max(np.abs(audio_denoised))) ** 0.9
+            audio_denoised = audio_denoised * normalize
+            wave = resampy.resample(
+                audio_denoised,
+                self.hifigan_h.sampling_rate,
+                self.hifigan_super_resolution_h.sampling_rate,
+                filter="sinc_window",
+                window=scipy.signal.windows.hann,
+                num_zeros=8,
+            )
+            wave_out = wave.astype(np.int16)
 
-        # HiFi-GAN super-resolution
-        wave = wave / MAX_WAV_VALUE
-        wave = torch.FloatTensor(wave).to(torch.device("cuda"))
-        new_mel = mel_spectrogram(
-            wave.unsqueeze(0),
-            self.hifigan_super_resolution_h.n_fft,
-            self.hifigan_super_resolution_h.num_mels,
-            self.hifigan_super_resolution_h.sampling_rate,
-            self.hifigan_super_resolution_h.hop_size,
-            self.hifigan_super_resolution_h.win_size,
-            self.hifigan_super_resolution_h.fmin,
-            self.hifigan_super_resolution_h.fmax,
-        )
-        y_g_hat2 = self.hifigan_super_resolution(new_mel)
-        audio2 = y_g_hat2.squeeze()
-        audio2 = audio2 * MAX_WAV_VALUE
-        audio2_denoised = self.hifigan_denoiser(audio2.view(1, -1), strength=35)[:, 0]
+            # HiFi-GAN super-resolution
+            wave = wave / MAX_WAV_VALUE
+            wave = torch.FloatTensor(wave).to(torch.device("cuda"))
+            new_mel = mel_spectrogram(
+                wave.unsqueeze(0),
+                self.hifigan_super_resolution_h.n_fft,
+                self.hifigan_super_resolution_h.num_mels,
+                self.hifigan_super_resolution_h.sampling_rate,
+                self.hifigan_super_resolution_h.hop_size,
+                self.hifigan_super_resolution_h.win_size,
+                self.hifigan_super_resolution_h.fmin,
+                self.hifigan_super_resolution_h.fmax,
+            )
+            y_g_hat2 = self.hifigan_super_resolution(new_mel)
+            audio2 = y_g_hat2.squeeze()
+            audio2 = audio2 * MAX_WAV_VALUE
+            audio2_denoised = self.hifigan_denoiser(audio2.view(1, -1), strength=35)[:, 0]
 
-        # High-pass filter, mixing and denormalizing
-        audio2_denoised = audio2_denoised.cpu().numpy().reshape(-1)
-        b = scipy.signal.firwin(
-            101, cutoff=10500, fs=h2.sampling_rate, pass_zero=False
-        )
-        y = scipy.signal.lfilter(b, [1.0], audio2_denoised)
-        superres_strength = 4.0
-        y *= superres_strength
-        y_out = y.astype(np.int16)
-        y_padded = np.zeros(wave_out.shape)
-        y_padded[: y_out.shape[0]] = y_out
-        sr_mix = wave_out + y_padded
-        sr_mix = sr_mix / normalize
+            # High-pass filter, mixing and denormalizing
+            audio2_denoised = audio2_denoised.cpu().numpy().reshape(-1)
+            b = scipy.signal.firwin(
+                101, cutoff=10500, fs=self.hifigan_super_resolution_h.sampling_rate, pass_zero=False
+            )
+            y = scipy.signal.lfilter(b, [1.0], audio2_denoised)
+            superres_strength = 4.0
+            y *= superres_strength
+            y_out = y.astype(np.int16)
+            y_padded = np.zeros(wave_out.shape)
+            y_padded[: y_out.shape[0]] = y_out
+            sr_mix = wave_out + y_padded
+            sr_mix = sr_mix / normalize
 
-        #print("")
-        #ipd.display(ipd.Audio(sr_mix.astype(np.int16), rate=h2.sampling_rate))
+            #print("")
+            #ipd.display(ipd.Audio(sr_mix.astype(np.int16), rate=h2.sampling_rate))
         
                 
 
