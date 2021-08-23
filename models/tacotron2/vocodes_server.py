@@ -28,6 +28,7 @@ from vocodes_common import TacotronWaveglowPipeline
 from vocodes_common import print_gpu_info
 from vocodes_common import load_tacotron_model
 from vocodes_common import load_waveglow_model
+from vocodes_common import load_hifigan_model
 
 print("TensorFlow version: {}".format(tf.version.VERSION))
 
@@ -233,6 +234,9 @@ class ApiHandler():
 
         pipeline.maybe_load_waveglow_model(vocoder_checkpoint_path)
         pipeline.maybe_load_tacotron_model_to_cache(synthesizer_checkpoint_path)
+
+        pipeline.maybe_load_hifigan('/home/bt/models/hifigan/universal_hifigan_g_02500000')
+        pipeline.maybe_load_hifigan_super_resolution('/home/bt/models/hifigan/Superres_Twilight_33000')
 
         inference_args = {
             'raw_text': inference_text,

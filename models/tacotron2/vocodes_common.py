@@ -15,6 +15,12 @@ from denoiser import Denoiser
 
 from scipy.io.wavfile import write as write_wav
 
+# Hifi-Gan
+from hifigan.env import AttrDict
+from hifigan.models import Generator
+from hifigan.denoiser import Denoiser as HifiDenoiser
+from hifigan.meldataset import mel_spectrogram
+
 # For metadata
 import subprocess
 import magic
@@ -55,6 +61,21 @@ def load_waveglow_model(checkpoint_path):
         k.float()
     denoiser = Denoiser(waveglow)
     return waveglow
+
+def load_hifigan_model(checkpoint_path, super_resolution = False):
+    conf_name = 'config_32k' if super_resolution else 'config_v1'
+    conf = os.path.join("hifigan", conf_name + ".json")
+    with open(conf) as f:
+        json_config = json.loads(f.read())
+    h = AttrDict(json_config)
+    torch.manual_seed(h.seed)
+    hifigan = Generator(h).to(torch.device("cuda"))
+    state_dict_g = torch.load(checkpoint_path, map_location=torch.device("cuda"))
+    hifigan.load_state_dict(state_dict_g["generator"])
+    hifigan.eval()
+    hifigan.remove_weight_norm()
+    denoiser = HifiDenoiser(hifigan, mode="normal")
+    return hifigan, h, denoiser
 
 def preprocess_text(text, raw_input=True):
     # TODO: Handle ARPAbet
@@ -150,6 +171,39 @@ class TacotronWaveglowPipeline:
         self.waveglow = None
         self.waveglow_filename = None
 
+        self.hifigan = None
+        self.hifigan_denoiser = None
+        self.hifigan_h = None
+        self.hifigan_filename = None
+        self.hifigan_super_resolution = None
+        self.hifigan_super_resolution_denoiser = None
+        self.hifigan_super_resolution_h = None
+        self.hifigan_super_resolution_filename = None
+
+    def maybe_load_hifigan(self, checkpoint_path):
+        if self.hifigan_filename == checkpoint_path:
+            print('Hifi-gan model already loaded into memory: {}'.format(checkpoint_path))
+            return
+        print('Dumping previous Hifi-gan model from memory: {}'.format(self.hifigan_filename))
+        print('Loading Hifi-gan model into memory: {}'.format(checkpoint_path), flush=True)
+        hifigan, h, denoiser = load_hifigan_model(checkpoint_path, False)
+        self.hifigan = hifigan
+        self.hifigan_denoiser = denoiser
+        self.hifigan_h = h
+        self.hifigan_filename = checkpoint_path
+
+    def maybe_load_hifigan_super_resolution(self, checkpoint_path):
+        if self.hifigan_super_resolution_filename == checkpoint_path:
+            print('Hifi-gan (SuperRes) model already loaded into memory: {}'.format(checkpoint_path))
+            return
+        print('Dumping previous Hifi-gan (SuperRes) model from memory: {}'.format(self.hifigan_super_resolution_filename))
+        print('Loading Hifi-gan (SuperRes) model into memory: {}'.format(checkpoint_path), flush=True)
+        hifigan, h, denoiser = load_hifigan_model(checkpoint_path, True)
+        self.hifigan_super_resolution = hifigan
+        self.hifigan_super_resolution_denoiser = denoiser
+        self.hifigan_super_resolution_h = h
+        self.hifigan_super_resolution_filename = checkpoint_path
+
     def maybe_load_waveglow_model(self, checkpoint_path):
         if self.waveglow_filename == checkpoint_path:
             print('Waveglow model already loaded into memory: {}'.format(checkpoint_path))
@@ -202,3 +256,82 @@ class TacotronWaveglowPipeline:
 
         print('Generating metadata file...')
         generate_metadata_file(args['output_audio_filename'], args['output_metadata_filename'])
+
+        #sequence = torch.autograd.Variable(torch.from_numpy(sequence)).cuda().long()
+        #mel_outputs, mel_outputs_postnet, _, alignments = model.inference(sequence)
+        #if show_graphs:
+        #    plot_data((mel_outputs_postnet.float().data.cpu().numpy()[0],
+        #               alignments.float().data.cpu().numpy()[0].T))
+
+        print('Running hifigan...')
+        y_g_hat = self.hifigan(mel_outputs_postnet.float())
+
+        MAX_WAV_VALUE = 32768.0
+        audio = y_g_hat.squeeze()
+        audio = audio * MAX_WAV_VALUE
+        audio_denoised = self.hifigan_denoiser(audio.view(1, -1), strength=35)[:, 0]
+
+        # Resample to 32k
+        audio_denoised = audio_denoised.cpu().numpy().reshape(-1)
+
+        normalize = (MAX_WAV_VALUE / np.max(np.abs(audio_denoised))) ** 0.9
+        audio_denoised = audio_denoised * normalize
+        wave = resampy.resample(
+            audio_denoised,
+            self.hifigan_h.sampling_rate,
+            self.hifigan_super_resolution_h.sampling_rate,
+            filter="sinc_window",
+            window=scipy.signal.windows.hann,
+            num_zeros=8,
+        )
+        wave_out = wave.astype(np.int16)
+
+        # HiFi-GAN super-resolution
+        wave = wave / MAX_WAV_VALUE
+        wave = torch.FloatTensor(wave).to(torch.device("cuda"))
+        new_mel = mel_spectrogram(
+            wave.unsqueeze(0),
+            self.hifigan_super_resolution_h.n_fft,
+            self.hifigan_super_resolution_h.num_mels,
+            self.hifigan_super_resolution_h.sampling_rate,
+            self.hifigan_super_resolution_h.hop_size,
+            self.hifigan_super_resolution_h.win_size,
+            self.hifigan_super_resolution_h.fmin,
+            self.hifigan_super_resolution_h.fmax,
+        )
+        y_g_hat2 = self.hifigan_super_resolution(new_mel)
+        audio2 = y_g_hat2.squeeze()
+        audio2 = audio2 * MAX_WAV_VALUE
+        audio2_denoised = self.hifigan_denoiser(audio2.view(1, -1), strength=35)[:, 0]
+
+        # High-pass filter, mixing and denormalizing
+        audio2_denoised = audio2_denoised.cpu().numpy().reshape(-1)
+        b = scipy.signal.firwin(
+            101, cutoff=10500, fs=h2.sampling_rate, pass_zero=False
+        )
+        y = scipy.signal.lfilter(b, [1.0], audio2_denoised)
+        superres_strength = 4.0
+        y *= superres_strength
+        y_out = y.astype(np.int16)
+        y_padded = np.zeros(wave_out.shape)
+        y_padded[: y_out.shape[0]] = y_out
+        sr_mix = wave_out + y_padded
+        sr_mix = sr_mix / normalize
+
+        #print("")
+        #ipd.display(ipd.Audio(sr_mix.astype(np.int16), rate=h2.sampling_rate))
+        
+                
+
+
+
+
+        
+
+
+
+
+
+
+
+
