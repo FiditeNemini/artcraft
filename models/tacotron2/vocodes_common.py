@@ -323,7 +323,15 @@ class TacotronWaveglowPipeline:
 
             #print("")
             #ipd.display(ipd.Audio(sr_mix.astype(np.int16), rate=h2.sampling_rate))
-        
+
+            print('Encoding and saving audio...')
+            #save_wav_audio_file(sr_mix, args['output_audio_filename'])
+
+            #output_audio = audio[0].data.cpu().numpy().astype(np.float32)
+            rate = self.hifigan_super_resolution_h.sampling_rate
+            output_audio = sr_mix.astype(np.float32)
+            write_wav(args['output_audio_filename'], rate, output_audio)
+
                 
 
 
