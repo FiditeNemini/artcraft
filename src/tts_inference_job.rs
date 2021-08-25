@@ -540,6 +540,48 @@ async fn process_job(
     info!("Downloaded waveglow vocoder model from bucket!");
   }
 
+  // ==================== CONFIRM OR DOWNLOAD HIFIGAN (NORMAL) VOCODER MODEL ==================== //
+
+  let hifigan_vocoder_model_filename = inferencer.hifigan_vocoder_model_filename.clone();
+  let hifigan_vocoder_model_fs_path = inferencer.semi_persistent_cache.tts_pretrained_vocoder_model_path(&hifigan_vocoder_model_filename);
+
+  if !hifigan_vocoder_model_fs_path.exists() {
+    warn!("Hifigan vocoder model file does not exist: {:?}", &hifigan_vocoder_model_fs_path);
+
+    let hifigan_vocoder_model_object_path = inferencer.bucket_path_unifier
+        .tts_pretrained_vocoders_path(&hifigan_vocoder_model_filename);
+
+    info!("Download hifigan vocoder from bucket path: {:?}", &hifigan_vocoder_model_object_path);
+
+    inferencer.private_bucket_client.download_file_to_disk(
+      &hifigan_vocoder_model_object_path,
+      &hifigan_vocoder_model_fs_path
+    ).await?;
+
+    info!("Downloaded hifigan vocoder model from bucket!");
+  }
+
+  // ==================== CONFIRM OR DOWNLOAD HIFIGAN (SUPERRES) VOCODER MODEL ==================== //
+
+  let hifigan_superres_vocoder_model_filename = inferencer.hifigan_superres_vocoder_model_filename.clone();
+  let hifigan_superres_vocoder_model_fs_path = inferencer.semi_persistent_cache.tts_pretrained_vocoder_model_path(&hifigan_superres_vocoder_model_filename);
+
+  if !hifigan_superres_vocoder_model_fs_path.exists() {
+    warn!("Hifigan superres vocoder model file does not exist: {:?}", &hifigan_superres_vocoder_model_fs_path);
+
+    let hifigan_superres_vocoder_model_object_path = inferencer.bucket_path_unifier
+        .tts_pretrained_vocoders_path(&hifigan_superres_vocoder_model_filename);
+
+    info!("Download hifigan superres vocoder from bucket path: {:?}", &hifigan_superres_vocoder_model_object_path);
+
+    inferencer.private_bucket_client.download_file_to_disk(
+      &hifigan_superres_vocoder_model_object_path,
+      &hifigan_superres_vocoder_model_fs_path
+    ).await?;
+
+    info!("Downloaded hifigan superres vocoder model from bucket!");
+  }
+
 //  // ==================== LOOK UP TTS SYNTHESIZER RECORD (WHICH CONTAINS ITS BUCKET PATH) ==================== //
 //
 //  info!("Looking up TTS model by token: {}", &job.model_token);
@@ -624,8 +666,8 @@ async fn process_job(
     &job.raw_inference_text,
     &tts_synthesizer_fs_path,
     VocoderType::WaveGlow,
-    &PathBuf::new(), // TODO
-    &PathBuf::new(), // TODO
+    &hifigan_vocoder_model_fs_path,
+    &hifigan_superres_vocoder_model_fs_path,
     &waveglow_vocoder_model_fs_path,
     &output_audio_fs_path,
     &output_spectrogram_fs_path,

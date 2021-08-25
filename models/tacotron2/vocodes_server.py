@@ -211,6 +211,8 @@ class ApiHandler():
         # Request parameters
         synthesizer_checkpoint_path = raw_data.get('synthesizer_checkpoint_path')
         waveglow_vocoder_checkpoint_path = raw_data.get('waveglow_vocoder_checkpoint_path')
+        hifigan_vocoder_checkpoint_path = raw_data.get('hifigan_vocoder_checkpoint_path')
+        hifigan_superres_vocoder_checkpoint_path = raw_data.get('hifigan_superres_vocoder_checkpoint_path')
         inference_text = raw_data.get('inference_text')
         output_audio_filename = raw_data.get('output_audio_filename')
         output_spectrogram_filename = raw_data.get('output_spectrogram_filename')
@@ -222,6 +224,8 @@ class ApiHandler():
 
         print('synthesizer_checkpoint_path: {}'.format(synthesizer_checkpoint_path))
         print('waveglow_vocoder_checkpoint_path: {}'.format(waveglow_vocoder_checkpoint_path))
+        print('hifigan_vocoder_checkpoint_path: {}'.format(hifigan_vocoder_checkpoint_path))
+        print('hifigan_superres_vocoder_checkpoint_path: {}'.format(hifigan_superres_vocoder_checkpoint_path))
         print('inference_text: {}'.format(inference_text))
         print('output_audio_filename: {}'.format(output_audio_filename))
         print('output_spectrogram_filename: {}'.format(output_spectrogram_filename))
@@ -229,14 +233,14 @@ class ApiHandler():
         print('maybe_clear_synthesizer_checkpoint_path: {}'.format(
             maybe_clear_synthesizer_checkpoint_path))
 
+        pipeline.maybe_load_waveglow_model(waveglow_vocoder_checkpoint_path)
+        pipeline.maybe_load_hifigan(hifigan_vocoder_checkpoint_path)
+        pipeline.maybe_load_hifigan_super_resolution(hifigan_superres_vocoder_checkpoint_path)
+
         if maybe_clear_synthesizer_checkpoint_path:
             pipeline.uncache_tacotron_model(maybe_clear_synthesizer_checkpoint_path)
 
-        pipeline.maybe_load_waveglow_model(waveglow_vocoder_checkpoint_path)
         pipeline.maybe_load_tacotron_model_to_cache(synthesizer_checkpoint_path)
-
-        pipeline.maybe_load_hifigan('/home/bt/models/hifigan/universal_hifigan_g_02500000')
-        pipeline.maybe_load_hifigan_super_resolution('/home/bt/models/hifigan/Superres_Twilight_33000')
 
         inference_args = {
             'raw_text': inference_text,
@@ -248,10 +252,6 @@ class ApiHandler():
 
         pipeline.infer(inference_args)
 
-        #response.content_type = 'audio/ogg'
-        #with open(out_file, mode='rb') as f:
-        #    response.data = f.read()
-
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--port', type=int, default=8000)
@@ -260,8 +260,7 @@ def main():
     api = falcon.API(middleware=[MultipartMiddleware()])
     api.add_route('/', IndexHandler())
     api.add_route('/infer', ApiHandler())
-    #api.add_static_route('/script', os.path.abspath('./script'))
-    #api.add_static_route('/sound', os.path.abspath('./sound'))
+
     print('Serving on 0.0.0.0:%d' % args.port)
     simple_server.make_server('0.0.0.0', args.port, api).serve_forever()
 

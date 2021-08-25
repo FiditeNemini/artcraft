@@ -246,7 +246,6 @@ class TacotronWaveglowPipeline:
         with torch.no_grad():
             mel_outputs, mel_outputs_postnet, _, alignments = tacotron.inference(sequence)
 
-
         print('Saving spectrogram as JSON...')
         save_spectorgram_json_file(mel_outputs_postnet, args['output_spectrogram_filename'])
 
@@ -259,6 +258,7 @@ class TacotronWaveglowPipeline:
         generate_metadata_file(args['output_audio_filename'], args['output_metadata_filename'])
 
     def vocode_waveglow(self, args, mel_outputs_postnet):
+        print('Running melgan...')
         with torch.no_grad():
             sigma = 0.8
             audio = self.waveglow.infer(mel_outputs_postnet, sigma=sigma)
@@ -267,8 +267,8 @@ class TacotronWaveglowPipeline:
         save_wav_audio_file(audio, args['output_audio_filename'])
 
     def vocode_hifigan_superres(self, args, mel_outputs_postnet):
+        print('Running hifigan...')
         with torch.no_grad():
-            print('Running hifigan...')
             y_g_hat = self.hifigan(mel_outputs_postnet.float())
 
             MAX_WAV_VALUE = 32768.0
@@ -292,6 +292,7 @@ class TacotronWaveglowPipeline:
             wave_out = wave.astype(np.int16)
 
             # HiFi-GAN super-resolution
+            print('Running hifigan super resolution...')
             wave = wave / MAX_WAV_VALUE
             wave = torch.FloatTensor(wave).to(torch.device("cuda"))
             new_mel = mel_spectrogram(
@@ -323,14 +324,7 @@ class TacotronWaveglowPipeline:
             sr_mix = wave_out + y_padded
             sr_mix = sr_mix / normalize
 
-            #print("")
-            #ipd.display(ipd.Audio(sr_mix.astype(np.int16), rate=h2.sampling_rate))
-
             print('Encoding and saving audio...')
-            #save_wav_audio_file(sr_mix, args['output_audio_filename'])
-
-            #output_audio = audio[0].data.cpu().numpy().astype(np.float32)
             rate = self.hifigan_super_resolution_h.sampling_rate
-            #output_audio = sr_mix.astype(np.float32)
             output_audio = sr_mix.astype(np.int16)
             write_wav(args['output_audio_filename'], rate, output_audio)
