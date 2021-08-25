@@ -246,21 +246,27 @@ class TacotronWaveglowPipeline:
         with torch.no_grad():
             mel_outputs, mel_outputs_postnet, _, alignments = tacotron.inference(sequence)
 
-        with torch.no_grad():
-            sigma = 0.8
-            audio = self.waveglow.infer(mel_outputs_postnet, sigma=sigma)
 
         print('Saving spectrogram as JSON...')
         save_spectorgram_json_file(mel_outputs_postnet, args['output_spectrogram_filename'])
 
-        print('Encoding and saving audio...')
-        save_wav_audio_file(audio, args['output_audio_filename'])
+        if False:
+            self.vocode_waveglow(args, mel_outputs_postnet)
+        else:
+            self.vocode_hifigan_superres(args, mel_outputs_postnet)
 
         print('Generating metadata file...')
         generate_metadata_file(args['output_audio_filename'], args['output_metadata_filename'])
 
-        return
+    def vocode_waveglow(self, args, mel_outputs_postnet):
+        with torch.no_grad():
+            sigma = 0.8
+            audio = self.waveglow.infer(mel_outputs_postnet, sigma=sigma)
 
+        print('Encoding and saving audio...')
+        save_wav_audio_file(audio, args['output_audio_filename'])
+
+    def vocode_hifigan_superres(self, args, mel_outputs_postnet):
         with torch.no_grad():
             print('Running hifigan...')
             y_g_hat = self.hifigan(mel_outputs_postnet.float())
@@ -328,18 +334,3 @@ class TacotronWaveglowPipeline:
             #output_audio = sr_mix.astype(np.float32)
             output_audio = sr_mix.astype(np.int16)
             write_wav(args['output_audio_filename'], rate, output_audio)
-
-                
-
-
-
-
-        
-
-
-
-
-
-
-
-
