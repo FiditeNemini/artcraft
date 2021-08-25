@@ -124,9 +124,6 @@ class TtsModelListComponent extends React.Component<Props, State> {
               <span className="icon is-small is-left">
                 <i className="fas fa-user"></i>
               </span>
-              <span className="icon is-small is-right">
-                <i className="fas fa-check"></i>
-              </span>
             </div>
             {/*<p className="help"></p>*/}
           </div>
