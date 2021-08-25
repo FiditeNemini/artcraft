@@ -665,7 +665,7 @@ async fn process_job(
   inferencer.tts_inference_sidecar_client.request_inference(
     &job.raw_inference_text,
     &tts_synthesizer_fs_path,
-    VocoderType::WaveGlow,
+    VocoderType::HifiGanSuperResolution,
     &hifigan_vocoder_model_fs_path,
     &hifigan_superres_vocoder_model_fs_path,
     &waveglow_vocoder_model_fs_path,

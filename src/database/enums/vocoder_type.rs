@@ -7,7 +7,11 @@ use crate::util::anyhow_result::AnyhowResult;
 #[serde(rename_all = "lowercase")]
 #[sqlx(rename_all = "lowercase")]
 pub enum VocoderType {
+  /// Current state of the art vocoder
+  #[serde(rename = "hifigan-superres")]
   HifiGanSuperResolution,
+
+  /// Older WaveGlow vocoder
   WaveGlow,
 }
 

@@ -234,6 +234,7 @@ class TacotronWaveglowPipeline:
 
     def infer(self, args):
         assert('synthesizer_checkpoint_path' in args)
+        assert('vocoder_type' in args)
         assert('raw_text' in args)
         assert('output_audio_filename' in args)
         assert('output_spectrogram_filename' in args)
@@ -246,13 +247,15 @@ class TacotronWaveglowPipeline:
         with torch.no_grad():
             mel_outputs, mel_outputs_postnet, _, alignments = tacotron.inference(sequence)
 
-        print('Saving spectrogram as JSON...')
-        save_spectorgram_json_file(mel_outputs_postnet, args['output_spectrogram_filename'])
-
-        if False:
+        if args['vocoder_type'] == 'hifigan-superres':
+            self.vocode_hifigan_superres(args, mel_outputs_postnet)
+        elif args['vocoder_type'] == 'waveglow':
             self.vocode_waveglow(args, mel_outputs_postnet)
         else:
-            self.vocode_hifigan_superres(args, mel_outputs_postnet)
+            raise Exception('Wrong vocoder type: {}'.format(args['vocoder_type']))
+
+        print('Saving spectrogram as JSON...')
+        save_spectorgram_json_file(mel_outputs_postnet, args['output_spectrogram_filename'])
 
         print('Generating metadata file...')
         generate_metadata_file(args['output_audio_filename'], args['output_metadata_filename'])

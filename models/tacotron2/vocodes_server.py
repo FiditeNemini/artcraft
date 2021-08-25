@@ -210,6 +210,7 @@ class ApiHandler():
 
         # Request parameters
         synthesizer_checkpoint_path = raw_data.get('synthesizer_checkpoint_path')
+        vocoder_type = raw_data.get('vocoder_type')
         waveglow_vocoder_checkpoint_path = raw_data.get('waveglow_vocoder_checkpoint_path')
         hifigan_vocoder_checkpoint_path = raw_data.get('hifigan_vocoder_checkpoint_path')
         hifigan_superres_vocoder_checkpoint_path = raw_data.get('hifigan_superres_vocoder_checkpoint_path')
@@ -223,6 +224,7 @@ class ApiHandler():
             raw_data.get('maybe_clear_synthesizer_checkpoint_path')
 
         print('synthesizer_checkpoint_path: {}'.format(synthesizer_checkpoint_path))
+        print('vocoder_type: {}'.format(vocoder_type))
         print('waveglow_vocoder_checkpoint_path: {}'.format(waveglow_vocoder_checkpoint_path))
         print('hifigan_vocoder_checkpoint_path: {}'.format(hifigan_vocoder_checkpoint_path))
         print('hifigan_superres_vocoder_checkpoint_path: {}'.format(hifigan_superres_vocoder_checkpoint_path))
@@ -245,6 +247,7 @@ class ApiHandler():
         inference_args = {
             'raw_text': inference_text,
             'synthesizer_checkpoint_path': synthesizer_checkpoint_path,
+            'vocoder_type': vocoder_type,
             'output_audio_filename': output_audio_filename,
             'output_spectrogram_filename': output_spectrogram_filename,
             'output_metadata_filename': output_metadata_filename,
