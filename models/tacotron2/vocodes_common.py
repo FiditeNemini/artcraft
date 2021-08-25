@@ -259,11 +259,7 @@ class TacotronWaveglowPipeline:
         print('Generating metadata file...')
         generate_metadata_file(args['output_audio_filename'], args['output_metadata_filename'])
 
-        #sequence = torch.autograd.Variable(torch.from_numpy(sequence)).cuda().long()
-        #mel_outputs, mel_outputs_postnet, _, alignments = model.inference(sequence)
-        #if show_graphs:
-        #    plot_data((mel_outputs_postnet.float().data.cpu().numpy()[0],
-        #               alignments.float().data.cpu().numpy()[0].T))
+        #return
 
         with torch.no_grad():
             print('Running hifigan...')
