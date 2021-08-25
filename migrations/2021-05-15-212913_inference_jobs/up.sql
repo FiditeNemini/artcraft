@@ -25,6 +25,9 @@ CREATE TABLE tts_inference_jobs (
   -- This also determines which architecture we're using.
   model_token VARCHAR(32) NOT NULL,
 
+  -- NB: ADDED BY ALTER
+  -- maybe_override_pretrained_vocoder VARCHAR(64) DEFAULT NULL,
+
   -- The raw, unprocessed user input.
   raw_inference_text TEXT NOT NULL,
 

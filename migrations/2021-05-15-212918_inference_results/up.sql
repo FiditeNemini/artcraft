@@ -14,6 +14,9 @@ CREATE TABLE tts_results (
   -- The TTS model that was used
   model_token VARCHAR(32) NOT NULL,
 
+  -- NB: ADDED BY ALTER
+  -- maybe_pretrained_vocoder_used VARCHAR(64) DEFAULT NULL,
+
   -- The original raw, unprocessed user input.
   raw_inference_text TEXT NOT NULL,
 

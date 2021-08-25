@@ -25,6 +25,9 @@ CREATE TABLE tts_models (
       'arpabet'
   ) NOT NULL DEFAULT 'basic',
 
+  -- NB: ADDED BY ALTER
+  -- maybe_default_pretrained_vocoder VARCHAR(64) DEFAULT NULL,
+
   -- Optional Pointer to a newer version of the voice
   -- If there's a newer version, we can disable this one.
   -- maybe_updated_model_token VARCHAR(32) DEFAULT NULL,

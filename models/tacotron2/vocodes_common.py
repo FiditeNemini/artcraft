@@ -261,7 +261,7 @@ class TacotronWaveglowPipeline:
         generate_metadata_file(args['output_audio_filename'], args['output_metadata_filename'])
 
     def vocode_waveglow(self, args, mel_outputs_postnet):
-        print('Running melgan...')
+        print('Running waveglow...')
         with torch.no_grad():
             sigma = 0.8
             audio = self.waveglow.infer(mel_outputs_postnet, sigma=sigma)

@@ -25,6 +25,7 @@ use sqlx::error::DatabaseError;
 use sqlx::error::Error::Database;
 use sqlx::mysql::MySqlDatabaseError;
 use std::sync::Arc;
+use crate::database::enums::vocoder_type::VocoderType;
 
 /// For the URL PathInfo
 #[derive(Deserialize)]
@@ -39,6 +40,7 @@ pub struct EditTtsModelRequest {
   pub title: Option<String>,
   pub description_markdown: Option<String>,
   pub creator_set_visibility: Option<String>,
+  pub maybe_default_pretrained_vocoder: Option<VocoderType>,
   //pub updatable_slug: Option<String>,
   //pub tts_model_type: Option<String>,
   //pub text_preprocessing_algorithm: Option<String>,
@@ -150,6 +152,9 @@ pub async fn edit_tts_model_handler(
   let mut description_markdown = None;
   let mut description_html = None;
   let mut creator_set_visibility = RecordVisibility::Public;
+  let mut maybe_default_pretrained_vocoder =
+      model_record.maybe_default_pretrained_vocoder
+          .clone();
 
   if let Some(payload) = request.title.as_deref() {
     if contains_slurs(payload) {
@@ -176,6 +181,10 @@ pub async fn edit_tts_model_handler(
         .map_err(|_| EditTtsModelError::BadInput("bad record visibility".to_string()))?;
   }
 
+  if let Some(vocoder) = request.maybe_default_pretrained_vocoder {
+    maybe_default_pretrained_vocoder = Some(vocoder);
+  }
+
   let ip_address = get_request_ip(&http_request);
 
   let query_result = if is_author {
@@ -184,6 +193,7 @@ pub async fn edit_tts_model_handler(
         r#"
 UPDATE tts_models
 SET
+    maybe_default_pretrained_vocoder = ?,
     title = ?,
     description_markdown = ?,
     description_rendered_html = ?,
@@ -193,6 +203,7 @@ SET
 WHERE token = ?
 LIMIT 1
         "#,
+      maybe_default_pretrained_vocoder.map(|v| v.to_str()),
       &title,
       &description_markdown,
       &description_html,
@@ -208,6 +219,7 @@ LIMIT 1
         r#"
 UPDATE tts_models
 SET
+    maybe_default_pretrained_vocoder = ?,
     title = ?,
     description_markdown = ?,
     description_rendered_html = ?,
@@ -217,6 +229,7 @@ SET
 WHERE token = ?
 LIMIT 1
         "#,
+      maybe_default_pretrained_vocoder.map(|v| v.to_str()),
       &title,
       &description_markdown,
       &description_html,

@@ -662,10 +662,17 @@ async fn process_job(
   //  false,
   //)?;
 
+  let mut pretrained_vocoder = VocoderType::HifiGanSuperResolution;
+  if let Some(default_vocoder) = model_record.maybe_default_pretrained_vocoder.as_deref() {
+    pretrained_vocoder = VocoderType::from_str(default_vocoder)?;
+  }
+
+  info!("With pretrained vocoder: {:?}", pretrained_vocoder);
+
   inferencer.tts_inference_sidecar_client.request_inference(
     &job.raw_inference_text,
     &tts_synthesizer_fs_path,
-    VocoderType::HifiGanSuperResolution,
+    pretrained_vocoder,
     &hifigan_vocoder_model_fs_path,
     &hifigan_superres_vocoder_model_fs_path,
     &waveglow_vocoder_model_fs_path,
@@ -724,6 +731,7 @@ async fn process_job(
     &inferencer.mysql_pool,
     job,
     &text_hash,
+    pretrained_vocoder,
     &audio_result_object_path,
     &spectrogram_result_object_path,
     file_metadata.file_size_bytes,

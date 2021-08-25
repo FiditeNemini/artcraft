@@ -2,6 +2,7 @@ use anyhow::anyhow;
 use chrono::{DateTime, Utc};
 use crate::AnyhowResult;
 use crate::database::enums::record_visibility::RecordVisibility;
+use crate::database::enums::vocoder_type::VocoderType;
 use crate::database::helpers::boolean_converters::i8_to_bool;
 use crate::database::helpers::boolean_converters::nullable_i8_to_optional_bool;
 use derive_more::{Display, Error};
@@ -20,6 +21,8 @@ pub struct TtsResultRecordForResponse {
 
   pub tts_model_token: String,
   pub tts_model_title: Option<String>, // TODO: Shouldn't be Option.
+
+  pub maybe_pretrained_vocoder_used: Option<VocoderType>,
 
   pub maybe_creator_user_token: Option<String>,
   pub maybe_creator_username: Option<String>,
@@ -64,6 +67,8 @@ pub struct TtsResultRecordRaw {
 
   pub tts_model_token: String,
   pub tts_model_title: Option<String>,
+
+  pub maybe_pretrained_vocoder_used: Option<String>,
 
   pub maybe_creator_user_token: Option<String>,
   pub maybe_creator_username: Option<String>,
@@ -123,6 +128,11 @@ pub async fn select_tts_result_by_token(
     }
   };
 
+  let mut pretrained_vocoder = None;
+  if let Some(vocoder) = ir.maybe_pretrained_vocoder_used.as_deref() {
+    pretrained_vocoder = Some(VocoderType::from_str(vocoder)?);
+  }
+
   let ir_for_response = TtsResultRecordForResponse {
     tts_result_token: ir.tts_result_token.clone(),
 
@@ -130,6 +140,8 @@ pub async fn select_tts_result_by_token(
 
     tts_model_token: ir.tts_model_token.clone(),
     tts_model_title: ir.tts_model_title.clone(),
+
+    maybe_pretrained_vocoder_used: pretrained_vocoder,
 
     maybe_creator_user_token: ir.maybe_creator_user_token.clone(),
     maybe_creator_username: ir.maybe_creator_username.clone(),
@@ -180,6 +192,8 @@ SELECT
 
     tts_results.model_token as tts_model_token,
     tts_models.title as tts_model_title,
+
+    tts_results.maybe_pretrained_vocoder_used,
 
     users.token as maybe_creator_user_token,
     users.username as maybe_creator_username,
@@ -235,6 +249,8 @@ SELECT
 
     tts_results.model_token as tts_model_token,
     tts_models.title as tts_model_title,
+
+    tts_results.maybe_pretrained_vocoder_used,
 
     users.token as maybe_creator_user_token,
     users.username as maybe_creator_username,

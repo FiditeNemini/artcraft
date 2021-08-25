@@ -2,6 +2,7 @@ use anyhow::anyhow;
 use chrono::{DateTime, Utc};
 use crate::AnyhowResult;
 use crate::database::enums::record_visibility::RecordVisibility;
+use crate::database::enums::vocoder_type::VocoderType;
 use crate::database::helpers::boolean_converters::i8_to_bool;
 use crate::database::helpers::boolean_converters::nullable_i8_to_optional_bool;
 use derive_more::{Display, Error};
@@ -17,6 +18,7 @@ use std::sync::Arc;
 pub struct TtsModelRecordForResponse {
   pub model_token: String,
   pub tts_model_type: String,
+  pub maybe_default_pretrained_vocoder: Option<VocoderType>,
   pub text_preprocessing_algorithm: String,
 
   pub creator_user_token: String,
@@ -52,6 +54,7 @@ pub struct TtsModelModeratorFields {
 pub struct TtsModelRecordRaw {
   pub model_token: String,
   pub tts_model_type: String,
+  pub maybe_default_pretrained_vocoder: Option<String>,
   pub text_preprocessing_algorithm: String,
 
   pub creator_user_token: String,
@@ -105,9 +108,15 @@ pub async fn select_tts_model_by_token(
     }
   };
 
+  let mut maybe_vocoder : Option<VocoderType> = None;
+  if let Some(vocoder) = model.maybe_default_pretrained_vocoder.as_deref() {
+    maybe_vocoder = Some(VocoderType::from_str(vocoder)?);
+  }
+
   let model_for_response = TtsModelRecordForResponse {
     model_token: model.model_token.clone(),
     tts_model_type: model.tts_model_type.clone(),
+    maybe_default_pretrained_vocoder: maybe_vocoder,
     text_preprocessing_algorithm: model.text_preprocessing_algorithm.clone(),
     creator_user_token: model.creator_user_token.clone(),
     creator_username: model.creator_username.clone(),
@@ -144,6 +153,7 @@ SELECT
     tts.token as model_token,
     tts.tts_model_type,
     tts.text_preprocessing_algorithm,
+    tts.maybe_default_pretrained_vocoder,
 
     tts.creator_user_token,
     users.username as creator_username,
@@ -188,6 +198,7 @@ SELECT
     tts.token as model_token,
     tts.tts_model_type,
     tts.text_preprocessing_algorithm,
+    tts.maybe_default_pretrained_vocoder,
 
     tts.creator_user_token,
     users.username as creator_username,

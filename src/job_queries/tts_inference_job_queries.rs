@@ -5,6 +5,7 @@
 use anyhow::anyhow;
 use chrono::{Utc, DateTime};
 use crate::database::enums::record_visibility::RecordVisibility;
+use crate::database::enums::vocoder_type::VocoderType;
 use crate::database::helpers::tokens::Tokens;
 use crate::util::anyhow_result::AnyhowResult;
 use crate::util::random_prefix_crockford_token::random_prefix_crockford_token;
@@ -227,6 +228,7 @@ pub async fn insert_tts_result<P: AsRef<Path>>(
   pool: &MySqlPool,
   job: &TtsInferenceJobRecord,
   text_hash: &str,
+  pretrained_vocoder_used: VocoderType,
   bucket_audio_results_path: P,
   bucket_spectrogram_results_path: P,
   file_size_bytes: u64,
@@ -314,6 +316,7 @@ SET
   token = ?,
 
   model_token = ?,
+  maybe_pretrained_vocoder_used = ?,
   raw_inference_text = ?,
   raw_inference_text_hash_sha2 = ?,
   normalized_inference_text = ?,
@@ -332,6 +335,7 @@ SET
         "#,
       inference_result_token,
       job.model_token.clone(),
+      pretrained_vocoder_used.to_str(),
       job.raw_inference_text.clone(),
       text_hash,
       normalized_inference_text,
@@ -374,6 +378,8 @@ pub struct TtsModelRecord2 {
   pub model_token: String,
   pub tts_model_type: String,
 
+  pub maybe_default_pretrained_vocoder: Option<String>,
+
   pub creator_user_token: String,
   pub creator_username: String,
   pub creator_display_name: String,
@@ -397,6 +403,7 @@ pub async fn get_tts_model_by_token(
 SELECT
     tts.token as model_token,
     tts.tts_model_type,
+    tts.maybe_default_pretrained_vocoder,
     tts.creator_user_token,
     users.username as creator_username,
     users.display_name as creator_display_name,
