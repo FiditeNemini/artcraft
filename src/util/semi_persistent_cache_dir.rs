@@ -8,7 +8,7 @@ pub struct SemiPersistentCacheDir {
   cache_root: PathBuf,
 
   tts_synthesizer_model_root: PathBuf,
-  tts_vocoder_model_root: PathBuf,
+  tts_pretrained_vocoder_model_root: PathBuf,
 
   w2l_model_root: PathBuf,
   w2l_end_bump_root: PathBuf,
@@ -32,7 +32,7 @@ impl SemiPersistentCacheDir {
       cache_root: cache_root.clone(),
 
       tts_synthesizer_model_root: cache_root.join("tts/synthesizer_models/"),
-      tts_vocoder_model_root: cache_root.join("tts/vocoder_models/"),
+      tts_pretrained_vocoder_model_root: cache_root.join("tts/vocoder_models_pretrained/"),
 
       w2l_model_root: cache_root.join("w2l/models/"),
       w2l_end_bump_root: cache_root.join("w2l/end_bumps/"),
@@ -59,19 +59,19 @@ impl SemiPersistentCacheDir {
     Ok(())
   }
 
-  // ==================== TTS VOCODER MODELS ====================
+  // ==================== TTS PRETRAINED VOCODER MODELS (WAVEGLOW, HIFIGAN, ETC) ====================
 
   /// We'll start with just a few vocoders, but this may grow.
-  pub fn tts_vocoder_model_path(&self, model_filename: &str) -> PathBuf {
-    self.tts_vocoder_model_root.join(model_filename)
+  pub fn tts_pretrained_vocoder_model_path(&self, model_filename: &str) -> PathBuf {
+    self.tts_pretrained_vocoder_model_root.join(model_filename)
   }
 
-  pub fn tts_vocoder_model_directory(&self) -> &Path {
-    &self.tts_vocoder_model_root
+  pub fn tts_pretrained_vocoder_model_directory(&self) -> &Path {
+    &self.tts_pretrained_vocoder_model_root
   }
 
-  pub fn create_tts_vocoder_model_path(&self) -> AnyhowResult<()> {
-    let _ = fs::create_dir_all(self.tts_vocoder_model_directory())?;
+  pub fn create_tts_pretrained_vocoder_model_path(&self) -> AnyhowResult<()> {
+    let _ = fs::create_dir_all(self.tts_pretrained_vocoder_model_directory())?;
     Ok(())
   }
 

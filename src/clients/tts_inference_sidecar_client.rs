@@ -1,11 +1,11 @@
 use actix_web::http::header;
 use anyhow::anyhow;
+use crate::database::enums::vocoder_type::VocoderType;
 use crate::util::anyhow_result::AnyhowResult;
 use hyper::client::Client;
 use hyper::{Body, Request};
 use log::info;
 use std::path::Path;
-use crate::database::enums::vocoder_type::VocoderType;
 
 pub struct TtsInferenceSidecarClient {
   hostname: String,
@@ -17,7 +17,7 @@ struct InferenceRequest {
   pub vocoder_type: VocoderType,
   pub waveglow_vocoder_checkpoint_path : String,
   pub hifigan_vocoder_checkpoint_path: String,
-  pub hifigan_supersample_vocoder_checkpoint_path: String,
+  pub hifigan_superres_vocoder_checkpoint_path: String,
 
   // Synthesizer information
   pub synthesizer_checkpoint_path : String,
@@ -51,7 +51,7 @@ impl TtsInferenceSidecarClient {
     synthesizer_checkpoint_path: P,
     vocoder_type: VocoderType,
     hifigan_vocoder_checkpoint_path: P,
-    hifigan_supersample_vocoder_checkpoint_path: P,
+    hifigan_superres_vocoder_checkpoint_path: P,
     waveglow_vocoder_checkpoint_path: P,
     output_audio_filename: P,
     output_spectrogram_filename: P,
@@ -71,11 +71,11 @@ impl TtsInferenceSidecarClient {
         .map(|s| s.to_string())
         .ok_or(anyhow!("bad hifigan vocoder path"))?;
 
-    let hifigan_supersample_vocoder_checkpoint_path = hifigan_supersample_vocoder_checkpoint_path
+    let hifigan_superres_vocoder_checkpoint_path = hifigan_superres_vocoder_checkpoint_path
         .as_ref()
         .to_str()
         .map(|s| s.to_string())
-        .ok_or(anyhow!("bad hifigan supersample vocoder path"))?;
+        .ok_or(anyhow!("bad hifigan super resolution vocoder path"))?;
 
     let synthesizer_checkpoint_path = synthesizer_checkpoint_path
         .as_ref()
@@ -106,7 +106,7 @@ impl TtsInferenceSidecarClient {
       vocoder_type,
       waveglow_vocoder_checkpoint_path,
       hifigan_vocoder_checkpoint_path,
-      hifigan_supersample_vocoder_checkpoint_path,
+      hifigan_superres_vocoder_checkpoint_path,
       synthesizer_checkpoint_path,
       output_audio_filename,
       output_spectrogram_filename,

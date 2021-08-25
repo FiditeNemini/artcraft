@@ -22,6 +22,7 @@ use anyhow::{anyhow, Error};
 use chrono::{Utc, DateTime, TimeZone};
 use crate::clients::tts_inference_sidecar_client::TtsInferenceSidecarClient;
 use crate::common_env::CommonEnv;
+use crate::database::enums::vocoder_type::VocoderType;
 use crate::database::mediators::firehose_publisher::FirehosePublisher;
 use crate::job_queries::tts_inference_job_queries::get_tts_model_by_token;
 use crate::job_queries::tts_inference_job_queries::grab_job_lock_and_mark_pending;
@@ -61,7 +62,6 @@ use std::process::Command;
 use std::thread;
 use std::time::Duration;
 use tempdir::TempDir;
-use crate::database::enums::vocoder_type::VocoderType;
 
 // Buckets (shared config)
 const ENV_ACCESS_KEY : &'static str = "ACCESS_KEY";
@@ -109,8 +109,8 @@ struct Inferencer {
   // Hifigan vocoder filename
   pub hifigan_vocoder_model_filename: String,
 
-  // Hifigan supersampling vocoder filename
-  pub hifigan_supersampling_vocoder_model_filename: String,
+  // Hifigan super resolution vocoder filename
+  pub hifigan_superres_vocoder_model_filename: String,
 
   // Sleep between batches
   pub job_batch_wait_millis: u64,
@@ -214,10 +214,16 @@ async fn main() -> AnyhowResult<()> {
 
   info!("Creating pod semi-persistent cache dirs...");
   semi_persistent_cache.create_tts_synthesizer_model_path()?;
-  semi_persistent_cache.create_tts_vocoder_model_path()?;
+  semi_persistent_cache.create_tts_pretrained_vocoder_model_path()?;
 
   let waveglow_vocoder_model_filename = easyenv::get_env_string_or_default(
     "TTS_WAVEGLOW_VOCODER_MODEL_FILENAME", "waveglow.pth");
+
+  let hifigan_vocoder_model_filename = easyenv::get_env_string_or_default(
+    "TTS_HIFIGAN_VOCODER_MODEL_FILENAME", "hifigan.pth");
+
+  let hifigan_superres_vocoder_model_filename = easyenv::get_env_string_or_default(
+    "TTS_HIFIGAN_SUPERRES_VOCODER_MODEL_FILENAME", "hifigan_superres.pth");
 
   let sidecar_max_synthesizer_models = easyenv::get_env_num(
     "SIDECAR_MAX_SYNTHESIZER_MODELS", 3)?;
@@ -268,8 +274,8 @@ async fn main() -> AnyhowResult<()> {
     semi_persistent_cache,
     firehose_publisher,
     waveglow_vocoder_model_filename,
-    hifigan_vocoder_model_filename: "".to_string(), // TODO
-    hifigan_supersampling_vocoder_model_filename: "".to_string(), // TODO
+    hifigan_vocoder_model_filename,
+    hifigan_superres_vocoder_model_filename,
     job_batch_wait_millis: common_env.job_batch_wait_millis,
     job_max_attempts: common_env.job_max_attempts as i32,
     job_batch_size: common_env.job_batch_size,
@@ -516,7 +522,7 @@ async fn process_job(
   // ==================== CONFIRM OR DOWNLOAD WAVEGLOW VOCODER MODEL ==================== //
 
   let waveglow_vocoder_model_filename = inferencer.waveglow_vocoder_model_filename.clone();
-  let waveglow_vocoder_model_fs_path = inferencer.semi_persistent_cache.tts_vocoder_model_path(&waveglow_vocoder_model_filename);
+  let waveglow_vocoder_model_fs_path = inferencer.semi_persistent_cache.tts_pretrained_vocoder_model_path(&waveglow_vocoder_model_filename);
 
   if !waveglow_vocoder_model_fs_path.exists() {
     warn!("Waveglow vocoder model file does not exist: {:?}", &waveglow_vocoder_model_fs_path);

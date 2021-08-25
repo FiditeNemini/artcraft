@@ -7,21 +7,21 @@ use crate::util::anyhow_result::AnyhowResult;
 #[serde(rename_all = "lowercase")]
 #[sqlx(rename_all = "lowercase")]
 pub enum VocoderType {
-  HifiGanSuperSample,
+  HifiGanSuperResolution,
   WaveGlow,
 }
 
 impl VocoderType {
   pub fn to_str(&self) -> &'static str {
     match self {
-      VocoderType::HifiGanSuperSample => "hifigan-supersample",
+      VocoderType::HifiGanSuperResolution => "hifigan-superres",
       VocoderType::WaveGlow => "waveglow",
     }
   }
 
   pub fn from_str(vocoder_type: &str) -> AnyhowResult<Self> {
     match vocoder_type {
-      "hifigan-supersample" => Ok(VocoderType::HifiGanSuperSample),
+      "hifigan-superres" => Ok(VocoderType::HifiGanSuperResolution),
       "waveglow" => Ok(VocoderType::WaveGlow),
       _ => Err(anyhow!("invalid value: {:?}", vocoder_type)),
     }

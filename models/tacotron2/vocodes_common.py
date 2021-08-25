@@ -259,7 +259,7 @@ class TacotronWaveglowPipeline:
         print('Generating metadata file...')
         generate_metadata_file(args['output_audio_filename'], args['output_metadata_filename'])
 
-        #return
+        return
 
         with torch.no_grad():
             print('Running hifigan...')
