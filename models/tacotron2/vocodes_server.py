@@ -210,7 +210,7 @@ class ApiHandler():
 
         # Request parameters
         synthesizer_checkpoint_path = raw_data.get('synthesizer_checkpoint_path')
-        vocoder_checkpoint_path = raw_data.get('vocoder_checkpoint_path')
+        waveglow_vocoder_checkpoint_path = raw_data.get('waveglow_vocoder_checkpoint_path')
         inference_text = raw_data.get('inference_text')
         output_audio_filename = raw_data.get('output_audio_filename')
         output_spectrogram_filename = raw_data.get('output_spectrogram_filename')
@@ -221,7 +221,7 @@ class ApiHandler():
             raw_data.get('maybe_clear_synthesizer_checkpoint_path')
 
         print('synthesizer_checkpoint_path: {}'.format(synthesizer_checkpoint_path))
-        print('vocoder_checkpoint_path: {}'.format(vocoder_checkpoint_path))
+        print('waveglow_vocoder_checkpoint_path: {}'.format(waveglow_vocoder_checkpoint_path))
         print('inference_text: {}'.format(inference_text))
         print('output_audio_filename: {}'.format(output_audio_filename))
         print('output_spectrogram_filename: {}'.format(output_spectrogram_filename))
@@ -232,7 +232,7 @@ class ApiHandler():
         if maybe_clear_synthesizer_checkpoint_path:
             pipeline.uncache_tacotron_model(maybe_clear_synthesizer_checkpoint_path)
 
-        pipeline.maybe_load_waveglow_model(vocoder_checkpoint_path)
+        pipeline.maybe_load_waveglow_model(waveglow_vocoder_checkpoint_path)
         pipeline.maybe_load_tacotron_model_to_cache(synthesizer_checkpoint_path)
 
         pipeline.maybe_load_hifigan('/home/bt/models/hifigan/universal_hifigan_g_02500000')

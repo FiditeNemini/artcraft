@@ -5,17 +5,27 @@ use hyper::client::Client;
 use hyper::{Body, Request};
 use log::info;
 use std::path::Path;
+use crate::database::enums::vocoder_type::VocoderType;
 
 pub struct TtsInferenceSidecarClient {
   hostname: String,
-  //client: Client,
 }
 
 #[derive(Serialize)]
 struct InferenceRequest {
-  pub vocoder_checkpoint_path : String,
+  // Vocoder information
+  pub vocoder_type: VocoderType,
+  pub waveglow_vocoder_checkpoint_path : String,
+  pub hifigan_vocoder_checkpoint_path: String,
+  pub hifigan_supersample_vocoder_checkpoint_path: String,
+
+  // Synthesizer information
   pub synthesizer_checkpoint_path : String,
+
+  // Text
   pub inference_text : String,
+
+  // Output information
   pub output_audio_filename : String,
   pub output_spectrogram_filename : String,
   pub output_metadata_filename : String,
@@ -39,18 +49,33 @@ impl TtsInferenceSidecarClient {
     &self,
     raw_text: &str,
     synthesizer_checkpoint_path: P,
-    vocoder_checkpoint_path: P,
+    vocoder_type: VocoderType,
+    hifigan_vocoder_checkpoint_path: P,
+    hifigan_supersample_vocoder_checkpoint_path: P,
+    waveglow_vocoder_checkpoint_path: P,
     output_audio_filename: P,
     output_spectrogram_filename: P,
     output_metadata_filename: P,
     maybe_unload_model_path: Option<String>,
   ) -> AnyhowResult<()> {
 
-    let vocoder_checkpoint_path = vocoder_checkpoint_path
+    let waveglow_vocoder_checkpoint_path = waveglow_vocoder_checkpoint_path
         .as_ref()
         .to_str()
         .map(|s| s.to_string())
-        .ok_or(anyhow!("bad vocoder path"))?;
+        .ok_or(anyhow!("bad waveglow vocoder path"))?;
+
+    let hifigan_vocoder_checkpoint_path = hifigan_vocoder_checkpoint_path
+        .as_ref()
+        .to_str()
+        .map(|s| s.to_string())
+        .ok_or(anyhow!("bad hifigan vocoder path"))?;
+
+    let hifigan_supersample_vocoder_checkpoint_path = hifigan_supersample_vocoder_checkpoint_path
+        .as_ref()
+        .to_str()
+        .map(|s| s.to_string())
+        .ok_or(anyhow!("bad hifigan supersample vocoder path"))?;
 
     let synthesizer_checkpoint_path = synthesizer_checkpoint_path
         .as_ref()
@@ -78,7 +103,10 @@ impl TtsInferenceSidecarClient {
 
     let request = InferenceRequest {
       inference_text: raw_text.to_string(),
-      vocoder_checkpoint_path,
+      vocoder_type,
+      waveglow_vocoder_checkpoint_path,
+      hifigan_vocoder_checkpoint_path,
+      hifigan_supersample_vocoder_checkpoint_path,
       synthesizer_checkpoint_path,
       output_audio_filename,
       output_spectrogram_filename,

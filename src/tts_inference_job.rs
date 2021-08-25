@@ -61,6 +61,7 @@ use std::process::Command;
 use std::thread;
 use std::time::Duration;
 use tempdir::TempDir;
+use crate::database::enums::vocoder_type::VocoderType;
 
 // Buckets (shared config)
 const ENV_ACCESS_KEY : &'static str = "ACCESS_KEY";
@@ -102,8 +103,14 @@ struct Inferencer {
   pub virtual_model_lfu: SyncVirtualLfuCache,
   pub cache_miss_strategizers: SyncMultiCacheMissStrategizer,
 
-  // Command to run
-  pub tts_vocoder_model_filename: String,
+  // Waveglow vocoder filename
+  pub waveglow_vocoder_model_filename: String,
+
+  // Hifigan vocoder filename
+  pub hifigan_vocoder_model_filename: String,
+
+  // Hifigan supersampling vocoder filename
+  pub hifigan_supersampling_vocoder_model_filename: String,
 
   // Sleep between batches
   pub job_batch_wait_millis: u64,
@@ -209,8 +216,8 @@ async fn main() -> AnyhowResult<()> {
   semi_persistent_cache.create_tts_synthesizer_model_path()?;
   semi_persistent_cache.create_tts_vocoder_model_path()?;
 
-  let tts_vocoder_model_filename = easyenv::get_env_string_or_default(
-    "TTS_VOCODER_MODEL_FILENAME", "waveglow.pth");
+  let waveglow_vocoder_model_filename = easyenv::get_env_string_or_default(
+    "TTS_WAVEGLOW_VOCODER_MODEL_FILENAME", "waveglow.pth");
 
   let sidecar_max_synthesizer_models = easyenv::get_env_num(
     "SIDECAR_MAX_SYNTHESIZER_MODELS", 3)?;
@@ -253,9 +260,6 @@ async fn main() -> AnyhowResult<()> {
     mysql_pool,
     public_bucket_client,
     private_bucket_client,
-    //ffmpeg_image_preview_generator: FfmpegGeneratePreviewImageCommand {},
-    //ffmpeg_video_preview_generator: FfmpegGeneratePreviewVideoCommand {},
-    //imagemagick_image_preview_generator: ImagemagickGeneratePreviewImageCommand {},
     tts_inference_command,
     tts_inference_sidecar_client,
     virtual_model_lfu: virtual_lfu_cache,
@@ -263,7 +267,9 @@ async fn main() -> AnyhowResult<()> {
     bucket_path_unifier: BucketPathUnifier::default_paths(),
     semi_persistent_cache,
     firehose_publisher,
-    tts_vocoder_model_filename,
+    waveglow_vocoder_model_filename,
+    hifigan_vocoder_model_filename: "".to_string(), // TODO
+    hifigan_supersampling_vocoder_model_filename: "".to_string(), // TODO
     job_batch_wait_millis: common_env.job_batch_wait_millis,
     job_max_attempts: common_env.job_max_attempts as i32,
     job_batch_size: common_env.job_batch_size,
@@ -507,25 +513,25 @@ async fn process_job(
     return Ok(())
   }
 
-  // ==================== CONFIRM OR DOWNLOAD TTS VOCODER MODEL ==================== //
+  // ==================== CONFIRM OR DOWNLOAD WAVEGLOW VOCODER MODEL ==================== //
 
-  let tts_vocoder_model_filename = inferencer.tts_vocoder_model_filename.clone();
-  let tts_vocoder_model_fs_path = inferencer.semi_persistent_cache.tts_vocoder_model_path(&tts_vocoder_model_filename);
+  let waveglow_vocoder_model_filename = inferencer.waveglow_vocoder_model_filename.clone();
+  let waveglow_vocoder_model_fs_path = inferencer.semi_persistent_cache.tts_vocoder_model_path(&waveglow_vocoder_model_filename);
 
-  if !tts_vocoder_model_fs_path.exists() {
-    warn!("Vocoder model file does not exist: {:?}", &tts_vocoder_model_fs_path);
+  if !waveglow_vocoder_model_fs_path.exists() {
+    warn!("Waveglow vocoder model file does not exist: {:?}", &waveglow_vocoder_model_fs_path);
 
-    let tts_vocoder_model_object_path = inferencer.bucket_path_unifier
-        .tts_pretrained_vocoders_path(&tts_vocoder_model_filename);
+    let waveglow_vocoder_model_object_path = inferencer.bucket_path_unifier
+        .tts_pretrained_vocoders_path(&waveglow_vocoder_model_filename);
 
-    info!("Download vocoder from bucket path: {:?}", &tts_vocoder_model_object_path);
+    info!("Download waveglow vocoder from bucket path: {:?}", &waveglow_vocoder_model_object_path);
 
     inferencer.private_bucket_client.download_file_to_disk(
-      &tts_vocoder_model_object_path,
-      &tts_vocoder_model_fs_path
+      &waveglow_vocoder_model_object_path,
+      &waveglow_vocoder_model_fs_path
     ).await?;
 
-    info!("Downloaded tts vocoder model from bucket!");
+    info!("Downloaded waveglow vocoder model from bucket!");
   }
 
 //  // ==================== LOOK UP TTS SYNTHESIZER RECORD (WHICH CONTAINS ITS BUCKET PATH) ==================== //
@@ -611,7 +617,10 @@ async fn process_job(
   inferencer.tts_inference_sidecar_client.request_inference(
     &job.raw_inference_text,
     &tts_synthesizer_fs_path,
-    &tts_vocoder_model_fs_path,
+    VocoderType::WaveGlow,
+    &PathBuf::new(), // TODO
+    &PathBuf::new(), // TODO
+    &waveglow_vocoder_model_fs_path,
     &output_audio_fs_path,
     &output_spectrogram_fs_path,
     &output_metadata_fs_path,
