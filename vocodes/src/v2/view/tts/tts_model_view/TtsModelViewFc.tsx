@@ -1,6 +1,4 @@
-
 import React, { useState, useEffect, useCallback } from 'react';
-//import axios from 'axios';
 import { ApiConfig } from '../../../../common/ApiConfig';
 import { EnqueueJobResponsePayload } from '../tts_model_list/TtsModelFormFc';
 import { SessionTtsInferenceResultListFc } from '../../_common/SessionTtsInferenceResultsListFc';
@@ -26,6 +24,7 @@ interface TtsModel {
   model_token: string,
   title: string,
   tts_model_type: string,
+  maybe_default_pretrained_vocoder: string | null,
   text_preprocessing_algorithm: string,
   creator_user_token: string,
   creator_username: string,
@@ -273,6 +272,16 @@ function TtsModelViewFc(props: Props) {
     <span>Hidden <HiddenIconFc /></span> :
     <span>Public <VisibleIconFc /></span> ;
 
+  let defaultVocoder = 'not set';
+  switch (ttsModel?.maybe_default_pretrained_vocoder) {
+    case 'hifigan-superres':
+      defaultVocoder = 'HiFi-GAN'
+      break;
+    case 'waveglow':
+      defaultVocoder = 'WaveGlow'
+      break;
+  }
+
   return (
     <div className="content">
       <h1 className="title is-1"> {title} </h1>
@@ -322,6 +331,10 @@ function TtsModelViewFc(props: Props) {
           <tr>
             <th>Model type</th>
             <td>{ttsModel?.tts_model_type}</td>
+          </tr>
+          <tr>
+            <th>Default vocoder</th>
+            <td>{defaultVocoder}</td>
           </tr>
           <tr>
             <th>Text preprocessing algorithm</th>

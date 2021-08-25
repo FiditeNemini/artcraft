@@ -21,6 +21,8 @@ interface TtsInferenceResult {
   tts_model_token: string,
   tts_model_title: string,
 
+  maybe_pretrained_vocoder_used: string | null,
+
   raw_inference_text: string,
 
   maybe_creator_user_token?: string,
@@ -101,6 +103,16 @@ function TtsResultViewFc(props: Props) {
   let durationSeconds = ttsInferenceResult?.duration_millis / 1000;
 
   let modelName = ttsInferenceResult.tts_model_title;
+
+  let vocoderUsed = 'unknown';
+  switch (ttsInferenceResult?.maybe_pretrained_vocoder_used) {
+    case 'hifigan-superres':
+      vocoderUsed = 'HiFi-GAN'
+      break;
+    case 'waveglow':
+      vocoderUsed = 'WaveGlow'
+      break;
+  }
 
   //const currentlyDeleted = !!ttsInferenceResult?.maybe_moderator_fields?.mod_deleted_at || !!ttsInferenceResult?.maybe_moderator_fields?.user_deleted_at;
 
@@ -237,7 +249,6 @@ function TtsResultViewFc(props: Props) {
       <br />
       <br />
 
-
       <h4 className="subtitle is-4"> Spectrogram </h4>
       <SpectrogramFc spectrogramJsonLink={spectrogramLink} />
 
@@ -291,6 +302,10 @@ function TtsResultViewFc(props: Props) {
             <td>
               {modelCreatorDetails}
             </td>
+          </tr>
+          <tr>
+            <th>Vocoder used</th>
+            <td>{vocoderUsed}</td>
           </tr>
       
           {moderatorRows}

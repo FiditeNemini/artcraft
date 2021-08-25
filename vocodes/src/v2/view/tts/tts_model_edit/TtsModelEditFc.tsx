@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useCallback } from 'react';
 //import axios from 'axios';
 import { ApiConfig } from '../../../../common/ApiConfig';
@@ -11,6 +10,8 @@ import { HiddenIconFc } from '../../_icons/HiddenIcon';
 
 const DEFAULT_VISIBILITY = 'public';
 
+const DEFAULT_PRETRAINED_VOCODER = 'hifigan-superres';
+
 interface TtsModelViewResponsePayload {
   success: boolean,
   model: TtsModel,
@@ -20,6 +21,7 @@ interface TtsModel {
   model_token: string,
   title: string,
   tts_model_type: string,
+  maybe_default_pretrained_vocoder: string | null,
   text_preprocessing_algorithm: string,
   creator_user_token: string,
   creator_username: string,
@@ -55,6 +57,7 @@ function TtsModelEditFc(props: Props) {
   const [title, setTitle] = useState<string>("");
   const [descriptionMarkdown, setDescriptionMarkdown] = useState<string>("");
   const [visibility, setVisibility] = useState<string>(DEFAULT_VISIBILITY);
+  const [defaultPretrainedVocoder, setDefaultPretrainedVocoder] = useState<string>(DEFAULT_PRETRAINED_VOCODER);
 
   const getModel = useCallback((token) => {
     const api = new ApiConfig();
@@ -77,6 +80,7 @@ function TtsModelEditFc(props: Props) {
       setTitle(modelsResponse.model.title || "")
       setDescriptionMarkdown(modelsResponse.model.description_markdown || "")
       setVisibility(modelsResponse.model.creator_set_visibility || DEFAULT_VISIBILITY);
+      setDefaultPretrainedVocoder(modelsResponse.model.maybe_default_pretrained_vocoder || DEFAULT_PRETRAINED_VOCODER);
       setTtsModel(modelsResponse.model);
     })
     .catch(e => {});
@@ -105,6 +109,10 @@ function TtsModelEditFc(props: Props) {
     setVisibility((ev.target as HTMLSelectElement).value)
   };
 
+  const handleDefaultPretrainedVocoderChange = (ev: React.FormEvent<HTMLSelectElement>) => {
+    setDefaultPretrainedVocoder((ev.target as HTMLSelectElement).value)
+  };
+
   const modelLink = FrontendUrlConfig.ttsModelPage(token);
 
   const handleFormSubmit = (ev: React.FormEvent<HTMLFormElement>) => { 
@@ -127,6 +135,7 @@ function TtsModelEditFc(props: Props) {
       title: title,
       description_markdown: descriptionMarkdown,
       creator_set_visibility: visibility || DEFAULT_VISIBILITY,
+      maybe_default_pretrained_vocoder: defaultPretrainedVocoder || DEFAULT_PRETRAINED_VOCODER,
     }
 
     fetch(endpointUrl, {
@@ -191,6 +200,20 @@ function TtsModelEditFc(props: Props) {
                 placeholder="Model description (ie. source of data, training duration, etc)"
                 value={descriptionMarkdown} 
                 />
+            </div>
+          </div>
+
+          <div className="field">
+            <label className="label">Default vocoder</label>
+            <div className="control select">
+              <select 
+                name="default_pretrained_vocoder" 
+                onChange={handleDefaultPretrainedVocoderChange}
+                value={defaultPretrainedVocoder}
+                >
+                <option value="hifigan-superres">HiFi-Gan (typically sounds best)</option>
+                <option value="waveglow">WaveGlow</option>
+              </select>
             </div>
           </div>
 
