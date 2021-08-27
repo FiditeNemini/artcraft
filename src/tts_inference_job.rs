@@ -53,6 +53,7 @@ use crate::util::semi_persistent_cache_dir::SemiPersistentCacheDir;
 use data_encoding::{HEXUPPER, HEXLOWER, HEXLOWER_PERMISSIVE};
 use log::{warn, info};
 use r2d2_redis::RedisConnectionManager;
+use r2d2_redis::r2d2::PooledConnection;
 use r2d2_redis::r2d2;
 use r2d2_redis::redis::Commands;
 use ring::digest::{Context, Digest, SHA256};
@@ -527,6 +528,8 @@ async fn process_job(
   // TODO 9. Mark job done
 
   let redis_status_key = RedisKeys::tts_inference_extra_status_info(&job.inference_job_token);
+  let mut redis = inferencer.redis_pool.get()?;
+  let mut redis_logger = JobExtraDetailStatusLogger::new(&mut redis, &job.inference_job_token);
 
   // ==================== ATTEMPT TO GRAB JOB LOCK ==================== //
 
@@ -545,10 +548,7 @@ async fn process_job(
   if !waveglow_vocoder_model_fs_path.exists() {
     warn!("Waveglow vocoder model file does not exist: {:?}", &waveglow_vocoder_model_fs_path);
 
-    let r : String = inferencer.redis_pool.get()
-        .unwrap()
-        .set_ex(&redis_status_key, "Downloading vocoder...", 60*60)
-        .unwrap();
+    redis_logger.log_status("downloading vocoder (1 of 3)")?;
 
     let waveglow_vocoder_model_object_path = inferencer.bucket_path_unifier
         .tts_pretrained_vocoders_path(&waveglow_vocoder_model_filename);
@@ -571,10 +571,7 @@ async fn process_job(
   if !hifigan_vocoder_model_fs_path.exists() {
     warn!("Hifigan vocoder model file does not exist: {:?}", &hifigan_vocoder_model_fs_path);
 
-    let r : String = inferencer.redis_pool.get()
-        .unwrap()
-        .set_ex(&redis_status_key, "Downloading vocoder...", 60*60)
-        .unwrap();
+    redis_logger.log_status("downloading vocoder (2 of 3)")?;
 
     let hifigan_vocoder_model_object_path = inferencer.bucket_path_unifier
         .tts_pretrained_vocoders_path(&hifigan_vocoder_model_filename);
@@ -597,10 +594,7 @@ async fn process_job(
   if !hifigan_superres_vocoder_model_fs_path.exists() {
     warn!("Hifigan superres vocoder model file does not exist: {:?}", &hifigan_superres_vocoder_model_fs_path);
 
-    let r : String = inferencer.redis_pool.get()
-        .unwrap()
-        .set_ex(&redis_status_key, "Downloading vocoder...", 60*60)
-        .unwrap();
+    redis_logger.log_status("downloading vocoder (3 of 3)")?;
 
     let hifigan_superres_vocoder_model_object_path = inferencer.bucket_path_unifier
         .tts_pretrained_vocoders_path(&hifigan_superres_vocoder_model_filename);
@@ -642,10 +636,7 @@ async fn process_job(
   if !tts_synthesizer_fs_path.exists() {
     info!("TTS synthesizer model file does not exist: {:?}", &tts_synthesizer_fs_path);
 
-    let r : String = inferencer.redis_pool.get()
-        .unwrap()
-        .set_ex(&redis_status_key, "Downloading synthesizer model...", 60*60)
-        .unwrap();
+    redis_logger.log_status("downloading synthesizer")?;
 
     let tts_synthesizer_object_path  = inferencer.bucket_path_unifier
         .tts_synthesizer_path(&model_record.private_bucket_hash);
@@ -671,10 +662,7 @@ async fn process_job(
 
   // ==================== RUN INFERENCE ==================== //
 
-  let r : String = inferencer.redis_pool.get()
-      .unwrap()
-      .set_ex(&redis_status_key, "Running inference...", 60*60)
-      .unwrap();
+  redis_logger.log_status("running inference")?;
 
   // TODO: Fix this.
   let maybe_unload_model_path = inferencer
@@ -737,10 +725,7 @@ async fn process_job(
 
   // ==================== UPLOAD AUDIO TO BUCKET ==================== //
 
-  let r : String = inferencer.redis_pool.get()
-      .unwrap()
-      .set_ex(&redis_status_key, "Uploading result...", 60*60)
-      .unwrap();
+  redis_logger.log_status("uploading result")?;
 
   let audio_result_object_path = inferencer.bucket_path_unifier.tts_inference_wav_audio_output_path(
     &job.uuid_idempotency_token); // TODO: Don't use this!
@@ -804,14 +789,33 @@ async fn process_job(
         anyhow!("error publishing event")
       })?;
 
+  redis_logger.log_status("done")?;
+
   info!("Job {} complete success! Downloaded, ran inference, and uploaded. Saved model record: {}",
         job.id, id);
 
-
-  let r : String = inferencer.redis_pool.get()
-      .unwrap()
-      .set_ex(&redis_status_key, "Done.", 60*60)
-      .unwrap();
-
   Ok(())
+}
+
+struct JobExtraDetailStatusLogger <'a> {
+  redis: &'a mut  PooledConnection<RedisConnectionManager>,
+  status_key: String,
+}
+
+impl <'a> JobExtraDetailStatusLogger <'a> {
+  fn new(redis: &'a mut PooledConnection<RedisConnectionManager>, job_token: &str) -> Self {
+    let status_key = RedisKeys::tts_inference_extra_status_info(job_token);
+    Self {
+      redis,
+      status_key,
+    }
+  }
+
+  fn log_status(&mut self, logging_details: &str) -> AnyhowResult<()> {
+    let _r : String = self.redis // NB: Compiler can't figure out the throwaway result type
+        .set_ex(&self.status_key,
+          logging_details,
+          RedisKeys::STATUS_KEY_TTL_SECONDS)?;
+    Ok(())
+  }
 }

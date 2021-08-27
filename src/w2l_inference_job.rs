@@ -568,7 +568,7 @@ async fn process_job(inferencer: &Inferencer, job: &W2lInferenceJobRecord) -> An
 
   // ==================== UPLOAD TO BUCKETS ==================== //
 
-  redis_logger.log_status("uploading")?;
+  redis_logger.log_status("uploading result")?;
 
   let result_object_path = inferencer.bucket_path_unifier.w2l_inference_video_output_path(
     &job.inference_job_token);
