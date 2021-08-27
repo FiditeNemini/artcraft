@@ -48,15 +48,20 @@ use crate::util::jobs::cache_miss_strategizer_multi::SyncMultiCacheMissStrategiz
 use crate::util::jobs::virtual_lfu_cache::SyncVirtualLfuCache;
 use crate::util::noop_logger::NoOpLogger;
 use crate::util::random_crockford_token::random_crockford_token;
+use crate::util::redis_keys::RedisKeys;
 use crate::util::semi_persistent_cache_dir::SemiPersistentCacheDir;
 use data_encoding::{HEXUPPER, HEXLOWER, HEXLOWER_PERMISSIVE};
 use log::{warn, info};
+use r2d2_redis::RedisConnectionManager;
+use r2d2_redis::r2d2;
+use r2d2_redis::redis::Commands;
 use ring::digest::{Context, Digest, SHA256};
 use sqlx::MySqlPool;
 use sqlx::mysql::MySqlPoolOptions;
 use std::collections::HashMap;
 use std::fs::{File, metadata};
 use std::io::{BufReader, Read};
+use std::ops::Deref;
 use std::path::{PathBuf, Path};
 use std::process::Command;
 use std::thread;
@@ -87,6 +92,8 @@ const DEFAULT_TEMP_DIR: &'static str = "/tmp";
 struct Inferencer {
   pub download_temp_directory: PathBuf,
   pub mysql_pool: MySqlPool,
+
+  pub redis_pool: r2d2::Pool<RedisConnectionManager>,
 
   pub private_bucket_client: BucketClient,
   pub public_bucket_client: BucketClient,
@@ -205,6 +212,16 @@ async fn main() -> AnyhowResult<()> {
       .connect(&db_connection_string)
       .await?;
 
+  let common_env = CommonEnv::read_from_env()?;
+
+  info!("Connecting to redis...");
+
+  let redis_manager =
+      RedisConnectionManager::new(common_env.redis_connection_string.deref())?;
+
+  let redis_pool = r2d2::Pool::builder()
+      .build(redis_manager)?;
+
   let persistent_cache_path = easyenv::get_env_string_or_default(
     ENV_SEMIPERSISTENT_CACHE_DIR,
     "/tmp");
@@ -231,8 +248,6 @@ async fn main() -> AnyhowResult<()> {
   let firehose_publisher = FirehosePublisher {
     mysql_pool: mysql_pool.clone(), // NB: MySqlPool is clone/send/sync safe
   };
-
-  let common_env = CommonEnv::read_from_env()?;
 
   let virtual_lfu_cache = SyncVirtualLfuCache::new(2)?;
 
@@ -264,6 +279,7 @@ async fn main() -> AnyhowResult<()> {
   let inferencer = Inferencer {
     download_temp_directory: temp_directory,
     mysql_pool,
+    redis_pool,
     public_bucket_client,
     private_bucket_client,
     tts_inference_command,
@@ -510,6 +526,8 @@ async fn process_job(
   // TODO 8. Save record
   // TODO 9. Mark job done
 
+  let redis_status_key = RedisKeys::tts_inference_extra_status_info(&job.inference_job_token);
+
   // ==================== ATTEMPT TO GRAB JOB LOCK ==================== //
 
   let lock_acquired = grab_job_lock_and_mark_pending(&inferencer.mysql_pool, job).await?;
@@ -526,6 +544,11 @@ async fn process_job(
 
   if !waveglow_vocoder_model_fs_path.exists() {
     warn!("Waveglow vocoder model file does not exist: {:?}", &waveglow_vocoder_model_fs_path);
+
+    let r : String = inferencer.redis_pool.get()
+        .unwrap()
+        .set_ex(&redis_status_key, "Downloading vocoder...", 60*60)
+        .unwrap();
 
     let waveglow_vocoder_model_object_path = inferencer.bucket_path_unifier
         .tts_pretrained_vocoders_path(&waveglow_vocoder_model_filename);
@@ -548,6 +571,11 @@ async fn process_job(
   if !hifigan_vocoder_model_fs_path.exists() {
     warn!("Hifigan vocoder model file does not exist: {:?}", &hifigan_vocoder_model_fs_path);
 
+    let r : String = inferencer.redis_pool.get()
+        .unwrap()
+        .set_ex(&redis_status_key, "Downloading vocoder...", 60*60)
+        .unwrap();
+
     let hifigan_vocoder_model_object_path = inferencer.bucket_path_unifier
         .tts_pretrained_vocoders_path(&hifigan_vocoder_model_filename);
 
@@ -568,6 +596,11 @@ async fn process_job(
 
   if !hifigan_superres_vocoder_model_fs_path.exists() {
     warn!("Hifigan superres vocoder model file does not exist: {:?}", &hifigan_superres_vocoder_model_fs_path);
+
+    let r : String = inferencer.redis_pool.get()
+        .unwrap()
+        .set_ex(&redis_status_key, "Downloading vocoder...", 60*60)
+        .unwrap();
 
     let hifigan_superres_vocoder_model_object_path = inferencer.bucket_path_unifier
         .tts_pretrained_vocoders_path(&hifigan_superres_vocoder_model_filename);
@@ -609,6 +642,11 @@ async fn process_job(
   if !tts_synthesizer_fs_path.exists() {
     info!("TTS synthesizer model file does not exist: {:?}", &tts_synthesizer_fs_path);
 
+    let r : String = inferencer.redis_pool.get()
+        .unwrap()
+        .set_ex(&redis_status_key, "Downloading synthesizer model...", 60*60)
+        .unwrap();
+
     let tts_synthesizer_object_path  = inferencer.bucket_path_unifier
         .tts_synthesizer_path(&model_record.private_bucket_hash);
 
@@ -632,6 +670,11 @@ async fn process_job(
   std::fs::write(&text_input_fs_path, &job.raw_inference_text)?;
 
   // ==================== RUN INFERENCE ==================== //
+
+  let r : String = inferencer.redis_pool.get()
+      .unwrap()
+      .set_ex(&redis_status_key, "Running inference...", 60*60)
+      .unwrap();
 
   // TODO: Fix this.
   let maybe_unload_model_path = inferencer
@@ -693,6 +736,11 @@ async fn process_job(
   let file_metadata = read_metadata_file(&output_metadata_fs_path)?;
 
   // ==================== UPLOAD AUDIO TO BUCKET ==================== //
+
+  let r : String = inferencer.redis_pool.get()
+      .unwrap()
+      .set_ex(&redis_status_key, "Uploading result...", 60*60)
+      .unwrap();
 
   let audio_result_object_path = inferencer.bucket_path_unifier.tts_inference_wav_audio_output_path(
     &job.uuid_idempotency_token); // TODO: Don't use this!
@@ -758,6 +806,12 @@ async fn process_job(
 
   info!("Job {} complete success! Downloaded, ran inference, and uploaded. Saved model record: {}",
         job.id, id);
+
+
+  let r : String = inferencer.redis_pool.get()
+      .unwrap()
+      .set_ex(&redis_status_key, "Done.", 60*60)
+      .unwrap();
 
   Ok(())
 }

@@ -1,3 +1,4 @@
+use crate::shared_constants::DEFAULT_REDIS_CONNECTION_STRING;
 use crate::util::anyhow_result::AnyhowResult;
 
 // TODO: Move more shared configs here.
@@ -6,6 +7,10 @@ use crate::util::anyhow_result::AnyhowResult;
 /// These do not have to have the same value for each instance, but they behave
 /// similarly across all usages.
 pub struct CommonEnv {
+
+  /// The Redis connection string.
+  /// Currently we only have a single Redis that serves all purposes.
+  pub redis_connection_string: String,
 
   /// The amount of time to wait between job batches (not individual jobs).
   /// This prevents the outer loop of querying batches from flooding the DB.
@@ -27,6 +32,8 @@ impl CommonEnv {
 
   pub fn read_from_env() -> AnyhowResult<Self> {
     Ok(Self {
+      redis_connection_string: easyenv::get_env_string_or_default("REDIS_URL",
+        DEFAULT_REDIS_CONNECTION_STRING),
       job_batch_wait_millis: easyenv::get_env_num("JOB_BATCH_WAIT_MILLIS", 100)?,
       job_max_attempts: easyenv::get_env_num("JOB_MAX_ATTEMPTS", 3)?,
       job_batch_size: easyenv::get_env_num("JOB_BATCH_SIZE", 10)?,

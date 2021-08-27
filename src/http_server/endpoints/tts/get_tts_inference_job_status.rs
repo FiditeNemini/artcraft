@@ -47,7 +47,7 @@ pub struct TtsInferenceJobStatusForResponse {
 
   /// Extra, temporary status from Redis.
   /// This can denote inference progress, and the Python code can write to it.
-  pub extra_status: Option<String>,
+  pub maybe_extra_status_description: Option<String>,
 
   pub attempt_count: u8,
 
@@ -169,7 +169,7 @@ WHERE jobs.token = ?
       })?;
 
   let extra_status_key = RedisKeys::tts_inference_extra_status_info(&path.token);
-  let extra_status : Option<String> = match redis.get(&extra_status_key) {
+  let maybe_extra_status_description : Option<String> = match redis.get(&extra_status_key) {
     Ok(Some(status)) => {
       Some(status)
     },
@@ -183,7 +183,7 @@ WHERE jobs.token = ?
   let model_for_response = TtsInferenceJobStatusForResponse {
     job_token: record.job_token.clone(),
     status: record.status.clone(),
-    extra_status,
+    maybe_extra_status_description,
     attempt_count: record.attempt_count as u8,
     maybe_result_token: record.maybe_result_token.clone(),
     maybe_public_bucket_wav_audio_path: record.maybe_public_bucket_wav_audio_path.clone(),
