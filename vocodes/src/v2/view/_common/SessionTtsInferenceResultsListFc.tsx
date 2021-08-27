@@ -20,10 +20,10 @@ function SessionTtsInferenceResultListFc(props: Props) {
       switch (job.jobState) {
         case JobState.PENDING:
         case JobState.UNKNOWN:
-          stateDescription = "Pending..."
+          stateDescription = job.maybeExtraStatusDescription == null ? "Pending..." : job.maybeExtraStatusDescription;
           break;
         case JobState.STARTED:
-          stateDescription = "Started...";
+          stateDescription = job.maybeExtraStatusDescription == null ? "Started..." : job.maybeExtraStatusDescription;
           break;
         case JobState.ATTEMPT_FAILED:
           stateDescription = `Failed ${job.attemptCount} attempt(s). Will retry...`;

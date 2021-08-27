@@ -5,6 +5,7 @@ export class TtsInferenceJob {
   jobToken: string;
   modelToken?: string;
   jobState: JobState;
+  maybeExtraStatusDescription: string | null;
   attemptCount: number;
   title?: string;
   maybeResultToken: string | undefined | null;
@@ -13,6 +14,7 @@ export class TtsInferenceJob {
   constructor(
     jobToken: string, 
     status: string = 'unknown',
+    maybeExtraStatusDescription: string | null = null,
     attemptCount: number = 0,
     modelToken: string | undefined = undefined,
     title: string | undefined = undefined,
@@ -20,6 +22,7 @@ export class TtsInferenceJob {
     maybePublicBucketWavAudioPath: string | undefined | null = null,
   ) {
     this.jobState = jobStateFromString(status);
+    this.maybeExtraStatusDescription = maybeExtraStatusDescription;
     this.attemptCount = attemptCount;
     this.jobToken = jobToken;
     this.maybeResultToken = maybeResulToken;
@@ -36,6 +39,7 @@ export class TtsInferenceJob {
     return new TtsInferenceJob(
       response.job_token,
       response.status,
+      response.maybe_extra_status_description || null,
       response.attempt_count || 0,
       response.model_token,
       response.title,
@@ -53,6 +57,7 @@ export interface TtsInferenceJobStateResponsePayload {
 export interface TtsInferenceJobState {
   job_token: string,
   status: string,
+  maybe_extra_status_description: string | null,
   attempt_count: number | null,
   maybe_result_token: string | null,
   maybe_public_bucket_wav_audio_path: string | null,
