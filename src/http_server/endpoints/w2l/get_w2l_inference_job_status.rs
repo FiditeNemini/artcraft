@@ -25,6 +25,8 @@ use sqlx::error::DatabaseError;
 use sqlx::error::Error::Database;
 use sqlx::mysql::MySqlDatabaseError;
 use std::sync::Arc;
+use crate::util::redis_keys::RedisKeys;
+use r2d2_redis::redis::Commands;
 
 /// For the URL PathInfo
 #[derive(Deserialize)]
@@ -36,7 +38,13 @@ pub struct GetW2lInferenceStatusPathInfo {
 pub struct W2lInferenceJobStatusForResponse {
   pub job_token: String,
 
+  /// Primary status from the database (a state machine).
   pub status: String,
+
+  /// Extra, temporary status from Redis.
+  /// This can denote inference progress, and the Python code can write to it.
+  pub maybe_extra_status_description: Option<String>,
+
   pub attempt_count: u8,
   pub maybe_result_token: Option<String>,
   pub maybe_public_bucket_video_path: Option<String>,
@@ -147,9 +155,29 @@ WHERE jobs.token = ?
     }
   };
 
+  let mut redis = server_state.redis_pool
+      .get()
+      .map_err(|e| {
+        warn!("redis error: {:?}", e);
+        GetW2lInferenceStatusError::ServerError
+      })?;
+
+  let extra_status_key = RedisKeys::w2l_inference_extra_status_info(&path.token);
+  let maybe_extra_status_description : Option<String> = match redis.get(&extra_status_key) {
+    Ok(Some(status)) => {
+      Some(status)
+    },
+    Ok(None) => None,
+    Err(e) => {
+      warn!("redis error: {:?}", e);
+      None // Fail open
+    },
+  };
+
   let template_for_response = W2lInferenceJobStatusForResponse {
     job_token: record.job_token.clone(),
     status: record.status.clone(),
+    maybe_extra_status_description,
     attempt_count: record.attempt_count as u8,
     maybe_result_token: record.maybe_result_token.clone(),
     maybe_public_bucket_video_path: record.maybe_public_bucket_video_path.clone(),

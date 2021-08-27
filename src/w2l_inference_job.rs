@@ -44,19 +44,25 @@ use crate::util::filesystem::check_file_exists;
 use crate::util::hashing::hash_file_sha2::hash_file_sha2;
 use crate::util::noop_logger::NoOpLogger;
 use crate::util::random_crockford_token::random_crockford_token;
+use crate::util::redis_keys::RedisKeys;
 use crate::util::semi_persistent_cache_dir::SemiPersistentCacheDir;
 use data_encoding::{HEXUPPER, HEXLOWER, HEXLOWER_PERMISSIVE};
 use log::{warn, info};
+use r2d2_redis::RedisConnectionManager;
+use r2d2_redis::r2d2;
+use r2d2_redis::redis::Commands;
 use ring::digest::{Context, Digest, SHA256};
 use sqlx::MySqlPool;
 use sqlx::mysql::MySqlPoolOptions;
 use std::fs::{File, metadata};
 use std::io::{BufReader, Read};
+use std::ops::Deref;
 use std::path::{PathBuf, Path};
 use std::process::Command;
 use std::thread;
 use std::time::Duration;
 use tempdir::TempDir;
+use r2d2_redis::r2d2::PooledConnection;
 
 // Buckets (shared config)
 const ENV_ACCESS_KEY : &'static str = "ACCESS_KEY";
@@ -81,6 +87,8 @@ const DEFAULT_TEMP_DIR: &'static str = "/tmp";
 struct Inferencer {
   pub download_temp_directory: PathBuf,
   pub mysql_pool: MySqlPool,
+
+  pub redis_pool: r2d2::Pool<RedisConnectionManager>,
 
   pub private_bucket_client: BucketClient,
   pub public_bucket_client: BucketClient,
@@ -190,6 +198,16 @@ async fn main() -> AnyhowResult<()> {
     .connect(&db_connection_string)
     .await?;
 
+  let common_env = CommonEnv::read_from_env()?;
+
+  info!("Connecting to redis...");
+
+  let redis_manager =
+      RedisConnectionManager::new(common_env.redis_connection_string.deref())?;
+
+  let redis_pool = r2d2::Pool::builder()
+      .build(redis_manager)?;
+
   let inference_script = "TODO".to_string();
 
   let persistent_cache_path = easyenv::get_env_string_or_default(
@@ -219,6 +237,7 @@ async fn main() -> AnyhowResult<()> {
   let inferencer = Inferencer {
     download_temp_directory: temp_directory,
     mysql_pool,
+    redis_pool,
     public_bucket_client,
     private_bucket_client,
     inference_script,
@@ -347,6 +366,10 @@ async fn process_job(inferencer: &Inferencer, job: &W2lInferenceJobRecord) -> An
   // TODO 7. Save record
   // TODO 8. Mark job done
 
+  let redis_status_key = RedisKeys::w2l_inference_extra_status_info(&job.inference_job_token);
+  let mut redis = inferencer.redis_pool.get()?;
+  let mut redis_logger = JobExtraDetailStatusLogger::new(&mut redis, &job.inference_job_token);
+
   // ==================== ATTEMPT TO GRAB JOB LOCK ==================== //
 
   let lock_acquired = grab_job_lock_and_mark_pending(&inferencer.mysql_pool, job).await?;
@@ -363,6 +386,8 @@ async fn process_job(inferencer: &Inferencer, job: &W2lInferenceJobRecord) -> An
 
   if !model_fs_path.exists() {
     warn!("Model file does not exist: {:?}", &model_fs_path);
+
+    redis_logger.log_status("downloading model")?;
 
     let model_object_path = inferencer.bucket_path_unifier
       .w2l_pretrained_models_path(&model_filename);
@@ -384,6 +409,8 @@ async fn process_job(inferencer: &Inferencer, job: &W2lInferenceJobRecord) -> An
 
   if !end_bump_fs_path.exists() {
     warn!("End bump file does not exist: {:?}", &end_bump_fs_path);
+
+    redis_logger.log_status("downloading assets")?;
 
     let end_bump_object_path = inferencer.bucket_path_unifier
       .end_bump_video_for_w2l_path(&end_bump_filename);
@@ -434,6 +461,8 @@ async fn process_job(inferencer: &Inferencer, job: &W2lInferenceJobRecord) -> An
   if !template_media_fs_path.exists() {
     info!("W2L template media file does not exist: {:?}", &template_media_fs_path);
 
+    redis_logger.log_status("downloading template")?;
+
     let template_media_object_path = inferencer.bucket_path_unifier
       .media_templates_for_w2l_path(&w2l_template.private_bucket_hash);
 
@@ -461,6 +490,8 @@ async fn process_job(inferencer: &Inferencer, job: &W2lInferenceJobRecord) -> An
   if !face_template_fs_path.exists() {
     info!("W2L face template file does not exist: {:?}", &face_template_fs_path);
 
+    redis_logger.log_status("downloading template metadata")?;
+
     let face_template_object_path = inferencer.bucket_path_unifier
       .precomputed_faces_for_w2l_path(&w2l_template.private_bucket_hash);
 
@@ -475,6 +506,8 @@ async fn process_job(inferencer: &Inferencer, job: &W2lInferenceJobRecord) -> An
   }
 
   // ==================== DOWNLOAD USER AUDIO ==================== //
+
+  redis_logger.log_status("downloading audio")?;
 
   let temp_dir = format!("temp_{}", job.id);
   let temp_dir = TempDir::new(&temp_dir)?; // NB: Exists until it goes out of scope.
@@ -499,6 +532,8 @@ async fn process_job(inferencer: &Inferencer, job: &W2lInferenceJobRecord) -> An
 
 
   // ==================== RUN INFERENCE ==================== //
+
+  redis_logger.log_status("executing")?;
 
   let output_video_fs_path = temp_dir.path().join("output.mp4");
   let output_metadata_fs_path = temp_dir.path().join("metadata.json");
@@ -532,6 +567,8 @@ async fn process_job(inferencer: &Inferencer, job: &W2lInferenceJobRecord) -> An
   let file_metadata = read_metadata_file(&output_metadata_fs_path)?;
 
   // ==================== UPLOAD TO BUCKETS ==================== //
+
+  redis_logger.log_status("uploading")?;
 
   let result_object_path = inferencer.bucket_path_unifier.w2l_inference_video_output_path(
     &job.inference_job_token);
@@ -582,8 +619,33 @@ async fn process_job(inferencer: &Inferencer, job: &W2lInferenceJobRecord) -> An
       anyhow!("error publishing event")
     })?;
 
+  redis_logger.log_status("done")?;
+
   info!("Job {} complete success! Downloaded, ran inference, and uploaded. Saved model record: {}",
         job.id, id);
 
   Ok(())
+}
+
+struct JobExtraDetailStatusLogger <'a> {
+  redis: &'a mut  PooledConnection<RedisConnectionManager>,
+  status_key: String,
+}
+
+impl <'a> JobExtraDetailStatusLogger <'a> {
+  fn new(redis: &'a mut PooledConnection<RedisConnectionManager>, job_token: &str) -> Self {
+    let status_key = RedisKeys::w2l_inference_extra_status_info(job_token);
+    Self {
+      redis,
+      status_key,
+    }
+  }
+
+  fn log_status(&mut self, logging_details: &str) -> AnyhowResult<()> {
+    let _r : String = self.redis // NB: Compiler can't figure out the throwaway result type
+        .set_ex(&self.status_key,
+          logging_details,
+          RedisKeys::STATUS_KEY_TTL_SECONDS)?;
+    Ok(())
+  }
 }

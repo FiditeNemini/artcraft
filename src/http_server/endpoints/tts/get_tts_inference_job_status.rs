@@ -42,7 +42,7 @@ pub struct GetTtsInferenceStatusPathInfo {
 pub struct TtsInferenceJobStatusForResponse {
   pub job_token: String,
 
-  /// Primary status from the database.
+  /// Primary status from the database (a state machine).
   pub status: String,
 
   /// Extra, temporary status from Redis.

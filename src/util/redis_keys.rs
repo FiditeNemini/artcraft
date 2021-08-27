@@ -2,6 +2,8 @@
 pub struct RedisKeys {}
 
 impl RedisKeys {
+  /// How long the "*_extra_status_info" keys should live.
+  pub const STATUS_KEY_TTL_SECONDS : usize = 60 * 60;
 
   /// This is a counter incremented with TTS inference.
   /// We can use a job to read MySql and fix counts if they get out of sync.
