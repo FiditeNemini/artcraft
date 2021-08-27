@@ -66,7 +66,6 @@ pub async fn get_tts_model_use_count_handler(
   path: Path<GetTtsModelUseCountPathInfo>,
   server_state: web::Data<Arc<ServerState>>) -> Result<HttpResponse, GetTtsModelUseCountError>
 {
-
   let mut redis = server_state.redis_pool
       .get()
       .map_err(|e| {

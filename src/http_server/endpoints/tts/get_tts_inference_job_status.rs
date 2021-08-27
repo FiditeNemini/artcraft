@@ -15,16 +15,22 @@ use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 use crate::http_server::web_utils::session_checker::SessionRecord;
 use crate::server_state::ServerState;
 use crate::util::random_crockford_token::random_crockford_token;
+use crate::util::redis_keys::RedisKeys;
 use crate::validations::passwords::validate_passwords;
 use crate::validations::username::validate_username;
 use derive_more::{Display, Error};
 use log::{info, warn, log};
+use r2d2_redis::RedisConnectionManager;
+use r2d2_redis::redis::{Commands, RedisError, RedisResult};
 use regex::Regex;
 use sqlx::MySqlPool;
 use sqlx::error::DatabaseError;
 use sqlx::error::Error::Database;
 use sqlx::mysql::MySqlDatabaseError;
+use std::borrow::BorrowMut;
 use std::sync::Arc;
+use r2d2_redis::r2d2::{Pool, PooledConnection};
+use std::ops::Deref;
 
 /// For the URL PathInfo
 #[derive(Deserialize)]
@@ -36,7 +42,13 @@ pub struct GetTtsInferenceStatusPathInfo {
 pub struct TtsInferenceJobStatusForResponse {
   pub job_token: String,
 
+  /// Primary status from the database.
   pub status: String,
+
+  /// Extra, temporary status from Redis.
+  /// This can denote inference progress, and the Python code can write to it.
+  pub extra_status: Option<String>,
+
   pub attempt_count: u8,
 
   pub maybe_result_token: Option<String>,
@@ -149,9 +161,29 @@ WHERE jobs.token = ?
     }
   };
 
+  let mut redis = server_state.redis_pool
+      .get()
+      .map_err(|e| {
+        warn!("redis error: {:?}", e);
+        GetTtsInferenceStatusError::ServerError
+      })?;
+
+  let extra_status_key = RedisKeys::tts_inference_extra_status_info(&path.token);
+  let extra_status : Option<String> = match redis.get(&extra_status_key) {
+    Ok(Some(status)) => {
+      Some(status)
+    },
+    Ok(None) => None,
+    Err(e) => {
+      warn!("redis error: {:?}", e);
+      None // Fail open
+    },
+  };
+
   let model_for_response = TtsInferenceJobStatusForResponse {
     job_token: record.job_token.clone(),
     status: record.status.clone(),
+    extra_status,
     attempt_count: record.attempt_count as u8,
     maybe_result_token: record.maybe_result_token.clone(),
     maybe_public_bucket_wav_audio_path: record.maybe_public_bucket_wav_audio_path.clone(),
