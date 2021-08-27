@@ -4,6 +4,7 @@ export class W2lInferenceJob {
   jobToken: string;
   maybeW2lTemplateToken: string | undefined | null;
   jobState: JobState;
+  maybeExtraStatusDescription: string | null;
   attemptCount: number;
   title?: string;
   maybeResultToken: string | undefined | null;
@@ -12,6 +13,7 @@ export class W2lInferenceJob {
   constructor(
     jobToken: string, 
     status: string = 'unknown',
+    maybeExtraStatusDescription: string | null = null,
     attemptCount: number = 0,
     maybeW2lTemplateToken: string | undefined | null = undefined,
     title: string | undefined = undefined,
@@ -19,6 +21,7 @@ export class W2lInferenceJob {
     maybePublicBucketVideoPath: string | undefined | null = undefined,
   ) {
     this.jobState = jobStateFromString(status);
+    this.maybeExtraStatusDescription = maybeExtraStatusDescription;
     this.attemptCount = attemptCount;
     this.jobToken = jobToken;
     this.maybeResultToken = maybeResulToken;
@@ -33,6 +36,7 @@ export class W2lInferenceJob {
     return new W2lInferenceJob(
       response.job_token,
       response.status,
+      response.maybe_extra_status_description || null,
       response.attempt_count || 0,
       response.maybe_w2l_template_token,
       response.title,
@@ -50,6 +54,7 @@ export interface W2lInferenceJobStateResponsePayload {
 export interface W2lInferenceJobState {
   job_token: string,
   status: string,
+  maybe_extra_status_description: string | null,
   attempt_count: number | null,
   maybe_result_token: string | undefined | null,
   maybe_public_bucket_video_path: string | undefined | null,
