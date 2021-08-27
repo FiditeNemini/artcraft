@@ -118,6 +118,10 @@ struct Inferencer {
   // Max job attempts before failure.
   // NB: This is an i32 so we don't need to convert to db column type.
   pub job_max_attempts: i32,
+
+  // Temporary for debugging
+  // Arbitrary timeouts can be inserted so we can exec in and poke around.
+  pub debug_job_end_sleep_millis: u64,
 }
 
 #[tokio::main]
@@ -254,6 +258,7 @@ async fn main() -> AnyhowResult<()> {
     job_batch_wait_millis: common_env.job_batch_wait_millis,
     job_max_attempts: common_env.job_max_attempts as i32,
     no_op_logger_millis: common_env.no_op_logger_millis,
+    debug_job_end_sleep_millis: common_env.debug_job_end_sleep_millis,
   };
 
   main_loop(inferencer).await;
@@ -602,6 +607,7 @@ async fn process_job(inferencer: &Inferencer, job: &W2lInferenceJobRecord) -> An
     .await?;
 
   info!("Marking job complete...");
+
   mark_w2l_inference_job_done(
     &inferencer.mysql_pool,
     job,
@@ -620,6 +626,11 @@ async fn process_job(inferencer: &Inferencer, job: &W2lInferenceJobRecord) -> An
     })?;
 
   redis_logger.log_status("done")?;
+
+  if inferencer.debug_job_end_sleep_millis != 0 {
+    warn!("Debug sleep after job end: {} ms", inferencer.debug_job_end_sleep_millis);
+    thread::sleep(Duration::from_millis(inferencer.debug_job_end_sleep_millis));
+  }
 
   info!("Job {} complete success! Downloaded, ran inference, and uploaded. Saved model record: {}",
         job.id, id);

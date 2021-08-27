@@ -223,10 +223,10 @@ async fn main() -> AnyhowResult<()> {
     bucket_root_w2l_template_uploads: bucket_root.to_string(),
     debug_download_sleep_millis: easyenv::get_env_num("DEBUG_DOWNLOAD_SLEEP_MILLIS", 0)?,
     debug_face_detect_sleep_millis: easyenv::get_env_num("DEBUG_FACE_DETECT_SLEEP_MILLIS", 0)?,
-    debug_job_end_sleep_millis: easyenv::get_env_num("DEBUG_JOB_END_SLEEP_MILLIS", 0)?,
     job_batch_wait_millis: common_env.job_batch_wait_millis,
     job_max_attempts: common_env.job_max_attempts as i32,
     no_op_logger_millis: common_env.no_op_logger_millis,
+    debug_job_end_sleep_millis: common_env.debug_job_end_sleep_millis,
   };
 
   main_loop(downloader).await;
@@ -556,9 +556,6 @@ async fn process_job(downloader: &Downloader, job: &W2lTemplateUploadJobRecord) 
     Some(&model_token)
   ).await?;
 
-  info!("Job {} complete success! Downloaded, processed, and uploaded. Saved model record: {}",
-        job.id, id);
-
   downloader.firehose_publisher.publish_w2l_template_upload_finished(&job.creator_user_token, &model_token)
     .await
     .map_err(|e| {
@@ -577,6 +574,9 @@ async fn process_job(downloader: &Downloader, job: &W2lTemplateUploadJobRecord) 
     warn!("Debug sleep after job end: {} ms", downloader.debug_job_end_sleep_millis);
     thread::sleep(Duration::from_millis(downloader.debug_job_end_sleep_millis));
   }
+
+  info!("Job {} complete success! Downloaded, processed, and uploaded. Saved model record: {}",
+        job.id, id);
 
   Ok(())
 }
