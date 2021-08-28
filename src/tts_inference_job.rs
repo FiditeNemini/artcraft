@@ -48,7 +48,7 @@ use crate::util::jobs::cache_miss_strategizer_multi::SyncMultiCacheMissStrategiz
 use crate::util::jobs::virtual_lfu_cache::SyncVirtualLfuCache;
 use crate::util::noop_logger::NoOpLogger;
 use crate::util::random_crockford_token::random_crockford_token;
-use crate::util::redis_keys::RedisKeys;
+use crate::util::redis::redis_keys::RedisKeys;
 use crate::util::semi_persistent_cache_dir::SemiPersistentCacheDir;
 use data_encoding::{HEXUPPER, HEXLOWER, HEXLOWER_PERMISSIVE};
 use log::{warn, info};

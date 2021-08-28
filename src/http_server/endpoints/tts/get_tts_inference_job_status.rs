@@ -15,7 +15,7 @@ use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 use crate::http_server::web_utils::session_checker::SessionRecord;
 use crate::server_state::ServerState;
 use crate::util::random_crockford_token::random_crockford_token;
-use crate::util::redis_keys::RedisKeys;
+use crate::util::redis::redis_keys::RedisKeys;
 use crate::validations::passwords::validate_passwords;
 use crate::validations::username::validate_username;
 use derive_more::{Display, Error};

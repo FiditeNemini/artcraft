@@ -44,7 +44,7 @@ use crate::util::filesystem::check_file_exists;
 use crate::util::hashing::hash_file_sha2::hash_file_sha2;
 use crate::util::noop_logger::NoOpLogger;
 use crate::util::random_crockford_token::random_crockford_token;
-use crate::util::redis_keys::RedisKeys;
+use crate::util::redis::redis_keys::RedisKeys;
 use crate::util::semi_persistent_cache_dir::SemiPersistentCacheDir;
 use data_encoding::{HEXUPPER, HEXLOWER, HEXLOWER_PERMISSIVE};
 use log::{warn, info};

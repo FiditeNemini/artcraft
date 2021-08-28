@@ -15,18 +15,18 @@ use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 use crate::http_server::web_utils::session_checker::SessionRecord;
 use crate::server_state::ServerState;
 use crate::util::random_crockford_token::random_crockford_token;
+use crate::util::redis::redis_keys::RedisKeys;
 use crate::validations::passwords::validate_passwords;
 use crate::validations::username::validate_username;
 use derive_more::{Display, Error};
 use log::{info, warn, log};
+use r2d2_redis::redis::Commands;
 use regex::Regex;
 use sqlx::MySqlPool;
 use sqlx::error::DatabaseError;
 use sqlx::error::Error::Database;
 use sqlx::mysql::MySqlDatabaseError;
 use std::sync::Arc;
-use crate::util::redis_keys::RedisKeys;
-use r2d2_redis::redis::Commands;
 
 /// For the URL PathInfo
 #[derive(Deserialize)]

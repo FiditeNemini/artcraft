@@ -11,5 +11,5 @@ pub mod noop_logger;
 pub mod random_crockford_token;
 pub mod random_prefix_crockford_token;
 pub mod random_uuid;
-pub mod redis_keys;
+pub mod redis;
 pub mod semi_persistent_cache_dir;
