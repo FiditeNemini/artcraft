@@ -3095,96 +3095,6 @@
       ]
     }
   },
-  "5c13a3969006332b5910fcfd4cd58eecbcd5866059b76afff610a2ad3900d094": {
-    "query": "\nSELECT\n    jobs.token as job_token,\n\n    jobs.status,\n    jobs.attempt_count,\n    jobs.on_success_result_token as maybe_template_token,\n\n    jobs.created_at,\n    jobs.updated_at\n\nFROM w2l_template_upload_jobs as jobs\n\nWHERE jobs.token = ?\n        ",
-    "describe": {
-      "columns": [
-        {
-          "ordinal": 0,
-          "name": "job_token",
-          "type_info": {
-            "type": "VarString",
-            "flags": {
-              "bits": 4229
-            },
-            "char_set": 224,
-            "max_size": 128
-          }
-        },
-        {
-          "ordinal": 1,
-          "name": "status",
-          "type_info": {
-            "type": "String",
-            "flags": {
-              "bits": 393
-            },
-            "char_set": 224,
-            "max_size": 64
-          }
-        },
-        {
-          "ordinal": 2,
-          "name": "attempt_count",
-          "type_info": {
-            "type": "Long",
-            "flags": {
-              "bits": 1
-            },
-            "char_set": 63,
-            "max_size": 3
-          }
-        },
-        {
-          "ordinal": 3,
-          "name": "maybe_template_token",
-          "type_info": {
-            "type": "VarString",
-            "flags": {
-              "bits": 136
-            },
-            "char_set": 224,
-            "max_size": 128
-          }
-        },
-        {
-          "ordinal": 4,
-          "name": "created_at",
-          "type_info": {
-            "type": "Timestamp",
-            "flags": {
-              "bits": 1153
-            },
-            "char_set": 63,
-            "max_size": 19
-          }
-        },
-        {
-          "ordinal": 5,
-          "name": "updated_at",
-          "type_info": {
-            "type": "Timestamp",
-            "flags": {
-              "bits": 9345
-            },
-            "char_set": 63,
-            "max_size": 19
-          }
-        }
-      ],
-      "parameters": {
-        "Right": 1
-      },
-      "nullable": [
-        false,
-        false,
-        false,
-        true,
-        false,
-        false
-      ]
-    }
-  },
   "5e54fd8569b2d6d3a0d11acee6bd03b75400b6325952eb16c8dac68a7933b13a": {
     "query": "\nSELECT\n    users.token as user_token,\n    username,\n    display_name,\n    email_gravatar_hash,\n    profile_markdown,\n    profile_rendered_html,\n    user_role_slug,\n    is_banned,\n    disable_gravatar,\n    discord_username,\n    twitch_username,\n    twitter_username,\n    patreon_username,\n    github_username,\n    created_at\nFROM users\nWHERE\n    users.username = ?\n    AND users.user_deleted_at IS NULL\n    AND users.mod_deleted_at IS NULL\n        ",
     "describe": {
@@ -5623,6 +5533,16 @@
       "nullable": []
     }
   },
+  "ab981965f518a8986aaaba41ed821fcb438db4c6156cbb26f639921225a88d59": {
+    "query": "\nUPDATE w2l_template_upload_jobs\nSET\n  status = \"dead\",\n  failure_reason = ?,\n  retry_at = NULL\nWHERE id = ?\n        ",
+    "describe": {
+      "columns": [],
+      "parameters": {
+        "Right": 2
+      },
+      "nullable": []
+    }
+  },
   "adc494ddafaa13aebe423984f32a0d8810da604b19f5d6e0081b5e891dfc0f52": {
     "query": "\nUPDATE tts_models\nSET\n    maybe_default_pretrained_vocoder = ?,\n    title = ?,\n    description_markdown = ?,\n    description_rendered_html = ?,\n    creator_set_visibility = ?,\n    maybe_mod_user_token = ?,\n    version = version + 1\nWHERE token = ?\nLIMIT 1\n        ",
     "describe": {
@@ -5641,6 +5561,109 @@
         "Right": 2
       },
       "nullable": []
+    }
+  },
+  "ae04054c4d32e581dd183fd7ebb8e48fc7df856d2ffd8036d9ce6006bb7a296a": {
+    "query": "\nSELECT\n    jobs.token as job_token,\n\n    jobs.status,\n    jobs.attempt_count,\n    jobs.on_success_result_token as maybe_template_token,\n\n    jobs.failure_reason as maybe_failure_reason,\n\n    jobs.created_at,\n    jobs.updated_at\n\nFROM w2l_template_upload_jobs as jobs\n\nWHERE jobs.token = ?\n        ",
+    "describe": {
+      "columns": [
+        {
+          "ordinal": 0,
+          "name": "job_token",
+          "type_info": {
+            "type": "VarString",
+            "flags": {
+              "bits": 4229
+            },
+            "char_set": 224,
+            "max_size": 128
+          }
+        },
+        {
+          "ordinal": 1,
+          "name": "status",
+          "type_info": {
+            "type": "String",
+            "flags": {
+              "bits": 393
+            },
+            "char_set": 224,
+            "max_size": 64
+          }
+        },
+        {
+          "ordinal": 2,
+          "name": "attempt_count",
+          "type_info": {
+            "type": "Long",
+            "flags": {
+              "bits": 1
+            },
+            "char_set": 63,
+            "max_size": 3
+          }
+        },
+        {
+          "ordinal": 3,
+          "name": "maybe_template_token",
+          "type_info": {
+            "type": "VarString",
+            "flags": {
+              "bits": 136
+            },
+            "char_set": 224,
+            "max_size": 128
+          }
+        },
+        {
+          "ordinal": 4,
+          "name": "maybe_failure_reason",
+          "type_info": {
+            "type": "VarString",
+            "flags": {
+              "bits": 128
+            },
+            "char_set": 224,
+            "max_size": 2048
+          }
+        },
+        {
+          "ordinal": 5,
+          "name": "created_at",
+          "type_info": {
+            "type": "Timestamp",
+            "flags": {
+              "bits": 1153
+            },
+            "char_set": 63,
+            "max_size": 19
+          }
+        },
+        {
+          "ordinal": 6,
+          "name": "updated_at",
+          "type_info": {
+            "type": "Timestamp",
+            "flags": {
+              "bits": 9345
+            },
+            "char_set": 63,
+            "max_size": 19
+          }
+        }
+      ],
+      "parameters": {
+        "Right": 1
+      },
+      "nullable": [
+        false,
+        false,
+        false,
+        true,
+        true,
+        false,
+        false
+      ]
     }
   },
   "b1ad806aa93f66cab358d7cdb405d57c643e2ff131cfec9f1ced55c2e6ca9511": {
