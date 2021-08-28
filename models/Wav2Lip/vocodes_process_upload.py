@@ -127,6 +127,11 @@ if os.path.isfile(args.image_or_video_filename) \
 elif args.is_image:
     args.static = True
 
+
+class FacelessFrameError(Exception):
+    """Throw this when there are frames without faces."""
+    pass
+
 def get_smoothened_boxes(boxes, T):
     for i in range(len(boxes)):
         if i + T > len(boxes):
@@ -160,7 +165,7 @@ def face_detect(images):
     for rect, image in zip(predictions, images):
         if rect is None:
             cv2.imwrite('temp/faulty_frame.jpg', image) # check this frame where the face was not detected.
-            raise ValueError('Face not detected! Ensure the video contains a face in all the frames.')
+            raise FacelessFrameError('Face not detected! Ensure the video contains a face in all the frames.')
 
         y1 = max(0, rect[1] - pady1)
         y2 = min(image.shape[0], rect[3] + pady2)
@@ -334,7 +339,12 @@ def main(tempdir):
     print('Number of frames to detect faces in: {}'.format(len(full_frames)), flush=True)
 
     print('Detecting faces...', flush=True)
-    _face_det_results = detect_faces_in_frames(full_frames, video_faces_pickle_file)
+    try:
+        _face_det_results = detect_faces_in_frames(full_frames, video_faces_pickle_file)
+    except FacelessFrameError as e:
+        print('One or more frames without faces were encountered.')
+        print(e)
+        sys.exit(5)
 
     print('Done detecting faces!', flush=True)
 

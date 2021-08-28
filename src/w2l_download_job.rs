@@ -27,12 +27,13 @@ use crate::job_queries::w2l_download_job_queries::grab_job_lock_and_mark_pending
 use crate::job_queries::w2l_download_job_queries::insert_w2l_template;
 use crate::job_queries::w2l_download_job_queries::mark_w2l_template_upload_job_done;
 use crate::job_queries::w2l_download_job_queries::mark_w2l_template_upload_job_failure;
+use crate::job_queries::w2l_download_job_queries::mark_w2l_template_upload_job_permanently_dead;
 use crate::job_queries::w2l_download_job_queries::query_w2l_template_upload_job_records;
 use crate::script_execution::ffmpeg_generate_preview_image_command::FfmpegGeneratePreviewImageCommand;
 use crate::script_execution::ffmpeg_generate_preview_video_command::FfmpegGeneratePreviewVideoCommand;
 use crate::script_execution::google_drive_download_command::GoogleDriveDownloadCommand;
 use crate::script_execution::imagemagick_generate_preview_image_command::ImagemagickGeneratePreviewImageCommand;
-use crate::script_execution::wav2lip_process_upload_command::Wav2LipPreprocessClient;
+use crate::script_execution::wav2lip_process_upload_command::{Wav2LipPreprocessClient, Wav2LipPreprocessError};
 use crate::shared_constants::DEFAULT_MYSQL_CONNECTION_STRING;
 use crate::shared_constants::DEFAULT_RUST_LOG;
 use crate::util::anyhow_result::AnyhowResult;
@@ -400,12 +401,27 @@ async fn process_job(downloader: &Downloader, job: &W2lTemplateUploadJobRecord) 
   let is_image = false; // TODO: Don't always treat as video.
   let spawn_process = false;
 
-  downloader.w2l_processor.execute(
+  let face_detect_result = downloader.w2l_processor.execute(
     &download_filename,
     &cached_faces_filename,
     &output_metadata_filename,
     is_image,
-    spawn_process)?;
+    spawn_process);
+
+  match face_detect_result {
+    Ok(_) => {}, // Ok to proceed.
+    Err(Wav2LipPreprocessError::UnknownError) => {} // Ok to proceed.
+    Err(Wav2LipPreprocessError::NoFacesDetected) => {
+      // Permanently fail.
+      warn!("Permanently failed due to no face detection!");
+      mark_w2l_template_upload_job_permanently_dead(
+        &downloader.mysql_pool,
+        job,
+        "faces must be present in every frame"
+      ).await?;
+      return Ok(());
+    }
+  }
 
   if downloader.debug_face_detect_sleep_millis != 0 {
     warn!("Debug sleep after face detect: {} ms", downloader.debug_face_detect_sleep_millis);

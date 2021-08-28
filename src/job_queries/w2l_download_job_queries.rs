@@ -168,6 +168,30 @@ WHERE id = ?
 
   Ok(())
 }
+
+pub async fn mark_w2l_template_upload_job_permanently_dead(
+  pool: &MySqlPool,
+  job: &W2lTemplateUploadJobRecord,
+  failure_reason: &str,
+) -> AnyhowResult<()> {
+  let query_result = sqlx::query!(
+        r#"
+UPDATE w2l_template_upload_jobs
+SET
+  status = "dead",
+  failure_reason = ?,
+  retry_at = NULL
+WHERE id = ?
+        "#,
+        failure_reason.to_string(),
+        job.id,
+    )
+      .execute(pool)
+      .await?;
+
+  Ok(())
+}
+
 pub async fn mark_w2l_template_upload_job_done(
   pool: &MySqlPool,
   job: &W2lTemplateUploadJobRecord,

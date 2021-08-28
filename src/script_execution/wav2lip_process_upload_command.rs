@@ -1,8 +1,14 @@
 use crate::AnyhowResult;
 use log::{info,warn};
 use std::process::{Command, Stdio};
-use subprocess::{Popen, PopenConfig, Redirection};
+use subprocess::{Popen, PopenConfig, Redirection, ExitStatus};
 use std::fs::OpenOptions;
+use std::error::Error;
+use std::fmt;
+use std::fmt::Formatter;
+
+/// The python script uses this exit code when face detection fails.
+const FACE_DETECT_FAILURE_CODE : u32 = 5;
 
 /// This command is used to preprocess the face detection frames from user-submitted video.
 /// This should only ever need to run once. The frames can then be uploaded to Buckets and saved.
@@ -11,6 +17,26 @@ pub struct Wav2LipPreprocessClient {
   w2l_directory: String,
   script_name: String,
   checkpoint_path: String,
+}
+
+/// Command failure
+#[derive(Debug, Copy, Clone)]
+pub enum Wav2LipPreprocessError {
+  /// Permanent failure
+  NoFacesDetected,
+  /// Unknown. Retry allowed.
+  UnknownError,
+}
+
+impl Error for Wav2LipPreprocessError {}
+
+impl fmt::Display for Wav2LipPreprocessError {
+  fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
+    match self {
+      Wav2LipPreprocessError::NoFacesDetected => write!(f, "NoFacesDetected"),
+      Wav2LipPreprocessError::UnknownError => write!(f, "UnknownError"),
+    }
+  }
 }
 
 impl Wav2LipPreprocessClient {
@@ -31,7 +57,7 @@ impl Wav2LipPreprocessClient {
                  output_cached_faces_filename: &str,
                  output_metadata_filename: &str,
                  is_image: bool,
-                 spawn_process: bool) -> AnyhowResult<()>
+                 spawn_process: bool) -> Result<(), Wav2LipPreprocessError>
   {
     let mut command = String::new();
 
@@ -58,67 +84,52 @@ impl Wav2LipPreprocessClient {
 
     info!("Command: {:?}", command);
 
-    let command_parts = [
-      "bash",
-      "-c",
-      &command
-    ];
+    // NB: Got rid of the previous (unused) child process spawning
 
-    if spawn_process {
-      // NB: This forks and returns immediately.
-      //let _child_pid = command_builder.spawn()?;
+    let exit_status = match self.do_execute(&command) {
+      Err(e) => {
+        warn!("Unknown execution error: {:?}", e);
+        return Err(Wav2LipPreprocessError::UnknownError);
+      },
+      Ok(exit_status) => exit_status,
+    };
 
-      let stdout_file = OpenOptions::new()
-        .read(true)
-        .write(true)
-        .create(true)
-        .truncate(true)
-        .open("/tmp/wav2lip_upload_stdout.txt")?;
+    info!("Exit status: {:?}", exit_status);
 
-      let stderr_file = OpenOptions::new()
-        .read(true)
-        .write(true)
-        .create(true)
-        .truncate(true)
-        .open("/tmp/wav2lip_upload_stderr.txt")?;
-
-      let mut p = Popen::create(&command_parts, PopenConfig {
-        //stdout: Redirection::Pipe,
-        //stderr: Redirection::Pipe,
-        stdout: Redirection::File(stdout_file),
-        stderr: Redirection::File(stderr_file),
-        ..Default::default()
-      })?;
-
-      info!("Pid : {:?}", p.pid());
-
-      p.detach();
-
-    } else {
-      // NB: This is a blocking call.
-      /*let output = command_builder.output()?;
-
-      info!("Output status: {}", output.status);
-      info!("Stdout: {:?}", String::from_utf8(output.stdout));
-      error!("Stderr: {:?}", String::from_utf8(output.stderr));
-
-      if !output.status.success() {
-        bail!("Bad error code: {:?}", output.status);
-      }*/
-
-      let mut p = Popen::create(&command_parts, PopenConfig {
-        //stdout: Redirection::Pipe,
-        //stderr: Redirection::Pipe,
-        ..Default::default()
-      })?;
-
-      info!("Pid : {:?}", p.pid());
-
-      let exit_status = p.wait()?;
-
-      info!("Exit status: {:?}", exit_status);
+    if !exit_status.success() {
+      if let ExitStatus::Exited(code) = exit_status {
+        if code == FACE_DETECT_FAILURE_CODE {
+          // We want to permanently fail retries.
+          warn!("Failure to detect faces error code returned. This is a permanent failure.");
+          return Err(Wav2LipPreprocessError::NoFacesDetected);
+        }
+      }
+      warn!("Unknown failure reason.");
+      return Err(Wav2LipPreprocessError::UnknownError);
     }
 
     Ok(())
+  }
+
+  fn do_execute(&self, command: &str) -> AnyhowResult<ExitStatus> {
+    let command_parts = [
+      "bash",
+      "-c",
+      command
+    ];
+
+    let mut p = Popen::create(&command_parts, PopenConfig {
+      //stdout: Redirection::Pipe,
+      //stderr: Redirection::Pipe,
+      ..Default::default()
+    })?;
+
+    info!("Pid : {:?}", p.pid());
+
+    let exit_status = p.wait()?;
+
+    info!("Exit status: {:?}", exit_status);
+
+    Ok(exit_status)
   }
 }

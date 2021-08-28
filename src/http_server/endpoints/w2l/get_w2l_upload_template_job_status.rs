@@ -45,6 +45,9 @@ pub struct W2lUploadTemplateJobStatusForResponse {
   /// This can denote inference progress, and the Python code can write to it.
   pub maybe_extra_status_description: Option<String>,
 
+  /// If the job failed or permanently died, we might have a reason.
+  pub maybe_failure_reason: Option<String>,
+
   pub attempt_count: u8,
   pub maybe_template_token: Option<String>,
 
@@ -70,6 +73,8 @@ pub struct W2lUploadTemplateJobStatusRecord {
   pub status: String,
   pub attempt_count: i32,
   pub maybe_template_token: Option<String>,
+
+  pub maybe_failure_reason: Option<String>,
 
   pub created_at: DateTime<Utc>,
   pub updated_at: DateTime<Utc>,
@@ -107,6 +112,8 @@ SELECT
     jobs.status,
     jobs.attempt_count,
     jobs.on_success_result_token as maybe_template_token,
+
+    jobs.failure_reason as maybe_failure_reason,
 
     jobs.created_at,
     jobs.updated_at
@@ -158,6 +165,7 @@ WHERE jobs.token = ?
     job_token: record.job_token.clone(),
     status: record.status.clone(),
     maybe_extra_status_description,
+    maybe_failure_reason: record.maybe_failure_reason.clone(),
     attempt_count: record.attempt_count as u8,
     maybe_template_token: record.maybe_template_token.clone(),
     created_at: record.created_at.clone(),
