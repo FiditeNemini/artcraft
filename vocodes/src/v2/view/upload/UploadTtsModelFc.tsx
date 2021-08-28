@@ -91,19 +91,21 @@ function UploadTtsModelFc(props: Props) {
     <div>
       <h1 className="title is-1"> Upload Voice (TTS Model) </h1>
       <p>
-        Vo.codes supports Tacotron 2 models and will soon accommodate other architectures as well.
+        Vo.codes supports Tacotron 2, GlowTTS, and a custom architecture we intend to open source. 
+        We will soon accommodate other model architectures soon.
         We'll supply instructions for training models and offer assistance on our Discord server.
       </p>
 
       <br />
 
       <div className="notification is-warning">
-        <strong>Over $500 in prizes!</strong> 
-        <p>You can help vo.codes grow by uploading Tacotron2 models. 
+        <strong>Over $30,000 in rewards!</strong> 
+        {/*<p>You can help vo.codes grow by uploading Tacotron2 models. 
         The person that uploads the most models will get $100, 
         the person that uploads the most popular model will get $100,
         and a number of other lucky winners will be chosen at random to 
-        recieve cash prizes. Uploaders will also get queue priority!</p>
+        recieve cash prizes. Uploaders will also get queue priority!</p>*/}
+        <p>Details are coming soon. The more you upload and help us grow, the more you can earn.</p>
       </div>
 
       <form onSubmit={handleFormSubmit}>
