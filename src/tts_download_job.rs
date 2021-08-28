@@ -40,13 +40,17 @@ use crate::util::filesystem::{check_directory_exists, check_file_exists};
 use crate::util::hashing::hash_file_sha2::hash_file_sha2;
 use crate::util::noop_logger::NoOpLogger;
 use crate::util::random_crockford_token::random_crockford_token;
+use crate::util::redis::redis_job_status_logger::RedisJobStatusLogger;
 use data_encoding::{HEXUPPER, HEXLOWER, HEXLOWER_PERMISSIVE};
 use log::{warn, info};
+use r2d2_redis::RedisConnectionManager;
+use r2d2_redis::r2d2;
 use ring::digest::{Context, Digest, SHA256};
 use sqlx::MySqlPool;
 use sqlx::mysql::MySqlPoolOptions;
 use std::fs::File;
 use std::io::{BufReader, Read};
+use std::ops::Deref;
 use std::path::{PathBuf, Path};
 use std::process::Command;
 use std::time::Duration;
@@ -68,6 +72,9 @@ const ENV_MODEL_CHECK_SCRIPT_NAME : &'static str = "TTS_MODEL_CHECK_SCRIPT_NAME"
 struct Downloader {
   pub download_temp_directory: PathBuf,
   pub mysql_pool: MySqlPool,
+
+  pub redis_pool: r2d2::Pool<RedisConnectionManager>,
+
   pub bucket_client: BucketClient,
   pub firehose_publisher: FirehosePublisher,
   pub badge_granter: BadgeGranter,
@@ -149,6 +156,16 @@ async fn main() -> AnyhowResult<()> {
     .connect(&db_connection_string)
     .await?;
 
+  let common_env = CommonEnv::read_from_env()?;
+
+  info!("Connecting to redis...");
+
+  let redis_manager =
+      RedisConnectionManager::new(common_env.redis_connection_string.deref())?;
+
+  let redis_pool = r2d2::Pool::builder()
+      .build(redis_manager)?;
+
   let firehose_publisher = FirehosePublisher {
     mysql_pool: mysql_pool.clone(), // NB: Pool is sync/send/clone-safe
   };
@@ -166,11 +183,10 @@ async fn main() -> AnyhowResult<()> {
     &py_script_name,
   );
 
-  let common_env = CommonEnv::read_from_env()?;
-
   let downloader = Downloader {
     download_temp_directory: temp_directory,
     mysql_pool,
+    redis_pool,
     bucket_client,
     download_script,
     google_drive_downloader,
@@ -276,6 +292,11 @@ async fn process_job(downloader: &Downloader, job: &TtsUploadJobRecord) -> Anyho
   // TODO: 4. Save record. (DONE)
   // TODO: 5. Mark job done. (DONE)
 
+  let mut redis = downloader.redis_pool.get()?;
+  let mut redis_logger = RedisJobStatusLogger::new_tts_download(
+    &mut redis,
+    &job.token);
+
   // ==================== ATTEMPT TO GRAB JOB LOCK ==================== //
 
   let lock_acquired = grab_job_lock_and_mark_pending(&downloader.mysql_pool, job).await?;
@@ -292,11 +313,14 @@ async fn process_job(downloader: &Downloader, job: &TtsUploadJobRecord) -> Anyho
 
   // ==================== DOWNLOAD MODEL FILE ==================== //
 
+  info!("Calling downloader...");
+
+  redis_logger.log_status("downloading model")?;
+
   let download_url = job.download_url.as_ref()
     .map(|c| c.to_string())
     .unwrap_or("".to_string());
 
-  info!("Calling downloader...");
   let download_filename = downloader.google_drive_downloader
     .download_file(&download_url, &temp_dir).await?;
 
@@ -313,6 +337,8 @@ async fn process_job(downloader: &Downloader, job: &TtsUploadJobRecord) -> Anyho
   // ==================== RUN MODEL CHECK ==================== //
 
   info!("Checking that model is valid...");
+
+  redis_logger.log_status("checking model")?;
 
   let file_path = PathBuf::from(download_filename);
 
@@ -335,6 +361,8 @@ async fn process_job(downloader: &Downloader, job: &TtsUploadJobRecord) -> Anyho
   // ==================== UPLOAD MODEL FILE ==================== //
 
   info!("Uploading model to GCS...");
+
+  redis_logger.log_status("uploading model")?;
 
   downloader.bucket_client.upload_filename(&synthesizer_model_bucket_path, &file_path).await?;
 
@@ -372,6 +400,8 @@ async fn process_job(downloader: &Downloader, job: &TtsUploadJobRecord) -> Anyho
         warn!("error maybe awarding badge: {:?}", e);
         anyhow!("error maybe awarding badge")
       })?;
+
+  redis_logger.log_status("done")?;
 
   info!("Job done: {}", job.id);
 

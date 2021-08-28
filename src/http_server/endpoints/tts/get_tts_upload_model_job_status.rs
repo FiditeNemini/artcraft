@@ -15,10 +15,12 @@ use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 use crate::http_server::web_utils::session_checker::SessionRecord;
 use crate::server_state::ServerState;
 use crate::util::random_crockford_token::random_crockford_token;
+use crate::util::redis::redis_keys::RedisKeys;
 use crate::validations::passwords::validate_passwords;
 use crate::validations::username::validate_username;
 use derive_more::{Display, Error};
 use log::{info, warn, log};
+use r2d2_redis::redis::Commands;
 use regex::Regex;
 use sqlx::MySqlPool;
 use sqlx::error::DatabaseError;
@@ -134,10 +136,29 @@ WHERE jobs.token = ?
     }
   };
 
+  let mut redis = server_state.redis_pool
+      .get()
+      .map_err(|e| {
+        warn!("redis error: {:?}", e);
+        GetTtsUploadModelStatusError::ServerError
+      })?;
+
+  let extra_status_key = RedisKeys::tts_download_extra_status_info(&path.token);
+  let maybe_extra_status_description : Option<String> = match redis.get(&extra_status_key) {
+    Ok(Some(status)) => {
+      Some(status)
+    },
+    Ok(None) => None,
+    Err(e) => {
+      warn!("redis error: {:?}", e);
+      None // Fail open
+    },
+  };
+
   let model_for_response = TtsUploadModelJobStatusForResponse {
     job_token: record.job_token.clone(),
     status: record.status.clone(),
-    maybe_extra_status_description: None,
+    maybe_extra_status_description,
     attempt_count: record.attempt_count as u8,
     maybe_model_token: record.maybe_model_token.clone(),
     created_at: record.created_at.clone(),

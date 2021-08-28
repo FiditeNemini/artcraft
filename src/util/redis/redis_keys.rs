@@ -18,6 +18,12 @@ impl RedisKeys {
 
   /// We write extra in-progress status information to keys.
   /// These keys should have a TTL.
+  pub fn tts_download_extra_status_info(inference_job_token: &str) -> String {
+    format!("ttsDownloadExtraStatus:{}", inference_job_token)
+  }
+
+  /// We write extra in-progress status information to keys.
+  /// These keys should have a TTL.
   pub fn tts_inference_extra_status_info(inference_job_token: &str) -> String {
     format!("ttsInferenceExtraStatus:{}", inference_job_token)
   }

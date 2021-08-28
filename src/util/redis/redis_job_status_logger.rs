@@ -14,6 +14,11 @@ pub struct RedisJobStatusLogger <'a> {
 impl <'a> RedisJobStatusLogger <'a> {
   pub const STATUS_KEY_TTL_SECONDS : usize = 60 * 60;
 
+  pub fn new_tts_download(redis: &'a mut RedisPool, w2l_job_token: &str) -> Self {
+    let status_key = RedisKeys::tts_download_extra_status_info(w2l_job_token);
+    Self { redis, status_key }
+  }
+
   pub fn new_tts_inference(redis: &'a mut RedisPool, tts_job_token: &str) -> Self {
     let status_key = RedisKeys::tts_inference_extra_status_info(tts_job_token);
     Self { redis, status_key }
