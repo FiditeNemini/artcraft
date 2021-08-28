@@ -36,7 +36,14 @@ pub struct GetTtsUploadModelStatusPathInfo {
 pub struct TtsUploadModelJobStatusForResponse {
   pub job_token: String,
 
+  /// Primary status from the database (a state machine).
   pub status: String,
+
+  // TODO: Not yet used.
+  /// Extra, temporary status from Redis.
+  /// This can denote inference progress, and the Python code can write to it.
+  pub maybe_extra_status_description: Option<String>,
+
   pub attempt_count: u8,
   pub maybe_model_token: Option<String>,
 
@@ -130,6 +137,7 @@ WHERE jobs.token = ?
   let model_for_response = TtsUploadModelJobStatusForResponse {
     job_token: record.job_token.clone(),
     status: record.status.clone(),
+    maybe_extra_status_description: None,
     attempt_count: record.attempt_count as u8,
     maybe_model_token: record.maybe_model_token.clone(),
     created_at: record.created_at.clone(),
