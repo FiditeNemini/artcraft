@@ -9,7 +9,8 @@ import glob
 import os
 import re
 import urllib
-import youtube_dl
+#import youtube_dl # NB: No longer maintained
+import yt_dlp
 
 parser = argparse.ArgumentParser(description='Download Google Drive files, Youtube videos, or web urls')
 
@@ -55,7 +56,7 @@ def download_youtube(youtube_url, output_filename):
         'noplaylist': True,
     }
 
-    with youtube_dl.YoutubeDL(ydl_opts) as ydl:
+    with yt_dlp.YoutubeDL(ydl_opts) as ydl:
         ydl.download([youtube_url])
 
     # ytdl forcefully appends the extension

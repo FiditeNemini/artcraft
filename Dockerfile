@@ -102,7 +102,14 @@ FROM ghcr.io/storytold/docker-base-images-nvidia-cuda-experimental:080f96bc7087 
 #
 
 # The downloader needs youtube-dl as a python library
-RUN pip3 install --upgrade youtube-dl
+# NB: No longer maintained: https://news.ycombinator.com/item?id=28319624
+#RUN pip3 install --upgrade youtube-dl
+
+# Used by the downloader script.
+# And it looks like youtube-dl is dead...
+# Per the README, it looks like pip will always pull the latest version.
+# https://github.com/yt-dlp/yt-dlp#update
+RUN python3 -m pip install --upgrade yt-dlp
 
 # ==================== Python Build Step 2: Wav2Lip Requirements ====================
 
