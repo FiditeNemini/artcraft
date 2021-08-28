@@ -24,6 +24,12 @@ impl RedisKeys {
 
   /// We write extra in-progress status information to keys.
   /// These keys should have a TTL.
+  pub fn w2l_download_extra_status_info(inference_job_token: &str) -> String {
+    format!("w2lDownloadExtraStatus:{}", inference_job_token)
+  }
+
+  /// We write extra in-progress status information to keys.
+  /// These keys should have a TTL.
   pub fn w2l_inference_extra_status_info(inference_job_token: &str) -> String {
     format!("w2lInferenceExtraStatus:{}", inference_job_token)
   }

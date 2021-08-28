@@ -19,6 +19,11 @@ impl <'a> RedisJobStatusLogger <'a> {
     Self { redis, status_key }
   }
 
+  pub fn new_w2l_download(redis: &'a mut RedisPool, w2l_job_token: &str) -> Self {
+    let status_key = RedisKeys::w2l_download_extra_status_info(w2l_job_token);
+    Self { redis, status_key }
+  }
+
   pub fn new_w2l_inference(redis: &'a mut RedisPool, w2l_job_token: &str) -> Self {
     let status_key = RedisKeys::w2l_inference_extra_status_info(w2l_job_token);
     Self { redis, status_key }
