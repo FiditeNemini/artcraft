@@ -29,7 +29,9 @@ function SessionW2lTemplateUploadResultListFc(props: Props) {
           break;
         case JobState.COMPLETE_FAILURE:
         case JobState.DEAD:
-          stateDescription = "Failed Permanently. Please tell us in Discord so we can fix. :(";
+          stateDescription = job.maybeFailureReason == null ? 
+              "Failed Permanently. Please tell us in Discord so we can fix. :(" : 
+              `Failed Permanently: ${job.maybeFailureReason}`;
           break;
         case JobState.COMPLETE_SUCCESS:
           stateDescription = "Success!"; // Not sure why we're here instead of other branch!
