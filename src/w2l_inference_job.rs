@@ -44,7 +44,7 @@ use crate::util::filesystem::check_file_exists;
 use crate::util::hashing::hash_file_sha2::hash_file_sha2;
 use crate::util::noop_logger::NoOpLogger;
 use crate::util::random_crockford_token::random_crockford_token;
-use crate::util::redis::redis_keys::RedisKeys;
+use crate::util::redis::redis_job_status_logger::RedisJobStatusLogger;
 use crate::util::semi_persistent_cache_dir::SemiPersistentCacheDir;
 use data_encoding::{HEXUPPER, HEXLOWER, HEXLOWER_PERMISSIVE};
 use log::{warn, info};
@@ -371,9 +371,10 @@ async fn process_job(inferencer: &Inferencer, job: &W2lInferenceJobRecord) -> An
   // TODO 7. Save record
   // TODO 8. Mark job done
 
-  let redis_status_key = RedisKeys::w2l_inference_extra_status_info(&job.inference_job_token);
   let mut redis = inferencer.redis_pool.get()?;
-  let mut redis_logger = JobExtraDetailStatusLogger::new(&mut redis, &job.inference_job_token);
+  let mut redis_logger = RedisJobStatusLogger::new_w2l_inference(
+    &mut redis,
+    &job.inference_job_token);
 
   // ==================== ATTEMPT TO GRAB JOB LOCK ==================== //
 
@@ -636,27 +637,4 @@ async fn process_job(inferencer: &Inferencer, job: &W2lInferenceJobRecord) -> An
         job.id, id);
 
   Ok(())
-}
-
-struct JobExtraDetailStatusLogger <'a> {
-  redis: &'a mut  PooledConnection<RedisConnectionManager>,
-  status_key: String,
-}
-
-impl <'a> JobExtraDetailStatusLogger <'a> {
-  fn new(redis: &'a mut PooledConnection<RedisConnectionManager>, job_token: &str) -> Self {
-    let status_key = RedisKeys::w2l_inference_extra_status_info(job_token);
-    Self {
-      redis,
-      status_key,
-    }
-  }
-
-  fn log_status(&mut self, logging_details: &str) -> AnyhowResult<()> {
-    let _r : String = self.redis // NB: Compiler can't figure out the throwaway result type
-        .set_ex(&self.status_key,
-          logging_details,
-          RedisKeys::STATUS_KEY_TTL_SECONDS)?;
-    Ok(())
-  }
 }
