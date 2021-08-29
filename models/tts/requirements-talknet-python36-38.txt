@@ -1,3 +1,8 @@
+# This should work with Python 3.6 and Python 3.8
+# Unknown CUDA version compatibility, but currently at:
+# - Driver Version: 470.57.02
+# - CUDA Version: 11.4 (nvidia-smi supported)
+
 # talknet
 tensorflow==2.4.1
 tensorboard==2.4.1
