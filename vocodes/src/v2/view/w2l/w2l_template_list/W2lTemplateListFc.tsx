@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { ApiConfig } from '../../../../common/ApiConfig';
 import { SessionWrapper } from '../../../../session/SessionWrapper';
 import { Link } from "react-router-dom";
-import { getRandomInt } from '../../../../v1/api/Utils';
+//import { getRandomInt } from '../../../../v1/api/Utils';
 import { BucketConfig } from '../../../../common/BucketConfig';
 
 interface W2lTemplateListResponsePayload {
@@ -93,7 +93,8 @@ function W2lTemplateListFc(props: Props) {
   let rowKey = "row0";
   let rowIndex = 0;
 
-  let nextRowSize = getRandomInt(3, 4);
+  //let nextRowSize = getRandomInt(3, 4);
+  let nextRowSize = 3;
 
   templateElements.forEach(el => {
     rowOfTemplateElements.push(el);
@@ -109,10 +110,10 @@ function W2lTemplateListFc(props: Props) {
       rowKey = `row${rowIndex}`;
 
       // Don't have the same number on each row.
-      let lastRowSize = nextRowSize;
-      while (lastRowSize === nextRowSize) {
-        nextRowSize = getRandomInt(2, 5);
-      }
+      //let lastRowSize = nextRowSize;
+      //while (lastRowSize === nextRowSize) {
+      //  nextRowSize = getRandomInt(2, 5);
+      //}
     }
   });
 
