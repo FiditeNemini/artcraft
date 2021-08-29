@@ -130,15 +130,15 @@ RUN . python/bin/activate \
 
 WORKDIR /
 
-COPY models/tacotron2 ./models/tacotron2
-WORKDIR models/tacotron2
+COPY models/tts ./models/tts
+WORKDIR models/tts
 
 # NB: Not sure if we need Python3.6 for Tacotron2, but Python3.8 gave me trouble.
 # NB: Setuptools fix: https://github.com/tensorflow/tensorflow/issues/34302#issuecomment-554450289
 RUN python3.6 -m venv python
 RUN . python/bin/activate \
   && pip install --upgrade pip setuptools \
-  && pip install -r requirements-working-2021-05-31.txt \
+  && pip install -r requirements-tacotron-python36.txt \
   && deactivate
 
 # ==================== Rust Build Base ====================
