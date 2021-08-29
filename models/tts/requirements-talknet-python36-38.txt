@@ -41,4 +41,23 @@ scipy==1.4.1
 soundfile==0.10.3.post1
 matplotlib==3.1.3
 
-
+# NeMo
+#numpy>=1.18.2 # NB: Already installed; version conflict
+onnx>=1.7.0
+pytorch-lightning>=1.3.0
+python-dateutil
+#torch # NB: Already installed; version conflict
+wget
+wrapt
+ruamel.yaml
+scikit-learn
+omegaconf>=2.1.0
+hydra-core>=1.1.0
+transformers>=4.0.1
+sentencepiece<1.0.0
+webdataset>=0.1.48,<=0.1.62
+tqdm>=4.41.0
+opencc
+pangu
+jieba
+numba
