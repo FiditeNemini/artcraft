@@ -20,7 +20,7 @@ from nemo.collections.asr.models import EncDecCTCModel
 from nemo.collections.tts.models import TalkNetSpectModel
 from nemo.collections.tts.models import TalkNetPitchModel
 from nemo.collections.tts.models import TalkNetDursModel
-from talknet_singer import TalkNetSingerModel
+from ControllableTalkNet.talknet_singer import TalkNetSingerModel
 import json
 from tqdm import tqdm
 import gdown
@@ -32,10 +32,10 @@ import time
 import uuid
 
 sys.path.append("hifi-gan")
-from env import AttrDict
-from meldataset import mel_spectrogram, MAX_WAV_VALUE
-from models import Generator
-from denoiser import Denoiser
+from hifigan.env import AttrDict
+from hifigan.meldataset import mel_spectrogram, MAX_WAV_VALUE
+from hifigan.models import Generator
+from hifigan.denoiser import Denoiser
 
 app = JupyterDash(__name__)
 DEVICE = "cuda:0"
