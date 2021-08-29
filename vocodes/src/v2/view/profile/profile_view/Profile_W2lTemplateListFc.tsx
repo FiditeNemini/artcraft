@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { ApiConfig } from '../../../../common/ApiConfig';
 import { Link } from "react-router-dom";
-import { getRandomInt } from '../../../../v1/api/Utils';
+//import { getRandomInt } from '../../../../v1/api/Utils';
 import { BucketConfig } from '../../../../common/BucketConfig';
 
 interface W2lTemplateListResponsePayload {
@@ -89,7 +89,8 @@ function ProfileW2lTemplateListFc(props: Props) {
   let allRowsOfTemplateElements : Array<JSX.Element> = [];
   let rowOfTemplateElements : Array<JSX.Element> = [];
 
-  let nextRowSize = getRandomInt(3, 4);
+  //let nextRowSize = getRandomInt(3, 4);
+  let nextRowSize = 3;
 
   // NB: To prevent React spamming about children having unique key props
   let rowKey = "row0";
@@ -109,10 +110,10 @@ function ProfileW2lTemplateListFc(props: Props) {
       rowKey = `row${rowIndex}`;
 
       // Don't have the same number on each row.
-      let lastRowSize = nextRowSize;
-      while (lastRowSize === nextRowSize) {
-        nextRowSize = getRandomInt(3, 6);
-      }
+      //let lastRowSize = nextRowSize;
+      //while (lastRowSize === nextRowSize) {
+      //  nextRowSize = getRandomInt(3, 6);
+      //}
     }
   });
 
