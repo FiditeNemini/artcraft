@@ -6,12 +6,13 @@ import json
 import numpy as np
 import torch
 
-from hparams import create_hparams
-from model import Tacotron2
-from layers import TacotronSTFT
-from audio_processing import griffin_lim
-from text import text_to_sequence
-from denoiser import Denoiser
+from tacotron2.hparams import create_hparams
+from tacotron2.model import Tacotron2
+from tacotron2.layers import TacotronSTFT
+from tacotron2.audio_processing import griffin_lim
+from tacotron2.text import text_to_sequence
+
+from waveglow.denoiser import Denoiser
 
 from scipy.io.wavfile import write as write_wav
 

@@ -52,3 +52,7 @@ falcon-multipart==0.2.0
 
 # For HTTP inference
 SoundFile==0.10.3.post1
+
+# Not sure where these came from
+cffi==1.14.5
+pycparser==2.20

@@ -19,8 +19,8 @@ import json
 
 import torch
 
-from hparams import create_hparams
-from model import Tacotron2
+from tacotron2.hparams import create_hparams
+from tacotron2.model import Tacotron2
 
 # For metadata
 import os
