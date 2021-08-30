@@ -6,7 +6,7 @@ import { TtsResult } from '../../../api/tts/GetTtsResult';
 import { PlayIcon } from '../../_icons/PlayIcon';
 import { PauseIcon } from '../../_icons/PauseIcon';
 import { RepeatIcon } from '../../_icons/RepeatIcon';
-import { ArrowRightIcon } from '../../_icons/ArrowRightIcon';
+import { NoRepeatIcon } from '../../_icons/NoRepeatIcon';
 
 enum PlaybackSpeed {
   HALF,
@@ -50,7 +50,10 @@ function TtsResultAudioPlayerFc(props: Props) {
     if (waveSurfer) {
       waveSurfer.unAll(); // NB: Otherwise we keep reinstalling the hooks and cause chaos
       waveSurfer.on('pause', () => {
-        setIsPlaying(false);
+        setIsPlaying(waveSurfer!.isPlaying());
+      })
+      waveSurfer.on('play', () => {
+        setIsPlaying(waveSurfer!.isPlaying());
       })
       waveSurfer.on('finish', () => {
         if (waveSurfer && isRepeating) {
@@ -63,7 +66,6 @@ function TtsResultAudioPlayerFc(props: Props) {
   const togglePlayPause = () => {
     if (waveSurfer) {
       waveSurfer.playPause();
-      setIsPlaying(!isPlaying)
     }
   }
 
@@ -95,7 +97,7 @@ function TtsResultAudioPlayerFc(props: Props) {
     playButtonText = <><PauseIcon /></>;
   }
 
-  let repeatButtonText = isRepeating ? <RepeatIcon /> : <ArrowRightIcon />;
+  let repeatButtonText = isRepeating ? <RepeatIcon /> : <NoRepeatIcon />;
 
   let speedButtonText = '1x';
   switch (playbackSpeed) {
