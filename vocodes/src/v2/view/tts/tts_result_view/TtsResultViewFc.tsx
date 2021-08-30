@@ -9,6 +9,7 @@ import { FrontendUrlConfig } from '../../../../common/FrontendUrlConfig';
 import { HiddenIconFc } from '../../_icons/HiddenIcon';
 import { VisibleIconFc } from '../../_icons/VisibleIcon';
 import { GetTtsResult, TtsResult } from '../../../api/tts/GetTtsResult';
+import { TtsResultAudioPlayerFc } from './TtsResultAudioPlayerFc';
 
 interface Props {
   sessionWrapper: SessionWrapper,
@@ -173,6 +174,10 @@ function TtsResultViewFc(props: Props) {
     <div>
       <h1 className="title is-1"> {headingTitle} </h1>
       {subtitle}
+
+      <TtsResultAudioPlayerFc ttsResult={ttsInferenceResult} />
+      
+      <hr />
 
       <audio
         controls
