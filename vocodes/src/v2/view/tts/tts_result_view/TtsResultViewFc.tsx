@@ -226,14 +226,12 @@ function TtsResultViewFc(props: Props) {
             <th>Visibility</th>
             <td>{resultVisibility}</td>
           </tr>
-        </tbody>
-        <tr>
-          <td colSpan={2}>
-            <br />
-            <h4 className="subtitle is-4">Model Used</h4>
-          </td>
-        </tr>
-        <tbody>
+          <tr>
+            <td colSpan={2}>
+              <br />
+              <h4 className="subtitle is-4">Model Used</h4>
+            </td>
+          </tr>
           <tr>
             <th>Model name</th>
             <td>

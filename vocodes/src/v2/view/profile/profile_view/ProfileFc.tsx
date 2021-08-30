@@ -176,7 +176,7 @@ function ProfileFc(props: Props) {
     let badgeList : Array<JSX.Element> = [];
     userData.badges.forEach(badge => {
       badgeList.push((
-        <li>
+        <li key={badge.slug}>
           {badge.title}
         </li>
       ));
