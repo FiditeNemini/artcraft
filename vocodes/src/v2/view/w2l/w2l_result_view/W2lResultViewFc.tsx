@@ -40,6 +40,7 @@ function W2lResultViewFc(props: Props) {
   let videoDownloadFilename = `vocodes-${w2lInferenceResult.w2l_result_token.replace(':', '')}.mp4`;
 
   MetaTags.setVideoUrl(videoLink);
+  MetaTags.setTitle('testing...');
 
   let durationSeconds = w2lInferenceResult?.duration_millis / 1000;
 
