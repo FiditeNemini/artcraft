@@ -24,6 +24,7 @@ pub struct TtsModelRecordForResponse {
   pub creator_user_token: String,
   pub creator_username: String,
   pub creator_display_name: String,
+  pub creator_gravatar_hash: String,
 
   pub title: String,
   pub description_markdown: String,
@@ -60,6 +61,7 @@ pub struct TtsModelRecordRaw {
   pub creator_user_token: String,
   pub creator_username: String,
   pub creator_display_name: String,
+  pub creator_gravatar_hash: String,
 
   pub title: String,
   pub description_markdown: String,
@@ -121,6 +123,7 @@ pub async fn select_tts_model_by_token(
     creator_user_token: model.creator_user_token.clone(),
     creator_username: model.creator_username.clone(),
     creator_display_name: model.creator_display_name.clone(),
+    creator_gravatar_hash: model.creator_gravatar_hash.clone(),
     title: model.title.clone(),
     description_markdown: model.description_markdown.clone(),
     description_rendered_html: model.description_rendered_html.clone(),
@@ -158,6 +161,7 @@ SELECT
     tts.creator_user_token,
     users.username as creator_username,
     users.display_name as creator_display_name,
+    users.email_gravatar_hash as creator_gravatar_hash,
 
     tts.title,
     tts.description_markdown,
@@ -203,6 +207,7 @@ SELECT
     tts.creator_user_token,
     users.username as creator_username,
     users.display_name as creator_display_name,
+    users.email_gravatar_hash as creator_gravatar_hash,
 
     tts.title,
     tts.description_markdown,
