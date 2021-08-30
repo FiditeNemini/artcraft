@@ -17,7 +17,6 @@ import { TtsInferenceJob, W2lInferenceJob } from '../../App';
 import { TtsModelDeleteFc } from './tts/tts_model_delete/TtsModelDeleteFc';
 import { TtsModelEditFc } from './tts/tts_model_edit/TtsModelEditFc';
 import { TtsModelFormFc } from './tts/tts_model_list/TtsModelFormFc';
-import { TtsModelListComponent } from './tts/tts_model_list/TtsModelListComponent';
 import { TtsModelUploadJob } from '../../jobs/TtsModelUploadJobs';
 import { TtsModelViewFc } from './tts/tts_model_view/TtsModelViewFc';
 import { TtsResultDeleteFc } from './tts/tts_result_delete/TtsResultDeleteFc';
@@ -150,14 +149,6 @@ class NewVocodesContainer extends React.Component<Props, State> {
                 sessionWrapper={this.props.sessionWrapper}
                 enqueueTtsJob={this.props.enqueueTtsJob}
                 ttsInferenceJobs={this.props.ttsInferenceJobs}
-              />
-            </Route>
-
-            <Route path="/tts">
-              <TtsModelListComponent
-                querySessionCallback={()=>{}}
-                sessionWrapper={this.props.sessionWrapper}
-                enqueueTtsJob={this.props.enqueueTtsJob}
               />
             </Route>
 
