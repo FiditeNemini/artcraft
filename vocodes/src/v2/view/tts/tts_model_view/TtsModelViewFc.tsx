@@ -9,40 +9,11 @@ import { v4 as uuidv4 } from 'uuid';
 import { FrontendUrlConfig } from '../../../../common/FrontendUrlConfig';
 import { HiddenIconFc } from '../../_icons/HiddenIcon';
 import { VisibleIconFc } from '../../_icons/VisibleIcon';
-
-interface TtsModelViewResponsePayload {
-  success: boolean,
-  model: TtsModel,
-}
+import { GetTtsModel, TtsModel } from '../../../api/tts/GetTtsModel';
 
 interface TtsModelUseCountResponsePayload {
   success: boolean,
   count: number | null | undefined,
-}
-
-interface TtsModel {
-  model_token: string,
-  title: string,
-  tts_model_type: string,
-  maybe_default_pretrained_vocoder: string | null,
-  text_preprocessing_algorithm: string,
-  creator_user_token: string,
-  creator_username: string,
-  creator_display_name: string,
-  description_markdown: string,
-  description_rendered_html: string,
-  creator_set_visibility: string,
-  updatable_slug: string,
-  created_at: string,
-  updated_at: string,
-  maybe_moderator_fields: TtsModelModeratorFields | null | undefined,
-}
-
-interface TtsModelModeratorFields {
-  creator_ip_address_creation: string,
-  creator_ip_address_last_update: string,
-  mod_deleted_at: string | undefined | null,
-  user_deleted_at: string | undefined | null,
 }
 
 interface Props {
@@ -58,27 +29,11 @@ function TtsModelViewFc(props: Props) {
   const [ttsModelUseCount, setTtsModelUseCount] = useState<number|undefined>(undefined);
   const [text, setText] = useState<string>("");
 
-  const getModel = useCallback((token) => {
-    const api = new ApiConfig();
-    const endpointUrl = api.viewTtsModel(token);
-
-    fetch(endpointUrl, {
-      method: 'GET',
-      headers: {
-        'Accept': 'application/json',
-      },
-      credentials: 'include',
-    })
-    .then(res => res.json())
-    .then(res => {
-      const modelsResponse : TtsModelViewResponsePayload = res;
-      if (!modelsResponse.success) {
-        return;
-      }
-
-      setTtsModel(modelsResponse.model)
-    })
-    .catch(e => {});
+  const getModel = useCallback(async (token) => {
+    const model = await GetTtsModel(token);
+    if (model) {
+      setTtsModel(model);
+    }
   }, []);
 
   const getModelUseCount = useCallback((token) => {
