@@ -8,6 +8,7 @@ import { HiddenIconFc } from '../../_icons/HiddenIcon';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faDiscord, faFirefox, faGithub, faTwitch, faTwitter } from '@fortawesome/free-brands-svg-icons';
 import { faDollarSign, faUser } from '@fortawesome/free-solid-svg-icons';
+import { GravatarFc } from '../../_common/GravatarFc';
 
 const DEFAULT_VISIBILITY = 'public';
 
@@ -254,14 +255,34 @@ function ProfileEditFc(props: Props) {
 
         <br />
 
-        <h4 className="subtitle is-4">Profile</h4>
+        <h4 className="subtitle is-4">Profile Picture</h4>
 
-        <div className="content">
-          <p>
-            Profiles help you network with other creatives. 
-            We're going to make amazing and hilarious content together!
-          </p>
+        <div className="card">
+          <div className="card-content">
+            <div className="media">
+              <div className="media-left">
+                <figure className="image is-48x48">
+                  <GravatarFc size={48} email_hash={userData.email_gravatar_hash} /> 
+                </figure>
+              </div>
+              <div className="media-content">
+                <p className="title is-4">{userData.username}</p>
+                <p className="subtitle is-6">@{userData.username}</p>
+              </div>
+            </div>
+
+            <div className="content">
+              You can set your profile picture on <a href="https://gravatar.com">gravatar.com</a>. 
+              Use the same email address you did to sign up for vo.codes. (In the future, we'll support
+              image uploads.)
+              <br />
+            </div>
+          </div>
         </div>
+
+        <br />
+
+        <h4 className="subtitle is-4">Profile</h4>
 
           <div className="field">
             <label className="label">
