@@ -17,6 +17,9 @@ interface Props {
   sessionWrapper: SessionWrapper,
   enqueueTtsJob: (jobToken: string) => void,
   ttsInferenceJobs: Array<TtsInferenceJob>,
+  textBuffer: string,
+  setTextBuffer: (textBuffer: string) => void,
+  clearTextBuffer: () => void,
 }
 
 function TtsModelViewFc(props: Props) {
@@ -24,7 +27,6 @@ function TtsModelViewFc(props: Props) {
 
   const [ttsModel, setTtsModel] = useState<TtsModel|undefined>(undefined);
   const [ttsModelUseCount, setTtsModelUseCount] = useState<number|undefined>(undefined);
-  const [text, setText] = useState<string>("");
 
   const getModel = useCallback(async (token) => {
     const model = await GetTtsModel(token);
@@ -44,11 +46,13 @@ function TtsModelViewFc(props: Props) {
   }, [token, getModel, getModelUseCount]);
 
   const handleChangeText = (ev: React.FormEvent<HTMLTextAreaElement>) => { 
-    ev.preventDefault();
     const textValue = (ev.target as HTMLTextAreaElement).value;
+    props.setTextBuffer(textValue);
+  };
 
-    setText(textValue);
-
+  const handleClearClick = (ev: React.FormEvent<HTMLButtonElement>) => { 
+    ev.preventDefault();
+    props.clearTextBuffer();
     return false;
   };
 
@@ -59,7 +63,7 @@ function TtsModelViewFc(props: Props) {
       return false;
     }
 
-    if (text === undefined) {
+    if (props.textBuffer === undefined) {
       return false;
     }
 
@@ -71,7 +75,7 @@ function TtsModelViewFc(props: Props) {
     const request = {
       uuid_idempotency_token: uuidv4(),
       tts_model_token: modelToken,
-      inference_text: text,
+      inference_text: props.textBuffer,
     }
 
     fetch(endpointUrl, {
@@ -236,10 +240,20 @@ function TtsModelViewFc(props: Props) {
       <form onSubmit={handleFormSubmit}>
         <textarea 
             onChange={handleChangeText}
+            value={props.textBuffer}
             className="textarea is-large" 
             placeholder="Textual shenanigans go here..."></textarea>
 
-        <button className="button is-large is-fullwidth is-success">Submit</button>
+        <div className="button-group">
+          <div className="columns is-mobile">
+            <div className="column has-text-centered">
+              <button className="button is-info is-large" >Speak</button>
+            </div>
+            <div className="column has-text-centered">
+              <button className="button is-info is-light is-large" onClick={handleClearClick}>Clear</button>
+            </div>
+          </div>
+        </div>
       </form>
 
       <br />

@@ -153,6 +153,9 @@ class NewVocodesContainer extends React.Component<Props, State> {
                 sessionWrapper={this.props.sessionWrapper}
                 enqueueTtsJob={this.props.enqueueTtsJob}
                 ttsInferenceJobs={this.props.ttsInferenceJobs}
+                textBuffer={this.props.textBuffer}
+                setTextBuffer={this.props.setTextBuffer}
+                clearTextBuffer={this.props.clearTextBuffer}
               />
             </Route>
 
