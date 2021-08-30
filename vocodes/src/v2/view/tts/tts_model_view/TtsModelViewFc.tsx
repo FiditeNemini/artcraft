@@ -11,11 +11,7 @@ import { HiddenIconFc } from '../../_icons/HiddenIcon';
 import { VisibleIconFc } from '../../_icons/VisibleIcon';
 import { GetTtsModel, TtsModel } from '../../../api/tts/GetTtsModel';
 import { GravatarFc } from '../../_common/GravatarFc';
-
-interface TtsModelUseCountResponsePayload {
-  success: boolean,
-  count: number | null | undefined,
-}
+import { GetTtsModelUseCount } from '../../../api/tts/GetTtsModelUseCount';
 
 interface Props {
   sessionWrapper: SessionWrapper,
@@ -37,29 +33,10 @@ function TtsModelViewFc(props: Props) {
     }
   }, []);
 
-  const getModelUseCount = useCallback((token) => {
-    const api = new ApiConfig();
-    const endpointUrl = api.getTtsModelUseCount(token);
-
-    fetch(endpointUrl, {
-      method: 'GET',
-      headers: {
-        'Accept': 'application/json',
-      },
-      credentials: 'include',
-    })
-    .then(res => res.json())
-    .then(res => {
-      const modelsResponse : TtsModelUseCountResponsePayload = res;
-      if (!modelsResponse.success) {
-        return;
-      }
-
-      setTtsModelUseCount(modelsResponse.count || 0)
-    })
-    .catch(e => {});
+  const getModelUseCount = useCallback(async (token) => {
+    const useCount = await GetTtsModelUseCount(token);
+    setTtsModelUseCount(useCount)
   }, []);
-
 
   useEffect(() => {
     getModel(token);

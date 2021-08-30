@@ -1,12 +1,12 @@
 import { ApiConfig } from "../../../common/ApiConfig";
 
-interface W2lTemplateUseCountResponsePayload {
+interface TtsModelUseCountResponsePayload {
   success: boolean,
   count: number | null | undefined,
 }
 
-export async function GetW2lTemplateUseCount(templateToken: string) : Promise<number | undefined> {
-  const endpoint = new ApiConfig().getW2lTemplateUseCount(templateToken);
+export async function GetTtsModelUseCount(modelToken: string) : Promise<number | undefined> {
+  const endpoint = new ApiConfig().getTtsModelUseCount(modelToken);
 
   return await fetch(endpoint, {
     method: 'GET',
@@ -17,7 +17,7 @@ export async function GetW2lTemplateUseCount(templateToken: string) : Promise<nu
   })
   .then(res => res.json())
   .then(res => {
-    const response : W2lTemplateUseCountResponsePayload = res;
+    const response : TtsModelUseCountResponsePayload = res;
     if (!response.success) {
       return;
     }
