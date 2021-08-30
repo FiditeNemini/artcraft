@@ -12,10 +12,18 @@ interface Props {
   ttsResult: TtsResult,
 }
 
+//function useIsLooping() : [boolean, () => void] {
+//  const [isLooping, setLooping] = useState(false)
+//  const toggleLooping = useCallback(() => setLooping(() => !isLooping), [])
+//  return [ isLooping, toggleLooping ]
+//}
+
 function TtsResultAudioPlayerFc(props: Props) {
   let [isPlaying, setIsPlaying] = useState(false);
   let [isRepeating, setIsRepeating] = useState(false);
   let [waveSurfer, setWaveSurfer] = useState<WaveSurfer|null>(null);
+
+  //let [isLooping, toggleLooping] = useIsLooping();
 
   useEffect(() => {
     const wavesurferInstance = WaveSurfer.create({
@@ -29,19 +37,36 @@ function TtsResultAudioPlayerFc(props: Props) {
       normalize: false,
     });
 
-    wavesurferInstance.on('pause', () => {
-      setIsPlaying(false);
-    })
+
+    //wavesurferInstance.on('finish', () => repeatCallback());
 
     setWaveSurfer(wavesurferInstance);
   }, [])
-
+  
   useEffect(() => {
     const audioLink = new BucketConfig().getGcsUrl(props.ttsResult?.public_bucket_wav_audio_path);
     if(waveSurfer) {
       waveSurfer.load(audioLink)
     }
   }, [waveSurfer, props.ttsResult])
+
+  const repeat = useCallback(() => {
+    console.log('repeat callback', isRepeating);
+    if (waveSurfer && isRepeating) {
+      waveSurfer!.play();
+    }
+  }, [waveSurfer, isRepeating]);
+
+  useEffect(() => {
+    console.log('isLooping', isRepeating);
+    if (waveSurfer) {
+      waveSurfer.unAll();
+      waveSurfer.on('pause', () => {
+        setIsPlaying(false);
+      })
+      waveSurfer.on('finish', repeat);
+    }
+  }, [waveSurfer, isRepeating, repeat])
 
   const togglePlayPause = () => {
     if (waveSurfer) {
@@ -51,20 +76,12 @@ function TtsResultAudioPlayerFc(props: Props) {
   }
 
   const toggleIsRepeating = () => {
+    console.log('toggleIsRepeating')
     setIsRepeating(!isRepeating)
+    //toggleLooping();
   }
 
-  const repeatCallback = useCallback((isRepeating) => {
-    if (isRepeating) {
-      waveSurfer!.play();
-    }
-  }, [waveSurfer]);
 
-
-  if (waveSurfer) {
-    waveSurfer.on('finish', () => repeatCallback(isRepeating));
-  }
-  
   let playButtonText = <><PlayIcon /></>;
   if (isPlaying) {
     playButtonText = <><PauseIcon /></>;
