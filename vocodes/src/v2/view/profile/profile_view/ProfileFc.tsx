@@ -1,5 +1,4 @@
-import React, { useEffect, useState }  from 'react';
-import { ApiConfig } from '../../../../common/ApiConfig';
+import React, { useCallback, useEffect, useState }  from 'react';
 import { GravatarFc } from '../../_common/GravatarFc';
 import { Link } from 'react-router-dom';
 import { ProfileTtsInferenceResultsListFc } from './Profile_TtsInferenceResultListFc';
@@ -11,94 +10,42 @@ import { useParams } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faDiscord, faFirefox, faGithub, faTwitch, faTwitter } from '@fortawesome/free-brands-svg-icons';
 import { faDollarSign } from '@fortawesome/free-solid-svg-icons';
+import { GetUserByUsername, User } from '../../../api/user/GetUserByUsername';
 
 interface Props {
   sessionWrapper: SessionWrapper,
 }
 
-interface ProfileResponsePayload {
-  success: boolean,
-  error_reason?: string,
-  user?: UserPayload,
-}
-
-interface UserPayload {
-  user_token: string,
-  username: string,
-  display_name: string,
-  email_gravatar_hash: string,
-  profile_markdown: string,
-  profile_rendered_html: string,
-  user_role_slug: string,
-  banned: boolean,
-  dark_mode: string,
-  avatar_public_bucket_hash: string,
-  disable_gravatar: boolean,
-  hide_results_preference: boolean,
-  website_url: string | undefined | null,
-  discord_username: string | undefined | null,
-  twitch_username: string | undefined | null,
-  twitter_username: string | undefined | null,
-  github_username: string | undefined | null,
-  //patreon_username?: string,
-  cashapp_username: string | undefined | null,
-  created_at: string,
-  badges: ProfileBadge[],
-}
-
-interface ProfileBadge {
-  slug: string,
-  title: string,
-  description: string,
-  image_url: string,
-  granted_at: string,
-}
 
 function ProfileFc(props: Props) {
-  const { username } = useParams() as { username: string };
+  const { username } : { username : string } = useParams();
 
-  const [userData, setUserData] = useState<UserPayload|undefined>(undefined);
+  const [userData, setUserData] = useState<User|undefined>(undefined);
+
+  const getUser = useCallback(async (username) => {
+    const user = await GetUserByUsername(username);
+    if (user) {
+      setUserData(user);
+    }
+  }, []);
 
   useEffect(() => {
-    const api = new ApiConfig();
-    const endpointUrl = api.getProfile(username);
+    getUser(username);
+  }, [username, getUser]); // NB: Empty array dependency sets to run ONLY on mount
 
-    fetch(endpointUrl, {
-      method: 'GET',
-      headers: {
-        'Accept': 'application/json',
-      },
-      credentials: 'include',
-    })
-    .then(res => res.json())
-    .then(res => {
-      const profileResponse : ProfileResponsePayload = res;
-
-      if (profileResponse === undefined ||
-        !profileResponse.success) {
-        return; // Endpoint error?
-      }
-
-      setUserData(profileResponse.user)
-    })
-    .catch(e => {
-      //this.props.onSpeakErrorCallback();
-    });
-
-  }, [username]); // NB: Empty array dependency sets to run ONLY on mount
-
-  let userEmailHash = "dne";
-  if (userData !== undefined) {
-    userEmailHash = userData!.email_gravatar_hash;
+  if (!userData) {
+    return <div />
   }
+
+  let userEmailHash = userData.email_gravatar_hash;
 
   let editProfileButton = <span />
 
-  if (props.sessionWrapper.canEditUserProfile(username)) {
-    const editLinkUrl = `/profile/${username}/edit`;
+  if (props.sessionWrapper.canEditUserProfile(userData.username)) {
+    const editLinkUrl = `/profile/${userData.username}/edit`;
 
     // Mods shouldn't edit preferences.
-    const buttonLabel = props.sessionWrapper.userTokenMatches(userData?.user_token) ? 
+    const buttonLabel = props.sessionWrapper.userTokenMatches(userData.user_token) ? 
       "Edit Profile & Preferences" : "Edit Profile";
 
     editProfileButton = (
@@ -113,9 +60,9 @@ function ProfileFc(props: Props) {
 
   let profileRows : Array<JSX.Element> = [];
 
-  if (userData !== undefined && userData.website_url !== undefined && userData.website_url !== null) {
+  if (userData.website_url !== undefined && userData.website_url !== null) {
     let websiteUrl = <span>{userData.website_url}</span>;
-    if (userData?.website_url?.startsWith("http://") || userData?.website_url?.startsWith("https://")) {
+    if (userData.website_url?.startsWith("http://") || userData.website_url?.startsWith("https://")) {
       websiteUrl = (
         <a 
           href={userData.website_url} 
@@ -135,7 +82,7 @@ function ProfileFc(props: Props) {
     )
   }
 
-  if (userData !== undefined && userData.twitch_username) {
+  if (userData.twitch_username) {
     let twitchUrl = `https://twitch.com/${userData.twitch_username}`;
     let twitchLink = (
       <a 
@@ -154,7 +101,7 @@ function ProfileFc(props: Props) {
     )
   }
 
-  if (userData !== undefined && userData.twitter_username) {
+  if (userData.twitter_username) {
     let twitterUrl = `https://twitter.com/${userData.twitter_username}`;
     let twitterLink = (
       <a 
@@ -173,7 +120,7 @@ function ProfileFc(props: Props) {
     )
   }
 
-  if (userData !== undefined && userData.discord_username) {
+  if (userData.discord_username) {
     profileRows.push(
       <tr key="discord">
         <th>
@@ -184,7 +131,7 @@ function ProfileFc(props: Props) {
     )
   }
 
-  if (userData !== undefined && userData.github_username) {
+  if (userData.github_username) {
     let githubUrl = `https://github.com/${userData.github_username}`;
     let githubLink = (
       <a 
@@ -203,7 +150,7 @@ function ProfileFc(props: Props) {
     )
   }
 
-  if (userData !== undefined && userData.cashapp_username) {
+  if (userData.cashapp_username) {
     // NB: URL includes a dollar sign
     let cashAppUrl = `https://cash.me/$${userData.cashapp_username}`;
     let cashAppLink = (
@@ -225,7 +172,7 @@ function ProfileFc(props: Props) {
 
   let badges = <div>None yet</div>;
 
-  if (userData !== undefined && userData.badges.length !== 0) {
+  if (userData.badges.length !== 0) {
     let badgeList : Array<JSX.Element> = [];
     userData.badges.forEach(badge => {
       badgeList.push((
@@ -244,16 +191,16 @@ function ProfileFc(props: Props) {
       <h1 className="title is-1">
         <GravatarFc 
           size={45} 
-          username={username}
+          username={userData.display_name}
           email_hash={userEmailHash} />
-        {username} 
+        {userData.display_name} 
       </h1>
 
       {editProfileButton}
 
       <div 
         className="profile content is-medium" 
-        dangerouslySetInnerHTML={{__html: userData?.profile_rendered_html || ""}}
+        dangerouslySetInnerHTML={{__html: userData.profile_rendered_html || ""}}
         />
 
       <table className="table">
@@ -266,16 +213,16 @@ function ProfileFc(props: Props) {
       {badges}
 
       <h3 className="title is-3"> TTS Results </h3>
-      <ProfileTtsInferenceResultsListFc username={username} />
+      <ProfileTtsInferenceResultsListFc username={userData.username} />
 
       <h3 className="title is-3"> Lipsync Results </h3>
-      <ProfileW2lInferenceResultsListFc username={username} />
+      <ProfileW2lInferenceResultsListFc username={userData.username} />
 
       <h3 className="title is-3"> Uploaded TTS Models </h3>
-      <ProfileTtsModelListFc username={username} />
+      <ProfileTtsModelListFc username={userData.username} />
 
       <h3 className="title is-3"> Uploaded Templates </h3>
-      <ProfileW2lTemplateListFc username={username} />
+      <ProfileW2lTemplateListFc username={userData.username} />
 
     </div>
   )
