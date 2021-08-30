@@ -8,6 +8,12 @@ import { PauseIcon } from '../../_icons/PauseIcon';
 import { RepeatIcon } from '../../_icons/RepeatIcon';
 import { ArrowRightIcon } from '../../_icons/ArrowRightIcon';
 
+enum PlaybackSpeed {
+  HALF,
+  NORMAL,
+  DOUBLE,
+}
+
 interface Props {
   ttsResult: TtsResult,
 }
@@ -15,6 +21,7 @@ interface Props {
 function TtsResultAudioPlayerFc(props: Props) {
   let [isPlaying, setIsPlaying] = useState(false);
   let [isRepeating, setIsRepeating] = useState(false);
+  let [playbackSpeed, setPlaybackSpeed] = useState(PlaybackSpeed.NORMAL);
   let [waveSurfer, setWaveSurfer] = useState<WaveSurfer|null>(null);
 
   useEffect(() => {
@@ -41,7 +48,7 @@ function TtsResultAudioPlayerFc(props: Props) {
 
   useEffect(() => {
     if (waveSurfer) {
-      waveSurfer.unAll();
+      waveSurfer.unAll(); // NB: Otherwise we keep reinstalling the hooks and cause chaos
       waveSurfer.on('pause', () => {
         setIsPlaying(false);
       })
@@ -64,6 +71,24 @@ function TtsResultAudioPlayerFc(props: Props) {
     setIsRepeating(!isRepeating)
   }
 
+  const togglePlaybackSpeed = () => {
+    let nextSpeed = PlaybackSpeed.NORMAL;
+    switch (playbackSpeed) {
+      case PlaybackSpeed.NORMAL:
+        nextSpeed = PlaybackSpeed.DOUBLE;
+        waveSurfer!.setPlaybackRate(1.5); // Okay, so a lie...
+        break;
+      case PlaybackSpeed.DOUBLE:
+        nextSpeed = PlaybackSpeed.HALF;
+        waveSurfer!.setPlaybackRate(0.5);
+        break;
+      case PlaybackSpeed.HALF:
+        nextSpeed = PlaybackSpeed.NORMAL;
+        waveSurfer!.setPlaybackRate(1.0);
+        break;
+    }
+    setPlaybackSpeed(nextSpeed);
+  }
 
   let playButtonText = <><PlayIcon /></>;
   if (isPlaying) {
@@ -71,6 +96,19 @@ function TtsResultAudioPlayerFc(props: Props) {
   }
 
   let repeatButtonText = isRepeating ? <RepeatIcon /> : <ArrowRightIcon />;
+
+  let speedButtonText = '1x';
+  switch (playbackSpeed) {
+    case PlaybackSpeed.NORMAL:
+      speedButtonText = '1x';
+      break;
+    case PlaybackSpeed.DOUBLE:
+      speedButtonText = '2x';
+      break;
+    case PlaybackSpeed.HALF:
+      speedButtonText = '1/2x';
+      break;
+  }
 
   return (
     <div>
@@ -85,6 +123,10 @@ function TtsResultAudioPlayerFc(props: Props) {
         <button 
           className="button is-info is-light"
           onClick={() => toggleIsRepeating()}>{repeatButtonText}</button>
+
+        <button 
+          className="button is-info is-light"
+          onClick={() => togglePlaybackSpeed()}>{speedButtonText}</button>
       </div>
       </div>
     </div>
