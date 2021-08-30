@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { ApiConfig } from '../../../../common/ApiConfig';
 import { Link } from 'react-router-dom';
 import { SessionTtsInferenceResultListFc } from '../../_common/SessionTtsInferenceResultsListFc';
@@ -11,23 +11,9 @@ import { TtsModelUploadJob } from '../../../../jobs/TtsModelUploadJobs';
 import { W2lInferenceJob } from '../../../../jobs/W2lInferenceJobs';
 import { W2lTemplateUploadJob } from '../../../../jobs/W2lTemplateUploadJobs';
 import { v4 as uuidv4 } from 'uuid';
+import { ListTtsModels, TtsModelListItem } from '../../../api/tts/ListTtsModels';
+import { GravatarFc } from '../../_common/GravatarFc';
 
-interface TtsModelListResponsePayload {
-  success: boolean,
-  models: Array<TtsModel>,
-}
-
-interface TtsModel {
-  model_token: string,
-  tts_model_type: string,
-  creator_user_token: string,
-  creator_username: string,
-  creator_display_name: string,
-  updatable_slug: string,
-  title: string,
-  created_at: string,
-  updated_at: string,
-}
 
 export interface EnqueueJobResponsePayload {
   success: boolean,
@@ -44,38 +30,24 @@ interface Props {
 }
 
 function TtsModelListFc(props: Props) {
-  const [ttsModels, setTtsModels] = useState<Array<TtsModel>>([]);
+  const [ttsModels, setTtsModels] = useState<Array<TtsModelListItem>>([]);
 
-  const [selectedTtsModel, setSelectedTtsModel] = useState<TtsModel|undefined>(undefined);
+  const [selectedTtsModel, setSelectedTtsModel] = useState<TtsModelListItem|undefined>(undefined);
   const [text, setText] = useState<string>("");
 
+  const listModels = useCallback(async () => {
+    const models = await ListTtsModels();
+    if (models) {
+      setTtsModels(models);
+      if (models.length > 0) {
+        setSelectedTtsModel(models[0]);
+      }
+    }
+  }, []);
+
   useEffect(() => {
-    const api = new ApiConfig();
-    const endpointUrl = api.listTts();
-
-    fetch(endpointUrl, {
-      method: 'GET',
-      headers: {
-        'Accept': 'application/json',
-      },
-      credentials: 'include',
-    })
-    .then(res => res.json())
-    .then(res => {
-      const ttsModelResponse : TtsModelListResponsePayload  = res;
-      if (!ttsModelResponse.success) {
-        return;
-      }
-
-      setTtsModels(ttsModelResponse.models);
-      if (ttsModelResponse.models.length > 0) {
-        setSelectedTtsModel(ttsModelResponse.models[0]);
-      }
-    })
-    .catch(e => {
-      // NO-OP
-    });
-  }, []); // NB: Empty array dependency sets to run ONLY on mount
+    listModels();
+  }, [listModels]);
 
   let listItems: Array<JSX.Element> = [];
 
@@ -164,13 +136,10 @@ function TtsModelListFc(props: Props) {
     })
     .then(res => res.json())
     .then(res => {
-      console.log('handleFormSubmit response:', res);
       let response : EnqueueJobResponsePayload = res;
       if (!response.success || response.inference_job_token === undefined) {
         return;
       }
-
-      console.log('enqueuing...')
 
       props.enqueueTtsJob(response.inference_job_token);
     })
@@ -188,9 +157,16 @@ function TtsModelListFc(props: Props) {
   let directViewLink = <span />;
 
   if (selectedTtsModel !== undefined) {
-    let modelLink = `/tts/${selectedTtsModel!.model_token}`;
+    let modelLink = `/tts/${selectedTtsModel.model_token}`;
     directViewLink = (
-      <Link to={modelLink}>See more details about the "{selectedTtsModel!.title}" model</Link>
+      <Link to={modelLink}>
+        See more details about the "<strong>{selectedTtsModel.title}</strong>" model 
+        by&nbsp;<strong>{selectedTtsModel.creator_display_name}</strong>&nbsp; 
+        <GravatarFc 
+          size={15}
+          username={selectedTtsModel.creator_display_name}
+          email_hash={selectedTtsModel.creator_gravatar_hash} /> 
+      </Link>
     );
   }
 
