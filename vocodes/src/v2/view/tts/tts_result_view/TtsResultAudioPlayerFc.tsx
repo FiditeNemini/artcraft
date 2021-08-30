@@ -117,19 +117,19 @@ function TtsResultAudioPlayerFc(props: Props) {
       <div id="waveform"></div>
       <br />
       <div className="columns is-centered">
-      <div className="buttons are-medium ">
-        <button 
-          className="button is-primary is-light"
-          onClick={() => togglePlayPause()}>{playButtonText}</button>
+        <div className="buttons are-medium ">
+          <button 
+            className="button is-primary is-light"
+            onClick={() => togglePlayPause()}>{playButtonText}</button>
 
-        <button 
-          className="button is-info is-light"
-          onClick={() => toggleIsRepeating()}>{repeatButtonText}</button>
+          <button 
+            className="button is-info is-light"
+            onClick={() => toggleIsRepeating()}>{repeatButtonText}</button>
 
-        <button 
-          className="button is-info is-light"
-          onClick={() => togglePlaybackSpeed()}>{speedButtonText}</button>
-      </div>
+          <button 
+            className="button is-info is-light"
+            onClick={() => togglePlaybackSpeed()}>{speedButtonText}</button>
+        </div>
       </div>
     </div>
   )

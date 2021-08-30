@@ -143,8 +143,15 @@ function ProfileTtsInferenceResultsListFc(props: Props) {
         </tbody>
       </table>
 
-      <button className="button is-info" onClick={() => getPage(previousCursor, true)} disabled={prevDisabled}>&lt; Get newer</button> &nbsp;
-      <button className="button is-info" onClick={() => getPage(nextCursor, false)} disabled={nextDisabled}>Get older&gt;</button>
+      <p>
+        Note: Results marked public (<VisibleIconFc />) are visible by anyone visiting your profile. 
+        {/*You can change this by editing results. You can also set a default preference for new results.*/}
+      </p>
+
+      <div className="columns is-centered">
+        <button className="button is-info" onClick={() => getPage(previousCursor, true)} disabled={prevDisabled}>&lt; Get newer</button> &nbsp;
+        <button className="button is-info" onClick={() => getPage(nextCursor, false)} disabled={nextDisabled}>Get older&gt;</button>
+      </div>
     </div>
   )
 }
