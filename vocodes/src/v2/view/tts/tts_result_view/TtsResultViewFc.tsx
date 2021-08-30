@@ -176,17 +176,15 @@ function TtsResultViewFc(props: Props) {
       {subtitle}
 
       <TtsResultAudioPlayerFc ttsResult={ttsInferenceResult} />
-      
-      <hr />
 
+      {/* Without wavesurfer, 
       <audio
         controls
         src={audioLink}>
             Your browser does not support the
             <code>audio</code> element.
-      </audio>
+      </audio>*/}
 
-      <br />
       <br />
 
       <a className="button is-large is-primary is-fullwidth"

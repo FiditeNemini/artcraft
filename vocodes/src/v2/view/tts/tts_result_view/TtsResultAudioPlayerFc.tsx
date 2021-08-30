@@ -1,8 +1,12 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 import WaveSurfer from 'wavesurfer.js';
 import { useEffect, useState } from 'react';
 import { BucketConfig } from '../../../../common/BucketConfig';
 import { TtsResult } from '../../../api/tts/GetTtsResult';
+import { PlayIcon } from '../../_icons/PlayIcon';
+import { PauseIcon } from '../../_icons/PauseIcon';
+import { RepeatIcon } from '../../_icons/RepeatIcon';
+import { ArrowRightIcon } from '../../_icons/ArrowRightIcon';
 
 interface Props {
   ttsResult: TtsResult,
@@ -10,12 +14,26 @@ interface Props {
 
 function TtsResultAudioPlayerFc(props: Props) {
   let [isPlaying, setIsPlaying] = useState(false);
+  let [isRepeating, setIsRepeating] = useState(false);
   let [waveSurfer, setWaveSurfer] = useState<WaveSurfer|null>(null);
 
   useEffect(() => {
-    setWaveSurfer(WaveSurfer.create({
-      container: '#waveform'
-    }))
+    const wavesurferInstance = WaveSurfer.create({
+      container: '#waveform', // Previousy I used 'this.ref.current' and React.createRef()
+      height: 200,
+      responsive: true,
+      waveColor: '#777',
+      progressColor:  '#ccc',
+      cursorColor: '#3273dc',
+      cursorWidth: 2,
+      normalize: false,
+    });
+
+    wavesurferInstance.on('pause', () => {
+      setIsPlaying(false);
+    })
+
+    setWaveSurfer(wavesurferInstance);
   }, [])
 
   useEffect(() => {
@@ -27,15 +45,48 @@ function TtsResultAudioPlayerFc(props: Props) {
 
   const togglePlayPause = () => {
     if (waveSurfer) {
-      waveSurfer.playPause()
+      waveSurfer.playPause();
       setIsPlaying(!isPlaying)
     }
   }
 
+  const toggleIsRepeating = () => {
+    setIsRepeating(!isRepeating)
+  }
+
+  const repeatCallback = useCallback((isRepeating) => {
+    if (isRepeating) {
+      waveSurfer!.play();
+    }
+  }, [waveSurfer]);
+
+
+  if (waveSurfer) {
+    waveSurfer.on('finish', () => repeatCallback(isRepeating));
+  }
+  
+  let playButtonText = <><PlayIcon /></>;
+  if (isPlaying) {
+    playButtonText = <><PauseIcon /></>;
+  }
+
+  let repeatButtonText = isRepeating ? <RepeatIcon /> : <ArrowRightIcon />;
+
   return (
     <div>
-      <div id="waveform" ></div>
-      <button onClick={() => togglePlayPause()}>{isPlaying ? '||' : '+'}</button>
+      <div id="waveform"></div>
+      <br />
+      <div className="columns is-centered">
+      <div className="buttons are-medium ">
+        <button 
+          className="button is-primary is-light"
+          onClick={() => togglePlayPause()}>{playButtonText}</button>
+
+        <button 
+          className="button is-info is-light"
+          onClick={() => toggleIsRepeating()}>{repeatButtonText}</button>
+      </div>
+      </div>
     </div>
   )
 }
