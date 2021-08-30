@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react';
+import React from 'react';
 import WaveSurfer from 'wavesurfer.js';
 import { useEffect, useState } from 'react';
 import { BucketConfig } from '../../../../common/BucketConfig';
@@ -12,18 +12,10 @@ interface Props {
   ttsResult: TtsResult,
 }
 
-//function useIsLooping() : [boolean, () => void] {
-//  const [isLooping, setLooping] = useState(false)
-//  const toggleLooping = useCallback(() => setLooping(() => !isLooping), [])
-//  return [ isLooping, toggleLooping ]
-//}
-
 function TtsResultAudioPlayerFc(props: Props) {
   let [isPlaying, setIsPlaying] = useState(false);
   let [isRepeating, setIsRepeating] = useState(false);
   let [waveSurfer, setWaveSurfer] = useState<WaveSurfer|null>(null);
-
-  //let [isLooping, toggleLooping] = useIsLooping();
 
   useEffect(() => {
     const wavesurferInstance = WaveSurfer.create({
@@ -37,9 +29,6 @@ function TtsResultAudioPlayerFc(props: Props) {
       normalize: false,
     });
 
-
-    //wavesurferInstance.on('finish', () => repeatCallback());
-
     setWaveSurfer(wavesurferInstance);
   }, [])
   
@@ -50,23 +39,19 @@ function TtsResultAudioPlayerFc(props: Props) {
     }
   }, [waveSurfer, props.ttsResult])
 
-  const repeat = useCallback(() => {
-    console.log('repeat callback', isRepeating);
-    if (waveSurfer && isRepeating) {
-      waveSurfer!.play();
-    }
-  }, [waveSurfer, isRepeating]);
-
   useEffect(() => {
-    console.log('isLooping', isRepeating);
     if (waveSurfer) {
       waveSurfer.unAll();
       waveSurfer.on('pause', () => {
         setIsPlaying(false);
       })
-      waveSurfer.on('finish', repeat);
+      waveSurfer.on('finish', () => {
+        if (waveSurfer && isRepeating) {
+          waveSurfer!.play();
+        }
+      });
     }
-  }, [waveSurfer, isRepeating, repeat])
+  }, [waveSurfer, isRepeating])
 
   const togglePlayPause = () => {
     if (waveSurfer) {
@@ -76,9 +61,7 @@ function TtsResultAudioPlayerFc(props: Props) {
   }
 
   const toggleIsRepeating = () => {
-    console.log('toggleIsRepeating')
     setIsRepeating(!isRepeating)
-    //toggleLooping();
   }
 
 
