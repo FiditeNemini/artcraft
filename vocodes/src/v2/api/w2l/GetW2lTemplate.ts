@@ -11,6 +11,7 @@ export interface W2lTemplate {
   creator_user_token: string,
   creator_username: string,
   creator_display_name: string,
+  creator_gravatar_hash: string,
   updatable_slug: string,
   title: string,
   description_markdown: string,

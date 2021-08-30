@@ -14,6 +14,7 @@ import { HiddenIconFc } from '../../_icons/HiddenIcon';
 import { FrontendUrlConfig } from '../../../../common/FrontendUrlConfig';
 import { GetW2lTemplate, W2lTemplate } from '../../../api/w2l/GetW2lTemplate';
 import { GetW2lTemplateUseCount } from '../../../api/w2l/GetW2lTemplateUseCount';
+import { GravatarFc } from '../../_common/GravatarFc';
 
 interface EnqueueJobResponsePayload {
   success: boolean,
@@ -117,7 +118,6 @@ function W2lTemplateViewFc(props: Props) {
     return false;
   };
 
-  let creatorLink=`/profile/${w2lTemplate?.creator_username}`;
   let object : string|undefined = undefined;
   
   if (w2lTemplate?.maybe_image_object_name !== undefined && w2lTemplate?.maybe_image_object_name !== null) {
@@ -181,6 +181,23 @@ function W2lTemplateViewFc(props: Props) {
           <td>{w2lTemplate?.maybe_moderator_fields?.user_deleted_at || "not deleted"}</td>
         </tr>
       </>
+    );
+  }
+
+  let creatorLink = <span />;
+
+  if (!!w2lTemplate?.creator_display_name) {
+    const creatorUrl = FrontendUrlConfig.userProfilePage(w2lTemplate?.creator_username);
+    creatorLink = (
+      <span>
+        <GravatarFc
+          size={15}
+          username={w2lTemplate.creator_display_name || ""} 
+          email_hash={w2lTemplate.creator_gravatar_hash || ""} 
+          />
+        &nbsp;
+        <Link to={creatorUrl}>{w2lTemplate.creator_display_name}</Link>
+      </span>
     );
   }
 
@@ -338,7 +355,7 @@ function W2lTemplateViewFc(props: Props) {
           <tr>
             <th>Creator</th>
             <td>
-              <Link to={creatorLink}>{w2lTemplate?.creator_display_name}</Link>
+              {creatorLink}
             </td>
           </tr>
           <tr>
