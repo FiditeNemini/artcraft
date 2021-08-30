@@ -10,6 +10,7 @@ import { FrontendUrlConfig } from '../../../../common/FrontendUrlConfig';
 import { HiddenIconFc } from '../../_icons/HiddenIcon';
 import { VisibleIconFc } from '../../_icons/VisibleIcon';
 import { GetTtsModel, TtsModel } from '../../../api/tts/GetTtsModel';
+import { GravatarFc } from '../../_common/GravatarFc';
 
 interface TtsModelUseCountResponsePayload {
   success: boolean,
@@ -123,9 +124,17 @@ function TtsModelViewFc(props: Props) {
   let creatorLink = <span />;
 
   if (!!ttsModel?.creator_display_name) {
-    const creatorUrl = FrontendUrlConfig.userProfilePage(ttsModel?.creator_display_name);
+    const creatorUrl = FrontendUrlConfig.userProfilePage(ttsModel?.creator_username);
     creatorLink = (
-      <Link to={creatorUrl}>{ttsModel?.creator_display_name}</Link>
+      <span>
+        <GravatarFc
+          size={15}
+          username={ttsModel.creator_display_name || ""} 
+          email_hash={ttsModel.creator_gravatar_hash || ""} 
+          />
+        &nbsp;
+        <Link to={creatorUrl}>{ttsModel.creator_display_name}</Link>
+      </span>
     );
   }
 
