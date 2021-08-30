@@ -1,5 +1,4 @@
-import React, { useState, useEffect } from 'react';
-import { ApiConfig } from '../../../../common/ApiConfig';
+import React, { useState, useEffect, useCallback } from 'react';
 import { SessionWrapper } from '../../../../session/SessionWrapper';
 import { useParams, Link } from 'react-router-dom';
 import { GravatarFc } from '../../_common/GravatarFc';
@@ -9,50 +8,7 @@ import { BucketConfig } from '../../../../common/BucketConfig';
 import { FrontendUrlConfig } from '../../../../common/FrontendUrlConfig';
 import { HiddenIconFc } from '../../_icons/HiddenIcon';
 import { VisibleIconFc } from '../../_icons/VisibleIcon';
-
-interface TtsInferenceResultResponsePayload {
-  success: boolean,
-  result: TtsInferenceResult,
-}
-
-interface TtsInferenceResult {
-  tts_result_token: string,
-
-  tts_model_token: string,
-  tts_model_title: string,
-
-  maybe_pretrained_vocoder_used: string | null,
-
-  raw_inference_text: string,
-
-  maybe_creator_user_token?: string,
-  maybe_creator_username?: string,
-  maybe_creator_display_name?: string,
-  maybe_creator_gravatar_hash?: string,
-
-  maybe_model_creator_user_token?: string,
-  maybe_model_creator_username?: string,
-  maybe_model_creator_display_name?: string,
-  maybe_model_creator_gravatar_hash?: string,
-
-  public_bucket_wav_audio_path: string,
-  public_bucket_spectrogram_path: string,
-
-  creator_set_visibility?: string,
-
-  file_size_bytes: number,
-  duration_millis: number,
-  created_at: string,
-  updated_at: string,
-
-  maybe_moderator_fields: TtsInferenceResultModeratorFields | null | undefined,
-}
-
-interface TtsInferenceResultModeratorFields {
-  creator_ip_address: string,
-  mod_deleted_at: string | undefined | null,
-  user_deleted_at: string | undefined | null,
-}
+import { GetTtsResult, TtsResult } from '../../../api/tts/GetTtsResult';
 
 interface Props {
   sessionWrapper: SessionWrapper,
@@ -61,32 +17,18 @@ interface Props {
 function TtsResultViewFc(props: Props) {
   let { token } : { token: string }= useParams();
 
-  const [ttsInferenceResult, setTtsInferenceResult] = useState<TtsInferenceResult|undefined>(undefined);
+  const [ttsInferenceResult, setTtsInferenceResult] = useState<TtsResult|undefined>(undefined);
+
+  const getTtsResult = useCallback(async (token) => {
+    const result = await GetTtsResult(token);
+    if (result) {
+      setTtsInferenceResult(result);
+    }
+  }, []);
 
   useEffect(() => {
-    const api = new ApiConfig();
-    const endpointUrl = api.viewTtsInferenceResult(token);
-
-    fetch(endpointUrl, {
-      method: 'GET',
-      headers: {
-        'Accept': 'application/json',
-      },
-      credentials: 'include',
-    })
-    .then(res => res.json())
-    .then(res => {
-      const modelsResponse : TtsInferenceResultResponsePayload = res;
-      if (!modelsResponse.success) {
-        return;
-      }
-
-      setTtsInferenceResult(modelsResponse.result)
-    })
-    .catch(e => {
-      //this.props.onSpeakErrorCallback();
-    });
-  }, [token]); // NB: Empty array dependency sets to run ONLY on mount
+    getTtsResult(token);
+  }, [token, getTtsResult]); // NB: Empty array dependency sets to run ONLY on mount
 
   if (ttsInferenceResult === undefined) {
     return <div />;
