@@ -2,9 +2,13 @@ import React from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faRetweet } from '@fortawesome/free-solid-svg-icons'
 
-export function RepeatIcon() {
+interface Props {
+  title?: string,
+}
+
+export function RepeatIcon(props: Props) {
   return (
-      <FontAwesomeIcon icon={faRetweet} />
+      <FontAwesomeIcon icon={faRetweet} title={props.title} />
   );
 }
 

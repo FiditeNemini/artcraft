@@ -97,7 +97,7 @@ function TtsResultAudioPlayerFc(props: Props) {
     playButtonText = <><PauseIcon /></>;
   }
 
-  let repeatButtonText = isRepeating ? <RepeatIcon /> : <NoRepeatIcon />;
+  let repeatButtonText = isRepeating ? <RepeatIcon title="Disable repeat" /> : <NoRepeatIcon title="Enable repeat" />;
 
   let speedButtonText = '1x';
   switch (playbackSpeed) {
