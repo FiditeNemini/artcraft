@@ -43,7 +43,7 @@ interface Props {
   w2lTemplateUploadJobs: Array<W2lTemplateUploadJob>,
 }
 
-function TtsModelFormFc(props: Props) {
+function TtsModelListFc(props: Props) {
   const [ttsModels, setTtsModels] = useState<Array<TtsModel>>([]);
 
   const [selectedTtsModel, setSelectedTtsModel] = useState<TtsModel|undefined>(undefined);
@@ -276,4 +276,4 @@ function TtsModelFormFc(props: Props) {
   )
 }
 
-export { TtsModelFormFc };
+export { TtsModelListFc };

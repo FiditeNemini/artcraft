@@ -16,7 +16,6 @@ import { TermsFc } from './about/terms_page/TermsFc';
 import { TtsInferenceJob, W2lInferenceJob } from '../../App';
 import { TtsModelDeleteFc } from './tts/tts_model_delete/TtsModelDeleteFc';
 import { TtsModelEditFc } from './tts/tts_model_edit/TtsModelEditFc';
-import { TtsModelFormFc } from './tts/tts_model_list/TtsModelFormFc';
 import { TtsModelUploadJob } from '../../jobs/TtsModelUploadJobs';
 import { TtsModelViewFc } from './tts/tts_model_view/TtsModelViewFc';
 import { TtsResultDeleteFc } from './tts/tts_result_delete/TtsResultDeleteFc';
@@ -35,6 +34,7 @@ import { W2lTemplateDeleteFc } from './w2l/w2l_template_delete/W2lTemplateDelete
 import { W2lTemplateEditFc } from './w2l/w2l_template_edit/W2lTemplateEditFc';
 import { W2lResultDeleteFc } from './w2l/w2l_result_delete/W2lResultDeleteFc';
 import { W2lTemplateApproveFc } from './w2l/w2l_template_approve/W2lTemplateApproveFc';
+import { TtsModelListFc } from './tts/tts_model_list/TtsModelListFc';
 
 interface Props {
   sessionWrapper: SessionWrapper,
@@ -259,7 +259,7 @@ class NewVocodesContainer extends React.Component<Props, State> {
             </Route>
 
             <Route path="/">
-              <TtsModelFormFc
+              <TtsModelListFc
                 sessionWrapper={this.props.sessionWrapper}
                 enqueueTtsJob={this.props.enqueueTtsJob}
                 ttsInferenceJobs={this.props.ttsInferenceJobs}

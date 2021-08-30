@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { ApiConfig } from '../../../../common/ApiConfig';
-import { EnqueueJobResponsePayload } from '../tts_model_list/TtsModelFormFc';
+import { EnqueueJobResponsePayload } from '../tts_model_list/TtsModelListFc';
 import { SessionTtsInferenceResultListFc } from '../../_common/SessionTtsInferenceResultsListFc';
 import { SessionWrapper } from '../../../../session/SessionWrapper';
 import { TtsInferenceJob } from '../../../../App';
