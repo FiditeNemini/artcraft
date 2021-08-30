@@ -47,12 +47,18 @@ interface State {
   textBuffer: string,
 }
 
+function newVocodes() {
+  const discord = /discord/i.test(navigator.userAgent || "");
+  const alphaCookie = document.cookie.includes("enable-alpha");
+  return discord || alphaCookie;
+}
+
 class App extends React.Component<Props, State> {
 
   constructor(props: Props) {
     super(props);
 
-    const enableAlpha = document.cookie.includes("enable-alpha");
+    const enableAlpha = newVocodes();
 
     const migrationMode = enableAlpha ? MigrationMode.NEW_VOCODES : MigrationMode.OLD_VOCODES;
 

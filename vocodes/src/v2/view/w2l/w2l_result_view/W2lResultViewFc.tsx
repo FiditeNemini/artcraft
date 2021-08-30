@@ -9,6 +9,7 @@ import { VisibleIconFc } from '../../_icons/VisibleIcon';
 import { FrontendUrlConfig } from '../../../../common/FrontendUrlConfig';
 import { DownloadIcon } from '../../_icons/DownloadIcon';
 import { GetW2lResult, W2lResult } from '../../../api/w2l/GetW2lResult';
+import { MetaTags } from '../../../../common/MetaTags';
 
 interface Props {
   sessionWrapper: SessionWrapper,
@@ -37,6 +38,8 @@ function W2lResultViewFc(props: Props) {
   let videoLink = new BucketConfig().getGcsUrl(w2lInferenceResult?.public_bucket_video_path);
   let templateLink = `/w2l/${w2lInferenceResult.maybe_w2l_template_token}`;
   let videoDownloadFilename = `vocodes-${w2lInferenceResult.w2l_result_token.replace(':', '')}.mp4`;
+
+  MetaTags.setVideoUrl(videoLink);
 
   let durationSeconds = w2lInferenceResult?.duration_millis / 1000;
 
