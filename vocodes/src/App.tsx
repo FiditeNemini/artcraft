@@ -42,6 +42,9 @@ interface State {
   w2lInferenceJobs: Array<W2lInferenceJob>,
   ttsModelUploadJobs: Array<TtsModelUploadJob>,
   w2lTemplateUploadJobs: Array<W2lTemplateUploadJob>,
+
+  // Current text entered
+  textBuffer: string,
 }
 
 class App extends React.Component<Props, State> {
@@ -62,6 +65,8 @@ class App extends React.Component<Props, State> {
       w2lInferenceJobs: [],
       ttsModelUploadJobs: [],
       w2lTemplateUploadJobs: [],
+
+      textBuffer: '',
     }
   }
 
@@ -339,6 +344,14 @@ class App extends React.Component<Props, State> {
     this.setState({migrationMode: mode});
   }
 
+  setTextBuffer = (textBuffer: string) => {
+    this.setState({ textBuffer: textBuffer });
+  }
+
+  clearTextBuffer = () => {
+    this.setState({ textBuffer: '' });
+  }
+
   public render() {
     if (this.state.migrationMode === MigrationMode.OLD_VOCODES) {
       return (
@@ -383,6 +396,10 @@ class App extends React.Component<Props, State> {
 
                     enqueueW2lTemplateUploadJob={this.enqueueW2lTemplateUploadJob}
                     w2lTemplateUploadJobs={this.state.w2lTemplateUploadJobs}
+
+                    textBuffer={this.state.textBuffer}
+                    setTextBuffer={this.setTextBuffer}
+                    clearTextBuffer={this.clearTextBuffer}
                     />
                 </Route>
               </Switch>

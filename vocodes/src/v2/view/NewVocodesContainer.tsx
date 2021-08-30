@@ -51,6 +51,10 @@ interface Props {
 
   enqueueW2lTemplateUploadJob: (jobToken: string) => void,
   w2lTemplateUploadJobs: Array<W2lTemplateUploadJob>,
+
+  textBuffer: string,
+  setTextBuffer: (textBuffer: string) => void,
+  clearTextBuffer: () => void,
 }
 
 interface State {
@@ -266,6 +270,9 @@ class NewVocodesContainer extends React.Component<Props, State> {
                 ttsModelUploadJobs={this.props.ttsModelUploadJobs}
                 w2lInferenceJobs={this.props.w2lInferenceJobs}
                 w2lTemplateUploadJobs={this.props.w2lTemplateUploadJobs}
+                textBuffer={this.props.textBuffer}
+                setTextBuffer={this.props.setTextBuffer}
+                clearTextBuffer={this.props.clearTextBuffer}
               />
             </Route>
 

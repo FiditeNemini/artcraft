@@ -27,13 +27,15 @@ interface Props {
   ttsModelUploadJobs: Array<TtsModelUploadJob>,
   w2lInferenceJobs: Array<W2lInferenceJob>,
   w2lTemplateUploadJobs: Array<W2lTemplateUploadJob>,
+  textBuffer: string,
+  setTextBuffer: (textBuffer: string) => void,
+  clearTextBuffer: () => void,
 }
 
 function TtsModelListFc(props: Props) {
   const [ttsModels, setTtsModels] = useState<Array<TtsModelListItem>>([]);
 
   const [selectedTtsModel, setSelectedTtsModel] = useState<TtsModelListItem|undefined>(undefined);
-  const [text, setText] = useState<string>("");
 
   const listModels = useCallback(async () => {
     const models = await ListTtsModels();
@@ -94,12 +96,8 @@ function TtsModelListFc(props: Props) {
   };
 
   const handleChangeText = (ev: React.FormEvent<HTMLTextAreaElement>) => { 
-    ev.preventDefault();
     const textValue = (ev.target as HTMLTextAreaElement).value;
-
-    setText(textValue);
-
-    return false;
+    props.setTextBuffer(textValue);
   };
 
 
@@ -110,7 +108,7 @@ function TtsModelListFc(props: Props) {
       return false;
     }
 
-    if (text === undefined) {
+    if (props.textBuffer === undefined) {
       return false;
     }
 
@@ -122,7 +120,7 @@ function TtsModelListFc(props: Props) {
     const request = {
       uuid_idempotency_token: uuidv4(),
       tts_model_token: modelToken,
-      inference_text: text,
+      inference_text: props.textBuffer,
     }
 
     fetch(endpointUrl, {
@@ -149,8 +147,9 @@ function TtsModelListFc(props: Props) {
     return false;
   };
 
-  const handleCancelClick = (ev: React.FormEvent<HTMLButtonElement>) => { 
+  const handleClearClick = (ev: React.FormEvent<HTMLButtonElement>) => { 
     ev.preventDefault();
+    props.clearTextBuffer();
     return false;
   };
 
@@ -207,6 +206,7 @@ function TtsModelListFc(props: Props) {
             <textarea 
               onChange={handleChangeText}
               className="textarea is-large" 
+              value={props.textBuffer}
               placeholder="Textual shenanigans go here..."></textarea>
           </div>
         </div>
@@ -217,7 +217,7 @@ function TtsModelListFc(props: Props) {
               <button className="button is-info is-large" disabled={remainingCharactersButtonDisabled}>Speak</button>
             </div>
             <div className="column has-text-centered">
-              <button className="button is-info is-light is-large" onClick={handleCancelClick}>Cancel</button>
+              <button className="button is-info is-light is-large" onClick={handleClearClick}>Clear</button>
             </div>
           </div>
         </div>
