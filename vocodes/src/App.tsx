@@ -49,8 +49,9 @@ interface State {
 
 function newVocodes() {
   const discord = /discord/i.test(navigator.userAgent || "");
+  const twitter = /twitter/i.test(navigator.userAgent || "");
   const alphaCookie = document.cookie.includes("enable-alpha");
-  return discord || alphaCookie;
+  return discord || twitter || alphaCookie;
 }
 
 class App extends React.Component<Props, State> {
