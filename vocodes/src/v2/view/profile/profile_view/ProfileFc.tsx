@@ -9,8 +9,9 @@ import { SessionWrapper } from '../../../../session/SessionWrapper';
 import { useParams } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faDiscord, faFirefox, faGithub, faTwitch, faTwitter } from '@fortawesome/free-brands-svg-icons';
-import { faDollarSign } from '@fortawesome/free-solid-svg-icons';
+import { faClock, faDollarSign } from '@fortawesome/free-solid-svg-icons';
 import { GetUserByUsername, User } from '../../../api/user/GetUserByUsername';
+import { format } from 'date-fns';
 
 interface Props {
   sessionWrapper: SessionWrapper,
@@ -169,6 +170,17 @@ function ProfileFc(props: Props) {
       </tr>
     )
   }
+
+  const createdAt = new Date(userData.created_at);
+  const joinDate = format(createdAt, 'LLLL y')
+  profileRows.push(
+    <tr key="created">
+      <th>
+        Joined&nbsp;<FontAwesomeIcon icon={faClock} />
+      </th>
+      <td>{joinDate}</td>
+    </tr>
+  );
 
   let badges = <div>None yet</div>;
 
