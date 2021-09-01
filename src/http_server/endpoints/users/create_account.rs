@@ -7,9 +7,10 @@ use actix_web::http::StatusCode;
 use actix_web::{Responder, web, HttpResponse, error, HttpRequest};
 use crate::database::helpers::tokens::Tokens;
 use crate::database::queries::create_session::create_session_for_user;
-use crate::http_server::endpoints::users::create_account::CreateAccountError::{BadInput, ServerError, UsernameTaken, EmailTaken};
+use crate::http_server::endpoints::users::create_account::CreateAccountErrorType::{BadInput, ServerError, UsernameTaken, EmailTaken};
 use crate::http_server::web_utils::ip_address::get_request_ip;
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
+use crate::http_server::web_utils::serialize_as_json_error::serialize_as_json_error;
 use crate::server_state::ServerState;
 use crate::util::email_to_gravatar::email_to_gravatar;
 use crate::util::random_crockford_token::random_crockford_token;
@@ -24,6 +25,9 @@ use regex::Regex;
 use sqlx::error::DatabaseError;
 use sqlx::error::Error::Database;
 use sqlx::mysql::MySqlDatabaseError;
+use std::collections::HashMap;
+use std::fmt::Formatter;
+use std::fmt;
 use std::sync::Arc;
 
 const NEW_USER_ROLE: &'static str = "user";
@@ -41,75 +45,107 @@ pub struct CreateAccountSuccessResponse {
   pub success: bool,
 }
 
-#[derive(Debug, Display)]
-pub enum CreateAccountError {
-  BadInput(String),
-  UsernameTaken,
-  ReservedUsername,
-  EmailTaken,
-  ServerError,
+#[derive(Serialize, Debug)]
+pub struct CreateAccountErrorResponse {
+  pub success: bool,
+  pub error_type: CreateAccountErrorType,
+  pub error_fields: HashMap<String, String>,
 }
 
-impl ResponseError for CreateAccountError {
+#[derive(Copy, Clone, Debug, Serialize)]
+pub enum CreateAccountErrorType {
+  BadInput,
+  EmailTaken,
+  ServerError,
+  UsernameReserved,
+  UsernameTaken,
+}
+
+impl CreateAccountErrorResponse {
+  fn server_error() -> Self {
+    Self {
+      success: false,
+      error_type: CreateAccountErrorType::ServerError,
+      error_fields: HashMap::new(),
+    }
+  }
+}
+
+// NB: Not using DeriveMore since Clion doesn't understand it.
+impl fmt::Display for CreateAccountErrorResponse {
+  fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
+    write!(f, "{:?}", self.error_type)
+  }
+}
+
+impl ResponseError for CreateAccountErrorResponse {
   fn status_code(&self) -> StatusCode {
-    match *self {
-      CreateAccountError::BadInput(_) => StatusCode::BAD_REQUEST,
-      CreateAccountError::UsernameTaken => StatusCode::BAD_REQUEST,
-      CreateAccountError::ReservedUsername => StatusCode::BAD_REQUEST,
-      CreateAccountError::EmailTaken => StatusCode::BAD_REQUEST,
-      CreateAccountError::ServerError => StatusCode::INTERNAL_SERVER_ERROR,
+    match self.error_type {
+      CreateAccountErrorType::BadInput => StatusCode::BAD_REQUEST,
+      CreateAccountErrorType::EmailTaken => StatusCode::BAD_REQUEST,
+      CreateAccountErrorType::ServerError => StatusCode::INTERNAL_SERVER_ERROR,
+      CreateAccountErrorType::UsernameReserved => StatusCode::BAD_REQUEST,
+      CreateAccountErrorType::UsernameTaken => StatusCode::BAD_REQUEST,
     }
   }
 
   fn error_response(&self) -> HttpResponse {
-    let error_reason = match self {
-      BadInput(reason) => reason.to_string(),
-      CreateAccountError::UsernameTaken => "username already taken".to_string(),
-      CreateAccountError::ReservedUsername => "username is reserved".to_string(),
-      CreateAccountError::EmailTaken => "email already taken".to_string(),
-      CreateAccountError::ServerError => "server error".to_string(),
-    };
-
-    to_simple_json_error(&error_reason, self.status_code())
+    serialize_as_json_error(self)
   }
 }
 
 pub async fn create_account_handler(
   http_request: HttpRequest,
   request: web::Json<CreateAccountRequest>,
-  server_state: web::Data<Arc<ServerState>>) -> Result<HttpResponse, CreateAccountError>
+  server_state: web::Data<Arc<ServerState>>) -> Result<HttpResponse, CreateAccountErrorResponse>
 {
+  let mut error_fields = HashMap::new();
+
   if let Err(reason) = validate_username(&request.username) {
-    return Err(CreateAccountError::BadInput(reason));
+    error_fields.insert("username".to_string(), reason);
   }
 
   if let Err(reason) = validate_passwords(&request.password, &request.password_confirmation) {
-    return Err(CreateAccountError::BadInput(reason));
-  }
-
-  if is_reserved_username(&request.username) {
-    return Err(CreateAccountError::ReservedUsername);
+    error_fields.insert("password".to_string(), reason);
   }
 
   if contains_slurs(&request.username) {
-    return Err(CreateAccountError::BadInput("username contains slurs".to_string()));
+    error_fields.insert("username".to_string(), "username contains slurs".to_string());
   }
 
   if !request.email_address.contains("@") {
-    return Err(CreateAccountError::BadInput("invalid email address".to_string()));
+    error_fields.insert("email_address".to_string(), "invalid email address".to_string());
+  }
+
+  if is_reserved_username(&request.username) {
+    error_fields.insert("username".to_string(), "username is reserved".to_string());
+
+    return Err(CreateAccountErrorResponse {
+      success: false,
+      error_type: CreateAccountErrorType::UsernameReserved,
+      error_fields
+    });
+  }
+
+  if !error_fields.is_empty() {
+    return Err(CreateAccountErrorResponse {
+      success: false,
+      error_type: CreateAccountErrorType::BadInput,
+      error_fields
+    });
   }
 
   let user_token = Tokens::new_user()
     .map_err(|e| {
       warn!("Bad crockford token: {:?}", e);
-      CreateAccountError::ServerError
+      CreateAccountErrorResponse::server_error()
     })?;
 
   let password_hash = match bcrypt::hash(&request.password, bcrypt::DEFAULT_COST) {
     Ok(hash) => hash,
     Err(err) => {
       warn!("Bcrypt error: {:?}", err);
-      return Err(ServerError);
+      return Err(CreateAccountErrorResponse::server_error());
     }
   };
 
@@ -171,20 +207,33 @@ VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? )
       match err {
         Database(err) => {
           let maybe_code = err.code().map(|c| c.into_owned());
+          let mut error_fields = HashMap::new();
+          let mut maybe_error_type = None;
+
           match maybe_code.as_deref() {
             Some("23000") => {
               if err.message().contains("username") {
-                return Err(UsernameTaken);
+                maybe_error_type = Some(CreateAccountErrorType::UsernameTaken);
+                error_fields.insert("username".to_string(), "username is taken".to_string());
               } else if err.message().contains("email_address") {
-                return Err(EmailTaken);
+                maybe_error_type = Some(CreateAccountErrorType::EmailTaken);
+                error_fields.insert("email_address".to_string(), "email is taken".to_string());
               }
             }
             _ => {},
           }
+
+          if let Some(error_type) = maybe_error_type {
+            return Err(CreateAccountErrorResponse {
+              success: false,
+              error_type,
+              error_fields
+            })
+          }
         },
         _ => {},
       }
-      return Err(ServerError);
+      return Err(CreateAccountErrorResponse::server_error());
     }
   };
 
@@ -196,7 +245,7 @@ VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? )
       .await
       .map_err(|e| {
         warn!("error creating badge: {:?}", e);
-        CreateAccountError::ServerError
+        CreateAccountErrorResponse::server_error()
       })?;
 
   let create_session_result =
@@ -206,7 +255,7 @@ VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? )
     Ok(token) => token,
     Err(e) => {
       warn!("create account session creation error : {:?}", e);
-      return Err(CreateAccountError::ServerError);
+      return Err(CreateAccountErrorResponse::server_error());
     }
   };
 
@@ -216,12 +265,12 @@ VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? )
     .await
     .map_err(|e| {
       warn!("error publishing event: {:?}", e);
-      CreateAccountError::ServerError
+      CreateAccountErrorResponse::server_error()
     })?;
 
   let session_cookie = match server_state.cookie_manager.create_cookie(&session_token) {
     Ok(cookie) => cookie,
-    Err(_) => return Err(ServerError),
+    Err(_) => return Err(CreateAccountErrorResponse::server_error()),
   };
 
   let response = CreateAccountSuccessResponse {
@@ -229,7 +278,7 @@ VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? )
   };
 
   let body = serde_json::to_string(&response)
-    .map_err(|e| BadInput("".to_string()))?;
+    .map_err(|e| CreateAccountErrorResponse::server_error())?;
 
   Ok(HttpResponse::Ok()
     .cookie(session_cookie)
