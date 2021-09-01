@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useEffect, useCallback } from 'react';
 import { ApiConfig } from '../../../../common/ApiConfig';
 import { Link } from 'react-router-dom';
 import { SessionTtsInferenceResultListFc } from '../../_common/SessionTtsInferenceResultsListFc';
@@ -30,22 +30,27 @@ interface Props {
   textBuffer: string,
   setTextBuffer: (textBuffer: string) => void,
   clearTextBuffer: () => void,
+  ttsModels: Array<TtsModelListItem>,
+  setTtsModels: (ttsVoices: Array<TtsModelListItem>) => void,
+  // TODO: rename 'active'
+  currentTtsModelSelected?: TtsModelListItem,
+  setCurrentTtsModelSelected: (ttsModel: TtsModelListItem) => void,
 }
 
 function TtsModelListFc(props: Props) {
-  const [ttsModels, setTtsModels] = useState<Array<TtsModelListItem>>([]);
 
-  const [selectedTtsModel, setSelectedTtsModel] = useState<TtsModelListItem|undefined>(undefined);
+  let { setTtsModels, setCurrentTtsModelSelected, currentTtsModelSelected } = props;
 
   const listModels = useCallback(async () => {
     const models = await ListTtsModels();
     if (models) {
       setTtsModels(models);
-      if (models.length > 0) {
-        setSelectedTtsModel(models[0]);
+      if (!currentTtsModelSelected && models.length > 0) {
+        const model = models[0];
+        setCurrentTtsModelSelected(model);
       }
     }
-  }, []);
+  }, [setTtsModels, setCurrentTtsModelSelected, currentTtsModelSelected]);
 
   useEffect(() => {
     listModels();
@@ -54,8 +59,11 @@ function TtsModelListFc(props: Props) {
   let listItems: Array<JSX.Element> = [];
 
   let defaultSelectValue = '';
+  if (props.currentTtsModelSelected) {
+    defaultSelectValue = props.currentTtsModelSelected.model_token;
+  }
 
-  ttsModels.forEach(m => {
+  props.ttsModels.forEach(m => {
     let option = (
       <option 
         key={m.model_token} 
@@ -86,9 +94,9 @@ function TtsModelListFc(props: Props) {
     const selectVoiceValue = (ev.target as HTMLSelectElement).value;
 
     // TODO: Inefficient.
-    ttsModels.forEach(model => {
+    props.ttsModels.forEach(model => {
       if (model.model_token === selectVoiceValue) {
-        setSelectedTtsModel(model);
+        props.setCurrentTtsModelSelected(model);
       }
     });
 
@@ -104,15 +112,15 @@ function TtsModelListFc(props: Props) {
   const handleFormSubmit = (ev: React.FormEvent<HTMLFormElement>) => { 
     ev.preventDefault();
 
-    if (selectedTtsModel === undefined) {
+    if (!props.currentTtsModelSelected) {
       return false;
     }
 
-    if (props.textBuffer === undefined) {
+    if (!props.textBuffer) {
       return false;
     }
 
-    const modelToken = selectedTtsModel!.model_token;
+    const modelToken = props.currentTtsModelSelected!.model_token;
 
     const api = new ApiConfig();
     const endpointUrl = api.inferTts();
@@ -155,16 +163,16 @@ function TtsModelListFc(props: Props) {
 
   let directViewLink = <span />;
 
-  if (selectedTtsModel !== undefined) {
-    let modelLink = `/tts/${selectedTtsModel.model_token}`;
+  if (props.currentTtsModelSelected) {
+    let modelLink = `/tts/${props.currentTtsModelSelected.model_token}`;
     directViewLink = (
       <Link to={modelLink}>
-        See more details about the "<strong>{selectedTtsModel.title}</strong>" model 
-        by&nbsp;<strong>{selectedTtsModel.creator_display_name}</strong>&nbsp; 
+        See more details about the "<strong>{props.currentTtsModelSelected.title}</strong>" model 
+        by&nbsp;<strong>{props.currentTtsModelSelected.creator_display_name}</strong>&nbsp; 
         <GravatarFc 
           size={15}
-          username={selectedTtsModel.creator_display_name}
-          email_hash={selectedTtsModel.creator_gravatar_hash} /> 
+          username={props.currentTtsModelSelected.creator_display_name}
+          email_hash={props.currentTtsModelSelected.creator_gravatar_hash} /> 
       </Link>
     );
   }
@@ -175,12 +183,6 @@ function TtsModelListFc(props: Props) {
       <h5 className="subtitle is-5">
         Say stuff with your favorite characters.
       </h5>
-
-      {/*
-      <div className="content is-large">
-        {extraDetails}
-      </div>
-      */}
 
       <br />
 

@@ -35,6 +35,7 @@ import { W2lTemplateEditFc } from './w2l/w2l_template_edit/W2lTemplateEditFc';
 import { W2lResultDeleteFc } from './w2l/w2l_result_delete/W2lResultDeleteFc';
 import { W2lTemplateApproveFc } from './w2l/w2l_template_approve/W2lTemplateApproveFc';
 import { TtsModelListFc } from './tts/tts_model_list/TtsModelListFc';
+import { TtsModelListItem } from '../api/tts/ListTtsModels';
 
 interface Props {
   sessionWrapper: SessionWrapper,
@@ -55,6 +56,11 @@ interface Props {
   textBuffer: string,
   setTextBuffer: (textBuffer: string) => void,
   clearTextBuffer: () => void,
+
+  ttsModels: Array<TtsModelListItem>,
+  setTtsModels: (ttsVoices: Array<TtsModelListItem>) => void,
+  currentTtsModelSelected?: TtsModelListItem,
+  setCurrentTtsModelSelected: (ttsModel: TtsModelListItem) => void,
 }
 
 interface State {
@@ -276,6 +282,10 @@ class NewVocodesContainer extends React.Component<Props, State> {
                 textBuffer={this.props.textBuffer}
                 setTextBuffer={this.props.setTextBuffer}
                 clearTextBuffer={this.props.clearTextBuffer}
+                ttsModels={this.props.ttsModels}
+                setTtsModels={this.props.setTtsModels}
+                currentTtsModelSelected={this.props.currentTtsModelSelected}
+                setCurrentTtsModelSelected={this.props.setCurrentTtsModelSelected}
               />
             </Route>
 

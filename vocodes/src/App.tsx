@@ -14,6 +14,7 @@ import { W2lInferenceJob, W2lInferenceJobStateResponsePayload } from './jobs/W2l
 import { TtsModelUploadJob, TtsModelUploadJobStateResponsePayload } from './jobs/TtsModelUploadJobs';
 import { W2lTemplateUploadJob, W2lTemplateUploadJobStateResponsePayload } from './jobs/W2lTemplateUploadJobs';
 import { jobStateCanChange } from './jobs/JobStates';
+import { TtsModelListItem } from './v2/api/tts/ListTtsModels';
 
 enum MigrationMode {
   NEW_VOCODES,
@@ -45,6 +46,10 @@ interface State {
 
   // Current text entered
   textBuffer: string,
+
+  // List of voices (post-query) and current voice selected on main page
+  ttsModels: Array<TtsModelListItem>,
+  currentTtsModelSelected?: TtsModelListItem,
 }
 
 function newVocodes() {
@@ -74,6 +79,9 @@ class App extends React.Component<Props, State> {
       w2lTemplateUploadJobs: [],
 
       textBuffer: '',
+
+      ttsModels: [],
+      currentTtsModelSelected: undefined,
     }
   }
 
@@ -359,6 +367,14 @@ class App extends React.Component<Props, State> {
     this.setState({ textBuffer: '' });
   }
 
+  setTtsModels = (ttsModels: Array<TtsModelListItem>) => {
+    this.setState({ ttsModels: ttsModels });
+  }
+
+  setCurrentTtsModelSelected = (ttsModel: TtsModelListItem) => {
+    this.setState({ currentTtsModelSelected: ttsModel });
+  }
+
   public render() {
     if (this.state.migrationMode === MigrationMode.OLD_VOCODES) {
       return (
@@ -407,6 +423,12 @@ class App extends React.Component<Props, State> {
                     textBuffer={this.state.textBuffer}
                     setTextBuffer={this.setTextBuffer}
                     clearTextBuffer={this.clearTextBuffer}
+
+                    ttsModels={this.state.ttsModels}
+                    setTtsModels={this.setTtsModels}
+                    currentTtsModelSelected={this.state.currentTtsModelSelected}
+                    setCurrentTtsModelSelected={this.setCurrentTtsModelSelected}
+                    
                     />
                 </Route>
               </Switch>
