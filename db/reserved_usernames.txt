@@ -6,6 +6,8 @@
 # https://github.com/mvila/reserved-usernames
 
 # Stuff we care about
+fake_you
+fakeyou
 monogatari
 storied
 stories
