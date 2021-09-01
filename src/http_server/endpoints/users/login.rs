@@ -9,6 +9,7 @@ use crate::AnyhowResult;
 use crate::database::queries::create_session::create_session_for_user;
 use crate::http_server::web_utils::ip_address::get_request_ip;
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
+use crate::http_server::web_utils::serialize_as_json_error::serialize_as_json_error;
 use crate::server_state::ServerState;
 use derive_more::{Display, Error};
 use log::{info, warn, log};
@@ -17,6 +18,8 @@ use sqlx::MySqlPool;
 use sqlx::error::DatabaseError;
 use sqlx::error::Error::Database;
 use sqlx::mysql::MySqlDatabaseError;
+use std::fmt::Formatter;
+use std::fmt;
 use std::sync::Arc;
 
 #[derive(Deserialize)]
@@ -30,34 +33,60 @@ pub struct LoginSuccessResponse {
   pub success: bool,
 }
 
-#[derive(Debug, Display)]
-pub enum LoginError {
-  WrongCredentials,
+#[derive(Serialize, Debug)]
+pub struct LoginErrorResponse {
+  pub success: bool,
+  pub error_type: LoginErrorType,
+  pub error_message: String,
+}
+
+#[derive(Copy, Clone, Debug, Serialize)]
+pub enum LoginErrorType {
+  InvalidCredentials,
   ServerError,
 }
 
-impl ResponseError for LoginError {
+impl LoginErrorResponse {
+  fn invalid_credentials() -> Self {
+    Self {
+      success: false,
+      error_type: LoginErrorType::InvalidCredentials,
+      error_message: "invalid credentials".to_string()
+    }
+  }
+  fn server_error() -> Self {
+    Self {
+      success: false,
+      error_type: LoginErrorType::ServerError,
+      error_message: "server error".to_string()
+    }
+  }
+}
+
+// NB: Not using DeriveMore since Clion doesn't understand it.
+impl fmt::Display for LoginErrorResponse {
+  fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
+    write!(f, "{:?}", self.error_type)
+  }
+}
+
+impl ResponseError for LoginErrorResponse {
   fn status_code(&self) -> StatusCode {
-    match *self {
-      LoginError::WrongCredentials => StatusCode::BAD_REQUEST,
-      LoginError::ServerError=> StatusCode::INTERNAL_SERVER_ERROR,
+    match self.error_type {
+      LoginErrorType::InvalidCredentials => StatusCode::UNAUTHORIZED,
+      LoginErrorType::ServerError=> StatusCode::INTERNAL_SERVER_ERROR,
     }
   }
 
   fn error_response(&self) -> HttpResponse {
-    let error_reason = match self {
-      LoginError::WrongCredentials => "wrong credentials".to_string(),
-      LoginError::ServerError => "server error".to_string(),
-    };
-
-    to_simple_json_error(&error_reason, self.status_code())
+    serialize_as_json_error(self)
   }
 }
 
 pub async fn login_handler(
   http_request: HttpRequest,
   request: web::Json<LoginRequest>,
-  server_state: web::Data<Arc<ServerState>>) -> Result<HttpResponse, LoginError>
+  server_state: web::Data<Arc<ServerState>>) -> Result<HttpResponse, LoginErrorResponse>
 {
   let check_username_or_email = request.username_or_email.to_lowercase();
 
@@ -70,8 +99,10 @@ pub async fn login_handler(
   let user = match maybe_user {
     Ok(user) => user,
     Err(e) =>  {
+      // TODO: This isn't necessarily user error. I need to fix the above code to not lose error
+      //  semantics. I also need to prevent user lookup attacks.
       warn!("Login lookup error: {:?}", e);
-      return Err(LoginError::WrongCredentials); // TODO: This isn't necessarily user error.
+      return Err(LoginErrorResponse::invalid_credentials());
     }
   };
 
@@ -81,7 +112,7 @@ pub async fn login_handler(
     Ok(hash) => hash,
     Err(e) => {
       warn!("Login hash hydration error: {:?}", e);
-      return Err(LoginError::ServerError);
+      return Err(LoginErrorResponse::server_error());
     }
   };
 
@@ -89,12 +120,12 @@ pub async fn login_handler(
     Ok(is_valid) => {
       if !is_valid {
         info!("invalid credentials");
-        return Err(LoginError::WrongCredentials);
+        return Err(LoginErrorResponse::invalid_credentials());
       }
     },
     Err(e) => {
       warn!("Login hash comparison error: {:?}", e);
-      return Err(LoginError::ServerError);
+      return Err(LoginErrorResponse::server_error());
     }
   };
 
@@ -107,7 +138,7 @@ pub async fn login_handler(
     Ok(token) => token,
     Err(e) => {
       warn!("login create session error : {:?}", e);
-      return Err(LoginError::ServerError);
+      return Err(LoginErrorResponse::server_error());
     }
   };
 
@@ -115,7 +146,7 @@ pub async fn login_handler(
 
   let session_cookie = match server_state.cookie_manager.create_cookie(&session_token) {
     Ok(cookie) => cookie,
-    Err(_) => return Err(LoginError::ServerError),
+    Err(_) => return Err(LoginErrorResponse::server_error()),
   };
 
   let response = LoginSuccessResponse {
@@ -123,7 +154,7 @@ pub async fn login_handler(
   };
 
   let body = serde_json::to_string(&response)
-    .map_err(|e| LoginError::ServerError)?;
+    .map_err(|e| LoginErrorResponse::server_error())?;
 
   Ok(HttpResponse::Ok()
     .cookie(session_cookie)
