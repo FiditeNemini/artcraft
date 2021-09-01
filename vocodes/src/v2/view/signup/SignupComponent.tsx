@@ -6,6 +6,7 @@ import { Link } from 'react-router-dom';
 import { Mode } from '../../../AppMode';
 import { SessionWrapper } from '../../../session/SessionWrapper';
 import { UserIcon } from '../_icons/UserIcon';
+import { CreateAccount, CreateAccountIsError, CreateAccountIsSuccess } from '../../api/user/CreateAccount';
 
 enum FieldTriState {
   EMPTY_FALSE,
@@ -187,7 +188,7 @@ class SignupComponent extends React.Component<Props, State> {
     return false;
   }
 
-  handleFormSubmit = (ev: React.FormEvent<HTMLFormElement>) : boolean => {
+  handleFormSubmit = async (ev: React.FormEvent<HTMLFormElement>) : Promise<boolean> => {
     ev.preventDefault();
 
     if (!this.state.usernameValid || 
@@ -197,39 +198,37 @@ class SignupComponent extends React.Component<Props, State> {
         return false;
     }
 
-    const api = new ApiConfig();
-    const endpointUrl = api.createAccount();
-    
     const request = {
       username: this.state.username,
       email_address: this.state.email,
       password: this.state.password,
       password_confirmation: this.state.passwordConfirmation,
+    };
+
+    const response = await CreateAccount(request);
+
+    if (CreateAccountIsError(response)) {
+      if ('email_address' in response.error_fields) {
+        this.setState({
+          emailValid: FieldTriState.FALSE,
+          emailInvalidReason: response.error_fields['email_address'] || "",
+        })
+      }
+      if ('username' in response.error_fields) {
+        this.setState({
+          usernameValid: FieldTriState.FALSE,
+          usernameInvalidReason: response.error_fields['username'] || "",
+        })
+      }
     }
 
-    fetch(endpointUrl, {
-      method: 'POST',
-      headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json',
-      },
-      credentials: 'include',
-      body: JSON.stringify(request),
-    })
-    .then(res => res.json())
-    .then(res => {
-      console.log('create account response', res)
-      if (res.success) {
-        console.log('querying new session');
-        this.props.querySessionCallback();
+    if (CreateAccountIsSuccess(response)) {
+      console.log('querying new session');
+      this.props.querySessionCallback();
 
-        // TODO: Switch to functional component.
-        window.location.href = '/';
-      }
-    })
-    .catch(e => {
-      //this.props.onSpeakErrorCallback();
-    });
+      // TODO: Switch to functional component.
+      window.location.href = '/';
+    }
 
     return false;
   }

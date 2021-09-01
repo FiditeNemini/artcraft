@@ -38,7 +38,6 @@ export interface ProfileBadge {
   granted_at: string,
 }
 
-
 export async function GetUserByUsername(username: string) : Promise<User | undefined> {
   const usernameLower = username.toLowerCase(); // NB: Until I standardize on display name vs username lookup.
   const endpoint = new ApiConfig().getProfile(usernameLower);
