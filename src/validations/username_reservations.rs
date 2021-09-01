@@ -27,8 +27,10 @@ fn is_reserved_substring(username: &str) -> bool {
       .collect::<Vec<String>>();
   }
 
+  let undashed = username.replace("_", "").replace("-", "");
+
   for substr in RESERVED_SUBSTRINGS_LIST.iter() {
-    if username.contains(substr) {
+    if username.contains(substr) || undashed.contains(substr) {
       return true;
     }
   }
@@ -60,5 +62,11 @@ mod tests {
     assert_eq!(is_reserved_username("12345test"), true);
     assert_eq!(is_reserved_username("test"), true);
     assert_eq!(is_reserved_username("111vocodes111"), true);
+  }
+
+  #[test]
+  fn reserved_substrings_with_dashes() {
+    assert_eq!(is_reserved_username("t_e_s_t"), true);
+    assert_eq!(is_reserved_username("-vo-co-de-s--"), true);
   }
 }
