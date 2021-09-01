@@ -1,4 +1,3 @@
-
 import { ApiConfig } from "../../../common/ApiConfig";
 
 export interface CreateAccountRequest {

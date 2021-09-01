@@ -4,12 +4,7 @@ import { useHistory } from "react-router-dom";
 import { ApiConfig } from '../../../common/ApiConfig';
 import { UserIcon } from '../_icons/UserIcon';
 import { EnvelopeIcon } from '../_icons/EnvelopeIcon';
-
-//enum FieldTriState {
-//  EMPTY_FALSE,
-//  FALSE,
-//  TRUE,
-//}
+import { CreateSession, CreateSessionIsError, CreateSessionIsSuccess } from '../../api/user/CreateSession';
 
 interface Props {
   sessionWrapper: SessionWrapper,
@@ -21,8 +16,7 @@ function LoginFc(props: Props) {
 
   const [password, setPassword] = useState('')
   const [usernameOrEmail, setUsernameOrEmail] = useState('')
-  //const [usernameOrEmailValid, setUsernameOrEmailValid] = useState(FieldTriState.EMPTY_FALSE)
-  //const [usernameOrEmailInvalidReason, setUsernameOrEmailInvalidReason] = useState('')
+  const [errorMessage, setErrorMessage] = useState('')
 
   if (props.sessionWrapper.isLoggedIn()) {
     history.push('/');
@@ -32,6 +26,7 @@ function LoginFc(props: Props) {
     ev.preventDefault();
     const usernameOrEmailValue  = (ev.target as HTMLInputElement).value;
     setUsernameOrEmail(usernameOrEmailValue);
+    setErrorMessage("");
     return false;
   };
 
@@ -39,10 +34,11 @@ function LoginFc(props: Props) {
     ev.preventDefault();
     const passwordValue = (ev.target as HTMLInputElement).value;
     setPassword(passwordValue);
+    setErrorMessage("");
     return false;
   };
 
-  const handleFormSubmit = (ev: React.FormEvent<HTMLFormElement>) : boolean => {
+  const handleFormSubmit = async (ev: React.FormEvent<HTMLFormElement>) : Promise<boolean> => {
     ev.preventDefault();
 
     const api = new ApiConfig();
@@ -53,35 +49,34 @@ function LoginFc(props: Props) {
       password: password,
     }
 
-    fetch(endpointUrl, {
-      method: 'POST',
-      headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json',
-      },
-      credentials: 'include',
-      body: JSON.stringify(request),
-    })
-    .then(res => res.json())
-    .then(res => {
-      console.log('login response', res)
-      if (res.success) {
-        console.log('querying new session');
-        props.querySessionAction();
-        history.push('/');
-      }
-    })
-    //.catch(e => {
-    //});
+
+    const response = await CreateSession(request);
+
+    if (CreateSessionIsError(response)) {
+      setErrorMessage(response.error_message);
+    } else if (CreateSessionIsSuccess(response)) {
+      console.log('querying new session');
+      props.querySessionAction();
+      history.push('/');
+    }
 
     return false;
+  }
+
+  let errorWarning = <span />
+  if (errorMessage) {
+    errorWarning = (
+      <div className="notification is-danger is-light">
+        <strong>Login Error:</strong> {errorMessage}
+      </div>
+    )
   }
 
   return (
     <div>
       <h1 className="title is-1"> Login </h1>
 
-      <p></p>
+      {errorWarning}
 
       <form onSubmit={handleFormSubmit}>
         <div className="field">
