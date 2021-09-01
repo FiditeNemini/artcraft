@@ -11,8 +11,8 @@ Local development
 See this spreadsheet for previous battles with version incompatibility:
 https://docs.google.com/spreadsheets/d/1BEdLmwOzo3r83-iJn9sj6co1VT92t3lIeJ-lNH25bdQ/edit#gid=0
 
-Ubuntu might upgrade the driver by accident, and it might need reinstallation. Who knows. This stuff
-is a nightmare.
+Ubuntu might upgrade the driver by accident, and it might need reinstallation. Who knows. 
+This stuff is a nightmare.
 
 ### Database Setup
 
