@@ -1,5 +1,4 @@
 import React from 'react';
-import { ApiConfig } from '../../../common/ApiConfig';
 import { AsteriskIcon } from '../_icons/AsteriskIcon';
 import { EnvelopeIcon } from '../_icons/EnvelopeIcon';
 import { Link } from 'react-router-dom';
@@ -220,9 +219,7 @@ class SignupComponent extends React.Component<Props, State> {
           usernameInvalidReason: response.error_fields['username'] || "",
         })
       }
-    }
-
-    if (CreateAccountIsSuccess(response)) {
+    } else if (CreateAccountIsSuccess(response)) {
       console.log('querying new session');
       this.props.querySessionCallback();
 

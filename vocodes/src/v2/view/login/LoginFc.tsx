@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { SessionWrapper } from '../../../session/SessionWrapper';
 import { useHistory } from "react-router-dom";
-import { ApiConfig } from '../../../common/ApiConfig';
 import { UserIcon } from '../_icons/UserIcon';
 import { EnvelopeIcon } from '../_icons/EnvelopeIcon';
 import { CreateSession, CreateSessionIsError, CreateSessionIsSuccess } from '../../api/user/CreateSession';
@@ -41,14 +40,10 @@ function LoginFc(props: Props) {
   const handleFormSubmit = async (ev: React.FormEvent<HTMLFormElement>) : Promise<boolean> => {
     ev.preventDefault();
 
-    const api = new ApiConfig();
-    const endpointUrl = api.login();
-    
     const request = {
       username_or_email: usernameOrEmail,
       password: password,
     }
-
 
     const response = await CreateSession(request);
 
