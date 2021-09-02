@@ -1,0 +1,176 @@
+use actix_http::Error;
+use actix_http::http::header;
+use actix_web::cookie::Cookie;
+use actix_web::dev::HttpResponseBuilder;
+use actix_web::error::ResponseError;
+use actix_web::http::StatusCode;
+use actix_web::{Responder, web, HttpResponse, error, HttpRequest};
+use crate::database::queries::query_user_profile::select_user_profile_by_username;
+use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
+use crate::http_server::web_utils::response_success_helpers::simple_json_success;
+use crate::http_server::web_utils::serialize_as_json_error::serialize_as_json_error;
+use crate::server_state::ServerState;
+use derive_more::{Display, Error};
+use log::{info, warn, log};
+use regex::Regex;
+use sqlx::error::DatabaseError;
+use sqlx::error::Error::Database;
+use sqlx::mysql::MySqlDatabaseError;
+use std::fmt;
+use std::sync::Arc;
+
+#[derive(Deserialize)]
+pub struct BanUserRequest {
+  pub maybe_user_token: Option<String>,
+  pub maybe_username: Option<String>,
+  pub mod_notes: String,
+  pub is_banned: bool,
+}
+
+#[derive(Serialize)]
+pub struct BanUserSuccessResponse {
+  pub success: bool,
+}
+
+#[derive(Serialize, Debug)]
+pub struct BanUserErrorResponse {
+  pub success: bool,
+  pub error_type: BanUserErrorType,
+  pub error_message: String,
+}
+
+#[derive(Copy, Clone, Debug, Serialize)]
+pub enum BanUserErrorType {
+  BadInput,
+  ServerError,
+  Unauthorized,
+  UserNotFound,
+}
+
+impl BanUserErrorResponse {
+  fn unauthorized() -> Self {
+    Self {
+      success: false,
+      error_type: BanUserErrorType::Unauthorized,
+      error_message: "unauthorized".to_string()
+    }
+  }
+  fn server_error() -> Self {
+    Self {
+      success: false,
+      error_type: BanUserErrorType::ServerError,
+      error_message: "server error".to_string()
+    }
+  }
+  fn bad_request(error_message: &str) -> Self {
+    Self {
+      success: false,
+      error_type: BanUserErrorType::BadInput,
+      error_message: error_message.to_string()
+    }
+  }
+}
+
+impl ResponseError for BanUserErrorResponse {
+  fn status_code(&self) -> StatusCode {
+    match self.error_type {
+      BanUserErrorType::BadInput => StatusCode::BAD_REQUEST,
+      BanUserErrorType::ServerError => StatusCode::INTERNAL_SERVER_ERROR,
+      BanUserErrorType::Unauthorized => StatusCode::UNAUTHORIZED,
+      BanUserErrorType::UserNotFound => StatusCode::NOT_FOUND,
+    }
+  }
+
+  fn error_response(&self) -> HttpResponse {
+    serialize_as_json_error(self)
+  }
+}
+
+// NB: Not using DeriveMore since Clion doesn't understand it.
+impl fmt::Display for BanUserErrorResponse {
+  fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+    write!(f, "{:?}", self.error_type)
+  }
+}
+
+pub async fn ban_user_handler(
+  http_request: HttpRequest,
+  request: web::Json<BanUserRequest>,
+  server_state: web::Data<Arc<ServerState>>
+) -> Result<HttpResponse, BanUserErrorResponse> {
+
+  let maybe_user_session = server_state
+      .session_checker
+      .maybe_get_user_session(&http_request, &server_state.mysql_pool)
+      .await
+      .map_err(|e| {
+        warn!("Session checker error: {:?}", e);
+        BanUserErrorResponse::server_error()
+      })?;
+
+  let user_session = match maybe_user_session {
+    Some(session) => session,
+    None => {
+      warn!("not logged in");
+      return Err(BanUserErrorResponse::unauthorized());
+    }
+  };
+
+  if !user_session.can_ban_users {
+    warn!("user is not allowed to add bans: {}", user_session.user_token);
+    return Err(BanUserErrorResponse::unauthorized());
+  }
+
+  if request.maybe_username.is_some() && request.maybe_user_token.is_some() {
+    warn!("can't use both username and user token for lookup");
+    return Err(BanUserErrorResponse::bad_request("can't use both username and user token for lookup"));
+  }
+
+  let bannable_user_token= if let Some(username) = request.maybe_username.as_deref() {
+    let username_lower = username.to_lowercase();
+
+    // TODO: API should return optional.
+    let maybe_user_profile = select_user_profile_by_username(
+      &username_lower,
+      &server_state.mysql_pool).await;
+
+    // TODO: Error isn't exactly correct! Could be server error or missing.
+    let user_profile = maybe_user_profile
+        .map_err(|e| BanUserErrorResponse::server_error())?;
+
+    user_profile.user_token
+  } else {
+    // TODO: Implement lookup by token.
+    return Err(BanUserErrorResponse::bad_request("lookup by token not yet supported"));
+  };
+
+  let query_result = sqlx::query!(
+        r#"
+UPDATE users
+SET
+    is_banned = ?,
+    maybe_mod_comments = ?,
+    maybe_mod_user_token  = ?,
+    version = version + 1
+
+WHERE users.token = ?
+LIMIT 1
+        "#,
+      &request.is_banned,
+      &request.mod_notes,
+      &user_session.user_token,
+      bannable_user_token
+    )
+    .execute(&server_state.mysql_pool)
+    .await;
+
+  match query_result {
+    Ok(_) => {},
+    Err(err) => {
+      warn!("Add IP ban DB error: {:?}", err);
+      return Err(BanUserErrorResponse::server_error());
+    }
+  };
+
+  Ok(simple_json_success())
+}

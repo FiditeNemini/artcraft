@@ -41,6 +41,8 @@ use crate::http_server::endpoints::moderation::ip_bans::add_ip_ban::add_ip_ban_h
 use crate::http_server::endpoints::moderation::ip_bans::delete_ip_ban::delete_ip_ban_handler;
 use crate::http_server::endpoints::moderation::ip_bans::get_ip_ban::get_ip_ban_handler;
 use crate::http_server::endpoints::moderation::ip_bans::list_ip_bans::list_ip_bans_handler;
+use crate::http_server::endpoints::moderation::user_bans::ban_user::ban_user_handler;
+use crate::http_server::endpoints::moderation::user_bans::list_banned_users::list_banned_users_handler;
 use crate::http_server::endpoints::moderation::user_roles::list_roles::list_user_roles_handler;
 use crate::http_server::endpoints::moderation::user_roles::list_staff::list_staff_handler;
 use crate::http_server::endpoints::moderation::user_roles::set_user_role::set_user_role_handler;
@@ -377,6 +379,19 @@ pub async fn serve(server_state: ServerState) -> AnyhowResult<()>
                       .route(web::head().to(|| HttpResponse::Ok()))
                 )
           )
+          .service(
+            web::scope("/user_bans")
+                .service(
+                  web::resource("/list")
+                      .route(web::get().to(list_banned_users_handler))
+                      .route(web::head().to(|| HttpResponse::Ok()))
+                )
+                .service(
+                  web::resource("/manage_ban")
+                      .route(web::post().to(ban_user_handler))
+                      .route(web::head().to(|| HttpResponse::Ok()))
+                )
+            )
           .service(
             web::scope("/roles")
                 .service(
