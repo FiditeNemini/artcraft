@@ -27,11 +27,6 @@ use std::sync::Arc;
 
 // TODO: This is duplicated in query_user_profile
 
-
-/// This changes the record:
-///  - changes banned to bool
-///  - changes hide_results_preference to bool
-///  - changes disable_gravatar to bool
 #[derive(Serialize)]
 pub struct UserProfileRecordForResponse {
   pub user_token: String,
@@ -41,7 +36,6 @@ pub struct UserProfileRecordForResponse {
   pub profile_markdown: String,
   pub profile_rendered_html: String,
   pub user_role_slug: String,
-  pub is_banned: bool,
   pub disable_gravatar: bool,
   pub preferred_tts_result_visibility: RecordVisibility,
   pub preferred_w2l_result_visibility: RecordVisibility,
@@ -54,6 +48,14 @@ pub struct UserProfileRecordForResponse {
   pub website_url: Option<String>,
   pub badges: Vec<UserBadgeForList>,
   pub created_at: DateTime<Utc>,
+  pub maybe_moderator_fields: Option<UserProfileModeratorFields>,
+}
+
+#[derive(Serialize)]
+pub struct UserProfileModeratorFields {
+  pub is_banned: bool,
+  pub maybe_mod_comments: Option<String>,
+  pub maybe_mod_user_token: Option<String>,
 }
 
 #[derive(Serialize)]
@@ -71,7 +73,6 @@ pub struct RawUserProfileRecord {
   pub profile_markdown: String,
   pub profile_rendered_html: String,
   pub user_role_slug: String,
-  pub is_banned: i8,
   pub disable_gravatar: i8,
   pub preferred_tts_result_visibility: RecordVisibility,
   pub preferred_w2l_result_visibility: RecordVisibility,
@@ -82,6 +83,9 @@ pub struct RawUserProfileRecord {
   pub github_username: Option<String>,
   pub cashapp_username: Option<String>,
   pub website_url: Option<String>,
+  pub is_banned: i8,
+  pub maybe_mod_comments: Option<String>,
+  pub maybe_mod_user_token: Option<String>,
   pub created_at: DateTime<Utc>,
 }
 
@@ -120,6 +124,21 @@ pub async fn get_profile_handler(
   path: Path<GetProfilePathInfo>,
   server_state: web::Data<Arc<ServerState>>) -> Result<HttpResponse, ProfileError>
 {
+  let maybe_user_session = server_state
+      .session_checker
+      .maybe_get_user_session(&http_request, &server_state.mysql_pool)
+      .await
+      .map_err(|e| {
+        warn!("Session checker error: {:?}", e);
+        ProfileError::ServerError
+      })?;
+
+  let mut is_mod = false;
+
+  if let Some(user_session) = &maybe_user_session {
+    is_mod = user_session.can_ban_users;
+  }
+
   // NB: Lookup failure is Err(RowNotFound).
   // NB: Since this is publicly exposed, we don't query sensitive data.
   let maybe_profile_record = sqlx::query_as!(
@@ -133,7 +152,6 @@ SELECT
     profile_markdown,
     profile_rendered_html,
     user_role_slug,
-    is_banned,
     disable_gravatar,
     preferred_tts_result_visibility as `preferred_tts_result_visibility: crate::database::enums::record_visibility::RecordVisibility`,
     preferred_w2l_result_visibility as `preferred_w2l_result_visibility: crate::database::enums::record_visibility::RecordVisibility`,
@@ -144,6 +162,9 @@ SELECT
     github_username,
     cashapp_username,
     website_url,
+    is_banned,
+    maybe_mod_comments,
+    maybe_mod_user_token,
     created_at
 FROM users
 WHERE
@@ -179,6 +200,16 @@ WHERE
         return Vec::new(); // NB: Fine if this fails. Not sure why it would.
       });
 
+  let maybe_mod_fields = if is_mod {
+    Some(UserProfileModeratorFields {
+      is_banned: i8_to_bool(profile_record.is_banned),
+      maybe_mod_comments: profile_record.maybe_mod_comments.clone(),
+      maybe_mod_user_token: profile_record.maybe_mod_user_token.clone(),
+    })
+  } else {
+    None
+  };
+
   let profile_for_response = UserProfileRecordForResponse {
     user_token: profile_record.user_token.clone(),
     username: profile_record.username.clone(),
@@ -187,7 +218,6 @@ WHERE
     profile_markdown: profile_record.profile_markdown.clone(),
     profile_rendered_html: profile_record.profile_rendered_html.clone(),
     user_role_slug: profile_record.user_role_slug.clone(),
-    is_banned: i8_to_bool(profile_record.is_banned),
     disable_gravatar: i8_to_bool(profile_record.disable_gravatar),
     preferred_tts_result_visibility: profile_record.preferred_tts_result_visibility,
     preferred_w2l_result_visibility: profile_record.preferred_w2l_result_visibility,
@@ -198,6 +228,7 @@ WHERE
     github_username: profile_record.github_username.clone(),
     cashapp_username: profile_record.cashapp_username.clone(),
     website_url: profile_record.website_url.clone(),
+    maybe_moderator_fields: maybe_mod_fields,
     created_at: profile_record.created_at.clone(),
     badges,
   };
