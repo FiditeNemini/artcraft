@@ -21,8 +21,7 @@ use std::sync::Arc;
 
 #[derive(Deserialize)]
 pub struct BanUserRequest {
-  pub maybe_user_token: Option<String>,
-  pub maybe_username: Option<String>,
+  pub username: String,
   pub mod_notes: String,
   pub is_banned: bool,
 }
@@ -41,7 +40,6 @@ pub struct BanUserErrorResponse {
 
 #[derive(Copy, Clone, Debug, Serialize)]
 pub enum BanUserErrorType {
-  BadInput,
   ServerError,
   Unauthorized,
   UserNotFound,
@@ -62,13 +60,6 @@ impl BanUserErrorResponse {
       error_message: "server error".to_string()
     }
   }
-  fn bad_request(error_message: &str) -> Self {
-    Self {
-      success: false,
-      error_type: BanUserErrorType::BadInput,
-      error_message: error_message.to_string()
-    }
-  }
   fn not_found() -> Self {
     Self {
       success: false,
@@ -81,7 +72,6 @@ impl BanUserErrorResponse {
 impl ResponseError for BanUserErrorResponse {
   fn status_code(&self) -> StatusCode {
     match self.error_type {
-      BanUserErrorType::BadInput => StatusCode::BAD_REQUEST,
       BanUserErrorType::ServerError => StatusCode::INTERNAL_SERVER_ERROR,
       BanUserErrorType::Unauthorized => StatusCode::UNAUTHORIZED,
       BanUserErrorType::UserNotFound => StatusCode::NOT_FOUND,
@@ -128,30 +118,18 @@ pub async fn ban_user_handler(
     return Err(BanUserErrorResponse::unauthorized());
   }
 
-  if request.maybe_username.is_some() && request.maybe_user_token.is_some() {
-    warn!("can't use both username and user token for lookup");
-    return Err(BanUserErrorResponse::bad_request("can't use both username and user token for lookup"));
-  }
+  let username_lower = request.username.to_lowercase();
 
-  let bannable_user_token= if let Some(username) = request.maybe_username.as_deref() {
-    let username_lower = username.to_lowercase();
+  let user_lookup_result = get_user_profile_by_username(
+    &username_lower, &server_state.mysql_pool).await;
 
-    let user_lookup_result = get_user_profile_by_username(
-      &username_lower, &server_state.mysql_pool).await;
-
-    let user_profile = match user_lookup_result {
-      Ok(Some(result)) => result,
-      Ok(None) => return Err(BanUserErrorResponse::not_found()),
-      Err(err) => {
-        warn!("lookup error: {:?}", err);
-        return Err(BanUserErrorResponse::server_error());
-      }
-    };
-
-    user_profile.user_token
-  } else {
-    // TODO: Implement lookup by token.
-    return Err(BanUserErrorResponse::bad_request("lookup by token not yet supported"));
+  let user_profile = match user_lookup_result {
+    Ok(Some(result)) => result,
+    Ok(None) => return Err(BanUserErrorResponse::not_found()),
+    Err(err) => {
+      warn!("lookup error: {:?}", err);
+      return Err(BanUserErrorResponse::server_error());
+    }
   };
 
   let query_result = sqlx::query!(
@@ -169,7 +147,7 @@ LIMIT 1
       &request.is_banned,
       &request.mod_notes,
       &user_session.user_token,
-      bannable_user_token
+      &user_profile.user_token
     )
     .execute(&server_state.mysql_pool)
     .await;
