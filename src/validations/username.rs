@@ -4,7 +4,7 @@ use regex::Regex;
 pub fn validate_username(username: &str) -> Result<(), String> {
   lazy_static! {
     static ref USERNAME_REGEX: Regex = {
-      Regex::new(r"^[A-Za-z0-9]{3,16}$").expect("should be valid regex")
+      Regex::new(r"^[A-Za-z0-9_\-]{3,16}$").expect("should be valid regex")
     };
   }
 
@@ -17,7 +17,7 @@ pub fn validate_username(username: &str) -> Result<(), String> {
   }
 
   if !USERNAME_REGEX.is_match(username) {
-    return Err("invalid username".to_string());
+    return Err("invalid username characters".to_string());
   }
 
   Ok(())
@@ -44,3 +44,24 @@ pub fn validate_username(username: &str) -> Result<(), String> {
 
   Ok(())
 }*/
+
+#[cfg(test)]
+mod tests {
+  use crate::validations::username::validate_username;
+
+  #[test]
+  fn test_valid_usernames() {
+    assert!(validate_username("echelon").is_ok());
+    assert!(validate_username("dr_mario").is_ok());
+    assert!(validate_username("Foo1234").is_ok());
+    assert!(validate_username("mr-person").is_ok());
+  }
+
+  #[test]
+  fn test_invalid_usernames() {
+    assert!(validate_username("").is_err());
+    assert!(validate_username("&&&&").is_err());
+    assert!(validate_username("........").is_err());
+    assert!(validate_username("really-long-username-that-is-too-long").is_err());
+  }
+}
