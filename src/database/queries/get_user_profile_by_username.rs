@@ -15,30 +15,7 @@ use std::sync::Arc;
 // TODO: This duplicates the get_profile_handler.
 
 #[derive(Serialize)]
-pub struct RawUserProfileRecord {
-  pub user_token: String,
-  pub username: String,
-  pub email_gravatar_hash: String,
-  pub display_name: String,
-  pub profile_markdown: String,
-  pub profile_rendered_html: String,
-  pub user_role_slug: String,
-  pub is_banned: i8,
-  pub disable_gravatar: i8,
-  pub discord_username: Option<String>,
-  pub twitch_username: Option<String>,
-  pub twitter_username: Option<String>,
-  pub patreon_username: Option<String>,
-  pub github_username: Option<String>,
-  pub created_at: DateTime<Utc>,
-}
-
-/// This changes the record:
-///  - changes banned to bool
-///  - changes hide_results_preference to bool
-///  - changes disable_gravatar to bool
-#[derive(Serialize)]
-pub struct UserProfileRecordForResponse {
+pub struct UserProfileResult {
   pub user_token: String,
   pub username: String,
   pub display_name: String,
@@ -56,11 +33,29 @@ pub struct UserProfileRecordForResponse {
   pub created_at: DateTime<Utc>,
 }
 
-pub async fn select_user_profile_by_username(
+#[derive(Serialize)]
+struct RawUserProfileRecord {
+  pub user_token: String,
+  pub username: String,
+  pub email_gravatar_hash: String,
+  pub display_name: String,
+  pub profile_markdown: String,
+  pub profile_rendered_html: String,
+  pub user_role_slug: String,
+  pub is_banned: i8,
+  pub disable_gravatar: i8,
+  pub discord_username: Option<String>,
+  pub twitch_username: Option<String>,
+  pub twitter_username: Option<String>,
+  pub patreon_username: Option<String>,
+  pub github_username: Option<String>,
+  pub created_at: DateTime<Utc>,
+}
+
+pub async fn get_user_profile_by_username(
   username: &str,
   mysql_pool: &MySqlPool
-) -> AnyhowResult<UserProfileRecordForResponse> {
-  // NB: Lookup failure is Err(RowNotFound).
+) -> AnyhowResult<Option<UserProfileResult>> {
   let maybe_profile_record = sqlx::query_as!(
       RawUserProfileRecord,
         r#"
@@ -89,25 +84,24 @@ WHERE
         username,
     )
       .fetch_one(mysql_pool)
-      .await; // TODO: This will return error if it doesn't exist
+      .await;
 
   let profile_record : RawUserProfileRecord = match maybe_profile_record {
     Ok(profile_record) => profile_record,
     Err(err) => {
-      match err {
+      return match err {
         RowNotFound => {
-          warn!("Invalid user");
-          return Err(anyhow!("could not find user"));
+          Ok(None)
         },
         _ => {
           warn!("User profile query error: {:?}", err);
-          return Err(anyhow!("query error"));
+          Err(anyhow!("query error"))
         }
       }
     }
   };
 
-  let profile_for_response = UserProfileRecordForResponse {
+  let profile_for_response = UserProfileResult {
     user_token: profile_record.user_token.clone(),
     username: profile_record.username.clone(),
     display_name: profile_record.display_name.clone(),
@@ -116,7 +110,7 @@ WHERE
     profile_rendered_html: profile_record.profile_rendered_html.clone(),
     user_role_slug: profile_record.user_role_slug.clone(),
     is_banned: i8_to_bool(profile_record.is_banned),
-    disable_gravatar: if profile_record.disable_gravatar == 0 { false } else { true },
+    disable_gravatar: i8_to_bool(profile_record.disable_gravatar),
     discord_username: profile_record.discord_username.clone(),
     twitch_username: profile_record.twitch_username.clone(),
     twitter_username: profile_record.twitter_username.clone(),
@@ -125,5 +119,5 @@ WHERE
     created_at: profile_record.created_at.clone(),
   };
 
-  Ok(profile_for_response)
+  Ok(Some(profile_for_response))
 }

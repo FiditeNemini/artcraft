@@ -8,7 +8,7 @@ use actix_web::web::Path;
 use actix_web::{Responder, web, HttpResponse, error, HttpRequest};
 use crate::database::enums::record_visibility::RecordVisibility;
 use crate::database::queries::create_session::create_session_for_user;
-use crate::database::queries::query_user_profile::select_user_profile_by_username;
+use crate::database::queries::get_user_profile_by_username::get_user_profile_by_username;
 use crate::http_server::web_utils::ip_address::get_request_ip;
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 use crate::server_state::ServerState;
@@ -117,17 +117,15 @@ pub async fn edit_profile_handler(
   };
 
   let user_lookup_result =
-      select_user_profile_by_username(&path.username, &server_state.mysql_pool)
+      get_user_profile_by_username(&path.username, &server_state.mysql_pool)
       .await;
 
   let user_record = match user_lookup_result {
-    Ok(result) => {
-      info!("Found user: {}", result.username);
-      result
-    }
+    Ok(Some(result)) => result,
+    Ok(None) => return Err(EditProfileError::UserNotFound),
     Err(err) => {
-      warn!("could not find user");
-      return Err(EditProfileError::UserNotFound);
+      warn!("lookup error: {:?}", err);
+      return Err(EditProfileError::ServerError);
     }
   };
 

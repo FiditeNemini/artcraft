@@ -13,6 +13,6 @@ pub mod list_w2l_inference_results;
 pub mod list_w2l_templates;
 pub mod query_tts_model;
 pub mod query_tts_result;
-pub mod query_user_profile;
+pub mod get_user_profile_by_username;
 pub mod query_w2l_result;
 pub mod query_w2l_template;

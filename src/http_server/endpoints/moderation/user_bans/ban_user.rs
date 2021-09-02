@@ -5,7 +5,7 @@ use actix_web::dev::HttpResponseBuilder;
 use actix_web::error::ResponseError;
 use actix_web::http::StatusCode;
 use actix_web::{Responder, web, HttpResponse, error, HttpRequest};
-use crate::database::queries::query_user_profile::select_user_profile_by_username;
+use crate::database::queries::get_user_profile_by_username::get_user_profile_by_username;
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 use crate::http_server::web_utils::response_success_helpers::simple_json_success;
 use crate::http_server::web_utils::serialize_as_json_error::serialize_as_json_error;
@@ -69,6 +69,13 @@ impl BanUserErrorResponse {
       error_message: error_message.to_string()
     }
   }
+  fn not_found() -> Self {
+    Self {
+      success: false,
+      error_type: BanUserErrorType::UserNotFound,
+      error_message: "user not found".to_string()
+    }
+  }
 }
 
 impl ResponseError for BanUserErrorResponse {
@@ -129,14 +136,17 @@ pub async fn ban_user_handler(
   let bannable_user_token= if let Some(username) = request.maybe_username.as_deref() {
     let username_lower = username.to_lowercase();
 
-    // TODO: API should return optional.
-    let maybe_user_profile = select_user_profile_by_username(
-      &username_lower,
-      &server_state.mysql_pool).await;
+    let user_lookup_result = get_user_profile_by_username(
+      &username_lower, &server_state.mysql_pool).await;
 
-    // TODO: Error isn't exactly correct! Could be server error or missing.
-    let user_profile = maybe_user_profile
-        .map_err(|e| BanUserErrorResponse::server_error())?;
+    let user_profile = match user_lookup_result {
+      Ok(Some(result)) => result,
+      Ok(None) => return Err(BanUserErrorResponse::not_found()),
+      Err(err) => {
+        warn!("lookup error: {:?}", err);
+        return Err(BanUserErrorResponse::server_error());
+      }
+    };
 
     user_profile.user_token
   } else {

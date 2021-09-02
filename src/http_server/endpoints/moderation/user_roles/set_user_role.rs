@@ -8,7 +8,7 @@ use actix_web::web::Path;
 use actix_web::{Responder, web, HttpResponse, error, HttpRequest};
 use crate::database::helpers::enums::{DownloadUrlType, CreatorSetVisibility, W2lTemplateType};
 use crate::database::queries::list_user_roles::list_user_roles;
-use crate::database::queries::query_user_profile::select_user_profile_by_username;
+use crate::database::queries::get_user_profile_by_username::get_user_profile_by_username;
 use crate::http_server::web_utils::ip_address::get_request_ip;
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 use crate::http_server::web_utils::response_success_helpers::simple_json_success;
@@ -111,13 +111,17 @@ pub async fn set_user_role_handler(
     return Err(SetUserRoleError::BadInput("invalid user role".to_string()));
   }
 
-  // TODO: Error *and* NotFound should be possible.
-  let target_user = select_user_profile_by_username(&path.username, &server_state.mysql_pool)
-      .await
-      .map_err(|err| {
-        warn!("error listing roles: {:?}", err);
-        return SetUserRoleError::ServerError;
-      })?;
+  let user_lookup_result =
+      get_user_profile_by_username(&path.username, &server_state.mysql_pool).await;
+
+  let target_user = match user_lookup_result {
+    Ok(Some(result)) => result,
+    Ok(None) => return Err(SetUserRoleError::NotFound),
+    Err(err) => {
+      warn!("lookup error: {:?}", err);
+      return Err(SetUserRoleError::ServerError);
+    }
+  };
 
   let query_result = sqlx::query!(
         r#"
