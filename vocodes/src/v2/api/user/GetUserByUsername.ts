@@ -14,7 +14,6 @@ export interface User {
   profile_markdown: string,
   profile_rendered_html: string,
   user_role_slug: string,
-  banned: boolean,
   dark_mode: string,
   avatar_public_bucket_hash: string,
   disable_gravatar: boolean,
@@ -28,6 +27,7 @@ export interface User {
   cashapp_username: string | undefined | null,
   created_at: string,
   badges: ProfileBadge[],
+  maybe_moderator_fields: UserProfileModeratorFields | null | undefined,
 }
 
 export interface ProfileBadge {
@@ -37,6 +37,13 @@ export interface ProfileBadge {
   image_url: string,
   granted_at: string,
 }
+
+export interface UserProfileModeratorFields {
+  is_banned: boolean,
+  maybe_mod_comments: string | null | undefined,
+  maybe_mod_user_token: string | null | undefined,
+}
+
 
 export async function GetUserByUsername(username: string) : Promise<User | undefined> {
   const usernameLower = username.toLowerCase(); // NB: Until I standardize on display name vs username lookup.

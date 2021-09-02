@@ -36,6 +36,7 @@ import { W2lResultDeleteFc } from './w2l/w2l_result_delete/W2lResultDeleteFc';
 import { W2lTemplateApproveFc } from './w2l/w2l_template_approve/W2lTemplateApproveFc';
 import { TtsModelListFc } from './tts/tts_model_list/TtsModelListFc';
 import { TtsModelListItem } from '../api/tts/ListTtsModels';
+import { ProfileBanFc } from './profile/profile_ban/ProfileBanFc';
 
 interface Props {
   sessionWrapper: SessionWrapper,
@@ -107,6 +108,12 @@ class NewVocodesContainer extends React.Component<Props, State> {
                 <ProfileEditFc
                   sessionWrapper={this.props.sessionWrapper}
                 />
+            </Route>
+
+            <Route path="/profile/:username/ban">
+              <ProfileBanFc
+                sessionWrapper={this.props.sessionWrapper}
+              />
             </Route>
 
             <Route path="/profile/:username">

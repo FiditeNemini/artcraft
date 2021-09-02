@@ -71,6 +71,14 @@ class FrontendUrlConfig {
   static userProfilePage(userDisplayName: string) : string {
     return `/profile/${userDisplayName}`;
   }
+
+  static userProfileEditPage(userDisplayName: string) : string {
+    return `/profile/${userDisplayName}/edit`;
+  }
+
+  static userProfileBanPage(userDisplayName: string) : string {
+    return `/profile/${userDisplayName}/ban`;
+  }
 }
 
 export { FrontendUrlConfig }

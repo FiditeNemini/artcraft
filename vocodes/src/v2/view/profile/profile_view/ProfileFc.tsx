@@ -12,6 +12,7 @@ import { faDiscord, faFirefox, faGithub, faTwitch, faTwitter } from '@fortawesom
 import { faClock, faDollarSign } from '@fortawesome/free-solid-svg-icons';
 import { GetUserByUsername, User } from '../../../api/user/GetUserByUsername';
 import { format } from 'date-fns';
+import { FrontendUrlConfig } from '../../../../common/FrontendUrlConfig';
 
 interface Props {
   sessionWrapper: SessionWrapper,
@@ -43,7 +44,7 @@ function ProfileFc(props: Props) {
   let editProfileButton = <span />
 
   if (props.sessionWrapper.canEditUserProfile(userData.username)) {
-    const editLinkUrl = `/profile/${userData.username}/edit`;
+    const editLinkUrl = FrontendUrlConfig.userProfileEditPage(userData.username);
 
     // Mods shouldn't edit preferences.
     const buttonLabel = props.sessionWrapper.userTokenMatches(userData.user_token) ? 
@@ -54,6 +55,26 @@ function ProfileFc(props: Props) {
         <Link 
           className={"button is-large is-fullwidth is-info"}
           to={editLinkUrl}>{buttonLabel}</Link>
+        <br />
+      </>
+    );
+  }
+
+  let banUserButton = <span />
+
+  if (props.sessionWrapper.canBanUsers()) {
+    const currentlyBanned = userData.maybe_moderator_fields?.is_banned;
+    const banLinkUrl = FrontendUrlConfig.userProfileBanPage(userData.username);
+    const buttonLabel = currentlyBanned ? "Unban User" : "Ban User";
+    const banButtonCss = currentlyBanned ? 
+      "button is-warning is-large is-fullwidth" :
+      "button is-danger is-large is-fullwidth";
+
+    banUserButton = (
+      <>
+        <Link 
+          className={banButtonCss}
+          to={banLinkUrl}>{buttonLabel}</Link>
         <br />
       </>
     );
@@ -209,6 +230,7 @@ function ProfileFc(props: Props) {
       </h1>
 
       {editProfileButton}
+      {banUserButton}
 
       <div 
         className="profile content is-medium" 

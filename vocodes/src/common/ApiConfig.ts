@@ -246,6 +246,10 @@ class ApiConfig {
     return `${this.getScheme()}://${this.getNewApiHost()}/moderation/ip_bans/${ipAddress}/delete`;
   }
 
+  banUser() : string {
+    return `${this.getScheme()}://${this.getNewApiHost()}/moderation/user_bans/manage_ban`;
+  }
+
   private getScheme() : string {
     return this.isLocalDev ? "http" : "https";
   }
