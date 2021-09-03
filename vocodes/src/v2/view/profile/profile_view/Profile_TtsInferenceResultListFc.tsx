@@ -108,7 +108,7 @@ function ProfileTtsInferenceResultsListFc(props: Props) {
       <tr key={result.tts_result_token}>
         <td>{result.maybe_creator_result_id}</td>
         <td>{visibilityIcon}</td>
-        <th>
+        <th className="overflow-fix">
           <Link to={inferenceLink}><span role="img" aria-label="result link">▶️</span> {text}</Link>
           &nbsp;
         </th>

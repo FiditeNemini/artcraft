@@ -208,7 +208,7 @@ function TtsResultViewFc(props: Props) {
           </tr>
           <tr>
             <th>Original text</th>
-            <td>
+            <td className="overflow-fix">
               {ttsInferenceResult.raw_inference_text}
             </td>
           </tr>

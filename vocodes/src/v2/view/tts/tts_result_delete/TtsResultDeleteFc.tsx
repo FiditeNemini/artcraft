@@ -194,7 +194,7 @@ function TtsResultDeleteFc(props: Props) {
         <tbody>
           <tr>
             <th>Original Text</th>
-            <td>
+            <td className="overflow-fix">
               {ttsInferenceResult.raw_inference_text}
             </td>
           </tr>
