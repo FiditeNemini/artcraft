@@ -50,7 +50,7 @@ impl ResponseError for GetW2lResultError {
   fn error_response(&self) -> HttpResponse {
     let error_reason = match self {
       GetW2lResultError::ServerError => "server error".to_string(),
-      GetW2lResultError::NotFound => "not founnd".to_string(),
+      GetW2lResultError::NotFound => "not found".to_string(),
     };
 
     to_simple_json_error(&error_reason, self.status_code())
