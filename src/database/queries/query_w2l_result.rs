@@ -1,7 +1,7 @@
 use anyhow::anyhow;
 use chrono::{DateTime, Utc};
 use crate::AnyhowResult;
-use crate::database::helpers::boolean_converters::i8_to_bool;
+use crate::database::helpers::boolean_converters::{i8_to_bool, nullable_i8_to_bool};
 use crate::database::helpers::boolean_converters::nullable_i8_to_optional_bool;
 use derive_more::{Display, Error};
 use log::{info, warn, log};
@@ -54,8 +54,10 @@ pub struct W2lResultRecordForResponse {
 /// It's the web endpoint controller's responsibility to clear these for non-mods.
 #[derive(Serialize)]
 pub struct W2lResultModeratorFields {
-  pub creator_ip_address: String,
-  pub user_deleted_at: Option<DateTime<Utc>>,
+  pub template_creator_is_banned: bool,
+  pub result_creator_is_banned_if_user: bool,
+  pub result_creator_ip_address: String,
+  pub result_creator_deleted_at: Option<DateTime<Utc>>,
   pub mod_deleted_at: Option<DateTime<Utc>>,
 }
 
@@ -71,11 +73,13 @@ pub struct W2lResultRecordRaw {
   pub template_type: Option<String>,
   pub template_title: Option<String>, // from field `w2l_templates.title`
 
+  pub maybe_creator_is_banned: Option<i8>,
   pub maybe_creator_user_token: Option<String>,
   pub maybe_creator_username: Option<String>,
   pub maybe_creator_display_name: Option<String>,
   pub maybe_creator_gravatar_hash: Option<String>,
 
+  pub maybe_template_creator_is_banned: Option<i8>,
   pub maybe_template_creator_user_token: Option<String>,
   pub maybe_template_creator_username: Option<String>,
   pub maybe_template_creator_display_name: Option<String>,
@@ -162,8 +166,12 @@ pub async fn select_w2l_result_by_token(
     updated_at: ir.updated_at.clone(),
 
     maybe_moderator_fields: Some(W2lResultModeratorFields {
-      creator_ip_address: ir.creator_ip_address.clone(),
-      user_deleted_at: ir.user_deleted_at.clone(),
+      template_creator_is_banned:
+        nullable_i8_to_bool(ir.maybe_template_creator_is_banned, false),
+      result_creator_is_banned_if_user:
+        nullable_i8_to_bool(ir.maybe_creator_is_banned, false),
+      result_creator_ip_address: ir.creator_ip_address.clone(),
+      result_creator_deleted_at: ir.user_deleted_at.clone(),
       mod_deleted_at: ir.mod_deleted_at.clone(),
     }),
   };
@@ -192,11 +200,13 @@ SELECT
     users.username as maybe_creator_username,
     users.display_name as maybe_creator_display_name,
     users.email_gravatar_hash as maybe_creator_gravatar_hash,
+    users.is_banned as maybe_creator_is_banned,
 
     template_users.token as maybe_template_creator_user_token,
     template_users.username as maybe_template_creator_username,
     template_users.display_name as maybe_template_creator_display_name,
     template_users.email_gravatar_hash as maybe_template_creator_gravatar_hash,
+    template_users.is_banned as maybe_template_creator_is_banned,
 
     w2l_results.creator_set_visibility,
 
@@ -248,11 +258,13 @@ SELECT
     users.username as maybe_creator_username,
     users.display_name as maybe_creator_display_name,
     users.email_gravatar_hash as maybe_creator_gravatar_hash,
+    users.is_banned as maybe_creator_is_banned,
 
     template_users.token as maybe_template_creator_user_token,
     template_users.username as maybe_template_creator_username,
     template_users.display_name as maybe_template_creator_display_name,
     template_users.email_gravatar_hash as maybe_template_creator_gravatar_hash,
+    template_users.is_banned as maybe_template_creator_is_banned,
 
     w2l_results.creator_set_visibility,
 

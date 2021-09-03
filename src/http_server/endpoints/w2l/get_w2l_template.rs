@@ -104,7 +104,7 @@ pub async fn get_w2l_template_handler(
   };
 
   if let Some(moderator_fields) = template.maybe_moderator_fields.as_ref() {
-    // NB: These will always be present before removal
+    // NB: The moderator fields will always be present before removal
     // We don't want non-mods seeing stuff made by banned users.
     if moderator_fields.creator_is_banned && !is_moderator {
       return Err(GetW2lTemplateError::NotFound);
