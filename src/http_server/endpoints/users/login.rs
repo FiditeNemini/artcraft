@@ -21,6 +21,7 @@ use sqlx::mysql::MySqlDatabaseError;
 use std::fmt::Formatter;
 use std::fmt;
 use std::sync::Arc;
+use crate::database::helpers::boolean_converters::i8_to_bool;
 
 #[derive(Deserialize)]
 pub struct LoginRequest {
@@ -106,6 +107,12 @@ pub async fn login_handler(
     }
   };
 
+  let is_banned = i8_to_bool(user.is_banned);
+  if is_banned {
+    // We don't allow banned users back in.
+    return Err(LoginErrorResponse::invalid_credentials());
+  }
+
   info!("login user found");
 
   let actual_hash = match String::from_utf8(user.password_hash.clone()) {
@@ -116,17 +123,18 @@ pub async fn login_handler(
     }
   };
 
-  let is_valid = match bcrypt::verify(&request.password, &actual_hash) {
+  match bcrypt::verify(&request.password, &actual_hash) {
+    Err(e) => {
+      warn!("Login hash comparison error: {:?}", e);
+      return Err(LoginErrorResponse::server_error());
+    }
     Ok(is_valid) => {
       if !is_valid {
         info!("invalid credentials");
         return Err(LoginErrorResponse::invalid_credentials());
       }
+      // Good to go...!
     },
-    Err(e) => {
-      warn!("Login hash comparison error: {:?}", e);
-      return Err(LoginErrorResponse::server_error());
-    }
   };
 
   let ip_address = get_request_ip(&http_request);
@@ -168,6 +176,7 @@ pub struct UserRecordForLogin {
   username: String,
   email_address: String,
   password_hash: Vec<u8>,
+  is_banned: i8,
 }
 
 async fn lookup_by_username(username: &str, pool: &MySqlPool) -> AnyhowResult<UserRecordForLogin>
@@ -176,7 +185,7 @@ async fn lookup_by_username(username: &str, pool: &MySqlPool) -> AnyhowResult<Us
   let record = sqlx::query_as!(
     UserRecordForLogin,
         r#"
-SELECT token, username, email_address, password_hash
+SELECT token, username, email_address, password_hash, is_banned
 FROM users
 WHERE username = ?
 LIMIT 1
@@ -194,7 +203,7 @@ async fn lookup_by_email(email: &str, pool: &MySqlPool) -> AnyhowResult<UserReco
   let record = sqlx::query_as!(
     UserRecordForLogin,
         r#"
-SELECT token, username, email_address, password_hash
+SELECT token, username, email_address, password_hash, is_banned
 FROM users
 WHERE email_address = ?
 LIMIT 1
