@@ -54,7 +54,6 @@ export function GetUserByUsernameIsErr(response: GetUserByUsernameResponse): res
   return !response.hasOwnProperty('user_token');
 }
 
-
 interface ProfileResponsePayload {
   success: boolean,
   error_reason?: string,
@@ -80,16 +79,15 @@ export async function GetUserByUsername(username: string) : Promise<GetUserByUse
       return response.user!;
     } 
 
-    let errorType = UserLookupError.FrontendError;
-    
     if (response?.success === false) {
       if (response.error_reason?.includes("not found")) {
-        errorType = UserLookupError.NotFound;
+        return UserLookupError.NotFound;
       } else {
-        errorType = UserLookupError.ServerError;
+        return UserLookupError.ServerError;
       }
     }
-    return errorType;
+
+    return UserLookupError.FrontendError;
   })
   .catch(e => {
     return UserLookupError.FrontendError;
