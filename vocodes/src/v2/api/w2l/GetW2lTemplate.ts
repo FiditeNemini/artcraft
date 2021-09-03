@@ -1,10 +1,5 @@
 import { ApiConfig } from "../../../common/ApiConfig";
 
-interface W2lTemplateViewResponsePayload {
-  success: boolean,
-  template: W2lTemplate,
-}
-
 export interface W2lTemplate {
   template_token: string,
   template_type: string,
@@ -29,13 +24,36 @@ export interface W2lTemplate {
 }
 
 export interface W2lTemplateModeratorFields {
+  creator_is_banned: boolean,
   creator_ip_address_creation: string,
   creator_ip_address_last_update: string,
   mod_deleted_at: string | undefined | null,
   user_deleted_at: string | undefined | null,
 }
 
-export async function GetW2lTemplate(templateToken: string) : Promise<W2lTemplate | undefined> {
+export enum W2lTemplateLookupError {
+  NotFound,
+  ServerError,
+  FrontendError,
+}
+
+export type GetW2lTemplateResponse = W2lTemplate | W2lTemplateLookupError;
+
+export function GetW2lTemplateIsOk(response: GetW2lTemplateResponse): response is W2lTemplate {
+  return response.hasOwnProperty('template_token');
+}
+
+export function GetW2lTemplateIsErr(response: GetW2lTemplateResponse): response is W2lTemplateLookupError {
+  return !response.hasOwnProperty('template_token');
+}
+
+interface W2lTemplateViewResponsePayload {
+  success: boolean,
+  error_reason?: string,
+  template?: W2lTemplate,
+}
+
+export async function GetW2lTemplate(templateToken: string) : Promise<GetW2lTemplateResponse> {
     const endpoint = new ApiConfig().viewW2lTemplate(templateToken);
 
     return await fetch(endpoint, {
@@ -48,12 +66,22 @@ export async function GetW2lTemplate(templateToken: string) : Promise<W2lTemplat
     .then(res => res.json())
     .then(res => {
       const templatesResponse : W2lTemplateViewResponsePayload = res;
-      if (!templatesResponse.success) {
-        return;
+
+      if (templatesResponse?.success) {
+        return templatesResponse.template!;
+      } 
+
+    if (templatesResponse?.success === false) {
+      if (templatesResponse.error_reason?.includes("not found")) {
+        return W2lTemplateLookupError.NotFound;
+      } else {
+        return W2lTemplateLookupError.ServerError;
       }
-      return templatesResponse?.template;
-    })
-    .catch(e => {
-      return undefined;
-    });
+    }
+
+    return W2lTemplateLookupError.FrontendError;
+  })
+  .catch(e => {
+    return W2lTemplateLookupError.FrontendError;
+  });
 }

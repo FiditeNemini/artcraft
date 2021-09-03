@@ -5,7 +5,7 @@ import { useParams, Link, useHistory } from 'react-router-dom';
 import { FrontendUrlConfig } from '../../../../common/FrontendUrlConfig';
 import { VisibleIconFc } from '../../_icons/VisibleIcon';
 import { HiddenIconFc } from '../../_icons/HiddenIcon';
-import { GetW2lTemplate, W2lTemplate } from '../../../api/w2l/GetW2lTemplate';
+import { GetW2lTemplate, GetW2lTemplateIsOk, W2lTemplate } from '../../../api/w2l/GetW2lTemplate';
 
 const DEFAULT_VISIBILITY = 'public';
 
@@ -26,14 +26,13 @@ function W2lTemplateEditFc(props: Props) {
   const getTemplate = useCallback(async (token) => {
     const template = await GetW2lTemplate(token);
 
-    if (!template) {
-      return;
+    if (GetW2lTemplateIsOk(template)) {
+      setTitle(template.title || "")
+      setDescriptionMarkdown(template.description_markdown || "")
+      setVisibility(template.creator_set_visibility || DEFAULT_VISIBILITY);
+      setW2lTemplate(template)
     }
 
-    setTitle(template.title || "")
-    setDescriptionMarkdown(template.description_markdown || "")
-    setVisibility(template.creator_set_visibility || DEFAULT_VISIBILITY);
-    setW2lTemplate(template)
   }, []);
 
 

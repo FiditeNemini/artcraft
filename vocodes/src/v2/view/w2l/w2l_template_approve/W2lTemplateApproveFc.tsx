@@ -3,7 +3,7 @@ import { ApiConfig } from '../../../../common/ApiConfig';
 import { FrontendUrlConfig } from '../../../../common/FrontendUrlConfig';
 import { SessionWrapper } from '../../../../session/SessionWrapper';
 import { useParams, Link, useHistory } from 'react-router-dom';
-import { GetW2lTemplate, W2lTemplate } from '../../../api/w2l/GetW2lTemplate';
+import { GetW2lTemplate, GetW2lTemplateIsOk, W2lTemplate } from '../../../api/w2l/GetW2lTemplate';
 import { GetW2lTemplateUseCount } from '../../../api/w2l/GetW2lTemplateUseCount';
 
 const DEFAULT_APPROVED_STATE = true;
@@ -23,7 +23,8 @@ function W2lTemplateApproveFc(props: Props) {
 
   const getTemplate = useCallback(async (templateToken) => {
     const template = await GetW2lTemplate(templateToken);
-    if (template) {
+
+    if (GetW2lTemplateIsOk(template)) {
       setW2lTemplate(template)
       const currentlyApproved = template?.is_public_listing_approved;
       setApprovedState(currentlyApproved);

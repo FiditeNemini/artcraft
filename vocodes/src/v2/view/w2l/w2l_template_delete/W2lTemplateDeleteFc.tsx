@@ -3,7 +3,7 @@ import { ApiConfig } from '../../../../common/ApiConfig';
 import { FrontendUrlConfig } from '../../../../common/FrontendUrlConfig';
 import { SessionWrapper } from '../../../../session/SessionWrapper';
 import { useParams, Link, useHistory } from 'react-router-dom';
-import { GetW2lTemplate, W2lTemplate } from '../../../api/w2l/GetW2lTemplate';
+import { GetW2lTemplate, GetW2lTemplateIsOk, W2lTemplate } from '../../../api/w2l/GetW2lTemplate';
 import { GetW2lTemplateUseCount } from '../../../api/w2l/GetW2lTemplateUseCount';
 
 interface Props {
@@ -20,7 +20,8 @@ function W2lTemplateDeleteFc(props: Props) {
 
   const getTemplate = useCallback(async (templateToken) => {
     const template = await GetW2lTemplate(templateToken);
-    if (template) {
+
+    if (GetW2lTemplateIsOk(template)) {
       setW2lTemplate(template)
     }
   }, []);
@@ -107,6 +108,10 @@ function W2lTemplateDeleteFc(props: Props) {
   if (props.sessionWrapper.canDeleteOtherUsersTtsResults() || props.sessionWrapper.canDeleteOtherUsersW2lTemplates()) {
     moderatorRows = (
       <>
+        <tr>
+          <th>Creator is banned</th>
+          <td>{w2lTemplate?.maybe_moderator_fields?.creator_is_banned ? "banned" : "good standing" }</td>
+        </tr>
         <tr>
           <th>Creator IP Address (Creation)</th>
           <td>{w2lTemplate?.maybe_moderator_fields?.creator_ip_address_creation || "server error"}</td>

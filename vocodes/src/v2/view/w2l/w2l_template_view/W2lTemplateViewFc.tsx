@@ -12,7 +12,7 @@ import { UploadIcon } from '../../_icons/UploadIcon';
 import { VisibleIconFc } from '../../_icons/VisibleIcon';
 import { HiddenIconFc } from '../../_icons/HiddenIcon';
 import { FrontendUrlConfig } from '../../../../common/FrontendUrlConfig';
-import { GetW2lTemplate, W2lTemplate } from '../../../api/w2l/GetW2lTemplate';
+import { GetW2lTemplate, GetW2lTemplateIsErr, GetW2lTemplateIsOk, W2lTemplate, W2lTemplateLookupError } from '../../../api/w2l/GetW2lTemplate';
 import { GetW2lTemplateUseCount } from '../../../api/w2l/GetW2lTemplateUseCount';
 import { GravatarFc } from '../../_common/GravatarFc';
 
@@ -33,6 +33,7 @@ function W2lTemplateViewFc(props: Props) {
   // Ajax
   const [w2lTemplate, setW2lTemplate] = useState<W2lTemplate|undefined>(undefined);
   const [w2lTemplateUseCount, setW2lTemplateUseCount] = useState<number|undefined>(undefined);
+  const [notFoundState, setNotFoundState] = useState<boolean>(false);
 
   // Inference
   const [audioFile, setAudioFile] = useState<File|undefined>(undefined);
@@ -43,19 +44,24 @@ function W2lTemplateViewFc(props: Props) {
   const getTemplate = useCallback(async (templateSlug: string) => {
     const templateResponse = await GetW2lTemplate(templateSlug);
 
-    if (!templateResponse) {
-      return;
+    if (GetW2lTemplateIsOk(templateResponse)) {
+      setW2lTemplate(templateResponse)
+
+      let modApprovalState = templateResponse?.is_public_listing_approved;
+
+      if (modApprovedFormValue === undefined || modApprovalState === null) {
+        modApprovalState = true;
+      }
+
+      setModApprovedFormValue(modApprovalState);
+
+    } else if (GetW2lTemplateIsErr(templateResponse))  {
+      switch(templateResponse) {
+        case W2lTemplateLookupError.NotFound:
+          setNotFoundState(true);
+          break;
+      }
     }
-
-    setW2lTemplate(templateResponse)
-
-    let modApprovalState = templateResponse?.is_public_listing_approved;
-    if (modApprovedFormValue === undefined || modApprovalState === null) {
-      modApprovalState = true;
-    }
-
-    setModApprovedFormValue(modApprovalState);
-
   }, [modApprovedFormValue]);
 
   const getTemplateUseCount = useCallback(async (templateToken) => {
@@ -67,6 +73,16 @@ function W2lTemplateViewFc(props: Props) {
     getTemplate(templateSlug);
     getTemplateUseCount(templateSlug);
   }, [templateSlug, getTemplate, getTemplateUseCount]);
+
+  if (notFoundState) {
+    return (
+      <h1 className="title is-1">Template not found</h1>
+    );
+  }
+
+  if (!w2lTemplate) {
+    return <div />
+  }
 
   const handleAudioFileChange = (fileList: FileList|null) => {
     if (fileList === null 
@@ -163,6 +179,10 @@ function W2lTemplateViewFc(props: Props) {
             <br />
             <h4 className="subtitle is-4"> Moderator Details </h4>
           </td>
+        </tr>
+        <tr>
+          <th>Creator is banned</th>
+          <td>{w2lTemplate?.maybe_moderator_fields?.creator_is_banned ? "banned" : "good standing" }</td>
         </tr>
         <tr>
           <th>Create IP address</th>
