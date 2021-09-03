@@ -97,38 +97,41 @@ pub async fn session_info_handler(
   match maybe_user_session {
     None => {}
     Some(session_data) => {
-      logged_in = true;
-      user_info = Some(UserInfo {
-        user_token: session_data.user_token.clone(),
-        username: session_data.username.to_string(),
-        display_name: session_data.display_name.to_string(),
-        email_gravatar_hash: session_data.email_gravatar_hash.to_string(),
+      if !session_data.is_banned {
+        // NB: Banned users can't be logged in
+        logged_in = true;
+        user_info = Some(UserInfo {
+          user_token: session_data.user_token.clone(),
+          username: session_data.username.to_string(),
+          display_name: session_data.display_name.to_string(),
+          email_gravatar_hash: session_data.email_gravatar_hash.to_string(),
 
-        // Usage permissions:
-        can_use_tts: session_data.can_use_tts,
-        can_use_w2l: session_data.can_use_w2l,
-        can_delete_own_tts_results: session_data.can_delete_own_tts_results,
-        can_delete_own_w2l_results: session_data.can_delete_own_w2l_results,
-        can_delete_own_account: session_data.can_delete_own_account,
+          // Usage permissions:
+          can_use_tts: session_data.can_use_tts,
+          can_use_w2l: session_data.can_use_w2l,
+          can_delete_own_tts_results: session_data.can_delete_own_tts_results,
+          can_delete_own_w2l_results: session_data.can_delete_own_w2l_results,
+          can_delete_own_account: session_data.can_delete_own_account,
 
-        // Contribution permissions:
-        can_upload_tts_models: session_data.can_upload_tts_models,
-        can_upload_w2l_templates: session_data.can_upload_w2l_templates,
-        can_delete_own_tts_models: session_data.can_delete_own_tts_models,
-        can_delete_own_w2l_templates: session_data.can_delete_own_w2l_templates,
+          // Contribution permissions:
+          can_upload_tts_models: session_data.can_upload_tts_models,
+          can_upload_w2l_templates: session_data.can_upload_w2l_templates,
+          can_delete_own_tts_models: session_data.can_delete_own_tts_models,
+          can_delete_own_w2l_templates: session_data.can_delete_own_w2l_templates,
 
-        // Moderation permissions:
-        can_approve_w2l_templates: session_data.can_approve_w2l_templates,
-        can_edit_other_users_profiles: session_data.can_edit_other_users_profiles,
-        can_edit_other_users_tts_models: session_data.can_edit_other_users_tts_models,
-        can_edit_other_users_w2l_templates: session_data.can_edit_other_users_w2l_templates,
-        can_delete_other_users_tts_models: session_data.can_delete_other_users_tts_models,
-        can_delete_other_users_tts_results: session_data.can_delete_other_users_tts_results,
-        can_delete_other_users_w2l_templates: session_data.can_delete_other_users_w2l_templates,
-        can_delete_other_users_w2l_results: session_data.can_delete_other_users_w2l_results,
-        can_ban_users: session_data.can_ban_users,
-        can_delete_users: session_data.can_delete_users,
-      });
+          // Moderation permissions:
+          can_approve_w2l_templates: session_data.can_approve_w2l_templates,
+          can_edit_other_users_profiles: session_data.can_edit_other_users_profiles,
+          can_edit_other_users_tts_models: session_data.can_edit_other_users_tts_models,
+          can_edit_other_users_w2l_templates: session_data.can_edit_other_users_w2l_templates,
+          can_delete_other_users_tts_models: session_data.can_delete_other_users_tts_models,
+          can_delete_other_users_tts_results: session_data.can_delete_other_users_tts_results,
+          can_delete_other_users_w2l_templates: session_data.can_delete_other_users_w2l_templates,
+          can_delete_other_users_w2l_results: session_data.can_delete_other_users_w2l_results,
+          can_ban_users: session_data.can_ban_users,
+          can_delete_users: session_data.can_delete_users,
+        });
+      }
     }
   }
 
