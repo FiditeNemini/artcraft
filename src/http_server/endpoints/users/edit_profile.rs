@@ -116,6 +116,11 @@ pub async fn edit_profile_handler(
     }
   };
 
+  if user_session.is_banned {
+    // Banned users can't edit anything
+    return Err(EditProfileError::NotAuthorized);
+  }
+
   let user_lookup_result =
       get_user_profile_by_username(&path.username, &server_state.mysql_pool)
       .await;

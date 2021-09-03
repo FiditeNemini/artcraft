@@ -39,6 +39,7 @@ pub struct InferW2lSuccessResponse {
 #[derive(Debug, Display)]
 pub enum InferW2lError {
   BadInput(String),
+  NotAuthorized,
   ServerError,
 }
 
@@ -47,6 +48,7 @@ impl ResponseError for InferW2lError {
     match *self {
       InferW2lError::BadInput(_) => StatusCode::BAD_REQUEST,
       InferW2lError::ServerError => StatusCode::INTERNAL_SERVER_ERROR,
+      InferW2lError::NotAuthorized => StatusCode::UNAUTHORIZED,
     }
   }
 
@@ -54,6 +56,7 @@ impl ResponseError for InferW2lError {
     let error_reason = match self {
       InferW2lError::BadInput(reason) => reason.to_string(),
       InferW2lError::ServerError => "server error".to_string(),
+      InferW2lError::NotAuthorized => "not authorized".to_string(),
     };
 
     to_simple_json_error(&error_reason, self.status_code())
