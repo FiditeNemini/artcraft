@@ -47,11 +47,11 @@ export enum UserLookupError {
 export type GetUserByUsernameResponse = User | UserLookupError;
 
 export function GetUserByUsernameIsOk(response: GetUserByUsernameResponse): response is User {
-  return response.hasOwnProperty('user_token');
+  return response.hasOwnProperty('username');
 }
 
 export function GetUserByUsernameIsErr(response: GetUserByUsernameResponse): response is UserLookupError {
-  return !response.hasOwnProperty('user_token');
+  return !response.hasOwnProperty('username');
 }
 
 interface ProfileResponsePayload {
