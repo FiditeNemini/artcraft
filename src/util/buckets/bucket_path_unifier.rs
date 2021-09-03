@@ -61,9 +61,10 @@ impl BucketPathUnifier {
 
   // ==================== TTS INFERENCE OUTPUT ==================== //
 
+  /// This should include the string "vocodes" for downloaders.
   pub fn tts_inference_wav_audio_output_path(&self, tts_inference_output_uuid: &str) -> PathBuf {
     let hashed_path = Self::hashed_directory_path(tts_inference_output_uuid);
-    let audio_filename = format!("{}.wav", &tts_inference_output_uuid);
+    let audio_filename = format!("vocodes_{}.wav", &tts_inference_output_uuid);
 
     self.tts_inference_output_root
         .join(hashed_path)
@@ -199,7 +200,7 @@ mod tests {
   fn test_tts_inference_wav_audio_output_path() {
     let paths = get_instance();
     assert_eq!(paths.tts_inference_wav_audio_output_path("foobar").to_str().unwrap(),
-      "/test_path_tts_output/f/o/o/foobar.wav");
+      "/test_path_tts_output/f/o/o/vocodes_foobar.wav");
   }
 
   #[test]
