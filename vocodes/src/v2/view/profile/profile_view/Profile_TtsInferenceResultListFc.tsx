@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 import { formatDistance } from 'date-fns';
 import { VisibleIconFc } from '../../_icons/VisibleIcon';
 import { HiddenIconFc } from '../../_icons/HiddenIcon';
+import { PlayCircleIcon } from '../../_icons/PlayCircleIcon';
 
 interface TtsInferenceResultListResponsePayload {
   success: boolean,
@@ -109,7 +110,12 @@ function ProfileTtsInferenceResultsListFc(props: Props) {
         <td>{result.maybe_creator_result_id}</td>
         <td>{visibilityIcon}</td>
         <th className="overflow-fix">
-          <Link to={inferenceLink}><span role="img" aria-label="result link">▶️</span> {text}</Link>
+
+          <Link to={inferenceLink}>
+            <PlayCircleIcon title="play" />
+            &nbsp;
+            {text}
+          </Link>
           &nbsp;
         </th>
         <th><Link to={modelLink}>Model: {result.tts_model_title}</Link></th>

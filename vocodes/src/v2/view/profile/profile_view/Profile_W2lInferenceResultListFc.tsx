@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 import { formatDistance } from 'date-fns'
 import { VisibleIconFc } from '../../_icons/VisibleIcon';
 import { HiddenIconFc } from '../../_icons/HiddenIcon';
+import { FilmIcon } from '../../_icons/FilmIcon';
 
 interface W2lInferenceResultListResponsePayload {
   success: boolean,
@@ -109,7 +110,13 @@ function ProfileW2lInferenceResultsListFc(props: Props) {
       <tr key={result.w2l_result_token}>
         <td>{result.maybe_creator_result_id}</td>
         <td>{visibilityIcon}</td>
-          <th><Link to={inferenceLink}><span role="img" aria-label="result link">▶️</span> Result</Link></th>
+        <th>
+          <Link to={inferenceLink}>
+            <FilmIcon title="Play &amp; Download" />
+            &nbsp;
+            Result
+          </Link>
+        </th>
         <th><Link to={templateLink}>{templateTitle}</Link></th>
         <td>(custom audio)</td>
         <td>{duration_seconds} s</td>
