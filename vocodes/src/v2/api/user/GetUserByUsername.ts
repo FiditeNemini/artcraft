@@ -38,11 +38,7 @@ export interface UserProfileModeratorFields {
   maybe_mod_user_token: string | null | undefined,
 }
 
-export interface UserLookupError {
-  errorType: UserLookupErrorType,
-}
-
-export enum UserLookupErrorType {
+export enum UserLookupError {
   NotFound,
   ServerError,
   FrontendError,
@@ -51,11 +47,11 @@ export enum UserLookupErrorType {
 export type GetUserByUsernameResponse = User | UserLookupError;
 
 export function GetUserByUsernameIsOk(response: GetUserByUsernameResponse): response is User {
-  return 'user_token' in response;
+  return response.hasOwnProperty('user_token');
 }
 
 export function GetUserByUsernameIsErr(response: GetUserByUsernameResponse): response is UserLookupError {
-  return 'errorType' in response;
+  return !response.hasOwnProperty('user_token');
 }
 
 
@@ -84,18 +80,18 @@ export async function GetUserByUsername(username: string) : Promise<GetUserByUse
       return response.user!;
     } 
 
-    let errorType = UserLookupErrorType.FrontendError;
+    let errorType = UserLookupError.FrontendError;
     
     if (response?.success === false) {
       if (response.error_reason?.includes("not found")) {
-        errorType = UserLookupErrorType.NotFound;
+        errorType = UserLookupError.NotFound;
       } else {
-        errorType = UserLookupErrorType.ServerError;
+        errorType = UserLookupError.ServerError;
       }
     }
-    return { errorType: errorType };
+    return errorType;
   })
   .catch(e => {
-    return { errorType: UserLookupErrorType.FrontendError };
+    return UserLookupError.FrontendError;
   });
 }

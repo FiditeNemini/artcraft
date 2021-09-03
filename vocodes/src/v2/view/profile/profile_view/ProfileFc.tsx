@@ -10,7 +10,7 @@ import { useParams } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faDiscord, faFirefox, faGithub, faTwitch, faTwitter } from '@fortawesome/free-brands-svg-icons';
 import { faClock, faDollarSign } from '@fortawesome/free-solid-svg-icons';
-import { GetUserByUsername, GetUserByUsernameIsErr, GetUserByUsernameIsOk, User, UserLookupErrorType } from '../../../api/user/GetUserByUsername';
+import { GetUserByUsername, GetUserByUsernameIsErr, GetUserByUsernameIsOk, User, UserLookupError } from '../../../api/user/GetUserByUsername';
 import { format } from 'date-fns';
 import { FrontendUrlConfig } from '../../../../common/FrontendUrlConfig';
 
@@ -30,8 +30,8 @@ function ProfileFc(props: Props) {
     if (GetUserByUsernameIsOk(response)) {
       setUserData(response);
     } else if (GetUserByUsernameIsErr(response)) {
-      switch(response.errorType) {
-        case UserLookupErrorType.NotFound:
+      switch(response) {
+        case UserLookupError.NotFound:
           setNotFoundState(true);
           break;
       }
@@ -40,7 +40,7 @@ function ProfileFc(props: Props) {
 
   useEffect(() => {
     getUser(username);
-  }, [username, getUser]); // NB: Empty array dependency sets to run ONLY on mount
+  }, [username, getUser]);
 
   if (notFoundState) {
     return (
