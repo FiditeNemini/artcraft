@@ -193,6 +193,13 @@ WHERE
     }
   };
 
+  let is_banned = i8_to_bool(profile_record.is_banned);
+
+  if is_banned && !is_mod {
+    // Can't see banned users.
+    return Err(ProfileError::NotFound);
+  }
+
   let badges = list_user_badges(&server_state.mysql_pool, &profile_record.user_token)
       .await
       .unwrap_or_else(|err| {
@@ -202,7 +209,7 @@ WHERE
 
   let maybe_mod_fields = if is_mod {
     Some(UserProfileModeratorFields {
-      is_banned: i8_to_bool(profile_record.is_banned),
+      is_banned,
       maybe_mod_comments: profile_record.maybe_mod_comments.clone(),
       maybe_mod_user_token: profile_record.maybe_mod_user_token.clone(),
     })
@@ -228,8 +235,8 @@ WHERE
     github_username: profile_record.github_username.clone(),
     cashapp_username: profile_record.cashapp_username.clone(),
     website_url: profile_record.website_url.clone(),
-    maybe_moderator_fields: maybe_mod_fields,
     created_at: profile_record.created_at.clone(),
+    maybe_moderator_fields: maybe_mod_fields,
     badges,
   };
 
