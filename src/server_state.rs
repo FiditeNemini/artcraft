@@ -46,4 +46,5 @@ pub struct EnvConfig {
   pub cookie_domain: String,
   pub cookie_secure: bool,
   pub cookie_http_only: bool,
+  pub website_homepage_redirect: String,
 }

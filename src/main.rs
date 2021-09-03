@@ -36,7 +36,8 @@ use crate::database::mediators::badge_granter::BadgeGranter;
 use crate::database::mediators::firehose_publisher::FirehosePublisher;
 use crate::http_server::endpoints::default_route_404::default_route_404;
 use crate::http_server::endpoints::events::list_events::list_events_handler;
-use crate::http_server::endpoints::misc::enable_alpha::enable_alpha;
+use crate::http_server::endpoints::misc::enable_alpha_easy_handler::enable_alpha_easy_handler;
+use crate::http_server::endpoints::misc::enable_alpha_handler::enable_alpha_handler;
 use crate::http_server::endpoints::moderation::ip_bans::add_ip_ban::add_ip_ban_handler;
 use crate::http_server::endpoints::moderation::ip_bans::delete_ip_ban::delete_ip_ban_handler;
 use crate::http_server::endpoints::moderation::ip_bans::get_ip_ban::get_ip_ban_handler;
@@ -192,6 +193,8 @@ async fn main() -> AnyhowResult<()> {
   let cookie_domain = easyenv::get_env_string_or_default("COOKIE_DOMAIN", ".vo.codes");
   let cookie_secure = easyenv::get_env_bool_or_default("COOKIE_SECURE", true);
   let cookie_http_only = easyenv::get_env_bool_or_default("COOKIE_HTTP_ONLY", true);
+  let website_homepage_redirect =
+      easyenv::get_env_string_or_default("WEBSITE_HOMEPAGE_REDIRECT", "https://vo.codes/");
 
   let cookie_manager = CookieManager::new(&cookie_domain, &hmac_secret);
   let session_checker = SessionChecker::new(&cookie_manager);
@@ -250,6 +253,7 @@ async fn main() -> AnyhowResult<()> {
       cookie_domain,
       cookie_secure,
       cookie_http_only,
+      website_homepage_redirect,
     },
     hostname: server_hostname,
     mysql_pool: pool,
@@ -579,7 +583,8 @@ pub async fn serve(server_state: ServerState) -> AnyhowResult<()>
           .route(web::head().to(|| HttpResponse::Ok()))
       )
       .service(get_root_index)
-      .service(enable_alpha)
+      .service(enable_alpha_handler)
+      .service(enable_alpha_easy_handler)
       .default_service( web::route().to(default_route_404))
   })
   .bind(bind_address)?

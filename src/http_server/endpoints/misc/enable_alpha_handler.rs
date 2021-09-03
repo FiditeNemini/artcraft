@@ -2,11 +2,11 @@ use actix_http::cookie::Cookie;
 use actix_http::http::StatusCode;
 use actix_web::web::Query;
 use actix_web::{HttpResponse, HttpRequest, Responder, get, web, HttpMessage};
+use crate::http_server::endpoints::misc::alpha_cookie::{ALPHA_COOKIE_NAME, alpha_cookie};
 use crate::server_state::ServerState;
 use log::info;
 use std::sync::Arc;
 
-const ALPHA_COOKIE_NAME : &'static str = "enable-alpha";
 const CONTENT_TYPE : &'static str = "text/html; charset=utf-8";
 
 const ENABLE_LINK : &'static str = "<a href=\"/alpha?enable=true\">I want Vocodes 2.0</a>";
@@ -20,18 +20,13 @@ pub struct QueryFields {
 }
 
 #[get("/alpha")]
-pub async fn enable_alpha(http_request: HttpRequest,
+pub async fn enable_alpha_handler(http_request: HttpRequest,
                           query: Query<QueryFields>,
                           server_state: web::Data<Arc<ServerState>>) -> impl Responder
 {
   info!("GET /alpha");
 
-  let cookie = Cookie::build(ALPHA_COOKIE_NAME, "true")
-    .domain(&server_state.env_config.cookie_domain)
-    .secure(server_state.env_config.cookie_secure) // HTTPS-only
-    .http_only(false) // This is meant to be exposed to Javascript!
-    .permanent()
-    .finish();
+  let cookie = alpha_cookie(&server_state);
 
   match query.enable {
     None => {
