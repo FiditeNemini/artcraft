@@ -42,6 +42,7 @@ pub struct W2lTemplateRecordForResponse {
 /// It's the web endpoint controller's responsibility to clear these for non-mods.
 #[derive(Serialize)]
 pub struct W2lTemplateModeratorFields {
+  pub creator_is_banned: bool,
   pub creator_ip_address_creation: String,
   pub creator_ip_address_last_update: String,
   pub user_deleted_at: Option<DateTime<Utc>>,
@@ -56,6 +57,7 @@ pub struct W2lTemplateRecordRaw {
   pub creator_username: String,
   pub creator_display_name: String,
   pub creator_gravatar_hash: String,
+  pub creator_is_banned: i8,
   pub title: String,
   pub description_markdown: String,
   pub description_rendered_html: String,
@@ -128,6 +130,7 @@ pub async fn select_w2l_template_by_token(
     created_at: template.created_at.clone(),
     updated_at: template.updated_at.clone(),
     maybe_moderator_fields: Some(W2lTemplateModeratorFields {
+      creator_is_banned: i8_to_bool(template.creator_is_banned),
       creator_ip_address_creation: template.creator_ip_address_creation.clone(),
       creator_ip_address_last_update: template.creator_ip_address_last_update.clone(),
       user_deleted_at: template.user_deleted_at.clone(),
@@ -149,6 +152,7 @@ SELECT
     w2l.token as template_token,
     w2l.template_type,
     w2l.creator_user_token,
+    users.is_banned as creator_is_banned,
     users.username as creator_username,
     users.display_name as creator_display_name,
     users.email_gravatar_hash as creator_gravatar_hash,
@@ -192,6 +196,7 @@ SELECT
     w2l.token as template_token,
     w2l.template_type,
     w2l.creator_user_token,
+    users.is_banned as creator_is_banned,
     users.username as creator_username,
     users.display_name as creator_display_name,
     users.email_gravatar_hash as creator_gravatar_hash,
