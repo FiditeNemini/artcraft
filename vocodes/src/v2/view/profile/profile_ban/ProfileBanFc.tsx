@@ -3,7 +3,7 @@ import { ApiConfig } from '../../../../common/ApiConfig';
 import { Link, useHistory } from 'react-router-dom';
 import { SessionWrapper } from '../../../../session/SessionWrapper';
 import { useParams } from 'react-router-dom';
-import { GetUserByUsername, User } from '../../../api/user/GetUserByUsername';
+import { GetUserByUsername, GetUserByUsernameIsOk, User } from '../../../api/user/GetUserByUsername';
 
 interface Props {
   sessionWrapper: SessionWrapper,
@@ -24,7 +24,7 @@ function ProfileBanFc(props: Props) {
 
   const getUserProfile = useCallback(async (username) => {
     const user = await GetUserByUsername(username);
-    if (user) {
+    if (GetUserByUsernameIsOk(user)) {
       setUserData(user);
       setIsBanned(user?.maybe_moderator_fields?.is_banned || false);
       setModComments(user?.maybe_moderator_fields?.maybe_mod_comments || "");

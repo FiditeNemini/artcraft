@@ -1,11 +1,5 @@
 import { ApiConfig } from "../../../common/ApiConfig";
 
-interface ProfileResponsePayload {
-  success: boolean,
-  error_reason?: string,
-  user?: User,
-}
-
 export interface User {
   user_token: string,
   username: string,
@@ -44,8 +38,34 @@ export interface UserProfileModeratorFields {
   maybe_mod_user_token: string | null | undefined,
 }
 
+export interface UserLookupError {
+  errorType: UserLookupErrorType,
+}
 
-export async function GetUserByUsername(username: string) : Promise<User | undefined> {
+export enum UserLookupErrorType {
+  NotFound,
+  ServerError,
+  FrontendError,
+}
+
+export type GetUserByUsernameResponse = User | UserLookupError;
+
+export function GetUserByUsernameIsOk(response: GetUserByUsernameResponse): response is User {
+  return 'user_token' in response;
+}
+
+export function GetUserByUsernameIsErr(response: GetUserByUsernameResponse): response is UserLookupError {
+  return 'errorType' in response;
+}
+
+
+interface ProfileResponsePayload {
+  success: boolean,
+  error_reason?: string,
+  user?: User,
+}
+
+export async function GetUserByUsername(username: string) : Promise<GetUserByUsernameResponse> {
   const usernameLower = username.toLowerCase(); // NB: Until I standardize on display name vs username lookup.
   const endpoint = new ApiConfig().getProfile(usernameLower);
   
@@ -59,12 +79,23 @@ export async function GetUserByUsername(username: string) : Promise<User | undef
   .then(res => res.json())
   .then(res => {
     const response : ProfileResponsePayload = res;
-    if (!response.success) {
-      return;
+
+    if (response?.success) {
+      return response.user!;
+    } 
+
+    let errorType = UserLookupErrorType.FrontendError;
+    
+    if (response?.success === false) {
+      if (response.error_reason?.includes("not found")) {
+        errorType = UserLookupErrorType.NotFound;
+      } else {
+        errorType = UserLookupErrorType.ServerError;
+      }
     }
-    return response?.user;
+    return { errorType: errorType };
   })
   .catch(e => {
-    return undefined;
+    return { errorType: UserLookupErrorType.FrontendError };
   });
 }

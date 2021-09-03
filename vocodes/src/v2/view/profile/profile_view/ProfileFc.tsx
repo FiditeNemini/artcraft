@@ -10,7 +10,7 @@ import { useParams } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faDiscord, faFirefox, faGithub, faTwitch, faTwitter } from '@fortawesome/free-brands-svg-icons';
 import { faClock, faDollarSign } from '@fortawesome/free-solid-svg-icons';
-import { GetUserByUsername, User } from '../../../api/user/GetUserByUsername';
+import { GetUserByUsername, GetUserByUsernameIsErr, GetUserByUsernameIsOk, User, UserLookupErrorType } from '../../../api/user/GetUserByUsername';
 import { format } from 'date-fns';
 import { FrontendUrlConfig } from '../../../../common/FrontendUrlConfig';
 
@@ -23,17 +23,30 @@ function ProfileFc(props: Props) {
   const { username } : { username : string } = useParams();
 
   const [userData, setUserData] = useState<User|undefined>(undefined);
+  const [notFoundState, setNotFoundState] = useState<boolean>(false);
 
   const getUser = useCallback(async (username) => {
-    const user = await GetUserByUsername(username);
-    if (user) {
-      setUserData(user);
+    const response = await GetUserByUsername(username);
+    if (GetUserByUsernameIsOk(response)) {
+      setUserData(response);
+    } else if (GetUserByUsernameIsErr(response)) {
+      switch(response.errorType) {
+        case UserLookupErrorType.NotFound:
+          setNotFoundState(true);
+          break;
+      }
     }
   }, []);
 
   useEffect(() => {
     getUser(username);
   }, [username, getUser]); // NB: Empty array dependency sets to run ONLY on mount
+
+  if (notFoundState) {
+    return (
+      <h1 className="title is-1">User not found</h1>
+    );
+  }
 
   if (!userData) {
     return <div />
