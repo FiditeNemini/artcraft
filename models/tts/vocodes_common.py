@@ -82,23 +82,22 @@ def load_hifigan_model(checkpoint_path, super_resolution = False):
 
 def preprocess_text(text, raw_input=True):
     # TODO: Handle ARPAbet
-    sequence = None
-    for i in text.split("\n"):
-        if len(i) < 1:
+    pre_sequence = ""
+    for line in text.split("\n"):
+        if len(line) < 1:
             continue
-        print(i)
         if raw_input:
-            if i[-1] != ";":
-                i = i+";"
+            if line[-1] != ";":
+                line = line + ";"
         else:
-            #i = ARPA(i)
+            #line = ARPA(line)
             pass
-        print(i)
-        with torch.no_grad():
-            # save VRAM by not including gradients
-            sequence = np.array(text_to_sequence(i, ['english_cleaners']))[None, :]
-            sequence = torch.autograd.Variable(torch.from_numpy(sequence)).cuda().long()
-            break # TODO: Handle multiple lines.
+        pre_sequence += line
+
+    with torch.no_grad():
+        # save VRAM by not including gradients
+        sequence = np.array(text_to_sequence(pre_sequence, ['english_cleaners']))[None, :]
+        sequence = torch.autograd.Variable(torch.from_numpy(sequence)).cuda().long()
     return sequence
 
 class NumpyEncoder(json.JSONEncoder):
@@ -240,6 +239,8 @@ class TacotronWaveglowPipeline:
         assert('output_audio_filename' in args)
         assert('output_spectrogram_filename' in args)
         assert('output_metadata_filename' in args)
+
+        print('Raw text: {}'.format(args['raw_text']))
 
         sequence = preprocess_text(args['raw_text'])
 
