@@ -4,7 +4,7 @@ import { ApiConfig } from '../../../../common/ApiConfig';
 import { FrontendUrlConfig } from '../../../../common/FrontendUrlConfig';
 import { SessionWrapper } from '../../../../session/SessionWrapper';
 import { useParams, Link, useHistory } from 'react-router-dom';
-import { GetW2lResult, W2lResult } from '../../../api/w2l/GetW2lResult';
+import { GetW2lResult, GetW2lResultIsOk, W2lResult } from '../../../api/w2l/GetW2lResult';
 
 interface Props {
   sessionWrapper: SessionWrapper,
@@ -19,7 +19,7 @@ function W2lResultDeleteFc(props: Props) {
 
   const getInferenceResult = useCallback(async (token) => {
     const templateResponse = await GetW2lResult(token);
-    if (templateResponse) {
+    if (GetW2lResultIsOk(templateResponse)) {
       setW2lInferenceResult(templateResponse)
     }
   }, []);
@@ -74,7 +74,7 @@ function W2lResultDeleteFc(props: Props) {
   }
 
   let currentlyDeleted = !!w2lInferenceResult?.maybe_moderator_fields?.mod_deleted_at ||
-      !!w2lInferenceResult?.maybe_moderator_fields?.user_deleted_at;
+      !!w2lInferenceResult?.maybe_moderator_fields?.result_creator_deleted_at;
 
   const h1Title = currentlyDeleted ? "Undelete Result?" : "Delete Result?";
 
@@ -87,7 +87,6 @@ function W2lResultDeleteFc(props: Props) {
   const formLabel = currentlyDeleted ? 
      "Recover the W2L Result (makes it visible again)" : 
      "Delete W2L Result (hides from everyone but mods)";
-
 
   const durationSeconds = (w2lInferenceResult?.duration_millis || 0) / 1000;
 

@@ -8,7 +8,7 @@ import { HiddenIconFc } from '../../_icons/HiddenIcon';
 import { VisibleIconFc } from '../../_icons/VisibleIcon';
 import { FrontendUrlConfig } from '../../../../common/FrontendUrlConfig';
 import { DownloadIcon } from '../../_icons/DownloadIcon';
-import { GetW2lResult, W2lResult } from '../../../api/w2l/GetW2lResult';
+import { GetW2lResult, GetW2lResultIsErr, GetW2lResultIsOk, W2lResult, W2lResultLookupError } from '../../../api/w2l/GetW2lResult';
 import { MetaTags } from '../../../../common/MetaTags';
 
 interface Props {
@@ -19,11 +19,18 @@ function W2lResultViewFc(props: Props) {
   let { token } = useParams() as { token : string };
 
   const [w2lInferenceResult, setW2lInferenceResult] = useState<W2lResult|undefined>(undefined);
+  const [notFoundState, setNotFoundState] = useState<boolean>(false);
 
   const getInferenceResult = useCallback(async (token) => {
     const templateResponse = await GetW2lResult(token);
-    if (templateResponse) {
+    if (GetW2lResultIsOk(templateResponse)) {
       setW2lInferenceResult(templateResponse)
+    } else if (GetW2lResultIsErr(templateResponse)) {
+      switch(templateResponse) {
+        case W2lResultLookupError.NotFound:
+          setNotFoundState(true);
+          break;
+      }
     }
   }, []);
 
@@ -31,8 +38,14 @@ function W2lResultViewFc(props: Props) {
     getInferenceResult(token);
   }, [token, getInferenceResult]); // NB: Empty array dependency sets to run ONLY on mount
 
-  if (w2lInferenceResult === undefined) {
-    return <div />;
+  if (notFoundState) {
+    return (
+      <h1 className="title is-1">Template result not found</h1>
+    );
+  }
+
+  if (!w2lInferenceResult) {
+    return <div />
   }
 
   let videoLink = new BucketConfig().getGcsUrl(w2lInferenceResult?.public_bucket_video_path);
@@ -59,16 +72,24 @@ function W2lResultViewFc(props: Props) {
           </td>
         </tr>
         <tr>
-          <th>Creator IP address</th>
-          <td>{w2lInferenceResult?.maybe_moderator_fields?.creator_ip_address || "server error"}</td>
+          <th>Template creator is banned</th>
+          <td>{w2lInferenceResult?.maybe_moderator_fields?.template_creator_is_banned ? "banned" : "good standing" }</td>
+        </tr>
+        <tr>
+          <th>Result creator is banned (if user)</th>
+          <td>{w2lInferenceResult?.maybe_moderator_fields?.result_creator_is_banned_if_user ? "banned" : "good standing" }</td>
+        </tr>
+        <tr>
+          <th>Result creator IP address</th>
+          <td>{w2lInferenceResult?.maybe_moderator_fields?.result_creator_ip_address || "server error"}</td>
         </tr>
         <tr>
           <th>Mod deleted at (UTC)</th>
           <td>{w2lInferenceResult?.maybe_moderator_fields?.mod_deleted_at || "not deleted"}</td>
         </tr>
         <tr>
-          <th>User deleted at (UTC)</th>
-          <td>{w2lInferenceResult?.maybe_moderator_fields?.user_deleted_at || "not deleted"}</td>
+          <th>Result creator deleted at (UTC)</th>
+          <td>{w2lInferenceResult?.maybe_moderator_fields?.result_creator_deleted_at || "not deleted"}</td>
         </tr>
       </>
     );
@@ -115,7 +136,7 @@ function W2lResultViewFc(props: Props) {
     <span>Public <VisibleIconFc /></span> ;
 
   const currentlyDeleted = !!w2lInferenceResult?.maybe_moderator_fields?.mod_deleted_at || 
-      !!w2lInferenceResult?.maybe_moderator_fields?.user_deleted_at;
+      !!w2lInferenceResult?.maybe_moderator_fields?.result_creator_deleted_at;
 
   const deleteButtonTitle = currentlyDeleted ? "Undelete Result?" : "Delete Result?";
 

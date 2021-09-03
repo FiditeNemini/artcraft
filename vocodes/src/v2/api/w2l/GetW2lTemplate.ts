@@ -54,22 +54,22 @@ interface W2lTemplateViewResponsePayload {
 }
 
 export async function GetW2lTemplate(templateToken: string) : Promise<GetW2lTemplateResponse> {
-    const endpoint = new ApiConfig().viewW2lTemplate(templateToken);
+  const endpoint = new ApiConfig().viewW2lTemplate(templateToken);
 
-    return await fetch(endpoint, {
-      method: 'GET',
-      headers: {
-        'Accept': 'application/json',
-      },
-      credentials: 'include',
-    })
-    .then(res => res.json())
-    .then(res => {
-      const templatesResponse : W2lTemplateViewResponsePayload = res;
+  return await fetch(endpoint, {
+    method: 'GET',
+    headers: {
+      'Accept': 'application/json',
+    },
+    credentials: 'include',
+  })
+  .then(res => res.json())
+  .then(res => {
+    const templatesResponse : W2lTemplateViewResponsePayload = res;
 
-      if (templatesResponse?.success) {
-        return templatesResponse.template!;
-      } 
+    if (templatesResponse?.success) {
+      return templatesResponse.template!;
+    } 
 
     if (templatesResponse?.success === false) {
       if (templatesResponse.error_reason?.includes("not found")) {
