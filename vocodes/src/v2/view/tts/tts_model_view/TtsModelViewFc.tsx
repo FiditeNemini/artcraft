@@ -217,7 +217,7 @@ function TtsModelViewFc(props: Props) {
     <span>Hidden <HiddenIconFc /></span> :
     <span>Public <VisibleIconFc /></span> ;
 
-  let defaultVocoder = 'not set';
+  let defaultVocoder = 'not set (defaults to HiFi-GAN)';
   switch (ttsModel?.maybe_default_pretrained_vocoder) {
     case 'hifigan-superres':
       defaultVocoder = 'HiFi-GAN'
