@@ -105,6 +105,7 @@ use sqlx::MySqlPool;
 use sqlx::mysql::MySqlPoolOptions;
 use std::sync::Arc;
 use std::time::Duration;
+use crate::http_server::endpoints::moderation::users::list_users::list_users_handler;
 
 // TODO TODO TODO TODO
 // TODO TODO TODO TODO
@@ -383,6 +384,14 @@ pub async fn serve(server_state: ServerState) -> AnyhowResult<()>
                       .route(web::head().to(|| HttpResponse::Ok()))
                 )
           )
+            .service(
+              web::scope("/user")
+                  .service(
+                    web::resource("/list")
+                        .route(web::get().to(list_users_handler))
+                        .route(web::head().to(|| HttpResponse::Ok()))
+                  )
+            )
           .service(
             web::scope("/user_bans")
                 .service(

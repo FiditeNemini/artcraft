@@ -1,3 +1,4 @@
+use chrono::{DateTime, Utc};
 use crate::database::helpers::boolean_converters::i8_to_bool;
 use crate::util::anyhow_result::AnyhowResult;
 use sqlx::MySqlPool;
@@ -29,16 +30,16 @@ pub struct UserForList {
   pub is_banned: bool,
   pub user_role_slug: String,
 
-  pub created_at: String,
-  pub updated_at: String,
+  pub created_at: DateTime<Utc>,
+  pub updated_at: DateTime<Utc>,
 }
 
-pub struct BuildListUsers {
+pub struct ListUsersQueryBuilder {
   sort_ascending: bool,
   per_page: i64,
 }
 
-impl BuildListUsers {
+impl ListUsersQueryBuilder {
   pub fn new() -> Self {
     Self {
       sort_ascending: false,
@@ -109,7 +110,7 @@ impl BuildListUsers {
     let mut query_string = r#"
 SELECT
   id as user_id,
-  user_token,
+  token as user_token,
   username,
   display_name,
   display_name,
@@ -117,9 +118,8 @@ SELECT
   is_banned,
   user_role_slug,
   created_at,
-  updated_at,
+  updated_at
 FROM users
-LIMIT 50
 "#;
 
     query_string.to_string()
@@ -138,7 +138,7 @@ pub struct UserForListRaw {
   pub is_banned: i8,
   pub user_role_slug: String,
 
-  pub created_at: String,
-  pub updated_at: String,
+  pub created_at: DateTime<Utc>,
+  pub updated_at: DateTime<Utc>,
 }
 
