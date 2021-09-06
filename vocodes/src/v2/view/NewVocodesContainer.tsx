@@ -37,6 +37,7 @@ import { W2lTemplateApproveFc } from './w2l/w2l_template_approve/W2lTemplateAppr
 import { TtsModelListFc } from './tts/tts_model_list/TtsModelListFc';
 import { TtsModelListItem } from '../api/tts/ListTtsModels';
 import { ProfileBanFc } from './profile/profile_ban/ProfileBanFc';
+import { ModerationUserListFc } from './moderation/moderation_user_list/ModerationUserList';
 
 interface Props {
   sessionWrapper: SessionWrapper,
@@ -248,6 +249,12 @@ class NewVocodesContainer extends React.Component<Props, State> {
 
             <Route path="/upload">
               <UploadChoiceFc
+                sessionWrapper={this.props.sessionWrapper}
+              />
+            </Route>
+
+            <Route path="/moderation/user/list">
+              <ModerationUserListFc
                 sessionWrapper={this.props.sessionWrapper}
               />
             </Route>

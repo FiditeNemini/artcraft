@@ -250,6 +250,10 @@ class ApiConfig {
     return `${this.getScheme()}://${this.getNewApiHost()}/moderation/user_bans/manage_ban`;
   }
 
+  getModerationUserList() : string {
+    return `${this.getScheme()}://${this.getNewApiHost()}/moderation/user/list`;
+  }
+
   private getScheme() : string {
     return this.isLocalDev ? "http" : "https";
   }

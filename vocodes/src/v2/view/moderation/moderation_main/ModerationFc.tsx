@@ -20,6 +20,13 @@ function ModerationFc(props: Props) {
         to="/moderation/ip_bans"
         className="button is-link is-large is-fullwidth is-outlined"
         >IP Ban List</Link>
+        
+      <br />
+
+      <Link
+        to="/moderation/user/list"
+        className="button is-link is-large is-fullwidth is-outlined"
+        >User List</Link>
 
       <br />
       <p>More mod controls will be added in the future: user roles, activity tracking, timed bans, account bans, etc.</p>

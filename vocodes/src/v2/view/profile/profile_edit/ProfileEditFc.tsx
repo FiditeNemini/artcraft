@@ -1,6 +1,6 @@
 import React, { useEffect, useState }  from 'react';
 import { ApiConfig } from '../../../../common/ApiConfig';
-import { Link, useHistory } from 'react-router-dom';
+import { useHistory } from 'react-router-dom';
 import { SessionWrapper } from '../../../../session/SessionWrapper';
 import { useParams } from 'react-router-dom';
 import { VisibleIconFc } from '../../_icons/VisibleIcon';
@@ -9,6 +9,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faDiscord, faFirefox, faGithub, faTwitch, faTwitter } from '@fortawesome/free-brands-svg-icons';
 import { faDollarSign, faUser } from '@fortawesome/free-solid-svg-icons';
 import { GravatarFc } from '../../_common/GravatarFc';
+import { BackLink } from '../../_common/BackLink';
 
 const DEFAULT_VISIBILITY = 'public';
 
@@ -205,7 +206,7 @@ function ProfileEditFc(props: Props) {
     <div>
       <h2 className="subtitle is-2">Profile &amp; Preferences</h2>
 
-      <Link to={viewLinkUrl}>&lt; Back to profile</Link>
+      <BackLink link={viewLinkUrl} text="Back to profile" />
 
       <br />
       <br />

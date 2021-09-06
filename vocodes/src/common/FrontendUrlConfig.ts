@@ -79,6 +79,12 @@ class FrontendUrlConfig {
   static userProfileBanPage(userDisplayName: string) : string {
     return `/profile/${userDisplayName}/ban`;
   }
+
+  // Moderation links
+
+  static moderationMain() : string {
+    return '/moderation';
+  }
 }
 
 export { FrontendUrlConfig }
