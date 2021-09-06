@@ -30,6 +30,10 @@ pub struct UserForList {
   pub is_banned: bool,
   pub user_role_slug: String,
 
+  pub ip_address_creation: String,
+  pub ip_address_last_login: String,
+  pub ip_address_last_update: String,
+
   pub created_at: DateTime<Utc>,
   pub updated_at: DateTime<Utc>,
 }
@@ -76,6 +80,9 @@ impl ListUsersQueryBuilder {
             gravatar_hash: r.gravatar_hash.clone(),
             is_banned: i8_to_bool(r.is_banned),
             user_role_slug: r.user_role_slug.clone(),
+            ip_address_creation: r.ip_address_creation.clone(),
+            ip_address_last_login: r.ip_address_last_login.clone(),
+            ip_address_last_update: r.ip_address_last_update.clone(),
             created_at: r.created_at.clone(),
             updated_at: r.updated_at.clone(),
           }
@@ -117,6 +124,9 @@ SELECT
   email_gravatar_hash as gravatar_hash,
   is_banned,
   user_role_slug,
+  ip_address_creation,
+  ip_address_last_login,
+  ip_address_last_update,
   created_at,
   updated_at
 FROM users
@@ -137,6 +147,10 @@ pub struct UserForListRaw {
 
   pub is_banned: i8,
   pub user_role_slug: String,
+
+  pub ip_address_creation: String,
+  pub ip_address_last_login: String,
+  pub ip_address_last_update: String,
 
   pub created_at: DateTime<Utc>,
   pub updated_at: DateTime<Utc>,
