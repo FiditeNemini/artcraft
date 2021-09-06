@@ -1,6 +1,6 @@
+use crate::database::helpers::boolean_converters::i8_to_bool;
 use crate::util::anyhow_result::AnyhowResult;
 use sqlx::MySqlPool;
-use crate::database::helpers::boolean_converters::i8_to_bool;
 
 /// NB: This is not to be shared externally.
 /// Only for trusted mods and staff.
