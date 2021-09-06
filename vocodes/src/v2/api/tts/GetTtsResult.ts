@@ -1,10 +1,5 @@
 import { ApiConfig } from "../../../common/ApiConfig";
 
-interface TtsInferenceResultResponsePayload {
-  success: boolean,
-  result: TtsResult,
-}
-
 export interface TtsResult {
   tts_result_token: string,
 
@@ -39,12 +34,37 @@ export interface TtsResult {
 }
 
 export interface TtsInferenceResultModeratorFields {
-  creator_ip_address: string,
+  model_creator_is_banned: boolean,
+  result_creator_is_banned_if_user: boolean,
+  result_creator_ip_address: string,
+  result_creator_deleted_at: string | undefined | null,
   mod_deleted_at: string | undefined | null,
-  user_deleted_at: string | undefined | null,
 }
 
-export async function GetTtsResult(resultToken: string) : Promise<TtsResult | undefined> {
+export enum TtsResultLookupError {
+  NotFound,
+  ServerError,
+  FrontendError,
+}
+
+export type GetTtsResultResponse = TtsResult | TtsResultLookupError;
+
+export function GetTtsResultIsOk(response: GetTtsResultResponse): response is TtsResult {
+  return response.hasOwnProperty('tts_result_token');
+}
+
+export function GetTtsResultIsErr(response: GetTtsResultResponse): response is TtsResultLookupError {
+  return !response.hasOwnProperty('tts_result_token');
+}
+
+interface TtsInferenceResultResponsePayload {
+  success: boolean,
+  error_reason?: string,
+  result?: TtsResult,
+}
+
+
+export async function GetTtsResult(resultToken: string) : Promise<GetTtsResultResponse> {
   const endpoint = new ApiConfig().viewTtsInferenceResult(resultToken);
   
   return await fetch(endpoint, {
@@ -57,12 +77,22 @@ export async function GetTtsResult(resultToken: string) : Promise<TtsResult | un
   .then(res => res.json())
   .then(res => {
     const response : TtsInferenceResultResponsePayload = res;
-    if (!response.success) {
-      return;
+
+    if (response?.success) {
+      return response.result!;
+    } 
+
+    if (response?.success === false) {
+      if (response.error_reason?.includes("not found")) {
+        return TtsResultLookupError.NotFound;
+      } else {
+        return TtsResultLookupError.ServerError;
+      }
     }
-    return response?.result;
+
+    return TtsResultLookupError.FrontendError;
   })
   .catch(e => {
-    return undefined;
+    return TtsResultLookupError.FrontendError;
   });
 }

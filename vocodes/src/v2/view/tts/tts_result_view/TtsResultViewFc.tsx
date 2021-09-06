@@ -8,7 +8,7 @@ import { BucketConfig } from '../../../../common/BucketConfig';
 import { FrontendUrlConfig } from '../../../../common/FrontendUrlConfig';
 import { HiddenIconFc } from '../../_icons/HiddenIcon';
 import { VisibleIconFc } from '../../_icons/VisibleIcon';
-import { GetTtsResult, TtsResult } from '../../../api/tts/GetTtsResult';
+import { GetTtsResult, GetTtsResultIsErr, GetTtsResultIsOk, TtsResult, TtsResultLookupError } from '../../../api/tts/GetTtsResult';
 import { TtsResultAudioPlayerFc } from './TtsResultAudioPlayerFc';
 
 interface Props {
@@ -19,11 +19,18 @@ function TtsResultViewFc(props: Props) {
   let { token } : { token: string }= useParams();
 
   const [ttsInferenceResult, setTtsInferenceResult] = useState<TtsResult|undefined>(undefined);
+  const [notFoundState, setNotFoundState] = useState<boolean>(false);
 
   const getTtsResult = useCallback(async (token) => {
     const result = await GetTtsResult(token);
-    if (result) {
+    if (GetTtsResultIsOk(result)) {
       setTtsInferenceResult(result);
+    } else if (GetTtsResultIsErr(result)) {
+      switch(result) {
+        case TtsResultLookupError.NotFound:
+          setNotFoundState(true);
+          break;
+      }
     }
   }, []);
 
@@ -31,7 +38,14 @@ function TtsResultViewFc(props: Props) {
     getTtsResult(token);
   }, [token, getTtsResult]); // NB: Empty array dependency sets to run ONLY on mount
 
-  if (ttsInferenceResult === undefined) {
+
+  if (notFoundState) {
+    return (
+      <h1 className="title is-1">TTS result not found</h1>
+    );
+  }
+
+  if (!ttsInferenceResult) {
     return <div />;
   }
 
@@ -71,16 +85,24 @@ function TtsResultViewFc(props: Props) {
           </td>
         </tr>
         <tr>
-          <th>Creator IP address</th>
-          <td>{ttsInferenceResult?.maybe_moderator_fields?.creator_ip_address || "server error"}</td>
+          <th>Model creator is banned</th>
+          <td>{ttsInferenceResult?.maybe_moderator_fields?.model_creator_is_banned ? "banned" : "good standing" }</td>
+        </tr>
+        <tr>
+          <th>Result creator is banned (if user)</th>
+          <td>{ttsInferenceResult?.maybe_moderator_fields?.result_creator_is_banned_if_user ? "banned" : "good standing" }</td>
+        </tr>
+        <tr>
+          <th>Result creator IP address</th>
+          <td>{ttsInferenceResult?.maybe_moderator_fields?.result_creator_ip_address || "server error"}</td>
         </tr>
         <tr>
           <th>Mod deleted at (UTC)</th>
           <td>{ttsInferenceResult?.maybe_moderator_fields?.mod_deleted_at || "not deleted"}</td>
         </tr>
         <tr>
-          <th>User deleted at (UTC)</th>
-          <td>{ttsInferenceResult?.maybe_moderator_fields?.user_deleted_at || "not deleted"}</td>
+          <th>Result creator deleted at (UTC)</th>
+          <td>{ttsInferenceResult?.maybe_moderator_fields?.result_creator_deleted_at || "not deleted"}</td>
         </tr>
       </>
     );
@@ -131,7 +153,7 @@ function TtsResultViewFc(props: Props) {
   }
 
   const currentlyDeleted = !!ttsInferenceResult?.maybe_moderator_fields?.mod_deleted_at || 
-      !!ttsInferenceResult?.maybe_moderator_fields?.user_deleted_at;
+      !!ttsInferenceResult?.maybe_moderator_fields?.result_creator_deleted_at;
 
   const deleteButtonTitle = currentlyDeleted ? "Undelete Result?" : "Delete Result?";
 
