@@ -230,6 +230,10 @@ class ApiConfig {
     return `${this.getScheme()}://${this.getNewApiHost()}/events`;
   }
 
+  getLeaderboard() : string {
+    return `${this.getScheme()}://${this.getNewApiHost()}/leaderboard`;
+  }
+
   getModerationIpBanList(): string {
     return `${this.getScheme()}://${this.getNewApiHost()}/moderation/ip_bans/list`;
   }

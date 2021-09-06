@@ -22,12 +22,12 @@ function NewTopNavFc(props: Props) {
         <div className="column">
           <Link to="/"
             className="button is-link is-medium is-inverted"
-            >Text to Speech️</Link>
+            >TTS</Link>
         </div>
         <div className="column">
           <Link to="/video"
             className="button is-link is-medium is-inverted"
-            >Lip Sync Video</Link>
+            >Video</Link>
         </div>
         <div className="column">
           <Link to="/upload"
@@ -35,9 +35,6 @@ function NewTopNavFc(props: Props) {
             >Upload</Link>
         </div>
         <div className="column">
-          {/*<Link to={myDataLink}
-            className="button is-link is-medium is-inverted"
-            >Pending</Link>*/}
           <Link to={myDataLink}
             className="button is-link is-medium is-inverted"
             >My Data</Link>
@@ -46,6 +43,11 @@ function NewTopNavFc(props: Props) {
           <Link to="/firehose"
             className="button is-link is-medium is-inverted"
             >Feed</Link>
+        </div>
+        <div className="column">
+          <Link to="/leaderboard"
+            className="button is-link is-medium is-inverted"
+            >Leaderboard</Link>
         </div>
       </div>
       <hr />

@@ -38,6 +38,7 @@ import { TtsModelListFc } from './tts/tts_model_list/TtsModelListFc';
 import { TtsModelListItem } from '../api/tts/ListTtsModels';
 import { ProfileBanFc } from './profile/profile_ban/ProfileBanFc';
 import { ModerationUserListFc } from './moderation/moderation_user_list/ModerationUserList';
+import { LeaderboardFc } from './leaderboard/LeaderboardFc';
 
 interface Props {
   sessionWrapper: SessionWrapper,
@@ -93,6 +94,12 @@ class NewVocodesContainer extends React.Component<Props, State> {
           <Switch>
             <Route path="/firehose">
               <FirehoseEventListFc
+                sessionWrapper={this.props.sessionWrapper}
+              />
+            </Route>
+
+            <Route path="/leaderboard">
+              <LeaderboardFc
                 sessionWrapper={this.props.sessionWrapper}
               />
             </Route>
