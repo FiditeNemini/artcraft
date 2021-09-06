@@ -25,6 +25,9 @@ pub struct W2lLeaderboardRecordForListRaw {
 pub async fn calculate_w2l_template_leaderboard(
   mysql_pool: &MySqlPool
 ) -> AnyhowResult<Vec<W2lLeaderboardRecordForList>> {
+
+  // NB: We're requiring "is_public_listing_approved IS TRUE" for W2L templates!
+  // This is the opposite for TTS models (for now at least)
   let maybe_results = sqlx::query_as!(
       W2lLeaderboardRecordForListRaw,
         r#"

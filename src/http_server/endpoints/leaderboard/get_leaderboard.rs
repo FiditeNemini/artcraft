@@ -7,6 +7,8 @@ use actix_web::http::StatusCode;
 use actix_web::{Responder, web, HttpResponse, error, HttpRequest, HttpMessage};
 use chrono::{DateTime, Utc};
 use crate::AnyhowResult;
+use crate::database::queries::calculate_tts_model_leaderboard::TtsLeaderboardRecordForList;
+use crate::database::queries::calculate_tts_model_leaderboard::calculate_tts_model_leaderboard;
 use crate::database::queries::calculate_w2l_template_leaderboard::W2lLeaderboardRecordForList;
 use crate::database::queries::calculate_w2l_template_leaderboard::calculate_w2l_template_leaderboard;
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
@@ -25,7 +27,8 @@ use std::sync::Arc;
 #[derive(Serialize)]
 pub struct LeaderboardResponse {
   success: bool,
-  w2l_leaderboard: Vec<W2lLeaderboardRecordForList>
+  tts_leaderboard: Vec<TtsLeaderboardRecordForList>,
+  w2l_leaderboard: Vec<W2lLeaderboardRecordForList>,
 }
 
 #[derive(Serialize, Debug)]
@@ -74,12 +77,21 @@ pub async fn leaderboard_handler(
   server_state: web::Data<Arc<ServerState>>
 ) -> Result<HttpResponse, LeaderboardErrorResponse> {
 
-  // TODO: Fire off both requests in parallel.
-  let maybe_results =
-      calculate_w2l_template_leaderboard(&server_state.mysql_pool).await;
+  let maybe_tts_results =
+      calculate_tts_model_leaderboard(&server_state.mysql_pool);
 
+  let maybe_w2l_results =
+      calculate_w2l_template_leaderboard(&server_state.mysql_pool);
 
-  let results = match maybe_results {
+  let tts_results = match maybe_tts_results.await {
+    Ok(results) => results,
+    Err(e) => {
+      warn!("Query error: {:?}", e);
+      return Err(LeaderboardErrorResponse::server_error());
+    }
+  };
+
+  let w2l_results = match maybe_w2l_results.await {
     Ok(results) => results,
     Err(e) => {
       warn!("Query error: {:?}", e);
@@ -89,7 +101,8 @@ pub async fn leaderboard_handler(
 
   let response = LeaderboardResponse {
     success: true,
-    w2l_leaderboard: results,
+    tts_leaderboard: tts_results,
+    w2l_leaderboard: w2l_results,
   };
 
   let body = serde_json::to_string(&response)
