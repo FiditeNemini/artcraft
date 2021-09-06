@@ -1,0 +1,144 @@
+use crate::util::anyhow_result::AnyhowResult;
+use sqlx::MySqlPool;
+use crate::database::helpers::boolean_converters::i8_to_bool;
+
+/// NB: This is not to be shared externally.
+/// Only for trusted mods and staff.
+#[derive(Serialize)]
+pub struct ListUsersPage {
+  pub users: Vec<UserForList>,
+  pub sorted_ascending: bool,
+  pub sorted_by_key: String,
+
+  /// ID of the first record in `users`
+  pub first_id: Option<i64>,
+
+  /// ID of the last record in `users`
+  pub last_id: Option<i64>,
+}
+
+#[derive(Serialize)]
+pub struct UserForList {
+  pub user_id: i64,
+  pub user_token: String,
+
+  pub username: String,
+  pub display_name: String,
+  pub gravatar_hash: String,
+
+  pub is_banned: bool,
+  pub user_role_slug: String,
+
+  pub created_at: String,
+  pub updated_at: String,
+}
+
+pub struct BuildListUsers {
+  sort_ascending: bool,
+  per_page: i64,
+}
+
+impl BuildListUsers {
+  pub fn new() -> Self {
+    Self {
+      sort_ascending: false,
+      per_page: 50,
+    }
+  }
+
+  pub fn sort_ascending(mut self, sort_ascending: bool) -> Self {
+    self.sort_ascending = sort_ascending;
+    self
+  }
+
+  pub async fn query_for_page(
+    &self,
+    mysql_pool: &MySqlPool
+  ) -> AnyhowResult<ListUsersPage> {
+
+    let internal_results = self.internal_query(mysql_pool).await?;
+
+    let mut first_id = internal_results.first()
+        .map(|raw_result| raw_result.user_id);
+
+    let mut last_id = internal_results.last()
+        .map(|raw_result| raw_result.user_id);
+
+    let users = internal_results
+        .iter()
+        .map(|r| {
+          UserForList {
+            user_id: r.user_id,
+            user_token: r.user_token.clone(),
+            username: r.username.clone(),
+            display_name: r.display_name.clone(),
+            gravatar_hash: r.gravatar_hash.clone(),
+            is_banned: i8_to_bool(r.is_banned),
+            user_role_slug: r.user_role_slug.clone(),
+            created_at: r.created_at.clone(),
+            updated_at: r.updated_at.clone(),
+          }
+        })
+        .collect::<Vec<UserForList>>();
+
+    Ok(ListUsersPage {
+      users,
+      sorted_ascending: false,
+      sorted_by_key: "".to_string(),
+      first_id,
+      last_id,
+    })
+  }
+
+  async fn internal_query(
+    &self,
+    mysql_pool: &MySqlPool
+  ) -> AnyhowResult<Vec<UserForListRaw>> {
+
+    let query = self.build_query_string();
+    let mut query = sqlx::query_as::<_, UserForListRaw>(&query);
+
+
+    let mut results = query.fetch_all(mysql_pool)
+        .await?;
+
+    Ok(results)
+  }
+
+  pub fn build_query_string(&self) -> String {
+    let mut query_string = r#"
+SELECT
+  id as user_id,
+  user_token,
+  username,
+  display_name,
+  display_name,
+  email_gravatar_hash as gravatar_hash,
+  is_banned,
+  user_role_slug,
+  created_at,
+  updated_at,
+FROM users
+LIMIT 50
+"#;
+
+    query_string.to_string()
+  }
+}
+
+#[derive(sqlx::FromRow)]
+pub struct UserForListRaw {
+  pub user_id: i64,
+  pub user_token: String,
+
+  pub username: String,
+  pub display_name: String,
+  pub gravatar_hash: String,
+
+  pub is_banned: i8,
+  pub user_role_slug: String,
+
+  pub created_at: String,
+  pub updated_at: String,
+}
+
