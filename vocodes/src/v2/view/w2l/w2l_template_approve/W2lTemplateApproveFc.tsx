@@ -5,6 +5,7 @@ import { SessionWrapper } from '../../../../session/SessionWrapper';
 import { useParams, Link, useHistory } from 'react-router-dom';
 import { GetW2lTemplate, GetW2lTemplateIsOk, W2lTemplate } from '../../../api/w2l/GetW2lTemplate';
 import { GetW2lTemplateUseCount } from '../../../api/w2l/GetW2lTemplateUseCount';
+import { BackLink } from '../../_common/BackLink';
 
 const DEFAULT_APPROVED_STATE = true;
 
@@ -104,7 +105,7 @@ function W2lTemplateApproveFc(props: Props) {
       <h1 className="title is-1"> {h1Title} </h1>
       
       <p>
-        <Link to={templateLink}>&lt; Back to template</Link>
+        <BackLink link={templateLink} text="Back to template" />
       </p>
       
       <table className="table">
@@ -164,7 +165,7 @@ function W2lTemplateApproveFc(props: Props) {
 
       <br />
       <br />
-      <Link to={templateLink}>&lt; Back to template</Link>
+      <BackLink link={templateLink} text="Back to template" />
     </div>
   )
 }

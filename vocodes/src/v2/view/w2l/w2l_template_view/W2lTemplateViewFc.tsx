@@ -434,7 +434,7 @@ function W2lTemplateViewFc(props: Props) {
 
       <div className="content">
         <p>
-          <Link to={FrontendUrlConfig.w2lListPage()}>&lt; Back to all templates</Link>
+          <BackLink link={FrontendUrlConfig.w2lListPage()} text="Back to all templates" />
         </p>
       </div>
 

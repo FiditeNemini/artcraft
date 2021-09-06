@@ -6,6 +6,7 @@ import { FrontendUrlConfig } from '../../../../common/FrontendUrlConfig';
 import { VisibleIconFc } from '../../_icons/VisibleIcon';
 import { HiddenIconFc } from '../../_icons/HiddenIcon';
 import { GetW2lTemplate, GetW2lTemplateIsOk, W2lTemplate } from '../../../api/w2l/GetW2lTemplate';
+import { BackLink } from '../../_common/BackLink';
 
 const DEFAULT_VISIBILITY = 'public';
 
@@ -114,7 +115,7 @@ function W2lTemplateEditFc(props: Props) {
       <h1 className="title is-1"> Edit Template </h1>
 
       <p>
-        <Link to={templateLink}>&lt; Back to template</Link>
+        <BackLink link={templateLink} text="Back to template" />
       </p>
 
       <form onSubmit={handleFormSubmit}>
