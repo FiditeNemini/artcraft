@@ -106,6 +106,7 @@ use sqlx::mysql::MySqlPoolOptions;
 use std::sync::Arc;
 use std::time::Duration;
 use crate::http_server::endpoints::moderation::users::list_users::list_users_handler;
+use crate::http_server::endpoints::leaderboard::get_leaderboard::leaderboard_handler;
 
 // TODO TODO TODO TODO
 // TODO TODO TODO TODO
@@ -590,6 +591,11 @@ pub async fn serve(server_state: ServerState) -> AnyhowResult<()>
         web::resource("/events")
           .route(web::get().to(list_events_handler))
           .route(web::head().to(|| HttpResponse::Ok()))
+      )
+      .service(
+        web::resource("/leaderboard")
+            .route(web::get().to(leaderboard_handler))
+            .route(web::head().to(|| HttpResponse::Ok()))
       )
       .service(get_root_index)
       .service(enable_alpha_handler)
