@@ -1,9 +1,10 @@
 import React, { useCallback, useEffect, useState }  from 'react';
 import { ApiConfig } from '../../../../common/ApiConfig';
-import { Link, useHistory } from 'react-router-dom';
+import { useHistory } from 'react-router-dom';
 import { SessionWrapper } from '../../../../session/SessionWrapper';
 import { useParams } from 'react-router-dom';
 import { GetUserByUsername, GetUserByUsernameIsOk, User } from '../../../api/user/GetUserByUsername';
+import { BackLink } from '../../_common/BackLink';
 
 interface Props {
   sessionWrapper: SessionWrapper,
@@ -109,7 +110,7 @@ function ProfileBanFc(props: Props) {
     <div>
       <h2 className="subtitle is-2">Profile &amp; Preferences</h2>
 
-      <Link to={viewLinkUrl}>&lt; Back to profile</Link>
+      <BackLink link={viewLinkUrl} text="Back to profile" />
 
       <br />
       <br />

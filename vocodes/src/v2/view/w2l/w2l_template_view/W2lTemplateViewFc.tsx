@@ -15,6 +15,7 @@ import { FrontendUrlConfig } from '../../../../common/FrontendUrlConfig';
 import { GetW2lTemplate, GetW2lTemplateIsErr, GetW2lTemplateIsOk, W2lTemplate, W2lTemplateLookupError } from '../../../api/w2l/GetW2lTemplate';
 import { GetW2lTemplateUseCount } from '../../../api/w2l/GetW2lTemplateUseCount';
 import { GravatarFc } from '../../_common/GravatarFc';
+import { BackLink } from '../../_common/BackLink';
 
 interface EnqueueJobResponsePayload {
   success: boolean,
@@ -311,7 +312,7 @@ function W2lTemplateViewFc(props: Props) {
 
       <div className="content">
         <p>
-          <Link to={FrontendUrlConfig.w2lListPage()}>&lt; Back to all templates</Link>
+          <BackLink link={FrontendUrlConfig.w2lListPage()} text="Back to all templates" />
         </p>
       </div>
 

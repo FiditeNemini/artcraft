@@ -40,9 +40,6 @@ function ModerationUserListFc(props: Props) {
   let rows : Array<JSX.Element> = [];
 
   userList.forEach(user => {
-    //const modUserLink = `/profile/${ban.mod_username}`;
-    //const viewBanLink = `/moderation/ip_bans/${ban.ip_address}`;
-
     const createTime = new Date(user.created_at);
     const relativeCreateTime = formatDistance(createTime, now, { addSuffix: true });
     
@@ -63,14 +60,6 @@ function ModerationUserListFc(props: Props) {
         <td>{relativeUpdateTime}</td>
         <td>{user.user_role_slug}</td>
         <td>{user.is_banned ? "banned" : ""}</td>
-        {/*<td>
-          <Link to={modUserLink}>{ban.mod_username}</Link>
-        </td>
-        <td>{ban.mod_notes}</td>
-        <td>{relativeCreateTime}</td>
-        <td>
-          <Link to={viewBanLink}>view / edit</Link>
-        </td>*/}
       </tr>
     )
   });
