@@ -1,18 +1,20 @@
 use actix_web::HttpRequest;
 use actix_web::dev::ServiceRequest;
-use actix_web::http::HeaderName;
 use log::{info};
+use actix_web::http::{HeaderMap, HeaderName};
+use std::str::FromStr;
 
 pub fn get_request_ip(request: &HttpRequest) -> String {
-  match request.headers().get(HeaderName::from_static("x-voder-proxy-for")) {
-    Some(ip_address) => {
-      // Unfortunately the upstream Rust proxy is replacing the `forwarded` and `x-forwarded-for`
-      // headers, so we populate this custom header as a workaround.
-      info!("Proxied IP address: {:?}", ip_address);
-      ip_address.to_str()
-        .unwrap_or("")
-        .to_string()
-    },
+  let headers = request.headers();
+  let maybe_x_forwarded = get_ip_from_header(headers, "x-forwarded-for");
+  let maybe_forwarded = get_ip_from_header(headers, "forwarded");
+
+  info!("(1) x-forwarded-for: {:?}, forwarded: {:?}", maybe_x_forwarded, maybe_forwarded);
+
+  let maybe_ip = maybe_x_forwarded.or(maybe_forwarded);
+
+  match maybe_ip {
+    Some(ip_address) => ip_address,
     None => {
       // If we're running without the upstream Rust proxy, we can grab 'x-forarded-for', which is
       // populated by the DigitalOcean load balancer.
@@ -26,7 +28,7 @@ pub fn get_request_ip(request: &HttpRequest) -> String {
         .copied()
         .unwrap_or("")
         .to_string();
-      info!("Forwarded IP address: {}", &ip_address);
+      info!("Forwarded IP address (1): {}", &ip_address);
       ip_address
     },
   }
@@ -34,15 +36,16 @@ pub fn get_request_ip(request: &HttpRequest) -> String {
 
 // TODO: De-duplicate
 pub fn get_service_request_ip(request: &ServiceRequest) -> String {
-  match request.headers().get(HeaderName::from_static("x-voder-proxy-for")) {
-    Some(ip_address) => {
-      // Unfortunately the upstream Rust proxy is replacing the `forwarded` and `x-forwarded-for`
-      // headers, so we populate this custom header as a workaround.
-      info!("Proxied IP address: {:?}", ip_address);
-      ip_address.to_str()
-          .unwrap_or("")
-          .to_string()
-    },
+  let headers = request.headers();
+  let maybe_x_forwarded = get_ip_from_header(headers, "x-forwarded-for");
+  let maybe_forwarded = get_ip_from_header(headers, "forwarded");
+
+  info!("(2) x-forwarded-for: {:?}, forwarded: {:?}", maybe_x_forwarded, maybe_forwarded);
+
+  let maybe_ip = maybe_x_forwarded.or(maybe_forwarded);
+
+  match maybe_ip {
+    Some(ip_address) => ip_address,
     None => {
       // If we're running without the upstream Rust proxy, we can grab 'x-forarded-for', which is
       // populated by the DigitalOcean load balancer.
@@ -56,8 +59,18 @@ pub fn get_service_request_ip(request: &ServiceRequest) -> String {
           .copied()
           .unwrap_or("")
           .to_string();
-      info!("Forwarded IP address: {}", &ip_address);
+      info!("(2) Forwarded IP address: {}", &ip_address);
       ip_address
     },
+  }
+}
+
+fn get_ip_from_header(headers: &HeaderMap, header_name: &str) -> Option<String> {
+  if let Ok(header_name) = HeaderName::from_str(header_name) {
+    headers.get(&header_name)
+      .and_then(|value| value.to_str().ok())
+      .map(|v| v.to_string())
+  } else {
+    None
   }
 }
