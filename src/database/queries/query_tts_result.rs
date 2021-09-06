@@ -3,7 +3,7 @@ use chrono::{DateTime, Utc};
 use crate::AnyhowResult;
 use crate::database::enums::record_visibility::RecordVisibility;
 use crate::database::enums::vocoder_type::VocoderType;
-use crate::database::helpers::boolean_converters::i8_to_bool;
+use crate::database::helpers::boolean_converters::{i8_to_bool, nullable_i8_to_bool};
 use crate::database::helpers::boolean_converters::nullable_i8_to_optional_bool;
 use derive_more::{Display, Error};
 use log::{info, warn, log};
@@ -55,8 +55,10 @@ pub struct TtsResultRecordForResponse {
 /// It's the web endpoint controller's responsibility to clear these for non-mods.
 #[derive(Serialize)]
 pub struct TtsResultModeratorFields {
-  pub creator_ip_address: String,
-  pub user_deleted_at: Option<DateTime<Utc>>,
+  pub model_creator_is_banned: bool,
+  pub result_creator_is_banned_if_user: bool,
+  pub result_creator_ip_address: String,
+  pub result_creator_deleted_at: Option<DateTime<Utc>>,
   pub mod_deleted_at: Option<DateTime<Utc>>,
 }
 
@@ -70,11 +72,13 @@ pub struct TtsResultRecordRaw {
 
   pub maybe_pretrained_vocoder_used: Option<String>,
 
+  pub maybe_creator_is_banned: Option<i8>,
   pub maybe_creator_user_token: Option<String>,
   pub maybe_creator_username: Option<String>,
   pub maybe_creator_display_name: Option<String>,
   pub maybe_creator_gravatar_hash: Option<String>,
 
+  pub maybe_model_creator_is_banned: Option<i8>,
   pub maybe_model_creator_user_token: Option<String>,
   pub maybe_model_creator_username: Option<String>,
   pub maybe_model_creator_display_name: Option<String>,
@@ -169,8 +173,12 @@ pub async fn select_tts_result_by_token(
     updated_at: ir.updated_at.clone(),
 
     maybe_moderator_fields: Some(TtsResultModeratorFields {
-      creator_ip_address: ir.creator_ip_address.clone(),
-      user_deleted_at: ir.user_deleted_at.clone(),
+      model_creator_is_banned:
+        nullable_i8_to_bool(ir.maybe_model_creator_is_banned, false),
+      result_creator_is_banned_if_user:
+        nullable_i8_to_bool(ir.maybe_creator_is_banned, false),
+      result_creator_ip_address: ir.creator_ip_address.clone(),
+      result_creator_deleted_at: ir.user_deleted_at.clone(),
       mod_deleted_at: ir.mod_deleted_at.clone(),
     }),
   };
@@ -199,11 +207,13 @@ SELECT
     users.username as maybe_creator_username,
     users.display_name as maybe_creator_display_name,
     users.email_gravatar_hash as maybe_creator_gravatar_hash,
+    users.is_banned as maybe_creator_is_banned,
 
     model_users.token as maybe_model_creator_user_token,
     model_users.username as maybe_model_creator_username,
     model_users.display_name as maybe_model_creator_display_name,
     model_users.email_gravatar_hash as maybe_model_creator_gravatar_hash,
+    model_users.is_banned as maybe_model_creator_is_banned,
 
     tts_results.public_bucket_wav_audio_path,
     tts_results.public_bucket_spectrogram_path,
@@ -256,11 +266,13 @@ SELECT
     users.username as maybe_creator_username,
     users.display_name as maybe_creator_display_name,
     users.email_gravatar_hash as maybe_creator_gravatar_hash,
+    users.is_banned as maybe_creator_is_banned,
 
     model_users.token as maybe_model_creator_user_token,
     model_users.username as maybe_model_creator_username,
     model_users.display_name as maybe_model_creator_display_name,
     model_users.email_gravatar_hash as maybe_model_creator_gravatar_hash,
+    model_users.is_banned as maybe_model_creator_is_banned,
 
     tts_results.public_bucket_wav_audio_path,
     tts_results.public_bucket_spectrogram_path,

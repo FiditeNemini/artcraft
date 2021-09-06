@@ -375,278 +375,6 @@
       ]
     }
   },
-  "030f7997681c4465e74929289aa24be0bb9a5d676d457a38be4353acda2341a9": {
-    "query": "\nSELECT\n    tts.token as model_token,\n    tts.tts_model_type,\n    tts.text_preprocessing_algorithm,\n    tts.maybe_default_pretrained_vocoder,\n\n    tts.creator_user_token,\n    users.username as creator_username,\n    users.display_name as creator_display_name,\n    users.email_gravatar_hash as creator_gravatar_hash,\n\n    tts.title,\n    tts.description_markdown,\n    tts.description_rendered_html,\n\n    tts.creator_set_visibility,\n\n    tts.is_locked_from_use,\n    tts.is_locked_from_user_modification,\n\n    tts.created_at,\n    tts.updated_at,\n\n    tts.creator_ip_address_creation,\n    tts.creator_ip_address_last_update,\n    tts.mod_deleted_at,\n    tts.user_deleted_at\n\nFROM tts_models as tts\nJOIN users\n    ON users.token = tts.creator_user_token\nWHERE\n    tts.token = ?\n    AND tts.user_deleted_at IS NULL\n    AND tts.mod_deleted_at IS NULL\n        ",
-    "describe": {
-      "columns": [
-        {
-          "ordinal": 0,
-          "name": "model_token",
-          "type_info": {
-            "type": "VarString",
-            "flags": {
-              "bits": 4229
-            },
-            "char_set": 224,
-            "max_size": 128
-          }
-        },
-        {
-          "ordinal": 1,
-          "name": "tts_model_type",
-          "type_info": {
-            "type": "String",
-            "flags": {
-              "bits": 385
-            },
-            "char_set": 224,
-            "max_size": 60
-          }
-        },
-        {
-          "ordinal": 2,
-          "name": "text_preprocessing_algorithm",
-          "type_info": {
-            "type": "String",
-            "flags": {
-              "bits": 385
-            },
-            "char_set": 224,
-            "max_size": 28
-          }
-        },
-        {
-          "ordinal": 3,
-          "name": "maybe_default_pretrained_vocoder",
-          "type_info": {
-            "type": "VarString",
-            "flags": {
-              "bits": 128
-            },
-            "char_set": 224,
-            "max_size": 256
-          }
-        },
-        {
-          "ordinal": 4,
-          "name": "creator_user_token",
-          "type_info": {
-            "type": "VarString",
-            "flags": {
-              "bits": 4233
-            },
-            "char_set": 224,
-            "max_size": 128
-          }
-        },
-        {
-          "ordinal": 5,
-          "name": "creator_username",
-          "type_info": {
-            "type": "VarString",
-            "flags": {
-              "bits": 4229
-            },
-            "char_set": 224,
-            "max_size": 80
-          }
-        },
-        {
-          "ordinal": 6,
-          "name": "creator_display_name",
-          "type_info": {
-            "type": "VarString",
-            "flags": {
-              "bits": 4225
-            },
-            "char_set": 224,
-            "max_size": 80
-          }
-        },
-        {
-          "ordinal": 7,
-          "name": "creator_gravatar_hash",
-          "type_info": {
-            "type": "String",
-            "flags": {
-              "bits": 4225
-            },
-            "char_set": 224,
-            "max_size": 128
-          }
-        },
-        {
-          "ordinal": 8,
-          "name": "title",
-          "type_info": {
-            "type": "VarString",
-            "flags": {
-              "bits": 4225
-            },
-            "char_set": 224,
-            "max_size": 1020
-          }
-        },
-        {
-          "ordinal": 9,
-          "name": "description_markdown",
-          "type_info": {
-            "type": "Blob",
-            "flags": {
-              "bits": 4241
-            },
-            "char_set": 224,
-            "max_size": 262140
-          }
-        },
-        {
-          "ordinal": 10,
-          "name": "description_rendered_html",
-          "type_info": {
-            "type": "Blob",
-            "flags": {
-              "bits": 4241
-            },
-            "char_set": 224,
-            "max_size": 262140
-          }
-        },
-        {
-          "ordinal": 11,
-          "name": "creator_set_visibility",
-          "type_info": {
-            "type": "String",
-            "flags": {
-              "bits": 393
-            },
-            "char_set": 224,
-            "max_size": 28
-          }
-        },
-        {
-          "ordinal": 12,
-          "name": "is_locked_from_use",
-          "type_info": {
-            "type": "Tiny",
-            "flags": {
-              "bits": 9
-            },
-            "char_set": 63,
-            "max_size": 1
-          }
-        },
-        {
-          "ordinal": 13,
-          "name": "is_locked_from_user_modification",
-          "type_info": {
-            "type": "Tiny",
-            "flags": {
-              "bits": 9
-            },
-            "char_set": 63,
-            "max_size": 1
-          }
-        },
-        {
-          "ordinal": 14,
-          "name": "created_at",
-          "type_info": {
-            "type": "Timestamp",
-            "flags": {
-              "bits": 1153
-            },
-            "char_set": 63,
-            "max_size": 19
-          }
-        },
-        {
-          "ordinal": 15,
-          "name": "updated_at",
-          "type_info": {
-            "type": "Timestamp",
-            "flags": {
-              "bits": 9345
-            },
-            "char_set": 63,
-            "max_size": 19
-          }
-        },
-        {
-          "ordinal": 16,
-          "name": "creator_ip_address_creation",
-          "type_info": {
-            "type": "VarString",
-            "flags": {
-              "bits": 4233
-            },
-            "char_set": 224,
-            "max_size": 160
-          }
-        },
-        {
-          "ordinal": 17,
-          "name": "creator_ip_address_last_update",
-          "type_info": {
-            "type": "VarString",
-            "flags": {
-              "bits": 4233
-            },
-            "char_set": 224,
-            "max_size": 160
-          }
-        },
-        {
-          "ordinal": 18,
-          "name": "mod_deleted_at",
-          "type_info": {
-            "type": "Timestamp",
-            "flags": {
-              "bits": 128
-            },
-            "char_set": 63,
-            "max_size": 19
-          }
-        },
-        {
-          "ordinal": 19,
-          "name": "user_deleted_at",
-          "type_info": {
-            "type": "Timestamp",
-            "flags": {
-              "bits": 128
-            },
-            "char_set": 63,
-            "max_size": 19
-          }
-        }
-      ],
-      "parameters": {
-        "Right": 1
-      },
-      "nullable": [
-        false,
-        false,
-        false,
-        true,
-        false,
-        false,
-        false,
-        false,
-        false,
-        false,
-        false,
-        false,
-        false,
-        false,
-        false,
-        false,
-        false,
-        false,
-        true,
-        true
-      ]
-    }
-  },
   "05c3ebf54cd8a5374d6f4bbe21b3c6027ce6314917af8acd0ed136d375d53342": {
     "query": "\nSELECT\n    w2l.token as template_token,\n    w2l.template_type,\n    w2l.creator_user_token,\n    users.username as creator_username,\n    users.display_name as creator_display_name,\n    w2l.title,\n    w2l.frame_width,\n    w2l.frame_height,\n    w2l.duration_millis,\n    w2l.maybe_public_bucket_preview_image_object_name,\n    w2l.maybe_public_bucket_preview_video_object_name,\n    w2l.is_public_listing_approved,\n    w2l.created_at,\n    w2l.updated_at\nFROM w2l_templates as w2l\nJOIN users\nON\n    users.token = w2l.creator_user_token\nWHERE\n    users.username = ?\n    AND w2l.user_deleted_at IS NULL\n    AND w2l.mod_deleted_at IS NULL\n        ",
     "describe": {
@@ -1501,6 +1229,291 @@
       ]
     }
   },
+  "0beeed2c02db2008aac904e20de9eb3677e4b16a11d10975cec566e4ef84c6b6": {
+    "query": "\nSELECT\n    tts.token as model_token,\n    tts.tts_model_type,\n    tts.text_preprocessing_algorithm,\n    tts.maybe_default_pretrained_vocoder,\n\n    tts.creator_user_token,\n    users.username as creator_username,\n    users.display_name as creator_display_name,\n    users.email_gravatar_hash as creator_gravatar_hash,\n    users.is_banned as creator_is_banned,\n\n    tts.title,\n    tts.description_markdown,\n    tts.description_rendered_html,\n\n    tts.creator_set_visibility,\n\n    tts.is_locked_from_use,\n    tts.is_locked_from_user_modification,\n\n    tts.created_at,\n    tts.updated_at,\n\n    tts.creator_ip_address_creation,\n    tts.creator_ip_address_last_update,\n    tts.mod_deleted_at,\n    tts.user_deleted_at\n\nFROM tts_models as tts\nJOIN users\n    ON users.token = tts.creator_user_token\nWHERE\n    tts.token = ?\n    AND tts.user_deleted_at IS NULL\n    AND tts.mod_deleted_at IS NULL\n        ",
+    "describe": {
+      "columns": [
+        {
+          "ordinal": 0,
+          "name": "model_token",
+          "type_info": {
+            "type": "VarString",
+            "flags": {
+              "bits": 4229
+            },
+            "char_set": 224,
+            "max_size": 128
+          }
+        },
+        {
+          "ordinal": 1,
+          "name": "tts_model_type",
+          "type_info": {
+            "type": "String",
+            "flags": {
+              "bits": 385
+            },
+            "char_set": 224,
+            "max_size": 60
+          }
+        },
+        {
+          "ordinal": 2,
+          "name": "text_preprocessing_algorithm",
+          "type_info": {
+            "type": "String",
+            "flags": {
+              "bits": 385
+            },
+            "char_set": 224,
+            "max_size": 28
+          }
+        },
+        {
+          "ordinal": 3,
+          "name": "maybe_default_pretrained_vocoder",
+          "type_info": {
+            "type": "VarString",
+            "flags": {
+              "bits": 128
+            },
+            "char_set": 224,
+            "max_size": 256
+          }
+        },
+        {
+          "ordinal": 4,
+          "name": "creator_user_token",
+          "type_info": {
+            "type": "VarString",
+            "flags": {
+              "bits": 4233
+            },
+            "char_set": 224,
+            "max_size": 128
+          }
+        },
+        {
+          "ordinal": 5,
+          "name": "creator_username",
+          "type_info": {
+            "type": "VarString",
+            "flags": {
+              "bits": 4229
+            },
+            "char_set": 224,
+            "max_size": 80
+          }
+        },
+        {
+          "ordinal": 6,
+          "name": "creator_display_name",
+          "type_info": {
+            "type": "VarString",
+            "flags": {
+              "bits": 4225
+            },
+            "char_set": 224,
+            "max_size": 80
+          }
+        },
+        {
+          "ordinal": 7,
+          "name": "creator_gravatar_hash",
+          "type_info": {
+            "type": "String",
+            "flags": {
+              "bits": 4225
+            },
+            "char_set": 224,
+            "max_size": 128
+          }
+        },
+        {
+          "ordinal": 8,
+          "name": "creator_is_banned",
+          "type_info": {
+            "type": "Tiny",
+            "flags": {
+              "bits": 1
+            },
+            "char_set": 63,
+            "max_size": 1
+          }
+        },
+        {
+          "ordinal": 9,
+          "name": "title",
+          "type_info": {
+            "type": "VarString",
+            "flags": {
+              "bits": 4225
+            },
+            "char_set": 224,
+            "max_size": 1020
+          }
+        },
+        {
+          "ordinal": 10,
+          "name": "description_markdown",
+          "type_info": {
+            "type": "Blob",
+            "flags": {
+              "bits": 4241
+            },
+            "char_set": 224,
+            "max_size": 262140
+          }
+        },
+        {
+          "ordinal": 11,
+          "name": "description_rendered_html",
+          "type_info": {
+            "type": "Blob",
+            "flags": {
+              "bits": 4241
+            },
+            "char_set": 224,
+            "max_size": 262140
+          }
+        },
+        {
+          "ordinal": 12,
+          "name": "creator_set_visibility",
+          "type_info": {
+            "type": "String",
+            "flags": {
+              "bits": 393
+            },
+            "char_set": 224,
+            "max_size": 28
+          }
+        },
+        {
+          "ordinal": 13,
+          "name": "is_locked_from_use",
+          "type_info": {
+            "type": "Tiny",
+            "flags": {
+              "bits": 9
+            },
+            "char_set": 63,
+            "max_size": 1
+          }
+        },
+        {
+          "ordinal": 14,
+          "name": "is_locked_from_user_modification",
+          "type_info": {
+            "type": "Tiny",
+            "flags": {
+              "bits": 9
+            },
+            "char_set": 63,
+            "max_size": 1
+          }
+        },
+        {
+          "ordinal": 15,
+          "name": "created_at",
+          "type_info": {
+            "type": "Timestamp",
+            "flags": {
+              "bits": 1153
+            },
+            "char_set": 63,
+            "max_size": 19
+          }
+        },
+        {
+          "ordinal": 16,
+          "name": "updated_at",
+          "type_info": {
+            "type": "Timestamp",
+            "flags": {
+              "bits": 9345
+            },
+            "char_set": 63,
+            "max_size": 19
+          }
+        },
+        {
+          "ordinal": 17,
+          "name": "creator_ip_address_creation",
+          "type_info": {
+            "type": "VarString",
+            "flags": {
+              "bits": 4233
+            },
+            "char_set": 224,
+            "max_size": 160
+          }
+        },
+        {
+          "ordinal": 18,
+          "name": "creator_ip_address_last_update",
+          "type_info": {
+            "type": "VarString",
+            "flags": {
+              "bits": 4233
+            },
+            "char_set": 224,
+            "max_size": 160
+          }
+        },
+        {
+          "ordinal": 19,
+          "name": "mod_deleted_at",
+          "type_info": {
+            "type": "Timestamp",
+            "flags": {
+              "bits": 128
+            },
+            "char_set": 63,
+            "max_size": 19
+          }
+        },
+        {
+          "ordinal": 20,
+          "name": "user_deleted_at",
+          "type_info": {
+            "type": "Timestamp",
+            "flags": {
+              "bits": 128
+            },
+            "char_set": 63,
+            "max_size": 19
+          }
+        }
+      ],
+      "parameters": {
+        "Right": 1
+      },
+      "nullable": [
+        false,
+        false,
+        false,
+        true,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        true,
+        true
+      ]
+    }
+  },
   "0caed749627ff22ae1cea52621a375156259a731e8070459593082b80d463491": {
     "query": "\nSELECT\n  id,\n  status\nFROM tts_model_upload_jobs\nWHERE id = ?\nFOR UPDATE\n        ",
     "describe": {
@@ -1536,317 +1549,6 @@
       "nullable": [
         false,
         false
-      ]
-    }
-  },
-  "0fb69a1cc22eb6d9fc189005f031e1636acbec6ba2033e980ccf5340eb337c08": {
-    "query": "\nSELECT\n    tts_results.token as tts_result_token,\n\n    tts_results.raw_inference_text,\n\n    tts_results.model_token as tts_model_token,\n    tts_models.title as tts_model_title,\n\n    tts_results.maybe_pretrained_vocoder_used,\n\n    users.token as maybe_creator_user_token,\n    users.username as maybe_creator_username,\n    users.display_name as maybe_creator_display_name,\n    users.email_gravatar_hash as maybe_creator_gravatar_hash,\n\n    model_users.token as maybe_model_creator_user_token,\n    model_users.username as maybe_model_creator_username,\n    model_users.display_name as maybe_model_creator_display_name,\n    model_users.email_gravatar_hash as maybe_model_creator_gravatar_hash,\n\n    tts_results.public_bucket_wav_audio_path,\n    tts_results.public_bucket_spectrogram_path,\n\n    tts_results.creator_set_visibility,\n\n    tts_results.file_size_bytes,\n    tts_results.duration_millis,\n    tts_results.created_at,\n    tts_results.updated_at,\n\n    tts_results.creator_ip_address,\n    tts_results.user_deleted_at,\n    tts_results.mod_deleted_at\n\nFROM tts_results\nLEFT OUTER JOIN tts_models\n  ON tts_results.model_token = tts_models.token\nLEFT OUTER JOIN users\n  ON tts_results.maybe_creator_user_token = users.token\nLEFT OUTER JOIN users as model_users\n  ON tts_models.creator_user_token = model_users.token\nWHERE\n    tts_results.token = ?\n        ",
-    "describe": {
-      "columns": [
-        {
-          "ordinal": 0,
-          "name": "tts_result_token",
-          "type_info": {
-            "type": "VarString",
-            "flags": {
-              "bits": 4229
-            },
-            "char_set": 224,
-            "max_size": 128
-          }
-        },
-        {
-          "ordinal": 1,
-          "name": "raw_inference_text",
-          "type_info": {
-            "type": "Blob",
-            "flags": {
-              "bits": 4241
-            },
-            "char_set": 224,
-            "max_size": 262140
-          }
-        },
-        {
-          "ordinal": 2,
-          "name": "tts_model_token",
-          "type_info": {
-            "type": "VarString",
-            "flags": {
-              "bits": 4233
-            },
-            "char_set": 224,
-            "max_size": 128
-          }
-        },
-        {
-          "ordinal": 3,
-          "name": "tts_model_title",
-          "type_info": {
-            "type": "VarString",
-            "flags": {
-              "bits": 4224
-            },
-            "char_set": 224,
-            "max_size": 1020
-          }
-        },
-        {
-          "ordinal": 4,
-          "name": "maybe_pretrained_vocoder_used",
-          "type_info": {
-            "type": "VarString",
-            "flags": {
-              "bits": 128
-            },
-            "char_set": 224,
-            "max_size": 256
-          }
-        },
-        {
-          "ordinal": 5,
-          "name": "maybe_creator_user_token",
-          "type_info": {
-            "type": "VarString",
-            "flags": {
-              "bits": 4228
-            },
-            "char_set": 224,
-            "max_size": 128
-          }
-        },
-        {
-          "ordinal": 6,
-          "name": "maybe_creator_username",
-          "type_info": {
-            "type": "VarString",
-            "flags": {
-              "bits": 4228
-            },
-            "char_set": 224,
-            "max_size": 80
-          }
-        },
-        {
-          "ordinal": 7,
-          "name": "maybe_creator_display_name",
-          "type_info": {
-            "type": "VarString",
-            "flags": {
-              "bits": 4224
-            },
-            "char_set": 224,
-            "max_size": 80
-          }
-        },
-        {
-          "ordinal": 8,
-          "name": "maybe_creator_gravatar_hash",
-          "type_info": {
-            "type": "String",
-            "flags": {
-              "bits": 4224
-            },
-            "char_set": 224,
-            "max_size": 128
-          }
-        },
-        {
-          "ordinal": 9,
-          "name": "maybe_model_creator_user_token",
-          "type_info": {
-            "type": "VarString",
-            "flags": {
-              "bits": 4228
-            },
-            "char_set": 224,
-            "max_size": 128
-          }
-        },
-        {
-          "ordinal": 10,
-          "name": "maybe_model_creator_username",
-          "type_info": {
-            "type": "VarString",
-            "flags": {
-              "bits": 4228
-            },
-            "char_set": 224,
-            "max_size": 80
-          }
-        },
-        {
-          "ordinal": 11,
-          "name": "maybe_model_creator_display_name",
-          "type_info": {
-            "type": "VarString",
-            "flags": {
-              "bits": 4224
-            },
-            "char_set": 224,
-            "max_size": 80
-          }
-        },
-        {
-          "ordinal": 12,
-          "name": "maybe_model_creator_gravatar_hash",
-          "type_info": {
-            "type": "String",
-            "flags": {
-              "bits": 4224
-            },
-            "char_set": 224,
-            "max_size": 128
-          }
-        },
-        {
-          "ordinal": 13,
-          "name": "public_bucket_wav_audio_path",
-          "type_info": {
-            "type": "VarString",
-            "flags": {
-              "bits": 4225
-            },
-            "char_set": 224,
-            "max_size": 1020
-          }
-        },
-        {
-          "ordinal": 14,
-          "name": "public_bucket_spectrogram_path",
-          "type_info": {
-            "type": "VarString",
-            "flags": {
-              "bits": 4225
-            },
-            "char_set": 224,
-            "max_size": 1020
-          }
-        },
-        {
-          "ordinal": 15,
-          "name": "creator_set_visibility",
-          "type_info": {
-            "type": "String",
-            "flags": {
-              "bits": 385
-            },
-            "char_set": 224,
-            "max_size": 28
-          }
-        },
-        {
-          "ordinal": 16,
-          "name": "file_size_bytes",
-          "type_info": {
-            "type": "Long",
-            "flags": {
-              "bits": 1
-            },
-            "char_set": 63,
-            "max_size": 10
-          }
-        },
-        {
-          "ordinal": 17,
-          "name": "duration_millis",
-          "type_info": {
-            "type": "Long",
-            "flags": {
-              "bits": 1
-            },
-            "char_set": 63,
-            "max_size": 10
-          }
-        },
-        {
-          "ordinal": 18,
-          "name": "created_at",
-          "type_info": {
-            "type": "Timestamp",
-            "flags": {
-              "bits": 1153
-            },
-            "char_set": 63,
-            "max_size": 19
-          }
-        },
-        {
-          "ordinal": 19,
-          "name": "updated_at",
-          "type_info": {
-            "type": "Timestamp",
-            "flags": {
-              "bits": 9345
-            },
-            "char_set": 63,
-            "max_size": 19
-          }
-        },
-        {
-          "ordinal": 20,
-          "name": "creator_ip_address",
-          "type_info": {
-            "type": "VarString",
-            "flags": {
-              "bits": 4233
-            },
-            "char_set": 224,
-            "max_size": 160
-          }
-        },
-        {
-          "ordinal": 21,
-          "name": "user_deleted_at",
-          "type_info": {
-            "type": "Timestamp",
-            "flags": {
-              "bits": 136
-            },
-            "char_set": 63,
-            "max_size": 19
-          }
-        },
-        {
-          "ordinal": 22,
-          "name": "mod_deleted_at",
-          "type_info": {
-            "type": "Timestamp",
-            "flags": {
-              "bits": 136
-            },
-            "char_set": 63,
-            "max_size": 19
-          }
-        }
-      ],
-      "parameters": {
-        "Right": 1
-      },
-      "nullable": [
-        false,
-        false,
-        false,
-        true,
-        true,
-        true,
-        true,
-        true,
-        true,
-        true,
-        true,
-        true,
-        true,
-        false,
-        false,
-        false,
-        false,
-        false,
-        false,
-        false,
-        false,
-        true,
-        true
       ]
     }
   },
@@ -2390,278 +2092,6 @@
       ]
     }
   },
-  "3048cf7a007d0d40fe22ea683edaa6be8d2a607c3077a9cb3a67ffdc07dfd1c7": {
-    "query": "\nSELECT\n    tts.token as model_token,\n    tts.tts_model_type,\n    tts.text_preprocessing_algorithm,\n    tts.maybe_default_pretrained_vocoder,\n\n    tts.creator_user_token,\n    users.username as creator_username,\n    users.display_name as creator_display_name,\n    users.email_gravatar_hash as creator_gravatar_hash,\n\n    tts.title,\n    tts.description_markdown,\n    tts.description_rendered_html,\n\n    tts.creator_set_visibility,\n\n    tts.is_locked_from_use,\n    tts.is_locked_from_user_modification,\n\n    tts.created_at,\n    tts.updated_at,\n\n    tts.creator_ip_address_creation,\n    tts.creator_ip_address_last_update,\n    tts.mod_deleted_at,\n    tts.user_deleted_at\n\nFROM tts_models as tts\nJOIN users\n    ON users.token = tts.creator_user_token\nWHERE tts.token = ?\n        ",
-    "describe": {
-      "columns": [
-        {
-          "ordinal": 0,
-          "name": "model_token",
-          "type_info": {
-            "type": "VarString",
-            "flags": {
-              "bits": 4229
-            },
-            "char_set": 224,
-            "max_size": 128
-          }
-        },
-        {
-          "ordinal": 1,
-          "name": "tts_model_type",
-          "type_info": {
-            "type": "String",
-            "flags": {
-              "bits": 385
-            },
-            "char_set": 224,
-            "max_size": 60
-          }
-        },
-        {
-          "ordinal": 2,
-          "name": "text_preprocessing_algorithm",
-          "type_info": {
-            "type": "String",
-            "flags": {
-              "bits": 385
-            },
-            "char_set": 224,
-            "max_size": 28
-          }
-        },
-        {
-          "ordinal": 3,
-          "name": "maybe_default_pretrained_vocoder",
-          "type_info": {
-            "type": "VarString",
-            "flags": {
-              "bits": 128
-            },
-            "char_set": 224,
-            "max_size": 256
-          }
-        },
-        {
-          "ordinal": 4,
-          "name": "creator_user_token",
-          "type_info": {
-            "type": "VarString",
-            "flags": {
-              "bits": 4233
-            },
-            "char_set": 224,
-            "max_size": 128
-          }
-        },
-        {
-          "ordinal": 5,
-          "name": "creator_username",
-          "type_info": {
-            "type": "VarString",
-            "flags": {
-              "bits": 4229
-            },
-            "char_set": 224,
-            "max_size": 80
-          }
-        },
-        {
-          "ordinal": 6,
-          "name": "creator_display_name",
-          "type_info": {
-            "type": "VarString",
-            "flags": {
-              "bits": 4225
-            },
-            "char_set": 224,
-            "max_size": 80
-          }
-        },
-        {
-          "ordinal": 7,
-          "name": "creator_gravatar_hash",
-          "type_info": {
-            "type": "String",
-            "flags": {
-              "bits": 4225
-            },
-            "char_set": 224,
-            "max_size": 128
-          }
-        },
-        {
-          "ordinal": 8,
-          "name": "title",
-          "type_info": {
-            "type": "VarString",
-            "flags": {
-              "bits": 4225
-            },
-            "char_set": 224,
-            "max_size": 1020
-          }
-        },
-        {
-          "ordinal": 9,
-          "name": "description_markdown",
-          "type_info": {
-            "type": "Blob",
-            "flags": {
-              "bits": 4241
-            },
-            "char_set": 224,
-            "max_size": 262140
-          }
-        },
-        {
-          "ordinal": 10,
-          "name": "description_rendered_html",
-          "type_info": {
-            "type": "Blob",
-            "flags": {
-              "bits": 4241
-            },
-            "char_set": 224,
-            "max_size": 262140
-          }
-        },
-        {
-          "ordinal": 11,
-          "name": "creator_set_visibility",
-          "type_info": {
-            "type": "String",
-            "flags": {
-              "bits": 393
-            },
-            "char_set": 224,
-            "max_size": 28
-          }
-        },
-        {
-          "ordinal": 12,
-          "name": "is_locked_from_use",
-          "type_info": {
-            "type": "Tiny",
-            "flags": {
-              "bits": 9
-            },
-            "char_set": 63,
-            "max_size": 1
-          }
-        },
-        {
-          "ordinal": 13,
-          "name": "is_locked_from_user_modification",
-          "type_info": {
-            "type": "Tiny",
-            "flags": {
-              "bits": 9
-            },
-            "char_set": 63,
-            "max_size": 1
-          }
-        },
-        {
-          "ordinal": 14,
-          "name": "created_at",
-          "type_info": {
-            "type": "Timestamp",
-            "flags": {
-              "bits": 1153
-            },
-            "char_set": 63,
-            "max_size": 19
-          }
-        },
-        {
-          "ordinal": 15,
-          "name": "updated_at",
-          "type_info": {
-            "type": "Timestamp",
-            "flags": {
-              "bits": 9345
-            },
-            "char_set": 63,
-            "max_size": 19
-          }
-        },
-        {
-          "ordinal": 16,
-          "name": "creator_ip_address_creation",
-          "type_info": {
-            "type": "VarString",
-            "flags": {
-              "bits": 4233
-            },
-            "char_set": 224,
-            "max_size": 160
-          }
-        },
-        {
-          "ordinal": 17,
-          "name": "creator_ip_address_last_update",
-          "type_info": {
-            "type": "VarString",
-            "flags": {
-              "bits": 4233
-            },
-            "char_set": 224,
-            "max_size": 160
-          }
-        },
-        {
-          "ordinal": 18,
-          "name": "mod_deleted_at",
-          "type_info": {
-            "type": "Timestamp",
-            "flags": {
-              "bits": 128
-            },
-            "char_set": 63,
-            "max_size": 19
-          }
-        },
-        {
-          "ordinal": 19,
-          "name": "user_deleted_at",
-          "type_info": {
-            "type": "Timestamp",
-            "flags": {
-              "bits": 128
-            },
-            "char_set": 63,
-            "max_size": 19
-          }
-        }
-      ],
-      "parameters": {
-        "Right": 1
-      },
-      "nullable": [
-        false,
-        false,
-        false,
-        true,
-        false,
-        false,
-        false,
-        false,
-        false,
-        false,
-        false,
-        false,
-        false,
-        false,
-        false,
-        false,
-        false,
-        false,
-        true,
-        true
-      ]
-    }
-  },
   "314904656a333caa75a8644e73f4d338b7bd6f68c7ea9e37b5bc7f7b257bf34d": {
     "query": "\nSELECT 1 as does_exist\nFROM user_badges\nWHERE\n  user_token = ?\nAND\n  badge_slug = ?\nLIMIT 1\n        ",
     "describe": {
@@ -2765,317 +2195,6 @@
         "Right": 9
       },
       "nullable": []
-    }
-  },
-  "3f79ccaf090955739c34988ba8bac4bd609bada186d96d11e9eb2815a3e01799": {
-    "query": "\nSELECT\n    tts_results.token as tts_result_token,\n\n    tts_results.raw_inference_text,\n\n    tts_results.model_token as tts_model_token,\n    tts_models.title as tts_model_title,\n\n    tts_results.maybe_pretrained_vocoder_used,\n\n    users.token as maybe_creator_user_token,\n    users.username as maybe_creator_username,\n    users.display_name as maybe_creator_display_name,\n    users.email_gravatar_hash as maybe_creator_gravatar_hash,\n\n    model_users.token as maybe_model_creator_user_token,\n    model_users.username as maybe_model_creator_username,\n    model_users.display_name as maybe_model_creator_display_name,\n    model_users.email_gravatar_hash as maybe_model_creator_gravatar_hash,\n\n    tts_results.public_bucket_wav_audio_path,\n    tts_results.public_bucket_spectrogram_path,\n\n    tts_results.creator_set_visibility,\n\n    tts_results.file_size_bytes,\n    tts_results.duration_millis,\n    tts_results.created_at,\n    tts_results.updated_at,\n\n    tts_results.creator_ip_address,\n    tts_results.user_deleted_at,\n    tts_results.mod_deleted_at\n\nFROM tts_results\nLEFT OUTER JOIN tts_models\n  ON tts_results.model_token = tts_models.token\nLEFT OUTER JOIN users\n  ON tts_results.maybe_creator_user_token = users.token\nLEFT OUTER JOIN users as model_users\n  ON tts_models.creator_user_token = model_users.token\nWHERE\n    tts_results.token = ?\n    AND tts_results.user_deleted_at IS NULL\n    AND tts_results.mod_deleted_at IS NULL\n        ",
-    "describe": {
-      "columns": [
-        {
-          "ordinal": 0,
-          "name": "tts_result_token",
-          "type_info": {
-            "type": "VarString",
-            "flags": {
-              "bits": 4229
-            },
-            "char_set": 224,
-            "max_size": 128
-          }
-        },
-        {
-          "ordinal": 1,
-          "name": "raw_inference_text",
-          "type_info": {
-            "type": "Blob",
-            "flags": {
-              "bits": 4241
-            },
-            "char_set": 224,
-            "max_size": 262140
-          }
-        },
-        {
-          "ordinal": 2,
-          "name": "tts_model_token",
-          "type_info": {
-            "type": "VarString",
-            "flags": {
-              "bits": 4233
-            },
-            "char_set": 224,
-            "max_size": 128
-          }
-        },
-        {
-          "ordinal": 3,
-          "name": "tts_model_title",
-          "type_info": {
-            "type": "VarString",
-            "flags": {
-              "bits": 4224
-            },
-            "char_set": 224,
-            "max_size": 1020
-          }
-        },
-        {
-          "ordinal": 4,
-          "name": "maybe_pretrained_vocoder_used",
-          "type_info": {
-            "type": "VarString",
-            "flags": {
-              "bits": 128
-            },
-            "char_set": 224,
-            "max_size": 256
-          }
-        },
-        {
-          "ordinal": 5,
-          "name": "maybe_creator_user_token",
-          "type_info": {
-            "type": "VarString",
-            "flags": {
-              "bits": 4228
-            },
-            "char_set": 224,
-            "max_size": 128
-          }
-        },
-        {
-          "ordinal": 6,
-          "name": "maybe_creator_username",
-          "type_info": {
-            "type": "VarString",
-            "flags": {
-              "bits": 4228
-            },
-            "char_set": 224,
-            "max_size": 80
-          }
-        },
-        {
-          "ordinal": 7,
-          "name": "maybe_creator_display_name",
-          "type_info": {
-            "type": "VarString",
-            "flags": {
-              "bits": 4224
-            },
-            "char_set": 224,
-            "max_size": 80
-          }
-        },
-        {
-          "ordinal": 8,
-          "name": "maybe_creator_gravatar_hash",
-          "type_info": {
-            "type": "String",
-            "flags": {
-              "bits": 4224
-            },
-            "char_set": 224,
-            "max_size": 128
-          }
-        },
-        {
-          "ordinal": 9,
-          "name": "maybe_model_creator_user_token",
-          "type_info": {
-            "type": "VarString",
-            "flags": {
-              "bits": 4228
-            },
-            "char_set": 224,
-            "max_size": 128
-          }
-        },
-        {
-          "ordinal": 10,
-          "name": "maybe_model_creator_username",
-          "type_info": {
-            "type": "VarString",
-            "flags": {
-              "bits": 4228
-            },
-            "char_set": 224,
-            "max_size": 80
-          }
-        },
-        {
-          "ordinal": 11,
-          "name": "maybe_model_creator_display_name",
-          "type_info": {
-            "type": "VarString",
-            "flags": {
-              "bits": 4224
-            },
-            "char_set": 224,
-            "max_size": 80
-          }
-        },
-        {
-          "ordinal": 12,
-          "name": "maybe_model_creator_gravatar_hash",
-          "type_info": {
-            "type": "String",
-            "flags": {
-              "bits": 4224
-            },
-            "char_set": 224,
-            "max_size": 128
-          }
-        },
-        {
-          "ordinal": 13,
-          "name": "public_bucket_wav_audio_path",
-          "type_info": {
-            "type": "VarString",
-            "flags": {
-              "bits": 4225
-            },
-            "char_set": 224,
-            "max_size": 1020
-          }
-        },
-        {
-          "ordinal": 14,
-          "name": "public_bucket_spectrogram_path",
-          "type_info": {
-            "type": "VarString",
-            "flags": {
-              "bits": 4225
-            },
-            "char_set": 224,
-            "max_size": 1020
-          }
-        },
-        {
-          "ordinal": 15,
-          "name": "creator_set_visibility",
-          "type_info": {
-            "type": "String",
-            "flags": {
-              "bits": 385
-            },
-            "char_set": 224,
-            "max_size": 28
-          }
-        },
-        {
-          "ordinal": 16,
-          "name": "file_size_bytes",
-          "type_info": {
-            "type": "Long",
-            "flags": {
-              "bits": 1
-            },
-            "char_set": 63,
-            "max_size": 10
-          }
-        },
-        {
-          "ordinal": 17,
-          "name": "duration_millis",
-          "type_info": {
-            "type": "Long",
-            "flags": {
-              "bits": 1
-            },
-            "char_set": 63,
-            "max_size": 10
-          }
-        },
-        {
-          "ordinal": 18,
-          "name": "created_at",
-          "type_info": {
-            "type": "Timestamp",
-            "flags": {
-              "bits": 1153
-            },
-            "char_set": 63,
-            "max_size": 19
-          }
-        },
-        {
-          "ordinal": 19,
-          "name": "updated_at",
-          "type_info": {
-            "type": "Timestamp",
-            "flags": {
-              "bits": 9345
-            },
-            "char_set": 63,
-            "max_size": 19
-          }
-        },
-        {
-          "ordinal": 20,
-          "name": "creator_ip_address",
-          "type_info": {
-            "type": "VarString",
-            "flags": {
-              "bits": 4233
-            },
-            "char_set": 224,
-            "max_size": 160
-          }
-        },
-        {
-          "ordinal": 21,
-          "name": "user_deleted_at",
-          "type_info": {
-            "type": "Timestamp",
-            "flags": {
-              "bits": 136
-            },
-            "char_set": 63,
-            "max_size": 19
-          }
-        },
-        {
-          "ordinal": 22,
-          "name": "mod_deleted_at",
-          "type_info": {
-            "type": "Timestamp",
-            "flags": {
-              "bits": 136
-            },
-            "char_set": 63,
-            "max_size": 19
-          }
-        }
-      ],
-      "parameters": {
-        "Right": 1
-      },
-      "nullable": [
-        false,
-        false,
-        false,
-        true,
-        true,
-        true,
-        true,
-        true,
-        true,
-        true,
-        true,
-        true,
-        true,
-        false,
-        false,
-        false,
-        false,
-        false,
-        false,
-        false,
-        false,
-        true,
-        true
-      ]
     }
   },
   "40a3301e9a3201e74d49b6b339f67291e2ae22d315188401708609ac2d28a68c": {
@@ -4555,6 +3674,291 @@
         "Right": 6
       },
       "nullable": []
+    }
+  },
+  "63ac1d3f54c8258b7d20d3f689b2613809099feb4df925c680594a1e43e74bcd": {
+    "query": "\nSELECT\n    tts.token as model_token,\n    tts.tts_model_type,\n    tts.text_preprocessing_algorithm,\n    tts.maybe_default_pretrained_vocoder,\n\n    tts.creator_user_token,\n    users.username as creator_username,\n    users.display_name as creator_display_name,\n    users.email_gravatar_hash as creator_gravatar_hash,\n    users.is_banned as creator_is_banned,\n\n    tts.title,\n    tts.description_markdown,\n    tts.description_rendered_html,\n\n    tts.creator_set_visibility,\n\n    tts.is_locked_from_use,\n    tts.is_locked_from_user_modification,\n\n    tts.created_at,\n    tts.updated_at,\n\n    tts.creator_ip_address_creation,\n    tts.creator_ip_address_last_update,\n    tts.mod_deleted_at,\n    tts.user_deleted_at\n\nFROM tts_models as tts\nJOIN users\n    ON users.token = tts.creator_user_token\nWHERE tts.token = ?\n        ",
+    "describe": {
+      "columns": [
+        {
+          "ordinal": 0,
+          "name": "model_token",
+          "type_info": {
+            "type": "VarString",
+            "flags": {
+              "bits": 4229
+            },
+            "char_set": 224,
+            "max_size": 128
+          }
+        },
+        {
+          "ordinal": 1,
+          "name": "tts_model_type",
+          "type_info": {
+            "type": "String",
+            "flags": {
+              "bits": 385
+            },
+            "char_set": 224,
+            "max_size": 60
+          }
+        },
+        {
+          "ordinal": 2,
+          "name": "text_preprocessing_algorithm",
+          "type_info": {
+            "type": "String",
+            "flags": {
+              "bits": 385
+            },
+            "char_set": 224,
+            "max_size": 28
+          }
+        },
+        {
+          "ordinal": 3,
+          "name": "maybe_default_pretrained_vocoder",
+          "type_info": {
+            "type": "VarString",
+            "flags": {
+              "bits": 128
+            },
+            "char_set": 224,
+            "max_size": 256
+          }
+        },
+        {
+          "ordinal": 4,
+          "name": "creator_user_token",
+          "type_info": {
+            "type": "VarString",
+            "flags": {
+              "bits": 4233
+            },
+            "char_set": 224,
+            "max_size": 128
+          }
+        },
+        {
+          "ordinal": 5,
+          "name": "creator_username",
+          "type_info": {
+            "type": "VarString",
+            "flags": {
+              "bits": 4229
+            },
+            "char_set": 224,
+            "max_size": 80
+          }
+        },
+        {
+          "ordinal": 6,
+          "name": "creator_display_name",
+          "type_info": {
+            "type": "VarString",
+            "flags": {
+              "bits": 4225
+            },
+            "char_set": 224,
+            "max_size": 80
+          }
+        },
+        {
+          "ordinal": 7,
+          "name": "creator_gravatar_hash",
+          "type_info": {
+            "type": "String",
+            "flags": {
+              "bits": 4225
+            },
+            "char_set": 224,
+            "max_size": 128
+          }
+        },
+        {
+          "ordinal": 8,
+          "name": "creator_is_banned",
+          "type_info": {
+            "type": "Tiny",
+            "flags": {
+              "bits": 1
+            },
+            "char_set": 63,
+            "max_size": 1
+          }
+        },
+        {
+          "ordinal": 9,
+          "name": "title",
+          "type_info": {
+            "type": "VarString",
+            "flags": {
+              "bits": 4225
+            },
+            "char_set": 224,
+            "max_size": 1020
+          }
+        },
+        {
+          "ordinal": 10,
+          "name": "description_markdown",
+          "type_info": {
+            "type": "Blob",
+            "flags": {
+              "bits": 4241
+            },
+            "char_set": 224,
+            "max_size": 262140
+          }
+        },
+        {
+          "ordinal": 11,
+          "name": "description_rendered_html",
+          "type_info": {
+            "type": "Blob",
+            "flags": {
+              "bits": 4241
+            },
+            "char_set": 224,
+            "max_size": 262140
+          }
+        },
+        {
+          "ordinal": 12,
+          "name": "creator_set_visibility",
+          "type_info": {
+            "type": "String",
+            "flags": {
+              "bits": 393
+            },
+            "char_set": 224,
+            "max_size": 28
+          }
+        },
+        {
+          "ordinal": 13,
+          "name": "is_locked_from_use",
+          "type_info": {
+            "type": "Tiny",
+            "flags": {
+              "bits": 9
+            },
+            "char_set": 63,
+            "max_size": 1
+          }
+        },
+        {
+          "ordinal": 14,
+          "name": "is_locked_from_user_modification",
+          "type_info": {
+            "type": "Tiny",
+            "flags": {
+              "bits": 9
+            },
+            "char_set": 63,
+            "max_size": 1
+          }
+        },
+        {
+          "ordinal": 15,
+          "name": "created_at",
+          "type_info": {
+            "type": "Timestamp",
+            "flags": {
+              "bits": 1153
+            },
+            "char_set": 63,
+            "max_size": 19
+          }
+        },
+        {
+          "ordinal": 16,
+          "name": "updated_at",
+          "type_info": {
+            "type": "Timestamp",
+            "flags": {
+              "bits": 9345
+            },
+            "char_set": 63,
+            "max_size": 19
+          }
+        },
+        {
+          "ordinal": 17,
+          "name": "creator_ip_address_creation",
+          "type_info": {
+            "type": "VarString",
+            "flags": {
+              "bits": 4233
+            },
+            "char_set": 224,
+            "max_size": 160
+          }
+        },
+        {
+          "ordinal": 18,
+          "name": "creator_ip_address_last_update",
+          "type_info": {
+            "type": "VarString",
+            "flags": {
+              "bits": 4233
+            },
+            "char_set": 224,
+            "max_size": 160
+          }
+        },
+        {
+          "ordinal": 19,
+          "name": "mod_deleted_at",
+          "type_info": {
+            "type": "Timestamp",
+            "flags": {
+              "bits": 128
+            },
+            "char_set": 63,
+            "max_size": 19
+          }
+        },
+        {
+          "ordinal": 20,
+          "name": "user_deleted_at",
+          "type_info": {
+            "type": "Timestamp",
+            "flags": {
+              "bits": 128
+            },
+            "char_set": 63,
+            "max_size": 19
+          }
+        }
+      ],
+      "parameters": {
+        "Right": 1
+      },
+      "nullable": [
+        false,
+        false,
+        false,
+        true,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        true,
+        true
+      ]
     }
   },
   "641253d4c621f75037877651bba044a21033f50a5e3f8fed9b06ec967a508853": {
@@ -6114,6 +5518,343 @@
       "nullable": []
     }
   },
+  "b58e215a61914d06cfdadc92130e8423e1b2db24c03850697873cd21a75dae61": {
+    "query": "\nSELECT\n    tts_results.token as tts_result_token,\n\n    tts_results.raw_inference_text,\n\n    tts_results.model_token as tts_model_token,\n    tts_models.title as tts_model_title,\n\n    tts_results.maybe_pretrained_vocoder_used,\n\n    users.token as maybe_creator_user_token,\n    users.username as maybe_creator_username,\n    users.display_name as maybe_creator_display_name,\n    users.email_gravatar_hash as maybe_creator_gravatar_hash,\n    users.is_banned as maybe_creator_is_banned,\n\n    model_users.token as maybe_model_creator_user_token,\n    model_users.username as maybe_model_creator_username,\n    model_users.display_name as maybe_model_creator_display_name,\n    model_users.email_gravatar_hash as maybe_model_creator_gravatar_hash,\n    model_users.is_banned as maybe_model_creator_is_banned,\n\n    tts_results.public_bucket_wav_audio_path,\n    tts_results.public_bucket_spectrogram_path,\n\n    tts_results.creator_set_visibility,\n\n    tts_results.file_size_bytes,\n    tts_results.duration_millis,\n    tts_results.created_at,\n    tts_results.updated_at,\n\n    tts_results.creator_ip_address,\n    tts_results.user_deleted_at,\n    tts_results.mod_deleted_at\n\nFROM tts_results\nLEFT OUTER JOIN tts_models\n  ON tts_results.model_token = tts_models.token\nLEFT OUTER JOIN users\n  ON tts_results.maybe_creator_user_token = users.token\nLEFT OUTER JOIN users as model_users\n  ON tts_models.creator_user_token = model_users.token\nWHERE\n    tts_results.token = ?\n        ",
+    "describe": {
+      "columns": [
+        {
+          "ordinal": 0,
+          "name": "tts_result_token",
+          "type_info": {
+            "type": "VarString",
+            "flags": {
+              "bits": 4229
+            },
+            "char_set": 224,
+            "max_size": 128
+          }
+        },
+        {
+          "ordinal": 1,
+          "name": "raw_inference_text",
+          "type_info": {
+            "type": "Blob",
+            "flags": {
+              "bits": 4241
+            },
+            "char_set": 224,
+            "max_size": 262140
+          }
+        },
+        {
+          "ordinal": 2,
+          "name": "tts_model_token",
+          "type_info": {
+            "type": "VarString",
+            "flags": {
+              "bits": 4233
+            },
+            "char_set": 224,
+            "max_size": 128
+          }
+        },
+        {
+          "ordinal": 3,
+          "name": "tts_model_title",
+          "type_info": {
+            "type": "VarString",
+            "flags": {
+              "bits": 4224
+            },
+            "char_set": 224,
+            "max_size": 1020
+          }
+        },
+        {
+          "ordinal": 4,
+          "name": "maybe_pretrained_vocoder_used",
+          "type_info": {
+            "type": "VarString",
+            "flags": {
+              "bits": 128
+            },
+            "char_set": 224,
+            "max_size": 256
+          }
+        },
+        {
+          "ordinal": 5,
+          "name": "maybe_creator_user_token",
+          "type_info": {
+            "type": "VarString",
+            "flags": {
+              "bits": 4228
+            },
+            "char_set": 224,
+            "max_size": 128
+          }
+        },
+        {
+          "ordinal": 6,
+          "name": "maybe_creator_username",
+          "type_info": {
+            "type": "VarString",
+            "flags": {
+              "bits": 4228
+            },
+            "char_set": 224,
+            "max_size": 80
+          }
+        },
+        {
+          "ordinal": 7,
+          "name": "maybe_creator_display_name",
+          "type_info": {
+            "type": "VarString",
+            "flags": {
+              "bits": 4224
+            },
+            "char_set": 224,
+            "max_size": 80
+          }
+        },
+        {
+          "ordinal": 8,
+          "name": "maybe_creator_gravatar_hash",
+          "type_info": {
+            "type": "String",
+            "flags": {
+              "bits": 4224
+            },
+            "char_set": 224,
+            "max_size": 128
+          }
+        },
+        {
+          "ordinal": 9,
+          "name": "maybe_creator_is_banned",
+          "type_info": {
+            "type": "Tiny",
+            "flags": {
+              "bits": 0
+            },
+            "char_set": 63,
+            "max_size": 1
+          }
+        },
+        {
+          "ordinal": 10,
+          "name": "maybe_model_creator_user_token",
+          "type_info": {
+            "type": "VarString",
+            "flags": {
+              "bits": 4228
+            },
+            "char_set": 224,
+            "max_size": 128
+          }
+        },
+        {
+          "ordinal": 11,
+          "name": "maybe_model_creator_username",
+          "type_info": {
+            "type": "VarString",
+            "flags": {
+              "bits": 4228
+            },
+            "char_set": 224,
+            "max_size": 80
+          }
+        },
+        {
+          "ordinal": 12,
+          "name": "maybe_model_creator_display_name",
+          "type_info": {
+            "type": "VarString",
+            "flags": {
+              "bits": 4224
+            },
+            "char_set": 224,
+            "max_size": 80
+          }
+        },
+        {
+          "ordinal": 13,
+          "name": "maybe_model_creator_gravatar_hash",
+          "type_info": {
+            "type": "String",
+            "flags": {
+              "bits": 4224
+            },
+            "char_set": 224,
+            "max_size": 128
+          }
+        },
+        {
+          "ordinal": 14,
+          "name": "maybe_model_creator_is_banned",
+          "type_info": {
+            "type": "Tiny",
+            "flags": {
+              "bits": 0
+            },
+            "char_set": 63,
+            "max_size": 1
+          }
+        },
+        {
+          "ordinal": 15,
+          "name": "public_bucket_wav_audio_path",
+          "type_info": {
+            "type": "VarString",
+            "flags": {
+              "bits": 4225
+            },
+            "char_set": 224,
+            "max_size": 1020
+          }
+        },
+        {
+          "ordinal": 16,
+          "name": "public_bucket_spectrogram_path",
+          "type_info": {
+            "type": "VarString",
+            "flags": {
+              "bits": 4225
+            },
+            "char_set": 224,
+            "max_size": 1020
+          }
+        },
+        {
+          "ordinal": 17,
+          "name": "creator_set_visibility",
+          "type_info": {
+            "type": "String",
+            "flags": {
+              "bits": 385
+            },
+            "char_set": 224,
+            "max_size": 28
+          }
+        },
+        {
+          "ordinal": 18,
+          "name": "file_size_bytes",
+          "type_info": {
+            "type": "Long",
+            "flags": {
+              "bits": 1
+            },
+            "char_set": 63,
+            "max_size": 10
+          }
+        },
+        {
+          "ordinal": 19,
+          "name": "duration_millis",
+          "type_info": {
+            "type": "Long",
+            "flags": {
+              "bits": 1
+            },
+            "char_set": 63,
+            "max_size": 10
+          }
+        },
+        {
+          "ordinal": 20,
+          "name": "created_at",
+          "type_info": {
+            "type": "Timestamp",
+            "flags": {
+              "bits": 1153
+            },
+            "char_set": 63,
+            "max_size": 19
+          }
+        },
+        {
+          "ordinal": 21,
+          "name": "updated_at",
+          "type_info": {
+            "type": "Timestamp",
+            "flags": {
+              "bits": 9345
+            },
+            "char_set": 63,
+            "max_size": 19
+          }
+        },
+        {
+          "ordinal": 22,
+          "name": "creator_ip_address",
+          "type_info": {
+            "type": "VarString",
+            "flags": {
+              "bits": 4233
+            },
+            "char_set": 224,
+            "max_size": 160
+          }
+        },
+        {
+          "ordinal": 23,
+          "name": "user_deleted_at",
+          "type_info": {
+            "type": "Timestamp",
+            "flags": {
+              "bits": 136
+            },
+            "char_set": 63,
+            "max_size": 19
+          }
+        },
+        {
+          "ordinal": 24,
+          "name": "mod_deleted_at",
+          "type_info": {
+            "type": "Timestamp",
+            "flags": {
+              "bits": 136
+            },
+            "char_set": 63,
+            "max_size": 19
+          }
+        }
+      ],
+      "parameters": {
+        "Right": 1
+      },
+      "nullable": [
+        false,
+        false,
+        false,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        true,
+        true
+      ]
+    }
+  },
   "b6a53361eda0f0f0517cc39b9bc5b7ab867cc8a1bcc7bc81c7d29c51193e3bbf": {
     "query": "\nUPDATE tts_models\nSET\n    is_public_listing_approved = ?,\n    is_locked_from_user_modification = ?,\n    is_locked_from_use = ?,\n    maybe_mod_comments = ?,\n    maybe_mod_user_token = ?,\n    version = version + 1\nWHERE token = ?\nLIMIT 1\n        ",
     "describe": {
@@ -7236,6 +6977,343 @@
         "Right": 2
       },
       "nullable": []
+    }
+  },
+  "c7bff6a198838ec7209f2b48ef1d8fe850e66aa532ed562aac75dd3adfaf48a9": {
+    "query": "\nSELECT\n    tts_results.token as tts_result_token,\n\n    tts_results.raw_inference_text,\n\n    tts_results.model_token as tts_model_token,\n    tts_models.title as tts_model_title,\n\n    tts_results.maybe_pretrained_vocoder_used,\n\n    users.token as maybe_creator_user_token,\n    users.username as maybe_creator_username,\n    users.display_name as maybe_creator_display_name,\n    users.email_gravatar_hash as maybe_creator_gravatar_hash,\n    users.is_banned as maybe_creator_is_banned,\n\n    model_users.token as maybe_model_creator_user_token,\n    model_users.username as maybe_model_creator_username,\n    model_users.display_name as maybe_model_creator_display_name,\n    model_users.email_gravatar_hash as maybe_model_creator_gravatar_hash,\n    model_users.is_banned as maybe_model_creator_is_banned,\n\n    tts_results.public_bucket_wav_audio_path,\n    tts_results.public_bucket_spectrogram_path,\n\n    tts_results.creator_set_visibility,\n\n    tts_results.file_size_bytes,\n    tts_results.duration_millis,\n    tts_results.created_at,\n    tts_results.updated_at,\n\n    tts_results.creator_ip_address,\n    tts_results.user_deleted_at,\n    tts_results.mod_deleted_at\n\nFROM tts_results\nLEFT OUTER JOIN tts_models\n  ON tts_results.model_token = tts_models.token\nLEFT OUTER JOIN users\n  ON tts_results.maybe_creator_user_token = users.token\nLEFT OUTER JOIN users as model_users\n  ON tts_models.creator_user_token = model_users.token\nWHERE\n    tts_results.token = ?\n    AND tts_results.user_deleted_at IS NULL\n    AND tts_results.mod_deleted_at IS NULL\n        ",
+    "describe": {
+      "columns": [
+        {
+          "ordinal": 0,
+          "name": "tts_result_token",
+          "type_info": {
+            "type": "VarString",
+            "flags": {
+              "bits": 4229
+            },
+            "char_set": 224,
+            "max_size": 128
+          }
+        },
+        {
+          "ordinal": 1,
+          "name": "raw_inference_text",
+          "type_info": {
+            "type": "Blob",
+            "flags": {
+              "bits": 4241
+            },
+            "char_set": 224,
+            "max_size": 262140
+          }
+        },
+        {
+          "ordinal": 2,
+          "name": "tts_model_token",
+          "type_info": {
+            "type": "VarString",
+            "flags": {
+              "bits": 4233
+            },
+            "char_set": 224,
+            "max_size": 128
+          }
+        },
+        {
+          "ordinal": 3,
+          "name": "tts_model_title",
+          "type_info": {
+            "type": "VarString",
+            "flags": {
+              "bits": 4224
+            },
+            "char_set": 224,
+            "max_size": 1020
+          }
+        },
+        {
+          "ordinal": 4,
+          "name": "maybe_pretrained_vocoder_used",
+          "type_info": {
+            "type": "VarString",
+            "flags": {
+              "bits": 128
+            },
+            "char_set": 224,
+            "max_size": 256
+          }
+        },
+        {
+          "ordinal": 5,
+          "name": "maybe_creator_user_token",
+          "type_info": {
+            "type": "VarString",
+            "flags": {
+              "bits": 4228
+            },
+            "char_set": 224,
+            "max_size": 128
+          }
+        },
+        {
+          "ordinal": 6,
+          "name": "maybe_creator_username",
+          "type_info": {
+            "type": "VarString",
+            "flags": {
+              "bits": 4228
+            },
+            "char_set": 224,
+            "max_size": 80
+          }
+        },
+        {
+          "ordinal": 7,
+          "name": "maybe_creator_display_name",
+          "type_info": {
+            "type": "VarString",
+            "flags": {
+              "bits": 4224
+            },
+            "char_set": 224,
+            "max_size": 80
+          }
+        },
+        {
+          "ordinal": 8,
+          "name": "maybe_creator_gravatar_hash",
+          "type_info": {
+            "type": "String",
+            "flags": {
+              "bits": 4224
+            },
+            "char_set": 224,
+            "max_size": 128
+          }
+        },
+        {
+          "ordinal": 9,
+          "name": "maybe_creator_is_banned",
+          "type_info": {
+            "type": "Tiny",
+            "flags": {
+              "bits": 0
+            },
+            "char_set": 63,
+            "max_size": 1
+          }
+        },
+        {
+          "ordinal": 10,
+          "name": "maybe_model_creator_user_token",
+          "type_info": {
+            "type": "VarString",
+            "flags": {
+              "bits": 4228
+            },
+            "char_set": 224,
+            "max_size": 128
+          }
+        },
+        {
+          "ordinal": 11,
+          "name": "maybe_model_creator_username",
+          "type_info": {
+            "type": "VarString",
+            "flags": {
+              "bits": 4228
+            },
+            "char_set": 224,
+            "max_size": 80
+          }
+        },
+        {
+          "ordinal": 12,
+          "name": "maybe_model_creator_display_name",
+          "type_info": {
+            "type": "VarString",
+            "flags": {
+              "bits": 4224
+            },
+            "char_set": 224,
+            "max_size": 80
+          }
+        },
+        {
+          "ordinal": 13,
+          "name": "maybe_model_creator_gravatar_hash",
+          "type_info": {
+            "type": "String",
+            "flags": {
+              "bits": 4224
+            },
+            "char_set": 224,
+            "max_size": 128
+          }
+        },
+        {
+          "ordinal": 14,
+          "name": "maybe_model_creator_is_banned",
+          "type_info": {
+            "type": "Tiny",
+            "flags": {
+              "bits": 0
+            },
+            "char_set": 63,
+            "max_size": 1
+          }
+        },
+        {
+          "ordinal": 15,
+          "name": "public_bucket_wav_audio_path",
+          "type_info": {
+            "type": "VarString",
+            "flags": {
+              "bits": 4225
+            },
+            "char_set": 224,
+            "max_size": 1020
+          }
+        },
+        {
+          "ordinal": 16,
+          "name": "public_bucket_spectrogram_path",
+          "type_info": {
+            "type": "VarString",
+            "flags": {
+              "bits": 4225
+            },
+            "char_set": 224,
+            "max_size": 1020
+          }
+        },
+        {
+          "ordinal": 17,
+          "name": "creator_set_visibility",
+          "type_info": {
+            "type": "String",
+            "flags": {
+              "bits": 385
+            },
+            "char_set": 224,
+            "max_size": 28
+          }
+        },
+        {
+          "ordinal": 18,
+          "name": "file_size_bytes",
+          "type_info": {
+            "type": "Long",
+            "flags": {
+              "bits": 1
+            },
+            "char_set": 63,
+            "max_size": 10
+          }
+        },
+        {
+          "ordinal": 19,
+          "name": "duration_millis",
+          "type_info": {
+            "type": "Long",
+            "flags": {
+              "bits": 1
+            },
+            "char_set": 63,
+            "max_size": 10
+          }
+        },
+        {
+          "ordinal": 20,
+          "name": "created_at",
+          "type_info": {
+            "type": "Timestamp",
+            "flags": {
+              "bits": 1153
+            },
+            "char_set": 63,
+            "max_size": 19
+          }
+        },
+        {
+          "ordinal": 21,
+          "name": "updated_at",
+          "type_info": {
+            "type": "Timestamp",
+            "flags": {
+              "bits": 9345
+            },
+            "char_set": 63,
+            "max_size": 19
+          }
+        },
+        {
+          "ordinal": 22,
+          "name": "creator_ip_address",
+          "type_info": {
+            "type": "VarString",
+            "flags": {
+              "bits": 4233
+            },
+            "char_set": 224,
+            "max_size": 160
+          }
+        },
+        {
+          "ordinal": 23,
+          "name": "user_deleted_at",
+          "type_info": {
+            "type": "Timestamp",
+            "flags": {
+              "bits": 136
+            },
+            "char_set": 63,
+            "max_size": 19
+          }
+        },
+        {
+          "ordinal": 24,
+          "name": "mod_deleted_at",
+          "type_info": {
+            "type": "Timestamp",
+            "flags": {
+              "bits": 136
+            },
+            "char_set": 63,
+            "max_size": 19
+          }
+        }
+      ],
+      "parameters": {
+        "Right": 1
+      },
+      "nullable": [
+        false,
+        false,
+        false,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        true,
+        true
+      ]
     }
   },
   "ca5efc3be0f09649df2add5270c06544133288a95ffcb9a0589efd4fe345efe7": {

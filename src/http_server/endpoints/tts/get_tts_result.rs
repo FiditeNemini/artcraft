@@ -103,6 +103,15 @@ pub async fn get_tts_inference_result_handler(
     Ok(Some(inference_result)) => inference_result,
   };
 
+  if let Some(moderator_fields) = inference_result.maybe_moderator_fields.as_ref() {
+    // NB: The moderator fields will always be present before removal
+    // We don't want non-mods seeing stuff made by banned users.
+    if (moderator_fields.model_creator_is_banned || moderator_fields.result_creator_is_banned_if_user)
+        && !is_moderator{
+      return Err(GetTtsResultError::NotFound);
+    }
+  }
+
   if !is_moderator {
     inference_result.maybe_moderator_fields = None;
   }
