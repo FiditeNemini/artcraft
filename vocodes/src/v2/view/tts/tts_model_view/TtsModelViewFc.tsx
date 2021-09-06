@@ -9,7 +9,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { FrontendUrlConfig } from '../../../../common/FrontendUrlConfig';
 import { HiddenIconFc } from '../../_icons/HiddenIcon';
 import { VisibleIconFc } from '../../_icons/VisibleIcon';
-import { GetTtsModel, TtsModel } from '../../../api/tts/GetTtsModel';
+import { GetTtsModel, GetTtsModelIsErr, GetTtsModelIsOk, TtsModel, TtsModelLookupError } from '../../../api/tts/GetTtsModel';
 import { GravatarFc } from '../../_common/GravatarFc';
 import { GetTtsModelUseCount } from '../../../api/tts/GetTtsModelUseCount';
 import { BackLink } from '../../_common/BackLink';
@@ -28,11 +28,19 @@ function TtsModelViewFc(props: Props) {
 
   const [ttsModel, setTtsModel] = useState<TtsModel|undefined>(undefined);
   const [ttsModelUseCount, setTtsModelUseCount] = useState<number|undefined>(undefined);
+  const [notFoundState, setNotFoundState] = useState<boolean>(false);
 
   const getModel = useCallback(async (token) => {
     const model = await GetTtsModel(token);
-    if (model) {
+
+    if (GetTtsModelIsOk(model)) {
       setTtsModel(model);
+    } else if (GetTtsModelIsErr(model))  {
+      switch(model) {
+        case TtsModelLookupError.NotFound:
+          setNotFoundState(true);
+          break;
+      }
     }
   }, []);
 
@@ -45,6 +53,17 @@ function TtsModelViewFc(props: Props) {
     getModel(token);
     getModelUseCount(token);
   }, [token, getModel, getModelUseCount]);
+
+
+  if (notFoundState) {
+    return (
+      <h1 className="title is-1">Model not found</h1>
+    );
+  }
+
+  if (!ttsModel) {
+    return <div />
+  }
 
   const handleChangeText = (ev: React.FormEvent<HTMLTextAreaElement>) => { 
     const textValue = (ev.target as HTMLTextAreaElement).value;
@@ -141,6 +160,10 @@ function TtsModelViewFc(props: Props) {
             <br />
             <h4 className="subtitle is-4"> Moderator Details </h4>
           </td>
+        </tr>
+        <tr>
+          <th>Creator is banned</th>
+          <td>{ttsModel?.maybe_moderator_fields?.creator_is_banned ? "banned" : "good standing" }</td>
         </tr>
         <tr>
           <th>Creation IP address</th>

@@ -1,10 +1,5 @@
 import { ApiConfig } from "../../../common/ApiConfig";
 
-interface TtsModelViewResponsePayload {
-  success: boolean,
-  model: TtsModel,
-}
-
 export interface TtsModel {
   model_token: string,
   title: string,
@@ -25,13 +20,36 @@ export interface TtsModel {
 }
 
 export interface TtsModelModeratorFields {
+  creator_is_banned: boolean,
   creator_ip_address_creation: string,
   creator_ip_address_last_update: string,
   mod_deleted_at: string | undefined | null,
   user_deleted_at: string | undefined | null,
 }
 
-export async function GetTtsModel(modelToken: string) : Promise<TtsModel | undefined> {
+export enum TtsModelLookupError {
+  NotFound,
+  ServerError,
+  FrontendError,
+}
+
+export type GetTtsModelResponse = TtsModel | TtsModelLookupError;
+
+export function GetTtsModelIsOk(response: GetTtsModelResponse): response is TtsModel {
+  return response.hasOwnProperty('model_token');
+}
+
+export function GetTtsModelIsErr(response: GetTtsModelResponse): response is TtsModelLookupError {
+  return !response.hasOwnProperty('model_token');
+}
+
+interface TtsModelViewResponsePayload {
+  success: boolean,
+  error_reason?: string,
+  model?: TtsModel,
+}
+
+export async function GetTtsModel(modelToken: string) : Promise<GetTtsModelResponse> {
   const endpoint = new ApiConfig().viewTtsModel(modelToken);
   
   return await fetch(endpoint, {
@@ -44,12 +62,22 @@ export async function GetTtsModel(modelToken: string) : Promise<TtsModel | undef
   .then(res => res.json())
   .then(res => {
     const response : TtsModelViewResponsePayload = res;
-    if (!response.success) {
-      return;
+
+    if (response?.success) {
+      return response.model!;
+    } 
+
+    if (response?.success === false) {
+      if (response.error_reason?.includes("not found")) {
+        return TtsModelLookupError.NotFound;
+      } else {
+        return TtsModelLookupError.ServerError;
+      }
     }
-    return response?.model;
+
+    return TtsModelLookupError.FrontendError;
   })
   .catch(e => {
-    return undefined;
+    return TtsModelLookupError.FrontendError;
   });
 }
