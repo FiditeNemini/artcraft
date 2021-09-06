@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useState }  from 'react';
 import { Link } from 'react-router-dom';
 import { FrontendUrlConfig } from '../../../common/FrontendUrlConfig';
 import { SessionWrapper } from '../../../session/SessionWrapper';
-import { GetLeaderboard, GetLeaderboardIsOk, Leaderboard, LeaderboardEntryForList } from '../../api/misc/GetLeaderboard';
+import { GetLeaderboard, GetLeaderboardIsErr, GetLeaderboardIsOk, Leaderboard, LeaderboardEntryForList, LeaderboardLookupError } from '../../api/misc/GetLeaderboard';
 import { GravatarFc } from '../_common/GravatarFc';
 
 interface Props {
@@ -13,6 +13,7 @@ function LeaderboardFc(props: Props) {
   const [leaderboard, setLeaderboard] = useState<Leaderboard|undefined>(undefined);
   const [ttsLeaderboard, setTtsLeaderboard] = useState<Array<LeaderboardEntryForList>|undefined>(undefined);
   const [w2lLeaderboard, setW2lLeaderboard] = useState<Array<LeaderboardEntryForList>|undefined>(undefined);
+  const [retryCount, setRetryCount] = useState(0);
 
   const getLeaderboard = useCallback(async () => {
     const leaderboardReponse = await GetLeaderboard();
@@ -21,9 +22,19 @@ function LeaderboardFc(props: Props) {
       setLeaderboard(leaderboardReponse);
       setTtsLeaderboard(leaderboardReponse.tts_leaderboard);
       setW2lLeaderboard(leaderboardReponse.w2l_leaderboard);
-    } else {
+    } else if (GetLeaderboardIsErr(leaderboardReponse)) {
+      switch(leaderboardReponse) {
+        // TODO: There's an issue with the queries not returning before the deadline.
+        // I should add a Redis TTL cache to store the results and an async job to warm the cache.
+        case LeaderboardLookupError.NotFound:
+          if (retryCount < 3) {
+            setTimeout(() => getLeaderboard(), 1000);
+            setRetryCount(retryCount+1);
+          }
+          break;
+      }
     }
-  }, []);
+  }, [retryCount]);
 
   useEffect(() => {
     getLeaderboard();
