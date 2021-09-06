@@ -3,6 +3,8 @@ import { SessionWrapper } from '../../session/SessionWrapper';
 import { Link } from 'react-router-dom';
 
 import './_css/footer.scss'
+import { ModerationIcon } from './_icons/ModerationIcon';
+import { FrontendUrlConfig } from '../../common/FrontendUrlConfig';
 
 interface Props {
   sessionWrapper: SessionWrapper,
@@ -15,7 +17,7 @@ function NewFooterNavFc(props: Props) {
   if (props.sessionWrapper.canBanUsers()) {
     moderationLink = (
       <div className="v2_mod_link">
-        <Link to="/moderation">&#xbb; Mod Controls</Link>
+        <Link to={FrontendUrlConfig.moderationMain()}><ModerationIcon /> Mod Controls</Link>
       </div>
     );
   }

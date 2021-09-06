@@ -4,6 +4,7 @@ import { ApiConfig } from '../../../../common/ApiConfig';
 import { FrontendUrlConfig } from '../../../../common/FrontendUrlConfig';
 import { SessionWrapper } from '../../../../session/SessionWrapper';
 import { useParams, Link, useHistory } from 'react-router-dom';
+import { BackLink } from '../../_common/BackLink';
 
 interface TtsModelViewResponsePayload {
   success: boolean,
@@ -199,7 +200,7 @@ function TtsModelDeleteFc(props: Props) {
       <h1 className="title is-1"> {h1Title} </h1>
       
       <p>
-        <Link to={modelLink}>&lt; Back to model</Link>
+        <BackLink link={modelLink} text="Back to model" />
       </p>
       
       <table className="table">
@@ -256,7 +257,7 @@ function TtsModelDeleteFc(props: Props) {
 
       <br />
       <br />
-      <Link to={modelLink}>&lt; Back to model</Link>
+      <BackLink link={modelLink} text="Back to model" />
     </div>
   )
 }

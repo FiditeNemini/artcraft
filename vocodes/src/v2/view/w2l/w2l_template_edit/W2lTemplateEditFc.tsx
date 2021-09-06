@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { ApiConfig } from '../../../../common/ApiConfig';
 import { SessionWrapper } from '../../../../session/SessionWrapper';
-import { useParams, Link, useHistory } from 'react-router-dom';
+import { useParams, useHistory } from 'react-router-dom';
 import { FrontendUrlConfig } from '../../../../common/FrontendUrlConfig';
 import { VisibleIconFc } from '../../_icons/VisibleIcon';
 import { HiddenIconFc } from '../../_icons/HiddenIcon';

@@ -12,6 +12,7 @@ import { VisibleIconFc } from '../../_icons/VisibleIcon';
 import { GetTtsModel, TtsModel } from '../../../api/tts/GetTtsModel';
 import { GravatarFc } from '../../_common/GravatarFc';
 import { GetTtsModelUseCount } from '../../../api/tts/GetTtsModelUseCount';
+import { BackLink } from '../../_common/BackLink';
 
 interface Props {
   sessionWrapper: SessionWrapper,
@@ -232,7 +233,7 @@ function TtsModelViewFc(props: Props) {
       <h1 className="title is-1"> {title} </h1>
       
       <p>
-        <Link to="/">&lt; Back to all models</Link>
+        <BackLink link="/" text="Back to all models" />
       </p>
       
       <h4 className="title is-4"> Use Model </h4>
@@ -315,7 +316,7 @@ function TtsModelViewFc(props: Props) {
 
       <br />
       <br />
-      <Link to="/">&lt; Back to all models</Link>
+      <BackLink link="/" text="Back to all models" />
     </div>
   )
 }

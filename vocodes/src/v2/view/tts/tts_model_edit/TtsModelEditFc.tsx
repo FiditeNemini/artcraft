@@ -3,10 +3,11 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { ApiConfig } from '../../../../common/ApiConfig';
 import { SessionWrapper } from '../../../../session/SessionWrapper';
 import { TtsInferenceJob } from '../../../../App';
-import { useParams, Link, useHistory } from 'react-router-dom';
+import { useParams, useHistory } from 'react-router-dom';
 import { FrontendUrlConfig } from '../../../../common/FrontendUrlConfig';
 import { VisibleIconFc } from '../../_icons/VisibleIcon';
 import { HiddenIconFc } from '../../_icons/HiddenIcon';
+import { BackLink } from '../../_common/BackLink';
 
 const DEFAULT_VISIBILITY = 'public';
 
@@ -171,7 +172,7 @@ function TtsModelEditFc(props: Props) {
       <h1 className="title is-1"> Edit Model </h1>
 
       <p>
-        <Link to={modelLink}>&lt; Back to model</Link>
+        <BackLink link={modelLink} text="Back to model" />
       </p>
 
       <form onSubmit={handleFormSubmit}>
