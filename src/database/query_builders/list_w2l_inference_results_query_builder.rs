@@ -372,7 +372,7 @@ pub struct RawInternalTtsRecord {
 
 #[cfg(test)]
 mod tests {
-  use crate::database::queries::list_w2l_inference_results::ListW2lResultsQueryBuilder;
+  use crate::database::query_builders::list_w2l_inference_results_query_builder::ListW2lResultsQueryBuilder;
 
   #[test]
   fn predicates_without_scoping() {

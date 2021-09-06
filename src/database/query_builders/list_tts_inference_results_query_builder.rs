@@ -326,7 +326,7 @@ pub struct RawInternalTtsRecord {
 
 #[cfg(test)]
 mod tests {
-  use crate::database::queries::list_tts_inference_results::ListTtsResultsQueryBuilder;
+  use crate::database::query_builders::list_tts_inference_results_query_builder::ListTtsResultsQueryBuilder;
 
   #[test]
   fn predicates_without_scoping() {
