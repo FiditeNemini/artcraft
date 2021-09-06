@@ -43,8 +43,9 @@ ON
   users.token = creator_user_token
 WHERE
   is_public_listing_approved IS TRUE
-AND
-  users.is_banned IS FALSE
+  AND users.is_banned IS FALSE
+  AND w2l_templates.user_deleted_at IS NULL
+  AND w2l_templates.mod_deleted_at IS NULL
 GROUP BY creator_user_token
 ORDER BY uploaded_count desc
 LIMIT 25;

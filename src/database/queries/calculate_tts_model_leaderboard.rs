@@ -43,6 +43,8 @@ ON
   users.token = creator_user_token
 WHERE
   users.is_banned IS FALSE
+  AND tts_models.user_deleted_at IS NULL
+  AND tts_models.mod_deleted_at IS NULL
 GROUP BY creator_user_token
 ORDER BY uploaded_count desc
 LIMIT 25;
