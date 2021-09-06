@@ -98,6 +98,14 @@ pub async fn get_tts_model_handler(
     Ok(Some(model)) => model,
   };
 
+  if let Some(moderator_fields) = model.maybe_moderator_fields.as_ref() {
+    // NB: The moderator fields will always be present before removal
+    // We don't want non-mods seeing stuff made by banned users.
+    if moderator_fields.creator_is_banned && !is_moderator {
+      return Err(GetTtsModelError::NotFound);
+    }
+  }
+
   if !is_moderator {
     model.maybe_moderator_fields = None;
   }

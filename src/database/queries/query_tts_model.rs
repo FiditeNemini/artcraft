@@ -45,6 +45,7 @@ pub struct TtsModelRecordForResponse {
 /// It's the web endpoint controller's responsibility to clear these for non-mods.
 #[derive(Serialize)]
 pub struct TtsModelModeratorFields {
+  pub creator_is_banned: bool,
   pub creator_ip_address_creation: String,
   pub creator_ip_address_last_update: String,
   pub user_deleted_at: Option<DateTime<Utc>>,
@@ -62,6 +63,7 @@ pub struct TtsModelRecordRaw {
   pub creator_username: String,
   pub creator_display_name: String,
   pub creator_gravatar_hash: String,
+  pub creator_is_banned: i8,
 
   pub title: String,
   pub description_markdown: String,
@@ -135,6 +137,7 @@ pub async fn select_tts_model_by_token(
     created_at: model.created_at.clone(),
     updated_at: model.updated_at.clone(),
     maybe_moderator_fields: Some(TtsModelModeratorFields {
+      creator_is_banned: i8_to_bool(model.creator_is_banned),
       creator_ip_address_creation: model.creator_ip_address_creation.clone(),
       creator_ip_address_last_update: model.creator_ip_address_last_update.clone(),
       user_deleted_at: model.user_deleted_at.clone(),
@@ -162,6 +165,7 @@ SELECT
     users.username as creator_username,
     users.display_name as creator_display_name,
     users.email_gravatar_hash as creator_gravatar_hash,
+    users.is_banned as creator_is_banned,
 
     tts.title,
     tts.description_markdown,
@@ -208,6 +212,7 @@ SELECT
     users.username as creator_username,
     users.display_name as creator_display_name,
     users.email_gravatar_hash as creator_gravatar_hash,
+    users.is_banned as creator_is_banned,
 
     tts.title,
     tts.description_markdown,
