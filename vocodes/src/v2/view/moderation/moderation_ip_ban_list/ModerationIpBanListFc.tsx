@@ -3,6 +3,8 @@ import { Link, useHistory } from 'react-router-dom';
 import { ApiConfig } from '../../../../common/ApiConfig';
 import { SessionWrapper } from '../../../../session/SessionWrapper';
 import { formatDistance } from 'date-fns';
+import { BackLink } from '../../_common/BackLink';
+import { FrontendUrlConfig } from '../../../../common/FrontendUrlConfig';
 
 interface Props {
   sessionWrapper: SessionWrapper,
@@ -133,7 +135,14 @@ function ModerationIpBanListFc(props: Props) {
     <div>
       <h1 className="title is-1"> Moderation Ip Ban List </h1>
 
+      <p>
+        <BackLink link={FrontendUrlConfig.moderationMain()} text="Back to moderation" />
+      </p>
+
+      <br />
+
       <p>IP Address bans will prevent bad actors from using and abusing the website.</p>
+      
       <br />
 
       <h3 className="title is-3"> Create Ban </h3>
