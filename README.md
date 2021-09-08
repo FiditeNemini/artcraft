@@ -259,6 +259,8 @@ async fn hello(name: web::Path<String>) -> impl Responder { format!("Hi {}", nam
 TODO
 ----
 
+* Revise this README to be more useful.
+
 Notes / TODOs:
 
 * Examples for good Actix+Sqlx Tests:
