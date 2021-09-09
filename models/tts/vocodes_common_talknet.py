@@ -384,27 +384,32 @@ class TacotronWaveglowPipeline:
             print("done!")
 
 
+        output_audio = sr_mix.astype(np.int16)
+        #rate = self.hifigan_super_resolution_h.sampling_rate
+        rate = h2.sampling_rate
+        write_wav(args['output_audio_filename'], rate, output_audio)
+
+        print('Saving spectrogram as JSON...')
+        save_spectorgram_json_file(spect, args['output_spectrogram_filename'])
+
+        print('Generating metadata file...')
+        generate_metadata_file(args['output_audio_filename'], args['output_metadata_filename'])
 
 
         # ======================= END TALKNET EXPERIMENT ========================
 
-        tacotron = self.tacotron_model_cache[args['synthesizer_checkpoint_path']]
+        #tacotron = self.tacotron_model_cache[args['synthesizer_checkpoint_path']]
 
-        with torch.no_grad():
-            mel_outputs, mel_outputs_postnet, _, alignments = tacotron.inference(sequence)
+        #with torch.no_grad():
+        #    mel_outputs, mel_outputs_postnet, _, alignments = tacotron.inference(sequence)
 
-        if args['vocoder_type'] == 'hifigan-superres':
-            self.vocode_hifigan_superres(args, mel_outputs_postnet)
-        elif args['vocoder_type'] == 'waveglow':
-            self.vocode_waveglow(args, mel_outputs_postnet)
-        else:
-            raise Exception('Wrong vocoder type: {}'.format(args['vocoder_type']))
+        #if args['vocoder_type'] == 'hifigan-superres':
+        #    self.vocode_hifigan_superres(args, mel_outputs_postnet)
+        #elif args['vocoder_type'] == 'waveglow':
+        #    self.vocode_waveglow(args, mel_outputs_postnet)
+        #else:
+        #    raise Exception('Wrong vocoder type: {}'.format(args['vocoder_type']))
 
-        print('Saving spectrogram as JSON...')
-        save_spectorgram_json_file(mel_outputs_postnet, args['output_spectrogram_filename'])
-
-        print('Generating metadata file...')
-        generate_metadata_file(args['output_audio_filename'], args['output_metadata_filename'])
 
     def vocode_waveglow(self, args, mel_outputs_postnet):
         print('Running waveglow...')
