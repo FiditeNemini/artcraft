@@ -29,6 +29,13 @@ import subprocess
 import magic
 import os
 
+# For talknet
+from ControllableTalkNet.controllable_talknet import arpa_parse
+from ControllableTalkNet.controllable_talknet import to_arpa
+from nemo.collections.tts.models import TalkNetSpectModel
+from nemo.collections.tts.models import TalkNetDursModel
+from nemo.collections.tts.models import TalkNetPitchModel
+
 def print_gpu_info():
     print('========================================')
     print('Python interpreter', sys.executable)
@@ -99,6 +106,19 @@ def preprocess_text(text, raw_input=True):
         sequence = np.array(text_to_sequence(pre_sequence, ['english_cleaners']))[None, :]
         sequence = torch.autograd.Variable(torch.from_numpy(sequence)).cuda().long()
     return sequence
+
+def preprocess_text_talknet(text, tnmodel):
+    token_list = arpa_parse(text, tnmodel)
+    print('token_list', token_list)
+
+    DEVICE = "cuda:0"
+    tokens = torch.IntTensor(token_list).view(1, -1).to(DEVICE)
+    print('tokens', tokens)
+
+    arpa = to_arpa(token_list)
+    print('arpa', arpa)
+
+    return arpa
 
 class NumpyEncoder(json.JSONEncoder):
     def default(self, obj):
@@ -240,9 +260,38 @@ class TacotronWaveglowPipeline:
         assert('output_spectrogram_filename' in args)
         assert('output_metadata_filename' in args)
 
+        # ======================= BEGIN TALKNET EXPERIMENT ========================
+
+        print('load models')
+
+        # TODO: Singer model?
+        #  tnmodel = TalkNetSingerModel.restore_from(singer_path
+        talknet_path = "/home/bt/models/tacotron/david-attenborough/TalkNetSpect.nemo"
+        tnmodel = TalkNetSpectModel.restore_from(talknet_path)
+
+        durs_path = "/home/bt/models/tacotron/david-attenborough/TalkNetDurs.nemo"
+        pitch_path = "/home/bt/models/tacotron/david-attenborough/TalkNetPitch.nemo"
+
+        if os.path.exists(durs_path):
+            print('loading duration and pitch models')
+            tndurs = TalkNetDursModel.restore_from(durs_path)
+            tnmodel.add_module("_durs_model", tndurs)
+            tnpitch = TalkNetPitchModel.restore_from(pitch_path)
+            tnmodel.add_module("_pitch_model", tnpitch)
+
+        tnmodel.eval()
+
+        print('done loading model?')
+
+
         print('Raw text: {}'.format(args['raw_text']))
 
-        sequence = preprocess_text(args['raw_text'])
+        sequence = preprocess_text_talknet(args['raw_text'], tnmodel)
+
+        print('done with arpabet')
+
+
+        # ======================= END TALKNET EXPERIMENT ========================
 
         tacotron = self.tacotron_model_cache[args['synthesizer_checkpoint_path']]
 
