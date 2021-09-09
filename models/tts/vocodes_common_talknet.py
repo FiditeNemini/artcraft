@@ -35,6 +35,9 @@ from ControllableTalkNet.controllable_talknet import to_arpa
 from nemo.collections.tts.models import TalkNetSpectModel
 from nemo.collections.tts.models import TalkNetDursModel
 from nemo.collections.tts.models import TalkNetPitchModel
+from ControllableTalkNet.controllable_talknet import load_hifigan
+from hifigan.meldataset import MAX_WAV_VALUE
+from hifigan.meldataset import mel_spectrogram
 
 def print_gpu_info():
     print('========================================')
@@ -106,19 +109,6 @@ def preprocess_text(text, raw_input=True):
         sequence = np.array(text_to_sequence(pre_sequence, ['english_cleaners']))[None, :]
         sequence = torch.autograd.Variable(torch.from_numpy(sequence)).cuda().long()
     return sequence
-
-def preprocess_text_talknet(text, tnmodel):
-    token_list = arpa_parse(text, tnmodel)
-    print('token_list', token_list)
-
-    DEVICE = "cuda:0"
-    tokens = torch.IntTensor(token_list).view(1, -1).to(DEVICE)
-    print('tokens', tokens)
-
-    arpa = to_arpa(token_list)
-    print('arpa', arpa)
-
-    return arpa
 
 class NumpyEncoder(json.JSONEncoder):
     def default(self, obj):
@@ -264,31 +254,136 @@ class TacotronWaveglowPipeline:
 
         print('load models')
 
-        # TODO: Singer model?
-        #  tnmodel = TalkNetSingerModel.restore_from(singer_path
-        talknet_path = "/home/bt/models/tacotron/david-attenborough/TalkNetSpect.nemo"
-        tnmodel = TalkNetSpectModel.restore_from(talknet_path)
+        with torch.no_grad():
 
-        durs_path = "/home/bt/models/tacotron/david-attenborough/TalkNetDurs.nemo"
-        pitch_path = "/home/bt/models/tacotron/david-attenborough/TalkNetPitch.nemo"
+            # TODO: Singer model?
+            #  tnmodel = TalkNetSingerModel.restore_from(singer_path
+            talknet_path = "/home/bt/models/talknet/david-attenborough/TalkNetSpect.nemo"
+            tnmodel = TalkNetSpectModel.restore_from(talknet_path)
 
-        if os.path.exists(durs_path):
-            print('loading duration and pitch models')
-            tndurs = TalkNetDursModel.restore_from(durs_path)
-            tnmodel.add_module("_durs_model", tndurs)
-            tnpitch = TalkNetPitchModel.restore_from(pitch_path)
-            tnmodel.add_module("_pitch_model", tnpitch)
+            durs_path = "/home/bt/models/talknet/david-attenborough/TalkNetDurs.nemo"
+            pitch_path = "/home/bt/models/talknet/david-attenborough/TalkNetPitch.nemo"
 
-        tnmodel.eval()
+            if os.path.exists(durs_path):
+                print('loading duration and pitch models')
+                tndurs = TalkNetDursModel.restore_from(durs_path)
+                tnmodel.add_module("_durs_model", tndurs)
+                tnpitch = TalkNetPitchModel.restore_from(pitch_path)
+                tnmodel.add_module("_pitch_model", tnpitch)
 
-        print('done loading model?')
+            tnmodel.eval()
+
+            print('done loading model?')
+
+            # ==== ARPABET ====
+
+            print('Raw text: {}'.format(args['raw_text']))
+
+            text = args['raw_text']
+
+            token_list = arpa_parse(text, tnmodel)
+            print('token_list', token_list)
+
+            DEVICE = "cuda:0"
+            tokens = torch.IntTensor(token_list).view(1, -1).to(DEVICE)
+            print('tokens', tokens)
+
+            arpa = to_arpa(token_list)
+
+            print('arpa', arpa)
+            print('done with arpabet')
+
+            # ==== END ARPABET ====
+
+            # TODO: Either pitch prediction (if model given), or use a source audio file (TODO)
+
+            print("spectrogram estimation")
+            spect = tnmodel.generate_spectrogram(tokens=tokens)
 
 
-        print('Raw text: {}'.format(args['raw_text']))
+            # ==== HIFIGAN ====
 
-        sequence = preprocess_text_talknet(args['raw_text'], tnmodel)
+            print("load hifigan")
 
-        print('done with arpabet')
+            hifigan_path = "/home/bt/models/talknet/david-attenborough/hifiganmodel"
+
+            hifigan, h, denoiser = load_hifigan(hifigan_path, "config_v1")
+            hifipath = hifigan_path
+
+            y_g_hat = hifigan(spect.float())
+            audio = y_g_hat.squeeze()
+            audio = audio * MAX_WAV_VALUE
+            audio_denoised = denoiser(audio.view(1, -1), strength=35)[:, 0]
+            audio_np = (
+                audio_denoised.detach().cpu().numpy().reshape(-1).astype(np.int16)
+            )
+
+            # ==== HIFIGAN SR ====
+
+            print("load hifigan SR")
+
+            sr_path = "/home/bt/models/hifigan/Superres_Twilight_33000"
+            hifigan_sr, h2, denoiser_sr = load_hifigan(sr_path, "config_32k")
+
+            # TODO
+            # TODO
+            # TODO -- Auto-tuning
+            # TODO
+            # TODO
+
+            print("resample 32k")
+
+            # Resample to 32k
+            wave = resampy.resample(
+                audio_np,
+                h.sampling_rate,
+                h2.sampling_rate,
+                filter="sinc_window",
+                window=scipy.signal.windows.hann,
+                num_zeros=8,
+            )
+            wave_out = wave.astype(np.int16)
+
+            print("hifi SR")
+
+            # HiFi-GAN super-resolution
+            wave = wave / MAX_WAV_VALUE
+            wave = torch.FloatTensor(wave).to(torch.device(DEVICE))
+            new_mel = mel_spectrogram(
+                wave.unsqueeze(0),
+                h2.n_fft,
+                h2.num_mels,
+                h2.sampling_rate,
+                h2.hop_size,
+                h2.win_size,
+                h2.fmin,
+                h2.fmax,
+            )
+            y_g_hat2 = hifigan_sr(new_mel)
+            audio2 = y_g_hat2.squeeze()
+            audio2 = audio2 * MAX_WAV_VALUE
+            audio2_denoised = denoiser(audio2.view(1, -1), strength=35)[:, 0]
+
+            # High-pass filter, mixing and denormalizing
+            audio2_denoised = audio2_denoised.detach().cpu().numpy().reshape(-1)
+            b = scipy.signal.firwin(
+                101, cutoff=10500, fs=h2.sampling_rate, pass_zero=False
+            )
+            y = scipy.signal.lfilter(b, [1.0], audio2_denoised)
+            y *= 4.0  # superres strength
+            y_out = y.astype(np.int16)
+            y_padded = np.zeros(wave_out.shape)
+            y_padded[: y_out.shape[0]] = y_out
+            sr_mix = wave_out + y_padded
+
+            #buffer = io.BytesIO()
+            #wavfile.write(buffer, 32000, sr_mix.astype(np.int16))
+            #b64 = base64.b64encode(buffer.getvalue())
+            #sound = "data:audio/x-wav;base64," + b64.decode("ascii")
+
+            print("done!")
+
+
 
 
         # ======================= END TALKNET EXPERIMENT ========================
