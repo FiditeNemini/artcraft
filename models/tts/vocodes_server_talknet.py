@@ -268,4 +268,16 @@ def main():
     simple_server.make_server('0.0.0.0', args.port, api).serve_forever()
 
 if __name__ == '__main__':
+    """
+    Launching a TalkNet server:
+    
+    from ControllableTalkNet.controllable_talknet import *
+    
+    app.run_server(
+        mode="inline",
+        threaded=True,
+        #dev_tools_ui=True,
+        #dev_tools_hot_reload=True,
+    )
+    """
     main()

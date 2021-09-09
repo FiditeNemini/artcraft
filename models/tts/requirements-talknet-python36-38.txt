@@ -66,3 +66,10 @@ opencc
 pangu
 jieba
 numba
+
+# For serving HTTP (existing vocodes pipeline)
+falcon==3.0.1
+falcon-multipart==0.2.0
+
+# For metadata
+python-magic==0.4.22
