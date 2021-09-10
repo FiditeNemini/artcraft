@@ -59,6 +59,15 @@ impl BucketPathUnifier {
       .join(model_filename)
   }
 
+  pub fn tts_zipped_synthesizer_path(&self, tts_synthesizer_file_hash: &str) -> PathBuf {
+    let hashed_path = Self::hashed_directory_path(tts_synthesizer_file_hash);
+    let model_filename = format!("{}.zip", &tts_synthesizer_file_hash);
+
+    self.tts_synthesizer_model_root
+        .join(hashed_path)
+        .join(model_filename)
+  }
+
   // ==================== TTS INFERENCE OUTPUT ==================== //
 
   /// This should include the string "vocodes" for downloaders.
@@ -194,6 +203,13 @@ mod tests {
     let paths = get_instance();
     assert_eq!(paths.tts_synthesizer_path("foobar").to_str().unwrap(),
       "/test_path_synthesizers/f/o/o/foobar.pt");
+  }
+
+  #[test]
+  fn test_tts_zipped_synthesizer_path() {
+    let paths = get_instance();
+    assert_eq!(paths.tts_synthesizer_path("foobar").to_str().unwrap(),
+      "/test_path_synthesizers/f/o/o/foobar.zip");
   }
 
   #[test]

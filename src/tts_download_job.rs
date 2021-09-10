@@ -20,6 +20,7 @@ pub mod util;
 use anyhow::anyhow;
 use chrono::Utc;
 use crate::common_env::CommonEnv;
+use crate::database::enums::tts_model_type::TtsModelType;
 use crate::database::mediators::badge_granter::BadgeGranter;
 use crate::database::mediators::firehose_publisher::FirehosePublisher;
 use crate::job_queries::tts_download_job_queries::TtsUploadJobRecord;
@@ -30,6 +31,7 @@ use crate::job_queries::tts_download_job_queries::mark_tts_upload_job_failure;
 use crate::job_queries::tts_download_job_queries::query_tts_upload_job_records;
 use crate::script_execution::google_drive_download_command::GoogleDriveDownloadCommand;
 use crate::script_execution::tacotron_model_check_command::TacotronModelCheckCommand;
+use crate::script_execution::talknet_model_check_command::TalknetModelCheckCommand;
 use crate::shared_constants::DEFAULT_MYSQL_CONNECTION_STRING;
 use crate::shared_constants::DEFAULT_RUST_LOG;
 use crate::util::anyhow_result::AnyhowResult;
@@ -67,7 +69,8 @@ const DEFAULT_TEMP_DIR: &'static str = "/tmp";
 
 // Python code
 const ENV_CODE_DIRECTORY : &'static str = "TTS_CODE_DIRECTORY";
-const ENV_MODEL_CHECK_SCRIPT_NAME : &'static str = "TTS_MODEL_CHECK_SCRIPT_NAME";
+const ENV_TACOTRON_CHECK_SCRIPT_NAME : &'static str = "TTS_TACOTRON_CHECK_SCRIPT_NAME";
+const ENV_TALKNET_CHECK_SCRIPT_NAME : &'static str = "TTS_TALKNET_CHECK_SCRIPT_NAME";
 
 struct Downloader {
   pub download_temp_directory: PathBuf,
@@ -82,7 +85,8 @@ struct Downloader {
 
   pub bucket_path_unifier: BucketPathUnifier,
 
-  pub tts_check: TacotronModelCheckCommand,
+  pub tacotron_tts_check: TacotronModelCheckCommand,
+  pub talknet_tts_check: TalknetModelCheckCommand,
 
   // Command to run
   pub download_script: String,
@@ -176,11 +180,17 @@ async fn main() -> AnyhowResult<()> {
   };
 
   let py_code_directory = easyenv::get_env_string_required(ENV_CODE_DIRECTORY)?;
-  let py_script_name = easyenv::get_env_string_required(ENV_MODEL_CHECK_SCRIPT_NAME)?;
+  let tacotron_check_script_name = easyenv::get_env_string_required(ENV_TACOTRON_CHECK_SCRIPT_NAME)?;
+  let talknet_check_script_name = easyenv::get_env_string_required(ENV_TALKNET_CHECK_SCRIPT_NAME)?;
 
-  let tts_model_check_command= TacotronModelCheckCommand::new(
+  let tacotron_check_command= TacotronModelCheckCommand::new(
     &py_code_directory,
-    &py_script_name,
+    &tacotron_check_script_name,
+  );
+
+  let talknet_check_command= TalknetModelCheckCommand::new(
+    &py_code_directory,
+    &talknet_check_script_name,
   );
 
   let downloader = Downloader {
@@ -194,7 +204,8 @@ async fn main() -> AnyhowResult<()> {
     bucket_root_tts_model_uploads: bucket_root.to_string(),
     firehose_publisher,
     badge_granter,
-    tts_check: tts_model_check_command,
+    tacotron_tts_check: tacotron_check_command,
+    talknet_tts_check: talknet_check_command,
     job_batch_wait_millis: common_env.job_batch_wait_millis,
     job_max_attempts: common_env.job_max_attempts as i32,
     no_op_logger_millis: common_env.no_op_logger_millis,
@@ -324,15 +335,13 @@ async fn process_job(downloader: &Downloader, job: &TtsUploadJobRecord) -> Anyho
   let download_filename = downloader.google_drive_downloader
     .download_file(&download_url, &temp_dir).await?;
 
-  let private_bucket_hash = hash_file_sha2(&download_filename)?;
+  let model_type = if download_filename.to_lowercase().ends_with("zip") {
+    TtsModelType::Talknet
+  } else {
+    TtsModelType::Tacotron2
+  };
 
-  info!("File hash: {}", private_bucket_hash);
-
-  let synthesizer_model_bucket_path = downloader.bucket_path_unifier.tts_synthesizer_path(
-    &private_bucket_hash);
-
-  info!("Destination bucket path: {:?}", &synthesizer_model_bucket_path);
-
+  info!("Uploaded model type: {:?}", model_type);
 
   // ==================== RUN MODEL CHECK ==================== //
 
@@ -340,15 +349,26 @@ async fn process_job(downloader: &Downloader, job: &TtsUploadJobRecord) -> Anyho
 
   redis_logger.log_status("checking model")?;
 
-  let file_path = PathBuf::from(download_filename);
+  let file_path = PathBuf::from(download_filename.clone());
 
   let output_metadata_fs_path = temp_dir.path().join("metadata.json");
 
-  downloader.tts_check.execute(
-    &file_path,
-    &output_metadata_fs_path,
-    false,
-  )?;
+  match model_type {
+    TtsModelType::Tacotron2 => {
+      downloader.tacotron_tts_check.execute(
+        &file_path,
+        &output_metadata_fs_path,
+        false,
+      )?;
+    },
+    TtsModelType::Talknet => {
+      downloader.talknet_tts_check.execute(
+        &file_path,
+        &output_metadata_fs_path,
+        false,
+      )?;
+    },
+  }
 
   // ==================== CHECK ALL FILES EXIST AND GET METADATA ==================== //
 
@@ -361,6 +381,17 @@ async fn process_job(downloader: &Downloader, job: &TtsUploadJobRecord) -> Anyho
   // ==================== UPLOAD MODEL FILE ==================== //
 
   info!("Uploading model to GCS...");
+
+  let private_bucket_hash = hash_file_sha2(&download_filename)?;
+
+  info!("File hash: {}", private_bucket_hash);
+
+  let synthesizer_model_bucket_path = match model_type {
+    TtsModelType::Tacotron2 => downloader.bucket_path_unifier.tts_synthesizer_path(&private_bucket_hash),
+    TtsModelType::Talknet => downloader.bucket_path_unifier.tts_zipped_synthesizer_path(&private_bucket_hash),
+  };
+
+  info!("Destination bucket path: {:?}", &synthesizer_model_bucket_path);
 
   redis_logger.log_status("uploading model")?;
 
