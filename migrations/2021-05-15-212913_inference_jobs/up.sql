@@ -2,6 +2,9 @@
 -- noinspection SqlNoDataSourceInspectionForFile
 -- noinspection SqlResolveForFile
 
+-- NB: See the "squashed" copy of this for better documentation
+-- and the current state of the table.
+
 CREATE TABLE tts_inference_jobs (
   id BIGINT(20) NOT NULL AUTO_INCREMENT,
 
