@@ -22,6 +22,18 @@ CREATE TABLE tts_models (
       'talknet'
   ) NOT NULL DEFAULT 'not-set',
 
+  -- For models distributed as archives/bundles (eg. TalkNet), we can pack
+  -- in a vocoder. Note that this vocoder does not have to be used.
+  has_self_contained_vocoder BOOLEAN NOT NULL DEFAULT FALSE,
+
+  -- For models distributed as archives/bundles (eg. TalkNet), we can pack
+  -- in a duration model.
+  has_self_contained_duration_model BOOLEAN NOT NULL DEFAULT FALSE,
+
+  -- For models distributed as archives/bundles (eg. TalkNet), we can pack
+  -- in a pitch model.
+  has_self_contained_pitch_model BOOLEAN NOT NULL DEFAULT FALSE,
+
   -- NB: DO NOT CHANGE ORDER; APPEND ONLY!
   -- How text should be handled.
   text_preprocessing_algorithm ENUM(
@@ -30,6 +42,7 @@ CREATE TABLE tts_models (
   ) NOT NULL DEFAULT 'basic',
 
   -- If set, use a different pretrained vocoder.
+  -- If not set, use the website default. (Currently HifiGan-SS)
   maybe_default_pretrained_vocoder VARCHAR(64) DEFAULT NULL,
 
   -- Optional Pointer to a newer version of the voice
@@ -108,6 +121,9 @@ CREATE TABLE tts_models (
   private_bucket_hash CHAR(64) NOT NULL,
   -- The "full url" version of the path
   private_bucket_object_name VARCHAR(255) NOT NULL,
+
+  -- Whether the file is a zip archive (rather than a model file).
+  private_bucket_object_is_archive BOOLEAN NOT NULL DEFAULT FALSE,
 
   -- ========== RATING AND RANKING ==========
 

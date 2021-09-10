@@ -26,6 +26,8 @@ pub enum TtsModelType {
   GlowTts,
   /// glowtts-vocodes
   GlowTts_Vocodes,
+  /// talknet
+  Talknet,
 }
 
 #[derive(Deserialize)]
