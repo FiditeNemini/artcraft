@@ -18,7 +18,8 @@ CREATE TABLE tts_models (
       'not-set',
       'tacotron2',
       'glowtts',
-      'glowtts-vocodes'
+      'glowtts-vocodes',
+      'talknet'
   ) NOT NULL DEFAULT 'not-set',
 
   -- NB: DO NOT CHANGE ORDER; APPEND ONLY!

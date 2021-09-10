@@ -30,6 +30,8 @@ CREATE TABLE tts_model_upload_jobs (
   -- If maybe_subject_token (etc.) is set, then it's authoritative instead.
   title VARCHAR(255) NOT NULL,
 
+  -- NB: THIS ENUM IS OUT OF DATE!
+  -- Check the squashed sql file as an updated reference!
   -- NB: DO NOT CHANGE ORDER; APPEND ONLY!
   -- THIS MUST MATCH THE RESPECTIVE JOBS TABLE.
   tts_model_type ENUM(

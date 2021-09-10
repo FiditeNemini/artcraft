@@ -12,6 +12,8 @@ CREATE TABLE tts_models (
   -- Effective "primary key" (PUBLIC)
   token VARCHAR(32) NOT NULL,
 
+  -- NB: THIS ENUM IS OUT OF DATE!
+  -- Check the squashed sql file as an updated reference!
   -- NB: DO NOT CHANGE ORDER; APPEND ONLY!
   -- THIS MUST MATCH THE RESPECTIVE JOBS TABLE.
   tts_model_type ENUM(
