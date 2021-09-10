@@ -64,7 +64,7 @@ class App extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props);
 
-    const enableAlpha = newVocodes();
+    const enableAlpha = newVocodes() || true;
 
     const migrationMode = enableAlpha ? MigrationMode.NEW_VOCODES : MigrationMode.OLD_VOCODES;
 
