@@ -1,3 +1,6 @@
+//! NB: This doesn't live in the `util.redis` package because it depends on `http_server`.
+//! It's only used for the server anyway, so living here makes sense.
+
 use actix_http::http::{HeaderName, HeaderMap};
 use actix_web::HttpRequest;
 use crate::http_server::web_utils::ip_address::get_request_ip;

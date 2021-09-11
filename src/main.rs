@@ -16,8 +16,8 @@ pub const RESERVED_USERNAMES : &'static str = include_str!("../db/reserved_usern
 pub const RESERVED_SUBSTRINGS : &'static str = include_str!("../db/reserved_usernames_including.txt");
 pub const BANNED_SLURS : &'static str = include_str!("../db/banned_slurs.txt");
 
-pub mod clients;
 pub mod database;
+pub mod http_clients;
 pub mod http_server;
 pub mod server_state;
 pub mod shared_constants;
@@ -90,6 +90,7 @@ use crate::http_server::endpoints::w2l::list_w2l_templates::list_w2l_templates_h
 use crate::http_server::endpoints::w2l::set_w2l_template_mod_approval::set_w2l_template_mod_approval_handler;
 use crate::http_server::middleware::ip_filter_middleware::IpFilter;
 use crate::http_server::web_utils::cookie_manager::CookieManager;
+use crate::http_server::web_utils::redis_rate_limiter::RedisRateLimiter;
 use crate::http_server::web_utils::session_checker::SessionChecker;
 use crate::server_state::{ServerState, EnvConfig};
 use crate::shared_constants::DEFAULT_MYSQL_CONNECTION_STRING;
@@ -99,9 +100,9 @@ use crate::threads::ip_banlist_set::IpBanlistSet;
 use crate::threads::poll_ip_banlist_thread::poll_ip_bans;
 use crate::util::buckets::bucket_client::BucketClient;
 use crate::util::encrypted_sort_id::SortKeyCrypto;
-use crate::util::redis::redis_rate_limiter::RedisRateLimiter;
 use futures::Future;
 use futures::executor::ThreadPool;
+use limitation::Limiter;
 use log::{info};
 use r2d2_redis::RedisConnectionManager;
 use r2d2_redis::r2d2;
@@ -110,7 +111,6 @@ use sqlx::MySqlPool;
 use sqlx::mysql::MySqlPoolOptions;
 use std::sync::Arc;
 use std::time::Duration;
-use limitation::Limiter;
 
 // TODO TODO TODO TODO
 // TODO TODO TODO TODO

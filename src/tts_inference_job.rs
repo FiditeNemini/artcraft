@@ -10,9 +10,9 @@
 
 #[macro_use] extern crate serde_derive;
 
-pub mod clients;
 pub mod common_env;
 pub mod database;
+pub mod http_clients;
 pub mod job_queries;
 pub mod script_execution;
 pub mod shared_constants;
@@ -20,10 +20,10 @@ pub mod util;
 
 use anyhow::{anyhow, Error};
 use chrono::{Utc, DateTime, TimeZone};
-use crate::clients::tts_inference_sidecar_client::TtsInferenceSidecarClient;
 use crate::common_env::CommonEnv;
 use crate::database::enums::vocoder_type::VocoderType;
 use crate::database::mediators::firehose_publisher::FirehosePublisher;
+use crate::http_clients::tts_inference_sidecar_client::TtsInferenceSidecarClient;
 use crate::job_queries::tts_inference_job_queries::get_tts_model_by_token;
 use crate::job_queries::tts_inference_job_queries::grab_job_lock_and_mark_pending;
 use crate::job_queries::tts_inference_job_queries::insert_tts_result;
