@@ -92,7 +92,7 @@ function UploadTtsModelFc(props: Props) {
     <div>
       <h1 className="title is-1"> Upload Voice (TTS Model) </h1>
 
-      <div className="notification is-warning">
+      <div className="notification is-info is-light">
         <strong>Content Creator Rewards!</strong> 
         {/*<p>You can help vo.codes grow by uploading Tacotron2 models. 
         The person that uploads the most models will get $100, 
@@ -101,28 +101,35 @@ function UploadTtsModelFc(props: Props) {
         recieve cash prizes. Uploaders will also get queue priority!</p>*/}
         <p>
           Details are coming soon. 
-          The more you upload and help us grow, the more you can earn.
+          The more you upload and help us grow, the more you can earn. We'll be paying for number of 
+          models uploaded as well as frequency of use and quality of training. Stay tuned.
         </p>
       </div>
 
-
       <p>
-        Vo.codes currently supports <em>Tacotron 2</em>, GlowTTS, and a custom architecture 
-        that we intend to open source. We'll soon add TalkNet and custom vocoder uploads as well as 
-        other model architectures.
+        If you're new to voice cloning, join our <DiscordLink /> to get started. We have a friendly 
+        community that can help you start creating your own voices of your favorite characters.
       </p>
 
       <br />
 
       <p>
-        Join our <DiscordLink /> for more info. We have a friendly community that can help you start
-        creating your own voices of your favorite characters.
+        Vo.codes currently supports <em>Tacotron 2</em>, GlowTTS, and a custom synthesizer architecture 
+        that we intend to open source. We'll soon add TalkNet, custom vocoder uploads, and more model 
+        architectures.
       </p>
 
       <br />
 
       <p>
-        Finally, please do not upload voices that you didn't train yourself or voices of individuals
+        Once your voice is successfully uploaded, you'll be able to start using it and sharing it 
+        with others.
+      </p>
+
+      <br />
+
+      <p>
+        Please do not upload voices that you didn't train yourself or voices of individuals
         who wish to not be voice cloned. We'll post a list of banned voices soon.
       </p>
 
