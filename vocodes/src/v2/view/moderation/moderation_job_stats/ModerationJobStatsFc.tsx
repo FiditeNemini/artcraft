@@ -27,11 +27,14 @@ function ModerationJobStatsFc(props: Props) {
     }
   }, []);
 
-
-  useEffect(() => {
+  const reloadStats = useCallback(async () => {
     getTtsStats();
     getW2lStats();
   }, [getTtsStats, getW2lStats]);
+
+  useEffect(() => {
+    reloadStats();
+  }, [reloadStats]);
 
 
   if (ttsPendingJobCount === -1 && w2lPendingJobCount === -1) {
@@ -67,6 +70,12 @@ function ModerationJobStatsFc(props: Props) {
           </tr>
         </tbody>
       </table>
+
+      <br />
+      <button 
+        className="button is-info is-large is-fullwidth"
+        onClick={() => reloadStats()}
+        >Reload</button>
     </div>
   )
 }
