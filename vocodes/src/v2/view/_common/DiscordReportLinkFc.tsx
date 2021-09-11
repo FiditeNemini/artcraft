@@ -1,4 +1,5 @@
 import React from 'react';
+import { DiscordLink } from './DiscordLink';
 
 interface Props {
 }
@@ -6,7 +7,7 @@ interface Props {
 function ReportDiscordLinkFc(props: Props) {
   return (
     <div className="content">
-      <p>Report inappropriate content on <a href="https://discord.gg/H72KFXm">Discord</a>.</p>
+      <p>Report inappropriate content on <DiscordLink />.</p>
     </div>
   )
 }

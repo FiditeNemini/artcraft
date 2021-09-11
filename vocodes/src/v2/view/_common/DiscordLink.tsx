@@ -1,4 +1,5 @@
 import React  from 'react';
+import { DiscordIcon } from '../_icons/DiscordIcon';
 
 interface Props {
   text?: string,
@@ -9,7 +10,7 @@ function DiscordLink(props: Props) {
   return (
     <a href="https://discord.gg/H72KFXm" 
        target="_blank" 
-       rel="noopener noreferrer">{linkText}</a>
+       rel="noopener noreferrer"><DiscordIcon title={linkText}/> {linkText}</a>
   )
 }
 
