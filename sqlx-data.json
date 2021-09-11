@@ -1838,6 +1838,31 @@
       "nullable": []
     }
   },
+  "196d879939ea1aac35bf1a5413a9fe28ff7c1bf641d6c6752d7746df211f2e39": {
+    "query": "\nSELECT\n    count(*) as pending_count\nFROM\n    tts_inference_jobs\nWHERE\n    status = \"pending\"\n        ",
+    "describe": {
+      "columns": [
+        {
+          "ordinal": 0,
+          "name": "pending_count",
+          "type_info": {
+            "type": "LongLong",
+            "flags": {
+              "bits": 129
+            },
+            "char_set": 63,
+            "max_size": 21
+          }
+        }
+      ],
+      "parameters": {
+        "Right": 0
+      },
+      "nullable": [
+        false
+      ]
+    }
+  },
   "1cc62e5cdc8de18969d7e8018d91c38794e5a7d23f117e5b0a4126845f300e60": {
     "query": "\nUPDATE user_sessions\nSET deleted_at = CURRENT_TIMESTAMP()\nWHERE\n    token = ?\n    AND deleted_at IS NULL\n        ",
     "describe": {
@@ -7685,6 +7710,31 @@
         "Right": 10
       },
       "nullable": []
+    }
+  },
+  "d9a30d5fcf83f723e696000893ef60774bf286d77b609c5c5f2b51a738fa283c": {
+    "query": "\nSELECT\n    count(*) as pending_count\nFROM\n    w2l_inference_jobs\nWHERE\n    status = \"pending\"\n        ",
+    "describe": {
+      "columns": [
+        {
+          "ordinal": 0,
+          "name": "pending_count",
+          "type_info": {
+            "type": "LongLong",
+            "flags": {
+              "bits": 129
+            },
+            "char_set": 63,
+            "max_size": 21
+          }
+        }
+      ],
+      "parameters": {
+        "Right": 0
+      },
+      "nullable": [
+        false
+      ]
     }
   },
   "da3197d279b94817c6c8a6277aff7a0cf44d66e6777f46680b1b07de48875dd5": {
