@@ -123,7 +123,8 @@ function UploadTtsModelFc(props: Props) {
 
       <p>
         Once your voice is successfully uploaded, you'll be able to start using it and sharing it 
-        with others.
+        with others. You'll also be able to edit the title, tags, and vocoder used, so don't worry
+        if you typo something.
       </p>
 
       <br />
