@@ -9,16 +9,6 @@ interface FirehoseEventListResponsePayload {
   events: Array<FirehoseEvent>,
 }
 
-/*
-event_token	"EV:YR8HA4VCVYX9JMH5AMDFHTNRGSYGD"
-event_type	"w2l_template_upload_completed"
-maybe_target_user_token	"U:WNZCXKV1AN7XD"
-maybe_target_username	"brandon"
-maybe_target_display_name	"brandon"
-maybe_target_entity_token	"W2L_TPL:MJZ2SMCXX9DRNZ249VK70TWJ"
-created_at	"2021-05-30T06:42:39Z"
-updated_at	"2021-05-30T06:42:39Z"
-*/
 interface FirehoseEvent {
   event_token: string,
   event_type: string,

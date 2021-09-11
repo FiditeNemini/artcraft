@@ -18,15 +18,22 @@ function ModerationFc(props: Props) {
 
       <Link
         to="/moderation/user/list"
-        className="button is-link is-large is-fullwidth is-outlined"
+        className="button is-link is-large is-fullwidth is-light"
         >User List</Link>
 
       <br />
 
       <Link
         to="/moderation/ip_bans"
-        className="button is-link is-large is-fullwidth is-outlined"
+        className="button is-link is-large is-fullwidth is-light"
         >IP Ban List</Link>
+        
+      <br />
+
+      <Link
+        to="/moderation/job_stats"
+        className="button is-link is-large is-fullwidth is-light"
+        >Job Stats</Link>
         
       <br />
 

@@ -1,8 +1,5 @@
 import { ApiConfig } from "../../../common/ApiConfig";
 
-//export interface GetUserListRequest {
-//}
-
 export interface GetUserListSuccessResponse {
   success: boolean,
   users: Array<UserForList>
@@ -53,7 +50,7 @@ export async function GetUserList() : Promise<GetUserListResponse>
   .then(res => res.json())
   .then(res => {
     if (!res) {
-      return { success : false };
+      return { success : false }; // TODO: This loses error semantics and is deprecated
     }
 
     if (res && 'success' in res) {

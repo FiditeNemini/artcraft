@@ -39,6 +39,7 @@ import { TtsModelListItem } from '../api/tts/ListTtsModels';
 import { ProfileBanFc } from './profile/profile_ban/ProfileBanFc';
 import { ModerationUserListFc } from './moderation/moderation_user_list/ModerationUserList';
 import { LeaderboardFc } from './leaderboard/LeaderboardFc';
+import { ModerationJobStatsFc } from './moderation/moderation_job_stats/ModerationJobStatsFc';
 
 interface Props {
   sessionWrapper: SessionWrapper,
@@ -274,6 +275,12 @@ class NewVocodesContainer extends React.Component<Props, State> {
 
             <Route path="/moderation/ip_bans">
               <ModerationIpBanListFc
+                sessionWrapper={this.props.sessionWrapper}
+              />
+            </Route>
+
+            <Route path="/moderation/job_stats">
+              <ModerationJobStatsFc
                 sessionWrapper={this.props.sessionWrapper}
               />
             </Route>

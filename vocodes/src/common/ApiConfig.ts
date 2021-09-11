@@ -258,6 +258,14 @@ class ApiConfig {
     return `${this.getScheme()}://${this.getNewApiHost()}/moderation/user/list`;
   }
 
+  getTtsInferenceStats() : string {
+    return `${this.getScheme()}://${this.getNewApiHost()}/moderation/jobs/tts_inference_queue_stats`;
+  }
+
+  getW2lInferenceStats() : string {
+    return `${this.getScheme()}://${this.getNewApiHost()}/moderation/jobs/w2l_inference_queue_stats`;
+  }
+
   private getScheme() : string {
     return this.isLocalDev ? "http" : "https";
   }
