@@ -44,6 +44,7 @@ pub struct InferTtsSuccessResponse {
 pub enum InferTtsError {
   BadInput(String),
   ServerError,
+  RateLimited,
 }
 
 impl ResponseError for InferTtsError {
@@ -51,6 +52,7 @@ impl ResponseError for InferTtsError {
     match *self {
       InferTtsError::BadInput(_) => StatusCode::BAD_REQUEST,
       InferTtsError::ServerError => StatusCode::INTERNAL_SERVER_ERROR,
+      InferTtsError::RateLimited => StatusCode::TOO_MANY_REQUESTS,
     }
   }
 
@@ -58,6 +60,7 @@ impl ResponseError for InferTtsError {
     let error_reason = match self {
       InferTtsError::BadInput(reason) => reason.to_string(),
       InferTtsError::ServerError => "server error".to_string(),
+      InferTtsError::RateLimited => "rate limited".to_string(),
     };
 
     to_simple_json_error(&error_reason, self.status_code())
@@ -69,6 +72,11 @@ pub async fn infer_tts_handler(
   request: web::Json<InferTtsRequest>,
   server_state: web::Data<Arc<ServerState>>) -> Result<HttpResponse, InferTtsError>
 {
+
+  if let Err(_err) = server_state.redis_rate_limiter.rate_limit_request(&http_request) {
+    return Err(InferTtsError::RateLimited);
+  }
+
   let maybe_user_session = server_state
     .session_checker
     .maybe_get_user_session(&http_request, &server_state.mysql_pool)

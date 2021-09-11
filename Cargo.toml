@@ -38,6 +38,7 @@ derive_more = "0.99.14"
 dotenv = "0.15.0"
 easyenv = "0.0.5"
 futures = { version = "0.3.15", features = ["thread-pool"] } # feature for ThreadPool
+futures_old_for_limiter = { package = "futures", version = "0.1.29" } # Older version of futures for `limiter` crate
 hex = "0.4.3"
 hostname = "0.3.1"
 lazy_static = "1.4.0"
@@ -66,6 +67,7 @@ tokio = { version = "0.2.25", features = ["macros"] }
 sqlx = { version = "0.4", features = [ "mysql", "runtime-tokio-native-tls", "offline", "chrono" ] }
 
 # Redis Database
+limitation = "0.1.1" # Redis rate limiter
 r2d2_redis = "0.14.0"
 
 # Files

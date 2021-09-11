@@ -36,17 +36,21 @@ use crate::database::mediators::badge_granter::BadgeGranter;
 use crate::database::mediators::firehose_publisher::FirehosePublisher;
 use crate::http_server::endpoints::default_route_404::default_route_404;
 use crate::http_server::endpoints::events::list_events::list_events_handler;
+use crate::http_server::endpoints::leaderboard::get_leaderboard::leaderboard_handler;
 use crate::http_server::endpoints::misc::enable_alpha_easy_handler::enable_alpha_easy_handler;
 use crate::http_server::endpoints::misc::enable_alpha_handler::enable_alpha_handler;
 use crate::http_server::endpoints::moderation::ip_bans::add_ip_ban::add_ip_ban_handler;
 use crate::http_server::endpoints::moderation::ip_bans::delete_ip_ban::delete_ip_ban_handler;
 use crate::http_server::endpoints::moderation::ip_bans::get_ip_ban::get_ip_ban_handler;
 use crate::http_server::endpoints::moderation::ip_bans::list_ip_bans::list_ip_bans_handler;
+use crate::http_server::endpoints::moderation::jobs::get_tts_inference_queue_count::get_tts_inference_queue_count_handler;
+use crate::http_server::endpoints::moderation::jobs::get_w2l_inference_queue_count::get_w2l_inference_queue_count_handler;
 use crate::http_server::endpoints::moderation::user_bans::ban_user::ban_user_handler;
 use crate::http_server::endpoints::moderation::user_bans::list_banned_users::list_banned_users_handler;
 use crate::http_server::endpoints::moderation::user_roles::list_roles::list_user_roles_handler;
 use crate::http_server::endpoints::moderation::user_roles::list_staff::list_staff_handler;
 use crate::http_server::endpoints::moderation::user_roles::set_user_role::set_user_role_handler;
+use crate::http_server::endpoints::moderation::users::list_users::list_users_handler;
 use crate::http_server::endpoints::root_index::get_root_index;
 use crate::http_server::endpoints::tts::delete_tts_model::delete_tts_model_handler;
 use crate::http_server::endpoints::tts::delete_tts_result::delete_tts_inference_result_handler;
@@ -95,6 +99,7 @@ use crate::threads::ip_banlist_set::IpBanlistSet;
 use crate::threads::poll_ip_banlist_thread::poll_ip_bans;
 use crate::util::buckets::bucket_client::BucketClient;
 use crate::util::encrypted_sort_id::SortKeyCrypto;
+use crate::util::redis::redis_rate_limiter::RedisRateLimiter;
 use futures::Future;
 use futures::executor::ThreadPool;
 use log::{info};
@@ -105,10 +110,7 @@ use sqlx::MySqlPool;
 use sqlx::mysql::MySqlPoolOptions;
 use std::sync::Arc;
 use std::time::Duration;
-use crate::http_server::endpoints::moderation::users::list_users::list_users_handler;
-use crate::http_server::endpoints::leaderboard::get_leaderboard::leaderboard_handler;
-use crate::http_server::endpoints::moderation::jobs::get_tts_inference_queue_count::get_tts_inference_queue_count_handler;
-use crate::http_server::endpoints::moderation::jobs::get_w2l_inference_queue_count::get_w2l_inference_queue_count_handler;
+use limitation::Limiter;
 
 // TODO TODO TODO TODO
 // TODO TODO TODO TODO
@@ -184,10 +186,21 @@ async fn main() -> AnyhowResult<()> {
     firehose_publisher: firehose_publisher.clone(), // NB: Also safe
   };
 
-  let redis_manager = RedisConnectionManager::new(redis_connection_string)?;
+  let redis_manager = RedisConnectionManager::new(redis_connection_string.clone())?;
 
   let redis_pool = r2d2::Pool::builder()
       .build(redis_manager)?;
+
+  let limiter_enabled = easyenv::get_env_bool_or_default("LIMITER_ENABLED", true);
+  let limiter_max_requests = easyenv::get_env_num("LIMITER_MAX_REQUESTS", 3)?;
+  let limiter_window_seconds = easyenv::get_env_num("LIMITER_WINDOW_SECONDS", 10)?;
+
+  let limiter = Limiter::build(&redis_connection_string)
+      .limit(limiter_max_requests)
+      .period(Duration::from_secs(limiter_window_seconds))
+      .finish()?;
+
+  let redis_rate_limiter = RedisRateLimiter::new(limiter, limiter_enabled);
 
   info!("Reading env vars and setting up utils...");
 
@@ -262,6 +275,7 @@ async fn main() -> AnyhowResult<()> {
     hostname: server_hostname,
     mysql_pool: pool,
     redis_pool,
+    redis_rate_limiter,
     firehose_publisher,
     badge_granter,
     cookie_manager,
