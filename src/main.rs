@@ -107,6 +107,8 @@ use std::sync::Arc;
 use std::time::Duration;
 use crate::http_server::endpoints::moderation::users::list_users::list_users_handler;
 use crate::http_server::endpoints::leaderboard::get_leaderboard::leaderboard_handler;
+use crate::http_server::endpoints::moderation::jobs::get_tts_inference_queue_count::get_tts_inference_queue_count_handler;
+use crate::http_server::endpoints::moderation::jobs::get_w2l_inference_queue_count::get_w2l_inference_queue_count_handler;
 
 // TODO TODO TODO TODO
 // TODO TODO TODO TODO
@@ -416,6 +418,19 @@ pub async fn serve(server_state: ServerState) -> AnyhowResult<()>
                 .service(
                   web::resource("/{username}/edit")
                       .route(web::post().to(set_user_role_handler))
+                      .route(web::head().to(|| HttpResponse::Ok()))
+                )
+          )
+          .service(
+            web::scope("/jobs")
+                .service(
+                  web::resource("/tts_inference_queue_stats")
+                      .route(web::get().to(get_tts_inference_queue_count_handler))
+                      .route(web::head().to(|| HttpResponse::Ok()))
+                )
+                .service(
+                  web::resource("/w2l_inference_queue_stats")
+                      .route(web::get().to(get_w2l_inference_queue_count_handler))
                       .route(web::head().to(|| HttpResponse::Ok()))
                 )
           )
