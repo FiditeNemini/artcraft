@@ -208,7 +208,7 @@ mod tests {
   #[test]
   fn test_tts_zipped_synthesizer_path() {
     let paths = get_instance();
-    assert_eq!(paths.tts_synthesizer_path("foobar").to_str().unwrap(),
+    assert_eq!(paths.tts_zipped_synthesizer_path("foobar").to_str().unwrap(),
       "/test_path_synthesizers/f/o/o/foobar.zip");
   }
 
