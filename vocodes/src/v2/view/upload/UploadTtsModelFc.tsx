@@ -5,6 +5,7 @@ import { SessionWrapper } from '../../../session/SessionWrapper';
 import { TtsModelUploadJob } from '../../../jobs/TtsModelUploadJobs';
 import { useHistory, Link } from "react-router-dom";
 import { v4 as uuidv4 } from 'uuid';
+import { DiscordLink } from '../_common/DiscordLink';
 
 interface Props {
   sessionWrapper: SessionWrapper,
@@ -26,7 +27,7 @@ function UploadTtsModelFc(props: Props) {
   const [titleInvalidReason] = useState('')
 
   if (!props.sessionWrapper.isLoggedIn()) {
-    history.push('/signup');
+    return <div>You need to create an account or sign in.</div>
   }
 
   const handleDownloadUrlChange = (ev: React.FormEvent<HTMLInputElement>) => {
@@ -90,23 +91,42 @@ function UploadTtsModelFc(props: Props) {
   return (
     <div>
       <h1 className="title is-1"> Upload Voice (TTS Model) </h1>
-      <p>
-        Vo.codes supports Tacotron 2, GlowTTS, and a custom architecture we intend to open source. 
-        We will soon accommodate other model architectures soon.
-        We'll supply instructions for training models and offer assistance on our Discord server.
-      </p>
-
-      <br />
 
       <div className="notification is-warning">
-        <strong>Over $30,000 in rewards!</strong> 
+        <strong>Content Creator Rewards!</strong> 
         {/*<p>You can help vo.codes grow by uploading Tacotron2 models. 
         The person that uploads the most models will get $100, 
         the person that uploads the most popular model will get $100,
         and a number of other lucky winners will be chosen at random to 
         recieve cash prizes. Uploaders will also get queue priority!</p>*/}
-        <p>Details are coming soon. The more you upload and help us grow, the more you can earn.</p>
+        <p>
+          Details are coming soon. 
+          The more you upload and help us grow, the more you can earn.
+        </p>
       </div>
+
+
+      <p>
+        Vo.codes currently supports <em>Tacotron 2</em>, GlowTTS, and a custom architecture 
+        that we intend to open source. We'll soon add TalkNet and custom vocoder uploads as well as 
+        other model architectures.
+      </p>
+
+      <br />
+
+      <p>
+        Join our <DiscordLink /> for more info. We have a friendly community that can help you start
+        creating your own voices of your favorite characters.
+      </p>
+
+      <br />
+
+      <p>
+        Finally, please do not upload voices that you didn't train yourself or voices of individuals
+        who wish to not be voice cloned. We'll post a list of banned voices soon.
+      </p>
+
+      <br />
 
       <form onSubmit={handleFormSubmit}>
         <div className="field">
