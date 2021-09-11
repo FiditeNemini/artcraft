@@ -58,6 +58,7 @@ pub enum InferW2lWithUploadError {
   BadInput(String),
   EmptyFileUploaded,
   ServerError,
+  RateLimited,
 }
 
 impl ResponseError for InferW2lWithUploadError {
@@ -66,6 +67,7 @@ impl ResponseError for InferW2lWithUploadError {
       InferW2lWithUploadError::BadInput(_) => StatusCode::BAD_REQUEST,
       InferW2lWithUploadError::EmptyFileUploaded => StatusCode::BAD_REQUEST,
       InferW2lWithUploadError::ServerError => StatusCode::INTERNAL_SERVER_ERROR,
+      InferW2lWithUploadError::RateLimited => StatusCode::TOO_MANY_REQUESTS,
     }
   }
 
@@ -74,6 +76,7 @@ impl ResponseError for InferW2lWithUploadError {
       InferW2lWithUploadError::BadInput(reason) => reason.to_string(),
       InferW2lWithUploadError::EmptyFileUploaded => "empty file uploaded".to_string(),
       InferW2lWithUploadError::ServerError => "server error".to_string(),
+      InferW2lWithUploadError::RateLimited => "rate limited".to_string(),
     };
 
     to_simple_json_error(&error_reason, self.status_code())
@@ -84,31 +87,16 @@ impl ResponseError for InferW2lWithUploadError {
 pub async fn enqueue_infer_w2l_with_uploads(
   http_request: HttpRequest,
   server_state: web::Data<Arc<ServerState>>,
-  mut payload: Multipart)
-  //-> Result<Json<UploadResponse>, HttpResponse>
-  -> Result<HttpResponse, InferW2lWithUploadError>
-{
-  // ==================== TODO: READ IP AND RATE LIMIT ==================== //
+  mut payload: Multipart
+) -> Result<HttpResponse, InferW2lWithUploadError> {
 
-  let ip_address = get_request_ip(&http_request);
+  // ==================== RATE LIMIT ==================== //
 
-  // TODO: Check IP address holds
-  // TODO: Rate Limiting!
-  /*let mut hold_exists = handler_state.redis_client.get_ip_hold(&ip_address)
-    .map_err(|err| HttpResponse::InternalServerError()
-      .body(format!("Error: {:?}", err)))?;
-
-  match ip_address.as_ref() {
-    "127.0.0.1" => {
-      warn!("Allowing IP address hold bypass for {}", &ip_address);
-      hold_exists = false
-    },
-    _ => {},
+  if let Err(_err) = server_state.redis_rate_limiter.rate_limit_request(&http_request) {
+    return Err(InferW2lWithUploadError::RateLimited);
   }
 
-  if hold_exists {
-    return Err(HttpResponse::TooManyRequests().body("you already have pending requests").into())
-  }*/
+  let ip_address = get_request_ip(&http_request);
 
   // ==================== READ SESSION ==================== //
 
@@ -342,11 +330,6 @@ SET
       return Err(InferW2lWithUploadError::ServerError);
     }
   };
-
-  // TODO: IP Address holds.
-  //handler_state.redis_client.set_ip_hold(&ip_address)
-  //  .map_err(|err| HttpResponse::InternalServerError()
-  //    .body(format!("Redis Err: {:?}", err)))?;
 
   server_state.firehose_publisher.enqueue_w2l_inference(maybe_user_token.as_deref(), &job_token, &template_token)
     .await

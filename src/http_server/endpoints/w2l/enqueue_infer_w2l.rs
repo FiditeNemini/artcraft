@@ -41,6 +41,7 @@ pub enum InferW2lError {
   BadInput(String),
   NotAuthorized,
   ServerError,
+  RateLimited,
 }
 
 impl ResponseError for InferW2lError {
@@ -49,6 +50,7 @@ impl ResponseError for InferW2lError {
       InferW2lError::BadInput(_) => StatusCode::BAD_REQUEST,
       InferW2lError::ServerError => StatusCode::INTERNAL_SERVER_ERROR,
       InferW2lError::NotAuthorized => StatusCode::UNAUTHORIZED,
+      InferW2lError::RateLimited => StatusCode::TOO_MANY_REQUESTS,
     }
   }
 
@@ -57,6 +59,7 @@ impl ResponseError for InferW2lError {
       InferW2lError::BadInput(reason) => reason.to_string(),
       InferW2lError::ServerError => "server error".to_string(),
       InferW2lError::NotAuthorized => "not authorized".to_string(),
+      InferW2lError::RateLimited => "rate limited".to_string(),
     };
 
     to_simple_json_error(&error_reason, self.status_code())
@@ -73,6 +76,9 @@ pub async fn infer_w2l_handler(
     unimplemented!("this isn't finished");
   }
 
+  if let Err(_err) = server_state.redis_rate_limiter.rate_limit_request(&http_request) {
+    return Err(InferW2lError::RateLimited);
+  }
 
   let maybe_session = server_state
     .session_checker

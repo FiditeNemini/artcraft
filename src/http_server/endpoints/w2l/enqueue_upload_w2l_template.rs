@@ -45,6 +45,7 @@ pub enum UploadW2lTemplateError {
   BadInput(String),
   MustBeLoggedIn,
   ServerError,
+  RateLimited,
 }
 
 impl ResponseError for UploadW2lTemplateError {
@@ -53,6 +54,7 @@ impl ResponseError for UploadW2lTemplateError {
       UploadW2lTemplateError::BadInput(_) => StatusCode::BAD_REQUEST,
       UploadW2lTemplateError::MustBeLoggedIn => StatusCode::UNAUTHORIZED,
       UploadW2lTemplateError::ServerError => StatusCode::INTERNAL_SERVER_ERROR,
+      UploadW2lTemplateError::RateLimited => StatusCode::TOO_MANY_REQUESTS,
     }
   }
 
@@ -61,6 +63,7 @@ impl ResponseError for UploadW2lTemplateError {
       UploadW2lTemplateError::BadInput(reason) => reason.to_string(),
       UploadW2lTemplateError::MustBeLoggedIn => "user must be logged in".to_string(),
       UploadW2lTemplateError::ServerError => "server error".to_string(),
+      UploadW2lTemplateError::RateLimited => "rate limited".to_string(),
     };
 
     to_simple_json_error(&error_reason, self.status_code())
@@ -72,6 +75,10 @@ pub async fn upload_w2l_template_handler(
   request: web::Json<UploadW2lTemplateRequest>,
   server_state: web::Data<Arc<ServerState>>) -> Result<HttpResponse, UploadW2lTemplateError>
 {
+  if let Err(_err) = server_state.redis_rate_limiter.rate_limit_request(&http_request) {
+    return Err(UploadW2lTemplateError::RateLimited);
+  }
+
   let maybe_user_session = server_state
     .session_checker
     .maybe_get_user_session(&http_request, &server_state.mysql_pool)

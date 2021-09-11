@@ -72,7 +72,6 @@ pub async fn infer_tts_handler(
   request: web::Json<InferTtsRequest>,
   server_state: web::Data<Arc<ServerState>>) -> Result<HttpResponse, InferTtsError>
 {
-
   if let Err(_err) = server_state.redis_rate_limiter.rate_limit_request(&http_request) {
     return Err(InferTtsError::RateLimited);
   }

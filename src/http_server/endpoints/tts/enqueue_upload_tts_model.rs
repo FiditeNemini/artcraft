@@ -44,6 +44,7 @@ pub enum UploadTtsModelError {
   BadInput(String),
   MustBeLoggedIn,
   ServerError,
+  RateLimited,
 }
 
 impl ResponseError for UploadTtsModelError {
@@ -52,6 +53,7 @@ impl ResponseError for UploadTtsModelError {
       UploadTtsModelError::BadInput(_) => StatusCode::BAD_REQUEST,
       UploadTtsModelError::MustBeLoggedIn => StatusCode::UNAUTHORIZED,
       UploadTtsModelError::ServerError => StatusCode::INTERNAL_SERVER_ERROR,
+      UploadTtsModelError::RateLimited => StatusCode::TOO_MANY_REQUESTS,
     }
   }
 
@@ -60,6 +62,7 @@ impl ResponseError for UploadTtsModelError {
       UploadTtsModelError::BadInput(reason) => reason.to_string(),
       UploadTtsModelError::MustBeLoggedIn => "user must be logged in".to_string(),
       UploadTtsModelError::ServerError => "server error".to_string(),
+      UploadTtsModelError::RateLimited => "rate limited".to_string(),
     };
 
     to_simple_json_error(&error_reason, self.status_code())
@@ -71,6 +74,10 @@ pub async fn upload_tts_model_handler(
   request: web::Json<UploadTtsModelRequest>,
   server_state: web::Data<Arc<ServerState>>) -> Result<HttpResponse, UploadTtsModelError>
 {
+  if let Err(_err) = server_state.redis_rate_limiter.rate_limit_request(&http_request) {
+    return Err(UploadTtsModelError::RateLimited);
+  }
+
   let maybe_user_session = server_state
     .session_checker
     .maybe_get_user_session(&http_request, &server_state.mysql_pool)
