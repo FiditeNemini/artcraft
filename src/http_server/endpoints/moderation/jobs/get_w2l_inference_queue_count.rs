@@ -23,6 +23,7 @@ use std::sync::Arc;
 pub struct GetW2lInferenceQueueCountResponse {
   pub success: bool,
   pub pending_count: i64,
+  pub seconds_since_first: i64,
 }
 
 #[derive(Debug, Serialize)]
@@ -84,11 +85,17 @@ pub async fn get_w2l_inference_queue_count_handler(
       PendingCountResult,
         r#"
 SELECT
-    count(*) as pending_count
-FROM
-    w2l_inference_jobs
-WHERE
-    status = "pending"
+  NOW() - t2.created_at AS seconds_since_first,
+  (
+    SELECT
+      count(t1.id) as pending_count
+    FROM w2l_inference_jobs AS t1
+    WHERE t1.status = "pending"
+  ) as pending_count
+FROM w2l_inference_jobs AS t2
+WHERE t2.status = "pending"
+ORDER BY t2.id ASC
+LIMIT 1
         "#,
     )
       .fetch_one(&server_state.mysql_pool)
@@ -101,7 +108,8 @@ WHERE
 
   let response = GetW2lInferenceQueueCountResponse {
     success: true,
-    pending_count: result.pending_count,
+    pending_count: result.pending_count.unwrap_or(0),
+    seconds_since_first: result.seconds_since_first,
   };
 
   let body = serde_json::to_string(&response)
@@ -114,5 +122,6 @@ WHERE
 
 #[derive(Serialize)]
 pub struct PendingCountResult {
-  pub pending_count: i64,
+  pub pending_count: Option<i64>,
+  pub seconds_since_first: i64,
 }
