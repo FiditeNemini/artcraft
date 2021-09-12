@@ -8,18 +8,25 @@ use std::path::Path;
 /// This command is used to check tacotron for being a real model
 #[derive(Clone)]
 pub struct TacotronModelCheckCommand {
-  tacotron_directory: String,
-  check_model_script_name: String,
+  /// Where the Tacotron code lives
+  tacotron_root_code_directory: String,
+  
+  /// eg. `source python/bin/activate`
+  virtual_env_activation_command: String,
+  
+  tacotron_model_check_script_name: String,
 }
 
 impl TacotronModelCheckCommand {
   pub fn new(
-    tacotron_directory: &str,
-    check_model_script_name: &str,
+    tacotron_root_code_directory: &str,
+    virtual_env_activation_command: &str,
+    tacotron_model_check_script_name: &str,
   ) -> Self {
     Self {
-      tacotron_directory: tacotron_directory.to_string(),
-      check_model_script_name: check_model_script_name.to_string(),
+      tacotron_root_code_directory: tacotron_root_code_directory.to_string(),
+      virtual_env_activation_command: virtual_env_activation_command.to_string(),
+      tacotron_model_check_script_name: tacotron_model_check_script_name.to_string(),
     }
   }
 
@@ -33,12 +40,12 @@ impl TacotronModelCheckCommand {
 
     command.push_str("echo 'test'");
     command.push_str(" && ");
-    command.push_str(&format!("cd {}", self.tacotron_directory));
+    command.push_str(&format!("cd {}", self.tacotron_root_code_directory));
     command.push_str(" && ");
-    command.push_str("source python/bin/activate");
+    command.push_str(&self.virtual_env_activation_command);
     command.push_str(" && ");
     command.push_str("python ");
-    command.push_str(&self.check_model_script_name);
+    command.push_str(&self.tacotron_model_check_script_name);
     command.push_str(" --synthesizer_checkpoint_path ");
     command.push_str(&synthesizer_checkpoint_path.as_ref().display().to_string());
     command.push_str(" --output_metadata_filename ");

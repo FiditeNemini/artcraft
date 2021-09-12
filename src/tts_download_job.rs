@@ -67,11 +67,6 @@ const ENV_BUCKET_ROOT : &'static str = "TTS_DOWNLOAD_BUCKET_ROOT";
 
 const DEFAULT_TEMP_DIR: &'static str = "/tmp";
 
-// Python code
-const ENV_CODE_DIRECTORY : &'static str = "TTS_CODE_DIRECTORY";
-const ENV_TACOTRON_CHECK_SCRIPT_NAME : &'static str = "TTS_TACOTRON_CHECK_SCRIPT_NAME";
-const ENV_TALKNET_CHECK_SCRIPT_NAME : &'static str = "TTS_TALKNET_CHECK_SCRIPT_NAME";
-
 struct Downloader {
   pub download_temp_directory: PathBuf,
   pub mysql_pool: MySqlPool,
@@ -179,17 +174,26 @@ async fn main() -> AnyhowResult<()> {
     firehose_publisher: firehose_publisher.clone(), // NB: Also safe
   };
 
-  let py_code_directory = easyenv::get_env_string_required(ENV_CODE_DIRECTORY)?;
-  let tacotron_check_script_name = easyenv::get_env_string_required(ENV_TACOTRON_CHECK_SCRIPT_NAME)?;
-  let talknet_check_script_name = easyenv::get_env_string_required(ENV_TALKNET_CHECK_SCRIPT_NAME)?;
+  let tacotron_root_code_directory = easyenv::get_env_string_required("TACOTRON_ROOT_CODE_DIRECTORY")?;
+  let tacotron_virtual_env_activation_command = easyenv::get_env_string_or_default(
+    "TACOTRON_VIRTUAL_ENV_ACTIVATION_COMMAND",
+    "source python-tacotron/bin/activate");
+
+  let tacotron_model_check_script_name = easyenv::get_env_string_or_default(
+    "TACOTRON_MODEL_CHECK_SCRIPT_NAME",
+    "vocodes_model_check_tacotron.py");
 
   let tacotron_check_command= TacotronModelCheckCommand::new(
-    &py_code_directory,
-    &tacotron_check_script_name,
+    &tacotron_root_code_directory,
+    &tacotron_virtual_env_activation_command,
+    &tacotron_model_check_script_name,
   );
 
+  let talknet_root_code_directory = easyenv::get_env_string_required("TALKNET_ROOT_CODE_DIRECTORY")?;
+  let talknet_check_script_name = easyenv::get_env_string_required("TALKNET_MODEL_CHECK_SCRIPT_NAME")?;
+
   let talknet_check_command= TalknetModelCheckCommand::new(
-    &py_code_directory,
+    &talknet_root_code_directory,
     &talknet_check_script_name,
   );
 
@@ -342,6 +346,12 @@ async fn process_job(downloader: &Downloader, job: &TtsUploadJobRecord) -> Anyho
   };
 
   info!("Uploaded model type: {:?}", model_type);
+
+  if model_type == TtsModelType::Talknet {
+    // TODO: Finish supporting TalkNet
+    warn!("Unsupported model type");
+    return Err(anyhow!("unsupported model type"));
+  }
 
   // ==================== RUN MODEL CHECK ==================== //
 
