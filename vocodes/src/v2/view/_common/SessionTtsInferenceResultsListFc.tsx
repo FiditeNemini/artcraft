@@ -61,6 +61,10 @@ function SessionTtsInferenceResultListFc(props: Props) {
     }
   });
 
+  if (results.length === 0) {
+    return <span />;
+  }
+
   let title = <span />;
   if  (results.length !== 0) {
       title = <h4 className="title is-4">Session TTS Results</h4>;
@@ -69,6 +73,13 @@ function SessionTtsInferenceResultListFc(props: Props) {
   return (
     <div>
       {title}
+      <div className="notification is-warning is-light">
+        <strong>Working on speeding this up</strong> 
+        <p>
+          Sorry this is slow. I'm scaling the cluster and fixing the caching.
+        </p>
+      </div>
+      <br />
       {results}
     </div>
   );
