@@ -45,6 +45,7 @@ use crate::http_server::endpoints::moderation::ip_bans::get_ip_ban::get_ip_ban_h
 use crate::http_server::endpoints::moderation::ip_bans::list_ip_bans::list_ip_bans_handler;
 use crate::http_server::endpoints::moderation::jobs::get_tts_inference_queue_count::get_tts_inference_queue_count_handler;
 use crate::http_server::endpoints::moderation::jobs::get_w2l_inference_queue_count::get_w2l_inference_queue_count_handler;
+use crate::http_server::endpoints::moderation::pending::pending_w2l_templates::get_pending_w2l_templates_handler;
 use crate::http_server::endpoints::moderation::user_bans::ban_user::ban_user_handler;
 use crate::http_server::endpoints::moderation::user_bans::list_banned_users::list_banned_users_handler;
 use crate::http_server::endpoints::moderation::user_roles::list_roles::list_user_roles_handler;
@@ -440,6 +441,19 @@ pub async fn serve(server_state: ServerState) -> AnyhowResult<()>
                 .service(
                   web::resource("/tts_inference_queue_stats")
                       .route(web::get().to(get_tts_inference_queue_count_handler))
+                      .route(web::head().to(|| HttpResponse::Ok()))
+                )
+                .service(
+                  web::resource("/w2l_inference_queue_stats")
+                      .route(web::get().to(get_w2l_inference_queue_count_handler))
+                      .route(web::head().to(|| HttpResponse::Ok()))
+                )
+          )
+          .service(
+            web::scope("/pending")
+                .service(
+                  web::resource("/w2l_templates")
+                      .route(web::get().to(get_pending_w2l_templates_handler))
                       .route(web::head().to(|| HttpResponse::Ok()))
                 )
                 .service(
