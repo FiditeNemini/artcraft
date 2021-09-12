@@ -551,7 +551,7 @@ async fn process_job(inferencer: &Inferencer, job: &W2lInferenceJobRecord) -> An
   info!("Is image? {}", is_image);
   info!("Running W2L inference...");
 
-  inferencer.w2l_inference.execute(
+  let inference_result = inferencer.w2l_inference.execute(
     &model_fs_path,
     &audio_fs_path,
     &end_bump_fs_path,
@@ -561,7 +561,14 @@ async fn process_job(inferencer: &Inferencer, job: &W2lInferenceJobRecord) -> An
     &output_video_fs_path,
     false,
     false
-  )?;
+  );
+
+  if let Err(e) = inference_result {
+    safe_delete_temp_file(&audio_fs_path);
+    safe_delete_temp_file(&output_video_fs_path);
+    safe_delete_temp_directory(&temp_dir);
+    return Err(e);
+  }
 
   info!("Output filename: {:?}", &output_video_fs_path);
 
@@ -591,11 +598,18 @@ async fn process_job(inferencer: &Inferencer, job: &W2lInferenceJobRecord) -> An
     .as_deref()
     .unwrap_or("application/octet-stream");
 
-  inferencer.public_bucket_client.upload_filename_with_content_type(
+  let upload_result = inferencer.public_bucket_client.upload_filename_with_content_type(
     &result_object_path,
     &output_video_fs_path,
     original_mime_type)
-    .await?;
+    .await;
+
+  if let Err(e) = upload_result {
+    safe_delete_temp_file(&audio_fs_path);
+    safe_delete_temp_file(&output_video_fs_path);
+    safe_delete_temp_directory(&temp_dir);
+    return Err(e);
+  }
 
   safe_delete_temp_file(&output_video_fs_path);
 
