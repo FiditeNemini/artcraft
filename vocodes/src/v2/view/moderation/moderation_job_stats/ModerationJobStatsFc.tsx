@@ -102,9 +102,9 @@ function humanWaitTime(seconds: number) : string {
   } else if (seconds < 60) {
     return `${seconds} seconds`;
   } else if (seconds < 60 * 60) {
-    return `${seconds / 60} minutes`;
+    return `${(seconds / 60).toFixed(1)} minutes`;
   } else {
-    return `${seconds / (60 * 60)} hours`;
+    return `${(seconds / (60 * 60)).toFixed(1)} hours`;
   }
 }
 
