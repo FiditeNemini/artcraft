@@ -41,6 +41,8 @@ use crate::util::buckets::bucket_path_unifier::BucketPathUnifier;
 use crate::util::buckets::bucket_paths::hash_to_bucket_path;
 use crate::util::filesystem::check_directory_exists;
 use crate::util::filesystem::check_file_exists;
+use crate::util::filesystem::safe_delete_temp_directory;
+use crate::util::filesystem::safe_delete_temp_file;
 use crate::util::hashing::hash_file_sha2::hash_file_sha2;
 use crate::util::noop_logger::NoOpLogger;
 use crate::util::random_crockford_token::random_crockford_token;
@@ -49,6 +51,7 @@ use crate::util::semi_persistent_cache_dir::SemiPersistentCacheDir;
 use data_encoding::{HEXUPPER, HEXLOWER, HEXLOWER_PERMISSIVE};
 use log::{warn, info};
 use r2d2_redis::RedisConnectionManager;
+use r2d2_redis::r2d2::PooledConnection;
 use r2d2_redis::r2d2;
 use r2d2_redis::redis::Commands;
 use ring::digest::{Context, Digest, SHA256};
@@ -62,7 +65,6 @@ use std::process::Command;
 use std::thread;
 use std::time::Duration;
 use tempdir::TempDir;
-use r2d2_redis::r2d2::PooledConnection;
 
 // Buckets (shared config)
 const ENV_ACCESS_KEY : &'static str = "ACCESS_KEY";
@@ -572,6 +574,8 @@ async fn process_job(inferencer: &Inferencer, job: &W2lInferenceJobRecord) -> An
 
   let file_metadata = read_metadata_file(&output_metadata_fs_path)?;
 
+  safe_delete_temp_file(&output_metadata_fs_path);
+
   // ==================== UPLOAD TO BUCKETS ==================== //
 
   redis_logger.log_status("uploading result")?;
@@ -592,6 +596,13 @@ async fn process_job(inferencer: &Inferencer, job: &W2lInferenceJobRecord) -> An
     &output_video_fs_path,
     original_mime_type)
     .await?;
+
+  safe_delete_temp_file(&output_video_fs_path);
+
+  // ==================== DELETE DOWNLOADED FILE ==================== //
+
+  // NB: We should be using a tempdir, but to make absolutely certain we don't overflow the disk...
+  safe_delete_temp_directory(&temp_dir);
 
   // ==================== SAVE RECORDS ==================== //
 
