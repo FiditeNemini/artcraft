@@ -3,6 +3,7 @@ import { ApiConfig } from "../../../common/ApiConfig";
 export interface TtsInferenceStats {
   success: boolean,
   pending_count: number,
+  seconds_since_first: number,
 }
 
 export enum TtsInferenceStatsError {
@@ -25,6 +26,7 @@ interface TtsInferenceStatsResponsePayload {
   success: boolean,
   error_reason?: string,
   pending_count?: number,
+  seconds_since_first?: number,
 }
 
 

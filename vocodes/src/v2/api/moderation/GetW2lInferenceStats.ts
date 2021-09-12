@@ -3,6 +3,7 @@ import { ApiConfig } from "../../../common/ApiConfig";
 export interface W2lInferenceStats {
   success: boolean,
   pending_count: number,
+  seconds_since_first: number,
 }
 
 export enum W2lInferenceStatsError {
@@ -25,6 +26,7 @@ interface W2lInferenceStatsResponsePayload {
   success: boolean,
   error_reason?: string,
   pending_count?: number,
+  seconds_since_first?: number,
 }
 
 
