@@ -40,6 +40,7 @@ import { ProfileBanFc } from './profile/profile_ban/ProfileBanFc';
 import { ModerationUserListFc } from './moderation/moderation_user_list/ModerationUserList';
 import { LeaderboardFc } from './leaderboard/LeaderboardFc';
 import { ModerationJobStatsFc } from './moderation/moderation_job_stats/ModerationJobStatsFc';
+import { ModerationPendingW2lTemplatesFc } from './moderation/moderation_pending_w2l_templates/ModerationPendingW2lTemplatesFc';
 
 interface Props {
   sessionWrapper: SessionWrapper,
@@ -281,6 +282,12 @@ class NewVocodesContainer extends React.Component<Props, State> {
 
             <Route path="/moderation/job_stats">
               <ModerationJobStatsFc
+                sessionWrapper={this.props.sessionWrapper}
+              />
+            </Route>
+
+            <Route path="/moderation/approve/w2l_templates">
+              <ModerationPendingW2lTemplatesFc
                 sessionWrapper={this.props.sessionWrapper}
               />
             </Route>

@@ -37,6 +37,13 @@ function ModerationFc(props: Props) {
         
       <br />
 
+      <Link
+        to="/moderation/approve/w2l_templates"
+        className="button is-link is-large is-fullwidth is-light"
+        >Unapproved W2L Templates</Link>
+        
+      <br />
+
       <p>
         More mod controls will be added in the future: user roles, activity tracking, 
         timed bans, account bans, etc.

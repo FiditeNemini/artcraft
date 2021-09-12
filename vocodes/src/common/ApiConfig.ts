@@ -266,6 +266,10 @@ class ApiConfig {
     return `${this.getScheme()}://${this.getNewApiHost()}/moderation/jobs/w2l_inference_queue_stats`;
   }
 
+  getModerationPendingW2lTemplates(): string {
+    return `${this.getScheme()}://${this.getNewApiHost()}/moderation/pending/w2l_templates`;
+  }
+
   private getScheme() : string {
     return this.isLocalDev ? "http" : "https";
   }
