@@ -17,7 +17,7 @@ pub mod script_execution;
 pub mod shared_constants;
 pub mod util;
 
-use anyhow::anyhow;
+use anyhow::{anyhow, Error};
 use chrono::Utc;
 use crate::common_env::CommonEnv;
 use crate::database::mediators::badge_granter::BadgeGranter;
@@ -41,6 +41,8 @@ use crate::util::buckets::bucket_client::BucketClient;
 use crate::util::buckets::bucket_paths::hash_to_bucket_path;
 use crate::util::filesystem::check_directory_exists;
 use crate::util::filesystem::check_file_exists;
+use crate::util::filesystem::safe_delete_temp_directory;
+use crate::util::filesystem::safe_delete_temp_file;
 use crate::util::hashing::hash_file_sha2::hash_file_sha2;
 use crate::util::noop_logger::NoOpLogger;
 use crate::util::random_crockford_token::random_crockford_token;
@@ -379,8 +381,13 @@ async fn process_job(downloader: &Downloader, job: &W2lTemplateUploadJobRecord) 
       .unwrap_or("".to_string());
 
   info!("Calling downloader...");
-  let download_filename = downloader.google_drive_downloader
-    .download_file(&download_url, &temp_dir).await?;
+  let download_filename = match downloader.google_drive_downloader.download_file(&download_url, &temp_dir).await {
+    Ok(filename) => filename,
+    Err(e) => {
+      safe_delete_temp_directory(&temp_dir);
+      return Err(e);
+    }
+  };
 
   if downloader.debug_download_sleep_millis != 0 {
     warn!("Debug sleep after download: {} ms", downloader.debug_download_sleep_millis);
@@ -414,6 +421,9 @@ async fn process_job(downloader: &Downloader, job: &W2lTemplateUploadJobRecord) 
     Err(Wav2LipPreprocessError::NoFacesDetected) => {
       // Permanently fail.
       warn!("Permanently failed due to no face detection!");
+
+      safe_delete_temp_directory(&temp_dir);
+
       mark_w2l_template_upload_job_permanently_dead(
         &downloader.mysql_pool,
         job,
@@ -466,14 +476,20 @@ async fn process_job(downloader: &Downloader, job: &W2lTemplateUploadJobRecord) 
   if file_metadata.is_video {
     let preview_filename = format!("{}_preview.webp", &download_filename);
 
-    downloader.ffmpeg_video_preview_generator.execute(
+    let preview_result = downloader.ffmpeg_video_preview_generator.execute(
       &download_filename,
       &preview_filename,
       500,
       500,
       true,
       false
-    )?;
+    );
+
+    if let Err(e) = preview_result {
+      safe_delete_temp_file(&download_filename);
+      safe_delete_temp_file(&preview_filename);
+      safe_delete_temp_directory(&temp_dir);
+    }
 
     let video_preview_path = PathBuf::from(&preview_filename);
     check_file_exists(&video_preview_path)?;
@@ -528,11 +544,15 @@ async fn process_job(downloader: &Downloader, job: &W2lTemplateUploadJobRecord) 
     &video_or_image_path,
     original_mime_type).await?;
 
+  safe_delete_temp_file(&video_or_image_path);
+
   info!("Uploading cached faces...");
   let path_copy: PathBuf = cached_faces_path.clone();
   downloader.private_bucket_client.upload_filename(
     &full_object_path_cached_faces,
     &path_copy).await?;
+
+  safe_delete_temp_file(&path_copy);
 
   // TODO: Fix this ugh.
   if let Some(image_preview_filename) = maybe_image_preview_filename.as_deref() {
@@ -549,6 +569,8 @@ async fn process_job(downloader: &Downloader, job: &W2lTemplateUploadJobRecord) 
         image_preview_filename,
         "image/webp").await?;
     }
+
+    safe_delete_temp_file(&image_preview_filename);
   }
 
   // TODO: Fix this ugh.
@@ -566,7 +588,14 @@ async fn process_job(downloader: &Downloader, job: &W2lTemplateUploadJobRecord) 
         video_preview_filename,
         "image/webp").await?;
     }
+
+    safe_delete_temp_file(&video_preview_filename);
   }
+
+  // ==================== DELETE DOWNLOADED FILE ==================== //
+
+  // NB: We should be using a tempdir, but to make absolutely certain we don't overflow the disk...
+  safe_delete_temp_directory(&temp_dir);
 
   // ==================== SAVE RECORDS ==================== //
 
