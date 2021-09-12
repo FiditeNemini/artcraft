@@ -66,7 +66,7 @@ function ModerationJobStatsFc(props: Props) {
           <tr>
             <th></th>
             <th>Pending jobs</th>
-            <th>Minutes wait</th>
+            <th>Wait time</th>
           </tr>
         </thead>
         <tbody>
