@@ -40,6 +40,8 @@ use crate::util::buckets::bucket_path_unifier::BucketPathUnifier;
 use crate::util::buckets::bucket_paths::hash_to_bucket_path;
 use crate::util::filesystem::check_directory_exists;
 use crate::util::filesystem::check_file_exists;
+use crate::util::filesystem::safe_delete_temp_directory;
+use crate::util::filesystem::safe_delete_temp_file;
 use crate::util::hashing::hash_file_sha2::hash_file_sha2;
 use crate::util::hashing::hash_string_sha2::hash_string_sha2;
 use crate::util::jobs::cache_miss_strategizer::CacheMissStrategizer;
@@ -724,6 +726,8 @@ async fn process_job(
 
   let file_metadata = read_metadata_file(&output_metadata_fs_path)?;
 
+  safe_delete_temp_file(&output_metadata_fs_path);
+
   // ==================== UPLOAD AUDIO TO BUCKET ==================== //
 
   redis_logger.log_status("uploading result")?;
@@ -741,6 +745,8 @@ async fn process_job(
     "audio/wav")
       .await?;
 
+  safe_delete_temp_file(&output_audio_fs_path);
+
   // ==================== UPLOAD SPECTROGRAM TO BUCKETS ==================== //
 
   let spectrogram_result_object_path = inferencer.bucket_path_unifier.tts_inference_spectrogram_output_path(
@@ -755,6 +761,13 @@ async fn process_job(
     &output_spectrogram_fs_path,
     "application/json")
       .await?;
+
+  safe_delete_temp_file(&output_spectrogram_fs_path);
+
+  // ==================== DELETE DOWNLOADED FILE ==================== //
+
+  // NB: We should be using a tempdir, but to make absolutely certain we don't overflow the disk...
+  safe_delete_temp_directory(&temp_dir);
 
   // ==================== SAVE RECORDS ==================== //
 
