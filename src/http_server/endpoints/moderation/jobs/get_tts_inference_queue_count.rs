@@ -103,7 +103,21 @@ LIMIT 1
 
   let result : PendingCountResult = match maybe_result {
     Ok(result) => result,
-    Err(err) => return Err(GetTtsInferenceQueueCountError::ServerError),
+    Err(err) => {
+      match err {
+        RowNotFound => {
+          // NB: Not Found for null results means nothing is pending in the queue
+          PendingCountResult {
+            pending_count: None,
+            seconds_since_first: 0,
+          }
+        },
+        _ => {
+          warn!("get tts pending count error: {:?}", err);
+          return Err(GetTtsInferenceQueueCountError::ServerError)
+        }
+      }
+    },
   };
 
   let response = GetTtsInferenceQueueCountResponse {
