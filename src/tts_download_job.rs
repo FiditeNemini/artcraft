@@ -38,6 +38,8 @@ use crate::util::anyhow_result::AnyhowResult;
 use crate::util::buckets::bucket_client::BucketClient;
 use crate::util::buckets::bucket_path_unifier::BucketPathUnifier;
 use crate::util::buckets::bucket_paths::hash_to_bucket_path;
+use crate::util::filesystem::safe_delete_temp_directory;
+use crate::util::filesystem::safe_delete_temp_file;
 use crate::util::filesystem::{check_directory_exists, check_file_exists};
 use crate::util::hashing::hash_file_sha2::hash_file_sha2;
 use crate::util::noop_logger::NoOpLogger;
@@ -51,13 +53,13 @@ use ring::digest::{Context, Digest, SHA256};
 use sqlx::MySqlPool;
 use sqlx::mysql::MySqlPoolOptions;
 use std::fs::File;
+use std::fs;
 use std::io::{BufReader, Read, Error};
 use std::ops::Deref;
 use std::path::{PathBuf, Path};
 use std::process::Command;
 use std::time::Duration;
 use tempdir::TempDir;
-use std::fs;
 
 // Buckets
 const ENV_ACCESS_KEY : &'static str = "ACCESS_KEY";
@@ -340,7 +342,7 @@ async fn process_job(downloader: &Downloader, job: &TtsUploadJobRecord) -> Anyho
   let download_filename = match downloader.google_drive_downloader.download_file(&download_url, &temp_dir).await {
     Ok(filename) => filename,
     Err(e) => {
-      delete_temp_directory(&temp_dir);
+      safe_delete_temp_directory(&temp_dir);
       return Err(e);
     }
   };
@@ -378,8 +380,8 @@ async fn process_job(downloader: &Downloader, job: &TtsUploadJobRecord) -> Anyho
       );
 
       if let Err(e) = result {
-        delete_temp_file(&file_path);
-        delete_temp_directory(&temp_dir);
+        safe_delete_temp_file(&file_path);
+        safe_delete_temp_directory(&temp_dir);
       }
     },
     TtsModelType::Talknet => {
@@ -390,8 +392,8 @@ async fn process_job(downloader: &Downloader, job: &TtsUploadJobRecord) -> Anyho
       );
 
       if let Err(e) = result {
-        delete_temp_file(&file_path);
-        delete_temp_directory(&temp_dir);
+        safe_delete_temp_file(&file_path);
+        safe_delete_temp_directory(&temp_dir);
       }
     },
   }
@@ -405,9 +407,9 @@ async fn process_job(downloader: &Downloader, job: &TtsUploadJobRecord) -> Anyho
   let file_metadata = match read_metadata_file(&output_metadata_fs_path) {
     Ok(metadata) => metadata,
     Err(e) => {
-      delete_temp_file(&file_path);
-      delete_temp_file(&output_metadata_fs_path);
-      delete_temp_directory(&temp_dir);
+      safe_delete_temp_file(&file_path);
+      safe_delete_temp_file(&output_metadata_fs_path);
+      safe_delete_temp_directory(&temp_dir);
       return Err(e);
     }
   };
@@ -430,18 +432,18 @@ async fn process_job(downloader: &Downloader, job: &TtsUploadJobRecord) -> Anyho
   redis_logger.log_status("uploading model")?;
 
   if let Err(e) = downloader.bucket_client.upload_filename(&synthesizer_model_bucket_path, &file_path).await {
-    delete_temp_file(&output_metadata_fs_path);
-    delete_temp_file(&file_path);
-    delete_temp_directory(&temp_dir);
+    safe_delete_temp_file(&output_metadata_fs_path);
+    safe_delete_temp_file(&file_path);
+    safe_delete_temp_directory(&temp_dir);
     return Err(e);
   }
 
   // ==================== DELETE DOWNLOADED FILE ==================== //
 
   // NB: We should be using a tempdir, but to make absolutely certain we don't overflow the disk...
-  delete_temp_file(&output_metadata_fs_path);
-  delete_temp_file(&file_path);
-  delete_temp_directory(&temp_dir);
+  safe_delete_temp_file(&output_metadata_fs_path);
+  safe_delete_temp_file(&file_path);
+  safe_delete_temp_directory(&temp_dir);
 
   // ==================== SAVE RECORDS ==================== //
 
@@ -483,24 +485,4 @@ async fn process_job(downloader: &Downloader, job: &TtsUploadJobRecord) -> Anyho
   info!("Job done: {}", job.id);
 
   Ok(())
-}
-
-fn delete_temp_file<P: AsRef<Path>>(file_path: P) {
-  // NB: We should be using a tempdir, but to make absolutely certain we don't overflow the disk...
-  let printable_name = file_path.as_ref().to_str().unwrap_or("bad filename");
-  match fs::remove_file(&file_path) {
-    Ok(_) => info!("File deleted: {}", printable_name),
-    Err(e) => warn!("Could not delete file {:?} (not a fatal error): {:?}",
-      printable_name, e),
-  }
-}
-
-fn delete_temp_directory<P: AsRef<Path>>(directory_path: P) {
-  // NB: We should be using a tempdir, but to make absolutely certain we don't overflow the disk...
-  let printable_name = directory_path.as_ref().to_str().unwrap_or("bad directory");
-  match fs::remove_dir_all(&directory_path) {
-    Ok(_) => info!("Directory deleted: {}", printable_name),
-    Err(e) => warn!("Could not delete directory{:?} (not a fatal error): {:?}",
-      printable_name, e),
-  }
 }
