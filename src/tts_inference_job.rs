@@ -369,8 +369,7 @@ async fn main_loop(inferencer: Inferencer) {
 
     span_batch.append(&mut spans);
 
-    if span_batch.len() > 1  {
-      //let spans_to_send = span_batch.drain(..).collect();
+    if span_batch.len() > 50  {
       let spans_to_send = span_batch.split_off(0).into();
       inferencer.newrelic_client.send_spans(spans_to_send).await;
     }
