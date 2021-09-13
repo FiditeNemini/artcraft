@@ -54,6 +54,9 @@ use crate::util::redis::redis_job_status_logger::RedisJobStatusLogger;
 use crate::util::semi_persistent_cache_dir::SemiPersistentCacheDir;
 use data_encoding::{HEXUPPER, HEXLOWER, HEXLOWER_PERMISSIVE};
 use log::{warn, info};
+use newrelic_telemetry::Client as NewRelicClient;
+use newrelic_telemetry::ClientBuilder;
+use newrelic_telemetry::Span;
 use r2d2_redis::RedisConnectionManager;
 use r2d2_redis::r2d2::PooledConnection;
 use r2d2_redis::r2d2;
@@ -68,8 +71,9 @@ use std::ops::Deref;
 use std::path::{PathBuf, Path};
 use std::process::Command;
 use std::thread;
-use std::time::Duration;
+use std::time::{Duration, SystemTime, UNIX_EPOCH, Instant};
 use tempdir::TempDir;
+use crate::util::random_uuid::generate_random_uuid;
 
 // Buckets (shared config)
 const ENV_ACCESS_KEY : &'static str = "ACCESS_KEY";
@@ -108,6 +112,8 @@ struct Inferencer {
 
   pub tts_inference_command: TacotronInferenceCommand,
   pub tts_inference_sidecar_client: TtsInferenceSidecarClient,
+
+  pub newrelic_client: NewRelicClient,
 
   // Keep tabs of which models to hold in the sidecar memory with this virtual LRU cache
   pub virtual_model_lfu: SyncVirtualLfuCache,
@@ -279,6 +285,9 @@ async fn main() -> AnyhowResult<()> {
     )
   };
 
+  let license_key = easyenv::get_env_string_required("NEWRELIC_API_KEY")?;
+  let newrelic_client = ClientBuilder::new(&license_key).build().unwrap();
+
   let inferencer = Inferencer {
     download_temp_directory: temp_directory,
     mysql_pool,
@@ -287,6 +296,7 @@ async fn main() -> AnyhowResult<()> {
     private_bucket_client,
     tts_inference_command,
     tts_inference_sidecar_client,
+    newrelic_client,
     virtual_model_lfu: virtual_lfu_cache,
     cache_miss_strategizers,
     bucket_path_unifier: BucketPathUnifier::default_paths(),
@@ -314,6 +324,8 @@ async fn main_loop(inferencer: Inferencer) {
   let mut error_timeout_millis = START_TIMEOUT_MILLIS;
 
   let mut noop_logger = NoOpLogger::new(inferencer.no_op_logger_millis as i64);
+
+  let mut span_batch = Vec::new();
 
   loop {
     let num_records = inferencer.job_batch_size;
@@ -345,14 +357,22 @@ async fn main_loop(inferencer: Inferencer) {
       jobs,
     ).await;
 
-    match batch_result {
-      Ok(_) => {},
+    let mut spans = match batch_result {
+      Ok(spans) => spans,
       Err(e) => {
         warn!("Error querying jobs: {:?}", e);
         std::thread::sleep(Duration::from_millis(error_timeout_millis));
         error_timeout_millis += INCREASE_TIMEOUT_MILLIS;
         continue;
       }
+    };
+
+    span_batch.append(&mut spans);
+
+    if span_batch.len() > 1  {
+      //let spans_to_send = span_batch.drain(..).collect();
+      let spans_to_send = span_batch.split_off(0).into();
+      inferencer.newrelic_client.send_spans(spans_to_send).await;
     }
 
     error_timeout_millis = START_TIMEOUT_MILLIS; // reset
@@ -365,7 +385,9 @@ async fn main_loop(inferencer: Inferencer) {
 async fn process_jobs(
   inferencer: &Inferencer,
   jobs: Vec<TtsInferenceJobRecord>,
-) -> AnyhowResult<()> {
+) -> AnyhowResult<Vec<Span>> {
+
+  let mut batch_spans = Vec::new();
 
   for job in jobs.into_iter() {
     let model_state_result = ModelState::query_model_and_check_filesystem(
@@ -428,7 +450,10 @@ async fn process_jobs(
 
     let result = process_job(inferencer, &job, &model_state.model_record).await;
     match result {
-      Ok(_) => {},
+      Ok((span1, span2)) => {
+        batch_spans.push(span1);
+        batch_spans.push(span2);
+      },
       Err(e) => {
         warn!("Failure to process job: {:?}", e);
         let failure_reason = "";
@@ -442,7 +467,7 @@ async fn process_jobs(
     }
   }
 
-  Ok(())
+  Ok(batch_spans)
 }
 
 #[derive(Deserialize, Default)]
@@ -513,7 +538,7 @@ async fn process_job(
   inferencer: &Inferencer,
   job: &TtsInferenceJobRecord,
   model_record: &TtsModelRecord2,
-) -> AnyhowResult<()> {
+) -> AnyhowResult<(Span, Span)> {
 
   // TODO 1. Mark processing (DONE)
 
@@ -529,6 +554,27 @@ async fn process_job(
   // TODO 8. Save record
   // TODO 9. Mark job done
 
+  let start = Instant::now();
+
+  let span_id = generate_random_uuid();
+  let trace_id = generate_random_uuid();
+  let maybe_user_token = job.maybe_creator_user_token.as_deref().unwrap_or("");
+
+  let mut job_iteration_span = Span::new(&span_id, &trace_id, get_timestamp_millis())
+      .name("single job execution")
+      .attribute("user_token", maybe_user_token)
+      .service_name("tts-inference-job");
+
+  let span_id = generate_random_uuid();
+  let trace_id = generate_random_uuid();
+
+  let created_at_timestamp = (job.created_at.timestamp() as u64) * 1000;
+
+  let mut since_creation_span = Span::new(&span_id, &trace_id, created_at_timestamp)
+      .name("job since creation")
+      .attribute("user_token", maybe_user_token)
+      .service_name("tts-inference-job");
+
   let mut redis = inferencer.redis_pool.get()?;
   let mut redis_logger = RedisJobStatusLogger::new_tts_inference(
     &mut redis,
@@ -540,7 +586,15 @@ async fn process_job(
 
   if !lock_acquired {
     warn!("Could not acquire job lock for: {}", &job.id);
-    return Ok(())
+    let duration = start.elapsed();
+
+    since_creation_span.set_attribute("status", "failure");
+    since_creation_span.set_duration(duration);
+
+    job_iteration_span.set_attribute("status", "failure");
+    job_iteration_span.set_duration(duration);
+
+    return Ok((since_creation_span, job_iteration_span));
   }
 
   // ==================== CONFIRM OR DOWNLOAD WAVEGLOW VOCODER MODEL ==================== //
@@ -808,5 +862,20 @@ async fn process_job(
   info!("Job {} complete success! Downloaded, ran inference, and uploaded. Saved model record: {}",
         job.id, id);
 
-  Ok(())
+  let duration = start.elapsed();
+
+  since_creation_span.set_attribute("status", "success");
+  since_creation_span.set_duration(duration);
+
+  job_iteration_span.set_attribute("status", "success");
+  job_iteration_span.set_duration(duration);
+
+  Ok((since_creation_span, job_iteration_span))
+}
+
+fn get_timestamp_millis() -> u64 {
+  SystemTime::now()
+      .duration_since(UNIX_EPOCH)
+      .map(|d| d.as_millis() as u64)
+      .unwrap_or(0)
 }

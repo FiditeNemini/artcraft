@@ -2150,6 +2150,20 @@ dependencies = [
 ]
 
 [[package]]
+name = "newrelic-telemetry"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "flate2",
+ "hyper",
+ "hyper-tls",
+ "log",
+ "serde",
+ "serde_json",
+ "uuid",
+]
+
+[[package]]
 name = "nom"
 version = "4.2.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3357,6 +3371,7 @@ dependencies = [
  "log",
  "magic-crypt",
  "md-5",
+ "newrelic-telemetry",
  "pulldown-cmark",
  "r2d2_redis",
  "rand 0.8.3",
