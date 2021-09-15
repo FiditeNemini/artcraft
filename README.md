@@ -269,6 +269,10 @@ Notes / TODOs:
 
 * Actix/sqlx runtime compat:
   https://github.com/launchbadge/sqlx/issues/1117#issuecomment-801237734
+  
+* Redis caching
+
+* Jobs for analytics queries
 
 
 Docker builds
