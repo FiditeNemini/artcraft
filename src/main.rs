@@ -46,6 +46,7 @@ use crate::http_server::endpoints::moderation::ip_bans::get_ip_ban::get_ip_ban_h
 use crate::http_server::endpoints::moderation::ip_bans::list_ip_bans::list_ip_bans_handler;
 use crate::http_server::endpoints::moderation::jobs::get_tts_inference_queue_count::get_tts_inference_queue_count_handler;
 use crate::http_server::endpoints::moderation::jobs::get_w2l_inference_queue_count::get_w2l_inference_queue_count_handler;
+use crate::http_server::endpoints::moderation::stats::get_voice_count_stats::get_voice_count_stats_handler;
 use crate::http_server::endpoints::moderation::user_bans::ban_user::ban_user_handler;
 use crate::http_server::endpoints::moderation::user_bans::list_banned_users::list_banned_users_handler;
 use crate::http_server::endpoints::moderation::user_roles::list_roles::list_user_roles_handler;
@@ -459,6 +460,14 @@ pub async fn serve(server_state: ServerState) -> AnyhowResult<()>
                 .service(
                   web::resource("/w2l_inference_queue_stats")
                       .route(web::get().to(get_w2l_inference_queue_count_handler))
+                      .route(web::head().to(|| HttpResponse::Ok()))
+                )
+          )
+          .service(
+            web::scope("/stats")
+                .service(
+                  web::resource("/tts_voices")
+                      .route(web::get().to(get_voice_count_stats_handler))
                       .route(web::head().to(|| HttpResponse::Ok()))
                 )
           )
