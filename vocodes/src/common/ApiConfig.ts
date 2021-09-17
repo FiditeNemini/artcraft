@@ -258,6 +258,10 @@ class ApiConfig {
     return `${this.getScheme()}://${this.getNewApiHost()}/moderation/user/list`;
   }
 
+  getTtsVoiceInventoryStats() : string {
+    return `${this.getScheme()}://${this.getNewApiHost()}/moderation/stats/tts_voices`;
+  }
+
   getTtsInferenceStats() : string {
     return `${this.getScheme()}://${this.getNewApiHost()}/moderation/jobs/tts_inference_queue_stats`;
   }

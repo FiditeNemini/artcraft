@@ -41,6 +41,7 @@ import { ModerationUserListFc } from './moderation/moderation_user_list/Moderati
 import { LeaderboardFc } from './leaderboard/LeaderboardFc';
 import { ModerationJobStatsFc } from './moderation/moderation_job_stats/ModerationJobStatsFc';
 import { ModerationPendingW2lTemplatesFc } from './moderation/moderation_pending_w2l_templates/ModerationPendingW2lTemplatesFc';
+import { ModerationVoiceStatsFc } from './moderation/moderation_voice_stats/ModerationVoiceStatsFc';
 
 interface Props {
   sessionWrapper: SessionWrapper,
@@ -276,6 +277,12 @@ class NewVocodesContainer extends React.Component<Props, State> {
 
             <Route path="/moderation/ip_bans">
               <ModerationIpBanListFc
+                sessionWrapper={this.props.sessionWrapper}
+              />
+            </Route>
+
+            <Route path="/moderation/voice_stats">
+              <ModerationVoiceStatsFc
                 sessionWrapper={this.props.sessionWrapper}
               />
             </Route>

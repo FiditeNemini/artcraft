@@ -31,16 +31,23 @@ function ModerationFc(props: Props) {
       <br />
 
       <Link
-        to="/moderation/job_stats"
+        to="/moderation/approve/w2l_templates"
         className="button is-link is-large is-fullwidth is-light"
-        >Job Stats</Link>
+        >Unapproved W2L Templates</Link>
         
       <br />
 
       <Link
-        to="/moderation/approve/w2l_templates"
+        to="/moderation/voice_stats"
         className="button is-link is-large is-fullwidth is-light"
-        >Unapproved W2L Templates</Link>
+        >Voice Stats</Link>
+        
+      <br />
+
+      <Link
+        to="/moderation/job_stats"
+        className="button is-link is-large is-fullwidth is-light"
+        >Job Stats</Link>
         
       <br />
 
