@@ -53,7 +53,7 @@ use crate::util::random_crockford_token::random_crockford_token;
 use crate::util::redis::redis_job_status_logger::RedisJobStatusLogger;
 use crate::util::semi_persistent_cache_dir::SemiPersistentCacheDir;
 use data_encoding::{HEXUPPER, HEXLOWER, HEXLOWER_PERMISSIVE};
-use log::{warn, info};
+use log::{warn, info, error};
 use newrelic_telemetry::Client as NewRelicClient;
 use newrelic_telemetry::ClientBuilder;
 use newrelic_telemetry::Span;
@@ -508,7 +508,7 @@ impl ModelState {
     let model_record = match query_result {
       Some(model) => model,
       None => {
-        warn!("TTS model not found: {}", &job.model_token);
+        error!("TTS model not found: {}", &job.model_token);
         return Err(anyhow!("Model not found!"))
       },
     };
@@ -852,7 +852,7 @@ async fn process_job(
     &inference_result_token)
       .await
       .map_err(|e| {
-        warn!("error publishing event: {:?}", e);
+        error!("error publishing event: {:?}", e);
         anyhow!("error publishing event")
       })?;
 
