@@ -247,7 +247,7 @@ async fn main() -> AnyhowResult<()> {
   )?;
 
   // In-Memory Cache
-  let cache_ttl = Duration::from_secs(60);
+  let cache_ttl = easyenv::get_env_duration_seconds_or_default("VOICE_LIST_CACHE_TTL_SECONDS", Duration::from_secs(60));
   let voice_list_cache = SingleItemTtlCache::create_with_duration(cache_ttl);
 
   // NB: This secret really isn't too important.
