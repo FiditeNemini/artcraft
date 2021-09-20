@@ -11,6 +11,7 @@ use crate::util::anyhow_result::AnyhowResult;
 use crate::util::random_prefix_crockford_token::random_prefix_crockford_token;
 use log::{warn, info};
 use sqlx::{MySqlPool, Transaction, MySql};
+use std::error;
 use std::path::Path;
 
 /// table: tts_inference_jobs
@@ -192,6 +193,30 @@ WHERE id = ?
 
   Ok(())
 }
+
+pub async fn mark_tts_inference_job_permanently_dead(
+  pool: &MySqlPool,
+  job: &TtsInferenceJobRecord,
+  failure_reason: &str,
+) -> AnyhowResult<()> {
+  let query_result = sqlx::query!(
+        r#"
+UPDATE tts_inference_jobs
+SET
+  status = "dead",
+  failure_reason = ?,
+  retry_at = NULL
+WHERE id = ?
+        "#,
+        failure_reason.to_string(),
+        job.id,
+    )
+      .execute(pool)
+      .await?;
+
+  Ok(())
+}
+
 pub async fn mark_tts_inference_job_done(
   pool: &MySqlPool,
   job: &TtsInferenceJobRecord,
@@ -374,7 +399,7 @@ SET
   Ok((record_id, inference_result_token.clone()))
 }
 
-pub struct TtsModelRecord2 {
+pub struct TtsModelForInferenceRecord {
   pub model_token: String,
   pub tts_model_type: String,
 
@@ -388,17 +413,40 @@ pub struct TtsModelRecord2 {
   pub private_bucket_hash: String,
   pub created_at: DateTime<Utc>,
   pub updated_at: DateTime<Utc>,
+  pub mod_deleted_at: Option<DateTime<Utc>>,
+  pub user_deleted_at: Option<DateTime<Utc>>,
 }
+
+
+#[derive(Clone, Debug)]
+pub enum TtsModelForInferenceError {
+  ModelNotFound,
+  ModelDeleted,
+  DatabaseError { reason: String },
+}
+
+impl std::fmt::Display for TtsModelForInferenceError {
+  fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+    match self {
+      TtsModelForInferenceError::ModelNotFound => write!(f, "ModelNotFound"),
+      TtsModelForInferenceError::ModelDeleted => write!(f, "ModelDeleted"),
+      TtsModelForInferenceError::DatabaseError { reason} =>
+        write!(f, "Database error: {:?}", reason),
+    }
+  }
+}
+
+impl std::error::Error for TtsModelForInferenceError {}
 
 pub async fn get_tts_model_by_token(
   pool: &MySqlPool,
   model_token: &str
-) -> AnyhowResult<Option<TtsModelRecord2>>
+) -> Result<TtsModelForInferenceRecord, TtsModelForInferenceError>
 {
   // NB: Lookup failure is Err(RowNotFound).
   // NB: Since this is publicly exposed, we don't query sensitive data.
   let maybe_model = sqlx::query_as!(
-      TtsModelRecord2,
+      TtsModelForInferenceRecord,
         r#"
 SELECT
     tts.token as model_token,
@@ -410,31 +458,39 @@ SELECT
     tts.title,
     tts.private_bucket_hash,
     tts.created_at,
-    tts.updated_at
+    tts.updated_at,
+    tts.user_deleted_at,
+    tts.mod_deleted_at
 FROM tts_models as tts
 JOIN users
 ON users.token = tts.creator_user_token
 WHERE tts.token = ?
-AND tts.user_deleted_at IS NULL
-AND tts.mod_deleted_at IS NULL
         "#,
       &model_token
     )
       .fetch_one(pool)
       .await; // TODO: This will return error if it doesn't exist
 
-  match maybe_model {
-    Ok(model) => Ok(Some(model)),
+  let model : TtsModelForInferenceRecord = match maybe_model {
+    Ok(model) => model,
     Err(err) => {
       match err {
         RowNotFound => {
-          Ok(None)
+          return Err(TtsModelForInferenceError::ModelNotFound);
         },
         _ => {
           warn!("tts model query error: {:?}", err);
-          Err(anyhow!("Mysql error: {:?}", err))
+          return Err(TtsModelForInferenceError::DatabaseError {
+            reason: format!("Mysql error: {:?}", err)
+          });
         }
       }
     }
+  };
+
+  if model.mod_deleted_at.is_some() || model.user_deleted_at.is_some() {
+    return Err(TtsModelForInferenceError::ModelDeleted);
   }
+
+  Ok(model)
 }

@@ -24,13 +24,16 @@ use crate::common_env::CommonEnv;
 use crate::database::enums::vocoder_type::VocoderType;
 use crate::database::mediators::firehose_publisher::FirehosePublisher;
 use crate::http_clients::tts_inference_sidecar_client::TtsInferenceSidecarClient;
+use crate::job_queries::tts_inference_job_queries::TtsInferenceJobRecord;
+use crate::job_queries::tts_inference_job_queries::TtsModelForInferenceError;
+use crate::job_queries::tts_inference_job_queries::TtsModelForInferenceRecord;
 use crate::job_queries::tts_inference_job_queries::get_tts_model_by_token;
 use crate::job_queries::tts_inference_job_queries::grab_job_lock_and_mark_pending;
 use crate::job_queries::tts_inference_job_queries::insert_tts_result;
 use crate::job_queries::tts_inference_job_queries::mark_tts_inference_job_done;
 use crate::job_queries::tts_inference_job_queries::mark_tts_inference_job_failure;
+use crate::job_queries::tts_inference_job_queries::mark_tts_inference_job_permanently_dead;
 use crate::job_queries::tts_inference_job_queries::query_tts_inference_job_records;
-use crate::job_queries::tts_inference_job_queries::{TtsInferenceJobRecord, TtsModelRecord2};
 use crate::script_execution::tacotron_inference_command::TacotronInferenceCommand;
 use crate::shared_constants::DEFAULT_MYSQL_CONNECTION_STRING;
 use crate::shared_constants::DEFAULT_RUST_LOG;
@@ -399,15 +402,40 @@ async fn process_jobs(
     let model_state = match model_state_result {
       Ok(model_state) => model_state,
       Err(e) => {
-        warn!("Failure to check model state: {:?}", e);
+        error!("TTS model fetch and state check error: {}, reason: {:?}", &job.model_token, &e);
 
-        let failure_reason = "";
-        let _r = mark_tts_inference_job_failure(
-          &inferencer.mysql_pool,
-          &job,
-          failure_reason,
-          inferencer.job_max_attempts
-        ).await;
+        let (failure_reason, permanent_failure) = match e {
+          ModelStateError::ModelNotFound => ("model was not found", true),
+          ModelStateError::ModelDeleted => ("model has been deleted", true),
+          ModelStateError::CacheError { .. } => ("internal cache error", false),
+          ModelStateError::DatabaseError { .. } => ("unknown database error", false),
+        };
+
+
+        let mut redis = inferencer.redis_pool.get()?;
+        let mut redis_logger = RedisJobStatusLogger::new_tts_inference(
+          &mut redis,
+          &job.inference_job_token);
+
+        redis_logger.log_status(failure_reason)?;
+
+        if permanent_failure {
+          warn!("Marking job permanently dead: {} because: {:?}", job.inference_job_token, &e);
+
+          let _r = mark_tts_inference_job_permanently_dead(
+            &inferencer.mysql_pool,
+            &job,
+            failure_reason
+          ).await;
+        } else {
+          let _r = mark_tts_inference_job_failure(
+            &inferencer.mysql_pool,
+            &job,
+            failure_reason,
+            inferencer.job_max_attempts
+          ).await;
+        }
+
         continue;
       }
     };
@@ -486,10 +514,41 @@ fn read_metadata_file(filename: &PathBuf) -> AnyhowResult<FileMetadata> {
 /// We check both of these in one go so that we can reuse the ModelRecord later
 /// without another DB query.
 struct ModelState {
-  pub model_record: TtsModelRecord2,
+  pub model_record: TtsModelForInferenceRecord,
   pub is_downloaded_to_filesystem: bool,
   pub is_in_memory_cache: bool,
 }
+
+#[derive(Debug, Clone)]
+enum ModelStateError {
+  ModelNotFound,
+  ModelDeleted,
+  CacheError { reason: String },
+  DatabaseError { reason: String },
+}
+
+impl std::fmt::Display for ModelStateError {
+  fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+    match self {
+      ModelStateError::ModelNotFound => write!(f, "ModelNotFound"),
+      ModelStateError::ModelDeleted => write!(f, "ModelDeleted"),
+      ModelStateError::CacheError { reason} => write!(f, "Cache error: {:?}", reason),
+      ModelStateError::DatabaseError { reason} => write!(f, "Database error: {:?}", reason),
+    }
+  }
+}
+
+impl From<TtsModelForInferenceError> for ModelStateError {
+  fn from(error: TtsModelForInferenceError) -> Self {
+    match error {
+      TtsModelForInferenceError::ModelNotFound => ModelStateError::ModelNotFound,
+      TtsModelForInferenceError::ModelDeleted => ModelStateError::ModelDeleted,
+      TtsModelForInferenceError::DatabaseError { reason } => ModelStateError::DatabaseError { reason }
+    }
+  }
+}
+
+impl std::error::Error for ModelStateError {}
 
 impl ModelState {
   /// Query the model details and see if the model file is on the filesystem in one go.
@@ -498,35 +557,37 @@ impl ModelState {
     mysql_pool: &MySqlPool,
     semi_persistent_cache: &SemiPersistentCacheDir,
     virtual_cache: &SyncVirtualLfuCache,
-  ) -> AnyhowResult<Self> {
+  ) -> Result<Self, ModelStateError> {
     info!("Looking up TTS model by token: {}", &job.model_token);
 
-    let query_result = get_tts_model_by_token(
+    let tts_model = get_tts_model_by_token(
       &mysql_pool,
-      &job.model_token).await?;
+      &job.model_token
+    ).await?;
 
-    let model_record = match query_result {
-      Some(model) => model,
-      None => {
-        error!("TTS model not found: {}", &job.model_token);
-        return Err(anyhow!("Model not found!"))
+    /*let model_record = match query_result {
+      Ok(model) => model,
+      Err(e) => {
+        error!("TTS model lookup error: {}, reason: {:?}", &job.model_token, &e);
+        return Err(e)
       },
-    };
+    };*/
 
     let tts_synthesizer_fs_path = semi_persistent_cache.tts_synthesizer_model_path(
-      &model_record.model_token);
+      &tts_model.model_token);
 
     let is_downloaded_to_filesystem = tts_synthesizer_fs_path.exists();
 
     let path = tts_synthesizer_fs_path
         .to_str()
-        .ok_or(anyhow!("could not make path"))?
+        .ok_or(ModelStateError::CacheError { reason: "could not make path".to_string() })?
         .to_string();
 
-    let is_in_memory_cache = virtual_cache.in_cache(&path)?;
+    let is_in_memory_cache = virtual_cache.in_cache(&path)
+        .map_err(|e| ModelStateError::CacheError { reason: format!("Model cache error: {:?}", e) })?;
 
     Ok(Self {
-      model_record,
+      model_record: tts_model,
       is_downloaded_to_filesystem,
       is_in_memory_cache,
     })
@@ -536,7 +597,7 @@ impl ModelState {
 async fn process_job(
   inferencer: &Inferencer,
   job: &TtsInferenceJobRecord,
-  model_record: &TtsModelRecord2,
+  model_record: &TtsModelForInferenceRecord,
 ) -> AnyhowResult<(Span, Span)> {
 
   // TODO 1. Mark processing (DONE)
