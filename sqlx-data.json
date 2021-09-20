@@ -375,6 +375,148 @@
       ]
     }
   },
+  "05612e384bdce558e4834c720d1eb7ca9a09e3cca64b72f1497929d860345ec7": {
+    "query": "\nSELECT\n    tts.token as model_token,\n    tts.tts_model_type,\n    tts.creator_user_token,\n    users.username as creator_username,\n    users.display_name as creator_display_name,\n    users.email_gravatar_hash as creator_gravatar_hash,\n    tts.title,\n    tts.is_locked_from_use,\n    tts.created_at,\n    tts.updated_at\nFROM tts_models as tts\nJOIN users\nON\n    users.token = tts.creator_user_token\nWHERE\n    users.username = ?\n    AND tts.is_locked_from_use IS FALSE\n    AND tts.user_deleted_at IS NULL\n    AND tts.mod_deleted_at IS NULL\n        ",
+    "describe": {
+      "columns": [
+        {
+          "ordinal": 0,
+          "name": "model_token",
+          "type_info": {
+            "type": "VarString",
+            "flags": {
+              "bits": 4229
+            },
+            "char_set": 224,
+            "max_size": 128
+          }
+        },
+        {
+          "ordinal": 1,
+          "name": "tts_model_type",
+          "type_info": {
+            "type": "String",
+            "flags": {
+              "bits": 385
+            },
+            "char_set": 224,
+            "max_size": 60
+          }
+        },
+        {
+          "ordinal": 2,
+          "name": "creator_user_token",
+          "type_info": {
+            "type": "VarString",
+            "flags": {
+              "bits": 4233
+            },
+            "char_set": 224,
+            "max_size": 128
+          }
+        },
+        {
+          "ordinal": 3,
+          "name": "creator_username",
+          "type_info": {
+            "type": "VarString",
+            "flags": {
+              "bits": 4229
+            },
+            "char_set": 224,
+            "max_size": 80
+          }
+        },
+        {
+          "ordinal": 4,
+          "name": "creator_display_name",
+          "type_info": {
+            "type": "VarString",
+            "flags": {
+              "bits": 4225
+            },
+            "char_set": 224,
+            "max_size": 80
+          }
+        },
+        {
+          "ordinal": 5,
+          "name": "creator_gravatar_hash",
+          "type_info": {
+            "type": "String",
+            "flags": {
+              "bits": 4225
+            },
+            "char_set": 224,
+            "max_size": 128
+          }
+        },
+        {
+          "ordinal": 6,
+          "name": "title",
+          "type_info": {
+            "type": "VarString",
+            "flags": {
+              "bits": 4225
+            },
+            "char_set": 224,
+            "max_size": 1020
+          }
+        },
+        {
+          "ordinal": 7,
+          "name": "is_locked_from_use",
+          "type_info": {
+            "type": "Tiny",
+            "flags": {
+              "bits": 9
+            },
+            "char_set": 63,
+            "max_size": 1
+          }
+        },
+        {
+          "ordinal": 8,
+          "name": "created_at",
+          "type_info": {
+            "type": "Timestamp",
+            "flags": {
+              "bits": 1153
+            },
+            "char_set": 63,
+            "max_size": 19
+          }
+        },
+        {
+          "ordinal": 9,
+          "name": "updated_at",
+          "type_info": {
+            "type": "Timestamp",
+            "flags": {
+              "bits": 9345
+            },
+            "char_set": 63,
+            "max_size": 19
+          }
+        }
+      ],
+      "parameters": {
+        "Right": 1
+      },
+      "nullable": [
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false
+      ]
+    }
+  },
   "05c3ebf54cd8a5374d6f4bbe21b3c6027ce6314917af8acd0ed136d375d53342": {
     "query": "\nSELECT\n    w2l.token as template_token,\n    w2l.template_type,\n    w2l.creator_user_token,\n    users.username as creator_username,\n    users.display_name as creator_display_name,\n    w2l.title,\n    w2l.frame_width,\n    w2l.frame_height,\n    w2l.duration_millis,\n    w2l.maybe_public_bucket_preview_image_object_name,\n    w2l.maybe_public_bucket_preview_video_object_name,\n    w2l.is_public_listing_approved,\n    w2l.created_at,\n    w2l.updated_at\nFROM w2l_templates as w2l\nJOIN users\nON\n    users.token = w2l.creator_user_token\nWHERE\n    users.username = ?\n    AND w2l.user_deleted_at IS NULL\n    AND w2l.mod_deleted_at IS NULL\n        ",
     "describe": {
@@ -1695,135 +1837,6 @@
         "Right": 1
       },
       "nullable": [
-        false
-      ]
-    }
-  },
-  "1556b7ed6b0cab002b52dfa8a5f81743a38967631ff24fd9555a168823b1dfc1": {
-    "query": "\nSELECT\n    tts.token as model_token,\n    tts.tts_model_type,\n    tts.creator_user_token,\n    users.username as creator_username,\n    users.display_name as creator_display_name,\n    tts.title,\n    tts.is_locked_from_use,\n    tts.created_at,\n    tts.updated_at\nFROM tts_models as tts\nJOIN users\n    ON users.token = tts.creator_user_token\nWHERE\n    tts.user_deleted_at IS NULL\n    AND tts.mod_deleted_at IS NULL\n        ",
-    "describe": {
-      "columns": [
-        {
-          "ordinal": 0,
-          "name": "model_token",
-          "type_info": {
-            "type": "VarString",
-            "flags": {
-              "bits": 4229
-            },
-            "char_set": 224,
-            "max_size": 128
-          }
-        },
-        {
-          "ordinal": 1,
-          "name": "tts_model_type",
-          "type_info": {
-            "type": "String",
-            "flags": {
-              "bits": 385
-            },
-            "char_set": 224,
-            "max_size": 60
-          }
-        },
-        {
-          "ordinal": 2,
-          "name": "creator_user_token",
-          "type_info": {
-            "type": "VarString",
-            "flags": {
-              "bits": 4233
-            },
-            "char_set": 224,
-            "max_size": 128
-          }
-        },
-        {
-          "ordinal": 3,
-          "name": "creator_username",
-          "type_info": {
-            "type": "VarString",
-            "flags": {
-              "bits": 4229
-            },
-            "char_set": 224,
-            "max_size": 80
-          }
-        },
-        {
-          "ordinal": 4,
-          "name": "creator_display_name",
-          "type_info": {
-            "type": "VarString",
-            "flags": {
-              "bits": 4225
-            },
-            "char_set": 224,
-            "max_size": 80
-          }
-        },
-        {
-          "ordinal": 5,
-          "name": "title",
-          "type_info": {
-            "type": "VarString",
-            "flags": {
-              "bits": 4225
-            },
-            "char_set": 224,
-            "max_size": 1020
-          }
-        },
-        {
-          "ordinal": 6,
-          "name": "is_locked_from_use",
-          "type_info": {
-            "type": "Tiny",
-            "flags": {
-              "bits": 9
-            },
-            "char_set": 63,
-            "max_size": 1
-          }
-        },
-        {
-          "ordinal": 7,
-          "name": "created_at",
-          "type_info": {
-            "type": "Timestamp",
-            "flags": {
-              "bits": 1153
-            },
-            "char_set": 63,
-            "max_size": 19
-          }
-        },
-        {
-          "ordinal": 8,
-          "name": "updated_at",
-          "type_info": {
-            "type": "Timestamp",
-            "flags": {
-              "bits": 9345
-            },
-            "char_set": 63,
-            "max_size": 19
-          }
-        }
-      ],
-      "parameters": {
-        "Right": 0
-      },
-      "nullable": [
-        false,
-        false,
-        false,
-        false,
-        false,
-        false,
-        false,
-        false,
         false
       ]
     }
@@ -3742,6 +3755,148 @@
       ]
     }
   },
+  "5d1f983fd2555c0fcb2ba065e9b3c6174346ee0fdaecacc2a557715a68cf23e2": {
+    "query": "\nSELECT\n    tts.token as model_token,\n    tts.tts_model_type,\n    tts.creator_user_token,\n    users.username as creator_username,\n    users.display_name as creator_display_name,\n    users.email_gravatar_hash as creator_gravatar_hash,\n    tts.title,\n    tts.is_locked_from_use,\n    tts.created_at,\n    tts.updated_at\nFROM tts_models as tts\nJOIN users\nON\n    users.token = tts.creator_user_token\nWHERE\n    users.username = ?\n    AND tts.user_deleted_at IS NULL\n    AND tts.mod_deleted_at IS NULL\n        ",
+    "describe": {
+      "columns": [
+        {
+          "ordinal": 0,
+          "name": "model_token",
+          "type_info": {
+            "type": "VarString",
+            "flags": {
+              "bits": 4229
+            },
+            "char_set": 224,
+            "max_size": 128
+          }
+        },
+        {
+          "ordinal": 1,
+          "name": "tts_model_type",
+          "type_info": {
+            "type": "String",
+            "flags": {
+              "bits": 385
+            },
+            "char_set": 224,
+            "max_size": 60
+          }
+        },
+        {
+          "ordinal": 2,
+          "name": "creator_user_token",
+          "type_info": {
+            "type": "VarString",
+            "flags": {
+              "bits": 4233
+            },
+            "char_set": 224,
+            "max_size": 128
+          }
+        },
+        {
+          "ordinal": 3,
+          "name": "creator_username",
+          "type_info": {
+            "type": "VarString",
+            "flags": {
+              "bits": 4229
+            },
+            "char_set": 224,
+            "max_size": 80
+          }
+        },
+        {
+          "ordinal": 4,
+          "name": "creator_display_name",
+          "type_info": {
+            "type": "VarString",
+            "flags": {
+              "bits": 4225
+            },
+            "char_set": 224,
+            "max_size": 80
+          }
+        },
+        {
+          "ordinal": 5,
+          "name": "creator_gravatar_hash",
+          "type_info": {
+            "type": "String",
+            "flags": {
+              "bits": 4225
+            },
+            "char_set": 224,
+            "max_size": 128
+          }
+        },
+        {
+          "ordinal": 6,
+          "name": "title",
+          "type_info": {
+            "type": "VarString",
+            "flags": {
+              "bits": 4225
+            },
+            "char_set": 224,
+            "max_size": 1020
+          }
+        },
+        {
+          "ordinal": 7,
+          "name": "is_locked_from_use",
+          "type_info": {
+            "type": "Tiny",
+            "flags": {
+              "bits": 9
+            },
+            "char_set": 63,
+            "max_size": 1
+          }
+        },
+        {
+          "ordinal": 8,
+          "name": "created_at",
+          "type_info": {
+            "type": "Timestamp",
+            "flags": {
+              "bits": 1153
+            },
+            "char_set": 63,
+            "max_size": 19
+          }
+        },
+        {
+          "ordinal": 9,
+          "name": "updated_at",
+          "type_info": {
+            "type": "Timestamp",
+            "flags": {
+              "bits": 9345
+            },
+            "char_set": 63,
+            "max_size": 19
+          }
+        }
+      ],
+      "parameters": {
+        "Right": 1
+      },
+      "nullable": [
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false
+      ]
+    }
+  },
   "5e54fd8569b2d6d3a0d11acee6bd03b75400b6325952eb16c8dac68a7933b13a": {
     "query": "\nSELECT\n    users.token as user_token,\n    username,\n    display_name,\n    email_gravatar_hash,\n    profile_markdown,\n    profile_rendered_html,\n    user_role_slug,\n    is_banned,\n    disable_gravatar,\n    discord_username,\n    twitch_username,\n    twitter_username,\n    patreon_username,\n    github_username,\n    created_at\nFROM users\nWHERE\n    users.username = ?\n    AND users.user_deleted_at IS NULL\n    AND users.mod_deleted_at IS NULL\n        ",
     "describe": {
@@ -5465,135 +5620,6 @@
       "nullable": []
     }
   },
-  "99f1869443b8331b3099af44c53d6db4573fdfb2df5af56668f3256bf446b096": {
-    "query": "\nSELECT\n    tts.token as model_token,\n    tts.tts_model_type,\n    tts.creator_user_token,\n    users.username as creator_username,\n    users.display_name as creator_display_name,\n    tts.title,\n    tts.is_locked_from_use,\n    tts.created_at,\n    tts.updated_at\nFROM tts_models as tts\nJOIN users\nON\n    users.token = tts.creator_user_token\nWHERE\n    users.username = ?\n    AND tts.is_locked_from_use IS FALSE\n    AND tts.user_deleted_at IS NULL\n    AND tts.mod_deleted_at IS NULL\n        ",
-    "describe": {
-      "columns": [
-        {
-          "ordinal": 0,
-          "name": "model_token",
-          "type_info": {
-            "type": "VarString",
-            "flags": {
-              "bits": 4229
-            },
-            "char_set": 224,
-            "max_size": 128
-          }
-        },
-        {
-          "ordinal": 1,
-          "name": "tts_model_type",
-          "type_info": {
-            "type": "String",
-            "flags": {
-              "bits": 385
-            },
-            "char_set": 224,
-            "max_size": 60
-          }
-        },
-        {
-          "ordinal": 2,
-          "name": "creator_user_token",
-          "type_info": {
-            "type": "VarString",
-            "flags": {
-              "bits": 4233
-            },
-            "char_set": 224,
-            "max_size": 128
-          }
-        },
-        {
-          "ordinal": 3,
-          "name": "creator_username",
-          "type_info": {
-            "type": "VarString",
-            "flags": {
-              "bits": 4229
-            },
-            "char_set": 224,
-            "max_size": 80
-          }
-        },
-        {
-          "ordinal": 4,
-          "name": "creator_display_name",
-          "type_info": {
-            "type": "VarString",
-            "flags": {
-              "bits": 4225
-            },
-            "char_set": 224,
-            "max_size": 80
-          }
-        },
-        {
-          "ordinal": 5,
-          "name": "title",
-          "type_info": {
-            "type": "VarString",
-            "flags": {
-              "bits": 4225
-            },
-            "char_set": 224,
-            "max_size": 1020
-          }
-        },
-        {
-          "ordinal": 6,
-          "name": "is_locked_from_use",
-          "type_info": {
-            "type": "Tiny",
-            "flags": {
-              "bits": 9
-            },
-            "char_set": 63,
-            "max_size": 1
-          }
-        },
-        {
-          "ordinal": 7,
-          "name": "created_at",
-          "type_info": {
-            "type": "Timestamp",
-            "flags": {
-              "bits": 1153
-            },
-            "char_set": 63,
-            "max_size": 19
-          }
-        },
-        {
-          "ordinal": 8,
-          "name": "updated_at",
-          "type_info": {
-            "type": "Timestamp",
-            "flags": {
-              "bits": 9345
-            },
-            "char_set": 63,
-            "max_size": 19
-          }
-        }
-      ],
-      "parameters": {
-        "Right": 1
-      },
-      "nullable": [
-        false,
-        false,
-        false,
-        false,
-        false,
-        false,
-        false,
-        false,
-        false
-      ]
-    }
-  },
   "9a879f76345ef5682b995f99026fac8b2f4c64c8ec4bb078187d1e53effcfbaf": {
     "query": "\nINSERT INTO w2l_templates\nSET\n  token = ?,\n  template_type = ?,\n  title = ?,\n  description_markdown = '',\n  description_rendered_html = '',\n  creator_user_token = ?,\n  creator_ip_address_creation = ?,\n  creator_ip_address_last_update = ?,\n  original_download_url = ?,\n  private_bucket_hash = ?,\n  private_bucket_object_name = ?,\n  private_bucket_cached_faces_object_name = ?,\n  maybe_public_bucket_preview_image_object_name = ?,\n  maybe_public_bucket_preview_video_object_name = ?,\n  file_size_bytes = ?,\n  mime_type = ?,\n  frame_width = ?,\n  frame_height = ?,\n  frame_count = ?,\n  fps = ?,\n  duration_millis = ?\n        ",
     "describe": {
@@ -5917,135 +5943,6 @@
         false,
         true,
         true,
-        false,
-        false
-      ]
-    }
-  },
-  "aff28dad260440114ea616087a6f29a8a81e8ad1329d0c3dd4a3db4a613eac29": {
-    "query": "\nSELECT\n    tts.token as model_token,\n    tts.tts_model_type,\n    tts.creator_user_token,\n    users.username as creator_username,\n    users.display_name as creator_display_name,\n    users.email_gravatar_hash as creator_gravatar_hash,\n    tts.title,\n    tts.created_at,\n    tts.updated_at\nFROM tts_models as tts\nJOIN users\n    ON users.token = tts.creator_user_token\nWHERE\n    tts.user_deleted_at IS NULL\n    AND tts.mod_deleted_at IS NULL\n        ",
-    "describe": {
-      "columns": [
-        {
-          "ordinal": 0,
-          "name": "model_token",
-          "type_info": {
-            "type": "VarString",
-            "flags": {
-              "bits": 4229
-            },
-            "char_set": 224,
-            "max_size": 128
-          }
-        },
-        {
-          "ordinal": 1,
-          "name": "tts_model_type",
-          "type_info": {
-            "type": "String",
-            "flags": {
-              "bits": 385
-            },
-            "char_set": 224,
-            "max_size": 60
-          }
-        },
-        {
-          "ordinal": 2,
-          "name": "creator_user_token",
-          "type_info": {
-            "type": "VarString",
-            "flags": {
-              "bits": 4233
-            },
-            "char_set": 224,
-            "max_size": 128
-          }
-        },
-        {
-          "ordinal": 3,
-          "name": "creator_username",
-          "type_info": {
-            "type": "VarString",
-            "flags": {
-              "bits": 4229
-            },
-            "char_set": 224,
-            "max_size": 80
-          }
-        },
-        {
-          "ordinal": 4,
-          "name": "creator_display_name",
-          "type_info": {
-            "type": "VarString",
-            "flags": {
-              "bits": 4225
-            },
-            "char_set": 224,
-            "max_size": 80
-          }
-        },
-        {
-          "ordinal": 5,
-          "name": "creator_gravatar_hash",
-          "type_info": {
-            "type": "String",
-            "flags": {
-              "bits": 4225
-            },
-            "char_set": 224,
-            "max_size": 128
-          }
-        },
-        {
-          "ordinal": 6,
-          "name": "title",
-          "type_info": {
-            "type": "VarString",
-            "flags": {
-              "bits": 4225
-            },
-            "char_set": 224,
-            "max_size": 1020
-          }
-        },
-        {
-          "ordinal": 7,
-          "name": "created_at",
-          "type_info": {
-            "type": "Timestamp",
-            "flags": {
-              "bits": 1153
-            },
-            "char_set": 63,
-            "max_size": 19
-          }
-        },
-        {
-          "ordinal": 8,
-          "name": "updated_at",
-          "type_info": {
-            "type": "Timestamp",
-            "flags": {
-              "bits": 9345
-            },
-            "char_set": 63,
-            "max_size": 19
-          }
-        }
-      ],
-      "parameters": {
-        "Right": 0
-      },
-      "nullable": [
-        false,
-        false,
-        false,
-        false,
-        false,
-        false,
-        false,
         false,
         false
       ]
@@ -7212,6 +7109,148 @@
       "nullable": []
     }
   },
+  "bf779826a10dd532f442d5b6a7ad3f35037276e8f822a3a633ca325c85c34234": {
+    "query": "\nSELECT\n    tts.token as model_token,\n    tts.tts_model_type,\n    tts.creator_user_token,\n    users.username as creator_username,\n    users.display_name as creator_display_name,\n    users.email_gravatar_hash as creator_gravatar_hash,\n    tts.title,\n    tts.is_locked_from_use,\n    tts.created_at,\n    tts.updated_at\nFROM tts_models as tts\nJOIN users\n    ON users.token = tts.creator_user_token\nWHERE\n    tts.user_deleted_at IS NULL\n    AND tts.mod_deleted_at IS NULL\n        ",
+    "describe": {
+      "columns": [
+        {
+          "ordinal": 0,
+          "name": "model_token",
+          "type_info": {
+            "type": "VarString",
+            "flags": {
+              "bits": 4229
+            },
+            "char_set": 224,
+            "max_size": 128
+          }
+        },
+        {
+          "ordinal": 1,
+          "name": "tts_model_type",
+          "type_info": {
+            "type": "String",
+            "flags": {
+              "bits": 385
+            },
+            "char_set": 224,
+            "max_size": 60
+          }
+        },
+        {
+          "ordinal": 2,
+          "name": "creator_user_token",
+          "type_info": {
+            "type": "VarString",
+            "flags": {
+              "bits": 4233
+            },
+            "char_set": 224,
+            "max_size": 128
+          }
+        },
+        {
+          "ordinal": 3,
+          "name": "creator_username",
+          "type_info": {
+            "type": "VarString",
+            "flags": {
+              "bits": 4229
+            },
+            "char_set": 224,
+            "max_size": 80
+          }
+        },
+        {
+          "ordinal": 4,
+          "name": "creator_display_name",
+          "type_info": {
+            "type": "VarString",
+            "flags": {
+              "bits": 4225
+            },
+            "char_set": 224,
+            "max_size": 80
+          }
+        },
+        {
+          "ordinal": 5,
+          "name": "creator_gravatar_hash",
+          "type_info": {
+            "type": "String",
+            "flags": {
+              "bits": 4225
+            },
+            "char_set": 224,
+            "max_size": 128
+          }
+        },
+        {
+          "ordinal": 6,
+          "name": "title",
+          "type_info": {
+            "type": "VarString",
+            "flags": {
+              "bits": 4225
+            },
+            "char_set": 224,
+            "max_size": 1020
+          }
+        },
+        {
+          "ordinal": 7,
+          "name": "is_locked_from_use",
+          "type_info": {
+            "type": "Tiny",
+            "flags": {
+              "bits": 9
+            },
+            "char_set": 63,
+            "max_size": 1
+          }
+        },
+        {
+          "ordinal": 8,
+          "name": "created_at",
+          "type_info": {
+            "type": "Timestamp",
+            "flags": {
+              "bits": 1153
+            },
+            "char_set": 63,
+            "max_size": 19
+          }
+        },
+        {
+          "ordinal": 9,
+          "name": "updated_at",
+          "type_info": {
+            "type": "Timestamp",
+            "flags": {
+              "bits": 9345
+            },
+            "char_set": 63,
+            "max_size": 19
+          }
+        }
+      ],
+      "parameters": {
+        "Right": 0
+      },
+      "nullable": [
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false
+      ]
+    }
+  },
   "c0f56e2656b566d3a8c869d39b0b56d1fbb75d7d9e817a24b10add44d348092d": {
     "query": "\nSELECT count(*) as count\nFROM w2l_templates\nWHERE\n  creator_user_token = ?\nLIMIT 1\n        ",
     "describe": {
@@ -7889,135 +7928,6 @@
       "nullable": []
     }
   },
-  "cc51b77e88c2ee5c046ea2f2287b9e9770743d50b0db90481662e5c1118885c5": {
-    "query": "\nSELECT\n    tts.token as model_token,\n    tts.tts_model_type,\n    tts.creator_user_token,\n    users.username as creator_username,\n    users.display_name as creator_display_name,\n    tts.title,\n    tts.is_locked_from_use,\n    tts.created_at,\n    tts.updated_at\nFROM tts_models as tts\nJOIN users\nON\n    users.token = tts.creator_user_token\nWHERE\n    users.username = ?\n    AND tts.user_deleted_at IS NULL\n    AND tts.mod_deleted_at IS NULL\n        ",
-    "describe": {
-      "columns": [
-        {
-          "ordinal": 0,
-          "name": "model_token",
-          "type_info": {
-            "type": "VarString",
-            "flags": {
-              "bits": 4229
-            },
-            "char_set": 224,
-            "max_size": 128
-          }
-        },
-        {
-          "ordinal": 1,
-          "name": "tts_model_type",
-          "type_info": {
-            "type": "String",
-            "flags": {
-              "bits": 385
-            },
-            "char_set": 224,
-            "max_size": 60
-          }
-        },
-        {
-          "ordinal": 2,
-          "name": "creator_user_token",
-          "type_info": {
-            "type": "VarString",
-            "flags": {
-              "bits": 4233
-            },
-            "char_set": 224,
-            "max_size": 128
-          }
-        },
-        {
-          "ordinal": 3,
-          "name": "creator_username",
-          "type_info": {
-            "type": "VarString",
-            "flags": {
-              "bits": 4229
-            },
-            "char_set": 224,
-            "max_size": 80
-          }
-        },
-        {
-          "ordinal": 4,
-          "name": "creator_display_name",
-          "type_info": {
-            "type": "VarString",
-            "flags": {
-              "bits": 4225
-            },
-            "char_set": 224,
-            "max_size": 80
-          }
-        },
-        {
-          "ordinal": 5,
-          "name": "title",
-          "type_info": {
-            "type": "VarString",
-            "flags": {
-              "bits": 4225
-            },
-            "char_set": 224,
-            "max_size": 1020
-          }
-        },
-        {
-          "ordinal": 6,
-          "name": "is_locked_from_use",
-          "type_info": {
-            "type": "Tiny",
-            "flags": {
-              "bits": 9
-            },
-            "char_set": 63,
-            "max_size": 1
-          }
-        },
-        {
-          "ordinal": 7,
-          "name": "created_at",
-          "type_info": {
-            "type": "Timestamp",
-            "flags": {
-              "bits": 1153
-            },
-            "char_set": 63,
-            "max_size": 19
-          }
-        },
-        {
-          "ordinal": 8,
-          "name": "updated_at",
-          "type_info": {
-            "type": "Timestamp",
-            "flags": {
-              "bits": 9345
-            },
-            "char_set": 63,
-            "max_size": 19
-          }
-        }
-      ],
-      "parameters": {
-        "Right": 1
-      },
-      "nullable": [
-        false,
-        false,
-        false,
-        false,
-        false,
-        false,
-        false,
-        false,
-        false
-      ]
-    }
-  },
   "d12757abef811cd6951e0e1427fdb496a8931b547519d320f5ade56007d3eb5d": {
     "query": "\nSELECT\n  id,\n  status\nFROM w2l_template_upload_jobs\nWHERE id = ?\nFOR UPDATE\n        ",
     "describe": {
@@ -8175,135 +8085,6 @@
         "Right": 0
       },
       "nullable": [
-        false,
-        false,
-        false,
-        false,
-        false
-      ]
-    }
-  },
-  "dfc7d0ff70e135e1c4d50c7655b6064e5034f16eacd9bb94070933a68815d270": {
-    "query": "\nSELECT\n    tts.token as model_token,\n    tts.tts_model_type,\n    tts.creator_user_token,\n    users.username as creator_username,\n    users.display_name as creator_display_name,\n    tts.title,\n    tts.is_locked_from_use,\n    tts.created_at,\n    tts.updated_at\nFROM tts_models as tts\nJOIN users\n    ON users.token = tts.creator_user_token\nWHERE\n    tts.is_locked_from_use IS FALSE\n    AND tts.user_deleted_at IS NULL\n    AND tts.mod_deleted_at IS NULL\n        ",
-    "describe": {
-      "columns": [
-        {
-          "ordinal": 0,
-          "name": "model_token",
-          "type_info": {
-            "type": "VarString",
-            "flags": {
-              "bits": 4229
-            },
-            "char_set": 224,
-            "max_size": 128
-          }
-        },
-        {
-          "ordinal": 1,
-          "name": "tts_model_type",
-          "type_info": {
-            "type": "String",
-            "flags": {
-              "bits": 385
-            },
-            "char_set": 224,
-            "max_size": 60
-          }
-        },
-        {
-          "ordinal": 2,
-          "name": "creator_user_token",
-          "type_info": {
-            "type": "VarString",
-            "flags": {
-              "bits": 4233
-            },
-            "char_set": 224,
-            "max_size": 128
-          }
-        },
-        {
-          "ordinal": 3,
-          "name": "creator_username",
-          "type_info": {
-            "type": "VarString",
-            "flags": {
-              "bits": 4229
-            },
-            "char_set": 224,
-            "max_size": 80
-          }
-        },
-        {
-          "ordinal": 4,
-          "name": "creator_display_name",
-          "type_info": {
-            "type": "VarString",
-            "flags": {
-              "bits": 4225
-            },
-            "char_set": 224,
-            "max_size": 80
-          }
-        },
-        {
-          "ordinal": 5,
-          "name": "title",
-          "type_info": {
-            "type": "VarString",
-            "flags": {
-              "bits": 4225
-            },
-            "char_set": 224,
-            "max_size": 1020
-          }
-        },
-        {
-          "ordinal": 6,
-          "name": "is_locked_from_use",
-          "type_info": {
-            "type": "Tiny",
-            "flags": {
-              "bits": 9
-            },
-            "char_set": 63,
-            "max_size": 1
-          }
-        },
-        {
-          "ordinal": 7,
-          "name": "created_at",
-          "type_info": {
-            "type": "Timestamp",
-            "flags": {
-              "bits": 1153
-            },
-            "char_set": 63,
-            "max_size": 19
-          }
-        },
-        {
-          "ordinal": 8,
-          "name": "updated_at",
-          "type_info": {
-            "type": "Timestamp",
-            "flags": {
-              "bits": 9345
-            },
-            "char_set": 63,
-            "max_size": 19
-          }
-        }
-      ],
-      "parameters": {
-        "Right": 0
-      },
-      "nullable": [
-        false,
-        false,
-        false,
-        false,
         false,
         false,
         false,
@@ -8769,6 +8550,148 @@
         "Right": 1
       },
       "nullable": []
+    }
+  },
+  "ef239806d026cd59106f79b3dc7c850da2bbc325a1adb831f319f87c0b07b56b": {
+    "query": "\nSELECT\n    tts.token as model_token,\n    tts.tts_model_type,\n    tts.creator_user_token,\n    users.username as creator_username,\n    users.display_name as creator_display_name,\n    users.email_gravatar_hash as creator_gravatar_hash,\n    tts.title,\n    tts.is_locked_from_use,\n    tts.created_at,\n    tts.updated_at\nFROM tts_models as tts\nJOIN users\n    ON users.token = tts.creator_user_token\nWHERE\n    tts.is_locked_from_use IS FALSE\n    AND tts.user_deleted_at IS NULL\n    AND tts.mod_deleted_at IS NULL\n        ",
+    "describe": {
+      "columns": [
+        {
+          "ordinal": 0,
+          "name": "model_token",
+          "type_info": {
+            "type": "VarString",
+            "flags": {
+              "bits": 4229
+            },
+            "char_set": 224,
+            "max_size": 128
+          }
+        },
+        {
+          "ordinal": 1,
+          "name": "tts_model_type",
+          "type_info": {
+            "type": "String",
+            "flags": {
+              "bits": 385
+            },
+            "char_set": 224,
+            "max_size": 60
+          }
+        },
+        {
+          "ordinal": 2,
+          "name": "creator_user_token",
+          "type_info": {
+            "type": "VarString",
+            "flags": {
+              "bits": 4233
+            },
+            "char_set": 224,
+            "max_size": 128
+          }
+        },
+        {
+          "ordinal": 3,
+          "name": "creator_username",
+          "type_info": {
+            "type": "VarString",
+            "flags": {
+              "bits": 4229
+            },
+            "char_set": 224,
+            "max_size": 80
+          }
+        },
+        {
+          "ordinal": 4,
+          "name": "creator_display_name",
+          "type_info": {
+            "type": "VarString",
+            "flags": {
+              "bits": 4225
+            },
+            "char_set": 224,
+            "max_size": 80
+          }
+        },
+        {
+          "ordinal": 5,
+          "name": "creator_gravatar_hash",
+          "type_info": {
+            "type": "String",
+            "flags": {
+              "bits": 4225
+            },
+            "char_set": 224,
+            "max_size": 128
+          }
+        },
+        {
+          "ordinal": 6,
+          "name": "title",
+          "type_info": {
+            "type": "VarString",
+            "flags": {
+              "bits": 4225
+            },
+            "char_set": 224,
+            "max_size": 1020
+          }
+        },
+        {
+          "ordinal": 7,
+          "name": "is_locked_from_use",
+          "type_info": {
+            "type": "Tiny",
+            "flags": {
+              "bits": 9
+            },
+            "char_set": 63,
+            "max_size": 1
+          }
+        },
+        {
+          "ordinal": 8,
+          "name": "created_at",
+          "type_info": {
+            "type": "Timestamp",
+            "flags": {
+              "bits": 1153
+            },
+            "char_set": 63,
+            "max_size": 19
+          }
+        },
+        {
+          "ordinal": 9,
+          "name": "updated_at",
+          "type_info": {
+            "type": "Timestamp",
+            "flags": {
+              "bits": 9345
+            },
+            "char_set": 63,
+            "max_size": 19
+          }
+        }
+      ],
+      "parameters": {
+        "Right": 0
+      },
+      "nullable": [
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false
+      ]
     }
   },
   "ef828549a221fe6fad3105fede0b38a439a685d6ea7f83a0657df9cdbb80c589": {
