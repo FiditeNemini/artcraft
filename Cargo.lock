@@ -1957,6 +1957,12 @@ dependencies = [
 ]
 
 [[package]]
+name = "lru_time_cache"
+version = "0.11.11"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "9106e1d747ffd48e6be5bb2d97fa706ed25b144fbee4d5c02eae110cd8d6badd"
+
+[[package]]
 name = "magic-crypt"
 version = "3.1.8"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3369,6 +3375,7 @@ dependencies = [
  "lfu",
  "limitation",
  "log",
+ "lru_time_cache",
  "magic-crypt",
  "md-5",
  "newrelic-telemetry",

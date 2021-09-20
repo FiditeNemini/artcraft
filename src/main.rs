@@ -101,6 +101,7 @@ use crate::shared_constants::DEFAULT_RUST_LOG;
 use crate::threads::ip_banlist_set::IpBanlistSet;
 use crate::threads::poll_ip_banlist_thread::poll_ip_bans;
 use crate::util::buckets::bucket_client::BucketClient;
+use crate::util::caching::single_item_ttl_cache::SingleItemTtlCache;
 use crate::util::encrypted_sort_id::SortKeyCrypto;
 use futures::Future;
 use futures::executor::ThreadPool;
@@ -245,6 +246,10 @@ async fn main() -> AnyhowResult<()> {
     None,
   )?;
 
+  // In-Memory Cache
+  let cache_ttl = Duration::from_secs(60);
+  let voice_list_cache = SingleItemTtlCache::create_with_duration(cache_ttl);
+
   // NB: This secret really isn't too important.
   // We can even rotate it without too much impact to users.
   let sort_key_crypto_secret =
@@ -287,6 +292,7 @@ async fn main() -> AnyhowResult<()> {
     audio_uploads_bucket_root,
     sort_key_crypto,
     ip_banlist,
+    voice_list_cache,
   };
 
   serve(server_state)

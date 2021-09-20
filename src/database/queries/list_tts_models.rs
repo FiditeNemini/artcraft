@@ -15,6 +15,7 @@ pub struct TtsModelRecordForList {
   pub creator_user_token: String,
   pub creator_username: String,
   pub creator_display_name: String,
+  pub creator_gravatar_hash: String,
 
   pub is_locked_from_use: bool, // converted
 
@@ -31,6 +32,7 @@ struct RawTtsModelRecordForList {
   pub creator_user_token: String,
   pub creator_username: String,
   pub creator_display_name: String,
+  pub creator_gravatar_hash: String,
 
   pub is_locked_from_use: i8, // NB: needs conversion
 
@@ -56,13 +58,8 @@ pub async fn list_tts_models(
   };
 
   let models : Vec<RawTtsModelRecordForList> = match maybe_models {
-    Ok(models) => {
-      info!("Model length: {}", models.len());
-      models
-    },
+    Ok(models) => models,
     Err(err) => {
-      warn!("Error: {:?}", err);
-
       match err {
         RowNotFound => {
           return Ok(Vec::new());
@@ -83,6 +80,7 @@ pub async fn list_tts_models(
         creator_user_token: model.creator_user_token.clone(),
         creator_username: model.creator_username.clone(),
         creator_display_name: model.creator_display_name.clone(),
+        creator_gravatar_hash: model.creator_gravatar_hash.clone(),
         title: model.title.clone(),
         is_locked_from_use: i8_to_bool(model.is_locked_from_use),
         created_at: model.created_at.clone(),
@@ -109,6 +107,7 @@ SELECT
     tts.creator_user_token,
     users.username as creator_username,
     users.display_name as creator_display_name,
+    users.email_gravatar_hash as creator_gravatar_hash,
     tts.title,
     tts.is_locked_from_use,
     tts.created_at,
@@ -134,6 +133,7 @@ SELECT
     tts.creator_user_token,
     users.username as creator_username,
     users.display_name as creator_display_name,
+    users.email_gravatar_hash as creator_gravatar_hash,
     tts.title,
     tts.is_locked_from_use,
     tts.created_at,
@@ -170,6 +170,7 @@ SELECT
     tts.creator_user_token,
     users.username as creator_username,
     users.display_name as creator_display_name,
+    users.email_gravatar_hash as creator_gravatar_hash,
     tts.title,
     tts.is_locked_from_use,
     tts.created_at,
@@ -198,6 +199,7 @@ SELECT
     tts.creator_user_token,
     users.username as creator_username,
     users.display_name as creator_display_name,
+    users.email_gravatar_hash as creator_gravatar_hash,
     tts.title,
     tts.is_locked_from_use,
     tts.created_at,

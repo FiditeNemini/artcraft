@@ -6,12 +6,13 @@ use actix_web::error::ResponseError;
 use actix_web::http::StatusCode;
 use actix_web::{Responder, web, HttpResponse, error, HttpRequest, HttpMessage};
 use chrono::{DateTime, Utc};
-use crate::AnyhowResult;
+use crate::database::queries::list_tts_models::list_tts_models;
 use crate::http_server::web_utils::ip_address::get_request_ip;
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 use crate::server_state::ServerState;
+use crate::util::anyhow_result::AnyhowResult;
 use derive_more::{Display, Error};
-use log::{info, warn, log};
+use log::{info, warn, log, error};
 use regex::Regex;
 use sqlx::MySqlPool;
 use sqlx::error::DatabaseError;
@@ -19,7 +20,7 @@ use sqlx::error::Error::Database;
 use sqlx::mysql::MySqlDatabaseError;
 use std::sync::Arc;
 
-#[derive(Serialize)]
+#[derive(Serialize, Clone)]
 pub struct TtsModelRecordForResponse {
   pub model_token: String,
   pub tts_model_type: String,
@@ -76,68 +77,38 @@ pub async fn list_tts_models_handler(
   http_request: HttpRequest,
   server_state: web::Data<Arc<ServerState>>) -> Result<HttpResponse, ListTtsModelsError>
 {
-  // NB: Lookup failure is Err(RowNotFound).
-  // NB: Since this is publicly exposed, we don't query sensitive data.
-  let maybe_models = sqlx::query_as!(
-      TtsModelRecord,
-        r#"
-SELECT
-    tts.token as model_token,
-    tts.tts_model_type,
-    tts.creator_user_token,
-    users.username as creator_username,
-    users.display_name as creator_display_name,
-    users.email_gravatar_hash as creator_gravatar_hash,
-    tts.title,
-    tts.created_at,
-    tts.updated_at
-FROM tts_models as tts
-JOIN users
-    ON users.token = tts.creator_user_token
-WHERE
-    tts.user_deleted_at IS NULL
-    AND tts.mod_deleted_at IS NULL
-        "#,
-    )
-    .fetch_all(&server_state.mysql_pool)
-    .await; // TODO: This will return error if it doesn't exist
+  let maybe_models = server_state.voice_list_cache.copy_without_bump_if_unexpired()
+      .map_err(|e| {
+        error!("Error consulting cache: {:?}", e);
+        ListTtsModelsError::ServerError
+      })?;
 
-  let mut models : Vec<TtsModelRecord> = match maybe_models {
-    Ok(models) => models,
-    Err(err) => {
-      match err {
-        RowNotFound => {
-          return Err(ListTtsModelsError::ServerError);
-        },
-        _ => {
-          warn!("tts models list query error: {:?}", err);
-          return Err(ListTtsModelsError::ServerError);
-        }
-      }
-    }
+  let models = match maybe_models {
+    Some(models) => {
+      info!("Serving TTS models from cache");
+      models
+    },
+    None => {
+      info!("Populating TTS models from database");
+      let models = get_all_models(&server_state.mysql_pool)
+          .await
+          .map_err(|e| {
+            error!("Error querying database: {:?}", e);
+            ListTtsModelsError::ServerError
+          })?;
+
+      server_state.voice_list_cache.store_copy(&models)
+          .map_err(|e| {
+            error!("Error storing cache: {:?}", e);
+            ListTtsModelsError::ServerError
+          })?;
+      models
+    },
   };
-
-  models.sort_by(|a, b| (&a.title).cmp(&b.title));
-
-  let models_for_response = models.into_iter()
-    .map(|model| {
-      TtsModelRecordForResponse {
-        model_token: model.model_token.clone(),
-        tts_model_type: model.tts_model_type.clone(),
-        creator_user_token: model.creator_user_token.clone(),
-        creator_username: model.creator_username.clone(),
-        creator_display_name: model.creator_display_name.clone(),
-        creator_gravatar_hash: model.creator_gravatar_hash.clone(),
-        title: model.title.clone(),
-        created_at: model.created_at.clone(),
-        updated_at: model.updated_at.clone(),
-      }
-    })
-    .collect::<Vec<TtsModelRecordForResponse>>();
 
   let response = ListTtsModelsSuccessResponse {
     success: true,
-    models: models_for_response,
+    models,
   };
 
   let body = serde_json::to_string(&response)
@@ -146,4 +117,32 @@ WHERE
   Ok(HttpResponse::Ok()
     .content_type("application/json")
     .body(body))
+}
+
+async fn get_all_models(mysql_pool: &MySqlPool) -> AnyhowResult<Vec<TtsModelRecordForResponse>> {
+  let mut models = list_tts_models(
+    mysql_pool,
+    None,
+    false
+  ).await?;
+
+  models.sort_by(|a, b| (&a.title).cmp(&b.title));
+
+  let models_for_response = models.into_iter()
+      .map(|model| {
+        TtsModelRecordForResponse {
+          model_token: model.model_token.clone(),
+          tts_model_type: model.tts_model_type.clone(),
+          creator_user_token: model.creator_user_token.clone(),
+          creator_username: model.creator_username.clone(),
+          creator_display_name: model.creator_display_name.clone(),
+          creator_gravatar_hash: model.creator_gravatar_hash.clone(),
+          title: model.title.clone(),
+          created_at: model.created_at.clone(),
+          updated_at: model.updated_at.clone(),
+        }
+      })
+      .collect::<Vec<TtsModelRecordForResponse>>();
+
+  Ok(models_for_response)
 }
