@@ -73,11 +73,10 @@ function SessionTtsInferenceResultListFc(props: Props) {
   return (
     <div>
       {title}
-      <div className="notification is-error is-light">
-        <strong>Currently broken / slow</strong> 
+      <div className="notification is-info is-light">
+        <strong>Working on speeding this up</strong> 
         <p>
-          I'll have this fixed by September 22nd, evening (Eastern time). Dealing with work and real life issues.
-          I know what the bug is. 
+          Sorry this is slow. I'm scaling the cluster and fixing the caching strategy.
         </p>
       </div>
       <br />
