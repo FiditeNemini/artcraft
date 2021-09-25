@@ -12,21 +12,28 @@ name = "twitch-tts-desktop-client"
 path = "src/main.rs"
 
 [dependencies]
-anyhow = "1.0.38"
-log = "0.4.14"
-prost = "0.7.0"
-rustls = "0.18"
-serde = "1.0.123"
-serde_derive = "1.0.123"
+# Async runtime
 tokio = { version = "0.2", features = ["full"] }
+
+# Crypto
+rustls = "0.18"
+
+# Serialization
+serde = "1.0.130"
+serde_derive = "1.0.130"
 toml = "0.5.8"
 
+# Twitch
+# (This is a fairly mature and robust Twitch chat library)
+twitchchat = { version = "0.14.8", features = ["tokio", "tokio-util", "async", "webpki-roots", "tokio-rustls"] }
 # Twitch Helix etc. API, but no PubSub just yet
 #twitch_api2 = "0.4.1"
 #twitch_oauth2 = "0.4.1"
 
-# Fairly mature and robust Twitch chat library
-twitchchat = { version = "0.14.8", features = ["tokio", "tokio-util", "async", "webpki-roots", "tokio-rustls"] }
+# Utils
+anyhow = "1.0.44"
+easyenv = "0.0.6"
+log = "0.4.14"
 
 #[build-dependencies]
 
