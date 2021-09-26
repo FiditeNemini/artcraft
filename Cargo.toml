@@ -12,12 +12,18 @@ name = "twitch-tts-desktop-client"
 path = "src/main.rs"
 
 [dependencies]
-# Async runtime
-#tokio = { version = "0.2", features = ["full"] }
+# Async runtime, Futures, etc.
+tokio = { version = "1.10.0", features = ["rt-multi-thread", "macros"] }
+futures-util = "0.3.17"
 
 # Crypto
-rustls = "0.18"
-tokio-tungstenite = { version = "0.15.0", features = ["rustls"] }
+rustls = "0.20.0-beta2"
+
+# Websockets
+tokio-tungstenite = { version = "0.15.0", features = ["rustls", "rustls-tls"] }
+
+# HTTP
+reqwest = { version = "0.11.4" }
 
 # Serialization
 serde = "1.0.130"
@@ -35,9 +41,6 @@ toml = "0.5.8"
 # NB "unsupported" pubsub features may disappear from the Twitch API at any time. It's an unofficial API.
 twitch_api2 = { version = "0.6.0-rc.2", features = ["helix", "reqwest_client", "pubsub", "chrono", "unsupported"] }
 twitch_oauth2 = "0.6.0-rc.2"
-reqwest = { version = "0.11.4" }
-tokio = { version = "1.10.0", features = ["rt-multi-thread", "macros"] }
-futures-util = "0.3.17"
 
 # Utils
 anyhow = "1.0.44"

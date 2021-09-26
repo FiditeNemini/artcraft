@@ -10,10 +10,7 @@ use twitch_api2::pubsub;
 use twitch_oauth2::{AppAccessToken, Scope, TwitchToken, tokens::errors::AppAccessTokenError, ClientId, ClientSecret};
 use twitch_api2::pubsub::Topic;
 
-use tokio_tungstenite::{
-  connect_async,
-  tungstenite::{Error as TungsteniteError, Result as TungsteniteResult},
-};
+use tokio_tungstenite::{connect_async, tungstenite::{Error as TungsteniteError, Result as TungsteniteResult}, connect_async_with_config};
 use reqwest::Url;
 
 pub mod twitch;
@@ -39,7 +36,7 @@ fn main() -> AnyhowResult<()> {
 async fn run() -> AnyhowResult<()> {
   let secrets = TwitchSecrets::from_file("secrets.toml")?;
 
-  let client_id = ClientId::new(&secrets.app_client_id);
+  /*let client_id = ClientId::new(&secrets.app_client_id);
   let client_secret = ClientSecret::new(&secrets.app_client_secret);
 
   let client: TwitchClient<reqwest::Client> = TwitchClient::default();
@@ -58,7 +55,7 @@ async fn run() -> AnyhowResult<()> {
   println!(
     "{:?}",
     &client.helix.req_get(req, &token).await?.data.unwrap().title
-  );
+  );*/
 
 
   // Want this:
@@ -75,7 +72,7 @@ async fn run() -> AnyhowResult<()> {
       .into_topic();*/
 
   // Listen to follows as well
-  let follows = pubsub::following::Following { channel_id: 1234 }.into_topic();
+  /*let follows = pubsub::following::Following { channel_id: 1234 }.into_topic();
   let topics = [follows];
   // Create the topic command to send to twitch
   let command = pubsub::listen_command(
@@ -84,7 +81,7 @@ async fn run() -> AnyhowResult<()> {
     "random nonce string",
   )?;
 
-  println!("Pubsub command: {:?}", command);
+  println!("Pubsub command: {:?}", command);*/
 
   // Send the message with your favorite websocket client
   //send_command(command).unwrap();
@@ -93,6 +90,10 @@ async fn run() -> AnyhowResult<()> {
   let url = Url::parse("wss://pubsub-edge.twitch.tv")?;
 
   println!("Connecting...");
+
+  if let Err(e) = connect_async(&url).await {
+    println!("Error connecting: {:?}", e);
+  }
 
   let (mut socket, _response) =
       connect_async(url).await?;
