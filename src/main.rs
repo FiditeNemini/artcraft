@@ -1,3 +1,7 @@
+#![allow(unused_imports)]
+#![allow(dead_code)]
+
+
 extern crate twitch_api2;
 use futures_util::{SinkExt, StreamExt};
 extern crate reqwest;
@@ -88,25 +92,14 @@ async fn run() -> AnyhowResult<()> {
   //send_command(command).unwrap();
   // To parse the websocket messages, use pubsub::Response::parse
 
-  let url = Url::parse("wss://pubsub-edge.twitch.tv")?;
-
-  println!("Connecting...");
-
-  /*if let Err(e) = connect_async(&url).await {
-    println!("Error connecting: {:?}", e);
-  }
-
-  let (mut socket, _response) =
-      connect_async(url).await?;
-
-  println!("Connected!");
-
-  let msg = socket.next().await.expect("Can't fetch case count")?;
-  socket.close(None).await?;*/
 
   println!("Connected");
   let mut ws_client = TwitchWebsocketClient::new()?;
   ws_client.connect().await?;
+
+  ws_client.send_ping().await?;
+
+  println!("success ping");
 
   //let text = msg.into_text()?;
   //println!("Text: {}", text);
