@@ -16,7 +16,8 @@ use twitch_api2::pubsub::Topic;
 
 use tokio_tungstenite::{connect_async, tungstenite::{Error as TungsteniteError, Result as TungsteniteResult}, connect_async_with_config};
 use reqwest::Url;
-use crate::twitch::websocket_client::TwitchWebsocketClient;
+use crate::twitch::websocket_client::{TwitchWebsocketClient, PollingTwitchWebsocketClient};
+use std::time::Duration;
 
 pub mod twitch;
 pub mod util;
@@ -93,13 +94,24 @@ async fn run() -> AnyhowResult<()> {
   // To parse the websocket messages, use pubsub::Response::parse
 
 
-  println!("Connected");
+  /*println!("Connected");
   let mut ws_client = TwitchWebsocketClient::new()?;
   ws_client.connect().await?;
 
   ws_client.send_ping().await?;
 
-  println!("success ping");
+  println!("success ping");*/
+
+  let mut client = PollingTwitchWebsocketClient::new()?;
+
+  println!("Connecting...");
+  client.connect().await?;
+  println!("Connected");
+
+  println!("Starting polling thread...");
+  client.polling_thread().await;
+
+  std::thread::sleep(Duration::from_millis(30000));
 
   //let text = msg.into_text()?;
   //println!("Text: {}", text);
