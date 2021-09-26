@@ -1,4 +1,4 @@
-use crate::twitch::secrets::TwitchSecrets;
+/*use crate::twitch::secrets::TwitchSecrets;
 use crate::util::anyhow_result::AnyhowResult;
 use log::debug;
 use log::info;
@@ -9,7 +9,7 @@ use twitchchat::messages::Join;
 use twitchchat::messages::Privmsg;
 use twitchchat::{AsyncRunner, Status, UserConfig};
 
-pub struct TwitchClient {
+pub struct TwitchClient2 {
   secrets: TwitchSecrets,
   channels_to_join: Vec<String>,
 
@@ -19,7 +19,7 @@ pub struct TwitchClient {
   runner: Option<AsyncRunner>,
 }
 
-impl TwitchClient {
+impl TwitchClient2 {
 
   pub fn new(secrets: &TwitchSecrets) -> Self
   {
@@ -169,3 +169,4 @@ pub fn get_user_config(twitch_secrets: &TwitchSecrets) -> AnyhowResult<UserConfi
       .build()?;
   Ok(config)
 }
+*/

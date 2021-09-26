@@ -13,7 +13,7 @@ path = "src/main.rs"
 
 [dependencies]
 # Async runtime
-tokio = { version = "0.2", features = ["full"] }
+#tokio = { version = "0.2", features = ["full"] }
 
 # Crypto
 rustls = "0.18"
@@ -25,10 +25,17 @@ toml = "0.5.8"
 
 # Twitch
 # (This is a fairly mature and robust Twitch chat library)
-twitchchat = { version = "0.14.8", features = ["tokio", "tokio-util", "async", "webpki-roots", "tokio-rustls"] }
+#twitchchat = { version = "0.14.8", features = ["tokio", "tokio-util", "async", "webpki-roots", "tokio-rustls"] }
 # Twitch Helix etc. API, but no PubSub just yet
 #twitch_api2 = "0.4.1"
 #twitch_oauth2 = "0.4.1"
+#twitch_api2 = "0.5.0"
+#twitch_oauth2 = "0.5.0"
+twitch_api2 = { version = "0.6.0-rc.2", features = ["helix", "reqwest_client"] }
+twitch_oauth2 = "0.6.0-rc.2"
+reqwest = { version = "0.11.4" }
+tokio = { version = "1.10.0", features = ["rt-multi-thread", "macros"] }
+
 
 # Utils
 anyhow = "1.0.44"
