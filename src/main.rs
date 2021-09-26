@@ -1,11 +1,20 @@
 extern crate twitch_api2;
+use futures_util::{SinkExt, StreamExt};
 extern crate reqwest;
 
+use crate::twitch::secrets::TwitchSecrets;
 use crate::util::anyhow_result::AnyhowResult;
 use twitch_api2::TwitchClient;
 use twitch_api2::helix::channels::GetChannelInformationRequest;
+use twitch_api2::pubsub;
 use twitch_oauth2::{AppAccessToken, Scope, TwitchToken, tokens::errors::AppAccessTokenError, ClientId, ClientSecret};
-use crate::twitch::secrets::TwitchSecrets;
+use twitch_api2::pubsub::Topic;
+
+use tokio_tungstenite::{
+  connect_async,
+  tungstenite::{Error as TungsteniteError, Result as TungsteniteResult},
+};
+use reqwest::Url;
 
 pub mod twitch;
 pub mod util;
@@ -51,5 +60,61 @@ async fn run() -> AnyhowResult<()> {
     &client.helix.req_get(req, &token).await?.data.unwrap().title
   );
 
+
+  // Want this:
+  // twitch_api2::pubsub::channel_bits::BitsEventData
+
+
+
+  /*// We want to subscribe to moderator actions on channel with id 1234
+  // as if we were a user with id 4321 that is moderator on the channel.
+  let chat_mod_actions = pubsub::moderation::ChatModeratorActions {
+    user_id: 4321,
+    channel_id: 1234,
+  }
+      .into_topic();*/
+
+  // Listen to follows as well
+  let follows = pubsub::following::Following { channel_id: 1234 }.into_topic();
+  let topics = [follows];
+  // Create the topic command to send to twitch
+  let command = pubsub::listen_command(
+    &topics,
+    "authtoken",
+    "random nonce string",
+  )?;
+
+  println!("Pubsub command: {:?}", command);
+
+  // Send the message with your favorite websocket client
+  //send_command(command).unwrap();
+  // To parse the websocket messages, use pubsub::Response::parse
+
+  let url = Url::parse("wss://pubsub-edge.twitch.tv")?;
+
+  println!("Connecting...");
+
+  let (mut socket, _response) =
+      connect_async(url).await?;
+
+  println!("Connected!");
+
+  let msg = socket.next().await.expect("Can't fetch case count")?;
+  socket.close(None).await?;
+
+  let text = msg.into_text()?;
+  println!("Text: {}", text);
+
   Ok(())
+}
+
+
+async fn get_case_count() -> TungsteniteResult<u32> {
+  let (mut socket, _) = connect_async(
+    Url::parse("ws://localhost:9001/getCaseCount").expect("Can't connect to case count URL"),
+  )
+      .await?;
+  let msg = socket.next().await.expect("Can't fetch case count")?;
+  socket.close(None).await?;
+  Ok(msg.into_text()?.parse::<u32>().expect("Can't parse case count"))
 }
