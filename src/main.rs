@@ -5,6 +5,7 @@ use crate::util::anyhow_result::AnyhowResult;
 use twitch_api2::TwitchClient;
 use twitch_api2::helix::channels::GetChannelInformationRequest;
 use twitch_oauth2::{AppAccessToken, Scope, TwitchToken, tokens::errors::AppAccessTokenError, ClientId, ClientSecret};
+use crate::twitch::secrets::TwitchSecrets;
 
 pub mod twitch;
 pub mod util;
@@ -27,11 +28,10 @@ fn main() -> AnyhowResult<()> {
 
 #[tokio::main]
 async fn run() -> AnyhowResult<()> {
-  let client_id = "".to_string();
-  let client_secret = "".to_string();
+  let secrets = TwitchSecrets::from_file("secrets.toml")?;
 
-  let client_id = ClientId::new(client_id);
-  let client_secret = ClientSecret::new(client_secret);
+  let client_id = ClientId::new(&secrets.app_client_id);
+  let client_secret = ClientSecret::new(&secrets.app_client_secret);
 
   let client: TwitchClient<reqwest::Client> = TwitchClient::default();
   let token = AppAccessToken::get_app_access_token(
@@ -42,7 +42,8 @@ async fn run() -> AnyhowResult<()> {
   ).await?;
 
   let req = GetChannelInformationRequest::builder()
-      .broadcaster_id("27620241")
+      //.broadcaster_id("27620241")
+      .broadcaster_id("650154491")
       .build();
 
   println!(
