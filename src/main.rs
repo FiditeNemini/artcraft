@@ -12,6 +12,7 @@ use twitch_api2::pubsub::Topic;
 
 use tokio_tungstenite::{connect_async, tungstenite::{Error as TungsteniteError, Result as TungsteniteResult}, connect_async_with_config};
 use reqwest::Url;
+use crate::twitch::websocket_client::TwitchWebsocketClient;
 
 pub mod twitch;
 pub mod util;
@@ -91,7 +92,7 @@ async fn run() -> AnyhowResult<()> {
 
   println!("Connecting...");
 
-  if let Err(e) = connect_async(&url).await {
+  /*if let Err(e) = connect_async(&url).await {
     println!("Error connecting: {:?}", e);
   }
 
@@ -101,10 +102,14 @@ async fn run() -> AnyhowResult<()> {
   println!("Connected!");
 
   let msg = socket.next().await.expect("Can't fetch case count")?;
-  socket.close(None).await?;
+  socket.close(None).await?;*/
 
-  let text = msg.into_text()?;
-  println!("Text: {}", text);
+  println!("Connected");
+  let mut ws_client = TwitchWebsocketClient::new()?;
+  ws_client.connect().await?;
+
+  //let text = msg.into_text()?;
+  //println!("Text: {}", text);
 
   Ok(())
 }
