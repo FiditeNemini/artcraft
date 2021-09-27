@@ -48,5 +48,8 @@ easyenv = "0.0.6"
 log = "0.4.14"
 rand = "0.8.4"
 
+# Temporary
+rpassword = "5.0.1"
+
 #[build-dependencies]
 

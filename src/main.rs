@@ -67,7 +67,8 @@ async fn run() -> AnyhowResult<()> {
 
   info!("Getting user id ...");
 
-  let user_id = twitch_client.get_user_id_from_username("testytest512").await?;
+  //let user_id = twitch_client.get_user_id_from_username("testytest512").await?;
+  let user_id = twitch_client.get_user_id_from_username("vocodes").await?;
 
   info!("User ID: {}", user_id);
 
@@ -112,22 +113,69 @@ async fn run() -> AnyhowResult<()> {
   let r = client.try_next().await?;
   println!("Result: {:?}", r);
 
+  let input = rpassword::prompt_password_stdout(
+    "Paste in the resulting adress after authenticating (input hidden): ",
+  )?;
 
-  let bit_topic = pubsub::channel_bits::ChannelBitsEventsV2 {
-    channel_id: TEST_CHANNEL_ID,
-  }.into_topic();
+
+  let u = twitch_oauth2::url::Url::parse(&input)?;
+
+  let map: std::collections::HashMap<_, _> = u.query_pairs().collect();
+
+  let user_token = match (map.get("state"), map.get("code")) {
+    (Some(state), Some(code)) => {
+      let token = builder
+          .get_user_token(
+            &reqwest::Client::builder()
+                .redirect(reqwest::redirect::Policy::none())
+                .build()?,
+            state,
+            code,
+          )
+          .await?;
+      println!("Got token: {:?}", token);
+
+      token
+    }
+    _ => match (map.get("error"), map.get("error_description")) {
+      (std::option::Option::Some(error), std::option::Option::Some(error_description)) => {
+        anyhow::bail!(
+                    "twitch errored with error: {} - {}",
+                    error,
+                    error_description
+                );
+      }
+      _ => anyhow::bail!("invalid url passed"),
+    },
+  };
+
+  let auth_token = user_token.access_token.as_str();
 
   println!("Begin LISTEN...");
-  //let auth_token = access_token.access_token.as_str();
-  let auth_token = "";
+
+  let bit_topic = pubsub::channel_bits::ChannelBitsEventsV2 {
+    channel_id: user_id,
+  }.into_topic();
+
   let topics = [bit_topic];
 
-  client.listen(auth_token, &topics).await?;
-
+  client.listen(&auth_token, &topics).await?;
 
   println!("Try read next...");
   let r = client.try_next().await?;
   println!("Result: {:?}", r);
+
+  /*
+  Result: Some(Message { data: ChannelBitsEventsV2 { topic: ChannelBitsEventsV2 {
+  channel_id: 652567283 }, reply: BitsEvent { data: BitsEventData { badge_entitlement:
+  Some(BadgeEntitlement { new_version: 100, previous_version: 1 }), bits_used: 100,
+  channel_id: "652567283", channel_name: "vocodes", chat_message: "Cheer100 testing the cheer",
+  context: Cheer, is_anonymous: false, time: "2021-09-27T04:30:53.627717085Z",
+  total_bits_used: 101, user_id: "650154491", user_name: "testytest512" },
+  message_id: "793f745e-8f3e-5f71-bc41-4808c4b49a53", version: "1.0", is_anonymous: false } } })
+   */
+
+
 
   println!("Try read next...");
   let r = client.try_next().await?;

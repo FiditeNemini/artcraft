@@ -887,6 +887,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "rpassword"
+version = "5.0.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "ffc936cf8a7ea60c58f030fd36a612a48f440610214dc54bc36431f9ea0c3efb"
+dependencies = [
+ "libc",
+ "winapi",
+]
+
+[[package]]
 name = "rustls"
 version = "0.19.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1302,6 +1312,7 @@ dependencies = [
  "log",
  "rand",
  "reqwest",
+ "rpassword",
  "rustls 0.20.0-beta2",
  "serde",
  "serde_derive",

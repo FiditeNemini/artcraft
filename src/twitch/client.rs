@@ -44,7 +44,7 @@ impl <'a> TwitchClientWrapper <'a> {
   }
 
   /// We frequently need to look up IDs from usernames.
-  pub async fn get_user_id_from_username(&self, username: &str) -> AnyhowResult<u64> {
+  pub async fn get_user_id_from_username(&self, username: &str) -> AnyhowResult<u32> {
     let access_token = match self.access_token {
       None => return Err(anyhow!("no access token has been granted")),
       Some(ref token) => token,
@@ -59,7 +59,7 @@ impl <'a> TwitchClientWrapper <'a> {
 
     match response.data.get(0) {
       None => Err(anyhow!("No such user: `{}`.", username)),
-      Some(user) => Ok(user.id.as_str().parse::<u64>()?),
+      Some(user) => Ok(user.id.as_str().parse::<u32>()?),
     }
   }
 }
