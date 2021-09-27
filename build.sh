@@ -2,6 +2,9 @@
 
 set -euxo pipefail
 
+# NB: Temporary for migration
+ln -s vocodes/ fakeyou/
+
 pushd vocodes/
 
 npm install
