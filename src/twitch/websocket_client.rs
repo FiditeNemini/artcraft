@@ -36,13 +36,6 @@ impl PollingTwitchWebsocketClient {
     })
   }
 
-  async fn connect_keepalive(&self) -> AnyhowResult<()> {
-
-    //tokio::spawn(self.polling_thread);
-
-    Ok(())
-  }
-
   pub async fn connect(&mut self) -> AnyhowResult<()> {
     match self.client.lock() {
       Err(e) => Err(anyhow!("unlock client err: {:?}", e)),
@@ -61,6 +54,15 @@ impl PollingTwitchWebsocketClient {
     }
   }
 
+  pub async fn send_ping(&mut self) -> AnyhowResult<()> {
+    match self.client.lock() {
+      Err(e) => Err(anyhow!("unlock client err: {:?}", e)),
+      Ok(mut client) => {
+        client.send_ping().await
+      }
+    }
+  }
+
   /// Start a pinging background thread.
   /// Per Twitch PubSub docs,
   ///   To keep the server from closing the connection, clients must send a PING command
@@ -72,7 +74,8 @@ impl PollingTwitchWebsocketClient {
       loop {
         match client.lock() {
           Ok(mut c) => {
-            c.send_ping();
+            // TODO: Future isn't Send
+            //let _r = c.send_ping().await;
             // TODO: Need to read from all call sites due to ordering.
             //c.read_response();
           }

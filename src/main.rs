@@ -65,26 +65,31 @@ async fn run() -> AnyhowResult<()> {
   let mut twitch_client = TwitchClientWrapper::new(client_id.clone(), client_secret.clone());
   twitch_client.request_access_token(scopes).await?;
 
-  let user_id = twitch_client.get_user_id_from_username("echelon").await?;
-  println!("user id: {:?}", user_id);
+  info!("Getting user id ...");
 
-  std::thread::sleep(Duration::from_secs(5000));
+  let user_id = twitch_client.get_user_id_from_username("testytest512").await?;
+
+  info!("User ID: {}", user_id);
+
+  //std::thread::sleep(Duration::from_secs(5000));
 
 
   // ==================== OAUTH FLOW ====================
 
+  println!("Oauth flow...");
 
   let redirect_url = twitch_oauth2::url::Url::parse("http://localhost/test")?;
   let mut builder = UserTokenBuilder::new(client_id, client_secret, redirect_url)
+      .set_scopes(Scope::all())
       .force_verify(true);
 
-  builder.add_scope(Scope::BitsRead);
+  //builder.add_scope(Scope::BitsRead);
 
   let (url, _csrf_token) = builder.generate_url();
 
   println!("Go to this page: {}", url);
 
-  //std::thread::sleep(Duration::from_secs(30));
+  //std::thread::sleep(Duration::from_secs(3000));
 
 
   // ==================== PUBSUB SUBSCRIPTION AND MAIN LOOP ====================
@@ -96,36 +101,29 @@ async fn run() -> AnyhowResult<()> {
 
   println!("Connected");
 
-  println!("Starting polling thread...");
-  client.start_ping_thread().await;
+  //println!("Starting polling thread...");
+  //client.start_ping_thread().await;
 
+  println!("Sending PING...");
+
+  client.send_ping().await?;
+
+  println!("Try read next...");
+  let r = client.try_next().await?;
+  println!("Result: {:?}", r);
 
 
   let bit_topic = pubsub::channel_bits::ChannelBitsEventsV2 {
     channel_id: TEST_CHANNEL_ID,
   }.into_topic();
 
-  // We want to subscribe to moderator actions on channel with id 1234
-  // as if we were a user with id 4321 that is moderator on the channel.
-  let chat_mod_actions = pubsub::moderation::ChatModeratorActions {
-    user_id: 4321,
-    channel_id: 1234,
-  }.into_topic();
-
-  // Listen to follows as well
-  let follows = pubsub::following::Following { channel_id: 1234 }.into_topic();
-
   println!("Begin LISTEN...");
   //let auth_token = access_token.access_token.as_str();
-  //let auth_token = "";
   let auth_token = "";
   let topics = [bit_topic];
 
-  client.listen(auth_token, &topics).await;
+  client.listen(auth_token, &topics).await?;
 
-  println!("Try read next...");
-  let r = client.try_next().await?;
-  println!("Result: {:?}", r);
 
   println!("Try read next...");
   let r = client.try_next().await?;
@@ -215,6 +213,19 @@ ws_client.connect().await?;
 ws_client.send_ping().await?;
 
 println!("success ping");*/
+
+/*
+
+  // We want to subscribe to moderator actions on channel with id 1234
+  // as if we were a user with id 4321 that is moderator on the channel.
+  let chat_mod_actions = pubsub::moderation::ChatModeratorActions {
+    user_id: 4321,
+    channel_id: 1234,
+  }.into_topic();
+
+  // Listen to follows as well
+  let follows = pubsub::following::Following { channel_id: 1234 }.into_topic();
+ */
 
 //match UserToken::from_existing(reqwest_http_client, token, None, None).await {
 //  Ok(t) => println!("user_token: {}", t.token().secret()),
