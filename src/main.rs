@@ -22,6 +22,8 @@ pub mod util;
 
 const DEFAULT_LOG : &'static str = "debug,rustls=warn,tungstenite=warn";
 
+const TEST_CHANNEL_ID : u32 = 650154491; // Test channel
+
 fn main() -> AnyhowResult<()> {
   easyenv::init_all_with_default_logging(Some(DEFAULT_LOG));
 
@@ -113,6 +115,40 @@ async fn run() -> AnyhowResult<()> {
   println!("Starting polling thread...");
   client.start_ping_thread().await;
 
+  //match UserToken::from_existing(reqwest_http_client, token, None, None).await {
+  //  Ok(t) => println!("user_token: {}", t.token().secret()),
+  //  Err(e) => panic!("got error: {}", e),
+  //}
+
+  let client_id = ClientId::new(&secrets.app_client_id);
+  let client_secret = ClientSecret::new(&secrets.app_client_secret);
+
+  let http_client = reqwest::Client::new();
+
+  let scopes = vec![
+    Scope::BitsRead,
+  ];
+
+  let scopes = Scope::all();
+
+  info!("Getting access token...");
+
+  let access_token = twitch_oauth2::AppAccessToken::get_app_access_token(
+    &http_client,
+    client_id,
+    client_secret,
+    scopes,
+  ).await?;
+
+  info!("Access token obtained.");
+
+  println!("Access Token Outer: {:?}", access_token);
+  let token = access_token.token();
+  println!("Access Token Inner: {:?}", token.as_str());
+
+  let bit_topic = pubsub::channel_bits::ChannelBitsEventsV2 {
+    channel_id: TEST_CHANNEL_ID,
+  }.into_topic();
 
   // We want to subscribe to moderator actions on channel with id 1234
   // as if we were a user with id 4321 that is moderator on the channel.
@@ -124,8 +160,13 @@ async fn run() -> AnyhowResult<()> {
   // Listen to follows as well
   let follows = pubsub::following::Following { channel_id: 1234 }.into_topic();
 
+
+
   println!("Begin LISTEN...");
-  client.listen("auth_token", &[chat_mod_actions, follows]).await;
+  let auth_token = access_token.access_token.as_str();
+  let topics = [bit_topic];
+
+  client.listen(auth_token, &topics).await;
 
 
   println!("Try read next...");
