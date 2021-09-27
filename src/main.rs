@@ -1,29 +1,31 @@
+// TODO: These are temporary -
 #![allow(unused_imports)]
+#![allow(unused_mut)]
 #![allow(dead_code)]
 
-
-extern crate twitch_api2;
-use futures_util::{SinkExt, StreamExt};
-extern crate reqwest;
-
 use crate::twitch::secrets::TwitchSecrets;
+use crate::twitch::websocket_client::{TwitchWebsocketClient, PollingTwitchWebsocketClient};
 use crate::util::anyhow_result::AnyhowResult;
+use futures_util::{SinkExt, StreamExt};
+use log::info;
+use reqwest::Url;
+use std::time::Duration;
+use tokio_tungstenite::{connect_async, tungstenite::{Error as TungsteniteError, Result as TungsteniteResult}, connect_async_with_config};
 use twitch_api2::TwitchClient;
 use twitch_api2::helix::channels::GetChannelInformationRequest;
+use twitch_api2::pubsub::Topic;
 use twitch_api2::pubsub;
 use twitch_oauth2::{AppAccessToken, Scope, TwitchToken, tokens::errors::AppAccessTokenError, ClientId, ClientSecret};
-use twitch_api2::pubsub::Topic;
-
-use tokio_tungstenite::{connect_async, tungstenite::{Error as TungsteniteError, Result as TungsteniteResult}, connect_async_with_config};
-use reqwest::Url;
-use crate::twitch::websocket_client::{TwitchWebsocketClient, PollingTwitchWebsocketClient};
-use std::time::Duration;
 
 pub mod twitch;
 pub mod util;
 
+const DEFAULT_LOG : &'static str = "debug,rustls=warn,tungstenite=warn";
+
 fn main() -> AnyhowResult<()> {
-  println!("Hello World");
+  easyenv::init_all_with_default_logging(Some(DEFAULT_LOG));
+
+  info!("Starting");
 
   use std::error::Error;
   if let Err(err) = run() {
@@ -109,8 +111,16 @@ async fn run() -> AnyhowResult<()> {
   println!("Connected");
 
   println!("Starting polling thread...");
-  client.polling_thread().await;
+  client.start_ping_thread().await;
 
+  println!("Try read next...");
+  client.try_next().await?;
+  println!("Try read next...");
+  client.try_next().await?;
+  println!("Try read next...");
+  client.try_next().await?;
+
+  println!("Sleep...");
   std::thread::sleep(Duration::from_millis(30000));
 
   //let text = msg.into_text()?;

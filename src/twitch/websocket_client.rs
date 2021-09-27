@@ -1,7 +1,8 @@
 use anyhow::anyhow;
 use anyhow::bail;
 use crate::util::anyhow_result::AnyhowResult;
-use futures_util::{SinkExt, StreamExt};
+use futures_util::{SinkExt, StreamExt, TryStreamExt};
+use log::debug;
 use reqwest::Url;
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::{Arc, Mutex, PoisonError, MutexGuard};
@@ -17,7 +18,9 @@ use twitch_api2::pubsub;
 // https://github.com/twitchdev/pubsub-javascript-sample/blob/main/main.js
 
 const WEBSOCKET_GATEWAY : &'static str = "wss://pubsub-edge.twitch.tv";
+
 const PING_COMMAND : &'static str = "{ \"type\": \"PING\" }";
+const PING_SECONDS : u64 = 1 * 60; // Twitch calls for every 5 minutes, we'll do every 1 minute.
 
 pub struct PollingTwitchWebsocketClient {
   client: Arc<Mutex<TwitchWebsocketClient>>,
@@ -41,32 +44,53 @@ impl PollingTwitchWebsocketClient {
 
   pub async fn connect(&mut self) -> AnyhowResult<()> {
     match self.client.lock() {
-      Err(e) => Err(anyhow!("could not connect: {:?}", e)),
+      Err(e) => Err(anyhow!("unlock client err: {:?}", e)),
       Ok(mut client) => {
         client.connect().await
       }
     }
   }
 
-  pub async fn polling_thread(&self) {
+  /// Start a pinging background thread.
+  /// Per Twitch PubSub docs,
+  ///   To keep the server from closing the connection, clients must send a PING command
+  ///   at least once every 5 minutes. If a client does not receive a PONG message within
+  ///   10 seconds of issuing a PING command, it should reconnect to the server.
+  pub async fn start_ping_thread(&self) {
     let client = self.client.clone();
     tokio::spawn(async move {
       loop {
-        println!("Poll");
-
         match client.lock() {
           Ok(mut c) => {
-            println!("Ping...");
             c.send_ping();
-            println!("Read response...");
-            c.read_response();
+            // TODO: Need to read from all call sites due to ordering.
+            //c.read_response();
           }
-          Err(_) => {}
+          Err(_) => {
+            // TODO
+          }
         }
-
-        tokio::time::sleep(Duration::from_millis(5000)).await;
+        tokio::time::sleep(Duration::from_secs(PING_SECONDS)).await;
       }
     });
+  }
+
+  pub async fn next(&mut self) -> AnyhowResult<Response> {
+    match self.client.lock() {
+      Err(e) => Err(anyhow!("unlock client err: {:?}", e)),
+      Ok(mut client) => {
+        client.next().await
+      }
+    }
+  }
+
+  pub async fn try_next(&mut self) -> AnyhowResult<Option<Response>> {
+    match self.client.lock() {
+      Err(e) => Err(anyhow!("unlock client err: {:?}", e)),
+      Ok(mut client) => {
+        client.try_next().await
+      }
+    }
   }
 
   /*async fn start_polling(&self) {
@@ -154,21 +178,20 @@ impl TwitchWebsocketClient {
       Some(ref mut socket) => socket,
     };
 
-    // TODO:
-    //  To keep the server from closing the connection, clients must send a PING command
-    //  at least once every 5 minutes. If a client does not receive a PONG message within
-    //  10 seconds of issuing a PING command, it should reconnect to the server.
+    debug!("Sending ping");
     let message = Message::Text(PING_COMMAND.to_string());
     socket.send(message).await?;
 
-    match self.read_response().await {
-      Err(e) => Err(e),
-      Ok(Response::Pong) => Ok(()),
-      _ => Err(bail!("wrong response type")),
-    }
+    // TODO: Need to read from all call sites due to ordering.
+    //match self.read_response().await {
+    //  Err(e) => Err(e),
+    //  Ok(Response::Pong) => Ok(()),
+    //  _ => Err(bail!("wrong response type")),
+    //}
+    Ok(())
   }
 
-  async fn read_response(&mut self) -> AnyhowResult<Response> {
+  pub async fn next(&mut self) -> AnyhowResult<Response> {
     let socket = match self.socket {
       None => return Err(anyhow!("not connected")),
       Some(ref mut s) => s,
@@ -181,6 +204,23 @@ impl TwitchWebsocketClient {
         let text = response.to_text()?;
         let typed_response = Response::parse(text)?;
         Ok(typed_response)
+      },
+    }
+  }
+
+  pub async fn try_next(&mut self) -> AnyhowResult<Option<Response>> {
+    let socket = match self.socket {
+      None => return Err(anyhow!("not connected")),
+      Some(ref mut s) => s,
+    };
+
+    match socket.try_next().await {
+      Err(e) => Err(anyhow!("websocket error: {:?}", e)),
+      Ok(None) => Ok(None),
+      Ok(Some(response)) => {
+        let text = response.to_text()?;
+        let typed_response = Response::parse(text)?;
+        Ok(Some(typed_response))
       },
     }
   }
