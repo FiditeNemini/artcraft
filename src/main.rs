@@ -16,6 +16,10 @@ use twitch_api2::helix::channels::GetChannelInformationRequest;
 use twitch_api2::pubsub::Topic;
 use twitch_api2::pubsub;
 use twitch_oauth2::{AppAccessToken, Scope, TwitchToken, tokens::errors::AppAccessTokenError, ClientId, ClientSecret};
+use twitch_oauth2::tokens::UserTokenBuilder;
+use twitch_api2::helix::users::GetUsersRequest;
+use twitch_api2::types::Nickname;
+use crate::twitch::client::TwitchClientWrapper;
 
 pub mod twitch;
 pub mod util;
@@ -44,107 +48,58 @@ fn main() -> AnyhowResult<()> {
 
 #[tokio::main]
 async fn run() -> AnyhowResult<()> {
-  let secrets = TwitchSecrets::from_file("secrets.toml")?;
+  // ==================== APPLICATION ACCESS ====================
 
-  /*let client_id = ClientId::new(&secrets.app_client_id);
+  let secrets = TwitchSecrets::from_file("secrets.toml")?;
+  let client_id = ClientId::new(&secrets.app_client_id);
   let client_secret = ClientSecret::new(&secrets.app_client_secret);
 
-  let client: TwitchClient<reqwest::Client> = TwitchClient::default();
-  let token = AppAccessToken::get_app_access_token(
-    &client,
-    client_id,
-    client_secret,
-    Scope::all(),
-  ).await?;
+  info!("Getting app access token...");
 
-  let req = GetChannelInformationRequest::builder()
-      //.broadcaster_id("27620241")
-      .broadcaster_id("650154491")
-      .build();
+  //let scopes = Scope::all();
+  let scopes = vec![
+    Scope::BitsRead,
+    Scope::UserReadEmail,
+  ];
 
-  println!(
-    "{:?}",
-    &client.helix.req_get(req, &token).await?.data.unwrap().title
-  );*/
+  let mut twitch_client = TwitchClientWrapper::new(client_id.clone(), client_secret.clone());
+  twitch_client.request_access_token(scopes).await?;
+
+  let user_id = twitch_client.get_user_id_from_username("echelon").await?;
+  println!("user id: {:?}", user_id);
+
+  std::thread::sleep(Duration::from_secs(5000));
 
 
-  // Want this:
-  // twitch_api2::pubsub::channel_bits::BitsEventData
+  // ==================== OAUTH FLOW ====================
 
 
+  let redirect_url = twitch_oauth2::url::Url::parse("http://localhost/test")?;
+  let mut builder = UserTokenBuilder::new(client_id, client_secret, redirect_url)
+      .force_verify(true);
 
-  /*// We want to subscribe to moderator actions on channel with id 1234
-  // as if we were a user with id 4321 that is moderator on the channel.
-  let chat_mod_actions = pubsub::moderation::ChatModeratorActions {
-    user_id: 4321,
-    channel_id: 1234,
-  }
-      .into_topic();*/
+  builder.add_scope(Scope::BitsRead);
 
-  // Listen to follows as well
-  /*let follows = pubsub::following::Following { channel_id: 1234 }.into_topic();
-  let topics = [follows];
-  // Create the topic command to send to twitch
-  let command = pubsub::listen_command(
-    &topics,
-    "authtoken",
-    "random nonce string",
-  )?;
+  let (url, _csrf_token) = builder.generate_url();
 
-  println!("Pubsub command: {:?}", command);*/
+  println!("Go to this page: {}", url);
 
-  // Send the message with your favorite websocket client
-  //send_command(command).unwrap();
-  // To parse the websocket messages, use pubsub::Response::parse
+  //std::thread::sleep(Duration::from_secs(30));
 
 
-  /*println!("Connected");
-  let mut ws_client = TwitchWebsocketClient::new()?;
-  ws_client.connect().await?;
-
-  ws_client.send_ping().await?;
-
-  println!("success ping");*/
+  // ==================== PUBSUB SUBSCRIPTION AND MAIN LOOP ====================
 
   let mut client = PollingTwitchWebsocketClient::new()?;
 
-  println!("Connecting...");
+  println!("Connecting PubSub...");
   client.connect().await?;
+
   println!("Connected");
 
   println!("Starting polling thread...");
   client.start_ping_thread().await;
 
-  //match UserToken::from_existing(reqwest_http_client, token, None, None).await {
-  //  Ok(t) => println!("user_token: {}", t.token().secret()),
-  //  Err(e) => panic!("got error: {}", e),
-  //}
 
-  let client_id = ClientId::new(&secrets.app_client_id);
-  let client_secret = ClientSecret::new(&secrets.app_client_secret);
-
-  let http_client = reqwest::Client::new();
-
-  let scopes = vec![
-    Scope::BitsRead,
-  ];
-
-  let scopes = Scope::all();
-
-  info!("Getting access token...");
-
-  let access_token = twitch_oauth2::AppAccessToken::get_app_access_token(
-    &http_client,
-    client_id,
-    client_secret,
-    scopes,
-  ).await?;
-
-  info!("Access token obtained.");
-
-  println!("Access Token Outer: {:?}", access_token);
-  let token = access_token.token();
-  println!("Access Token Inner: {:?}", token.as_str());
 
   let bit_topic = pubsub::channel_bits::ChannelBitsEventsV2 {
     channel_id: TEST_CHANNEL_ID,
@@ -160,14 +115,13 @@ async fn run() -> AnyhowResult<()> {
   // Listen to follows as well
   let follows = pubsub::following::Following { channel_id: 1234 }.into_topic();
 
-
-
   println!("Begin LISTEN...");
-  let auth_token = access_token.access_token.as_str();
+  //let auth_token = access_token.access_token.as_str();
+  //let auth_token = "";
+  let auth_token = "";
   let topics = [bit_topic];
 
   client.listen(auth_token, &topics).await;
-
 
   println!("Try read next...");
   let r = client.try_next().await?;
@@ -200,3 +154,70 @@ async fn get_case_count() -> TungsteniteResult<u32> {
   socket.close(None).await?;
   Ok(msg.into_text()?.parse::<u32>().expect("Can't parse case count"))
 }
+
+
+/*let client_id = ClientId::new(&secrets.app_client_id);
+let client_secret = ClientSecret::new(&secrets.app_client_secret);
+
+let client: TwitchClient<reqwest::Client> = TwitchClient::default();
+let token = AppAccessToken::get_app_access_token(
+  &client,
+  client_id,
+  client_secret,
+  Scope::all(),
+).await?;
+
+let req = GetChannelInformationRequest::builder()
+    //.broadcaster_id("27620241")
+    .broadcaster_id("650154491")
+    .build();
+
+println!(
+  "{:?}",
+  &client.helix.req_get(req, &token).await?.data.unwrap().title
+);*/
+
+
+// Want this:
+// twitch_api2::pubsub::channel_bits::BitsEventData
+
+
+
+/*// We want to subscribe to moderator actions on channel with id 1234
+// as if we were a user with id 4321 that is moderator on the channel.
+let chat_mod_actions = pubsub::moderation::ChatModeratorActions {
+  user_id: 4321,
+  channel_id: 1234,
+}
+    .into_topic();*/
+
+// Listen to follows as well
+/*let follows = pubsub::following::Following { channel_id: 1234 }.into_topic();
+let topics = [follows];
+// Create the topic command to send to twitch
+let command = pubsub::listen_command(
+  &topics,
+  "authtoken",
+  "random nonce string",
+)?;
+
+println!("Pubsub command: {:?}", command);*/
+
+// Send the message with your favorite websocket client
+//send_command(command).unwrap();
+// To parse the websocket messages, use pubsub::Response::parse
+
+
+/*println!("Connected");
+let mut ws_client = TwitchWebsocketClient::new()?;
+ws_client.connect().await?;
+
+ws_client.send_ping().await?;
+
+println!("success ping");*/
+
+//match UserToken::from_existing(reqwest_http_client, token, None, None).await {
+//  Ok(t) => println!("user_token: {}", t.token().secret()),
+//  Err(e) => panic!("got error: {}", e),
+//}
+
