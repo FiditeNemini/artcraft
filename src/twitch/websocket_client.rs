@@ -167,6 +167,18 @@ impl TwitchWebsocketClient {
     Ok(())
   }
 
+  pub async fn close(&mut self) -> AnyhowResult<()> {
+    let mut socket = match self.socket {
+      None => return Ok(()), // Already closed.
+      Some(ref mut socket) => socket,
+    };
+
+    socket.close(None).await?;
+    self.socket = None;
+
+    Ok(())
+  }
+
   pub fn is_connected(&self) -> bool {
     // TODO: This probably isn't accurate
     self.socket.is_some()
