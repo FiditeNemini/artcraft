@@ -11,8 +11,9 @@ use tokio::net::TcpStream;
 use tokio;
 use tokio_tungstenite::tungstenite::Message;
 use tokio_tungstenite::{connect_async, WebSocketStream, MaybeTlsStream};
-use twitch_api2::pubsub::{Response, TopicData};
+use twitch_api2::pubsub::{Response, TopicData, Topic, Topics};
 use twitch_api2::pubsub;
+use crate::util::random_nonce::random_nonce;
 
 // Reference javascript Twitch Websocket client:
 // https://github.com/twitchdev/pubsub-javascript-sample/blob/main/main.js
@@ -179,6 +180,37 @@ impl TwitchWebsocketClient {
     Ok(())
   }
 
+  pub async fn listen<'t>(&mut self, auth_token: &str, topics: &'t [Topics]) -> AnyhowResult<()> {
+    //// We want to subscribe to moderator actions on channel with id 1234
+    //// as if we were a user with id 4321 that is moderator on the channel.
+    //let chat_mod_actions = pubsub::moderation::ChatModeratorActions {
+    //  user_id: 4321,
+    //  channel_id: 1234,
+    //}.into_topic();
+
+    //// Listen to follows as well
+    //let follows = pubsub::following::Following { channel_id: 1234 }.into_topic();
+
+    let mut socket = match self.socket {
+      None => return Err(anyhow!("not connected")),
+      Some(ref mut socket) => socket,
+    };
+
+    let nonce = random_nonce(128);
+
+    let command = pubsub::listen_command(
+      topics,
+      auth_token,
+      nonce.as_ref(),
+    )?;
+
+    debug!("Sending LISTEN");
+    let message = Message::Text(command);
+    socket.send(message).await?;
+
+    Ok(())
+  }
+
   pub fn is_connected(&self) -> bool {
     // TODO: This probably isn't accurate
     self.socket.is_some()
@@ -190,7 +222,7 @@ impl TwitchWebsocketClient {
       Some(ref mut socket) => socket,
     };
 
-    debug!("Sending ping");
+    debug!("Sending PING");
     let message = Message::Text(PING_COMMAND.to_string());
     socket.send(message).await?;
 

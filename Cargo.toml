@@ -46,6 +46,7 @@ twitch_oauth2 = "0.6.0-rc.2"
 anyhow = "1.0.44"
 easyenv = "0.0.6"
 log = "0.4.14"
+rand = "0.8.4"
 
 #[build-dependencies]
 
