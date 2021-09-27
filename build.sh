@@ -3,7 +3,7 @@
 set -euxo pipefail
 
 # NB: Temporary for migration
-ln -s vocodes/ fakeyou/
+ln -s vocodes/ fakeyou
 
 pushd vocodes/
 
