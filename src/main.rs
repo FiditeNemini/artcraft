@@ -113,12 +113,32 @@ async fn run() -> AnyhowResult<()> {
   println!("Starting polling thread...");
   client.start_ping_thread().await;
 
+
+  // We want to subscribe to moderator actions on channel with id 1234
+  // as if we were a user with id 4321 that is moderator on the channel.
+  let chat_mod_actions = pubsub::moderation::ChatModeratorActions {
+    user_id: 4321,
+    channel_id: 1234,
+  }.into_topic();
+
+  // Listen to follows as well
+  let follows = pubsub::following::Following { channel_id: 1234 }.into_topic();
+
+  println!("Begin LISTEN...");
+  client.listen("auth_token", &[chat_mod_actions, follows]).await;
+
+
   println!("Try read next...");
-  client.try_next().await?;
+  let r = client.try_next().await?;
+  println!("Result: {:?}", r);
+
   println!("Try read next...");
-  client.try_next().await?;
+  let r = client.try_next().await?;
+  println!("Result: {:?}", r);
+
   println!("Try read next...");
-  client.try_next().await?;
+  let r = client.try_next().await?;
+  println!("Result: {:?}", r);
 
   println!("Sleep...");
   std::thread::sleep(Duration::from_millis(30000));

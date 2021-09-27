@@ -52,6 +52,15 @@ impl PollingTwitchWebsocketClient {
     }
   }
 
+  pub async fn listen<'t>(&mut self, auth_token: &str, topics: &'t [Topics]) -> AnyhowResult<()> {
+    match self.client.lock() {
+      Err(e) => Err(anyhow!("unlock client err: {:?}", e)),
+      Ok(mut client) => {
+        client.listen(auth_token, topics).await
+      }
+    }
+  }
+
   /// Start a pinging background thread.
   /// Per Twitch PubSub docs,
   ///   To keep the server from closing the connection, clients must send a PING command
@@ -181,16 +190,6 @@ impl TwitchWebsocketClient {
   }
 
   pub async fn listen<'t>(&mut self, auth_token: &str, topics: &'t [Topics]) -> AnyhowResult<()> {
-    //// We want to subscribe to moderator actions on channel with id 1234
-    //// as if we were a user with id 4321 that is moderator on the channel.
-    //let chat_mod_actions = pubsub::moderation::ChatModeratorActions {
-    //  user_id: 4321,
-    //  channel_id: 1234,
-    //}.into_topic();
-
-    //// Listen to follows as well
-    //let follows = pubsub::following::Following { channel_id: 1234 }.into_topic();
-
     let mut socket = match self.socket {
       None => return Err(anyhow!("not connected")),
       Some(ref mut socket) => socket,
