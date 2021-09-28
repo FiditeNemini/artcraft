@@ -309,7 +309,7 @@ class ApiConfig {
         return "api.vo.codes";
       case Domain.FakeYou:
       case Domain.Unknown:
-        return "api.fake.you";
+        return "api.fakeyou.com";
     }
   }
 }
