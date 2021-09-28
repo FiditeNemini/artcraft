@@ -15,17 +15,37 @@ export interface ListW2lInferenceResultsForUserArgs {
   limit?: number
 };
 
+enum Domain {
+  Localhost,
+  JungleHorse,
+  Vocodes,
+  FakeYou,
+  Unknown,
+}
+
 class ApiConfig {
   
-  isLocalDev: boolean;
+  domain: Domain;
+  useSsl: boolean;
 
   constructor() {
-    if (document.location.host.includes("localhost") ||
-        document.location.host.includes("jungle.horse")) {
-      this.isLocalDev = true;
-    } else {
-      this.isLocalDev = false;
+    let useSsl = true;
+    let domain = Domain.Unknown;
+
+    if (document.location.host.includes("localhost")) {
+      domain = Domain.Localhost;
+      useSsl = false;
+    } else if (document.location.host.includes("jungle.horse")) {
+      domain = Domain.JungleHorse;
+      useSsl = false;
+    } else if (document.location.host.includes("vo.codes")) {
+      domain = Domain.Vocodes;
+    } else if (document.location.host.includes("fakeyou.com")) {
+      domain = Domain.FakeYou;
     }
+
+    this.domain = domain;
+    this.useSsl = useSsl;
   }
 
   speakEndpoint() : string {
@@ -275,13 +295,22 @@ class ApiConfig {
   }
 
   private getScheme() : string {
-    return this.isLocalDev ? "http" : "https";
+    return this.useSsl ? "https" : "http";
   }
 
   private getNewApiHost() : string {
     // NB: `localhost` seems to have problems with cookies. 
     // I've added jungle.horse as a localhost mapped domain in /etc/hosts
-    return this.isLocalDev ? "api.jungle.horse" : "api.vo.codes";
+    switch (this.domain) {
+      case Domain.Localhost:
+      case Domain.JungleHorse:
+        return "api.jungle.horse";
+      case Domain.Vocodes:
+        return "api.vo.codes";
+      case Domain.FakeYou:
+      case Domain.Unknown:
+        return "api.fake.you";
+    }
   }
 }
 
