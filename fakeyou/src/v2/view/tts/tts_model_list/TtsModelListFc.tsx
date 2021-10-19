@@ -13,6 +13,7 @@ import { W2lTemplateUploadJob } from '../../../../jobs/W2lTemplateUploadJobs';
 import { v4 as uuidv4 } from 'uuid';
 import { ListTtsModels, TtsModelListItem } from '../../../api/tts/ListTtsModels';
 import { GravatarFc } from '../../_common/GravatarFc';
+import { TtsModelListNotice } from './TtsModelListNotice';
 
 
 export interface EnqueueJobResponsePayload {
@@ -184,7 +185,7 @@ function TtsModelListFc(props: Props) {
         Use deep fake tech to say stuff with your favorite characters.
       </h5>
 
-      <br />
+      <TtsModelListNotice />
 
       <form onSubmit={handleFormSubmit}>
         <div className={selectClasses}>
