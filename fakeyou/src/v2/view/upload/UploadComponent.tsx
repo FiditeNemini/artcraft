@@ -160,7 +160,7 @@ class UploadComponent extends React.Component<Props, State> {
       extra = (
         <div className="notification is-warning">
           <strong>Over $500 in prizes!</strong> 
-          <p>You can help vo.codes grow by uploading Tacotron2 models. 
+          <p>You can help FakeYou grow by uploading Tacotron2 models. 
           The person that uploads the most models will get $100, 
           the person that uploads the most popular model will get $100,
           and a number of other lucky winners will be chosen at random to 

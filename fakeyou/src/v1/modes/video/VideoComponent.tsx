@@ -301,7 +301,7 @@ class VideoComponent extends React.Component<Props, State> {
 
         <div className="content is-size-4">
           <p>
-            Upload audio from vo.codes or any other source (music, other websites), 
+            Upload audio from FakeYou or any other source (music, other websites), 
             then pick a template below. The audio shouldn't be too long or it will
             fail.
           </p>

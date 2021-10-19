@@ -274,7 +274,7 @@ function ProfileEditFc(props: Props) {
 
             <div className="content">
               You can set your profile picture on <a href="https://gravatar.com">gravatar.com</a>. 
-              Use the same email address you did to sign up for vo.codes. (In the future, we'll support
+              Use the same email address you did to sign up for FakeYou. (In the future, we'll support
               image uploads.)
               <br />
             </div>
@@ -300,7 +300,7 @@ function ProfileEditFc(props: Props) {
           </div>
 
           {/*<div className="field">
-            <label className="label">Vo.codes Display Name</label>
+            <label className="label">FakeYou Display Name</label>
             <div className="control has-icons-left has-icons-right">
               //value={downloadUrl} onChange={handleDownloadUrlChange}
               <input 

@@ -106,7 +106,7 @@ function FirehoseEventListFc(props: Props) {
             &nbsp;
             {userLink}
             &nbsp;
-            signed up for vo.codes!
+            signed up for FakeYou!
           </span>
         );
         break;

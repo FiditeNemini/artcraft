@@ -51,7 +51,7 @@ function TermsComponent(props: Props) {
         <p><em>Don't legislate deep fakes.</em></p>
 
         <p><sup>&dagger;</sup> Anyone can download Tacotron from Github to produce the same
-        results on their own. Vocodes.com is not connected with your activities.</p>
+        results on their own. FakeYou.com is not connected with your activities.</p>
         
       <button onClick={() => props.resetModeCallback()}>Go Back</button>
     </div>

@@ -10,8 +10,8 @@ function UploadChoiceFc(props: Props) {
   return (
     <div>
       <div>
-        <h1 className="title is-1"> Upload to Vocodes ! </h1>
-        <h1 className="subtitle is-3"> You make vo.codes <strong>better</strong> by uploading</h1>
+        <h1 className="title is-1"> Upload to FakeYou! </h1>
+        <h1 className="subtitle is-3"> You make FakeYou <strong>better</strong> by uploading</h1>
       </div>
 
       <br />

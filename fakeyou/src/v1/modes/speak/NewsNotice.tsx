@@ -25,7 +25,7 @@ class NewsNotice extends React.Component<Props, State> {
       <article className="message is-info news-alert">
         <div className="message-header">
           <p>Join our Twitch for Early Access</p>
-          {/*<p>Vo.codes is currently down</p>*/}
+          {/*<p>FakeYou is currently down</p>*/}
           <button className="delete" aria-label="delete" onClick={() => this.props.toggleNewsNoticeCallback()}></button>
         </div>
         <div className="message-body">

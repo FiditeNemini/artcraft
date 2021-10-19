@@ -6,7 +6,7 @@ interface Props {
 function AboutFc(props: Props) {
   return (
     <div className="content is-medium">
-      <h1 className="">About Vocodes</h1>
+      <h1 className="">About FakeYou</h1>
 
       <p>
         Your brain was already capable of imagining things spoken in other people's voices. This is
@@ -51,6 +51,12 @@ function AboutFc(props: Props) {
         <a href="https://github.com/NVIDIA/tacotron2" target="_blank" rel="noopener noreferrer">NVIDIA
         makes these tools publicly available for you to make your own voice models</a>. Check it out!
       </p>
+
+      <h1 className="title is-4">FakeYou was previously Vocodes</h1>
+
+      <p>FakeYou.com was previously known as <strong>https://vo.codes</strong>, but has been rebranded
+      to better reflect its purpose and direction. (Not many people know what a <em>vocoder</em> is 
+      anyway, so it didn't make sense to keep the name.)</p>
 
       <h1 className="title is-4">Thanks</h1>
 

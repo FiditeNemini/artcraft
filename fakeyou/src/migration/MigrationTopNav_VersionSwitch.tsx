@@ -15,7 +15,7 @@ function MigrationTopNavVersionSwitch(props: Props) {
       <Route path="/old">
         <Link to="/"
           className="button is-danger is-inverted"
-          >Switch to New Vocodes (it's awesome!)</Link>
+          >Switch to FakeYou (it's awesome!)</Link>
       </Route>
       <Route path="/">
         <Link to="/old"

@@ -9,14 +9,14 @@ function TermsFc(props: Props) {
       <h1 className="">Terms of Use</h1>
 
       <p>
-        We do not condone the use of vocodes for any type of deception, slur, 
+        We do not condone the use of FakeYou for any type of deception, slur, 
         abuse, or mistreatment of any individual or group. Please report such 
         abuses to our <a href="https://discord.gg/H72KFXm">community staff on Discord</a>. 
         Bad actors will have their access revoked and materials deleted.
       </p>
 
       <p>
-        This is a research technololgy for fun. You may not use vocodes deepfakes 
+        This is a research technololgy for fun. You may not use FakeYou deepfakes 
         for commercial use.
       </p>
 

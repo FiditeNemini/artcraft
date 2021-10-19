@@ -94,7 +94,7 @@ function UploadTtsModelFc(props: Props) {
 
       <div className="notification is-info is-light">
         <strong>Content Creator Rewards!</strong> 
-        {/*<p>You can help vo.codes grow by uploading Tacotron2 models. 
+        {/*<p>You can help FakeYou grow by uploading Tacotron2 models. 
         The person that uploads the most models will get $100, 
         the person that uploads the most popular model will get $100,
         and a number of other lucky winners will be chosen at random to 
@@ -114,7 +114,7 @@ function UploadTtsModelFc(props: Props) {
       <br />
 
       <p>
-        Vo.codes currently supports <em>Tacotron 2</em>, GlowTTS, and a custom synthesizer architecture 
+        FakeYou currently supports <em>Tacotron 2</em>, GlowTTS, and a custom synthesizer architecture 
         that we intend to open source. We'll soon add TalkNet, custom vocoder uploads, and more model 
         architectures.
       </p>

@@ -51,7 +51,7 @@ class HistoryComponent extends React.Component<Props, State> {
 
         <div className="content is-size-4">
           <p>
-            Please cite <strong><u>vocodes.com</u></strong> if you make YouTube videos,
+            Please cite <strong><u>fakeyou.com</u></strong> if you make YouTube videos,
             post on social media, or find this project useful.
           </p>
 
