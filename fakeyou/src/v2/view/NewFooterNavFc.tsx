@@ -37,9 +37,9 @@ function NewFooterNavFc(props: Props) {
       <div className="v2_social">
         <a href="https://discord.gg/H72KFXm" target="_blank" rel="noopener noreferrer"><img src="/social-icons/016-discord.png" alt="Join us on Discord!" /></a>
         <a href="https://twitch.tv/vocodes" target="_blank" rel="noopener noreferrer"><img src="/social-icons/094-twitch.png" alt="Twitch" /></a>
-        <a href="https://twitter.com/intent/follow?screen_name=vocodes" target="_blank" rel="noopener noreferrer"><img src="/social-icons/096-twitter.png" alt="Twitter" /></a>
+        <a href="https://twitter.com/intent/follow?screen_name=FakeYouApp" target="_blank" rel="noopener noreferrer"><img src="/social-icons/096-twitter.png" alt="Twitter" /></a>
         <a href="https://facebook.com/vocodes" target="_blank" rel="noopener noreferrer"><img src="/social-icons/024-facebook.png" alt="Facething" /></a>
-        <a href="https://www.patreon.com/vocodes" target="_blank" rel="noopener noreferrer"><img src="/social-icons/061-patreon.png" alt="Patreon" /></a>
+        <a href="https://www.patreon.com/FakeYou" target="_blank" rel="noopener noreferrer"><img src="/social-icons/061-patreon.png" alt="Patreon" /></a>
       </div>
 
       {moderationLink}
