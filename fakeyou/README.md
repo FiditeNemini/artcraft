@@ -1,4 +1,4 @@
-vocodes-frontend
+fakeyou-frontend
 ================
 
 To install on a new machine, simply run `npm install` in this directory.

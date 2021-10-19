@@ -1,10 +1,10 @@
 #!/bin/bash
 wc -l \
-	vocodes/src/*css \
-	vocodes/src/*ts* \
-	vocodes/src/*/*ts* \
-	vocodes/src/*/*/*ts* \
-	vocodes/src/*/*/*/*ts* \
-	vocodes/src/*/*/*/*/*ts* \
-	vocodes/src/*/*/*/*/*/*ts* \
+	fakeyou/src/*css \
+	fakeyou/src/*ts* \
+	fakeyou/src/*/*ts* \
+	fakeyou/src/*/*/*ts* \
+	fakeyou/src/*/*/*/*ts* \
+	fakeyou/src/*/*/*/*/*ts* \
+	fakeyou/src/*/*/*/*/*/*ts* \
 	| sort -n

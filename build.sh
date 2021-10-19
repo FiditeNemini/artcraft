@@ -3,9 +3,9 @@
 set -euxo pipefail
 
 # NB: Temporary for migration
-ln -s vocodes/ fakeyou
+ln -s fakeyou/ fakeyou
 
-pushd vocodes/
+pushd fakeyou/
 
 npm install
 npm run-script build
@@ -13,5 +13,5 @@ npm run-script build
 popd
 
 echo "Copying redirects configuration to Netlify build dir..."
-cp _redirects vocodes/build
+cp _redirects fakeyou/build
 

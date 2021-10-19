@@ -1,14 +1,14 @@
-vocodes-frontend
+fakeyou-frontend
 ================
 
-Frontend website for https://vo.codes/
+Frontend website for https://fakeyou.com/ (previously https://vo.codes)
 
 Hosted with netlify.
 
 Installation in Dev
 -------------------
 
-Normally, `npm install` in the `./vocodes` directory works, but Mac needed
+Normally, `npm install` in the `./fakeyou` directory works, but Mac needed
 the following workaround for a [sass build failure](https://stackoverflow.com/a/67242989): 
 
 ```
