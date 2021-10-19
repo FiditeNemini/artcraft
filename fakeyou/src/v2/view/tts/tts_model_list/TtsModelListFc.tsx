@@ -179,9 +179,9 @@ function TtsModelListFc(props: Props) {
 
   return (
     <div>
-      <h1 className="title is-1"> FakeYou </h1>
+      <h1 className="title is-1"> FakeYou Text to Speech </h1>
       <h5 className="subtitle is-5">
-        Use deep fake text to speech.
+        Use deep fake tech to say stuff with your favorite characters.
       </h5>
 
       <br />
