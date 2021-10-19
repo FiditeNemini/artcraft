@@ -73,12 +73,12 @@ function SessionTtsInferenceResultListFc(props: Props) {
   return (
     <div>
       {title}
-      <div className="notification is-info is-light">
+      {/*<div className="notification is-info is-light">
         <strong>Working on speeding this up</strong> 
         <p>
           Sorry this is slow. I'm scaling the cluster and fixing the caching strategy.
         </p>
-      </div>
+      </div>*/}
       <br />
       {results}
     </div>
