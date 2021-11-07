@@ -2,6 +2,7 @@
 
 members = [
   "app/config",
+  "app/http_server_common",
   "app/obs_gateway",
   "app/storyteller_web",
 ]

@@ -1,45 +1,18 @@
 [package]
-name = "storyteller-web"
+name = "http_server_common"
 edition = "2018"
 version = "0.0.1"
 authors = [
-  "Brandon Thomas <bt@brand.io>",
-  "Brandon Thomas <echelon@gmail.com>",
+    "Brandon Thomas <bt@brand.io>",
+    "Brandon Thomas <echelon@gmail.com>",
 ]
 publish = false
 
-# Main server monolith
-[[bin]]
-name = "storyteller-web"
-path = "src/main.rs"
-
-## OBS websocket server
-#[[bin]]
-#name = "obs-gateway-server"
-#path = "src/obs_gateway_server.rs"
-
-# Jobs for managing downloads and inference
-[[bin]]
-name = "tts-download-job"
-path = "src/tts_download_job.rs"
-
-[[bin]]
-name = "tts-inference-job"
-path = "src/tts_inference_job.rs"
-
-[[bin]]
-name = "w2l-download-job"
-path = "src/w2l_download_job.rs"
-
-[[bin]]
-name = "w2l-inference-job"
-path = "src/w2l_inference_job.rs"
+[lib]
+name = "http_server_common"
+path = "src/lib.rs"
 
 [dependencies]
-
-# Internal
-config = { path = "../config" }
-http_server_common = { path = "../http_server_common" }
 
 # External
 anyhow = "1.0.40"
@@ -52,11 +25,7 @@ futures = { version = "0.3.15", features = ["thread-pool"] } # feature for Threa
 futures_old_for_limiter = { package = "futures", version = "0.1.29" } # Older version of futures for `limiter` crate
 hex = "0.4.3"
 hostname = "0.3.1"
-lazy_static = "1.4.0"
-lfu = "0.2.5"
 log = "0.4.14"
-#newrelic = "0.2.2"
-newrelic-telemetry = { path = "../../vendor/newrelic-telemetry-sdk-rust" }
 rand = "0.8.3"
 regex = "1.5.4"
 time = "0.2.26"

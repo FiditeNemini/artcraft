@@ -21,6 +21,8 @@ use config::shared_constants::DEFAULT_REDIS_CONNECTION_STRING;
 use config::shared_constants::DEFAULT_RUST_LOG;
 use futures::Future;
 use futures::executor::ThreadPool;
+use http_server_common::endpoints::default_route_404::default_route_404;
+use http_server_common::endpoints::root_index::get_root_index;
 use limitation::Limiter;
 use log::{info};
 use r2d2_redis::RedisConnectionManager;
@@ -186,8 +188,8 @@ pub async fn serve(server_state: ObsGatewayServerState) -> AnyhowResult<()>
         //      .route(web::get().to(ws_index))
         //      .route(web::head().to(|| HttpResponse::Ok()))
         //)
-        //.service(get_root_index)
-        //.default_service( web::route().to(default_route_404))
+        .service(get_root_index)
+        .default_service( web::route().to(default_route_404))
   })
       .bind(bind_address)?
       .workers(num_workers)

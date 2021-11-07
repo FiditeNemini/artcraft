@@ -36,7 +36,6 @@ use config::shared_constants::DEFAULT_REDIS_CONNECTION_STRING;
 use config::shared_constants::DEFAULT_RUST_LOG;
 use crate::database::mediators::badge_granter::BadgeGranter;
 use crate::database::mediators::firehose_publisher::FirehosePublisher;
-use crate::http_server::endpoints::default_route_404::default_route_404;
 use crate::http_server::endpoints::events::list_events::list_events_handler;
 use crate::http_server::endpoints::leaderboard::get_leaderboard::leaderboard_handler;
 use crate::http_server::endpoints::misc::enable_alpha_easy_handler::enable_alpha_easy_handler;
@@ -55,7 +54,6 @@ use crate::http_server::endpoints::moderation::user_roles::list_roles::list_user
 use crate::http_server::endpoints::moderation::user_roles::list_staff::list_staff_handler;
 use crate::http_server::endpoints::moderation::user_roles::set_user_role::set_user_role_handler;
 use crate::http_server::endpoints::moderation::users::list_users::list_users_handler;
-use crate::http_server::endpoints::root_index::get_root_index;
 use crate::http_server::endpoints::tts::delete_tts_model::delete_tts_model_handler;
 use crate::http_server::endpoints::tts::delete_tts_result::delete_tts_inference_result_handler;
 use crate::http_server::endpoints::tts::edit_tts_model::edit_tts_model_handler;
@@ -68,6 +66,7 @@ use crate::http_server::endpoints::tts::get_tts_model_use_count::get_tts_model_u
 use crate::http_server::endpoints::tts::get_tts_result::get_tts_inference_result_handler;
 use crate::http_server::endpoints::tts::get_tts_upload_model_job_status::get_tts_upload_model_job_status_handler;
 use crate::http_server::endpoints::tts::list_tts_models::list_tts_models_handler;
+use crate::http_server::endpoints::twitch::pubsub_gateway::ws_index;
 use crate::http_server::endpoints::users::create_account::create_account_handler;
 use crate::http_server::endpoints::users::edit_profile::edit_profile_handler;
 use crate::http_server::endpoints::users::get_profile::get_profile_handler;
@@ -104,6 +103,8 @@ use crate::util::caching::single_item_ttl_cache::SingleItemTtlCache;
 use crate::util::encrypted_sort_id::SortKeyCrypto;
 use futures::Future;
 use futures::executor::ThreadPool;
+use http_server_common::endpoints::default_route_404::default_route_404;
+use http_server_common::endpoints::root_index::get_root_index;
 use limitation::Limiter;
 use log::{info};
 use r2d2_redis::RedisConnectionManager;
@@ -113,7 +114,6 @@ use sqlx::MySqlPool;
 use sqlx::mysql::MySqlPoolOptions;
 use std::sync::Arc;
 use std::time::Duration;
-use crate::http_server::endpoints::twitch::pubsub_gateway::ws_index;
 
 // TODO TODO TODO TODO
 // TODO TODO TODO TODO
