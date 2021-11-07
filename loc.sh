@@ -3,9 +3,9 @@ wc -l \
 	Cargo.toml \
 	Dockerfile \
 	migrations/*/*.sql \
-	src/*.rs \
-	src/*/*.rs \
-	src/*/*/*.rs \
-	src/*/*/*/*.rs \
-	src/*/*/*/*/*.rs \
+	app/*/*/*.rs \
+	app/*/*/*/*.rs \
+	app/*/*/*/*/*.rs \
+	app/*/*/*/*/*/*.rs \
+	app/*/*/*/*/*/*/*.rs \
 	| sort -n
