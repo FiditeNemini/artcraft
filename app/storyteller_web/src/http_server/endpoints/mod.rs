@@ -3,6 +3,5 @@ pub mod leaderboard;
 pub mod misc;
 pub mod moderation;
 pub mod tts;
-pub mod twitch;
 pub mod users;
 pub mod w2l;

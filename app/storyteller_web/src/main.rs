@@ -66,7 +66,6 @@ use crate::http_server::endpoints::tts::get_tts_model_use_count::get_tts_model_u
 use crate::http_server::endpoints::tts::get_tts_result::get_tts_inference_result_handler;
 use crate::http_server::endpoints::tts::get_tts_upload_model_job_status::get_tts_upload_model_job_status_handler;
 use crate::http_server::endpoints::tts::list_tts_models::list_tts_models_handler;
-use crate::http_server::endpoints::twitch::pubsub_gateway::ws_index;
 use crate::http_server::endpoints::users::create_account::create_account_handler;
 use crate::http_server::endpoints::users::edit_profile::edit_profile_handler;
 use crate::http_server::endpoints::users::get_profile::get_profile_handler;
@@ -660,12 +659,6 @@ pub async fn serve(server_state: ServerState) -> AnyhowResult<()>
             .route(web::get().to(leaderboard_handler))
             .route(web::head().to(|| HttpResponse::Ok()))
       )
-      // Twitch
-        .service(
-          web::resource("/twitch")
-              .route(web::get().to(ws_index))
-              .route(web::head().to(|| HttpResponse::Ok()))
-        )
       .service(get_root_index)
       .service(enable_alpha_handler)
       .service(enable_alpha_easy_handler)

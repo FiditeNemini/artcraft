@@ -12,6 +12,8 @@
 #[macro_use] extern crate magic_crypt;
 #[macro_use] extern crate serde_derive;
 
+pub mod pubsub_gateway;
+
 use actix_cors::Cors;
 use actix_http::http;
 use actix_web::middleware::{Logger, DefaultHeaders};
@@ -19,6 +21,7 @@ use actix_web::{HttpServer, web, HttpResponse, App};
 use config::shared_constants::DEFAULT_MYSQL_CONNECTION_STRING;
 use config::shared_constants::DEFAULT_REDIS_CONNECTION_STRING;
 use config::shared_constants::DEFAULT_RUST_LOG;
+use crate::pubsub_gateway::ws_index;
 use futures::Future;
 use futures::executor::ThreadPool;
 use http_server_common::endpoints::default_route_404::default_route_404;
@@ -183,11 +186,11 @@ pub async fn serve(server_state: ObsGatewayServerState) -> AnyhowResult<()>
             .header("X-Backend-Hostname", &hostname)
             .header("X-Build-Sha", ""))
         // Twitch
-        //.service(
-        //  web::resource("/twitch")
-        //      .route(web::get().to(ws_index))
-        //      .route(web::head().to(|| HttpResponse::Ok()))
-        //)
+        .service(
+          web::resource("/twitch")
+              .route(web::get().to(ws_index))
+              .route(web::head().to(|| HttpResponse::Ok()))
+        )
         .service(get_root_index)
         .default_service( web::route().to(default_route_404))
   })
