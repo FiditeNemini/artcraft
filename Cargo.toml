@@ -13,6 +13,11 @@ publish = false
 name = "storyteller-web"
 path = "src/main.rs"
 
+# OBS websocket server
+[[bin]]
+name = "obs-gateway-server"
+path = "src/obs_gateway_server.rs"
+
 # Jobs for managing downloads and inference
 [[bin]]
 name = "tts-download-job"
@@ -89,6 +94,10 @@ subprocess = "0.2.6"
 tempdir = "0.3.7"
 
 # Web
+actix = "0.10"
+#actix-web = "3"
+actix-web-actors = "3"
+
 actix-cors = "0.5.4"
 actix-files= "0.5"
 actix-http = "2.2.0"

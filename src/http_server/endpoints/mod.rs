@@ -5,5 +5,6 @@ pub mod misc;
 pub mod moderation;
 pub mod root_index;
 pub mod tts;
+pub mod twitch;
 pub mod users;
 pub mod w2l;
