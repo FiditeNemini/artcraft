@@ -14,11 +14,12 @@ pub mod common_env;
 pub mod database;
 pub mod job_queries;
 pub mod script_execution;
-pub mod shared_constants;
 pub mod util;
 
 use anyhow::{anyhow, Error};
 use chrono::Utc;
+use config::shared_constants::DEFAULT_MYSQL_CONNECTION_STRING;
+use config::shared_constants::DEFAULT_RUST_LOG;
 use crate::common_env::CommonEnv;
 use crate::database::mediators::badge_granter::BadgeGranter;
 use crate::database::mediators::firehose_publisher::FirehosePublisher;
@@ -34,8 +35,6 @@ use crate::script_execution::ffmpeg_generate_preview_video_command::FfmpegGenera
 use crate::script_execution::google_drive_download_command::GoogleDriveDownloadCommand;
 use crate::script_execution::imagemagick_generate_preview_image_command::ImagemagickGeneratePreviewImageCommand;
 use crate::script_execution::wav2lip_process_upload_command::{Wav2LipPreprocessClient, Wav2LipPreprocessError};
-use crate::shared_constants::DEFAULT_MYSQL_CONNECTION_STRING;
-use crate::shared_constants::DEFAULT_RUST_LOG;
 use crate::util::anyhow_result::AnyhowResult;
 use crate::util::buckets::bucket_client::BucketClient;
 use crate::util::buckets::bucket_paths::hash_to_bucket_path;

@@ -1,7 +1,7 @@
 use anyhow::anyhow;
 use chrono::{DateTime, Utc};
+use config::shared_constants::DEFAULT_MYSQL_QUERY_RESULT_PAGE_SIZE;
 use crate::database::enums::record_visibility::RecordVisibility;
-use crate::shared_constants::DEFAULT_MYSQL_QUERY_RESULT_PAGE_SIZE;
 use crate::util::anyhow_result::AnyhowResult;
 use log::{warn, info};
 use sqlx::MySqlPool;

@@ -1,6 +1,7 @@
 [workspace]
 
 members = [
+  "app/config",
   "app/obs_gateway",
   "app/storyteller_web",
 ]

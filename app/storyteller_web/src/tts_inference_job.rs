@@ -15,11 +15,12 @@ pub mod database;
 pub mod http_clients;
 pub mod job_queries;
 pub mod script_execution;
-pub mod shared_constants;
 pub mod util;
 
 use anyhow::{anyhow, Error};
 use chrono::{Utc, DateTime, TimeZone};
+use config::shared_constants::DEFAULT_MYSQL_CONNECTION_STRING;
+use config::shared_constants::DEFAULT_RUST_LOG;
 use crate::common_env::CommonEnv;
 use crate::database::enums::vocoder_type::VocoderType;
 use crate::database::mediators::firehose_publisher::FirehosePublisher;
@@ -35,8 +36,6 @@ use crate::job_queries::tts_inference_job_queries::mark_tts_inference_job_failur
 use crate::job_queries::tts_inference_job_queries::mark_tts_inference_job_permanently_dead;
 use crate::job_queries::tts_inference_job_queries::query_tts_inference_job_records;
 use crate::script_execution::tacotron_inference_command::TacotronInferenceCommand;
-use crate::shared_constants::DEFAULT_MYSQL_CONNECTION_STRING;
-use crate::shared_constants::DEFAULT_RUST_LOG;
 use crate::util::anyhow_result::AnyhowResult;
 use crate::util::buckets::bucket_client::BucketClient;
 use crate::util::buckets::bucket_path_unifier::BucketPathUnifier;
