@@ -12,9 +12,9 @@
 #[macro_use] extern crate magic_crypt;
 #[macro_use] extern crate serde_derive;
 
-pub const RESERVED_USERNAMES : &'static str = include_str!("../db/reserved_usernames.txt");
-pub const RESERVED_SUBSTRINGS : &'static str = include_str!("../db/reserved_usernames_including.txt");
-pub const BANNED_SLURS : &'static str = include_str!("../db/banned_slurs.txt");
+pub const RESERVED_USERNAMES : &'static str = include_str!("../../../db/reserved_usernames.txt");
+pub const RESERVED_SUBSTRINGS : &'static str = include_str!("../../../db/reserved_usernames_including.txt");
+pub const BANNED_SLURS : &'static str = include_str!("../../../db/banned_slurs.txt");
 
 pub mod database;
 pub mod http_clients;
@@ -114,6 +114,7 @@ use sqlx::MySqlPool;
 use sqlx::mysql::MySqlPoolOptions;
 use std::sync::Arc;
 use std::time::Duration;
+use crate::http_server::endpoints::twitch::pubsub_gateway::ws_index;
 
 // TODO TODO TODO TODO
 // TODO TODO TODO TODO
@@ -660,6 +661,12 @@ pub async fn serve(server_state: ServerState) -> AnyhowResult<()>
             .route(web::get().to(leaderboard_handler))
             .route(web::head().to(|| HttpResponse::Ok()))
       )
+      // Twitch
+        .service(
+          web::resource("/twitch")
+              .route(web::get().to(ws_index))
+              .route(web::head().to(|| HttpResponse::Ok()))
+        )
       .service(get_root_index)
       .service(enable_alpha_handler)
       .service(enable_alpha_easy_handler)

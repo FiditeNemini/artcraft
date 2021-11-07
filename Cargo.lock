@@ -2222,12 +2222,16 @@ name = "newrelic-telemetry"
 version = "0.1.0"
 dependencies = [
  "anyhow",
+ "env_logger",
  "flate2",
+ "futures 0.3.15",
  "hyper",
  "hyper-tls",
  "log",
+ "rand 0.7.3",
  "serde",
  "serde_json",
+ "tokio 0.2.25",
  "uuid",
 ]
 
@@ -2343,6 +2347,10 @@ dependencies = [
  "hermit-abi",
  "libc",
 ]
+
+[[package]]
+name = "obs-gateway-server"
+version = "0.0.1"
 
 [[package]]
 name = "once_cell"
