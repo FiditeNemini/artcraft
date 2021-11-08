@@ -34,7 +34,7 @@ lazy_static = "1.4.0"
 lfu = "0.2.5"
 log = "0.4.14"
 #newrelic = "0.2.2"
-newrelic-telemetry = { path = "../../vendor/newrelic-telemetry-sdk-rust" }
+#newrelic-telemetry = { path = "../../vendor/newrelic-telemetry-sdk-rust" }
 rand = "0.8.3"
 regex = "1.5.4"
 time = "0.2.26"
@@ -46,7 +46,9 @@ uuid = { version = "0.8.2", features = ["v4"] }
 # NB(2): Really unfortunate. We can't use Tokio 1.x due to a bug in `rust-s3` that I filed:
 # https://github.com/durch/rust-s3/issues/198
 #tokio = { version = "1.6.0", features = ["macros"] }
-tokio = { version = "0.2.25", features = ["macros"] }
+#tokio = { version = "0.2.25", features = ["macros"] }
+# NB(3,2021-11-07): Actually, maybe we can do this in a complex multi-project monorepo
+tokio = { version = "1.6.0", features = ["macros", "rt-multi-thread"] }
 
 # MySql Database
 # "offline" supports typesafe builds without a live database
@@ -65,6 +67,11 @@ r2d2_redis = "0.14.0"
 # NB "unsupported" pubsub features may disappear from the Twitch API at any time. It's an unofficial API.
 twitch_api2 = { version = "0.6.0-rc.2", features = ["helix", "reqwest_client", "pubsub", "chrono", "unsupported"] }
 twitch_oauth2 = "0.6.0-rc.2"
+
+# HTTP
+reqwest = { version = "0.11.4" }
+
+native-tls = "0.2.8"
 
 # In-memory caching
 lru_time_cache = "0.11.11"

@@ -38,7 +38,9 @@ use sqlx::MySqlPool;
 use sqlx::mysql::MySqlPoolOptions;
 use std::sync::Arc;
 use std::time::Duration;
+use twitch_oauth2::tokens::UserTokenBuilder;
 use twitch_oauth2::{AppAccessToken, Scope, TwitchToken, tokens::errors::AppAccessTokenError, ClientId, ClientSecret};
+use crate::twitch::twitch_client_wrapper::TwitchClientWrapper;
 
 const DEFAULT_BIND_ADDRESS : &'static str = "0.0.0.0:12345";
 
@@ -64,7 +66,8 @@ pub struct EnvConfig {
   pub website_homepage_redirect: String,
 }
 
-#[actix_web::main]
+//#[actix_web::main]
+#[tokio::main]
 async fn main() -> AnyhowResult<()> {
   easyenv::init_all_with_default_logging(Some(DEFAULT_RUST_LOG));
 
@@ -86,6 +89,52 @@ async fn main() -> AnyhowResult<()> {
   let secrets = TwitchSecrets::from_file("twitch_secrets.toml")?;
   let client_id = ClientId::new(&secrets.app_client_id);
   let client_secret = ClientSecret::new(&secrets.app_client_secret);
+
+
+  // ========================================================
+
+  info!("Getting app access token...");
+
+  //let scopes = Scope::all();
+  let scopes = vec![
+    Scope::BitsRead,
+    Scope::UserReadEmail,
+  ];
+
+  let mut twitch_client = TwitchClientWrapper::new(client_id.clone(), client_secret.clone());
+  twitch_client.request_access_token(scopes).await?;
+
+  info!("Getting user id ...");
+
+  //let user_id = twitch_client.get_user_id_from_username("testytest512").await?;
+  let user_id = twitch_client.get_user_id_from_username("vocodes").await?;
+
+  info!("User ID: {}", user_id);
+
+  //std::thread::sleep(Duration::from_secs(5000));
+
+
+  // ==================== OAUTH FLOW ====================
+
+  println!("Oauth flow...");
+
+  let redirect_url = twitch_oauth2::url::Url::parse("http://localhost/test")?;
+  let mut builder = UserTokenBuilder::new(client_id, client_secret, redirect_url)
+      .set_scopes(Scope::all())
+      .force_verify(true);
+
+  //builder.add_scope(Scope::BitsRead);
+
+  let (url, _csrf_token) = builder.generate_url();
+
+  println!("Go to this page: {}", url);
+
+
+
+
+
+  // ========================================================
+
 
   info!("Connecting to database...");
 
