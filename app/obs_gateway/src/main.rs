@@ -13,6 +13,7 @@
 #[macro_use] extern crate serde_derive;
 
 pub mod pubsub_gateway;
+pub mod twitch;
 
 use actix_cors::Cors;
 use actix_http::http;
@@ -22,6 +23,7 @@ use config::shared_constants::DEFAULT_MYSQL_CONNECTION_STRING;
 use config::shared_constants::DEFAULT_REDIS_CONNECTION_STRING;
 use config::shared_constants::DEFAULT_RUST_LOG;
 use crate::pubsub_gateway::ws_index;
+use crate::twitch::twitch_secrets::TwitchSecrets;
 use futures::Future;
 use futures::executor::ThreadPool;
 use http_server_common::endpoints::default_route_404::default_route_404;
@@ -35,6 +37,7 @@ use sqlx::MySqlPool;
 use sqlx::mysql::MySqlPoolOptions;
 use std::sync::Arc;
 use std::time::Duration;
+use twitch_oauth2::{AppAccessToken, Scope, TwitchToken, tokens::errors::AppAccessTokenError, ClientId, ClientSecret};
 
 const DEFAULT_BIND_ADDRESS : &'static str = "0.0.0.0:12345";
 
@@ -76,6 +79,12 @@ async fn main() -> AnyhowResult<()> {
       .unwrap_or("obs-gateway-server-unknown".to_string());
 
   info!("Hostname: {}", &server_hostname);
+
+  info!("Reading Twitch secrets...");
+
+  let secrets = TwitchSecrets::from_file("twitch_secrets.toml")?;
+  let client_id = ClientId::new(&secrets.app_client_id);
+  let client_secret = ClientSecret::new(&secrets.app_client_secret);
 
   info!("Connecting to database...");
 
