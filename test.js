@@ -2,9 +2,12 @@
 var sock = new WebSocket("ws://localhost:12345/twitch");
 
 sock.onopen = function (event) {
-    //sock.send("Here's some text that the server is urgently awaiting!");
+    console.log('on open event', event);
+    sock.send('on open message from client');
 };
 
 sock.onmessage = function (event) {
-    console.log('got a message', event.data);
+    console.log('on message event', event.data);
 }
+
+sock.send('this is a message from the client');
