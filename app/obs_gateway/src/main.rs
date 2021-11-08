@@ -14,7 +14,11 @@
 
 pub mod pubsub_gateway;
 pub mod twitch;
+pub mod util;
 
+//use http_server_common::cors::build_common_cors_config;
+//use http_server_common::endpoints::default_route_404::default_route_404;
+//use http_server_common::endpoints::root_index::get_root_index;
 use actix_cors::Cors;
 use actix_http::http;
 use actix_web::middleware::{Logger, DefaultHeaders};
@@ -23,12 +27,11 @@ use config::shared_constants::DEFAULT_MYSQL_CONNECTION_STRING;
 use config::shared_constants::DEFAULT_REDIS_CONNECTION_STRING;
 use config::shared_constants::DEFAULT_RUST_LOG;
 use crate::pubsub_gateway::ws_index;
+use crate::twitch::twitch_client_wrapper::TwitchClientWrapper;
 use crate::twitch::twitch_secrets::TwitchSecrets;
+use crate::twitch::websocket_client::PollingTwitchWebsocketClient;
 use futures::Future;
 use futures::executor::ThreadPool;
-//use http_server_common::cors::build_common_cors_config;
-//use http_server_common::endpoints::default_route_404::default_route_404;
-//use http_server_common::endpoints::root_index::get_root_index;
 use limitation::Limiter;
 use log::{info};
 use r2d2_redis::RedisConnectionManager;
@@ -38,9 +41,10 @@ use sqlx::MySqlPool;
 use sqlx::mysql::MySqlPoolOptions;
 use std::sync::Arc;
 use std::time::Duration;
+use twitch_api2::pubsub::Topic;
+use twitch_api2::pubsub;
 use twitch_oauth2::tokens::UserTokenBuilder;
 use twitch_oauth2::{AppAccessToken, Scope, TwitchToken, tokens::errors::AppAccessTokenError, ClientId, ClientSecret};
-use crate::twitch::twitch_client_wrapper::TwitchClientWrapper;
 
 const DEFAULT_BIND_ADDRESS : &'static str = "0.0.0.0:12345";
 
@@ -131,6 +135,109 @@ async fn main() -> AnyhowResult<()> {
 
   println!("Go to this page: {}", url);
 
+
+
+  let input = rpassword::prompt_password_stdout(
+    "Paste in the resulting adress after authenticating (input hidden): ",
+  )?;
+
+  let u = twitch_oauth2::url::Url::parse(&input)?;
+
+  let map: std::collections::HashMap<_, _> = u.query_pairs().collect();
+
+  let user_token = match (map.get("state"), map.get("code")) {
+    (Some(state), Some(code)) => {
+      let token = builder
+          .get_user_token(
+            &reqwest::Client::builder()
+                .redirect(reqwest::redirect::Policy::none())
+                .build()?,
+            state,
+            code,
+          )
+          .await?;
+      println!("Got token: {:?}", token);
+
+      token
+    }
+    _ => match (map.get("error"), map.get("error_description")) {
+      (std::option::Option::Some(error), std::option::Option::Some(error_description)) => {
+        anyhow::bail!(
+                    "twitch errored with error: {} - {}",
+                    error,
+                    error_description
+                );
+      }
+      _ => anyhow::bail!("invalid url passed"),
+    },
+  };
+
+  let auth_token = user_token.access_token.as_str();
+
+  // ==================== PUBSUB SUBSCRIPTION AND MAIN LOOP ====================
+
+  let mut client = PollingTwitchWebsocketClient::new()?;
+
+  println!("Connecting PubSub...");
+  client.connect().await?;
+
+  println!("Connected");
+
+  //println!("Starting polling thread...");
+  //client.start_ping_thread().await;
+
+  println!("Sending PING...");
+
+  client.send_ping().await?;
+
+  println!("Try read next...");
+  let r = client.try_next().await?;
+  println!("Result: {:?}", r);
+
+
+  println!("Begin LISTEN...");
+
+  let bit_topic = pubsub::channel_bits::ChannelBitsEventsV2 {
+    channel_id: user_id,
+  }.into_topic();
+
+  let topics = [bit_topic];
+
+  client.listen(&auth_token, &topics).await?;
+
+  println!("Try read next...");
+  let r = client.try_next().await?;
+  println!("Result: {:?}", r);
+
+  /*
+  Result: Some(Message { data: ChannelBitsEventsV2 { topic: ChannelBitsEventsV2 {
+  channel_id: 652567283 }, reply: BitsEvent { data: BitsEventData { badge_entitlement:
+  Some(BadgeEntitlement { new_version: 100, previous_version: 1 }), bits_used: 100,
+  channel_id: "652567283", channel_name: "vocodes", chat_message: "Cheer100 testing the cheer",
+  context: Cheer, is_anonymous: false, time: "2021-09-27T04:30:53.627717085Z",
+  total_bits_used: 101, user_id: "650154491", user_name: "testytest512" },
+  message_id: "793f745e-8f3e-5f71-bc41-4808c4b49a53", version: "1.0", is_anonymous: false } } })
+
+  Result: Some(Message { data: ChannelBitsEventsV2 { topic: ChannelBitsEventsV2 {
+  channel_id: 652567283 }, reply: BitsEvent { data: BitsEventData { badge_entitlement: None,
+  bits_used: 1, channel_id: "652567283", channel_name: "vocodes",
+  chat_message: "mario: hello everybody Cheer1", context: Cheer, is_anonymous: false,
+  time: "2021-09-27T04:47:32.943872952Z", total_bits_used: 102, user_id: "650154491",
+  user_name: "testytest512" }, message_id: "5844328d-495b-5585-9d6c-3c99949f9a0a", version: "1.0",
+  is_anonymous: false } } })
+   */
+
+
+
+  println!("Try read next...");
+  let r = client.try_next().await?;
+  println!("Result: {:?}", r);
+
+  println!("Sleep...");
+  std::thread::sleep(Duration::from_millis(30000));
+
+  //let text = msg.into_text()?;
+  //println!("Text: {}", text);
 
   // ========================================================
 
