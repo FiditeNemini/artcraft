@@ -17,7 +17,7 @@ path = "src/main.rs"
 # Internal
 config = { path = "../config" }
 container_common = { path = "../container_common" }
-http_server_common = { path = "../http_server_common" }
+#http_server_common = { path = "../http_server_common" }
 
 # External
 anyhow = "1.0.40"
@@ -47,7 +47,8 @@ uuid = { version = "0.8.2", features = ["v4"] }
 # https://github.com/durch/rust-s3/issues/198
 #tokio = { version = "1.6.0", features = ["macros"] }
 #tokio = { version = "0.2.25", features = ["macros"] }
-# NB(3,2021-11-07): Actually, maybe we can do this in a complex multi-project monorepo
+# NB(3,2021-11-07): Actually, maybe we can specify a version that diverges from
+#  the rest of the monorepo. The Twitch client needs a 1.x runtime.
 tokio = { version = "1.6.0", features = ["macros", "rt-multi-thread"] }
 
 # MySql Database
@@ -76,32 +77,16 @@ native-tls = "0.2.8"
 # In-memory caching
 lru_time_cache = "0.11.11"
 
-# Files
-data-encoding = "2.3.2"
-ring = "0.17.0-alpha.10"
-# NB: This is the source of all of our problems. `rust-s3` can't upload to object names with directories
-# in the 0.27.* series, so we have to downgrade to 0.26, which includes a broad downgrade from Tokio 1.0 -> 0.2
-#rust-s3 = "0.27.0-rc4"
-#rust-s3 = { version = "0.27.0-rc4", features = ["with-async-std"], default-features = false }
-rust-s3 = { version = "0.26" }
-infer = "0.5.0"
-
-subprocess = "0.2.6"
-tempdir = "0.3.7"
-
 # Web
-actix = "0.10"
-#actix-web = "3"
-actix-web-actors = "3"
-
+actix = "0.12.0"
 actix-cors = "0.5.4"
 actix-files= "0.5"
-actix-http = "2.2.0"
-actix-multipart = "0.3.0" # TODO: Ready for 0.4 upgrade
-actix-rt = "2.2.0"
-actix-service = "1.0.6"
+actix-http = "3.0.0-beta.11"
+actix-rt = "2.4.0"
+actix-service = "2.0.1"
 actix-utils = "3.0.0"
-actix-web = "3.3.2"
+actix-web = "4.0.0-beta.10"
+actix-web-actors = "4.0.0-beta.7"
 jwt = "0.13.0"
 
 # NB: Hyper is just for HTTP client use in jobs. I'd use Actix client, but I need tokio runtime

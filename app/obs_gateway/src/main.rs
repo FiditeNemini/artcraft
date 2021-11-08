@@ -26,9 +26,9 @@ use crate::pubsub_gateway::ws_index;
 use crate::twitch::twitch_secrets::TwitchSecrets;
 use futures::Future;
 use futures::executor::ThreadPool;
-use http_server_common::cors::build_common_cors_config;
-use http_server_common::endpoints::default_route_404::default_route_404;
-use http_server_common::endpoints::root_index::get_root_index;
+//use http_server_common::cors::build_common_cors_config;
+//use http_server_common::endpoints::default_route_404::default_route_404;
+//use http_server_common::endpoints::root_index::get_root_index;
 use limitation::Limiter;
 use log::{info};
 use r2d2_redis::RedisConnectionManager;
@@ -66,8 +66,8 @@ pub struct EnvConfig {
   pub website_homepage_redirect: String,
 }
 
-//#[actix_web::main]
-#[tokio::main]
+#[actix_web::main]
+//#[tokio::main]
 async fn main() -> AnyhowResult<()> {
   easyenv::init_all_with_default_logging(Some(DEFAULT_RUST_LOG));
 
@@ -93,6 +93,8 @@ async fn main() -> AnyhowResult<()> {
 
   // ========================================================
 
+// TODO: Temp comment out to debug actix-web vs. runtime
+//
   info!("Getting app access token...");
 
   //let scopes = Scope::all();
@@ -130,33 +132,29 @@ async fn main() -> AnyhowResult<()> {
   println!("Go to this page: {}", url);
 
 
-
-
-
   // ========================================================
 
-
-  info!("Connecting to database...");
-
-  let db_connection_string =
-      easyenv::get_env_string_or_default(
-        "MYSQL_URL",
-        DEFAULT_MYSQL_CONNECTION_STRING);
-
-  let redis_connection_string =
-      easyenv::get_env_string_or_default(
-        "REDIS_URL",
-        DEFAULT_REDIS_CONNECTION_STRING);
-
-  let pool = MySqlPoolOptions::new()
-      .max_connections(5)
-      .connect(&db_connection_string)
-      .await?;
-
-  let redis_manager = RedisConnectionManager::new(redis_connection_string.clone())?;
-
-  let redis_pool = r2d2::Pool::builder()
-      .build(redis_manager)?;
+//  info!("Connecting to database...");
+//
+//  let db_connection_string =
+//      easyenv::get_env_string_or_default(
+//        "MYSQL_URL",
+//        DEFAULT_MYSQL_CONNECTION_STRING);
+//
+//  let redis_connection_string =
+//      easyenv::get_env_string_or_default(
+//        "REDIS_URL",
+//        DEFAULT_REDIS_CONNECTION_STRING);
+//
+//  let pool = MySqlPoolOptions::new()
+//      .max_connections(5)
+//      .connect(&db_connection_string)
+//      .await?;
+//
+//  let redis_manager = RedisConnectionManager::new(redis_connection_string.clone())?;
+//
+//  let redis_pool = r2d2::Pool::builder()
+//      .build(redis_manager)?;
 
   info!("Reading env vars and setting up utils...");
 
@@ -201,7 +199,7 @@ pub async fn serve(server_state: ObsGatewayServerState) -> AnyhowResult<()>
   HttpServer::new(move || {
     App::new()
         .app_data(server_state_arc.clone())
-        .wrap(build_common_cors_config())
+        //.wrap(build_common_cors_config())
         .wrap(Logger::new(&log_format)
             .exclude("/liveness")
             .exclude("/readiness"))
@@ -214,8 +212,8 @@ pub async fn serve(server_state: ObsGatewayServerState) -> AnyhowResult<()>
               .route(web::get().to(ws_index))
               .route(web::head().to(|| HttpResponse::Ok()))
         )
-        .service(get_root_index)
-        .default_service( web::route().to(default_route_404))
+        //.service(get_root_index)
+        //.default_service( web::route().to(default_route_404))
   })
       .bind(bind_address)?
       .workers(num_workers)
