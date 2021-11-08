@@ -69,19 +69,25 @@ subprocess = "0.2.6"
 tempdir = "0.3.7"
 
 # Web
-actix = "0.10"
-#actix-web = "3"
-actix-web-actors = "3"
-
+#actix = "0.12.0"
 actix-cors = "0.5.4"
-actix-files= "0.5"
-actix-http = "2.2.0"
-actix-multipart = "0.3.0" # TODO: Ready for 0.4 upgrade
-actix-rt = "2.2.0"
-actix-service = "1.0.6"
-actix-utils = "3.0.0"
-actix-web = "3.3.2"
-jwt = "0.13.0"
+#actix-files= "0.5"
+actix-http = "*"
+#actix-multipart = "0.3.0" # TODO: Ready for 0.4 upgrade
+#actix-rt = "2.2.0"
+#actix-service = "1.0.6"
+#actix-utils = "3.0.0"
+actix-web = "*"
+#actix-web-actors = "3"
+#jwt = "0.13.0"
+
+
+#actix-http-old = { package = "actix-http", version = "2.2.0", optional = true }
+#actix-web-old = { package = "actix-web", version = "3.3.2", optional = true }
+#actix-http-new = { package = "actix-http", version = "3.0.0-beta.11", optional = true }
+#actix-web-new = { package = "actix-web", version = "4.0.0-beta.10", optional = true }
+
+
 
 # NB: Hyper is just for HTTP client use in jobs. I'd use Actix client, but I need tokio runtime
 # NB: Furthermore, the Tokio runtime is old, so I have to use an older Hyper.
@@ -106,3 +112,7 @@ pulldown-cmark = "0.8.0"
 [build-dependencies]
 # NB: Only using diesel for migrations support
 diesel = { version = "1.4.6", features = ["mysql"] }
+
+#[features]
+#actix-old = ["actix-http-old", "actix-web-old"]
+#actix-new = ["actix-http-new", "actix-web-new"]

@@ -2044,16 +2044,9 @@ dependencies = [
 name = "http_server_common"
 version = "0.0.1"
 dependencies = [
- "actix 0.10.0",
  "actix-cors",
- "actix-files",
  "actix-http 2.2.0",
- "actix-multipart",
- "actix-rt 2.4.0",
- "actix-service 1.0.6",
- "actix-utils 3.0.0",
  "actix-web 3.3.2",
- "actix-web-actors 3.0.0",
  "anyhow",
  "base64 0.13.0",
  "bcrypt",
@@ -2070,7 +2063,6 @@ dependencies = [
  "hostname",
  "hyper 0.13.10",
  "infer",
- "jwt",
  "limitation",
  "log",
  "lru_time_cache",
@@ -2827,6 +2819,7 @@ dependencies = [
  "hex",
  "hmac 0.10.1",
  "hostname",
+ "http_server_common",
  "hyper 0.13.10",
  "jwt",
  "lazy_static",
