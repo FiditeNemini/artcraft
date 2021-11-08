@@ -12,6 +12,7 @@
 #[macro_use] extern crate magic_crypt;
 #[macro_use] extern crate serde_derive;
 
+//pub mod endpoints;
 pub mod pubsub_gateway;
 pub mod twitch;
 pub mod util;
@@ -45,6 +46,7 @@ use twitch_api2::pubsub::Topic;
 use twitch_api2::pubsub;
 use twitch_oauth2::tokens::UserTokenBuilder;
 use twitch_oauth2::{AppAccessToken, Scope, TwitchToken, tokens::errors::AppAccessTokenError, ClientId, ClientSecret};
+//use crate::endpoints::oauth_begin::oauth_begin_enroll;
 
 const DEFAULT_BIND_ADDRESS : &'static str = "0.0.0.0:12345";
 
@@ -319,7 +321,18 @@ pub async fn serve(server_state: ObsGatewayServerState) -> AnyhowResult<()>
               .route(web::get().to(ws_index))
               .route(web::head().to(|| HttpResponse::Ok()))
         )
-        //.service(get_root_index)
+        // /twitch_oauth_enroll
+        // /twitch_oauth_redirect
+//        .service(
+//          web::resource("/twitch_oauth_enroll")
+//              .route(web::get().to(oauth_begin_enroll))
+//              .route(web::head().to(|| HttpResponse::Ok()))
+//        )
+//        .service(
+//          web::resource("/twitch_oauth_redirect")
+//              .route(web::get().to(oauth_begin_enroll))
+//              .route(web::head().to(|| HttpResponse::Ok()))
+//        )
         //.default_service( web::route().to(default_route_404))
   })
       .bind(bind_address)?

@@ -2,5 +2,6 @@
 //! Common HTTP Server components
 //!
 
-pub mod endpoints;
 pub mod cors;
+pub mod endpoints;
+pub mod response;
