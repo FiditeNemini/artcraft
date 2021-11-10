@@ -17,7 +17,7 @@ path = "src/main.rs"
 # Internal
 config = { path = "../config" }
 container_common = { path = "../container_common" }
-http_server_common = { path = "../http_server_common" }
+http_server_common = { path = "../http_server_common", features = ["actix-new"] }
 
 # External
 anyhow = "1.0.40"

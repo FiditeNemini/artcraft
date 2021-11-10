@@ -31,7 +31,7 @@ use crate::twitch::twitch_secrets::TwitchSecrets;
 use crate::twitch::websocket_client::PollingTwitchWebsocketClient;
 use futures::Future;
 use futures::executor::ThreadPool;
-use http_server_common::cors::build_common_cors_config;
+//use http_server_common::cors::build_common_cors_config;
 use http_server_common::endpoints::default_route_404::default_route_404;
 use http_server_common::endpoints::root_index::get_root_index;
 use limitation::Limiter;

@@ -46,9 +46,5 @@ pub async fn oauth_begin_enroll(
 
 
   info!("oauth enrollment begin");
-  //Ok(simple_json_success())
-
-  Ok(HttpResponse::Ok()
-      .content_type("application/json")
-      .body(""))
+  Ok(simple_json_success())
 }
