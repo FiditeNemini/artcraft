@@ -12,14 +12,11 @@
 #[macro_use] extern crate magic_crypt;
 #[macro_use] extern crate serde_derive;
 
-//pub mod endpoints;
+pub mod endpoints;
 pub mod pubsub_gateway;
 pub mod twitch;
 pub mod util;
 
-//use http_server_common::cors::build_common_cors_config;
-//use http_server_common::endpoints::default_route_404::default_route_404;
-//use http_server_common::endpoints::root_index::get_root_index;
 use actix_cors::Cors;
 use actix_http::http;
 use actix_web::middleware::{Logger, DefaultHeaders};
@@ -27,12 +24,16 @@ use actix_web::{HttpServer, web, HttpResponse, App};
 use config::shared_constants::DEFAULT_MYSQL_CONNECTION_STRING;
 use config::shared_constants::DEFAULT_REDIS_CONNECTION_STRING;
 use config::shared_constants::DEFAULT_RUST_LOG;
+use crate::endpoints::oauth_begin::oauth_begin_enroll;
 use crate::pubsub_gateway::ws_index;
 use crate::twitch::twitch_client_wrapper::TwitchClientWrapper;
 use crate::twitch::twitch_secrets::TwitchSecrets;
 use crate::twitch::websocket_client::PollingTwitchWebsocketClient;
 use futures::Future;
 use futures::executor::ThreadPool;
+use http_server_common::cors::build_common_cors_config;
+use http_server_common::endpoints::default_route_404::default_route_404;
+use http_server_common::endpoints::root_index::get_root_index;
 use limitation::Limiter;
 use log::{info};
 use r2d2_redis::RedisConnectionManager;
@@ -46,7 +47,6 @@ use twitch_api2::pubsub::Topic;
 use twitch_api2::pubsub;
 use twitch_oauth2::tokens::UserTokenBuilder;
 use twitch_oauth2::{AppAccessToken, Scope, TwitchToken, tokens::errors::AppAccessTokenError, ClientId, ClientSecret};
-//use crate::endpoints::oauth_begin::oauth_begin_enroll;
 
 const DEFAULT_BIND_ADDRESS : &'static str = "0.0.0.0:12345";
 
@@ -323,16 +323,16 @@ pub async fn serve(server_state: ObsGatewayServerState) -> AnyhowResult<()>
         )
         // /twitch_oauth_enroll
         // /twitch_oauth_redirect
-//        .service(
-//          web::resource("/twitch_oauth_enroll")
-//              .route(web::get().to(oauth_begin_enroll))
-//              .route(web::head().to(|| HttpResponse::Ok()))
-//        )
-//        .service(
-//          web::resource("/twitch_oauth_redirect")
-//              .route(web::get().to(oauth_begin_enroll))
-//              .route(web::head().to(|| HttpResponse::Ok()))
-//        )
+        .service(
+          web::resource("/twitch_oauth_enroll")
+              .route(web::get().to(oauth_begin_enroll))
+              .route(web::head().to(|| HttpResponse::Ok()))
+        )
+        .service(
+          web::resource("/twitch_oauth_redirect")
+              .route(web::get().to(oauth_begin_enroll))
+              .route(web::head().to(|| HttpResponse::Ok()))
+        )
         //.default_service( web::route().to(default_route_404))
   })
       .bind(bind_address)?
