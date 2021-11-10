@@ -12,14 +12,12 @@
 
 #[cfg(feature = "actix-new")]
 extern crate actix_http_new as actix_http;
-
 #[cfg(feature = "actix-new")]
 extern crate actix_web_new as actix_web;
 
-#[cfg(feature = "actix-old")]
+#[cfg(not(feature = "actix-new"))]
 extern crate actix_http_old as actix_http;
-
-#[cfg(feature = "actix-old")]
+#[cfg(not(feature = "actix-new"))]
 extern crate actix_web_old as actix_web;
 
 pub mod cors;

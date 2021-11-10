@@ -39,7 +39,7 @@ path = "src/w2l_inference_job.rs"
 
 # Internal
 config = { path = "../config" }
-http_server_common = { path = "../http_server_common" }
+http_server_common = { path = "../http_server_common", features = ["actix-old"] }
 
 # External
 anyhow = "1.0.40"
