@@ -22,6 +22,6 @@ extern crate actix_http_old as actix_http;
 #[cfg(feature = "actix-old")]
 extern crate actix_web_old as actix_web;
 
-//pub mod cors;
+pub mod cors;
 pub mod endpoints;
 pub mod response;

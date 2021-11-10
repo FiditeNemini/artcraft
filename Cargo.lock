@@ -118,6 +118,21 @@ dependencies = [
 ]
 
 [[package]]
+name = "actix-cors"
+version = "0.6.0-beta.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "fa59d36d7ad063401d94ada05264a303791796ad5222d0954cc21f2e1052e99b"
+dependencies = [
+ "actix-service 2.0.1",
+ "actix-web 4.0.0-beta.10",
+ "derive_more",
+ "futures-util",
+ "log",
+ "once_cell",
+ "smallvec 1.6.1",
+]
+
+[[package]]
 name = "actix-files"
 version = "0.5.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2044,6 +2059,7 @@ dependencies = [
 name = "http_server_common"
 version = "0.0.1"
 dependencies = [
+ "actix-cors 0.6.0-beta.3",
  "actix-http 2.2.0",
  "actix-http 3.0.0-beta.11",
  "actix-web 3.3.2",
@@ -2767,7 +2783,7 @@ name = "obs-gateway-server"
 version = "0.0.1"
 dependencies = [
  "actix 0.12.0",
- "actix-cors",
+ "actix-cors 0.5.4",
  "actix-files",
  "actix-http 3.0.0-beta.11",
  "actix-rt 2.4.0",
@@ -4008,7 +4024,7 @@ name = "storyteller-web"
 version = "0.0.1"
 dependencies = [
  "actix 0.10.0",
- "actix-cors",
+ "actix-cors 0.5.4",
  "actix-files",
  "actix-http 2.2.0",
  "actix-multipart",
