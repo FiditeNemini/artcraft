@@ -624,10 +624,10 @@ pub async fn serve(server_state: ServerState) -> AnyhowResult<()>
             .route(web::get().to(leaderboard_handler))
             .route(web::head().to(|| HttpResponse::Ok()))
       )
-      .service(get_root_index)
+      //.service(get_root_index)
       .service(enable_alpha_handler)
       .service(enable_alpha_easy_handler)
-      .default_service( web::route().to(default_route_404))
+      //.default_service( web::route().to(default_route_404))
   })
   .bind(bind_address)?
   .workers(num_workers)
