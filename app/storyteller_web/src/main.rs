@@ -90,7 +90,7 @@ use crate::http_server::endpoints::w2l::get_w2l_template_use_count::get_w2l_temp
 use crate::http_server::endpoints::w2l::get_w2l_upload_template_job_status::get_w2l_upload_template_job_status_handler;
 use crate::http_server::endpoints::w2l::list_w2l_templates::list_w2l_templates_handler;
 use crate::http_server::endpoints::w2l::set_w2l_template_mod_approval::set_w2l_template_mod_approval_handler;
-//use crate::http_server::middleware::ip_filter_middleware::IpFilter;
+use crate::http_server::middleware::ip_filter_middleware::IpFilter;
 use crate::http_server::web_utils::cookie_manager::CookieManager;
 use crate::http_server::web_utils::redis_rate_limiter::RedisRateLimiter;
 use crate::http_server::web_utils::session_checker::SessionChecker;
@@ -325,7 +325,7 @@ pub async fn serve(server_state: ServerState) -> AnyhowResult<()>
       .wrap(DefaultHeaders::new()
         .header("X-Backend-Hostname", &hostname)
         .header("X-Build-Sha", ""))
-      //.wrap(IpFilter::new(ip_banlist)) // TODO(FIXME): Bad upgrade
+      .wrap(IpFilter::new(ip_banlist))
       // ==================== ACCOUNT CREATION / SESSION MANAGEMENT ====================
       .service(
         web::resource("/create_account")

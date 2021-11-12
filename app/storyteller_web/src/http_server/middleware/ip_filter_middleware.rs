@@ -1,15 +1,15 @@
+use actix_service::{Service, Transform};
+use actix_web::error::ErrorForbidden;
+use actix_web::{dev::ServiceRequest, dev::ServiceResponse, Error};
+use crate::http_server::web_utils::ip_address::get_service_request_ip;
+use crate::threads::ip_banlist_set::IpBanlistSet;
+use futures::Future;
+use futures::future::{ok, Ready, LocalBoxFuture};
+use log::info;
+use log::warn;
 use std::pin::Pin;
 use std::task::{Context, Poll};
-
-use actix_service::{Service, Transform};
-use actix_web::{dev::ServiceRequest, dev::ServiceResponse, Error};
-use futures::future::{ok, Ready};
-use futures::Future;
-use crate::threads::ip_banlist_set::IpBanlistSet;
-use log::warn;
-use log::info;
-use crate::http_server::web_utils::ip_address::get_service_request_ip;
-use actix_web::error::ErrorForbidden;
+use actix_utils::future::Either;
 
 // There are two steps in middleware processing.
 // 1. Middleware initialization, middleware factory gets called with
@@ -31,17 +31,15 @@ impl IpFilter {
 // Middleware factory is `Transform` trait from actix-service crate
 // `S` - type of the next service
 // `B` - type of response's body
-impl<S, B> Transform<S> for IpFilter
+impl<S, B> Transform<S, ServiceRequest> for IpFilter
   where
-      S: Service<Request = ServiceRequest, Response = ServiceResponse<B>, Error = Error>,
+      S: Service<ServiceRequest, Response = ServiceResponse<B>, Error = Error>,
       S::Future: 'static,
-      B: 'static,
 {
-  type Request = ServiceRequest;
   type Response = ServiceResponse<B>;
   type Error = Error;
-  type InitError = ();
   type Transform = IpFilterMiddleware<S>;
+  type InitError = ();
   type Future = Ready<Result<Self::Transform, Self::InitError>>;
 
   fn new_transform(&self, service: S) -> Self::Future {
@@ -55,22 +53,18 @@ pub struct IpFilterMiddleware<S> {
   ip_banlist: IpBanlistSet,
 }
 
-impl<S, B> Service for IpFilterMiddleware<S>
+impl<S, B> Service<ServiceRequest> for IpFilterMiddleware<S>
   where
-      S: Service<Request = ServiceRequest, Response = ServiceResponse<B>, Error = Error>,
+      S: Service<ServiceRequest, Response = ServiceResponse<B>, Error = Error>,
       S::Future: 'static,
-      B: 'static,
 {
-  type Request = ServiceRequest;
   type Response = ServiceResponse<B>;
   type Error = Error;
-  type Future = Pin<Box<dyn Future<Output = Result<Self::Response, Self::Error>>>>;
+  type Future = S::Future;
 
-  fn poll_ready(&mut self, cx: &mut Context<'_>) -> Poll<Result<(), Self::Error>> {
-    self.service.poll_ready(cx)
-  }
+  actix_service::forward_ready!(service);
 
-  fn call(&mut self, req: ServiceRequest) -> Self::Future {
+  fn call(&self, req: ServiceRequest) -> Self::Future {
     let ip_address = get_service_request_ip(&req);
 
     // NB: Fail open.
@@ -78,14 +72,11 @@ impl<S, B> Service for IpFilterMiddleware<S>
 
     if is_banned {
       warn!("Ip is banned: {}", &ip_address);
-      return Box::pin(ok(req.error_response(ErrorForbidden("Forbidden"))))
+      //return Box::pin(ok(req.error_response(ErrorForbidden("Forbidden"))))
+      //return req.error_response(ErrorForbidden("Forbidden"))
+      // TODO: RESTORE BLOCK
     }
 
-    // Call endpoint and return results
-    let fut = self.service.call(req);
-    Box::pin(async move {
-      let res = fut.await?;
-      Ok(res)
-    })
+    self.service.call(req)
   }
 }
