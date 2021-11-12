@@ -9,7 +9,7 @@ use log::info;
 use log::warn;
 use std::pin::Pin;
 use std::task::{Context, Poll};
-use actix_web::body::AnyBody;
+use actix_web::body::{AnyBody, MessageBody};
 use actix_http::http;
 
 // There are two steps in middleware processing.
@@ -36,6 +36,7 @@ impl<S, B> Transform<S, ServiceRequest> for IpFilter
   where
       S: Service<ServiceRequest, Response = ServiceResponse<B>, Error = Error>,
       S::Future: 'static,
+      B: 'static,
 {
   type Response = ServiceResponse<B>;
   type Error = Error;
@@ -56,10 +57,12 @@ pub struct IpFilterMiddleware<S> {
 
 // Updated example from
 //  - https://github.com/actix/examples/blob/master/basics/middleware/src/redirect.rs
+//  - https://stackoverflow.com/questions/68944823/returning-an-unauthorized-response-in-actix-web-middleware-in-rust
 impl<S, B> Service<ServiceRequest> for IpFilterMiddleware<S>
   where
       S: Service<ServiceRequest, Response = ServiceResponse<B>, Error = Error>,
       S::Future: 'static,
+      B: 'static,
 {
   type Response = ServiceResponse<B>;
   type Error = Error;
@@ -72,6 +75,16 @@ impl<S, B> Service<ServiceRequest> for IpFilterMiddleware<S>
 
   actix_service::forward_ready!(service);
 
+  /*
+
+  Future
+
+  Future = Pin<Box<dyn Future<Result<RESPONSE, ERROR>>>
+
+  RESPONSE = ServiceResponse<B>
+
+
+   */
   fn call(&self, req: ServiceRequest) -> Self::Future {
     let ip_address = get_service_request_ip(&req);
 
@@ -103,13 +116,13 @@ impl<S, B> Service<ServiceRequest> for IpFilterMiddleware<S>
       //  ErrorForbidden("")
       //)));
 
-      //return Box::pin(async move {
-      //  let res = req.into_response(
-      //    HttpResponse::Unauthorized()
-      //        .finish()
-      //  );
-      //  Ok(res)
-      //})
+      return Box::pin(async move {
+        let res = req.into_response(
+          HttpResponse::Unauthorized()
+              .finish()
+        );
+        Ok(res)
+      })
 
     }
 
