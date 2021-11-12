@@ -2645,6 +2645,7 @@ dependencies = [
  "hex",
  "hmac 0.10.1",
  "hostname",
+ "http_server_common",
  "hyper 0.13.10",
  "jwt",
  "lazy_static",
