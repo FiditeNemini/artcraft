@@ -1,12 +1,8 @@
 use actix_http::http::header;
+use actix_web::HttpResponseBuilder;
 use actix_web::http::StatusCode;
 use actix_web::{HttpResponse, ResponseError};
 
-#[cfg(feature = "actix-new")]
-use actix_web::HttpResponseBuilder;
-
-#[cfg(not(feature = "actix-new"))]
-use actix_web::dev::HttpResponseBuilder;
 
 #[derive(Serialize)]
 pub struct SimpleGenericJsonError {

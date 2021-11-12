@@ -5,7 +5,7 @@ use crate::util::anyhow_result::AnyhowResult;
 use crate::util::random_prefix_crockford_token::random_prefix_crockford_token;
 use log::{warn,info};
 use sqlx::error::Error::Database;
-use sqlx::mysql::MySqlDone;
+use sqlx::mysql::MySqlQueryResult;
 use sqlx::{MySqlPool};
 use std::sync::Arc;
 
@@ -314,7 +314,7 @@ SET
     Ok(record_id)
   }
 
-  fn handle_results(query_result: Result<MySqlDone, sqlx::Error>) -> AnyhowResult<u64> {
+  fn handle_results(query_result: Result<MySqlQueryResult, sqlx::Error>) -> AnyhowResult<u64> {
     let record_id = match query_result {
       Ok(res) => {
         res.last_insert_id()

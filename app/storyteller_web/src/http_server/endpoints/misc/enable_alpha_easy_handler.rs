@@ -1,4 +1,4 @@
-use actix_http::cookie::Cookie;
+use actix_web::cookie::Cookie;
 use actix_http::http::StatusCode;
 use actix_web::web::Query;
 use actix_web::{HttpResponse, HttpRequest, Responder, get, web, HttpMessage};

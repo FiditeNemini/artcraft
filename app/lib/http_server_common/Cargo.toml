@@ -22,23 +22,12 @@ dotenv = "0.15.0"
 log = "0.4.14"
 
 # Web
-# NB: One microservice requires old Tokio (thus old actix), and another new Tokio (new actix).
-#  Thus I'm being extremely extra here and supporting both.
-actix-cors-old = { package = "actix-cors", version = "0.5.4", optional = true }
-actix-http-old = { package = "actix-http", version = "2.2.0", optional = true }
-actix-web-old = { package = "actix-web", version = "3.3.2", optional = true }
-
-actix-cors-new = { package = "actix-cors", version = "0.6.0-beta.3", optional = true }
-actix-http-new = { package = "actix-http", version = "3.0.0-beta.11", optional = true }
-actix-web-new = { package = "actix-web", version = "4.0.0-beta.10", optional = true }
+actix-cors = "0.6.0-beta.3"
+actix-http = "3.0.0-beta.11"
+actix-web = "4.0.0-beta.10"
 
 # Serialization
 serde = "1.0.125"
 serde_derive = "1.0.125"
 serde_json = "1.0.64"
 toml = "0.5.8"
-
-[features]
-# default = ["actix-cors-new", "actix-web-new", "actix-http-new"]
-actix-new = ["actix-cors-new", "actix-http-new", "actix-web-new"]
-actix-old = ["actix-cors-old", "actix-http-old", "actix-web-old"]

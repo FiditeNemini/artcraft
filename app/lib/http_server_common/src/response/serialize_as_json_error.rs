@@ -1,18 +1,8 @@
 use actix_http::http::{StatusCode, header};
 use actix_web::HttpResponse;
-use serde::Serialize;
-
-#[cfg(feature = "actix-new")]
-use actix_web::error::ResponseError;
-
-#[cfg(feature = "actix-new")]
 use actix_web::HttpResponseBuilder;
-
-#[cfg(not(feature = "actix-new"))]
-use actix_http::ResponseError;
-
-#[cfg(not(feature = "actix-new"))]
-use actix_web::dev::HttpResponseBuilder;
+use actix_web::error::ResponseError;
+use serde::Serialize;
 
 /// Turn error responses into JSON HTTP responses
 pub fn serialize_as_json_error<T>(

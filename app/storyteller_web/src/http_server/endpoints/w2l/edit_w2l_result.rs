@@ -1,7 +1,7 @@
 use actix_http::Error;
 use actix_http::http::header;
 use actix_web::cookie::Cookie;
-use actix_web::dev::HttpResponseBuilder;
+use actix_web::HttpResponseBuilder;
 use actix_web::error::ResponseError;
 use actix_web::http::StatusCode;
 use actix_web::web::{Path, Json};
