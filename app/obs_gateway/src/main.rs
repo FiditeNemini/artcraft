@@ -315,6 +315,9 @@ pub async fn serve(server_state: ObsGatewayServerState) -> AnyhowResult<()>
         .wrap(DefaultHeaders::new()
             .header("X-Backend-Hostname", &hostname)
             .header("X-Build-Sha", ""))
+        .service(web::resource("/")
+            .route(web::get().to(get_root_index))
+        )
         // Twitch
         .service(
           web::resource("/twitch")

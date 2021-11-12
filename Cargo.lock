@@ -2059,6 +2059,7 @@ dependencies = [
 name = "http_server_common"
 version = "0.0.1"
 dependencies = [
+ "actix-cors 0.5.4",
  "actix-cors 0.6.0-beta.3",
  "actix-http 2.2.0",
  "actix-http 3.0.0-beta.11",
@@ -4048,7 +4049,6 @@ dependencies = [
  "hex",
  "hmac 0.10.1",
  "hostname",
- "http_server_common",
  "hyper 0.13.10",
  "infer",
  "jwt",

@@ -103,8 +103,6 @@ use crate::util::encrypted_sort_id::SortKeyCrypto;
 use futures::Future;
 use futures::executor::ThreadPool;
 //use http_server_common::cors::build_common_cors_config;
-use http_server_common::endpoints::default_route_404::default_route_404;
-use http_server_common::endpoints::root_index::get_root_index;
 use limitation::Limiter;
 use log::{info};
 use r2d2_redis::RedisConnectionManager;
@@ -114,6 +112,8 @@ use sqlx::MySqlPool;
 use sqlx::mysql::MySqlPoolOptions;
 use std::sync::Arc;
 use std::time::Duration;
+use crate::http_server::endpoints::misc::root_index::get_root_index;
+use crate::http_server::endpoints::misc::default_route_404::default_route_404;
 
 // TODO TODO TODO TODO
 // TODO TODO TODO TODO
@@ -624,10 +624,13 @@ pub async fn serve(server_state: ServerState) -> AnyhowResult<()>
             .route(web::get().to(leaderboard_handler))
             .route(web::head().to(|| HttpResponse::Ok()))
       )
-      //.service(get_root_index)
+      .service(web::resource("/")
+          .route(web::get().to(get_root_index))
+          .route(web::head().to(|| HttpResponse::Ok()))
+      )
       .service(enable_alpha_handler)
       .service(enable_alpha_easy_handler)
-      //.default_service( web::route().to(default_route_404))
+      .default_service( web::route().to(default_route_404))
   })
   .bind(bind_address)?
   .workers(num_workers)
