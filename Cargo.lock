@@ -3963,7 +3963,7 @@ dependencies = [
  "hmac 0.10.1",
  "hostname",
  "http_server_common",
- "hyper 0.13.10",
+ "hyper 0.14.14",
  "infer",
  "jwt",
  "lazy_static",

@@ -95,7 +95,7 @@ ring = "0.17.0-alpha.10"
 #rust-s3 = { version = "0.27.0-rc4", features = ["with-async-std"], default-features = false }
 #rust-s3 = { version = "0.26" }
 #rust-s3 = { version = "0.28", features = ["with-async-std"], default-features = false }
-rust-s3 = { version = "0.28" }
+rust-s3 = { version = "0.28", features = ["never-encode-slash"] }
 infer = "0.5.0"
 
 subprocess = "0.2.6"
@@ -128,7 +128,7 @@ jwt = "0.13.0"
 
 # NB: Hyper is just for HTTP client use in jobs. I'd use Actix client, but I need tokio runtime
 # NB: Furthermore, the Tokio runtime is old, so I have to use an older Hyper.
-hyper = { version = "0.13.10" }
+hyper = { version = "0.14.14" }
 
 # Crypto
 bcrypt = "0.8" # password hashes
