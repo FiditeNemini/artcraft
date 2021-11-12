@@ -102,7 +102,7 @@ use crate::util::caching::single_item_ttl_cache::SingleItemTtlCache;
 use crate::util::encrypted_sort_id::SortKeyCrypto;
 use futures::Future;
 use futures::executor::ThreadPool;
-//use http_server_common::cors::build_common_cors_config;
+use http_server_common::cors::build_common_cors_config;
 use limitation::Limiter;
 use log::{info};
 use r2d2_redis::RedisConnectionManager;
@@ -318,7 +318,7 @@ pub async fn serve(server_state: ServerState) -> AnyhowResult<()>
 
     App::new()
       .app_data(server_state_arc.clone())
-      //.wrap(build_common_cors_config())
+      .wrap(build_common_cors_config())
       .wrap(Logger::new(&log_format)
         .exclude("/liveness")
         .exclude("/readiness"))
