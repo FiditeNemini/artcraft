@@ -50,6 +50,7 @@ dotenv = "0.15.0"
 easyenv = "0.0.6"
 futures = { version = "0.3.15", features = ["thread-pool"] } # feature for ThreadPool
 futures_old_for_limiter = { package = "futures", version = "0.1.29" } # Older version of futures for `limiter` crate
+futures-util = "0.3.9"
 hex = "0.4.3"
 hostname = "0.3.1"
 lazy_static = "1.4.0"
@@ -121,7 +122,7 @@ actix-multipart = "0.4.0-beta.7" # TODO: Ready for 0.4 upgrade
 actix-rt = "2.4.0"
 actix-service = "2.0.1"
 actix-utils = "3.0.0"
-actix-web = "4.0.0-beta.10"
+actix-web = "4.0.0-beta.7"
 actix-web-actors = "4.0.0-beta.7"
 jwt = "0.13.0"
 

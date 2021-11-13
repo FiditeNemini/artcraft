@@ -1,16 +1,29 @@
-use actix_service::{Service, Transform};
-use actix_web::error::ErrorForbidden;
-use actix_web::{dev::ServiceRequest, dev::ServiceResponse, Error, HttpResponse};
 use crate::http_server::web_utils::ip_address::get_service_request_ip;
 use crate::threads::ip_banlist_set::IpBanlistSet;
-use futures::Future;
-use futures::future::{ok, Ready, LocalBoxFuture, err, Either};
-use log::info;
-use log::warn;
-use std::pin::Pin;
+
+//use actix_web::error::ErrorForbidden;
+//use actix_web::{HttpResponse, ResponseError};
+//use anyhow::anyhow;
+//use futures::Future;
+//use futures::future::{ok, Ready, LocalBoxFuture, err, Either};
+//use log::info;
+//use log::warn;
+//use std::pin::Pin;
+//use std::task::{Context, Poll};
+//use actix_web::body::{AnyBody, MessageBody};
+//use actix_http::{http, StatusCode, header, Response};
+//use actix_http::body::{Body, ResponseBody};
+//use actix_web::web::{BytesMut, Buf, BufMut};
+//use std::fmt;
+//use std::{io::Write as _};
+//use futures::future::FutureExt;
+
 use std::task::{Context, Poll};
-use actix_web::body::{AnyBody, MessageBody};
-use actix_http::http;
+
+use actix_web::dev::{Service, Transform};
+use actix_web::dev::{ServiceRequest, ServiceResponse};
+use actix_web::Error;
+use futures_util::future::{err, ok, Either, Ready};
 
 // There are two steps in middleware processing.
 // 1. Middleware initialization, middleware factory gets called with
@@ -32,16 +45,16 @@ impl IpFilter {
 // Middleware factory is `Transform` trait from actix-service crate
 // `S` - type of the next service
 // `B` - type of response's body
-impl<S, B> Transform<S, ServiceRequest> for IpFilter
+
+impl<S> Transform<S, ServiceRequest> for IpFilter
   where
-      S: Service<ServiceRequest, Response = ServiceResponse<B>, Error = Error>,
+      S: Service<ServiceRequest, Response = ServiceResponse, Error = Error>,
       S::Future: 'static,
-      B: 'static,
 {
-  type Response = ServiceResponse<B>;
+  type Response = ServiceResponse;
   type Error = Error;
-  type Transform = IpFilterMiddleware<S>;
   type InitError = ();
+  type Transform = IpFilterMiddleware<S>;
   type Future = Ready<Result<Self::Transform, Self::InitError>>;
 
   fn new_transform(&self, service: S) -> Self::Future {
@@ -55,78 +68,26 @@ pub struct IpFilterMiddleware<S> {
   ip_banlist: IpBanlistSet,
 }
 
-// Updated example from
-//  - https://github.com/actix/examples/blob/master/basics/middleware/src/redirect.rs
-//  - https://stackoverflow.com/questions/68944823/returning-an-unauthorized-response-in-actix-web-middleware-in-rust
-impl<S, B> Service<ServiceRequest> for IpFilterMiddleware<S>
+impl<S> Service<ServiceRequest> for IpFilterMiddleware<S>
   where
-      S: Service<ServiceRequest, Response = ServiceResponse<B>, Error = Error>,
+      S: Service<ServiceRequest, Response = ServiceResponse, Error = Error>,
       S::Future: 'static,
-      B: 'static,
 {
-  type Response = ServiceResponse<B>;
+  type Response = ServiceResponse;
   type Error = Error;
-  //type Future = Either<S::Future,
-  //  Pin<Box<dyn Future<Output = Result<Self::Response, Self::Error>>>>>;
-  //type Future = Pin<Box<dyn Future<Output = Result<Self::Response, Self::Error>>>>;
-  type Future = Pin<Box<dyn Future<Output = Result<Self::Response, Self::Error>>>>;
-  //type Future = LocalBoxFuture<'static, Result<Self::Response, Self::Error>>;
-  //type Future = Either<S::Future, Ready<Result<Self::Response, Self::Error>>>;
+  type Future = Either<S::Future, Ready<Result<Self::Response, Self::Error>>>;
 
-  actix_service::forward_ready!(service);
+  //actix_service::forward_ready!(service);
+  fn poll_ready(&self, cx: &mut Context) -> Poll<Result<(), Self::Error>> {
+    self.service.poll_ready(cx)
+  }
 
-  /*
-
-  Future
-
-  Future = Pin<Box<dyn Future<Result<RESPONSE, ERROR>>>
-
-  RESPONSE = ServiceResponse<B>
-
-
-   */
   fn call(&self, req: ServiceRequest) -> Self::Future {
     let ip_address = get_service_request_ip(&req);
 
     // NB: Fail open.
     let is_banned = self.ip_banlist.is_banned(&ip_address).unwrap_or(false);
 
-    if is_banned {
-      warn!("Ip is banned: {}", &ip_address);
-      //return Either::right(
-      //  Box::pin(ok(req.error_response(ErrorForbidden("Forbidden")))))
-
-
-      //return Box::pin(ok(req.error_response(ErrorForbidden("Forbidden"))));
-
-      //return req.error_response(ErrorForbidden("Forbidden"))
-      // TODO: RESTORE BLOCK
-      //return Box::pin(AnyBody::from_message());
-      //return Box::pin(req.error_response(ErrorForbidden("Forbidden")));
-      //return Box::pin(AnyBody::from_message(""));
-
-
-      //return Either::Right(ok(req.into_response(
-      //  HttpResponse::Found()
-      //      .finish()
-      //      .into_body(),
-      //)));
-
-      //return Either::Right(ok(req.error_response(
-      //  ErrorForbidden("")
-      //)));
-
-      return Box::pin(async move {
-        let res = req.into_response(
-          HttpResponse::Unauthorized()
-              .finish()
-        );
-        Ok(res)
-      })
-
-    }
-
-    Box::pin(self.service.call(req))
-    //Either::Left(self.service.call(req))
+    Either::Left(self.service.call(req))
   }
 }
