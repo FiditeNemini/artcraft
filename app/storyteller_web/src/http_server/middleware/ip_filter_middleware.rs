@@ -13,13 +13,20 @@ use actix_web::{Error, HttpResponse};
 use actix_web::{ResponseError, HttpMessage, HttpRequest, HttpResponseBuilder};
 use crate::http_server::web_utils::ip_address::get_service_request_ip;
 use crate::threads::ip_banlist_set::IpBanlistSet;
-use derive_more::{Display, Error as ErrorE};
 use futures_util::future::{err, ok, Either, Ready};
 use std::io::Write;
 use std::task::{Context, Poll};
 
-#[derive(Debug, Display, ErrorE)]
+#[derive(Debug)]
 pub struct BannedError {}
+
+impl std::error::Error for BannedError {}
+
+impl std::fmt::Display for BannedError {
+  fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+    write!(f, "BannedError")
+  }
+}
 
 impl ResponseError for BannedError {
   fn status_code(&self) -> StatusCode {
