@@ -1,9 +1,9 @@
 [workspace]
 
 members = [
-  "app/lib/config",
-  "app/lib/container_common",
-  "app/lib/http_server_common",
-  "app/obs_gateway",
-  "app/storyteller_web",
+  "crates/app/obs_gateway",
+  "crates/app/storyteller_web",
+  "crates/lib/config",
+  "crates/lib/container_common",
+  "crates/lib/http_server_common",
 ]

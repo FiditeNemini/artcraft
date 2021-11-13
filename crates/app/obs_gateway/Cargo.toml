@@ -15,9 +15,9 @@ path = "src/main.rs"
 [dependencies]
 
 # Internal
-config = { path = "../lib/config" }
-container_common = { path = "../lib/container_common" }
-http_server_common = { path = "../lib/http_server_common" }
+config = { path = "../../lib/config" }
+container_common = { path = "../../lib/container_common" }
+http_server_common = { path = "../../lib/http_server_common" }
 
 # External
 anyhow = "1.0.40"
@@ -34,7 +34,7 @@ lazy_static = "1.4.0"
 lfu = "0.2.5"
 log = "0.4.14"
 #newrelic = "0.2.2"
-#newrelic-telemetry = { path = "../../vendor/newrelic-telemetry-sdk-rust" }
+#newrelic-telemetry = { path = "../../../vendor/newrelic-telemetry-sdk-rust" }
 rand = "0.8.3"
 regex = "1.5.4"
 time = "0.2.26"
