@@ -319,13 +319,13 @@ pub async fn serve(server_state: ServerState) -> AnyhowResult<()>
     App::new()
       .app_data(server_state_arc.clone())
       .wrap(build_common_cors_config())
-      .wrap(Logger::new(&log_format)
-        .exclude("/liveness")
-        .exclude("/readiness"))
       .wrap(DefaultHeaders::new()
         .header("X-Backend-Hostname", &hostname)
         .header("X-Build-Sha", ""))
       .wrap(IpFilter::new(ip_banlist))
+      .wrap(Logger::new(&log_format)
+        .exclude("/liveness")
+        .exclude("/readiness"))
       // ==================== ACCOUNT CREATION / SESSION MANAGEMENT ====================
       .service(
         web::resource("/create_account")
