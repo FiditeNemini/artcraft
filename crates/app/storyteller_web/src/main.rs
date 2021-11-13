@@ -38,8 +38,10 @@ use crate::database::mediators::badge_granter::BadgeGranter;
 use crate::database::mediators::firehose_publisher::FirehosePublisher;
 use crate::http_server::endpoints::events::list_events::list_events_handler;
 use crate::http_server::endpoints::leaderboard::get_leaderboard::leaderboard_handler;
+use crate::http_server::endpoints::misc::default_route_404::default_route_404;
 use crate::http_server::endpoints::misc::enable_alpha_easy_handler::enable_alpha_easy_handler;
 use crate::http_server::endpoints::misc::enable_alpha_handler::enable_alpha_handler;
+use crate::http_server::endpoints::misc::root_index::get_root_index;
 use crate::http_server::endpoints::moderation::approval::pending_w2l_templates::get_pending_w2l_templates_handler;
 use crate::http_server::endpoints::moderation::ip_bans::add_ip_ban::add_ip_ban_handler;
 use crate::http_server::endpoints::moderation::ip_bans::delete_ip_ban::delete_ip_ban_handler;
@@ -101,7 +103,6 @@ use crate::util::buckets::bucket_client::BucketClient;
 use crate::util::caching::single_item_ttl_cache::SingleItemTtlCache;
 use crate::util::encrypted_sort_id::SortKeyCrypto;
 use futures::Future;
-use futures::executor::ThreadPool;
 use http_server_common::cors::build_common_cors_config;
 use limitation::Limiter;
 use log::{info};
@@ -112,8 +113,7 @@ use sqlx::MySqlPool;
 use sqlx::mysql::MySqlPoolOptions;
 use std::sync::Arc;
 use std::time::Duration;
-use crate::http_server::endpoints::misc::root_index::get_root_index;
-use crate::http_server::endpoints::misc::default_route_404::default_route_404;
+use tokio::runtime::Runtime;
 
 // TODO TODO TODO TODO
 // TODO TODO TODO TODO
@@ -260,13 +260,12 @@ async fn main() -> AnyhowResult<()> {
   let ip_banlist2 = ip_banlist.clone();
   let mysql_pool3 = pool.clone();
 
-  // Necessary to run our background work.
-  // I tried getting this running with actix, tokio, by other means,
-  // but didn't have much luck. The task didn't respond to ctrl-c
-  // interrupts.
-  let thread_pool = ThreadPool::new()?;
+  // Background jobs.
+  info!("Spawning IP ban polling thread.");
 
-  thread_pool.spawn_ok(async {
+  let tokio_runtime = Runtime::new()?;
+
+  tokio_runtime.spawn(async {
     poll_ip_bans(ip_banlist2, mysql_pool3).await;
   });
 
