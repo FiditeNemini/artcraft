@@ -9,31 +9,30 @@ Brandon Thomas 2019-07-29 <bt@brand.io> <echelon@gmail.com>
 import argparse
 import falcon
 import io
-#import librosa
-#import numpy as np
+import librosa
+import numpy as np
 import os
-#import scipy
-#import soundfile
-#import tensorflow as tf
+import scipy
+import soundfile
+import tensorflow as tf
 import subprocess
 import tempfile
 import json
-import shutil
 
 from falcon_multipart.middleware import MultipartMiddleware
 #from model import CycleGAN
 #from preprocess import *
 from wsgiref import simple_server
 
-#from vocodes_common import TacotronWaveglowPipeline
-#from vocodes_common import print_gpu_info
-#from vocodes_common import load_tacotron_model
-#from vocodes_common import load_waveglow_model
-#from vocodes_common import load_hifigan_model
+from vocodes_common import TacotronWaveglowPipeline
+from vocodes_common import print_gpu_info
+from vocodes_common import load_tacotron_model
+from vocodes_common import load_waveglow_model
+from vocodes_common import load_hifigan_model
 
-#print("TensorFlow version: {}".format(tf.version.VERSION))
+print("TensorFlow version: {}".format(tf.version.VERSION))
 
-#print_gpu_info()
+print_gpu_info()
 
 INDEX_HTML = '''
 <!doctype html>
@@ -198,7 +197,7 @@ INDEX_HTML = '''
 
 #tacotron = load_tacotron_model('/home/bt/models/tacotron2/tacotron2_uberduck_Noire.pt')
 #waveglow = load_waveglow_model('/home/bt/models/waveglow/waveglow_256channels_universal_v5.pt')
-#pipeline = TacotronWaveglowPipeline()
+pipeline = TacotronWaveglowPipeline()
 
 class IndexHandler():
     def on_get(self, request, response):
@@ -236,14 +235,14 @@ class ApiHandler():
         print('maybe_clear_synthesizer_checkpoint_path: {}'.format(
             maybe_clear_synthesizer_checkpoint_path))
 
-        #pipeline.maybe_load_waveglow_model(waveglow_vocoder_checkpoint_path)
-        #pipeline.maybe_load_hifigan(hifigan_vocoder_checkpoint_path)
-        #pipeline.maybe_load_hifigan_super_resolution(hifigan_superres_vocoder_checkpoint_path)
+        pipeline.maybe_load_waveglow_model(waveglow_vocoder_checkpoint_path)
+        pipeline.maybe_load_hifigan(hifigan_vocoder_checkpoint_path)
+        pipeline.maybe_load_hifigan_super_resolution(hifigan_superres_vocoder_checkpoint_path)
 
-        #if maybe_clear_synthesizer_checkpoint_path:
-        #    pipeline.uncache_tacotron_model(maybe_clear_synthesizer_checkpoint_path)
+        if maybe_clear_synthesizer_checkpoint_path:
+            pipeline.uncache_tacotron_model(maybe_clear_synthesizer_checkpoint_path)
 
-        #pipeline.maybe_load_tacotron_model_to_cache(synthesizer_checkpoint_path)
+        pipeline.maybe_load_tacotron_model_to_cache(synthesizer_checkpoint_path)
 
         inference_args = {
             'raw_text': inference_text,
@@ -254,18 +253,7 @@ class ApiHandler():
             'output_metadata_filename': output_metadata_filename,
         }
 
-        #pipeline.infer(inference_args)
-
-        metadata_temp = "/Users/bt/dev/storyteller/storyteller-web/temp/metadata.json"
-        audio_temp = "/Users/bt/dev/storyteller/storyteller-web/temp/test.wav"
-        spectrogram_temp = "/Users/bt/dev/storyteller/storyteller-web/temp/spectrogram.json"
-
-        args = inference_args
-
-        print('TEMP COPYING FAKE FILES...')
-        shutil.copyfile(metadata_temp, args['output_metadata_filename'])
-        shutil.copyfile(audio_temp, args['output_audio_filename'])
-        shutil.copyfile(spectrogram_temp, args['output_spectrogram_filename'])
+        pipeline.infer(inference_args)
 
 def main():
     parser = argparse.ArgumentParser()
