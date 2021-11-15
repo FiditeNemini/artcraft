@@ -49,6 +49,7 @@ use twitch_api2::pubsub;
 use twitch_oauth2::tokens::UserTokenBuilder;
 use twitch_oauth2::{AppAccessToken, Scope, TwitchToken, tokens::errors::AppAccessTokenError, ClientId, ClientSecret};
 use crate::server_state::{ObsGatewayServerState, EnvConfig, TwitchOauthSecrets};
+use crate::endpoints::oauth_begin_redirect::oauth_begin_enroll_redirect;
 
 const DEFAULT_BIND_ADDRESS : &'static str = "0.0.0.0:54321";
 
@@ -313,6 +314,10 @@ pub async fn serve(server_state: ObsGatewayServerState) -> AnyhowResult<()>
               .service(web::resource("/oauth_enroll")
                     .route(web::get().to(oauth_begin_enroll))
                     .route(web::head().to(|| HttpResponse::Ok()))
+              )
+              .service(web::resource("/oauth_enroll_redirect")
+                  .route(web::get().to(oauth_begin_enroll_redirect))
+                  .route(web::head().to(|| HttpResponse::Ok()))
               )
               .service(web::resource("/oauth_redirect")
                     .route(web::get().to(oauth_begin_enroll))

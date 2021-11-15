@@ -45,7 +45,7 @@ impl ResponseError for OauthBeginEnrollError {
   }
 }
 
-pub async fn oauth_begin_enroll(
+pub async fn oauth_begin_enroll_redirect(
   http_request: HttpRequest,
   server_state: web::Data<Arc<ObsGatewayServerState>>
 ) -> Result<HttpResponse, OauthBeginEnrollError> {
@@ -74,5 +74,7 @@ pub async fn oauth_begin_enroll(
   let response = to_json_success_response(&response)
       .map_err(|_| OauthBeginEnrollError::ServerError)?;
 
-  Ok(response)
+  Ok(HttpResponse::Found()
+      .append_header((header::LOCATION, url.to_string()))
+      .finish())
 }
