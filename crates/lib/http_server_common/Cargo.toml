@@ -14,6 +14,9 @@ path = "src/lib.rs"
 
 [dependencies]
 
+# Internal
+container_common = { path = "../container_common" }
+
 # External
 anyhow = "1.0.40"
 base64 = "0.13.0"

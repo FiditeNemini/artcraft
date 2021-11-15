@@ -14,6 +14,7 @@
 
 pub mod endpoints;
 pub mod pubsub_gateway;
+pub mod server_state;
 pub mod twitch;
 pub mod util;
 
@@ -47,30 +48,11 @@ use twitch_api2::pubsub::Topic;
 use twitch_api2::pubsub;
 use twitch_oauth2::tokens::UserTokenBuilder;
 use twitch_oauth2::{AppAccessToken, Scope, TwitchToken, tokens::errors::AppAccessTokenError, ClientId, ClientSecret};
+use crate::server_state::{ObsGatewayServerState, EnvConfig, TwitchOauthSecrets};
 
-const DEFAULT_BIND_ADDRESS : &'static str = "0.0.0.0:12345";
+const DEFAULT_BIND_ADDRESS : &'static str = "0.0.0.0:54321";
 
 pub type AnyhowResult<T> = anyhow::Result<T>;
-
-/// State that is injected into every endpoint.
-#[derive(Clone)]
-pub struct ObsGatewayServerState {
-  /// Configuration from ENV vars.
-  /// Some of this might not be used.
-  pub env_config: EnvConfig,
-  pub hostname: String,
-}
-
-#[derive(Clone)]
-pub struct EnvConfig {
-  // Number of thread workers.
-  pub num_workers: usize,
-  pub bind_address: String,
-  pub cookie_domain: String,
-  pub cookie_secure: bool,
-  pub cookie_http_only: bool,
-  pub website_homepage_redirect: String,
-}
 
 #[actix_web::main]
 //#[tokio::main]
@@ -122,126 +104,129 @@ async fn main() -> AnyhowResult<()> {
   //std::thread::sleep(Duration::from_secs(5000));
 
 
-  // ==================== OAUTH FLOW ====================
-
-  println!("Oauth flow...");
-
-  let redirect_url = twitch_oauth2::url::Url::parse("http://localhost/test")?;
-  let mut builder = UserTokenBuilder::new(client_id, client_secret, redirect_url)
-      .set_scopes(Scope::all())
-      .force_verify(true);
-
-  //builder.add_scope(Scope::BitsRead);
-
-  let (url, _csrf_token) = builder.generate_url();
-
-  println!("Go to this page: {}", url);
-
-
-
-  let input = rpassword::prompt_password_stdout(
-    "Paste in the resulting adress after authenticating (input hidden): ",
-  )?;
-
-  let u = twitch_oauth2::url::Url::parse(&input)?;
-
-  let map: std::collections::HashMap<_, _> = u.query_pairs().collect();
-
-  let user_token = match (map.get("state"), map.get("code")) {
-    (Some(state), Some(code)) => {
-      let token = builder
-          .get_user_token(
-            &reqwest::Client::builder()
-                .redirect(reqwest::redirect::Policy::none())
-                .build()?,
-            state,
-            code,
-          )
-          .await?;
-      println!("Got token: {:?}", token);
-
-      token
-    }
-    _ => match (map.get("error"), map.get("error_description")) {
-      (std::option::Option::Some(error), std::option::Option::Some(error_description)) => {
-        anyhow::bail!(
-                    "twitch errored with error: {} - {}",
-                    error,
-                    error_description
-                );
-      }
-      _ => anyhow::bail!("invalid url passed"),
-    },
-  };
-
-  let auth_token = user_token.access_token.as_str();
-
-  // ==================== PUBSUB SUBSCRIPTION AND MAIN LOOP ====================
-
-  let mut client = PollingTwitchWebsocketClient::new()?;
-
-  println!("Connecting PubSub...");
-  client.connect().await?;
-
-  println!("Connected");
-
-  //println!("Starting polling thread...");
-  //client.start_ping_thread().await;
-
-  println!("Sending PING...");
-
-  client.send_ping().await?;
-
-  println!("Try read next...");
-  let r = client.try_next().await?;
-  println!("Result: {:?}", r);
-
-
-  println!("Begin LISTEN...");
-
-  let bit_topic = pubsub::channel_bits::ChannelBitsEventsV2 {
-    channel_id: user_id,
-  }.into_topic();
-
-  let topics = [bit_topic];
-
-  client.listen(&auth_token, &topics).await?;
-
-  println!("Try read next...");
-  let r = client.try_next().await?;
-  println!("Result: {:?}", r);
-
-  /*
-  Result: Some(Message { data: ChannelBitsEventsV2 { topic: ChannelBitsEventsV2 {
-  channel_id: 652567283 }, reply: BitsEvent { data: BitsEventData { badge_entitlement:
-  Some(BadgeEntitlement { new_version: 100, previous_version: 1 }), bits_used: 100,
-  channel_id: "652567283", channel_name: "vocodes", chat_message: "Cheer100 testing the cheer",
-  context: Cheer, is_anonymous: false, time: "2021-09-27T04:30:53.627717085Z",
-  total_bits_used: 101, user_id: "650154491", user_name: "testytest512" },
-  message_id: "793f745e-8f3e-5f71-bc41-4808c4b49a53", version: "1.0", is_anonymous: false } } })
-
-  Result: Some(Message { data: ChannelBitsEventsV2 { topic: ChannelBitsEventsV2 {
-  channel_id: 652567283 }, reply: BitsEvent { data: BitsEventData { badge_entitlement: None,
-  bits_used: 1, channel_id: "652567283", channel_name: "vocodes",
-  chat_message: "mario: hello everybody Cheer1", context: Cheer, is_anonymous: false,
-  time: "2021-09-27T04:47:32.943872952Z", total_bits_used: 102, user_id: "650154491",
-  user_name: "testytest512" }, message_id: "5844328d-495b-5585-9d6c-3c99949f9a0a", version: "1.0",
-  is_anonymous: false } } })
-   */
-
-
-
-  println!("Try read next...");
-  let r = client.try_next().await?;
-  println!("Result: {:?}", r);
-
-  println!("Sleep...");
-  std::thread::sleep(Duration::from_millis(30000));
-
-  //let text = msg.into_text()?;
-  //println!("Text: {}", text);
-
-  // ========================================================
+//  // ==================== OAUTH FLOW ====================
+//
+//  println!("Oauth flow...");
+//
+//  let redirect_url = twitch_oauth2::url::Url::parse("http://localhost/test")?;
+//  let mut builder = UserTokenBuilder::new(
+//    client_id.clone(),
+//    client_secret.clone(),
+//    redirect_url)
+//      .set_scopes(Scope::all())
+//      .force_verify(true);
+//
+//  //builder.add_scope(Scope::BitsRead);
+//
+//  let (url, _csrf_token) = builder.generate_url();
+//
+//  println!("Go to this page: {}", url);
+//
+//
+//
+//  let input = rpassword::prompt_password_stdout(
+//    "Paste in the resulting adress after authenticating (input hidden): ",
+//  )?;
+//
+//  let u = twitch_oauth2::url::Url::parse(&input)?;
+//
+//  let map: std::collections::HashMap<_, _> = u.query_pairs().collect();
+//
+//  let user_token = match (map.get("state"), map.get("code")) {
+//    (Some(state), Some(code)) => {
+//      let token = builder
+//          .get_user_token(
+//            &reqwest::Client::builder()
+//                .redirect(reqwest::redirect::Policy::none())
+//                .build()?,
+//            state,
+//            code,
+//          )
+//          .await?;
+//      println!("Got token: {:?}", token);
+//
+//      token
+//    }
+//    _ => match (map.get("error"), map.get("error_description")) {
+//      (std::option::Option::Some(error), std::option::Option::Some(error_description)) => {
+//        anyhow::bail!(
+//                    "twitch errored with error: {} - {}",
+//                    error,
+//                    error_description
+//                );
+//      }
+//      _ => anyhow::bail!("invalid url passed"),
+//    },
+//  };
+//
+//  let auth_token = user_token.access_token.as_str();
+//
+//  // ==================== PUBSUB SUBSCRIPTION AND MAIN LOOP ====================
+//
+//  let mut client = PollingTwitchWebsocketClient::new()?;
+//
+//  println!("Connecting PubSub...");
+//  client.connect().await?;
+//
+//  println!("Connected");
+//
+//  //println!("Starting polling thread...");
+//  //client.start_ping_thread().await;
+//
+//  println!("Sending PING...");
+//
+//  client.send_ping().await?;
+//
+//  println!("Try read next...");
+//  let r = client.try_next().await?;
+//  println!("Result: {:?}", r);
+//
+//
+//  println!("Begin LISTEN...");
+//
+//  let bit_topic = pubsub::channel_bits::ChannelBitsEventsV2 {
+//    channel_id: user_id,
+//  }.into_topic();
+//
+//  let topics = [bit_topic];
+//
+//  client.listen(&auth_token, &topics).await?;
+//
+//  println!("Try read next...");
+//  let r = client.try_next().await?;
+//  println!("Result: {:?}", r);
+//
+//  /*
+//  Result: Some(Message { data: ChannelBitsEventsV2 { topic: ChannelBitsEventsV2 {
+//  channel_id: 652567283 }, reply: BitsEvent { data: BitsEventData { badge_entitlement:
+//  Some(BadgeEntitlement { new_version: 100, previous_version: 1 }), bits_used: 100,
+//  channel_id: "652567283", channel_name: "vocodes", chat_message: "Cheer100 testing the cheer",
+//  context: Cheer, is_anonymous: false, time: "2021-09-27T04:30:53.627717085Z",
+//  total_bits_used: 101, user_id: "650154491", user_name: "testytest512" },
+//  message_id: "793f745e-8f3e-5f71-bc41-4808c4b49a53", version: "1.0", is_anonymous: false } } })
+//
+//  Result: Some(Message { data: ChannelBitsEventsV2 { topic: ChannelBitsEventsV2 {
+//  channel_id: 652567283 }, reply: BitsEvent { data: BitsEventData { badge_entitlement: None,
+//  bits_used: 1, channel_id: "652567283", channel_name: "vocodes",
+//  chat_message: "mario: hello everybody Cheer1", context: Cheer, is_anonymous: false,
+//  time: "2021-09-27T04:47:32.943872952Z", total_bits_used: 102, user_id: "650154491",
+//  user_name: "testytest512" }, message_id: "5844328d-495b-5585-9d6c-3c99949f9a0a", version: "1.0",
+//  is_anonymous: false } } })
+//   */
+//
+//
+//
+//  println!("Try read next...");
+//  let r = client.try_next().await?;
+//  println!("Result: {:?}", r);
+//
+//  println!("Sleep...");
+//  std::thread::sleep(Duration::from_millis(30000));
+//
+//  //let text = msg.into_text()?;
+//  //println!("Text: {}", text);
+//
+//  // ========================================================
 
 //  info!("Connecting to database...");
 //
@@ -285,6 +270,11 @@ async fn main() -> AnyhowResult<()> {
       cookie_http_only,
       website_homepage_redirect,
     },
+    twitch_oauth_secrets: TwitchOauthSecrets {
+      client_id: secrets.app_client_id.clone(),
+      client_secret: secrets.app_client_secret.clone(),
+      redirect_url: "http://localhost:54321/twitch/oauth_redirect".to_string()
+    },
     hostname: server_hostname,
   };
 
@@ -319,22 +309,19 @@ pub async fn serve(server_state: ObsGatewayServerState) -> AnyhowResult<()>
             .route(web::get().to(get_root_index))
         )
         // Twitch
-        .service(
-          web::resource("/twitch")
-              .route(web::get().to(ws_index))
-              .route(web::head().to(|| HttpResponse::Ok()))
-        )
-        // /twitch_oauth_enroll
-        // /twitch_oauth_redirect
-        .service(
-          web::resource("/twitch_oauth_enroll")
-              .route(web::get().to(oauth_begin_enroll))
-              .route(web::head().to(|| HttpResponse::Ok()))
-        )
-        .service(
-          web::resource("/twitch_oauth_redirect")
-              .route(web::get().to(oauth_begin_enroll))
-              .route(web::head().to(|| HttpResponse::Ok()))
+        .service(web::scope("/twitch")
+              .service(web::resource("/oauth_enroll")
+                    .route(web::get().to(oauth_begin_enroll))
+                    .route(web::head().to(|| HttpResponse::Ok()))
+              )
+              .service(web::resource("/oauth_redirect")
+                    .route(web::get().to(oauth_begin_enroll))
+                    .route(web::head().to(|| HttpResponse::Ok()))
+              )
+              .service(web::resource("/websocket")
+                    .route(web::get().to(ws_index))
+                    .route(web::head().to(|| HttpResponse::Ok()))
+              )
         )
         //.default_service( web::route().to(default_route_404))
   })
