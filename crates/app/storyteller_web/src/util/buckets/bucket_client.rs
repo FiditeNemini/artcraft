@@ -29,14 +29,6 @@ impl BucketClient {
     bucket_name: &str,
     optional_bucket_root: Option<&str>) -> anyhow::Result<Self>
   {
-    /*let credentials = Credentials::new(
-      Some(&access_key),
-      Some(&secret_key),
-      None,
-      None,
-      None,
-    )?;*/
-
     let credentials = Credentials {
       access_key: Some(access_key.to_string()),
       secret_key: Some(secret_key.to_string()),
@@ -192,8 +184,6 @@ impl BucketClient {
 
     info!("downloading from bucket: {:?}", &object_path_str);
 
-    //let mut output_file = std::fs::File::create(filesystem_path)?;
-    //let mut output_file = async_std::fs::File::create(filesystem_path).await?;
     let mut output_file = tokio::fs::File::create(filesystem_path).await?;
 
     let status_code = self.bucket.get_object_stream(&object_path_str, &mut output_file).await?;
