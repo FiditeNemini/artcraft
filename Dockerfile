@@ -152,7 +152,7 @@ WORKDIR /tmp
 COPY Cargo.lock . 
 COPY Cargo.toml .
 COPY sqlx-data.json .
-COPY app/ ./app
+COPY crates/ ./crates
 COPY vendor/ ./vendor
 COPY db/ ./db
 COPY migrations/ ./migrations
