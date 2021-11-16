@@ -50,6 +50,7 @@ use twitch_oauth2::tokens::UserTokenBuilder;
 use twitch_oauth2::{AppAccessToken, Scope, TwitchToken, tokens::errors::AppAccessTokenError, ClientId, ClientSecret};
 use crate::server_state::{ObsGatewayServerState, EnvConfig, TwitchOauthSecrets};
 use crate::endpoints::oauth_begin_redirect::oauth_begin_enroll_redirect;
+use crate::endpoints::oauth_end::oauth_end_enroll_from_redirect;
 
 const DEFAULT_BIND_ADDRESS : &'static str = "0.0.0.0:54321";
 
@@ -262,6 +263,10 @@ async fn main() -> AnyhowResult<()> {
   let website_homepage_redirect =
       easyenv::get_env_string_or_default("WEBSITE_HOMEPAGE_REDIRECT", "https://vo.codes/");
 
+  let oauth_redirect_url = easyenv::get_env_string_or_default(
+    "TWITCH_OAUTH_REDIRECT_URL",
+    "http://localhost:54321/twitch/oauth_redirect");
+
   let server_state = ObsGatewayServerState {
     env_config: EnvConfig {
       num_workers,
@@ -274,7 +279,7 @@ async fn main() -> AnyhowResult<()> {
     twitch_oauth_secrets: TwitchOauthSecrets {
       client_id: secrets.app_client_id.clone(),
       client_secret: secrets.app_client_secret.clone(),
-      redirect_url: "http://localhost:54321/twitch/oauth_redirect".to_string()
+      redirect_url: oauth_redirect_url,
     },
     hostname: server_hostname,
   };
@@ -320,7 +325,7 @@ pub async fn serve(server_state: ObsGatewayServerState) -> AnyhowResult<()>
                   .route(web::head().to(|| HttpResponse::Ok()))
               )
               .service(web::resource("/oauth_redirect")
-                    .route(web::get().to(oauth_begin_enroll))
+                    .route(web::get().to(oauth_end_enroll_from_redirect))
                     .route(web::head().to(|| HttpResponse::Ok()))
               )
               .service(web::resource("/websocket")

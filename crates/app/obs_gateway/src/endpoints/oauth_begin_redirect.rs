@@ -62,7 +62,12 @@ pub async fn oauth_begin_enroll_redirect(
 
   // TODO: Not all scopes are needed!
   let mut builder = UserTokenBuilder::new(client_id, client_secret, redirect_url)
-      .set_scopes(Scope::all())
+      .set_scopes(vec![
+        Scope::BitsRead,
+        Scope::ChannelReadSubscriptions,
+        Scope::ChatEdit,
+        Scope::ChatRead,
+      ])
       .force_verify(true);
 
   let (url, _csrf_token) = builder.generate_url();
