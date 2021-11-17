@@ -36,6 +36,7 @@ pub struct TwitchOauthSecrets {
 #[deprecated]
 #[derive(Clone)]
 pub struct TwitchOauthTemp {
+  pub temp_oauth_user_id: String,
   pub temp_oauth_access_token: String,
   pub temp_oauth_refresh_token: String,
 }

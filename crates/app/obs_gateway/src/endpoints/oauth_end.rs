@@ -121,11 +121,13 @@ pub async fn oauth_end_enroll_from_redirect(
         }
       })?;
 
+  let user_id = user_token.user_id.to_string();
   let auth_token = user_token.access_token.secret().to_string();
   let refresh_token: Option<String> = user_token.refresh_token
       .as_ref()
       .map(|token| token.secret().to_string());
 
+  info!("User id: {:?}", user_id);
   info!("Auth token: {:?}", auth_token);
   info!("Refresh token: {:?}", refresh_token);
 

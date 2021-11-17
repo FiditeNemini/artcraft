@@ -219,6 +219,7 @@ async fn main() -> AnyhowResult<()> {
     "http://localhost:54321/twitch/oauth_redirect");
 
   // TODO: These are temporary.
+  let temp_oauth_user_id = easyenv::get_env_string_or_default("TEMP_TWITCH_OAUTH_USER_ID", "");
   let temp_oauth_access_token = easyenv::get_env_string_or_default("TEMP_TWITCH_OAUTH_ACCESS", "");
   let temp_oauth_refresh_token = easyenv::get_env_string_or_default("TEMP_TWITCH_OAUTH_REFRESH", "");
 
@@ -237,6 +238,7 @@ async fn main() -> AnyhowResult<()> {
       redirect_url: oauth_redirect_url,
     },
     twitch_oauth_temp: TwitchOauthTemp {
+      temp_oauth_user_id,
       temp_oauth_access_token,
       temp_oauth_refresh_token,
     },

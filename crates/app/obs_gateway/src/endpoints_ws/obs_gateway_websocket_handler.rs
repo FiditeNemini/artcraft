@@ -35,14 +35,20 @@ pub async fn obs_gateway_websocket_handler(
   let r = client.try_next().await.unwrap();
   error!("Twitch PubSub Result: {:?}", r);
 
-
   // User: vocodes
-  let user_id = 652567283;
+  //let user_id = 652567283;
+
+  let user_id = server_state.twitch_oauth_temp.temp_oauth_user_id.parse::<u32>().unwrap();
+
   let bit_topic = pubsub::channel_bits::ChannelBitsEventsV2 {
     channel_id: user_id,
   }.into_topic();
 
-  let topics = [bit_topic];
+  let sub_topic = pubsub::channel_subscriptions::ChannelSubscribeEventsV1 {
+    channel_id: user_id,
+  }.into_topic();
+
+  let topics = [bit_topic, sub_topic];
 
   let auth_token = server_state.twitch_oauth_temp.temp_oauth_access_token.clone();
 
