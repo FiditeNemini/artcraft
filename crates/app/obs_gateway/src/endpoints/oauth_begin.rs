@@ -11,6 +11,7 @@ use std::sync::Arc;
 use twitch_api2::twitch_oauth2::ClientId;
 use twitch_oauth2::tokens::UserTokenBuilder;
 use twitch_oauth2::{Scope, ClientSecret};
+use crate::twitch::oauth_token_builder::get_oauth_token_builder;
 
 #[derive(Serialize)]
 pub struct OauthBeginEnrollResult {
@@ -57,18 +58,11 @@ pub async fn oauth_begin_enroll(
             OauthBeginEnrollError::ServerError
           })?;
 
-  let client_id = ClientId::new(&server_state.twitch_oauth_secrets.client_id);
-  let client_secret = ClientSecret::new(&server_state.twitch_oauth_secrets.client_secret);
-
-  // TODO: Not all scopes are needed!
-  let mut builder = UserTokenBuilder::new(client_id, client_secret, redirect_url)
-      .set_scopes(vec![
-        Scope::BitsRead,
-        Scope::ChannelReadSubscriptions,
-        Scope::ChatEdit,
-        Scope::ChatRead,
-      ])
-      .force_verify(true);
+  let mut builder = get_oauth_token_builder(
+    &server_state.twitch_oauth_secrets.client_id,
+    &server_state.twitch_oauth_secrets.client_secret,
+    &redirect_url,
+  true);
 
   let (url, _csrf_token) = builder.generate_url();
 
