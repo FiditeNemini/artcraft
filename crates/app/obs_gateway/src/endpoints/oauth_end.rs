@@ -121,9 +121,13 @@ pub async fn oauth_end_enroll_from_redirect(
         }
       })?;
 
-  let auth_token = user_token.access_token.as_str();
+  let auth_token = user_token.access_token.secret().to_string();
+  let refresh_token: Option<String> = user_token.refresh_token
+      .as_ref()
+      .map(|token| token.secret().to_string());
 
   info!("Auth token: {:?}", auth_token);
+  info!("Refresh token: {:?}", refresh_token);
 
   Ok(HttpResponse::Ok()
       .body("TODO"))
