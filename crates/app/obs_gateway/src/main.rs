@@ -13,7 +13,7 @@
 #[macro_use] extern crate serde_derive;
 
 pub mod endpoints;
-pub mod pubsub_gateway;
+pub mod endpoints_ws;
 pub mod server_state;
 pub mod twitch;
 pub mod util;
@@ -26,7 +26,11 @@ use config::shared_constants::DEFAULT_MYSQL_CONNECTION_STRING;
 use config::shared_constants::DEFAULT_REDIS_CONNECTION_STRING;
 use config::shared_constants::DEFAULT_RUST_LOG;
 use crate::endpoints::oauth_begin::oauth_begin_enroll;
-use crate::pubsub_gateway::ws_index;
+use crate::endpoints::oauth_begin_redirect::oauth_begin_enroll_redirect;
+use crate::endpoints::oauth_end::oauth_end_enroll_from_redirect;
+use crate::endpoints_ws::obs_gateway_websocket_handler::obs_gateway_websocket_handler;
+use crate::endpoints_ws::pubsub_gateway::ws_index;
+use crate::server_state::{ObsGatewayServerState, EnvConfig, TwitchOauthSecrets, TwitchOauthTemp};
 use crate::twitch::twitch_client_wrapper::TwitchClientWrapper;
 use crate::twitch::twitch_secrets::TwitchSecrets;
 use crate::twitch::websocket_client::PollingTwitchWebsocketClient;
@@ -48,9 +52,6 @@ use twitch_api2::pubsub::Topic;
 use twitch_api2::pubsub;
 use twitch_oauth2::tokens::UserTokenBuilder;
 use twitch_oauth2::{AppAccessToken, Scope, TwitchToken, tokens::errors::AppAccessTokenError, ClientId, ClientSecret};
-use crate::server_state::{ObsGatewayServerState, EnvConfig, TwitchOauthSecrets};
-use crate::endpoints::oauth_begin_redirect::oauth_begin_enroll_redirect;
-use crate::endpoints::oauth_end::oauth_end_enroll_from_redirect;
 
 const DEFAULT_BIND_ADDRESS : &'static str = "0.0.0.0:54321";
 
@@ -107,59 +108,9 @@ async fn main() -> AnyhowResult<()> {
 
 
 //  // ==================== OAUTH FLOW ====================
-//
-//  println!("Oauth flow...");
-//
-//  let redirect_url = twitch_oauth2::url::Url::parse("http://localhost/test")?;
-//  let mut builder = UserTokenBuilder::new(
-//    client_id.clone(),
-//    client_secret.clone(),
-//    redirect_url)
-//      .set_scopes(Scope::all())
-//      .force_verify(true);
-//
-//  //builder.add_scope(Scope::BitsRead);
-//
-//  let (url, _csrf_token) = builder.generate_url();
-//
-//  println!("Go to this page: {}", url);
-//
-//
-//
-//  let input = rpassword::prompt_password_stdout(
-//    "Paste in the resulting adress after authenticating (input hidden): ",
-//  )?;
-//
-//  let u = twitch_oauth2::url::Url::parse(&input)?;
-//
-//  let map: std::collections::HashMap<_, _> = u.query_pairs().collect();
-//
-//  let user_token = match (map.get("state"), map.get("code")) {
-//    (Some(state), Some(code)) => {
-//      let token = builder
-//          .get_user_token(
-//            &reqwest::Client::builder()
-//                .redirect(reqwest::redirect::Policy::none())
-//                .build()?,
-//            state,
-//            code,
-//          )
-//          .await?;
-//      println!("Got token: {:?}", token);
-//
-//      token
-//    }
-//    _ => match (map.get("error"), map.get("error_description")) {
-//      (std::option::Option::Some(error), std::option::Option::Some(error_description)) => {
-//        anyhow::bail!(
-//                    "twitch errored with error: {} - {}",
-//                    error,
-//                    error_description
-//                );
-//      }
-//      _ => anyhow::bail!("invalid url passed"),
-//    },
-//  };
+
+
+
 //
 //  let auth_token = user_token.access_token.as_str();
 //
@@ -267,6 +218,10 @@ async fn main() -> AnyhowResult<()> {
     "TWITCH_OAUTH_REDIRECT_URL",
     "http://localhost:54321/twitch/oauth_redirect");
 
+  // TODO: These are temporary.
+  let temp_oauth_access_token = easyenv::get_env_string_or_default("TEMP_TWITCH_OAUTH_ACCESS", "");
+  let temp_oauth_refresh_token = easyenv::get_env_string_or_default("TEMP_TWITCH_OAUTH_REFRESH", "");
+
   let server_state = ObsGatewayServerState {
     env_config: EnvConfig {
       num_workers,
@@ -280,6 +235,10 @@ async fn main() -> AnyhowResult<()> {
       client_id: secrets.app_client_id.clone(),
       client_secret: secrets.app_client_secret.clone(),
       redirect_url: oauth_redirect_url,
+    },
+    twitch_oauth_temp: TwitchOauthTemp {
+      temp_oauth_access_token,
+      temp_oauth_refresh_token,
     },
     hostname: server_hostname,
   };
@@ -333,7 +292,16 @@ pub async fn serve(server_state: ObsGatewayServerState) -> AnyhowResult<()>
                     .route(web::head().to(|| HttpResponse::Ok()))
               )
         )
-        //.default_service( web::route().to(default_route_404))
+        .service(web::resource("/obs")
+            .route(web::get().to(obs_gateway_websocket_handler))
+            .route(web::head().to(|| HttpResponse::Ok()))
+        )
+        .service(
+          actix_files::Files::new("/static", "static")
+              .show_files_listing()
+              .use_last_modified(true),
+        )
+    //.default_service( web::route().to(default_route_404))
   })
       .bind(bind_address)?
       .workers(num_workers)

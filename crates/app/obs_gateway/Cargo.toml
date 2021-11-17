@@ -72,7 +72,7 @@ lru_time_cache = "0.11.11"
 # Web
 actix = "0.12.0"
 actix-cors = "0.5.4"
-actix-files= "0.5"
+actix-files= "0.6.0-beta.8"
 actix-http = "3.0.0-beta.11"
 actix-rt = "2.4.0"
 actix-service = "2.0.1"
