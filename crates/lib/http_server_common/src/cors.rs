@@ -14,6 +14,7 @@ pub fn build_common_cors_config() -> Cors {
       .allowed_origin("http://jungle.horse:7000")
       .allowed_origin("http://localhost:12345")
       .allowed_origin("http://localhost:3000")
+      .allowed_origin("http://localhost:54321")
       .allowed_origin("http://localhost:5555")
       .allowed_origin("http://localhost:7000")
       .allowed_origin("http://localhost:8000")
