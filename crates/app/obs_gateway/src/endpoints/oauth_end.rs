@@ -9,6 +9,7 @@ use log::warn;
 use std::fmt;
 use std::sync::Arc;
 use twitch_oauth2::tokens::BearerTokenType::UserToken;
+use twitch_oauth2::CsrfToken;
 
 #[derive(Deserialize)]
 pub struct QueryParams {
@@ -78,6 +79,10 @@ pub async fn oauth_end_enroll_from_redirect(
     }
   };
 
+  // TODO/FIXME: This is a major security issue (part 1).
+  //  These need to be persisted in the database and associated with the user.
+  let csrf_token = CsrfToken::new(&state);
+
   let redirect_url =
       twitch_oauth2::url::Url::parse(&server_state.twitch_oauth_secrets.redirect_url)
           .map_err(|e| {
@@ -90,6 +95,9 @@ pub async fn oauth_end_enroll_from_redirect(
     &server_state.twitch_oauth_secrets.client_secret,
     &redirect_url,
     true);
+
+  // TODO/FIXME: This is a major security issue (part 2).
+  builder.set_csrf(csrf_token);
 
   let http_client = &reqwest::Client::builder()
       .redirect(reqwest::redirect::Policy::none())

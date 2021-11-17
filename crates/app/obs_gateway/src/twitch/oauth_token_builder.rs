@@ -1,5 +1,5 @@
 use twitch_oauth2::tokens::UserTokenBuilder;
-use twitch_oauth2::{Scope, ClientSecret, ClientId};
+use twitch_oauth2::{Scope, ClientSecret, ClientId, CsrfToken};
 use twitch_oauth2::url::Url;
 
 /// Get the token builder with the scopes our app needs
