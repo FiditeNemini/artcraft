@@ -16,7 +16,8 @@ pub fn get_oauth_token_builder(
 
   UserTokenBuilder::new(client_id, client_secret, redirect_url.clone())
       .set_scopes(vec![
-        Scope::BitsRead,
+        Scope::BitsRead, // Using bits to cheer (cost money, larger streams)
+        Scope::ChannelReadRedemptions, // Channel points redeemed (free points, smaller streams)
         Scope::ChannelReadSubscriptions,
         Scope::ChatEdit,
         Scope::ChatRead,

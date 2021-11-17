@@ -44,11 +44,19 @@ pub async fn obs_gateway_websocket_handler(
     channel_id: user_id,
   }.into_topic();
 
+  let points_topic = pubsub::channel_points::ChannelPointsChannelV1 {
+    channel_id: user_id,
+  }.into_topic();
+
+  let cheer_topic = pubsub::channel_cheer::ChannelCheerEventsPublicV1 {
+    channel_id: user_id,
+  }.into_topic();
+
   let sub_topic = pubsub::channel_subscriptions::ChannelSubscribeEventsV1 {
     channel_id: user_id,
   }.into_topic();
 
-  let topics = [bit_topic, sub_topic];
+  let topics = [bit_topic, points_topic, cheer_topic, sub_topic];
 
   let auth_token = server_state.twitch_oauth_temp.temp_oauth_access_token.clone();
 
@@ -62,16 +70,22 @@ pub async fn obs_gateway_websocket_handler(
   error!("Twitch PubSub Result: {:?}", r);
 
   error!("Begin Javascript WebSocket...");
-  let websocket = ObsGatewayWebSocket::new();
+  let websocket = ObsGatewayWebSocket::new(client);
+
   ws::start(websocket, &request, stream)
 }
 
 /// Websocket behavior
-struct ObsGatewayWebSocket {}
+struct ObsGatewayWebSocket {
+  twitch_client: PollingTwitchWebsocketClient,
+}
+
 
 impl ObsGatewayWebSocket {
-  fn new() -> Self {
-    Self {}
+  fn new(twitch_client: PollingTwitchWebsocketClient) -> Self {
+    Self {
+      twitch_client
+    }
   }
 }
 
