@@ -391,6 +391,10 @@ async fn run_server(app_state: AppState, server_args: ServerArgs) -> std::io::Re
             .allowed_origin("https://vo.codes")
             .allowed_origin("http://vocodes.com")
             .allowed_origin("https://vocodes.com")
+            .allowed_origin("http://www.fakeyou.com")
+            .allowed_origin("https://www.fakeyou.com")
+            .allowed_origin("http://fakeyou.com")
+            .allowed_origin("https://fakeyou.com")
             .allowed_methods(vec!["GET", "POST", "OPTIONS"])
             .allowed_headers(vec![
               http::header::ACCEPT,
