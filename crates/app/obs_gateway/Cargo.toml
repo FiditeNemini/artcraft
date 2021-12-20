@@ -46,6 +46,9 @@ futures = { version = "0.3.15", features = ["thread-pool"] } # feature for Threa
 futures-util = "0.3.17"
 futures_old_for_limiter = { package = "futures", version = "0.1.29" } # Older version of futures for `limiter` crate
 
+# Threading
+crossbeam = "0.8.1"
+
 # MySql Database
 # "offline" supports typesafe builds without a live database
 # "rustls" doesn't appear to work with IP addresses, per:

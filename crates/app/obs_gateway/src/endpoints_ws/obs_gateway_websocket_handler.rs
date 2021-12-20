@@ -4,10 +4,15 @@ use actix_web_actors::ws;
 use crate::server_state::ObsGatewayServerState;
 use log::error;
 use log::warn;
+use log::info;
 use std::sync::Arc;
 use crate::twitch::websocket_client::PollingTwitchWebsocketClient;
 use twitch_api2::pubsub;
 use twitch_api2::pubsub::Topic;
+use tokio::runtime::Handle;
+use crate::endpoints_ws::obs_twitch_thread::ObsTwitchThread;
+use std::thread::sleep;
+use std::time::Duration;
 
 /// Endpoint
 pub async fn obs_gateway_websocket_handler(
@@ -64,10 +69,12 @@ pub async fn obs_gateway_websocket_handler(
 
   client.listen(&auth_token, &topics).await.unwrap();
 
-  error!("Twitch PubSub Try read next...");
-  let r = client.try_next().await.unwrap();
 
-  error!("Twitch PubSub Result: {:?}", r);
+  //let (tx, rx) = crossbeam::channel::bounded(1);
+  //let client = Arc::new(&self.twitch_client);
+  //let client2 = client.clone();
+
+  //let res = rx.recv().unwrap();
 
   error!("Begin Javascript WebSocket...");
   let websocket = ObsGatewayWebSocket::new(client);
@@ -77,14 +84,16 @@ pub async fn obs_gateway_websocket_handler(
 
 /// Websocket behavior
 struct ObsGatewayWebSocket {
-  twitch_client: PollingTwitchWebsocketClient,
+  //twitch_client: PollingTwitchWebsocketClient,
+  twitch_thread: ObsTwitchThread,
 }
 
 
 impl ObsGatewayWebSocket {
   fn new(twitch_client: PollingTwitchWebsocketClient) -> Self {
+    let twitch_thread = ObsTwitchThread::new(twitch_client);
     Self {
-      twitch_client
+      twitch_thread
     }
   }
 }
@@ -105,6 +114,46 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for ObsGatewayWebSock
   ) {
     if let Ok(msg) = msg {
       error!(">>>>>> obs streamhandler::handle (msg = {:?})", msg);
+
+      //let (tx, rx) = crossbeam::channel::bounded(1);
+      //let handle = Handle::current();
+
+      //let client = Arc::new(&self.twitch_client);
+      //let client2 = client.clone();
+
+      //handle.spawn(async {
+      //  error!("Twitch PubSub Try read next...");
+      //  match client2.try_next().await {
+      //    Ok(r) => {
+      //      error!("Twitch PubSub Result: {:?}", r);
+      //    },
+      //    Err(e) => {
+      //      warn!("pubsub error: {:?}", e);
+      //    }
+      //  }
+      //});
+
+      //let res = rx.recv().unwrap();
+
+      let handle = Handle::current();
+
+      handle.spawn(async move {
+        //error!("Twitch PubSub Try read next...");
+        //match client2.try_next().await {
+        //  Ok(r) => {
+        //    error!("Twitch PubSub Result: {:?}", r);
+        //  },
+        //  Err(e) => {
+        //    warn!("pubsub error: {:?}", e);
+        //  }
+        //}
+        loop {
+          info!("Thread loop");
+          sleep(Duration::from_millis(1000));
+        }
+      });
+
+
       match msg {
         ws::Message::Text(text) => ctx.text(text),
         ws::Message::Binary(bin) => ctx.binary(bin),

@@ -15,5 +15,9 @@
         console.log('on message event', event.data);
     }
 
-    sock.send('this is a message from the client');
+    setInterval(() => {
+        console.log('sending message to server on interval');
+        sock.send('interval trigger');
+    }, 2000);
+
 })();
