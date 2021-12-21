@@ -56,4 +56,8 @@ impl Tokens {
   pub fn new_firehose_event() -> AnyhowResult<String> {
     random_prefix_crockford_token("EV:", 32, false)
   }
+
+  pub fn new_category() -> AnyhowResult<String> {
+    random_prefix_crockford_token("CAT:", 32, false)
+  }
 }
