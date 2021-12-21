@@ -1,3 +1,4 @@
+pub mod categories;
 pub mod events;
 pub mod leaderboard;
 pub mod misc;

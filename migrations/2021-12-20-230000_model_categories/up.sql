@@ -9,6 +9,14 @@ CREATE TABLE model_categories (
   -- Visible "primary key"
   token VARCHAR(32) NOT NULL,
 
+  -- ========== MODEL TYPE ==========
+
+  model_type ENUM(
+    'not_set',
+    'tts',
+    'w2l'
+  ) NOT NULL DEFAULT 'not_set',
+
   -- ========== CATEGORY TOPOLOGY ==========
 
   -- Optional foreign key link to super category.
@@ -16,7 +24,7 @@ CREATE TABLE model_categories (
   super_category_token VARCHAR(32) DEFAULT NULL,
 
   -- If this category can be applied directly to models.
-  can_have_models BOOLEAN NOT NULL DEFAULT false,
+  can_directly_have_models BOOLEAN NOT NULL DEFAULT false,
 
   -- If this category can have subcategories.
   can_have_subcategories BOOLEAN NOT NULL DEFAULT false,
@@ -70,14 +78,54 @@ CREATE TABLE model_categories (
   PRIMARY KEY (id),
   UNIQUE KEY (token),
   KEY fk_super_category_token (super_category_token),
-  KEY index_can_have_models (can_have_models),
+  KEY index_model_type (model_type),
+  KEY index_can_directly_have_models (can_directly_have_models),
   KEY index_can_have_subcategories (can_have_subcategories),
   KEY index_is_mod_approved (is_mod_approved)
 
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin;
 
 -- Join table assigning models to zero or more categories.
-CREATE TABLE model_category_assignments (
+CREATE TABLE tts_category_assignments (
+  -- Not used for anything except replication.
+  id BIGINT(20) NOT NULL AUTO_INCREMENT,
+
+  model_token VARCHAR(32) NOT NULL,
+  category_token VARCHAR(32) NOT NULL,
+
+  -- ========== USER DETAILS ==========
+
+  -- The person that created the assignment.
+  -- This can be the model owner or a moderator.
+  category_addition_user_token VARCHAR(32) NOT NULL,
+
+  -- The person that removed the assignment.
+  -- This can be the model owner or a moderator.
+  category_removal_user_token VARCHAR(32) NOT NULL,
+
+  -- For abuse tracking.
+  -- THIS CAN BE A MODERATOR FOR SIMPLICITY.
+  -- Wide enough for IPv4/6
+  ip_address_creation VARCHAR(40) NOT NULL,
+  ip_address_last_update VARCHAR(40) NOT NULL,
+
+  -- ========== TIMESTAMPS ==========
+
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  deleted_at TIMESTAMP NULL,
+
+  -- INDICES --
+  PRIMARY KEY (id),
+  UNIQUE KEY (model_token, category_token),
+  KEY fk_model_token (model_token),
+  KEY fk_category_token (category_token),
+  KEY index_deleted_at (deleted_at)
+
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin;
+
+-- Join table assigning models to zero or more categories.
+CREATE TABLE w2l_category_assignments (
   -- Not used for anything except replication.
   id BIGINT(20) NOT NULL AUTO_INCREMENT,
 
