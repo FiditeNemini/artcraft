@@ -17,11 +17,11 @@ ignore = [
 # Item-level imports makes for better diffs and fewer merge conflicts.
 # Another suitable option is "Module", but that's not the default either.
 # (This is commented out for now to reduce the first round of rustfmt diffs, but will be enabled.)
-#imports_granularity = "Item"
+imports_granularity = "Item"
 
 # It's better to keep stdlib, crate (self), and external crates separate.
 # (This is commented out for now to reduce the first round of rustfmt diffs, but will be enabled.)
-#group_imports = "StdExternalCrate"
+group_imports = "StdExternalCrate"
 
 # The default is wrong
 match_block_trailing_comma = true
@@ -30,10 +30,13 @@ match_block_trailing_comma = true
 use_try_shorthand = true
 
 # MAYBE
-struct_lit_single_line = true
-use_small_heuristics = "Off" # Fix for method chaining?
+#struct_lit_single_line = true
+
+# This fixes method chaining. 
+# (rustfmt ordinarily puts everything on one line.)
+use_small_heuristics = "Off" 
 
 # TEMPORARY
-reorder_imports = false
+#reorder_imports = false
 #max_width = 180 # default 100
 #chain_width = 10
