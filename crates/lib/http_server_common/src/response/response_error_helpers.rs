@@ -1,7 +1,6 @@
-use actix_http::http::header;
 use actix_web::HttpResponseBuilder;
 use actix_web::http::StatusCode;
-use actix_web::{HttpResponse};
+use actix_web::HttpResponse;
 
 
 #[derive(Serialize)]
@@ -26,6 +25,6 @@ pub fn to_simple_json_error(
   };
 
   HttpResponseBuilder::new(status_code)
-      .set_header(header::CONTENT_TYPE, "application/json")
+      .content_type("application/json")
       .body(body)
 }

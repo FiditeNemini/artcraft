@@ -1,5 +1,4 @@
-
-use actix_web::{HttpResponse, HttpRequest, Responder, get};
+use actix_web::{HttpResponse, Responder};
 use log::warn;
 
 pub async fn default_route_404() -> impl Responder {
