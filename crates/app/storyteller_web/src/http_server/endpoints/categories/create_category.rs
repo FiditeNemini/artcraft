@@ -28,6 +28,9 @@ use std::fmt;
 use http_server_common::response::serialize_as_json_error::serialize_as_json_error;
 use crate::database::helpers::tokens::Tokens;
 
+const DEFAULT_CAN_DIRECTLY_HAVE_MODELS : bool = true;
+const DEFAULT_CAN_HAVE_SUBCATEGORIES : bool = false;
+
 // =============== Request ===============
 
 #[derive(Deserialize)]
@@ -139,13 +142,20 @@ pub async fn create_category_handler(
 
   let creator_ip_address = get_request_ip(&http_request);
 
-  let is_mod_approved = is_mod;
+  let mut is_mod_approved = false;
+  let mut maybe_mod_user_token = None;
+  let mut can_directly_have_models = DEFAULT_CAN_DIRECTLY_HAVE_MODELS;
+  let mut can_have_subcategories = DEFAULT_CAN_HAVE_SUBCATEGORIES;
 
-  let maybe_mod_user_token = if is_mod {
-    Some(user_session.user_token.clone())
-  } else {
-    None
-  };
+  if is_mod {
+    // Moderator fields and adjustments
+    is_mod_approved = true;
+    maybe_mod_user_token = Some(user_session.user_token.clone());
+    can_directly_have_models = request.can_directly_have_models
+        .unwrap_or(DEFAULT_CAN_DIRECTLY_HAVE_MODELS);
+    can_have_subcategories= request.can_have_subcategories
+        .unwrap_or(DEFAULT_CAN_HAVE_SUBCATEGORIES);
+  }
 
   let query_result = sqlx::query!(
         r#"
@@ -162,8 +172,8 @@ SET
 
     is_mod_approved = ?,
     maybe_mod_user_token = ?,
-    can_directly_have_models = true,
-    can_have_subcategories = false
+    can_directly_have_models = ?,
+    can_have_subcategories = ?
         "#,
 
     category_token,
@@ -175,6 +185,8 @@ SET
     &creator_ip_address,
     is_mod_approved,
     maybe_mod_user_token,
+    can_directly_have_models,
+    can_have_subcategories
   )
   .execute(&server_state.mysql_pool)
     .await;

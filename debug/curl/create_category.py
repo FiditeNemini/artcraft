@@ -36,6 +36,8 @@ payload = {
   'idempotency_token': str(uuid.uuid4()),
   'name': 'First Category',
   'model_type': 'tts', # tts or w2l
+  'can_directly_have_models': False,
+  'can_have_subcategories': True,
 }
 
 r = requests.post(category_create_url, cookies=cookies, json=payload)
