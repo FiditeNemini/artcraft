@@ -12,6 +12,7 @@ use actix_web::web::{BytesMut, Buf, BufMut};
 use actix_web::{Error, HttpResponse};
 use actix_web::{ResponseError, HttpMessage, HttpRequest, HttpResponseBuilder};
 use crate::http_server::web_utils::ip_address::get_service_request_ip;
+use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 use crate::threads::ip_banlist_set::IpBanlistSet;
 use futures_util::future::{err, ok, Either, Ready};
 use std::io::Write;
@@ -34,9 +35,12 @@ impl ResponseError for BannedError {
   }
 
   fn error_response(&self) -> HttpResponse<Body> {
-    HttpResponseBuilder::new(self.status_code())
-      .append_header((header::CONTENT_TYPE, "application/json"))
-      .body("{}")
+    // NB: I'm setting a string error because I mistakenly got caught by this in local dev
+    // and couldn't figure out the issue for a bit. At least I can grep for this string.
+    // However, I need to balance this requirement with not cluing in those that are banned.
+    to_simple_json_error(
+      "ERR64: storyteller-web database error",
+      self.status_code())
   }
 }
 
