@@ -61,6 +61,7 @@ use crate::http_server::endpoints::w2l::get_w2l_upload_template_job_status::get_
 use crate::http_server::endpoints::w2l::list_w2l_templates::list_w2l_templates_handler;
 use crate::http_server::endpoints::w2l::set_w2l_template_mod_approval::set_w2l_template_mod_approval_handler;
 use crate::http_server::endpoints::categories::delete_category::delete_category_handler;
+use crate::http_server::endpoints::categories::edit_category::edit_category_handler;
 
 pub fn add_routes<T, B> (app: App<T, B>) -> App<T, B>
   where
@@ -418,6 +419,11 @@ fn add_category_routes<T, B> (app: App<T, B>) -> App<T, B>
         .service(
           web::resource("/{token}/delete")
               .route(web::post().to(delete_category_handler))
+              .route(web::head().to(|| HttpResponse::Ok()))
+        )
+        .service(
+          web::resource("/{token}/edit")
+              .route(web::post().to(edit_category_handler))
               .route(web::head().to(|| HttpResponse::Ok()))
         )
   )

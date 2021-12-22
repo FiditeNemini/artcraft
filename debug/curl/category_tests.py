@@ -8,6 +8,7 @@ import uuid
 login_url = 'http://localhost:12345/login'
 category_create_url = 'http://localhost:12345/category/create'
 category_delete_url_format = 'http://localhost:12345/category/{}/delete'
+category_edit_url_format = 'http://localhost:12345/category/{}/edit'
 
 payload = {
   'username_or_email': 'echelon',
@@ -77,6 +78,27 @@ payload = {
 }
 
 r = requests.post(category_delete_url, cookies=cookies, json=payload)
+
+print('Status: {}'.format(r.status_code))
+print(r.content)
+
+
+print("===== Edit Category =====")
+
+category_edit_url = category_edit_url_format.format(category_token)
+
+cookies = { 'session': session_cookie }
+
+payload = {
+  'name': 'Edited Name',
+  'dropdown_name': 'Edited Dropdown Name',
+  'can_directly_have_models': True,
+  'can_have_subcategories': True,
+  'is_mod_approved': True,
+  'maybe_mod_comments': 'mod comment',
+}
+
+r = requests.post(category_edit_url, cookies=cookies, json=payload)
 
 print('Status: {}'.format(r.status_code))
 print(r.content)
