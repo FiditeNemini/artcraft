@@ -94,7 +94,7 @@ pub async fn select_w2l_template_by_token(
     Ok(template) => template,
     Err(ref err) => {
       match err {
-        RowNotFound => {
+        sqlx::Error::RowNotFound => {
           warn!("w2l template not found: {:?}", &err);
           return Ok(None);
         },

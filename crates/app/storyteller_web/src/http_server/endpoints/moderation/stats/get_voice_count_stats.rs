@@ -101,7 +101,7 @@ SELECT public_count, all_count FROM (
     Ok(result) => result,
     Err(err) => {
       match err {
-        RowNotFound => {
+        sqlx::Error::RowNotFound => {
           // NB: Not Found for null results means nothing is pending in the queue
           VoiceStats {
             all_count: -1,

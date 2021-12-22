@@ -181,7 +181,7 @@ WHERE
     Ok(profile_record) => profile_record,
     Err(err) => {
       match err {
-        RowNotFound => {
+        sqlx::Error::RowNotFound => {
           warn!("Invalid user");
           return Err(ProfileError::NotFound);
         },

@@ -119,7 +119,7 @@ pub async fn select_w2l_result_by_token(
     Ok(inference_result) => inference_result,
     Err(ref err) => {
       match err {
-        RowNotFound => {
+        sqlx::Error::RowNotFound => {
           warn!("w2l result not found: {:?}", &err);
           return Ok(None);
         },

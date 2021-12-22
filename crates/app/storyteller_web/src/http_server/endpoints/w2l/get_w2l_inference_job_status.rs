@@ -137,7 +137,7 @@ WHERE jobs.token = ?
     Ok(record) => record,
     Err(err) => {
       match err {
-        RowNotFound => {
+        sqlx::Error::RowNotFound => {
           return Err(GetW2lInferenceStatusError::ServerError);
         },
         _ => {

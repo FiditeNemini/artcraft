@@ -1,7 +1,7 @@
 use actix_http::http::header;
 use actix_web::HttpResponseBuilder;
 use actix_web::http::StatusCode;
-use actix_web::{HttpResponse, ResponseError};
+use actix_web::{HttpResponse};
 
 
 #[derive(Serialize)]

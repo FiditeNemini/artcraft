@@ -113,7 +113,7 @@ FROM user_roles
     Err(err) => {
       warn!("Error: {:?}", err);
       match err {
-        RowNotFound => Vec::new(),
+        sqlx::Error::RowNotFound => Vec::new(),
         _ => {
           warn!("user role query error: {:?}", err);
           return Err(anyhow!("error querying user roles"));

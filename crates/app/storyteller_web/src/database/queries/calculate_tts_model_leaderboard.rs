@@ -59,7 +59,7 @@ LIMIT 25;
       warn!("Error: {:?}", err);
 
       match err {
-        RowNotFound => {
+        sqlx::Error::RowNotFound => {
           return Ok(Vec::new());
         },
         _ => {

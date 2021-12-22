@@ -233,7 +233,7 @@ LIMIT 1
       Ok(_record) => true,
       Err(err) => {
         match err {
-          RowNotFound => false,
+          sqlx::Error::RowNotFound => false,
           _ => {
             warn!("query error: {:?}", err);
             return Err(anyhow!("error querying: {:?}", err));
@@ -352,7 +352,7 @@ SET
       Ok(record) => record.count as u64,
       Err(err) => {
         match err {
-          RowNotFound => 0,
+          sqlx::Error::RowNotFound => 0,
           _ => {
             warn!("query error: {:?}", err);
             return Err(anyhow!("error querying: {:?}", err));

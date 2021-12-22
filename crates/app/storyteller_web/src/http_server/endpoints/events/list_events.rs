@@ -91,7 +91,7 @@ LIMIT 25
     Ok(events) => events,
     Err(err) => {
       match err {
-        RowNotFound => {
+        sqlx::Error::RowNotFound => {
           return Err(ListEventsError::ServerError);
         },
         _ => {

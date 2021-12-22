@@ -52,7 +52,7 @@ WHERE
   match maybe_results {
     Err(err) => {
       match err {
-        RowNotFound => {
+        sqlx::Error::RowNotFound => {
           Ok(Vec::new())
         },
         _ => {

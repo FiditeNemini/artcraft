@@ -120,7 +120,7 @@ pub async fn select_tts_result_by_token(
     Ok(inference_result) => inference_result,
     Err(ref err) => {
       match err {
-        RowNotFound => {
+        sqlx::Error::RowNotFound => {
           warn!("tts result not found: {:?}", &err);
           return Ok(None);
         },

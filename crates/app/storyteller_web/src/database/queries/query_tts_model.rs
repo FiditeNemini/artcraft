@@ -100,7 +100,7 @@ pub async fn select_tts_model_by_token(
     Ok(model) => model,
     Err(ref err) => {
       match err {
-        RowNotFound => {
+        sqlx::Error::RowNotFound => {
           warn!("tts model not found: {:?}", &err);
           return Ok(None);
         },

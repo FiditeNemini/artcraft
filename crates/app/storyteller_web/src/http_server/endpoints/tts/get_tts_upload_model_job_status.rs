@@ -118,7 +118,7 @@ WHERE jobs.token = ?
     Ok(record) => record,
     Err(err) => {
       match err {
-        RowNotFound => {
+        sqlx::Error::RowNotFound => {
           return Err(GetTtsUploadModelStatusError::ServerError);
         },
         _ => {

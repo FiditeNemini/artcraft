@@ -137,7 +137,7 @@ FOR UPDATE
     Ok(record) => record,
     Err(err) => {
       match err {
-        RowNotFound => {
+        sqlx::Error::RowNotFound => {
           return Err(anyhow!("could not job"));
         },
         _ => {
@@ -441,7 +441,7 @@ AND w2l.mod_deleted_at IS NULL
     Ok(template) => Ok(Some(template)),
     Err(err) => {
       match err {
-        RowNotFound => {
+        sqlx::Error::RowNotFound => {
           Ok(None)
         },
         _ => {

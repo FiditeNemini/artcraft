@@ -105,7 +105,7 @@ LIMIT 1
     Ok(result) => result,
     Err(err) => {
       match err {
-        RowNotFound => {
+        sqlx::Error::RowNotFound => {
           // NB: Not Found for null results means nothing is pending in the queue
           PendingCountResult {
             pending_count: None,

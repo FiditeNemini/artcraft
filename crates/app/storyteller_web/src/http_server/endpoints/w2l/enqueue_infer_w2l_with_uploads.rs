@@ -378,7 +378,7 @@ WHERE
     },
     Err(err) => {
       match err {
-        RowNotFound => {
+        sqlx::Error::RowNotFound => {
           false
         },
         _ => {

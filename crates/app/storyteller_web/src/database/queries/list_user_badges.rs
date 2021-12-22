@@ -53,7 +53,7 @@ WHERE
     Err(err) => {
       warn!("Error: {:?}", err);
       match err {
-        RowNotFound => Vec::new(),
+        sqlx::Error::RowNotFound => Vec::new(),
         _ => {
           warn!("user badges query error: {:?}", err);
           return Err(anyhow!("error querying user badges"));

@@ -90,7 +90,7 @@ WHERE
     Ok(profile_record) => profile_record,
     Err(err) => {
       return match err {
-        RowNotFound => {
+        sqlx::Error::RowNotFound => {
           Ok(None)
         },
         _ => {

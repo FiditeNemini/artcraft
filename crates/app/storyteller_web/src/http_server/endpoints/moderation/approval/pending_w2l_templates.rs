@@ -126,7 +126,7 @@ WHERE
     Ok(results) => results,
     Err(err) => {
       match err {
-        RowNotFound => {
+        sqlx::Error::RowNotFound => {
           Vec::new()
         },
         _ => {

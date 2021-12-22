@@ -92,7 +92,7 @@ FOR UPDATE
     Ok(record) => record,
     Err(err) => {
       match err {
-        RowNotFound => {
+        sqlx::Error::RowNotFound => {
           return Err(anyhow!("could not job"));
         },
         _ => {

@@ -148,7 +148,7 @@ LIMIT 1
     },
     Err(err) => {
       match err {
-        RowNotFound => {
+        sqlx::Error::RowNotFound => {
           return Err(GetIpBanError::NotFound);
         },
         _ => {
