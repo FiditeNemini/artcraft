@@ -1,4 +1,9 @@
 use actix_web::{App, web, HttpResponse};
+use actix_http::body::MessageBody;
+use actix_service::ServiceFactory;
+use actix_web::dev::{ServiceRequest, ServiceResponse};
+use actix_web::error::Error;
+use crate::http_server::endpoints::categories::create_category::create_category_handler;
 use crate::http_server::endpoints::events::list_events::list_events_handler;
 use crate::http_server::endpoints::leaderboard::get_leaderboard::leaderboard_handler;
 use crate::http_server::endpoints::misc::default_route_404::default_route_404;
@@ -55,10 +60,6 @@ use crate::http_server::endpoints::w2l::get_w2l_template_use_count::get_w2l_temp
 use crate::http_server::endpoints::w2l::get_w2l_upload_template_job_status::get_w2l_upload_template_job_status_handler;
 use crate::http_server::endpoints::w2l::list_w2l_templates::list_w2l_templates_handler;
 use crate::http_server::endpoints::w2l::set_w2l_template_mod_approval::set_w2l_template_mod_approval_handler;
-use actix_http::body::MessageBody;
-use actix_service::ServiceFactory;
-use actix_web::dev::{ServiceRequest, ServiceResponse};
-use actix_web::error::Error;
 
 pub fn add_routes<T, B> (app: App<T, B>) -> App<T, B>
   where
@@ -74,6 +75,7 @@ pub fn add_routes<T, B> (app: App<T, B>) -> App<T, B>
   let mut app = add_moderator_routes(app); /* /moderation */
   app = add_tts_routes(app); /* /tts */
   app = add_w2l_routes(app); /* /w2l */
+  app = add_category_routes(app); /* /category */
   app = add_user_profile_routes(app); /* /user */
 
   // ==================== ACCOUNT CREATION / SESSION MANAGEMENT ====================
@@ -97,6 +99,7 @@ pub fn add_routes<T, B> (app: App<T, B>) -> App<T, B>
         .route(web::get().to(session_info_handler))
         .route(web::head().to(|| HttpResponse::Ok()))
   )
+  // ==================== MISC ====================
   .service(
     web::resource("/events")
         .route(web::get().to(list_events_handler))
@@ -388,6 +391,29 @@ fn add_w2l_routes<T, B> (app: App<T, B>) -> App<T, B>
             .route(web::get().to(get_w2l_upload_template_job_status_handler))
             .route(web::head().to(|| HttpResponse::Ok()))
       )
+  )
+}
+
+// ==================== CATEGORY ROUTES ====================
+
+fn add_category_routes<T, B> (app: App<T, B>) -> App<T, B>
+  where
+      B: MessageBody,
+      T: ServiceFactory<
+        ServiceRequest,
+        Config = (),
+        Response = ServiceResponse<B>,
+        Error = Error,
+        InitError = (),
+      >,
+{
+  app.service(
+    web::scope("/category")
+        .service(
+          web::resource("/create")
+              .route(web::post().to(create_category_handler))
+              .route(web::head().to(|| HttpResponse::Ok()))
+        )
   )
 }
 
