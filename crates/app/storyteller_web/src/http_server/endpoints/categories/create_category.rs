@@ -31,6 +31,7 @@ use crate::database::helpers::tokens::Tokens;
 // =============== Request ===============
 
 #[derive(Deserialize)]
+#[serde(rename_all = "snake_case")]
 pub enum ModelType {
   Tts,
   W2l,
@@ -38,8 +39,14 @@ pub enum ModelType {
 
 #[derive(Deserialize)]
 pub struct CreateCategoryRequest {
+  // Fields for everyone
   pub name: Option<String>,
   pub model_type: Option<ModelType>,
+  pub idempotency_token: Option<String>,
+
+  // Fields for moderators only
+  pub can_directly_have_models: Option<bool>,
+  pub can_have_subcategories: Option<bool>,
 }
 
 // =============== Success Response ===============
@@ -116,6 +123,10 @@ pub async fn create_category_handler(
     Some(ModelType::W2l) => "w2l",
   };
 
+  let idempotency_token = request.idempotency_token
+      .clone()
+      .ok_or(CreateCategoryError::BadInput("no idempotency token provided".to_string()))?;
+
   let name = request.name
       .clone()
       .ok_or(CreateCategoryError::BadInput("no name provided".to_string()))?;
@@ -141,11 +152,13 @@ pub async fn create_category_handler(
 INSERT INTO model_categories
 SET
     token = ?,
+    uuid_idempotency_token = ?,
     model_type = ?,
     name = ?,
 
     creator_user_token = ?,
     creator_ip_address_creation = ?,
+    creator_ip_address_last_update = ?,
 
     is_mod_approved = ?,
     maybe_mod_user_token = ?,
@@ -154,10 +167,12 @@ SET
         "#,
 
     category_token,
+    idempotency_token,
     model_type,
     name,
     &user_session.user_token,
-    creator_ip_address,
+    &creator_ip_address,
+    &creator_ip_address,
     is_mod_approved,
     maybe_mod_user_token,
   )

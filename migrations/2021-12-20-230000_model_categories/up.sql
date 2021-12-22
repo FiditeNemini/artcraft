@@ -9,6 +9,11 @@ CREATE TABLE model_categories (
   -- Visible "primary key"
   token VARCHAR(32) NOT NULL,
 
+  -- Idempotency token
+  -- This is so the frontend client doesn't submit duplicate requests.
+  -- Only used on create.
+  uuid_idempotency_token VARCHAR(36) NOT NULL,
+
   -- ========== MODEL TYPE ==========
 
   model_type ENUM(
@@ -77,6 +82,7 @@ CREATE TABLE model_categories (
   -- INDICES --
   PRIMARY KEY (id),
   UNIQUE KEY (token),
+  UNIQUE KEY (uuid_idempotency_token),
   KEY fk_super_category_token (super_category_token),
   KEY index_model_type (model_type),
   KEY index_can_directly_have_models (can_directly_have_models),
