@@ -26,13 +26,16 @@ CREATE TABLE model_categories (
 
   -- Optional foreign key link to super category.
   -- If absent, this is a top-level category or top-level super category.
-  super_category_token VARCHAR(32) DEFAULT NULL,
+  maybe_super_category_token VARCHAR(32) DEFAULT NULL,
 
   -- If this category can be applied directly to models.
   can_directly_have_models BOOLEAN NOT NULL DEFAULT false,
 
   -- If this category can have subcategories.
   can_have_subcategories BOOLEAN NOT NULL DEFAULT false,
+
+  -- If only mods are allowed to tag (or untag) models with this.
+  can_only_mods_apply BOOLEAN NOT NULL DEFAULT false,
 
   -- ========== CATEGORY NAME ==========
 
@@ -41,7 +44,7 @@ CREATE TABLE model_categories (
 
   -- The name displayed in the dropdown (if it should be different), otherwise NULL.
   -- eg. "Gender" (name) and "By Gender" (dropdown name)
-  dropdown_name VARCHAR(20) DEFAULT NULL,
+  maybe_dropdown_name VARCHAR(20) DEFAULT NULL,
 
   -- ========== CREATOR DETAILS ==========
 
@@ -83,7 +86,8 @@ CREATE TABLE model_categories (
   PRIMARY KEY (id),
   UNIQUE KEY (token),
   UNIQUE KEY (uuid_idempotency_token),
-  KEY fk_super_category_token (super_category_token),
+  KEY fk_maybe_super_category_token (maybe_super_category_token),
+  KEY fk_creator_user_token (creator_user_token),
   KEY index_model_type (model_type),
   KEY index_can_directly_have_models (can_directly_have_models),
   KEY index_can_have_subcategories (can_have_subcategories),

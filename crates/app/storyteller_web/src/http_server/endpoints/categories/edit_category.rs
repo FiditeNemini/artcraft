@@ -36,19 +36,23 @@ pub struct EditCategoryPathInfo {
   token: String,
 }
 
-// NB: Only moderators can edit categories.
+// NB: ONLY MODERATORS CAN EDIT CATEGORIES.
 // These are not sparse updates!
 #[derive(Deserialize)]
 pub struct EditCategoryRequest {
   pub name: String,
-  // If absent, null the field.
-  pub dropdown_name: Option<String>,
+
+  // If absent, null the fields.
+  pub maybe_dropdown_name: Option<String>,
+  pub maybe_super_category_token: Option<String>,
 
   pub can_directly_have_models: bool,
   pub can_have_subcategories: bool,
+  pub can_only_mods_apply: bool,
 
   // Moderation fields
   pub is_mod_approved: bool,
+
   // If absent, null the field.
   pub maybe_mod_comments: Option<String>,
 }
@@ -130,10 +134,13 @@ pub async fn edit_category_handler(
 UPDATE model_categories
 SET
     name = ?,
-    dropdown_name = ?,
+    maybe_dropdown_name = ?,
 
     can_directly_have_models = ?,
     can_have_subcategories = ?,
+    can_only_mods_apply = ?,
+
+    maybe_super_category_token = ?,
 
     is_mod_approved = ?,
     maybe_mod_user_token = ?,
@@ -145,9 +152,11 @@ WHERE token = ?
 LIMIT 1
         "#,
       &request.name,
-      &request.dropdown_name,
+      &request.maybe_dropdown_name,
       &request.can_directly_have_models,
       &request.can_have_subcategories,
+      &request.can_only_mods_apply,
+      &request.maybe_super_category_token,
       &request.is_mod_approved,
       &user_session.user_token,
       &request.maybe_mod_comments,
