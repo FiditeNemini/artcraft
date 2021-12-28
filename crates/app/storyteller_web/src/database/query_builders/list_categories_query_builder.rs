@@ -49,9 +49,13 @@ pub struct Category {
 /// These are very difficult queries, so the builder helps for
 /// testability, construction, and correctness.
 pub struct ListCategoriesQueryBuilder {
-  // The public lists won't include unapproved/deleted, but mod
-  // views will want to see both.
+  // The public lists won't include unapproved, but mod views
+  // will want to see them.
   show_unapproved: bool,
+
+  // The public lists won't include deleted models, but mod views
+  // will want to see them.
+  show_deleted: bool,
 
   // Useful for showing categories a user themselves has suggested
   // We don't want users spamming creation.
@@ -65,7 +69,8 @@ pub struct ListCategoriesQueryBuilder {
 impl ListCategoriesQueryBuilder {
   pub fn new() -> Self {
     Self {
-      show_unapproved: true,
+      show_unapproved: false,
+      show_deleted: false,
       scope_creator_user_token: None,
       scope_model_type: None,
     }
@@ -73,6 +78,11 @@ impl ListCategoriesQueryBuilder {
 
   pub fn show_unapproved(mut self, show_unapproved: bool) -> Self {
     self.show_unapproved = show_unapproved;
+    self
+  }
+
+  pub fn show_deleted(mut self, show_deleted: bool) -> Self {
+    self.show_deleted = show_deleted;
     self
   }
 
@@ -217,10 +227,17 @@ LEFT OUTER JOIN users
     if !self.show_unapproved {
       if !first_predicate_added {
         query.push_str(" WHERE model_categories.is_mod_approved IS TRUE");
-        query.push_str(" AND model_categories.deleted_at IS NOT NULL");
         first_predicate_added = true;
       } else {
         query.push_str(" AND model_categories.is_mod_approved IS TRUE");
+      }
+    }
+
+    if !self.show_deleted {
+      if !first_predicate_added {
+        query.push_str(" WHERE model_categories.deleted_at IS NOT NULL");
+        first_predicate_added = true;
+      } else {
         query.push_str(" AND model_categories.deleted_at IS NOT NULL");
       }
     }
@@ -262,10 +279,12 @@ mod tests {
   use crate::database::query_builders::list_categories_query_builder::ListCategoriesQueryBuilder;
 
   #[test]
-  fn predicates_without_scoping() {
+  fn predicates_default_scoping() {
     let query_builder = ListCategoriesQueryBuilder::new();
 
-    assert_eq!(&query_builder.build_predicates(), "");
+    assert_eq!(&query_builder.build_predicates(),
+               " WHERE model_categories.is_mod_approved IS TRUE \
+                AND model_categories.deleted_at IS NOT NULL");
   }
 
   #[test]
@@ -274,29 +293,51 @@ mod tests {
         .scope_creator_user_token(Some("U:ASDF"));
 
     assert_eq!(&query_builder.build_predicates(),
-               " WHERE model_categories.creator_user_token = ?");
+               " WHERE model_categories.creator_user_token = ? \
+                AND model_categories.is_mod_approved IS TRUE \
+                AND model_categories.deleted_at IS NOT NULL");
   }
 
-//  #[test]
-//  fn predicates_including_user_hidden() {
-//    let query_builder = ListCategoriesQueryBuilder::new()
-//        .include_user_hidden(true);
-//
-//    assert_eq!(&query_builder.build_predicates(),
-//               " WHERE tts_results.user_deleted_at IS NULL \
-//      AND tts_results.mod_deleted_at IS NULL \
-//      ORDER BY tts_results.id DESC \
-//      LIMIT ?");
-//  }
-//
-//  #[test]
-//  fn predicates_including_deleted() {
-//    let query_builder = ListCategoriesQueryBuilder::new()
-//        .include_mod_disabled_results(true);
-//
-//    assert_eq!(&query_builder.build_predicates(),
-//               " WHERE tts_results.creator_set_visibility = 'public' \
-//      ORDER BY tts_results.id DESC \
-//      LIMIT ?");
-//  }
+  #[test]
+  fn predicates_scoped_to_model_type() {
+    let query_builder = ListCategoriesQueryBuilder::new()
+        .scope_model_type(Some("foo"));
+
+    assert_eq!(&query_builder.build_predicates(),
+               " WHERE model_categories.model_type = ? \
+                AND model_categories.is_mod_approved IS TRUE \
+                AND model_categories.deleted_at IS NOT NULL");
+  }
+
+  #[test]
+  fn predicates_scoped_to_unapproved() {
+    let query_builder = ListCategoriesQueryBuilder::new()
+        .show_unapproved(false);
+
+    assert_eq!(&query_builder.build_predicates(),
+               " WHERE model_categories.is_mod_approved IS TRUE \
+                AND model_categories.deleted_at IS NOT NULL");
+
+    let query_builder = ListCategoriesQueryBuilder::new()
+        .show_unapproved(true);
+
+    assert_eq!(&query_builder.build_predicates(),
+               " WHERE model_categories.deleted_at IS NOT NULL");
+  }
+
+  #[test]
+  fn predicates_scoped_to_deleted() {
+    let query_builder = ListCategoriesQueryBuilder::new()
+        .show_deleted(false);
+
+    assert_eq!(&query_builder.build_predicates(),
+               " WHERE model_categories.is_mod_approved IS TRUE \
+                AND model_categories.deleted_at IS NOT NULL");
+
+    let query_builder = ListCategoriesQueryBuilder::new()
+        .show_deleted(true);
+
+    assert_eq!(&query_builder.build_predicates(),
+               " WHERE model_categories.is_mod_approved IS TRUE");
+  }
 }
