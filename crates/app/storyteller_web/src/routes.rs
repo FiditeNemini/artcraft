@@ -62,6 +62,7 @@ use crate::http_server::endpoints::w2l::list_w2l_templates::list_w2l_templates_h
 use crate::http_server::endpoints::w2l::set_w2l_template_mod_approval::set_w2l_template_mod_approval_handler;
 use crate::http_server::endpoints::categories::delete_category::delete_category_handler;
 use crate::http_server::endpoints::categories::edit_category::edit_category_handler;
+use crate::http_server::endpoints::categories::list_tts_categories::list_tts_categories_handler;
 
 pub fn add_routes<T, B> (app: App<T, B>) -> App<T, B>
   where
@@ -425,6 +426,14 @@ fn add_category_routes<T, B> (app: App<T, B>) -> App<T, B>
           web::resource("/{token}/edit")
               .route(web::post().to(edit_category_handler))
               .route(web::head().to(|| HttpResponse::Ok()))
+        )
+        .service(
+          web::scope("/list")
+              .service(
+                web::resource("/tts")
+                    .route(web::get().to(list_tts_categories_handler))
+                    .route(web::head().to(|| HttpResponse::Ok()))
+              )
         )
   )
 }

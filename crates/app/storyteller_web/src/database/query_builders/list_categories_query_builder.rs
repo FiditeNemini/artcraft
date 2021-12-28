@@ -1,6 +1,5 @@
 use anyhow::anyhow;
 use chrono::{DateTime, Utc};
-use config::shared_constants::DEFAULT_MYSQL_QUERY_RESULT_PAGE_SIZE;
 use crate::database::enums::record_visibility::RecordVisibility;
 use crate::database::helpers::boolean_converters::{i8_to_bool, nullable_i8_to_optional_bool};
 use crate::util::anyhow_result::AnyhowResult;
@@ -97,7 +96,7 @@ impl ListCategoriesQueryBuilder {
   }
 
   /// Perform the query based on the set predicates.
-  pub async fn perform_query_for_page(
+  pub async fn perform_query(
     &self,
     mysql_pool: &MySqlPool
   ) -> AnyhowResult<CategoryList> {
@@ -134,7 +133,7 @@ impl ListCategoriesQueryBuilder {
   }
 
   /// Perform the query based on the set predicates.
-  pub async fn perform_internal_query(
+  async fn perform_internal_query(
     &self,
     mysql_pool: &MySqlPool
   ) -> AnyhowResult<Vec<RawInternalCategoryRecord>> {
@@ -158,7 +157,7 @@ impl ListCategoriesQueryBuilder {
     Ok(results)
   }
 
-  pub fn build_query_string(&self) -> String {
+  fn build_query_string(&self) -> String {
     // TODO: I haven't figured out how to get field name disambiguation and type coercion working here.
     //    (1) tts_results.creator_set_visibility `creator_set_visibility: crate::database::enums::record_visibility::RecordVisibility`,
     //    Query error: no column found for name: creator_set_visibility
@@ -168,7 +167,7 @@ impl ListCategoriesQueryBuilder {
     // TODO/NB: Unfortunately SQLx can't statically typecheck this query
     let mut query = r#"
 SELECT
-    model_categories.token as model_token,
+    model_categories.token as category_token,
 
     model_categories.model_type,
 
@@ -235,10 +234,10 @@ LEFT OUTER JOIN users
 
     if !self.show_deleted {
       if !first_predicate_added {
-        query.push_str(" WHERE model_categories.deleted_at IS NOT NULL");
+        query.push_str(" WHERE model_categories.deleted_at IS NULL");
         first_predicate_added = true;
       } else {
-        query.push_str(" AND model_categories.deleted_at IS NOT NULL");
+        query.push_str(" AND model_categories.deleted_at IS NULL");
       }
     }
 
@@ -284,7 +283,7 @@ mod tests {
 
     assert_eq!(&query_builder.build_predicates(),
                " WHERE model_categories.is_mod_approved IS TRUE \
-                AND model_categories.deleted_at IS NOT NULL");
+                AND model_categories.deleted_at IS NULL");
   }
 
   #[test]
@@ -295,7 +294,7 @@ mod tests {
     assert_eq!(&query_builder.build_predicates(),
                " WHERE model_categories.creator_user_token = ? \
                 AND model_categories.is_mod_approved IS TRUE \
-                AND model_categories.deleted_at IS NOT NULL");
+                AND model_categories.deleted_at IS NULL");
   }
 
   #[test]
@@ -306,7 +305,7 @@ mod tests {
     assert_eq!(&query_builder.build_predicates(),
                " WHERE model_categories.model_type = ? \
                 AND model_categories.is_mod_approved IS TRUE \
-                AND model_categories.deleted_at IS NOT NULL");
+                AND model_categories.deleted_at IS NULL");
   }
 
   #[test]
@@ -316,13 +315,13 @@ mod tests {
 
     assert_eq!(&query_builder.build_predicates(),
                " WHERE model_categories.is_mod_approved IS TRUE \
-                AND model_categories.deleted_at IS NOT NULL");
+                AND model_categories.deleted_at IS NULL");
 
     let query_builder = ListCategoriesQueryBuilder::new()
         .show_unapproved(true);
 
     assert_eq!(&query_builder.build_predicates(),
-               " WHERE model_categories.deleted_at IS NOT NULL");
+               " WHERE model_categories.deleted_at IS NULL");
   }
 
   #[test]
@@ -332,7 +331,7 @@ mod tests {
 
     assert_eq!(&query_builder.build_predicates(),
                " WHERE model_categories.is_mod_approved IS TRUE \
-                AND model_categories.deleted_at IS NOT NULL");
+                AND model_categories.deleted_at IS NULL");
 
     let query_builder = ListCategoriesQueryBuilder::new()
         .show_deleted(true);
