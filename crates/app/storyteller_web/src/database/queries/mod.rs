@@ -1,6 +1,7 @@
 pub mod badges;
 pub mod calculate_tts_model_leaderboard;
 pub mod calculate_w2l_template_leaderboard;
+pub mod categories;
 pub mod create_session;
 pub mod delete_tts_model;
 pub mod delete_tts_result;

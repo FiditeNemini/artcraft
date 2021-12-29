@@ -107,11 +107,11 @@ CREATE TABLE tts_category_assignments (
 
   -- The person that created the assignment.
   -- This can be the model owner or a moderator.
-  category_addition_user_token VARCHAR(32) NOT NULL,
+  category_addition_user_token VARCHAR(32) DEFAULT NULL,
 
   -- The person that removed the assignment.
   -- This can be the model owner or a moderator.
-  category_removal_user_token VARCHAR(32) NOT NULL,
+  category_removal_user_token VARCHAR(32) DEFAULT NULL,
 
   -- For abuse tracking.
   -- THIS CAN BE A MODERATOR FOR SIMPLICITY.
@@ -146,11 +146,11 @@ CREATE TABLE w2l_category_assignments (
 
   -- The person that created the assignment.
   -- This can be the model owner or a moderator.
-  category_addition_user_token VARCHAR(32) NOT NULL,
+  category_addition_user_token VARCHAR(32) DEFAULT NULL,
 
   -- The person that removed the assignment.
   -- This can be the model owner or a moderator.
-  category_removal_user_token VARCHAR(32) NOT NULL,
+  category_removal_user_token VARCHAR(32) DEFAULT NULL,
 
   -- For abuse tracking.
   -- THIS CAN BE A MODERATOR FOR SIMPLICITY.
