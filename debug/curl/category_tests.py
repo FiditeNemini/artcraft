@@ -9,6 +9,8 @@ login_url = 'http://localhost:12345/login'
 category_create_url = 'http://localhost:12345/category/create'
 category_delete_url_format = 'http://localhost:12345/category/{}/delete'
 category_edit_url_format = 'http://localhost:12345/category/{}/edit'
+tts_model_list_url = 'http://localhost:12345/tts/list'
+tts_category_assignment_url = 'http://localhost:12345/category/assign/tts'
 
 payload = {
   'username_or_email': 'echelon',
@@ -17,7 +19,7 @@ payload = {
 
 r = requests.post(login_url, json=payload)
 
-print("===== Login =====")
+print("===== [1] Login =====")
 print('Status: {}'.format(r.status_code))
 print(r.content)
 for k, v in r.headers.items():
@@ -31,7 +33,7 @@ m = re.match(r'session=([^;\s]+);', raw_set_cookie_header)
 session_cookie = m.group(1)
 
 
-print("===== Create Category =====")
+print("===== [2] Create Category =====")
 
 cookies = { 'session': session_cookie }
 
@@ -54,7 +56,7 @@ category_token = d['token']
 print(f'created category token: #{category_token}')
 
 
-print("===== (Soft) Delete Category =====")
+print("===== [3] (Soft) Delete Category =====")
 
 category_delete_url = category_delete_url_format.format(category_token)
 
@@ -70,7 +72,7 @@ print('Status: {}'.format(r.status_code))
 print(r.content)
 
 
-print("===== Undelete Category =====")
+print("===== [4] Undelete Category =====")
 
 cookies = { 'session': session_cookie }
 
@@ -84,7 +86,7 @@ print('Status: {}'.format(r.status_code))
 print(r.content)
 
 
-print("===== Edit Category =====")
+print("===== [5] Edit Category =====")
 
 category_edit_url = category_edit_url_format.format(category_token)
 
@@ -105,4 +107,44 @@ r = requests.post(category_edit_url, cookies=cookies, json=payload)
 print('Status: {}'.format(r.status_code))
 print(r.content)
 
+
+print("===== [6] List TTS Models =====")
+
+r = requests.get(tts_model_list_url, cookies=cookies)
+
+print('Status: {}'.format(r.status_code))
+
+d = json.loads(r.content)
+
+tts_model_token = d['models'][0]['model_token']
+
+print('TTS model token: {}'.format(tts_model_token))
+
+
+print("===== [7] Create Category Assignment to TTS Model =====")
+
+payload = {
+  'category_token': category_token,
+  'tts_model_token': tts_model_token,
+  'assign': True,
+}
+
+r = requests.post(tts_category_assignment_url, cookies=cookies, json=payload)
+
+print('Status: {}'.format(r.status_code))
+print(r.content)
+
+
+print("===== [8] Delete Category Assignment to TTS Model =====")
+
+payload = {
+  'category_token': category_token,
+  'tts_model_token': tts_model_token,
+  'assign': False,
+}
+
+r = requests.post(tts_category_assignment_url, cookies=cookies, json=payload)
+
+print('Status: {}'.format(r.status_code))
+print(r.content)
 
