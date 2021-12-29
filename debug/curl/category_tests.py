@@ -41,6 +41,7 @@ payload = {
   'model_type': 'tts', # tts or w2l
   'can_directly_have_models': False,
   'can_have_subcategories': True,
+  'is_mod_approved': True,
 }
 
 r = requests.post(category_create_url, cookies=cookies, json=payload)
@@ -94,6 +95,7 @@ payload = {
   'dropdown_name': 'Edited Dropdown Name',
   'can_directly_have_models': True,
   'can_have_subcategories': True,
+  'can_only_mods_apply': False,
   'is_mod_approved': True,
   'maybe_mod_comments': 'mod comment',
 }
