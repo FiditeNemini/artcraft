@@ -1,23 +1,24 @@
-use actix_http::Error;
 use actix_http::http::header;
-use actix_web::cookie::Cookie;
 use actix_web::HttpResponseBuilder;
+use actix_web::cookie::Cookie;
 use actix_web::error::ResponseError;
 use actix_web::http::StatusCode;
 use actix_web::{Responder, web, HttpResponse, error, HttpRequest, HttpMessage};
 use chrono::{DateTime, Utc};
+use crate::database::queries::categories::list_tts_model_category_assignments::fetch_tts_model_category_map;
 use crate::database::queries::list_tts_models::list_tts_models;
 use crate::http_server::web_utils::ip_address::get_request_ip;
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 use crate::server_state::ServerState;
 use crate::util::anyhow_result::AnyhowResult;
-use derive_more::{Display, Error};
 use log::{info, warn, log, error};
 use regex::Regex;
 use sqlx::MySqlPool;
 use sqlx::error::DatabaseError;
 use sqlx::error::Error::Database;
 use sqlx::mysql::MySqlDatabaseError;
+use std::collections::HashSet;
+use std::fmt;
 use std::sync::Arc;
 
 #[derive(Serialize, Clone)]
@@ -29,6 +30,11 @@ pub struct TtsModelRecordForResponse {
   pub creator_display_name: String,
   pub creator_gravatar_hash: String,
   pub title: String,
+
+  /// Category assignments
+  /// From non-deleted, mod-approved categories only
+  pub category_tokens: HashSet<String>,
+
   pub created_at: DateTime<Utc>,
   pub updated_at: DateTime<Utc>,
 }
@@ -39,7 +45,7 @@ pub struct ListTtsModelsSuccessResponse {
   pub models: Vec<TtsModelRecordForResponse>,
 }
 
-#[derive(Debug, Display)]
+#[derive(Debug)]
 pub enum ListTtsModelsError {
   ServerError,
 }
@@ -70,6 +76,13 @@ impl ResponseError for ListTtsModelsError {
     };
 
     to_simple_json_error(&error_reason, self.status_code())
+  }
+}
+
+// NB: Not using derive_more::Display since Clion doesn't understand it.
+impl fmt::Display for ListTtsModelsError {
+  fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+    write!(f, "{:?}", self)
   }
 }
 
@@ -126,6 +139,9 @@ async fn get_all_models(mysql_pool: &MySqlPool) -> AnyhowResult<Vec<TtsModelReco
     false
   ).await?;
 
+  let model_categories_map
+      = fetch_tts_model_category_map(mysql_pool).await?;
+
   models.sort_by(|a, b| (&a.title).cmp(&b.title));
 
   let models_for_response = models.into_iter()
@@ -138,6 +154,9 @@ async fn get_all_models(mysql_pool: &MySqlPool) -> AnyhowResult<Vec<TtsModelReco
           creator_display_name: model.creator_display_name.clone(),
           creator_gravatar_hash: model.creator_gravatar_hash.clone(),
           title: model.title.clone(),
+          category_tokens: model_categories_map.model_to_category_tokens.get(&model.model_token)
+              .map(|hash| hash.clone())
+              .unwrap_or(HashSet::new()),
           created_at: model.created_at.clone(),
           updated_at: model.updated_at.clone(),
         }
