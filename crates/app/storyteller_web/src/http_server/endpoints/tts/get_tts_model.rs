@@ -1,25 +1,27 @@
-use actix_http::Error;
 use actix_http::http::header;
-use actix_web::cookie::Cookie;
 use actix_web::HttpResponseBuilder;
+use actix_web::cookie::Cookie;
 use actix_web::error::ResponseError;
 use actix_web::http::StatusCode;
 use actix_web::web::Path;
 use actix_web::{Responder, web, HttpResponse, error, HttpRequest, HttpMessage};
+use anyhow::Error;
 use chrono::{DateTime, Utc};
 use crate::AnyhowResult;
 use crate::database::queries::query_tts_model::TtsModelRecordForResponse;
 use crate::database::queries::query_tts_model::select_tts_model_by_token;
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 use crate::server_state::ServerState;
-use derive_more::{Display, Error};
 use log::{info, warn, log};
 use regex::Regex;
 use sqlx::MySqlPool;
 use sqlx::error::DatabaseError;
 use sqlx::error::Error::Database;
 use sqlx::mysql::MySqlDatabaseError;
+use std::fmt;
 use std::sync::Arc;
+
+// =============== Request ===============
 
 /// For the URL PathInfo
 #[derive(Deserialize)]
@@ -27,13 +29,17 @@ pub struct GetTtsModelPathInfo {
   token: String,
 }
 
+// =============== Success Response ===============
+
 #[derive(Serialize)]
 pub struct GetTtsModelSuccessResponse {
   pub success: bool,
   pub model: TtsModelRecordForResponse,
 }
 
-#[derive(Debug, Display)]
+// =============== Error Response ===============
+
+#[derive(Debug)]
 pub enum GetTtsModelError {
   ServerError,
   NotFound,
@@ -56,6 +62,15 @@ impl ResponseError for GetTtsModelError {
     to_simple_json_error(&error_reason, self.status_code())
   }
 }
+
+// NB: Not using derive_more::Display since Clion doesn't understand it.
+impl fmt::Display for GetTtsModelError {
+  fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+    write!(f, "{:?}", self)
+  }
+}
+
+// =============== Handler ===============
 
 pub async fn get_tts_model_handler(
   http_request: HttpRequest,

@@ -1,3 +1,4 @@
+pub mod list_assigned_tts_categories_query_builder;
 pub mod list_categories_query_builder;
 pub mod list_tts_inference_results_query_builder;
 pub mod list_users_query_builder;

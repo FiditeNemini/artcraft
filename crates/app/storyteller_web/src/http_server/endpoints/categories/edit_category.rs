@@ -89,7 +89,7 @@ impl ResponseError for EditCategoryError {
   }
 }
 
-// NB: Not using DeriveMore since Clion doesn't understand it.
+// NB: Not using derive_more::Display since Clion doesn't understand it.
 impl fmt::Display for EditCategoryError {
   fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
     write!(f, "{:?}", self)
