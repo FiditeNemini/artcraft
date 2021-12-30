@@ -1,9 +1,13 @@
-use actix_web::{App, web, HttpResponse};
 use actix_http::body::MessageBody;
 use actix_service::ServiceFactory;
 use actix_web::dev::{ServiceRequest, ServiceResponse};
 use actix_web::error::Error;
+use actix_web::{App, web, HttpResponse};
+use crate::http_server::endpoints::categories::assign_tts_category::assign_tts_category_handler;
 use crate::http_server::endpoints::categories::create_category::create_category_handler;
+use crate::http_server::endpoints::categories::delete_category::delete_category_handler;
+use crate::http_server::endpoints::categories::list_tts_categories::list_tts_categories_handler;
+use crate::http_server::endpoints::categories::list_tts_model_assigned_categories::list_tts_model_assigned_categories_handler;
 use crate::http_server::endpoints::events::list_events::list_events_handler;
 use crate::http_server::endpoints::leaderboard::get_leaderboard::leaderboard_handler;
 use crate::http_server::endpoints::misc::default_route_404::default_route_404;
@@ -11,6 +15,7 @@ use crate::http_server::endpoints::misc::enable_alpha_easy_handler::enable_alpha
 use crate::http_server::endpoints::misc::enable_alpha_handler::enable_alpha_handler;
 use crate::http_server::endpoints::misc::root_index::get_root_index;
 use crate::http_server::endpoints::moderation::approval::pending_w2l_templates::get_pending_w2l_templates_handler;
+use crate::http_server::endpoints::moderation::categories::edit_category::edit_category_handler;
 use crate::http_server::endpoints::moderation::ip_bans::add_ip_ban::add_ip_ban_handler;
 use crate::http_server::endpoints::moderation::ip_bans::delete_ip_ban::delete_ip_ban_handler;
 use crate::http_server::endpoints::moderation::ip_bans::get_ip_ban::get_ip_ban_handler;
@@ -60,11 +65,7 @@ use crate::http_server::endpoints::w2l::get_w2l_template_use_count::get_w2l_temp
 use crate::http_server::endpoints::w2l::get_w2l_upload_template_job_status::get_w2l_upload_template_job_status_handler;
 use crate::http_server::endpoints::w2l::list_w2l_templates::list_w2l_templates_handler;
 use crate::http_server::endpoints::w2l::set_w2l_template_mod_approval::set_w2l_template_mod_approval_handler;
-use crate::http_server::endpoints::categories::delete_category::delete_category_handler;
-use crate::http_server::endpoints::categories::edit_category::edit_category_handler;
-use crate::http_server::endpoints::categories::list_tts_categories::list_tts_categories_handler;
-use crate::http_server::endpoints::categories::assign_tts_category::assign_tts_category_handler;
-use crate::http_server::endpoints::categories::list_tts_model_assigned_categories::list_tts_model_assigned_categories_handler;
+use crate::http_server::endpoints::moderation::categories::list_tts_categories_for_moderation::list_tts_categories_for_moderation_handler;
 
 pub fn add_routes<T, B> (app: App<T, B>) -> App<T, B>
   where
@@ -232,6 +233,19 @@ fn add_moderator_routes<T, B> (app: App<T, B>) -> App<T, B>
             .service(
               web::resource("/tts_voices")
                   .route(web::get().to(get_voice_count_stats_handler))
+                  .route(web::head().to(|| HttpResponse::Ok()))
+            )
+      )
+      .service(
+        web::scope("/categories")
+            .service(
+              web::resource("/{token}/edit")
+                  .route(web::post().to(edit_category_handler))
+                  .route(web::head().to(|| HttpResponse::Ok()))
+            )
+            .service(
+              web::resource("/tts/list")
+                  .route(web::get().to(list_tts_categories_for_moderation_handler))
                   .route(web::head().to(|| HttpResponse::Ok()))
             )
       )
@@ -417,11 +431,6 @@ fn add_category_routes<T, B> (app: App<T, B>) -> App<T, B>
         .service(
           web::resource("/create")
               .route(web::post().to(create_category_handler))
-              .route(web::head().to(|| HttpResponse::Ok()))
-        )
-        .service(
-          web::resource("/{token}/edit")
-              .route(web::post().to(edit_category_handler))
               .route(web::head().to(|| HttpResponse::Ok()))
         )
         .service(
