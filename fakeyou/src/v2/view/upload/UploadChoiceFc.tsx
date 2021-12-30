@@ -1,6 +1,7 @@
 import React from 'react';
 import { SessionWrapper } from '../../../session/SessionWrapper';
 import { Link } from "react-router-dom";
+import { DiscordLink } from '../_common/DiscordLink';
 
 interface Props {
   sessionWrapper: SessionWrapper,
@@ -10,47 +11,54 @@ function UploadChoiceFc(props: Props) {
   return (
     <div>
       <div>
-        <h1 className="title is-1"> Upload to FakeYou! </h1>
-        <h1 className="subtitle is-3"> You make FakeYou <strong>better</strong> by uploading</h1>
+        <h1 className="title is-1"> Contribute to FakeYou! </h1>
+        <h1 className="subtitle is-3"> You make FakeYou <strong>better</strong> by contributing </h1>
       </div>
 
       <br />
 
       <div className="content is-medium">
         <p>
-          You'll get credited for everything you upload. You'll also get queue priority, 
+          You'll get credited for everything you contribute. You'll also get queue priority, 
           be eligible to win prizes, and help us become a Hollywood-killing deepfake 
           tooling, streaming, and filmmaking powerhouse.
         </p>
 
-        <p>
-          Choose an upload type:
-        </p>
+        <h3 className="title is-3"> Upload Models </h3>
 
-        <br />
+        <p>Create new voices and video templates for FakeYou. <DiscordLink text="Join our Discord" iconAfterText={true} /> to learn how.</p>
 
         <Link
           to="/upload/tts"
-          className="button is-link is-large is-fullwidth is-outlined"
+          className="button is-link is-large is-fullwidth "
           >Upload voice (TTS model)</Link>
 
         <br />
 
         <Link
           to="/upload/w2l_video"
-          className="button is-link is-large is-fullwidth is-outlined"
+          className="button is-link is-large is-fullwidth "
           >Upload lipsync video (w2l)</Link>
 
         <br />
 
         <Link
           to="/upload/w2l_photo"
-          className="button is-info is-large is-fullwidth is-outlined"
+          className="button is-link is-large is-fullwidth"
           >Upload lipsync photo (w2l)</Link>
 
-        <br />
+        <h3 className="title is-3"> Create Categories </h3>
 
-        <p> Want to contribute code? We're hiring! </p>
+        <p>Help us organize the models!</p>
+
+        <Link
+          to="/category/create"
+          className="button is-info is-large is-fullwidth"
+          >Suggest category</Link>
+
+        <h3 className="title is-3"> More </h3>
+
+        <p> Want to contribute code, design, or data science? <DiscordLink text="Say hi in Discord" iconAfterText={true} />! </p>
 
       </div>
     </div>
