@@ -199,7 +199,7 @@ LEFT OUTER JOIN users
     let mut query = "".to_string();
 
     // Scoping to tts model is required.
-    query.push_str(" WHERE model_categories.model_token = ?");
+    query.push_str(" WHERE tts_category_assignments.model_token = ?");
     query.push_str(" AND model_categories.model_type = 'tts'");
 
     // We also don't care to ever show soft-deleted assignments
