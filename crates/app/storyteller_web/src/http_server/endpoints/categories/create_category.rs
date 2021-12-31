@@ -30,13 +30,16 @@ use std::sync::Arc;
 
 const DEFAULT_CAN_DIRECTLY_HAVE_MODELS : bool = true;
 const DEFAULT_CAN_HAVE_SUBCATEGORIES : bool = false;
+const DEFAULT_CAN_ONLY_MODS_APPLY : bool = false;
 
 // =============== Request ===============
 
 #[derive(Deserialize)]
 #[serde(rename_all = "snake_case")]
 pub enum ModelType {
+  /// 'tts' in database
   Tts,
+  /// 'w2l' in database
   W2l,
 }
 
@@ -50,6 +53,7 @@ pub struct CreateCategoryRequest {
   // Fields for moderators only
   pub can_directly_have_models: Option<bool>,
   pub can_have_subcategories: Option<bool>,
+  pub can_only_mods_apply: Option<bool>,
 }
 
 // =============== Success Response ===============
@@ -146,6 +150,7 @@ pub async fn create_category_handler(
   let mut maybe_mod_user_token = None;
   let mut can_directly_have_models = DEFAULT_CAN_DIRECTLY_HAVE_MODELS;
   let mut can_have_subcategories = DEFAULT_CAN_HAVE_SUBCATEGORIES;
+  let mut can_only_mods_apply = DEFAULT_CAN_ONLY_MODS_APPLY;
 
   if is_mod {
     // Moderator fields and adjustments
@@ -153,8 +158,10 @@ pub async fn create_category_handler(
     maybe_mod_user_token = Some(user_session.user_token.clone());
     can_directly_have_models = request.can_directly_have_models
         .unwrap_or(DEFAULT_CAN_DIRECTLY_HAVE_MODELS);
-    can_have_subcategories= request.can_have_subcategories
+    can_have_subcategories = request.can_have_subcategories
         .unwrap_or(DEFAULT_CAN_HAVE_SUBCATEGORIES);
+    can_only_mods_apply = request.can_only_mods_apply
+        .unwrap_or(DEFAULT_CAN_ONLY_MODS_APPLY);
   }
 
   let query_result = sqlx::query!(
@@ -173,7 +180,8 @@ SET
     is_mod_approved = ?,
     maybe_mod_user_token = ?,
     can_directly_have_models = ?,
-    can_have_subcategories = ?
+    can_have_subcategories = ?,
+    can_only_mods_apply = ?
         "#,
 
     category_token,
@@ -186,7 +194,8 @@ SET
     is_mod_approved,
     maybe_mod_user_token,
     can_directly_have_models,
-    can_have_subcategories
+    can_have_subcategories,
+    can_only_mods_apply
   )
   .execute(&server_state.mysql_pool)
     .await;
