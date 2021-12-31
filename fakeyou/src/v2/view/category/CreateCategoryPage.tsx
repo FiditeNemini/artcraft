@@ -44,43 +44,33 @@ function CreateCategoryPage(props: Props) {
   }
 
   const handleNameChange = (ev: React.FormEvent<HTMLInputElement>) => {
-    ev.preventDefault();
     const newName = (ev.target as HTMLInputElement).value;
     maybeRecalculateIdempotencyToken(name, newName);
     setName(newName);
-    return false;
   }
 
   const handleModelTypeChange = (ev: React.FormEvent<HTMLSelectElement>) => {
-    ev.preventDefault();
     const newModelType = (ev.target as HTMLSelectElement).value;
     maybeRecalculateIdempotencyToken(modelType, newModelType);
     setModelType(newModelType);
-    return false;
   }
 
   const handleCanDirectlyHaveModelsChange = (ev: React.FormEvent<HTMLInputElement>) => {
-    ev.preventDefault();
     const newCanDirectlyHaveModels = (ev.target as HTMLInputElement).checked;
     maybeRecalculateIdempotencyToken(canDirectlyHaveModels, newCanDirectlyHaveModels);
     setCanDirectlyHaveModels(newCanDirectlyHaveModels);
-    return false;
   }
 
   const handleCanHaveSubcategoriesChange = (ev: React.FormEvent<HTMLInputElement>) => {
-    ev.preventDefault();
     const newCanHaveSubcategories = (ev.target as HTMLInputElement).checked;
     maybeRecalculateIdempotencyToken(canHaveSubcategories, newCanHaveSubcategories);
     setCanHaveSubcategories(newCanHaveSubcategories);
-    return false;
   }
 
   const handleCanOnlyModsApplyChange = (ev: React.FormEvent<HTMLInputElement>) => {
-    ev.preventDefault();
     const newCanOnlyModsApply = (ev.target as HTMLInputElement).checked;
     maybeRecalculateIdempotencyToken(canOnlyModsApply, newCanOnlyModsApply);
     setCanOnlyModsApply(newCanOnlyModsApply);
-    return false;
   }
 
   const handleFormSubmit = async (ev: React.FormEvent<HTMLFormElement>) : Promise<boolean> => {
@@ -113,7 +103,8 @@ function CreateCategoryPage(props: Props) {
     return false;
   }
 
-  const categoryActionName = props.sessionWrapper.canEditCategories() ? "Create" : "Suggest";
+  const isMod = props.sessionWrapper.canEditCategories();
+  const categoryActionName = isMod ? "Create" : "Suggest";
 
   let errorFlash = <></>;
 
@@ -125,6 +116,52 @@ function CreateCategoryPage(props: Props) {
         </div>
       </>
     );
+  }
+
+  let additionalModFields = <></>;
+
+  /*
+const DEFAULT_CAN_DIRECTLY_HAVE_MODELS = true;
+const DEFAULT_CAN_HAVE_SUBCATEGORIES = false;
+const DEFAULT_CAN_ONLY_MODS_APPLY = false;
+  */
+
+  if (isMod) {
+    additionalModFields = (
+      <>
+        <div className="control">
+          <label className="label">Moderator Options</label>
+
+          <label className="checkbox">
+            <input 
+              type="checkbox"
+              checked={canDirectlyHaveModels} 
+              onChange={handleCanDirectlyHaveModelsChange} />
+            &nbsp;Can this category be assigned to models? (If not, it's a super category.)
+          </label>
+
+          <br />
+
+          <label className="checkbox">
+            <input 
+              type="checkbox"
+              checked={canHaveSubcategories} 
+              onChange={handleCanHaveSubcategoriesChange} />
+            &nbsp;Can this category have subcategories?
+          </label>
+
+          <br />
+
+          <label className="checkbox">
+            <input 
+              type="checkbox"
+              checked={canOnlyModsApply} 
+              onChange={handleCanOnlyModsApplyChange} />
+            &nbsp;Can only mods apply this category?
+          </label>
+        </div>
+      </>
+    )
   }
 
   return (
@@ -147,12 +184,14 @@ function CreateCategoryPage(props: Props) {
           <div className="control">
             <div className="select is-info">
               <select onChange={handleModelTypeChange}>
-                <option value="tts">Category for TTS voice</option>
-                <option value="w2l">Category for W2L video</option>
+                <option value="tts">TTS voice</option>
+                <option value="w2l">W2L video</option>
               </select>
             </div>
           </div>
         </div>
+
+        {additionalModFields}
 
         <br />
 
