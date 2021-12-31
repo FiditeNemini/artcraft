@@ -1,6 +1,6 @@
 import { ApiConfig } from "../../../common/ApiConfig";
 
-export interface ListCategoriesForTtsModelSuccessResponse {
+export interface ListTtsCategoriesForModelSuccessResponse {
   success: boolean,
   categories: Array<TtsModelCategory>
 }
@@ -24,23 +24,23 @@ export interface TtsModelCategory {
   category_deleted_at?: Date,
 }
 
-export interface ListCategoriesForTtsModelErrorResponse {
+export interface ListTtsCategoriesForModelErrorResponse {
   success: boolean,
 }
 
-type ListCategoriesForTtsModelResponse = ListCategoriesForTtsModelSuccessResponse | ListCategoriesForTtsModelErrorResponse;
+type ListTtsCategoriesForModelResponse = ListTtsCategoriesForModelSuccessResponse | ListTtsCategoriesForModelErrorResponse;
 
-export function ListCategoriesForTtsModelIsOk(response: ListCategoriesForTtsModelResponse): response is ListCategoriesForTtsModelSuccessResponse {
+export function ListTtsCategoriesForModelIsOk(response: ListTtsCategoriesForModelResponse): response is ListTtsCategoriesForModelSuccessResponse {
   return response?.success === true;
 }
 
-export function ListCategoriesForTtsModelIsError(response: ListCategoriesForTtsModelResponse): response is ListCategoriesForTtsModelErrorResponse {
+export function ListTtsCategoriesForModelIsError(response: ListTtsCategoriesForModelResponse): response is ListTtsCategoriesForModelErrorResponse {
   return response?.success === false;
 }
 
-export async function ListCategoriesForTtsModel(ttsModelToken: string) : Promise<ListCategoriesForTtsModelResponse> 
+export async function ListTtsCategoriesForModel(ttsModelToken: string) : Promise<ListTtsCategoriesForModelResponse> 
 {
-  const endpoint = new ApiConfig().listCategoriesForTtsModel(ttsModelToken);
+  const endpoint = new ApiConfig().listTtsCategoriesForModel(ttsModelToken);
   
   return await fetch(endpoint, {
     method: 'GET',

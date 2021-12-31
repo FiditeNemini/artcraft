@@ -250,7 +250,15 @@ class ApiConfig {
     return `${this.getScheme()}://${this.getNewApiHost()}/category/create`;
   }
 
-  listCategoriesForTtsModel(ttsModelToken: string) : string {
+  assignTtsCategory() : string {
+    return `${this.getScheme()}://${this.getNewApiHost()}/category/assign/tts`;
+  }
+
+  listTtsCategories() : string {
+    return `${this.getScheme()}://${this.getNewApiHost()}/category/list/tts`;
+  }
+
+  listTtsCategoriesForModel(ttsModelToken: string) : string {
     return `${this.getScheme()}://${this.getNewApiHost()}/category/assignments/tts/${ttsModelToken}`;
   }
 
