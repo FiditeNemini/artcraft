@@ -54,7 +54,6 @@ function TtsModelViewFc(props: Props) {
     getModelUseCount(token);
   }, [token, getModel, getModelUseCount]);
 
-
   if (notFoundState) {
     return (
       <h1 className="title is-1">Model not found</h1>
@@ -186,6 +185,7 @@ function TtsModelViewFc(props: Props) {
   }
 
   let editModelButton = <span />;
+  let editModelCategoriesButton = <span />;
 
   if (props.sessionWrapper.canEditTtsModelByUserToken(ttsModel?.creator_user_token)) {
     editModelButton = (
@@ -195,6 +195,15 @@ function TtsModelViewFc(props: Props) {
           className={"button is-large is-info is-fullwidth"}
           to={FrontendUrlConfig.ttsModelEditPage(token)}
           >Edit Model Details</Link>
+      </>
+    );
+    editModelCategoriesButton = (
+      <>
+        <br />
+        <Link 
+          className={"button is-large is-info is-fullwidth"}
+          to={FrontendUrlConfig.ttsModelEditCategoriesPage(token)}
+          >Edit Model Categories</Link>
       </>
     );
   }
@@ -334,6 +343,8 @@ function TtsModelViewFc(props: Props) {
       </table>
 
       {editModelButton}
+
+      {editModelCategoriesButton}
 
       {deleteModelButton}
 

@@ -43,6 +43,7 @@ import { ModerationJobStatsFc } from './moderation/moderation_job_stats/Moderati
 import { ModerationPendingW2lTemplatesFc } from './moderation/moderation_pending_w2l_templates/ModerationPendingW2lTemplatesFc';
 import { ModerationVoiceStatsFc } from './moderation/moderation_voice_stats/ModerationVoiceStatsFc';
 import { CreateCategoryPage } from './category/CreateCategoryPage';
+import { TtsEditCategoriesPage } from './tts/tts_edit_categories/TtsEditCategoriesPage';
 
 interface Props {
   sessionWrapper: SessionWrapper,
@@ -169,6 +170,12 @@ class NewVocodesContainer extends React.Component<Props, State> {
 
             <Route path="/tts/:token/delete">
               <TtsModelDeleteFc
+                sessionWrapper={this.props.sessionWrapper}
+              />
+            </Route>
+
+            <Route path="/tts/:token/categories">
+              <TtsEditCategoriesPage
                 sessionWrapper={this.props.sessionWrapper}
               />
             </Route>

@@ -16,6 +16,10 @@ class FrontendUrlConfig {
     return `/tts/${modelToken}/edit`;
   }
 
+  static ttsModelEditCategoriesPage(modelToken: string) : string {
+    return `/tts/${modelToken}/categories`;
+  }
+
   static ttsModelDeletePage(modelToken: string) : string {
     return `/tts/${modelToken}/delete`;
   }
