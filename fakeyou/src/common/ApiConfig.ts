@@ -250,6 +250,10 @@ class ApiConfig {
     return `${this.getScheme()}://${this.getNewApiHost()}/category/create`;
   }
 
+  getCategory(categoryToken: string) : string {
+    return `${this.getScheme()}://${this.getNewApiHost()}/category/view/${categoryToken}`;
+  }
+
   assignTtsCategory() : string {
     return `${this.getScheme()}://${this.getNewApiHost()}/category/assign/tts`;
   }
@@ -312,6 +316,10 @@ class ApiConfig {
 
   getModerationTtsCategoryList(): string {
     return `${this.getScheme()}://${this.getNewApiHost()}/moderation/categories/tts/list`;
+  }
+
+  moderatorEditCategory(categoryToken: string) : string {
+    return `${this.getScheme()}://${this.getNewApiHost()}/moderation/categories/${categoryToken}/edit`;
   }
 
   private getScheme() : string {

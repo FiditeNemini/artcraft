@@ -93,6 +93,10 @@ class FrontendUrlConfig {
   static moderationTtsCategoryList() : string {
     return '/moderation/tts_category/list';
   }
+
+  static moderationTtsCategoryEdit(categoryToken: string) : string {
+    return `/moderation/tts_category/edit/${categoryToken}`;
+  }
 }
 
 export { FrontendUrlConfig }

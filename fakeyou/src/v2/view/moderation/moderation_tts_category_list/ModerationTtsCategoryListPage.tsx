@@ -64,6 +64,7 @@ function ModerationTtsCategoryListPage(props: Props) {
             <th>Name</th>
             <th>Creator</th>
             <th>Approved</th>
+            <th></th>
           </tr>
         </thead>
         <tbody>
@@ -116,6 +117,9 @@ function ModerationTtsCategoryListPage(props: Props) {
                 </td>
                 <td>
                   {approved}
+                </td>
+                <td>
+                  <Link to={FrontendUrlConfig.moderationTtsCategoryEdit(category.category_token)}>edit</Link>
                 </td>
               </tr>
             );
