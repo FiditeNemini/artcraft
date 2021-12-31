@@ -7,7 +7,7 @@ import { GetTtsModel, GetTtsModelIsErr, GetTtsModelIsOk, TtsModel, TtsModelLooku
 import { ListTtsCategories, ListTtsCategoriesIsError, ListTtsCategoriesIsOk, TtsCategory } from '../../../api/category/ListTtsCategories';
 import { ListTtsCategoriesForModel, ListTtsCategoriesForModelIsError, ListTtsCategoriesForModelIsOk, TtsModelCategory } from '../../../api/category/ListTtsCategoriesForModel';
 import { SessionWrapper } from '../../../../session/SessionWrapper';
-import { faMinusCircle } from '@fortawesome/free-solid-svg-icons';
+import { faMinusCircle, faTimes } from '@fortawesome/free-solid-svg-icons';
 import { useParams } from 'react-router-dom';
 
 interface Props {
@@ -124,12 +124,15 @@ function TtsEditCategoriesPage(props: Props) {
         {assignedCategories.map(category => {
           return (
             <li>
-              {category.name}
+              <span className="content is-medium">{category.name}</span>
                 &nbsp;
-                [<a onClick={() => handleRemoveCategory(category.category_token)}>
+                <button 
+                  className="button is-rounded is-danger is-small is-light"
+                  onClick={() => handleRemoveCategory(category.category_token)}
+                >
                   remove&nbsp;
-                  <FontAwesomeIcon icon={faMinusCircle} />
-                </a>]
+                  <FontAwesomeIcon icon={faTimes} />
+                </button>
             </li>
           );
         })}
@@ -189,7 +192,7 @@ function TtsEditCategoriesPage(props: Props) {
       </div>
 
       <br />
-      
+
       <p>
         <BackLink link={modelLink} text="Back to model" />
       </p>
