@@ -7,7 +7,7 @@ import { GetTtsModel, GetTtsModelIsErr, GetTtsModelIsOk, TtsModel, TtsModelLooku
 import { ListTtsCategories, ListTtsCategoriesIsError, ListTtsCategoriesIsOk, TtsCategory } from '../../../api/category/ListTtsCategories';
 import { ListTtsCategoriesForModel, ListTtsCategoriesForModelIsError, ListTtsCategoriesForModelIsOk, TtsModelCategory } from '../../../api/category/ListTtsCategoriesForModel';
 import { SessionWrapper } from '../../../../session/SessionWrapper';
-import { faTimes } from '@fortawesome/free-solid-svg-icons';
+import { faExclamationCircle, faTimes } from '@fortawesome/free-solid-svg-icons';
 import { useParams } from 'react-router-dom';
 
 interface Props {
@@ -124,9 +124,24 @@ function TtsEditCategoriesPage(props: Props) {
     currentCategoriesList = (
       <>
         {assignedCategories.map(category => {
+          let notApprovedWarning = null;
+
+          if (!category.is_mod_approved) {
+            notApprovedWarning = (
+              <>
+                <span className="tag is-rounded is-warning is-medium is-light">
+                  Not Mod Approved
+                  &nbsp;
+                  <FontAwesomeIcon icon={faExclamationCircle} />
+                </span>
+              </>
+            )
+          }
+
           return (
             <li>
               <span className="content is-medium">{category.name}</span>
+                {notApprovedWarning}
                 &nbsp;
                 <button 
                   className="button is-rounded is-danger is-small is-light"
