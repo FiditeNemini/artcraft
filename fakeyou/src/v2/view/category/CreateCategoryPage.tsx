@@ -111,20 +111,16 @@ function CreateCategoryPage(props: Props) {
   if (!!errorMessage) {
     errorFlash = (
       <>
-        <div>
-          {errorMessage}
-        </div>
+        <article className="message is-error">
+          <div className="message-body">
+            {errorMessage}
+          </div>
+        </article>
       </>
     );
   }
 
   let additionalModFields = <></>;
-
-  /*
-const DEFAULT_CAN_DIRECTLY_HAVE_MODELS = true;
-const DEFAULT_CAN_HAVE_SUBCATEGORIES = false;
-const DEFAULT_CAN_ONLY_MODS_APPLY = false;
-  */
 
   if (isMod) {
     additionalModFields = (
