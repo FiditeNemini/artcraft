@@ -91,6 +91,11 @@ export class SessionWrapper {
     return this.sessionStateResponse?.user?.can_ban_users || false;
   }
 
+  public canEditCategories() : boolean {
+    // TODO / NB: There aren't fine-grained controls over categories.
+    return this.canBanUsers();
+  }
+
   public canApproveW2lTemplates() : boolean {
     return this.sessionStateResponse?.user?.can_approve_w2l_templates || false;
   }

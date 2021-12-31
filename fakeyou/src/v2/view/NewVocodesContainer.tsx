@@ -42,6 +42,7 @@ import { LeaderboardFc } from './leaderboard/LeaderboardFc';
 import { ModerationJobStatsFc } from './moderation/moderation_job_stats/ModerationJobStatsFc';
 import { ModerationPendingW2lTemplatesFc } from './moderation/moderation_pending_w2l_templates/ModerationPendingW2lTemplatesFc';
 import { ModerationVoiceStatsFc } from './moderation/moderation_voice_stats/ModerationVoiceStatsFc';
+import { CreateCategoryPage } from './category/CreateCategoryPage';
 
 interface Props {
   sessionWrapper: SessionWrapper,
@@ -259,6 +260,12 @@ class NewVocodesContainer extends React.Component<Props, State> {
 
             <Route path="/upload">
               <UploadChoiceFc
+                sessionWrapper={this.props.sessionWrapper}
+              />
+            </Route>
+
+            <Route path="/category/create">
+              <CreateCategoryPage
                 sessionWrapper={this.props.sessionWrapper}
               />
             </Route>

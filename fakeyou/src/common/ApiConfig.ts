@@ -245,6 +245,10 @@ class ApiConfig {
 
     return base_url + query;
   }
+  
+  createCategory() : string {
+    return `${this.getScheme()}://${this.getNewApiHost()}/category/create`;
+  }
 
   firehoseEvents() : string {
     return `${this.getScheme()}://${this.getNewApiHost()}/events`;

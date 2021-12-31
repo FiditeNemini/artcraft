@@ -32,7 +32,7 @@ function NewTopNavFc(props: Props) {
         <div className="column">
           <Link to="/upload"
             className="button is-link is-medium is-inverted"
-            >Upload</Link>
+            >Contribute</Link>
         </div>
         <div className="column">
           <Link to={myDataLink}

@@ -8,6 +8,8 @@ interface Props {
 }
 
 function UploadChoiceFc(props: Props) {
+  const categoryActionName = props.sessionWrapper.canEditCategories() ? "Create" : "Suggest";
+
   return (
     <div>
       <div>
@@ -47,14 +49,14 @@ function UploadChoiceFc(props: Props) {
           className="button is-link is-large is-fullwidth"
           >Upload lipsync photo (w2l)</Link>
 
-        <h3 className="title is-3"> Create Categories </h3>
+        <h3 className="title is-3"> {categoryActionName} Categories </h3>
 
         <p>Help us organize the models!</p>
 
         <Link
           to="/category/create"
           className="button is-info is-large is-fullwidth"
-          >Suggest category</Link>
+          >{categoryActionName} category</Link>
 
         <h3 className="title is-3"> More </h3>
 
