@@ -143,7 +143,9 @@ function TtsEditCategoriesPage(props: Props) {
   }
 
   const addCategoryOptions = allTtsCategories.filter(category => {
-    return !(assignedCategoryTokens.has(category.category_token));
+    const alreadyAdded = assignedCategoryTokens.has(category.category_token);
+    const cannotAdd = !category.can_directly_have_models;
+    return !alreadyAdded && !cannotAdd;
   }).map(category => {
     return (
       <>

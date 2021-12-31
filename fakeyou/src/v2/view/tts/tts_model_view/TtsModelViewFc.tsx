@@ -213,7 +213,6 @@ function TtsModelViewFc(props: Props) {
     );
     editModelCategoriesButton = (
       <>
-        <br />
         <Link 
           className={"button is-large is-info is-fullwidth"}
           to={FrontendUrlConfig.ttsModelEditCategoriesPage(token)}
