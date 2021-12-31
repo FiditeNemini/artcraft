@@ -1,5 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { FrontendUrlConfig } from '../../../../common/FrontendUrlConfig';
 import { SessionWrapper } from '../../../../session/SessionWrapper';
 
 interface Props {
@@ -27,6 +28,13 @@ function ModerationFc(props: Props) {
         to="/moderation/ip_bans"
         className="button is-link is-large is-fullwidth is-light"
         >IP Ban List</Link>
+        
+      <br />
+
+      <Link
+        to={FrontendUrlConfig.moderationTtsCategoryList()}
+        className="button is-link is-large is-fullwidth is-light"
+        >Manage TTS Categories</Link>
         
       <br />
 

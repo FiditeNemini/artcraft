@@ -89,6 +89,10 @@ class FrontendUrlConfig {
   static moderationMain() : string {
     return '/moderation';
   }
+
+  static moderationTtsCategoryList() : string {
+    return '/moderation/tts_category/list';
+  }
 }
 
 export { FrontendUrlConfig }

@@ -44,6 +44,7 @@ import { ModerationPendingW2lTemplatesFc } from './moderation/moderation_pending
 import { ModerationVoiceStatsFc } from './moderation/moderation_voice_stats/ModerationVoiceStatsFc';
 import { CreateCategoryPage } from './category/CreateCategoryPage';
 import { TtsEditCategoriesPage } from './tts/tts_edit_categories/TtsEditCategoriesPage';
+import { ModerationTtsCategoryListPage } from './moderation/moderation_tts_category_list/ModerationTtsCategoryListPage';
 
 interface Props {
   sessionWrapper: SessionWrapper,
@@ -303,6 +304,12 @@ class NewVocodesContainer extends React.Component<Props, State> {
 
             <Route path="/moderation/job_stats">
               <ModerationJobStatsFc
+                sessionWrapper={this.props.sessionWrapper}
+              />
+            </Route>
+
+            <Route path="/moderation/tts_category/list">
+              <ModerationTtsCategoryListPage
                 sessionWrapper={this.props.sessionWrapper}
               />
             </Route>

@@ -310,6 +310,10 @@ class ApiConfig {
     return `${this.getScheme()}://${this.getNewApiHost()}/moderation/pending/w2l_templates`;
   }
 
+  getModerationTtsCategoryList(): string {
+    return `${this.getScheme()}://${this.getNewApiHost()}/moderation/categories/tts/list`;
+  }
+
   private getScheme() : string {
     return this.useSsl ? "https" : "http";
   }
