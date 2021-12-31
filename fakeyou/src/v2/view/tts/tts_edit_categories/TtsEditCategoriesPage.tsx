@@ -1,12 +1,14 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { SessionWrapper } from '../../../../session/SessionWrapper';
-import { useParams, useHistory } from 'react-router-dom';
-import { FrontendUrlConfig } from '../../../../common/FrontendUrlConfig';
-import { BackLink } from '../../_common/BackLink';
-import { GetTtsModel, GetTtsModelIsErr, GetTtsModelIsOk, TtsModel, TtsModelLookupError } from '../../../api/tts/GetTtsModel';
-import { ListTtsCategoriesForModel, ListTtsCategoriesForModelIsError, ListTtsCategoriesForModelIsOk, TtsModelCategory } from '../../../api/category/ListTtsCategoriesForModel';
-import { ListTtsCategories, ListTtsCategoriesIsError, ListTtsCategoriesIsOk, TtsCategory } from '../../../api/category/ListTtsCategories';
 import { AssignTtsCategory, AssignTtsCategoryIsError, AssignTtsCategoryIsOk } from '../../../api/category/AssignTtsCategory';
+import { BackLink } from '../../_common/BackLink';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { FrontendUrlConfig } from '../../../../common/FrontendUrlConfig';
+import { GetTtsModel, GetTtsModelIsErr, GetTtsModelIsOk, TtsModel, TtsModelLookupError } from '../../../api/tts/GetTtsModel';
+import { ListTtsCategories, ListTtsCategoriesIsError, ListTtsCategoriesIsOk, TtsCategory } from '../../../api/category/ListTtsCategories';
+import { ListTtsCategoriesForModel, ListTtsCategoriesForModelIsError, ListTtsCategoriesForModelIsOk, TtsModelCategory } from '../../../api/category/ListTtsCategoriesForModel';
+import { SessionWrapper } from '../../../../session/SessionWrapper';
+import { faMinusCircle } from '@fortawesome/free-solid-svg-icons';
+import { useParams } from 'react-router-dom';
 
 interface Props {
   sessionWrapper: SessionWrapper,
@@ -15,13 +17,13 @@ interface Props {
 function TtsEditCategoriesPage(props: Props) {
   let { token } = useParams() as { token : string };
 
-  const history = useHistory();
-
   const [ttsModel, setTtsModel] = useState<TtsModel|undefined>(undefined);
   const [notFoundState, setNotFoundState] = useState<boolean>(false);
 
   const [allTtsCategories, setAllTtsCategories] = useState<TtsCategory[]>([]);
   const [assignedCategories, setAssignedCategories] = useState<TtsModelCategory[]>([]);
+
+  const [errorMessage, setErrorMessage] = useState<string|undefined>(undefined); 
 
   const getModel = useCallback(async (token) => {
     const model = await GetTtsModel(token);
@@ -43,7 +45,7 @@ function TtsEditCategoriesPage(props: Props) {
     if (ListTtsCategoriesIsOk(categoryList)) {
       setAllTtsCategories(categoryList.categories);
     } else if (ListTtsCategoriesIsError(categoryList))  {
-      // TODO: Improve
+      setErrorMessage("error listing all categories");
     }
   }, []);
 
@@ -53,7 +55,7 @@ function TtsEditCategoriesPage(props: Props) {
     if (ListTtsCategoriesForModelIsOk(categoryList)) {
       setAssignedCategories(categoryList.categories);
     } else if (ListTtsCategoriesForModelIsError(categoryList))  {
-      // TODO: Improve
+      setErrorMessage("error listing categories for model");
     }
   }, []);
 
@@ -74,9 +76,7 @@ function TtsEditCategoriesPage(props: Props) {
     return <div />
   }
 
-  const handleAddCategory = async (ev: React.FormEvent<HTMLSelectElement>) => {
-    const categoryToken = (ev.target as HTMLSelectElement).value;
-
+  const assignCategory = async (categoryToken: string, assign: boolean) => {
     if (categoryToken === '') {
       return; // Default dropdown option is a no-op
     }
@@ -84,32 +84,27 @@ function TtsEditCategoriesPage(props: Props) {
     const assignRequest = {
       category_token: categoryToken,
       tts_model_token: token,
-      assign: true,
+      assign: assign,
     };
 
     const result = await AssignTtsCategory(assignRequest);
 
     if (AssignTtsCategoryIsOk(result)) {
+      setErrorMessage(undefined);
       listTtsCategoriesForModel(token); // Reload
     } else if (AssignTtsCategoryIsError(result))  {
-      // TODO: Improve
+      const action = assign ? "adding" : "removing";
+      setErrorMessage(`error ${action} category`);
     }
   }
 
+  const handleAddCategory = async (ev: React.FormEvent<HTMLSelectElement>) => {
+    const categoryToken = (ev.target as HTMLSelectElement).value;
+    await assignCategory(categoryToken, true);
+  }
+
   const handleRemoveCategory = async (categoryToken: string) => {
-    const assignRequest = {
-      category_token: categoryToken,
-      tts_model_token: token,
-      assign: false,
-    };
-
-    const result = await AssignTtsCategory(assignRequest);
-
-    if (AssignTtsCategoryIsOk(result)) {
-      listTtsCategoriesForModel(token); // Reload
-    } else if (AssignTtsCategoryIsError(result))  {
-      // TODO: Improve
-    }
+    await assignCategory(categoryToken, false);
   }
 
   const modelLink = FrontendUrlConfig.ttsModelPage(token);
@@ -129,9 +124,12 @@ function TtsEditCategoriesPage(props: Props) {
         {assignedCategories.map(category => {
           return (
             <li>
-              {category.name} 
-                [<a href="#">edit category</a>] 
-                [<a onClick={() => handleRemoveCategory(category.category_token)}>remove</a>]
+              {category.name}
+                &nbsp;
+                [<a onClick={() => handleRemoveCategory(category.category_token)}>
+                  remove&nbsp;
+                  <FontAwesomeIcon icon={faMinusCircle} />
+                </a>]
             </li>
           );
         })}
@@ -149,10 +147,26 @@ function TtsEditCategoriesPage(props: Props) {
     )
   });
 
+  let errorFlash = <></>;
+
+  if (!!errorMessage) {
+    errorFlash = (
+      <>
+        <article className="message is-danger">
+          <div className="message-body">
+            {errorMessage}
+          </div>
+        </article>
+      </>
+    );
+  }
+
   return (
     <div className="content">
       <h1 className="title is-1">Edit Categories</h1>
       <h4 className="subtitle is-4"> TTS Model: {ttsModel.title} </h4>
+
+      {errorFlash}
 
       <p>
         <BackLink link={modelLink} text="Back to model" />
@@ -174,6 +188,8 @@ function TtsEditCategoriesPage(props: Props) {
         </div>
       </div>
 
+      <br />
+      
       <p>
         <BackLink link={modelLink} text="Back to model" />
       </p>
