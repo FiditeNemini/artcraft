@@ -122,6 +122,7 @@ pub async fn list_tts_model_assigned_categories_handler(
       .unwrap_or(false);
 
   let query_builder = ListAssignedTtsCategoriesQueryBuilder::for_model_token(&path.token)
+      .show_invalid_model_not_allowed_categories(is_mod)
       .show_deleted(is_mod)
       .show_unapproved(is_mod);
 

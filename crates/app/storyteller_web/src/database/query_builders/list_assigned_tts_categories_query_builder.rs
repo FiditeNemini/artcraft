@@ -56,6 +56,10 @@ pub struct ListAssignedTtsCategoriesQueryBuilder {
   // REQUIRED.
   scope_tts_model_token: String,
 
+  // Sometimes "can_directly_have_models" categories change state.
+  // Mods will want to see invalid uses.
+  show_invalid_model_not_allowed_categories: bool,
+
   // The public lists won't include unapproved, but mod views
   // will want to see them.
   show_unapproved: bool,
@@ -69,9 +73,15 @@ impl ListAssignedTtsCategoriesQueryBuilder {
   pub fn for_model_token(model_token: &str) -> Self {
     Self {
       scope_tts_model_token: model_token.to_string(),
+      show_invalid_model_not_allowed_categories: false,
       show_unapproved: false,
       show_deleted: false,
     }
+  }
+
+  pub fn show_invalid_model_not_allowed_categories(mut self, show_invalid_model_not_allowed_categories: bool) -> Self {
+    self.show_invalid_model_not_allowed_categories = show_invalid_model_not_allowed_categories;
+    self
   }
 
   pub fn show_unapproved(mut self, show_unapproved: bool) -> Self {
@@ -204,6 +214,10 @@ LEFT OUTER JOIN users
 
     // We also don't care to ever show soft-deleted assignments
     query.push_str(" AND tts_category_assignments.deleted_at IS NULL");
+
+    if !self.show_invalid_model_not_allowed_categories {
+      query.push_str(" AND model_categories.can_directly_have_models IS TRUE");
+    }
 
     if !self.show_unapproved {
       query.push_str(" AND model_categories.is_mod_approved IS TRUE");
