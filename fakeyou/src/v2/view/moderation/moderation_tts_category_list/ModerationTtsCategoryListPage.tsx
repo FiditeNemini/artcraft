@@ -69,8 +69,8 @@ function ModerationTtsCategoryListPage(props: Props) {
         </thead>
         <tbody>
           {ttsCategories.map(category => {
-
             let name = <>{category.name}</>;
+
             if (!!category.maybe_dropdown_name) {
               name = (
                 <>

@@ -198,10 +198,11 @@ function TtsModelViewFc(props: Props) {
     );
   }
 
-  let editModelButton = <span />;
-  let editModelCategoriesButton = <span />;
+  let canEditModel = props.sessionWrapper.canEditTtsModelByUserToken(ttsModel?.creator_user_token);
 
-  if (props.sessionWrapper.canEditTtsModelByUserToken(ttsModel?.creator_user_token)) {
+  let editModelButton = <span />;
+
+  if (canEditModel) {
     editModelButton = (
       <>
         <br />
@@ -209,14 +210,6 @@ function TtsModelViewFc(props: Props) {
           className={"button is-large is-info is-fullwidth"}
           to={FrontendUrlConfig.ttsModelEditPage(token)}
           >Edit Model Details</Link>
-      </>
-    );
-    editModelCategoriesButton = (
-      <>
-        <Link 
-          className={"button is-large is-info is-fullwidth"}
-          to={FrontendUrlConfig.ttsModelEditCategoriesPage(token)}
-          >Edit Model Categories</Link>
       </>
     );
   }
@@ -259,21 +252,49 @@ function TtsModelViewFc(props: Props) {
     );
   }
 
-  let modelCategories = null;
-  if (assignedCategories.length !== 0) {
-    modelCategories = (
+  const showCategorySection = canEditModel || assignedCategories.length !== 0;
+  let modelCategoriesSection = <></>;
+
+  if (showCategorySection) {
+    let modelCategories = null;
+
+    if (assignedCategories.length !== 0) {
+      modelCategories = (
+        <>
+          <div className="content">
+            <ul>
+            {assignedCategories.map(category => {
+              return (
+                <>
+                  <li>{category.name}</li>
+                </>
+              );
+            })}
+            </ul>
+          </div>
+        </>
+      );
+    }
+
+    let editModelCategoriesButton = null;
+
+    if (canEditModel) {
+      editModelCategoriesButton = (
+        <>
+          <Link 
+            className={"button is-large is-info is-fullwidth"}
+            to={FrontendUrlConfig.ttsModelEditCategoriesPage(token)}
+            >Edit Model Categories</Link>
+        </>
+      );
+    }
+
+    modelCategoriesSection = (
       <>
-        <div className="content">
-          <ul>
-          {assignedCategories.map(category => {
-            return (
-              <>
-                <li>{category.name}</li>
-              </>
-            );
-          })}
-          </ul>
-        </div>
+        <h4 className="title is-4"> Model Categories </h4>
+        {modelCategories}
+        {editModelCategoriesButton}
+        <br />
       </>
     );
   }
@@ -327,10 +348,7 @@ function TtsModelViewFc(props: Props) {
     
       {modelDescription}
 
-      <h4 className="title is-4"> Model Categories </h4>
-      {modelCategories}
-      {editModelCategoriesButton}
-      <br />
+      {modelCategoriesSection}
 
       <table className="table is-fullwidth">
         <tbody>
