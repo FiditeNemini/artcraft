@@ -7,6 +7,7 @@ import { Link, useHistory } from 'react-router-dom';
 import { SessionWrapper } from '../../../../session/SessionWrapper';
 import { useParams } from 'react-router-dom';
 import { EditCategory, EditCategoryIsError, EditCategoryIsSuccess, EditCategoryRequest } from '../../../api/category/EditCategory';
+import { ListTtsCategories, ListTtsCategoriesIsError, ListTtsCategoriesIsOk, TtsCategory } from '../../../api/category/ListTtsCategories';
 
 interface Props {
   sessionWrapper: SessionWrapper,
@@ -19,13 +20,19 @@ function ModerationTtsCategoryEditPage(props: Props) {
 
   const [category, setCategory] = useState<Category|undefined>(undefined);
 
+  // Fields
   const [name, setName] = useState('');
+  const [maybeSuperCategoryToken, setMaybeSuperCategoryToken] = useState<string|undefined>(undefined); // Optional
   const [maybeDropdownName, setMaybeDropdownName] = useState<string|undefined>(undefined); // Optional
   const [canDirectlyHaveModels, setCanDirectlyHaveModels] = useState(false);
   const [canHaveSubcategories, setCanHaveSubcategories] = useState(false);
   const [canOnlyModsApply, setCanOnlyModsApply] = useState(false);
   const [isModApproved, setIsModApproved] = useState(false);
   const [maybeModComments, setMaybeModComments] = useState<string|undefined>(undefined); // Optional
+
+  // Additional object lookups to support parent categories
+  const [allTtsCategories, setAllTtsCategories] = useState<TtsCategory[]>([]);
+  //const [maybeSuperCategory, setMaybeSuperCategory] = useState<Category|undefined>(undefined);
 
   const [errorMessage, setErrorMessage] = useState<string|undefined>(undefined); 
 
@@ -36,6 +43,7 @@ function ModerationTtsCategoryEditPage(props: Props) {
       const category = categoryList.category;
       setCategory(category);
       setName(category.name);
+      setMaybeSuperCategoryToken(category.maybe_super_category_token);
       setMaybeDropdownName(category.maybe_dropdown_name);
       setCanDirectlyHaveModels(category.can_directly_have_models);
       setCanHaveSubcategories(category.can_have_subcategories);
@@ -46,9 +54,31 @@ function ModerationTtsCategoryEditPage(props: Props) {
       setErrorMessage("error fetching category");
     }
   }, []);
+  
+  //const getSuperCategory = useCallback(async (parentCategoryToken: string) => {
+  //  const categoryList = await GetCategory(parentCategoryToken);
+
+  //  if (GetCategoryIsOk(categoryList)) {
+  //    const category = categoryList.category;
+  //    setMaybeSuperCategory(category);
+  //  } else if (GetCategoryIsError(categoryList))  {
+  //    setErrorMessage("error fetching parent category");
+  //  }
+  //}, []);
+
+  const listTtsCategories = useCallback(async () => {
+    const categoryList = await ListTtsCategories();
+
+    if (ListTtsCategoriesIsOk(categoryList)) {
+      setAllTtsCategories(categoryList.categories);
+    } else if (ListTtsCategoriesIsError(categoryList))  {
+      setErrorMessage("error listing all categories");
+    }
+  }, []);
 
   useEffect(() => {
     getCategory(token);
+    listTtsCategories();
   }, [token, getCategory]);
 
   if (!props.sessionWrapper.canBanUsers()) {
@@ -90,6 +120,12 @@ function ModerationTtsCategoryEditPage(props: Props) {
     setIsModApproved(updatedValue)
   };
 
+  const handleSetSuperCategory = async (ev: React.FormEvent<HTMLSelectElement>) => {
+    const superCategoryToken = (ev.target as HTMLSelectElement).value;
+    let fixedSuperCategoryToken = !!superCategoryToken ? superCategoryToken : undefined;
+    setMaybeSuperCategoryToken(fixedSuperCategoryToken);
+  }
+
   const handleFormSubmit = async (ev: React.FormEvent<HTMLFormElement>) : Promise<boolean> => {
     ev.preventDefault();
 
@@ -99,6 +135,7 @@ function ModerationTtsCategoryEditPage(props: Props) {
       name: name,
       maybe_dropdown_name: maybeDropdownName,
       maybe_mod_comments: maybeModComments,
+      maybe_super_category_token: maybeSuperCategoryToken,
       can_directly_have_models: canDirectlyHaveModels,
       can_have_subcategories: canHaveSubcategories,
       can_only_mods_apply: canOnlyModsApply,
@@ -131,6 +168,19 @@ function ModerationTtsCategoryEditPage(props: Props) {
   }
 
   const isModApprovedHtmlFormState = isModApproved ? "true" : "false";
+  const maybeSuperCategoryTokenFormHtmlState = maybeSuperCategoryToken ? maybeSuperCategoryToken : "";
+
+  const superCategoryOptions = allTtsCategories.filter(category => {
+    const isSelf = token === category.category_token;
+    const cannotAdd = !category.can_directly_have_models;
+    return !isSelf && !cannotAdd;
+  }).map(category => {
+    return (
+      <>
+        <option value={category.category_token}>{category.name}</option>
+      </>
+    )
+  });
 
   return (
     <div>
@@ -145,6 +195,18 @@ function ModerationTtsCategoryEditPage(props: Props) {
       <br />
 
       <form onSubmit={handleFormSubmit}>
+
+        <label className="label">Mod Approval (sets public list visibility)</label>
+
+        <div className="select is-info is-large">
+          <select name="approve" value={isModApprovedHtmlFormState} onChange={handleIsModApprovedChange}>
+            <option value="true">Approve</option>
+            <option value="false">Disapprove</option>
+          </select>
+        </div>
+
+        <br />
+        <br />
 
         <div className="field">
           <label className="label">Category Name</label>
@@ -165,26 +227,27 @@ function ModerationTtsCategoryEditPage(props: Props) {
 
         <br />
 
-        <label className="label">Mod Approval (sets public list visibility)</label>
+        <label className="label">Permission Flags</label>
 
-        <div className="select is-info is-large">
-          <select name="approve" value={isModApprovedHtmlFormState} onChange={handleIsModApprovedChange}>
-            <option value="true">Approve</option>
-            <option value="false">Disapprove</option>
-          </select>
-        </div>
+        <label className="checkbox">
+          <input 
+            type="checkbox"
+            checked={canOnlyModsApply} 
+            onChange={handleCanOnlyModsApplyChange} />
+          &nbsp;Can only mods apply this category? (Model authors can't add this themselves.)
+        </label>
 
         <br />
         <br />
 
-        <label className="label">Flags</label>
+        <label className="label">Topology (Children)</label>
 
         <label className="checkbox">
           <input 
             type="checkbox"
             checked={canDirectlyHaveModels} 
             onChange={handleCanDirectlyHaveModelsChange} />
-          &nbsp;Can this category be assigned to models? (If not, it's a super category.)
+          &nbsp;Can this category be directly assigned to models? (If not, it's only a super category.)
         </label>
 
         <br />
@@ -198,16 +261,20 @@ function ModerationTtsCategoryEditPage(props: Props) {
         </label>
 
         <br />
+        <br />
 
-        <label className="checkbox">
-          <input 
-            type="checkbox"
-            checked={canOnlyModsApply} 
-            onChange={handleCanOnlyModsApplyChange} />
-          &nbsp;Can only mods apply this category?
-        </label>
-        <br />
-        <br />
+        <label className="label">Topology (Optional Parent Category)</label>
+
+        <div className="field">
+          <div className="control">
+            <div className="select is-info">
+              <select onChange={handleSetSuperCategory} value={maybeSuperCategoryTokenFormHtmlState}>
+                <option value="">None (this is optional)</option>
+                {superCategoryOptions}
+              </select>
+            </div>
+          </div>
+        </div>
 
         <button className="button is-link is-large is-fullwidth"> Edit </button>
       </form>
