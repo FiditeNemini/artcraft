@@ -125,6 +125,19 @@ function TtsEditCategoriesPage(props: Props) {
       <>
         {assignedCategories.map(category => {
           let notApprovedWarning = null;
+          let modelsNotAllowedWarning = null;
+
+          if (!category.can_directly_have_models) {
+            modelsNotAllowedWarning = (
+              <>
+                <span className="tag is-rounded is-warning is-medium is-light">
+                  Models not directly allowed
+                  &nbsp;
+                  <FontAwesomeIcon icon={faExclamationCircle} />
+                </span>
+              </>
+            )
+          }
 
           if (!category.is_mod_approved) {
             notApprovedWarning = (
@@ -141,6 +154,7 @@ function TtsEditCategoriesPage(props: Props) {
           return (
             <li>
               <span className="content is-medium">{category.name}</span>
+                {modelsNotAllowedWarning}
                 {notApprovedWarning}
                 &nbsp;
                 <button 
