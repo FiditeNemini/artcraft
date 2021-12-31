@@ -7,7 +7,7 @@ import { GetTtsModel, GetTtsModelIsErr, GetTtsModelIsOk, TtsModel, TtsModelLooku
 import { ListTtsCategories, ListTtsCategoriesIsError, ListTtsCategoriesIsOk, TtsCategory } from '../../../api/category/ListTtsCategories';
 import { ListTtsCategoriesForModel, ListTtsCategoriesForModelIsError, ListTtsCategoriesForModelIsOk, TtsModelCategory } from '../../../api/category/ListTtsCategoriesForModel';
 import { SessionWrapper } from '../../../../session/SessionWrapper';
-import { faMinusCircle, faTimes } from '@fortawesome/free-solid-svg-icons';
+import { faTimes } from '@fortawesome/free-solid-svg-icons';
 import { useParams } from 'react-router-dom';
 
 interface Props {
@@ -99,8 +99,10 @@ function TtsEditCategoriesPage(props: Props) {
   }
 
   const handleAddCategory = async (ev: React.FormEvent<HTMLSelectElement>) => {
+    ev.preventDefault();
     const categoryToken = (ev.target as HTMLSelectElement).value;
     await assignCategory(categoryToken, true);
+    return false;
   }
 
   const handleRemoveCategory = async (categoryToken: string) => {
@@ -183,7 +185,7 @@ function TtsEditCategoriesPage(props: Props) {
       <div className="field">
         <div className="control">
           <div className="select is-info">
-            <select onChange={handleAddCategory}>
+            <select onChange={handleAddCategory} value="">
               <option value="">Select category to add...</option>
               {addCategoryOptions}
             </select>
