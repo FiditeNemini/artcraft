@@ -267,6 +267,7 @@ function TtsModelViewFc(props: Props) {
             <ul>
             {assignedCategories.map(category => {
               let notApprovedWarning = null;
+              let modelsNotAllowedWarning = null;
 
               if (!category.is_mod_approved) {
                 notApprovedWarning = (
@@ -280,9 +281,21 @@ function TtsModelViewFc(props: Props) {
                 )
               }
 
+              if (!category.can_directly_have_models) {
+                modelsNotAllowedWarning = (
+                  <>
+                    <span className="tag is-rounded is-warning is-medium is-light">
+                      Models not directly allowed
+                      &nbsp;
+                      <FontAwesomeIcon icon={faExclamationCircle} />
+                    </span>
+                  </>
+                )
+              }
+
               return (
                 <>
-                  <li>{category.name} {notApprovedWarning}</li>
+                  <li>{category.name} {modelsNotAllowedWarning} {notApprovedWarning}</li>
                 </>
               );
             })}
