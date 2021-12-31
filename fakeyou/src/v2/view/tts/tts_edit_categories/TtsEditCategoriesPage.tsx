@@ -96,7 +96,26 @@ function TtsEditCategoriesPage(props: Props) {
     }
   }
 
+  const handleRemoveCategory = async (categoryToken: string) => {
+    const assignRequest = {
+      category_token: categoryToken,
+      tts_model_token: token,
+      assign: false,
+    };
+
+    const result = await AssignTtsCategory(assignRequest);
+
+    if (AssignTtsCategoryIsOk(result)) {
+      listTtsCategoriesForModel(token); // Reload
+    } else if (AssignTtsCategoryIsError(result))  {
+      // TODO: Improve
+    }
+  }
+
   const modelLink = FrontendUrlConfig.ttsModelPage(token);
+
+  const assignedCategoryTokens = 
+      new Set<string>(assignedCategories.map(category => category.category_token));
 
   let currentCategoriesList = (
     <>
@@ -110,7 +129,9 @@ function TtsEditCategoriesPage(props: Props) {
         {assignedCategories.map(category => {
           return (
             <li>
-              {category.name} [<a href="#">edit category</a>] [<a href="#">remove</a>]
+              {category.name} 
+                [<a href="#">edit category</a>] 
+                [<a onClick={() => handleRemoveCategory(category.category_token)}>remove</a>]
             </li>
           );
         })}
@@ -119,8 +140,7 @@ function TtsEditCategoriesPage(props: Props) {
   }
 
   const addCategoryOptions = allTtsCategories.filter(category => {
-    //if (category.category_token)
-    return true;
+    return !(assignedCategoryTokens.has(category.category_token));
   }).map(category => {
     return (
       <>
@@ -131,8 +151,8 @@ function TtsEditCategoriesPage(props: Props) {
 
   return (
     <div className="content">
-      <h1 className="title is-1">Edit TTS Categories</h1>
-      <h4 className="subtitle is-4"> Model: {ttsModel.title} </h4>
+      <h1 className="title is-1">Edit Categories</h1>
+      <h4 className="subtitle is-4"> TTS Model: {ttsModel.title} </h4>
 
       <p>
         <BackLink link={modelLink} text="Back to model" />
