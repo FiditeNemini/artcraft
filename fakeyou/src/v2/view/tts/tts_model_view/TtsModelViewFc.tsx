@@ -14,6 +14,8 @@ import { GravatarFc } from '../../_common/GravatarFc';
 import { GetTtsModelUseCount } from '../../../api/tts/GetTtsModelUseCount';
 import { BackLink } from '../../_common/BackLink';
 import { ListTtsCategoriesForModel, ListTtsCategoriesForModelIsError, ListTtsCategoriesForModelIsOk, TtsModelCategory } from '../../../api/category/ListTtsCategoriesForModel';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faExclamationCircle } from '@fortawesome/free-solid-svg-icons';
 
 interface Props {
   sessionWrapper: SessionWrapper,
@@ -264,9 +266,23 @@ function TtsModelViewFc(props: Props) {
           <div className="content">
             <ul>
             {assignedCategories.map(category => {
+              let notApprovedWarning = null;
+
+              if (!category.is_mod_approved) {
+                notApprovedWarning = (
+                  <>
+                    <span className="tag is-rounded is-warning is-medium is-light">
+                      Not Mod Approved
+                      &nbsp;
+                      <FontAwesomeIcon icon={faExclamationCircle} />
+                    </span>
+                  </>
+                )
+              }
+
               return (
                 <>
-                  <li>{category.name}</li>
+                  <li>{category.name} {notApprovedWarning}</li>
                 </>
               );
             })}
