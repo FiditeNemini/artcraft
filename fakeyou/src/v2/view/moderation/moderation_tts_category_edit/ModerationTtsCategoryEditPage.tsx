@@ -2,8 +2,7 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { BackLink } from '../../_common/BackLink';
 import { Category, GetCategory, GetCategoryIsError, GetCategoryIsOk } from '../../../api/category/GetCategory';
 import { FrontendUrlConfig } from '../../../../common/FrontendUrlConfig';
-import { GravatarFc } from '../../_common/GravatarFc';
-import { Link, useHistory } from 'react-router-dom';
+import { useHistory } from 'react-router-dom';
 import { SessionWrapper } from '../../../../session/SessionWrapper';
 import { useParams } from 'react-router-dom';
 import { EditCategory, EditCategoryIsError, EditCategoryIsSuccess, EditCategoryRequest } from '../../../api/category/EditCategory';
@@ -79,7 +78,7 @@ function ModerationTtsCategoryEditPage(props: Props) {
   useEffect(() => {
     getCategory(token);
     listTtsCategories();
-  }, [token, getCategory]);
+  }, [token, getCategory, listTtsCategories]);
 
   if (!props.sessionWrapper.canBanUsers()) {
     return <h1>Unauthorized</h1>;
