@@ -55,6 +55,7 @@ pub struct CategoryForModeration {
   pub creator_user_token: Option<String>,
   pub creator_username: Option<String>,
   pub creator_display_name: Option<String>,
+  pub creator_gravatar_hash: Option<String>,
 
   // Moderator fields
   pub is_mod_approved: Option<bool>,
@@ -154,6 +155,7 @@ pub async fn list_tts_categories_for_moderation_handler(
           creator_user_token: c.creator_user_token.clone(),
           creator_username: c.creator_username.clone(),
           creator_display_name: c.creator_display_name.clone(),
+          creator_gravatar_hash: c.creator_gravatar_hash.clone(),
           is_mod_approved: c.is_mod_approved.clone(),
           maybe_mod_comments: c.maybe_mod_comments.clone(),
           created_at: c.created_at.clone(),

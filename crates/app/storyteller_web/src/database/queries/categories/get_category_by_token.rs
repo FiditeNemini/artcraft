@@ -26,6 +26,7 @@ pub struct ModelCategory {
   pub creator_user_token: String,
   pub creator_username: String,
   pub creator_display_name: String,
+  pub creator_gravatar_hash: String,
 
   pub creator_ip_address_creation: String,
   pub creator_ip_address_last_update: String,
@@ -59,6 +60,7 @@ SELECT
     category.creator_user_token,
     users.username as creator_username,
     users.display_name as creator_display_name,
+    users.email_gravatar_hash AS creator_gravatar_hash,
     category.creator_ip_address_creation,
     category.creator_ip_address_last_update,
     category.is_mod_approved,
@@ -105,6 +107,7 @@ WHERE
     creator_user_token: category.creator_user_token.clone(),
     creator_username: category.creator_username.clone(),
     creator_display_name: category.creator_display_name.clone(),
+    creator_gravatar_hash: category.creator_gravatar_hash.clone(),
     creator_ip_address_creation: category.creator_ip_address_creation.clone(),
     creator_ip_address_last_update: category.creator_ip_address_last_update.clone(),
     is_mod_approved: nullable_i8_to_optional_bool(category.is_mod_approved),
@@ -139,6 +142,7 @@ pub struct RawModelCategory {
   pub creator_user_token: String,
   pub creator_username: String,
   pub creator_display_name: String,
+  pub creator_gravatar_hash: String,
 
   pub creator_ip_address_creation: String,
   pub creator_ip_address_last_update: String,

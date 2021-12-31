@@ -119,7 +119,7 @@ pub async fn assign_tts_category_handler(
       return Err(AssignTtsCategoryError::CategoryNotFound);
     },
     Err(err) => {
-      warn!("error looking up model: {:?}", err);
+      warn!("error looking up category: {:?}", err);
       return Err(AssignTtsCategoryError::ServerError);
     },
   };

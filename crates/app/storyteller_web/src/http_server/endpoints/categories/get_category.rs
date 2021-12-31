@@ -7,8 +7,10 @@ use actix_web::http::StatusCode;
 use actix_web::web::{Path, Json};
 use actix_web::{Responder, web, HttpResponse, error, HttpRequest};
 use chrono::{DateTime, Utc};
+use crate::database::enums::record_visibility::RecordVisibility;
+use crate::database::queries::categories::get_category_by_token::get_category_by_token;
 use crate::database::queries::query_w2l_template::select_w2l_template_by_token;
-use crate::database::query_builders::list_assigned_tts_categories_query_builder::ListAssignedTtsCategoriesQueryBuilder;
+use crate::database::query_builders::list_categories_query_builder::ListCategoriesQueryBuilder;
 use crate::http_server::web_utils::ip_address::get_request_ip;
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 use crate::http_server::web_utils::response_success_helpers::simple_json_success;
@@ -32,7 +34,7 @@ use std::sync::Arc;
 
 /// For the URL PathInfo
 #[derive(Deserialize)]
-pub struct ListTtsModelAssignedCategoriesPathInfo {
+pub struct GetCategoryPathInfo {
   /// TTS model token
   token: String,
 }
@@ -40,9 +42,9 @@ pub struct ListTtsModelAssignedCategoriesPathInfo {
 // =============== Success Response ===============
 
 #[derive(Serialize)]
-pub struct ListTtsModelAssignedCategoriesResponse {
+pub struct GetCategoryResponse {
   pub success: bool,
-  pub categories: Vec<DisplayCategory>,
+  pub category: DisplayCategory,
 }
 
 /// Public-facing and optimized (non-irrelevant fields) category list
@@ -62,29 +64,33 @@ pub struct DisplayCategory {
   pub name: String,
   pub maybe_dropdown_name: Option<String>,
 
-  // NB: It's okay for non-mods to see this.
+  pub creator_user_token: String,
+  pub creator_username: String,
+  pub creator_display_name: String,
+  pub creator_gravatar_hash: String,
+
+  // Moderator fields
   pub is_mod_approved: Option<bool>,
+  pub maybe_mod_comments: Option<String>,
 
-  pub category_created_at: DateTime<Utc>,
-  pub category_updated_at: DateTime<Utc>,
-  pub category_deleted_at: Option<DateTime<Utc>>,
-
-  //pub creator_user_token: Option<String>,
-  //pub creator_username: Option<String>,
-  //pub creator_display_name: Option<String>,
+  pub created_at: DateTime<Utc>,
+  pub updated_at: DateTime<Utc>,
+  pub deleted_at: Option<DateTime<Utc>>,
 }
 
 // =============== Error Response ===============
 
 #[derive(Debug, Serialize)]
-pub enum ListTtsModelAssignedCategoriesError {
+pub enum GetCategoryError {
+  NotFound,
   ServerError,
 }
 
-impl ResponseError for ListTtsModelAssignedCategoriesError {
+impl ResponseError for GetCategoryError {
   fn status_code(&self) -> StatusCode {
     match *self {
-      ListTtsModelAssignedCategoriesError::ServerError => StatusCode::INTERNAL_SERVER_ERROR,
+      GetCategoryError::NotFound => StatusCode::NOT_FOUND,
+      GetCategoryError::ServerError => StatusCode::INTERNAL_SERVER_ERROR,
     }
   }
 
@@ -94,7 +100,7 @@ impl ResponseError for ListTtsModelAssignedCategoriesError {
 }
 
 // NB: Not using derive_more::Display since Clion doesn't understand it.
-impl fmt::Display for ListTtsModelAssignedCategoriesError {
+impl fmt::Display for GetCategoryError {
   fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
     write!(f, "{:?}", self)
   }
@@ -102,10 +108,10 @@ impl fmt::Display for ListTtsModelAssignedCategoriesError {
 
 // =============== Handler ===============
 
-pub async fn list_tts_model_assigned_categories_handler(
+pub async fn get_category_handler(
   http_request: HttpRequest,
-  path: Path<ListTtsModelAssignedCategoriesPathInfo>,
-  server_state: web::Data<Arc<ServerState>>) -> Result<HttpResponse, ListTtsModelAssignedCategoriesError>
+  path: Path<GetCategoryPathInfo>,
+  server_state: web::Data<Arc<ServerState>>) -> Result<HttpResponse, GetCategoryError>
 {
   let maybe_user_session = server_state
       .session_checker
@@ -113,7 +119,7 @@ pub async fn list_tts_model_assigned_categories_handler(
       .await
       .map_err(|e| {
         warn!("Session checker error: {:?}", e);
-        ListTtsModelAssignedCategoriesError::ServerError
+        GetCategoryError::ServerError
       })?;
 
   // TODO: We don't have any permissions for categories. This is a proxy.
@@ -121,50 +127,52 @@ pub async fn list_tts_model_assigned_categories_handler(
       .map(|session| session.can_ban_users)
       .unwrap_or(false);
 
-  let query_builder = ListAssignedTtsCategoriesQueryBuilder::for_model_token(&path.token)
-      .show_deleted(is_mod)
-      .show_unapproved(is_mod);
+  let category_lookup_result
+      = get_category_by_token(&path.token, &server_state.mysql_pool).await;
 
-  let query_result =
-      query_builder.perform_query(&server_state.mysql_pool).await;
-
-  let results = match query_result {
-    Ok(results) => results,
+  let category = match category_lookup_result {
+    Ok(Some(result)) => {
+      result
+    },
+    Ok(None) => {
+      warn!("could not find category");
+      return Err(GetCategoryError::NotFound);
+    },
     Err(err) => {
-      warn!("DB error: {:?}", err);
-      return Err(ListTtsModelAssignedCategoriesError::ServerError);
-    }
+      warn!("error looking up category: {:?}", err);
+      return Err(GetCategoryError::ServerError);
+    },
   };
 
-  let mut categories = results.categories.iter()
-      .map(|c| {
-        DisplayCategory {
-          category_token: c.category_token.clone(),
-          model_type: c.model_type.clone(),
-          maybe_super_category_token: c.maybe_super_category_token.clone(),
-          can_directly_have_models: c.can_directly_have_models,
-          can_have_subcategories: c.can_have_subcategories,
-          can_only_mods_apply: c.can_only_mods_apply,
-          name: c.name.clone(),
-          maybe_dropdown_name:c.maybe_dropdown_name.clone(),
-          is_mod_approved: c.is_mod_approved.clone(),
-          category_created_at: c.category_created_at.clone(),
-          category_updated_at: c.category_updated_at.clone(),
-          category_deleted_at: c.category_deleted_at.clone(),
-        }
-      })
-      .collect::<Vec<DisplayCategory>>();
+  let category_for_response = DisplayCategory {
+    category_token: category.category_token.clone(),
+    model_type: category.model_type.clone(),
+    maybe_super_category_token: category.maybe_super_category_token.clone(),
+    can_directly_have_models: category.can_directly_have_models,
+    can_have_subcategories: category.can_have_subcategories,
+    can_only_mods_apply: category.can_only_mods_apply,
+    name: category.name.clone(),
+    maybe_dropdown_name: category.maybe_dropdown_name.clone(),
+    creator_user_token: category.creator_user_token.clone(),
+    creator_username: category.creator_username.clone(),
+    creator_display_name: category.creator_display_name.clone(),
+    creator_gravatar_hash: category.creator_gravatar_hash.clone(),
+    is_mod_approved: category.is_mod_approved.clone(),
+    created_at: category.created_at.clone(),
+    updated_at: category.updated_at.clone(),
+    deleted_at: category.deleted_at.clone(),
+    // Moderator fields
+    // Clear out fields for non-mods
+    maybe_mod_comments: if is_mod { category.maybe_mod_comments.clone() } else { None },
+  };
 
-  // TODO: Sort by dropdown name too.
-  categories.sort_by(|c1, c2| c1.name.cmp(&c2.name));
-
-  let response = ListTtsModelAssignedCategoriesResponse {
+  let response = GetCategoryResponse {
     success: true,
-    categories,
+    category: category_for_response,
   };
 
   let body = serde_json::to_string(&response)
-      .map_err(|e| ListTtsModelAssignedCategoriesError::ServerError)?;
+      .map_err(|e| GetCategoryError::ServerError)?;
 
   Ok(HttpResponse::Ok()
       .content_type("application/json")

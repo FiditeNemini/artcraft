@@ -31,6 +31,7 @@ pub struct Category {
   pub creator_user_token: Option<String>,
   pub creator_username: Option<String>,
   pub creator_display_name: Option<String>,
+  pub creator_gravatar_hash: Option<String>,
 
   // Moderator fields
   pub is_mod_approved: Option<bool>,
@@ -118,6 +119,7 @@ impl ListCategoriesQueryBuilder {
             creator_user_token: c.creator_user_token.clone(),
             creator_username: c.creator_username.clone(),
             creator_display_name: c.creator_display_name.clone(),
+            creator_gravatar_hash: c.creator_gravatar_hash.clone(),
             is_mod_approved: nullable_i8_to_optional_bool(c.is_mod_approved),
             maybe_mod_comments: c.maybe_mod_comments.clone(),
             created_at: c.created_at,
@@ -183,6 +185,7 @@ SELECT
     users.token as creator_user_token,
     users.username as creator_username,
     users.display_name as creator_display_name,
+    users.email_gravatar_hash AS creator_gravatar_hash,
 
     model_categories.is_mod_approved,
     model_categories.maybe_mod_comments,
@@ -263,6 +266,7 @@ pub struct RawInternalCategoryRecord {
   pub creator_user_token: Option<String>,
   pub creator_username: Option<String>,
   pub creator_display_name: Option<String>,
+  pub creator_gravatar_hash: Option<String>,
 
   // Moderator fields
   pub is_mod_approved: Option<i8>,
