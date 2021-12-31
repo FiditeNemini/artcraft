@@ -1,0 +1,67 @@
+import { ApiConfig } from "../../../common/ApiConfig";
+
+export interface ListCategoriesForTtsModelSuccessResponse {
+  success: boolean,
+  categories: Array<TtsModelCategory>
+}
+
+export interface TtsModelCategory {
+  category_token: string,
+  model_type: string,
+  maybe_super_category_token?: string,
+
+  can_directly_have_models: boolean,
+  can_have_subcategories: boolean,
+  can_only_mods_apply: boolean,
+
+  name: string,
+  maybe_dropdown_name?: string,
+
+  is_mod_approved?: boolean,
+
+  category_created_at: Date,
+  category_updated_at: Date,
+  category_deleted_at?: Date,
+}
+
+export interface ListCategoriesForTtsModelErrorResponse {
+  success: boolean,
+}
+
+type ListCategoriesForTtsModelResponse = ListCategoriesForTtsModelSuccessResponse | ListCategoriesForTtsModelErrorResponse;
+
+export function ListCategoriesForTtsModelIsOk(response: ListCategoriesForTtsModelResponse): response is ListCategoriesForTtsModelSuccessResponse {
+  return response?.success === true;
+}
+
+export function ListCategoriesForTtsModelIsError(response: ListCategoriesForTtsModelResponse): response is ListCategoriesForTtsModelErrorResponse {
+  return response?.success === false;
+}
+
+export async function ListCategoriesForTtsModel(ttsModelToken: string) : Promise<ListCategoriesForTtsModelResponse> 
+{
+  const endpoint = new ApiConfig().listCategoriesForTtsModel(ttsModelToken);
+  
+  return await fetch(endpoint, {
+    method: 'GET',
+    headers: {
+      'Accept': 'application/json',
+    },
+    credentials: 'include',
+  })
+  .then(res => res.json())
+  .then(res => {
+    if (!res) {
+      return { success : false }; // TODO: This loses error semantics and is deprecated
+    }
+
+    if (res && 'success' in res) {
+      return res;
+    } else {
+      return { success : false };
+    }
+  })
+  .catch(e => {
+    return { success : false };
+  });
+}
