@@ -54,6 +54,7 @@ pub struct AssignTtsCategoryResponse {
 #[derive(Debug, Serialize)]
 pub enum AssignTtsCategoryError {
   CategoryNotFound,
+  CategoryNotApplicable,
   ModelNotFound,
   NotAuthorized,
   ServerError,
@@ -63,6 +64,7 @@ impl ResponseError for AssignTtsCategoryError {
   fn status_code(&self) -> StatusCode {
     match *self {
       AssignTtsCategoryError::CategoryNotFound => StatusCode::NOT_FOUND,
+      AssignTtsCategoryError::CategoryNotApplicable => StatusCode::BAD_REQUEST,
       AssignTtsCategoryError::ModelNotFound => StatusCode::NOT_FOUND,
       AssignTtsCategoryError::NotAuthorized => StatusCode::UNAUTHORIZED,
       AssignTtsCategoryError::ServerError => StatusCode::INTERNAL_SERVER_ERROR,
@@ -138,6 +140,11 @@ pub async fn assign_tts_category_handler(
       warn!("user is not allowed to see this category: {}", user_session.user_token);
       return Err(AssignTtsCategoryError::ModelNotFound);
     }
+  }
+
+  if !category.can_directly_have_models {
+    warn!("category cannot have models: {}", category.category_token);
+    return Err(AssignTtsCategoryError::CategoryNotApplicable);
   }
 
   // NB: Second set of permission checks.
