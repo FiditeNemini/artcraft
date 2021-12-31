@@ -20,7 +20,7 @@ import { TtsModelUploadJob } from '../../jobs/TtsModelUploadJobs';
 import { TtsModelViewFc } from './tts/tts_model_view/TtsModelViewFc';
 import { TtsResultDeleteFc } from './tts/tts_result_delete/TtsResultDeleteFc';
 import { TtsResultViewFc } from './tts/tts_result_view/TtsResultViewFc';
-import { UploadChoiceFc } from './upload/UploadChoiceFc';
+import { ContributeIndexPage } from './contribute/ContributeIndexPage';
 import { UploadTtsModelFc } from './upload/UploadTtsModelFc';
 import { UploadW2lPhotoFc } from './upload/UploadW2lPhotoFc';
 import { UploadW2lVideoFc } from './upload/UploadW2lVideoFc';
@@ -267,8 +267,8 @@ class NewVocodesContainer extends React.Component<Props, State> {
               />
             </Route>
 
-            <Route path="/upload">
-              <UploadChoiceFc
+            <Route path="/contribute">
+              <ContributeIndexPage
                 sessionWrapper={this.props.sessionWrapper}
               />
             </Route>

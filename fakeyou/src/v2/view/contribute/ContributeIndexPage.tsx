@@ -7,7 +7,7 @@ interface Props {
   sessionWrapper: SessionWrapper,
 }
 
-function UploadChoiceFc(props: Props) {
+function ContributeIndexPage(props: Props) {
   const categoryActionName = props.sessionWrapper.canEditCategories() ? "Create" : "Suggest";
 
   return (
@@ -67,4 +67,4 @@ function UploadChoiceFc(props: Props) {
   )
 }
 
-export { UploadChoiceFc };
+export { ContributeIndexPage };

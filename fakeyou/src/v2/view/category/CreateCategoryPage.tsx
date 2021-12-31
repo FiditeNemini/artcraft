@@ -4,6 +4,8 @@ import { useHistory, Link } from "react-router-dom";
 import { v4 as uuidv4 } from 'uuid';
 import { CreateCategory, CreateCategoryIsError, CreateCategoryRequest } from '../../api/category/CreateCategory';
 import { CreateSessionIsSuccess } from '../../api/user/CreateSession';
+import { BackLink } from '../_common/BackLink';
+import { FrontendUrlConfig } from '../../../common/FrontendUrlConfig';
 
 const DEFAULT_CAN_DIRECTLY_HAVE_MODELS = true;
 const DEFAULT_CAN_HAVE_SUBCATEGORIES = false;
@@ -196,11 +198,7 @@ function CreateCategoryPage(props: Props) {
 
       <br />
 
-      <Link
-        to="/upload"
-        className="button is-link is-fullwidth is-outlined"
-        onClick={() => {}}
-        >&lt; Back to contribute</Link>
+      <BackLink link={FrontendUrlConfig.contributePage()} text="Back to contribute page" />
 
       <br />
     </div>

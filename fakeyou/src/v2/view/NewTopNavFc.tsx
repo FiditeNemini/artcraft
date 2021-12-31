@@ -30,7 +30,7 @@ function NewTopNavFc(props: Props) {
             >Video</Link>
         </div>
         <div className="column">
-          <Link to="/upload"
+          <Link to="/contribute"
             className="button is-link is-medium is-inverted"
             >Contribute</Link>
         </div>

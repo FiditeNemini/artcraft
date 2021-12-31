@@ -84,6 +84,12 @@ class FrontendUrlConfig {
     return `/profile/${userDisplayName}/ban`;
   }
 
+  // Contribute 
+
+  static contributePage() : string {
+    return '/contribute';
+  }
+  
   // Moderation links
 
   static moderationMain() : string {

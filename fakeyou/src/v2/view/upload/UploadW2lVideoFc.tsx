@@ -5,6 +5,8 @@ import { SessionWrapper } from '../../../session/SessionWrapper';
 import { W2lTemplateUploadJob } from '../../../jobs/W2lTemplateUploadJobs';
 import { useHistory, Link } from "react-router-dom";
 import { v4 as uuidv4 } from 'uuid';
+import { BackLink } from '../_common/BackLink';
+import { FrontendUrlConfig } from '../../../common/FrontendUrlConfig';
 
 interface W2lTemplateUploadJobResponsePayload {
   success: boolean,
@@ -142,11 +144,7 @@ function UploadW2lVideoFc(props: Props) {
       <br />
       <br />
 
-      <Link
-        to="/upload"
-        className="button is-link is-fullwidth is-outlined"
-        onClick={() => {}}
-        >&lt; Back to upload type selection</Link>
+      <BackLink link={FrontendUrlConfig.contributePage()} text="Back to contribute page" />
 
       <br />
       <br />

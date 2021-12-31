@@ -6,6 +6,8 @@ import { TtsModelUploadJob } from '../../../jobs/TtsModelUploadJobs';
 import { useHistory, Link } from "react-router-dom";
 import { v4 as uuidv4 } from 'uuid';
 import { DiscordLink } from '../_common/DiscordLink';
+import { BackLink } from '../_common/BackLink';
+import { FrontendUrlConfig } from '../../../common/FrontendUrlConfig';
 
 interface Props {
   sessionWrapper: SessionWrapper,
@@ -178,11 +180,8 @@ function UploadTtsModelFc(props: Props) {
         </div>*/}
       </form>
       <br />
-      <Link
-        to="/upload"
-        className="button is-link is-fullwidth is-outlined"
-        onClick={() => {}}
-        >&lt; Back to upload type selection</Link>
+
+      <BackLink link={FrontendUrlConfig.contributePage()} text="Back to contribute page" />
 
       <br />
       <br />
