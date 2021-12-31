@@ -69,8 +69,9 @@ pub struct DisplayCategory {
   pub creator_display_name: String,
   pub creator_gravatar_hash: String,
 
-  // Moderator fields
   pub is_mod_approved: Option<bool>,
+
+  /// Absent for non-mods
   pub maybe_mod_comments: Option<String>,
 
   pub created_at: DateTime<Utc>,
