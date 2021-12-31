@@ -233,7 +233,7 @@ function ModerationTtsCategoryEditPage(props: Props) {
             type="checkbox"
             checked={canOnlyModsApply} 
             onChange={handleCanOnlyModsApplyChange} />
-          &nbsp;Can only mods apply this category? (Model authors can't add this themselves.)
+          &nbsp;Can only mods apply this category? (Model authors can't add this themselves. For "Best of" and other special categories.)
         </label>
 
         <br />
@@ -274,6 +274,8 @@ function ModerationTtsCategoryEditPage(props: Props) {
             </div>
           </div>
         </div>
+
+        <br />
 
         <button className="button is-link is-large is-fullwidth"> Edit </button>
       </form>
