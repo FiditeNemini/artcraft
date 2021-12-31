@@ -13,6 +13,7 @@ import { GetTtsModel, GetTtsModelIsErr, GetTtsModelIsOk, TtsModel, TtsModelLooku
 import { GravatarFc } from '../../_common/GravatarFc';
 import { GetTtsModelUseCount } from '../../../api/tts/GetTtsModelUseCount';
 import { BackLink } from '../../_common/BackLink';
+import { ListTtsCategoriesForModel, ListTtsCategoriesForModelIsError, ListTtsCategoriesForModelIsOk, TtsModelCategory } from '../../../api/category/ListTtsCategoriesForModel';
 
 interface Props {
   sessionWrapper: SessionWrapper,
@@ -28,6 +29,8 @@ function TtsModelViewFc(props: Props) {
 
   const [ttsModel, setTtsModel] = useState<TtsModel|undefined>(undefined);
   const [ttsModelUseCount, setTtsModelUseCount] = useState<number|undefined>(undefined);
+  const [assignedCategories, setAssignedCategories] = useState<TtsModelCategory[]>([]);
+
   const [notFoundState, setNotFoundState] = useState<boolean>(false);
 
   const getModel = useCallback(async (token) => {
@@ -49,10 +52,21 @@ function TtsModelViewFc(props: Props) {
     setTtsModelUseCount(useCount)
   }, []);
 
+  const listTtsCategoriesForModel = useCallback(async (token) => {
+    const categoryList = await ListTtsCategoriesForModel(token);
+    if (ListTtsCategoriesForModelIsOk(categoryList)) {
+      setAssignedCategories(categoryList.categories);
+    } else if (ListTtsCategoriesForModelIsError(categoryList))  {
+      // TODO: Surface error.
+    }
+  }, []);
+
+
   useEffect(() => {
     getModel(token);
     getModelUseCount(token);
-  }, [token, getModel, getModelUseCount]);
+    listTtsCategoriesForModel(token);
+  }, [token, getModel, getModelUseCount, listTtsCategoriesForModel]);
 
   if (notFoundState) {
     return (
@@ -246,6 +260,26 @@ function TtsModelViewFc(props: Props) {
     );
   }
 
+  let modelCategories = null;
+  if (assignedCategories.length !== 0) {
+    modelCategories = (
+      <>
+        <h4 className="title is-4"> Model Categories </h4>
+        <div className="content">
+          <ul>
+          {assignedCategories.map(category => {
+            return (
+              <>
+                <li>{category.name}</li>
+              </>
+            );
+          })}
+          </ul>
+        </div>
+      </>
+    );
+  }
+
   const resultVisibility = ttsModel?.creator_set_visibility === 'hidden' ? 
     <span>Hidden <HiddenIconFc /></span> :
     <span>Public <VisibleIconFc /></span> ;
@@ -294,6 +328,7 @@ function TtsModelViewFc(props: Props) {
       <SessionTtsInferenceResultListFc ttsInferenceJobs={props.ttsInferenceJobs} />
     
       {modelDescription}
+      {modelCategories}
 
       <table className="table is-fullwidth">
         <tbody>
