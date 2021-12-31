@@ -142,7 +142,7 @@ pub async fn assign_tts_category_handler(
     }
   }
 
-  if !category.can_directly_have_models {
+  if request.assign && !category.can_directly_have_models {
     warn!("category cannot have models: {}", category.category_token);
     return Err(AssignTtsCategoryError::CategoryNotApplicable);
   }
