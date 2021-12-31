@@ -27,6 +27,7 @@ use sqlx::error::Error::Database;
 use sqlx::mysql::MySqlDatabaseError;
 use std::fmt;
 use std::sync::Arc;
+use crate::database::queries::categories::get_category_by_token::get_category_by_token;
 
 // =============== Request ===============
 
@@ -125,6 +126,31 @@ pub async fn edit_category_handler(
   if !user_session.can_ban_users {
     warn!("no permission to edit categories");
     return Err(EditCategoryError::NotAuthorized);
+  }
+
+  // Category tree integrity
+  if let Some(parent_category_token) = request.maybe_super_category_token.as_deref() {
+    if parent_category_token == &path.token {
+      return Err(EditCategoryError::BadInput(
+        "category cannot have itself as a parent".to_string()));
+    }
+
+    let parent_category_lookup
+        = get_category_by_token(parent_category_token, &server_state.mysql_pool).await;
+
+    match parent_category_lookup {
+      Ok(Some(parent_category)) => {
+        if !parent_category.can_have_subcategories {
+          return Err(EditCategoryError::BadInput(
+            "parent category cannot have children".to_string()));
+        }
+      },
+      Ok(None) => return Err(EditCategoryError::NotFound),
+      Err(err) => {
+        warn!("Category lookup DB error: {:?}", err);
+        return Err(EditCategoryError::ServerError)
+      },
+    }
   }
 
   let query_result =
