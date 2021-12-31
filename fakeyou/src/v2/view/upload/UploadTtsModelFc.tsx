@@ -3,7 +3,7 @@ import { ApiConfig } from '../../../common/ApiConfig';
 import { SessionTtsModelUploadResultListFc } from '../_common/SessionTtsModelUploadResultsListFc';
 import { SessionWrapper } from '../../../session/SessionWrapper';
 import { TtsModelUploadJob } from '../../../jobs/TtsModelUploadJobs';
-import { useHistory, Link } from "react-router-dom";
+import { useHistory } from "react-router-dom";
 import { v4 as uuidv4 } from 'uuid';
 import { DiscordLink } from '../_common/DiscordLink';
 import { BackLink } from '../_common/BackLink';

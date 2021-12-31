@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { SessionWrapper } from '../../../session/SessionWrapper';
-import { useHistory, Link } from "react-router-dom";
+import { useHistory } from "react-router-dom";
 import { v4 as uuidv4 } from 'uuid';
 import { CreateCategory, CreateCategoryIsError, CreateCategoryRequest } from '../../api/category/CreateCategory';
 import { CreateSessionIsSuccess } from '../../api/user/CreateSession';

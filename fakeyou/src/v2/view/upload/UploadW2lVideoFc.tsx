@@ -3,7 +3,7 @@ import { ApiConfig } from '../../../common/ApiConfig';
 import { SessionW2lTemplateUploadResultListFc } from '../_common/SessionW2lTemplateUploadResultsListFc';
 import { SessionWrapper } from '../../../session/SessionWrapper';
 import { W2lTemplateUploadJob } from '../../../jobs/W2lTemplateUploadJobs';
-import { useHistory, Link } from "react-router-dom";
+import { useHistory } from "react-router-dom";
 import { v4 as uuidv4 } from 'uuid';
 import { BackLink } from '../_common/BackLink';
 import { FrontendUrlConfig } from '../../../common/FrontendUrlConfig';
