@@ -264,7 +264,6 @@ function TtsModelViewFc(props: Props) {
   if (assignedCategories.length !== 0) {
     modelCategories = (
       <>
-        <h4 className="title is-4"> Model Categories </h4>
         <div className="content">
           <ul>
           {assignedCategories.map(category => {
@@ -328,7 +327,11 @@ function TtsModelViewFc(props: Props) {
       <SessionTtsInferenceResultListFc ttsInferenceJobs={props.ttsInferenceJobs} />
     
       {modelDescription}
+
+      <h4 className="title is-4"> Model Categories </h4>
       {modelCategories}
+      {editModelCategoriesButton}
+      <br />
 
       <table className="table is-fullwidth">
         <tbody>
@@ -378,8 +381,6 @@ function TtsModelViewFc(props: Props) {
       </table>
 
       {editModelButton}
-
-      {editModelCategoriesButton}
 
       {deleteModelButton}
 

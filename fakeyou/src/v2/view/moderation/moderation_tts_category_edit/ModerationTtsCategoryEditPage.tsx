@@ -136,7 +136,7 @@ function ModerationTtsCategoryEditPage(props: Props) {
     <div>
       <h1 className="title is-1"> Moderate TTS Category </h1>
 
-      <BackLink link={FrontendUrlConfig.moderationMain()} text="Back to moderation" />
+      <BackLink link={FrontendUrlConfig.moderationTtsCategoryList()} text="Back to category list" />
 
       <br />
 
@@ -214,9 +214,7 @@ function ModerationTtsCategoryEditPage(props: Props) {
 
       <br />
 
-
-
-      <BackLink link={FrontendUrlConfig.moderationMain()} text="Back to moderation" />
+      <BackLink link={FrontendUrlConfig.moderationTtsCategoryList()} text="Back to category list" />
     </div>
   )
 }
