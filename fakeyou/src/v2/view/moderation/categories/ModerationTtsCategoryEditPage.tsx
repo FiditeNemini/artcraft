@@ -7,6 +7,8 @@ import { SessionWrapper } from '../../../../session/SessionWrapper';
 import { useParams } from 'react-router-dom';
 import { EditCategory, EditCategoryIsError, EditCategoryIsSuccess, EditCategoryRequest } from '../../../api/moderation/category/EditCategory';
 import { ListTtsCategories, ListTtsCategoriesIsError, ListTtsCategoriesIsOk, TtsCategory } from '../../../api/category/ListTtsCategories';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faChevronRight } from '@fortawesome/free-solid-svg-icons';
 
 interface Props {
   sessionWrapper: SessionWrapper,
@@ -31,7 +33,6 @@ function ModerationTtsCategoryEditPage(props: Props) {
 
   // Additional object lookups to support parent categories
   const [allTtsCategories, setAllTtsCategories] = useState<TtsCategory[]>([]);
-  //const [maybeSuperCategory, setMaybeSuperCategory] = useState<Category|undefined>(undefined);
 
   const [errorMessage, setErrorMessage] = useState<string|undefined>(undefined); 
 
@@ -54,17 +55,6 @@ function ModerationTtsCategoryEditPage(props: Props) {
     }
   }, []);
   
-  //const getSuperCategory = useCallback(async (parentCategoryToken: string) => {
-  //  const categoryList = await GetCategory(parentCategoryToken);
-
-  //  if (GetCategoryIsOk(categoryList)) {
-  //    const category = categoryList.category;
-  //    setMaybeSuperCategory(category);
-  //  } else if (GetCategoryIsError(categoryList))  {
-  //    setErrorMessage("error fetching parent category");
-  //  }
-  //}, []);
-
   const listTtsCategories = useCallback(async () => {
     const categoryList = await ListTtsCategories();
 
@@ -207,12 +197,25 @@ function ModerationTtsCategoryEditPage(props: Props) {
     );
   }
 
+  const categoryHierarchy = recursiveBuildHierarchy(allTtsCategories, token);
+
+  const breadcrumbs = categoryHierarchy
+      .map(category => <>
+          <Link to={FrontendUrlConfig.moderationTtsCategoryEdit(category.category_token)}
+            >{category.name}</Link>
+      </>)
+      .reduce((acc, cur) => <>{acc} <FontAwesomeIcon icon={faChevronRight}/> {cur}</>)
+
   return (
     <div>
       <h1 className="title is-1"> Moderate TTS Category </h1>
 
       <BackLink link={FrontendUrlConfig.moderationTtsCategoryList()} text="Back to category list" />
 
+      <br />
+      <br />
+
+      {breadcrumbs}
       <br />
 
       {errorFlash}
@@ -326,6 +329,17 @@ function ModerationTtsCategoryEditPage(props: Props) {
       <BackLink link={FrontendUrlConfig.moderationTtsCategoryList()} text="Back to category list" />
     </div>
   )
+}
+
+function recursiveBuildHierarchy(allCategories: TtsCategory[], currentToken: string): TtsCategory[] {
+  let found = allCategories.find(category => category.category_token === currentToken);
+  if (found === undefined) {
+    return [];
+  }
+  if (found.maybe_super_category_token === undefined) {
+    return [found];
+  }
+  return [...recursiveBuildHierarchy(allCategories, found.maybe_super_category_token), found];
 }
 
 export { ModerationTtsCategoryEditPage };
