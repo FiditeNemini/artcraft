@@ -103,6 +103,10 @@ class FrontendUrlConfig {
   static moderationTtsCategoryEdit(categoryToken: string) : string {
     return `/moderation/tts_category/edit/${categoryToken}`;
   }
+
+  static moderationCategoryDeletePage(categoryToken: string) : string {
+    return `/moderation/category/delete/${categoryToken}`;
+  }
 }
 
 export { FrontendUrlConfig }

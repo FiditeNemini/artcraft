@@ -46,6 +46,7 @@ import { CreateCategoryPage } from './category/CreateCategoryPage';
 import { TtsEditCategoriesPage } from './tts/tts_edit_categories/TtsEditCategoriesPage';
 import { ModerationTtsCategoryListPage } from './moderation/moderation_tts_category_list/ModerationTtsCategoryListPage';
 import { ModerationTtsCategoryEditPage } from './moderation/moderation_tts_category_edit/ModerationTtsCategoryEditPage';
+import { ModerationCategoryDeletePage } from './moderation/moderation_category_delete/ModerationCategoryDeletePage';
 
 interface Props {
   sessionWrapper: SessionWrapper,
@@ -317,6 +318,12 @@ class NewVocodesContainer extends React.Component<Props, State> {
 
             <Route path="/moderation/tts_category/edit/:token">
               <ModerationTtsCategoryEditPage
+                sessionWrapper={this.props.sessionWrapper}
+              />
+            </Route>
+            
+            <Route path="/moderation/category/delete/:token">
+              <ModerationCategoryDeletePage
                 sessionWrapper={this.props.sessionWrapper}
               />
             </Route>

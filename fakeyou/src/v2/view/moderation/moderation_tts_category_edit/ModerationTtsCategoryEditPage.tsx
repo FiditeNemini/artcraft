@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { BackLink } from '../../_common/BackLink';
 import { Category, GetCategory, GetCategoryIsError, GetCategoryIsOk } from '../../../api/category/GetCategory';
 import { FrontendUrlConfig } from '../../../../common/FrontendUrlConfig';
-import { useHistory } from 'react-router-dom';
+import { Link, useHistory } from 'react-router-dom';
 import { SessionWrapper } from '../../../../session/SessionWrapper';
 import { useParams } from 'react-router-dom';
 import { EditCategory, EditCategoryIsError, EditCategoryIsSuccess, EditCategoryRequest } from '../../../api/category/EditCategory';
@@ -157,6 +157,7 @@ function ModerationTtsCategoryEditPage(props: Props) {
   if (!!errorMessage) {
     errorFlash = (
       <>
+        <br />
         <article className="message is-error">
           <div className="message-body">
             {errorMessage}
@@ -181,6 +182,29 @@ function ModerationTtsCategoryEditPage(props: Props) {
     )
   });
 
+  const currentlyDeleted = !!category?.deleted_at;
+
+  const deleteButtonTitle = currentlyDeleted ? "Undelete Model?" : "Delete Model?";
+
+  const deleteButtonCss = currentlyDeleted ? 
+    "button is-warning is-large is-fullwidth" :
+    "button is-danger is-large is-fullwidth";
+
+  let deletedNotice = <></>;
+
+  if (currentlyDeleted) {
+    deletedNotice = (
+      <>
+        <br />
+        <article className="message is-warning">
+          <div className="message-body">
+            Category is currently deleted and will not show up unless undeleted.
+          </div>
+        </article>
+      </>
+    );
+  }
+
   return (
     <div>
       <h1 className="title is-1"> Moderate TTS Category </h1>
@@ -190,8 +214,10 @@ function ModerationTtsCategoryEditPage(props: Props) {
       <br />
 
       {errorFlash}
+      {deletedNotice}
 
       <br />
+
 
       <form onSubmit={handleFormSubmit}>
 
@@ -277,8 +303,17 @@ function ModerationTtsCategoryEditPage(props: Props) {
 
         <br />
 
-        <button className="button is-link is-large is-fullwidth"> Edit </button>
+        <button className="button is-link is-large is-fullwidth"> Save Changes </button>
+
       </form>
+
+      <br />
+
+      <Link 
+        className={deleteButtonCss}
+        to={FrontendUrlConfig.moderationCategoryDeletePage(token)}
+        >{deleteButtonTitle}</Link>
+
 
       <br />
 
