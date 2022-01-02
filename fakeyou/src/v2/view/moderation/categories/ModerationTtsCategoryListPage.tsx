@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { SessionWrapper } from '../../../../session/SessionWrapper';
 import { FrontendUrlConfig } from '../../../../common/FrontendUrlConfig';
 import { BackLink } from '../../_common/BackLink';
-import { ListTtsCategoriesForModeration, ListTtsCategoriesForModerationIsError, ListTtsCategoriesForModerationIsOk, ModerationTtsCategory } from '../../../api/moderation/category/ListTtsCategoriesForModeration';
+import { ListTtsCategoriesForModeration, ListTtsCategoriesForModerationIsError, ListTtsCategoriesForModerationIsOk, ListTtsCategoriesTriState, ModerationTtsCategory } from '../../../api/moderation/category/ListTtsCategoriesForModeration';
 import { GravatarFc } from '../../_common/GravatarFc';
 import { Link } from 'react-router-dom';
 
@@ -14,15 +14,18 @@ function ModerationTtsCategoryListPage(props: Props) {
   const [ttsCategories, setTtsCategories] = useState<ModerationTtsCategory[]>([]);
   const [errorMessage, setErrorMessage] = useState<string|undefined>(undefined); 
 
+  const [deletedView, setDeletedView] = useState<ListTtsCategoriesTriState>(ListTtsCategoriesTriState.Exclude); 
+  const [unapprovedView, setUnapprovedView] = useState<ListTtsCategoriesTriState>(ListTtsCategoriesTriState.Include); 
+
   const listTtsCategories = useCallback(async () => {
-    const categoryList = await ListTtsCategoriesForModeration();
+    const categoryList = await ListTtsCategoriesForModeration(deletedView, unapprovedView);
 
     if (ListTtsCategoriesForModerationIsOk(categoryList)) {
       setTtsCategories(categoryList.categories);
     } else if (ListTtsCategoriesForModerationIsError(categoryList))  {
       setErrorMessage("error listing all categories");
     }
-  }, []);
+  }, [deletedView, unapprovedView]);
 
   useEffect(() => {
     listTtsCategories();
@@ -30,6 +33,22 @@ function ModerationTtsCategoryListPage(props: Props) {
 
   if (!props.sessionWrapper.canBanUsers()) {
     return <h1>Unauthorized</h1>;
+  }
+
+  const handleDeletedChange = (ev: React.FormEvent<HTMLInputElement>) => {
+    const value = (ev.target as HTMLInputElement).value;
+    const maybeTriState = StringToTriState(value);
+    if (maybeTriState !== undefined) {
+      setDeletedView(maybeTriState);
+    }
+  }
+
+  const handleUnapprovedChange = (ev: React.FormEvent<HTMLInputElement>) => {
+    const value = (ev.target as HTMLInputElement).value;
+    const maybeTriState = StringToTriState(value);
+    if (maybeTriState !== undefined) {
+      setUnapprovedView(maybeTriState);
+    }
   }
 
   let errorFlash = <></>;
@@ -55,6 +74,42 @@ function ModerationTtsCategoryListPage(props: Props) {
       <br />
 
       {errorFlash}
+
+      <br />
+
+      <div className="control">
+        <strong>Show Unapproved:</strong>
+        &nbsp;
+        <label className="radio">
+          <input type="radio" name="unapproved" value="include" onChange={handleUnapprovedChange} />
+          Include
+        </label>
+        <label className="radio">
+          <input type="radio" name="unapproved" value="exclude" onChange={handleUnapprovedChange} />
+          Exclude
+        </label>
+        <label className="radio">
+          <input type="radio" name="unapproved" value="only" onChange={handleUnapprovedChange} />
+          Only
+        </label>
+      </div>
+
+      <div className="control">
+        <strong>Show Deleted:</strong>
+        &nbsp;
+        <label className="radio">
+          <input type="radio" name="deleted" value="include" onChange={handleDeletedChange} />
+          Include
+        </label>
+        <label className="radio">
+          <input type="radio" name="deleted" value="exclude" onChange={handleDeletedChange} />
+          Exclude
+        </label>
+        <label className="radio">
+          <input type="radio" name="deleted" value="only" onChange={handleDeletedChange} />
+          Only
+        </label>
+      </div>
 
       <br />
       
@@ -108,7 +163,7 @@ function ModerationTtsCategoryListPage(props: Props) {
             }
 
             return (
-              <tr>
+              <tr key={category.category_token}>
                 <td>
                   {name}
                 </td>
@@ -130,6 +185,17 @@ function ModerationTtsCategoryListPage(props: Props) {
       <BackLink link={FrontendUrlConfig.moderationMain()} text="Back to moderation" />
     </div>
   )
+}
+
+function StringToTriState(state: string) : ListTtsCategoriesTriState | undefined {
+  switch (state) {
+    case 'include':
+      return ListTtsCategoriesTriState.Include;
+    case 'exclude':
+      return ListTtsCategoriesTriState.Exclude;
+    case 'only':
+      return ListTtsCategoriesTriState.Only;
+  }
 }
 
 export { ModerationTtsCategoryListPage };

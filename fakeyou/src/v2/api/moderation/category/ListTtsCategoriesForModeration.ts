@@ -1,5 +1,11 @@
 import { ApiConfig } from "../../../../common/ApiConfig";
 
+export enum ListTtsCategoriesTriState {
+  Include,
+  Exclude,
+  Only,
+}
+
 export interface ListTtsCategoriesForModerationSuccessResponse {
   success: boolean,
   categories: Array<ModerationTtsCategory>
@@ -44,9 +50,14 @@ export function ListTtsCategoriesForModerationIsError(response: ListTtsCategorie
   return response?.success === false;
 }
 
-export async function ListTtsCategoriesForModeration() : Promise<ListTtsCategoriesForModerationResponse> 
+export async function ListTtsCategoriesForModeration(deleted: ListTtsCategoriesTriState, unapproved: ListTtsCategoriesTriState) : Promise<ListTtsCategoriesForModerationResponse> 
 {
-  const endpoint = new ApiConfig().getModerationTtsCategoryList();
+  let endpoint = new ApiConfig().getModerationTtsCategoryList();
+
+  let deletedState = TriStateToString(deleted);
+  let unapprovedState = TriStateToString(unapproved);
+
+  endpoint = `${endpoint}?deleted=${deletedState}&unapproved=${unapprovedState}`;
   
   return await fetch(endpoint, {
     method: 'GET',
@@ -70,4 +81,15 @@ export async function ListTtsCategoriesForModeration() : Promise<ListTtsCategori
   .catch(e => {
     return { success : false };
   });
+}
+
+function TriStateToString(state: ListTtsCategoriesTriState) : string {
+  switch (state) {
+    case ListTtsCategoriesTriState.Include:
+      return 'include';
+    case ListTtsCategoriesTriState.Exclude:
+      return 'exclude';
+    case ListTtsCategoriesTriState.Only:
+      return 'only';
+  }
 }
