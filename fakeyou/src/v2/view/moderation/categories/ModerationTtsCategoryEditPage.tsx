@@ -172,12 +172,14 @@ function ModerationTtsCategoryEditPage(props: Props) {
 
   const superCategoryOptions = allTtsCategories.filter(category => {
     const isSelf = token === category.category_token;
-    const cannotAdd = !category.can_directly_have_models;
+    const cannotAdd = !category.can_have_subcategories;
     return !isSelf && !cannotAdd;
   }).map(category => {
     return (
       <>
-        <option value={category.category_token}>{category.name}</option>
+        <option 
+            value={category.category_token} 
+            key={category.category_token}>{category.name}</option>
       </>
     )
   });
@@ -245,7 +247,12 @@ function ModerationTtsCategoryEditPage(props: Props) {
         <div className="field">
           <label className="label">Dropdown Name Override (optional)</label>
           <div className="control">
-            <input className="input" type="text" placeholder="Dropdown Name" value={maybeDropdownName} onChange={handleMaybeDropdownNameChange} />
+            <input 
+                className="input" 
+                type="text" 
+                placeholder="Dropdown Name" 
+                value={maybeDropdownName || ""} 
+                onChange={handleMaybeDropdownNameChange} />
           </div>
           <p>(eg. if the category name is "Gender", this might be named "By Gender" for the dropdown.)</p>
         </div>
@@ -294,7 +301,7 @@ function ModerationTtsCategoryEditPage(props: Props) {
           <div className="control">
             <div className="select is-info">
               <select onChange={handleSetSuperCategory} value={maybeSuperCategoryTokenFormHtmlState}>
-                <option value="">None (this is optional)</option>
+                <option value="" key="">None (this is optional)</option>
                 {superCategoryOptions}
               </select>
             </div>
