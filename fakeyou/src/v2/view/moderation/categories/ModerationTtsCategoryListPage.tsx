@@ -81,15 +81,30 @@ function ModerationTtsCategoryListPage(props: Props) {
         <strong>Show Unapproved:</strong>
         &nbsp;
         <label className="radio">
-          <input type="radio" name="unapproved" value="include" onChange={handleUnapprovedChange} />
+          <input 
+            type="radio" 
+            name="unapproved" 
+            value="include" 
+            checked={unapprovedView === ListTtsCategoriesTriState.Include}
+            onChange={handleUnapprovedChange} />
           Include
         </label>
         <label className="radio">
-          <input type="radio" name="unapproved" value="exclude" onChange={handleUnapprovedChange} />
+          <input 
+            type="radio" 
+            name="unapproved" 
+            value="exclude" 
+            checked={unapprovedView === ListTtsCategoriesTriState.Exclude}
+            onChange={handleUnapprovedChange} />
           Exclude
         </label>
         <label className="radio">
-          <input type="radio" name="unapproved" value="only" onChange={handleUnapprovedChange} />
+          <input 
+            type="radio" 
+            name="unapproved" 
+            value="only" 
+            checked={unapprovedView === ListTtsCategoriesTriState.Only}
+            onChange={handleUnapprovedChange} />
           Only
         </label>
       </div>
@@ -98,15 +113,30 @@ function ModerationTtsCategoryListPage(props: Props) {
         <strong>Show Deleted:</strong>
         &nbsp;
         <label className="radio">
-          <input type="radio" name="deleted" value="include" onChange={handleDeletedChange} />
+          <input 
+            type="radio" 
+            name="deleted" 
+            value="include" 
+            checked={deletedView === ListTtsCategoriesTriState.Include}
+            onChange={handleDeletedChange} />
           Include
         </label>
         <label className="radio">
-          <input type="radio" name="deleted" value="exclude" onChange={handleDeletedChange} />
+          <input 
+            type="radio" 
+            name="deleted" 
+            value="exclude" 
+            checked={deletedView === ListTtsCategoriesTriState.Exclude}
+            onChange={handleDeletedChange} />
           Exclude
         </label>
         <label className="radio">
-          <input type="radio" name="deleted" value="only" onChange={handleDeletedChange} />
+          <input 
+            type="radio" 
+            name="deleted" 
+            value="only" 
+            checked={deletedView === ListTtsCategoriesTriState.Only}
+            onChange={handleDeletedChange} />
           Only
         </label>
       </div>
@@ -189,9 +219,9 @@ function ModerationTtsCategoryListPage(props: Props) {
       </table>
 
       <p>
-        Only approved, non-deleted categories will show up publicly. New category suggestions by 
-        non-mods are "unapproved" by default. Use "deletion" to hide categories you don't want to 
-        deal with anymore.
+        <strong>Note: </strong> Only approved, non-deleted categories will show up publicly. 
+        New category suggestions by non-mods are "unapproved" by default. 
+        Use "deletion" to hide categories you don't want to deal with anymore.
       </p>
 
       <br />
