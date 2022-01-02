@@ -44,9 +44,9 @@ import { ModerationPendingW2lTemplatesFc } from './moderation/moderation_pending
 import { ModerationVoiceStatsFc } from './moderation/moderation_voice_stats/ModerationVoiceStatsFc';
 import { CreateCategoryPage } from './category/CreateCategoryPage';
 import { TtsEditCategoriesPage } from './tts/tts_edit_categories/TtsEditCategoriesPage';
-import { ModerationTtsCategoryListPage } from './moderation/moderation_tts_category_list/ModerationTtsCategoryListPage';
-import { ModerationTtsCategoryEditPage } from './moderation/moderation_tts_category_edit/ModerationTtsCategoryEditPage';
-import { ModerationCategoryDeletePage } from './moderation/moderation_category_delete/ModerationCategoryDeletePage';
+import { ModerationTtsCategoryListPage } from './moderation/categories/ModerationTtsCategoryListPage';
+import { ModerationTtsCategoryEditPage } from './moderation/categories/ModerationTtsCategoryEditPage';
+import { ModerationCategoryDeletePage } from './moderation/categories/ModerationCategoryDeletePage';
 
 interface Props {
   sessionWrapper: SessionWrapper,
