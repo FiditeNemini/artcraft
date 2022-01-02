@@ -5,6 +5,8 @@ import { BackLink } from '../../_common/BackLink';
 import { ListTtsCategoriesForModeration, ListTtsCategoriesForModerationIsError, ListTtsCategoriesForModerationIsOk, ListTtsCategoriesTriState, ModerationTtsCategory } from '../../../api/moderation/category/ListTtsCategoriesForModeration';
 import { GravatarFc } from '../../_common/GravatarFc';
 import { Link } from 'react-router-dom';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faLock } from '@fortawesome/free-solid-svg-icons';
 
 interface Props {
   sessionWrapper: SessionWrapper,
@@ -155,16 +157,20 @@ function ModerationTtsCategoryListPage(props: Props) {
         </thead>
         <tbody>
           {ttsCategories.map(category => {
-            let name = <>{category.name}</>;
+            let modOnlyIcon = category.can_only_mods_apply ? 
+              <>&nbsp;<FontAwesomeIcon icon={faLock} title={"mod only"} /></> :
+              <></>;
+
+            let name = <>{category.name}{modOnlyIcon}</>;
 
             if (!!category.maybe_dropdown_name) {
               name = (
                 <>
-                  {category.name}<br />
+                  {category.name}{modOnlyIcon}
+                  <br />
                   ({category.maybe_dropdown_name})
                 </>
               );
-
             }
 
             let creatorLink = <span />;
