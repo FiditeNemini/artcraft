@@ -5,7 +5,7 @@ import { FrontendUrlConfig } from '../../../../common/FrontendUrlConfig';
 import { Link, useHistory } from 'react-router-dom';
 import { SessionWrapper } from '../../../../session/SessionWrapper';
 import { useParams } from 'react-router-dom';
-import { EditCategory, EditCategoryIsError, EditCategoryIsSuccess, EditCategoryRequest } from '../../../api/category/EditCategory';
+import { EditCategory, EditCategoryIsError, EditCategoryIsSuccess, EditCategoryRequest } from '../../../api/moderation/category/EditCategory';
 import { ListTtsCategories, ListTtsCategoriesIsError, ListTtsCategoriesIsOk, TtsCategory } from '../../../api/category/ListTtsCategories';
 
 interface Props {
@@ -184,7 +184,7 @@ function ModerationTtsCategoryEditPage(props: Props) {
 
   const currentlyDeleted = !!category?.deleted_at;
 
-  const deleteButtonTitle = currentlyDeleted ? "Undelete Model?" : "Delete Model?";
+  const deleteButtonTitle = currentlyDeleted ? "Undelete Category?" : "Delete Category?";
 
   const deleteButtonCss = currentlyDeleted ? 
     "button is-warning is-large is-fullwidth" :
@@ -313,7 +313,6 @@ function ModerationTtsCategoryEditPage(props: Props) {
         className={deleteButtonCss}
         to={FrontendUrlConfig.moderationCategoryDeletePage(token)}
         >{deleteButtonTitle}</Link>
-
 
       <br />
 

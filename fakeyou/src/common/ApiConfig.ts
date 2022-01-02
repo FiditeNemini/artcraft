@@ -322,6 +322,10 @@ class ApiConfig {
     return `${this.getScheme()}://${this.getNewApiHost()}/moderation/categories/${categoryToken}/edit`;
   }
 
+  moderatorSetCategoryDeletionState(categoryToken: string) : string {
+    return `${this.getScheme()}://${this.getNewApiHost()}/moderation/categories/${categoryToken}/delete`;
+  }
+
   private getScheme() : string {
     return this.useSsl ? "https" : "http";
   }

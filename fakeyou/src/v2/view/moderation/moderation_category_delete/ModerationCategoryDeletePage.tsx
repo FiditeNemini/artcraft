@@ -5,8 +5,7 @@ import { FrontendUrlConfig } from '../../../../common/FrontendUrlConfig';
 import { Link, useHistory } from 'react-router-dom';
 import { SessionWrapper } from '../../../../session/SessionWrapper';
 import { useParams } from 'react-router-dom';
-import { EditCategory, EditCategoryIsError, EditCategoryIsSuccess, EditCategoryRequest } from '../../../api/category/EditCategory';
-import { ListTtsCategories, ListTtsCategoriesIsError, ListTtsCategoriesIsOk, TtsCategory } from '../../../api/category/ListTtsCategories';
+import { SetCategoryDeletionState, SetCategoryDeletionStateIsError, SetCategoryDeletionStateIsSuccess } from '../../../api/moderation/category/SetCategoryDeletionState';
 
 interface Props {
   sessionWrapper: SessionWrapper,
@@ -44,29 +43,25 @@ function ModerationCategoryDeletePage(props: Props) {
     return <div />
   }
 
+  const currentlyDeleted = !!category?.deleted_at;
+
+  const deletePageTitle = currentlyDeleted ? "Undelete Category?" : "Delete Category?";
+  const deleteButtonTitle = currentlyDeleted ? "Confirm Undelete Category" : "Confirm Delete Category";
+
+  const deleteButtonCss = currentlyDeleted ? 
+    "button is-warning is-large is-fullwidth" :
+    "button is-danger is-large is-fullwidth";
+
   const handleFormSubmit = async (ev: React.FormEvent<HTMLFormElement>) : Promise<boolean> => {
     ev.preventDefault();
 
-    /*setErrorMessage(undefined);
+    let response = await SetCategoryDeletionState(token, !currentlyDeleted);
 
-    let request : EditCategoryRequest = {
-      name: name,
-      maybe_dropdown_name: maybeDropdownName,
-      maybe_mod_comments: maybeModComments,
-      maybe_super_category_token: maybeSuperCategoryToken,
-      can_directly_have_models: canDirectlyHaveModels,
-      can_have_subcategories: canHaveSubcategories,
-      can_only_mods_apply: canOnlyModsApply,
-      is_mod_approved: isModApproved,
-    }
-
-    const response = await EditCategory(token, request);
-
-    if (EditCategoryIsError(response)) {
+    if (SetCategoryDeletionStateIsError(response)) {
       setErrorMessage('there was an error with the request'); // TODO: Fix error serialization
-    } else if (EditCategoryIsSuccess(response)) {
-      history.go(0); // NB: Force reload
-    }*/
+    } else if (SetCategoryDeletionStateIsSuccess(response)) {
+      history.push(FrontendUrlConfig.moderationTtsCategoryEdit(token));
+    }
 
     return false;
   }
@@ -85,15 +80,6 @@ function ModerationCategoryDeletePage(props: Props) {
       </>
     );
   }
-
-  const currentlyDeleted = !!category?.deleted_at;
-
-  const deletePageTitle = currentlyDeleted ? "Undelete Category?" : "Delete Category?";
-  const deleteButtonTitle = currentlyDeleted ? "Confirm Undelete Category" : "Confirm Delete Category";
-
-  const deleteButtonCss = currentlyDeleted ? 
-    "button is-warning is-large is-fullwidth" :
-    "button is-danger is-large is-fullwidth";
 
   return (
     <div>
@@ -139,6 +125,12 @@ function ModerationCategoryDeletePage(props: Props) {
             <th>Is Mod Approved?</th>
             <td>
               {category.is_mod_approved ? "Yes" : "No"}
+            </td>
+          </tr>
+          <tr>
+            <th>Is Currently Deleted?</th>
+            <td>
+              {currentlyDeleted ? "Yes" : "No"}
             </td>
           </tr>
         </tbody>

@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { SessionWrapper } from '../../../../session/SessionWrapper';
 import { FrontendUrlConfig } from '../../../../common/FrontendUrlConfig';
 import { BackLink } from '../../_common/BackLink';
-import { ListTtsCategoriesForModeration, ListTtsCategoriesForModerationIsError, ListTtsCategoriesForModerationIsOk, ModerationTtsCategory } from '../../../api/category/ListTtsCategoriesForModeration';
+import { ListTtsCategoriesForModeration, ListTtsCategoriesForModerationIsError, ListTtsCategoriesForModerationIsOk, ModerationTtsCategory } from '../../../api/moderation/category/ListTtsCategoriesForModeration';
 import { GravatarFc } from '../../_common/GravatarFc';
 import { Link } from 'react-router-dom';
 

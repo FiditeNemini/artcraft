@@ -1,4 +1,4 @@
-import { ApiConfig } from "../../../common/ApiConfig";
+import { ApiConfig } from "../../../../common/ApiConfig";
 
 export interface EditCategoryRequest {
   name: string,
