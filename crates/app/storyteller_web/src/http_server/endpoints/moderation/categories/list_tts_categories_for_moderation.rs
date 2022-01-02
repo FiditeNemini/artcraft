@@ -29,6 +29,26 @@ use sqlx::mysql::MySqlDatabaseError;
 use std::fmt;
 use std::sync::Arc;
 
+// =============== Request ===============
+
+#[derive(Deserialize, Copy, Clone, Debug)]
+#[serde(rename_all = "snake_case")]
+pub enum ViewState {
+  /// 'exclude'; keep the objects out
+  Exclude,
+  /// 'include'; include the objects
+  Include,
+  /// 'only'; limit to just the objects
+  Only,
+}
+
+// Only show approved&non-deleted , only show un-approved, only show deleted
+#[derive(Deserialize)]
+pub struct QueryParams {
+  deleted: Option<ViewState>,
+  unapproved: Option<ViewState>,
+}
+
 // =============== Success Response ===============
 
 #[derive(Serialize)]
@@ -98,6 +118,7 @@ impl fmt::Display for ListTtsCategoriesForModerationError {
 
 pub async fn list_tts_categories_for_moderation_handler(
   http_request: HttpRequest,
+  query: web::Query<QueryParams>,
   server_state: web::Data<Arc<ServerState>>) -> Result<HttpResponse, ListTtsCategoriesForModerationError>
 {
   let maybe_user_session = server_state
@@ -123,11 +144,25 @@ pub async fn list_tts_categories_for_moderation_handler(
     return Err(ListTtsCategoriesForModerationError::NotAuthorized);
   }
 
-  let query_builder = ListCategoriesQueryBuilder::new()
-      .show_deleted(true)
-      .show_unapproved(true)
+  // The objects we'll show or hide
+  let delete_state = query.deleted.unwrap_or(ViewState::Exclude);
+  let unapproved_state = query.unapproved.unwrap_or(ViewState::Include);
+
+  let mut query_builder = ListCategoriesQueryBuilder::new()
       .scope_model_type(Some("tts"));
-  
+
+  query_builder = match delete_state {
+    ViewState::Exclude => query_builder.show_deleted(false),
+    ViewState::Include => query_builder.show_deleted(true),
+    ViewState::Only => query_builder.show_deleted(true).hide_non_deleted(true),
+  };
+
+  query_builder = match unapproved_state {
+    ViewState::Exclude => query_builder.show_unapproved(false),
+    ViewState::Include => query_builder.show_unapproved(true),
+    ViewState::Only => query_builder.show_unapproved(true).hide_approved(true),
+  };
+
   let query_result =
       query_builder.perform_query(&server_state.mysql_pool).await;
 

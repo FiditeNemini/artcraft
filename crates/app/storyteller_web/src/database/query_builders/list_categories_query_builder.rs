@@ -57,6 +57,16 @@ pub struct ListCategoriesQueryBuilder {
   // will want to see them.
   show_deleted: bool,
 
+  // Filter out approved records.
+  // Useful as a moderation filter.
+  // Doesn't make sense to use with `show_unapproved`, but don't want to refactor atm.
+  hide_approved: bool,
+
+  // Filter out records with a non-deleted timestamp.
+  // Useful as a moderation filter.
+  // Doesn't make sense to use with `show_deleted`, but don't want to refactor atm.
+  hide_non_deleted: bool,
+
   // Useful for showing categories a user themselves has suggested
   // We don't want users spamming creation.
   scope_creator_user_token: Option<String>,
@@ -71,6 +81,8 @@ impl ListCategoriesQueryBuilder {
     Self {
       show_unapproved: false,
       show_deleted: false,
+      hide_approved: false,
+      hide_non_deleted: false,
       scope_creator_user_token: None,
       scope_model_type: None,
     }
@@ -83,6 +95,16 @@ impl ListCategoriesQueryBuilder {
 
   pub fn show_deleted(mut self, show_deleted: bool) -> Self {
     self.show_deleted = show_deleted;
+    self
+  }
+
+  pub fn hide_approved(mut self, hide_approved: bool) -> Self {
+    self.hide_approved = hide_approved;
+    self
+  }
+
+  pub fn hide_non_deleted(mut self, hide_non_deleted: bool) -> Self {
+    self.hide_non_deleted = hide_non_deleted;
     self
   }
 
@@ -241,6 +263,24 @@ LEFT OUTER JOIN users
         first_predicate_added = true;
       } else {
         query.push_str(" AND model_categories.deleted_at IS NULL");
+      }
+    }
+
+    if self.hide_approved {
+      if !first_predicate_added {
+        query.push_str(" WHERE (model_categories.is_mod_approved IS NULL OR model_categories.is_mod_approved IS FALSE) ");
+        first_predicate_added = true;
+      } else {
+        query.push_str(" AND (model_categories.is_mod_approved IS NULL OR model_categories.is_mod_approved IS FALSE) ");
+      }
+    }
+
+    if self.hide_non_deleted {
+      if !first_predicate_added {
+        query.push_str(" WHERE model_categories.deleted_at IS NOT NULL");
+        first_predicate_added = true;
+      } else {
+        query.push_str(" AND model_categories.deleted_at IS NOT NULL");
       }
     }
 
