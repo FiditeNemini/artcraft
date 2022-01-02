@@ -119,6 +119,7 @@ function ModerationTtsCategoryListPage(props: Props) {
             <th>Name</th>
             <th>Creator</th>
             <th>Approved</th>
+            <th>Deleted</th>
             <th></th>
           </tr>
         </thead>
@@ -162,6 +163,8 @@ function ModerationTtsCategoryListPage(props: Props) {
               approved = 'DISAPPROVED';
             }
 
+            let deleted = !!category.deleted_at ? 'DELETED' : 'No';
+
             return (
               <tr key={category.category_token}>
                 <td>
@@ -174,6 +177,9 @@ function ModerationTtsCategoryListPage(props: Props) {
                   {approved}
                 </td>
                 <td>
+                  {deleted}
+                </td>
+                <td>
                   <Link to={FrontendUrlConfig.moderationTtsCategoryEdit(category.category_token)}>edit</Link>
                 </td>
               </tr>
@@ -181,6 +187,14 @@ function ModerationTtsCategoryListPage(props: Props) {
           })}
         </tbody>
       </table>
+
+      <p>
+        Only approved, non-deleted categories will show up publicly. New category suggestions by 
+        non-mods are "unapproved" by default. Use "deletion" to hide categories you don't want to 
+        deal with anymore.
+      </p>
+
+      <br />
 
       <BackLink link={FrontendUrlConfig.moderationMain()} text="Back to moderation" />
     </div>
