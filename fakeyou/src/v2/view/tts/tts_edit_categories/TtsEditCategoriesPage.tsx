@@ -126,12 +126,25 @@ function TtsEditCategoriesPage(props: Props) {
         {assignedCategories.map(category => {
           let notApprovedWarning = null;
           let modelsNotAllowedWarning = null;
+          let deletedWarning = null;
 
           if (!category.can_directly_have_models) {
             modelsNotAllowedWarning = (
               <>
                 <span className="tag is-rounded is-warning is-medium is-light">
                   Models not directly allowed
+                  &nbsp;
+                  <FontAwesomeIcon icon={faExclamationCircle} />
+                </span>
+              </>
+            )
+          }
+
+          if (!!category.category_deleted_at) {
+            deletedWarning = (
+              <>
+                <span className="tag is-rounded is-warning is-medium is-light">
+                  Deleted category
                   &nbsp;
                   <FontAwesomeIcon icon={faExclamationCircle} />
                 </span>
@@ -156,6 +169,7 @@ function TtsEditCategoriesPage(props: Props) {
               <span className="content is-medium">{category.name}</span>
                 {modelsNotAllowedWarning}
                 {notApprovedWarning}
+                {deletedWarning}
                 &nbsp;
                 <button 
                   className="button is-rounded is-danger is-small is-light"
