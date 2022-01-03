@@ -6,6 +6,7 @@ use actix_web::error::ResponseError;
 use actix_web::http::StatusCode;
 use actix_web::web::{Path, Json};
 use actix_web::{Responder, web, HttpResponse, error, HttpRequest};
+use chrono::{DateTime, Utc};
 use crate::database::enums::record_visibility::RecordVisibility;
 use crate::database::queries::query_w2l_template::select_w2l_template_by_token;
 use crate::database::query_builders::list_categories_query_builder::ListCategoriesQueryBuilder;
@@ -53,9 +54,18 @@ pub struct DisplayCategory {
   pub name: String,
   pub maybe_dropdown_name: Option<String>,
 
+  // Moderator fields
+  // It's okay to leak this since we do for assigned categories and for mods to see
+  // which assigned categories might be invalid.
+  pub is_mod_approved: Option<bool>,
+
   //pub creator_user_token: Option<String>,
   //pub creator_username: Option<String>,
   //pub creator_display_name: Option<String>,
+
+  pub created_at: DateTime<Utc>,
+  pub updated_at: DateTime<Utc>,
+  pub deleted_at: Option<DateTime<Utc>>,
 }
 
 // =============== Error Response ===============
@@ -119,8 +129,12 @@ pub async fn list_tts_categories_handler(
           can_directly_have_models: c.can_directly_have_models,
           can_have_subcategories: c.can_have_subcategories,
           can_only_mods_apply: c.can_only_mods_apply,
+          is_mod_approved: c.is_mod_approved,
           name: c.name.clone(),
-          maybe_dropdown_name:c.maybe_dropdown_name.clone(),
+          maybe_dropdown_name: c.maybe_dropdown_name.clone(),
+          created_at: c.created_at.clone(),
+          updated_at: c.updated_at.clone(),
+          deleted_at: c.deleted_at.clone(),
         }
       })
       .collect::<Vec<DisplayCategory>>();
