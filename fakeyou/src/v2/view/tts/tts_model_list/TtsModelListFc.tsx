@@ -46,7 +46,7 @@ interface Props {
 
 function TtsModelListFc(props: Props) {
 
-  let { setTtsModels, setCurrentTtsModelSelected, currentTtsModelSelected } = props;
+  let { setTtsModels, setAllTtsCategories, setCurrentTtsModelSelected, currentTtsModelSelected } = props;
 
   const listModels = useCallback(async () => {
     const models = await ListTtsModels();
@@ -62,11 +62,11 @@ function TtsModelListFc(props: Props) {
   const listTtsCategories = useCallback(async () => {
     const categoryList = await ListTtsCategories();
     if (ListTtsCategoriesIsOk(categoryList)) {
-      props.setAllTtsCategories(categoryList.categories);
+      setAllTtsCategories(categoryList.categories);
     } else if (ListTtsCategoriesIsError(categoryList))  {
       // TODO: Retry on decay function
     }
-  }, []);
+  }, [setAllTtsCategories]);
 
   useEffect(() => {
     listModels();

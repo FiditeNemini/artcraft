@@ -6,7 +6,7 @@ import { ListTtsCategoriesForModeration, ListTtsCategoriesForModerationIsError, 
 import { GravatarFc } from '../../_common/GravatarFc';
 import { Link } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faLock } from '@fortawesome/free-solid-svg-icons';
+import { faBox, faLock } from '@fortawesome/free-solid-svg-icons';
 
 interface Props {
   sessionWrapper: SessionWrapper,
@@ -66,6 +66,13 @@ function ModerationTtsCategoryListPage(props: Props) {
       </>
     );
   }
+
+  let ttsCategoriesSorted = ttsCategories.sort((first, second) => {
+    if (first.can_have_subcategories !== second.can_have_subcategories) {
+      return first.can_have_subcategories ? -1 : 1;
+    }
+    return first.name.localeCompare(second.name);
+  })
 
   return (
     <div>
@@ -156,17 +163,21 @@ function ModerationTtsCategoryListPage(props: Props) {
           </tr>
         </thead>
         <tbody>
-          {ttsCategories.map(category => {
+          {ttsCategoriesSorted.map(category => {
             let modOnlyIcon = category.can_only_mods_apply ? 
               <>&nbsp;<FontAwesomeIcon icon={faLock} title={"mod only"} /></> :
               <></>;
 
-            let name = <>{category.name}{modOnlyIcon}</>;
+            let parentCategoryIcon = category.can_have_subcategories ? 
+              <><FontAwesomeIcon icon={faBox} title={"can have subcategories"} />&nbsp;</> :
+              <></>;
+
+            let name = <>{parentCategoryIcon}{category.name}{modOnlyIcon}</>;
 
             if (!!category.maybe_dropdown_name) {
               name = (
                 <>
-                  {category.name}{modOnlyIcon}
+                  {parentCategoryIcon}{category.name}{modOnlyIcon}
                   <br />
                   ({category.maybe_dropdown_name})
                 </>
