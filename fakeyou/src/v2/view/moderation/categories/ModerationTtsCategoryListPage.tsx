@@ -218,7 +218,7 @@ function ModerationTtsCategoryListPage(props: Props) {
             return (
               <tr key={category.category_token}>
                 <td>
-                  <CategoryBreadcrumb categoryHierarchy={categoryHierarchy} isCategoryMod={true} leafHasModels={false} />
+                  <CategoryBreadcrumb categoryHierarchy={categoryHierarchy} isCategoryMod={true} leafHasModels={false} disableLinks={true} />
                   {name}
                 </td>
                 <td>

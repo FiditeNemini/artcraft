@@ -10,10 +10,15 @@ export interface Props {
   // This is a list of categories in order: [grandparent/root, parent, child/leaf]
   // Note: The two possible types differ in their timestamp names.
   categoryHierarchy: (TtsCategory|TtsModelCategory)[]
+
   // Whether we're rendering for a moderator
   isCategoryMod: boolean,
+
   // If we're showing this on a category edit page, this is false.
   leafHasModels: boolean,
+
+  // Turn off rendering of individual category links.
+  disableLinks?: boolean,
 }
 
 export function CategoryBreadcrumb(props: Props) {
@@ -84,7 +89,7 @@ export function CategoryBreadcrumb(props: Props) {
 
         let categoryName = <>{category.name}</>;
 
-        if (props.isCategoryMod) {
+        if (props.isCategoryMod && !props.disableLinks) {
           categoryName = (<>
             <Link to={FrontendUrlConfig.moderationTtsCategoryEdit(category.category_token)}>{category.name}</Link>
           </>);
