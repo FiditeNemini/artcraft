@@ -285,6 +285,8 @@ function TtsModelViewFc(props: Props) {
     );
   }
 
+  const isCategoryModerator = props.sessionWrapper.canEditCategories();
+
   const showCategorySection = canEditModel || assignedCategories.length !== 0;
   let modelCategoriesSection = <></>;
 
@@ -363,7 +365,7 @@ function TtsModelViewFc(props: Props) {
                     .reduce((acc, cur) => <>{acc} <FontAwesomeIcon icon={faChevronRight}/> {cur}</>)
               }
 
-              if (parentCount !== categoryHierarchy.length - 1) {
+              if (isCategoryModerator && parentCount !== categoryHierarchy.length - 1) {
                 hierarchyWarning = (
                   <>
                     <span className="tag is-rounded is-warning is-medium is-light">
