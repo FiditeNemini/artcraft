@@ -291,8 +291,7 @@ function TtsModelViewFc(props: Props) {
   if (showCategorySection) {
     let modelCategories = null;
 
-    // TODO: Fix this.
-    // This is grossly superlinear with no caching
+    // TODO: Should be a shared component
     if (assignedCategories.length !== 0) {
       modelCategories = (
         <>
@@ -305,6 +304,8 @@ function TtsModelViewFc(props: Props) {
                   category.category_token);
 
               let breadcrumbs = <></>;
+              let parentCount = 0;
+              let hierarchyWarning = null;
 
               if (categoryHierarchy.length !== 0) {
                 breadcrumbs = categoryHierarchy
@@ -312,6 +313,10 @@ function TtsModelViewFc(props: Props) {
                       let deletedWarning = null;
                       let notApprovedWarning = null;
                       let modelsNotAllowedWarning = null;
+
+                      if (!!category.maybe_super_category_token) {
+                        parentCount++;
+                      }
 
                       if (!!category.category_deleted_at) {
                         deletedWarning = (
@@ -358,9 +363,21 @@ function TtsModelViewFc(props: Props) {
                     .reduce((acc, cur) => <>{acc} <FontAwesomeIcon icon={faChevronRight}/> {cur}</>)
               }
 
+              if (parentCount !== categoryHierarchy.length - 1) {
+                hierarchyWarning = (
+                  <>
+                    <span className="tag is-rounded is-warning is-medium is-light">
+                      Bad parent category in chain
+                      &nbsp;
+                      <FontAwesomeIcon icon={faExclamationCircle} />
+                    </span>
+                  </>
+                )
+              }
+
               return (
                 <>
-                  <li>{breadcrumbs}</li>
+                  <li>{hierarchyWarning} {breadcrumbs}</li>
                 </>
               );
             })}
