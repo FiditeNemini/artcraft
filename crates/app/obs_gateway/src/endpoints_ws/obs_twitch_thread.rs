@@ -5,8 +5,8 @@ use std::sync::atomic::AtomicBool;
 use std::sync::{Arc, RwLock, PoisonError};
 use std::thread::sleep;
 use std::time::Duration;
+use std::time::Instant;
 use tokio::runtime::Handle;
-use time::Instant;
 
 pub struct ObsTwitchThread {
   twitch_client: Arc<RwLock<PollingTwitchWebsocketClient>>,
@@ -23,11 +23,16 @@ impl ObsTwitchThread {
   }
 
   pub fn keep_alive_thread(&self) {
-    let now = Instant::now();
-    let lock = self.last_requested
-        .clone()
-        .get_mut();
-    *lock = Some(now);
+    // TODO(bt, 2022-01-03): builds are failing, not sure when I worked on this last
+    //let now = Instant::now();
+    //let lock = self.last_requested
+    //    .clone()
+    //    .get_mut();
+    ////*lock = Some(now);
+    //match lock {
+    //  Ok(l) => *l = Some(now),
+    //  Err(_) => {}
+    //}
   }
 
   // TODO: Investigate use of a thread pool instead.
@@ -44,29 +49,30 @@ impl ObsTwitchThread {
   fn thread_main_loop(
     mut last_requested: Arc<RwLock<Instant>>,
   ) {
-    loop {
-      let c = last_requested.get_mut();
+    // TODO(bt, 2022-01-03): builds are failing, not sure when I worked on this last
+    //loop {
+    //  let c = last_requested.get_mut();
 
-      match c {
-        Err(e) => {
-          error!("Mutex failure: {:?}, ending job.", e);
-          break;
-        }
-        Ok(t) => {
-          let now = Instant::now();
-          let delta : Duration = now.duration_since(t);
+    //  match c {
+    //    Err(e) => {
+    //      error!("Mutex failure: {:?}, ending job.", e);
+    //      break;
+    //    }
+    //    Ok(t) => {
+    //      let now = Instant::now();
+    //      let delta : Duration = now.duration_since(t.clone());
 
-          if delta.gt(&Duration::from_secs(60)) {
-            info!("Timeout elapsed, ending job.");
-            break;
-          }
-        }
-      }
+    //      if delta.gt(&Duration::from_secs(60)) {
+    //        info!("Timeout elapsed, ending job.");
+    //        break;
+    //      }
+    //    }
+    //  }
 
-      Self::thread_single_loop();
+    //  Self::thread_single_loop();
 
-      sleep(Duration::from_millis(1000));
-    }
+    //  sleep(Duration::from_millis(1000));
+    //}
   }
 
   fn thread_single_loop() {
