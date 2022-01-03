@@ -14,9 +14,8 @@ import { GravatarFc } from '../../_common/GravatarFc';
 import { GetTtsModelUseCount } from '../../../api/tts/GetTtsModelUseCount';
 import { BackLink } from '../../_common/BackLink';
 import { ListTtsCategoriesForModel, ListTtsCategoriesForModelIsError, ListTtsCategoriesForModelIsOk, TtsModelCategory } from '../../../api/category/ListTtsCategoriesForModel';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faChevronRight, faExclamationCircle } from '@fortawesome/free-solid-svg-icons';
 import { ListTtsCategories, ListTtsCategoriesIsError, ListTtsCategoriesIsOk, TtsCategory } from '../../../api/category/ListTtsCategories';
+import { CategoryBreadcrumb } from '../../_common/CategoryBreadcrumb';
 
 interface Props {
   sessionWrapper: SessionWrapper,
@@ -293,7 +292,6 @@ function TtsModelViewFc(props: Props) {
   if (showCategorySection) {
     let modelCategories = null;
 
-    // TODO: Should be a shared component
     if (assignedCategories.length !== 0) {
       modelCategories = (
         <>
@@ -305,81 +303,11 @@ function TtsModelViewFc(props: Props) {
                   assignedCategoriesByTokenMap,
                   category.category_token);
 
-              let breadcrumbs = <></>;
-              let parentCount = 0;
-              let hierarchyWarning = null;
-
-              if (categoryHierarchy.length !== 0) {
-                breadcrumbs = categoryHierarchy
-                    .map((category, index) => {
-                      let deletedWarning = null;
-                      let notApprovedWarning = null;
-                      let modelsNotAllowedWarning = null;
-
-                      if (!!category.maybe_super_category_token) {
-                        parentCount++;
-                      }
-
-                      if (!!category.category_deleted_at) {
-                        deletedWarning = (
-                          <>
-                            <span className="tag is-rounded is-warning is-medium is-light">
-                              Deleted category
-                              &nbsp;
-                              <FontAwesomeIcon icon={faExclamationCircle} />
-                            </span>
-                          </>
-                        )
-                      }
-
-                      if (!category.is_mod_approved) {
-                        notApprovedWarning = (
-                          <>
-                            <span className="tag is-rounded is-warning is-medium is-light">
-                              Not Mod Approved
-                              &nbsp;
-                              <FontAwesomeIcon icon={faExclamationCircle} />
-                            </span>
-                          </>
-                        )
-                      }
-
-                      const isLeaf = index === categoryHierarchy.length - 1;
-
-                      if (isLeaf && !category.can_directly_have_models) {
-                        modelsNotAllowedWarning = (
-                          <>
-                            <span className="tag is-rounded is-warning is-medium is-light">
-                              Models not directly allowed
-                              &nbsp;
-                              <FontAwesomeIcon icon={faExclamationCircle} />
-                            </span>
-                          </>
-                        )
-                      }
-
-                      return (
-                        <> {category.name} {deletedWarning} {modelsNotAllowedWarning} {notApprovedWarning}</>
-                      )
-                    })
-                    .reduce((acc, cur) => <>{acc} <FontAwesomeIcon icon={faChevronRight}/> {cur}</>)
-              }
-
-              if (isCategoryModerator && parentCount !== categoryHierarchy.length - 1) {
-                hierarchyWarning = (
-                  <>
-                    <span className="tag is-rounded is-warning is-medium is-light">
-                      Bad parent category in chain
-                      &nbsp;
-                      <FontAwesomeIcon icon={faExclamationCircle} />
-                    </span>
-                  </>
-                )
-              }
-
               return (
                 <>
-                  <li>{hierarchyWarning} {breadcrumbs}</li>
+                  <li>
+                    <CategoryBreadcrumb categoryHierarchy={categoryHierarchy} isCategoryMod={isCategoryModerator} />
+                  </li>
                 </>
               );
             })}
