@@ -212,7 +212,7 @@ function ModerationTtsCategoryListPage(props: Props) {
             if (!!category?.creator_display_name) {
               const creatorUrl = FrontendUrlConfig.userProfilePage(category?.creator_username || "username error");
               creatorLink = (
-                <span>
+                <span className="white-space-nowrap">
                   <GravatarFc
                     size={15}
                     username={category.creator_display_name || ""} 
