@@ -323,6 +323,7 @@ function ModerationTtsCategoryEditPage(props: Props) {
   )
 }
 
+// FIXME: This has been implemented three times, slightly differently
 function recursiveBuildHierarchy(allCategories: TtsCategory[], currentToken: string): TtsCategory[] {
   let found = allCategories.find(category => category.category_token === currentToken);
   if (found === undefined) {

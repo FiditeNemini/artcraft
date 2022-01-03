@@ -19,9 +19,9 @@ export interface TtsCategory {
 
   is_mod_approved?: boolean,
 
-  category_created_at: Date,
-  category_updated_at: Date,
-  category_deleted_at?: Date,
+  created_at: Date,
+  updated_at: Date,
+  deleted_at?: Date,
 }
 
 export interface ListTtsCategoriesErrorResponse {

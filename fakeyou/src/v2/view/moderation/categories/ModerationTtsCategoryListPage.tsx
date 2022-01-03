@@ -7,6 +7,7 @@ import { GravatarFc } from '../../_common/GravatarFc';
 import { Link } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faBox, faLock } from '@fortawesome/free-solid-svg-icons';
+import { CategoryBreadcrumb } from '../../_common/CategoryBreadcrumb';
 
 interface Props {
   sessionWrapper: SessionWrapper,
@@ -164,6 +165,8 @@ function ModerationTtsCategoryListPage(props: Props) {
         </thead>
         <tbody>
           {ttsCategoriesSorted.map(category => {
+            const categoryHierarchy = recursiveBuildHierarchy(ttsCategories, category.category_token);
+
             let modOnlyIcon = category.can_only_mods_apply ? 
               <>&nbsp;<FontAwesomeIcon icon={faLock} title={"mod only"} /></> :
               <></>;
@@ -215,6 +218,7 @@ function ModerationTtsCategoryListPage(props: Props) {
             return (
               <tr key={category.category_token}>
                 <td>
+                  <CategoryBreadcrumb categoryHierarchy={categoryHierarchy} isCategoryMod={true} leafHasModels={false} />
                   {name}
                 </td>
                 <td>
@@ -258,5 +262,18 @@ function StringToTriState(state: string) : ListTtsCategoriesTriState | undefined
       return ListTtsCategoriesTriState.Only;
   }
 }
+
+// FIXME: This has been implemented three times, slightly differently
+function recursiveBuildHierarchy(allCategories: ModerationTtsCategory[], currentToken: string): ModerationTtsCategory[] {
+  let found = allCategories.find(category => category.category_token === currentToken);
+  if (found === undefined) {
+    return [];
+  }
+  if (found.maybe_super_category_token === undefined) {
+    return [found];
+  }
+  return [...recursiveBuildHierarchy(allCategories, found.maybe_super_category_token), found];
+}
+
 
 export { ModerationTtsCategoryListPage };

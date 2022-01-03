@@ -449,13 +449,14 @@ function TtsModelViewFc(props: Props) {
   )
 }
 
+// FIXME: This has been implemented three times, slightly differently
 function recursiveBuildHierarchy(
   categoryByTokenMap: Map<string, TtsCategory>, 
   assignedCategoryByTokenMap: Map<string, TtsModelCategory>, 
   currentToken: string
-): TtsCategory[] {
+): (TtsCategory|TtsModelCategory)[] {
   // NB: Using both maps should catch assigned categories that aren't public/approved.
-  let found = assignedCategoryByTokenMap.get(currentToken);
+  let found : TtsCategory | TtsModelCategory | undefined = assignedCategoryByTokenMap.get(currentToken);
   if (found === undefined) {
     found = categoryByTokenMap.get(currentToken);
   }

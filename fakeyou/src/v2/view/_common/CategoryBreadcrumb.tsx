@@ -4,10 +4,12 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { FrontendUrlConfig } from '../../../common/FrontendUrlConfig';
 import { TtsCategory } from '../../api/category/ListTtsCategories';
+import { TtsModelCategory } from '../../api/category/ListTtsCategoriesForModel';
 
 export interface Props {
   // This is a list of categories in order: [grandparent/root, parent, child/leaf]
-  categoryHierarchy: TtsCategory[]
+  // Note: The two possible types differ in their timestamp names.
+  categoryHierarchy: (TtsCategory|TtsModelCategory)[]
   // Whether we're rendering for a moderator
   isCategoryMod: boolean,
   // If we're showing this on a category edit page, this is false.
@@ -33,7 +35,15 @@ export function CategoryBreadcrumb(props: Props) {
           parentCount++;
         }
 
-        if (!!category.category_deleted_at) {
+        // We're handling a union type of JSON response payloads; each names its deleted timestamp differently.
+        let deleted = false;
+        if ('deleted_at' in category) {
+          deleted = !!category.deleted_at;
+        } else if ('category_deleted_at' in category) {
+          deleted = !!category.category_deleted_at;
+        }
+
+        if (deleted) {
             deletedWarning = (
             <>
                 <span className="tag is-rounded is-warning is-medium is-light">
