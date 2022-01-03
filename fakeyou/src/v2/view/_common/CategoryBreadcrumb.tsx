@@ -6,7 +6,10 @@ import { TtsCategory } from '../../api/category/ListTtsCategories';
 export interface Props {
   // This is a list of categories in order: [grandparent/root, parent, child/leaf]
   categoryHierarchy: TtsCategory[]
+  // Whether we're rendering for a moderator
   isCategoryMod: boolean,
+  // If we're showing this on a category edit page, this is false.
+  leafHasModels: boolean,
 }
 
 export function CategoryBreadcrumb(props: Props) {
@@ -41,20 +44,21 @@ export function CategoryBreadcrumb(props: Props) {
         }
 
         if (!category.is_mod_approved) {
-            notApprovedWarning = (
+          notApprovedWarning = (
             <>
-                <span className="tag is-rounded is-warning is-medium is-light">
+              <span className="tag is-rounded is-warning is-medium is-light">
                 Not Mod Approved
                 &nbsp;
                 <FontAwesomeIcon icon={faExclamationCircle} />
-                </span>
+              </span>
             </>
-            )
+          )
         }
 
         const isLeaf = index === props.categoryHierarchy.length - 1;
 
-        if (isLeaf && !category.can_directly_have_models) {
+        // Only show this when attached to a model view page.
+        if (props.leafHasModels && isLeaf && !category.can_directly_have_models) {
           modelsNotAllowedWarning = (
             <>
               <span className="tag is-rounded is-warning is-medium is-light">

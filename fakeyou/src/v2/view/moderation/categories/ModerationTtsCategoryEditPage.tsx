@@ -9,6 +9,7 @@ import { EditCategory, EditCategoryIsError, EditCategoryIsSuccess, EditCategoryR
 import { ListTtsCategories, ListTtsCategoriesIsError, ListTtsCategoriesIsOk, TtsCategory } from '../../../api/category/ListTtsCategories';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faChevronRight } from '@fortawesome/free-solid-svg-icons';
+import { CategoryBreadcrumb } from '../../_common/CategoryBreadcrumb';
 
 interface Props {
   sessionWrapper: SessionWrapper,
@@ -220,6 +221,7 @@ function ModerationTtsCategoryEditPage(props: Props) {
       <br />
 
       {breadcrumbs}
+      <CategoryBreadcrumb categoryHierarchy={categoryHierarchy} isCategoryMod={true} leafHasModels={false} />
       <br />
 
       {errorFlash}

@@ -306,7 +306,7 @@ function TtsModelViewFc(props: Props) {
               return (
                 <>
                   <li>
-                    <CategoryBreadcrumb categoryHierarchy={categoryHierarchy} isCategoryMod={isCategoryModerator} />
+                    <CategoryBreadcrumb categoryHierarchy={categoryHierarchy} isCategoryMod={isCategoryModerator} leafHasModels={true} />
                   </li>
                 </>
               );
