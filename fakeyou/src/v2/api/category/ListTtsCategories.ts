@@ -16,6 +16,12 @@ export interface TtsCategory {
 
   name: string,
   maybe_dropdown_name?: string,
+
+  is_mod_approved?: boolean,
+
+  category_created_at: Date,
+  category_updated_at: Date,
+  category_deleted_at?: Date,
 }
 
 export interface ListTtsCategoriesErrorResponse {

@@ -15,7 +15,8 @@ import { GetTtsModelUseCount } from '../../../api/tts/GetTtsModelUseCount';
 import { BackLink } from '../../_common/BackLink';
 import { ListTtsCategoriesForModel, ListTtsCategoriesForModelIsError, ListTtsCategoriesForModelIsOk, TtsModelCategory } from '../../../api/category/ListTtsCategoriesForModel';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faExclamationCircle } from '@fortawesome/free-solid-svg-icons';
+import { faChevronRight, faExclamationCircle } from '@fortawesome/free-solid-svg-icons';
+import { ListTtsCategories, ListTtsCategoriesIsError, ListTtsCategoriesIsOk, TtsCategory } from '../../../api/category/ListTtsCategories';
 
 interface Props {
   sessionWrapper: SessionWrapper,
@@ -32,6 +33,9 @@ function TtsModelViewFc(props: Props) {
   const [ttsModel, setTtsModel] = useState<TtsModel|undefined>(undefined);
   const [ttsModelUseCount, setTtsModelUseCount] = useState<number|undefined>(undefined);
   const [assignedCategories, setAssignedCategories] = useState<TtsModelCategory[]>([]);
+
+  const [assignedCategoriesByTokenMap, setAssignedCategoriesByTokenMap] = useState<Map<string, TtsModelCategory>>(new Map());
+  const [allCategoriesByTokenMap, setAllCategoriesByTokenMap] = useState<Map<string, TtsCategory>>(new Map());
 
   const [notFoundState, setNotFoundState] = useState<boolean>(false);
 
@@ -58,17 +62,44 @@ function TtsModelViewFc(props: Props) {
     const categoryList = await ListTtsCategoriesForModel(token);
     if (ListTtsCategoriesForModelIsOk(categoryList)) {
       setAssignedCategories(categoryList.categories);
+
+      let categoriesByTokenMap = new Map();
+
+      categoryList.categories.forEach(category => {
+        categoriesByTokenMap.set(category.category_token, category);
+      })
+
+      setAssignedCategoriesByTokenMap(categoriesByTokenMap);
+
     } else if (ListTtsCategoriesForModelIsError(categoryList))  {
       // TODO: Surface error.
     }
   }, []);
+  
+  // TODO: Cache globally? Shouldn't change much.
+  const listAllTtsCategories = useCallback(async () => {
+    const categoryList = await ListTtsCategories();
+    if (ListTtsCategoriesIsOk(categoryList)) {
 
+      let categoriesByTokenMap = new Map();
+
+      categoryList.categories.forEach(category => {
+        categoriesByTokenMap.set(category.category_token, category);
+      })
+
+      setAllCategoriesByTokenMap(categoriesByTokenMap);
+
+    } else if (ListTtsCategoriesIsError(categoryList))  {
+      // Ignore.
+    }
+  }, []);
 
   useEffect(() => {
     getModel(token);
     getModelUseCount(token);
     listTtsCategoriesForModel(token);
-  }, [token, getModel, getModelUseCount, listTtsCategoriesForModel]);
+    listAllTtsCategories();
+  }, [token, getModel, getModelUseCount, listTtsCategoriesForModel, listAllTtsCategories]);
 
   if (notFoundState) {
     return (
@@ -260,42 +291,76 @@ function TtsModelViewFc(props: Props) {
   if (showCategorySection) {
     let modelCategories = null;
 
+    // TODO: Fix this.
+    // This is grossly superlinear with no caching
     if (assignedCategories.length !== 0) {
       modelCategories = (
         <>
           <div className="content">
             <ul>
             {assignedCategories.map(category => {
-              let notApprovedWarning = null;
-              let modelsNotAllowedWarning = null;
+              const categoryHierarchy = recursiveBuildHierarchy(
+                  allCategoriesByTokenMap, 
+                  assignedCategoriesByTokenMap,
+                  category.category_token);
 
-              if (!category.is_mod_approved) {
-                notApprovedWarning = (
-                  <>
-                    <span className="tag is-rounded is-warning is-medium is-light">
-                      Not Mod Approved
-                      &nbsp;
-                      <FontAwesomeIcon icon={faExclamationCircle} />
-                    </span>
-                  </>
-                )
-              }
+              let breadcrumbs = <></>;
 
-              if (!category.can_directly_have_models) {
-                modelsNotAllowedWarning = (
-                  <>
-                    <span className="tag is-rounded is-warning is-medium is-light">
-                      Models not directly allowed
-                      &nbsp;
-                      <FontAwesomeIcon icon={faExclamationCircle} />
-                    </span>
-                  </>
-                )
+              if (categoryHierarchy.length !== 0) {
+                breadcrumbs = categoryHierarchy
+                    .map((category, index) => {
+                      let deletedWarning = null;
+                      let notApprovedWarning = null;
+                      let modelsNotAllowedWarning = null;
+
+                      if (!!category.category_deleted_at) {
+                        deletedWarning = (
+                          <>
+                            <span className="tag is-rounded is-warning is-medium is-light">
+                              Deleted category
+                              &nbsp;
+                              <FontAwesomeIcon icon={faExclamationCircle} />
+                            </span>
+                          </>
+                        )
+                      }
+
+                      if (!category.is_mod_approved) {
+                        notApprovedWarning = (
+                          <>
+                            <span className="tag is-rounded is-warning is-medium is-light">
+                              Not Mod Approved
+                              &nbsp;
+                              <FontAwesomeIcon icon={faExclamationCircle} />
+                            </span>
+                          </>
+                        )
+                      }
+
+                      const isLeaf = index === categoryHierarchy.length - 1;
+
+                      if (isLeaf && !category.can_directly_have_models) {
+                        modelsNotAllowedWarning = (
+                          <>
+                            <span className="tag is-rounded is-warning is-medium is-light">
+                              Models not directly allowed
+                              &nbsp;
+                              <FontAwesomeIcon icon={faExclamationCircle} />
+                            </span>
+                          </>
+                        )
+                      }
+
+                      return (
+                        <> {category.name} {deletedWarning} {modelsNotAllowedWarning} {notApprovedWarning}</>
+                      )
+                    })
+                    .reduce((acc, cur) => <>{acc} <FontAwesomeIcon icon={faChevronRight}/> {cur}</>)
               }
 
               return (
                 <>
-                  <li>{category.name} {modelsNotAllowedWarning} {notApprovedWarning}</li>
+                  <li>{breadcrumbs}</li>
                 </>
               );
             })}
@@ -435,6 +500,26 @@ function TtsModelViewFc(props: Props) {
       <BackLink link="/" text="Back to all models" />
     </div>
   )
+}
+
+function recursiveBuildHierarchy(
+  categoryByTokenMap: Map<string, TtsCategory>, 
+  assignedCategoryByTokenMap: Map<string, TtsModelCategory>, 
+  currentToken: string
+): TtsCategory[] {
+  // NB: Using both maps should catch assigned categories that aren't public/approved.
+  let found = assignedCategoryByTokenMap.get(currentToken);
+  if (found === undefined) {
+    found = categoryByTokenMap.get(currentToken);
+  }
+  if (found === undefined) {
+    return [];
+  }
+  if (found.maybe_super_category_token === undefined) {
+    return [found];
+  }
+  return [...recursiveBuildHierarchy(
+    categoryByTokenMap, assignedCategoryByTokenMap, found.maybe_super_category_token), found];
 }
 
 export { TtsModelViewFc };
