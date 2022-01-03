@@ -13,6 +13,12 @@ interface Props {
   sessionWrapper: SessionWrapper,
 }
 
+interface SortableCategoryHierarchy {
+  hierarchy: ModerationTtsCategory[],
+  // NB: While we could pull out the last item of the hierarchy list, this is more convenient.
+  category: ModerationTtsCategory,
+}
+
 function ModerationTtsCategoryListPage(props: Props) {
   const [ttsCategories, setTtsCategories] = useState<ModerationTtsCategory[]>([]);
   const [errorMessage, setErrorMessage] = useState<string|undefined>(undefined); 
@@ -68,12 +74,38 @@ function ModerationTtsCategoryListPage(props: Props) {
     );
   }
 
-  let ttsCategoriesSorted = ttsCategories.sort((first, second) => {
-    if (first.can_have_subcategories !== second.can_have_subcategories) {
-      return first.can_have_subcategories ? -1 : 1;
+  let sortableHierarchies : SortableCategoryHierarchy[] = ttsCategories.map(category => {
+    const categoryHierarchy = recursiveBuildHierarchy(ttsCategories, category.category_token);
+    return {
+      hierarchy: categoryHierarchy,
+      category: category,
     }
-    return first.name.localeCompare(second.name);
-  })
+  }).sort((first, second) => {
+    let maxLength = Math.max(first.hierarchy.length, second.hierarchy.length);
+    for (let i = 0; i < maxLength; i++) {
+      let f = first.hierarchy[i];
+      let s = second.hierarchy[i];
+      if (f !== undefined && s !== undefined) {
+        let compared = f.name.localeCompare(s.name)
+        if (compared !== 0) {
+          return compared;
+        }
+      } else if (f === undefined) {
+        return -1;
+      } else if (s === undefined) {
+        return 1;
+      }
+    }
+
+    return -1;
+  });
+
+  //let ttsCategoriesSorted = ttsCategories.sort((first, second) => {
+  //  if (first.can_have_subcategories !== second.can_have_subcategories) {
+  //    return first.can_have_subcategories ? -1 : 1;
+  //  }
+  //  return first.name.localeCompare(second.name);
+  //})
 
   return (
     <div>
@@ -164,8 +196,9 @@ function ModerationTtsCategoryListPage(props: Props) {
           </tr>
         </thead>
         <tbody>
-          {ttsCategoriesSorted.map(category => {
-            const categoryHierarchy = recursiveBuildHierarchy(ttsCategories, category.category_token);
+          {sortableHierarchies.map(sortableHierarchy => {
+            const category = sortableHierarchy.category;
+            const categoryHierarchy = sortableHierarchy.hierarchy;
 
             let modOnlyIcon = category.can_only_mods_apply ? 
               <>&nbsp;<FontAwesomeIcon icon={faLock} title={"mod only"} /></> :
@@ -218,8 +251,9 @@ function ModerationTtsCategoryListPage(props: Props) {
             return (
               <tr key={category.category_token}>
                 <td>
+                  {parentCategoryIcon}
+                  {modOnlyIcon}
                   <CategoryBreadcrumb categoryHierarchy={categoryHierarchy} isCategoryMod={true} leafHasModels={false} disableLinks={true} />
-                  {name}
                 </td>
                 <td>
                   {creatorLink}
