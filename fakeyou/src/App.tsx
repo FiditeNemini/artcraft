@@ -15,6 +15,7 @@ import { TtsModelUploadJob, TtsModelUploadJobStateResponsePayload } from './jobs
 import { W2lTemplateUploadJob, W2lTemplateUploadJobStateResponsePayload } from './jobs/W2lTemplateUploadJobs';
 import { jobStateCanChange } from './jobs/JobStates';
 import { TtsModelListItem } from './v2/api/tts/ListTtsModels';
+import { TtsCategory } from './v2/api/category/ListTtsCategories';
 
 enum MigrationMode {
   NEW_VOCODES,
@@ -49,6 +50,11 @@ interface State {
 
   // List of voices (post-query) and current voice selected on main page
   ttsModels: Array<TtsModelListItem>,
+
+  // Comprehensive list of categories we've queried.
+  allTtsCategories: TtsCategory[],
+
+  // Selection state
   currentTtsModelSelected?: TtsModelListItem,
 }
 
@@ -59,6 +65,7 @@ function newVocodes() {
   return discord || twitter || alphaCookie;
 }
 
+// TODO: Port to functional component
 class App extends React.Component<Props, State> {
 
   constructor(props: Props) {
@@ -81,6 +88,8 @@ class App extends React.Component<Props, State> {
       textBuffer: '',
 
       ttsModels: [],
+      allTtsCategories: [],
+      
       currentTtsModelSelected: undefined,
     }
   }
@@ -375,6 +384,10 @@ class App extends React.Component<Props, State> {
     this.setState({ currentTtsModelSelected: ttsModel });
   }
 
+  setAllTtsCategories = (allTtsCategories: TtsCategory[]) => {
+    this.setState({ allTtsCategories: allTtsCategories })
+  }
+
   public render() {
     if (this.state.migrationMode === MigrationMode.OLD_VOCODES) {
       return (
@@ -426,6 +439,10 @@ class App extends React.Component<Props, State> {
 
                     ttsModels={this.state.ttsModels}
                     setTtsModels={this.setTtsModels}
+
+                    allTtsCategories={this.state.allTtsCategories}
+                    setAllTtsCategories={this.setAllTtsCategories}
+                    
                     currentTtsModelSelected={this.state.currentTtsModelSelected}
                     setCurrentTtsModelSelected={this.setCurrentTtsModelSelected}
                     

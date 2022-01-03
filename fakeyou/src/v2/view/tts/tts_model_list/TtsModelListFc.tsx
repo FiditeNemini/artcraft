@@ -14,6 +14,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { ListTtsModels, TtsModelListItem } from '../../../api/tts/ListTtsModels';
 import { GravatarFc } from '../../_common/GravatarFc';
 import { TtsModelListNotice } from './TtsModelListNotice';
+import { ListTtsCategories, ListTtsCategoriesIsError, ListTtsCategoriesIsOk, TtsCategory } from '../../../api/category/ListTtsCategories';
 
 
 export interface EnqueueJobResponsePayload {
@@ -31,8 +32,13 @@ interface Props {
   textBuffer: string,
   setTextBuffer: (textBuffer: string) => void,
   clearTextBuffer: () => void,
+
   ttsModels: Array<TtsModelListItem>,
   setTtsModels: (ttsVoices: Array<TtsModelListItem>) => void,
+
+  allTtsCategories: TtsCategory[],
+  setAllTtsCategories: (allTtsCategories: TtsCategory[]) => void,
+
   // TODO: rename 'active'
   currentTtsModelSelected?: TtsModelListItem,
   setCurrentTtsModelSelected: (ttsModel: TtsModelListItem) => void,
@@ -53,9 +59,19 @@ function TtsModelListFc(props: Props) {
     }
   }, [setTtsModels, setCurrentTtsModelSelected, currentTtsModelSelected]);
 
+  const listTtsCategories = useCallback(async () => {
+    const categoryList = await ListTtsCategories();
+    if (ListTtsCategoriesIsOk(categoryList)) {
+      props.setAllTtsCategories(categoryList.categories);
+    } else if (ListTtsCategoriesIsError(categoryList))  {
+      // TODO: Retry on decay function
+    }
+  }, []);
+
   useEffect(() => {
     listModels();
-  }, [listModels]);
+    listTtsCategories();
+  }, [listModels, listTtsCategories]);
 
   let listItems: Array<JSX.Element> = [];
 
@@ -178,6 +194,25 @@ function TtsModelListFc(props: Props) {
     );
   }
 
+  let categoryList : JSX.Element[] = [];
+
+  props.allTtsCategories.forEach(ttsCategory => {
+    let categoryName = !!ttsCategory.maybe_dropdown_name ? ttsCategory.maybe_dropdown_name : ttsCategory.name;
+
+    let option = (
+      <option 
+        key={ttsCategory.category_token} 
+        value={ttsCategory.category_token} 
+        >{categoryName}</option>
+    );
+
+    //if (defaultSelectValue === '') {
+    //  defaultSelectValue = m.model_token;
+    //}
+
+    categoryList.push(option);
+  });
+
   return (
     <div>
       <h1 className="title is-1"> FakeYou Text to Speech </h1>
@@ -188,6 +223,13 @@ function TtsModelListFc(props: Props) {
       <TtsModelListNotice />
 
       <form onSubmit={handleFormSubmit}>
+
+        <div className={selectClasses}>
+        <select>
+          {categoryList}
+        </select>
+        </div>
+
         <div className={selectClasses}>
           <select 
             onChange={handleChangeVoice} 
