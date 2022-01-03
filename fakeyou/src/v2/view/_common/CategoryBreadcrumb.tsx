@@ -1,6 +1,8 @@
 import { faChevronRight, faExclamationCircle } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import React from 'react';
+import { Link } from 'react-router-dom';
+import { FrontendUrlConfig } from '../../../common/FrontendUrlConfig';
 import { TtsCategory } from '../../api/category/ListTtsCategories';
 
 export interface Props {
@@ -70,8 +72,16 @@ export function CategoryBreadcrumb(props: Props) {
           )
         }
 
+        let categoryName = <>{category.name}</>;
+
+        if (props.isCategoryMod) {
+          categoryName = (<>
+            <Link to={FrontendUrlConfig.moderationTtsCategoryEdit(category.category_token)}>{category.name}</Link>
+          </>);
+        }
+
         return (
-          <> {category.name} {deletedWarning} {modelsNotAllowedWarning} {notApprovedWarning}</>
+          <> {categoryName} {deletedWarning} {modelsNotAllowedWarning} {notApprovedWarning}</>
         )
     })
     .reduce((acc, cur) => <>{acc} <FontAwesomeIcon icon={faChevronRight}/> {cur}</>)

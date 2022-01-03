@@ -200,17 +200,6 @@ function ModerationTtsCategoryEditPage(props: Props) {
 
   const categoryHierarchy = recursiveBuildHierarchy(allTtsCategories, token);
 
-  let breadcrumbs = <></>;
-
-  if (categoryHierarchy.length !== 0) {
-    breadcrumbs = categoryHierarchy
-        .map(category => <>
-            <Link to={FrontendUrlConfig.moderationTtsCategoryEdit(category.category_token)}
-              >{category.name}</Link>
-        </>)
-        .reduce((acc, cur) => <>{acc} <FontAwesomeIcon icon={faChevronRight}/> {cur}</>)
-  }
-
   return (
     <div>
       <h1 className="title is-1"> Moderate TTS Category </h1>
@@ -220,7 +209,6 @@ function ModerationTtsCategoryEditPage(props: Props) {
       <br />
       <br />
 
-      {breadcrumbs}
       <CategoryBreadcrumb categoryHierarchy={categoryHierarchy} isCategoryMod={true} leafHasModels={false} />
       <br />
 
