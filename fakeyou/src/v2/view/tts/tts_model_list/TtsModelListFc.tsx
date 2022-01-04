@@ -15,6 +15,7 @@ import { ListTtsModels, TtsModelListItem } from '../../../api/tts/ListTtsModels'
 import { GravatarFc } from '../../_common/GravatarFc';
 import { TtsModelListNotice } from './TtsModelListNotice';
 import { ListTtsCategories, ListTtsCategoriesIsError, ListTtsCategoriesIsOk, TtsCategory } from '../../../api/category/ListTtsCategories';
+import { MultiDropdownSearch } from './MultiDropdownSearch';
 
 
 export interface EnqueueJobResponsePayload {
@@ -224,11 +225,16 @@ function TtsModelListFc(props: Props) {
 
       <form onSubmit={handleFormSubmit}>
 
+        <MultiDropdownSearch allTtsCategories={props.allTtsCategories} />
+        <hr />
+
         <div className={selectClasses}>
-        <select>
-          {categoryList}
-        </select>
+          <select>
+            {categoryList}
+          </select>
         </div>
+
+        <hr />
 
         <div className={selectClasses}>
           <select 
