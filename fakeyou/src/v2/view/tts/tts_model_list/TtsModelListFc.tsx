@@ -225,7 +225,11 @@ function TtsModelListFc(props: Props) {
 
       <form onSubmit={handleFormSubmit}>
 
-        <MultiDropdownSearch allTtsCategories={props.allTtsCategories} />
+        <MultiDropdownSearch 
+          allTtsCategories={props.allTtsCategories} 
+          allTtsModels={props.ttsModels}
+          />
+
         <hr />
 
         <div className={selectClasses}>

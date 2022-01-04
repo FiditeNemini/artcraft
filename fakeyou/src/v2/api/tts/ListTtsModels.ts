@@ -14,6 +14,7 @@ export interface TtsModelListItem {
   creator_gravatar_hash: string,
   updatable_slug: string,
   title: string,
+  category_tokens: string[],
   created_at: string,
   updated_at: string,
 }

@@ -1,10 +1,10 @@
-import React, { useEffect, useCallback, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { TtsCategory } from '../../../api/category/ListTtsCategories';
 import { TtsModelListItem } from '../../../api/tts/ListTtsModels';
 
 interface Props {
   allTtsCategories: TtsCategory[],
-  //allTtsModels: TtsModelListItem[],
+  allTtsModels: TtsModelListItem[],
 }
 
 //interface TtsModelLite {
@@ -17,33 +17,31 @@ interface Props {
 //  maybeParentCategoryToken?: string,
 //}
 
-/*
-rootCat
-  .children[]
-  .allVoices[]
-
-rootCat
-  .children[]
-  .allVoices[]
-*/
-
 export function MultiDropdownSearch(props: Props) {
-  const { allTtsCategories } = props;
+  const { allTtsCategories, allTtsModels } = props;
 
-  // categoryToken -> category
+  // Lookup table
+  // Structure: { categoryToken -> category }
   const [allCategoriesByTokenMap, setAllCategoriesByTokenMap] = useState<Map<string,TtsCategory>>(new Map());
 
-  // [dropdownLevel][categories]
   // Outer array has length of at least one, one element per <select>
   // Inner array contains the categories in each level.
+  // Structure: [dropdownLevel][categories]
   const [dropdownCategories, setDropdownCategories] = useState<TtsCategory[][]>([]);
 
-  // Empty if none are selected.
+  // Every category in the heirarchy that has been selected by the user.
+  // Empty list if none are selected.
+  // Structure: [firstSelected, secondSelected...]
   const [selectedCategories, setSelectedCategories] = useState<TtsCategory[]>([]);
+
+  // A TTS voice is attached to every category up the tree from the leaf.
+  // We recursively build this, 1) to ensure we can access a voice at all levels 
+  // of specificity, and 2) to prune empty categories.
+  const [ttsModelByCategoryToken, setTtsModelByCategoryToken] = useState<Map<string,TtsModelListItem[]>>(new Map());
 
   // TODO: Handle empty category list
   useEffect(() => {
-    // Lookup table
+    // Category lookup table
     let categoriesByTokenMap = new Map();
     allTtsCategories.forEach(category => {
       categoriesByTokenMap.set(category.category_token, category);
@@ -57,7 +55,36 @@ export function MultiDropdownSearch(props: Props) {
     const rootLevel = [rootCategories];
     setDropdownCategories(rootLevel);
 
-  }, [allTtsCategories]);
+    // Voice lookup table
+    let categoriesToTtsModelTokens = new Map();
+    // Category ancestry memoization
+    let categoryTokenToAllAncestorTokens : Map<string, Set<string>> = new Map();
+
+    // N * M with memoization should't be too bad here.
+    allTtsModels.forEach(ttsModel => {
+      if (ttsModel.category_tokens.length === 0) {
+        // TODO: Attach to "uncategorized" special category
+        return;
+      }
+      ttsModel.category_tokens.forEach(categoryToken => {
+        let ancestors = categoryTokenToAllAncestorTokens.get(categoryToken);
+        if (ancestors === undefined) {
+          ancestors = findAllAncestorTokens(categoryToken, allCategoriesByTokenMap);
+          categoryTokenToAllAncestorTokens.set(categoryToken, ancestors);
+        }
+        ancestors.forEach(categoryToken => {
+          let modelTokens = categoriesToTtsModelTokens.get(categoryToken);
+          if (modelTokens === undefined) {
+            modelTokens = [];
+            categoriesToTtsModelTokens.set(categoryToken, modelTokens);
+          }
+          modelTokens.push(ttsModel.model_token);
+        })
+      });
+    });
+    setTtsModelByCategoryToken(categoriesToTtsModelTokens);
+
+  }, [allTtsCategories, allTtsModels, allCategoriesByTokenMap]);
 
 
   // 1. Create lookup map [string token] => object
@@ -164,4 +191,23 @@ export function MultiDropdownSearch(props: Props) {
       {dropdowns}
     </div>
   )
+}
+
+function findAllAncestorTokens(categoryToken: string, allCategoriesByTokenMap: Map<string, TtsCategory>): Set<string> {
+  const ancestorTokens = recursiveFindAllAncestorTokens(categoryToken, allCategoriesByTokenMap);
+  return new Set(ancestorTokens);
+}
+
+function recursiveFindAllAncestorTokens(categoryToken: string, allCategoriesByTokenMap: Map<string, TtsCategory>): string[] {
+  let category = allCategoriesByTokenMap.get(categoryToken)
+  if (category === undefined) {
+    return [];
+  }
+  if (!category.maybe_super_category_token) {
+    return [categoryToken];
+  }
+  return [
+    ...recursiveFindAllAncestorTokens(category.maybe_super_category_token, allCategoriesByTokenMap), 
+    categoryToken,
+  ];
 }
