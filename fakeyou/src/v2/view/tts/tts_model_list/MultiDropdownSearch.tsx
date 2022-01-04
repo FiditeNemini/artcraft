@@ -82,25 +82,37 @@ export function MultiDropdownSearch(props: Props) {
   // 
 
   const handleChangeCategory = (ev: React.FormEvent<HTMLSelectElement>, level: number) => { 
+    console.log('======= handleChangeCategory =======')
+
     const maybeToken = (ev.target as HTMLSelectElement).value;
     if (!maybeToken) {
       return;
     }
 
+    // Slice off all the irrelevant child category choices, then append new choice.
+    let newCategorySelections = selectedCategories.slice(0, level);
+    
+    // And the dropdowns themselves
+    let newDropdownCategories = dropdownCategories.slice(0, level + 1);
+
     let category = allCategoriesByTokenMap.get(maybeToken);
-    if (!category) {
-      return;
+    if (!!category) {
+      newCategorySelections.push(category);
     }
 
-    // Pop off all the irrelevant child choices.
-    let newCategorySelections = selectedCategories.slice(0, level);
+    console.log('newCategorySelections', newCategorySelections);
+    setSelectedCategories(selectedCategories);
 
-    newCategorySelections.push(category);
+    const newSubcategories = allTtsCategories.filter(category => {
+      return category.maybe_super_category_token === maybeToken;
+    });
 
-    console.log('level', level);
-    console.log('maybe token', maybeToken);
-    console.log('category', category);
-    console.log(newCategorySelections);
+    console.log('new subcategories', newSubcategories.length);
+
+    newDropdownCategories.push(newSubcategories);
+
+    setDropdownCategories(newDropdownCategories);
+
     /*ev.preventDefault();
     return false;*/
   };
@@ -116,20 +128,22 @@ export function MultiDropdownSearch(props: Props) {
     dropdownOptions.push(<option value="">Select...</option>);
 
     currentDropdownCategories.forEach(category => {
-      const isSelected = category.category_token === maybeSelectedToken;
+      //const isSelected = category.category_token === maybeSelectedToken;
       dropdownOptions.push(
         <option
           value={category.category_token}
-          selected={isSelected}
           >
           {category.name}
         </option>
       )
     })
 
+    console.log('maybeSelectedToken', maybeSelectedToken);
+
     dropdowns.push(
       <select
         onChange={(ev) => handleChangeCategory(ev, i)}
+        value={maybeSelectedToken}
         >
         {dropdownOptions}
       </select>
