@@ -86,7 +86,7 @@ export function MultiDropdownSearch(props: Props) {
 
     const maybeToken = (ev.target as HTMLSelectElement).value;
     if (!maybeToken) {
-      return;
+      return true;
     }
 
     // Slice off all the irrelevant child category choices, then append new choice.
@@ -101,7 +101,7 @@ export function MultiDropdownSearch(props: Props) {
     }
 
     console.log('newCategorySelections', newCategorySelections);
-    setSelectedCategories(selectedCategories);
+    setSelectedCategories(newCategorySelections);
 
     const newSubcategories = allTtsCategories.filter(category => {
       return category.maybe_super_category_token === maybeToken;
@@ -115,6 +115,7 @@ export function MultiDropdownSearch(props: Props) {
 
     /*ev.preventDefault();
     return false;*/
+    return true;
   };
 
   let dropdowns = [];
@@ -122,28 +123,27 @@ export function MultiDropdownSearch(props: Props) {
   for (let i = 0; i < dropdownCategories.length; i++) {
     const currentDropdownCategories = dropdownCategories[i];
 
-    let maybeSelectedToken = (selectedCategories[i] !== undefined)? selectedCategories[i].category_token : undefined;
+    let maybeSelectedToken = (!!selectedCategories[i])? selectedCategories[i].category_token : undefined;
+
+    console.log('maybeSelectedToken', maybeSelectedToken, i, selectedCategories.map(c => c.category_token));
 
     let dropdownOptions = [];
     dropdownOptions.push(<option value="">Select...</option>);
 
     currentDropdownCategories.forEach(category => {
-      //const isSelected = category.category_token === maybeSelectedToken;
       dropdownOptions.push(
         <option
-          value={category.category_token}
-          >
+          value={category.category_token}>
           {category.name}
         </option>
       )
     })
 
-    console.log('maybeSelectedToken', maybeSelectedToken);
 
     dropdowns.push(
       <select
-        onChange={(ev) => handleChangeCategory(ev, i)}
         value={maybeSelectedToken}
+        onChange={(ev) => handleChangeCategory(ev, i)}
         >
         {dropdownOptions}
       </select>
