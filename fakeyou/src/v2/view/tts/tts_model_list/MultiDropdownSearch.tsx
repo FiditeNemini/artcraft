@@ -120,19 +120,22 @@ export function MultiDropdownSearch(props: Props) {
 
   let dropdowns = [];
 
+  console.log('-------render-------');
+
   for (let i = 0; i < dropdownCategories.length; i++) {
     const currentDropdownCategories = dropdownCategories[i];
 
     let maybeSelectedToken = (!!selectedCategories[i])? selectedCategories[i].category_token : undefined;
 
-    console.log('maybeSelectedToken', maybeSelectedToken, i, selectedCategories.map(c => c.category_token));
+    console.log('maybeSelectedToken', i, maybeSelectedToken, selectedCategories.map(c => c.category_token));
 
     let dropdownOptions = [];
-    dropdownOptions.push(<option value="">Select...</option>);
+    dropdownOptions.push(<option key={`option-${i}-*`} value="*">Select...</option>);
 
     currentDropdownCategories.forEach(category => {
       dropdownOptions.push(
         <option
+          key={`option-${i}-${category.category_token}`}
           value={category.category_token}>
           {category.name}
         </option>
@@ -142,8 +145,9 @@ export function MultiDropdownSearch(props: Props) {
 
     dropdowns.push(
       <select
-        value={maybeSelectedToken}
+        key={i}
         onChange={(ev) => handleChangeCategory(ev, i)}
+        defaultValue="*"
         >
         {dropdownOptions}
       </select>
