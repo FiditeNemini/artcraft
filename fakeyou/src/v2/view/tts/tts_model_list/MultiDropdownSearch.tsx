@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { TtsCategory } from '../../../api/category/ListTtsCategories';
+import { TtsModel } from '../../../api/tts/GetTtsModel';
 import { TtsModelListItem } from '../../../api/tts/ListTtsModels';
 
 interface Props {
@@ -73,18 +74,18 @@ export function MultiDropdownSearch(props: Props) {
           categoryTokenToAllAncestorTokens.set(categoryToken, ancestors);
         }
         ancestors.forEach(categoryToken => {
-          let modelTokens = categoriesToTtsModelTokens.get(categoryToken);
-          if (modelTokens === undefined) {
-            modelTokens = [];
-            categoriesToTtsModelTokens.set(categoryToken, modelTokens);
+          let models = categoriesToTtsModelTokens.get(categoryToken);
+          if (models === undefined) {
+            models = [];
+            categoriesToTtsModelTokens.set(categoryToken, models);
           }
-          modelTokens.push(ttsModel.model_token);
+          models.push(ttsModel);
         })
       });
     });
     setTtsModelByCategoryToken(categoriesToTtsModelTokens);
 
-  }, [allTtsCategories, allTtsModels, allCategoriesByTokenMap]);
+  }, [allTtsCategories, allTtsModels]);
 
 
   // 1. Create lookup map [string token] => object
@@ -186,9 +187,30 @@ export function MultiDropdownSearch(props: Props) {
     );
   }
 
+  const leafiestCategory = selectedCategories[selectedCategories.length - 1];
+
+  let leafiestCategoryModels : TtsModelListItem[] = [];
+  if (leafiestCategory !== undefined) {
+    leafiestCategoryModels = ttsModelByCategoryToken.get(leafiestCategory.category_token) || [];
+  }
+
+  let modelDropdown = (
+    <select>
+      {leafiestCategoryModels.map(model => {
+        return (
+          <option
+            key={model.model_token}
+            value={model.model_token}
+            >{model.title}</option>
+        );
+      })}
+    </select>
+  );
+
   return (
     <div>
       {dropdowns}
+      {modelDropdown}
     </div>
   )
 }
