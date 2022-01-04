@@ -30,6 +30,9 @@ rootCat
 export function MultiDropdownSearch(props: Props) {
   const { allTtsCategories } = props;
 
+  // categoryToken -> category
+  const [allCategoriesByTokenMap, setAllCategoriesByTokenMap] = useState<Map<string,TtsCategory>>(new Map());
+
   // [dropdownLevel][categories]
   // Outer array has length of at least one, one element per <select>
   // Inner array contains the categories in each level.
@@ -38,12 +41,22 @@ export function MultiDropdownSearch(props: Props) {
   // Empty if none are selected.
   const [selectedCategories, setSelectedCategories] = useState<TtsCategory[]>([]);
 
+  // TODO: Handle empty category list
   useEffect(() => {
+    // Lookup table
+    let categoriesByTokenMap = new Map();
+    allTtsCategories.forEach(category => {
+      categoriesByTokenMap.set(category.category_token, category);
+    })
+    setAllCategoriesByTokenMap(categoriesByTokenMap);
+
+    // Initial dropdown state
     const rootCategories = allTtsCategories.filter(category => {
       return !category.maybe_super_category_token;
     });
     const rootLevel = [rootCategories];
-    setDropdownCategories(rootLevel)
+    setDropdownCategories(rootLevel);
+
   }, [allTtsCategories]);
 
 
@@ -68,20 +81,59 @@ export function MultiDropdownSearch(props: Props) {
   //     default if we prepopulate the list.
   // 
 
+  const handleChangeCategory = (ev: React.FormEvent<HTMLSelectElement>, level: number) => { 
+    const maybeToken = (ev.target as HTMLSelectElement).value;
+    if (!maybeToken) {
+      return;
+    }
+
+    let category = allCategoriesByTokenMap.get(maybeToken);
+    if (!category) {
+      return;
+    }
+
+    // Pop off all the irrelevant child choices.
+    let newCategorySelections = selectedCategories.slice(0, level);
+
+    newCategorySelections.push(category);
+
+    console.log('level', level);
+    console.log('maybe token', maybeToken);
+    console.log('category', category);
+    console.log(newCategorySelections);
+    /*ev.preventDefault();
+    return false;*/
+  };
+
   let dropdowns = [];
 
   for (let i = 0; i < dropdownCategories.length; i++) {
     const currentDropdownCategories = dropdownCategories[i];
 
-    let dropdownOptions = [];
+    let maybeSelectedToken = (selectedCategories[i] !== undefined)? selectedCategories[i].category_token : undefined;
 
-    dropdownOptions.push(<option>Select...</option>);
+    let dropdownOptions = [];
+    dropdownOptions.push(<option value="">Select...</option>);
 
     currentDropdownCategories.forEach(category => {
-      dropdownOptions.push(<option>{category.name}</option>)
+      const isSelected = category.category_token === maybeSelectedToken;
+      dropdownOptions.push(
+        <option
+          value={category.category_token}
+          selected={isSelected}
+          >
+          {category.name}
+        </option>
+      )
     })
 
-    dropdowns.push(<select>{dropdownOptions}</select>);
+    dropdowns.push(
+      <select
+        onChange={(ev) => handleChangeCategory(ev, i)}
+        >
+        {dropdownOptions}
+      </select>
+    );
   }
 
   return (
