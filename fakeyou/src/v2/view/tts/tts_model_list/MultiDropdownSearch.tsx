@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import { TtsCategory } from '../../../api/category/ListTtsCategories';
-import { TtsModel } from '../../../api/tts/GetTtsModel';
 import { TtsModelListItem } from '../../../api/tts/ListTtsModels';
 
 interface Props {
@@ -70,7 +69,7 @@ export function MultiDropdownSearch(props: Props) {
       ttsModel.category_tokens.forEach(categoryToken => {
         let ancestors = categoryTokenToAllAncestorTokens.get(categoryToken);
         if (ancestors === undefined) {
-          ancestors = findAllAncestorTokens(categoryToken, allCategoriesByTokenMap);
+          ancestors = findAllAncestorTokens(categoryToken, categoriesByTokenMap);
           categoryTokenToAllAncestorTokens.set(categoryToken, ancestors);
         }
         ancestors.forEach(categoryToken => {
