@@ -142,6 +142,11 @@ export function MultiDropdownSearch(props: Props) {
       )
     })
 
+    if (dropdownOptions.length <= 1) {
+      // We've run out of subcategories. (1 == "Select...")
+      // No sense trying to build a disjointed tree.
+      break; 
+    }
 
     dropdowns.push(
       <select
