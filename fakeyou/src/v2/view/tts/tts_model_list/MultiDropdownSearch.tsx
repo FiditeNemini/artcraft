@@ -37,7 +37,7 @@ export function MultiDropdownSearch(props: Props) {
   // A TTS voice is attached to every category up the tree from the leaf.
   // We recursively build this, 1) to ensure we can access a voice at all levels 
   // of specificity, and 2) to prune empty categories.
-  const [ttsModelByCategoryToken, setTtsModelByCategoryToken] = useState<Map<string,TtsModelListItem[]>>(new Map());
+  const [ttsModelsByCategoryToken, setTtsModelsByCategoryToken] = useState<Map<string,TtsModelListItem[]>>(new Map());
 
   // TODO: Handle empty category list
   useEffect(() => {
@@ -82,7 +82,7 @@ export function MultiDropdownSearch(props: Props) {
         })
       });
     });
-    setTtsModelByCategoryToken(categoriesToTtsModelTokens);
+    setTtsModelsByCategoryToken(categoriesToTtsModelTokens);
 
   }, [allTtsCategories, allTtsModels]);
 
@@ -160,6 +160,10 @@ export function MultiDropdownSearch(props: Props) {
     dropdownOptions.push(<option key={`option-${i}-*`} value="*">Select...</option>);
 
     currentDropdownCategories.forEach(category => {
+      const models = ttsModelsByCategoryToken.get(category.category_token);
+      if (models === undefined || models.length === 0) {
+        return; // If there are no models at the leaves, skip
+      }
       dropdownOptions.push(
         <option
           key={`option-${i}-${category.category_token}`}
@@ -190,7 +194,9 @@ export function MultiDropdownSearch(props: Props) {
 
   let leafiestCategoryModels : TtsModelListItem[] = [];
   if (leafiestCategory !== undefined) {
-    leafiestCategoryModels = ttsModelByCategoryToken.get(leafiestCategory.category_token) || [];
+    leafiestCategoryModels = ttsModelsByCategoryToken.get(leafiestCategory.category_token) || [];
+  } else {
+    leafiestCategoryModels = allTtsModels;
   }
 
   let modelDropdown = (
