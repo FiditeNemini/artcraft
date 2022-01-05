@@ -31,8 +31,6 @@ export function MultiDropdownSearch(props: Props) {
   // of specificity, and 2) to prune empty categories.
   const [ttsModelsByCategoryToken, setTtsModelsByCategoryToken] = useState<Map<string,Set<TtsModelListItem>>>(new Map());
 
-  const [hideSelect, setHideSelect] = useState(false);
-
   // TODO: Handle empty category list
   useEffect(() => {
     // Category lookup table
@@ -115,49 +113,30 @@ export function MultiDropdownSearch(props: Props) {
       newCategorySelections.push(category);
     }
 
-    //console.log('newCategorySelections', newCategorySelections);
     setSelectedCategories(newCategorySelections);
 
     const newSubcategories = allTtsCategories.filter(category => {
       return category.maybe_super_category_token === maybeToken;
     });
 
-    //console.log('new subcategories', newSubcategories.length);
-
     newDropdownCategories.push(newSubcategories);
-    //console.log('new categories', newDropdownCategories);
-
     setDropdownCategories(newDropdownCategories);
   }
 
   const handleChangeCategory = (ev: React.FormEvent<HTMLSelectElement>, level: number) => { 
-    //console.log('======= handleChangeCategory =======')
     const maybeToken = (ev.target as HTMLSelectElement).value;
     if (!maybeToken) {
       return true;
     }
-
-    //const maybeName: string | undefined = allCategoriesByTokenMap.get(maybeToken)?.name_for_dropdown; // TODO DEBUG ONLY
-    //console.log('[+] handleChangeCategory', level, maybeToken, maybeName)
-
     doChangeCategory(level, maybeToken);
-
     return true;
   };
 
   const handleRemoveCategory = (level: number) => {
-    const parentLevel = Math.max(level - 1, 0);
+    let parentLevel = Math.max(level - 1, 0);
+    let maybeToken = '*';
 
-    let maybeToken : string | undefined = selectedCategories[parentLevel]?.category_token;
-    let maybeName: string | undefined = selectedCategories[parentLevel]?.name_for_dropdown; // TODO DEBUG ONLY
-
-    level = Math.max(level - 1, 0);
-    maybeToken = '*';
-    maybeName = '*';
-
-    console.log('[-] handleRemoveCategory', level, maybeToken, maybeName)
-
-    doChangeCategory(level, maybeToken);
+    doChangeCategory(parentLevel, maybeToken);
 
     // NB: There's a bug selecting the "default" of the parent category.
     // React won't respect the state, so we'll brute force it here.
@@ -304,10 +283,6 @@ export function MultiDropdownSearch(props: Props) {
       </span>
     </div>
   );
-
-  if (hideSelect) {
-    return <div></div>
-  }
 
   return (
     <div>
