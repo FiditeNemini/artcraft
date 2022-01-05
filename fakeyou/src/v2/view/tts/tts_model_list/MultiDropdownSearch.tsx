@@ -1,3 +1,5 @@
+import { faHeadphonesAlt, faTags } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import React, { useEffect, useState } from 'react';
 import { TtsCategory } from '../../../api/category/ListTtsCategories';
 import { TtsModelListItem } from '../../../api/tts/ListTtsModels';
@@ -172,16 +174,20 @@ export function MultiDropdownSearch(props: Props) {
 
     categoryDropdowns.push(
       <>
-        <div className="select is-normal">
-          <select
-            key={i}
-            onChange={(ev) => handleChangeCategory(ev, i)}
-            defaultValue="*"
-            >
-            {dropdownOptions}
-          </select>
+        <div className="control has-icons-left">
+          <div className="select is-normal">
+            <select
+              key={i}
+              onChange={(ev) => handleChangeCategory(ev, i)}
+              defaultValue="*"
+              >
+              {dropdownOptions}
+            </select>
+          </div>
+          <span className="icon is-small is-left">
+            <FontAwesomeIcon icon={faTags} />
+          </span>
         </div>
-        <br />
       </>
     );
   }
@@ -206,23 +212,33 @@ export function MultiDropdownSearch(props: Props) {
   }
 
   let modelDropdown = (
-    <div className="select is-normal">
-      <select>
-        {Array.from(leafiestCategoryModels).map(model => {
-          return (
-            <option
-              key={model.model_token}
-              value={model.model_token}
-              >{model.title}</option>
-          );
-        })}
-      </select>
+    <div className="control has-icons-left">
+      <div className="select is-normal">
+        <select>
+          {Array.from(leafiestCategoryModels).map(model => {
+            return (
+              <option
+                key={model.model_token}
+                value={model.model_token}
+                >{model.title} (by {model.creator_display_name})</option>
+            );
+          })}
+        </select>
+      </div>
+      <span className="icon is-small is-left">
+        <FontAwesomeIcon icon={faHeadphonesAlt} />
+      </span>
     </div>
   );
 
   return (
     <div>
+      <strong>Category Filters</strong>
+      <br />
       {categoryDropdowns}
+      <br />
+      <strong>Voice</strong>
+      <br />
       {modelDropdown}
     </div>
   )
