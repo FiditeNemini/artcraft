@@ -195,19 +195,6 @@ function TtsModelListFc(props: Props) {
     );
   }
 
-  let categoryList : JSX.Element[] = [];
-
-  props.allTtsCategories.forEach(ttsCategory => {
-    let option = (
-      <option 
-        key={ttsCategory.category_token} 
-        value={ttsCategory.category_token} 
-        >{ttsCategory.name_for_dropdown}</option>
-    );
-
-    categoryList.push(option);
-  });
-
   return (
     <div>
       <h1 className="title is-1"> FakeYou Text to Speech </h1>
@@ -223,14 +210,6 @@ function TtsModelListFc(props: Props) {
           allTtsCategories={props.allTtsCategories} 
           allTtsModels={props.ttsModels}
           />
-
-        <hr />
-
-        <div className={selectClasses}>
-          <select>
-            {categoryList}
-          </select>
-        </div>
 
         <hr />
 

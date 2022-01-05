@@ -134,7 +134,7 @@ export function MultiDropdownSearch(props: Props) {
     return true;
   };
 
-  let dropdowns = [];
+  let categoryDropdowns = [];
 
   console.log('-------render-------');
 
@@ -145,8 +145,10 @@ export function MultiDropdownSearch(props: Props) {
 
     console.log('maybeSelectedToken', i, maybeSelectedToken, selectedCategories.map(c => c.category_token));
 
+    let defaultName = (i === 0) ? 'All Voices' : 'Select...';
+
     let dropdownOptions = [];
-    dropdownOptions.push(<option key={`option-${i}-*`} value="*">Select...</option>);
+    dropdownOptions.push(<option key={`option-${i}-*`} value="*">{defaultName}</option>);
 
     currentDropdownCategories.forEach(category => {
       const models = ttsModelsByCategoryToken.get(category.category_token);
@@ -168,16 +170,31 @@ export function MultiDropdownSearch(props: Props) {
       break; 
     }
 
-    dropdowns.push(
-      <select
-        key={i}
-        onChange={(ev) => handleChangeCategory(ev, i)}
-        defaultValue="*"
-        >
-        {dropdownOptions}
-      </select>
+    categoryDropdowns.push(
+      <>
+        <div className="select is-normal">
+          <select
+            key={i}
+            onChange={(ev) => handleChangeCategory(ev, i)}
+            defaultValue="*"
+            >
+            {dropdownOptions}
+          </select>
+        </div>
+        <br />
+      </>
     );
   }
+
+  /*
+  let selectClasses = 'select is-large';
+  if (listItems.length === 0) {
+    selectClasses = 'select is-large is-loading';
+    listItems.push((
+      <option key="waiting" value="" disabled={true}>Loading...</option>
+    ))
+  }
+  */
 
   const leafiestCategory = selectedCategories[selectedCategories.length - 1];
 
@@ -189,21 +206,23 @@ export function MultiDropdownSearch(props: Props) {
   }
 
   let modelDropdown = (
-    <select>
-      {Array.from(leafiestCategoryModels).map(model => {
-        return (
-          <option
-            key={model.model_token}
-            value={model.model_token}
-            >{model.title}</option>
-        );
-      })}
-    </select>
+    <div className="select is-normal">
+      <select>
+        {Array.from(leafiestCategoryModels).map(model => {
+          return (
+            <option
+              key={model.model_token}
+              value={model.model_token}
+              >{model.title}</option>
+          );
+        })}
+      </select>
+    </div>
   );
 
   return (
     <div>
-      {dropdowns}
+      {categoryDropdowns}
       {modelDropdown}
     </div>
   )
