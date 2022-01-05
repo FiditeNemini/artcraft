@@ -211,6 +211,8 @@ export function MultiDropdownSearch(props: Props) {
     leafiestCategoryModels = new Set(allTtsModels);
   }
 
+  const voiceCount = leafiestCategoryModels.size;
+
   let modelDropdown = (
     <div className="control has-icons-left">
       <div className="select is-normal">
@@ -237,7 +239,7 @@ export function MultiDropdownSearch(props: Props) {
       <br />
       {categoryDropdowns}
       <br />
-      <strong>Voice</strong>
+      <strong>Voice ({voiceCount} to choose from)</strong>
       <br />
       {modelDropdown}
     </div>
