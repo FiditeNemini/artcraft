@@ -31,6 +31,8 @@ export function MultiDropdownSearch(props: Props) {
   // of specificity, and 2) to prune empty categories.
   const [ttsModelsByCategoryToken, setTtsModelsByCategoryToken] = useState<Map<string,Set<TtsModelListItem>>>(new Map());
 
+  const [hideSelect, setHideSelect] = useState(false);
+
   // TODO: Handle empty category list
   useEffect(() => {
     // Category lookup table
@@ -123,24 +125,22 @@ export function MultiDropdownSearch(props: Props) {
     //console.log('new subcategories', newSubcategories.length);
 
     newDropdownCategories.push(newSubcategories);
+    //console.log('new categories', newDropdownCategories);
 
     setDropdownCategories(newDropdownCategories);
   }
 
   const handleChangeCategory = (ev: React.FormEvent<HTMLSelectElement>, level: number) => { 
     //console.log('======= handleChangeCategory =======')
-
     const maybeToken = (ev.target as HTMLSelectElement).value;
     if (!maybeToken) {
       return true;
     }
 
-    const maybeName: string | undefined = allCategoriesByTokenMap.get(maybeToken)?.name_for_dropdown; // TODO DEBUG ONLY
-
-    console.log('[+] handleChangeCategory', level, maybeToken, maybeName)
+    //const maybeName: string | undefined = allCategoriesByTokenMap.get(maybeToken)?.name_for_dropdown; // TODO DEBUG ONLY
+    //console.log('[+] handleChangeCategory', level, maybeToken, maybeName)
 
     doChangeCategory(level, maybeToken);
-
 
     return true;
   };
@@ -158,6 +158,13 @@ export function MultiDropdownSearch(props: Props) {
     console.log('[-] handleRemoveCategory', level, maybeToken, maybeName)
 
     doChangeCategory(level, maybeToken);
+
+    // NB: There's a bug selecting the "default" of the parent category.
+    // React won't respect the state, so we'll brute force it here.
+    let maybeElement = document.getElementsByName(`categories-${parentLevel}`)[0];
+    if (maybeElement) {
+      (maybeElement as any).value = '*';
+    }
 
     /*// drop0 = { foo, [bar] }
     // drop1 = { [aaa], bbb }
@@ -195,7 +202,7 @@ export function MultiDropdownSearch(props: Props) {
   for (let i = 0; i < dropdownCategories.length; i++) {
     const currentDropdownCategories = dropdownCategories[i];
 
-    let maybeSelectedToken = (!!selectedCategories[i])? selectedCategories[i].category_token : undefined;
+    //let maybeSelectedToken = (!!selectedCategories[i])? selectedCategories[i].category_token : undefined;
 
     //console.log('maybeSelectedToken', i, maybeSelectedToken, selectedCategories.map(c => c.category_token));
 
@@ -229,6 +236,7 @@ export function MultiDropdownSearch(props: Props) {
         <div className="control has-icons-left">
           <div className="select is-normal">
             <select
+              name={`categories-${i}`}
               key={i}
               onChange={(ev) => handleChangeCategory(ev, i)}
               defaultValue="*"
@@ -296,6 +304,10 @@ export function MultiDropdownSearch(props: Props) {
       </span>
     </div>
   );
+
+  if (hideSelect) {
+    return <div></div>
+  }
 
   return (
     <div>
