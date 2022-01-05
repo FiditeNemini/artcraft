@@ -80,27 +80,6 @@ export function MultiDropdownSearch(props: Props) {
   }, [allTtsCategories, allTtsModels]);
 
 
-  // 1. Create lookup map [string token] => object
-
-  // 2. Build parentless dropdown (level 0), filter(category => !category.parent_token)
-
-  // 3. Build "All Voices" special parentless dropdown
-  // 4. Select a random voice (perhaps from a pre-approved set)
-
-
-  //// ----- user interaction -------
-
-  // 1. User selects eg. "Gender"
-
-  // 2. Find all subcategories & voices and put into dropdown
-  // 3. Select a random subcategory or voice, which may incur the need to select more recursively... (BAD AND CONFUSING)
-  // 3. -- OR -- Make the user select something, but this invalidates the voice selection. 
-  // 3. -- OR -- Keep previous voice choice until set?
-
-  // Combine voice and category dropdowns? Or keep voice dropdown always separate?  -- If separate, we can always choose a 
-  //     default if we prepopulate the list.
-  // 
-
   const doChangeCategory = (level: number, maybeToken: string) => {
     // Slice off all the irrelevant child category choices, then append new choice.
     let newCategorySelections = selectedCategories.slice(0, level);
@@ -144,46 +123,12 @@ export function MultiDropdownSearch(props: Props) {
     if (maybeElement) {
       (maybeElement as any).value = '*';
     }
-
-    /*// drop0 = { foo, [bar] }
-    // drop1 = { [aaa], bbb }
-    // drop2 = { AAA, BBB }
-
-    // level = 2 clicked,
-
-    //
-
-
-    // Slice off all the irrelevant child category choices, then append new choice.
-    let newCategorySelections = selectedCategories.slice(0, parentLevel + 1);
-    setSelectedCategories(newCategorySelections);
-
-    const maybeToken : string | undefined = newCategorySelections[newCategorySelections.length -1]?.category_token;
-
-    // And the dropdowns themselves
-    let newDropdownCategories = dropdownCategories.slice(0, parentLevel);
-
-    const newSubcategories = allTtsCategories.filter(category => {
-      return category.maybe_super_category_token === maybeToken;
-    });
-
-    console.log('new subcategories', newSubcategories.length);
-
-    newDropdownCategories.push(newSubcategories);
-
-    setDropdownCategories(newDropdownCategories);*/
   }
 
   let categoryDropdowns = [];
 
-  //console.log('-------render-------');
-
   for (let i = 0; i < dropdownCategories.length; i++) {
     const currentDropdownCategories = dropdownCategories[i];
-
-    //let maybeSelectedToken = (!!selectedCategories[i])? selectedCategories[i].category_token : undefined;
-
-    //console.log('maybeSelectedToken', i, maybeSelectedToken, selectedCategories.map(c => c.category_token));
 
     let defaultName = (i === 0) ? 'All Voices' : 'Select...';
 
