@@ -20,6 +20,7 @@ use crate::util::random_crockford_token::random_crockford_token;
 use crate::util::random_prefix_crockford_token::random_prefix_crockford_token;
 use crate::validations::check_for_slurs::contains_slurs;
 use http_server_common::response::serialize_as_json_error::serialize_as_json_error;
+use lexical_sort::natural_lexical_cmp;
 use log::{info, warn, log};
 use regex::Regex;
 use sqlx::MySqlPool;
@@ -52,7 +53,8 @@ pub struct DisplayCategory {
   pub can_only_mods_apply: bool,
 
   pub name: String,
-  pub maybe_dropdown_name: Option<String>,
+  /// Instead of making the frontend deal with "maybe_dropdown_name", always use this:
+  pub name_for_dropdown: String,
 
   // Moderator fields
   // It's okay to leak this since we do for assigned categories and for mods to see
@@ -131,7 +133,7 @@ pub async fn list_tts_categories_handler(
           can_only_mods_apply: c.can_only_mods_apply,
           is_mod_approved: c.is_mod_approved,
           name: c.name.clone(),
-          maybe_dropdown_name: c.maybe_dropdown_name.clone(),
+          name_for_dropdown: c.maybe_dropdown_name.clone().unwrap_or(c.name.clone()),
           created_at: c.created_at.clone(),
           updated_at: c.updated_at.clone(),
           deleted_at: c.deleted_at.clone(),
@@ -139,8 +141,10 @@ pub async fn list_tts_categories_handler(
       })
       .collect::<Vec<DisplayCategory>>();
 
-  // TODO: Sort by dropdown name too.
-  categories.sort_by(|c1, c2| c1.name.cmp(&c2.name));
+  // NB: This might produce weird sorting resorts relative to the "name" field,
+  // but the typical way this should be consumed is via dropdowns.
+  categories.sort_by(|c1, c2|
+      natural_lexical_cmp(&c1.name_for_dropdown, &c2.name_for_dropdown));
 
   // TODO: Cache results in Redis w/ TTL.
   let response = ListTtsCategoriesResponse {
