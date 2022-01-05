@@ -20,6 +20,7 @@ use sqlx::mysql::MySqlDatabaseError;
 use std::collections::HashSet;
 use std::fmt;
 use std::sync::Arc;
+use lexical_sort::natural_lexical_cmp;
 
 #[derive(Serialize, Clone)]
 pub struct TtsModelRecordForResponse {
@@ -142,7 +143,9 @@ async fn get_all_models(mysql_pool: &MySqlPool) -> AnyhowResult<Vec<TtsModelReco
   let model_categories_map
       = fetch_tts_model_category_map(mysql_pool).await?;
 
-  models.sort_by(|a, b| (&a.title).cmp(&b.title));
+  // Make the list nice for human readers.
+  models.sort_by(|a, b|
+      natural_lexical_cmp(&a.title, &b.title));
 
   let models_for_response = models.into_iter()
       .map(|model| {
