@@ -1,4 +1,4 @@
-import { faHeadphonesAlt, faTags, faTimes, faTimesCircle } from '@fortawesome/free-solid-svg-icons';
+import { faHeadphonesAlt, faTags, faTimes } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import React, { useEffect, useState } from 'react';
 import { TtsCategory } from '../../../api/category/ListTtsCategories';
@@ -101,14 +101,7 @@ export function MultiDropdownSearch(props: Props) {
   //     default if we prepopulate the list.
   // 
 
-  const handleChangeCategory = (ev: React.FormEvent<HTMLSelectElement>, level: number) => { 
-    console.log('======= handleChangeCategory =======')
-
-    const maybeToken = (ev.target as HTMLSelectElement).value;
-    if (!maybeToken) {
-      return true;
-    }
-
+  const doChangeCategory = (level: number, maybeToken: string) => {
     // Slice off all the irrelevant child category choices, then append new choice.
     let newCategorySelections = selectedCategories.slice(0, level);
     
@@ -120,8 +113,69 @@ export function MultiDropdownSearch(props: Props) {
       newCategorySelections.push(category);
     }
 
-    console.log('newCategorySelections', newCategorySelections);
+    //console.log('newCategorySelections', newCategorySelections);
     setSelectedCategories(newCategorySelections);
+
+    const newSubcategories = allTtsCategories.filter(category => {
+      return category.maybe_super_category_token === maybeToken;
+    });
+
+    //console.log('new subcategories', newSubcategories.length);
+
+    newDropdownCategories.push(newSubcategories);
+
+    setDropdownCategories(newDropdownCategories);
+  }
+
+  const handleChangeCategory = (ev: React.FormEvent<HTMLSelectElement>, level: number) => { 
+    //console.log('======= handleChangeCategory =======')
+
+    const maybeToken = (ev.target as HTMLSelectElement).value;
+    if (!maybeToken) {
+      return true;
+    }
+
+    const maybeName: string | undefined = allCategoriesByTokenMap.get(maybeToken)?.name_for_dropdown; // TODO DEBUG ONLY
+
+    console.log('[+] handleChangeCategory', level, maybeToken, maybeName)
+
+    doChangeCategory(level, maybeToken);
+
+
+    return true;
+  };
+
+  const handleRemoveCategory = (level: number) => {
+    const parentLevel = Math.max(level - 1, 0);
+
+    let maybeToken : string | undefined = selectedCategories[parentLevel]?.category_token;
+    let maybeName: string | undefined = selectedCategories[parentLevel]?.name_for_dropdown; // TODO DEBUG ONLY
+
+    level = Math.max(level - 1, 0);
+    maybeToken = '*';
+    maybeName = '*';
+
+    console.log('[-] handleRemoveCategory', level, maybeToken, maybeName)
+
+    doChangeCategory(level, maybeToken);
+
+    /*// drop0 = { foo, [bar] }
+    // drop1 = { [aaa], bbb }
+    // drop2 = { AAA, BBB }
+
+    // level = 2 clicked,
+
+    //
+
+
+    // Slice off all the irrelevant child category choices, then append new choice.
+    let newCategorySelections = selectedCategories.slice(0, parentLevel + 1);
+    setSelectedCategories(newCategorySelections);
+
+    const maybeToken : string | undefined = newCategorySelections[newCategorySelections.length -1]?.category_token;
+
+    // And the dropdowns themselves
+    let newDropdownCategories = dropdownCategories.slice(0, parentLevel);
 
     const newSubcategories = allTtsCategories.filter(category => {
       return category.maybe_super_category_token === maybeToken;
@@ -131,21 +185,19 @@ export function MultiDropdownSearch(props: Props) {
 
     newDropdownCategories.push(newSubcategories);
 
-    setDropdownCategories(newDropdownCategories);
-
-    return true;
-  };
+    setDropdownCategories(newDropdownCategories);*/
+  }
 
   let categoryDropdowns = [];
 
-  console.log('-------render-------');
+  //console.log('-------render-------');
 
   for (let i = 0; i < dropdownCategories.length; i++) {
     const currentDropdownCategories = dropdownCategories[i];
 
     let maybeSelectedToken = (!!selectedCategories[i])? selectedCategories[i].category_token : undefined;
 
-    console.log('maybeSelectedToken', i, maybeSelectedToken, selectedCategories.map(c => c.category_token));
+    //console.log('maybeSelectedToken', i, maybeSelectedToken, selectedCategories.map(c => c.category_token));
 
     let defaultName = (i === 0) ? 'All Voices' : 'Select...';
 
@@ -192,10 +244,10 @@ export function MultiDropdownSearch(props: Props) {
 
           <button 
             className="button is-danger is-normal is-inverted is-rounded"
-            onClick={() => {}}
+            onClick={() => handleRemoveCategory(i)}
           >
             <span className="icon is-normal">
-              <FontAwesomeIcon icon={faTimesCircle} title="remove" />
+              <FontAwesomeIcon icon={faTimes} title="remove" />
             </span>
           </button>
 
