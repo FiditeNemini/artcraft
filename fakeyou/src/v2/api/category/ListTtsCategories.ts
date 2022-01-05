@@ -15,7 +15,7 @@ export interface TtsCategory {
   can_only_mods_apply: boolean,
 
   name: string,
-  maybe_dropdown_name?: string,
+  name_for_dropdown: string,
 
   is_mod_approved?: boolean,
 

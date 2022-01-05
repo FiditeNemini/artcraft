@@ -198,18 +198,12 @@ function TtsModelListFc(props: Props) {
   let categoryList : JSX.Element[] = [];
 
   props.allTtsCategories.forEach(ttsCategory => {
-    let categoryName = !!ttsCategory.maybe_dropdown_name ? ttsCategory.maybe_dropdown_name : ttsCategory.name;
-
     let option = (
       <option 
         key={ttsCategory.category_token} 
         value={ttsCategory.category_token} 
-        >{categoryName}</option>
+        >{ttsCategory.name_for_dropdown}</option>
     );
-
-    //if (defaultSelectValue === '') {
-    //  defaultSelectValue = m.model_token;
-    //}
 
     categoryList.push(option);
   });

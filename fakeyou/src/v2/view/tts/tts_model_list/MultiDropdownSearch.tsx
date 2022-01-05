@@ -157,7 +157,7 @@ export function MultiDropdownSearch(props: Props) {
         <option
           key={`option-${i}-${category.category_token}`}
           value={category.category_token}>
-          {category.name}
+          {category.name_for_dropdown}
         </option>
       )
     })
