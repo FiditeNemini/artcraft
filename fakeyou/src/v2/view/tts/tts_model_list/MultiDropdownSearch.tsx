@@ -1,6 +1,6 @@
-import { faHeadphonesAlt, faTags, faTimes } from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import React, { useEffect, useState } from 'react';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faHeadphonesAlt, faTags, faTimes } from '@fortawesome/free-solid-svg-icons';
 import { TtsCategory } from '../../../api/category/ListTtsCategories';
 import { TtsModelListItem } from '../../../api/tts/ListTtsModels';
 
@@ -151,40 +151,36 @@ export function MultiDropdownSearch(props: Props) {
 
     if (dropdownOptions.length <= 1) {
       // We've run out of subcategories. (1 == "Select...")
-      // No sense trying to build a disjointed tree.
+      // No sense trying to build more.
       break; 
     }
 
     categoryDropdowns.push(
-      <>
-        <div className="control has-icons-left">
-          <div className="select is-normal">
-            <select
-              name={`categories-${i}`}
-              key={i}
-              onChange={(ev) => handleChangeCategory(ev, i)}
-              defaultValue="*"
-              >
-              {dropdownOptions}
-            </select>
-          </div>
-          <span className="icon is-small is-left">
-            <FontAwesomeIcon icon={faTags} />
-          </span>
-
-          &nbsp;
-
-          <button 
-            className="button is-danger is-normal is-inverted is-rounded"
-            onClick={() => handleRemoveCategory(i)}
-          >
-            <span className="icon is-normal">
-              <FontAwesomeIcon icon={faTimes} title="remove" />
-            </span>
-          </button>
-
+      <div className="control has-icons-left" key={`categoryDropdown-${i}`}>
+        <div className="select is-normal">
+          <select
+            name={`categories-${i}`}
+            onChange={(ev) => handleChangeCategory(ev, i)}
+            defaultValue="*"
+            >
+            {dropdownOptions}
+          </select>
         </div>
-      </>
+        <span className="icon is-small is-left">
+          <FontAwesomeIcon icon={faTags} />
+        </span>
+
+        &nbsp;
+
+        <button 
+          className="button is-danger is-normal is-inverted is-rounded"
+          onClick={() => handleRemoveCategory(i)}
+        >
+          <span className="icon is-normal">
+            <FontAwesomeIcon icon={faTimes} title="remove" />
+          </span>
+        </button>
+      </div>
     );
   }
 
