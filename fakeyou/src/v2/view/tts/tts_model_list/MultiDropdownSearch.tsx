@@ -7,16 +7,6 @@ interface Props {
   allTtsModels: TtsModelListItem[],
 }
 
-//interface TtsModelLite {
-//  ttsModelToken: string,
-//  categoryTokens: string[],
-//}
-//
-//interface CategoryLite {
-//  categoryToken: string,
-//  maybeParentCategoryToken?: string,
-//}
-
 export function MultiDropdownSearch(props: Props) {
   const { allTtsCategories, allTtsModels } = props;
 
@@ -141,8 +131,6 @@ export function MultiDropdownSearch(props: Props) {
 
     setDropdownCategories(newDropdownCategories);
 
-    /*ev.preventDefault();
-    return false;*/
     return true;
   };
 
