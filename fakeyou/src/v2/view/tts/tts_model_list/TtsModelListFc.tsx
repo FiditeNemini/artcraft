@@ -209,6 +209,7 @@ function TtsModelListFc(props: Props) {
         <MultiDropdownSearch 
           allTtsCategories={props.allTtsCategories} 
           allTtsModels={props.ttsModels}
+          setCurrentTtsModelSelected={props.setCurrentTtsModelSelected}
           />
 
         <hr />

@@ -7,14 +7,17 @@ import { TtsModelListItem } from '../../../api/tts/ListTtsModels';
 interface Props {
   allTtsCategories: TtsCategory[],
   allTtsModels: TtsModelListItem[],
+
+  // Pass state up the chain
+  setCurrentTtsModelSelected: (ttsModel: TtsModelListItem) => void,
 }
 
 export function MultiDropdownSearch(props: Props) {
   const { allTtsCategories, allTtsModels } = props;
 
-  // Lookup table
-  // Structure: { categoryToken -> category }
+  // Lookup by primary key
   const [allCategoriesByTokenMap, setAllCategoriesByTokenMap] = useState<Map<string,TtsCategory>>(new Map());
+  const [allTtsModelsByTokenMap, setAllTtsModelsByTokenMap] = useState<Map<string,TtsModelListItem>>(new Map());
 
   // Outer array has length of at least one, one element per <select>
   // Inner array contains the categories in each level.
@@ -33,12 +36,19 @@ export function MultiDropdownSearch(props: Props) {
 
   // TODO: Handle empty category list
   useEffect(() => {
-    // Category lookup table
+    // Category lookup by token
     let categoriesByTokenMap = new Map();
     allTtsCategories.forEach(category => {
       categoriesByTokenMap.set(category.category_token, category);
     })
     setAllCategoriesByTokenMap(categoriesByTokenMap);
+
+    // TTS model lookup by token
+    let ttsModelsByTokenMap = new Map();
+    allTtsModels.forEach(model => {
+      ttsModelsByTokenMap.set(model.model_token, model);
+    })
+    setAllTtsModelsByTokenMap(ttsModelsByTokenMap);
 
     // Initial dropdown state
     const rootCategories = allTtsCategories.filter(category => {
@@ -125,6 +135,14 @@ export function MultiDropdownSearch(props: Props) {
     }
   }
 
+  const handleChangeVoice = (ev: React.FormEvent<HTMLSelectElement>) => { 
+    const ttsModelToken = (ev.target as HTMLSelectElement).value;
+    const maybeTtsModel = allTtsModelsByTokenMap.get(ttsModelToken);
+    if (maybeTtsModel) {
+      props.setCurrentTtsModelSelected(maybeTtsModel);
+    }
+  };
+
   let categoryDropdowns = [];
 
   for (let i = 0; i < dropdownCategories.length; i++) {
@@ -208,7 +226,7 @@ export function MultiDropdownSearch(props: Props) {
   let modelDropdown = (
     <div className="control has-icons-left">
       <div className="select is-normal">
-        <select>
+        <select onChange={handleChangeVoice}>
           {Array.from(leafiestCategoryModels).map(model => {
             return (
               <option
