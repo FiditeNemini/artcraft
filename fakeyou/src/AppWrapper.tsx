@@ -1,6 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faHeadphonesAlt, faTags, faTimes } from '@fortawesome/free-solid-svg-icons';
 import { TtsCategory } from './v2/api/category/ListTtsCategories';
 import { TtsModelListItem } from './v2/api/tts/ListTtsModels';
 import { App } from './App';
@@ -98,193 +96,28 @@ export function AppWrapper(props: Props) {
 
   }, [allTtsCategories, allTtsModels]);
 
-
-  const doChangeCategory = (level: number, maybeToken: string) => {
-    // Slice off all the irrelevant child category choices, then append new choice.
-    let newCategorySelections = selectedCategories.slice(0, level);
-    
-    // And the dropdowns themselves
-    let newDropdownCategories = dropdownCategories.slice(0, level + 1);
-
-    let category = allCategoriesByTokenMap.get(maybeToken);
-    if (!!category) {
-      newCategorySelections.push(category);
-    }
-
-    setSelectedCategories(newCategorySelections);
-
-    const newSubcategories = allTtsCategories.filter(category => {
-      return category.maybe_super_category_token === maybeToken;
-    });
-
-    newDropdownCategories.push(newSubcategories);
-    setDropdownCategories(newDropdownCategories);
-  }
-
-  const handleChangeCategory = (ev: React.FormEvent<HTMLSelectElement>, level: number) => { 
-    const maybeToken = (ev.target as HTMLSelectElement).value;
-    if (!maybeToken) {
-      return true;
-    }
-    doChangeCategory(level, maybeToken);
-    return true;
-  };
-
-  const handleRemoveCategory = (level: number) => {
-    let parentLevel = Math.max(level - 1, 0);
-    let maybeToken = '*';
-
-    doChangeCategory(parentLevel, maybeToken);
-
-    // NB: There's a bug selecting the "default" of the parent category.
-    // React won't respect the state, so we'll brute force it here.
-    let maybeElement = document.getElementsByName(`categories-${parentLevel}`)[0];
-    if (maybeElement) {
-      (maybeElement as any).value = '*';
-    }
-  }
-
-  const handleChangeVoice = (ev: React.FormEvent<HTMLSelectElement>) => { 
-    const ttsModelToken = (ev.target as HTMLSelectElement).value;
-    const maybeTtsModel = allTtsModelsByTokenMap.get(ttsModelToken);
-    if (maybeTtsModel) {
-      //props.setCurrentTtsModelSelected(maybeTtsModel);
-    }
-  };
-
-  let categoryDropdowns = [];
-
-  for (let i = 0; i < dropdownCategories.length; i++) {
-    const currentDropdownCategories = dropdownCategories[i];
-
-    let defaultName = (i === 0) ? 'All Voices' : 'Select...';
-
-    let dropdownOptions = [];
-    dropdownOptions.push(<option key={`option-${i}-*`} value="*">{defaultName}</option>);
-
-    currentDropdownCategories.forEach(category => {
-      const models = ttsModelsByCategoryToken.get(category.category_token);
-      if (models === undefined || models.size === 0) {
-        return; // If there are no models at the leaves, skip
-      }
-      dropdownOptions.push(
-        <option
-          key={`option-${i}-${category.category_token}`}
-          value={category.category_token}>
-          {category.name_for_dropdown}
-        </option>
-      )
-    })
-
-    if (dropdownOptions.length <= 1) {
-      // We've run out of subcategories. (1 == "Select...")
-      // No sense trying to build more.
-      break; 
-    }
-
-    categoryDropdowns.push(
-      <div className="control has-icons-left" key={`categoryDropdown-${i}`}>
-        <div className="select is-normal">
-          <select
-            name={`categories-${i}`}
-            onChange={(ev) => handleChangeCategory(ev, i)}
-            defaultValue="*"
-            >
-            {dropdownOptions}
-          </select>
-        </div>
-        <span className="icon is-small is-left">
-          <FontAwesomeIcon icon={faTags} />
-        </span>
-
-        &nbsp;
-
-        <button 
-          className="button is-danger is-normal is-inverted is-rounded"
-          onClick={() => handleRemoveCategory(i)}
-        >
-          <span className="icon is-normal">
-            <FontAwesomeIcon icon={faTimes} title="remove" />
-          </span>
-        </button>
-      </div>
-    );
-  }
-
-  /*
-  let selectClasses = 'select is-large';
-  if (listItems.length === 0) {
-    selectClasses = 'select is-large is-loading';
-    listItems.push((
-      <option key="waiting" value="" disabled={true}>Loading...</option>
-    ))
-  }
-  */
-
-  const leafiestCategory = selectedCategories[selectedCategories.length - 1];
-
-  let leafiestCategoryModels : Set<TtsModelListItem> = new Set();
-  if (leafiestCategory !== undefined) {
-    leafiestCategoryModels = ttsModelsByCategoryToken.get(leafiestCategory.category_token) || new Set();
-  } else {
-    leafiestCategoryModels = new Set(allTtsModels);
-  }
-
-  const voiceCount = leafiestCategoryModels.size;
-
-  let modelDropdown = (
-    <div className="control has-icons-left">
-      <div className="select is-normal">
-        <select onChange={handleChangeVoice}>
-          {Array.from(leafiestCategoryModels).map(model => {
-            return (
-              <option
-                key={model.model_token}
-                value={model.model_token}
-                >{model.title} (by {model.creator_display_name})</option>
-            );
-          })}
-        </select>
-      </div>
-      <span className="icon is-small is-left">
-        <FontAwesomeIcon icon={faHeadphonesAlt} />
-      </span>
-    </div>
-  );
-
   return (
-    <>
-      <div>
-        <strong>Category Filters</strong>
-        <br />
-        {categoryDropdowns}
-        <br />
-        <strong>Voice ({voiceCount} to choose from)</strong>
-        <br />
-        {modelDropdown}
-      </div>
-      <App 
-          enableSpectrograms={props.enableSpectrograms} 
+    <App 
+        enableSpectrograms={props.enableSpectrograms} 
 
-          allTtsCategories={allTtsCategories}
-          setAllTtsCategories={setAllTtsCategories}
+        allTtsCategories={allTtsCategories}
+        setAllTtsCategories={setAllTtsCategories}
 
-          allTtsModels={allTtsModels}
-          setAllTtsModels={setAllTtsModels}
+        allTtsModels={allTtsModels}
+        setAllTtsModels={setAllTtsModels}
 
-          allTtsCategoriesByTokenMap={allCategoriesByTokenMap}
-          allTtsModelsByTokenMap={allTtsModelsByTokenMap}
-          ttsModelsByCategoryToken={ttsModelsByCategoryToken}
+        allTtsCategoriesByTokenMap={allCategoriesByTokenMap}
+        allTtsModelsByTokenMap={allTtsModelsByTokenMap}
+        ttsModelsByCategoryToken={ttsModelsByCategoryToken}
 
-          dropdownCategories={dropdownCategories}
-          setDropdownCategories={setDropdownCategories}
-          selectedCategories={selectedCategories}
-          setSelectedCategories={setSelectedCategories}
+        dropdownCategories={dropdownCategories}
+        setDropdownCategories={setDropdownCategories}
+        selectedCategories={selectedCategories}
+        setSelectedCategories={setSelectedCategories}
 
-          maybeSelectedTtsModel={maybeSelectedTtsModel}
-          setMaybeSelectedTtsModel={setMaybeSelectedTtsModel}
-        />
-    </>
+        maybeSelectedTtsModel={maybeSelectedTtsModel}
+        setMaybeSelectedTtsModel={setMaybeSelectedTtsModel}
+      />
   )
 }
 
