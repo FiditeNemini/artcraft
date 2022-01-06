@@ -48,10 +48,6 @@ interface Props {
   selectedCategories: TtsCategory[],
   setSelectedCategories: (selectedCategories: TtsCategory[]) => void,
 
-  // TODO: rename 'active'
-  //currentTtsModelSelected?: TtsModelListItem,
-  //setCurrentTtsModelSelected: (ttsModel: TtsModelListItem) => void,
-
   maybeSelectedTtsModel?: TtsModelListItem,
   setMaybeSelectedTtsModel: (maybeSelectedTtsModel: TtsModelListItem) => void,
 }
@@ -77,16 +73,12 @@ function TtsModelListFc(props: Props) {
     const models = await ListTtsModels();
     if (models) {
       setTtsModels(models);
-//      if (!currentTtsModelSelected && models.length > 0) {
-//        const model = models[0];
-//        setCurrentTtsModelSelected(model);
-//      }
       if (!maybeSelectedTtsModel && models.length > 0) {
         const model = models[0];
         setMaybeSelectedTtsModel(model);
       }
     }
-  }, [setTtsModels, /*setCurrentTtsModelSelected, currentTtsModelSelected*/ maybeSelectedTtsModel, setMaybeSelectedTtsModel]);
+  }, [setTtsModels, maybeSelectedTtsModel, setMaybeSelectedTtsModel]);
 
   const listTtsCategories = useCallback(async () => {
     if (allTtsCategories.length > 0) {
@@ -109,9 +101,6 @@ function TtsModelListFc(props: Props) {
   let listItems: Array<JSX.Element> = [];
 
   let defaultSelectValue = '';
-//  if (props.currentTtsModelSelected) {
-//    defaultSelectValue = props.currentTtsModelSelected.model_token;
-//  }
   if (props.maybeSelectedTtsModel) {
     defaultSelectValue = props.maybeSelectedTtsModel.model_token;
   }
@@ -149,7 +138,6 @@ function TtsModelListFc(props: Props) {
     // TODO: Inefficient.
     props.ttsModels.forEach(model => {
       if (model.model_token === selectVoiceValue) {
-//        props.setCurrentTtsModelSelected(model);
         props.setMaybeSelectedTtsModel(model);
       }
     });
@@ -166,9 +154,6 @@ function TtsModelListFc(props: Props) {
   const handleFormSubmit = (ev: React.FormEvent<HTMLFormElement>) => { 
     ev.preventDefault();
 
-//    if (!props.currentTtsModelSelected) {
-//      return false;
-//    }
     if (!props.maybeSelectedTtsModel) {
       return false;
     }
@@ -177,7 +162,6 @@ function TtsModelListFc(props: Props) {
       return false;
     }
 
-//    const modelToken = props.currentTtsModelSelected!.model_token;
     const modelToken = props.maybeSelectedTtsModel!.model_token;
 
     const api = new ApiConfig();
@@ -221,20 +205,6 @@ function TtsModelListFc(props: Props) {
 
   let directViewLink = <span />;
 
-//  if (props.currentTtsModelSelected) {
-//    let modelLink = `/tts/${props.currentTtsModelSelected.model_token}`;
-//    directViewLink = (
-//      <Link to={modelLink}>
-//        See more details about the "<strong>{props.currentTtsModelSelected.title}</strong>" model 
-//        by&nbsp;<strong>{props.currentTtsModelSelected.creator_display_name}</strong>&nbsp; 
-//        <GravatarFc 
-//          size={15}
-//          username={props.currentTtsModelSelected.creator_display_name}
-//          email_hash={props.currentTtsModelSelected.creator_gravatar_hash} /> 
-//      </Link>
-//    );
-//  }
-
   if (props.maybeSelectedTtsModel) {
     let modelLink = `/tts/${props.maybeSelectedTtsModel.model_token}`;
     directViewLink = (
@@ -270,7 +240,6 @@ function TtsModelListFc(props: Props) {
           setDropdownCategories={props.setDropdownCategories}
           selectedCategories={props.selectedCategories}
           setSelectedCategories={props.setSelectedCategories}
-          //setCurrentTtsModelSelected={props.setCurrentTtsModelSelected}
           maybeSelectedTtsModel={props.maybeSelectedTtsModel}
           setMaybeSelectedTtsModel={props.setMaybeSelectedTtsModel}
           />

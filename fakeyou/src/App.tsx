@@ -64,14 +64,6 @@ interface State {
 
   // Current text entered
   textBuffer: string,
-
-//  // List of voices (post-query) and current voice selected on main page
-//  ttsModels: Array<TtsModelListItem>,
-//
-//  // Comprehensive list of categories we've queried.
-//  allTtsCategories: TtsCategory[],
-
-  // Selection state
 }
 
 function newVocodes() {
@@ -102,11 +94,6 @@ class App extends React.Component<Props, State> {
       w2lTemplateUploadJobs: [],
 
       textBuffer: '',
-
-//      ttsModels: [],
-//      allTtsCategories: [],
-      
-//      currentTtsModelSelected: undefined,
     }
   }
 
@@ -392,20 +379,6 @@ class App extends React.Component<Props, State> {
     this.setState({ textBuffer: '' });
   }
 
-//  setTtsModels = (ttsModels: Array<TtsModelListItem>) => {
-//    this.setState({ ttsModels: ttsModels });
-//    this.props.setAllTtsModels(ttsModels);
-//  }
-
-//  setCurrentTtsModelSelected = (ttsModel: TtsModelListItem) => {
-//    this.setState({ currentTtsModelSelected: ttsModel });
-//  }
-
-//  setAllTtsCategories = (allTtsCategories: TtsCategory[]) => {
-//    this.setState({ allTtsCategories: allTtsCategories })
-//    this.props.setAllTtsCategories(allTtsCategories);
-//  }
-
   public render() {
     if (this.state.migrationMode === MigrationMode.OLD_VOCODES) {
       return (
@@ -469,9 +442,6 @@ class App extends React.Component<Props, State> {
                     setDropdownCategories={this.props.setDropdownCategories}
                     selectedCategories={this.props.selectedCategories}
                     setSelectedCategories={this.props.setSelectedCategories}
-                    
-                    //currentTtsModelSelected={this.state.currentTtsModelSelected}
-                    //setCurrentTtsModelSelected={this.setCurrentTtsModelSelected}
 
                     maybeSelectedTtsModel={this.props.maybeSelectedTtsModel}
                     setMaybeSelectedTtsModel={this.props.setMaybeSelectedTtsModel}

@@ -17,26 +17,29 @@ export function AppWrapper(props: Props) {
   const [allTtsCategories, setAllTtsCategories] = useState<TtsCategory[]>([]);
   const [allTtsModels, setAllTtsModels] = useState<TtsModelListItem[]>([]);
 
-  // Lookup by primary key
+  // Precalculated maps for lookup by primary key
   const [allCategoriesByTokenMap, setAllCategoriesByTokenMap] = useState<Map<string,TtsCategory>>(new Map());
   const [allTtsModelsByTokenMap, setAllTtsModelsByTokenMap] = useState<Map<string,TtsModelListItem>>(new Map());
 
-  // Lookup by foreign key
+  // Precalculated map for lookup by foreign key
   // A TTS voice is attached to every category up the tree from the leaf.
   // We recursively build this, 1) to ensure we can access a voice at all levels 
   // of specificity, and 2) to prune empty categories.
   const [ttsModelsByCategoryToken, setTtsModelsByCategoryToken] = useState<Map<string,Set<TtsModelListItem>>>(new Map());
 
+  // Calculated dropdown options for every level of categories.
   // Outer array has length of at least one, one element per <select>
   // Inner array contains the categories in each level.
   // Structure: [dropdownLevel][categories]
   const [dropdownCategories, setDropdownCategories] = useState<TtsCategory[][]>([]);
 
+  // User selections.
   // Every category in the heirarchy that has been selected by the user.
   // Empty list if none are selected.
   // Structure: [firstSelected, secondSelected...]
   const [selectedCategories, setSelectedCategories] = useState<TtsCategory[]>([]);
 
+  // User selections.
   const [maybeSelectedTtsModel, setMaybeSelectedTtsModel] = useState<TtsModelListItem|undefined>(undefined);
 
   // TODO: Handle empty category list
@@ -139,4 +142,3 @@ function recursiveFindAllAncestorTokens(categoryToken: string, allCategoriesByTo
     categoryToken,
   ];
 }
-

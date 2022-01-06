@@ -31,11 +31,9 @@ interface Props {
 
   dropdownCategories: TtsCategory[][],
   setDropdownCategories: (dropdownCategories: TtsCategory[][]) => void,
+
   selectedCategories: TtsCategory[],
   setSelectedCategories: (selectedCategories: TtsCategory[]) => void,
-
-  // Pass state up the chain
-  //setCurrentTtsModelSelected: (ttsModel: TtsModelListItem) => void,
 
   maybeSelectedTtsModel?: TtsModelListItem,
   setMaybeSelectedTtsModel: (maybeSelectedTtsModel: TtsModelListItem) => void,
@@ -140,7 +138,6 @@ export function MultiDropdownSearch(props: Props) {
     const ttsModelToken = (ev.target as HTMLSelectElement).value;
     const maybeTtsModel = allTtsModelsByTokenMap.get(ttsModelToken);
     if (maybeTtsModel) {
-//      props.setCurrentTtsModelSelected(maybeTtsModel);
       props.setMaybeSelectedTtsModel(maybeTtsModel);
     }
   };
