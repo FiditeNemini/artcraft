@@ -179,8 +179,8 @@ export function MultiDropdownSearch(props: Props) {
     }
 
     categoryDropdowns.push(
-      <>
-        <div className="control has-icons-left is-expanded" key={`categoryDropdown-${i}`}>
+      <React.Fragment key={`categoryDropdown-${i}`}>
+        <div className="control has-icons-left is-expanded">
           <div className="select is-fullwidth">
             <select
               className="category-dropdown"
@@ -208,10 +208,10 @@ export function MultiDropdownSearch(props: Props) {
         </div>
 
 
-        <div className="control">
+        <div className="control" >
           <FontAwesomeIcon icon={faChevronRight} size="2x" color="#999" />
         </div>
-      </>
+      </React.Fragment>
     );
   }
 
@@ -225,7 +225,7 @@ export function MultiDropdownSearch(props: Props) {
 
     if (categoryFields.length >= groupSize) {
       categoryFieldGroups.push(
-        <div className="field is-grouped is-grouped">
+        <div className="field is-grouped is-grouped" key={`fieldGroup-${i}`}>
           {categoryFields.splice(0, categoryFields.length)}
         </div>
       );
@@ -234,7 +234,7 @@ export function MultiDropdownSearch(props: Props) {
 
   if (categoryFields.length >= 0) {
     categoryFieldGroups.push(
-      <div className="field is-grouped is-grouped">
+      <div className="field is-grouped is-grouped" key="fieldGroup-last">
         {categoryFields.splice(0, categoryFields.length)}
       </div>
     );
