@@ -52,14 +52,26 @@ export function MultiDropdownSearch(props: Props) {
     setDropdownCategories,
     selectedCategories,
     setSelectedCategories,
+    maybeSelectedTtsModel,
   } = props;
 
   useEffect(() => {
     console.log('========= MultiDropdownSearch.useEffect() ===========')
 
+    let selectedModelToken = undefined;
+
+    if (maybeSelectedTtsModel) {
+      selectedModelToken = maybeSelectedTtsModel.model_token;
+    } else if (allTtsModels.length > 0) {
+      //selectedModelToken = allTtsModels[0].model_token;
+    }
+
     let maybeElement = document.getElementsByName('tts-model-select')[0];
-    if (maybeElement) {
-      (maybeElement as any).value = '*';
+
+    if (!!maybeElement && !!selectedModelToken) {
+      console.log(`Setting dropdown to ${selectedModelToken}`);
+
+      (maybeElement as any).value = selectedModelToken;
     }
   });
 
