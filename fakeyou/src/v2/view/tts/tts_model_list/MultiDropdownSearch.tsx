@@ -109,6 +109,20 @@ export function MultiDropdownSearch(props: Props) {
 
     newDropdownCategories.push(newSubcategories);
     setDropdownCategories(newDropdownCategories);
+
+    // We might have switched into a category without our selected TTS model.
+    // If so, pick a new TTS model.
+    let maybeNewModel = undefined;
+    const availableModelsForCategory = ttsModelsByCategoryToken.get(maybeToken);
+    if (!!availableModelsForCategory && !!maybeSelectedTtsModel) {
+      const modelValid = availableModelsForCategory.has(maybeSelectedTtsModel);
+      if (!modelValid) {
+        maybeNewModel = Array.from(availableModelsForCategory)[0];
+      }
+    }
+    if (!!maybeNewModel) {
+      props.setMaybeSelectedTtsModel(maybeNewModel);
+    }
   }
 
   const handleChangeCategory = (ev: React.FormEvent<HTMLSelectElement>, level: number) => { 

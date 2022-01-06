@@ -57,8 +57,6 @@ function TtsModelListFc(props: Props) {
   let { 
     setTtsModels, 
     setAllTtsCategories, 
-    //setCurrentTtsModelSelected, 
-    //currentTtsModelSelected, 
     ttsModels, 
     allTtsCategories,
     maybeSelectedTtsModel,
