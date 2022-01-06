@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faChevronRight, faHeadphonesAlt, faTags, faTimes, faTimesCircle } from '@fortawesome/free-solid-svg-icons';
+import { faChevronRight, faHeadphonesAlt, faTags, faTimes } from '@fortawesome/free-solid-svg-icons';
 import { TtsCategory } from '../../../api/category/ListTtsCategories';
 import { TtsModelListItem } from '../../../api/tts/ListTtsModels';
 
