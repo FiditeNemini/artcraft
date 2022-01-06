@@ -23,11 +23,9 @@ enum MigrationMode {
 }
 
 interface Props {
-  // Certan browsers (iPhone) have pitiful support for drawing APIs. Worse yet,
-  // they seem to lose the "touch event sandboxing" that allows for audio to be 
-  // played after user interaction if the XHRs delivering the audio don't do so
-  // as actual audio mimetypes. (Decoding from base64 and trying to play fails.)
   enableSpectrograms: boolean,
+
+  flashVocodesNotice: boolean,
 
   allTtsCategories: TtsCategory[],
   setAllTtsCategories: (allTtsCategories: TtsCategory[]) => void,
@@ -55,6 +53,9 @@ interface State {
   // Rollout of vocodes 2.0
   enableAlpha: boolean,
   sessionWrapper: SessionWrapper,
+
+  // Show flash notice of vocodes name change
+  isShowingVocodesNotice: boolean,
 
   // Jobs enqueued during this browser session.
   ttsInferenceJobs: Array<TtsInferenceJob>,
@@ -87,6 +88,8 @@ class App extends React.Component<Props, State> {
       enableAlpha: enableAlpha,
       migrationMode: migrationMode,
       sessionWrapper: SessionWrapper.emptySession(),
+
+      isShowingVocodesNotice: props.flashVocodesNotice,
 
       ttsInferenceJobs: [],
       w2lInferenceJobs: [],
@@ -151,6 +154,10 @@ class App extends React.Component<Props, State> {
       this.querySession();
     })
     .catch(e => { /* Ignore. */ });
+  }
+
+  clearVocodesNotice = () => {
+    this.setState({ isShowingVocodesNotice: false })
   }
 
   enqueueTtsJob = (jobToken: string) => {
@@ -411,6 +418,9 @@ class App extends React.Component<Props, State> {
                   <NewVocodesContainer
                     sessionWrapper={this.state.sessionWrapper}
                     querySessionAction={this.querySession}
+
+                    isShowingVocodesNotice={this.state.isShowingVocodesNotice}
+                    clearVocodesNotice={this.clearVocodesNotice}
 
                     enqueueTtsJob={this.enqueueTtsJob}
                     ttsInferenceJobs={this.state.ttsInferenceJobs}

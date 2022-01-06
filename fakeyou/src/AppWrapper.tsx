@@ -9,6 +9,9 @@ interface Props {
   // played after user interaction if the XHRs delivering the audio don't do so
   // as actual audio mimetypes. (Decoding from base64 and trying to play fails.)
   enableSpectrograms: boolean,
+
+  // Whether or not to inform users that the name of the website has changed.
+  flashVocodesNotice: boolean,
 }
 
 export function AppWrapper(props: Props) {
@@ -102,6 +105,7 @@ export function AppWrapper(props: Props) {
   return (
     <App 
         enableSpectrograms={props.enableSpectrograms} 
+        flashVocodesNotice={props.flashVocodesNotice}
 
         allTtsCategories={allTtsCategories}
         setAllTtsCategories={setAllTtsCategories}

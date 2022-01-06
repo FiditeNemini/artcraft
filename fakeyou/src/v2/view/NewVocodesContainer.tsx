@@ -53,6 +53,9 @@ interface Props {
   sessionWrapper: SessionWrapper,
   querySessionAction: () => void,
 
+  isShowingVocodesNotice: boolean,
+  clearVocodesNotice: () => void,
+
   enqueueTtsJob: (jobToken: string) => void,
   ttsInferenceJobs: Array<TtsInferenceJob>,
 
@@ -365,6 +368,8 @@ class NewVocodesContainer extends React.Component<Props, State> {
             <Route path="/">
               <TtsModelListFc
                 sessionWrapper={this.props.sessionWrapper}
+                isShowingVocodesNotice={this.props.isShowingVocodesNotice}
+                clearVocodesNotice={this.props.clearVocodesNotice}
                 enqueueTtsJob={this.props.enqueueTtsJob}
                 ttsInferenceJobs={this.props.ttsInferenceJobs}
                 ttsModelUploadJobs={this.props.ttsModelUploadJobs}

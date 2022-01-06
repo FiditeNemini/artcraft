@@ -6,11 +6,16 @@ import { AppWrapper } from './AppWrapper';
 
 const IS_IOS : boolean = /iPad|iPhone|iPod/.test(navigator.platform || "");
 
-let enableSpectrograms = !IS_IOS;
+const enableSpectrograms = !IS_IOS;
+
+const flashVocodesNotice = new URLSearchParams(window.location.search).has('vocodes');
 
 ReactDOM.render(
   <React.StrictMode>
-    <AppWrapper enableSpectrograms={enableSpectrograms} />
+    <AppWrapper 
+        enableSpectrograms={enableSpectrograms} 
+        flashVocodesNotice={flashVocodesNotice}
+      />
   </React.StrictMode>,
   document.getElementById('root')
 );

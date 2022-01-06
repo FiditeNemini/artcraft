@@ -13,7 +13,7 @@ import { W2lTemplateUploadJob } from '../../../../jobs/W2lTemplateUploadJobs';
 import { v4 as uuidv4 } from 'uuid';
 import { ListTtsModels, TtsModelListItem } from '../../../api/tts/ListTtsModels';
 import { GravatarFc } from '../../_common/GravatarFc';
-import { TtsModelListNotice } from './TtsModelListNotice';
+import { VocodesNotice } from './VocodesNotice';
 import { ListTtsCategories, ListTtsCategoriesIsError, ListTtsCategoriesIsOk, TtsCategory } from '../../../api/category/ListTtsCategories';
 import { MultiDropdownSearch } from './MultiDropdownSearch';
 
@@ -24,6 +24,10 @@ export interface EnqueueJobResponsePayload {
 
 interface Props {
   sessionWrapper: SessionWrapper,
+
+  isShowingVocodesNotice: boolean,
+  clearVocodesNotice: () => void,
+
   enqueueTtsJob: (jobToken: string) => void,
   ttsInferenceJobs: Array<TtsInferenceJob>,
   ttsModelUploadJobs: Array<TtsModelUploadJob>,
@@ -175,6 +179,10 @@ function TtsModelListFc(props: Props) {
     );
   }
 
+  const vocodesNotice = props.isShowingVocodesNotice ? 
+      <VocodesNotice clearVocodesNotice={props.clearVocodesNotice} /> : 
+      undefined;
+
   return (
     <div>
       <h1 className="title is-1"> FakeYou Text to Speech </h1>
@@ -182,7 +190,7 @@ function TtsModelListFc(props: Props) {
         Use deep fake tech to say stuff with your favorite characters.
       </h5>
 
-      <TtsModelListNotice />
+      {vocodesNotice}
 
       <form onSubmit={handleFormSubmit}>
 
@@ -199,7 +207,6 @@ function TtsModelListFc(props: Props) {
           maybeSelectedTtsModel={props.maybeSelectedTtsModel}
           setMaybeSelectedTtsModel={props.setMaybeSelectedTtsModel}
           />
-
 
         <br />
 
