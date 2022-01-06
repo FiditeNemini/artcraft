@@ -73,6 +73,22 @@ export function MultiDropdownSearch(props: Props) {
 
       (maybeElement as any).value = selectedModelToken;
     }
+
+
+    let categoryDropdownElements = document.getElementsByClassName('category-dropdown');
+
+    const iterLength = Math.min(selectedCategories.length, categoryDropdownElements.length);
+
+    for (let i = 0; i < iterLength; i++) {
+      let categoryDropdownElement = categoryDropdownElements[i];
+      let selectedCategory = selectedCategories[i];
+
+      if (!categoryDropdownElements || !selectedCategory) {
+        break;
+      }
+
+      (categoryDropdownElement as any).value = selectedCategory.category_token;
+    }
   });
 
   const doChangeCategory = (level: number, maybeToken: string) => {
@@ -163,6 +179,7 @@ export function MultiDropdownSearch(props: Props) {
       <div className="control has-icons-left" key={`categoryDropdown-${i}`}>
         <div className="select is-normal">
           <select
+            className="category-dropdown"
             name={`categories-${i}`}
             onChange={(ev) => handleChangeCategory(ev, i)}
             defaultValue="*"
