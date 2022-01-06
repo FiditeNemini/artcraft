@@ -179,34 +179,36 @@ export function MultiDropdownSearch(props: Props) {
     }
 
     categoryDropdowns.push(
-      <div className="field">
-      <div className="control has-icons-left" key={`categoryDropdown-${i}`}>
-        <div className="select is-fullwidth">
-          <select
-            className="category-dropdown"
-            name={`categories-${i}`}
-            onChange={(ev) => handleChangeCategory(ev, i)}
-            defaultValue="*"
-            >
-            {dropdownOptions}
-          </select>
-        </div>
-        <span className="icon is-small is-left">
-          <FontAwesomeIcon icon={faTags} />
-        </span>
-
-        &nbsp;
-
-        <button 
-          className="button is-danger is-normal is-inverted is-rounded"
-          onClick={() => handleRemoveCategory(i)}
-        >
-          <span className="icon is-normal">
-            <FontAwesomeIcon icon={faTimes} title="remove" />
+      <>
+        <div className="control has-icons-left is-expanded" key={`categoryDropdown-${i}`}>
+          <div className="select is-fullwidth">
+            <select
+              className="category-dropdown"
+              name={`categories-${i}`}
+              onChange={(ev) => handleChangeCategory(ev, i)}
+              defaultValue="*"
+              >
+              {dropdownOptions}
+            </select>
+          </div>
+          <span className="icon is-small is-left">
+            <FontAwesomeIcon icon={faTags} />
           </span>
-        </button>
-      </div>
-      </div>
+        </div>
+
+        <div className="control">
+          <button 
+            className="button is-danger is-normal is-inverted is-rounded"
+            onClick={() => handleRemoveCategory(i)}
+          >
+            <span className="icon is-normal">
+              <FontAwesomeIcon icon={faTimes} title="remove" />
+            </span>
+          </button>
+
+          <FontAwesomeIcon icon={faChevronRight} size="2x" color="#999" />
+        </div>
+      </>
     );
   }
 
@@ -235,10 +237,10 @@ export function MultiDropdownSearch(props: Props) {
 
   if (categoryDropdowns.length > 0) {
     separatedCategoryDropdowns = categoryDropdowns
-      .map(el => <>{el}</>)
+      /*.map(el => <>{el}</>)
       .reduce((acc, cur) => {
         return <>{acc} <FontAwesomeIcon icon={faChevronRight} size="2x" /> {cur}</>
-      });
+      });*/
   }
 
   return (
@@ -248,13 +250,11 @@ export function MultiDropdownSearch(props: Props) {
       <br />
 
 
-      <div className="field is-horizontal">
+      <div className="field is-grouped is-grouped">
         {/*<div className="field-label is-normal">
           <label className="label">Department</label>
         </div>*/}
-        <div className="field-body">
           {separatedCategoryDropdowns}
-        </div>
       </div>
 
       {/*
@@ -304,6 +304,8 @@ export function MultiDropdownSearch(props: Props) {
         </div>
       </div>
       */}
+
+      <br />
 
       {/* Model Dropdown */}
       <strong>Voice ({voiceCount} to choose from)</strong>
