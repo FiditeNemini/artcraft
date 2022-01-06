@@ -54,24 +54,25 @@ export function MultiDropdownSearch(props: Props) {
   } = props;
 
   useEffect(() => {
-    console.log('========= MultiDropdownSearch.useEffect() ===========')
+    // NB: Dropdowns do not seem to respect React very well.
+    // Despite setting <select>'s value and defaultValue, and <option>'s selected=true, 
+    // the dropdowns are left in a default state. I'll use the post-render side effect
+    // to select the correct options.
 
     let selectedModelToken = undefined;
 
     if (maybeSelectedTtsModel) {
       selectedModelToken = maybeSelectedTtsModel.model_token;
     } else if (allTtsModels.length > 0) {
+      // TODO: Move the initial model selection logic here, perhaps.
       //selectedModelToken = allTtsModels[0].model_token;
     }
 
     let maybeElement = document.getElementsByName('tts-model-select')[0];
 
     if (!!maybeElement && !!selectedModelToken) {
-      console.log(`Setting dropdown to ${selectedModelToken}`);
-
       (maybeElement as any).value = selectedModelToken;
     }
-
 
     let categoryDropdownElements = document.getElementsByClassName('category-dropdown');
 
@@ -80,11 +81,9 @@ export function MultiDropdownSearch(props: Props) {
     for (let i = 0; i < iterLength; i++) {
       let categoryDropdownElement = categoryDropdownElements[i];
       let selectedCategory = selectedCategories[i];
-
       if (!categoryDropdownElements || !selectedCategory) {
         break;
       }
-
       (categoryDropdownElement as any).value = selectedCategory.category_token;
     }
   });
@@ -136,7 +135,7 @@ export function MultiDropdownSearch(props: Props) {
 
   const handleRemoveCategory = (level: number) => {
     let parentLevel = Math.max(level - 1, 0);
-    let maybeToken = '*';
+    let maybeToken = '*'; // NB: Sentinel for the "All Voices" / "Select..." <option>
 
     doChangeCategory(parentLevel, maybeToken);
 
@@ -164,7 +163,13 @@ export function MultiDropdownSearch(props: Props) {
     let defaultName = (i === 0) ? 'All Voices' : 'Select...';
 
     let dropdownOptions = [];
-    dropdownOptions.push(<option key={`option-${i}-*`} value="*">{defaultName}</option>);
+    dropdownOptions.push(
+      <option 
+        key={`option-${i}-*`} 
+        value="*">
+          {defaultName}
+      </option>
+    );
 
     currentDropdownCategories.forEach(category => {
       const models = ttsModelsByCategoryToken.get(category.category_token);
