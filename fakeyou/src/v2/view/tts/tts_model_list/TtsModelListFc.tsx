@@ -65,8 +65,11 @@ function TtsModelListFc(props: Props) {
     setMaybeSelectedTtsModel,
   } = props;
 
+  const ttsModelsLoaded = ttsModels.length > 0;
+  const ttsCategoriesLoaded = allTtsCategories.length > 0;
+
   const listModels = useCallback(async () => {
-    if (ttsModels.length > 0) {
+    if (ttsModelsLoaded) {
       console.log('models already queried');
       return; // Already queried.
     }
@@ -78,10 +81,10 @@ function TtsModelListFc(props: Props) {
         setMaybeSelectedTtsModel(model);
       }
     }
-  }, [setTtsModels, maybeSelectedTtsModel, setMaybeSelectedTtsModel]);
+  }, [setTtsModels, maybeSelectedTtsModel, setMaybeSelectedTtsModel, ttsModelsLoaded]);
 
   const listTtsCategories = useCallback(async () => {
-    if (allTtsCategories.length > 0) {
+    if (ttsCategoriesLoaded) {
       console.log('categories already queried');
       return; // Already queried.
     }
@@ -91,7 +94,7 @@ function TtsModelListFc(props: Props) {
     } else if (ListTtsCategoriesIsError(categoryList))  {
       // TODO: Retry on decay function
     }
-  }, [setAllTtsCategories]);
+  }, [setAllTtsCategories, ttsCategoriesLoaded]);
 
   useEffect(() => {
     listModels();
@@ -201,7 +204,7 @@ function TtsModelListFc(props: Props) {
 
 
         <br />
-        
+
         {directViewLink}
 
         <br />
