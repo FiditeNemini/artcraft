@@ -47,8 +47,6 @@ export function AppWrapper(props: Props) {
 
   // TODO: Handle empty category list
   useEffect(() => {
-    console.log("========== AppWrapper.useEffect() ==========")
-
     // Category lookup by token
     let categoriesByTokenMap = new Map();
     allTtsCategories.forEach(category => {

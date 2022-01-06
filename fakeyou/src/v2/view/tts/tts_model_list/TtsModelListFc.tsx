@@ -72,7 +72,6 @@ function TtsModelListFc(props: Props) {
 
   const listModels = useCallback(async () => {
     if (ttsModelsLoaded) {
-      console.log('models already queried');
       return; // Already queried.
     }
     const models = await ListTtsModels();
@@ -87,7 +86,6 @@ function TtsModelListFc(props: Props) {
 
   const listTtsCategories = useCallback(async () => {
     if (ttsCategoriesLoaded) {
-      console.log('categories already queried');
       return; // Already queried.
     }
     const categoryList = await ListTtsCategories();
