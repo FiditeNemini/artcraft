@@ -17,7 +17,6 @@ import { TtsModelListNotice } from './TtsModelListNotice';
 import { ListTtsCategories, ListTtsCategoriesIsError, ListTtsCategoriesIsOk, TtsCategory } from '../../../api/category/ListTtsCategories';
 import { MultiDropdownSearch } from './MultiDropdownSearch';
 
-
 export interface EnqueueJobResponsePayload {
   success: boolean,
   inference_job_token?: string,
@@ -50,26 +49,50 @@ interface Props {
   setSelectedCategories: (selectedCategories: TtsCategory[]) => void,
 
   // TODO: rename 'active'
-  currentTtsModelSelected?: TtsModelListItem,
-  setCurrentTtsModelSelected: (ttsModel: TtsModelListItem) => void,
+  //currentTtsModelSelected?: TtsModelListItem,
+  //setCurrentTtsModelSelected: (ttsModel: TtsModelListItem) => void,
+
+  maybeSelectedTtsModel?: TtsModelListItem,
+  setMaybeSelectedTtsModel: (maybeSelectedTtsModel: TtsModelListItem) => void,
 }
 
 function TtsModelListFc(props: Props) {
 
-  let { setTtsModels, setAllTtsCategories, setCurrentTtsModelSelected, currentTtsModelSelected } = props;
+  let { 
+    setTtsModels, 
+    setAllTtsCategories, 
+    //setCurrentTtsModelSelected, 
+    //currentTtsModelSelected, 
+    ttsModels, 
+    allTtsCategories,
+    maybeSelectedTtsModel,
+    setMaybeSelectedTtsModel,
+  } = props;
 
   const listModels = useCallback(async () => {
+    if (ttsModels.length > 0) {
+      console.log('models already queried');
+      return; // Already queried.
+    }
     const models = await ListTtsModels();
     if (models) {
       setTtsModels(models);
-      if (!currentTtsModelSelected && models.length > 0) {
+//      if (!currentTtsModelSelected && models.length > 0) {
+//        const model = models[0];
+//        setCurrentTtsModelSelected(model);
+//      }
+      if (!maybeSelectedTtsModel && models.length > 0) {
         const model = models[0];
-        setCurrentTtsModelSelected(model);
+        setMaybeSelectedTtsModel(model);
       }
     }
-  }, [setTtsModels, setCurrentTtsModelSelected, currentTtsModelSelected]);
+  }, [setTtsModels, /*setCurrentTtsModelSelected, currentTtsModelSelected*/ maybeSelectedTtsModel, setMaybeSelectedTtsModel]);
 
   const listTtsCategories = useCallback(async () => {
+    if (allTtsCategories.length > 0) {
+      console.log('categories already queried');
+      return; // Already queried.
+    }
     const categoryList = await ListTtsCategories();
     if (ListTtsCategoriesIsOk(categoryList)) {
       setAllTtsCategories(categoryList.categories);
@@ -86,8 +109,11 @@ function TtsModelListFc(props: Props) {
   let listItems: Array<JSX.Element> = [];
 
   let defaultSelectValue = '';
-  if (props.currentTtsModelSelected) {
-    defaultSelectValue = props.currentTtsModelSelected.model_token;
+//  if (props.currentTtsModelSelected) {
+//    defaultSelectValue = props.currentTtsModelSelected.model_token;
+//  }
+  if (props.maybeSelectedTtsModel) {
+    defaultSelectValue = props.maybeSelectedTtsModel.model_token;
   }
 
   props.ttsModels.forEach(m => {
@@ -123,7 +149,8 @@ function TtsModelListFc(props: Props) {
     // TODO: Inefficient.
     props.ttsModels.forEach(model => {
       if (model.model_token === selectVoiceValue) {
-        props.setCurrentTtsModelSelected(model);
+//        props.setCurrentTtsModelSelected(model);
+        props.setMaybeSelectedTtsModel(model);
       }
     });
 
@@ -139,7 +166,10 @@ function TtsModelListFc(props: Props) {
   const handleFormSubmit = (ev: React.FormEvent<HTMLFormElement>) => { 
     ev.preventDefault();
 
-    if (!props.currentTtsModelSelected) {
+//    if (!props.currentTtsModelSelected) {
+//      return false;
+//    }
+    if (!props.maybeSelectedTtsModel) {
       return false;
     }
 
@@ -147,7 +177,8 @@ function TtsModelListFc(props: Props) {
       return false;
     }
 
-    const modelToken = props.currentTtsModelSelected!.model_token;
+//    const modelToken = props.currentTtsModelSelected!.model_token;
+    const modelToken = props.maybeSelectedTtsModel!.model_token;
 
     const api = new ApiConfig();
     const endpointUrl = api.inferTts();
@@ -190,16 +221,30 @@ function TtsModelListFc(props: Props) {
 
   let directViewLink = <span />;
 
-  if (props.currentTtsModelSelected) {
-    let modelLink = `/tts/${props.currentTtsModelSelected.model_token}`;
+//  if (props.currentTtsModelSelected) {
+//    let modelLink = `/tts/${props.currentTtsModelSelected.model_token}`;
+//    directViewLink = (
+//      <Link to={modelLink}>
+//        See more details about the "<strong>{props.currentTtsModelSelected.title}</strong>" model 
+//        by&nbsp;<strong>{props.currentTtsModelSelected.creator_display_name}</strong>&nbsp; 
+//        <GravatarFc 
+//          size={15}
+//          username={props.currentTtsModelSelected.creator_display_name}
+//          email_hash={props.currentTtsModelSelected.creator_gravatar_hash} /> 
+//      </Link>
+//    );
+//  }
+
+  if (props.maybeSelectedTtsModel) {
+    let modelLink = `/tts/${props.maybeSelectedTtsModel.model_token}`;
     directViewLink = (
       <Link to={modelLink}>
-        See more details about the "<strong>{props.currentTtsModelSelected.title}</strong>" model 
-        by&nbsp;<strong>{props.currentTtsModelSelected.creator_display_name}</strong>&nbsp; 
+        See more details about the "<strong>{props.maybeSelectedTtsModel.title}</strong>" model 
+        by&nbsp;<strong>{props.maybeSelectedTtsModel.creator_display_name}</strong>&nbsp; 
         <GravatarFc 
           size={15}
-          username={props.currentTtsModelSelected.creator_display_name}
-          email_hash={props.currentTtsModelSelected.creator_gravatar_hash} /> 
+          username={props.maybeSelectedTtsModel.creator_display_name}
+          email_hash={props.maybeSelectedTtsModel.creator_gravatar_hash} /> 
       </Link>
     );
   }
@@ -225,7 +270,9 @@ function TtsModelListFc(props: Props) {
           setDropdownCategories={props.setDropdownCategories}
           selectedCategories={props.selectedCategories}
           setSelectedCategories={props.setSelectedCategories}
-          setCurrentTtsModelSelected={props.setCurrentTtsModelSelected}
+          //setCurrentTtsModelSelected={props.setCurrentTtsModelSelected}
+          maybeSelectedTtsModel={props.maybeSelectedTtsModel}
+          setMaybeSelectedTtsModel={props.setMaybeSelectedTtsModel}
           />
 
         <hr />

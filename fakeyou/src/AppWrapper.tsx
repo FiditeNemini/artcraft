@@ -39,8 +39,12 @@ export function AppWrapper(props: Props) {
   // Structure: [firstSelected, secondSelected...]
   const [selectedCategories, setSelectedCategories] = useState<TtsCategory[]>([]);
 
+  const [maybeSelectedTtsModel, setMaybeSelectedTtsModel] = useState<TtsModelListItem|undefined>(undefined);
+
   // TODO: Handle empty category list
   useEffect(() => {
+    console.log("========== AppWrapper.useEffect() ==========")
+
     // Category lookup by token
     let categoriesByTokenMap = new Map();
     allTtsCategories.forEach(category => {
@@ -271,11 +275,14 @@ export function AppWrapper(props: Props) {
           allTtsCategoriesByTokenMap={allCategoriesByTokenMap}
           allTtsModelsByTokenMap={allTtsModelsByTokenMap}
           ttsModelsByCategoryToken={ttsModelsByCategoryToken}
-          
+
           dropdownCategories={dropdownCategories}
           setDropdownCategories={setDropdownCategories}
           selectedCategories={selectedCategories}
           setSelectedCategories={setSelectedCategories}
+
+          maybeSelectedTtsModel={maybeSelectedTtsModel}
+          setMaybeSelectedTtsModel={setMaybeSelectedTtsModel}
         />
     </>
   )

@@ -84,8 +84,11 @@ interface Props {
   selectedCategories: TtsCategory[],
   setSelectedCategories: (selectedCategories: TtsCategory[]) => void,
 
-  currentTtsModelSelected?: TtsModelListItem,
-  setCurrentTtsModelSelected: (ttsModel: TtsModelListItem) => void,
+  //currentTtsModelSelected?: TtsModelListItem,
+  //setCurrentTtsModelSelected: (ttsModel: TtsModelListItem) => void,
+
+  maybeSelectedTtsModel?: TtsModelListItem,
+  setMaybeSelectedTtsModel: (maybeSelectedTtsModel: TtsModelListItem) => void,
 }
 
 interface State {
@@ -384,8 +387,10 @@ class NewVocodesContainer extends React.Component<Props, State> {
                 setDropdownCategories={this.props.setDropdownCategories}
                 selectedCategories={this.props.selectedCategories}
                 setSelectedCategories={this.props.setSelectedCategories}
-                currentTtsModelSelected={this.props.currentTtsModelSelected}
-                setCurrentTtsModelSelected={this.props.setCurrentTtsModelSelected}
+                //currentTtsModelSelected={this.props.currentTtsModelSelected}
+                //setCurrentTtsModelSelected={this.props.setCurrentTtsModelSelected}
+                maybeSelectedTtsModel={this.props.maybeSelectedTtsModel}
+                setMaybeSelectedTtsModel={this.props.setMaybeSelectedTtsModel}
               />
             </Route>
 

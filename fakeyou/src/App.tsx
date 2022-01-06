@@ -22,7 +22,6 @@ enum MigrationMode {
   OLD_VOCODES,
 }
 
-
 interface Props {
   // Certan browsers (iPhone) have pitiful support for drawing APIs. Worse yet,
   // they seem to lose the "touch event sandboxing" that allows for audio to be 
@@ -44,6 +43,9 @@ interface Props {
   setDropdownCategories: (dropdownCategories: TtsCategory[][]) => void,
   selectedCategories: TtsCategory[],
   setSelectedCategories: (selectedCategories: TtsCategory[]) => void,
+
+  maybeSelectedTtsModel?: TtsModelListItem,
+  setMaybeSelectedTtsModel: (maybeSelectedTtsModel: TtsModelListItem) => void,
 }
 
 interface State {
@@ -70,7 +72,6 @@ interface State {
 //  allTtsCategories: TtsCategory[],
 
   // Selection state
-  currentTtsModelSelected?: TtsModelListItem,
 }
 
 function newVocodes() {
@@ -105,7 +106,7 @@ class App extends React.Component<Props, State> {
 //      ttsModels: [],
 //      allTtsCategories: [],
       
-      currentTtsModelSelected: undefined,
+//      currentTtsModelSelected: undefined,
     }
   }
 
@@ -396,9 +397,9 @@ class App extends React.Component<Props, State> {
 //    this.props.setAllTtsModels(ttsModels);
 //  }
 
-  setCurrentTtsModelSelected = (ttsModel: TtsModelListItem) => {
-    this.setState({ currentTtsModelSelected: ttsModel });
-  }
+//  setCurrentTtsModelSelected = (ttsModel: TtsModelListItem) => {
+//    this.setState({ currentTtsModelSelected: ttsModel });
+//  }
 
 //  setAllTtsCategories = (allTtsCategories: TtsCategory[]) => {
 //    this.setState({ allTtsCategories: allTtsCategories })
@@ -469,8 +470,11 @@ class App extends React.Component<Props, State> {
                     selectedCategories={this.props.selectedCategories}
                     setSelectedCategories={this.props.setSelectedCategories}
                     
-                    currentTtsModelSelected={this.state.currentTtsModelSelected}
-                    setCurrentTtsModelSelected={this.setCurrentTtsModelSelected}
+                    //currentTtsModelSelected={this.state.currentTtsModelSelected}
+                    //setCurrentTtsModelSelected={this.setCurrentTtsModelSelected}
+
+                    maybeSelectedTtsModel={this.props.maybeSelectedTtsModel}
+                    setMaybeSelectedTtsModel={this.props.setMaybeSelectedTtsModel}
                       
                     />
                 </Route>

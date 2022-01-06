@@ -4,6 +4,23 @@ import { faHeadphonesAlt, faTags, faTimes } from '@fortawesome/free-solid-svg-ic
 import { TtsCategory } from '../../../api/category/ListTtsCategories';
 import { TtsModelListItem } from '../../../api/tts/ListTtsModels';
 
+/*
+TODO: Spinner.
+
+let selectClasses = 'select is-large';
+if (listItems.length === 0) {
+  selectClasses = 'select is-large is-loading';
+  listItems.push((
+    <option key="waiting" value="" disabled={true}>Loading...</option>
+  ))
+}
+
+
+TODO: Persist default voice.
+
+
+*/
+
 interface Props {
   allTtsCategories: TtsCategory[],
   allTtsModels: TtsModelListItem[],
@@ -18,7 +35,10 @@ interface Props {
   setSelectedCategories: (selectedCategories: TtsCategory[]) => void,
 
   // Pass state up the chain
-  setCurrentTtsModelSelected: (ttsModel: TtsModelListItem) => void,
+  //setCurrentTtsModelSelected: (ttsModel: TtsModelListItem) => void,
+
+  maybeSelectedTtsModel?: TtsModelListItem,
+  setMaybeSelectedTtsModel: (maybeSelectedTtsModel: TtsModelListItem) => void,
 }
 
 export function MultiDropdownSearch(props: Props) {
@@ -34,62 +54,14 @@ export function MultiDropdownSearch(props: Props) {
     setSelectedCategories,
   } = props;
 
-//  // Outer array has length of at least one, one element per <select>
-//  // Inner array contains the categories in each level.
-//  // Structure: [dropdownLevel][categories]
-//  const [dropdownCategories, setDropdownCategories] = useState<TtsCategory[][]>([]);
-//
-//  // Every category in the heirarchy that has been selected by the user.
-//  // Empty list if none are selected.
-//  // Structure: [firstSelected, secondSelected...]
-//  const [selectedCategories, setSelectedCategories] = useState<TtsCategory[]>([]);
-//
-//  // A TTS voice is attached to every category up the tree from the leaf.
-//  // We recursively build this, 1) to ensure we can access a voice at all levels 
-//  // of specificity, and 2) to prune empty categories.
-//  const [ttsModelsByCategoryToken, setTtsModelsByCategoryToken] = useState<Map<string,Set<TtsModelListItem>>>(new Map());
+  useEffect(() => {
+    console.log('========= MultiDropdownSearch.useEffect() ===========')
 
-//  // TODO: Handle empty category list
-//  useEffect(() => {
-//    // Initial dropdown state
-//    const rootCategories = allTtsCategories.filter(category => {
-//      return !category.maybe_super_category_token;
-//    });
-//    const rootLevel = [rootCategories];
-//    setDropdownCategories(rootLevel);
-//
-//    // Voice lookup table
-//    let categoriesToTtsModelTokens = new Map();
-//    // Category ancestry memoization
-//    let categoryTokenToAllAncestorTokens : Map<string, Set<string>> = new Map();
-//
-//    // N * M with memoization should't be too bad here.
-//    // Also note that the models should be lexographically sorted by name.
-//    allTtsModels.forEach(ttsModel => {
-//      if (ttsModel.category_tokens.length === 0) {
-//        // TODO: Attach to "uncategorized" special category
-//        return;
-//      }
-//      ttsModel.category_tokens.forEach(categoryToken => {
-//        let ancestors = categoryTokenToAllAncestorTokens.get(categoryToken);
-//        if (ancestors === undefined) {
-//          ancestors = findAllAncestorTokens(categoryToken, allTtsCategoriesByTokenMap);
-//          categoryTokenToAllAncestorTokens.set(categoryToken, ancestors);
-//        }
-//        ancestors.forEach(categoryToken => {
-//          let models : Set<TtsModelListItem> = categoriesToTtsModelTokens.get(categoryToken);
-//          if (models === undefined) {
-//            models = new Set();
-//            categoriesToTtsModelTokens.set(categoryToken, models);
-//          }
-//          models.add(ttsModel);
-//        })
-//      });
-//    });
-//    setTtsModelsByCategoryToken(categoriesToTtsModelTokens);
-//
-//  }, [allTtsCategories, allTtsModels, allTtsCategoriesByTokenMap]);
-
+    let maybeElement = document.getElementsByName('tts-model-select')[0];
+    if (maybeElement) {
+      (maybeElement as any).value = '*';
+    }
+  });
 
   const doChangeCategory = (level: number, maybeToken: string) => {
     // Slice off all the irrelevant child category choices, then append new choice.
@@ -140,7 +112,8 @@ export function MultiDropdownSearch(props: Props) {
     const ttsModelToken = (ev.target as HTMLSelectElement).value;
     const maybeTtsModel = allTtsModelsByTokenMap.get(ttsModelToken);
     if (maybeTtsModel) {
-      props.setCurrentTtsModelSelected(maybeTtsModel);
+//      props.setCurrentTtsModelSelected(maybeTtsModel);
+      props.setMaybeSelectedTtsModel(maybeTtsModel);
     }
   };
 
@@ -203,16 +176,6 @@ export function MultiDropdownSearch(props: Props) {
     );
   }
 
-  /*
-  let selectClasses = 'select is-large';
-  if (listItems.length === 0) {
-    selectClasses = 'select is-large is-loading';
-    listItems.push((
-      <option key="waiting" value="" disabled={true}>Loading...</option>
-    ))
-  }
-  */
-
   const leafiestCategory = selectedCategories[selectedCategories.length - 1];
 
   let leafiestCategoryModels : Set<TtsModelListItem> = new Set();
@@ -224,54 +187,37 @@ export function MultiDropdownSearch(props: Props) {
 
   const voiceCount = leafiestCategoryModels.size;
 
-  let modelDropdown = (
-    <div className="control has-icons-left">
-      <div className="select is-normal">
-        <select onChange={handleChangeVoice}>
-          {Array.from(leafiestCategoryModels).map(model => {
-            return (
-              <option
-                key={model.model_token}
-                value={model.model_token}
-                >{model.title} (by {model.creator_display_name})</option>
-            );
-          })}
-        </select>
-      </div>
-      <span className="icon is-small is-left">
-        <FontAwesomeIcon icon={faHeadphonesAlt} />
-      </span>
-    </div>
-  );
-
   return (
     <div>
+      {/* Category Dropdowns */}
       <strong>Category Filters</strong>
       <br />
       {categoryDropdowns}
       <br />
+
+      {/* Model Dropdown */}
       <strong>Voice ({voiceCount} to choose from)</strong>
       <br />
-      {modelDropdown}
+      <div className="control has-icons-left">
+        <div className="select is-normal">
+          <select 
+              name="tts-model-select"
+              onChange={handleChangeVoice}
+            >
+            {Array.from(leafiestCategoryModels).map(model => {
+              return (
+                <option
+                  key={model.model_token}
+                  value={model.model_token}
+                  >{model.title} (by {model.creator_display_name})</option>
+              );
+            })}
+          </select>
+        </div>
+        <span className="icon is-small is-left">
+          <FontAwesomeIcon icon={faHeadphonesAlt} />
+        </span>
+      </div>
     </div>
   )
-}
-
-function findAllAncestorTokens(categoryToken: string, allCategoriesByTokenMap: Map<string, TtsCategory>): Set<string> {
-  const ancestorTokens = recursiveFindAllAncestorTokens(categoryToken, allCategoriesByTokenMap);
-  return new Set(ancestorTokens);
-}
-
-function recursiveFindAllAncestorTokens(categoryToken: string, allCategoriesByTokenMap: Map<string, TtsCategory>): string[] {
-  let category = allCategoriesByTokenMap.get(categoryToken)
-  if (category === undefined) {
-    return [];
-  }
-  if (!category.maybe_super_category_token) {
-    return [categoryToken];
-  }
-  return [
-    ...recursiveFindAllAncestorTokens(category.maybe_super_category_token, allCategoriesByTokenMap), 
-    categoryToken,
-  ];
 }
