@@ -1,8 +1,8 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
-import { App } from './App';
 import * as serviceWorker from './serviceWorker';
+import { AppWrapper } from './AppWrapper';
 
 const IS_IOS : boolean = /iPad|iPhone|iPod/.test(navigator.platform || "");
 
@@ -10,7 +10,7 @@ let enableSpectrograms = !IS_IOS;
 
 ReactDOM.render(
   <React.StrictMode>
-    <App enableSpectrograms={enableSpectrograms} />
+    <AppWrapper enableSpectrograms={enableSpectrograms} />
   </React.StrictMode>,
   document.getElementById('root')
 );

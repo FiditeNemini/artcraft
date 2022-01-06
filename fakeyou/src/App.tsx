@@ -29,6 +29,12 @@ interface Props {
   // played after user interaction if the XHRs delivering the audio don't do so
   // as actual audio mimetypes. (Decoding from base64 and trying to play fails.)
   enableSpectrograms: boolean,
+
+  allTtsCategories: TtsCategory[],
+  setAllTtsCategories: (allTtsCategories: TtsCategory[]) => void,
+
+  allTtsModels: TtsModelListItem[],
+  setAllTtsModels: (allTtsModels: TtsModelListItem[]) => void,
 }
 
 interface State {
@@ -48,11 +54,11 @@ interface State {
   // Current text entered
   textBuffer: string,
 
-  // List of voices (post-query) and current voice selected on main page
-  ttsModels: Array<TtsModelListItem>,
-
-  // Comprehensive list of categories we've queried.
-  allTtsCategories: TtsCategory[],
+//  // List of voices (post-query) and current voice selected on main page
+//  ttsModels: Array<TtsModelListItem>,
+//
+//  // Comprehensive list of categories we've queried.
+//  allTtsCategories: TtsCategory[],
 
   // Selection state
   currentTtsModelSelected?: TtsModelListItem,
@@ -87,8 +93,8 @@ class App extends React.Component<Props, State> {
 
       textBuffer: '',
 
-      ttsModels: [],
-      allTtsCategories: [],
+//      ttsModels: [],
+//      allTtsCategories: [],
       
       currentTtsModelSelected: undefined,
     }
@@ -376,17 +382,19 @@ class App extends React.Component<Props, State> {
     this.setState({ textBuffer: '' });
   }
 
-  setTtsModels = (ttsModels: Array<TtsModelListItem>) => {
-    this.setState({ ttsModels: ttsModels });
-  }
+//  setTtsModels = (ttsModels: Array<TtsModelListItem>) => {
+//    this.setState({ ttsModels: ttsModels });
+//    this.props.setAllTtsModels(ttsModels);
+//  }
 
   setCurrentTtsModelSelected = (ttsModel: TtsModelListItem) => {
     this.setState({ currentTtsModelSelected: ttsModel });
   }
 
-  setAllTtsCategories = (allTtsCategories: TtsCategory[]) => {
-    this.setState({ allTtsCategories: allTtsCategories })
-  }
+//  setAllTtsCategories = (allTtsCategories: TtsCategory[]) => {
+//    this.setState({ allTtsCategories: allTtsCategories })
+//    this.props.setAllTtsCategories(allTtsCategories);
+//  }
 
   public render() {
     if (this.state.migrationMode === MigrationMode.OLD_VOCODES) {
@@ -437,11 +445,11 @@ class App extends React.Component<Props, State> {
                     setTextBuffer={this.setTextBuffer}
                     clearTextBuffer={this.clearTextBuffer}
 
-                    ttsModels={this.state.ttsModels}
-                    setTtsModels={this.setTtsModels}
+                    ttsModels={this.props.allTtsModels}
+                    setTtsModels={this.props.setAllTtsModels}
 
-                    allTtsCategories={this.state.allTtsCategories}
-                    setAllTtsCategories={this.setAllTtsCategories}
+                    allTtsCategories={this.props.allTtsCategories}
+                    setAllTtsCategories={this.props.setAllTtsCategories}
                     
                     currentTtsModelSelected={this.state.currentTtsModelSelected}
                     setCurrentTtsModelSelected={this.setCurrentTtsModelSelected}
