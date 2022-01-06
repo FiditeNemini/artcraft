@@ -98,58 +98,13 @@ function TtsModelListFc(props: Props) {
     listTtsCategories();
   }, [listModels, listTtsCategories]);
 
-  let listItems: Array<JSX.Element> = [];
-
-  let defaultSelectValue = '';
-  if (props.maybeSelectedTtsModel) {
-    defaultSelectValue = props.maybeSelectedTtsModel.model_token;
-  }
-
-  props.ttsModels.forEach(m => {
-    let option = (
-      <option 
-        key={m.model_token} 
-        value={m.model_token} 
-        >{m.title} (by {m.creator_username})</option>
-    );
-
-    if (defaultSelectValue === '') {
-      defaultSelectValue = m.model_token;
-    }
-
-    listItems.push(option);
-  });
-
-  let selectClasses = 'select is-large';
-
-  if (listItems.length === 0) {
-    selectClasses = 'select is-large is-loading';
-    listItems.push((
-      <option key="waiting" value="" disabled={true}>Loading...</option>
-    ))
-  }
-
+  // TODO: I never did anything with this.
   let remainingCharactersButtonDisabled = false;
-
-  const handleChangeVoice = (ev: React.FormEvent<HTMLSelectElement>) => { 
-    ev.preventDefault();
-    const selectVoiceValue = (ev.target as HTMLSelectElement).value;
-
-    // TODO: Inefficient.
-    props.ttsModels.forEach(model => {
-      if (model.model_token === selectVoiceValue) {
-        props.setMaybeSelectedTtsModel(model);
-      }
-    });
-
-    return false;
-  };
 
   const handleChangeText = (ev: React.FormEvent<HTMLTextAreaElement>) => { 
     const textValue = (ev.target as HTMLTextAreaElement).value;
     props.setTextBuffer(textValue);
   };
-
 
   const handleFormSubmit = (ev: React.FormEvent<HTMLFormElement>) => { 
     ev.preventDefault();
@@ -244,19 +199,9 @@ function TtsModelListFc(props: Props) {
           setMaybeSelectedTtsModel={props.setMaybeSelectedTtsModel}
           />
 
-        <hr />
-
-        <div className={selectClasses}>
-          <select 
-            onChange={handleChangeVoice} 
-            defaultValue={defaultSelectValue}>
-            {listItems}
-          </select>
-        </div>
 
         <br />
-        <br />
-
+        
         {directViewLink}
 
         <br />
