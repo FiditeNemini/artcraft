@@ -23,6 +23,12 @@ export function AppWrapper(props: Props) {
   const [allCategoriesByTokenMap, setAllCategoriesByTokenMap] = useState<Map<string,TtsCategory>>(new Map());
   const [allTtsModelsByTokenMap, setAllTtsModelsByTokenMap] = useState<Map<string,TtsModelListItem>>(new Map());
 
+  // Lookup by foreign key
+  // A TTS voice is attached to every category up the tree from the leaf.
+  // We recursively build this, 1) to ensure we can access a voice at all levels 
+  // of specificity, and 2) to prune empty categories.
+  const [ttsModelsByCategoryToken, setTtsModelsByCategoryToken] = useState<Map<string,Set<TtsModelListItem>>>(new Map());
+
   // Outer array has length of at least one, one element per <select>
   // Inner array contains the categories in each level.
   // Structure: [dropdownLevel][categories]
@@ -32,11 +38,6 @@ export function AppWrapper(props: Props) {
   // Empty list if none are selected.
   // Structure: [firstSelected, secondSelected...]
   const [selectedCategories, setSelectedCategories] = useState<TtsCategory[]>([]);
-
-  // A TTS voice is attached to every category up the tree from the leaf.
-  // We recursively build this, 1) to ensure we can access a voice at all levels 
-  // of specificity, and 2) to prune empty categories.
-  const [ttsModelsByCategoryToken, setTtsModelsByCategoryToken] = useState<Map<string,Set<TtsModelListItem>>>(new Map());
 
   // TODO: Handle empty category list
   useEffect(() => {
@@ -269,6 +270,12 @@ export function AppWrapper(props: Props) {
 
           allTtsCategoriesByTokenMap={allCategoriesByTokenMap}
           allTtsModelsByTokenMap={allTtsModelsByTokenMap}
+          ttsModelsByCategoryToken={ttsModelsByCategoryToken}
+          
+          dropdownCategories={dropdownCategories}
+          setDropdownCategories={setDropdownCategories}
+          selectedCategories={selectedCategories}
+          setSelectedCategories={setSelectedCategories}
         />
     </>
   )

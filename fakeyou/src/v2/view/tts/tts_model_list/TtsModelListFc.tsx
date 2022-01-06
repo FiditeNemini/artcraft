@@ -42,6 +42,12 @@ interface Props {
 
   allTtsCategoriesByTokenMap: Map<string,TtsCategory>,
   allTtsModelsByTokenMap: Map<string,TtsModelListItem>,
+  ttsModelsByCategoryToken: Map<string,Set<TtsModelListItem>>,
+
+  dropdownCategories: TtsCategory[][],
+  setDropdownCategories: (dropdownCategories: TtsCategory[][]) => void,
+  selectedCategories: TtsCategory[],
+  setSelectedCategories: (selectedCategories: TtsCategory[]) => void,
 
   // TODO: rename 'active'
   currentTtsModelSelected?: TtsModelListItem,
@@ -214,6 +220,11 @@ function TtsModelListFc(props: Props) {
           allTtsModels={props.ttsModels}
           allTtsCategoriesByTokenMap={props.allTtsCategoriesByTokenMap}
           allTtsModelsByTokenMap={props.allTtsModelsByTokenMap}
+          ttsModelsByCategoryToken={props.ttsModelsByCategoryToken}
+          dropdownCategories={props.dropdownCategories}
+          setDropdownCategories={props.setDropdownCategories}
+          selectedCategories={props.selectedCategories}
+          setSelectedCategories={props.setSelectedCategories}
           setCurrentTtsModelSelected={props.setCurrentTtsModelSelected}
           />
 

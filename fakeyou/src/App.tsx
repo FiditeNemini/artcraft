@@ -38,6 +38,12 @@ interface Props {
 
   allTtsCategoriesByTokenMap: Map<string,TtsCategory>,
   allTtsModelsByTokenMap: Map<string,TtsModelListItem>,
+  ttsModelsByCategoryToken: Map<string,Set<TtsModelListItem>>,
+
+  dropdownCategories: TtsCategory[][],
+  setDropdownCategories: (dropdownCategories: TtsCategory[][]) => void,
+  selectedCategories: TtsCategory[],
+  setSelectedCategories: (selectedCategories: TtsCategory[]) => void,
 }
 
 interface State {
@@ -456,6 +462,12 @@ class App extends React.Component<Props, State> {
 
                     allTtsCategoriesByTokenMap={this.props.allTtsCategoriesByTokenMap}
                     allTtsModelsByTokenMap={this.props.allTtsModelsByTokenMap}
+                    ttsModelsByCategoryToken={this.props.ttsModelsByCategoryToken}
+
+                    dropdownCategories={this.props.dropdownCategories}
+                    setDropdownCategories={this.props.setDropdownCategories}
+                    selectedCategories={this.props.selectedCategories}
+                    setSelectedCategories={this.props.setSelectedCategories}
                     
                     currentTtsModelSelected={this.state.currentTtsModelSelected}
                     setCurrentTtsModelSelected={this.setCurrentTtsModelSelected}
