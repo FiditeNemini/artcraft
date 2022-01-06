@@ -212,6 +212,33 @@ export function MultiDropdownSearch(props: Props) {
     );
   }
 
+  let categoryFields = [];
+  let categoryFieldGroups = [];
+
+  for (let i = 0; i < categoryDropdowns.length; i++) {
+    console.log('categoryDropdowns', i)
+    let categoryDropdown = categoryDropdowns[i];
+
+    categoryFields.push(categoryDropdown);
+
+    if (categoryFields.length >= 2) {
+      categoryFieldGroups.push(
+        <div className="field is-grouped is-grouped">
+          {categoryFields.splice(0, categoryFields.length)}
+        </div>
+      );
+    }
+  }
+
+  if (categoryFields.length >= 0) {
+    categoryFieldGroups.push(
+      <div className="field is-grouped is-grouped">
+        {categoryFields.splice(0, categoryFields.length)}
+      </div>
+    );
+  }
+
+
   const leafiestCategory = selectedCategories[selectedCategories.length - 1];
 
   let leafiestCategoryModels : Set<TtsModelListItem> = new Set();
@@ -254,8 +281,9 @@ export function MultiDropdownSearch(props: Props) {
         {/*<div className="field-label is-normal">
           <label className="label">Department</label>
         </div>*/}
-          {separatedCategoryDropdowns}
       </div>
+      
+      {categoryFieldGroups}
 
       {/*
       <div className="field is-horizontal">
