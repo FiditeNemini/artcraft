@@ -215,16 +215,15 @@ export function MultiDropdownSearch(props: Props) {
     );
   }
 
+  // Group categories into rows of two (on Desktop)
+  let groupSize = (window.innerWidth < 550) ? 1 : 2;
   let categoryFields = [];
   let categoryFieldGroups = [];
 
   for (let i = 0; i < categoryDropdowns.length; i++) {
-    console.log('categoryDropdowns', i)
-    let categoryDropdown = categoryDropdowns[i];
+    categoryFields.push(categoryDropdowns[i]);
 
-    categoryFields.push(categoryDropdown);
-
-    if (categoryFields.length >= 2) {
+    if (categoryFields.length >= groupSize) {
       categoryFieldGroups.push(
         <div className="field is-grouped is-grouped">
           {categoryFields.splice(0, categoryFields.length)}
@@ -240,7 +239,6 @@ export function MultiDropdownSearch(props: Props) {
       </div>
     );
   }
-
 
   const leafiestCategory = selectedCategories[selectedCategories.length - 1];
 
@@ -263,80 +261,12 @@ export function MultiDropdownSearch(props: Props) {
     )
   }
 
-  let separatedCategoryDropdowns = undefined;
-
-  if (categoryDropdowns.length > 0) {
-    separatedCategoryDropdowns = categoryDropdowns
-      /*.map(el => <>{el}</>)
-      .reduce((acc, cur) => {
-        return <>{acc} <FontAwesomeIcon icon={faChevronRight} size="2x" /> {cur}</>
-      });*/
-  }
-
   return (
     <div>
       {/* Category Dropdowns */}
       <strong>Category Filters</strong>
       <br />
-
-
-      <div className="field is-grouped is-grouped">
-        {/*<div className="field-label is-normal">
-          <label className="label">Department</label>
-        </div>*/}
-      </div>
-      
       {categoryFieldGroups}
-
-      {/*
-      <div className="field is-horizontal">
-        <div className="field-label is-normal">
-          <label className="label">Department</label>
-        </div>
-        <div className="field-body">
-          <div className="field is-narrow">
-            <div className="control">
-              <div className="select is-fullwidth">
-                <select>
-                  <option>Business development</option>
-                  <option>Marketing</option>
-                  <option>Sales</option>
-                </select>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div className="field is-horizontal">
-        <div className="field-label is-normal">
-          <label className="label">From</label>
-        </div>
-        <div className="field-body">
-          <div className="field">
-            <p className="control is-expanded has-icons-left">
-              <input className="input" type="text" placeholder="Name" />
-              <span className="icon is-small is-left">
-                <i className="fas fa-user"></i>
-              </span>
-            </p>
-          </div>
-          <div className="field">
-            <p className="control is-expanded has-icons-left has-icons-right">
-              <input className="input is-success" type="email" placeholder="Email" value="alex@smith.com" />
-              <span className="icon is-small is-left">
-                <i className="fas fa-envelope"></i>
-              </span>
-              <span className="icon is-small is-right">
-                <i className="fas fa-check"></i>
-              </span>
-            </p>
-          </div>
-        </div>
-      </div>
-      */}
-
-      <br />
 
       {/* Model Dropdown */}
       <strong>Voice ({voiceCount} to choose from)</strong>
