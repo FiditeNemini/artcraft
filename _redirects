@@ -1,5 +1,6 @@
 # We can't redirect everything until legacy vocodes is dead
 /about*   /index.html   200
+/category*   /index.html   200
 /contribute*   /index.html   200
 /firehose*   /index.html   200
 /leaderboard*   /index.html   200
