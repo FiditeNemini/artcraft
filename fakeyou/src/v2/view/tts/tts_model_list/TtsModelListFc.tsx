@@ -40,6 +40,9 @@ interface Props {
   allTtsCategories: TtsCategory[],
   setAllTtsCategories: (allTtsCategories: TtsCategory[]) => void,
 
+  allTtsCategoriesByTokenMap: Map<string,TtsCategory>,
+  allTtsModelsByTokenMap: Map<string,TtsModelListItem>,
+
   // TODO: rename 'active'
   currentTtsModelSelected?: TtsModelListItem,
   setCurrentTtsModelSelected: (ttsModel: TtsModelListItem) => void,
@@ -209,6 +212,8 @@ function TtsModelListFc(props: Props) {
         <MultiDropdownSearch 
           allTtsCategories={props.allTtsCategories} 
           allTtsModels={props.ttsModels}
+          allTtsCategoriesByTokenMap={props.allTtsCategoriesByTokenMap}
+          allTtsModelsByTokenMap={props.allTtsModelsByTokenMap}
           setCurrentTtsModelSelected={props.setCurrentTtsModelSelected}
           />
 

@@ -35,6 +35,9 @@ interface Props {
 
   allTtsModels: TtsModelListItem[],
   setAllTtsModels: (allTtsModels: TtsModelListItem[]) => void,
+
+  allTtsCategoriesByTokenMap: Map<string,TtsCategory>,
+  allTtsModelsByTokenMap: Map<string,TtsModelListItem>,
 }
 
 interface State {
@@ -450,10 +453,13 @@ class App extends React.Component<Props, State> {
 
                     allTtsCategories={this.props.allTtsCategories}
                     setAllTtsCategories={this.props.setAllTtsCategories}
+
+                    allTtsCategoriesByTokenMap={this.props.allTtsCategoriesByTokenMap}
+                    allTtsModelsByTokenMap={this.props.allTtsModelsByTokenMap}
                     
                     currentTtsModelSelected={this.state.currentTtsModelSelected}
                     setCurrentTtsModelSelected={this.setCurrentTtsModelSelected}
-                    
+                      
                     />
                 </Route>
               </Switch>

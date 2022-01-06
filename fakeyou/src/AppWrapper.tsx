@@ -6,14 +6,18 @@ import { TtsModelListItem } from './v2/api/tts/ListTtsModels';
 import { App } from './App';
 
 interface Props {
+  // Certan browsers (iPhone) have pitiful support for drawing APIs. Worse yet,
+  // they seem to lose the "touch event sandboxing" that allows for audio to be 
+  // played after user interaction if the XHRs delivering the audio don't do so
+  // as actual audio mimetypes. (Decoding from base64 and trying to play fails.)
   enableSpectrograms: boolean,
 }
 
 export function AppWrapper(props: Props) {
-
+  // Caches of all objects queried
+  // These may be triggered by a different page than the user initially lands on.
   const [allTtsCategories, setAllTtsCategories] = useState<TtsCategory[]>([]);
   const [allTtsModels, setAllTtsModels] = useState<TtsModelListItem[]>([]);
-
 
   // Lookup by primary key
   const [allCategoriesByTokenMap, setAllCategoriesByTokenMap] = useState<Map<string,TtsCategory>>(new Map());
@@ -262,6 +266,9 @@ export function AppWrapper(props: Props) {
 
           allTtsModels={allTtsModels}
           setAllTtsModels={setAllTtsModels}
+
+          allTtsCategoriesByTokenMap={allCategoriesByTokenMap}
+          allTtsModelsByTokenMap={allTtsModelsByTokenMap}
         />
     </>
   )

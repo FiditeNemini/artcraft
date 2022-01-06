@@ -8,16 +8,20 @@ interface Props {
   allTtsCategories: TtsCategory[],
   allTtsModels: TtsModelListItem[],
 
+  allTtsCategoriesByTokenMap: Map<string,TtsCategory>,
+  allTtsModelsByTokenMap: Map<string,TtsModelListItem>,
+
   // Pass state up the chain
   setCurrentTtsModelSelected: (ttsModel: TtsModelListItem) => void,
 }
 
 export function MultiDropdownSearch(props: Props) {
-  const { allTtsCategories, allTtsModels } = props;
-
-  // Lookup by primary key
-  const [allCategoriesByTokenMap, setAllCategoriesByTokenMap] = useState<Map<string,TtsCategory>>(new Map());
-  const [allTtsModelsByTokenMap, setAllTtsModelsByTokenMap] = useState<Map<string,TtsModelListItem>>(new Map());
+  const { 
+    allTtsCategories, 
+    allTtsModels,
+    allTtsCategoriesByTokenMap,
+    allTtsModelsByTokenMap,
+  } = props;
 
   // Outer array has length of at least one, one element per <select>
   // Inner array contains the categories in each level.
@@ -36,20 +40,6 @@ export function MultiDropdownSearch(props: Props) {
 
   // TODO: Handle empty category list
   useEffect(() => {
-    // Category lookup by token
-    let categoriesByTokenMap = new Map();
-    allTtsCategories.forEach(category => {
-      categoriesByTokenMap.set(category.category_token, category);
-    })
-    setAllCategoriesByTokenMap(categoriesByTokenMap);
-
-    // TTS model lookup by token
-    let ttsModelsByTokenMap = new Map();
-    allTtsModels.forEach(model => {
-      ttsModelsByTokenMap.set(model.model_token, model);
-    })
-    setAllTtsModelsByTokenMap(ttsModelsByTokenMap);
-
     // Initial dropdown state
     const rootCategories = allTtsCategories.filter(category => {
       return !category.maybe_super_category_token;
@@ -72,7 +62,7 @@ export function MultiDropdownSearch(props: Props) {
       ttsModel.category_tokens.forEach(categoryToken => {
         let ancestors = categoryTokenToAllAncestorTokens.get(categoryToken);
         if (ancestors === undefined) {
-          ancestors = findAllAncestorTokens(categoryToken, categoriesByTokenMap);
+          ancestors = findAllAncestorTokens(categoryToken, allTtsCategoriesByTokenMap);
           categoryTokenToAllAncestorTokens.set(categoryToken, ancestors);
         }
         ancestors.forEach(categoryToken => {
@@ -87,7 +77,7 @@ export function MultiDropdownSearch(props: Props) {
     });
     setTtsModelsByCategoryToken(categoriesToTtsModelTokens);
 
-  }, [allTtsCategories, allTtsModels]);
+  }, [allTtsCategories, allTtsModels, allTtsCategoriesByTokenMap]);
 
 
   const doChangeCategory = (level: number, maybeToken: string) => {
@@ -97,7 +87,7 @@ export function MultiDropdownSearch(props: Props) {
     // And the dropdowns themselves
     let newDropdownCategories = dropdownCategories.slice(0, level + 1);
 
-    let category = allCategoriesByTokenMap.get(maybeToken);
+    let category = allTtsCategoriesByTokenMap.get(maybeToken);
     if (!!category) {
       newCategorySelections.push(category);
     }

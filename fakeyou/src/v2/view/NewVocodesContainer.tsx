@@ -75,6 +75,9 @@ interface Props {
   allTtsCategories: TtsCategory[],
   setAllTtsCategories: (allTtsCategories: TtsCategory[]) => void,
 
+  allTtsCategoriesByTokenMap: Map<string,TtsCategory>,
+  allTtsModelsByTokenMap: Map<string,TtsModelListItem>,
+
   currentTtsModelSelected?: TtsModelListItem,
   setCurrentTtsModelSelected: (ttsModel: TtsModelListItem) => void,
 }
@@ -368,6 +371,8 @@ class NewVocodesContainer extends React.Component<Props, State> {
                 setTtsModels={this.props.setTtsModels}
                 allTtsCategories={this.props.allTtsCategories}
                 setAllTtsCategories={this.props.setAllTtsCategories}
+                allTtsCategoriesByTokenMap={this.props.allTtsCategoriesByTokenMap}
+                allTtsModelsByTokenMap={this.props.allTtsModelsByTokenMap}
                 currentTtsModelSelected={this.props.currentTtsModelSelected}
                 setCurrentTtsModelSelected={this.props.setCurrentTtsModelSelected}
               />
