@@ -4,23 +4,6 @@ import { faHeadphonesAlt, faTags, faTimes } from '@fortawesome/free-solid-svg-ic
 import { TtsCategory } from '../../../api/category/ListTtsCategories';
 import { TtsModelListItem } from '../../../api/tts/ListTtsModels';
 
-/*
-TODO: Spinner.
-
-let selectClasses = 'select is-large';
-if (listItems.length === 0) {
-  selectClasses = 'select is-large is-loading';
-  listItems.push((
-    <option key="waiting" value="" disabled={true}>Loading...</option>
-  ))
-}
-
-
-TODO: Persist default voice.
-
-
-*/
-
 interface Props {
   allTtsCategories: TtsCategory[],
   allTtsModels: TtsModelListItem[],
@@ -53,6 +36,8 @@ export function MultiDropdownSearch(props: Props) {
     maybeSelectedTtsModel,
   } = props;
 
+  const isLoading = allTtsModels.length === 0;
+
   useEffect(() => {
     // NB: Dropdowns do not seem to respect React very well.
     // Despite setting <select>'s value and defaultValue, and <option>'s selected=true, 
@@ -72,6 +57,8 @@ export function MultiDropdownSearch(props: Props) {
 
     if (!!maybeElement && !!selectedModelToken) {
       (maybeElement as any).value = selectedModelToken;
+    } else if (isLoading) {
+      (maybeElement as any).value = ""; // Empty string will match "loading" <option>
     }
 
     let categoryDropdownElements = document.getElementsByClassName('category-dropdown');
@@ -232,6 +219,16 @@ export function MultiDropdownSearch(props: Props) {
 
   const voiceCount = leafiestCategoryModels.size;
 
+  let selectClasses = 'select is-normal';
+  let loadingOption = undefined;
+
+  if (isLoading) {
+    selectClasses = 'select is-normal is-loading';
+    loadingOption = (
+      <option key="waiting" value="" disabled={true}>Loading...</option>
+    )
+  }
+
   return (
     <div>
       {/* Category Dropdowns */}
@@ -244,12 +241,13 @@ export function MultiDropdownSearch(props: Props) {
       <strong>Voice ({voiceCount} to choose from)</strong>
       <br />
       <div className="control has-icons-left">
-        <div className="select is-normal">
+        <div className={selectClasses}>
           <select 
               name="tts-model-select"
               onChange={handleChangeVoice}
+              disabled={isLoading}
             >
-            {Array.from(leafiestCategoryModels).map(model => {
+            {isLoading ? loadingOption : Array.from(leafiestCategoryModels).map(model => {
               return (
                 <option
                   key={model.model_token}
