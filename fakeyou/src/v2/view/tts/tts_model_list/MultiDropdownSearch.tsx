@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faChevronRight, faHeadphonesAlt, faTags, faTimes } from '@fortawesome/free-solid-svg-icons';
+import { faChevronRight, faHeadphonesAlt, faTags, faTimes, faTimesCircle } from '@fortawesome/free-solid-svg-icons';
 import { TtsCategory } from '../../../api/category/ListTtsCategories';
 import { TtsModelListItem } from '../../../api/tts/ListTtsModels';
 
@@ -198,14 +198,17 @@ export function MultiDropdownSearch(props: Props) {
 
         <div className="control">
           <button 
-            className="button is-danger is-normal is-inverted is-rounded"
+            className="button is-rounded is-outlined"
             onClick={() => handleRemoveCategory(i)}
           >
             <span className="icon is-normal">
-              <FontAwesomeIcon icon={faTimes} title="remove" />
+              <FontAwesomeIcon icon={faTimes} title="remove" color="#f14668" />
             </span>
           </button>
+        </div>
 
+
+        <div className="control">
           <FontAwesomeIcon icon={faChevronRight} size="2x" color="#999" />
         </div>
       </>
