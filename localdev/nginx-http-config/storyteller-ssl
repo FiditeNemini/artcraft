@@ -10,6 +10,11 @@
 #  - /usr/local/etc/nginx/sites-enabled/{name-of-site} (for default nginx install)
 #
 #
+# On Mac, verify configs and restart with,
+#
+#   sudo nginx -t
+#   sudo nginx -s reload
+#
 #           ================
 #           SSL Instructions
 #           ================
@@ -30,7 +35,9 @@
 # set about:config `security.tls.insecure_fallback_hosts` to include a list of
 # permitted domains. You may also need to configure other settings. 
 #
+#
 
+# API backend over plain HTTP
 server {
     listen 80;
     server_name api.jungle.horse;
@@ -41,6 +48,22 @@ server {
     }
 }
 
+# Javascript frontend over plain HTTP
+server {
+    listen 443 ssl;
+    listen [::]:443 ssl;
+    ssl_certificate /etc/ssl/certs/localhost.crt;
+    ssl_certificate_key /etc/ssl/private/localhost.key;
+    ssl_protocols TLSv1.2 TLSv1.1 TLSv1;
+    server_name www.jungle.horse;
+    location / {
+        proxy_set_header Host $host;
+        proxy_pass http://127.0.0.1:7000;
+        proxy_redirect off;
+    }
+}
+
+# Javascript frontend over SSL
 server {
     listen 443 ssl;
     listen [::]:443 ssl;
@@ -54,3 +77,4 @@ server {
         proxy_redirect off;
     }
 }
+
