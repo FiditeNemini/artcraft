@@ -27,25 +27,37 @@ class ApiConfig {
   
   domain: Domain;
   useSsl: boolean;
+  v2ApiHost: string;
 
   constructor() {
     let useSsl = true;
     let domain = Domain.Unknown;
 
     if (document.location.host.includes("localhost")) {
+      // NB: `localhost` seems to have problems with cookies. 
+      // I've added jungle.horse as a localhost mapped domain in /etc/hosts,
+      // This should be the preferred mechanism for local testing.
       domain = Domain.Localhost;
       useSsl = false;
     } else if (document.location.host.includes("jungle.horse")) {
+      // NB: Local dev.
       domain = Domain.JungleHorse;
-      useSsl = false;
+      useSsl = document.location.protocol === 'https:';
     } else if (document.location.host.includes("vo.codes")) {
       domain = Domain.Vocodes;
     } else if (document.location.host.includes("fakeyou.com")) {
       domain = Domain.FakeYou;
     }
 
+    let v2ApiHost = "api.fakeyou.com";
+    if (!useSsl && (domain === Domain.Localhost || domain === Domain.JungleHorse)) {
+      // NB: Lack of SSL means use local development.
+      v2ApiHost = "api.jungle.horse";
+    }
+
     this.domain = domain;
     this.useSsl = useSsl;
+    this.v2ApiHost = v2ApiHost;
   }
 
   speakEndpoint() : string {
@@ -331,18 +343,7 @@ class ApiConfig {
   }
 
   private getNewApiHost() : string {
-    // NB: `localhost` seems to have problems with cookies. 
-    // I've added jungle.horse as a localhost mapped domain in /etc/hosts
-    switch (this.domain) {
-      case Domain.Localhost:
-      case Domain.JungleHorse:
-        return "api.jungle.horse";
-      case Domain.Vocodes:
-        return "api.vo.codes";
-      case Domain.FakeYou:
-      case Domain.Unknown:
-        return "api.fakeyou.com";
-    }
+    return this.v2ApiHost;
   }
 }
 

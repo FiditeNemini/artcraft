@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { TtsCategory } from './v2/api/category/ListTtsCategories';
 import { TtsModelListItem } from './v2/api/tts/ListTtsModels';
 import { App } from './App';
+import { v4 as uuidv4 } from 'uuid';
 
 interface Props {
   // Certan browsers (iPhone) have pitiful support for drawing APIs. Worse yet,
@@ -14,14 +15,35 @@ interface Props {
   flashVocodesNotice: boolean,
 }
 
+// Special synthetic categories created on the frontend.
+// Used in a union type, but they should play well with `TtsCategory`.
+export class SyntheticCategory {
+  name: string;
+  name_for_dropdown: string;
+  category_token: string;
+  maybe_super_category_token?: string;
+
+  ttsModels: Set<TtsModelListItem>;
+
+  constructor(name: string, token?: string, maybe_super_category_token?: string) {
+    this.name = name;
+    this.name_for_dropdown = name;
+    this.category_token = !!token ? token : `syn:${uuidv4()}`;
+    this.maybe_super_category_token = maybe_super_category_token;
+    this.ttsModels = new Set();
+  }
+}
+
+export type TtsCategoryType = TtsCategory|SyntheticCategory;
+
 export function AppWrapper(props: Props) {
   // Caches of all objects queried
   // These may be triggered by a different page than the user initially lands on.
-  const [allTtsCategories, setAllTtsCategories] = useState<TtsCategory[]>([]);
+  const [allTtsCategories, setAllTtsCategories] = useState<TtsCategoryType[]>([]);
   const [allTtsModels, setAllTtsModels] = useState<TtsModelListItem[]>([]);
 
   // Precalculated maps for lookup by primary key
-  const [allCategoriesByTokenMap, setAllCategoriesByTokenMap] = useState<Map<string,TtsCategory>>(new Map());
+  const [allCategoriesByTokenMap, setAllCategoriesByTokenMap] = useState<Map<string,TtsCategoryType>>(new Map());
   const [allTtsModelsByTokenMap, setAllTtsModelsByTokenMap] = useState<Map<string,TtsModelListItem>>(new Map());
 
   // Precalculated map for lookup by foreign key
@@ -34,13 +56,13 @@ export function AppWrapper(props: Props) {
   // Outer array has length of at least one, one element per <select>
   // Inner array contains the categories in each level.
   // Structure: [dropdownLevel][categories]
-  const [dropdownCategories, setDropdownCategories] = useState<TtsCategory[][]>([]);
+  const [dropdownCategories, setDropdownCategories] = useState<TtsCategoryType[][]>([]);
 
   // User selections.
   // Every category in the heirarchy that has been selected by the user.
   // Empty list if none are selected.
   // Structure: [firstSelected, secondSelected...]
-  const [selectedCategories, setSelectedCategories] = useState<TtsCategory[]>([]);
+  const [selectedCategories, setSelectedCategories] = useState<TtsCategoryType[]>([]);
 
   // User selections.
   const [maybeSelectedTtsModel, setMaybeSelectedTtsModel] = useState<TtsModelListItem|undefined>(undefined);

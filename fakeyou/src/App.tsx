@@ -15,7 +15,7 @@ import { TtsModelUploadJob, TtsModelUploadJobStateResponsePayload } from './jobs
 import { W2lTemplateUploadJob, W2lTemplateUploadJobStateResponsePayload } from './jobs/W2lTemplateUploadJobs';
 import { jobStateCanChange } from './jobs/JobStates';
 import { TtsModelListItem } from './v2/api/tts/ListTtsModels';
-import { TtsCategory } from './v2/api/category/ListTtsCategories';
+import { TtsCategoryType } from './AppWrapper';
 
 enum MigrationMode {
   NEW_VOCODES,
@@ -27,20 +27,20 @@ interface Props {
 
   flashVocodesNotice: boolean,
 
-  allTtsCategories: TtsCategory[],
-  setAllTtsCategories: (allTtsCategories: TtsCategory[]) => void,
+  allTtsCategories: TtsCategoryType[],
+  setAllTtsCategories: (allTtsCategories: TtsCategoryType[]) => void,
 
   allTtsModels: TtsModelListItem[],
   setAllTtsModels: (allTtsModels: TtsModelListItem[]) => void,
 
-  allTtsCategoriesByTokenMap: Map<string,TtsCategory>,
+  allTtsCategoriesByTokenMap: Map<string,TtsCategoryType>,
   allTtsModelsByTokenMap: Map<string,TtsModelListItem>,
   ttsModelsByCategoryToken: Map<string,Set<TtsModelListItem>>,
 
-  dropdownCategories: TtsCategory[][],
-  setDropdownCategories: (dropdownCategories: TtsCategory[][]) => void,
-  selectedCategories: TtsCategory[],
-  setSelectedCategories: (selectedCategories: TtsCategory[]) => void,
+  dropdownCategories: TtsCategoryType[][],
+  setDropdownCategories: (dropdownCategories: TtsCategoryType[][]) => void,
+  selectedCategories: TtsCategoryType[],
+  setSelectedCategories: (selectedCategories: TtsCategoryType[]) => void,
 
   maybeSelectedTtsModel?: TtsModelListItem,
   setMaybeSelectedTtsModel: (maybeSelectedTtsModel: TtsModelListItem) => void,

@@ -47,7 +47,7 @@ import { TtsEditCategoriesPage } from './tts/tts_edit_categories/TtsEditCategori
 import { ModerationTtsCategoryListPage } from './moderation/categories/ModerationTtsCategoryListPage';
 import { ModerationTtsCategoryEditPage } from './moderation/categories/ModerationTtsCategoryEditPage';
 import { ModerationCategoryDeletePage } from './moderation/categories/ModerationCategoryDeletePage';
-import { TtsCategory } from '../api/category/ListTtsCategories';
+import { TtsCategoryType } from '../../AppWrapper';
 
 interface Props {
   sessionWrapper: SessionWrapper,
@@ -75,17 +75,17 @@ interface Props {
   ttsModels: Array<TtsModelListItem>,
   setTtsModels: (ttsVoices: Array<TtsModelListItem>) => void,
 
-  allTtsCategories: TtsCategory[],
-  setAllTtsCategories: (allTtsCategories: TtsCategory[]) => void,
+  allTtsCategories: TtsCategoryType[],
+  setAllTtsCategories: (allTtsCategories: TtsCategoryType[]) => void,
 
-  allTtsCategoriesByTokenMap: Map<string,TtsCategory>,
+  allTtsCategoriesByTokenMap: Map<string,TtsCategoryType>,
   allTtsModelsByTokenMap: Map<string,TtsModelListItem>,
   ttsModelsByCategoryToken: Map<string,Set<TtsModelListItem>>,
 
-  dropdownCategories: TtsCategory[][],
-  setDropdownCategories: (dropdownCategories: TtsCategory[][]) => void,
-  selectedCategories: TtsCategory[],
-  setSelectedCategories: (selectedCategories: TtsCategory[]) => void,
+  dropdownCategories: TtsCategoryType[][],
+  setDropdownCategories: (dropdownCategories: TtsCategoryType[][]) => void,
+  selectedCategories: TtsCategoryType[],
+  setSelectedCategories: (selectedCategories: TtsCategoryType[]) => void,
 
   maybeSelectedTtsModel?: TtsModelListItem,
   setMaybeSelectedTtsModel: (maybeSelectedTtsModel: TtsModelListItem) => void,

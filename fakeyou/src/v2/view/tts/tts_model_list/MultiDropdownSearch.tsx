@@ -1,22 +1,22 @@
 import React, { useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faChevronRight, faHeadphonesAlt, faTags, faTimes } from '@fortawesome/free-solid-svg-icons';
-import { TtsCategory } from '../../../api/category/ListTtsCategories';
 import { TtsModelListItem } from '../../../api/tts/ListTtsModels';
+import { TtsCategoryType } from '../../../../AppWrapper';
 
 interface Props {
-  allTtsCategories: TtsCategory[],
+  allTtsCategories: TtsCategoryType[],
   allTtsModels: TtsModelListItem[],
 
-  allTtsCategoriesByTokenMap: Map<string,TtsCategory>,
+  allTtsCategoriesByTokenMap: Map<string,TtsCategoryType>,
   allTtsModelsByTokenMap: Map<string,TtsModelListItem>,
   ttsModelsByCategoryToken: Map<string,Set<TtsModelListItem>>,
 
-  dropdownCategories: TtsCategory[][],
-  setDropdownCategories: (dropdownCategories: TtsCategory[][]) => void,
+  dropdownCategories: TtsCategoryType[][],
+  setDropdownCategories: (dropdownCategories: TtsCategoryType[][]) => void,
 
-  selectedCategories: TtsCategory[],
-  setSelectedCategories: (selectedCategories: TtsCategory[]) => void,
+  selectedCategories: TtsCategoryType[],
+  setSelectedCategories: (selectedCategories: TtsCategoryType[]) => void,
 
   maybeSelectedTtsModel?: TtsModelListItem,
   setMaybeSelectedTtsModel: (maybeSelectedTtsModel: TtsModelListItem) => void,

@@ -14,8 +14,9 @@ import { v4 as uuidv4 } from 'uuid';
 import { ListTtsModels, TtsModelListItem } from '../../../api/tts/ListTtsModels';
 import { GravatarFc } from '../../_common/GravatarFc';
 import { VocodesNotice } from './VocodesNotice';
-import { ListTtsCategories, ListTtsCategoriesIsError, ListTtsCategoriesIsOk, TtsCategory } from '../../../api/category/ListTtsCategories';
+import { ListTtsCategories, ListTtsCategoriesIsError, ListTtsCategoriesIsOk } from '../../../api/category/ListTtsCategories';
 import { MultiDropdownSearch } from './MultiDropdownSearch';
+import { SyntheticCategory, TtsCategoryType } from '../../../../AppWrapper';
 
 export interface EnqueueJobResponsePayload {
   success: boolean,
@@ -40,17 +41,17 @@ interface Props {
   ttsModels: Array<TtsModelListItem>,
   setTtsModels: (ttsVoices: Array<TtsModelListItem>) => void,
 
-  allTtsCategories: TtsCategory[],
-  setAllTtsCategories: (allTtsCategories: TtsCategory[]) => void,
+  allTtsCategories: TtsCategoryType[],
+  setAllTtsCategories: (allTtsCategories: TtsCategoryType[]) => void,
 
-  allTtsCategoriesByTokenMap: Map<string,TtsCategory>,
+  allTtsCategoriesByTokenMap: Map<string,TtsCategoryType>,
   allTtsModelsByTokenMap: Map<string,TtsModelListItem>,
   ttsModelsByCategoryToken: Map<string,Set<TtsModelListItem>>,
 
-  dropdownCategories: TtsCategory[][],
-  setDropdownCategories: (dropdownCategories: TtsCategory[][]) => void,
-  selectedCategories: TtsCategory[],
-  setSelectedCategories: (selectedCategories: TtsCategory[]) => void,
+  dropdownCategories: TtsCategoryType[][],
+  setDropdownCategories: (dropdownCategories: TtsCategoryType[][]) => void,
+  selectedCategories: TtsCategoryType[],
+  setSelectedCategories: (selectedCategories: TtsCategoryType[]) => void,
 
   maybeSelectedTtsModel?: TtsModelListItem,
   setMaybeSelectedTtsModel: (maybeSelectedTtsModel: TtsModelListItem) => void,
@@ -76,6 +77,7 @@ function TtsModelListFc(props: Props) {
     }
     const models = await ListTtsModels();
     if (models) {
+      dynamicallyCategorizeModels(models);
       setTtsModels(models);
       if (!maybeSelectedTtsModel && models.length > 0) {
         const model = models[0];
@@ -90,7 +92,10 @@ function TtsModelListFc(props: Props) {
     }
     const categoryList = await ListTtsCategories();
     if (ListTtsCategoriesIsOk(categoryList)) {
-      setAllTtsCategories(categoryList.categories);
+      const serverCategories : TtsCategoryType[] = categoryList.categories;
+      const dynamicCategories : TtsCategoryType[] = generateSyntheticCategories();
+      const allCategories = serverCategories.concat(dynamicCategories);
+      setAllTtsCategories(allCategories);
     } else if (ListTtsCategoriesIsError(categoryList))  {
       // TODO: Retry on decay function
     }
@@ -262,6 +267,48 @@ function TtsModelListFc(props: Props) {
 
     </div>
   )
+}
+
+function generateSyntheticCategories() : SyntheticCategory[] {
+  return [
+    // Under-categorized
+    new SyntheticCategory('Under-categorized Models', 'syn:under'),
+    new SyntheticCategory('With 0 categories', 'syn:uncategorized', 'syn:under'),
+    new SyntheticCategory('With 1 category', 'syn:one-category', 'syn:under'),
+    // Most recent
+    new SyntheticCategory('Most Recent Voices', 'syn:most-recent'),
+  ]
+}
+
+// Directly mutate the model records
+function dynamicallyCategorizeModels(models: TtsModelListItem[]) {
+  // NB: Sorting by creation date will involve more refactoring, so this is fine for now.
+  const mostRecentModelTokens = new Set([...models].sort((modelA, modelB) => {
+    const dateA = new Date(modelA.created_at);
+    const dateB = new Date(modelB.created_at);
+    if (dateA > dateB) {
+      return -1;
+    } else if (dateA < dateB) {
+      return 1;
+    } else {
+      return 0;
+    }
+  }).map(model => model.model_token).slice(0, 25));
+
+  models.forEach(model => {
+    if (!model.category_tokens) {
+      model.category_tokens = [];
+    }
+    if (model.category_tokens.length === 1) {
+      model.category_tokens.push('syn:one-category');
+    } else if (model.category_tokens.length === 0) {
+      model.category_tokens.push('syn:uncategorized');
+    }
+
+    if (mostRecentModelTokens.has(model.model_token)) {
+      model.category_tokens.push('syn:most-recent');
+    }
+  })
 }
 
 export { TtsModelListFc };
