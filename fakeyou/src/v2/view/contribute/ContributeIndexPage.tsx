@@ -2,6 +2,7 @@ import React from 'react';
 import { SessionWrapper } from '../../../session/SessionWrapper';
 import { Link } from "react-router-dom";
 import { DiscordLink } from '../_common/DiscordLink';
+import { FrontendUrlConfig } from '../../../common/FrontendUrlConfig';
 
 interface Props {
   sessionWrapper: SessionWrapper,
@@ -54,7 +55,7 @@ function ContributeIndexPage(props: Props) {
         <p>Help us organize the models!</p>
 
         <Link
-          to="/category/create"
+          to={FrontendUrlConfig.createCategoryPage()}
           className="button is-info is-large is-fullwidth"
           >{categoryActionName} category</Link>
 

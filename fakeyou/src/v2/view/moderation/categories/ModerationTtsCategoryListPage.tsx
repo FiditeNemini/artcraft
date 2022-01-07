@@ -267,6 +267,13 @@ function ModerationTtsCategoryListPage(props: Props) {
       </p>
 
       <br />
+      
+      <Link
+        to={FrontendUrlConfig.createCategoryPage()}
+        className="button is-info is-large is-fullwidth"
+        >Create new category</Link>
+
+      <br />
 
       <BackLink link={FrontendUrlConfig.moderationMain()} text="Back to moderation" />
     </div>

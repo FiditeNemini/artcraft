@@ -89,6 +89,10 @@ class FrontendUrlConfig {
   static contributePage() : string {
     return '/contribute';
   }
+
+  static createCategoryPage(): string {
+    return '/category/create';
+  }
   
   // Moderation links
 

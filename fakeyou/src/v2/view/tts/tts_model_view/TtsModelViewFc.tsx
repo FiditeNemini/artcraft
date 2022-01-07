@@ -362,31 +362,6 @@ function TtsModelViewFc(props: Props) {
         <BackLink link="/" text="Back to all models" />
       </p>
       
-      <h4 className="title is-4"> Use Model </h4>
-
-      <form onSubmit={handleFormSubmit}>
-        <textarea 
-            onChange={handleChangeText}
-            value={props.textBuffer}
-            className="textarea is-large" 
-            placeholder="Textual shenanigans go here..."></textarea>
-
-        <div className="button-group">
-          <div className="columns is-mobile">
-            <div className="column has-text-centered">
-              <button className="button is-info is-large" >Speak</button>
-            </div>
-            <div className="column has-text-centered">
-              <button className="button is-info is-light is-large" onClick={handleClearClick}>Clear</button>
-            </div>
-          </div>
-        </div>
-      </form>
-
-      <br />
-      
-      <SessionTtsInferenceResultListFc ttsInferenceJobs={props.ttsInferenceJobs} />
-    
       {modelDescription}
 
       {modelCategoriesSection}
@@ -443,6 +418,32 @@ function TtsModelViewFc(props: Props) {
       {deleteModelButton}
 
       <br />
+
+      <h4 className="title is-4"> Use Model </h4>
+
+      <form onSubmit={handleFormSubmit}>
+        <textarea 
+            onChange={handleChangeText}
+            value={props.textBuffer}
+            className="textarea is-large" 
+            placeholder="Textual shenanigans go here..."></textarea>
+
+        <div className="button-group">
+          <div className="columns is-mobile">
+            <div className="column has-text-centered">
+              <button className="button is-info is-large" >Speak</button>
+            </div>
+            <div className="column has-text-centered">
+              <button className="button is-info is-light is-large" onClick={handleClearClick}>Clear</button>
+            </div>
+          </div>
+        </div>
+      </form>
+
+      <br />
+      
+      <SessionTtsInferenceResultListFc ttsInferenceJobs={props.ttsInferenceJobs} />
+
       <br />
       <BackLink link="/" text="Back to all models" />
     </div>

@@ -219,6 +219,10 @@ function TtsEditCategoriesPage(props: Props) {
       {errorFlash}
 
       <p>
+        <BackLink link={FrontendUrlConfig.indexPage()} text="Back to main" />
+      </p>
+
+      <p>
         <BackLink link={modelLink} text="Back to model" />
       </p>
 
