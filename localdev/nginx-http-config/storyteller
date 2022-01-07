@@ -1,3 +1,15 @@
+# Nginx configs for "jungle.horse" and "api.jungle.horse" (http)
+#
+# On Ubuntu Linux, this config is located at the following location:
+# 
+#  - /etc/nginx/sites-enabled/{name-of-site}
+#
+# On Mac, this is located at the following locations:
+#
+#  - /opt/homebrew/etc/nginx/servers/{name-of-site} (for nginx installed with homebrew)
+#  - /usr/local/etc/nginx/sites-enabled/{name-of-site} (for default nginx install)
+#
+
 server {
     listen 80;
     server_name api.jungle.horse;
