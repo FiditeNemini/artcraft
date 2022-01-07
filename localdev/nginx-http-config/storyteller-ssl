@@ -1,0 +1,56 @@
+# Nginx configs for "jungle.horse" and "api.jungle.horse" (http)
+#
+# On Ubuntu Linux, this config is located at the following location:
+# 
+#  - /etc/nginx/sites-enabled/{name-of-site}
+#
+# On Mac, this is located at the following locations:
+#
+#  - /opt/homebrew/etc/nginx/servers/{name-of-site} (for nginx installed with homebrew)
+#  - /usr/local/etc/nginx/sites-enabled/{name-of-site} (for default nginx install)
+#
+#
+#           ================
+#           SSL Instructions
+#           ================
+# 
+# To create self-signed certs on Mac,
+#
+#     openssl req -x509 -sha256 -nodes -newkey rsa:2048 -days 365 -keyout localhost.key -out localhost.crt
+#
+#     ^ most fields can be blank, but the "Common Name" should be `*.jungle.horse`
+#
+# On Mac, load the self signed cert into the keychain with the following command:
+#
+#     sudo security add-trusted-cert \
+#      -d -r trustRoot \
+#      -k /Library/Keychains/System.keychain /etc/ssl/certs/localhost.crt
+#
+# Self signed certs might be considered insecure by the browser. In Firefox, 
+# set about:config `security.tls.insecure_fallback_hosts` to include a list of
+# permitted domains. You may also need to configure other settings. 
+#
+
+server {
+    listen 80;
+    server_name api.jungle.horse;
+    location / {
+        proxy_set_header Host $host;
+        proxy_pass http://127.0.0.1:12345;
+        proxy_redirect off;
+    }
+}
+
+server {
+    listen 443 ssl;
+    listen [::]:443 ssl;
+    ssl_certificate /etc/ssl/certs/localhost.crt;
+    ssl_certificate_key /etc/ssl/private/localhost.key;
+    ssl_protocols TLSv1.2 TLSv1.1 TLSv1;
+    server_name jungle.horse;
+    location / {
+        proxy_set_header Host $host;
+        proxy_pass http://127.0.0.1:7000;
+        proxy_redirect off;
+    }
+}
