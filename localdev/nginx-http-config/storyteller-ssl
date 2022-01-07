@@ -50,12 +50,9 @@ server {
 
 # Javascript frontend over plain HTTP
 server {
-    listen 443 ssl;
-    listen [::]:443 ssl;
-    ssl_certificate /etc/ssl/certs/localhost.crt;
-    ssl_certificate_key /etc/ssl/private/localhost.key;
-    ssl_protocols TLSv1.2 TLSv1.1 TLSv1;
-    server_name www.jungle.horse;
+    listen 80;
+    # server_name www.jungle.horse;
+    server_name jungle.horse;
     location / {
         proxy_set_header Host $host;
         proxy_pass http://127.0.0.1:7000;
