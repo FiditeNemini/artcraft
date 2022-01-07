@@ -152,31 +152,7 @@ SQLX_OFFLINE=true cargo sqlx prepare -- --bin storyteller-web
 
 Set up a local nginx to proxy to the frontend and backend so cookie issues aren't annoying
 
-Edit the nginx config file, 
-
-- `/etc/nginx/sites-enabled/storyteller` (linux)
-- `/usr/local/etc/nginx/sites-enabled/storyteller` (mac)
-
-```
-server {
-    listen 80;
-    server_name api.jungle.horse;
-    location / {
-        proxy_set_header Host $host;
-        proxy_pass http://127.0.0.1:12345;
-        proxy_redirect off;
-    }
-}
-server {
-    listen 80;
-    server_name jungle.horse;
-    location / {
-        proxy_set_header Host $host;
-        proxy_pass http://127.0.0.1:7000;
-        proxy_redirect off;
-    }
-}
-
+Configure Nginx per the checked in Nginx configs (and instructions) in `localdev/nginx-http-config`.
 
 ```
 
@@ -186,76 +162,6 @@ And in /etc/hosts,
 127.0.0.1  jungle.horse
 127.0.0.1  api.jungle.horse
 
-```
-
-### Setting up local Nginx with SSL self-signed certs
-
-From https://imagineer.in/blog/https-on-localhost-with-nginx/ , 
-
-```
-openssl req -x509 -sha256 -nodes -newkey rsa:2048 -days 365 -keyout localhost.key -out localhost.crt
-```
-
-Most fields can be blank, but the "Common Name" should be `*.jungle.horse`
-
-
-Edit the appropriate Nginx config file,
-
-- `/etc/nginx/sites-enabled/storyteller` (linux)
-- `/usr/local/etc/nginx/sites-enabled/storyteller` (mac typical)
-- `/opt/homebrew/etc/nginx/nginx.conf (mac alternate, w/ homebrew)
-- `/opt/homebrew/etc/nginx/servers/storyteller` (mac alternate - this is the one I'm using)
-
-```
-events {}
-http {
-  # upstream backend {
-  #   server 127.0.0.1:7000
-  # }
-  # server {
-  #   server_name jungle.horse;
-  #   rewrite ^(.*) https://jungle.horse$1 permanent;
-  # }
-  server {
-    listen 443;
-    ssl on;
-    ssl_certificate      /Users/bt/dev/storyteller/storyteller-web/localhost.crt;
-    ssl_certificate_key  /Users/bt/dev/storyteller/storyteller-web/localhost.key;
-    ssl_ciphers  HIGH:!aNULL:!MD5;
-    server_name: jungle.horse;
-    location / {
-      proxy_pass http://127.0.0.1:7000
-    }
-  }
-}
-server {
-    listen 80;
-    server_name api.jungle.horse;
-    location / {
-        proxy_set_header Host $host;
-        proxy_pass http://127.0.0.1:12345;
-        proxy_redirect off;
-    }
-}
-server {
-    listen 80;
-    server_name jungle.horse;
-    location / {
-        proxy_set_header Host $host;
-        proxy_pass http://127.0.0.1:7000;
-        proxy_redirect off;
-    }
-}
-
-```
-
-Nginx Mac version:
-
-```
-nginx version: nginx/1.21.4
-built by clang 13.0.0 (clang-1300.0.29.3)
-built with OpenSSL 1.1.1l  24 Aug 2021
-TLS SNI support enabled
 ```
 
 ### Python 3.6 on Apple M1 Mac
