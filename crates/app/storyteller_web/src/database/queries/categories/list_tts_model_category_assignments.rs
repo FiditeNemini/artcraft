@@ -40,9 +40,7 @@ pub struct CategoryAssignment {
   pub category_token: String,
 }
 
-// NB: This shows for all models, including deleted and unapproved.
-// However, it does not return deleted/unapproved categories.
-pub async fn list_tts_model_category_assignments(mysql_pool: &MySqlPool) -> AnyhowResult<Vec<CategoryAssignment>> {
+async fn list_tts_model_category_assignments(mysql_pool: &MySqlPool) -> AnyhowResult<Vec<CategoryAssignment>> {
   let maybe_results = sqlx::query_as!(
       CategoryAssignment,
         r#"
@@ -58,6 +56,8 @@ WHERE
     tts.is_locked_from_use IS FALSE
     AND tts.user_deleted_at IS NULL
     AND tts.mod_deleted_at IS NULL
+    AND assignments.deleted_at IS NULL
+
         "#,
     )
       .fetch_all(mysql_pool)

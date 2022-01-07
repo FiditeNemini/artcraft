@@ -337,44 +337,6 @@
       ]
     }
   },
-  "013e26fbe298b3de8403f9541807190fe556470c55b7ca342a50aaafea1bbb87": {
-    "query": "\nSELECT\n    assignments.model_token AS tts_model_token,\n    assignments.category_token\nFROM\n    tts_category_assignments AS assignments\nJOIN\n    tts_models AS tts\n    ON assignments.model_token = tts.token\nWHERE\n    tts.is_locked_from_use IS FALSE\n    AND tts.user_deleted_at IS NULL\n    AND tts.mod_deleted_at IS NULL\n        ",
-    "describe": {
-      "columns": [
-        {
-          "ordinal": 0,
-          "name": "tts_model_token",
-          "type_info": {
-            "type": "VarString",
-            "flags": {
-              "bits": 4233
-            },
-            "char_set": 224,
-            "max_size": 128
-          }
-        },
-        {
-          "ordinal": 1,
-          "name": "category_token",
-          "type_info": {
-            "type": "VarString",
-            "flags": {
-              "bits": 4233
-            },
-            "char_set": 224,
-            "max_size": 128
-          }
-        }
-      ],
-      "parameters": {
-        "Right": 0
-      },
-      "nullable": [
-        false,
-        false
-      ]
-    }
-  },
   "02060ab9b8ca472a2bd4d4fa3120743e90148ccd6a4cb13bc491d00f36ed7a8f": {
     "query": "\nSELECT\n  id,\n  status\nFROM w2l_inference_jobs\nWHERE id = ?\nFOR UPDATE\n        ",
     "describe": {
@@ -1850,6 +1812,44 @@
         "Right": 1
       },
       "nullable": [
+        false
+      ]
+    }
+  },
+  "12a176252df63d1e3a958362d754c828991d64ade427ab11a2025098d1581976": {
+    "query": "\nSELECT\n    assignments.model_token AS tts_model_token,\n    assignments.category_token\nFROM\n    tts_category_assignments AS assignments\nJOIN\n    tts_models AS tts\n    ON assignments.model_token = tts.token\nWHERE\n    tts.is_locked_from_use IS FALSE\n    AND tts.user_deleted_at IS NULL\n    AND tts.mod_deleted_at IS NULL\n    AND assignments.deleted_at IS NULL\n\n        ",
+    "describe": {
+      "columns": [
+        {
+          "ordinal": 0,
+          "name": "tts_model_token",
+          "type_info": {
+            "type": "VarString",
+            "flags": {
+              "bits": 4233
+            },
+            "char_set": 224,
+            "max_size": 128
+          }
+        },
+        {
+          "ordinal": 1,
+          "name": "category_token",
+          "type_info": {
+            "type": "VarString",
+            "flags": {
+              "bits": 4233
+            },
+            "char_set": 224,
+            "max_size": 128
+          }
+        }
+      ],
+      "parameters": {
+        "Right": 0
+      },
+      "nullable": [
+        false,
         false
       ]
     }
