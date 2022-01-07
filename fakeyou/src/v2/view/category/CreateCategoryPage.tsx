@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { SessionWrapper } from '../../../session/SessionWrapper';
-import { useHistory } from "react-router-dom";
+import { Link, useHistory } from "react-router-dom";
 import { v4 as uuidv4 } from 'uuid';
 import { CreateCategory, CreateCategoryIsError, CreateCategoryRequest } from '../../api/category/CreateCategory';
 import { CreateSessionIsSuccess } from '../../api/user/CreateSession';
@@ -162,6 +162,18 @@ function CreateCategoryPage(props: Props) {
     )
   }
 
+  let moderateCategoriesLink = undefined;
+
+  if (props.sessionWrapper.canEditCategories()) {
+    moderateCategoriesLink = (
+      <>
+        <Link to={FrontendUrlConfig.moderationTtsCategoryList()}>Moderate categories</Link>
+        <br/>
+        <br/>
+      </>
+    )
+  }
+
   return (
     <div>
       <h1 className="title is-1"> {categoryActionName} Category </h1>
@@ -197,6 +209,8 @@ function CreateCategoryPage(props: Props) {
       </form>
 
       <br />
+
+      {moderateCategoriesLink}
 
       <BackLink link={FrontendUrlConfig.contributePage()} text="Back to contribute page" />
 
