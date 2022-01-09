@@ -8,16 +8,27 @@
 
     sock.onopen = function (event) {
         console.log('on open event', event);
-        sock.send('on open message from client');
+        sock.send('on open message from browser');
     };
 
     sock.onmessage = function (event) {
         console.log('on message event', event.data);
     }
 
+    sock.onerror = function(event) {
+        console.log('on error event', event.data);
+    }
+
     setInterval(() => {
-        console.log('sending message to server on interval');
+        console.log('sending browser message to server on interval');
         sock.send('interval trigger');
     }, 2000);
+
+    //setTimeout(() => {
+    //    console.log('disconnect')
+    //    const normal_close = 1000;
+    //    sock.close(normal_close, 'close');
+    //
+    //}, 10000)
 
 })();

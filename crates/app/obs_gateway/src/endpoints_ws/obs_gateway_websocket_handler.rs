@@ -20,25 +20,25 @@ pub async fn obs_gateway_websocket_handler(
   server_state: web::Data<Arc<ObsGatewayServerState>>,
   stream: web::Payload,
 ) -> Result<HttpResponse, Error> {
-  error!(">>>>>> obs_ws_index");
+  info!(">>>>>> obs_ws_index");
 
   let mut client = PollingTwitchWebsocketClient::new().unwrap();
 
-  error!("Connecting to Twitch PubSub...");
+  info!("Connecting to Twitch PubSub...");
   client.connect().await.unwrap();
 
-  error!("Connected to Twitch PubSub");
+  info!("Connected to Twitch PubSub");
 
   //println!("Starting polling thread...");
   //client.start_ping_thread().await;
 
-  error!("Sending Twitch PubSub PING...");
+  info!("Sending Twitch PubSub PING...");
 
   client.send_ping().await.unwrap();
 
-  error!("Try read next from Twitch PubSub...");
+  info!("Try read next from Twitch PubSub...");
   let r = client.try_next().await.unwrap();
-  error!("Twitch PubSub Result: {:?}", r);
+  info!("Twitch PubSub Result: {:?}", r);
 
   // User: vocodes
   //let user_id = 652567283;
@@ -65,7 +65,7 @@ pub async fn obs_gateway_websocket_handler(
 
   let auth_token = server_state.twitch_oauth_temp.temp_oauth_access_token.clone();
 
-  error!("Begin TwitchPubSub LISTEN on authenticated OAuth topics...");
+  info!("Begin TwitchPubSub LISTEN on authenticated OAuth topics...");
 
   client.listen(&auth_token, &topics).await.unwrap();
 
@@ -76,7 +76,7 @@ pub async fn obs_gateway_websocket_handler(
 
   //let res = rx.recv().unwrap();
 
-  error!("Begin Javascript WebSocket...");
+  info!("Begin Javascript WebSocket...");
   let websocket = ObsGatewayWebSocket::new(client);
 
   ws::start(websocket, &request, stream)
@@ -102,7 +102,7 @@ impl Actor for ObsGatewayWebSocket {
   type Context = ws::WebsocketContext<Self>;
 
   fn started(&mut self, _ctx: &mut Self::Context) {
-    error!(">>>>>> obs actor started");
+    info!(">>>>>> obs actor started");
   }
 }
 
@@ -113,7 +113,7 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for ObsGatewayWebSock
     ctx: &mut Self::Context,
   ) {
     if let Ok(msg) = msg {
-      error!(">>>>>> obs streamhandler::handle (msg = {:?})", msg);
+      info!(">>>>>> obs streamhandler::handle (msg = {:?})", msg);
 
       //let (tx, rx) = crossbeam::channel::bounded(1);
       //let handle = Handle::current();
@@ -148,10 +148,12 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for ObsGatewayWebSock
         //  }
         //}
         loop {
-          info!("Thread loop");
+          info!("thread loop");
           sleep(Duration::from_millis(1000));
         }
       });
+
+      info!("after thread spawn");
 
 
       match msg {
