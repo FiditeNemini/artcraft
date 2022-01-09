@@ -66,13 +66,6 @@ pub async fn oauth_begin_enroll_redirect(
 
   let (url, _csrf_token) = builder.generate_url();
 
-  let response = OauthBeginEnrollResult {
-    redirect_url: url.to_string(),
-  };
-
-  let response = to_json_success_response(&response)
-      .map_err(|_| OauthBeginEnrollError::ServerError)?;
-
   Ok(HttpResponse::Found()
       .append_header((header::LOCATION, url.to_string()))
       .finish())

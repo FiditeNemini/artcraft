@@ -9,7 +9,7 @@ use log::warn;
 use std::fmt;
 use std::sync::Arc;
 use twitch_oauth2::tokens::BearerTokenType::UserToken;
-use twitch_oauth2::CsrfToken;
+use twitch_oauth2::{CsrfToken, TwitchToken};
 
 #[derive(Deserialize)]
 pub struct QueryParams {
@@ -127,9 +127,16 @@ pub async fn oauth_end_enroll_from_redirect(
       .as_ref()
       .map(|token| token.secret().to_string());
 
+  let twitch_username = user_token.login.to_string();
+  let never_expiring = user_token.never_expiring;
+  let expires_in = user_token.expires_in();
+
   info!("User id: {:?}", user_id);
   info!("Auth token: {:?}", auth_token);
   info!("Refresh token: {:?}", refresh_token);
+  info!("Twitch username: {:?}", twitch_username);
+  info!("Never expiring: {:?}", never_expiring);
+  info!("Expires in (don't store): {:?}", expires_in); // Should be ~4 hours
 
   Ok(HttpResponse::Ok()
       .body("TODO"))
