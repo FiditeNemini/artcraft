@@ -21,7 +21,7 @@
 
     setInterval(() => {
         console.log('sending browser message to server on interval');
-        sock.send('interval trigger');
+        sock.send('interval trigger from browser');
     }, 2000);
 
     //setTimeout(() => {

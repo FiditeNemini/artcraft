@@ -135,29 +135,33 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for ObsGatewayWebSock
 
       //let res = rx.recv().unwrap();
 
-      let handle = Handle::current();
+      //let handle = Handle::current();
 
-      handle.spawn(async move {
-        //error!("Twitch PubSub Try read next...");
-        //match client2.try_next().await {
-        //  Ok(r) => {
-        //    error!("Twitch PubSub Result: {:?}", r);
-        //  },
-        //  Err(e) => {
-        //    warn!("pubsub error: {:?}", e);
-        //  }
-        //}
-        loop {
-          info!("thread loop");
-          sleep(Duration::from_millis(1000));
-        }
-      });
+      //handle.spawn(async move {
+      //  //error!("Twitch PubSub Try read next...");
+      //  //match client2.try_next().await {
+      //  //  Ok(r) => {
+      //  //    error!("Twitch PubSub Result: {:?}", r);
+      //  //  },
+      //  //  Err(e) => {
+      //  //    warn!("pubsub error: {:?}", e);
+      //  //  }
+      //  //}
+      //  loop {
+      //    info!("thread loop");
+      //    sleep(Duration::from_millis(1000));
+      //  }
+      //});
 
       info!("after thread spawn");
 
+      info!("process message: {:?}", &msg);
 
       match msg {
-        ws::Message::Text(text) => ctx.text(text),
+        ws::Message::Text(text) => {
+          info!("sending text response");
+          ctx.text("hello from Rust")
+        },
         ws::Message::Binary(bin) => ctx.binary(bin),
         ws::Message::Ping(bytes) => ctx.pong(&bytes),
         ws::Message::Close(reason) => {
