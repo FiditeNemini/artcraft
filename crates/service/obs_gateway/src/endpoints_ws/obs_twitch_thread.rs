@@ -1,4 +1,5 @@
 use crate::twitch::polling_websocket_client::PollingTwitchWebsocketClient;
+use crate::twitch::websocket_client::TwitchWebsocketClient;
 use log::error;
 use log::info;
 use std::sync::atomic::AtomicBool;
@@ -19,12 +20,12 @@ use tokio::runtime::Handle;
 
 pub struct ObsTwitchThread {
   twitch_user_id: u32,
-  twitch_client: Arc<RwLock<PollingTwitchWebsocketClient>>,
+  twitch_client: Arc<RwLock<TwitchWebsocketClient>>,
   last_requested: Arc<RwLock<Instant>>,
 }
 
 impl ObsTwitchThread {
-  pub fn new(twitch_user_id: u32, twitch_client: PollingTwitchWebsocketClient) -> Self {
+  pub fn new(twitch_user_id: u32, twitch_client: TwitchWebsocketClient) -> Self {
     let now = Instant::now();
     Self {
       twitch_user_id,

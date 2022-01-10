@@ -16,6 +16,8 @@ use tokio::runtime::Handle;
 use twitch_api2::pubsub::Topic;
 use twitch_api2::pubsub;
 use crate::twitch::pubsub::build_pubsub_topics_for_user::build_pubsub_topics_for_user;
+use crate::twitch::oauth::oauth_token_refresher::OauthTokenRefresher;
+use crate::twitch::websocket_client::TwitchWebsocketClient;
 
 /// Endpoint
 pub async fn obs_gateway_websocket_handler(
@@ -28,7 +30,9 @@ pub async fn obs_gateway_websocket_handler(
   let user_id = server_state.twitch_oauth_temp.temp_oauth_user_id.parse::<u32>().unwrap();
   let auth_token = server_state.twitch_oauth_temp.temp_oauth_access_token.clone();
 
-  let mut client = PollingTwitchWebsocketClient::new().unwrap();
+  let mut client = TwitchWebsocketClient::new().unwrap();
+
+  let token_refresher = OauthTokenRefresher::new(user_id, &auth_token, None);
 
   info!("Connecting to Twitch PubSub...");
   client.connect().await.unwrap();
@@ -66,7 +70,7 @@ struct ObsGatewayWebSocket {
 
 
 impl ObsGatewayWebSocket {
-  fn new(twitch_user_id: u32, twitch_client: PollingTwitchWebsocketClient) -> Self {
+  fn new(twitch_user_id: u32, twitch_client: TwitchWebsocketClient) -> Self {
     let twitch_thread = ObsTwitchThread::new(twitch_user_id, twitch_client);
     Self {
       twitch_user_id,
