@@ -15,6 +15,7 @@ use std::time::Duration;
 use tokio::runtime::Handle;
 use twitch_api2::pubsub::Topic;
 use twitch_api2::pubsub;
+use crate::twitch::pubsub::build_pubsub_topics_for_user::build_pubsub_topics_for_user;
 
 /// Endpoint
 pub async fn obs_gateway_websocket_handler(
@@ -63,7 +64,9 @@ pub async fn obs_gateway_websocket_handler(
     channel_id: user_id,
   }.into_topic();
 
-  let topics = [bit_topic, points_topic, cheer_topic, sub_topic];
+  //let topics = [bit_topic, points_topic, cheer_topic, sub_topic];
+
+  let topics = build_pubsub_topics_for_user(user_id);
 
   let auth_token = server_state.twitch_oauth_temp.temp_oauth_access_token.clone();
 
