@@ -1,7 +1,7 @@
 use actix_http::StatusCode;
 use actix_web::{HttpResponse, HttpRequest, web, ResponseError};
 use crate::server_state::ObsGatewayServerState;
-use crate::twitch::oauth_token_builder::get_oauth_token_builder;
+use crate::twitch::oauth::oauth_token_builder::get_oauth_token_builder;
 use http_server_common::response::response_error_helpers::to_simple_json_error;
 use log::error;
 use log::info;

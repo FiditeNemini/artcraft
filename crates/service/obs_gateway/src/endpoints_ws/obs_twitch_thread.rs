@@ -8,15 +8,26 @@ use std::time::Duration;
 use std::time::Instant;
 use tokio::runtime::Handle;
 
+// TODO: Let's make this an Arc<RwLock<Map<Token, Thread>>>
+//  so that multiple browser sessions for the same user can
+//  share the same single backing instance.
+//  .
+//  however, this causes events (TTS) to get flushed to just
+//  a single browser instance.
+//  .
+//  maybe just kill other sessions ? browser+uuid -> LRU.
+
 pub struct ObsTwitchThread {
+  twitch_user_id: u32,
   twitch_client: Arc<RwLock<PollingTwitchWebsocketClient>>,
   last_requested: Arc<RwLock<Instant>>,
 }
 
 impl ObsTwitchThread {
-  pub fn new(twitch_client: PollingTwitchWebsocketClient) -> Self {
+  pub fn new(twitch_user_id: u32, twitch_client: PollingTwitchWebsocketClient) -> Self {
     let now = Instant::now();
     Self {
+      twitch_user_id,
       twitch_client: Arc::new(RwLock::new(twitch_client)),
       last_requested: Arc::new(RwLock::new(now)),
     }

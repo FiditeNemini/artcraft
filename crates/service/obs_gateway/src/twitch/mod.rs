@@ -1,4 +1,4 @@
-pub mod oauth_token_builder;
+pub mod oauth;
 pub mod polling_websocket_client;
 pub mod pubsub;
 pub mod twitch_client_wrapper;

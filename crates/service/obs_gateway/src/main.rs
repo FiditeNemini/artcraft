@@ -29,7 +29,6 @@ use crate::endpoints::oauth_begin::oauth_begin_enroll;
 use crate::endpoints::oauth_begin_redirect::oauth_begin_enroll_redirect;
 use crate::endpoints::oauth_end::oauth_end_enroll_from_redirect;
 use crate::endpoints_ws::obs_gateway_websocket_handler::obs_gateway_websocket_handler;
-use crate::endpoints_ws::pubsub_gateway::ws_index;
 use crate::server_state::{ObsGatewayServerState, EnvConfig, TwitchOauthSecrets, TwitchOauthTemp};
 use crate::twitch::polling_websocket_client::PollingTwitchWebsocketClient;
 use crate::twitch::twitch_client_wrapper::TwitchClientWrapper;
@@ -287,10 +286,6 @@ pub async fn serve(server_state: ObsGatewayServerState) -> AnyhowResult<()>
               )
               .service(web::resource("/oauth_redirect")
                     .route(web::get().to(oauth_end_enroll_from_redirect))
-                    .route(web::head().to(|| HttpResponse::Ok()))
-              )
-              .service(web::resource("/websocket")
-                    .route(web::get().to(ws_index))
                     .route(web::head().to(|| HttpResponse::Ok()))
               )
         )

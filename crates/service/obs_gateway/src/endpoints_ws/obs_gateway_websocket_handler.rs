@@ -25,6 +25,9 @@ pub async fn obs_gateway_websocket_handler(
 ) -> Result<HttpResponse, Error> {
   info!(">>>>>> obs_ws_index");
 
+  let user_id = server_state.twitch_oauth_temp.temp_oauth_user_id.parse::<u32>().unwrap();
+  let auth_token = server_state.twitch_oauth_temp.temp_oauth_access_token.clone();
+
   let mut client = PollingTwitchWebsocketClient::new().unwrap();
 
   info!("Connecting to Twitch PubSub...");
@@ -32,57 +35,24 @@ pub async fn obs_gateway_websocket_handler(
 
   info!("Connected to Twitch PubSub");
 
-  //println!("Starting polling thread...");
-  //client.start_ping_thread().await;
-
   info!("Sending Twitch PubSub PING...");
-
   client.send_ping().await.unwrap();
 
   info!("Try read next from Twitch PubSub...");
   let r = client.try_next().await.unwrap();
   info!("Twitch PubSub Result: {:?}", r);
 
-  // User: vocodes
-  //let user_id = 652567283;
-
-  let user_id = server_state.twitch_oauth_temp.temp_oauth_user_id.parse::<u32>().unwrap();
-
-  let bit_topic = pubsub::channel_bits::ChannelBitsEventsV2 {
-    channel_id: user_id,
-  }.into_topic();
-
-  let points_topic = pubsub::channel_points::ChannelPointsChannelV1 {
-    channel_id: user_id,
-  }.into_topic();
-
-  let cheer_topic = pubsub::channel_cheer::ChannelCheerEventsPublicV1 {
-    channel_id: user_id,
-  }.into_topic();
-
-  let sub_topic = pubsub::channel_subscriptions::ChannelSubscribeEventsV1 {
-    channel_id: user_id,
-  }.into_topic();
-
-  //let topics = [bit_topic, points_topic, cheer_topic, sub_topic];
-
-  let topics = build_pubsub_topics_for_user(user_id);
-
-  let auth_token = server_state.twitch_oauth_temp.temp_oauth_access_token.clone();
-
   info!("Begin TwitchPubSub LISTEN on authenticated OAuth topics...");
-
+  let topics = build_pubsub_topics_for_user(user_id);
   client.listen(&auth_token, &topics).await.unwrap();
-
 
   //let (tx, rx) = crossbeam::channel::bounded(1);
   //let client = Arc::new(&self.twitch_client);
   //let client2 = client.clone();
-
   //let res = rx.recv().unwrap();
 
   info!("Begin Javascript WebSocket...");
-  let websocket = ObsGatewayWebSocket::new(client);
+  let websocket = ObsGatewayWebSocket::new(user_id, client);
 
   ws::start(websocket, &request, stream)
 }
@@ -90,14 +60,16 @@ pub async fn obs_gateway_websocket_handler(
 /// Websocket behavior
 struct ObsGatewayWebSocket {
   //twitch_client: PollingTwitchWebsocketClient,
+  twitch_user_id: u32,
   twitch_thread: ObsTwitchThread,
 }
 
 
 impl ObsGatewayWebSocket {
-  fn new(twitch_client: PollingTwitchWebsocketClient) -> Self {
-    let twitch_thread = ObsTwitchThread::new(twitch_client);
+  fn new(twitch_user_id: u32, twitch_client: PollingTwitchWebsocketClient) -> Self {
+    let twitch_thread = ObsTwitchThread::new(twitch_user_id, twitch_client);
     Self {
+      twitch_user_id,
       twitch_thread
     }
   }

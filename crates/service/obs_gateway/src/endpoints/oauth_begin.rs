@@ -1,6 +1,7 @@
 use actix_http::{StatusCode, header};
 use actix_web::{HttpRequest, web, HttpResponse, ResponseError, HttpResponseBuilder};
 use crate::ObsGatewayServerState;
+use crate::twitch::oauth::oauth_token_builder::get_oauth_token_builder;
 use http_server_common::response::response_error_helpers::to_simple_json_error;
 use http_server_common::response::response_success_helpers::simple_json_success;
 use http_server_common::response::to_json_success_response::to_json_success_response;
@@ -11,7 +12,6 @@ use std::sync::Arc;
 use twitch_api2::twitch_oauth2::ClientId;
 use twitch_oauth2::tokens::UserTokenBuilder;
 use twitch_oauth2::{Scope, ClientSecret};
-use crate::twitch::oauth_token_builder::get_oauth_token_builder;
 
 #[derive(Serialize)]
 pub struct OauthBeginEnrollResult {
