@@ -13,6 +13,7 @@ use tokio::runtime::Handle;
 use crate::endpoints_ws::obs_twitch_thread::ObsTwitchThread;
 use std::thread::sleep;
 use std::time::Duration;
+use actix_rt::Runtime;
 
 /// Endpoint
 pub async fn obs_gateway_websocket_handler(
@@ -103,6 +104,31 @@ impl Actor for ObsGatewayWebSocket {
 
   fn started(&mut self, _ctx: &mut Self::Context) {
     info!(">>>>>> obs actor started");
+
+
+    info!("before spawn thread");
+
+    let handle = Handle::current();
+    //let rt = Runtime::new().unwrap();
+
+    handle.spawn_blocking(|| {
+      //error!("Twitch PubSub Try read next...");
+      //match client2.try_next().await {
+      //  Ok(r) => {
+      //    error!("Twitch PubSub Result: {:?}", r);
+      //  },
+      //  Err(e) => {
+      //    warn!("pubsub error: {:?}", e);
+      //  }
+      //}
+      loop {
+        info!("thread loop");
+        sleep(Duration::from_millis(1000));
+      }
+    });
+
+    info!("after thread spawn");
+
   }
 }
 
@@ -135,27 +161,8 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for ObsGatewayWebSock
 
       //let res = rx.recv().unwrap();
 
-      //let handle = Handle::current();
-
-      //handle.spawn(async move {
-      //  //error!("Twitch PubSub Try read next...");
-      //  //match client2.try_next().await {
-      //  //  Ok(r) => {
-      //  //    error!("Twitch PubSub Result: {:?}", r);
-      //  //  },
-      //  //  Err(e) => {
-      //  //    warn!("pubsub error: {:?}", e);
-      //  //  }
-      //  //}
-      //  loop {
-      //    info!("thread loop");
-      //    sleep(Duration::from_millis(1000));
-      //  }
-      //});
-
-      info!("after thread spawn");
-
       info!("process message: {:?}", &msg);
+
 
       match msg {
         ws::Message::Text(text) => {
