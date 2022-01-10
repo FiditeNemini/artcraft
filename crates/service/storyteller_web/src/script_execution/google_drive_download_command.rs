@@ -1,6 +1,6 @@
 use anyhow::anyhow;
 use container_common::anyhow_result::AnyhowResult;
-use crate::util::random_crockford_token::random_crockford_token;
+use container_common::token::random_crockford_token::random_crockford_token;
 use log::{info, warn};
 use std::io::{BufReader, Read};
 use std::path::{PathBuf, Path};

@@ -18,7 +18,7 @@ pub fn random_crockford_token(length: usize) -> String {
 
 #[cfg(test)]
 mod tests {
-  use crate::util::random_crockford_token::random_crockford_token;
+  use crate::token::random_crockford_token::random_crockford_token;
 
   #[test]
   fn random_token_length() {

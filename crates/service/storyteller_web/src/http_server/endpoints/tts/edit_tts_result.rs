@@ -15,8 +15,6 @@ use crate::http_server::web_utils::response_success_helpers::simple_json_success
 use crate::server_state::ServerState;
 use crate::util::email_to_gravatar::email_to_gravatar;
 use crate::util::markdown_to_html::markdown_to_html;
-use crate::util::random_crockford_token::random_crockford_token;
-use crate::util::random_prefix_crockford_token::random_prefix_crockford_token;
 use crate::validations::check_for_slurs::contains_slurs;
 use derive_more::{Display, Error};
 use log::{info, warn, log};

@@ -1,5 +1,5 @@
 use anyhow::anyhow;
-use container_common::anyhow_result::AnyhowResult;
+use crate::anyhow_result::AnyhowResult;
 use rand::Rng;
 
 // Crockford characters
@@ -44,7 +44,7 @@ pub fn random_prefix_crockford_token(prefix: &str, length: usize, uppercase: boo
 
 #[cfg(test)]
 mod tests {
-  use crate::util::random_prefix_crockford_token::random_prefix_crockford_token;
+  use crate::token::random_prefix_crockford_token::random_prefix_crockford_token;
 
   #[test]
   fn no_prefix_error() {

@@ -1,8 +1,6 @@
 use anyhow::anyhow;
 use crate::AnyhowResult;
 use crate::database::helpers::tokens::Tokens;
-use crate::util::random_crockford_token::random_crockford_token;
-use crate::util::random_prefix_crockford_token::random_prefix_crockford_token;
 use log::{info, warn};
 use sqlx::MySqlPool;
 

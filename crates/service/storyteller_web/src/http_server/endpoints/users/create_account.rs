@@ -13,8 +13,6 @@ use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 use crate::http_server::web_utils::serialize_as_json_error::serialize_as_json_error;
 use crate::server_state::ServerState;
 use crate::util::email_to_gravatar::email_to_gravatar;
-use crate::util::random_crockford_token::random_crockford_token;
-use crate::util::random_prefix_crockford_token::random_prefix_crockford_token;
 use crate::validations::check_for_slurs::contains_slurs;
 use crate::validations::passwords::validate_passwords;
 use crate::validations::username::validate_username;

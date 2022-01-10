@@ -22,6 +22,7 @@ use chrono::{Utc, DateTime, TimeZone};
 use config::shared_constants::DEFAULT_MYSQL_CONNECTION_STRING;
 use config::shared_constants::DEFAULT_RUST_LOG;
 use container_common::anyhow_result::AnyhowResult;
+use container_common::token::random_uuid::generate_random_uuid;
 use crate::common_env::CommonEnv;
 use crate::database::enums::vocoder_type::VocoderType;
 use crate::database::mediators::firehose_publisher::FirehosePublisher;
@@ -51,7 +52,6 @@ use crate::util::jobs::cache_miss_strategizer::CacheMissStrategy;
 use crate::util::jobs::cache_miss_strategizer_multi::SyncMultiCacheMissStrategizer;
 use crate::util::jobs::virtual_lfu_cache::SyncVirtualLfuCache;
 use crate::util::noop_logger::NoOpLogger;
-use crate::util::random_crockford_token::random_crockford_token;
 use crate::util::redis::redis_job_status_logger::RedisJobStatusLogger;
 use crate::util::semi_persistent_cache_dir::SemiPersistentCacheDir;
 use data_encoding::{HEXUPPER, HEXLOWER, HEXLOWER_PERMISSIVE};
@@ -75,7 +75,6 @@ use std::process::Command;
 use std::thread;
 use std::time::{Duration, SystemTime, UNIX_EPOCH, Instant};
 use tempdir::TempDir;
-use crate::util::random_uuid::generate_random_uuid;
 
 // Buckets (shared config)
 const ENV_ACCESS_KEY : &'static str = "ACCESS_KEY";

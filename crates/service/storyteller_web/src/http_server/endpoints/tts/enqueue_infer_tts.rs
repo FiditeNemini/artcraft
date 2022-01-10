@@ -11,7 +11,6 @@ use crate::database::helpers::tokens::Tokens;
 use crate::http_server::web_utils::ip_address::get_request_ip;
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 use crate::server_state::ServerState;
-use crate::util::random_prefix_crockford_token::random_prefix_crockford_token;
 use crate::util::redis::redis_keys::RedisKeys;
 use crate::validations::check_for_slurs::contains_slurs;
 use crate::validations::model_uploads::validate_model_title;
