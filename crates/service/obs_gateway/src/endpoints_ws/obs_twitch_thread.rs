@@ -8,6 +8,7 @@ use std::thread::sleep;
 use std::time::Duration;
 use std::time::Instant;
 use tokio::runtime::Handle;
+use crate::twitch::oauth::oauth_token_refresher::OauthTokenRefresher;
 
 // TODO: Let's make this an Arc<RwLock<Map<Token, Thread>>>
 //  so that multiple browser sessions for the same user can
@@ -20,19 +21,43 @@ use tokio::runtime::Handle;
 
 pub struct ObsTwitchThread {
   twitch_user_id: u32,
+  token_refresher: OauthTokenRefresher,
   twitch_client: Arc<RwLock<TwitchWebsocketClient>>,
   last_requested: Arc<RwLock<Instant>>,
 }
 
 impl ObsTwitchThread {
-  pub fn new(twitch_user_id: u32, twitch_client: TwitchWebsocketClient) -> Self {
+  pub fn new(
+    twitch_user_id: u32,
+    token_refresher: OauthTokenRefresher,
+    twitch_client: TwitchWebsocketClient
+  ) -> Self {
     let now = Instant::now();
     Self {
       twitch_user_id,
+      token_refresher,
       twitch_client: Arc::new(RwLock::new(twitch_client)),
       last_requested: Arc::new(RwLock::new(now)),
     }
   }
+
+  pub async fn run_until_exit(&self) {
+    loop {
+      info!("TwitchThread::run_until_exit()");
+      sleep(Duration::from_millis(1000));
+    }
+  }
+
+  pub async fn send_ping(&self) {
+    //self.twitch_client.connect().await.unwrap();
+  }
+
+
+
+
+
+
+
 
   pub fn keep_alive_thread(&self) {
     // TODO(bt, 2022-01-03): builds are failing, not sure when I worked on this last

@@ -56,7 +56,7 @@ pub async fn obs_gateway_websocket_handler(
   //let res = rx.recv().unwrap();
 
   info!("Begin Javascript WebSocket...");
-  let websocket = ObsGatewayWebSocket::new(user_id, client);
+  let websocket = ObsGatewayWebSocket::new(user_id, client, token_refresher);
 
   ws::start(websocket, &request, stream)
 }
@@ -65,13 +65,17 @@ pub async fn obs_gateway_websocket_handler(
 struct ObsGatewayWebSocket {
   //twitch_client: PollingTwitchWebsocketClient,
   twitch_user_id: u32,
-  twitch_thread: ObsTwitchThread,
+  twitch_thread: Arc<ObsTwitchThread>,
 }
 
 
 impl ObsGatewayWebSocket {
-  fn new(twitch_user_id: u32, twitch_client: TwitchWebsocketClient) -> Self {
-    let twitch_thread = ObsTwitchThread::new(twitch_user_id, twitch_client);
+  fn new(
+    twitch_user_id: u32,
+    twitch_client: TwitchWebsocketClient,
+    oauth_token_refresher: OauthTokenRefresher,
+  ) -> Self {
+    let twitch_thread = Arc::new(ObsTwitchThread::new(twitch_user_id, oauth_token_refresher, twitch_client));
     Self {
       twitch_user_id,
       twitch_thread
@@ -84,15 +88,14 @@ impl Actor for ObsGatewayWebSocket {
 
   fn started(&mut self, _ctx: &mut Self::Context) {
     let handle = Handle::current();
+    let twitch_thread = self.twitch_thread.clone();
 
     handle.spawn_blocking(move || {
-      loop {
-        info!("thread loop");
-        sleep(Duration::from_millis(1000));
+      let twitch_thread2 = twitch_thread.clone();
+      async move {
+        twitch_thread2.run_until_exit().await;
       }
     });
-
-    info!("after thread spawn");
   }
 }
 
