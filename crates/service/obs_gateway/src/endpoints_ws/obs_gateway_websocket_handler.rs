@@ -3,6 +3,7 @@ use actix_rt::Runtime;
 use actix_web::{middleware, web, App, Error, HttpRequest, HttpResponse, HttpServer};
 use actix_web_actors::ws;
 use container_common::token::random_crockford_token::random_crockford_token;
+//use futures::future::{BoxFuture, FutureExt};
 use crate::endpoints_ws::obs_twitch_thread::ObsTwitchThread;
 use crate::server_state::ObsGatewayServerState;
 use crate::twitch::polling_websocket_client::PollingTwitchWebsocketClient;
@@ -90,7 +91,7 @@ impl Actor for ObsGatewayWebSocket {
     let handle = Handle::current();
     let twitch_thread = self.twitch_thread.clone();
 
-    handle.spawn_blocking(move || {
+    handle.spawn_blocking(async move  {
       let twitch_thread2 = twitch_thread.clone();
       async move {
         twitch_thread2.run_until_exit().await;
