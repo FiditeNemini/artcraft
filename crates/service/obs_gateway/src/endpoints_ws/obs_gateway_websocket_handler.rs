@@ -1,20 +1,20 @@
 use actix::prelude::*;
+use actix_rt::Runtime;
 use actix_web::{middleware, web, App, Error, HttpRequest, HttpResponse, HttpServer};
 use actix_web_actors::ws;
-use crate::server_state::ObsGatewayServerState;
-use log::error;
-use log::warn;
-use log::info;
-use std::sync::Arc;
-use crate::twitch::websocket_client::PollingTwitchWebsocketClient;
-use twitch_api2::pubsub;
-use twitch_api2::pubsub::Topic;
-use tokio::runtime::Handle;
+use container_common::token::random_crockford_token::random_crockford_token;
 use crate::endpoints_ws::obs_twitch_thread::ObsTwitchThread;
+use crate::server_state::ObsGatewayServerState;
+use crate::twitch::polling_websocket_client::PollingTwitchWebsocketClient;
+use log::error;
+use log::info;
+use log::warn;
+use std::sync::Arc;
 use std::thread::sleep;
 use std::time::Duration;
-use actix_rt::Runtime;
-use container_common::token::random_crockford_token::random_crockford_token;
+use tokio::runtime::Handle;
+use twitch_api2::pubsub::Topic;
+use twitch_api2::pubsub;
 
 /// Endpoint
 pub async fn obs_gateway_websocket_handler(
@@ -104,35 +104,16 @@ impl Actor for ObsGatewayWebSocket {
   type Context = ws::WebsocketContext<Self>;
 
   fn started(&mut self, _ctx: &mut Self::Context) {
-    info!(">>>>>> obs actor started");
-
-
-    let token = random_crockford_token(6);
-
-
-    info!("before spawn thread");
-
     let handle = Handle::current();
-    //let rt = Runtime::new().unwrap();
 
     handle.spawn_blocking(move || {
-      //error!("Twitch PubSub Try read next...");
-      //match client2.try_next().await {
-      //  Ok(r) => {
-      //    error!("Twitch PubSub Result: {:?}", r);
-      //  },
-      //  Err(e) => {
-      //    warn!("pubsub error: {:?}", e);
-      //  }
-      //}
       loop {
-        info!("[{}] thread loop", token);
+        info!("thread loop");
         sleep(Duration::from_millis(1000));
       }
     });
 
     info!("after thread spawn");
-
   }
 }
 

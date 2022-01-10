@@ -1,4 +1,4 @@
-use crate::twitch::websocket_client::PollingTwitchWebsocketClient;
+use crate::twitch::polling_websocket_client::PollingTwitchWebsocketClient;
 use log::error;
 use log::info;
 use std::sync::atomic::AtomicBool;
