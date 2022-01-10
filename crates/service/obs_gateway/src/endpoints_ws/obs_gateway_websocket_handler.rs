@@ -106,6 +106,8 @@ impl Actor for ObsGatewayWebSocket {
     info!(">>>>>> obs actor started");
 
 
+
+
     info!("before spawn thread");
 
     let handle = Handle::current();
