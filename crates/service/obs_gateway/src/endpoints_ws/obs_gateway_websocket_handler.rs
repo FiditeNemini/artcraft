@@ -14,6 +14,7 @@ use crate::endpoints_ws::obs_twitch_thread::ObsTwitchThread;
 use std::thread::sleep;
 use std::time::Duration;
 use actix_rt::Runtime;
+use container_common::token::random_crockford_token::random_crockford_token;
 
 /// Endpoint
 pub async fn obs_gateway_websocket_handler(
@@ -106,6 +107,7 @@ impl Actor for ObsGatewayWebSocket {
     info!(">>>>>> obs actor started");
 
 
+    let token = random_crockford_token(6);
 
 
     info!("before spawn thread");
@@ -113,7 +115,7 @@ impl Actor for ObsGatewayWebSocket {
     let handle = Handle::current();
     //let rt = Runtime::new().unwrap();
 
-    handle.spawn_blocking(|| {
+    handle.spawn_blocking(move || {
       //error!("Twitch PubSub Try read next...");
       //match client2.try_next().await {
       //  Ok(r) => {
@@ -124,7 +126,7 @@ impl Actor for ObsGatewayWebSocket {
       //  }
       //}
       loop {
-        info!("thread loop");
+        info!("[{}] thread loop", token);
         sleep(Duration::from_millis(1000));
       }
     });
