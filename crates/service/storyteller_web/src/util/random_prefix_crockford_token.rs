@@ -1,6 +1,6 @@
-use rand::Rng;
 use anyhow::anyhow;
-use crate::util::anyhow_result::AnyhowResult;
+use container_common::anyhow_result::AnyhowResult;
+use rand::Rng;
 
 // Crockford characters
 const CROCKFORD_UPPERCASE_CHARSET: &[u8] = b"0123456789ABCDEFGHJKMNPQRSTVWXYZ";

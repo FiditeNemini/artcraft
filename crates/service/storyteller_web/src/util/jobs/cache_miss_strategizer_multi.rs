@@ -1,6 +1,6 @@
 use anyhow::anyhow;
 use chrono::{DateTime, Utc, Duration};
-use crate::util::anyhow_result::AnyhowResult;
+use container_common::anyhow_result::AnyhowResult;
 use crate::util::jobs::cache_miss_strategizer::{CacheMissStrategizer, CacheMissStrategy};
 use std::sync::{RwLock, Arc};
 

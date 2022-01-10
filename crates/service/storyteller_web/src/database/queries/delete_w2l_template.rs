@@ -1,4 +1,4 @@
-use crate::util::anyhow_result::AnyhowResult;
+use container_common::anyhow_result::AnyhowResult;
 use sqlx::MySqlPool;
 
 pub async fn delete_w2l_template_as_user(

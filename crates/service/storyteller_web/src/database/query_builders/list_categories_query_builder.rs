@@ -1,8 +1,8 @@
 use anyhow::anyhow;
 use chrono::{DateTime, Utc};
+use container_common::anyhow_result::AnyhowResult;
 use crate::database::enums::record_visibility::RecordVisibility;
 use crate::database::helpers::boolean_converters::{i8_to_bool, nullable_i8_to_optional_bool};
-use crate::util::anyhow_result::AnyhowResult;
 use log::{warn, info};
 use sqlx::MySqlPool;
 

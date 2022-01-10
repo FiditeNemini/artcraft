@@ -2,7 +2,7 @@ use actix_http::http::HeaderMap;
 use actix_http::http::HeaderName;
 use actix_web::HttpRequest;
 use actix_web::http::HeaderValue;
-use crate::util::anyhow_result::AnyhowResult;
+use container_common::anyhow_result::AnyhowResult;
 
 // NB: This is extracted because CLion is having incredible difficulty with these types.
 pub fn get_host_header(http_request: &HttpRequest) -> AnyhowResult<Option<String>> {

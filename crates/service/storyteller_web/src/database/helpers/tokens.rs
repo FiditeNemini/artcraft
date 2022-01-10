@@ -1,4 +1,4 @@
-use crate::util::anyhow_result::AnyhowResult;
+use container_common::anyhow_result::AnyhowResult;
 use crate::util::random_prefix_crockford_token::random_prefix_crockford_token;
 
 /// Central place to define all the token types.

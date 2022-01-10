@@ -1,7 +1,7 @@
 //! These denote the TTS synthesizer model types
 
 use anyhow::anyhow;
-use crate::util::anyhow_result::AnyhowResult;
+use container_common::anyhow_result::AnyhowResult;
 
 #[derive(Clone, Copy, PartialEq, Eq, Debug, Serialize, Deserialize, sqlx::Type)]
 #[serde(rename_all = "lowercase")]

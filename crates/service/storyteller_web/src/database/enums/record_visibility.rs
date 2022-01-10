@@ -1,7 +1,7 @@
 //! These are columns where users can control the visibility of their data.
 
 use anyhow::anyhow;
-use crate::util::anyhow_result::AnyhowResult;
+use container_common::anyhow_result::AnyhowResult;
 
 /// To use this in a query, the query must have type annotations.
 /// See: https://www.gitmemory.com/issue/launchbadge/sqlx/1241/847154375

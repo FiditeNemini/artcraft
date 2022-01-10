@@ -1,4 +1,4 @@
-use crate::util::anyhow_result::AnyhowResult;
+use container_common::anyhow_result::AnyhowResult;
 use crate::util::redis::redis_keys::RedisKeys;
 use r2d2_redis::RedisConnectionManager;
 use r2d2_redis::r2d2::PooledConnection;

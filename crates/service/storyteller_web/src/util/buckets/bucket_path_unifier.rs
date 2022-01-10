@@ -1,4 +1,4 @@
-use crate::util::anyhow_result::AnyhowResult;
+use container_common::anyhow_result::AnyhowResult;
 use crate::util::buckets::bucket_paths::hash_to_bucket_path;
 use std::path::PathBuf;
 

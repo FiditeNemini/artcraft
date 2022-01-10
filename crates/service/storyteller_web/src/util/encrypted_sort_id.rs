@@ -1,12 +1,11 @@
-
-use base64;
-use magic_crypt::{MagicCryptTrait, MagicCrypt256};
-use magic_crypt::generic_array::typenum::U256;
-use std::io::Cursor;
-use magic_crypt::new_magic_crypt;
-use crate::util::anyhow_result::AnyhowResult;
-use rand::RngCore;
 use base64::{Config, CharacterSet};
+use base64;
+use container_common::anyhow_result::AnyhowResult;
+use magic_crypt::generic_array::typenum::U256;
+use magic_crypt::new_magic_crypt;
+use magic_crypt::{MagicCryptTrait, MagicCrypt256};
+use rand::RngCore;
+use std::io::Cursor;
 
 // TODO: A protobuf would be more compact!
 /// This gets encrypted and sent to the frontend as an opaque handle.

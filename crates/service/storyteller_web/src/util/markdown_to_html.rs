@@ -1,5 +1,5 @@
+use container_common::anyhow_result::AnyhowResult;
 use pulldown_cmark::{Options, Parser, html};
-use crate::util::anyhow_result::AnyhowResult;
 
 pub fn markdown_to_html(markdown_input: &str) -> String {
   // NB: CommonMark allows for HTML, including <script>! WTF!

@@ -1,5 +1,5 @@
 use anyhow::anyhow;
-use crate::util::anyhow_result::AnyhowResult;
+use container_common::anyhow_result::AnyhowResult;
 use log::warn;
 use sqlx::MySqlPool;
 

@@ -1,5 +1,5 @@
 use config::shared_constants::DEFAULT_REDIS_CONNECTION_STRING;
-use crate::util::anyhow_result::AnyhowResult;
+use container_common::anyhow_result::AnyhowResult;
 
 // TODO: Move more shared configs here.
 

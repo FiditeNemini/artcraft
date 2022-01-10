@@ -1,6 +1,6 @@
 use chrono::{DateTime, Utc};
+use container_common::anyhow_result::AnyhowResult;
 use crate::database::helpers::boolean_converters::i8_to_bool;
-use crate::util::anyhow_result::AnyhowResult;
 use sqlx::MySqlPool;
 
 /// NB: This is not to be shared externally.

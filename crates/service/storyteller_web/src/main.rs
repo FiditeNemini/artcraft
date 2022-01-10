@@ -35,6 +35,7 @@ use actix_web::{HttpServer, web, HttpResponse, App};
 use config::shared_constants::DEFAULT_MYSQL_CONNECTION_STRING;
 use config::shared_constants::DEFAULT_REDIS_CONNECTION_STRING;
 use config::shared_constants::DEFAULT_RUST_LOG;
+use container_common::anyhow_result::AnyhowResult;
 use crate::database::mediators::badge_granter::BadgeGranter;
 use crate::database::mediators::firehose_publisher::FirehosePublisher;
 use crate::http_server::endpoints::events::list_events::list_events_handler;
@@ -145,8 +146,6 @@ const ENV_PUBLIC_BUCKET_NAME : &'static str = "W2L_PUBLIC_DOWNLOAD_BUCKET_NAME";
 
 // Various bucket roots
 const ENV_AUDIO_UPLOADS_BUCKET_ROOT : &'static str = "AUDIO_UPLOADS_BUCKET_ROOT";
-
-pub type AnyhowResult<T> = anyhow::Result<T>;
 
 #[actix_web::main]
 async fn main() -> AnyhowResult<()> {

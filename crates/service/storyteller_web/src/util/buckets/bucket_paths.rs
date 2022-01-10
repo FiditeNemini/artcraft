@@ -1,6 +1,6 @@
 use anyhow::anyhow;
 use anyhow::bail;
-use crate::util::anyhow_result::AnyhowResult;
+use container_common::anyhow_result::AnyhowResult;
 use std::path::PathBuf;
 
 pub fn hash_to_bucket_path(file_hash: &str,
