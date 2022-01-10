@@ -1,0 +1,7 @@
+
+# Hide sourcemaps in production
+[build.environment]
+GENERATE_SOURCEMAP = "true"
+[build.production.environment]
+GENERATE_SOURCEMAP = "false"
+
