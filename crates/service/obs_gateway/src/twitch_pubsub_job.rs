@@ -36,21 +36,22 @@ pub async fn main() -> AnyhowResult<()> {
   info!("Thread pool created");
 
   //thread_pool.spawn(watch_user_thread())?;
-  runtime.spawn(watch_user_thread());
+  runtime.spawn(watch_user_thread(10));
+  runtime.spawn(watch_user_thread(9999));
 
   loop {
     sleep(Duration::from_millis(1000));
   }
 }
 
-pub async fn watch_user_thread() {
+pub async fn watch_user_thread(user_id: u32) {
   let mut client = TwitchWebsocketClient::new().unwrap();
 
-  info!("Connecting to Twitch PubSub...");
+  info!("Connecting to Twitch PubSub... {}", user_id);
   client.connect().await.unwrap();
 
   loop {
-    info!("Sending ping...");
+    info!("Sending ping... {}", user_id);
     client.send_ping().await.unwrap();
     sleep(Duration::from_millis(10_000));
   }
