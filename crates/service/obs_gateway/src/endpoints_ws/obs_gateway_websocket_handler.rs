@@ -51,7 +51,7 @@ pub async fn obs_gateway_websocket_handler(
 //
 //  info!("Begin TwitchPubSub LISTEN on authenticated OAuth topics...");
 //  let topics = build_pubsub_topics_for_user(user_id);
-//  client.listen(&auth_token, &topics).await.unwrap();
+  client.listen(&auth_token, &topics).await.unwrap();
 
   //let (tx, rx) = crossbeam::channel::bounded(1);
   //let client = Arc::new(&self.twitch_client);
@@ -94,12 +94,13 @@ impl Actor for ObsGatewayWebSocket {
     let twitch_thread = self.twitch_thread.clone();
 
 
-    let now_future = Delay::new(Duration::from_secs(5));
+    let future = self.twitch_thread.run_until_exit();
+    //let now_future = Delay::new(Duration::from_secs(5));
     warn!("Starting thread...");
     //actix_rt::spawn
     //actix_rt::spawn(twitch_thread.run_until_exit());
 
-    actix_rt::spawn(now_future.map(|x| {
+    actix_rt::spawn(future.map(|x| {
       println!("waited for 5 secs");
     }));
 
