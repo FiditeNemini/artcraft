@@ -78,6 +78,7 @@ impl ObsTwitchThread {
   pub async fn maybe_send_ping(&self) {
     let inner_clone = self.inner_data.clone();
     {
+      info!("maybe_send_ping() lock.");
       let mut inner_data = inner_clone.lock().await;
       let now = SystemTime::now();
       let duration = now.duration_since(inner_data.last_ping).unwrap();
@@ -89,6 +90,7 @@ impl ObsTwitchThread {
 
       info!("Sending ping...");
       inner_data.twitch_client.send_ping().await.unwrap();
+      info!("Sent ping.");
 
       inner_data.last_ping = now;
     }

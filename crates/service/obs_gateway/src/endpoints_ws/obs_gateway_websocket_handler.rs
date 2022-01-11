@@ -1,6 +1,7 @@
 use actix::prelude::*;
 use actix_rt::Runtime;
 use actix_web::{middleware, web, App, Error, HttpRequest, HttpResponse, HttpServer};
+use futures_util::FutureExt;
 use actix_web_actors::ws;
 use container_common::token::random_crockford_token::random_crockford_token;
 //use futures::future::{BoxFuture, FutureExt};
@@ -8,6 +9,7 @@ use crate::endpoints_ws::obs_twitch_thread::ObsTwitchThread;
 use crate::server_state::ObsGatewayServerState;
 use crate::twitch::polling_websocket_client::PollingTwitchWebsocketClient;
 use log::error;
+use futures_timer::Delay;
 use log::info;
 use log::warn;
 use std::sync::Arc;
@@ -38,18 +40,18 @@ pub async fn obs_gateway_websocket_handler(
   info!("Connecting to Twitch PubSub...");
   client.connect().await.unwrap();
 
-  info!("Connected to Twitch PubSub");
-
-  info!("Sending Twitch PubSub PING...");
-  client.send_ping().await.unwrap();
-
-  info!("Try read next from Twitch PubSub...");
-  let r = client.try_next().await.unwrap();
-  info!("Twitch PubSub Result: {:?}", r);
-
-  info!("Begin TwitchPubSub LISTEN on authenticated OAuth topics...");
-  let topics = build_pubsub_topics_for_user(user_id);
-  client.listen(&auth_token, &topics).await.unwrap();
+//  info!("Connected to Twitch PubSub");
+//
+//  info!("Sending Twitch PubSub PING...");
+//  client.send_ping().await.unwrap();
+//
+//  info!("Try read next from Twitch PubSub...");
+//  let r = client.try_next().await.unwrap();
+//  info!("Twitch PubSub Result: {:?}", r);
+//
+//  info!("Begin TwitchPubSub LISTEN on authenticated OAuth topics...");
+//  let topics = build_pubsub_topics_for_user(user_id);
+//  client.listen(&auth_token, &topics).await.unwrap();
 
   //let (tx, rx) = crossbeam::channel::bounded(1);
   //let client = Arc::new(&self.twitch_client);
@@ -91,12 +93,26 @@ impl Actor for ObsGatewayWebSocket {
     let handle = Handle::current();
     let twitch_thread = self.twitch_thread.clone();
 
-    handle.spawn_blocking(move  || {
-      let twitch_thread2 = twitch_thread.clone();
-      async move {
-        twitch_thread2.run_until_exit().await;
-      }
-    });
+
+    let now_future = Delay::new(Duration::from_secs(5));
+    warn!("Starting thread...");
+    //actix_rt::spawn
+    //actix_rt::spawn(twitch_thread.run_until_exit());
+
+    actix_rt::spawn(now_future.map(|x| {
+      println!("waited for 5 secs");
+    }));
+
+    //handle.spawn_blocking(result);
+//    handle.spawn_blocking(async {
+//      warn!("inside thread 1");
+//      let twitch_thread2 = twitch_thread.clone();
+//      //async move {
+//      //  warn!("inside thread 2");
+//      //  twitch_thread2.run_until_exit().await;
+//      //}.await;
+//    });
+    warn!("Thread started");
   }
 }
 
@@ -107,7 +123,7 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for ObsGatewayWebSock
     ctx: &mut Self::Context,
   ) {
     if let Ok(msg) = msg {
-      info!(">>>>>> obs streamhandler::handle (msg = {:?})", msg);
+      //info!(">>>>>> obs streamhandler::handle (msg = {:?})", msg);
 
       //let (tx, rx) = crossbeam::channel::bounded(1);
       //let handle = Handle::current();
@@ -129,12 +145,12 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for ObsGatewayWebSock
 
       //let res = rx.recv().unwrap();
 
-      info!("process message: {:?}", &msg);
+      //info!("process message: {:?}", &msg);
 
 
       match msg {
         ws::Message::Text(text) => {
-          info!("sending text response");
+          //info!("sending text response");
           ctx.text("hello from Rust")
         },
         ws::Message::Binary(bin) => ctx.binary(bin),

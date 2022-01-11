@@ -20,6 +20,7 @@ container_common = { path = "../../lib/container_common" }
 http_server_common = { path = "../../lib/http_server_common" }
 
 # External
+futures-timer = "3.0.2"
 anyhow = "1.0.40"
 base64 = "0.13.0"
 chrono = { version = "0.4.19", features = ["serde"] }

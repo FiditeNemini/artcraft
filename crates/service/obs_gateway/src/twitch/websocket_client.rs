@@ -95,6 +95,7 @@ impl TwitchWebsocketClient {
     //  Ok(Response::Pong) => Ok(()),
     //  _ => Err(bail!("wrong response type")),
     //}
+    debug!("send ping ok");
     Ok(())
   }
 
