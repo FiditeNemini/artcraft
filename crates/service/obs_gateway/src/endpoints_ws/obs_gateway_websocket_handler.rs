@@ -91,7 +91,7 @@ impl Actor for ObsGatewayWebSocket {
     let handle = Handle::current();
     let twitch_thread = self.twitch_thread.clone();
 
-    handle.spawn_blocking(async move  {
+    handle.spawn_blocking(move  || {
       let twitch_thread2 = twitch_thread.clone();
       async move {
         twitch_thread2.run_until_exit().await;

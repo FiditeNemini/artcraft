@@ -5,6 +5,7 @@ use log::info;
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::{Arc, RwLock, PoisonError, RwLockWriteGuard};
 use std::thread::sleep;
+use futures::lock::Mutex;
 use std::time::{Duration, SystemTime, UNIX_EPOCH};
 use std::time::Instant;
 use tokio::runtime::Handle;
@@ -20,7 +21,9 @@ use crate::twitch::oauth::oauth_token_refresher::OauthTokenRefresher;
 //  maybe just kill other sessions ? browser+uuid -> LRU.
 
 pub struct ObsTwitchThread {
-  inner_data: Arc<RwLock<InnerData>>,
+  // NB: This is a `futures` Mutex, which is much more compatible with async code
+  // than the blocking std::sync mutexes.
+  inner_data: Arc<Mutex<InnerData>>,
 }
 
 struct InnerData {
@@ -39,7 +42,7 @@ impl ObsTwitchThread {
   ) -> Self {
     let now = Instant::now();
     Self {
-      inner_data: Arc::new(RwLock::new(InnerData {
+      inner_data: Arc::new(Mutex::new(InnerData {
         twitch_user_id,
         token_refresher,
         is_connected: false,
@@ -59,6 +62,7 @@ impl ObsTwitchThread {
       //  self.connect().await;
       //}
 
+      info!("run_until_exit()...");
       self.maybe_send_ping().await;
 
       sleep(Duration::from_millis(1000));
@@ -74,23 +78,19 @@ impl ObsTwitchThread {
   pub async fn maybe_send_ping(&self) {
     let inner_clone = self.inner_data.clone();
     {
-      match inner_clone.write() {
-        Err(_) => {}
-        Ok(mut inner_data) => {
-          let now = SystemTime::now();
-          let duration = now.duration_since(inner_data.last_ping).unwrap();
+      let mut inner_data = inner_clone.lock().await;
+      let now = SystemTime::now();
+      let duration = now.duration_since(inner_data.last_ping).unwrap();
 
-          let delta = Duration::from_secs(60);
-          if duration.lt(&delta) {
-            return;
-          }
+      let delta = Duration::from_secs(60);
+      if duration.lt(&delta) {
+        return;
+      }
 
-          info!("Sending ping...");
-          inner_data.twitch_client.send_ping().await.unwrap();
+      info!("Sending ping...");
+      inner_data.twitch_client.send_ping().await.unwrap();
 
-          inner_data.last_ping = now;
-        }
-      };
+      inner_data.last_ping = now;
     }
   }
 
