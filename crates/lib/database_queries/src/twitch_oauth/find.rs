@@ -1,0 +1,256 @@
+use anyhow::anyhow;
+use chrono::{DateTime, Utc};
+use container_common::anyhow_result::AnyhowResult;
+use crate::helpers::boolean_converters::i8_to_bool;
+use log::warn;
+use sqlx::MySqlPool;
+
+#[derive(Serialize)]
+pub struct TwitchOauthTokenRecord {
+  /// NB: Vocodes/FakeYou/Storyteller user
+  pub maybe_user_token: Option<String>,
+  pub maybe_display_name: Option<String>,
+  pub maybe_gravatar_hash: Option<String>,
+
+  /// Twitch user
+  //pub twitch_user_id: u32,
+  pub maybe_twitch_username: Option<String>,
+
+  /// Token details
+  pub access_token: String,
+  pub maybe_refresh_token: Option<String>,
+  pub token_type: Option<String>,
+  //pub expires_in_seconds: Option<u32>,
+  pub has_bits_read: bool,
+  pub has_channel_read_subscriptions: bool,
+  pub has_channel_read_redemptions: bool,
+  pub has_user_read_follows: bool,
+  pub ip_address_creation: Option<String>,
+
+  /// Potentially when the token is expected to expire.
+  /// Do not eagerly refresh. Lazily renew.
+  pub expires_at: Option<DateTime<Utc>>,
+  pub user_deleted_at: DateTime<Utc>,
+  pub mod_deleted_at: DateTime<Utc>,
+}
+
+pub struct TwitchOauthTokenFinder {
+  /// Storyteller/FakeYou username
+  scope_user_token: Option<String>,
+
+  scope_twitch_user_id: Option<u32>,
+  scope_twitch_username: Option<String>,
+}
+
+impl TwitchOauthTokenFinder {
+  pub fn new() -> Self {
+    Self {
+      scope_user_token: None,
+      scope_twitch_user_id: None,
+      scope_twitch_username: None
+    }
+  }
+
+  pub fn scope_user_token(mut self, user_token: Option<&str>) -> Self {
+    self.scope_user_token = user_token.map(|t| t.to_string());
+    self
+  }
+
+  pub fn scope_twitch_user_id(mut self, user_id: Option<u32>) -> Self {
+    self.scope_twitch_user_id = user_id;
+    self
+  }
+
+  pub fn scope_twitch_username(mut self, twitch_username: Option<&str>) -> Self {
+    self.scope_twitch_username = twitch_username.map(|t| t.to_string());
+    self
+  }
+
+  pub async fn perform_query(
+    &self,
+    mysql_pool: &MySqlPool
+  ) -> AnyhowResult<Option<TwitchOauthTokenRecord>> {
+    Ok(self.perform_query_internal(mysql_pool).await?
+        .map(|record| {
+          TwitchOauthTokenRecord {
+            maybe_user_token: record.maybe_user_token.clone(),
+            maybe_display_name: record.maybe_display_name.clone(),
+            maybe_gravatar_hash: record.maybe_gravatar_hash.clone(),
+            //twitch_user_id: record.twitch_user_id,
+            maybe_twitch_username: record.maybe_twitch_username.clone(),
+            access_token: record.access_token.clone(),
+            maybe_refresh_token: record.maybe_refresh_token.clone(),
+            token_type: record.token_type.clone(),
+            //expires_in_seconds: record.expires_in_seconds.clone(),
+            has_bits_read: i8_to_bool(record.has_bits_read),
+            has_channel_read_subscriptions: i8_to_bool(record.has_channel_read_subscriptions),
+            has_channel_read_redemptions: i8_to_bool(record.has_channel_read_redemptions),
+            has_user_read_follows: i8_to_bool(record.has_user_read_follows),
+            ip_address_creation: record.ip_address_creation.clone(),
+            expires_at: record.expires_at.clone(),
+            user_deleted_at: record.user_deleted_at.clone(),
+            mod_deleted_at: record.mod_deleted_at.clone(),
+          }
+        }))
+  }
+
+  pub async fn perform_query_internal(
+    &self,
+    mysql_pool: &MySqlPool
+  ) -> AnyhowResult<Option<TwitchOauthTokenRecordInternal>> {
+
+    let query = self.build_query_string();
+    let mut query = sqlx::query_as::<_, TwitchOauthTokenRecordInternal>(&query);
+    //let mut query = sqlx::query(&query);
+
+    // NB: The following bindings must match the order of the query builder !!
+
+    if let Some(user_token) = self.scope_user_token.as_deref() {
+      query = query.bind(user_token);
+    }
+
+    if let Some(user_id) = self.scope_twitch_user_id {
+      query = query.bind(user_id);
+    }
+
+    if let Some(twitch_username) = self.scope_twitch_username.as_deref() {
+      query = query.bind(twitch_username);
+    }
+
+    let mut result = query.fetch_optional(mysql_pool).await;
+
+    match result {
+      Ok(Some(record)) => {
+        Ok(Some(record))
+      }
+      Ok(None) => {
+        Ok(None)
+      },
+      Err(err) => {
+        match err {
+          RowNotFound => {
+            Ok(None)
+          },
+          _ => {
+            warn!("twitch oauth token query error: {:?}", err);
+            Err(anyhow!("twitch oauth token query error: {:?}", err))
+          }
+        }
+      }
+    }
+  }
+
+  pub fn build_query_string(&self) -> String {
+    // TODO/NB: Unfortunately SQLx can't statically typecheck this query
+    let mut query = r#"
+SELECT
+    users.username as maybe_username,
+    users.display_name as maybe_display_name,
+    users.email_gravatar_hash as maybe_user_gravatar_hash,
+    twitch_oauth_tokens.maybe_user_token,
+
+    twitch_oauth_tokens.twitch_user_id,
+    twitch_oauth_tokens.maybe_twich_username,
+
+    twitch_oauth_tokens.access_token,
+    twitch_oauth_tokens.maybe_refresh_token,
+    twitch_oauth_tokens.token_type,
+    twitch_oauth_tokens.expires_in_seconds,
+    twitch_oauth_tokens.has_bits_read,
+    twitch_oauth_tokens.has_channel_read_subscriptions,
+    twitch_oauth_tokens.has_channel_read_redemptions,
+    twitch_oauth_tokens.has_user_read_follows,
+    twitch_oauth_tokens.ip_address_creation,
+    twitch_oauth_tokens.created_at,
+    twitch_oauth_tokens.updated_at,
+    twitch_oauth_tokens.expires_at,
+    twitch_oauth_tokens.user_deleted_at,
+    twitch_oauth_tokens.mod_deleted_at
+
+
+FROM twich_oauth_tokens
+LEFT OUTER JOIN users
+    ON users.token = twitch_oauth_tokens.maybe_user_token
+    "#.to_string();
+
+    query.push_str(&self.build_predicates());
+    query
+  }
+
+  pub fn build_predicates(&self) -> String {
+    let mut query = "".to_string();
+    let mut first_predicate_added = false;
+
+    if let Some(user_token) = self.scope_user_token.as_deref() {
+      if !first_predicate_added {
+        query.push_str(" WHERE users.token = ?");
+        first_predicate_added = true;
+      } else {
+        query.push_str(" AND users.token = ?");
+      }
+    }
+
+    if let Some(user_id) = self.scope_twitch_user_id {
+      if !first_predicate_added {
+        query.push_str(" WHERE twitch_oauth_tokens.twitch_user_id = ?");
+        first_predicate_added = true;
+      } else {
+        query.push_str(" AND twitch_oauth_tokens.twitch_user_id = ?");
+      }
+    }
+
+    if let Some(username) = self.scope_twitch_username.as_deref() {
+      if !first_predicate_added {
+        query.push_str(" WHERE twitch_oauth_tokens.maybe_twitch_username = ?");
+        first_predicate_added = true;
+      } else {
+        query.push_str(" AND twitch_oauth_tokens.maybe_twitch_username = ?");
+      }
+    }
+
+    if !first_predicate_added {
+      query.push_str(" WHERE ( twitch_oauth_tokens.expires_at IS NULL OR twitch_oauth_tokens.expires_at > NOW() ) ");
+    } else {
+      query.push_str(" AND ( twitch_oauth_tokens.expires_at IS NULL OR twitch_oauth_tokens.expires_at > NOW() ) ");
+    }
+
+    // NB: Return the most recent.
+    // This might have stupid race condition/transaction weirdness.
+    // Sorry future me.
+    query.push_str(" ORDER BY twitch_oauth_token.id DESC");
+
+    // NB: Only a single record.
+    query.push_str(" LIMIT 1");
+
+    query
+  }
+}
+
+#[derive(Serialize)]
+pub struct TwitchOauthTokenRecordInternal {
+  /// NB: Vocodes/FakeYou/Storyteller user
+  pub maybe_user_token: Option<String>,
+  pub maybe_display_name: Option<String>,
+  pub maybe_gravatar_hash: Option<String>,
+
+  /// Twitch user
+  //pub twitch_user_id: u32,
+  pub maybe_twitch_username: Option<String>,
+
+  /// Token details
+  pub access_token: String,
+  pub maybe_refresh_token: Option<String>,
+  pub token_type: Option<String>,
+  //pub expires_in_seconds: Option<u32>,
+  pub has_bits_read: i8,
+  pub has_channel_read_subscriptions: i8,
+  pub has_channel_read_redemptions: i8,
+  pub has_user_read_follows: i8,
+  pub ip_address_creation: Option<String>,
+
+  /// Potentially when the token is expected to expire.
+  /// Do not eagerly refresh. Lazily renew.
+  pub expires_at: Option<DateTime<Utc>>,
+  pub user_deleted_at: DateTime<Utc>,
+  pub mod_deleted_at: DateTime<Utc>,
+}

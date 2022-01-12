@@ -8,7 +8,7 @@
 
 CREATE TABLE twitch_oauth_tokens(
   -- Not used for anything except replication.
-  id BIGINT(20) NOT NULL AUTO_INCREMENT,
+  id BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
 
   -- ========== STORYTELLER/FAKEYOU USER ==========
 
@@ -20,7 +20,7 @@ CREATE TABLE twitch_oauth_tokens(
 
   -- The user ID / channel ID are the same
   -- https://discuss.dev.twitch.tv/t/what-is-the-difference-between-the-stream--id-and-channel--id/4423
-  twitch_user_id INT(10) NOT NULL,
+  twitch_user_id INT(10) UNSIGNED NOT NULL,
 
   -- Usernames are between 4 and 25 characters.
   maybe_twitch_username VARCHAR(32) DEFAULT NULL,
@@ -39,7 +39,7 @@ CREATE TABLE twitch_oauth_tokens(
   -- When the token expires from time of first grant.
   -- (We don't update this field.)
   -- Null if it does not expire or we were not informed
-  expires_in_seconds INT(10) DEFAULT NULL,
+  expires_in_seconds INT(10) UNSIGNED DEFAULT NULL,
 
   -- ========== OAUTH SCOPES ==========
 
@@ -75,7 +75,7 @@ CREATE TABLE twitch_oauth_tokens(
   -- ========== VECTOR CLOCK ==========
 
   -- Incremented with every update.
-  version INT NOT NULL DEFAULT 0,
+  version INT UNSIGNED NOT NULL DEFAULT 0,
 
   -- ========== TIMESTAMPS ==========
 
