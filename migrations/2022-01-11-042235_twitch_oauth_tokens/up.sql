@@ -66,6 +66,12 @@ CREATE TABLE twitch_oauth_tokens(
 
   -- THERE ARE MORE SCOPES... PERHAPS WE SHOULD ADD THEM?
 
+  -- ========== SECURITY ==========
+
+  -- For abuse tracking.
+  -- Wide enough for IPv4/6
+  ip_address_creation VARCHAR(40) DEFAULT NULL,
+
   -- ========== VECTOR CLOCK ==========
 
   -- Incremented with every update.

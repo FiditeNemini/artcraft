@@ -20,6 +20,9 @@ pub struct TwitchOauthTokenInsertBuilder {
   /// Storyteller/FakeYou username.
   maybe_user_token: Option<String>,
 
+  /// Abuse tracking.
+  maybe_ip_address_creation: Option<String>,
+
   /// Twitch username / channel name.
   maybe_twitch_username: Option<String>,
 
@@ -42,6 +45,7 @@ impl TwitchOauthTokenInsertBuilder {
       access_token: access_token.to_string(),
       maybe_refresh_token: None,
       maybe_user_token: None,
+      maybe_ip_address_creation: None,
       maybe_twitch_username: None,
       token_type: None,
       expires_in_seconds: None,
@@ -59,6 +63,11 @@ impl TwitchOauthTokenInsertBuilder {
 
   pub fn set_user_token(mut self, maybe_user_token: Option<&str>) -> Self {
     self.maybe_user_token = maybe_user_token.map(|t| t.to_string());
+    self
+  }
+
+  pub fn set_ip_address_creation(mut self, ip_address_creation: Option<&str>) -> Self {
+    self.maybe_ip_address_creation = ip_address_creation.map(|t| t.to_string());
     self
   }
 
@@ -117,6 +126,7 @@ SET
   has_channel_read_subscriptions = ?,
   has_channel_read_redemptions= ?,
   has_user_read_follows = ?,
+  ip_address_creation = ?,
   expires_at = DATE_ADD(NOW(), INTERVAL ? SECOND)
         "#,
         self.maybe_user_token.clone(),
@@ -130,6 +140,7 @@ SET
         self.has_channel_read_subscriptions.clone(),
         self.has_channel_read_redemptions.clone(),
         self.has_user_read_follows.clone(),
+        self.maybe_ip_address_creation.clone(),
         expires_in_seconds,
       )
     } else {
@@ -148,6 +159,7 @@ SET
   has_channel_read_subscriptions = ?,
   has_channel_read_redemptions= ?,
   has_user_read_follows = ?,
+  ip_address_creation = ?,
   expires_at = NULL
         "#,
         self.maybe_user_token.clone(),
@@ -160,6 +172,7 @@ SET
         self.has_channel_read_subscriptions.clone(),
         self.has_channel_read_redemptions.clone(),
         self.has_user_read_follows.clone(),
+        self.maybe_ip_address_creation.clone(),
       )
     };
 
