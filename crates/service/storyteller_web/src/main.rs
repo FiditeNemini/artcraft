@@ -28,6 +28,13 @@ pub mod validations;
 // NB: This is included so sqlx can generate all the queries.
 mod job_queries;
 
+// NB: Also so sqlx codegens everything.
+// Not sure if this is strictly necessary.
+mod shared_queries {
+  use database_queries::twitch_oauth::find;
+  use database_queries::twitch_oauth::insert;
+}
+
 use actix_cors::Cors;
 use actix_http::http;
 use actix_web::middleware::{Logger, DefaultHeaders};
@@ -98,6 +105,7 @@ use crate::http_server::middleware::ip_filter_middleware::IpFilter;
 use crate::http_server::web_utils::cookie_manager::CookieManager;
 use crate::http_server::web_utils::redis_rate_limiter::RedisRateLimiter;
 use crate::http_server::web_utils::session_checker::SessionChecker;
+use crate::routes::add_routes;
 use crate::server_state::{ServerState, EnvConfig};
 use crate::threads::ip_banlist_set::IpBanlistSet;
 use crate::threads::poll_ip_banlist_thread::poll_ip_bans;
@@ -116,7 +124,6 @@ use sqlx::mysql::MySqlPoolOptions;
 use std::sync::Arc;
 use std::time::Duration;
 use tokio::runtime::Runtime;
-use crate::routes::add_routes;
 
 // TODO TODO TODO TODO
 // TODO TODO TODO TODO

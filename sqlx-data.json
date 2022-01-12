@@ -375,6 +375,16 @@
       ]
     }
   },
+  "05030f800d4e16abedc75fd0697711e9396a0eae783ad86a86dd7c0540a4d489": {
+    "query": "\nINSERT INTO twitch_oauth_tokens\nSET\n  maybe_user_token = ?,\n  twitch_user_id = ?,\n  maybe_twitch_username = ?,\n  access_token = ?,\n  maybe_refresh_token = ?,\n  token_type = ?,\n  expires_in_seconds = ?,\n  has_bits_read = ?,\n  has_channel_read_subscriptions = ?,\n  has_channel_read_redemptions= ?,\n  has_user_read_follows = ?,\n  ip_address_creation = ?,\n  expires_at = DATE_ADD(NOW(), INTERVAL ? SECOND)\n        ",
+    "describe": {
+      "columns": [],
+      "parameters": {
+        "Right": 13
+      },
+      "nullable": []
+    }
+  },
   "05612e384bdce558e4834c720d1eb7ca9a09e3cca64b72f1497929d860345ec7": {
     "query": "\nSELECT\n    tts.token as model_token,\n    tts.tts_model_type,\n    tts.creator_user_token,\n    users.username as creator_username,\n    users.display_name as creator_display_name,\n    users.email_gravatar_hash as creator_gravatar_hash,\n    tts.title,\n    tts.is_locked_from_use,\n    tts.created_at,\n    tts.updated_at\nFROM tts_models as tts\nJOIN users\nON\n    users.token = tts.creator_user_token\nWHERE\n    users.username = ?\n    AND tts.is_locked_from_use IS FALSE\n    AND tts.user_deleted_at IS NULL\n    AND tts.mod_deleted_at IS NULL\n        ",
     "describe": {
@@ -5956,6 +5966,16 @@
       "columns": [],
       "parameters": {
         "Right": 2
+      },
+      "nullable": []
+    }
+  },
+  "91beefeb04c0baafe4c3983c2760df2e5d08ea5e2433225221d20da8d2dca114": {
+    "query": "\nINSERT INTO twitch_oauth_tokens\nSET\n  maybe_user_token = ?,\n  twitch_user_id = ?,\n  maybe_twitch_username = ?,\n  access_token = ?,\n  maybe_refresh_token = ?,\n  token_type = ?,\n  expires_in_seconds = NULL,\n  has_bits_read = ?,\n  has_channel_read_subscriptions = ?,\n  has_channel_read_redemptions= ?,\n  has_user_read_follows = ?,\n  ip_address_creation = ?,\n  expires_at = NULL\n        ",
+    "describe": {
+      "columns": [],
+      "parameters": {
+        "Right": 11
       },
       "nullable": []
     }

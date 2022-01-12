@@ -3764,6 +3764,7 @@ dependencies = [
  "config",
  "container_common",
  "data-encoding",
+ "database_queries",
  "derive_more",
  "diesel",
  "dotenv",
