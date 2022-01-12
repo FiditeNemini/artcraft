@@ -20,7 +20,7 @@ CREATE TABLE twitch_oauth_tokens(
 
   -- The user ID / channel ID are the same
   -- https://discuss.dev.twitch.tv/t/what-is-the-difference-between-the-stream--id-and-channel--id/4423
-  twitch_user_id VARCHAR(32) NOT NULL,
+  twitch_user_id INT(10) NOT NULL,
 
   -- Usernames are between 4 and 25 characters.
   maybe_twitch_username VARCHAR(32) DEFAULT NULL,
@@ -81,7 +81,7 @@ CREATE TABLE twitch_oauth_tokens(
   -- refreshes and instead wants the code to lazily refresh.
   -- This also has no bearing on the "refresh_token".
   -- We'll just use this for bookkeeping.
-  expires_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  expires_at TIMESTAMP DEFAULT NULL,
 
   -- If the OAuth token is deleted, we set this.
   -- We'll need to set it for all of a user's OAuth tokens since this table stores many tokens.

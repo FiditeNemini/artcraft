@@ -1292,6 +1292,23 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "3ee2393c4a91429dffb4bedf19f4d6abf27d8a732c8ce4980305d782e5426d57"
 
 [[package]]
+name = "database_queries"
+version = "0.0.1"
+dependencies = [
+ "anyhow",
+ "base64 0.13.0",
+ "chrono",
+ "container_common",
+ "dotenv",
+ "log",
+ "serde",
+ "serde_derive",
+ "serde_json",
+ "sqlx 0.4.2",
+ "toml",
+]
+
+[[package]]
 name = "debug-helper"
 version = "0.3.11"
 source = "registry+https://github.com/rust-lang/crates.io-index"

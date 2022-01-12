@@ -4,6 +4,7 @@ members = [
   # Shared libraries
   "crates/lib/config",
   "crates/lib/container_common",
+  "crates/lib/database_queries",
   "crates/lib/http_server_common",
   # Application 
   "crates/service/obs_gateway",
