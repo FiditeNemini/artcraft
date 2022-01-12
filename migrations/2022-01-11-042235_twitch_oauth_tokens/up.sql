@@ -20,7 +20,11 @@ CREATE TABLE twitch_oauth_tokens(
 
   -- The user ID / channel ID are the same
   -- https://discuss.dev.twitch.tv/t/what-is-the-difference-between-the-stream--id-and-channel--id/4423
-  twitch_user_id INT(10) UNSIGNED NOT NULL,
+  -- Several suggest this should be a string and not an integer
+  -- https://discuss.dev.twitch.tv/t/type-of-user-id-in-api-responses/10205
+  -- Yep, strings
+  -- https://discuss.dev.twitch.tv/t/bug-v5-api-returns--id-as-string-for-featured-channels/10310
+  twitch_user_id VARCHAR(64) NOT NULL,
 
   -- Usernames are between 4 and 25 characters.
   maybe_twitch_username VARCHAR(32) DEFAULT NULL,

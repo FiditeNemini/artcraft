@@ -8,8 +8,9 @@ use sqlx::MySqlPool;
 pub struct TwitchOauthTokenInsertBuilder {
   // ===== Required Fields =====
 
-  /// Exactly an INT(10) ~= UNSIGNED INTEGER
-  twitch_user_id: u32,
+  /// Old APIs return a u32, but this should be a string.
+  /// Twitch is migrating IDs to strings.
+  twitch_user_id: String,
 
   access_token: String,
 
@@ -40,9 +41,9 @@ pub struct TwitchOauthTokenInsertBuilder {
 }
 
 impl TwitchOauthTokenInsertBuilder {
-  pub fn new(twitch_user_id: u32, access_token: &str) -> Self {
+  pub fn new(twitch_user_id: &str, access_token: &str) -> Self {
     Self {
-      twitch_user_id,
+      twitch_user_id: twitch_user_id.to_string(),
       access_token: access_token.to_string(),
       maybe_refresh_token: None,
       maybe_user_token: None,
@@ -81,7 +82,6 @@ impl TwitchOauthTokenInsertBuilder {
     self.token_type = token_type.map(|t| t.to_string());
     self
   }
-
 
   pub fn set_expires_in_seconds(mut self, expires_in_seconds: Option<u32>) -> Self {
     self.expires_in_seconds = expires_in_seconds;

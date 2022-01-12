@@ -13,14 +13,14 @@ pub struct TwitchOauthTokenRecord {
   pub maybe_gravatar_hash: Option<String>,
 
   /// Twitch user
-  //pub twitch_user_id: u32,
+  pub twitch_user_id: String,
   pub maybe_twitch_username: Option<String>,
 
   /// Token details
   pub access_token: String,
   pub maybe_refresh_token: Option<String>,
   pub token_type: Option<String>,
-  //pub expires_in_seconds: Option<u32>,
+  pub expires_in_seconds: Option<u32>,
   pub has_bits_read: bool,
   pub has_channel_read_subscriptions: bool,
   pub has_channel_read_redemptions: bool,
@@ -76,12 +76,12 @@ impl TwitchOauthTokenFinder {
             maybe_user_token: record.maybe_user_token.clone(),
             maybe_display_name: record.maybe_display_name.clone(),
             maybe_gravatar_hash: record.maybe_gravatar_hash.clone(),
-            //twitch_user_id: record.twitch_user_id,
+            twitch_user_id: record.twitch_user_id.clone(),
             maybe_twitch_username: record.maybe_twitch_username.clone(),
             access_token: record.access_token.clone(),
             maybe_refresh_token: record.maybe_refresh_token.clone(),
             token_type: record.token_type.clone(),
-            //expires_in_seconds: record.expires_in_seconds.clone(),
+            expires_in_seconds: record.expires_in_seconds.clone(),
             has_bits_read: i8_to_bool(record.has_bits_read),
             has_channel_read_subscriptions: i8_to_bool(record.has_channel_read_subscriptions),
             has_channel_read_redemptions: i8_to_bool(record.has_channel_read_redemptions),
@@ -226,7 +226,7 @@ LEFT OUTER JOIN users
   }
 }
 
-#[derive(Serialize)]
+#[derive(sqlx::FromRow)]
 pub struct TwitchOauthTokenRecordInternal {
   /// NB: Vocodes/FakeYou/Storyteller user
   pub maybe_user_token: Option<String>,
@@ -234,14 +234,14 @@ pub struct TwitchOauthTokenRecordInternal {
   pub maybe_gravatar_hash: Option<String>,
 
   /// Twitch user
-  //pub twitch_user_id: u32,
+  pub twitch_user_id: String,
   pub maybe_twitch_username: Option<String>,
 
   /// Token details
   pub access_token: String,
   pub maybe_refresh_token: Option<String>,
   pub token_type: Option<String>,
-  //pub expires_in_seconds: Option<u32>,
+  pub expires_in_seconds: Option<u32>,
   pub has_bits_read: i8,
   pub has_channel_read_subscriptions: i8,
   pub has_channel_read_redemptions: i8,
