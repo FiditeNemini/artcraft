@@ -11,6 +11,7 @@ use std::fmt;
 use std::sync::Arc;
 use twitch_oauth2::tokens::BearerTokenType::UserToken;
 use twitch_oauth2::{CsrfToken, TwitchToken};
+use http_server_common::request::get_request_ip::get_request_ip;
 
 #[derive(Deserialize)]
 pub struct QueryParams {
@@ -139,13 +140,19 @@ pub async fn oauth_end_enroll_from_redirect(
   info!("Never expiring: {:?}", never_expiring);
   info!("Expires in (don't store): {:?}", expires_in); // Should be ~4 hours
 
+  let ip_address = get_request_ip(&http_request);
+
   let expires_seconds = expires_in.as_secs() as u32; // NB: Silent overflow
 
   let mut insert_builder =
       TwitchOauthTokenInsertBuilder::new(&user_id, &auth_token)
           .set_expires_in_seconds(Some(expires_seconds))
-          .set_twitch_username(Some(&twitch_username));
-          //.set_has_bits_read(true)
+          .set_twitch_username(Some(&twitch_username))
+          .set_refresh_token(refresh_token.as_deref())
+          .set_ip_address_creation(Some(&ip_address));
+  //.set_user_token()
+  //.set_token_type()
+  //.set_has_bits_read(true) ...
 
   let result = insert_builder.insert(&server_state.backends.mysql_pool)
       .await
