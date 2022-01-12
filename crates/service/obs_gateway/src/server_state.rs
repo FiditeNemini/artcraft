@@ -1,3 +1,4 @@
+use sqlx::MySqlPool;
 use twitch_oauth2::{ClientId, ClientSecret};
 
 /// State that is injected into every endpoint.
@@ -7,8 +8,16 @@ pub struct ObsGatewayServerState {
   /// Some of this might not be used.
   pub env_config: EnvConfig,
   pub hostname: String,
+
   pub twitch_oauth_secrets: TwitchOauthSecrets,
   pub twitch_oauth_temp: TwitchOauthTemp,
+
+  pub backends: BackendsConfig,
+}
+
+#[derive(Clone)]
+pub struct BackendsConfig {
+  pub mysql_pool: MySqlPool,
 }
 
 // TODO: Many of these do not need to be passed around past server init.

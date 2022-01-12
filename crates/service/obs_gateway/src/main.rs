@@ -29,7 +29,7 @@ use crate::endpoints::oauth_begin::oauth_begin_enroll;
 use crate::endpoints::oauth_begin_redirect::oauth_begin_enroll_redirect;
 use crate::endpoints::oauth_end::oauth_end_enroll_from_redirect;
 use crate::endpoints_ws::obs_gateway_websocket_handler::obs_gateway_websocket_handler;
-use crate::server_state::{ObsGatewayServerState, EnvConfig, TwitchOauthSecrets, TwitchOauthTemp};
+use crate::server_state::{ObsGatewayServerState, EnvConfig, TwitchOauthSecrets, TwitchOauthTemp, BackendsConfig};
 use crate::twitch::polling_websocket_client::PollingTwitchWebsocketClient;
 use crate::twitch::twitch_client_wrapper::TwitchClientWrapper;
 use crate::twitch::twitch_secrets::TwitchSecrets;
@@ -222,6 +222,21 @@ async fn main() -> AnyhowResult<()> {
   let temp_oauth_access_token = easyenv::get_env_string_or_default("TEMP_TWITCH_OAUTH_ACCESS", "");
   let temp_oauth_refresh_token = easyenv::get_env_string_or_default("TEMP_TWITCH_OAUTH_REFRESH", "");
 
+  let db_connection_string =
+      easyenv::get_env_string_or_default(
+        "MYSQL_URL",
+        DEFAULT_MYSQL_CONNECTION_STRING);
+
+  //let redis_connection_string =
+  //    easyenv::get_env_string_or_default(
+  //      "REDIS_URL",
+  //      DEFAULT_REDIS_CONNECTION_STRING);
+
+  let pool = MySqlPoolOptions::new()
+      .max_connections(5)
+      .connect(&db_connection_string)
+      .await?;
+
   let server_state = ObsGatewayServerState {
     env_config: EnvConfig {
       num_workers,
@@ -242,6 +257,9 @@ async fn main() -> AnyhowResult<()> {
       temp_oauth_refresh_token,
     },
     hostname: server_hostname,
+    backends: BackendsConfig {
+      mysql_pool: pool,
+    }
   };
 
   serve(server_state)

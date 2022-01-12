@@ -2,6 +2,7 @@ use actix_http::StatusCode;
 use actix_web::{HttpResponse, HttpRequest, web, ResponseError};
 use crate::server_state::ObsGatewayServerState;
 use crate::twitch::oauth::oauth_token_builder::get_oauth_token_builder;
+use database_queries::twitch_oauth::insert::TwitchOauthTokenInsertBuilder;
 use http_server_common::response::response_error_helpers::to_simple_json_error;
 use log::error;
 use log::info;
@@ -137,6 +138,21 @@ pub async fn oauth_end_enroll_from_redirect(
   info!("Twitch username: {:?}", twitch_username);
   info!("Never expiring: {:?}", never_expiring);
   info!("Expires in (don't store): {:?}", expires_in); // Should be ~4 hours
+
+  let expires_seconds = expires_in.as_secs() as u32; // NB: Silent overflow
+
+  let mut insert_builder =
+      TwitchOauthTokenInsertBuilder::new(&user_id, &auth_token)
+          .set_expires_in_seconds(Some(expires_seconds))
+          .set_twitch_username(Some(&twitch_username));
+          //.set_has_bits_read(true)
+
+  let result = insert_builder.insert(&server_state.backends.mysql_pool)
+      .await
+      .map_err(|e| {
+        warn!("Error saving to db: {:?}", e);
+        OauthEndEnrollFromRedirectError::ServerError
+      })?;
 
   Ok(HttpResponse::Ok()
       .body("TODO"))
