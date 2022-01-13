@@ -17,6 +17,7 @@ import { VocodesNotice } from './VocodesNotice';
 import { ListTtsCategories, ListTtsCategoriesIsError, ListTtsCategoriesIsOk } from '../../../api/category/ListTtsCategories';
 import { MultiDropdownSearch } from './MultiDropdownSearch';
 import { SyntheticCategory, TtsCategoryType } from '../../../../AppWrapper';
+import { AutocompleteSearch } from './AutocompleteSearch';
 
 export interface EnqueueJobResponsePayload {
   success: boolean,
@@ -211,7 +212,17 @@ function TtsModelListFc(props: Props) {
           setMaybeSelectedTtsModel={props.setMaybeSelectedTtsModel}
           />
 
-        <br />
+        <AutocompleteSearch
+          allTtsCategories={props.allTtsCategories} 
+          allTtsModels={props.ttsModels}
+          allTtsModelsByTokenMap={props.allTtsModelsByTokenMap}
+          dropdownCategories={props.dropdownCategories}
+          setDropdownCategories={props.setDropdownCategories}
+          selectedCategories={props.selectedCategories}
+          setSelectedCategories={props.setSelectedCategories}
+          maybeSelectedTtsModel={props.maybeSelectedTtsModel}
+          setMaybeSelectedTtsModel={props.setMaybeSelectedTtsModel}
+          />
 
         {directViewLink}
 
