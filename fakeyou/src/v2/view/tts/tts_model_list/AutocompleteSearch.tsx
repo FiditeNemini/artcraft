@@ -36,7 +36,7 @@ export function AutocompleteSearch(props: Props) {
   return (
     <>
       <div className="field">
-        <label className="label" style={{ margin: "5px 0 0 0"}}>Search</label>
+        <strong className="label" style={{ display: "block", margin: "7px 0 0 0"}}>Search</strong>
         <div className="control has-icons-left">
 
           {/* NB: See note above about this library. */}
