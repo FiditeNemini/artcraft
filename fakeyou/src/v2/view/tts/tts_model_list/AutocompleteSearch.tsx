@@ -59,26 +59,21 @@ export function AutocompleteSearch(props: Props) {
             value={searchValue}
             onChange={(e : any) => setSearchValue(e.target.value) }
             onSelect={(val : string, item: TtsModelListItem) => {
-
-              // Slice off all the irrelevant child category choices, then append new choice.
-              let newCategorySelections = props.selectedCategories.slice(0, 0);
-              
-              // And the dropdowns themselves
-              let newDropdownCategories = props.dropdownCategories.slice(0, 1);
-
               // Nothing selected.
               props.setSelectedCategories([]);
 
-              // Root dropdown
-              //const newSubcategories = props.allTtsCategories.filter(category => {
-              //  return category.maybe_super_category_token === undefined;
-              //});
+              // And the dropdowns themselves
+              // Shouldn't need to rebuild this...
+              let newDropdownCategories = props.dropdownCategories.slice(0, 1);
 
-              //newDropdownCategories.push(newSubcategories);
+              if (newDropdownCategories.length === 0) {
+                // ...but just in case.
+                newDropdownCategories.push(props.allTtsCategories.filter(category => {
+                  return category.maybe_super_category_token === undefined;
+                }));
+              }
+
               props.setDropdownCategories(newDropdownCategories);
-
-
-
               props.setMaybeSelectedTtsModel(item)
             }}
             shouldItemRender={(item : TtsModelListItem, value) => {
