@@ -6,6 +6,7 @@ import { MigrationTopNavSession } from '../../migration/MigrationTopNav_Session'
 interface Props {
   sessionWrapper: SessionWrapper,
   logoutHandler: () => void,
+  querySessionCallback : () => void,
 }
 
 function NewTopNavFc(props: Props) {
@@ -111,7 +112,7 @@ function NewTopNavFc(props: Props) {
                 <MigrationTopNavSession
                   sessionWrapper={props.sessionWrapper}
                   enableAlpha={true}
-                  querySessionAction={() => { /* TODO */}}
+                  querySessionAction={props.querySessionCallback}
                   />
               </p>
             </div>

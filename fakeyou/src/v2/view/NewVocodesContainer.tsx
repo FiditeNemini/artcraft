@@ -114,6 +114,7 @@ class NewVocodesContainer extends React.Component<Props, State> {
           <NewTopNavFc
             logoutHandler={this.logout}
             sessionWrapper={this.props.sessionWrapper}
+            querySessionCallback={this.props.querySessionAction}
             />
 
           <Switch>
