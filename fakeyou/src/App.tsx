@@ -399,7 +399,7 @@ class App extends React.Component<Props, State> {
         <div id="main" className="mainwrap">
           <div id="viewable">
 
-            {/*
+            {/* This is the old vocodes1.0-compatible username and version switch
             <MigrationTopNav
               enableAlpha={this.state.enableAlpha}
               sessionWrapper={this.state.sessionWrapper}
