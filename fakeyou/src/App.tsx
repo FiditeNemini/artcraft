@@ -400,11 +400,13 @@ class App extends React.Component<Props, State> {
         <div id="main" className="mainwrap">
           <div id="viewable">
 
+            {/*
             <MigrationTopNav
               enableAlpha={this.state.enableAlpha}
               sessionWrapper={this.state.sessionWrapper}
               querySessionAction={this.querySession}
               />
+            */}
 
             <div className="migrationComponentWrapper">
 
