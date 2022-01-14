@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { SessionWrapper } from '../../session/SessionWrapper';
 import { Link } from 'react-router-dom';
 import { MigrationTopNavSession } from '../../migration/MigrationTopNav_Session';
@@ -17,6 +17,15 @@ function NewTopNavFc(props: Props) {
     myDataLink = `/profile/${username}`;
   }
 
+  const [mobileHamburgerIsActive, setMobileHamburgerIsActive] = useState<boolean>(false);
+
+  const toggleHamburger = () => { 
+    setMobileHamburgerIsActive(!mobileHamburgerIsActive);
+  }
+
+  const navbarClasses = mobileHamburgerIsActive ? "navbar-menu is-active" : "navbar-menu";
+  const navbarBurgerClasses = mobileHamburgerIsActive ? "navbar-burger is-active" : "navbar-burger";
+
   return (
     <>
     <nav className="navbar is-transparent">
@@ -24,14 +33,14 @@ function NewTopNavFc(props: Props) {
         <Link className="navbar-item" to="/">
           <img src="/fakeyou/fakeyou-nav-logo-8.png" alt="FakeYou: Cartoon and Celebrity Text to Speech" />
         </Link>
-        <div className="navbar-burger" data-target="navbarExampleTransparentExample">
+        <div className={navbarBurgerClasses} data-target="navbarExampleTransparentExample" onClick={() => toggleHamburger()}>
           <span></span>
           <span></span>
           <span></span>
         </div>
       </div>
 
-      <div id="navbarExampleTransparentExample" className="navbar-menu">
+      <div id="navbarExampleTransparentExample" className={navbarClasses}>
         <div className="navbar-start">
 
           <Link to="/"
