@@ -153,6 +153,7 @@ function W2lTemplateListFc(props: Props) {
 
   return (
     <div>
+      <br />
       <h1 className="title is-1"> Video lip sync templates </h1>
 
       {extraDetails}

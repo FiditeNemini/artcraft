@@ -28,7 +28,7 @@ function NewTopNavFc(props: Props) {
 
   return (
     <>
-    <nav className="navbar is-transparent">
+    <nav className="navbar is-transparent padding-bottom-1em">
       <div className="navbar-brand">
         <Link className="navbar-item" to="/">
           <img src="/fakeyou/fakeyou-nav-logo-8.png" alt="FakeYou: Cartoon and Celebrity Text to Speech" />

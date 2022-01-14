@@ -190,7 +190,7 @@ function TtsModelListFc(props: Props) {
   return (
     <div>
 
-      <section className="hero">
+      <section className="hero is-small">
         <div className="hero-body">
           <p className="title">
             Text to Speech
@@ -200,6 +200,8 @@ function TtsModelListFc(props: Props) {
           </p>
         </div>
       </section>
+
+      <br />
 
       {vocodesNotice}
 
