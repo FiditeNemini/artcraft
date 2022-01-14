@@ -32,7 +32,7 @@ function NewTopNavFc(props: Props) {
     <nav className="navbar is-transparent padding-bottom-1em">
       <div className="navbar-brand">
         <Link className="navbar-item" to="/">
-          <img src="/fakeyou/fakeyou-nav-logo-8.png" alt="FakeYou: Cartoon and Celebrity Text to Speech" />
+          <img src="/fakeyou/fakeyou-nav-logo.png" alt="FakeYou: Cartoon and Celebrity Text to Speech" />
         </Link>
         <div className={navbarBurgerClasses} data-target="navbarExampleTransparentExample" onClick={() => toggleHamburger()}>
           <span></span>
