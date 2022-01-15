@@ -14,7 +14,7 @@ pub struct TwitchOauthTokenRecord {
 
   /// Twitch user
   pub twitch_user_id: String,
-  pub maybe_twitch_username: Option<String>,
+  pub twitch_username: String,
 
   /// Token details
   pub access_token: String,
@@ -77,7 +77,7 @@ impl TwitchOauthTokenFinder {
             maybe_display_name: record.maybe_display_name.clone(),
             maybe_gravatar_hash: record.maybe_gravatar_hash.clone(),
             twitch_user_id: record.twitch_user_id.clone(),
-            maybe_twitch_username: record.maybe_twitch_username.clone(),
+            twitch_username: record.twitch_username.clone(),
             access_token: record.access_token.clone(),
             maybe_refresh_token: record.maybe_refresh_token.clone(),
             token_type: record.token_type.clone(),
@@ -150,7 +150,7 @@ SELECT
     twitch_oauth_tokens.maybe_user_token,
 
     twitch_oauth_tokens.twitch_user_id,
-    twitch_oauth_tokens.maybe_twich_username,
+    twitch_oauth_tokens.twich_username,
 
     twitch_oauth_tokens.access_token,
     twitch_oauth_tokens.maybe_refresh_token,
@@ -201,10 +201,10 @@ LEFT OUTER JOIN users
 
     if let Some(username) = self.scope_twitch_username.as_deref() {
       if !first_predicate_added {
-        query.push_str(" WHERE twitch_oauth_tokens.maybe_twitch_username = ?");
+        query.push_str(" WHERE twitch_oauth_tokens.twitch_username = ?");
         first_predicate_added = true;
       } else {
-        query.push_str(" AND twitch_oauth_tokens.maybe_twitch_username = ?");
+        query.push_str(" AND twitch_oauth_tokens.twitch_username = ?");
       }
     }
 
@@ -235,7 +235,7 @@ pub struct TwitchOauthTokenRecordInternal {
 
   /// Twitch user
   pub twitch_user_id: String,
-  pub maybe_twitch_username: Option<String>,
+  pub twitch_username: String,
 
   /// Token details
   pub access_token: String,

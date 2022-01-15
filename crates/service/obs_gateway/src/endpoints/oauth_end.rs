@@ -145,9 +145,8 @@ pub async fn oauth_end_enroll_from_redirect(
   let expires_seconds = expires_in.as_secs() as u32; // NB: Silent overflow
 
   let mut insert_builder =
-      TwitchOauthTokenInsertBuilder::new(&user_id, &auth_token)
+      TwitchOauthTokenInsertBuilder::new(&user_id, &twitch_username, &auth_token)
           .set_expires_in_seconds(Some(expires_seconds))
-          .set_twitch_username(Some(&twitch_username))
           .set_refresh_token(refresh_token.as_deref())
           .set_ip_address_creation(Some(&ip_address));
   //.set_user_token()

@@ -12,6 +12,10 @@ pub struct TwitchOauthTokenInsertBuilder {
   /// Twitch is migrating IDs to strings.
   twitch_user_id: String,
 
+  /// Twitch username / channel name.
+  twitch_username: String,
+
+  /// The secret we use
   access_token: String,
 
   // ===== Optional / Default Fields =====
@@ -24,9 +28,6 @@ pub struct TwitchOauthTokenInsertBuilder {
 
   /// Abuse tracking.
   maybe_ip_address_creation: Option<String>,
-
-  /// Twitch username / channel name.
-  maybe_twitch_username: Option<String>,
 
   /// Probably 'bearer'
   token_type: Option<String>,
@@ -41,14 +42,14 @@ pub struct TwitchOauthTokenInsertBuilder {
 }
 
 impl TwitchOauthTokenInsertBuilder {
-  pub fn new(twitch_user_id: &str, access_token: &str) -> Self {
+  pub fn new(twitch_user_id: &str, twitch_username: &str, access_token: &str) -> Self {
     Self {
       twitch_user_id: twitch_user_id.to_string(),
+      twitch_username: twitch_username.to_string(),
       access_token: access_token.to_string(),
       maybe_refresh_token: None,
       maybe_user_token: None,
       maybe_ip_address_creation: None,
-      maybe_twitch_username: None,
       token_type: None,
       expires_in_seconds: None,
       has_bits_read: false,
@@ -70,11 +71,6 @@ impl TwitchOauthTokenInsertBuilder {
 
   pub fn set_ip_address_creation(mut self, ip_address_creation: Option<&str>) -> Self {
     self.maybe_ip_address_creation = ip_address_creation.map(|t| t.to_string());
-    self
-  }
-
-  pub fn set_twitch_username(mut self, maybe_twitch_username: Option<&str>) -> Self {
-    self.maybe_twitch_username = maybe_twitch_username.map(|t| t.to_string());
     self
   }
 
@@ -118,7 +114,7 @@ INSERT INTO twitch_oauth_tokens
 SET
   maybe_user_token = ?,
   twitch_user_id = ?,
-  maybe_twitch_username = ?,
+  twitch_username = ?,
   access_token = ?,
   maybe_refresh_token = ?,
   token_type = ?,
@@ -132,7 +128,7 @@ SET
         "#,
         self.maybe_user_token.clone(),
         self.twitch_user_id.clone(),
-        self.maybe_twitch_username.clone(),
+        self.twitch_username.clone(),
         self.access_token.clone(),
         self.maybe_refresh_token.clone(),
         self.token_type.clone(),
@@ -151,7 +147,7 @@ INSERT INTO twitch_oauth_tokens
 SET
   maybe_user_token = ?,
   twitch_user_id = ?,
-  maybe_twitch_username = ?,
+  twitch_username = ?,
   access_token = ?,
   maybe_refresh_token = ?,
   token_type = ?,
@@ -165,7 +161,7 @@ SET
         "#,
         self.maybe_user_token.clone(),
         self.twitch_user_id.clone(),
-        self.maybe_twitch_username.clone(),
+        self.twitch_username.clone(),
         self.access_token.clone(),
         self.maybe_refresh_token.clone(),
         self.token_type.clone(),

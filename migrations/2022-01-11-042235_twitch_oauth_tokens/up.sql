@@ -27,7 +27,8 @@ CREATE TABLE twitch_oauth_tokens(
   twitch_user_id VARCHAR(64) NOT NULL,
 
   -- Usernames are between 4 and 25 characters.
-  maybe_twitch_username VARCHAR(32) DEFAULT NULL,
+  -- This is returned in the oauth flow
+  twitch_username VARCHAR(32) NOT NULL,
 
   -- ========== OAUTH TOKEN DETAILS ==========
 
@@ -102,7 +103,7 @@ CREATE TABLE twitch_oauth_tokens(
   PRIMARY KEY (id),
   KEY fk_maybe_user_token (maybe_user_token),
   KEY index_twitch_user_id (twitch_user_id),
-  KEY index_maybe_twitch_username (maybe_twitch_username),
+  KEY index_twitch_username (twitch_username),
   KEY index_expires_at (expires_at),
   KEY index_user_deleted_at (user_deleted_at),
   KEY index_mod_deleted_at (mod_deleted_at)
