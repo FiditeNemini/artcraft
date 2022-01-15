@@ -24,22 +24,22 @@ Application overview
 Schema and API notes
 --------------------
 
-* [Redis Schema Notes README](docs/redis_schema.md)
+* [Redis Schema Notes README](_docs/redis_schema.md)
 
 Local development
 -----------------
 
-[Local development setup README](docs/local_development_setup.md)
+[Local development setup README](_docs/local_development_setup.md)
 
 Production and Deployment
 -------------------------
 
-[Production builds and deployment README](docs/production_builds_and_deployment.md)
+[Production builds and deployment README](_docs/production_builds_and_deployment.md)
 
 Development notes
 -----------------
 
-[Development notes README](docs/development_notes.md)
+[Development notes README](_docs/development_notes.md)
 
 TODO
 ----
