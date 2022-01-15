@@ -17,6 +17,7 @@ pub const RESERVED_SUBSTRINGS : &'static str = include_str!("../../../../db/rese
 pub const BANNED_SLURS : &'static str = include_str!("../../../../db/banned_slurs.txt");
 
 pub mod database;
+pub mod common_env;
 pub mod http_clients;
 pub mod http_server;
 pub mod routes;
@@ -40,9 +41,9 @@ use actix_http::http;
 use actix_web::middleware::{Logger, DefaultHeaders};
 use actix_web::{HttpServer, web, HttpResponse, App};
 use config::shared_constants::DEFAULT_MYSQL_CONNECTION_STRING;
-use config::shared_constants::DEFAULT_REDIS_CONNECTION_STRING;
 use config::shared_constants::DEFAULT_RUST_LOG;
 use container_common::anyhow_result::AnyhowResult;
+use crate::common_env::CommonEnv;
 use crate::database::mediators::badge_granter::BadgeGranter;
 use crate::database::mediators::firehose_publisher::FirehosePublisher;
 use crate::http_server::endpoints::events::list_events::list_events_handler;
@@ -162,6 +163,8 @@ async fn main() -> AnyhowResult<()> {
   // This file should only contain *development* secrets, never production.
   let _ = dotenv::from_filename(".env-secrets").ok();
 
+  let common_env = CommonEnv::read_from_env()?;
+
   info!("Obtaining hostname...");
 
   let server_hostname = hostname::get()
@@ -178,11 +181,6 @@ async fn main() -> AnyhowResult<()> {
       "MYSQL_URL",
       DEFAULT_MYSQL_CONNECTION_STRING);
 
-  let redis_connection_string =
-      easyenv::get_env_string_or_default(
-        "REDIS_URL",
-        DEFAULT_REDIS_CONNECTION_STRING);
-
   let pool = MySqlPoolOptions::new()
     .max_connections(5)
     .connect(&db_connection_string)
@@ -197,7 +195,8 @@ async fn main() -> AnyhowResult<()> {
     firehose_publisher: firehose_publisher.clone(), // NB: Also safe
   };
 
-  let redis_manager = RedisConnectionManager::new(redis_connection_string.clone())?;
+  let redis_manager = RedisConnectionManager::new(
+    common_env.redis_0_connection_string.clone())?;
 
   let redis_pool = r2d2::Pool::builder()
       .build(redis_manager)?;
@@ -206,7 +205,7 @@ async fn main() -> AnyhowResult<()> {
   let limiter_max_requests = easyenv::get_env_num("LIMITER_MAX_REQUESTS", 3)?;
   let limiter_window_seconds = easyenv::get_env_num("LIMITER_WINDOW_SECONDS", 10)?;
 
-  let limiter = Limiter::build(&redis_connection_string)
+  let limiter = Limiter::build(&common_env.redis_0_connection_string)
       .limit(limiter_max_requests)
       .period(Duration::from_secs(limiter_window_seconds))
       .finish()?;

@@ -207,7 +207,7 @@ async fn main() -> AnyhowResult<()> {
   info!("Connecting to redis...");
 
   let redis_manager =
-      RedisConnectionManager::new(common_env.redis_connection_string.deref())?;
+      RedisConnectionManager::new(common_env.redis_0_connection_string.deref())?;
 
   let redis_pool = r2d2::Pool::builder()
       .build(redis_manager)?;

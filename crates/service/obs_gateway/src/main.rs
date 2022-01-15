@@ -23,7 +23,7 @@ use actix_http::http;
 use actix_web::middleware::{Logger, DefaultHeaders};
 use actix_web::{HttpServer, web, HttpResponse, App};
 use config::shared_constants::DEFAULT_MYSQL_CONNECTION_STRING;
-use config::shared_constants::DEFAULT_REDIS_CONNECTION_STRING;
+use config::shared_constants::DEFAULT_REDIS_DATABASE_1_CONNECTION_STRING;
 use config::shared_constants::DEFAULT_RUST_LOG;
 use crate::endpoints::oauth_begin::oauth_begin_enroll;
 use crate::endpoints::oauth_begin_redirect::oauth_begin_enroll_redirect;
@@ -187,11 +187,6 @@ async fn main() -> AnyhowResult<()> {
 //        "MYSQL_URL",
 //        DEFAULT_MYSQL_CONNECTION_STRING);
 //
-//  let redis_connection_string =
-//      easyenv::get_env_string_or_default(
-//        "REDIS_URL",
-//        DEFAULT_REDIS_CONNECTION_STRING);
-//
 //  let pool = MySqlPoolOptions::new()
 //      .max_connections(5)
 //      .connect(&db_connection_string)
@@ -227,15 +222,28 @@ async fn main() -> AnyhowResult<()> {
         "MYSQL_URL",
         DEFAULT_MYSQL_CONNECTION_STRING);
 
-  //let redis_connection_string =
-  //    easyenv::get_env_string_or_default(
-  //      "REDIS_URL",
-  //      DEFAULT_REDIS_CONNECTION_STRING);
+  let redis_connection_string =
+      easyenv::get_env_string_or_default(
+        "REDIS_1_URL",
+        DEFAULT_REDIS_DATABASE_1_CONNECTION_STRING);
+
+  info!("Connecting to mysql...");
 
   let pool = MySqlPoolOptions::new()
       .max_connections(5)
       .connect(&db_connection_string)
       .await?;
+
+  info!("Connecting to redis...");
+
+  let redis_manager = RedisConnectionManager::new(redis_connection_string.clone())?;
+
+  let redis_pool = r2d2::Pool::builder()
+      .build(redis_manager)?;
+
+  // NB: Compiler can't figure out throwaway return type
+  let key = "hi-database-1".to_string();
+  let _r : String = redis_pool.get().unwrap().set(&key, "bar").unwrap();
 
   let server_state = ObsGatewayServerState {
     env_config: EnvConfig {
@@ -259,6 +267,7 @@ async fn main() -> AnyhowResult<()> {
     hostname: server_hostname,
     backends: BackendsConfig {
       mysql_pool: pool,
+      redis_pool,
     }
   };
 

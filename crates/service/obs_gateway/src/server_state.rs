@@ -1,3 +1,4 @@
+use r2d2_redis::{r2d2, RedisConnectionManager};
 use sqlx::MySqlPool;
 use twitch_oauth2::{ClientId, ClientSecret};
 
@@ -18,6 +19,7 @@ pub struct ObsGatewayServerState {
 #[derive(Clone)]
 pub struct BackendsConfig {
   pub mysql_pool: MySqlPool,
+  pub redis_pool: r2d2::Pool<RedisConnectionManager>,
 }
 
 // TODO: Many of these do not need to be passed around past server init.

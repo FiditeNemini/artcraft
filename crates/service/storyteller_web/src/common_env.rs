@@ -1,4 +1,5 @@
-use config::shared_constants::DEFAULT_REDIS_CONNECTION_STRING;
+use config::shared_constants::DEFAULT_REDIS_DATABASE_0_CONNECTION_STRING;
+use config::shared_constants::DEFAULT_REDIS_DATABASE_1_CONNECTION_STRING;
 use container_common::anyhow_result::AnyhowResult;
 
 // TODO: Move more shared configs here.
@@ -9,8 +10,12 @@ use container_common::anyhow_result::AnyhowResult;
 pub struct CommonEnv {
 
   /// The Redis connection string.
-  /// Currently we only have a single Redis that serves all purposes.
-  pub redis_connection_string: String,
+  /// This has FakeYou voice stats, rate limiters, etc.
+  pub redis_0_connection_string: String,
+
+  /// The Redis connection string.
+  /// This has OBS/Twitch related functionality
+  pub redis_1_connection_string: String,
 
   /// The amount of time to wait between job batches (not individual jobs).
   /// This prevents the outer loop of querying batches from flooding the DB.
@@ -37,8 +42,10 @@ impl CommonEnv {
 
   pub fn read_from_env() -> AnyhowResult<Self> {
     Ok(Self {
-      redis_connection_string: easyenv::get_env_string_or_default("REDIS_URL",
-        DEFAULT_REDIS_CONNECTION_STRING),
+      redis_0_connection_string: easyenv::get_env_string_or_default("REDIS_0_URL",
+        DEFAULT_REDIS_DATABASE_0_CONNECTION_STRING),
+      redis_1_connection_string: easyenv::get_env_string_or_default("REDIS_1_URL",
+                                                                  DEFAULT_REDIS_DATABASE_1_CONNECTION_STRING),
       job_batch_wait_millis: easyenv::get_env_num("JOB_BATCH_WAIT_MILLIS", 100)?,
       job_max_attempts: easyenv::get_env_num("JOB_MAX_ATTEMPTS", 3)?,
       job_batch_size: easyenv::get_env_num("JOB_BATCH_SIZE", 10)?,

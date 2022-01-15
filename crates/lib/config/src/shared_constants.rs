@@ -7,7 +7,11 @@ pub const DEFAULT_RUST_LOG: &'static str = "debug,actix_web=info,sqlx::query=war
 //const DEFAULT_RUST_LOG: &'static str = "debug,actix_web=info"; // but sometimes we want to debug
 
 /// The default Redis connection string for use in development
-pub const DEFAULT_REDIS_CONNECTION_STRING: &'static str = "redis://localhost";
+pub const DEFAULT_REDIS_DATABASE_0_CONNECTION_STRING: &'static str = "redis://localhost/0";
+
+/// The default Redis connection string for use in development
+/// Database 1
+pub const DEFAULT_REDIS_DATABASE_1_CONNECTION_STRING: &'static str = "redis://localhost/1";
 
 /// The default MySql connection string for use in development
 pub const DEFAULT_MYSQL_CONNECTION_STRING: &'static str = "mysql://storyteller:password@localhost/storyteller";
