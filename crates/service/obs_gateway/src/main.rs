@@ -15,6 +15,7 @@
 pub mod endpoints;
 pub mod endpoints_ws;
 pub mod server_state;
+pub mod threads;
 pub mod twitch;
 pub mod util;
 
@@ -48,7 +49,7 @@ use sqlx::mysql::MySqlPoolOptions;
 use std::sync::Arc;
 use std::thread::sleep;
 use std::time::Duration;
-use tokio::runtime::Handle;
+use tokio::runtime::{Handle, Runtime};
 use twitch_api2::pubsub::Topic;
 use twitch_api2::pubsub;
 use twitch_oauth2::tokens::UserTokenBuilder;
@@ -126,13 +127,6 @@ async fn main() -> AnyhowResult<()> {
   let redis_pool = r2d2::Pool::builder()
       .build(redis_manager)?;
 
-  info!("Connecting to pubsub redis...");
-
-  let redis_pubsub_manager = RedisConnectionManager::new(redis_connection_string.clone())?;
-
-  let redis_pubsub_pool = r2d2::Pool::builder()
-      .build(redis_pubsub_manager)?;
-
   let server_state = ObsGatewayServerState {
     env_config: EnvConfig {
       num_workers,
@@ -156,20 +150,23 @@ async fn main() -> AnyhowResult<()> {
     backends: BackendsConfig {
       mysql_pool: pool,
       redis_pool,
-      redis_pubsub_pool,
     }
   };
 
-  info!("Starting thread...");
+  // Works, but can't Ctrl-C
+  //let handle = Handle::current();
+  //handle.spawn_blocking(|| {
+  //  loop {
+  //    info!("...thread...");
+  //    sleep(Duration::from_millis(2000));
+  //  }
+  //});
 
-  let handle = Handle::current();
+  //let tokio_runtime = Runtime::new()?;
+  //tokio_runtime.spawn(async {
+  //  poll_ip_bans(ip_banlist2, mysql_pool3).await;
+  //});
 
-  handle.spawn_blocking(|| {
-    loop {
-      info!("...thread...");
-      sleep(Duration::from_millis(2000));
-    }
-  });
 
   info!("Starting server...");
 

@@ -20,8 +20,6 @@ pub struct ObsGatewayServerState {
 pub struct BackendsConfig {
   pub mysql_pool: MySqlPool,
   pub redis_pool: r2d2::Pool<RedisConnectionManager>,
-  /// For pubsub only (the connection can only be used for pubsub.)
-  pub redis_pubsub_pool: r2d2::Pool<RedisConnectionManager>,
 }
 
 // TODO: Many of these do not need to be passed around past server init.
