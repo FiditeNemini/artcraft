@@ -241,6 +241,13 @@ async fn main() -> AnyhowResult<()> {
   let redis_pool = r2d2::Pool::builder()
       .build(redis_manager)?;
 
+  info!("Connecting to pubsub redis...");
+
+  let redis_pubsub_manager = RedisConnectionManager::new(redis_connection_string.clone())?;
+
+  let redis_pubsub_pool = r2d2::Pool::builder()
+      .build(redis_pubsub_manager)?;
+
   // NB: Compiler can't figure out throwaway return type
   let key = "hi-database-1".to_string();
   let _r : String = redis_pool.get().unwrap().set(&key, "bar").unwrap();
@@ -268,6 +275,7 @@ async fn main() -> AnyhowResult<()> {
     backends: BackendsConfig {
       mysql_pool: pool,
       redis_pool,
+      redis_pubsub_pool,
     }
   };
 

@@ -87,7 +87,7 @@ fn first_ip_from_list(ip_list: &str) -> Option<String> {
 
 #[cfg(test)]
 mod tests {
-  use crate::http_server::web_utils::ip_address::first_ip_from_list;
+  use crate::request::get_request_ip::first_ip_from_list;
 
   #[test]
   fn test_first_ip() {

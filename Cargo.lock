@@ -3085,6 +3085,10 @@ dependencies = [
 ]
 
 [[package]]
+name = "redis_common"
+version = "0.0.1"
+
+[[package]]
 name = "redox_syscall"
 version = "0.1.57"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3791,6 +3795,7 @@ dependencies = [
  "pulldown-cmark",
  "r2d2_redis",
  "rand 0.8.4",
+ "redis_common",
  "regex",
  "ring 0.17.0-alpha.10",
  "rust-s3",

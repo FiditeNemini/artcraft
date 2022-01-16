@@ -6,6 +6,8 @@ members = [
   "crates/lib/container_common",
   "crates/lib/database_queries",
   "crates/lib/http_server_common",
+  "crates/lib/redis_common",
+
   # Application 
   "crates/service/obs_gateway",
   "crates/service/storyteller_web",
