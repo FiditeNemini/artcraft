@@ -2623,6 +2623,7 @@ dependencies = [
  "pulldown-cmark",
  "r2d2_redis",
  "rand 0.8.4",
+ "redis_common",
  "regex",
  "reqwest",
  "rpassword",

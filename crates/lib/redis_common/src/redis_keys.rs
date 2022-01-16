@@ -2,6 +2,9 @@
 pub struct RedisKeys {}
 
 impl RedisKeys {
+
+  // =============== FAKEYOU / TTS / W2L ===============
+
   /// This is a counter incremented with TTS inference.
   /// We can use a job to read MySql and fix counts if they get out of sync.
   /// These should be long-lived keys.
@@ -38,5 +41,13 @@ impl RedisKeys {
   /// These keys should have a TTL.
   pub fn w2l_inference_extra_status_info(inference_job_token: &str) -> String {
     format!("w2lInferenceExtraStatus:{}", inference_job_token)
+  }
+
+  // =============== OBS / TWITCH ===============
+
+  /// This is a PubSub topic.
+  /// We publish when new viewers arrive and as a "keep-alive ping".
+  pub fn obs_session_active_topic() -> &'static str {
+    "obsSessionActive"
   }
 }

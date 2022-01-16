@@ -17,12 +17,14 @@ use http_server_common::error::common_server_error::CommonServerError;
 use log::error;
 use log::info;
 use log::warn;
+use r2d2_redis::redis::Commands;
 use std::sync::Arc;
 use std::thread::sleep;
 use std::time::Duration;
 use tokio::runtime::Handle;
 use twitch_api2::pubsub::Topic;
 use twitch_api2::pubsub;
+use redis_common::redis_keys::RedisKeys;
 
 #[derive(Deserialize)]
 pub struct PathInfo {
@@ -67,6 +69,22 @@ pub async fn obs_gateway_websocket_handler(
         CommonServerError::ServerError
       })?;
 
+  let mut redis = server_state.backends
+      .redis_pool
+      .get()
+      .map_err(|err| {
+        error!("Could not get Redis: {:?}", err);
+        CommonServerError::ServerError
+      })?;
+
+  let channel = RedisKeys::obs_session_active_topic();
+
+  let _count_received : Option<u64> = redis.publish(channel, &token_record.twitch_user_id)
+      .map_err(|e| {
+        warn!("redis error: {:?}", e);
+        CommonServerError::ServerError
+      })?;
+
   let mut client = TwitchWebsocketClient::new().unwrap();
   let token_refresher = OauthTokenRefresher::new(
     user_id,
@@ -96,10 +114,14 @@ pub async fn obs_gateway_websocket_handler(
 
   info!("Begin Javascript WebSocket...");
 
+  let server_state_arc = server_state.get_ref().clone();
+
   let websocket = ObsGatewayWebSocket::new(
     user_id,
     client,
-    token_refresher);
+    token_refresher,
+    server_state_arc
+  );
 
   ws::start(websocket, &http_request, stream)
       .map_err(|e| {
@@ -113,6 +135,7 @@ struct ObsGatewayWebSocket {
   //twitch_client: PollingTwitchWebsocketClient,
   twitch_user_id: u32,
   twitch_thread: Arc<ObsTwitchThread>,
+  server_state: Arc<ObsGatewayServerState>,
 }
 
 impl ObsGatewayWebSocket {
@@ -120,11 +143,13 @@ impl ObsGatewayWebSocket {
     twitch_user_id: u32,
     twitch_client: TwitchWebsocketClient,
     oauth_token_refresher: OauthTokenRefresher,
+    server_state: Arc<ObsGatewayServerState>,
   ) -> Self {
     let twitch_thread = Arc::new(ObsTwitchThread::new(twitch_user_id, oauth_token_refresher, twitch_client));
     Self {
       twitch_user_id,
-      twitch_thread
+      twitch_thread,
+      server_state,
     }
   }
 }
@@ -192,10 +217,32 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for ObsGatewayWebSock
       //info!("process message: {:?}", &msg);
 
 
+
+      let mut redis = self.server_state.backends
+          .redis_pool
+          .get()
+          .map_err(|err| {
+            error!("Could not get Redis: {:?}", err);
+            CommonServerError::ServerError
+          }).unwrap(); // TODO: FIXME
+
+      let channel = RedisKeys::obs_session_active_topic();
+
+      let _count_received : Option<u64> = redis.publish(channel, self.twitch_user_id)
+          .map_err(|e| {
+            warn!("redis error: {:?}", e);
+            CommonServerError::ServerError
+          }).unwrap(); // TODO: Fixme
+
+
       match msg {
         ws::Message::Text(text) => {
           //info!("sending text response");
           ctx.text("hello from Rust")
+
+
+
+
         },
         ws::Message::Binary(bin) => ctx.binary(bin),
         ws::Message::Ping(bytes) => ctx.pong(&bytes),
