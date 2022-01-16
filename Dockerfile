@@ -155,7 +155,8 @@ COPY sqlx-data.json .
 COPY crates/ ./crates
 COPY vendor/ ./vendor
 COPY db/ ./db
-COPY migrations/ ./migrations
+# TODO(2022-01-16): Might not be necessary:
+# COPY _migrations/ ./_migrations
 
 RUN $HOME/.cargo/bin/cargo fetch
 
