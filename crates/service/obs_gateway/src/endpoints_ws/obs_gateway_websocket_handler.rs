@@ -56,17 +56,22 @@ pub async fn obs_gateway_websocket_handler(
       return Err(CommonServerError::NotFound);
     },
     Err(e) => {
-      warn!("MySQL Error: {}", e);
+      error!("MySQL Error: {}", e);
       return Err(CommonServerError::ServerError);
     },
   };
 
-
-  let user_id = server_state.twitch_oauth_temp.temp_oauth_user_id.parse::<u32>().unwrap();
-  let auth_token = server_state.twitch_oauth_temp.temp_oauth_access_token.clone();
+  let user_id = token_record.twitch_user_id.parse::<u32>()
+      .map_err(|e| {
+        error!("Error converting twitch user id: {}, id= {}", e, &token_record.twitch_user_id);
+        CommonServerError::ServerError
+      })?;
 
   let mut client = TwitchWebsocketClient::new().unwrap();
-  let token_refresher = OauthTokenRefresher::new(user_id, &auth_token, None);
+  let token_refresher = OauthTokenRefresher::new(
+    user_id,
+    &token_record.access_token,
+    token_record.maybe_refresh_token.as_deref());
 
   info!("Connecting to Twitch PubSub...");
   client.connect().await.unwrap();
@@ -90,7 +95,11 @@ pub async fn obs_gateway_websocket_handler(
   //let res = rx.recv().unwrap();
 
   info!("Begin Javascript WebSocket...");
-  let websocket = ObsGatewayWebSocket::new(user_id, client, token_refresher);
+
+  let websocket = ObsGatewayWebSocket::new(
+    user_id,
+    client,
+    token_refresher);
 
   ws::start(websocket, &http_request, stream)
       .map_err(|e| {

@@ -1,10 +1,13 @@
 
+const WS_URL = 'ws://localhost:54321/obs';
+
 (function() {
     console.log('installing script');
 
-    const WS_URL = 'ws://localhost:54321/obs';
+    const username = 'testytest512';
+    const url = `${WS_URL}/${username}`;
 
-    let sock = new WebSocket(WS_URL);
+    let sock = new WebSocket(url);
 
     sock.onopen = function (event) {
         console.log('on open event', event);
