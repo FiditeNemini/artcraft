@@ -115,7 +115,6 @@ struct ObsGatewayWebSocket {
   twitch_thread: Arc<ObsTwitchThread>,
 }
 
-
 impl ObsGatewayWebSocket {
   fn new(
     twitch_user_id: u32,

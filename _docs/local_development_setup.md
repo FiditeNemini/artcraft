@@ -27,8 +27,18 @@ Diesel is an ORM, which is dumb, so we use sqlx as at-compile-time typesafe SQL.
 
 ```
 sudo apt-get install libmysqlclient-dev
-cargo install sqlx-cli --no-default-features --features mysql
-cargo install diesel_cli --no-default-features --features mysql
+cargo install sqlx-cli --no-default-features --features mysql [2022-01-16: is this needed?]
+```
+
+To install a more modern version of Diesel (unreleased) that 
+supports the "migrations_dir" toml config option:
+
+```
+cargo install diesel_cli \
+  --git https://github.com/diesel-rs/diesel.git \
+  --rev a213fe232a122f35a812b0ce0269708a1845a4c9 \
+  --no-default-features \
+  --features mysql
 ```
 
 #### Linux database notes
