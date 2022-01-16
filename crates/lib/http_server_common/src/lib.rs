@@ -12,5 +12,6 @@
 
 pub mod cors;
 pub mod endpoints;
+pub mod error;
 pub mod request;
 pub mod response;

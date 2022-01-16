@@ -1,15 +1,20 @@
 use actix::prelude::*;
 use actix_rt::Runtime;
+use actix_web::web::Path;
 use actix_web::{middleware, web, App, Error, HttpRequest, HttpResponse, HttpServer};
-use futures_util::FutureExt;
 use actix_web_actors::ws;
 use container_common::token::random_crockford_token::random_crockford_token;
-//use futures::future::{BoxFuture, FutureExt};
 use crate::endpoints_ws::obs_twitch_thread::ObsTwitchThread;
 use crate::server_state::ObsGatewayServerState;
+use crate::twitch::oauth::oauth_token_refresher::OauthTokenRefresher;
 use crate::twitch::polling_websocket_client::PollingTwitchWebsocketClient;
-use log::error;
+use crate::twitch::pubsub::build_pubsub_topics_for_user::build_pubsub_topics_for_user;
+use crate::twitch::websocket_client::TwitchWebsocketClient;
+use database_queries::twitch_oauth::find::{TwitchOauthTokenFinder, TwitchOauthTokenRecord};
 use futures_timer::Delay;
+use futures_util::FutureExt;
+use http_server_common::error::common_server_error::CommonServerError;
+use log::error;
 use log::info;
 use log::warn;
 use std::sync::Arc;
@@ -18,23 +23,49 @@ use std::time::Duration;
 use tokio::runtime::Handle;
 use twitch_api2::pubsub::Topic;
 use twitch_api2::pubsub;
-use crate::twitch::pubsub::build_pubsub_topics_for_user::build_pubsub_topics_for_user;
-use crate::twitch::oauth::oauth_token_refresher::OauthTokenRefresher;
-use crate::twitch::websocket_client::TwitchWebsocketClient;
+
+#[derive(Deserialize)]
+pub struct PathInfo {
+  twitch_username: String,
+}
+
+#[derive(Deserialize)]
+pub struct QueryData {
+  voice_token_1: Option<String>,
+  voice_token_2: Option<String>,
+  // Other preferences...
+}
 
 /// Endpoint
 pub async fn obs_gateway_websocket_handler(
-  request: HttpRequest,
+  path: Path<PathInfo>,
+  http_request: HttpRequest,
   server_state: web::Data<Arc<ObsGatewayServerState>>,
   stream: web::Payload,
-) -> Result<HttpResponse, Error> {
-  info!(">>>>>> obs_ws_index");
+) -> Result<HttpResponse, CommonServerError> {
+
+  let mut finder = TwitchOauthTokenFinder::new()
+      .scope_twitch_username(Some(&path.twitch_username));
+
+  let lookup_result = finder.perform_query(&server_state.backends.mysql_pool).await;
+
+  let token_record = match lookup_result {
+    Ok(Some(token_record)) => token_record,
+    Ok(None) => {
+      warn!("Could not find Twitch user: {}", &path.twitch_username);
+      return Err(CommonServerError::NotFound);
+    },
+    Err(e) => {
+      warn!("MySQL Error: {}", e);
+      return Err(CommonServerError::ServerError);
+    },
+  };
+
 
   let user_id = server_state.twitch_oauth_temp.temp_oauth_user_id.parse::<u32>().unwrap();
   let auth_token = server_state.twitch_oauth_temp.temp_oauth_access_token.clone();
 
   let mut client = TwitchWebsocketClient::new().unwrap();
-
   let token_refresher = OauthTokenRefresher::new(user_id, &auth_token, None);
 
   info!("Connecting to Twitch PubSub...");
@@ -61,7 +92,11 @@ pub async fn obs_gateway_websocket_handler(
   info!("Begin Javascript WebSocket...");
   let websocket = ObsGatewayWebSocket::new(user_id, client, token_refresher);
 
-  ws::start(websocket, &request, stream)
+  ws::start(websocket, &http_request, stream)
+      .map_err(|e| {
+        warn!("Websocket error: {}", e);
+        CommonServerError::ServerError
+      })
 }
 
 /// Websocket behavior

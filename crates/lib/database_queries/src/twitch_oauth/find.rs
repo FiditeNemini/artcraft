@@ -1,7 +1,10 @@
+//! Return the *SINGLE MOST RECENT* Twitch OAuth token per the search params.
+
 use anyhow::anyhow;
 use chrono::{DateTime, Utc};
 use container_common::anyhow_result::AnyhowResult;
 use crate::helpers::boolean_converters::i8_to_bool;
+use log::error;
 use log::warn;
 use sqlx::MySqlPool;
 
@@ -9,8 +12,8 @@ use sqlx::MySqlPool;
 pub struct TwitchOauthTokenRecord {
   /// NB: Vocodes/FakeYou/Storyteller user
   pub maybe_user_token: Option<String>,
-  pub maybe_display_name: Option<String>,
-  pub maybe_gravatar_hash: Option<String>,
+  pub maybe_user_display_name: Option<String>,
+  pub maybe_user_gravatar_hash: Option<String>,
 
   /// Twitch user
   pub twitch_user_id: String,
@@ -30,10 +33,11 @@ pub struct TwitchOauthTokenRecord {
   /// Potentially when the token is expected to expire.
   /// Do not eagerly refresh. Lazily renew.
   pub expires_at: Option<DateTime<Utc>>,
-  pub user_deleted_at: DateTime<Utc>,
-  pub mod_deleted_at: DateTime<Utc>,
+  pub user_deleted_at: Option<DateTime<Utc>>,
+  pub mod_deleted_at: Option<DateTime<Utc>>,
 }
 
+/// Return the *SINGLE MOST RECENT* Twitch OAuth token per the search params.
 pub struct TwitchOauthTokenFinder {
   /// Storyteller/FakeYou username
   scope_user_token: Option<String>,
@@ -74,8 +78,8 @@ impl TwitchOauthTokenFinder {
         .map(|record| {
           TwitchOauthTokenRecord {
             maybe_user_token: record.maybe_user_token.clone(),
-            maybe_display_name: record.maybe_display_name.clone(),
-            maybe_gravatar_hash: record.maybe_gravatar_hash.clone(),
+            maybe_user_display_name: record.maybe_user_display_name.clone(),
+            maybe_user_gravatar_hash: record.maybe_user_gravatar_hash.clone(),
             twitch_user_id: record.twitch_user_id.clone(),
             twitch_username: record.twitch_username.clone(),
             access_token: record.access_token.clone(),
@@ -127,15 +131,8 @@ impl TwitchOauthTokenFinder {
         Ok(None)
       },
       Err(err) => {
-        match err {
-          RowNotFound => {
-            Ok(None)
-          },
-          _ => {
-            warn!("twitch oauth token query error: {:?}", err);
-            Err(anyhow!("twitch oauth token query error: {:?}", err))
-          }
-        }
+        error!("twitch oauth token query error: {:?}", err);
+        Err(anyhow!("twitch oauth token query error: {:?}", err))
       }
     }
   }
@@ -145,12 +142,12 @@ impl TwitchOauthTokenFinder {
     let mut query = r#"
 SELECT
     users.username as maybe_username,
-    users.display_name as maybe_display_name,
+    users.display_name as maybe_user_display_name,
     users.email_gravatar_hash as maybe_user_gravatar_hash,
     twitch_oauth_tokens.maybe_user_token,
 
     twitch_oauth_tokens.twitch_user_id,
-    twitch_oauth_tokens.twich_username,
+    twitch_oauth_tokens.twitch_username,
 
     twitch_oauth_tokens.access_token,
     twitch_oauth_tokens.maybe_refresh_token,
@@ -168,12 +165,13 @@ SELECT
     twitch_oauth_tokens.mod_deleted_at
 
 
-FROM twich_oauth_tokens
+FROM twitch_oauth_tokens
 LEFT OUTER JOIN users
-    ON users.token = twitch_oauth_tokens.maybe_user_token
+    ON twitch_oauth_tokens.maybe_user_token = users.token
     "#.to_string();
 
     query.push_str(&self.build_predicates());
+
     query
   }
 
@@ -217,7 +215,7 @@ LEFT OUTER JOIN users
     // NB: Return the most recent.
     // This might have stupid race condition/transaction weirdness.
     // Sorry future me.
-    query.push_str(" ORDER BY twitch_oauth_token.id DESC");
+    query.push_str(" ORDER BY twitch_oauth_tokens.id DESC");
 
     // NB: Only a single record.
     query.push_str(" LIMIT 1");
@@ -230,8 +228,8 @@ LEFT OUTER JOIN users
 pub struct TwitchOauthTokenRecordInternal {
   /// NB: Vocodes/FakeYou/Storyteller user
   pub maybe_user_token: Option<String>,
-  pub maybe_display_name: Option<String>,
-  pub maybe_gravatar_hash: Option<String>,
+  pub maybe_user_display_name: Option<String>,
+  pub maybe_user_gravatar_hash: Option<String>,
 
   /// Twitch user
   pub twitch_user_id: String,
@@ -251,6 +249,6 @@ pub struct TwitchOauthTokenRecordInternal {
   /// Potentially when the token is expected to expire.
   /// Do not eagerly refresh. Lazily renew.
   pub expires_at: Option<DateTime<Utc>>,
-  pub user_deleted_at: DateTime<Utc>,
-  pub mod_deleted_at: DateTime<Utc>,
+  pub user_deleted_at: Option<DateTime<Utc>>,
+  pub mod_deleted_at: Option<DateTime<Utc>>,
 }

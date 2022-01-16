@@ -316,7 +316,7 @@ pub async fn serve(server_state: ObsGatewayServerState) -> AnyhowResult<()>
                     .route(web::head().to(|| HttpResponse::Ok()))
               )
         )
-        .service(web::resource("/obs")
+        .service(web::resource("/obs/{twitch_username}")
             .route(web::get().to(obs_gateway_websocket_handler))
             .route(web::head().to(|| HttpResponse::Ok()))
         )
