@@ -27,3 +27,29 @@ struct SimpleGenericJsonError {
   pub success: bool,
   pub error_reason: String,
 }
+
+#[cfg(test)]
+mod tests {
+  use crate::error::simple_json_error_response::simple_json_error_response;
+  use actix_web::http::StatusCode;
+  use actix_http::body::AnyBody;
+
+  #[test]
+  pub fn serialization() {
+    let response = simple_json_error_response(
+      "foo",
+      StatusCode::TOO_MANY_REQUESTS);
+
+    assert_eq!(response.status(), StatusCode::TOO_MANY_REQUESTS);
+
+    let body = response.into_body();
+    match body {
+      AnyBody::Bytes(bytes) => {
+        let bytes = bytes.to_vec();
+        let body = String::from_utf8(bytes).unwrap();
+        assert_eq!(body, "{\"success\":false,\"error_reason\":\"foo\"}");
+      }
+      _ => panic!("this failed"),
+    }
+  }
+}
