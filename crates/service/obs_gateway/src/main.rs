@@ -46,7 +46,9 @@ use r2d2_redis::redis::Commands;
 use sqlx::MySqlPool;
 use sqlx::mysql::MySqlPoolOptions;
 use std::sync::Arc;
+use std::thread::sleep;
 use std::time::Duration;
+use tokio::runtime::Handle;
 use twitch_api2::pubsub::Topic;
 use twitch_api2::pubsub;
 use twitch_oauth2::tokens::UserTokenBuilder;
@@ -157,6 +159,17 @@ async fn main() -> AnyhowResult<()> {
       redis_pubsub_pool,
     }
   };
+
+  info!("Starting thread...");
+
+  let handle = Handle::current();
+
+  handle.spawn_blocking(|| {
+    loop {
+      info!("...thread...");
+      sleep(Duration::from_millis(2000));
+    }
+  });
 
   info!("Starting server...");
 
