@@ -80,30 +80,175 @@ async fn main() -> AnyhowResult<()> {
   let client_id = ClientId::new(&secrets.app_client_id);
   let client_secret = ClientSecret::new(&secrets.app_client_secret);
 
+  info!("Reading env vars and setting up utils...");
 
-  // ========================================================
+  let bind_address = easyenv::get_env_string_or_default("BIND_ADDRESS", DEFAULT_BIND_ADDRESS);
+  let num_workers = easyenv::get_env_num("NUM_WORKERS", 8)?;
+  let hmac_secret = easyenv::get_env_string_or_default("COOKIE_SECRET", "notsecret");
+  let cookie_domain = easyenv::get_env_string_or_default("COOKIE_DOMAIN", ".vo.codes");
+  let cookie_secure = easyenv::get_env_bool_or_default("COOKIE_SECURE", true);
+  let cookie_http_only = easyenv::get_env_bool_or_default("COOKIE_HTTP_ONLY", true);
+  let website_homepage_redirect =
+      easyenv::get_env_string_or_default("WEBSITE_HOMEPAGE_REDIRECT", "https://vo.codes/");
+
+  let oauth_redirect_url = easyenv::get_env_string_or_default(
+    "TWITCH_OAUTH_REDIRECT_URL",
+    "http://localhost:54321/twitch/oauth_redirect");
+
+  // TODO: These are temporary.
+  let temp_oauth_user_id = easyenv::get_env_string_or_default("TEMP_TWITCH_OAUTH_USER_ID", "");
+  let temp_oauth_access_token = easyenv::get_env_string_or_default("TEMP_TWITCH_OAUTH_ACCESS", "");
+  let temp_oauth_refresh_token = easyenv::get_env_string_or_default("TEMP_TWITCH_OAUTH_REFRESH", "");
+
+  let db_connection_string =
+      easyenv::get_env_string_or_default(
+        "MYSQL_URL",
+        DEFAULT_MYSQL_CONNECTION_STRING);
+
+  let redis_connection_string =
+      easyenv::get_env_string_or_default(
+        "REDIS_1_URL",
+        DEFAULT_REDIS_DATABASE_1_CONNECTION_STRING);
+
+  info!("Connecting to mysql...");
+
+  let pool = MySqlPoolOptions::new()
+      .max_connections(5)
+      .connect(&db_connection_string)
+      .await?;
+
+  info!("Connecting to redis...");
+
+  let redis_manager = RedisConnectionManager::new(redis_connection_string.clone())?;
+
+  let redis_pool = r2d2::Pool::builder()
+      .build(redis_manager)?;
+
+  info!("Connecting to pubsub redis...");
+
+  let redis_pubsub_manager = RedisConnectionManager::new(redis_connection_string.clone())?;
+
+  let redis_pubsub_pool = r2d2::Pool::builder()
+      .build(redis_pubsub_manager)?;
+
+  let server_state = ObsGatewayServerState {
+    env_config: EnvConfig {
+      num_workers,
+      bind_address,
+      cookie_domain,
+      cookie_secure,
+      cookie_http_only,
+      website_homepage_redirect,
+    },
+    twitch_oauth_secrets: TwitchOauthSecrets {
+      client_id: secrets.app_client_id.clone(),
+      client_secret: secrets.app_client_secret.clone(),
+      redirect_url: oauth_redirect_url,
+    },
+    twitch_oauth_temp: TwitchOauthTemp {
+      temp_oauth_user_id,
+      temp_oauth_access_token,
+      temp_oauth_refresh_token,
+    },
+    hostname: server_hostname,
+    backends: BackendsConfig {
+      mysql_pool: pool,
+      redis_pool,
+      redis_pubsub_pool,
+    }
+  };
+
+  info!("Starting server...");
+
+  serve(server_state).await?;
+
+  Ok(())
+}
+
+pub async fn serve(server_state: ObsGatewayServerState) -> AnyhowResult<()>
+{
+  let bind_address = server_state.env_config.bind_address.clone();
+  let num_workers = server_state.env_config.num_workers.clone();
+  let hostname = server_state.hostname.clone();
+
+  let server_state_arc = web::Data::new(Arc::new(server_state));
+
+  info!("Starting HTTP service.");
+
+  let log_format = "[%{HOSTNAME}e] %a \"%r\" %s %b \"%{Referer}i\" \"%{User-Agent}i\" %T";
+
+  HttpServer::new(move || {
+    App::new()
+        .app_data(server_state_arc.clone())
+        .wrap(build_common_cors_config())
+        .wrap(Logger::new(&log_format)
+            .exclude("/liveness")
+            .exclude("/readiness"))
+        .wrap(DefaultHeaders::new()
+            .header("X-Backend-Hostname", &hostname)
+            .header("X-Build-Sha", ""))
+        .service(web::resource("/")
+            .route(web::get().to(get_root_index))
+        )
+        // Twitch
+        .service(web::scope("/twitch")
+              .service(web::resource("/oauth_enroll")
+                    .route(web::get().to(oauth_begin_enroll))
+                    .route(web::head().to(|| HttpResponse::Ok()))
+              )
+              .service(web::resource("/oauth_enroll_redirect")
+                  .route(web::get().to(oauth_begin_enroll_redirect))
+                  .route(web::head().to(|| HttpResponse::Ok()))
+              )
+              .service(web::resource("/oauth_redirect")
+                    .route(web::get().to(oauth_end_enroll_from_redirect))
+                    .route(web::head().to(|| HttpResponse::Ok()))
+              )
+        )
+        .service(web::resource("/obs/{twitch_username}")
+            .route(web::get().to(obs_gateway_websocket_handler))
+            .route(web::head().to(|| HttpResponse::Ok()))
+        )
+        .service(
+          actix_files::Files::new("/static", "static")
+              .show_files_listing()
+              .use_last_modified(true),
+        )
+    //.default_service( web::route().to(default_route_404))
+  })
+      .bind(bind_address)?
+      .workers(num_workers)
+      .run()
+      .await?;
+
+  Ok(())
+}
+
+
+
+// ========================================================
 
 // TODO: Temp comment out to debug actix-web vs. runtime
 //
-  info!("Getting app access token...");
+//info!("Getting app access token...");
 
-  //let scopes = Scope::all();
-  let scopes = vec![
-    Scope::BitsRead,
-    Scope::UserReadEmail,
-  ];
+////let scopes = Scope::all();
+//let scopes = vec![
+//  Scope::BitsRead,
+//  Scope::UserReadEmail,
+//];
 
-  let mut twitch_client = TwitchClientWrapper::new(client_id.clone(), client_secret.clone());
-  twitch_client.request_access_token(scopes).await?;
+//let mut twitch_client = TwitchClientWrapper::new(client_id.clone(), client_secret.clone());
+//twitch_client.request_access_token(scopes).await?;
 
-  info!("Getting user id ...");
+//info!("Getting user id ...");
 
-  //let user_id = twitch_client.get_user_id_from_username("testytest512").await?;
-  let user_id = twitch_client.get_user_id_from_username("vocodes").await?;
+////let user_id = twitch_client.get_user_id_from_username("testytest512").await?;
+//let user_id = twitch_client.get_user_id_from_username("vocodes").await?;
 
-  info!("User ID: {}", user_id);
+//info!("User ID: {}", user_id);
 
-  //std::thread::sleep(Duration::from_secs(5000));
+//std::thread::sleep(Duration::from_secs(5000));
 
 
 //  // ==================== OAUTH FLOW ====================
@@ -196,149 +341,3 @@ async fn main() -> AnyhowResult<()> {
 //
 //  let redis_pool = r2d2::Pool::builder()
 //      .build(redis_manager)?;
-
-  info!("Reading env vars and setting up utils...");
-
-  let bind_address = easyenv::get_env_string_or_default("BIND_ADDRESS", DEFAULT_BIND_ADDRESS);
-  let num_workers = easyenv::get_env_num("NUM_WORKERS", 8)?;
-  let hmac_secret = easyenv::get_env_string_or_default("COOKIE_SECRET", "notsecret");
-  let cookie_domain = easyenv::get_env_string_or_default("COOKIE_DOMAIN", ".vo.codes");
-  let cookie_secure = easyenv::get_env_bool_or_default("COOKIE_SECURE", true);
-  let cookie_http_only = easyenv::get_env_bool_or_default("COOKIE_HTTP_ONLY", true);
-  let website_homepage_redirect =
-      easyenv::get_env_string_or_default("WEBSITE_HOMEPAGE_REDIRECT", "https://vo.codes/");
-
-  let oauth_redirect_url = easyenv::get_env_string_or_default(
-    "TWITCH_OAUTH_REDIRECT_URL",
-    "http://localhost:54321/twitch/oauth_redirect");
-
-  // TODO: These are temporary.
-  let temp_oauth_user_id = easyenv::get_env_string_or_default("TEMP_TWITCH_OAUTH_USER_ID", "");
-  let temp_oauth_access_token = easyenv::get_env_string_or_default("TEMP_TWITCH_OAUTH_ACCESS", "");
-  let temp_oauth_refresh_token = easyenv::get_env_string_or_default("TEMP_TWITCH_OAUTH_REFRESH", "");
-
-  let db_connection_string =
-      easyenv::get_env_string_or_default(
-        "MYSQL_URL",
-        DEFAULT_MYSQL_CONNECTION_STRING);
-
-  let redis_connection_string =
-      easyenv::get_env_string_or_default(
-        "REDIS_1_URL",
-        DEFAULT_REDIS_DATABASE_1_CONNECTION_STRING);
-
-  info!("Connecting to mysql...");
-
-  let pool = MySqlPoolOptions::new()
-      .max_connections(5)
-      .connect(&db_connection_string)
-      .await?;
-
-  info!("Connecting to redis...");
-
-  let redis_manager = RedisConnectionManager::new(redis_connection_string.clone())?;
-
-  let redis_pool = r2d2::Pool::builder()
-      .build(redis_manager)?;
-
-  info!("Connecting to pubsub redis...");
-
-  let redis_pubsub_manager = RedisConnectionManager::new(redis_connection_string.clone())?;
-
-  let redis_pubsub_pool = r2d2::Pool::builder()
-      .build(redis_pubsub_manager)?;
-
-  // NB: Compiler can't figure out throwaway return type
-  let key = "hi-database-1".to_string();
-  let _r : String = redis_pool.get().unwrap().set(&key, "bar").unwrap();
-
-  let server_state = ObsGatewayServerState {
-    env_config: EnvConfig {
-      num_workers,
-      bind_address,
-      cookie_domain,
-      cookie_secure,
-      cookie_http_only,
-      website_homepage_redirect,
-    },
-    twitch_oauth_secrets: TwitchOauthSecrets {
-      client_id: secrets.app_client_id.clone(),
-      client_secret: secrets.app_client_secret.clone(),
-      redirect_url: oauth_redirect_url,
-    },
-    twitch_oauth_temp: TwitchOauthTemp {
-      temp_oauth_user_id,
-      temp_oauth_access_token,
-      temp_oauth_refresh_token,
-    },
-    hostname: server_hostname,
-    backends: BackendsConfig {
-      mysql_pool: pool,
-      redis_pool,
-      redis_pubsub_pool,
-    }
-  };
-
-  serve(server_state)
-      .await?;
-  Ok(())
-}
-
-pub async fn serve(server_state: ObsGatewayServerState) -> AnyhowResult<()>
-{
-  let bind_address = server_state.env_config.bind_address.clone();
-  let num_workers = server_state.env_config.num_workers.clone();
-  let hostname = server_state.hostname.clone();
-
-  let server_state_arc = web::Data::new(Arc::new(server_state));
-
-  info!("Starting HTTP service.");
-
-  let log_format = "[%{HOSTNAME}e] %a \"%r\" %s %b \"%{Referer}i\" \"%{User-Agent}i\" %T";
-
-  HttpServer::new(move || {
-    App::new()
-        .app_data(server_state_arc.clone())
-        .wrap(build_common_cors_config())
-        .wrap(Logger::new(&log_format)
-            .exclude("/liveness")
-            .exclude("/readiness"))
-        .wrap(DefaultHeaders::new()
-            .header("X-Backend-Hostname", &hostname)
-            .header("X-Build-Sha", ""))
-        .service(web::resource("/")
-            .route(web::get().to(get_root_index))
-        )
-        // Twitch
-        .service(web::scope("/twitch")
-              .service(web::resource("/oauth_enroll")
-                    .route(web::get().to(oauth_begin_enroll))
-                    .route(web::head().to(|| HttpResponse::Ok()))
-              )
-              .service(web::resource("/oauth_enroll_redirect")
-                  .route(web::get().to(oauth_begin_enroll_redirect))
-                  .route(web::head().to(|| HttpResponse::Ok()))
-              )
-              .service(web::resource("/oauth_redirect")
-                    .route(web::get().to(oauth_end_enroll_from_redirect))
-                    .route(web::head().to(|| HttpResponse::Ok()))
-              )
-        )
-        .service(web::resource("/obs/{twitch_username}")
-            .route(web::get().to(obs_gateway_websocket_handler))
-            .route(web::head().to(|| HttpResponse::Ok()))
-        )
-        .service(
-          actix_files::Files::new("/static", "static")
-              .show_files_listing()
-              .use_last_modified(true),
-        )
-    //.default_service( web::route().to(default_route_404))
-  })
-      .bind(bind_address)?
-      .workers(num_workers)
-      .run()
-      .await?;
-
-  Ok(())
-}
