@@ -77,7 +77,7 @@ pub async fn obs_gateway_websocket_handler(
         CommonServerError::ServerError
       })?;
 
-  let channel = RedisKeys::obs_session_active_topic();
+  let channel = RedisKeys::obs_active_session_topic();
 
   let _count_received : Option<u64> = redis.publish(channel, &token_record.twitch_user_id)
       .map_err(|e| {
@@ -226,7 +226,7 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for ObsGatewayWebSock
             CommonServerError::ServerError
           }).unwrap(); // TODO: FIXME
 
-      let channel = RedisKeys::obs_session_active_topic();
+      let channel = RedisKeys::obs_active_session_topic();
 
       let _count_received : Option<u64> = redis.publish(channel, self.twitch_user_id)
           .map_err(|e| {

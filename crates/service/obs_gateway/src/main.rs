@@ -15,6 +15,7 @@
 pub mod endpoints;
 pub mod endpoints_ws;
 pub mod server_state;
+pub mod redis;
 pub mod threads;
 pub mod twitch;
 pub mod util;

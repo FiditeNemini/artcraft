@@ -47,7 +47,21 @@ impl RedisKeys {
 
   /// This is a PubSub topic.
   /// We publish when new viewers arrive and as a "keep-alive ping".
-  pub fn obs_session_active_topic() -> &'static str {
-    "obsSessionActive"
+  pub fn obs_active_session_topic() -> &'static str {
+    "obsActiveSessionTopic"
+  }
+
+  /// This is a key that denotes a PubSub lease subscriber.
+  /// Only one thread should be PubSub subscribed to any given user at a time.
+  /// These keys should have a TTL so that they naturally expire without maintenance.
+  pub fn twitch_pubsub_lease(twitch_user_id: &str) -> String {
+    format!("twitchPubsubLease:{}", twitch_user_id)
+  }
+
+  /// This is a PubSub topic.
+  /// These are "unenriched" Twitch events from the PubSub (and eventually IRC)
+  /// subscribers. Downstream listeners will enrich these for user-facing functionality.
+  pub fn twitchEventTopic(twitch_user_id: &str) -> String {
+    format!("twitchEventTopic:{}", twitch_user_id)
   }
 }

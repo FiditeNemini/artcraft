@@ -27,7 +27,9 @@ use r2d2_redis::RedisConnectionManager;
 use std::sync::Arc;
 use r2d2_redis::r2d2::Pool;
 use redis_common::redis_keys::RedisKeys;
+use crate::threads::listen_for_active_obs_sessions_thread::listen_for_active_obs_session_thread;
 
+pub mod redis;
 pub mod threads;
 pub mod twitch;
 pub mod util;
@@ -84,7 +86,8 @@ pub async fn main() -> AnyhowResult<()> {
 
   //runtime.spawn(watch_user_thread(10));
   //runtime.spawn(watch_user_thread(9999));
-  runtime.spawn(listen_for_subscriptions_thread(redis_pubsub_pool, runtime_2));
+  runtime.spawn(listen_for_active_obs_session_thread(
+    redis_pubsub_pool, runtime_2));
 
   loop {
     sleep(Duration::from_millis(10_000));
@@ -104,46 +107,3 @@ pub async fn watch_user_thread(user_id: u32) {
   }
 }
 
-pub async fn listen_for_subscriptions_thread(
-  redis_pool: Arc<Pool<RedisConnectionManager>>,
-  runtime: Arc<Runtime>,
-) {
-
-  // TODO: ERROR HANDLING
-  let mut pool = redis_pool.get().unwrap();
-  let mut pubsub = pool.as_pubsub();
-  let channel = RedisKeys::obs_session_active_topic();
-  pubsub.subscribe(channel).unwrap();
-
-  let mut count = 0;
-
-  //loop {
-  //  let payload : String = try!(msg.get_payload());
-  //  println!("channel '{}': {}", msg.get_channel_name(), payload);
-  //}
-
-  loop {
-    info!("[PubSub]");
-
-    let message = pubsub.get_message().unwrap();
-    let payload : String = message.get_payload().unwrap();
-
-    info!("Message: {}", payload);
-
-    if count < 3 {
-      info!("Spawning....");
-
-      let count2 = count;
-
-      runtime.spawn(async move {
-        let count3 = count2;
-        loop {
-          info!(".....spawned..... {}", count3);
-          sleep(Duration::from_millis(1_000));
-        }
-      });
-    }
-
-    count += 1;
-  }
-}
