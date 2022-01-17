@@ -192,12 +192,26 @@ function TtsModelListFc(props: Props) {
 
       <section className="hero is-small">
         <div className="hero-body">
-          <p className="title">
-            Text to Speech
-          </p>
-          <p className="subtitle">
-            Use <strong>FakeYou</strong> deep fake tech to say stuff with your favorite characters.
-          </p>
+
+          <div className="columns is-vcentered">
+
+            <div className="column is-one-third">
+              <div className="mascot">
+                <img src="/mascot/kitsune_pose2_black_2000.webp" alt="FakeYou's mascot!" />
+              </div>
+            </div>
+
+            <div className="column">
+              <p className="title">
+                Text to Speech
+              </p>
+              <p className="subtitle">
+                Use <strong>FakeYou</strong> deep fake tech to say stuff with your favorite characters.
+              </p>
+            </div>
+
+          </div>
+
         </div>
       </section>
 
@@ -251,10 +265,10 @@ function TtsModelListFc(props: Props) {
         <div className="button-group">
           <div className="columns is-mobile">
             <div className="column has-text-centered">
-              <button className="button is-info is-large" disabled={remainingCharactersButtonDisabled}>Speak</button>
+              <button className="button is-danger is-large" disabled={remainingCharactersButtonDisabled}>Speak</button>
             </div>
             <div className="column has-text-centered">
-              <button className="button is-info is-light is-large" onClick={handleClearClick}>Clear</button>
+              <button className="button is-danger is-light is-large" onClick={handleClearClick}>Clear</button>
             </div>
           </div>
         </div>
