@@ -62,28 +62,25 @@ function NewTopNavFc(props: Props) {
 
               <Link to="/contribute"
                 className="navbar-item"
-                >Contribute</Link>
-
-              <Link to="/firehose"
-                className="navbar-item"
-                >Feed</Link>
-
-              <Link to={FrontendUrlConfig.patronsPage()}
-                className="navbar-item"
-                >Patrons</Link>
+                >Contribute / Upload</Link>
 
               <Link to="/leaderboard"
                 className="navbar-item"
                 >Leaderboard</Link>
 
+              <Link to={FrontendUrlConfig.patronsPage()}
+                className="navbar-item"
+                >Patrons</Link>
+
+              <Link to="/firehose"
+                className="navbar-item"
+                >Feed</Link>
 
               <hr className="navbar-divider" />
 
               <Link to={myDataLink}
                 className="navbar-item is-active"
                 >My Data</Link>
-
-
             </div>
           </div>
         </div>
