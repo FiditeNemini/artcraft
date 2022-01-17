@@ -23,6 +23,7 @@ function MigrationTopNav(props: Props) {
         sessionWrapper={props.sessionWrapper}
         enableAlpha={props.enableAlpha}
         querySessionAction={props.querySessionAction}
+        closeHamburgerAction={() => {}} // No-op
         />
     </nav>
   )

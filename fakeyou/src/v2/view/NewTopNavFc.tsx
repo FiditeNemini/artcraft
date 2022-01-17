@@ -25,81 +25,96 @@ function NewTopNavFc(props: Props) {
     setMobileHamburgerIsActive(!mobileHamburgerIsActive);
   }
 
+  const closeHamburger = () => { 
+    // TODO: This is an ergonomic hack. 
+    // The hamburger ideally should close whenever it is no longer active.
+    setMobileHamburgerIsActive(false);
+  }
+
   const navbarClasses = mobileHamburgerIsActive ? "navbar-menu is-active" : "navbar-menu";
   const navbarBurgerClasses = mobileHamburgerIsActive ? "navbar-burger is-active" : "navbar-burger";
 
   return (
     <>
-    <nav className="navbar is-transparent padding-bottom-1em">
-      <div className="navbar-brand">
-        <Link className="navbar-item" to="/">
-          <img src="/fakeyou/fakeyou-nav-logo.png" alt="FakeYou: Cartoon and Celebrity Text to Speech" />
-        </Link>
-        <div className={navbarBurgerClasses} data-target="navbarExampleTransparentExample" onClick={() => toggleHamburger()}>
-          <span></span>
-          <span></span>
-          <span></span>
+      <nav className="navbar is-transparent padding-bottom-1em">
+        <div className="navbar-brand">
+          <Link className="navbar-item" to="/">
+            <img src="/fakeyou/fakeyou-nav-logo.png" alt="FakeYou: Cartoon and Celebrity Text to Speech" />
+          </Link>
+          <div className={navbarBurgerClasses} data-target="navbarExampleTransparentExample" onClick={() => toggleHamburger()}>
+            <span></span>
+            <span></span>
+            <span></span>
+          </div>
         </div>
-      </div>
 
-      <div id="navbarExampleTransparentExample" className={navbarClasses}>
-        <div className="navbar-start">
+        <div id="navbarExampleTransparentExample" className={navbarClasses}>
+          <div className="navbar-start">
 
-          <Link to="/"
-            className="navbar-item"
-            >TTS</Link>
+            <Link to="/"
+              className="navbar-item"
+              onClick={() => closeHamburger()}
+              >TTS</Link>
 
-          <Link to="/video"
-            className="navbar-item"
-            >Video</Link>
+            <Link to="/video"
+              className="navbar-item"
+              onClick={() => closeHamburger()}
+              >Video</Link>
 
-          <div className="navbar-item has-dropdown is-hoverable">
-            <Link to={myDataLink}
-              className="navbar-link"
-              >Community</Link>
-
-            <div className="navbar-dropdown is-boxed">
-
-              <Link to="/contribute"
-                className="navbar-item"
-                >Contribute / Upload</Link>
-
-              <Link to="/leaderboard"
-                className="navbar-item"
-                >Leaderboard</Link>
-
-              <Link to={FrontendUrlConfig.patronsPage()}
-                className="navbar-item"
-                >Patrons</Link>
-
-              <Link to="/firehose"
-                className="navbar-item"
-                >Feed</Link>
-
-              <hr className="navbar-divider" />
-
+            <div className="navbar-item has-dropdown is-hoverable">
               <Link to={myDataLink}
-                className="navbar-item is-active"
-                >My Data</Link>
-            </div>
-          </div>
-        </div>
+                className="navbar-link"
+                onClick={() => closeHamburger()}
+                >Community</Link>
 
-        <div className="navbar-end">
-          <div className="navbar-item">
-            <div className="field is-grouped">
-              <p className="control">
-                <MigrationTopNavSession
-                  sessionWrapper={props.sessionWrapper}
-                  enableAlpha={true}
-                  querySessionAction={props.querySessionCallback}
-                  />
-              </p>
+              <div className="navbar-dropdown is-boxed">
+
+                <Link to="/contribute"
+                  className="navbar-item"
+                  onClick={() => closeHamburger()}
+                  >Contribute / Upload</Link>
+
+                <Link to="/leaderboard"
+                  className="navbar-item"
+                  onClick={() => closeHamburger()}
+                  >Leaderboard</Link>
+
+                <Link to={FrontendUrlConfig.patronsPage()}
+                  className="navbar-item"
+                  onClick={() => closeHamburger()}
+                  >Patrons</Link>
+
+                <Link to="/firehose"
+                  className="navbar-item"
+                  onClick={() => closeHamburger()}
+                  >Feed</Link>
+
+                <hr className="navbar-divider" />
+
+                <Link to={myDataLink}
+                  className="navbar-item is-active"
+                  onClick={() => closeHamburger()}
+                  >My Data</Link>
+              </div>
+            </div>
+          </div>
+
+          <div className="navbar-end">
+            <div className="navbar-item">
+              <div className="field is-grouped">
+                <p className="control">
+                  <MigrationTopNavSession
+                    sessionWrapper={props.sessionWrapper}
+                    enableAlpha={true}
+                    querySessionAction={props.querySessionCallback}
+                    closeHamburgerAction={() => closeHamburger()}
+                    />
+                </p>
+              </div>
             </div>
           </div>
         </div>
-      </div>
-    </nav>
+      </nav>
     </>
   )
 }

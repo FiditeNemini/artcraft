@@ -7,6 +7,7 @@ interface Props {
   sessionWrapper: SessionWrapper,
   enableAlpha: boolean,
   querySessionAction: () => void,
+  closeHamburgerAction: () => void,
 }
 
 function MigrationTopNavSession(props: Props) {
@@ -62,18 +63,23 @@ function MigrationTopNavSession(props: Props) {
     sessionLink = (
       <Link
         to={url}
+        onClick={() => props.closeHamburgerAction()}
         className="button is-alert is-inverted is-pulled-right"
         > {gravatar}&nbsp; {displayName}</Link>
     );
     logoutLink = <button
         className="button is-alert is-inverted is-pulled-right"
-        onClick={logoutHandler}
+        onClick={() => {
+          logoutHandler();
+          props.closeHamburgerAction();
+        }}
       >Logout</button>;
   } else {
     sessionLink = (
       <Link
         to="/signup"
         className="button is-danger is-pulled-right"
+        onClick={() => props.closeHamburgerAction()}
         >Sign Up / Login</Link>
     );
   }
