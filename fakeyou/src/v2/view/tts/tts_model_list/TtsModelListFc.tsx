@@ -205,7 +205,7 @@ function TtsModelListFc(props: Props) {
 
       {vocodesNotice}
 
-      <form onSubmit={handleFormSubmit}>
+      <form onSubmit={handleFormSubmit} className="main-form">
 
         <MultiDropdownSearch 
           allTtsCategories={props.allTtsCategories} 
