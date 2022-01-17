@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { SessionWrapper } from '../../session/SessionWrapper';
 import { Link } from 'react-router-dom';
 import { MigrationTopNavSession } from '../../migration/MigrationTopNav_Session';
+import { FrontendUrlConfig } from '../../common/FrontendUrlConfig';
 
 interface Props {
   sessionWrapper: SessionWrapper,
@@ -67,6 +68,10 @@ function NewTopNavFc(props: Props) {
                 className="navbar-item"
                 >Feed</Link>
 
+              <Link to={FrontendUrlConfig.patronsPage()}
+                className="navbar-item"
+                >Patrons</Link>
+
               <Link to="/leaderboard"
                 className="navbar-item"
                 >Leaderboard</Link>
@@ -98,46 +103,6 @@ function NewTopNavFc(props: Props) {
         </div>
       </div>
     </nav>
-
-    {/*
-    <nav>
-      <div className="columns">
-        <div className="column">
-          <Link to="/"
-            className="button is-link is-medium is-inverted"
-            >TTS</Link>
-        </div>
-        <div className="column">
-          <Link to="/video"
-            className="button is-link is-medium is-inverted"
-            >Video</Link>
-        </div>
-        <div className="column">
-          <Link to="/contribute"
-            className="button is-link is-medium is-inverted"
-            >Contribute</Link>
-        </div>
-        <div className="column">
-          <Link to={myDataLink}
-            className="button is-link is-medium is-inverted"
-            >My Data</Link>
-        </div>
-        <div className="column">
-          <Link to="/firehose"
-            className="button is-link is-medium is-inverted"
-            >Feed</Link>
-        </div>
-        <div className="column">
-          <Link to="/leaderboard"
-            className="button is-link is-medium is-inverted"
-            >Leaderboard</Link>
-        </div>
-      </div>
-      <hr />
-
-
-    </nav>
-    */}
     </>
   )
 }

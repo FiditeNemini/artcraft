@@ -48,6 +48,7 @@ import { ModerationTtsCategoryListPage } from './moderation/categories/Moderatio
 import { ModerationTtsCategoryEditPage } from './moderation/categories/ModerationTtsCategoryEditPage';
 import { ModerationCategoryDeletePage } from './moderation/categories/ModerationCategoryDeletePage';
 import { TtsCategoryType } from '../../AppWrapper';
+import { PatronPage } from './patrons/PatronPage';
 
 interface Props {
   sessionWrapper: SessionWrapper,
@@ -354,6 +355,12 @@ class NewVocodesContainer extends React.Component<Props, State> {
 
             <Route path="/moderation">
               <ModerationFc
+                sessionWrapper={this.props.sessionWrapper}
+              />
+            </Route>
+
+            <Route path="/patrons">
+              <PatronPage
                 sessionWrapper={this.props.sessionWrapper}
               />
             </Route>

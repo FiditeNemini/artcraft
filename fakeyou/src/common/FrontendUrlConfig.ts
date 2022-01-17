@@ -93,6 +93,12 @@ class FrontendUrlConfig {
   static createCategoryPage(): string {
     return '/category/create';
   }
+
+  // Patrons
+
+  static patronsPage() : string {
+    return '/patrons';
+  }
   
   // Moderation links
 

@@ -7,6 +7,7 @@
 /login*   /index.html   200
 /moderation*   /index.html   200
 /old*   /index.html   200
+/patrons*   /index.html   200
 /pending*   /index.html   200
 /profile*   /index.html   200
 /signup*   /index.html   200
