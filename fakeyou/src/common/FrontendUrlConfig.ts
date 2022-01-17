@@ -2,8 +2,20 @@
 /** Centralize URL configurations (apart from bindings) */
 class FrontendUrlConfig {
 
+  // Main
+
   static indexPage() : string {
     return '/';
+  }
+
+  // Standalone pages
+
+  static aboutUsPage() : string {
+    return '/about';
+  }
+  
+  static patronsPage() : string {
+    return '/patrons';
   }
 
   // TTS model links
@@ -94,12 +106,6 @@ class FrontendUrlConfig {
     return '/category/create';
   }
 
-  // Patrons
-
-  static patronsPage() : string {
-    return '/patrons';
-  }
-  
   // Moderation links
 
   static moderationMain() : string {

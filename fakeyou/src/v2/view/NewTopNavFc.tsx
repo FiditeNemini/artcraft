@@ -3,6 +3,9 @@ import { SessionWrapper } from '../../session/SessionWrapper';
 import { Link } from 'react-router-dom';
 import { MigrationTopNavSession } from '../../migration/MigrationTopNav_Session';
 import { FrontendUrlConfig } from '../../common/FrontendUrlConfig';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faGrinBeamSweat, faList, faTrophy, faUpload, faUser } from '@fortawesome/free-solid-svg-icons';
+import { faPatreon } from '@fortawesome/free-brands-svg-icons';
 
 interface Props {
   sessionWrapper: SessionWrapper,
@@ -68,33 +71,42 @@ function NewTopNavFc(props: Props) {
                 >Community</Link>
 
               <div className="navbar-dropdown is-boxed">
+                {/* NB: There's an "is-active" class that looks nice. */}
 
                 <Link to="/contribute"
                   className="navbar-item"
                   onClick={() => closeHamburger()}
-                  >Contribute / Upload</Link>
+                  ><FontAwesomeIcon icon={faUpload} />&nbsp;&nbsp;Contribute / Upload</Link>
 
                 <Link to="/leaderboard"
                   className="navbar-item"
                   onClick={() => closeHamburger()}
-                  >Leaderboard</Link>
+                  ><FontAwesomeIcon icon={faTrophy} />&nbsp;&nbsp;Leaderboard</Link>
 
                 <Link to={FrontendUrlConfig.patronsPage()}
                   className="navbar-item"
                   onClick={() => closeHamburger()}
-                  >Patrons</Link>
+                  ><FontAwesomeIcon icon={faPatreon}/>&nbsp;&nbsp;Patrons</Link>
 
                 <Link to="/firehose"
                   className="navbar-item"
                   onClick={() => closeHamburger()}
-                  >Feed</Link>
+                  ><FontAwesomeIcon icon={faList} />&nbsp;&nbsp;Feed</Link>
 
                 <hr className="navbar-divider" />
 
                 <Link to={myDataLink}
-                  className="navbar-item is-active"
+                  className="navbar-item"
                   onClick={() => closeHamburger()}
-                  >My Data</Link>
+                  ><FontAwesomeIcon icon={faUser} />&nbsp;&nbsp;My Data</Link>
+
+                <hr className="navbar-divider" />
+
+                <Link to={FrontendUrlConfig.aboutUsPage()}
+                  className="navbar-item"
+                  onClick={() => closeHamburger()}
+                  ><FontAwesomeIcon icon={faGrinBeamSweat} />&nbsp;&nbsp;About Us</Link>
+
               </div>
             </div>
           </div>
