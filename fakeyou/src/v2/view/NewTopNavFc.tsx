@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 import { MigrationTopNavSession } from '../../migration/MigrationTopNav_Session';
 import { FrontendUrlConfig } from '../../common/FrontendUrlConfig';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faGrinBeamSweat, faList, faTrophy, faUpload, faUser } from '@fortawesome/free-solid-svg-icons';
+import { faGavel, faGrinBeamSweat, faList, faTrophy, faUpload, faUser } from '@fortawesome/free-solid-svg-icons';
 import { faPatreon } from '@fortawesome/free-brands-svg-icons';
 
 interface Props {
@@ -106,6 +106,11 @@ function NewTopNavFc(props: Props) {
                   className="navbar-item"
                   onClick={() => closeHamburger()}
                   ><FontAwesomeIcon icon={faGrinBeamSweat} />&nbsp;&nbsp;About Us</Link>
+
+                <Link to={FrontendUrlConfig.termsPage()}
+                  className="navbar-item"
+                  onClick={() => closeHamburger()}
+                  ><FontAwesomeIcon icon={faGavel} />&nbsp;&nbsp;Terms</Link>
 
               </div>
             </div>

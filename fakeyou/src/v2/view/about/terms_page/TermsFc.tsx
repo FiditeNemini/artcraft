@@ -6,7 +6,33 @@ interface Props {
 function TermsFc(props: Props) {
   return (
     <div className="content is-medium">
-      <h1 className="">Terms of Use</h1>
+
+      <section className="hero is-small">
+        <div className="hero-body">
+
+          <div className="columns is-vcentered">
+
+            <div className="column is-one-third">
+              <div className="mascot">
+                <img src="/mascot/kitsune_pose1_black_2000.webp" alt="FakeYou Kitsune Mascot!" />
+              </div>
+            </div>
+
+            <div className="column">
+              <p className="title">
+                Terms and Conditions
+              </p>
+              <p className="subtitle">
+                Please use this technology responsibly.
+              </p>
+            </div>
+
+          </div>
+
+        </div>
+      </section>
+
+      <h1 className="title is-4">Terms of Use</h1>
 
       <p>
         We do not condone the use of FakeYou for any type of deception, slur, 

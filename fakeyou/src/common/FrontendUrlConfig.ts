@@ -14,6 +14,10 @@ class FrontendUrlConfig {
     return '/about';
   }
   
+  static termsPage() : string {
+    return '/terms';
+  }
+  
   static patronsPage() : string {
     return '/patrons';
   }
