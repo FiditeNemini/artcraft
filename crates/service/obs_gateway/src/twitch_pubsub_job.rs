@@ -22,7 +22,7 @@ use std::time::Duration;
 use crate::twitch::twitch_client_wrapper::TwitchClientWrapper;
 use crate::twitch::websocket_client::TwitchWebsocketClient;
 use futures::task::SpawnExt;
-use tokio::runtime::Builder;
+use tokio::runtime::{Builder, Runtime};
 use r2d2_redis::RedisConnectionManager;
 use std::sync::Arc;
 use r2d2_redis::r2d2::Pool;
@@ -67,11 +67,24 @@ pub async fn main() -> AnyhowResult<()> {
       .enable_all()
       .build()?;
 
+  let runtime = Arc::new(runtime);
+  //let runtime_2 = runtime.clone();
+
+  // https://docs.rs/tokio/latest/tokio/runtime/struct.Builder.html
+  let runtime_2 = Builder::new_multi_thread()
+      .worker_threads(4)
+      .thread_name("twitch-pubsub-")
+      .thread_stack_size(3 * 1024 * 1024)
+      .enable_all()
+      .build()?;
+
+  let runtime_2 = Arc::new(runtime_2);
+
   info!("Thread pool created");
 
   //runtime.spawn(watch_user_thread(10));
   //runtime.spawn(watch_user_thread(9999));
-  runtime.spawn(listen_for_subscriptions_thread(redis_pubsub_pool));
+  runtime.spawn(listen_for_subscriptions_thread(redis_pubsub_pool, runtime_2));
 
   loop {
     sleep(Duration::from_millis(10_000));
@@ -91,7 +104,10 @@ pub async fn watch_user_thread(user_id: u32) {
   }
 }
 
-pub async fn listen_for_subscriptions_thread(redis_pool: Arc<Pool<RedisConnectionManager>>) {
+pub async fn listen_for_subscriptions_thread(
+  redis_pool: Arc<Pool<RedisConnectionManager>>,
+  runtime: Arc<Runtime>,
+) {
 
   // TODO: ERROR HANDLING
   let mut pool = redis_pool.get().unwrap();
@@ -99,15 +115,35 @@ pub async fn listen_for_subscriptions_thread(redis_pool: Arc<Pool<RedisConnectio
   let channel = RedisKeys::obs_session_active_topic();
   pubsub.subscribe(channel).unwrap();
 
+  let mut count = 0;
+
   //loop {
   //  let payload : String = try!(msg.get_payload());
   //  println!("channel '{}': {}", msg.get_channel_name(), payload);
   //}
 
   loop {
-    info!("PubSub");
+    info!("[PubSub]");
+
     let message = pubsub.get_message().unwrap();
     let payload : String = message.get_payload().unwrap();
+
     info!("Message: {}", payload);
+
+    if count < 3 {
+      info!("Spawning....");
+
+      let count2 = count;
+
+      runtime.spawn(async move {
+        let count3 = count2;
+        loop {
+          info!(".....spawned..... {}", count3);
+          sleep(Duration::from_millis(1_000));
+        }
+      });
+    }
+
+    count += 1;
   }
 }
