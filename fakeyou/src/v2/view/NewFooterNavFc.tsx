@@ -28,10 +28,6 @@ function NewFooterNavFc(props: Props) {
 
       <div className="content has-text-centered">
         <p>
-          <Link to="/about">About Us</Link>
-          &nbsp;|
-          <Link to="/terms">Terms of Use</Link>
-          &nbsp;|
           <Link to="/">Text to Speech</Link>
           &nbsp;|
           <Link to="/video">Video</Link>
@@ -43,6 +39,10 @@ function NewFooterNavFc(props: Props) {
           <Link to={FrontendUrlConfig.patronsPage()}>Patrons</Link>
           &nbsp;|
           <Link to="/firehose">Feed</Link>
+          &nbsp;|
+          <Link to="/about">About Us</Link>
+          &nbsp;|
+          <Link to="/terms">Terms of Use</Link>
         </p>
 
 
