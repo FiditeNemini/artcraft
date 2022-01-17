@@ -6,7 +6,34 @@ interface Props {
 function AboutFc(props: Props) {
   return (
     <div className="content is-medium">
-      <h1 className="">About FakeYou</h1>
+
+      <section className="hero is-small">
+        <div className="hero-body">
+
+          <div className="columns is-vcentered">
+
+            <div className="column is-one-third">
+              <div className="mascot">
+                <img src="/mascot/kitsune_pose3_black_2000.webp" alt="FakeYou Kitsune Mascot!" />
+              </div>
+            </div>
+
+            <div className="column">
+              <p className="title">
+                A Glimpse of the Future
+              </p>
+              <p className="subtitle">
+                We're building <strong>FakeYou</strong> as just one component of a 
+                broad set of production and creative tooling.
+              </p>
+            </div>
+
+          </div>
+
+        </div>
+      </section>
+
+      <h1 className="title is-4">About FakeYou</h1>
 
       <p>
         Your brain was already capable of imagining things spoken in other people's voices. This is
