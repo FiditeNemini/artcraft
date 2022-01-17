@@ -49,6 +49,7 @@ import { ModerationTtsCategoryEditPage } from './moderation/categories/Moderatio
 import { ModerationCategoryDeletePage } from './moderation/categories/ModerationCategoryDeletePage';
 import { TtsCategoryType } from '../../AppWrapper';
 import { PatronPage } from './patrons/PatronPage';
+import ScrollToTop from './_common/ScrollToTop';
 
 interface Props {
   sessionWrapper: SessionWrapper,
@@ -117,6 +118,8 @@ class NewVocodesContainer extends React.Component<Props, State> {
             sessionWrapper={this.props.sessionWrapper}
             querySessionCallback={this.props.querySessionAction}
             />
+
+          <ScrollToTop />
 
           <Switch>
             <Route path="/firehose">
