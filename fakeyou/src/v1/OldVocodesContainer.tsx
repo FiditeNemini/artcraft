@@ -17,6 +17,10 @@ import { VideoQueuePoller } from './modes/video/VideoQueuePoller';
 import { VideoQueueStats } from './modes/video/VideoQueueStats';
 import { ApiConfig } from '../common/ApiConfig';
 import { SessionStateResponse } from './api/SessionState';
+import { Link } from 'react-router-dom';
+import { FrontendUrlConfig } from '../common/FrontendUrlConfig';
+import { DiscordLink } from '../v2/view/_common/DiscordLink';
+import { PatreonLink } from '../v2/view/_common/PatreonLink';
 
 interface Props {
   // Certan browsers (iPhone) have pitiful support for drawing APIs. Worse yet,
@@ -425,6 +429,16 @@ class OldVocodesContainer extends React.Component<Props, State> {
             switchModeCallback={this.switchMode}
             logoutHandler={this.logoutSession}
             />
+          
+          <div className="notification is-danger">
+            <strong>Old Vocodes is down until February 1st.</strong>
+            <p>We're working really hard on new features, but we'll bring back the Old Vocodes (GlowTTS) voices soon.</p>
+            <p>Please use the main <Link to={FrontendUrlConfig.indexPage()}>FakeYou website</Link> for now.</p>
+            <p>If you want to support us, please 
+              <DiscordLink text="join our Discord" iconAfterText={true} /> or 
+              <PatreonLink text="support us on Patreon" iconAfterText={true} /></p>
+          </div>
+
           {component}
         </div>
         <Footer mode={this.state.mode} switchModeCallback={this.switchMode} />
