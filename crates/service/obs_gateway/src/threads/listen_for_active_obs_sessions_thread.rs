@@ -1,8 +1,11 @@
+use crate::redis::lease_payload::LeasePayload;
+use crate::redis::obs_active_payload::ObsActivePayload;
 use log::error;
 use log::info;
 use log::warn;
 use r2d2_redis::RedisConnectionManager;
 use r2d2_redis::r2d2::Pool;
+use r2d2_redis::redis::Commands;
 use redis_common::redis_keys::RedisKeys;
 use std::sync::Arc;
 use std::thread::sleep;
@@ -11,12 +14,13 @@ use tokio::runtime::Runtime;
 
 pub async fn listen_for_active_obs_session_thread(
   redis_pool: Arc<Pool<RedisConnectionManager>>,
+  redis_pubsub_pool: Arc<Pool<RedisConnectionManager>>,
   runtime: Arc<Runtime>,
 ) {
 
   // TODO: ERROR HANDLING
-  let mut pool = redis_pool.get().unwrap();
-  let mut pubsub = pool.as_pubsub();
+  let mut pubsub_pool = redis_pubsub_pool.get().unwrap();
+  let mut pubsub = pubsub_pool.as_pubsub();
   let channel = RedisKeys::obs_active_session_topic();
   pubsub.subscribe(channel).unwrap();
 
@@ -30,10 +34,38 @@ pub async fn listen_for_active_obs_session_thread(
   loop {
     info!("[PubSub]");
 
+    // TODO: ERROR HANDLING
     let message = pubsub.get_message().unwrap();
     let payload : String = message.get_payload().unwrap();
 
     info!("Message: {}", payload);
+
+    let payload = ObsActivePayload::from_json_str(&payload).unwrap();
+
+    info!("Message decoded: {:?}", payload);
+
+    let lease_key = RedisKeys::twitch_pubsub_lease(&payload.twitch_user_id);
+
+    let mut redis = redis_pool.get().unwrap();
+
+    let lease_value : Option<String> = redis.get(&lease_key).unwrap();
+
+    if let Some(value) = lease_value.as_deref() {
+      info!("Already has lease.");
+      let lease = LeasePayload::deserialize(value).unwrap();
+
+      info!("Lease value: {:?}", &lease);
+    } else {
+      info!("No existing lease...");
+
+      let lease = LeasePayload::new("foo", "bar");
+
+      let serialized = lease.serialize();
+      let _v : Option<String> = redis.set(&lease_key, &serialized).unwrap();
+    }
+
+
+
 
     // Publish: (ActiveSession, user_id)
     //  - On: First connect
@@ -70,6 +102,8 @@ pub async fn listen_for_active_obs_session_thread(
     // frontend --> lease key
     //   -- no, frontend won't know about disconnects, just drought of events
 
+/*
+    THIS WORKS
     if count < 3 {
       info!("Spawning....");
 
@@ -85,5 +119,6 @@ pub async fn listen_for_active_obs_session_thread(
     }
 
     count += 1;
+ */
   }
 }

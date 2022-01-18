@@ -5,6 +5,7 @@ use actix_web::{middleware, web, App, Error, HttpRequest, HttpResponse, HttpServ
 use actix_web_actors::ws;
 use container_common::token::random_crockford_token::random_crockford_token;
 use crate::endpoints_ws::obs_twitch_thread::ObsTwitchThread;
+use crate::redis::obs_active_payload::ObsActivePayload;
 use crate::server_state::ObsGatewayServerState;
 use crate::twitch::oauth::oauth_token_refresher::OauthTokenRefresher;
 use crate::twitch::polling_websocket_client::PollingTwitchWebsocketClient;
@@ -18,13 +19,13 @@ use log::error;
 use log::info;
 use log::warn;
 use r2d2_redis::redis::Commands;
+use redis_common::redis_keys::RedisKeys;
 use std::sync::Arc;
 use std::thread::sleep;
 use std::time::Duration;
 use tokio::runtime::Handle;
 use twitch_api2::pubsub::Topic;
 use twitch_api2::pubsub;
-use redis_common::redis_keys::RedisKeys;
 
 #[derive(Deserialize)]
 pub struct PathInfo {
@@ -79,7 +80,14 @@ pub async fn obs_gateway_websocket_handler(
 
   let channel = RedisKeys::obs_active_session_topic();
 
-  let _count_received : Option<u64> = redis.publish(channel, &token_record.twitch_user_id)
+  let payload = ObsActivePayload::new(&token_record.twitch_user_id);
+  let json_payload = payload.serialize()
+      .map_err(|e| {
+        error!("Could not serialize JSON: {:?}", e);
+        CommonServerError::ServerError
+      })?;
+
+  let _count_received : Option<u64> = redis.publish(channel, &json_payload)
       .map_err(|e| {
         warn!("redis error: {:?}", e);
         CommonServerError::ServerError
@@ -228,7 +236,15 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for ObsGatewayWebSock
 
       let channel = RedisKeys::obs_active_session_topic();
 
-      let _count_received : Option<u64> = redis.publish(channel, self.twitch_user_id)
+      let twitch_user_id = self.twitch_user_id.to_string();
+      let payload = ObsActivePayload::new(&twitch_user_id);
+      let json_payload = payload.serialize()
+          .map_err(|e| {
+            error!("Could not serialize JSON: {:?}", e);
+            CommonServerError::ServerError
+          }).unwrap(); // TODO: FIXME
+
+      let _count_received : Option<u64> = redis.publish(channel, &json_payload)
           .map_err(|e| {
             warn!("redis error: {:?}", e);
             CommonServerError::ServerError
@@ -239,10 +255,6 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for ObsGatewayWebSock
         ws::Message::Text(text) => {
           //info!("sending text response");
           ctx.text("hello from Rust")
-
-
-
-
         },
         ws::Message::Binary(bin) => ctx.binary(bin),
         ws::Message::Ping(bytes) => ctx.pong(&bytes),

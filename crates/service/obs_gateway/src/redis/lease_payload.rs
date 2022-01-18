@@ -2,6 +2,7 @@ use anyhow::anyhow;
 use container_common::anyhow_result::AnyhowResult;
 
 /// Lease values stored in Redis are in the form "{server_id}:{thread_id}"
+#[derive(Debug)]
 pub struct LeasePayload {
   server_id: String,
   thread_id: String,
@@ -19,7 +20,7 @@ impl LeasePayload {
     format!("{}:{}", &self.server_id, &self.thread_id)
   }
 
-  pub fn deserialize(&self, payload: &str) -> AnyhowResult<Self> {
+  pub fn deserialize(payload: &str) -> AnyhowResult<Self> {
     let pieces = payload.split(":").collect::<Vec<_>>();
     if pieces.len() != 2 {
       return Err(anyhow!("Invalid payload: {}", payload));

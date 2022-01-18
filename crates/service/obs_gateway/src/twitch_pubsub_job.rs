@@ -43,6 +43,15 @@ pub async fn main() -> AnyhowResult<()> {
         "REDIS_1_URL",
         DEFAULT_REDIS_DATABASE_1_CONNECTION_STRING);
 
+  info!("Connecting to redis...");
+
+  let redis_manager = RedisConnectionManager::new(redis_connection_string.clone())?;
+
+  let redis_pool = r2d2::Pool::builder()
+      .build(redis_manager)?;
+
+  let redis_pool = Arc::new(redis_pool);
+
   info!("Connecting to pubsub redis...");
 
   let redis_pubsub_manager = RedisConnectionManager::new(redis_connection_string.clone())?;
@@ -87,7 +96,7 @@ pub async fn main() -> AnyhowResult<()> {
   //runtime.spawn(watch_user_thread(10));
   //runtime.spawn(watch_user_thread(9999));
   runtime.spawn(listen_for_active_obs_session_thread(
-    redis_pubsub_pool, runtime_2));
+    redis_pool, redis_pubsub_pool, runtime_2));
 
   loop {
     sleep(Duration::from_millis(10_000));
