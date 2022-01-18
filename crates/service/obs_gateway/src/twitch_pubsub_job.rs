@@ -12,7 +12,7 @@
 #[macro_use] extern crate magic_crypt;
 #[macro_use] extern crate serde_derive;
 
-use config::shared_constants::{DEFAULT_RUST_LOG, DEFAULT_REDIS_DATABASE_1_CONNECTION_STRING};
+use config::shared_constants::{DEFAULT_RUST_LOG, DEFAULT_REDIS_DATABASE_1_CONNECTION_STRING, DEFAULT_MYSQL_CONNECTION_STRING};
 use container_common::anyhow_result::AnyhowResult;
 use futures::executor::{ThreadPool, ThreadPoolBuilder};
 use r2d2_redis::r2d2;
@@ -28,6 +28,7 @@ use std::sync::Arc;
 use r2d2_redis::r2d2::Pool;
 use redis_common::redis_keys::RedisKeys;
 use crate::threads::listen_for_active_obs_sessions_thread::listen_for_active_obs_session_thread;
+use sqlx::mysql::MySqlPoolOptions;
 
 pub mod redis;
 pub mod threads;
@@ -38,10 +39,24 @@ pub mod util;
 pub async fn main() -> AnyhowResult<()> {
   easyenv::init_all_with_default_logging(Some(DEFAULT_RUST_LOG));
 
+  let db_connection_string =
+      easyenv::get_env_string_or_default(
+        "MYSQL_URL",
+        DEFAULT_MYSQL_CONNECTION_STRING);
+
   let redis_connection_string =
       easyenv::get_env_string_or_default(
         "REDIS_1_URL",
         DEFAULT_REDIS_DATABASE_1_CONNECTION_STRING);
+
+  info!("Connecting to mysql...");
+
+  let mysql_pool = MySqlPoolOptions::new()
+      .max_connections(5)
+      .connect(&db_connection_string)
+      .await?;
+
+  let mysql_pool = Arc::new(mysql_pool);
 
   info!("Connecting to redis...");
 
@@ -96,7 +111,7 @@ pub async fn main() -> AnyhowResult<()> {
   //runtime.spawn(watch_user_thread(10));
   //runtime.spawn(watch_user_thread(9999));
   runtime.spawn(listen_for_active_obs_session_thread(
-    redis_pool, redis_pubsub_pool, runtime_2));
+    mysql_pool, redis_pool, redis_pubsub_pool, runtime_2));
 
   loop {
     sleep(Duration::from_millis(10_000));

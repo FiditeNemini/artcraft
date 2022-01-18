@@ -1,21 +1,27 @@
 use crate::redis::lease_payload::LeasePayload;
+use crate::redis::lease_timeout::LEASE_TIMEOUT_SECONDS;
+use crate::twitch::pubsub::build_pubsub_topics_for_user::build_pubsub_topics_for_user;
+use crate::twitch::websocket_client::TwitchWebsocketClient;
+use database_queries::twitch_oauth::find::{TwitchOauthTokenRecord, TwitchOauthTokenFinder};
 use log::info;
 use log::warn;
-use crate::redis::lease_timeout::LEASE_TIMEOUT_SECONDS;
 use r2d2_redis::RedisConnectionManager;
-use r2d2_redis::r2d2::Pool;
+use r2d2_redis::r2d2;
 use r2d2_redis::redis::Commands;
+use redis_common::redis_keys::RedisKeys;
+use sqlx::MySql;
 use std::sync::Arc;
 use std::thread::sleep;
 use std::time::Duration;
-use redis_common::redis_keys::RedisKeys;
 
 pub async fn twitch_pubsub_user_subscriber_thread(
   twitch_user_id: String,
-  redis_pool: Arc<Pool<RedisConnectionManager>>
+  mysql_pool: Arc<sqlx::Pool<MySql>>,
+  redis_pool: Arc<r2d2::Pool<RedisConnectionManager>>,
 ) {
 
   // TODO: Error handling
+  let numeric_twitch_user_id = twitch_user_id.parse::<u32>().unwrap();
 
   loop {
     info!("Twitch subscriber thread");
@@ -32,7 +38,39 @@ pub async fn twitch_pubsub_user_subscriber_thread(
       LEASE_TIMEOUT_SECONDS
     ).unwrap();
 
+    let result = TwitchOauthTokenFinder::new()
+        .scope_twitch_user_id(Some(numeric_twitch_user_id))
+        .perform_query(&mysql_pool)
+        .await
+        .unwrap();
 
-    sleep(Duration::from_secs(3));
+    let record = match result {
+      None => {
+        info!("Twitch user oauth token does not exit. Auth please");
+        sleep(Duration::from_secs(5));
+        continue;
+      }
+      Some(record) => record
+    };
+
+    let mut client = TwitchWebsocketClient::new().unwrap();
+    //let token_refresher = OauthTokenRefresher::new(
+    //  user_id,
+    //  &token_record.access_token,
+    //  token_record.maybe_refresh_token.as_deref());
+
+    warn!("Connecting to Twitch PubSub for user {}...", &record.twitch_username);
+    client.connect().await.unwrap();
+
+    warn!("Sending ping...");
+    client.send_ping().await.unwrap();
+
+    warn!("Listen to user...");
+    let topics = build_pubsub_topics_for_user(numeric_twitch_user_id);
+
+    client.listen(&record.access_token, &topics).await.unwrap();
+
+
+    sleep(Duration::from_secs(30));
   }
 }

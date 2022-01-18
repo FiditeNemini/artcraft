@@ -1,22 +1,24 @@
 use crate::redis::lease_payload::LeasePayload;
+use crate::redis::lease_timeout::LEASE_TIMEOUT_SECONDS;
 use crate::redis::obs_active_payload::ObsActivePayload;
+use crate::threads::twitch_pubsub_user_subscriber_thread::twitch_pubsub_user_subscriber_thread;
 use log::error;
 use log::info;
 use log::warn;
 use r2d2_redis::RedisConnectionManager;
-use r2d2_redis::r2d2::Pool;
+use r2d2_redis::r2d2;
 use r2d2_redis::redis::Commands;
 use redis_common::redis_keys::RedisKeys;
+use sqlx::MySql;
 use std::sync::Arc;
 use std::thread::sleep;
 use std::time::Duration;
 use tokio::runtime::Runtime;
-use crate::redis::lease_timeout::LEASE_TIMEOUT_SECONDS;
-use crate::threads::twitch_pubsub_user_subscriber_thread::twitch_pubsub_user_subscriber_thread;
 
 pub async fn listen_for_active_obs_session_thread(
-  redis_pool: Arc<Pool<RedisConnectionManager>>,
-  redis_pubsub_pool: Arc<Pool<RedisConnectionManager>>,
+  mysql_pool: Arc<sqlx::Pool<MySql>>,
+  redis_pool: Arc<r2d2::Pool<RedisConnectionManager>>,
+  redis_pubsub_pool: Arc<r2d2::Pool<RedisConnectionManager>>,
   runtime: Arc<Runtime>,
 ) {
   // TODO: ERROR HANDLING
@@ -73,8 +75,9 @@ pub async fn listen_for_active_obs_session_thread(
 
     let twitch_user_id = payload.twitch_user_id.clone();
     let redis_pool2 = redis_pool.clone();
+    let mysql_pool2 = mysql_pool.clone();
 
-    runtime.spawn(twitch_pubsub_user_subscriber_thread(twitch_user_id, redis_pool2));
+    runtime.spawn(twitch_pubsub_user_subscriber_thread(twitch_user_id, mysql_pool2, redis_pool2));
 
 
     // Publish: (ActiveSession, user_id)
