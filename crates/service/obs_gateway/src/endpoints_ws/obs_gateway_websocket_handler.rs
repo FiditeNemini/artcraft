@@ -224,7 +224,9 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for ObsGatewayWebSock
 
       //info!("process message: {:?}", &msg);
 
-
+      // TODO: Only send this every 60 seconds.
+      // TODO: Error handling.
+      // TODO: Reconnecting.
 
       let mut redis = self.server_state.backends
           .redis_pool

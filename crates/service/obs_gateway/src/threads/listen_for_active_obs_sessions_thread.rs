@@ -11,13 +11,14 @@ use std::sync::Arc;
 use std::thread::sleep;
 use std::time::Duration;
 use tokio::runtime::Runtime;
+use crate::redis::lease_timeout::LEASE_TIMEOUT_SECONDS;
+use crate::threads::twitch_pubsub_user_subscriber_thread::twitch_pubsub_user_subscriber_thread;
 
 pub async fn listen_for_active_obs_session_thread(
   redis_pool: Arc<Pool<RedisConnectionManager>>,
   redis_pubsub_pool: Arc<Pool<RedisConnectionManager>>,
   runtime: Arc<Runtime>,
 ) {
-
   // TODO: ERROR HANDLING
   let mut pubsub_pool = redis_pubsub_pool.get().unwrap();
   let mut pubsub = pubsub_pool.as_pubsub();
@@ -55,16 +56,25 @@ pub async fn listen_for_active_obs_session_thread(
       let lease = LeasePayload::deserialize(value).unwrap();
 
       info!("Lease value: {:?}", &lease);
-    } else {
-      info!("No existing lease...");
 
-      let lease = LeasePayload::new("foo", "bar");
-
-      let serialized = lease.serialize();
-      let _v : Option<String> = redis.set(&lease_key, &serialized).unwrap();
+      continue;
     }
 
+    info!("No existing lease...");
 
+    let lease = LeasePayload::new("foo", "bar");
+
+    let serialized = lease.serialize();
+    let _v : Option<String> = redis.set_ex(
+      &lease_key,
+      &serialized,
+          LEASE_TIMEOUT_SECONDS
+    ).unwrap();
+
+    let twitch_user_id = payload.twitch_user_id.clone();
+    let redis_pool2 = redis_pool.clone();
+
+    runtime.spawn(twitch_pubsub_user_subscriber_thread(twitch_user_id, redis_pool2));
 
 
     // Publish: (ActiveSession, user_id)
