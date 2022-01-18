@@ -13,6 +13,7 @@ use sqlx::MySql;
 use std::sync::Arc;
 use std::thread::sleep;
 use std::time::Duration;
+use twitch_api2::pubsub::Response;
 
 pub async fn twitch_pubsub_user_subscriber_thread(
   twitch_user_id: String,
@@ -62,6 +63,7 @@ pub async fn twitch_pubsub_user_subscriber_thread(
     warn!("Connecting to Twitch PubSub for user {}...", &record.twitch_username);
     client.connect().await.unwrap();
 
+    // TODO: BACKGROUND PINGS UGH!
     warn!("Sending ping...");
     client.send_ping().await.unwrap();
 
@@ -70,7 +72,20 @@ pub async fn twitch_pubsub_user_subscriber_thread(
 
     client.listen(&record.access_token, &topics).await.unwrap();
 
+    loop {
+      warn!("client.next()");
+      let event = client.next().await.unwrap();
 
-    sleep(Duration::from_secs(30));
+      warn!("event: {:?}", event);
+
+      match event {
+        Response::Response(_) => {}
+        Response::Message { .. } => {}
+        Response::Pong => {}
+        Response::Reconnect => {}
+      }
+
+      sleep(Duration::from_secs(5));
+    }
   }
 }

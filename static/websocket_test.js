@@ -1,10 +1,18 @@
 
 const WS_URL = 'ws://localhost:54321/obs';
 
+const DEFAULT_USERNAME = 'testytest512';
+
 (function() {
     console.log('installing script');
 
-    const username = 'testytest512';
+    const maybeUsername = window.location.hash.replace('#', '').trim();
+
+    const username = (!!maybeUsername) ? maybeUsername : DEFAULT_USERNAME;
+
+    console.log('username', username);
+    document.getElementById('username').innerHTML = username;
+
     const url = `${WS_URL}/${username}`;
 
     let sock = new WebSocket(url);

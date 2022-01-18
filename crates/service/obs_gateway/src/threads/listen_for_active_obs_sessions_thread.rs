@@ -35,17 +35,17 @@ pub async fn listen_for_active_obs_session_thread(
   //}
 
   loop {
-    info!("[PubSub]");
+    //info!("[PubSub]");
 
     // TODO: ERROR HANDLING
     let message = pubsub.get_message().unwrap();
     let payload : String = message.get_payload().unwrap();
 
-    info!("Message: {}", payload);
+    //info!("Message: {}", payload);
 
     let payload = ObsActivePayload::from_json_str(&payload).unwrap();
 
-    info!("Message decoded: {:?}", payload);
+    //info!("Message decoded: {:?}", payload);
 
     let lease_key = RedisKeys::twitch_pubsub_lease(&payload.twitch_user_id);
 
@@ -54,15 +54,15 @@ pub async fn listen_for_active_obs_session_thread(
     let lease_value : Option<String> = redis.get(&lease_key).unwrap();
 
     if let Some(value) = lease_value.as_deref() {
-      info!("Already has lease.");
+      //info!("Already has lease.");
       let lease = LeasePayload::deserialize(value).unwrap();
 
-      info!("Lease value: {:?}", &lease);
+      //info!("Lease value: {:?}", &lease);
 
       continue;
     }
 
-    info!("No existing lease...");
+    info!("No existing lease for {:?}...", &lease_key);
 
     let lease = LeasePayload::new("foo", "bar");
 
