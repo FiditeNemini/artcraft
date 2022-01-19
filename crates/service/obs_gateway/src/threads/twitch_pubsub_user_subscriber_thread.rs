@@ -74,15 +74,17 @@ pub async fn twitch_pubsub_user_subscriber_thread(
 
     loop {
       warn!("client.next()");
-      let event = client.next().await.unwrap();
+      let maybe_event = client.try_next().await.unwrap();
 
-      warn!("event: {:?}", event);
+      if let Some(event) = maybe_event.as_ref() {
+        warn!("event: {:?}", event);
 
-      match event {
-        Response::Response(_) => {}
-        Response::Message { .. } => {}
-        Response::Pong => {}
-        Response::Reconnect => {}
+        match event {
+          Response::Response(_) => {}
+          Response::Message { .. } => {}
+          Response::Pong => {}
+          Response::Reconnect => {}
+        }
       }
 
       sleep(Duration::from_secs(5));
