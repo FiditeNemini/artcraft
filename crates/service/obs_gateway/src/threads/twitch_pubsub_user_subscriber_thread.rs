@@ -1,6 +1,7 @@
 use crate::redis::lease_payload::LeasePayload;
 use crate::redis::lease_timeout::LEASE_TIMEOUT_SECONDS;
 use crate::twitch::pubsub::build_pubsub_topics_for_user::build_pubsub_topics_for_user;
+use crate::twitch::twitch_user_id::TwitchUserId;
 use crate::twitch::websocket_client::TwitchWebsocketClient;
 use database_queries::twitch_oauth::find::{TwitchOauthTokenRecord, TwitchOauthTokenFinder};
 use log::info;
@@ -17,20 +18,19 @@ use twitch_api2::pubsub::Response;
 
 /// Receive both forms of twitch userid
 pub async fn twitch_pubsub_user_subscriber_thread(
-  twitch_user_id: String,
+  twitch_user_id: TwitchUserId,
   mysql_pool: Arc<sqlx::Pool<MySql>>,
   redis_pool: Arc<r2d2::Pool<RedisConnectionManager>>,
 ) {
 
   // TODO: Error handling
-  let numeric_twitch_user_id = twitch_user_id.parse::<u32>().unwrap();
 
   loop {
     info!("Twitch subscriber thread");
 
     let mut redis = redis_pool.get().unwrap();
 
-    let lease_key = RedisKeys::twitch_pubsub_lease(&twitch_user_id);
+    let lease_key = RedisKeys::twitch_pubsub_lease(twitch_user_id.get_str());
     let lease = LeasePayload::new("foo", "bar");
 
     let serialized = lease.serialize();
@@ -41,7 +41,7 @@ pub async fn twitch_pubsub_user_subscriber_thread(
     ).unwrap();
 
     let result = TwitchOauthTokenFinder::new()
-        .scope_twitch_user_id(Some(numeric_twitch_user_id))
+        .scope_twitch_user_id(Some(twitch_user_id.get_numeric()))
         .perform_query(&mysql_pool)
         .await
         .unwrap();
@@ -69,7 +69,7 @@ pub async fn twitch_pubsub_user_subscriber_thread(
     client.send_ping().await.unwrap();
 
     warn!("Listen to user...");
-    let topics = build_pubsub_topics_for_user(numeric_twitch_user_id);
+    let topics = build_pubsub_topics_for_user(twitch_user_id.get_numeric());
 
     client.listen(&record.access_token, &topics).await.unwrap();
 

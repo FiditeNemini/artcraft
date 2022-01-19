@@ -65,7 +65,7 @@ pub async fn obs_gateway_websocket_handler(
     },
   };
 
-  let twitch_user_id = TwitchUserId::from_string(&token_record.twitch_user_id)
+  let twitch_user_id = TwitchUserId::from_str(&token_record.twitch_user_id)
       .map_err(|e| {
         error!("Error converting twitch user id: {}, id= {}", e, &token_record.twitch_user_id);
         CommonServerError::ServerError

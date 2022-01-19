@@ -10,7 +10,7 @@ pub struct TwitchUserId {
 
 impl TwitchUserId {
 
-  pub fn from_string(twitch_user_id: &str) -> AnyhowResult<Self> {
+  pub fn from_str(twitch_user_id: &str) -> AnyhowResult<Self> {
     let numeric_id = twitch_user_id.parse::<u32>()?;
     Ok(Self {
       string_user_id: twitch_user_id.to_string(),
