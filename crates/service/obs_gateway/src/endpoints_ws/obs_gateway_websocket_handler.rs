@@ -10,6 +10,7 @@ use crate::server_state::ObsGatewayServerState;
 use crate::twitch::oauth::oauth_token_refresher::OauthTokenRefresher;
 use crate::twitch::polling_websocket_client::PollingTwitchWebsocketClient;
 use crate::twitch::pubsub::build_pubsub_topics_for_user::build_pubsub_topics_for_user;
+use crate::twitch::twitch_user_id::TwitchUserId;
 use crate::twitch::websocket_client::TwitchWebsocketClient;
 use database_queries::twitch_oauth::find::{TwitchOauthTokenFinder, TwitchOauthTokenRecord};
 use futures_timer::Delay;
@@ -64,7 +65,7 @@ pub async fn obs_gateway_websocket_handler(
     },
   };
 
-  let user_id = token_record.twitch_user_id.parse::<u32>()
+  let twitch_user_id = TwitchUserId::from_string(&token_record.twitch_user_id)
       .map_err(|e| {
         error!("Error converting twitch user id: {}, id= {}", e, &token_record.twitch_user_id);
         CommonServerError::ServerError
@@ -95,7 +96,7 @@ pub async fn obs_gateway_websocket_handler(
 
   let mut client = TwitchWebsocketClient::new().unwrap();
   let token_refresher = OauthTokenRefresher::new(
-    user_id,
+    twitch_user_id.get_numeric(),
     &token_record.access_token,
     token_record.maybe_refresh_token.as_deref());
 
@@ -125,7 +126,7 @@ pub async fn obs_gateway_websocket_handler(
   let server_state_arc = server_state.get_ref().clone();
 
   let websocket = ObsGatewayWebSocket::new(
-    user_id,
+    twitch_user_id.clone(),
     client,
     token_refresher,
     server_state_arc
@@ -140,20 +141,22 @@ pub async fn obs_gateway_websocket_handler(
 
 /// Websocket behavior
 struct ObsGatewayWebSocket {
-  //twitch_client: PollingTwitchWebsocketClient,
-  twitch_user_id: u32,
+  twitch_user_id: TwitchUserId,
   twitch_thread: Arc<ObsTwitchThread>,
   server_state: Arc<ObsGatewayServerState>,
 }
 
 impl ObsGatewayWebSocket {
   fn new(
-    twitch_user_id: u32,
+    twitch_user_id: TwitchUserId,
     twitch_client: TwitchWebsocketClient,
     oauth_token_refresher: OauthTokenRefresher,
     server_state: Arc<ObsGatewayServerState>,
   ) -> Self {
-    let twitch_thread = Arc::new(ObsTwitchThread::new(twitch_user_id, oauth_token_refresher, twitch_client));
+    let twitch_thread = Arc::new(ObsTwitchThread::new(
+      twitch_user_id.clone(),
+      oauth_token_refresher,
+      twitch_client));
     Self {
       twitch_user_id,
       twitch_thread,
@@ -238,8 +241,8 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for ObsGatewayWebSock
 
       let channel = RedisKeys::obs_active_session_topic();
 
-      let twitch_user_id = self.twitch_user_id.to_string();
-      let payload = ObsActivePayload::new(&twitch_user_id);
+      let payload = ObsActivePayload::new(self.twitch_user_id.get_str());
+
       let json_payload = payload.serialize()
           .map_err(|e| {
             error!("Could not serialize JSON: {:?}", e);

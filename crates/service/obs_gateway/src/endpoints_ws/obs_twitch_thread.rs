@@ -1,15 +1,16 @@
+use crate::twitch::oauth::oauth_token_refresher::OauthTokenRefresher;
 use crate::twitch::polling_websocket_client::PollingTwitchWebsocketClient;
+use crate::twitch::twitch_user_id::TwitchUserId;
 use crate::twitch::websocket_client::TwitchWebsocketClient;
+use futures::lock::Mutex;
 use log::error;
 use log::info;
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::{Arc, RwLock, PoisonError, RwLockWriteGuard};
 use std::thread::sleep;
-use futures::lock::Mutex;
-use std::time::{Duration, SystemTime, UNIX_EPOCH};
 use std::time::Instant;
+use std::time::{Duration, SystemTime, UNIX_EPOCH};
 use tokio::runtime::Handle;
-use crate::twitch::oauth::oauth_token_refresher::OauthTokenRefresher;
 
 // TODO: Let's make this an Arc<RwLock<Map<Token, Thread>>>
 //  so that multiple browser sessions for the same user can
@@ -27,7 +28,7 @@ pub struct ObsTwitchThread {
 }
 
 struct InnerData {
-  twitch_user_id: u32,
+  twitch_user_id: TwitchUserId,
   token_refresher: OauthTokenRefresher,
   is_connected: bool,
   twitch_client: TwitchWebsocketClient,
@@ -36,7 +37,7 @@ struct InnerData {
 
 impl ObsTwitchThread {
   pub fn new(
-    twitch_user_id: u32,
+    twitch_user_id: TwitchUserId,
     token_refresher: OauthTokenRefresher,
     twitch_client: TwitchWebsocketClient
   ) -> Self {

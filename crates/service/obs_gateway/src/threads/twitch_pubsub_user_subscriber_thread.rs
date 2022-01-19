@@ -15,6 +15,7 @@ use std::thread::sleep;
 use std::time::Duration;
 use twitch_api2::pubsub::Response;
 
+/// Receive both forms of twitch userid
 pub async fn twitch_pubsub_user_subscriber_thread(
   twitch_user_id: String,
   mysql_pool: Arc<sqlx::Pool<MySql>>,
