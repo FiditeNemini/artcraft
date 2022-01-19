@@ -18,6 +18,7 @@ pub struct TwitchOauthTokenRecord {
   /// Twitch user
   pub twitch_user_id: String,
   pub twitch_username: String,
+  pub twitch_username_lowercase: String,
 
   /// Token details
   pub access_token: String,
@@ -43,7 +44,7 @@ pub struct TwitchOauthTokenFinder {
   scope_user_token: Option<String>,
 
   scope_twitch_user_id: Option<u32>,
-  scope_twitch_username: Option<String>,
+  scope_twitch_username_lowercase: Option<String>,
 }
 
 impl TwitchOauthTokenFinder {
@@ -51,7 +52,7 @@ impl TwitchOauthTokenFinder {
     Self {
       scope_user_token: None,
       scope_twitch_user_id: None,
-      scope_twitch_username: None
+      scope_twitch_username_lowercase: None
     }
   }
 
@@ -65,8 +66,10 @@ impl TwitchOauthTokenFinder {
     self
   }
 
+  /// This will automatically look up against a lowercased username
   pub fn scope_twitch_username(mut self, twitch_username: Option<&str>) -> Self {
-    self.scope_twitch_username = twitch_username.map(|t| t.to_string());
+    self.scope_twitch_username_lowercase = twitch_username
+        .map(|t| t.to_string().to_lowercase());
     self
   }
 
@@ -82,6 +85,7 @@ impl TwitchOauthTokenFinder {
             maybe_user_gravatar_hash: record.maybe_user_gravatar_hash.clone(),
             twitch_user_id: record.twitch_user_id.clone(),
             twitch_username: record.twitch_username.clone(),
+            twitch_username_lowercase: record.twitch_username_lowercase.clone(),
             access_token: record.access_token.clone(),
             maybe_refresh_token: record.maybe_refresh_token.clone(),
             token_type: record.token_type.clone(),
@@ -117,7 +121,7 @@ impl TwitchOauthTokenFinder {
       query = query.bind(user_id);
     }
 
-    if let Some(twitch_username) = self.scope_twitch_username.as_deref() {
+    if let Some(twitch_username) = self.scope_twitch_username_lowercase.as_deref() {
       query = query.bind(twitch_username);
     }
 
@@ -148,6 +152,7 @@ SELECT
 
     twitch_oauth_tokens.twitch_user_id,
     twitch_oauth_tokens.twitch_username,
+    twitch_oauth_tokens.twitch_username_lowercase,
 
     twitch_oauth_tokens.access_token,
     twitch_oauth_tokens.maybe_refresh_token,
@@ -197,12 +202,12 @@ LEFT OUTER JOIN users
       }
     }
 
-    if let Some(username) = self.scope_twitch_username.as_deref() {
+    if let Some(username) = self.scope_twitch_username_lowercase.as_deref() {
       if !first_predicate_added {
-        query.push_str(" WHERE twitch_oauth_tokens.twitch_username = ?");
+        query.push_str(" WHERE twitch_oauth_tokens.twitch_username_lowercase = ?");
         first_predicate_added = true;
       } else {
-        query.push_str(" AND twitch_oauth_tokens.twitch_username = ?");
+        query.push_str(" AND twitch_oauth_tokens.twitch_username_lowercase = ?");
       }
     }
 
@@ -234,6 +239,7 @@ pub struct TwitchOauthTokenRecordInternal {
   /// Twitch user
   pub twitch_user_id: String,
   pub twitch_username: String,
+  pub twitch_username_lowercase: String,
 
   /// Token details
   pub access_token: String,

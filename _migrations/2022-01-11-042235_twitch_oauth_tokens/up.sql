@@ -26,9 +26,12 @@ CREATE TABLE twitch_oauth_tokens(
   -- https://discuss.dev.twitch.tv/t/bug-v5-api-returns--id-as-string-for-featured-channels/10310
   twitch_user_id VARCHAR(64) NOT NULL,
 
-  -- Usernames are between 4 and 25 characters.
+  -- Twitch usernames are between 4 and 25 characters.
   -- This is returned in the oauth flow
   twitch_username VARCHAR(32) NOT NULL,
+
+  -- Twitch username, but lowercase for lookup.
+  twitch_username_lowercase VARCHAR(32) NOT NULL,
 
   -- ========== OAUTH TOKEN DETAILS ==========
 
@@ -103,7 +106,8 @@ CREATE TABLE twitch_oauth_tokens(
   PRIMARY KEY (id),
   KEY fk_maybe_user_token (maybe_user_token),
   KEY index_twitch_user_id (twitch_user_id),
-  KEY index_twitch_username (twitch_username),
+  -- KEY index_twitch_username (twitch_username),
+  KEY index_twitch_username_lowercase (twitch_username_lowercase),
   KEY index_expires_at (expires_at),
   KEY index_user_deleted_at (user_deleted_at),
   KEY index_mod_deleted_at (mod_deleted_at)
