@@ -1,5 +1,5 @@
 use crate::redis::lease_payload::LeasePayload;
-use crate::redis::lease_timeout::LEASE_TIMEOUT_SECONDS;
+use crate::redis::lease_timeout::{LEASE_TIMEOUT_SECONDS, LEASE_RENEW_PERIOD};
 use crate::twitch::pubsub::build_pubsub_topics_for_user::build_pubsub_topics_for_user;
 use crate::twitch::twitch_user_id::TwitchUserId;
 use crate::twitch::websocket_client::TwitchWebsocketClient;
@@ -15,18 +15,41 @@ use std::sync::Arc;
 use std::thread::sleep;
 use std::time::Duration;
 use twitch_api2::pubsub::Response;
+use time::Instant;
 
-/// Receive both forms of twitch userid
+// TODO: ERROR HANDLING
+// TODO: ERROR HANDLING
+// TODO: ERROR HANDLING
+// TODO: ERROR HANDLING
+
+// TODO: Timer to ping().
+// TODO: Timer to renew lease.
+// TODO: Publish events back to OBS thread.
+// TODO: Disconnect when OBS is done.
+// TODO: Refresh oauth token.
+// TODO: Handle disconnects.
+// TODO: Server+thread IDs
+
 pub async fn twitch_pubsub_user_subscriber_thread(
   twitch_user_id: TwitchUserId,
   mysql_pool: Arc<sqlx::Pool<MySql>>,
   redis_pool: Arc<r2d2::Pool<RedisConnectionManager>>,
 ) {
 
-  // TODO: Error handling
+  let mut last_renewed_lease = Instant::now();
 
   loop {
     info!("Twitch subscriber thread");
+
+    let now = Instant::now();
+    let mut should_renew = false;
+
+    match now.checked_sub(LEASE_RENEW_PERIOD) {
+      None => { should_renew = true }
+      Some(before) => {
+
+      }
+    }
 
     let mut redis = redis_pool.get().unwrap();
 
