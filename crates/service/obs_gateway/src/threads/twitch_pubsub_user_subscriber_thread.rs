@@ -1,9 +1,14 @@
+use container_common::anyhow_result::AnyhowResult;
+use container_common::thread::thread_id::ThreadId;
 use crate::redis::lease_payload::LeasePayload;
 use crate::redis::lease_timeout::{LEASE_TIMEOUT_SECONDS, LEASE_RENEW_PERIOD};
+use crate::twitch::constants::TWITCH_PING_CADENCE;
 use crate::twitch::pubsub::build_pubsub_topics_for_user::build_pubsub_topics_for_user;
 use crate::twitch::twitch_user_id::TwitchUserId;
 use crate::twitch::websocket_client::TwitchWebsocketClient;
 use database_queries::twitch_oauth::find::{TwitchOauthTokenRecord, TwitchOauthTokenFinder};
+use log::debug;
+use log::error;
 use log::info;
 use log::warn;
 use r2d2_redis::RedisConnectionManager;
@@ -14,11 +19,8 @@ use sqlx::MySql;
 use std::sync::Arc;
 use std::thread::sleep;
 use std::time::Duration;
-use twitch_api2::pubsub::Response;
 use time::Instant;
-use container_common::anyhow_result::AnyhowResult;
-use crate::twitch::constants::TWITCH_PING_CADENCE;
-use container_common::thread::thread_id::ThreadId;
+use twitch_api2::pubsub::Response;
 
 // TODO: ERROR HANDLING
 // TODO: ERROR HANDLING
@@ -84,47 +86,45 @@ impl TwitchPubsubUserSubscriberThread {
     let oauth_lookup_result = self.lookup_oauth_record().await;
     let oauth_token_record = match oauth_lookup_result {
       Err(e) => {
-        info!("Error looking up oauth creds: {:?}", e);
+        error!("Error looking up oauth creds: {:?}", e);
         return; // TODO: Better flow.
       }
       Ok(None) => {
-        info!("Twitch user oauth token does not exit. Auth please.");
+        error!("Twitch user oauth token does not exit. Auth please.");
         return; // TODO: Better flow.
       }
       Ok(Some(record)) => record,
     };
 
-    warn!("Connecting to Twitch PubSub for user {}...", &oauth_token_record.twitch_username);
+    info!("Connecting to Twitch PubSub for user {}...", &oauth_token_record.twitch_username);
     self.twitch_websocket_client.connect().await.unwrap(); // TODO: Error handling
 
     loop {
       self.maybe_renew_redis_lease().unwrap();
       self.maybe_send_twitch_ping().await.unwrap();
 
-      warn!("Listen to user...");
+      info!("Listen to user...");
       let topics = build_pubsub_topics_for_user(self.twitch_user_id.get_numeric());
       self.twitch_websocket_client.listen(&oauth_token_record.access_token, &topics).await.unwrap();
 
       loop {
-        //let maybe_event = self.twitch_websocket_client.try_next()
-        //    .await
-        //    .unwrap();
+        //debug!("[{}] maybe event for user {}...", self.thread_id.get_id(), self.twitch_user_id.get_str());
 
-        info!("maybe event...");
         let mut interval = tokio::time::interval(Duration::from_millis(1000));
 
-
         // NB: We can't block forever.
-        // Adapted from https://github.com/snapview/tokio-tungstenite/blob/master/examples/interval-server.rs
+        // Adapted from the very good tokio-tungstenite example here, which also splits sockets
+        // into bidirectional streams:
+        // https://github.com/snapview/tokio-tungstenite/blob/master/examples/interval-server.rs
         tokio::select! {
           maybe_event = self.twitch_websocket_client.try_next() => {
             match maybe_event {
               Err(e) => {
-                warn!("socket recv error: {:?}", e);
+                error!("socket recv error: {:?}", e);
               }
               Ok(None) => {},
               Ok(Some(ref event)) => {
-                warn!("event: {:?}", event);
+                info!("event: {:?}", event);
 
                 match event {
                   Response::Response(_) => {}
@@ -136,7 +136,6 @@ impl TwitchPubsubUserSubscriberThread {
             }
           }
           _ = interval.tick() => {
-            //ws_sender.send(Message::Text("tick".to_owned())).await?;
             sleep(Duration::from_secs(5));
           }
         }
