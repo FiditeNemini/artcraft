@@ -5,7 +5,7 @@ use container_common::token::random_crockford_token::random_crockford_token;
 
 // TODO: This should be JSON for future compat.
 /// Lease values stored in Redis are in the form "{server_id}:{thread_id}"
-#[derive(Debug)]
+#[derive(Debug, Eq, PartialEq, Clone)]
 pub struct LeasePayload {
   pub server_id: String,
   pub thread_id: String,
@@ -45,5 +45,35 @@ impl LeasePayload {
     } else {
       return Err(anyhow!("Invalid payload: {}", payload));
     }
+  }
+}
+
+#[cfg(test)]
+mod tests {
+  use container_common::thread::thread_id::ThreadId;
+  use crate::redis::lease_payload::LeasePayload;
+
+  #[test]
+  fn equals() {
+    let a = LeasePayload::from_string_id("foo", "bar");
+    let b = LeasePayload::from_string_id("foo", "bar");
+    assert_eq!(a, b);
+    let t = ThreadId::with_id("bar");
+    let b = LeasePayload::from_thread_id("foo", &t);
+    assert_eq!(a, b);
+  }
+
+  #[test]
+  fn not_equals() {
+    let a = LeasePayload::from_string_id("foo", "bar");
+    let b = LeasePayload::from_string_id("asdf", "qwerty");
+    assert_ne!(a, b);
+    let b = LeasePayload::from_string_id("foo", "ASDF");
+    assert_ne!(a, b);
+    let b = LeasePayload::from_string_id("ASDF", "bar");
+    assert_ne!(a, b);
+    let t = ThreadId::with_id("ASDF");
+    let b = LeasePayload::from_thread_id("foo", &t);
+    assert_ne!(a, b);
   }
 }

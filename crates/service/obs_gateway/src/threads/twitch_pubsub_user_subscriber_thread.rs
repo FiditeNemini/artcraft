@@ -1,7 +1,7 @@
 use container_common::anyhow_result::AnyhowResult;
 use container_common::thread::thread_id::ThreadId;
 use crate::redis::lease_payload::LeasePayload;
-use crate::redis::lease_timeout::{LEASE_TIMEOUT_SECONDS, LEASE_RENEW_PERIOD};
+use crate::redis::lease_timeout::{LEASE_TIMEOUT_SECONDS, LEASE_RENEW_PERIOD, LEASE_CHECK_PERIOD};
 use crate::twitch::constants::TWITCH_PING_CADENCE;
 use crate::twitch::pubsub::build_pubsub_topics_for_user::build_pubsub_topics_for_user;
 use crate::twitch::twitch_user_id::TwitchUserId;
@@ -27,17 +27,17 @@ use twitch_api2::pubsub::Response;
 // TODO: ERROR HANDLING
 // TODO: ERROR HANDLING
 
-// TODO: Publish events back to OBS thread (keepalive redis key from websocket).
-// TODO: Disconnect when OBS is done.
+// TODO: Publish events back to OBS thread
+// TODO: Disconnect when OBS is done. (keepalive redis key from websocket).
 // TODO: Refresh oauth token.
 // TODO: Handle disconnects.
 // TODO: Server+thread IDs
-
 
 pub struct TwitchPubsubUserSubscriberThread {
   thread_id: ThreadId,
   server_hostname: String,
   twitch_user_id: TwitchUserId,
+  expected_lease_payload: LeasePayload,
 
   mysql_pool: Arc<sqlx::Pool<MySql>>,
   redis_pool: Arc<r2d2::Pool<RedisConnectionManager>>,
@@ -48,6 +48,10 @@ pub struct TwitchPubsubUserSubscriberThread {
   // The thread must renew the lease, or another worker will pick it up.
   // If the lease gets taken by another, we abandon our own workload.
   redis_lease_last_renewed_at: Option<Instant>,
+
+  // If the lease gets taken by another thread, we abandon our own workload.
+  // This controls when we periodically check.
+  redis_lease_last_checked_at: Option<Instant>,
 
   /// Twitch PubSub requires PINGs at regular intervals,
   ///   "To keep the server from closing the connection, clients must send a PING
@@ -66,14 +70,17 @@ impl TwitchPubsubUserSubscriberThread {
     thread_id: ThreadId,
   ) -> Self {
     let twitch_websocket_client = TwitchWebsocketClient::new().unwrap();
+    let expected_lease_payload = LeasePayload::from_thread_id(&server_hostname, &thread_id);
     Self {
       thread_id,
+      expected_lease_payload,
       server_hostname: server_hostname.to_string(),
       twitch_user_id,
       mysql_pool,
       redis_pool,
       twitch_websocket_client,
       redis_lease_last_renewed_at: None,
+      redis_lease_last_checked_at: None,
       twitch_last_pinged_at: None,
     }
   }
@@ -81,6 +88,7 @@ impl TwitchPubsubUserSubscriberThread {
   pub async fn start_thread(mut self) {
     // We lease from outside before starting the thread.
     self.redis_lease_last_renewed_at = Some(Instant::now());
+    self.redis_lease_last_checked_at = Some(Instant::now());
 
     // Lookup the OAuth credentials
     let oauth_lookup_result = self.lookup_oauth_record().await;
@@ -142,8 +150,54 @@ impl TwitchPubsubUserSubscriberThread {
 
         sleep(Duration::from_secs(1));
 
+        let is_valid = self.maybe_check_redis_lease_is_valid().unwrap();
+        if !is_valid {
+          warn!("Exiting thread.");
+          return; // Exit thread
+        }
+
         self.maybe_renew_redis_lease().unwrap();
         self.maybe_send_twitch_ping().await.unwrap();
+      }
+    }
+  }
+
+  fn maybe_check_redis_lease_is_valid(&mut self) -> AnyhowResult<bool> {
+    let mut should_check_lease = self.redis_lease_last_checked_at
+        .map(|last_read| last_read.elapsed().gt(&LEASE_CHECK_PERIOD))
+        .unwrap_or(true);
+
+    if should_check_lease {
+      info!("Checking Redis Lease for user {}", self.twitch_user_id.get_numeric());
+      let is_valid = self.check_redis_lease_is_valid()?;
+
+      if !is_valid {
+        warn!("Lease got taken by another thread");
+        return Ok(false);
+      }
+
+      self.redis_lease_last_checked_at = Some(Instant::now());
+    }
+
+    Ok(true)
+  }
+
+  fn check_redis_lease_is_valid(&mut self) -> AnyhowResult<bool> {
+    // TODO: Error handling
+
+    let mut redis = self.redis_pool.get().unwrap();
+    let lease_key = RedisKeys::twitch_pubsub_lease(self.twitch_user_id.get_str());
+
+    let payload : Option<String> = redis.get(&lease_key).unwrap();
+    match payload {
+      None => {
+        warn!("Redis lease payload absent. Another thread could be started.");
+        Ok(true)
+      }
+      Some(payload) => {
+        let actual_payload = LeasePayload::deserialize(&payload).unwrap();
+        let equals_expected = self.expected_lease_payload.eq(&actual_payload);
+        Ok(equals_expected)
       }
     }
   }
@@ -167,8 +221,7 @@ impl TwitchPubsubUserSubscriberThread {
     let mut redis = self.redis_pool.get().unwrap();
 
     let lease_key = RedisKeys::twitch_pubsub_lease(self.twitch_user_id.get_str());
-    let lease_value = LeasePayload::from_thread_id(&self.server_hostname, &self.thread_id)
-        .serialize();
+    let lease_value = self.expected_lease_payload.serialize();
 
     let _v : Option<String> = redis.set_ex(
       &lease_key,
