@@ -100,13 +100,13 @@ impl TwitchPubsubUserSubscriberThread {
       self.twitch_websocket_client.listen(&oauth_token_record.access_token, &topics).await.unwrap();
 
       loop {
+        info!("maybe event...");
         let maybe_event = self.twitch_websocket_client.try_next()
             .await
             .unwrap();
 
         match maybe_event {
           None => {
-            sleep(Duration::from_secs(5));
           }
           Some(ref event) => {
             warn!("event: {:?}", event);
@@ -119,6 +119,11 @@ impl TwitchPubsubUserSubscriberThread {
             }
           }
         }
+
+        self.maybe_renew_redis_lease().unwrap();
+        self.maybe_send_twitch_ping().await.unwrap();
+
+        sleep(Duration::from_secs(5));
       }
     }
   }
