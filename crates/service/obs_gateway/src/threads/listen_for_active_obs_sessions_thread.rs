@@ -1,7 +1,7 @@
 use crate::redis::lease_payload::LeasePayload;
 use crate::redis::lease_timeout::LEASE_TIMEOUT_SECONDS;
 use crate::redis::obs_active_payload::ObsActivePayload;
-use crate::threads::twitch_pubsub_user_subscriber_thread::{twitch_pubsub_user_subscriber_thread, TwitchPubsubUserSubscriberThread};
+use crate::threads::twitch_pubsub_user_subscriber_thread::TwitchPubsubUserSubscriberThread;
 use crate::twitch::twitch_user_id::TwitchUserId;
 use log::error;
 use log::info;
