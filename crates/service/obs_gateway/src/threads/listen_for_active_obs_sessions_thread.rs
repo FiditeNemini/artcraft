@@ -1,7 +1,7 @@
 use crate::redis::lease_payload::LeasePayload;
 use crate::redis::lease_timeout::LEASE_TIMEOUT_SECONDS;
 use crate::redis::obs_active_payload::ObsActivePayload;
-use crate::threads::twitch_pubsub_user_subscriber_thread::twitch_pubsub_user_subscriber_thread;
+use crate::threads::twitch_pubsub_user_subscriber_thread::{twitch_pubsub_user_subscriber_thread, TwitchPubsubUserSubscriberThread};
 use crate::twitch::twitch_user_id::TwitchUserId;
 use log::error;
 use log::info;
@@ -70,6 +70,7 @@ pub async fn listen_for_active_obs_session_thread(
     let redis_pool2 = redis_pool.clone();
     let mysql_pool2 = mysql_pool.clone();
 
-    runtime.spawn(twitch_pubsub_user_subscriber_thread(twitch_user_id, mysql_pool2, redis_pool2));
+    let thread = TwitchPubsubUserSubscriberThread::new(twitch_user_id, mysql_pool2, redis_pool2);
+    runtime.spawn(thread.start_thread());
   }
 }
