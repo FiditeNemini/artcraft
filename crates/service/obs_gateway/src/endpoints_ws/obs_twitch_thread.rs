@@ -1,5 +1,3 @@
-use crate::twitch::oauth::oauth_token_refresher::OauthTokenRefresher;
-use crate::twitch::polling_websocket_client::PollingTwitchWebsocketClient;
 use crate::twitch::twitch_user_id::TwitchUserId;
 use crate::twitch::websocket_client::TwitchWebsocketClient;
 use futures::lock::Mutex;
@@ -29,7 +27,6 @@ pub struct ObsTwitchThread {
 
 struct InnerData {
   twitch_user_id: TwitchUserId,
-  token_refresher: OauthTokenRefresher,
   is_connected: bool,
   twitch_client: TwitchWebsocketClient,
   last_ping: SystemTime,
@@ -38,14 +35,12 @@ struct InnerData {
 impl ObsTwitchThread {
   pub fn new(
     twitch_user_id: TwitchUserId,
-    token_refresher: OauthTokenRefresher,
     twitch_client: TwitchWebsocketClient
   ) -> Self {
     let now = Instant::now();
     Self {
       inner_data: Arc::new(Mutex::new(InnerData {
         twitch_user_id,
-        token_refresher,
         is_connected: false,
         twitch_client,
         last_ping: UNIX_EPOCH,

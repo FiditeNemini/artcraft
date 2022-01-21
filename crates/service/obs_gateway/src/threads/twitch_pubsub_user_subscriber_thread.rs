@@ -24,9 +24,7 @@ use crate::twitch::constants::TWITCH_PING_CADENCE;
 // TODO: ERROR HANDLING
 // TODO: ERROR HANDLING
 
-// TODO: Timer to ping().
-// TODO: Timer to renew lease.
-// TODO: Publish events back to OBS thread.
+// TODO: Publish events back to OBS thread (keepalive redis key from websocket).
 // TODO: Disconnect when OBS is done.
 // TODO: Refresh oauth token.
 // TODO: Handle disconnects.
@@ -137,24 +135,8 @@ impl TwitchPubsubUserSubscriberThread {
 
         sleep(Duration::from_secs(1));
 
-//        match maybe_event {
-//          None => {
-//          }
-//          Some(ref event) => {
-//            warn!("event: {:?}", event);
-//
-//            match event {
-//              Response::Response(_) => {}
-//              Response::Message { .. } => {}
-//              Response::Pong => {}
-//              Response::Reconnect => {}
-//            }
-//          }
-//        }
-
         self.maybe_renew_redis_lease().unwrap();
         self.maybe_send_twitch_ping().await.unwrap();
-
       }
     }
   }

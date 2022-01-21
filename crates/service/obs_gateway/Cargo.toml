@@ -9,7 +9,7 @@ authors = [
 publish = false
 
 [[bin]]
-name = "obs-gateway-server"
+name = "obs-gateway"
 path = "src/main.rs"
 
 [[bin]]
@@ -26,19 +26,18 @@ http_server_common = { path = "../../lib/http_server_common" }
 redis_common = { path = "../../lib/redis_common" }
 
 # External
-futures-timer = "3.0.2"
 anyhow = "1.0.40"
 base64 = "0.13.0"
 chrono = { version = "0.4.19", features = ["serde"] }
 derive_more = "0.99.14"
 dotenv = "0.15.0"
 easyenv = "0.0.6"
+futures-timer = "3.0.2"
 hex = "0.4.3"
 hostname = "0.3.1"
 lazy_static = "1.4.0"
 lfu = "0.2.5"
 log = "0.4.14"
-#newrelic-telemetry = { path = "../../../vendor/newrelic-telemetry-sdk-rust" }
 rand = "0.8.3"
 regex = "1.5.4"
 time = "0.2.26"

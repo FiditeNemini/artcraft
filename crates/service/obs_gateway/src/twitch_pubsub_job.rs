@@ -14,22 +14,20 @@
 
 use config::shared_constants::{DEFAULT_RUST_LOG, DEFAULT_REDIS_DATABASE_1_CONNECTION_STRING, DEFAULT_MYSQL_CONNECTION_STRING};
 use container_common::anyhow_result::AnyhowResult;
+use crate::threads::listen_for_active_obs_sessions_thread::listen_for_active_obs_session_thread;
+use crate::twitch::websocket_client::TwitchWebsocketClient;
 use futures::executor::{ThreadPool, ThreadPoolBuilder};
-use r2d2_redis::r2d2;
+use futures::task::SpawnExt;
 use log::info;
+use r2d2_redis::RedisConnectionManager;
+use r2d2_redis::r2d2::Pool;
+use r2d2_redis::r2d2;
+use redis_common::redis_keys::RedisKeys;
+use sqlx::mysql::MySqlPoolOptions;
+use std::sync::Arc;
 use std::thread::sleep;
 use std::time::Duration;
-use crate::twitch::twitch_client_wrapper::TwitchClientWrapper;
-use crate::twitch::websocket_client::TwitchWebsocketClient;
-use futures::task::SpawnExt;
 use tokio::runtime::{Builder, Runtime};
-use r2d2_redis::RedisConnectionManager;
-use std::sync::Arc;
-use r2d2_redis::r2d2::Pool;
-use redis_common::redis_keys::RedisKeys;
-use crate::threads::listen_for_active_obs_sessions_thread::listen_for_active_obs_session_thread;
-use sqlx::mysql::MySqlPoolOptions;
-
 pub mod redis;
 pub mod threads;
 pub mod twitch;

@@ -7,8 +7,6 @@ use container_common::token::random_crockford_token::random_crockford_token;
 use crate::endpoints_ws::obs_twitch_thread::ObsTwitchThread;
 use crate::redis::obs_active_payload::ObsActivePayload;
 use crate::server_state::ObsGatewayServerState;
-use crate::twitch::oauth::oauth_token_refresher::OauthTokenRefresher;
-use crate::twitch::polling_websocket_client::PollingTwitchWebsocketClient;
 use crate::twitch::pubsub::build_pubsub_topics_for_user::build_pubsub_topics_for_user;
 use crate::twitch::twitch_user_id::TwitchUserId;
 use crate::twitch::websocket_client::TwitchWebsocketClient;
@@ -95,10 +93,6 @@ pub async fn obs_gateway_websocket_handler(
       })?;
 
   let mut client = TwitchWebsocketClient::new().unwrap();
-  let token_refresher = OauthTokenRefresher::new(
-    twitch_user_id.get_numeric(),
-    &token_record.access_token,
-    token_record.maybe_refresh_token.as_deref());
 
   info!("Connecting to Twitch PubSub...");
   client.connect().await.unwrap();
@@ -128,7 +122,6 @@ pub async fn obs_gateway_websocket_handler(
   let websocket = ObsGatewayWebSocket::new(
     twitch_user_id.clone(),
     client,
-    token_refresher,
     server_state_arc
   );
 
@@ -150,12 +143,10 @@ impl ObsGatewayWebSocket {
   fn new(
     twitch_user_id: TwitchUserId,
     twitch_client: TwitchWebsocketClient,
-    oauth_token_refresher: OauthTokenRefresher,
     server_state: Arc<ObsGatewayServerState>,
   ) -> Self {
     let twitch_thread = Arc::new(ObsTwitchThread::new(
       twitch_user_id.clone(),
-      oauth_token_refresher,
       twitch_client));
     Self {
       twitch_user_id,
