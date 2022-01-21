@@ -100,30 +100,61 @@ impl TwitchPubsubUserSubscriberThread {
       self.twitch_websocket_client.listen(&oauth_token_record.access_token, &topics).await.unwrap();
 
       loop {
+        //let maybe_event = self.twitch_websocket_client.try_next()
+        //    .await
+        //    .unwrap();
+
         info!("maybe event...");
-        let maybe_event = self.twitch_websocket_client.try_next()
-            .await
-            .unwrap();
+        let mut interval = tokio::time::interval(Duration::from_millis(1000));
 
-        match maybe_event {
-          None => {
-          }
-          Some(ref event) => {
-            warn!("event: {:?}", event);
 
-            match event {
-              Response::Response(_) => {}
-              Response::Message { .. } => {}
-              Response::Pong => {}
-              Response::Reconnect => {}
+        // NB: We can't block forever.
+        // Adapted from https://github.com/snapview/tokio-tungstenite/blob/master/examples/interval-server.rs
+        tokio::select! {
+          maybe_event = self.twitch_websocket_client.try_next() => {
+            match maybe_event {
+              Err(e) => {
+                warn!("socket recv error: {:?}", e);
+              }
+              Ok(None) => {},
+              Ok(Some(ref event)) => {
+                warn!("event: {:?}", event);
+
+                match event {
+                  Response::Response(_) => {}
+                  Response::Message { .. } => {}
+                  Response::Pong => {}
+                  Response::Reconnect => {}
+                }
+              }
             }
           }
+          _ = interval.tick() => {
+            //ws_sender.send(Message::Text("tick".to_owned())).await?;
+            sleep(Duration::from_secs(5));
+          }
         }
+
+        sleep(Duration::from_secs(1));
+
+//        match maybe_event {
+//          None => {
+//          }
+//          Some(ref event) => {
+//            warn!("event: {:?}", event);
+//
+//            match event {
+//              Response::Response(_) => {}
+//              Response::Message { .. } => {}
+//              Response::Pong => {}
+//              Response::Reconnect => {}
+//            }
+//          }
+//        }
 
         self.maybe_renew_redis_lease().unwrap();
         self.maybe_send_twitch_ping().await.unwrap();
 
-        sleep(Duration::from_secs(5));
       }
     }
   }
