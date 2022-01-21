@@ -18,6 +18,7 @@ use twitch_api2::pubsub::Response;
 use time::Instant;
 use container_common::anyhow_result::AnyhowResult;
 use crate::twitch::constants::TWITCH_PING_CADENCE;
+use container_common::thread::thread_id::ThreadId;
 
 // TODO: ERROR HANDLING
 // TODO: ERROR HANDLING
@@ -32,6 +33,8 @@ use crate::twitch::constants::TWITCH_PING_CADENCE;
 
 
 pub struct TwitchPubsubUserSubscriberThread {
+  thread_id: ThreadId,
+  server_hostname: String,
   twitch_user_id: TwitchUserId,
   mysql_pool: Arc<sqlx::Pool<MySql>>,
   redis_pool: Arc<r2d2::Pool<RedisConnectionManager>>,
@@ -56,9 +59,13 @@ impl TwitchPubsubUserSubscriberThread {
     twitch_user_id: TwitchUserId,
     mysql_pool: Arc<sqlx::Pool<MySql>>,
     redis_pool: Arc<r2d2::Pool<RedisConnectionManager>>,
+    server_hostname: &str,
+    thread_id: ThreadId,
   ) -> Self {
     let twitch_websocket_client = TwitchWebsocketClient::new().unwrap();
     Self {
+      thread_id,
+      server_hostname: server_hostname.to_string(),
       twitch_user_id,
       mysql_pool,
       redis_pool,
@@ -158,8 +165,11 @@ impl TwitchPubsubUserSubscriberThread {
   fn renew_redis_lease(&mut self) -> AnyhowResult<()> {
     // TODO: Error handling
     let mut redis = self.redis_pool.get().unwrap();
+
     let lease_key = RedisKeys::twitch_pubsub_lease(self.twitch_user_id.get_str());
-    let lease_value = LeasePayload::new("foo", "bar").serialize();
+    let lease_value = LeasePayload::from_thread_id(&self.server_hostname, &self.thread_id)
+        .serialize();
+
     let _v : Option<String> = redis.set_ex(
       &lease_key,
       &lease_value,

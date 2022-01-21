@@ -12,6 +12,11 @@
 #[macro_use] extern crate magic_crypt;
 #[macro_use] extern crate serde_derive;
 
+pub mod redis;
+pub mod threads;
+pub mod twitch;
+pub mod util;
+
 use config::shared_constants::{DEFAULT_RUST_LOG, DEFAULT_REDIS_DATABASE_1_CONNECTION_STRING, DEFAULT_MYSQL_CONNECTION_STRING};
 use container_common::anyhow_result::AnyhowResult;
 use crate::threads::listen_for_active_obs_sessions_thread::listen_for_active_obs_session_thread;
@@ -28,14 +33,15 @@ use std::sync::Arc;
 use std::thread::sleep;
 use std::time::Duration;
 use tokio::runtime::{Builder, Runtime};
-pub mod redis;
-pub mod threads;
-pub mod twitch;
-pub mod util;
 
 #[tokio::main]
 pub async fn main() -> AnyhowResult<()> {
   easyenv::init_all_with_default_logging(Some(DEFAULT_RUST_LOG));
+
+  let server_hostname = hostname::get()
+      .ok()
+      .and_then(|h| h.into_string().ok())
+      .unwrap_or("twitch-pubsub-job".to_string());
 
   let db_connection_string =
       easyenv::get_env_string_or_default(
@@ -106,10 +112,9 @@ pub async fn main() -> AnyhowResult<()> {
 
   info!("Thread pool created");
 
-  //runtime.spawn(watch_user_thread(10));
-  //runtime.spawn(watch_user_thread(9999));
   runtime.spawn(listen_for_active_obs_session_thread(
-    mysql_pool, redis_pool, redis_pubsub_pool, runtime_2));
+    mysql_pool, redis_pool, redis_pubsub_pool, runtime_2,
+    server_hostname.to_string()));
 
   loop {
     sleep(Duration::from_millis(10_000));

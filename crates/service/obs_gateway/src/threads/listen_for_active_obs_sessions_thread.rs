@@ -15,6 +15,7 @@ use std::sync::Arc;
 use std::thread::sleep;
 use std::time::Duration;
 use tokio::runtime::Runtime;
+use container_common::thread::thread_id::ThreadId;
 
 // TODO: Apart from error handling, this looks mostly good.
 
@@ -23,6 +24,7 @@ pub async fn listen_for_active_obs_session_thread(
   redis_pool: Arc<r2d2::Pool<RedisConnectionManager>>,
   redis_pubsub_pool: Arc<r2d2::Pool<RedisConnectionManager>>,
   runtime: Arc<Runtime>,
+  hostname: String,
 ) {
   // TODO: ERROR HANDLING
   // TODO: ERROR HANDLING
@@ -55,8 +57,8 @@ pub async fn listen_for_active_obs_session_thread(
 
     info!("No existing lease for {:?}...", &lease_key);
 
-    // TODO: Thread and server ids.
-    let lease = LeasePayload::new("foo", "bar");
+    let thread_id = ThreadId::random_id();
+    let lease = LeasePayload::from_thread_id(&hostname, &thread_id);
 
     let serialized = lease.serialize();
     let _v : Option<String> = redis.set_ex(
@@ -70,7 +72,13 @@ pub async fn listen_for_active_obs_session_thread(
     let redis_pool2 = redis_pool.clone();
     let mysql_pool2 = mysql_pool.clone();
 
-    let thread = TwitchPubsubUserSubscriberThread::new(twitch_user_id, mysql_pool2, redis_pool2);
+    let thread = TwitchPubsubUserSubscriberThread::new(
+      twitch_user_id,
+      mysql_pool2,
+      redis_pool2,
+      &hostname,
+      thread_id.clone());
+
     runtime.spawn(thread.start_thread());
   }
 }
