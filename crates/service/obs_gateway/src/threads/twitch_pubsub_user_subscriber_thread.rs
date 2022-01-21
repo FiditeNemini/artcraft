@@ -36,6 +36,7 @@ pub struct TwitchPubsubUserSubscriberThread {
   thread_id: ThreadId,
   server_hostname: String,
   twitch_user_id: TwitchUserId,
+
   mysql_pool: Arc<sqlx::Pool<MySql>>,
   redis_pool: Arc<r2d2::Pool<RedisConnectionManager>>,
   twitch_websocket_client: TwitchWebsocketClient,

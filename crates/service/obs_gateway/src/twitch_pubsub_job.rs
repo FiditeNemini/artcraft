@@ -19,7 +19,7 @@ pub mod util;
 
 use config::shared_constants::{DEFAULT_RUST_LOG, DEFAULT_REDIS_DATABASE_1_CONNECTION_STRING, DEFAULT_MYSQL_CONNECTION_STRING};
 use container_common::anyhow_result::AnyhowResult;
-use crate::threads::listen_for_active_obs_sessions_thread::listen_for_active_obs_session_thread;
+use crate::threads::listen_for_active_obs_sessions_thread::ListenForActiveObsSessionThread;
 use crate::twitch::websocket_client::TwitchWebsocketClient;
 use futures::executor::{ThreadPool, ThreadPoolBuilder};
 use futures::task::SpawnExt;
@@ -112,9 +112,15 @@ pub async fn main() -> AnyhowResult<()> {
 
   info!("Thread pool created");
 
-  runtime.spawn(listen_for_active_obs_session_thread(
-    mysql_pool, redis_pool, redis_pubsub_pool, runtime_2,
-    server_hostname.to_string()));
+  let thread = ListenForActiveObsSessionThread::new(
+    server_hostname.to_string(),
+    mysql_pool,
+    redis_pool,
+    redis_pubsub_pool,
+    runtime_2,
+  );
+
+  runtime.spawn(thread.start_thread());
 
   loop {
     sleep(Duration::from_millis(10_000));
