@@ -1,7 +1,7 @@
 use container_common::anyhow_result::AnyhowResult;
 use container_common::thread::thread_id::ThreadId;
 use crate::redis::lease_payload::LeasePayload;
-use crate::redis::lease_timeout::{LEASE_TIMEOUT_SECONDS, LEASE_RENEW_PERIOD, LEASE_CHECK_PERIOD};
+use crate::redis::constants::{LEASE_TIMEOUT_SECONDS, LEASE_RENEW_PERIOD, LEASE_CHECK_PERIOD};
 use crate::twitch::constants::TWITCH_PING_CADENCE;
 use crate::twitch::pubsub::build_pubsub_topics_for_user::build_pubsub_topics_for_user;
 use crate::twitch::twitch_user_id::TwitchUserId;

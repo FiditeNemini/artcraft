@@ -1,5 +1,6 @@
+use container_common::thread::thread_id::ThreadId;
+use crate::redis::constants::LEASE_TIMEOUT_SECONDS;
 use crate::redis::lease_payload::LeasePayload;
-use crate::redis::lease_timeout::LEASE_TIMEOUT_SECONDS;
 use crate::redis::obs_active_payload::ObsActivePayload;
 use crate::threads::twitch_pubsub_user_subscriber_thread::TwitchPubsubUserSubscriberThread;
 use crate::twitch::twitch_user_id::TwitchUserId;
@@ -15,7 +16,6 @@ use std::sync::Arc;
 use std::thread::sleep;
 use std::time::Duration;
 use tokio::runtime::Runtime;
-use container_common::thread::thread_id::ThreadId;
 
 // TODO: Apart from error handling, this looks mostly good.
 
@@ -55,7 +55,7 @@ impl ListenForActiveObsSessionThread {
     let mut pubsub_pool = self.redis_pubsub_pool.get().unwrap();
     let mut pubsub = pubsub_pool.as_pubsub();
 
-    pubsub.subscribe(RedisKeys::obs_active_session_topic()).unwrap();
+    pubsub.subscribe(RedisKeys::obs_active_sessions_topic()).unwrap();
 
     loop {
       let message = pubsub.get_message().unwrap();

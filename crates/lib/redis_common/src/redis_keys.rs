@@ -47,8 +47,15 @@ impl RedisKeys {
 
   /// This is a PubSub topic.
   /// We publish when new viewers arrive and as a "keep-alive ping".
-  pub fn obs_active_session_topic() -> &'static str {
-    "obsActiveSessionTopic"
+  pub fn obs_active_sessions_topic() -> &'static str {
+    "obsActiveSessionsTopic"
+  }
+
+  /// This is a key that denotes a user is actively on the OBS gateway.
+  /// These keys have a short expiry and OBS gateway must continually bump them.
+  /// If a key goes away, the thread monitoring that user should exit.
+  pub fn obs_active_session(twitch_user_id: &str) -> String {
+    format!("obsActiveSession:{}", twitch_user_id)
   }
 
   /// This is a key that denotes a PubSub lease subscriber.
@@ -61,7 +68,7 @@ impl RedisKeys {
   /// This is a PubSub topic.
   /// These are "unenriched" Twitch events from the PubSub (and eventually IRC)
   /// subscribers. Downstream listeners will enrich these for user-facing functionality.
-  pub fn twitchEventTopic(twitch_user_id: &str) -> String {
-    format!("twitchEventTopic:{}", twitch_user_id)
+  pub fn twitch_events_topic(twitch_user_id: &str) -> String {
+    format!("twitchEventsTopic:{}", twitch_user_id)
   }
 }

@@ -13,3 +13,7 @@ pub const LEASE_RENEW_PERIOD : Duration = Duration::seconds(30);
 
 /// The amount of time to wait before checking or lease is valid.
 pub const LEASE_CHECK_PERIOD : Duration = Duration::seconds(15);
+
+/// The OBS websocket polls a key to inform the backend that the
+/// user is still active.
+pub const OBS_ACTIVE_TTL_SECONDS : usize = 120;
