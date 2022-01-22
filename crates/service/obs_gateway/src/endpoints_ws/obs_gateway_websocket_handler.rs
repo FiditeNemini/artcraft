@@ -3,8 +3,10 @@ use actix_rt::Runtime;
 use actix_web::web::Path;
 use actix_web::{middleware, web, App, Error, HttpRequest, HttpResponse, HttpServer};
 use actix_web_actors::ws;
+use container_common::anyhow_result::AnyhowResult;
 use container_common::token::random_crockford_token::random_crockford_token;
 use crate::endpoints_ws::obs_twitch_thread::ObsTwitchThread;
+use crate::redis::constants::OBS_ACTIVE_TTL_SECONDS;
 use crate::redis::obs_active_payload::ObsActivePayload;
 use crate::server_state::ObsGatewayServerState;
 use crate::twitch::pubsub::build_pubsub_topics_for_user::build_pubsub_topics_for_user;
@@ -17,6 +19,8 @@ use http_server_common::error::common_server_error::CommonServerError;
 use log::error;
 use log::info;
 use log::warn;
+use r2d2_redis::RedisConnectionManager;
+use r2d2_redis::r2d2::PooledConnection;
 use r2d2_redis::redis::Commands;
 use redis_common::redis_keys::RedisKeys;
 use std::sync::Arc;
@@ -25,6 +29,8 @@ use std::time::Duration;
 use tokio::runtime::Handle;
 use twitch_api2::pubsub::Topic;
 use twitch_api2::pubsub;
+
+// TODO: Redis calls are synchronous (but fast), but is there any way to make them async?
 
 #[derive(Deserialize)]
 pub struct PathInfo {
@@ -114,23 +120,11 @@ struct ObsGatewayWebSocket {
   server_state: Arc<ObsGatewayServerState>,
 }
 
-impl ObsGatewayWebSocket {
-  fn new(
-    twitch_user_id: TwitchUserId,
-    server_state: Arc<ObsGatewayServerState>,
-  ) -> Self {
-    Self {
-      twitch_user_id,
-      server_state,
-    }
-  }
-}
-
 impl Actor for ObsGatewayWebSocket {
   type Context = ws::WebsocketContext<Self>;
 
   fn started(&mut self, _ctx: &mut Self::Context) {
-    warn!("Thread started");
+    info!("ObsGatewayWebSocket Actor::started()");
   }
 }
 
@@ -170,6 +164,7 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for ObsGatewayWebSock
             CommonServerError::ServerError
           }).unwrap(); // TODO: Fixme
 
+      self.write_obs_active().unwrap();
 
       match msg {
         ws::Message::Text(text) => {
@@ -190,3 +185,42 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for ObsGatewayWebSock
     }
   }
 }
+
+impl ObsGatewayWebSocket {
+  fn new(
+    twitch_user_id: TwitchUserId,
+    server_state: Arc<ObsGatewayServerState>,
+  ) -> Self {
+    Self {
+      twitch_user_id,
+      server_state,
+    }
+  }
+
+  fn get_redis(&self)
+    -> AnyhowResult<PooledConnection<RedisConnectionManager>>
+  {
+    let redis = self.server_state.backends
+        .redis_pool
+        .get()
+        .map_err(|err| {
+          error!("Could not get Redis: {:?}", err);
+          CommonServerError::ServerError
+        }).unwrap(); // TODO: FIXME
+
+    Ok(redis)
+  }
+
+  fn write_obs_active(&self) -> AnyhowResult<()> {
+    let mut redis = self.get_redis().unwrap();
+    let redis_key = RedisKeys::obs_active_session_keepalive(self.twitch_user_id.get_str());
+    let _r : bool = redis.set_ex(redis_key, "1", OBS_ACTIVE_TTL_SECONDS)
+        .map_err(|e| {
+          warn!("redis error: {:?}", e);
+          CommonServerError::ServerError
+        }).unwrap(); // TODO: Fixme
+
+    Ok(())
+  }
+}
+

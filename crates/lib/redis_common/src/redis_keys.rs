@@ -54,8 +54,8 @@ impl RedisKeys {
   /// This is a key that denotes a user is actively on the OBS gateway.
   /// These keys have a short expiry and OBS gateway must continually bump them.
   /// If a key goes away, the thread monitoring that user should exit.
-  pub fn obs_active_session(twitch_user_id: &str) -> String {
-    format!("obsActiveSession:{}", twitch_user_id)
+  pub fn obs_active_session_keepalive(twitch_user_id: &str) -> String {
+    format!("obsActiveSessionKeepalive:{}", twitch_user_id)
   }
 
   /// This is a key that denotes a PubSub lease subscriber.

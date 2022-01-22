@@ -17,3 +17,6 @@ pub const LEASE_CHECK_PERIOD : Duration = Duration::seconds(15);
 /// The OBS websocket polls a key to inform the backend that the
 /// user is still active.
 pub const OBS_ACTIVE_TTL_SECONDS : usize = 120;
+
+/// How often to check the OBS session activity.
+pub const OBS_ACTIVE_CHECK_PERIOD : Duration = Duration::seconds(30);

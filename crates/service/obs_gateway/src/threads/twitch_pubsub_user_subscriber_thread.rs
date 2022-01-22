@@ -1,7 +1,7 @@
 use container_common::anyhow_result::AnyhowResult;
 use container_common::thread::thread_id::ThreadId;
 use crate::redis::lease_payload::LeasePayload;
-use crate::redis::constants::{LEASE_TIMEOUT_SECONDS, LEASE_RENEW_PERIOD, LEASE_CHECK_PERIOD};
+use crate::redis::constants::{LEASE_TIMEOUT_SECONDS, LEASE_RENEW_PERIOD, LEASE_CHECK_PERIOD, OBS_ACTIVE_CHECK_PERIOD};
 use crate::twitch::constants::TWITCH_PING_CADENCE;
 use crate::twitch::pubsub::build_pubsub_topics_for_user::build_pubsub_topics_for_user;
 use crate::twitch::twitch_user_id::TwitchUserId;
@@ -53,6 +53,10 @@ pub struct TwitchPubsubUserSubscriberThread {
   // This controls when we periodically check.
   redis_lease_last_checked_at: Option<Instant>,
 
+  // Check if the OBS session is still active.
+  // If the underlying Redis key dies, we abandon our thread.
+  obs_session_active_last_checked_at: Option<Instant>,
+
   /// Twitch PubSub requires PINGs at regular intervals,
   ///   "To keep the server from closing the connection, clients must send a PING
   ///    command at least once every 5 minutes. If a client does not receive a PONG
@@ -82,6 +86,7 @@ impl TwitchPubsubUserSubscriberThread {
       redis_lease_last_renewed_at: None,
       redis_lease_last_checked_at: None,
       twitch_last_pinged_at: None,
+      obs_session_active_last_checked_at: None,
     }
   }
 
@@ -89,6 +94,10 @@ impl TwitchPubsubUserSubscriberThread {
     // We lease from outside before starting the thread.
     self.redis_lease_last_renewed_at = Some(Instant::now());
     self.redis_lease_last_checked_at = Some(Instant::now());
+
+    // We know at the start that the session should be active.
+    // TODO: Ensure we write this before the thread even starts.
+    self.obs_session_active_last_checked_at = Some(Instant::now());
 
     // Lookup the OAuth credentials
     let oauth_lookup_result = self.lookup_oauth_record().await;
@@ -152,12 +161,18 @@ impl TwitchPubsubUserSubscriberThread {
 
         let is_valid = self.maybe_check_redis_lease_is_valid().unwrap();
         if !is_valid {
-          warn!("Exiting thread.");
+          warn!("Thread lease is invalid; exiting thread.");
           return; // Exit thread
         }
 
         self.maybe_renew_redis_lease().unwrap();
         self.maybe_send_twitch_ping().await.unwrap();
+
+        let is_active = self.maybe_check_obs_session_active().unwrap();
+        if !is_active {
+          warn!("OBS session ended; exiting thread.");
+          return; // Exit thread
+        }
       }
     }
   }
@@ -229,6 +244,39 @@ impl TwitchPubsubUserSubscriberThread {
       LEASE_TIMEOUT_SECONDS
     ).unwrap();
     Ok(())
+  }
+
+  fn maybe_check_obs_session_active(&mut self) -> AnyhowResult<bool> {
+    let mut should_check_active = self.obs_session_active_last_checked_at
+        .map(|last_check| last_check.elapsed().gt(&OBS_ACTIVE_CHECK_PERIOD))
+        .unwrap_or(true);
+
+    if should_check_active {
+      info!("Checking OBS active for user {}", self.twitch_user_id.get_numeric());
+      let is_active = self.check_obs_session_active()?;
+
+      if !is_active {
+        warn!("OBS session is no longer active");
+        return Ok(false);
+      }
+
+      self.obs_session_active_last_checked_at = Some(Instant::now());
+    }
+
+    Ok(true)
+  }
+
+  fn check_obs_session_active(&mut self) -> AnyhowResult<bool> {
+    // TODO: Error handling
+    let mut redis = self.redis_pool.get().unwrap();
+    let key = RedisKeys::obs_active_session_keepalive(self.twitch_user_id.get_str());
+
+    // The value doesn't matter, just the presence of the key.
+    let payload : Option<String> = redis.get(&key).unwrap();
+    match payload {
+      None => Ok(false),
+      Some(_payload) => Ok(true),
+    }
   }
 
   async fn lookup_oauth_record(&mut self) -> AnyhowResult<Option<TwitchOauthTokenRecord>> {

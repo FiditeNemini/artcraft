@@ -27,6 +27,7 @@ use actix_web::{HttpServer, web, HttpResponse, App};
 use config::shared_constants::DEFAULT_MYSQL_CONNECTION_STRING;
 use config::shared_constants::DEFAULT_REDIS_DATABASE_1_CONNECTION_STRING;
 use config::shared_constants::DEFAULT_RUST_LOG;
+use container_common::anyhow_result::AnyhowResult;
 use crate::endpoints::oauth_begin::oauth_begin_enroll;
 use crate::endpoints::oauth_begin_redirect::oauth_begin_enroll_redirect;
 use crate::endpoints::oauth_end::oauth_end_enroll_from_redirect;
@@ -55,8 +56,6 @@ use twitch_oauth2::tokens::UserTokenBuilder;
 use twitch_oauth2::{AppAccessToken, Scope, TwitchToken, tokens::errors::AppAccessTokenError, ClientId, ClientSecret};
 
 const DEFAULT_BIND_ADDRESS : &'static str = "0.0.0.0:54321";
-
-pub type AnyhowResult<T> = anyhow::Result<T>;
 
 #[actix_web::main]
 //#[tokio::main]
