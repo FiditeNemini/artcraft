@@ -142,7 +142,14 @@ impl TwitchPubsubUserSubscriberThread {
                 info!("event: {:?}", event);
 
                 match event {
-                  Response::Response(_) => {}
+                  Response::Response(response) => {
+                    match response.error.as_deref() {
+                      Some("ERR_BADAUTH") => {
+                        warn!("Invalid token. Bad auth. Need to refresh");
+                      }
+                      _ => {},
+                    }
+                  }
                   Response::Message { .. } => {}
                   Response::Pong => {}
                   Response::Reconnect => {}
