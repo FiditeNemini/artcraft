@@ -8,7 +8,7 @@ use log::error;
 use log::warn;
 use sqlx::MySqlPool;
 
-#[derive(Serialize)]
+#[derive(Serialize, Clone)]
 pub struct TwitchOauthTokenRecord {
   /// NB: Vocodes/FakeYou/Storyteller user
   pub maybe_user_token: Option<String>,

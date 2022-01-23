@@ -1,3 +1,4 @@
+use anyhow::{anyhow, Error};
 use container_common::anyhow_result::AnyhowResult;
 use container_common::thread::thread_id::ThreadId;
 use crate::redis::lease_payload::LeasePayload;
@@ -22,6 +23,7 @@ use std::time::Duration;
 use time::Instant;
 use twitch_api2::pubsub::Response;
 use crate::twitch::oauth::oauth_token_refresher::OauthTokenRefresher;
+use database_queries::twitch_oauth::insert::TwitchOauthTokenInsertBuilder;
 
 // TODO: ERROR HANDLING
 // TODO: ERROR HANDLING
@@ -36,15 +38,90 @@ pub struct TwitchPubsubUserSubscriberThread {
   thread_id: ThreadId,
   server_hostname: String,
   twitch_user_id: TwitchUserId,
-  expected_lease_payload: LeasePayload,
-
   oauth_token_refresher: OauthTokenRefresher,
-
   mysql_pool: Arc<sqlx::Pool<MySql>>,
   redis_pool: Arc<r2d2::Pool<RedisConnectionManager>>,
-  twitch_websocket_client: TwitchWebsocketClient,
+}
 
-  // ========== Thread state ==========
+impl TwitchPubsubUserSubscriberThread {
+  pub fn new(
+    twitch_user_id: TwitchUserId,
+    oauth_token_refresher: OauthTokenRefresher,
+    mysql_pool: Arc<sqlx::Pool<MySql>>,
+    redis_pool: Arc<r2d2::Pool<RedisConnectionManager>>,
+    server_hostname: &str,
+    thread_id: ThreadId,
+  ) -> Self {
+    Self {
+      thread_id,
+      oauth_token_refresher,
+      server_hostname: server_hostname.to_string(),
+      twitch_user_id,
+      mysql_pool,
+      redis_pool,
+    }
+  }
+
+  pub async fn start_thread(mut self) {
+    let twitch_websocket_client = TwitchWebsocketClient::new().unwrap();
+    let expected_lease_payload
+        = LeasePayload::from_thread_id(&self.server_hostname, &self.thread_id);
+
+    // By failing to look this up, the thread will fail fast.
+    // When the user auths, the thread will be picked back up again.
+    let lookup_result
+        = lookup_oauth_record(&self.twitch_user_id, &self.mysql_pool).await;
+
+    let record = match lookup_result {
+      Ok(Some(record)) => record,
+      Ok(None) => {
+        error!("No twitch oauth token record");
+        return;
+      }
+      Err(e) => {
+        error!("Error looking up twitch oauth token record: {:?}", e);
+        return;
+      }
+    };
+
+    let thread = TwitchPubsubUserSubscriberThreadStageTwo {
+      thread_id: self.thread_id,
+      server_hostname: self.server_hostname,
+      twitch_user_id: self.twitch_user_id,
+      oauth_token_refresher: self.oauth_token_refresher,
+      mysql_pool: self.mysql_pool,
+      redis_pool: self.redis_pool,
+      twitch_websocket_client,
+      expected_lease_payload,
+      twitch_oauth_token_record: record,
+      redis_lease_last_renewed_at: None,
+      redis_lease_last_checked_at: None,
+      obs_session_active_last_checked_at: None,
+      twitch_last_pinged_at: None
+    };
+
+    thread.continue_thread().await
+  }
+}
+
+/// The thread is somewhat of a state machine.
+/// The first stage of thread startup can end prematurely, which is why
+/// this is modeled as two different structs.
+struct TwitchPubsubUserSubscriberThreadStageTwo {
+  thread_id: ThreadId,
+  server_hostname: String,
+  twitch_user_id: TwitchUserId,
+  oauth_token_refresher: OauthTokenRefresher,
+  mysql_pool: Arc<sqlx::Pool<MySql>>,
+  redis_pool: Arc<r2d2::Pool<RedisConnectionManager>>,
+
+  // ========== Stage Two Thread State ==========
+
+  twitch_websocket_client: TwitchWebsocketClient,
+  expected_lease_payload: LeasePayload,
+
+  // The user's oauth access and refresh tokens.
+  twitch_oauth_token_record: TwitchOauthTokenRecord,
 
   // The thread must renew the lease, or another worker will pick it up.
   // If the lease gets taken by another, we abandon our own workload.
@@ -66,34 +143,8 @@ pub struct TwitchPubsubUserSubscriberThread {
   twitch_last_pinged_at: Option<Instant>,
 }
 
-impl TwitchPubsubUserSubscriberThread {
-  pub fn new(
-    twitch_user_id: TwitchUserId,
-    oauth_token_refresher: OauthTokenRefresher,
-    mysql_pool: Arc<sqlx::Pool<MySql>>,
-    redis_pool: Arc<r2d2::Pool<RedisConnectionManager>>,
-    server_hostname: &str,
-    thread_id: ThreadId,
-  ) -> Self {
-    let twitch_websocket_client = TwitchWebsocketClient::new().unwrap();
-    let expected_lease_payload = LeasePayload::from_thread_id(&server_hostname, &thread_id);
-    Self {
-      thread_id,
-      oauth_token_refresher,
-      expected_lease_payload,
-      server_hostname: server_hostname.to_string(),
-      twitch_user_id,
-      mysql_pool,
-      redis_pool,
-      twitch_websocket_client,
-      redis_lease_last_renewed_at: None,
-      redis_lease_last_checked_at: None,
-      twitch_last_pinged_at: None,
-      obs_session_active_last_checked_at: None,
-    }
-  }
-
-  pub async fn start_thread(mut self) {
+impl TwitchPubsubUserSubscriberThreadStageTwo {
+  pub async fn continue_thread(mut self) {
     // We lease from outside before starting the thread.
     self.redis_lease_last_renewed_at = Some(Instant::now());
     self.redis_lease_last_checked_at = Some(Instant::now());
@@ -102,21 +153,7 @@ impl TwitchPubsubUserSubscriberThread {
     // TODO: Ensure we write this before the thread even starts.
     self.obs_session_active_last_checked_at = Some(Instant::now());
 
-    // Lookup the OAuth credentials
-    let oauth_lookup_result = self.lookup_oauth_record().await;
-    let oauth_token_record = match oauth_lookup_result {
-      Err(e) => {
-        error!("Error looking up oauth creds: {:?}", e);
-        return; // TODO: Better flow.
-      }
-      Ok(None) => {
-        error!("Twitch user oauth token does not exit. Auth please.");
-        return; // TODO: Better flow.
-      }
-      Ok(Some(record)) => record,
-    };
-
-    info!("Connecting to Twitch PubSub for user {}...", &oauth_token_record.twitch_username);
+    info!("Connecting to Twitch PubSub for user {}...", &self.twitch_oauth_token_record.twitch_username);
     self.twitch_websocket_client.connect().await.unwrap(); // TODO: Error handling
 
     loop {
@@ -125,7 +162,7 @@ impl TwitchPubsubUserSubscriberThread {
 
       info!("Listen to user...");
       let topics = build_pubsub_topics_for_user(self.twitch_user_id.get_numeric());
-      self.twitch_websocket_client.listen(&oauth_token_record.access_token, &topics).await.unwrap();
+      self.twitch_websocket_client.listen(&self.twitch_oauth_token_record.access_token, &topics).await.unwrap();
 
       loop {
         //debug!("[{}] maybe event for user {}...", self.thread_id.get_id(), self.twitch_user_id.get_str());
@@ -151,6 +188,7 @@ impl TwitchPubsubUserSubscriberThread {
                     match response.error.as_deref() {
                       Some("ERR_BADAUTH") => {
                         warn!("Invalid token. Bad auth. Need to refresh");
+                        self.refresh_twitch_oauth_token().await.unwrap();
                       }
                       _ => {},
                     }
@@ -289,14 +327,6 @@ impl TwitchPubsubUserSubscriberThread {
     }
   }
 
-  async fn lookup_oauth_record(&mut self) -> AnyhowResult<Option<TwitchOauthTokenRecord>> {
-    TwitchOauthTokenFinder::new()
-        .scope_twitch_user_id(Some(self.twitch_user_id.get_numeric()))
-        .allow_expired_tokens(true)
-        .perform_query(&self.mysql_pool)
-        .await
-  }
-
   async fn maybe_send_twitch_ping(&mut self) -> AnyhowResult<()> {
     let mut should_send_ping = self.twitch_last_pinged_at
         .map(|last_ping| last_ping.elapsed().gt(&TWITCH_PING_CADENCE))
@@ -310,4 +340,69 @@ impl TwitchPubsubUserSubscriberThread {
 
     Ok(())
   }
+
+  // =============== OAUTH TOKEN LOOKUP AND RENEWAL ===============
+
+  async fn refresh_twitch_oauth_token(&mut self) -> AnyhowResult<()> {
+    let refresh_token = match self.twitch_oauth_token_record.maybe_refresh_token.as_deref() {
+      Some(token) => token,
+      None => {
+        error!("No refresh token present. Cannot refresh");
+        return Err(anyhow!("No refresh token present. Cannot refresh!"));
+      },
+    };
+
+    // TODO: Move this somewhere common
+    let refresh_result = self.oauth_token_refresher.refresh_token(refresh_token)
+        .await?;
+
+    let access_token = refresh_result.access_token.secret().to_string();
+    let refresh_token : Option<String> = refresh_result.maybe_refresh_token
+        .map(|t| t.secret().to_string());
+    let expires_seconds = refresh_result.duration.as_secs() as u32;
+
+    // TODO: Move this somewhere common
+    let mut query_builder = TwitchOauthTokenInsertBuilder::new(
+      &self.twitch_oauth_token_record.twitch_user_id,
+      &self.twitch_oauth_token_record.twitch_username,
+      &access_token)
+        .set_refresh_token(refresh_token.as_deref())
+        .set_user_token(self.twitch_oauth_token_record.maybe_user_token.as_deref())
+        .set_expires_in_seconds(Some(expires_seconds))
+        // NB: We don't get these back from the refresh, but it seems like they would stay the same.
+        .set_token_type(self.twitch_oauth_token_record.token_type.as_deref())
+        .set_has_bits_read(self.twitch_oauth_token_record.has_bits_read)
+        .has_channel_read_subscriptions(self.twitch_oauth_token_record.has_channel_read_subscriptions)
+        .has_channel_read_redemptions(self.twitch_oauth_token_record.has_channel_read_redemptions)
+        .has_user_read_follows(self.twitch_oauth_token_record.has_user_read_follows);
+
+    query_builder.insert(&self.mysql_pool).await?;
+
+    let maybe_inserted
+        = lookup_oauth_record(&self.twitch_user_id, &self.mysql_pool).await?;
+
+    let new_record = match maybe_inserted {
+      Some(record) => record,
+      None => {
+        error!("Did not find oauth token record in database upon refresh");
+        return Err(anyhow!("Did not find oauth token record in database upon refresh"));
+      }
+    };
+
+    // TODO: Compare a "refresh_count"
+    self.twitch_oauth_token_record = new_record;
+
+    Ok(())
+  }
+}
+
+async fn lookup_oauth_record(
+  twitch_user_id: &TwitchUserId,
+  mysql_pool: &sqlx::Pool<MySql>
+) -> AnyhowResult<Option<TwitchOauthTokenRecord>> {
+  TwitchOauthTokenFinder::new()
+      .scope_twitch_user_id(Some(twitch_user_id.get_numeric()))
+      .allow_expired_tokens(true)
+      .perform_query(mysql_pool)
+      .await
 }
