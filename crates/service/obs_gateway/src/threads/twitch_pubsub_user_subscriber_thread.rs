@@ -21,6 +21,7 @@ use std::thread::sleep;
 use std::time::Duration;
 use time::Instant;
 use twitch_api2::pubsub::Response;
+use crate::twitch::oauth::oauth_token_refresher::OauthTokenRefresher;
 
 // TODO: ERROR HANDLING
 // TODO: ERROR HANDLING
@@ -36,6 +37,8 @@ pub struct TwitchPubsubUserSubscriberThread {
   server_hostname: String,
   twitch_user_id: TwitchUserId,
   expected_lease_payload: LeasePayload,
+
+  oauth_token_refresher: OauthTokenRefresher,
 
   mysql_pool: Arc<sqlx::Pool<MySql>>,
   redis_pool: Arc<r2d2::Pool<RedisConnectionManager>>,
@@ -66,6 +69,7 @@ pub struct TwitchPubsubUserSubscriberThread {
 impl TwitchPubsubUserSubscriberThread {
   pub fn new(
     twitch_user_id: TwitchUserId,
+    oauth_token_refresher: OauthTokenRefresher,
     mysql_pool: Arc<sqlx::Pool<MySql>>,
     redis_pool: Arc<r2d2::Pool<RedisConnectionManager>>,
     server_hostname: &str,
@@ -75,6 +79,7 @@ impl TwitchPubsubUserSubscriberThread {
     let expected_lease_payload = LeasePayload::from_thread_id(&server_hostname, &thread_id);
     Self {
       thread_id,
+      oauth_token_refresher,
       expected_lease_payload,
       server_hostname: server_hostname.to_string(),
       twitch_user_id,

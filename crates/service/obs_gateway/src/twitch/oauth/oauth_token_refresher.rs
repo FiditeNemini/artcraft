@@ -22,43 +22,39 @@ pub struct RefreshTokenResult {
 
 impl OauthTokenRefresher {
 
-  pub fn new(client_id: &str, client_secret: &str) -> AnyhowResult<Self> {
+  pub fn from_secrets(client_id: ClientId, client_secret: ClientSecret) -> AnyhowResult<Self> {
     let http_client = Client::builder()
         .redirect(Policy::none())
         .build()?;
-
     Ok(Self {
       http_client,
-      client_id: ClientId::new(client_id),
-      client_secret: ClientSecret::new(client_secret),
+      client_id,
+      client_secret,
     })
+  }
+
+  pub fn from_secrets_str(client_id: &str, client_secret: &str) -> AnyhowResult<Self> {
+    let client_id = ClientId::new(client_id);
+    let client_secret = ClientSecret::new(client_secret);
+    Self::from_secrets(client_id, client_secret)
   }
 
   /// Perform a token refresh
   pub async fn refresh_token(&self, refresh_token: &str) -> AnyhowResult<RefreshTokenResult> {
     let refresh_token = RefreshToken::new(refresh_token);
-
     let result = twitch_oauth2::refresh_token(
       &self.http_client,
       &refresh_token,
       &self.client_id,
-      &self.client_secret
-    ).await;
-
-    match result {
-      Err(e) => {
-        Err(anyhow!("error refreshing token: {:?}", e))
-      },
-      Ok((access_token,
-           duration,
-           maybe_refresh_token
-         )) => {
-        Ok(RefreshTokenResult {
-          access_token,
-          duration,
-          maybe_refresh_token,
-        })
-      }
-    }
+      &self.client_secret)
+        .await
+        .map(|(access_token, duration, maybe_refresh_token)| {
+          RefreshTokenResult {
+            access_token,
+            duration,
+            maybe_refresh_token,
+          }
+        })?;
+    Ok(result)
   }
 }

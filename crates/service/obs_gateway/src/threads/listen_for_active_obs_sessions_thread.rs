@@ -16,12 +16,14 @@ use std::sync::Arc;
 use std::thread::sleep;
 use std::time::Duration;
 use tokio::runtime::Runtime;
+use crate::twitch::oauth::oauth_token_refresher::OauthTokenRefresher;
 
 // TODO: Apart from error handling, this looks mostly good.
 
 
 pub struct ListenForActiveObsSessionThread {
   server_hostname: String,
+  oauth_token_refresher: OauthTokenRefresher,
   mysql_pool: Arc<sqlx::Pool<MySql>>,
   redis_pool: Arc<r2d2::Pool<RedisConnectionManager>>,
   redis_pubsub_pool: Arc<r2d2::Pool<RedisConnectionManager>>,
@@ -31,6 +33,7 @@ pub struct ListenForActiveObsSessionThread {
 impl ListenForActiveObsSessionThread {
   pub fn new(
     server_hostname: String,
+    oauth_token_refresher: OauthTokenRefresher,
     mysql_pool: Arc<sqlx::Pool<MySql>>,
     redis_pool: Arc<r2d2::Pool<RedisConnectionManager>>,
     redis_pubsub_pool: Arc<r2d2::Pool<RedisConnectionManager>>,
@@ -38,6 +41,7 @@ impl ListenForActiveObsSessionThread {
   ) -> Self {
     Self {
       server_hostname,
+      oauth_token_refresher,
       mysql_pool,
       redis_pool,
       redis_pubsub_pool,
@@ -94,6 +98,7 @@ impl ListenForActiveObsSessionThread {
 
       let thread = TwitchPubsubUserSubscriberThread::new(
         twitch_user_id,
+        self.oauth_token_refresher.clone(),
         mysql_pool2,
         redis_pool2,
         &self.server_hostname,

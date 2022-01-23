@@ -20,6 +20,8 @@ pub mod util;
 use config::shared_constants::{DEFAULT_RUST_LOG, DEFAULT_REDIS_DATABASE_1_CONNECTION_STRING, DEFAULT_MYSQL_CONNECTION_STRING};
 use container_common::anyhow_result::AnyhowResult;
 use crate::threads::listen_for_active_obs_sessions_thread::ListenForActiveObsSessionThread;
+use crate::twitch::oauth::oauth_token_refresher::OauthTokenRefresher;
+use crate::twitch::twitch_secrets::TwitchSecrets;
 use crate::twitch::websocket_client::TwitchWebsocketClient;
 use futures::executor::{ThreadPool, ThreadPoolBuilder};
 use futures::task::SpawnExt;
@@ -33,6 +35,7 @@ use std::sync::Arc;
 use std::thread::sleep;
 use std::time::Duration;
 use tokio::runtime::{Builder, Runtime};
+use twitch_oauth2::{ClientId, ClientSecret, RefreshToken, AccessToken};
 
 #[tokio::main]
 pub async fn main() -> AnyhowResult<()> {
@@ -42,6 +45,14 @@ pub async fn main() -> AnyhowResult<()> {
       .ok()
       .and_then(|h| h.into_string().ok())
       .unwrap_or("twitch-pubsub-job".to_string());
+
+  info!("Reading Twitch secrets...");
+
+  let secrets = TwitchSecrets::from_file("twitch_secrets.toml")?;
+  let client_id = ClientId::new(&secrets.app_client_id);
+  let client_secret = ClientSecret::new(&secrets.app_client_secret);
+
+  let oauth_token_refresher = OauthTokenRefresher::from_secrets(client_id, client_secret)?;
 
   let db_connection_string =
       easyenv::get_env_string_or_default(
@@ -114,6 +125,7 @@ pub async fn main() -> AnyhowResult<()> {
 
   let thread = ListenForActiveObsSessionThread::new(
     server_hostname.to_string(),
+    oauth_token_refresher,
     mysql_pool,
     redis_pool,
     redis_pubsub_pool,
