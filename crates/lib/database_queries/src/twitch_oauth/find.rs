@@ -45,6 +45,9 @@ pub struct TwitchOauthTokenFinder {
 
   scope_twitch_user_id: Option<u32>,
   scope_twitch_username_lowercase: Option<String>,
+
+  /// Allow return of expired tokens? Expired tokens can be renewed.
+  allow_expired_tokens: bool,
 }
 
 impl TwitchOauthTokenFinder {
@@ -52,7 +55,8 @@ impl TwitchOauthTokenFinder {
     Self {
       scope_user_token: None,
       scope_twitch_user_id: None,
-      scope_twitch_username_lowercase: None
+      scope_twitch_username_lowercase: None,
+      allow_expired_tokens: false,
     }
   }
 
@@ -70,6 +74,11 @@ impl TwitchOauthTokenFinder {
   pub fn scope_twitch_username(mut self, twitch_username: Option<&str>) -> Self {
     self.scope_twitch_username_lowercase = twitch_username
         .map(|t| t.to_string().to_lowercase());
+    self
+  }
+
+  pub fn allow_expired_tokens(mut self, allow_expired: bool) -> Self {
+    self.allow_expired_tokens = allow_expired;
     self
   }
 
@@ -169,7 +178,6 @@ SELECT
     twitch_oauth_tokens.user_deleted_at,
     twitch_oauth_tokens.mod_deleted_at
 
-
 FROM twitch_oauth_tokens
 LEFT OUTER JOIN users
     ON twitch_oauth_tokens.maybe_user_token = users.token
@@ -211,10 +219,12 @@ LEFT OUTER JOIN users
       }
     }
 
-    if !first_predicate_added {
-      query.push_str(" WHERE ( twitch_oauth_tokens.expires_at IS NULL OR twitch_oauth_tokens.expires_at > NOW() ) ");
-    } else {
-      query.push_str(" AND ( twitch_oauth_tokens.expires_at IS NULL OR twitch_oauth_tokens.expires_at > NOW() ) ");
+    if !self.allow_expired_tokens {
+      if !first_predicate_added {
+        query.push_str(" WHERE ( twitch_oauth_tokens.expires_at IS NULL OR twitch_oauth_tokens.expires_at > NOW() ) ");
+      } else {
+        query.push_str(" AND ( twitch_oauth_tokens.expires_at IS NULL OR twitch_oauth_tokens.expires_at > NOW() ) ");
+      }
     }
 
     // NB: Return the most recent.

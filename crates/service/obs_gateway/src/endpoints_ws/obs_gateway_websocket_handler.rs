@@ -53,6 +53,7 @@ pub async fn obs_gateway_websocket_handler(
 ) -> Result<HttpResponse, CommonServerError> {
 
   let mut finder = TwitchOauthTokenFinder::new()
+      .allow_expired_tokens(true)
       .scope_twitch_username(Some(&path.twitch_username));
 
   let lookup_result = finder.perform_query(&server_state.backends.mysql_pool).await;
@@ -164,6 +165,7 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for ObsGatewayWebSock
             CommonServerError::ServerError
           }).unwrap(); // TODO: Fixme
 
+      // TODO: This should be done *BEFORE* PubSub
       self.write_obs_active().unwrap();
 
       match msg {

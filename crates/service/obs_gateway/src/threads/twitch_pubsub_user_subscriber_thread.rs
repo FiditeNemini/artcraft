@@ -28,10 +28,8 @@ use twitch_api2::pubsub::Response;
 // TODO: ERROR HANDLING
 
 // TODO: Publish events back to OBS thread
-// TODO: Disconnect when OBS is done. (keepalive redis key from websocket).
 // TODO: Refresh oauth token.
-// TODO: Handle disconnects.
-// TODO: Server+thread IDs
+// TODO: Error handling, handle disconnects.
 
 pub struct TwitchPubsubUserSubscriberThread {
   thread_id: ThreadId,
@@ -282,6 +280,7 @@ impl TwitchPubsubUserSubscriberThread {
   async fn lookup_oauth_record(&mut self) -> AnyhowResult<Option<TwitchOauthTokenRecord>> {
     TwitchOauthTokenFinder::new()
         .scope_twitch_user_id(Some(self.twitch_user_id.get_numeric()))
+        .allow_expired_tokens(true)
         .perform_query(&self.mysql_pool)
         .await
   }
