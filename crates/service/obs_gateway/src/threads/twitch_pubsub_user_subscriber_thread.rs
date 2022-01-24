@@ -89,10 +89,17 @@ impl TwitchPubsubUserSubscriberThread {
         = LeasePayload::from_thread_id(&self.server_hostname, &self.thread_id);
 
     loop {
-      // TODO: Error handling
       info!("Connecting to Twitch PubSub for user {}...", &record.twitch_username);
-      let mut twitch_websocket_client =
-          self.create_subscribed_twitch_client(&record.access_token).await.unwrap();
+      let maybe_client =
+          self.create_subscribed_twitch_client(&record.access_token).await;
+
+      let twitch_websocket_client = match maybe_client {
+        Ok(client) => client,
+        Err(e) => {
+          error!("Error building Twitch client (exiting thread): {:?}", e);
+          return;
+        }
+      };
 
       let thread = TwitchPubsubUserSubscriberThreadStageTwo {
         thread_id: self.thread_id.clone(),
@@ -165,6 +172,8 @@ struct TwitchPubsubUserSubscriberThreadStageTwo {
   // ========== Stage Two Thread State ==========
 
   twitch_websocket_client: TwitchWebsocketClient,
+
+  // We'll use this again and again, so precompute it.
   expected_lease_payload: LeasePayload,
 
   // The user's oauth access and refresh tokens.
@@ -208,10 +217,10 @@ impl TwitchPubsubUserSubscriberThreadStageTwo {
         return Ok(LoopEndedReason::ExitThread { reason: "Thread lease taken".to_string() });
       }
 
-      self.maybe_renew_redis_lease().unwrap();
-      self.maybe_send_twitch_ping().await.unwrap();
+      self.maybe_renew_redis_lease()?;
+      self.maybe_send_twitch_ping().await?;
 
-      let is_active = self.maybe_check_obs_session_active().unwrap();
+      let is_active = self.maybe_check_obs_session_active()?;
       if !is_active {
         return Ok(LoopEndedReason::ExitThread { reason: "OBS session ended".to_string() });
       }
@@ -244,13 +253,14 @@ impl TwitchPubsubUserSubscriberThreadStageTwo {
     maybe_event: AnyhowResult<Option<twitch_api2::pubsub::Response>>
   ) -> AnyhowResult<Option<LoopEndedReason>> {
 
+    let maybe_event = maybe_event.map_err(|error| {
+      error!("socket error: {:?}", error);
+      error
+    })?;
+
     let event = match maybe_event {
-      Err(e) => {
-        error!("socket recv error: {:?}", e);
-        return Ok(None);
-      },
-      Ok(Some(event)) => event,
-      Ok(None) => return Ok(None),
+      None => return Ok(None),
+      Some(event) => event,
     };
 
     info!("event: {:?}", event);
@@ -260,7 +270,7 @@ impl TwitchPubsubUserSubscriberThreadStageTwo {
         match response.error.as_deref() {
           Some("ERR_BADAUTH") => {
             warn!("Invalid token. Bad auth. Need to refresh");
-            self.refresh_twitch_oauth_token().await.unwrap();
+            self.refresh_twitch_oauth_token().await?;
             return Ok(Some(LoopEndedReason::TwitchNeedsReset));
           }
           _ => {},
@@ -313,17 +323,17 @@ impl TwitchPubsubUserSubscriberThreadStageTwo {
   fn check_redis_lease_is_valid(&mut self) -> AnyhowResult<bool> {
     // TODO: Error handling
 
-    let mut redis = self.redis_pool.get().unwrap();
+    let mut redis = self.redis_pool.get()?;
     let lease_key = RedisKeys::twitch_pubsub_lease(self.twitch_user_id.get_str());
 
-    let payload : Option<String> = redis.get(&lease_key).unwrap();
+    let payload : Option<String> = redis.get(&lease_key)?;
     match payload {
       None => {
         warn!("Redis lease payload absent. Another thread could be started.");
         Ok(true)
       }
       Some(payload) => {
-        let actual_payload = LeasePayload::deserialize(&payload).unwrap();
+        let actual_payload = LeasePayload::deserialize(&payload)?;
         let equals_expected = self.expected_lease_payload.eq(&actual_payload);
         Ok(equals_expected)
       }
@@ -346,7 +356,7 @@ impl TwitchPubsubUserSubscriberThreadStageTwo {
 
   fn renew_redis_lease(&mut self) -> AnyhowResult<()> {
     // TODO: Error handling
-    let mut redis = self.redis_pool.get().unwrap();
+    let mut redis = self.redis_pool.get()?;
 
     let lease_key = RedisKeys::twitch_pubsub_lease(self.twitch_user_id.get_str());
     let lease_value = self.expected_lease_payload.serialize();
@@ -355,7 +365,7 @@ impl TwitchPubsubUserSubscriberThreadStageTwo {
       &lease_key,
       &lease_value,
       LEASE_TIMEOUT_SECONDS
-    ).unwrap();
+    )?;
     Ok(())
   }
 
@@ -383,11 +393,11 @@ impl TwitchPubsubUserSubscriberThreadStageTwo {
 
   fn check_obs_session_active(&mut self) -> AnyhowResult<bool> {
     // TODO: Error handling
-    let mut redis = self.redis_pool.get().unwrap();
+    let mut redis = self.redis_pool.get()?;
     let key = RedisKeys::obs_active_session_keepalive(self.twitch_user_id.get_str());
 
     // The value doesn't matter, just the presence of the key.
-    let payload : Option<String> = redis.get(&key).unwrap();
+    let payload : Option<String> = redis.get(&key)?;
     match payload {
       None => Ok(false),
       Some(_payload) => Ok(true),
