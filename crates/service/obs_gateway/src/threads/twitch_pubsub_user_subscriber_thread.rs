@@ -25,14 +25,7 @@ use twitch_api2::pubsub::Response;
 use crate::twitch::oauth::oauth_token_refresher::OauthTokenRefresher;
 use database_queries::twitch_oauth::insert::TwitchOauthTokenInsertBuilder;
 
-// TODO: ERROR HANDLING
-// TODO: ERROR HANDLING
-// TODO: ERROR HANDLING
-// TODO: ERROR HANDLING
-
 // TODO: Publish events back to OBS thread
-// TODO: Refresh oauth token and restart client.
-// TODO: Error handling, handle disconnects.
 // TODO: (cleanup) make the logic clearer to follow.
 
 // =========================================
@@ -101,6 +94,10 @@ impl TwitchPubsubUserSubscriberThread {
         }
       };
 
+      // NB: All of the timers (thus far) can wait to run.
+      // We set their first run time to now so we don't have to deal with Option<>.
+      let now = Instant::now();
+
       let thread = TwitchPubsubUserSubscriberThreadStageTwo {
         thread_id: self.thread_id.clone(),
         server_hostname: self.server_hostname.clone(),
@@ -111,10 +108,10 @@ impl TwitchPubsubUserSubscriberThread {
         twitch_websocket_client,
         expected_lease_payload: expected_lease_payload.clone(),
         twitch_oauth_token_record: record.clone(),
-        redis_lease_last_renewed_at: None,
-        redis_lease_last_checked_at: None,
-        obs_session_active_last_checked_at: None,
-        twitch_last_pinged_at: None
+        redis_lease_last_renewed_at: now,
+        redis_lease_last_checked_at: now,
+        obs_session_active_last_checked_at: now,
+        twitch_last_pinged_at: now,
       };
 
       // NB: The following call will run its main loop until/unless the Twitch client
@@ -181,22 +178,22 @@ struct TwitchPubsubUserSubscriberThreadStageTwo {
 
   // The thread must renew the lease, or another worker will pick it up.
   // If the lease gets taken by another, we abandon our own workload.
-  redis_lease_last_renewed_at: Option<Instant>,
+  redis_lease_last_renewed_at: Instant,
 
   // If the lease gets taken by another thread, we abandon our own workload.
   // This controls when we periodically check.
-  redis_lease_last_checked_at: Option<Instant>,
+  redis_lease_last_checked_at: Instant,
 
   // Check if the OBS session is still active.
   // If the underlying Redis key dies, we abandon our thread.
-  obs_session_active_last_checked_at: Option<Instant>,
+  obs_session_active_last_checked_at: Instant,
 
   /// Twitch PubSub requires PINGs at regular intervals,
   ///   "To keep the server from closing the connection, clients must send a PING
   ///    command at least once every 5 minutes. If a client does not receive a PONG
   ///    message within 10 seconds of issuing a PING command, it should reconnect
   ///    to the server. See details in Handling Connection Failures."
-  twitch_last_pinged_at: Option<Instant>,
+  twitch_last_pinged_at: Instant,
 }
 
 impl TwitchPubsubUserSubscriberThreadStageTwo {
@@ -204,13 +201,6 @@ impl TwitchPubsubUserSubscriberThreadStageTwo {
   /// This function will loop until it either errors or hits a `LoopEndedReason` condition.
   /// The caller will need to handle these cases.
   pub async fn continue_thread(mut self) -> AnyhowResult<LoopEndedReason> {
-    // We lease from outside before starting the thread.
-    self.redis_lease_last_renewed_at = Some(Instant::now());
-
-    // We know at the start that the session should be active.
-    // TODO: Ensure we write this before the thread even starts.
-    self.obs_session_active_last_checked_at = Some(Instant::now());
-
     loop {
       let is_valid = self.maybe_check_redis_lease_is_valid()?;
       if !is_valid {
@@ -286,13 +276,13 @@ impl TwitchPubsubUserSubscriberThreadStageTwo {
 
   async fn maybe_send_twitch_ping(&mut self) -> AnyhowResult<()> {
     let mut should_send_ping = self.twitch_last_pinged_at
-        .map(|last_ping| last_ping.elapsed().gt(&TWITCH_PING_CADENCE))
-        .unwrap_or(true);
+        .elapsed()
+        .gt(&TWITCH_PING_CADENCE);
 
     if should_send_ping {
       info!("Sending Twitch ping for user {}", self.twitch_user_id.get_numeric());
       self.twitch_websocket_client.send_ping().await?;
-      self.twitch_last_pinged_at = Some(Instant::now());
+      self.twitch_last_pinged_at = Instant::now();
     }
 
     Ok(())
@@ -302,8 +292,8 @@ impl TwitchPubsubUserSubscriberThreadStageTwo {
 
   fn maybe_check_redis_lease_is_valid(&mut self) -> AnyhowResult<bool> {
     let mut should_check_lease = self.redis_lease_last_checked_at
-        .map(|last_read| last_read.elapsed().gt(&LEASE_CHECK_PERIOD))
-        .unwrap_or(true);
+        .elapsed()
+        .gt(&LEASE_CHECK_PERIOD);
 
     if should_check_lease {
       info!("Checking Redis Lease for user {}", self.twitch_user_id.get_numeric());
@@ -314,15 +304,13 @@ impl TwitchPubsubUserSubscriberThreadStageTwo {
         return Ok(false);
       }
 
-      self.redis_lease_last_checked_at = Some(Instant::now());
+      self.redis_lease_last_checked_at = Instant::now();
     }
 
     Ok(true)
   }
 
   fn check_redis_lease_is_valid(&mut self) -> AnyhowResult<bool> {
-    // TODO: Error handling
-
     let mut redis = self.redis_pool.get()?;
     let lease_key = RedisKeys::twitch_pubsub_lease(self.twitch_user_id.get_str());
 
@@ -342,13 +330,13 @@ impl TwitchPubsubUserSubscriberThreadStageTwo {
 
   fn maybe_renew_redis_lease(&mut self) -> AnyhowResult<()> {
     let mut should_renew_lease = self.redis_lease_last_renewed_at
-        .map(|last_write| last_write.elapsed().gt(&LEASE_RENEW_PERIOD))
-        .unwrap_or(true);
+        .elapsed()
+        .gt(&LEASE_RENEW_PERIOD);
 
     if should_renew_lease {
       info!("Renewing Redis Lease for user {}", self.twitch_user_id.get_numeric());
       self.renew_redis_lease()?;
-      self.redis_lease_last_renewed_at = Some(Instant::now());
+      self.redis_lease_last_renewed_at = Instant::now();
     }
 
     Ok(())
@@ -373,8 +361,8 @@ impl TwitchPubsubUserSubscriberThreadStageTwo {
 
   fn maybe_check_obs_session_active(&mut self) -> AnyhowResult<bool> {
     let mut should_check_active = self.obs_session_active_last_checked_at
-        .map(|last_check| last_check.elapsed().gt(&OBS_ACTIVE_CHECK_PERIOD))
-        .unwrap_or(true);
+        .elapsed()
+        .gt(&OBS_ACTIVE_CHECK_PERIOD);
 
     if should_check_active {
       info!("Checking OBS active for user {}", self.twitch_user_id.get_numeric());
@@ -385,7 +373,7 @@ impl TwitchPubsubUserSubscriberThreadStageTwo {
         return Ok(false);
       }
 
-      self.obs_session_active_last_checked_at = Some(Instant::now());
+      self.obs_session_active_last_checked_at = Instant::now();
     }
 
     Ok(true)
