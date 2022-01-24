@@ -66,7 +66,7 @@ impl TwitchPubsubUserSubscriberThread {
     let lookup_result
         = lookup_oauth_record(&self.twitch_user_id, &self.mysql_pool).await;
 
-    let record = match lookup_result {
+    let mut record = match lookup_result {
       Ok(Some(record)) => record,
       Ok(None) => {
         error!("No twitch oauth token record");
@@ -124,6 +124,11 @@ impl TwitchPubsubUserSubscriberThread {
         Ok(LoopEndedReason::ExitThread { reason}) => {
           warn!("Thread has ended with reason: {}", reason);
           return;
+        }
+        Ok(LoopEndedReason::RefreshedOauthToken { token }) => {
+          warn!("OAuth token was refreshed.");
+          record = token;
+          sleep(Duration::from_secs(3));
         }
         Err(e) => {
           error!("There was an error, restarting thread shortly: {:?}", e);
@@ -260,8 +265,8 @@ impl TwitchPubsubUserSubscriberThreadStageTwo {
         match response.error.as_deref() {
           Some("ERR_BADAUTH") => {
             warn!("Invalid token. Bad auth. Need to refresh");
-            self.refresh_twitch_oauth_token().await?;
-            return Ok(Some(LoopEndedReason::TwitchNeedsReset));
+            let token_record = self.refresh_twitch_oauth_token().await?;
+            return Ok(Some(LoopEndedReason::RefreshedOauthToken { token: token_record }));
           }
           _ => {},
         }
@@ -394,7 +399,7 @@ impl TwitchPubsubUserSubscriberThreadStageTwo {
 
   // =============== OAUTH TOKEN LOOKUP AND RENEWAL ===============
 
-  async fn refresh_twitch_oauth_token(&mut self) -> AnyhowResult<()> {
+  async fn refresh_twitch_oauth_token(&mut self) -> AnyhowResult<TwitchOauthTokenRecord> {
     let refresh_token = match self.twitch_oauth_token_record.maybe_refresh_token.as_deref() {
       Some(token) => token,
       None => {
@@ -440,10 +445,11 @@ impl TwitchPubsubUserSubscriberThreadStageTwo {
       }
     };
 
+    // NB: Instead of resetting the local loop state, we'll create a fresh new Twitch client.
     // TODO: Compare a "refresh_count"
-    self.twitch_oauth_token_record = new_record;
+    self.twitch_oauth_token_record = new_record.clone();
 
-    Ok(())
+    Ok(new_record)
   }
 }
 
@@ -467,5 +473,7 @@ enum LoopEndedReason {
   TwitchNeedsReset,
   /// Terminate the thread
   ExitThread { reason: String },
+  /// A new OAuth token was minted.
+  RefreshedOauthToken { token: TwitchOauthTokenRecord }
 }
 
