@@ -35,6 +35,10 @@ use database_queries::twitch_oauth::insert::TwitchOauthTokenInsertBuilder;
 // TODO: Error handling, handle disconnects.
 // TODO: (cleanup) make the logic clearer to follow.
 
+// =========================================
+// =============== STAGE ONE ===============
+// =========================================
+
 pub struct TwitchPubsubUserSubscriberThread {
   thread_id: ThreadId,
   server_hostname: String,
@@ -142,6 +146,10 @@ impl TwitchPubsubUserSubscriberThread {
     Ok(twitch_websocket_client)
   }
 }
+
+// =========================================
+// =============== STAGE TWO ===============
+// =========================================
 
 /// The thread is somewhat of a state machine.
 /// The first stage of thread startup can end prematurely, which is why
@@ -440,6 +448,10 @@ impl TwitchPubsubUserSubscriberThreadStageTwo {
     Ok(())
   }
 }
+
+// ====================================
+// =============== MISC ===============
+// ====================================
 
 async fn lookup_oauth_record(
   twitch_user_id: &TwitchUserId,
