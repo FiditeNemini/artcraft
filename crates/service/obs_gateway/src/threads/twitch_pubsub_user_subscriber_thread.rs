@@ -31,8 +31,9 @@ use database_queries::twitch_oauth::insert::TwitchOauthTokenInsertBuilder;
 // TODO: ERROR HANDLING
 
 // TODO: Publish events back to OBS thread
-// TODO: Refresh oauth token.
+// TODO: Refresh oauth token and restart client.
 // TODO: Error handling, handle disconnects.
+// TODO: (cleanup) make the logic clearer to follow.
 
 pub struct TwitchPubsubUserSubscriberThread {
   thread_id: ThreadId,
@@ -63,10 +64,6 @@ impl TwitchPubsubUserSubscriberThread {
   }
 
   pub async fn start_thread(mut self) {
-    let twitch_websocket_client = TwitchWebsocketClient::new().unwrap();
-    let expected_lease_payload
-        = LeasePayload::from_thread_id(&self.server_hostname, &self.thread_id);
-
     // By failing to look this up, the thread will fail fast.
     // When the user auths, the thread will be picked back up again.
     let lookup_result
@@ -84,23 +81,65 @@ impl TwitchPubsubUserSubscriberThread {
       }
     };
 
-    let thread = TwitchPubsubUserSubscriberThreadStageTwo {
-      thread_id: self.thread_id,
-      server_hostname: self.server_hostname,
-      twitch_user_id: self.twitch_user_id,
-      oauth_token_refresher: self.oauth_token_refresher,
-      mysql_pool: self.mysql_pool,
-      redis_pool: self.redis_pool,
-      twitch_websocket_client,
-      expected_lease_payload,
-      twitch_oauth_token_record: record,
-      redis_lease_last_renewed_at: None,
-      redis_lease_last_checked_at: None,
-      obs_session_active_last_checked_at: None,
-      twitch_last_pinged_at: None
-    };
+    let expected_lease_payload
+        = LeasePayload::from_thread_id(&self.server_hostname, &self.thread_id);
 
-    thread.continue_thread().await
+    loop {
+      // TODO: Error handling
+      info!("Connecting to Twitch PubSub for user {}...", &record.twitch_username);
+      let mut twitch_websocket_client =
+          self.create_subscribed_twitch_client(&record.access_token).await.unwrap();
+
+      let thread = TwitchPubsubUserSubscriberThreadStageTwo {
+        thread_id: self.thread_id.clone(),
+        server_hostname: self.server_hostname.clone(),
+        twitch_user_id: self.twitch_user_id.clone(),
+        oauth_token_refresher: self.oauth_token_refresher.clone(),
+        mysql_pool: self.mysql_pool.clone(),
+        redis_pool: self.redis_pool.clone(),
+        twitch_websocket_client,
+        expected_lease_payload: expected_lease_payload.clone(),
+        twitch_oauth_token_record: record.clone(),
+        redis_lease_last_renewed_at: None,
+        redis_lease_last_checked_at: None,
+        obs_session_active_last_checked_at: None,
+        twitch_last_pinged_at: None
+      };
+
+      // NB: The following call will run its main loop until/unless the Twitch client
+      // fails to auth or disconnects. If this happens, we'll try again.
+      match thread.continue_thread().await {
+        Ok(LoopEndedReason::TwitchNeedsReset) => {
+          sleep(Duration::from_secs(15));
+          continue;
+        }
+        Ok(LoopEndedReason::ExitThread { reason}) => {
+          warn!("Thread has ended with reason: {}", reason);
+          return;
+        }
+        Err(e) => {
+          error!("There was an error, restarting thread shortly: {:?}", e);
+          sleep(Duration::from_secs(15));
+          continue;
+        }
+      }
+    }
+  }
+
+  async fn create_subscribed_twitch_client(
+    &self,
+    access_token: &str
+  ) -> AnyhowResult<TwitchWebsocketClient> {
+    let mut twitch_websocket_client = TwitchWebsocketClient::new()?;
+
+    twitch_websocket_client.connect().await?;
+    twitch_websocket_client.send_ping().await?;
+
+    // NB: Failure to auth won't be immediate.
+    let topics = build_pubsub_topics_for_user(self.twitch_user_id.get_numeric());
+    twitch_websocket_client.listen(access_token, &topics).await?;
+
+    Ok(twitch_websocket_client)
   }
 }
 
@@ -144,7 +183,10 @@ struct TwitchPubsubUserSubscriberThreadStageTwo {
 }
 
 impl TwitchPubsubUserSubscriberThreadStageTwo {
-  pub async fn continue_thread(mut self) {
+
+  /// This function will loop until it either errors or hits a `LoopEndedReason` condition.
+  /// The caller will need to handle these cases.
+  pub async fn continue_thread(mut self) -> AnyhowResult<LoopEndedReason> {
     // We lease from outside before starting the thread.
     self.redis_lease_last_renewed_at = Some(Instant::now());
     self.redis_lease_last_checked_at = Some(Instant::now());
@@ -153,77 +195,90 @@ impl TwitchPubsubUserSubscriberThreadStageTwo {
     // TODO: Ensure we write this before the thread even starts.
     self.obs_session_active_last_checked_at = Some(Instant::now());
 
-    info!("Connecting to Twitch PubSub for user {}...", &self.twitch_oauth_token_record.twitch_username);
-    self.twitch_websocket_client.connect().await.unwrap(); // TODO: Error handling
-
     loop {
+      let mut interval = tokio::time::interval(Duration::from_millis(1000));
+
+      // NB: We can't block forever.
+      // Adapted from the very good tokio-tungstenite example here, which also splits sockets
+      // into bidirectional streams:
+      // https://github.com/snapview/tokio-tungstenite/blob/master/examples/interval-server.rs
+      tokio::select! {
+        maybe_event = self.twitch_websocket_client.try_next() => {
+          if let Some(r) = self.handle_event(maybe_event).await? {
+            return Ok(r);
+          }
+        }
+        _ = interval.tick() => {
+          sleep(Duration::from_secs(5));
+        }
+      }
+
+      sleep(Duration::from_secs(1));
+
+      let is_valid = self.maybe_check_redis_lease_is_valid()?;
+      if !is_valid {
+        return Ok(LoopEndedReason::ExitThread { reason: "Thread lease taken".to_string() });
+      }
+
       self.maybe_renew_redis_lease().unwrap();
       self.maybe_send_twitch_ping().await.unwrap();
 
-      info!("Listen to user...");
-      let topics = build_pubsub_topics_for_user(self.twitch_user_id.get_numeric());
-      self.twitch_websocket_client.listen(&self.twitch_oauth_token_record.access_token, &topics).await.unwrap();
-
-      loop {
-        //debug!("[{}] maybe event for user {}...", self.thread_id.get_id(), self.twitch_user_id.get_str());
-
-        let mut interval = tokio::time::interval(Duration::from_millis(1000));
-
-        // NB: We can't block forever.
-        // Adapted from the very good tokio-tungstenite example here, which also splits sockets
-        // into bidirectional streams:
-        // https://github.com/snapview/tokio-tungstenite/blob/master/examples/interval-server.rs
-        tokio::select! {
-          maybe_event = self.twitch_websocket_client.try_next() => {
-            match maybe_event {
-              Err(e) => {
-                error!("socket recv error: {:?}", e);
-              }
-              Ok(None) => {},
-              Ok(Some(ref event)) => {
-                info!("event: {:?}", event);
-
-                match event {
-                  Response::Response(response) => {
-                    match response.error.as_deref() {
-                      Some("ERR_BADAUTH") => {
-                        warn!("Invalid token. Bad auth. Need to refresh");
-                        self.refresh_twitch_oauth_token().await.unwrap();
-                      }
-                      _ => {},
-                    }
-                  }
-                  Response::Message { .. } => {}
-                  Response::Pong => {}
-                  Response::Reconnect => {}
-                }
-              }
-            }
-          }
-          _ = interval.tick() => {
-            sleep(Duration::from_secs(5));
-          }
-        }
-
-        sleep(Duration::from_secs(1));
-
-        let is_valid = self.maybe_check_redis_lease_is_valid().unwrap();
-        if !is_valid {
-          warn!("Thread lease is invalid; exiting thread.");
-          return; // Exit thread
-        }
-
-        self.maybe_renew_redis_lease().unwrap();
-        self.maybe_send_twitch_ping().await.unwrap();
-
-        let is_active = self.maybe_check_obs_session_active().unwrap();
-        if !is_active {
-          warn!("OBS session ended; exiting thread.");
-          return; // Exit thread
-        }
+      let is_active = self.maybe_check_obs_session_active().unwrap();
+      if !is_active {
+        return Ok(LoopEndedReason::ExitThread { reason: "OBS session ended".to_string() });
       }
     }
   }
+
+  // =============== TWITCH PUBSUB EVENTS AND KEEPALIVE ===============
+
+  async fn handle_event(
+    &mut self,
+    event: AnyhowResult<Option<twitch_api2::pubsub::Response>>
+  ) -> AnyhowResult<Option<LoopEndedReason>> {
+
+    info!("event: {:?}", event);
+
+    /*match maybe_event {
+      Err(e) => error!("socket recv error: {:?}", e),
+      Ok(None) => {},
+      Ok(Some(ref event)) => {
+      }
+    }
+    match event {
+      Response::Response(response) => {
+        match response.error.as_deref() {
+          Some("ERR_BADAUTH") => {
+            warn!("Invalid token. Bad auth. Need to refresh");
+            self.refresh_twitch_oauth_token().await.unwrap();
+            return Ok(Some(LoopEndedReason::TwitchNeedsReset));
+          }
+          _ => {},
+        }
+      }
+      Response::Message { .. } => {}
+      Response::Pong => {}
+      Response::Reconnect => {}
+    }*/
+
+    Ok(None)
+  }
+
+  async fn maybe_send_twitch_ping(&mut self) -> AnyhowResult<()> {
+    let mut should_send_ping = self.twitch_last_pinged_at
+        .map(|last_ping| last_ping.elapsed().gt(&TWITCH_PING_CADENCE))
+        .unwrap_or(true);
+
+    if should_send_ping {
+      info!("Sending Twitch ping for user {}", self.twitch_user_id.get_numeric());
+      self.twitch_websocket_client.send_ping().await?;
+      self.twitch_last_pinged_at = Some(Instant::now());
+    }
+
+    Ok(())
+  }
+
+  // =============== REDIS THREAD LEASE ===============
 
   fn maybe_check_redis_lease_is_valid(&mut self) -> AnyhowResult<bool> {
     let mut should_check_lease = self.redis_lease_last_checked_at
@@ -294,6 +349,8 @@ impl TwitchPubsubUserSubscriberThreadStageTwo {
     Ok(())
   }
 
+  // =============== OBS SESSION ACTIVITY ===============
+
   fn maybe_check_obs_session_active(&mut self) -> AnyhowResult<bool> {
     let mut should_check_active = self.obs_session_active_last_checked_at
         .map(|last_check| last_check.elapsed().gt(&OBS_ACTIVE_CHECK_PERIOD))
@@ -325,20 +382,6 @@ impl TwitchPubsubUserSubscriberThreadStageTwo {
       None => Ok(false),
       Some(_payload) => Ok(true),
     }
-  }
-
-  async fn maybe_send_twitch_ping(&mut self) -> AnyhowResult<()> {
-    let mut should_send_ping = self.twitch_last_pinged_at
-        .map(|last_ping| last_ping.elapsed().gt(&TWITCH_PING_CADENCE))
-        .unwrap_or(true);
-
-    if should_send_ping {
-      info!("Sending Twitch ping for user {}", self.twitch_user_id.get_numeric());
-      self.twitch_websocket_client.send_ping().await?;
-      self.twitch_last_pinged_at = Some(Instant::now());
-    }
-
-    Ok(())
   }
 
   // =============== OAUTH TOKEN LOOKUP AND RENEWAL ===============
@@ -406,3 +449,11 @@ async fn lookup_oauth_record(
       .perform_query(mysql_pool)
       .await
 }
+
+enum LoopEndedReason {
+  /// Reset the Twitch client
+  TwitchNeedsReset,
+  /// Terminate the thread
+  ExitThread { reason: String },
+}
+
