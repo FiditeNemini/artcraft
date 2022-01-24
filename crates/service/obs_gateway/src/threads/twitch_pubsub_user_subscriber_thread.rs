@@ -117,10 +117,6 @@ impl TwitchPubsubUserSubscriberThread {
       // NB: The following call will run its main loop until/unless the Twitch client
       // fails to auth or disconnects. If this happens, we'll try again.
       match thread.continue_thread().await {
-        Ok(LoopEndedReason::TwitchNeedsReset) => {
-          sleep(Duration::from_secs(15));
-          continue;
-        }
         Ok(LoopEndedReason::ExitThread { reason}) => {
           warn!("Thread has ended with reason: {}", reason);
           return;
@@ -469,8 +465,6 @@ async fn lookup_oauth_record(
 }
 
 enum LoopEndedReason {
-  /// Reset the Twitch client
-  TwitchNeedsReset,
   /// Terminate the thread
   ExitThread { reason: String },
   /// A new OAuth token was minted.
