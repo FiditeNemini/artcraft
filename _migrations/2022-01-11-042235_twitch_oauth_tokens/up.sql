@@ -5,6 +5,7 @@
 -- **NOTE ABOUT DESIGN**:
 --   This table contains _many_ OAuth tokens for any single user. (many users : many tokens)
 --   An entire history of tokens is kept in the table.
+--   Apart from "deleted_at", etc., these records should largely be IMMUTABLE.
 
 CREATE TABLE twitch_oauth_tokens(
   -- Not used for anything except replication.
@@ -48,6 +49,11 @@ CREATE TABLE twitch_oauth_tokens(
   -- (We don't update this field.)
   -- Null if it does not expire or we were not informed
   expires_in_seconds INT(10) UNSIGNED DEFAULT NULL,
+
+  -- Number of times this token has been refreshed
+  -- The original token creation will be "0", and each
+  -- subsequent time will bump by one. Mostly for debugging.
+  refresh_count INT(10) UNSIGNED DEFAULT 0,
 
   -- ========== OAUTH SCOPES ==========
 

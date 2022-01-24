@@ -35,6 +35,9 @@ pub struct TwitchOauthTokenInsertBuilder {
   /// TTL seconds from issue
   expires_in_seconds: Option<u32>,
 
+  /// Number of times we've refreshed the token
+  refresh_count: u32,
+
   has_bits_read: bool,
   has_channel_read_subscriptions: bool,
   has_channel_read_redemptions: bool,
@@ -55,7 +58,8 @@ impl TwitchOauthTokenInsertBuilder {
       has_bits_read: false,
       has_channel_read_subscriptions: false,
       has_channel_read_redemptions: false,
-      has_user_read_follows: false
+      has_user_read_follows: false,
+      refresh_count: 0,
     }
   }
 
@@ -81,6 +85,11 @@ impl TwitchOauthTokenInsertBuilder {
 
   pub fn set_expires_in_seconds(mut self, expires_in_seconds: Option<u32>) -> Self {
     self.expires_in_seconds = expires_in_seconds;
+    self
+  }
+
+  pub fn set_refresh_count(mut self, refresh_count: u32) -> Self {
+    self.refresh_count = refresh_count;
     self
   }
 

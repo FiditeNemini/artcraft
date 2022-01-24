@@ -1,13 +1,15 @@
 use anyhow::{anyhow, Error};
 use container_common::anyhow_result::AnyhowResult;
 use container_common::thread::thread_id::ThreadId;
-use crate::redis::lease_payload::LeasePayload;
 use crate::redis::constants::{LEASE_TIMEOUT_SECONDS, LEASE_RENEW_PERIOD, LEASE_CHECK_PERIOD, OBS_ACTIVE_CHECK_PERIOD};
+use crate::redis::lease_payload::LeasePayload;
 use crate::twitch::constants::TWITCH_PING_CADENCE;
+use crate::twitch::oauth::oauth_token_refresher::OauthTokenRefresher;
 use crate::twitch::pubsub::build_pubsub_topics_for_user::build_pubsub_topics_for_user;
 use crate::twitch::twitch_user_id::TwitchUserId;
 use crate::twitch::websocket_client::TwitchWebsocketClient;
 use database_queries::twitch_oauth::find::{TwitchOauthTokenRecord, TwitchOauthTokenFinder};
+use database_queries::twitch_oauth::insert::TwitchOauthTokenInsertBuilder;
 use log::debug;
 use log::error;
 use log::info;
@@ -22,8 +24,6 @@ use std::thread::sleep;
 use std::time::Duration;
 use time::Instant;
 use twitch_api2::pubsub::Response;
-use crate::twitch::oauth::oauth_token_refresher::OauthTokenRefresher;
-use database_queries::twitch_oauth::insert::TwitchOauthTokenInsertBuilder;
 
 // TODO: Publish events back to OBS thread
 // TODO: (cleanup) make the logic clearer to follow.
@@ -344,7 +344,6 @@ impl TwitchPubsubUserSubscriberThreadStageTwo {
   }
 
   fn renew_redis_lease(&mut self) -> AnyhowResult<()> {
-    // TODO: Error handling
     let mut redis = self.redis_pool.get()?;
 
     let lease_key = RedisKeys::twitch_pubsub_lease(self.twitch_user_id.get_str());
@@ -381,7 +380,6 @@ impl TwitchPubsubUserSubscriberThreadStageTwo {
   }
 
   fn check_obs_session_active(&mut self) -> AnyhowResult<bool> {
-    // TODO: Error handling
     let mut redis = self.redis_pool.get()?;
     let key = RedisKeys::obs_active_session_keepalive(self.twitch_user_id.get_str());
 
@@ -404,7 +402,6 @@ impl TwitchPubsubUserSubscriberThreadStageTwo {
       },
     };
 
-    // TODO: Move this somewhere common
     let refresh_result = self.oauth_token_refresher.refresh_token(refresh_token)
         .await?;
 
@@ -413,7 +410,7 @@ impl TwitchPubsubUserSubscriberThreadStageTwo {
         .map(|t| t.secret().to_string());
     let expires_seconds = refresh_result.duration.as_secs() as u32;
 
-    // TODO: Move this somewhere common
+    // TODO: Move saving a refreshed record somewhere common
     let mut query_builder = TwitchOauthTokenInsertBuilder::new(
       &self.twitch_oauth_token_record.twitch_user_id,
       &self.twitch_oauth_token_record.twitch_username,
@@ -421,6 +418,7 @@ impl TwitchPubsubUserSubscriberThreadStageTwo {
         .set_refresh_token(refresh_token.as_deref())
         .set_user_token(self.twitch_oauth_token_record.maybe_user_token.as_deref())
         .set_expires_in_seconds(Some(expires_seconds))
+        .set_refresh_count(self.twitch_oauth_token_record.refresh_count.saturating_add(1))
         // NB: We don't get these back from the refresh, but it seems like they would stay the same.
         .set_token_type(self.twitch_oauth_token_record.token_type.as_deref())
         .set_has_bits_read(self.twitch_oauth_token_record.has_bits_read)
