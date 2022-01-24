@@ -189,32 +189,12 @@ impl TwitchPubsubUserSubscriberThreadStageTwo {
   pub async fn continue_thread(mut self) -> AnyhowResult<LoopEndedReason> {
     // We lease from outside before starting the thread.
     self.redis_lease_last_renewed_at = Some(Instant::now());
-    self.redis_lease_last_checked_at = Some(Instant::now());
 
     // We know at the start that the session should be active.
     // TODO: Ensure we write this before the thread even starts.
     self.obs_session_active_last_checked_at = Some(Instant::now());
 
     loop {
-      let mut interval = tokio::time::interval(Duration::from_millis(1000));
-
-      // NB: We can't block forever.
-      // Adapted from the very good tokio-tungstenite example here, which also splits sockets
-      // into bidirectional streams:
-      // https://github.com/snapview/tokio-tungstenite/blob/master/examples/interval-server.rs
-      tokio::select! {
-        maybe_event = self.twitch_websocket_client.try_next() => {
-          if let Some(r) = self.handle_event(maybe_event).await? {
-            return Ok(r);
-          }
-        }
-        _ = interval.tick() => {
-          sleep(Duration::from_secs(5));
-        }
-      }
-
-      sleep(Duration::from_secs(1));
-
       let is_valid = self.maybe_check_redis_lease_is_valid()?;
       if !is_valid {
         return Ok(LoopEndedReason::ExitThread { reason: "Thread lease taken".to_string() });
@@ -227,6 +207,25 @@ impl TwitchPubsubUserSubscriberThreadStageTwo {
       if !is_active {
         return Ok(LoopEndedReason::ExitThread { reason: "OBS session ended".to_string() });
       }
+
+      // NB: We can't have calls to read the Twitch websocket client block forever, and they
+      // would do exactly that if not for this code. This is adapted from the very good example
+      // in the `tokio-tungstenite` repo, which also contains good recipes for splitting sockets
+      // into two unidirectional streams:
+      // https://github.com/snapview/tokio-tungstenite/blob/master/examples/interval-server.rs
+      let mut interval = tokio::time::interval(Duration::from_secs(1));
+      tokio::select! {
+        maybe_event = self.twitch_websocket_client.try_next() => {
+          if let Some(loop_end_reason) = self.handle_event(maybe_event).await? {
+            return Ok(loop_end_reason);
+          }
+        }
+        _ = interval.tick() => {
+          sleep(Duration::from_secs(1));
+        }
+      }
+
+      sleep(Duration::from_secs(1));
     }
   }
 
@@ -234,17 +233,20 @@ impl TwitchPubsubUserSubscriberThreadStageTwo {
 
   async fn handle_event(
     &mut self,
-    event: AnyhowResult<Option<twitch_api2::pubsub::Response>>
+    maybe_event: AnyhowResult<Option<twitch_api2::pubsub::Response>>
   ) -> AnyhowResult<Option<LoopEndedReason>> {
+
+    let event = match maybe_event {
+      Err(e) => {
+        error!("socket recv error: {:?}", e);
+        return Ok(None);
+      },
+      Ok(Some(event)) => event,
+      Ok(None) => return Ok(None),
+    };
 
     info!("event: {:?}", event);
 
-    /*match maybe_event {
-      Err(e) => error!("socket recv error: {:?}", e),
-      Ok(None) => {},
-      Ok(Some(ref event)) => {
-      }
-    }
     match event {
       Response::Response(response) => {
         match response.error.as_deref() {
@@ -259,7 +261,7 @@ impl TwitchPubsubUserSubscriberThreadStageTwo {
       Response::Message { .. } => {}
       Response::Pong => {}
       Response::Reconnect => {}
-    }*/
+    }
 
     Ok(None)
   }
