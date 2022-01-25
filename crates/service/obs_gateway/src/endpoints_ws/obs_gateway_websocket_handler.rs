@@ -129,6 +129,37 @@ impl Actor for ObsGatewayWebSocket {
   }
 }
 
+/*
+
+Message {
+  data: ChannelBitsEventsV2 {
+    topic: ChannelBitsEventsV2 {
+      channel_id: 652567283
+    },
+    reply: BitsEvent {
+      data: BitsEventData {
+        badge_entitlement: None,
+        bits_used: 1,
+        channel_id: "652567283",
+        channel_name: "vocodes",
+        chat_message: "test Cheer1",
+        context: Cheer,
+        is_anonymous: false,
+        time: "2022-01-25T08:40:04.760906991Z",
+        total_bits_used: 116,
+        user_id: "650154491",
+        user_name: "testytest512"
+      },
+      message_id: "7703927a-78a5-56d1-aa28-4e6c12aa79a1",
+      version: "1.0",
+      is_anonymous: false
+    }
+  }
+}
+
+*/
+
+
 impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for ObsGatewayWebSocket {
   fn handle(
     &mut self,
