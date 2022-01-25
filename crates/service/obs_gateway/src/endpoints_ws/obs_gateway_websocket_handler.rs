@@ -157,6 +157,66 @@ Message {
   }
 }
 
+Message {
+  data: ChannelPointsChannelV1 {
+    topic: ChannelPointsChannelV1 {
+      channel_id: 652567283
+    },
+    reply: RewardRedeemed {
+      timestamp: "2022-01-25T08:44:09.266674947Z",
+      redemption: Redemption {
+        channel_id: "652567283",
+        id: "e90823c7-934c-497c-ba2c-34c93dcf7163",
+        redeemed_at: "2022-01-25T08:44:09.266674947Z",
+        reward: Reward {
+          background_color: "#BD0078",
+          channel_id: "652567283",
+          cooldown_expires_at: None,
+          cost: 50,
+          default_image: Some(Image {
+            url_1x: "https://static-cdn.jtvnw.net/custom-reward-images/default-1.png",
+            url_2x: "https://static-cdn.jtvnw.net/custom-reward-images/default-2.png",
+            url_4x: "https://static-cdn.jtvnw.net/custom-reward-images/default-4.png"
+          }),
+          global_cooldown: GlobalCooldown {
+            is_enabled: false,
+            global_cooldown_seconds: 0
+          },
+          id: "3e0eaf15-f454-482d-b48c-5be6ede61901",
+          image: None,
+          is_enabled: true,
+          is_in_stock: true,
+          is_paused: false,
+          is_sub_only: false,
+          is_user_input_required: true,
+          max_per_stream: MaxPerStream {
+            is_enabled: false,
+            max_per_stream: 0
+          },
+          max_per_user_per_stream: MaxPerUserPerStream {
+            is_enabled: false,
+            max_per_user_per_stream: 0
+          },
+          prompt: "This is a reward",
+          redemptions_redeemed_current_stream: None,
+          should_redemptions_skip_request_queue: false,
+          template_id: None,
+          title: "Reward #1",
+          updated_for_indicator_at: Some("2021-09-28T08:42:31.949564296Z")
+        },
+        status: Unfulfilled,
+        user: User {
+          id: "650154491",
+          login: "testytest512",
+          display_name: "testytest512",
+          profile_image_url: None
+        },
+        user_input: Some("highlight reward thing"),
+        cursor: None
+      }
+    }
+  }
+}
 */
 
 
