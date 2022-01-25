@@ -157,6 +157,14 @@ Message {
   }
 }
 
+// These cheer emotes always combine with a number
+// This list seems pretty comprehensive
+https://github.com/nossebro/TwitchPubSubMirror/blob/master/TwitchPubSubMirror_StreamlabsSystem.py
+CheerMotes = [ "Cheer", "DoodleCheer", "BibleThump", "cheerwhal", "Corgo", "uni", "ShowLove", "Party", "SeemsGood", "Pride", "Kappa", "FrankerZ", "HeyGuys", "DansGame", "EleGiggle", "TriHard", "Kreygasm", "4Head", "SwiftRage", "NotLikeThis", "FailFish", "VoHiYo", "PJSalt", "MrDestructoid", "bday", "RIPCheer", "Shamrock", "BitBoss", "Streamlabs", "Muxy", "HolidayCheer" ]
+
+
+// Map "Reward Name" ("title") --> FakeYou voice id.
+
 Message {
   data: ChannelPointsChannelV1 {
     topic: ChannelPointsChannelV1 {
