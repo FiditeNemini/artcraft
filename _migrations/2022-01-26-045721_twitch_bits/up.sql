@@ -9,6 +9,8 @@ CREATE TABLE twitch_bits_events(
   -- Not used for anything except replication.
   id BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
 
+  -- ========== USER / CHANNEL ==========
+
   -- The user sending the bits.
   -- We'll need to keep the name and lowercase for lookup.
   sender_twitch_user_id VARCHAR(64) NOT NULL,
@@ -20,6 +22,8 @@ CREATE TABLE twitch_bits_events(
   -- the name for convenience.
   destination_channel_id VARCHAR(64) NOT NULL,
   destination_channel_name VARCHAR(32) NOT NULL,
+
+  -- ========== BITS DETAILS ==========
 
   is_anonymous BOOLEAN NOT NULL DEFAULT FALSE,
 
