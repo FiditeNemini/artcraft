@@ -29,6 +29,8 @@ use std::time::Duration;
 use tokio::runtime::Handle;
 use twitch_api2::pubsub::Topic;
 use twitch_api2::pubsub;
+use twitch_api2::pubsub::channel_bits::ChannelBitsEventsV2Reply::BitsEvent;
+use twitch_api2::pubsub::TopicData::ChannelPointsChannelV1;
 
 // TODO: Redis calls are synchronous (but fast), but is there any way to make them async?
 
@@ -134,25 +136,25 @@ impl Actor for ObsGatewayWebSocket {
 Message {
   data: ChannelBitsEventsV2 {
     topic: ChannelBitsEventsV2 {
-      channel_id: 652567283
+      +channel_id: 652567283
     },
     reply: BitsEvent {
       data: BitsEventData {
-        badge_entitlement: None,
-        bits_used: 1,
-        channel_id: "652567283",
-        channel_name: "vocodes",
-        chat_message: "test Cheer1",
-        context: Cheer,
-        is_anonymous: false,
-        time: "2022-01-25T08:40:04.760906991Z",
-        total_bits_used: 116,
-        user_id: "650154491",
-        user_name: "testytest512"
+        -badge_entitlement: None,
+        +bits_used: 1,
+        +channel_id: "652567283",
+        -channel_name: "vocodes",
+        +chat_message: "test Cheer1",
+        -context: Cheer,
+        +is_anonymous: false,
+        -time: "2022-01-25T08:40:04.760906991Z",
+        +total_bits_used: 116,
+        +user_id: "650154491",
+        +user_name: "testytest512"
       },
-      message_id: "7703927a-78a5-56d1-aa28-4e6c12aa79a1",
-      version: "1.0",
-      is_anonymous: false
+      -message_id: "7703927a-78a5-56d1-aa28-4e6c12aa79a1",
+      -version: "1.0",
+      +is_anonymous: false
     }
   }
 }
@@ -177,25 +179,25 @@ Message {
         id: "e90823c7-934c-497c-ba2c-34c93dcf7163",
         redeemed_at: "2022-01-25T08:44:09.266674947Z",
         reward: Reward {
-          background_color: "#BD0078",
-          channel_id: "652567283",
-          cooldown_expires_at: None,
-          cost: 50,
+          -background_color: "#BD0078",
+          -channel_id: "652567283",
+          -cooldown_expires_at: None,
+          -cost: 50,
           default_image: Some(Image {
             url_1x: "https://static-cdn.jtvnw.net/custom-reward-images/default-1.png",
             url_2x: "https://static-cdn.jtvnw.net/custom-reward-images/default-2.png",
             url_4x: "https://static-cdn.jtvnw.net/custom-reward-images/default-4.png"
           }),
-          global_cooldown: GlobalCooldown {
+          -global_cooldown: GlobalCooldown {
             is_enabled: false,
             global_cooldown_seconds: 0
           },
           id: "3e0eaf15-f454-482d-b48c-5be6ede61901",
           image: None,
-          is_enabled: true,
-          is_in_stock: true,
-          is_paused: false,
-          is_sub_only: false,
+          -is_enabled: true,
+          -is_in_stock: true,
+          -is_paused: false,
+          +is_sub_only: false,
           is_user_input_required: true,
           max_per_stream: MaxPerStream {
             is_enabled: false,
@@ -214,12 +216,12 @@ Message {
         },
         status: Unfulfilled,
         user: User {
-          id: "650154491",
-          login: "testytest512",
+          +id: "650154491",
+          +login: "testytest512",
           display_name: "testytest512",
           profile_image_url: None
         },
-        user_input: Some("highlight reward thing"),
+        +user_input: Some("highlight reward thing"),
         cursor: None
       }
     }
@@ -266,6 +268,11 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for ObsGatewayWebSock
 
       // TODO: This should be done *BEFORE* PubSub
       self.write_obs_active().unwrap();
+
+
+      //BitsEvent {}
+      //ChannelPointsChannelV1 {}
+
 
       match msg {
         ws::Message::Text(text) => {
