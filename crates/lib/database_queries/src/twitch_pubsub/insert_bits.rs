@@ -89,6 +89,26 @@ impl TwitchPubsubBitsInsertBuilder {
   }
 
   pub async fn insert(&mut self, mysql_pool: &MySqlPool) -> AnyhowResult<()> {
+    let sender_twitch_user_id = self.sender_twitch_user_id
+        .clone()
+        .ok_or(anyhow!("no sender_twitch_user_id"))?;
+
+    let sender_twitch_username = self.sender_twitch_username
+        .clone()
+        .ok_or(anyhow!("no sender_twitch_username"))?;
+
+    let sender_twitch_username_lowercase = self.sender_twitch_username_lowercase
+        .clone()
+        .ok_or(anyhow!("no sender_twitch_username_lowercase"))?;
+
+    let destination_channel_id = self.destination_channel_id
+        .clone()
+        .ok_or(anyhow!("no destination_channel_id"))?;
+
+    let destination_channel_name = self.destination_channel_name
+        .clone()
+        .ok_or(anyhow!("no destination_channel_name"))?;
+
     let query = sqlx::query!(
         r#"
 INSERT INTO twitch_bits_events
@@ -103,11 +123,11 @@ SET
     total_bits_used = ?,
     chat_message = ?
         "#,
-      self.sender_twitch_user_id.clone(),
-      self.sender_twitch_username.clone(),
-      self.sender_twitch_username_lowercase.clone(),
-      self.destination_channel_id.clone(),
-      self.destination_channel_name.clone(),
+      sender_twitch_user_id,
+      sender_twitch_username,
+      sender_twitch_username_lowercase,
+      destination_channel_id,
+      destination_channel_name,
       self.is_anonymous,
       self.bits_used,
       self.total_bits_used,
