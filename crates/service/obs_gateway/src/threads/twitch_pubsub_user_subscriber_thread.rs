@@ -1,7 +1,7 @@
 use anyhow::{anyhow, Error};
 use container_common::anyhow_result::AnyhowResult;
 use container_common::thread::thread_id::ThreadId;
-use crate::redis::constants::{LEASE_TIMEOUT_SECONDS, LEASE_RENEW_PERIOD, LEASE_CHECK_PERIOD, OBS_ACTIVE_CHECK_PERIOD};
+use crate::redis::constants::{LEASE_TIMEOUT_SECONDS, LEASE_RENEW_PERIOD, LEASE_CHECK_PERIOD, OBS_ACTIVE_CHECK_PERIOD, STREAMER_TTS_JOB_QUEUE_TTL_SECONDS};
 use crate::redis::lease_payload::LeasePayload;
 use crate::twitch::constants::TWITCH_PING_CADENCE;
 use crate::twitch::oauth::oauth_token_refresher::OauthTokenRefresher;
@@ -565,6 +565,12 @@ impl TwitchPubsubUserSubscriberThreadStageTwo {
     let _r = builder.insert(&self.mysql_pool).await?;
 
     // TODO: Report job token to frontend
+    let mut redis = self.redis_pool.get()?;
+    let redis_key = RedisKeys::twitch_tts_job_queue(&self.twitch_user_id.get_str());
+
+    let _size : Option<u64> = redis.rpush(&redis_key, job_token)?;
+    let _size : Option<u64> = redis.expire(&redis_key, STREAMER_TTS_JOB_QUEUE_TTL_SECONDS)?;
+
     Ok(())
   }
 }

@@ -151,21 +151,6 @@ async fn main() -> AnyhowResult<()> {
     }
   };
 
-  // Works, but can't Ctrl-C
-  //let handle = Handle::current();
-  //handle.spawn_blocking(|| {
-  //  loop {
-  //    info!("...thread...");
-  //    sleep(Duration::from_millis(2000));
-  //  }
-  //});
-
-  //let tokio_runtime = Runtime::new()?;
-  //tokio_runtime.spawn(async {
-  //  poll_ip_bans(ip_banlist2, mysql_pool3).await;
-  //});
-
-
   info!("Starting server...");
 
   serve(server_state).await?;

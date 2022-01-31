@@ -20,3 +20,6 @@ pub const OBS_ACTIVE_TTL_SECONDS : usize = 120;
 
 /// How often to check the OBS session activity.
 pub const OBS_ACTIVE_CHECK_PERIOD : Duration = Duration::seconds(30);
+
+/// When to expire the streamer-specific TTS job queue notifications
+pub const STREAMER_TTS_JOB_QUEUE_TTL_SECONDS : usize = 600;

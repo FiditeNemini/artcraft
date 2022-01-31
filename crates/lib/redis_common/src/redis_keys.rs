@@ -71,4 +71,11 @@ impl RedisKeys {
   pub fn twitch_events_topic(twitch_user_id: &str) -> String {
     format!("twitchEventsTopic:{}", twitch_user_id)
   }
+
+  /// This is a lazy first approximation of the worker -> OBS messaging.
+  /// We push new TTS job tokens into a Redis list (with long expiry), and OBS
+  /// will dequeue the events in order.
+  pub fn twitch_tts_job_queue(twitch_user_id: &str) -> String {
+    format!("twitchTtsJobs:{}", twitch_user_id)
+  }
 }
