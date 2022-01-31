@@ -59,7 +59,7 @@ impl TwitchPubsubChannelPointsInsertBuilder {
 
   pub fn set_sender_twitch_username(mut self, value: &str) -> Self {
     self.sender_twitch_username = Some(value.to_string());
-    self.sender_twitch_username_lowercase = Some(value.to_uppercase());
+    self.sender_twitch_username_lowercase = Some(value.to_lowercase());
     self
   }
 
@@ -102,6 +102,11 @@ impl TwitchPubsubChannelPointsInsertBuilder {
 
   pub fn set_is_sub_only(mut self, value: bool) -> Self {
     self.is_sub_only = value;
+    self
+  }
+
+  pub fn set_reward_cost(mut self, value: u64) -> Self {
+    self.reward_cost = value;
     self
   }
 

@@ -352,7 +352,8 @@ impl TwitchPubsubUserSubscriberThreadStageTwo {
                 .set_user_text_input(redemption.user_input.as_deref())
                 .set_redemption_id(&redemption.id.to_string())
                 .set_reward_id(&redemption.reward.id.to_string())
-                .set_is_sub_only(redemption.reward.is_sub_only);
+                .set_is_sub_only(redemption.reward.is_sub_only)
+                .set_reward_cost(redemption.reward.cost as u64);
                 // TODO:
                 // .set_max_per_stream(redemption.reward.max_per_stream as u64)
                 // .set_max_per_user_per_stream(redemption.reward.max_per_user_per_stream as u64);

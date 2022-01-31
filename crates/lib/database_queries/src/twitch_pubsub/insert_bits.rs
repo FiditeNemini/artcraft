@@ -47,7 +47,7 @@ impl TwitchPubsubBitsInsertBuilder {
 
   pub fn set_sender_twitch_username(mut self, value: &str) -> Self {
     self.sender_twitch_username = Some(value.to_string());
-    self.sender_twitch_username_lowercase = Some(value.to_uppercase());
+    self.sender_twitch_username_lowercase = Some(value.to_lowercase());
     self
   }
 
