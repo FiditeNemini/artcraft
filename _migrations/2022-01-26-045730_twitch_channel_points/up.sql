@@ -34,7 +34,7 @@ CREATE TABLE twitch_channel_point_events (
 
   -- This is the text that the user sends
   -- This is optional, but we'll coerce null to empty
-  user_input TEXT NOT NULL,
+  user_text_input TEXT NOT NULL,
 
   -- A UUID for this instance of reward redemption
   redemption_id VARCHAR(36) NOT NULL,
