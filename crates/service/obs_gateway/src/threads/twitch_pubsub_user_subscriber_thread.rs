@@ -8,6 +8,7 @@ use crate::twitch::oauth::oauth_token_refresher::OauthTokenRefresher;
 use crate::twitch::pubsub::build_pubsub_topics_for_user::build_pubsub_topics_for_user;
 use crate::twitch::twitch_user_id::TwitchUserId;
 use crate::twitch::websocket_client::TwitchWebsocketClient;
+use database_queries::tts::insert_tts_inference_job::TtsInferenceJobInsertBuilder;
 use database_queries::twitch_oauth::find::{TwitchOauthTokenRecord, TwitchOauthTokenFinder};
 use database_queries::twitch_oauth::insert::TwitchOauthTokenInsertBuilder;
 use database_queries::twitch_pubsub::insert_bits::TwitchPubsubBitsInsertBuilder;
@@ -284,6 +285,7 @@ impl TwitchPubsubUserSubscriberThreadStageTwo {
       Some(e) => e,
     };
     match error {
+      "" => {}, // No-op
       "ERR_BADAUTH" => {
         warn!("Invalid token. Bad auth. Need to refresh");
         let token_record = self.refresh_twitch_oauth_token().await?;
@@ -551,6 +553,14 @@ impl TwitchPubsubUserSubscriberThreadStageTwo {
 
   async fn write_tts_inference_event(&mut self, tts_text: &str) -> AnyhowResult<()> {
     let sanitized_text = remove_cheers(tts_text);
+    let model_token = "TM:7wbtjphx8h8v"; // "Mario *" voice.
+
+    let mut builder = TtsInferenceJobInsertBuilder::new_for_internal_tts()
+        .set_job_token("todo")
+        .set_model_token(model_token)
+        .set_raw_inference_text(&sanitized_text);
+
+    let _r = builder.insert(&self.mysql_pool).await?;
     Ok(())
   }
 }

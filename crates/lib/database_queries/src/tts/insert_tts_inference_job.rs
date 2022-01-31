@@ -47,7 +47,8 @@ impl TtsInferenceJobInsertBuilder {
       uuid_idempotency_token: Some(idempotency_token),
       maybe_creator_user_token: None,
       creator_ip_address: Some("127.0.0.1".to_string()),
-      creator_set_visibility: Some("public".to_string()),
+      // hidden | public | ...
+      creator_set_visibility: Some("hidden".to_string()),
     }
   }
 
@@ -57,7 +58,7 @@ impl TtsInferenceJobInsertBuilder {
   }
 
   pub fn set_model_token(mut self, value: &str) -> Self {
-    self.job_token = Some(value.to_string());
+    self.model_token = Some(value.to_string());
     self
   }
 
@@ -87,6 +88,7 @@ impl TtsInferenceJobInsertBuilder {
   }
 
   pub async fn insert(&mut self, mysql_pool: &MySqlPool) -> AnyhowResult<()> {
+    // TODO: These should be custom error types with a custom macro to make this easy.
     let job_token = self.job_token
         .clone()
         .ok_or(anyhow!("no job_token"))?;
