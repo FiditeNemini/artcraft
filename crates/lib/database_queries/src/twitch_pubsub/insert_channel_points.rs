@@ -5,7 +5,7 @@ use log::info;
 use log::warn;
 use sqlx::MySqlPool;
 
-pub struct TwitchPubsubBitsInsertBuilder {
+pub struct TwitchPubsubChannelPointsInsertBuilder {
   // ===== Required Fields =====
 
   sender_twitch_user_id: Option<String>,
@@ -32,7 +32,7 @@ pub struct TwitchPubsubBitsInsertBuilder {
   max_per_user_per_stream: u64,
 }
 
-impl TwitchPubsubBitsInsertBuilder {
+impl TwitchPubsubChannelPointsInsertBuilder {
   pub fn new() -> Self {
     Self {
       sender_twitch_user_id: None,

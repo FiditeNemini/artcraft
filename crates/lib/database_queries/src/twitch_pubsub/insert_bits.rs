@@ -40,29 +40,24 @@ impl TwitchPubsubBitsInsertBuilder {
     }
   }
 
-  pub fn set_sender_twitch_user_id(mut self, value: Option<&str>) -> Self {
-    self.sender_twitch_user_id = value.map(|s| s.to_string());
+  pub fn set_sender_twitch_user_id(mut self, value: &str) -> Self {
+    self.sender_twitch_user_id = Some(value.to_string());
     self
   }
 
-  pub fn set_sender_twitch_username(mut self, value: Option<&str>) -> Self {
-    if let Some(username) = value {
-      self.sender_twitch_username = Some(username.to_string());
-      self.sender_twitch_username_lowercase = Some(username.to_uppercase());
-    } else {
-      self.sender_twitch_username = None;
-      self.sender_twitch_username_lowercase = None;
-    }
+  pub fn set_sender_twitch_username(mut self, value: &str) -> Self {
+    self.sender_twitch_username = Some(value.to_string());
+    self.sender_twitch_username_lowercase = Some(value.to_uppercase());
     self
   }
 
-  pub fn set_destination_channel_id(mut self, value: Option<&str>) -> Self {
-    self.destination_channel_id = value.map(|s| s.to_string());
+  pub fn set_destination_channel_id(mut self, value: &str) -> Self {
+    self.destination_channel_id = Some(value.to_string());
     self
   }
 
-  pub fn set_destination_channel_name(mut self, value: Option<&str>) -> Self {
-    self.destination_channel_name = value.map(|s| s.to_string());
+  pub fn set_destination_channel_name(mut self, value: &str) -> Self {
+    self.destination_channel_name = Some(value.to_string());
     self
   }
 
@@ -81,10 +76,8 @@ impl TwitchPubsubBitsInsertBuilder {
     self
   }
 
-  pub fn set_chat_message(mut self, value: Option<&str>) -> Self {
-    self.chat_message = value
-        .map(|s| s.to_string())
-        .unwrap_or("".to_string());
+  pub fn set_chat_message(mut self, value: &str) -> Self {
+    self.chat_message = value.to_string();
     self
   }
 

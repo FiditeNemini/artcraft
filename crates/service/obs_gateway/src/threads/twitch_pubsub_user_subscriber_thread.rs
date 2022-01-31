@@ -10,6 +10,8 @@ use crate::twitch::twitch_user_id::TwitchUserId;
 use crate::twitch::websocket_client::TwitchWebsocketClient;
 use database_queries::twitch_oauth::find::{TwitchOauthTokenRecord, TwitchOauthTokenFinder};
 use database_queries::twitch_oauth::insert::TwitchOauthTokenInsertBuilder;
+use database_queries::twitch_pubsub::insert_bits::TwitchPubsubBitsInsertBuilder;
+use database_queries::twitch_pubsub::insert_channel_points::TwitchPubsubChannelPointsInsertBuilder;
 use log::debug;
 use log::error;
 use log::info;
@@ -23,7 +25,8 @@ use std::sync::Arc;
 use std::thread::sleep;
 use std::time::Duration;
 use time::Instant;
-use twitch_api2::pubsub::Response;
+use twitch_api2::pubsub::{Response, TwitchResponse, TopicData};
+use twitch_api2::pubsub::channel_bits::ChannelBitsEventsV2Reply;
 
 // TODO: Publish events back to OBS thread
 // TODO: (cleanup) make the logic clearer to follow.
@@ -258,21 +261,79 @@ impl TwitchPubsubUserSubscriberThreadStageTwo {
 
     match event {
       Response::Response(response) => {
-        match response.error.as_deref() {
-          Some("ERR_BADAUTH") => {
-            warn!("Invalid token. Bad auth. Need to refresh");
-            let token_record = self.refresh_twitch_oauth_token().await?;
-            return Ok(Some(LoopEndedReason::RefreshedOauthToken { token: token_record }));
-          }
-          _ => {},
-        }
+        // NB: Auth failure might cause the loop to end.
+        return self.handle_maybe_auth_error_event(response).await;
       }
-      Response::Message { .. } => {}
+      Response::Message { data } => {
+        self.handle_pubsub_topic_event(data).await?;
+      }
       Response::Pong => {}
       Response::Reconnect => {}
     }
 
+    Ok(None) // Don't end loop
+  }
+
+  async fn handle_maybe_auth_error_event(&mut self, response: TwitchResponse)
+    -> AnyhowResult<Option<LoopEndedReason>>
+  {
+    let error = match response.error.as_deref() {
+      None => return Ok(None),
+      Some(e) => e,
+    };
+    match error {
+      "ERR_BADAUTH" => {
+        warn!("Invalid token. Bad auth. Need to refresh");
+        let token_record = self.refresh_twitch_oauth_token().await?;
+        return Ok(Some(LoopEndedReason::RefreshedOauthToken { token: token_record }));
+      }
+      _ => warn!("Unknown Twitch PubSub error: {:?}", error),
+    }
     Ok(None)
+  }
+
+  async fn handle_pubsub_topic_event(&mut self, topic_data: TopicData) -> AnyhowResult<()> {
+    match topic_data {
+      // Unimplemented
+      TopicData::AutoModQueue { .. } => {}
+      TopicData::ChannelBitsBadgeUnlocks { .. } => {}
+      TopicData::ChatModeratorActions { .. } => {}
+      TopicData::ChannelSubscribeEventsV1 { .. } => {}
+      TopicData::CommunityPointsChannelV1 { .. } => {}
+      TopicData::ChannelCheerEventsPublicV1 { .. } => {}
+      TopicData::ChannelSubGiftsV1 { .. } => {}
+      TopicData::VideoPlayback { .. } => {}
+      TopicData::VideoPlaybackById { .. } => {}
+      TopicData::HypeTrainEventsV1 { .. } => {}
+      TopicData::HypeTrainEventsV1Rewards { .. } => {}
+      TopicData::Following { .. } => {}
+      TopicData::Raid { .. } => {}
+      TopicData::UserModerationNotifications { .. } => {}
+      // Implemented
+      TopicData::ChannelBitsEventsV2 { topic, reply } => {
+        let mut event_builder = TwitchPubsubBitsInsertBuilder::new();
+        match *reply {
+          ChannelBitsEventsV2Reply::BitsEvent { data, message_id, version, is_anonymous } => {
+            let user_id = data.user_id.to_string();
+            let user_name = data.user_name.to_string();
+            let mut event_builder = event_builder.set_sender_twitch_user_id(&user_id)
+                .set_sender_twitch_username(&user_name)
+                .set_destination_channel_id(&data.channel_id.to_string())
+                .set_destination_channel_name(&data.channel_name.to_string())
+                .set_bits_used(data.bits_used as u64)
+                .set_total_bits_used(data.total_bits_used as u64)
+                .set_is_anonymous(is_anonymous)
+                .set_chat_message(&data.chat_message);
+            event_builder.insert(&self.mysql_pool).await?;
+          }
+          _ => {}
+        }
+      }
+      TopicData::ChannelPointsChannelV1 { topic, reply } => {
+      }
+    }
+
+    Ok(())
   }
 
   async fn maybe_send_twitch_ping(&mut self) -> AnyhowResult<()> {
