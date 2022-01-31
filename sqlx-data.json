@@ -375,16 +375,6 @@
       ]
     }
   },
-  "05030f800d4e16abedc75fd0697711e9396a0eae783ad86a86dd7c0540a4d489": {
-    "query": "\nINSERT INTO twitch_oauth_tokens\nSET\n  maybe_user_token = ?,\n  twitch_user_id = ?,\n  maybe_twitch_username = ?,\n  access_token = ?,\n  maybe_refresh_token = ?,\n  token_type = ?,\n  expires_in_seconds = ?,\n  has_bits_read = ?,\n  has_channel_read_subscriptions = ?,\n  has_channel_read_redemptions= ?,\n  has_user_read_follows = ?,\n  ip_address_creation = ?,\n  expires_at = DATE_ADD(NOW(), INTERVAL ? SECOND)\n        ",
-    "describe": {
-      "columns": [],
-      "parameters": {
-        "Right": 13
-      },
-      "nullable": []
-    }
-  },
   "05612e384bdce558e4834c720d1eb7ca9a09e3cca64b72f1497929d860345ec7": {
     "query": "\nSELECT\n    tts.token as model_token,\n    tts.tts_model_type,\n    tts.creator_user_token,\n    users.username as creator_username,\n    users.display_name as creator_display_name,\n    users.email_gravatar_hash as creator_gravatar_hash,\n    tts.title,\n    tts.is_locked_from_use,\n    tts.created_at,\n    tts.updated_at\nFROM tts_models as tts\nJOIN users\nON\n    users.token = tts.creator_user_token\nWHERE\n    users.username = ?\n    AND tts.is_locked_from_use IS FALSE\n    AND tts.user_deleted_at IS NULL\n    AND tts.mod_deleted_at IS NULL\n        ",
     "describe": {
@@ -2306,6 +2296,16 @@
       "nullable": []
     }
   },
+  "3a4a4edd2b1a1957c5eb42ed426ef4c11468549b9b8c3d62f1d59c07f4495c0e": {
+    "query": "\nINSERT INTO twitch_oauth_tokens\nSET\n  maybe_user_token = ?,\n  twitch_user_id = ?,\n  twitch_username = ?,\n  twitch_username_lowercase = ?,\n  access_token = ?,\n  maybe_refresh_token = ?,\n  refresh_count = ?,\n  token_type = ?,\n  expires_in_seconds = NULL,\n  has_bits_read = ?,\n  has_channel_read_subscriptions = ?,\n  has_channel_read_redemptions= ?,\n  has_user_read_follows = ?,\n  ip_address_creation = ?,\n  expires_at = NULL\n        ",
+    "describe": {
+      "columns": [],
+      "parameters": {
+        "Right": 13
+      },
+      "nullable": []
+    }
+  },
   "40a3301e9a3201e74d49b6b339f67291e2ae22d315188401708609ac2d28a68c": {
     "query": "\nUPDATE tts_results\nSET\n  mod_deleted_at = NULL,\n  maybe_mod_user_token = ?\nWHERE\n  token = ?\nLIMIT 1\n        ",
     "describe": {
@@ -3965,6 +3965,16 @@
       ]
     }
   },
+  "5e4a00c339ce4d7fac19aff728449156b1e02b9e1d9fd534ac37d4ac79f44820": {
+    "query": "\nINSERT INTO twitch_bits_events\nSET\n    sender_twitch_user_id = ?,\n    sender_twitch_username = ?,\n    sender_twitch_username_lowercase = ?,\n    destination_channel_id = ?,\n    destination_channel_name = ?,\n    is_anonymous= ?,\n    bits_used = ?,\n    total_bits_used = ?,\n    chat_message = ?\n        ",
+    "describe": {
+      "columns": [],
+      "parameters": {
+        "Right": 9
+      },
+      "nullable": []
+    }
+  },
   "5e54fd8569b2d6d3a0d11acee6bd03b75400b6325952eb16c8dac68a7933b13a": {
     "query": "\nSELECT\n    users.token as user_token,\n    username,\n    display_name,\n    email_gravatar_hash,\n    profile_markdown,\n    profile_rendered_html,\n    user_role_slug,\n    is_banned,\n    disable_gravatar,\n    discord_username,\n    twitch_username,\n    twitter_username,\n    patreon_username,\n    github_username,\n    created_at\nFROM users\nWHERE\n    users.username = ?\n    AND users.user_deleted_at IS NULL\n    AND users.mod_deleted_at IS NULL\n        ",
     "describe": {
@@ -4170,6 +4180,16 @@
         true,
         false
       ]
+    }
+  },
+  "5eacdf9c65dc13820077be2930cca7047aed07804ed2e7b2ff38e12a617b4858": {
+    "query": "\nINSERT INTO twitch_channel_point_events\nSET\n    sender_twitch_user_id = ?,\n    sender_twitch_username = ?,\n    sender_twitch_username_lowercase = ?,\n    destination_channel_id = ?,\n    destination_channel_name = ?,\n    title = ?,\n    prompt = ?,\n    user_text_input = ?,\n    redemption_id = ?,\n    reward_id = ?,\n    reward_cost = ?,\n    is_sub_only = ?,\n    max_per_stream = ?,\n    max_per_user_per_stream = ?\n        ",
+    "describe": {
+      "columns": [],
+      "parameters": {
+        "Right": 14
+      },
+      "nullable": []
     }
   },
   "60c06a507349919addb5d26b1c4a283a04f66fce86e84ed0a51db6001c9fc2b5": {
@@ -5966,16 +5986,6 @@
       "columns": [],
       "parameters": {
         "Right": 2
-      },
-      "nullable": []
-    }
-  },
-  "91beefeb04c0baafe4c3983c2760df2e5d08ea5e2433225221d20da8d2dca114": {
-    "query": "\nINSERT INTO twitch_oauth_tokens\nSET\n  maybe_user_token = ?,\n  twitch_user_id = ?,\n  maybe_twitch_username = ?,\n  access_token = ?,\n  maybe_refresh_token = ?,\n  token_type = ?,\n  expires_in_seconds = NULL,\n  has_bits_read = ?,\n  has_channel_read_subscriptions = ?,\n  has_channel_read_redemptions= ?,\n  has_user_read_follows = ?,\n  ip_address_creation = ?,\n  expires_at = NULL\n        ",
-    "describe": {
-      "columns": [],
-      "parameters": {
-        "Right": 11
       },
       "nullable": []
     }
@@ -8284,6 +8294,16 @@
       "columns": [],
       "parameters": {
         "Right": 4
+      },
+      "nullable": []
+    }
+  },
+  "cad1a53adb21efd78fa3a6f3c8c0f4d5f55164c4f397b50426bf987ea68af3d0": {
+    "query": "\nINSERT INTO twitch_oauth_tokens\nSET\n  maybe_user_token = ?,\n  twitch_user_id = ?,\n  twitch_username = ?,\n  twitch_username_lowercase = ?,\n  access_token = ?,\n  maybe_refresh_token = ?,\n  refresh_count = ?,\n  token_type = ?,\n  expires_in_seconds = ?,\n  has_bits_read = ?,\n  has_channel_read_subscriptions = ?,\n  has_channel_read_redemptions= ?,\n  has_user_read_follows = ?,\n  ip_address_creation = ?,\n  expires_at = DATE_ADD(NOW(), INTERVAL ? SECOND)\n        ",
+    "describe": {
+      "columns": [],
+      "parameters": {
+        "Right": 15
       },
       "nullable": []
     }
