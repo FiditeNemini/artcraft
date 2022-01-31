@@ -2637,6 +2637,7 @@ dependencies = [
  "tokio-tungstenite",
  "toml",
  "twitch_api2",
+ "twitch_common",
  "twitch_oauth2",
  "uuid",
 ]

@@ -1,5 +1,7 @@
 #[macro_use] extern crate serde_derive;
 
+mod builders;
 pub mod helpers;
-pub mod twitch_pubsub;
+pub mod tts;
 pub mod twitch_oauth;
+pub mod twitch_pubsub;

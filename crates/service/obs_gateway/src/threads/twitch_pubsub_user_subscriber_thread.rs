@@ -28,6 +28,7 @@ use time::Instant;
 use twitch_api2::pubsub::{Response, TwitchResponse, TopicData};
 use twitch_api2::pubsub::channel_bits::ChannelBitsEventsV2Reply;
 use twitch_api2::pubsub::channel_points::ChannelPointsChannelV1Reply;
+use twitch_common::cheers::remove_cheers;
 
 // TODO: Publish events back to OBS thread
 // TODO: (cleanup) make the logic clearer to follow.
@@ -241,7 +242,7 @@ impl TwitchPubsubUserSubscriberThreadStageTwo {
     }
   }
 
-  // =============== TWITCH PUBSUB EVENTS AND KEEPALIVE ===============
+  // =============== TWITCH PUBSUB EVENTS ===============
 
   async fn handle_event(
     &mut self,
@@ -326,6 +327,8 @@ impl TwitchPubsubUserSubscriberThreadStageTwo {
                 .set_is_anonymous(is_anonymous)
                 .set_chat_message(&data.chat_message);
             event_builder.insert(&self.mysql_pool).await?;
+
+            self.write_tts_inference_event(&data.chat_message).await?;
           }
           _ => {}
         }
@@ -358,6 +361,10 @@ impl TwitchPubsubUserSubscriberThreadStageTwo {
                 // .set_max_per_stream(redemption.reward.max_per_stream as u64)
                 // .set_max_per_user_per_stream(redemption.reward.max_per_user_per_stream as u64);
             event_builder.insert(&self.mysql_pool).await?;
+
+            if let Some(user_text) = redemption.user_input.as_deref() {
+              self.write_tts_inference_event(user_text).await?;
+            }
           }
           _ => {},
         }
@@ -366,6 +373,8 @@ impl TwitchPubsubUserSubscriberThreadStageTwo {
 
     Ok(())
   }
+
+  // =============== TWITCH PUBSUB KEEPALIVE ===============
 
   async fn maybe_send_twitch_ping(&mut self) -> AnyhowResult<()> {
     let mut should_send_ping = self.twitch_last_pinged_at
@@ -536,6 +545,13 @@ impl TwitchPubsubUserSubscriberThreadStageTwo {
     self.twitch_oauth_token_record = new_record.clone();
 
     Ok(new_record)
+  }
+
+  // =============== TTS EVENTS ===============
+
+  async fn write_tts_inference_event(&mut self, tts_text: &str) -> AnyhowResult<()> {
+    let sanitized_text = remove_cheers(tts_text);
+    Ok(())
   }
 }
 
