@@ -8,6 +8,7 @@ use crate::twitch::oauth::oauth_token_refresher::OauthTokenRefresher;
 use crate::twitch::pubsub::build_pubsub_topics_for_user::build_pubsub_topics_for_user;
 use crate::twitch::twitch_user_id::TwitchUserId;
 use crate::twitch::websocket_client::TwitchWebsocketClient;
+use database_queries::tokens::Tokens;
 use database_queries::tts::insert_tts_inference_job::TtsInferenceJobInsertBuilder;
 use database_queries::twitch_oauth::find::{TwitchOauthTokenRecord, TwitchOauthTokenFinder};
 use database_queries::twitch_oauth::insert::TwitchOauthTokenInsertBuilder;
@@ -26,9 +27,9 @@ use std::sync::Arc;
 use std::thread::sleep;
 use std::time::Duration;
 use time::Instant;
-use twitch_api2::pubsub::{Response, TwitchResponse, TopicData};
 use twitch_api2::pubsub::channel_bits::ChannelBitsEventsV2Reply;
 use twitch_api2::pubsub::channel_points::ChannelPointsChannelV1Reply;
+use twitch_api2::pubsub::{Response, TwitchResponse, TopicData};
 use twitch_common::cheers::remove_cheers;
 
 // TODO: Publish events back to OBS thread
@@ -553,14 +554,17 @@ impl TwitchPubsubUserSubscriberThreadStageTwo {
 
   async fn write_tts_inference_event(&mut self, tts_text: &str) -> AnyhowResult<()> {
     let sanitized_text = remove_cheers(tts_text);
+    let job_token = Tokens::new_tts_inference_job()?;
     let model_token = "TM:7wbtjphx8h8v"; // "Mario *" voice.
 
     let mut builder = TtsInferenceJobInsertBuilder::new_for_internal_tts()
-        .set_job_token("todo")
+        .set_job_token(&job_token)
         .set_model_token(model_token)
         .set_raw_inference_text(&sanitized_text);
 
     let _r = builder.insert(&self.mysql_pool).await?;
+
+    // TODO: Report job token to frontend
     Ok(())
   }
 }
@@ -586,4 +590,3 @@ enum LoopEndedReason {
   /// A new OAuth token was minted.
   RefreshedOauthToken { token: TwitchOauthTokenRecord }
 }
-
