@@ -27,6 +27,7 @@ use std::time::Duration;
 use time::Instant;
 use twitch_api2::pubsub::{Response, TwitchResponse, TopicData};
 use twitch_api2::pubsub::channel_bits::ChannelBitsEventsV2Reply;
+use twitch_api2::pubsub::channel_points::ChannelPointsChannelV1Reply;
 
 // TODO: Publish events back to OBS thread
 // TODO: (cleanup) make the logic clearer to follow.
@@ -330,6 +331,35 @@ impl TwitchPubsubUserSubscriberThreadStageTwo {
         }
       }
       TopicData::ChannelPointsChannelV1 { topic, reply } => {
+        let mut event_builder = TwitchPubsubChannelPointsInsertBuilder::new();
+        match *reply {
+          // Unimplemented
+          ChannelPointsChannelV1Reply::CustomRewardUpdated { .. } => {}
+          ChannelPointsChannelV1Reply::RedemptionStatusUpdate { .. } => {}
+          ChannelPointsChannelV1Reply::UpdateRedemptionStatusesFinished { .. } => {}
+          ChannelPointsChannelV1Reply::UpdateRedemptionStatusProgress { .. } => {}
+          // Implemented
+          ChannelPointsChannelV1Reply::RewardRedeemed { timestamp, redemption } => {
+            let user_id = redemption.user.id.to_string();
+            let user_name = redemption.user.login.to_string();
+            let mut event_builder = event_builder.set_sender_twitch_user_id(&user_id)
+                .set_sender_twitch_username(&user_name)
+                .set_destination_channel_id(&redemption.channel_id.to_string())
+                // TODO:
+                .set_destination_channel_name("todo: not available")
+                .set_title(&redemption.reward.title)
+                .set_prompt(&redemption.reward.prompt)
+                .set_user_text_input(redemption.user_input.as_deref())
+                .set_redemption_id(&redemption.id.to_string())
+                .set_reward_id(&redemption.reward.id.to_string())
+                .set_is_sub_only(redemption.reward.is_sub_only);
+                // TODO:
+                // .set_max_per_stream(redemption.reward.max_per_stream as u64)
+                // .set_max_per_user_per_stream(redemption.reward.max_per_user_per_stream as u64);
+            event_builder.insert(&self.mysql_pool).await?;
+          }
+          _ => {},
+        }
       }
     }
 
