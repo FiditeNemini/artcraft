@@ -2,31 +2,20 @@ use once_cell::sync::Lazy;
 use std::collections::HashSet;
 use regex::Regex;
 
-macro_rules! regex {
-    ($re:literal $(,)?) => {{
-        static RE: once_cell::sync::OnceCell<regex::Regex> = once_cell::sync::OnceCell::new();
-        RE.get_or_init(|| regex::Regex::new($re).unwrap())
-    }};
-}
+// NB: This can be used as a nice, succinct macro with once_cell:
+//macro_rules! regex {
+//    ($re:literal $(,)?) => {{
+//        static RE: once_cell::sync::OnceCell<regex::Regex> = once_cell::sync::OnceCell::new();
+//        RE.get_or_init(|| regex::Regex::new($re).unwrap())
+//    }};
+//}
 
-
+/// Remove cheermotes from text, eg "this is great Cheer1" -> "this is great"
 pub fn remove_cheers(text: &str) -> String {
-  return TWITCH_CHEER_REGEX.replace_all(text, "").to_string()
+  let result = TWITCH_CHEER_REGEX.replace_all(text, "");
+  let result = MULTI_SPACE_REGEX.replace_all(&result, " ").to_string();
+  result.trim().to_string()
 }
-
-static TWITCH_CHEER_REGEX : Lazy<Regex> = Lazy::new(|| {
-  let mut regex_pieces  = Vec::new();
-
-  for cheer in TWITCH_CHEERS.iter() {
-    regex_pieces.push(format!("({}\\d+)", cheer));
-  }
-
-  let regex = regex_pieces.join("|");
-  let regex = format!("({})", regex);
-
-  Regex::new(&regex).unwrap()
-});
-
 
 /// These cheer emotes always combine with a number
 /// This list seems pretty comprehensive
@@ -73,14 +62,33 @@ static TWITCH_CHEERS : Lazy<HashSet<String>> = Lazy::new(|| {
   s
 });
 
+static MULTI_SPACE_REGEX : Lazy<Regex> = Lazy::new(|| {
+  Regex::new("(\\s{2,})").unwrap()
+});
+
+static TWITCH_CHEER_REGEX : Lazy<Regex> = Lazy::new(|| {
+  let mut regex_pieces  = Vec::new();
+
+  for cheer in TWITCH_CHEERS.iter() {
+    regex_pieces.push(format!("({}\\d+)", cheer));
+  }
+
+  let regex = regex_pieces.join("|");
+  let regex = format!("({})", regex);
+
+  Regex::new(&regex).unwrap()
+});
+
 #[cfg(test)]
 mod tests {
   use crate::cheers::remove_cheers;
 
-  // TODO: REMOVE SPACES
   #[test]
   fn test_remove_cheers() {
     let r = remove_cheers("testing Kappa1 SeemsGood100 removal");
-    assert_eq!(&r, "testing   removal"); // TODO: REMOVE SPACES
+    assert_eq!(&r, "testing removal");
+
+    let r = remove_cheers("Kappa1 SeemsGood100 no more Cheer1 cheers");
+    assert_eq!(&r, "no more cheers");
   }
 }
