@@ -3823,6 +3823,16 @@
       ]
     }
   },
+  "591bda610a0fe952cafc5d97808757da8652133082e94ad15ab063db9d4e2f44": {
+    "query": "\nINSERT INTO tts_inference_jobs\nSET\n  token = ?,\n  uuid_idempotency_token = ?,\n  model_token = ?,\n  raw_inference_text = ?,\n  maybe_creator_user_token = ?,\n  creator_ip_address = ?,\n  creator_set_visibility = ?,\n  status = \"pending\"\n        ",
+    "describe": {
+      "columns": [],
+      "parameters": {
+        "Right": 7
+      },
+      "nullable": []
+    }
+  },
   "5d1f983fd2555c0fcb2ba065e9b3c6174346ee0fdaecacc2a557715a68cf23e2": {
     "query": "\nSELECT\n    tts.token as model_token,\n    tts.tts_model_type,\n    tts.creator_user_token,\n    users.username as creator_username,\n    users.display_name as creator_display_name,\n    users.email_gravatar_hash as creator_gravatar_hash,\n    tts.title,\n    tts.is_locked_from_use,\n    tts.created_at,\n    tts.updated_at\nFROM tts_models as tts\nJOIN users\nON\n    users.token = tts.creator_user_token\nWHERE\n    users.username = ?\n    AND tts.user_deleted_at IS NULL\n    AND tts.mod_deleted_at IS NULL\n        ",
     "describe": {
