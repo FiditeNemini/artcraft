@@ -41,6 +41,10 @@ use twitch_oauth2::{ClientId, ClientSecret, RefreshToken, AccessToken};
 pub async fn main() -> AnyhowResult<()> {
   easyenv::init_all_with_default_logging(Some(DEFAULT_RUST_LOG));
 
+  // NB: Do not check this secrets-containing dotenv file into VCS.
+  // This file should only contain *development* secrets, never production.
+  let _ = dotenv::from_filename(".env-secrets").ok();
+
   let server_hostname = hostname::get()
       .ok()
       .and_then(|h| h.into_string().ok())
@@ -48,7 +52,7 @@ pub async fn main() -> AnyhowResult<()> {
 
   info!("Reading Twitch secrets...");
 
-  let secrets = TwitchSecrets::from_file("twitch_secrets.toml")?;
+  let secrets = TwitchSecrets::from_env()?;
   let client_id = ClientId::new(&secrets.app_client_id);
   let client_secret = ClientSecret::new(&secrets.app_client_secret);
 

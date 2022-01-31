@@ -77,7 +77,7 @@ async fn main() -> AnyhowResult<()> {
 
   info!("Reading Twitch secrets...");
 
-  let secrets = TwitchSecrets::from_file("twitch_secrets.toml")?;
+  let secrets = TwitchSecrets::from_env()?;
   let client_id = ClientId::new(&secrets.app_client_id);
   let client_secret = ClientSecret::new(&secrets.app_client_secret);
 

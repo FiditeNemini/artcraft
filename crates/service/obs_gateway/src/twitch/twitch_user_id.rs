@@ -1,7 +1,7 @@
 use container_common::anyhow_result::AnyhowResult;
 
-/// Twitch says to encode these as strings, but the Twitch libraries
-/// still deal in integers. This centralizes type juggling.
+/// Twitch says to encode these as strings, but the Twitch Rust libraries
+/// still deal in integers (uh oh). This centralizes type juggling.
 #[derive(Clone)]
 pub struct TwitchUserId {
   string_user_id: String,
