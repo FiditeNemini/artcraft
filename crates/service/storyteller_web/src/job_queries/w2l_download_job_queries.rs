@@ -5,7 +5,7 @@
 use anyhow::anyhow;
 use chrono::Utc;
 use container_common::anyhow_result::AnyhowResult;
-use crate::database::helpers::tokens::Tokens;
+use database_queries::tokens::Tokens;
 use sqlx::MySqlPool;
 
 /// table: w2l_template_upload_jobs

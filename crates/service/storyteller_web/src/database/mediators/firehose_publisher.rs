@@ -1,6 +1,6 @@
 use anyhow::anyhow;
 use container_common::anyhow_result::AnyhowResult;
-use crate::database::helpers::tokens::Tokens;
+use database_queries::tokens::Tokens;
 use log::{warn,info};
 use sqlx::error::Error::Database;
 use sqlx::mysql::MySqlQueryResult;

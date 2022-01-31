@@ -1,6 +1,6 @@
 use anyhow::anyhow;
 use crate::AnyhowResult;
-use crate::database::helpers::tokens::Tokens;
+use database_queries::tokens::Tokens;
 use log::{info, warn};
 use sqlx::MySqlPool;
 

@@ -24,7 +24,6 @@ use sqlx::mysql::MySqlDatabaseError;
 use std::sync::Arc;
 use std::fmt;
 use http_server_common::response::serialize_as_json_error::serialize_as_json_error;
-use crate::database::helpers::tokens::Tokens;
 
 // =============== Request ===============
 

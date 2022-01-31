@@ -7,7 +7,6 @@ use actix_web::http::StatusCode;
 use actix_web::web::{Path, Json};
 use actix_web::{Responder, web, HttpResponse, error, HttpRequest};
 use crate::database::enums::record_visibility::RecordVisibility;
-use crate::database::helpers::tokens::Tokens;
 use crate::database::queries::query_w2l_template::select_w2l_template_by_token;
 use crate::http_server::web_utils::ip_address::get_request_ip;
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;

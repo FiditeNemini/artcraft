@@ -6,7 +6,7 @@ use anyhow::anyhow;
 use chrono::{Utc, DateTime};
 use container_common::anyhow_result::AnyhowResult;
 use crate::database::enums::record_visibility::RecordVisibility;
-use crate::database::helpers::tokens::Tokens;
+use database_queries::tokens::Tokens;
 use log::{warn, info};
 use sqlx::MySqlPool;
 use std::path::Path;
