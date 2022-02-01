@@ -1,27 +1,38 @@
+import 'bulma/css/bulma.css'
 import React from 'react';
-import logo from './logo.svg';
-import './App.css';
-import { Common } from "@storyteller/components";
+import { BrowserRouter, Route, Switch } from "react-router-dom";
+//import { Common } from "@storyteller/components";
+import { IndexPage } from './pages/index/IndexPage';
+import { AboutPage } from './pages/about/AboutPage';
+import { TopNav } from './layout/TopNav';
+import { StreamPage } from './pages/stream/StreamPage';
+import { ComingSoonPage } from './pages/coming-soon/ComingSoonPage';
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Storyteller
-        </p>
-        <Common />
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <BrowserRouter>
+      <div id="main" className="mainwrap">
+        <div id="viewable">
+          <TopNav />
+
+          <Switch>
+            <Route path="/">
+              <IndexPage />
+            </Route>
+            <Route path="/about">
+              <AboutPage />
+            </Route>
+            <Route path="/stream">
+              <StreamPage />
+            </Route>
+            <Route path="/coming-soon">
+              <ComingSoonPage />
+            </Route>
+          </Switch>
+
+        </div>
+      </div>
+    </BrowserRouter>
   );
 }
 

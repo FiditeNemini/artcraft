@@ -16,3 +16,7 @@
 /upload*   /index.html   200
 /video*   /index.html   200
 /w2l*   /index.html   200
+
+# These are Storyteller routes
+/coming-soon*   /index.html   200
+/stream*   /index.html   200
