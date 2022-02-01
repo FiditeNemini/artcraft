@@ -1,11 +1,12 @@
 {
-    "name": "@storyteller/monorepo",
+    "name": "@storyteller/root",
     "private": true,
     "version": "1.0.0",
-    "workspaces": [
-        "./app/*",
-        "./app/modules/*"
-    ],
+    "workspaces": {
+      "packages": [
+        "./packages/**"
+      ]
+    },
     "devDependencies": {
         "lerna": "^4.0.0"
     }
