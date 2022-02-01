@@ -8,8 +8,8 @@
         ]
     },
 		"scripts": {
-			"start": "lerna exec --scope @storyteller/fakeyou -- yarn start",
-			"start2": "lerna exec --scope @storyteller/storyteller -- yarn start"
+			"start-fakeyou": "lerna exec --scope @storyteller/fakeyou -- yarn start",
+			"start-storyteller": "lerna exec --scope @storyteller/storyteller -- yarn start"
 		},
     "devDependencies": {
         "craco": "^0.0.3",
