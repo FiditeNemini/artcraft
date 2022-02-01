@@ -8,9 +8,11 @@ function ComingSoonPage() {
           <h1 className="title">
             Coming Soon
           </h1>
+          <p className="subtitle">
+            We're almost done!
+          </p>
           <div className="content">
-
-            <p>We'll be launching the following features within the next few months:</p>
+            <p>We'll be launching the following features shortly:</p>
 
             <ul>
               <li>Audience rewards
@@ -26,7 +28,12 @@ function ComingSoonPage() {
                     into games)</li>
                 </ul>
               </li>
-              <li>Storyteller Engine
+              <li>Big Secret Project
+                <ul>
+                  <li>???</li>
+                </ul>
+              </li>
+              {/*<li>Storyteller Engine
                 <ul>
                   <li>This is a high quality cinematic game engine.
                     You don't need to own an expensive computer. It can run in the cloud.</li>
@@ -36,10 +43,10 @@ function ComingSoonPage() {
                   <li>Embed rich content: games, browser panes, video feeds</li>
                   <li>Let your audience control your world</li>
                 </ul>
-              </li>
+              </li>*/}
             </ul>
 
-            <p>You'll be able to make films, Hollywood-quality streams, and so much more! </p>
+            {/*<p>You'll be able to make films, Hollywood-quality streams, and so much more! </p>*/}
 
           </div>
         </div>

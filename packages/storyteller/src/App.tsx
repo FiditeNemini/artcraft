@@ -5,7 +5,6 @@ import React from 'react';
 import { BrowserRouter, Route, Switch } from "react-router-dom";
 //import { Common } from "@storyteller/components";
 import { IndexPage } from './pages/index/IndexPage';
-import { AboutPage } from './pages/about/AboutPage';
 import { TopNav } from './layout/TopNav';
 import { StreamPage } from './pages/stream/StreamPage';
 import { ComingSoonPage } from './pages/coming-soon/ComingSoonPage';
@@ -18,9 +17,6 @@ function App() {
           <TopNav />
 
           <Switch>
-            <Route path="/about">
-              <AboutPage />
-            </Route>
             <Route path="/stream">
               <StreamPage />
             </Route>

@@ -11,11 +11,14 @@ function IndexPage() {
           <p className="subtitle">
             Supercharge your Content
           </p>
-        </div>
-      </section>
 
-      <section className="section">
-        <div className="container">
+          <div className="content">
+            <p>Storyteller is a new platform built by the creators of the&nbsp; 
+              <a href="https://fakeyou.com">FakeYou deep fake website</a>.</p>
+
+            {/*<p>In the future, everyone will have their own Hollywood studio.
+              And that's what we're building.</p>*/}
+          </div>
         </div>
       </section>
     </div>

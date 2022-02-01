@@ -42,11 +42,6 @@ function TopNav() {
               onClick={() => closeHamburger()}
               >Stream TTS</Link>
 
-            <Link to="/about"
-              className="navbar-item"
-              onClick={() => closeHamburger()}
-              >About</Link>
-
             <Link to="/coming-soon"
               className="navbar-item"
               onClick={() => closeHamburger()}
