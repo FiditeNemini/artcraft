@@ -7,10 +7,6 @@ import { TtsCategory } from '../../api/category/ListTtsCategories';
 import { TtsModelCategory } from '../../api/category/ListTtsCategoriesForModel';
 import { ModerationTtsCategory } from '../../api/moderation/category/ListTtsCategoriesForModeration';
 
-interface CategoryLike {
-
-}
-
 export interface Props {
   // This is a list of categories in order: [grandparent/root, parent, child/leaf]
   // Note: The two possible types differ in their timestamp names.

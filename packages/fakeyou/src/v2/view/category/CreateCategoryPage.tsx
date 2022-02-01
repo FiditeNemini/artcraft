@@ -15,11 +15,6 @@ interface Props {
   sessionWrapper: SessionWrapper,
 }
 
-interface TtsModelUploadJobResponsePayload {
-  success: boolean,
-  job_token?: string,
-}
-
 function CreateCategoryPage(props: Props) {
   let history = useHistory();
 
