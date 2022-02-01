@@ -16,7 +16,6 @@ function IndexPage() {
 
       <section className="section">
         <div className="container">
-          <p>This is some text</p>
         </div>
       </section>
     </div>

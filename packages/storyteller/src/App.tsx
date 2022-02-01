@@ -1,4 +1,6 @@
 import 'bulma/css/bulma.css'
+import './App.scss';
+
 import React from 'react';
 import { BrowserRouter, Route, Switch } from "react-router-dom";
 //import { Common } from "@storyteller/components";
@@ -16,9 +18,6 @@ function App() {
           <TopNav />
 
           <Switch>
-            <Route path="/">
-              <IndexPage />
-            </Route>
             <Route path="/about">
               <AboutPage />
             </Route>
@@ -27,6 +26,9 @@ function App() {
             </Route>
             <Route path="/coming-soon">
               <ComingSoonPage />
+            </Route>
+            <Route exact={true} path="/">
+              <IndexPage />
             </Route>
           </Switch>
 
