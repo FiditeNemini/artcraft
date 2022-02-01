@@ -1,5 +1,5 @@
 {
-  "name": "storyteller",
+  "name": "@storyteller/storyteller",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
