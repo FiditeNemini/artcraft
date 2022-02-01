@@ -1,4 +1,5 @@
 import { Speaker } from "./Speakers";
+import { Howl } from 'howler';
 
 class Utterance {
   static counter: number = 0;

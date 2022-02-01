@@ -7,10 +7,10 @@
             "./packages/**"
         ]
     },
-		"scripts": {
-			"start-fakeyou": "lerna exec --scope @storyteller/fakeyou -- yarn start",
-			"start-storyteller": "lerna exec --scope @storyteller/storyteller -- yarn start"
-		},
+    "scripts": {
+        "start-fakeyou": "lerna exec --scope @storyteller/fakeyou -- yarn start",
+        "start-storyteller": "lerna exec --scope @storyteller/storyteller -- yarn start"
+    },
     "devDependencies": {
         "craco": "^0.0.3",
         "lerna": "^4.0.0"

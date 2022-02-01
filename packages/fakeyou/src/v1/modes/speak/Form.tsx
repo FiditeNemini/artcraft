@@ -1,5 +1,5 @@
-import Howl from 'howler';
 import React from 'react';
+import { Howl } from 'howler';
 import { SpeakRequest } from './SpeakRequest';
 import { Speaker } from '../../model/Speakers';
 import { createColorMap, linearScale } from "@colormap/core";
@@ -106,9 +106,9 @@ class Form extends React.Component<Props, State> {
       const spectrogram = new Spectrogram(base64ByteString, bytes, res.spectrogram.width, res.spectrogram.height);
       this.props.updateSpectrogramCallback(spectrogram);
 
-      const sound = new Howl.Howl({
+      const sound = new Howl({
         src: [data],
-        format: 'wav',
+        format: ['wav'],
         // NB: Attempting to get this working on iPhone Safari
         // https://github.com/goldfire/howler.js/issues/1093
         // Other issues cite needing to cache a single player 
@@ -149,9 +149,9 @@ class Form extends React.Component<Props, State> {
       const audioUrl = window.URL.createObjectURL(blob);
       //console.log(url);
 
-      const sound = new Howl.Howl({
+      const sound = new Howl({
         src: [audioUrl],
-        format: 'wav',
+        format: ['wav'],
         // NB: Attempting to get this working on iPhone Safari
         // https://github.com/goldfire/howler.js/issues/1093
         // Other issues cite needing to cache a single player 
