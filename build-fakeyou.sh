@@ -16,7 +16,7 @@ set -euxo pipefail
 #cp _redirects fakeyou/build
 
 # --ignore-engines: https://stackoverflow.com/a/59615348
-yarn build-fakeyou --silent --ignore-optional --ignore-engines
+yarn build-fakeyou --verbose --ignore-optional --ignore-engines
 
 mkdir fakeyou
 mv packages/fakeyou/build/ fakeyou/build/
