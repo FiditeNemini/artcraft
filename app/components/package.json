@@ -2,8 +2,11 @@
   "name": "components",
   "version": "1.0.0",
   "description": "",
+  "module": "dist/components.bundle.min.js",
   "main": "index.js",
   "scripts": {
+    "build": "webpack",
+    "build-watch": "webpack --watch",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
