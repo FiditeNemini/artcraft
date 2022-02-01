@@ -8,8 +8,8 @@
         ]
     },
     "scripts": {
-        "start-fakeyou": "lerna exec --scope @storyteller/fakeyou -- yarn start",
-        "start-storyteller": "lerna exec --scope @storyteller/storyteller -- yarn start"
+        "start-fakeyou": "PORT=7000 BROWSER=none lerna exec --scope @storyteller/fakeyou -- yarn start",
+        "start-storyteller": "PORT=7000 BROWSER=none lerna exec --scope @storyteller/storyteller -- yarn start"
     },
     "devDependencies": {
         "craco": "^0.0.3",
