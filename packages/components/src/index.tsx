@@ -1,3 +1,7 @@
+import Box from "./components/Box";
 import Common from "./components/Common";
 
-export { Common };
+export { 
+  Box,
+  Common,
+};

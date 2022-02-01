@@ -1,7 +1,7 @@
 import React from 'react';
 import logo from './logo.svg';
 import './App.css';
-import { Common } from "@storyteller/components";
+import { Box, Common } from "@storyteller/components";
 
 function App() {
   return (
@@ -12,6 +12,7 @@ function App() {
           FakeYou
         </p>
         <Common />
+        <Box />
         <a
           className="App-link"
           href="https://reactjs.org"
