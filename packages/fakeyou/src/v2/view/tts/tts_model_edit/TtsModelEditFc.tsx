@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { ApiConfig } from '../../../../common/ApiConfig';
 import { SessionWrapper } from '../../../../session/SessionWrapper';
-import { TtsInferenceJob } from '../../../../App';
+import { TtsInferenceJob } from '../../../../jobs/TtsInferenceJobs';
 import { useParams, useHistory } from 'react-router-dom';
 import { FrontendUrlConfig } from '../../../../common/FrontendUrlConfig';
 import { VisibleIconFc } from '../../_icons/VisibleIcon';

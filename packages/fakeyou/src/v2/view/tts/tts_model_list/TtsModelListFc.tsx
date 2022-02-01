@@ -6,7 +6,7 @@ import { SessionTtsModelUploadResultListFc } from '../../_common/SessionTtsModel
 import { SessionW2lInferenceResultListFc } from '../../_common/SessionW2lInferenceResultsListFc';
 import { SessionW2lTemplateUploadResultListFc } from '../../_common/SessionW2lTemplateUploadResultsListFc';
 import { SessionWrapper } from '../../../../session/SessionWrapper';
-import { TtsInferenceJob } from '../../../../App';
+import { TtsInferenceJob } from '../../../../jobs/TtsInferenceJobs';
 import { TtsModelUploadJob } from '../../../../jobs/TtsModelUploadJobs';
 import { W2lInferenceJob } from '../../../../jobs/W2lInferenceJobs';
 import { W2lTemplateUploadJob } from '../../../../jobs/W2lTemplateUploadJobs';
