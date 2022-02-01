@@ -11,6 +11,12 @@ Library code is exported in the library's index.tsx (meh)
 
 To start the react server, run "yarn start-storyteller" or "yarn start-fakeyou"
 
+
+Netlify Notes
+-------------
+
+The `.node-version` file controls which version of node Netlify uses to build!
+
 Old Readme Follows
 ------------------
 
