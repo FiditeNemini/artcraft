@@ -203,7 +203,7 @@ function TtsModelListFc(props: Props) {
 
             <div className="column">
               <p className="title">
-                Text to Speech
+                Text to Speech*
               </p>
               <p className="subtitle">
                 Use <strong>FakeYou</strong> deep fake tech to say stuff with your favorite characters.
