@@ -1,6 +1,19 @@
 fakeyou-frontend
 ================
 
+NB: This is now a MONOREPO
+--------------------------
+
+Based on https://medium.com/geekculture/setting-up-monorepo-with-create-react-app-cb2cfa763b96, 
+which isn't the best guide, but it works.
+
+Library code is exported in the library's index.tsx (meh)
+
+To start the react server, run "yarn start-storyteller" or "yarn start-fakeyou"
+
+Old Readme Follows
+------------------
+
 Frontend website for https://fakeyou.com/ (previously https://vo.codes)
 
 Hosted with netlify.
