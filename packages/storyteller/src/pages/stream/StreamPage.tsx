@@ -1,3 +1,5 @@
+import { faTwitch } from '@fortawesome/free-brands-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import React from 'react';
 
 function StreamPage() {
@@ -18,6 +20,31 @@ function StreamPage() {
               
             <p>You don't need to set up any software on your end. Simply point OBS or your 
               broadcast software the URL below:</p>
+
+            <br />
+
+            <button className="button is-large is-danger">
+              1. Connect with Twitch
+            </button>
+
+            <br />
+            <br />
+            <br />
+
+            <div className="field">
+              <p className="control has-icons-left">
+                <input className="input is-large" type="text" placeholder="Twitch Username" />
+                <span className="icon is-large is-left">
+                  <FontAwesomeIcon icon={faTwitch} />
+                </span>
+              </p>
+            </div>
+
+            <br />
+
+            <button className="button is-large is-danger">
+              2. Open OBS Page
+            </button>
           </div>
         </div>
       </section>

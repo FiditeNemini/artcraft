@@ -8,6 +8,7 @@ import { IndexPage } from './pages/index/IndexPage';
 import { TopNav } from './layout/TopNav';
 import { StreamPage } from './pages/stream/StreamPage';
 import { ComingSoonPage } from './pages/coming-soon/ComingSoonPage';
+import { ObsLayerPage } from './pages/obs-layer/ObsLayerPage';
 
 function App() {
   return (
