@@ -15,7 +15,7 @@ set -euxo pipefail
 #echo "Copying redirects configuration to Netlify build dir..."
 #cp _redirects fakeyou/build
 
-yarn build-fakeyou
+yarn build-fakeyou --silent --ignore-optional
 
 mkdir fakeyou
 mv packages/fakeyou/build/ fakeyou/build/
