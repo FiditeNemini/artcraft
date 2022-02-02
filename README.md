@@ -18,6 +18,9 @@ yarn install
 yarn start-storyteller
 ```
 
+TODO: Upgrade React, it's a bit behind. See downgrade @ SHA
+`d739b66bfa3315620208579193d652e8e460da1e`.
+
 
 Netlify Notes
 -------------

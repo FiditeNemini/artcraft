@@ -1,80 +1,47 @@
-import React from 'react';
+import React, { useEffect } from 'react';
+import { useParams } from 'react-router-dom';
 
 function ObsLayerPage() {
-  const WS_URL = 'ws://localhost:54321/obs';
+  const { username } : { username : string } = useParams();
 
-  //const url = `${WS_URL}/${props.twitchUsername}`;
+  useEffect(() => {
+    openWebsocket(username);
+  }, [username]);
 
   return (
     <div>
       <section className="section">
         <div className="container">
           <h1 className="title">
-            Stream TTS
+            Paste this page's URL into OBS
           </h1>
-          <p className="subtitle">
-            Early Alpha Preview
-          </p>
-          <div className="content">
-            <p>This is an early demo of our Stream TTS, powered by FakeYou. 
-              It does not currently offer customization, though our plans are to 
-              allow for a high degree of configurability: set your own voices, rewards, etc.</p>
-              
-            <p>You don't need to set up any software on your end. Simply point OBS or your 
-              broadcast software the URL below:</p>
-          </div>
         </div>
       </section>
     </div>
   )
 }
 
-/*
+function openWebsocket(twitchUsername: string) {
+  const url = `ws://localhost:54321/obs/${twitchUsername}`;
+  const sock = new WebSocket(url);
 
-const DEFAULT_USERNAME = 'testytest512';
+  sock.onopen = function (event: Event) {
+    console.log('on open event', event);
+    sock.send('on open message from browser');
+  };
 
-(function() {
-    console.log('installing script');
+  sock.onmessage = function (event: MessageEvent) {
+    console.log('on message event', event.data);
+  }
 
-    const maybeUsername = window.location.hash.replace('#', '').trim();
+  sock.onerror = function(event: Event) {
+    console.log('on error event', event);
+  }
 
-    const username = (!!maybeUsername) ? maybeUsername : DEFAULT_USERNAME;
-
-    console.log('username', username);
-    document.getElementById('username').innerHTML = username;
-
-    const url = `${WS_URL}/${username}`;
-
-    let sock = new WebSocket(url);
-
-    sock.onopen = function (event) {
-        console.log('on open event', event);
-        sock.send('on open message from browser');
-    };
-
-    sock.onmessage = function (event) {
-        console.log('on message event', event.data);
-    }
-
-    sock.onerror = function(event) {
-        console.log('on error event', event.data);
-    }
-
-    setInterval(() => {
-        console.log('sending browser message to server on interval');
-        sock.send('interval trigger from browser');
-    }, 2000);
-
-    //setTimeout(() => {
-    //    console.log('disconnect')
-    //    const normal_close = 1000;
-    //    sock.close(normal_close, 'close');
-    //
-    //}, 10000)
-
-})();
-*/
-
-
+  //setInterval(() => {
+  //  console.log('sending browser message to server on interval');
+  //  sock.send('interval trigger from browser');
+  //}, 2000);
+}
 
 export { ObsLayerPage }

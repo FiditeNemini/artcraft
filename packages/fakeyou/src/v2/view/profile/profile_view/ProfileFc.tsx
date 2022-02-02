@@ -18,7 +18,6 @@ interface Props {
   sessionWrapper: SessionWrapper,
 }
 
-
 function ProfileFc(props: Props) {
   const { username } : { username : string } = useParams();
 

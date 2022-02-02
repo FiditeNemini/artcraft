@@ -3,10 +3,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import React, { useState } from 'react';
 import { useHistory, withRouter } from 'react-router-dom';
 
-interface Props {
-}
-
-function StreamPage(props: Props) {
+function StreamPage() {
   const history = useHistory();
 
   const [twitchUsername, setTwitchUsername] = useState('')
@@ -18,12 +15,14 @@ function StreamPage(props: Props) {
     return false;
   };
 
-  //const openObs = (ev: React.FormEvent<HTMLButtonElement>) => {
-  //  ev.preventDefault();
-  //  let url = `/obs/${twitchUsername}`;
-  //  history.push(url);
-  //  return false;
-  //};
+  const openObs = (ev: React.FormEvent<HTMLButtonElement>) => {
+    ev.preventDefault();
+    let url = `/obs/${twitchUsername}`;
+    history.push(url);
+    return false;
+  };
+
+  const buttonDisabled = twitchUsername.trim().length === 0;
 
   return (
     <div>
@@ -68,7 +67,11 @@ function StreamPage(props: Props) {
 
             <br />
 
-            <button className="button is-large is-danger">
+            <button 
+              className="button is-large is-danger"
+              disabled={buttonDisabled}
+              onClick={openObs}
+              >
               2. Open OBS Page
             </button>
           </div>
