@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { ApiConfig } from '../../../../common/ApiConfig';
+import { ApiConfig } from '@storyteller/components';
 import { SessionWrapper } from '../../../../session/SessionWrapper';
 import { TtsInferenceJob } from '../../../../jobs/TtsInferenceJobs';
 import { useParams, useHistory } from 'react-router-dom';

@@ -1,4 +1,4 @@
-import { ApiConfig } from "../../../common/ApiConfig";
+import { ApiConfig } from "@storyteller/components";
 
 export interface W2lInferenceStats {
   success: boolean,

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Link, useHistory } from 'react-router-dom';
-import { ApiConfig } from '../../../../common/ApiConfig';
+import { ApiConfig } from '@storyteller/components';
 import { SessionWrapper } from '../../../../session/SessionWrapper';
 import { formatDistance } from 'date-fns';
 import { BackLink } from '../../_common/BackLink';

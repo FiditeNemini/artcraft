@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ApiConfig } from '../../../common/ApiConfig';
+import { ApiConfig } from '@storyteller/components';
 import { SessionTtsModelUploadResultListFc } from '../_common/SessionTtsModelUploadResultsListFc';
 import { SessionWrapper } from '../../../session/SessionWrapper';
 import { TtsModelUploadJob } from '../../../jobs/TtsModelUploadJobs';

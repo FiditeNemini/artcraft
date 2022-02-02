@@ -1,4 +1,4 @@
-import { ApiConfig } from "../../../common/ApiConfig";
+import { ApiConfig } from "@storyteller/components";
 
 export interface CreateSessionRequest {
   username_or_email: string,

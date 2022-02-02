@@ -1,7 +1,7 @@
 import React from 'react';
 import { SessionWrapper } from '../session/SessionWrapper';
 import { Link, useHistory } from 'react-router-dom';
-import { ApiConfig } from '../common/ApiConfig';
+import { ApiConfig } from '@storyteller/components';
 
 interface Props {
   sessionWrapper: SessionWrapper,

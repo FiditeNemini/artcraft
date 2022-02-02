@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ApiConfig } from '../../../common/ApiConfig';
+import { ApiConfig } from '@storyteller/components';
 import { SessionWrapper } from '../../../session/SessionWrapper';
 import { W2lTemplateUploadJob } from '../../../jobs/W2lTemplateUploadJobs';
 import { useHistory } from "react-router-dom";

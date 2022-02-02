@@ -338,6 +338,10 @@ class ApiConfig {
     return `${this.getScheme()}://${this.getNewApiHost()}/moderation/categories/${categoryToken}/delete`;
   }
 
+  obsEventsWebsocket(twitchUsername: string) : string {
+    return `ws://localhost:54321/obs/${twitchUsername}`;
+  }
+
   private getScheme() : string {
     return this.useSsl ? "https" : "http";
   }

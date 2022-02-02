@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { ApiConfig, ListTtsInferenceResultsForUserArgs } from '../../../../common/ApiConfig';
+import { ApiConfig, ListTtsInferenceResultsForUserArgs } from '@storyteller/components';
 import { Link } from 'react-router-dom';
 import { formatDistance } from 'date-fns';
 import { VisibleIconFc } from '../../_icons/VisibleIcon';

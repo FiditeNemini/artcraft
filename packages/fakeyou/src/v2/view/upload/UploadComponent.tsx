@@ -1,5 +1,5 @@
 import React from 'react';
-import { ApiConfig } from '../../../common/ApiConfig';
+import { ApiConfig } from '@storyteller/components';
 import { SessionWrapper } from '../../../session/SessionWrapper';
 import { TtsModelUploadJob } from '../../../jobs/TtsModelUploadJobs';
 import { W2lTemplateUploadJob } from '../../../jobs/W2lTemplateUploadJobs';

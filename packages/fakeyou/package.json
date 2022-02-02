@@ -3,10 +3,10 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@storyteller/components": "0.1.0",
     "@colormap/core": "0.1.0-3",
     "@colormap/presets": "0.1.0-4",
     "@craco/craco": "^6.4.3",
-    "@storyteller/components": "0.1.0",
     "@fortawesome/fontawesome-svg-core": "^1.2.36",
     "@fortawesome/free-brands-svg-icons": "^5.15.4",
     "@fortawesome/free-solid-svg-icons": "^5.15.4",

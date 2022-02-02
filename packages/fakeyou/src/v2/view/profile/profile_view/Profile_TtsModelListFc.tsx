@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { ApiConfig } from '../../../../common/ApiConfig';
+import { ApiConfig } from '@storyteller/components';
 import { Link } from 'react-router-dom';
 import { formatDistance } from 'date-fns';
 

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { ApiConfig } from '../../../../common/ApiConfig';
+import { ApiConfig } from '@storyteller/components';
 import { SessionWrapper } from '../../../../session/SessionWrapper';
 import { useParams, useHistory } from 'react-router-dom';
 import { FrontendUrlConfig } from '../../../../common/FrontendUrlConfig';

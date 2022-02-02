@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
 import { useParams } from 'react-router-dom';
+import { ApiConfig } from '@storyteller/components';
 
 function ObsLayerPage() {
   const { username } : { username : string } = useParams();
@@ -22,7 +23,7 @@ function ObsLayerPage() {
 }
 
 function openWebsocket(twitchUsername: string) {
-  const url = `ws://localhost:54321/obs/${twitchUsername}`;
+  const url = new ApiConfig().obsEventsWebsocket(twitchUsername);
   const sock = new WebSocket(url);
 
   sock.onopen = function (event: Event) {

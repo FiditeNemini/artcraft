@@ -2,7 +2,7 @@ import 'bulma/css/bulma.css'
 import './App.scss';
 
 import React from 'react';
-import { ApiConfig } from './common/ApiConfig';
+import { ApiConfig } from '@storyteller/components';
 import { BrowserRouter, Route, Switch } from "react-router-dom";
 import { NewVocodesContainer } from './v2/view/NewVocodesContainer';
 import { OldVocodesContainer } from './v1/OldVocodesContainer';

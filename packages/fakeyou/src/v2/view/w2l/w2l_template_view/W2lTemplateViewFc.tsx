@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
-import { ApiConfig } from '../../../../common/ApiConfig';
+import { ApiConfig } from '@storyteller/components';
 import { SessionWrapper } from '../../../../session/SessionWrapper';
 import { W2lInferenceJob } from '../../../../App';
 import { useParams, Link } from 'react-router-dom';

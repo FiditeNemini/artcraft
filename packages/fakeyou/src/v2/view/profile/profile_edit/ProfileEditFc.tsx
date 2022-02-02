@@ -1,5 +1,5 @@
 import React, { useEffect, useState }  from 'react';
-import { ApiConfig } from '../../../../common/ApiConfig';
+import { ApiConfig } from '@storyteller/components';
 import { useHistory } from 'react-router-dom';
 import { SessionWrapper } from '../../../../session/SessionWrapper';
 import { useParams } from 'react-router-dom';

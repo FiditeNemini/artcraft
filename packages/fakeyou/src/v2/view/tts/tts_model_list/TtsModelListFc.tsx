@@ -1,5 +1,5 @@
 import React, { useEffect, useCallback } from 'react';
-import { ApiConfig } from '../../../../common/ApiConfig';
+import { ApiConfig } from '@storyteller/components';
 import { Link } from 'react-router-dom';
 import { SessionTtsInferenceResultListFc } from '../../_common/SessionTtsInferenceResultsListFc';
 import { SessionTtsModelUploadResultListFc } from '../../_common/SessionTtsModelUploadResultsListFc';

@@ -15,7 +15,7 @@ import { VideoJob, VideoJobStatus } from './modes/video/VideoJob';
 import { VideoJobPoller } from './modes/video/VideoJobPoller';
 import { VideoQueuePoller } from './modes/video/VideoQueuePoller';
 import { VideoQueueStats } from './modes/video/VideoQueueStats';
-import { ApiConfig } from '../common/ApiConfig';
+import { ApiConfig } from '@storyteller/components';
 import { SessionStateResponse } from './api/SessionState';
 import { Link } from 'react-router-dom';
 import { FrontendUrlConfig } from '../common/FrontendUrlConfig';

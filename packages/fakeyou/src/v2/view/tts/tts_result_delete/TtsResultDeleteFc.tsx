@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { ApiConfig } from '../../../../common/ApiConfig';
+import { ApiConfig } from '@storyteller/components';
 import { SessionWrapper } from '../../../../session/SessionWrapper';
 import { useParams, Link, useHistory } from 'react-router-dom';
 import { GravatarFc } from '../../_common/GravatarFc';

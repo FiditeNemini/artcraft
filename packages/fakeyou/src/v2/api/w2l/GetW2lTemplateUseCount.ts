@@ -1,4 +1,4 @@
-import { ApiConfig } from "../../../common/ApiConfig";
+import { ApiConfig } from "@storyteller/components";
 
 interface W2lTemplateUseCountResponsePayload {
   success: boolean,
