@@ -8,11 +8,11 @@ import { NewVocodesContainer } from './v2/view/NewVocodesContainer';
 import { OldVocodesContainer } from './v1/OldVocodesContainer';
 import { SessionStateResponse } from './session/SessionState';
 import { SessionWrapper } from './session/SessionWrapper';
-import { TtsInferenceJob, TtsInferenceJobStateResponsePayload } from './jobs/TtsInferenceJobs';
-import { W2lInferenceJob, W2lInferenceJobStateResponsePayload } from './jobs/W2lInferenceJobs';
-import { TtsModelUploadJob, TtsModelUploadJobStateResponsePayload } from './jobs/TtsModelUploadJobs';
-import { W2lTemplateUploadJob, W2lTemplateUploadJobStateResponsePayload } from './jobs/W2lTemplateUploadJobs';
-import { jobStateCanChange } from './jobs/JobStates';
+import { TtsInferenceJob, TtsInferenceJobStateResponsePayload } from '@storyteller/components/src/jobs/TtsInferenceJobs';
+import { W2lInferenceJob, W2lInferenceJobStateResponsePayload } from '@storyteller/components/src/jobs/W2lInferenceJobs';
+import { TtsModelUploadJob, TtsModelUploadJobStateResponsePayload } from '@storyteller/components/src/jobs/TtsModelUploadJobs';
+import { W2lTemplateUploadJob, W2lTemplateUploadJobStateResponsePayload } from '@storyteller/components/src/jobs/W2lTemplateUploadJobs';
+import { jobStateCanChange } from '@storyteller/components/src/jobs/JobStates';
 import { TtsModelListItem } from './v2/api/tts/ListTtsModels';
 import { TtsCategoryType } from './AppWrapper';
 

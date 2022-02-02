@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link, } from 'react-router-dom';
-import { JobState } from '../../../jobs/JobStates';
-import { TtsModelUploadJob } from '../../../jobs/TtsModelUploadJobs';
+import { JobState } from '@storyteller/components/src/jobs/JobStates';
+import { TtsModelUploadJob } from '@storyteller/components/src/jobs/TtsModelUploadJobs';
 
 interface Props {
   modelUploadJobs: Array<TtsModelUploadJob>,

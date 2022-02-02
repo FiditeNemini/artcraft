@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { ApiConfig } from '@storyteller/components';
 import { SessionWrapper } from '../../../../session/SessionWrapper';
-import { TtsInferenceJob } from '../../../../jobs/TtsInferenceJobs';
+import { TtsInferenceJob } from '@storyteller/components/src/jobs/TtsInferenceJobs';
 import { useParams, useHistory } from 'react-router-dom';
 import { FrontendUrlConfig } from '../../../../common/FrontendUrlConfig';
 import { VisibleIconFc } from '../../_icons/VisibleIcon';

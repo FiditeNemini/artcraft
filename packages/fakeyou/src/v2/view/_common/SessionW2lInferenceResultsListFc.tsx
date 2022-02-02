@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { W2lInferenceJob } from '../../../App'
-import { JobState } from '../../../jobs/JobStates';
+import { JobState } from '@storyteller/components/src/jobs/JobStates';
 
 interface Props {
   w2lInferenceJobs: Array<W2lInferenceJob>,

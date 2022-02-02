@@ -6,10 +6,10 @@ import { SessionTtsModelUploadResultListFc } from '../../_common/SessionTtsModel
 import { SessionW2lInferenceResultListFc } from '../../_common/SessionW2lInferenceResultsListFc';
 import { SessionW2lTemplateUploadResultListFc } from '../../_common/SessionW2lTemplateUploadResultsListFc';
 import { SessionWrapper } from '../../../../session/SessionWrapper';
-import { TtsInferenceJob } from '../../../../jobs/TtsInferenceJobs';
-import { TtsModelUploadJob } from '../../../../jobs/TtsModelUploadJobs';
-import { W2lInferenceJob } from '../../../../jobs/W2lInferenceJobs';
-import { W2lTemplateUploadJob } from '../../../../jobs/W2lTemplateUploadJobs';
+import { TtsInferenceJob } from '@storyteller/components/src/jobs/TtsInferenceJobs';
+import { TtsModelUploadJob } from '@storyteller/components/src/jobs/TtsModelUploadJobs';
+import { W2lInferenceJob } from '@storyteller/components/src/jobs/W2lInferenceJobs';
+import { W2lTemplateUploadJob } from '@storyteller/components/src/jobs/W2lTemplateUploadJobs';
 import { v4 as uuidv4 } from 'uuid';
 import { ListTtsModels, TtsModelListItem } from '../../../api/tts/ListTtsModels';
 import { GravatarFc } from '../../_common/GravatarFc';

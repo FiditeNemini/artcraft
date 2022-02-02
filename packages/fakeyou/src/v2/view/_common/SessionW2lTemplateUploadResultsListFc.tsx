@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link, } from 'react-router-dom';
-import { JobState } from '../../../jobs/JobStates';
-import { W2lTemplateUploadJob } from '../../../jobs/W2lTemplateUploadJobs';
+import { JobState } from '@storyteller/components/src/jobs/JobStates';
+import { W2lTemplateUploadJob } from '@storyteller/components/src/jobs/W2lTemplateUploadJobs';
 
 interface Props {
   w2lTemplateUploadJobs: Array<W2lTemplateUploadJob>,

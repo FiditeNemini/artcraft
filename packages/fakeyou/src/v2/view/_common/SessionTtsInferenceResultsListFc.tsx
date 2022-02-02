@@ -2,7 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { TtsInferenceJob } from '../../../App'
 import { BucketConfig } from '../../../common/BucketConfig';
-import { JobState } from '../../../jobs/JobStates';
+import { JobState } from '@storyteller/components/src/jobs/JobStates';
 
 interface Props {
   ttsInferenceJobs: Array<TtsInferenceJob>,

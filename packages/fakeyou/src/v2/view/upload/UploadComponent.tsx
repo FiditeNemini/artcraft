@@ -1,8 +1,8 @@
 import React from 'react';
 import { ApiConfig } from '@storyteller/components';
 import { SessionWrapper } from '../../../session/SessionWrapper';
-import { TtsModelUploadJob } from '../../../jobs/TtsModelUploadJobs';
-import { W2lTemplateUploadJob } from '../../../jobs/W2lTemplateUploadJobs';
+import { TtsModelUploadJob } from '@storyteller/components/src/jobs/TtsModelUploadJobs';
+import { W2lTemplateUploadJob } from '@storyteller/components/src/jobs/W2lTemplateUploadJobs';
 import { v4 } from 'uuid';
 
 enum UploadType {
