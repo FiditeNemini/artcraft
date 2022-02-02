@@ -38,10 +38,11 @@ function openWebsocket(twitchUsername: string) {
     console.log('on error event', event);
   }
 
-  //setInterval(() => {
-  //  console.log('sending browser message to server on interval');
-  //  sock.send('interval trigger from browser');
-  //}, 2000);
+  // NB: This has a direct bearing on how fast the backend responds.
+  // Increasing the delay will slow down the flow of events.
+  setInterval(() => {
+    sock.send('ping');
+  }, 1000);
 }
 
 export { ObsLayerPage }
