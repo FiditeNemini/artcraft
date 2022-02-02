@@ -1,8 +1,30 @@
 import { faTwitch } from '@fortawesome/free-brands-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import React from 'react';
+import React, { useState } from 'react';
+import { useHistory, withRouter } from 'react-router-dom';
 
-function StreamPage() {
+interface Props {
+}
+
+function StreamPage(props: Props) {
+  const history = useHistory();
+
+  const [twitchUsername, setTwitchUsername] = useState('')
+
+  const handleTwitchUsernameChange = (ev: React.FormEvent<HTMLInputElement>) => {
+    ev.preventDefault();
+    const value = (ev.target as HTMLInputElement).value;
+    setTwitchUsername(value);
+    return false;
+  };
+
+  //const openObs = (ev: React.FormEvent<HTMLButtonElement>) => {
+  //  ev.preventDefault();
+  //  let url = `/obs/${twitchUsername}`;
+  //  history.push(url);
+  //  return false;
+  //};
+
   return (
     <div>
       <section className="section">
@@ -33,7 +55,11 @@ function StreamPage() {
 
             <div className="field">
               <p className="control has-icons-left">
-                <input className="input is-large" type="text" placeholder="Twitch Username" />
+                <input 
+                    className="input is-large" 
+                    type="text" 
+                    placeholder="Twitch Username" 
+                    onChange={handleTwitchUsernameChange}/>
                 <span className="icon is-large is-left">
                   <FontAwesomeIcon icon={faTwitch} />
                 </span>
@@ -52,4 +78,4 @@ function StreamPage() {
   )
 }
 
-export { StreamPage }
+export default withRouter(StreamPage);

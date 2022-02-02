@@ -6,7 +6,7 @@ import { BrowserRouter, Route, Switch } from "react-router-dom";
 //import { Common } from "@storyteller/components";
 import { IndexPage } from './pages/index/IndexPage';
 import { TopNav } from './layout/TopNav';
-import { StreamPage } from './pages/stream/StreamPage';
+import StreamPage from './pages/stream/StreamPage';
 import { ComingSoonPage } from './pages/coming-soon/ComingSoonPage';
 import { ObsLayerPage } from './pages/obs-layer/ObsLayerPage';
 
@@ -23,6 +23,9 @@ function App() {
             </Route>
             <Route path="/coming-soon">
               <ComingSoonPage />
+            </Route>
+            <Route path="/obs/:username">
+              <ObsLayerPage />
             </Route>
             <Route exact={true} path="/">
               <IndexPage />

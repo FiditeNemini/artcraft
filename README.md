@@ -11,6 +11,13 @@ Library code is exported in the library's index.tsx (meh)
 
 To start the react server, run "yarn start-storyteller" or "yarn start-fakeyou"
 
+### Running
+
+```
+yarn install
+yarn start-storyteller
+```
+
 
 Netlify Notes
 -------------

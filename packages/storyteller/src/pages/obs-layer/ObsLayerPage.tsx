@@ -1,13 +1,9 @@
 import React from 'react';
 
-interface Props {
-  twitchUsername: string,
-}
-
-function ObsLayerPage(props: Props) {
+function ObsLayerPage() {
   const WS_URL = 'ws://localhost:54321/obs';
 
-  const url = `${WS_URL}/${props.twitchUsername}`;
+  //const url = `${WS_URL}/${props.twitchUsername}`;
 
   return (
     <div>
