@@ -21,3 +21,13 @@ container_common = { path = "../container_common" }
 anyhow = "1.0.40"
 once_cell = "1.9.0"
 regex = "1.5.4"
+easyenv = "0.0.6"
+
+# Twitch
+# NB "unsupported" pubsub features may disappear from the Twitch API at any time. It's an unofficial API.
+# twitch_api2 = { version = "0.6.0-rc.2", features = ["helix", "reqwest_client", "pubsub", "chrono", "unsupported"] }
+twitch_oauth2 = "0.6.0-rc.2"
+
+# Serialization
+serde = "1.0.125"
+serde_derive = "1.0.125"

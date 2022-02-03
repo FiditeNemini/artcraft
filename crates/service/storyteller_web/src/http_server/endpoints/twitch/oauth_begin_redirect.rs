@@ -1,7 +1,6 @@
 use actix_http::{StatusCode, header};
 use actix_web::{HttpRequest, web, HttpResponse, ResponseError, HttpResponseBuilder};
-use crate::ObsGatewayServerState;
-use crate::twitch::oauth::oauth_token_builder::get_oauth_token_builder;
+use crate::server_state::ServerState;
 use http_server_common::response::response_error_helpers::to_simple_json_error;
 use http_server_common::response::response_success_helpers::simple_json_success;
 use http_server_common::response::to_json_success_response::to_json_success_response;
@@ -10,6 +9,7 @@ use log::warn;
 use std::fmt;
 use std::sync::Arc;
 use twitch_api2::twitch_oauth2::ClientId;
+use twitch_common::oauth_token_builder::get_oauth_token_builder;
 use twitch_oauth2::tokens::UserTokenBuilder;
 use twitch_oauth2::{Scope, ClientSecret};
 
@@ -46,9 +46,9 @@ impl ResponseError for OauthBeginEnrollError {
   }
 }
 
-pub async fn oauth_begin_enroll(
+pub async fn oauth_begin_enroll_redirect(
   http_request: HttpRequest,
-  server_state: web::Data<Arc<ObsGatewayServerState>>
+  server_state: web::Data<Arc<ServerState>>
 ) -> Result<HttpResponse, OauthBeginEnrollError> {
 
   let redirect_url =
@@ -62,16 +62,11 @@ pub async fn oauth_begin_enroll(
     &server_state.twitch_oauth_secrets.client_id,
     &server_state.twitch_oauth_secrets.client_secret,
     &redirect_url,
-  true);
+    true);
 
   let (url, _csrf_token) = builder.generate_url();
 
-  let response = OauthBeginEnrollResult {
-    redirect_url: url.to_string(),
-  };
-
-  let response = to_json_success_response(&response)
-      .map_err(|_| OauthBeginEnrollError::ServerError)?;
-
-  Ok(response)
+  Ok(HttpResponse::Found()
+      .append_header((header::LOCATION, url.to_string()))
+      .finish())
 }

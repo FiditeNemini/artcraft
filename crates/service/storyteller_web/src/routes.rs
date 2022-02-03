@@ -43,6 +43,9 @@ use crate::http_server::endpoints::tts::get_tts_model_use_count::get_tts_model_u
 use crate::http_server::endpoints::tts::get_tts_result::get_tts_inference_result_handler;
 use crate::http_server::endpoints::tts::get_tts_upload_model_job_status::get_tts_upload_model_job_status_handler;
 use crate::http_server::endpoints::tts::list_tts_models::list_tts_models_handler;
+use crate::http_server::endpoints::twitch::oauth_begin::oauth_begin_enroll;
+use crate::http_server::endpoints::twitch::oauth_begin_redirect::oauth_begin_enroll_redirect;
+use crate::http_server::endpoints::twitch::oauth_end::oauth_end_enroll_from_redirect;
 use crate::http_server::endpoints::users::create_account::create_account_handler;
 use crate::http_server::endpoints::users::edit_profile::edit_profile_handler;
 use crate::http_server::endpoints::users::get_profile::get_profile_handler;
@@ -84,6 +87,7 @@ pub fn add_routes<T, B> (app: App<T, B>) -> App<T, B>
   app = add_w2l_routes(app); /* /w2l */
   app = add_category_routes(app); /* /category */
   app = add_user_profile_routes(app); /* /user */
+  app = add_twitch_oauth_routes(app); /* /twitch */ // TODO: MAYBE TEMPORARY
 
   // ==================== ACCOUNT CREATION / SESSION MANAGEMENT ====================
   app.service(
@@ -516,5 +520,36 @@ fn add_user_profile_routes<T, B> (app: App<T, B>) -> App<T, B>
             .route(web::get().to(list_user_w2l_inference_results_handler))
             .route(web::head().to(|| HttpResponse::Ok()))
       )
+  )
+}
+// ==================== TWITCH ROUTES ====================
+
+// TODO: Maybe move these into an "oauth-gateway" type http service.
+//  We'll want the domain to have reputation and not confuse people.
+//  It'll also be nice to accrue all oauth things here.
+fn add_twitch_oauth_routes<T, B> (app: App<T, B>) -> App<T, B>
+  where
+      B: MessageBody,
+      T: ServiceFactory<
+        ServiceRequest,
+        Config = (),
+        Response = ServiceResponse<B>,
+        Error = Error,
+        InitError = (),
+      >,
+{
+  app.service(web::scope("/twitch")
+    .service(web::resource("/oauth_enroll")
+      .route(web::get().to(oauth_begin_enroll))
+      .route(web::head().to(|| HttpResponse::Ok()))
+    )
+    .service(web::resource("/oauth_enroll_redirect")
+      .route(web::get().to(oauth_begin_enroll_redirect))
+      .route(web::head().to(|| HttpResponse::Ok()))
+    )
+    .service(web::resource("/oauth_redirect")
+      .route(web::get().to(oauth_end_enroll_from_redirect))
+      .route(web::head().to(|| HttpResponse::Ok()))
+    )
   )
 }

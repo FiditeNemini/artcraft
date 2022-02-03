@@ -12,7 +12,6 @@
 #[macro_use] extern crate magic_crypt;
 #[macro_use] extern crate serde_derive;
 
-pub mod endpoints;
 pub mod endpoints_ws;
 pub mod server_state;
 pub mod redis;
@@ -28,12 +27,8 @@ use config::shared_constants::DEFAULT_MYSQL_CONNECTION_STRING;
 use config::shared_constants::DEFAULT_REDIS_DATABASE_1_CONNECTION_STRING;
 use config::shared_constants::DEFAULT_RUST_LOG;
 use container_common::anyhow_result::AnyhowResult;
-use crate::endpoints::oauth_begin::oauth_begin_enroll;
-use crate::endpoints::oauth_begin_redirect::oauth_begin_enroll_redirect;
-use crate::endpoints::oauth_end::oauth_end_enroll_from_redirect;
 use crate::endpoints_ws::obs_gateway_websocket_handler::obs_gateway_websocket_handler;
-use crate::server_state::{ObsGatewayServerState, EnvConfig, TwitchOauthSecrets, TwitchOauthTemp, BackendsConfig};
-use crate::twitch::twitch_secrets::TwitchSecrets;
+use crate::server_state::{ObsGatewayServerState, EnvConfig, TwitchOauthSecrets, BackendsConfig};
 use futures::Future;
 use futures::executor::ThreadPool;
 use http_server_common::cors::build_common_cors_config;
@@ -52,6 +47,7 @@ use std::time::Duration;
 use tokio::runtime::{Handle, Runtime};
 use twitch_api2::pubsub::Topic;
 use twitch_api2::pubsub;
+use twitch_common::twitch_secrets::TwitchSecrets;
 use twitch_oauth2::tokens::UserTokenBuilder;
 use twitch_oauth2::{AppAccessToken, Scope, TwitchToken, tokens::errors::AppAccessTokenError, ClientId, ClientSecret};
 
@@ -77,9 +73,7 @@ async fn main() -> AnyhowResult<()> {
 
   info!("Reading Twitch secrets...");
 
-  let secrets = TwitchSecrets::from_env()?;
-  let client_id = ClientId::new(&secrets.app_client_id);
-  let client_secret = ClientSecret::new(&secrets.app_client_secret);
+  let twitch_secrets = TwitchSecrets::from_env()?;
 
   info!("Reading env vars and setting up utils...");
 
@@ -95,11 +89,6 @@ async fn main() -> AnyhowResult<()> {
   let oauth_redirect_url = easyenv::get_env_string_or_default(
     "TWITCH_OAUTH_REDIRECT_URL",
     "http://localhost:54321/twitch/oauth_redirect");
-
-  // TODO: These are temporary.
-  let temp_oauth_user_id = easyenv::get_env_string_or_default("TEMP_TWITCH_OAUTH_USER_ID", "");
-  let temp_oauth_access_token = easyenv::get_env_string_or_default("TEMP_TWITCH_OAUTH_ACCESS", "");
-  let temp_oauth_refresh_token = easyenv::get_env_string_or_default("TEMP_TWITCH_OAUTH_REFRESH", "");
 
   let db_connection_string =
       easyenv::get_env_string_or_default(
@@ -135,14 +124,9 @@ async fn main() -> AnyhowResult<()> {
       website_homepage_redirect,
     },
     twitch_oauth_secrets: TwitchOauthSecrets {
-      client_id: secrets.app_client_id.clone(),
-      client_secret: secrets.app_client_secret.clone(),
+      client_id: twitch_secrets.app_client_id.clone(),
+      client_secret: twitch_secrets.app_client_secret.clone(),
       redirect_url: oauth_redirect_url,
-    },
-    twitch_oauth_temp: TwitchOauthTemp {
-      temp_oauth_user_id,
-      temp_oauth_access_token,
-      temp_oauth_refresh_token,
     },
     hostname: server_hostname,
     backends: BackendsConfig {
@@ -183,31 +167,18 @@ pub async fn serve(server_state: ObsGatewayServerState) -> AnyhowResult<()>
         .service(web::resource("/")
             .route(web::get().to(get_root_index))
         )
-        // Twitch
-        .service(web::scope("/twitch")
-              .service(web::resource("/oauth_enroll")
-                    .route(web::get().to(oauth_begin_enroll))
-                    .route(web::head().to(|| HttpResponse::Ok()))
-              )
-              .service(web::resource("/oauth_enroll_redirect")
-                  .route(web::get().to(oauth_begin_enroll_redirect))
-                  .route(web::head().to(|| HttpResponse::Ok()))
-              )
-              .service(web::resource("/oauth_redirect")
-                    .route(web::get().to(oauth_end_enroll_from_redirect))
-                    .route(web::head().to(|| HttpResponse::Ok()))
-              )
-        )
+        // Twitch websocket
         .service(web::resource("/obs/{twitch_username}")
             .route(web::get().to(obs_gateway_websocket_handler))
             .route(web::head().to(|| HttpResponse::Ok()))
         )
+        // Local development debugging
         .service(
           actix_files::Files::new("/static", "static")
               .show_files_listing()
               .use_last_modified(true),
         )
-    //.default_service( web::route().to(default_route_404))
+    .default_service( web::route().to(default_route_404))
   })
       .bind(bind_address)?
       .workers(num_workers)

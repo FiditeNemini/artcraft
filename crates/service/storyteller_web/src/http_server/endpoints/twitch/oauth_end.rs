@@ -1,17 +1,17 @@
 use actix_http::StatusCode;
 use actix_web::{HttpResponse, HttpRequest, web, ResponseError};
-use crate::server_state::ObsGatewayServerState;
-use crate::twitch::oauth::oauth_token_builder::get_oauth_token_builder;
+use crate::server_state::ServerState;
 use database_queries::twitch_oauth::insert::TwitchOauthTokenInsertBuilder;
+use http_server_common::request::get_request_ip::get_request_ip;
 use http_server_common::response::response_error_helpers::to_simple_json_error;
 use log::error;
 use log::info;
 use log::warn;
 use std::fmt;
 use std::sync::Arc;
+use twitch_common::oauth_token_builder::get_oauth_token_builder;
 use twitch_oauth2::tokens::BearerTokenType::UserToken;
 use twitch_oauth2::{CsrfToken, TwitchToken};
-use http_server_common::request::get_request_ip::get_request_ip;
 
 #[derive(Deserialize)]
 pub struct QueryParams {
@@ -62,7 +62,7 @@ impl ResponseError for OauthEndEnrollFromRedirectError {
 pub async fn oauth_end_enroll_from_redirect(
   http_request: HttpRequest,
   query: web::Query<QueryParams>,
-  server_state: web::Data<Arc<ObsGatewayServerState>>
+  server_state: web::Data<Arc<ServerState>>
 ) -> Result<HttpResponse, OauthEndEnrollFromRedirectError> {
 
   if let Some(error) = query.error.as_deref() {
@@ -134,11 +134,7 @@ pub async fn oauth_end_enroll_from_redirect(
   let expires_in = user_token.expires_in();
 
   info!("User id: {:?}", user_id);
-  info!("Auth token: {:?}", auth_token);
-  info!("Refresh token: {:?}", refresh_token);
   info!("Twitch username: {:?}", twitch_username);
-  info!("Never expiring: {:?}", never_expiring);
-  info!("Expires in (don't store): {:?}", expires_in); // Should be ~4 hours
 
   let ip_address = get_request_ip(&http_request);
 
@@ -153,7 +149,7 @@ pub async fn oauth_end_enroll_from_redirect(
   //.set_token_type()
   //.set_has_bits_read(true) ...
 
-  let result = insert_builder.insert(&server_state.backends.mysql_pool)
+  let result = insert_builder.insert(&server_state.mysql_pool)
       .await
       .map_err(|e| {
         warn!("Error saving to db: {:?}", e);

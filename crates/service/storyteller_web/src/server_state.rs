@@ -44,6 +44,8 @@ pub struct ServerState {
 
   /// In-memory caches with TTL-based eviction. Contains a list of all voices.
   pub voice_list_cache: SingleItemTtlCache<Vec<TtsModelRecordForResponse>>,
+
+  pub twitch_oauth_secrets: TwitchOauthSecrets,
 }
 
 #[derive(Clone)]
@@ -55,4 +57,12 @@ pub struct EnvConfig {
   pub cookie_secure: bool,
   pub cookie_http_only: bool,
   pub website_homepage_redirect: String,
+}
+
+/// Necessary to run the OAuth flow.
+#[derive(Clone)]
+pub struct TwitchOauthSecrets {
+  pub client_id: String,
+  pub client_secret: String,
+  pub redirect_url: String,
 }

@@ -43,6 +43,7 @@ container_common = { path = "../../lib/container_common" }
 database_queries = { path = "../../lib/database_queries" }
 http_server_common = { path = "../../lib/http_server_common" }
 redis_common = { path = "../../lib/redis_common" }
+twitch_common = { path = "../../lib/twitch_common" }
 
 # External
 anyhow = "1.0.40"
@@ -62,6 +63,17 @@ rand = "0.8.3"
 regex = "1.5.4"
 time = "0.2.26"
 uuid = { version = "0.8.2", features = ["v4"] }
+
+# TODO/TEMPORARY:
+#  Twitch
+#  NB: "unsupported" pubsub features may disappear from the Twitch API at any time. It's an unofficial API.
+twitch_api2 = { version = "0.6.0-rc.2", features = ["helix", "reqwest_client", "pubsub", "chrono", "unsupported"] }
+twitch_oauth2 = "0.6.0-rc.2"
+
+# HTTP
+# TODO/NB: This is just for Twitch, but we might need it later.
+reqwest = { version = "0.11.4" }
+native-tls = "0.2.8"
 
 # Runtime
 # NB: We switched to Tokio from `async-std` for broader ecosystem support.

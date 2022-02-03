@@ -3793,12 +3793,14 @@ dependencies = [
  "lru_time_cache",
  "magic-crypt",
  "md-5",
+ "native-tls",
  "newrelic-telemetry",
  "pulldown-cmark",
  "r2d2_redis",
  "rand 0.8.4",
  "redis_common",
  "regex",
+ "reqwest",
  "ring 0.17.0-alpha.10",
  "rust-s3",
  "serde",
@@ -3811,6 +3813,9 @@ dependencies = [
  "time 0.2.26",
  "tokio 1.13.0",
  "toml",
+ "twitch_api2",
+ "twitch_common",
+ "twitch_oauth2",
  "uuid",
 ]
 
@@ -4406,8 +4411,12 @@ version = "0.0.1"
 dependencies = [
  "anyhow",
  "container_common",
+ "easyenv",
  "once_cell",
  "regex",
+ "serde",
+ "serde_derive",
+ "twitch_oauth2",
 ]
 
 [[package]]

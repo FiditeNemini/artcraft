@@ -11,7 +11,6 @@ pub struct ObsGatewayServerState {
   pub hostname: String,
 
   pub twitch_oauth_secrets: TwitchOauthSecrets,
-  pub twitch_oauth_temp: TwitchOauthTemp,
 
   pub backends: BackendsConfig,
 }
@@ -40,14 +39,4 @@ pub struct TwitchOauthSecrets {
   pub client_id: String,
   pub client_secret: String,
   pub redirect_url: String,
-}
-
-/// TODO: THIS IS JUST FOR FEATURE DEVELOPMENT. KILL THIS.
-///  Being lazy here until I have a decent DB model and know what I want to build.
-#[deprecated]
-#[derive(Clone)]
-pub struct TwitchOauthTemp {
-  pub temp_oauth_user_id: String,
-  pub temp_oauth_access_token: String,
-  pub temp_oauth_refresh_token: String,
 }

@@ -1,5 +1,7 @@
 use container_common::anyhow_result::AnyhowResult;
 
+/// Standardized way to read Twitch secrets.
+/// These are used in several different apps.
 #[derive(Clone, serde::Deserialize)]
 pub struct TwitchSecrets {
   pub app_client_id: String,
@@ -22,12 +24,6 @@ impl TwitchSecrets {
       &easyenv::get_env_string_required("TWITCH_APP_CLIENT_ID")?,
       &easyenv::get_env_string_required("TWITCH_APP_CLIENT_SECRET")?,
     ))
-  }
-
-  pub fn from_file(filename: &str) -> AnyhowResult<Self> {
-    let contents = std::fs::read_to_string(filename)?;
-    let secrets = toml::from_str(&contents)?;
-    Ok(secrets)
   }
 }
 

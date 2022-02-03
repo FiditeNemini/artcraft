@@ -137,105 +137,6 @@ impl Actor for ObsGatewayWebSocket {
   }
 }
 
-/*
-
-Message {
-  data: ChannelBitsEventsV2 {
-    topic: ChannelBitsEventsV2 {
-      +channel_id: 652567283
-    },
-    reply: BitsEvent {
-      data: BitsEventData {
-        -badge_entitlement: None,
-        +bits_used: 1,
-        +channel_id: "652567283",
-        -channel_name: "vocodes",
-        +chat_message: "test Cheer1",
-        -context: Cheer,
-        +is_anonymous: false,
-        -time: "2022-01-25T08:40:04.760906991Z",
-        +total_bits_used: 116,
-        +user_id: "650154491",
-        +user_name: "testytest512"
-      },
-      -message_id: "7703927a-78a5-56d1-aa28-4e6c12aa79a1",
-      -version: "1.0",
-      +is_anonymous: false
-    }
-  }
-}
-
-// These cheer emotes always combine with a number
-// This list seems pretty comprehensive
-https://github.com/nossebro/TwitchPubSubMirror/blob/master/TwitchPubSubMirror_StreamlabsSystem.py
-CheerMotes = [ "Cheer", "DoodleCheer", "BibleThump", "cheerwhal", "Corgo", "uni", "ShowLove", "Party", "SeemsGood", "Pride", "Kappa", "FrankerZ", "HeyGuys", "DansGame", "EleGiggle", "TriHard", "Kreygasm", "4Head", "SwiftRage", "NotLikeThis", "FailFish", "VoHiYo", "PJSalt", "MrDestructoid", "bday", "RIPCheer", "Shamrock", "BitBoss", "Streamlabs", "Muxy", "HolidayCheer" ]
-
-
-// Map "Reward Name" ("title") --> FakeYou voice id.
-
-Message {
-  data: ChannelPointsChannelV1 {
-    topic: ChannelPointsChannelV1 {
-      channel_id: 652567283
-    },
-    reply: RewardRedeemed {
-      timestamp: "2022-01-25T08:44:09.266674947Z",
-      redemption: Redemption {
-        channel_id: "652567283",
-        id: "e90823c7-934c-497c-ba2c-34c93dcf7163",
-        redeemed_at: "2022-01-25T08:44:09.266674947Z",
-        reward: Reward {
-          -background_color: "#BD0078",
-          -channel_id: "652567283",
-          -cooldown_expires_at: None,
-          -cost: 50,
-          default_image: Some(Image {
-            url_1x: "https://static-cdn.jtvnw.net/custom-reward-images/default-1.png",
-            url_2x: "https://static-cdn.jtvnw.net/custom-reward-images/default-2.png",
-            url_4x: "https://static-cdn.jtvnw.net/custom-reward-images/default-4.png"
-          }),
-          -global_cooldown: GlobalCooldown {
-            is_enabled: false,
-            global_cooldown_seconds: 0
-          },
-          id: "3e0eaf15-f454-482d-b48c-5be6ede61901",
-          image: None,
-          -is_enabled: true,
-          -is_in_stock: true,
-          -is_paused: false,
-          +is_sub_only: false,
-          is_user_input_required: true,
-          max_per_stream: MaxPerStream {
-            is_enabled: false,
-            max_per_stream: 0
-          },
-          max_per_user_per_stream: MaxPerUserPerStream {
-            is_enabled: false,
-            max_per_user_per_stream: 0
-          },
-          prompt: "This is a reward",
-          redemptions_redeemed_current_stream: None,
-          should_redemptions_skip_request_queue: false,
-          template_id: None,
-          title: "Reward #1",
-          updated_for_indicator_at: Some("2021-09-28T08:42:31.949564296Z")
-        },
-        status: Unfulfilled,
-        user: User {
-          +id: "650154491",
-          +login: "testytest512",
-          display_name: "testytest512",
-          profile_image_url: None
-        },
-        +user_input: Some("highlight reward thing"),
-        cursor: None
-      }
-    }
-  }
-}
-*/
-
-
 impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for ObsGatewayWebSocket {
   fn handle(
     &mut self,
@@ -274,7 +175,6 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for ObsGatewayWebSock
 
       // TODO: This should be done *BEFORE* PubSub
       self.write_obs_active().unwrap();
-
 
       let redis_key = RedisKeys::twitch_tts_job_queue(&self.twitch_user_id.get_str());
       let values : Vec<String> = redis.lpop((redis_key, 5)).unwrap(); // TODO: Error handling

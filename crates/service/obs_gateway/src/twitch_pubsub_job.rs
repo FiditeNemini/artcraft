@@ -21,7 +21,6 @@ use config::shared_constants::{DEFAULT_RUST_LOG, DEFAULT_REDIS_DATABASE_1_CONNEC
 use container_common::anyhow_result::AnyhowResult;
 use crate::threads::listen_for_active_obs_sessions_thread::ListenForActiveObsSessionThread;
 use crate::twitch::oauth::oauth_token_refresher::OauthTokenRefresher;
-use crate::twitch::twitch_secrets::TwitchSecrets;
 use crate::twitch::websocket_client::TwitchWebsocketClient;
 use futures::executor::{ThreadPool, ThreadPoolBuilder};
 use futures::task::SpawnExt;
@@ -35,6 +34,7 @@ use std::sync::Arc;
 use std::thread::sleep;
 use std::time::Duration;
 use tokio::runtime::{Builder, Runtime};
+use twitch_common::twitch_secrets::TwitchSecrets;
 use twitch_oauth2::{ClientId, ClientSecret, RefreshToken, AccessToken};
 
 #[tokio::main]
