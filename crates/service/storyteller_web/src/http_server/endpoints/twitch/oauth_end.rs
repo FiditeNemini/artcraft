@@ -1,4 +1,4 @@
-use actix_http::StatusCode;
+use actix_http::{StatusCode, header};
 use actix_web::{HttpResponse, HttpRequest, web, ResponseError};
 use crate::server_state::ServerState;
 use database_queries::twitch_oauth::insert::TwitchOauthTokenInsertBuilder;
@@ -86,15 +86,15 @@ pub async fn oauth_end_enroll_from_redirect(
   let csrf_token = CsrfToken::new(&state);
 
   let redirect_url =
-      twitch_oauth2::url::Url::parse(&server_state.twitch_oauth_secrets.redirect_url)
+      twitch_oauth2::url::Url::parse(&server_state.twitch_oauth.redirect_landing_url)
           .map_err(|e| {
             warn!("Error parsing url: {:?}", e);
             OauthEndEnrollFromRedirectError::ServerError
           })?;
 
   let mut builder = get_oauth_token_builder(
-    &server_state.twitch_oauth_secrets.client_id,
-    &server_state.twitch_oauth_secrets.client_secret,
+    &server_state.twitch_oauth.secrets.client_id,
+    &server_state.twitch_oauth.secrets.client_secret,
     &redirect_url,
     true);
 
@@ -158,6 +158,10 @@ pub async fn oauth_end_enroll_from_redirect(
         OauthEndEnrollFromRedirectError::ServerError
       })?;
 
-  Ok(HttpResponse::Ok()
-      .body("TODO"))
+  Ok(HttpResponse::Found()
+      .append_header((
+        header::LOCATION,
+        server_state.twitch_oauth.redirect_landing_finished_url.as_str()
+      ))
+      .finish())
 }

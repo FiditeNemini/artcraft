@@ -52,15 +52,15 @@ pub async fn oauth_begin_enroll_redirect(
 ) -> Result<HttpResponse, OauthBeginEnrollError> {
 
   let redirect_url =
-      twitch_oauth2::url::Url::parse(&server_state.twitch_oauth_secrets.redirect_url)
+      twitch_oauth2::url::Url::parse(&server_state.twitch_oauth.redirect_landing_url)
           .map_err(|e| {
             warn!("Error parsing url: {:?}", e);
             OauthBeginEnrollError::ServerError
           })?;
 
   let mut builder = get_oauth_token_builder(
-    &server_state.twitch_oauth_secrets.client_id,
-    &server_state.twitch_oauth_secrets.client_secret,
+    &server_state.twitch_oauth.secrets.client_id,
+    &server_state.twitch_oauth.secrets.client_secret,
     &redirect_url,
     true);
 

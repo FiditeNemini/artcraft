@@ -525,10 +525,11 @@ impl TwitchPubsubUserSubscriberThreadStageTwo {
         .set_refresh_count(self.twitch_oauth_token_record.refresh_count.saturating_add(1))
         // NB: We don't get these back from the refresh, but it seems like they would stay the same.
         .set_token_type(self.twitch_oauth_token_record.token_type.as_deref())
-        .set_has_bits_read(self.twitch_oauth_token_record.has_bits_read)
-        .has_channel_read_subscriptions(self.twitch_oauth_token_record.has_channel_read_subscriptions)
+        .has_bits_read(self.twitch_oauth_token_record.has_bits_read)
         .has_channel_read_redemptions(self.twitch_oauth_token_record.has_channel_read_redemptions)
-        .has_user_read_follows(self.twitch_oauth_token_record.has_user_read_follows);
+        .has_channel_read_subscriptions(self.twitch_oauth_token_record.has_channel_read_subscriptions)
+        .has_chat_edit(self.twitch_oauth_token_record.has_chat_edit)
+        .has_chat_read(self.twitch_oauth_token_record.has_chat_read);
 
     query_builder.insert(&self.mysql_pool).await?;
 

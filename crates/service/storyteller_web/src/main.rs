@@ -107,7 +107,7 @@ use crate::http_server::web_utils::cookie_manager::CookieManager;
 use crate::http_server::web_utils::redis_rate_limiter::RedisRateLimiter;
 use crate::http_server::web_utils::session_checker::SessionChecker;
 use crate::routes::add_routes;
-use crate::server_state::{ServerState, EnvConfig, TwitchOauthSecrets};
+use crate::server_state::{ServerState, EnvConfig, TwitchOauthSecrets, TwitchOauth};
 use crate::threads::ip_banlist_set::IpBanlistSet;
 use crate::threads::poll_ip_banlist_thread::poll_ip_bans;
 use crate::util::buckets::bucket_client::BucketClient;
@@ -268,9 +268,13 @@ async fn main() -> AnyhowResult<()> {
   let ip_banlist2 = ip_banlist.clone();
   let mysql_pool3 = pool.clone();
 
-  let twitch_oauth_redirect_url = easyenv::get_env_string_or_default(
-    "TWITCH_OAUTH_REDIRECT_URL",
+  let twitch_oauth_redirect_landing_url = easyenv::get_env_string_or_default(
+    "TWITCH_OAUTH_REDIRECT_LANDING_URL",
     "http://localhost:54321/twitch/oauth_redirect");
+
+  let twitch_oauth_redirect_landing_finished_url = easyenv::get_env_string_or_default(
+    "TWITCH_OAUTH_REDIRECT_LANDING_FINISHED_URL",
+    "http://localhost:54321/");
 
   let twitch_secrets = TwitchSecrets::from_env()?;
 
@@ -306,10 +310,13 @@ async fn main() -> AnyhowResult<()> {
     sort_key_crypto,
     ip_banlist,
     voice_list_cache,
-    twitch_oauth_secrets : TwitchOauthSecrets {
-      client_id: twitch_secrets.app_client_id,
-      client_secret: twitch_secrets.app_client_secret,
-      redirect_url: twitch_oauth_redirect_url,
+    twitch_oauth: TwitchOauth {
+      secrets: TwitchOauthSecrets {
+        client_id: twitch_secrets.app_client_id,
+        client_secret: twitch_secrets.app_client_secret,
+      },
+      redirect_landing_url: twitch_oauth_redirect_landing_url,
+      redirect_landing_finished_url: twitch_oauth_redirect_landing_finished_url,
     }
   };
 

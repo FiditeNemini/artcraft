@@ -547,7 +547,7 @@ fn add_twitch_oauth_routes<T, B> (app: App<T, B>) -> App<T, B>
       .route(web::get().to(oauth_begin_enroll_redirect))
       .route(web::head().to(|| HttpResponse::Ok()))
     )
-    .service(web::resource("/oauth_redirect")
+    .service(web::resource("/oauth_landing")
       .route(web::get().to(oauth_end_enroll_from_redirect))
       .route(web::head().to(|| HttpResponse::Ok()))
     )
