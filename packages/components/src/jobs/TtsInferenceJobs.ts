@@ -1,5 +1,5 @@
+import { TtsInferenceJobStatus } from "../api/jobs/GetTtsInferenceJobStatus";
 import { JobState, jobStateFromString } from "./JobStates";
-
 
 export class TtsInferenceJob {
   jobToken: string;
@@ -35,7 +35,7 @@ export class TtsInferenceJob {
     this.maybePublicBucketWavAudioPath = maybePublicBucketWavAudioPath;
   }
 
-  static fromResponse(response: TtsInferenceJobState) :  TtsInferenceJob {
+  static fromResponse(response: TtsInferenceJobState | TtsInferenceJobStatus) : TtsInferenceJob {
     return new TtsInferenceJob(
       response.job_token,
       response.status,
@@ -43,8 +43,8 @@ export class TtsInferenceJob {
       response.attempt_count || 0,
       response.model_token,
       response.title,
-      response.maybe_result_token,
-      response.maybe_public_bucket_wav_audio_path
+      response.maybe_result_token || null,
+      response.maybe_public_bucket_wav_audio_path || null,
     );
   }
 }
