@@ -518,7 +518,8 @@ impl TwitchPubsubUserSubscriberThreadStageTwo {
     let mut query_builder = TwitchOauthTokenInsertBuilder::new(
       &self.twitch_oauth_token_record.twitch_user_id,
       &self.twitch_oauth_token_record.twitch_username,
-      &access_token)
+      &access_token,
+    &self.twitch_oauth_token_record.oauth_refresh_grouping_token)
         .set_refresh_token(refresh_token.as_deref())
         .set_user_token(self.twitch_oauth_token_record.maybe_user_token.as_deref())
         .set_expires_in_seconds(Some(expires_seconds))

@@ -18,6 +18,9 @@ pub struct TwitchOauthTokenInsertBuilder {
   /// The secret we use
   access_token: String,
 
+  /// Internal mechanism we use to group tokens across refresh events
+  oauth_grouping_token: String,
+
   // ===== Optional / Default Fields =====
 
   /// Other half of the access token, for renewal
@@ -48,11 +51,17 @@ pub struct TwitchOauthTokenInsertBuilder {
 }
 
 impl TwitchOauthTokenInsertBuilder {
-  pub fn new(twitch_user_id: &str, twitch_username: &str, access_token: &str) -> Self {
+  pub fn new(
+    twitch_user_id: &str,
+    twitch_username: &str,
+    access_token: &str,
+    oauth_grouping_token: &str
+  ) -> Self {
     Self {
       twitch_user_id: twitch_user_id.to_string(),
       twitch_username: twitch_username.to_string(),
       access_token: access_token.to_string(),
+      oauth_grouping_token: oauth_grouping_token.to_string(),
       maybe_refresh_token: None,
       maybe_user_token: None,
       maybe_ip_address_creation: None,
@@ -130,6 +139,7 @@ impl TwitchOauthTokenInsertBuilder {
         r#"
 INSERT INTO twitch_oauth_tokens
 SET
+  oauth_refresh_grouping_token = ?,
   maybe_user_token = ?,
   twitch_user_id = ?,
   twitch_username = ?,
@@ -147,6 +157,7 @@ SET
   ip_address_creation = ?,
   expires_at = DATE_ADD(NOW(), INTERVAL ? SECOND)
         "#,
+        self.oauth_grouping_token.clone(),
         self.maybe_user_token.clone(),
         self.twitch_user_id.clone(),
         self.twitch_username.clone(),
@@ -169,6 +180,7 @@ SET
         r#"
 INSERT INTO twitch_oauth_tokens
 SET
+  oauth_refresh_grouping_token = ?,
   maybe_user_token = ?,
   twitch_user_id = ?,
   twitch_username = ?,
@@ -186,6 +198,7 @@ SET
   ip_address_creation = ?,
   expires_at = NULL
         "#,
+        self.oauth_grouping_token.clone(),
         self.maybe_user_token.clone(),
         self.twitch_user_id.clone(),
         self.twitch_username.clone(),

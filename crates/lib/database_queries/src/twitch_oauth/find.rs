@@ -10,6 +10,11 @@ use sqlx::MySqlPool;
 
 #[derive(Serialize, Clone)]
 pub struct TwitchOauthTokenRecord {
+  /// Our internal token metadata / bookkeeping
+  pub oauth_refresh_grouping_token: String,
+  pub refresh_count: u32,
+  pub ip_address_creation: Option<String>,
+
   /// NB: Vocodes/FakeYou/Storyteller user
   pub maybe_user_token: Option<String>,
   pub maybe_user_display_name: Option<String>,
@@ -20,18 +25,16 @@ pub struct TwitchOauthTokenRecord {
   pub twitch_username: String,
   pub twitch_username_lowercase: String,
 
-  /// Token details
+  /// Twitch token details
   pub access_token: String,
   pub maybe_refresh_token: Option<String>,
   pub token_type: Option<String>,
   pub expires_in_seconds: Option<u32>,
-  pub refresh_count: u32,
   pub has_bits_read: bool,
   pub has_channel_read_redemptions: bool,
   pub has_channel_read_subscriptions: bool,
   pub has_chat_edit: bool,
   pub has_chat_read: bool,
-  pub ip_address_creation: Option<String>,
 
   /// Potentially when the token is expected to expire.
   /// Do not eagerly refresh. Lazily renew.
@@ -91,6 +94,7 @@ impl TwitchOauthTokenFinder {
     Ok(self.perform_query_internal(mysql_pool).await?
         .map(|record| {
           TwitchOauthTokenRecord {
+            oauth_refresh_grouping_token: record.oauth_refresh_grouping_token.clone(),
             maybe_user_token: record.maybe_user_token.clone(),
             maybe_user_display_name: record.maybe_user_display_name.clone(),
             maybe_user_gravatar_hash: record.maybe_user_gravatar_hash.clone(),
@@ -158,6 +162,7 @@ impl TwitchOauthTokenFinder {
     // TODO/NB: Unfortunately SQLx can't statically typecheck this query
     let mut query = r#"
 SELECT
+    twitch_oauth_tokens.oauth_refresh_grouping_token,
     users.username as maybe_username,
     users.display_name as maybe_user_display_name,
     users.email_gravatar_hash as maybe_user_gravatar_hash,
@@ -247,6 +252,11 @@ LEFT OUTER JOIN users
 
 #[derive(sqlx::FromRow)]
 pub struct TwitchOauthTokenRecordInternal {
+  /// Our internal token metadata / bookkeeping
+  pub oauth_refresh_grouping_token: String,
+  pub refresh_count: u32,
+  pub ip_address_creation: Option<String>,
+
   /// NB: Vocodes/FakeYou/Storyteller user
   pub maybe_user_token: Option<String>,
   pub maybe_user_display_name: Option<String>,
@@ -262,13 +272,11 @@ pub struct TwitchOauthTokenRecordInternal {
   pub maybe_refresh_token: Option<String>,
   pub token_type: Option<String>,
   pub expires_in_seconds: Option<u32>,
-  pub refresh_count: u32,
   pub has_bits_read: i8,
   pub has_channel_read_subscriptions: i8,
   pub has_channel_read_redemptions: i8,
   pub has_chat_edit: i8,
   pub has_chat_read: i8,
-  pub ip_address_creation: Option<String>,
 
   /// Potentially when the token is expected to expire.
   /// Do not eagerly refresh. Lazily renew.

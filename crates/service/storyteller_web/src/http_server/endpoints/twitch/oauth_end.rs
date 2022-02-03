@@ -12,6 +12,7 @@ use std::sync::Arc;
 use twitch_common::oauth_token_builder::get_oauth_token_builder;
 use twitch_oauth2::tokens::BearerTokenType::UserToken;
 use twitch_oauth2::{CsrfToken, TwitchToken};
+use database_queries::tokens::Tokens;
 
 #[derive(Deserialize)]
 pub struct QueryParams {
@@ -140,8 +141,14 @@ pub async fn oauth_end_enroll_from_redirect(
 
   let expires_seconds = expires_in.as_secs() as u32; // NB: Silent overflow
 
+  let oauth_grouping_token = Tokens::new_twitch_oauth_grouping_token()
+      .map_err(|e| {
+        error!("token creation error: {:?}", e);
+        OauthEndEnrollFromRedirectError::ServerError
+      })?;
+
   let mut insert_builder =
-      TwitchOauthTokenInsertBuilder::new(&user_id, &twitch_username, &auth_token)
+      TwitchOauthTokenInsertBuilder::new(&user_id, &twitch_username, &auth_token, &oauth_grouping_token)
           .set_expires_in_seconds(Some(expires_seconds))
           .set_refresh_token(refresh_token.as_deref())
           .set_ip_address_creation(Some(&ip_address))

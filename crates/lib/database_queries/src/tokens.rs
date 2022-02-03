@@ -58,4 +58,8 @@ impl Tokens {
   pub fn new_category() -> AnyhowResult<String> {
     random_prefix_crockford_token("CAT:", 15, false)
   }
+
+  pub fn new_twitch_oauth_grouping_token() -> AnyhowResult<String> {
+    random_prefix_crockford_token("OG:", 32, false)
+  }
 }

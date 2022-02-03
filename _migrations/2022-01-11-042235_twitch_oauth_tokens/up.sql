@@ -11,6 +11,11 @@ CREATE TABLE twitch_oauth_tokens(
   -- Not used for anything except replication.
   id BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
 
+  -- Minted on first request and copied on each refresh.
+  -- This allows us to group access tokens all the way back up the
+  -- refresh chain.
+  oauth_refresh_grouping_token VARCHAR(32) NOT NULL,
+
   -- ========== STORYTELLER/FAKEYOU USER ==========
 
   -- Foreign key to user (Storyteller/FakeYou user)
@@ -243,6 +248,7 @@ CREATE TABLE twitch_oauth_tokens(
 
   -- INDICES --
   PRIMARY KEY (id),
+  KEY index_oauth_refresh_grouping_token (oauth_refresh_grouping_token),
   KEY fk_maybe_user_token (maybe_user_token),
   KEY index_twitch_user_id (twitch_user_id),
   -- KEY index_twitch_username (twitch_username),
