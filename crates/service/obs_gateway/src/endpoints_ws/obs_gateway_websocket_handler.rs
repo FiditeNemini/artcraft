@@ -176,11 +176,30 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for ObsGatewayWebSock
       self.write_obs_active().unwrap();
 
       let redis_key = RedisKeys::twitch_tts_job_queue(&self.twitch_user_id.get_str());
-      let values : Vec<String> = redis.lpop((redis_key, 5)).unwrap(); // TODO: Error handling
+//      let values : Vec<String> = redis.lpop((&redis_key, 5)).unwrap(); // TODO: Error handling
+//
+//      if !values.is_empty() {
+//        info!("Got {} TTS values", values.len());
+//
+//        let payload = FrontendEventPayload {
+//          tts_job_tokens: values,
+//        };
+//
+//        match serde_json::to_string(&payload) {
+//          Ok(json) => {
+//            ctx.text(json);
+//          },
+//          Err(e) => {
+//            error!("Error with JSON payload: {:?}", e);
+//          }
+//        }
+//      }
 
-      if !values.is_empty() {
-        info!("Got {} TTS values", values.len());
+      let lookup_result : Option<String> = redis.lpop(&redis_key).unwrap(); // TODO: Error handling
+      let mut values = Vec::new();
 
+      if let Some(v) = lookup_result.as_deref() {
+        values.push(v.to_string());
         let payload = FrontendEventPayload {
           tts_job_tokens: values,
         };
