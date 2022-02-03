@@ -5,7 +5,6 @@ use actix_web::{middleware, web, App, Error, HttpRequest, HttpResponse, HttpServ
 use actix_web_actors::ws;
 use container_common::anyhow_result::AnyhowResult;
 use container_common::token::random_crockford_token::random_crockford_token;
-use crate::endpoints_ws::obs_twitch_thread::ObsTwitchThread;
 use crate::redis::constants::OBS_ACTIVE_TTL_SECONDS;
 use crate::redis::obs_active_payload::ObsActivePayload;
 use crate::server_state::ObsGatewayServerState;

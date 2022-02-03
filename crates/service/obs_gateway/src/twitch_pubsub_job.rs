@@ -97,27 +97,19 @@ pub async fn main() -> AnyhowResult<()> {
 
   info!("Creating thread pool...");
 
-  // "The thread pool multiplexes any number of tasks onto a fixed number
-  //  of worker threads."
-  let thread_pool = ThreadPoolBuilder::new()
-      .pool_size(8)
-      .name_prefix("twitch-pubsub-")
-      .create()?;
-
   // https://docs.rs/tokio/latest/tokio/runtime/struct.Builder.html
   let runtime = Builder::new_multi_thread()
-      .worker_threads(4)
+      .worker_threads(2)
       .thread_name("twitch-pubsub-")
       .thread_stack_size(3 * 1024 * 1024)
       .enable_all()
       .build()?;
 
   let runtime = Arc::new(runtime);
-  //let runtime_2 = runtime.clone();
 
   // https://docs.rs/tokio/latest/tokio/runtime/struct.Builder.html
   let runtime_2 = Builder::new_multi_thread()
-      .worker_threads(4)
+      .worker_threads(8)
       .thread_name("twitch-pubsub-")
       .thread_stack_size(3 * 1024 * 1024)
       .enable_all()
@@ -139,20 +131,6 @@ pub async fn main() -> AnyhowResult<()> {
   runtime.spawn(thread.start_thread());
 
   loop {
-    sleep(Duration::from_millis(10_000));
+    sleep(Duration::from_millis(60_000));
   }
 }
-
-pub async fn watch_user_thread(user_id: u32) {
-  let mut client = TwitchWebsocketClient::new().unwrap();
-
-  info!("Connecting to Twitch PubSub... {}", user_id);
-  client.connect().await.unwrap();
-
-  loop {
-    info!("Sending ping... {}", user_id);
-    client.send_ping().await.unwrap();
-    sleep(Duration::from_millis(10_000));
-  }
-}
-
