@@ -55,11 +55,88 @@ CREATE TABLE twitch_oauth_tokens(
   -- subsequent time will bump by one. Mostly for debugging.
   refresh_count INT(10) UNSIGNED DEFAULT 0,
 
-  -- ========== OAUTH SCOPES ==========
+  -- ======================================================
+  -- ==================== OAUTH SCOPES ====================
+  -- ======================================================
+
+  -- TODO: Probably could have stored this in a bitfield. Ugh.
+
+  -- "analytics:read:extensions"
+  -- "View analytics data for the Twitch Extensions owned by the authenticated account."
+  has_analytics_read_extensions BOOLEAN NOT NULL DEFAULT FALSE,
+
+  -- scope: "analytics:read:games"
+  -- "View analytics data for the games owned by the authenticated account."
+  has_analytics_read_games BOOLEAN NOT NULL DEFAULT FALSE,
 
   -- "bits:read"
   -- "View Bits information for a channel."
   has_bits_read BOOLEAN NOT NULL DEFAULT FALSE,
+
+  -- "channel:edit:commercial"
+  -- "Run commercials on a channel."
+  has_channel_edit_commercial BOOLEAN NOT NULL DEFAULT FALSE,
+
+  -- "channel:manage:broadcast"
+  -- "Manage a channel's broadcast configuration, including updating channel configuration and managing stream markers and stream tags."
+  has_channel_manage_broadcast  BOOLEAN NOT NULL DEFAULT FALSE,
+
+  -- "channel:manage:extensions"
+  -- "Manage a channel's Extension configuration, including activating Extensions."
+  has_channel_manage_extensions  BOOLEAN NOT NULL DEFAULT FALSE,
+
+  -- "channel:manage:polls"
+  -- "Manage a channel's polls."
+  has_channel_manage_polls  BOOLEAN NOT NULL DEFAULT FALSE,
+
+  -- "channel:manage:predictions"
+  -- "Manage of channel's Channel Points Predictions"
+  has_channel_manage_predictions  BOOLEAN NOT NULL DEFAULT FALSE,
+
+  -- "channel:manage:redemptions"
+  -- "Manage Channel Points custom rewards and their redemptions on a channel."
+  has_channel_manage_redemptions  BOOLEAN NOT NULL DEFAULT FALSE,
+
+  -- "channel:manage:schedule"
+  -- "Manage a channel's stream schedule."
+  has_channel_manage_schedule  BOOLEAN NOT NULL DEFAULT FALSE,
+
+  -- "channel:manage:videos"
+  -- "Manage a channel's videos, including deleting videos."
+  has_channel_manage_videos  BOOLEAN NOT NULL DEFAULT FALSE,
+
+  -- "channel:moderate"
+  -- "Perform moderation actions in a channel. The user requesting the scope must be a moderator in the channel."
+  has_channel_moderate  BOOLEAN NOT NULL DEFAULT FALSE,
+
+  -- "channel:read:editors"
+  -- "View a list of users with the editor role for a channel."
+  has_channel_read_editors  BOOLEAN NOT NULL DEFAULT FALSE,
+
+  -- "channel:read:goals"
+  -- "View Creator Goals for a channel."
+  has_channel_read_goals  BOOLEAN NOT NULL DEFAULT FALSE,
+
+  -- "channel:read:hype_train"
+  -- "View Hype Train information for a channel."
+  has_channel_read_hype_train  BOOLEAN NOT NULL DEFAULT FALSE,
+
+  -- "channel:read:polls"
+  -- "View a channel's polls."
+  has_channel_read_polls  BOOLEAN NOT NULL DEFAULT FALSE,
+
+  -- "channel:read:predictions"
+  -- "View a channel's Channel Points Predictions."
+  has_channel_read_predictions  BOOLEAN NOT NULL DEFAULT FALSE,
+
+  -- "channel:read:redemptions"
+  -- "View Channel Points custom rewards and their redemptions on a channel."
+  -- eg. PubSub subscribe to `channel-points-channel-v1.<channel_id>` (channel points spends)
+  has_channel_read_redemptions BOOLEAN NOT NULL DEFAULT FALSE,
+
+  -- "channel:read:stream_key"
+  -- "View an authorized user's stream key."
+  has_channel_read_stream_key BOOLEAN NOT NULL DEFAULT FALSE,
 
   -- "channel:read:subscriptions"
   -- "View a list of all subscribers to a channel and check if a user is subscribed to a channel."
@@ -67,18 +144,74 @@ CREATE TABLE twitch_oauth_tokens(
   -- eg. PubSub subscribe to `channel-subscribe-events-v1.<channel ID>` (subscribe, resubscribe, gift)
   has_channel_read_subscriptions BOOLEAN NOT NULL DEFAULT FALSE,
 
-  -- "channel:read:redemptions"
-  -- "View Channel Points custom rewards and their redemptions on a channel."
-  -- eg. PubSub subscribe to `channel-points-channel-v1.<channel_id>` (channel points spends)
-  has_channel_read_redemptions BOOLEAN NOT NULL DEFAULT FALSE,
+  -- "channel_subscriptions"
+  -- "\\[DEPRECATED\\] Read all subscribers to your channel."
+  has_channel_subscriptions BOOLEAN NOT NULL DEFAULT FALSE,
+
+  -- "chat:edit"
+  -- "Send live stream chat and rooms messages."
+  has_chat_edit BOOLEAN NOT NULL DEFAULT FALSE,
+
+  -- "chat:read"
+  -- "View live stream chat and rooms messages."
+  has_chat_read BOOLEAN NOT NULL DEFAULT FALSE,
+
+  -- "clips:edit"
+  -- "Manage Clips for a channel."
+  has_clips_edit BOOLEAN NOT NULL DEFAULT FALSE,
+
+  -- "moderation:read"
+  -- "View a channel's moderation data including Moderators, Bans, Timeouts, and Automod settings."
+  has_moderation_read BOOLEAN NOT NULL DEFAULT FALSE,
+
+  -- "moderator:manage:automod"
+  -- "Manage messages held for review by AutoMod in channels where you are a moderator."
+  has_moderator_manage_auto_mod BOOLEAN NOT NULL DEFAULT FALSE,
+
+  -- "user:edit"
+  -- "Manage a user object."
+  has_user_edit BOOLEAN NOT NULL DEFAULT FALSE,
+
+  -- "user:edit:broadcast"
+  -- "Edit your channel's broadcast configuration, including extension configuration. (This scope implies user:read:broadcast capability.)"
+  has_user_edit_broadcast BOOLEAN NOT NULL DEFAULT FALSE,
+
+  -- "user:edit:follows"
+  -- "Edit a user's follows."
+  has_user_edit_follows BOOLEAN NOT NULL DEFAULT FALSE,
+
+  -- "user:manage:blocked_users"
+  -- "Manage the block list of a user."
+  has_user_manage_blocked_users BOOLEAN NOT NULL DEFAULT FALSE,
+
+  -- "user:read:blocked_users"
+  -- "View the block list of a user."
+  has_user_read_blocked_users BOOLEAN NOT NULL DEFAULT FALSE,
+
+  -- "user:read:broadcast"
+  -- "View a user's broadcasting configuration, including Extension configurations."
+  has_user_read_broadcast BOOLEAN NOT NULL DEFAULT FALSE,
+
+  -- "user:read:email"
+  -- "Read an authorized user's email address."
+  has_user_read_email BOOLEAN NOT NULL DEFAULT FALSE,
 
   -- "user:read:follows"
   -- "View the list of channels a user follows."
   -- eg. We can use this to see if a Twitch user follows us.
   has_user_read_follows BOOLEAN NOT NULL DEFAULT FALSE,
 
+  -- "user:read:subscriptions"
+  -- "View if an authorized user is subscribed to specific channels."
+  has_user_read_subscriptions BOOLEAN NOT NULL DEFAULT FALSE,
 
-  -- THERE ARE MORE SCOPES... PERHAPS WE SHOULD ADD THEM?
+  -- "whispers:edit"
+  -- "Send whisper messages."
+  has_whispers_edit BOOLEAN NOT NULL DEFAULT FALSE,
+
+  -- "whispers:read"
+  -- "View your whisper messages."
+  has_whispers_read BOOLEAN NOT NULL DEFAULT FALSE,
 
   -- ========== SECURITY ==========
 

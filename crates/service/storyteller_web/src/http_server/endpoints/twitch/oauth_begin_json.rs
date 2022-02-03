@@ -46,7 +46,7 @@ impl ResponseError for OauthBeginEnrollError {
   }
 }
 
-pub async fn oauth_begin_enroll(
+pub async fn oauth_begin_enroll_json(
   http_request: HttpRequest,
   server_state: web::Data<Arc<ServerState>>
 ) -> Result<HttpResponse, OauthBeginEnrollError> {

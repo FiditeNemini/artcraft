@@ -38,10 +38,13 @@ pub struct TwitchOauthTokenInsertBuilder {
   /// Number of times we've refreshed the token
   refresh_count: u32,
 
+  // ===== OAuth Scopes =====
+
   has_bits_read: bool,
-  has_channel_read_subscriptions: bool,
   has_channel_read_redemptions: bool,
-  has_user_read_follows: bool,
+  has_channel_read_subscriptions: bool,
+  has_chat_edit: bool,
+  has_chat_read: bool,
 }
 
 impl TwitchOauthTokenInsertBuilder {
@@ -58,7 +61,8 @@ impl TwitchOauthTokenInsertBuilder {
       has_bits_read: false,
       has_channel_read_subscriptions: false,
       has_channel_read_redemptions: false,
-      has_user_read_follows: false,
+      has_chat_edit: false,
+      has_chat_read: false,
       refresh_count: 0,
     }
   }
@@ -93,23 +97,28 @@ impl TwitchOauthTokenInsertBuilder {
     self
   }
 
-  pub fn set_has_bits_read(mut self, has_bits_read: bool) -> Self {
-    self.has_bits_read = has_bits_read;
+  pub fn has_bits_read(mut self, value: bool) -> Self {
+    self.has_bits_read = value;
     self
   }
 
-  pub fn has_channel_read_subscriptions(mut self, channel_read_subscriptions: bool) -> Self {
-    self.has_channel_read_subscriptions = channel_read_subscriptions;
+  pub fn has_channel_read_redemptions(mut self, value: bool) -> Self {
+    self.has_channel_read_redemptions = value;
     self
   }
 
-  pub fn has_channel_read_redemptions(mut self, channel_read_redemptions: bool) -> Self {
-    self.has_channel_read_redemptions = channel_read_redemptions;
+  pub fn has_channel_read_subscriptions(mut self, value: bool) -> Self {
+    self.has_channel_read_subscriptions = value;
     self
   }
 
-  pub fn has_user_read_follows(mut self, has_user_read_follows: bool) -> Self {
-    self.has_user_read_follows = has_user_read_follows;
+  pub fn has_chat_edit(mut self, value: bool) -> Self {
+    self.has_chat_edit = value;
+    self
+  }
+
+  pub fn has_chat_read(mut self, value: bool) -> Self {
+    self.has_chat_read = value;
     self
   }
 
@@ -131,9 +140,10 @@ SET
   token_type = ?,
   expires_in_seconds = ?,
   has_bits_read = ?,
-  has_channel_read_subscriptions = ?,
   has_channel_read_redemptions= ?,
-  has_user_read_follows = ?,
+  has_channel_read_subscriptions = ?,
+  has_chat_edit = ?,
+  has_chat_read = ?,
   ip_address_creation = ?,
   expires_at = DATE_ADD(NOW(), INTERVAL ? SECOND)
         "#,
@@ -147,9 +157,10 @@ SET
         self.token_type.clone(),
         expires_in_seconds,
         self.has_bits_read.clone(),
-        self.has_channel_read_subscriptions.clone(),
         self.has_channel_read_redemptions.clone(),
-        self.has_user_read_follows.clone(),
+        self.has_channel_read_subscriptions.clone(),
+        self.has_chat_edit.clone(),
+        self.has_chat_read.clone(),
         self.maybe_ip_address_creation.clone(),
         expires_in_seconds,
       )
@@ -168,9 +179,10 @@ SET
   token_type = ?,
   expires_in_seconds = NULL,
   has_bits_read = ?,
-  has_channel_read_subscriptions = ?,
   has_channel_read_redemptions= ?,
-  has_user_read_follows = ?,
+  has_channel_read_subscriptions = ?,
+  has_chat_edit = ?,
+  has_chat_read = ?,
   ip_address_creation = ?,
   expires_at = NULL
         "#,
@@ -183,9 +195,10 @@ SET
         self.refresh_count,
         self.token_type.clone(),
         self.has_bits_read.clone(),
-        self.has_channel_read_subscriptions.clone(),
         self.has_channel_read_redemptions.clone(),
-        self.has_user_read_follows.clone(),
+        self.has_channel_read_subscriptions.clone(),
+        self.has_chat_edit.clone(),
+        self.has_chat_read.clone(),
         self.maybe_ip_address_creation.clone(),
       )
     };

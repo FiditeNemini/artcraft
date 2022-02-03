@@ -38,5 +38,4 @@ pub struct EnvConfig {
 pub struct TwitchOauthSecrets {
   pub client_id: String,
   pub client_secret: String,
-  pub redirect_url: String,
 }

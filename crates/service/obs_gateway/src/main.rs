@@ -86,10 +86,6 @@ async fn main() -> AnyhowResult<()> {
   let website_homepage_redirect =
       easyenv::get_env_string_or_default("WEBSITE_HOMEPAGE_REDIRECT", "https://vo.codes/");
 
-  let oauth_redirect_url = easyenv::get_env_string_or_default(
-    "TWITCH_OAUTH_REDIRECT_URL",
-    "http://localhost:54321/twitch/oauth_redirect");
-
   let db_connection_string =
       easyenv::get_env_string_or_default(
         "MYSQL_URL",
@@ -126,7 +122,6 @@ async fn main() -> AnyhowResult<()> {
     twitch_oauth_secrets: TwitchOauthSecrets {
       client_id: twitch_secrets.app_client_id.clone(),
       client_secret: twitch_secrets.app_client_secret.clone(),
-      redirect_url: oauth_redirect_url,
     },
     hostname: server_hostname,
     backends: BackendsConfig {

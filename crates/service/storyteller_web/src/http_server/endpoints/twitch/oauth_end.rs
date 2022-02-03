@@ -144,10 +144,12 @@ pub async fn oauth_end_enroll_from_redirect(
       TwitchOauthTokenInsertBuilder::new(&user_id, &twitch_username, &auth_token)
           .set_expires_in_seconds(Some(expires_seconds))
           .set_refresh_token(refresh_token.as_deref())
-          .set_ip_address_creation(Some(&ip_address));
-  //.set_user_token()
-  //.set_token_type()
-  //.set_has_bits_read(true) ...
+          .set_ip_address_creation(Some(&ip_address))
+          .has_bits_read(true)
+          .has_channel_read_redemptions(true)
+          .has_channel_read_subscriptions(true)
+          .has_chat_edit(true)
+          .has_chat_read(true);
 
   let result = insert_builder.insert(&server_state.mysql_pool)
       .await
