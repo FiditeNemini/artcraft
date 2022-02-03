@@ -270,11 +270,11 @@ async fn main() -> AnyhowResult<()> {
 
   let twitch_oauth_redirect_landing_url = easyenv::get_env_string_or_default(
     "TWITCH_OAUTH_REDIRECT_LANDING_URL",
-    "http://localhost:54321/twitch/oauth_redirect");
+    "http://localhost:12345/twitch/oauth_landing");
 
   let twitch_oauth_redirect_landing_finished_url = easyenv::get_env_string_or_default(
     "TWITCH_OAUTH_REDIRECT_LANDING_FINISHED_URL",
-    "http://localhost:54321/");
+    "http://localhost:12345/");
 
   let twitch_secrets = TwitchSecrets::from_env()?;
 
