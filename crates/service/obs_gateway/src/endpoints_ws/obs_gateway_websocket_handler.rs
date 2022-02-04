@@ -15,6 +15,7 @@ use database_queries::twitch_oauth::find::{TwitchOauthTokenFinder, TwitchOauthTo
 use futures_timer::Delay;
 use futures_util::FutureExt;
 use http_server_common::error::common_server_error::CommonServerError;
+use log::debug;
 use log::error;
 use log::info;
 use log::warn;
@@ -142,7 +143,10 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for ObsGatewayWebSock
     msg: Result<ws::Message, ws::ProtocolError>,
     ctx: &mut Self::Context,
   ) {
+    debug!("Socket Handler::handle()");
+
     if let Ok(msg) = msg {
+      debug!("Socket Handler::handle(): msg = {:?}", msg);
 
       // TODO: Only send this every 60 seconds.
       // TODO: Error handling.
@@ -215,14 +219,20 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for ObsGatewayWebSock
       }
 
       match msg {
-        ws::Message::Ping(bytes) => ctx.pong(&bytes),
+        ws::Message::Ping(bytes) => {
+          debug!("Socket Handler::handle(): got ping");
+          ctx.pong(&bytes)
+        },
         ws::Message::Text(text) => {
+          debug!("Socket Handler::handle(): got text = {:?}", text);
           //ctx.text("response")
         },
         ws::Message::Binary(bin) => {
+          debug!("Socket Handler::handle(): got binary...");
           //ctx.binary("response".as_bytes())
         },
         ws::Message::Close(reason) => {
+          warn!("Socket Handler::handle(): got close, reason = {:?}", reason);
           ctx.close(reason);
           ctx.stop();
         }
