@@ -31,6 +31,7 @@ use twitch_api2::pubsub::Topic;
 use twitch_api2::pubsub;
 use twitch_api2::pubsub::channel_bits::ChannelBitsEventsV2Reply::BitsEvent;
 use twitch_api2::pubsub::TopicData::ChannelPointsChannelV1;
+use crate::endpoints_ws::obs_gateway_websocket_handler::ResponseType::TtsEvent;
 
 // TODO: Redis calls are synchronous (but fast), but is there any way to make them async?
 
@@ -47,9 +48,17 @@ pub struct QueryData {
 }
 
 /// Sent back to the frontend websocket.
+#[derive(Serialize, Copy, Clone)]
+pub enum ResponseType {
+  Pong,
+  TtsEvent,
+}
+
+/// Sent back to the frontend websocket.
 #[derive(Serialize)]
 pub struct FrontendEventPayload {
-  pub tts_job_tokens: Vec<String>,
+  pub response_type: ResponseType,
+  pub tts_job_tokens: Option<Vec<String>>,
 }
 
 /// Endpoint
@@ -205,7 +214,8 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for ObsGatewayWebSock
       if let Some(v) = lookup_result.as_deref() {
         values.push(v.to_string());
         let payload = FrontendEventPayload {
-          tts_job_tokens: values,
+          response_type: TtsEvent,
+          tts_job_tokens: Some(values),
         };
 
         match serde_json::to_string(&payload) {
@@ -225,6 +235,21 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for ObsGatewayWebSock
         },
         ws::Message::Text(text) => {
           debug!("Socket Handler::handle(): got text = {:?}", text);
+
+          let payload = FrontendEventPayload {
+            response_type: ResponseType::Pong,
+            tts_job_tokens: None,
+          };
+
+          match serde_json::to_string(&payload) {
+            Ok(json) => {
+              ctx.text(json);
+            },
+            Err(e) => {
+              error!("Error with JSON PONG payload: {:?}", e);
+            }
+          }
+          
           //ctx.text("response")
         },
         ws::Message::Binary(bin) => {
