@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { TtsInferenceJob } from '../../../App'
-import { BucketConfig } from '../../../common/BucketConfig';
+import { BucketConfig } from '@storyteller/components/src/api/BucketConfig';
 import { JobState } from '@storyteller/components/src/jobs/JobStates';
 
 interface Props {

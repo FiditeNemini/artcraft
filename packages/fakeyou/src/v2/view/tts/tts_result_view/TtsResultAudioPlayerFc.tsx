@@ -1,7 +1,7 @@
 import React from 'react';
 import WaveSurfer from 'wavesurfer.js';
 import { useEffect, useState } from 'react';
-import { BucketConfig } from '../../../../common/BucketConfig';
+import { BucketConfig } from '@storyteller/components/src/api/BucketConfig';
 import { TtsResult } from '../../../api/tts/GetTtsResult';
 import { PlayIcon } from '../../_icons/PlayIcon';
 import { PauseIcon } from '../../_icons/PauseIcon';

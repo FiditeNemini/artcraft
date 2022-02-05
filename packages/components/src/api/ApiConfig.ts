@@ -339,7 +339,8 @@ class ApiConfig {
   }
 
   obsEventsWebsocket(twitchUsername: string) : string {
-    return `ws://localhost:54321/obs/${twitchUsername}`;
+    //return `ws://localhost:54321/obs/${twitchUsername}`;
+    return `wss://obs.storyteller.io/obs/${twitchUsername}`;
   }
 
   private getScheme() : string {

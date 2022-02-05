@@ -7,7 +7,7 @@ import { useParams, Link } from 'react-router-dom';
 import { v4 as uuidv4 } from 'uuid';
 import { SessionW2lInferenceResultListFc } from '../../_common/SessionW2lInferenceResultsListFc';
 import { ReportDiscordLinkFc } from '../../_common/DiscordReportLinkFc';
-import { BucketConfig } from '../../../../common/BucketConfig';
+import { BucketConfig } from '@storyteller/components/src/api/BucketConfig';
 import { UploadIcon } from '../../_icons/UploadIcon';
 import { VisibleIconFc } from '../../_icons/VisibleIcon';
 import { HiddenIconFc } from '../../_icons/HiddenIcon';

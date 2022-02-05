@@ -3,7 +3,7 @@ import { GravatarFc } from '../../_common/GravatarFc';
 import { SessionWrapper } from '../../../../session/SessionWrapper';
 import { useParams, Link } from 'react-router-dom';
 import { ReportDiscordLinkFc } from '../../_common/DiscordReportLinkFc';
-import { BucketConfig } from '../../../../common/BucketConfig';
+import { BucketConfig } from '@storyteller/components/src/api/BucketConfig';
 import { HiddenIconFc } from '../../_icons/HiddenIcon';
 import { VisibleIconFc } from '../../_icons/VisibleIcon';
 import { FrontendUrlConfig } from '../../../../common/FrontendUrlConfig';

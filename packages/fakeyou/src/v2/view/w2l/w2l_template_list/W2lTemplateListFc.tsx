@@ -3,7 +3,7 @@ import { ApiConfig } from '@storyteller/components';
 import { SessionWrapper } from '../../../../session/SessionWrapper';
 import { Link } from "react-router-dom";
 //import { getRandomInt } from '../../../../v1/api/Utils';
-import { BucketConfig } from '../../../../common/BucketConfig';
+import { BucketConfig } from '@storyteller/components/src/api/BucketConfig';
 
 interface W2lTemplateListResponsePayload {
   success: boolean,

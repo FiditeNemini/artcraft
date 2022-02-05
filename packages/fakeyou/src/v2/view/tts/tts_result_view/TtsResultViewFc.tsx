@@ -4,7 +4,7 @@ import { useParams, Link } from 'react-router-dom';
 import { GravatarFc } from '../../_common/GravatarFc';
 import { SpectrogramFc } from './SpectrogramFc';
 import { ReportDiscordLinkFc } from '../../_common/DiscordReportLinkFc';
-import { BucketConfig } from '../../../../common/BucketConfig';
+import { BucketConfig } from '@storyteller/components/src/api/BucketConfig';
 import { FrontendUrlConfig } from '../../../../common/FrontendUrlConfig';
 import { HiddenIconFc } from '../../_icons/HiddenIcon';
 import { VisibleIconFc } from '../../_icons/VisibleIcon';

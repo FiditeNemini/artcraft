@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { ApiConfig } from '@storyteller/components';
 import { Link } from "react-router-dom";
 //import { getRandomInt } from '../../../../v1/api/Utils';
-import { BucketConfig } from '../../../../common/BucketConfig';
+import { BucketConfig } from '@storyteller/components/src/api/BucketConfig';
 
 interface W2lTemplateListResponsePayload {
   success: boolean,
