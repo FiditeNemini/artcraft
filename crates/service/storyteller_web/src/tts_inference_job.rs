@@ -767,6 +767,10 @@ async fn process_job(
     info!("Downloaded template media from bucket!");
   }
 
+  // ==================== Preprocess text ==================== //
+
+  let cleaned_inference_text = clean_symbols(&job.raw_inference_text);
+
   // ==================== WRITE TEXT TO FILE ==================== //
 
   let temp_dir = format!("temp_tts_inference_{}", job.id);
@@ -774,7 +778,6 @@ async fn process_job(
 
   let text_input_fs_path = temp_dir.path().join("inference_input.txt");
 
-  let cleaned_inference_text = clean_symbols(&job.raw_inference_text);
   std::fs::write(&text_input_fs_path, &cleaned_inference_text)?;
 
   // ==================== RUN INFERENCE ==================== //
@@ -818,7 +821,7 @@ async fn process_job(
   info!("With pretrained vocoder: {:?}", pretrained_vocoder);
 
   inferencer.tts_inference_sidecar_client.request_inference(
-    &job.raw_inference_text,
+    &cleaned_inference_text,
     &tts_synthesizer_fs_path,
     pretrained_vocoder,
     &hifigan_vocoder_model_fs_path,
@@ -885,7 +888,7 @@ async fn process_job(
 
   // ==================== SAVE RECORDS ==================== //
 
-  let text_hash = hash_string_sha2(&job.raw_inference_text)?;
+  let text_hash = hash_string_sha2(&cleaned_inference_text)?;
 
   info!("Saving tts inference record...");
   let (id, inference_result_token) = insert_tts_result(
