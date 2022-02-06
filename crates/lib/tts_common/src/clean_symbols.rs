@@ -3,6 +3,7 @@ use std::collections::HashMap;
 use unicode_segmentation::UnicodeSegmentation;
 
 // https://unicodelookup.com/#quo
+// http://www.geocities.ws/click2speak/unicode/chars_es.html
 static REPLACEMENTS : Lazy<HashMap<String, String>> = Lazy::new(|| {
   let mut map = HashMap::new();
   // Quotes (single)
@@ -100,6 +101,12 @@ static REPLACEMENTS : Lazy<HashMap<String, String>> = Lazy::new(|| {
   map.insert("\u{EF}".to_string(), "i".to_string()); // Latin small letter i with diaeresis
   // Latin characters with accent (eth)
   // map.insert("\u{F0}".to_string(), "d".to_string()); // Latin small letter eith
+  // Spanish special characters
+  map.insert("\u{F1}".to_string(), "n".to_string());  // Lower n tilde
+  map.insert("\u{A1}".to_string(), "!".to_string());  // Inverted exclamation mark
+  map.insert("\u{BF}".to_string(), "?".to_string());  // Inverted question mark
+  map.insert("\u{AA}".to_string(), "a".to_string());  // Feminine ordinal
+  map.insert("\u{BA}".to_string(), "o".to_string());  // Masculine ordinal
   map
 });
 
@@ -166,5 +173,20 @@ mod tests {
     assert_eq!(clean_symbols("ç"), "c".to_string());
     assert_eq!(clean_symbols("èéêë"), "eeee".to_string());
     assert_eq!(clean_symbols("ìíîï"), "iiii".to_string());
+  }
+
+  #[test]
+  fn filters_spanish_characters() {
+    assert_eq!(clean_symbols("¡"), "!".to_string());
+    assert_eq!(clean_symbols("¿"), "?".to_string());
+  }
+
+  #[test]
+  fn actual_database_failures() {
+    assert_eq!(clean_symbols(
+      "Sabías que?,tu papá es el tercer planeta del sistema solar"),
+               "Sabias que?,tu papa es el tercer planeta del sistema solar".to_string());
+    assert_eq!(clean_symbols("señoras"), "senoras".to_string());
+
   }
 }
