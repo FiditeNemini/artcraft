@@ -75,6 +75,7 @@ use std::process::Command;
 use std::thread;
 use std::time::{Duration, SystemTime, UNIX_EPOCH, Instant};
 use tempdir::TempDir;
+use tts_common::clean_symbols::clean_symbols;
 
 // Buckets (shared config)
 const ENV_ACCESS_KEY : &'static str = "ACCESS_KEY";
@@ -773,7 +774,8 @@ async fn process_job(
 
   let text_input_fs_path = temp_dir.path().join("inference_input.txt");
 
-  std::fs::write(&text_input_fs_path, &job.raw_inference_text)?;
+  let cleaned_inference_text = clean_symbols(&job.raw_inference_text);
+  std::fs::write(&text_input_fs_path, &cleaned_inference_text)?;
 
   // ==================== RUN INFERENCE ==================== //
 

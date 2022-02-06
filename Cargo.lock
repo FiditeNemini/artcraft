@@ -3813,6 +3813,7 @@ dependencies = [
  "time 0.2.26",
  "tokio 1.13.0",
  "toml",
+ "tts_common",
  "twitch_api2",
  "twitch_common",
  "twitch_oauth2",
