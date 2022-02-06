@@ -2,14 +2,31 @@ use once_cell::sync::Lazy;
 use std::collections::HashMap;
 use unicode_segmentation::UnicodeSegmentation;
 
+// https://unicodelookup.com/#quo
 static REPLACEMENTS : Lazy<HashMap<String, String>> = Lazy::new(|| {
   let mut map = HashMap::new();
-  map.insert("’".to_string(), "'".to_string());
-  map.insert("‘".to_string(), "'".to_string());
-  map.insert("“".to_string(), "\"".to_string());
-  map.insert("”".to_string(), "\"".to_string());
-  map.insert("–".to_string(), "-".to_string()); // endash
-  map.insert("—".to_string(), "-".to_string()); // emdash
+  // Quotes (single)
+  map.insert("\u{0060}".to_string(), "'".to_string()); // Grave Accent
+  map.insert("\u{00B4}".to_string(), "'".to_string()); // Acute Accent
+  map.insert("\u{2018}".to_string(), "'".to_string()); // Left Single Quotation Mark
+  map.insert("\u{2019}".to_string(), "'".to_string()); // Right Single Quotation Mark
+  map.insert("\u{201A}".to_string(), "'".to_string()); // Single Low-9 Quotation Mark
+  // Quotes (double)
+  map.insert("\u{201C}".to_string(), "\"".to_string()); // Left Double Quotation Mark
+  map.insert("\u{201D}".to_string(), "\"".to_string()); // Right Double Quotation Mark
+  map.insert("\u{201E}".to_string(), "\"".to_string()); // Double Low-9 Quotation Mark
+  // Dashes
+  map.insert("\u{2010}".to_string(), "-".to_string()); // Hyphen
+  map.insert("\u{2011}".to_string(), "-".to_string()); // Non-Breaking Hyphen
+  map.insert("\u{2013}".to_string(), "-".to_string()); // En Dash
+  map.insert("\u{2014}".to_string(), "-".to_string()); // Em Dash
+  map.insert("\u{2015}".to_string(), "-".to_string()); // Horizontal Bar
+  map.insert("\u{2E3A}".to_string(), "-".to_string()); // Two-Em Dash
+  map.insert("\u{2E3B}".to_string(), "-".to_string()); // Three-Em Dash
+  map.insert("\u{FE58}".to_string(), "-".to_string()); // Small Em Dash
+  map.insert("\u{FE63}".to_string(), "-".to_string()); // Small Hyphen-Minus
+  map.insert("\u{FF0D}".to_string(), "-".to_string()); // Fullwidth Hyphen-Minus
+  // Ellipsis
   map.insert("…".to_string(), "...".to_string());
   map
 });
@@ -49,6 +66,7 @@ mod tests {
   fn filters_dashes() {
     assert_eq!(clean_symbols("en – dash"), "en - dash".to_string());
     assert_eq!(clean_symbols("em — dash"), "em - dash".to_string());
+    assert_eq!(clean_symbols("three em ⸻ dash"), "three em - dash".to_string());
   }
 
   #[test]
