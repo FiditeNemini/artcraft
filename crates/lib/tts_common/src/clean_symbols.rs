@@ -9,6 +9,8 @@ static REPLACEMENTS : Lazy<HashMap<String, String>> = Lazy::new(|| {
   map.insert("‘".to_string(), "'".to_string());
   map.insert("“".to_string(), "\"".to_string());
   map.insert("”".to_string(), "\"".to_string());
+  map.insert("–".to_string(), "-".to_string()); // endash
+  map.insert("—".to_string(), "-".to_string()); // emdash
   map
 });
 
@@ -35,5 +37,11 @@ mod tests {
     assert_eq!(clean_symbols("That’s it’s new home"), "That's it's new home".to_string());
     assert_eq!(clean_symbols("‘foo’"), "'foo'".to_string());
     assert_eq!(clean_symbols("“as ‘shown’ here.”"), "\"as 'shown' here.\"".to_string());
+  }
+
+  #[test]
+  fn filters_dashes() {
+    assert_eq!(clean_symbols("en – dash"), "en - dash".to_string());
+    assert_eq!(clean_symbols("em — dash"), "em - dash".to_string());
   }
 }
