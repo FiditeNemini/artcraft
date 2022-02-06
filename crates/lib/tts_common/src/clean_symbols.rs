@@ -11,10 +11,16 @@ static REPLACEMENTS : Lazy<HashMap<String, String>> = Lazy::new(|| {
   map.insert("\u{2018}".to_string(), "'".to_string()); // Left Single Quotation Mark
   map.insert("\u{2019}".to_string(), "'".to_string()); // Right Single Quotation Mark
   map.insert("\u{201A}".to_string(), "'".to_string()); // Single Low-9 Quotation Mark
+  map.insert("\u{201B}".to_string(), "'".to_string()); // Single High-Revered-9 Quotation Mark
   // Quotes (double)
   map.insert("\u{201C}".to_string(), "\"".to_string()); // Left Double Quotation Mark
   map.insert("\u{201D}".to_string(), "\"".to_string()); // Right Double Quotation Mark
   map.insert("\u{201E}".to_string(), "\"".to_string()); // Double Low-9 Quotation Mark
+  map.insert("\u{201F}".to_string(), "\"".to_string()); // Double High-Reversed-9 Quotation Mark
+  map.insert("\u{301D}".to_string(), "\"".to_string()); // Reversed Double Prime Quotation Mark
+  map.insert("\u{301E}".to_string(), "\"".to_string()); // Double Prime Quotation Mark
+  map.insert("\u{301F}".to_string(), "\"".to_string()); // Low Double Prime Quotation Mark
+  map.insert("\u{FF02}".to_string(), "\"".to_string()); // Fullwidth Quotation Mark
   // Dashes
   map.insert("\u{2010}".to_string(), "-".to_string()); // Hyphen
   map.insert("\u{2011}".to_string(), "-".to_string()); // Non-Breaking Hyphen
