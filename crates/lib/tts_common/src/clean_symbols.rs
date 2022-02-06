@@ -1,6 +1,5 @@
 use once_cell::sync::Lazy;
 use std::collections::HashMap;
-use log::info;
 use unicode_segmentation::UnicodeSegmentation;
 
 static REPLACEMENTS : Lazy<HashMap<String, String>> = Lazy::new(|| {
@@ -30,6 +29,12 @@ pub fn clean_symbols(input_text: &str) -> String {
 #[cfg(test)]
 mod tests {
   use crate::clean_symbols::clean_symbols;
+
+  #[test]
+  fn neutral_tests() {
+    assert_eq!(clean_symbols("this should be the same."), "this should be the same.".to_string());
+    assert_eq!(clean_symbols("one\ntwo\r\nthree    "), "one\ntwo\r\nthree    ".to_string());
+  }
 
   #[test]
   fn filters_smart_quotes() {
