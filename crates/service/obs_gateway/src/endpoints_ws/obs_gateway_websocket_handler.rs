@@ -58,6 +58,7 @@ pub enum ResponseType {
 #[derive(Serialize)]
 pub struct FrontendEventPayload {
   pub response_type: ResponseType,
+  #[serde(skip_serializing_if = "Option::is_none")]
   pub tts_job_tokens: Option<Vec<String>>,
 }
 
@@ -249,7 +250,7 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for ObsGatewayWebSock
               error!("Error with JSON PONG payload: {:?}", e);
             }
           }
-          
+
           //ctx.text("response")
         },
         ws::Message::Binary(bin) => {
