@@ -4358,6 +4358,18 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "59547bce71d9c38b83d9c0e92b6066c4253371f15005def0c30d9657f50c7642"
 
 [[package]]
+name = "tts_common"
+version = "0.0.1"
+dependencies = [
+ "anyhow",
+ "container_common",
+ "log",
+ "once_cell",
+ "regex",
+ "unicode-segmentation",
+]
+
+[[package]]
 name = "tungstenite"
 version = "0.14.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
