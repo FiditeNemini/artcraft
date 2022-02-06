@@ -65,7 +65,7 @@ static REPLACEMENTS : Lazy<HashMap<String, String>> = Lazy::new(|| {
   map.insert("\u{D4}".to_string(), "O".to_string()); // Latin capital letter o with circumflex
   map.insert("\u{D5}".to_string(), "O".to_string()); // Latin capital letter o with tilde
   map.insert("\u{D6}".to_string(), "O".to_string()); // Latin capital letter o with diaeresis
-  map.insert("\u{D7}".to_string(), "O".to_string()); // Latin capital letter o with stroke
+  map.insert("\u{D8}".to_string(), "O".to_string()); // Latin capital letter o with stroke (NB: Skips D7)
   // Latin characters with accent (U)
   map.insert("\u{D9}".to_string(), "U".to_string()); // Latin capital letter u with grave
   map.insert("\u{DA}".to_string(), "U".to_string()); // Latin capital letter u with acute
@@ -144,5 +144,27 @@ mod tests {
   #[test]
   fn filters_ellipsis() {
     assert_eq!(clean_symbols("test…"), "test...".to_string());
+  }
+
+  #[test]
+  fn filters_latin_characters() {
+    assert_eq!(clean_symbols("pokémon"), "pokemon".to_string());
+    assert_eq!(clean_symbols("POKÉMON"), "POKEMON".to_string());
+    assert_eq!(clean_symbols("Æther"), "AEther".to_string());
+    assert_eq!(clean_symbols("æther"), "aether".to_string());
+    // Almost exhaustive
+    assert_eq!(clean_symbols("ÀÁÂÃÄÅ"), "AAAAAA".to_string());
+    assert_eq!(clean_symbols("Æ"), "AE".to_string());
+    assert_eq!(clean_symbols("Ç"), "C".to_string());
+    assert_eq!(clean_symbols("ÈÉÊË"), "EEEE".to_string());
+    assert_eq!(clean_symbols("ÌÍÎÏ"), "IIII".to_string());
+    assert_eq!(clean_symbols("ÒÓÔÕÖØ"), "OOOOOO".to_string());
+    assert_eq!(clean_symbols("ÙÚÛÜ"), "UUUU".to_string());
+    assert_eq!(clean_symbols("Ý"), "Y".to_string());
+    assert_eq!(clean_symbols("àáâãäå"), "aaaaaa".to_string());
+    assert_eq!(clean_symbols("æ"), "ae".to_string());
+    assert_eq!(clean_symbols("ç"), "c".to_string());
+    assert_eq!(clean_symbols("èéêë"), "eeee".to_string());
+    assert_eq!(clean_symbols("ìíîï"), "iiii".to_string());
   }
 }
