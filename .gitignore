@@ -10,6 +10,7 @@ _ignored_schema.rs
 models/Wav2Lip/python/
 models/tacotron2/python/
 production_database_secret_connect.sh
+production_database_secret_query.sh
 secrets.toml
 secrets.yaml
 target/

@@ -6,6 +6,11 @@ use unicode_segmentation::UnicodeSegmentation;
 // http://www.geocities.ws/click2speak/unicode/chars_es.html
 static REPLACEMENTS : Lazy<HashMap<String, String>> = Lazy::new(|| {
   let mut map = HashMap::new();
+  // Weird spacing characters
+  map.insert("\u{00a0}".to_string(), " ".to_string());  // Non-break space (aka &nbsp;) \xa0
+  map.insert("\u{2005}".to_string(), " ".to_string());  // Four-Per-Em Space
+  map.insert("\u{2588}".to_string(), " ".to_string());  // Full Block
+  map.insert("\u{205F}".to_string(), " ".to_string());  // Medium Mathematical Space (MMSP)
   // Quotes (single)
   map.insert("\u{0060}".to_string(), "'".to_string()); // Grave Accent
   map.insert("\u{00B4}".to_string(), "'".to_string()); // Acute Accent
@@ -35,6 +40,8 @@ static REPLACEMENTS : Lazy<HashMap<String, String>> = Lazy::new(|| {
   map.insert("\u{FF0D}".to_string(), "-".to_string()); // Fullwidth Hyphen-Minus
   // Ellipsis
   map.insert("…".to_string(), "...".to_string());
+  // Commas
+  map.insert("\u{3001}".to_string(), ",".to_string());
   // Latin characters with accent (A)
   map.insert("\u{C0}".to_string(), "A".to_string()); // Latin capital letter a with grave
   map.insert("\u{C1}".to_string(), "A".to_string()); // Latin capital letter a with acute
@@ -107,6 +114,23 @@ static REPLACEMENTS : Lazy<HashMap<String, String>> = Lazy::new(|| {
   map.insert("\u{BF}".to_string(), "?".to_string());  // Inverted question mark
   map.insert("\u{AA}".to_string(), "a".to_string());  // Feminine ordinal
   map.insert("\u{BA}".to_string(), "o".to_string());  // Masculine ordinal
+  // Misc characters that frequently occur
+  map.insert("\u{00F3}".to_string(), "o".to_string());  // Latin Small Letter O with Acute
+  map.insert("\u{0131}".to_string(), "i".to_string());  // Latin Small Letter Dotless I
+  map.insert("\u{00FC}".to_string(), "u".to_string());  // Latin Small Letter U with Diaeresis
+  map.insert("\u{015F}".to_string(), "s".to_string());  // Latin Small Letter S with Cedilla
+  map.insert("\u{00F6}".to_string(), "o".to_string());  // Latin Small Letter O with Diaeresis
+  map.insert("\u{011F}".to_string(), "g".to_string());  // Latin Small Letter G with Breve
+  map.insert("\u{0130}".to_string(), "I".to_string());  // Latin Capital Letter I with Dot Above
+  map.insert("\u{0259}".to_string(), "e".to_string());  // Latin Small Letter Schwa (TODO: Inaccurate?)
+  map.insert("\u{012B}".to_string(), "i".to_string());  // Latin Small Letter I with Macron
+  map.insert("\u{1D3A}".to_string(), "n".to_string());  // Modifier Letter Capital N
+  map.insert("\u{01D0}".to_string(), "i".to_string());  // Latin Small Letter I with Caron
+  map.insert("\u{014D}".to_string(), "o".to_string());  // Latin Small Letter O with Macron
+  map.insert("\u{0101}".to_string(), "a".to_string());  // Latin Small Letter A with Macron
+  map.insert("\u{00F9}".to_string(), "u".to_string());  // Latin Small Letter U with Grave
+  map.insert("\u{01Ce}".to_string(), "a".to_string());  // Latin Small Letter A with Caron
+  map.insert("\u{203C}".to_string(), "!!".to_string());  // Double Exclamation Mark
   map
 });
 
@@ -129,6 +153,7 @@ mod tests {
 
   #[test]
   fn neutral_tests() {
+    assert_eq!(clean_symbols(""), "".to_string()); // Empty check
     assert_eq!(clean_symbols("this should be the same."), "this should be the same.".to_string());
     assert_eq!(clean_symbols("one\ntwo\r\nthree    "), "one\ntwo\r\nthree    ".to_string());
   }
@@ -188,5 +213,54 @@ mod tests {
                "Sabias que?,tu papa es el tercer planeta del sistema solar".to_string());
     assert_eq!(clean_symbols("señoras"), "senoras".to_string());
 
+    // Most frequent according to partial histogram
+    assert_eq!(clean_symbols("á"), "a".to_string());
+    assert_eq!(clean_symbols("í"), "i".to_string());
+    assert_eq!(clean_symbols("ó"), "o".to_string());
+    assert_eq!(clean_symbols("é"), "e".to_string());
+    assert_eq!(clean_symbols("ñ"), "n".to_string());
+    assert_eq!(clean_symbols("ú"), "ú".to_string());
+    assert_eq!(clean_symbols("ı"), "i".to_string()); // Dotless i
+    assert_eq!(clean_symbols("ü"), "u".to_string());
+    assert_eq!(clean_symbols("¿"), "?".to_string());
+    assert_eq!(clean_symbols("…"), "...".to_string());
+    assert_eq!(clean_symbols("¡"), "!".to_string());
+    assert_eq!(clean_symbols("ş"), "s".to_string());
+    assert_eq!(clean_symbols("ç"), "c".to_string());
+    assert_eq!(clean_symbols("”"), "\"".to_string());
+    assert_eq!(clean_symbols("“"), "\"".to_string());
+    assert_eq!(clean_symbols("ö"), "o".to_string());
+    assert_eq!(clean_symbols("ğ"), "g".to_string());
+    assert_eq!(clean_symbols("\u{00a0}"), " ".to_string());
+    assert_eq!(clean_symbols("ã"), "a".to_string());
+    assert_eq!(clean_symbols("à"), "a".to_string());
+    assert_eq!(clean_symbols("Á"), "A".to_string());
+    assert_eq!(clean_symbols("İ"), "I".to_string());
+    assert_eq!(clean_symbols(" "), " ".to_string());
+    assert_eq!(clean_symbols(" "), " ".to_string());
+    assert_eq!(clean_symbols("—"), "-".to_string());
+    assert_eq!(clean_symbols("Ñ"), "N".to_string());
+    assert_eq!(clean_symbols("´"), "'".to_string());
+    assert_eq!(clean_symbols("ê"), "e".to_string());
+    assert_eq!(clean_symbols("ə"), "e".to_string());
+    assert_eq!(clean_symbols("è"), "e".to_string());
+    assert_eq!(clean_symbols("ī"), "i".to_string());
+    assert_eq!(clean_symbols("ᴺ"), "n".to_string());
+    assert_eq!(clean_symbols(" "), " ".to_string());
+    assert_eq!(clean_symbols("ä"), "a".to_string());
+    assert_eq!(clean_symbols("ǐ"), "i".to_string());
+    assert_eq!(clean_symbols("█"), " ".to_string());
+    assert_eq!(clean_symbols("ō"), "o".to_string());
+    assert_eq!(clean_symbols("‘"), "'".to_string());
+    assert_eq!(clean_symbols("Í"), "I".to_string());
+    assert_eq!(clean_symbols("É"), "E".to_string());
+    assert_eq!(clean_symbols("ā"), "a".to_string());
+    assert_eq!(clean_symbols("ù"), "u".to_string());
+    assert_eq!(clean_symbols("、"), ",".to_string());
+    assert_eq!(clean_symbols("ǎ"), "a".to_string());
+    assert_eq!(clean_symbols("‼"), "!!".to_string());
+
+    // TODO: assert_eq!(clean_symbols("ß"), "B".to_string());
+    // TODO: assert_eq!(clean_symbols("°"), "degrees".to_string());
   }
 }
