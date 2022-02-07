@@ -24,7 +24,7 @@ function LanguageNotice (props: Props) {
           ("Category Filters").</p>
         <p>Podemos ayudarte a hacer tus propias voces.&nbsp;
           <DiscordLink text="Únete a nuestro chat Discord" iconAfterText={true} />. 
-          Pagaremos por los primeros veinte modelos subidos.</p>
+          Pagaremos por los primeros cincuenta modelos subidos.</p>
       </div>
     </>
   )  
