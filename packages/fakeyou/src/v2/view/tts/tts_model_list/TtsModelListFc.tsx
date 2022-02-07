@@ -210,6 +210,14 @@ function TtsModelListFc(props: Props) {
         para decir cosas con tus personajes favoritos.
       </>
     );
+  } else if (props.displayLanguage === Language.Portuguese) {
+    title = "Texto para fala";
+    subtitle = (
+      <>
+        Use a tecnologia deepfake do <strong>FakeYou</strong> para 
+        dizer coisas com seus personagens favoritos.
+      </>
+    );
   } else if (props.displayLanguage === Language.Turkish) {
     title = "Konuşma metni";
     subtitle = (
