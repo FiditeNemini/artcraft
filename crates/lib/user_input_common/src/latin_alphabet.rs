@@ -2,6 +2,10 @@ use once_cell::sync::Lazy;
 use std::collections::HashMap;
 use unicode_segmentation::UnicodeSegmentation;
 
+fn to_owned(item: &(&str, &str)) -> (String, String) {
+  (item.0.to_string(), item.1.to_string())
+}
+
 // http://www.geocities.ws/click2speak/unicode/chars_es.html
 pub static LATIN_TO_ASCII_CHARACTER_MAP : Lazy<HashMap<String, String>> = Lazy::new(|| {
   // NB: Note that certain latin characters map to multiple ascii characters, eg. "AE".
@@ -77,6 +81,30 @@ pub static LATIN_TO_ASCII_CHARACTER_MAP : Lazy<HashMap<String, String>> = Lazy::
   let mut map = HashMap::new();
 
   map.extend(table.iter().map(|item| (item.0.to_string(), item.1.to_string())));
+
+  // Latin Extended-A
+  // https://unicode-table.com/en/0100/ (doesn't start here, though)
+  map.extend([
+    ("\u{0100}", "A"), // Ā Latin Capital Letter a with Macron
+    ("\u{0101}", "a"), // ā Latin Small Letter a with Macron
+    ("\u{0102}", "A"), // Ă Latin Capital Letter a with Breve
+    ("\u{0103}", "a"), // ă Latin Small Letter a with Breve
+    ("\u{0104}", "A"), // Ą Latin Capital Letter a with Ogonek
+    ("\u{0105}", "a"), // ą Latin Small Letter a with Ogonek
+    ("\u{0106}", "C"), // Ć Latin Capital Letter C with Acute
+    ("\u{0107}", "c"), // ć Latin Small Letter C with Acute
+    ("\u{0108}", "C"), // Ĉ Latin Capital Letter C with Circumflex
+    ("\u{0109}", "c"), // ĉ Latin Small Letter C with Circumflex
+    ("\u{010A}", "C"), // Ċ Latin Capital Letter C with Dot Above
+    ("\u{010B}", "c"), // ċ Latin Small Letter C with Dot Above
+    ("\u{010C}", "C"), // Č Latin Capital Letter C with Caron
+    ("\u{010D}", "c"), // č Latin Small Letter C with Caron
+    ("\u{010E}", "D"), // Ď Latin Capital Letter D with Caron
+    ("\u{010F}", "d"), // ď Latin Small Letter D with Caron
+
+    // TODO: This is far from done...
+    
+  ].iter().map(&to_owned));
 
   // Misc characters that frequently occur
   map.insert("\u{00F3}".to_string(), "o".to_string());  // Latin Small Letter O with Acute
