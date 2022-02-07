@@ -34,10 +34,14 @@ static REPLACEMENTS : Lazy<HashMap<String, String>> = Lazy::new(|| {
     ("\u{200B}", " "), // Zero Width Space
     ("\u{200C}", " "), // Zero Width Non-Joiner
     ("\u{200D}", " "), // Zero Width Joiner
+    ("\u{2028}", " "), // Line Separator
+    ("\u{2029}", " "), // Paragraph Separator
     ("\u{205F}", " "), // Medium Mathematical Space (MMSP)
     ("\u{2588}", " "), // Full Block
     ("\u{2800}", " "), // Braille Pattern Blank
     ("\u{3000}", " "), // Ideographic Space
+    ("\u{3164}", " "), // Hangul Filler
+    ("\u{FEFF}", " "), // Zero Width No-Break Space
   ].iter().map(&to_owned));
 
   // Punctuation that should turn into spaces
@@ -70,6 +74,7 @@ static REPLACEMENTS : Lazy<HashMap<String, String>> = Lazy::new(|| {
 
   // Dashes
   map.extend([
+    ("\u{00AD}", "-"), // ­ Soft Hyphen
     ("\u{2010}", "-"), // ‐ Hyphen
     ("\u{2011}", "-"), // ‑ Non-Breaking Hyphen
     ("\u{2013}", "-"), // – En Dash
@@ -91,6 +96,7 @@ static REPLACEMENTS : Lazy<HashMap<String, String>> = Lazy::new(|| {
     ("\u{2026}", "..."), // … Horizontal Ellipsis
     ("\u{203C}", "!!"), // ‼ Double Exclamation Mark Emoji
     ("\u{203D}", "!?"), // ‽ Interrobang
+    ("\u{2588}", " "), // █ Full Block
     ("\u{3001}", ","), // 、 Ideographic Comma
     ("\u{3002}", "."), // 。 Ideographic Full Stop
     ("\u{FF01}", "!"), // ！ Fullwidth Exclamation Mark
@@ -104,9 +110,28 @@ static REPLACEMENTS : Lazy<HashMap<String, String>> = Lazy::new(|| {
 
   // Symbols we can insert as words
   map.extend([
-    ("\u{B0}", " degrees "), // degree sign
-    ("\u{03C0}", " pie "), // greek small letter pi
-    ("\u{2122}", " trademark "), // trade mark sign
+    ("\u{00A9}", " copyright "), // © Copyright Sign Emoji
+    ("\u{00B0}", " degrees "), // ° Degree Sign
+    ("\u{03C0}", " pie "), // greek small letter pi (TODO: Incorrect handling)
+    ("\u{2122}", " trademark "), // ™ Trade Mark Sign Emoji
+  ].iter().map(&to_owned));
+
+  // Emoji we can insert as words
+  // https://unicode-table.com/en/blocks/emoticons/
+  map.extend([
+    ("\u{1F33D}", " corn on the cobb "), // 🌽 Ear of Maize Emoji
+    ("\u{1F436}", " dog face "), // 🐶 Dog Face Emoji
+    ("\u{1F44C}", " okay "), // 👌 Ok Hand Sign Emoji
+    ("\u{1F4A6}", " splashing sweat "), // 💦 Splashing Sweat Symbol Emoji
+    ("\u{1F4A9}", " poop "), // 💩 Pile of Poo Emoji
+    ("\u{1F4AF}", " hundred points "), // 💯 Hundred Points Symbol Emoji
+    ("\u{1F525}", " fire "), // 🔥 Fire Emoji
+    ("\u{1F530}", " japanese symbol for beginner "), // 🔰 Japanese Symbol for Beginner Emoji
+    ("\u{1F602}", " face with tears of joy "), // 😂 Face with Tears of Joy Emoji
+    ("\u{1F60D}", " heart eyes "), // 😍 Smiling Face with Heart-Shaped Eyes Emoji
+    ("\u{1F62D}", " loudly crying face "), // 😭 Loudly Crying Face Emoji
+    ("\u{1F633}", " flushed face "), // 😳 Flushed Face Emoji
+    ("\u{1F923}", " rolling on the floor laughing "), // 🤣 Rolling On The Floor Laughing Emoji
   ].iter().map(&to_owned));
 
   map
@@ -319,7 +344,7 @@ mod tests {
     assert_converted("â", "a"); // b'\xe2' 2607
     assert_converted("α", "a"); // b'\\u03b1' 2625
     assert_converted("å", "a"); // b'\xe5' 2753
-    //assert_converted("🐶", " dog "); // b'\\U0001f436' 2782
+    assert_converted("🐶", " dog face "); // b'\\U0001f436' 2782
     assert_converted("™", " trademark "); // b'\\u2122' 2869
     assert_converted("É", "E"); // b'\xc9' 3040
     assert_converted("æ", "ae"); // b'\xe6' 3142
