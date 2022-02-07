@@ -16,6 +16,7 @@ path = "src/lib.rs"
 
 # Internal
 container_common = { path = "../container_common" }
+user_input_common = { path = "../user_input_common" }
 
 # External
 anyhow = "1.0.40"

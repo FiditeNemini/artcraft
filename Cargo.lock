@@ -4333,6 +4333,7 @@ dependencies = [
  "once_cell",
  "regex",
  "unicode-segmentation",
+ "user_input_common",
 ]
 
 [[package]]

@@ -3,7 +3,7 @@ use std::collections::HashMap;
 use unicode_segmentation::UnicodeSegmentation;
 
 // http://www.geocities.ws/click2speak/unicode/chars_es.html
-pub static LATIN_CHARACTER_MAP : Lazy<HashMap<String, String>> = Lazy::new(|| {
+pub static LATIN_TO_ASCII_CHARACTER_MAP : Lazy<HashMap<String, String>> = Lazy::new(|| {
   let mut map = HashMap::new();
   // Latin characters with accent (A)
   map.insert("\u{C0}".to_string(), "A".to_string()); // Latin capital letter a with grave
@@ -97,7 +97,7 @@ pub static LATIN_CHARACTER_MAP : Lazy<HashMap<String, String>> = Lazy::new(|| {
 pub fn latin_to_ascii(input_text: &str) -> String {
   let segmented = UnicodeSegmentation::graphemes(input_text, true)
       .map(|segment| {
-        LATIN_CHARACTER_MAP.get(segment)
+        LATIN_TO_ASCII_CHARACTER_MAP.get(segment)
             .map(|replace| replace.as_str())
             .unwrap_or(segment)
       })
