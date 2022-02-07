@@ -20,7 +20,8 @@ function LanguageNotice (props: Props) {
       <div className="notification is-link">
         <button className="delete" onClick={() => props.clearLanguageNotice()}></button>
         <h1>¡Bienvenidos!</h1>
-        <p>Tenemos modelos de habla hispana. Echa un vistazo a la categoría "Español".</p>
+        <p>Tenemos modelos de habla hispana. Echa un vistazo a la categoría "Español" 
+          ("Category Filters").</p>
         <p>Podemos ayudarte a hacer tus propias voces.&nbsp;
           <DiscordLink text="Únete a nuestro chat Discord" iconAfterText={true} />. 
           Pagaremos por los primeros veinte modelos subidos.</p>
