@@ -9,6 +9,7 @@ members = [
   "crates/lib/redis_common",
   "crates/lib/tts_common",
   "crates/lib/twitch_common",
+  "crates/lib/user_input_common",
 
   # Application 
   "crates/service/obs_gateway",

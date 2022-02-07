@@ -1,15 +1,16 @@
-use std::collections::HashSet;
 use crate::BANNED_SLURS;
+use once_cell::sync::Lazy;
+use std::collections::HashSet;
 
-pub fn contains_slurs(unparsed_text: &str) -> bool {
-  lazy_static! {
-    static ref BANNED_SLURS_SET : HashSet<String> = BANNED_SLURS.lines()
+static BANNED_SLURS_SET : Lazy<HashSet<String>> = Lazy::new(|| {
+  BANNED_SLURS.lines()
       .map(|line| line.trim())
       .filter(|line| !(line.starts_with("#") || line.is_empty()))
       .map(|line| line.to_string())
-      .collect::<HashSet<String>>();
-  }
+      .collect::<HashSet<String>>()
+});
 
+pub fn contains_slurs(unparsed_text: &str) -> bool {
   for wordlike in unparsed_text.split_ascii_whitespace() {
     if BANNED_SLURS_SET.contains(wordlike) {
       return true;
@@ -21,7 +22,7 @@ pub fn contains_slurs(unparsed_text: &str) -> bool {
 
 #[cfg(test)]
 mod tests {
-  use crate::validations::check_for_slurs::contains_slurs;
+  use crate::check_for_slurs::contains_slurs;
 
   #[test]
   fn valid_text_passes() {

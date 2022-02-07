@@ -14,7 +14,6 @@
 
 pub const RESERVED_USERNAMES : &'static str = include_str!("../../../../db/reserved_usernames.txt");
 pub const RESERVED_SUBSTRINGS : &'static str = include_str!("../../../../db/reserved_usernames_including.txt");
-pub const BANNED_SLURS : &'static str = include_str!("../../../../db/banned_slurs.txt");
 
 pub mod database;
 pub mod common_env;

@@ -45,6 +45,7 @@ http_server_common = { path = "../../lib/http_server_common" }
 redis_common = { path = "../../lib/redis_common" }
 tts_common = { path = "../../lib/tts_common" }
 twitch_common = { path = "../../lib/twitch_common" }
+user_input_common = { path = "../../lib/user_input_common" }
 
 # External
 anyhow = "1.0.40"

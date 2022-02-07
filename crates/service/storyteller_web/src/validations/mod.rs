@@ -1,5 +1,4 @@
 pub mod cashapp_username;
-pub mod check_for_slurs;
 pub mod discord_username;
 pub mod github_username;
 pub mod ip_addresses;

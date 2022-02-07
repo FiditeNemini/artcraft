@@ -3804,6 +3804,7 @@ dependencies = [
  "twitch_api2",
  "twitch_common",
  "twitch_oauth2",
+ "user_input_common",
  "uuid",
 ]
 
@@ -4536,6 +4537,17 @@ dependencies = [
  "idna 0.2.3",
  "matches",
  "percent-encoding 2.1.0",
+]
+
+[[package]]
+name = "user_input_common"
+version = "0.0.1"
+dependencies = [
+ "anyhow",
+ "container_common",
+ "log",
+ "once_cell",
+ "regex",
 ]
 
 [[package]]

@@ -1,0 +1,24 @@
+[package]
+name = "user_input_common"
+edition = "2018"
+version = "0.0.1"
+authors = [
+    "Brandon Thomas <bt@brand.io>",
+    "Brandon Thomas <echelon@gmail.com>",
+]
+publish = false
+
+[lib]
+name = "user_input_common"
+path = "src/lib.rs"
+
+[dependencies]
+
+# Internal
+container_common = { path = "../container_common" }
+
+# External
+anyhow = "1.0.40"
+log = "0.4.14"
+once_cell = "1.9.0"
+regex = "1.5.4"

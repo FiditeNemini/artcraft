@@ -1,7 +1,7 @@
 use actix_http::Error;
 use actix_http::http::header;
-use actix_web::cookie::Cookie;
 use actix_web::HttpResponseBuilder;
+use actix_web::cookie::Cookie;
 use actix_web::error::ResponseError;
 use actix_web::http::StatusCode;
 use actix_web::web::Path;
@@ -15,7 +15,6 @@ use crate::server_state::ServerState;
 use crate::util::email_to_gravatar::email_to_gravatar;
 use crate::util::markdown_to_html::markdown_to_html;
 use crate::validations::cashapp_username::{validate_cashapp_username, normalize_cashapp_username_for_storage};
-use crate::validations::check_for_slurs::contains_slurs;
 use crate::validations::discord_username::validate_discord_username;
 use crate::validations::github_username::validate_github_username;
 use crate::validations::passwords::validate_passwords;
@@ -31,6 +30,7 @@ use sqlx::error::DatabaseError;
 use sqlx::error::Error::Database;
 use sqlx::mysql::MySqlDatabaseError;
 use std::sync::Arc;
+use user_input_common::check_for_slurs::contains_slurs;
 
 /// For the URL PathInfo
 #[derive(Deserialize)]
