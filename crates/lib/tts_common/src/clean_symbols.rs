@@ -280,6 +280,72 @@ mod tests {
   }
 
   #[test]
+  pub fn most_frequent_failures_5k_usages() {
+    assert_converted("​", " "); // b'\\u200b' 6019
+    assert_converted("ğ", "g"); // b'\\u011f' 6103
+    assert_converted("–", "-"); // b'\\u2013' 6172
+    assert_converted("ì", "i"); // b'\xec' 6209
+    assert_converted("ē", "e"); // b'\\u0113' 6312
+    assert_converted("ù", "u"); // b'\xf9' 6907
+    assert_converted("‘", "'"); // b'\\u2018' 7151
+    assert_converted("ǔ", "u"); // b'\\u01d4' 7422
+    assert_converted("´", "'"); // b'\xb4' 8210
+    assert_converted("ê", "e"); // b'\xea' 8882
+    assert_converted("ä", "a"); // b'\xe4' 9202
+  }
+
+  #[test]
+  pub fn most_frequent_failures_2p5k_usages() {
+    assert_converted("～", "~"); // b'\\uff5e' 2507
+    assert_converted("â", "a"); // b'\xe2' 2607
+    assert_converted("α", "a"); // b'\\u03b1' 2625
+    assert_converted("å", "a"); // b'\xe5' 2753
+    //assert_converted("🐶", " dog "); // b'\\U0001f436' 2782
+    assert_converted("™", " trademark "); // b'\\u2122' 2869
+    assert_converted("É", "E"); // b'\xc9' 3040
+    assert_converted("æ", "ae"); // b'\xe6' 3142
+    assert_converted("¨", "\""); // b'\xa8' 3236
+    assert_converted("ò", "o"); // b'\xf2' 3250
+    assert_converted("đ", "d"); // b'\\u0111' 3420
+    assert_converted("，", ","); // b'\\uff0c' 3487
+    assert_converted("ô", "o"); // b'\xf4' 3568
+    assert_converted("Á", "A"); // b'\xc1' 3779
+    assert_converted("ß", "B"); // b'\xdf' 3779
+    assert_converted("Ñ", "N"); // b'\xd1' 3963
+    assert_converted("ǒ", "o"); // b'\\u01d2' 4613
+    assert_converted("İ", "I"); // b'\\u0130' 4808
+  }
+
+  #[test]
+  pub fn most_frequent_failures_2k_usages() {
+    assert_converted("、", ","); // b'\\u3001' 2001
+    assert_converted("ć", "c"); // b'\\u0107' 2017
+    assert_converted("ę", "e"); // b'\\u0119' 2236
+    assert_converted("。", "."); // b'\\u3002' 2288
+    assert_converted(" ", " "); // b'\\u205f' 2347
+    assert_converted("ᴺ", "n"); // b'\\u1d3a' 2383
+    assert_converted("ě", "e"); // b'\\u011b' 2441
+    assert_converted("ᴾ", "p"); // b'\\u1d3e' 2479
+    assert_converted("ł", "s"); // b'\\u0142' 2480
+  }
+
+  #[test]
+  pub fn most_frequent_failures_1p5k_usages() {
+    assert_converted("·", " "); // b'\xb7' 1514
+    assert_converted("š", "s"); // b'\\u0161' 1514
+    assert_converted("ο", "o"); // b'\\u03bf' 1515
+    assert_converted("ū", "u"); // b'\\u016b' 1523
+    assert_converted("Ö", "O"); // b'\xd6' 1543
+    assert_converted("ι", "l"); // b'\\u03b9' 1559
+    assert_converted("ε", "e"); // b'\\u03b5' 1575
+    assert_converted("ă", "a"); // b'\\u0103' 1576
+    //assert_converted("😂", ""); // b'\\U0001f602' 1741
+    assert_converted("Ó", "O"); // b'\xd3' 1774
+    assert_converted("ư", "u"); // b'\\u01b0' 1794
+    assert_converted("•", " "); // b'\\u2022' 1948
+  }
+
+  #[test]
   pub fn most_frequent_failures_1k_usages() {
     assert_converted("　", " "); // b'\\u3000' 1005
     //assert_converted("🤣", " laugh "); // b'\\U0001f923' 1010
@@ -302,55 +368,5 @@ mod tests {
     assert_converted("ś", "s"); // b'\\u015b' 1402
     assert_converted("ạ", "a"); // b'\\u1ea1' 1413
     assert_converted("Í", "I"); // b'\xcd' 1434
-    assert_converted("·", " "); // b'\xb7' 1514
-    assert_converted("š", "s"); // b'\\u0161' 1514
-    assert_converted("ο", "o"); // b'\\u03bf' 1515
-    assert_converted("ū", "u"); // b'\\u016b' 1523
-    assert_converted("Ö", "O"); // b'\xd6' 1543
-    assert_converted("ι", "l"); // b'\\u03b9' 1559
-    assert_converted("ε", "e"); // b'\\u03b5' 1575
-    assert_converted("ă", "a"); // b'\\u0103' 1576
-    //assert_converted("😂", ""); // b'\\U0001f602' 1741
-    assert_converted("Ó", "O"); // b'\xd3' 1774
-    assert_converted("ư", "u"); // b'\\u01b0' 1794
-    assert_converted("•", " "); // b'\\u2022' 1948
-    assert_converted("、", ","); // b'\\u3001' 2001
-    assert_converted("ć", "c"); // b'\\u0107' 2017
-    assert_converted("ę", "e"); // b'\\u0119' 2236
-    assert_converted("。", "."); // b'\\u3002' 2288
-    assert_converted(" ", " "); // b'\\u205f' 2347
-    assert_converted("ᴺ", "n"); // b'\\u1d3a' 2383
-    assert_converted("ě", "e"); // b'\\u011b' 2441
-    assert_converted("ᴾ", "p"); // b'\\u1d3e' 2479
-    assert_converted("ł", "s"); // b'\\u0142' 2480
-    assert_converted("～", "~"); // b'\\uff5e' 2507
-    assert_converted("â", "a"); // b'\xe2' 2607
-    assert_converted("α", "a"); // b'\\u03b1' 2625
-    assert_converted("å", "a"); // b'\xe5' 2753
-    //assert_converted("🐶", " dog "); // b'\\U0001f436' 2782
-    assert_converted("™", " trademark "); // b'\\u2122' 2869
-    assert_converted("É", "E"); // b'\xc9' 3040
-    assert_converted("æ", "ae"); // b'\xe6' 3142
-    assert_converted("¨", "\""); // b'\xa8' 3236
-    assert_converted("ò", "o"); // b'\xf2' 3250
-    assert_converted("đ", "d"); // b'\\u0111' 3420
-    assert_converted("，", ","); // b'\\uff0c' 3487
-    assert_converted("ô", "o"); // b'\xf4' 3568
-    assert_converted("Á", "A"); // b'\xc1' 3779
-    assert_converted("ß", "B"); // b'\xdf' 3779
-    assert_converted("Ñ", "N"); // b'\xd1' 3963
-    assert_converted("ǒ", "o"); // b'\\u01d2' 4613
-    assert_converted("İ", "I"); // b'\\u0130' 4808
-    assert_converted("​", " "); // b'\\u200b' 6019
-    assert_converted("ğ", "g"); // b'\\u011f' 6103
-    assert_converted("–", "-"); // b'\\u2013' 6172
-    assert_converted("ì", "i"); // b'\xec' 6209
-    assert_converted("ē", "e"); // b'\\u0113' 6312
-    assert_converted("ù", "u"); // b'\xf9' 6907
-    assert_converted("‘", "'"); // b'\\u2018' 7151
-    assert_converted("ǔ", "u"); // b'\\u01d4' 7422
-    assert_converted("´", "'"); // b'\xb4' 8210
-    assert_converted("ê", "e"); // b'\xea' 8882
-    assert_converted("ä", "a"); // b'\xe4' 9202
   }
 }
