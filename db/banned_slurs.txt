@@ -1,9 +1,14 @@
 # This file serves to remove racial slurs and epithets from usage with vocodes.
 # There's probably more than this that we'll want to remove.
 # I need to investigate.
+chink
+chinks
+dyke
 fag
 faggot
 fags
 kniggers
+nig
 nigger
 niggers
+nigs
