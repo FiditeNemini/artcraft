@@ -4,77 +4,72 @@ use unicode_segmentation::UnicodeSegmentation;
 
 // http://www.geocities.ws/click2speak/unicode/chars_es.html
 pub static LATIN_TO_ASCII_CHARACTER_MAP : Lazy<HashMap<String, String>> = Lazy::new(|| {
+  // NB: Note that certain latin characters map to multiple ascii characters, eg. "AE".
+  let table = [
+    ("\u{C0}", "A"), // Latin capital letter A with grave
+    ("\u{C1}", "A"), // Latin capital letter A with acute
+    ("\u{C2}", "A"), // Latin capital letter A with circumflex
+    ("\u{C3}", "A"), // Latin capital letter A with tilde
+    ("\u{C4}", "A"), // Latin capital letter A diaeresis
+    ("\u{C5}", "A"), // Latin capital letter A with ring above
+    ("\u{C6}", "AE"), // Latin capital letter AE
+    ("\u{C7}", "C"), // Latin capital letter C with cedilla
+    ("\u{C8}", "E"), // Latin capital letter E with grave
+    ("\u{C9}", "E"), // Latin capital letter E with acute
+    ("\u{CA}", "E"), // Latin capital letter E with circumflex
+    ("\u{CB}", "E"), // Latin capital letter E with diaeresis
+    ("\u{CC}", "I"), // Latin capital letter I with grave
+    ("\u{CD}", "I"), // Latin capital letter I with acute
+    ("\u{CE}", "I"), // Latin capital letter I with circumflex
+    ("\u{CF}", "I"), // Latin capital letter I with diaeresis
+    ("\u{D1}", "N"), // Latin capital letter N with tilde
+    ("\u{D2}", "O"), // Latin capital letter O with grave
+    ("\u{D3}", "O"), // Latin capital letter O with acute
+    ("\u{D4}", "O"), // Latin capital letter O with circumflex
+    ("\u{D5}", "O"), // Latin capital letter O with tilde
+    ("\u{D6}", "O"), // Latin capital letter O with diaeresis
+    ("\u{D8}", "O"), // Latin capital letter O with stroke (NB: Skips D7)
+    ("\u{D9}", "U"), // Latin capital letter U with grave
+    ("\u{DA}", "U"), // Latin capital letter U with acute
+    ("\u{DB}", "U"), // Latin capital letter U with circumflex
+    ("\u{DC}", "U"), // Latin capital letter U with diaeresis
+    ("\u{DD}", "Y"), // Latin capital letter Y with acute
+    ("\u{E0}", "a"), // Latin small letter a with grave
+    ("\u{E1}", "a"), // Latin small letter a with acute
+    ("\u{E2}", "a"), // Latin small letter a with circumflex
+    ("\u{E3}", "a"), // Latin small letter a with tilde
+    ("\u{E4}", "a"), // Latin small letter a with diaeresis
+    ("\u{E5}", "a"), // Latin small letter a with ring above
+    ("\u{E6}", "ae"), // Latin small letter ae
+    ("\u{E7}", "c"), // Latin small letter c with cedilla
+    ("\u{E8}", "e"), // Latin small letter e with grave
+    ("\u{E9}", "e"), // Latin small letter e with acute
+    ("\u{EA}", "e"), // Latin small letter e with circumflex
+    ("\u{EB}", "e"), // Latin small letter e with diaeresis
+    ("\u{EC}", "i"), // Latin small letter i with grave
+    ("\u{ED}", "i"), // Latin small letter i with acute
+    ("\u{EE}", "i"), // Latin small letter i with circumflex
+    ("\u{EF}", "i"), // Latin small letter i with diaeresis
+    ("\u{F1}", "n"), // Lower n tilde
+    ("\u{AA}", "a"), // Feminine ordinal
+    ("\u{BA}", "o"), // Masculine ordinal
+  ];
+
   let mut map = HashMap::new();
-  // Latin characters with accent (A)
-  map.insert("\u{C0}".to_string(), "A".to_string()); // Latin capital letter a with grave
-  map.insert("\u{C1}".to_string(), "A".to_string()); // Latin capital letter a with acute
-  map.insert("\u{C2}".to_string(), "A".to_string()); // Latin capital letter a with circumflex
-  map.insert("\u{C3}".to_string(), "A".to_string()); // Latin capital letter a with tilde
-  map.insert("\u{C4}".to_string(), "A".to_string()); // Latin capital letter a diaeresis
-  map.insert("\u{C5}".to_string(), "A".to_string()); // Latin capital letter a with ring above
-  // Latin characters with accent (AE)
-  map.insert("\u{C6}".to_string(), "AE".to_string()); // Latin capital letter ae
-  // Latin characters with accent (C)
-  map.insert("\u{C7}".to_string(), "C".to_string()); // Latin capital letter c with cedilla
-  // Latin characters with accent (E)
-  map.insert("\u{C8}".to_string(), "E".to_string()); // Latin capital letter e with grave
-  map.insert("\u{C9}".to_string(), "E".to_string()); // Latin capital letter e with acute
-  map.insert("\u{CA}".to_string(), "E".to_string()); // Latin capital letter e with circumflex
-  map.insert("\u{CB}".to_string(), "E".to_string()); // Latin capital letter e with diaeresis
-  // Latin characters with accent (I)
-  map.insert("\u{CC}".to_string(), "I".to_string()); // Latin capital letter i with grave
-  map.insert("\u{CD}".to_string(), "I".to_string()); // Latin capital letter i with acute
-  map.insert("\u{CE}".to_string(), "I".to_string()); // Latin capital letter i with circumflex
-  map.insert("\u{CF}".to_string(), "I".to_string()); // Latin capital letter i with diaeresis
+
+  map.extend(table.iter().map(|item| (item.0.to_string(), item.1.to_string())));
+
   // Latin characters with accent (ETH)
   // map.insert("\u{D0}".to_string(), "D".to_string()); // Latin capital letter eth
   // Latin characters with accent (N)
-  map.insert("\u{D1}".to_string(), "N".to_string()); // Latin capital letter n with tilde
-  // Latin characters with accent (O)
-  map.insert("\u{D2}".to_string(), "O".to_string()); // Latin capital letter o with grave
-  map.insert("\u{D3}".to_string(), "O".to_string()); // Latin capital letter o with acute
-  map.insert("\u{D4}".to_string(), "O".to_string()); // Latin capital letter o with circumflex
-  map.insert("\u{D5}".to_string(), "O".to_string()); // Latin capital letter o with tilde
-  map.insert("\u{D6}".to_string(), "O".to_string()); // Latin capital letter o with diaeresis
-  map.insert("\u{D8}".to_string(), "O".to_string()); // Latin capital letter o with stroke (NB: Skips D7)
-  // Latin characters with accent (U)
-  map.insert("\u{D9}".to_string(), "U".to_string()); // Latin capital letter u with grave
-  map.insert("\u{DA}".to_string(), "U".to_string()); // Latin capital letter u with acute
-  map.insert("\u{DB}".to_string(), "U".to_string()); // Latin capital letter u with circumflex
-  map.insert("\u{DC}".to_string(), "U".to_string()); // Latin capital letter u with diaeresis
-  // Latin characters with accent (Y)
-  map.insert("\u{DD}".to_string(), "Y".to_string()); // Latin capital letter y with acute
   // Latin characters with accent (THORN)
   // map.insert("\u{DE}".to_string(), "P".to_string()); // Latin capital letter thorn
   // Latin characters with accent (SHARP S)
   // map.insert("\u{DF}".to_string(), "B".to_string()); // Latin capital letter sharp s
   // Latin characters with accent (a)
-  map.insert("\u{E0}".to_string(), "a".to_string()); // Latin small letter a with grave
-  map.insert("\u{E1}".to_string(), "a".to_string()); // Latin small letter a with acute
-  map.insert("\u{E2}".to_string(), "a".to_string()); // Latin small letter a with circumflex
-  map.insert("\u{E3}".to_string(), "a".to_string()); // Latin small letter a with tilde
-  map.insert("\u{E4}".to_string(), "a".to_string()); // Latin small letter a with diaeresis
-  map.insert("\u{E5}".to_string(), "a".to_string()); // Latin small letter a with ring above
-  // Latin characters with accent (ae)
-  map.insert("\u{E6}".to_string(), "ae".to_string()); // Latin small letter ae
-  // Latin characters with accent (c)
-  map.insert("\u{E7}".to_string(), "c".to_string()); // Latin small letter c with cedilla
-  // Latin characters with accent (e)
-  map.insert("\u{E8}".to_string(), "e".to_string()); // Latin small letter e with grave
-  map.insert("\u{E9}".to_string(), "e".to_string()); // Latin small letter e with acute
-  map.insert("\u{EA}".to_string(), "e".to_string()); // Latin small letter e with circumflex
-  map.insert("\u{EB}".to_string(), "e".to_string()); // Latin small letter e with diaeresis
-  // Latin characters with accent (i)
-  map.insert("\u{EC}".to_string(), "i".to_string()); // Latin small letter i with grave
-  map.insert("\u{ED}".to_string(), "i".to_string()); // Latin small letter i with acute
-  map.insert("\u{EE}".to_string(), "i".to_string()); // Latin small letter i with circumflex
-  map.insert("\u{EF}".to_string(), "i".to_string()); // Latin small letter i with diaeresis
   // Latin characters with accent (eth)
   // map.insert("\u{F0}".to_string(), "d".to_string()); // Latin small letter eith
   // Spanish special characters
-  map.insert("\u{F1}".to_string(), "n".to_string());  // Lower n tilde
-  map.insert("\u{AA}".to_string(), "a".to_string());  // Feminine ordinal
-  map.insert("\u{BA}".to_string(), "o".to_string());  // Masculine ordinal
   // Misc characters that frequently occur
   map.insert("\u{00F3}".to_string(), "o".to_string());  // Latin Small Letter O with Acute
   map.insert("\u{0131}".to_string(), "i".to_string());  // Latin Small Letter Dotless I
