@@ -4,6 +4,7 @@ import './App.scss';
 import React from 'react';
 import { ApiConfig } from '@storyteller/components';
 import { DetectLocale, DetectLocaleIsOk } from '@storyteller/components/src/api/locale/DetectLocale';
+import { Language } from '@storyteller/components/src/i18n/Language';
 import { BrowserRouter, Route, Switch } from "react-router-dom";
 import { NewVocodesContainer } from './v2/view/NewVocodesContainer';
 import { OldVocodesContainer } from './v1/OldVocodesContainer';
@@ -61,6 +62,7 @@ interface State {
   //localeLanguageCodes: string[],
   //localeFullLanguageTags: string[],
   isShowingLanguageNotice: boolean,
+  displayLanguage: Language,
 
   // Jobs enqueued during this browser session.
   ttsInferenceJobs: Array<TtsInferenceJob>,
@@ -99,6 +101,7 @@ class App extends React.Component<Props, State> {
       //localeLanguageCodes: [],
       //localeFullLanguageTags: [],
       isShowingLanguageNotice: false,
+      displayLanguage: Language.English,
 
       ttsInferenceJobs: [],
       w2lInferenceJobs: [],
@@ -152,9 +155,34 @@ class App extends React.Component<Props, State> {
   queryLanguage = async () => {
     let locale = await DetectLocale();
     if (DetectLocaleIsOk(locale)) {
+      // TODO: Does not respect preference
       const hasSpanish = locale.language_codes.indexOf("es") > -1;
+      const hasPortuguese = locale.language_codes.indexOf("pt") > -1;
+      const hasTurkish = locale.language_codes.indexOf("tr") > -1;
+      const hasIndonesian = locale.language_codes.indexOf("id") > -1;
+      const hasGerman = locale.language_codes.indexOf("de") > -1;
+      const hasJapanese = locale.language_codes.indexOf("ja") > -1;
+      const showNotice = hasSpanish || hasPortuguese || hasTurkish || hasIndonesian || hasGerman || hasJapanese;
+
+      let displayLanguage = Language.English;
+
+      if (hasSpanish) {
+        displayLanguage = Language.Spanish;
+      } else if (hasPortuguese) {
+        displayLanguage = Language.Portuguese;
+      } else if (hasTurkish) {
+        displayLanguage = Language.Turkish;
+      } else if (hasIndonesian) {
+        displayLanguage = Language.Indonesian;
+      } else if (hasGerman) {
+        displayLanguage = Language.German;
+      } else if (hasJapanese) {
+        displayLanguage = Language.Japanese;
+      }
+
       this.setState({
-        isShowingLanguageNotice: hasSpanish,
+        isShowingLanguageNotice: showNotice,
+        displayLanguage: displayLanguage,
       });
     }
   }
@@ -447,8 +475,10 @@ class App extends React.Component<Props, State> {
 
                     isShowingVocodesNotice={this.state.isShowingVocodesNotice}
                     clearVocodesNotice={this.clearVocodesNotice}
+
                     isShowingLangaugeNotice={this.state.isShowingLanguageNotice}
                     clearLanguageNotice={this.clearLanguageNotice}
+                    displayLanguage={this.state.displayLanguage}
 
                     enqueueTtsJob={this.enqueueTtsJob}
                     ttsInferenceJobs={this.state.ttsInferenceJobs}

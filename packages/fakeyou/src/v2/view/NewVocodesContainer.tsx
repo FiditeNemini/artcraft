@@ -50,6 +50,7 @@ import { ModerationCategoryDeletePage } from './moderation/categories/Moderation
 import { TtsCategoryType } from '../../AppWrapper';
 import { PatronPage } from './patrons/PatronPage';
 import ScrollToTop from './_common/ScrollToTop';
+import { Language } from '@storyteller/components/src/i18n/Language';
 
 interface Props {
   sessionWrapper: SessionWrapper,
@@ -60,6 +61,7 @@ interface Props {
 
   isShowingLangaugeNotice: boolean,
   clearLanguageNotice: () => void,
+  displayLanguage: Language,
 
   enqueueTtsJob: (jobToken: string) => void,
   ttsInferenceJobs: Array<TtsInferenceJob>,
@@ -386,6 +388,7 @@ class NewVocodesContainer extends React.Component<Props, State> {
                 clearVocodesNotice={this.props.clearVocodesNotice}
                 isShowingLanguageNotice={this.props.isShowingLangaugeNotice}
                 clearLanguageNotice={this.props.clearLanguageNotice}
+                displayLanguage={this.props.displayLanguage}
                 enqueueTtsJob={this.props.enqueueTtsJob}
                 ttsInferenceJobs={this.props.ttsInferenceJobs}
                 ttsModelUploadJobs={this.props.ttsModelUploadJobs}

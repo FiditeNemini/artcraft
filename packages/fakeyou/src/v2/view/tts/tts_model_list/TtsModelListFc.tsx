@@ -19,6 +19,7 @@ import { MultiDropdownSearch } from './MultiDropdownSearch';
 import { SyntheticCategory, TtsCategoryType } from '../../../../AppWrapper';
 import { AutocompleteSearch } from './AutocompleteSearch';
 import { LanguageNotice } from './LanguageNotice';
+import { Language } from '@storyteller/components/src/i18n/Language';
 
 export interface EnqueueJobResponsePayload {
   success: boolean,
@@ -30,8 +31,10 @@ interface Props {
 
   isShowingVocodesNotice: boolean,
   clearVocodesNotice: () => void,
+
   isShowingLanguageNotice: boolean,
   clearLanguageNotice: () => void,
+  displayLanguage: Language,
 
   enqueueTtsJob: (jobToken: string) => void,
   ttsInferenceJobs: Array<TtsInferenceJob>,
@@ -191,8 +194,39 @@ function TtsModelListFc(props: Props) {
       undefined;
 
   const languageNotice = props.isShowingLanguageNotice? 
-      <LanguageNotice clearLanguageNotice={props.clearLanguageNotice} /> :
+      <LanguageNotice clearLanguageNotice={props.clearLanguageNotice} displayLanguage={props.displayLanguage} /> :
       undefined;
+
+  // ===== I18N =====
+
+  let title = "Text to Speech*";
+  let subtitle = <>Use <strong>FakeYou</strong> deep fake tech to say stuff with your favorite characters.</>;
+
+  if (props.displayLanguage === Language.Spanish) {
+    title = "Texto a voz";
+    subtitle = (
+      <>
+        Usa la tecnología falsa profunda de <strong>FakeYou</strong> 
+        para decir cosas con tus personajes favoritos.
+      </>
+    );
+  } else if (props.displayLanguage === Language.Turkish) {
+    title = "Konuşma metni";
+    subtitle = (
+      <>
+        En sevdiğiniz karakterlerle bir şeyler söylemek için 
+        <strong>FakeYou</strong> derin sahte teknolojisini kullanın.
+      </>
+    );
+  } else if (props.displayLanguage === Language.Japanese) {
+    title = "テキスト読み上げ";
+    subtitle = (
+      <>
+        <strong>FakeYou</strong>ディープフェイクテックを使用して、
+        お気に入りのキャラクターと何かを言いましょう。
+      </>
+    );
+  }
 
   return (
     <div>
@@ -210,10 +244,10 @@ function TtsModelListFc(props: Props) {
 
             <div className="column">
               <p className="title">
-                Text to Speech*
+                {title}
               </p>
               <p className="subtitle">
-                Use <strong>FakeYou</strong> deep fake tech to say stuff with your favorite characters.
+                {subtitle}
               </p>
             </div>
 
