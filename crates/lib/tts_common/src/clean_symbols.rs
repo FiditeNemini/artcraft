@@ -40,6 +40,12 @@ static REPLACEMENTS : Lazy<HashMap<String, String>> = Lazy::new(|| {
     ("\u{3000}", " "), // Ideographic Space
   ].iter().map(&to_owned));
 
+  // Punctuation that should turn into spaces
+  map.extend([
+    ("\u{b7}", " "), // · Middle Dot
+    ("\u{2022}", " "), // • Bullet
+  ].iter().map(&to_owned));
+
   // Quotes (single)
   map.extend([
     ("\u{0060}", "'"), // Grave Accent
@@ -76,25 +82,24 @@ static REPLACEMENTS : Lazy<HashMap<String, String>> = Lazy::new(|| {
     ("\u{FF0D}", "-"), // Fullwidth Hyphen-Minus
   ].iter().map(&to_owned));
 
-  // Spanish special characters
-  map.extend([
-    ("\u{A1}", "!"), // Inverted exclamation mark
-    ("\u{BF}", "?"), // Inverted question mark
-    ("\u{AA}", "a"), // Feminine ordinal
-    ("\u{BA}", "o"), // Masculine ordinal
-  ].iter().map(&to_owned));
-
-  // Misc
-  map.insert("…".to_string(), "...".to_string()); // Ellipsis
-  map.insert("\u{3001}".to_string(), ",".to_string()); // Commas
-
-  // Misc characters that frequently occur
-  map.insert("\u{203C}".to_string(), "!!".to_string());  // Double Exclamation Mark
-
   // Close enough to existing allowed punctuation
   map.extend([
-    ("\u{3002}", "."), // Ideographic full stop
-    ("\u{FF01}", "!"), // Fullwidth Exclamation Mark
+    ("\u{00A1}", "!"), // ¡ Inverted Exclamation Mark
+    ("\u{00BF}", "?"), // ¿ Inverted Question Mark
+    ("\u{2024}", "."), // ․ One Dot Leader
+    ("\u{2025}", ".."), // ‥ Two Dot Leader
+    ("\u{2026}", "..."), // … Horizontal Ellipsis
+    ("\u{203C}", "!!"), // ‼ Double Exclamation Mark Emoji
+    ("\u{203D}", "!?"), // ‽ Interrobang
+    ("\u{3001}", ","), // 、 Ideographic Comma
+    ("\u{3002}", "."), // 。 Ideographic Full Stop
+    ("\u{FF01}", "!"), // ！ Fullwidth Exclamation Mark
+  ].iter().map(&to_owned));
+
+  // Spanish special characters
+  map.extend([
+    ("\u{AA}", "a"), // Feminine ordinal
+    ("\u{BA}", "o"), // Masculine ordinal
   ].iter().map(&to_owned));
 
   // Symbols we can insert as words
@@ -102,12 +107,6 @@ static REPLACEMENTS : Lazy<HashMap<String, String>> = Lazy::new(|| {
     ("\u{B0}", " degrees "), // degree sign
     ("\u{03C0}", " pie "), // greek small letter pi
     ("\u{2122}", " trademark "), // trade mark sign
-  ].iter().map(&to_owned));
-
-  // These should turn into spaces
-  map.extend([
-    ("\u{b7}", " "), // · Middle Dot
-    ("\u{2022}", " "), // • Bullet
   ].iter().map(&to_owned));
 
   map
