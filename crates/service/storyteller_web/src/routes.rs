@@ -70,6 +70,7 @@ use crate::http_server::endpoints::w2l::get_w2l_template_use_count::get_w2l_temp
 use crate::http_server::endpoints::w2l::get_w2l_upload_template_job_status::get_w2l_upload_template_job_status_handler;
 use crate::http_server::endpoints::w2l::list_w2l_templates::list_w2l_templates_handler;
 use crate::http_server::endpoints::w2l::set_w2l_template_mod_approval::set_w2l_template_mod_approval_handler;
+use crate::http_server::endpoints::misc::detect_locale_handler::detect_locale_handler;
 
 pub fn add_routes<T, B> (app: App<T, B>) -> App<T, B>
   where
@@ -116,6 +117,11 @@ pub fn add_routes<T, B> (app: App<T, B>) -> App<T, B>
         .route(web::get().to(list_events_handler))
         .route(web::head().to(|| HttpResponse::Ok()))
   )
+      .service(
+        web::resource("/detect_locale")
+            .route(web::get().to(detect_locale_handler))
+            .route(web::head().to(|| HttpResponse::Ok()))
+      )
   .service(
     web::resource("/leaderboard")
         .route(web::get().to(leaderboard_handler))
