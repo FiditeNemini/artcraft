@@ -149,7 +149,17 @@ pub fn clean_symbols(input_text: &str) -> String {
       })
       .collect::<Vec<&str>>();
 
-  segmented.join("")
+  let before_clean : String = segmented.join("");
+
+  before_clean.chars()
+      .filter(|segment| {
+        match segment {
+          '\x00'..='\x7f' => true, // Full ASCII range
+          //'\x01'...'\x08' | '\u{10FFFE}'...'\u{10FFFF}' => true,
+          _ => false,
+        }
+      })
+      .collect::<String>()
 }
 
 #[cfg(test)]
@@ -165,6 +175,29 @@ mod tests {
     assert_eq!(clean_symbols(""), "".to_string()); // Empty check
     assert_eq!(clean_symbols("this should be the same."), "this should be the same.".to_string());
     assert_eq!(clean_symbols("one\ntwo\r\nthree    "), "one\ntwo\r\nthree    ".to_string());
+  }
+
+  #[test]
+  fn assert_ascii_retained() {
+    assert_converted("This, sentence. It\nhas\nnewlines.",
+                     "This, sentence. It\nhas\nnewlines.");
+    assert_converted("12:34", "12:34");
+    assert_converted("Punctuation!?.", "Punctuation!?.");
+  }
+
+  #[test]
+  fn assert_non_handled_emoji_removed() {
+    assert_converted("👹", "");
+    assert_converted("👹👍✅", "");
+    assert_converted("✨what✨", "what");
+  }
+
+  #[test]
+  fn assert_non_handled_languages_removed() {
+    assert_converted("これはテスト", "");
+    assert_converted("これはテストdesu", "desu");
+    assert_converted("你好", "");
+    assert_converted("hello你好hello", "hellohello");
   }
 
   #[test]
