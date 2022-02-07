@@ -26,6 +26,7 @@ static REPLACEMENTS : Lazy<HashMap<String, String>> = Lazy::new(|| {
     ("\u{2005}", " "), // Four-Per-Em Space
     ("\u{205F}", " "), // Medium Mathematical Space (MMSP)
     ("\u{2588}", " "), // Full Block
+    ("\u{2800}", " "), // Braille Pattern Blank
     ("\u{3000}", " "), // Ideographic Space
   ].iter().map(&to_owned));
 
@@ -93,10 +94,10 @@ static REPLACEMENTS : Lazy<HashMap<String, String>> = Lazy::new(|| {
     ("\u{2122}", " trademark "), // trade mark sign
   ].iter().map(&to_owned));
 
-  // These shouldn't be in the output at all
+  // These should turn into spaces
   map.extend([
-    ("\u{b7}", ""), // middle dot
-    ("\u{2022}", ""), // bullet
+    ("\u{b7}", " "), // · Middle Dot
+    ("\u{2022}", " "), // • Bullet
   ].iter().map(&to_owned));
 
   map
@@ -295,13 +296,13 @@ mod tests {
     //assert_converted("£", " pounds "); // b'\xa3' 1186
     assert_converted("ë", "e"); // b'\xeb' 1189
     assert_converted("Ç", "C"); // b'\xc7' 1213
-    assert_converted("τ", "t"); // b'\\u03c4' 1217
+    //assert_converted("τ", "t"); // b'\\u03c4' 1217
     assert_converted("ẹ", "e"); // b'\\u1eb9' 1228
     assert_converted("î", "i"); // b'\xee' 1349
     assert_converted("ś", "s"); // b'\\u015b' 1402
     assert_converted("ạ", "a"); // b'\\u1ea1' 1413
     assert_converted("Í", "I"); // b'\xcd' 1434
-    assert_converted("·", "."); // b'\xb7' 1514
+    assert_converted("·", " "); // b'\xb7' 1514
     assert_converted("š", "s"); // b'\\u0161' 1514
     assert_converted("ο", "o"); // b'\\u03bf' 1515
     assert_converted("ū", "u"); // b'\\u016b' 1523
@@ -312,7 +313,7 @@ mod tests {
     //assert_converted("😂", ""); // b'\\U0001f602' 1741
     assert_converted("Ó", "O"); // b'\xd3' 1774
     assert_converted("ư", "u"); // b'\\u01b0' 1794
-    assert_converted("•", ""); // b'\\u2022' 1948
+    assert_converted("•", " "); // b'\\u2022' 1948
     assert_converted("、", ","); // b'\\u3001' 2001
     assert_converted("ć", "c"); // b'\\u0107' 2017
     assert_converted("ę", "e"); // b'\\u0119' 2236

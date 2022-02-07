@@ -83,7 +83,7 @@ pub static LATIN_TO_ASCII_CHARACTER_MAP : Lazy<HashMap<String, String>> = Lazy::
   map.extend(table.iter().map(|item| (item.0.to_string(), item.1.to_string())));
 
   // Latin Extended-A
-  // https://unicode-table.com/en/0100/ (doesn't start here, though)
+  // https://unicode-table.com/en/blocks/latin-extended-a/
   map.extend([
     ("\u{0100}", "A"), // Ā Latin Capital Letter a with Macron
     ("\u{0101}", "a"), // ā Latin Small Letter a with Macron
@@ -101,9 +101,38 @@ pub static LATIN_TO_ASCII_CHARACTER_MAP : Lazy<HashMap<String, String>> = Lazy::
     ("\u{010D}", "c"), // č Latin Small Letter C with Caron
     ("\u{010E}", "D"), // Ď Latin Capital Letter D with Caron
     ("\u{010F}", "d"), // ď Latin Small Letter D with Caron
+    // TODO: Not done...
+    ("\u{015B}", "s"), // ś Latin Small Letter S with Acute
+    ("\u{0161}", "s"), // š Latin Small Letter S with Caron
+    ("\u{017C}", "z"), // ż Latin Small Letter Z with Dot Above
+    // TODO: Incomplete
+  ].iter().map(&to_owned));
 
-    // TODO: This is far from done...
-    
+  // Latin Extended-B
+  // https://unicode-table.com/en/blocks/latin-extended-b/
+  map.extend([
+    ("\u{01B0}", "u"), // ư Latin Small Letter U with Horn
+    ("\u{01B1}", "U"), // Ʊ Latin Capital Letter Upsilon (TODO: Not correct handling)
+    ("\u{01B3}", "Y"), // Ƴ Latin Capital Letter Y with Hook
+    ("\u{01B4}", "y"), // ƴ Latin Small Letter Y with Hook
+    ("\u{01B5}", "Z"), // Ƶ Latin Capital Letter Z with Stroke
+    // TODO: Incomplete
+  ].iter().map(&to_owned));
+
+  // Greek and Coptic
+  // https://unicode-table.com/en/blocks/greek-coptic/
+  map.extend([
+    ("\u{03BD}", "v"), // ν Greek Small Letter Nu (TODO: Incorrect handling, but very frequent.)
+    ("\u{03BF}", "o"), // ο Greek Small Letter Omicron (TODO: Incorrect handling, but very frequent.)
+    // TODO: Incomplete
+  ].iter().map(&to_owned));
+
+  // Latin Extended Additional
+  // https://unicode-table.com/en/blocks/latin-extended-additional/
+  map.extend([
+    ("\u{1EA1}", "a"), // ạ Latin Small Letter a with Dot Below
+    ("\u{1EB9}", "e"), // ẹ Latin Small Letter E with Dot Below
+    // TODO: Incomplete
   ].iter().map(&to_owned));
 
   // Misc characters that frequently occur
