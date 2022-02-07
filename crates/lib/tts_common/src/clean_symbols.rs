@@ -131,6 +131,12 @@ mod tests {
   }
 
   #[test]
+  fn symbol_expansion() {
+    assert_eq!(clean_symbols("Pokémon™ is a popular video game series"),
+               "Pokemon trademark  is a popular video game series".to_string()); // NB: Extra space
+  }
+
+  #[test]
   fn filters_latin_characters() {
     assert_eq!(clean_symbols("pokémon"), "pokemon".to_string());
     assert_eq!(clean_symbols("POKÉMON"), "POKEMON".to_string());
@@ -171,7 +177,7 @@ mod tests {
     assert_eq!(clean_symbols("ó"), "o".to_string());
     assert_eq!(clean_symbols("é"), "e".to_string());
     assert_eq!(clean_symbols("ñ"), "n".to_string());
-    assert_eq!(clean_symbols("ú"), "ú".to_string());
+    assert_eq!(clean_symbols("ú"), "u".to_string());
     assert_eq!(clean_symbols("ı"), "i".to_string()); // Dotless i
     assert_eq!(clean_symbols("ü"), "u".to_string());
     assert_eq!(clean_symbols("¿"), "?".to_string());
