@@ -338,6 +338,10 @@ class ApiConfig {
     return `${this.getScheme()}://${this.getNewApiHost()}/moderation/categories/${categoryToken}/delete`;
   }
 
+  detectLocale() : string {
+    return `${this.getScheme()}://${this.getNewApiHost()}/detect_locale`;
+  }
+
   obsEventsWebsocket(twitchUsername: string) : string {
     //return `ws://localhost:54321/obs/${twitchUsername}`;
     return `wss://obs.storyteller.io/obs/${twitchUsername}`;

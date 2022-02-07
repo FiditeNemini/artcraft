@@ -3,6 +3,7 @@ import './App.scss';
 
 import React from 'react';
 import { ApiConfig } from '@storyteller/components';
+import { DetectLocale, DetectLocaleIsOk } from '@storyteller/components/src/api/locale/DetectLocale';
 import { BrowserRouter, Route, Switch } from "react-router-dom";
 import { NewVocodesContainer } from './v2/view/NewVocodesContainer';
 import { OldVocodesContainer } from './v1/OldVocodesContainer';
@@ -56,6 +57,11 @@ interface State {
   // Show flash notice of vocodes name change
   isShowingVocodesNotice: boolean,
 
+  // Locale + show flash notice to Spanish speakers
+  //localeLanguageCodes: string[],
+  //localeFullLanguageTags: string[],
+  isShowingLanguageNotice: boolean,
+
   // Jobs enqueued during this browser session.
   ttsInferenceJobs: Array<TtsInferenceJob>,
   w2lInferenceJobs: Array<W2lInferenceJob>,
@@ -90,6 +96,10 @@ class App extends React.Component<Props, State> {
 
       isShowingVocodesNotice: props.flashVocodesNotice,
 
+      //localeLanguageCodes: [],
+      //localeFullLanguageTags: [],
+      isShowingLanguageNotice: false,
+
       ttsInferenceJobs: [],
       w2lInferenceJobs: [],
       ttsModelUploadJobs: [],
@@ -99,8 +109,9 @@ class App extends React.Component<Props, State> {
     }
   }
 
-  componentDidMount() {
+  async componentDidMount() {
     this.querySession();
+    await this.queryLanguage();
 
     setInterval(() => { this.querySession() }, 60000);
     // TODO: Use websockets, this is dumb
@@ -138,6 +149,16 @@ class App extends React.Component<Props, State> {
     .catch(e => { /* Ignore. */ });
   }
 
+  queryLanguage = async () => {
+    let locale = await DetectLocale();
+    if (DetectLocaleIsOk(locale)) {
+      const hasSpanish = locale.language_codes.indexOf("es") > -1;
+      this.setState({
+        isShowingLanguageNotice: hasSpanish,
+      });
+    }
+  }
+
   logoutSession = () => {
     const api = new ApiConfig();
     const endpointUrl = api.logout();
@@ -157,6 +178,10 @@ class App extends React.Component<Props, State> {
 
   clearVocodesNotice = () => {
     this.setState({ isShowingVocodesNotice: false })
+  }
+
+  clearLanguageNotice = () => {
+    this.setState({ isShowingLanguageNotice: false })
   }
 
   enqueueTtsJob = (jobToken: string) => {
@@ -422,6 +447,8 @@ class App extends React.Component<Props, State> {
 
                     isShowingVocodesNotice={this.state.isShowingVocodesNotice}
                     clearVocodesNotice={this.clearVocodesNotice}
+                    isShowingLangaugeNotice={this.state.isShowingLanguageNotice}
+                    clearLanguageNotice={this.clearLanguageNotice}
 
                     enqueueTtsJob={this.enqueueTtsJob}
                     ttsInferenceJobs={this.state.ttsInferenceJobs}

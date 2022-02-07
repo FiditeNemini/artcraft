@@ -18,6 +18,7 @@ import { ListTtsCategories, ListTtsCategoriesIsError, ListTtsCategoriesIsOk } fr
 import { MultiDropdownSearch } from './MultiDropdownSearch';
 import { SyntheticCategory, TtsCategoryType } from '../../../../AppWrapper';
 import { AutocompleteSearch } from './AutocompleteSearch';
+import { LanguageNotice } from './LanguageNotice';
 
 export interface EnqueueJobResponsePayload {
   success: boolean,
@@ -29,6 +30,8 @@ interface Props {
 
   isShowingVocodesNotice: boolean,
   clearVocodesNotice: () => void,
+  isShowingLanguageNotice: boolean,
+  clearLanguageNotice: () => void,
 
   enqueueTtsJob: (jobToken: string) => void,
   ttsInferenceJobs: Array<TtsInferenceJob>,
@@ -187,6 +190,10 @@ function TtsModelListFc(props: Props) {
       <VocodesNotice clearVocodesNotice={props.clearVocodesNotice} /> : 
       undefined;
 
+  const languageNotice = props.isShowingLanguageNotice? 
+      <LanguageNotice clearLanguageNotice={props.clearLanguageNotice} /> :
+      undefined;
+
   return (
     <div>
 
@@ -216,6 +223,8 @@ function TtsModelListFc(props: Props) {
       </section>
 
       <br />
+
+      {languageNotice}
 
       {vocodesNotice}
 

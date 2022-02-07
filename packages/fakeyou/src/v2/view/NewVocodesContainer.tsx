@@ -58,6 +58,9 @@ interface Props {
   isShowingVocodesNotice: boolean,
   clearVocodesNotice: () => void,
 
+  isShowingLangaugeNotice: boolean,
+  clearLanguageNotice: () => void,
+
   enqueueTtsJob: (jobToken: string) => void,
   ttsInferenceJobs: Array<TtsInferenceJob>,
 
@@ -381,6 +384,8 @@ class NewVocodesContainer extends React.Component<Props, State> {
                 sessionWrapper={this.props.sessionWrapper}
                 isShowingVocodesNotice={this.props.isShowingVocodesNotice}
                 clearVocodesNotice={this.props.clearVocodesNotice}
+                isShowingLanguageNotice={this.props.isShowingLangaugeNotice}
+                clearLanguageNotice={this.props.clearLanguageNotice}
                 enqueueTtsJob={this.props.enqueueTtsJob}
                 ttsInferenceJobs={this.props.ttsInferenceJobs}
                 ttsModelUploadJobs={this.props.ttsModelUploadJobs}

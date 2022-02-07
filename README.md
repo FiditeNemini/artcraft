@@ -15,6 +15,8 @@ To start the react server, run "yarn start-storyteller" or "yarn start-fakeyou"
 
 ```
 yarn install
+yarn start-fakeyou
+  OR
 yarn start-storyteller
 ```
 
