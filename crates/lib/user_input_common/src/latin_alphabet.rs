@@ -102,6 +102,7 @@ pub static LATIN_TO_ASCII_CHARACTER_MAP : Lazy<HashMap<String, String>> = Lazy::
     ("\u{010E}", "D"), // Ď Latin Capital Letter D with Caron
     ("\u{010F}", "d"), // ď Latin Small Letter D with Caron
     // TODO: Not done...
+    ("\u{0113}", "e"), // ē Latin Small Letter E with Macron
     ("\u{015B}", "s"), // ś Latin Small Letter S with Acute
     ("\u{0161}", "s"), // š Latin Small Letter S with Caron
     ("\u{017C}", "z"), // ż Latin Small Letter Z with Dot Above
@@ -116,7 +117,12 @@ pub static LATIN_TO_ASCII_CHARACTER_MAP : Lazy<HashMap<String, String>> = Lazy::
     ("\u{01B3}", "Y"), // Ƴ Latin Capital Letter Y with Hook
     ("\u{01B4}", "y"), // ƴ Latin Small Letter Y with Hook
     ("\u{01B5}", "Z"), // Ƶ Latin Capital Letter Z with Stroke
-    // TODO: Incomplete
+    // TODO: Incomplete...
+    ("\u{01D0}", "i"), // ǐ Latin Small Letter I with Caron
+    ("\u{01D1}", "O"), // Ǒ Latin Capital Letter O with Caron
+    ("\u{01D2}", "o"), // ǒ Latin Small Letter O with Caron
+    ("\u{01D3}", "U"), // Ǔ Latin Capital Letter U with Caron
+    ("\u{01D4}", "u"), // ǔ Latin Small Letter U with Caron
   ].iter().map(&to_owned));
 
   // Greek and Coptic

@@ -23,7 +23,17 @@ static REPLACEMENTS : Lazy<HashMap<String, String>> = Lazy::new(|| {
   // Spacing character replacements
   map.extend([
     ("\u{00A0}", " "), // Non-break space (aka &nbsp;) \xa0
+    ("\u{2003}", " "), // Em Space
+    ("\u{2004}", " "), // Three-Per-Em Space
     ("\u{2005}", " "), // Four-Per-Em Space
+    ("\u{2006}", " "), // Six-Per-Em Space
+    ("\u{2007}", " "), // Figure Space
+    ("\u{2008}", " "), // Punctuation Space
+    ("\u{2009}", " "), // Thin Space
+    ("\u{200A}", " "), // Hair Space
+    ("\u{200B}", " "), // Zero Width Space
+    ("\u{200C}", " "), // Zero Width Non-Joiner
+    ("\u{200D}", " "), // Zero Width Joiner
     ("\u{205F}", " "), // Medium Mathematical Space (MMSP)
     ("\u{2588}", " "), // Full Block
     ("\u{2800}", " "), // Braille Pattern Blank
