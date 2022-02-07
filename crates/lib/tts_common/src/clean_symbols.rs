@@ -244,9 +244,34 @@ mod tests {
   }
 
   #[test]
-  pub fn most_frequent_failures_10k_usages() {
+  pub fn most_frequent_failures_100k_usages() {
     // The leftmost number is the number of occurrences in our histogram of TTS failures
     // The order of the lines is reversed.
+    assert_converted("ñ", "n"); // b'\xf1' 105898
+    assert_converted("ó", "o"); // b'\xf3' 127099
+    assert_converted("í", "i"); // b'\xed' 132716
+    assert_converted("é", "e"); // b'\xe9' 140278
+    assert_converted("á", "a"); // b'\xe1' 184138
+    assert_converted("’", "'"); // b'\\u2019' 739079
+  }
+
+  #[test]
+  pub fn most_frequent_failures_20k_usages() {
+    assert_converted("ǐ", "i"); //  b'\\u01d0' 20236
+    assert_converted("ī", "i"); //  b'\\u012b' 20257
+    assert_converted("è", "e"); //  b'\xe8' 21121
+    assert_converted("°", " degrees "); //  b'\xb0' 22808
+    assert_converted("“", "\""); //  b'\\u201c' 27343
+    assert_converted("ü", "u"); // b'\xfc' 27955
+    assert_converted("”", "\""); // b'\\u201d' 28171
+    assert_converted("à", "a"); // b'\xe0' 34414
+    assert_converted("ı", "i"); // b'\\u0131' 44032
+    assert_converted("ú", "u"); // b'\xfa' 44043
+    assert_converted("…", "..."); // b'\\u2026' 49348
+  }
+
+  #[test]
+  pub fn most_frequent_failures_10k_usages() {
     assert_converted("ş", "s"); // b'\\u015f' 10006
     assert_converted(" ", " "); // b'\\u2005' 10118
     assert_converted("—", "-"); // b'\\u2014' 10555
@@ -260,23 +285,6 @@ mod tests {
     assert_converted("ō", "o"); //  b'\\u014d' 14329
     assert_converted("ā", "a"); //  b'\\u0101' 15927
     assert_converted("¡", "!"); //  b'\xa1' 17933
-    assert_converted("ǐ", "i"); //  b'\\u01d0' 20236
-    assert_converted("ī", "i"); //  b'\\u012b' 20257
-    assert_converted("è", "e"); //  b'\xe8' 21121
-    assert_converted("°", " degrees "); //  b'\xb0' 22808
-    assert_converted("“", "\""); //  b'\\u201c' 27343
-    assert_converted("ü", "u"); // b'\xfc' 27955
-    assert_converted("”", "\""); // b'\\u201d' 28171
-    assert_converted("à", "a"); // b'\xe0' 34414
-    assert_converted("ı", "i"); // b'\\u0131' 44032
-    assert_converted("ú", "u"); // b'\xfa' 44043
-    assert_converted("…", "..."); // b'\\u2026' 49348
-    assert_converted("ñ", "n"); // b'\xf1' 105898
-    assert_converted("ó", "o"); // b'\xf3' 127099
-    assert_converted("í", "i"); // b'\xed' 132716
-    assert_converted("é", "e"); // b'\xe9' 140278
-    assert_converted("á", "a"); // b'\xe1' 184138
-    assert_converted("’", "'"); // b'\\u2019' 739079
   }
 
   #[test]
