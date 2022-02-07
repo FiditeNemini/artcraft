@@ -3,85 +3,99 @@ use std::collections::HashMap;
 use unicode_segmentation::UnicodeSegmentation;
 use user_input_common::latin_alphabet::LATIN_TO_ASCII_CHARACTER_MAP;
 
+// Used to insert tables into hashmap
+fn deref_to_owned(item: (&String, &String)) -> (String, String) {
+  (item.0.to_string(), item.1.to_string())
+}
+
+fn to_owned(item: &(&str, &str)) -> (String, String) {
+  (item.0.to_string(), item.1.to_string())
+}
+
 // https://unicodelookup.com/#quo
 // http://www.geocities.ws/click2speak/unicode/chars_es.html
 static REPLACEMENTS : Lazy<HashMap<String, String>> = Lazy::new(|| {
   let mut map = HashMap::new();
 
   // Latin characters such as àáâãäå
-  map.extend(LATIN_TO_ASCII_CHARACTER_MAP.iter()
-      .map(|(k, v)| (k.to_string(), v.to_string())));
+  map.extend(LATIN_TO_ASCII_CHARACTER_MAP.iter().map(&deref_to_owned));
 
-  // Weird spacing characters
-  map.insert("\u{00a0}".to_string(), " ".to_string());  // Non-break space (aka &nbsp;) \xa0
-  map.insert("\u{2005}".to_string(), " ".to_string());  // Four-Per-Em Space
-  map.insert("\u{2588}".to_string(), " ".to_string());  // Full Block
-  map.insert("\u{205F}".to_string(), " ".to_string());  // Medium Mathematical Space (MMSP)
+  // Weird spacing character replacements
+  map.extend([
+    ("\u{00a0}", " "), // Non-break space (aka &nbsp;) \xa0
+    ("\u{2005}", " "), // Four-Per-Em Space
+    ("\u{205F}", " "), // Medium Mathematical Space (MMSP)
+    ("\u{2588}", " "), // Full Block
+  ].iter().map(&to_owned));
+
   // Quotes (single)
-  map.insert("\u{0060}".to_string(), "'".to_string()); // Grave Accent
-  map.insert("\u{00B4}".to_string(), "'".to_string()); // Acute Accent
-  map.insert("\u{2018}".to_string(), "'".to_string()); // Left Single Quotation Mark
-  map.insert("\u{2019}".to_string(), "'".to_string()); // Right Single Quotation Mark
-  map.insert("\u{201A}".to_string(), "'".to_string()); // Single Low-9 Quotation Mark
-  map.insert("\u{201B}".to_string(), "'".to_string()); // Single High-Revered-9 Quotation Mark
+  map.extend([
+    ("\u{0060}", "'"), // Grave Accent
+    ("\u{00B4}", "'"), // Acute Accent
+    ("\u{2018}", "'"), // Left Single Quotation Mark
+    ("\u{2019}", "'"), // Right Single Quotation Mark
+    ("\u{201A}", "'"), // Single Low-9 Quotation Mark
+    ("\u{201B}", "'"), // Single High-Revered-9 Quotation Mark
+  ].iter().map(&to_owned));
+
   // Quotes (double)
-  map.insert("\u{201C}".to_string(), "\"".to_string()); // Left Double Quotation Mark
-  map.insert("\u{201D}".to_string(), "\"".to_string()); // Right Double Quotation Mark
-  map.insert("\u{201E}".to_string(), "\"".to_string()); // Double Low-9 Quotation Mark
-  map.insert("\u{201F}".to_string(), "\"".to_string()); // Double High-Reversed-9 Quotation Mark
-  map.insert("\u{301D}".to_string(), "\"".to_string()); // Reversed Double Prime Quotation Mark
-  map.insert("\u{301E}".to_string(), "\"".to_string()); // Double Prime Quotation Mark
-  map.insert("\u{301F}".to_string(), "\"".to_string()); // Low Double Prime Quotation Mark
-  map.insert("\u{FF02}".to_string(), "\"".to_string()); // Fullwidth Quotation Mark
+  map.extend([
+    ("\u{201C}", "\""), // Left Double Quotation Mark
+    ("\u{201D}", "\""), // Right Double Quotation Mark
+    ("\u{201E}", "\""), // Double Low-9 Quotation Mark
+    ("\u{201F}", "\""), // Double High-Reversed-9 Quotation Mark
+    ("\u{301D}", "\""), // Reversed Double Prime Quotation Mark
+    ("\u{301E}", "\""), // Double Prime Quotation Mark
+    ("\u{301F}", "\""), // Low Double Prime Quotation Mark
+    ("\u{FF02}", "\""), // Fullwidth Quotation Mark
+  ].iter().map(&to_owned));
+
   // Dashes
-  map.insert("\u{2010}".to_string(), "-".to_string()); // Hyphen
-  map.insert("\u{2011}".to_string(), "-".to_string()); // Non-Breaking Hyphen
-  map.insert("\u{2013}".to_string(), "-".to_string()); // En Dash
-  map.insert("\u{2014}".to_string(), "-".to_string()); // Em Dash
-  map.insert("\u{2015}".to_string(), "-".to_string()); // Horizontal Bar
-  map.insert("\u{2E3A}".to_string(), "-".to_string()); // Two-Em Dash
-  map.insert("\u{2E3B}".to_string(), "-".to_string()); // Three-Em Dash
-  map.insert("\u{FE58}".to_string(), "-".to_string()); // Small Em Dash
-  map.insert("\u{FE63}".to_string(), "-".to_string()); // Small Hyphen-Minus
-  map.insert("\u{FF0D}".to_string(), "-".to_string()); // Fullwidth Hyphen-Minus
-  // Ellipsis
-  map.insert("…".to_string(), "...".to_string());
-  // Commas
-  map.insert("\u{3001}".to_string(), ",".to_string());
+  map.extend([
+    ("\u{2010}", "-"), // Hyphen
+    ("\u{2011}", "-"), // Non-Breaking Hyphen
+    ("\u{2013}", "-"), // En Dash
+    ("\u{2014}", "-"), // Em Dash
+    ("\u{2015}", "-"), // Horizontal Bar
+    ("\u{2E3A}", "-"), // Two-Em Dash
+    ("\u{2E3B}", "-"), // Three-Em Dash
+    ("\u{FE58}", "-"), // Small Em Dash
+    ("\u{FE63}", "-"), // Small Hyphen-Minus
+    ("\u{FF0D}", "-"), // Fullwidth Hyphen-Minus
+  ].iter().map(&to_owned));
+
   // Spanish special characters
-  map.insert("\u{A1}".to_string(), "!".to_string());  // Inverted exclamation mark
-  map.insert("\u{BF}".to_string(), "?".to_string());  // Inverted question mark
-  map.insert("\u{AA}".to_string(), "a".to_string());  // Feminine ordinal
-  map.insert("\u{BA}".to_string(), "o".to_string());  // Masculine ordinal
+  map.extend([
+    ("\u{A1}", "!"), // Inverted exclamation mark
+    ("\u{BF}", "?"), // Inverted question mark
+    ("\u{AA}", "a"), // Feminine ordinal
+    ("\u{BA}", "o"), // Masculine ordinal
+  ].iter().map(&to_owned));
+
+  // Misc
+  map.insert("…".to_string(), "...".to_string()); // Ellipsis
+  map.insert("\u{3001}".to_string(), ",".to_string()); // Commas
+
   // Misc characters that frequently occur
   map.insert("\u{203C}".to_string(), "!!".to_string());  // Double Exclamation Mark
 
   // Close enough to existing allowed punctuation
-  let punctuation = [
+  map.extend([
     ("\u{3002}", "."), // idiographic full stop
-  ];
-
-  map.extend(punctuation.iter()
-      .map(|(k, v)| (k.to_string(), v.to_string())));
+  ].iter().map(&to_owned));
 
   // Symbols we can insert as words
-  let phonetic_replacements = [
+  map.extend([
     ("\u{B0}", " degrees "), // degree sign
     ("\u{03C0}", " pie "), // greek small letter pi
     ("\u{2122}", " trademark "), // trade mark sign
-  ];
-
-  map.extend(phonetic_replacements.iter()
-      .map(|(k, v)| (k.to_string(), v.to_string())));
+  ].iter().map(&to_owned));
 
   // These shouldn't be in the output at all
-  let remove_replacements = [
+  map.extend([
     ("\u{b7}", ""), // middle dot
     ("\u{2022}", ""), // bullet
-  ];
-
-  map.extend(remove_replacements.iter()
-      .map(|(k, v)| (k.to_string(), v.to_string())));
+  ].iter().map(&to_owned));
 
   map
 });
