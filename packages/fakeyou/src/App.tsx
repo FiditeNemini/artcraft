@@ -162,7 +162,7 @@ class App extends React.Component<Props, State> {
       const hasIndonesian = locale.language_codes.indexOf("id") > -1;
       const hasGerman = locale.language_codes.indexOf("de") > -1;
       const hasJapanese = locale.language_codes.indexOf("ja") > -1;
-      const showNotice = hasSpanish || hasPortuguese || hasTurkish || hasIndonesian || hasGerman || hasJapanese;
+      const showNotice = hasSpanish || hasPortuguese || hasTurkish; //|| hasIndonesian || hasGerman || hasJapanese;
 
       let displayLanguage = Language.English;
 
