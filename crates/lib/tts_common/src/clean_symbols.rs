@@ -70,16 +70,16 @@ static REPLACEMENTS : Lazy<HashMap<String, String>> = Lazy::new(|| {
 
   // Dashes
   map.extend([
-    ("\u{2010}", "-"), // Hyphen
-    ("\u{2011}", "-"), // Non-Breaking Hyphen
-    ("\u{2013}", "-"), // En Dash
-    ("\u{2014}", "-"), // Em Dash
-    ("\u{2015}", "-"), // Horizontal Bar
-    ("\u{2E3A}", "-"), // Two-Em Dash
-    ("\u{2E3B}", "-"), // Three-Em Dash
-    ("\u{FE58}", "-"), // Small Em Dash
-    ("\u{FE63}", "-"), // Small Hyphen-Minus
-    ("\u{FF0D}", "-"), // Fullwidth Hyphen-Minus
+    ("\u{2010}", "-"), // ‐ Hyphen
+    ("\u{2011}", "-"), // ‑ Non-Breaking Hyphen
+    ("\u{2013}", "-"), // – En Dash
+    ("\u{2014}", "-"), // — Em Dash
+    ("\u{2015}", "-"), // ― Horizontal Bar
+    ("\u{2E3A}", "-"), // ⸺ Two-Em Dash
+    ("\u{2E3B}", "-"), // ⸻ Three-Em Dash
+    ("\u{FE58}", "-"), // ﹘ Small Em Dash
+    ("\u{FE63}", "-"), // ﹣ Small Hyphen-Minus
+    ("\u{FF0D}", "-"), // － Fullwidth Hyphen-Minus
   ].iter().map(&to_owned));
 
   // Close enough to existing allowed punctuation
@@ -112,6 +112,8 @@ static REPLACEMENTS : Lazy<HashMap<String, String>> = Lazy::new(|| {
   map
 });
 
+/// Tacotron chokes on Unicode, latin characters, special punctuation, emoji, etc.
+/// We attempt to turn as much as possible into ASCII and a reduced set of symbols.
 pub fn clean_symbols(input_text: &str) -> String {
   let segmented= UnicodeSegmentation::graphemes(input_text, true)
       .map(|segment| {
