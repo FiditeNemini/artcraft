@@ -55,6 +55,34 @@ static REPLACEMENTS : Lazy<HashMap<String, String>> = Lazy::new(|| {
   map.insert("\u{BA}".to_string(), "o".to_string());  // Masculine ordinal
   // Misc characters that frequently occur
   map.insert("\u{203C}".to_string(), "!!".to_string());  // Double Exclamation Mark
+
+  // Close enough to existing allowed punctuation
+  let punctuation = [
+    ("\u{3002}", "."), // idiographic full stop
+  ];
+
+  map.extend(punctuation.iter()
+      .map(|(k, v)| (k.to_string(), v.to_string())));
+
+  // Symbols we can insert as words
+  let phonetic_replacements = [
+    ("\u{B0}", " degrees "), // degree sign
+    ("\u{03C0}", " pie "), // greek small letter pi
+    ("\u{2122}", " trademark "), // trade mark sign
+  ];
+
+  map.extend(phonetic_replacements.iter()
+      .map(|(k, v)| (k.to_string(), v.to_string())));
+
+  // These shouldn't be in the output at all
+  let remove_replacements = [
+    ("\u{b7}", ""), // middle dot
+    ("\u{2022}", ""), // bullet
+  ];
+
+  map.extend(remove_replacements.iter()
+      .map(|(k, v)| (k.to_string(), v.to_string())));
+
   map
 });
 
