@@ -6,6 +6,8 @@ use unicode_segmentation::UnicodeSegmentation;
 pub static LATIN_TO_ASCII_CHARACTER_MAP : Lazy<HashMap<String, String>> = Lazy::new(|| {
   // NB: Note that certain latin characters map to multiple ascii characters, eg. "AE".
   let table = [
+    ("\u{AA}", "a"), // Feminine ordinal
+    ("\u{BA}", "o"), // Masculine ordinal
     ("\u{C0}", "A"), // Latin capital letter A with grave
     ("\u{C1}", "A"), // Latin capital letter A with acute
     ("\u{C2}", "A"), // Latin capital letter A with circumflex
@@ -22,18 +24,21 @@ pub static LATIN_TO_ASCII_CHARACTER_MAP : Lazy<HashMap<String, String>> = Lazy::
     ("\u{CD}", "I"), // Latin capital letter I with acute
     ("\u{CE}", "I"), // Latin capital letter I with circumflex
     ("\u{CF}", "I"), // Latin capital letter I with diaeresis
+    ("\u{D0}", "D"), // Latin capital letter ETH (~D) TODO: How to handle this?
     ("\u{D1}", "N"), // Latin capital letter N with tilde
     ("\u{D2}", "O"), // Latin capital letter O with grave
     ("\u{D3}", "O"), // Latin capital letter O with acute
     ("\u{D4}", "O"), // Latin capital letter O with circumflex
     ("\u{D5}", "O"), // Latin capital letter O with tilde
     ("\u{D6}", "O"), // Latin capital letter O with diaeresis
-    ("\u{D8}", "O"), // Latin capital letter O with stroke (NB: Skips D7)
+    ("\u{D8}", "O"), // Latin capital letter O with stroke (NB: Skips D7 multiplication sign)
     ("\u{D9}", "U"), // Latin capital letter U with grave
     ("\u{DA}", "U"), // Latin capital letter U with acute
     ("\u{DB}", "U"), // Latin capital letter U with circumflex
     ("\u{DC}", "U"), // Latin capital letter U with diaeresis
     ("\u{DD}", "Y"), // Latin capital letter Y with acute
+    ("\u{DE}", "P"), // Latin capital letter THORN (~P) TODO: How to handle this?
+    ("\u{DF}", "b"), // Latin small letter sharp s (~B) TODO: How to handle this?
     ("\u{E0}", "a"), // Latin small letter a with grave
     ("\u{E1}", "a"), // Latin small letter a with acute
     ("\u{E2}", "a"), // Latin small letter a with circumflex
@@ -50,26 +55,29 @@ pub static LATIN_TO_ASCII_CHARACTER_MAP : Lazy<HashMap<String, String>> = Lazy::
     ("\u{ED}", "i"), // Latin small letter i with acute
     ("\u{EE}", "i"), // Latin small letter i with circumflex
     ("\u{EF}", "i"), // Latin small letter i with diaeresis
+    ("\u{F0}", "d"), // Latin capital letter eth (~d) TODO: How to handle this?
     ("\u{F1}", "n"), // Lower n tilde
-    ("\u{AA}", "a"), // Feminine ordinal
-    ("\u{BA}", "o"), // Masculine ordinal
+    ("\u{F2}", "o"), // Latin small letter o with grave
+    ("\u{F3}", "o"), // Latin small letter o with acute
+    ("\u{F4}", "o"), // Latin small letter o with circumflex
+    ("\u{F5}", "o"), // Latin small letter o with tilde
+    ("\u{F6}", "o"), // Latin small letter o with diaeresis
+    ("\u{F8}", "o"), // Latin small letter o with stroke (NB: Skips F7 division sign)
+    ("\u{F9}", "u"), // Latin small letter u with grave
+    ("\u{FA}", "u"), // Latin small letter u with acute
+    ("\u{FB}", "u"), // Latin small letter u with circumflex
+    ("\u{FC}", "u"), // Latin small letter u with diaeresis
+    ("\u{FD}", "y"), // Latin small letter y with acute
+    ("\u{FE}", "p"), // Latin small letter thorn (~p) TODO: How to handle this?
+    ("\u{FF}", "y"), // Latin small letter y with diaeresis
+
+    // TODO: There are a lot more to go...
   ];
 
   let mut map = HashMap::new();
 
   map.extend(table.iter().map(|item| (item.0.to_string(), item.1.to_string())));
 
-  // Latin characters with accent (ETH)
-  // map.insert("\u{D0}".to_string(), "D".to_string()); // Latin capital letter eth
-  // Latin characters with accent (N)
-  // Latin characters with accent (THORN)
-  // map.insert("\u{DE}".to_string(), "P".to_string()); // Latin capital letter thorn
-  // Latin characters with accent (SHARP S)
-  // map.insert("\u{DF}".to_string(), "B".to_string()); // Latin capital letter sharp s
-  // Latin characters with accent (a)
-  // Latin characters with accent (eth)
-  // map.insert("\u{F0}".to_string(), "d".to_string()); // Latin small letter eith
-  // Spanish special characters
   // Misc characters that frequently occur
   map.insert("\u{00F3}".to_string(), "o".to_string());  // Latin Small Letter O with Acute
   map.insert("\u{0131}".to_string(), "i".to_string());  // Latin Small Letter Dotless I
@@ -125,5 +133,7 @@ mod tests {
     assert_eq!(latin_to_ascii("ç"), "c".to_string());
     assert_eq!(latin_to_ascii("èéêë"), "eeee".to_string());
     assert_eq!(latin_to_ascii("ìíîï"), "iiii".to_string());
+    assert_eq!(latin_to_ascii("òóôõöø"), "oooooo".to_string());
+    assert_eq!(latin_to_ascii("ùúûü"), "uuuu".to_string());
   }
 }
