@@ -27,9 +27,14 @@ pub struct TtsInferenceJobRecord {
   pub maybe_creator_user_token: Option<String>,
   pub creator_set_visibility: RecordVisibility,
 
+  pub is_from_api: i8,
+  pub is_for_twitch: i8,
+
   pub status: String, // TODO
+  pub priority_level: u8,
   pub attempt_count: i32,
   pub failure_reason: Option<String>,
+
   pub created_at: chrono::DateTime<Utc>,
   pub updated_at: chrono::DateTime<Utc>,
   pub retry_at: Option<chrono::DateTime<Utc>>,
@@ -55,7 +60,11 @@ SELECT
   maybe_creator_user_token,
   creator_set_visibility as `creator_set_visibility: crate::database::enums::record_visibility::RecordVisibility`,
 
+  is_from_api,
+  is_for_twitch,
+
   status,
+  priority_level,
   attempt_count,
   failure_reason,
   created_at,

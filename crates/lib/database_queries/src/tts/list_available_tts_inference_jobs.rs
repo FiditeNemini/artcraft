@@ -1,10 +1,11 @@
 use anyhow::anyhow;
 use chrono::{Utc, DateTime};
 use container_common::anyhow_result::AnyhowResult;
+use crate::column_types::job_status::JobStatus;
 use crate::column_types::record_visibility::RecordVisibility;
+use crate::helpers::boolean_converters::i8_to_bool;
 use log::{warn, info};
 use sqlx::MySqlPool;
-use crate::helpers::boolean_converters::i8_to_bool;
 
 /// table: tts_inference_jobs
 #[derive(Debug)]
@@ -23,7 +24,7 @@ pub struct TtsInferenceJob {
   pub is_from_api: bool,
   pub is_for_twitch: bool,
 
-  pub status: String, // TODO: Enum
+  pub status: JobStatus,
   pub priority_level: u8,
   pub attempt_count: i32,
   pub failure_reason: Option<String>,
@@ -33,6 +34,7 @@ pub struct TtsInferenceJob {
   pub retry_at: Option<chrono::DateTime<Utc>>,
 }
 
+/// Query jobs that are ready to run
 pub async fn query_tts_inference_job_records(
   pool: &MySqlPool,
   num_records: u32
@@ -56,7 +58,7 @@ SELECT
   is_from_api,
   is_for_twitch,
 
-  status,
+  status as `status: crate::column_types::job_status::JobStatus`,
   priority_level,
   attempt_count,
   failure_reason,
@@ -125,7 +127,7 @@ pub struct TtsInferenceJobRawInternal {
   pub is_from_api: i8,
   pub is_for_twitch: i8,
 
-  pub status: String,
+  pub status: JobStatus,
   pub priority_level: u8,
   pub attempt_count: i32,
   pub failure_reason: Option<String>,
