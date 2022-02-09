@@ -8,6 +8,7 @@
 # Stuff we care about
 fake_you
 fakeyou
+hanashi
 monogatari
 storied
 stories
@@ -19,6 +20,7 @@ vocode
 vocoder
 vocoders
 vocodes
+voxelcam
 
 # Types of models
 first_order_model

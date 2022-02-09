@@ -7,3 +7,4 @@ storyteller
 test
 vocode
 vocodes
+voxelcam
