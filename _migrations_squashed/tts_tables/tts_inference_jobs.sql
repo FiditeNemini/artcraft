@@ -57,6 +57,11 @@ CREATE TABLE tts_inference_jobs (
     'private'
   ) NOT NULL DEFAULT 'public',
 
+  -- ========== SOURCE METADATA ==========
+
+  is_from_api BOOLEAN NOT NULL DEFAULT FALSE,
+  is_for_twitch BOOLEAN NOT NULL DEFAULT FALSE,
+
   -- ========== JOB SYSTEM DETAILS ==========
 
   -- Jobs begin as "pending", then transition to other states.

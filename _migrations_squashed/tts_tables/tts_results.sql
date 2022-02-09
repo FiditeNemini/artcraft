@@ -72,6 +72,11 @@ CREATE TABLE tts_results (
   file_size_bytes INT(10) NOT NULL DEFAULT 0,
   duration_millis INT(10) NOT NULL DEFAULT 0,
 
+  -- ========== SOURCE METADATA ==========
+
+  is_from_api BOOLEAN NOT NULL DEFAULT FALSE,
+  is_for_twitch BOOLEAN NOT NULL DEFAULT FALSE,
+
   -- ========== MODERATION DETAILS ==========
 
   -- The last moderator that made changes.
