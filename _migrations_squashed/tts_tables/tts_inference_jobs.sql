@@ -84,7 +84,13 @@ CREATE TABLE tts_inference_jobs (
       'attempt_failed',
       'dead') NOT NULL DEFAULT 'pending',
 
-    -- We can track this against a "max_attempt_count"
+  -- Priority *increases*, so a level of 2 will be higher than 1.
+  -- By default, all jobs from FakeYou have level 0.
+  -- Twitch TTS has level 1.
+  -- Paid Twitch and Paid API have level 2.
+  priority_level TINYINT UNSIGNED NOT NULL DEFAULT 0,
+
+  -- We can track this against a "max_attempt_count"
   attempt_count INT(3) NOT NULL DEFAULT 0,
 
   -- If there is a failure, tell the user why.
