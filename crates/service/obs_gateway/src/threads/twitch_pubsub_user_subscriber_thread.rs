@@ -557,7 +557,8 @@ impl TwitchPubsubUserSubscriberThreadStageTwo {
   async fn write_tts_inference_event(&mut self, tts_text: &str) -> AnyhowResult<()> {
     let sanitized_text = remove_cheers(tts_text);
     let job_token = Tokens::new_tts_inference_job()?;
-    let model_token = "TM:7wbtjphx8h8v"; // "Mario *" voice.
+    //let model_token = "TM:7wbtjphx8h8v"; // "Mario *" voice (prod)
+    let model_token = "TM:40m3aqtt41y0"; // "Wakko" voice (dev)
 
     let mut builder = TtsInferenceJobInsertBuilder::new_for_internal_tts()
         .set_job_token(&job_token)

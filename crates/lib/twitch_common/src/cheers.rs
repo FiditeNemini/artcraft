@@ -74,7 +74,10 @@ static TWITCH_CHEER_REGEX : Lazy<Regex> = Lazy::new(|| {
   }
 
   let regex = regex_pieces.join("|");
-  let regex = format!("({})", regex);
+
+  // NB: (?i) is case insensitive search
+  // https://docs.rs/regex/1.5.4/regex/#structs
+  let regex = format!("(?i)({})", regex);
 
   Regex::new(&regex).unwrap()
 });
@@ -90,5 +93,14 @@ mod tests {
 
     let r = remove_cheers("Kappa1 SeemsGood100 no more Cheer1 cheers");
     assert_eq!(&r, "no more cheers");
+  }
+
+  #[test]
+  fn test_remove_cheers_case_insensitive() {
+    let r = remove_cheers("testing cheer1");
+    assert_eq!(&r, "testing");
+
+    let r = remove_cheers("TESTING CHEER1");
+    assert_eq!(&r, "TESTING");
   }
 }
