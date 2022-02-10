@@ -11,6 +11,9 @@ use log::{warn, info};
 use sqlx::MySqlPool;
 use std::path::Path;
 
+// TODO(2022-02-10): Move these queries to the 'database_queries' crate
+//  I moved tts_inference_job queries out already.
+
 /// table: w2l_inference_jobs
 #[derive(Debug)]
 pub struct W2lInferenceJobRecord {

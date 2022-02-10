@@ -9,7 +9,7 @@ use crate::twitch::pubsub::build_pubsub_topics_for_user::build_pubsub_topics_for
 use crate::twitch::twitch_user_id::TwitchUserId;
 use crate::twitch::websocket_client::TwitchWebsocketClient;
 use database_queries::tokens::Tokens;
-use database_queries::tts::insert_tts_inference_job::TtsInferenceJobInsertBuilder;
+use database_queries::tts::tts_inference_jobs::insert_tts_inference_job::TtsInferenceJobInsertBuilder;
 use database_queries::twitch_oauth::find::{TwitchOauthTokenRecord, TwitchOauthTokenFinder};
 use database_queries::twitch_oauth::insert::TwitchOauthTokenInsertBuilder;
 use database_queries::twitch_pubsub::insert_bits::TwitchPubsubBitsInsertBuilder;

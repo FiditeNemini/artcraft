@@ -4,13 +4,14 @@ use container_common::anyhow_result::AnyhowResult;
 use crate::column_types::job_status::JobStatus;
 use crate::column_types::record_visibility::RecordVisibility;
 use crate::helpers::boolean_converters::i8_to_bool;
+use crate::tts::tts_inference_jobs::_keys::TtsInferenceJobId;
 use log::{warn, info};
 use sqlx::MySqlPool;
 
 /// table: tts_inference_jobs
 #[derive(Debug)]
-pub struct TtsInferenceJob {
-  pub id: i64,
+pub struct AvailableTtsInferenceJob {
+  pub id: TtsInferenceJobId,
   pub inference_job_token: String,
   pub uuid_idempotency_token: String,
 
@@ -35,13 +36,13 @@ pub struct TtsInferenceJob {
 }
 
 /// Query jobs that are ready to run
-pub async fn query_tts_inference_job_records(
+pub async fn list_available_tts_inference_jobs(
   pool: &MySqlPool,
   num_records: u32
-) -> AnyhowResult<Vec<TtsInferenceJob>> {
+) -> AnyhowResult<Vec<AvailableTtsInferenceJob>> {
 
-  let job_records : Vec<TtsInferenceJobRawInternal> = sqlx::query_as!(
-      TtsInferenceJobRawInternal,
+  let job_records : Vec<AvailableTtsInferenceJobRawInternal> = sqlx::query_as!(
+      AvailableTtsInferenceJobRawInternal,
         r#"
 SELECT
   id,
@@ -85,9 +86,9 @@ WHERE
       .await?;
 
   let job_records = job_records.into_iter()
-      .map(|record : TtsInferenceJobRawInternal| {
-        TtsInferenceJob {
-          id: record.id,
+      .map(|record : AvailableTtsInferenceJobRawInternal| {
+        AvailableTtsInferenceJob {
+          id: TtsInferenceJobId(record.id),
           inference_job_token: record.inference_job_token,
           uuid_idempotency_token: record.uuid_idempotency_token,
           model_token: record.model_token,
@@ -106,13 +107,13 @@ WHERE
           retry_at: record.retry_at,
         }
       })
-      .collect::<Vec<TtsInferenceJob>>();
+      .collect::<Vec<AvailableTtsInferenceJob>>();
 
   Ok(job_records)
 }
 
 #[derive(Debug)]
-pub struct TtsInferenceJobRawInternal {
+struct AvailableTtsInferenceJobRawInternal {
   pub id: i64,
   pub inference_job_token: String,
   pub uuid_idempotency_token: String,

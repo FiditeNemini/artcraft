@@ -7,8 +7,8 @@ use container_common::anyhow_result::AnyhowResult;
 /// See: https://www.gitmemory.com/issue/launchbadge/sqlx/1241/847154375
 /// eg. job_status as `job_status: crate::column_types::job_status::JobStatus`
 #[derive(Clone, Copy, PartialEq, Eq, Debug, Serialize, Deserialize, sqlx::Type)]
-#[serde(rename_all = "lowercase")]
-#[sqlx(rename_all = "lowercase")]
+#[serde(rename_all = "snake_case")]
+#[sqlx(rename_all = "snake_case")]
 pub enum JobStatus {
   Pending,
   Started,

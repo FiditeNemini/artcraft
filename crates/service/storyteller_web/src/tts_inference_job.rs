@@ -24,19 +24,8 @@ use config::shared_constants::DEFAULT_RUST_LOG;
 use container_common::anyhow_result::AnyhowResult;
 use container_common::token::random_uuid::generate_random_uuid;
 use crate::common_env::CommonEnv;
-use crate::database::enums::vocoder_type::VocoderType;
 use crate::database::mediators::firehose_publisher::FirehosePublisher;
 use crate::http_clients::tts_inference_sidecar_client::TtsInferenceSidecarClient;
-use crate::job_queries::tts_inference_job_queries::TtsInferenceJobRecord;
-use crate::job_queries::tts_inference_job_queries::TtsModelForInferenceError;
-use crate::job_queries::tts_inference_job_queries::TtsModelForInferenceRecord;
-use crate::job_queries::tts_inference_job_queries::get_tts_model_by_token;
-use crate::job_queries::tts_inference_job_queries::grab_job_lock_and_mark_pending;
-use crate::job_queries::tts_inference_job_queries::insert_tts_result;
-use crate::job_queries::tts_inference_job_queries::mark_tts_inference_job_done;
-use crate::job_queries::tts_inference_job_queries::mark_tts_inference_job_failure;
-use crate::job_queries::tts_inference_job_queries::mark_tts_inference_job_permanently_dead;
-use crate::job_queries::tts_inference_job_queries::query_tts_inference_job_records;
 use crate::script_execution::tacotron_inference_command::TacotronInferenceCommand;
 use crate::util::buckets::bucket_client::BucketClient;
 use crate::util::buckets::bucket_path_unifier::BucketPathUnifier;
@@ -55,6 +44,14 @@ use crate::util::noop_logger::NoOpLogger;
 use crate::util::redis::redis_job_status_logger::RedisJobStatusLogger;
 use crate::util::semi_persistent_cache_dir::SemiPersistentCacheDir;
 use data_encoding::{HEXUPPER, HEXLOWER, HEXLOWER_PERMISSIVE};
+use database_queries::column_types::vocoder_type::VocoderType;
+use database_queries::tts::tts_inference_jobs::list_available_tts_inference_jobs::{AvailableTtsInferenceJob, list_available_tts_inference_jobs};
+use database_queries::tts::tts_inference_jobs::mark_tts_inference_job_done::mark_tts_inference_job_done;
+use database_queries::tts::tts_inference_jobs::mark_tts_inference_job_failure::mark_tts_inference_job_failure;
+use database_queries::tts::tts_inference_jobs::mark_tts_inference_job_pending_and_grab_lock::mark_tts_inference_job_pending_and_grab_lock;
+use database_queries::tts::tts_inference_jobs::mark_tts_inference_job_permanently_dead::mark_tts_inference_job_permanently_dead;
+use database_queries::tts::tts_models::get_tts_model_for_inference::{get_tts_model_for_inference, TtsModelForInferenceError, TtsModelForInferenceRecord};
+use database_queries::tts::tts_results::insert_tts_result::insert_tts_result;
 use log::{warn, info, error};
 use newrelic_telemetry::Client as NewRelicClient;
 use newrelic_telemetry::ClientBuilder;
@@ -332,12 +329,10 @@ async fn main_loop(inferencer: Inferencer) {
   loop {
     let num_records = inferencer.job_batch_size;
 
-    let query_result = query_tts_inference_job_records(
-      &inferencer.mysql_pool,
-      num_records)
-        .await;
+    let maybe_available_jobs
+        = list_available_tts_inference_jobs(&inferencer.mysql_pool, num_records).await;
 
-    let jobs = match query_result {
+    let jobs = match maybe_available_jobs {
       Ok(jobs) => jobs,
       Err(e) => {
         warn!("Error querying jobs: {:?}", e);
@@ -385,7 +380,7 @@ async fn main_loop(inferencer: Inferencer) {
 /// Process a batch of jobs, returning the count of cold-cache skipped jobs.
 async fn process_jobs(
   inferencer: &Inferencer,
-  jobs: Vec<TtsInferenceJobRecord>,
+  jobs: Vec<AvailableTtsInferenceJob>,
 ) -> AnyhowResult<Vec<Span>> {
 
   let mut batch_spans = Vec::new();
@@ -423,7 +418,7 @@ async fn process_jobs(
 
           let _r = mark_tts_inference_job_permanently_dead(
             &inferencer.mysql_pool,
-            &job,
+            job.id,
             failure_reason
           ).await;
         } else {
@@ -552,25 +547,17 @@ impl std::error::Error for ModelStateError {}
 impl ModelState {
   /// Query the model details and see if the model file is on the filesystem in one go.
   pub async fn query_model_and_check_filesystem(
-    job: &TtsInferenceJobRecord,
+    job: &AvailableTtsInferenceJob,
     mysql_pool: &MySqlPool,
     semi_persistent_cache: &SemiPersistentCacheDir,
     virtual_cache: &SyncVirtualLfuCache,
   ) -> Result<Self, ModelStateError> {
     info!("Looking up TTS model by token: {}", &job.model_token);
 
-    let tts_model = get_tts_model_by_token(
+    let tts_model = get_tts_model_for_inference(
       &mysql_pool,
       &job.model_token
     ).await?;
-
-    /*let model_record = match query_result {
-      Ok(model) => model,
-      Err(e) => {
-        error!("TTS model lookup error: {}, reason: {:?}", &job.model_token, &e);
-        return Err(e)
-      },
-    };*/
 
     let tts_synthesizer_fs_path = semi_persistent_cache.tts_synthesizer_model_path(
       &tts_model.model_token);
@@ -595,7 +582,7 @@ impl ModelState {
 
 async fn process_job(
   inferencer: &Inferencer,
-  job: &TtsInferenceJobRecord,
+  job: &AvailableTtsInferenceJob,
   model_record: &TtsModelForInferenceRecord,
 ) -> AnyhowResult<(Span, Span)> {
 
@@ -641,10 +628,11 @@ async fn process_job(
 
   // ==================== ATTEMPT TO GRAB JOB LOCK ==================== //
 
-  let lock_acquired = grab_job_lock_and_mark_pending(&inferencer.mysql_pool, job).await?;
+  let lock_acquired =
+      mark_tts_inference_job_pending_and_grab_lock(&inferencer.mysql_pool, job.id).await?;
 
   if !lock_acquired {
-    warn!("Could not acquire job lock for: {}", &job.id);
+    warn!("Could not acquire job lock for: {:?}", &job.id);
     let duration = start.elapsed();
 
     since_creation_span.set_attribute("status", "failure");
@@ -773,7 +761,7 @@ async fn process_job(
 
   // ==================== WRITE TEXT TO FILE ==================== //
 
-  let temp_dir = format!("temp_tts_inference_{}", job.id);
+  let temp_dir = format!("temp_tts_inference_{}", job.id.0);
   let temp_dir = TempDir::new(&temp_dir)?; // NB: Exists until it goes out of scope.
 
   let text_input_fs_path = temp_dir.path().join("inference_input.txt");
@@ -905,7 +893,7 @@ async fn process_job(
   info!("Marking job complete...");
   mark_tts_inference_job_done(
     &inferencer.mysql_pool,
-    job,
+    job.id,
     true,
     Some(&inference_result_token)
   ).await?;
@@ -922,7 +910,7 @@ async fn process_job(
 
   redis_logger.log_status("done")?;
 
-  info!("Job {} complete success! Downloaded, ran inference, and uploaded. Saved model record: {}",
+  info!("Job {:?} complete success! Downloaded, ran inference, and uploaded. Saved model record: {}",
         job.id, id);
 
   let duration = start.elapsed();

@@ -8,6 +8,9 @@ use container_common::anyhow_result::AnyhowResult;
 use database_queries::tokens::Tokens;
 use sqlx::MySqlPool;
 
+// TODO(2022-02-10): Move these queries to the 'database_queries' crate
+//  I moved tts_inference_job queries out already.
+
 /// table: w2l_template_upload_jobs
 #[derive(Debug)]
 pub struct W2lTemplateUploadJobRecord {

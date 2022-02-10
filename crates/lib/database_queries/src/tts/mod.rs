@@ -1,2 +1,3 @@
-pub mod insert_tts_inference_job;
-pub mod list_available_tts_inference_jobs;
+pub mod tts_inference_jobs;
+pub mod tts_models;
+pub mod tts_results;
