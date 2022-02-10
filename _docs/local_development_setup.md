@@ -41,6 +41,19 @@ cargo install diesel_cli \
   --features mysql
 ```
 
+#### Sqlx Error on Linux when Performing Schema Migrations
+
+You might get this error message during migration,
+
+```
+Encountered unknown type for Mysql: enum
+thread 'main' panicked at 'internal error: entered unreachable code: Mysql only supports a closed set of types.
+                         If you ever see this error message please open an issue at https://github.com/diesel-rs/diesel containing a dump of your schema definition.', diesel_cli/src/print_schema.rs:310:17
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+```
+
+I haven't found the cause (it doesn't happen on Mac), but the migrations appear to work regardless of the error message.
+
 #### Linux database notes
 
 If MySql in local dev can't be connected to, reset the accounts:
