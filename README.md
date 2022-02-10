@@ -4,7 +4,7 @@ fakeyou-frontend
 NB: This is now a MONOREPO
 --------------------------
 
-Based on https://medium.com/geekculture/setting-up-monorepo-with-create-react-app-cb2cfa763b96, 
+Based on https://medium.com/geekculture/setting-up-monorepo-with-create-react-app-cb2cfa763b96,
 which isn't the best guide, but it works.
 
 Library code is exported in the library's index.tsx (meh)
@@ -14,9 +14,18 @@ To start the react server, run "yarn start-storyteller" or "yarn start-fakeyou"
 ### Running
 
 ```
+# Install Yarn if not present (Linux/Mac)
+sudo npm install --global yarn
+
+# We might need a newer node (Linux/Mac)
+sudo install n -g
+sudo n stable
+
+# Install project deps (Linux/Mac)
 yarn install
+
+# Start one or more of the several frontends (Linux/Mac)
 yarn start-fakeyou
-  OR
 yarn start-storyteller
 ```
 
@@ -40,7 +49,7 @@ Installation in Dev
 -------------------
 
 Normally, `npm install` in the `./fakeyou` directory works, but Mac needed
-the following workaround for a [sass build failure](https://stackoverflow.com/a/67242989): 
+the following workaround for a [sass build failure](https://stackoverflow.com/a/67242989):
 
 ```
 nvm install 14
