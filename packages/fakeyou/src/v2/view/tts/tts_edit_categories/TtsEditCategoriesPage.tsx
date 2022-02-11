@@ -3,7 +3,7 @@ import { AssignTtsCategory, AssignTtsCategoryIsError, AssignTtsCategoryIsOk } fr
 import { BackLink } from '../../_common/BackLink';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { FrontendUrlConfig } from '../../../../common/FrontendUrlConfig';
-import { GetTtsModel, GetTtsModelIsErr, GetTtsModelIsOk, TtsModel, TtsModelLookupError } from '../../../api/tts/GetTtsModel';
+import { GetTtsModel, GetTtsModelIsErr, GetTtsModelIsOk, TtsModel, TtsModelLookupError } from '@storyteller/components/src/api/tts/GetTtsModel';
 import { ListTtsCategories, ListTtsCategoriesIsError, ListTtsCategoriesIsOk, TtsCategory } from '../../../api/category/ListTtsCategories';
 import { ListTtsCategoriesForModel, ListTtsCategoriesForModelIsError, ListTtsCategoriesForModelIsOk, TtsModelCategory } from '../../../api/category/ListTtsCategoriesForModel';
 import { SessionWrapper } from '../../../../session/SessionWrapper';

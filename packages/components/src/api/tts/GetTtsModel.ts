@@ -1,4 +1,4 @@
-import { ApiConfig } from "@storyteller/components";
+import { ApiConfig } from "../ApiConfig";
 
 export interface TtsModel {
   model_token: string,
@@ -12,6 +12,8 @@ export interface TtsModel {
   creator_gravatar_hash: string,
   description_markdown: string,
   description_rendered_html: string,
+  is_front_page_featured: boolean,
+  is_twitch_featured: boolean,
   creator_set_visibility: string,
   updatable_slug: string,
   created_at: string,

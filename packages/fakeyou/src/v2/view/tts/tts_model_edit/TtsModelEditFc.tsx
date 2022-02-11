@@ -6,41 +6,15 @@ import { useParams, useHistory } from 'react-router-dom';
 import { FrontendUrlConfig } from '../../../../common/FrontendUrlConfig';
 import { VisibleIconFc } from '../../_icons/VisibleIcon';
 import { HiddenIconFc } from '../../_icons/HiddenIcon';
+import { GetTtsModel, GetTtsModelIsErr, GetTtsModelIsOk, TtsModel, TtsModelLookupError } from '@storyteller/components/src/api/tts/GetTtsModel';
 import { BackLink } from '../../_common/BackLink';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faHeadphones, faHome } from '@fortawesome/free-solid-svg-icons';
+import { faTwitch } from '@fortawesome/free-brands-svg-icons';
 
 const DEFAULT_VISIBILITY = 'public';
 
 const DEFAULT_PRETRAINED_VOCODER = 'hifigan-superres';
-
-interface TtsModelViewResponsePayload {
-  success: boolean,
-  model: TtsModel,
-}
-
-interface TtsModel {
-  model_token: string,
-  title: string,
-  tts_model_type: string,
-  maybe_default_pretrained_vocoder: string | null,
-  text_preprocessing_algorithm: string,
-  creator_user_token: string,
-  creator_username: string,
-  creator_display_name: string,
-  description_markdown: string,
-  description_rendered_html: string,
-  creator_set_visibility: string,
-  updatable_slug: string,
-  created_at: string,
-  updated_at: string,
-  maybe_moderator_fields: TtsModelModeratorFields | null | undefined,
-}
-
-interface TtsModelModeratorFields {
-  creator_ip_address_creation: string,
-  creator_ip_address_last_update: string,
-  mod_deleted_at: string | undefined | null,
-  user_deleted_at: string | undefined | null,
-}
 
 interface Props {
   sessionWrapper: SessionWrapper,
@@ -53,37 +27,38 @@ function TtsModelEditFc(props: Props) {
 
   const history = useHistory();
 
+  // Model lookup
   const [ttsModel, setTtsModel] = useState<TtsModel|undefined>(undefined);
+  const [notFoundState, setNotFoundState] = useState<boolean>(false);
+
+  // Fields
   const [title, setTitle] = useState<string>("");
   const [descriptionMarkdown, setDescriptionMarkdown] = useState<string>("");
   const [visibility, setVisibility] = useState<string>(DEFAULT_VISIBILITY);
   const [defaultPretrainedVocoder, setDefaultPretrainedVocoder] = useState<string>(DEFAULT_PRETRAINED_VOCODER);
+  const [isFrontPageFeatured, setIsFrontPageFeatured] = useState<boolean>(false);
+  const [isTwitchFeatured, setIsTwitchFeatured] = useState<boolean>(false);
 
-  const getModel = useCallback((token) => {
-    const api = new ApiConfig();
-    const endpointUrl = api.viewTtsModel(token);
+  const getModel = useCallback(async (token) => {
+    const model = await GetTtsModel(token);
 
-    fetch(endpointUrl, {
-      method: 'GET',
-      headers: {
-        'Accept': 'application/json',
-      },
-      credentials: 'include',
-    })
-    .then(res => res.json())
-    .then(res => {
-      const modelsResponse : TtsModelViewResponsePayload = res;
-      if (!modelsResponse.success) {
-        return;
+    if (GetTtsModelIsOk(model)) {
+      setTtsModel(model);
+
+      setTitle(model.title || "")
+      setDescriptionMarkdown(model.description_markdown || "")
+      setVisibility(model.creator_set_visibility || DEFAULT_VISIBILITY);
+      setDefaultPretrainedVocoder(model.maybe_default_pretrained_vocoder || DEFAULT_PRETRAINED_VOCODER);
+      setIsFrontPageFeatured(model.is_front_page_featured|| false);
+      setIsTwitchFeatured(model.is_twitch_featured || false);
+
+    } else if (GetTtsModelIsErr(model))  {
+      switch(model) {
+        case TtsModelLookupError.NotFound:
+          setNotFoundState(true);
+          break;
       }
-
-      setTitle(modelsResponse.model.title || "")
-      setDescriptionMarkdown(modelsResponse.model.description_markdown || "")
-      setVisibility(modelsResponse.model.creator_set_visibility || DEFAULT_VISIBILITY);
-      setDefaultPretrainedVocoder(modelsResponse.model.maybe_default_pretrained_vocoder || DEFAULT_PRETRAINED_VOCODER);
-      setTtsModel(modelsResponse.model);
-    })
-    .catch(e => {});
+    }
   }, []);
 
 
@@ -113,7 +88,19 @@ function TtsModelEditFc(props: Props) {
     setDefaultPretrainedVocoder((ev.target as HTMLSelectElement).value)
   };
 
+  const handleIsFrontPageFeaturedChange = (ev: React.FormEvent<HTMLSelectElement>) => {
+    const value = !((ev.target as HTMLSelectElement).value === 'false');
+    setIsFrontPageFeatured(value);
+  };
+
+  const handleIsTwitchFeaturedChange = (ev: React.FormEvent<HTMLSelectElement>) => {
+    const value = !((ev.target as HTMLSelectElement).value === 'false');
+    setIsTwitchFeatured(value);
+  };
+
   const modelLink = FrontendUrlConfig.ttsModelPage(token);
+
+  const isModerator = props.sessionWrapper.canEditOtherUsersTtsModels();
 
   const handleFormSubmit = (ev: React.FormEvent<HTMLFormElement>) => { 
     ev.preventDefault();
@@ -131,11 +118,16 @@ function TtsModelEditFc(props: Props) {
     const api = new ApiConfig();
     const endpointUrl = api.editTtsModel(modelToken);
     
-    const request = {
+    let request : any = {
       title: title,
       description_markdown: descriptionMarkdown,
       creator_set_visibility: visibility || DEFAULT_VISIBILITY,
       maybe_default_pretrained_vocoder: defaultPretrainedVocoder || DEFAULT_PRETRAINED_VOCODER,
+    }
+
+    if (isModerator) {
+      request.is_front_page_featured = isFrontPageFeatured;
+      request.is_twitch_featured = isTwitchFeatured;
     }
 
     fetch(endpointUrl, {
@@ -162,6 +154,65 @@ function TtsModelEditFc(props: Props) {
     return false;
   };
 
+  if (notFoundState) {
+    return (
+      <h1 className="title is-1">Model not found</h1>
+    );
+  }
+
+  if (!ttsModel) {
+    return <div />
+  }
+
+  let optionalModeratorFields = <></>;
+
+  if (isModerator) {
+    let isFrontPageFeaturedFormValue = isFrontPageFeatured ? "true" : "false";
+    let isTwitchFeaturedFormValue = isTwitchFeatured ? "true" : "false";
+
+    optionalModeratorFields = (<>
+      <div className="field">
+        <label className="label">Is Front Page Featured? (Don't set too many!)</label>
+        <div className="control has-icons-left">
+          <div className="select">
+            <select 
+              name="default_pretrained_vocoder" 
+              onChange={handleIsFrontPageFeaturedChange}
+              value={isFrontPageFeaturedFormValue}
+              >
+              <option value="true">Yes (randomly used as a default)</option>
+              <option value="false">No</option>
+              
+            </select>
+          </div>
+          <span className="icon is-small is-left">
+            <FontAwesomeIcon icon={faHome} />
+          </span>
+        </div>
+      </div>
+      <div className="field">
+        <label className="label">Is Twitch Featured? (Don't set too many!)</label>
+        <div className="control has-icons-left">
+          <div className="select">
+            <select 
+              name="default_pretrained_vocoder" 
+              onChange={handleIsTwitchFeaturedChange}
+              value={isTwitchFeaturedFormValue}
+              >
+              <option value="true">Yes (randomly used as a default)</option>
+              <option value="false">No</option>
+              
+            </select>
+          </div>
+          <span className="icon is-small is-left">
+            <FontAwesomeIcon icon={faTwitch} />
+          </span>
+        </div>
+      </div>
+    </>);
+  }
+
+
   let isDisabled = ttsModel === undefined;
 
   const visibilityIcon = (visibility === 'public') ? <VisibleIconFc /> : <HiddenIconFc />;
@@ -187,6 +238,9 @@ function TtsModelEditFc(props: Props) {
                 placeholder="Model Title" 
                 value={title}
                 />
+              <span className="icon is-small is-left">
+                <FontAwesomeIcon icon={faHeadphones} />
+              </span>
             </div>
             {/*<p className="help">{invalidReason}</p>*/}
           </div>
@@ -232,6 +286,8 @@ function TtsModelEditFc(props: Props) {
               </select>
             </div>
           </div>
+
+          {optionalModeratorFields}
 
           <br />
 

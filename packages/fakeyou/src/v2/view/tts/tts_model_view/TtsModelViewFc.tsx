@@ -9,7 +9,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { FrontendUrlConfig } from '../../../../common/FrontendUrlConfig';
 import { HiddenIconFc } from '../../_icons/HiddenIcon';
 import { VisibleIconFc } from '../../_icons/VisibleIcon';
-import { GetTtsModel, GetTtsModelIsErr, GetTtsModelIsOk, TtsModel, TtsModelLookupError } from '../../../api/tts/GetTtsModel';
+import { GetTtsModel, GetTtsModelIsErr, GetTtsModelIsOk, TtsModel, TtsModelLookupError } from '@storyteller/components/src/api/tts/GetTtsModel';
 import { GravatarFc } from '../../_common/GravatarFc';
 import { GetTtsModelUseCount } from '../../../api/tts/GetTtsModelUseCount';
 import { BackLink } from '../../_common/BackLink';
@@ -225,6 +225,14 @@ function TtsModelViewFc(props: Props) {
         <tr>
           <th>User deleted at (UTC)</th>
           <td>{ttsModel?.maybe_moderator_fields?.user_deleted_at || "not deleted"}</td>
+        </tr>
+        <tr>
+          <th>Is Front Page Featured?</th>
+          <td>{ttsModel?.is_front_page_featured ? "yes" : "no"}</td>
+        </tr>
+        <tr>
+          <th>Is Twitch Featured?</th>
+          <td>{ttsModel?.is_twitch_featured ? "yes" : "no" }</td>
         </tr>
       </>
     );
