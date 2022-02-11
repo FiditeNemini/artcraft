@@ -44,12 +44,17 @@ pub struct EditTtsModelRequest {
   //pub text_preprocessing_algorithm: Option<String>,
   //pub vocoder_token: Option<String>,
 
-  // ========== Moderator options ==========
+  // ========== Moderator options (protection) ==========
 
   pub is_public_listing_approved: Option<bool>,
   pub is_locked_from_user_modification: Option<bool>,
   pub is_locked_from_use: Option<bool>,
   pub maybe_mod_comments: Option<String>,
+
+  // ========== Moderator options (front page) ==========
+
+  pub is_front_page_featured: Option<bool>,
+  pub is_twitch_featured: Option<bool>,
 }
 
 #[derive(Debug)]
@@ -281,6 +286,9 @@ async fn update_mod_details(
   let is_locked_from_user_modification = request.is_locked_from_user_modification.unwrap_or(false);
   let is_locked_from_use = request.is_locked_from_use.unwrap_or(false);
 
+  let is_front_page_featured = request.is_front_page_featured.unwrap_or(false);
+  let is_twitch_featured = request.is_twitch_featured.unwrap_or(false);
+
   let query_result = sqlx::query!(
         r#"
 UPDATE tts_models
@@ -290,6 +298,8 @@ SET
     is_locked_from_use = ?,
     maybe_mod_comments = ?,
     maybe_mod_user_token = ?,
+    is_front_page_featured = ?,
+    is_twitch_featured = ?,
     version = version + 1
 WHERE token = ?
 LIMIT 1
@@ -299,6 +309,8 @@ LIMIT 1
       is_locked_from_use,
       request.maybe_mod_comments,
       mod_user_token,
+      is_front_page_featured,
+      is_twitch_featured,
       model_token
     )
       .execute(mysql_pool)
