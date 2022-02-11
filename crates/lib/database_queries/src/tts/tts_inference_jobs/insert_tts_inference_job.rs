@@ -19,6 +19,9 @@ pub struct TtsInferenceJobInsertBuilder {
   // ========== Optional ==========
   maybe_creator_user_token: Option<String>,
   creator_set_visibility: Option<String>,
+  is_from_api: bool,
+  is_for_twitch: bool,
+  priority_level: u8, // Priority is 0 by default and optionally increases
 }
 
 impl TtsInferenceJobInsertBuilder {
@@ -33,6 +36,9 @@ impl TtsInferenceJobInsertBuilder {
       creator_ip_address: None,
       maybe_creator_user_token: None,
       creator_set_visibility: None,
+      is_from_api: false,
+      is_for_twitch: false,
+      priority_level: 0,
     }
   }
 
@@ -49,6 +55,9 @@ impl TtsInferenceJobInsertBuilder {
       creator_ip_address: Some("127.0.0.1".to_string()),
       // hidden | public | ...
       creator_set_visibility: Some("hidden".to_string()),
+      is_from_api: false,
+      is_for_twitch: false,
+      priority_level: 0,
     }
   }
 
@@ -84,6 +93,21 @@ impl TtsInferenceJobInsertBuilder {
 
   pub fn set_creator_set_visibility(mut self, value: &str) -> Self {
     self.creator_set_visibility = Some(value.to_string());
+    self
+  }
+
+  pub fn set_is_from_api(mut self, value: bool) -> Self {
+    self.is_from_api = value;
+    self
+  }
+
+  pub fn set_is_for_twitch(mut self, value: bool) -> Self {
+    self.is_for_twitch = value;
+    self
+  }
+
+  pub fn set_priority_level(mut self, value: u8) -> Self {
+    self.priority_level = value;
     self
   }
 
@@ -124,6 +148,9 @@ SET
   maybe_creator_user_token = ?,
   creator_ip_address = ?,
   creator_set_visibility = ?,
+  is_from_api = ?,
+  is_for_twitch = ?,
+  priority_level = ?,
   status = "pending"
         "#,
       job_token,
@@ -133,6 +160,9 @@ SET
       self.maybe_creator_user_token.clone(),
       creator_ip_address,
       creator_set_visibility,
+      self.is_from_api,
+      self.is_for_twitch,
+      self.priority_level,
     );
 
     let query_result = query.execute(mysql_pool)

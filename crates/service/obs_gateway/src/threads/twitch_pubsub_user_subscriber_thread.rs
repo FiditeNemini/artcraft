@@ -561,6 +561,8 @@ impl TwitchPubsubUserSubscriberThreadStageTwo {
     let model_token = "TM:40m3aqtt41y0"; // "Wakko" voice (dev)
 
     let mut builder = TtsInferenceJobInsertBuilder::new_for_internal_tts()
+        .set_is_for_twitch(true)
+        .set_priority_level(1)
         .set_job_token(&job_token)
         .set_model_token(model_token)
         .set_raw_inference_text(&sanitized_text);
