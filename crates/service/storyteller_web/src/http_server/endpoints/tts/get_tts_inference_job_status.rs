@@ -49,7 +49,9 @@ pub struct TtsInferenceJobStatusForResponse {
 
   pub model_token: String,
   pub tts_model_type: String,
-  pub title: String,
+  pub title: String, // Name of the TTS model
+
+  pub raw_inference_text: String, // User text
 
   pub created_at: DateTime<Utc>,
   pub updated_at: DateTime<Utc>,
@@ -78,8 +80,9 @@ pub struct TtsInferenceJobStatusRecord {
 
   pub model_token: String,
   pub tts_model_type: String,
+  pub title: String, // Name of the TTS model
 
-  pub title: String,
+  pub raw_inference_text: String, // User text
 
   pub created_at: DateTime<Utc>,
   pub updated_at: DateTime<Utc>,
@@ -130,6 +133,8 @@ SELECT
     jobs.model_token,
     tts.tts_model_type,
     tts.title,
+
+    jobs.raw_inference_text,
 
     jobs.created_at,
     jobs.updated_at
@@ -183,17 +188,18 @@ WHERE jobs.token = ?
   };
 
   let record_for_response = TtsInferenceJobStatusForResponse {
-    job_token: record.job_token.clone(),
-    status: record.status.clone(),
+    job_token: record.job_token,
+    status: record.status,
     maybe_extra_status_description,
     attempt_count: record.attempt_count as u8,
-    maybe_result_token: record.maybe_result_token.clone(),
-    maybe_public_bucket_wav_audio_path: record.maybe_public_bucket_wav_audio_path.clone(),
-    model_token: record.model_token.clone(),
-    tts_model_type: record.tts_model_type.clone(),
-    title: record.title.clone(),
-    created_at: record.created_at.clone(),
-    updated_at: record.updated_at.clone(),
+    maybe_result_token: record.maybe_result_token,
+    maybe_public_bucket_wav_audio_path: record.maybe_public_bucket_wav_audio_path,
+    model_token: record.model_token,
+    tts_model_type: record.tts_model_type,
+    title: record.title,
+    raw_inference_text: record.raw_inference_text,
+    created_at: record.created_at,
+    updated_at: record.updated_at,
   };
 
   let response = GetTtsInferenceStatusSuccessResponse {
