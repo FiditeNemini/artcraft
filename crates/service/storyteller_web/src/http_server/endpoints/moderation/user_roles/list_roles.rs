@@ -7,7 +7,6 @@ use actix_web::http::StatusCode;
 use actix_web::web::Path;
 use actix_web::{Responder, web, HttpResponse, error, HttpRequest};
 use chrono::{DateTime, Utc};
-use crate::database::helpers::enums::{DownloadUrlType, CreatorSetVisibility, W2lTemplateType};
 use crate::database::queries::list_user_roles::UserRoleForList;
 use crate::database::queries::list_user_roles::list_user_roles;
 use crate::http_server::web_utils::ip_address::get_request_ip;

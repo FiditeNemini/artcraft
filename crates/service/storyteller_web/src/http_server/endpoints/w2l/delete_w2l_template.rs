@@ -6,7 +6,6 @@ use actix_web::error::ResponseError;
 use actix_web::http::StatusCode;
 use actix_web::web::Path;
 use actix_web::{Responder, web, HttpResponse, error, HttpRequest};
-use crate::database::helpers::enums::{DownloadUrlType, CreatorSetVisibility, W2lTemplateType};
 use crate::database::queries::delete_w2l_template::delete_w2l_template_as_mod;
 use crate::database::queries::delete_w2l_template::delete_w2l_template_as_user;
 use crate::database::queries::delete_w2l_template::undelete_w2l_template_as_mod;
