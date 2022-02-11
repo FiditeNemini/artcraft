@@ -1,7 +1,7 @@
 use actix_http::Error;
 use actix_http::http::header;
-use actix_web::cookie::Cookie;
 use actix_web::HttpResponseBuilder;
+use actix_web::cookie::Cookie;
 use actix_web::error::ResponseError;
 use actix_web::http::StatusCode;
 use actix_web::web::Path;
@@ -10,8 +10,7 @@ use chrono::{DateTime, Utc};
 use crate::AnyhowResult;
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 use crate::server_state::ServerState;
-use derive_more::{Display, Error};
-use log::{info, warn, log};
+use log::{info, warn, log, error};
 use r2d2_redis::RedisConnectionManager;
 use r2d2_redis::r2d2::{Pool, PooledConnection};
 use r2d2_redis::redis::{Commands, RedisError, RedisResult};
@@ -22,6 +21,7 @@ use sqlx::error::DatabaseError;
 use sqlx::error::Error::Database;
 use sqlx::mysql::MySqlDatabaseError;
 use std::borrow::BorrowMut;
+use std::fmt;
 use std::ops::Deref;
 use std::sync::Arc;
 
@@ -61,7 +61,7 @@ pub struct GetTtsInferenceStatusSuccessResponse {
   pub state: TtsInferenceJobStatusForResponse,
 }
 
-#[derive(Debug, Display)]
+#[derive(Debug)]
 pub enum GetTtsInferenceStatusError {
   ServerError,
 }
@@ -100,6 +100,14 @@ impl ResponseError for GetTtsInferenceStatusError {
     to_simple_json_error(&error_reason, self.status_code())
   }
 }
+
+// NB: Not using derive_more::Display since Clion doesn't understand it.
+impl fmt::Display for GetTtsInferenceStatusError {
+  fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+    write!(f, "{:?}", self)
+  }
+}
+
 
 pub async fn get_tts_inference_job_status_handler(
   http_request: HttpRequest,
@@ -144,10 +152,11 @@ WHERE jobs.token = ?
     Err(err) => {
       match err {
         sqlx::Error::RowNotFound => {
+          warn!("tts job record not found");
           return Err(GetTtsInferenceStatusError::ServerError);
         },
         _ => {
-          warn!("tts template query error: {:?}", err);
+          error!("tts job query error: {:?}", err);
           return Err(GetTtsInferenceStatusError::ServerError);
         }
       }
@@ -157,7 +166,7 @@ WHERE jobs.token = ?
   let mut redis = server_state.redis_pool
       .get()
       .map_err(|e| {
-        warn!("redis error: {:?}", e);
+        error!("redis error: {:?}", e);
         GetTtsInferenceStatusError::ServerError
       })?;
 
@@ -168,12 +177,12 @@ WHERE jobs.token = ?
     },
     Ok(None) => None,
     Err(e) => {
-      warn!("redis error: {:?}", e);
+      error!("redis error: {:?}", e);
       None // Fail open
     },
   };
 
-  let model_for_response = TtsInferenceJobStatusForResponse {
+  let record_for_response = TtsInferenceJobStatusForResponse {
     job_token: record.job_token.clone(),
     status: record.status.clone(),
     maybe_extra_status_description,
@@ -189,11 +198,14 @@ WHERE jobs.token = ?
 
   let response = GetTtsInferenceStatusSuccessResponse {
     success: true,
-    state: model_for_response,
+    state: record_for_response,
   };
 
   let body = serde_json::to_string(&response)
-      .map_err(|e| GetTtsInferenceStatusError::ServerError)?;
+      .map_err(|e| {
+        error!("error returning response: {:?}",  e);
+        GetTtsInferenceStatusError::ServerError
+      })?;
 
   Ok(HttpResponse::Ok()
       .content_type("application/json")
