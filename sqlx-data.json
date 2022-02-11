@@ -398,7 +398,7 @@
               "bits": 1
             },
             "char_set": 63,
-            "max_size": 11
+            "max_size": 3
           }
         },
         {
@@ -474,16 +474,6 @@
       ]
     }
   },
-  "591bda610a0fe952cafc5d97808757da8652133082e94ad15ab063db9d4e2f44": {
-    "query": "\nINSERT INTO tts_inference_jobs\nSET\n  token = ?,\n  uuid_idempotency_token = ?,\n  model_token = ?,\n  raw_inference_text = ?,\n  maybe_creator_user_token = ?,\n  creator_ip_address = ?,\n  creator_set_visibility = ?,\n  status = \"pending\"\n        ",
-    "describe": {
-      "columns": [],
-      "parameters": {
-        "Right": 7
-      },
-      "nullable": []
-    }
-  },
   "5b8c906b09cc7068dcad9eb837b1146893b63c3ce7c8dbefea9129849448c3f6": {
     "query": "\nINSERT INTO twitch_oauth_tokens\nSET\n  oauth_refresh_grouping_token = ?,\n  maybe_user_token = ?,\n  twitch_user_id = ?,\n  twitch_username = ?,\n  twitch_username_lowercase = ?,\n  access_token = ?,\n  maybe_refresh_token = ?,\n  refresh_count = ?,\n  token_type = ?,\n  expires_in_seconds = NULL,\n  has_bits_read = ?,\n  has_channel_read_redemptions= ?,\n  has_channel_read_subscriptions = ?,\n  has_chat_edit = ?,\n  has_chat_read = ?,\n  ip_address_creation = ?,\n  expires_at = NULL\n        ",
     "describe": {
@@ -550,6 +540,16 @@
       "columns": [],
       "parameters": {
         "Right": 17
+      },
+      "nullable": []
+    }
+  },
+  "def4202f63874e7b04d8f8a5da028a9aacc4dfe19b8898d3d6820d393a633cf3": {
+    "query": "\nINSERT INTO tts_inference_jobs\nSET\n  token = ?,\n  uuid_idempotency_token = ?,\n  model_token = ?,\n  raw_inference_text = ?,\n  maybe_creator_user_token = ?,\n  creator_ip_address = ?,\n  creator_set_visibility = ?,\n  is_from_api = ?,\n  is_for_twitch = ?,\n  priority_level = ?,\n  status = \"pending\"\n        ",
+    "describe": {
+      "columns": [],
+      "parameters": {
+        "Right": 10
       },
       "nullable": []
     }
@@ -707,7 +707,7 @@
               "bits": 1
             },
             "char_set": 63,
-            "max_size": 11
+            "max_size": 10
           }
         },
         {
@@ -719,7 +719,7 @@
               "bits": 1
             },
             "char_set": 63,
-            "max_size": 11
+            "max_size": 10
           }
         },
         {
@@ -731,7 +731,7 @@
               "bits": 1
             },
             "char_set": 63,
-            "max_size": 11
+            "max_size": 10
           }
         },
         {
@@ -1176,7 +1176,7 @@
               "bits": 1
             },
             "char_set": 63,
-            "max_size": 11
+            "max_size": 10
           }
         },
         {
@@ -1188,7 +1188,7 @@
               "bits": 1
             },
             "char_set": 63,
-            "max_size": 11
+            "max_size": 10
           }
         },
         {
@@ -1200,7 +1200,7 @@
               "bits": 1
             },
             "char_set": 63,
-            "max_size": 11
+            "max_size": 10
           }
         },
         {
@@ -1502,7 +1502,7 @@
               "bits": 1
             },
             "char_set": 63,
-            "max_size": 11
+            "max_size": 3
           }
         },
         {
@@ -1716,7 +1716,7 @@
               "bits": 1
             },
             "char_set": 63,
-            "max_size": 11
+            "max_size": 10
           }
         },
         {
@@ -1728,7 +1728,7 @@
               "bits": 1
             },
             "char_set": 63,
-            "max_size": 11
+            "max_size": 10
           }
         },
         {
@@ -1740,7 +1740,7 @@
               "bits": 1
             },
             "char_set": 63,
-            "max_size": 11
+            "max_size": 10
           }
         },
         {
@@ -2549,7 +2549,7 @@
               "bits": 129
             },
             "char_set": 63,
-            "max_size": 1
+            "max_size": 2
           }
         }
       ],
@@ -2736,7 +2736,7 @@
               "bits": 1
             },
             "char_set": 63,
-            "max_size": 11
+            "max_size": 10
           }
         },
         {
@@ -2748,7 +2748,7 @@
               "bits": 1
             },
             "char_set": 63,
-            "max_size": 11
+            "max_size": 10
           }
         },
         {
@@ -2760,7 +2760,7 @@
               "bits": 1
             },
             "char_set": 63,
-            "max_size": 11
+            "max_size": 10
           }
         },
         {
@@ -3567,7 +3567,7 @@
               "bits": 1
             },
             "char_set": 63,
-            "max_size": 11
+            "max_size": 10
           }
         },
         {
@@ -3579,7 +3579,7 @@
               "bits": 1
             },
             "char_set": 63,
-            "max_size": 11
+            "max_size": 10
           }
         },
         {
@@ -3591,7 +3591,7 @@
               "bits": 1
             },
             "char_set": 63,
-            "max_size": 11
+            "max_size": 10
           }
         },
         {
@@ -3603,7 +3603,7 @@
               "bits": 1
             },
             "char_set": 63,
-            "max_size": 11
+            "max_size": 10
           }
         },
         {
@@ -3757,7 +3757,7 @@
               "bits": 1
             },
             "char_set": 63,
-            "max_size": 11
+            "max_size": 3
           }
         },
         {
@@ -3847,7 +3847,7 @@
               "bits": 1
             },
             "char_set": 63,
-            "max_size": 11
+            "max_size": 3
           }
         },
         {
@@ -4360,7 +4360,7 @@
               "bits": 1
             },
             "char_set": 63,
-            "max_size": 11
+            "max_size": 10
           }
         },
         {
@@ -4372,7 +4372,7 @@
               "bits": 1
             },
             "char_set": 63,
-            "max_size": 11
+            "max_size": 10
           }
         },
         {
@@ -4384,7 +4384,7 @@
               "bits": 1
             },
             "char_set": 63,
-            "max_size": 11
+            "max_size": 10
           }
         },
         {
@@ -5379,7 +5379,7 @@
               "bits": 1
             },
             "char_set": 63,
-            "max_size": 11
+            "max_size": 3
           }
         },
         {
@@ -5539,7 +5539,7 @@
               "bits": 1
             },
             "char_set": 63,
-            "max_size": 11
+            "max_size": 10
           }
         },
         {
@@ -5551,7 +5551,7 @@
               "bits": 1
             },
             "char_set": 63,
-            "max_size": 11
+            "max_size": 10
           }
         },
         {
@@ -5563,7 +5563,7 @@
               "bits": 1
             },
             "char_set": 63,
-            "max_size": 11
+            "max_size": 10
           }
         },
         {
@@ -6351,7 +6351,7 @@
               "bits": 1
             },
             "char_set": 63,
-            "max_size": 11
+            "max_size": 3
           }
         },
         {
@@ -6666,7 +6666,7 @@
               "bits": 1
             },
             "char_set": 63,
-            "max_size": 11
+            "max_size": 10
           }
         },
         {
@@ -6678,7 +6678,7 @@
               "bits": 1
             },
             "char_set": 63,
-            "max_size": 11
+            "max_size": 10
           }
         },
         {
@@ -6929,7 +6929,7 @@
               "bits": 1
             },
             "char_set": 63,
-            "max_size": 11
+            "max_size": 3
           }
         },
         {
@@ -7221,7 +7221,7 @@
               "bits": 1
             },
             "char_set": 63,
-            "max_size": 11
+            "max_size": 10
           }
         },
         {
@@ -7233,7 +7233,7 @@
               "bits": 1
             },
             "char_set": 63,
-            "max_size": 11
+            "max_size": 10
           }
         },
         {
@@ -7245,7 +7245,7 @@
               "bits": 1
             },
             "char_set": 63,
-            "max_size": 11
+            "max_size": 10
           }
         },
         {
@@ -7257,7 +7257,7 @@
               "bits": 1
             },
             "char_set": 63,
-            "max_size": 11
+            "max_size": 10
           }
         },
         {
@@ -7439,7 +7439,7 @@
               "bits": 1
             },
             "char_set": 63,
-            "max_size": 11
+            "max_size": 10
           }
         },
         {
@@ -7451,7 +7451,7 @@
               "bits": 1
             },
             "char_set": 63,
-            "max_size": 11
+            "max_size": 10
           }
         },
         {
@@ -7463,7 +7463,7 @@
               "bits": 1
             },
             "char_set": 63,
-            "max_size": 11
+            "max_size": 10
           }
         },
         {
@@ -8259,7 +8259,7 @@
               "bits": 1
             },
             "char_set": 63,
-            "max_size": 11
+            "max_size": 10
           }
         },
         {
@@ -8271,7 +8271,7 @@
               "bits": 1
             },
             "char_set": 63,
-            "max_size": 11
+            "max_size": 10
           }
         },
         {
@@ -8695,7 +8695,7 @@
               "bits": 1
             },
             "char_set": 63,
-            "max_size": 11
+            "max_size": 10
           }
         },
         {
@@ -8707,7 +8707,7 @@
               "bits": 1
             },
             "char_set": 63,
-            "max_size": 11
+            "max_size": 10
           }
         },
         {
@@ -8719,7 +8719,7 @@
               "bits": 1
             },
             "char_set": 63,
-            "max_size": 11
+            "max_size": 10
           }
         },
         {
@@ -9329,7 +9329,7 @@
               "bits": 1
             },
             "char_set": 63,
-            "max_size": 11
+            "max_size": 3
           }
         },
         {
