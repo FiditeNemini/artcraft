@@ -1,4 +1,4 @@
-import { ApiConfig } from "@storyteller/components";
+import { ApiConfig } from "../ApiConfig";
 
 interface TtsModelListResponsePayload {
   success: boolean,
@@ -14,6 +14,8 @@ export interface TtsModelListItem {
   creator_gravatar_hash: string,
   updatable_slug: string,
   title: string,
+  is_front_page_featured: boolean,
+  is_twitch_featured: boolean,
   category_tokens: string[],
   created_at: string,
   updated_at: string,

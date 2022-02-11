@@ -35,7 +35,7 @@ import { W2lTemplateEditFc } from './w2l/w2l_template_edit/W2lTemplateEditFc';
 import { W2lResultDeleteFc } from './w2l/w2l_result_delete/W2lResultDeleteFc';
 import { W2lTemplateApproveFc } from './w2l/w2l_template_approve/W2lTemplateApproveFc';
 import { TtsModelListFc } from './tts/tts_model_list/TtsModelListFc';
-import { TtsModelListItem } from '../api/tts/ListTtsModels';
+import { TtsModelListItem } from '@storyteller/components/src/api/tts/ListTtsModels';
 import { ProfileBanFc } from './profile/profile_ban/ProfileBanFc';
 import { ModerationUserListFc } from './moderation/moderation_user_list/ModerationUserList';
 import { LeaderboardFc } from './leaderboard/LeaderboardFc';

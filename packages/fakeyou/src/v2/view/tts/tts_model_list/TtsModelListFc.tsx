@@ -11,7 +11,7 @@ import { TtsModelUploadJob } from '@storyteller/components/src/jobs/TtsModelUplo
 import { W2lInferenceJob } from '@storyteller/components/src/jobs/W2lInferenceJobs';
 import { W2lTemplateUploadJob } from '@storyteller/components/src/jobs/W2lTemplateUploadJobs';
 import { v4 as uuidv4 } from 'uuid';
-import { ListTtsModels, TtsModelListItem } from '../../../api/tts/ListTtsModels';
+import { ListTtsModels, TtsModelListItem } from '@storyteller/components/src/api/tts/ListTtsModels';
 import { GravatarFc } from '../../_common/GravatarFc';
 import { VocodesNotice } from './VocodesNotice';
 import { ListTtsCategories, ListTtsCategoriesIsError, ListTtsCategoriesIsOk } from '../../../api/category/ListTtsCategories';
@@ -87,7 +87,14 @@ function TtsModelListFc(props: Props) {
       dynamicallyCategorizeModels(models);
       setTtsModels(models);
       if (!maybeSelectedTtsModel && models.length > 0) {
-        const model = models[0];
+        let model = models[0];
+        const featuredModels = models.filter(m => m.is_front_page_featured);
+        if (featuredModels.length > 0) {
+          // Random featured model
+          model = featuredModels[
+            Math.floor(Math.random()*featuredModels.length)
+          ];
+        }
         setMaybeSelectedTtsModel(model);
       }
     }

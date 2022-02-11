@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faChevronRight, faHeadphonesAlt, faTags, faTimes } from '@fortawesome/free-solid-svg-icons';
-import { TtsModelListItem } from '../../../api/tts/ListTtsModels';
+import { TtsModelListItem } from '@storyteller/components/src/api/tts/ListTtsModels';
 import { TtsCategoryType } from '../../../../AppWrapper';
 
 interface Props {

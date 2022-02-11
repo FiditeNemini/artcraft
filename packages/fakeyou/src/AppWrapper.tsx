@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { TtsCategory } from './v2/api/category/ListTtsCategories';
-import { TtsModelListItem } from './v2/api/tts/ListTtsModels';
+import { TtsModelListItem } from '@storyteller/components/src/api/tts/ListTtsModels';
 import { App } from './App';
 import { v4 as uuidv4 } from 'uuid';
 

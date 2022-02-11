@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { TtsModelListItem } from '../../../api/tts/ListTtsModels';
+import { TtsModelListItem } from '@storyteller/components/src/api/tts/ListTtsModels';
 import { TtsCategoryType } from '../../../../AppWrapper';
 import Autocomplete from 'react-autocomplete';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
