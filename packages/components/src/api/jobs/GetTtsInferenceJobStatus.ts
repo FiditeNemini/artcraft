@@ -26,6 +26,8 @@ export interface TtsInferenceJobStatus {
   tts_model_type: string,
   title: string,
 
+  raw_inference_text: string,
+
   created_at: Date,
   updated_at: Date,
 }

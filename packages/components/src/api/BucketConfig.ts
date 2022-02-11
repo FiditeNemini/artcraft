@@ -11,7 +11,7 @@ class BucketConfig {
       this.isLocalDev = false;
     }
     // TODO TEMP
-    this.isLocalDev = false;
+    //this.isLocalDev = false;
   }
 
   // TODO: Prevent callers with undefined/null paths

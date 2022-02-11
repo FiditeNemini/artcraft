@@ -1,13 +1,16 @@
 import { TtsInferenceJobStatus } from "../api/jobs/GetTtsInferenceJobStatus";
 import { JobState, jobStateFromString } from "./JobStates";
 
+// NB: Many of these fields are optional despite the response payload containing them
+// This is because we create temporary placeholder objects with just the token.
 export class TtsInferenceJob {
   jobToken: string;
   modelToken?: string;
   jobState: JobState;
   maybeExtraStatusDescription: string | null;
   attemptCount: number;
-  title?: string;
+  title?: string; // Name of the TTS model
+  rawInferenceText?: string;
   maybeResultToken: string | undefined | null;
   maybePublicBucketWavAudioPath: string | undefined | null;
 
@@ -18,6 +21,7 @@ export class TtsInferenceJob {
     attemptCount: number = 0,
     modelToken: string | undefined = undefined,
     title: string | undefined = undefined,
+    rawInferenceText: string | undefined = undefined,
     maybeResulToken: string | undefined | null = null,
     maybePublicBucketWavAudioPath: string | undefined | null = null,
   ) {
@@ -32,6 +36,7 @@ export class TtsInferenceJob {
     if (!!title) {
       this.title = title;
     }
+    this.rawInferenceText = rawInferenceText;
     this.maybePublicBucketWavAudioPath = maybePublicBucketWavAudioPath;
   }
 
@@ -43,6 +48,7 @@ export class TtsInferenceJob {
       response.attempt_count || 0,
       response.model_token,
       response.title,
+      response.raw_inference_text,
       response.maybe_result_token || null,
       response.maybe_public_bucket_wav_audio_path || null,
     );
@@ -64,6 +70,7 @@ export interface TtsInferenceJobState {
   model_token: string,
   tts_model_type: string,
   title: string,
+  raw_inference_text: string,
   created_at: string,
   updated_at: string,
 }
