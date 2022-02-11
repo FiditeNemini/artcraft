@@ -1,24 +1,23 @@
 use actix_http::Error;
 use actix_http::http::header;
-use actix_web::cookie::Cookie;
 use actix_web::HttpResponseBuilder;
+use actix_web::cookie::Cookie;
 use actix_web::error::ResponseError;
 use actix_web::http::StatusCode;
 use actix_web::web::Path;
 use actix_web::{Responder, web, HttpResponse, error, HttpRequest, HttpMessage};
 use chrono::{DateTime, Utc};
 use crate::AnyhowResult;
-use crate::database::queries::list_tts_models::{TtsModelRecordForList, list_tts_models};
-use crate::http_server::web_utils::ip_address::get_request_ip;
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 use crate::server_state::ServerState;
-use derive_more::{Display, Error};
+use database_queries::tts::tts_models::list_tts_models::{TtsModelRecordForList, list_tts_models};
 use log::{info, warn, log};
 use regex::Regex;
 use sqlx::MySqlPool;
 use sqlx::error::DatabaseError;
 use sqlx::error::Error::Database;
 use sqlx::mysql::MySqlDatabaseError;
+use std::fmt;
 use std::sync::Arc;
 
 /// For the URL PathInfo
@@ -33,7 +32,7 @@ pub struct ListTtsModelsForUserSuccessResponse {
   pub models: Vec<TtsModelRecordForList>,
 }
 
-#[derive(Debug, Display)]
+#[derive(Debug)]
 pub enum ListTtsModelsForUserError {
   ServerError,
 }
@@ -51,6 +50,13 @@ impl ResponseError for ListTtsModelsForUserError {
     };
 
     to_simple_json_error(&error_reason, self.status_code())
+  }
+}
+
+// NB: Not using derive_more::Display since Clion doesn't understand it.
+impl fmt::Display for ListTtsModelsForUserError {
+  fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+    write!(f, "{:?}", self)
   }
 }
 

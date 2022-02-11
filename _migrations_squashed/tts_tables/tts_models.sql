@@ -83,6 +83,10 @@ CREATE TABLE tts_models (
   -- Optional; eg. if you train the model more than once.
   version_string VARCHAR(255) DEFAULT NULL,
 
+  -- Whether the voice features on the front of FakeYou or Storyteller Twitch TTS
+  is_front_page_featured BOOLEAN NOT NULL DEFAULT FALSE,
+  is_twitch_featured BOOLEAN NOT NULL DEFAULT FALSE,
+
   -- ========== IMMUTABLE PROVENANCE AND METADATA ==========
 
   -- Where the file was originally downloaded (if it was downloaded)

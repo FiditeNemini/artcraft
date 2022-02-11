@@ -9,7 +9,6 @@ pub mod delete_w2l_result;
 pub mod delete_w2l_template;
 pub mod get_user_profile_by_username;
 pub mod list_ip_bans;
-pub mod list_tts_models;
 pub mod list_user_badges;
 pub mod list_user_roles;
 pub mod list_w2l_templates;

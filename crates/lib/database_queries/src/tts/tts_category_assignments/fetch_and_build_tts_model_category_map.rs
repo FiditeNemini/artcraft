@@ -1,10 +1,8 @@
 use anyhow::anyhow;
-use chrono::{DateTime, Utc};
 use container_common::anyhow_result::AnyhowResult;
 use log::warn;
 use sqlx::MySqlPool;
 use std::collections::{HashSet, HashMap};
-
 
 /// Map of model_token => vec<category tokens>
 #[derive(Serialize, Default)]
@@ -12,9 +10,10 @@ pub struct TtsModelCategoryMap {
   pub model_to_category_tokens: HashMap<String, HashSet<String>>,
 }
 
-pub async fn fetch_tts_model_category_map(mysql_pool: &MySqlPool)
-  -> AnyhowResult<TtsModelCategoryMap>
-{
+/// Fetch a map of every model to all of its categories.
+pub async fn fetch_and_build_tts_model_category_map(
+  mysql_pool: &MySqlPool
+) -> AnyhowResult<TtsModelCategoryMap> {
   let assignments = list_tts_model_category_assignments(mysql_pool).await?;
 
   let mut map : HashMap<String, HashSet<String>> = HashMap::new();
@@ -23,7 +22,7 @@ pub async fn fetch_tts_model_category_map(mysql_pool: &MySqlPool)
     if !map.contains_key(&assignment.tts_model_token) {
       map.insert(assignment.tts_model_token.clone(), HashSet::new());
     }
-    
+
     map.get_mut(&assignment.tts_model_token).map(|hashset| {
       hashset.insert(assignment.category_token.clone())
     });

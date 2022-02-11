@@ -1,9 +1,11 @@
 use anyhow::anyhow;
 use chrono::{DateTime, Utc};
 use container_common::anyhow_result::AnyhowResult;
-use crate::database::helpers::boolean_converters::i8_to_bool;
+use crate::helpers::boolean_converters::i8_to_bool;
 use log::{warn, info};
 use sqlx::MySqlPool;
+
+// FIXME: This is the old style of query scoping and shouldn't be copied.
 
 #[derive(Serialize)]
 pub struct TtsModelRecordForList {
@@ -17,28 +19,16 @@ pub struct TtsModelRecordForList {
   pub creator_display_name: String,
   pub creator_gravatar_hash: String,
 
-  pub is_locked_from_use: bool, // converted
+  pub is_locked_from_use: bool,
+
+  pub is_front_page_featured: bool,
+  pub is_twitch_featured: bool,
 
   pub created_at: DateTime<Utc>,
   pub updated_at: DateTime<Utc>,
 }
 
-struct RawTtsModelRecordForList {
-  pub model_token: String,
-  pub tts_model_type: String,
-
-  pub title: String,
-
-  pub creator_user_token: String,
-  pub creator_username: String,
-  pub creator_display_name: String,
-  pub creator_gravatar_hash: String,
-
-  pub is_locked_from_use: i8, // NB: needs conversion
-
-  pub created_at: DateTime<Utc>,
-  pub updated_at: DateTime<Utc>,
-}
+// FIXME: This is the old style of query scoping and shouldn't be copied.
 
 pub async fn list_tts_models(
   mysql_pool: &MySqlPool,
@@ -57,7 +47,7 @@ pub async fn list_tts_models(
     },
   };
 
-  let models : Vec<RawTtsModelRecordForList> = match maybe_models {
+  let models : Vec<InternalRawTtsModelRecordForList> = match maybe_models {
     Ok(models) => models,
     Err(err) => {
       match err {
@@ -75,16 +65,18 @@ pub async fn list_tts_models(
   Ok(models.into_iter()
     .map(|model| {
       TtsModelRecordForList {
-        model_token: model.model_token.clone(),
-        tts_model_type: model.tts_model_type.clone(),
-        creator_user_token: model.creator_user_token.clone(),
-        creator_username: model.creator_username.clone(),
-        creator_display_name: model.creator_display_name.clone(),
-        creator_gravatar_hash: model.creator_gravatar_hash.clone(),
-        title: model.title.clone(),
+        model_token: model.model_token,
+        tts_model_type: model.tts_model_type,
+        creator_user_token: model.creator_user_token,
+        creator_username: model.creator_username,
+        creator_display_name: model.creator_display_name,
+        creator_gravatar_hash: model.creator_gravatar_hash,
+        title: model.title,
         is_locked_from_use: i8_to_bool(model.is_locked_from_use),
-        created_at: model.created_at.clone(),
-        updated_at: model.updated_at.clone(),
+        is_front_page_featured: i8_to_bool(model.is_front_page_featured),
+        is_twitch_featured: i8_to_bool(model.is_twitch_featured),
+        created_at: model.created_at,
+        updated_at: model.updated_at,
       }
     })
     .collect::<Vec<TtsModelRecordForList>>())
@@ -93,13 +85,13 @@ pub async fn list_tts_models(
 async fn list_tts_models_for_all_creators(
   mysql_pool: &MySqlPool,
   allow_mod_disabled: bool
-) -> AnyhowResult<Vec<RawTtsModelRecordForList>> {
+) -> AnyhowResult<Vec<InternalRawTtsModelRecordForList>> {
   // TODO: There has to be a better way.
   //  Sqlx doesn't like anything except string literals.
   let maybe_models = if !allow_mod_disabled {
     info!("listing tts models for everyone; mod-approved only");
     sqlx::query_as!(
-      RawTtsModelRecordForList,
+      InternalRawTtsModelRecordForList,
         r#"
 SELECT
     tts.token as model_token,
@@ -110,6 +102,8 @@ SELECT
     users.email_gravatar_hash as creator_gravatar_hash,
     tts.title,
     tts.is_locked_from_use,
+    tts.is_front_page_featured,
+    tts.is_twitch_featured,
     tts.created_at,
     tts.updated_at
 FROM tts_models as tts
@@ -125,7 +119,7 @@ WHERE
   } else {
     info!("listing tts models for everyone; all");
     sqlx::query_as!(
-      RawTtsModelRecordForList,
+      InternalRawTtsModelRecordForList,
         r#"
 SELECT
     tts.token as model_token,
@@ -136,6 +130,8 @@ SELECT
     users.email_gravatar_hash as creator_gravatar_hash,
     tts.title,
     tts.is_locked_from_use,
+    tts.is_front_page_featured,
+    tts.is_twitch_featured,
     tts.created_at,
     tts.updated_at
 FROM tts_models as tts
@@ -156,13 +152,13 @@ async fn list_tts_models_creator_scoped(
   mysql_pool: &MySqlPool,
   scope_creator_username: &str,
   allow_mod_disabled: bool
-) -> AnyhowResult<Vec<RawTtsModelRecordForList>> {
+) -> AnyhowResult<Vec<InternalRawTtsModelRecordForList>> {
   // TODO: There has to be a better way.
   //  Sqlx doesn't like anything except string literals.
   let maybe_models = if !allow_mod_disabled {
     info!("listing tts models for user; mod-approved only");
     sqlx::query_as!(
-      RawTtsModelRecordForList,
+      InternalRawTtsModelRecordForList,
         r#"
 SELECT
     tts.token as model_token,
@@ -173,6 +169,8 @@ SELECT
     users.email_gravatar_hash as creator_gravatar_hash,
     tts.title,
     tts.is_locked_from_use,
+    tts.is_front_page_featured,
+    tts.is_twitch_featured,
     tts.created_at,
     tts.updated_at
 FROM tts_models as tts
@@ -191,7 +189,7 @@ WHERE
   } else {
     info!("listing tts models for user; all");
     sqlx::query_as!(
-      RawTtsModelRecordForList,
+      InternalRawTtsModelRecordForList,
         r#"
 SELECT
     tts.token as model_token,
@@ -202,6 +200,8 @@ SELECT
     users.email_gravatar_hash as creator_gravatar_hash,
     tts.title,
     tts.is_locked_from_use,
+    tts.is_front_page_featured,
+    tts.is_twitch_featured,
     tts.created_at,
     tts.updated_at
 FROM tts_models as tts
@@ -220,3 +220,24 @@ WHERE
 
   Ok(maybe_models)
 }
+
+struct InternalRawTtsModelRecordForList {
+  pub model_token: String,
+  pub tts_model_type: String,
+
+  pub title: String,
+
+  pub creator_user_token: String,
+  pub creator_username: String,
+  pub creator_display_name: String,
+  pub creator_gravatar_hash: String,
+
+  pub is_locked_from_use: i8, // bool
+
+  pub is_front_page_featured: i8, // bool
+  pub is_twitch_featured: i8, // bool
+
+  pub created_at: DateTime<Utc>,
+  pub updated_at: DateTime<Utc>,
+}
+

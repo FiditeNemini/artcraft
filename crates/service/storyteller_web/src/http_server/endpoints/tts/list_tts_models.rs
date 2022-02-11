@@ -6,11 +6,12 @@ use actix_web::http::StatusCode;
 use actix_web::{Responder, web, HttpResponse, error, HttpRequest, HttpMessage};
 use chrono::{DateTime, Utc};
 use container_common::anyhow_result::AnyhowResult;
-use crate::database::queries::categories::list_tts_model_category_assignments::fetch_tts_model_category_map;
-use crate::database::queries::list_tts_models::list_tts_models;
 use crate::http_server::web_utils::ip_address::get_request_ip;
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 use crate::server_state::ServerState;
+use database_queries::tts::tts_category_assignments::fetch_and_build_tts_model_category_map::fetch_and_build_tts_model_category_map;
+use database_queries::tts::tts_models::list_tts_models::list_tts_models;
+use lexical_sort::natural_lexical_cmp;
 use log::{info, warn, log, error};
 use regex::Regex;
 use sqlx::MySqlPool;
@@ -20,7 +21,6 @@ use sqlx::mysql::MySqlDatabaseError;
 use std::collections::HashSet;
 use std::fmt;
 use std::sync::Arc;
-use lexical_sort::natural_lexical_cmp;
 
 #[derive(Serialize, Clone)]
 pub struct TtsModelRecordForResponse {
@@ -31,6 +31,8 @@ pub struct TtsModelRecordForResponse {
   pub creator_display_name: String,
   pub creator_gravatar_hash: String,
   pub title: String,
+  pub is_front_page_featured: bool,
+  pub is_twitch_featured: bool,
 
   /// Category assignments
   /// From non-deleted, mod-approved categories only
@@ -141,7 +143,7 @@ async fn get_all_models(mysql_pool: &MySqlPool) -> AnyhowResult<Vec<TtsModelReco
   ).await?;
 
   let model_categories_map
-      = fetch_tts_model_category_map(mysql_pool).await?;
+      = fetch_and_build_tts_model_category_map(mysql_pool).await?;
 
   // Make the list nice for human readers.
   models.sort_by(|a, b|
@@ -157,6 +159,8 @@ async fn get_all_models(mysql_pool: &MySqlPool) -> AnyhowResult<Vec<TtsModelReco
           creator_display_name: model.creator_display_name.clone(),
           creator_gravatar_hash: model.creator_gravatar_hash.clone(),
           title: model.title.clone(),
+          is_front_page_featured: model.is_front_page_featured,
+          is_twitch_featured: model.is_twitch_featured,
           category_tokens: model_categories_map.model_to_category_tokens.get(&model.model_token)
               .map(|hash| hash.clone())
               .unwrap_or(HashSet::new()),
