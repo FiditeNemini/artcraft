@@ -1,7 +1,7 @@
 use actix_http::Error;
 use actix_http::http::header;
-use actix_web::cookie::Cookie;
 use actix_web::HttpResponseBuilder;
+use actix_web::cookie::Cookie;
 use actix_web::error::ResponseError;
 use actix_web::http::StatusCode;
 use actix_web::web::Path;
@@ -10,7 +10,6 @@ use crate::database::queries::delete_tts_model::delete_tts_model_as_mod;
 use crate::database::queries::delete_tts_model::delete_tts_model_as_user;
 use crate::database::queries::delete_tts_model::undelete_tts_model_as_mod;
 use crate::database::queries::delete_tts_model::undelete_tts_model_as_user;
-use crate::database::queries::query_tts_model::select_tts_model_by_token;
 use crate::database::queries::query_tts_result::select_tts_result_by_token;
 use crate::http_server::web_utils::ip_address::get_request_ip;
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
@@ -18,13 +17,14 @@ use crate::http_server::web_utils::response_success_helpers::simple_json_success
 use crate::server_state::ServerState;
 use crate::util::delete_role_disambiguation::DeleteRole;
 use crate::util::delete_role_disambiguation::delete_role_disambiguation;
-use derive_more::{Display, Error};
+use database_queries::tts::tts_models::get_tts_model::get_tts_model_by_token;
 use log::{info, warn, log};
 use regex::Regex;
 use sqlx::MySqlPool;
 use sqlx::error::DatabaseError;
 use sqlx::error::Error::Database;
 use sqlx::mysql::MySqlDatabaseError;
+use std::fmt;
 use std::sync::Arc;
 
 /// For the URL PathInfo
@@ -40,7 +40,7 @@ pub struct DeleteTtsModelRequest {
   as_mod: Option<bool>,
 }
 
-#[derive(Debug, Display)]
+#[derive(Debug)]
 pub enum DeleteTtsModelError {
   BadInput(String),
   NotAuthorized,
@@ -67,6 +67,13 @@ impl ResponseError for DeleteTtsModelError {
     };
 
     to_simple_json_error(&error_reason, self.status_code())
+  }
+}
+
+// NB: Not using derive_more::Display since Clion doesn't understand it.
+impl fmt::Display for DeleteTtsModelError {
+  fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+    write!(f, "{:?}", self)
   }
 }
 
@@ -97,7 +104,7 @@ pub async fn delete_tts_model_handler(
   // Only mods should see deleted models (both user_* and mod_* deleted).
   let is_mod = user_session.can_delete_other_users_tts_models;
 
-  let model_query_result = select_tts_model_by_token(
+  let model_query_result = get_tts_model_by_token(
     &path.token,
     is_mod,
     &server_state.mysql_pool,

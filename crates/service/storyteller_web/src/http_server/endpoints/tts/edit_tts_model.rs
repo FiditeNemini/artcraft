@@ -6,22 +6,22 @@ use actix_web::error::ResponseError;
 use actix_web::http::StatusCode;
 use actix_web::web::{Path, Json};
 use actix_web::{Responder, web, HttpResponse, error, HttpRequest};
-use crate::database::enums::record_visibility::RecordVisibility;
-use crate::database::enums::vocoder_type::VocoderType;
-use crate::database::queries::query_tts_model::select_tts_model_by_token;
 use crate::http_server::web_utils::ip_address::get_request_ip;
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 use crate::http_server::web_utils::response_success_helpers::simple_json_success;
 use crate::server_state::ServerState;
 use crate::util::email_to_gravatar::email_to_gravatar;
 use crate::util::markdown_to_html::markdown_to_html;
-use derive_more::{Display, Error};
+use database_queries::column_types::record_visibility::RecordVisibility;
+use database_queries::column_types::vocoder_type::VocoderType;
+use database_queries::tts::tts_models::get_tts_model::get_tts_model_by_token;
 use log::{info, warn, log};
 use regex::Regex;
 use sqlx::MySqlPool;
 use sqlx::error::DatabaseError;
 use sqlx::error::Error::Database;
 use sqlx::mysql::MySqlDatabaseError;
+use std::fmt;
 use std::sync::Arc;
 use user_input_common::check_for_slurs::contains_slurs;
 
@@ -52,7 +52,7 @@ pub struct EditTtsModelRequest {
   pub maybe_mod_comments: Option<String>,
 }
 
-#[derive(Debug, Display)]
+#[derive(Debug)]
 pub enum EditTtsModelError {
   BadInput(String),
   NotAuthorized,
@@ -79,6 +79,13 @@ impl ResponseError for EditTtsModelError {
     };
 
     to_simple_json_error(&error_reason, self.status_code())
+  }
+}
+
+// NB: Not using derive_more::Display since Clion doesn't understand it.
+impl fmt::Display for EditTtsModelError {
+  fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+    write!(f, "{:?}", self)
   }
 }
 
@@ -109,7 +116,7 @@ pub async fn edit_tts_model_handler(
   // Only mods should see deleted models (both user_* and mod_* deleted).
   let is_mod_that_can_see_deleted = user_session.can_delete_other_users_tts_models;
 
-  let model_lookup_result = select_tts_model_by_token(
+  let model_lookup_result = get_tts_model_by_token(
     &path.model_token,
     is_mod_that_can_see_deleted,
     &server_state.mysql_pool).await;

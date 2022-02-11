@@ -8,10 +8,9 @@ use actix_web::{Responder, web, HttpResponse, error, HttpRequest, HttpMessage};
 use anyhow::Error;
 use chrono::{DateTime, Utc};
 use crate::AnyhowResult;
-use crate::database::queries::query_tts_model::TtsModelRecordForResponse;
-use crate::database::queries::query_tts_model::select_tts_model_by_token;
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 use crate::server_state::ServerState;
+use database_queries::tts::tts_models::get_tts_model::{TtsModelRecordForResponse, get_tts_model_by_token};
 use log::{info, warn, log};
 use regex::Regex;
 use sqlx::MySqlPool;
@@ -98,7 +97,7 @@ pub async fn get_tts_model_handler(
         || user_session.can_edit_other_users_tts_models;
   }
 
-  let model_query_result = select_tts_model_by_token(
+  let model_query_result = get_tts_model_by_token(
     &path.token,
     show_deleted_models,
     &server_state.mysql_pool

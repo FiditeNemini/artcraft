@@ -1,18 +1,14 @@
 use anyhow::anyhow;
 use chrono::{DateTime, Utc};
-use crate::AnyhowResult;
-use crate::database::enums::record_visibility::RecordVisibility;
-use crate::database::enums::vocoder_type::VocoderType;
-use crate::database::helpers::boolean_converters::i8_to_bool;
-use crate::database::helpers::boolean_converters::nullable_i8_to_optional_bool;
-use derive_more::{Display, Error};
-use log::{info, warn, log};
-use regex::Regex;
+use container_common::anyhow_result::AnyhowResult;
+use crate::column_types::record_visibility::RecordVisibility;
+use crate::column_types::vocoder_type::VocoderType;
+use crate::helpers::boolean_converters::i8_to_bool;
+use log::warn;
 use sqlx::MySqlPool;
-use sqlx::error::DatabaseError;
-use sqlx::error::Error::Database;
-use sqlx::mysql::MySqlDatabaseError;
-use std::sync::Arc;
+
+// FIXME: This is the old style of query scoping and shouldn't be copied.
+//  The moderator-only fields are good practice, though.
 
 #[derive(Serialize)]
 pub struct TtsModelRecordForResponse {
@@ -29,6 +25,9 @@ pub struct TtsModelRecordForResponse {
   pub title: String,
   pub description_markdown: String,
   pub description_rendered_html: String,
+
+  pub is_front_page_featured: bool,
+  pub is_twitch_featured: bool,
 
   pub creator_set_visibility: RecordVisibility,
 
@@ -52,39 +51,10 @@ pub struct TtsModelModeratorFields {
   pub mod_deleted_at: Option<DateTime<Utc>>,
 }
 
-#[derive(Serialize)]
-pub struct TtsModelRecordRaw {
-  pub model_token: String,
-  pub tts_model_type: String,
-  pub maybe_default_pretrained_vocoder: Option<String>,
-  pub text_preprocessing_algorithm: String,
+// FIXME: This is the old style of query scoping and shouldn't be copied.
+//  The moderator-only fields are good practice, though.
 
-  pub creator_user_token: String,
-  pub creator_username: String,
-  pub creator_display_name: String,
-  pub creator_gravatar_hash: String,
-  pub creator_is_banned: i8,
-
-  pub title: String,
-  pub description_markdown: String,
-  pub description_rendered_html: String,
-
-  pub creator_set_visibility: String,
-
-  pub is_locked_from_use: i8,
-  pub is_locked_from_user_modification: i8,
-
-  pub created_at: DateTime<Utc>,
-  pub updated_at: DateTime<Utc>,
-
-  // Moderator fields
-  pub creator_ip_address_creation: String,
-  pub creator_ip_address_last_update: String,
-  pub user_deleted_at: Option<DateTime<Utc>>,
-  pub mod_deleted_at: Option<DateTime<Utc>>,
-}
-
-pub async fn select_tts_model_by_token(
+pub async fn get_tts_model_by_token(
   tts_model_token: &str,
   can_see_deleted: bool,
   mysql_pool: &MySqlPool
@@ -96,7 +66,7 @@ pub async fn select_tts_model_by_token(
     select_without_deleted(tts_model_token, mysql_pool).await
   };
 
-  let model : TtsModelRecordRaw = match maybe_record {
+  let model : InternalTtsModelRecordRaw = match maybe_record {
     Ok(model) => model,
     Err(ref err) => {
       match err {
@@ -118,30 +88,32 @@ pub async fn select_tts_model_by_token(
   }
 
   let model_for_response = TtsModelRecordForResponse {
-    model_token: model.model_token.clone(),
-    tts_model_type: model.tts_model_type.clone(),
+    model_token: model.model_token,
+    tts_model_type: model.tts_model_type,
     maybe_default_pretrained_vocoder: maybe_vocoder,
-    text_preprocessing_algorithm: model.text_preprocessing_algorithm.clone(),
-    creator_user_token: model.creator_user_token.clone(),
-    creator_username: model.creator_username.clone(),
-    creator_display_name: model.creator_display_name.clone(),
-    creator_gravatar_hash: model.creator_gravatar_hash.clone(),
-    title: model.title.clone(),
-    description_markdown: model.description_markdown.clone(),
-    description_rendered_html: model.description_rendered_html.clone(),
+    text_preprocessing_algorithm: model.text_preprocessing_algorithm,
+    creator_user_token: model.creator_user_token,
+    creator_username: model.creator_username,
+    creator_display_name: model.creator_display_name,
+    creator_gravatar_hash: model.creator_gravatar_hash,
+    title: model.title,
+    description_markdown: model.description_markdown,
+    description_rendered_html: model.description_rendered_html,
     // NB: Fail open/public with creator_set_visibility since we're already looking at it
+    is_front_page_featured: i8_to_bool(model.is_front_page_featured),
+    is_twitch_featured: i8_to_bool(model.is_twitch_featured),
     creator_set_visibility: RecordVisibility::from_str(&model.creator_set_visibility)
         .unwrap_or(RecordVisibility::Public),
     is_locked_from_use: i8_to_bool(model.is_locked_from_use),
     is_locked_from_user_modification: i8_to_bool(model.is_locked_from_user_modification),
-    created_at: model.created_at.clone(),
-    updated_at: model.updated_at.clone(),
+    created_at: model.created_at,
+    updated_at: model.updated_at,
     maybe_moderator_fields: Some(TtsModelModeratorFields {
       creator_is_banned: i8_to_bool(model.creator_is_banned),
-      creator_ip_address_creation: model.creator_ip_address_creation.clone(),
-      creator_ip_address_last_update: model.creator_ip_address_last_update.clone(),
-      user_deleted_at: model.user_deleted_at.clone(),
-      mod_deleted_at: model.mod_deleted_at.clone(),
+      creator_ip_address_creation: model.creator_ip_address_creation,
+      creator_ip_address_last_update: model.creator_ip_address_last_update,
+      user_deleted_at: model.user_deleted_at,
+      mod_deleted_at: model.mod_deleted_at,
     }),
   };
 
@@ -151,9 +123,9 @@ pub async fn select_tts_model_by_token(
 async fn select_including_deleted(
   tts_model_token: &str,
   mysql_pool: &MySqlPool
-) -> Result<TtsModelRecordRaw, sqlx::Error> {
+) -> Result<InternalTtsModelRecordRaw, sqlx::Error> {
   sqlx::query_as!(
-      TtsModelRecordRaw,
+      InternalTtsModelRecordRaw,
         r#"
 SELECT
     tts.token as model_token,
@@ -170,6 +142,9 @@ SELECT
     tts.title,
     tts.description_markdown,
     tts.description_rendered_html,
+
+    tts.is_front_page_featured,
+    tts.is_twitch_featured,
 
     tts.creator_set_visibility,
 
@@ -198,9 +173,9 @@ WHERE tts.token = ?
 async fn select_without_deleted(
   tts_model_token: &str,
   mysql_pool: &MySqlPool
-) -> Result<TtsModelRecordRaw, sqlx::Error> {
+) -> Result<InternalTtsModelRecordRaw, sqlx::Error> {
   sqlx::query_as!(
-      TtsModelRecordRaw,
+      InternalTtsModelRecordRaw,
         r#"
 SELECT
     tts.token as model_token,
@@ -217,6 +192,9 @@ SELECT
     tts.title,
     tts.description_markdown,
     tts.description_rendered_html,
+
+    tts.is_front_page_featured,
+    tts.is_twitch_featured,
 
     tts.creator_set_visibility,
 
@@ -243,4 +221,39 @@ WHERE
     )
     .fetch_one(mysql_pool)
     .await // TODO: This will return error if it doesn't exist
+}
+
+#[derive(Serialize)]
+struct InternalTtsModelRecordRaw {
+  pub model_token: String,
+  pub tts_model_type: String,
+  pub maybe_default_pretrained_vocoder: Option<String>,
+  pub text_preprocessing_algorithm: String,
+
+  pub creator_user_token: String,
+  pub creator_username: String,
+  pub creator_display_name: String,
+  pub creator_gravatar_hash: String,
+  pub creator_is_banned: i8,
+
+  pub title: String,
+  pub description_markdown: String,
+  pub description_rendered_html: String,
+
+  pub is_front_page_featured: i8,
+  pub is_twitch_featured: i8,
+
+  pub creator_set_visibility: String,
+
+  pub is_locked_from_use: i8,
+  pub is_locked_from_user_modification: i8,
+
+  pub created_at: DateTime<Utc>,
+  pub updated_at: DateTime<Utc>,
+
+  // Moderator fields
+  pub creator_ip_address_creation: String,
+  pub creator_ip_address_last_update: String,
+  pub user_deleted_at: Option<DateTime<Utc>>,
+  pub mod_deleted_at: Option<DateTime<Utc>>,
 }

@@ -9,7 +9,6 @@ use actix_web::{Responder, web, HttpResponse, error, HttpRequest};
 use anyhow::anyhow;
 use crate::database::enums::record_visibility::RecordVisibility;
 use crate::database::queries::categories::get_category_by_token::get_category_by_token;
-use crate::database::queries::query_tts_model::select_tts_model_by_token;
 use crate::database::queries::query_w2l_template::select_w2l_template_by_token;
 use crate::http_server::web_utils::ip_address::get_request_ip;
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
@@ -17,6 +16,7 @@ use crate::http_server::web_utils::response_success_helpers::simple_json_success
 use crate::server_state::ServerState;
 use crate::util::email_to_gravatar::email_to_gravatar;
 use crate::util::markdown_to_html::markdown_to_html;
+use database_queries::tts::tts_models::get_tts_model::get_tts_model_by_token;
 use http_server_common::response::serialize_as_json_error::serialize_as_json_error;
 use log::{info, warn, log};
 use regex::Regex;
@@ -147,7 +147,7 @@ pub async fn assign_tts_category_handler(
   // Only mods should see deleted models (both user_* and mod_* deleted).
   let is_mod_that_can_see_deleted = user_session.can_delete_other_users_tts_models;
 
-  let model_lookup_result = select_tts_model_by_token(
+  let model_lookup_result = get_tts_model_by_token(
     &request.tts_model_token,
     is_mod_that_can_see_deleted,
     &server_state.mysql_pool).await;
