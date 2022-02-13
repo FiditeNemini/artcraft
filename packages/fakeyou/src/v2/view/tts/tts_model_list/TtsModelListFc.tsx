@@ -322,7 +322,7 @@ function TtsModelListFc(props: Props) {
               onChange={handleChangeText}
               className="textarea is-large" 
               value={props.textBuffer}
-              placeholder="Textual shenanigans go here..."></textarea>
+              placeholder={t('ttsListPage.textGoesHere')}></textarea>
           </div>
         </div>
 
