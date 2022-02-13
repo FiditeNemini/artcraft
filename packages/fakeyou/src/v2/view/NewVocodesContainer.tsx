@@ -62,6 +62,7 @@ interface Props {
   isShowingLangaugeNotice: boolean,
   clearLanguageNotice: () => void,
   displayLanguage: Language,
+  primaryLanguageCode: string,
 
   enqueueTtsJob: (jobToken: string) => void,
   ttsInferenceJobs: Array<TtsInferenceJob>,
