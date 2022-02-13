@@ -3,7 +3,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faChevronRight, faHeadphonesAlt, faTags, faTimes } from '@fortawesome/free-solid-svg-icons';
 import { TtsModelListItem } from '@storyteller/components/src/api/tts/ListTtsModels';
 import { TtsCategoryType } from '../../../../AppWrapper';
-import { useTranslation } from 'react-i18next';
+import { Trans, useTranslation } from 'react-i18next';
 
 interface Props {
   allTtsCategories: TtsCategoryType[],
@@ -272,7 +272,11 @@ export function MultiDropdownSearch(props: Props) {
       {categoryFieldGroups}
 
       {/* Model Dropdown */}
-      <strong>Voice ({voiceCount} to choose from)</strong>
+      <strong>
+        <Trans i18nKey="ttsListPage.voiceCount" count={voiceCount}>
+        Voice ({voiceCount} to choose from)
+        </Trans>
+      </strong>
       <br />
       <div className="control has-icons-left">
         <div className={selectClasses}>
@@ -286,7 +290,7 @@ export function MultiDropdownSearch(props: Props) {
                 <option
                   key={model.model_token}
                   value={model.model_token}
-                  >{model.title} (by {model.creator_display_name})</option>
+                  >{model.title} ({t('ttsListPage.by')} {model.creator_display_name})</option>
               );
             })}
           </select>

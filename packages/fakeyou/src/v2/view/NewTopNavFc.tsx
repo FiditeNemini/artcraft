@@ -81,17 +81,17 @@ function NewTopNavFc(props: Props) {
                 <Link to="/leaderboard"
                   className="navbar-item"
                   onClick={() => closeHamburger()}
-                  ><FontAwesomeIcon icon={faTrophy} />&nbsp;&nbsp;Leaderboard</Link>
+                  ><FontAwesomeIcon icon={faTrophy} />&nbsp;&nbsp;{t('coreUi.topNav.leaderboard')}</Link>
 
                 <Link to={FrontendUrlConfig.patronsPage()}
                   className="navbar-item"
                   onClick={() => closeHamburger()}
-                  ><FontAwesomeIcon icon={faPatreon}/>&nbsp;&nbsp;Patrons</Link>
+                  ><FontAwesomeIcon icon={faPatreon}/>&nbsp;&nbsp;{t('coreUi.topNav.patrons')}</Link>
 
                 <Link to="/firehose"
                   className="navbar-item"
                   onClick={() => closeHamburger()}
-                  ><FontAwesomeIcon icon={faList} />&nbsp;&nbsp;Feed</Link>
+                  ><FontAwesomeIcon icon={faList} />&nbsp;&nbsp;{t('coreUi.topNav.feed')}</Link>
 
                 <hr className="navbar-divider" />
 
@@ -105,12 +105,12 @@ function NewTopNavFc(props: Props) {
                 <Link to={FrontendUrlConfig.aboutUsPage()}
                   className="navbar-item"
                   onClick={() => closeHamburger()}
-                  ><FontAwesomeIcon icon={faGrinBeamSweat} />&nbsp;&nbsp;About Us</Link>
+                  ><FontAwesomeIcon icon={faGrinBeamSweat} />&nbsp;&nbsp;{t('coreUi.topNav.aboutUs')}</Link>
 
                 <Link to={FrontendUrlConfig.termsPage()}
                   className="navbar-item"
                   onClick={() => closeHamburger()}
-                  ><FontAwesomeIcon icon={faGavel} />&nbsp;&nbsp;Terms</Link>
+                  ><FontAwesomeIcon icon={faGavel} />&nbsp;&nbsp;{t('coreUi.topNav.terms')}</Link>
 
               </div>
             </div>

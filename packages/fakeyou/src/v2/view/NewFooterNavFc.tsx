@@ -6,6 +6,7 @@ import './_css/footer.scss'
 import { ModerationIcon } from './_icons/ModerationIcon';
 import { FrontendUrlConfig } from '../../common/FrontendUrlConfig';
 import { t } from 'i18next';
+import { Trans } from 'react-i18next';
 
 interface Props {
   sessionWrapper: SessionWrapper,
@@ -56,7 +57,9 @@ function NewFooterNavFc(props: Props) {
         </div>
 
         <p>
-          Built by <Link to="/profile/echelon">@echelon</Link> in Atlanta.
+          <Trans i18nKey="coreUi.footerNav.builtBy">
+            Built by <Link to="/profile/echelon">@echelon</Link> in Atlanta.
+          </Trans>
         </p>
 
       </div>

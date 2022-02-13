@@ -1,3 +1,4 @@
+// Use \u{00a0} = &nbsp; character literal
 
 const TRANSLATIONS : any = {
   // English: 46.6% Twitch (#1), 30+% FakeYou (#1)
@@ -6,6 +7,7 @@ const TRANSLATIONS : any = {
       coreUi: {
         footerNav: {
           aboutUs: 'About Us',
+          builtBy: 'Built by <1>echelon</1> in Atlanta.',
           feed: 'Feed',
           leaderboard: 'Leaderboard',
           patrons: 'Patrons',
@@ -15,21 +17,28 @@ const TRANSLATIONS : any = {
           video: 'Video',
         },
         topNav: {
+          aboutUs: 'About Us',
           community: 'Community',
           contributeUpload: 'Contribute / Upload',
+          feed: 'Feed',
+          leaderboard: 'Leaderboard',
           logout: 'Logout',
           myData: 'My Data',
+          patrons: 'Patrons',
           signUpLogin: 'Sign up / Login',
+          terms: 'Terms of Use',
           video: 'Video',
         },
       },
       ttsListPage: {
+        by: 'by',
         categoryFilters: 'Category Filters', // "Category / Language" in other locales
         loading: 'Loading...',
         search: 'Search',
         searchTerm: 'Search Term',
         speakButton: 'Speak',
         clearButton: 'Clear',
+        voiceCount: 'Voice ({{count}} to choose from)',
       }
     }
   },
@@ -44,30 +53,38 @@ const TRANSLATIONS : any = {
       coreUi: {
         footerNav: {
           aboutUs: 'Sobre Nosotros',
+          builtBy: 'Construido por <1>echelon</1> en Atlanta.',
           feed: 'Transmisión en Vivo',
-          leaderboard: 'Tabla de Clasificación',
+          leaderboard: 'Tabla\u{00a0}de\u{00a0}Clasificación',
           patrons: 'Mecenas',
-          termsOfUse: 'Términos de Uso',
+          termsOfUse: 'Términos\u{00a0}de\u{00a0}Uso',
           textToSpeech: 'Texto a Voz',
           upload: 'Subir',
           video: 'Video', // NB: This *is* translated
         },
         topNav: {
+          aboutUs: 'Sobre Nosotros',
           community: 'Comunidad',
           contributeUpload: 'Contribuir / Subir',
+          feed: 'Transmisión en Vivo',
+          leaderboard: 'Tabla de Clasificación',
           logout: 'Cerrar sesión',
           myData: 'Mis datos',
+          patrons: 'Mecenas',
           signUpLogin: 'Registrate e inicia secion',
+          terms: 'Términos de Uso',
           video: 'Video', // NB: This *is* translated
         },
       },
       ttsListPage: {
+        by: 'de',
         categoryFilters: 'Categoría / Idioma',
         loading: 'Cargando...',
         search: 'Búsqueda',
         searchTerm: 'Término de búsqueda',
         speakButton: 'Hablar',
         clearButton: 'Claro',
+        voiceCount: 'Voz ({{count}} para elegir)',
       }
     }
   },
