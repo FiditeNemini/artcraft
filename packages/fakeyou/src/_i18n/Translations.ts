@@ -33,13 +33,13 @@ const TRANSLATIONS : any = {
       ttsListPage: {
         by: 'by',
         categoryFilters: 'Category Filters', // "Category / Language" in other locales
-        seeModelDetails: 'See more details about the "<1>{{modelName}}</1>" model by <3>{{userName}}</3>\u{00a0}',
+        clearButton: 'Clear',
         loading: 'Loading...',
         search: 'Search',
         searchTerm: 'Search Term',
-        textGoesHere: 'Textual shenanigans go here...',
+        seeModelDetails: 'See more details about the "<1>{{modelName}}</1>" model by <3>{{userName}}</3>\u{00a0}',
         speakButton: 'Speak',
-        clearButton: 'Clear',
+        textGoesHere: 'Textual shenanigans go here...',
         voiceCount: 'Voice ({{count}} to choose from)',
       }
     }
@@ -81,13 +81,13 @@ const TRANSLATIONS : any = {
       ttsListPage: {
         by: 'de',
         categoryFilters: 'Categoría / Idioma',
-        seeModelDetails: 'Ver más detalles sobre el modelo "<1>{{modelName}}</1>" de <3>{{userName}}</3>\u{00a0}',
+        clearButton: 'Claro',
         loading: 'Cargando...',
         search: 'Búsqueda',
         searchTerm: 'Término de búsqueda',
-        textGoesHere: 'Las travesuras textuales van aquí...',
+        seeModelDetails: 'Ver más detalles sobre el modelo "<1>{{modelName}}</1>" de <3>{{userName}}</3>\u{00a0}',
         speakButton: 'Hablar',
-        clearButton: 'Claro',
+        textGoesHere: 'Las travesuras textuales van aquí...',
         voiceCount: 'Voz ({{count}} para elegir)',
       }
     }
