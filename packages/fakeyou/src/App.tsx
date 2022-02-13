@@ -82,6 +82,7 @@ interface State {
   //localeFullLanguageTags: string[],
   isShowingLanguageNotice: boolean,
   displayLanguage: Language,
+  primaryLanguageCode: string,
 
   // Jobs enqueued during this browser session.
   ttsInferenceJobs: Array<TtsInferenceJob>,
@@ -121,6 +122,7 @@ class App extends React.Component<Props, State> {
       //localeFullLanguageTags: [],
       isShowingLanguageNotice: false,
       displayLanguage: Language.English,
+      primaryLanguageCode: 'en',
 
       ttsInferenceJobs: [],
       w2lInferenceJobs: [],
@@ -209,6 +211,7 @@ class App extends React.Component<Props, State> {
       this.setState({
         isShowingLanguageNotice: showNotice,
         displayLanguage: displayLanguage,
+        primaryLanguageCode: languageCode,
       });
 
       i18n.changeLanguage(languageCode);
@@ -507,6 +510,7 @@ class App extends React.Component<Props, State> {
                     isShowingLangaugeNotice={this.state.isShowingLanguageNotice}
                     clearLanguageNotice={this.clearLanguageNotice}
                     displayLanguage={this.state.displayLanguage}
+                    primaryLanguageCode={this.state.primaryLanguageCode}
 
                     enqueueTtsJob={this.enqueueTtsJob}
                     ttsInferenceJobs={this.state.ttsInferenceJobs}

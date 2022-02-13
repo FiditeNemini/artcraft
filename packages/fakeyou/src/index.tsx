@@ -2,7 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
 import * as serviceWorker from './serviceWorker';
-import { AppWrapper } from './AppWrapper';
+import AppTranslated from './AppTranslated';
 
 const IS_IOS : boolean = /iPad|iPhone|iPod/.test(navigator.platform || "");
 
@@ -12,7 +12,7 @@ const flashVocodesNotice = new URLSearchParams(window.location.search).has('voco
 
 ReactDOM.render(
   <React.StrictMode>
-    <AppWrapper 
+    <AppTranslated
         enableSpectrograms={enableSpectrograms} 
         flashVocodesNotice={flashVocodesNotice}
       />
