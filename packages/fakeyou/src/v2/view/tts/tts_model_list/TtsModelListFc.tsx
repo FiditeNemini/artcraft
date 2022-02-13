@@ -286,7 +286,7 @@ function TtsModelListFc(props: Props) {
               onChange={handleChangeText}
               className="textarea is-large" 
               value={props.textBuffer}
-              placeholder={t('ttsListPage.textGoesHere')}></textarea>
+              placeholder={t('pages.ttsList.placeholderTextGoesHere')}></textarea>
           </div>
         </div>
 
@@ -295,12 +295,12 @@ function TtsModelListFc(props: Props) {
             <div className="column has-text-centered">
               <button 
                 className="button is-danger is-large" 
-                disabled={remainingCharactersButtonDisabled}>{t('ttsListPage.speakButton')}</button>
+                disabled={remainingCharactersButtonDisabled}>{t('pages.ttsList.buttonSpeak')}</button>
             </div>
             <div className="column has-text-centered">
               <button 
                 className="button is-danger is-light is-large" 
-                onClick={handleClearClick}>{t('ttsListPage.clearButton')}</button>
+                onClick={handleClearClick}>{t('pages.ttsList.buttonClear')}</button>
             </div>
           </div>
         </div>
