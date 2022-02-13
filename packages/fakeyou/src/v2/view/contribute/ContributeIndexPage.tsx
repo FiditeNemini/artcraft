@@ -42,7 +42,7 @@ function ContributeIndexPage(props: Props) {
         <p>
           <Trans i18nKey="pages.contributeIndex.describeUploadModels">
             Create new voices and video templates for FakeYou. 
-            <DiscordLink text={t('pages.contributeIndex.discordLink')} iconAfterText={true} /> 
+            <DiscordLink text={t('pages.contributeIndex.discordLink1')} iconAfterText={true} /> 
             to learn how.
           </Trans>
         </p>
