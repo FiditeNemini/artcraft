@@ -41,8 +41,14 @@ const TRANSLATIONS : any = {
         },
         // Other pages
         contributeIndex: {
+          buttonUploadVoice: 'Upload voice (TTS model)',
+          buttonUploadW2lPhoto: 'Upload lipsync photo (w2l)',
+          buttonUploadW2lVideo: 'Upload lipsync video (w2l)',
           discordLink: 'Join our Discord',
+          discordLink2: 'Say hi in Discord',
+          describeMore: 'Want to contribute code, design, or data science? <1 />',
           describeUploadModels: 'Create new voices and video templates for FakeYou. <1 /> to learn how.',
+          headingMore: 'More Ways to Contribute',
           headingUploadModels: 'Upload Models',
           heroTitle: 'Contribute to FakeYou!',
           heroSubtitle: 'You make FakeYou <strong>better</strong> by contributing',
@@ -100,8 +106,14 @@ const TRANSLATIONS : any = {
         },
         // Other pages
         contributeIndex: {
+          buttonUploadVoice: 'Subir voz (modelo TTS)',
+          buttonUploadW2lPhoto: 'Foto de sincronización de labios (w2l)', // NB: Remove 'Subdir' ~= upload
+          buttonUploadW2lVideo: 'Video de sincronización de labios (w2l)', // NB: Remove 'Subdir' ~= upload
           discordLink: 'Únase a nuestro Discord',
+          discordLink2: '¡Saluda en Discord!',
+          describeMore: '¿Quiere contribuir con código, diseño o ciencia de datos? <1 />',
           describeUploadModels: 'Crea nuevas voces y plantillas de video para FakeYou. <1 /> para aprender cómo.',
+          headingMore: 'Más Formas de Contribuir',
           headingUploadModels: 'Subir Modelos',
           heroTitle: 'Contribuir a FakeYou',
           heroSubtitle: 'Haces FakeYou <strong>mejor</strong> contribuyendo',

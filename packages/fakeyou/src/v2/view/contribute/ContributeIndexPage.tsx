@@ -44,21 +44,21 @@ function ContributeIndexPage(props: Props) {
         <Link
           to="/upload/tts"
           className="button is-link is-large is-fullwidth "
-          >Upload voice (TTS model)</Link>
+          >{t('pages.contributeIndex.buttonUploadVoice')}</Link>
 
         <br />
 
         <Link
           to="/upload/w2l_video"
           className="button is-link is-large is-fullwidth "
-          >Upload lipsync video (w2l)</Link>
+          >{t('pages.contributeIndex.buttonUploadW2lVideo')}</Link>
 
         <br />
 
         <Link
           to="/upload/w2l_photo"
           className="button is-link is-large is-fullwidth"
-          >Upload lipsync photo (w2l)</Link>
+          >{t('pages.contributeIndex.buttonUploadW2lPhoto')}</Link>
 
         <h3 className="title is-3"> {categoryActionName} Categories </h3>
 
@@ -69,9 +69,16 @@ function ContributeIndexPage(props: Props) {
           className="button is-info is-large is-fullwidth"
           >{categoryActionName} category</Link>
 
-        <h3 className="title is-3"> More </h3>
+        <h3 className="title is-3">{t('pages.contributeIndex.headingMore')}</h3>
 
-        <p> Want to contribute code, design, or data science? <DiscordLink text="Say hi in Discord" iconAfterText={true} />! </p>
+        <p>
+          <Trans i18nKey='pages.contributeIndex.describeMore'>
+            Want to contribute code, design, or data science? 
+            <DiscordLink 
+              text={t('pages.contributeIndex.discordLink2')} 
+              iconAfterText={true} />! 
+          </Trans>
+        </p>
 
       </div>
     </div>
