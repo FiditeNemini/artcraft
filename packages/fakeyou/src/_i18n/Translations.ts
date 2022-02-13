@@ -36,24 +36,6 @@ const TRANSLATIONS : any = {
   // German: 6.5% Twitch (#4)
   de: {
     translation: {
-      coreUi: {
-        topNav: {
-          community: 'Community',
-          contributeUpload: 'Contribute / Upload',
-          logout: 'Logout',
-          myData: 'My Data',
-          signUpLogin: 'Sign up / Login',
-          video: 'Video',
-        },
-      },
-      ttsListPage: {
-        categoryFilters: 'Category Filters', // "Category / Language" in other locales
-        loading: 'Loading...',
-        search: 'Search',
-        searchTerm: 'Search Term',
-        speakButton: 'Speak',
-        clearButton: 'Clear',
-      }
     }
   },
   // Spanish: 10.5% Twitch (#2), 20+% FakeYou (#2)
@@ -92,47 +74,11 @@ const TRANSLATIONS : any = {
   // French: 5.6% Twitch (#6)
   fr: {
     translation: {
-      coreUi: {
-        topNav: {
-          community: 'Community',
-          contributeUpload: 'Contribute / Upload',
-          logout: 'Logout',
-          myData: 'My Data',
-          signUpLogin: 'Sign up / Login',
-          video: 'Video',
-        },
-      },
-      ttsListPage: {
-        categoryFilters: 'Category Filters', // "Category / Language" in other locales
-        loading: 'Loading...',
-        search: 'Search',
-        searchTerm: 'Search Term',
-        speakButton: 'Speak',
-        clearButton: 'Clear',
-      }
     }
   },
   // Indonesian 2% FakeYou
   id: {
     translation: {
-      coreUi: {
-        topNav: {
-          community: 'Community',
-          contributeUpload: 'Contribute / Upload',
-          logout: 'Logout',
-          myData: 'My Data',
-          signUpLogin: 'Sign up / Login',
-          video: 'Video',
-        },
-      },
-      ttsListPage: {
-        categoryFilters: 'Category Filters', // "Category / Language" in other locales
-        loading: 'Loading...',
-        search: 'Search',
-        searchTerm: 'Search Term',
-        speakButton: 'Speak',
-        clearButton: 'Clear',
-      }
     }
   },
   // Japanese: 2.5% Twitch (#8)
@@ -161,24 +107,6 @@ const TRANSLATIONS : any = {
   // Korean: 5.4% Twitch (#7)
   ko: {
     translation: {
-      coreUi: {
-        topNav: {
-          community: 'コミュニティ',
-          contributeUpload: '投稿 / アップロード',
-          logout: 'ログアウト',
-          myData: '私のデータ',
-          signUpLogin: 'サインアップ / ログイン',
-          video: 'Video', // NB: Katakana here gets forced horizontal for some reason
-        },
-      },
-      ttsListPage: {
-        categoryFilters: 'カテゴリ / 言語',
-        loading: '読み込んでいます...',
-        search: '検索',
-        searchTerm: '検索語',
-        speakButton: '話す',
-        clearButton: 'クリア',
-      }
     }
   },
   // Portuguese: 6.2% Twitch (#5)
@@ -207,47 +135,11 @@ const TRANSLATIONS : any = {
   // 6.5% Twitch (#3)
   ru: {
     translation: {
-      coreUi: {
-        topNav: {
-          community: 'Community',
-          contributeUpload: 'Contribute / Upload',
-          logout: 'Logout',
-          myData: 'My Data',
-          signUpLogin: 'Sign up / Login',
-          video: 'Video',
-        },
-      },
-      ttsListPage: {
-        categoryFilters: 'Category Filters', // "Category / Language" in other locales
-        loading: 'Loading...',
-        search: 'Search',
-        searchTerm: 'Search Term',
-        speakButton: 'Speak',
-        clearButton: 'Clear',
-      }
     }
   },
   // Turkish: 4% FakeYou (#3)
   tr: {
     translation: {
-      coreUi: {
-        topNav: {
-          community: 'Community',
-          contributeUpload: 'Contribute / Upload',
-          logout: 'Logout',
-          myData: 'My Data',
-          signUpLogin: 'Sign up / Login',
-          video: 'Video',
-        },
-      },
-      ttsListPage: {
-        categoryFilters: 'Category Filters', // "Category / Language" in other locales
-        loading: 'Loading...',
-        search: 'Search',
-        searchTerm: 'Search Term',
-        speakButton: 'Speak',
-        clearButton: 'Clear',
-      }
     }
   },
 }
