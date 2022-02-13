@@ -4,6 +4,16 @@ const TRANSLATIONS : any = {
   en: {
     translation: {
       coreUi: {
+        footerNav: {
+          aboutUs: 'About Us',
+          feed: 'Feed',
+          leaderboard: 'Leaderboard',
+          patrons: 'Patrons',
+          termsOfUse: 'Terms of Use',
+          textToSpeech: 'Text to Speech',
+          upload: 'Upload',
+          video: 'Video',
+        },
         topNav: {
           community: 'Community',
           contributeUpload: 'Contribute / Upload',
@@ -50,13 +60,23 @@ const TRANSLATIONS : any = {
   es: {
     translation: {
       coreUi: {
+        footerNav: {
+          aboutUs: 'Sobre Nosotros',
+          feed: 'Transmisión en Vivo',
+          leaderboard: 'Tabla de Clasificación',
+          patrons: 'Mecenas',
+          termsOfUse: 'Términos de Uso',
+          textToSpeech: 'Texto a Voz',
+          upload: 'Subir',
+          video: 'Video', // NB: This *is* translated
+        },
         topNav: {
           community: 'Comunidad',
           contributeUpload: 'Contribuir / Subir',
           logout: 'Cerrar sesión',
           myData: 'Mis datos',
           signUpLogin: 'Registrate e inicia secion',
-          video: 'Video', // NB: Translated
+          video: 'Video', // NB: This *is* translated
         },
       },
       ttsListPage: {

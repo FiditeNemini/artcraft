@@ -5,6 +5,7 @@ import { Link } from 'react-router-dom';
 import './_css/footer.scss'
 import { ModerationIcon } from './_icons/ModerationIcon';
 import { FrontendUrlConfig } from '../../common/FrontendUrlConfig';
+import { t } from 'i18next';
 
 interface Props {
   sessionWrapper: SessionWrapper,
@@ -28,21 +29,21 @@ function NewFooterNavFc(props: Props) {
 
       <div className="content has-text-centered">
         <p>
-          <Link to="/">Text to Speech</Link>
+          <Link to="/">{t('coreUi.footerNav.textToSpeech')}</Link>
           &nbsp;|
-          <Link to="/video">Video</Link>
+          <Link to="/video">{t('coreUi.footerNav.video')}</Link>
           &nbsp;|
-          <Link to="/contribute">Upload</Link>
+          <Link to="/contribute">{t('coreUi.footerNav.upload')}</Link>
           &nbsp;|
-          <Link to="/leaderboard">Leaderboard</Link>
+          <Link to="/leaderboard">{t('coreUi.footerNav.leaderboard')}</Link>
           &nbsp;|
-          <Link to={FrontendUrlConfig.patronsPage()}>Patrons</Link>
+          <Link to={FrontendUrlConfig.patronsPage()}>{t('coreUi.footerNav.patrons')}</Link>
           &nbsp;|
-          <Link to="/firehose">Feed</Link>
+          <Link to="/firehose">{t('coreUi.footerNav.feed')}</Link>
           &nbsp;|
-          <Link to="/about">About Us</Link>
+          <Link to="/about">{t('coreUi.footerNav.aboutUs')}</Link>
           &nbsp;|
-          <Link to="/terms">Terms of Use</Link>
+          <Link to="/terms">{t('coreUi.footerNav.termsOfUse')}</Link>
         </p>
 
 
