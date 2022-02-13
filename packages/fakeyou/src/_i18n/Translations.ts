@@ -1,5 +1,6 @@
 
 const TRANSLATIONS : any = {
+  // English: 46.6% Twitch (#1), 30+% FakeYou (#1)
   en: {
     translation: {
       coreUi: {
@@ -22,6 +23,7 @@ const TRANSLATIONS : any = {
       }
     }
   },
+  // German: 6.5% Twitch (#4)
   de: {
     translation: {
       coreUi: {
@@ -44,6 +46,7 @@ const TRANSLATIONS : any = {
       }
     }
   },
+  // Spanish: 10.5% Twitch (#2), 20+% FakeYou (#2)
   es: {
     translation: {
       coreUi: {
@@ -66,6 +69,7 @@ const TRANSLATIONS : any = {
       }
     }
   },
+  // French: 5.6% Twitch (#6)
   fr: {
     translation: {
       coreUi: {
@@ -88,6 +92,7 @@ const TRANSLATIONS : any = {
       }
     }
   },
+  // Indonesian 2% FakeYou
   id: {
     translation: {
       coreUi: {
@@ -110,6 +115,7 @@ const TRANSLATIONS : any = {
       }
     }
   },
+  // Japanese: 2.5% Twitch (#8)
   ja: {
     translation: {
       coreUi: {
@@ -132,6 +138,7 @@ const TRANSLATIONS : any = {
       }
     }
   },
+  // Korean: 5.4% Twitch (#7)
   ko: {
     translation: {
       coreUi: {
@@ -154,6 +161,7 @@ const TRANSLATIONS : any = {
       }
     }
   },
+  // Portuguese: 6.2% Twitch (#5)
   pt: {
     translation: {
       coreUi: {
@@ -176,6 +184,7 @@ const TRANSLATIONS : any = {
       }
     }
   },
+  // 6.5% Twitch (#3)
   ru: {
     translation: {
       coreUi: {
@@ -198,6 +207,7 @@ const TRANSLATIONS : any = {
       }
     }
   },
+  // Turkish: 4% FakeYou (#3)
   tr: {
     translation: {
       coreUi: {
