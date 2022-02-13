@@ -237,14 +237,14 @@ VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? )
 
   info!("new user id: {}", record_id);
 
-  // TODO: Remove me in the future. Too lazy to check the date, plus this will
-  //  vary with adoption rate.
-  server_state.badge_granter.grant_early_user_badge(&user_token)
-      .await
-      .map_err(|e| {
-        warn!("error creating badge: {:?}", e);
-        CreateAccountErrorResponse::server_error()
-      })?;
+  //// TODO: Remove me in the future. Too lazy to check the date, plus this will
+  ////  vary with adoption rate.
+  //server_state.badge_granter.grant_early_user_badge(&user_token)
+  //    .await
+  //    .map_err(|e| {
+  //      warn!("error creating badge: {:?}", e);
+  //      CreateAccountErrorResponse::server_error()
+  //    })?;
 
   let create_session_result =
     create_session_for_user(&user_token, &ip_address, &server_state.mysql_pool).await;
