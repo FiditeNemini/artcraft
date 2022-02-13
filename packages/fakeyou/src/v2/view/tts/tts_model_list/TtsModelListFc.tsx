@@ -20,6 +20,7 @@ import { SyntheticCategory, TtsCategoryType } from '../../../../AppWrapper';
 import { AutocompleteSearch } from './AutocompleteSearch';
 import { LanguageNotice } from './LanguageNotice';
 import { Language } from '@storyteller/components/src/i18n/Language';
+import { t } from 'i18next';
 
 export interface EnqueueJobResponsePayload {
   success: boolean,
@@ -323,10 +324,14 @@ function TtsModelListFc(props: Props) {
         <div className="button-group">
           <div className="columns is-mobile">
             <div className="column has-text-centered">
-              <button className="button is-danger is-large" disabled={remainingCharactersButtonDisabled}>Speak</button>
+              <button 
+                className="button is-danger is-large" 
+                disabled={remainingCharactersButtonDisabled}>{t('ttsListPage.speakButton')}</button>
             </div>
             <div className="column has-text-centered">
-              <button className="button is-danger is-light is-large" onClick={handleClearClick}>Clear</button>
+              <button 
+                className="button is-danger is-light is-large" 
+                onClick={handleClearClick}>{t('ttsListPage.clearButton')}</button>
             </div>
           </div>
         </div>

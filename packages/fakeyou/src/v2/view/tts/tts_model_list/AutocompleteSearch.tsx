@@ -5,6 +5,7 @@ import { TtsCategoryType } from '../../../../AppWrapper';
 import Autocomplete from 'react-autocomplete';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSearch } from '@fortawesome/free-solid-svg-icons';
+import { t } from 'i18next';
 
 // NB: This probably is not the best autocomplete library in the world
 // A lot of the libraries are really old and depend on jQuery (gross). 
@@ -36,7 +37,7 @@ export function AutocompleteSearch(props: Props) {
   return (
     <>
       <div className="field">
-        <strong style={{ display: "block", margin: "7px 0 0 0"}}>Search</strong>
+        <strong style={{ display: "block", margin: "7px 0 0 0"}}>{t('ttsListPage.search')}</strong>
         <div className="control has-icons-left">
 
           {/* NB: See note above about this library. */}
@@ -44,7 +45,11 @@ export function AutocompleteSearch(props: Props) {
             getItemValue={(item : TtsModelListItem) => item.title}
             items={props.allTtsModels}
             renderInput={(props) => (
-              <input className="input" type="text" placeholder="search" value={searchValue} {...props} />
+              <input 
+                className="input" 
+                type="text" 
+                placeholder={t('ttsListPage.searchTerm')} 
+                value={searchValue} {...props} />
             )}
             renderMenu={children => (
               <div className="menu">

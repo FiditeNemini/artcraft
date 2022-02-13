@@ -3,6 +3,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faChevronRight, faHeadphonesAlt, faTags, faTimes } from '@fortawesome/free-solid-svg-icons';
 import { TtsModelListItem } from '@storyteller/components/src/api/tts/ListTtsModels';
 import { TtsCategoryType } from '../../../../AppWrapper';
+import { useTranslation } from 'react-i18next';
 
 interface Props {
   allTtsCategories: TtsCategoryType[],
@@ -35,6 +36,8 @@ export function MultiDropdownSearch(props: Props) {
     setSelectedCategories,
     maybeSelectedTtsModel,
   } = props;
+
+  const { t } = useTranslation();
 
   const isLoading = allTtsModels.length === 0;
 
@@ -257,14 +260,14 @@ export function MultiDropdownSearch(props: Props) {
   if (isLoading) {
     selectClasses = 'select is-normal is-loading';
     loadingOption = (
-      <option key="waiting" value="" disabled={true}>Loading...</option>
+      <option key="waiting" value="" disabled={true}>{t('ttsListPage.loading')}</option>
     )
   }
 
   return (
     <div>
       {/* Category Dropdowns */}
-      <strong>Category Filters</strong>
+      <strong>{t('ttsListPage.categoryFilters')}</strong>
       <br />
       {categoryFieldGroups}
 

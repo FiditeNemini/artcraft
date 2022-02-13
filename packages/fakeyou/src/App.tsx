@@ -17,6 +17,25 @@ import { W2lTemplateUploadJob, W2lTemplateUploadJobStateResponsePayload } from '
 import { jobStateCanChange } from '@storyteller/components/src/jobs/JobStates';
 import { TtsModelListItem } from '@storyteller/components/src/api/tts/ListTtsModels';
 import { TtsCategoryType } from './AppWrapper';
+import { TRANSLATIONS } from './_i18n/Translations';
+import i18n from 'i18next';
+import { initReactI18next } from 'react-i18next';
+
+i18n
+  .use(initReactI18next) // passes i18n down to react-i18next
+  .init({
+    // the translations
+    // (tip move them in a JSON file and import them,
+    // or even better, manage them via a UI: https://react.i18next.com/guides/multiple-translation-files#manage-your-translations-with-a-management-gui)
+    resources: TRANSLATIONS,
+    //lng: 'en', // if you're using a language detector, do not define the lng option
+    fallbackLng: 'en',
+
+    interpolation: {
+      escapeValue: false // react already safes from xss => https://www.i18next.com/translation-function/interpolation#unescape
+    }
+  });
+
 
 enum MigrationMode {
   NEW_VOCODES,
@@ -165,25 +184,34 @@ class App extends React.Component<Props, State> {
       const showNotice = hasSpanish || hasPortuguese || hasTurkish; //|| hasIndonesian || hasGerman || hasJapanese;
 
       let displayLanguage = Language.English;
+      let languageCode = 'en';
 
       if (hasSpanish) {
         displayLanguage = Language.Spanish;
+        languageCode = 'es';
       } else if (hasPortuguese) {
         displayLanguage = Language.Portuguese;
+        languageCode = 'pt';
       } else if (hasTurkish) {
         displayLanguage = Language.Turkish;
+        languageCode = 'tr';
       } else if (hasIndonesian) {
         displayLanguage = Language.Indonesian;
+        languageCode = 'id';
       } else if (hasGerman) {
         displayLanguage = Language.German;
+        languageCode = 'de';
       } else if (hasJapanese) {
         displayLanguage = Language.Japanese;
+        languageCode = 'ja';
       }
 
       this.setState({
         isShowingLanguageNotice: showNotice,
         displayLanguage: displayLanguage,
       });
+
+      i18n.changeLanguage(languageCode);
     }
   }
 
