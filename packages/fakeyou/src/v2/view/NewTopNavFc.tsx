@@ -18,7 +18,6 @@ function NewTopNavFc(props: Props) {
 
   if (props.sessionWrapper.isLoggedIn()) {
     let username = props.sessionWrapper.getUsername();
-    //myDataLink = `/profile/${username}/data`;
     myDataLink = `/profile/${username}`;
   }
 

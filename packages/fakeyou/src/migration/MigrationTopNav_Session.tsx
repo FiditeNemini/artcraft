@@ -2,6 +2,7 @@ import React from 'react';
 import { SessionWrapper } from '../session/SessionWrapper';
 import { Link, useHistory } from 'react-router-dom';
 import { ApiConfig } from '@storyteller/components';
+import { t } from 'i18next';
 
 interface Props {
   sessionWrapper: SessionWrapper,
@@ -73,14 +74,14 @@ function MigrationTopNavSession(props: Props) {
           logoutHandler();
           props.closeHamburgerAction();
         }}
-      >Logout</button>;
+      >{t('coreUi.topNav.logout')}</button>;
   } else {
     sessionLink = (
       <Link
         to="/signup"
         className="button is-danger is-pulled-right"
         onClick={() => props.closeHamburgerAction()}
-        >Sign Up / Login</Link>
+        >{t('coreUi.topNav.signUpLogin')}</Link>
     );
   }
 

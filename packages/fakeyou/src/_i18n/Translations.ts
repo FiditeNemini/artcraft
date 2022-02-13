@@ -3,7 +3,10 @@ const TRANSLATIONS : any = {
   en: {
     translation: {
       coreUi: {
-        logout: 'Logout',
+        topNav: {
+          logout: 'Logout',
+          signUpLogin: 'Sign up / Login',
+        },
       },
       ttsListPage: {
         categoryFilters: 'Category Filters', // "Category / Language" in other locales
@@ -18,7 +21,10 @@ const TRANSLATIONS : any = {
   es: {
     translation: {
       coreUi: {
-        logout: 'Cerrar sesión',
+        topNav: {
+          logout: 'Cerrar sesión',
+          signUpLogin: 'Registrate e inicia secion',
+        },
       },
       ttsListPage: {
         categoryFilters: 'Categoría / Idioma',
@@ -33,7 +39,10 @@ const TRANSLATIONS : any = {
   pt: {
     translation: {
       coreUi: {
-        logout: 'Sair',
+        topNav: {
+          logout: 'Sair',
+          signUpLogin: 'Inscreva-se / Faça login',
+        },
       },
       ttsListPage: {
         categoryFilters: 'Categoria / Idioma',
@@ -48,7 +57,10 @@ const TRANSLATIONS : any = {
   ja: {
     translation: {
       coreUi: {
-        logout: 'ログアウト',
+        topNav: {
+          logout: 'ログアウト',
+          signUpLogin: 'サインアップ / ログイン',
+        },
       },
       ttsListPage: {
         categoryFilters: 'カテゴリ / 言語',
