@@ -21,6 +21,7 @@ import { AutocompleteSearch } from './AutocompleteSearch';
 import { LanguageNotice } from './LanguageNotice';
 import { Language } from '@storyteller/components/src/i18n/Language';
 import { t } from 'i18next';
+import { Trans } from 'react-i18next';
 
 export interface EnqueueJobResponsePayload {
   success: boolean,
@@ -185,14 +186,18 @@ function TtsModelListFc(props: Props) {
 
   if (props.maybeSelectedTtsModel) {
     let modelLink = `/tts/${props.maybeSelectedTtsModel.model_token}`;
+    let modelName = props.maybeSelectedTtsModel.title;
+    let userName = props.maybeSelectedTtsModel.creator_display_name;
     directViewLink = (
       <Link to={modelLink}>
-        See more details about the "<strong>{props.maybeSelectedTtsModel.title}</strong>" model 
-        by&nbsp;<strong>{props.maybeSelectedTtsModel.creator_display_name}</strong>&nbsp; 
-        <GravatarFc 
-          size={15}
-          username={props.maybeSelectedTtsModel.creator_display_name}
-          email_hash={props.maybeSelectedTtsModel.creator_gravatar_hash} /> 
+        <Trans i18nKey='ttsListPage.seeModelDetails'>
+          See more details about the "<strong>{{modelName}}</strong>" model 
+          by&nbsp;<strong>{{userName}}</strong>&nbsp; 
+        </Trans>
+          <GravatarFc 
+            size={15}
+            username={props.maybeSelectedTtsModel.creator_display_name}
+            email_hash={props.maybeSelectedTtsModel.creator_gravatar_hash} /> 
       </Link>
     );
   }

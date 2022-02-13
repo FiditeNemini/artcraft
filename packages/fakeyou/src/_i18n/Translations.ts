@@ -33,6 +33,7 @@ const TRANSLATIONS : any = {
       ttsListPage: {
         by: 'by',
         categoryFilters: 'Category Filters', // "Category / Language" in other locales
+        seeModelDetails: 'See more details about the "<1>{{modelName}}</1>" model by <3>{{userName}}</3>\u{00a0}',
         loading: 'Loading...',
         search: 'Search',
         searchTerm: 'Search Term',
@@ -79,6 +80,7 @@ const TRANSLATIONS : any = {
       ttsListPage: {
         by: 'de',
         categoryFilters: 'Categoría / Idioma',
+        seeModelDetails: 'Ver más detalles sobre el modelo "<1>{{modelName}}</1>" de <3>{{userName}}</3>\u{00a0}',
         loading: 'Cargando...',
         search: 'Búsqueda',
         searchTerm: 'Término de búsqueda',
