@@ -30,6 +30,12 @@ const TRANSLATIONS : any = {
           video: 'Video',
         },
       },
+      pages: {
+        ttsList: {
+          heroTitle: 'Text to Speech*',
+          heroSubtitle: 'Use <strong>FakeYou</strong> deep fake tech to say stuff with your favorite characters',
+        },
+      },
       ttsListPage: {
         by: 'by',
         categoryFilters: 'Category Filters', // "Category / Language" in other locales
@@ -71,6 +77,12 @@ const TRANSLATIONS : any = {
           signUpLogin: 'Registrate e inicia secion',
           terms: 'Términos de Uso',
           video: 'Video', // NB: This *is* translated
+        },
+      },
+      pages: {
+        ttsList: {
+          heroTitle: 'Texto a Voz',
+          heroSubtitle: 'Usa <strong>FakeYou</strong> tecnología falsa profunda para decir cosas con tus personajes favoritos',
         },
       },
       ttsListPage: {
@@ -118,6 +130,12 @@ const TRANSLATIONS : any = {
           video: 'Video', // NB: Katakana here gets forced horizontal for some reason
         },
       },
+      pages: {
+        ttsList: {
+          heroTitle: 'テキスト読み上げ',
+          heroSubtitle: '<strong>FakeYou</strong>ディープフェイクテックを使用して、お気に入りのキャラクターと何かを言いましょう。',
+        },
+      },
       ttsListPage: {
         categoryFilters: 'カテゴリ / 言語',
         loading: '読み込んでいます...',
@@ -146,6 +164,12 @@ const TRANSLATIONS : any = {
           video: 'Vídeo',
         },
       },
+      pages: {
+        ttsList: {
+          heroTitle: 'Texto para Fala',
+          heroSubtitle: 'Use a tecnologia deepfake do <strong>FakeYou</strong> para dizer coisas com seus personagens favoritos.',
+        },
+      },
       ttsListPage: {
         categoryFilters: 'Categoria / Idioma',
         loading: 'Carregando...',
@@ -164,6 +188,12 @@ const TRANSLATIONS : any = {
   // Turkish: 4% FakeYou (#3)
   tr: {
     translation: {
+      pages: {
+        ttsList: {
+          heroTitle: 'Konuşma Metni',
+          heroSubtitle: 'En sevdiğiniz karakterlerle bir şeyler söylemek için <strong>FakeYou</strong> derin sahte teknolojisini kullanın.',
+        },
+      },
     }
   },
 }
