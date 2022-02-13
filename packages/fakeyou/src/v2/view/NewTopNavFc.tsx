@@ -6,6 +6,7 @@ import { FrontendUrlConfig } from '../../common/FrontendUrlConfig';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faGavel, faGrinBeamSweat, faList, faTrophy, faUpload, faUser } from '@fortawesome/free-solid-svg-icons';
 import { faPatreon } from '@fortawesome/free-brands-svg-icons';
+import { t } from 'i18next';
 
 interface Props {
   sessionWrapper: SessionWrapper,
@@ -61,13 +62,13 @@ function NewTopNavFc(props: Props) {
             <Link to="/video"
               className="navbar-item"
               onClick={() => closeHamburger()}
-              >Video</Link>
+              >{t('coreUi.topNav.video')}</Link>
 
             <div className="navbar-item has-dropdown is-hoverable">
               <Link to={myDataLink}
                 className="navbar-link"
                 onClick={() => closeHamburger()}
-                >Community</Link>
+                >{t('coreUi.topNav.community')}</Link>
 
               <div className="navbar-dropdown is-boxed">
                 {/* NB: There's an "is-active" class that looks nice. */}
@@ -75,7 +76,7 @@ function NewTopNavFc(props: Props) {
                 <Link to="/contribute"
                   className="navbar-item"
                   onClick={() => closeHamburger()}
-                  ><FontAwesomeIcon icon={faUpload} />&nbsp;&nbsp;Contribute / Upload</Link>
+                  ><FontAwesomeIcon icon={faUpload} />&nbsp;&nbsp;{t('coreUi.topNav.contributeUpload')}</Link>
 
                 <Link to="/leaderboard"
                   className="navbar-item"
@@ -97,7 +98,7 @@ function NewTopNavFc(props: Props) {
                 <Link to={myDataLink}
                   className="navbar-item"
                   onClick={() => closeHamburger()}
-                  ><FontAwesomeIcon icon={faUser} />&nbsp;&nbsp;My Data</Link>
+                  ><FontAwesomeIcon icon={faUser} />&nbsp;&nbsp;{t('coreUi.topNav.myData')}</Link>
 
                 <hr className="navbar-divider" />
 
