@@ -11,7 +11,13 @@ interface Props {
 }
 
 function ContributeIndexPage(props: Props) {
-  const categoryActionName = props.sessionWrapper.canEditCategories() ? "Create" : "Suggest";
+  const categoryHeading = props.sessionWrapper.canEditCategories() ?
+      t('pages.contributeIndex.headingCreateCategory') :
+      t('pages.contributeIndex.headingSuggestCategory');
+
+  const categoryButton = props.sessionWrapper.canEditCategories() ?
+      t('pages.contributeIndex.buttonCreateCategory') :
+      t('pages.contributeIndex.buttonSuggestCategory');
 
   return (
     <div>
@@ -60,14 +66,14 @@ function ContributeIndexPage(props: Props) {
           className="button is-link is-large is-fullwidth"
           >{t('pages.contributeIndex.buttonUploadW2lPhoto')}</Link>
 
-        <h3 className="title is-3"> {categoryActionName} Categories </h3>
+        <h3 className="title is-3">{categoryHeading}</h3>
 
-        <p>Help us organize the models!</p>
+        <p>{t('pages.contributeIndex.describeSuggest')}</p>
 
         <Link
           to={FrontendUrlConfig.createCategoryPage()}
           className="button is-info is-large is-fullwidth"
-          >{categoryActionName} category</Link>
+          >{categoryButton}</Link>
 
         <h3 className="title is-3">{t('pages.contributeIndex.headingMore')}</h3>
 
