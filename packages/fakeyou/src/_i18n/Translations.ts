@@ -31,12 +31,22 @@ const TRANSLATIONS : any = {
         },
       },
       pages: {
+        // Index page
         ttsList: {
           buttonClear: 'Clear',
           buttonSpeak: 'Speak',
           heroTitle: 'Text to Speech*',
           heroSubtitle: 'Use <strong>FakeYou</strong> deep fake tech to say stuff with your favorite characters',
           placeholderTextGoesHere: 'Textual shenanigans go here...',
+        },
+        // Other pages
+        contributeIndex: {
+          discordLink: 'Join our Discord',
+          describeUploadModels: 'Create new voices and video templates for FakeYou. <1 /> to learn how.',
+          headingUploadModels: 'Upload Models',
+          heroTitle: 'Contribute to FakeYou!',
+          heroSubtitle: 'You make FakeYou <strong>better</strong> by contributing',
+          introText: "You'll get credited for everything you contribute. You'll also get queue priority, be eligible to win prizes, and help us become a Hollywood-killing deepfake tooling, streaming, and filmmaking powerhouse.",
         },
       },
       ttsListPage: {
@@ -80,12 +90,22 @@ const TRANSLATIONS : any = {
         },
       },
       pages: {
+        // Index page
         ttsList: {
           buttonClear: 'Claro',
           buttonSpeak: 'Hablar',
           heroTitle: 'Texto a Voz',
           heroSubtitle: 'Usa <strong>FakeYou</strong> tecnología falsa profunda para decir cosas con tus personajes favoritos',
           placeholderTextGoesHere: 'Las travesuras textuales van aquí...',
+        },
+        // Other pages
+        contributeIndex: {
+          discordLink: 'Únase a nuestro Discord',
+          describeUploadModels: 'Crea nuevas voces y plantillas de video para FakeYou. <1 /> para aprender cómo.',
+          headingUploadModels: 'Subir Modelos',
+          heroTitle: 'Contribuir a FakeYou',
+          heroSubtitle: 'Haces FakeYou <strong>mejor</strong> contribuyendo',
+          introText: "Recibirás crédito por todo lo que contribuyas. También obtendrá prioridad en la cola, será elegible para ganar premios y nos ayudará a convertirnos en una potencia de herramientas, transmisión y cine de deepfake que acaba con Hollywood.",
         },
       },
       ttsListPage: {
