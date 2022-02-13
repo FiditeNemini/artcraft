@@ -44,11 +44,6 @@ const TRANSLATIONS : any = {
       }
     }
   },
-  // German: 6.5% Twitch (#4)
-  de: {
-    translation: {
-    }
-  },
   // Spanish: 10.5% Twitch (#2), 20+% FakeYou (#2)
   es: {
     translation: {
@@ -90,6 +85,14 @@ const TRANSLATIONS : any = {
         textGoesHere: 'Las travesuras textuales van aquí...',
         voiceCount: 'Voz ({{count}} para elegir)',
       }
+    }
+  },
+
+  // ---------- OTHER LANGUAGES ----------
+
+  // German: 6.5% Twitch (#4)
+  de: {
+    translation: {
     }
   },
   // French: 5.6% Twitch (#6)
