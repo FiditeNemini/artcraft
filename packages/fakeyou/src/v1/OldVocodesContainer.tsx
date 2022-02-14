@@ -20,7 +20,7 @@ import { SessionStateResponse } from './api/SessionState';
 import { Link } from 'react-router-dom';
 import { FrontendUrlConfig } from '../common/FrontendUrlConfig';
 import { DiscordLink } from '@storyteller/components/src/elements/DiscordLink';
-import { PatreonLink } from '../v2/view/_common/PatreonLink';
+import { PatreonLink } from '@storyteller/components/src/elements/PatreonLink';
 
 interface Props {
   // Certan browsers (iPhone) have pitiful support for drawing APIs. Worse yet,

@@ -3,7 +3,7 @@ import { BackLink } from '../_common/BackLink';
 import { FrontendUrlConfig } from '../../../common/FrontendUrlConfig';
 import { SessionWrapper } from '@storyteller/components/src/session/SessionWrapper';
 import { PATRONS } from '../../../data/Patrons';
-import { PatreonLink } from '../_common/PatreonLink';
+import { PatreonLink } from '@storyteller/components/src/elements/PatreonLink';
 
 interface Props {
   sessionWrapper: SessionWrapper,
