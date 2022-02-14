@@ -1,4 +1,4 @@
-import { SessionStateResponse } from "./SessionState";
+import { GetSessionInfo, GetSessionInfoIsOk, SessionInfoSuccessResponse } from '../api/session/GetSessionInfo'
 
 // A lot of the APIs return null or leave values absent. 
 // I need to pick a single strategy and stick with it.
@@ -7,16 +7,28 @@ type MaybeString = string | null | undefined;
 /**
  * SessionWrapper can wrap each of the following states:
  * 
- *   1) non-existing session
- *   2) logged-out session
- *   3) logged-in session
+ *   1) logged-in session
+ *   2) non-existing session (logged out)
+ *   3) lookup errors, server errors, 401, etc. (logged out)
+ * 
+ * It then makes frontend permission checking simple.
  */
 export class SessionWrapper {
-  sessionStateResponse?: SessionStateResponse;
+  sessionStateResponse?: SessionInfoSuccessResponse;
 
-  private constructor(sessionStateResponse?: SessionStateResponse) {
+  private constructor(sessionStateResponse?: SessionInfoSuccessResponse) {
     if (sessionStateResponse !== undefined) {
       this.sessionStateResponse = sessionStateResponse;
+    }
+  }
+
+  // Perform lookup and return a wrapper of a valid, inval
+  public static async lookupSession() : Promise<SessionWrapper> {
+    let response = await GetSessionInfo();
+    if (GetSessionInfoIsOk(response)) {
+      return SessionWrapper.wrapResponse(response);
+    } else {
+      return SessionWrapper.emptySession();
     }
   }
 
@@ -24,7 +36,7 @@ export class SessionWrapper {
     return new SessionWrapper();
   }
 
-  public static wrapResponse(sessionStateResponse: SessionStateResponse) : SessionWrapper {
+  public static wrapResponse(sessionStateResponse: SessionInfoSuccessResponse) : SessionWrapper {
     return new SessionWrapper(sessionStateResponse);
   }
 
