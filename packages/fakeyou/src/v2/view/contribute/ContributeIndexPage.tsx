@@ -3,6 +3,8 @@ import { SessionWrapper } from '@storyteller/components/src/session/SessionWrapp
 import { Link } from "react-router-dom";
 import { DiscordLink } from '@storyteller/components/src/elements/DiscordLink';
 import { FrontendUrlConfig } from '../../../common/FrontendUrlConfig';
+import { t } from 'i18next';
+import { Trans } from 'react-i18next';
 
 interface Props {
   sessionWrapper: SessionWrapper,
@@ -14,22 +16,30 @@ function ContributeIndexPage(props: Props) {
   return (
     <div>
       <div>
-        <h1 className="title is-1"> Contribute to FakeYou! </h1>
-        <h1 className="subtitle is-3"> You make FakeYou <strong>better</strong> by contributing </h1>
+        <h1 className="title is-1"> {t('pages.contributeIndex.heroTitle')} </h1>
+        <h1 className="subtitle is-3"> 
+          <Trans i18nKey="pages.contributeIndex.heroSubtitle">
+            You make FakeYou <strong>better</strong> by contributing 
+          </Trans>
+        </h1>
       </div>
 
       <br />
 
       <div className="content is-medium">
         <p>
-          You'll get credited for everything you contribute. You'll also get queue priority, 
-          be eligible to win prizes, and help us become a Hollywood-killing deepfake 
-          tooling, streaming, and filmmaking powerhouse.
+          {t('pages.contributeIndex.introText')}
         </p>
 
-        <h3 className="title is-3"> Upload Models </h3>
+        <h3 className="title is-3">{t('pages.contributeIndex.headingUploadModels')}</h3>
 
-        <p>Create new voices and video templates for FakeYou. <DiscordLink text="Join our Discord" iconAfterText={true} /> to learn how.</p>
+        <p>
+          <Trans i18nKey="pages.contributeIndex.describeUploadModels">
+            Create new voices and video templates for FakeYou. 
+            <DiscordLink text={t('pages.contributeIndex.discordLink')} iconAfterText={true} /> 
+            to learn how.
+          </Trans>
+        </p>
 
         <Link
           to="/upload/tts"

@@ -210,45 +210,6 @@ function TtsModelListFc(props: Props) {
       <LanguageNotice clearLanguageNotice={props.clearLanguageNotice} displayLanguage={props.displayLanguage} /> :
       undefined;
 
-  // ===== I18N =====
-
-  let title = "Text to Speech*";
-  let subtitle = <>Use <strong>FakeYou</strong> deep fake tech to say stuff with your favorite characters.</>;
-
-  if (props.displayLanguage === Language.Spanish) {
-    title = "Texto a voz";
-    subtitle = (
-      <>
-        Usa la tecnología falsa profunda de <strong>FakeYou</strong> 
-        para decir cosas con tus personajes favoritos.
-      </>
-    );
-  } else if (props.displayLanguage === Language.Portuguese) {
-    title = "Texto para fala";
-    subtitle = (
-      <>
-        Use a tecnologia deepfake do <strong>FakeYou</strong> para 
-        dizer coisas com seus personagens favoritos.
-      </>
-    );
-  } else if (props.displayLanguage === Language.Turkish) {
-    title = "Konuşma metni";
-    subtitle = (
-      <>
-        En sevdiğiniz karakterlerle bir şeyler söylemek için 
-        <strong>FakeYou</strong> derin sahte teknolojisini kullanın.
-      </>
-    );
-  } else if (props.displayLanguage === Language.Japanese) {
-    title = "テキスト読み上げ";
-    subtitle = (
-      <>
-        <strong>FakeYou</strong>ディープフェイクテックを使用して、
-        お気に入りのキャラクターと何かを言いましょう。
-      </>
-    );
-  }
-
   return (
     <div>
 
@@ -265,10 +226,13 @@ function TtsModelListFc(props: Props) {
 
             <div className="column">
               <p className="title">
-                {title}
+                {t('pages.ttsList.heroTitle')}
               </p>
               <p className="subtitle">
-                {subtitle}
+                <Trans i18nKey="pages.ttsList.heroSubtitle">
+                  Use <strong>FakeYou</strong> deep fake tech to say stuff with your 
+                  favorite characters.
+                </Trans>
               </p>
             </div>
 
@@ -322,7 +286,7 @@ function TtsModelListFc(props: Props) {
               onChange={handleChangeText}
               className="textarea is-large" 
               value={props.textBuffer}
-              placeholder={t('ttsListPage.textGoesHere')}></textarea>
+              placeholder={t('pages.ttsList.placeholderTextGoesHere')}></textarea>
           </div>
         </div>
 
@@ -331,12 +295,12 @@ function TtsModelListFc(props: Props) {
             <div className="column has-text-centered">
               <button 
                 className="button is-danger is-large" 
-                disabled={remainingCharactersButtonDisabled}>{t('ttsListPage.speakButton')}</button>
+                disabled={remainingCharactersButtonDisabled}>{t('pages.ttsList.buttonSpeak')}</button>
             </div>
             <div className="column has-text-centered">
               <button 
                 className="button is-danger is-light is-large" 
-                onClick={handleClearClick}>{t('ttsListPage.clearButton')}</button>
+                onClick={handleClearClick}>{t('pages.ttsList.buttonClear')}</button>
             </div>
           </div>
         </div>

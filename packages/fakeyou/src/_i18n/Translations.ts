@@ -30,16 +30,32 @@ const TRANSLATIONS : any = {
           video: 'Video',
         },
       },
+      pages: {
+        // Index page
+        ttsList: {
+          buttonClear: 'Clear',
+          buttonSpeak: 'Speak',
+          heroTitle: 'Text to Speech*',
+          heroSubtitle: 'Use <strong>FakeYou</strong> deep fake tech to say stuff with your favorite characters',
+          placeholderTextGoesHere: 'Textual shenanigans go here...',
+        },
+        // Other pages
+        contributeIndex: {
+          discordLink: 'Join our Discord',
+          describeUploadModels: 'Create new voices and video templates for FakeYou. <1 /> to learn how.',
+          headingUploadModels: 'Upload Models',
+          heroTitle: 'Contribute to FakeYou!',
+          heroSubtitle: 'You make FakeYou <strong>better</strong> by contributing',
+          introText: "You'll get credited for everything you contribute. You'll also get queue priority, be eligible to win prizes, and help us become a Hollywood-killing deepfake tooling, streaming, and filmmaking powerhouse.",
+        },
+      },
       ttsListPage: {
         by: 'by',
         categoryFilters: 'Category Filters', // "Category / Language" in other locales
-        clearButton: 'Clear',
         loading: 'Loading...',
         search: 'Search',
         searchTerm: 'Search Term',
         seeModelDetails: 'See more details about the "<1>{{modelName}}</1>" model by <3>{{userName}}</3>\u{00a0}',
-        speakButton: 'Speak',
-        textGoesHere: 'Textual shenanigans go here...',
         voiceCount: 'Voice ({{count}} to choose from)',
       }
     }
@@ -73,16 +89,32 @@ const TRANSLATIONS : any = {
           video: 'Video', // NB: This *is* translated
         },
       },
+      pages: {
+        // Index page
+        ttsList: {
+          buttonClear: 'Claro',
+          buttonSpeak: 'Hablar',
+          heroTitle: 'Texto a Voz',
+          heroSubtitle: 'Usa <strong>FakeYou</strong> tecnología falsa profunda para decir cosas con tus personajes favoritos',
+          placeholderTextGoesHere: 'Las travesuras textuales van aquí...',
+        },
+        // Other pages
+        contributeIndex: {
+          discordLink: 'Únase a nuestro Discord',
+          describeUploadModels: 'Crea nuevas voces y plantillas de video para FakeYou. <1 /> para aprender cómo.',
+          headingUploadModels: 'Subir Modelos',
+          heroTitle: 'Contribuir a FakeYou',
+          heroSubtitle: 'Haces FakeYou <strong>mejor</strong> contribuyendo',
+          introText: "Recibirás crédito por todo lo que contribuyas. También obtendrá prioridad en la cola, será elegible para ganar premios y nos ayudará a convertirnos en una potencia de herramientas, transmisión y cine de deepfake que acaba con Hollywood.",
+        },
+      },
       ttsListPage: {
         by: 'de',
         categoryFilters: 'Categoría / Idioma',
-        clearButton: 'Claro',
         loading: 'Cargando...',
         search: 'Búsqueda',
         searchTerm: 'Término de búsqueda',
         seeModelDetails: 'Ver más detalles sobre el modelo "<1>{{modelName}}</1>" de <3>{{userName}}</3>\u{00a0}',
-        speakButton: 'Hablar',
-        textGoesHere: 'Las travesuras textuales van aquí...',
         voiceCount: 'Voz ({{count}} para elegir)',
       }
     }
@@ -118,6 +150,12 @@ const TRANSLATIONS : any = {
           video: 'Video', // NB: Katakana here gets forced horizontal for some reason
         },
       },
+      pages: {
+        ttsList: {
+          heroTitle: 'テキスト読み上げ',
+          heroSubtitle: '<strong>FakeYou</strong>ディープフェイクテックを使用して、お気に入りのキャラクターと何かを言いましょう。',
+        },
+      },
       ttsListPage: {
         categoryFilters: 'カテゴリ / 言語',
         loading: '読み込んでいます...',
@@ -146,6 +184,12 @@ const TRANSLATIONS : any = {
           video: 'Vídeo',
         },
       },
+      pages: {
+        ttsList: {
+          heroTitle: 'Texto para Fala',
+          heroSubtitle: 'Use a tecnologia deepfake do <strong>FakeYou</strong> para dizer coisas com seus personagens favoritos.',
+        },
+      },
       ttsListPage: {
         categoryFilters: 'Categoria / Idioma',
         loading: 'Carregando...',
@@ -164,6 +208,12 @@ const TRANSLATIONS : any = {
   // Turkish: 4% FakeYou (#3)
   tr: {
     translation: {
+      pages: {
+        ttsList: {
+          heroTitle: 'Konuşma Metni',
+          heroSubtitle: 'En sevdiğiniz karakterlerle bir şeyler söylemek için <strong>FakeYou</strong> derin sahte teknolojisini kullanın.',
+        },
+      },
     }
   },
 }
