@@ -1,5 +1,5 @@
 import React from 'react';
-import { SessionWrapper } from '../session/SessionWrapper';
+import { SessionWrapper } from '@storyteller/components/src/session/SessionWrapper';
 import { Link, useHistory } from 'react-router-dom';
 import { ApiConfig } from '@storyteller/components';
 import { t } from 'i18next';

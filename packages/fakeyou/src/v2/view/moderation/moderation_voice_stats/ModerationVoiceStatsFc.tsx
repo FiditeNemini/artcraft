@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { SessionWrapper } from '../../../../session/SessionWrapper';
+import { SessionWrapper } from '@storyteller/components/src/session/SessionWrapper';
 import { FrontendUrlConfig } from '../../../../common/FrontendUrlConfig';
 import { BackLink } from '../../_common/BackLink';
 import { GetVoiceInventoryStats, GetVoiceInventoryStatsIsOk } from '../../../api/moderation/GetVoiceInventoryStats';

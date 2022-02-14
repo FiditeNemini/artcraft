@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { ApiConfig } from '@storyteller/components';
-import { SessionWrapper } from '../../../session/SessionWrapper';
+import { SessionWrapper } from '@storyteller/components/src/session/SessionWrapper';
 import { W2lTemplateUploadJob } from '@storyteller/components/src/jobs/W2lTemplateUploadJobs';
 import { useHistory } from "react-router-dom";
 import { v4 as uuidv4 } from 'uuid';

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { ApiConfig } from '@storyteller/components';
-import { SessionWrapper } from '../../../../session/SessionWrapper';
+import { SessionWrapper } from '@storyteller/components/src/session/SessionWrapper';
 import { Link } from "react-router-dom";
 //import { getRandomInt } from '../../../../v1/api/Utils';
 import { BucketConfig } from '@storyteller/components/src/api/BucketConfig';

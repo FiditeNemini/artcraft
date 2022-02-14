@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { GravatarFc } from '../../_common/GravatarFc';
-import { SessionWrapper } from '../../../../session/SessionWrapper';
+import { SessionWrapper } from '@storyteller/components/src/session/SessionWrapper';
 import { useParams, Link } from 'react-router-dom';
 import { ReportDiscordLinkFc } from '../../_common/DiscordReportLinkFc';
 import { BucketConfig } from '@storyteller/components/src/api/BucketConfig';

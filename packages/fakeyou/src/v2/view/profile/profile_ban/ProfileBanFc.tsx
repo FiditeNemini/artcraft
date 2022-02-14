@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useState }  from 'react';
 import { ApiConfig } from '@storyteller/components';
 import { useHistory } from 'react-router-dom';
-import { SessionWrapper } from '../../../../session/SessionWrapper';
+import { SessionWrapper } from '@storyteller/components/src/session/SessionWrapper';
 import { useParams } from 'react-router-dom';
 import { GetUserByUsername, GetUserByUsernameIsOk, User } from '../../../api/user/GetUserByUsername';
 import { BackLink } from '../../_common/BackLink';

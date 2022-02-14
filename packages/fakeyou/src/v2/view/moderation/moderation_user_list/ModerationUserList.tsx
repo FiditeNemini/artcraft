@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { SessionWrapper } from '../../../../session/SessionWrapper';
+import { SessionWrapper } from '@storyteller/components/src/session/SessionWrapper';
 import { GetUserList, GetUserListIsOk, UserForList } from '../../../api/moderation/GetUserList';
 import { formatDistance } from 'date-fns';
 import { FrontendUrlConfig } from '../../../../common/FrontendUrlConfig';

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { ApiConfig } from '@storyteller/components';
 import { SessionTtsModelUploadResultListFc } from '../_common/SessionTtsModelUploadResultsListFc';
-import { SessionWrapper } from '../../../session/SessionWrapper';
+import { SessionWrapper } from '@storyteller/components/src/session/SessionWrapper';
 import { TtsModelUploadJob } from '@storyteller/components/src/jobs/TtsModelUploadJobs';
 import { useHistory } from "react-router-dom";
 import { v4 as uuidv4 } from 'uuid';

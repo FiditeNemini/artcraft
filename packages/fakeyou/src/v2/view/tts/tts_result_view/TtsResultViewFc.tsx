@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { SessionWrapper } from '../../../../session/SessionWrapper';
+import { SessionWrapper } from '@storyteller/components/src/session/SessionWrapper';
 import { useParams, Link } from 'react-router-dom';
 import { GravatarFc } from '../../_common/GravatarFc';
 import { SpectrogramFc } from './SpectrogramFc';

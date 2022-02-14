@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { ApiConfig } from '@storyteller/components';
 import { EnqueueJobResponsePayload } from '../tts_model_list/TtsModelListFc';
 import { SessionTtsInferenceResultListFc } from '../../_common/SessionTtsInferenceResultsListFc';
-import { SessionWrapper } from '../../../../session/SessionWrapper';
+import { SessionWrapper } from '@storyteller/components/src/session/SessionWrapper';
 import { TtsInferenceJob } from '@storyteller/components/src/jobs/TtsInferenceJobs';
 import { useParams, Link } from 'react-router-dom';
 import { v4 as uuidv4 } from 'uuid';

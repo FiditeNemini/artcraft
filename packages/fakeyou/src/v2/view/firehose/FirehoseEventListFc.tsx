@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { ApiConfig } from '@storyteller/components';
-import { SessionWrapper } from '../../../session/SessionWrapper';
+import { SessionWrapper } from '@storyteller/components/src/session/SessionWrapper';
 import { Link } from "react-router-dom";
 import { GravatarFc } from '../_common/GravatarFc';
 

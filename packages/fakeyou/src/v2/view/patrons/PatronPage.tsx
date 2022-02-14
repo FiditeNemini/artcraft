@@ -1,7 +1,7 @@
 import React from 'react';
 import { BackLink } from '../_common/BackLink';
 import { FrontendUrlConfig } from '../../../common/FrontendUrlConfig';
-import { SessionWrapper } from '../../../session/SessionWrapper';
+import { SessionWrapper } from '@storyteller/components/src/session/SessionWrapper';
 import { PATRONS } from '../../../data/Patrons';
 import { PatreonLink } from '../_common/PatreonLink';
 

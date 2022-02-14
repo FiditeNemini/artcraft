@@ -1,7 +1,7 @@
 import React from 'react';
 import { MigrationTopNavSession } from './MigrationTopNav_Session';
 import { MigrationTopNavVersionSwitch } from './MigrationTopNav_VersionSwitch';
-import { SessionWrapper } from '../session/SessionWrapper';
+import { SessionWrapper } from '@storyteller/components/src/session/SessionWrapper';
 
 interface Props {
   sessionWrapper: SessionWrapper,

@@ -9,7 +9,7 @@ import { NewFooterNavFc } from './NewFooterNavFc';
 import { NewTopNavFc } from './NewTopNavFc';
 import { ProfileEditFc } from './profile/profile_edit/ProfileEditFc';
 import { ProfileFc } from './profile/profile_view/ProfileFc';
-import { SessionWrapper } from '../../session/SessionWrapper';
+import { SessionWrapper } from '@storyteller/components/src/session/SessionWrapper';
 import { SignupComponent } from './signup/SignupComponent';
 import { Switch, Route } from 'react-router-dom';
 import { TermsFc } from './about/terms_page/TermsFc';

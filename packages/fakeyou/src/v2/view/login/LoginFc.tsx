@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { SessionWrapper } from '../../../session/SessionWrapper';
+import { SessionWrapper } from '@storyteller/components/src/session/SessionWrapper';
 import { useHistory } from "react-router-dom";
 import { UserIcon } from '../_icons/UserIcon';
 import { EnvelopeIcon } from '../_icons/EnvelopeIcon';

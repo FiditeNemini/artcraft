@@ -5,7 +5,7 @@ import { ProfileTtsInferenceResultsListFc } from './Profile_TtsInferenceResultLi
 import { ProfileTtsModelListFc } from './Profile_TtsModelListFc';
 import { ProfileW2lInferenceResultsListFc } from './Profile_W2lInferenceResultListFc';
 import { ProfileW2lTemplateListFc } from './Profile_W2lTemplateListFc';
-import { SessionWrapper } from '../../../../session/SessionWrapper';
+import { SessionWrapper } from '@storyteller/components/src/session/SessionWrapper';
 import { useParams } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faDiscord, faFirefox, faGithub, faTwitch, faTwitter } from '@fortawesome/free-brands-svg-icons';

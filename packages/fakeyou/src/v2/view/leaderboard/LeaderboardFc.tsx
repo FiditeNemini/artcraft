@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useState }  from 'react';
 import { Link } from 'react-router-dom';
 import { FrontendUrlConfig } from '../../../common/FrontendUrlConfig';
-import { SessionWrapper } from '../../../session/SessionWrapper';
+import { SessionWrapper } from '@storyteller/components/src/session/SessionWrapper';
 import { GetLeaderboard, GetLeaderboardIsErr, GetLeaderboardIsOk, Leaderboard, LeaderboardEntryForList, LeaderboardLookupError } from '../../api/misc/GetLeaderboard';
 import { GravatarFc } from '../_common/GravatarFc';
 

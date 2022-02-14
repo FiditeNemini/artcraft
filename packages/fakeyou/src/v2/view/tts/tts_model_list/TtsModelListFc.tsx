@@ -5,7 +5,7 @@ import { SessionTtsInferenceResultListFc } from '../../_common/SessionTtsInferen
 import { SessionTtsModelUploadResultListFc } from '../../_common/SessionTtsModelUploadResultsListFc';
 import { SessionW2lInferenceResultListFc } from '../../_common/SessionW2lInferenceResultsListFc';
 import { SessionW2lTemplateUploadResultListFc } from '../../_common/SessionW2lTemplateUploadResultsListFc';
-import { SessionWrapper } from '../../../../session/SessionWrapper';
+import { SessionWrapper } from '@storyteller/components/src/session/SessionWrapper';
 import { TtsInferenceJob } from '@storyteller/components/src/jobs/TtsInferenceJobs';
 import { TtsModelUploadJob } from '@storyteller/components/src/jobs/TtsModelUploadJobs';
 import { W2lInferenceJob } from '@storyteller/components/src/jobs/W2lInferenceJobs';
