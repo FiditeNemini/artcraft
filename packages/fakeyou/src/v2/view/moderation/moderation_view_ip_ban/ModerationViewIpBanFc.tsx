@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { ApiConfig } from '@storyteller/components';
 import { Link, useHistory, useParams } from 'react-router-dom';
-import { SessionWrapper } from '../../../../session/SessionWrapper';
+import { SessionWrapper } from '@storyteller/components/src/session/SessionWrapper';
 import { formatDistance } from 'date-fns';
 
 interface Props {

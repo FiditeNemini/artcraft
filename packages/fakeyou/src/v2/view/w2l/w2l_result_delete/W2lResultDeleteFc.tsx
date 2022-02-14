@@ -2,7 +2,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { ApiConfig } from '@storyteller/components';
 import { FrontendUrlConfig } from '../../../../common/FrontendUrlConfig';
-import { SessionWrapper } from '../../../../session/SessionWrapper';
+import { SessionWrapper } from '@storyteller/components/src/session/SessionWrapper';
 import { useParams, Link, useHistory } from 'react-router-dom';
 import { GetW2lResult, GetW2lResultIsOk, W2lResult } from '../../../api/w2l/GetW2lResult';
 

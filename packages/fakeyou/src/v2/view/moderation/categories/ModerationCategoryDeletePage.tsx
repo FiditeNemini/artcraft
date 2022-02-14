@@ -3,7 +3,7 @@ import { BackLink } from '../../_common/BackLink';
 import { Category, GetCategory, GetCategoryIsError, GetCategoryIsOk } from '../../../api/category/GetCategory';
 import { FrontendUrlConfig } from '../../../../common/FrontendUrlConfig';
 import { Link, useHistory } from 'react-router-dom';
-import { SessionWrapper } from '../../../../session/SessionWrapper';
+import { SessionWrapper } from '@storyteller/components/src/session/SessionWrapper';
 import { useParams } from 'react-router-dom';
 import { SetCategoryDeletionState, SetCategoryDeletionStateIsError, SetCategoryDeletionStateIsSuccess } from '../../../api/moderation/category/SetCategoryDeletionState';
 

@@ -3,7 +3,7 @@ import { AsteriskIcon } from '../_icons/AsteriskIcon';
 import { EnvelopeIcon } from '../_icons/EnvelopeIcon';
 import { Link } from 'react-router-dom';
 import { Mode } from '../../../AppMode';
-import { SessionWrapper } from '../../../session/SessionWrapper';
+import { SessionWrapper } from '@storyteller/components/src/session/SessionWrapper';
 import { UserIcon } from '../_icons/UserIcon';
 import { CreateAccount, CreateAccountIsError, CreateAccountIsSuccess } from '../../api/user/CreateAccount';
 

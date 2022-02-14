@@ -1,7 +1,7 @@
 import React from 'react';
-import { SessionWrapper } from '../../../session/SessionWrapper';
+import { SessionWrapper } from '@storyteller/components/src/session/SessionWrapper';
 import { Link } from "react-router-dom";
-import { DiscordLink } from '../_common/DiscordLink';
+import { DiscordLink } from '@storyteller/components/src/elements/DiscordLink';
 import { FrontendUrlConfig } from '../../../common/FrontendUrlConfig';
 import { t } from 'i18next';
 import { Trans } from 'react-i18next';

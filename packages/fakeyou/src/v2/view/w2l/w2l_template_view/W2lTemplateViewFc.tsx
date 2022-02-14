@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
 import { ApiConfig } from '@storyteller/components';
-import { SessionWrapper } from '../../../../session/SessionWrapper';
+import { SessionWrapper } from '@storyteller/components/src/session/SessionWrapper';
+import { Gravatar } from '@storyteller/components/src/elements/Gravatar';
 import { W2lInferenceJob } from '../../../../App';
 import { useParams, Link } from 'react-router-dom';
 import { v4 as uuidv4 } from 'uuid';
@@ -14,7 +15,6 @@ import { HiddenIconFc } from '../../_icons/HiddenIcon';
 import { FrontendUrlConfig } from '../../../../common/FrontendUrlConfig';
 import { GetW2lTemplate, GetW2lTemplateIsErr, GetW2lTemplateIsOk, W2lTemplate, W2lTemplateLookupError } from '../../../api/w2l/GetW2lTemplate';
 import { GetW2lTemplateUseCount } from '../../../api/w2l/GetW2lTemplateUseCount';
-import { GravatarFc } from '../../_common/GravatarFc';
 import { BackLink } from '../../_common/BackLink';
 
 interface EnqueueJobResponsePayload {
@@ -211,7 +211,7 @@ function W2lTemplateViewFc(props: Props) {
     const creatorUrl = FrontendUrlConfig.userProfilePage(w2lTemplate?.creator_username);
     creatorLink = (
       <span>
-        <GravatarFc
+        <Gravatar
           size={15}
           username={w2lTemplate.creator_display_name || ""} 
           email_hash={w2lTemplate.creator_gravatar_hash || ""} 

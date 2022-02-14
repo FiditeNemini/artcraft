@@ -1,7 +1,7 @@
 import React from 'react';
+import { Link, useHistory } from 'react-router-dom';
 import { SessionWrapper } from '@storyteller/components/src/session/SessionWrapper';
 import { Logout } from '@storyteller/components/src/api/session/Logout';
-import { Link, useHistory } from 'react-router-dom';
 import { t } from 'i18next';
 import { Gravatar } from '@storyteller/components/src/elements/Gravatar';
 
@@ -12,7 +12,7 @@ interface Props {
   closeHamburgerAction: () => void,
 }
 
-function MigrationTopNavSession(props: Props) {
+function TopNavSessionButton(props: Props) {
   let history = useHistory();
 
   if (!props.enableAlpha) {
@@ -75,4 +75,4 @@ function MigrationTopNavSession(props: Props) {
   );
 }
 
-export { MigrationTopNavSession };
+export { TopNavSessionButton };

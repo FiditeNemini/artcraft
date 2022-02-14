@@ -1,7 +1,14 @@
+import { SessionWrapper } from '@storyteller/components/src/session/SessionWrapper';
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { TopNavSessionButton } from './TopNavSessionButton'
 
-function TopNav() {
+interface Props {
+  sessionWrapper: SessionWrapper,
+  querySessionCallback: () => void,
+}
+
+function TopNav(props: Props) {
 
   const [mobileHamburgerIsActive, setMobileHamburgerIsActive] = useState<boolean>(false);
 
@@ -65,6 +72,21 @@ function TopNav() {
             */}
           </div>
 
+
+          <div className="navbar-end">
+            <div className="navbar-item">
+              <div className="field is-grouped">
+                <p className="control">
+                  <TopNavSessionButton
+                    sessionWrapper={props.sessionWrapper}
+                    enableAlpha={true}
+                    querySessionAction={props.querySessionCallback}
+                    closeHamburgerAction={() => closeHamburger()}
+                    />
+                </p>
+              </div>
+            </div>
+          </div>
           {/*<div className="navbar-end">
             <div className="navbar-item">
               <div className="field is-grouped">

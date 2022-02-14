@@ -1,5 +1,6 @@
 import React  from 'react';
-import { DiscordIcon } from '../_icons/DiscordIcon';
+import { faDiscord } from '@fortawesome/free-brands-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 interface Props {
   text?: string,
@@ -10,8 +11,8 @@ function DiscordLink(props: Props) {
   const linkText = props.text === undefined ? 'Discord' : props.text;
   const iconAfterText = props.iconAfterText ? true : false;
   const linkBody = iconAfterText ? 
-      <>{linkText} <DiscordIcon title={linkText}/></> :
-      <><DiscordIcon title={linkText}/> {linkText}</> ;
+      <>{linkText} <FontAwesomeIcon icon={faDiscord} title={linkText}/></> :
+      <><FontAwesomeIcon icon={faDiscord} title={linkText}/> {linkText}</> ;
   return (
     <a href="https://discord.gg/H72KFXm" 
        target="_blank" 

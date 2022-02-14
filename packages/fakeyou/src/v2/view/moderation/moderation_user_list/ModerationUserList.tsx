@@ -1,10 +1,10 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { SessionWrapper } from '../../../../session/SessionWrapper';
+import { SessionWrapper } from '@storyteller/components/src/session/SessionWrapper';
+import { Gravatar } from '@storyteller/components/src/elements/Gravatar';
 import { GetUserList, GetUserListIsOk, UserForList } from '../../../api/moderation/GetUserList';
 import { formatDistance } from 'date-fns';
 import { FrontendUrlConfig } from '../../../../common/FrontendUrlConfig';
-import { GravatarFc } from '../../_common/GravatarFc';
 import { BackLink } from '../../_common/BackLink';
 
 interface Props {
@@ -51,7 +51,7 @@ function ModerationUserListFc(props: Props) {
         <td>{user.user_id}</td>
         <td>
           <Link to={FrontendUrlConfig.userProfilePage(user.display_name)}>
-            <GravatarFc username={user.display_name} email_hash={user.gravatar_hash} size={12} />
+            <Gravatar username={user.display_name} email_hash={user.gravatar_hash} size={12} />
             &nbsp;
             {user.display_name}
           </Link>

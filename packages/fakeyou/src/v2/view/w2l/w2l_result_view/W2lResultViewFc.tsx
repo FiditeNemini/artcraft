@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { GravatarFc } from '../../_common/GravatarFc';
-import { SessionWrapper } from '../../../../session/SessionWrapper';
+import { Gravatar } from '@storyteller/components/src/elements/Gravatar';
+import { SessionWrapper } from '@storyteller/components/src/session/SessionWrapper';
 import { useParams, Link } from 'react-router-dom';
 import { ReportDiscordLinkFc } from '../../_common/DiscordReportLinkFc';
 import { BucketConfig } from '@storyteller/components/src/api/BucketConfig';
@@ -104,7 +104,7 @@ function W2lResultViewFc(props: Props) {
     let creatorLink = `/profile/${w2lInferenceResult.maybe_creator_username}`;
     creatorDetails = (
       <span>
-        <GravatarFc 
+        <Gravatar
           size={15}
           username={w2lInferenceResult.maybe_creator_display_name || ""} 
           email_hash={w2lInferenceResult.maybe_creator_gravatar_hash || ""} 
@@ -120,7 +120,7 @@ function W2lResultViewFc(props: Props) {
     let templateCreatorLink = `/profile/${w2lInferenceResult.maybe_template_creator_username}`;
     templateCreatorDetails = (
       <span>
-        <GravatarFc 
+        <Gravatar
           size={15}
           username={w2lInferenceResult.maybe_template_creator_display_name || ""} 
           email_hash={w2lInferenceResult.maybe_template_creator_gravatar_hash || ""} 

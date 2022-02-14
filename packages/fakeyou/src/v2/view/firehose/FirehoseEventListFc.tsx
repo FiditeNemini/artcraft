@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { ApiConfig } from '@storyteller/components';
-import { SessionWrapper } from '../../../session/SessionWrapper';
+import { SessionWrapper } from '@storyteller/components/src/session/SessionWrapper';
+import { Gravatar } from '@storyteller/components/src/elements/Gravatar';
 import { Link } from "react-router-dom";
-import { GravatarFc } from '../_common/GravatarFc';
 
 interface FirehoseEventListResponsePayload {
   success: boolean,
@@ -90,7 +90,7 @@ function FirehoseEventListFc(props: Props) {
         </Link>
       );
       gravatar = (
-        <GravatarFc 
+        <Gravatar
           size={15}
           username={event.maybe_target_username} 
           email_hash={event.maybe_target_user_gravatar_hash}

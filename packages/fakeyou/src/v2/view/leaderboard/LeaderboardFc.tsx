@@ -1,9 +1,9 @@
 import React, { useCallback, useEffect, useState }  from 'react';
 import { Link } from 'react-router-dom';
 import { FrontendUrlConfig } from '../../../common/FrontendUrlConfig';
-import { SessionWrapper } from '../../../session/SessionWrapper';
+import { SessionWrapper } from '@storyteller/components/src/session/SessionWrapper';
+import { Gravatar } from '@storyteller/components/src/elements/Gravatar';
 import { GetLeaderboard, GetLeaderboardIsErr, GetLeaderboardIsOk, Leaderboard, LeaderboardEntryForList, LeaderboardLookupError } from '../../api/misc/GetLeaderboard';
-import { GravatarFc } from '../_common/GravatarFc';
 
 interface Props {
   sessionWrapper: SessionWrapper,
@@ -52,7 +52,7 @@ function LeaderboardFc(props: Props) {
         <tr>
           <td>
             <Link to={FrontendUrlConfig.userProfilePage(ttsEntry.display_name)}>
-              <GravatarFc 
+              <Gravatar 
                 size={12} 
                 username={ttsEntry.display_name} 
                 email_hash={ttsEntry.gravatar_hash} />
@@ -74,7 +74,7 @@ function LeaderboardFc(props: Props) {
         <tr>
           <td>
             <Link to={FrontendUrlConfig.userProfilePage(w2lEntry.display_name)}>
-              <GravatarFc 
+              <Gravatar 
                 size={12} 
                 username={w2lEntry.display_name} 
                 email_hash={w2lEntry.gravatar_hash} />

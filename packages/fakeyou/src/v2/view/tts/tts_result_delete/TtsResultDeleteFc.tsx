@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { ApiConfig } from '@storyteller/components';
-import { SessionWrapper } from '../../../../session/SessionWrapper';
+import { SessionWrapper } from '@storyteller/components/src/session/SessionWrapper';
 import { useParams, Link, useHistory } from 'react-router-dom';
-import { GravatarFc } from '../../_common/GravatarFc';
+import { Gravatar } from '@storyteller/components/src/elements/Gravatar';
 import { FrontendUrlConfig } from '../../../../common/FrontendUrlConfig';
 
 interface TtsInferenceResultResponsePayload {
@@ -135,7 +135,7 @@ function TtsResultDeleteFc(props: Props) {
     let creatorLink = `/profile/${ttsInferenceResult.maybe_creator_username}`;
     creatorDetails = (
       <span>
-        <GravatarFc 
+        <Gravatar
           size={15}
           username={ttsInferenceResult.maybe_creator_display_name || ""} 
           email_hash={ttsInferenceResult.maybe_creator_gravatar_hash || ""} 
@@ -151,7 +151,7 @@ function TtsResultDeleteFc(props: Props) {
     let modelCreatorLink = `/profile/${ttsInferenceResult.maybe_model_creator_username}`;
     modelCreatorDetails = (
       <span>
-        <GravatarFc 
+        <Gravatar
           size={15}
           username={ttsInferenceResult.maybe_model_creator_display_name || ""} 
           email_hash={ttsInferenceResult.maybe_model_creator_gravatar_hash || ""} 

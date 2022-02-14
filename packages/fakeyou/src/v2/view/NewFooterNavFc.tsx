@@ -1,5 +1,5 @@
 import React from 'react';
-import { SessionWrapper } from '../../session/SessionWrapper';
+import { SessionWrapper } from '@storyteller/components/src/session/SessionWrapper';
 import { Link } from 'react-router-dom';
 
 import './_css/footer.scss'

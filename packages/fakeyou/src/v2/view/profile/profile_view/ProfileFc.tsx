@@ -1,11 +1,11 @@
 import React, { useCallback, useEffect, useState }  from 'react';
-import { GravatarFc } from '../../_common/GravatarFc';
+import { Gravatar } from '@storyteller/components/src/elements/Gravatar';
 import { Link } from 'react-router-dom';
 import { ProfileTtsInferenceResultsListFc } from './Profile_TtsInferenceResultListFc';
 import { ProfileTtsModelListFc } from './Profile_TtsModelListFc';
 import { ProfileW2lInferenceResultsListFc } from './Profile_W2lInferenceResultListFc';
 import { ProfileW2lTemplateListFc } from './Profile_W2lTemplateListFc';
-import { SessionWrapper } from '../../../../session/SessionWrapper';
+import { SessionWrapper } from '@storyteller/components/src/session/SessionWrapper';
 import { useParams } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faDiscord, faFirefox, faGithub, faTwitch, faTwitter } from '@fortawesome/free-brands-svg-icons';
@@ -234,7 +234,7 @@ function ProfileFc(props: Props) {
   return (
     <div className="content">
       <h1 className="title is-1">
-        <GravatarFc 
+        <Gravatar 
           size={45} 
           username={userData.display_name}
           email_hash={userEmailHash} />

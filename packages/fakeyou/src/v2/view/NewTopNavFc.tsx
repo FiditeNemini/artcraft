@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { SessionWrapper } from '../../session/SessionWrapper';
+import { SessionWrapper } from '@storyteller/components/src/session/SessionWrapper';
 import { Link } from 'react-router-dom';
 import { MigrationTopNavSession } from '../../migration/MigrationTopNav_Session';
 import { FrontendUrlConfig } from '../../common/FrontendUrlConfig';

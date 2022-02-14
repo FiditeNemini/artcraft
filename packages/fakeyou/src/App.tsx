@@ -8,8 +8,7 @@ import { Language } from '@storyteller/components/src/i18n/Language';
 import { BrowserRouter, Route, Switch } from "react-router-dom";
 import { NewVocodesContainer } from './v2/view/NewVocodesContainer';
 import { OldVocodesContainer } from './v1/OldVocodesContainer';
-import { SessionStateResponse } from './session/SessionState';
-import { SessionWrapper } from './session/SessionWrapper';
+import { SessionWrapper } from '@storyteller/components/src/session/SessionWrapper';
 import { TtsInferenceJob, TtsInferenceJobStateResponsePayload } from '@storyteller/components/src/jobs/TtsInferenceJobs';
 import { W2lInferenceJob, W2lInferenceJobStateResponsePayload } from '@storyteller/components/src/jobs/W2lInferenceJobs';
 import { TtsModelUploadJob, TtsModelUploadJobStateResponsePayload } from '@storyteller/components/src/jobs/TtsModelUploadJobs';
@@ -134,43 +133,19 @@ class App extends React.Component<Props, State> {
   }
 
   async componentDidMount() {
-    this.querySession();
+    await this.querySession();
     await this.queryLanguage();
 
-    setInterval(() => { this.querySession() }, 60000);
+    setInterval(async () => { await this.querySession() }, 60000);
     // TODO: Use websockets, this is dumb
     setInterval(() => { this.pollJobs() }, 1000);
   }
 
-  querySession = () => {
-    if (!this.state.enableAlpha) {
-      return;
-    }
-
-    const api = new ApiConfig();
-    const endpointUrl = api.sessionDetails();
-
-    fetch(endpointUrl, {
-      method: 'GET',
-      credentials: 'include',
-      headers: {
-        'Accept': 'application/json',
-      },
-    })
-    .then(res => res.json())
-    .then(response => {
-      const sessionResponse : SessionStateResponse = response;
-
-      if (sessionResponse === undefined) {
-        return; // Endpoint error?
-      }
-
-      const sessionWrapper = SessionWrapper.wrapResponse(sessionResponse);
-      this.setState({ 
-        sessionWrapper: sessionWrapper,
-      });
-    })
-    .catch(e => { /* Ignore. */ });
+  querySession = async () => {
+    const sessionWrapper = await SessionWrapper.lookupSession();
+    this.setState({ 
+      sessionWrapper: sessionWrapper,
+    });
   }
 
   queryLanguage = async () => {
