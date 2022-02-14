@@ -7,16 +7,16 @@ interface Props {
 }
 
 function GravatarFc(props: Props) {
-    const gravatarUrl = `https://www.gravatar.com/avatar/${props.email_hash}?s=${props.size}`
+  const gravatarUrl = `https://www.gravatar.com/avatar/${props.email_hash}?s=${props.size}`
 
-    let altText = "gravatar";
-    if (props.username !== undefined) {
-      altText = `${props.username}'s gravatar`;
-    }
+  let altText = "gravatar";
+  if (props.username !== undefined) {
+    altText = `${props.username}'s gravatar`;
+  }
 
-    return (
-      <img alt={altText} src={gravatarUrl} />
-    )
+  return (
+    <img alt={altText} src={gravatarUrl} />
+  )
 }
 
 export { GravatarFc };

@@ -2,8 +2,8 @@ import React from 'react';
 import { SessionWrapper } from '@storyteller/components/src/session/SessionWrapper';
 import { Logout } from '@storyteller/components/src/api/session/Logout';
 import { Link, useHistory } from 'react-router-dom';
-import { ApiConfig } from '@storyteller/components';
 import { t } from 'i18next';
+import { GravatarFc } from '../v2/view/_common/GravatarFc';
 
 interface Props {
   sessionWrapper: SessionWrapper,
@@ -35,10 +35,7 @@ function MigrationTopNavSession(props: Props) {
   }
 
   if (gravatarHash !== undefined) {
-    const hash = gravatarHash;
-    const size = 15;
-    const gravatarUrl = `https://www.gravatar.com/avatar/${hash}?s=${size}`
-    gravatar = <img alt="gravatar" src={gravatarUrl} />
+    gravatar = <GravatarFc email_hash={gravatarHash} size={15} />
   }
 
   let sessionLink = <span />;
