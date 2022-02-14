@@ -1,5 +1,6 @@
 import React from 'react';
 import { SessionWrapper } from '@storyteller/components/src/session/SessionWrapper';
+import { Logout } from '@storyteller/components/src/api/session/Logout';
 import { Link, useHistory } from 'react-router-dom';
 import { ApiConfig } from '@storyteller/components';
 import { t } from 'i18next';
@@ -18,26 +19,10 @@ function MigrationTopNavSession(props: Props) {
     return <nav />
   }
 
-  const logoutHandler = () => {
-    if (!props.enableAlpha) {
-      return;
-    }
-
-    const api = new ApiConfig();
-    const endpointUrl = api.logout();
-
-    fetch(endpointUrl, {
-      method: 'POST',
-      credentials: 'include',
-      headers: {
-        'Accept': 'application/json',
-      },
-    })
-    .then(_raw_response => {
-      props.querySessionAction();
-      history.push('/');
-    })
-    .catch(e => { /* Ignore. */ });
+  const logoutHandler = async () => {
+    await Logout();
+    props.querySessionAction();
+    history.push('/');
   }
 
   let loggedIn = props.sessionWrapper.isLoggedIn();
@@ -70,8 +55,8 @@ function MigrationTopNavSession(props: Props) {
     );
     logoutLink = <button
         className="button is-alert is-inverted is-pulled-right"
-        onClick={() => {
-          logoutHandler();
+        onClick={async () => {
+          await logoutHandler();
           props.closeHamburgerAction();
         }}
       >{t('coreUi.topNav.logout')}</button>;
