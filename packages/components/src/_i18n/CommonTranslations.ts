@@ -83,20 +83,57 @@ interface TranslationDictionary {
 }
 
 interface Translations {
-  translation: any,
+  translation: { [key: string]: any },
 }
 
 function MergeTranslations(translationsA: TranslationDictionary, translationsB: TranslationDictionary) {
   let outputTranslations = {};
 
-  translationsA.keys()
+  let languageCodes = new Set(Object.keys(translationsA).concat(Object.keys(translationsB)));
+
+  languageCodes.forEach(languageCode => {
+    let transA = translationsA[languageCode]?.translation;
+    let transB = translationsA[languageCode]?.translation;
+
+
+  })
+
 
   for (let key in translationsA) {
     let transA = translationsA[key];
     let transB = translationsA[key];
 
   }
-
 }
 
-export { COMMON_TRANSLATIONS }
+interface DeepDictionary {
+  [key: string]: DeepDictionary | string
+}
+
+// Merge two deep dictionaries. 
+// On ties, give preference to the first one.
+function MergeDeepDictionary(dictA: DeepDictionary, dictB: DeepDictionary) : DeepDictionary {
+  let output : DeepDictionary = {};
+
+  let keys = new Set(Object.keys(dictA).concat(Object.keys(dictB)));
+
+  keys.forEach((key : string) => {
+    let vA = dictA[key];
+    let vB = dictB[key];
+
+    if (vA === undefined) {
+      output[key] = vB;
+    } else if (vB === undefined) {
+      output[key] = vA;
+    } else if (typeof vA !== 'string' && typeof vB !== 'string' ) {
+      output[key] = MergeDeepDictionary(vA, vB);
+    } else {
+      output[key] = vA;
+    }
+  });
+
+  return output;
+}
+
+
+export { COMMON_TRANSLATIONS, MergeDeepDictionary }

@@ -1,6 +1,8 @@
+import { COMMON_TRANSLATIONS, MergeDeepDictionary } from '@storyteller/components/src/_i18n/CommonTranslations';
+
 // Use \u{00a0} = &nbsp; character literal
 
-const TRANSLATIONS : any = {
+const STORYTELLER_TRANSLATIONS : any = {
   // English: 46.6% Twitch (#1), 30+% FakeYou (#1)
   en: {
     translation: {
@@ -63,5 +65,7 @@ const TRANSLATIONS : any = {
     }
   },
 }
+
+const TRANSLATIONS = MergeDeepDictionary(STORYTELLER_TRANSLATIONS, COMMON_TRANSLATIONS);
 
 export { TRANSLATIONS }
