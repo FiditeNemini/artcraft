@@ -1,13 +1,22 @@
 use actix_http::http::StatusCode;
-use actix_web::{HttpResponse, HttpRequest, get};
+use actix_web::Error;
 use actix_web::Responder;
 use actix_web::Result;
-use actix_web::Error;
+use actix_web::web::Data;
+use actix_web::{HttpResponse, HttpRequest, get};
+use crate::server_state::ServerState;
 use log::debug;
+use std::sync::Arc;
 
-pub async fn get_root_index() -> HttpResponse {
+pub async fn get_root_index(server_state: Data<Arc<ServerState>>) -> HttpResponse {
   debug!("GET /"); // NB: Google load balancer hits this a lot, and it spams.
+  let body = format!(" \
+      <h1>hello!</h1> \
+      <p>Are you looking for an API? <a href=\"https://discord.gg/H72KFXm\">Join our Discord!</a></p> \
+      <p>Maybe you want to work with us? We can pay! Get in touch!</p> \
+      <p><em>storyteller-web instance: {}</em></p> \
+      ", server_state.hostname);
   HttpResponse::build(StatusCode::OK)
     .content_type("text/html; charset=utf-8")
-    .body("<h1>hello!</h1><p>Are you looking for an API? Join our Discord!</p><p>Maybe you want to work with us? We can pay! Get in touch!</p>")
+    .body(body)
 }
