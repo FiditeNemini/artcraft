@@ -3,6 +3,7 @@ import { ApiConfig } from '@storyteller/components';
 import { EnqueueJobResponsePayload } from '../tts_model_list/TtsModelListFc';
 import { SessionTtsInferenceResultListFc } from '../../_common/SessionTtsInferenceResultsListFc';
 import { SessionWrapper } from '@storyteller/components/src/session/SessionWrapper';
+import { Gravatar } from '@storyteller/components/src/elements/Gravatar';
 import { TtsInferenceJob } from '@storyteller/components/src/jobs/TtsInferenceJobs';
 import { useParams, Link } from 'react-router-dom';
 import { v4 as uuidv4 } from 'uuid';
@@ -10,7 +11,6 @@ import { FrontendUrlConfig } from '../../../../common/FrontendUrlConfig';
 import { HiddenIconFc } from '../../_icons/HiddenIcon';
 import { VisibleIconFc } from '../../_icons/VisibleIcon';
 import { GetTtsModel, GetTtsModelIsErr, GetTtsModelIsOk, TtsModel, TtsModelLookupError } from '@storyteller/components/src/api/tts/GetTtsModel';
-import { GravatarFc } from '../../_common/GravatarFc';
 import { GetTtsModelUseCount } from '../../../api/tts/GetTtsModelUseCount';
 import { BackLink } from '../../_common/BackLink';
 import { ListTtsCategoriesForModel, ListTtsCategoriesForModelIsError, ListTtsCategoriesForModelIsOk, TtsModelCategory } from '../../../api/category/ListTtsCategoriesForModel';
@@ -173,7 +173,7 @@ function TtsModelViewFc(props: Props) {
     const creatorUrl = FrontendUrlConfig.userProfilePage(ttsModel?.creator_username);
     creatorLink = (
       <span>
-        <GravatarFc
+        <Gravatar
           size={15}
           username={ttsModel.creator_display_name || ""} 
           email_hash={ttsModel.creator_gravatar_hash || ""} 

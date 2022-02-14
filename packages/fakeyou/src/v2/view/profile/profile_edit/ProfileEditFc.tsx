@@ -2,13 +2,13 @@ import React, { useEffect, useState }  from 'react';
 import { ApiConfig } from '@storyteller/components';
 import { useHistory } from 'react-router-dom';
 import { SessionWrapper } from '@storyteller/components/src/session/SessionWrapper';
+import { Gravatar } from '@storyteller/components/src/elements/Gravatar';
 import { useParams } from 'react-router-dom';
 import { VisibleIconFc } from '../../_icons/VisibleIcon';
 import { HiddenIconFc } from '../../_icons/HiddenIcon';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faDiscord, faFirefox, faGithub, faTwitch, faTwitter } from '@fortawesome/free-brands-svg-icons';
 import { faDollarSign, faUser } from '@fortawesome/free-solid-svg-icons';
-import { GravatarFc } from '../../_common/GravatarFc';
 import { BackLink } from '../../_common/BackLink';
 
 const DEFAULT_VISIBILITY = 'public';
@@ -263,7 +263,7 @@ function ProfileEditFc(props: Props) {
             <div className="media">
               <div className="media-left">
                 <figure className="image is-48x48">
-                  <GravatarFc size={48} email_hash={userData.email_gravatar_hash} /> 
+                  <Gravatar size={48} email_hash={userData.email_gravatar_hash} /> 
                 </figure>
               </div>
               <div className="media-content">

@@ -1,10 +1,10 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { SessionWrapper } from '@storyteller/components/src/session/SessionWrapper';
+import { Gravatar } from '@storyteller/components/src/elements/Gravatar';
+import { BucketConfig } from '@storyteller/components/src/api/BucketConfig';
 import { useParams, Link } from 'react-router-dom';
-import { GravatarFc } from '../../_common/GravatarFc';
 import { SpectrogramFc } from './SpectrogramFc';
 import { ReportDiscordLinkFc } from '../../_common/DiscordReportLinkFc';
-import { BucketConfig } from '@storyteller/components/src/api/BucketConfig';
 import { FrontendUrlConfig } from '../../../../common/FrontendUrlConfig';
 import { HiddenIconFc } from '../../_icons/HiddenIcon';
 import { VisibleIconFc } from '../../_icons/VisibleIcon';
@@ -113,7 +113,7 @@ function TtsResultViewFc(props: Props) {
     let creatorLink = `/profile/${ttsInferenceResult.maybe_creator_username}`;
     creatorDetails = (
       <span>
-        <GravatarFc 
+        <Gravatar
           size={15}
           username={ttsInferenceResult.maybe_creator_display_name || ""} 
           email_hash={ttsInferenceResult.maybe_creator_gravatar_hash || ""} 
@@ -129,7 +129,7 @@ function TtsResultViewFc(props: Props) {
     let modelCreatorLink = `/profile/${ttsInferenceResult.maybe_model_creator_username}`;
     modelCreatorDetails = (
       <span>
-        <GravatarFc 
+        <Gravatar
           size={15}
           username={ttsInferenceResult.maybe_model_creator_display_name || ""} 
           email_hash={ttsInferenceResult.maybe_model_creator_gravatar_hash || ""} 

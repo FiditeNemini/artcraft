@@ -1,9 +1,9 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { SessionWrapper } from '@storyteller/components/src/session/SessionWrapper';
+import { Gravatar } from '@storyteller/components/src/elements/Gravatar';
 import { FrontendUrlConfig } from '../../../../common/FrontendUrlConfig';
 import { BackLink } from '../../_common/BackLink';
 import { ListTtsCategoriesForModeration, ListTtsCategoriesForModerationIsError, ListTtsCategoriesForModerationIsOk, ListTtsCategoriesTriState, ModerationTtsCategory } from '../../../api/moderation/category/ListTtsCategoriesForModeration';
-import { GravatarFc } from '../../_common/GravatarFc';
 import { Link } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faBox, faBoxOpen, faLock } from '@fortawesome/free-solid-svg-icons';
@@ -213,7 +213,7 @@ function ModerationTtsCategoryListPage(props: Props) {
               const creatorUrl = FrontendUrlConfig.userProfilePage(category?.creator_username || "username error");
               creatorLink = (
                 <span className="white-space-nowrap">
-                  <GravatarFc
+                  <Gravatar
                     size={15}
                     username={category.creator_display_name || ""} 
                     email_hash={category.creator_gravatar_hash || ""} 

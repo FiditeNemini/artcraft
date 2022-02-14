@@ -1,9 +1,9 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { SessionWrapper } from '@storyteller/components/src/session/SessionWrapper';
+import { Gravatar } from '@storyteller/components/src/elements/Gravatar';
 import { formatDistance } from 'date-fns';
 import { FrontendUrlConfig } from '../../../../common/FrontendUrlConfig';
-import { GravatarFc } from '../../_common/GravatarFc';
 import { BackLink } from '../../_common/BackLink';
 import { GetPendingW2lTemplates, GetPendingW2lTemplatesIsOk, PendingW2lTemplatesEntryForList } from '../../../api/moderation/GetPendingW2lTemplates';
 import { PhotoVideoIcon } from '../../_icons/PhotoVideoIcon';
@@ -55,7 +55,7 @@ function ModerationPendingW2lTemplatesFc(props: Props) {
         </td>
         <td>
           <Link to={FrontendUrlConfig.userProfilePage(template.creator_display_name)}>
-            <GravatarFc username={template.creator_display_name} email_hash={template.creator_gravatar_hash} size={12} />
+            <Gravatar username={template.creator_display_name} email_hash={template.creator_gravatar_hash} size={12} />
             &nbsp;
             {template.creator_display_name}
           </Link>

@@ -6,13 +6,13 @@ import { SessionTtsModelUploadResultListFc } from '../../_common/SessionTtsModel
 import { SessionW2lInferenceResultListFc } from '../../_common/SessionW2lInferenceResultsListFc';
 import { SessionW2lTemplateUploadResultListFc } from '../../_common/SessionW2lTemplateUploadResultsListFc';
 import { SessionWrapper } from '@storyteller/components/src/session/SessionWrapper';
+import { Gravatar } from '@storyteller/components/src/elements/Gravatar';
 import { TtsInferenceJob } from '@storyteller/components/src/jobs/TtsInferenceJobs';
 import { TtsModelUploadJob } from '@storyteller/components/src/jobs/TtsModelUploadJobs';
 import { W2lInferenceJob } from '@storyteller/components/src/jobs/W2lInferenceJobs';
 import { W2lTemplateUploadJob } from '@storyteller/components/src/jobs/W2lTemplateUploadJobs';
 import { v4 as uuidv4 } from 'uuid';
 import { ListTtsModels, TtsModelListItem } from '@storyteller/components/src/api/tts/ListTtsModels';
-import { GravatarFc } from '../../_common/GravatarFc';
 import { VocodesNotice } from './VocodesNotice';
 import { ListTtsCategories, ListTtsCategoriesIsError, ListTtsCategoriesIsOk } from '../../../api/category/ListTtsCategories';
 import { MultiDropdownSearch } from './MultiDropdownSearch';
@@ -194,7 +194,7 @@ function TtsModelListFc(props: Props) {
           See more details about the "<strong>{{modelName}}</strong>" model 
           by&nbsp;<strong>{{userName}}</strong>&nbsp; 
         </Trans>
-          <GravatarFc 
+          <Gravatar
             size={15}
             username={props.maybeSelectedTtsModel.creator_display_name}
             email_hash={props.maybeSelectedTtsModel.creator_gravatar_hash} /> 

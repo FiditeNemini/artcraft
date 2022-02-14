@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState }  from 'react';
-import { GravatarFc } from '../../_common/GravatarFc';
+import { Gravatar } from '@storyteller/components/src/elements/Gravatar';
 import { Link } from 'react-router-dom';
 import { ProfileTtsInferenceResultsListFc } from './Profile_TtsInferenceResultListFc';
 import { ProfileTtsModelListFc } from './Profile_TtsModelListFc';
@@ -234,7 +234,7 @@ function ProfileFc(props: Props) {
   return (
     <div className="content">
       <h1 className="title is-1">
-        <GravatarFc 
+        <Gravatar 
           size={45} 
           username={userData.display_name}
           email_hash={userEmailHash} />

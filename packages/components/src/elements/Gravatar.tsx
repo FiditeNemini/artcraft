@@ -6,7 +6,7 @@ interface Props {
   username?: string,
 }
 
-function GravatarFc(props: Props) {
+function Gravatar(props: Props) {
   const gravatarUrl = `https://www.gravatar.com/avatar/${props.email_hash}?s=${props.size}`
 
   let altText = "gravatar";
@@ -19,4 +19,4 @@ function GravatarFc(props: Props) {
   )
 }
 
-export { GravatarFc };
+export { Gravatar };
