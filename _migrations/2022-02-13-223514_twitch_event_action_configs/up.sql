@@ -26,6 +26,9 @@ CREATE TABLE twitch_event_action_rules(
       'chat_command'
   ) NOT NULL,
 
+  -- Whether or not the rule is enabled.
+  rule_is_enabled BOOLEAN NOT NULL DEFAULT FALSE,
+
   -- A JSON payload containing any predicates we wish to apply to the match.
   -- eg. bits_value > 100
   -- eg. channel_points_award_name == "Mario Voice"
