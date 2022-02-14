@@ -1,7 +1,7 @@
 import React from 'react';
 import { SessionWrapper } from '@storyteller/components/src/session/SessionWrapper';
 import { Link } from "react-router-dom";
-import { DiscordLink } from '../_common/DiscordLink';
+import { DiscordLink } from '@storyteller/components/src/elements/DiscordLink';
 import { FrontendUrlConfig } from '../../../common/FrontendUrlConfig';
 
 interface Props {

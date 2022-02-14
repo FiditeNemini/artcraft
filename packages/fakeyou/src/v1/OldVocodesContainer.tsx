@@ -19,7 +19,7 @@ import { ApiConfig } from '@storyteller/components';
 import { SessionStateResponse } from './api/SessionState';
 import { Link } from 'react-router-dom';
 import { FrontendUrlConfig } from '../common/FrontendUrlConfig';
-import { DiscordLink } from '../v2/view/_common/DiscordLink';
+import { DiscordLink } from '@storyteller/components/src/elements/DiscordLink';
 import { PatreonLink } from '../v2/view/_common/PatreonLink';
 
 interface Props {

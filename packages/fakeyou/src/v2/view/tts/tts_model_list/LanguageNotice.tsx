@@ -1,6 +1,6 @@
-import { Language } from '@storyteller/components/src/i18n/Language';
 import React from 'react';
-import { DiscordLink } from '../../_common/DiscordLink';
+import { Language } from '@storyteller/components/src/i18n/Language';
+import { DiscordLink } from '@storyteller/components/src/elements/DiscordLink';
 
 interface Props {
   clearLanguageNotice: () => void,

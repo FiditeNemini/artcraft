@@ -1,5 +1,5 @@
 import React from 'react';
-import { DiscordLink } from './DiscordLink';
+import { DiscordLink } from '@storyteller/components/src/elements/DiscordLink';
 
 interface Props {
 }
