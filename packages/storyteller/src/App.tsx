@@ -3,17 +3,17 @@ import './App.scss';
 
 import React from 'react';
 import { BrowserRouter, Route, Switch } from "react-router-dom";
-//import { Common } from "@storyteller/components";
-import { IndexPage } from './pages/index/IndexPage';
-import { TopNav } from './layout/TopNav';
 import StreamPage from './pages/stream/StreamPage';
-import { ComingSoonPage } from './pages/coming-soon/ComingSoonPage';
-import { ObsLayerPage } from './pages/obs-layer/ObsLayerPage';
-import { SessionWrapper } from '@storyteller/components/src/session/SessionWrapper';
-import { DetectLocale, DetectLocaleIsOk } from '@storyteller/components/src/api/locale/DetectLocale';
 import i18n from 'i18next';
-import { initReactI18next } from 'react-i18next';
+import { ComingSoonPage } from './pages/coming-soon/ComingSoonPage';
+import { LoginPage } from './pages/login/LoginPage';
+import { DetectLocale, DetectLocaleIsOk } from '@storyteller/components/src/api/locale/DetectLocale';
+import { IndexPage } from './pages/index/IndexPage';
+import { ObsLayerPage } from './pages/obs-layer/ObsLayerPage';
 import { STORYTELLER_MERGED_TRANSLATIONS } from './_i18n/StorytellerTranslations'
+import { SessionWrapper } from '@storyteller/components/src/session/SessionWrapper';
+import { TopNav } from './layout/TopNav';
+import { initReactI18next } from 'react-i18next';
 
 i18n
   .use(initReactI18next) // passes i18n down to react-i18next
@@ -83,6 +83,12 @@ class App extends React.Component<Props, State> {
               </Route>
               <Route path="/coming-soon">
                 <ComingSoonPage />
+              </Route>
+              <Route path="/login">
+                <LoginPage 
+                  sessionWrapper={this.state.sessionWrapper}
+                  querySessionAction={this.querySession}
+                  />
               </Route>
               <Route path="/obs/:username">
                 <ObsLayerPage />
