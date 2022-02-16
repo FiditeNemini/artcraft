@@ -1,0 +1,30 @@
+-- noinspection SqlDialectInspectionForFile
+-- noinspection SqlNoDataSourceInspectionForFile
+-- noinspection SqlResolveForFile
+
+-- We'll use application logic to kill any API keys beyond the most recent 5 "active" a user creates.
+CREATE TABLE api_tokens (
+  -- Not used for anything except replication.
+  id BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
+
+  -- This is the secret API token value
+  api_token VARCHAR(32) NOT NULL,
+
+  -- Foreign key to user that owns the API token.
+  -- A user can have several.
+  user_token VARCHAR(32) NOT NULL,
+
+  -- A user-defined short description (optional)
+  maybe_short_description VARCHAR(32) DEFAULT NULL,
+
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  deleted_at TIMESTAMP,
+
+    -- INDICES --
+  PRIMARY KEY (id),
+  UNIQUE KEY (api_token),
+  KEY fk_user_token (user_token),
+  KEY index_deleted_at (deleted_at)
+
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin;
