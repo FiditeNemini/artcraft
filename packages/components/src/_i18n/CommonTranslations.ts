@@ -115,7 +115,7 @@ interface DeepDictionary {
 
 // Merge two deep dictionaries. 
 // On ties, give preference to the first one.
-function MergeDeepDictionary(dictA: Resource, dictB: DeepDictionary) : DeepDictionary {
+function MergeDeepDictionary(dictA: DeepDictionary, dictB: DeepDictionary) : DeepDictionary {
   let output : DeepDictionary = {};
 
   let keys = new Set(Object.keys(dictA).concat(Object.keys(dictB)));

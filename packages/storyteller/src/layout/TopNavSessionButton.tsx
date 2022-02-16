@@ -56,14 +56,14 @@ function TopNavSessionButton(props: Props) {
           await logoutHandler();
           props.closeHamburgerAction();
         }}
-      >{t('coreUi.topNav.logout')}</button>;
+      >{t('common.logout')}</button>;
   } else {
     sessionLink = (
       <Link
         to="/signup"
         className="button is-danger is-pulled-right"
         onClick={() => props.closeHamburgerAction()}
-        >{t('coreUi.topNav.signUpLogin')}</Link>
+        >{t('common.signUpLogin')}</Link>
     );
   }
 
