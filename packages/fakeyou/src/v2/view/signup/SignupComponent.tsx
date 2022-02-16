@@ -1,11 +1,10 @@
 import React from 'react';
-import { AsteriskIcon } from '../_icons/AsteriskIcon';
-import { EnvelopeIcon } from '../_icons/EnvelopeIcon';
 import { Link } from 'react-router-dom';
 import { Mode } from '../../../AppMode';
 import { SessionWrapper } from '@storyteller/components/src/session/SessionWrapper';
-import { UserIcon } from '../_icons/UserIcon';
 import { CreateAccount, CreateAccountIsError, CreateAccountIsSuccess } from '../../api/user/CreateAccount';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { iconEnvelope, iconPasswordField, iconUser } from '@storyteller/components/src/icons/SemanticIcons';
 
 enum FieldTriState {
   EMPTY_FALSE,
@@ -305,7 +304,7 @@ class SignupComponent extends React.Component<Props, State> {
             <div className="control has-icons-left has-icons-right">
               <input className={usernameInputClass} type="text" placeholder="Username" value={this.state.username} onChange={this.handleUsernameChange} />
               <span className="icon is-small is-left">
-                <UserIcon />
+                <FontAwesomeIcon icon={iconUser} />
               </span>
             </div>
             <p className={usernameHelpClass}>{this.state.usernameInvalidReason}</p>
@@ -316,7 +315,7 @@ class SignupComponent extends React.Component<Props, State> {
             <div className="control has-icons-left has-icons-right">
               <input className={emailInputClass} type="email" placeholder="Email" value={this.state.email} onChange={this.handleEmailChange} />
               <span className="icon is-small is-left">
-                <EnvelopeIcon />
+                <FontAwesomeIcon icon={iconEnvelope} />
               </span>
             </div>
             <p className={emailHelpClass}>{this.state.emailInvalidReason}</p>
@@ -327,7 +326,7 @@ class SignupComponent extends React.Component<Props, State> {
             <div className="control has-icons-left has-icons-right">
               <input className={passwordInputClass} type="password" placeholder="Password" value={this.state.password} onChange={this.handlePasswordChange} />
               <span className="icon is-small is-left">
-                <AsteriskIcon />
+                <FontAwesomeIcon icon={iconPasswordField} />
               </span>
             </div>
             <p className={passwordHelpClass}>{this.state.passwordInvalidReason}</p>
@@ -338,7 +337,7 @@ class SignupComponent extends React.Component<Props, State> {
             <div className="control has-icons-left has-icons-right">
               <input className={passwordConfirmationInputClass} type="password" placeholder="Password confirmation" value={this.state.passwordConfirmation} onChange={this.handlePasswordConfirmationChange} />
               <span className="icon is-small is-left">
-                <AsteriskIcon />
+                <FontAwesomeIcon icon={iconPasswordField} />
               </span>
             </div>
             <p className={passwordConfirmationHelpClass}>

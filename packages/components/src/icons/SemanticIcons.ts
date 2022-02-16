@@ -1,8 +1,10 @@
-import { IconDefinition, faUser, faEnvelope } from '@fortawesome/free-solid-svg-icons'
+import { IconDefinition, faUser, faEnvelope, faAsterisk } from '@fortawesome/free-solid-svg-icons'
 
 // Semantic, shared definitions for reused icons.
+// The alias names might make more sense and allow bulk update.
 
 export const iconEnvelope : IconDefinition = faEnvelope;
+export const iconPasswordField : IconDefinition = faAsterisk;
 export const iconUser : IconDefinition = faUser;
 
 

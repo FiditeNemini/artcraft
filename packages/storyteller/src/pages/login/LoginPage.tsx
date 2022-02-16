@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { SessionWrapper } from '@storyteller/components/src/session/SessionWrapper';
 import { useHistory } from "react-router-dom";
-import { iconEnvelope, iconUser } from '@storyteller/components/src/icons/SemanticIcons';
+import { iconEnvelope, iconPasswordField, iconUser } from '@storyteller/components/src/icons/SemanticIcons';
 import { CreateSession, CreateSessionIsError, CreateSessionIsSuccess } from '@storyteller/components/src/session/CreateSession';
 
 interface Props {
@@ -90,7 +90,7 @@ function LoginPage(props: Props) {
           <div className="control has-icons-left has-icons-right">
             <input className="input" type="password" placeholder="Password" value={password} onChange={handlePasswordChange} />
             <span className="icon is-small is-left">
-              <FontAwesomeIcon icon={iconEnvelope} />
+              <FontAwesomeIcon icon={iconPasswordField} />
             </span>
           </div>
           {/*<p className="help"></p>*/}
