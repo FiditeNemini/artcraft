@@ -25,6 +25,10 @@ impl Tokens {
     random_prefix_crockford_token("WR:", 32, false)
   }
 
+  pub fn new_api_token() -> AnyhowResult<String> {
+    random_prefix_crockford_token("API:", 32, true)
+  }
+
   // ========== Tokens not typically visible to users ==========
 
   pub fn new_user() -> AnyhowResult<String> {

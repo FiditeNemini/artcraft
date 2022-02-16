@@ -71,6 +71,8 @@ use crate::http_server::endpoints::w2l::get_w2l_upload_template_job_status::get_
 use crate::http_server::endpoints::w2l::list_w2l_templates::list_w2l_templates_handler;
 use crate::http_server::endpoints::w2l::set_w2l_template_mod_approval::set_w2l_template_mod_approval_handler;
 use crate::http_server::endpoints::misc::detect_locale_handler::detect_locale_handler;
+use crate::http_server::endpoints::api_tokens::create_api_token::create_api_token_handler;
+use crate::http_server::endpoints::api_tokens::list_api_tokens::list_api_tokens_handler;
 
 pub fn add_routes<T, B> (app: App<T, B>) -> App<T, B>
   where
@@ -88,6 +90,7 @@ pub fn add_routes<T, B> (app: App<T, B>) -> App<T, B>
   app = add_w2l_routes(app); /* /w2l */
   app = add_category_routes(app); /* /category */
   app = add_user_profile_routes(app); /* /user */
+  app = add_api_token_routes(app); /* /api_tokens */
   app = add_twitch_oauth_routes(app); /* /twitch */ // TODO: MAYBE TEMPORARY
 
   // ==================== ACCOUNT CREATION / SESSION MANAGEMENT ====================
@@ -528,6 +531,32 @@ fn add_user_profile_routes<T, B> (app: App<T, B>) -> App<T, B>
       )
   )
 }
+
+// ==================== API TOKEN ROUTES ====================
+
+fn add_api_token_routes<T, B> (app: App<T, B>) -> App<T, B>
+  where
+      B: MessageBody,
+      T: ServiceFactory<
+        ServiceRequest,
+        Config = (),
+        Response = ServiceResponse<B>,
+        Error = Error,
+        InitError = (),
+      >,
+{
+  app.service(web::scope("/api_tokens")
+      .service(web::resource("/create")
+          .route(web::post().to(create_api_token_handler))
+          .route(web::head().to(|| HttpResponse::Ok()))
+      )
+      .service(web::resource("/list")
+          .route(web::get().to(list_api_tokens_handler))
+          .route(web::head().to(|| HttpResponse::Ok()))
+      )
+  )
+}
+
 // ==================== TWITCH ROUTES ====================
 
 // TODO: Maybe move these into an "oauth-gateway" type http service.

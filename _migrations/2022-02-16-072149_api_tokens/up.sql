@@ -7,6 +7,10 @@ CREATE TABLE api_tokens (
   -- Not used for anything except replication.
   id BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
 
+  -- Idempotency token from client
+  -- This is so the frontend client doesn't submit duplicate jobs.
+  uuid_idempotency_token VARCHAR(36) NOT NULL,
+
   -- This is the secret API token value
   api_token VARCHAR(32) NOT NULL,
 
@@ -24,7 +28,9 @@ CREATE TABLE api_tokens (
     -- INDICES --
   PRIMARY KEY (id),
   UNIQUE KEY (api_token),
+  UNIQUE KEY (uuid_idempotency_token),
   KEY fk_user_token (user_token),
+  KEY index_created_at (created_at),
   KEY index_deleted_at (deleted_at)
 
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin;

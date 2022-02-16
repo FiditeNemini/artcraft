@@ -1,3 +1,4 @@
+pub mod api_tokens;
 pub mod categories;
 pub mod events;
 pub mod leaderboard;
