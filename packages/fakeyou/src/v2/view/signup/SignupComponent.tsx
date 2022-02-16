@@ -1,10 +1,10 @@
 import React from 'react';
+import { CreateAccount, CreateAccountIsError, CreateAccountIsSuccess } from '@storyteller/components/src/api/user/CreateAccount';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Link } from 'react-router-dom';
 import { Mode } from '../../../AppMode';
 import { SessionWrapper } from '@storyteller/components/src/session/SessionWrapper';
-import { CreateAccount, CreateAccountIsError, CreateAccountIsSuccess } from '../../api/user/CreateAccount';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { iconEnvelope, iconPasswordField, iconUser } from '@storyteller/components/src/icons/SemanticIcons';
+import { iconEmailField, iconPasswordField, iconUser } from '@storyteller/components/src/icons/SemanticIcons';
 
 enum FieldTriState {
   EMPTY_FALSE,
@@ -315,7 +315,7 @@ class SignupComponent extends React.Component<Props, State> {
             <div className="control has-icons-left has-icons-right">
               <input className={emailInputClass} type="email" placeholder="Email" value={this.state.email} onChange={this.handleEmailChange} />
               <span className="icon is-small is-left">
-                <FontAwesomeIcon icon={iconEnvelope} />
+                <FontAwesomeIcon icon={iconEmailField} />
               </span>
             </div>
             <p className={emailHelpClass}>{this.state.emailInvalidReason}</p>

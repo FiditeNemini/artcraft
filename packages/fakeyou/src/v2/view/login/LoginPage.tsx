@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { SessionWrapper } from '@storyteller/components/src/session/SessionWrapper';
 import { useHistory } from "react-router-dom";
-import { CreateSession, CreateSessionIsError, CreateSessionIsSuccess } from '@storyteller/components/src/session/CreateSession';
-import { iconUser, iconEnvelope, iconPasswordField } from '@storyteller/components/src/icons/SemanticIcons';
+import { CreateSession, CreateSessionIsError, CreateSessionIsSuccess } from '@storyteller/components/src/api/session/CreateSession';
+import { iconUser, iconPasswordField } from '@storyteller/components/src/icons/SemanticIcons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 interface Props {

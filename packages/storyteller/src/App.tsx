@@ -7,6 +7,7 @@ import StreamPage from './pages/stream/StreamPage';
 import i18n from 'i18next';
 import { ComingSoonPage } from './pages/coming-soon/ComingSoonPage';
 import { LoginPage } from './pages/login/LoginPage';
+import { SignupPage } from './pages/signup/SignupPage';
 import { DetectLocale, DetectLocaleIsOk } from '@storyteller/components/src/api/locale/DetectLocale';
 import { IndexPage } from './pages/index/IndexPage';
 import { ObsLayerPage } from './pages/obs-layer/ObsLayerPage';
@@ -83,6 +84,12 @@ class App extends React.Component<Props, State> {
               </Route>
               <Route path="/coming-soon">
                 <ComingSoonPage />
+              </Route>
+              <Route path="/signup">
+                <SignupPage
+                  sessionWrapper={this.state.sessionWrapper}
+                  querySessionCallback={this.querySession}
+                  />
               </Route>
               <Route path="/login">
                 <LoginPage 

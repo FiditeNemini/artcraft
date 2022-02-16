@@ -3,7 +3,7 @@ import { IconDefinition, faUser, faEnvelope, faAsterisk } from '@fortawesome/fre
 // Semantic, shared definitions for reused icons.
 // The alias names might make more sense and allow bulk update.
 
-export const iconEnvelope : IconDefinition = faEnvelope;
+export const iconEmailField : IconDefinition = faEnvelope;
 export const iconPasswordField : IconDefinition = faAsterisk;
 export const iconUser : IconDefinition = faUser;
 
