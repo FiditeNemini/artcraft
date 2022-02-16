@@ -81,34 +81,6 @@ const COMMON_TRANSLATIONS : any = {
   },
 }
 
-interface TranslationDictionary {
-  [languageCode: string]: Translations,
-}
-
-interface Translations {
-  translation: { [key: string]: any },
-}
-
-function MergeTranslations(translationsA: TranslationDictionary, translationsB: TranslationDictionary) {
-  let outputTranslations = {};
-
-  let languageCodes = new Set(Object.keys(translationsA).concat(Object.keys(translationsB)));
-
-  languageCodes.forEach(languageCode => {
-    let transA = translationsA[languageCode]?.translation;
-    let transB = translationsA[languageCode]?.translation;
-
-
-  })
-
-
-  for (let key in translationsA) {
-    let transA = translationsA[key];
-    let transB = translationsA[key];
-
-  }
-}
-
 interface DeepDictionary {
   [key: string]: DeepDictionary | string
 }
