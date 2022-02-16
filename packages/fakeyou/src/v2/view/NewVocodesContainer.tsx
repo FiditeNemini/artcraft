@@ -1,7 +1,7 @@
 import React from 'react';
 import { AboutFc } from './about/about_page/AboutFc';
 import { FirehoseEventListFc } from './firehose/FirehoseEventListFc';
-import { LoginFc } from './login/LoginFc';
+import { LoginPage } from './login/LoginPage';
 import { ModerationFc } from './moderation/moderation_main/ModerationFc';
 import { ModerationIpBanListFc } from './moderation/moderation_ip_ban_list/ModerationIpBanListFc';
 import { ModerationViewIpBanFc } from './moderation/moderation_view_ip_ban/ModerationViewIpBanFc';
@@ -141,7 +141,7 @@ class NewVocodesContainer extends React.Component<Props, State> {
             </Route>
 
             <Route path="/login">
-              <LoginFc
+              <LoginPage
                 sessionWrapper={this.props.sessionWrapper}
                 querySessionAction={this.props.querySessionAction}
               />

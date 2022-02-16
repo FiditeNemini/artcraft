@@ -2,8 +2,7 @@ import React, { useState } from 'react';
 import { SessionWrapper } from '@storyteller/components/src/session/SessionWrapper';
 import { Link, useHistory } from "react-router-dom";
 import { v4 as uuidv4 } from 'uuid';
-import { CreateCategory, CreateCategoryIsError, CreateCategoryRequest } from '../../api/category/CreateCategory';
-import { CreateSessionIsSuccess } from '../../api/user/CreateSession';
+import { CreateCategory, CreateCategoryIsError, CreateCategoryIsSuccess, CreateCategoryRequest } from '../../api/category/CreateCategory';
 import { BackLink } from '../_common/BackLink';
 import { FrontendUrlConfig } from '../../../common/FrontendUrlConfig';
 
@@ -93,7 +92,7 @@ function CreateCategoryPage(props: Props) {
 
     if (CreateCategoryIsError(response)) {
       setErrorMessage('there was an error with the request'); // TODO: Fix error serialization
-    } else if (CreateSessionIsSuccess(response)) {
+    } else if (CreateCategoryIsSuccess(response)) {
       history.push('/');
     }
 

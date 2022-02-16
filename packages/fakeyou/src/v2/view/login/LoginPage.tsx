@@ -1,16 +1,16 @@
 import React, { useState } from 'react';
 import { SessionWrapper } from '@storyteller/components/src/session/SessionWrapper';
 import { useHistory } from "react-router-dom";
-import { UserIcon } from '../_icons/UserIcon';
-import { EnvelopeIcon } from '../_icons/EnvelopeIcon';
 import { CreateSession, CreateSessionIsError, CreateSessionIsSuccess } from '@storyteller/components/src/session/CreateSession';
+import { iconUser, iconEnvelope } from '@storyteller/components/src/icons/SemanticIcons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 interface Props {
   sessionWrapper: SessionWrapper,
   querySessionAction: () => void,
 }
 
-function LoginFc(props: Props) {
+function LoginPage(props: Props) {
   let history = useHistory();
 
   const [password, setPassword] = useState('')
@@ -79,7 +79,7 @@ function LoginFc(props: Props) {
           <div className="control has-icons-left has-icons-right">
             <input className="input" type="text" placeholder="Username or Email" value={usernameOrEmail} onChange={handleUsernameOrEmailChange} />
             <span className="icon is-small is-left">
-              <UserIcon />
+              <FontAwesomeIcon icon={iconUser} />
             </span>
           </div>
           {/*<p className="help"></p>*/}
@@ -90,7 +90,7 @@ function LoginFc(props: Props) {
           <div className="control has-icons-left has-icons-right">
             <input className="input" type="password" placeholder="Password" value={password} onChange={handlePasswordChange} />
             <span className="icon is-small is-left">
-              <EnvelopeIcon />
+              <FontAwesomeIcon icon={iconEnvelope} />
             </span>
           </div>
           {/*<p className="help"></p>*/}
@@ -105,4 +105,4 @@ function LoginFc(props: Props) {
   )
 }
 
-export { LoginFc };
+export { LoginPage };
