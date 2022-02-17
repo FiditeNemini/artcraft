@@ -915,7 +915,7 @@
               "bits": 1
             },
             "char_set": 63,
-            "max_size": 3
+            "max_size": 11
           }
         },
         {
@@ -989,6 +989,16 @@
         false,
         true
       ]
+    }
+  },
+  "5951014fbd8f71ea21a8d6f69c23e8b2a449595bf28216b9a9cc87979ea60b05": {
+    "query": "\nUPDATE api_tokens\nSET\n  deleted_at = CURRENT_TIMESTAMP\nWHERE\n  user_token = ?\nAND api_token NOT IN (?, ?, ?, ?, ?)\n        ",
+    "describe": {
+      "columns": [],
+      "parameters": {
+        "Right": 6
+      },
+      "nullable": []
     }
   },
   "5a17891eec52d8304af8a54f6bb7629cb71d3603146f8b2c842f6e1047c31e91": {
@@ -1365,6 +1375,70 @@
         "Right": 3
       },
       "nullable": []
+    }
+  },
+  "9810f6a24480b44ec766e35a1c60daf36f9c8a048bb0192a6069214a695c8dd2": {
+    "query": "\nSELECT\n  api_token,\n  maybe_short_description,\n  created_at,\n  updated_at\nFROM api_tokens\nWHERE\n  user_token = ?\n  AND deleted_at IS NULL\nORDER BY created_at DESC\nLIMIT 5\n        ",
+    "describe": {
+      "columns": [
+        {
+          "ordinal": 0,
+          "name": "api_token",
+          "type_info": {
+            "type": "VarString",
+            "flags": {
+              "bits": 4229
+            },
+            "char_set": 224,
+            "max_size": 128
+          }
+        },
+        {
+          "ordinal": 1,
+          "name": "maybe_short_description",
+          "type_info": {
+            "type": "VarString",
+            "flags": {
+              "bits": 128
+            },
+            "char_set": 224,
+            "max_size": 128
+          }
+        },
+        {
+          "ordinal": 2,
+          "name": "created_at",
+          "type_info": {
+            "type": "Timestamp",
+            "flags": {
+              "bits": 1161
+            },
+            "char_set": 63,
+            "max_size": 19
+          }
+        },
+        {
+          "ordinal": 3,
+          "name": "updated_at",
+          "type_info": {
+            "type": "Timestamp",
+            "flags": {
+              "bits": 9345
+            },
+            "char_set": 63,
+            "max_size": 19
+          }
+        }
+      ],
+      "parameters": {
+        "Right": 1
+      },
+      "nullable": [
+        false,
+        true,
+        false,
+        false
+      ]
     }
   },
   "9e6aa0da19f7e428206c95498f748a30ab428892fb9b17547a7dc60470cc3c09": {
@@ -1866,6 +1940,16 @@
       "nullable": []
     }
   },
+  "c638431e2bcdef1e14d5ef35d571df717a8d3782e15768dfbadb38ac7e94a674": {
+    "query": "\nINSERT INTO api_tokens\nSET\n  api_token = ?,\n  user_token = ?,\n  uuid_idempotency_token = ?\n        ",
+    "describe": {
+      "columns": [],
+      "parameters": {
+        "Right": 3
+      },
+      "nullable": []
+    }
+  },
   "d7ac9f84e92d6b2111162a674284c0b9fa50c718bedfb8ab7238ca0a7b0875e6": {
     "query": "\nINSERT INTO twitch_oauth_tokens\nSET\n  oauth_refresh_grouping_token = ?,\n  maybe_user_token = ?,\n  twitch_user_id = ?,\n  twitch_username = ?,\n  twitch_username_lowercase = ?,\n  access_token = ?,\n  maybe_refresh_token = ?,\n  refresh_count = ?,\n  token_type = ?,\n  expires_in_seconds = ?,\n  has_bits_read = ?,\n  has_channel_read_redemptions= ?,\n  has_channel_read_subscriptions = ?,\n  has_chat_edit = ?,\n  has_chat_read = ?,\n  ip_address_creation = ?,\n  expires_at = DATE_ADD(NOW(), INTERVAL ? SECOND)\n        ",
     "describe": {
@@ -2039,7 +2123,7 @@
               "bits": 1
             },
             "char_set": 63,
-            "max_size": 10
+            "max_size": 11
           }
         },
         {
@@ -2051,7 +2135,7 @@
               "bits": 1
             },
             "char_set": 63,
-            "max_size": 10
+            "max_size": 11
           }
         },
         {
@@ -2063,7 +2147,7 @@
               "bits": 1
             },
             "char_set": 63,
-            "max_size": 10
+            "max_size": 11
           }
         },
         {
@@ -2366,7 +2450,7 @@
               "bits": 1
             },
             "char_set": 63,
-            "max_size": 10
+            "max_size": 11
           }
         },
         {
@@ -2378,7 +2462,7 @@
               "bits": 1
             },
             "char_set": 63,
-            "max_size": 10
+            "max_size": 11
           }
         },
         {
@@ -2390,7 +2474,7 @@
               "bits": 1
             },
             "char_set": 63,
-            "max_size": 10
+            "max_size": 11
           }
         },
         {
@@ -2692,7 +2776,7 @@
               "bits": 1
             },
             "char_set": 63,
-            "max_size": 3
+            "max_size": 11
           }
         },
         {
@@ -2906,7 +2990,7 @@
               "bits": 1
             },
             "char_set": 63,
-            "max_size": 10
+            "max_size": 11
           }
         },
         {
@@ -2918,7 +3002,7 @@
               "bits": 1
             },
             "char_set": 63,
-            "max_size": 10
+            "max_size": 11
           }
         },
         {
@@ -2930,7 +3014,7 @@
               "bits": 1
             },
             "char_set": 63,
-            "max_size": 10
+            "max_size": 11
           }
         },
         {
@@ -3416,7 +3500,7 @@
               "bits": 129
             },
             "char_set": 63,
-            "max_size": 2
+            "max_size": 1
           }
         }
       ],
@@ -3603,7 +3687,7 @@
               "bits": 1
             },
             "char_set": 63,
-            "max_size": 10
+            "max_size": 11
           }
         },
         {
@@ -3615,7 +3699,7 @@
               "bits": 1
             },
             "char_set": 63,
-            "max_size": 10
+            "max_size": 11
           }
         },
         {
@@ -3627,7 +3711,7 @@
               "bits": 1
             },
             "char_set": 63,
-            "max_size": 10
+            "max_size": 11
           }
         },
         {
@@ -4434,7 +4518,7 @@
               "bits": 1
             },
             "char_set": 63,
-            "max_size": 10
+            "max_size": 11
           }
         },
         {
@@ -4446,7 +4530,7 @@
               "bits": 1
             },
             "char_set": 63,
-            "max_size": 10
+            "max_size": 11
           }
         },
         {
@@ -4458,7 +4542,7 @@
               "bits": 1
             },
             "char_set": 63,
-            "max_size": 10
+            "max_size": 11
           }
         },
         {
@@ -4470,7 +4554,7 @@
               "bits": 1
             },
             "char_set": 63,
-            "max_size": 10
+            "max_size": 11
           }
         },
         {
@@ -4624,7 +4708,7 @@
               "bits": 1
             },
             "char_set": 63,
-            "max_size": 3
+            "max_size": 11
           }
         },
         {
@@ -4714,7 +4798,7 @@
               "bits": 1
             },
             "char_set": 63,
-            "max_size": 3
+            "max_size": 11
           }
         },
         {
@@ -5085,7 +5169,7 @@
               "bits": 1
             },
             "char_set": 63,
-            "max_size": 10
+            "max_size": 11
           }
         },
         {
@@ -5097,7 +5181,7 @@
               "bits": 1
             },
             "char_set": 63,
-            "max_size": 10
+            "max_size": 11
           }
         },
         {
@@ -5109,7 +5193,7 @@
               "bits": 1
             },
             "char_set": 63,
-            "max_size": 10
+            "max_size": 11
           }
         },
         {
@@ -5819,7 +5903,7 @@
               "bits": 1
             },
             "char_set": 63,
-            "max_size": 3
+            "max_size": 11
           }
         },
         {
@@ -5979,7 +6063,7 @@
               "bits": 1
             },
             "char_set": 63,
-            "max_size": 10
+            "max_size": 11
           }
         },
         {
@@ -5991,7 +6075,7 @@
               "bits": 1
             },
             "char_set": 63,
-            "max_size": 10
+            "max_size": 11
           }
         },
         {
@@ -6003,7 +6087,7 @@
               "bits": 1
             },
             "char_set": 63,
-            "max_size": 10
+            "max_size": 11
           }
         },
         {
@@ -6646,7 +6730,7 @@
               "bits": 1
             },
             "char_set": 63,
-            "max_size": 3
+            "max_size": 11
           }
         },
         {
@@ -6946,7 +7030,7 @@
               "bits": 1
             },
             "char_set": 63,
-            "max_size": 3
+            "max_size": 11
           }
         },
         {
@@ -7261,7 +7345,7 @@
               "bits": 1
             },
             "char_set": 63,
-            "max_size": 10
+            "max_size": 11
           }
         },
         {
@@ -7273,7 +7357,7 @@
               "bits": 1
             },
             "char_set": 63,
-            "max_size": 10
+            "max_size": 11
           }
         },
         {
@@ -7514,7 +7598,7 @@
               "bits": 1
             },
             "char_set": 63,
-            "max_size": 3
+            "max_size": 11
           }
         },
         {
@@ -7806,7 +7890,7 @@
               "bits": 1
             },
             "char_set": 63,
-            "max_size": 10
+            "max_size": 11
           }
         },
         {
@@ -7818,7 +7902,7 @@
               "bits": 1
             },
             "char_set": 63,
-            "max_size": 10
+            "max_size": 11
           }
         },
         {
@@ -7830,7 +7914,7 @@
               "bits": 1
             },
             "char_set": 63,
-            "max_size": 10
+            "max_size": 11
           }
         },
         {
@@ -7842,7 +7926,7 @@
               "bits": 1
             },
             "char_set": 63,
-            "max_size": 10
+            "max_size": 11
           }
         },
         {
@@ -8024,7 +8108,7 @@
               "bits": 1
             },
             "char_set": 63,
-            "max_size": 10
+            "max_size": 11
           }
         },
         {
@@ -8036,7 +8120,7 @@
               "bits": 1
             },
             "char_set": 63,
-            "max_size": 10
+            "max_size": 11
           }
         },
         {
@@ -8048,7 +8132,7 @@
               "bits": 1
             },
             "char_set": 63,
-            "max_size": 10
+            "max_size": 11
           }
         },
         {
@@ -8702,7 +8786,7 @@
               "bits": 1
             },
             "char_set": 63,
-            "max_size": 10
+            "max_size": 11
           }
         },
         {
@@ -8714,7 +8798,7 @@
               "bits": 1
             },
             "char_set": 63,
-            "max_size": 10
+            "max_size": 11
           }
         },
         {
@@ -9138,7 +9222,7 @@
               "bits": 1
             },
             "char_set": 63,
-            "max_size": 10
+            "max_size": 11
           }
         },
         {
@@ -9150,7 +9234,7 @@
               "bits": 1
             },
             "char_set": 63,
-            "max_size": 10
+            "max_size": 11
           }
         },
         {
@@ -9162,7 +9246,7 @@
               "bits": 1
             },
             "char_set": 63,
-            "max_size": 10
+            "max_size": 11
           }
         },
         {
