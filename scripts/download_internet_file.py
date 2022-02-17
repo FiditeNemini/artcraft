@@ -38,7 +38,12 @@ def _normalize_google_drive_url(url):
         return url
 
     document_token = match_groups[0]
-    return 'https://drive.google.com/uc?id={}'.format(document_token)
+
+    # NB(2022-02-17): Google appears to have broken downloads
+    # Using this fix with URL structure:
+    # https://github.com/wkentaro/gdown/issues/146#issuecomment-1042382215
+    # OLD FORMAT: return 'https://drive.google.com/uc?id={}'.format(document_token)
+    return 'https://drive.google.com/uc?export=download&confirm=pbef&id={}'.format(document_token)
 
 
 def download_url_or_gdrive(url, output_filename):
