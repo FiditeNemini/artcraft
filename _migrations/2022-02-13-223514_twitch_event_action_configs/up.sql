@@ -38,9 +38,14 @@ CREATE TABLE twitch_event_action_rules(
   -- eg. tts M:model
   event_response MEDIUMTEXT NOT NULL,
 
+  -- For abuse tracking.
+  -- Wide enough for IPv4/6
+  ip_address_creation VARCHAR(40) NOT NULL,
+  ip_address_last_update VARCHAR(40) NOT NULL,
+
   created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  deleted_at TIMESTAMP,
+  deleted_at TIMESTAMP DEFAULT NULL,
 
   -- INDICES --
   PRIMARY KEY (id),

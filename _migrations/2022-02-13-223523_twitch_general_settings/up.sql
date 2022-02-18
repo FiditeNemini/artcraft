@@ -23,6 +23,11 @@ CREATE TABLE twitch_general_settings (
   -- Can set a fallback voice if a TTS voice goes missing.
   maybe_fallback_tts_model_token VARCHAR(32) DEFAULT NULL,
 
+  -- For abuse tracking.
+  -- Wide enough for IPv4/6
+  ip_address_creation VARCHAR(40) NOT NULL,
+  ip_address_last_update VARCHAR(40) NOT NULL,
+
   created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 
