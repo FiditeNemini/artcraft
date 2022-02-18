@@ -2,27 +2,24 @@ use anyhow::anyhow;
 use container_common::anyhow_result::AnyhowResult;
 use sqlx::MySqlPool;
 
-pub async fn delete_api_token(
-  user_token: &str,
-  api_token: &str,
-  ip_address_update: &str,
+pub async fn delete_twitch_event_rule(
+  event_rule_token: &str,
+  ip_address_delete: &str,
   mysql_pool: &MySqlPool
 ) -> AnyhowResult<bool> {
 
   let query = sqlx::query!(
         r#"
-UPDATE api_tokens
+UPDATE twitch_event_rules
 SET
     deleted_at = CURRENT_TIMESTAMP,
     ip_address_last_update = ?
 WHERE
-    user_token = ?
-    AND api_token = ?
+    token = ?
 LIMIT 1
         "#,
-      ip_address_update,
-      user_token,
-      api_token,
+      ip_address_delete,
+      event_rule_token,
     );
 
   let result = query.execute(mysql_pool).await;

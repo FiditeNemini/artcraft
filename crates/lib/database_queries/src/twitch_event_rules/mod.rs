@@ -1,1 +1,2 @@
-pub mod create_event_rule;
+pub mod create_twitch_event_rule;
+pub mod delete_twitch_event_rule;
