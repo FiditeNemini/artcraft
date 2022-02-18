@@ -21,6 +21,11 @@ CREATE TABLE api_tokens (
   -- A user-defined short description (optional)
   maybe_short_description VARCHAR(32) DEFAULT NULL,
 
+  -- For abuse tracking.
+  -- Wide enough for IPv4/6
+  ip_address_creation VARCHAR(40) NOT NULL,
+  ip_address_last_update VARCHAR(40) NOT NULL,
+
   created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   deleted_at TIMESTAMP,

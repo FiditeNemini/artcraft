@@ -10,6 +10,7 @@ use crate::api_tokens::list_available_api_tokens_for_user::list_available_api_to
 pub async fn create_api_token_for_user(
   user_token: &str,
   uuid_idempotency_token: &str,
+  creator_ip_address: &str,
   mysql_pool: &MySqlPool
 ) -> AnyhowResult<String> {
 
@@ -24,11 +25,15 @@ INSERT INTO api_tokens
 SET
   api_token = ?,
   user_token = ?,
-  uuid_idempotency_token = ?
+  uuid_idempotency_token = ?,
+  ip_address_creation = ?,
+  ip_address_last_update = ?
         "#,
       api_token,
       user_token,
-      uuid_idempotency_token
+      uuid_idempotency_token,
+      creator_ip_address,
+      creator_ip_address
     );
 
   let query_result = query.execute(mysql_pool).await;
@@ -66,11 +71,13 @@ SET
         r#"
 UPDATE api_tokens
 SET
-  deleted_at = CURRENT_TIMESTAMP
+  deleted_at = CURRENT_TIMESTAMP,
+  ip_address_last_update = ?
 WHERE
   user_token = ?
 AND api_token NOT IN (?, ?, ?, ?, ?)
         "#,
+      creator_ip_address,
       user_token,
       &api_tokens[0],
       &api_tokens[1],

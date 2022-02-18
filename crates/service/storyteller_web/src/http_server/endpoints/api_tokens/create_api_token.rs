@@ -100,9 +100,12 @@ pub async fn create_api_token_handler(
     return Err(CreateApiTokenError::NotAuthorized);
   }
 
+  let creator_ip_address = get_request_ip(&http_request);
+
   let api_token = create_api_token_for_user(
     &user_session.user_token,
     &request.idempotency_token,
+    &creator_ip_address,
     &server_state.mysql_pool)
       .await
       .map_err(|e| {

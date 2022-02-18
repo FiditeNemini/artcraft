@@ -3,6 +3,9 @@ use actix_service::ServiceFactory;
 use actix_web::dev::{ServiceRequest, ServiceResponse};
 use actix_web::error::Error;
 use actix_web::{App, web, HttpResponse};
+use crate::http_server::endpoints::api_tokens::create_api_token::create_api_token_handler;
+use crate::http_server::endpoints::api_tokens::edit_api_token::edit_api_token_handler;
+use crate::http_server::endpoints::api_tokens::list_api_tokens::list_api_tokens_handler;
 use crate::http_server::endpoints::categories::assign_tts_category::assign_tts_category_handler;
 use crate::http_server::endpoints::categories::create_category::create_category_handler;
 use crate::http_server::endpoints::categories::get_category::get_category_handler;
@@ -11,6 +14,7 @@ use crate::http_server::endpoints::categories::list_tts_model_assigned_categorie
 use crate::http_server::endpoints::events::list_events::list_events_handler;
 use crate::http_server::endpoints::leaderboard::get_leaderboard::leaderboard_handler;
 use crate::http_server::endpoints::misc::default_route_404::default_route_404;
+use crate::http_server::endpoints::misc::detect_locale_handler::detect_locale_handler;
 use crate::http_server::endpoints::misc::enable_alpha_easy_handler::enable_alpha_easy_handler;
 use crate::http_server::endpoints::misc::enable_alpha_handler::enable_alpha_handler;
 use crate::http_server::endpoints::misc::root_index::get_root_index;
@@ -70,9 +74,6 @@ use crate::http_server::endpoints::w2l::get_w2l_template_use_count::get_w2l_temp
 use crate::http_server::endpoints::w2l::get_w2l_upload_template_job_status::get_w2l_upload_template_job_status_handler;
 use crate::http_server::endpoints::w2l::list_w2l_templates::list_w2l_templates_handler;
 use crate::http_server::endpoints::w2l::set_w2l_template_mod_approval::set_w2l_template_mod_approval_handler;
-use crate::http_server::endpoints::misc::detect_locale_handler::detect_locale_handler;
-use crate::http_server::endpoints::api_tokens::create_api_token::create_api_token_handler;
-use crate::http_server::endpoints::api_tokens::list_api_tokens::list_api_tokens_handler;
 
 pub fn add_routes<T, B> (app: App<T, B>) -> App<T, B>
   where
@@ -548,6 +549,10 @@ fn add_api_token_routes<T, B> (app: App<T, B>) -> App<T, B>
   app.service(web::scope("/api_tokens")
       .service(web::resource("/create")
           .route(web::post().to(create_api_token_handler))
+          .route(web::head().to(|| HttpResponse::Ok()))
+      )
+      .service(web::resource("/edit")
+          .route(web::post().to(edit_api_token_handler))
           .route(web::head().to(|| HttpResponse::Ok()))
       )
       .service(web::resource("/list")
