@@ -1,3 +1,4 @@
+use anyhow::anyhow;
 use container_common::anyhow_result::AnyhowResult;
 use crate::tts::tts_inference_jobs::list_available_tts_inference_jobs::AvailableTtsInferenceJob;
 use sqlx::MySqlPool;
@@ -35,7 +36,12 @@ WHERE id = ?
         job.id.0,
     )
       .execute(pool)
-      .await?;
+      .await;
 
-  Ok(())
+  match query_result {
+    Err(err) => {
+      Err(anyhow!("error with query: {:?}", err))
+    },
+    Ok(_r) => Ok(()),
+  }
 }

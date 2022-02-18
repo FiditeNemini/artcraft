@@ -31,6 +31,6 @@ LIMIT 1
     Err(err) => {
       Err(anyhow!("error with query: {:?}", err))
     },
-    Ok(results) => Ok(true),
+    Ok(_r) => Ok(true),
   }
 }

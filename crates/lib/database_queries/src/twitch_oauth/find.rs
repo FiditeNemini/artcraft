@@ -203,7 +203,7 @@ LEFT OUTER JOIN users
     let mut query = "".to_string();
     let mut first_predicate_added = false;
 
-    if let Some(user_token) = self.scope_user_token.as_deref() {
+    if let Some(_user_token) = self.scope_user_token.as_deref() {
       if !first_predicate_added {
         query.push_str(" WHERE users.token = ?");
         first_predicate_added = true;
@@ -212,7 +212,7 @@ LEFT OUTER JOIN users
       }
     }
 
-    if let Some(user_id) = self.scope_twitch_user_id {
+    if let Some(_user_id) = self.scope_twitch_user_id {
       if !first_predicate_added {
         query.push_str(" WHERE twitch_oauth_tokens.twitch_user_id = ?");
         first_predicate_added = true;
@@ -221,7 +221,7 @@ LEFT OUTER JOIN users
       }
     }
 
-    if let Some(username) = self.scope_twitch_username_lowercase.as_deref() {
+    if let Some(_username) = self.scope_twitch_username_lowercase.as_deref() {
       if !first_predicate_added {
         query.push_str(" WHERE twitch_oauth_tokens.twitch_username_lowercase = ?");
         first_predicate_added = true;
