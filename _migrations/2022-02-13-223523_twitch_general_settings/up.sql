@@ -23,6 +23,9 @@ CREATE TABLE twitch_general_settings (
   -- Can set a fallback voice if a TTS voice goes missing.
   maybe_fallback_tts_model_token VARCHAR(32) DEFAULT NULL,
 
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+
   -- INDICES --
   PRIMARY KEY (id),
   UNIQUE KEY (user_token)

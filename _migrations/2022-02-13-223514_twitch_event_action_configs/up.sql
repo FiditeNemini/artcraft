@@ -19,7 +19,7 @@ CREATE TABLE twitch_event_action_rules(
   -- NB: There is nothing in MySQL to guarantee unique ordering.
   user_specified_rule_order INT(10) UNSIGNED NOT NULL DEFAULT 0,
 
-    -- What type of event we'll be responding to.
+  -- What type of event we'll be responding to.
   event_category ENUM(
       'bits',
       'channel_points',
@@ -38,10 +38,15 @@ CREATE TABLE twitch_event_action_rules(
   -- eg. tts M:model
   event_response MEDIUMTEXT NOT NULL,
 
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  deleted_at TIMESTAMP,
+
   -- INDICES --
   PRIMARY KEY (id),
   UNIQUE KEY (token),
   KEY fk_user_token (user_token),
-  KEY index_event_category (event_category)
+  KEY index_event_category (event_category),
+  KEY index_deleted_at (deleted_at)
 
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin;
