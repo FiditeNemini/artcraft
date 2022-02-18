@@ -8,6 +8,10 @@ CREATE TABLE twitch_event_rules(
   -- Not used for anything except replication.
   id BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
 
+  -- Idempotency token from client
+  -- This is so the frontend client doesn't submit duplicate jobs.
+  uuid_idempotency_token VARCHAR(36) NOT NULL,
+
   -- Effective "primary key" (PUBLIC)
   token VARCHAR(32) NOT NULL,
 
@@ -57,6 +61,7 @@ CREATE TABLE twitch_event_rules(
 
   -- INDICES --
   PRIMARY KEY (id),
+  UNIQUE KEY (uuid_idempotency_token),
   UNIQUE KEY (token),
   KEY fk_user_token (user_token),
   KEY index_event_category (event_category),

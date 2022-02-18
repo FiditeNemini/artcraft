@@ -32,8 +32,8 @@ CREATE TABLE api_tokens (
 
   -- INDICES --
   PRIMARY KEY (id),
-  UNIQUE KEY (api_token),
   UNIQUE KEY (uuid_idempotency_token),
+  UNIQUE KEY (api_token),
   KEY fk_user_token (user_token),
   KEY index_created_at (created_at),
   KEY index_deleted_at (deleted_at)
