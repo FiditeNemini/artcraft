@@ -153,7 +153,6 @@ COPY Cargo.lock .
 COPY Cargo.toml .
 COPY sqlx-data.json .
 COPY crates/ ./crates
-COPY vendor/ ./vendor
 COPY db/ ./db
 # TODO(2022-01-16): Might not be necessary:
 # COPY _migrations/ ./_migrations

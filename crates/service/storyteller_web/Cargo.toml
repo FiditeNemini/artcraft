@@ -47,6 +47,9 @@ tts_common = { path = "../../lib/tts_common" }
 twitch_common = { path = "../../lib/twitch_common" }
 user_input_common = { path = "../../lib/user_input_common" }
 
+# Vendored code
+newrelic-telemetry = { path = "../../vendor/newrelic-telemetry-sdk-rust" }
+
 # External
 anyhow = "1.0.40"
 base64 = "0.13.0"
@@ -60,7 +63,6 @@ lazy_static = "1.4.0"
 lexical-sort = "0.3.1"
 lfu = "0.2.5"
 log = "0.4.14"
-newrelic-telemetry = { path = "../../../vendor/newrelic-telemetry-sdk-rust" }
 rand = "0.8.3"
 regex = "1.5.4"
 time = "0.2.26"
