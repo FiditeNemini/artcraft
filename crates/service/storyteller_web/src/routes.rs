@@ -4,6 +4,7 @@ use actix_web::dev::{ServiceRequest, ServiceResponse};
 use actix_web::error::Error;
 use actix_web::{App, web, HttpResponse};
 use crate::http_server::endpoints::api_tokens::create_api_token::create_api_token_handler;
+use crate::http_server::endpoints::api_tokens::delete_api_token::delete_api_token_handler;
 use crate::http_server::endpoints::api_tokens::edit_api_token::edit_api_token_handler;
 use crate::http_server::endpoints::api_tokens::list_api_tokens::list_api_tokens_handler;
 use crate::http_server::endpoints::categories::assign_tts_category::assign_tts_category_handler;
@@ -553,6 +554,10 @@ fn add_api_token_routes<T, B> (app: App<T, B>) -> App<T, B>
       )
       .service(web::resource("/edit")
           .route(web::post().to(edit_api_token_handler))
+          .route(web::head().to(|| HttpResponse::Ok()))
+      )
+      .service(web::resource("/{api_token}/delete")
+          .route(web::post().to(delete_api_token_handler))
           .route(web::head().to(|| HttpResponse::Ok()))
       )
       .service(web::resource("/list")
