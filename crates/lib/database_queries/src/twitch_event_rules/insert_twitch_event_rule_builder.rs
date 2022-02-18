@@ -4,7 +4,7 @@ use crate::column_types::twitch_event_category::TwitchEventCategory;
 use crate::tokens::Tokens;
 use sqlx::MySqlPool;
 
-pub struct TwitchEventRuleInsertBuilder {
+pub struct InsertTwitchEventRuleBuilder {
   pub uuid_idempotency_token: String,
   pub user_token: String,
   pub event_category: TwitchEventCategory,
@@ -15,7 +15,7 @@ pub struct TwitchEventRuleInsertBuilder {
   pub ip_address_creation: String,
 }
 
-impl TwitchEventRuleInsertBuilder {
+impl InsertTwitchEventRuleBuilder {
 
   /// Returns the newly generated token.
   pub async fn insert(&self, mysql_pool: &MySqlPool) -> AnyhowResult<String> {
