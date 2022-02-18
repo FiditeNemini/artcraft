@@ -27,6 +27,7 @@ CREATE TABLE twitch_event_action_rules(
   ) NOT NULL,
 
   -- Whether or not the rule is enabled.
+  -- This is different than deleted. It still shows up in the UI.
   rule_is_enabled BOOLEAN NOT NULL DEFAULT FALSE,
 
   -- A JSON payload containing any predicates we wish to apply to the match.
