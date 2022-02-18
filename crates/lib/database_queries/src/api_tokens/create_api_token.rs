@@ -17,18 +17,21 @@ pub async fn create_api_token_for_user(
   // TODO: Get last 5 API tokens for the user.
   // TODO: Database transaction.
 
+  let internal_token = Tokens::new_api_token_internal_token()?;
   let api_token = Tokens::new_api_token()?;
 
   let query = sqlx::query!(
         r#"
 INSERT INTO api_tokens
 SET
+  internal_token = ?,
   api_token = ?,
   user_token = ?,
   uuid_idempotency_token = ?,
   ip_address_creation = ?,
   ip_address_last_update = ?
         "#,
+      internal_token,
       api_token,
       user_token,
       uuid_idempotency_token,

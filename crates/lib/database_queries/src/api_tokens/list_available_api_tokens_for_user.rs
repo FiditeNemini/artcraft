@@ -11,6 +11,7 @@ use sqlx::MySqlPool;
 /// table: api_tokens
 #[derive(Debug)]
 pub struct AvailableApiToken {
+  pub internal_token: String,
   pub api_token: String,
   pub maybe_short_description: Option<String>,
   pub created_at: chrono::DateTime<Utc>,
@@ -28,6 +29,7 @@ pub async fn list_available_api_tokens_for_user(
       AvailableApiTokenInternal,
         r#"
 SELECT
+  internal_token,
   api_token,
   maybe_short_description,
   created_at,
@@ -47,6 +49,7 @@ LIMIT 5
   let mut records = records.into_iter()
       .map(|record : AvailableApiTokenInternal | {
         AvailableApiToken {
+          internal_token: record.internal_token,
           api_token: record.api_token,
           maybe_short_description: record.maybe_short_description,
           created_at: record.created_at,
@@ -63,6 +66,7 @@ LIMIT 5
 
 #[derive(Debug)]
 struct AvailableApiTokenInternal {
+  pub internal_token: String,
   pub api_token: String,
   pub maybe_short_description: Option<String>,
   pub created_at: chrono::DateTime<Utc>,

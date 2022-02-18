@@ -63,11 +63,15 @@ impl Tokens {
     random_prefix_crockford_token("CAT:", 15, false)
   }
 
-  pub fn new_twitch_oauth_grouping_token() -> AnyhowResult<String> {
-    random_prefix_crockford_token("OG:", 32, false)
+  pub fn new_api_token_internal_token() -> AnyhowResult<String> {
+    random_prefix_crockford_token("AIT:", 32, false)
   }
 
   // ========== [Twitch] Tokens not typically visible to users ==========
+
+  pub fn new_twitch_oauth_grouping_token() -> AnyhowResult<String> {
+    random_prefix_crockford_token("OG:", 32, false)
+  }
 
   pub fn new_twitch_event_rule() -> AnyhowResult<String> {
     random_prefix_crockford_token("TER:", 32, false)

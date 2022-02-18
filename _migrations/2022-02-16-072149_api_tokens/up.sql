@@ -11,7 +11,12 @@ CREATE TABLE api_tokens (
   -- This is so the frontend client doesn't submit duplicate jobs.
   uuid_idempotency_token VARCHAR(36) NOT NULL,
 
-  -- This is the secret API token value
+  -- This is a private internal reference to the API token.
+  -- Not shared with consumers / users.
+  -- This should be used as the foreign key for the token.
+  internal_token VARCHAR(32) NOT NULL,
+
+  -- This is the secret API token value given to consumers
   api_token VARCHAR(32) NOT NULL,
 
   -- Foreign key to user that owns the API token.
@@ -33,6 +38,7 @@ CREATE TABLE api_tokens (
   -- INDICES --
   PRIMARY KEY (id),
   UNIQUE KEY (uuid_idempotency_token),
+  UNIQUE KEY (internal_token),
   UNIQUE KEY (api_token),
   KEY fk_user_token (user_token),
   KEY index_created_at (created_at),
