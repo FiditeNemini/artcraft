@@ -13,12 +13,12 @@ use crate::validations::model_uploads::validate_model_title;
 use crate::validations::passwords::validate_passwords;
 use crate::validations::username::validate_username;
 use database_queries::tokens::Tokens;
-use derive_more::{Display, Error};
 use log::{info, warn, log};
 use regex::Regex;
 use sqlx::error::DatabaseError;
 use sqlx::error::Error::Database;
 use sqlx::mysql::MySqlDatabaseError;
+use std::fmt;
 use std::sync::Arc;
 use user_input_common::check_for_slurs::contains_slurs;
 
@@ -38,7 +38,7 @@ pub struct UploadW2lTemplateSuccessResponse {
   pub job_token: String,
 }
 
-#[derive(Debug, Display)]
+#[derive(Debug)]
 pub enum UploadW2lTemplateError {
   BadInput(String),
   MustBeLoggedIn,
@@ -65,6 +65,13 @@ impl ResponseError for UploadW2lTemplateError {
     };
 
     to_simple_json_error(&error_reason, self.status_code())
+  }
+}
+
+// NB: Not using derive_more::Display since Clion doesn't understand it.
+impl fmt::Display for UploadW2lTemplateError {
+  fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+    write!(f, "{:?}", self)
   }
 }
 

@@ -15,6 +15,7 @@ path = "src/lib.rs"
 [dependencies]
 
 # Internal
+config = { path = "../config" }
 container_common = { path = "../container_common" }
 
 # External

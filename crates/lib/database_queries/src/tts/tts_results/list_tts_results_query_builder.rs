@@ -2,7 +2,7 @@ use anyhow::anyhow;
 use chrono::{DateTime, Utc};
 use config::shared_constants::DEFAULT_MYSQL_QUERY_RESULT_PAGE_SIZE;
 use container_common::anyhow_result::AnyhowResult;
-use database_queries::column_types::record_visibility::RecordVisibility;
+use crate::column_types::record_visibility::RecordVisibility;
 use log::{warn, info};
 use sqlx::MySqlPool;
 
@@ -326,7 +326,7 @@ pub struct RawInternalTtsRecord {
 
 #[cfg(test)]
 mod tests {
-  use crate::database::query_builders::list_tts_inference_results_query_builder::ListTtsResultsQueryBuilder;
+  use crate::tts::tts_results::list_tts_results_query_builder::ListTtsResultsQueryBuilder;
 
   #[test]
   fn predicates_without_scoping() {
