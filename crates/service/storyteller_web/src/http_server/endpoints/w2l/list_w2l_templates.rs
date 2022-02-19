@@ -1,22 +1,22 @@
 use actix_http::Error;
 use actix_http::http::header;
-use actix_web::cookie::Cookie;
 use actix_web::HttpResponseBuilder;
+use actix_web::cookie::Cookie;
 use actix_web::error::ResponseError;
 use actix_web::http::StatusCode;
 use actix_web::{Responder, web, HttpResponse, error, HttpRequest, HttpMessage};
 use chrono::{DateTime, Utc};
 use crate::AnyhowResult;
-use crate::database::queries::list_w2l_templates::{list_w2l_templates, W2lTemplateRecordForList};
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 use crate::server_state::ServerState;
-use derive_more::{Display, Error};
+use database_queries::w2l::w2l_templates::list_w2l_templates::{W2lTemplateRecordForList, list_w2l_templates};
 use log::{info, warn, log};
 use regex::Regex;
 use sqlx::MySqlPool;
 use sqlx::error::DatabaseError;
 use sqlx::error::Error::Database;
 use sqlx::mysql::MySqlDatabaseError;
+use std::fmt;
 use std::sync::Arc;
 
 #[derive(Serialize)]
@@ -25,7 +25,7 @@ pub struct ListW2lTemplatesSuccessResponse {
   pub templates: Vec<W2lTemplateRecordForList>,
 }
 
-#[derive(Debug, Display)]
+#[derive(Debug)]
 pub enum ListW2lTemplatesError {
   ServerError,
 }
@@ -43,6 +43,13 @@ impl ResponseError for ListW2lTemplatesError {
     };
 
     to_simple_json_error(&error_reason, self.status_code())
+  }
+}
+
+// NB: Not using derive_more::Display since Clion doesn't understand it.
+impl fmt::Display for ListW2lTemplatesError {
+  fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+    write!(f, "{:?}", self)
   }
 }
 

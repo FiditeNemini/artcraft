@@ -1,7 +1,7 @@
 use anyhow::anyhow;
 use chrono::{DateTime, Utc};
 use container_common::anyhow_result::AnyhowResult;
-use database_queries::helpers::boolean_converters::{i8_to_bool, nullable_i8_to_optional_bool};
+use crate::helpers::boolean_converters::{i8_to_bool, nullable_i8_to_optional_bool};
 use log::{warn, info};
 use sqlx::MySqlPool;
 
@@ -318,7 +318,7 @@ pub struct RawInternalCategoryRecord {
 
 #[cfg(test)]
 mod tests {
-  use crate::database::query_builders::list_categories_query_builder::ListCategoriesQueryBuilder;
+  use crate::model_categories::list_categories_query_builder::ListCategoriesQueryBuilder;
 
   #[test]
   fn predicates_default_scoping() {

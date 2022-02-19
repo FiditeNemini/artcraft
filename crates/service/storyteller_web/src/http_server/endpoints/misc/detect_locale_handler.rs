@@ -7,8 +7,6 @@ use actix_web::http::StatusCode;
 use actix_web::web::{Path, Json};
 use actix_web::{Responder, web, HttpResponse, error, HttpRequest};
 use chrono::{DateTime, Utc};
-use crate::database::queries::categories::get_category_by_token::get_category_by_token;
-use crate::database::query_builders::list_categories_query_builder::ListCategoriesQueryBuilder;
 use crate::http_server::web_utils::ip_address::get_request_ip;
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 use crate::http_server::web_utils::response_success_helpers::simple_json_success;

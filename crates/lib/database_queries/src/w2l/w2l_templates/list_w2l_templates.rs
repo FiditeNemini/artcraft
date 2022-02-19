@@ -1,9 +1,11 @@
 use anyhow::anyhow;
 use chrono::{DateTime, Utc};
 use container_common::anyhow_result::AnyhowResult;
+use crate::helpers::boolean_converters::nullable_i8_to_optional_bool;
 use log::{warn, info};
 use sqlx::MySqlPool;
-use database_queries::helpers::boolean_converters::nullable_i8_to_optional_bool;
+
+// FIXME: This is the old style of query scoping and shouldn't be copied.
 
 #[derive(Serialize)]
 pub struct W2lTemplateRecordForList {
