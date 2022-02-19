@@ -25,9 +25,7 @@ LIMIT 1
   let result = query.execute(mysql_pool).await;
 
   match result {
-    Err(err) => {
-      Err(anyhow!("error with query: {:?}", err))
-    },
+    Err(err) => Err(anyhow!("error with query: {:?}", err)),
     Ok(_r) => Ok(true),
   }
 }

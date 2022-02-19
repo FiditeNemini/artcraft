@@ -1,9 +1,9 @@
-use container_common::anyhow_result::AnyhowResult;
-use sqlx::MySqlPool;
-use crate::tokens::Tokens;
-use sqlx;
 use anyhow::anyhow;
+use container_common::anyhow_result::AnyhowResult;
 use crate::api_tokens::list_available_api_tokens_for_user::list_available_api_tokens_for_user;
+use crate::tokens::Tokens;
+use sqlx::MySqlPool;
+use sqlx;
 
 /// Create a new API token for the user.
 /// If the user has more than five tokens, delete the least recent.
@@ -14,7 +14,6 @@ pub async fn create_api_token_for_user(
   mysql_pool: &MySqlPool
 ) -> AnyhowResult<String> {
 
-  // TODO: Get last 5 API tokens for the user.
   // TODO: Database transaction.
 
   let internal_token = Tokens::new_api_token_internal_token()?;
@@ -53,7 +52,7 @@ SET
       .map(|r| r.api_token)
       .collect::<Vec<String>>();
 
-  // TODO: THis is a massive hack since SQLx doesn't support binding Vec<T>
+  // TODO: This is a massive hack since SQLx doesn't support binding Vec<T>
   // This array's elements will be replaced with any valid tokens.
   let mut api_tokens = [
     api_token.as_str(),
