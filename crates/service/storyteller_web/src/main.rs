@@ -16,6 +16,7 @@ pub const RESERVED_USERNAMES : &'static str = include_str!("../../../../db/reser
 pub const RESERVED_SUBSTRINGS : &'static str = include_str!("../../../../db/reserved_usernames_including.txt");
 
 pub mod common_env;
+pub mod complex_models;
 pub mod http_clients;
 pub mod http_server;
 pub mod routes;
