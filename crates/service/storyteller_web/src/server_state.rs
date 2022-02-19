@@ -1,5 +1,3 @@
-use crate::database::mediators::badge_granter::BadgeGranter;
-use crate::database::mediators::firehose_publisher::FirehosePublisher;
 use crate::http_server::endpoints::tts::list_tts_models::TtsModelRecordForResponse;
 use crate::http_server::web_utils::cookie_manager::CookieManager;
 use crate::http_server::web_utils::redis_rate_limiter::RedisRateLimiter;
@@ -8,6 +6,8 @@ use crate::threads::ip_banlist_set::IpBanlistSet;
 use crate::util::buckets::bucket_client::BucketClient;
 use crate::util::caching::single_item_ttl_cache::SingleItemTtlCache;
 use crate::util::encrypted_sort_id::SortKeyCrypto;
+use database_queries::mediators::badge_granter::BadgeGranter;
+use database_queries::mediators::firehose_publisher::FirehosePublisher;
 use r2d2_redis::{r2d2, RedisConnectionManager};
 use sqlx::MySqlPool;
 

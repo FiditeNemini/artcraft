@@ -1,6 +1,6 @@
 use anyhow::anyhow;
 use container_common::anyhow_result::AnyhowResult;
-use crate::database::mediators::firehose_publisher::FirehosePublisher;
+use crate::mediators::firehose_publisher::FirehosePublisher;
 use log::{warn,info};
 use sqlx::error::Error::Database;
 use sqlx::mysql::MySqlQueryResult;

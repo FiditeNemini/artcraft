@@ -11,7 +11,6 @@
 #[macro_use] extern crate serde_derive;
 
 pub mod common_env;
-pub mod database;
 pub mod job_queries;
 pub mod script_execution;
 pub mod util;
@@ -22,7 +21,6 @@ use config::shared_constants::DEFAULT_MYSQL_CONNECTION_STRING;
 use config::shared_constants::DEFAULT_RUST_LOG;
 use container_common::anyhow_result::AnyhowResult;
 use crate::common_env::CommonEnv;
-use crate::database::mediators::firehose_publisher::FirehosePublisher;
 use crate::job_queries::w2l_inference_job_queries::W2lInferenceJobRecord;
 use crate::job_queries::w2l_inference_job_queries::get_w2l_template_by_token;
 use crate::job_queries::w2l_inference_job_queries::grab_job_lock_and_mark_pending;
@@ -47,6 +45,7 @@ use crate::util::noop_logger::NoOpLogger;
 use crate::util::redis::redis_job_status_logger::RedisJobStatusLogger;
 use crate::util::semi_persistent_cache_dir::SemiPersistentCacheDir;
 use data_encoding::{HEXUPPER, HEXLOWER, HEXLOWER_PERMISSIVE};
+use database_queries::mediators::firehose_publisher::FirehosePublisher;
 use log::{warn, info};
 use r2d2_redis::RedisConnectionManager;
 use r2d2_redis::r2d2::PooledConnection;

@@ -11,7 +11,6 @@
 #[macro_use] extern crate serde_derive;
 
 pub mod common_env;
-pub mod database;
 pub mod http_clients;
 pub mod job_queries;
 pub mod script_execution;
@@ -24,7 +23,6 @@ use config::shared_constants::DEFAULT_RUST_LOG;
 use container_common::anyhow_result::AnyhowResult;
 use container_common::token::random_uuid::generate_random_uuid;
 use crate::common_env::CommonEnv;
-use crate::database::mediators::firehose_publisher::FirehosePublisher;
 use crate::http_clients::tts_inference_sidecar_client::TtsInferenceSidecarClient;
 use crate::script_execution::tacotron_inference_command::TacotronInferenceCommand;
 use crate::util::buckets::bucket_client::BucketClient;
@@ -45,6 +43,7 @@ use crate::util::redis::redis_job_status_logger::RedisJobStatusLogger;
 use crate::util::semi_persistent_cache_dir::SemiPersistentCacheDir;
 use data_encoding::{HEXUPPER, HEXLOWER, HEXLOWER_PERMISSIVE};
 use database_queries::column_types::vocoder_type::VocoderType;
+use database_queries::mediators::firehose_publisher::FirehosePublisher;
 use database_queries::tts::tts_inference_jobs::list_available_tts_inference_jobs::{AvailableTtsInferenceJob, list_available_tts_inference_jobs};
 use database_queries::tts::tts_inference_jobs::mark_tts_inference_job_done::mark_tts_inference_job_done;
 use database_queries::tts::tts_inference_jobs::mark_tts_inference_job_failure::mark_tts_inference_job_failure;

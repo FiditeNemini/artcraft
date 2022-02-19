@@ -6,6 +6,7 @@ pub mod api_tokens;
 pub mod column_types;
 pub mod helpers;
 pub mod ip_bans;
+pub mod mediators;
 pub mod model_categories;
 pub mod tokens;
 pub mod tts;

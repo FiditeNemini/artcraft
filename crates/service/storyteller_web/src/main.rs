@@ -15,7 +15,6 @@
 pub const RESERVED_USERNAMES : &'static str = include_str!("../../../../db/reserved_usernames.txt");
 pub const RESERVED_SUBSTRINGS : &'static str = include_str!("../../../../db/reserved_usernames_including.txt");
 
-pub mod database;
 pub mod common_env;
 pub mod http_clients;
 pub mod http_server;
@@ -43,8 +42,6 @@ use config::shared_constants::DEFAULT_MYSQL_CONNECTION_STRING;
 use config::shared_constants::DEFAULT_RUST_LOG;
 use container_common::anyhow_result::AnyhowResult;
 use crate::common_env::CommonEnv;
-use crate::database::mediators::badge_granter::BadgeGranter;
-use crate::database::mediators::firehose_publisher::FirehosePublisher;
 use crate::http_server::endpoints::events::list_events::list_events_handler;
 use crate::http_server::endpoints::leaderboard::get_leaderboard::leaderboard_handler;
 use crate::http_server::endpoints::misc::default_route_404::default_route_404;
@@ -112,6 +109,8 @@ use crate::threads::poll_ip_banlist_thread::poll_ip_bans;
 use crate::util::buckets::bucket_client::BucketClient;
 use crate::util::caching::single_item_ttl_cache::SingleItemTtlCache;
 use crate::util::encrypted_sort_id::SortKeyCrypto;
+use database_queries::mediators::badge_granter::BadgeGranter;
+use database_queries::mediators::firehose_publisher::FirehosePublisher;
 use futures::Future;
 use http_server_common::cors::build_common_cors_config;
 use limitation::Limiter;
