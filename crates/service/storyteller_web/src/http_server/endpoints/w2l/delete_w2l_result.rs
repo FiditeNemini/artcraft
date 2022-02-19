@@ -1,16 +1,11 @@
 use actix_http::Error;
 use actix_http::http::header;
-use actix_web::cookie::Cookie;
 use actix_web::HttpResponseBuilder;
+use actix_web::cookie::Cookie;
 use actix_web::error::ResponseError;
 use actix_web::http::StatusCode;
 use actix_web::web::Path;
 use actix_web::{Responder, web, HttpResponse, error, HttpRequest};
-use crate::database::queries::delete_w2l_result::delete_w2l_inference_result_as_mod;
-use crate::database::queries::delete_w2l_result::delete_w2l_inference_result_as_user;
-use crate::database::queries::delete_w2l_result::undelete_w2l_inference_result_as_mod;
-use crate::database::queries::delete_w2l_result::undelete_w2l_inference_result_as_user;
-use crate::database::queries::query_w2l_result::select_w2l_result_by_token;
 use crate::http_server::web_utils::ip_address::get_request_ip;
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 use crate::http_server::web_utils::response_success_helpers::simple_json_success;
@@ -20,13 +15,18 @@ use crate::util::delete_role_disambiguation::delete_role_disambiguation;
 use crate::validations::model_uploads::validate_model_title;
 use crate::validations::passwords::validate_passwords;
 use crate::validations::username::validate_username;
-use derive_more::{Display, Error};
+use database_queries::w2l::w2l_results::delete_w2l_result_various_scopes::delete_w2l_inference_result_as_mod;
+use database_queries::w2l::w2l_results::delete_w2l_result_various_scopes::delete_w2l_inference_result_as_user;
+use database_queries::w2l::w2l_results::delete_w2l_result_various_scopes::undelete_w2l_inference_result_as_mod;
+use database_queries::w2l::w2l_results::delete_w2l_result_various_scopes::undelete_w2l_inference_result_as_user;
+use database_queries::w2l::w2l_results::query_w2l_result::select_w2l_result_by_token;
 use log::{info, warn, log};
 use regex::Regex;
 use sqlx::MySqlPool;
 use sqlx::error::DatabaseError;
 use sqlx::error::Error::Database;
 use sqlx::mysql::MySqlDatabaseError;
+use std::fmt;
 use std::sync::Arc;
 
 /// For the URL PathInfo
@@ -42,7 +42,7 @@ pub struct DeleteW2lInferenceResultRequest {
   as_mod: Option<bool>,
 }
 
-#[derive(Debug, Display)]
+#[derive(Debug)]
 pub enum DeleteW2lInferenceResultError {
   BadInput(String),
   NotAuthorized,
@@ -69,6 +69,13 @@ impl ResponseError for DeleteW2lInferenceResultError {
     };
 
     to_simple_json_error(&error_reason, self.status_code())
+  }
+}
+
+// NB: Not using derive_more::Display since Clion doesn't understand it.
+impl fmt::Display for DeleteW2lInferenceResultError {
+  fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+    write!(f, "{:?}", self)
   }
 }
 

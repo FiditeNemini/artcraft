@@ -1,3 +1,2 @@
 pub mod list_categories_query_builder;
 pub mod list_users_query_builder;
-pub mod list_w2l_inference_results_query_builder;
