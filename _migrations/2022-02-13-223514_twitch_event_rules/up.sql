@@ -46,7 +46,7 @@ CREATE TABLE twitch_event_rules(
 
   -- Whether or not the rule is enabled.
   -- This is different than deleted. It still shows up in the UI.
-  rule_is_enabled BOOLEAN NOT NULL DEFAULT FALSE,
+  rule_is_disabled BOOLEAN NOT NULL DEFAULT FALSE,
 
   -- ========== ABUSE TRACKING, ETC. ==========
 

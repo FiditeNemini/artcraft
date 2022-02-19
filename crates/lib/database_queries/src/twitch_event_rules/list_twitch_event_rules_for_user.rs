@@ -13,7 +13,7 @@ pub struct TwitchEventRule {
   pub event_match_predicate: String,
   pub event_response: String,
   pub user_specified_rule_order: u32,
-  pub rule_is_enabled: bool,
+  pub rule_is_disabled: bool,
   pub created_at: chrono::DateTime<Utc>,
   pub updated_at: chrono::DateTime<Utc>,
 }
@@ -33,7 +33,7 @@ SELECT
   event_match_predicate,
   event_response,
   user_specified_rule_order,
-  rule_is_enabled,
+  rule_is_disabled,
   created_at,
   updated_at
 FROM twitch_event_rules
@@ -54,7 +54,7 @@ WHERE
           event_match_predicate: record.event_match_predicate,
           event_response: record.event_response,
           user_specified_rule_order: record.user_specified_rule_order,
-          rule_is_enabled: i8_to_bool(record.rule_is_enabled),
+          rule_is_disabled: i8_to_bool(record.rule_is_disabled),
           created_at: record.created_at,
           updated_at: record.updated_at,
         }
@@ -74,7 +74,7 @@ struct TwitchEventRuleInternal {
   pub event_match_predicate: String,
   pub event_response: String,
   pub user_specified_rule_order: u32,
-  pub rule_is_enabled: i8,
+  pub rule_is_disabled: i8,
   pub created_at: chrono::DateTime<Utc>,
   pub updated_at: chrono::DateTime<Utc>,
 }
