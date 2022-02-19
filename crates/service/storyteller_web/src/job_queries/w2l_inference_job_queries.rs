@@ -5,7 +5,7 @@
 use anyhow::anyhow;
 use chrono::{Utc, DateTime};
 use container_common::anyhow_result::AnyhowResult;
-use crate::database::enums::record_visibility::RecordVisibility;
+use database_queries::column_types::record_visibility::RecordVisibility;
 use database_queries::tokens::Tokens;
 use log::{warn, info};
 use sqlx::MySqlPool;
@@ -75,7 +75,7 @@ SELECT
   creator_ip_address,
   maybe_creator_user_token,
 
-  creator_set_visibility as `creator_set_visibility: crate::database::enums::record_visibility::RecordVisibility`,
+  creator_set_visibility as `creator_set_visibility: database_queries::column_types::record_visibility::RecordVisibility`,
   disable_end_bump,
   disable_watermark,
 

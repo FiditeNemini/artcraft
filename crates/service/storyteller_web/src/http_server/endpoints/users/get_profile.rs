@@ -9,11 +9,11 @@ use actix_web::{Responder, web, HttpResponse, error, HttpRequest, HttpMessage};
 use anyhow::anyhow;
 use chrono::{DateTime, Utc};
 use crate::AnyhowResult;
-use crate::database::enums::record_visibility::RecordVisibility;
 use crate::database::queries::list_user_badges::UserBadgeForList;
 use crate::database::queries::list_user_badges::list_user_badges;
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 use crate::server_state::ServerState;
+use database_queries::column_types::record_visibility::RecordVisibility;
 use database_queries::helpers::boolean_converters::i8_to_bool;
 use log::{info, warn, log};
 use md5::{Md5, Digest};
@@ -160,8 +160,8 @@ SELECT
     profile_rendered_html,
     user_role_slug,
     disable_gravatar,
-    preferred_tts_result_visibility as `preferred_tts_result_visibility: crate::database::enums::record_visibility::RecordVisibility`,
-    preferred_w2l_result_visibility as `preferred_w2l_result_visibility: crate::database::enums::record_visibility::RecordVisibility`,
+    preferred_tts_result_visibility as `preferred_tts_result_visibility: database_queries::column_types::record_visibility::RecordVisibility`,
+    preferred_w2l_result_visibility as `preferred_w2l_result_visibility: database_queries::column_types::record_visibility::RecordVisibility`,
     discord_username,
     twitch_username,
     twitter_username,

@@ -6,7 +6,6 @@ use actix_web::error::ResponseError;
 use actix_web::http::StatusCode;
 use actix_web::web::Path;
 use actix_web::{Responder, web, HttpResponse, error, HttpRequest};
-use crate::database::enums::record_visibility::RecordVisibility;
 use crate::database::queries::create_session::create_session_for_user;
 use crate::database::queries::get_user_profile_by_username::get_user_profile_by_username;
 use crate::http_server::web_utils::ip_address::get_request_ip;
@@ -23,12 +22,13 @@ use crate::validations::twitter_username::{validate_twitter_username, normalize_
 use crate::validations::username::validate_username;
 use crate::validations::username_reservations::is_reserved_username;
 use crate::validations::website_url::validate_website_url;
-use derive_more::{Display, Error};
+use database_queries::column_types::record_visibility::RecordVisibility;
 use log::{info, warn, log};
 use regex::Regex;
 use sqlx::error::DatabaseError;
 use sqlx::error::Error::Database;
 use sqlx::mysql::MySqlDatabaseError;
+use std::fmt;
 use std::sync::Arc;
 use user_input_common::check_for_slurs::contains_slurs;
 
@@ -61,7 +61,7 @@ pub struct EditProfileSuccessResponse {
   pub success: bool,
 }
 
-#[derive(Debug, Display)]
+#[derive(Debug)]
 pub enum EditProfileError {
   BadInput(String),
   NotAuthorized,
@@ -88,6 +88,13 @@ impl ResponseError for EditProfileError {
     };
 
     to_simple_json_error(&error_reason, self.status_code())
+  }
+}
+
+// NB: Not using derive_more::Display since Clion doesn't understand it.
+impl fmt::Display for EditProfileError {
+  fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+    write!(f, "{:?}", self)
   }
 }
 

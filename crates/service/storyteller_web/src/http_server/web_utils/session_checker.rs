@@ -1,8 +1,8 @@
 use actix_web::HttpRequest;
 use anyhow::anyhow;
 use crate::AnyhowResult;
-use crate::database::enums::record_visibility::RecordVisibility;
 use crate::http_server::web_utils::cookie_manager::CookieManager;
+use database_queries::column_types::record_visibility::RecordVisibility;
 use database_queries::helpers::boolean_converters::{nullable_i8_to_optional_bool, i8_to_bool};
 use log::{info, warn};
 use sqlx::MySqlPool;
@@ -189,8 +189,8 @@ SELECT
     users.disable_gravatar,
     users.auto_play_audio_preference,
     users.auto_play_video_preference,
-    users.preferred_tts_result_visibility as `preferred_tts_result_visibility: crate::database::enums::record_visibility::RecordVisibility`,
-    users.preferred_w2l_result_visibility as `preferred_w2l_result_visibility: crate::database::enums::record_visibility::RecordVisibility`,
+    users.preferred_tts_result_visibility as `preferred_tts_result_visibility: database_queries::column_types::record_visibility::RecordVisibility`,
+    users.preferred_w2l_result_visibility as `preferred_w2l_result_visibility: database_queries::column_types::record_visibility::RecordVisibility`,
 
     users.user_role_slug,
     users.is_banned,

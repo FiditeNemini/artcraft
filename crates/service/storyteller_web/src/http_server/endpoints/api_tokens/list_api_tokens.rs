@@ -7,15 +7,14 @@ use actix_web::http::StatusCode;
 use actix_web::web::{Path, Json};
 use actix_web::{Responder, web, HttpResponse, error, HttpRequest};
 use chrono::{DateTime, Utc};
-use crate::database::enums::record_visibility::RecordVisibility;
 use crate::database::queries::query_w2l_template::select_w2l_template_by_token;
-use crate::database::query_builders::list_categories_query_builder::ListCategoriesQueryBuilder;
 use crate::http_server::web_utils::ip_address::get_request_ip;
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 use crate::http_server::web_utils::response_success_helpers::simple_json_success;
 use crate::server_state::ServerState;
 use crate::util::email_to_gravatar::email_to_gravatar;
 use crate::util::markdown_to_html::markdown_to_html;
+use database_queries::api_tokens::list_available_api_tokens_for_user::list_available_api_tokens_for_user;
 use http_server_common::response::serialize_as_json_error::serialize_as_json_error;
 use lexical_sort::natural_lexical_cmp;
 use log::{info, warn, log};
@@ -26,7 +25,6 @@ use sqlx::error::Error::Database;
 use sqlx::mysql::MySqlDatabaseError;
 use std::fmt;
 use std::sync::Arc;
-use database_queries::api_tokens::list_available_api_tokens_for_user::list_available_api_tokens_for_user;
 
 // =============== Success Response ===============
 

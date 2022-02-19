@@ -5,7 +5,6 @@ use actix_web::cookie::Cookie;
 use actix_web::error::ResponseError;
 use actix_web::http::StatusCode;
 use actix_web::{Responder, web, HttpResponse, error, HttpRequest};
-use crate::database::enums::record_visibility::RecordVisibility;
 use crate::database::helpers::enums::{DownloadUrlType, W2lTemplateType};
 use crate::http_server::web_utils::ip_address::get_request_ip;
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
@@ -13,8 +12,8 @@ use crate::server_state::ServerState;
 use crate::validations::model_uploads::validate_model_title;
 use crate::validations::passwords::validate_passwords;
 use crate::validations::username::validate_username;
+use database_queries::column_types::record_visibility::RecordVisibility;
 use database_queries::tokens::Tokens;
-use derive_more::{Display, Error};
 use log::{info, warn, log};
 use r2d2_redis::redis::Commands;
 use redis_common::redis_keys::RedisKeys;
@@ -22,6 +21,7 @@ use regex::Regex;
 use sqlx::error::DatabaseError;
 use sqlx::error::Error::Database;
 use sqlx::mysql::MySqlDatabaseError;
+use std::fmt;
 use std::sync::Arc;
 use user_input_common::check_for_slurs::contains_slurs;
 
@@ -39,7 +39,7 @@ pub struct InferTtsSuccessResponse {
   pub inference_job_token: String,
 }
 
-#[derive(Debug, Display)]
+#[derive(Debug)]
 pub enum InferTtsError {
   BadInput(String),
   ServerError,
@@ -63,6 +63,13 @@ impl ResponseError for InferTtsError {
     };
 
     to_simple_json_error(&error_reason, self.status_code())
+  }
+}
+
+// NB: Not using derive_more::Display since Clion doesn't understand it.
+impl fmt::Display for InferTtsError {
+  fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+    write!(f, "{:?}", self)
   }
 }
 

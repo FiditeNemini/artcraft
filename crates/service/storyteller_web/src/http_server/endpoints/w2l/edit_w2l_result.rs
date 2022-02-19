@@ -1,12 +1,11 @@
 use actix_http::Error;
 use actix_http::http::header;
-use actix_web::cookie::Cookie;
 use actix_web::HttpResponseBuilder;
+use actix_web::cookie::Cookie;
 use actix_web::error::ResponseError;
 use actix_web::http::StatusCode;
 use actix_web::web::{Path, Json};
 use actix_web::{Responder, web, HttpResponse, error, HttpRequest};
-use crate::database::enums::record_visibility::RecordVisibility;
 use crate::database::queries::query_w2l_result::select_w2l_result_by_token;
 use crate::http_server::web_utils::ip_address::get_request_ip;
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
@@ -14,13 +13,14 @@ use crate::http_server::web_utils::response_success_helpers::simple_json_success
 use crate::server_state::ServerState;
 use crate::util::email_to_gravatar::email_to_gravatar;
 use crate::util::markdown_to_html::markdown_to_html;
-use derive_more::{Display, Error};
+use database_queries::column_types::record_visibility::RecordVisibility;
 use log::{info, warn, log};
 use regex::Regex;
 use sqlx::MySqlPool;
 use sqlx::error::DatabaseError;
 use sqlx::error::Error::Database;
 use sqlx::mysql::MySqlDatabaseError;
+use std::fmt;
 use std::sync::Arc;
 
 /// For the URL PathInfo
@@ -35,7 +35,7 @@ pub struct EditW2lResultRequest {
   pub creator_set_visibility: Option<String>,
 }
 
-#[derive(Debug, Display)]
+#[derive(Debug)]
 pub enum EditW2lResultError {
   BadInput(String),
   NotAuthorized,
@@ -62,6 +62,13 @@ impl ResponseError for EditW2lResultError {
     };
 
     to_simple_json_error(&error_reason, self.status_code())
+  }
+}
+
+// NB: Not using derive_more::Display since Clion doesn't understand it.
+impl fmt::Display for EditW2lResultError {
+  fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+    write!(f, "{:?}", self)
   }
 }
 

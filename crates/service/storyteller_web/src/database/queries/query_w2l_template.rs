@@ -1,7 +1,7 @@
 use anyhow::anyhow;
 use chrono::{DateTime, Utc};
 use crate::AnyhowResult;
-use crate::database::enums::record_visibility::RecordVisibility;
+use database_queries::column_types::record_visibility::RecordVisibility;
 use database_queries::helpers::boolean_converters::{nullable_i8_to_optional_bool, i8_to_bool};
 use derive_more::{Display, Error};
 use log::{info, warn, log};

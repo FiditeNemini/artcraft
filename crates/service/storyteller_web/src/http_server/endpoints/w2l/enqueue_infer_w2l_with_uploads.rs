@@ -9,7 +9,6 @@ use actix_web::{middleware, web, App, Error, HttpResponse, HttpServer, HttpReque
 use anyhow::anyhow;
 use container_common::anyhow_result::AnyhowResult;
 use container_common::token::random_uuid::generate_random_uuid;
-use crate::database::enums::record_visibility::RecordVisibility;
 use crate::http_server::web_utils::ip_address::get_request_ip;
 use crate::http_server::web_utils::read_multipart_field_bytes::checked_read_multipart_bytes;
 use crate::http_server::web_utils::read_multipart_field_bytes::read_multipart_field_as_boolean;
@@ -19,14 +18,15 @@ use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 use crate::server_state::ServerState;
 use crate::util::buckets::bucket_client::BucketClient;
 use crate::util::buckets::bucket_paths::hash_to_bucket_path;
+use database_queries::column_types::record_visibility::RecordVisibility;
 use database_queries::tokens::Tokens;
-use derive_more::{Display, Error};
 use futures::{StreamExt, TryStreamExt};
 use log::{warn, info};
 use r2d2_redis::redis::Commands;
 use redis_common::redis_keys::RedisKeys;
 use sqlx::MySqlPool;
 use sqlx::error::Error::Database;
+use std::fmt;
 use std::io::Write;
 use std::sync::Arc;
 
@@ -50,7 +50,7 @@ pub struct InferW2lWithUploadSuccessResponse {
   pub inference_job_token: String,
 }
 
-#[derive(Debug, Display)]
+#[derive(Debug)]
 pub enum InferW2lWithUploadError {
   BadInput(String),
   EmptyFileUploaded,
@@ -77,6 +77,13 @@ impl ResponseError for InferW2lWithUploadError {
     };
 
     to_simple_json_error(&error_reason, self.status_code())
+  }
+}
+
+// NB: Not using derive_more::Display since Clion doesn't understand it.
+impl fmt::Display for InferW2lWithUploadError {
+  fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+    write!(f, "{:?}", self)
   }
 }
 
