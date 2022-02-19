@@ -5,7 +5,6 @@ use actix_web::cookie::Cookie;
 use actix_web::error::ResponseError;
 use actix_web::http::StatusCode;
 use actix_web::{Responder, web, HttpResponse, error, HttpRequest};
-use crate::database::helpers::enums::{CreatorSetVisibility, W2lTemplateType};
 use crate::http_server::web_utils::ip_address::get_request_ip;
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 use crate::server_state::ServerState;
@@ -21,6 +20,27 @@ use sqlx::mysql::MySqlDatabaseError;
 use std::fmt;
 use std::sync::Arc;
 use user_input_common::check_for_slurs::contains_slurs;
+
+#[derive(Deserialize)]
+pub enum W2lTemplateType {
+  /// unknown
+  Unknown,
+  /// video
+  Video,
+  /// image
+  Image,
+}
+
+#[deprecated(note = "Use `RecordVisibility` instead!")]
+#[derive(Deserialize)]
+pub enum CreatorSetVisibility {
+  /// public
+  Public,
+  /// hidden
+  Hidden,
+  /// private
+  Private,
+}
 
 #[derive(Deserialize)]
 pub struct UploadW2lTemplateRequest {
