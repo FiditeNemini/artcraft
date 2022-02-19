@@ -2,7 +2,7 @@ use anyhow::anyhow;
 use chrono::{DateTime, Utc};
 use container_common::anyhow_result::AnyhowResult;
 use crate::database::enums::record_visibility::RecordVisibility;
-use crate::database::helpers::boolean_converters::{i8_to_bool, nullable_i8_to_optional_bool};
+use database_queries::helpers::boolean_converters::{i8_to_bool, nullable_i8_to_optional_bool};
 use log::{warn, info};
 use sqlx::MySqlPool;
 
@@ -127,26 +127,26 @@ impl ListCategoriesQueryBuilder {
     let internal_results = self.perform_internal_query(mysql_pool).await?;
 
     let categories = internal_results
-        .iter()
+        .into_iter()
         .map(|c| {
           Category {
-            category_token: c.category_token.clone(),
-            model_type: c.model_type.clone(),
-            maybe_super_category_token: c.maybe_super_category_token.clone(),
+            category_token: c.category_token,
+            model_type: c.model_type,
+            maybe_super_category_token: c.maybe_super_category_token,
             can_directly_have_models: i8_to_bool(c.can_directly_have_models),
             can_have_subcategories: i8_to_bool(c.can_have_subcategories),
             can_only_mods_apply: i8_to_bool(c.can_only_mods_apply),
-            name: c.name.clone(),
-            maybe_dropdown_name: c.maybe_dropdown_name.clone(),
-            creator_user_token: c.creator_user_token.clone(),
-            creator_username: c.creator_username.clone(),
-            creator_display_name: c.creator_display_name.clone(),
-            creator_gravatar_hash: c.creator_gravatar_hash.clone(),
+            name: c.name,
+            maybe_dropdown_name: c.maybe_dropdown_name,
+            creator_user_token: c.creator_user_token,
+            creator_username: c.creator_username,
+            creator_display_name: c.creator_display_name,
+            creator_gravatar_hash: c.creator_gravatar_hash,
             is_mod_approved: nullable_i8_to_optional_bool(c.is_mod_approved),
-            maybe_mod_comments: c.maybe_mod_comments.clone(),
+            maybe_mod_comments: c.maybe_mod_comments,
             created_at: c.created_at,
             updated_at: c.updated_at,
-            deleted_at: c.deleted_at.clone(),
+            deleted_at: c.deleted_at,
           }
         })
         .collect::<Vec<Category>>();

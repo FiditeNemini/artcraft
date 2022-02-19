@@ -2,8 +2,7 @@ use anyhow::anyhow;
 use chrono::{DateTime, Utc};
 use crate::AnyhowResult;
 use crate::database::enums::record_visibility::RecordVisibility;
-use crate::database::helpers::boolean_converters::i8_to_bool;
-use crate::database::helpers::boolean_converters::nullable_i8_to_optional_bool;
+use database_queries::helpers::boolean_converters::{nullable_i8_to_optional_bool, i8_to_bool};
 use derive_more::{Display, Error};
 use log::{info, warn, log};
 use regex::Regex;
@@ -107,34 +106,34 @@ pub async fn select_w2l_template_by_token(
   };
 
   let template_for_response = W2lTemplateRecordForResponse {
-    template_token: template.template_token.clone(),
-    template_type: template.template_type.clone(),
-    creator_user_token: template.creator_user_token.clone(),
-    creator_username: template.creator_username.clone(),
-    creator_display_name: template.creator_display_name.clone(),
-    creator_gravatar_hash: template.creator_gravatar_hash.clone(),
-    title: template.title.clone(),
-    description_markdown: template.description_markdown.clone(),
-    description_rendered_html: template.description_rendered_html.clone(),
+    template_token: template.template_token,
+    template_type: template.template_type,
+    creator_user_token: template.creator_user_token,
+    creator_username: template.creator_username,
+    creator_display_name: template.creator_display_name,
+    creator_gravatar_hash: template.creator_gravatar_hash,
+    title: template.title,
+    description_markdown: template.description_markdown,
+    description_rendered_html: template.description_rendered_html,
     frame_width: if template.frame_width > 0 { template.frame_width as u32 } else { 0 },
     frame_height: if template.frame_height  > 0 { template.frame_height as u32 } else { 0 },
     duration_millis: if template.duration_millis > 0 { template.duration_millis as u32 } else { 0 },
-    maybe_image_object_name: template.maybe_public_bucket_preview_image_object_name.clone(),
-    maybe_video_object_name: template.maybe_public_bucket_preview_video_object_name.clone(),
+    maybe_image_object_name: template.maybe_public_bucket_preview_image_object_name,
+    maybe_video_object_name: template.maybe_public_bucket_preview_video_object_name,
     // NB: Fail open/public with creator_set_visibility since we're already looking at it
     creator_set_visibility: RecordVisibility::from_str(&template.creator_set_visibility)
         .unwrap_or(RecordVisibility::Public),
     is_public_listing_approved: nullable_i8_to_optional_bool(template.is_public_listing_approved),
     is_locked_from_use: i8_to_bool(template.is_locked_from_use),
     is_locked_from_user_modification: i8_to_bool(template.is_locked_from_user_modification),
-    created_at: template.created_at.clone(),
-    updated_at: template.updated_at.clone(),
+    created_at: template.created_at,
+    updated_at: template.updated_at,
     maybe_moderator_fields: Some(W2lTemplateModeratorFields {
       creator_is_banned: i8_to_bool(template.creator_is_banned),
-      creator_ip_address_creation: template.creator_ip_address_creation.clone(),
-      creator_ip_address_last_update: template.creator_ip_address_last_update.clone(),
-      user_deleted_at: template.user_deleted_at.clone(),
-      mod_deleted_at: template.mod_deleted_at.clone(),
+      creator_ip_address_creation: template.creator_ip_address_creation,
+      creator_ip_address_last_update: template.creator_ip_address_last_update,
+      user_deleted_at: template.user_deleted_at,
+      mod_deleted_at: template.mod_deleted_at,
     }),
   };
 

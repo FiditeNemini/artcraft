@@ -1,7 +1,7 @@
 use anyhow::anyhow;
 use chrono::{DateTime, Utc};
 use container_common::anyhow_result::AnyhowResult;
-use crate::database::helpers::boolean_converters::{nullable_i8_to_optional_bool, i8_to_bool};
+use database_queries::helpers::boolean_converters::i8_to_bool;
 use log::{warn, info};
 use sqlx::MySqlPool;
 
@@ -125,8 +125,8 @@ FROM user_roles
   Ok(user_roles.into_iter()
       .map(|ur| {
         UserRoleForList {
-          slug: ur.slug.clone(),
-          name: ur.name.clone(),
+          slug: ur.slug,
+          name: ur.name,
           can_use_tts: i8_to_bool(ur.can_use_tts),
           can_use_w2l: i8_to_bool(ur.can_use_w2l),
           can_delete_own_tts_results: i8_to_bool(ur.can_delete_own_tts_results),
@@ -146,8 +146,8 @@ FROM user_roles
           can_delete_other_users_w2l_results: i8_to_bool(ur.can_delete_other_users_w2l_results),
           can_ban_users: i8_to_bool(ur.can_ban_users),
           can_delete_users: i8_to_bool(ur.can_delete_users),
-          created_at: ur.created_at.clone(),
-          updated_at: ur.updated_at.clone(),
+          created_at: ur.created_at,
+          updated_at: ur.updated_at,
         }
       })
       .collect::<Vec<UserRoleForList>>())

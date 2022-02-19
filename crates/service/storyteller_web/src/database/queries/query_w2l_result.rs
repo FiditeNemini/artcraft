@@ -1,9 +1,8 @@
 use anyhow::anyhow;
 use chrono::{DateTime, Utc};
 use crate::AnyhowResult;
-use crate::database::helpers::boolean_converters::{i8_to_bool, nullable_i8_to_bool};
-use crate::database::helpers::boolean_converters::nullable_i8_to_optional_bool;
-use derive_more::{Display, Error};
+use crate::database::enums::record_visibility::RecordVisibility;
+use database_queries::helpers::boolean_converters::nullable_i8_to_bool;
 use log::{info, warn, log};
 use regex::Regex;
 use sqlx::MySqlPool;
@@ -11,7 +10,6 @@ use sqlx::error::DatabaseError;
 use sqlx::error::Error::Database;
 use sqlx::mysql::MySqlDatabaseError;
 use std::sync::Arc;
-use crate::database::enums::record_visibility::RecordVisibility;
 
 #[derive(Serialize)]
 pub struct W2lResultRecordForResponse {
@@ -132,24 +130,24 @@ pub async fn select_w2l_result_by_token(
   };
 
   let ir_for_response = W2lResultRecordForResponse {
-    w2l_result_token: ir.w2l_result_token.clone(),
-    maybe_w2l_template_token: ir.maybe_w2l_template_token.clone(),
-    maybe_tts_inference_result_token: ir.maybe_tts_inference_result_token.clone(),
+    w2l_result_token: ir.w2l_result_token,
+    maybe_w2l_template_token: ir.maybe_w2l_template_token,
+    maybe_tts_inference_result_token: ir.maybe_tts_inference_result_token,
 
-    public_bucket_video_path: ir.public_bucket_video_path.clone(),
+    public_bucket_video_path: ir.public_bucket_video_path,
 
-    template_type: ir.template_type.clone(),
-    template_title: ir.template_title.clone(),
+    template_type: ir.template_type,
+    template_title: ir.template_title,
 
-    maybe_creator_user_token: ir.maybe_creator_user_token.clone(),
-    maybe_creator_username: ir.maybe_creator_username.clone(),
-    maybe_creator_display_name: ir.maybe_creator_display_name.clone(),
-    maybe_creator_gravatar_hash: ir.maybe_creator_gravatar_hash.clone(),
+    maybe_creator_user_token: ir.maybe_creator_user_token,
+    maybe_creator_username: ir.maybe_creator_username,
+    maybe_creator_display_name: ir.maybe_creator_display_name,
+    maybe_creator_gravatar_hash: ir.maybe_creator_gravatar_hash,
 
-    maybe_template_creator_user_token: ir.maybe_template_creator_user_token.clone(),
-    maybe_template_creator_username: ir.maybe_template_creator_username.clone(),
-    maybe_template_creator_display_name: ir.maybe_template_creator_display_name.clone(),
-    maybe_template_creator_gravatar_hash: ir.maybe_template_creator_gravatar_hash.clone(),
+    maybe_template_creator_user_token: ir.maybe_template_creator_user_token,
+    maybe_template_creator_username: ir.maybe_template_creator_username,
+    maybe_template_creator_display_name: ir.maybe_template_creator_display_name,
+    maybe_template_creator_gravatar_hash: ir.maybe_template_creator_gravatar_hash,
 
     // NB: Fail open/public since we're already looking at it
     creator_set_visibility: RecordVisibility::from_str(&ir.creator_set_visibility)
@@ -162,17 +160,17 @@ pub async fn select_w2l_result_by_token(
     frame_height: if ir.frame_height  > 0 { ir.frame_height as u32 } else { 0 },
     duration_millis: if ir.duration_millis > 0 { ir.duration_millis as u32 } else { 0 },
 
-    created_at: ir.created_at.clone(),
-    updated_at: ir.updated_at.clone(),
+    created_at: ir.created_at,
+    updated_at: ir.updated_at,
 
     maybe_moderator_fields: Some(W2lResultModeratorFields {
       template_creator_is_banned:
         nullable_i8_to_bool(ir.maybe_template_creator_is_banned, false),
       result_creator_is_banned_if_user:
         nullable_i8_to_bool(ir.maybe_creator_is_banned, false),
-      result_creator_ip_address: ir.creator_ip_address.clone(),
-      result_creator_deleted_at: ir.user_deleted_at.clone(),
-      mod_deleted_at: ir.mod_deleted_at.clone(),
+      result_creator_ip_address: ir.creator_ip_address,
+      result_creator_deleted_at: ir.user_deleted_at,
+      mod_deleted_at: ir.mod_deleted_at,
     }),
   };
 

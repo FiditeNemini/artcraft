@@ -1,9 +1,9 @@
 use anyhow::anyhow;
 use chrono::{DateTime, Utc};
 use container_common::anyhow_result::AnyhowResult;
-use crate::database::helpers::boolean_converters::nullable_i8_to_optional_bool;
 use log::{warn, info};
 use sqlx::MySqlPool;
+use database_queries::helpers::boolean_converters::nullable_i8_to_optional_bool;
 
 #[derive(Serialize)]
 pub struct W2lTemplateRecordForList {
@@ -80,20 +80,20 @@ pub async fn list_w2l_templates(
   Ok(templates.into_iter()
     .map(|template| {
       W2lTemplateRecordForList {
-        template_token: template.template_token.clone(),
-        template_type: template.template_type.clone(),
-        creator_user_token: template.creator_user_token.clone(),
-        creator_username: template.creator_username.clone(),
-        creator_display_name: template.creator_display_name.clone(),
-        title: template.title.clone(),
+        template_token: template.template_token,
+        template_type: template.template_type,
+        creator_user_token: template.creator_user_token,
+        creator_username: template.creator_username,
+        creator_display_name: template.creator_display_name,
+        title: template.title,
         frame_width: if template.frame_width > 0 { template.frame_width as u32 } else { 0 },
         frame_height: if template.frame_height  > 0 { template.frame_height as u32 } else { 0 },
         duration_millis: if template.duration_millis > 0 { template.duration_millis as u32 } else { 0 },
-        maybe_image_object_name: template.maybe_public_bucket_preview_image_object_name.clone(),
-        maybe_video_object_name: template.maybe_public_bucket_preview_video_object_name.clone(),
+        maybe_image_object_name: template.maybe_public_bucket_preview_image_object_name,
+        maybe_video_object_name: template.maybe_public_bucket_preview_video_object_name,
         is_public_listing_approved: nullable_i8_to_optional_bool(template.is_public_listing_approved),
-        created_at: template.created_at.clone(),
-        updated_at: template.updated_at.clone(),
+        created_at: template.created_at,
+        updated_at: template.updated_at,
       }
     })
     .collect::<Vec<W2lTemplateRecordForList>>())

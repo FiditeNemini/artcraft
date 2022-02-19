@@ -3,9 +3,7 @@ use chrono::{DateTime, Utc};
 use crate::AnyhowResult;
 use crate::database::enums::record_visibility::RecordVisibility;
 use crate::database::enums::vocoder_type::VocoderType;
-use crate::database::helpers::boolean_converters::{i8_to_bool, nullable_i8_to_bool};
-use crate::database::helpers::boolean_converters::nullable_i8_to_optional_bool;
-use derive_more::{Display, Error};
+use database_queries::helpers::boolean_converters::nullable_i8_to_bool;
 use log::{info, warn, log};
 use regex::Regex;
 use sqlx::MySqlPool;
@@ -138,29 +136,29 @@ pub async fn select_tts_result_by_token(
   }
 
   let ir_for_response = TtsResultRecordForResponse {
-    tts_result_token: ir.tts_result_token.clone(),
+    tts_result_token: ir.tts_result_token,
 
-    raw_inference_text: ir.raw_inference_text.clone(),
+    raw_inference_text: ir.raw_inference_text,
 
-    tts_model_token: ir.tts_model_token.clone(),
-    tts_model_title: ir.tts_model_title.clone(),
+    tts_model_token: ir.tts_model_token,
+    tts_model_title: ir.tts_model_title,
 
     maybe_pretrained_vocoder_used: pretrained_vocoder,
 
-    maybe_creator_user_token: ir.maybe_creator_user_token.clone(),
-    maybe_creator_username: ir.maybe_creator_username.clone(),
-    maybe_creator_display_name: ir.maybe_creator_display_name.clone(),
-    maybe_creator_gravatar_hash: ir.maybe_creator_gravatar_hash.clone(),
+    maybe_creator_user_token: ir.maybe_creator_user_token,
+    maybe_creator_username: ir.maybe_creator_username,
+    maybe_creator_display_name: ir.maybe_creator_display_name,
+    maybe_creator_gravatar_hash: ir.maybe_creator_gravatar_hash,
 
-    maybe_model_creator_user_token: ir.maybe_model_creator_user_token.clone(),
-    maybe_model_creator_username: ir.maybe_model_creator_username.clone(),
-    maybe_model_creator_display_name: ir.maybe_model_creator_display_name.clone(),
-    maybe_model_creator_gravatar_hash: ir.maybe_model_creator_gravatar_hash.clone(),
+    maybe_model_creator_user_token: ir.maybe_model_creator_user_token,
+    maybe_model_creator_username: ir.maybe_model_creator_username,
+    maybe_model_creator_display_name: ir.maybe_model_creator_display_name,
+    maybe_model_creator_gravatar_hash: ir.maybe_model_creator_gravatar_hash,
 
     //model_is_mod_approved: if ir.model_is_mod_approved == 0 { false } else { true },
 
-    public_bucket_wav_audio_path: ir.public_bucket_wav_audio_path.clone(),
-    public_bucket_spectrogram_path: ir.public_bucket_spectrogram_path.clone(),
+    public_bucket_wav_audio_path: ir.public_bucket_wav_audio_path,
+    public_bucket_spectrogram_path: ir.public_bucket_spectrogram_path,
 
     // NB: Fail open/public since we're already looking at it
     creator_set_visibility: RecordVisibility::from_str(&ir.creator_set_visibility)
@@ -169,17 +167,17 @@ pub async fn select_tts_result_by_token(
     file_size_bytes: if ir.file_size_bytes > 0 { ir.file_size_bytes as u32 } else { 0 },
     duration_millis: if ir.duration_millis > 0 { ir.duration_millis as u32 } else { 0 },
 
-    created_at: ir.created_at.clone(),
-    updated_at: ir.updated_at.clone(),
+    created_at: ir.created_at,
+    updated_at: ir.updated_at,
 
     maybe_moderator_fields: Some(TtsResultModeratorFields {
       model_creator_is_banned:
         nullable_i8_to_bool(ir.maybe_model_creator_is_banned, false),
       result_creator_is_banned_if_user:
         nullable_i8_to_bool(ir.maybe_creator_is_banned, false),
-      result_creator_ip_address: ir.creator_ip_address.clone(),
-      result_creator_deleted_at: ir.user_deleted_at.clone(),
-      mod_deleted_at: ir.mod_deleted_at.clone(),
+      result_creator_ip_address: ir.creator_ip_address,
+      result_creator_deleted_at: ir.user_deleted_at,
+      mod_deleted_at: ir.mod_deleted_at,
     }),
   };
 

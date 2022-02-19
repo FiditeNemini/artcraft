@@ -1,7 +1,7 @@
 use anyhow::anyhow;
 use chrono::{DateTime, Utc};
 use crate::AnyhowResult;
-use crate::database::helpers::boolean_converters::i8_to_bool;
+use database_queries::helpers::boolean_converters::i8_to_bool;
 use derive_more::{Display, Error};
 use log::{info, warn, log};
 use md5::{Md5, Digest};

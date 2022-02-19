@@ -1,14 +1,13 @@
 use actix_http::Error;
 use actix_http::http::header;
-use actix_web::cookie::Cookie;
 use actix_web::HttpResponseBuilder;
+use actix_web::cookie::Cookie;
 use actix_web::error::ResponseError;
 use actix_web::http::StatusCode;
 use actix_web::web::Path;
 use actix_web::{Responder, web, HttpResponse, error, HttpRequest, HttpMessage};
 use chrono::{DateTime, Utc};
 use crate::AnyhowResult;
-use crate::database::helpers::boolean_converters::nullable_i8_to_optional_bool;
 use crate::database::queries::query_w2l_template::W2lTemplateRecordForResponse;
 use crate::database::queries::query_w2l_template::select_w2l_template_by_token;
 use crate::http_server::web_utils::ip_address::get_request_ip;
@@ -16,13 +15,13 @@ use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 use crate::server_state::ServerState;
 use crate::validations::passwords::validate_passwords;
 use crate::validations::username::validate_username;
-use derive_more::{Display, Error};
 use log::{info, warn, log};
 use regex::Regex;
 use sqlx::MySqlPool;
 use sqlx::error::DatabaseError;
 use sqlx::error::Error::Database;
 use sqlx::mysql::MySqlDatabaseError;
+use std::fmt;
 use std::sync::Arc;
 
 /// For the URL PathInfo
@@ -37,7 +36,7 @@ pub struct GetW2lTemplateSuccessResponse {
   pub template: W2lTemplateRecordForResponse,
 }
 
-#[derive(Debug, Display)]
+#[derive(Debug)]
 pub enum GetW2lTemplateError {
   ServerError,
   NotFound,
@@ -58,6 +57,13 @@ impl ResponseError for GetW2lTemplateError {
     };
 
     to_simple_json_error(&error_reason, self.status_code())
+  }
+}
+
+// NB: Not using derive_more::Display since Clion doesn't understand it.
+impl fmt::Display for GetW2lTemplateError {
+  fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+    write!(f, "{:?}", self)
   }
 }
 

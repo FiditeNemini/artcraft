@@ -2,8 +2,8 @@ use actix_web::HttpRequest;
 use anyhow::anyhow;
 use crate::AnyhowResult;
 use crate::database::enums::record_visibility::RecordVisibility;
-use crate::database::helpers::boolean_converters::{i8_to_bool, nullable_i8_to_optional_bool};
 use crate::http_server::web_utils::cookie_manager::CookieManager;
+use database_queries::helpers::boolean_converters::{nullable_i8_to_optional_bool, i8_to_bool};
 use log::{info, warn};
 use sqlx::MySqlPool;
 use sqlx::error::Error::RowNotFound;
@@ -235,17 +235,17 @@ WHERE user_sessions.token = ?
     match maybe_user_record {
       Ok(raw_user_record) => {
         let result_user_record = SessionUserRecord {
-          user_token: raw_user_record.user_token.clone(),
-          username: raw_user_record.username.clone(),
-          display_name: raw_user_record.display_name.clone(),
-          email_address: raw_user_record.email_address.clone(),
+          user_token: raw_user_record.user_token,
+          username: raw_user_record.username,
+          display_name: raw_user_record.display_name,
+          email_address: raw_user_record.email_address,
           email_confirmed: i8_to_bool(raw_user_record.email_confirmed),
-          email_gravatar_hash: raw_user_record.email_gravatar_hash.clone(),
+          email_gravatar_hash: raw_user_record.email_gravatar_hash,
           // Preference
           disable_gravatar: i8_to_bool(raw_user_record.disable_gravatar),
           auto_play_audio_preference: nullable_i8_to_optional_bool(raw_user_record.auto_play_audio_preference),
           auto_play_video_preference: nullable_i8_to_optional_bool(raw_user_record.auto_play_video_preference),
-          user_role_slug: raw_user_record.user_role_slug.clone(),
+          user_role_slug: raw_user_record.user_role_slug,
           preferred_tts_result_visibility: raw_user_record.preferred_tts_result_visibility,
           preferred_w2l_result_visibility: raw_user_record.preferred_w2l_result_visibility,
 

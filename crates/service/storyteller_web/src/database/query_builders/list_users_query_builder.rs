@@ -1,6 +1,6 @@
 use chrono::{DateTime, Utc};
 use container_common::anyhow_result::AnyhowResult;
-use crate::database::helpers::boolean_converters::i8_to_bool;
+use database_queries::helpers::boolean_converters::i8_to_bool;
 use sqlx::MySqlPool;
 
 /// NB: This is not to be shared externally.
@@ -70,21 +70,21 @@ impl ListUsersQueryBuilder {
         .map(|raw_result| raw_result.user_id);
 
     let users = internal_results
-        .iter()
+        .into_iter()
         .map(|r| {
           UserForList {
             user_id: r.user_id,
-            user_token: r.user_token.clone(),
-            username: r.username.clone(),
-            display_name: r.display_name.clone(),
-            gravatar_hash: r.gravatar_hash.clone(),
+            user_token: r.user_token,
+            username: r.username,
+            display_name: r.display_name,
+            gravatar_hash: r.gravatar_hash,
             is_banned: i8_to_bool(r.is_banned),
-            user_role_slug: r.user_role_slug.clone(),
-            ip_address_creation: r.ip_address_creation.clone(),
-            ip_address_last_login: r.ip_address_last_login.clone(),
-            ip_address_last_update: r.ip_address_last_update.clone(),
-            created_at: r.created_at.clone(),
-            updated_at: r.updated_at.clone(),
+            user_role_slug: r.user_role_slug,
+            ip_address_creation: r.ip_address_creation,
+            ip_address_last_login: r.ip_address_last_login,
+            ip_address_last_update: r.ip_address_last_update,
+            created_at: r.created_at,
+            updated_at: r.updated_at,
           }
         })
         .collect::<Vec<UserForList>>();

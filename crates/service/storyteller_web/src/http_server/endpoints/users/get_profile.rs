@@ -1,7 +1,7 @@
 use actix_http::Error;
 use actix_http::http::header;
-use actix_web::cookie::Cookie;
 use actix_web::HttpResponseBuilder;
+use actix_web::cookie::Cookie;
 use actix_web::error::ResponseError;
 use actix_web::http::StatusCode;
 use actix_web::web::Path;
@@ -10,12 +10,11 @@ use anyhow::anyhow;
 use chrono::{DateTime, Utc};
 use crate::AnyhowResult;
 use crate::database::enums::record_visibility::RecordVisibility;
-use crate::database::helpers::boolean_converters::i8_to_bool;
 use crate::database::queries::list_user_badges::UserBadgeForList;
 use crate::database::queries::list_user_badges::list_user_badges;
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 use crate::server_state::ServerState;
-use derive_more::{Display, Error};
+use database_queries::helpers::boolean_converters::i8_to_bool;
 use log::{info, warn, log};
 use md5::{Md5, Digest};
 use regex::Regex;
@@ -23,6 +22,7 @@ use sqlx::MySqlPool;
 use sqlx::error::DatabaseError;
 use sqlx::error::Error::Database;
 use sqlx::mysql::MySqlDatabaseError;
+use std::fmt;
 use std::sync::Arc;
 
 // TODO: This is duplicated in query_user_profile
@@ -89,7 +89,7 @@ pub struct RawUserProfileRecord {
   pub created_at: DateTime<Utc>,
 }
 
-#[derive(Debug, Display)]
+#[derive(Debug)]
 pub enum ProfileError {
   ServerError,
   NotFound,
@@ -116,6 +116,13 @@ impl ResponseError for ProfileError {
     };
 
     to_simple_json_error(&error_reason, self.status_code())
+  }
+}
+
+// NB: Not using derive_more::Display since Clion doesn't understand it.
+impl fmt::Display for ProfileError {
+  fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+    write!(f, "{:?}", self)
   }
 }
 
@@ -218,24 +225,24 @@ WHERE
   };
 
   let profile_for_response = UserProfileRecordForResponse {
-    user_token: profile_record.user_token.clone(),
-    username: profile_record.username.clone(),
-    display_name: profile_record.display_name.clone(),
-    email_gravatar_hash: profile_record.email_gravatar_hash.clone(),
-    profile_markdown: profile_record.profile_markdown.clone(),
-    profile_rendered_html: profile_record.profile_rendered_html.clone(),
-    user_role_slug: profile_record.user_role_slug.clone(),
+    user_token: profile_record.user_token,
+    username: profile_record.username,
+    display_name: profile_record.display_name,
+    email_gravatar_hash: profile_record.email_gravatar_hash,
+    profile_markdown: profile_record.profile_markdown,
+    profile_rendered_html: profile_record.profile_rendered_html,
+    user_role_slug: profile_record.user_role_slug,
     disable_gravatar: i8_to_bool(profile_record.disable_gravatar),
     preferred_tts_result_visibility: profile_record.preferred_tts_result_visibility,
     preferred_w2l_result_visibility: profile_record.preferred_w2l_result_visibility,
-    discord_username: profile_record.discord_username.clone(),
-    twitch_username: profile_record.twitch_username.clone(),
-    twitter_username: profile_record.twitter_username.clone(),
-    patreon_username: profile_record.patreon_username.clone(),
-    github_username: profile_record.github_username.clone(),
-    cashapp_username: profile_record.cashapp_username.clone(),
-    website_url: profile_record.website_url.clone(),
-    created_at: profile_record.created_at.clone(),
+    discord_username: profile_record.discord_username,
+    twitch_username: profile_record.twitch_username,
+    twitter_username: profile_record.twitter_username,
+    patreon_username: profile_record.patreon_username,
+    github_username: profile_record.github_username,
+    cashapp_username: profile_record.cashapp_username,
+    website_url: profile_record.website_url,
+    created_at: profile_record.created_at,
     maybe_moderator_fields: maybe_mod_fields,
     badges,
   };

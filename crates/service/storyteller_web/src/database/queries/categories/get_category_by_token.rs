@@ -1,7 +1,7 @@
 use anyhow::anyhow;
 use chrono::{DateTime, Utc};
 use crate::AnyhowResult;
-use crate::database::helpers::boolean_converters::{i8_to_bool, nullable_i8_to_optional_bool};
+use database_queries::helpers::boolean_converters::{nullable_i8_to_optional_bool, i8_to_bool};
 use log::{info, warn, log};
 use sqlx::MySqlPool;
 
@@ -96,26 +96,26 @@ WHERE
   };
 
   let category = ModelCategory {
-    category_token: category.category_token.clone(),
-    model_type: category.model_type.clone(),
-    maybe_super_category_token: category.maybe_super_category_token.clone(),
+    category_token: category.category_token,
+    model_type: category.model_type,
+    maybe_super_category_token: category.maybe_super_category_token,
     can_directly_have_models: i8_to_bool(category.can_directly_have_models),
     can_have_subcategories: i8_to_bool(category.can_have_subcategories),
     can_only_mods_apply: i8_to_bool(category.can_only_mods_apply),
     name: category.name.clone(),
-    maybe_dropdown_name: category.maybe_dropdown_name.clone(),
-    creator_user_token: category.creator_user_token.clone(),
-    creator_username: category.creator_username.clone(),
-    creator_display_name: category.creator_display_name.clone(),
-    creator_gravatar_hash: category.creator_gravatar_hash.clone(),
-    creator_ip_address_creation: category.creator_ip_address_creation.clone(),
-    creator_ip_address_last_update: category.creator_ip_address_last_update.clone(),
+    maybe_dropdown_name: category.maybe_dropdown_name,
+    creator_user_token: category.creator_user_token,
+    creator_username: category.creator_username,
+    creator_display_name: category.creator_display_name,
+    creator_gravatar_hash: category.creator_gravatar_hash,
+    creator_ip_address_creation: category.creator_ip_address_creation,
+    creator_ip_address_last_update: category.creator_ip_address_last_update,
     is_mod_approved: nullable_i8_to_optional_bool(category.is_mod_approved),
-    maybe_mod_comments: category.maybe_mod_comments.clone(),
-    maybe_mod_user_token: category.maybe_mod_user_token.clone(),
-    created_at: category.created_at.clone(),
-    updated_at: category.updated_at.clone(),
-    deleted_at: category.deleted_at.clone(),
+    maybe_mod_comments: category.maybe_mod_comments,
+    maybe_mod_user_token: category.maybe_mod_user_token,
+    created_at: category.created_at,
+    updated_at: category.updated_at,
+    deleted_at: category.deleted_at,
   };
 
   Ok(Some(category))
