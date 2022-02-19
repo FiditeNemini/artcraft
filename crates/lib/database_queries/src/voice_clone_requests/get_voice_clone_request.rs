@@ -50,7 +50,6 @@ pub async fn get_voice_clone_request_by_token(
   voice_clone_request_token: &str,
   pool: &MySqlPool,
 ) -> AnyhowResult<Option<VoiceCloneRequest>> {
-
   let maybe_record = sqlx::query_as!(
       VoiceCloneRequestInternal,
         r#"
@@ -92,6 +91,61 @@ WHERE
       .fetch_one(pool)
       .await;
 
+  handle_result(maybe_record)
+}
+
+
+pub async fn get_voice_clone_request_by_user_token(
+  user_token: &str,
+  pool: &MySqlPool,
+) -> AnyhowResult<Option<VoiceCloneRequest>> {
+  let maybe_record = sqlx::query_as!(
+      VoiceCloneRequestInternal,
+        r#"
+SELECT
+  token,
+
+  maybe_user_token,
+  email_address,
+  discord_username,
+
+  is_for_studio,
+  is_for_twitch_tts,
+  is_for_api_use,
+  is_for_music,
+  is_for_games,
+  is_for_other,
+  optional_notes_on_use,
+
+  is_for_private_use,
+  is_for_public_use,
+
+  is_own_voice,
+  is_third_party_voice,
+
+  has_clean_audio_recordings,
+  has_good_microphone,
+
+  optional_questions,
+  optional_extra_comments,
+
+  created_at,
+  updated_at
+FROM voice_clone_requests
+WHERE
+  maybe_user_token = ?
+        "#,
+      user_token,
+    )
+      .fetch_one(pool)
+      .await;
+
+  handle_result(maybe_record)
+}
+
+fn handle_result(
+  maybe_record: Result<VoiceCloneRequestInternal, sqlx::Error>,
+) -> AnyhowResult<Option<VoiceCloneRequest>> {
   let record : VoiceCloneRequestInternal = match maybe_record {
     Ok(record) => record,
     Err(sqlx::Error::RowNotFound) => return Ok(None),
