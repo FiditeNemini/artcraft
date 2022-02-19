@@ -5,6 +5,22 @@ use crate::column_types::twitch_event_category::TwitchEventCategory;
 use crate::helpers::boolean_converters::i8_to_bool;
 use sqlx::MySqlPool;
 
+/// Lookup by voice clone request token
+pub async fn get_voice_clone_request_by_token(
+  voice_clone_request_token: &str,
+  pool: &MySqlPool,
+) -> AnyhowResult<Option<VoiceCloneRequest>> {
+  internal_voice_clone_request_by_token(voice_clone_request_token, pool).await
+}
+
+/// Lookup by user
+pub async fn get_voice_clone_request_by_user_token(
+  user_token: &str,
+  pool: &MySqlPool,
+) -> AnyhowResult<Option<VoiceCloneRequest>> {
+  internal_voice_clone_request_by_user_token(user_token, pool).await
+}
+
 /// Used for both *BY TOKEN* and for *BY USER* lookups.
 /// The user field should be optional for one and not for the other, but code reuse is more
 /// important and this is a quick / hasty feature.
@@ -46,7 +62,7 @@ pub struct VoiceCloneRequest {
   pub updated_at: chrono::DateTime<Utc>,
 }
 
-pub async fn get_voice_clone_request_by_token(
+async fn internal_voice_clone_request_by_token(
   voice_clone_request_token: &str,
   pool: &MySqlPool,
 ) -> AnyhowResult<Option<VoiceCloneRequest>> {
@@ -94,8 +110,7 @@ WHERE
   handle_result(maybe_record)
 }
 
-
-pub async fn get_voice_clone_request_by_user_token(
+async fn internal_voice_clone_request_by_user_token(
   user_token: &str,
   pool: &MySqlPool,
 ) -> AnyhowResult<Option<VoiceCloneRequest>> {
