@@ -1,7 +1,7 @@
 use actix_http::{StatusCode, header};
 use actix_web::{HttpResponse, HttpRequest, web, ResponseError};
 use crate::server_state::ServerState;
-use database_queries::twitch_oauth::insert::TwitchOauthTokenInsertBuilder;
+use database_queries::queries::twitch::twitch_oauth::insert::TwitchOauthTokenInsertBuilder;
 use http_server_common::request::get_request_ip::get_request_ip;
 use http_server_common::response::response_error_helpers::to_simple_json_error;
 use log::error;

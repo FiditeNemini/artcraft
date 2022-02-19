@@ -318,7 +318,7 @@ pub struct RawInternalCategoryRecord {
 
 #[cfg(test)]
 mod tests {
-  use crate::model_categories::list_categories_query_builder::ListCategoriesQueryBuilder;
+  use crate::queries::model_categories::list_categories_query_builder::ListCategoriesQueryBuilder;
 
   #[test]
   fn predicates_default_scoping() {

@@ -4,7 +4,7 @@ use container_common::anyhow_result::AnyhowResult;
 use crate::column_types::job_status::JobStatus;
 use crate::column_types::record_visibility::RecordVisibility;
 use crate::helpers::boolean_converters::i8_to_bool;
-use crate::tts::tts_inference_jobs::_keys::TtsInferenceJobId;
+use crate::queries::tts::tts_inference_jobs::_keys::TtsInferenceJobId;
 use log::{warn, info};
 use sqlx::MySqlPool;
 

@@ -22,7 +22,7 @@ use sqlx::error::Error::Database;
 use sqlx::mysql::MySqlDatabaseError;
 use std::fmt;
 use std::sync::Arc;
-use database_queries::api_tokens::create_api_token::create_api_token_for_user;
+use database_queries::queries::api_tokens::create_api_token::create_api_token_for_user;
 
 // =============== Request ===============
 

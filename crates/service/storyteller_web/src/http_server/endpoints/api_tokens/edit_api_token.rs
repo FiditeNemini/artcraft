@@ -18,8 +18,8 @@ use sqlx::error::Error::Database;
 use sqlx::mysql::MySqlDatabaseError;
 use std::fmt;
 use std::sync::Arc;
-use database_queries::api_tokens::list_available_api_tokens_for_user::list_available_api_tokens_for_user;
-use database_queries::api_tokens::edit_api_token::edit_api_token;
+use database_queries::queries::api_tokens::list_available_api_tokens_for_user::list_available_api_tokens_for_user;
+use database_queries::queries::api_tokens::edit_api_token::edit_api_token;
 use crate::http_server::web_utils::ip_address::get_request_ip;
 
 // =============== Request ===============

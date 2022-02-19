@@ -10,7 +10,7 @@ use chrono::{DateTime, Utc};
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 use crate::http_server::web_utils::response_success_helpers::simple_json_success;
 use crate::server_state::ServerState;
-use database_queries::tts::tts_category_assignments::list_assigned_tts_categories_query_builder::ListAssignedTtsCategoriesQueryBuilder;
+use database_queries::queries::tts::tts_category_assignments::list_assigned_tts_categories_query_builder::ListAssignedTtsCategoriesQueryBuilder;
 use http_server_common::response::serialize_as_json_error::serialize_as_json_error;
 use log::{info, warn, log};
 use regex::Regex;

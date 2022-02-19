@@ -30,8 +30,8 @@ mod job_queries;
 // NB: Also so sqlx codegens everything.
 // Not sure if this is strictly necessary.
 mod shared_queries {
-  use database_queries::twitch_oauth::find;
-  use database_queries::twitch_oauth::insert;
+  use database_queries::queries::twitch::twitch_oauth::find;
+  use database_queries::queries::twitch::twitch_oauth::insert;
 }
 
 use actix_cors::Cors;

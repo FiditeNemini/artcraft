@@ -1,6 +1,6 @@
 use anyhow::anyhow;
 use container_common::anyhow_result::AnyhowResult;
-use crate::api_tokens::list_available_api_tokens_for_user::list_available_api_tokens_for_user;
+use crate::queries::api_tokens::list_available_api_tokens_for_user::list_available_api_tokens_for_user;
 use crate::tokens::Tokens;
 use sqlx::MySqlPool;
 use sqlx;

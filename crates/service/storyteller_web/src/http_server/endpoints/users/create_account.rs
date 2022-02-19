@@ -15,7 +15,7 @@ use crate::validations::passwords::validate_passwords;
 use crate::validations::username::validate_username;
 use crate::validations::username_reservations::is_reserved_username;
 use database_queries::tokens::Tokens;
-use database_queries::users::user_sessions::create_session::create_session_for_user;
+use database_queries::queries::users::user_sessions::create_session::create_session_for_user;
 use log::{info, warn, log};
 use regex::Regex;
 use sqlx::error::DatabaseError;

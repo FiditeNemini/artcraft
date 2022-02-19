@@ -13,7 +13,7 @@ use crate::http_server::web_utils::response_success_helpers::simple_json_success
 use crate::server_state::ServerState;
 use crate::util::email_to_gravatar::email_to_gravatar;
 use crate::util::markdown_to_html::markdown_to_html;
-use database_queries::model_categories::get_category_by_token::get_category_by_token;
+use database_queries::queries::model_categories::get_category_by_token::get_category_by_token;
 use http_server_common::response::serialize_as_json_error::serialize_as_json_error;
 use log::{info, warn, log};
 use regex::Regex;

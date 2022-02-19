@@ -1,6 +1,6 @@
 use anyhow::Error;
 use crate::threads::ip_banlist_set::IpBanlistSet;
-use database_queries::ip_bans::list_ip_bans::list_ip_bans;
+use database_queries::queries::ip_bans::list_ip_bans::list_ip_bans;
 use log::info;
 use log::warn;
 use sqlx::MySqlPool;

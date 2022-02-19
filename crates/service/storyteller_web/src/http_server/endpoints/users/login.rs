@@ -11,7 +11,7 @@ use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 use crate::http_server::web_utils::serialize_as_json_error::serialize_as_json_error;
 use crate::server_state::ServerState;
 use database_queries::helpers::boolean_converters::i8_to_bool;
-use database_queries::users::user_sessions::create_session::create_session_for_user;
+use database_queries::queries::users::user_sessions::create_session::create_session_for_user;
 use log::{info, warn, log};
 use regex::Regex;
 use sqlx::MySqlPool;

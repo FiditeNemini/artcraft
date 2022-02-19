@@ -14,7 +14,7 @@ use crate::server_state::ServerState;
 use crate::validations::model_uploads::validate_model_title;
 use crate::validations::passwords::validate_passwords;
 use crate::validations::username::validate_username;
-use database_queries::users::user_roles::list_user_roles::{UserRoleForList, list_user_roles};
+use database_queries::queries::users::user_roles::list_user_roles::{UserRoleForList, list_user_roles};
 use log::{info, warn, log};
 use regex::Regex;
 use sqlx::error::DatabaseError;

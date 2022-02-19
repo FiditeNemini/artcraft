@@ -14,7 +14,7 @@ use crate::util::email_to_gravatar::email_to_gravatar;
 use crate::util::markdown_to_html::markdown_to_html;
 use database_queries::column_types::record_visibility::RecordVisibility;
 use database_queries::column_types::vocoder_type::VocoderType;
-use database_queries::tts::tts_models::get_tts_model::get_tts_model_by_token;
+use database_queries::queries::tts::tts_models::get_tts_model::get_tts_model_by_token;
 use log::{info, warn, log};
 use regex::Regex;
 use sqlx::MySqlPool;

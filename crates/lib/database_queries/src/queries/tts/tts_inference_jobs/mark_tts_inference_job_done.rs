@@ -1,6 +1,6 @@
 use anyhow::anyhow;
 use container_common::anyhow_result::AnyhowResult;
-use crate::tts::tts_inference_jobs::_keys::TtsInferenceJobId;
+use crate::queries::tts::tts_inference_jobs::_keys::TtsInferenceJobId;
 use sqlx::MySqlPool;
 use sqlx;
 

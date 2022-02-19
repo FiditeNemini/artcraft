@@ -10,7 +10,7 @@ use chrono::{DateTime, Utc};
 use crate::AnyhowResult;
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 use crate::server_state::ServerState;
-use database_queries::w2l::w2l_templates::list_w2l_templates::{W2lTemplateRecordForList, list_w2l_templates};
+use database_queries::queries::w2l::w2l_templates::list_w2l_templates::{W2lTemplateRecordForList, list_w2l_templates};
 use log::{info, warn, log};
 use regex::Regex;
 use sqlx::MySqlPool;

@@ -10,7 +10,7 @@ use chrono::{DateTime, Utc};
 use crate::AnyhowResult;
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 use crate::server_state::ServerState;
-use database_queries::tts::tts_models::get_tts_model::{TtsModelRecordForResponse, get_tts_model_by_token};
+use database_queries::queries::tts::tts_models::get_tts_model::{TtsModelRecordForResponse, get_tts_model_by_token};
 use log::{info, warn, log};
 use regex::Regex;
 use sqlx::MySqlPool;

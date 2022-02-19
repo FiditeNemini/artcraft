@@ -12,11 +12,11 @@ use crate::http_server::web_utils::response_success_helpers::simple_json_success
 use crate::server_state::ServerState;
 use crate::util::delete_role_disambiguation::DeleteRole;
 use crate::util::delete_role_disambiguation::delete_role_disambiguation;
-use database_queries::tts::tts_models::delete_tts_model_various_scopes::delete_tts_model_as_mod;
-use database_queries::tts::tts_models::delete_tts_model_various_scopes::delete_tts_model_as_user;
-use database_queries::tts::tts_models::delete_tts_model_various_scopes::undelete_tts_model_as_mod;
-use database_queries::tts::tts_models::delete_tts_model_various_scopes::undelete_tts_model_as_user;
-use database_queries::tts::tts_models::get_tts_model::get_tts_model_by_token;
+use database_queries::queries::tts::tts_models::delete_tts_model_various_scopes::delete_tts_model_as_mod;
+use database_queries::queries::tts::tts_models::delete_tts_model_various_scopes::delete_tts_model_as_user;
+use database_queries::queries::tts::tts_models::delete_tts_model_various_scopes::undelete_tts_model_as_mod;
+use database_queries::queries::tts::tts_models::delete_tts_model_various_scopes::undelete_tts_model_as_user;
+use database_queries::queries::tts::tts_models::get_tts_model::get_tts_model_by_token;
 use log::{info, warn, log};
 use regex::Regex;
 use sqlx::MySqlPool;

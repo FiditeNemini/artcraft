@@ -21,7 +21,7 @@ use crate::validations::username::validate_username;
 use crate::validations::username_reservations::is_reserved_username;
 use crate::validations::website_url::validate_website_url;
 use database_queries::column_types::record_visibility::RecordVisibility;
-use database_queries::users::get_user_profile_by_username::get_user_profile_by_username;
+use database_queries::queries::users::get_user_profile_by_username::get_user_profile_by_username;
 use log::{info, warn, log};
 use regex::Regex;
 use sqlx::error::DatabaseError;
