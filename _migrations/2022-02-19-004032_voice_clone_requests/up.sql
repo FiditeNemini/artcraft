@@ -25,6 +25,10 @@ CREATE TABLE voice_clone_requests(
 
   -- ========== REASON ==========
 
+  -- Visibility
+  is_for_private_use BOOLEAN NOT NULL DEFAULT FALSE,
+  is_for_public_use BOOLEAN NOT NULL DEFAULT FALSE,
+
   -- How they'll use
   is_for_studio BOOLEAN NOT NULL DEFAULT FALSE,
   is_for_twitch_tts BOOLEAN NOT NULL DEFAULT FALSE,
@@ -34,13 +38,10 @@ CREATE TABLE voice_clone_requests(
   is_for_other BOOLEAN NOT NULL DEFAULT FALSE,
   optional_notes_on_use MEDIUMTEXT DEFAULT NULL,
 
-  -- Visibility
-  is_for_private_use BOOLEAN NOT NULL DEFAULT FALSE,
-  is_for_public_use BOOLEAN NOT NULL DEFAULT FALSE,
-
-  -- Ownership
+  -- Subject/Ownership
   is_own_voice BOOLEAN NOT NULL DEFAULT FALSE,
   is_third_party_voice BOOLEAN NOT NULL DEFAULT FALSE,
+  optional_notes_on_subject VARCHAR(255) DEFAULT NULL,
 
   -- ========== RECORDING QUALITY / EQUIPMENT ==========
 

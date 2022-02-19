@@ -33,6 +33,10 @@ pub struct VoiceCloneRequest {
   pub email_address: String,
   pub discord_username: String,
 
+  // Visibility
+  pub is_for_private_use: bool,
+  pub is_for_public_use: bool,
+
   // Use
   pub is_for_studio: bool,
   pub is_for_twitch_tts: bool,
@@ -42,13 +46,10 @@ pub struct VoiceCloneRequest {
   pub is_for_other: bool,
   pub optional_notes_on_use: Option<String>,
 
-  // Visibility
-  pub is_for_private_use: bool,
-  pub is_for_public_use: bool,
-
-  // Ownership
+  // Subject/Ownership
   pub is_own_voice: bool,
   pub is_third_party_voice: bool,
+  pub optional_notes_on_subject: Option<String>,
 
   // Equipment
   pub has_clean_audio_recordings: bool,
@@ -76,6 +77,9 @@ SELECT
   email_address,
   discord_username,
 
+  is_for_private_use,
+  is_for_public_use,
+
   is_for_studio,
   is_for_twitch_tts,
   is_for_api_use,
@@ -84,11 +88,9 @@ SELECT
   is_for_other,
   optional_notes_on_use,
 
-  is_for_private_use,
-  is_for_public_use,
-
   is_own_voice,
   is_third_party_voice,
+  optional_notes_on_subject,
 
   has_clean_audio_recordings,
   has_good_microphone,
@@ -124,6 +126,9 @@ SELECT
   email_address,
   discord_username,
 
+  is_for_private_use,
+  is_for_public_use,
+
   is_for_studio,
   is_for_twitch_tts,
   is_for_api_use,
@@ -132,11 +137,9 @@ SELECT
   is_for_other,
   optional_notes_on_use,
 
-  is_for_private_use,
-  is_for_public_use,
-
   is_own_voice,
   is_third_party_voice,
+  optional_notes_on_subject,
 
   has_clean_audio_recordings,
   has_good_microphone,
@@ -172,6 +175,8 @@ fn handle_result(
     maybe_user_token: record.maybe_user_token,
     email_address: record.email_address,
     discord_username: record.discord_username,
+    is_for_private_use: i8_to_bool(record.is_for_private_use),
+    is_for_public_use: i8_to_bool(record.is_for_public_use),
     is_for_studio: i8_to_bool(record.is_for_studio),
     is_for_twitch_tts: i8_to_bool(record.is_for_twitch_tts),
     is_for_api_use: i8_to_bool(record.is_for_api_use),
@@ -179,10 +184,9 @@ fn handle_result(
     is_for_games: i8_to_bool(record.is_for_games),
     is_for_other: i8_to_bool(record.is_for_other),
     optional_notes_on_use: record.optional_notes_on_use,
-    is_for_private_use: i8_to_bool(record.is_for_private_use),
-    is_for_public_use: i8_to_bool(record.is_for_public_use),
     is_own_voice: i8_to_bool(record.is_own_voice),
     is_third_party_voice: i8_to_bool(record.is_third_party_voice),
+    optional_notes_on_subject: record.optional_notes_on_subject,
     has_clean_audio_recordings: i8_to_bool(record.has_clean_audio_recordings),
     has_good_microphone: i8_to_bool(record.has_good_microphone),
     optional_questions: record.optional_questions,
@@ -201,6 +205,10 @@ struct VoiceCloneRequestInternal {
   pub email_address: String,
   pub discord_username: String,
 
+  // Visibility
+  pub is_for_private_use: i8,
+  pub is_for_public_use: i8,
+
   // Use
   pub is_for_studio: i8,
   pub is_for_twitch_tts: i8,
@@ -210,13 +218,10 @@ struct VoiceCloneRequestInternal {
   pub is_for_other: i8,
   pub optional_notes_on_use: Option<String>,
 
-  // Visibility
-  pub is_for_private_use: i8,
-  pub is_for_public_use: i8,
-
-  // Ownership
+  // Subject/Ownership
   pub is_own_voice: i8,
   pub is_third_party_voice: i8,
+  pub optional_notes_on_subject: Option<String>,
 
   // Equipment
   pub has_clean_audio_recordings: i8,

@@ -1,0 +1,158 @@
+use actix_http::Error;
+use actix_http::http::header;
+use actix_web::HttpResponseBuilder;
+use actix_web::cookie::Cookie;
+use actix_web::error::ResponseError;
+use actix_web::http::StatusCode;
+use actix_web::web::{Path, Json};
+use actix_web::{Responder, web, HttpResponse, error, HttpRequest};
+use crate::http_server::web_utils::ip_address::get_request_ip;
+use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
+use crate::http_server::web_utils::response_success_helpers::simple_json_success;
+use crate::server_state::ServerState;
+use database_queries::queries::voice_clone_requests::insert_voice_clone_requests_builder::InsertVoiceCloneRequestBuilder;
+use http_server_common::response::serialize_as_json_error::serialize_as_json_error;
+use log::{info, warn, log};
+use regex::Regex;
+use sqlx::MySqlPool;
+use sqlx::error::DatabaseError;
+use sqlx::error::Error::Database;
+use sqlx::mysql::MySqlDatabaseError;
+use std::fmt;
+use std::sync::Arc;
+
+// =============== Request ===============
+
+#[derive(Deserialize)]
+pub struct CreateVoiceRequestRequest {
+  pub idempotency_token: String,
+
+  // Contact
+  pub email_address: String,
+  pub discord_username: String,
+
+  // TODO: Make enum.
+  // Visibility
+  pub is_for_private_use: bool,
+  pub is_for_public_use: bool,
+
+  // Use
+  pub is_for_studio: bool,
+  pub is_for_twitch_tts: bool,
+  pub is_for_api_use: bool,
+  pub is_for_music: bool,
+  pub is_for_games: bool,
+  pub is_for_other: bool,
+  pub optional_notes_on_use: Option<String>,
+
+  // Subject/Ownership
+  pub is_own_voice: bool,
+  pub is_third_party_voice: bool,
+  pub optional_notes_on_subject: Option<String>,
+
+  // Equipment
+  pub has_clean_audio_recordings: bool,
+  pub has_good_microphone: bool,
+
+  // Comments
+  pub optional_questions: Option<String>,
+  pub optional_extra_comments: Option<String>,
+}
+
+// =============== Success Response ===============
+
+#[derive(Serialize)]
+pub struct CreateVoiceRequestResponse {
+  pub success: bool,
+}
+
+// =============== Error Response ===============
+
+#[derive(Debug, Serialize)]
+pub enum CreateVoiceRequestError {
+  BadInput(String),
+  NotAuthorized,
+  ServerError,
+}
+
+impl ResponseError for CreateVoiceRequestError {
+  fn status_code(&self) -> StatusCode {
+    match *self {
+      CreateVoiceRequestError::BadInput(_) => StatusCode::BAD_REQUEST,
+      CreateVoiceRequestError::NotAuthorized => StatusCode::UNAUTHORIZED,
+      CreateVoiceRequestError::ServerError => StatusCode::INTERNAL_SERVER_ERROR,
+    }
+  }
+
+  fn error_response(&self) -> HttpResponse {
+    serialize_as_json_error(self)
+  }
+}
+
+// NB: Not using DeriveMore since Clion doesn't understand it.
+impl fmt::Display for CreateVoiceRequestError {
+  fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+    write!(f, "{:?}", self)
+  }
+}
+
+// =============== Handler ===============
+
+pub async fn create_voice_clone_request_handler(
+  http_request: HttpRequest,
+  request: web::Json<CreateVoiceRequestRequest>,
+  server_state: web::Data<Arc<ServerState>>) -> Result<HttpResponse, CreateVoiceRequestError>
+{
+  let maybe_user_session = server_state
+      .session_checker
+      .maybe_get_user_session(&http_request, &server_state.mysql_pool)
+      .await
+      .map_err(|e| {
+        warn!("Session checker error: {:?}", e);
+        CreateVoiceRequestError::ServerError
+      })?;
+
+  let creator_ip_address = get_request_ip(&http_request);
+
+  let builder = InsertVoiceCloneRequestBuilder {
+    uuid_idempotency_token: request.idempotency_token.clone(),
+    maybe_user_token: maybe_user_session.map(|user| user.user_token.clone()),
+    email_address: request.email_address.clone(),
+    discord_username: request.discord_username.clone(),
+    is_for_private_use: request.is_for_private_use,
+    is_for_public_use: request.is_for_public_use,
+    is_for_studio: request.is_for_studio,
+    is_for_twitch_tts: request.is_for_twitch_tts,
+    is_for_api_use: request.is_for_api_use,
+    is_for_music: request.is_for_music,
+    is_for_games: request.is_for_games,
+    is_for_other: request.is_for_other,
+    optional_notes_on_use: request.optional_notes_on_use.clone(),
+    is_own_voice: request.is_own_voice,
+    is_third_party_voice: request.is_third_party_voice,
+    optional_notes_on_subject: request.optional_notes_on_subject.clone(),
+    has_clean_audio_recordings: request.has_clean_audio_recordings,
+    has_good_microphone: request.has_good_microphone,
+    optional_questions: request.optional_questions.clone(),
+    optional_extra_comments: request.optional_extra_comments.clone(),
+    ip_address_creation: creator_ip_address,
+  };
+
+  builder.insert(&server_state.mysql_pool)
+      .await
+      .map_err(|e| {
+        warn!("creation error: {:?}", e);
+        CreateVoiceRequestError::ServerError
+      })?;
+
+  let response = CreateVoiceRequestResponse {
+    success: true,
+  };
+
+  let body = serde_json::to_string(&response)
+      .map_err(|e| CreateVoiceRequestError::ServerError)?;
+
+  Ok(HttpResponse::Ok()
+      .content_type("application/json")
+      .body(body))
+}

@@ -12,6 +12,10 @@ pub struct InsertVoiceCloneRequestBuilder {
   pub email_address: String,
   pub discord_username: String,
 
+  // Visibility
+  pub is_for_private_use: bool,
+  pub is_for_public_use: bool,
+
   // Use
   pub is_for_studio: bool,
   pub is_for_twitch_tts: bool,
@@ -21,13 +25,10 @@ pub struct InsertVoiceCloneRequestBuilder {
   pub is_for_other: bool,
   pub optional_notes_on_use: Option<String>,
 
-  // Visibility
-  pub is_for_private_use: bool,
-  pub is_for_public_use: bool,
-
-  // Ownership
+  // Subject/Ownership
   pub is_own_voice: bool,
   pub is_third_party_voice: bool,
+  pub optional_notes_on_subject: Option<String>,
 
   // Equipment
   pub has_clean_audio_recordings: bool,
@@ -58,6 +59,9 @@ SET
   email_address = ?,
   discord_username = ?,
 
+  is_for_private_use = ?,
+  is_for_public_use = ?,
+
   is_for_studio = ?,
   is_for_twitch_tts = ?,
   is_for_api_use = ?,
@@ -66,11 +70,9 @@ SET
   is_for_other = ?,
   optional_notes_on_use = ?,
 
-  is_for_private_use = ?,
-  is_for_public_use = ?,
-
   is_own_voice = ?,
   is_third_party_voice = ?,
+  optional_notes_on_subject = ?,
 
   has_clean_audio_recordings = ?,
   has_good_microphone = ?,
@@ -87,6 +89,9 @@ SET
       &self.email_address,
       &self.discord_username,
 
+      &self.is_for_private_use,
+      &self.is_for_public_use,
+
       &self.is_for_studio,
       &self.is_for_twitch_tts,
       &self.is_for_api_use,
@@ -95,11 +100,9 @@ SET
       &self.is_for_other,
       &self.optional_notes_on_use,
 
-      &self.is_for_private_use,
-      &self.is_for_public_use,
-
       &self.is_own_voice,
       &self.is_third_party_voice,
+      &self.optional_notes_on_subject,
 
       &self.has_clean_audio_recordings,
       &self.has_good_microphone,

@@ -79,6 +79,8 @@ use crate::http_server::endpoints::twitch::event_rules::create_event_rule::creat
 use crate::http_server::endpoints::twitch::event_rules::list_event_rules_for_user::list_twitch_event_rules_for_user_handler;
 use crate::http_server::endpoints::twitch::event_rules::delete_event_rule::delete_twitch_event_rule_handler;
 use crate::http_server::endpoints::twitch::event_rules::edit_event_rule::edit_twitch_event_rule_handler;
+use crate::http_server::endpoints::voice_clone_requests::create_voice_clone_request::create_voice_clone_request_handler;
+use crate::http_server::endpoints::voice_clone_requests::check_if_voice_clone_request_submitted::check_if_voice_clone_request_submitted_handler;
 
 pub fn add_routes<T, B> (app: App<T, B>) -> App<T, B>
   where
@@ -97,6 +99,7 @@ pub fn add_routes<T, B> (app: App<T, B>) -> App<T, B>
   app = add_category_routes(app); /* /category */
   app = add_user_profile_routes(app); /* /user */
   app = add_api_token_routes(app); /* /api_tokens */
+  app = add_voice_clone_request_routes(app); /* /voice_clone_requests */
   app = add_twitch_oauth_routes(app); /* /twitch */ // TODO: MAYBE TEMPORARY
 
   // ==================== ACCOUNT CREATION / SESSION MANAGEMENT ====================
@@ -570,6 +573,32 @@ fn add_api_token_routes<T, B> (app: App<T, B>) -> App<T, B>
       )
   )
 }
+
+// ==================== API TOKEN ROUTES ====================
+
+fn add_voice_clone_request_routes<T, B> (app: App<T, B>) -> App<T, B>
+  where
+      B: MessageBody,
+      T: ServiceFactory<
+        ServiceRequest,
+        Config = (),
+        Response = ServiceResponse<B>,
+        Error = Error,
+        InitError = (),
+      >,
+{
+  app.service(web::scope("/voice_clone_requests")
+      .service(web::resource("/create")
+          .route(web::post().to(create_voice_clone_request_handler))
+          .route(web::head().to(|| HttpResponse::Ok()))
+      )
+      .service(web::resource("/check")
+          .route(web::post().to(check_if_voice_clone_request_submitted_handler))
+          .route(web::head().to(|| HttpResponse::Ok()))
+      )
+  )
+}
+
 
 // ==================== TWITCH ROUTES ====================
 
