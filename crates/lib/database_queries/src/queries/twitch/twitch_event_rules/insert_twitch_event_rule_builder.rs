@@ -40,7 +40,7 @@ SET
       &self.uuid_idempotency_token,
       &token,
       &self.user_token,
-      &self.event_category,
+      &self.event_category.to_str(),
       &self.event_match_predicate,
       &self.event_response,
       &self.user_specified_rule_order,
