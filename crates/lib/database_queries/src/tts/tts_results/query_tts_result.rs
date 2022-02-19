@@ -1,11 +1,10 @@
 use anyhow::anyhow;
 use chrono::{DateTime, Utc};
-use crate::AnyhowResult;
-use crate::database::enums::record_visibility::RecordVisibility;
-use crate::database::enums::vocoder_type::VocoderType;
-use database_queries::helpers::boolean_converters::nullable_i8_to_bool;
+use container_common::anyhow_result::AnyhowResult;
+use crate::column_types::record_visibility::RecordVisibility;
+use crate::column_types::vocoder_type::VocoderType;
+use crate::helpers::boolean_converters::nullable_i8_to_bool;
 use log::{info, warn, log};
-use regex::Regex;
 use sqlx::MySqlPool;
 use sqlx::error::DatabaseError;
 use sqlx::error::Error::Database;

@@ -1,7 +1,7 @@
 use actix_http::Error;
 use actix_http::http::header;
-use actix_web::cookie::Cookie;
 use actix_web::HttpResponseBuilder;
+use actix_web::cookie::Cookie;
 use actix_web::error::ResponseError;
 use actix_web::http::StatusCode;
 use actix_web::web::Path;
@@ -10,7 +10,6 @@ use chrono::{DateTime, Utc};
 use crate::AnyhowResult;
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 use crate::server_state::ServerState;
-use derive_more::{Display, Error};
 use log::{info, warn, log};
 use r2d2_redis::redis::Commands;
 use redis_common::redis_keys::RedisKeys;
@@ -19,6 +18,7 @@ use sqlx::MySqlPool;
 use sqlx::error::DatabaseError;
 use sqlx::error::Error::Database;
 use sqlx::mysql::MySqlDatabaseError;
+use std::fmt;
 use std::sync::Arc;
 
 /// For the URL PathInfo
@@ -56,7 +56,7 @@ pub struct GetW2lInferenceStatusSuccessResponse {
   pub state: W2lInferenceJobStatusForResponse,
 }
 
-#[derive(Debug, Display)]
+#[derive(Debug)]
 pub enum GetW2lInferenceStatusError {
   ServerError,
 }
@@ -92,6 +92,13 @@ impl ResponseError for GetW2lInferenceStatusError {
     };
 
     to_simple_json_error(&error_reason, self.status_code())
+  }
+}
+
+// NB: Not using derive_more::Display since Clion doesn't understand it.
+impl fmt::Display for GetW2lInferenceStatusError {
+  fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+    write!(f, "{:?}", self)
   }
 }
 

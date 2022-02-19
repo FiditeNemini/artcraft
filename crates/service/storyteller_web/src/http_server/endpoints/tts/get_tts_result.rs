@@ -1,28 +1,28 @@
 use actix_http::Error;
 use actix_http::http::header;
-use actix_web::cookie::Cookie;
 use actix_web::HttpResponseBuilder;
+use actix_web::cookie::Cookie;
 use actix_web::error::ResponseError;
 use actix_web::http::StatusCode;
 use actix_web::web::Path;
 use actix_web::{Responder, web, HttpResponse, error, HttpRequest, HttpMessage};
 use chrono::{DateTime, Utc};
 use crate::AnyhowResult;
-use crate::database::queries::query_tts_result::TtsResultRecordForResponse;
-use crate::database::queries::query_tts_result::select_tts_result_by_token;
 use crate::http_server::web_utils::ip_address::get_request_ip;
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 use crate::http_server::web_utils::session_checker::SessionRecord;
 use crate::server_state::ServerState;
 use crate::validations::passwords::validate_passwords;
 use crate::validations::username::validate_username;
-use derive_more::{Display, Error};
+use database_queries::tts::tts_results::query_tts_result::TtsResultRecordForResponse;
+use database_queries::tts::tts_results::query_tts_result::select_tts_result_by_token;
 use log::{info, warn, log};
 use regex::Regex;
 use sqlx::MySqlPool;
 use sqlx::error::DatabaseError;
 use sqlx::error::Error::Database;
 use sqlx::mysql::MySqlDatabaseError;
+use std::fmt;
 use std::sync::Arc;
 
 /// For the URL PathInfo
@@ -37,7 +37,7 @@ pub struct GetTtsResultSuccessResponse {
   pub result: TtsResultRecordForResponse,
 }
 
-#[derive(Debug, Display)]
+#[derive(Debug)]
 pub enum GetTtsResultError {
   ServerError,
   NotFound,
@@ -58,6 +58,13 @@ impl ResponseError for GetTtsResultError {
     };
 
     to_simple_json_error(&error_reason, self.status_code())
+  }
+}
+
+// NB: Not using derive_more::Display since Clion doesn't understand it.
+impl fmt::Display for GetTtsResultError {
+  fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+    write!(f, "{:?}", self)
   }
 }
 
