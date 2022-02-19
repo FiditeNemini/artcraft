@@ -5,8 +5,8 @@ use crate::column_types::twitch_event_category::TwitchEventCategory;
 use crate::helpers::boolean_converters::i8_to_bool;
 use sqlx::MySqlPool;
 
-/// table: api_tokens
-#[derive(Debug)]
+// TODO: This is exposed to the frontend. Write a different struct.
+#[derive(Debug, Serialize)]
 pub struct TwitchEventRule {
   pub token: String,
   pub event_category: TwitchEventCategory,

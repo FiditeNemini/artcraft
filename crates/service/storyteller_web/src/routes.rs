@@ -48,9 +48,9 @@ use crate::http_server::endpoints::tts::get_tts_model_use_count::get_tts_model_u
 use crate::http_server::endpoints::tts::get_tts_result::get_tts_inference_result_handler;
 use crate::http_server::endpoints::tts::get_tts_upload_model_job_status::get_tts_upload_model_job_status_handler;
 use crate::http_server::endpoints::tts::list_tts_models::list_tts_models_handler;
-use crate::http_server::endpoints::twitch::oauth_begin_json::oauth_begin_enroll_json;
-use crate::http_server::endpoints::twitch::oauth_begin_redirect::oauth_begin_enroll_redirect;
-use crate::http_server::endpoints::twitch::oauth_end::oauth_end_enroll_from_redirect;
+use crate::http_server::endpoints::twitch::oauth::oauth_begin_json::oauth_begin_enroll_json;
+use crate::http_server::endpoints::twitch::oauth::oauth_begin_redirect::oauth_begin_enroll_redirect;
+use crate::http_server::endpoints::twitch::oauth::oauth_end::oauth_end_enroll_from_redirect;
 use crate::http_server::endpoints::users::create_account::create_account_handler;
 use crate::http_server::endpoints::users::edit_profile::edit_profile_handler;
 use crate::http_server::endpoints::users::get_profile::get_profile_handler;
@@ -75,6 +75,10 @@ use crate::http_server::endpoints::w2l::get_w2l_template_use_count::get_w2l_temp
 use crate::http_server::endpoints::w2l::get_w2l_upload_template_job_status::get_w2l_upload_template_job_status_handler;
 use crate::http_server::endpoints::w2l::list_w2l_templates::list_w2l_templates_handler;
 use crate::http_server::endpoints::w2l::set_w2l_template_mod_approval::set_w2l_template_mod_approval_handler;
+use crate::http_server::endpoints::twitch::event_rules::create_event_rule::create_twitch_event_rule_handler;
+use crate::http_server::endpoints::twitch::event_rules::list_event_rules_for_user::list_twitch_event_rules_for_user_handler;
+use crate::http_server::endpoints::twitch::event_rules::delete_event_rule::delete_twitch_event_rule_handler;
+use crate::http_server::endpoints::twitch::event_rules::edit_event_rule::edit_twitch_event_rule_handler;
 
 pub fn add_routes<T, B> (app: App<T, B>) -> App<T, B>
   where
@@ -583,6 +587,7 @@ fn add_twitch_oauth_routes<T, B> (app: App<T, B>) -> App<T, B>
         InitError = (),
       >,
 {
+  // TODO: Move oauth endpoints under /twitch/oauth (requires updating Twitch configs too.)
   app.service(web::scope("/twitch")
     .service(web::resource("/oauth_enroll_json")
       .route(web::get().to(oauth_begin_enroll_json))
@@ -595,6 +600,24 @@ fn add_twitch_oauth_routes<T, B> (app: App<T, B>) -> App<T, B>
     .service(web::resource("/oauth_landing")
       .route(web::get().to(oauth_end_enroll_from_redirect))
       .route(web::head().to(|| HttpResponse::Ok()))
+    )
+    .service(web::scope("/event_rule")
+        .service(web::resource("/create")
+            .route(web::post().to(create_twitch_event_rule_handler))
+            .route(web::head().to(|| HttpResponse::Ok()))
+        )
+        .service(web::resource("/list")
+            .route(web::get().to(list_twitch_event_rules_for_user_handler))
+            .route(web::head().to(|| HttpResponse::Ok()))
+        )
+        .service(web::resource("/update/{token}")
+            .route(web::post().to(edit_twitch_event_rule_handler))
+            .route(web::head().to(|| HttpResponse::Ok()))
+        )
+        .service(web::resource("/delete/{token}")
+            .route(web::delete().to(delete_twitch_event_rule_handler))
+            .route(web::head().to(|| HttpResponse::Ok()))
+        )
     )
   )
 }

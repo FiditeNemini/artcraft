@@ -68,7 +68,7 @@ impl Tokens {
   }
 
   pub fn new_api_token_internal_token() -> AnyhowResult<String> {
-    random_prefix_crockford_token("AIT:", 32, false)
+    random_prefix_crockford_token("INT_API:", 32, false)
   }
 
   // ========== [Twitch] Tokens not typically visible to users ==========
