@@ -59,6 +59,10 @@ impl Tokens {
     random_prefix_crockford_token("EV:", 32, false)
   }
 
+  pub fn new_voice_clone_request_token() -> AnyhowResult<String> {
+    random_prefix_crockford_token("VCR:", 32, false)
+  }
+
   pub fn new_category() -> AnyhowResult<String> {
     random_prefix_crockford_token("CAT:", 15, false)
   }

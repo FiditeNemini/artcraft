@@ -10,3 +10,4 @@ pub mod tts;
 pub mod twitch_event_rules;
 pub mod twitch_oauth;
 pub mod twitch_pubsub;
+pub mod voice_clone_requests;

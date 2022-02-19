@@ -38,6 +38,10 @@ CREATE TABLE voice_clone_requests(
   is_for_private_use BOOLEAN NOT NULL DEFAULT FALSE,
   is_for_public_use BOOLEAN NOT NULL DEFAULT FALSE,
 
+  -- Ownership
+  is_own_voice BOOLEAN NOT NULL DEFAULT FALSE,
+  is_third_party_voice BOOLEAN NOT NULL DEFAULT FALSE,
+
   -- ========== RECORDING QUALITY / EQUIPMENT ==========
 
   has_clean_audio_recordings BOOLEAN NOT NULL DEFAULT FALSE,
