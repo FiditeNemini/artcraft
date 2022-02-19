@@ -1,7 +1,7 @@
 use anyhow::anyhow;
 use chrono::{DateTime, Utc};
 use container_common::anyhow_result::AnyhowResult;
-use database_queries::helpers::boolean_converters::i8_to_bool;
+use crate::helpers::boolean_converters::i8_to_bool;
 use log::{warn, info};
 use sqlx::MySqlPool;
 
@@ -36,7 +36,7 @@ pub struct UserRoleForList {
   pub updated_at : DateTime<Utc>,
 }
 
-pub struct RawDbUserRoleForList {
+struct RawDbUserRoleForList {
   slug: String,
   name: String,
 

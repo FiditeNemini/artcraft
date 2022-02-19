@@ -8,13 +8,12 @@ use actix_web::web::Path;
 use actix_web::{Responder, web, HttpResponse, error, HttpRequest, HttpMessage};
 use anyhow::anyhow;
 use chrono::{DateTime, Utc};
-use crate::AnyhowResult;
-use crate::database::queries::list_user_badges::UserBadgeForList;
-use crate::database::queries::list_user_badges::list_user_badges;
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 use crate::server_state::ServerState;
 use database_queries::column_types::record_visibility::RecordVisibility;
 use database_queries::helpers::boolean_converters::i8_to_bool;
+use database_queries::users::user_badges::list_user_badges::UserBadgeForList;
+use database_queries::users::user_badges::list_user_badges::list_user_badges;
 use log::{info, warn, log};
 use md5::{Md5, Digest};
 use regex::Regex;
@@ -26,6 +25,7 @@ use std::fmt;
 use std::sync::Arc;
 
 // TODO: This is duplicated in query_user_profile
+// TODO: This handler has embedded queries.
 
 #[derive(Serialize)]
 pub struct UserProfileRecordForResponse {

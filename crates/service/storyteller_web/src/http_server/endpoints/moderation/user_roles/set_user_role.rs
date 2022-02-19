@@ -1,13 +1,11 @@
 use actix_http::Error;
 use actix_http::http::header;
-use actix_web::cookie::Cookie;
 use actix_web::HttpResponseBuilder;
+use actix_web::cookie::Cookie;
 use actix_web::error::ResponseError;
 use actix_web::http::StatusCode;
 use actix_web::web::Path;
 use actix_web::{Responder, web, HttpResponse, error, HttpRequest};
-use crate::database::queries::list_user_roles::list_user_roles;
-use crate::database::queries::get_user_profile_by_username::get_user_profile_by_username;
 use crate::http_server::web_utils::ip_address::get_request_ip;
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 use crate::http_server::web_utils::response_success_helpers::simple_json_success;
@@ -15,12 +13,14 @@ use crate::server_state::ServerState;
 use crate::validations::model_uploads::validate_model_title;
 use crate::validations::passwords::validate_passwords;
 use crate::validations::username::validate_username;
-use derive_more::{Display, Error};
+use database_queries::users::get_user_profile_by_username::get_user_profile_by_username;
+use database_queries::users::user_roles::list_user_roles::list_user_roles;
 use log::{info, warn, log};
 use regex::Regex;
 use sqlx::error::DatabaseError;
 use sqlx::error::Error::Database;
 use sqlx::mysql::MySqlDatabaseError;
+use std::fmt;
 use std::sync::Arc;
 
 /// For the URL PathInfo
@@ -34,7 +34,7 @@ pub struct SetUserRoleRequest {
   user_role_slug: String,
 }
 
-#[derive(Debug, Display)]
+#[derive(Debug)]
 pub enum SetUserRoleError {
   BadInput(String),
   NotAuthorized,
@@ -61,6 +61,13 @@ impl ResponseError for SetUserRoleError {
     };
 
     to_simple_json_error(&error_reason, self.status_code())
+  }
+}
+
+// NB: Not using derive_more::Display since Clion doesn't understand it.
+impl fmt::Display for SetUserRoleError {
+  fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+    write!(f, "{:?}", self)
   }
 }
 

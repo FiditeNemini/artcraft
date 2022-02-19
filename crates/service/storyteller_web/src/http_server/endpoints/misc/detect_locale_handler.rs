@@ -14,6 +14,7 @@ use crate::server_state::ServerState;
 use crate::util::email_to_gravatar::email_to_gravatar;
 use crate::util::markdown_to_html::markdown_to_html;
 use http_server_common::request::get_request_header_optional::get_request_header_optional;
+use http_server_common::request::parse_accept_language::parse_accept_language;
 use http_server_common::response::serialize_as_json_error::serialize_as_json_error;
 use log::{info, warn, log};
 use regex::Regex;
@@ -23,7 +24,6 @@ use sqlx::error::Error::Database;
 use sqlx::mysql::MySqlDatabaseError;
 use std::fmt;
 use std::sync::Arc;
-use http_server_common::request::parse_accept_language::parse_accept_language;
 
 // =============== Success Response ===============
 

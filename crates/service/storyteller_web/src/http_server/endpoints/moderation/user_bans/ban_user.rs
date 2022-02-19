@@ -1,16 +1,15 @@
 use actix_http::Error;
 use actix_http::http::header;
-use actix_web::cookie::Cookie;
 use actix_web::HttpResponseBuilder;
+use actix_web::cookie::Cookie;
 use actix_web::error::ResponseError;
 use actix_web::http::StatusCode;
 use actix_web::{Responder, web, HttpResponse, error, HttpRequest};
-use crate::database::queries::get_user_profile_by_username::get_user_profile_by_username;
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 use crate::http_server::web_utils::response_success_helpers::simple_json_success;
 use crate::http_server::web_utils::serialize_as_json_error::serialize_as_json_error;
 use crate::server_state::ServerState;
-use derive_more::{Display, Error};
+use database_queries::users::get_user_profile_by_username::get_user_profile_by_username;
 use log::{info, warn, log};
 use regex::Regex;
 use sqlx::error::DatabaseError;

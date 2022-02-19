@@ -13,7 +13,7 @@ pub struct UserBadgeForList {
   pub granted_at: DateTime<Utc>,
 }
 
-pub struct RawDbUserBadgeForList {
+struct RawDbUserBadgeForList {
   slug: String,
   title: String,
   description: String,
@@ -65,11 +65,11 @@ WHERE
   Ok(user_badges.into_iter()
       .map(|badge| {
         UserBadgeForList {
-          slug: badge.slug.clone(),
-          title: badge.title.clone(),
-          description: badge.description.clone(),
-          image_url: badge.image_url.clone(),
-          granted_at: badge.user_created_at.clone(),
+          slug: badge.slug,
+          title: badge.title,
+          description: badge.description,
+          image_url: badge.image_url,
+          granted_at: badge.user_created_at,
         }
       })
       .collect::<Vec<UserBadgeForList>>())

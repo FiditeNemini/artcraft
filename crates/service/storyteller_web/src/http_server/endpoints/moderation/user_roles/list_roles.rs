@@ -1,14 +1,12 @@
 use actix_http::Error;
 use actix_http::http::header;
-use actix_web::cookie::Cookie;
 use actix_web::HttpResponseBuilder;
+use actix_web::cookie::Cookie;
 use actix_web::error::ResponseError;
 use actix_web::http::StatusCode;
 use actix_web::web::Path;
 use actix_web::{Responder, web, HttpResponse, error, HttpRequest};
 use chrono::{DateTime, Utc};
-use crate::database::queries::list_user_roles::UserRoleForList;
-use crate::database::queries::list_user_roles::list_user_roles;
 use crate::http_server::web_utils::ip_address::get_request_ip;
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 use crate::http_server::web_utils::response_success_helpers::simple_json_success;
@@ -16,12 +14,13 @@ use crate::server_state::ServerState;
 use crate::validations::model_uploads::validate_model_title;
 use crate::validations::passwords::validate_passwords;
 use crate::validations::username::validate_username;
-use derive_more::{Display, Error};
+use database_queries::users::user_roles::list_user_roles::{UserRoleForList, list_user_roles};
 use log::{info, warn, log};
 use regex::Regex;
 use sqlx::error::DatabaseError;
 use sqlx::error::Error::Database;
 use sqlx::mysql::MySqlDatabaseError;
+use std::fmt;
 use std::sync::Arc;
 
 #[derive(Serialize)]
@@ -30,7 +29,7 @@ pub struct ListUserRolesResponse {
   pub user_roles: Vec<UserRoleForList>,
 }
 
-#[derive(Debug, Display)]
+#[derive(Debug)]
 pub enum ListUserRolesError {
   BadInput(String),
   ServerError,
@@ -54,6 +53,13 @@ impl ResponseError for ListUserRolesError {
     };
 
     to_simple_json_error(&error_reason, self.status_code())
+  }
+}
+
+// NB: Not using derive_more::Display since Clion doesn't understand it.
+impl fmt::Display for ListUserRolesError {
+  fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+    write!(f, "{:?}", self)
   }
 }
 

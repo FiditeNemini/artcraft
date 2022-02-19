@@ -1,6 +1,6 @@
 use chrono::{DateTime, Utc};
 use container_common::anyhow_result::AnyhowResult;
-use database_queries::helpers::boolean_converters::i8_to_bool;
+use crate::helpers::boolean_converters::i8_to_bool;
 use sqlx::MySqlPool;
 
 /// NB: This is not to be shared externally.
@@ -137,7 +137,7 @@ FROM users
 }
 
 #[derive(sqlx::FromRow)]
-pub struct UserForListRaw {
+struct UserForListRaw {
   pub user_id: i64,
   pub user_token: String,
 
