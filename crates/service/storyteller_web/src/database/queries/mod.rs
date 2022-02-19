@@ -1,5 +1,4 @@
 pub mod badges;
-pub mod calculate_w2l_template_leaderboard;
 pub mod categories;
 pub mod create_session;
 pub mod delete_w2l_result;

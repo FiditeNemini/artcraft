@@ -13,7 +13,7 @@ pub struct TtsLeaderboardRecordForList {
 }
 
 #[derive(Serialize)]
-pub struct TtsLeaderboardRecordForListRaw {
+struct TtsLeaderboardRecordForListRaw {
   pub username: String,
   pub display_name: String,
   pub gravatar_hash: String,

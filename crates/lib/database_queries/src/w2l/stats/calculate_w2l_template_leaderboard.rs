@@ -13,7 +13,7 @@ pub struct W2lLeaderboardRecordForList {
 }
 
 #[derive(Serialize)]
-pub struct W2lLeaderboardRecordForListRaw {
+struct W2lLeaderboardRecordForListRaw {
   pub username: String,
   pub display_name: String,
   pub gravatar_hash: String,
