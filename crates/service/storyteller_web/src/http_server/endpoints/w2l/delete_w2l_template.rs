@@ -6,11 +6,11 @@ use actix_web::error::ResponseError;
 use actix_web::http::StatusCode;
 use actix_web::web::Path;
 use actix_web::{Responder, web, HttpResponse, error, HttpRequest};
-use crate::database::queries::delete_w2l_template::delete_w2l_template_as_mod;
-use crate::database::queries::delete_w2l_template::delete_w2l_template_as_user;
-use crate::database::queries::delete_w2l_template::undelete_w2l_template_as_mod;
-use crate::database::queries::delete_w2l_template::undelete_w2l_template_as_user;
-use crate::database::queries::query_w2l_template::select_w2l_template_by_token;
+use database_queries::w2l::w2l_templates::delete_w2l_template_various_scopes::delete_w2l_template_as_mod;
+use database_queries::w2l::w2l_templates::delete_w2l_template_various_scopes::delete_w2l_template_as_user;
+use database_queries::w2l::w2l_templates::delete_w2l_template_various_scopes::undelete_w2l_template_as_mod;
+use database_queries::w2l::w2l_templates::delete_w2l_template_various_scopes::undelete_w2l_template_as_user;
+use database_queries::w2l::w2l_templates::get_w2l_template::select_w2l_template_by_token;
 use crate::http_server::web_utils::ip_address::get_request_ip;
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 use crate::http_server::web_utils::response_success_helpers::simple_json_success;
@@ -20,8 +20,8 @@ use crate::util::delete_role_disambiguation::delete_role_disambiguation;
 use crate::validations::model_uploads::validate_model_title;
 use crate::validations::passwords::validate_passwords;
 use crate::validations::username::validate_username;
-use derive_more::{Display, Error};
 use log::{info, warn, log};
+use std::fmt;
 use regex::Regex;
 use sqlx::MySqlPool;
 use sqlx::error::DatabaseError;
@@ -42,7 +42,7 @@ pub struct DeleteW2lTemplateRequest {
   as_mod: Option<bool>,
 }
 
-#[derive(Debug, Display)]
+#[derive(Debug)]
 pub enum DeleteW2lTemplateError {
   BadInput(String),
   NotAuthorized,
@@ -69,6 +69,13 @@ impl ResponseError for DeleteW2lTemplateError {
     };
 
     to_simple_json_error(&error_reason, self.status_code())
+  }
+}
+
+// NB: Not using derive_more::Display since Clion doesn't understand it.
+impl fmt::Display for DeleteW2lTemplateError {
+  fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+    write!(f, "{:?}", self)
   }
 }
 

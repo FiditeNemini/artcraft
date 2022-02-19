@@ -1,16 +1,17 @@
 use anyhow::anyhow;
 use chrono::{DateTime, Utc};
-use crate::AnyhowResult;
-use database_queries::column_types::record_visibility::RecordVisibility;
-use database_queries::helpers::boolean_converters::{nullable_i8_to_optional_bool, i8_to_bool};
-use derive_more::{Display, Error};
+use container_common::anyhow_result::AnyhowResult;
+use crate::column_types::record_visibility::RecordVisibility;
+use crate::helpers::boolean_converters::{nullable_i8_to_optional_bool, i8_to_bool};
 use log::{info, warn, log};
-use regex::Regex;
 use sqlx::MySqlPool;
 use sqlx::error::DatabaseError;
 use sqlx::error::Error::Database;
 use sqlx::mysql::MySqlDatabaseError;
 use std::sync::Arc;
+
+// FIXME: This is the old style of query scoping and shouldn't be copied.
+//  The moderator-only fields are good practice, though.
 
 #[derive(Serialize)]
 pub struct W2lTemplateRecordForResponse {

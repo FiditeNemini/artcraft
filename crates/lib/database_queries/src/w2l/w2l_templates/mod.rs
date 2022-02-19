@@ -1,0 +1,2 @@
+pub mod delete_w2l_template_various_scopes;
+pub mod get_w2l_template;
