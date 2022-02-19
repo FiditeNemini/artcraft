@@ -1868,6 +1868,16 @@
       ]
     }
   },
+  "4cea10944b8869419ecdfea30c58f49a87c090b9083078043177c33737ecb949": {
+    "query": "\nINSERT INTO voice_clone_requests\nSET\n  token = ?,\n  uuid_idempotency_token = ?,\n\n  maybe_user_token = ?,\n  email_address = ?,\n  discord_username = ?,\n\n  is_for_private_use = ?,\n  is_for_public_use = ?,\n\n  is_for_studio = ?,\n  is_for_twitch_tts = ?,\n  is_for_api_use = ?,\n  is_for_music = ?,\n  is_for_games = ?,\n  is_for_other = ?,\n  optional_notes_on_use = ?,\n\n  is_own_voice = ?,\n  is_third_party_voice = ?,\n  optional_notes_on_subject = ?,\n\n  has_clean_audio_recordings = ?,\n  has_good_microphone = ?,\n\n  optional_questions = ?,\n  optional_extra_comments = ?,\n\n  ip_address_creation = ?\n        ",
+    "describe": {
+      "columns": [],
+      "parameters": {
+        "Right": 22
+      },
+      "nullable": []
+    }
+  },
   "4df4765816d8c431a241b5ea2e7e9b292bf8e603937b095fe256cbc8a7a165f6": {
     "query": "\nSELECT\n  internal_token,\n  api_token,\n  maybe_short_description,\n  created_at,\n  updated_at\nFROM api_tokens\nWHERE\n  user_token = ?\n  AND deleted_at IS NULL\nORDER BY created_at DESC\nLIMIT 5\n        ",
     "describe": {
@@ -3337,291 +3347,6 @@
       "nullable": []
     }
   },
-  "6768d25558d29345eeb5aa43285485bf7b23e90834b27aacdc2da700a3440a03": {
-    "query": "\nSELECT\n  token,\n\n  maybe_user_token,\n  email_address,\n  discord_username,\n\n  is_for_studio,\n  is_for_twitch_tts,\n  is_for_api_use,\n  is_for_music,\n  is_for_games,\n  is_for_other,\n  optional_notes_on_use,\n\n  is_for_private_use,\n  is_for_public_use,\n\n  is_own_voice,\n  is_third_party_voice,\n\n  has_clean_audio_recordings,\n  has_good_microphone,\n\n  optional_questions,\n  optional_extra_comments,\n\n  created_at,\n  updated_at\nFROM voice_clone_requests\nWHERE\n  token = ?\n        ",
-    "describe": {
-      "columns": [
-        {
-          "ordinal": 0,
-          "name": "token",
-          "type_info": {
-            "type": "VarString",
-            "flags": {
-              "bits": 4229
-            },
-            "char_set": 224,
-            "max_size": 128
-          }
-        },
-        {
-          "ordinal": 1,
-          "name": "maybe_user_token",
-          "type_info": {
-            "type": "VarString",
-            "flags": {
-              "bits": 136
-            },
-            "char_set": 224,
-            "max_size": 128
-          }
-        },
-        {
-          "ordinal": 2,
-          "name": "email_address",
-          "type_info": {
-            "type": "VarString",
-            "flags": {
-              "bits": 4225
-            },
-            "char_set": 224,
-            "max_size": 1020
-          }
-        },
-        {
-          "ordinal": 3,
-          "name": "discord_username",
-          "type_info": {
-            "type": "VarString",
-            "flags": {
-              "bits": 4225
-            },
-            "char_set": 224,
-            "max_size": 1020
-          }
-        },
-        {
-          "ordinal": 4,
-          "name": "is_for_studio",
-          "type_info": {
-            "type": "Tiny",
-            "flags": {
-              "bits": 1
-            },
-            "char_set": 63,
-            "max_size": 1
-          }
-        },
-        {
-          "ordinal": 5,
-          "name": "is_for_twitch_tts",
-          "type_info": {
-            "type": "Tiny",
-            "flags": {
-              "bits": 1
-            },
-            "char_set": 63,
-            "max_size": 1
-          }
-        },
-        {
-          "ordinal": 6,
-          "name": "is_for_api_use",
-          "type_info": {
-            "type": "Tiny",
-            "flags": {
-              "bits": 1
-            },
-            "char_set": 63,
-            "max_size": 1
-          }
-        },
-        {
-          "ordinal": 7,
-          "name": "is_for_music",
-          "type_info": {
-            "type": "Tiny",
-            "flags": {
-              "bits": 1
-            },
-            "char_set": 63,
-            "max_size": 1
-          }
-        },
-        {
-          "ordinal": 8,
-          "name": "is_for_games",
-          "type_info": {
-            "type": "Tiny",
-            "flags": {
-              "bits": 1
-            },
-            "char_set": 63,
-            "max_size": 1
-          }
-        },
-        {
-          "ordinal": 9,
-          "name": "is_for_other",
-          "type_info": {
-            "type": "Tiny",
-            "flags": {
-              "bits": 1
-            },
-            "char_set": 63,
-            "max_size": 1
-          }
-        },
-        {
-          "ordinal": 10,
-          "name": "optional_notes_on_use",
-          "type_info": {
-            "type": "Blob",
-            "flags": {
-              "bits": 144
-            },
-            "char_set": 224,
-            "max_size": 67108860
-          }
-        },
-        {
-          "ordinal": 11,
-          "name": "is_for_private_use",
-          "type_info": {
-            "type": "Tiny",
-            "flags": {
-              "bits": 1
-            },
-            "char_set": 63,
-            "max_size": 1
-          }
-        },
-        {
-          "ordinal": 12,
-          "name": "is_for_public_use",
-          "type_info": {
-            "type": "Tiny",
-            "flags": {
-              "bits": 1
-            },
-            "char_set": 63,
-            "max_size": 1
-          }
-        },
-        {
-          "ordinal": 13,
-          "name": "is_own_voice",
-          "type_info": {
-            "type": "Tiny",
-            "flags": {
-              "bits": 1
-            },
-            "char_set": 63,
-            "max_size": 1
-          }
-        },
-        {
-          "ordinal": 14,
-          "name": "is_third_party_voice",
-          "type_info": {
-            "type": "Tiny",
-            "flags": {
-              "bits": 1
-            },
-            "char_set": 63,
-            "max_size": 1
-          }
-        },
-        {
-          "ordinal": 15,
-          "name": "has_clean_audio_recordings",
-          "type_info": {
-            "type": "Tiny",
-            "flags": {
-              "bits": 1
-            },
-            "char_set": 63,
-            "max_size": 1
-          }
-        },
-        {
-          "ordinal": 16,
-          "name": "has_good_microphone",
-          "type_info": {
-            "type": "Tiny",
-            "flags": {
-              "bits": 1
-            },
-            "char_set": 63,
-            "max_size": 1
-          }
-        },
-        {
-          "ordinal": 17,
-          "name": "optional_questions",
-          "type_info": {
-            "type": "Blob",
-            "flags": {
-              "bits": 144
-            },
-            "char_set": 224,
-            "max_size": 67108860
-          }
-        },
-        {
-          "ordinal": 18,
-          "name": "optional_extra_comments",
-          "type_info": {
-            "type": "Blob",
-            "flags": {
-              "bits": 144
-            },
-            "char_set": 224,
-            "max_size": 67108860
-          }
-        },
-        {
-          "ordinal": 19,
-          "name": "created_at",
-          "type_info": {
-            "type": "Timestamp",
-            "flags": {
-              "bits": 1153
-            },
-            "char_set": 63,
-            "max_size": 19
-          }
-        },
-        {
-          "ordinal": 20,
-          "name": "updated_at",
-          "type_info": {
-            "type": "Timestamp",
-            "flags": {
-              "bits": 9345
-            },
-            "char_set": 63,
-            "max_size": 19
-          }
-        }
-      ],
-      "parameters": {
-        "Right": 1
-      },
-      "nullable": [
-        false,
-        true,
-        false,
-        false,
-        false,
-        false,
-        false,
-        false,
-        false,
-        false,
-        true,
-        false,
-        false,
-        false,
-        false,
-        false,
-        false,
-        true,
-        true,
-        false,
-        false
-      ]
-    }
-  },
   "6aaa7c04e6984434bd2feb6f42a9014cd45e995b94e4d5e29f2d502f09136691": {
     "query": "\nUPDATE tts_models\nSET\n  maybe_mod_user_token = ?,\n  mod_deleted_at = NULL\nWHERE\n  token = ?\nLIMIT 1\n        ",
     "describe": {
@@ -4565,6 +4290,304 @@
         false,
         false,
         true
+      ]
+    }
+  },
+  "922a7dbcfa24a2c5901d0453c229b066b3b4eea2c73fa533651bb27365f17be0": {
+    "query": "\nSELECT\n  token,\n\n  maybe_user_token,\n  email_address,\n  discord_username,\n\n  is_for_private_use,\n  is_for_public_use,\n\n  is_for_studio,\n  is_for_twitch_tts,\n  is_for_api_use,\n  is_for_music,\n  is_for_games,\n  is_for_other,\n  optional_notes_on_use,\n\n  is_own_voice,\n  is_third_party_voice,\n  optional_notes_on_subject,\n\n  has_clean_audio_recordings,\n  has_good_microphone,\n\n  optional_questions,\n  optional_extra_comments,\n\n  created_at,\n  updated_at\nFROM voice_clone_requests\nWHERE\n  token = ?\n        ",
+    "describe": {
+      "columns": [
+        {
+          "ordinal": 0,
+          "name": "token",
+          "type_info": {
+            "type": "VarString",
+            "flags": {
+              "bits": 4229
+            },
+            "char_set": 224,
+            "max_size": 128
+          }
+        },
+        {
+          "ordinal": 1,
+          "name": "maybe_user_token",
+          "type_info": {
+            "type": "VarString",
+            "flags": {
+              "bits": 136
+            },
+            "char_set": 224,
+            "max_size": 128
+          }
+        },
+        {
+          "ordinal": 2,
+          "name": "email_address",
+          "type_info": {
+            "type": "VarString",
+            "flags": {
+              "bits": 4225
+            },
+            "char_set": 224,
+            "max_size": 1020
+          }
+        },
+        {
+          "ordinal": 3,
+          "name": "discord_username",
+          "type_info": {
+            "type": "VarString",
+            "flags": {
+              "bits": 4225
+            },
+            "char_set": 224,
+            "max_size": 1020
+          }
+        },
+        {
+          "ordinal": 4,
+          "name": "is_for_private_use",
+          "type_info": {
+            "type": "Tiny",
+            "flags": {
+              "bits": 1
+            },
+            "char_set": 63,
+            "max_size": 1
+          }
+        },
+        {
+          "ordinal": 5,
+          "name": "is_for_public_use",
+          "type_info": {
+            "type": "Tiny",
+            "flags": {
+              "bits": 1
+            },
+            "char_set": 63,
+            "max_size": 1
+          }
+        },
+        {
+          "ordinal": 6,
+          "name": "is_for_studio",
+          "type_info": {
+            "type": "Tiny",
+            "flags": {
+              "bits": 1
+            },
+            "char_set": 63,
+            "max_size": 1
+          }
+        },
+        {
+          "ordinal": 7,
+          "name": "is_for_twitch_tts",
+          "type_info": {
+            "type": "Tiny",
+            "flags": {
+              "bits": 1
+            },
+            "char_set": 63,
+            "max_size": 1
+          }
+        },
+        {
+          "ordinal": 8,
+          "name": "is_for_api_use",
+          "type_info": {
+            "type": "Tiny",
+            "flags": {
+              "bits": 1
+            },
+            "char_set": 63,
+            "max_size": 1
+          }
+        },
+        {
+          "ordinal": 9,
+          "name": "is_for_music",
+          "type_info": {
+            "type": "Tiny",
+            "flags": {
+              "bits": 1
+            },
+            "char_set": 63,
+            "max_size": 1
+          }
+        },
+        {
+          "ordinal": 10,
+          "name": "is_for_games",
+          "type_info": {
+            "type": "Tiny",
+            "flags": {
+              "bits": 1
+            },
+            "char_set": 63,
+            "max_size": 1
+          }
+        },
+        {
+          "ordinal": 11,
+          "name": "is_for_other",
+          "type_info": {
+            "type": "Tiny",
+            "flags": {
+              "bits": 1
+            },
+            "char_set": 63,
+            "max_size": 1
+          }
+        },
+        {
+          "ordinal": 12,
+          "name": "optional_notes_on_use",
+          "type_info": {
+            "type": "Blob",
+            "flags": {
+              "bits": 144
+            },
+            "char_set": 224,
+            "max_size": 67108860
+          }
+        },
+        {
+          "ordinal": 13,
+          "name": "is_own_voice",
+          "type_info": {
+            "type": "Tiny",
+            "flags": {
+              "bits": 1
+            },
+            "char_set": 63,
+            "max_size": 1
+          }
+        },
+        {
+          "ordinal": 14,
+          "name": "is_third_party_voice",
+          "type_info": {
+            "type": "Tiny",
+            "flags": {
+              "bits": 1
+            },
+            "char_set": 63,
+            "max_size": 1
+          }
+        },
+        {
+          "ordinal": 15,
+          "name": "optional_notes_on_subject",
+          "type_info": {
+            "type": "VarString",
+            "flags": {
+              "bits": 128
+            },
+            "char_set": 224,
+            "max_size": 1020
+          }
+        },
+        {
+          "ordinal": 16,
+          "name": "has_clean_audio_recordings",
+          "type_info": {
+            "type": "Tiny",
+            "flags": {
+              "bits": 1
+            },
+            "char_set": 63,
+            "max_size": 1
+          }
+        },
+        {
+          "ordinal": 17,
+          "name": "has_good_microphone",
+          "type_info": {
+            "type": "Tiny",
+            "flags": {
+              "bits": 1
+            },
+            "char_set": 63,
+            "max_size": 1
+          }
+        },
+        {
+          "ordinal": 18,
+          "name": "optional_questions",
+          "type_info": {
+            "type": "Blob",
+            "flags": {
+              "bits": 144
+            },
+            "char_set": 224,
+            "max_size": 67108860
+          }
+        },
+        {
+          "ordinal": 19,
+          "name": "optional_extra_comments",
+          "type_info": {
+            "type": "Blob",
+            "flags": {
+              "bits": 144
+            },
+            "char_set": 224,
+            "max_size": 67108860
+          }
+        },
+        {
+          "ordinal": 20,
+          "name": "created_at",
+          "type_info": {
+            "type": "Timestamp",
+            "flags": {
+              "bits": 1153
+            },
+            "char_set": 63,
+            "max_size": 19
+          }
+        },
+        {
+          "ordinal": 21,
+          "name": "updated_at",
+          "type_info": {
+            "type": "Timestamp",
+            "flags": {
+              "bits": 9345
+            },
+            "char_set": 63,
+            "max_size": 19
+          }
+        }
+      ],
+      "parameters": {
+        "Right": 1
+      },
+      "nullable": [
+        false,
+        true,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        true,
+        false,
+        false,
+        true,
+        false,
+        false,
+        true,
+        true,
+        false,
+        false
       ]
     }
   },
@@ -6547,14 +6570,302 @@
       "nullable": []
     }
   },
-  "e954932f95837c915c943aabdf55cf7535340036e32d4fba4c43a67d66bb21e0": {
-    "query": "\nINSERT INTO voice_clone_requests\nSET\n  token = ?,\n  uuid_idempotency_token = ?,\n\n  maybe_user_token = ?,\n  email_address = ?,\n  discord_username = ?,\n\n  is_for_studio = ?,\n  is_for_twitch_tts = ?,\n  is_for_api_use = ?,\n  is_for_music = ?,\n  is_for_games = ?,\n  is_for_other = ?,\n  optional_notes_on_use = ?,\n\n  is_for_private_use = ?,\n  is_for_public_use = ?,\n\n  is_own_voice = ?,\n  is_third_party_voice = ?,\n\n  has_clean_audio_recordings = ?,\n  has_good_microphone = ?,\n\n  optional_questions = ?,\n  optional_extra_comments = ?,\n\n  ip_address_creation = ?\n        ",
+  "e5ef2bda28221a570da6dcfa73e76cae9910a0b4ee53005a87176ecf1be73dd7": {
+    "query": "\nSELECT\n  token,\n\n  maybe_user_token,\n  email_address,\n  discord_username,\n\n  is_for_private_use,\n  is_for_public_use,\n\n  is_for_studio,\n  is_for_twitch_tts,\n  is_for_api_use,\n  is_for_music,\n  is_for_games,\n  is_for_other,\n  optional_notes_on_use,\n\n  is_own_voice,\n  is_third_party_voice,\n  optional_notes_on_subject,\n\n  has_clean_audio_recordings,\n  has_good_microphone,\n\n  optional_questions,\n  optional_extra_comments,\n\n  created_at,\n  updated_at\nFROM voice_clone_requests\nWHERE\n  maybe_user_token = ?\n        ",
     "describe": {
-      "columns": [],
+      "columns": [
+        {
+          "ordinal": 0,
+          "name": "token",
+          "type_info": {
+            "type": "VarString",
+            "flags": {
+              "bits": 4229
+            },
+            "char_set": 224,
+            "max_size": 128
+          }
+        },
+        {
+          "ordinal": 1,
+          "name": "maybe_user_token",
+          "type_info": {
+            "type": "VarString",
+            "flags": {
+              "bits": 136
+            },
+            "char_set": 224,
+            "max_size": 128
+          }
+        },
+        {
+          "ordinal": 2,
+          "name": "email_address",
+          "type_info": {
+            "type": "VarString",
+            "flags": {
+              "bits": 4225
+            },
+            "char_set": 224,
+            "max_size": 1020
+          }
+        },
+        {
+          "ordinal": 3,
+          "name": "discord_username",
+          "type_info": {
+            "type": "VarString",
+            "flags": {
+              "bits": 4225
+            },
+            "char_set": 224,
+            "max_size": 1020
+          }
+        },
+        {
+          "ordinal": 4,
+          "name": "is_for_private_use",
+          "type_info": {
+            "type": "Tiny",
+            "flags": {
+              "bits": 1
+            },
+            "char_set": 63,
+            "max_size": 1
+          }
+        },
+        {
+          "ordinal": 5,
+          "name": "is_for_public_use",
+          "type_info": {
+            "type": "Tiny",
+            "flags": {
+              "bits": 1
+            },
+            "char_set": 63,
+            "max_size": 1
+          }
+        },
+        {
+          "ordinal": 6,
+          "name": "is_for_studio",
+          "type_info": {
+            "type": "Tiny",
+            "flags": {
+              "bits": 1
+            },
+            "char_set": 63,
+            "max_size": 1
+          }
+        },
+        {
+          "ordinal": 7,
+          "name": "is_for_twitch_tts",
+          "type_info": {
+            "type": "Tiny",
+            "flags": {
+              "bits": 1
+            },
+            "char_set": 63,
+            "max_size": 1
+          }
+        },
+        {
+          "ordinal": 8,
+          "name": "is_for_api_use",
+          "type_info": {
+            "type": "Tiny",
+            "flags": {
+              "bits": 1
+            },
+            "char_set": 63,
+            "max_size": 1
+          }
+        },
+        {
+          "ordinal": 9,
+          "name": "is_for_music",
+          "type_info": {
+            "type": "Tiny",
+            "flags": {
+              "bits": 1
+            },
+            "char_set": 63,
+            "max_size": 1
+          }
+        },
+        {
+          "ordinal": 10,
+          "name": "is_for_games",
+          "type_info": {
+            "type": "Tiny",
+            "flags": {
+              "bits": 1
+            },
+            "char_set": 63,
+            "max_size": 1
+          }
+        },
+        {
+          "ordinal": 11,
+          "name": "is_for_other",
+          "type_info": {
+            "type": "Tiny",
+            "flags": {
+              "bits": 1
+            },
+            "char_set": 63,
+            "max_size": 1
+          }
+        },
+        {
+          "ordinal": 12,
+          "name": "optional_notes_on_use",
+          "type_info": {
+            "type": "Blob",
+            "flags": {
+              "bits": 144
+            },
+            "char_set": 224,
+            "max_size": 67108860
+          }
+        },
+        {
+          "ordinal": 13,
+          "name": "is_own_voice",
+          "type_info": {
+            "type": "Tiny",
+            "flags": {
+              "bits": 1
+            },
+            "char_set": 63,
+            "max_size": 1
+          }
+        },
+        {
+          "ordinal": 14,
+          "name": "is_third_party_voice",
+          "type_info": {
+            "type": "Tiny",
+            "flags": {
+              "bits": 1
+            },
+            "char_set": 63,
+            "max_size": 1
+          }
+        },
+        {
+          "ordinal": 15,
+          "name": "optional_notes_on_subject",
+          "type_info": {
+            "type": "VarString",
+            "flags": {
+              "bits": 128
+            },
+            "char_set": 224,
+            "max_size": 1020
+          }
+        },
+        {
+          "ordinal": 16,
+          "name": "has_clean_audio_recordings",
+          "type_info": {
+            "type": "Tiny",
+            "flags": {
+              "bits": 1
+            },
+            "char_set": 63,
+            "max_size": 1
+          }
+        },
+        {
+          "ordinal": 17,
+          "name": "has_good_microphone",
+          "type_info": {
+            "type": "Tiny",
+            "flags": {
+              "bits": 1
+            },
+            "char_set": 63,
+            "max_size": 1
+          }
+        },
+        {
+          "ordinal": 18,
+          "name": "optional_questions",
+          "type_info": {
+            "type": "Blob",
+            "flags": {
+              "bits": 144
+            },
+            "char_set": 224,
+            "max_size": 67108860
+          }
+        },
+        {
+          "ordinal": 19,
+          "name": "optional_extra_comments",
+          "type_info": {
+            "type": "Blob",
+            "flags": {
+              "bits": 144
+            },
+            "char_set": 224,
+            "max_size": 67108860
+          }
+        },
+        {
+          "ordinal": 20,
+          "name": "created_at",
+          "type_info": {
+            "type": "Timestamp",
+            "flags": {
+              "bits": 1153
+            },
+            "char_set": 63,
+            "max_size": 19
+          }
+        },
+        {
+          "ordinal": 21,
+          "name": "updated_at",
+          "type_info": {
+            "type": "Timestamp",
+            "flags": {
+              "bits": 9345
+            },
+            "char_set": 63,
+            "max_size": 19
+          }
+        }
+      ],
       "parameters": {
-        "Right": 21
+        "Right": 1
       },
-      "nullable": []
+      "nullable": [
+        false,
+        true,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        true,
+        false,
+        false,
+        true,
+        false,
+        false,
+        true,
+        true,
+        false,
+        false
+      ]
     }
   },
   "e9ec861d6eb135370f9baf3a866282ec5686d4b299fc4ec10900ab32ea8577d8": {
@@ -6820,291 +7131,6 @@
         "Right": 3
       },
       "nullable": []
-    }
-  },
-  "fc421ad1b946460bf443271730b969c96850b3c5d467c8f785730bc8ec163780": {
-    "query": "\nSELECT\n  token,\n\n  maybe_user_token,\n  email_address,\n  discord_username,\n\n  is_for_studio,\n  is_for_twitch_tts,\n  is_for_api_use,\n  is_for_music,\n  is_for_games,\n  is_for_other,\n  optional_notes_on_use,\n\n  is_for_private_use,\n  is_for_public_use,\n\n  is_own_voice,\n  is_third_party_voice,\n\n  has_clean_audio_recordings,\n  has_good_microphone,\n\n  optional_questions,\n  optional_extra_comments,\n\n  created_at,\n  updated_at\nFROM voice_clone_requests\nWHERE\n  maybe_user_token = ?\n        ",
-    "describe": {
-      "columns": [
-        {
-          "ordinal": 0,
-          "name": "token",
-          "type_info": {
-            "type": "VarString",
-            "flags": {
-              "bits": 4229
-            },
-            "char_set": 224,
-            "max_size": 128
-          }
-        },
-        {
-          "ordinal": 1,
-          "name": "maybe_user_token",
-          "type_info": {
-            "type": "VarString",
-            "flags": {
-              "bits": 136
-            },
-            "char_set": 224,
-            "max_size": 128
-          }
-        },
-        {
-          "ordinal": 2,
-          "name": "email_address",
-          "type_info": {
-            "type": "VarString",
-            "flags": {
-              "bits": 4225
-            },
-            "char_set": 224,
-            "max_size": 1020
-          }
-        },
-        {
-          "ordinal": 3,
-          "name": "discord_username",
-          "type_info": {
-            "type": "VarString",
-            "flags": {
-              "bits": 4225
-            },
-            "char_set": 224,
-            "max_size": 1020
-          }
-        },
-        {
-          "ordinal": 4,
-          "name": "is_for_studio",
-          "type_info": {
-            "type": "Tiny",
-            "flags": {
-              "bits": 1
-            },
-            "char_set": 63,
-            "max_size": 1
-          }
-        },
-        {
-          "ordinal": 5,
-          "name": "is_for_twitch_tts",
-          "type_info": {
-            "type": "Tiny",
-            "flags": {
-              "bits": 1
-            },
-            "char_set": 63,
-            "max_size": 1
-          }
-        },
-        {
-          "ordinal": 6,
-          "name": "is_for_api_use",
-          "type_info": {
-            "type": "Tiny",
-            "flags": {
-              "bits": 1
-            },
-            "char_set": 63,
-            "max_size": 1
-          }
-        },
-        {
-          "ordinal": 7,
-          "name": "is_for_music",
-          "type_info": {
-            "type": "Tiny",
-            "flags": {
-              "bits": 1
-            },
-            "char_set": 63,
-            "max_size": 1
-          }
-        },
-        {
-          "ordinal": 8,
-          "name": "is_for_games",
-          "type_info": {
-            "type": "Tiny",
-            "flags": {
-              "bits": 1
-            },
-            "char_set": 63,
-            "max_size": 1
-          }
-        },
-        {
-          "ordinal": 9,
-          "name": "is_for_other",
-          "type_info": {
-            "type": "Tiny",
-            "flags": {
-              "bits": 1
-            },
-            "char_set": 63,
-            "max_size": 1
-          }
-        },
-        {
-          "ordinal": 10,
-          "name": "optional_notes_on_use",
-          "type_info": {
-            "type": "Blob",
-            "flags": {
-              "bits": 144
-            },
-            "char_set": 224,
-            "max_size": 67108860
-          }
-        },
-        {
-          "ordinal": 11,
-          "name": "is_for_private_use",
-          "type_info": {
-            "type": "Tiny",
-            "flags": {
-              "bits": 1
-            },
-            "char_set": 63,
-            "max_size": 1
-          }
-        },
-        {
-          "ordinal": 12,
-          "name": "is_for_public_use",
-          "type_info": {
-            "type": "Tiny",
-            "flags": {
-              "bits": 1
-            },
-            "char_set": 63,
-            "max_size": 1
-          }
-        },
-        {
-          "ordinal": 13,
-          "name": "is_own_voice",
-          "type_info": {
-            "type": "Tiny",
-            "flags": {
-              "bits": 1
-            },
-            "char_set": 63,
-            "max_size": 1
-          }
-        },
-        {
-          "ordinal": 14,
-          "name": "is_third_party_voice",
-          "type_info": {
-            "type": "Tiny",
-            "flags": {
-              "bits": 1
-            },
-            "char_set": 63,
-            "max_size": 1
-          }
-        },
-        {
-          "ordinal": 15,
-          "name": "has_clean_audio_recordings",
-          "type_info": {
-            "type": "Tiny",
-            "flags": {
-              "bits": 1
-            },
-            "char_set": 63,
-            "max_size": 1
-          }
-        },
-        {
-          "ordinal": 16,
-          "name": "has_good_microphone",
-          "type_info": {
-            "type": "Tiny",
-            "flags": {
-              "bits": 1
-            },
-            "char_set": 63,
-            "max_size": 1
-          }
-        },
-        {
-          "ordinal": 17,
-          "name": "optional_questions",
-          "type_info": {
-            "type": "Blob",
-            "flags": {
-              "bits": 144
-            },
-            "char_set": 224,
-            "max_size": 67108860
-          }
-        },
-        {
-          "ordinal": 18,
-          "name": "optional_extra_comments",
-          "type_info": {
-            "type": "Blob",
-            "flags": {
-              "bits": 144
-            },
-            "char_set": 224,
-            "max_size": 67108860
-          }
-        },
-        {
-          "ordinal": 19,
-          "name": "created_at",
-          "type_info": {
-            "type": "Timestamp",
-            "flags": {
-              "bits": 1153
-            },
-            "char_set": 63,
-            "max_size": 19
-          }
-        },
-        {
-          "ordinal": 20,
-          "name": "updated_at",
-          "type_info": {
-            "type": "Timestamp",
-            "flags": {
-              "bits": 9345
-            },
-            "char_set": 63,
-            "max_size": 19
-          }
-        }
-      ],
-      "parameters": {
-        "Right": 1
-      },
-      "nullable": [
-        false,
-        true,
-        false,
-        false,
-        false,
-        false,
-        false,
-        false,
-        false,
-        false,
-        true,
-        false,
-        false,
-        false,
-        false,
-        false,
-        false,
-        true,
-        true,
-        false,
-        false
-      ]
     }
   },
   "ffa85f7c65101a43653c724479ee080e0a74577d2ae37863b039f3a452493d1e": {
