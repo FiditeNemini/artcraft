@@ -7,14 +7,17 @@ use actix_web::http::StatusCode;
 use actix_web::web::{Path, Json};
 use actix_web::{Responder, web, HttpResponse, error, HttpRequest};
 use chrono::{DateTime, Utc};
+use crate::complex_models::event_match_predicate::EventMatchPredicate;
+use crate::complex_models::event_responses::EventResponse;
 use crate::http_server::web_utils::ip_address::get_request_ip;
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 use crate::http_server::web_utils::response_success_helpers::simple_json_success;
 use crate::server_state::ServerState;
+use database_queries::column_types::twitch_event_category::TwitchEventCategory;
 use database_queries::queries::twitch::twitch_event_rules::list_twitch_event_rules_for_user::{TwitchEventRule, list_twitch_event_rules_for_user};
 use http_server_common::response::serialize_as_json_error::serialize_as_json_error;
 use lexical_sort::natural_lexical_cmp;
-use log::{info, warn, log};
+use log::{info, warn, log, error};
 use sqlx::MySqlPool;
 use sqlx::error::DatabaseError;
 use sqlx::error::Error::Database;
@@ -24,10 +27,22 @@ use std::sync::Arc;
 
 // =============== Success Response ===============
 
+#[derive(Debug, Serialize)]
+pub struct HydratedTwitchEventRule {
+  pub token: String,
+  pub event_category: TwitchEventCategory,
+  pub event_match_predicate: EventMatchPredicate,
+  pub event_response: EventResponse,
+  pub user_specified_rule_order: u32,
+  pub rule_is_disabled: bool,
+  pub created_at: chrono::DateTime<Utc>,
+  pub updated_at: chrono::DateTime<Utc>,
+}
+
 #[derive(Serialize)]
 pub struct ListTwitchEventRulesResponse {
   pub success: bool,
-  pub twitch_event_rules: Vec<TwitchEventRule>,
+  pub twitch_event_rules: Vec<HydratedTwitchEventRule>,
 }
 
 
@@ -94,6 +109,34 @@ pub async fn list_twitch_event_rules_for_user_handler(
         warn!("query error: {:?}", e);
         ListTwitchEventRulesError::ServerError
       })?;
+
+  let twitch_event_rules = twitch_event_rules.into_iter()
+      .map(|rule| {
+
+        let event_match_predicate = serde_json::from_str(&rule.event_match_predicate)
+            .unwrap_or_else(|e| {
+              error!("Issue with deserializing: {}", e);
+              EventMatchPredicate::NotSet
+            });
+
+        let event_response = serde_json::from_str(&rule.event_response)
+            .unwrap_or_else(|e| {
+              error!("Issue with deserializing: {}", e);
+              EventResponse::NotSet
+            });
+
+        HydratedTwitchEventRule {
+          token: rule.token,
+          event_category: rule.event_category,
+          event_match_predicate,
+          event_response,
+          user_specified_rule_order: rule.user_specified_rule_order,
+          rule_is_disabled: rule.rule_is_disabled,
+          created_at: rule.created_at,
+          updated_at: rule.updated_at,
+        }
+      })
+      .collect();
 
   let response = ListTwitchEventRulesResponse {
     success: true,
