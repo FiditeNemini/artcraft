@@ -3,12 +3,16 @@ use container_common::anyhow_result::AnyhowResult;
 use container_common::thread::thread_id::ThreadId;
 use crate::redis::constants::{LEASE_TIMEOUT_SECONDS, LEASE_RENEW_PERIOD, LEASE_CHECK_PERIOD, OBS_ACTIVE_CHECK_PERIOD, STREAMER_TTS_JOB_QUEUE_TTL_SECONDS};
 use crate::redis::lease_payload::LeasePayload;
+use crate::threads::thread_state::twitch_pubsub_subscriber_state::{TwitchEventRuleLight, TwitchPubsubCachedState};
 use crate::twitch::constants::TWITCH_PING_CADENCE;
 use crate::twitch::oauth::oauth_token_refresher::OauthTokenRefresher;
 use crate::twitch::pubsub::build_pubsub_topics_for_user::build_pubsub_topics_for_user;
 use crate::twitch::twitch_user_id::TwitchUserId;
 use crate::twitch::websocket_client::TwitchWebsocketClient;
+use database_queries::complex_models::event_match_predicate::EventMatchPredicate;
+use database_queries::complex_models::event_responses::EventResponse;
 use database_queries::queries::tts::tts_inference_jobs::insert_tts_inference_job::TtsInferenceJobInsertBuilder;
+use database_queries::queries::twitch::twitch_event_rules::list_twitch_event_rules_for_user::list_twitch_event_rules_for_user;
 use database_queries::queries::twitch::twitch_oauth::find::{TwitchOauthTokenRecord, TwitchOauthTokenFinder};
 use database_queries::queries::twitch::twitch_oauth::insert::TwitchOauthTokenInsertBuilder;
 use database_queries::queries::twitch::twitch_pubsub::insert_bits::TwitchPubsubBitsInsertBuilder;
@@ -20,10 +24,11 @@ use log::info;
 use log::warn;
 use r2d2_redis::RedisConnectionManager;
 use r2d2_redis::r2d2;
+use time::Duration as  TimeDuration;
 use r2d2_redis::redis::Commands;
 use redis_common::redis_keys::RedisKeys;
 use sqlx::MySql;
-use std::sync::Arc;
+use std::sync::{Arc, RwLock, PoisonError, RwLockWriteGuard};
 use std::thread::sleep;
 use std::time::Duration;
 use time::Instant;
@@ -31,9 +36,12 @@ use twitch_api2::pubsub::channel_bits::ChannelBitsEventsV2Reply;
 use twitch_api2::pubsub::channel_points::ChannelPointsChannelV1Reply;
 use twitch_api2::pubsub::{Response, TwitchResponse, TopicData};
 use twitch_common::cheers::remove_cheers;
+use std::ops::Sub;
 
 // TODO: Publish events back to OBS thread
 // TODO: (cleanup) make the logic clearer to follow.
+
+pub const REFRESH_WEBSITE_SETTINGS_CADENCE : TimeDuration = TimeDuration::minutes(2);
 
 // =========================================
 // =============== STAGE ONE ===============
@@ -43,9 +51,11 @@ pub struct TwitchPubsubUserSubscriberThread {
   thread_id: ThreadId,
   server_hostname: String,
   twitch_user_id: TwitchUserId,
+  maybe_user_token: Option<String>, // Storyteller user
   oauth_token_refresher: OauthTokenRefresher,
   mysql_pool: Arc<sqlx::Pool<MySql>>,
   redis_pool: Arc<r2d2::Pool<RedisConnectionManager>>,
+  twitch_subscriber_state: Arc<RwLock<TwitchPubsubCachedState>>,
 }
 
 impl TwitchPubsubUserSubscriberThread {
@@ -62,8 +72,10 @@ impl TwitchPubsubUserSubscriberThread {
       oauth_token_refresher,
       server_hostname: server_hostname.to_string(),
       twitch_user_id,
+      maybe_user_token: None,
       mysql_pool,
       redis_pool,
+      twitch_subscriber_state: Arc::new(RwLock::new(TwitchPubsubCachedState::new())),
     }
   }
 
@@ -85,6 +97,8 @@ impl TwitchPubsubUserSubscriberThread {
       }
     };
 
+    self.maybe_user_token = record.maybe_user_token.clone();
+
     let expected_lease_payload
         = LeasePayload::from_thread_id(&self.server_hostname, &self.thread_id);
 
@@ -105,10 +119,14 @@ impl TwitchPubsubUserSubscriberThread {
       // We set their first run time to now so we don't have to deal with Option<>.
       let now = Instant::now();
 
+      // NB(2022-02-20): Actually, we can set these in the past with a bit of a hack.
+      let long_ago = Instant::now().sub(Duration::from_secs(60*60*24));
+
       let thread = TwitchPubsubUserSubscriberThreadStageTwo {
         thread_id: self.thread_id.clone(),
         server_hostname: self.server_hostname.clone(),
         twitch_user_id: self.twitch_user_id.clone(),
+        maybe_user_token: self.maybe_user_token.clone(),
         oauth_token_refresher: self.oauth_token_refresher.clone(),
         mysql_pool: self.mysql_pool.clone(),
         redis_pool: self.redis_pool.clone(),
@@ -119,6 +137,8 @@ impl TwitchPubsubUserSubscriberThread {
         redis_lease_last_checked_at: now,
         obs_session_active_last_checked_at: now,
         twitch_last_pinged_at: now,
+        twitch_subscriber_state: self.twitch_subscriber_state.clone(),
+        website_settings_last_refreshed_at: long_ago,
       };
 
       // NB: The following call will run its main loop until/unless the Twitch client
@@ -170,9 +190,14 @@ struct TwitchPubsubUserSubscriberThreadStageTwo {
   thread_id: ThreadId,
   server_hostname: String,
   twitch_user_id: TwitchUserId,
+  maybe_user_token: Option<String>,
   oauth_token_refresher: OauthTokenRefresher,
   mysql_pool: Arc<sqlx::Pool<MySql>>,
   redis_pool: Arc<r2d2::Pool<RedisConnectionManager>>,
+
+  // ========== CACHE ==========
+
+  twitch_subscriber_state: Arc<RwLock<TwitchPubsubCachedState>>,
 
   // ========== Stage Two Thread State ==========
 
@@ -202,6 +227,9 @@ struct TwitchPubsubUserSubscriberThreadStageTwo {
   ///    message within 10 seconds of issuing a PING command, it should reconnect
   ///    to the server. See details in Handling Connection Failures."
   twitch_last_pinged_at: Instant,
+
+  // When we last reloaded the website settings
+  website_settings_last_refreshed_at: Instant,
 }
 
 impl TwitchPubsubUserSubscriberThreadStageTwo {
@@ -222,6 +250,8 @@ impl TwitchPubsubUserSubscriberThreadStageTwo {
       if !is_active {
         return Ok(LoopEndedReason::ExitThread { reason: "OBS session ended".to_string() });
       }
+
+      self.maybe_refresh_website_user_settings().await?;
 
       // NB: We can't have calls to read the Twitch websocket client block forever, and they
       // would do exactly that if not for this code. This is adapted from the very good example
@@ -578,6 +608,44 @@ impl TwitchPubsubUserSubscriberThreadStageTwo {
 
     Ok(())
   }
+
+  // =============== WEBSITE SETTINGS ===============
+
+  async fn maybe_refresh_website_user_settings(&mut self) -> AnyhowResult<()> {
+    let user_token = match self.maybe_user_token.as_deref() {
+      Some(token) => token,
+      None => {
+        // Only Twitch users with a storyteller account get settings.
+        return Ok(());
+      }
+    };
+
+    let mut should_refresh = self.website_settings_last_refreshed_at
+        .elapsed()
+        .gt(&REFRESH_WEBSITE_SETTINGS_CADENCE);
+
+    if !should_refresh {
+      return Ok(());
+    }
+
+    info!("Reloading website settings for user {}", self.twitch_user_id.get_numeric());
+
+    let event_rules =
+        lookup_event_rules(user_token, &self.mysql_pool).await?;
+
+    match self.twitch_subscriber_state.write() {
+      Err(e) => {
+        return Err(anyhow!("Lock error: {:?}", e))
+      },
+      Ok(mut lock) => {
+        lock.event_rules = event_rules;
+      }
+    }
+
+    self.website_settings_last_refreshed_at = Instant::now();
+
+    Ok(())
+  }
 }
 
 // ====================================
@@ -593,6 +661,37 @@ async fn lookup_oauth_record(
       .allow_expired_tokens(true)
       .perform_query(mysql_pool)
       .await
+}
+
+async fn lookup_event_rules(
+  user_token: &str,
+  mysql_pool: &sqlx::Pool<MySql>
+) -> AnyhowResult<Vec<TwitchEventRuleLight>> {
+  let rules = list_twitch_event_rules_for_user(user_token, mysql_pool)
+      .await?;
+  let rules = rules.into_iter()
+      .map(|rule| {
+        let event_match_predicate = serde_json::from_str(&rule.event_match_predicate)
+            .unwrap_or_else(|e| {
+              error!("Issue with deserializing: {}", e);
+              EventMatchPredicate::NotSet
+            });
+        let event_response = serde_json::from_str(&rule.event_response)
+            .unwrap_or_else(|e| {
+              error!("Issue with deserializing: {}", e);
+              EventResponse::NotSet
+            });
+        TwitchEventRuleLight {
+          token: rule.token,
+          event_category: rule.event_category,
+          event_match_predicate,
+          event_response,
+          user_specified_rule_order: 0,
+          rule_is_disabled: false
+        }
+      })
+      .collect();
+  Ok(rules)
 }
 
 enum LoopEndedReason {

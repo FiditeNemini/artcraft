@@ -1,2 +1,3 @@
 pub mod listen_for_active_obs_sessions_thread;
+pub mod thread_state;
 pub mod twitch_pubsub_user_subscriber_thread;
