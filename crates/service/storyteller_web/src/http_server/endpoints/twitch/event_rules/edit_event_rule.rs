@@ -6,6 +6,8 @@ use actix_web::error::ResponseError;
 use actix_web::http::StatusCode;
 use actix_web::web::{Path, Json};
 use actix_web::{Responder, web, HttpResponse, error, HttpRequest};
+use crate::complex_models::event_match_predicate::EventMatchPredicate;
+use crate::complex_models::event_responses::EventResponse;
 use crate::http_server::web_utils::ip_address::get_request_ip;
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 use crate::http_server::web_utils::response_success_helpers::simple_json_success;
@@ -31,8 +33,8 @@ pub struct EditTwitchEventRulePathInfo {
 // These are not sparse updates!
 #[derive(Deserialize)]
 pub struct EditTwitchEventRuleRequest {
-  pub event_match_predicate: String,
-  pub event_response: String,
+  pub event_match_predicate: Option<EventMatchPredicate>,
+  pub event_response: Option<EventResponse>,
   pub user_specified_rule_order: u32,
   pub rule_is_disabled: bool,
 }
@@ -121,10 +123,30 @@ pub async fn edit_twitch_event_rule_handler(
 
   let creator_ip_address = get_request_ip(&http_request);
 
+  let event_match_predicate = request.event_match_predicate
+      .clone()
+      .unwrap_or(EventMatchPredicate::NotSet);
+
+  let mut event_match_predicate = serde_json::to_string(&event_match_predicate)
+      .map_err(|e| {
+        return EditTwitchEventRuleError::BadInput(
+          "improper EventMatchPredicate".to_string());
+      })?;
+
+  let event_response = request.event_response
+      .clone()
+      .unwrap_or(EventResponse::NotSet);
+
+  let mut event_response = serde_json::to_string(&event_match_predicate)
+      .map_err(|e| {
+        return EditTwitchEventRuleError::BadInput(
+          "improper EventResponse".to_string());
+      })?;
+
   let update_builder = UpdateTwitchEventRuleBuilder {
     token: path.token.clone(),
-    event_match_predicate: request.event_match_predicate.clone(),
-    event_response: request.event_response.clone(),
+    event_match_predicate,
+    event_response,
     user_specified_rule_order: request.user_specified_rule_order,
     rule_is_disabled: request.rule_is_disabled,
     ip_address_update: creator_ip_address,
