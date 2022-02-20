@@ -1,11 +1,16 @@
+use container_common::anyhow_result::AnyhowResult;
 
-#[derive(Serialize, Deserialize, Debug, PartialEq, Eq)]
+#[derive(Serialize, Deserialize, Debug, PartialEq, Eq, Clone)]
 #[serde(rename_all = "snake_case")]
 pub enum EventResponse {
+  /// Default value
+  NotSet,
+
   /// Respond with a single TTS voice.
   TtsSingleVoice {
     tts_model_token: String,
   },
+
   /// Respond with a random TTS voice.
   TtsRandomVoice {
     tts_model_tokens: Vec<String>,

@@ -1,21 +1,27 @@
 
-#[derive(Serialize, Deserialize, Debug, PartialEq, Eq)]
+#[derive(Serialize, Deserialize, Debug, PartialEq, Eq, Clone)]
 #[serde(rename_all = "snake_case")]
 pub enum EventMatchPredicate {
+  /// Default value
+  NotSet,
+
   /// A predicate for an exactly matched cheermote name, including the bit value,
   /// eg "Cheer1". Case insensitive.
   BitsCheermoteNameExactMatch {
     cheermote_name: String,
   },
+
   /// A predicate for a cheermote name without value, but with a minimum bits
   /// threshold. eg "Cheer", minimum=150 bits. Case insensitive.
   BitsCheermoteNameSpendThreshold {
     cheermote_name_prefix: String,
     minimum_bits_spent: u32,
   },
+
   BitsSpendThreshold {
     minimum_bits_spent: u32,
   },
+
   ChannelPointsRewardNameExactMatch {
     reward_name: String,
   },
