@@ -64,7 +64,17 @@ pub async fn oauth_end_enroll_from_redirect(
   http_request: HttpRequest,
   query: web::Query<QueryParams>,
   server_state: web::Data<Arc<ServerState>>
-) -> Result<HttpResponse, OauthEndEnrollFromRedirectError> {
+)
+  -> Result<HttpResponse, OauthEndEnrollFromRedirectError>
+{
+  let maybe_user_session = server_state
+      .session_checker
+      .maybe_get_user_session(&http_request, &server_state.mysql_pool)
+      .await
+      .map_err(|e| {
+        warn!("Session checker error: {:?}", e);
+        OauthEndEnrollFromRedirectError::ServerError
+      })?;
 
   if let Some(error) = query.error.as_deref() {
     return Err(OauthEndEnrollFromRedirectError::TwitchOauthError { reason: error.to_string() })
@@ -158,7 +168,11 @@ pub async fn oauth_end_enroll_from_redirect(
           .has_chat_edit(true)
           .has_chat_read(true);
 
-  let result = insert_builder.insert(&server_state.mysql_pool)
+  if let Some(user_session) = maybe_user_session {
+    insert_builder = insert_builder.set_user_token(Some(&user_session.user_token));
+  }
+
+  let _result = insert_builder.insert(&server_state.mysql_pool)
       .await
       .map_err(|e| {
         warn!("Error saving to db: {:?}", e);
