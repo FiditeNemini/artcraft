@@ -31,12 +31,15 @@ impl TtsWriter {
     }
   }
 
-  // NB: &mut is for Redis pool.
   pub async fn write_tts(&self, message_text: &str) -> AnyhowResult<()> {
-    let sanitized_text = remove_cheers(message_text);
-    let job_token = Tokens::new_tts_inference_job()?;
     //let model_token = "TM:7wbtjphx8h8v"; // "Mario *" voice (prod)
     let model_token = "TM:40m3aqtt41y0"; // "Wakko" voice (dev)
+    self.write_tts_with_model(message_text, model_token).await
+  }
+
+  pub async fn write_tts_with_model(&self, message_text: &str, model_token: &str) -> AnyhowResult<()> {
+    let sanitized_text = remove_cheers(message_text);
+    let job_token = Tokens::new_tts_inference_job()?;
 
     let mut builder = TtsInferenceJobInsertBuilder::new_for_internal_tts()
         .set_is_for_twitch(true)

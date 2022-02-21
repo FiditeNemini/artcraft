@@ -15,11 +15,11 @@ pub enum EventMatchPredicate {
   /// threshold. eg "Cheer", minimum=150 bits. Case insensitive.
   BitsCheermoteNameSpendThreshold {
     cheermote_name_prefix: String,
-    minimum_bits_spent: u32,
+    minimum_bits_spent: u64,
   },
 
   BitsSpendThreshold {
-    minimum_bits_spent: u32,
+    minimum_bits_spent: u64,
   },
 
   ChannelPointsRewardNameExactMatch {

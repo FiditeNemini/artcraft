@@ -3,6 +3,7 @@ use database_queries::column_types::twitch_event_category::TwitchEventCategory;
 use database_queries::complex_models::event_match_predicate::EventMatchPredicate;
 use database_queries::complex_models::event_responses::EventResponse;
 
+#[derive(Clone)]
 pub struct TwitchEventRuleLight {
   pub token: String,
   pub event_category: TwitchEventCategory,
