@@ -32,7 +32,7 @@ impl TtsWriter {
   }
 
   // NB: &mut is for Redis pool.
-  pub async fn write_tts(&mut self, message_text: &str) -> AnyhowResult<()> {
+  pub async fn write_tts(&self, message_text: &str) -> AnyhowResult<()> {
     let sanitized_text = remove_cheers(message_text);
     let job_token = Tokens::new_tts_inference_job()?;
     //let model_token = "TM:7wbtjphx8h8v"; // "Mario *" voice (prod)

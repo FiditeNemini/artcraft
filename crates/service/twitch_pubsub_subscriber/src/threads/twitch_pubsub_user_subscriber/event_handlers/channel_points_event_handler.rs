@@ -38,7 +38,7 @@ impl ChannelPointsEventHandler {
       ChannelPointsChannelV1Reply::UpdateRedemptionStatusProgress { .. } => {}
       // Implemented
       ChannelPointsChannelV1Reply::RewardRedeemed { timestamp, redemption } => {
-        self.handle_reward_redeemed(redemption).await;
+        self.handle_reward_redeemed(redemption).await?;
       }
       _ => {},
     }
