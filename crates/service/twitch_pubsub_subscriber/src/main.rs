@@ -18,7 +18,7 @@ pub mod util;
 
 use config::shared_constants::{DEFAULT_RUST_LOG, DEFAULT_REDIS_DATABASE_1_CONNECTION_STRING, DEFAULT_MYSQL_CONNECTION_STRING};
 use container_common::anyhow_result::AnyhowResult;
-use crate::threads::listen_for_active_obs_sessions_thread::ListenForActiveObsSessionThread;
+use crate::threads::listen_for_active_obs_sessions::listen_for_active_obs_sessions_thread::ListenForActiveObsSessionThread;
 use crate::twitch::oauth::oauth_token_refresher::OauthTokenRefresher;
 use crate::twitch::websocket_client::TwitchWebsocketClient;
 use futures::executor::{ThreadPool, ThreadPoolBuilder};

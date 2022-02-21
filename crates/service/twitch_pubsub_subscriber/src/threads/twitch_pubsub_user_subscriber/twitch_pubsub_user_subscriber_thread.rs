@@ -1,7 +1,8 @@
 use anyhow::{anyhow, Error};
 use container_common::anyhow_result::AnyhowResult;
 use container_common::thread::thread_id::ThreadId;
-use crate::threads::thread_state::twitch_pubsub_subscriber_state::{TwitchEventRuleLight, TwitchPubsubCachedState};
+use crate::threads::twitch_pubsub_user_subscriber::subscriber_preferences_cache::TwitchEventRuleLight;
+use crate::threads::twitch_pubsub_user_subscriber::subscriber_preferences_cache::TwitchPubsubCachedState;
 use crate::twitch::constants::TWITCH_PING_CADENCE;
 use crate::twitch::oauth::oauth_token_refresher::OauthTokenRefresher;
 use crate::twitch::pubsub::build_pubsub_topics_for_user::build_pubsub_topics_for_user;

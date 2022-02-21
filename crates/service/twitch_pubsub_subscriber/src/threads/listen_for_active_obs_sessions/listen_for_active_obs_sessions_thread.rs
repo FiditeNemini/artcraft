@@ -1,5 +1,5 @@
 use container_common::thread::thread_id::ThreadId;
-use crate::threads::twitch_pubsub_user_subscriber_thread::TwitchPubsubUserSubscriberThread;
+use crate::threads::twitch_pubsub_user_subscriber::twitch_pubsub_user_subscriber_thread::TwitchPubsubUserSubscriberThread;
 use crate::twitch::oauth::oauth_token_refresher::OauthTokenRefresher;
 use log::error;
 use log::info;
