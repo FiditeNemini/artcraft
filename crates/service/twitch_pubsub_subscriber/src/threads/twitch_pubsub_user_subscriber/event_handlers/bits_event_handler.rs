@@ -29,7 +29,7 @@ impl BitsEventHandler {
     }
   }
 
-  pub async fn handle(&mut self, topic: ChannelBitsEventsV2, reply: Box<ChannelBitsEventsV2Reply>) -> AnyhowResult<()> {
+  pub async fn handle(&self, topic: ChannelBitsEventsV2, reply: Box<ChannelBitsEventsV2Reply>) -> AnyhowResult<()> {
     match *reply {
       ChannelBitsEventsV2Reply::BitsEvent { data, message_id, version, is_anonymous } => {
         self.handle_bits_event(&data).await?;
@@ -39,15 +39,14 @@ impl BitsEventHandler {
     Ok(())
   }
 
-  // NB: &mut is for Redis pool in downstream write_tts.
-  async fn handle_bits_event(&mut self, data: &BitsEventData) -> AnyhowResult<()> {
+  async fn handle_bits_event(&self, data: &BitsEventData) -> AnyhowResult<()> {
     self.tts_writer.write_tts(&data.chat_message).await?;
     // Report event for analytics
     self.report_event_for_analytics(&data).await?;
     Ok(())
   }
 
-  async fn report_event_for_analytics(&mut self, data: &BitsEventData) -> AnyhowResult<()> {
+  async fn report_event_for_analytics(&self, data: &BitsEventData) -> AnyhowResult<()> {
     let user_id = data.user_id.to_string();
     let user_name = data.user_name.to_string();
     let mut event_builder = TwitchPubsubBitsInsertBuilder::new();

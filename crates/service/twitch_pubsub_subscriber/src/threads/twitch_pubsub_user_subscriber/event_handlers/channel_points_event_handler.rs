@@ -29,7 +29,7 @@ impl ChannelPointsEventHandler {
   }
 
   // NB: &mut is for Redis pool in downstream write_tts.
-  pub async fn handle(&mut self, topic: ChannelPointsChannelV1, reply: Box<ChannelPointsChannelV1Reply>) -> AnyhowResult<()> {
+  pub async fn handle(&self, topic: ChannelPointsChannelV1, reply: Box<ChannelPointsChannelV1Reply>) -> AnyhowResult<()> {
     match *reply {
       // Unimplemented
       ChannelPointsChannelV1Reply::CustomRewardUpdated { .. } => {}
@@ -45,8 +45,7 @@ impl ChannelPointsEventHandler {
     Ok(())
   }
 
-  // NB: &mut is for Redis pool in downstream write_tts.
-  async fn handle_reward_redeemed(&mut self, redemption: Redemption) -> AnyhowResult<()> {
+  async fn handle_reward_redeemed(&self, redemption: Redemption) -> AnyhowResult<()> {
     if let Some(user_text) = redemption.user_input.as_deref() {
       self.tts_writer.write_tts(user_text).await?;
     }
