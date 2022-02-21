@@ -1,5 +1,5 @@
 [package]
-name = "obs-gateway-server"
+name = "websocket-gateway"
 edition = "2018"
 version = "0.0.1"
 authors = [
@@ -9,7 +9,7 @@ authors = [
 publish = false
 
 [[bin]]
-name = "obs-gateway"
+name = "websocket-gateway"
 path = "src/main.rs"
 
 [[bin]]

@@ -2567,71 +2567,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "obs-gateway-server"
-version = "0.0.1"
-dependencies = [
- "actix",
- "actix-cors 0.5.4",
- "actix-files",
- "actix-http 3.0.0-beta.11",
- "actix-rt 2.4.0",
- "actix-service 2.0.1",
- "actix-utils 3.0.0",
- "actix-web 4.0.0-beta.10",
- "actix-web-actors",
- "anyhow",
- "base64 0.13.0",
- "bcrypt",
- "chrono",
- "config",
- "container_common",
- "crossbeam",
- "database_queries",
- "derive_more",
- "diesel",
- "dotenv",
- "easyenv",
- "futures 0.1.31",
- "futures 0.3.17",
- "futures-timer",
- "futures-util",
- "hex",
- "hmac 0.10.1",
- "hostname",
- "http_server_common",
- "hyper 0.13.10",
- "jwt",
- "lazy_static",
- "lfu",
- "limitation",
- "log",
- "lru_time_cache",
- "magic-crypt",
- "md-5",
- "native-tls",
- "pulldown-cmark",
- "r2d2_redis",
- "rand 0.8.4",
- "redis_common",
- "regex",
- "reqwest",
- "rpassword",
- "serde",
- "serde_derive",
- "serde_json",
- "sha2",
- "sqlx",
- "time 0.2.26",
- "tokio 1.13.0",
- "tokio-tungstenite",
- "toml",
- "twitch_api2",
- "twitch_common",
- "twitch_oauth2",
- "uuid",
-]
-
-[[package]]
 name = "once_cell"
 version = "1.9.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3078,6 +3013,14 @@ dependencies = [
 [[package]]
 name = "redis_common"
 version = "0.0.1"
+dependencies = [
+ "anyhow",
+ "container_common",
+ "serde",
+ "serde_derive",
+ "serde_json",
+ "time 0.2.26",
+]
 
 [[package]]
 name = "redox_syscall"
@@ -4361,6 +4304,71 @@ dependencies = [
 ]
 
 [[package]]
+name = "twitch-pubsub-subscriber"
+version = "0.0.1"
+dependencies = [
+ "actix",
+ "actix-cors 0.5.4",
+ "actix-files",
+ "actix-http 3.0.0-beta.11",
+ "actix-rt 2.4.0",
+ "actix-service 2.0.1",
+ "actix-utils 3.0.0",
+ "actix-web 4.0.0-beta.10",
+ "actix-web-actors",
+ "anyhow",
+ "base64 0.13.0",
+ "bcrypt",
+ "chrono",
+ "config",
+ "container_common",
+ "crossbeam",
+ "database_queries",
+ "derive_more",
+ "diesel",
+ "dotenv",
+ "easyenv",
+ "futures 0.1.31",
+ "futures 0.3.17",
+ "futures-timer",
+ "futures-util",
+ "hex",
+ "hmac 0.10.1",
+ "hostname",
+ "http_server_common",
+ "hyper 0.13.10",
+ "jwt",
+ "lazy_static",
+ "lfu",
+ "limitation",
+ "log",
+ "lru_time_cache",
+ "magic-crypt",
+ "md-5",
+ "native-tls",
+ "pulldown-cmark",
+ "r2d2_redis",
+ "rand 0.8.4",
+ "redis_common",
+ "regex",
+ "reqwest",
+ "rpassword",
+ "serde",
+ "serde_derive",
+ "serde_json",
+ "sha2",
+ "sqlx",
+ "time 0.2.26",
+ "tokio 1.13.0",
+ "tokio-tungstenite",
+ "toml",
+ "twitch_api2",
+ "twitch_common",
+ "twitch_oauth2",
+ "uuid",
+]
+
+[[package]]
 name = "twitch_api2"
 version = "0.6.0-rc.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -4702,6 +4710,71 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "aabe153544e473b775453675851ecc86863d2a81d786d741f6b76778f2a48940"
 dependencies = [
  "webpki",
+]
+
+[[package]]
+name = "websocket-gateway"
+version = "0.0.1"
+dependencies = [
+ "actix",
+ "actix-cors 0.5.4",
+ "actix-files",
+ "actix-http 3.0.0-beta.11",
+ "actix-rt 2.4.0",
+ "actix-service 2.0.1",
+ "actix-utils 3.0.0",
+ "actix-web 4.0.0-beta.10",
+ "actix-web-actors",
+ "anyhow",
+ "base64 0.13.0",
+ "bcrypt",
+ "chrono",
+ "config",
+ "container_common",
+ "crossbeam",
+ "database_queries",
+ "derive_more",
+ "diesel",
+ "dotenv",
+ "easyenv",
+ "futures 0.1.31",
+ "futures 0.3.17",
+ "futures-timer",
+ "futures-util",
+ "hex",
+ "hmac 0.10.1",
+ "hostname",
+ "http_server_common",
+ "hyper 0.13.10",
+ "jwt",
+ "lazy_static",
+ "lfu",
+ "limitation",
+ "log",
+ "lru_time_cache",
+ "magic-crypt",
+ "md-5",
+ "native-tls",
+ "pulldown-cmark",
+ "r2d2_redis",
+ "rand 0.8.4",
+ "redis_common",
+ "regex",
+ "reqwest",
+ "rpassword",
+ "serde",
+ "serde_derive",
+ "serde_json",
+ "sha2",
+ "sqlx",
+ "time 0.2.26",
+ "tokio 1.13.0",
+ "tokio-tungstenite",
+ "toml",
+ "twitch_api2",
+ "twitch_common",
+ "twitch_oauth2",
+ "uuid",
 ]
 
 [[package]]

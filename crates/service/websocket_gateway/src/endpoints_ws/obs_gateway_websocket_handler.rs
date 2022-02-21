@@ -6,12 +6,7 @@ use actix_web_actors::ws;
 use container_common::anyhow_result::AnyhowResult;
 use container_common::token::random_crockford_token::random_crockford_token;
 use crate::endpoints_ws::obs_gateway_websocket_handler::ResponseType::TtsEvent;
-use crate::redis::constants::OBS_ACTIVE_TTL_SECONDS;
-use crate::redis::obs_active_payload::ObsActivePayload;
 use crate::server_state::ObsGatewayServerState;
-use crate::twitch::pubsub::build_pubsub_topics_for_user::build_pubsub_topics_for_user;
-use crate::twitch::twitch_user_id::TwitchUserId;
-use crate::twitch::websocket_client::TwitchWebsocketClient;
 use database_queries::queries::twitch::twitch_oauth::find::{TwitchOauthTokenFinder, TwitchOauthTokenRecord};
 use futures_timer::Delay;
 use futures_util::FutureExt;
@@ -23,7 +18,9 @@ use log::warn;
 use r2d2_redis::RedisConnectionManager;
 use r2d2_redis::r2d2::PooledConnection;
 use r2d2_redis::redis::Commands;
+use redis_common::payloads::obs_active_payload::ObsActivePayload;
 use redis_common::redis_keys::RedisKeys;
+use redis_common::shared_constants::OBS_ACTIVE_TTL_SECONDS;
 use std::sync::Arc;
 use std::thread::sleep;
 use std::time::Duration;
@@ -32,6 +29,7 @@ use twitch_api2::pubsub::Topic;
 use twitch_api2::pubsub::TopicData::ChannelPointsChannelV1;
 use twitch_api2::pubsub::channel_bits::ChannelBitsEventsV2Reply::BitsEvent;
 use twitch_api2::pubsub;
+use twitch_common::twitch_user_id::TwitchUserId;
 
 // TODO: Redis calls are synchronous (but fast), but is there any way to make them async?
 

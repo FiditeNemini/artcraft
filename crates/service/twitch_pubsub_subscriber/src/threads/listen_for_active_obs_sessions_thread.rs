@@ -1,22 +1,22 @@
 use container_common::thread::thread_id::ThreadId;
-use crate::redis::constants::LEASE_TIMEOUT_SECONDS;
-use crate::redis::lease_payload::LeasePayload;
-use crate::redis::obs_active_payload::ObsActivePayload;
 use crate::threads::twitch_pubsub_user_subscriber_thread::TwitchPubsubUserSubscriberThread;
-use crate::twitch::twitch_user_id::TwitchUserId;
+use crate::twitch::oauth::oauth_token_refresher::OauthTokenRefresher;
 use log::error;
 use log::info;
 use log::warn;
 use r2d2_redis::RedisConnectionManager;
 use r2d2_redis::r2d2;
 use r2d2_redis::redis::Commands;
+use redis_common::payloads::lease_payload::LeasePayload;
+use redis_common::payloads::obs_active_payload::ObsActivePayload;
 use redis_common::redis_keys::RedisKeys;
+use redis_common::shared_constants::LEASE_TIMEOUT_SECONDS;
 use sqlx::MySql;
 use std::sync::Arc;
 use std::thread::sleep;
 use std::time::Duration;
 use tokio::runtime::Runtime;
-use crate::twitch::oauth::oauth_token_refresher::OauthTokenRefresher;
+use twitch_common::twitch_user_id::TwitchUserId;
 
 // TODO: Apart from error handling, this looks mostly good.
 

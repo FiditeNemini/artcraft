@@ -11,3 +11,19 @@ publish = false
 [lib]
 name = "redis_common"
 path = "src/lib.rs"
+
+[dependencies]
+
+# Internal
+container_common = { path = "../container_common" }
+
+# External
+anyhow = "1.0.40"
+
+# Serialization
+serde = "1.0.125"
+serde_derive = "1.0.125"
+serde_json = "1.0.64"
+
+# TODO: Get rid of in favor of std::time
+time = "0.2.26"

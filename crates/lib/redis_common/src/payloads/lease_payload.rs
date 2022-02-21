@@ -3,6 +3,8 @@ use container_common::anyhow_result::AnyhowResult;
 use container_common::thread::thread_id::ThreadId;
 use container_common::token::random_crockford_token::random_crockford_token;
 
+// TODO: Rename, document
+
 // TODO: This should be JSON for future compat.
 /// Lease values stored in Redis are in the form "{server_id}:{thread_id}"
 #[derive(Debug, Eq, PartialEq, Clone)]
@@ -51,7 +53,7 @@ impl LeasePayload {
 #[cfg(test)]
 mod tests {
   use container_common::thread::thread_id::ThreadId;
-  use crate::redis::lease_payload::LeasePayload;
+  use crate::payloads::lease_payload::LeasePayload;
 
   #[test]
   fn equals() {

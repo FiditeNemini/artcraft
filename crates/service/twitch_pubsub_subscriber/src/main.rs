@@ -12,7 +12,6 @@
 #[macro_use] extern crate magic_crypt;
 #[macro_use] extern crate serde_derive;
 
-pub mod redis;
 pub mod threads;
 pub mod twitch;
 pub mod util;

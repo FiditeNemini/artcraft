@@ -1,13 +1,10 @@
 use anyhow::{anyhow, Error};
 use container_common::anyhow_result::AnyhowResult;
 use container_common::thread::thread_id::ThreadId;
-use crate::redis::constants::{LEASE_TIMEOUT_SECONDS, LEASE_RENEW_PERIOD, LEASE_CHECK_PERIOD, OBS_ACTIVE_CHECK_PERIOD, STREAMER_TTS_JOB_QUEUE_TTL_SECONDS};
-use crate::redis::lease_payload::LeasePayload;
 use crate::threads::thread_state::twitch_pubsub_subscriber_state::{TwitchEventRuleLight, TwitchPubsubCachedState};
 use crate::twitch::constants::TWITCH_PING_CADENCE;
 use crate::twitch::oauth::oauth_token_refresher::OauthTokenRefresher;
 use crate::twitch::pubsub::build_pubsub_topics_for_user::build_pubsub_topics_for_user;
-use crate::twitch::twitch_user_id::TwitchUserId;
 use crate::twitch::websocket_client::TwitchWebsocketClient;
 use database_queries::complex_models::event_match_predicate::EventMatchPredicate;
 use database_queries::complex_models::event_responses::EventResponse;
@@ -24,19 +21,26 @@ use log::info;
 use log::warn;
 use r2d2_redis::RedisConnectionManager;
 use r2d2_redis::r2d2;
-use time::Duration as  TimeDuration;
 use r2d2_redis::redis::Commands;
+use redis_common::payloads::lease_payload::LeasePayload;
 use redis_common::redis_keys::RedisKeys;
+use redis_common::shared_constants::LEASE_CHECK_PERIOD;
+use redis_common::shared_constants::LEASE_RENEW_PERIOD;
+use redis_common::shared_constants::LEASE_TIMEOUT_SECONDS;
+use redis_common::shared_constants::OBS_ACTIVE_CHECK_PERIOD;
+use redis_common::shared_constants::STREAMER_TTS_JOB_QUEUE_TTL_SECONDS;
 use sqlx::MySql;
+use std::ops::Sub;
 use std::sync::{Arc, RwLock, PoisonError, RwLockWriteGuard};
 use std::thread::sleep;
 use std::time::Duration;
+use time::Duration as  TimeDuration;
 use time::Instant;
 use twitch_api2::pubsub::channel_bits::ChannelBitsEventsV2Reply;
 use twitch_api2::pubsub::channel_points::ChannelPointsChannelV1Reply;
 use twitch_api2::pubsub::{Response, TwitchResponse, TopicData};
 use twitch_common::cheers::remove_cheers;
-use std::ops::Sub;
+use twitch_common::twitch_user_id::TwitchUserId;
 
 // TODO: Publish events back to OBS thread
 // TODO: (cleanup) make the logic clearer to follow.

@@ -194,13 +194,13 @@ RUN SQLX_OFFLINE=true \
   LD_LIBRARY_PATH=/usr/lib:${LD_LIBRARY_PATH} \
   $HOME/.cargo/bin/cargo build \
   --release \
-  --bin obs-gateway
+  --bin websocket-gateway
 
 RUN SQLX_OFFLINE=true \
   LD_LIBRARY_PATH=/usr/lib:${LD_LIBRARY_PATH} \
   $HOME/.cargo/bin/cargo build \
   --release \
-  --bin twitch-pubsub-job
+  --bin twitch-pubsub-subscriber
 
 # Final image
 #  FROM ubuntu:xenial
@@ -244,8 +244,8 @@ COPY --from=rust-build /tmp/target/release/tts-download-job /
 COPY --from=rust-build /tmp/target/release/tts-inference-job /
 COPY --from=rust-build /tmp/target/release/w2l-download-job /
 COPY --from=rust-build /tmp/target/release/w2l-inference-job /
-COPY --from=rust-build /tmp/target/release/obs-gateway /
-COPY --from=rust-build /tmp/target/release/twitch-pubsub-job /
+COPY --from=rust-build /tmp/target/release/websocket-gateway /
+COPY --from=rust-build /tmp/target/release/twitch-pubsub-subscriber /
 
 # SSL certs are required for crypto
 COPY --from=rust-build /etc/ssl /etc/ssl

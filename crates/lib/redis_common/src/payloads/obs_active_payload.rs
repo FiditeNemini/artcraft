@@ -1,5 +1,7 @@
 use container_common::anyhow_result::AnyhowResult;
 
+// TODO: Rename, document
+
 #[derive(Serialize, Deserialize, Debug)]
 pub struct ObsActivePayload {
   pub twitch_user_id: String,

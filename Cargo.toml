@@ -12,7 +12,8 @@ members = [
   "crates/lib/user_input_common",
 
   # Application 
-  "crates/service/obs_gateway",
   "crates/service/storyteller_web",
+  "crates/service/twitch_pubsub_subscriber",
+  "crates/service/websocket_gateway",
 ]
 

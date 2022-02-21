@@ -81,6 +81,7 @@ impl TwitchOauthTokenInsertBuilder {
     self
   }
 
+  /// NB: This is the FakeYou/Storyteller user account, not Twitch!
   pub fn set_user_token(mut self, maybe_user_token: Option<&str>) -> Self {
     self.maybe_user_token = maybe_user_token.map(|t| t.to_string());
     self
