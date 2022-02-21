@@ -1,8 +1,6 @@
 use anyhow::{anyhow, Error};
 use container_common::anyhow_result::AnyhowResult;
 use container_common::thread::thread_id::ThreadId;
-use crate::threads::twitch_pubsub_user_subscriber::subscriber_preferences_cache::TwitchEventRuleLight;
-use crate::threads::twitch_pubsub_user_subscriber::subscriber_preferences_cache::TwitchPubsubCachedState;
 use crate::twitch::constants::TWITCH_PING_CADENCE;
 use crate::twitch::oauth::oauth_token_refresher::OauthTokenRefresher;
 use crate::twitch::pubsub::build_pubsub_topics_for_user::build_pubsub_topics_for_user;
@@ -42,6 +40,11 @@ use twitch_api2::pubsub::channel_points::ChannelPointsChannelV1Reply;
 use twitch_api2::pubsub::{Response, TwitchResponse, TopicData};
 use twitch_common::cheers::remove_cheers;
 use twitch_common::twitch_user_id::TwitchUserId;
+use crate::threads::twitch_pubsub_user_subscriber::subscriber_preferences_cache::TwitchPubsubCachedState;
+use crate::threads::twitch_pubsub_user_subscriber::subscriber_preferences_cache::TwitchEventRuleLight;
+use crate::threads::twitch_pubsub_user_subscriber::event_handlers::channel_points_event_handler::ChannelPointsEventHandler;
+use crate::threads::twitch_pubsub_user_subscriber::tts_writer::TtsWriter;
+use crate::threads::twitch_pubsub_user_subscriber::event_handlers::bits_event_handler::BitsEventHandler;
 
 // TODO: Publish events back to OBS thread
 // TODO: (cleanup) make the logic clearer to follow.
@@ -120,6 +123,24 @@ impl TwitchPubsubUserSubscriberThread {
         }
       };
 
+      let tts_writer = Arc::new(TtsWriter::new(
+        self.mysql_pool.clone(),
+        self.redis_pool.clone(),
+        self.twitch_user_id.clone(),
+      ));
+
+      let bits_event_handler = BitsEventHandler::new(
+        self.twitch_subscriber_state.clone(),
+        self.mysql_pool.clone(),
+        tts_writer.clone(),
+      );
+
+      let channel_points_event_handler = ChannelPointsEventHandler::new(
+        self.twitch_subscriber_state.clone(),
+        self.mysql_pool.clone(),
+        tts_writer.clone(),
+      );
+
       // NB: All of the timers (thus far) can wait to run.
       // We set their first run time to now so we don't have to deal with Option<>.
       let now = Instant::now();
@@ -144,6 +165,8 @@ impl TwitchPubsubUserSubscriberThread {
         twitch_last_pinged_at: now,
         twitch_subscriber_state: self.twitch_subscriber_state.clone(),
         website_settings_last_refreshed_at: long_ago,
+        channel_points_event_handler,
+        bits_event_handler,
       };
 
       // NB: The following call will run its main loop until/unless the Twitch client
@@ -203,6 +226,11 @@ struct TwitchPubsubUserSubscriberThreadStageTwo {
   // ========== CACHE ==========
 
   twitch_subscriber_state: Arc<RwLock<TwitchPubsubCachedState>>,
+
+  // ========== Handlers ==========
+
+  bits_event_handler: BitsEventHandler,
+  channel_points_event_handler: ChannelPointsEventHandler,
 
   // ========== Stage Two Thread State ==========
 
@@ -351,61 +379,10 @@ impl TwitchPubsubUserSubscriberThreadStageTwo {
       TopicData::UserModerationNotifications { .. } => {}
       // Implemented
       TopicData::ChannelBitsEventsV2 { topic, reply } => {
-        let mut event_builder = TwitchPubsubBitsInsertBuilder::new();
-        match *reply {
-          ChannelBitsEventsV2Reply::BitsEvent { data, message_id, version, is_anonymous } => {
-            let user_id = data.user_id.to_string();
-            let user_name = data.user_name.to_string();
-            let mut event_builder = event_builder.set_sender_twitch_user_id(&user_id)
-                .set_sender_twitch_username(&user_name)
-                .set_destination_channel_id(&data.channel_id.to_string())
-                .set_destination_channel_name(&data.channel_name.to_string())
-                .set_bits_used(data.bits_used as u64)
-                .set_total_bits_used(data.total_bits_used as u64)
-                .set_is_anonymous(is_anonymous)
-                .set_chat_message(&data.chat_message);
-            event_builder.insert(&self.mysql_pool).await?;
-
-            self.write_tts_inference_event(&data.chat_message).await?;
-          }
-          _ => {}
-        }
+        self.bits_event_handler.handle(topic, reply).await?;
       }
       TopicData::ChannelPointsChannelV1 { topic, reply } => {
-        let mut event_builder = TwitchPubsubChannelPointsInsertBuilder::new();
-        match *reply {
-          // Unimplemented
-          ChannelPointsChannelV1Reply::CustomRewardUpdated { .. } => {}
-          ChannelPointsChannelV1Reply::RedemptionStatusUpdate { .. } => {}
-          ChannelPointsChannelV1Reply::UpdateRedemptionStatusesFinished { .. } => {}
-          ChannelPointsChannelV1Reply::UpdateRedemptionStatusProgress { .. } => {}
-          // Implemented
-          ChannelPointsChannelV1Reply::RewardRedeemed { timestamp, redemption } => {
-            let user_id = redemption.user.id.to_string();
-            let user_name = redemption.user.login.to_string();
-            let mut event_builder = event_builder.set_sender_twitch_user_id(&user_id)
-                .set_sender_twitch_username(&user_name)
-                .set_destination_channel_id(&redemption.channel_id.to_string())
-                // TODO:
-                .set_destination_channel_name("todo: not available")
-                .set_title(&redemption.reward.title)
-                .set_prompt(&redemption.reward.prompt)
-                .set_user_text_input(redemption.user_input.as_deref())
-                .set_redemption_id(&redemption.id.to_string())
-                .set_reward_id(&redemption.reward.id.to_string())
-                .set_is_sub_only(redemption.reward.is_sub_only)
-                .set_reward_cost(redemption.reward.cost as u64);
-                // TODO:
-                // .set_max_per_stream(redemption.reward.max_per_stream as u64)
-                // .set_max_per_user_per_stream(redemption.reward.max_per_user_per_stream as u64);
-            event_builder.insert(&self.mysql_pool).await?;
-
-            if let Some(user_text) = redemption.user_input.as_deref() {
-              self.write_tts_inference_event(user_text).await?;
-            }
-          }
-          _ => {},
-        }
+        self.channel_points_event_handler.handle(topic, reply).await?;
       }
     }
 
