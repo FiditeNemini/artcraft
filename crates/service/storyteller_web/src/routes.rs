@@ -48,6 +48,11 @@ use crate::http_server::endpoints::tts::get_tts_model_use_count::get_tts_model_u
 use crate::http_server::endpoints::tts::get_tts_result::get_tts_inference_result_handler;
 use crate::http_server::endpoints::tts::get_tts_upload_model_job_status::get_tts_upload_model_job_status_handler;
 use crate::http_server::endpoints::tts::list_tts_models::list_tts_models_handler;
+use crate::http_server::endpoints::twitch::event_rules::create_event_rule::create_twitch_event_rule_handler;
+use crate::http_server::endpoints::twitch::event_rules::delete_event_rule::delete_twitch_event_rule_handler;
+use crate::http_server::endpoints::twitch::event_rules::edit_event_rule::edit_twitch_event_rule_handler;
+use crate::http_server::endpoints::twitch::event_rules::get_event_rule::get_twitch_event_rule_for_user_handler;
+use crate::http_server::endpoints::twitch::event_rules::list_event_rules_for_user::list_twitch_event_rules_for_user_handler;
 use crate::http_server::endpoints::twitch::oauth::oauth_begin_json::oauth_begin_enroll_json;
 use crate::http_server::endpoints::twitch::oauth::oauth_begin_redirect::oauth_begin_enroll_redirect;
 use crate::http_server::endpoints::twitch::oauth::oauth_end::oauth_end_enroll_from_redirect;
@@ -61,6 +66,8 @@ use crate::http_server::endpoints::users::list_user_w2l_templates::list_user_w2l
 use crate::http_server::endpoints::users::login::login_handler;
 use crate::http_server::endpoints::users::logout::logout_handler;
 use crate::http_server::endpoints::users::session_info::session_info_handler;
+use crate::http_server::endpoints::voice_clone_requests::check_if_voice_clone_request_submitted::check_if_voice_clone_request_submitted_handler;
+use crate::http_server::endpoints::voice_clone_requests::create_voice_clone_request::create_voice_clone_request_handler;
 use crate::http_server::endpoints::w2l::delete_w2l_result::delete_w2l_inference_result_handler;
 use crate::http_server::endpoints::w2l::delete_w2l_template::delete_w2l_template_handler;
 use crate::http_server::endpoints::w2l::edit_w2l_result::edit_w2l_inference_result_handler;
@@ -75,12 +82,6 @@ use crate::http_server::endpoints::w2l::get_w2l_template_use_count::get_w2l_temp
 use crate::http_server::endpoints::w2l::get_w2l_upload_template_job_status::get_w2l_upload_template_job_status_handler;
 use crate::http_server::endpoints::w2l::list_w2l_templates::list_w2l_templates_handler;
 use crate::http_server::endpoints::w2l::set_w2l_template_mod_approval::set_w2l_template_mod_approval_handler;
-use crate::http_server::endpoints::twitch::event_rules::create_event_rule::create_twitch_event_rule_handler;
-use crate::http_server::endpoints::twitch::event_rules::list_event_rules_for_user::list_twitch_event_rules_for_user_handler;
-use crate::http_server::endpoints::twitch::event_rules::delete_event_rule::delete_twitch_event_rule_handler;
-use crate::http_server::endpoints::twitch::event_rules::edit_event_rule::edit_twitch_event_rule_handler;
-use crate::http_server::endpoints::voice_clone_requests::create_voice_clone_request::create_voice_clone_request_handler;
-use crate::http_server::endpoints::voice_clone_requests::check_if_voice_clone_request_submitted::check_if_voice_clone_request_submitted_handler;
 
 pub fn add_routes<T, B> (app: App<T, B>) -> App<T, B>
   where
@@ -639,11 +640,15 @@ fn add_twitch_oauth_routes<T, B> (app: App<T, B>) -> App<T, B>
             .route(web::get().to(list_twitch_event_rules_for_user_handler))
             .route(web::head().to(|| HttpResponse::Ok()))
         )
-        .service(web::resource("/update/{token}")
+        .service(web::resource("/{token}/info")
+            .route(web::get().to(get_twitch_event_rule_for_user_handler))
+            .route(web::head().to(|| HttpResponse::Ok()))
+        )
+        .service(web::resource("/{token}/update")
             .route(web::post().to(edit_twitch_event_rule_handler))
             .route(web::head().to(|| HttpResponse::Ok()))
         )
-        .service(web::resource("/delete/{token}")
+        .service(web::resource("/{token}/delete")
             .route(web::delete().to(delete_twitch_event_rule_handler))
             .route(web::head().to(|| HttpResponse::Ok()))
         )

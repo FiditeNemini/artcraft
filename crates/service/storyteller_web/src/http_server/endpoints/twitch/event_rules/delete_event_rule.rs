@@ -11,7 +11,7 @@ use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 use crate::http_server::web_utils::response_success_helpers::simple_json_success;
 use crate::server_state::ServerState;
 use database_queries::queries::twitch::twitch_event_rules::delete_twitch_event_rule::delete_twitch_event_rule;
-use database_queries::queries::twitch::twitch_event_rules::get_twitch_event_rule_for_user::get_twitch_event_rules_for_user;
+use database_queries::queries::twitch::twitch_event_rules::get_twitch_event_rule_for_user::get_twitch_event_rule_for_user;
 use http_server_common::response::serialize_as_json_error::serialize_as_json_error;
 use log::{info, warn, log, error};
 use sqlx::MySqlPool;
@@ -96,7 +96,7 @@ pub async fn delete_twitch_event_rule_handler(
     return Err(DeleteTwitchEventRuleError::NotAuthorized);
   }
 
-  let twitch_event_rule = get_twitch_event_rules_for_user(
+  let twitch_event_rule = get_twitch_event_rule_for_user(
     &path.token, &user_session.user_token, &server_state.mysql_pool)
       .await
       .map_err(|e| {

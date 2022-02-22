@@ -185,6 +185,32 @@ print("===== Created Event Rule Output =====")
 print('Status: {}'.format(r.status_code))
 print(r.content)
 
+# ========== Create (5) ==========
+
+payload = {
+    'idempotency_token': str(uuid.uuid4()),
+    'event_category': 'bits',
+    'event_match_predicate': {
+        'bits_cheermote_prefix_spend_threshold': {
+            'cheermote_prefix': 'Cheer',
+            'minimum_bits_spent': 5,
+        },
+    },
+    'event_response': {
+        'tts_single_voice': {
+            'tts_model_token': 'TM:40m3aqtt41y0', # "Wakko" voice (dev)
+        }
+    },
+    'user_specified_rule_order': 0,
+    'rule_is_disabled': False,
+}
+
+r = requests.post(create_url, cookies=cookies, json=payload)
+
+print("===== Created Event Rule Output =====")
+print('Status: {}'.format(r.status_code))
+print(r.content)
+
 
 # ========== List ==========
 

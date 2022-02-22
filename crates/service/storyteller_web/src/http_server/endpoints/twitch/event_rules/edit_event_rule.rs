@@ -12,7 +12,7 @@ use crate::http_server::web_utils::response_success_helpers::simple_json_success
 use crate::server_state::ServerState;
 use database_queries::complex_models::event_match_predicate::EventMatchPredicate;
 use database_queries::complex_models::event_responses::EventResponse;
-use database_queries::queries::twitch::twitch_event_rules::get_twitch_event_rule_for_user::get_twitch_event_rules_for_user;
+use database_queries::queries::twitch::twitch_event_rules::get_twitch_event_rule_for_user::get_twitch_event_rule_for_user;
 use database_queries::queries::twitch::twitch_event_rules::update_twitch_event_rule_builder::UpdateTwitchEventRuleBuilder;
 use http_server_common::response::serialize_as_json_error::serialize_as_json_error;
 use log::{info, warn, log, error};
@@ -108,7 +108,7 @@ pub async fn edit_twitch_event_rule_handler(
     return Err(EditTwitchEventRuleError::NotAuthorized);
   }
 
-  let twitch_event_rule = get_twitch_event_rules_for_user(
+  let twitch_event_rule = get_twitch_event_rule_for_user(
     &path.token, &user_session.user_token, &server_state.mysql_pool)
       .await
       .map_err(|e| {

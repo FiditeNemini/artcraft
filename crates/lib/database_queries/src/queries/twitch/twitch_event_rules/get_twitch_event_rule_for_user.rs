@@ -19,7 +19,7 @@ pub struct TwitchEventRule {
 }
 
 /// Query record by token and user token
-pub async fn get_twitch_event_rules_for_user(
+pub async fn get_twitch_event_rule_for_user(
   twitch_event_rule_token: &str,
   user_token: &str,
   pool: &MySqlPool,
