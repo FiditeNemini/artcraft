@@ -211,6 +211,33 @@ print("===== Created Event Rule Output =====")
 print('Status: {}'.format(r.status_code))
 print(r.content)
 
+# ========== Create (6) ==========
+
+payload = {
+    'idempotency_token': str(uuid.uuid4()),
+    'event_category': 'channel_points',
+    'event_match_predicate': {
+        'channel_points_reward_name_exact_match': {
+            'reward_name': 'My Reward',
+        },
+    },
+    'event_response': {
+        'tts_random_voice': {
+            'tts_model_tokens': [
+                'TM:40m3aqtt41y0', # "Wakko" voice (dev)
+                'TM:4c1hycjj3a3t', # "Zephyr" voice (dev)
+            ],
+        }
+    },
+    'user_specified_rule_order': 0,
+    'rule_is_disabled': False,
+}
+
+r = requests.post(create_url, cookies=cookies, json=payload)
+
+print("===== Created Event Rule Output =====")
+print('Status: {}'.format(r.status_code))
+print(r.content)
 
 # ========== List ==========
 
