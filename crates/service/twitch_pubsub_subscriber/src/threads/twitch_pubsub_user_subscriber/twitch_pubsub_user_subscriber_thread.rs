@@ -656,12 +656,12 @@ async fn lookup_event_rules(
         let event_match_predicate = serde_json::from_str(&rule.event_match_predicate)
             .unwrap_or_else(|e| {
               error!("Issue with deserializing: {}", e);
-              EventMatchPredicate::NotSet
+              EventMatchPredicate::NotSet {}
             });
         let event_response = serde_json::from_str(&rule.event_response)
             .unwrap_or_else(|e| {
               error!("Issue with deserializing: {}", e);
-              EventResponse::NotSet
+              EventResponse::NotSet {}
             });
         TwitchEventRuleLight {
           token: rule.token,

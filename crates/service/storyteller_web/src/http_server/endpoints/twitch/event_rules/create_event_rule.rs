@@ -107,7 +107,7 @@ pub async fn create_twitch_event_rule_handler(
 
   let event_match_predicate = request.event_match_predicate
       .clone()
-      .unwrap_or(EventMatchPredicate::NotSet);
+      .unwrap_or(EventMatchPredicate::NotSet {});
 
   let mut event_match_predicate = serde_json::to_string(&event_match_predicate)
       .map_err(|e| {
@@ -117,7 +117,7 @@ pub async fn create_twitch_event_rule_handler(
 
   let event_response = request.event_response
       .clone()
-      .unwrap_or(EventResponse::NotSet);
+      .unwrap_or(EventResponse::NotSet {});
 
   let mut event_response = serde_json::to_string(&event_match_predicate)
       .map_err(|e| {

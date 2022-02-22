@@ -94,9 +94,9 @@ impl ChannelPointsEventHandler {
             .filter(|rule| rule.event_category.eq(&TwitchEventCategory::ChannelPoints))
             .find(|rule| {
               match rule.event_match_predicate {
-                EventMatchPredicate::NotSet => false, // Not set
+                EventMatchPredicate::NotSet {} => false, // Not set
                 EventMatchPredicate::BitsCheermoteNameExactMatch { ..} => false, // Wrong type
-                EventMatchPredicate::BitsCheermoteNameSpendThreshold { .. } => false, // Wrong type
+                EventMatchPredicate::BitsCheermotePrefixSpendThreshold { .. } => false, // Wrong type
                 EventMatchPredicate::BitsSpendThreshold { .. } => false, // Wrong type
                 EventMatchPredicate::ChannelPointsRewardNameExactMatch { ref reward_name } => {
                   reward_name.eq_ignore_ascii_case(&redemption.reward.title)
@@ -116,7 +116,7 @@ impl ChannelPointsEventHandler {
       Some(ref m) => m.as_str(),
     };
     match rule.event_response {
-      EventResponse::NotSet => {
+      EventResponse::NotSet {} => {
         info!("Empty event response.");
         return Ok(())
       },

@@ -80,12 +80,12 @@ impl BitsEventHandler {
             .filter(|rule| rule.event_category.eq(&TwitchEventCategory::Bits))
             .find(|rule| {
               match rule.event_match_predicate {
-                EventMatchPredicate::NotSet => false, // Not set
+                EventMatchPredicate::NotSet {} => false, // Not set
                 EventMatchPredicate::ChannelPointsRewardNameExactMatch { .. } => false, // Wrong type
                 EventMatchPredicate::BitsCheermoteNameExactMatch { ref cheermote_name } => {
                   false // TODO
                 },
-                EventMatchPredicate::BitsCheermoteNameSpendThreshold { ref cheermote_name_prefix, minimum_bits_spent } => {
+                EventMatchPredicate::BitsCheermotePrefixSpendThreshold { ref cheermote_prefix, minimum_bits_spent } => {
                   false // TODO
                 },
                 EventMatchPredicate::BitsSpendThreshold { minimum_bits_spent } => {
@@ -103,7 +103,7 @@ impl BitsEventHandler {
   //noinspection DuplicatedCode
   async fn handle_matched_rule(&self, rule: &TwitchEventRuleLight, data: &BitsEventData) -> AnyhowResult<()> {
     match rule.event_response {
-      EventResponse::NotSet => {
+      EventResponse::NotSet {} => {
         info!("Empty event response.");
         return Ok(())
       },
