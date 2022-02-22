@@ -14,11 +14,13 @@ pub enum EventMatchPredicate {
 
   /// A predicate for a cheermote name without value, but with a minimum bits
   /// threshold. eg "Cheer", minimum=150 bits. Case insensitive.
-  BitsCheermoteNameSpendThreshold {
-    cheermote_name_prefix: String,
+  /// Twitch also calls the leading part "prefix"
+  BitsCheermotePrefixSpendThreshold {
+    cheermote_prefix: String,
     minimum_bits_spent: u64,
   },
 
+  /// Spend a minimum amount of bits.
   BitsSpendThreshold {
     minimum_bits_spent: u64,
   },
@@ -35,7 +37,6 @@ mod tests {
   #[test]
   fn not_set() {
     let rust_value = EventMatchPredicate::NotSet {};
-
     let json = "{\"not_set\":{}}";
 
     let converted_to_json= serde_json::to_string(&rust_value).unwrap();

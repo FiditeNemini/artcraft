@@ -4,7 +4,8 @@ use container_common::anyhow_result::AnyhowResult;
 #[serde(rename_all = "snake_case")]
 pub enum EventResponse {
   /// Default value
-  NotSet,
+  /// NB: This has an empty struct so it serializes as JSON and not a String!
+  NotSet {},
 
   /// Respond with a single TTS voice.
   TtsSingleVoice {
@@ -20,6 +21,18 @@ pub enum EventResponse {
 #[cfg(test)]
 mod tests {
   use crate::complex_models::event_responses::EventResponse;
+
+  #[test]
+  fn not_set() {
+    let rust_value = EventResponse::NotSet {};
+    let json = "{\"not_set\":{}}";
+
+    let converted_to_json= serde_json::to_string(&rust_value).unwrap();
+    assert_eq!(&converted_to_json, json);
+
+    let converted_from_json : EventResponse = serde_json::from_str(json).unwrap();
+    assert_eq!(&converted_from_json, &rust_value);
+  }
 
   #[test]
   fn tts_single_voice() {
