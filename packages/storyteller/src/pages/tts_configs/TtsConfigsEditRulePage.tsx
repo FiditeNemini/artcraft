@@ -1,28 +1,36 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { SessionWrapper } from '@storyteller/components/src/session/SessionWrapper';
 import { GetTwitchEventRule, GetTwitchEventRuleIsError, GetTwitchEventRuleIsOk, TwitchEventRule } from '@storyteller/components/src/api/storyteller/twitch_event_rules/GetTwitchEventRule';
-import { DeleteTwitchEventRule } from '@storyteller/components/src/api/storyteller/twitch_event_rules/DeleteTwitchEventRule';
+import { EditTwitchEventRule } from '@storyteller/components/src/api/storyteller/twitch_event_rules/EditTwitchEventRule';
 import { TwitchEventRuleElement } from './TwitchEventRuleElement';
 import { Link, useHistory, useParams } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faAngleLeft, faTrash } from '@fortawesome/free-solid-svg-icons';
+import { faAngleLeft, faSave, faTrash } from '@fortawesome/free-solid-svg-icons';
+import { EventMatchPredicate } from '@storyteller/components/src/api/storyteller/twitch_event_rules/shared/EventMatchPredicate';
+import { EventResponse } from '@storyteller/components/src/api/storyteller/twitch_event_rules/shared/EventResponse';
 
 interface Props {
   sessionWrapper: SessionWrapper,
 }
 
-function TtsConfigsDeleteRulePage(props: Props) {
+function TtsConfigsEditRulePage(props: Props) {
   const { token } : { token : string } = useParams();
 
   const history = useHistory();
 
   const [twitchEventRule, setTwitchEventRule] = useState<TwitchEventRule|undefined>(undefined);
+  const [eventMatchPredicate, setEventMatchPredicate] = useState<EventMatchPredicate|undefined>(undefined);
+  const [eventResponse, setEventResponse] = useState<EventResponse|undefined>(undefined);
+  const [ruleIsDisabled, setRuleIsDisabled] = useState(false);
 
   const getTwitchEventRule = useCallback(async (token: string) => {
     const response = await GetTwitchEventRule(token);
 
     if (GetTwitchEventRuleIsOk(response)) {
       setTwitchEventRule(response.twitch_event_rule);
+      setEventMatchPredicate(response.twitch_event_rule.event_match_predicate);
+      setEventResponse(response.twitch_event_rule.event_response);
+      setRuleIsDisabled(response.twitch_event_rule.rule_is_disabled);
     } else if (GetTwitchEventRuleIsError(response))  {
       // TODO
     }
@@ -37,7 +45,17 @@ function TtsConfigsDeleteRulePage(props: Props) {
   const handleDeleteFormSubmit = async (ev: React.FormEvent<HTMLFormElement>) : Promise<boolean> => {
     ev.preventDefault();
 
-    const result = await DeleteTwitchEventRule(token);
+    if (eventMatchPredicate === undefined || eventResponse === undefined) {
+      return false;
+    }
+
+    const request = {
+      event_match_predicate: eventMatchPredicate,
+      event_response: eventResponse,
+      rule_is_disabled: ruleIsDisabled,
+    };
+
+    const result = await EditTwitchEventRule(token, request);
     if (result.success) {
       history.push(indexLink);
     }
@@ -57,7 +75,7 @@ function TtsConfigsDeleteRulePage(props: Props) {
   return (
     <>
       <div className="section">
-        <h1 className="title"> Delete Rule ? </h1>
+        <h1 className="title"> Edit Rule </h1>
       </div>
 
       <br />
@@ -69,8 +87,8 @@ function TtsConfigsDeleteRulePage(props: Props) {
       <br />
 
       <form onSubmit={handleDeleteFormSubmit}>
-        <button className="button is-large is-fullwidth is-danger">
-          <FontAwesomeIcon icon={faTrash} />&nbsp;Delete
+        <button className="button is-large is-fullwidth is-primary">
+          Save Changes&nbsp;<FontAwesomeIcon icon={faSave} />
         </button>
       </form>
       
@@ -84,4 +102,4 @@ function TtsConfigsDeleteRulePage(props: Props) {
   )
 }
 
-export { TtsConfigsDeleteRulePage }
+export { TtsConfigsEditRulePage }
