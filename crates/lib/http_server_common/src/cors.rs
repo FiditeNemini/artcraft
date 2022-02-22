@@ -44,7 +44,7 @@ pub fn build_common_cors_config() -> Cors {
       .allowed_origin("https://vo.codes")
       .allowed_origin("https://vocodes.com")
       // Remaining setup
-      .allowed_methods(vec!["GET", "POST", "OPTIONS"])
+      .allowed_methods(vec!["GET", "POST", "OPTIONS", "DELETE"])
       .supports_credentials()
       .allowed_headers(vec![
         http::header::ACCEPT,

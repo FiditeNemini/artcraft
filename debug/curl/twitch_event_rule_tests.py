@@ -9,8 +9,8 @@ import pprint
 login_url = 'http://localhost:12345/login'
 create_url = 'http://localhost:12345/twitch/event_rule/create'
 list_url = 'http://localhost:12345/twitch/event_rule/list'
-update_url = 'http://localhost:12345/twitch/event_rule/update/{}'
-delete_url = 'http://localhost:12345/twitch/event_rule/delete/{}'
+update_url = 'http://localhost:12345/twitch/event_rule/{}/update'
+delete_url = 'http://localhost:12345/twitch/event_rule/{}/delete'
 
 
 def delete_rule(token, cookies):
