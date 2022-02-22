@@ -137,7 +137,7 @@ pub async fn edit_twitch_event_rule_handler(
       .clone()
       .unwrap_or(EventResponse::NotSet {});
 
-  let mut event_response = serde_json::to_string(&event_match_predicate)
+  let mut event_response = serde_json::to_string(&event_response)
       .map_err(|e| {
         return EditTwitchEventRuleError::BadInput(
           "improper EventResponse".to_string());

@@ -4,12 +4,24 @@ import json
 import re
 import requests
 import uuid
+import pprint
 
 login_url = 'http://localhost:12345/login'
 create_url = 'http://localhost:12345/twitch/event_rule/create'
 list_url = 'http://localhost:12345/twitch/event_rule/list'
 update_url = 'http://localhost:12345/twitch/event_rule/update/{}'
 delete_url = 'http://localhost:12345/twitch/event_rule/delete/{}'
+
+
+def delete_rule(token, cookies):
+    url = delete_url.format(token)
+    r = requests.delete(url, cookies=cookies)
+    print("===== Deleted Event Rule Output =====")
+    print('Status: {}'.format(r.status_code))
+    print(r.content)
+
+
+# ========== Setup / Login ==========
 
 payload = {
     'username_or_email': 'echelon',
@@ -30,11 +42,33 @@ session_cookie = m.group(1)
 
 cookies = { 'session': session_cookie }
 
+# ========== Delete All Existing ==========
+
+r = requests.get(list_url, cookies=cookies)
+
+print("===== List Event Rule Output =====")
+print('Status: {}'.format(r.status_code))
+response = json.loads(r.content)
+
+tokens = [rule['token'] for rule in response['twitch_event_rules']]
+for token in tokens:
+    delete_rule(token, cookies)
+
+# ========== Create (1) ==========
+
 payload = {
     'idempotency_token': str(uuid.uuid4()),
     'event_category': 'channel_points',
-    'event_match_predicate': 'TODO testing this',
-    'event_response': 'TODO testing this',
+    'event_match_predicate': {
+        'bits_spend_threshold': {
+            'minimum_bits_spent': 2,
+        },
+    },
+    'event_response': {
+        'tts_single_voice': {
+            'tts_model_token': 'TM:4c1hycjj3a3t', # "Zephyr" voice (dev)
+        }
+    },
     'user_specified_rule_order': 0,
     'rule_is_disabled': False,
 }
@@ -48,9 +82,48 @@ print(r.content)
 response = json.loads(r.content)
 token = response['twitch_event_rule_token']
 
+# ========== Create (2) ==========
+
 payload = {
-    'event_match_predicate': 'Updated',
-    'event_response': 'Updated 2',
+    'idempotency_token': str(uuid.uuid4()),
+    'event_category': 'channel_points',
+    'event_match_predicate': {
+        'bits_spend_threshold': {
+            'minimum_bits_spent': 1,
+        },
+    },
+    'event_response': {
+        'tts_single_voice': {
+            'tts_model_token': 'TM:40m3aqtt41y0', # "Wakko" voice (dev)
+        }
+    },
+    'user_specified_rule_order': 0,
+    'rule_is_disabled': False,
+}
+
+r = requests.post(create_url, cookies=cookies, json=payload)
+
+print("===== Created Event Rule Output =====")
+print('Status: {}'.format(r.status_code))
+print(r.content)
+
+response = json.loads(r.content)
+token = response['twitch_event_rule_token']
+
+# ========== Update ==========
+
+
+payload = {
+    'event_match_predicate': {
+        'bits_spend_threshold': {
+            'minimum_bits_spent': 1,
+        },
+    },
+    'event_response': {
+        'tts_single_voice': {
+            'tts_model_token': 'TM:40m3aqtt41y0', # "Wakko" voice (dev)
+        }
+    },
     'user_specified_rule_order': 123,
     'rule_is_disabled': True,
 }
@@ -61,16 +134,12 @@ print("===== Edited Event Rule Output =====")
 print('Status: {}'.format(r.status_code))
 print(r.content)
 
+# ========== List ==========
+
 r = requests.get(list_url, cookies=cookies)
 
 print("===== List Event Rule Output =====")
 print('Status: {}'.format(r.status_code))
-print(r.content)
-
-url = delete_url.format(token)
-r = requests.delete(url, cookies=cookies)
-
-print("===== Deleted Event Rule Output =====")
-print('Status: {}'.format(r.status_code))
-print(r.content)
+response = json.loads(r.content)
+pprint.pprint(response)
 

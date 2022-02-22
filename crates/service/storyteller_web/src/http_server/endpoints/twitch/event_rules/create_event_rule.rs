@@ -16,7 +16,7 @@ use database_queries::complex_models::event_responses::EventResponse;
 use database_queries::queries::twitch::twitch_event_rules::insert_twitch_event_rule_builder::InsertTwitchEventRuleBuilder;
 use database_queries::tokens::Tokens;
 use http_server_common::response::serialize_as_json_error::serialize_as_json_error;
-use log::{info, warn, log};
+use log::{info, warn, log, error};
 use sqlx::MySqlPool;
 use sqlx::error::DatabaseError;
 use sqlx::error::Error::Database;
@@ -119,7 +119,7 @@ pub async fn create_twitch_event_rule_handler(
       .clone()
       .unwrap_or(EventResponse::NotSet {});
 
-  let mut event_response = serde_json::to_string(&event_match_predicate)
+  let mut event_response = serde_json::to_string(&event_response)
       .map_err(|e| {
         return CreateTwitchEventRuleError::BadInput(
           "improper EventResponse".to_string());
