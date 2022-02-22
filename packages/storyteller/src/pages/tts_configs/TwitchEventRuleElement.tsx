@@ -8,7 +8,6 @@ interface Props {
 }
 
 function TwitchEventRuleElement(props: Props) {
-
   let title = "Not Set"
 
   if (props.rule.event_match_predicate.bits_cheermote_name_exact_match !== undefined) {

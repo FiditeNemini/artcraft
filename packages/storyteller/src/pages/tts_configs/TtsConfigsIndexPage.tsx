@@ -3,6 +3,8 @@ import { SessionWrapper } from '@storyteller/components/src/session/SessionWrapp
 import { ListTwitchEventRules, ListTwitchEventRulesIsError, ListTwitchEventRulesIsOk, TwitchEventRule } from '@storyteller/components/src/api/storyteller/twitch_event_rules/ListTwitchEventRules';
 import { TwitchEventRuleElement } from './TwitchEventRuleElement';
 import { TwitchEventCategory } from '@storyteller/components/src/api/storyteller/twitch_event_rules/shared/TwitchEventCategory';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faBox, faCircleNotch, faCoins, faDonate, faExclamation, faGem, faLightbulb, faTerminal } from '@fortawesome/free-solid-svg-icons';
 
 interface Props {
   sessionWrapper: SessionWrapper,
@@ -40,20 +42,32 @@ function TtsConfigsIndexPage(props: Props) {
         <h2 className="subtitle"> Configure how your stream TTS works </h2>
       </div>
       <div className="content">
-        <h1 className="title"> Bits / Cheers </h1>
+        <article className="message is-primary">
+          <div className="message-body">
+          You can create rules for matching <em>different categories of events</em>: cheers (bits), 
+          channel point rewards, etc. 
+          
+          When an event occurs in your stream, we compare it against the rules in its 
+          category. <strong>The first matched rule</strong> (from the top) is selected, and the action 
+          that it specifies is taken. For now this is limited to FakeYou text to speech, but we'll be 
+          adding lots of new capabilities soon.
+          </div>
+        </article>
+        <h1 className="title"> <FontAwesomeIcon icon={faGem} /> Bits / Cheers </h1>
         <h2 className="subtitle is-4">
           (These settings are best for small and medium-sized channels.)
         </h2>
         <p>
-          You can create rules for matching cheers. When someone cheers, these rules will be tested in order. 
-          The first match wins, and the action the rule specifies will be taken.
         </p>
         {cheerEventRules.map(rule => {
           return <TwitchEventRuleElement rule={rule} />
         })}
       </div>
+
+      <br />
+
       <div className="content">
-        <h1 className="title"> Channel Points / Rewards </h1>
+        <h1 className="title"> <FontAwesomeIcon icon={faBox} /> Channel Points / Rewards </h1>
         <h2 className="subtitle is-4">
           (These settings are best for small channels.)
         </h2>
@@ -66,19 +80,35 @@ function TtsConfigsIndexPage(props: Props) {
           return <TwitchEventRuleElement rule={rule} />
         })}
       </div>
+
+      <br />
+
       <div className="content">
-        <h1 className="title"> Donation Services (Streamlabs, StreamElements, etc.) </h1>
+        <h1 className="title"> <FontAwesomeIcon icon={faDonate} /> Donation Services (Streamlabs, StreamElements, etc.) </h1>
         <h2 className="subtitle is-4">
           (These settings are great for large channels, but work for channels of all sizes.)
         </h2>
         <p>Coming soon&hellip;</p>
       </div>
+
+      <br />
+
       <div className="content">
-        <h1 className="title"> Text <code>/slash</code> Commands</h1>
+        <h1 className="title"> <FontAwesomeIcon icon={faTerminal} />Text <code>/slash</code> Commands</h1>
         <h2 className="subtitle is-4">
           (These settings are great for very small channels.)
         </h2>
         <p>Coming soon&hellip;</p>
+      </div>
+
+      <br />
+
+      <div className="content">
+        <h1 className="title"> <FontAwesomeIcon icon={faLightbulb} /> Suggestions? </h1>
+        <h2 className="subtitle is-4">
+          We want to build the things you want
+        </h2>
+        <p>Can you think of anything we haven't provided? Please let us know in Discord so that we can build it!</p>
       </div>
       <br />
       <br />
