@@ -5,12 +5,15 @@ import { EditTwitchEventRule } from '@storyteller/components/src/api/storyteller
 import { TwitchEventRuleElement } from './TwitchEventRuleElement';
 import { Link, useHistory, useParams } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faAngleLeft, faSave, faTrash } from '@fortawesome/free-solid-svg-icons';
+import { faAngleLeft, faSave } from '@fortawesome/free-solid-svg-icons';
 import { EventMatchPredicate } from '@storyteller/components/src/api/storyteller/twitch_event_rules/shared/EventMatchPredicate';
 import { EventResponse } from '@storyteller/components/src/api/storyteller/twitch_event_rules/shared/EventResponse';
+import { TtsModelListItem } from '@storyteller/components/src/api/tts/ListTtsModels';
 
 interface Props {
   sessionWrapper: SessionWrapper,
+  allTtsModels: TtsModelListItem[],
+  allTtsModelsByToken: Map<string, TtsModelListItem>,
 }
 
 function TtsConfigsEditRulePage(props: Props) {
@@ -81,7 +84,11 @@ function TtsConfigsEditRulePage(props: Props) {
       <br />
 
       <div className="content">
-        <TwitchEventRuleElement rule={twitchEventRule} hideButtons={true} />
+        <TwitchEventRuleElement 
+          rule={twitchEventRule} 
+          hideButtons={true} 
+          allTtsModelsByToken={props.allTtsModelsByToken}
+          />
       </div>
 
       <br />

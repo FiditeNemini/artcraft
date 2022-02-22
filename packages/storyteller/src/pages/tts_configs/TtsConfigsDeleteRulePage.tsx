@@ -6,9 +6,11 @@ import { TwitchEventRuleElement } from './TwitchEventRuleElement';
 import { Link, useHistory, useParams } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faAngleLeft, faTrash } from '@fortawesome/free-solid-svg-icons';
+import { TtsModelListItem } from '@storyteller/components/src/api/tts/ListTtsModels';
 
 interface Props {
   sessionWrapper: SessionWrapper,
+  allTtsModelsByToken: Map<string, TtsModelListItem>,
 }
 
 function TtsConfigsDeleteRulePage(props: Props) {
@@ -63,7 +65,10 @@ function TtsConfigsDeleteRulePage(props: Props) {
       <br />
 
       <div className="content">
-        <TwitchEventRuleElement rule={twitchEventRule} hideButtons={true} />
+        <TwitchEventRuleElement 
+          rule={twitchEventRule} 
+          hideButtons={true} 
+          allTtsModelsByToken={props.allTtsModelsByToken} />
       </div>
 
       <br />

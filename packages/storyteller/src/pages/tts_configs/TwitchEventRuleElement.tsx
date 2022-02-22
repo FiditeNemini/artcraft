@@ -1,11 +1,13 @@
 import React from 'react';
 import { TwitchEventRule } from '@storyteller/components/src/api/storyteller/twitch_event_rules/ListTwitchEventRules';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faArrowDown, faArrowUp, faEdit, faTrash } from '@fortawesome/free-solid-svg-icons';
+import { faArrowDown, faArrowUp, faEdit, faExternalLinkAlt, faTrash } from '@fortawesome/free-solid-svg-icons';
 import { Link } from 'react-router-dom';
+import { TtsModelListItem } from '@storyteller/components/src/api/tts/ListTtsModels';
 
 interface Props {
   rule: TwitchEventRule,
+  allTtsModelsByToken: Map<string, TtsModelListItem>,
   hideButtons?: boolean,
 }
 
@@ -46,15 +48,45 @@ function TwitchEventRuleElement(props: Props) {
   }
 
   if (props.rule.event_response.tts_single_voice !== undefined) {
+    const token = props.rule.event_response.tts_single_voice.tts_model_token;
+
+    let model = props.allTtsModelsByToken.get(token);
+    let modelName = token;
+
+    if (!!model) {
+      modelName = model.title;
+    }
+
+    let link = `https://fakeyou.com/tts/${token}`;
+
     description = (
       <>
-        TTS with voice: {props.rule.event_response.tts_single_voice.tts_model_token}
+        TTS with voice: {modelName} <a href={link} target="_blank"><FontAwesomeIcon icon={faExternalLinkAlt} /></a>
       </>
     );
   } else if (props.rule.event_response.tts_random_voice !== undefined) {
+    const tokens = props.rule.event_response.tts_random_voice.tts_model_tokens;
+
+    let modelNameAndLinks = tokens.map(token => {
+      let model = props.allTtsModelsByToken.get(token);
+      let link = `https://fakeyou.com/tts/${token}`;
+
+      let modelName = token;
+      if (!!model) {
+        modelName = model.title;
+      }
+
+      return (
+        <li>
+          {modelName} <a href={link} target="_blank"><FontAwesomeIcon icon={faExternalLinkAlt} /></a>
+        </li>
+      );
+    });
+
+
     description = (
       <>
-        TTS with a random voice from: {props.rule.event_response.tts_random_voice.tts_model_tokens}
+        TTS with a random voice from: <ul>{modelNameAndLinks}</ul>
       </>
     );
   }

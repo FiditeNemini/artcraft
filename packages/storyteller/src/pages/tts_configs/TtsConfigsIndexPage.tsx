@@ -6,9 +6,11 @@ import { TwitchEventCategory } from '@storyteller/components/src/api/storyteller
 import { DiscordLink } from '@storyteller/components/src/elements/DiscordLink';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faBox, faDonate, faGem, faLightbulb, faTerminal } from '@fortawesome/free-solid-svg-icons';
+import { TtsModelListItem } from '@storyteller/components/src/api/tts/ListTtsModels';
 
 interface Props {
   sessionWrapper: SessionWrapper,
+  allTtsModelsByToken: Map<string, TtsModelListItem>,
 }
 
 function TtsConfigsIndexPage(props: Props) {
@@ -61,7 +63,10 @@ function TtsConfigsIndexPage(props: Props) {
         <p>
         </p>
         {cheerEventRules.map(rule => {
-          return <TwitchEventRuleElement rule={rule} />
+          return <TwitchEventRuleElement 
+            rule={rule} 
+            allTtsModelsByToken={props.allTtsModelsByToken}
+            />
         })}
       </div>
 
@@ -73,7 +78,10 @@ function TtsConfigsIndexPage(props: Props) {
           (These settings are best for small channels.)
         </h2>
         {channelPointsEventRules.map(rule => {
-          return <TwitchEventRuleElement rule={rule} />
+          return <TwitchEventRuleElement 
+            rule={rule} 
+            allTtsModelsByToken={props.allTtsModelsByToken}
+            />
         })}
       </div>
 

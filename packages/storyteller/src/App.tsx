@@ -3,6 +3,7 @@ import './App.scss';
 
 import React from 'react';
 import { BrowserRouter, Route, Switch } from "react-router-dom";
+import { ListTtsModels, TtsModelListItem } from '@storyteller/components/src/api/tts/ListTtsModels';
 import StreamPage from './pages/stream/StreamPage';
 import i18n from 'i18next';
 import { ComingSoonPage } from './pages/coming-soon/ComingSoonPage';
@@ -40,6 +41,8 @@ interface Props {
 
 interface State {
   sessionWrapper: SessionWrapper,
+  allTtsModels: TtsModelListItem[],
+  allTtsModelsByToken: Map<string, TtsModelListItem>,
 }
 
 // Root element is a non-functional component for easier global lifecycle management
@@ -49,12 +52,15 @@ class App extends React.Component<Props, State> {
     super(props);
     this.state = {
       sessionWrapper: SessionWrapper.emptySession(),
+      allTtsModels: [],
+      allTtsModelsByToken: new Map(),
     };
   }
 
   async componentDidMount() {
     await this.querySession();
     await this.queryLanguage();
+    await this.queryTtsModels();
     setInterval(async () => { await this.querySession() }, 60000);
   }
 
@@ -69,6 +75,39 @@ class App extends React.Component<Props, State> {
     let locale = await DetectLocale();
     if (DetectLocaleIsOk(locale)) {
       // TODO
+    }
+  }
+
+  queryTtsModels = async () => {
+    if (this.state.allTtsModels.length > 0) {
+      return; // Already queried.
+    }
+    const models = await ListTtsModels();
+    if (models) {
+
+      let allTtsModelsByToken = new Map();
+
+      models.forEach(item => {
+        allTtsModelsByToken.set(item.model_token, item);
+      })
+
+
+      //dynamicallyCategorizeModels(models);
+      this.setState({
+        allTtsModels: models,
+        allTtsModelsByToken: allTtsModelsByToken,
+      });
+      //if (!maybeSelectedTtsModel && models.length > 0) {
+      //  let model = models[0];
+      //  const featuredModels = models.filter(m => m.is_front_page_featured);
+      //  if (featuredModels.length > 0) {
+      //    // Random featured model
+      //    model = featuredModels[
+      //      Math.floor(Math.random()*featuredModels.length)
+      //    ];
+      //  }
+      //  setMaybeSelectedTtsModel(model);
+      //}
     }
   }
 
@@ -104,21 +143,27 @@ class App extends React.Component<Props, State> {
               <Route exact={true} path="/tts_configs/create">
                 <TtsConfigsCreateRulePage
                   sessionWrapper={this.state.sessionWrapper}
+                  allTtsModels={this.state.allTtsModels}
+                  allTtsModelsByToken={this.state.allTtsModelsByToken}
                 />
               </Route>
               <Route exact={true} path="/tts_configs/delete/:token">
                 <TtsConfigsDeleteRulePage
                   sessionWrapper={this.state.sessionWrapper}
+                  allTtsModelsByToken={this.state.allTtsModelsByToken}
                 />
               </Route>
               <Route exact={true} path="/tts_configs/edit/:token">
                 <TtsConfigsEditRulePage
                   sessionWrapper={this.state.sessionWrapper}
+                  allTtsModels={this.state.allTtsModels}
+                  allTtsModelsByToken={this.state.allTtsModelsByToken}
                 />
               </Route>
               <Route exact={true} path="/tts_configs">
                 <TtsConfigsIndexPage
                   sessionWrapper={this.state.sessionWrapper}
+                  allTtsModelsByToken={this.state.allTtsModelsByToken}
                 />
               </Route>
               <Route path="/obs/:username">
