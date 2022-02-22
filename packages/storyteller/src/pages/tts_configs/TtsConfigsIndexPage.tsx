@@ -71,11 +71,6 @@ function TtsConfigsIndexPage(props: Props) {
         <h2 className="subtitle is-4">
           (These settings are best for small channels.)
         </h2>
-        <p>
-          You can create rules for matching channel point reward redemptions. When a reward is redeemed, 
-          it will be tested against these rules in order. The first match wins, and the action the rule 
-          specifies will be taken.
-        </p>
         {channelPointsEventRules.map(rule => {
           return <TwitchEventRuleElement rule={rule} />
         })}
@@ -94,7 +89,7 @@ function TtsConfigsIndexPage(props: Props) {
       <br />
 
       <div className="content">
-        <h1 className="title"> <FontAwesomeIcon icon={faTerminal} />Text <code>/slash</code> Commands</h1>
+        <h1 className="title"> <FontAwesomeIcon icon={faTerminal} /> Text <code>/slash</code> Commands</h1>
         <h2 className="subtitle is-4">
           (These settings are great for very small channels.)
         </h2>

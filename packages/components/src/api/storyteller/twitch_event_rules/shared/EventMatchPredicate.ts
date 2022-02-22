@@ -7,7 +7,7 @@ export interface BitsCheermoteNameExactMatch {
 };
 
 export interface BitsCheermotePrefixSpendThreshold {
-  cheermote_name_prefix: string,
+  cheermote_prefix: string,
   minimum_bits_spent: number,
 };
 
