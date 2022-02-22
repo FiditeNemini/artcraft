@@ -100,6 +100,7 @@ impl BitsEventHandler {
     };
   }
 
+  //noinspection DuplicatedCode
   async fn handle_matched_rule(&self, rule: &TwitchEventRuleLight, data: &BitsEventData) -> AnyhowResult<()> {
     match rule.event_response {
       EventResponse::NotSet => {

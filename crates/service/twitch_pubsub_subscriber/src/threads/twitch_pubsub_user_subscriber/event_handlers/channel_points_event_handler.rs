@@ -1,7 +1,13 @@
+use anyhow::anyhow;
 use container_common::anyhow_result::AnyhowResult;
-use crate::threads::twitch_pubsub_user_subscriber::subscriber_preferences_cache::TwitchPubsubCachedState;
+use container_common::collections::random_from_vec::random_from_vec;
+use crate::threads::twitch_pubsub_user_subscriber::subscriber_preferences_cache::{TwitchPubsubCachedState, TwitchEventRuleLight};
 use crate::threads::twitch_pubsub_user_subscriber::tts_writer::TtsWriter;
+use database_queries::column_types::twitch_event_category::TwitchEventCategory;
+use database_queries::complex_models::event_match_predicate::EventMatchPredicate;
+use database_queries::complex_models::event_responses::EventResponse;
 use database_queries::queries::twitch::twitch_pubsub::insert_channel_points::TwitchPubsubChannelPointsInsertBuilder;
+use log::info;
 use r2d2_redis::r2d2;
 use sqlx::MySql;
 use std::sync::Arc;
@@ -38,19 +44,19 @@ impl ChannelPointsEventHandler {
       ChannelPointsChannelV1Reply::UpdateRedemptionStatusProgress { .. } => {}
       // Implemented
       ChannelPointsChannelV1Reply::RewardRedeemed { timestamp, redemption } => {
-        self.handle_reward_redeemed(redemption).await?;
+        self.handle_reward_redeemed_event(&redemption).await?;
       }
       _ => {},
     }
     Ok(())
   }
 
-  async fn handle_reward_redeemed(&self, redemption: Redemption) -> AnyhowResult<()> {
-    if let Some(user_text) = redemption.user_input.as_deref() {
-      self.tts_writer.write_tts(user_text).await?;
+  async fn handle_reward_redeemed_event(&self, redemption: &Redemption) -> AnyhowResult<()> {
+    let maybe_rule = self.find_matching_rule(redemption)?;
+    if let Some(rule) = maybe_rule {
+      self.handle_matched_rule(&rule, redemption).await?;
+      self.report_event_for_analytics(redemption).await?; // Report event for analytics
     }
-    // Report event for analytics
-    self.report_event_for_analytics(&redemption).await?;
     Ok(())
   }
 
@@ -76,6 +82,55 @@ impl ChannelPointsEventHandler {
     // .set_max_per_stream(redemption.reward.max_per_stream as u64)
     // .set_max_per_user_per_stream(redemption.reward.max_per_user_per_stream as u64);
     event_builder.insert(&self.mysql_pool).await?;
+
+    Ok(())
+  }
+
+  fn find_matching_rule(&self, redemption: &Redemption) -> AnyhowResult<Option<TwitchEventRuleLight>> {
+    return match self.twitch_subscriber_state.read() {
+      Err(e) => { Err(anyhow!("Lock error: {:?}", e)) },
+      Ok(state) => {
+        let maybe_rule = state.event_rules.iter()
+            .filter(|rule| rule.event_category.eq(&TwitchEventCategory::ChannelPoints))
+            .find(|rule| {
+              match rule.event_match_predicate {
+                EventMatchPredicate::NotSet => false, // Not set
+                EventMatchPredicate::BitsCheermoteNameExactMatch { ..} => false, // Wrong type
+                EventMatchPredicate::BitsCheermoteNameSpendThreshold { .. } => false, // Wrong type
+                EventMatchPredicate::BitsSpendThreshold { .. } => false, // Wrong type
+                EventMatchPredicate::ChannelPointsRewardNameExactMatch { ref reward_name } => {
+                  reward_name.eq_ignore_ascii_case(&redemption.reward.title)
+                }
+              }
+            })
+            .map(|rule| rule.clone());
+        Ok(maybe_rule)
+      }
+    };
+  }
+
+  //noinspection DuplicatedCode
+  async fn handle_matched_rule(&self, rule: &TwitchEventRuleLight, redemption: &Redemption) -> AnyhowResult<()> {
+    let message = match redemption.user_input {
+      None => return Ok(()), // Nothing to do.
+      Some(ref m) => m.as_str(),
+    };
+    match rule.event_response {
+      EventResponse::NotSet => {
+        info!("Empty event response.");
+        return Ok(())
+      },
+      EventResponse::TtsSingleVoice { ref tts_model_token } => {
+        self.tts_writer.write_tts_with_model(message, tts_model_token).await?;
+      }
+      EventResponse::TtsRandomVoice { ref tts_model_tokens } => {
+        let maybe_token = random_from_vec(tts_model_tokens);
+        if let Some(token) = maybe_token {
+          self.tts_writer.write_tts_with_model(message, token.as_str())
+              .await?;
+        }
+      }
+    }
 
     Ok(())
   }
