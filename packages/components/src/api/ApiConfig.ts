@@ -20,6 +20,7 @@ enum Domain {
   JungleHorse,
   Vocodes,
   FakeYou,
+  Storyteller,
   Unknown,
 }
 
@@ -47,10 +48,14 @@ class ApiConfig {
       domain = Domain.Vocodes;
     } else if (document.location.host.includes("fakeyou.com")) {
       domain = Domain.FakeYou;
+    } else if (document.location.host.includes("storyteller.io")) {
+      domain = Domain.Storyteller;
     }
 
     let v2ApiHost = "api.fakeyou.com";
-    if (!useSsl && (domain === Domain.Localhost || domain === Domain.JungleHorse)) {
+    if (domain === Domain.Storyteller) {
+      v2ApiHost = "api.storyteller.io";
+    } else if (!useSsl && (domain === Domain.Localhost || domain === Domain.JungleHorse)) {
       // NB: Lack of SSL means use local development.
       v2ApiHost = "api.jungle.horse";
     }
@@ -340,6 +345,24 @@ class ApiConfig {
 
   detectLocale() : string {
     return `${this.getScheme()}://${this.getNewApiHost()}/detect_locale`;
+  }
+
+  // =============== Storyteller-specific ===============
+
+  listTwitchEventRules() : string {
+    return `${this.getScheme()}://${this.getNewApiHost()}/twitch/event_rule/list`;
+  }
+
+  createTwitchEventRule() : string {
+    return `${this.getScheme()}://${this.getNewApiHost()}/twitch/event_rule/create`;
+  }
+
+  deleteTwitchEventRule(eventRuleToken: string) : string {
+    return `${this.getScheme()}://${this.getNewApiHost()}/twitch/event_rule/delete/${eventRuleToken}`;
+  }
+
+  editTwitchEventRule(eventRuleToken: string) : string {
+    return `${this.getScheme()}://${this.getNewApiHost()}/twitch/event_rule/update/${eventRuleToken}`;
   }
 
   obsEventsWebsocket(twitchUsername: string) : string {

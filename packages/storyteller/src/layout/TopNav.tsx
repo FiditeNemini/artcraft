@@ -45,7 +45,12 @@ function TopNav(props: Props) {
             <Link to="/stream"
               className="navbar-item"
               onClick={() => closeHamburger()}
-              >Stream TTS</Link>
+              >Stream TTS (OLD)</Link>
+
+            <Link to="/tts_configs"
+              className="navbar-item"
+              onClick={() => closeHamburger()}
+              >TTS Configs (NEW)</Link>
 
             <Link to="/coming-soon"
               className="navbar-item"

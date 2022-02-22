@@ -8,6 +8,7 @@ import i18n from 'i18next';
 import { ComingSoonPage } from './pages/coming-soon/ComingSoonPage';
 import { LoginPage } from './pages/login/LoginPage';
 import { SignupPage } from './pages/signup/SignupPage';
+import { TtsConfigsIndexPage } from './pages/tts_configs/TtsConfigsIndexPage';
 import { DetectLocale, DetectLocaleIsOk } from '@storyteller/components/src/api/locale/DetectLocale';
 import { IndexPage } from './pages/index/IndexPage';
 import { ObsLayerPage } from './pages/obs-layer/ObsLayerPage';
@@ -15,6 +16,7 @@ import { STORYTELLER_MERGED_TRANSLATIONS } from './_i18n/StorytellerTranslations
 import { SessionWrapper } from '@storyteller/components/src/session/SessionWrapper';
 import { TopNav } from './layout/TopNav';
 import { initReactI18next } from 'react-i18next';
+import { TtsConfigsCreateRulePage } from './pages/tts_configs/TtsConfigsCreateRulePage';
 
 i18n
   .use(initReactI18next) // passes i18n down to react-i18next
@@ -96,6 +98,16 @@ class App extends React.Component<Props, State> {
                   sessionWrapper={this.state.sessionWrapper}
                   querySessionAction={this.querySession}
                   />
+              </Route>
+              <Route exact={true} path="/tts_configs/create">
+                <TtsConfigsCreateRulePage
+                  sessionWrapper={this.state.sessionWrapper}
+                />
+              </Route>
+              <Route exact={true} path="/tts_configs">
+                <TtsConfigsIndexPage
+                  sessionWrapper={this.state.sessionWrapper}
+                />
               </Route>
               <Route path="/obs/:username">
                 <ObsLayerPage />
