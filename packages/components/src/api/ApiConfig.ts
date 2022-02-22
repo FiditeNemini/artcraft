@@ -357,12 +357,16 @@ class ApiConfig {
     return `${this.getScheme()}://${this.getNewApiHost()}/twitch/event_rule/create`;
   }
 
-  deleteTwitchEventRule(eventRuleToken: string) : string {
-    return `${this.getScheme()}://${this.getNewApiHost()}/twitch/event_rule/delete/${eventRuleToken}`;
+  getTwitchEventRule(eventRuleToken: string) : string {
+    return `${this.getScheme()}://${this.getNewApiHost()}/twitch/event_rule/${eventRuleToken}/info`;
   }
 
   editTwitchEventRule(eventRuleToken: string) : string {
-    return `${this.getScheme()}://${this.getNewApiHost()}/twitch/event_rule/update/${eventRuleToken}`;
+    return `${this.getScheme()}://${this.getNewApiHost()}/twitch/event_rule/${eventRuleToken}/update`;
+  }
+
+  deleteTwitchEventRule(eventRuleToken: string) : string {
+    return `${this.getScheme()}://${this.getNewApiHost()}/twitch/event_rule/${eventRuleToken}/delete`;
   }
 
   obsEventsWebsocket(twitchUsername: string) : string {

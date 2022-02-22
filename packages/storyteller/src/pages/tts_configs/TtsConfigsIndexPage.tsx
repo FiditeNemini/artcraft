@@ -3,8 +3,9 @@ import { SessionWrapper } from '@storyteller/components/src/session/SessionWrapp
 import { ListTwitchEventRules, ListTwitchEventRulesIsError, ListTwitchEventRulesIsOk, TwitchEventRule } from '@storyteller/components/src/api/storyteller/twitch_event_rules/ListTwitchEventRules';
 import { TwitchEventRuleElement } from './TwitchEventRuleElement';
 import { TwitchEventCategory } from '@storyteller/components/src/api/storyteller/twitch_event_rules/shared/TwitchEventCategory';
+import { DiscordLink } from '@storyteller/components/src/elements/DiscordLink';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faBox, faCircleNotch, faCoins, faDonate, faExclamation, faGem, faLightbulb, faTerminal } from '@fortawesome/free-solid-svg-icons';
+import { faBox, faDonate, faGem, faLightbulb, faTerminal } from '@fortawesome/free-solid-svg-icons';
 
 interface Props {
   sessionWrapper: SessionWrapper,
@@ -103,7 +104,9 @@ function TtsConfigsIndexPage(props: Props) {
         <h2 className="subtitle is-4">
           We want to build the things you want
         </h2>
-        <p>Can you think of anything we haven't provided? Please let us know in Discord so that we can build it!</p>
+        <p>Can you think of anything we haven't 
+          provided? <DiscordLink text="Please let us know in Discord" iconAfterText={true} /> so 
+          that we can build it!</p>
       </div>
       <br />
       <br />

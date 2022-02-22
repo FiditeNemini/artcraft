@@ -17,6 +17,7 @@ import { SessionWrapper } from '@storyteller/components/src/session/SessionWrapp
 import { TopNav } from './layout/TopNav';
 import { initReactI18next } from 'react-i18next';
 import { TtsConfigsCreateRulePage } from './pages/tts_configs/TtsConfigsCreateRulePage';
+import { TtsConfigsDeleteRulePage } from './pages/tts_configs/TtsConfigsDeleteRulePage';
 
 i18n
   .use(initReactI18next) // passes i18n down to react-i18next
@@ -101,6 +102,11 @@ class App extends React.Component<Props, State> {
               </Route>
               <Route exact={true} path="/tts_configs/create">
                 <TtsConfigsCreateRulePage
+                  sessionWrapper={this.state.sessionWrapper}
+                />
+              </Route>
+              <Route exact={true} path="/tts_configs/delete/:token">
+                <TtsConfigsDeleteRulePage
                   sessionWrapper={this.state.sessionWrapper}
                 />
               </Route>

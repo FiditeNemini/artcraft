@@ -1,13 +1,17 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React from 'react';
 import { TwitchEventRule } from '@storyteller/components/src/api/storyteller/twitch_event_rules/ListTwitchEventRules';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faArrowDown, faArrowUp, faRulerVertical } from '@fortawesome/free-solid-svg-icons';
+import { faArrowDown, faArrowUp, faEdit, faTrash } from '@fortawesome/free-solid-svg-icons';
+import { Link } from 'react-router-dom';
 
 interface Props {
   rule: TwitchEventRule,
+  hideButtons?: boolean,
 }
 
 function TwitchEventRuleElement(props: Props) {
+  const hideButtons = !!props.hideButtons;
+
   let title = "Not Set";
   let subtitle = <></>;
   let description = <></>;
@@ -55,6 +59,43 @@ function TwitchEventRuleElement(props: Props) {
     );
   }
 
+  const editUrl = `/tts_configs/edit/${props.rule.token}`;
+  const deleteUrl = `/tts_configs/delete/${props.rule.token}`;
+
+  let buttons = <></>;
+  if (!hideButtons) {
+    buttons = (
+      <>
+        <footer className="card-footer">
+          <p className="card-footer-item">
+            <span className="icon">
+              <FontAwesomeIcon icon={faArrowUp} />&nbsp;Up
+            </span>
+          </p>
+          <p className="card-footer-item">
+            <span className="icon">
+              <FontAwesomeIcon icon={faArrowDown} />&nbsp;Down
+            </span>
+          </p>
+          <p className="card-footer-item">
+            <span>
+              <Link to={editUrl}>
+                <FontAwesomeIcon icon={faEdit} />&nbsp;Edit
+              </Link>
+            </span>
+          </p>
+          <p className="card-footer-item">
+            <span>
+              <Link to={deleteUrl}>
+                <FontAwesomeIcon icon={faTrash} /> Delete
+              </Link>
+            </span>
+          </p>
+        </footer>
+      </>
+    )
+  }
+
   return (
     <div>
       <div className="card">
@@ -66,28 +107,7 @@ function TwitchEventRuleElement(props: Props) {
             {description}
           </p>
         </div>
-        <footer className="card-footer">
-          <p className="card-footer-item">
-            <span className="icon">
-              <FontAwesomeIcon icon={faArrowUp} />
-            </span>
-          </p>
-          <p className="card-footer-item">
-            <span className="icon">
-              <FontAwesomeIcon icon={faArrowDown} />
-            </span>
-          </p>
-          <p className="card-footer-item">
-            <span>
-              Edit
-            </span>
-          </p>
-          <p className="card-footer-item">
-            <span>
-              Delete
-            </span>
-          </p>
-        </footer>
+        {buttons}
       </div>
       <br />
     </div>
