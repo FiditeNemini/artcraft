@@ -58,7 +58,7 @@ for token in tokens:
 
 payload = {
     'idempotency_token': str(uuid.uuid4()),
-    'event_category': 'channel_points',
+    'event_category': 'bits',
     'event_match_predicate': {
         'bits_spend_threshold': {
             'minimum_bits_spent': 2,
@@ -86,7 +86,7 @@ token = response['twitch_event_rule_token']
 
 payload = {
     'idempotency_token': str(uuid.uuid4()),
-    'event_category': 'channel_points',
+    'event_category': 'bits',
     'event_match_predicate': {
         'bits_spend_threshold': {
             'minimum_bits_spent': 1,
@@ -133,6 +133,58 @@ r = requests.post(url, cookies=cookies, json=payload)
 print("===== Edited Event Rule Output =====")
 print('Status: {}'.format(r.status_code))
 print(r.content)
+
+
+# ========== Create (3) ==========
+
+payload = {
+    'idempotency_token': str(uuid.uuid4()),
+    'event_category': 'channel_points',
+    'event_match_predicate': {
+        'channel_points_reward_name_exact_match': {
+            'reward_name': 'My Reward',
+        },
+    },
+    'event_response': {
+        'tts_single_voice': {
+            'tts_model_token': 'TM:40m3aqtt41y0', # "Wakko" voice (dev)
+        }
+    },
+    'user_specified_rule_order': 0,
+    'rule_is_disabled': False,
+}
+
+r = requests.post(create_url, cookies=cookies, json=payload)
+
+print("===== Created Event Rule Output =====")
+print('Status: {}'.format(r.status_code))
+print(r.content)
+
+# ========== Create (4) ==========
+
+payload = {
+    'idempotency_token': str(uuid.uuid4()),
+    'event_category': 'bits',
+    'event_match_predicate': {
+        'bits_cheermote_name_exact_match': {
+            'cheermote_name': 'Cheer1',
+        },
+    },
+    'event_response': {
+        'tts_single_voice': {
+            'tts_model_token': 'TM:40m3aqtt41y0', # "Wakko" voice (dev)
+        }
+    },
+    'user_specified_rule_order': 0,
+    'rule_is_disabled': False,
+}
+
+r = requests.post(create_url, cookies=cookies, json=payload)
+
+print("===== Created Event Rule Output =====")
+print('Status: {}'.format(r.status_code))
+print(r.content)
+
 
 # ========== List ==========
 
