@@ -10,12 +10,15 @@ interface Props {
 function TwitchEventRuleElement(props: Props) {
 
   let title = "Not Set"
+
   if (props.rule.event_match_predicate.bits_cheermote_name_exact_match !== undefined) {
     title = "Cheermote Name Matches"
   } else if (props.rule.event_match_predicate.bits_cheermote_prefix_spend_threshold !== undefined) {
     title = "Cheermote Prefix Matches and Spend Threshold"
   } else if (props.rule.event_match_predicate.bits_spend_threshold !== undefined) {
     title = "Spend Threshold"
+  } else if (props.rule.event_match_predicate.channel_points_reward_name_exact_match !== undefined) {
+    title = "Channel Points Reward Name Match"
   }
 
   return (

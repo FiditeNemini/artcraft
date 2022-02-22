@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { SessionWrapper } from '@storyteller/components/src/session/SessionWrapper';
 import { ListTwitchEventRules, ListTwitchEventRulesIsError, ListTwitchEventRulesIsOk, TwitchEventRule } from '@storyteller/components/src/api/storyteller/twitch_event_rules/ListTwitchEventRules';
 import { TwitchEventRuleElement } from './TwitchEventRuleElement';
+import { TwitchEventCategory } from '@storyteller/components/src/api/storyteller/twitch_event_rules/shared/TwitchEventCategory';
 
 interface Props {
   sessionWrapper: SessionWrapper,
@@ -28,6 +29,10 @@ function TtsConfigsIndexPage(props: Props) {
     return <h1>Must Log In</h1>;
   }
 
+  const cheerEventRules = twitchEventRules.filter(rule => rule.event_category === TwitchEventCategory.Bits);
+
+  const channelPointsEventRules = twitchEventRules.filter(rule => rule.event_category === TwitchEventCategory.ChannelPoints);
+
   return (
     <>
       <div className="section">
@@ -43,7 +48,7 @@ function TtsConfigsIndexPage(props: Props) {
           You can create rules for matching cheers. When someone cheers, these rules will be tested in order. 
           The first match wins, and the action the rule specifies will be taken.
         </p>
-        {twitchEventRules.map(rule => {
+        {cheerEventRules.map(rule => {
           return <TwitchEventRuleElement rule={rule} />
         })}
       </div>
@@ -57,7 +62,7 @@ function TtsConfigsIndexPage(props: Props) {
           it will be tested against these rules in order. The first match wins, and the action the rule 
           specifies will be taken.
         </p>
-        {twitchEventRules.map(rule => {
+        {channelPointsEventRules.map(rule => {
           return <TwitchEventRuleElement rule={rule} />
         })}
       </div>
