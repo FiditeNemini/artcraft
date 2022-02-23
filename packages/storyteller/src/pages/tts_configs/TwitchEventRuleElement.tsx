@@ -77,7 +77,7 @@ function TwitchEventRuleElement(props: Props) {
       }
 
       return (
-        <li>
+        <li key={token}>
           {modelName} <a href={link} target="_blank"><FontAwesomeIcon icon={faExternalLinkAlt} /></a>
         </li>
       );
@@ -99,45 +99,45 @@ function TwitchEventRuleElement(props: Props) {
     buttons = (
       <>
         <footer className="card-footer">
-          <p className="card-footer-item">
+          <div className="card-footer-item">
             <span className="icon">
               <FontAwesomeIcon icon={faArrowUp} />&nbsp;Up
             </span>
-          </p>
-          <p className="card-footer-item">
+          </div>
+          <div className="card-footer-item">
             <span className="icon">
               <FontAwesomeIcon icon={faArrowDown} />&nbsp;Down
             </span>
-          </p>
-          <p className="card-footer-item">
+          </div>
+          <div className="card-footer-item">
             <span>
               <Link to={editUrl}>
                 <FontAwesomeIcon icon={faEdit} />&nbsp;Edit
               </Link>
             </span>
-          </p>
-          <p className="card-footer-item">
+          </div>
+          <div className="card-footer-item">
             <span>
               <Link to={deleteUrl}>
                 <FontAwesomeIcon icon={faTrash} /> Delete
               </Link>
             </span>
-          </p>
+          </div>
         </footer>
       </>
     )
   }
 
   return (
-    <div>
+    <div key={props.rule.token}>
       <div className="card">
         <div className="card-content">
-          <p className="title is-5">
+          <div className="title is-5">
             {subtitle}
-          </p>
-          <p>
+          </div>
+          <div>
             {description}
-          </p>
+          </div>
         </div>
         {buttons}
       </div>

@@ -64,6 +64,7 @@ function TtsConfigsIndexPage(props: Props) {
         </p>
         {cheerEventRules.map(rule => {
           return <TwitchEventRuleElement 
+            key={rule.token}
             rule={rule} 
             allTtsModelsByToken={props.allTtsModelsByToken}
             />
@@ -79,6 +80,7 @@ function TtsConfigsIndexPage(props: Props) {
         </h2>
         {channelPointsEventRules.map(rule => {
           return <TwitchEventRuleElement 
+            key={rule.token}
             rule={rule} 
             allTtsModelsByToken={props.allTtsModelsByToken}
             />

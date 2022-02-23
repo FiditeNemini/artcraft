@@ -137,9 +137,6 @@ function TtsConfigsEditRulePage(props: Props) {
   } else if (twitchEventCategory === TwitchEventCategory.ChannelPoints) {
   }
 
-  console.log(bitsRuleType);
-  console.log(bitsRuleType.toString());
-
   return (
     <>
       <div className="section">
@@ -158,8 +155,7 @@ function TtsConfigsEditRulePage(props: Props) {
           <div className="control">
             <div className="select is-medium is-fullwidth">
               <select 
-                defaultValue={bitsRuleType.toString()}
-                value={bitsRuleType.toString()}
+                value={bitsRuleType}
                 onChange={updateBitsRuleType}>
                 <option value={BitsRuleType.BitsSpendThreshold}>Bits Spend Threshold</option>
                 <option value={BitsRuleType.BitsCheermoteNameExactMatch}>Cheermote Name (Exact Match)</option>
