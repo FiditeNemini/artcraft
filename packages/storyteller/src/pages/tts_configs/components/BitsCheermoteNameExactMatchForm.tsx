@@ -4,12 +4,14 @@ import { faGem } from '@fortawesome/free-solid-svg-icons';
 import { CHEER_BIT_LEVELS, CHEER_PREFIXES } from '../../../twitch/Cheers';
 
 interface BitsCheermoteNameExactMatchProps {
+  cheerName: string,
+  updateCheerNameOrPrefix: (cheerNameOrPrefix: string) => void,
 };
 
 function BitsCheermoteNameExactMatchForm(props: BitsCheermoteNameExactMatchProps) {
-  const [cheerPrefix, setCheerPrefix] = useState<string|undefined>();
+  const [cheerPrefix, setCheerPrefix] = useState<string|undefined>(props.cheerName);
   const [bitsValue, setBitsValue] = useState<number>(1);
-  const [manualCheerValue, setManualCheerValue] = useState<string>("");
+  const [manualCheerValue, setManualCheerValue] = useState<string>(props.cheerName);
 
   const updateCheerPrefix = (ev: React.FormEvent<HTMLSelectElement>) : boolean => {
     const value = (ev.target as HTMLSelectElement).value;
@@ -29,6 +31,7 @@ function BitsCheermoteNameExactMatchForm(props: BitsCheermoteNameExactMatchProps
   const updateTextCheerValue = (ev: React.FormEvent<HTMLInputElement>) : boolean => {
     const value = (ev.target as HTMLInputElement).value;
     setManualCheerValue(value);
+    props.updateCheerNameOrPrefix(value);
     return true;
   }
 
@@ -39,6 +42,7 @@ function BitsCheermoteNameExactMatchForm(props: BitsCheermoteNameExactMatchProps
     }
     const cheerValue = `${prefix}${bits}`;
     setManualCheerValue(cheerValue);
+    props.updateCheerNameOrPrefix(cheerValue);
   }
 
   return (

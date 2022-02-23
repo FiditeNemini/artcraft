@@ -4,11 +4,13 @@ import { faGem } from '@fortawesome/free-solid-svg-icons';
 import { CHEER_BIT_LEVELS, CHEER_PREFIXES } from '../../../twitch/Cheers';
 
 interface BitsCheermotePrefixSpendThresholdProps {
+  cheerPrefix: string,
+  updateCheerNameOrPrefix: (cheerNameOrPrefix: string) => void,
 };
 
 function BitsCheermotePrefixSpendThresholdForm(props: BitsCheermotePrefixSpendThresholdProps) {
-  const [cheerPrefix, setCheerPrefix] = useState<string|undefined>();
-  const [customCheerPrefix, setCustomCheerPrefix] = useState<string>("");
+  const [cheerPrefix, setCheerPrefix] = useState<string>(props.cheerPrefix);
+  const [customCheerPrefix, setCustomCheerPrefix] = useState<string>(props.cheerPrefix);
 
   const [bitsValue, setBitsValue] = useState<number>(1);
   const [customBitsValue, setCustomBitsValue] = useState<number>(1);
@@ -20,27 +22,21 @@ function BitsCheermotePrefixSpendThresholdForm(props: BitsCheermotePrefixSpendTh
     return true;
   }
 
-  const updateBitsValue = (ev: React.FormEvent<HTMLSelectElement>) : boolean => {
-    const value = (ev.target as HTMLSelectElement).value;
-    const numericValue = parseInt(value);
-    setBitsValue(numericValue);
-    recalcuateFieldValue(cheerPrefix, numericValue);
-    return true;
-  }
-
   const updateTextCheerValue = (ev: React.FormEvent<HTMLInputElement>) : boolean => {
     const value = (ev.target as HTMLInputElement).value;
     setCustomCheerPrefix(value);
+    props.updateCheerNameOrPrefix(value);
     return true;
   }
 
   // When the dropdowns are used, replace any manual text entry.
-  const recalcuateFieldValue = (prefix: string|undefined, bits: number) => {
+  const recalcuateFieldValue = (prefix: string, bits: number) => {
     if (prefix === undefined) {
       return;
     }
     const cheerValue = `${prefix}`;
     setCustomCheerPrefix(cheerValue);
+    props.updateCheerNameOrPrefix(cheerValue);
   }
 
   const handleBitSelect = (ev: React.FormEvent<HTMLSelectElement>) : boolean => {
@@ -56,7 +52,6 @@ function BitsCheermotePrefixSpendThresholdForm(props: BitsCheermotePrefixSpendTh
     setCustomBitsValue(numericValue);
     return true;
   }
-
 
   return (
     <>
@@ -115,8 +110,6 @@ function BitsCheermotePrefixSpendThresholdForm(props: BitsCheermotePrefixSpendTh
         </div>
       </article>
 
-
-      <hr />
       <h1 className="title is-5">Bits spent</h1>
 
       <div className="field is-grouped">

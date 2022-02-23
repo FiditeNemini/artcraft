@@ -36,9 +36,12 @@ function TtsConfigsEditRulePage(props: Props) {
 
   // The rule types differ per category and the user can change them
   const [bitsRuleType, setBitsRuleType] = useState<BitsRuleType>(BitsRuleType.BitsCheermoteNameExactMatch);
-  const [channelPointsRuleType, setChannelPointsRuleType] = useState<ChannelPointsRuleType>(ChannelPointsRuleType.ChannelPointsRewardNameExactMatch);
+  //const [channelPointsRuleType, setChannelPointsRuleType] = useState<ChannelPointsRuleType>(ChannelPointsRuleType.ChannelPointsRewardNameExactMatch);
 
-  // Field values
+  // Field values (editing)
+  const [cheerNameOrPrefix, setCheerNameOrPrefix] = useState('');
+
+  // Field values (final)
   const [eventMatchPredicate, setEventMatchPredicate] = useState<EventMatchPredicate|undefined>(undefined);
   const [eventResponse, setEventResponse] = useState<EventResponse|undefined>(undefined);
   const [ruleIsDisabled, setRuleIsDisabled] = useState(false);
@@ -89,6 +92,10 @@ function TtsConfigsEditRulePage(props: Props) {
     return true;
   }
 
+  const updateCheerNameOrPrefix = (nameOrPrefix: string) => {
+    setCheerNameOrPrefix(nameOrPrefix);
+  }
+
   const handleFormSubmit = async (ev: React.FormEvent<HTMLFormElement>) : Promise<boolean> => {
     ev.preventDefault();
 
@@ -124,10 +131,16 @@ function TtsConfigsEditRulePage(props: Props) {
   if (twitchEventCategory === TwitchEventCategory.Bits) {
     switch (bitsRuleType) {
       case BitsRuleType.BitsCheermoteNameExactMatch:
-        ruleTypeForm = <BitsCheermoteNameExactMatchForm />;
+        ruleTypeForm = <BitsCheermoteNameExactMatchForm 
+          cheerName={cheerNameOrPrefix}
+          updateCheerNameOrPrefix={updateCheerNameOrPrefix}
+          />;
         break;
       case BitsRuleType.BitsCheermotePrefixSpendThreshold:
-        ruleTypeForm = <BitsCheermotePrefixSpendThresholdForm />
+        ruleTypeForm = <BitsCheermotePrefixSpendThresholdForm 
+          cheerPrefix={cheerNameOrPrefix}
+          updateCheerNameOrPrefix={updateCheerNameOrPrefix}
+          />
         break;
       case BitsRuleType.BitsSpendThreshold:
         ruleTypeForm = <BitsSpendThresholdForm />;
