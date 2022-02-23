@@ -4,11 +4,13 @@ import { faGem } from '@fortawesome/free-solid-svg-icons';
 import { CHEER_BIT_LEVELS, CHEER_PREFIXES } from '../../../twitch/Cheers';
 
 interface BitsSpendThresholdFormProps {
+  minimumBitsSpent: number,
+  updateMinimumBitsSpent: (minimumSpent: number) => void,
 };
 
 function BitsSpendThresholdForm(props: BitsSpendThresholdFormProps) {
-  const [bitsValue, setBitsValue] = useState<number>(1);
-  const [customAmount, setCustomAmount] = useState<number|undefined>();
+  const [bitsValue, setBitsValue] = useState<number>(props.minimumBitsSpent);
+  const [customAmount, setCustomAmount] = useState<number>(props.minimumBitsSpent);
 
 
   const handleBitSelect = (ev: React.FormEvent<HTMLSelectElement>) : boolean => {
@@ -16,6 +18,7 @@ function BitsSpendThresholdForm(props: BitsSpendThresholdFormProps) {
     const numericValue = parseInt(value);
     setBitsValue(numericValue);
     setCustomAmount(numericValue);
+    props.updateMinimumBitsSpent(numericValue);
     return true;
   }
 
@@ -23,14 +26,8 @@ function BitsSpendThresholdForm(props: BitsSpendThresholdFormProps) {
     const value = (ev.target as HTMLInputElement).value;
     const numericValue = parseInt(value);
     setCustomAmount(numericValue);
+    props.updateMinimumBitsSpent(numericValue);
     return true;
-  }
-
-  // When the dropdowns are used, replace any manual text entry.
-  const recalcuateFieldValue = (prefix: string|undefined, bits: number) => {
-    if (prefix === undefined) {
-      return;
-    }
   }
 
   return (

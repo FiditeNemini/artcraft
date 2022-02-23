@@ -38,10 +38,20 @@ function TtsConfigsEditRulePage(props: Props) {
   const [bitsRuleType, setBitsRuleType] = useState<BitsRuleType>(BitsRuleType.BitsCheermoteNameExactMatch);
   //const [channelPointsRuleType, setChannelPointsRuleType] = useState<ChannelPointsRuleType>(ChannelPointsRuleType.ChannelPointsRewardNameExactMatch);
 
-  // Field values (editing)
-  const [cheerNameOrPrefix, setCheerNameOrPrefix] = useState('');
+  // ===== Field values (editing) =====
 
-  // Field values (final)
+  // Used in:
+  // BitsCheermoteNameExactMatch
+  // BitsCheermotePrefixSpendThreshold
+  const [cheerNameOrPrefix, setCheerNameOrPrefix] = useState(''); 
+
+  // Used in:
+  // BitsSpendThreshold
+  // BitsCheermotePrefixSpendThreshold
+  const [minimumBitsSpent, setMinimumBitsSpent] = useState(1); 
+
+  // ===== Field values (final) =====
+
   const [eventMatchPredicate, setEventMatchPredicate] = useState<EventMatchPredicate|undefined>(undefined);
   const [eventResponse, setEventResponse] = useState<EventResponse|undefined>(undefined);
   const [ruleIsDisabled, setRuleIsDisabled] = useState(false);
@@ -64,8 +74,10 @@ function TtsConfigsEditRulePage(props: Props) {
             serverBitsRuleType = BitsRuleType.BitsCheermoteNameExactMatch;
           } else if (!!response.twitch_event_rule.event_match_predicate.bits_cheermote_prefix_spend_threshold) {
             serverBitsRuleType = BitsRuleType.BitsCheermotePrefixSpendThreshold;
+            setMinimumBitsSpent(response.twitch_event_rule.event_match_predicate.bits_cheermote_prefix_spend_threshold.minimum_bits_spent);
           } else if (!!response.twitch_event_rule.event_match_predicate.bits_spend_threshold) {
             serverBitsRuleType = BitsRuleType.BitsSpendThreshold;
+            setMinimumBitsSpent(response.twitch_event_rule.event_match_predicate.bits_spend_threshold.minimum_bits_spent);
           }
           break;
         case TwitchEventCategory.ChannelPoints: // NB: Only one rule type
@@ -94,6 +106,10 @@ function TtsConfigsEditRulePage(props: Props) {
 
   const updateCheerNameOrPrefix = (nameOrPrefix: string) => {
     setCheerNameOrPrefix(nameOrPrefix);
+  }
+
+  const updateMinimumBitsSpent = (minimumSpent: number) => {
+    setMinimumBitsSpent(minimumSpent);
   }
 
   const handleFormSubmit = async (ev: React.FormEvent<HTMLFormElement>) : Promise<boolean> => {
@@ -140,10 +156,15 @@ function TtsConfigsEditRulePage(props: Props) {
         ruleTypeForm = <BitsCheermotePrefixSpendThresholdForm 
           cheerPrefix={cheerNameOrPrefix}
           updateCheerNameOrPrefix={updateCheerNameOrPrefix}
+          minimumBitsSpent={minimumBitsSpent}
+          updateMinimumBitsSpent={updateMinimumBitsSpent}
           />
         break;
       case BitsRuleType.BitsSpendThreshold:
-        ruleTypeForm = <BitsSpendThresholdForm />;
+        ruleTypeForm = <BitsSpendThresholdForm 
+          minimumBitsSpent={minimumBitsSpent}
+          updateMinimumBitsSpent={updateMinimumBitsSpent}
+          />;
         break;
     }
 

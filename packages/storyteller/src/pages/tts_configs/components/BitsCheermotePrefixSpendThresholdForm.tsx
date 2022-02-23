@@ -6,14 +6,16 @@ import { CHEER_BIT_LEVELS, CHEER_PREFIXES } from '../../../twitch/Cheers';
 interface BitsCheermotePrefixSpendThresholdProps {
   cheerPrefix: string,
   updateCheerNameOrPrefix: (cheerNameOrPrefix: string) => void,
+  minimumBitsSpent: number,
+  updateMinimumBitsSpent: (minimumSpent: number) => void,
 };
 
 function BitsCheermotePrefixSpendThresholdForm(props: BitsCheermotePrefixSpendThresholdProps) {
   const [cheerPrefix, setCheerPrefix] = useState<string>(props.cheerPrefix);
   const [customCheerPrefix, setCustomCheerPrefix] = useState<string>(props.cheerPrefix);
 
-  const [bitsValue, setBitsValue] = useState<number>(1);
-  const [customBitsValue, setCustomBitsValue] = useState<number>(1);
+  const [bitsValue, setBitsValue] = useState<number>(props.minimumBitsSpent);
+  const [customBitsValue, setCustomBitsValue] = useState<number>(props.minimumBitsSpent);
 
   const updateCheerPrefix = (ev: React.FormEvent<HTMLSelectElement>) : boolean => {
     const value = (ev.target as HTMLSelectElement).value;
@@ -44,12 +46,14 @@ function BitsCheermotePrefixSpendThresholdForm(props: BitsCheermotePrefixSpendTh
     const numericValue = parseInt(value);
     setBitsValue(numericValue);
     setCustomBitsValue(numericValue);
+    props.updateMinimumBitsSpent(numericValue);
     return true;
   }
   const handleCustomBitsValueUpdate = (ev: React.FormEvent<HTMLInputElement>) : boolean => {
     const value = (ev.target as HTMLInputElement).value;
     const numericValue = parseInt(value);
     setCustomBitsValue(numericValue);
+    props.updateMinimumBitsSpent(numericValue);
     return true;
   }
 
