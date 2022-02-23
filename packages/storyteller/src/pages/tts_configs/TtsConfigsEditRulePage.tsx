@@ -12,6 +12,8 @@ import { TtsModelListItem } from '@storyteller/components/src/api/tts/ListTtsMod
 import { BitsCheermoteNameExactMatchForm } from './components/BitsCheermoteNameExactMatchForm';
 import { BitsSpendThresholdForm } from './components/BitsSpendThresholdForm';
 import { BitsCheermotePrefixSpendThresholdForm } from './components/BitsCheermotePrefixSpendThresholdForm';
+import { TwitchEventCategory } from '@storyteller/components/src/api/storyteller/twitch_event_rules/shared/TwitchEventCategory';
+import { BitsRuleType, ChannelPointsRuleType } from './components/RuleTypes';
 
 interface Props {
   sessionWrapper: SessionWrapper,
@@ -22,9 +24,21 @@ interface Props {
 function TtsConfigsEditRulePage(props: Props) {
   const { token } : { token : string } = useParams();
 
+  const indexLink = '/tts_configs';
+
   const history = useHistory();
 
+  // Initial request
   const [twitchEventRule, setTwitchEventRule] = useState<TwitchEventRule|undefined>(undefined);
+
+  // The event category cannot be changed !
+  const [twitchEventCategory, setTwitchEventCategory] = useState<TwitchEventCategory>(TwitchEventCategory.Bits);
+
+  // The rule types differ per category and the user can change them
+  const [bitsRuleType, setBitsRuleType] = useState<BitsRuleType>(BitsRuleType.BitsCheermoteNameExactMatch);
+  const [channelPointsRuleType, setChannelPointsRuleType] = useState<ChannelPointsRuleType>(ChannelPointsRuleType.ChannelPointsRewardNameExactMatch);
+
+  // Field values
   const [eventMatchPredicate, setEventMatchPredicate] = useState<EventMatchPredicate|undefined>(undefined);
   const [eventResponse, setEventResponse] = useState<EventResponse|undefined>(undefined);
   const [ruleIsDisabled, setRuleIsDisabled] = useState(false);
@@ -34,9 +48,32 @@ function TtsConfigsEditRulePage(props: Props) {
 
     if (GetTwitchEventRuleIsOk(response)) {
       setTwitchEventRule(response.twitch_event_rule);
+      setTwitchEventCategory(response.twitch_event_rule.event_category);
       setEventMatchPredicate(response.twitch_event_rule.event_match_predicate);
       setEventResponse(response.twitch_event_rule.event_response);
       setRuleIsDisabled(response.twitch_event_rule.rule_is_disabled);
+
+      let serverBitsRuleType = BitsRuleType.BitsCheermoteNameExactMatch;
+
+      switch (response.twitch_event_rule.event_category) {
+        case TwitchEventCategory.Bits:
+          if (!!response.twitch_event_rule.event_match_predicate.bits_cheermote_name_exact_match) {
+            serverBitsRuleType = BitsRuleType.BitsCheermoteNameExactMatch;
+          } else if (!!response.twitch_event_rule.event_match_predicate.bits_cheermote_prefix_spend_threshold) {
+            serverBitsRuleType = BitsRuleType.BitsCheermotePrefixSpendThreshold;
+          } else if (!!response.twitch_event_rule.event_match_predicate.bits_spend_threshold) {
+            serverBitsRuleType = BitsRuleType.BitsSpendThreshold;
+          }
+          break;
+        case TwitchEventCategory.ChannelPoints: // NB: Only one rule type
+          break;
+        case TwitchEventCategory.ChatCommand: // TODO: Not yet supported
+        default:
+          break;
+      }
+
+      setBitsRuleType(bitsRuleType);
+
     } else if (GetTwitchEventRuleIsError(response))  {
       // TODO
     }
@@ -46,7 +83,12 @@ function TtsConfigsEditRulePage(props: Props) {
     getTwitchEventRule(token);
   }, [getTwitchEventRule, token]);
 
-  const indexLink = '/tts_configs';
+  const updateBitsRuleType = (ev: React.FormEvent<HTMLSelectElement>) : boolean => {
+    const value = (ev.target as HTMLSelectElement).value;
+    const numericValue = parseInt(value);
+    setBitsRuleType(numericValue);
+    return true;
+  }
 
   const handleFormSubmit = async (ev: React.FormEvent<HTMLFormElement>) : Promise<boolean> => {
     ev.preventDefault();
@@ -78,6 +120,25 @@ function TtsConfigsEditRulePage(props: Props) {
     return <h1>Loading...</h1>;
   }
 
+  let ruleTypeForm = <></>
+
+  if (twitchEventCategory === TwitchEventCategory.Bits) {
+    switch (bitsRuleType) {
+      case BitsRuleType.BitsCheermoteNameExactMatch:
+        ruleTypeForm = <BitsCheermoteNameExactMatchForm />;
+        break;
+      case BitsRuleType.BitsCheermotePrefixSpendThreshold:
+        ruleTypeForm = <BitsCheermotePrefixSpendThresholdForm />
+        break;
+      case BitsRuleType.BitsSpendThreshold:
+        ruleTypeForm = <BitsSpendThresholdForm />;
+        break;
+    }
+
+  } else if (twitchEventCategory === TwitchEventCategory.ChannelPoints) {
+
+  }
+
   return (
     <>
       <div className="section">
@@ -92,43 +153,22 @@ function TtsConfigsEditRulePage(props: Props) {
         <h2 className="title is-4">Match on</h2>
 
         <div className="field">
-          <label className="label">Type</label>
+          <label className="label">Rule Type</label>
           <div className="control">
             <div className="select is-medium is-fullwidth">
-              <select>
-                <option>Bits Spend Threshold</option>
-                <option>Cheermote Name (Exact Match)</option>
-                <option>Cheermote Prefix and Bits Spend Threshold</option>
+              <select onChange={updateBitsRuleType}>
+                <option value={BitsRuleType.BitsSpendThreshold}>Bits Spend Threshold</option>
+                <option value={BitsRuleType.BitsCheermoteNameExactMatch}>Cheermote Name (Exact Match)</option>
+                <option value={BitsRuleType.BitsCheermotePrefixSpendThreshold}>Cheermote Prefix and Bits Spend Threshold</option>
               </select>
             </div>
           </div>
         </div>
 
-        <hr />
+        <br />
 
-        <br />
-        <strong>Exact Cheer Match</strong>
-        <hr />
-        <br />
-        <BitsCheermoteNameExactMatchForm />
-        <hr />
+        {ruleTypeForm}
 
-        <br />
-        <strong>Bits Spend Threshold</strong>
-        <hr />
-        <br />
-        <BitsSpendThresholdForm />
-        <hr />
-
-        <br />
-        <strong>Cheer Prefix + Spend Threshold</strong>
-        <hr />
-        <br />
-        <BitsCheermotePrefixSpendThresholdForm />
-        <hr />
-
-
-        <br />
         <br />
 
         <h2 className="title is-4">TTS Behavior</h2>
