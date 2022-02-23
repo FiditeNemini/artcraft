@@ -72,7 +72,7 @@ function TtsConfigsEditRulePage(props: Props) {
           break;
       }
 
-      setBitsRuleType(bitsRuleType);
+      setBitsRuleType(serverBitsRuleType);
 
     } else if (GetTwitchEventRuleIsError(response))  {
       // TODO
@@ -84,9 +84,8 @@ function TtsConfigsEditRulePage(props: Props) {
   }, [getTwitchEventRule, token]);
 
   const updateBitsRuleType = (ev: React.FormEvent<HTMLSelectElement>) : boolean => {
-    const value = (ev.target as HTMLSelectElement).value;
-    const numericValue = parseInt(value);
-    setBitsRuleType(numericValue);
+    const value = (ev.target as HTMLSelectElement).value as BitsRuleType;
+    setBitsRuleType(value);
     return true;
   }
 
@@ -136,8 +135,10 @@ function TtsConfigsEditRulePage(props: Props) {
     }
 
   } else if (twitchEventCategory === TwitchEventCategory.ChannelPoints) {
-
   }
+
+  console.log(bitsRuleType);
+  console.log(bitsRuleType.toString());
 
   return (
     <>
@@ -156,7 +157,10 @@ function TtsConfigsEditRulePage(props: Props) {
           <label className="label">Rule Type</label>
           <div className="control">
             <div className="select is-medium is-fullwidth">
-              <select onChange={updateBitsRuleType}>
+              <select 
+                defaultValue={bitsRuleType.toString()}
+                value={bitsRuleType.toString()}
+                onChange={updateBitsRuleType}>
                 <option value={BitsRuleType.BitsSpendThreshold}>Bits Spend Threshold</option>
                 <option value={BitsRuleType.BitsCheermoteNameExactMatch}>Cheermote Name (Exact Match)</option>
                 <option value={BitsRuleType.BitsCheermotePrefixSpendThreshold}>Cheermote Prefix and Bits Spend Threshold</option>
