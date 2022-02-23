@@ -9,6 +9,7 @@ import { faAngleLeft, faSave } from '@fortawesome/free-solid-svg-icons';
 import { EventMatchPredicate } from '@storyteller/components/src/api/storyteller/twitch_event_rules/shared/EventMatchPredicate';
 import { EventResponse } from '@storyteller/components/src/api/storyteller/twitch_event_rules/shared/EventResponse';
 import { TtsModelListItem } from '@storyteller/components/src/api/tts/ListTtsModels';
+import { CHEERS } from '../../twitch/Cheers';
 
 interface Props {
   sessionWrapper: SessionWrapper,
@@ -45,7 +46,7 @@ function TtsConfigsEditRulePage(props: Props) {
 
   const indexLink = '/tts_configs';
 
-  const handleDeleteFormSubmit = async (ev: React.FormEvent<HTMLFormElement>) : Promise<boolean> => {
+  const handleFormSubmit = async (ev: React.FormEvent<HTMLFormElement>) : Promise<boolean> => {
     ev.preventDefault();
 
     if (eventMatchPredicate === undefined || eventResponse === undefined) {
@@ -93,7 +94,25 @@ function TtsConfigsEditRulePage(props: Props) {
 
       <br />
 
-      <form onSubmit={handleDeleteFormSubmit}>
+      <form onSubmit={handleFormSubmit}>
+
+        <div className="field">
+          <label className="label">Match on</label>
+          <div className="control">
+            <div className="select is-large is-fullwidth">
+              <select>
+                <option>Bits Spend Threshold</option>
+                <option>Cheermote Name (Exact Match)</option>
+                <option>Cheermote Prefix and Bits Spend Threshold</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <ExactCheersForm />
+
+
+
         <button className="button is-large is-fullwidth is-primary">
           Save Changes&nbsp;<FontAwesomeIcon icon={faSave} />
         </button>
@@ -104,6 +123,32 @@ function TtsConfigsEditRulePage(props: Props) {
       <Link to={indexLink} className="button is-large is-fullwidth is-info is-outlined">
         <FontAwesomeIcon icon={faAngleLeft} />&nbsp;Cancel / Go Back
       </Link>
+
+    </>
+  )
+}
+
+
+interface ExactCheersFormProps {
+};
+
+function ExactCheersForm(props: ExactCheersFormProps) {
+  const [cheerType, setCheerType] = useState<string|undefined>();
+
+  return (
+    <>
+      <div className="field">
+        <label className="label">Cheer type</label>
+        <div className="control">
+          <div className="select is-large is-fullwidth">
+            <select>
+              {CHEERS.map(cheerName => {
+                return <option>{cheerName}</option>
+              })}
+            </select>
+          </div>
+        </div>
+      </div>
 
     </>
   )
