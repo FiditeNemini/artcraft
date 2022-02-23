@@ -14,6 +14,7 @@ import { BitsSpendThresholdForm } from './components/BitsSpendThresholdForm';
 import { BitsCheermotePrefixSpendThresholdForm } from './components/BitsCheermotePrefixSpendThresholdForm';
 import { TwitchEventCategory } from '@storyteller/components/src/api/storyteller/twitch_event_rules/shared/TwitchEventCategory';
 import { BitsRuleType, ChannelPointsRuleType } from './components/RuleTypes';
+import { ChannelPointsRewardNameExactMatchForm } from './components/ChannelPointsRewardNameExactMatchForm';
 
 interface Props {
   sessionWrapper: SessionWrapper,
@@ -50,6 +51,10 @@ function TtsConfigsEditRulePage(props: Props) {
   // BitsCheermotePrefixSpendThreshold
   const [minimumBitsSpent, setMinimumBitsSpent] = useState(1); 
 
+  // Used in:
+  // ChannelPointsRewardNameExactMatch
+  const [rewardName, setRewardName] = useState(''); 
+
   // ===== Field values (final) =====
 
   const [eventMatchPredicate, setEventMatchPredicate] = useState<EventMatchPredicate|undefined>(undefined);
@@ -81,6 +86,9 @@ function TtsConfigsEditRulePage(props: Props) {
           }
           break;
         case TwitchEventCategory.ChannelPoints: // NB: Only one rule type
+          if (!!response.twitch_event_rule.event_match_predicate.channel_points_reward_name_exact_match) {
+            setRewardName(response.twitch_event_rule.event_match_predicate.channel_points_reward_name_exact_match.reward_name);
+          }
           break;
         case TwitchEventCategory.ChatCommand: // TODO: Not yet supported
         default:
@@ -110,6 +118,10 @@ function TtsConfigsEditRulePage(props: Props) {
 
   const updateMinimumBitsSpent = (minimumSpent: number) => {
     setMinimumBitsSpent(minimumSpent);
+  }
+
+  const updateRewardName = (name: string) => {
+    setRewardName(name);
   }
 
   const handleFormSubmit = async (ev: React.FormEvent<HTMLFormElement>) : Promise<boolean> => {
@@ -169,6 +181,10 @@ function TtsConfigsEditRulePage(props: Props) {
     }
 
   } else if (twitchEventCategory === TwitchEventCategory.ChannelPoints) {
+    ruleTypeForm = <ChannelPointsRewardNameExactMatchForm
+      rewardName={rewardName}
+      updateRewardName={updateRewardName}
+      />;
   }
 
   return (
