@@ -121,8 +121,6 @@ function TtsConfigsEditRulePage(props: Props) {
             />
         </div>
 
-
-
         <button className="button is-large is-fullwidth is-primary">
           Save Changes&nbsp;<FontAwesomeIcon icon={faSave} />
         </button>
@@ -150,16 +148,15 @@ function ExactCheersForm(props: ExactCheersFormProps) {
   const updateCheerPrefix = (ev: React.FormEvent<HTMLSelectElement>) : boolean => {
     const value = (ev.target as HTMLSelectElement).value;
     setCheerPrefix(value);
-    calcuateFieldValue(value, bitsValue);
+    recalcuateFieldValue(value, bitsValue);
     return true;
   }
 
   const updateBitsValue = (ev: React.FormEvent<HTMLSelectElement>) : boolean => {
     const value = (ev.target as HTMLSelectElement).value;
     const numericValue = parseInt(value);
-    console.log(value, numericValue);
     setBitsValue(numericValue);
-    calcuateFieldValue(cheerPrefix, numericValue);
+    recalcuateFieldValue(cheerPrefix, numericValue);
     return true;
   }
 
@@ -169,52 +166,17 @@ function ExactCheersForm(props: ExactCheersFormProps) {
     return true;
   }
 
-  const calcuateFieldValue = (prefix: string|undefined, bits: number) => {
+  // When the dropdowns are used, replace any manual text entry.
+  const recalcuateFieldValue = (prefix: string|undefined, bits: number) => {
     if (prefix === undefined) {
       return;
     }
-    //if (!cheerPrefix || !bitsValue || !!manualCheerValue) {
-    //  return;
-    //}
     const cheerValue = `${prefix}${bits}`;
     setManualCheerValue(cheerValue);
   }
 
-
-  let secondSelect = <></>;
-
-  if (!!cheerPrefix) {
-    secondSelect = (
-      <>
-        <div>
-          <div className="field">
-            <label className="label">Full cheer name (includes bit value)</label>
-            <div className="control">
-              <div className="select is-medium is-fullwidth">
-                <select onChange={updateBitsValue}>
-                  {CHEER_BIT_LEVELS.map(level => {
-                    return (
-                      <option
-                        key={`option-${cheerPrefix}-${level}`}
-                        value={level}
-                      >{cheerPrefix}{level}</option>
-                    );
-                  })}
-                </select>
-              </div>
-            </div>
-          </div>
-        </div>
-      </>
-    );
-  }
-
   return (
     <>
-      <div className="field">
-      </div>
-
-
       <div className="field is-grouped">
         <p className="control">
         <label className="label">Pick the cheer</label>
@@ -236,7 +198,6 @@ function ExactCheersForm(props: ExactCheersFormProps) {
           </div>
         </p>
         <p className="control">
-
           <label className="label">Then the bit value</label>
           <div className="control">
             <div className="select is-medium">
@@ -253,7 +214,6 @@ function ExactCheersForm(props: ExactCheersFormProps) {
             </div>
           </div>
         </p>
-
         <p className="control is-expanded">
           <label className="label">To match against this (or set something custom)</label>
           <p className="control has-icons-left is-large">
@@ -269,7 +229,6 @@ function ExactCheersForm(props: ExactCheersFormProps) {
           </p>
         </p>
       </div>
-
     </>
   )
 }
