@@ -5,11 +5,12 @@ import { EditTwitchEventRule } from '@storyteller/components/src/api/storyteller
 import { TwitchEventRuleElement } from './TwitchEventRuleElement';
 import { Link, useHistory, useParams } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faAngleLeft, faGem, faSave } from '@fortawesome/free-solid-svg-icons';
+import { faAngleLeft, faSave } from '@fortawesome/free-solid-svg-icons';
 import { EventMatchPredicate } from '@storyteller/components/src/api/storyteller/twitch_event_rules/shared/EventMatchPredicate';
 import { EventResponse } from '@storyteller/components/src/api/storyteller/twitch_event_rules/shared/EventResponse';
 import { TtsModelListItem } from '@storyteller/components/src/api/tts/ListTtsModels';
-import { CHEER_BIT_LEVELS, CHEER_PREFIXES } from '../../twitch/Cheers';
+import { ExactCheerMatchForm } from './components/ExactCheerMatchForm';
+import { BitsSpendThresholdForm } from './components/BitsSpendThresholdForm';
 
 interface Props {
   sessionWrapper: SessionWrapper,
@@ -102,7 +103,15 @@ function TtsConfigsEditRulePage(props: Props) {
           </div>
         </div>
 
-        <ExactCheersForm />
+        <hr />
+        <strong>Exact Cheer Match</strong>
+        <br />
+        <ExactCheerMatchForm />
+        <hr />
+        <strong>Bits Spend Threshold</strong>
+        <br />
+        <BitsSpendThresholdForm />
+        <hr />
 
         <br />
         <br />
@@ -136,102 +145,8 @@ function TtsConfigsEditRulePage(props: Props) {
   )
 }
 
-
-interface ExactCheersFormProps {
+interface BitsSpendThresholdFormProps {
 };
-
-function ExactCheersForm(props: ExactCheersFormProps) {
-  const [cheerPrefix, setCheerPrefix] = useState<string|undefined>();
-  const [bitsValue, setBitsValue] = useState<number>(1);
-  const [manualCheerValue, setManualCheerValue] = useState<string>("");
-
-  const updateCheerPrefix = (ev: React.FormEvent<HTMLSelectElement>) : boolean => {
-    const value = (ev.target as HTMLSelectElement).value;
-    setCheerPrefix(value);
-    recalcuateFieldValue(value, bitsValue);
-    return true;
-  }
-
-  const updateBitsValue = (ev: React.FormEvent<HTMLSelectElement>) : boolean => {
-    const value = (ev.target as HTMLSelectElement).value;
-    const numericValue = parseInt(value);
-    setBitsValue(numericValue);
-    recalcuateFieldValue(cheerPrefix, numericValue);
-    return true;
-  }
-
-  const updateTextCheerValue = (ev: React.FormEvent<HTMLInputElement>) : boolean => {
-    const value = (ev.target as HTMLInputElement).value;
-    setManualCheerValue(value);
-    return true;
-  }
-
-  // When the dropdowns are used, replace any manual text entry.
-  const recalcuateFieldValue = (prefix: string|undefined, bits: number) => {
-    if (prefix === undefined) {
-      return;
-    }
-    const cheerValue = `${prefix}${bits}`;
-    setManualCheerValue(cheerValue);
-  }
-
-  return (
-    <>
-      <div className="field is-grouped">
-        <p className="control">
-        <label className="label">Pick the cheer</label>
-          <div className="select is-medium">
-            <select onChange={updateCheerPrefix}>
-              <option
-                key={`option-*`}
-                value=""
-              >Select cheer...</option>
-              {CHEER_PREFIXES.map(cheerPrefix => {
-                return (
-                  <option
-                    key={`option-${cheerPrefix}`}
-                    value={cheerPrefix}
-                  >{cheerPrefix}</option>
-                );
-              })}
-            </select>
-          </div>
-        </p>
-        <p className="control">
-          <label className="label">Then the bit value</label>
-          <div className="control">
-            <div className="select is-medium">
-              <select onChange={updateBitsValue}>
-                {CHEER_BIT_LEVELS.map(level => {
-                  return (
-                    <option
-                      key={`option-${cheerPrefix}-${level}`}
-                      value={level}
-                    >{level}</option>
-                  );
-                })}
-              </select>
-            </div>
-          </div>
-        </p>
-        <p className="control is-expanded">
-          <label className="label">To match against this (or set something custom)</label>
-          <p className="control has-icons-left is-large">
-            <input 
-              value={manualCheerValue}
-              onChange={updateTextCheerValue}
-              className="input is-medium is-primary" 
-              type="text" 
-              placeholder="Cheermote full name (including bit value)" />
-            <span className="icon is-small is-left">
-              <FontAwesomeIcon icon={faGem} />
-            </span>
-          </p>
-        </p>
-      </div>
-    </>
-  )
-}
 
 
 
