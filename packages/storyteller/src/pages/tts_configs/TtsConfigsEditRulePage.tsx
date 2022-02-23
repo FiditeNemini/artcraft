@@ -198,7 +198,7 @@ function TtsConfigsEditRulePage(props: Props) {
 
       <form onSubmit={handleFormSubmit}>
 
-        <h2 className="title is-4">Match on</h2>
+        <h2 className="title is-4">1) Pick a type of rule</h2>
 
         <div className="field">
           <label className="label">Rule Type</label>
@@ -216,17 +216,23 @@ function TtsConfigsEditRulePage(props: Props) {
         </div>
 
         <br />
+        <br />
 
+        <h2 className="title is-4">2) Configure matching</h2>
+        
         {ruleTypeForm}
 
         <br />
+        <br />
 
-        <h2 className="title is-4">TTS Behavior</h2>
+        <h2 className="title is-4">3) Pick how to respond</h2>
         <p>Todo</p>
+
         <br />
         <br />
 
-        <h2 className="title is-4">Final Rule</h2>
+        <h2 className="title is-4">This is the rule:</h2>
+
         <div className="content">
           <TwitchEventRuleElement 
             rule={twitchEventRule} 
