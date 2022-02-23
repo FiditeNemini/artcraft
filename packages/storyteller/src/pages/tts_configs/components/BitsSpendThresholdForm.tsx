@@ -36,7 +36,7 @@ function BitsSpendThresholdForm(props: BitsSpendThresholdFormProps) {
   return (
     <>
       <div className="field is-grouped">
-        <p className="control">
+        <div className="control">
           <label className="label">Preset thresholds</label>
           <div className="control">
             <div className="select is-medium">
@@ -52,8 +52,8 @@ function BitsSpendThresholdForm(props: BitsSpendThresholdFormProps) {
               </select>
             </div>
           </div>
-        </p>
-        <p className="control is-expanded">
+        </div>
+        <div className="control is-expanded">
           <label className="label">Or a custom minimum amount.</label>
           <p className="control has-icons-left is-large">
             <input 
@@ -66,7 +66,7 @@ function BitsSpendThresholdForm(props: BitsSpendThresholdFormProps) {
               <FontAwesomeIcon icon={faGem} />
             </span>
           </p>
-        </p>
+        </div>
       </div>
       <article className="message">
         <div className="message-body">

@@ -9,8 +9,9 @@ import { faAngleLeft, faSave } from '@fortawesome/free-solid-svg-icons';
 import { EventMatchPredicate } from '@storyteller/components/src/api/storyteller/twitch_event_rules/shared/EventMatchPredicate';
 import { EventResponse } from '@storyteller/components/src/api/storyteller/twitch_event_rules/shared/EventResponse';
 import { TtsModelListItem } from '@storyteller/components/src/api/tts/ListTtsModels';
-import { ExactCheerMatchForm } from './components/ExactCheerMatchForm';
+import { BitsCheermoteNameExactMatchForm } from './components/BitsCheermoteNameExactMatchForm';
 import { BitsSpendThresholdForm } from './components/BitsSpendThresholdForm';
+import { BitsCheermotePrefixSpendThresholdForm } from './components/BitsCheermotePrefixSpendThresholdForm';
 
 interface Props {
   sessionWrapper: SessionWrapper,
@@ -104,14 +105,28 @@ function TtsConfigsEditRulePage(props: Props) {
         </div>
 
         <hr />
-        <strong>Exact Cheer Match</strong>
+
         <br />
-        <ExactCheerMatchForm />
+        <strong>Exact Cheer Match</strong>
         <hr />
+        <br />
+        <BitsCheermoteNameExactMatchForm />
+        <hr />
+
+        <br />
         <strong>Bits Spend Threshold</strong>
+        <hr />
         <br />
         <BitsSpendThresholdForm />
         <hr />
+
+        <br />
+        <strong>Cheer Prefix + Spend Threshold</strong>
+        <hr />
+        <br />
+        <BitsCheermotePrefixSpendThresholdForm />
+        <hr />
+
 
         <br />
         <br />

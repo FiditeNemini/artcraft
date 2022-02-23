@@ -3,10 +3,10 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faGem } from '@fortawesome/free-solid-svg-icons';
 import { CHEER_BIT_LEVELS, CHEER_PREFIXES } from '../../../twitch/Cheers';
 
-interface ExactCheerMatchFormProps {
+interface BitsCheermoteNameExactMatchProps {
 };
 
-function ExactCheerMatchForm(props: ExactCheerMatchFormProps) {
+function BitsCheermoteNameExactMatchForm(props: BitsCheermoteNameExactMatchProps) {
   const [cheerPrefix, setCheerPrefix] = useState<string|undefined>();
   const [bitsValue, setBitsValue] = useState<number>(1);
   const [manualCheerValue, setManualCheerValue] = useState<string>("");
@@ -44,8 +44,8 @@ function ExactCheerMatchForm(props: ExactCheerMatchFormProps) {
   return (
     <>
       <div className="field is-grouped">
-        <p className="control">
-        <label className="label">Pick the cheer</label>
+        <div className="control">
+          <label className="label">Pick the cheer</label>
           <div className="select is-medium">
             <select onChange={updateCheerPrefix}>
               <option
@@ -62,8 +62,8 @@ function ExactCheerMatchForm(props: ExactCheerMatchFormProps) {
               })}
             </select>
           </div>
-        </p>
-        <p className="control">
+        </div>
+        <div className="control">
           <label className="label">Then the bit value</label>
           <div className="control">
             <div className="select is-medium">
@@ -79,8 +79,8 @@ function ExactCheerMatchForm(props: ExactCheerMatchFormProps) {
               </select>
             </div>
           </div>
-        </p>
-        <p className="control is-expanded">
+        </div>
+        <div className="control is-expanded">
           <label className="label">To match against this (or set something custom)</label>
           <p className="control has-icons-left is-large">
             <input 
@@ -93,10 +93,10 @@ function ExactCheerMatchForm(props: ExactCheerMatchFormProps) {
               <FontAwesomeIcon icon={faGem} />
             </span>
           </p>
-        </p>
+        </div>
       </div>
     </>
   )
 }
 
-export { ExactCheerMatchForm }
+export { BitsCheermoteNameExactMatchForm }
