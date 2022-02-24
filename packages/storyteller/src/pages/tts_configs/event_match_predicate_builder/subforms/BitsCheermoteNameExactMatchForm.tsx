@@ -30,6 +30,8 @@ function BitsCheermoteNameExactMatchForm(props: BitsCheermoteNameExactMatchProps
   //  https://stackoverflow.com/a/62982753
   useEffect(() => {
     let newBits = props.minimumBitsSpent;
+    let newManualCheerValue = props.cheerName;
+    let joinBitsAndCheer = true;
 
     // Cheer name is the full value, eg. 'Corgo100'
     const matches = props.cheerName.trim().match(CHEER_REGEX)
@@ -37,6 +39,8 @@ function BitsCheermoteNameExactMatchForm(props: BitsCheermoteNameExactMatchProps
     if (!!matches && matches.length > 1) {
       setCheerPrefix(matches[1]); // First match group
       if (matches.length == 3 && matches[2] !== undefined) {
+        // If we detect a number, let's not conjoin bits and cheer.
+        joinBitsAndCheer = false;
         // NB(1): We're getting this value from a fullly named cheer, eg 'Corgo5000'.
         // NB(2): The second match group can be 'undefined' if no number is present. (Optional matching, I guess.)
         let maybeBits = parseInt(matches[2]);
@@ -46,7 +50,12 @@ function BitsCheermoteNameExactMatchForm(props: BitsCheermoteNameExactMatchProps
       }
     }
 
-    setManualCheerValue(props.cheerName); // The freeform text field
+    // NB: This is for arriving from "CheermotePrefixSpendThreshold", where the values are disjoint.
+    if (joinBitsAndCheer) {
+      newManualCheerValue = `${cheerPrefix}${newBits}`;
+    }
+
+    setManualCheerValue(newManualCheerValue); // The freeform text field
     setBitsValue(newBits);
   }, [props.cheerName, props.minimumBitsSpent]);
 
