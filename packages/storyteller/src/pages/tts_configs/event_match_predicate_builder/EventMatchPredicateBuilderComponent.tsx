@@ -132,7 +132,7 @@ function EventMatchPredicateBuilderComponent(props: EventMatchPredicateBuilderCo
       case BitsRuleType.BitsCheermotePrefixSpendThreshold:
         predicate.bits_cheermote_prefix_spend_threshold = {
           cheermote_prefix: nameOrPrefix, // New value
-          minimum_bits_spent: props.eventMatchPredicate.bits_cheermote_prefix_spend_threshold?.minimum_bits_spent || 0,
+          minimum_bits_spent: minimumBitsSpent,
         }
         break;
       case BitsRuleType.BitsSpendThreshold:
