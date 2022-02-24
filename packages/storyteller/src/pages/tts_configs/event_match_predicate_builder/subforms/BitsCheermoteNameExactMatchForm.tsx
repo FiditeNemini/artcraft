@@ -9,6 +9,7 @@ const CHEER_REGEX = /^([A-Za-z]+)(\d+)?$/;
 interface BitsCheermoteNameExactMatchProps {
   cheerName: string,
   updateCheerNameOrPrefix: (cheerNameOrPrefix: string) => void,
+  updateMinimumBitsSpent: (minimumSpent: number) => void, // NB: Technically not a field, but we can parse it out!
 };
 
 function BitsCheermoteNameExactMatchForm(props: BitsCheermoteNameExactMatchProps) {
@@ -65,7 +66,11 @@ function BitsCheermoteNameExactMatchForm(props: BitsCheermoteNameExactMatchProps
       setCheerPrefix(matches[1]); // First match group
       if (matches.length == 3 && matches[2] !== undefined) {
         // NB: Second match group can be 'undefined' if no number is present. (Zero-width matching?)
-        setBitsValue(parseInt(matches[2])); // Second match group
+        const maybeBits = parseInt(matches[2]);
+        if (!isNaN(maybeBits)) {
+          setBitsValue(maybeBits); // Second match group
+          props.updateMinimumBitsSpent(maybeBits); // NB: Technically not in this form, but helps when switching
+        }
       }
     }
 
@@ -82,6 +87,7 @@ function BitsCheermoteNameExactMatchForm(props: BitsCheermoteNameExactMatchProps
     const cheerValue = `${prefix}${bits}`;
     setManualCheerValue(cheerValue);
     props.updateCheerNameOrPrefix(cheerValue);
+    props.updateMinimumBitsSpent(bits); // NB: Technically not in this form, but helps when switching
   }
 
   return (

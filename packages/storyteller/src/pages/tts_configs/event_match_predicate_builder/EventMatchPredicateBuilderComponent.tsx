@@ -9,6 +9,9 @@ import { BitsSpendThresholdForm } from './subforms/BitsSpendThresholdForm';
 import { ChannelPointsRewardNameExactMatchForm } from './subforms/ChannelPointsRewardNameExactMatchForm';
 import { ChannelPointsRuleType } from './types/ChannelPointsRuleType';
 
+// TODO: Don't duplicate
+const CHEER_REGEX = /^([A-Za-z]+)(\d+)?$/;
+
 interface EventMatchPredicateBuilderComponentProps {
   // CANNOT BE CHANGED AFTER CREATION
   twitchEventCategory: TwitchEventCategory,
@@ -207,14 +210,13 @@ function EventMatchPredicateBuilderComponent(props: EventMatchPredicateBuilderCo
     switch (bitsRuleType) {
       case BitsRuleType.BitsCheermoteNameExactMatch:
         matchingRulesForm = <BitsCheermoteNameExactMatchForm 
-          //cheerName={currentNameOrPrefix}
           cheerName={cheerNameOrPrefix}
           updateCheerNameOrPrefix={handleChangedCheerNameOrPrefix}
+          updateMinimumBitsSpent={handleChangedMinimumBitsSpent} // NB: Technically not a field, but we can parse it out!
           />;
         break;
       case BitsRuleType.BitsCheermotePrefixSpendThreshold:
         matchingRulesForm = <BitsCheermotePrefixSpendThresholdForm
-          //cheerPrefix={currentNameOrPrefix}
           cheerPrefix={cheerNameOrPrefix}
           updateCheerNameOrPrefix={handleChangedCheerNameOrPrefix}
           minimumBitsSpent={minimumBitsSpent}
