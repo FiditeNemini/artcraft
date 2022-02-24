@@ -1,7 +1,10 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faGem } from '@fortawesome/free-solid-svg-icons';
 import { CHEER_BIT_LEVELS, CHEER_PREFIXES } from '../../../../twitch/Cheers';
+
+// TODO: Don't duplicate
+const CHEER_REGEX = /^([A-Za-z]+)(\d+)?$/;
 
 interface BitsCheermotePrefixSpendThresholdProps {
   cheerPrefix: string,
@@ -16,6 +19,45 @@ function BitsCheermotePrefixSpendThresholdForm(props: BitsCheermotePrefixSpendTh
 
   const [bitsValue, setBitsValue] = useState<number>(props.minimumBitsSpent);
   const [customBitsValue, setCustomBitsValue] = useState<number>(props.minimumBitsSpent);
+
+  // This handles initialization after mount.
+  // NB: useState is not always setting from props correctly (after several re-renders)
+  // The following answers suggests using useEffect:
+  //  https://stackoverflow.com/a/54866051 (less clear by also using useState(), but good comments)
+  //  https://stackoverflow.com/a/62982753
+  useEffect(() => {
+    let newBitsValue = 1;
+
+    // Cheer prefix could be just a prefix (eg. 'Corgo') OR the full name (eg. 'Corgo100')
+    // This depends on what the previous view was.
+    const matches = props.cheerPrefix.trim().match(CHEER_REGEX)
+
+    if (!!matches && matches.length > 1) {
+      // First match group
+      setCheerPrefix(matches[1]);
+      setCustomCheerPrefix(matches[1]);
+      if (matches.length == 3 && matches[2] !== undefined) {
+        // NB: Second match group can be 'undefined' if no number is present. (Zero-width matching?)
+        let maybeValid = parseInt(matches[2]);
+        if (!isNaN(maybeValid)) {
+          newBitsValue = maybeValid;
+        }
+      }
+    }
+
+    if (!!props.minimumBitsSpent && !isNaN(props.minimumBitsSpent) && props.minimumBitsSpent > 0) {
+      newBitsValue = props.minimumBitsSpent;
+    }
+
+    console.log('newBitsValue', newBitsValue);
+    
+    setBitsValue(newBitsValue);
+    setCustomBitsValue(newBitsValue);
+
+  }, [props.cheerPrefix, props.minimumBitsSpent]);
+
+  console.log('bv', bitsValue);
+
 
   const updateCheerPrefix = (ev: React.FormEvent<HTMLSelectElement>) : boolean => {
     const value = (ev.target as HTMLSelectElement).value;
@@ -72,7 +114,10 @@ function BitsCheermotePrefixSpendThresholdForm(props: BitsCheermotePrefixSpendTh
         <div className="control">
           <label className="label">Pick the cheer prefix</label>
           <div className="select is-medium">
-            <select onChange={updateCheerPrefix}>
+            <select 
+              onChange={updateCheerPrefix}
+              value={cheerPrefix}
+              >
               <option
                 key={`option-*`}
                 value=""

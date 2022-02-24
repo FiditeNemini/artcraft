@@ -3,6 +3,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faGem } from '@fortawesome/free-solid-svg-icons';
 import { CHEER_BIT_LEVELS, CHEER_PREFIXES } from '../../../../twitch/Cheers';
 
+// TODO: Don't duplicate
 const CHEER_REGEX = /^([A-Za-z]+)(\d+)?$/;
 
 interface BitsCheermoteNameExactMatchProps {
@@ -12,7 +13,7 @@ interface BitsCheermoteNameExactMatchProps {
 
 function BitsCheermoteNameExactMatchForm(props: BitsCheermoteNameExactMatchProps) {
   // The two dropdowns
-  const [cheerPrefix, setCheerPrefix] = useState<string|undefined>(props.cheerName);
+  const [cheerPrefix, setCheerPrefix] = useState<string>(props.cheerName);
   const [bitsValue, setBitsValue] = useState<number>(1);
   // The freeform text input
   const [manualCheerValue, setManualCheerValue] = useState<string>(props.cheerName);
