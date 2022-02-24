@@ -49,15 +49,10 @@ function BitsCheermotePrefixSpendThresholdForm(props: BitsCheermotePrefixSpendTh
       newBitsValue = props.minimumBitsSpent;
     }
 
-    console.log('newBitsValue', newBitsValue);
-    
     setBitsValue(newBitsValue);
     setCustomBitsValue(newBitsValue);
 
   }, [props.cheerPrefix, props.minimumBitsSpent]);
-
-  console.log('bv', bitsValue);
-
 
   const updateCheerPrefix = (ev: React.FormEvent<HTMLSelectElement>) : boolean => {
     const value = (ev.target as HTMLSelectElement).value;
@@ -166,7 +161,10 @@ function BitsCheermotePrefixSpendThresholdForm(props: BitsCheermotePrefixSpendTh
           <label className="label">Preset thresholds</label>
           <div className="control">
             <div className="select is-medium">
-              <select onChange={handleBitSelect}>
+              <select 
+                onChange={handleBitSelect}
+                value={bitsValue}
+                >
                 {CHEER_BIT_LEVELS.map(level => {
                   return (
                     <option

@@ -31,7 +31,10 @@ function BitsCheermoteNameExactMatchForm(props: BitsCheermoteNameExactMatchProps
       setCheerPrefix(matches[1]); // First match group
       if (matches.length == 3 && matches[2] !== undefined) {
         // NB: Second match group can be 'undefined' if no number is present. (Zero-width matching?)
-        setBitsValue(parseInt(matches[2]));
+        let maybeBits = parseInt(matches[2]);
+        if (!isNaN(maybeBits)) {
+          setBitsValue(maybeBits);
+        }
       }
     }
 
