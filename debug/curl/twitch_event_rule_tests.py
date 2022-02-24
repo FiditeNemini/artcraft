@@ -61,7 +61,7 @@ payload = {
     'event_category': 'bits',
     'event_match_predicate': {
         'bits_spend_threshold': {
-            'minimum_bits_spent': 2,
+            'minimum_bits_spent': 5000,
         },
     },
     'event_response': {
