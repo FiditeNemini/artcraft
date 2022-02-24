@@ -9,13 +9,18 @@ const CHEER_REGEX = /^([A-Za-z]+)(\d+)?$/;
 interface BitsCheermoteNameExactMatchProps {
   cheerName: string,
   updateCheerNameOrPrefix: (cheerNameOrPrefix: string) => void,
-  updateMinimumBitsSpent: (minimumSpent: number) => void, // NB: Technically not a field, but we can parse it out!
+  
+  // NB: 'minimumBitsSpent' and its update are technically not a field here, but we can parse it out
+  // to communicate back upstream in case the field changes, or infer it from a context switch to this
+  // field. Basically, we're trying not to lose information.
+  minimumBitsSpent: number,
+  updateMinimumBitsSpent: (minimumSpent: number) => void, 
 };
 
 function BitsCheermoteNameExactMatchForm(props: BitsCheermoteNameExactMatchProps) {
   // The two dropdowns
   const [cheerPrefix, setCheerPrefix] = useState<string>(props.cheerName);
-  const [bitsValue, setBitsValue] = useState<number>(1);
+  const [bitsValue, setBitsValue] = useState<number>(props.minimumBitsSpent);
   // The freeform text input
   const [manualCheerValue, setManualCheerValue] = useState<string>(props.cheerName);
 
@@ -24,22 +29,26 @@ function BitsCheermoteNameExactMatchForm(props: BitsCheermoteNameExactMatchProps
   //  https://stackoverflow.com/a/54866051 (less clear by also using useState(), but good comments)
   //  https://stackoverflow.com/a/62982753
   useEffect(() => {
+    let newBits = props.minimumBitsSpent;
+
     // Cheer name is the full value, eg. 'Corgo100'
     const matches = props.cheerName.trim().match(CHEER_REGEX)
 
     if (!!matches && matches.length > 1) {
       setCheerPrefix(matches[1]); // First match group
       if (matches.length == 3 && matches[2] !== undefined) {
-        // NB: Second match group can be 'undefined' if no number is present. (Zero-width matching?)
+        // NB(1): We're getting this value from a fullly named cheer, eg 'Corgo5000'.
+        // NB(2): The second match group can be 'undefined' if no number is present. (Optional matching, I guess.)
         let maybeBits = parseInt(matches[2]);
         if (!isNaN(maybeBits)) {
-          setBitsValue(maybeBits);
+          newBits = maybeBits;
         }
       }
     }
 
     setManualCheerValue(props.cheerName); // The freeform text field
-  }, [props.cheerName]);
+    setBitsValue(newBits);
+  }, [props.cheerName, props.minimumBitsSpent]);
 
   const updateCheerPrefix = (ev: React.FormEvent<HTMLSelectElement>) : boolean => {
     const value = (ev.target as HTMLSelectElement).value;

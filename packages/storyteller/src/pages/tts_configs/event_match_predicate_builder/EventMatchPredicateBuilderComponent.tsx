@@ -211,6 +211,7 @@ function EventMatchPredicateBuilderComponent(props: EventMatchPredicateBuilderCo
       case BitsRuleType.BitsCheermoteNameExactMatch:
         matchingRulesForm = <BitsCheermoteNameExactMatchForm 
           cheerName={cheerNameOrPrefix}
+          minimumBitsSpent={minimumBitsSpent}
           updateCheerNameOrPrefix={handleChangedCheerNameOrPrefix}
           updateMinimumBitsSpent={handleChangedMinimumBitsSpent} // NB: Technically not a field, but we can parse it out!
           />;
