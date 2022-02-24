@@ -57,7 +57,7 @@ function BitsCheermotePrefixSpendThresholdForm(props: BitsCheermotePrefixSpendTh
   const updateCheerPrefix = (ev: React.FormEvent<HTMLSelectElement>) : boolean => {
     const value = (ev.target as HTMLSelectElement).value;
     setCheerPrefix(value);
-    recalcuateFieldValue(value, bitsValue);
+    setCustomCheerPrefix(value);
     return true;
   }
 
@@ -66,16 +66,6 @@ function BitsCheermotePrefixSpendThresholdForm(props: BitsCheermotePrefixSpendTh
     setCustomCheerPrefix(value);
     props.updateCheerNameOrPrefix(value);
     return true;
-  }
-
-  // When the dropdowns are used, replace any manual text entry.
-  const recalcuateFieldValue = (prefix: string, bits: number) => {
-    if (prefix === undefined) {
-      return;
-    }
-    const cheerValue = `${prefix}`;
-    setCustomCheerPrefix(cheerValue);
-    props.updateCheerNameOrPrefix(cheerValue);
   }
 
   const handleBitSelect = (ev: React.FormEvent<HTMLSelectElement>) : boolean => {
