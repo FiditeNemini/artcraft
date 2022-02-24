@@ -32,6 +32,10 @@ yarn start-storyteller
 TODO: Upgrade React, it's a bit behind. See downgrade @ SHA
 `d739b66bfa3315620208579193d652e8e460da1e`.
 
+Good Code Examples
+------------------
+
+* `storyteller/src/pages/tts_configs/TtsConfigsEditRulePage.tsx` - Tree of components that handle a very complicated update API
 
 Netlify Notes
 -------------
