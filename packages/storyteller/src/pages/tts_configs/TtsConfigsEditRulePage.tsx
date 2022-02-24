@@ -57,8 +57,8 @@ function TtsConfigsEditRulePage(props: Props) {
 
   // ===== Field values (final) =====
 
-  const [eventMatchPredicate, setEventMatchPredicate] = useState<EventMatchPredicate|undefined>(undefined);
-  const [eventResponse, setEventResponse] = useState<EventResponse|undefined>(undefined);
+  const [eventMatchPredicate, setEventMatchPredicate] = useState<EventMatchPredicate>({});
+  const [eventResponse, setEventResponse] = useState<EventResponse>({});
   const [ruleIsDisabled, setRuleIsDisabled] = useState(false);
 
   const getTwitchEventRule = useCallback(async (token: string) => {
@@ -107,17 +107,86 @@ function TtsConfigsEditRulePage(props: Props) {
   }, [getTwitchEventRule, token]);
 
   const updateBitsRuleType = (ev: React.FormEvent<HTMLSelectElement>) : boolean => {
-    const value = (ev.target as HTMLSelectElement).value as BitsRuleType;
-    setBitsRuleType(value);
+    const value = (ev.target as HTMLSelectElement).value;
+    const ruleType = value as BitsRuleType;
+
+    let predicate : EventMatchPredicate = {};
+
+    switch (ruleType) {
+      case BitsRuleType.BitsCheermoteNameExactMatch:
+        predicate.bits_cheermote_name_exact_match = {
+          cheermote_name: cheerNameOrPrefix,
+        }
+        break;
+      case BitsRuleType.BitsCheermotePrefixSpendThreshold:
+        predicate.bits_cheermote_prefix_spend_threshold = {
+          cheermote_prefix: cheerNameOrPrefix,
+          minimum_bits_spent: minimumBitsSpent,
+        }
+        break;
+      case BitsRuleType.BitsSpendThreshold:
+        predicate.bits_spend_threshold = {
+          minimum_bits_spent: minimumBitsSpent,
+        }
+        break;
+    }
+
+    setBitsRuleType(ruleType);
+    setEventMatchPredicate(predicate);
+
     return true;
   }
 
   const updateCheerNameOrPrefix = (nameOrPrefix: string) => {
+    let predicate : EventMatchPredicate = {};
+
+    switch (bitsRuleType) {
+      case BitsRuleType.BitsCheermoteNameExactMatch:
+        predicate.bits_cheermote_name_exact_match = {
+          cheermote_name: nameOrPrefix,
+        }
+        break;
+      case BitsRuleType.BitsCheermotePrefixSpendThreshold:
+        predicate.bits_cheermote_prefix_spend_threshold = {
+          cheermote_prefix: nameOrPrefix,
+          minimum_bits_spent: minimumBitsSpent,
+        }
+        break;
+      case BitsRuleType.BitsSpendThreshold:
+        predicate.bits_spend_threshold = {
+          minimum_bits_spent: minimumBitsSpent,
+        }
+        break;
+    }
+
     setCheerNameOrPrefix(nameOrPrefix);
+    setEventMatchPredicate(predicate);
   }
 
   const updateMinimumBitsSpent = (minimumSpent: number) => {
+    let predicate : EventMatchPredicate = {};
+
+    switch (bitsRuleType) {
+      case BitsRuleType.BitsCheermoteNameExactMatch:
+        predicate.bits_cheermote_name_exact_match = {
+          cheermote_name: cheerNameOrPrefix,
+        }
+        break;
+      case BitsRuleType.BitsCheermotePrefixSpendThreshold:
+        predicate.bits_cheermote_prefix_spend_threshold = {
+          cheermote_prefix: cheerNameOrPrefix,
+          minimum_bits_spent: minimumSpent,
+        }
+        break;
+      case BitsRuleType.BitsSpendThreshold:
+        predicate.bits_spend_threshold = {
+          minimum_bits_spent: minimumSpent,
+        }
+        break;
+    }
+
     setMinimumBitsSpent(minimumSpent);
+    setEventMatchPredicate(predicate);
   }
 
   const updateRewardName = (name: string) => {
@@ -187,6 +256,21 @@ function TtsConfigsEditRulePage(props: Props) {
       />;
   }
 
+  // NB: This is a hypothetical version of what we'll update to
+  let renderRule : TwitchEventRule = {
+    // Unchanged
+    token: twitchEventRule.token,
+    event_category: twitchEventRule.event_category,
+    user_specified_rule_order: twitchEventRule.user_specified_rule_order,
+    created_at: twitchEventRule.created_at,
+    updated_at: twitchEventRule.updated_at,
+
+    // Updated in UI
+    event_match_predicate: eventMatchPredicate,
+    event_response: eventResponse,
+    rule_is_disabled: ruleIsDisabled,
+  };
+
   return (
     <>
       <div className="section">
@@ -235,7 +319,7 @@ function TtsConfigsEditRulePage(props: Props) {
 
         <div className="content">
           <TwitchEventRuleElement 
-            rule={twitchEventRule} 
+            rule={renderRule} 
             hideButtons={true} 
             allTtsModelsByToken={props.allTtsModelsByToken}
             />
