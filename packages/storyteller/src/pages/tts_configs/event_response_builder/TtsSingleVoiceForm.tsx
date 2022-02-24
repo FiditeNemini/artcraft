@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { TtsModelListItem } from '@storyteller/components/src/api/tts/ListTtsModels';
 import { FakeYouExternalLink } from '@storyteller/components/src/elements/FakeYouExternalLink';
 
@@ -13,7 +13,16 @@ interface TtsSingleVoiceFormProps {
 };
 
 function TtsSingleVoiceForm(props: TtsSingleVoiceFormProps) {
-  const [ttsModelToken, setTtsModelToken] = useState(props.ttsModelToken);
+  const [ttsModelToken, setTtsModelToken] = useState('');
+
+  // NB: useState is not always setting from props correctly (after several re-renders)
+  // The following answers suggests using useEffect:
+  //  https://stackoverflow.com/a/54866051 (less clear by also using useState(), but good comments)
+  //  https://stackoverflow.com/a/62982753
+  useEffect(() => {
+    setTtsModelToken(props.ttsModelToken);
+  }, [props.ttsModelToken]);
+
 
   const handleModelSelect = (ev: React.FormEvent<HTMLSelectElement>) : boolean => {
     const value = (ev.target as HTMLSelectElement).value;
