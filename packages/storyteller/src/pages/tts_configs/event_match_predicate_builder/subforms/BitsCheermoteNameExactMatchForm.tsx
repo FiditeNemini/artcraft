@@ -25,8 +25,9 @@ function BitsCheermoteNameExactMatchForm(props: BitsCheermoteNameExactMatchProps
 
     if (!!matches && matches.length > 1) {
       setCheerPrefix(matches[1]); // First match group
-      if (matches.length == 3) {
-        setBitsValue(parseInt(matches[2])); // Second match group
+      if (matches.length == 3 && matches[2] !== undefined) {
+        // NB: Second match group can be 'undefined' if no number is present. (Zero-width matching?)
+        setBitsValue(parseInt(matches[2]));
       }
     }
 
@@ -43,8 +44,11 @@ function BitsCheermoteNameExactMatchForm(props: BitsCheermoteNameExactMatchProps
   const updateBitsValue = (ev: React.FormEvent<HTMLSelectElement>) : boolean => {
     const value = (ev.target as HTMLSelectElement).value;
     const numericValue = parseInt(value);
-    setBitsValue(numericValue);
-    recalcuateFieldValue(cheerPrefix, numericValue);
+    if (!isNaN(numericValue)) {
+      // NB: The form shouldn't yield NaN, but just in case.
+      setBitsValue(numericValue);
+      recalcuateFieldValue(cheerPrefix, numericValue);
+    }
     return true;
   }
 
@@ -56,7 +60,8 @@ function BitsCheermoteNameExactMatchForm(props: BitsCheermoteNameExactMatchProps
 
     if (!!matches && matches.length > 1) {
       setCheerPrefix(matches[1]); // First match group
-      if (matches.length == 3) {
+      if (matches.length == 3 && matches[2] !== undefined) {
+        // NB: Second match group can be 'undefined' if no number is present. (Zero-width matching?)
         setBitsValue(parseInt(matches[2])); // Second match group
       }
     }
@@ -105,7 +110,10 @@ function BitsCheermoteNameExactMatchForm(props: BitsCheermoteNameExactMatchProps
           <label className="label">Then the bit value</label>
           <div className="control">
             <div className="select is-medium">
-              <select onChange={updateBitsValue}>
+              <select 
+                onChange={updateBitsValue}
+                value={bitsValue}
+                >
                 {CHEER_BIT_LEVELS.map(level => {
                   return (
                     <option
