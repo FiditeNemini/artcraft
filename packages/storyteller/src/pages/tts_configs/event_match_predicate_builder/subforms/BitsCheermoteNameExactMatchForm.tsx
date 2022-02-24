@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faGem } from '@fortawesome/free-solid-svg-icons';
-import { CHEER_BIT_LEVELS, CHEER_PREFIXES } from '../../../twitch/Cheers';
+import { CHEER_BIT_LEVELS, CHEER_PREFIXES } from '../../../../twitch/Cheers';
 
 interface BitsCheermoteNameExactMatchProps {
   cheerName: string,

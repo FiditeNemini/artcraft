@@ -9,14 +9,15 @@ import { faAngleLeft, faSave } from '@fortawesome/free-solid-svg-icons';
 import { EventMatchPredicate } from '@storyteller/components/src/api/storyteller/twitch_event_rules/shared/EventMatchPredicate';
 import { EventResponse } from '@storyteller/components/src/api/storyteller/twitch_event_rules/shared/EventResponse';
 import { TtsModelListItem } from '@storyteller/components/src/api/tts/ListTtsModels';
-import { BitsCheermoteNameExactMatchForm } from './components/BitsCheermoteNameExactMatchForm';
-import { BitsSpendThresholdForm } from './components/BitsSpendThresholdForm';
-import { BitsCheermotePrefixSpendThresholdForm } from './components/BitsCheermotePrefixSpendThresholdForm';
+import { BitsCheermoteNameExactMatchForm } from './event_match_predicate_builder/subforms/BitsCheermoteNameExactMatchForm';
+import { BitsSpendThresholdForm } from './event_match_predicate_builder/subforms/BitsSpendThresholdForm';
+import { BitsCheermotePrefixSpendThresholdForm } from './event_match_predicate_builder/subforms/BitsCheermotePrefixSpendThresholdForm';
 import { TwitchEventCategory } from '@storyteller/components/src/api/storyteller/twitch_event_rules/shared/TwitchEventCategory';
-import { BitsRuleType } from './components/RuleTypes';
-import { ChannelPointsRewardNameExactMatchForm } from './components/ChannelPointsRewardNameExactMatchForm';
-import { TtsSingleVoiceForm } from './event_response_builder/TtsSingleVoiceForm';
+import { ChannelPointsRewardNameExactMatchForm } from './event_match_predicate_builder/subforms/ChannelPointsRewardNameExactMatchForm';
 import { EventResponseType } from './event_response_builder/EventResponseType';
+import { EventResponseComponent } from './event_response_builder/EventResponseComponent';
+import { BitsRuleType } from './event_match_predicate_builder/types/BitsRuleType';
+import { EventMatchPredicateBuilderComponent } from './event_match_predicate_builder/EventMatchPredicateBuilderComponent';
 
 interface Props {
   sessionWrapper: SessionWrapper,
@@ -124,92 +125,92 @@ function TtsConfigsEditRulePage(props: Props) {
     getTwitchEventRule(token);
   }, [getTwitchEventRule, token]);
 
-  const updateBitsRuleType = (ev: React.FormEvent<HTMLSelectElement>) : boolean => {
-    const value = (ev.target as HTMLSelectElement).value;
-    const ruleType = value as BitsRuleType;
+//  const updateBitsRuleType = (ev: React.FormEvent<HTMLSelectElement>) : boolean => {
+//    const value = (ev.target as HTMLSelectElement).value;
+//    const ruleType = value as BitsRuleType;
+//
+//    let predicate : EventMatchPredicate = {};
+//
+//    switch (ruleType) {
+//      case BitsRuleType.BitsCheermoteNameExactMatch:
+//        predicate.bits_cheermote_name_exact_match = {
+//          cheermote_name: cheerNameOrPrefix,
+//        }
+//        break;
+//      case BitsRuleType.BitsCheermotePrefixSpendThreshold:
+//        predicate.bits_cheermote_prefix_spend_threshold = {
+//          cheermote_prefix: cheerNameOrPrefix,
+//          minimum_bits_spent: minimumBitsSpent,
+//        }
+//        break;
+//      case BitsRuleType.BitsSpendThreshold:
+//        predicate.bits_spend_threshold = {
+//          minimum_bits_spent: minimumBitsSpent,
+//        }
+//        break;
+//    }
+//
+//    setBitsRuleType(ruleType);
+//    setEventMatchPredicate(predicate);
+//
+//    return true;
+//  }
 
-    let predicate : EventMatchPredicate = {};
+//  const updateCheerNameOrPrefix = (nameOrPrefix: string) => {
+//    let predicate : EventMatchPredicate = {};
+//
+//    switch (bitsRuleType) {
+//      case BitsRuleType.BitsCheermoteNameExactMatch:
+//        predicate.bits_cheermote_name_exact_match = {
+//          cheermote_name: nameOrPrefix,
+//        }
+//        break;
+//      case BitsRuleType.BitsCheermotePrefixSpendThreshold:
+//        predicate.bits_cheermote_prefix_spend_threshold = {
+//          cheermote_prefix: nameOrPrefix,
+//          minimum_bits_spent: minimumBitsSpent,
+//        }
+//        break;
+//      case BitsRuleType.BitsSpendThreshold:
+//        predicate.bits_spend_threshold = {
+//          minimum_bits_spent: minimumBitsSpent,
+//        }
+//        break;
+//    }
+//
+//    setCheerNameOrPrefix(nameOrPrefix);
+//    setEventMatchPredicate(predicate);
+//  }
 
-    switch (ruleType) {
-      case BitsRuleType.BitsCheermoteNameExactMatch:
-        predicate.bits_cheermote_name_exact_match = {
-          cheermote_name: cheerNameOrPrefix,
-        }
-        break;
-      case BitsRuleType.BitsCheermotePrefixSpendThreshold:
-        predicate.bits_cheermote_prefix_spend_threshold = {
-          cheermote_prefix: cheerNameOrPrefix,
-          minimum_bits_spent: minimumBitsSpent,
-        }
-        break;
-      case BitsRuleType.BitsSpendThreshold:
-        predicate.bits_spend_threshold = {
-          minimum_bits_spent: minimumBitsSpent,
-        }
-        break;
-    }
+//  const updateMinimumBitsSpent = (minimumSpent: number) => {
+//    let predicate : EventMatchPredicate = {};
+//
+//    switch (bitsRuleType) {
+//      case BitsRuleType.BitsCheermoteNameExactMatch:
+//        predicate.bits_cheermote_name_exact_match = {
+//          cheermote_name: cheerNameOrPrefix,
+//        }
+//        break;
+//      case BitsRuleType.BitsCheermotePrefixSpendThreshold:
+//        predicate.bits_cheermote_prefix_spend_threshold = {
+//          cheermote_prefix: cheerNameOrPrefix,
+//          minimum_bits_spent: minimumSpent,
+//        }
+//        break;
+//      case BitsRuleType.BitsSpendThreshold:
+//        predicate.bits_spend_threshold = {
+//          minimum_bits_spent: minimumSpent,
+//        }
+//        break;
+//    }
+//
+//    setMinimumBitsSpent(minimumSpent);
+//    setEventMatchPredicate(predicate);
+//  }
 
-    setBitsRuleType(ruleType);
-    setEventMatchPredicate(predicate);
-
-    return true;
-  }
-
-  const updateCheerNameOrPrefix = (nameOrPrefix: string) => {
-    let predicate : EventMatchPredicate = {};
-
-    switch (bitsRuleType) {
-      case BitsRuleType.BitsCheermoteNameExactMatch:
-        predicate.bits_cheermote_name_exact_match = {
-          cheermote_name: nameOrPrefix,
-        }
-        break;
-      case BitsRuleType.BitsCheermotePrefixSpendThreshold:
-        predicate.bits_cheermote_prefix_spend_threshold = {
-          cheermote_prefix: nameOrPrefix,
-          minimum_bits_spent: minimumBitsSpent,
-        }
-        break;
-      case BitsRuleType.BitsSpendThreshold:
-        predicate.bits_spend_threshold = {
-          minimum_bits_spent: minimumBitsSpent,
-        }
-        break;
-    }
-
-    setCheerNameOrPrefix(nameOrPrefix);
-    setEventMatchPredicate(predicate);
-  }
-
-  const updateMinimumBitsSpent = (minimumSpent: number) => {
-    let predicate : EventMatchPredicate = {};
-
-    switch (bitsRuleType) {
-      case BitsRuleType.BitsCheermoteNameExactMatch:
-        predicate.bits_cheermote_name_exact_match = {
-          cheermote_name: cheerNameOrPrefix,
-        }
-        break;
-      case BitsRuleType.BitsCheermotePrefixSpendThreshold:
-        predicate.bits_cheermote_prefix_spend_threshold = {
-          cheermote_prefix: cheerNameOrPrefix,
-          minimum_bits_spent: minimumSpent,
-        }
-        break;
-      case BitsRuleType.BitsSpendThreshold:
-        predicate.bits_spend_threshold = {
-          minimum_bits_spent: minimumSpent,
-        }
-        break;
-    }
-
-    setMinimumBitsSpent(minimumSpent);
-    setEventMatchPredicate(predicate);
-  }
-
-  const updateRewardName = (name: string) => {
-    setRewardName(name);
-  }
+//  const updateRewardName = (name: string) => {
+//    setRewardName(name);
+//  }
 
   const updateTtsModelToken = (token: string) => {
     let response : EventResponse = {};
@@ -260,38 +261,38 @@ function TtsConfigsEditRulePage(props: Props) {
     return <h1>Loading...</h1>;
   }
 
-  let ruleTypeForm = <></>
-
-  if (twitchEventCategory === TwitchEventCategory.Bits) {
-    switch (bitsRuleType) {
-      case BitsRuleType.BitsCheermoteNameExactMatch:
-        ruleTypeForm = <BitsCheermoteNameExactMatchForm 
-          cheerName={cheerNameOrPrefix}
-          updateCheerNameOrPrefix={updateCheerNameOrPrefix}
-          />;
-        break;
-      case BitsRuleType.BitsCheermotePrefixSpendThreshold:
-        ruleTypeForm = <BitsCheermotePrefixSpendThresholdForm 
-          cheerPrefix={cheerNameOrPrefix}
-          updateCheerNameOrPrefix={updateCheerNameOrPrefix}
-          minimumBitsSpent={minimumBitsSpent}
-          updateMinimumBitsSpent={updateMinimumBitsSpent}
-          />
-        break;
-      case BitsRuleType.BitsSpendThreshold:
-        ruleTypeForm = <BitsSpendThresholdForm 
-          minimumBitsSpent={minimumBitsSpent}
-          updateMinimumBitsSpent={updateMinimumBitsSpent}
-          />;
-        break;
-    }
-
-  } else if (twitchEventCategory === TwitchEventCategory.ChannelPoints) {
-    ruleTypeForm = <ChannelPointsRewardNameExactMatchForm
-      rewardName={rewardName}
-      updateRewardName={updateRewardName}
-      />;
-  }
+//  let ruleTypeForm = <></>
+//
+//  if (twitchEventCategory === TwitchEventCategory.Bits) {
+//    switch (bitsRuleType) {
+//      case BitsRuleType.BitsCheermoteNameExactMatch:
+//        ruleTypeForm = <BitsCheermoteNameExactMatchForm 
+//          cheerName={cheerNameOrPrefix}
+//          updateCheerNameOrPrefix={updateCheerNameOrPrefix}
+//          />;
+//        break;
+//      case BitsRuleType.BitsCheermotePrefixSpendThreshold:
+//        ruleTypeForm = <BitsCheermotePrefixSpendThresholdForm 
+//          cheerPrefix={cheerNameOrPrefix}
+//          updateCheerNameOrPrefix={updateCheerNameOrPrefix}
+//          minimumBitsSpent={minimumBitsSpent}
+//          updateMinimumBitsSpent={updateMinimumBitsSpent}
+//          />
+//        break;
+//      case BitsRuleType.BitsSpendThreshold:
+//        ruleTypeForm = <BitsSpendThresholdForm 
+//          minimumBitsSpent={minimumBitsSpent}
+//          updateMinimumBitsSpent={updateMinimumBitsSpent}
+//          />;
+//        break;
+//    }
+//
+//  } else if (twitchEventCategory === TwitchEventCategory.ChannelPoints) {
+//    ruleTypeForm = <ChannelPointsRewardNameExactMatchForm
+//      rewardName={rewardName}
+//      updateRewardName={updateRewardName}
+//      />;
+//  }
 
   // NB: This is a hypothetical version of what we'll update to
   let renderRule : TwitchEventRule = {
@@ -319,7 +320,8 @@ function TtsConfigsEditRulePage(props: Props) {
 
       <form onSubmit={handleFormSubmit}>
 
-        <h2 className="title is-4">1) Pick a type of rule</h2>
+{/*
+        <h2 className="title is-4">1) Pick what to match on</h2>
 
         <div className="field">
           <label className="label">Rule Type</label>
@@ -339,24 +341,27 @@ function TtsConfigsEditRulePage(props: Props) {
         <br />
         <br />
 
-        <h2 className="title is-4">2) Configure matching</h2>
+        <h2 className="title is-4">2) Configure the matching</h2>
         
         {ruleTypeForm}
 
         <br />
         <br />
+*/}
 
-        <h2 className="title is-4">3) Pick how to respond</h2>
+        <EventMatchPredicateBuilderComponent
+          twitchEventCategory={twitchEventRule.event_category}
+          allTtsModels={props.allTtsModels}
+          allTtsModelsByToken={props.allTtsModelsByToken}
 
-        <TtsSingleVoiceForm
+          />
+
+        <EventResponseComponent
           allTtsModels={props.allTtsModels}
           allTtsModelsByToken={props.allTtsModelsByToken}
           setTtsModelToken={updateTtsModelToken}
           ttsModelToken={ttsModelToken}
           />
-
-        <br />
-        <br />
 
         <h2 className="title is-4">This is the rule:</h2>
 
