@@ -8,6 +8,7 @@ import { BitsCheermoteNameExactMatchForm } from './subforms/BitsCheermoteNameExa
 import { BitsCheermotePrefixSpendThresholdForm } from './subforms/BitsCheermotePrefixSpendThresholdForm';
 import { BitsSpendThresholdForm } from './subforms/BitsSpendThresholdForm';
 import { ChannelPointsRewardNameExactMatchForm } from './subforms/ChannelPointsRewardNameExactMatchForm';
+import { ChannelPointsRuleType } from './types/ChannelPointsRuleType';
 
 interface EventMatchPredicateBuilderComponentProps {
   // CANNOT BE CHANGED AFTER CREATION
@@ -24,7 +25,7 @@ function EventMatchPredicateBuilderComponent(props: EventMatchPredicateBuilderCo
   // ========== Core UI flow ==========
 
   const [bitsRuleType, setBitsRuleType] = useState<BitsRuleType>(BitsRuleType.BitsCheermoteNameExactMatch);
-
+  const [channelPointsRuleType, setChannelPointsRuleType] = useState<ChannelPointsRuleType>(ChannelPointsRuleType.ChannelPointsRewardNameExactMatch);
 
   // ========== Cached Values for Editing ==========
 
@@ -45,7 +46,6 @@ function EventMatchPredicateBuilderComponent(props: EventMatchPredicateBuilderCo
   // Used in:
   // TtsSingleVoice
   const [ttsModelToken, setTtsModelToken] = useState(''); 
-
 
   const handleChangedBitsRuleType = (ev: React.FormEvent<HTMLSelectElement>) : boolean => {
     const value = (ev.target as HTMLSelectElement).value;
@@ -77,6 +77,17 @@ function EventMatchPredicateBuilderComponent(props: EventMatchPredicateBuilderCo
     // TODO
     //setEventMatchPredicate(predicate);
 
+    return true;
+  }
+
+  const handleChangedChannelPointsRuleType = (ev: React.FormEvent<HTMLSelectElement>) : boolean => {
+    const value = (ev.target as HTMLSelectElement).value;
+    const ruleType = value as ChannelPointsRuleType;
+
+    // TODO:
+    let predicate : EventMatchPredicate = {};
+
+    setChannelPointsRuleType(ruleType);
     return true;
   }
 
@@ -139,18 +150,37 @@ function EventMatchPredicateBuilderComponent(props: EventMatchPredicateBuilderCo
   }
 
 
-  let ruleTypeForm = <></>
+  let ruleTypeSelect = <></>
+  let matchingRulesForm = <></>
 
   if (props.twitchEventCategory === TwitchEventCategory.Bits) {
+    ruleTypeSelect = (
+      <>
+        <select 
+          value={bitsRuleType}
+          onChange={handleChangedBitsRuleType}>
+          <option 
+            value={BitsRuleType.BitsSpendThreshold}
+            >Bits Spend Threshold</option>
+          <option 
+            value={BitsRuleType.BitsCheermoteNameExactMatch}
+            >Cheermote Name (Exact Match)</option>
+          <option 
+            value={BitsRuleType.BitsCheermotePrefixSpendThreshold}
+            >Cheermote Prefix and Bits Spend Threshold</option>
+        </select>
+      </>
+    );
+
     switch (bitsRuleType) {
       case BitsRuleType.BitsCheermoteNameExactMatch:
-        ruleTypeForm = <BitsCheermoteNameExactMatchForm 
+        matchingRulesForm = <BitsCheermoteNameExactMatchForm 
           cheerName={cheerNameOrPrefix}
           updateCheerNameOrPrefix={updateCheerNameOrPrefix}
           />;
         break;
       case BitsRuleType.BitsCheermotePrefixSpendThreshold:
-        ruleTypeForm = <BitsCheermotePrefixSpendThresholdForm
+        matchingRulesForm = <BitsCheermotePrefixSpendThresholdForm
           cheerPrefix={cheerNameOrPrefix}
           updateCheerNameOrPrefix={updateCheerNameOrPrefix}
           minimumBitsSpent={minimumBitsSpent}
@@ -158,7 +188,7 @@ function EventMatchPredicateBuilderComponent(props: EventMatchPredicateBuilderCo
           />
         break;
       case BitsRuleType.BitsSpendThreshold:
-        ruleTypeForm = <BitsSpendThresholdForm 
+        matchingRulesForm = <BitsSpendThresholdForm 
           minimumBitsSpent={minimumBitsSpent}
           updateMinimumBitsSpent={updateMinimumBitsSpent}
           />;
@@ -166,11 +196,25 @@ function EventMatchPredicateBuilderComponent(props: EventMatchPredicateBuilderCo
     }
 
   } else if (props.twitchEventCategory === TwitchEventCategory.ChannelPoints) {
-    ruleTypeForm = <ChannelPointsRewardNameExactMatchForm
+    ruleTypeSelect = (
+      <>
+        <select 
+          value={channelPointsRuleType}
+          onChange={handleChangedChannelPointsRuleType}>
+          <option 
+            value={ChannelPointsRuleType.ChannelPointsRewardNameExactMatch}
+            >Channel Points Reward Name (exact match)</option>
+        </select>
+      </>
+    );
+
+    matchingRulesForm = <ChannelPointsRewardNameExactMatchForm
       rewardName={rewardName}
       updateRewardName={updateRewardName}
       />;
   }
+
+  console.log(matchingRulesForm);
 
   return (
     <>
@@ -180,13 +224,7 @@ function EventMatchPredicateBuilderComponent(props: EventMatchPredicateBuilderCo
         <label className="label">Rule Type</label>
         <div className="control">
           <div className="select is-medium is-fullwidth">
-            <select 
-              value={bitsRuleType}
-              onChange={handleChangedBitsRuleType}>
-              <option value={BitsRuleType.BitsSpendThreshold}>Bits Spend Threshold</option>
-              <option value={BitsRuleType.BitsCheermoteNameExactMatch}>Cheermote Name (Exact Match)</option>
-              <option value={BitsRuleType.BitsCheermotePrefixSpendThreshold}>Cheermote Prefix and Bits Spend Threshold</option>
-            </select>
+            {ruleTypeSelect}
           </div>
         </div>
       </div>
@@ -196,7 +234,7 @@ function EventMatchPredicateBuilderComponent(props: EventMatchPredicateBuilderCo
 
       <h2 className="title is-4">2) Configure the matching</h2>
       
-      {ruleTypeForm}
+      {matchingRulesForm}
 
 
     </>
