@@ -17,7 +17,13 @@ function TtsSingleVoiceForm(props: TtsSingleVoiceFormProps) {
 
   const handleModelSelect = (ev: React.FormEvent<HTMLSelectElement>) : boolean => {
     const value = (ev.target as HTMLSelectElement).value;
-    // check voice
+
+    if (!!value && !props.allTtsModelsByToken.has(value)) {
+      return false;
+    }
+
+    setTtsModelToken(value);
+    props.setTtsModelToken(value);
     return true;
   }
 
@@ -27,8 +33,11 @@ function TtsSingleVoiceForm(props: TtsSingleVoiceFormProps) {
         <label className="label">TTS Voice Model</label>
         <div className="control">
           <div className="select is-medium is-fullwidth">
-            <select>
-              <option value="*">Select a voice...</option>
+            <select
+              value={ttsModelToken}
+              onChange={handleModelSelect}
+              >
+              <option value="">Select a voice...</option>
               {props.allTtsModels.map(ttsModel => {
                 return (
                   <option
@@ -44,7 +53,8 @@ function TtsSingleVoiceForm(props: TtsSingleVoiceFormProps) {
 
       <article className="message">
         <div className="message-body">
-          <FakeYouExternalLink>Check out the voices at FakeYou</FakeYouExternalLink> to experiment with them and see how they sound. 
+          <FakeYouExternalLink>Check out the voices at FakeYou</FakeYouExternalLink> to search for voices, experiment with them,
+          and see how they sound. Sorry that this list is a nightmare to navigate. It will improve over time.
         </div>
       </article>
     </>

@@ -13,8 +13,10 @@ import { BitsCheermoteNameExactMatchForm } from './components/BitsCheermoteNameE
 import { BitsSpendThresholdForm } from './components/BitsSpendThresholdForm';
 import { BitsCheermotePrefixSpendThresholdForm } from './components/BitsCheermotePrefixSpendThresholdForm';
 import { TwitchEventCategory } from '@storyteller/components/src/api/storyteller/twitch_event_rules/shared/TwitchEventCategory';
-import { BitsRuleType, ChannelPointsRuleType } from './components/RuleTypes';
+import { BitsRuleType } from './components/RuleTypes';
 import { ChannelPointsRewardNameExactMatchForm } from './components/ChannelPointsRewardNameExactMatchForm';
+import { TtsSingleVoiceForm } from './event_response_builder/TtsSingleVoiceForm';
+import { EventResponseType } from './event_response_builder/EventResponseType';
 
 interface Props {
   sessionWrapper: SessionWrapper,
@@ -39,7 +41,9 @@ function TtsConfigsEditRulePage(props: Props) {
   const [bitsRuleType, setBitsRuleType] = useState<BitsRuleType>(BitsRuleType.BitsCheermoteNameExactMatch);
   //const [channelPointsRuleType, setChannelPointsRuleType] = useState<ChannelPointsRuleType>(ChannelPointsRuleType.ChannelPointsRewardNameExactMatch);
 
-  // ===== Field values (editing) =====
+  const [eventResponseType, setEventResponseType] = useState<EventResponseType>(EventResponseType.TtsSingleVoice);
+
+  // ===== Predicate Field values (editing) =====
 
   // Used in:
   // BitsCheermoteNameExactMatch
@@ -54,6 +58,12 @@ function TtsConfigsEditRulePage(props: Props) {
   // Used in:
   // ChannelPointsRewardNameExactMatch
   const [rewardName, setRewardName] = useState(''); 
+
+  // ===== Response Field values (editing) =====
+
+  // Used in:
+  // TtsSingleVoice
+  const [ttsModelToken, setTtsModelToken] = useState(''); 
 
   // ===== Field values (final) =====
 
@@ -96,6 +106,14 @@ function TtsConfigsEditRulePage(props: Props) {
       }
 
       setBitsRuleType(serverBitsRuleType);
+
+      if (!!response.twitch_event_rule.event_response.tts_single_voice) {
+        setEventResponseType(EventResponseType.TtsSingleVoice);
+        setTtsModelToken(response.twitch_event_rule.event_response.tts_single_voice.tts_model_token)
+      } else if (!!response.twitch_event_rule.event_response.tts_random_voice) {
+        setEventResponseType(EventResponseType.TtsRandomVoice);
+        // TODO
+      }
 
     } else if (GetTwitchEventRuleIsError(response))  {
       // TODO
@@ -191,6 +209,25 @@ function TtsConfigsEditRulePage(props: Props) {
 
   const updateRewardName = (name: string) => {
     setRewardName(name);
+  }
+
+  const updateTtsModelToken = (token: string) => {
+    let response : EventResponse = {};
+
+    switch (eventResponseType) {
+      case EventResponseType.TtsSingleVoice:
+        response.tts_single_voice = {
+          tts_model_token: token,
+        }
+        break;
+      case EventResponseType.TtsRandomVoice:
+        break;
+    }
+
+    console.log(token);
+
+    setTtsModelToken(token);
+    setEventResponse(response);
   }
 
   const handleFormSubmit = async (ev: React.FormEvent<HTMLFormElement>) : Promise<boolean> => {
@@ -310,7 +347,13 @@ function TtsConfigsEditRulePage(props: Props) {
         <br />
 
         <h2 className="title is-4">3) Pick how to respond</h2>
-        <p>Todo</p>
+
+        <TtsSingleVoiceForm
+          allTtsModels={props.allTtsModels}
+          allTtsModelsByToken={props.allTtsModelsByToken}
+          setTtsModelToken={updateTtsModelToken}
+          ttsModelToken={ttsModelToken}
+          />
 
         <br />
         <br />
