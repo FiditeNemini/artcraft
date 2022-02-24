@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import { TtsModelListItem } from '@storyteller/components/src/api/tts/ListTtsModels';
-import { FakeYouExternalLink } from '@storyteller/components/src/elements/FakeYouExternalLink';
 import { BitsRuleType } from './types/BitsRuleType';
 import { TwitchEventCategory } from '@storyteller/components/src/api/storyteller/twitch_event_rules/shared/TwitchEventCategory';
 import { EventMatchPredicate } from '@storyteller/components/src/api/storyteller/twitch_event_rules/shared/EventMatchPredicate';

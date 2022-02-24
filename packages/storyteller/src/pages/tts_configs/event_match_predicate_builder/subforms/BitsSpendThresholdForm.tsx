@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faGem } from '@fortawesome/free-solid-svg-icons';
 import { CHEER_BIT_LEVELS } from '../../../../twitch/Cheers';
@@ -9,24 +9,46 @@ interface BitsSpendThresholdFormProps {
 };
 
 function BitsSpendThresholdForm(props: BitsSpendThresholdFormProps) {
+  // The dropdown
   const [bitsValue, setBitsValue] = useState<number>(props.minimumBitsSpent);
+  // The freeform text input
   const [customAmount, setCustomAmount] = useState<number>(props.minimumBitsSpent);
 
+  // NB: useState is not always setting from props correctly (after several re-renders) // The following answers suggests using useEffect:
+  //  https://stackoverflow.com/a/54866051 (less clear by also using useState(), but good comments)
+  //  https://stackoverflow.com/a/62982753
+  useEffect(() => {
+    if (!isNaN(props.minimumBitsSpent)) {
+      setBitsValue(props.minimumBitsSpent)
+      setCustomAmount(props.minimumBitsSpent)
+    }
+  }, [props.minimumBitsSpent]);
 
   const handleBitSelect = (ev: React.FormEvent<HTMLSelectElement>) : boolean => {
     const value = (ev.target as HTMLSelectElement).value;
     const numericValue = parseInt(value);
-    setBitsValue(numericValue);
-    setCustomAmount(numericValue);
-    props.updateMinimumBitsSpent(numericValue);
+
+    if (!isNaN(numericValue) && numericValue > 0) {
+      // Only update on valid positive integers
+      setBitsValue(numericValue);
+      setCustomAmount(numericValue);
+      props.updateMinimumBitsSpent(numericValue);
+    }
+
     return true;
   }
 
   const handleCustomAmountUpdate = (ev: React.FormEvent<HTMLInputElement>) : boolean => {
     const value = (ev.target as HTMLInputElement).value;
     const numericValue = parseInt(value);
-    setCustomAmount(numericValue);
-    props.updateMinimumBitsSpent(numericValue);
+
+    if (!isNaN(numericValue) && numericValue > 0) {
+      // Only update on valid positive integers
+      setBitsValue(numericValue);
+      setCustomAmount(numericValue);
+      props.updateMinimumBitsSpent(numericValue);
+    }
+
     return true;
   }
 
@@ -37,7 +59,14 @@ function BitsSpendThresholdForm(props: BitsSpendThresholdFormProps) {
           <label className="label">Preset thresholds</label>
           <div className="control">
             <div className="select is-medium">
-              <select onChange={handleBitSelect}>
+              <select 
+                onChange={handleBitSelect}
+                value={bitsValue}
+                >
+                <option
+                  key={`option-*`}
+                  value=""
+                >Choose or type...</option>
                 {CHEER_BIT_LEVELS.map(level => {
                   return (
                     <option
