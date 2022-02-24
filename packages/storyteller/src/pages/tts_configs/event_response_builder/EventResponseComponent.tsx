@@ -5,7 +5,7 @@ import { TtsSingleVoiceForm } from './TtsSingleVoiceForm';
 import { EventResponseType } from './EventResponseType';
 
 interface EventResponseComponentProps {
-  // Storyteller TTS configs
+  // Form state communicated upstream
   ttsModelToken: string,
   setTtsModelToken: (token: string) => void,
 
@@ -20,32 +20,7 @@ function EventResponseComponent(props: EventResponseComponentProps) {
   const handleChangedEventResponseType = (ev: React.FormEvent<HTMLSelectElement>) : boolean => {
     const value = (ev.target as HTMLSelectElement).value;
     const responseType = value as EventResponseType;
-
-    // TODO:
-    //let predicate : EventMatchPredicate = {};
-
-    //switch (ruleType) {
-    //  case BitsRuleType.BitsCheermoteNameExactMatch:
-    //    predicate.bits_cheermote_name_exact_match = {
-    //      cheermote_name: cheerNameOrPrefix,
-    //    }
-    //    break;
-    //  case BitsRuleType.BitsCheermotePrefixSpendThreshold:
-    //    predicate.bits_cheermote_prefix_spend_threshold = {
-    //      cheermote_prefix: cheerNameOrPrefix,
-    //      minimum_bits_spent: minimumBitsSpent,
-    //    }
-    //    break;
-    //  case BitsRuleType.BitsSpendThreshold:
-    //    predicate.bits_spend_threshold = {
-    //      minimum_bits_spent: minimumBitsSpent,
-    //    }
-    //    break;
-    //}
-
     setEventResponseType(responseType);
-    //setEventMatchPredicate(predicate);
-
     return true;
   }
   return (

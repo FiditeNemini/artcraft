@@ -9,11 +9,7 @@ import { faAngleLeft, faSave } from '@fortawesome/free-solid-svg-icons';
 import { EventMatchPredicate } from '@storyteller/components/src/api/storyteller/twitch_event_rules/shared/EventMatchPredicate';
 import { EventResponse } from '@storyteller/components/src/api/storyteller/twitch_event_rules/shared/EventResponse';
 import { TtsModelListItem } from '@storyteller/components/src/api/tts/ListTtsModels';
-import { BitsCheermoteNameExactMatchForm } from './event_match_predicate_builder/subforms/BitsCheermoteNameExactMatchForm';
-import { BitsSpendThresholdForm } from './event_match_predicate_builder/subforms/BitsSpendThresholdForm';
-import { BitsCheermotePrefixSpendThresholdForm } from './event_match_predicate_builder/subforms/BitsCheermotePrefixSpendThresholdForm';
 import { TwitchEventCategory } from '@storyteller/components/src/api/storyteller/twitch_event_rules/shared/TwitchEventCategory';
-import { ChannelPointsRewardNameExactMatchForm } from './event_match_predicate_builder/subforms/ChannelPointsRewardNameExactMatchForm';
 import { EventResponseType } from './event_response_builder/EventResponseType';
 import { EventResponseComponent } from './event_response_builder/EventResponseComponent';
 import { BitsRuleType } from './event_match_predicate_builder/types/BitsRuleType';
@@ -32,17 +28,20 @@ function TtsConfigsEditRulePage(props: Props) {
 
   const history = useHistory();
 
-  // Initial request
+  // ========== Initial Load of Server State ==========
+
   const [twitchEventRule, setTwitchEventRule] = useState<TwitchEventRule|undefined>(undefined);
 
-  // The event category cannot be changed !
-  const [twitchEventCategory, setTwitchEventCategory] = useState<TwitchEventCategory>(TwitchEventCategory.Bits);
+  // ========== Values passed to subcomponents for editing ==========
 
-  // The rule types differ per category and the user can change them
-  const [bitsRuleType, setBitsRuleType] = useState<BitsRuleType>(BitsRuleType.BitsCheermoteNameExactMatch);
-  //const [channelPointsRuleType, setChannelPointsRuleType] = useState<ChannelPointsRuleType>(ChannelPointsRuleType.ChannelPointsRewardNameExactMatch);
+  const [newEventMatchPredicate, setNewEventMatchPredicate] = useState<EventMatchPredicate>({});
+  const [newEventResponse, setNewEventResponse] = useState<EventResponse>({});
 
+  // ========== ??? ==========
+
+  /// TODO GET RID OF THIS
   const [eventResponseType, setEventResponseType] = useState<EventResponseType>(EventResponseType.TtsSingleVoice);
+
 
   // ===== Predicate Field values (editing) =====
 
@@ -77,10 +76,13 @@ function TtsConfigsEditRulePage(props: Props) {
 
     if (GetTwitchEventRuleIsOk(response)) {
       setTwitchEventRule(response.twitch_event_rule);
-      setTwitchEventCategory(response.twitch_event_rule.event_category);
       setEventMatchPredicate(response.twitch_event_rule.event_match_predicate);
       setEventResponse(response.twitch_event_rule.event_response);
       setRuleIsDisabled(response.twitch_event_rule.rule_is_disabled);
+
+      // TODO
+      setNewEventMatchPredicate(response.twitch_event_rule.event_match_predicate);
+      setNewEventResponse(response.twitch_event_rule.event_response);
 
       let serverBitsRuleType = BitsRuleType.BitsCheermoteNameExactMatch;
 
@@ -106,8 +108,6 @@ function TtsConfigsEditRulePage(props: Props) {
           break;
       }
 
-      setBitsRuleType(serverBitsRuleType);
-
       if (!!response.twitch_event_rule.event_response.tts_single_voice) {
         setEventResponseType(EventResponseType.TtsSingleVoice);
         setTtsModelToken(response.twitch_event_rule.event_response.tts_single_voice.tts_model_token)
@@ -124,93 +124,6 @@ function TtsConfigsEditRulePage(props: Props) {
   useEffect(() => {
     getTwitchEventRule(token);
   }, [getTwitchEventRule, token]);
-
-//  const updateBitsRuleType = (ev: React.FormEvent<HTMLSelectElement>) : boolean => {
-//    const value = (ev.target as HTMLSelectElement).value;
-//    const ruleType = value as BitsRuleType;
-//
-//    let predicate : EventMatchPredicate = {};
-//
-//    switch (ruleType) {
-//      case BitsRuleType.BitsCheermoteNameExactMatch:
-//        predicate.bits_cheermote_name_exact_match = {
-//          cheermote_name: cheerNameOrPrefix,
-//        }
-//        break;
-//      case BitsRuleType.BitsCheermotePrefixSpendThreshold:
-//        predicate.bits_cheermote_prefix_spend_threshold = {
-//          cheermote_prefix: cheerNameOrPrefix,
-//          minimum_bits_spent: minimumBitsSpent,
-//        }
-//        break;
-//      case BitsRuleType.BitsSpendThreshold:
-//        predicate.bits_spend_threshold = {
-//          minimum_bits_spent: minimumBitsSpent,
-//        }
-//        break;
-//    }
-//
-//    setBitsRuleType(ruleType);
-//    setEventMatchPredicate(predicate);
-//
-//    return true;
-//  }
-
-//  const updateCheerNameOrPrefix = (nameOrPrefix: string) => {
-//    let predicate : EventMatchPredicate = {};
-//
-//    switch (bitsRuleType) {
-//      case BitsRuleType.BitsCheermoteNameExactMatch:
-//        predicate.bits_cheermote_name_exact_match = {
-//          cheermote_name: nameOrPrefix,
-//        }
-//        break;
-//      case BitsRuleType.BitsCheermotePrefixSpendThreshold:
-//        predicate.bits_cheermote_prefix_spend_threshold = {
-//          cheermote_prefix: nameOrPrefix,
-//          minimum_bits_spent: minimumBitsSpent,
-//        }
-//        break;
-//      case BitsRuleType.BitsSpendThreshold:
-//        predicate.bits_spend_threshold = {
-//          minimum_bits_spent: minimumBitsSpent,
-//        }
-//        break;
-//    }
-//
-//    setCheerNameOrPrefix(nameOrPrefix);
-//    setEventMatchPredicate(predicate);
-//  }
-
-//  const updateMinimumBitsSpent = (minimumSpent: number) => {
-//    let predicate : EventMatchPredicate = {};
-//
-//    switch (bitsRuleType) {
-//      case BitsRuleType.BitsCheermoteNameExactMatch:
-//        predicate.bits_cheermote_name_exact_match = {
-//          cheermote_name: cheerNameOrPrefix,
-//        }
-//        break;
-//      case BitsRuleType.BitsCheermotePrefixSpendThreshold:
-//        predicate.bits_cheermote_prefix_spend_threshold = {
-//          cheermote_prefix: cheerNameOrPrefix,
-//          minimum_bits_spent: minimumSpent,
-//        }
-//        break;
-//      case BitsRuleType.BitsSpendThreshold:
-//        predicate.bits_spend_threshold = {
-//          minimum_bits_spent: minimumSpent,
-//        }
-//        break;
-//    }
-//
-//    setMinimumBitsSpent(minimumSpent);
-//    setEventMatchPredicate(predicate);
-//  }
-
-//  const updateRewardName = (name: string) => {
-//    setRewardName(name);
-//  }
 
   const updateTtsModelToken = (token: string) => {
     let response : EventResponse = {};
@@ -229,6 +142,10 @@ function TtsConfigsEditRulePage(props: Props) {
 
     setTtsModelToken(token);
     setEventResponse(response);
+  }
+
+  const updateEventMatchPredicate = (predicate: EventMatchPredicate) => {
+    setNewEventMatchPredicate(predicate);
   }
 
   const handleFormSubmit = async (ev: React.FormEvent<HTMLFormElement>) : Promise<boolean> => {
@@ -252,7 +169,6 @@ function TtsConfigsEditRulePage(props: Props) {
     return false;
   }
 
-
   if (!props.sessionWrapper.isLoggedIn()) {
     return <h1>Must Log In</h1>;
   }
@@ -260,39 +176,6 @@ function TtsConfigsEditRulePage(props: Props) {
   if (twitchEventRule === undefined) {
     return <h1>Loading...</h1>;
   }
-
-//  let ruleTypeForm = <></>
-//
-//  if (twitchEventCategory === TwitchEventCategory.Bits) {
-//    switch (bitsRuleType) {
-//      case BitsRuleType.BitsCheermoteNameExactMatch:
-//        ruleTypeForm = <BitsCheermoteNameExactMatchForm 
-//          cheerName={cheerNameOrPrefix}
-//          updateCheerNameOrPrefix={updateCheerNameOrPrefix}
-//          />;
-//        break;
-//      case BitsRuleType.BitsCheermotePrefixSpendThreshold:
-//        ruleTypeForm = <BitsCheermotePrefixSpendThresholdForm 
-//          cheerPrefix={cheerNameOrPrefix}
-//          updateCheerNameOrPrefix={updateCheerNameOrPrefix}
-//          minimumBitsSpent={minimumBitsSpent}
-//          updateMinimumBitsSpent={updateMinimumBitsSpent}
-//          />
-//        break;
-//      case BitsRuleType.BitsSpendThreshold:
-//        ruleTypeForm = <BitsSpendThresholdForm 
-//          minimumBitsSpent={minimumBitsSpent}
-//          updateMinimumBitsSpent={updateMinimumBitsSpent}
-//          />;
-//        break;
-//    }
-//
-//  } else if (twitchEventCategory === TwitchEventCategory.ChannelPoints) {
-//    ruleTypeForm = <ChannelPointsRewardNameExactMatchForm
-//      rewardName={rewardName}
-//      updateRewardName={updateRewardName}
-//      />;
-//  }
 
   // NB: This is a hypothetical version of what we'll update to
   let renderRule : TwitchEventRule = {
@@ -304,7 +187,7 @@ function TtsConfigsEditRulePage(props: Props) {
     updated_at: twitchEventRule.updated_at,
 
     // Updated in UI
-    event_match_predicate: eventMatchPredicate,
+    event_match_predicate: newEventMatchPredicate,
     event_response: eventResponse,
     rule_is_disabled: ruleIsDisabled,
   };
@@ -320,37 +203,10 @@ function TtsConfigsEditRulePage(props: Props) {
 
       <form onSubmit={handleFormSubmit}>
 
-{/*
-        <h2 className="title is-4">1) Pick what to match on</h2>
-
-        <div className="field">
-          <label className="label">Rule Type</label>
-          <div className="control">
-            <div className="select is-medium is-fullwidth">
-              <select 
-                value={bitsRuleType}
-                onChange={updateBitsRuleType}>
-                <option value={BitsRuleType.BitsSpendThreshold}>Bits Spend Threshold</option>
-                <option value={BitsRuleType.BitsCheermoteNameExactMatch}>Cheermote Name (Exact Match)</option>
-                <option value={BitsRuleType.BitsCheermotePrefixSpendThreshold}>Cheermote Prefix and Bits Spend Threshold</option>
-              </select>
-            </div>
-          </div>
-        </div>
-
-        <br />
-        <br />
-
-        <h2 className="title is-4">2) Configure the matching</h2>
-        
-        {ruleTypeForm}
-
-        <br />
-        <br />
-*/}
-
         <EventMatchPredicateBuilderComponent
           twitchEventCategory={twitchEventRule.event_category}
+          eventMatchPredicate={newEventMatchPredicate}
+          updateEventMatchPredicate={updateEventMatchPredicate}
           allTtsModels={props.allTtsModels}
           allTtsModelsByToken={props.allTtsModelsByToken}
 
