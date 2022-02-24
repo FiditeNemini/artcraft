@@ -11,8 +11,10 @@ interface BitsCheermoteNameExactMatchProps {
 };
 
 function BitsCheermoteNameExactMatchForm(props: BitsCheermoteNameExactMatchProps) {
+  // The two dropdowns
   const [cheerPrefix, setCheerPrefix] = useState<string|undefined>(props.cheerName);
   const [bitsValue, setBitsValue] = useState<number>(1);
+  // The freeform text input
   const [manualCheerValue, setManualCheerValue] = useState<string>(props.cheerName);
 
   // NB: useState is not always setting from props correctly (after several re-renders)

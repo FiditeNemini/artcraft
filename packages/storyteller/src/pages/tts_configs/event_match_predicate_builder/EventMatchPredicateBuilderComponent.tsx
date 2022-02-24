@@ -59,17 +59,17 @@ function EventMatchPredicateBuilderComponent(props: EventMatchPredicateBuilderCo
           newBitsRuleType = BitsRuleType.BitsCheermoteNameExactMatch;
           setCheerNameOrPrefix(props.eventMatchPredicate.bits_cheermote_name_exact_match.cheermote_name);
         } else if (!!props.eventMatchPredicate.bits_cheermote_prefix_spend_threshold) {
-          //setMinimumBitsSpent(props.eventMatchPredicate.bits_cheermote_prefix_spend_threshold.minimum_bits_spent);
-          setCheerNameOrPrefix(props.eventMatchPredicate.bits_cheermote_prefix_spend_threshold.cheermote_prefix);
           newBitsRuleType = BitsRuleType.BitsCheermotePrefixSpendThreshold;
+          setMinimumBitsSpent(props.eventMatchPredicate.bits_cheermote_prefix_spend_threshold.minimum_bits_spent);
+          setCheerNameOrPrefix(props.eventMatchPredicate.bits_cheermote_prefix_spend_threshold.cheermote_prefix);
         } else if (!!props.eventMatchPredicate.bits_spend_threshold) {
-          //setMinimumBitsSpent(props.eventMatchPredicate.bits_spend_threshold.minimum_bits_spent);
           newBitsRuleType = BitsRuleType.BitsSpendThreshold;
+          setMinimumBitsSpent(props.eventMatchPredicate.bits_spend_threshold.minimum_bits_spent);
         }
         break;
       case TwitchEventCategory.ChannelPoints: // NB: Only one rule type
         if (!!props.eventMatchPredicate.channel_points_reward_name_exact_match) {
-          //setRewardName(props.eventMatchPredicate.channel_points_reward_name_exact_match.reward_name);
+          setRewardName(props.eventMatchPredicate.channel_points_reward_name_exact_match.reward_name);
           newChannelPointsRuleType = ChannelPointsRuleType.ChannelPointsRewardNameExactMatch;
         }
         break;
@@ -97,26 +97,28 @@ function EventMatchPredicateBuilderComponent(props: EventMatchPredicateBuilderCo
     return true;
   }
 
-  // Existing values will be used to pre-populate the forms as well as handle
-  // differential updates to other fields (since this isn't a sparse update model).
-
-  let currentNameOrPrefix = '';
-
-  switch (bitsRuleType) {
-    case BitsRuleType.BitsCheermoteNameExactMatch:
-      currentNameOrPrefix = props.eventMatchPredicate.bits_cheermote_name_exact_match?.cheermote_name || '';
-      break;
-    case BitsRuleType.BitsCheermotePrefixSpendThreshold:
-      currentNameOrPrefix = props.eventMatchPredicate.bits_cheermote_prefix_spend_threshold?.cheermote_prefix || '';
-      break;
-    case BitsRuleType.BitsSpendThreshold:
-      // No name
-      break;
-  }
+// TODO: This may work instead of local setState().
+//  // Existing values will be used to pre-populate the forms as well as handle
+//  // differential updates to other fields (since this isn't a sparse update model).
+//
+//  let currentNameOrPrefix = '';
+//  let currentMinimumBitsSpent = 1;
+//
+//  switch (bitsRuleType) {
+//    case BitsRuleType.BitsCheermoteNameExactMatch:
+//      currentNameOrPrefix = props.eventMatchPredicate.bits_cheermote_name_exact_match?.cheermote_name || '';
+//      break;
+//    case BitsRuleType.BitsCheermotePrefixSpendThreshold:
+//      currentNameOrPrefix = props.eventMatchPredicate.bits_cheermote_prefix_spend_threshold?.cheermote_prefix || '';
+//      currentMinimumBitsSpent = props.eventMatchPredicate.bits_cheermote_prefix_spend_threshold?.minimum_bits_spent || 1;
+//      break;
+//    case BitsRuleType.BitsSpendThreshold:
+//      // No name
+//      currentMinimumBitsSpent = props.eventMatchPredicate.bits_cheermote_prefix_spend_threshold?.minimum_bits_spent || 1;
+//      break;
+//  }
 
   const handleChangedCheerNameOrPrefix = (nameOrPrefix: string) => {
-    //setCheerNameOrPrefix(nameOrPrefix);
-    //backPropagateEventMatchPredicate();
     let predicate : EventMatchPredicate = {};
 
     switch (bitsRuleType) {
@@ -142,19 +144,17 @@ function EventMatchPredicateBuilderComponent(props: EventMatchPredicateBuilderCo
   }
 
   const handleChangedMinimumBitsSpent = (minimumSpent: number) => {
-    //setMinimumBitsSpent(minimumSpent);
-    //backPropagateEventMatchPredicate();
     let predicate : EventMatchPredicate = {};
 
     switch (bitsRuleType) {
       case BitsRuleType.BitsCheermoteNameExactMatch:
         predicate.bits_cheermote_name_exact_match = {
-          cheermote_name: currentNameOrPrefix, // Untouched existing value
+          cheermote_name: cheerNameOrPrefix, // Untouched existing value
         }
         break;
       case BitsRuleType.BitsCheermotePrefixSpendThreshold:
         predicate.bits_cheermote_prefix_spend_threshold = {
-          cheermote_prefix: currentNameOrPrefix, // Untouched existing value
+          cheermote_prefix: cheerNameOrPrefix, // Untouched existing value
           minimum_bits_spent: minimumSpent, // New value
         }
         break;
@@ -170,35 +170,18 @@ function EventMatchPredicateBuilderComponent(props: EventMatchPredicateBuilderCo
 
   // TODO
   const handleChangedRewardName = (name: string) => {
-    setRewardName(name);
-    backPropagateEventMatchPredicate();
-  }
-
-  const backPropagateEventMatchPredicate = () => {
     let predicate : EventMatchPredicate = {};
 
-    switch (bitsRuleType) {
-      case BitsRuleType.BitsCheermoteNameExactMatch:
-        predicate.bits_cheermote_name_exact_match = {
-          cheermote_name: cheerNameOrPrefix,
-        }
-        break;
-      case BitsRuleType.BitsCheermotePrefixSpendThreshold:
-        predicate.bits_cheermote_prefix_spend_threshold = {
-          cheermote_prefix: cheerNameOrPrefix,
-          minimum_bits_spent: minimumBitsSpent,
-        }
-        break;
-      case BitsRuleType.BitsSpendThreshold:
-        predicate.bits_spend_threshold = {
-          minimum_bits_spent: minimumBitsSpent,
+    switch (channelPointsRuleType) {
+      case ChannelPointsRuleType.ChannelPointsRewardNameExactMatch:
+        predicate.channel_points_reward_name_exact_match = {
+          reward_name: name, // New value
         }
         break;
     }
 
     props.updateEventMatchPredicate(predicate);
   }
-
 
   let ruleTypeSelect = <></>
   let matchingRulesForm = <></>
