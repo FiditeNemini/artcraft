@@ -1,7 +1,9 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faGem } from '@fortawesome/free-solid-svg-icons';
 import { CHEER_BIT_LEVELS, CHEER_PREFIXES } from '../../../../twitch/Cheers';
+
+const CHEER_REGEX = /^([A-Za-z]+)(\d+)?$/;
 
 interface BitsCheermoteNameExactMatchProps {
   cheerName: string,
@@ -12,6 +14,24 @@ function BitsCheermoteNameExactMatchForm(props: BitsCheermoteNameExactMatchProps
   const [cheerPrefix, setCheerPrefix] = useState<string|undefined>(props.cheerName);
   const [bitsValue, setBitsValue] = useState<number>(1);
   const [manualCheerValue, setManualCheerValue] = useState<string>(props.cheerName);
+
+  // NB: useState is not always setting from props correctly (after several re-renders)
+  // The following answers suggests using useEffect:
+  //  https://stackoverflow.com/a/54866051 (less clear by also using useState(), but good comments)
+  //  https://stackoverflow.com/a/62982753
+  useEffect(() => {
+    // Cheer name is the full value, eg. 'Corgo100'
+    const matches = props.cheerName.trim().match(CHEER_REGEX)
+
+    if (!!matches && matches.length > 1) {
+      setCheerPrefix(matches[1]); // First match group
+      if (matches.length == 3) {
+        setBitsValue(parseInt(matches[2])); // Second match group
+      }
+    }
+
+    setManualCheerValue(props.cheerName); // The freeform text field
+  }, [props.cheerName]);
 
   const updateCheerPrefix = (ev: React.FormEvent<HTMLSelectElement>) : boolean => {
     const value = (ev.target as HTMLSelectElement).value;
@@ -30,6 +50,17 @@ function BitsCheermoteNameExactMatchForm(props: BitsCheermoteNameExactMatchProps
 
   const updateTextCheerValue = (ev: React.FormEvent<HTMLInputElement>) : boolean => {
     const value = (ev.target as HTMLInputElement).value;
+
+    // Cheer name is the full value, eg. 'Corgo100'
+    const matches = value.trim().match(CHEER_REGEX)
+
+    if (!!matches && matches.length > 1) {
+      setCheerPrefix(matches[1]); // First match group
+      if (matches.length == 3) {
+        setBitsValue(parseInt(matches[2])); // Second match group
+      }
+    }
+
     setManualCheerValue(value);
     props.updateCheerNameOrPrefix(value);
     return true;
@@ -51,7 +82,10 @@ function BitsCheermoteNameExactMatchForm(props: BitsCheermoteNameExactMatchProps
         <div className="control">
           <label className="label">Pick the cheer</label>
           <div className="select is-medium">
-            <select onChange={updateCheerPrefix}>
+            <select 
+              onChange={updateCheerPrefix}
+              value={cheerPrefix}
+              >
               <option
                 key={`option-*`}
                 value=""
