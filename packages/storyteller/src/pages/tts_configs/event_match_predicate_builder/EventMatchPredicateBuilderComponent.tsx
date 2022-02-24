@@ -56,21 +56,20 @@ function EventMatchPredicateBuilderComponent(props: EventMatchPredicateBuilderCo
     switch (props.twitchEventCategory) {
       case TwitchEventCategory.Bits:
         if (!!props.eventMatchPredicate.bits_cheermote_name_exact_match) {
-          //serverBitsRuleType = BitsRuleType.BitsCheermoteNameExactMatch;
           newBitsRuleType = BitsRuleType.BitsCheermoteNameExactMatch;
+          //setCheerNameOrPrefix(props.eventMatchPredicate.bits_cheermote_name_exact_match.cheermote_name);
         } else if (!!props.eventMatchPredicate.bits_cheermote_prefix_spend_threshold) {
-          //serverBitsRuleType = BitsRuleType.BitsCheermotePrefixSpendThreshold;
-          //setMinimumBitsSpent(response.twitch_event_rule.event_match_predicate.bits_cheermote_prefix_spend_threshold.minimum_bits_spent);
+          //setMinimumBitsSpent(props.eventMatchPredicate.bits_cheermote_prefix_spend_threshold.minimum_bits_spent);
+          //setCheerNameOrPrefix(props.eventMatchPredicate.bits_cheermote_prefix_spend_threshold.cheermote_prefix);
           newBitsRuleType = BitsRuleType.BitsCheermotePrefixSpendThreshold;
         } else if (!!props.eventMatchPredicate.bits_spend_threshold) {
-          //serverBitsRuleType = BitsRuleType.BitsSpendThreshold;
-          //setMinimumBitsSpent(response.twitch_event_rule.event_match_predicate.bits_spend_threshold.minimum_bits_spent);
+          //setMinimumBitsSpent(props.eventMatchPredicate.bits_spend_threshold.minimum_bits_spent);
           newBitsRuleType = BitsRuleType.BitsSpendThreshold;
         }
         break;
       case TwitchEventCategory.ChannelPoints: // NB: Only one rule type
         if (!!props.eventMatchPredicate.channel_points_reward_name_exact_match) {
-          //setRewardName(response.twitch_event_rule.event_match_predicate.channel_points_reward_name_exact_match.reward_name);
+          //setRewardName(props.eventMatchPredicate.channel_points_reward_name_exact_match.reward_name);
           newChannelPointsRuleType = ChannelPointsRuleType.ChannelPointsRewardNameExactMatch;
         }
         break;
@@ -98,18 +97,19 @@ function EventMatchPredicateBuilderComponent(props: EventMatchPredicateBuilderCo
     return true;
   }
 
-  const updateCheerNameOrPrefix = (nameOrPrefix: string) => {
+  const handleChangedCheerNameOrPrefix = (nameOrPrefix: string) => {
     setCheerNameOrPrefix(nameOrPrefix);
     backPropagateEventMatchPredicate();
   }
 
-  const updateMinimumBitsSpent = (minimumSpent: number) => {
+  const handleChangedMinimumBitsSpent = (minimumSpent: number) => {
     setMinimumBitsSpent(minimumSpent);
     backPropagateEventMatchPredicate();
   }
 
-  const updateRewardName = (name: string) => {
+  const handleChangedRewardName = (name: string) => {
     setRewardName(name);
+    backPropagateEventMatchPredicate();
   }
 
   const backPropagateEventMatchPredicate = () => {
@@ -164,21 +164,21 @@ function EventMatchPredicateBuilderComponent(props: EventMatchPredicateBuilderCo
       case BitsRuleType.BitsCheermoteNameExactMatch:
         matchingRulesForm = <BitsCheermoteNameExactMatchForm 
           cheerName={cheerNameOrPrefix}
-          updateCheerNameOrPrefix={updateCheerNameOrPrefix}
+          updateCheerNameOrPrefix={handleChangedCheerNameOrPrefix}
           />;
         break;
       case BitsRuleType.BitsCheermotePrefixSpendThreshold:
         matchingRulesForm = <BitsCheermotePrefixSpendThresholdForm
           cheerPrefix={cheerNameOrPrefix}
-          updateCheerNameOrPrefix={updateCheerNameOrPrefix}
+          updateCheerNameOrPrefix={handleChangedCheerNameOrPrefix}
           minimumBitsSpent={minimumBitsSpent}
-          updateMinimumBitsSpent={updateMinimumBitsSpent}
+          updateMinimumBitsSpent={handleChangedMinimumBitsSpent}
           />
         break;
       case BitsRuleType.BitsSpendThreshold:
         matchingRulesForm = <BitsSpendThresholdForm 
           minimumBitsSpent={minimumBitsSpent}
-          updateMinimumBitsSpent={updateMinimumBitsSpent}
+          updateMinimumBitsSpent={handleChangedMinimumBitsSpent}
           />;
         break;
     }
@@ -198,7 +198,7 @@ function EventMatchPredicateBuilderComponent(props: EventMatchPredicateBuilderCo
 
     matchingRulesForm = <ChannelPointsRewardNameExactMatchForm
       rewardName={rewardName}
-      updateRewardName={updateRewardName}
+      updateRewardName={handleChangedRewardName}
       />;
   }
 
@@ -221,7 +221,6 @@ function EventMatchPredicateBuilderComponent(props: EventMatchPredicateBuilderCo
       <h2 className="title is-4">2) Configure the matching</h2>
       
       {matchingRulesForm}
-
 
     </>
   )
