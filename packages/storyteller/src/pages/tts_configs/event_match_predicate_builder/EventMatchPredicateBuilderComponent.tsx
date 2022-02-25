@@ -10,7 +10,7 @@ import { ChannelPointsRewardNameExactMatchForm } from './subforms/ChannelPointsR
 import { ChannelPointsRuleType } from './types/ChannelPointsRuleType';
 import { CheerUtil } from '../../../twitch/CheerUtil';
 import { CheerState, CheerStateIsCustom, CheerStateIsOfficial, cheerStateToPredicate, predicateToCheerState } from './CheerState';
-import { CHEER_LOOKUP_MAP, CHEER_PREFIXES } from '../../../twitch/Cheers';
+import { CHEER_LOOKUP_MAP } from '../../../twitch/Cheers';
 
 interface EventMatchPredicateBuilderComponentProps {
   // CANNOT BE CHANGED AFTER CREATION
@@ -38,11 +38,6 @@ function EventMatchPredicateBuilderComponent(props: EventMatchPredicateBuilderCo
 
   // New, and remove everything else:
   const [cheerState, setCheerState] = useState<CheerState>({});
-  
-
-
-
-
 
 
   // Used in:
@@ -50,17 +45,11 @@ function EventMatchPredicateBuilderComponent(props: EventMatchPredicateBuilderCo
   // BitsCheermotePrefixSpendThreshold
   const [cheerNameOrPrefix, setCheerNameOrPrefix] = useState('');  // TODO: DIE
 
-//  // Used in:
-//  // BitsSpendThreshold
-//  // BitsCheermotePrefixSpendThreshold
-//  const [minimumBitsSpent, setMinimumBitsSpent] = useState(1);  // TODO: DIE
-
   // Shared state for :
   // BitsSpendThreshold
   // BitsCheermoteNameExactMatch
   // BitsCheermotePrefixSpendThreshold
   const [bitsValue, setBitsValue] = useState(1);
-  const [cheerPrefix, setCheerPrefix] = useState('');
 
   // Used in:
   // ChannelPointsRewardNameExactMatch
@@ -117,17 +106,12 @@ function EventMatchPredicateBuilderComponent(props: EventMatchPredicateBuilderCo
 
     if (!!cheerAndBitsV) {
       let { cheerPrefix, bitValue } = CheerUtil.parseCheerString(cheerAndBitsV);
-      setCheerPrefix(cheerPrefix || '');
       setBitsValue(bitValue || 1);
       setCheerNameOrPrefix(cheerAndBitsV); // TODO: DIE
     } 
     if (!!bitsV) {
       setBitsValue(bitsV || 1);
     }
-    if (!!cheerPrefixV) {
-      setCheerPrefix(cheerPrefixV || '');
-    }
-
     setBitsRuleType(newBitsRuleType);
     setChannelPointsRuleType(newChannelPointsRuleType);
 

@@ -9,12 +9,9 @@ import { faAngleLeft, faSave } from '@fortawesome/free-solid-svg-icons';
 import { EventMatchPredicate } from '@storyteller/components/src/api/storyteller/twitch_event_rules/shared/EventMatchPredicate';
 import { EventResponse } from '@storyteller/components/src/api/storyteller/twitch_event_rules/shared/EventResponse';
 import { TtsModelListItem } from '@storyteller/components/src/api/tts/ListTtsModels';
-import { TwitchEventCategory } from '@storyteller/components/src/api/storyteller/twitch_event_rules/shared/TwitchEventCategory';
 import { EventResponseType } from './event_response_builder/EventResponseType';
 import { EventResponseComponent } from './event_response_builder/EventResponseComponent';
-import { BitsRuleType } from './event_match_predicate_builder/types/BitsRuleType';
 import { EventMatchPredicateBuilderComponent } from './event_match_predicate_builder/EventMatchPredicateBuilderComponent';
-import { CheerState } from './event_match_predicate_builder/CheerState';
 
 interface Props {
   sessionWrapper: SessionWrapper,
@@ -40,22 +37,15 @@ function TtsConfigsEditRulePage(props: Props) {
   // ========== In-Progress Model Edits ==========
 
   const [modifiedEventMatchPredicate, setModifiedEventMatchPredicate] = useState<EventMatchPredicate>({});
+  const [modifiedEventResponse, setModifiedEventResponse] = useState<EventResponse>({});
+  const [ruleIsDisabled, setRuleIsDisabled] = useState(false);
 
   // ========== ??? ==========
 
   // TODO: GET RID OF THIS
   const [eventResponseType, setEventResponseType] = useState<EventResponseType>(EventResponseType.TtsSingleVoice);
-
-
   // TODO: GET RID OF THIS
   const [ttsModelToken, setTtsModelToken] = useState(''); 
-
-  // ===== Field values (final) =====
-
-  // TODO: GET RID OF non-"new" (see above)
-  const [eventMatchPredicate, setEventMatchPredicate] = useState<EventMatchPredicate>({});
-  const [eventResponse, setEventResponse] = useState<EventResponse>({});
-  const [ruleIsDisabled, setRuleIsDisabled] = useState(false);
 
   const getTwitchEventRule = useCallback(async (token: string) => {
     const response = await GetTwitchEventRule(token);
@@ -68,36 +58,10 @@ function TtsConfigsEditRulePage(props: Props) {
 
       // In-progress modifications
       setModifiedEventMatchPredicate(response.twitch_event_rule.event_match_predicate);
-
-      // TODO REMOVE
-      setEventMatchPredicate(response.twitch_event_rule.event_match_predicate);
-      setEventResponse(response.twitch_event_rule.event_response);
+      setModifiedEventResponse(response.twitch_event_rule.event_response);
       setRuleIsDisabled(response.twitch_event_rule.rule_is_disabled);
 
-      let serverBitsRuleType = BitsRuleType.BitsCheermoteNameExactMatch;
-
-      switch (response.twitch_event_rule.event_category) {
-        case TwitchEventCategory.Bits:
-          if (!!response.twitch_event_rule.event_match_predicate.bits_cheermote_name_exact_match) {
-            serverBitsRuleType = BitsRuleType.BitsCheermoteNameExactMatch;
-          } else if (!!response.twitch_event_rule.event_match_predicate.bits_cheermote_prefix_spend_threshold) {
-            serverBitsRuleType = BitsRuleType.BitsCheermotePrefixSpendThreshold;
-            //setMinimumBitsSpent(response.twitch_event_rule.event_match_predicate.bits_cheermote_prefix_spend_threshold.minimum_bits_spent);
-          } else if (!!response.twitch_event_rule.event_match_predicate.bits_spend_threshold) {
-            serverBitsRuleType = BitsRuleType.BitsSpendThreshold;
-            //setMinimumBitsSpent(response.twitch_event_rule.event_match_predicate.bits_spend_threshold.minimum_bits_spent);
-          }
-          break;
-        case TwitchEventCategory.ChannelPoints: // NB: Only one rule type
-          if (!!response.twitch_event_rule.event_match_predicate.channel_points_reward_name_exact_match) {
-            //setRewardName(response.twitch_event_rule.event_match_predicate.channel_points_reward_name_exact_match.reward_name);
-          }
-          break;
-        case TwitchEventCategory.ChatCommand: // TODO: Not yet supported
-        default:
-          break;
-      }
-
+      // TODO: MOVE THIS
       if (!!response.twitch_event_rule.event_response.tts_single_voice) {
         setEventResponseType(EventResponseType.TtsSingleVoice);
         setTtsModelToken(response.twitch_event_rule.event_response.tts_single_voice.tts_model_token)
@@ -129,7 +93,6 @@ function TtsConfigsEditRulePage(props: Props) {
     }
 
     setTtsModelToken(token);
-    setEventResponse(response);
   }
 
   const updateModifiedEventMatchPredicate = (predicate: EventMatchPredicate) => {
@@ -139,13 +102,16 @@ function TtsConfigsEditRulePage(props: Props) {
   const handleFormSubmit = async (ev: React.FormEvent<HTMLFormElement>) : Promise<boolean> => {
     ev.preventDefault();
 
-    if (eventMatchPredicate === undefined || eventResponse === undefined) {
-      return false;
-    }
+    // TODO
+    // TODO
+    // TODO
+
+    let newEventMatchPredicate = {};
+    let newEventResponse = {};
 
     const request = {
-      event_match_predicate: eventMatchPredicate,
-      event_response: eventResponse,
+      event_match_predicate: newEventMatchPredicate,
+      event_response: newEventResponse,
       rule_is_disabled: ruleIsDisabled,
     };
 
@@ -176,7 +142,7 @@ function TtsConfigsEditRulePage(props: Props) {
 
     // Updated in UI
     event_match_predicate: modifiedEventMatchPredicate,
-    event_response: eventResponse,
+    event_response: modifiedEventResponse,
     rule_is_disabled: ruleIsDisabled,
   };
 
@@ -197,7 +163,6 @@ function TtsConfigsEditRulePage(props: Props) {
           updateModifiedEventMatchPredicate={updateModifiedEventMatchPredicate}
           allTtsModels={props.allTtsModels}
           allTtsModelsByToken={props.allTtsModelsByToken}
-
           />
 
         <br />
@@ -234,10 +199,5 @@ function TtsConfigsEditRulePage(props: Props) {
     </>
   )
 }
-
-interface BitsSpendThresholdFormProps {
-};
-
-
 
 export { TtsConfigsEditRulePage }
