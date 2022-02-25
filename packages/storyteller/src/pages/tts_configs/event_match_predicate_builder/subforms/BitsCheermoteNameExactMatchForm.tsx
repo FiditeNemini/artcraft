@@ -1,63 +1,65 @@
 import React, { useEffect, useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faGem } from '@fortawesome/free-solid-svg-icons';
-import { CHEER_BIT_LEVELS, CHEER_PREFIXES } from '../../../../twitch/Cheers';
+import { CHEER_BIT_LEVELS, CHEER_PREFIXES, CHEER_PREFIX_TO_STRING_MAP } from '../../../../twitch/Cheers';
+import { CheerState, CheerStateIsCustom, CheerStateIsOfficial } from '../CheerState';
 
 // TODO: Don't duplicate
 const CHEER_REGEX = /^([A-Za-z]+)(\d+)?$/;
 
 interface BitsCheermoteNameExactMatchProps {
-  cheerName: string,
-  updateCheerNameOrPrefix: (cheerNameOrPrefix: string) => void,
+  cheerState: CheerState,
+
+  updateCheerName: (cheerNameOrPrefix: string) => void,
+  updateCheerPrefix: (cheerNameOrPrefix: string) => void,
   
   // NB: 'minimumBitsSpent' and its update are technically not a field here, but we can parse it out
   // to communicate back upstream in case the field changes, or infer it from a context switch to this
   // field. Basically, we're trying not to lose information.
-  minimumBitsSpent: number,
   updateMinimumBitsSpent: (minimumSpent: number) => void, 
 };
 
 function BitsCheermoteNameExactMatchForm(props: BitsCheermoteNameExactMatchProps) {
   // The two dropdowns
-  const [cheerPrefix, setCheerPrefix] = useState<string>(props.cheerName);
-  const [bitsValue, setBitsValue] = useState<number>(props.minimumBitsSpent);
+  const [cheerPrefix, setCheerPrefix] = useState<string>('');
+  const [bitsValue, setBitsValue] = useState<number>(1);
   // The freeform text input
-  const [manualCheerValue, setManualCheerValue] = useState<string>(props.cheerName);
+  const [manualCheerValue, setManualCheerValue] = useState<string>('');
 
   // NB: useState is not always setting from props correctly (after several re-renders)
   // The following answers suggests using useEffect:
   //  https://stackoverflow.com/a/54866051 (less clear by also using useState(), but good comments)
   //  https://stackoverflow.com/a/62982753
   useEffect(() => {
-    let newBits = props.minimumBitsSpent;
-    let newManualCheerValue = props.cheerName;
-    let joinBitsAndCheer = true;
+    let newPrefix = '';
+    let newBits = 1;
+    let newFullName = '';
 
-    // Cheer name is the full value, eg. 'Corgo100'
-    const matches = props.cheerName.trim().match(CHEER_REGEX)
+    if (CheerStateIsOfficial(props.cheerState)) {
+      if (!!props.cheerState.cheerPrefix) {
+        newPrefix = CHEER_PREFIX_TO_STRING_MAP.get((props.cheerState.cheerPrefix)) || '';
+      }
+      
+      if (!!props.cheerState.bits && !isNaN(props.cheerState.bits) && props.cheerState.bits > 0) {
+        newBits = props.cheerState.bits;
+        newFullName = `${newPrefix}${newBits}`;
+      } else {
+        newFullName = newPrefix;
+      }
 
-    if (!!matches && matches.length > 1) {
-      setCheerPrefix(matches[1]); // First match group
-      if (matches.length == 3 && matches[2] !== undefined) {
-        // If we detect a number, let's not conjoin bits and cheer.
-        joinBitsAndCheer = false;
-        // NB(1): We're getting this value from a fullly named cheer, eg 'Corgo5000'.
-        // NB(2): The second match group can be 'undefined' if no number is present. (Optional matching, I guess.)
-        let maybeBits = parseInt(matches[2]);
-        if (!isNaN(maybeBits)) {
-          newBits = maybeBits;
-        }
+    } else if (CheerStateIsCustom(props.cheerState)) {
+      newFullName = props.cheerState.cheerFull || '';
+
+      if (!!props.cheerState.bits && !isNaN(props.cheerState.bits) && props.cheerState.bits > 0) {
+        newBits = props.cheerState.bits;
       }
     }
 
-    // NB: This is for arriving from "CheermotePrefixSpendThreshold", where the values are disjoint.
-    if (joinBitsAndCheer) {
-      newManualCheerValue = `${cheerPrefix}${newBits}`;
-    }
-
-    setManualCheerValue(newManualCheerValue); // The freeform text field
+    setCheerPrefix(newPrefix);
     setBitsValue(newBits);
-  }, [props.cheerName, props.minimumBitsSpent]);
+    setManualCheerValue(newFullName);
+
+  }, [props.cheerState]);
 
   const updateCheerPrefix = (ev: React.FormEvent<HTMLSelectElement>) : boolean => {
     const value = (ev.target as HTMLSelectElement).value;
@@ -96,7 +98,7 @@ function BitsCheermoteNameExactMatchForm(props: BitsCheermoteNameExactMatchProps
     }
 
     setManualCheerValue(value);
-    props.updateCheerNameOrPrefix(value);
+    props.updateCheerName(value);
     return true;
   }
 
@@ -107,7 +109,7 @@ function BitsCheermoteNameExactMatchForm(props: BitsCheermoteNameExactMatchProps
     }
     const cheerValue = `${prefix}${bits}`;
     setManualCheerValue(cheerValue);
-    props.updateCheerNameOrPrefix(cheerValue);
+    props.updateCheerName(cheerValue);
     props.updateMinimumBitsSpent(bits); // NB: Technically not in this form, but helps when switching
   }
 

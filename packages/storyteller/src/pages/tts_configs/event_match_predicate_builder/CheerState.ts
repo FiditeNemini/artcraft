@@ -3,6 +3,7 @@ import { CHEER_LOOKUP_MAP, TwitchCheerPrefix } from "../../../twitch/Cheers";
 import { CheerUtil } from "../../../twitch/CheerUtil";
 import { BitsRuleType } from "./types/BitsRuleType";
 
+// TODO: This needs tests badly.
 
 export interface CheerStateOfficial {
   cheerPrefix?: TwitchCheerPrefix,
@@ -51,17 +52,21 @@ export function convertExactMatchToCheerState(freeformText: string) : CheerState
 }
 
 // Convert "prefix + bits" into CheerState
-export function parsePrefixAndBitsToCheerState(freeformText: string, bits?: number) : CheerState {
-  const trimmed = freeformText.trim();
+export function convertPrefixAndBitsToCheerState(freeformText?: string, bits?: number) : CheerState {
+  const trimmed = !!freeformText ? freeformText.trim() : '';
 
   let { cheerPrefix, bitValue } = CheerUtil.parseCheerString(trimmed);
 
   let maybeCheer = CHEER_LOOKUP_MAP.get(cheerPrefix || '');
 
+  // NB: Prefer function args over parsed value since we might be parsing 
+  // custom cheers such as "Sus11" or "1984" (7tv.app)
+  let maybeBits = bits || bitValue; 
+
   if (maybeCheer !== undefined) {
     return {
       cheerPrefix: maybeCheer,
-      bits: bitValue,
+      bits: maybeBits,
     }
   }
 
@@ -69,10 +74,9 @@ export function parsePrefixAndBitsToCheerState(freeformText: string, bits?: numb
   // eg. "1984"
   return {
     cheerFull: freeformText,
-    bits: bitValue,
+    bits: maybeBits,
   };
 }
-
 
 // Turn a cheer state into a predicate
 export function predicateToCheerState(predicate: EventMatchPredicate) : CheerState 
@@ -80,10 +84,10 @@ export function predicateToCheerState(predicate: EventMatchPredicate) : CheerSta
   if (!!predicate.bits_cheermote_name_exact_match) {
     return convertExactMatchToCheerState(predicate.bits_cheermote_name_exact_match.cheermote_name)
   } else if (!!predicate.bits_cheermote_prefix_spend_threshold) {
-    return {
-      cheerFull: predicate.bits_cheermote_prefix_spend_threshold.cheermote_prefix,
-      bits: predicate.bits_cheermote_prefix_spend_threshold.minimum_bits_spent,
-    }
+    return convertPrefixAndBitsToCheerState(
+      predicate.bits_cheermote_prefix_spend_threshold.cheermote_prefix,
+      predicate.bits_cheermote_prefix_spend_threshold.minimum_bits_spent,
+    );
   } else if (!!predicate.bits_spend_threshold) {
     return {
       bits: predicate.bits_spend_threshold.minimum_bits_spent,
@@ -126,8 +130,10 @@ export function cheerStateToPredicate(
 
 /*
 
+Truth table-ish breakdown (incomplete).
+
 "Corgo" is an official cheer
-"Zombo" is a custom cheer
+"Zombo", "Sus12", and "1984" are custom cheers
 
 ------------------------------------------------------------------------------------------------
 

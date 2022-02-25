@@ -2,27 +2,28 @@ import React, { useEffect, useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faGem } from '@fortawesome/free-solid-svg-icons';
 import { CHEER_BIT_LEVELS } from '../../../../twitch/Cheers';
+import { CheerState } from '../CheerState';
 
 interface BitsSpendThresholdFormProps {
-  minimumBitsSpent: number,
+  cheerState: CheerState,
   updateMinimumBitsSpent: (minimumSpent: number) => void,
 };
 
 function BitsSpendThresholdForm(props: BitsSpendThresholdFormProps) {
   // The dropdown
-  const [bitsValue, setBitsValue] = useState<number>(props.minimumBitsSpent);
+  const [bitsValue, setBitsValue] = useState<number>(1);
   // The freeform text input
-  const [customAmount, setCustomAmount] = useState<number>(props.minimumBitsSpent);
+  const [customAmount, setCustomAmount] = useState<number>(1);
 
   // NB: useState is not always setting from props correctly (after several re-renders) // The following answers suggests using useEffect:
   //  https://stackoverflow.com/a/54866051 (less clear by also using useState(), but good comments)
   //  https://stackoverflow.com/a/62982753
   useEffect(() => {
-    if (!isNaN(props.minimumBitsSpent)) {
-      setBitsValue(props.minimumBitsSpent)
-      setCustomAmount(props.minimumBitsSpent)
+    if (!!props.cheerState.bits && !isNaN(props.cheerState.bits) && props.cheerState.bits > 0) {
+      setBitsValue(props.cheerState.bits);
+      setCustomAmount(props.cheerState.bits);
     }
-  }, [props.minimumBitsSpent]);
+  }, [props.cheerState]);
 
   const handleBitSelect = (ev: React.FormEvent<HTMLSelectElement>) : boolean => {
     const value = (ev.target as HTMLSelectElement).value;

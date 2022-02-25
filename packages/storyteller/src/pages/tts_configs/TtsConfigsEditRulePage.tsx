@@ -14,6 +14,7 @@ import { EventResponseType } from './event_response_builder/EventResponseType';
 import { EventResponseComponent } from './event_response_builder/EventResponseComponent';
 import { BitsRuleType } from './event_match_predicate_builder/types/BitsRuleType';
 import { EventMatchPredicateBuilderComponent } from './event_match_predicate_builder/EventMatchPredicateBuilderComponent';
+import { CheerState } from './event_match_predicate_builder/CheerState';
 
 interface Props {
   sessionWrapper: SessionWrapper,
@@ -37,36 +38,20 @@ function TtsConfigsEditRulePage(props: Props) {
   const [newEventMatchPredicate, setNewEventMatchPredicate] = useState<EventMatchPredicate>({});
   const [newEventResponse, setNewEventResponse] = useState<EventResponse>({});
 
+  const [cheerState, setCheerState] = useState<CheerState>({});
+
   // ========== ??? ==========
 
-  /// TODO GET RID OF THIS
+  // TODO: GET RID OF THIS
   const [eventResponseType, setEventResponseType] = useState<EventResponseType>(EventResponseType.TtsSingleVoice);
 
 
-  // ===== Predicate Field values (editing) =====
-
-  // Used in:
-  // BitsCheermoteNameExactMatch
-  // BitsCheermotePrefixSpendThreshold
-  const [cheerNameOrPrefix, setCheerNameOrPrefix] = useState(''); 
-
-  // Used in:
-  // BitsSpendThreshold
-  // BitsCheermotePrefixSpendThreshold
-  const [minimumBitsSpent, setMinimumBitsSpent] = useState(1); 
-
-  // Used in:
-  // ChannelPointsRewardNameExactMatch
-  const [rewardName, setRewardName] = useState(''); 
-
-  // ===== Response Field values (editing) =====
-
-  // Used in:
-  // TtsSingleVoice
+  // TODO: GET RID OF THIS
   const [ttsModelToken, setTtsModelToken] = useState(''); 
 
   // ===== Field values (final) =====
 
+  // TODO: GET RID OF non-"new" (see above)
   const [eventMatchPredicate, setEventMatchPredicate] = useState<EventMatchPredicate>({});
   const [eventResponse, setEventResponse] = useState<EventResponse>({});
   const [ruleIsDisabled, setRuleIsDisabled] = useState(false);
@@ -92,15 +77,15 @@ function TtsConfigsEditRulePage(props: Props) {
             serverBitsRuleType = BitsRuleType.BitsCheermoteNameExactMatch;
           } else if (!!response.twitch_event_rule.event_match_predicate.bits_cheermote_prefix_spend_threshold) {
             serverBitsRuleType = BitsRuleType.BitsCheermotePrefixSpendThreshold;
-            setMinimumBitsSpent(response.twitch_event_rule.event_match_predicate.bits_cheermote_prefix_spend_threshold.minimum_bits_spent);
+            //setMinimumBitsSpent(response.twitch_event_rule.event_match_predicate.bits_cheermote_prefix_spend_threshold.minimum_bits_spent);
           } else if (!!response.twitch_event_rule.event_match_predicate.bits_spend_threshold) {
             serverBitsRuleType = BitsRuleType.BitsSpendThreshold;
-            setMinimumBitsSpent(response.twitch_event_rule.event_match_predicate.bits_spend_threshold.minimum_bits_spent);
+            //setMinimumBitsSpent(response.twitch_event_rule.event_match_predicate.bits_spend_threshold.minimum_bits_spent);
           }
           break;
         case TwitchEventCategory.ChannelPoints: // NB: Only one rule type
           if (!!response.twitch_event_rule.event_match_predicate.channel_points_reward_name_exact_match) {
-            setRewardName(response.twitch_event_rule.event_match_predicate.channel_points_reward_name_exact_match.reward_name);
+            //setRewardName(response.twitch_event_rule.event_match_predicate.channel_points_reward_name_exact_match.reward_name);
           }
           break;
         case TwitchEventCategory.ChatCommand: // TODO: Not yet supported
@@ -187,7 +172,7 @@ function TtsConfigsEditRulePage(props: Props) {
     updated_at: twitchEventRule.updated_at,
 
     // Updated in UI
-    event_match_predicate: newEventMatchPredicate,
+    event_match_predicate: eventMatchPredicate,
     event_response: eventResponse,
     rule_is_disabled: ruleIsDisabled,
   };
