@@ -1,5 +1,5 @@
 import { EventMatchPredicate } from "@storyteller/components/src/api/storyteller/twitch_event_rules/shared/EventMatchPredicate";
-import { CHEER_LOOKUP_MAP, TwitchCheerPrefix } from "../../../twitch/Cheers";
+import { CHEER_LOOKUP_MAP, CHEER_PREFIX_TO_STRING_MAP, TwitchCheerPrefix } from "../../../twitch/Cheers";
 import { CheerUtil } from "../../../twitch/CheerUtil";
 import { BitsRuleType } from "./types/BitsRuleType";
 
@@ -106,20 +106,29 @@ export function cheerStateToPredicate(
 
   switch (bitsRuleType) {
     case BitsRuleType.BitsCheermoteNameExactMatch:
-      // TODO
-      // TODO
-      // TODO
-      // TODO
+      let cheermoteName = '';
       if (CheerStateIsOfficial(cheerState)) {
-        // TODO
-
+        let cheerPrefix = '';
+        let bitsValue = '';
+        if (!!cheerState.cheerPrefix) {
+          cheerPrefix = CHEER_PREFIX_TO_STRING_MAP.get(cheerState.cheerPrefix) || '';
+        }
+        if (!!cheerState.bits && !isNaN(cheerState.bits) && cheerState.bits > 1) {
+          bitsValue = cheerState.bits.toString();
+        }
+        if (!!cheerPrefix) {
+          // Don't bother setting unless we have a prefix
+          cheermoteName = `${cheerPrefix}${bitsValue}`
+        }
       } else if (CheerStateIsCustom(cheerState)) {
         // TODO
-
+        // TODO
+        // TODO
+        // TODO
       }
 
       predicate.bits_cheermote_name_exact_match = {
-        cheermote_name: '',
+        cheermote_name: cheermoteName,
       }
       break;
     case BitsRuleType.BitsCheermotePrefixSpendThreshold:

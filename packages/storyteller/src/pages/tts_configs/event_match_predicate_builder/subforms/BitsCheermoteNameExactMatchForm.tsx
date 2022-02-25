@@ -103,10 +103,7 @@ function BitsCheermoteNameExactMatchForm(props: BitsCheermoteNameExactMatchProps
   }
 
   // When the dropdowns are used, replace any manual text entry.
-  const recalcuateFieldValue = (prefix: string|undefined, bits: number) => {
-    if (prefix === undefined) {
-      return;
-    }
+  const recalcuateFieldValue = (prefix: string, bits: number) => {
     const cheerValue = `${prefix}${bits}`;
     setManualCheerValue(cheerValue);
     props.updateCheerName(cheerValue);

@@ -279,10 +279,13 @@ function EventMatchPredicateBuilderComponent(props: EventMatchPredicateBuilderCo
 
     setCheerState(newCheerState);
 
-
     let predicate = cheerStateToPredicate(newCheerState, bitsRuleType);
 
 
+    console.log('\n\n======== handleChangedMinimumBitsSpend() =======');
+    console.log('cheerState', newCheerState);
+    console.table(predicate)
+    console.log('\n\n');
 
     //switch (bitsRuleType) {
     //  case BitsRuleType.BitsCheermoteNameExactMatch:
