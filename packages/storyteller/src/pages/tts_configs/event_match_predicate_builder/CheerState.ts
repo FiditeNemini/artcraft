@@ -131,10 +131,8 @@ export function cheerStateToPredicate(
         console.log(cheermoteName);
 
       } else if (CheerStateIsCustom(cheerState)) {
-        // TODO
-        // TODO
-        // TODO
-        // TODO
+        // Cheer name is the full value, eg. 'ZomboCom1000'
+        cheermoteName = cheerState.cheerFull || '';
       }
 
       predicate.bits_cheermote_name_exact_match = {
