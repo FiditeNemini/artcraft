@@ -33,12 +33,13 @@ function TtsConfigsEditRulePage(props: Props) {
 
   const [twitchEventRule, setTwitchEventRule] = useState<TwitchEventRule|undefined>(undefined);
 
-  // ========== Values passed to subcomponents for editing ==========
+  // Sent to sub-components to initialize UI
+  const [serverEventMatchPredicate, setServerEventMatchPredicate] = useState<EventMatchPredicate>({});
+  const [serverEventResponse, setServerEventResponse] = useState<EventResponse>({});
 
-  const [newEventMatchPredicate, setNewEventMatchPredicate] = useState<EventMatchPredicate>({});
-  const [newEventResponse, setNewEventResponse] = useState<EventResponse>({});
+  // ========== In-Progress Model Edits ==========
 
-  const [cheerState, setCheerState] = useState<CheerState>({});
+  const [modifiedEventMatchPredicate, setModifiedEventMatchPredicate] = useState<EventMatchPredicate>({});
 
   // ========== ??? ==========
 
@@ -60,14 +61,18 @@ function TtsConfigsEditRulePage(props: Props) {
     const response = await GetTwitchEventRule(token);
 
     if (GetTwitchEventRuleIsOk(response)) {
+      // Source of truth
       setTwitchEventRule(response.twitch_event_rule);
+      setServerEventMatchPredicate(response.twitch_event_rule.event_match_predicate);
+      setServerEventResponse(response.twitch_event_rule.event_response);
+
+      // In-progress modifications
+      setModifiedEventMatchPredicate(response.twitch_event_rule.event_match_predicate);
+
+      // TODO REMOVE
       setEventMatchPredicate(response.twitch_event_rule.event_match_predicate);
       setEventResponse(response.twitch_event_rule.event_response);
       setRuleIsDisabled(response.twitch_event_rule.rule_is_disabled);
-
-      // TODO
-      setNewEventMatchPredicate(response.twitch_event_rule.event_match_predicate);
-      setNewEventResponse(response.twitch_event_rule.event_response);
 
       let serverBitsRuleType = BitsRuleType.BitsCheermoteNameExactMatch;
 
@@ -123,14 +128,12 @@ function TtsConfigsEditRulePage(props: Props) {
         break;
     }
 
-    console.log(token);
-
     setTtsModelToken(token);
     setEventResponse(response);
   }
 
-  const updateEventMatchPredicate = (predicate: EventMatchPredicate) => {
-    setNewEventMatchPredicate(predicate);
+  const updateModifiedEventMatchPredicate = (predicate: EventMatchPredicate) => {
+    setModifiedEventMatchPredicate(predicate);
   }
 
   const handleFormSubmit = async (ev: React.FormEvent<HTMLFormElement>) : Promise<boolean> => {
@@ -172,7 +175,7 @@ function TtsConfigsEditRulePage(props: Props) {
     updated_at: twitchEventRule.updated_at,
 
     // Updated in UI
-    event_match_predicate: eventMatchPredicate,
+    event_match_predicate: modifiedEventMatchPredicate,
     event_response: eventResponse,
     rule_is_disabled: ruleIsDisabled,
   };
@@ -190,8 +193,8 @@ function TtsConfigsEditRulePage(props: Props) {
 
         <EventMatchPredicateBuilderComponent
           twitchEventCategory={twitchEventRule.event_category}
-          eventMatchPredicate={newEventMatchPredicate}
-          updateEventMatchPredicate={updateEventMatchPredicate}
+          serverEventMatchPredicate={serverEventMatchPredicate}
+          updateModifiedEventMatchPredicate={updateModifiedEventMatchPredicate}
           allTtsModels={props.allTtsModels}
           allTtsModelsByToken={props.allTtsModelsByToken}
 

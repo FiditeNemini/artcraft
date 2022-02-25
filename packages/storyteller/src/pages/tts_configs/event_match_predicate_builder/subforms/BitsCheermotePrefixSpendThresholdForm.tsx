@@ -4,9 +4,6 @@ import { faGem } from '@fortawesome/free-solid-svg-icons';
 import { CHEER_BIT_LEVELS, CHEER_PREFIXES, CHEER_PREFIX_TO_STRING_MAP } from '../../../../twitch/Cheers';
 import { CheerState, CheerStateIsCustom, CheerStateIsOfficial } from '../CheerState';
 
-// TODO: Don't duplicate
-const CHEER_REGEX = /^([A-Za-z]+)(\d+)?$/;
-
 interface BitsCheermotePrefixSpendThresholdProps {
   cheerState: CheerState,
 

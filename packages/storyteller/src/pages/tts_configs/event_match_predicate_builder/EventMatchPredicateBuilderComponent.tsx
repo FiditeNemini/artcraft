@@ -9,18 +9,18 @@ import { BitsSpendThresholdForm } from './subforms/BitsSpendThresholdForm';
 import { ChannelPointsRewardNameExactMatchForm } from './subforms/ChannelPointsRewardNameExactMatchForm';
 import { ChannelPointsRuleType } from './types/ChannelPointsRuleType';
 import { CheerUtil } from '../../../twitch/CheerUtil';
-import { CheerState, predicateToCheerState } from './CheerState';
-
-// TODO: Don't duplicate
-const CHEER_REGEX = /^([A-Za-z]+)(\d+)?$/;
+import { CheerState, CheerStateIsCustom, CheerStateIsOfficial, cheerStateToPredicate, predicateToCheerState } from './CheerState';
 
 interface EventMatchPredicateBuilderComponentProps {
   // CANNOT BE CHANGED AFTER CREATION
   twitchEventCategory: TwitchEventCategory,
 
+  // Original event match predicate from the server 
+  // (also immutable for sanity and because we lose information on UI changes)
+  serverEventMatchPredicate: EventMatchPredicate,
+
   // Updates sent back up the tree
-  eventMatchPredicate: EventMatchPredicate,
-  updateEventMatchPredicate: (predicate: EventMatchPredicate) => void,
+  updateModifiedEventMatchPredicate: (predicate: EventMatchPredicate) => void,
 
   // FakeYou voices
   allTtsModels: TtsModelListItem[],
@@ -34,8 +34,6 @@ function EventMatchPredicateBuilderComponent(props: EventMatchPredicateBuilderCo
   const [channelPointsRuleType, setChannelPointsRuleType] = useState<ChannelPointsRuleType>(ChannelPointsRuleType.ChannelPointsRewardNameExactMatch);
 
   // ========== Cached Values for Editing ==========
-
-
 
   // New, and remove everything else:
   const [cheerState, setCheerState] = useState<CheerState>({});
@@ -79,28 +77,28 @@ function EventMatchPredicateBuilderComponent(props: EventMatchPredicateBuilderCo
     let bitsV = undefined;
     let cheerPrefixV = undefined;
 
-    let newCheerState = predicateToCheerState(props.eventMatchPredicate);
+    let newCheerState = predicateToCheerState(props.serverEventMatchPredicate);
 
     switch (props.twitchEventCategory) {
       case TwitchEventCategory.Bits:
-        if (!!props.eventMatchPredicate.bits_cheermote_name_exact_match) {
+        if (!!props.serverEventMatchPredicate.bits_cheermote_name_exact_match) {
           newBitsRuleType = BitsRuleType.BitsCheermoteNameExactMatch;
-          cheerAndBitsV = props.eventMatchPredicate.bits_cheermote_name_exact_match.cheermote_name;
+          cheerAndBitsV = props.serverEventMatchPredicate.bits_cheermote_name_exact_match.cheermote_name;
 
-        } else if (!!props.eventMatchPredicate.bits_cheermote_prefix_spend_threshold) {
+        } else if (!!props.serverEventMatchPredicate.bits_cheermote_prefix_spend_threshold) {
           newBitsRuleType = BitsRuleType.BitsCheermotePrefixSpendThreshold;
-          cheerPrefixV = props.eventMatchPredicate.bits_cheermote_prefix_spend_threshold.cheermote_prefix;
-          bitsV = props.eventMatchPredicate.bits_cheermote_prefix_spend_threshold.minimum_bits_spent;
+          cheerPrefixV = props.serverEventMatchPredicate.bits_cheermote_prefix_spend_threshold.cheermote_prefix;
+          bitsV = props.serverEventMatchPredicate.bits_cheermote_prefix_spend_threshold.minimum_bits_spent;
 
-        } else if (!!props.eventMatchPredicate.bits_spend_threshold) {
+        } else if (!!props.serverEventMatchPredicate.bits_spend_threshold) {
           newBitsRuleType = BitsRuleType.BitsSpendThreshold;
-          bitsV = props.eventMatchPredicate.bits_spend_threshold.minimum_bits_spent;
+          bitsV = props.serverEventMatchPredicate.bits_spend_threshold.minimum_bits_spent;
 
         }
         break;
       case TwitchEventCategory.ChannelPoints: // NB: Only one rule type
-        if (!!props.eventMatchPredicate.channel_points_reward_name_exact_match) {
-          setRewardName(props.eventMatchPredicate.channel_points_reward_name_exact_match.reward_name);
+        if (!!props.serverEventMatchPredicate.channel_points_reward_name_exact_match) {
+          setRewardName(props.serverEventMatchPredicate.channel_points_reward_name_exact_match.reward_name);
           newChannelPointsRuleType = ChannelPointsRuleType.ChannelPointsRewardNameExactMatch;
         }
         break;
@@ -111,15 +109,16 @@ function EventMatchPredicateBuilderComponent(props: EventMatchPredicateBuilderCo
 
     setCheerState(newCheerState);
 
-    console.table(props.eventMatchPredicate)
+    console.log('\n\n======== useEffect() =======');
+    console.table(props.serverEventMatchPredicate)
     console.log('cheerState', newCheerState);
+    console.log('\n\n');
 
     if (!!cheerAndBitsV) {
       let { cheerPrefix, bitValue } = CheerUtil.parseCheerString(cheerAndBitsV);
       setCheerPrefix(cheerPrefix || '');
       setBitsValue(bitValue || 1);
       setCheerNameOrPrefix(cheerAndBitsV); // TODO: DIE
-      console.log('parsed', cheerPrefix, bitValue);
     } 
     if (!!bitsV) {
       setBitsValue(bitsV || 1);
@@ -131,7 +130,7 @@ function EventMatchPredicateBuilderComponent(props: EventMatchPredicateBuilderCo
     setBitsRuleType(newBitsRuleType);
     setChannelPointsRuleType(newChannelPointsRuleType);
 
-  }, [props.twitchEventCategory, props.eventMatchPredicate]);
+  }, [props.twitchEventCategory, props.serverEventMatchPredicate]);
 
   // TODO: We need to recalculate the model.
   const handleChangedBitsRuleType = (ev: React.FormEvent<HTMLSelectElement>) : boolean => {
@@ -159,7 +158,7 @@ function EventMatchPredicateBuilderComponent(props: EventMatchPredicateBuilderCo
         break;
     }
 
-    props.updateEventMatchPredicate(predicate);
+    props.updateModifiedEventMatchPredicate(predicate);
     setBitsRuleType(newRuleType);
 
     return true;
@@ -181,15 +180,15 @@ function EventMatchPredicateBuilderComponent(props: EventMatchPredicateBuilderCo
 //
 //  switch (bitsRuleType) {
 //    case BitsRuleType.BitsCheermoteNameExactMatch:
-//      currentNameOrPrefix = props.eventMatchPredicate.bits_cheermote_name_exact_match?.cheermote_name || '';
+//      currentNameOrPrefix = props.serverEventMatchPredicate.bits_cheermote_name_exact_match?.cheermote_name || '';
 //      break;
 //    case BitsRuleType.BitsCheermotePrefixSpendThreshold:
-//      currentNameOrPrefix = props.eventMatchPredicate.bits_cheermote_prefix_spend_threshold?.cheermote_prefix || '';
-//      currentMinimumBitsSpent = props.eventMatchPredicate.bits_cheermote_prefix_spend_threshold?.minimum_bits_spent || 1;
+//      currentNameOrPrefix = props.serverEventMatchPredicate.bits_cheermote_prefix_spend_threshold?.cheermote_prefix || '';
+//      currentMinimumBitsSpent = props.serverEventMatchPredicate.bits_cheermote_prefix_spend_threshold?.minimum_bits_spent || 1;
 //      break;
 //    case BitsRuleType.BitsSpendThreshold:
 //      // No name
-//      currentMinimumBitsSpent = props.eventMatchPredicate.bits_cheermote_prefix_spend_threshold?.minimum_bits_spent || 1;
+//      currentMinimumBitsSpent = props.serverEventMatchPredicate.bits_cheermote_prefix_spend_threshold?.minimum_bits_spent || 1;
 //      break;
 //  }
 
@@ -217,7 +216,7 @@ function EventMatchPredicateBuilderComponent(props: EventMatchPredicateBuilderCo
         break;
     }
 
-    props.updateEventMatchPredicate(predicate);
+    props.updateModifiedEventMatchPredicate(predicate);
   }
 
   const handleChangedCheerName = (name: string) => {
@@ -243,33 +242,69 @@ function EventMatchPredicateBuilderComponent(props: EventMatchPredicateBuilderCo
         break;
     }
 
-    props.updateEventMatchPredicate(predicate);
+    props.updateModifiedEventMatchPredicate(predicate);
   }
 
   const handleChangedMinimumBitsSpent = (minimumSpent: number) => {
-    let predicate : EventMatchPredicate = {};
 
-    switch (bitsRuleType) {
-      case BitsRuleType.BitsCheermoteNameExactMatch:
-        let joined = CheerUtil.joinCheerAndPrefix(cheerPrefix, minimumSpent);
-        predicate.bits_cheermote_name_exact_match = {
-          cheermote_name: joined, // Combined value
-        }
-        break;
-      case BitsRuleType.BitsCheermotePrefixSpendThreshold:
-        predicate.bits_cheermote_prefix_spend_threshold = {
-          cheermote_prefix: cheerPrefix, // Untouched existing value
-          minimum_bits_spent: minimumSpent, // New value
-        }
-        break;
-      case BitsRuleType.BitsSpendThreshold:
-        predicate.bits_spend_threshold = {
-          minimum_bits_spent: minimumSpent, // New value
-        }
-        break;
+    // 1) Update Cheer State
+    // 2) Update NewEventMatchPredicate
+    let newCheerState = {};
+
+    if (CheerStateIsOfficial(cheerState)) {
+      newCheerState = {
+        cheerPrefix: cheerState.cheerPrefix, // Unchanged
+        bits: minimumSpent,
+      }
+    } else if (CheerStateIsCustom(cheerState)) {
+      // Test if the cheer name includes numbers, eg. 'Sus12', or '1984', that differ from bit spend
+      let { cheerPrefix, bitValue } = CheerUtil.parseCheerString(cheerState.cheerFull || '');
+      let cheerFull = cheerState.cheerFull;
+
+      if (!!cheerPrefix && !!bitValue && bitValue === cheerState.bits) {
+        // Let's replace the cheer.
+        cheerFull = CheerUtil.joinCheerAndPrefix(cheerPrefix, minimumSpent);
+      }
+
+      newCheerState = {
+        cheerFull: cheerFull,
+        bits: minimumSpent,
+      }
+
+    } else {
+      newCheerState = {
+        bits: minimumSpent,
+      }
     }
 
-    props.updateEventMatchPredicate(predicate);
+    setCheerState(newCheerState);
+
+
+    let predicate = cheerStateToPredicate(newCheerState, bitsRuleType);
+
+
+
+    //switch (bitsRuleType) {
+    //  case BitsRuleType.BitsCheermoteNameExactMatch:
+    //    let joined = CheerUtil.joinCheerAndPrefix(cheerPrefix, minimumSpent);
+    //    predicate.bits_cheermote_name_exact_match = {
+    //      cheermote_name: joined, // Combined value
+    //    }
+    //    break;
+    //  case BitsRuleType.BitsCheermotePrefixSpendThreshold:
+    //    predicate.bits_cheermote_prefix_spend_threshold = {
+    //      cheermote_prefix: cheerPrefix, // Untouched existing value
+    //      minimum_bits_spent: minimumSpent, // New value
+    //    }
+    //    break;
+    //  case BitsRuleType.BitsSpendThreshold:
+    //    predicate.bits_spend_threshold = {
+    //      minimum_bits_spent: minimumSpent, // New value
+    //    }
+    //    break;
+    //}
+
+    props.updateModifiedEventMatchPredicate(predicate);
   }
 
   // TODO
@@ -284,7 +319,7 @@ function EventMatchPredicateBuilderComponent(props: EventMatchPredicateBuilderCo
         break;
     }
 
-    props.updateEventMatchPredicate(predicate);
+    props.updateModifiedEventMatchPredicate(predicate);
   }
 
   let ruleTypeSelect = <></>

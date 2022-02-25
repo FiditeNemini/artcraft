@@ -104,22 +104,41 @@ export function cheerStateToPredicate(
 {
   let predicate : EventMatchPredicate = {};
 
-
   switch (bitsRuleType) {
     case BitsRuleType.BitsCheermoteNameExactMatch:
+      // TODO
+      // TODO
+      // TODO
+      // TODO
+      if (CheerStateIsOfficial(cheerState)) {
+        // TODO
+
+      } else if (CheerStateIsCustom(cheerState)) {
+        // TODO
+
+      }
+
       predicate.bits_cheermote_name_exact_match = {
         cheermote_name: '',
       }
       break;
     case BitsRuleType.BitsCheermotePrefixSpendThreshold:
+      // TODO
+      // TODO
+      // TODO
+      // TODO
       predicate.bits_cheermote_prefix_spend_threshold = {
         cheermote_prefix: '',
         minimum_bits_spent: 1,
       }
       break;
     case BitsRuleType.BitsSpendThreshold:
+      let newBits = 1;
+      if (!!cheerState.bits && !isNaN(cheerState.bits) && cheerState.bits > 1) {
+        newBits = cheerState.bits;
+      }
       predicate.bits_spend_threshold = {
-        minimum_bits_spent: 1,
+        minimum_bits_spent: newBits,
       }
       break;
   }
