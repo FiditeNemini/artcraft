@@ -356,7 +356,6 @@ function EventMatchPredicateBuilderComponent(props: EventMatchPredicateBuilderCo
         matchingRulesForm = <BitsCheermoteNameExactMatchForm 
           cheerState={cheerState}
           updateCheerName={handleChangedCheerName}
-          updateMinimumBitsSpent={handleChangedMinimumBitsSpent} // NB: Technically not a field, but we can parse it out!
           />;
         break;
       case BitsRuleType.BitsCheermotePrefixSpendThreshold:

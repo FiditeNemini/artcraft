@@ -120,15 +120,10 @@ export function cheerStateToPredicate(
           bitsValue = cheerState.bits.toString();
         }
 
-        //console.log(cheerPrefix);
-        //console.log(bitsValue);
-
         if (!!cheerPrefix) {
           // Don't bother setting unless we have a prefix
           cheermoteName = `${cheerPrefix}${bitsValue}`
         }
-
-        console.log(cheermoteName);
 
       } else if (CheerStateIsCustom(cheerState)) {
         // Cheer name is the full value, eg. 'ZomboCom1000'

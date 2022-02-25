@@ -16,7 +16,7 @@ export class CheerUtil {
 
     if (!!matches && matches.length > 1) {
       cheerPrefix = matches[1];
-      if (matches.length == 3 && matches[2] !== undefined) {
+      if (matches.length === 3 && matches[2] !== undefined) {
         // NB(1): The second match group can be 'undefined' if no number is present. (Optional matching.)
         let maybeBits = parseInt(matches[2]);
         if (!isNaN(maybeBits) && maybeBits > 0) {

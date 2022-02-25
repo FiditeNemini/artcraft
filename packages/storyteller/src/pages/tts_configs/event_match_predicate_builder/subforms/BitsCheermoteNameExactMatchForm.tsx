@@ -9,13 +9,7 @@ const CHEER_REGEX = /^([A-Za-z]+)(\d+)?$/;
 
 interface BitsCheermoteNameExactMatchProps {
   cheerState: CheerState,
-
   updateCheerName: (cheerNameOrPrefix: string) => void,
-  
-  // NB: 'minimumBitsSpent' and its update are technically not a field here, but we can parse it out
-  // to communicate back upstream in case the field changes, or infer it from a context switch to this
-  // field. Basically, we're trying not to lose information.
-  updateMinimumBitsSpent: (minimumSpent: number) => void, 
 };
 
 function BitsCheermoteNameExactMatchForm(props: BitsCheermoteNameExactMatchProps) {
@@ -86,12 +80,11 @@ function BitsCheermoteNameExactMatchForm(props: BitsCheermoteNameExactMatchProps
 
     if (!!matches && matches.length > 1) {
       setCheerPrefix(matches[1]); // First match group
-      if (matches.length == 3 && matches[2] !== undefined) {
+      if (matches.length === 3 && matches[2] !== undefined) {
         // NB: Second match group can be 'undefined' if no number is present. (Zero-width matching?)
         const maybeBits = parseInt(matches[2]);
         if (!isNaN(maybeBits)) {
           setBitsValue(maybeBits); // Second match group
-          props.updateMinimumBitsSpent(maybeBits); // NB: Technically not in this form, but helps when switching
         }
       }
     }
@@ -106,7 +99,6 @@ function BitsCheermoteNameExactMatchForm(props: BitsCheermoteNameExactMatchProps
     const cheerValue = `${prefix}${bits}`;
     setManualCheerValue(cheerValue);
     props.updateCheerName(cheerValue);
-    //props.updateMinimumBitsSpent(bits); // NB: Technically not in this form, but helps when switching
   }
 
   return (
