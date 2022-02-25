@@ -9,7 +9,6 @@ import { faAngleLeft, faSave } from '@fortawesome/free-solid-svg-icons';
 import { EventMatchPredicate } from '@storyteller/components/src/api/storyteller/twitch_event_rules/shared/EventMatchPredicate';
 import { EventResponse } from '@storyteller/components/src/api/storyteller/twitch_event_rules/shared/EventResponse';
 import { TtsModelListItem } from '@storyteller/components/src/api/tts/ListTtsModels';
-import { EventResponseType } from './event_response_builder/EventResponseType';
 import { EventResponseComponent } from './event_response_builder/EventResponseComponent';
 import { EventMatchPredicateBuilderComponent } from './event_match_predicate_builder/EventMatchPredicateBuilderComponent';
 

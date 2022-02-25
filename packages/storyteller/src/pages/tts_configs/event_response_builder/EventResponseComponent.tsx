@@ -3,6 +3,7 @@ import { TtsModelListItem } from '@storyteller/components/src/api/tts/ListTtsMod
 import { TtsSingleVoiceForm } from './TtsSingleVoiceForm';
 import { EventResponseType } from './EventResponseType';
 import { EventResponse } from '@storyteller/components/src/api/storyteller/twitch_event_rules/shared/EventResponse';
+import { buildEventResponse } from './BuildEventResponse';
 
 interface EventResponseComponentProps {
   // Original response from server.
@@ -68,13 +69,16 @@ function EventResponseComponent(props: EventResponseComponentProps) {
     // the "random voices" view, etc.
     let updatedTokens = [... selectedTtsModelTokens];
 
-    if (updatedTokens.length > 1) {
+    if (updatedTokens.length > 0) {
       updatedTokens[0] = token;
     } else if (updatedTokens.length === 0) {
       updatedTokens.push(token);
     }
 
+    const newEventResponse = buildEventResponse(updatedTokens, eventResponseType);
+
     setSelectedTtsModelTokens(updatedTokens);
+    props.updateModifiedEventResponse(newEventResponse);
   }
 
   return (
