@@ -25,16 +25,21 @@ function BitsCheermoteNameExactMatchForm(props: BitsCheermoteNameExactMatchProps
   //  https://stackoverflow.com/a/62982753
   useEffect(() => {
     let newPrefix = '';
-    let newBits = 1;
     let newFullName = '';
+    let newBits = 1;
+    let hasBits = false;
+
+    if (!!props.cheerState.bits && !isNaN(props.cheerState.bits) && props.cheerState.bits > 0) {
+      newBits = props.cheerState.bits;
+      hasBits = true;
+    }
 
     if (CheerStateIsOfficial(props.cheerState)) {
       if (!!props.cheerState.cheerPrefix) {
         newPrefix = CHEER_PREFIX_TO_STRING_MAP.get((props.cheerState.cheerPrefix)) || '';
       }
       
-      if (!!props.cheerState.bits && !isNaN(props.cheerState.bits) && props.cheerState.bits > 0) {
-        newBits = props.cheerState.bits;
+      if (hasBits) {
         newFullName = `${newPrefix}${newBits}`;
       } else {
         newFullName = newPrefix;
@@ -42,10 +47,6 @@ function BitsCheermoteNameExactMatchForm(props: BitsCheermoteNameExactMatchProps
 
     } else if (CheerStateIsCustom(props.cheerState)) {
       newFullName = props.cheerState.cheerFull || '';
-
-      if (!!props.cheerState.bits && !isNaN(props.cheerState.bits) && props.cheerState.bits > 0) {
-        newBits = props.cheerState.bits;
-      }
     }
 
     setCheerPrefix(newPrefix);
