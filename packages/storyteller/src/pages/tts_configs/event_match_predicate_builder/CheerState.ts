@@ -104,6 +104,9 @@ export function cheerStateToPredicate(
 {
   let predicate : EventMatchPredicate = {};
 
+  //console.log('-----cheerStateToPredicate()-----');
+  //console.table(cheerState);
+
   switch (bitsRuleType) {
     case BitsRuleType.BitsCheermoteNameExactMatch:
       let cheermoteName = '';
@@ -116,10 +119,17 @@ export function cheerStateToPredicate(
         if (!!cheerState.bits && !isNaN(cheerState.bits) && cheerState.bits > 1) {
           bitsValue = cheerState.bits.toString();
         }
+
+        //console.log(cheerPrefix);
+        //console.log(bitsValue);
+
         if (!!cheerPrefix) {
           // Don't bother setting unless we have a prefix
           cheermoteName = `${cheerPrefix}${bitsValue}`
         }
+
+        console.log(cheermoteName);
+
       } else if (CheerStateIsCustom(cheerState)) {
         // TODO
         // TODO
@@ -131,6 +141,7 @@ export function cheerStateToPredicate(
         cheermote_name: cheermoteName,
       }
       break;
+
     case BitsRuleType.BitsCheermotePrefixSpendThreshold:
       // TODO
       // TODO
@@ -141,6 +152,7 @@ export function cheerStateToPredicate(
         minimum_bits_spent: 1,
       }
       break;
+
     case BitsRuleType.BitsSpendThreshold:
       let newBits = 1;
       if (!!cheerState.bits && !isNaN(cheerState.bits) && cheerState.bits > 1) {

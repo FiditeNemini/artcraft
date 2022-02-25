@@ -11,7 +11,6 @@ interface BitsCheermoteNameExactMatchProps {
   cheerState: CheerState,
 
   updateCheerName: (cheerNameOrPrefix: string) => void,
-  updateCheerPrefix: (cheerNameOrPrefix: string) => void,
   
   // NB: 'minimumBitsSpent' and its update are technically not a field here, but we can parse it out
   // to communicate back upstream in case the field changes, or infer it from a context switch to this
@@ -107,7 +106,7 @@ function BitsCheermoteNameExactMatchForm(props: BitsCheermoteNameExactMatchProps
     const cheerValue = `${prefix}${bits}`;
     setManualCheerValue(cheerValue);
     props.updateCheerName(cheerValue);
-    props.updateMinimumBitsSpent(bits); // NB: Technically not in this form, but helps when switching
+    //props.updateMinimumBitsSpent(bits); // NB: Technically not in this form, but helps when switching
   }
 
   return (

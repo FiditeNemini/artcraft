@@ -10,6 +10,7 @@ import { ChannelPointsRewardNameExactMatchForm } from './subforms/ChannelPointsR
 import { ChannelPointsRuleType } from './types/ChannelPointsRuleType';
 import { CheerUtil } from '../../../twitch/CheerUtil';
 import { CheerState, CheerStateIsCustom, CheerStateIsOfficial, cheerStateToPredicate, predicateToCheerState } from './CheerState';
+import { CHEER_LOOKUP_MAP, CHEER_PREFIXES } from '../../../twitch/Cheers';
 
 interface EventMatchPredicateBuilderComponentProps {
   // CANNOT BE CHANGED AFTER CREATION
@@ -220,33 +221,56 @@ function EventMatchPredicateBuilderComponent(props: EventMatchPredicateBuilderCo
   }
 
   const handleChangedCheerName = (name: string) => {
-    let predicate : EventMatchPredicate = {};
+    // 1) Update Cheer State
+    // 2) Update NewEventMatchPredicate
+    let newCheerState : CheerState = {};
 
-    switch (bitsRuleType) {
-      case BitsRuleType.BitsCheermoteNameExactMatch:
-        predicate.bits_cheermote_name_exact_match = {
-          cheermote_name: name, // New value
-        }
-        break;
-      case BitsRuleType.BitsCheermotePrefixSpendThreshold:
-        let { cheerPrefix, bitValue } = CheerUtil.parseCheerString(name);
-        predicate.bits_cheermote_prefix_spend_threshold = {
-          cheermote_prefix: cheerPrefix || name, // New value
-          minimum_bits_spent: bitValue || bitsValue,
-        }
-        break;
-      case BitsRuleType.BitsSpendThreshold:
-        predicate.bits_spend_threshold = {
-          minimum_bits_spent: bitsValue,
-        }
-        break;
-    }
+    let { cheerPrefix, bitValue } = CheerUtil.parseCheerString(name);
 
+    let newBitValue = bitValue;
+    let maybeCheerPrefix = CHEER_LOOKUP_MAP.get(cheerPrefix || '');
+
+    if (!!maybeCheerPrefix) {
+      // Official prefix.
+      newCheerState = {
+        cheerPrefix: maybeCheerPrefix,
+        bits: newBitValue,
+      }
+    } else if (!!cheerPrefix) {
+      // Custom prefix.
+
+      // Test if hypothetically we should retain an independent of name bit value.
+      // Hypothetically, Sus13 -> Sus12, but the bit value is 5000 in a separate field. 
+      // We don't want to repalace with 13.
+      if (CheerStateIsCustom(cheerState)) {
+        let { cheerPrefix, bitValue } = CheerUtil.parseCheerString(cheerState.cheerFull || '');
+
+        if ((!!cheerPrefix && !!bitValue) // We have a complete name
+          && (bitValue !== cheerState.bits)) // The bit value is not independent of the cheer name, as in eg. (Foobar1000, 1000)
+        {
+          // Keep the old value.
+          newBitValue = cheerState.bits;
+        }
+      }
+
+      newCheerState = {
+        cheerFull: name, // Should always be the full value
+        bits: newBitValue, 
+      }
+    } 
+
+    let predicate = cheerStateToPredicate(newCheerState, bitsRuleType);
+
+    console.log('\n\n======== handleChangedCheerName() =======');
+    console.log('cheerState', newCheerState);
+    console.table(predicate)
+    console.log('\n\n');
+
+    setCheerState(newCheerState);
     props.updateModifiedEventMatchPredicate(predicate);
   }
 
   const handleChangedMinimumBitsSpent = (minimumSpent: number) => {
-
     // 1) Update Cheer State
     // 2) Update NewEventMatchPredicate
     let newCheerState = {};
@@ -277,7 +301,6 @@ function EventMatchPredicateBuilderComponent(props: EventMatchPredicateBuilderCo
       }
     }
 
-    setCheerState(newCheerState);
 
     let predicate = cheerStateToPredicate(newCheerState, bitsRuleType);
 
@@ -287,26 +310,7 @@ function EventMatchPredicateBuilderComponent(props: EventMatchPredicateBuilderCo
     console.table(predicate)
     console.log('\n\n');
 
-    //switch (bitsRuleType) {
-    //  case BitsRuleType.BitsCheermoteNameExactMatch:
-    //    let joined = CheerUtil.joinCheerAndPrefix(cheerPrefix, minimumSpent);
-    //    predicate.bits_cheermote_name_exact_match = {
-    //      cheermote_name: joined, // Combined value
-    //    }
-    //    break;
-    //  case BitsRuleType.BitsCheermotePrefixSpendThreshold:
-    //    predicate.bits_cheermote_prefix_spend_threshold = {
-    //      cheermote_prefix: cheerPrefix, // Untouched existing value
-    //      minimum_bits_spent: minimumSpent, // New value
-    //    }
-    //    break;
-    //  case BitsRuleType.BitsSpendThreshold:
-    //    predicate.bits_spend_threshold = {
-    //      minimum_bits_spent: minimumSpent, // New value
-    //    }
-    //    break;
-    //}
-
+    setCheerState(newCheerState);
     props.updateModifiedEventMatchPredicate(predicate);
   }
 
@@ -352,7 +356,6 @@ function EventMatchPredicateBuilderComponent(props: EventMatchPredicateBuilderCo
         matchingRulesForm = <BitsCheermoteNameExactMatchForm 
           cheerState={cheerState}
           updateCheerName={handleChangedCheerName}
-          updateCheerPrefix={handleChangedCheerPrefix}
           updateMinimumBitsSpent={handleChangedMinimumBitsSpent} // NB: Technically not a field, but we can parse it out!
           />;
         break;
