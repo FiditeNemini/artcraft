@@ -19,8 +19,11 @@ function TtsSingleVoiceForm(props: TtsSingleVoiceFormProps) {
   //  https://stackoverflow.com/a/54866051 (less clear by also using useState(), but good comments)
   //  https://stackoverflow.com/a/62982753
   useEffect(() => {
-    //setTtsModelToken(props.ttsModelToken);
-  }, []);
+    console.log(props.selectedTtsModelTokens);
+    if (props.selectedTtsModelTokens.length > 0) {
+      setTtsModelToken(props.selectedTtsModelTokens[0]);
+    }
+  }, [props.selectedTtsModelTokens]);
 
 
   const handleModelSelect = (ev: React.FormEvent<HTMLSelectElement>) : boolean => {

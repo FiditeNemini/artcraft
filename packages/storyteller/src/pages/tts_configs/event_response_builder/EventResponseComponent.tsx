@@ -32,14 +32,27 @@ function EventResponseComponent(props: EventResponseComponentProps) {
   //  https://stackoverflow.com/a/62982753
   useEffect(() => {
     let newEventResponseType = EventResponseType.TtsSingleVoice;
+    let modelTokens : string[] = [];
     
     if (!!props.serverEventResponse.tts_single_voice) {
       newEventResponseType = EventResponseType.TtsSingleVoice;
+
+      if (!!props.serverEventResponse.tts_single_voice.tts_model_token) {
+        modelTokens.push(props.serverEventResponse.tts_single_voice.tts_model_token)
+      }
+
     } else if (!!props.serverEventResponse.tts_random_voice) {
       newEventResponseType = EventResponseType.TtsRandomVoice;
+
+      if (!!props.serverEventResponse.tts_random_voice.tts_model_tokens && 
+        props.serverEventResponse.tts_random_voice.tts_model_tokens.length > 0) 
+      {
+        modelTokens = [...props.serverEventResponse.tts_random_voice.tts_model_tokens];
+      }
     }
 
     setEventResponseType(newEventResponseType);
+    setSelectedTtsModelTokens(modelTokens);
 
   }, [props.serverEventResponse]);
 
