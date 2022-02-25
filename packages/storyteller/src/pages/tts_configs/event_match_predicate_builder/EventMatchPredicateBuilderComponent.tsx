@@ -36,19 +36,10 @@ function EventMatchPredicateBuilderComponent(props: EventMatchPredicateBuilderCo
 
   // ========== Cached Values for Editing ==========
 
-  // New, and remove everything else:
+  // A very complicated container that juggles bits and cheermote state.
+  // The state transitions are complicated, and I've tried to document as best as possible.
+  // TODO: This really needs some testing.
   const [cheerState, setCheerState] = useState<CheerState>({});
-
-  // Used in:
-  // BitsCheermoteNameExactMatch
-  // BitsCheermotePrefixSpendThreshold
-  const [cheerNameOrPrefix, setCheerNameOrPrefix] = useState('');  // TODO: DIE
-
-  // Shared state for :
-  // BitsSpendThreshold
-  // BitsCheermoteNameExactMatch
-  // BitsCheermotePrefixSpendThreshold
-  const [bitsValue, setBitsValue] = useState(1);
 
   // Used in:
   // ChannelPointsRewardNameExactMatch
@@ -87,11 +78,6 @@ function EventMatchPredicateBuilderComponent(props: EventMatchPredicateBuilderCo
 
     setCheerState(newCheerState);
 
-    console.log('\n\n======== useEffect() =======');
-    console.table(props.serverEventMatchPredicate)
-    console.log('cheerState', newCheerState);
-    console.log('\n\n');
-
     setBitsRuleType(newBitsRuleType);
     setChannelPointsRuleType(newChannelPointsRuleType);
 
@@ -104,11 +90,6 @@ function EventMatchPredicateBuilderComponent(props: EventMatchPredicateBuilderCo
 
     let predicate = cheerStateToPredicate(cheerState, newRuleType);
     
-    console.log('\n\n======== handleChangedBitsRuleType() =======');
-    console.log('cheerState', cheerState);
-    console.table(predicate)
-    console.log('\n\n');
-
     setBitsRuleType(newRuleType);
     props.updateModifiedEventMatchPredicate(predicate);
 
@@ -142,11 +123,6 @@ function EventMatchPredicateBuilderComponent(props: EventMatchPredicateBuilderCo
     }
 
     let predicate = cheerStateToPredicate(newCheerState, bitsRuleType);
-
-    console.log('\n\n======== handleChangedCheerPrefix() =======');
-    console.log('cheerState', newCheerState);
-    console.table(predicate)
-    console.log('\n\n');
 
     setCheerState(newCheerState);
     props.updateModifiedEventMatchPredicate(predicate);
@@ -193,11 +169,6 @@ function EventMatchPredicateBuilderComponent(props: EventMatchPredicateBuilderCo
 
     let predicate = cheerStateToPredicate(newCheerState, bitsRuleType);
 
-    console.log('\n\n======== handleChangedCheerName() =======');
-    console.log('cheerState', newCheerState);
-    console.table(predicate)
-    console.log('\n\n');
-
     setCheerState(newCheerState);
     props.updateModifiedEventMatchPredicate(predicate);
   }
@@ -234,11 +205,6 @@ function EventMatchPredicateBuilderComponent(props: EventMatchPredicateBuilderCo
     }
 
     let predicate = cheerStateToPredicate(newCheerState, bitsRuleType);
-
-    console.log('\n\n======== handleChangedMinimumBitsSpend() =======');
-    console.log('cheerState', newCheerState);
-    console.table(predicate)
-    console.log('\n\n');
 
     setCheerState(newCheerState);
     props.updateModifiedEventMatchPredicate(predicate);

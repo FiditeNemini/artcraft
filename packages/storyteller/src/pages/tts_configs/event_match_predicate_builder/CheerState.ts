@@ -105,9 +105,6 @@ export function cheerStateToPredicate(
 {
   let predicate : EventMatchPredicate = {};
 
-  //console.log('-----cheerStateToPredicate()-----');
-  //console.table(cheerState);
-
   switch (bitsRuleType) {
     case BitsRuleType.BitsCheermoteNameExactMatch:
       let cheermoteName = '';

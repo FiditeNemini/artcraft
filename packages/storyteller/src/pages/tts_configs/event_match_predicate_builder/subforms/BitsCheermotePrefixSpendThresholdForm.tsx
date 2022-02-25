@@ -188,7 +188,6 @@ function BitsCheermotePrefixSpendThresholdForm(props: BitsCheermotePrefixSpendTh
           Or 420. Whatever you want.
         </div>
       </article>
-
     </>
   )
 }
