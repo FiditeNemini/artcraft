@@ -172,50 +172,31 @@ function EventMatchPredicateBuilderComponent(props: EventMatchPredicateBuilderCo
     return true;
   }
 
-// TODO: This may work instead of local setState().
-//  // Existing values will be used to pre-populate the forms as well as handle
-//  // differential updates to other fields (since this isn't a sparse update model).
-//
-//  let currentNameOrPrefix = '';
-//  let currentMinimumBitsSpent = 1;
-//
-//  switch (bitsRuleType) {
-//    case BitsRuleType.BitsCheermoteNameExactMatch:
-//      currentNameOrPrefix = props.serverEventMatchPredicate.bits_cheermote_name_exact_match?.cheermote_name || '';
-//      break;
-//    case BitsRuleType.BitsCheermotePrefixSpendThreshold:
-//      currentNameOrPrefix = props.serverEventMatchPredicate.bits_cheermote_prefix_spend_threshold?.cheermote_prefix || '';
-//      currentMinimumBitsSpent = props.serverEventMatchPredicate.bits_cheermote_prefix_spend_threshold?.minimum_bits_spent || 1;
-//      break;
-//    case BitsRuleType.BitsSpendThreshold:
-//      // No name
-//      currentMinimumBitsSpent = props.serverEventMatchPredicate.bits_cheermote_prefix_spend_threshold?.minimum_bits_spent || 1;
-//      break;
-//  }
+  const handleChangedCheerPrefix = (newPrefix: string) => {
+    // 1) Update Cheer State
+    // 2) Update NewEventMatchPredicate
+    let newCheerState : CheerState = {};
 
-  //const handleChangedCheerNameOrPrefix = (prefix: string) => {
-  const handleChangedCheerPrefix = (prefix: string) => {
-    let predicate : EventMatchPredicate = {};
+    let maybeCheerPrefix = CHEER_LOOKUP_MAP.get(newPrefix || '');
 
-    switch (bitsRuleType) {
-      case BitsRuleType.BitsCheermoteNameExactMatch:
-        let joined = CheerUtil.joinCheerAndPrefix(prefix, bitsValue);
-        predicate.bits_cheermote_name_exact_match = {
-          cheermote_name: joined, // New value
-        }
-        break;
-      case BitsRuleType.BitsCheermotePrefixSpendThreshold:
-        predicate.bits_cheermote_prefix_spend_threshold = {
-          cheermote_prefix: prefix, // New value
-          minimum_bits_spent: bitsValue,
-        }
-        break;
-      case BitsRuleType.BitsSpendThreshold:
-        predicate.bits_spend_threshold = {
-          minimum_bits_spent: bitsValue,
-        }
-        break;
+    if (!!maybeCheerPrefix) {
+      newCheerState = {
+        cheerPrefix: maybeCheerPrefix,
+        bits: cheerState.bits, // Unchanged
+      }
+    } else {
+      newCheerState = {
+        cheerFull: newPrefix,
+        bits: cheerState.bits, // Unchanged
+      }
     }
+
+    let predicate = cheerStateToPredicate(newCheerState, bitsRuleType);
+
+    console.log('\n\n======== handleChangedCheerPrefix() =======');
+    console.log('cheerState', newCheerState);
+    console.table(predicate)
+    console.log('\n\n');
 
     props.updateModifiedEventMatchPredicate(predicate);
   }

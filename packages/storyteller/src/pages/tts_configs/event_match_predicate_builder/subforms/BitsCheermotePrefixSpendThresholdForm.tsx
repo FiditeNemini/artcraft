@@ -60,11 +60,13 @@ function BitsCheermotePrefixSpendThresholdForm(props: BitsCheermotePrefixSpendTh
     const value = (ev.target as HTMLSelectElement).value;
     setCheerPrefix(value);
     setCustomCheerPrefix(value);
+    props.updateCheerPrefix(value);
     return true;
   }
 
   const updateTextCheerValue = (ev: React.FormEvent<HTMLInputElement>) : boolean => {
     const value = (ev.target as HTMLInputElement).value;
+    setCheerPrefix(value);
     setCustomCheerPrefix(value);
     props.updateCheerPrefix(value);
     return true;

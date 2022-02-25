@@ -136,13 +136,23 @@ export function cheerStateToPredicate(
       break;
 
     case BitsRuleType.BitsCheermotePrefixSpendThreshold:
-      // TODO
-      // TODO
-      // TODO
-      // TODO
+      let newBitsValue = 1;
+      if (!!cheerState.bits && !isNaN(cheerState.bits) && cheerState.bits > 1) {
+        newBitsValue = cheerState.bits;
+      }
+
+      let newPrefix = '';
+      if (CheerStateIsOfficial(cheerState)) {
+        if (!!cheerState.cheerPrefix) {
+          newPrefix = CHEER_PREFIX_TO_STRING_MAP.get(cheerState.cheerPrefix) || '';
+        }
+      } else if (CheerStateIsCustom(cheerState)) {
+        newPrefix = cheerState.cheerFull || '';
+      }
+
       predicate.bits_cheermote_prefix_spend_threshold = {
-        cheermote_prefix: '',
-        minimum_bits_spent: 1,
+        cheermote_prefix: newPrefix,
+        minimum_bits_spent: newBitsValue,
       }
       break;
 
