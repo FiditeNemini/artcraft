@@ -62,27 +62,16 @@ function EventMatchPredicateBuilderComponent(props: EventMatchPredicateBuilderCo
     let newBitsRuleType = BitsRuleType.BitsCheermoteNameExactMatch; 
     let newChannelPointsRuleType = ChannelPointsRuleType.ChannelPointsRewardNameExactMatch;
 
-    let cheerAndBitsV = undefined;
-    let bitsV = undefined;
-    let cheerPrefixV = undefined;
-
     let newCheerState = predicateToCheerState(props.serverEventMatchPredicate);
 
     switch (props.twitchEventCategory) {
       case TwitchEventCategory.Bits:
         if (!!props.serverEventMatchPredicate.bits_cheermote_name_exact_match) {
           newBitsRuleType = BitsRuleType.BitsCheermoteNameExactMatch;
-          cheerAndBitsV = props.serverEventMatchPredicate.bits_cheermote_name_exact_match.cheermote_name;
-
         } else if (!!props.serverEventMatchPredicate.bits_cheermote_prefix_spend_threshold) {
           newBitsRuleType = BitsRuleType.BitsCheermotePrefixSpendThreshold;
-          cheerPrefixV = props.serverEventMatchPredicate.bits_cheermote_prefix_spend_threshold.cheermote_prefix;
-          bitsV = props.serverEventMatchPredicate.bits_cheermote_prefix_spend_threshold.minimum_bits_spent;
-
         } else if (!!props.serverEventMatchPredicate.bits_spend_threshold) {
           newBitsRuleType = BitsRuleType.BitsSpendThreshold;
-          bitsV = props.serverEventMatchPredicate.bits_spend_threshold.minimum_bits_spent;
-
         }
         break;
       case TwitchEventCategory.ChannelPoints: // NB: Only one rule type
@@ -103,14 +92,6 @@ function EventMatchPredicateBuilderComponent(props: EventMatchPredicateBuilderCo
     console.log('cheerState', newCheerState);
     console.log('\n\n');
 
-    if (!!cheerAndBitsV) {
-      let { cheerPrefix, bitValue } = CheerUtil.parseCheerString(cheerAndBitsV);
-      setBitsValue(bitValue || 1);
-      setCheerNameOrPrefix(cheerAndBitsV); // TODO: DIE
-    } 
-    if (!!bitsV) {
-      setBitsValue(bitsV || 1);
-    }
     setBitsRuleType(newBitsRuleType);
     setChannelPointsRuleType(newChannelPointsRuleType);
 
@@ -167,6 +148,7 @@ function EventMatchPredicateBuilderComponent(props: EventMatchPredicateBuilderCo
     console.table(predicate)
     console.log('\n\n');
 
+    setCheerState(newCheerState);
     props.updateModifiedEventMatchPredicate(predicate);
   }
 

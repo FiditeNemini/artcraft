@@ -24,6 +24,7 @@ export type CheerState = CheerStateOfficial | CheerStateCustom;
 export function CheerStateIsOfficial(cheerState: CheerState): cheerState is CheerStateOfficial {
   return cheerState.hasOwnProperty('cheerPrefix');
 }
+
 export function CheerStateIsCustom(cheerState: CheerState): cheerState is CheerStateCustom {
   return cheerState.hasOwnProperty('cheerFull');
 }
