@@ -199,7 +199,7 @@ payload = {
     'event_category': 'bits',
     'event_match_predicate': {
         'bits_cheermote_prefix_spend_threshold': {
-            'cheermote_prefix': 'Cheer',
+            'cheermote_prefix': 'DoodleCheer',
             'minimum_bits_spent': 1000,
         },
     },
