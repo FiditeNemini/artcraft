@@ -39,7 +39,6 @@ function EventMatchPredicateBuilderComponent(props: EventMatchPredicateBuilderCo
   // New, and remove everything else:
   const [cheerState, setCheerState] = useState<CheerState>({});
 
-
   // Used in:
   // BitsCheermoteNameExactMatch
   // BitsCheermotePrefixSpendThreshold
@@ -122,29 +121,15 @@ function EventMatchPredicateBuilderComponent(props: EventMatchPredicateBuilderCo
     const value = (ev.target as HTMLSelectElement).value;
     const newRuleType = value as BitsRuleType;
 
-    let predicate : EventMatchPredicate = {};
+    let predicate = cheerStateToPredicate(cheerState, newRuleType);
+    
+    console.log('\n\n======== handleChangedBitsRuleType() =======');
+    console.log('cheerState', cheerState);
+    console.table(predicate)
+    console.log('\n\n');
 
-    switch (newRuleType) {
-      case BitsRuleType.BitsCheermoteNameExactMatch:
-        predicate.bits_cheermote_name_exact_match = {
-          cheermote_name: cheerNameOrPrefix,
-        }
-        break;
-      case BitsRuleType.BitsCheermotePrefixSpendThreshold:
-        predicate.bits_cheermote_prefix_spend_threshold = {
-          cheermote_prefix: cheerNameOrPrefix,
-          minimum_bits_spent: bitsValue,
-        }
-        break;
-      case BitsRuleType.BitsSpendThreshold:
-        predicate.bits_spend_threshold = {
-          minimum_bits_spent: bitsValue,
-        }
-        break;
-    }
-
-    props.updateModifiedEventMatchPredicate(predicate);
     setBitsRuleType(newRuleType);
+    props.updateModifiedEventMatchPredicate(predicate);
 
     return true;
   }
@@ -266,9 +251,7 @@ function EventMatchPredicateBuilderComponent(props: EventMatchPredicateBuilderCo
       }
     }
 
-
     let predicate = cheerStateToPredicate(newCheerState, bitsRuleType);
-
 
     console.log('\n\n======== handleChangedMinimumBitsSpend() =======');
     console.log('cheerState', newCheerState);
@@ -362,7 +345,6 @@ function EventMatchPredicateBuilderComponent(props: EventMatchPredicateBuilderCo
       <h2 className="title is-4">1) Pick what to match on</h2>
 
       <div className="field">
-        {/*<label className="label">Rule Type</label>*/}
         <div className="control">
           <div className="select is-medium is-fullwidth">
             {ruleTypeSelect}
@@ -376,7 +358,6 @@ function EventMatchPredicateBuilderComponent(props: EventMatchPredicateBuilderCo
       <h2 className="title is-4">2) Configure the matching</h2>
       
       {matchingRulesForm}
-
     </>
   )
 }

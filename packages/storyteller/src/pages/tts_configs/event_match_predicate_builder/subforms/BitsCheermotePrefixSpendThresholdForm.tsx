@@ -29,24 +29,18 @@ function BitsCheermotePrefixSpendThresholdForm(props: BitsCheermotePrefixSpendTh
     let newBits = 1;
     let newCustomBits = 1;
 
+    if (!!props.cheerState.bits && !isNaN(props.cheerState.bits) && props.cheerState.bits > 0) {
+      newBits = props.cheerState.bits;
+      newCustomBits = props.cheerState.bits;
+    }
+
     if (CheerStateIsOfficial(props.cheerState)) {
       if (!!props.cheerState.cheerPrefix) {
         newPrefix = CHEER_PREFIX_TO_STRING_MAP.get((props.cheerState.cheerPrefix)) || '';
         newCustomPrefix = CHEER_PREFIX_TO_STRING_MAP.get((props.cheerState.cheerPrefix)) || '';
       }
-      
-      if (!!props.cheerState.bits && !isNaN(props.cheerState.bits) && props.cheerState.bits > 0) {
-        newBits = props.cheerState.bits;
-        newCustomBits = props.cheerState.bits;
-      }
-
     } else if (CheerStateIsCustom(props.cheerState)) {
       newCustomPrefix = props.cheerState.cheerFull || '';
-
-      if (!!props.cheerState.bits && !isNaN(props.cheerState.bits) && props.cheerState.bits > 0) {
-        newBits = props.cheerState.bits;
-        newCustomBits = props.cheerState.bits;
-      }
     }
 
     setCheerPrefix(newPrefix);
