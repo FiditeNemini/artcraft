@@ -4,6 +4,7 @@ import { TtsSingleVoiceForm } from './TtsSingleVoiceForm';
 import { EventResponseType } from './EventResponseType';
 import { EventResponse } from '@storyteller/components/src/api/storyteller/twitch_event_rules/shared/EventResponse';
 import { buildEventResponse } from './BuildEventResponse';
+import { TtsRandomVoiceForm } from './TtsRandomVoiceForm';
 
 interface EventResponseComponentProps {
   // Original response from server.
@@ -81,6 +82,36 @@ function EventResponseComponent(props: EventResponseComponentProps) {
     props.updateModifiedEventResponse(newEventResponse);
   }
 
+  const handleChangedTtsModelTokens = (tokens: string[]) => {
+    let updatedTokens = [... tokens];
+
+    const newEventResponse = buildEventResponse(updatedTokens, eventResponseType);
+
+    setSelectedTtsModelTokens(updatedTokens);
+    props.updateModifiedEventResponse(newEventResponse);
+  }
+
+  let responseForm = <></>
+
+  switch (eventResponseType) {
+    case EventResponseType.TtsSingleVoice:
+      responseForm = <TtsSingleVoiceForm
+        selectedTtsModelTokens={selectedTtsModelTokens}
+        updateSelectedTtsModelToken={handleChangedTtsModelToken}
+        allTtsModels={props.allTtsModels}
+        allTtsModelsByToken={props.allTtsModelsByToken}
+        />
+      break;
+    case EventResponseType.TtsRandomVoice:
+      responseForm = <TtsRandomVoiceForm
+        selectedTtsModelTokens={selectedTtsModelTokens}
+        updateSelectedTtsModelTokens={handleChangedTtsModelTokens}
+        allTtsModels={props.allTtsModels}
+        allTtsModelsByToken={props.allTtsModelsByToken}
+        />
+      break;
+  }
+
   return (
     <>
       <h2 className="title is-4">3) Pick how to respond</h2>
@@ -104,12 +135,7 @@ function EventResponseComponent(props: EventResponseComponentProps) {
 
       <h2 className="title is-4">4) Configure the response</h2>
 
-      <TtsSingleVoiceForm
-        selectedTtsModelTokens={selectedTtsModelTokens}
-        updateSelectedTtsModelToken={handleChangedTtsModelToken}
-        allTtsModels={props.allTtsModels}
-        allTtsModelsByToken={props.allTtsModelsByToken}
-        />
+      {responseForm}
 
       <br />
       <br />

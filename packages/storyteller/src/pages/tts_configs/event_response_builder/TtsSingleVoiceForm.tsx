@@ -62,9 +62,11 @@ function TtsSingleVoiceForm(props: TtsSingleVoiceFormProps) {
 
       <article className="message">
         <div className="message-body">
-          <FakeYouExternalLink>Check out the voices at FakeYou</FakeYouExternalLink> to search for voices, experiment with them,
-          and see how they sound. Sorry that this list is a nightmare to navigate. It will improve over time.
-        </div>
+          We apologize that this list is a nightmare to navigate right now. It will improve over time.
+          In the mean time, <FakeYouExternalLink>check out the voices at FakeYou</FakeYouExternalLink> to 
+          find the voices you want, experiment with them, and see which ones work best for your stream. The 
+          names of the voices at FakeYou are the same as in this dropdown, so you can search at FakeYou, then 
+          add them here when you're done looking.</div>
       </article>
     </>
   )
