@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import { TtsModelListItem } from '@storyteller/components/src/api/tts/ListTtsModels';
 import { BitsRuleType } from './types/BitsRuleType';
 import { TwitchEventCategory } from '@storyteller/components/src/api/storyteller/twitch_event_rules/shared/TwitchEventCategory';
 import { EventMatchPredicate } from '@storyteller/components/src/api/storyteller/twitch_event_rules/shared/EventMatchPredicate';
@@ -22,10 +21,6 @@ interface EventMatchPredicateBuilderComponentProps {
 
   // Updates sent back up the tree
   updateModifiedEventMatchPredicate: (predicate: EventMatchPredicate) => void,
-
-  // FakeYou voices
-  allTtsModels: TtsModelListItem[],
-  allTtsModelsByToken: Map<string, TtsModelListItem>,
 };
 
 function EventMatchPredicateBuilderComponent(props: EventMatchPredicateBuilderComponentProps) {

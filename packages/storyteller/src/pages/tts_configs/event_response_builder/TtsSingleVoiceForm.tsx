@@ -3,9 +3,8 @@ import { TtsModelListItem } from '@storyteller/components/src/api/tts/ListTtsMod
 import { FakeYouExternalLink } from '@storyteller/components/src/elements/FakeYouExternalLink';
 
 interface TtsSingleVoiceFormProps {
-  // Storyteller TTS configs
-  ttsModelToken: string,
-  setTtsModelToken: (token: string) => void,
+  selectedTtsModelTokens: string[],
+  updateSelectedTtsModelToken: (token: string) => void,
 
   // FakeYou voices
   allTtsModels: TtsModelListItem[],
@@ -20,8 +19,8 @@ function TtsSingleVoiceForm(props: TtsSingleVoiceFormProps) {
   //  https://stackoverflow.com/a/54866051 (less clear by also using useState(), but good comments)
   //  https://stackoverflow.com/a/62982753
   useEffect(() => {
-    setTtsModelToken(props.ttsModelToken);
-  }, [props.ttsModelToken]);
+    //setTtsModelToken(props.ttsModelToken);
+  }, []);
 
 
   const handleModelSelect = (ev: React.FormEvent<HTMLSelectElement>) : boolean => {
@@ -32,7 +31,7 @@ function TtsSingleVoiceForm(props: TtsSingleVoiceFormProps) {
     }
 
     setTtsModelToken(value);
-    props.setTtsModelToken(value);
+    //props.setTtsModelToken(value);
     return true;
   }
 

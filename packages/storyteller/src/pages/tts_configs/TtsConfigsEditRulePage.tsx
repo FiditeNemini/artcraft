@@ -40,13 +40,6 @@ function TtsConfigsEditRulePage(props: Props) {
   const [modifiedEventResponse, setModifiedEventResponse] = useState<EventResponse>({});
   const [ruleIsDisabled, setRuleIsDisabled] = useState(false);
 
-  // ========== ??? ==========
-
-  // TODO: GET RID OF THIS
-  const [eventResponseType, setEventResponseType] = useState<EventResponseType>(EventResponseType.TtsSingleVoice);
-  // TODO: GET RID OF THIS
-  const [ttsModelToken, setTtsModelToken] = useState(''); 
-
   const getTwitchEventRule = useCallback(async (token: string) => {
     const response = await GetTwitchEventRule(token);
 
@@ -61,15 +54,6 @@ function TtsConfigsEditRulePage(props: Props) {
       setModifiedEventResponse(response.twitch_event_rule.event_response);
       setRuleIsDisabled(response.twitch_event_rule.rule_is_disabled);
 
-      // TODO: MOVE THIS
-      if (!!response.twitch_event_rule.event_response.tts_single_voice) {
-        setEventResponseType(EventResponseType.TtsSingleVoice);
-        setTtsModelToken(response.twitch_event_rule.event_response.tts_single_voice.tts_model_token)
-      } else if (!!response.twitch_event_rule.event_response.tts_random_voice) {
-        setEventResponseType(EventResponseType.TtsRandomVoice);
-        // TODO
-      }
-
     } else if (GetTwitchEventRuleIsError(response))  {
       // TODO
     }
@@ -79,24 +63,12 @@ function TtsConfigsEditRulePage(props: Props) {
     getTwitchEventRule(token);
   }, [getTwitchEventRule, token]);
 
-  const updateTtsModelToken = (token: string) => {
-    let response : EventResponse = {};
-
-    switch (eventResponseType) {
-      case EventResponseType.TtsSingleVoice:
-        response.tts_single_voice = {
-          tts_model_token: token,
-        }
-        break;
-      case EventResponseType.TtsRandomVoice:
-        break;
-    }
-
-    setTtsModelToken(token);
-  }
-
   const updateModifiedEventMatchPredicate = (predicate: EventMatchPredicate) => {
     setModifiedEventMatchPredicate(predicate);
+  }
+
+  const updateModifiedEventResponse = (response: EventResponse) => {
+    setModifiedEventResponse(response);
   }
 
   const handleFormSubmit = async (ev: React.FormEvent<HTMLFormElement>) : Promise<boolean> => {
@@ -161,18 +133,16 @@ function TtsConfigsEditRulePage(props: Props) {
           twitchEventCategory={twitchEventRule.event_category}
           serverEventMatchPredicate={serverEventMatchPredicate}
           updateModifiedEventMatchPredicate={updateModifiedEventMatchPredicate}
-          allTtsModels={props.allTtsModels}
-          allTtsModelsByToken={props.allTtsModelsByToken}
           />
 
         <br />
         <br />
 
         <EventResponseComponent
+          serverEventResponse={serverEventResponse}
+          updateModifiedEventResponse={updateModifiedEventResponse}
           allTtsModels={props.allTtsModels}
           allTtsModelsByToken={props.allTtsModelsByToken}
-          setTtsModelToken={updateTtsModelToken}
-          ttsModelToken={ttsModelToken}
           />
 
         <h2 className="title is-4">This is the rule:</h2>
