@@ -357,6 +357,10 @@ class ApiConfig {
     return `${this.getScheme()}://${this.getNewApiHost()}/twitch/event_rule/create`;
   }
 
+  reorderTwitchEventRules() : string {
+    return `${this.getScheme()}://${this.getNewApiHost()}/twitch/event_rule/reorder`;
+  }
+
   getTwitchEventRule(eventRuleToken: string) : string {
     return `${this.getScheme()}://${this.getNewApiHost()}/twitch/event_rule/${eventRuleToken}/info`;
   }
