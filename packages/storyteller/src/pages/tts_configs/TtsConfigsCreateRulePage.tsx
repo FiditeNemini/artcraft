@@ -29,10 +29,10 @@ function TtsConfigsCreateRulePage(props: Props) {
 
   // ========== In-Progress Model Edits ==========
 
-  // NB: This is a HACK. The views were created initially for "Edit" UI and this had 
-  // to be done to get them to work for "Create" UI:
-  //
   // Sent to sub-components to initialize UI
+  // NB: This is a HACK. The subcomponent views were originally created for the "Edit" UI 
+  // and this had to be done to get them to work for "Create" UI. Sending empty dictionaries 
+  // or statically initialized values froze the UI.
   const [serverEventMatchPredicate, setServerEventMatchPredicate] = useState<EventMatchPredicate>({});
   const [serverEventResponse, setServerEventResponse] = useState<EventResponse>({});
 
@@ -138,7 +138,7 @@ function TtsConfigsCreateRulePage(props: Props) {
         <br />
 
         <EventResponseComponent
-          serverEventResponse={emptyEventResponse}
+          serverEventResponse={serverEventResponse}
           updateModifiedEventResponse={updateModifiedEventResponse}
           allTtsModels={props.allTtsModels}
           allTtsModelsByToken={props.allTtsModelsByToken}
