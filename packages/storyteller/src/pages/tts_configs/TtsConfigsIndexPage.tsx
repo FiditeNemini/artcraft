@@ -5,7 +5,7 @@ import { TwitchEventRuleElement } from './rule_cards/TwitchEventRuleElement';
 import { TwitchEventCategory } from '@storyteller/components/src/api/storyteller/twitch_event_rules/shared/TwitchEventCategory';
 import { DiscordLink } from '@storyteller/components/src/elements/DiscordLink';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faBox, faDonate, faGem, faHeart, faLightbulb, faMeteor, faPlus, faSort, faTerminal } from '@fortawesome/free-solid-svg-icons';
+import { faBox, faDonate, faFilm, faGem, faHeart, faLightbulb, faMeteor, faPlus, faSort, faTerminal, faUserFriends, faUsers } from '@fortawesome/free-solid-svg-icons';
 import { TtsModelListItem } from '@storyteller/components/src/api/tts/ListTtsModels';
 import { Link } from 'react-router-dom';
 
@@ -150,6 +150,24 @@ function TtsConfigsIndexPage(props: Props) {
         <h1 className="title is-5"> <FontAwesomeIcon icon={faTerminal} /> Text <code>/slash</code> Commands</h1>
         <h2 className="subtitle is-6">
           These settings are great for very small channels.
+        </h2>
+      </div>
+
+      <br />
+
+      <div className="content">
+        <h1 className="title is-4"> <FontAwesomeIcon icon={faFilm} /> User-generated Animated Deepfake Rewards </h1>
+        <h2 className="subtitle is-6">
+          A lip-synced, green screened <em>&ldquo;Famous Person&rdquo;</em> pops up and says something.
+        </h2>
+      </div>
+
+      <br />
+
+      <div className="content">
+        <h1 className="title is-4"> <FontAwesomeIcon icon={faUsers} /> Multi Voice and Sound Effects </h1>
+        <h2 className="subtitle is-6">
+          User-selected voices can be strung together in a single reward, interspersed with sound effects.
         </h2>
       </div>
 
