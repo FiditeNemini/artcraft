@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { SessionWrapper } from '@storyteller/components/src/session/SessionWrapper';
 import { TtsModelListItem } from '@storyteller/components/src/api/tts/ListTtsModels';
 import { TwitchEventRule } from '@storyteller/components/src/api/storyteller/twitch_event_rules/GetTwitchEventRule';
@@ -12,6 +12,8 @@ import { EventResponseComponent } from './event_response_builder/EventResponseCo
 import { TwitchEventRuleElement } from './TwitchEventRuleElement';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faAngleLeft, faSave } from '@fortawesome/free-solid-svg-icons';
+import { buildEventResponse } from './event_response_builder/BuildEventResponse';
+import { EventResponseType } from './event_response_builder/EventResponseType';
 
 interface Props {
   sessionWrapper: SessionWrapper,
@@ -28,18 +30,26 @@ function TtsConfigsCreateRulePage(props: Props) {
   // ========== In-Progress Model Edits ==========
 
   const [twitchEventCategory, setTwitchEventCategory] = useState<TwitchEventCategory>(TwitchEventCategory.Bits);
-  const [eventMatchPredicate, setEventMatchPredicate] = useState<EventMatchPredicate>({});
-  const [eventResponse, setEventResponse] = useState<EventResponse>({});
   const [ruleIsDisabled, setRuleIsDisabled] = useState(false);
 
+  const [modifiedEventMatchPredicate, setModifiedEventMatchPredicate] = useState<EventMatchPredicate>({});
+  const [modifiedEventResponse, setModifiedEventResponse] = useState<EventResponse>({});
+
+  const handleChangeTwitchEventCategory = (ev: React.FormEvent<HTMLSelectElement>) : boolean => {
+    const value = (ev.target as HTMLSelectElement).value;
+    const newTwitchEventCategory = value as TwitchEventCategory;
+    setTwitchEventCategory(newTwitchEventCategory);
+    return true;
+  }
+  
   const updateModifiedEventMatchPredicate = (predicate: EventMatchPredicate) => {
     // TODO
-    // setModifiedEventMatchPredicate(predicate);
+    setModifiedEventMatchPredicate(predicate);
   }
 
   const updateModifiedEventResponse = (response: EventResponse) => {
     // TODO
-    // setModifiedEventResponse(response);
+    setModifiedEventResponse(response);
   }
 
   const handleFormSubmit = async (ev: React.FormEvent<HTMLFormElement>) : Promise<boolean> => {
@@ -47,8 +57,10 @@ function TtsConfigsCreateRulePage(props: Props) {
 
     // TODO: Check for errors.
 
-    let newEventMatchPredicate = eventMatchPredicate;
-    let newEventResponse = eventResponse;
+    let newEventMatchPredicate = modifiedEventMatchPredicate;
+    let newEventResponse = modifiedEventResponse;
+
+    // TODO: UUID idempotency token that updates on every model change.
 
     const request : CreateTwitchEventRuleRequest = {
       idempotency_token: 'todo',
@@ -82,8 +94,8 @@ function TtsConfigsCreateRulePage(props: Props) {
 
     // Updated in UI
     event_category: twitchEventCategory,
-    event_match_predicate: eventMatchPredicate,
-    event_response: eventResponse,
+    event_match_predicate: modifiedEventMatchPredicate,
+    event_response: modifiedEventResponse,
     rule_is_disabled: ruleIsDisabled,
   };
 
@@ -101,6 +113,28 @@ function TtsConfigsCreateRulePage(props: Props) {
       <br />
 
       <form onSubmit={handleFormSubmit}>
+
+        <h2 className="title is-4">1) Pick the type of event </h2>
+
+        <div className="field">
+          <div className="control">
+            <div className="select is-medium is-fullwidth">
+              <select 
+                value={twitchEventCategory}
+                onChange={handleChangeTwitchEventCategory}>
+                <option 
+                  value={TwitchEventCategory.Bits}
+                  >Bits and Cheering</option>
+                <option 
+                  value={TwitchEventCategory.ChannelPoints}
+                  >Channel Points</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <br />
+        <br />
 
         <EventMatchPredicateBuilderComponent
           twitchEventCategory={twitchEventCategory}
