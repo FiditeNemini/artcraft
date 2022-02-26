@@ -9,7 +9,6 @@ pub struct UpdateTwitchEventRuleBuilder {
   pub token: String,
   pub event_match_predicate: String,
   pub event_response: String,
-  pub user_specified_rule_order: u32,
   pub rule_is_disabled: bool,
   pub ip_address_update: String,
 }
@@ -24,7 +23,6 @@ UPDATE twitch_event_rules
 SET
   event_match_predicate = ?,
   event_response = ?,
-  user_specified_rule_order = ?,
   rule_is_disabled = ?,
   ip_address_last_update = ?
 WHERE
@@ -34,7 +32,6 @@ LIMIT 1
         "#,
       &self.event_match_predicate,
       &self.event_response,
-      &self.user_specified_rule_order,
       &self.rule_is_disabled,
       &self.ip_address_update,
       &self.token,

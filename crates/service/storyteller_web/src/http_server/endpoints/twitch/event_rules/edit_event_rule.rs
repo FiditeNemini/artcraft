@@ -35,7 +35,6 @@ pub struct EditTwitchEventRulePathInfo {
 pub struct EditTwitchEventRuleRequest {
   pub event_match_predicate: Option<EventMatchPredicate>,
   pub event_response: Option<EventResponse>,
-  pub user_specified_rule_order: u32,
   pub rule_is_disabled: bool,
 }
 
@@ -147,7 +146,6 @@ pub async fn edit_twitch_event_rule_handler(
     token: path.token.clone(),
     event_match_predicate,
     event_response,
-    user_specified_rule_order: request.user_specified_rule_order,
     rule_is_disabled: request.rule_is_disabled,
     ip_address_update: creator_ip_address,
   };
