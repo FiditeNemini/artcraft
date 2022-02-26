@@ -56,6 +56,8 @@ function TtsRandomVoiceForm(props: TtsRandomVoiceFormProps) {
 
     props.updateSelectedTtsModelTokens(newModelTokens);
   }
+  
+  const deleteDisabled = props.selectedTtsModelTokens.length < 2;
 
   let selectBoxes : JSX.Element[] = [];
 
@@ -70,6 +72,7 @@ function TtsRandomVoiceForm(props: TtsRandomVoiceFormProps) {
         voiceIndex={index}
         handleModelSelect={handleModelSelect}
         handleModelDelete={handleModelDelete}
+        deleteDisabled={deleteDisabled}
         allTtsModels={props.allTtsModels}
         allTtsModelsByToken={props.allTtsModelsByToken}
         />
@@ -84,6 +87,7 @@ function TtsRandomVoiceForm(props: TtsRandomVoiceFormProps) {
         voiceIndex={0}
         handleModelSelect={handleModelSelect}
         handleModelDelete={handleModelDelete}
+        deleteDisabled={false}
         allTtsModels={props.allTtsModels}
         allTtsModelsByToken={props.allTtsModelsByToken}
         />
@@ -123,6 +127,9 @@ interface VoiceDropdownProps {
   // Callbacks
   handleModelSelect: (token: string, index: number) => void,
   handleModelDelete: (index: number) => void,
+
+  // Whether to disable the delete button
+  deleteDisabled: boolean,
 
   // FakeYou voices
   allTtsModels: TtsModelListItem[],
@@ -184,6 +191,7 @@ function VoiceDropdown(props: VoiceDropdownProps) {
           <button 
             onClick={handleRemoveClick}
             className="button is-medium is-danger is-inverted"
+            disabled={props.deleteDisabled}
             >
             <FontAwesomeIcon icon={faTrash} />&nbsp;Remove
           </button>
