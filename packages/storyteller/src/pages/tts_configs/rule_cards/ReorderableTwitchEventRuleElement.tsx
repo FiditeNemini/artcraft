@@ -23,10 +23,6 @@ function ReorderableTwitchEventRuleElement(props: Props) {
   let subtitle = <></>;
   let description = <></>;
 
-  const handleClickUp = (ev: React.FormEvent<HTMLButtonElement>) : boolean => {
-    return true;
-  }
-
   if (props.rule.event_match_predicate.bits_cheermote_name_exact_match !== undefined) {
     title = "Cheermote Name Matches"
     subtitle = (

@@ -41,6 +41,7 @@ function TtsConfigsReorderPage(props: Props) {
   }, []);
 
   useEffect(() => {
+    console.log('useEffect');
     let maybeTwitchEventCategory = TWITCH_EVENT_CATEGORY_BY_STRING.get(event_category);
 
     if (maybeTwitchEventCategory === undefined) {
@@ -53,11 +54,40 @@ function TtsConfigsReorderPage(props: Props) {
   }, [listTwitchEventRules, event_category, history]);
 
   const handleMoveUp = (ruleIndex: number) => {
+    let newEventRules = [...twitchEventRules];
 
+    if (ruleIndex >= newEventRules.length || // Walk off end
+      ruleIndex === 0) { // Can't move up.
+      return false;
+    }
+
+    let aboveIndex = ruleIndex - 1;
+    let aboveRule = newEventRules[aboveIndex];
+
+    newEventRules[aboveIndex] = newEventRules[ruleIndex];
+    newEventRules[ruleIndex] = aboveRule;
+
+    setTwitchEventRules(newEventRules);
   }
 
   const handleMoveDown = (ruleIndex: number) => {
+    let newEventRules = [...twitchEventRules];
 
+    if (ruleIndex < 0 || // Invalid
+      ruleIndex >= newEventRules.length - 1) { // Can't move down.
+      return false;
+    }
+
+    let belowIndex = ruleIndex + 1;
+
+    console.log(ruleIndex, belowIndex);
+
+    let belowRule = newEventRules[belowIndex];
+
+    newEventRules[belowIndex] = newEventRules[ruleIndex];
+    newEventRules[ruleIndex] = belowRule;
+
+    setTwitchEventRules(newEventRules);
   }
 
   if (!props.sessionWrapper.isLoggedIn()) {
