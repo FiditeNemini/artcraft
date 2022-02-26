@@ -20,6 +20,7 @@ import { initReactI18next } from 'react-i18next';
 import { TtsConfigsCreateRulePage } from './pages/tts_configs/TtsConfigsCreateRulePage';
 import { TtsConfigsDeleteRulePage } from './pages/tts_configs/TtsConfigsDeleteRulePage';
 import { TtsConfigsEditRulePage } from './pages/tts_configs/TtsConfigsEditRulePage';
+import { TtsConfigsReorderPage } from './pages/tts_configs/TtsConfigsReorderPage';
 
 i18n
   .use(initReactI18next) // passes i18n down to react-i18next
@@ -144,6 +145,12 @@ class App extends React.Component<Props, State> {
                 <TtsConfigsCreateRulePage
                   sessionWrapper={this.state.sessionWrapper}
                   allTtsModels={this.state.allTtsModels}
+                  allTtsModelsByToken={this.state.allTtsModelsByToken}
+                />
+              </Route>
+              <Route path="/tts_configs/reorder/:event_category">
+                <TtsConfigsReorderPage
+                  sessionWrapper={this.state.sessionWrapper}
                   allTtsModelsByToken={this.state.allTtsModelsByToken}
                 />
               </Route>

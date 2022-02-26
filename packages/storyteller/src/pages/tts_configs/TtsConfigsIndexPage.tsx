@@ -1,11 +1,11 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { SessionWrapper } from '@storyteller/components/src/session/SessionWrapper';
 import { ListTwitchEventRules, ListTwitchEventRulesIsError, ListTwitchEventRulesIsOk, TwitchEventRule } from '@storyteller/components/src/api/storyteller/twitch_event_rules/ListTwitchEventRules';
-import { TwitchEventRuleElement } from './TwitchEventRuleElement';
+import { TwitchEventRuleElement } from './rule_cards/TwitchEventRuleElement';
 import { TwitchEventCategory } from '@storyteller/components/src/api/storyteller/twitch_event_rules/shared/TwitchEventCategory';
 import { DiscordLink } from '@storyteller/components/src/elements/DiscordLink';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faBox, faDonate, faGem, faHeart, faLightbulb, faMeteor, faPlus, faTerminal } from '@fortawesome/free-solid-svg-icons';
+import { faBox, faDonate, faGem, faHeart, faLightbulb, faMeteor, faPlus, faSort, faTerminal } from '@fortawesome/free-solid-svg-icons';
 import { TtsModelListItem } from '@storyteller/components/src/api/tts/ListTtsModels';
 import { Link } from 'react-router-dom';
 
@@ -80,6 +80,15 @@ function TtsConfigsIndexPage(props: Props) {
       </Link>
 
       <br />
+
+      <Link
+        to="/tts_configs/reorder/bits" 
+        className="button is-large is-fullwidth is-primary is-outlined"
+        >
+        <FontAwesomeIcon icon={faSort} />&nbsp;Reorder Rules
+      </Link>
+
+      <br />
       <br />
 
       <div className="content">
@@ -101,6 +110,15 @@ function TtsConfigsIndexPage(props: Props) {
         className="button is-large is-fullwidth is-primary"
         >
         <FontAwesomeIcon icon={faPlus} />&nbsp;Create Channel Points Rule
+      </Link>
+
+      <br />
+      
+      <Link
+        to="/tts_configs/reorder/channel_points" 
+        className="button is-large is-fullwidth is-primary is-outlined"
+        >
+        <FontAwesomeIcon icon={faSort} />&nbsp;Reorder Rules
       </Link>
 
       <br />

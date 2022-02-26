@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { SessionWrapper } from '@storyteller/components/src/session/SessionWrapper';
 import { GetTwitchEventRule, GetTwitchEventRuleIsError, GetTwitchEventRuleIsOk, TwitchEventRule } from '@storyteller/components/src/api/storyteller/twitch_event_rules/GetTwitchEventRule';
 import { EditTwitchEventRule, EditTwitchEventRuleRequest } from '@storyteller/components/src/api/storyteller/twitch_event_rules/EditTwitchEventRule';
-import { TwitchEventRuleElement } from './TwitchEventRuleElement';
+import { TwitchEventRuleElement } from './rule_cards/TwitchEventRuleElement';
 import { Link, useHistory, useParams } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faAngleLeft, faSave } from '@fortawesome/free-solid-svg-icons';

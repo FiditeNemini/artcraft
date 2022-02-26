@@ -9,7 +9,7 @@ import { EventMatchPredicate } from '@storyteller/components/src/api/storyteller
 import { CreateTwitchEventRule, CreateTwitchEventRuleRequest } from '@storyteller/components/src/api/storyteller/twitch_event_rules/CreateTwitchEventRule';
 import { EventMatchPredicateBuilderComponent } from './event_match_predicate_builder/EventMatchPredicateBuilderComponent';
 import { EventResponseComponent } from './event_response_builder/EventResponseComponent';
-import { TwitchEventRuleElement } from './TwitchEventRuleElement';
+import { TwitchEventRuleElement } from './rule_cards/TwitchEventRuleElement';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faAngleLeft, faSave } from '@fortawesome/free-solid-svg-icons';
 
@@ -47,15 +47,14 @@ function TtsConfigsCreateRulePage(props: Props) {
     return <></>;
   }
 
+  // NB: To satisfy the type system and not be a union on 'undefined'
   const twitchEventCategory = maybeTwitchEventCategory;
 
   const updateModifiedEventMatchPredicate = (predicate: EventMatchPredicate) => {
-    // TODO
     setModifiedEventMatchPredicate(predicate);
   }
 
   const updateModifiedEventResponse = (response: EventResponse) => {
-    // TODO
     setModifiedEventResponse(response);
   }
 
@@ -85,7 +84,6 @@ function TtsConfigsCreateRulePage(props: Props) {
 
     return false;
   }
-
 
   if (!props.sessionWrapper.isLoggedIn()) {
     return <h1>Must Log In</h1>;
