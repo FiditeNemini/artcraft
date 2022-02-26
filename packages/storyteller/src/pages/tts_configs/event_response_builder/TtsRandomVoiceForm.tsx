@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { TtsModelListItem } from '@storyteller/components/src/api/tts/ListTtsModels';
 import { FakeYouExternalLink } from '@storyteller/components/src/elements/FakeYouExternalLink';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faPlus } from '@fortawesome/free-solid-svg-icons';
 
 interface TtsRandomVoiceFormProps {
   selectedTtsModelTokens: string[],
@@ -36,29 +38,54 @@ function TtsRandomVoiceForm(props: TtsRandomVoiceFormProps) {
     return true;
   }
 
+
+  const handleModelSelect2 = (ttsModelToken: string, voiceIndex: number) => {
+    // TODO; also rename
+  }
+
+  console.log('selected', props.selectedTtsModelTokens);
+
+  let selectBoxes : JSX.Element[] = [];
+
+  // No tokens - show one box (unselected)
+  // One or more tokens - show boxes for each (with selections)
+
+  props.selectedTtsModelTokens.forEach((token, index) => {
+    selectBoxes.push(
+      <VoiceDropdown
+        key={index}
+        selectedTtsModelToken={token}
+        voiceIndex={index}
+        handleModelSelect={handleModelSelect2}
+        allTtsModels={props.allTtsModels}
+        allTtsModelsByToken={props.allTtsModelsByToken}
+        />
+    )
+  });
+
+  if (selectBoxes.length === 0) {
+    selectBoxes.push(
+      <VoiceDropdown
+        key={0}
+        selectedTtsModelToken={""}
+        voiceIndex={0}
+        handleModelSelect={handleModelSelect2}
+        allTtsModels={props.allTtsModels}
+        allTtsModelsByToken={props.allTtsModelsByToken}
+        />
+    )
+  }
+
   return (
     <>
-      <div className="field">
-        <label className="label">TTS Voice Model</label>
-        <div className="control">
-          <div className="select is-medium is-fullwidth">
-            <select
-              value={ttsModelToken}
-              onChange={handleModelSelect}
-              >
-              <option value="">Select a voice...</option>
-              {props.allTtsModels.map(ttsModel => {
-                return (
-                  <option
-                    key={`option-${ttsModel.model_token}`}
-                    value={ttsModel.model_token}
-                  >{ttsModel.title}</option>
-                );
-              })}
-            </select>
-          </div>
-        </div>
-      </div>
+
+      {selectBoxes}
+
+      <button className="button is-large is-fullwidth is-info">
+        <FontAwesomeIcon icon={faPlus} />&nbsp;Add Additional Voice
+      </button>
+
+      <br />
 
       <article className="message">
         <div className="message-body">
@@ -68,6 +95,61 @@ function TtsRandomVoiceForm(props: TtsRandomVoiceFormProps) {
       </article>
     </>
   )
+}
+
+interface VoiceDropdownProps {
+  // Actual token, empty string, or undefined
+  selectedTtsModelToken?: string,
+
+  // Position in the list, 0-indexed
+  voiceIndex: number,
+
+  // Callbacks
+  handleModelSelect: (token: string, index: number) => void,
+
+  // FakeYou voices
+  allTtsModels: TtsModelListItem[],
+  allTtsModelsByToken: Map<string, TtsModelListItem>,
+}
+
+function VoiceDropdown(props: VoiceDropdownProps) {
+
+  const handleSelectChange = (ev: React.FormEvent<HTMLSelectElement>) : boolean => {
+    const value = (ev.target as HTMLSelectElement).value;
+    props.handleModelSelect(value, props.voiceIndex);
+    return true;
+  }
+
+  return (
+    <div key={`dropdown-${props.voiceIndex}`}>
+      <div className="field">
+        <label className="label">TTS Voice Model</label>
+        <div className="control">
+          <div className="select is-medium is-fullwidth">
+            <select
+              value={props.selectedTtsModelToken}
+              onChange={handleSelectChange}
+              >
+              <option 
+                key={`option-${props.voiceIndex}-*`}
+                value="">
+                Select a voice...</option>
+              {props.allTtsModels.map(ttsModel => {
+                return (
+                  <option
+                    key={`option-${props.voiceIndex}-${ttsModel.model_token}`}
+                    value={ttsModel.model_token}
+                  >{ttsModel.title}</option>
+                );
+              })}
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <br />
+    </div>
+  );
 }
 
 export { TtsRandomVoiceForm }
