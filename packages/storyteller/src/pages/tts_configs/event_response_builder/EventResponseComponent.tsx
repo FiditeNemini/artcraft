@@ -60,8 +60,13 @@ function EventResponseComponent(props: EventResponseComponentProps) {
 
   const handleChangedEventResponseType = (ev: React.FormEvent<HTMLSelectElement>) : boolean => {
     const value = (ev.target as HTMLSelectElement).value;
-    const responseType = value as EventResponseType;
-    setEventResponseType(responseType);
+    const newResponseType = value as EventResponseType;
+
+    const newEventResponse = buildEventResponse(selectedTtsModelTokens, newResponseType);
+
+    setEventResponseType(newResponseType);
+    props.updateModifiedEventResponse(newEventResponse);
+
     return true;
   }
 

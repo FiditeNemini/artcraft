@@ -73,12 +73,10 @@ function TtsConfigsEditRulePage(props: Props) {
   const handleFormSubmit = async (ev: React.FormEvent<HTMLFormElement>) : Promise<boolean> => {
     ev.preventDefault();
 
-    // TODO
-    // TODO
-    // TODO
+    // TODO: Check for errors.
 
-    let newEventMatchPredicate = {};
-    let newEventResponse = {};
+    let newEventMatchPredicate = modifiedEventMatchPredicate;
+    let newEventResponse = modifiedEventResponse;
 
     const request = {
       event_match_predicate: newEventMatchPredicate,

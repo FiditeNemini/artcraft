@@ -1,7 +1,7 @@
 import { EventResponse } from "@storyteller/components/src/api/storyteller/twitch_event_rules/shared/EventResponse";
 import { EventResponseType } from "./EventResponseType";
 
-export function buildEventResponse(ttsModelTokens: string[], eventResponseType: EventResponseType) {
+export function buildEventResponse(ttsModelTokens: string[], eventResponseType: EventResponseType) :EventResponse {
   let eventResponse : EventResponse = {};
 
   switch (eventResponseType) {
