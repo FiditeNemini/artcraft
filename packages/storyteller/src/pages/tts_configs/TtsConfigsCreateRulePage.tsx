@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { SessionWrapper } from '@storyteller/components/src/session/SessionWrapper';
 import { TtsModelListItem } from '@storyteller/components/src/api/tts/ListTtsModels';
 import { TwitchEventRule } from '@storyteller/components/src/api/storyteller/twitch_event_rules/GetTwitchEventRule';
-import { Link, useHistory } from 'react-router-dom';
+import { Link, useHistory, useParams } from 'react-router-dom';
 import { TwitchEventCategory } from '@storyteller/components/src/api/storyteller/twitch_event_rules/shared/TwitchEventCategory';
 import { EventResponse } from '@storyteller/components/src/api/storyteller/twitch_event_rules/shared/EventResponse';
 import { EventMatchPredicate } from '@storyteller/components/src/api/storyteller/twitch_event_rules/shared/EventMatchPredicate';
@@ -22,6 +22,8 @@ interface Props {
 }
 
 function TtsConfigsCreateRulePage(props: Props) {
+  const { eventCategory } = useParams() as { eventCategory : string };
+
   // TODO: Use centralized configs
   const indexLink = '/tts_configs';
 

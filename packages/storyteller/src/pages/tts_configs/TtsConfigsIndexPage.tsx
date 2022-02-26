@@ -5,7 +5,7 @@ import { TwitchEventRuleElement } from './TwitchEventRuleElement';
 import { TwitchEventCategory } from '@storyteller/components/src/api/storyteller/twitch_event_rules/shared/TwitchEventCategory';
 import { DiscordLink } from '@storyteller/components/src/elements/DiscordLink';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faBox, faDonate, faGem, faHeart, faLightbulb, faPlus, faTerminal } from '@fortawesome/free-solid-svg-icons';
+import { faBox, faDonate, faGem, faHeart, faLightbulb, faMeteor, faPlus, faTerminal } from '@fortawesome/free-solid-svg-icons';
 import { TtsModelListItem } from '@storyteller/components/src/api/tts/ListTtsModels';
 import { Link } from 'react-router-dom';
 
@@ -72,6 +72,14 @@ function TtsConfigsIndexPage(props: Props) {
         })}
       </div>
 
+      <Link
+        to="/tts_configs/create/bits" 
+        className="button is-large is-fullwidth is-primary"
+        >
+        <FontAwesomeIcon icon={faPlus} />&nbsp;Create New Bits / Cheer Rule
+      </Link>
+
+      <br />
       <br />
 
       <div className="content">
@@ -89,13 +97,18 @@ function TtsConfigsIndexPage(props: Props) {
       </div>
 
       <Link
-        to="/tts_configs/create" 
+        to="/tts_configs/create/channel_points" 
         className="button is-large is-fullwidth is-primary"
         >
-        <FontAwesomeIcon icon={faPlus} />&nbsp;Create New Rule
+        <FontAwesomeIcon icon={faPlus} />&nbsp;Create Channel Points Rule
       </Link>
 
       <br />
+      <br />
+
+      <div className="content">
+        <h1 className="title is-1"> <FontAwesomeIcon icon={faMeteor} /> Coming Soon&hellip;</h1>
+      </div>
       <br />
 
       <div className="content">
@@ -103,7 +116,6 @@ function TtsConfigsIndexPage(props: Props) {
         <h2 className="subtitle is-6">
           These settings are great for all channel sizes.
         </h2>
-        <p>Coming soon&hellip;</p>
       </div>
       <br />
 
@@ -112,7 +124,6 @@ function TtsConfigsIndexPage(props: Props) {
         <h2 className="subtitle is-6">
           These settings are great for large channels, but work for channels of all sizes.
         </h2>
-        <p>Coming soon&hellip;</p>
       </div>
 
       <br />
@@ -122,13 +133,12 @@ function TtsConfigsIndexPage(props: Props) {
         <h2 className="subtitle is-6">
           These settings are great for very small channels.
         </h2>
-        <p>Coming soon&hellip;</p>
       </div>
 
       <br />
 
       <div className="content">
-        <h1 className="title"> <FontAwesomeIcon icon={faLightbulb} /> Suggestions? </h1>
+        <h1 className="title is-2"> <FontAwesomeIcon icon={faLightbulb} /> Suggestions? </h1>
         <h2 className="subtitle is-4">
           Let us know what to build!
         </h2>
