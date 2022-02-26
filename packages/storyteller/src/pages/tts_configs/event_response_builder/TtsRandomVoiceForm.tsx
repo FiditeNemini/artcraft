@@ -26,21 +26,27 @@ function TtsRandomVoiceForm(props: TtsRandomVoiceFormProps) {
     }
   }, [props.selectedTtsModelTokens]);
 
-  const handleModelSelect = (ev: React.FormEvent<HTMLSelectElement>) : boolean => {
-    const value = (ev.target as HTMLSelectElement).value;
+  const handleAddVoice = (ev: React.FormEvent<HTMLButtonElement>) : boolean => {
+    ev.preventDefault();
 
-    if (!!value && !props.allTtsModelsByToken.has(value)) {
-      return false;
-    }
+    let newModelTokens = [...props.selectedTtsModelTokens];
 
-    setTtsModelToken(value);
-    props.updateSelectedTtsModelTokens([value]); // TODO
+    newModelTokens.push('');
+
+    props.updateSelectedTtsModelTokens(newModelTokens);
+
     return true;
   }
 
+  const handleModelSelect = (ttsModelToken: string, voiceIndex: number) => {
+    let newModelTokens = [...props.selectedTtsModelTokens];
 
-  const handleModelSelect2 = (ttsModelToken: string, voiceIndex: number) => {
-    // TODO; also rename
+    if (voiceIndex >= ttsModelToken.length) {
+      return;
+    }
+
+    newModelTokens[voiceIndex] = ttsModelToken;
+    props.updateSelectedTtsModelTokens(newModelTokens);
   }
 
   console.log('selected', props.selectedTtsModelTokens);
@@ -56,7 +62,7 @@ function TtsRandomVoiceForm(props: TtsRandomVoiceFormProps) {
         key={index}
         selectedTtsModelToken={token}
         voiceIndex={index}
-        handleModelSelect={handleModelSelect2}
+        handleModelSelect={handleModelSelect}
         allTtsModels={props.allTtsModels}
         allTtsModelsByToken={props.allTtsModelsByToken}
         />
@@ -69,7 +75,7 @@ function TtsRandomVoiceForm(props: TtsRandomVoiceFormProps) {
         key={0}
         selectedTtsModelToken={""}
         voiceIndex={0}
-        handleModelSelect={handleModelSelect2}
+        handleModelSelect={handleModelSelect}
         allTtsModels={props.allTtsModels}
         allTtsModelsByToken={props.allTtsModelsByToken}
         />
@@ -81,7 +87,10 @@ function TtsRandomVoiceForm(props: TtsRandomVoiceFormProps) {
 
       {selectBoxes}
 
-      <button className="button is-large is-fullwidth is-info">
+      <button 
+        className="button is-large is-fullwidth is-info"
+        onClick={handleAddVoice}
+        >
         <FontAwesomeIcon icon={faPlus} />&nbsp;Add Additional Voice
       </button>
 
@@ -98,8 +107,8 @@ function TtsRandomVoiceForm(props: TtsRandomVoiceFormProps) {
 }
 
 interface VoiceDropdownProps {
-  // Actual token, empty string, or undefined
-  selectedTtsModelToken?: string,
+  // Actual token or empty string
+  selectedTtsModelToken: string,
 
   // Position in the list, 0-indexed
   voiceIndex: number,
@@ -115,15 +124,26 @@ interface VoiceDropdownProps {
 function VoiceDropdown(props: VoiceDropdownProps) {
 
   const handleSelectChange = (ev: React.FormEvent<HTMLSelectElement>) : boolean => {
-    const value = (ev.target as HTMLSelectElement).value;
-    props.handleModelSelect(value, props.voiceIndex);
+    const maybeModelToken = (ev.target as HTMLSelectElement).value;
+
+    if (!maybeModelToken) {
+      // Clear selection
+      props.handleModelSelect(maybeModelToken, props.voiceIndex);
+      return true;
+    }
+
+    if (!!maybeModelToken && !props.allTtsModelsByToken.has(maybeModelToken)) {
+      return false;
+    }
+
+    props.handleModelSelect(maybeModelToken, props.voiceIndex);
     return true;
   }
 
   return (
     <div key={`dropdown-${props.voiceIndex}`}>
       <div className="field">
-        <label className="label">TTS Voice Model</label>
+        <label className="label">TTS Voice Model (used as a Random Voice)</label>
         <div className="control">
           <div className="select is-medium is-fullwidth">
             <select
