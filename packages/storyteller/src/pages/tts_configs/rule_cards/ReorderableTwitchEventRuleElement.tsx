@@ -1,22 +1,31 @@
 import React from 'react';
 import { TwitchEventRule } from '@storyteller/components/src/api/storyteller/twitch_event_rules/ListTwitchEventRules';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faArrowDown, faArrowUp, faEdit, faExternalLinkAlt, faTrash } from '@fortawesome/free-solid-svg-icons';
-import { Link } from 'react-router-dom';
+import { faArrowDown, faArrowUp, faExternalLinkAlt, } from '@fortawesome/free-solid-svg-icons';
 import { TtsModelListItem } from '@storyteller/components/src/api/tts/ListTtsModels';
 
 interface Props {
   rule: TwitchEventRule,
+
+  // Index of the rule in the parents' list
+  ruleIndex: number,
+
+  // Update callbacks
+  handleMoveUp: (index: number) => void,
+  handleMoveDown: (index: number) => void,
+
+  // FakeYou voices
   allTtsModelsByToken: Map<string, TtsModelListItem>,
-  hideButtons?: boolean,
 }
 
 function ReorderableTwitchEventRuleElement(props: Props) {
-  const hideButtons = !!props.hideButtons;
-
   let title = "Not Set";
   let subtitle = <></>;
   let description = <></>;
+
+  const handleClickUp = (ev: React.FormEvent<HTMLButtonElement>) : boolean => {
+    return true;
+  }
 
   if (props.rule.event_match_predicate.bits_cheermote_name_exact_match !== undefined) {
     title = "Cheermote Name Matches"
@@ -91,29 +100,6 @@ function ReorderableTwitchEventRuleElement(props: Props) {
     );
   }
 
-  const editUrl = `/tts_configs/edit/${props.rule.token}`;
-  const deleteUrl = `/tts_configs/delete/${props.rule.token}`;
-
-  let buttons = <></>;
-  if (!hideButtons) {
-    buttons = (
-      <>
-        <footer className="card-footer">
-          <div className="card-footer-item">
-            <span className="icon">
-              <FontAwesomeIcon icon={faArrowUp} />&nbsp;Up
-            </span>
-          </div>
-          <div className="card-footer-item">
-            <span className="icon">
-              <FontAwesomeIcon icon={faArrowDown} />&nbsp;Down
-            </span>
-          </div>
-        </footer>
-      </>
-    )
-  }
-
   return (
     <div key={props.rule.token}>
       <div className="card">
@@ -125,7 +111,22 @@ function ReorderableTwitchEventRuleElement(props: Props) {
             {description}
           </div>
         </div>
-        {buttons}
+        <footer className="card-footer">
+          <div className="card-footer-item">
+            <span className="icon">
+              <button onClick={() => props.handleMoveUp(props.ruleIndex)} className="button is-ghost">
+                <FontAwesomeIcon icon={faArrowUp} />&nbsp;Up
+              </button>
+            </span>
+          </div>
+          <div className="card-footer-item">
+            <span className="icon">
+              <button onClick={() => props.handleMoveDown(props.ruleIndex)} className="button is-ghost">
+                <FontAwesomeIcon icon={faArrowDown} />&nbsp;Down
+              </button>
+            </span>
+          </div>
+        </footer>
       </div>
       <br />
     </div>

@@ -52,6 +52,14 @@ function TtsConfigsReorderPage(props: Props) {
 
   }, [listTwitchEventRules, event_category, history]);
 
+  const handleMoveUp = (ruleIndex: number) => {
+
+  }
+
+  const handleMoveDown = (ruleIndex: number) => {
+
+  }
+
   if (!props.sessionWrapper.isLoggedIn()) {
     return <h1>Must Log In</h1>;
   }
@@ -76,10 +84,13 @@ function TtsConfigsReorderPage(props: Props) {
           </div>
         </article>
 
-        {twitchEventRules.map(rule => {
+        {twitchEventRules.map((rule, index) => {
           return <ReorderableTwitchEventRuleElement
             key={rule.token}
             rule={rule} 
+            ruleIndex={index}
+            handleMoveUp={handleMoveUp}
+            handleMoveDown={handleMoveDown}
             allTtsModelsByToken={props.allTtsModelsByToken}
             />
         })}
