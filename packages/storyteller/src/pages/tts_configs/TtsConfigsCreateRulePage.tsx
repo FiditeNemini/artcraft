@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { v4 as uuidv4 } from 'uuid';
 import { SessionWrapper } from '@storyteller/components/src/session/SessionWrapper';
 import { TtsModelListItem } from '@storyteller/components/src/api/tts/ListTtsModels';
 import { TwitchEventRule } from '@storyteller/components/src/api/storyteller/twitch_event_rules/GetTwitchEventRule';
@@ -69,7 +70,7 @@ function TtsConfigsCreateRulePage(props: Props) {
     // TODO: UUID idempotency token that updates on every model change.
 
     const request : CreateTwitchEventRuleRequest = {
-      idempotency_token: 'todo',
+      idempotency_token: uuidv4(),
       event_category: twitchEventCategory,
       event_match_predicate: newEventMatchPredicate,
       event_response: newEventResponse,
