@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { TtsModelListItem } from '@storyteller/components/src/api/tts/ListTtsModels';
 import { FakeYouExternalLink } from '@storyteller/components/src/elements/FakeYouExternalLink';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faPlus } from '@fortawesome/free-solid-svg-icons';
+import { faPlus, faTrash } from '@fortawesome/free-solid-svg-icons';
 
 interface TtsRandomVoiceFormProps {
   selectedTtsModelTokens: string[],
@@ -14,16 +14,11 @@ interface TtsRandomVoiceFormProps {
 };
 
 function TtsRandomVoiceForm(props: TtsRandomVoiceFormProps) {
-  const [ttsModelToken, setTtsModelToken] = useState('');
-
   // NB: useState is not always setting from props correctly (after several re-renders)
   // The following answers suggests using useEffect:
   //  https://stackoverflow.com/a/54866051 (less clear by also using useState(), but good comments)
   //  https://stackoverflow.com/a/62982753
   useEffect(() => {
-    if (props.selectedTtsModelTokens.length > 0) {
-      setTtsModelToken(props.selectedTtsModelTokens[0]);
-    }
   }, [props.selectedTtsModelTokens]);
 
   const handleAddVoice = (ev: React.FormEvent<HTMLButtonElement>) : boolean => {
@@ -41,7 +36,7 @@ function TtsRandomVoiceForm(props: TtsRandomVoiceFormProps) {
   const handleModelSelect = (ttsModelToken: string, voiceIndex: number) => {
     let newModelTokens = [...props.selectedTtsModelTokens];
 
-    if (voiceIndex >= ttsModelToken.length) {
+    if (voiceIndex >= newModelTokens.length) {
       return;
     }
 
@@ -49,7 +44,18 @@ function TtsRandomVoiceForm(props: TtsRandomVoiceFormProps) {
     props.updateSelectedTtsModelTokens(newModelTokens);
   }
 
-  console.log('selected', props.selectedTtsModelTokens);
+  const handleModelDelete = (voiceIndex: number) => {
+    let newModelTokens = [...props.selectedTtsModelTokens];
+
+    if (newModelTokens.length <= 1 || voiceIndex >= newModelTokens.length) {
+      // We must have at least one item in the list
+      return;
+    }
+
+    newModelTokens.splice(voiceIndex, 1);
+
+    props.updateSelectedTtsModelTokens(newModelTokens);
+  }
 
   let selectBoxes : JSX.Element[] = [];
 
@@ -63,6 +69,7 @@ function TtsRandomVoiceForm(props: TtsRandomVoiceFormProps) {
         selectedTtsModelToken={token}
         voiceIndex={index}
         handleModelSelect={handleModelSelect}
+        handleModelDelete={handleModelDelete}
         allTtsModels={props.allTtsModels}
         allTtsModelsByToken={props.allTtsModelsByToken}
         />
@@ -76,6 +83,7 @@ function TtsRandomVoiceForm(props: TtsRandomVoiceFormProps) {
         selectedTtsModelToken={""}
         voiceIndex={0}
         handleModelSelect={handleModelSelect}
+        handleModelDelete={handleModelDelete}
         allTtsModels={props.allTtsModels}
         allTtsModelsByToken={props.allTtsModelsByToken}
         />
@@ -114,6 +122,7 @@ interface VoiceDropdownProps {
 
   // Callbacks
   handleModelSelect: (token: string, index: number) => void,
+  handleModelDelete: (index: number) => void,
 
   // FakeYou voices
   allTtsModels: TtsModelListItem[],
@@ -139,11 +148,18 @@ function VoiceDropdown(props: VoiceDropdownProps) {
     return true;
   }
 
+  const handleRemoveClick = (ev: React.FormEvent<HTMLButtonElement>) : boolean => {
+    props.handleModelDelete(props.voiceIndex);
+    return true;
+  }
+
   return (
     <div key={`dropdown-${props.voiceIndex}`}>
-      <div className="field">
-        <label className="label">{props.voiceIndex+1}. TTS Voice Model (used as a Random Voice)</label>
-        <div className="control">
+      <label className="label">{props.voiceIndex+1}. TTS Voice Model (used as a Random Voice)</label>
+
+      <div className="field is-grouped">
+        <div className="control is-expanded">
+
           <div className="select is-medium is-fullwidth">
             <select
               value={props.selectedTtsModelToken}
@@ -163,6 +179,14 @@ function VoiceDropdown(props: VoiceDropdownProps) {
               })}
             </select>
           </div>
+        </div>
+        <div className="control">
+          <button 
+            onClick={handleRemoveClick}
+            className="button is-medium is-danger is-inverted"
+            >
+            <FontAwesomeIcon icon={faTrash} />&nbsp;Remove
+          </button>
         </div>
       </div>
 
