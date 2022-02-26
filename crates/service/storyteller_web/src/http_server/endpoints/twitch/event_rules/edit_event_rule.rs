@@ -22,6 +22,8 @@ use sqlx::error::Error::Database;
 use sqlx::mysql::MySqlDatabaseError;
 use std::fmt;
 use std::sync::Arc;
+use crate::http_server::endpoints::twitch::event_rules::validations::validate_event_response::validate_event_response;
+use crate::http_server::endpoints::twitch::event_rules::validations::validate_event_match_predicate::validate_event_match_predicate;
 
 // =============== Request ===============
 
@@ -126,6 +128,9 @@ pub async fn edit_twitch_event_rule_handler(
       .clone()
       .unwrap_or(EventMatchPredicate::NotSet {});
 
+  validate_event_match_predicate(&event_match_predicate)
+      .map_err(|reason|  EditTwitchEventRuleError::BadInput(reason))?;
+
   let mut event_match_predicate = serde_json::to_string(&event_match_predicate)
       .map_err(|e| {
         return EditTwitchEventRuleError::BadInput(
@@ -135,6 +140,9 @@ pub async fn edit_twitch_event_rule_handler(
   let event_response = request.event_response
       .clone()
       .unwrap_or(EventResponse::NotSet {});
+
+  validate_event_response(&event_response)
+      .map_err(|reason|  EditTwitchEventRuleError::BadInput(reason))?;
 
   let mut event_response = serde_json::to_string(&event_response)
       .map_err(|e| {
