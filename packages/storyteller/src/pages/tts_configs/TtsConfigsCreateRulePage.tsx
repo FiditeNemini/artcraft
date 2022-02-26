@@ -29,11 +29,16 @@ function TtsConfigsCreateRulePage(props: Props) {
 
   // ========== In-Progress Model Edits ==========
 
-  const [ruleIsDisabled, setRuleIsDisabled] = useState(false);
+  // NB: This is a HACK. The views were created initially for "Edit" UI and this had 
+  // to be done to get them to work for "Create" UI:
+  //
+  // Sent to sub-components to initialize UI
+  const [serverEventMatchPredicate, setServerEventMatchPredicate] = useState<EventMatchPredicate>({});
+  const [serverEventResponse, setServerEventResponse] = useState<EventResponse>({});
 
   const [modifiedEventMatchPredicate, setModifiedEventMatchPredicate] = useState<EventMatchPredicate>({});
   const [modifiedEventResponse, setModifiedEventResponse] = useState<EventResponse>({});
-
+  const [ruleIsDisabled, setRuleIsDisabled] = useState(false);
 
   let maybeTwitchEventCategory = TWITCH_EVENT_CATEGORY_BY_STRING.get(event_category);
 
@@ -124,8 +129,8 @@ function TtsConfigsCreateRulePage(props: Props) {
       <form onSubmit={handleFormSubmit}>
 
         <EventMatchPredicateBuilderComponent
-          twitchEventCategory={twitchEventCategory}
-          serverEventMatchPredicate={emptyEventMatchPredicate}
+          twitchEventCategory={TwitchEventCategory.Bits}
+          serverEventMatchPredicate={serverEventMatchPredicate}
           updateModifiedEventMatchPredicate={updateModifiedEventMatchPredicate}
           />
 
