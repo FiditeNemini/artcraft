@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { SessionWrapper } from '@storyteller/components/src/session/SessionWrapper';
 import { GetTwitchEventRule, GetTwitchEventRuleIsError, GetTwitchEventRuleIsOk, TwitchEventRule } from '@storyteller/components/src/api/storyteller/twitch_event_rules/GetTwitchEventRule';
-import { EditTwitchEventRule } from '@storyteller/components/src/api/storyteller/twitch_event_rules/EditTwitchEventRule';
+import { EditTwitchEventRule, EditTwitchEventRuleRequest } from '@storyteller/components/src/api/storyteller/twitch_event_rules/EditTwitchEventRule';
 import { TwitchEventRuleElement } from './TwitchEventRuleElement';
 import { Link, useHistory, useParams } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -19,6 +19,7 @@ interface Props {
 }
 
 function TtsConfigsEditRulePage(props: Props) {
+  // TODO: Use centralized configs
   const { token } : { token : string } = useParams();
 
   const indexLink = '/tts_configs';
@@ -78,7 +79,7 @@ function TtsConfigsEditRulePage(props: Props) {
     let newEventMatchPredicate = modifiedEventMatchPredicate;
     let newEventResponse = modifiedEventResponse;
 
-    const request = {
+    const request : EditTwitchEventRuleRequest = {
       event_match_predicate: newEventMatchPredicate,
       event_response: newEventResponse,
       rule_is_disabled: ruleIsDisabled,

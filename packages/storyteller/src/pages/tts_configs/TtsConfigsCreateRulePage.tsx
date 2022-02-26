@@ -1,6 +1,17 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { SessionWrapper } from '@storyteller/components/src/session/SessionWrapper';
 import { TtsModelListItem } from '@storyteller/components/src/api/tts/ListTtsModels';
+import { TwitchEventRule } from '@storyteller/components/src/api/storyteller/twitch_event_rules/GetTwitchEventRule';
+import { Link, useHistory } from 'react-router-dom';
+import { TwitchEventCategory } from '@storyteller/components/src/api/storyteller/twitch_event_rules/shared/TwitchEventCategory';
+import { EventResponse } from '@storyteller/components/src/api/storyteller/twitch_event_rules/shared/EventResponse';
+import { EventMatchPredicate } from '@storyteller/components/src/api/storyteller/twitch_event_rules/shared/EventMatchPredicate';
+import { CreateTwitchEventRule, CreateTwitchEventRuleRequest } from '@storyteller/components/src/api/storyteller/twitch_event_rules/CreateTwitchEventRule';
+import { EventMatchPredicateBuilderComponent } from './event_match_predicate_builder/EventMatchPredicateBuilderComponent';
+import { EventResponseComponent } from './event_response_builder/EventResponseComponent';
+import { TwitchEventRuleElement } from './TwitchEventRuleElement';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faAngleLeft, faSave } from '@fortawesome/free-solid-svg-icons';
 
 interface Props {
   sessionWrapper: SessionWrapper,
@@ -9,10 +20,126 @@ interface Props {
 }
 
 function TtsConfigsCreateRulePage(props: Props) {
+  // TODO: Use centralized configs
+  const indexLink = '/tts_configs';
+
+  const history = useHistory();
+
+  // ========== In-Progress Model Edits ==========
+
+  const [twitchEventCategory, setTwitchEventCategory] = useState<TwitchEventCategory>(TwitchEventCategory.Bits);
+  const [eventMatchPredicate, setEventMatchPredicate] = useState<EventMatchPredicate>({});
+  const [eventResponse, setEventResponse] = useState<EventResponse>({});
+  const [ruleIsDisabled, setRuleIsDisabled] = useState(false);
+
+  const updateModifiedEventMatchPredicate = (predicate: EventMatchPredicate) => {
+    // TODO
+    // setModifiedEventMatchPredicate(predicate);
+  }
+
+  const updateModifiedEventResponse = (response: EventResponse) => {
+    // TODO
+    // setModifiedEventResponse(response);
+  }
+
+  const handleFormSubmit = async (ev: React.FormEvent<HTMLFormElement>) : Promise<boolean> => {
+    ev.preventDefault();
+
+    // TODO: Check for errors.
+
+    let newEventMatchPredicate = eventMatchPredicate;
+    let newEventResponse = eventResponse;
+
+    const request : CreateTwitchEventRuleRequest = {
+      idempotency_token: 'todo',
+      event_category: twitchEventCategory,
+      event_match_predicate: newEventMatchPredicate,
+      event_response: newEventResponse,
+      rule_is_disabled: ruleIsDisabled,
+      user_specified_rule_order: 1000,
+    };
+
+    const result = await CreateTwitchEventRule(request);
+    if (result.success) {
+      history.push(indexLink);
+    }
+
+    return false;
+  }
+
+
+  if (!props.sessionWrapper.isLoggedIn()) {
+    return <h1>Must Log In</h1>;
+  }
+
+  // NB: This is a hypothetical version of what we'll update to
+  let renderRule : TwitchEventRule = {
+    // Not yet saved, so fake values
+    token: 'virtual',
+    user_specified_rule_order: 1000,
+    created_at: new Date(),
+    updated_at: new Date(),
+
+    // Updated in UI
+    event_category: twitchEventCategory,
+    event_match_predicate: eventMatchPredicate,
+    event_response: eventResponse,
+    rule_is_disabled: ruleIsDisabled,
+  };
+
+  // NB: We're starting from scratch, but our forms want these
+  const emptyEventMatchPredicate = {};
+  const emptyEventResponse = {};
+
   return (
-    <div>
-      <h1> TTS : Create Rule </h1>
-    </div>
+    <>
+      <div className="section">
+        <h1 className="title"> Create New Rule </h1>
+      </div>
+
+      <br />
+      <br />
+
+      <form onSubmit={handleFormSubmit}>
+
+        <EventMatchPredicateBuilderComponent
+          twitchEventCategory={twitchEventCategory}
+          serverEventMatchPredicate={emptyEventMatchPredicate}
+          updateModifiedEventMatchPredicate={updateModifiedEventMatchPredicate}
+          />
+
+        <br />
+        <br />
+
+        <EventResponseComponent
+          serverEventResponse={emptyEventResponse}
+          updateModifiedEventResponse={updateModifiedEventResponse}
+          allTtsModels={props.allTtsModels}
+          allTtsModelsByToken={props.allTtsModelsByToken}
+          />
+
+        <h2 className="title is-4">This is the rule:</h2>
+
+        <div className="content">
+          <TwitchEventRuleElement 
+            rule={renderRule} 
+            hideButtons={true} 
+            allTtsModelsByToken={props.allTtsModelsByToken}
+            />
+        </div>
+
+        <button className="button is-large is-fullwidth is-primary">
+          Save New Rule&nbsp;<FontAwesomeIcon icon={faSave} />
+        </button>
+      </form>
+      
+      <br />
+
+      <Link to={indexLink} className="button is-large is-fullwidth is-info is-outlined">
+        <FontAwesomeIcon icon={faAngleLeft} />&nbsp;Cancel / Go Back
+      </Link>
+
+    </>
   )
 }
 

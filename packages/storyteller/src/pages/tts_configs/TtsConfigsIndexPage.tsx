@@ -5,8 +5,9 @@ import { TwitchEventRuleElement } from './TwitchEventRuleElement';
 import { TwitchEventCategory } from '@storyteller/components/src/api/storyteller/twitch_event_rules/shared/TwitchEventCategory';
 import { DiscordLink } from '@storyteller/components/src/elements/DiscordLink';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faBox, faDonate, faGem, faHeart, faLightbulb, faTerminal } from '@fortawesome/free-solid-svg-icons';
+import { faBox, faDonate, faGem, faHeart, faLightbulb, faPlus, faTerminal } from '@fortawesome/free-solid-svg-icons';
 import { TtsModelListItem } from '@storyteller/components/src/api/tts/ListTtsModels';
+import { Link } from 'react-router-dom';
 
 interface Props {
   sessionWrapper: SessionWrapper,
@@ -45,7 +46,7 @@ function TtsConfigsIndexPage(props: Props) {
         <h2 className="subtitle"> Configure how your stream TTS works </h2>
       </div>
       <div className="content">
-        <article className="message is-primary">
+        <article className="message is-dark">
           <div className="message-body">
           You can create rules for matching <em>different categories of events</em>: cheers (bits), 
           channel point rewards, etc. 
@@ -87,7 +88,16 @@ function TtsConfigsIndexPage(props: Props) {
         })}
       </div>
 
+      <Link
+        to="/tts_configs/create" 
+        className="button is-large is-fullwidth is-primary"
+        >
+        <FontAwesomeIcon icon={faPlus} />&nbsp;Create New Rule
+      </Link>
+
       <br />
+      <br />
+
       <div className="content">
         <h1 className="title is-4"> <FontAwesomeIcon icon={faHeart} /> Subs, Resubs, and Gifted Subs </h1>
         <h2 className="subtitle is-6">
