@@ -11,7 +11,7 @@ interface Props {
   hideButtons?: boolean,
 }
 
-function TwitchEventRuleElement(props: Props) {
+function ReorderableTwitchEventRuleElement(props: Props) {
   const hideButtons = !!props.hideButtons;
 
   let title = "Not Set";
@@ -100,17 +100,13 @@ function TwitchEventRuleElement(props: Props) {
       <>
         <footer className="card-footer">
           <div className="card-footer-item">
-            <span>
-              <Link to={editUrl}>
-                <FontAwesomeIcon icon={faEdit} />&nbsp;Edit
-              </Link>
+            <span className="icon">
+              <FontAwesomeIcon icon={faArrowUp} />&nbsp;Up
             </span>
           </div>
           <div className="card-footer-item">
-            <span>
-              <Link to={deleteUrl}>
-                <FontAwesomeIcon icon={faTrash} /> Delete
-              </Link>
+            <span className="icon">
+              <FontAwesomeIcon icon={faArrowDown} />&nbsp;Down
             </span>
           </div>
         </footer>
@@ -136,4 +132,4 @@ function TwitchEventRuleElement(props: Props) {
   )
 }
 
-export { TwitchEventRuleElement }
+export { ReorderableTwitchEventRuleElement }

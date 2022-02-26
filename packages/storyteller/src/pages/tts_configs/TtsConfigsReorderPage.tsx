@@ -8,6 +8,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faBox, faDonate, faGem, faHeart, faLightbulb, faMeteor, faPlus, faSort, faTerminal } from '@fortawesome/free-solid-svg-icons';
 import { TtsModelListItem } from '@storyteller/components/src/api/tts/ListTtsModels';
 import { Link, useHistory, useParams } from 'react-router-dom';
+import { ReorderableTwitchEventRuleElement } from './rule_cards/ReorderableTwitchEventRuleElement';
 
 interface Props {
   sessionWrapper: SessionWrapper,
@@ -76,7 +77,7 @@ function TtsConfigsReorderPage(props: Props) {
         </article>
 
         {twitchEventRules.map(rule => {
-          return <TwitchEventRuleElement 
+          return <ReorderableTwitchEventRuleElement
             key={rule.token}
             rule={rule} 
             allTtsModelsByToken={props.allTtsModelsByToken}
