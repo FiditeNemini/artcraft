@@ -74,10 +74,6 @@ function EventMatchPredicateBuilderComponent(props: EventMatchPredicateBuilderCo
         break;
     }
 
-    console.log('\n\n========= PredicateBuilder.useEffect() =========')
-    console.log('newBitRulesType', newBitsRuleType);
-    console.table(newCheerState);
-
     setCheerState(newCheerState);
 
     setBitsRuleType(newBitsRuleType);
@@ -248,8 +244,6 @@ function EventMatchPredicateBuilderComponent(props: EventMatchPredicateBuilderCo
         </select>
       </>
     );
-
-    console.log('bitRulesType', bitsRuleType);
 
     switch (bitsRuleType) {
       case BitsRuleType.BitsCheermoteNameExactMatch:
