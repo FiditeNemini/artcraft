@@ -67,7 +67,7 @@ function TwitchEventRuleElement(props: Props) {
   } else if (props.rule.event_response.tts_random_voice !== undefined) {
     const tokens = props.rule.event_response.tts_random_voice.tts_model_tokens;
 
-    let modelNameAndLinks = tokens.map(token => {
+    let modelNameAndLinks = tokens.map((token, index) => {
       let model = props.allTtsModelsByToken.get(token);
       let link = `https://fakeyou.com/tts/${token}`;
 
@@ -77,16 +77,16 @@ function TwitchEventRuleElement(props: Props) {
       }
 
       return (
-        <li key={token}>
+        <li key={index}>
           {modelName} <a href={link} target="_blank"><FontAwesomeIcon icon={faExternalLinkAlt} /></a>
         </li>
       );
     });
 
-
     description = (
       <>
-        TTS with a random voice from: <ul>{modelNameAndLinks}</ul>
+        TTS with a random voice from the following {modelNameAndLinks.length} voice(s): 
+        <ul>{modelNameAndLinks}</ul>
       </>
     );
   }

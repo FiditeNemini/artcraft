@@ -84,7 +84,6 @@ function TtsRandomVoiceForm(props: TtsRandomVoiceFormProps) {
 
   return (
     <>
-
       {selectBoxes}
 
       <button 
@@ -143,7 +142,7 @@ function VoiceDropdown(props: VoiceDropdownProps) {
   return (
     <div key={`dropdown-${props.voiceIndex}`}>
       <div className="field">
-        <label className="label">TTS Voice Model (used as a Random Voice)</label>
+        <label className="label">{props.voiceIndex+1}. TTS Voice Model (used as a Random Voice)</label>
         <div className="control">
           <div className="select is-medium is-fullwidth">
             <select
