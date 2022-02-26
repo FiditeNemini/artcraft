@@ -5,7 +5,7 @@ import { TwitchEventRuleElement } from './TwitchEventRuleElement';
 import { TwitchEventCategory } from '@storyteller/components/src/api/storyteller/twitch_event_rules/shared/TwitchEventCategory';
 import { DiscordLink } from '@storyteller/components/src/elements/DiscordLink';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faBox, faDonate, faGem, faLightbulb, faTerminal } from '@fortawesome/free-solid-svg-icons';
+import { faBox, faDonate, faGem, faHeart, faLightbulb, faTerminal } from '@fortawesome/free-solid-svg-icons';
 import { TtsModelListItem } from '@storyteller/components/src/api/tts/ListTtsModels';
 
 interface Props {
@@ -56,9 +56,9 @@ function TtsConfigsIndexPage(props: Props) {
           adding lots of new capabilities soon.
           </div>
         </article>
-        <h1 className="title"> <FontAwesomeIcon icon={faGem} /> Bits / Cheers </h1>
-        <h2 className="subtitle is-4">
-          (These settings are best for small and medium-sized channels.)
+        <h1 className="title is-3"> <FontAwesomeIcon icon={faGem} /> Bits / Cheers </h1>
+        <h2 className="subtitle is-5">
+          These settings are best for small and medium-sized channels.
         </h2>
         <p>
         </p>
@@ -74,9 +74,9 @@ function TtsConfigsIndexPage(props: Props) {
       <br />
 
       <div className="content">
-        <h1 className="title"> <FontAwesomeIcon icon={faBox} /> Channel Points / Rewards </h1>
-        <h2 className="subtitle is-4">
-          (These settings are best for small channels.)
+        <h1 className="title is-3"> <FontAwesomeIcon icon={faBox} /> Channel Points / Rewards </h1>
+        <h2 className="subtitle is-5">
+          These settings are best for small channels.
         </h2>
         {channelPointsEventRules.map(rule => {
           return <TwitchEventRuleElement 
@@ -88,11 +88,19 @@ function TtsConfigsIndexPage(props: Props) {
       </div>
 
       <br />
+      <div className="content">
+        <h1 className="title is-4"> <FontAwesomeIcon icon={faHeart} /> Subs, Resubs, and Gifted Subs </h1>
+        <h2 className="subtitle is-6">
+          These settings are great for all channel sizes.
+        </h2>
+        <p>Coming soon&hellip;</p>
+      </div>
+      <br />
 
       <div className="content">
-        <h1 className="title"> <FontAwesomeIcon icon={faDonate} /> Donation Services (Streamlabs, StreamElements, etc.) </h1>
-        <h2 className="subtitle is-4">
-          (These settings are great for large channels, but work for channels of all sizes.)
+        <h1 className="title is-4"> <FontAwesomeIcon icon={faDonate} /> Donation Services (Streamlabs, StreamElements, etc.) </h1>
+        <h2 className="subtitle is-6">
+          These settings are great for large channels, but work for channels of all sizes.
         </h2>
         <p>Coming soon&hellip;</p>
       </div>
@@ -100,9 +108,9 @@ function TtsConfigsIndexPage(props: Props) {
       <br />
 
       <div className="content">
-        <h1 className="title"> <FontAwesomeIcon icon={faTerminal} /> Text <code>/slash</code> Commands</h1>
-        <h2 className="subtitle is-4">
-          (These settings are great for very small channels.)
+        <h1 className="title is-5"> <FontAwesomeIcon icon={faTerminal} /> Text <code>/slash</code> Commands</h1>
+        <h2 className="subtitle is-6">
+          These settings are great for very small channels.
         </h2>
         <p>Coming soon&hellip;</p>
       </div>
@@ -112,7 +120,7 @@ function TtsConfigsIndexPage(props: Props) {
       <div className="content">
         <h1 className="title"> <FontAwesomeIcon icon={faLightbulb} /> Suggestions? </h1>
         <h2 className="subtitle is-4">
-          We want to build the things you want
+          Let us know what to build!
         </h2>
         <p>Can you think of anything we haven't 
           provided? <DiscordLink text="Please let us know in Discord" iconAfterText={true} /> so 
