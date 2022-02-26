@@ -53,6 +53,7 @@ use crate::http_server::endpoints::twitch::event_rules::delete_event_rule::delet
 use crate::http_server::endpoints::twitch::event_rules::edit_event_rule::edit_twitch_event_rule_handler;
 use crate::http_server::endpoints::twitch::event_rules::get_event_rule::get_twitch_event_rule_for_user_handler;
 use crate::http_server::endpoints::twitch::event_rules::list_event_rules_for_user::list_twitch_event_rules_for_user_handler;
+use crate::http_server::endpoints::twitch::event_rules::reorder_twitch_event_rules::reorder_twitch_event_rules_handler;
 use crate::http_server::endpoints::twitch::oauth::oauth_begin_json::oauth_begin_enroll_json;
 use crate::http_server::endpoints::twitch::oauth::oauth_begin_redirect::oauth_begin_enroll_redirect;
 use crate::http_server::endpoints::twitch::oauth::oauth_end::oauth_end_enroll_from_redirect;
@@ -101,7 +102,7 @@ pub fn add_routes<T, B> (app: App<T, B>) -> App<T, B>
   app = add_user_profile_routes(app); /* /user */
   app = add_api_token_routes(app); /* /api_tokens */
   app = add_voice_clone_request_routes(app); /* /voice_clone_requests */
-  app = add_twitch_oauth_routes(app); /* /twitch */ // TODO: MAYBE TEMPORARY
+  app = add_twitch_routes(app); /* /twitch */ // TODO: MAYBE TEMPORARY
 
   // ==================== ACCOUNT CREATION / SESSION MANAGEMENT ====================
   app.service(
@@ -606,7 +607,7 @@ fn add_voice_clone_request_routes<T, B> (app: App<T, B>) -> App<T, B>
 // TODO: Maybe move these into an "oauth-gateway" type http service.
 //  We'll want the domain to have reputation and not confuse people.
 //  It'll also be nice to accrue all oauth things here.
-fn add_twitch_oauth_routes<T, B> (app: App<T, B>) -> App<T, B>
+fn add_twitch_routes<T, B> (app: App<T, B>) -> App<T, B>
   where
       B: MessageBody,
       T: ServiceFactory<
@@ -634,6 +635,10 @@ fn add_twitch_oauth_routes<T, B> (app: App<T, B>) -> App<T, B>
     .service(web::scope("/event_rule")
         .service(web::resource("/create")
             .route(web::post().to(create_twitch_event_rule_handler))
+            .route(web::head().to(|| HttpResponse::Ok()))
+        )
+        .service(web::resource("/reorder")
+            .route(web::post().to(reorder_twitch_event_rules_handler))
             .route(web::head().to(|| HttpResponse::Ok()))
         )
         .service(web::resource("/list")
