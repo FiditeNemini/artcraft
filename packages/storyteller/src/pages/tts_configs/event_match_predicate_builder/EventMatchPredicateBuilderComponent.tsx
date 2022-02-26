@@ -11,6 +11,9 @@ import { CheerUtil } from '../../../twitch/CheerUtil';
 import { CheerState, CheerStateIsCustom, CheerStateIsOfficial, cheerStateToPredicate, predicateToCheerState } from './CheerState';
 import { CHEER_LOOKUP_MAP } from '../../../twitch/Cheers';
 
+// NB: This was created for "Edit" view, but we've forced it to work for "Create" view by hardcoding 
+// values that don't actually come from the server.
+
 interface EventMatchPredicateBuilderComponentProps {
   // CANNOT BE CHANGED AFTER CREATION
   twitchEventCategory: TwitchEventCategory,

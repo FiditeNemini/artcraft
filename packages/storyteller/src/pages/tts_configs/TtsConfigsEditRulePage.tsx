@@ -19,9 +19,9 @@ interface Props {
 }
 
 function TtsConfigsEditRulePage(props: Props) {
-  // TODO: Use centralized configs
   const { token } : { token : string } = useParams();
 
+  // TODO: Use centralized URL configs
   const indexLink = '/tts_configs';
 
   const history = useHistory();

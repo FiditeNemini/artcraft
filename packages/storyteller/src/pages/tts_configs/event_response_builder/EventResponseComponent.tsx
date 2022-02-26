@@ -6,6 +6,9 @@ import { EventResponse } from '@storyteller/components/src/api/storyteller/twitc
 import { buildEventResponse } from './BuildEventResponse';
 import { TtsRandomVoiceForm } from './TtsRandomVoiceForm';
 
+// NB: This was created for "Edit" view, but we've forced it to work for "Create" view by hardcoding 
+// values that don't actually come from the server.
+
 interface EventResponseComponentProps {
   // Original response from server.
   // (also immutable for sanity and because we may lose info on UI changes)

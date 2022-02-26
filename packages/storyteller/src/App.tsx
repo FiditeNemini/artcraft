@@ -140,7 +140,7 @@ class App extends React.Component<Props, State> {
                   querySessionAction={this.querySession}
                   />
               </Route>
-              <Route path="/tts_configs/create/:eventCategory">
+              <Route path="/tts_configs/create/:event_category">
                 <TtsConfigsCreateRulePage
                   sessionWrapper={this.state.sessionWrapper}
                   allTtsModels={this.state.allTtsModels}
