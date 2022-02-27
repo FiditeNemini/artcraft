@@ -6,6 +6,9 @@ import { faDiscord, faTwitch } from '@fortawesome/free-brands-svg-icons';
 import { DiscordLink } from '@storyteller/components/src/elements/DiscordLink';
 
 function LoggedInIndex() {
+  //const oauthUrl = `https://api.jungle.horse/twitch/oauth_enroll_redirect`;
+  const oauthUrl = `https://api.storyteller.io/twitch/oauth_enroll_redirect`;
+
   return (
     <div>
 
@@ -13,7 +16,7 @@ function LoggedInIndex() {
         <div className="container">
 
           <a
-            href="https://api.jungle.horse/twitch/oauth_enroll_redirect"
+            href={oauthUrl}
             className="button is-large is-info is-fullwidth"
             >
               Link to Your Twitch&nbsp;<FontAwesomeIcon icon={faTwitch} />
