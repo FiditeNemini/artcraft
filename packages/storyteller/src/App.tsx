@@ -12,7 +12,6 @@ import { SignupPage } from './pages/signup/SignupPage';
 import { TtsConfigsIndexPage } from './pages/tts_configs/TtsConfigsIndexPage';
 import { DetectLocale, DetectLocaleIsOk } from '@storyteller/components/src/api/locale/DetectLocale';
 import { IndexPage } from './pages/index/IndexPage';
-import { ObsLayerPage } from './pages/obs-layer/ObsLayerPage';
 import { STORYTELLER_MERGED_TRANSLATIONS } from './_i18n/StorytellerTranslations'
 import { SessionWrapper } from '@storyteller/components/src/session/SessionWrapper';
 import { TopNav } from './layout/TopNav';
@@ -172,9 +171,6 @@ class App extends React.Component<Props, State> {
                   sessionWrapper={this.state.sessionWrapper}
                   allTtsModelsByToken={this.state.allTtsModelsByToken}
                 />
-              </Route>
-              <Route path="/obs/:username">
-                <ObsLayerPage />
               </Route>
               <Route exact={true} path="/">
                 <IndexPage 
