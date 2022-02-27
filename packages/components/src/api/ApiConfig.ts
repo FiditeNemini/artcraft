@@ -374,7 +374,11 @@ class ApiConfig {
   }
 
   obsEventsWebsocket(twitchUsername: string) : string {
-    return `ws://localhost:54321/obs/${twitchUsername}`;
+    if (this.domain === Domain.Localhost) {
+      return `ws://localhost:54321/obs/${twitchUsername}`;
+    } else {
+      return `wss://ws.storyteller.io/obs/${twitchUsername}`;
+    }
     //return `wss://ws.jungle.horse/obs/${twitchUsername}`;
     //return `wss://obs.storyteller.io/obs/${twitchUsername}`;
   }
