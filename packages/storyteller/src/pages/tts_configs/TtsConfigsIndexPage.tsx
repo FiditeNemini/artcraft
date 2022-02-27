@@ -54,10 +54,10 @@ function TtsConfigsIndexPage(props: Props) {
             </div>
 
             <div className="column">
-              <p className="title">
+              <p className="title is-1">
                 Stream Setup
               </p>
-              <p className="subtitle">
+              <p className="subtitle is-3">
                 Configure TTS (and soon much more!)
               </p>
             </div>
