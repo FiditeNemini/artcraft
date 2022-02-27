@@ -8,6 +8,13 @@ import { TtsInferenceJob } from '@storyteller/components/src/jobs/TtsInferenceJo
 import { jobStateCanChange } from '@storyteller/components/src/jobs/JobStates';
 import { useParams } from 'react-router-dom';
 
+/*
+NB: Debugging with CORS and self signed certs in local dev is a nightmare. Use this:
+
+    chromium-browser --disable-web-security --user-data-dir="~/chrome"
+
+*/
+
 function ObsLayerPage() {
   console.warn('>>> OBS <<<');
 
@@ -40,6 +47,9 @@ function ObsLayerPage() {
     console.warn('>>>>>>> CREATING WEB SOCKET <<<<<<<<');
 
     const url = new ApiConfig().obsEventsWebsocket(twitchUsername);
+    
+    console.log('websocket url: ', url);
+
     const sock = new WebSocket(url);
 
     document.documentElement.addEventListener("mousedown", () => {
@@ -81,16 +91,26 @@ function ObsLayerPage() {
 
     sock.onerror = function(event: Event) {
       console.log('on error event', event);
+
+      sock.close();
+      openWebsocket(username);
     }
+
+    let intervalHandle : number | undefined = undefined;
 
     // NB: This has a direct bearing on how fast the backend responds.
     // Increasing the delay will slow down the flow of events.
-    setInterval(() => {
-      console.log('sending ping');
+    intervalHandle = window.setInterval(() => {
+      //console.log('sending ping');
       if (sock.readyState === sock.OPEN) {
         sock.send('ping');
       } else {
-        console.warn('Socket is closed', sock.readyState, sock)
+        console.warn('Socket is closed', sock.readyState, sock);
+
+        sock.close();
+        clearInterval(intervalHandle);
+
+        openWebsocket(username);
       }
     }, 1000);
   };

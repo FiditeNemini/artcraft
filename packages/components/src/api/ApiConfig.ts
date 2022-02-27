@@ -375,6 +375,7 @@ class ApiConfig {
 
   obsEventsWebsocket(twitchUsername: string) : string {
     return `ws://localhost:54321/obs/${twitchUsername}`;
+    //return `wss://ws.jungle.horse/obs/${twitchUsername}`;
     //return `wss://obs.storyteller.io/obs/${twitchUsername}`;
   }
 
