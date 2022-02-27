@@ -41,10 +41,31 @@ function TtsConfigsIndexPage(props: Props) {
 
   return (
     <>
-      <div className="section">
-        <h1 className="title"> TTS Setup </h1>
-        <h2 className="subtitle"> Configure how your stream TTS works </h2>
-      </div>
+
+      <section className="hero is-small">
+        <div className="hero-body">
+
+          <div className="columns is-vcentered">
+
+            <div className="column is-one-third">
+              <div className="mascot">
+                <img src="/mascot/kitsune_pose8_black_2000.webp" alt="Storyteller's mascot!" />
+              </div>
+            </div>
+
+            <div className="column">
+              <p className="title">
+                Stream Setup
+              </p>
+              <p className="subtitle">
+                Configure TTS (and soon much more!)
+              </p>
+            </div>
+
+          </div>
+        </div>
+      </section>
+
       <div className="content">
         <article className="message is-dark">
           <div className="message-body">
