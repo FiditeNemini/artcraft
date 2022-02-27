@@ -1,0 +1,22 @@
+//@import-normalize; /* bring in normalize.css styles */
+
+$page-width: 700px;
+
+$light-text-color: #777;
+$button-text-color: #666;
+
+$body-font-family: 'Fira Sans', serif;
+$nav-font-family: 'Fira Sans', sans-serif;
+$footer-font-family: 'Fira Sans Condensed', sans-serif;
+$textarea-font-family: 'Fira Sans', sans-serif;
+$headings-font-family: 'Merriweather', serif;
+
+body {
+  font-family: $body-font-family;
+  font-weight: 300; // For Fira Sans
+}
+
+.mainwrap {
+  max-width: 1000px;
+  margin: auto;
+}
