@@ -168,6 +168,7 @@ function ObsLayerPage() {
           <h1 className="title">
             Paste this page's URL into OBS
           </h1>
+          <h1 className="subtitle">Twitch Username : {username}</h1>
         </div>
       </section>
     </div>

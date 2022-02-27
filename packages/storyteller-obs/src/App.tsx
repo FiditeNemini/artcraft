@@ -1,18 +1,17 @@
 
 import React from 'react';
-import { BrowserRouter } from 'react-router-dom';
+import { BrowserRouter, Route } from 'react-router-dom';
 import { ObsLayerPage } from './pages/obs-layer/ObsLayerPage';
 
 
-interface Props {
-}
-
-function App (props: Props) {
+function App () {
   return (
     <div id="main" className="mainwrap">
       <div id="viewable">
         <BrowserRouter>
-          <ObsLayerPage />
+          <Route path="/twitch/:username">
+            <ObsLayerPage />
+          </Route>
         </BrowserRouter>
       </div>
     </div>
