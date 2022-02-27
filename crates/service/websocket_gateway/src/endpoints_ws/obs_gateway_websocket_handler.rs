@@ -115,8 +115,6 @@ pub async fn obs_gateway_websocket_handler(
         CommonServerError::ServerError
       })?;
 
-  info!("Begin Javascript WebSocket...");
-
   let server_state_arc = server_state.get_ref().clone();
 
   let websocket = ObsGatewayWebSocket::new(
@@ -124,9 +122,11 @@ pub async fn obs_gateway_websocket_handler(
     server_state_arc
   );
 
+  info!("Begin Javascript WebSocket...");
+
   ws::start(websocket, &http_request, stream)
       .map_err(|e| {
-        warn!("Websocket error: {}", e);
+        warn!("Websocket ws::start() error: {}", e);
         CommonServerError::ServerError
       })
 }
