@@ -40,10 +40,12 @@ pub fn build_common_cors_config() -> Cors {
       .allowed_origin("https://fakeyou.com")
       // Storyteller
       .allowed_origin("http://api.storyteller.io")
+      .allowed_origin("http://create.storyteller.io")
       .allowed_origin("http://obs.storyteller.io")
       .allowed_origin("http://storyteller.io")
       .allowed_origin("http://ws.storyteller.io")
       .allowed_origin("https://api.storyteller.io")
+      .allowed_origin("https://create.storyteller.io")
       .allowed_origin("https://obs.storyteller.io")
       .allowed_origin("https://storyteller.io")
       .allowed_origin("https://ws.storyteller.io")
