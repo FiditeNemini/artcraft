@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef } from 'react';
 //import WaveSurfer from 'wavesurfer.js';
 import { ApiConfig } from '@storyteller/components';
 import { BucketConfig } from '@storyteller/components/src/api/BucketConfig';
@@ -9,7 +9,7 @@ import { jobStateCanChange } from '@storyteller/components/src/jobs/JobStates';
 import { useParams } from 'react-router-dom';
 
 /*
-NB: Debugging with CORS and self signed certs in local dev is a nightmare. Use this:
+NB: Debugging with CORS and self signed certs in local dev is a nightmare. Use this (Linux):
 
     chromium-browser --disable-web-security --user-data-dir="~/chrome"
 
@@ -20,7 +20,7 @@ function ObsLayerPage() {
 
   const { username } : { username : string } = useParams();
 
-  const [pendingTtsJobs, setPendingTtsJobs] = useState<TtsInferenceJob[]>([])
+  //const [pendingTtsJobs, setPendingTtsJobs] = useState<TtsInferenceJob[]>([])
   const webSocketRef = useRef<WebSocket|undefined>(undefined);
   const pendingTtsJobsRef = useRef<TtsInferenceJob[]>([]);
 
@@ -28,7 +28,7 @@ function ObsLayerPage() {
 
   // TODO: Do I need to use useCallback on everything?
 
-  const openWebsocket = async (twitchUsername: string) => {
+  const openWebsocket = useCallback(async (twitchUsername: string) => {
     if (webSocketRef.current !== undefined) {
       return;
     }
@@ -113,7 +113,7 @@ function ObsLayerPage() {
         openWebsocket(username);
       }
     }, 1000);
-  };
+  }, [username]);
 
   const playAudio = async (job: TtsInferenceJob) => {
     const audioLink = new BucketConfig().getGcsUrl(job.maybePublicBucketWavAudioPath);
@@ -157,7 +157,7 @@ function ObsLayerPage() {
 
     //setPendingTtsJobs(updatedJobs);
     pendingTtsJobsRef.current = updatedJobs;
-  }, [pendingTtsJobs]);
+  }, []);
 
   const checkTtsInferenceJob = useCallback(async (jobToken: string) => {
     const response = await GetTtsInferenceJobStatus(jobToken);
@@ -174,7 +174,7 @@ function ObsLayerPage() {
         await checkTtsInferenceJob(job.jobToken);
       }
     });
-  }, [checkTtsInferenceJob, pendingTtsJobs]);
+  }, [checkTtsInferenceJob]);
 
   useEffect(() => {
     openWebsocket(username);
