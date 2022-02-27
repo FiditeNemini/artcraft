@@ -61,7 +61,7 @@ WHERE
       .collect::<Vec<TwitchEventRule>>();
 
   // Queried in DESC order, but sort returned results ordered ASC.
-  records.sort_by_key(|r| r.created_at);
+  records.sort_by_key(|r| r.user_specified_rule_order);
 
   Ok(records)
 }
