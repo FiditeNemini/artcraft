@@ -34,12 +34,12 @@ function TtsConfigsCreateRulePage(props: Props) {
   // NB: This is a HACK. The subcomponent views were originally created for the "Edit" UI 
   // and this had to be done to get them to work for "Create" UI. Sending empty dictionaries 
   // or statically initialized values froze the UI.
-  const [serverEventMatchPredicate, setServerEventMatchPredicate] = useState<EventMatchPredicate>({});
-  const [serverEventResponse, setServerEventResponse] = useState<EventResponse>({});
+  const [serverEventMatchPredicate] = useState<EventMatchPredicate>({});
+  const [serverEventResponse] = useState<EventResponse>({});
 
   const [modifiedEventMatchPredicate, setModifiedEventMatchPredicate] = useState<EventMatchPredicate>({});
   const [modifiedEventResponse, setModifiedEventResponse] = useState<EventResponse>({});
-  const [ruleIsDisabled, setRuleIsDisabled] = useState(false);
+  const [ruleIsDisabled] = useState(false);
 
   let maybeTwitchEventCategory = TWITCH_EVENT_CATEGORY_BY_STRING.get(event_category);
 
@@ -104,10 +104,6 @@ function TtsConfigsCreateRulePage(props: Props) {
     event_response: modifiedEventResponse,
     rule_is_disabled: ruleIsDisabled,
   };
-
-  // NB: We're starting from scratch, but our forms want these
-  const emptyEventMatchPredicate = {};
-  const emptyEventResponse = {};
 
   const titlesByCategory = new Map<TwitchEventCategory, string>([
     [TwitchEventCategory.Bits, 'Create New Bits / Cheers Rule'],

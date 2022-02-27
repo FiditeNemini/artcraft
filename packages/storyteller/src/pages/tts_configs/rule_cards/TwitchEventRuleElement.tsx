@@ -1,7 +1,7 @@
 import React from 'react';
 import { TwitchEventRule } from '@storyteller/components/src/api/storyteller/twitch_event_rules/ListTwitchEventRules';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faArrowDown, faArrowUp, faEdit, faExternalLinkAlt, faTrash } from '@fortawesome/free-solid-svg-icons';
+import { faEdit, faExternalLinkAlt, faTrash } from '@fortawesome/free-solid-svg-icons';
 import { Link } from 'react-router-dom';
 import { TtsModelListItem } from '@storyteller/components/src/api/tts/ListTtsModels';
 
@@ -14,17 +14,14 @@ interface Props {
 function TwitchEventRuleElement(props: Props) {
   const hideButtons = !!props.hideButtons;
 
-  let title = "Not Set";
   let subtitle = <></>;
   let description = <></>;
 
   if (props.rule.event_match_predicate.bits_cheermote_name_exact_match !== undefined) {
-    title = "Cheermote Name Matches"
     subtitle = (
       <>Cheermote name matches "{props.rule.event_match_predicate.bits_cheermote_name_exact_match.cheermote_name}"</>
     );
   } else if (props.rule.event_match_predicate.bits_cheermote_prefix_spend_threshold !== undefined) {
-    title = "Cheermote Prefix Matches and Spend Threshold"
     subtitle = (
       <>
         Cheermote prefix is "{props.rule.event_match_predicate.bits_cheermote_prefix_spend_threshold.cheermote_prefix}"
@@ -32,14 +29,12 @@ function TwitchEventRuleElement(props: Props) {
       </>
     );
   } else if (props.rule.event_match_predicate.bits_spend_threshold !== undefined) {
-    title = "Spend Threshold"
     subtitle = (
       <>
         Spend at least {props.rule.event_match_predicate.bits_spend_threshold.minimum_bits_spent} bits
       </>
     );
   } else if (props.rule.event_match_predicate.channel_points_reward_name_exact_match !== undefined) {
-    title = "Channel Points Reward Name Match"
     subtitle = (
       <>
         Reward name matches "{props.rule.event_match_predicate.channel_points_reward_name_exact_match.reward_name}"
@@ -61,7 +56,7 @@ function TwitchEventRuleElement(props: Props) {
 
     description = (
       <>
-        TTS with voice: {modelName} <a href={link} target="_blank"><FontAwesomeIcon icon={faExternalLinkAlt} /></a>
+        TTS with voice: {modelName} <a href={link} target="_blank" rel="noreferrer"><FontAwesomeIcon icon={faExternalLinkAlt} /></a>
       </>
     );
   } else if (props.rule.event_response.tts_random_voice !== undefined) {
@@ -78,7 +73,7 @@ function TwitchEventRuleElement(props: Props) {
 
       return (
         <li key={index}>
-          {modelName} <a href={link} target="_blank"><FontAwesomeIcon icon={faExternalLinkAlt} /></a>
+          {modelName} <a href={link} target="_blank" rel="noreferrer"><FontAwesomeIcon icon={faExternalLinkAlt} /></a>
         </li>
       );
     });

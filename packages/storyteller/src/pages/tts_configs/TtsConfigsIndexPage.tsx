@@ -5,7 +5,7 @@ import { TwitchEventRuleElement } from './rule_cards/TwitchEventRuleElement';
 import { TwitchEventCategory } from '@storyteller/components/src/api/storyteller/twitch_event_rules/shared/TwitchEventCategory';
 import { DiscordLink } from '@storyteller/components/src/elements/DiscordLink';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faBox, faDonate, faFilm, faGem, faHeart, faLightbulb, faMeteor, faPlus, faSort, faTerminal, faUserFriends, faUsers } from '@fortawesome/free-solid-svg-icons';
+import { faBox, faDonate, faFilm, faGem, faHeart, faLightbulb, faMeteor, faPlus, faSort, faTerminal, faUsers } from '@fortawesome/free-solid-svg-icons';
 import { TtsModelListItem } from '@storyteller/components/src/api/tts/ListTtsModels';
 import { Link } from 'react-router-dom';
 

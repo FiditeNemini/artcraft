@@ -1,15 +1,13 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { SessionWrapper } from '@storyteller/components/src/session/SessionWrapper';
 import { ListTwitchEventRules, ListTwitchEventRulesIsError, ListTwitchEventRulesIsOk, TwitchEventRule } from '@storyteller/components/src/api/storyteller/twitch_event_rules/ListTwitchEventRules';
-import { ReorderTwitchEventRules, ReorderTwitchEventRulesIsOk, ReorderTwitchEventRulesRequest } from '@storyteller/components/src/api/storyteller/twitch_event_rules/ReorderTwitchEventRules';
+import { ReorderTwitchEventRules, ReorderTwitchEventRulesRequest } from '@storyteller/components/src/api/storyteller/twitch_event_rules/ReorderTwitchEventRules';
 import { TwitchEventCategory, TWITCH_EVENT_CATEGORY_BY_STRING } from '@storyteller/components/src/api/storyteller/twitch_event_rules/shared/TwitchEventCategory';
-import { DiscordLink } from '@storyteller/components/src/elements/DiscordLink';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faBox, faDonate, faGem, faHeart, faLightbulb, faMeteor, faPlus, faSave, faSort, faTerminal } from '@fortawesome/free-solid-svg-icons';
+import { faSave } from '@fortawesome/free-solid-svg-icons';
 import { TtsModelListItem } from '@storyteller/components/src/api/tts/ListTtsModels';
-import { Link, useHistory, useParams } from 'react-router-dom';
+import { useHistory, useParams } from 'react-router-dom';
 import { ReorderableTwitchEventRuleElement } from './rule_cards/ReorderableTwitchEventRuleElement';
-import { parseIsolatedEntityName } from 'typescript';
 
 interface Props {
   sessionWrapper: SessionWrapper,
@@ -24,7 +22,6 @@ function TtsConfigsReorderPage(props: Props) {
   // TODO: Use centralized configs
   const indexLink = '/tts_configs';
 
-  const [twitchEventCategory, setTwitchEventCategory] = useState(TwitchEventCategory.Bits);
   const [twitchEventRules, setTwitchEventRules] = useState<TwitchEventRule[]>([]);
 
   const listTwitchEventRules = useCallback(async (twitchEventCategory: TwitchEventCategory) => {
@@ -48,7 +45,6 @@ function TtsConfigsReorderPage(props: Props) {
     if (maybeTwitchEventCategory === undefined) {
       history.push(indexLink);
     } else {
-      setTwitchEventCategory(maybeTwitchEventCategory);
       listTwitchEventRules(maybeTwitchEventCategory);
     }
 
@@ -92,7 +88,7 @@ function TtsConfigsReorderPage(props: Props) {
   }
 
   const handleSaveOrderings = async (ev: React.FormEvent<HTMLButtonElement>) : Promise<boolean> => {
-    
+
     const pairs = twitchEventRules.map((rule, index) => {
       return {
         rule_token: rule.token,
