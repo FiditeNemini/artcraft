@@ -20,3 +20,4 @@
 # These are Storyteller routes
 /coming-soon*   /index.html   200
 /stream*   /index.html   200
+/twitch*   /index.html   200
