@@ -69,38 +69,43 @@ function LoginPage(props: Props) {
 
   return (
     <div>
-      <h1 className="title is-1"> Login </h1>
+      <section className="section">
+        <div className="container">
+          <h1 className="title is-1"> Login </h1>
+          <h1 className="subtitle is-6">(If you have a FakeYou.com account, it'll work here too.)</h1>
 
-      {errorWarning}
+          {errorWarning}
 
-      <form onSubmit={handleFormSubmit}>
-        <div className="field">
-          <label className="label">Username or Email</label>
-          <div className="control has-icons-left has-icons-right">
-            <input className="input" type="text" placeholder="Username or Email" value={usernameOrEmail} onChange={handleUsernameOrEmailChange} />
-            <span className="icon is-small is-left">
-              <FontAwesomeIcon icon={iconUser} />
-            </span>
-          </div>
-          {/*<p className="help"></p>*/}
+          <form onSubmit={handleFormSubmit}>
+            <div className="field">
+              <label className="label">Username or Email</label>
+              <div className="control has-icons-left has-icons-right">
+                <input className="input" type="text" placeholder="Username or Email" value={usernameOrEmail} onChange={handleUsernameOrEmailChange} />
+                <span className="icon is-small is-left">
+                  <FontAwesomeIcon icon={iconUser} />
+                </span>
+              </div>
+              {/*<p className="help"></p>*/}
+            </div>
+
+            <div className="field">
+              <label className="label">Password</label>
+              <div className="control has-icons-left has-icons-right">
+                <input className="input" type="password" placeholder="Password" value={password} onChange={handlePasswordChange} />
+                <span className="icon is-small is-left">
+                  <FontAwesomeIcon icon={iconPasswordField} />
+                </span>
+              </div>
+              {/*<p className="help"></p>*/}
+            </div>
+
+            <br />
+
+            <button className="button is-link is-large is-fullwidth">Login</button>
+
+          </form>
         </div>
-
-        <div className="field">
-          <label className="label">Password</label>
-          <div className="control has-icons-left has-icons-right">
-            <input className="input" type="password" placeholder="Password" value={password} onChange={handlePasswordChange} />
-            <span className="icon is-small is-left">
-              <FontAwesomeIcon icon={iconPasswordField} />
-            </span>
-          </div>
-          {/*<p className="help"></p>*/}
-        </div>
-
-        <br />
-
-        <button className="button is-link is-large is-fullwidth">Login</button>
-
-      </form>
+      </section>
     </div>
   )
 }

@@ -10,6 +10,8 @@ function LoggedOutIndex() {
         <div className="container">
 
           <h1 className="title is-4"> <FontAwesomeIcon icon={faRocket} /> You'll need an account to continue&hellip;</h1>
+          <h1 className="subtitle is-6">(If you have a FakeYou.com account, it'll work here too.)</h1>
+
           <Link
             to="/signup"
             className="button is-large is-info is-fullwidth"
