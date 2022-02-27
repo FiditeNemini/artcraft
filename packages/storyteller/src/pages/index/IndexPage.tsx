@@ -1,10 +1,6 @@
-import { faTwitch } from '@fortawesome/free-brands-svg-icons';
-import { faCogs, faVideo } from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import React from 'react';
 import { FakeYouExternalLink } from '@storyteller/components/src/elements/FakeYouExternalLink';
 import { SessionWrapper } from '@storyteller/components/src/session/SessionWrapper';
-import React from 'react';
-import { Link } from 'react-router-dom';
 import { LoggedInIndex } from './subpages/LoggedInIndex';
 import { LoggedOutIndex } from './subpages/LoggedOutIndex';
 

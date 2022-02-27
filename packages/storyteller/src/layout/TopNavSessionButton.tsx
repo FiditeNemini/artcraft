@@ -42,14 +42,15 @@ function TopNavSessionButton(props: Props) {
   let logoutLink = <span />;
 
   if (loggedIn) {
-    //let url = `/profile/${displayName}`;
-    let url = `/`;
+    let url = `https://fakeyou.com/profile/${displayName}`;
     sessionLink = (
-      <Link
-        to={url}
+      <a
+        href={url}
+        target="_blank"
+        rel="noreferrer"
         onClick={() => props.closeHamburgerAction()}
         className="button is-alert is-inverted is-pulled-right"
-        > {gravatar}&nbsp; {displayName}</Link>
+        > {gravatar}&nbsp; {displayName}</a>
     );
     logoutLink = <button
         className="button is-alert is-inverted is-pulled-right"
