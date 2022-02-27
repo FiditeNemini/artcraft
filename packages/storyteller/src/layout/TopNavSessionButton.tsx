@@ -42,7 +42,8 @@ function TopNavSessionButton(props: Props) {
   let logoutLink = <span />;
 
   if (loggedIn) {
-    let url = `/profile/${displayName}`;
+    //let url = `/profile/${displayName}`;
+    let url = `/`;
     sessionLink = (
       <Link
         to={url}

@@ -42,20 +42,15 @@ function TopNav(props: Props) {
         <div id="navbarExampleTransparentExample" className={navbarClasses}>
           <div className="navbar-start">
 
-            <Link to="/stream"
-              className="navbar-item"
-              onClick={() => closeHamburger()}
-              >Stream TTS (OLD)</Link>
-
             <Link to="/tts_configs"
               className="navbar-item"
               onClick={() => closeHamburger()}
-              >TTS Configs (NEW)</Link>
+              >TTS Configs</Link>
 
-            <Link to="/coming-soon"
+            <Link to="/"
               className="navbar-item"
               onClick={() => closeHamburger()}
-              >Coming Soon</Link>
+              >OBS Configs</Link>
 
             {/* 
             <div className="navbar-item has-dropdown is-hoverable">
