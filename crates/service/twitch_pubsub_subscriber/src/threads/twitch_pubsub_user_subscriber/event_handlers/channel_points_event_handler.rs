@@ -54,6 +54,7 @@ impl ChannelPointsEventHandler {
   async fn handle_reward_redeemed_event(&self, redemption: &Redemption) -> AnyhowResult<()> {
     let maybe_rule = self.find_matching_rule(redemption)?;
     if let Some(rule) = maybe_rule {
+      info!("Channel Points rule matched: {}", &rule.token);
       self.handle_matched_rule(&rule, redemption).await?;
       self.report_event_for_analytics(redemption).await?; // Report event for analytics
     }
@@ -90,6 +91,7 @@ impl ChannelPointsEventHandler {
     return match self.twitch_subscriber_state.read() {
       Err(e) => { Err(anyhow!("Lock error: {:?}", e)) },
       Ok(state) => {
+        info!("Checking channel points event against {} rules...", state.event_rules.len());
         let maybe_rule = state.event_rules.iter()
             .filter(|rule| rule.event_category.eq(&TwitchEventCategory::ChannelPoints))
             .find(|rule| {

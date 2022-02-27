@@ -50,6 +50,7 @@ impl BitsEventHandler {
   async fn handle_bits_event(&self, data: &BitsEventData) -> AnyhowResult<()> {
     let maybe_rule = self.find_matching_rule(data)?;
     if let Some(rule) = maybe_rule {
+      info!("Bits Rule matched: {}", &rule.token);
       self.handle_matched_rule(&rule, data).await?;
       self.report_event_for_analytics(&data).await?; // Report event for analytics
     }
@@ -76,6 +77,7 @@ impl BitsEventHandler {
     return match self.twitch_subscriber_state.read() {
       Err(e) => { Err(anyhow!("Lock error: {:?}", e)) },
       Ok(state) => {
+        info!("Checking bits event against {} rules...", state.event_rules.len());
         let maybe_rule = state.event_rules.iter()
             .filter(|rule| rule.event_category.eq(&TwitchEventCategory::Bits))
             .find(|rule| {
