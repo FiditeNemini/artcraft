@@ -33,10 +33,10 @@ function IndexPage(props: Props) {
             </div>
 
             <div className="column">
-              <p className="title">
+              <p className="title is-1">
                 Storyteller
               </p>
-              <p className="subtitle">
+              <p className="subtitle is-3">
                 Supercharge your Stream
               </p>
 

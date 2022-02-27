@@ -50,7 +50,7 @@ function TopNavSessionButton(props: Props) {
         rel="noreferrer"
         onClick={() => props.closeHamburgerAction()}
         className="button is-alert is-inverted is-pulled-right"
-        > {gravatar}&nbsp; {displayName}</a>
+        > {gravatar}&nbsp; {displayName} (FakeYou)</a>
     );
     logoutLink = <button
         className="button is-alert is-inverted is-pulled-right"

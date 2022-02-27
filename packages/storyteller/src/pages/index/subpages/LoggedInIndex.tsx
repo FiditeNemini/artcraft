@@ -2,7 +2,8 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCogs, faVideo } from '@fortawesome/free-solid-svg-icons';
-import { faTwitch } from '@fortawesome/free-brands-svg-icons';
+import { faDiscord, faTwitch } from '@fortawesome/free-brands-svg-icons';
+import { DiscordLink } from '@storyteller/components/src/elements/DiscordLink';
 
 function LoggedInIndex() {
   return (
@@ -37,6 +38,21 @@ function LoggedInIndex() {
           </Link>
 
         </div>
+
+        <br />
+        <br />
+
+        <div className="content">
+          <h1 className="title is-3"> <FontAwesomeIcon icon={faDiscord} /> Join us in Discord! </h1>
+          <h2 className="subtitle is-5">
+            We'd like to chat with you.
+          </h2>
+          <p>
+            <DiscordLink text="Please join us in Discord" iconAfterText={true} /> so that we know 
+            what you're thinking.
+          </p>
+        </div>
+
       </section>
 
     </div>
