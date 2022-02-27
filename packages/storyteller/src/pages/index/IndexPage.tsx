@@ -31,9 +31,7 @@ function IndexPage() {
               <p>
                 Storyteller is a new platform built by the creators of the&nbsp; 
                 <FakeYouExternalLink>FakeYou deep fake website</FakeYouExternalLink>. We're
-                building a virtual and deepfake production tools for your 
-                home studio. Twitch TTS is just the first of many tools we'll be 
-                offering.
+                building virtual and deepfake production tools for your home studio. 
               </p>
             </div>
 
