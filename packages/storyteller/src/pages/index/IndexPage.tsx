@@ -8,23 +8,43 @@ import { Link } from 'react-router-dom';
 function IndexPage() {
   return (
     <div>
+
+      <section className="hero is-small">
+        <div className="hero-body">
+
+          <div className="columns is-vcentered">
+
+            <div className="column is-one-third">
+              <div className="mascot">
+                <img src="/mascot/kitsune_pose6_black_2000.webp" alt="FakeYou's mascot!" />
+              </div>
+            </div>
+
+            <div className="column">
+              <p className="title">
+                Storyteller
+              </p>
+              <p className="subtitle">
+                Supercharge your Stream
+              </p>
+
+              <p>
+                Storyteller is a new platform built by the creators of the&nbsp; 
+                <FakeYouExternalLink>FakeYou deep fake website</FakeYouExternalLink>. We're
+                building a virtual and deepfake production tools for your 
+                home studio. Twitch TTS is just the first of many tools we'll be 
+                offering.
+              </p>
+            </div>
+
+          </div>
+        </div>
+      </section>
+
       <section className="section">
         <div className="container">
-          <h1 className="title">
-            Storyteller
-          </h1>
-          <p className="subtitle">
-            Supercharge your Content
-          </p>
 
           <div className="content">
-            <p>
-              Storyteller is a new platform built by the creators of the&nbsp; 
-              <FakeYouExternalLink>FakeYou deep fake website</FakeYouExternalLink>. We're
-              building a virtual and deepfake production tools for your 
-              home studio. Twitch TTS is just the first of many tools we'll be 
-              offering.
-            </p>
           </div>
 
           <a
