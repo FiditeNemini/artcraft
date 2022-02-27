@@ -177,7 +177,9 @@ class App extends React.Component<Props, State> {
                 <ObsLayerPage />
               </Route>
               <Route exact={true} path="/">
-                <IndexPage />
+                <IndexPage 
+                  sessionWrapper={this.state.sessionWrapper}
+                  />
               </Route>
             </Switch>
 

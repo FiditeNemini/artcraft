@@ -2,10 +2,26 @@ import { faTwitch } from '@fortawesome/free-brands-svg-icons';
 import { faCogs, faVideo } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { FakeYouExternalLink } from '@storyteller/components/src/elements/FakeYouExternalLink';
+import { SessionWrapper } from '@storyteller/components/src/session/SessionWrapper';
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { LoggedInIndex } from './subpages/LoggedInIndex';
+import { LoggedOutIndex } from './subpages/LoggedOutIndex';
 
-function IndexPage() {
+interface Props {
+  sessionWrapper: SessionWrapper,
+}
+
+function IndexPage(props: Props) {
+
+  let indexComponent = <></>;
+
+  if (props.sessionWrapper.isLoggedIn()) {
+    indexComponent  = <LoggedInIndex />
+  } else {
+    indexComponent = <LoggedOutIndex />
+  }
+
   return (
     <div>
 
@@ -39,42 +55,8 @@ function IndexPage() {
         </div>
       </section>
 
-      <section className="section">
-        <div className="container">
+      {indexComponent}
 
-          <div className="content">
-          </div>
-
-          <a
-            href="https://api.jungle.horse/twitch/oauth_enroll_redirect"
-            className="button is-large is-info is-fullwidth"
-            >
-              Link to Your Twitch&nbsp;<FontAwesomeIcon icon={faTwitch} />
-          </a>
-
-          <br />
-
-          <Link
-            to="/tts_configs"
-            className="button is-large is-info is-fullwidth"
-            >
-              Configure TTS&nbsp;<FontAwesomeIcon icon={faCogs} />
-          </Link>
-
-          <br />
-
-          <Link
-            to="/obs_info"
-            className="button is-large is-info is-fullwidth"
-            >
-              Configure OBS&nbsp;<FontAwesomeIcon icon={faVideo} />
-          </Link>
-
-
-
-
-        </div>
-      </section>
     </div>
   )
 }
