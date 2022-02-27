@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { TtsModelListItem } from '@storyteller/components/src/api/tts/ListTtsModels';
 import { FakeYouExternalLink } from '@storyteller/components/src/elements/FakeYouExternalLink';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';

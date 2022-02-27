@@ -76,7 +76,7 @@ function EventResponseComponent(props: EventResponseComponentProps) {
   const handleChangedTtsModelToken = (token: string) => {
     // We may be only updating to a single token, but we want to be able to navigate back to 
     // the "random voices" view, etc.
-    let updatedTokens = [... selectedTtsModelTokens];
+    let updatedTokens = [...selectedTtsModelTokens];
 
     if (updatedTokens.length > 0) {
       updatedTokens[0] = token;
@@ -91,7 +91,7 @@ function EventResponseComponent(props: EventResponseComponentProps) {
   }
 
   const handleChangedTtsModelTokens = (tokens: string[]) => {
-    let updatedTokens = [... tokens];
+    let updatedTokens = [...tokens];
 
     const newEventResponse = buildEventResponse(updatedTokens, eventResponseType);
 
