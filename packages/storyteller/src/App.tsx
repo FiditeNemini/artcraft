@@ -20,6 +20,7 @@ import { TtsConfigsCreateRulePage } from './pages/tts_configs/TtsConfigsCreateRu
 import { TtsConfigsDeleteRulePage } from './pages/tts_configs/TtsConfigsDeleteRulePage';
 import { TtsConfigsEditRulePage } from './pages/tts_configs/TtsConfigsEditRulePage';
 import { TtsConfigsReorderPage } from './pages/tts_configs/TtsConfigsReorderPage';
+import { ObsConfigsPage } from './pages/obs_configs/ObsConfigsPage';
 
 i18n
   .use(initReactI18next) // passes i18n down to react-i18next
@@ -170,6 +171,11 @@ class App extends React.Component<Props, State> {
                 <TtsConfigsIndexPage
                   sessionWrapper={this.state.sessionWrapper}
                   allTtsModelsByToken={this.state.allTtsModelsByToken}
+                />
+              </Route>
+              <Route exact={true} path="/obs_configs">
+                <ObsConfigsPage
+                  sessionWrapper={this.state.sessionWrapper}
                 />
               </Route>
               <Route exact={true} path="/">

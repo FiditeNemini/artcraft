@@ -31,7 +31,7 @@ function LoggedInIndex() {
           <br />
 
           <Link
-            to="/obs_info"
+            to="/obs_configs"
             className="button is-large is-info is-fullwidth"
             >
               Configure OBS&nbsp;<FontAwesomeIcon icon={faVideo} />

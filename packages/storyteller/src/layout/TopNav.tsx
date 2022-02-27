@@ -47,7 +47,7 @@ function TopNav(props: Props) {
               onClick={() => closeHamburger()}
               >TTS Configs</Link>
 
-            <Link to="/"
+            <Link to="/obs_configs"
               className="navbar-item"
               onClick={() => closeHamburger()}
               >OBS Configs</Link>
