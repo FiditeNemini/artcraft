@@ -26,7 +26,7 @@ treat the tokens as *opaque strings*. That is, do not validate the prefix (eg. `
 that a given token (eg. `U:E00D2RD3ZNZ7P`) is a user. These are only helpful for human debugging, 
 and they are subject to change.
 
-## Text to Speech
+## Voice Models & Categories
 
 ### Get a list of voices
 
@@ -94,10 +94,83 @@ Response
 ]
 ```
 
+### Get a list of voice categories
+
+To download a list of voice categories (useful for building a voice search dropdown), 
+use the following API:
+
+```bash
+curl -X GET https://api.fakeyou.com/category/list/tts | jq
+```
+
+Response (note that categories are a *tree* of categories and subcategories):
+
+```json
+{
+  "success": true,
+  "categories": [
+    {
+      // The primary key identifier of the category
+      "category_token": "CAT:nbfg6v5jsdd",
+
+      // The model type. Other valid values are: "w2l".
+      "model_type": "tts",
+
+      // If the category has a parent, this will be populated with the
+      // parent category token. You can recursively build a tree if you
+      // want to build hierarchical navigation. Or you can exclude parents
+      // and just show the leaves.
+      "maybe_super_category_token": "CAT:0aezw83sdnp",
+
+      // If the category can have models in it directly
+      // If false, the category is only a super category.
+      "can_directly_have_models": true,
+
+      // If the model can have children categories.
+      // Leaf categories cannot.
+      "can_have_subcategories": false,
+
+      // If the category can only be applied by mods. Typically false.
+      "can_only_mods_apply": false,
+
+      // The human readable name of the category
+      "name": "Aaahh!!! Real Monsters",
+
+      // This will always be populated and you should prefer it for tree-based 
+      // dropdowns.
+      //
+      // This is the name of the category to show in dropdown menus as it may
+      // occasionally be contextually different than `name`, eg. it could be 
+      // titled "(by Game)" if the category title was "Sonic Voices by Game". 
+      "name_for_dropdown": "Aaahh!!! Real Monsters",
+
+      // If the category has been approved by mods for general use.
+      // You won't ever see any categories where this is `false`.
+      "is_mod_approved": true,
+
+      // When the category was created
+      "created_at": "2022-01-09T09:34:25Z",
+
+      // When the category was last edited
+      "updated_at": "2022-01-09T09:35:25Z",
+
+      // If the category has been deleted, this will be populated.
+      // This is for moderators and you can safely ignore the field 
+      // as deleted categories will never be returned in any non-moderator 
+      // views.
+      "deleted_at": null
+    },
+    // ...
+  ]
+}
+```
+
+## Generate TTS Audio
+
 ### Make a TTS request
 
 To turn text into speech with your desired voice, you'll need to find the appropriate TTS model token 
-from the lookup API. 
+from the model lookup API. 
 
 For example, `TM:7wbtjphx8h8v` in the following examples is our `Mario *` voice. (A paid voice actor 
 that we hired to impersonate Mario).
@@ -137,7 +210,7 @@ A closer look at the request payload,
 }
 ```
 
-And the response it initially gives back,
+And the response it gives us back,
 
 ```json
 {
@@ -152,14 +225,15 @@ And the response it initially gives back,
 
 ### Poll TTS request status
 
-Once you've submitted your TTS request, you'll want to poll for completion.
+Once you've submitted your TTS request, you'll want to poll for completion using 
+the `inference_job_token`.
 
 ```bash
 curl -X GET 'https://api.fakeyou.com/tts/job/{INFERENCE_JOB_TOKEN}' \
   -H 'Accept: application/json' | jq
 ```
 
-Or filled out with an actual token,
+Or filled out with an actual token from the earlier request,
 
 ```bash
 curl -X GET 'https://api.fakeyou.com/tts/job/JTINF:qsy72wnfashhvnkktc16y49cy1' \
