@@ -118,7 +118,7 @@ function NewTopNavFc(props: Props) {
             <a href={FrontendUrlConfig.developerDocs()}
               className="navbar-item"
               onClick={() => closeHamburger()}
-              >Developers</a>
+              >{t('coreUi.topNav.developers')}</a>
 
           </div>
 

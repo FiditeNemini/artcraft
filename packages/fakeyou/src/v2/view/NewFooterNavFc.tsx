@@ -42,6 +42,8 @@ function NewFooterNavFc(props: Props) {
           &nbsp;|
           <Link to="/firehose">{t('coreUi.footerNav.feed')}</Link>
           &nbsp;|
+          <a href={FrontendUrlConfig.developerDocs()}>{t('coreUi.footerNav.apiDocs')}</a>
+          &nbsp;|
           <Link to="/about">{t('coreUi.footerNav.aboutUs')}</Link>
           &nbsp;|
           <Link to="/terms">{t('coreUi.footerNav.termsOfUse')}</Link>

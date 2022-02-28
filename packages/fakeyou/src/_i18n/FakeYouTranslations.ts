@@ -8,6 +8,7 @@ const FAKEYOU_TRANSLATIONS : any = {
     translation: {
       coreUi: {
         footerNav: {
+          apiDocs: 'API Docs',
           aboutUs: 'About Us',
           builtBy: 'Built by <1>echelon</1> in Atlanta.',
           feed: 'Feed',
@@ -22,6 +23,7 @@ const FAKEYOU_TRANSLATIONS : any = {
           aboutUs: 'About Us',
           community: 'Community',
           contributeUpload: 'Contribute / Upload',
+          developers: 'Developers',
           feed: 'Feed',
           leaderboard: 'Leaderboard',
           logout: 'Logout',
@@ -78,6 +80,7 @@ const FAKEYOU_TRANSLATIONS : any = {
     translation: {
       coreUi: {
         footerNav: {
+          apiDocs: 'Documentos de la API',
           aboutUs: 'Sobre Nosotros',
           builtBy: 'Construido por <1>echelon</1> en Atlanta.',
           feed: 'Transmisión en Vivo',
@@ -92,6 +95,7 @@ const FAKEYOU_TRANSLATIONS : any = {
           aboutUs: 'Sobre Nosotros',
           community: 'Comunidad',
           contributeUpload: 'Contribuir / Subir',
+          developers: 'Desarrollador',
           feed: 'Transmisión en Vivo',
           leaderboard: 'Tabla de Clasificación',
           logout: 'Cerrar sesión',
