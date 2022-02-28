@@ -349,3 +349,9 @@ That would make the URL for the audio the following:
 
 https://storage.googleapis.com/vocodes-public/tts_inference_output/9/c/d/vocodes_9cdd9865-0e10-48f0-9a23-861118ec3286.wav
 
+# Need help, additional docs, or anything else?
+
+Would you like assistance? Or to see API docs for our other endpoints? (W2L? Talknet? Model upload?) 
+We'll be happy to assist, update the docs, and more.
+
+[Please reach out to us in Discord!](https://discord.gg/H72KFXm)
