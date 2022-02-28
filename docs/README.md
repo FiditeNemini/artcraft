@@ -80,3 +80,149 @@ Response
     // ...
 ]
 ```
+
+### Make a TTS request
+
+To turn text into speech with your desired voice, you'll need to find the appropriate TTS model token 
+from the lookup API. 
+
+For example, `TM:7wbtjphx8h8v` in the following examples is our `Mario *` voice. (A paid voice actor 
+that we hired to impersonate Mario).
+
+```bash
+curl -X POST 'https://api.fakeyou.com/tts/inference' 
+
+ -H 'Accept: application/json' \
+ -H 'Content-Type: application/json' \
+ --data-raw '{"uuid_idempotency_token":"entropy","tts_model_token":"TM:7wbtjphx8h8v","inference_text":"Testing"}'
+```
+
+A closer look at the request payload,
+
+```json
+{
+  // The primary key token identifier of the model you want to use. 
+  // This can be looked up in the aforementioned list endpoint.
+  "tts_model_token": "TM:7wbtjphx8h8v",
+
+  // A random value that can only be used once!
+  // 
+  // Any subsequent request with the same idempotency token will fail outright.
+  // The reason for this is so that frontend "create" APIs won't accidentally resubmit 
+  // the same request twice.
+  //
+  // This payload doesn't have to be a UUID, but we recommend uuid V4 (or a more modern 
+  // algorithm that makes better use of entropy). The chances that your request will fail due 
+  // to duplicate UUIDs is infinitsimal, so set it and don't worry about it.
+  //
+  // Notably, the UUID has a maximum length of 36 characters.
+  "uuid_idempotency_token": "9cdd9865-0e10-48f0-9a23-861118ec3286",
+
+  // The text to be synthesized into audio.
+  // We have a slur filter, but you'll also want to sanitize the input on your end.
+  "inference_text": "I'll only say the things you want me to say, and nothing more."
+}
+```
+
+And the response it initially gives back,
+
+```json
+{
+  // Whether the request was successful
+  "success": true,
+
+  // The token to look up the results.
+  // You'll use this to poll an API to see if your request has finished processing.
+  "inference_job_token": "JTINF:qsy72wnfashhvnkktc16y49cy1"
+}
+```
+
+### Poll TTS request status
+
+Once you've submitted your TTS request, you'll want to poll for completion.
+
+```bash
+curl -X GET 'https://api.fakeyou.com/tts/job/{INFERENCE_JOB_TOKEN}' \
+  -H 'Accept: application/json' | jq
+```
+
+Or filled out with an actual token,
+
+```bash
+curl -X GET 'https://api.fakeyou.com/tts/job/JTINF:qsy72wnfashhvnkktc16y49cy1' \
+  -H 'Accept: application/json' | jq
+```
+
+The response looks like this while the results are processing,
+
+```json
+{
+  // Whether the request succeeded
+  "success": true,
+
+  // Container for the job state record
+  "state": {
+
+    // Simply returns the same job token you supplied
+    "job_token": "JTINF:qsy72wnfashhvnkktc16y49cy1",
+
+    // The overall status of the job. 
+    // 
+    // Job states are as follows:
+    //
+    //  - "pending": job is waiting to run
+    //  - "started": job is processing now
+    //  - "complete_success": the job ran to completion
+    //        successfully and you have audio results
+    //  - "complete_failure": the job failed in a knowably
+    //        non-repeatable way and will not be retried.
+    //  - "attempt_failed": the job failed once, but it's
+    //        recoverable and we'll retry again soon.
+    //  - "dead": retry attempts were exhausted and the job
+    //        will not be retried further.
+    //
+    // As a state machine:
+    //
+    // Pending -> Started -> Complete_Success
+    //                    |-> Complete_Failure
+    //                    \-> Attempt_Failed -> Started -> { Complete, Failed, Dead }
+    "status": "pending",
+
+    // During processing, this may be a human-readable string
+    // to describe the execution status. 
+    "maybe_extra_status_description": null,
+
+    // The number of attempts we've made to render the audio.
+    "attempt_count": 0,
+
+    // If there are results, this is the token you'll use to 
+    // look up more details (wav file, spectrogram, duration, 
+    // execution statistics, etc.)
+    "maybe_result_token": null,
+
+    // If there are results, this will show the path to the 
+    // wav file. You can use this to avoid looking up the audio
+    // record directly in another API call.
+    "maybe_public_bucket_wav_audio_path": null,
+
+    // Voice (tts model) that was used to synthesize the audio.
+    "model_token": "TM:7wbtjphx8h8v",
+
+    // The synthesizer architecture
+    "tts_model_type": "tacotron2",
+
+    // The name of the model. 
+    // This field works the same as the `title` field in the 
+    // aforementioned /tts/list request.
+    "title": "Mario*",
+
+    // The text that was used to generate the audio.
+    "raw_inference_text": "This is a use of the voice",
+
+    // When the TTS request was made.
+    "created_at": "2022-02-28T05:39:36Z",
+
+    // When the job status was last updated.
+    "updated_at": "2022-02-28T05:39:36Z"
+  }
+}
