@@ -1,10 +1,14 @@
 FakeYou API
 ===========
 
-Our API is freely available for you to use, though it is IP rate limited to prevent abuse. 
+[FakeYou.com](https://fakeyou.com) has an API that is freely available for you to use, though it is IP 
+rate limited to prevent abuse. 
 
-We will provide API tokens for use in the HTTP `Authorization:` header soon as a means to bypass 
-rate limiting as well as access your privately uploaded voice models.
+We will soon (by March 5th, 2022) provide optional API tokens for use in the HTTP `Authorization:` header 
+as a means to bypass rate limiting as well as access your privately uploaded voice models.
+
+[Please reach out to us over Discord](https://discord.gg/H72KFXm) to describe what you're building, 
+and we'll see if we can help!
 
 ## High level notes
 
@@ -12,11 +16,13 @@ The following details pertain to all of our endpoints.
 
 ### HTTP Response Codes
 
-* **`HTTP 400` - Bad request**, something was wrong with your request.
+* **`HTTP 400` - Bad request**, something was wrong with your request. Please consult the docs
+  or ask about it in [Discord](https://discord.gg/H72KFXm).
 * **`HTTP 401` - Unauthorized**, eg. bad `Authorization:` header or incorrect use of a 
   login-required endpoint.
 * **`HTTP 429` - Too many requests**, you're sending too many requests and you'll need to 
   slow things down.
+* **`HTTP 500` - Server error**, something went wrong and we messed up. Please let us know.
 
 ### Tokens / Primary Key Identifiers
 
