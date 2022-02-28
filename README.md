@@ -37,6 +37,19 @@ Good Code Examples
 
 * `storyteller/src/pages/tts_configs/TtsConfigsEditRulePage.tsx` - Tree of components that handle a very complicated update API
 
+Documentation
+-------------
+
+docs.fakeyou.com is generated from `./docs` using [Docsify](https://docsify.js.org/).
+
+To run and test locally,
+
+```bash
+sudo npm i docsify-cli -g
+docsify serve docs
+```
+
+
 Netlify Notes
 -------------
 
