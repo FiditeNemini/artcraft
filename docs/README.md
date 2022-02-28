@@ -1,3 +1,10 @@
+<div class="demo-theme-preview">
+  <a data-theme="vue">light mode</a>
+  <a data-theme="dark">dark mode</a>
+</div>
+
+---
+
 FakeYou API
 ===========
 
@@ -361,3 +368,33 @@ Would you like assistance? Or to see API docs for our other endpoints? (W2L? Tal
 We'll be happy to assist, update the docs, and more.
 
 [Please reach out to us in Discord!](https://discord.gg/H72KFXm)
+
+
+<div class="demo-theme-preview">
+  <a data-theme="vue">light mode</a>
+  <a data-theme="dark">dark mode</a>
+</div>
+
+<style>
+  .demo-theme-preview a {
+    padding-right: 10px;
+  }
+
+  .demo-theme-preview a:hover {
+    cursor: pointer;
+    text-decoration: underline;
+  }
+</style>
+
+<script>
+  var preview = Docsify.dom.find('.demo-theme-preview');
+  var themes = Docsify.dom.findAll('[rel="stylesheet"]');
+
+  preview.onclick = function (e) {
+    var title = e.target.getAttribute('data-theme');
+
+    themes.forEach(function (theme) {
+      theme.disabled = theme.title !== title;
+    });
+  };
+</script>
