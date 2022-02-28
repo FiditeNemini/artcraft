@@ -88,6 +88,8 @@ Response
       "is_front_page_featured": false,
 
       // Whether the voice is highlighted on Twitch
+      // If you're building a Twitch integration, these are good voices 
+      // to highlight for streamers.
       "is_twitch_featured": false,
 
       // Categories this voice belongs to
