@@ -1,12 +1,12 @@
+FakeYou API
+===========
+
 <div class="demo-theme-preview">
-  <a data-theme="vue">light mode</a>
-  <a data-theme="dark">dark mode</a>
+  <a data-theme="vue">☀️ light mode</a>
+  <a data-theme="dark">🌙 dark mode</a>
 </div>
 
 ---
-
-FakeYou API
-===========
 
 [FakeYou.com](https://fakeyou.com) has an API that is freely available for you to use, though it is IP 
 rate limited to prevent abuse. 
@@ -369,10 +369,11 @@ We'll be happy to assist, update the docs, and more.
 
 [Please reach out to us in Discord!](https://discord.gg/H72KFXm)
 
+---
 
 <div class="demo-theme-preview">
-  <a data-theme="vue">light mode</a>
-  <a data-theme="dark">dark mode</a>
+  <a data-theme="vue">☀️ light mode</a>
+  <a data-theme="dark">🌙 dark mode</a>
 </div>
 
 <style>
@@ -387,14 +388,18 @@ We'll be happy to assist, update the docs, and more.
 </style>
 
 <script>
-  var preview = Docsify.dom.find('.demo-theme-preview');
+  // NB: This is a list since I want theme switchers at top and bottom of page.
+  var themeSwitchers = Docsify.dom.findAll('.demo-theme-preview');
   var themes = Docsify.dom.findAll('[rel="stylesheet"]');
 
-  preview.onclick = function (e) {
-    var title = e.target.getAttribute('data-theme');
+  themeSwitchers.forEach(function (themeSwitcher) {
+    themeSwitcher.onclick = function (e) {
+      var title = e.target.getAttribute('data-theme');
 
-    themes.forEach(function (theme) {
-      theme.disabled = theme.title !== title;
-    });
-  };
+      themes.forEach(function (theme) {
+        theme.disabled = theme.title !== title;
+      });
+    };
+  })
+
 </script>
