@@ -6,12 +6,25 @@ Our API is freely available for you to use, though it is IP rate limited to prev
 We will provide API tokens for use in the HTTP `Authorization:` header soon as a means to bypass 
 rate limiting as well as access your privately uploaded voice models.
 
-## A note about tokens
+## High level notes
+
+The following details pertain to all of our endpoints. 
+
+### HTTP Response Codes
+
+* **`HTTP 400` - Bad request**, something was wrong with your request.
+* **`HTTP 401` - Unauthorized**, eg. bad `Authorization:` header or incorrect use of a 
+  login-required endpoint.
+* **`HTTP 429` - Too many requests**, you're sending too many requests and you'll need to 
+  slow things down.
+
+### Tokens / Primary Key Identifiers
 
 All of the entities in our database model have Crockford-encoded token primary key identifiers. 
-We uniquely prefix each entity type to keep tokens recognizable, but you should treat the tokens 
-as *opaque strings*. That is, do not validate the prefix (eg. `U:`) to assert that a given 
-token (eg. `U:E00D2RD3ZNZ7P`) is a user. These are only helpful for human debugging.
+We uniquely prefix each entity type to keep tokens recognizably namespaced, but you should 
+treat the tokens as *opaque strings*. That is, do not validate the prefix (eg. `U:`) to assert 
+that a given token (eg. `U:E00D2RD3ZNZ7P`) is a user. These are only helpful for human debugging, 
+and they are subject to change.
 
 ## Text to Speech
 
@@ -226,3 +239,39 @@ The response looks like this while the results are processing,
     "updated_at": "2022-02-28T05:39:36Z"
   }
 }
+```
+
+Here's a successfully completed job:
+
+```json
+{
+  "success": true,
+  "state": {
+    "job_token": "JTINF:qsy72wnfashhvnkktc16y49cy1",
+    "status": "complete_success",
+    "maybe_extra_status_description": "done",
+    "attempt_count": 1,
+    "maybe_result_token": "TR:tn7gq96wg6httvnq91y4y9fka76nj",
+    "maybe_public_bucket_wav_audio_path": "/tts_inference_output/9/c/d/vocodes_9cdd9865-0e10-48f0-9a23-861118ec3286.wav",
+    "model_token": "TM:7wbtjphx8h8v",
+    "tts_model_type": "tacotron2",
+    "title": "Mario*",
+    "raw_inference_text": "This is a use of the voice",
+    "created_at": "2022-02-28T05:39:36Z",
+    "updated_at": "2022-02-28T05:39:51Z"
+  }
+}
+```
+
+### Request audio file
+
+Use the final value of `maybe_public_bucket_wav_audio_path` as the path to the audio file. 
+
+We have an API to look up the current result CDN, but for now you can hardcode the following to avoid extra round trips:
+
+**https://storage.googleapis.com/vocodes-public**
+
+That would make the URL for the audio the following: 
+
+https://storage.googleapis.com/vocodes-public/tts_inference_output/9/c/d/vocodes_9cdd9865-0e10-48f0-9a23-861118ec3286.wav
+
