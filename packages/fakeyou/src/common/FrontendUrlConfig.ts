@@ -22,6 +22,12 @@ class FrontendUrlConfig {
     return '/patrons';
   }
 
+  // Other domains
+
+  static developerDocs() : string {
+    return 'https://docs.fakeyou.com/';
+  }
+
   // TTS model links
 
   static ttsModelPage(modelToken: string) : string {
