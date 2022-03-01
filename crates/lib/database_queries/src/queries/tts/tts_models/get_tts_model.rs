@@ -10,6 +10,7 @@ use sqlx::MySqlPool;
 // FIXME: This is the old style of query scoping and shouldn't be copied.
 //  The moderator-only fields are good practice, though.
 
+// TODO/FIXME : This struct is returned publicly in some endpoints!
 #[derive(Serialize)]
 pub struct TtsModelRecordForResponse {
   pub model_token: String,
@@ -26,8 +27,13 @@ pub struct TtsModelRecordForResponse {
   pub description_markdown: String,
   pub description_rendered_html: String,
 
+  pub ietf_language_tag: String,
+  pub ietf_primary_language_subtag: String,
+
   pub is_front_page_featured: bool,
   pub is_twitch_featured: bool,
+
+  pub maybe_suggested_unique_bot_command: Option<String>,
 
   pub creator_set_visibility: RecordVisibility,
 
@@ -100,8 +106,11 @@ pub async fn get_tts_model_by_token(
     description_markdown: model.description_markdown,
     description_rendered_html: model.description_rendered_html,
     // NB: Fail open/public with creator_set_visibility since we're already looking at it
+    ietf_language_tag: model.ietf_language_tag,
+    ietf_primary_language_subtag: model.ietf_primary_language_subtag,
     is_front_page_featured: i8_to_bool(model.is_front_page_featured),
     is_twitch_featured: i8_to_bool(model.is_twitch_featured),
+    maybe_suggested_unique_bot_command: model.maybe_suggested_unique_bot_command,
     creator_set_visibility: RecordVisibility::from_str(&model.creator_set_visibility)
         .unwrap_or(RecordVisibility::Public),
     is_locked_from_use: i8_to_bool(model.is_locked_from_use),
@@ -143,8 +152,13 @@ SELECT
     tts.description_markdown,
     tts.description_rendered_html,
 
+    tts.ietf_language_tag,
+    tts.ietf_primary_language_subtag,
+
     tts.is_front_page_featured,
     tts.is_twitch_featured,
+
+    tts.maybe_suggested_unique_bot_command,
 
     tts.creator_set_visibility,
 
@@ -193,8 +207,13 @@ SELECT
     tts.description_markdown,
     tts.description_rendered_html,
 
+    tts.ietf_language_tag,
+    tts.ietf_primary_language_subtag,
+
     tts.is_front_page_featured,
     tts.is_twitch_featured,
+    
+    tts.maybe_suggested_unique_bot_command,
 
     tts.creator_set_visibility,
 
@@ -240,8 +259,13 @@ struct InternalTtsModelRecordRaw {
   pub description_markdown: String,
   pub description_rendered_html: String,
 
+  pub ietf_language_tag: String,
+  pub ietf_primary_language_subtag: String,
+
   pub is_front_page_featured: i8,
   pub is_twitch_featured: i8,
+
+  pub maybe_suggested_unique_bot_command: Option<String>,
 
   pub creator_set_visibility: String,
 

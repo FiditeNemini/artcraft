@@ -7,7 +7,7 @@ use sqlx::MySqlPool;
 
 // FIXME: This is the old style of query scoping and shouldn't be copied.
 
-// TODO: This record type is publicly returned in some endpoints!
+// TODO/FIXME : This struct is returned publicly in some endpoints!
 #[derive(Serialize)]
 pub struct TtsModelRecordForList {
   pub model_token: String,
