@@ -59,6 +59,7 @@ Response
     {
       // The primary token identifier for the model.
       // This is what you use to reference and utilize the model.
+      // These values cannot be edited and will never change.
       "model_token": "TM:pgdraamqpbke",
 
       // The type of synthesizer (options: tacotron2, glowtts, etc.)
@@ -117,7 +118,7 @@ Response
       //
       // If set, the value will always be lowercase, alphanumeric ASCII characters
       // only. (We don't allow hyphens or underscores since we don't know the parameters 
-      // or limitations of your input system. We don't want to create problems.)
+      // or limitations of your input system. We don't want to create problems for you.)
       //
       // Field type: `string | null`
       "maybe_suggested_unique_bot_command": "frieza",
