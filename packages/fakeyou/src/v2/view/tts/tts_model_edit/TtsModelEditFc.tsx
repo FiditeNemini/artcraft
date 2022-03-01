@@ -11,6 +11,7 @@ import { BackLink } from '../../_common/BackLink';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faHeadphones, faHome } from '@fortawesome/free-solid-svg-icons';
 import { faTwitch } from '@fortawesome/free-brands-svg-icons';
+import { DEFAULT_MODEL_LANGUAGE, SUPPORTED_MODEL_LANGUAGE_TAG_TO_FULL } from '@storyteller/components/src/i18n/SupportedModelLanguages';
 
 const DEFAULT_VISIBILITY = 'public';
 
@@ -34,6 +35,7 @@ function TtsModelEditFc(props: Props) {
   // Fields
   const [title, setTitle] = useState<string>("");
   const [descriptionMarkdown, setDescriptionMarkdown] = useState<string>("");
+  const [fullLanguageTag, setFullLanguageTag] = useState<string>(""); // NB: Should be full IETF, eg. ["en", "en-US", "es-419", etc.]
   const [visibility, setVisibility] = useState<string>(DEFAULT_VISIBILITY);
   const [defaultPretrainedVocoder, setDefaultPretrainedVocoder] = useState<string>(DEFAULT_PRETRAINED_VOCODER);
   const [isFrontPageFeatured, setIsFrontPageFeatured] = useState<boolean>(false);
@@ -47,6 +49,7 @@ function TtsModelEditFc(props: Props) {
 
       setTitle(model.title || "")
       setDescriptionMarkdown(model.description_markdown || "")
+      setFullLanguageTag(model.ietf_language_tag || DEFAULT_MODEL_LANGUAGE)
       setVisibility(model.creator_set_visibility || DEFAULT_VISIBILITY);
       setDefaultPretrainedVocoder(model.maybe_default_pretrained_vocoder || DEFAULT_PRETRAINED_VOCODER);
       setIsFrontPageFeatured(model.is_front_page_featured|| false);
@@ -78,6 +81,10 @@ function TtsModelEditFc(props: Props) {
     const textValue = (ev.target as HTMLTextAreaElement).value;
     setDescriptionMarkdown(textValue);
     return false;
+  };
+
+  const handleSpokenLanguageChange = (ev: React.FormEvent<HTMLSelectElement>) => {
+    setFullLanguageTag((ev.target as HTMLSelectElement).value)
   };
 
   const handleVisibilityChange = (ev: React.FormEvent<HTMLSelectElement>) => {
@@ -123,6 +130,7 @@ function TtsModelEditFc(props: Props) {
       description_markdown: descriptionMarkdown,
       creator_set_visibility: visibility || DEFAULT_VISIBILITY,
       maybe_default_pretrained_vocoder: defaultPretrainedVocoder || DEFAULT_PRETRAINED_VOCODER,
+      ietf_language_tag: fullLanguageTag || DEFAULT_MODEL_LANGUAGE,
     }
 
     if (isModerator) {
@@ -254,6 +262,22 @@ function TtsModelEditFc(props: Props) {
                 placeholder="Model description (ie. source of data, training duration, etc)"
                 value={descriptionMarkdown} 
                 />
+            </div>
+          </div>
+
+          <div className="field">
+            <label className="label">Model Spoken Language</label>
+            <div className="control select">
+              <select 
+                onChange={handleSpokenLanguageChange}
+                value={fullLanguageTag}
+                >
+                {Array.from(SUPPORTED_MODEL_LANGUAGE_TAG_TO_FULL, ([languageTag, description]) => {
+                  return (<>
+                    <option value={languageTag}>{description}</option>
+                  </>);
+                })}
+              </select>
             </div>
           </div>
 

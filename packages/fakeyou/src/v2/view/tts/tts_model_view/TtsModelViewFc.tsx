@@ -4,6 +4,7 @@ import { EnqueueJobResponsePayload } from '../tts_model_list/TtsModelListFc';
 import { SessionTtsInferenceResultListFc } from '../../_common/SessionTtsInferenceResultsListFc';
 import { SessionWrapper } from '@storyteller/components/src/session/SessionWrapper';
 import { Gravatar } from '@storyteller/components/src/elements/Gravatar';
+import { LanguageCodeToDescriptionWithDefault } from '@storyteller/components/src/i18n/SupportedModelLanguages';
 import { TtsInferenceJob } from '@storyteller/components/src/jobs/TtsInferenceJobs';
 import { useParams, Link } from 'react-router-dom';
 import { v4 as uuidv4 } from 'uuid';
@@ -16,6 +17,9 @@ import { BackLink } from '../../_common/BackLink';
 import { ListTtsCategoriesForModel, ListTtsCategoriesForModelIsError, ListTtsCategoriesForModelIsOk, TtsModelCategory } from '../../../api/category/ListTtsCategoriesForModel';
 import { ListTtsCategories, ListTtsCategoriesIsError, ListTtsCategoriesIsOk, TtsCategory } from '../../../api/category/ListTtsCategories';
 import { CategoryBreadcrumb } from '../../_common/CategoryBreadcrumb';
+import { DiscordLink } from '@storyteller/components/src/elements/DiscordLink';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faDiscord, faTwitch } from '@fortawesome/free-brands-svg-icons';
 
 interface Props {
   sessionWrapper: SessionWrapper,
@@ -361,6 +365,12 @@ function TtsModelViewFc(props: Props) {
       defaultVocoder = 'WaveGlow'
       break;
   }
+  
+  const language = LanguageCodeToDescriptionWithDefault(ttsModel?.ietf_language_tag)
+
+  const discordCommand = !!ttsModel?.maybe_suggested_unique_bot_command ? 
+    <>{ttsModel?.maybe_suggested_unique_bot_command}</> :
+    <>not set (ask a moderator in <DiscordLink text="Discord" />)</> ;
 
   return (
     <div className="content">
@@ -396,6 +406,10 @@ function TtsModelViewFc(props: Props) {
             <td>{ttsModel?.title}</td>
           </tr>
           <tr>
+            <th>Spoken Language</th>
+            <td>{language}</td>
+          </tr>
+          <tr>
             <th>Model type</th>
             <td>{ttsModel?.tts_model_type}</td>
           </tr>
@@ -414,6 +428,12 @@ function TtsModelViewFc(props: Props) {
           <tr>
             <th>Visibility</th>
             <td>{resultVisibility}</td>
+          </tr>
+          <tr>
+            <th>
+              Bot TTS Command for <FontAwesomeIcon icon={faDiscord} /> / <FontAwesomeIcon icon={faTwitch} />
+            </th>
+            <td>{discordCommand}</td>
           </tr>
 
           {moderatorRows}
