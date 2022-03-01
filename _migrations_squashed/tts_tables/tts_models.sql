@@ -61,8 +61,8 @@ CREATE TABLE tts_models (
 
   -- ========== UNSTRUCTURED METADATA ==========
 
-  -- The IETF BCP47 language tag (eg. en-US, es-419, ja-JP, etc.)
-  ietf_language_tag VARCHAR(64) NOT NULL DEFAULT 'en-US',
+  -- The full IETF BCP47 language tag (eg. en, en-US, es-419, ja-JP, pt, etc.)
+  ietf_language_tag VARCHAR(64) NOT NULL DEFAULT 'en',
 
   -- The IETF BCP47 language tag's primary language subtag (eg. "es-419" becomes "es")
   ietf_primary_language_subtag VARCHAR(12) NOT NULL DEFAULT 'en',
