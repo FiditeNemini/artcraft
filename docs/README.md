@@ -115,9 +115,9 @@ Response
       // models for single speakers, we'll make sure to set the best sounding
       // options here and update them whenever necessary.
       //
-      // If set, the value will be lowercase, alphanumeric ASCII characters only.
-      // (We don't allow hyphens or underscores since we do not know the parameters 
-      // or limitations of your system and don't want to create problems.)
+      // If set, the value will always be lowercase, alphanumeric ASCII characters
+      // only. (We don't allow hyphens or underscores since we don't know the parameters 
+      // or limitations of your input system. We don't want to create problems.)
       //
       // Field type: `string | null`
       "maybe_suggested_unique_bot_command": "frieza",
