@@ -116,6 +116,8 @@ Response
       // options here and update them whenever necessary.
       //
       // If set, the value will be lowercase, alphanumeric ASCII characters only.
+      // (We don't allow hyphens or underscores since we do not know the parameters 
+      // of limitations of your system.)
       //
       // Field type: `string | null`
       "maybe_suggested_unique_bot_command": "frieza",
