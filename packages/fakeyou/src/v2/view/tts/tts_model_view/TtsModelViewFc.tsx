@@ -369,7 +369,7 @@ function TtsModelViewFc(props: Props) {
   const language = LanguageCodeToDescriptionWithDefault(ttsModel?.ietf_language_tag)
 
   const discordCommand = !!ttsModel?.maybe_suggested_unique_bot_command ? 
-    <>{ttsModel?.maybe_suggested_unique_bot_command}</> :
+    <><code>/tts {ttsModel?.maybe_suggested_unique_bot_command}</code></> :
     <>not set (ask a moderator in <DiscordLink text="Discord" />)</> ;
 
   return (

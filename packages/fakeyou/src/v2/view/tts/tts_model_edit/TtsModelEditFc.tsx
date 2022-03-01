@@ -9,8 +9,8 @@ import { HiddenIconFc } from '../../_icons/HiddenIcon';
 import { GetTtsModel, GetTtsModelIsErr, GetTtsModelIsOk, TtsModel, TtsModelLookupError } from '@storyteller/components/src/api/tts/GetTtsModel';
 import { BackLink } from '../../_common/BackLink';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faHeadphones, faHome } from '@fortawesome/free-solid-svg-icons';
-import { faTwitch } from '@fortawesome/free-brands-svg-icons';
+import { faHeadphones, faHome, faRobot } from '@fortawesome/free-solid-svg-icons';
+import { faDiscord, faTwitch } from '@fortawesome/free-brands-svg-icons';
 import { DEFAULT_MODEL_LANGUAGE, SUPPORTED_MODEL_LANGUAGE_TAG_TO_FULL } from '@storyteller/components/src/i18n/SupportedModelLanguages';
 
 const DEFAULT_VISIBILITY = 'public';
@@ -33,13 +33,14 @@ function TtsModelEditFc(props: Props) {
   const [notFoundState, setNotFoundState] = useState<boolean>(false);
 
   // Fields
-  const [title, setTitle] = useState<string>("");
-  const [descriptionMarkdown, setDescriptionMarkdown] = useState<string>("");
-  const [fullLanguageTag, setFullLanguageTag] = useState<string>(""); // NB: Should be full IETF, eg. ["en", "en-US", "es-419", etc.]
-  const [visibility, setVisibility] = useState<string>(DEFAULT_VISIBILITY);
-  const [defaultPretrainedVocoder, setDefaultPretrainedVocoder] = useState<string>(DEFAULT_PRETRAINED_VOCODER);
-  const [isFrontPageFeatured, setIsFrontPageFeatured] = useState<boolean>(false);
-  const [isTwitchFeatured, setIsTwitchFeatured] = useState<boolean>(false);
+  const [title, setTitle] = useState("");
+  const [descriptionMarkdown, setDescriptionMarkdown] = useState("");
+  const [fullLanguageTag, setFullLanguageTag] = useState(""); // NB: Should be full IETF, eg. ["en", "en-US", "es-419", etc.]
+  const [visibility, setVisibility] = useState(DEFAULT_VISIBILITY);
+  const [defaultPretrainedVocoder, setDefaultPretrainedVocoder] = useState(DEFAULT_PRETRAINED_VOCODER);
+  const [isFrontPageFeatured, setIsFrontPageFeatured] = useState(false);
+  const [isTwitchFeatured, setIsTwitchFeatured] = useState(false);
+  const [suggestedUniqueBotCommand, setSuggestedUniqueBotCommand] = useState("");
 
   const getModel = useCallback(async (token) => {
     const model = await GetTtsModel(token);
@@ -54,6 +55,7 @@ function TtsModelEditFc(props: Props) {
       setDefaultPretrainedVocoder(model.maybe_default_pretrained_vocoder || DEFAULT_PRETRAINED_VOCODER);
       setIsFrontPageFeatured(model.is_front_page_featured|| false);
       setIsTwitchFeatured(model.is_twitch_featured || false);
+      setSuggestedUniqueBotCommand(model.maybe_suggested_unique_bot_command || "");
 
     } else if (GetTtsModelIsErr(model))  {
       switch(model) {
@@ -105,6 +107,12 @@ function TtsModelEditFc(props: Props) {
     setIsTwitchFeatured(value);
   };
 
+  const handleBotCommandChange = (ev: React.FormEvent<HTMLInputElement>) => {
+    const value = (ev.target as HTMLInputElement).value;
+    const command = value.trim();
+    setSuggestedUniqueBotCommand(command);
+  };
+
   const modelLink = FrontendUrlConfig.ttsModelPage(token);
 
   const isModerator = props.sessionWrapper.canEditOtherUsersTtsModels();
@@ -136,6 +144,9 @@ function TtsModelEditFc(props: Props) {
     if (isModerator) {
       request.is_front_page_featured = isFrontPageFeatured;
       request.is_twitch_featured = isTwitchFeatured;
+      if (!!suggestedUniqueBotCommand) {
+        request.maybe_suggested_unique_bot_command = suggestedUniqueBotCommand;
+      }
     }
 
     fetch(endpointUrl, {
@@ -198,6 +209,7 @@ function TtsModelEditFc(props: Props) {
           </span>
         </div>
       </div>
+
       <div className="field">
         <label className="label">Is Twitch Featured? (Don't set too many!)</label>
         <div className="control has-icons-left">
@@ -216,6 +228,23 @@ function TtsModelEditFc(props: Props) {
             <FontAwesomeIcon icon={faTwitch} />
           </span>
         </div>
+      </div>
+
+      <div className="field">
+        <label className="label">Command Alias (Must be unique, eg. <em>&ldquo;mario&rdquo;</em> for commands like <code>/tts mario It's me!</code>)</label>
+        <div className="control has-icons-left has-icons-right">
+          <input 
+            onChange={handleBotCommandChange}
+            className="input" 
+            type="text" 
+            placeholder="Optional Unique Bot Command (short and lowercase)" 
+            value={suggestedUniqueBotCommand}
+            />
+          <span className="icon is-small is-left">
+            <FontAwesomeIcon icon={faRobot} />
+          </span>
+        </div>
+        {/*<p className="help">{invalidReason}</p>*/}
       </div>
     </>);
   }
@@ -273,9 +302,10 @@ function TtsModelEditFc(props: Props) {
                 value={fullLanguageTag}
                 >
                 {Array.from(SUPPORTED_MODEL_LANGUAGE_TAG_TO_FULL, ([languageTag, description]) => {
-                  return (<>
-                    <option value={languageTag}>{description}</option>
-                  </>);
+                  return <option 
+                    key={languageTag}
+                    value={languageTag}
+                    >{description}</option>
                 })}
               </select>
             </div>
