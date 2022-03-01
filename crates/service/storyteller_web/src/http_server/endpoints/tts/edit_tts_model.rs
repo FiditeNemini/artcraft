@@ -6,6 +6,7 @@ use actix_web::error::ResponseError;
 use actix_web::http::StatusCode;
 use actix_web::web::{Path, Json};
 use actix_web::{Responder, web, HttpResponse, error, HttpRequest};
+use container_common::i18n::supported_languages_for_models::{is_valid_language_for_models, get_canonicalized_language_tag_for_model};
 use crate::http_server::web_utils::ip_address::get_request_ip;
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 use crate::http_server::web_utils::response_success_helpers::simple_json_success;
@@ -15,7 +16,8 @@ use crate::util::markdown_to_html::markdown_to_html;
 use database_queries::column_types::record_visibility::RecordVisibility;
 use database_queries::column_types::vocoder_type::VocoderType;
 use database_queries::queries::tts::tts_models::get_tts_model::get_tts_model_by_token;
-use log::{info, warn, log};
+use language_tags::{LanguageTag, ParseError};
+use log::{info, warn, log, error};
 use regex::Regex;
 use sqlx::MySqlPool;
 use sqlx::error::DatabaseError;
@@ -24,6 +26,9 @@ use sqlx::mysql::MySqlDatabaseError;
 use std::fmt;
 use std::sync::Arc;
 use user_input_common::check_for_slurs::contains_slurs;
+
+const DEFAULT_IETF_LANGUAGE_TAG : &'static str = "en-US";
+const DEFAULT_IETF_PRIMARY_LANGUAGE_SUBTAG : &'static str = "en";
 
 /// For the URL PathInfo
 #[derive(Deserialize)]
@@ -39,6 +44,10 @@ pub struct EditTtsModelRequest {
   pub description_markdown: Option<String>,
   pub creator_set_visibility: Option<String>,
   pub maybe_default_pretrained_vocoder: Option<VocoderType>,
+
+  // NB: We calculate 'ietf_primary_language_subtag' from this value.
+  pub ietf_language_tag: Option<String>,
+
   //pub updatable_slug: Option<String>,
   //pub tts_model_type: Option<String>,
   //pub text_preprocessing_algorithm: Option<String>,
@@ -51,10 +60,13 @@ pub struct EditTtsModelRequest {
   pub is_locked_from_use: Option<bool>,
   pub maybe_mod_comments: Option<String>,
 
-  // ========== Moderator options (front page) ==========
+  // ========== Moderator options (front page, Discord, Twitch, etc.) ==========
 
   pub is_front_page_featured: Option<bool>,
   pub is_twitch_featured: Option<bool>,
+
+  // NB: We take "empty string" to mean removal.
+  pub maybe_suggested_unique_bot_command: Option<String>,
 }
 
 #[derive(Debug)]
@@ -156,11 +168,17 @@ pub async fn edit_tts_model_handler(
     }
   }
 
+  // =============================================
   // Author + Mod fields.
   // These fields must be present on all requests.
+  // =============================================
+
   let mut title = None;
   let mut description_markdown = None;
   let mut description_html = None;
+  let mut ietf_language_tag = None;
+  let mut ietf_primary_language_subtag = None;
+
   let mut creator_set_visibility = RecordVisibility::Public;
   let mut maybe_default_pretrained_vocoder =
       model_record.maybe_default_pretrained_vocoder
@@ -186,6 +204,35 @@ pub async fn edit_tts_model_handler(
     description_html = Some(html);
   }
 
+  if let Some(tag) = request.ietf_language_tag.as_deref() {
+    // eg. en, en-US, es-419, ja-JP, etc.
+    let maybe_full_canonical_tag = get_canonicalized_language_tag_for_model(tag);
+
+    // eg. en, es, ja, etc.
+    let maybe_primary_language_subtag = maybe_full_canonical_tag
+        .map(|t| LanguageTag::parse(t)
+            .map(|language_tag| language_tag.primary_language().to_string())
+        )
+        .transpose()
+        .map_err(|e| {
+          error!("Error parsing language tag '{}': {:?}", tag, e);
+          EditTtsModelError::BadInput("bad locale string".to_string())
+        })?;
+
+    if let Some(full_tag) = maybe_full_canonical_tag {
+      if let Some(primary_subtag) = maybe_primary_language_subtag.as_deref() {
+        ietf_language_tag = Some(full_tag.to_string());
+        ietf_primary_language_subtag = Some(primary_subtag.to_string());
+      }
+    }
+  }
+
+  let mut ietf_language_tag = ietf_language_tag
+      .unwrap_or(DEFAULT_IETF_LANGUAGE_TAG.to_string());
+
+  let mut ietf_primary_language_subtag = ietf_primary_language_subtag
+      .unwrap_or(DEFAULT_IETF_PRIMARY_LANGUAGE_SUBTAG.to_string());
+
   if let Some(visibility) = request.creator_set_visibility.as_deref() {
     creator_set_visibility = RecordVisibility::from_str(visibility)
         .map_err(|_| EditTtsModelError::BadInput("bad record visibility".to_string()))?;
@@ -207,6 +254,8 @@ SET
     title = ?,
     description_markdown = ?,
     description_rendered_html = ?,
+    ietf_language_tag = ?,
+    ietf_primary_language_subtag = ?,
     creator_set_visibility = ?,
     creator_ip_address_last_update = ?,
     version = version + 1
@@ -217,6 +266,8 @@ LIMIT 1
       &title,
       &description_markdown,
       &description_html,
+      &ietf_language_tag,
+      &ietf_primary_language_subtag,
       &creator_set_visibility.to_str(),
       &ip_address,
       &model_record.model_token,
@@ -233,6 +284,8 @@ SET
     title = ?,
     description_markdown = ?,
     description_rendered_html = ?,
+    ietf_language_tag = ?,
+    ietf_primary_language_subtag = ?,
     creator_set_visibility = ?,
     maybe_mod_user_token = ?,
     version = version + 1
@@ -243,6 +296,8 @@ LIMIT 1
       &title,
       &description_markdown,
       &description_html,
+      &ietf_language_tag,
+      &ietf_primary_language_subtag,
       &creator_set_visibility.to_str(),
       &user_session.user_token,
       &model_record.model_token,
@@ -250,6 +305,10 @@ LIMIT 1
         .execute(&server_state.mysql_pool)
         .await
   };
+
+  // =============================================
+  // Mod-only fields.
+  // =============================================
 
   // TODO: This is lazy and suboptimal af to UPDATE again.
   //  The reason we're doing this is because `sqlx` only does static type checking of queries
@@ -289,6 +348,19 @@ async fn update_mod_details(
   let is_front_page_featured = request.is_front_page_featured.unwrap_or(false);
   let is_twitch_featured = request.is_twitch_featured.unwrap_or(false);
 
+  // Commands must be non-empty, alphanumeric, and lowercase.
+  let mut maybe_suggested_unique_bot_command = None;
+  if let Some(command) = request.maybe_suggested_unique_bot_command.as_deref() {
+    // Clear empty commands to null.
+    let command = command.trim().to_lowercase();
+
+    let is_alphanumeric = command.chars().all(|c| c.is_ascii_alphanumeric());
+
+    if !command.is_empty() && is_alphanumeric {
+      maybe_suggested_unique_bot_command = Some(command);
+    }
+  }
+
   let query_result = sqlx::query!(
         r#"
 UPDATE tts_models
@@ -300,6 +372,7 @@ SET
     maybe_mod_user_token = ?,
     is_front_page_featured = ?,
     is_twitch_featured = ?,
+    maybe_suggested_unique_bot_command = ?,
     version = version + 1
 WHERE token = ?
 LIMIT 1
@@ -311,6 +384,7 @@ LIMIT 1
       mod_user_token,
       is_front_page_featured,
       is_twitch_featured,
+      maybe_suggested_unique_bot_command,
       model_token
     )
       .execute(mysql_pool)

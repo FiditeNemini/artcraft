@@ -212,7 +212,7 @@ SELECT
 
     tts.is_front_page_featured,
     tts.is_twitch_featured,
-    
+
     tts.maybe_suggested_unique_bot_command,
 
     tts.creator_set_visibility,

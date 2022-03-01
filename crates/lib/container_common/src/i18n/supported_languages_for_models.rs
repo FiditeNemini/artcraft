@@ -4,6 +4,9 @@ use std::collections::{HashSet, HashMap};
 /// These are language tags we try to support.
 static SUPPORTED_LANGUAGES_FOR_MODELS : Lazy<HashSet<String>> = Lazy::new(|| {
   let language_tags = [
+
+    // ========== Technically, we only support these so far ==========
+
     // English
     "en",
     "en-AU",
@@ -23,6 +26,9 @@ static SUPPORTED_LANGUAGES_FOR_MODELS : Lazy<HashSet<String>> = Lazy::new(|| {
     // Portuguese
     "pt",
     "pt-BR",
+
+    // ========== But these are on the horizon ==========
+
     // French
     "fr",
     "fr-FR",
@@ -71,7 +77,7 @@ pub fn is_valid_language_for_models(language_tag: &str) -> bool {
 
 #[cfg(test)]
 mod tests {
-  use crate::i18n::supported_languages::{get_canonicalized_language_tag_for_model, is_valid_language_for_models};
+  use crate::i18n::supported_languages_for_models::{get_canonicalized_language_tag_for_model, is_valid_language_for_models};
 
   #[test]
   fn get_canonical_language_for_model_success() {

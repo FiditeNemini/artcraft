@@ -1,1 +1,1 @@
-pub mod supported_languages;
+pub mod supported_languages_for_models;

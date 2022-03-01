@@ -74,6 +74,10 @@ uuid = { version = "0.8.2", features = ["v4"] }
 twitch_api2 = { version = "0.6.0-rc.2", features = ["helix", "reqwest_client", "pubsub", "chrono", "unsupported"] }
 twitch_oauth2 = "0.6.0-rc.2"
 
+# Language tag parsing
+# TODO: Move to language support crate
+language-tags = "0.3.2" # Parsing single tags richly
+
 # HTTP
 # TODO/NB: This is just for Twitch, but we might need it later.
 reqwest = { version = "0.11.4" }

@@ -3720,6 +3720,7 @@ dependencies = [
  "hyper 0.14.14",
  "infer",
  "jwt",
+ "language-tags 0.3.2",
  "lazy_static",
  "lexical-sort",
  "lfu",
