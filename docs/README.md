@@ -364,6 +364,13 @@ That would make the URL for the audio the following:
 
 https://storage.googleapis.com/vocodes-public/tts_inference_output/9/c/d/vocodes_9cdd9865-0e10-48f0-9a23-861118ec3286.wav
 
+# Open Source
+
+* [justinjohn0306 / FakeYou-Tacotron2-Notebook](https://github.com/justinjohn0306/FakeYou-Tacotron2-Notebook) - 
+  Tacotron2 Training and Synthesis Notebooks for FakeYou.com, including HifiGan and Arpabet support. 
+
+* (More to come)
+
 # Need help, additional docs, or anything else?
 
 Would you like assistance? Or to see API docs for our other endpoints? (W2L? Talknet? Model upload?) 
