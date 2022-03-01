@@ -31,8 +31,11 @@ pub struct TtsModelRecordForResponse {
   pub creator_display_name: String,
   pub creator_gravatar_hash: String,
   pub title: String,
+  pub ietf_language_tag: String,
+  pub ietf_primary_language_subtag: String,
   pub is_front_page_featured: bool,
   pub is_twitch_featured: bool,
+  pub maybe_suggested_unique_bot_command: Option<String>,
 
   /// Category assignments
   /// From non-deleted, mod-approved categories only
@@ -51,19 +54,6 @@ pub struct ListTtsModelsSuccessResponse {
 #[derive(Debug)]
 pub enum ListTtsModelsError {
   ServerError,
-}
-
-#[derive(Serialize)]
-pub struct TtsModelRecord {
-  pub model_token: String,
-  pub tts_model_type: String,
-  pub creator_user_token: String,
-  pub creator_username: String,
-  pub creator_display_name: String,
-  pub creator_gravatar_hash: String,
-  pub title: String,
-  pub created_at: DateTime<Utc>,
-  pub updated_at: DateTime<Utc>,
 }
 
 impl ResponseError for ListTtsModelsError {
@@ -151,21 +141,25 @@ async fn get_all_models(mysql_pool: &MySqlPool) -> AnyhowResult<Vec<TtsModelReco
 
   let models_for_response = models.into_iter()
       .map(|model| {
+        let model_token = model.model_token.clone();
         TtsModelRecordForResponse {
-          model_token: model.model_token.clone(),
-          tts_model_type: model.tts_model_type.clone(),
-          creator_user_token: model.creator_user_token.clone(),
-          creator_username: model.creator_username.clone(),
-          creator_display_name: model.creator_display_name.clone(),
-          creator_gravatar_hash: model.creator_gravatar_hash.clone(),
-          title: model.title.clone(),
+          model_token: model.model_token,
+          tts_model_type: model.tts_model_type,
+          creator_user_token: model.creator_user_token,
+          creator_username: model.creator_username,
+          creator_display_name: model.creator_display_name,
+          creator_gravatar_hash: model.creator_gravatar_hash,
+          title: model.title,
+          ietf_language_tag: model.ietf_language_tag,
+          ietf_primary_language_subtag: model.ietf_primary_language_subtag,
           is_front_page_featured: model.is_front_page_featured,
           is_twitch_featured: model.is_twitch_featured,
-          category_tokens: model_categories_map.model_to_category_tokens.get(&model.model_token)
+          maybe_suggested_unique_bot_command: model.maybe_suggested_unique_bot_command,
+          category_tokens: model_categories_map.model_to_category_tokens.get(&model_token)
               .map(|hash| hash.clone())
               .unwrap_or(HashSet::new()),
-          created_at: model.created_at.clone(),
-          updated_at: model.updated_at.clone(),
+          created_at: model.created_at,
+          updated_at: model.updated_at,
         }
       })
       .collect::<Vec<TtsModelRecordForResponse>>();

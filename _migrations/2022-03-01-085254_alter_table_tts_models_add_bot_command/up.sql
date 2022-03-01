@@ -6,9 +6,9 @@
 -- These are unique strings and can only be applied to one model at a time.
 -- Only moderators can set this, and it's only for the best voices.
 ALTER TABLE tts_models
-    ADD COLUMN maybe_unique_bot_command_prefix VARCHAR(255) DEFAULT NULL
+    ADD COLUMN maybe_suggested_unique_bot_command VARCHAR(255) DEFAULT NULL
     AFTER is_twitch_featured;
 
 -- And the unique index.
 ALTER TABLE tts_models
-    ADD UNIQUE INDEX unique_index_maybe_unique_bot_command_prefix (maybe_unique_bot_command_prefix);
+    ADD UNIQUE INDEX unique_index_maybe_suggested_unique_bot_command (maybe_suggested_unique_bot_command);

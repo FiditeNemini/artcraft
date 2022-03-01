@@ -93,10 +93,10 @@ CREATE TABLE tts_models (
   is_front_page_featured BOOLEAN NOT NULL DEFAULT FALSE,
   is_twitch_featured BOOLEAN NOT NULL DEFAULT FALSE,
 
-  -- A bot command prefix, eg. 'sonic' that could be interpreted as '/sonic' by a TTS system.
-  -- These are unique strings and can only be applied to one model at a time.
-  -- Only moderators can set this, and it's only for the best voices.
-  maybe_unique_bot_command_prefix VARCHAR(255) DEFAULT NULL,
+  -- A suggested bot command prefix, eg. 'sonic' that could be interpreted as '/sonic'
+  -- by a TTS system. These are unique strings that can only be applied to one model at
+  -- a time at most. Only moderators can set this, and it's only for the best voices.
+  maybe_suggested_unique_bot_command VARCHAR(255) DEFAULT NULL,
 
   -- ========== IMMUTABLE PROVENANCE AND METADATA ==========
 

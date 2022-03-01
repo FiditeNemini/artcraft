@@ -7,12 +7,16 @@ use sqlx::MySqlPool;
 
 // FIXME: This is the old style of query scoping and shouldn't be copied.
 
+// TODO: This record type is publicly returned in some endpoints!
 #[derive(Serialize)]
 pub struct TtsModelRecordForList {
   pub model_token: String,
   pub tts_model_type: String,
 
   pub title: String,
+
+  pub ietf_language_tag: String,
+  pub ietf_primary_language_subtag: String,
 
   pub creator_user_token: String,
   pub creator_username: String,
@@ -23,6 +27,8 @@ pub struct TtsModelRecordForList {
 
   pub is_front_page_featured: bool,
   pub is_twitch_featured: bool,
+
+  pub maybe_suggested_unique_bot_command: Option<String>,
 
   pub created_at: DateTime<Utc>,
   pub updated_at: DateTime<Utc>,
@@ -72,9 +78,12 @@ pub async fn list_tts_models(
         creator_display_name: model.creator_display_name,
         creator_gravatar_hash: model.creator_gravatar_hash,
         title: model.title,
+        ietf_language_tag: model.ietf_language_tag,
+        ietf_primary_language_subtag: model.ietf_primary_language_subtag,
         is_locked_from_use: i8_to_bool(model.is_locked_from_use),
         is_front_page_featured: i8_to_bool(model.is_front_page_featured),
         is_twitch_featured: i8_to_bool(model.is_twitch_featured),
+        maybe_suggested_unique_bot_command: model.maybe_suggested_unique_bot_command,
         created_at: model.created_at,
         updated_at: model.updated_at,
       }
@@ -101,9 +110,12 @@ SELECT
     users.display_name as creator_display_name,
     users.email_gravatar_hash as creator_gravatar_hash,
     tts.title,
+    tts.ietf_language_tag,
+    tts.ietf_primary_language_subtag,
     tts.is_locked_from_use,
     tts.is_front_page_featured,
     tts.is_twitch_featured,
+    tts.maybe_suggested_unique_bot_command,
     tts.created_at,
     tts.updated_at
 FROM tts_models as tts
@@ -129,9 +141,12 @@ SELECT
     users.display_name as creator_display_name,
     users.email_gravatar_hash as creator_gravatar_hash,
     tts.title,
+    tts.ietf_language_tag,
+    tts.ietf_primary_language_subtag,
     tts.is_locked_from_use,
     tts.is_front_page_featured,
     tts.is_twitch_featured,
+    tts.maybe_suggested_unique_bot_command,
     tts.created_at,
     tts.updated_at
 FROM tts_models as tts
@@ -168,9 +183,12 @@ SELECT
     users.display_name as creator_display_name,
     users.email_gravatar_hash as creator_gravatar_hash,
     tts.title,
+    tts.ietf_language_tag,
+    tts.ietf_primary_language_subtag,
     tts.is_locked_from_use,
     tts.is_front_page_featured,
     tts.is_twitch_featured,
+    tts.maybe_suggested_unique_bot_command,
     tts.created_at,
     tts.updated_at
 FROM tts_models as tts
@@ -199,9 +217,12 @@ SELECT
     users.display_name as creator_display_name,
     users.email_gravatar_hash as creator_gravatar_hash,
     tts.title,
+    tts.ietf_language_tag,
+    tts.ietf_primary_language_subtag,
     tts.is_locked_from_use,
     tts.is_front_page_featured,
     tts.is_twitch_featured,
+    tts.maybe_suggested_unique_bot_command,
     tts.created_at,
     tts.updated_at
 FROM tts_models as tts
@@ -227,6 +248,9 @@ struct InternalRawTtsModelRecordForList {
 
   pub title: String,
 
+  pub ietf_language_tag: String,
+  pub ietf_primary_language_subtag: String,
+
   pub creator_user_token: String,
   pub creator_username: String,
   pub creator_display_name: String,
@@ -236,6 +260,8 @@ struct InternalRawTtsModelRecordForList {
 
   pub is_front_page_featured: i8, // bool
   pub is_twitch_featured: i8, // bool
+
+  pub maybe_suggested_unique_bot_command: Option<String>,
 
   pub created_at: DateTime<Utc>,
   pub updated_at: DateTime<Utc>,
