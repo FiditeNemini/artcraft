@@ -1042,6 +1042,7 @@ name = "container_common"
 version = "0.0.1"
 dependencies = [
  "anyhow",
+ "once_cell",
  "rand 0.8.4",
  "uuid",
 ]
