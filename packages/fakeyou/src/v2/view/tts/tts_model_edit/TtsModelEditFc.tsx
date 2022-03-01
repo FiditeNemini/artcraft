@@ -10,7 +10,7 @@ import { GetTtsModel, GetTtsModelIsErr, GetTtsModelIsOk, TtsModel, TtsModelLooku
 import { BackLink } from '../../_common/BackLink';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faHeadphones, faHome, faRobot } from '@fortawesome/free-solid-svg-icons';
-import { faDiscord, faTwitch } from '@fortawesome/free-brands-svg-icons';
+import { faTwitch } from '@fortawesome/free-brands-svg-icons';
 import { DEFAULT_MODEL_LANGUAGE, SUPPORTED_MODEL_LANGUAGE_TAG_TO_FULL } from '@storyteller/components/src/i18n/SupportedModelLanguages';
 
 const DEFAULT_VISIBILITY = 'public';
