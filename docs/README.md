@@ -84,6 +84,16 @@ Response
       // identify characters, voice actors, etc. in the future.
       "title": "Frieza (Chris Ayres)",
 
+      // IETF BCP 47 langauge tag.
+      // This is the spoken language of the model's speaker / dataset
+      // Example values: 'en', 'en-US', 'es-419', 'ja-JP', ...
+      "ietf_language_tag": "en-US",
+
+      // The primary language tag of the model's speaker / dataset, 
+      // removing all other tag and locale data. 
+      // Example values: 'en', 'es', 'ja', ...
+      "ietf_primary_language_subtag": "en",
+
       // Whether the voice is highlighted on FakeYou.com
       "is_front_page_featured": false,
 
@@ -91,6 +101,22 @@ Response
       // If you're building a Twitch integration, these are good voices 
       // to highlight for streamers.
       "is_twitch_featured": false,
+
+      // FOR APP AND EXTENSION DEVELOPERS
+      //
+      // This is an optional, but guaranteed unique identifier for the voice. 
+      // It's meant to aid in Twitch and Discord applications, eg. if the value
+      // here is "mario", you could make the command `/tts mario "Itsa me, Mario"`
+      // map to the given voice in your hypothetical TTS application.
+      //
+      // These values will be specially curated by our staff. Only moderators
+      // have the ability to set or edit these values, and by default most voices 
+      // will report a null value here. Since FakeYou supports potentially many
+      // models for single speakers, we'll make sure to set the best sounding
+      // options here and update them whenever necessary.
+      //
+      // Field type: `string | null`
+      "maybe_suggested_unique_bot_command": "frieza",
 
       // Categories this voice belongs to
       "category_tokens": [
