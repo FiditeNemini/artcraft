@@ -115,6 +115,8 @@ Response
       // models for single speakers, we'll make sure to set the best sounding
       // options here and update them whenever necessary.
       //
+      // If set, the value will be lowercase, alphanumeric ASCII characters only.
+      //
       // Field type: `string | null`
       "maybe_suggested_unique_bot_command": "frieza",
 
