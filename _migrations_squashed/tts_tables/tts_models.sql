@@ -61,6 +61,12 @@ CREATE TABLE tts_models (
 
   -- ========== UNSTRUCTURED METADATA ==========
 
+  -- The IETF BCP47 language tag (eg. en-US, es-419, ja-JP, etc.)
+  ietf_language_tag VARCHAR(64) NOT NULL DEFAULT 'en-US',
+
+  -- The IETF BCP47 language tag's primary language subtag (eg. "es-419" becomes "es")
+  ietf_primary_language_subtag VARCHAR(12) NOT NULL DEFAULT 'en',
+
   -- The "name" of the voice model, which might be complicated.
   -- If maybe_subject_token (etc.) is set, then it's authoritative instead.
   title VARCHAR(255) NOT NULL,
@@ -86,6 +92,11 @@ CREATE TABLE tts_models (
   -- Whether the voice features on the front of FakeYou or Storyteller Twitch TTS
   is_front_page_featured BOOLEAN NOT NULL DEFAULT FALSE,
   is_twitch_featured BOOLEAN NOT NULL DEFAULT FALSE,
+
+  -- A bot command prefix, eg. 'sonic' that could be interpreted as '/sonic' by a TTS system.
+  -- These are unique strings and can only be applied to one model at a time.
+  -- Only moderators can set this, and it's only for the best voices.
+  maybe_unique_bot_command_prefix VARCHAR(255) DEFAULT NULL,
 
   -- ========== IMMUTABLE PROVENANCE AND METADATA ==========
 
