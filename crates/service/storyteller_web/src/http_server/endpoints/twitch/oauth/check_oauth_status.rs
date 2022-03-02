@@ -21,6 +21,10 @@ pub struct CheckOauthResponse {
 
   /// This is false if the user isn't logged in, doesn't have oauth, or oauth is invalid
   pub oauth_token_found: bool,
+
+  /// Shouldn't be harmful to send this back since user must be logged in.
+  pub maybe_twitch_username: Option<String>,
+  pub maybe_twitch_username_lowercase: Option<String>,
 }
 
 #[derive(Debug)]
@@ -66,27 +70,38 @@ pub async fn check_oauth_status_handler(
         CheckOauthStatusError::ServerError
       })?;
 
-  let oauth_token_found = match maybe_user_session {
-    None => false, // Not logged in - not found
+  let mut oauth_token_found = false;
+  let mut maybe_twitch_username = None;
+  let mut maybe_twitch_username_lowercase = None;
+
+  match maybe_user_session {
+    None => {}, // Not logged in - not found
     Some(session) => {
       let finder = TwitchOauthTokenFinder::new()
           .allow_expired_tokens(true)
           .scope_user_token(Some(&session.user_token));
 
-      let record = finder.perform_query(&server_state.mysql_pool).await
+      let maybe_record = finder.perform_query(&server_state.mysql_pool)
+          .await
           .map_err(|e| {
             warn!("lookup error: {:?}", e);
             CheckOauthStatusError::ServerError
           })?;
 
       // Existence is sufficient.
-      record.is_some()
+      if let Some(record) = maybe_record {
+        oauth_token_found = true;
+        maybe_twitch_username = Some(record.twitch_username.to_string());
+        maybe_twitch_username_lowercase = Some(record.twitch_username_lowercase.to_string());
+      }
     },
-  };
+  }
 
   let response = CheckOauthResponse {
     success: true,
     oauth_token_found,
+    maybe_twitch_username,
+    maybe_twitch_username_lowercase,
   };
 
   let body = serde_json::to_string(&response)
