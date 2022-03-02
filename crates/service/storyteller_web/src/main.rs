@@ -268,11 +268,11 @@ async fn main() -> AnyhowResult<()> {
 
   let twitch_oauth_redirect_landing_url = easyenv::get_env_string_or_default(
     "TWITCH_OAUTH_REDIRECT_LANDING_URL",
-    "https://api.jungle.horse/twitch/oauth_landing");
+    "https://api.jungle.horse/twitch/oauth/enroll_redirect_landing");
 
   let twitch_oauth_redirect_landing_finished_url = easyenv::get_env_string_or_default(
     "TWITCH_OAUTH_REDIRECT_LANDING_FINISHED_URL",
-    "https://api.jungle.horse/");
+    "https://jungle.horse/");
 
   let twitch_secrets = TwitchSecrets::from_env()?;
 
