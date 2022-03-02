@@ -4,10 +4,10 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCogs, faVideo } from '@fortawesome/free-solid-svg-icons';
 import { faDiscord, faTwitch } from '@fortawesome/free-brands-svg-icons';
 import { DiscordLink } from '@storyteller/components/src/elements/DiscordLink';
+import { StorytellerUrlConfig } from '@storyteller/components/src/urls/StorytellerUrlConfig';
 
 function LoggedInIndex() {
-  //const oauthUrl = `https://api.jungle.horse/twitch/oauth_enroll_redirect`;
-  const oauthUrl = `https://api.storyteller.io/twitch/oauth_enroll_redirect`;
+  const oauthUrl = new StorytellerUrlConfig().twitchOauthEnrollRedirect();
 
   return (
     <div>
