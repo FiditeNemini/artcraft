@@ -83,6 +83,7 @@ use crate::http_server::endpoints::w2l::get_w2l_template_use_count::get_w2l_temp
 use crate::http_server::endpoints::w2l::get_w2l_upload_template_job_status::get_w2l_upload_template_job_status_handler;
 use crate::http_server::endpoints::w2l::list_w2l_templates::list_w2l_templates_handler;
 use crate::http_server::endpoints::w2l::set_w2l_template_mod_approval::set_w2l_template_mod_approval_handler;
+use crate::http_server::endpoints::twitch::oauth::check_oauth_status::check_oauth_status_handler;
 
 pub fn add_routes<T, B> (app: App<T, B>) -> App<T, B>
   where
@@ -631,6 +632,12 @@ fn add_twitch_routes<T, B> (app: App<T, B>) -> App<T, B>
     .service(web::resource("/oauth_landing")
       .route(web::get().to(oauth_end_enroll_from_redirect))
       .route(web::head().to(|| HttpResponse::Ok()))
+    )
+    .service(web::scope("/oauth")
+        .service(web::resource("/check")
+            .route(web::get().to(check_oauth_status_handler))
+            .route(web::head().to(|| HttpResponse::Ok()))
+        )
     )
     .service(web::scope("/event_rule")
         .service(web::resource("/create")
