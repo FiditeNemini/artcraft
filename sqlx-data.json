@@ -2832,16 +2832,6 @@
       ]
     }
   },
-  "5b8c906b09cc7068dcad9eb837b1146893b63c3ce7c8dbefea9129849448c3f6": {
-    "query": "\nINSERT INTO twitch_oauth_tokens\nSET\n  oauth_refresh_grouping_token = ?,\n  maybe_user_token = ?,\n  twitch_user_id = ?,\n  twitch_username = ?,\n  twitch_username_lowercase = ?,\n  access_token = ?,\n  maybe_refresh_token = ?,\n  refresh_count = ?,\n  token_type = ?,\n  expires_in_seconds = NULL,\n  has_bits_read = ?,\n  has_channel_read_redemptions= ?,\n  has_channel_read_subscriptions = ?,\n  has_chat_edit = ?,\n  has_chat_read = ?,\n  ip_address_creation = ?,\n  expires_at = NULL\n        ",
-    "describe": {
-      "columns": [],
-      "parameters": {
-        "Right": 15
-      },
-      "nullable": []
-    }
-  },
   "5e4a00c339ce4d7fac19aff728449156b1e02b9e1d9fd534ac37d4ac79f44820": {
     "query": "\nINSERT INTO twitch_bits_events\nSET\n    sender_twitch_user_id = ?,\n    sender_twitch_username = ?,\n    sender_twitch_username_lowercase = ?,\n    destination_channel_id = ?,\n    destination_channel_name = ?,\n    is_anonymous= ?,\n    bits_used = ?,\n    total_bits_used = ?,\n    chat_message = ?\n        ",
     "describe": {
@@ -3602,6 +3592,16 @@
         false,
         false
       ]
+    }
+  },
+  "80e8ad515ab8fbfadc12463b87059a1eb6554be32527729d6075fc46c966630c": {
+    "query": "\nINSERT INTO twitch_oauth_tokens\nSET\n  internal_token = ?,\n  oauth_refresh_grouping_token = ?,\n  maybe_user_token = ?,\n  twitch_user_id = ?,\n  twitch_username = ?,\n  twitch_username_lowercase = ?,\n  access_token = ?,\n  maybe_refresh_token = ?,\n  refresh_count = ?,\n  token_type = ?,\n  expires_in_seconds = ?,\n  has_bits_read = ?,\n  has_channel_read_redemptions= ?,\n  has_channel_read_subscriptions = ?,\n  has_chat_edit = ?,\n  has_chat_read = ?,\n  ip_address_creation = ?,\n  expires_at = DATE_ADD(NOW(), INTERVAL ? SECOND)\n        ",
+    "describe": {
+      "columns": [],
+      "parameters": {
+        "Right": 18
+      },
+      "nullable": []
     }
   },
   "865ce236444a36d597939660b14eb4b0cee05c70fdb73f31c2fb8cddddfef42c": {
@@ -5421,6 +5421,16 @@
       "nullable": []
     }
   },
+  "aeeed0077e567e4b67ffa30e32f5475e168c6c68d2f206cc7b6c37168384089c": {
+    "query": "\nINSERT INTO twitch_oauth_tokens\nSET\n  internal_token = ?,\n  oauth_refresh_grouping_token = ?,\n  maybe_user_token = ?,\n  twitch_user_id = ?,\n  twitch_username = ?,\n  twitch_username_lowercase = ?,\n  access_token = ?,\n  maybe_refresh_token = ?,\n  refresh_count = ?,\n  token_type = ?,\n  expires_in_seconds = NULL,\n  has_bits_read = ?,\n  has_channel_read_redemptions= ?,\n  has_channel_read_subscriptions = ?,\n  has_chat_edit = ?,\n  has_chat_read = ?,\n  ip_address_creation = ?,\n  expires_at = NULL\n        ",
+    "describe": {
+      "columns": [],
+      "parameters": {
+        "Right": 16
+      },
+      "nullable": []
+    }
+  },
   "af032ec861cb91f15ec763d9452e03c23797af15b5714565aa330f6cc420e8d6": {
     "query": "\nINSERT INTO api_tokens\nSET\n  internal_token = ?,\n  api_token = ?,\n  user_token = ?,\n  uuid_idempotency_token = ?,\n  ip_address_creation = ?,\n  ip_address_last_update = ?\n        ",
     "describe": {
@@ -6526,16 +6536,6 @@
       "columns": [],
       "parameters": {
         "Right": 2
-      },
-      "nullable": []
-    }
-  },
-  "d7ac9f84e92d6b2111162a674284c0b9fa50c718bedfb8ab7238ca0a7b0875e6": {
-    "query": "\nINSERT INTO twitch_oauth_tokens\nSET\n  oauth_refresh_grouping_token = ?,\n  maybe_user_token = ?,\n  twitch_user_id = ?,\n  twitch_username = ?,\n  twitch_username_lowercase = ?,\n  access_token = ?,\n  maybe_refresh_token = ?,\n  refresh_count = ?,\n  token_type = ?,\n  expires_in_seconds = ?,\n  has_bits_read = ?,\n  has_channel_read_redemptions= ?,\n  has_channel_read_subscriptions = ?,\n  has_chat_edit = ?,\n  has_chat_read = ?,\n  ip_address_creation = ?,\n  expires_at = DATE_ADD(NOW(), INTERVAL ? SECOND)\n        ",
-    "describe": {
-      "columns": [],
-      "parameters": {
-        "Right": 17
       },
       "nullable": []
     }
