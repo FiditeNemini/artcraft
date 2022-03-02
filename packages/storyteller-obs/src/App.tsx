@@ -12,6 +12,12 @@ function App () {
           <Route path="/twitch/:username">
             <ObsLayerPage />
           </Route>
+          <Route exact={true} path="/">
+            <div style={{ width: "500px", margin: "auto", textAlign: "center" }}>
+            <h1>Invalid Page for OBS</h1>
+            <h3><a href="https://controls.storyteller.io">Back to Storyteller</a></h3>
+            </div>
+          </Route>
         </BrowserRouter>
       </div>
     </div>
