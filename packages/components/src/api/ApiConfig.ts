@@ -58,6 +58,9 @@ class ApiConfig {
     } else if (!useSsl && (domain === Domain.Localhost || domain === Domain.JungleHorse)) {
       // NB: Lack of SSL means use local development.
       v2ApiHost = "api.jungle.horse";
+    } else if (domain === Domain.JungleHorse) {
+      // TODO: Clean up these branches
+      v2ApiHost = "api.jungle.horse";
     }
 
     this.domain = domain;
@@ -371,6 +374,12 @@ class ApiConfig {
 
   deleteTwitchEventRule(eventRuleToken: string) : string {
     return `${this.getScheme()}://${this.getNewApiHost()}/twitch/event_rule/${eventRuleToken}/delete`;
+  }
+
+  // =============== Twitch OAuth ===============
+
+  checkTwitchOauthStatus() : string {
+    return `${this.getScheme()}://${this.getNewApiHost()}/twitch/oauth/check`;
   }
 
   obsEventsWebsocket(twitchUsername: string) : string {

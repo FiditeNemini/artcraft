@@ -1,17 +1,39 @@
-import React from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCogs, faVideo } from '@fortawesome/free-solid-svg-icons';
 import { faDiscord, faTwitch } from '@fortawesome/free-brands-svg-icons';
 import { DiscordLink } from '@storyteller/components/src/elements/DiscordLink';
 import { StorytellerUrlConfig } from '@storyteller/components/src/urls/StorytellerUrlConfig';
+import { CheckTwitchOauth, CheckTwitchOauthIsError, CheckTwitchOauthIsOk } from '@storyteller/components/src/api/storyteller/twitch_oauth/CheckTwitchOauth';
 
 function LoggedInIndex() {
   const oauthUrl = new StorytellerUrlConfig().twitchOauthEnrollRedirect();
 
+  const [oauthTokenFound, setOauthTokenFound] = useState(false);
+
+  const checkTwitchOauth = useCallback(async () => {
+    const result = await CheckTwitchOauth();
+
+    if (CheckTwitchOauthIsOk(result)) {
+      setOauthTokenFound(result.oauth_token_found);
+    } else if (CheckTwitchOauthIsError(result))  {
+    }
+  }, []);
+
+  useEffect(() => {
+    checkTwitchOauth();
+  }, [])
+
+  let linkText = <>Link Your Twitch &nbsp;<FontAwesomeIcon icon={faTwitch} /></> ;
+
+  if (oauthTokenFound) {
+    linkText = <>Re-link Your Twitch &nbsp;<FontAwesomeIcon icon={faTwitch} /></> ;
+  }
+
+
   return (
     <div>
-
       <section className="section">
         <div className="container">
 
@@ -19,7 +41,7 @@ function LoggedInIndex() {
             href={oauthUrl}
             className="button is-large is-info is-fullwidth"
             >
-              Link to Your Twitch&nbsp;<FontAwesomeIcon icon={faTwitch} />
+              {linkText}
           </a>
 
           <br />

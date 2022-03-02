@@ -25,7 +25,7 @@ export class StorytellerUrlConfig {
   }
 
   twitchOauthEnrollRedirect() : string {
-    return `${this.getScheme()}://${this.getApiHost()}/twitch/oauth_enroll_redirect`;
+    return `${this.getScheme()}://${this.getApiHost()}/twitch/oauth/enroll_redirect_begin`;
   }
 
   // =============== API HOSTS ===============
