@@ -11,6 +11,7 @@ use sqlx::MySqlPool;
 #[derive(Serialize, Clone)]
 pub struct TwitchOauthTokenRecord {
   /// Our internal token metadata / bookkeeping
+  pub internal_token: String,
   pub oauth_refresh_grouping_token: String,
   pub refresh_count: u32,
   pub ip_address_creation: Option<String>,
@@ -94,27 +95,28 @@ impl TwitchOauthTokenFinder {
     Ok(self.perform_query_internal(mysql_pool).await?
         .map(|record| {
           TwitchOauthTokenRecord {
-            oauth_refresh_grouping_token: record.oauth_refresh_grouping_token.clone(),
-            maybe_user_token: record.maybe_user_token.clone(),
-            maybe_user_display_name: record.maybe_user_display_name.clone(),
-            maybe_user_gravatar_hash: record.maybe_user_gravatar_hash.clone(),
-            twitch_user_id: record.twitch_user_id.clone(),
-            twitch_username: record.twitch_username.clone(),
-            twitch_username_lowercase: record.twitch_username_lowercase.clone(),
-            access_token: record.access_token.clone(),
-            maybe_refresh_token: record.maybe_refresh_token.clone(),
-            token_type: record.token_type.clone(),
-            expires_in_seconds: record.expires_in_seconds.clone(),
+            internal_token: record.internal_token,
+            oauth_refresh_grouping_token: record.oauth_refresh_grouping_token,
+            maybe_user_token: record.maybe_user_token,
+            maybe_user_display_name: record.maybe_user_display_name,
+            maybe_user_gravatar_hash: record.maybe_user_gravatar_hash,
+            twitch_user_id: record.twitch_user_id,
+            twitch_username: record.twitch_username,
+            twitch_username_lowercase: record.twitch_username_lowercase,
+            access_token: record.access_token,
+            maybe_refresh_token: record.maybe_refresh_token,
+            token_type: record.token_type,
+            expires_in_seconds: record.expires_in_seconds,
             refresh_count: record.refresh_count,
             has_bits_read: i8_to_bool(record.has_bits_read),
             has_channel_read_redemptions: i8_to_bool(record.has_channel_read_redemptions),
             has_channel_read_subscriptions: i8_to_bool(record.has_channel_read_subscriptions),
             has_chat_edit: i8_to_bool(record.has_chat_edit),
             has_chat_read: i8_to_bool(record.has_chat_read),
-            ip_address_creation: record.ip_address_creation.clone(),
-            expires_at: record.expires_at.clone(),
-            user_deleted_at: record.user_deleted_at.clone(),
-            mod_deleted_at: record.mod_deleted_at.clone(),
+            ip_address_creation: record.ip_address_creation,
+            expires_at: record.expires_at,
+            user_deleted_at: record.user_deleted_at,
+            mod_deleted_at: record.mod_deleted_at,
           }
         }))
   }
@@ -162,6 +164,7 @@ impl TwitchOauthTokenFinder {
     // TODO/NB: Unfortunately SQLx can't statically typecheck this query
     let mut query = r#"
 SELECT
+    twitch_oauth_tokens.internal_token,
     twitch_oauth_tokens.oauth_refresh_grouping_token,
     users.username as maybe_username,
     users.display_name as maybe_user_display_name,
@@ -253,6 +256,7 @@ LEFT OUTER JOIN users
 #[derive(sqlx::FromRow)]
 pub struct TwitchOauthTokenRecordInternal {
   /// Our internal token metadata / bookkeeping
+  pub internal_token: String,
   pub oauth_refresh_grouping_token: String,
   pub refresh_count: u32,
   pub ip_address_creation: Option<String>,

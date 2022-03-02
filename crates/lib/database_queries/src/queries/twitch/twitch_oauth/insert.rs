@@ -4,6 +4,7 @@ use container_common::anyhow_result::AnyhowResult;
 use log::info;
 use log::warn;
 use sqlx::MySqlPool;
+use crate::tokens::Tokens;
 
 pub struct TwitchOauthTokenInsertBuilder {
   // ===== Required Fields =====
@@ -133,6 +134,9 @@ impl TwitchOauthTokenInsertBuilder {
   }
 
   pub async fn insert(&mut self, mysql_pool: &MySqlPool) -> AnyhowResult<()> {
+    // An internal token that we may use in the future.
+    let internal_token = Tokens::new_twitch_oauth_internal_token()?;
+
     // NB: We have to duplicate these since the string literals must not
     // include concatenation. Boo.
     let query = if let Some(expires_in_seconds) = self.expires_in_seconds {
@@ -140,6 +144,7 @@ impl TwitchOauthTokenInsertBuilder {
         r#"
 INSERT INTO twitch_oauth_tokens
 SET
+  internal_token = ?,
   oauth_refresh_grouping_token = ?,
   maybe_user_token = ?,
   twitch_user_id = ?,
@@ -158,6 +163,7 @@ SET
   ip_address_creation = ?,
   expires_at = DATE_ADD(NOW(), INTERVAL ? SECOND)
         "#,
+        internal_token.clone(),
         self.oauth_grouping_token.clone(),
         self.maybe_user_token.clone(),
         self.twitch_user_id.clone(),
@@ -181,6 +187,7 @@ SET
         r#"
 INSERT INTO twitch_oauth_tokens
 SET
+  internal_token = ?,
   oauth_refresh_grouping_token = ?,
   maybe_user_token = ?,
   twitch_user_id = ?,
@@ -199,6 +206,7 @@ SET
   ip_address_creation = ?,
   expires_at = NULL
         "#,
+        internal_token.clone(),
         self.oauth_grouping_token.clone(),
         self.maybe_user_token.clone(),
         self.twitch_user_id.clone(),

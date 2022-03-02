@@ -73,6 +73,10 @@ impl Tokens {
 
   // ========== [Twitch] Tokens not typically visible to users ==========
 
+  pub fn new_twitch_oauth_internal_token() -> AnyhowResult<String> {
+    random_prefix_crockford_token("TOI:", 32, false)
+  }
+
   pub fn new_twitch_oauth_grouping_token() -> AnyhowResult<String> {
     random_prefix_crockford_token("OG:", 32, false)
   }
