@@ -4,7 +4,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faDiscord } from '@fortawesome/free-brands-svg-icons';
 import { CheckTwitchOauth, CheckTwitchOauthIsError, CheckTwitchOauthIsOk } from '@storyteller/components/src/api/storyteller/twitch_oauth/CheckTwitchOauth';
 import { StorytellerUrlConfig } from '@storyteller/components/src/urls/StorytellerUrlConfig';
-import { faArrowAltCircleUp, faExternalLinkAlt } from '@fortawesome/free-solid-svg-icons';
+import { faExternalLinkAlt } from '@fortawesome/free-solid-svg-icons';
 
 interface Props {
   sessionWrapper: SessionWrapper,
