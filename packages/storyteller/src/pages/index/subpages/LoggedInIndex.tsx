@@ -23,7 +23,7 @@ function LoggedInIndex() {
 
   useEffect(() => {
     checkTwitchOauth();
-  }, [])
+  }, [checkTwitchOauth])
 
   let linkText = <>Link Your Twitch &nbsp;<FontAwesomeIcon icon={faTwitch} /></> ;
 

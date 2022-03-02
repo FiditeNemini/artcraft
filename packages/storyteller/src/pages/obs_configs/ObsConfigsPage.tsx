@@ -24,7 +24,7 @@ function ObsConfigsPage(props: Props) {
 
   useEffect(() => {
     checkTwitchOauth();
-  }, [])
+  }, [checkTwitchOauth])
 
 
   if (!props.sessionWrapper.isLoggedIn()) {
