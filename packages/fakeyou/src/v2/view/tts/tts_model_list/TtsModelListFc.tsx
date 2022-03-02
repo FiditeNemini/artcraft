@@ -1,5 +1,4 @@
-import React, { useEffect, useCallback } from 'react';
-import { ApiConfig } from '@storyteller/components';
+import React, { useEffect, useCallback, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { SessionTtsInferenceResultListFc } from '../../_common/SessionTtsInferenceResultsListFc';
 import { SessionTtsModelUploadResultListFc } from '../../_common/SessionTtsModelUploadResultsListFc';
@@ -13,6 +12,7 @@ import { W2lInferenceJob } from '@storyteller/components/src/jobs/W2lInferenceJo
 import { W2lTemplateUploadJob } from '@storyteller/components/src/jobs/W2lTemplateUploadJobs';
 import { v4 as uuidv4 } from 'uuid';
 import { ListTtsModels, TtsModelListItem } from '@storyteller/components/src/api/tts/ListTtsModels';
+import { GenerateTtsAudio, GenerateTtsAudioErrorType, GenerateTtsAudioIsError, GenerateTtsAudioIsOk } from '@storyteller/components/src/api/tts/GenerateTtsAudio';
 import { VocodesNotice } from './VocodesNotice';
 import { ListTtsCategories, ListTtsCategoriesIsError, ListTtsCategoriesIsOk } from '../../../api/category/ListTtsCategories';
 import { MultiDropdownSearch } from './MultiDropdownSearch';
@@ -77,6 +77,8 @@ function TtsModelListFc(props: Props) {
     setMaybeSelectedTtsModel,
   } = props;
 
+  const [maybeTtsError, setMaybeTtsError] = useState<GenerateTtsAudioErrorType|undefined>(undefined);
+
   const ttsModelsLoaded = ttsModels.length > 0;
   const ttsCategoriesLoaded = allTtsCategories.length > 0;
 
@@ -130,7 +132,7 @@ function TtsModelListFc(props: Props) {
     props.setTextBuffer(textValue);
   };
 
-  const handleFormSubmit = (ev: React.FormEvent<HTMLFormElement>) => { 
+  const handleFormSubmit = async (ev: React.FormEvent<HTMLFormElement>) => { 
     ev.preventDefault();
 
     if (!props.maybeSelectedTtsModel) {
@@ -143,35 +145,20 @@ function TtsModelListFc(props: Props) {
 
     const modelToken = props.maybeSelectedTtsModel!.model_token;
 
-    const api = new ApiConfig();
-    const endpointUrl = api.inferTts();
-    
     const request = {
       uuid_idempotency_token: uuidv4(),
       tts_model_token: modelToken,
       inference_text: props.textBuffer,
     }
 
-    fetch(endpointUrl, {
-      method: 'POST',
-      headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json',
-      },
-      credentials: 'include',
-      body: JSON.stringify(request),
-    })
-    .then(res => res.json())
-    .then(res => {
-      let response : EnqueueJobResponsePayload = res;
-      if (!response.success || response.inference_job_token === undefined) {
-        return;
-      }
+    const response = await GenerateTtsAudio(request)
 
+    if (GenerateTtsAudioIsOk(response)) {
+      setMaybeTtsError(undefined);
       props.enqueueTtsJob(response.inference_job_token);
-    })
-    .catch(e => {
-    });
+    } else if (GenerateTtsAudioIsError(response)) {
+      setMaybeTtsError(response.error);
+    }
 
     return false;
   };
@@ -209,6 +196,37 @@ function TtsModelListFc(props: Props) {
   const languageNotice = props.isShowingLanguageNotice? 
       <LanguageNotice clearLanguageNotice={props.clearLanguageNotice} displayLanguage={props.displayLanguage} /> :
       undefined;
+
+  // Show errors on TTS failure
+  let maybeError = <></>;
+  if (!!maybeTtsError) {
+    let hasMessage = false;
+    let message = <></>;
+    switch(maybeTtsError) {
+      case GenerateTtsAudioErrorType.TooManyRequests:
+        hasMessage = true;
+        message = (
+          <Trans i18nKey="pages.ttsList.errorTooManyRequests">
+            <strong>You're sending too many requests!</strong> 
+            Slow down a little. We have to slow things down a little when the server gets busy.
+          </Trans>
+        )
+        break;
+      case GenerateTtsAudioErrorType.ServerError | 
+           GenerateTtsAudioErrorType.BadRequest |
+           GenerateTtsAudioErrorType.NotFound:
+        break;
+    }
+
+    if (hasMessage) {
+      maybeError = (
+        <div className="notification is-warning">
+          <button className="delete" onClick={() => setMaybeTtsError(undefined)}></button>
+          {message}
+        </div>
+      );
+    }
+  }
 
   return (
     <div>
@@ -289,6 +307,8 @@ function TtsModelListFc(props: Props) {
               placeholder={t('pages.ttsList.placeholderTextGoesHere')}></textarea>
           </div>
         </div>
+
+        {maybeError}
 
         <div className="button-group">
           <div className="columns is-mobile">

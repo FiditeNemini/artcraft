@@ -85,7 +85,7 @@ Response
       // identify characters, voice actors, etc. in the future.
       "title": "Frieza (Chris Ayres)",
 
-      // IETF BCP 47 langauge tag.
+      // IETF BCP 47 language tag.
       // This is the spoken language of the model's speaker / dataset
       // Example values: 'en', 'en-US', 'es-419', 'ja-JP', ...
       "ietf_language_tag": "en-US",

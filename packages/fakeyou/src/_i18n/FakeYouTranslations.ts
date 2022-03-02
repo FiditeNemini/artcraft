@@ -39,6 +39,7 @@ const FAKEYOU_TRANSLATIONS : any = {
         ttsList: {
           buttonClear: 'Clear',
           buttonSpeak: 'Speak',
+          errorTooManyRequests: "<strong>You're sending too many requests!</strong> Slow down a little. We have to slow things down a little when the server gets busy.",
           heroSubtitle: 'Use <strong>FakeYou</strong> deep fake tech to say stuff with your favorite characters',
           heroTitle: 'Text to Speech*',
           placeholderTextGoesHere: 'Textual shenanigans go here...',
@@ -111,6 +112,7 @@ const FAKEYOU_TRANSLATIONS : any = {
         ttsList: {
           buttonClear: 'Claro',
           buttonSpeak: 'Hablar',
+          errorTooManyRequests: "<strong>¡Estás enviando demasiadas solicitudes!</strong> Reduzca la velocidad un poco. Tenemos que ralentizar un poco las cosas cuando el servidor está ocupado. ",
           heroSubtitle: 'Usa <strong>FakeYou</strong> tecnología falsa profunda para decir cosas con tus personajes favoritos',
           heroTitle: 'Texto a Voz',
           placeholderTextGoesHere: 'Las travesuras textuales van aquí...',
@@ -216,6 +218,7 @@ const FAKEYOU_TRANSLATIONS : any = {
         ttsList: {
           heroTitle: 'Texto para Fala',
           heroSubtitle: 'Use a tecnologia deepfake do <strong>FakeYou</strong> para dizer coisas com seus personagens favoritos.',
+          errorTooManyRequests: "<strong>Você está enviando muitos pedidos!</strong> Desacelere um pouco. Temos que desacelerar um pouco as coisas quando o servidor fica ocupado.",
         },
       },
       ttsListPage: {
