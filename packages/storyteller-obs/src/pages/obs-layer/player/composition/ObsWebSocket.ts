@@ -45,12 +45,9 @@ class ObsWebSocket {
   // ========== Handlers ==========
 
   private onOpen(event: Event) {
-
-    console.log('open ws');
   }
 
   private onMessage(event: MessageEvent) {
-    console.log('on message');
     if (!!this.onMessageCallback) {
       this.onMessageCallback(event);
     }

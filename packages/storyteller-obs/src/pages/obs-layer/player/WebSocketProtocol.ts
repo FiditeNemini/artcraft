@@ -33,21 +33,22 @@ class WebSocketProtocol {
     const that = this;
     this.webSocket = new ObsWebSocket(
       this.twitchUsername,
-      (ev: any) => that.onWebsocketError(ev),
-      (ev: any) => that.onWebsocketMessage(ev),
+      (ev: Event) => that.onWebsocketError(ev),
+      (ev: MessageEvent) => that.onWebsocketMessage(ev),
     );
   }
 
   private beginPollingMediaQueue() {
+    const that = this;
     setInterval(async () => {
-      await this.mediaQueue.queryAllPendingJobs();
+      await that.mediaQueue.queryAllPendingJobs();
     }, 1000);
   }
 
   private beginPollingAvailableAudioToPlay() {
     const that = this;
     setInterval(() => {
-      this.playNextAvailableAudio();
+      that.playNextAvailableAudio();
     }, 1000);
   }
 
@@ -64,7 +65,6 @@ class WebSocketProtocol {
 
 
   private onWebsocketError(event: Event) {
-    console.log('wsError', event);
     const that = this;
     setTimeout(() => that.newWebsocket(), 1000);
   }
@@ -106,7 +106,7 @@ class WebSocketProtocol {
     const sound = new Howl({
       src: [maybePlayableAudio.getUrl()],
       onend: function(soundId: number) {
-        that.playNextAvailableAudio(); // eagerly play the next one.
+        //that.playNextAvailableAudio(); // eagerly play the next one.
       }
     });
 

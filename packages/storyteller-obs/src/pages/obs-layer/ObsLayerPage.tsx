@@ -9,6 +9,7 @@ import { jobStateCanChange } from '@storyteller/components/src/jobs/JobStates';
 import { useParams } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faVolumeUp } from '@fortawesome/free-solid-svg-icons';
+import WebSocketProtocol from './player/WebSocketProtocol';
 
 /*
 NB: Debugging with CORS and self signed certs in local dev is a nightmare. Use this (Linux):
@@ -24,13 +25,16 @@ function ObsLayerPage() {
 
   const [interfaceHidden, setInterfaceHidden]= useState(false);
 
-  //const [pendingTtsJobs, setPendingTtsJobs] = useState<TtsInferenceJob[]>([])
+  const webSocketProtocolRef = useRef<WebSocketProtocol>(new WebSocketProtocol(username));
+
+  useEffect(() => {
+    webSocketProtocolRef.current.start();
+  }, [username]);
+
+  /*
   const webSocketRef = useRef<WebSocket|undefined>(undefined);
   const pendingTtsJobsRef = useRef<TtsInferenceJob[]>([]);
 
-  //const waveSurferInstance = useRef<WaveSurfer|undefined>(undefined);
-
-  // TODO: Do I need to use useCallback on everything?
 
   const openWebsocket = useCallback(async (twitchUsername: string) => {
     if (webSocketRef.current !== undefined) {
@@ -184,6 +188,8 @@ function ObsLayerPage() {
     openWebsocket(username);
     setInterval(() => { pollJobs() }, 1000);
   }, [username, openWebsocket, pollJobs]);
+
+  */
 
   if (interfaceHidden) {
     return <></>;
