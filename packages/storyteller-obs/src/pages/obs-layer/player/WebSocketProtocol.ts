@@ -63,7 +63,6 @@ class WebSocketProtocol {
     }, 1000);
   }
 
-
   private onWebsocketError(event: Event) {
     const that = this;
     setTimeout(() => that.newWebsocket(), 1000);
@@ -106,9 +105,12 @@ class WebSocketProtocol {
     const sound = new Howl({
       src: [maybePlayableAudio.getUrl()],
       onend: function(soundId: number) {
-        //that.playNextAvailableAudio(); // eagerly play the next one.
+        that.currentSound = undefined;
+        that.playNextAvailableAudio(); // eagerly play the next one.
       }
     });
+
+    this.currentSound = sound;
 
     sound.play();
   }
