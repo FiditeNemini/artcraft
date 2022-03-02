@@ -1,6 +1,13 @@
 fakeyou-frontend
 ================
 
+GO AWAY CORS
+------------
+
+```
+chromium-browser --disable-web-security --user-data-dir=~/chrome
+```
+
 NB: This is now a MONOREPO
 --------------------------
 

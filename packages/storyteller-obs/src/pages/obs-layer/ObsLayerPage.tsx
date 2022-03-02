@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 //import WaveSurfer from 'wavesurfer.js';
 import { ApiConfig } from '@storyteller/components';
 import { BucketConfig } from '@storyteller/components/src/api/BucketConfig';
@@ -7,6 +7,8 @@ import { Howl } from 'howler';
 import { TtsInferenceJob } from '@storyteller/components/src/jobs/TtsInferenceJobs';
 import { jobStateCanChange } from '@storyteller/components/src/jobs/JobStates';
 import { useParams } from 'react-router-dom';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faVolumeUp } from '@fortawesome/free-solid-svg-icons';
 
 /*
 NB: Debugging with CORS and self signed certs in local dev is a nightmare. Use this (Linux):
@@ -19,6 +21,8 @@ function ObsLayerPage() {
   console.warn('>>> OBS <<<');
 
   const { username } : { username : string } = useParams();
+
+  const [interfaceHidden, setInterfaceHidden]= useState(false);
 
   //const [pendingTtsJobs, setPendingTtsJobs] = useState<TtsInferenceJob[]>([])
   const webSocketRef = useRef<WebSocket|undefined>(undefined);
@@ -181,6 +185,10 @@ function ObsLayerPage() {
     setInterval(() => { pollJobs() }, 1000);
   }, [username, openWebsocket, pollJobs]);
 
+  if (interfaceHidden) {
+    return <></>;
+  }
+
   return (
     <div>
       <section className="section">
@@ -188,7 +196,14 @@ function ObsLayerPage() {
           <h1 className="title">
             Paste this page's URL into OBS
           </h1>
-          <h1 className="subtitle">Twitch Username : {username}</h1>
+          <h1 className="subtitle is-5">Twitch Username : {username}</h1>
+          <br />
+          <button
+            className="button is-info is-large is-fullwidth"
+            onClick={() => setInterfaceHidden(true)}
+            >
+            <FontAwesomeIcon icon={faVolumeUp} />&nbsp;&nbsp;Click this to activate audio and hide UI 
+          </button>
         </div>
       </section>
     </div>
