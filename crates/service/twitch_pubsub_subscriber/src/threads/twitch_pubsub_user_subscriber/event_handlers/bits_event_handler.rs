@@ -10,6 +10,7 @@ use database_queries::complex_models::event_responses::EventResponse;
 use database_queries::queries::twitch::twitch_pubsub::insert_bits::TwitchPubsubBitsInsertBuilder;
 use database_queries::queries::twitch::twitch_pubsub::insert_channel_points::TwitchPubsubChannelPointsInsertBuilder;
 use log::info;
+use log::error;
 use r2d2_redis::r2d2;
 use rand::seq::SliceRandom;
 use sqlx::MySql;
@@ -79,16 +80,20 @@ impl BitsEventHandler {
       Ok(state) => {
         info!("Checking bits event against {} rules...", state.event_rules.len());
         let maybe_rule = state.event_rules.iter()
+            .filter(|rule| !rule.rule_is_disabled)
             .filter(|rule| rule.event_category.eq(&TwitchEventCategory::Bits))
             .find(|rule| {
               match rule.event_match_predicate {
                 EventMatchPredicate::NotSet {} => false, // Not set
                 EventMatchPredicate::ChannelPointsRewardNameExactMatch { .. } => false, // Wrong type
                 EventMatchPredicate::BitsCheermoteNameExactMatch { ref cheermote_name } => {
-                  false // TODO
+                  let contains_cheermote = data.chat_message.to_lowercase().contains(&cheermote_name.to_lowercase());
+                  contains_cheermote
                 },
                 EventMatchPredicate::BitsCheermotePrefixSpendThreshold { ref cheermote_prefix, minimum_bits_spent } => {
-                  false // TODO
+                  let contains_cheermote = data.chat_message.to_lowercase().contains(&cheermote_prefix.to_lowercase());
+                  let spent = i64_to_unsigned_zeroing_negatives(data.bits_used);
+                  contains_cheermote && spent >= minimum_bits_spent
                 },
                 EventMatchPredicate::BitsSpendThreshold { minimum_bits_spent } => {
                   let spent = i64_to_unsigned_zeroing_negatives(data.bits_used);

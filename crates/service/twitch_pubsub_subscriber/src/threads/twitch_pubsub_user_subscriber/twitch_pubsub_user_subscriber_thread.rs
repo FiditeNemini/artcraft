@@ -668,8 +668,8 @@ async fn lookup_event_rules(
           event_category: rule.event_category,
           event_match_predicate,
           event_response,
-          user_specified_rule_order: 0,
-          rule_is_disabled: false
+          user_specified_rule_order: rule.user_specified_rule_order,
+          rule_is_disabled: rule.rule_is_disabled,
         }
       })
       .collect();

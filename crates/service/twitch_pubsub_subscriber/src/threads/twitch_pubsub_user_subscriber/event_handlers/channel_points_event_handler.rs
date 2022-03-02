@@ -93,6 +93,7 @@ impl ChannelPointsEventHandler {
       Ok(state) => {
         info!("Checking channel points event against {} rules...", state.event_rules.len());
         let maybe_rule = state.event_rules.iter()
+            .filter(|rule| !rule.rule_is_disabled)
             .filter(|rule| rule.event_category.eq(&TwitchEventCategory::ChannelPoints))
             .find(|rule| {
               match rule.event_match_predicate {
