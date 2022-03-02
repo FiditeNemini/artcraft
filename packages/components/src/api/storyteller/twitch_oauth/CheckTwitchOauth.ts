@@ -3,6 +3,8 @@ import { ApiConfig } from "../../ApiConfig";
 export interface CheckTwitchOauthSuccessResponse {
   success: boolean,
   oauth_token_found: boolean,
+  maybe_twitch_username?: string,
+  maybe_twitch_username_lowercase?: string,
 }
 
 export interface CheckTwitchOauthErrorResponse {

@@ -1,19 +1,39 @@
-import React from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { SessionWrapper } from '@storyteller/components/src/session/SessionWrapper';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faDiscord } from '@fortawesome/free-brands-svg-icons';
+import { CheckTwitchOauth, CheckTwitchOauthIsError, CheckTwitchOauthIsOk } from '@storyteller/components/src/api/storyteller/twitch_oauth/CheckTwitchOauth';
+import { StorytellerUrlConfig } from '@storyteller/components/src/urls/StorytellerUrlConfig';
+import { faArrowAltCircleUp, faExternalLinkAlt } from '@fortawesome/free-solid-svg-icons';
 
 interface Props {
   sessionWrapper: SessionWrapper,
 }
 
 function ObsConfigsPage(props: Props) {
+  const [maybeTwitchUsername, setMaybeTwitchUsername] = useState("");
+
+  const checkTwitchOauth = useCallback(async () => {
+    const result = await CheckTwitchOauth();
+
+    if (CheckTwitchOauthIsOk(result)) {
+      setMaybeTwitchUsername(result.maybe_twitch_username || "");
+    } else if (CheckTwitchOauthIsError(result))  {
+    }
+  }, []);
+
+  useEffect(() => {
+    checkTwitchOauth();
+  }, [])
+
 
   if (!props.sessionWrapper.isLoggedIn()) {
     return <h1>Must Log In</h1>;
   }
 
-  const obsUrl = 'https://obs.storyteller.io/twitch/YOUR_USERNAME';
+  const username = !!maybeTwitchUsername ? maybeTwitchUsername : 'YOUR_USERNAME';
+
+  const obsUrl = new StorytellerUrlConfig().obsPageFortwitch(username);
 
   return (
     <div>
@@ -58,6 +78,17 @@ function ObsConfigsPage(props: Props) {
               </span>
             </p>
           </div>
+
+          <br />
+
+          <a
+            href={obsUrl}
+            target="_blank"
+            rel="noreferrer"
+            className="button is-large is-info is-fullwidth"
+            >
+              Open In New Tab&nbsp;<FontAwesomeIcon icon={faExternalLinkAlt} />
+          </a>
 
           <br />
 

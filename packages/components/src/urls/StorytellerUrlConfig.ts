@@ -28,6 +28,10 @@ export class StorytellerUrlConfig {
     return `${this.getScheme()}://${this.getApiHost()}/twitch/oauth/enroll_redirect_begin`;
   }
 
+  obsPageFortwitch(twitchUsername: string) : string {
+    return `${this.getScheme()}://${this.getObsHost()}/twitch/${twitchUsername}`;
+  }
+
   // =============== API HOSTS ===============
 
   private getApiHost() : string {
