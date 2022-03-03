@@ -140,7 +140,7 @@ struct Inferencer {
   pub no_op_logger_millis: u64,
 
   // Maximum number of synthesizer models to hold in memory.
-  pub sidecar_max_synthesizer_models: u32,
+  pub sidecar_max_synthesizer_models: usize,
 }
 
 #[tokio::main]
