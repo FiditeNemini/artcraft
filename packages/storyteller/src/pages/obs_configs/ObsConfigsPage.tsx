@@ -104,7 +104,7 @@ function ObsConfigsPage(props: Props) {
 
           <h1 className="title is-4">Step 1) Click <FontAwesomeIcon icon={faPlus} /> to add a new Browser Source</h1>
 
-          <img src="/obs-tutorial/obs-step1.webp" />
+          <img src="/obs-tutorial/obs-step1.webp" alt="step 1" />
 
           <p>The bottom of OBS should have a plus icon (<FontAwesomeIcon icon={faPlus} />) to add new sources. 
           You'll want to add a new <strong>Browser Source</strong>.</p>
@@ -113,7 +113,7 @@ function ObsConfigsPage(props: Props) {
 
           <h1 className="title is-4">Step 2) Paste the URL into the configuration window</h1>
 
-          <img src="/obs-tutorial/obs-step2.webp" />
+          <img src="/obs-tutorial/obs-step2.webp" alt="step 2" />
 
           <br />
 
@@ -123,7 +123,7 @@ function ObsConfigsPage(props: Props) {
 
           <h1 className="title is-4">Step 3) Activate the Page</h1>
 
-          <img src="/obs-tutorial/obs-step3.webp" />
+          <img src="/obs-tutorial/obs-step3.webp" alt="step 3" />
 
           <br />
           <br />
