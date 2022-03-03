@@ -83,6 +83,8 @@ interface State {
   displayLanguage: Language,
   primaryLanguageCode: string,
 
+  isShowingTwitchTtsNotice: boolean,
+
   // Jobs enqueued during this browser session.
   ttsInferenceJobs: Array<TtsInferenceJob>,
   w2lInferenceJobs: Array<W2lInferenceJob>,
@@ -122,6 +124,8 @@ class App extends React.Component<Props, State> {
       isShowingLanguageNotice: false,
       displayLanguage: Language.English,
       primaryLanguageCode: 'en',
+
+      isShowingTwitchTtsNotice: true,
 
       ttsInferenceJobs: [],
       w2lInferenceJobs: [],
@@ -216,6 +220,10 @@ class App extends React.Component<Props, State> {
 
   clearLanguageNotice = () => {
     this.setState({ isShowingLanguageNotice: false })
+  }
+
+  clearTwitchTtsNotice = () => {
+    this.setState({ isShowingTwitchTtsNotice: false })
   }
 
   enqueueTtsJob = (jobToken: string) => {
@@ -486,6 +494,9 @@ class App extends React.Component<Props, State> {
                     clearLanguageNotice={this.clearLanguageNotice}
                     displayLanguage={this.state.displayLanguage}
                     primaryLanguageCode={this.state.primaryLanguageCode}
+
+                    isShowingTwitchTtsNotice={this.state.isShowingTwitchTtsNotice}
+                    clearTwitchTtsNotice={this.clearTwitchTtsNotice}
 
                     enqueueTtsJob={this.enqueueTtsJob}
                     ttsInferenceJobs={this.state.ttsInferenceJobs}

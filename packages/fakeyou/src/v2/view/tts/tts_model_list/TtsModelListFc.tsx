@@ -13,15 +13,16 @@ import { W2lTemplateUploadJob } from '@storyteller/components/src/jobs/W2lTempla
 import { v4 as uuidv4 } from 'uuid';
 import { ListTtsModels, TtsModelListItem } from '@storyteller/components/src/api/tts/ListTtsModels';
 import { GenerateTtsAudio, GenerateTtsAudioErrorType, GenerateTtsAudioIsError, GenerateTtsAudioIsOk } from '@storyteller/components/src/api/tts/GenerateTtsAudio';
-import { VocodesNotice } from './VocodesNotice';
+import { VocodesNotice } from './notices/VocodesNotice';
 import { ListTtsCategories, ListTtsCategoriesIsError, ListTtsCategoriesIsOk } from '../../../api/category/ListTtsCategories';
 import { MultiDropdownSearch } from './MultiDropdownSearch';
 import { SyntheticCategory, TtsCategoryType } from '../../../../AppWrapper';
 import { AutocompleteSearch } from './AutocompleteSearch';
-import { LanguageNotice } from './LanguageNotice';
+import { LanguageNotice } from './notices/LanguageNotice';
 import { Language } from '@storyteller/components/src/i18n/Language';
 import { t } from 'i18next';
 import { Trans } from 'react-i18next';
+import { TwitchTtsNotice } from './notices/TwitchTtsNotice';
 
 export interface EnqueueJobResponsePayload {
   success: boolean,
@@ -37,6 +38,9 @@ interface Props {
   isShowingLanguageNotice: boolean,
   clearLanguageNotice: () => void,
   displayLanguage: Language,
+
+  isShowingTwitchTtsNotice: boolean,
+  clearTwitchTtsNotice: () => void,
 
   enqueueTtsJob: (jobToken: string) => void,
   ttsInferenceJobs: Array<TtsInferenceJob>,
@@ -197,6 +201,10 @@ function TtsModelListFc(props: Props) {
       <LanguageNotice clearLanguageNotice={props.clearLanguageNotice} displayLanguage={props.displayLanguage} /> :
       undefined;
 
+  const twitchTtsNotice = props.isShowingTwitchTtsNotice ? 
+      <TwitchTtsNotice clearTwitchTtsNotice={props.clearTwitchTtsNotice} /> :
+      undefined;
+
   // Show errors on TTS failure
   let maybeError = <></>;
   if (!!maybeTtsError) {
@@ -264,6 +272,8 @@ function TtsModelListFc(props: Props) {
       {languageNotice}
 
       {vocodesNotice}
+
+      {twitchTtsNotice}
 
       <form onSubmit={handleFormSubmit} className="main-form">
 

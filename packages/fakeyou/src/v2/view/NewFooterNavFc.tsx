@@ -64,6 +64,10 @@ function NewFooterNavFc(props: Props) {
           </Trans>
         </p>
 
+        <p>
+          <a href="https://create.storyteller.io" target="_blank" rel="noreferrer">storyteller<sup>(alpha)</sup></a>
+        </p>
+
       </div>
 
       {moderationLink}
