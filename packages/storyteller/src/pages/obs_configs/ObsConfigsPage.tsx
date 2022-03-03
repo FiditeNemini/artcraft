@@ -138,7 +138,9 @@ function ObsConfigsPage(props: Props) {
 
           <p>You can now hide the layer and make it invisible. The audio levels are also independently adjustable.</p>
 
-          <p>Have fun!</p>
+          <br />
+
+          <p>Have fun! We'll be back soon with some even more jaw-dropping utilities.</p>
         </div>
       </section>
 
