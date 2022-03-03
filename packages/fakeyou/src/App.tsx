@@ -102,6 +102,14 @@ function newVocodes() {
   return discord || twitter || alphaCookie;
 }
 
+function isMacOs() {
+  // Not on macs yet
+  // https://stackoverflow.com/a/38241481
+  const platform = window.navigator.platform;
+  const macPlatforms = ['Macintosh', 'MacIntel', 'MacPPC', 'Mac68K', 'darwin']; 
+  return (macPlatforms.indexOf(platform) !== -1);
+}
+
 // TODO: Port to functional component
 class App extends React.Component<Props, State> {
 
@@ -111,6 +119,8 @@ class App extends React.Component<Props, State> {
     const enableAlpha = newVocodes() || true;
 
     const migrationMode = enableAlpha ? MigrationMode.NEW_VOCODES : MigrationMode.OLD_VOCODES;
+
+    const showTwitchNotice = !isMacOs();
 
     this.state = {
       enableAlpha: enableAlpha,
@@ -125,7 +135,7 @@ class App extends React.Component<Props, State> {
       displayLanguage: Language.English,
       primaryLanguageCode: 'en',
 
-      isShowingTwitchTtsNotice: true,
+      isShowingTwitchTtsNotice: showTwitchNotice,
 
       ttsInferenceJobs: [],
       w2lInferenceJobs: [],
