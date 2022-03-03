@@ -156,6 +156,9 @@ pub async fn infer_tts_handler(
         InferTtsError::ServerError
       })?;
 
+  // Give logged in users execution priority.
+  let priority_level = if maybe_user_session.is_some() { 1 } else { 0 };
+
   info!("Creating w2l inference job record...");
 
   let query_result = sqlx::query!(
@@ -170,6 +173,7 @@ SET
   maybe_creator_user_token = ?,
   creator_ip_address = ?,
   creator_set_visibility = ?,
+  priority_level = ?,
   status = "pending"
         "#,
       &job_token,
@@ -179,6 +183,7 @@ SET
       maybe_user_token,
       ip_address,
       set_visibility.to_str(),
+      priority_level,
     )
     .execute(&server_state.mysql_pool)
     .await;

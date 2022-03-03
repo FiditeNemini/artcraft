@@ -85,9 +85,11 @@ CREATE TABLE tts_inference_jobs (
       'dead') NOT NULL DEFAULT 'pending',
 
   -- Priority *increases*, so a level of 2 will be higher than 1.
-  -- By default, all jobs from FakeYou have level 0.
-  -- Twitch TTS has level 1.
-  -- Paid Twitch and Paid API have level 2.
+  -- These are the level semantics currently:
+  --   - All jobs from anonymous FakeYou users have level 0.
+  --   - All jobs from logged in FakeYou users have level 1.
+  --   - All jobs from Twitch TTS (unpaid) have level 10 (ten).
+  --   - (There will be future levels for paid Twitch and social FakeYou rewards.)
   priority_level TINYINT UNSIGNED NOT NULL DEFAULT 0,
 
   -- We can track this against a "max_attempt_count"

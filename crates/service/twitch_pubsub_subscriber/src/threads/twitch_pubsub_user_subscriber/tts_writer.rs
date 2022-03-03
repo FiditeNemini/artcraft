@@ -11,6 +11,10 @@ use std::sync::Arc;
 use twitch_common::cheers::remove_cheers;
 use twitch_common::twitch_user_id::TwitchUserId;
 
+/// Twitch users get priority above all FakeYou users.
+///  TODO: In the future, there should be higher priority for paid users.
+const TWITCH_TTS_PRIORITY_LEVEL : u8 = 10;
+
 pub struct TtsWriter {
   mysql_pool: Arc<sqlx::Pool<MySql>>,
   redis_pool: Arc<r2d2::Pool<RedisConnectionManager>>,
@@ -43,7 +47,7 @@ impl TtsWriter {
 
     let mut builder = TtsInferenceJobInsertBuilder::new_for_internal_tts()
         .set_is_for_twitch(true)
-        .set_priority_level(1) // TODO: This shouldn't be for everyone.
+        .set_priority_level(TWITCH_TTS_PRIORITY_LEVEL)
         .set_job_token(&job_token)
         .set_model_token(model_token)
         .set_raw_inference_text(&sanitized_text);
