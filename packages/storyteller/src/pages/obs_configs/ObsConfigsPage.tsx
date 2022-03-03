@@ -1,10 +1,10 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { SessionWrapper } from '@storyteller/components/src/session/SessionWrapper';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faDiscord } from '@fortawesome/free-brands-svg-icons';
+import { faDiscord, faTwitch } from '@fortawesome/free-brands-svg-icons';
 import { CheckTwitchOauth, CheckTwitchOauthIsError, CheckTwitchOauthIsOk } from '@storyteller/components/src/api/storyteller/twitch_oauth/CheckTwitchOauth';
 import { StorytellerUrlConfig } from '@storyteller/components/src/urls/StorytellerUrlConfig';
-import { faExternalLinkAlt } from '@fortawesome/free-solid-svg-icons';
+import { faExternalLinkAlt, faPlus } from '@fortawesome/free-solid-svg-icons';
 
 interface Props {
   sessionWrapper: SessionWrapper,
@@ -66,7 +66,9 @@ function ObsConfigsPage(props: Props) {
       <section className="section">
         <div className="container">
 
-          <p>Once you've linked Twitch with Storyteller, you can open the following page in OBS:</p>
+          <h1 className="title is-2">Your OBS Browser Source</h1>
+
+          <p>Once you've linked Twitch with Storyteller, you can add the following page as an <em>OBS Browser Source</em>:</p>
 
           <br />
 
@@ -91,9 +93,52 @@ function ObsConfigsPage(props: Props) {
           </a>
 
           <br />
+          <br />
+          <br />
 
-          <p>This page is a work in progress! It will include instructions, more configs, etc.</p>
+          <h1 className="title is-2">Setup Instructions</h1>
 
+          <p>If you're not familiar with OBS or you need a refresher, here's a quick glance at the setup.</p>  
+
+          <br />
+
+          <h1 className="title is-4">Step 1) Click <FontAwesomeIcon icon={faPlus} /> to add a new Browser Source</h1>
+
+          <img src="/obs-tutorial/obs-step1.webp" />
+
+          <p>The bottom of OBS should have a plus icon (<FontAwesomeIcon icon={faPlus} />) to add new sources. 
+          You'll want to add a new <strong>Browser Source</strong>.</p>
+
+          <br />
+
+          <h1 className="title is-4">Step 2) Paste the URL into the configuration window</h1>
+
+          <img src="/obs-tutorial/obs-step2.webp" />
+
+          <br />
+
+          <p>Remember, the URL is <code>{obsUrl}</code></p>
+          
+          <br />
+
+          <h1 className="title is-4">Step 3) Activate the Page</h1>
+
+          <img src="/obs-tutorial/obs-step3.webp" />
+
+          <br />
+          <br />
+
+          <p>Right click the layer and select <em>&ldquo;Interact&rdquo;</em>. 
+          This will let you click the button and activate the service.</p>
+
+          <br />
+          <br />
+
+          <h1 className="title is-2">Good to go! <FontAwesomeIcon icon={faTwitch} /></h1>
+
+          <p>You can now hide the layer and make it invisible. The audio levels are also independently adjustable.</p>
+
+          <p>Have fun!</p>
         </div>
       </section>
 
