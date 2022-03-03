@@ -776,6 +776,10 @@ async fn process_job(
       .virtual_model_lfu
       .insert_returning_replaced(tts_synthesizer_fs_path.to_str().unwrap_or(""))?;
 
+  if let Some(model_path) = maybe_unload_model_path.as_deref() {
+    warn!("Remove model from LFU cache: {:?}", model_path);
+  }
+
   let output_audio_fs_path = temp_dir.path().join("output.wav");
   let output_metadata_fs_path = temp_dir.path().join("metadata.json");
   let output_spectrogram_fs_path = temp_dir.path().join("spectrogram.json");
