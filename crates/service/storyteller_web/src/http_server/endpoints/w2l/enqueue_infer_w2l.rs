@@ -81,10 +81,6 @@ pub async fn infer_w2l_handler(
     unimplemented!("this isn't finished");
   }
 
-  if let Err(_err) = server_state.redis_rate_limiter.rate_limit_request(&http_request) {
-    return Err(InferW2lError::RateLimited);
-  }
-
   let maybe_session = server_state
     .session_checker
     .maybe_get_session(&http_request, &server_state.mysql_pool)
@@ -93,6 +89,11 @@ pub async fn infer_w2l_handler(
       warn!("Session checker error: {:?}", e);
       InferW2lError::ServerError
     })?;
+
+  // TODO
+  //if let Err(_err) = server_state.redis_rate_limiter.rate_limit_request(&http_request) {
+  //  return Err(InferW2lError::RateLimited);
+  //}
 
   let mut maybe_user_token : Option<String> = maybe_session
     .as_ref()

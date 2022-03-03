@@ -53,6 +53,7 @@ pub struct InferW2lWithUploadSuccessResponse {
 #[derive(Debug)]
 pub enum InferW2lWithUploadError {
   BadInput(String),
+  NotAuthorized,
   EmptyFileUploaded,
   ServerError,
   RateLimited,
@@ -62,6 +63,7 @@ impl ResponseError for InferW2lWithUploadError {
   fn status_code(&self) -> StatusCode {
     match *self {
       InferW2lWithUploadError::BadInput(_) => StatusCode::BAD_REQUEST,
+      InferW2lWithUploadError::NotAuthorized => StatusCode::UNAUTHORIZED,
       InferW2lWithUploadError::EmptyFileUploaded => StatusCode::BAD_REQUEST,
       InferW2lWithUploadError::ServerError => StatusCode::INTERNAL_SERVER_ERROR,
       InferW2lWithUploadError::RateLimited => StatusCode::TOO_MANY_REQUESTS,
@@ -71,6 +73,7 @@ impl ResponseError for InferW2lWithUploadError {
   fn error_response(&self) -> HttpResponse {
     let error_reason = match self {
       InferW2lWithUploadError::BadInput(reason) => reason.to_string(),
+      InferW2lWithUploadError::NotAuthorized => "unauthorized".to_string(),
       InferW2lWithUploadError::EmptyFileUploaded => "empty file uploaded".to_string(),
       InferW2lWithUploadError::ServerError => "server error".to_string(),
       InferW2lWithUploadError::RateLimited => "rate limited".to_string(),
@@ -94,12 +97,6 @@ pub async fn enqueue_infer_w2l_with_uploads(
   mut payload: Multipart
 ) -> Result<HttpResponse, InferW2lWithUploadError> {
 
-  // ==================== RATE LIMIT ==================== //
-
-  if let Err(_err) = server_state.redis_rate_limiter.rate_limit_request(&http_request) {
-    return Err(InferW2lWithUploadError::RateLimited);
-  }
-
   let ip_address = get_request_ip(&http_request);
 
   // ==================== READ SESSION ==================== //
@@ -112,6 +109,24 @@ pub async fn enqueue_infer_w2l_with_uploads(
       warn!("Session checker error: {:?}", e);
       InferW2lWithUploadError::ServerError
     })?;
+
+  // ==================== RATE LIMIT ==================== //
+
+  let rate_limiter = match maybe_session {
+    None => &server_state.redis_rate_limiters.logged_out,
+    Some(ref user) => {
+      if user.is_banned {
+        return Err(InferW2lWithUploadError::NotAuthorized);
+      }
+      &server_state.redis_rate_limiters.logged_in
+    },
+  };
+
+  if let Err(_err) = rate_limiter.rate_limit_request(&http_request) {
+    return Err(InferW2lWithUploadError::RateLimited);
+  }
+
+  // ==================== SESSION DETAILS ==================== //
 
   let mut maybe_user_token : Option<String> = maybe_session
     .as_ref()

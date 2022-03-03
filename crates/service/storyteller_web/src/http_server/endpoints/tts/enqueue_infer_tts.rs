@@ -41,6 +41,7 @@ pub struct InferTtsSuccessResponse {
 #[derive(Debug)]
 pub enum InferTtsError {
   BadInput(String),
+  NotAuthorized,
   ServerError,
   RateLimited,
 }
@@ -49,6 +50,7 @@ impl ResponseError for InferTtsError {
   fn status_code(&self) -> StatusCode {
     match *self {
       InferTtsError::BadInput(_) => StatusCode::BAD_REQUEST,
+      InferTtsError::NotAuthorized => StatusCode::UNAUTHORIZED,
       InferTtsError::ServerError => StatusCode::INTERNAL_SERVER_ERROR,
       InferTtsError::RateLimited => StatusCode::TOO_MANY_REQUESTS,
     }
@@ -57,6 +59,7 @@ impl ResponseError for InferTtsError {
   fn error_response(&self) -> HttpResponse {
     let error_reason = match self {
       InferTtsError::BadInput(reason) => reason.to_string(),
+      InferTtsError::NotAuthorized => "unauthorized".to_string(),
       InferTtsError::ServerError => "server error".to_string(),
       InferTtsError::RateLimited => "rate limited".to_string(),
     };
@@ -77,10 +80,6 @@ pub async fn infer_tts_handler(
   request: web::Json<InferTtsRequest>,
   server_state: web::Data<Arc<ServerState>>) -> Result<HttpResponse, InferTtsError>
 {
-  if let Err(_err) = server_state.redis_rate_limiter.rate_limit_request(&http_request) {
-    return Err(InferTtsError::RateLimited);
-  }
-
   let maybe_user_session = server_state
     .session_checker
     .maybe_get_user_session(&http_request, &server_state.mysql_pool)
@@ -89,6 +88,24 @@ pub async fn infer_tts_handler(
       warn!("Session checker error: {:?}", e);
       InferTtsError::ServerError
     })?;
+
+  // ==================== RATE LIMIT ==================== //
+
+  let rate_limiter = match maybe_user_session {
+    None => &server_state.redis_rate_limiters.logged_out,
+    Some(ref user) => {
+      if user.is_banned {
+        return Err(InferTtsError::NotAuthorized);
+      }
+      &server_state.redis_rate_limiters.logged_in
+    },
+  };
+
+  if let Err(_err) = rate_limiter.rate_limit_request(&http_request) {
+    return Err(InferTtsError::RateLimited);
+  }
+
+  // ==================== CHECK AND PERFORM TTS ==================== //
 
   let mut maybe_user_token : Option<String> = maybe_user_session
     .as_ref()

@@ -103,7 +103,7 @@ use crate::http_server::web_utils::cookie_manager::CookieManager;
 use crate::http_server::web_utils::redis_rate_limiter::RedisRateLimiter;
 use crate::http_server::web_utils::session_checker::SessionChecker;
 use crate::routes::add_routes;
-use crate::server_state::{ServerState, EnvConfig, TwitchOauthSecrets, TwitchOauth};
+use crate::server_state::{ServerState, EnvConfig, TwitchOauthSecrets, TwitchOauth, RedisRateLimiters};
 use crate::threads::ip_banlist_set::IpBanlistSet;
 use crate::threads::poll_ip_banlist_thread::poll_ip_bans;
 use crate::util::buckets::bucket_client::BucketClient;
@@ -200,16 +200,52 @@ async fn main() -> AnyhowResult<()> {
   let redis_pool = r2d2::Pool::builder()
       .build(redis_manager)?;
 
-  let limiter_enabled = easyenv::get_env_bool_or_default("LIMITER_ENABLED", true);
-  let limiter_max_requests = easyenv::get_env_num("LIMITER_MAX_REQUESTS", 3)?;
-  let limiter_window_seconds = easyenv::get_env_num("LIMITER_WINDOW_SECONDS", 10)?;
+  info!("Setting up Redis rate limiters...");
 
-  let limiter = Limiter::build(&common_env.redis_0_connection_string)
-      .limit(limiter_max_requests)
-      .period(Duration::from_secs(limiter_window_seconds))
-      .finish()?;
+  // Old env vars:
+  //
+  // "LIMITER_ENABLED"
+  // "LIMITER_MAX_REQUESTS"
+  // "LIMITER_WINDOW_SECONDS"
+  //
+  let logged_out_redis_rate_limiter = {
+    let limiter_enabled = easyenv::get_env_bool_or_default("LIMITER_LOGGED_OUT_ENABLED", true);
+    let limiter_max_requests = easyenv::get_env_num("LIMITER_LOGGED_OUT_MAX_REQUESTS", 3)?;
+    let limiter_window_seconds = easyenv::get_env_num("LIMITER_LOGGED_OUT_WINDOW_SECONDS", 10)?;
 
-  let redis_rate_limiter = RedisRateLimiter::new(limiter, limiter_enabled);
+    let limiter = Limiter::build(&common_env.redis_0_connection_string)
+        .limit(limiter_max_requests)
+        .period(Duration::from_secs(limiter_window_seconds))
+        .finish()?;
+
+    RedisRateLimiter::new(limiter, "logged_out", limiter_enabled)
+  };
+
+  let logged_in_redis_rate_limiter = {
+    let limiter_enabled = easyenv::get_env_bool_or_default("LIMITER_LOGGED_IN_ENABLED", true);
+    let limiter_max_requests = easyenv::get_env_num("LIMITER_LOGGED_IN_MAX_REQUESTS", 3)?;
+    let limiter_window_seconds = easyenv::get_env_num("LIMITER_LOGGED_IN_WINDOW_SECONDS", 10)?;
+
+    let limiter = Limiter::build(&common_env.redis_0_connection_string)
+        .limit(limiter_max_requests)
+        .period(Duration::from_secs(limiter_window_seconds))
+        .finish()?;
+
+    RedisRateLimiter::new(limiter, "logged_in", limiter_enabled)
+  };
+
+  let model_upload_rate_limiter = {
+    let limiter_enabled = easyenv::get_env_bool_or_default("LIMITER_MODEL_UPLOAD_ENABLED", true);
+    let limiter_max_requests = easyenv::get_env_num("LIMITER_MODEL_UPLOAD_MAX_REQUESTS", 3)?;
+    let limiter_window_seconds = easyenv::get_env_num("LIMITER_MODEL_UPLOAD_WINDOW_SECONDS", 10)?;
+
+    let limiter = Limiter::build(&common_env.redis_0_connection_string)
+        .limit(limiter_max_requests)
+        .period(Duration::from_secs(limiter_window_seconds))
+        .finish()?;
+
+    RedisRateLimiter::new(limiter, "model_upload", limiter_enabled)
+  };
 
   info!("Reading env vars and setting up utils...");
 
@@ -297,7 +333,11 @@ async fn main() -> AnyhowResult<()> {
     hostname: server_hostname,
     mysql_pool: pool,
     redis_pool,
-    redis_rate_limiter,
+    redis_rate_limiters: RedisRateLimiters {
+      logged_out: logged_out_redis_rate_limiter,
+      logged_in: logged_in_redis_rate_limiter,
+      model_upload: model_upload_rate_limiter,
+    },
     firehose_publisher,
     badge_granter,
     cookie_manager,

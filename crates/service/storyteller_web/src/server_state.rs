@@ -23,7 +23,7 @@ pub struct ServerState {
 
   pub redis_pool: r2d2::Pool<RedisConnectionManager>,
 
-  pub redis_rate_limiter: RedisRateLimiter,
+  pub redis_rate_limiters: RedisRateLimiters,
 
   pub cookie_manager: CookieManager,
 
@@ -72,4 +72,17 @@ pub struct TwitchOauth {
 pub struct TwitchOauthSecrets {
   pub client_id: String,
   pub client_secret: String,
+}
+
+/// Different rate limiters for different users
+#[derive(Clone)]
+pub struct RedisRateLimiters {
+  /// Logged out users have stricter limits
+  pub logged_out: RedisRateLimiter,
+
+  /// Logged in users have a little more leeway
+  pub logged_in: RedisRateLimiter,
+
+  /// A rate limiter for TTS and W2L uploads
+  pub model_upload: RedisRateLimiter,
 }

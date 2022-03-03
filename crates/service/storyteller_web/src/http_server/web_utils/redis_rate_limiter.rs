@@ -14,6 +14,7 @@ const RATE_LIMIT_BYPASS_HEADER : &'static str = "limitless";
 #[derive(Clone)] // NB: Limiter is `Clone`
 pub struct RedisRateLimiter {
   limiter: Limiter,
+  limit_key_prefix: String,
   limiter_enabled: bool,
   rate_limit_bypass_header: HeaderName,
 }
@@ -24,10 +25,11 @@ pub enum RateLimiterError {
 }
 
 impl RedisRateLimiter {
-  pub fn new(limiter: Limiter, limiter_enabled: bool) -> Self {
+  pub fn new(limiter: Limiter, limit_key_prefix: &str, limiter_enabled: bool) -> Self {
     let rate_limit_bypass_header = HeaderName::from_static(RATE_LIMIT_BYPASS_HEADER);
     RedisRateLimiter {
       limiter,
+      limit_key_prefix: limit_key_prefix.to_string(),
       limiter_enabled,
       rate_limit_bypass_header,
     }
@@ -46,7 +48,7 @@ impl RedisRateLimiter {
 
     let ip_address = get_request_ip(&request);
 
-    let rate_limit_key = format!("rate_limit:{}", ip_address);
+    let rate_limit_key = format!("rate_limit:{}:{}", &self.limit_key_prefix, ip_address);
     self.rate_limit_key(&rate_limit_key)
   }
 

@@ -101,7 +101,7 @@ pub async fn upload_tts_model_handler(
   request: web::Json<UploadTtsModelRequest>,
   server_state: web::Data<Arc<ServerState>>) -> Result<HttpResponse, UploadTtsModelError>
 {
-  if let Err(_err) = server_state.redis_rate_limiter.rate_limit_request(&http_request) {
+  if let Err(_err) = server_state.redis_rate_limiters.model_upload.rate_limit_request(&http_request) {
     return Err(UploadTtsModelError::RateLimited);
   }
 
