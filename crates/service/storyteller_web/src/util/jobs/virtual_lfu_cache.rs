@@ -109,6 +109,23 @@ pub mod tests {
   use crate::util::jobs::virtual_lfu_cache::VirtualLfuCache;
 
   #[test]
+  fn large_capacity_does_not_shed() {
+    let mut cache = VirtualLfuCache::new(10).unwrap();
+    cache.insert_returning_replaced("1");
+    cache.insert_returning_replaced("2");
+    cache.insert_returning_replaced("3");
+    cache.insert_returning_replaced("4");
+    cache.insert_returning_replaced("5");
+    cache.insert_returning_replaced("6");
+    cache.insert_returning_replaced("7");
+    cache.insert_returning_replaced("8");
+    cache.insert_returning_replaced("9");
+    assert!(cache.insert_returning_replaced("10").is_none()); // Does not remove
+    assert!(cache.insert_returning_replaced("11").is_some()); // Removes
+    assert_eq!(cache.size(), 10);
+  }
+
+  #[test]
   fn insert_beyond_capacity() {
     let mut cache = VirtualLfuCache::new(3).unwrap();
     assert_eq!(cache.size(), 0);
