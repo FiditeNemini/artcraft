@@ -256,7 +256,7 @@ async fn main() -> AnyhowResult<()> {
     mysql_pool: mysql_pool.clone(), // NB: MySqlPool is clone/send/sync safe
   };
 
-  let virtual_lfu_cache = SyncVirtualLfuCache::new(2)?;
+  let virtual_lfu_cache = SyncVirtualLfuCache::new(sidecar_max_synthesizer_models)?;
 
   let cache_miss_strategizers = {
     let in_memory_strategizer = CacheMissStrategizer::new(
