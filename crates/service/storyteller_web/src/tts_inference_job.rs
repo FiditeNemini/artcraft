@@ -141,6 +141,11 @@ struct Inferencer {
 
   // Maximum number of synthesizer models to hold in memory.
   pub sidecar_max_synthesizer_models: usize,
+
+  // Typically we'll sort jobs by priority. Occasionally we introduce a chance for low
+  // priority jobs to run in the order they were enqueued.
+  // If this is set to "0", we no longer consider priority
+  pub low_priority_starvation_prevention_every_nth: usize,
 }
 
 #[tokio::main]
@@ -252,6 +257,10 @@ async fn main() -> AnyhowResult<()> {
   let sidecar_max_synthesizer_models = easyenv::get_env_num(
     "SIDECAR_MAX_SYNTHESIZER_MODELS", 3)?;
 
+  // Set to "0" to always treat low priority the same as high priority
+  let low_priority_starvation_prevention_every_nth= easyenv::get_env_num(
+    "LOW_PRIORITY_STARVATION_PREVENTION_EVERY_NTH", 3)?;
+
   let firehose_publisher = FirehosePublisher {
     mysql_pool: mysql_pool.clone(), // NB: MySqlPool is clone/send/sync safe
   };
@@ -308,6 +317,7 @@ async fn main() -> AnyhowResult<()> {
     job_batch_size: common_env.job_batch_size,
     no_op_logger_millis: common_env.no_op_logger_millis,
     sidecar_max_synthesizer_models,
+    low_priority_starvation_prevention_every_nth,
   };
 
   main_loop(inferencer).await;
@@ -325,11 +335,27 @@ async fn main_loop(inferencer: Inferencer) {
 
   let mut span_batch = Vec::new();
 
+  let mut sort_by_priority = true;
+  let mut sort_by_priority_count = 0;
+
   loop {
     let num_records = inferencer.job_batch_size;
 
-    let maybe_available_jobs
-        = list_available_tts_inference_jobs(&inferencer.mysql_pool, num_records).await;
+    // Don't completely starve low-priority jobs
+    if sort_by_priority_count >= inferencer.low_priority_starvation_prevention_every_nth {
+      sort_by_priority_count = 0;
+      sort_by_priority = false;
+    }
+
+    let maybe_available_jobs =
+        list_available_tts_inference_jobs(
+          &inferencer.mysql_pool,
+          sort_by_priority,
+          num_records
+        ).await;
+
+    sort_by_priority = true;
+    sort_by_priority_count += 1;
 
     let jobs = match maybe_available_jobs {
       Ok(jobs) => jobs,

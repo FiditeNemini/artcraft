@@ -36,12 +36,63 @@ pub struct AvailableTtsInferenceJob {
 }
 
 /// Query jobs that are ready to run
+/// If sorting by priority, be careful not to starve lower priority jobs
+///  (ie. if there's an issue with higher priorities.)
 pub async fn list_available_tts_inference_jobs(
   pool: &MySqlPool,
+  sort_by_priority: bool,
   num_records: u32
 ) -> AnyhowResult<Vec<AvailableTtsInferenceJob>> {
 
-  let job_records : Vec<AvailableTtsInferenceJobRawInternal> = sqlx::query_as!(
+  // NB: This query is awkwardly written twice because this is the only way the
+  // macro can statically type check the query, result types, and parameter bindings.
+  //
+  // The only difference here is the 'ORDER BY' clause !
+  let job_records : Vec<AvailableTtsInferenceJobRawInternal> = if sort_by_priority {
+    sqlx::query_as!(
+      AvailableTtsInferenceJobRawInternal,
+        r#"
+SELECT
+  id,
+  token AS inference_job_token,
+  uuid_idempotency_token,
+
+  model_token,
+  raw_inference_text,
+
+  creator_ip_address,
+  maybe_creator_user_token,
+  creator_set_visibility as `creator_set_visibility: crate::column_types::record_visibility::RecordVisibility`,
+
+  is_from_api,
+  is_for_twitch,
+
+  status as `status: crate::column_types::job_status::JobStatus`,
+  priority_level,
+  attempt_count,
+  failure_reason,
+
+  created_at,
+  updated_at,
+  retry_at
+FROM tts_inference_jobs
+WHERE
+  (
+    status IN ("pending", "attempt_failed")
+  )
+  AND
+  (
+    retry_at IS NULL
+    OR
+    retry_at < CURRENT_TIMESTAMP
+  )
+  ORDER BY priority_level DESC, id ASC
+  LIMIT ?
+        "#,
+      num_records,
+    ).fetch_all(pool).await?
+  } else {
+    sqlx::query_as!(
       AvailableTtsInferenceJobRawInternal,
         r#"
 SELECT
@@ -81,9 +132,8 @@ WHERE
   LIMIT ?
         "#,
       num_records,
-    )
-      .fetch_all(pool)
-      .await?;
+    ).fetch_all(pool).await?
+  };
 
   let job_records = job_records.into_iter()
       .map(|record : AvailableTtsInferenceJobRawInternal| {
