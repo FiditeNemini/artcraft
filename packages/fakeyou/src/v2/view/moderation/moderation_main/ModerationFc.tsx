@@ -17,18 +17,28 @@ function ModerationFc(props: Props) {
     <div>
       <h1 className="title is-1"> Moderation Controls </h1>
 
+      <h3 className="title is-4"> Emergency </h3>
+      <Link
+        to="/moderation/ip_bans"
+        className="button is-link is-large is-fullwidth is-light"
+        >IP Bans</Link>
+        
+      <br />
+
+      <Link
+        to="/moderation/job_stats"
+        className="button is-link is-large is-fullwidth is-light"
+        >Job Stats</Link>
+        
+      <br />
+
+      <h3 className="title is-4"> Lookup, Stats, and Editing </h3>
+
       <Link
         to="/moderation/user/list"
         className="button is-link is-large is-fullwidth is-light"
         >User List</Link>
 
-      <br />
-
-      <Link
-        to="/moderation/ip_bans"
-        className="button is-link is-large is-fullwidth is-light"
-        >IP Ban List</Link>
-        
       <br />
 
       <Link
@@ -49,13 +59,6 @@ function ModerationFc(props: Props) {
         to="/moderation/voice_stats"
         className="button is-link is-large is-fullwidth is-light"
         >Voice Stats</Link>
-        
-      <br />
-
-      <Link
-        to="/moderation/job_stats"
-        className="button is-link is-large is-fullwidth is-light"
-        >Job Stats</Link>
         
       <br />
 
