@@ -350,6 +350,14 @@ class ApiConfig {
     return `${this.getScheme()}://${this.getNewApiHost()}/detect_locale`;
   }
 
+  createVoiceCloneRequest() : string {
+    return `${this.getScheme()}://${this.getNewApiHost()}/voice_clone_requests/create`;
+  }
+
+  checkVoiceCloneRequest() : string {
+    return `${this.getScheme()}://${this.getNewApiHost()}/voice_clone_requests/check`;
+  }
+
   // =============== Storyteller-specific ===============
 
   listTwitchEventRules() : string {

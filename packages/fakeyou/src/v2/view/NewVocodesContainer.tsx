@@ -51,6 +51,7 @@ import { TtsCategoryType } from '../../AppWrapper';
 import { PatronPage } from './patrons/PatronPage';
 import ScrollToTop from './_common/ScrollToTop';
 import { Language } from '@storyteller/components/src/i18n/Language';
+import { VoiceCloneRequestPage } from './clone_voice_requests/VoiceCloneRequestPage';
 
 interface Props {
   sessionWrapper: SessionWrapper,
@@ -369,6 +370,10 @@ class NewVocodesContainer extends React.Component<Props, State> {
               <ModerationFc
                 sessionWrapper={this.props.sessionWrapper}
               />
+            </Route>
+
+            <Route exact={true} path="/clone">
+              <VoiceCloneRequestPage />
             </Route>
 
             <Route path="/patrons">

@@ -8,10 +8,11 @@ interface Props {
 }
 
 function VoiceCloneRequestPage(props: Props) {
-  //const [leaderboard, setLeaderboard] = useState<Leaderboard|undefined>(undefined);
-  //const [ttsLeaderboard, setTtsLeaderboard] = useState<Array<LeaderboardEntryForList>|undefined>(undefined);
-  //const [w2lLeaderboard, setW2lLeaderboard] = useState<Array<LeaderboardEntryForList>|undefined>(undefined);
-  //const [retryCount, setRetryCount] = useState(0);
+  // Contact
+  const [emailAddress, setEmailAddress] = useState("");
+  const [discord, setDiscord] = useState("");
+
+  // Visibility
 
   //const getLeaderboard = useCallback(async () => {
   //  const leaderboardReponse = await GetLeaderboard();
@@ -113,6 +114,35 @@ function VoiceCloneRequestPage(props: Props) {
 
           <br />
 
+          <h1 className="title is-3">Who's voice is this?</h1>
+
+          <p>If it's your voice, you'll be able to do anything you want with it. If it's another person's voice, you may have 
+            limits on how you can use it (eg. limits on commercialization.) That doesn't mean we can't help you. Even if you
+            just want your favorite character so you can make Twitter memes, that's fine!</p>
+
+          <br />
+
+          <div className="checkbox-block">
+            <div className="control">
+              <label className="radio">
+                <input type="radio" name="answer" />
+                &nbsp;My own voice
+              </label>
+              <br />
+              <label className="radio">
+                <input type="radio" name="answer" />
+                &nbsp;A family member's voice
+              </label>
+              <br />
+              <label className="radio">
+                <input type="radio" name="answer" />
+                &nbsp;Another person's voice
+              </label>
+            </div>
+          </div>
+
+          <br />
+
           <h1 className="title is-3">How will you use it?</h1>
 
           <p>Click as many as you plan to use!</p>
@@ -170,31 +200,31 @@ function VoiceCloneRequestPage(props: Props) {
 
           <br />
 
-          <h1 className="title is-3">Who's voice is this?</h1>
+          <h1 className="title is-3">Do you want it to be private?</h1>
 
-          <p>If it's your voice, you'll be able to do anything you want with it. If it's another person's voice, you may have 
-            limits on how you can use it (eg. limits on commercialization.) That doesn't mean we can't help you. Even if you
-            just want your favorite character so you can make Twitter memes, that's fine!</p>
+          <p>(We'll accept multiple answers here, because maybe you want to use it multiple ways.)</p>
 
           <br />
 
           <div className="checkbox-block">
-            <div className="control">
-              <label className="radio">
-                <input type="radio" name="answer" />
-                &nbsp;My own voice
-              </label>
-              <br />
-              <label className="radio">
-                <input type="radio" name="answer" />
-                &nbsp;A family member's voice
-              </label>
-              <br />
-              <label className="radio">
-                <input type="radio" name="answer" />
-                &nbsp;Another person's voice
-              </label>
-            </div>
+            <label className="checkbox">
+              <input type="checkbox" />
+              &nbsp;This is for private use for just me
+            </label>
+
+            <br />
+            
+            <label className="checkbox">
+              <input type="checkbox" />
+              &nbsp;This is for private use amongst a group of people
+            </label>
+
+            <br />
+
+            <label className="checkbox">
+              <input type="checkbox" />
+              &nbsp;This is for public use
+            </label>
           </div>
 
           <br />
@@ -238,87 +268,12 @@ function VoiceCloneRequestPage(props: Props) {
             </div>
           </div>          
 
-
-          {/*
-          <p>Once you've linked Twitch with Storyteller, you can add the following page as an <em>OBS Browser Source</em>:</p>
-
           <br />
 
-          <div className="field">
-            <p className="control has-icons-left">
-              <input className="input is-large" type="text" value={obsUrl} readOnly={true} />
-              <span className="icon is-small is-left">
-                <FontAwesomeIcon icon={faDiscord} />
-              </span>
-            </p>
-          </div>
-
-          <br />
-
-          <a
-            href={obsUrl}
-            target="_blank"
-            rel="noreferrer"
-            className="button is-large is-info is-fullwidth"
-            >
-              Open In New Tab&nbsp;<FontAwesomeIcon icon={faExternalLinkAlt} />
-          </a>
-
-          <br />
-          <br />
-          <br />
-
-          <h1 className="title is-2">Setup Instructions</h1>
-
-          <p>If you're not familiar with OBS or you need a refresher, here's a quick glance at the setup.</p>  
-
-          <br />
-
-          <h1 className="title is-4">Step 1) Click <FontAwesomeIcon icon={faPlus} /> to add a new Browser Source</h1>
-
-          <img src="/obs-tutorial/obs-step1.webp" alt="step 1" />
-
-          <p>The bottom of OBS should have a plus icon (<FontAwesomeIcon icon={faPlus} />) to add new sources. 
-          You'll want to add a new <strong>Browser Source</strong>.</p>
-
-          <br />
-
-          <h1 className="title is-4">Step 2) Paste the URL into the configuration window</h1>
-
-          <img src="/obs-tutorial/obs-step2.webp" alt="step 2" />
-
-          <br />
-
-          <p>Remember, the URL is <code>{obsUrl}</code></p>
-          
-          <br />
-
-          <h1 className="title is-4">Step 3) Activate the Page</h1>
-
-          <img src="/obs-tutorial/obs-step3.webp" alt="step 3" />
-
-          <br />
-          <br />
-
-          <p>Right click the layer and select <em>&ldquo;Interact&rdquo;</em>. 
-          This will let you click the button and activate the service.</p>
-
-          <br />
-          <br />
-
-          <h1 className="title is-2">Good to go! <FontAwesomeIcon icon={faTwitch} /></h1>
-
-          <p>You can now hide the layer and make it invisible. The audio levels are also independently adjustable.</p>
-
-          <br />
-
-          <p>Have fun! We'll be back soon with some even more jaw-dropping utilities.</p>
-          */}
+          <button className="button is-link is-large is-fullwidth">Clone my voice!</button>
 
         </div>
-
       </section>
-
     </div>
   );
 }
