@@ -1,9 +1,11 @@
 import './VoiceCloneRequestPage.css';
 
+import { v4 as uuidv4 } from 'uuid';
 import { faEnvelope, faUser } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import React, { useCallback, useEffect, useState }  from 'react';
 import { faDiscord } from '@fortawesome/free-brands-svg-icons';
+import { CreateVoiceCloneApplication, CreateVoiceCloneApplicationIsError, CreateVoiceCloneApplicationIsSuccess, CreateVoiceCloneApplicationRequest } from '@storyteller/components/src/api/clone_requests/CreateVoiceCloneApplicationRequest';
 
 interface Props {
 }
@@ -141,9 +143,67 @@ function VoiceCloneRequestPage(props: Props) {
     setOptionalExtraComments((ev.target as HTMLTextAreaElement).value);
   };
 
-  const handleOptionalQuestionsChange= (ev: React.FormEvent<HTMLTextAreaElement>) => {
+  const handleOptionalQuestionsChange = (ev: React.FormEvent<HTMLTextAreaElement>) => {
     setOptionalQuestions((ev.target as HTMLTextAreaElement).value);
   };
+
+  const handleSubmit = async (ev: React.FormEvent<HTMLButtonElement>) => {
+    ev.preventDefault();
+
+    let request : CreateVoiceCloneApplicationRequest = {
+      idempotency_token: uuidv4(),
+
+      // Contact
+      email_address: emailAddress,
+      discord_username: discord,
+
+      // Visibility
+      is_for_private_use: isForPrivateUse,
+      is_for_public_use: isForPublicUse,
+
+      // Use
+      is_for_studio: false,
+      is_for_twitch_tts: isForTwitchTts,
+      is_for_api_use: isForApiUse,
+      is_for_music: isForMusic,
+      is_for_games: isForGames,
+      is_for_other: isForOther,
+
+      // Subject/Ownership
+      is_own_voice: isOwnVoice,
+      is_third_party_voice: isThirdPartyVoice,
+
+      // Equipment
+      has_clean_audio_recordings: hasCleanAudioRecordings,
+      has_good_microphone: hasGoodMicrophone,
+    };
+
+    if (!!optionalNotesOnUse) {
+      request.optional_notes_on_use = optionalNotesOnUse;
+    }
+
+    if (!!notesOnSubject) {
+      request.optional_notes_on_subject = notesOnSubject;
+    }
+
+    if (!!optionalQuestions) {
+      request.optional_questions = optionalQuestions;
+    }
+
+    if (!!optionalExtraComments) {
+      request.optional_extra_comments = optionalExtraComments;
+    }
+
+    const response = await CreateVoiceCloneApplication(request)
+
+    if (CreateVoiceCloneApplicationIsSuccess(response)) {
+      //
+    } else if (CreateVoiceCloneApplicationIsError(response)) {
+      // TODO
+    }
+
+    return false;
+  }
 
   return (
     <div>
@@ -428,7 +488,10 @@ function VoiceCloneRequestPage(props: Props) {
 
           <br />
 
-          <button className="button is-link is-large is-fullwidth">Clone my voice!</button>
+          <button 
+            className="button is-link is-large is-fullwidth"
+            onClick={handleSubmit}
+            >Clone my voice!</button>
 
         </div>
       </section>
