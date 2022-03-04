@@ -1,11 +1,14 @@
 import './VoiceCloneRequestPage.css';
 
 import { v4 as uuidv4 } from 'uuid';
-import { faEnvelope, faUser } from '@fortawesome/free-solid-svg-icons';
+import { faEnvelope, faMicrophone, faRedo, faUser } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import React, { useCallback, useEffect, useState }  from 'react';
 import { faDiscord } from '@fortawesome/free-brands-svg-icons';
 import { CreateVoiceCloneApplication, CreateVoiceCloneApplicationIsError, CreateVoiceCloneApplicationIsSuccess, CreateVoiceCloneApplicationRequest } from '@storyteller/components/src/api/clone_requests/CreateVoiceCloneApplicationRequest';
+import { CheckVoiceCloneApplication, CheckVoiceCloneApplicationIsError, CheckVoiceCloneApplicationIsSuccess, CheckVoiceCloneApplicationRequest } from '@storyteller/components/src/api/clone_requests/CheckVoiceCloneApplication';
+import { Link } from 'react-router-dom';
+import { FrontendUrlConfig } from '../../../common/FrontendUrlConfig';
 
 interface Props {
 }
@@ -40,30 +43,28 @@ function VoiceCloneRequestPage(props: Props) {
   const [optionalQuestions, setOptionalQuestions] = useState("");
   const [optionalExtraComments, setOptionalExtraComments] = useState("");
 
-  //const getLeaderboard = useCallback(async () => {
-  //  const leaderboardReponse = await GetLeaderboard();
+  // Form submission state
+  const [formWasSubmitted, setFormWasSubmitted] = useState(false);
 
-  //  if (GetLeaderboardIsOk(leaderboardReponse)) {
-  //    setLeaderboard(leaderboardReponse);
-  //    setTtsLeaderboard(leaderboardReponse.tts_leaderboard);
-  //    setW2lLeaderboard(leaderboardReponse.w2l_leaderboard);
-  //  } else if (GetLeaderboardIsErr(leaderboardReponse)) {
-  //    switch(leaderboardReponse) {
-  //      // TODO: There's an issue with the queries not returning before the deadline.
-  //      // I should add a Redis TTL cache to store the results and an async job to warm the cache.
-  //      case LeaderboardLookupError.NotFound:
-  //        if (retryCount < 3) {
-  //          setTimeout(() => getLeaderboard(), 1000);
-  //          setRetryCount(retryCount+1);
-  //        }
-  //        break;
-  //    }
-  //  }
-  //}, [retryCount]);
+  // Previous form submission state
+  const [formWasPrevioiuslySubmitted, setFormWasPreviouslySubmitted] = useState(false);
 
-  //useEffect(() => {
-  //  getLeaderboard();
-  //}, [getLeaderboard]);
+  const checkPreviousApplication = useCallback(async () => {
+
+    const request : CheckVoiceCloneApplicationRequest = {
+    };
+
+    const response = await CheckVoiceCloneApplication(request);
+
+    if (CheckVoiceCloneApplicationIsSuccess(response)) {
+      setFormWasPreviouslySubmitted(response.has_submitted);
+    } else if (CheckVoiceCloneApplicationIsError(response)) {
+    }
+  }, []);
+
+  useEffect(() => {
+    checkPreviousApplication();
+  }, [checkPreviousApplication]);
 
   const handleEmailAddressChange = (ev: React.FormEvent<HTMLInputElement>) => {
     setEmailAddress((ev.target as HTMLInputElement).value);
@@ -197,7 +198,7 @@ function VoiceCloneRequestPage(props: Props) {
     const response = await CreateVoiceCloneApplication(request)
 
     if (CreateVoiceCloneApplicationIsSuccess(response)) {
-      //
+      setFormWasSubmitted(true);
     } else if (CreateVoiceCloneApplicationIsError(response)) {
       // TODO
     }
@@ -205,39 +206,87 @@ function VoiceCloneRequestPage(props: Props) {
     return false;
   }
 
+  const header = (
+    <section className="hero is-small">
+      <div className="hero-body">
+
+        <div className="columns is-vcentered">
+
+          <div className="column is-one-third">
+            <div className="mascot">
+              <img src="/mascot/kitsune_pose4_black_2000.webp" alt="FakeYou's mascot!" />
+            </div>
+          </div>
+
+          <div className="column">
+            <p className="title is-1">
+              Professionally Clone Your Voice
+            </p>
+            <p className="subtitle is-3">
+              (or any voice) for just $70
+            </p>
+
+          </div>
+
+        </div>
+      </div>
+    </section>
+  );
+
+  if (formWasSubmitted) {
+    return (
+      <div>
+        {header}
+
+        <section className="section">
+          <div className="container">
+            <h1 className="title is-2">We've got it! We'll be in touch!</h1>
+            <h1 className="title is-4">(We can't wait to clone your voice!)</h1>
+          </div>
+
+          <br />
+          <br />
+
+          <Link
+            to={FrontendUrlConfig.indexPage()}
+            className="button is-info is-large is-fullwidth is-outlined"
+            >
+              Back to home&nbsp;<FontAwesomeIcon icon={faRedo} />
+            </Link>
+        </section>
+      </div>
+    );
+  }
+
+  let previouslySubmittedNote = <></>;
+  
+  if (formWasPrevioiuslySubmitted) {
+    previouslySubmittedNote = (
+      <>
+        <article className="message is-warning">
+          <div className="message-body">
+            It looks like you've already submitted a request, but feel free to submit another!
+            <br />
+            (Especially if you have another voice for us!)
+          </div>
+        </article>
+        <br />
+      </>
+    );
+  }
+
   return (
     <div>
 
-      <section className="hero is-small">
-        <div className="hero-body">
-
-          <div className="columns is-vcentered">
-
-            <div className="column is-one-third">
-              <div className="mascot">
-                <img src="/mascot/kitsune_pose4_black_2000.webp" alt="FakeYou's mascot!" />
-              </div>
-            </div>
-
-            <div className="column">
-              <p className="title is-1">
-                Professionally Clone Your Voice
-              </p>
-              <p className="subtitle is-3">
-                (or any voice) for just $70
-              </p>
-
-            </div>
-
-          </div>
-        </div>
-      </section>
+      {header}
 
       <section className="section">
         <div className="container">
 
           <h1 className="title is-2">Want a Custom Voice You Can Use?</h1>
           <h1 className="subtitle is-4">For Music, Videos, Twitch Rewards, API, Friends, Family&hellip; whatever you want!</h1>
+
+          {previouslySubmittedNote}
 
           <p>
             We have an extremely talented staff that will personally handle your voice clone request. 
@@ -491,7 +540,9 @@ function VoiceCloneRequestPage(props: Props) {
           <button 
             className="button is-link is-large is-fullwidth"
             onClick={handleSubmit}
-            >Clone my voice!</button>
+            >
+              Clone my voice!&nbsp;<FontAwesomeIcon icon={faMicrophone} />
+            </button>
 
         </div>
       </section>
