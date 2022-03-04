@@ -1,8 +1,9 @@
 import './VoiceCloneRequestPage.css';
 
-import { faEnvelope } from '@fortawesome/free-solid-svg-icons';
+import { faEnvelope, faUser } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import React, { useCallback, useEffect, useState }  from 'react';
+import { faDiscord } from '@fortawesome/free-brands-svg-icons';
 
 interface Props {
 }
@@ -13,6 +14,29 @@ function VoiceCloneRequestPage(props: Props) {
   const [discord, setDiscord] = useState("");
 
   // Visibility
+  const [isForPublicUse, setIsForPublicUse] = useState(false);
+  const [isForPrivateUse, setIsForPrivateUse] = useState(false);
+
+  // Use
+  const [isForTwitchTts, setIsForTwitchTts] = useState(false);
+  const [isForApiUse, setIsForApiUse] = useState(false);
+  const [isForMusic, setIsForMusic] = useState(false);
+  const [isForGames, setIsForGames] = useState(false);
+  const [isForOther, setIsForOther] = useState(false);
+  const [optionalNotesOnUse, setOptionalNotesOnUse] = useState("");
+
+  // Subject/ownership
+  const [isOwnVoice, setIsOwnVoice] = useState(false);
+  const [isThirdPartyVoice, setIsThirdPartyVoice] = useState(false);
+  const [notesOnSubject, setNotesOnSubject] = useState("");
+  
+  // Equipment
+  const [hasCleanAudioRecordings, setHasCleanAudioRecordings] = useState(false);
+  const [hasGoodMicrophone, setHasGoodMicrophone] = useState(false);
+
+  // Comments
+  const [optionalQuestions, setOptionalQuestions] = useState("");
+  const [optionalExtraComments, setOptionalExtraComments] = useState("");
 
   //const getLeaderboard = useCallback(async () => {
   //  const leaderboardReponse = await GetLeaderboard();
@@ -38,6 +62,88 @@ function VoiceCloneRequestPage(props: Props) {
   //useEffect(() => {
   //  getLeaderboard();
   //}, [getLeaderboard]);
+
+  const handleEmailAddressChange = (ev: React.FormEvent<HTMLInputElement>) => {
+    setEmailAddress((ev.target as HTMLInputElement).value);
+  };
+
+  const handleDiscordChange = (ev: React.FormEvent<HTMLInputElement>) => {
+    setDiscord((ev.target as HTMLInputElement).value);
+  };
+
+  const handleSubjectChange = (ev: React.FormEvent<HTMLInputElement>) => {
+    const value = (ev.target as HTMLInputElement).value;
+    switch (value) {
+      case 'mine':
+        setIsOwnVoice(true);
+        setIsThirdPartyVoice(false);
+        break;
+      case 'family':
+        setIsOwnVoice(false);
+        setIsThirdPartyVoice(true);
+        break;
+      case 'client':
+        setIsOwnVoice(false);
+        setIsThirdPartyVoice(true);
+        break;
+      case '3rd':
+        setIsOwnVoice(false);
+        setIsThirdPartyVoice(true);
+        break;
+    }
+  };
+
+  const handleSubjectNotesChange = (ev: React.FormEvent<HTMLInputElement>) => {
+    setNotesOnSubject((ev.target as HTMLInputElement).value);
+  };
+
+  const handleIsForMusicChange = () => {
+    setIsForMusic(!isForMusic);
+  };
+
+  const handleIsForGamesChange = () => {
+    setIsForGames(!isForGames);
+  };
+
+  const handleIsForTwitchTtsChange = () => {
+    setIsForTwitchTts(!isForTwitchTts);
+  };
+
+  const handleIsForApiUseChange = () => {
+    setIsForApiUse(!isForApiUse);
+  };
+
+  const handleIsForOtherChange = () => {
+    setIsForOther(!isForOther);
+  };
+
+  const handleOptionalNotesOnUseChange = (ev: React.FormEvent<HTMLInputElement>) => {
+    setOptionalNotesOnUse((ev.target as HTMLInputElement).value);
+  };
+
+  const handleIsForPrivateUseChange = () => {
+    setIsForPrivateUse(!isForPrivateUse);
+  };
+
+  const handleIsForPublicUseChange = () => {
+    setIsForPublicUse(!isForPublicUse);
+  };
+
+  const handleHasCleanAudioRecordingsChange= () => {
+    setHasCleanAudioRecordings(!hasCleanAudioRecordings);
+  };
+
+  const handleHasGoodMicrophoneChange = () => {
+    setHasGoodMicrophone(!hasGoodMicrophone);
+  };
+
+  const handleOptionalExtraCommentsChange = (ev: React.FormEvent<HTMLTextAreaElement>) => {
+    setOptionalExtraComments((ev.target as HTMLTextAreaElement).value);
+  };
+
+  const handleOptionalQuestionsChange= (ev: React.FormEvent<HTMLTextAreaElement>) => {
+    setOptionalQuestions((ev.target as HTMLTextAreaElement).value);
+  };
 
   return (
     <div>
@@ -71,7 +177,7 @@ function VoiceCloneRequestPage(props: Props) {
         <div className="container">
 
           <h1 className="title is-2">Want a Custom Voice You Can Use?</h1>
-          <h1 className="subtitle is-4">For Music, Videos, Twitch Rewards, API, friends, family&hellip; whatever you want!</h1>
+          <h1 className="subtitle is-4">For Music, Videos, Twitch Rewards, API, Friends, Family&hellip; whatever you want!</h1>
 
           <p>
             We have an extremely talented staff that will personally handle your voice clone request. 
@@ -86,7 +192,13 @@ function VoiceCloneRequestPage(props: Props) {
           <div className="field">
             <label className="label">Email Address</label>
             <div className="control has-icons-left">
-              <input className="input is-medium is-fullwidth" type="text" placeholder="Email Address" value="" />
+              <input 
+                className="input is-medium is-fullwidth" 
+                type="text" 
+                placeholder="Email Address" 
+                value={emailAddress} 
+                onChange={handleEmailAddressChange} 
+                />
               <span className="icon is-small is-left">
                 <FontAwesomeIcon icon={faEnvelope} />
               </span>
@@ -101,9 +213,14 @@ function VoiceCloneRequestPage(props: Props) {
               <br />
             </label>
             <div className="control has-icons-left">
-              <input className="input is-medium is-fullwidth" type="text" placeholder="Discord" value="" />
+              <input className="input is-medium is-fullwidth" 
+                type="text" 
+                placeholder="Discord" 
+                value={discord} 
+                onChange={handleDiscordChange} 
+                />
               <span className="icon is-small is-left">
-                <FontAwesomeIcon icon={faEnvelope} />
+                <FontAwesomeIcon icon={faDiscord} />
               </span>
             </div>
             <p className="help">
@@ -125,20 +242,45 @@ function VoiceCloneRequestPage(props: Props) {
           <div className="checkbox-block">
             <div className="control">
               <label className="radio">
-                <input type="radio" name="answer" />
+                <input type="radio" name="subject" value="mine" onChange={handleSubjectChange} />
                 &nbsp;My own voice
               </label>
               <br />
               <label className="radio">
-                <input type="radio" name="answer" />
+                <input type="radio" name="subject" value="family" onChange={handleSubjectChange} />
                 &nbsp;A family member's voice
               </label>
               <br />
               <label className="radio">
-                <input type="radio" name="answer" />
+                <input type="radio" name="subject" value="client" onChange={handleSubjectChange} />
+                &nbsp;A client's voice
+              </label>
+              <br />
+              <label className="radio">
+                <input type="radio" name="subject" value="3rd" onChange={handleSubjectChange} />
                 &nbsp;Another person's voice
               </label>
             </div>
+          </div>
+
+          <br />
+
+          <div className="field">
+            <label className="label">If it isn't your voice, tell us about who it is!</label>
+            <div className="control has-icons-left">
+              <input 
+                className="input is-medium is-fullwidth" 
+                type="text" 
+                placeholder="Notes on the person" 
+                value={notesOnSubject}
+                onChange={handleSubjectNotesChange}
+                />
+              <span className="icon is-small is-left">
+                <FontAwesomeIcon icon={faUser} />
+              </span>
+            </div>
+            <p className="help is-success"></p>
+            <p className="help is-danger"></p>
           </div>
 
           <br />
@@ -151,36 +293,36 @@ function VoiceCloneRequestPage(props: Props) {
 
           <div className="checkbox-block">
             <label className="checkbox">
-              <input type="checkbox" />
+              <input type="checkbox" checked={isForMusic} onChange={handleIsForMusicChange} />
               &nbsp;For Music (for creating new songs)
             </label>
 
             <br />
 
             <label className="checkbox">
-              <input type="checkbox" />
+              <input type="checkbox" checked={isForGames} onChange={handleIsForGamesChange} />
               &nbsp;For Games (because NPCs won't talk by themselves)
             </label>
 
             <br />
 
             <label className="checkbox">
-              <input type="checkbox" />
+              <input type="checkbox" checked={isForTwitchTts} onChange={handleIsForTwitchTtsChange} />
               &nbsp;For Twitch TTS (creating rewards for my stream, helping me engage and monetize)
             </label>
 
             <br />
 
             <label className="checkbox">
-              <input type="checkbox" />
+              <input type="checkbox" checked={isForApiUse} onChange={handleIsForApiUseChange} />
               &nbsp;For API use (unlimited use of the FakeYou.com API for anything you want to build)
             </label>
 
             <br />
 
             <label className="checkbox">
-              <input type="checkbox" />
-              &nbsp;Other (Oooh, now we're curious!)
+              <input type="checkbox" checked={isForOther} onChange={handleIsForOtherChange} />
+              &nbsp;Other (Now we're curious!)
             </label>
           </div>
 
@@ -189,7 +331,13 @@ function VoiceCloneRequestPage(props: Props) {
           <div className="field">
             <label className="label">Let us know more about your use (optional)</label>
             <div className="control has-icons-left">
-              <input className="input is-medium is-fullwidth" type="text" placeholder="Optional details" value="" />
+              <input 
+                className="input is-medium is-fullwidth" 
+                type="text" 
+                placeholder="Optional details" 
+                value={optionalNotesOnUse}
+                onChange={handleOptionalNotesOnUseChange}
+                />
               <span className="icon is-small is-left">
                 <FontAwesomeIcon icon={faEnvelope} />
               </span>
@@ -215,14 +363,14 @@ function VoiceCloneRequestPage(props: Props) {
             <br />
             
             <label className="checkbox">
-              <input type="checkbox" />
+              <input type="checkbox" checked={isForPrivateUse} onChange={handleIsForPrivateUseChange} />
               &nbsp;This is for private use amongst a group of people
             </label>
 
             <br />
 
             <label className="checkbox">
-              <input type="checkbox" />
+              <input type="checkbox" checked={isForPublicUse} onChange={handleIsForPublicUseChange} />
               &nbsp;This is for public use
             </label>
           </div>
@@ -237,14 +385,14 @@ function VoiceCloneRequestPage(props: Props) {
 
           <div className="checkbox-block">
             <label className="checkbox">
-              <input type="checkbox" />
+              <input type="checkbox" checked={hasGoodMicrophone} onChange={handleHasGoodMicrophoneChange} />
               &nbsp;I have a good microphone (and I know what a condenser microphone is)
             </label>
 
             <br />
 
             <label className="checkbox">
-              <input type="checkbox" />
+              <input type="checkbox" checked={hasCleanAudioRecordings} onChange={handleHasCleanAudioRecordingsChange} />
               &nbsp;I have really good preexisting recordings.
             </label>
           </div>
@@ -257,14 +405,24 @@ function VoiceCloneRequestPage(props: Props) {
           <div className="field">
             <label className="label">Do you have any questions for us?</label>
             <div className="control">
-              <textarea className="textarea" placeholder="Optional Questions"></textarea>
+              <textarea 
+                className="textarea" 
+                placeholder="Optional Questions"
+                onChange={handleOptionalQuestionsChange}
+                value={optionalQuestions}
+                ></textarea>
             </div>
           </div>          
 
           <div className="field">
             <label className="label">Do you have any important notes or details?</label>
             <div className="control">
-              <textarea className="textarea" placeholder="Optional Notes"></textarea>
+              <textarea 
+                className="textarea" 
+                placeholder="Optional Notes"
+                onChange={handleOptionalExtraCommentsChange}
+                value={optionalExtraComments}
+                ></textarea>
             </div>
           </div>          
 
