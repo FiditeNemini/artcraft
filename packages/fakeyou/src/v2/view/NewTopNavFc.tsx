@@ -54,15 +54,36 @@ function NewTopNavFc(props: Props) {
         <div id="navbarExampleTransparentExample" className={navbarClasses}>
           <div className="navbar-start">
 
-            <Link to="/"
-              className="navbar-item"
+            <Link to={FrontendUrlConfig.cloneRequestPage()}
+              className="navbar-item "
               onClick={() => closeHamburger()}
-              >TTS</Link>
+              >Clone&nbsp;My&nbsp;Voice!</Link>
 
-            <Link to="/video"
-              className="navbar-item"
-              onClick={() => closeHamburger()}
-              >{t('coreUi.topNav.video')}</Link>
+            {/* DROPDOWN: CREATE */}
+
+            <div className="navbar-item has-dropdown is-hoverable">
+              <Link to={FrontendUrlConfig.indexPage()}
+                className="navbar-link"
+                onClick={() => closeHamburger()}
+                >{t('coreUi.topNav.create')}</Link>
+
+              <div className="navbar-dropdown is-boxed">
+                {/* NB: There's an "is-active" class that looks nice. */}
+
+                <Link to="/"
+                  className="navbar-item"
+                  onClick={() => closeHamburger()}
+                  >TTS</Link>
+
+                <Link to="/video"
+                  className="navbar-item"
+                  onClick={() => closeHamburger()}
+                  >{t('coreUi.topNav.video')}</Link>
+
+              </div>
+            </div>
+
+            {/* DROPDOWN: COMMUNITY */}
 
             <div className="navbar-item has-dropdown is-hoverable">
               <Link to={myDataLink}
@@ -111,7 +132,6 @@ function NewTopNavFc(props: Props) {
                   className="navbar-item"
                   onClick={() => closeHamburger()}
                   ><FontAwesomeIcon icon={faGavel} />&nbsp;&nbsp;{t('coreUi.topNav.terms')}</Link>
-
               </div>
             </div>
 

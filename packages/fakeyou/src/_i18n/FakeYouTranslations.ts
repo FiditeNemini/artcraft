@@ -23,6 +23,7 @@ const FAKEYOU_TRANSLATIONS : any = {
           aboutUs: 'About Us',
           community: 'Community',
           contributeUpload: 'Contribute / Upload',
+          create: 'Create',
           developers: 'Developers',
           feed: 'Feed',
           leaderboard: 'Leaderboard',

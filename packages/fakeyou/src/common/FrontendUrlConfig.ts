@@ -22,6 +22,10 @@ class FrontendUrlConfig {
     return '/patrons';
   }
 
+  static cloneRequestPage() : string {
+    return '/clone';
+  }
+
   // Other domains
 
   static developerDocs() : string {
