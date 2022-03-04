@@ -44,6 +44,7 @@ function VoiceCloneRequestPage(props: Props) {
   const [optionalExtraComments, setOptionalExtraComments] = useState("");
 
   // Form submission state
+  const [formErrorMessage, setFormErrorMessage] = useState("");
   const [formWasSubmitted, setFormWasSubmitted] = useState(false);
 
   // Previous form submission state
@@ -151,19 +152,24 @@ function VoiceCloneRequestPage(props: Props) {
   const handleSubmit = async (ev: React.FormEvent<HTMLButtonElement>) => {
     ev.preventDefault();
 
+    if (!emailAddress.trim() || !emailAddress.includes("@")) {
+      setFormErrorMessage("Email address is invalid");
+      return false;
+    }
+
     let request : CreateVoiceCloneApplicationRequest = {
       idempotency_token: uuidv4(),
 
       // Contact
-      email_address: emailAddress,
-      discord_username: discord,
+      email_address: emailAddress.trim(),
+      discord_username: discord.trim(),
 
       // Visibility
       is_for_private_use: isForPrivateUse,
       is_for_public_use: isForPublicUse,
 
       // Use
-      is_for_studio: false,
+      is_for_studio: false, // TODO
       is_for_twitch_tts: isForTwitchTts,
       is_for_api_use: isForApiUse,
       is_for_music: isForMusic,
@@ -180,25 +186,26 @@ function VoiceCloneRequestPage(props: Props) {
     };
 
     if (!!optionalNotesOnUse) {
-      request.optional_notes_on_use = optionalNotesOnUse;
+      request.optional_notes_on_use = optionalNotesOnUse.trim();
     }
 
     if (!!notesOnSubject) {
-      request.optional_notes_on_subject = notesOnSubject;
+      request.optional_notes_on_subject = notesOnSubject.trim();
     }
 
     if (!!optionalQuestions) {
-      request.optional_questions = optionalQuestions;
+      request.optional_questions = optionalQuestions.trim();
     }
 
     if (!!optionalExtraComments) {
-      request.optional_extra_comments = optionalExtraComments;
+      request.optional_extra_comments = optionalExtraComments.trim();
     }
 
     const response = await CreateVoiceCloneApplication(request)
 
     if (CreateVoiceCloneApplicationIsSuccess(response)) {
       setFormWasSubmitted(true);
+      setFormErrorMessage("");
     } else if (CreateVoiceCloneApplicationIsError(response)) {
       // TODO
     }
@@ -270,7 +277,19 @@ function VoiceCloneRequestPage(props: Props) {
             (Especially if you have another voice for us!)
           </div>
         </article>
-        <br />
+      </>
+    );
+  }
+
+  let errorMessage = <></>;
+  if (!!formErrorMessage) {
+    errorMessage = (
+      <>
+        <article className="message is-danger">
+          <div className="message-body">
+            <strong>Error with form:</strong> {formErrorMessage}
+          </div>
+        </article>
       </>
     );
   }
@@ -536,6 +555,8 @@ function VoiceCloneRequestPage(props: Props) {
           </div>          
 
           <br />
+
+          {errorMessage}
 
           <button 
             className="button is-link is-large is-fullwidth"
