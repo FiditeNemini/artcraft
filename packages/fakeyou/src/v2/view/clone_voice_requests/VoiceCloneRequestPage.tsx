@@ -157,6 +157,11 @@ function VoiceCloneRequestPage(props: Props) {
       return false;
     }
 
+    if (!!discord.trim() && !discord.includes("#")) {
+      setFormErrorMessage("Discord username is invalid. It needs the '#' number.");
+      return false;
+    }
+
     let request : CreateVoiceCloneApplicationRequest = {
       idempotency_token: uuidv4(),
 
