@@ -9350,44 +9350,6 @@
       ]
     }
   },
-  "a9173fd8148645bda75529aae0af63dcfb7cf9e114604ce4dcc962974e7268e1": {
-    "query": "\nSELECT\n  NOW() - t2.created_at AS seconds_since_first,\n  (\n    SELECT\n      count(t1.id) as pending_count\n    FROM tts_inference_jobs AS t1\n    WHERE t1.status = \"pending\"\n  ) as pending_count\nFROM tts_inference_jobs AS t2\nWHERE t2.status = \"pending\"\nORDER BY t2.id ASC\nLIMIT 1\n        ",
-    "describe": {
-      "columns": [
-        {
-          "ordinal": 0,
-          "name": "seconds_since_first",
-          "type_info": {
-            "type": "LongLong",
-            "flags": {
-              "bits": 129
-            },
-            "char_set": 63,
-            "max_size": 16
-          }
-        },
-        {
-          "ordinal": 1,
-          "name": "pending_count",
-          "type_info": {
-            "type": "LongLong",
-            "flags": {
-              "bits": 128
-            },
-            "char_set": 63,
-            "max_size": 21
-          }
-        }
-      ],
-      "parameters": {
-        "Right": 0
-      },
-      "nullable": [
-        false,
-        true
-      ]
-    }
-  },
   "ab981965f518a8986aaaba41ed821fcb438db4c6156cbb26f639921225a88d59": {
     "query": "\nUPDATE w2l_template_upload_jobs\nSET\n  status = \"dead\",\n  failure_reason = ?,\n  retry_at = NULL\nWHERE id = ?\n        ",
     "describe": {
@@ -10204,6 +10166,83 @@
         "Right": 4
       },
       "nullable": []
+    }
+  },
+  "ed8d32dd94719ad6479dd638cdc7a8cfbf725785f51678533988ddba94aac112": {
+    "query": "\nSELECT\n  IFNULL((\n    SELECT\n      NOW() - t1.created_at AS seconds_since_first\n    FROM tts_inference_jobs AS t1\n    WHERE t1.status = \"pending\"\n    ORDER BY t1.id ASC\n    LIMIT 1\n  ), 0) as seconds_since_first,\n  sub2.pending_count,\n  sub3.pending_priority_nonzero_count,\n  sub4.pending_priority_gt_one_count,\n  sub5.attempt_failed_count\nFROM\n  (\n    SELECT\n      count(t2.id) as pending_count\n    FROM tts_inference_jobs AS t2\n    WHERE t2.status = \"pending\"\n  ) as sub2,\n  (\n    SELECT\n      count(t3.id) as pending_priority_nonzero_count\n    FROM tts_inference_jobs AS t3\n    WHERE t3.status = \"pending\"\n    AND t3.priority_level > 0\n  ) as sub3,\n  (\n    SELECT\n      count(t4.id) as pending_priority_gt_one_count\n    FROM tts_inference_jobs AS t4\n    WHERE t4.status = \"pending\"\n    AND t4.priority_level > 1\n  ) as sub4,\n  (\n    SELECT\n      count(t5.id) as attempt_failed_count\n    FROM tts_inference_jobs AS t5\n    WHERE t5.status = \"attempt_failed\"\n  ) as sub5\n        ",
+    "describe": {
+      "columns": [
+        {
+          "ordinal": 0,
+          "name": "seconds_since_first",
+          "type_info": {
+            "type": "LongLong",
+            "flags": {
+              "bits": 129
+            },
+            "char_set": 63,
+            "max_size": 16
+          }
+        },
+        {
+          "ordinal": 1,
+          "name": "pending_count",
+          "type_info": {
+            "type": "LongLong",
+            "flags": {
+              "bits": 1
+            },
+            "char_set": 63,
+            "max_size": 21
+          }
+        },
+        {
+          "ordinal": 2,
+          "name": "pending_priority_nonzero_count",
+          "type_info": {
+            "type": "LongLong",
+            "flags": {
+              "bits": 1
+            },
+            "char_set": 63,
+            "max_size": 21
+          }
+        },
+        {
+          "ordinal": 3,
+          "name": "pending_priority_gt_one_count",
+          "type_info": {
+            "type": "LongLong",
+            "flags": {
+              "bits": 1
+            },
+            "char_set": 63,
+            "max_size": 21
+          }
+        },
+        {
+          "ordinal": 4,
+          "name": "attempt_failed_count",
+          "type_info": {
+            "type": "LongLong",
+            "flags": {
+              "bits": 1
+            },
+            "char_set": 63,
+            "max_size": 21
+          }
+        }
+      ],
+      "parameters": {
+        "Right": 0
+      },
+      "nullable": [
+        false,
+        false,
+        false,
+        false,
+        false
+      ]
     }
   },
   "ee05f95e45f7aaa5811d70b1f00d3f40a361536dfc6451affcad97586dc3338f": {

@@ -22,8 +22,20 @@ use std::sync::Arc;
 #[derive(Serialize)]
 pub struct GetTtsInferenceQueueCountResponse {
   pub success: bool,
-  pub pending_count: i64,
+  // Seconds since job at head of queue was enqueued (proxy for queue wait time)
   pub seconds_since_first: i64,
+
+  // All "pending" jobs
+  pub pending_count: i64,
+
+  // All "pending" jobs with priority > 0
+  pub pending_priority_nonzero_count: i64,
+
+  // All "pending" jobs with priority > 1
+  pub pending_priority_gt_one_count: i64,
+
+  // Failed, but not permanently dead
+  pub attempt_failed_count: i64,
 }
 
 #[derive(Debug, Serialize)]
@@ -80,22 +92,52 @@ pub async fn get_tts_inference_queue_count_handler(
     return Err(GetTtsInferenceQueueCountError::Unauthorized);
   }
 
-  // NB: Lookup failure is Err(RowNotFound).
+  // NB(old?): Lookup failure is Err(RowNotFound).
+  // NB(2022-03-05): The "seconds_since_first" result might return null if no pending, so IFNULL
+  //  means we won't fail the full query.
   let maybe_result = sqlx::query_as!(
       PendingCountResult,
         r#"
 SELECT
-  NOW() - t2.created_at AS seconds_since_first,
-  (
+  IFNULL((
     SELECT
-      count(t1.id) as pending_count
+      NOW() - t1.created_at AS seconds_since_first
     FROM tts_inference_jobs AS t1
     WHERE t1.status = "pending"
-  ) as pending_count
-FROM tts_inference_jobs AS t2
-WHERE t2.status = "pending"
-ORDER BY t2.id ASC
-LIMIT 1
+    ORDER BY t1.id ASC
+    LIMIT 1
+  ), 0) as seconds_since_first,
+  sub2.pending_count,
+  sub3.pending_priority_nonzero_count,
+  sub4.pending_priority_gt_one_count,
+  sub5.attempt_failed_count
+FROM
+  (
+    SELECT
+      count(t2.id) as pending_count
+    FROM tts_inference_jobs AS t2
+    WHERE t2.status = "pending"
+  ) as sub2,
+  (
+    SELECT
+      count(t3.id) as pending_priority_nonzero_count
+    FROM tts_inference_jobs AS t3
+    WHERE t3.status = "pending"
+    AND t3.priority_level > 0
+  ) as sub3,
+  (
+    SELECT
+      count(t4.id) as pending_priority_gt_one_count
+    FROM tts_inference_jobs AS t4
+    WHERE t4.status = "pending"
+    AND t4.priority_level > 1
+  ) as sub4,
+  (
+    SELECT
+      count(t5.id) as attempt_failed_count
+    FROM tts_inference_jobs AS t5
+    WHERE t5.status = "attempt_failed"
+  ) as sub5
         "#,
     )
       .fetch_one(&server_state.mysql_pool)
@@ -108,8 +150,11 @@ LIMIT 1
         sqlx::Error::RowNotFound => {
           // NB: Not Found for null results means nothing is pending in the queue
           PendingCountResult {
-            pending_count: None,
             seconds_since_first: 0,
+            pending_count: 0,
+            pending_priority_nonzero_count: 0,
+            pending_priority_gt_one_count: 0,
+            attempt_failed_count: 0,
           }
         },
         _ => {
@@ -120,10 +165,15 @@ LIMIT 1
     },
   };
 
+  println!("Foo: {:?}",  &result);
+
   let response = GetTtsInferenceQueueCountResponse {
     success: true,
-    pending_count: result.pending_count.unwrap_or(0),
     seconds_since_first: result.seconds_since_first,
+    pending_count: result.pending_count,
+    pending_priority_nonzero_count: result.pending_priority_nonzero_count,
+    pending_priority_gt_one_count: result.pending_priority_gt_one_count,
+    attempt_failed_count: result.attempt_failed_count,
   };
 
   let body = serde_json::to_string(&response)
@@ -134,8 +184,11 @@ LIMIT 1
       .body(body))
 }
 
-#[derive(Serialize)]
+#[derive(Serialize, Debug)]
 pub struct PendingCountResult {
-  pub pending_count: Option<i64>,
   pub seconds_since_first: i64,
+  pub pending_count: i64,
+  pub pending_priority_nonzero_count: i64,
+  pub pending_priority_gt_one_count: i64,
+  pub attempt_failed_count: i64,
 }
