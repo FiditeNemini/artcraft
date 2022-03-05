@@ -214,6 +214,12 @@ function ModerationJobStatsFc(props: Props) {
         className="button is-large is-danger is-fullwidth"
         onClick={() => killPendingAndFailed()}
         >Kill ALL Pending and Failed TTS&nbsp;<FontAwesomeIcon icon={faBomb} /></button>
+
+
+      <br />
+      <br />
+
+      <BackLink link={FrontendUrlConfig.moderationMain()} text="Back to moderation" />
     </div>
   )
 }
