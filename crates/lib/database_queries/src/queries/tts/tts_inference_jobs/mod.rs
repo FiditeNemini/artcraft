@@ -1,5 +1,6 @@
 pub mod _keys;
 pub mod insert_tts_inference_job;
+pub mod kill_tts_inference_jobs;
 pub mod list_available_tts_inference_jobs;
 pub mod mark_tts_inference_job_done;
 pub mod mark_tts_inference_job_failure;

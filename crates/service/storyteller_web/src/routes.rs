@@ -29,6 +29,7 @@ use crate::http_server::endpoints::moderation::ip_bans::get_ip_ban::get_ip_ban_h
 use crate::http_server::endpoints::moderation::ip_bans::list_ip_bans::list_ip_bans_handler;
 use crate::http_server::endpoints::moderation::jobs::get_tts_inference_queue_count::get_tts_inference_queue_count_handler;
 use crate::http_server::endpoints::moderation::jobs::get_w2l_inference_queue_count::get_w2l_inference_queue_count_handler;
+use crate::http_server::endpoints::moderation::jobs::kill_tts_inference_jobs::kill_tts_inference_jobs_handler;
 use crate::http_server::endpoints::moderation::stats::get_voice_count_stats::get_voice_count_stats_handler;
 use crate::http_server::endpoints::moderation::user_bans::ban_user::ban_user_handler;
 use crate::http_server::endpoints::moderation::user_bans::list_banned_users::list_banned_users_handler;
@@ -54,6 +55,7 @@ use crate::http_server::endpoints::twitch::event_rules::edit_event_rule::edit_tw
 use crate::http_server::endpoints::twitch::event_rules::get_event_rule::get_twitch_event_rule_for_user_handler;
 use crate::http_server::endpoints::twitch::event_rules::list_event_rules_for_user::list_twitch_event_rules_for_user_handler;
 use crate::http_server::endpoints::twitch::event_rules::reorder_twitch_event_rules::reorder_twitch_event_rules_handler;
+use crate::http_server::endpoints::twitch::oauth::check_oauth_status::check_oauth_status_handler;
 use crate::http_server::endpoints::twitch::oauth::oauth_begin_json::oauth_begin_enroll_json;
 use crate::http_server::endpoints::twitch::oauth::oauth_begin_redirect::oauth_begin_enroll_redirect;
 use crate::http_server::endpoints::twitch::oauth::oauth_end::oauth_end_enroll_from_redirect;
@@ -83,7 +85,6 @@ use crate::http_server::endpoints::w2l::get_w2l_template_use_count::get_w2l_temp
 use crate::http_server::endpoints::w2l::get_w2l_upload_template_job_status::get_w2l_upload_template_job_status_handler;
 use crate::http_server::endpoints::w2l::list_w2l_templates::list_w2l_templates_handler;
 use crate::http_server::endpoints::w2l::set_w2l_template_mod_approval::set_w2l_template_mod_approval_handler;
-use crate::http_server::endpoints::twitch::oauth::check_oauth_status::check_oauth_status_handler;
 
 pub fn add_routes<T, B> (app: App<T, B>) -> App<T, B>
   where
@@ -233,6 +234,11 @@ fn add_moderator_routes<T, B> (app: App<T, B>) -> App<T, B>
             .service(
               web::resource("/tts_inference_queue_stats")
                   .route(web::get().to(get_tts_inference_queue_count_handler))
+                  .route(web::head().to(|| HttpResponse::Ok()))
+            )
+            .service(
+              web::resource("/kill_tts_inference_jobs")
+                  .route(web::post().to(kill_tts_inference_jobs_handler))
                   .route(web::head().to(|| HttpResponse::Ok()))
             )
             .service(

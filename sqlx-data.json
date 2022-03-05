@@ -4119,6 +4119,16 @@
       ]
     }
   },
+  "89b66d91d1f2cd5c9871671b21a90e77d9041572a90cc6be6dd49845424677fa": {
+    "query": "\nUPDATE tts_inference_jobs\nSET status='complete_failure'\nWHERE\n  status IN ('pending');\n        ",
+    "describe": {
+      "columns": [],
+      "parameters": {
+        "Right": 0
+      },
+      "nullable": []
+    }
+  },
   "8ac132004408188cc55710185539ff6cd2011de3e0f80b4c91e2bf8b3212135e": {
     "query": "\nSELECT\n    tts.token as model_token,\n    tts.tts_model_type,\n    tts.creator_user_token,\n    users.username as creator_username,\n    users.display_name as creator_display_name,\n    users.email_gravatar_hash as creator_gravatar_hash,\n    tts.title,\n    tts.ietf_language_tag,\n    tts.ietf_primary_language_subtag,\n    tts.is_locked_from_use,\n    tts.is_front_page_featured,\n    tts.is_twitch_featured,\n    tts.maybe_suggested_unique_bot_command,\n    tts.created_at,\n    tts.updated_at\nFROM tts_models as tts\nJOIN users\nON\n    users.token = tts.creator_user_token\nWHERE\n    users.username = ?\n    AND tts.is_locked_from_use IS FALSE\n    AND tts.user_deleted_at IS NULL\n    AND tts.mod_deleted_at IS NULL\n        ",
     "describe": {
@@ -4324,6 +4334,16 @@
         false,
         false
       ]
+    }
+  },
+  "8c3f19f67e8871ada450832b5342efd870c87975f065f3d6b3789d537cab01ed": {
+    "query": "\nUPDATE tts_inference_jobs\nSET status='complete_failure'\nWHERE\n  status IN ('pending', 'attempt_failed');\n        ",
+    "describe": {
+      "columns": [],
+      "parameters": {
+        "Right": 0
+      },
+      "nullable": []
     }
   },
   "8c49202950a8d6cf87bbc60517168fba4c9b0c52c71a25d766be49fedbd28827": {
@@ -6751,6 +6771,16 @@
         true,
         true
       ]
+    }
+  },
+  "cb732b1732a36c826317f835b87c17d1b6d061c9363e9477f2603b435f9bf28f": {
+    "query": "\nUPDATE tts_inference_jobs\nSET status='complete_failure'\nWHERE\n  status IN ('pending')\n  AND priority_level = 0;\n        ",
+    "describe": {
+      "columns": [],
+      "parameters": {
+        "Right": 0
+      },
+      "nullable": []
     }
   },
   "d51e6e901cc8641b7b076f42b0fc507dad2168617c33c615ef97417f3a78ccc1": {
