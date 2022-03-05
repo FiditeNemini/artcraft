@@ -6,6 +6,7 @@ import { GetTtsInferenceStats, GetTtsInferenceStatsIsOk } from '../../../api/mod
 import { GetW2lInferenceStats, GetW2lInferenceStatsIsOk } from '../../../api/moderation/GetW2lInferenceStats';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faBomb, faRedo } from '@fortawesome/free-solid-svg-icons';
+import { KillAction, KillTtsInferenceJobsRequest, KillTtsInferenceJobsIsSuccess, KillTtsInferenceJobs } from '@storyteller/components/src/api/moderation/tts/KillTtsInferenceJobs';
 
 interface Props {
   sessionWrapper: SessionWrapper,
@@ -52,14 +53,23 @@ function ModerationJobStatsFc(props: Props) {
   }, [reloadStats]);
 
   const killPending = async () => {
-    reloadStats();
+    await doKill(KillAction.AllPending);
   }
+
   const killPendingAndFailed = async () => {
-    reloadStats();
+    await doKill(KillAction.AllPendingAndFailed);
   }
 
   const killZeroPriorityPending = async () => {
-    reloadStats();
+    await doKill(KillAction.ZeroPriorityPending);
+  }
+
+  const doKill = async(killAction: KillAction) => {
+    const response = await KillTtsInferenceJobs(killAction);
+
+    if (KillTtsInferenceJobsIsSuccess(response)) {
+      reloadStats();
+    }
   }
 
   if (ttsPendingJobCount === -1 && w2lPendingJobCount === -1) {
@@ -109,31 +119,27 @@ function ModerationJobStatsFc(props: Props) {
         <tbody>
           <tr>
             <th>
-              All Jobs
+              Pending Jobs (All)
             </th>
             <td>{ttsPendingJobCount} pending </td>
           </tr>
           <tr>
             <th>
-              Priority &gt; 0
+              Pending Jobs (Priority &gt; 0)
             </th>
-            <td>{ttsPendingJobCount} pending </td>
+            <td>{ttsPendingPriorityNonzeroJobCount} pending </td>
           </tr>
           <tr>
             <th>
-              Priority &gt; 1
+              Pending Jobs (Priority &gt; 1)
             </th>
-            <td>{ttsPendingJobCount} pending </td>
+            <td>{ttsPendingPriorityGtOneJobCount} pending </td>
           </tr>
           <tr>
             <th>
-              Retryably failed
+              Failed Jobs w/ Retry
             </th>
-            <td>{ttsPendingJobCount} pending </td>
-          </tr>
-          <tr>
-            <th>Wait time</th>
-            <th>summary statistics, job counts, etc.</th>
+            <td>{ttsAttemptFailedJobCount} pending </td>
           </tr>
         </tbody>
       </table>
@@ -168,7 +174,7 @@ function ModerationJobStatsFc(props: Props) {
         <tbody>
           <tr>
             <th>
-              All Jobs
+              Pending Jobs (All)
             </th>
             <td>{w2lPendingJobCount} pending </td>
           </tr>

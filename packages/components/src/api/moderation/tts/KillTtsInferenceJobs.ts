@@ -29,9 +29,13 @@ export function KillTtsInferenceJobsIsError(response: KillTtsInferenceJobsRespon
   return response?.success === false;
 }
 
-export async function KillTtsInferenceJobs(request: KillTtsInferenceJobsRequest) : Promise<KillTtsInferenceJobsResponse> 
+export async function KillTtsInferenceJobs(killAction: KillAction) : Promise<KillTtsInferenceJobsResponse> 
 {
   const endpoint = new ApiConfig().killTtsInferenceJobs();
+
+  const request : KillTtsInferenceJobsRequest = {
+    kill_action: killAction,
+  };
   
   return await fetch(endpoint, {
     method: 'POST',
