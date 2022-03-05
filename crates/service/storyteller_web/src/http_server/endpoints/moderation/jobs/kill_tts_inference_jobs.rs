@@ -18,15 +18,13 @@ use std::sync::Arc;
 // =============== Request ===============
 
 #[derive(Copy, Clone, Deserialize)]
+#[serde(rename_all = "snake_case")]
 pub enum KillAction {
   /// Kill all "pending" jobs
-  #[serde(rename_all = "snake_case")]
   AllPending,
   /// Kill all "pending" and "attempt_failed" jobs
-  #[serde(rename_all = "snake_case")]
   AllPendingAndFailed,
   /// Kill "pending" jobs with priority_level = 0.
-  #[serde(rename_all = "snake_case")]
   ZeroPriorityPending,
 }
 
