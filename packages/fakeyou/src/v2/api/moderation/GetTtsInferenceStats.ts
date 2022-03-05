@@ -2,8 +2,11 @@ import { ApiConfig } from "@storyteller/components";
 
 export interface TtsInferenceStats {
   success: boolean,
-  pending_count: number,
   seconds_since_first: number,
+  pending_count: number,
+  pending_priority_nonzero_count: number,
+  pending_priority_gt_one_count: number,
+  attempt_failed_count: number,
 }
 
 export enum TtsInferenceStatsError {

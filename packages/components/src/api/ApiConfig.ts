@@ -326,6 +326,10 @@ class ApiConfig {
     return `${this.getScheme()}://${this.getNewApiHost()}/moderation/jobs/tts_inference_queue_stats`;
   }
 
+  killTtsInferenceJobs() : string {
+    return `${this.getScheme()}://${this.getNewApiHost()}/moderation/jobs/kill_tts_inference_jobs`;
+  }
+
   getW2lInferenceStats() : string {
     return `${this.getScheme()}://${this.getNewApiHost()}/moderation/jobs/w2l_inference_queue_stats`;
   }

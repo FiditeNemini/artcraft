@@ -4,22 +4,33 @@ import { FrontendUrlConfig } from '../../../../common/FrontendUrlConfig';
 import { BackLink } from '../../_common/BackLink';
 import { GetTtsInferenceStats, GetTtsInferenceStatsIsOk } from '../../../api/moderation/GetTtsInferenceStats';
 import { GetW2lInferenceStats, GetW2lInferenceStatsIsOk } from '../../../api/moderation/GetW2lInferenceStats';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faBomb, faRedo } from '@fortawesome/free-solid-svg-icons';
 
 interface Props {
   sessionWrapper: SessionWrapper,
 }
 
 function ModerationJobStatsFc(props: Props) {
-  const [ttsPendingJobCount, setTtsPendingJobCount] = useState<number>(-1);
+  // NB: We have more TTS stats than W2L stats now.
   const [ttsSecondsSinceFirst, setTtsSecondsSinceFirst] = useState<number>(-1);
+  const [ttsPendingJobCount, setTtsPendingJobCount] = useState<number>(-1);
+  const [ttsPendingPriorityNonzeroJobCount, setTtsPendingPriorityNonzeroJobCount] = useState<number>(-1);
+  const [ttsPendingPriorityGtOneJobCount, setTtsPendingPriorityGtOneJobCount] = useState<number>(-1);
+  const [ttsAttemptFailedJobCount, setTtsAttemptFailedJobCount] = useState<number>(-1);
+
+
   const [w2lPendingJobCount, setW2lPendingJobCount] = useState<number>(-1);
   const [w2lSecondsSinceFirst, setW2lSecondsSinceFirst] = useState<number>(-1);
 
   const getTtsStats = useCallback(async () => {
     const response = await GetTtsInferenceStats();
     if (GetTtsInferenceStatsIsOk(response)) {
-      setTtsPendingJobCount(response.pending_count);
       setTtsSecondsSinceFirst(response.seconds_since_first);
+      setTtsPendingJobCount(response.pending_count);
+      setTtsPendingPriorityNonzeroJobCount(response.pending_priority_nonzero_count);
+      setTtsPendingPriorityGtOneJobCount(response.pending_priority_gt_one_count);
+      setTtsAttemptFailedJobCount(response.attempt_failed_count);
     }
   }, []);
   
@@ -40,6 +51,16 @@ function ModerationJobStatsFc(props: Props) {
     reloadStats();
   }, [reloadStats]);
 
+  const killPending = async () => {
+    reloadStats();
+  }
+  const killPendingAndFailed = async () => {
+    reloadStats();
+  }
+
+  const killZeroPriorityPending = async () => {
+    reloadStats();
+  }
 
   if (ttsPendingJobCount === -1 && w2lPendingJobCount === -1) {
     return <div />
@@ -61,37 +82,132 @@ function ModerationJobStatsFc(props: Props) {
       <br />
       <br />
       
-      <table className="table is-fullwidth">
+      <h2 className="title is-3">TTS Stats</h2>
+
+      <table className="table is-fullwidth is-bordered is-striped">
         <thead>
           <tr>
-            <th></th>
-            <th>Pending jobs</th>
-            <th>Wait time</th>
+            <th colSpan={2} className="is-info"><u>Misc Stats</u></th>
           </tr>
         </thead>
         <tbody>
           <tr>
             <th>
-              TTS Inference
+              TTS wait time
+            </th>
+            <td>{ttsWait}</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <table className="table is-fullwidth is-bordered is-striped">
+        <thead>
+          <tr>
+            <th colSpan={2} className="is-info"><u>Failed Jobs by Type</u></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <th>
+              All Jobs
             </th>
             <td>{ttsPendingJobCount} pending </td>
-            <td>{ttsWait}</td>
           </tr>
           <tr>
             <th>
-              W2L Inference
+              Priority &gt; 0
             </th>
-            <td>{w2lPendingJobCount} pending </td>
-            <td>{w2lWait}</td>
+            <td>{ttsPendingJobCount} pending </td>
+          </tr>
+          <tr>
+            <th>
+              Priority &gt; 1
+            </th>
+            <td>{ttsPendingJobCount} pending </td>
+          </tr>
+          <tr>
+            <th>
+              Retryably failed
+            </th>
+            <td>{ttsPendingJobCount} pending </td>
+          </tr>
+          <tr>
+            <th>Wait time</th>
+            <th>summary statistics, job counts, etc.</th>
           </tr>
         </tbody>
       </table>
 
       <br />
+
+      <h2 className="title is-3">W2L Stats</h2>
+
+      <table className="table is-fullwidth is-bordered is-striped">
+        <thead>
+          <tr>
+            <th colSpan={2} className="is-info"><u>Misc Stats</u></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <th>
+              W2L wait time
+            </th>
+            <td>{w2lWait}</td>
+          </tr>
+        </tbody>
+      </table>
+
+
+      <table className="table is-fullwidth is-bordered is-striped">
+        <thead>
+          <tr>
+            <th colSpan={2} className="is-info"><u>Failed Jobs by Type</u></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <th>
+              All Jobs
+            </th>
+            <td>{w2lPendingJobCount} pending </td>
+          </tr>
+        </tbody>
+      </table>
+
+      <br />
+
+      <h2 className="title is-4">Reload Job Stats</h2>
+
       <button 
-        className="button is-info is-large is-fullwidth"
+        className="button is-large is-primary is-fullwidth"
         onClick={() => reloadStats()}
-        >Reload</button>
+        >Reload&nbsp;<FontAwesomeIcon icon={faRedo} /></button>
+
+      <br />
+      <br />
+      
+      <h2 className="title is-4">Kill Stuck Jobs (Danger Zone)</h2>
+      <h2 className="subtitle is-6">(Please don't do this.)</h2>
+
+      <button 
+        className="button is-large is-warning is-fullwidth"
+        onClick={() => killZeroPriorityPending()}
+        >Kill Zero-Priority Pending TTS</button>
+
+      <br />
+
+      <button 
+        className="button is-large is-danger is-fullwidth"
+        onClick={() => killPending()}
+        >Kill ALL Pending TTS&nbsp;<FontAwesomeIcon icon={faBomb} /></button>
+
+      <br />
+
+      <button 
+        className="button is-large is-danger is-fullwidth"
+        onClick={() => killPendingAndFailed()}
+        >Kill ALL Pending and Failed TTS&nbsp;<FontAwesomeIcon icon={faBomb} /></button>
     </div>
   )
 }
