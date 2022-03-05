@@ -6,7 +6,7 @@ import { GetTtsInferenceStats, GetTtsInferenceStatsIsOk } from '../../../api/mod
 import { GetW2lInferenceStats, GetW2lInferenceStatsIsOk } from '../../../api/moderation/GetW2lInferenceStats';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faBomb, faRedo } from '@fortawesome/free-solid-svg-icons';
-import { KillAction, KillTtsInferenceJobsRequest, KillTtsInferenceJobsIsSuccess, KillTtsInferenceJobs } from '@storyteller/components/src/api/moderation/tts/KillTtsInferenceJobs';
+import { KillAction, KillTtsInferenceJobsIsSuccess, KillTtsInferenceJobs } from '@storyteller/components/src/api/moderation/tts/KillTtsInferenceJobs';
 
 interface Props {
   sessionWrapper: SessionWrapper,
