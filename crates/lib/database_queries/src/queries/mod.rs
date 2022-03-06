@@ -1,4 +1,5 @@
 pub mod api_tokens;
+pub mod health_check;
 pub mod ip_bans;
 pub mod model_categories;
 pub mod tts;

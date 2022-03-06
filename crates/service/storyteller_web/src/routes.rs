@@ -85,6 +85,7 @@ use crate::http_server::endpoints::w2l::get_w2l_template_use_count::get_w2l_temp
 use crate::http_server::endpoints::w2l::get_w2l_upload_template_job_status::get_w2l_upload_template_job_status_handler;
 use crate::http_server::endpoints::w2l::list_w2l_templates::list_w2l_templates_handler;
 use crate::http_server::endpoints::w2l::set_w2l_template_mod_approval::set_w2l_template_mod_approval_handler;
+use crate::http_server::endpoints::service::health_check_handler::get_health_check_handler;
 
 pub fn add_routes<T, B> (app: App<T, B>) -> App<T, B>
   where
@@ -106,8 +107,14 @@ pub fn add_routes<T, B> (app: App<T, B>) -> App<T, B>
   app = add_voice_clone_request_routes(app); /* /voice_clone_requests */
   app = add_twitch_routes(app); /* /twitch */ // TODO: MAYBE TEMPORARY
 
-  // ==================== ACCOUNT CREATION / SESSION MANAGEMENT ====================
+  // ==================== SERVICE ====================
   app.service(
+    web::resource("/_status")
+        .route(web::get().to(get_health_check_handler))
+        .route(web::head().to(|| HttpResponse::Ok()))
+  )
+  // ==================== ACCOUNT CREATION / SESSION MANAGEMENT ====================
+  .service(
     web::resource("/create_account")
         .route(web::post().to(create_account_handler))
         .route(web::head().to(|| HttpResponse::Ok()))

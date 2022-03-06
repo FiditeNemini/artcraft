@@ -124,6 +124,8 @@ use std::sync::Arc;
 use std::time::Duration;
 use tokio::runtime::Runtime;
 use twitch_common::twitch_secrets::TwitchSecrets;
+use crate::threads::db_health_checker_thread::db_health_checker_thread::db_health_checker_thread;
+use crate::threads::db_health_checker_thread::db_health_check_status::HealthCheckStatus;
 
 // TODO TODO TODO TODO
 // TODO TODO TODO TODO
@@ -298,10 +300,6 @@ async fn main() -> AnyhowResult<()> {
       easyenv::get_env_string_or_default("SORT_KEY_SECRET", "webscale");
   let sort_key_crypto = SortKeyCrypto::new(&sort_key_crypto_secret);
 
-  let ip_banlist = IpBanlistSet::new();
-  let ip_banlist2 = ip_banlist.clone();
-  let mysql_pool3 = pool.clone();
-
   let twitch_oauth_redirect_landing_url = easyenv::get_env_string_or_default(
     "TWITCH_OAUTH_REDIRECT_LANDING_URL",
     "https://api.jungle.horse/twitch/oauth/enroll_redirect_landing");
@@ -313,12 +311,26 @@ async fn main() -> AnyhowResult<()> {
   let twitch_secrets = TwitchSecrets::from_env()?;
 
   // Background jobs.
-  info!("Spawning IP ban polling thread.");
+
+  let health_check_status = HealthCheckStatus::new();
+  let health_check_status2 = health_check_status.clone();
+  let ip_banlist = IpBanlistSet::new();
+  let ip_banlist2 = ip_banlist.clone();
+  let mysql_pool3 = pool.clone();
+  let mysql_pool4 = pool.clone();
 
   let tokio_runtime = Runtime::new()?;
 
+  info!("Spawning DB health checker thread.");
+
   tokio_runtime.spawn(async {
-    poll_ip_bans(ip_banlist2, mysql_pool3).await;
+    db_health_checker_thread(health_check_status2, mysql_pool3).await;
+  });
+
+  info!("Spawning IP ban polling thread.");
+
+  tokio_runtime.spawn(async {
+    poll_ip_bans(ip_banlist2, mysql_pool4).await;
   });
 
   let server_state = ServerState {
@@ -331,6 +343,7 @@ async fn main() -> AnyhowResult<()> {
       website_homepage_redirect,
     },
     hostname: server_hostname,
+    health_check_status,
     mysql_pool: pool,
     redis_pool,
     redis_rate_limiters: RedisRateLimiters {

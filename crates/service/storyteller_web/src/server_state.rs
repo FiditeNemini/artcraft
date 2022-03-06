@@ -10,6 +10,7 @@ use database_queries::mediators::badge_granter::BadgeGranter;
 use database_queries::mediators::firehose_publisher::FirehosePublisher;
 use r2d2_redis::{r2d2, RedisConnectionManager};
 use sqlx::MySqlPool;
+use crate::threads::db_health_checker_thread::db_health_check_status::HealthCheckStatus;
 
 /// State that is injected into every endpoint.
 #[derive(Clone)]
@@ -18,6 +19,8 @@ pub struct ServerState {
   pub env_config: EnvConfig,
 
   pub hostname: String,
+
+  pub health_check_status: HealthCheckStatus,
 
   pub mysql_pool: MySqlPool,
 

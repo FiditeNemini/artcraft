@@ -4,6 +4,7 @@ pub mod events;
 pub mod leaderboard;
 pub mod misc;
 pub mod moderation;
+pub mod service;
 pub mod tts;
 pub mod twitch;
 pub mod users;
