@@ -104,15 +104,19 @@ class WebSocketProtocol {
 
     const sound = new Howl({
       src: [maybePlayableAudio.getUrl()],
+      autoplay: false,
+      loop: false,
       onend: function(soundId: number) {
         that.currentSound = undefined;
         that.playNextAvailableAudio(); // eagerly play the next one.
-      }
+      },
     });
 
     this.currentSound = sound;
 
-    sound.play();
+    sound.once('load', function() {
+      sound.play();
+    });
   }
 }
 
