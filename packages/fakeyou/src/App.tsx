@@ -30,6 +30,9 @@ i18n
     //lng: 'en', // if you're using a language detector, do not define the lng option
     fallbackLng: 'en',
 
+    // For finding 'Trans' component keys.
+    debug: false,
+
     interpolation: {
       escapeValue: false // react already safes from xss => https://www.i18next.com/translation-function/interpolation#unescape
     }
@@ -84,6 +87,7 @@ interface State {
   primaryLanguageCode: string,
 
   isShowingTwitchTtsNotice: boolean,
+  isShowingPleaseFollowNotice: boolean,
 
   // Jobs enqueued during this browser session.
   ttsInferenceJobs: Array<TtsInferenceJob>,
@@ -121,9 +125,9 @@ class App extends React.Component<Props, State> {
     const migrationMode = enableAlpha ? MigrationMode.NEW_VOCODES : MigrationMode.OLD_VOCODES;
 
     let showTwitchNotice = !isMacOs();
+    showTwitchNotice = false; // TODO: Temporarily disabled. 
 
-    // TODO: Temporarily disabled. 
-    showTwitchNotice = false;
+    let showPleaseFollowNotice = false;
 
     this.state = {
       enableAlpha: enableAlpha,
@@ -139,6 +143,7 @@ class App extends React.Component<Props, State> {
       primaryLanguageCode: 'en',
 
       isShowingTwitchTtsNotice: showTwitchNotice,
+      isShowingPleaseFollowNotice: showPleaseFollowNotice,
 
       ttsInferenceJobs: [],
       w2lInferenceJobs: [],
@@ -180,12 +185,16 @@ class App extends React.Component<Props, State> {
       let displayLanguage = Language.English;
       let languageCode = 'en';
 
+      let showPleaseFollowNotice = false;
+
       if (hasSpanish) {
         displayLanguage = Language.Spanish;
         languageCode = 'es';
+        showPleaseFollowNotice = true;
       } else if (hasPortuguese) {
         displayLanguage = Language.Portuguese;
         languageCode = 'pt';
+        showPleaseFollowNotice = true;
       } else if (hasTurkish) {
         displayLanguage = Language.Turkish;
         languageCode = 'tr';
@@ -204,6 +213,7 @@ class App extends React.Component<Props, State> {
         isShowingLanguageNotice: showNotice,
         displayLanguage: displayLanguage,
         primaryLanguageCode: languageCode,
+        isShowingPleaseFollowNotice: showPleaseFollowNotice,
       });
 
       i18n.changeLanguage(languageCode);
@@ -237,6 +247,10 @@ class App extends React.Component<Props, State> {
 
   clearTwitchTtsNotice = () => {
     this.setState({ isShowingTwitchTtsNotice: false })
+  }
+
+  clearPleaseFollowNotice = () => {
+    this.setState({ isShowingPleaseFollowNotice: false })
   }
 
   enqueueTtsJob = (jobToken: string) => {
@@ -510,6 +524,9 @@ class App extends React.Component<Props, State> {
 
                     isShowingTwitchTtsNotice={this.state.isShowingTwitchTtsNotice}
                     clearTwitchTtsNotice={this.clearTwitchTtsNotice}
+
+                    isShowingPleaseFollowNotice={this.state.isShowingPleaseFollowNotice}
+                    clearPleaseFollowNotice={this.clearPleaseFollowNotice}
 
                     enqueueTtsJob={this.enqueueTtsJob}
                     ttsInferenceJobs={this.state.ttsInferenceJobs}

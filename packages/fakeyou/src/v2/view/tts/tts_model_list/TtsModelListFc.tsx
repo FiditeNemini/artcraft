@@ -23,6 +23,7 @@ import { Language } from '@storyteller/components/src/i18n/Language';
 import { t } from 'i18next';
 import { Trans } from 'react-i18next';
 import { TwitchTtsNotice } from './notices/TwitchTtsNotice';
+import { PleaseFollowNotice } from './notices/PleaseFollowNotice';
 
 export interface EnqueueJobResponsePayload {
   success: boolean,
@@ -41,6 +42,9 @@ interface Props {
 
   isShowingTwitchTtsNotice: boolean,
   clearTwitchTtsNotice: () => void,
+
+  isShowingPleaseFollowNotice: boolean,
+  clearPleaseFollowNotice: () => void,
 
   enqueueTtsJob: (jobToken: string) => void,
   ttsInferenceJobs: Array<TtsInferenceJob>,
@@ -205,6 +209,11 @@ function TtsModelListFc(props: Props) {
       <TwitchTtsNotice clearTwitchTtsNotice={props.clearTwitchTtsNotice} /> :
       undefined;
 
+
+  const pleaseFollowNotice = props.isShowingPleaseFollowNotice ? 
+      <PleaseFollowNotice clearPleaseFollowNotice={props.clearPleaseFollowNotice} /> :
+      undefined;
+
   // Show errors on TTS failure
   let maybeError = <></>;
   if (!!maybeTtsError) {
@@ -268,6 +277,8 @@ function TtsModelListFc(props: Props) {
       </section>
 
       <br />
+
+      {pleaseFollowNotice}
 
       {languageNotice}
 

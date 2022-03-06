@@ -35,6 +35,12 @@ const FAKEYOU_TRANSLATIONS : any = {
           video: 'Video',
         },
       },
+      notices: {
+        pleaseFollow: {
+          title: 'Sorry our site is so slow!',
+          body: "I am so sorry the website is slow. We're getting millions of requests. <1>Please follow us on Twitter</1> and also <3>join our Discord</3>. I'm going to introduce faster processing (less than one minute) for those that follow us and help support our work. So please follow our Twitter and join our Discord.",
+        }
+      },
       pages: {
         // Index page
         ttsList: {
@@ -107,6 +113,12 @@ const FAKEYOU_TRANSLATIONS : any = {
           terms: 'Términos de Uso',
           video: 'Video', // NB: This *is* translated
         },
+      },
+      notices: {
+        pleaseFollow: {
+          title: '¡Lo sentimos, nuestro sitio es tan lento!',
+          body: "Lamento mucho que el sitio web sea lento. Estamos recibiendo millones de solicitudes. <1>Síganos en Twitter</1> y también únase a nuestro <3>Discord</3>. Voy a presentar un procesamiento más rápido (menos de un minuto) para aquellos que nos siguen y ayudan a respaldar nuestro trabajo. Así que sigue nuestro Twitter y únete a nuestro Discord.",
+        }
       },
       pages: {
         // Index page
@@ -214,6 +226,12 @@ const FAKEYOU_TRANSLATIONS : any = {
           signUpLogin: 'Inscreva-se / Faça login',
           video: 'Vídeo',
         },
+      },
+      notices: {
+        pleaseFollow: {
+          title: 'Desculpe, nosso site é tão lento!',
+          body: "Sinto muito que o site esteja lento. Estamos recebendo milhões de solicitações. <1>Por favor, siga-nos no Twitter</1> e também <3>entre no nosso Discord</3>. Vou apresentar um processamento mais rápido (menos de um minuto) para aqueles que nos seguem e ajudam a apoiar nosso trabalho. Então, por favor, siga nosso Twitter e participe do nosso Discord.",
+        }
       },
       pages: {
         ttsList: {
