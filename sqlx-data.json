@@ -6833,6 +6833,31 @@
       "nullable": []
     }
   },
+  "dfe8dedd1838627a7bebbc2facabc3c51a7f3122e19ece6259629696643ae877": {
+    "query": "\nSELECT NOW() as present_time\n        ",
+    "describe": {
+      "columns": [
+        {
+          "ordinal": 0,
+          "name": "present_time",
+          "type_info": {
+            "type": "Datetime",
+            "flags": {
+              "bits": 129
+            },
+            "char_set": 63,
+            "max_size": 19
+          }
+        }
+      ],
+      "parameters": {
+        "Right": 0
+      },
+      "nullable": [
+        false
+      ]
+    }
+  },
   "e0ad2a7fe4ae795e4f097f604d5cfcf9605298b58cde5ca23bdf9c8ec7383b00": {
     "query": "\nUPDATE w2l_templates\nSET\n  creator_ip_address_last_update = ?,\n  user_deleted_at = NULL\nWHERE\n  token = ?\nLIMIT 1\n        ",
     "describe": {
