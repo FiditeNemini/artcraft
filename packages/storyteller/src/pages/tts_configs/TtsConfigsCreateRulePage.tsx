@@ -124,7 +124,7 @@ function TtsConfigsCreateRulePage(props: Props) {
       <form onSubmit={handleFormSubmit}>
 
         <EventMatchPredicateBuilderComponent
-          twitchEventCategory={TwitchEventCategory.Bits}
+          twitchEventCategory={twitchEventCategory}
           serverEventMatchPredicate={serverEventMatchPredicate}
           updateModifiedEventMatchPredicate={updateModifiedEventMatchPredicate}
           />
