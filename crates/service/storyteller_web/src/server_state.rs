@@ -11,6 +11,7 @@ use database_queries::mediators::firehose_publisher::FirehosePublisher;
 use r2d2_redis::{r2d2, RedisConnectionManager};
 use sqlx::MySqlPool;
 use crate::threads::db_health_checker_thread::db_health_check_status::HealthCheckStatus;
+use crate::http_server::endpoints::categories::list_tts_categories::DisplayCategory;
 
 /// State that is injected into every endpoint.
 #[derive(Clone)]
@@ -45,8 +46,7 @@ pub struct ServerState {
 
   pub ip_banlist: IpBanlistSet,
 
-  /// In-memory caches with TTL-based eviction. Contains a list of all voices.
-  pub voice_list_cache: SingleItemTtlCache<Vec<TtsModelRecordForResponse>>,
+  pub caches: InMemoryCaches,
 
   pub twitch_oauth: TwitchOauth,
 }
@@ -88,4 +88,14 @@ pub struct RedisRateLimiters {
 
   /// A rate limiter for TTS and W2L uploads
   pub model_upload: RedisRateLimiter,
+}
+
+/// In-memory caches
+#[derive(Clone)]
+pub struct InMemoryCaches {
+  /// In-memory caches with TTL-based eviction. Contains a list of all voices.
+  pub voice_list: SingleItemTtlCache<Vec<TtsModelRecordForResponse>>,
+
+  /// In-memory caches with TTL-based eviction. Contains a list of all TTS categories.
+  pub category_list: SingleItemTtlCache<Vec<DisplayCategory>>,
 }

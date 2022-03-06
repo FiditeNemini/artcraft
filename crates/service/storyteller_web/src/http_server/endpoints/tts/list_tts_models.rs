@@ -83,7 +83,7 @@ pub async fn list_tts_models_handler(
   http_request: HttpRequest,
   server_state: web::Data<Arc<ServerState>>) -> Result<HttpResponse, ListTtsModelsError>
 {
-  let maybe_models = server_state.voice_list_cache.copy_without_bump_if_unexpired()
+  let maybe_models = server_state.caches.voice_list.copy_without_bump_if_unexpired()
       .map_err(|e| {
         error!("Error consulting cache: {:?}", e);
         ListTtsModelsError::ServerError
@@ -103,7 +103,7 @@ pub async fn list_tts_models_handler(
             ListTtsModelsError::ServerError
           })?;
 
-      server_state.voice_list_cache.store_copy(&models)
+      server_state.caches.voice_list.store_copy(&models)
           .map_err(|e| {
             error!("Error storing cache: {:?}", e);
             ListTtsModelsError::ServerError

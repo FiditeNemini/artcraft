@@ -4,9 +4,12 @@ use lru_time_cache::LruCache;
 use std::sync::{Arc, Mutex, PoisonError, MutexGuard};
 use std::time::Duration;
 
+/// NB: There's only ONE ITEM of ONE TYPE in the cache. We can use a single key.
 const CACHE_KEY : &'static str = "ITEM";
 
 /// Store a single payload in the cache
+/// There's only ONE ITEM of ONE TYPE in the cache.
+/// This is essentially a singleton cache with expiry.
 #[derive(Clone)]
 pub struct SingleItemTtlCache<T: Clone + ?Sized> {
   cache: Arc<Mutex<LruCache<String, T>>>,

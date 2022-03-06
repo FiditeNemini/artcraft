@@ -103,7 +103,7 @@ use crate::http_server::web_utils::cookie_manager::CookieManager;
 use crate::http_server::web_utils::redis_rate_limiter::RedisRateLimiter;
 use crate::http_server::web_utils::session_checker::SessionChecker;
 use crate::routes::add_routes;
-use crate::server_state::{ServerState, EnvConfig, TwitchOauthSecrets, TwitchOauth, RedisRateLimiters};
+use crate::server_state::{ServerState, EnvConfig, TwitchOauthSecrets, TwitchOauth, RedisRateLimiters, InMemoryCaches};
 use crate::threads::ip_banlist_set::IpBanlistSet;
 use crate::threads::poll_ip_banlist_thread::poll_ip_bans;
 use crate::util::buckets::bucket_client::BucketClient;
@@ -291,8 +291,10 @@ async fn main() -> AnyhowResult<()> {
   )?;
 
   // In-Memory Cache
-  let cache_ttl = easyenv::get_env_duration_seconds_or_default("VOICE_LIST_CACHE_TTL_SECONDS", Duration::from_secs(60));
-  let voice_list_cache = SingleItemTtlCache::create_with_duration(cache_ttl);
+  let voice_list_cache_ttl = easyenv::get_env_duration_seconds_or_default("VOICE_LIST_CACHE_TTL_SECONDS", Duration::from_secs(60));
+  let category_list_cache_ttl = easyenv::get_env_duration_seconds_or_default("CATEGORY_LIST_CACHE_TTL_SECONDS", Duration::from_secs(60));
+  let voice_list_cache = SingleItemTtlCache::create_with_duration(voice_list_cache_ttl);
+  let category_list_cache = SingleItemTtlCache::create_with_duration(category_list_cache_ttl);
 
   // NB: This secret really isn't too important.
   // We can even rotate it without too much impact to users.
@@ -360,7 +362,10 @@ async fn main() -> AnyhowResult<()> {
     audio_uploads_bucket_root,
     sort_key_crypto,
     ip_banlist,
-    voice_list_cache,
+    caches: InMemoryCaches {
+      voice_list: voice_list_cache,
+      category_list: category_list_cache,
+    },
     twitch_oauth: TwitchOauth {
       secrets: TwitchOauthSecrets {
         client_id: twitch_secrets.app_client_id,

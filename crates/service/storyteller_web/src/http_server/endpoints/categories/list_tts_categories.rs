@@ -16,7 +16,7 @@ use crate::util::markdown_to_html::markdown_to_html;
 use database_queries::queries::model_categories::list_categories_query_builder::ListCategoriesQueryBuilder;
 use http_server_common::response::serialize_as_json_error::serialize_as_json_error;
 use lexical_sort::natural_lexical_cmp;
-use log::{info, warn, log};
+use log::{info, warn, log, error};
 use regex::Regex;
 use sqlx::MySqlPool;
 use sqlx::error::DatabaseError;
@@ -35,7 +35,7 @@ pub struct ListTtsCategoriesResponse {
 
 /// Public-facing and optimized (non-irrelevant fields) category list
 /// Used for the main TTS dropdown as well as the TTS edit/tagging UI
-#[derive(Serialize)]
+#[derive(Serialize, Clone)]
 pub struct DisplayCategory {
   pub category_token: String,
 
@@ -99,47 +99,69 @@ pub async fn list_tts_categories_handler(
   http_request: HttpRequest,
   server_state: web::Data<Arc<ServerState>>) -> Result<HttpResponse, ListTtsCategoriesError>
 {
-  let query_builder = ListCategoriesQueryBuilder::new()
-      .show_deleted(false)
-      .show_unapproved(false)
-      .scope_model_type(Some("tts"));
-  
-  let query_result =
-      query_builder.perform_query(&server_state.mysql_pool).await;
+  let maybe_categories = server_state.caches.category_list.copy_without_bump_if_unexpired()
+      .map_err(|e| {
+        error!("Error consulting cache: {:?}", e);
+        ListTtsCategoriesError::ServerError
+      })?;
 
-  let results = match query_result {
-    Ok(results) => results,
-    Err(err) => {
-      warn!("DB error: {:?}", err);
-      return Err(ListTtsCategoriesError::ServerError);
-    }
-  };
+  let categories = match maybe_categories {
+    Some(categories) => {
+      info!("Serving TTS categories from cache");
+      categories
+    },
+    None => {
+      let query_builder = ListCategoriesQueryBuilder::new()
+          .show_deleted(false)
+          .show_unapproved(false)
+          .scope_model_type(Some("tts"));
 
-  warn!("Number of categories: {:?}", results.categories.len());
+      let query_result =
+          query_builder.perform_query(&server_state.mysql_pool).await;
 
-  let mut categories = results.categories.iter()
-      .map(|c| {
-        DisplayCategory {
-          category_token: c.category_token.clone(),
-          model_type: c.model_type.clone(),
-          maybe_super_category_token: c.maybe_super_category_token.clone(),
-          can_directly_have_models: c.can_directly_have_models,
-          can_have_subcategories: c.can_have_subcategories,
-          can_only_mods_apply: c.can_only_mods_apply,
-          is_mod_approved: c.is_mod_approved,
-          name: c.name.clone(),
-          name_for_dropdown: c.maybe_dropdown_name.clone().unwrap_or(c.name.clone()),
-          created_at: c.created_at.clone(),
-          updated_at: c.updated_at.clone(),
-          deleted_at: c.deleted_at.clone(),
+      let results = match query_result {
+        Ok(results) => results,
+        Err(err) => {
+          warn!("DB error: {:?}", err);
+          return Err(ListTtsCategoriesError::ServerError);
         }
-      })
-      .collect::<Vec<DisplayCategory>>();
+      };
 
-  // NB: This might produce weird sorting resorts relative to the "name" field,
-  // but the typical way this should be consumed is via dropdowns.
-  categories.sort_by(|c1, c2|
-      natural_lexical_cmp(&c1.name_for_dropdown, &c2.name_for_dropdown));
+      warn!("Number of categories: {:?}", results.categories.len());
+
+      let mut categories = results.categories.iter()
+          .map(|c| {
+            DisplayCategory {
+              category_token: c.category_token.clone(),
+              model_type: c.model_type.clone(),
+              maybe_super_category_token: c.maybe_super_category_token.clone(),
+              can_directly_have_models: c.can_directly_have_models,
+              can_have_subcategories: c.can_have_subcategories,
+              can_only_mods_apply: c.can_only_mods_apply,
+              is_mod_approved: c.is_mod_approved,
+              name: c.name.clone(),
+              name_for_dropdown: c.maybe_dropdown_name.clone().unwrap_or(c.name.clone()),
+              created_at: c.created_at.clone(),
+              updated_at: c.updated_at.clone(),
+              deleted_at: c.deleted_at.clone(),
+            }
+          })
+          .collect::<Vec<DisplayCategory>>();
+
+      // NB: This might produce weird sorting resorts relative to the "name" field,
+      // but the typical way this should be consumed is via dropdowns.
+      categories.sort_by(|c1, c2|
+          natural_lexical_cmp(&c1.name_for_dropdown, &c2.name_for_dropdown));
+
+      server_state.caches.category_list.store_copy(&categories)
+          .map_err(|e| {
+            error!("Error storing cache: {:?}", e);
+            ListTtsCategoriesError::ServerError
+          })?;
+
+      categories
+    },
+  };
 
   // TODO: Cache results in Redis w/ TTL.
   let response = ListTtsCategoriesResponse {
