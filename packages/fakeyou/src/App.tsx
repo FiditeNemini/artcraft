@@ -120,7 +120,10 @@ class App extends React.Component<Props, State> {
 
     const migrationMode = enableAlpha ? MigrationMode.NEW_VOCODES : MigrationMode.OLD_VOCODES;
 
-    const showTwitchNotice = !isMacOs();
+    let showTwitchNotice = !isMacOs();
+
+    // TODO: Temporarily disabled. 
+    showTwitchNotice = false;
 
     this.state = {
       enableAlpha: enableAlpha,
