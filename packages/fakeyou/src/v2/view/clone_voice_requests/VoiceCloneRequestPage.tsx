@@ -235,7 +235,7 @@ function VoiceCloneRequestPage(props: Props) {
               Professionally Clone Your Voice
             </p>
             <p className="subtitle is-3">
-              (or any voice) for just $70
+              (or any voice) for just $150
             </p>
 
           </div>
