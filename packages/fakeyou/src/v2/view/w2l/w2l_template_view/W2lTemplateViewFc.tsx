@@ -318,9 +318,8 @@ function W2lTemplateViewFc(props: Props) {
 
       <div className="content is-size-4">
         <p>
-          Upload audio from FakeYou or any other source (music, other websites), 
-          then submit. You'll get a lipsynced video. The audio shouldn't be too 
-          long or it will fail.
+          Upload audio from FakeYou or any other source (eg. music), 
+          then submit. You'll get a beautifully lipsynced video. 
         </p>
       </div>
 

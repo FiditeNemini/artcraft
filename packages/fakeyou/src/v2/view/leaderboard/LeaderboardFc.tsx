@@ -4,6 +4,7 @@ import { FrontendUrlConfig } from '../../../common/FrontendUrlConfig';
 import { SessionWrapper } from '@storyteller/components/src/session/SessionWrapper';
 import { Gravatar } from '@storyteller/components/src/elements/Gravatar';
 import { GetLeaderboard, GetLeaderboardIsErr, GetLeaderboardIsOk, Leaderboard, LeaderboardEntryForList, LeaderboardLookupError } from '../../api/misc/GetLeaderboard';
+import { DiscordLink2 } from '@storyteller/components/src/elements/DiscordLink2';
 
 interface Props {
   sessionWrapper: SessionWrapper,
@@ -91,6 +92,9 @@ function LeaderboardFc(props: Props) {
   return (
     <div>
       <h1 className="title is-1"> Leaderboard </h1>
+      <h1 className="subtitle is-3"> Our most frequent contributors! </h1>
+
+      <p>Want to be on the leaderboard? <DiscordLink2>Join our Discord</DiscordLink2> and learn more!</p>
 
       <table className="table is-fullwidth">
         <tbody>

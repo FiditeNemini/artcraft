@@ -93,6 +93,7 @@ function UploadTtsModelFc(props: Props) {
   return (
     <div>
       <h1 className="title is-1"> Upload Voice (TTS Model) </h1>
+      <h1 className="subtitle is-3">This works just like YouTube!</h1>
 
       <div className="notification is-info is-light">
         <strong>Content Creator Rewards!</strong> 
@@ -102,9 +103,8 @@ function UploadTtsModelFc(props: Props) {
         and a number of other lucky winners will be chosen at random to 
         recieve cash prizes. Uploaders will also get queue priority!</p>*/}
         <p>
-          Details are coming soon. 
-          The more you upload and help us grow, the more you can earn. We'll be paying for number of 
-          models uploaded as well as frequency of use and quality of training. Stay tuned.
+          As you upload and help us grow, you'll earn unique perks such as featured 
+          roles in Discord, queue priority, and more!
         </p>
       </div>
 
@@ -115,11 +115,11 @@ function UploadTtsModelFc(props: Props) {
 
       <br />
 
-      <p>
+      {/* TODO TEMP (2022-03-08) <p>
         FakeYou currently supports <em>Tacotron 2</em>, GlowTTS, and a custom synthesizer architecture 
         that we intend to open source. We'll soon add TalkNet, custom vocoder uploads, and more model 
         architectures.
-      </p>
+      </p>*/}
 
       <br />
 
@@ -131,10 +131,10 @@ function UploadTtsModelFc(props: Props) {
 
       <br />
 
-      <p>
+      {/* TODO TEMP (2022-03-08) <p>
         Please do not upload voices that you didn't train yourself or voices of individuals
         who wish to not be voice cloned. We'll post a list of banned voices soon.
-      </p>
+      </p>*/}
 
       <br />
 

@@ -287,10 +287,11 @@ function FirehoseEventListFc(props: Props) {
 
   return (
     <div>
-      <h1 className="title is-1"> Firehose events </h1>
+      <h1 className="title is-1"> Firehose event feed </h1>
+      <h1 className="subtitle is-3"> The latest <em>FakeYou</em> events refreshed every few seconds</h1>
 
       <div className="content is-large">
-        <p>Slightly slow until I do some infrastructure magic.</p>
+        <p>As you can see, we're <em>really</em> popular. But we owe it to you, our users. Thank you!</p>
         <ul>
           {eventItems}
         </ul>
