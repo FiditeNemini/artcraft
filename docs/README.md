@@ -11,7 +11,7 @@ FakeYou API
 [FakeYou.com](https://fakeyou.com) has an API that is freely available for you to use, though it is IP 
 rate limited to prevent abuse. 
 
-We will soon (by March 5th, 2022) provide optional API tokens for use in the HTTP `Authorization:` header 
+We provide optional API tokens for use in the HTTP `Authorization:` header 
 as a means to bypass rate limiting as well as access your privately uploaded voice models.
 
 [Please reach out to us over Discord](https://discord.gg/H72KFXm) to describe what you're building, 
