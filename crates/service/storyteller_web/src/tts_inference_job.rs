@@ -927,6 +927,8 @@ async fn process_job(
     Some(&inference_result_token)
   ).await?;
 
+  info!("TTS Done. Original text was: {}", &job.raw_inference_text);
+
   inferencer.firehose_publisher.tts_inference_finished(
     job.maybe_creator_user_token.as_deref(),
     &model_record.model_token,
