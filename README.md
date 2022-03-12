@@ -1,7 +1,7 @@
 fakeyou-frontend
 ================
 
-GO AWAY CORS
+Develop locally without CORS:
 ------------
 
 ```
