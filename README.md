@@ -17,7 +17,16 @@ a bit of updating. Follow these instructions:
 
 - Camera isn't detected without sudo. Try this:
   https://github.com/microsoft/Azure-Kinect-Sensor-SDK/issues/869#issuecomment-548562354
+  In particular, copying the config makes Microsoft's `k4aviewer` work, but it still 
+  doesn't work for our cloudcam. Still figuring this out.
 
+  Copying the depthengine sofile seems to work (but we still have one last error):
+
+  `sudo cp /usr/lib/x86_64-linux-gnu/libk4a1.4/libdepthengine.so.2.0 /usr/lib`
+
+  Maybe it needed the rules file copied into `/usr/lib/udev/rules.d` instead.
+
+  NOPE! I used a device index of "1", when only one camera was plugged in!
 
 
 Older Instructions / README
