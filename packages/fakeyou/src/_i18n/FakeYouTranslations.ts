@@ -117,7 +117,7 @@ const FAKEYOU_TRANSLATIONS : any = {
       notices: {
         pleaseFollow: {
           title: '¡Lo sentimos, nuestro sitio es tan lento!',
-          body: "Lamento mucho que el sitio web sea lento. Estamos recibiendo millones de solicitudes. <1>Síganos en Twitter</1> y también únase a nuestro <3>Discord</3>. Voy a presentar un procesamiento más rápido (menos de un minuto) para aquellos que nos siguen y ayudan a respaldar nuestro trabajo. Así que sigue nuestro Twitter y únete a nuestro Discord.",
+          body: "Lamento mucho que el sitio web sea lento. Estamos recibiendo millones de solicitudes. <1>Síganos en Twitter</1> y también únase a nuestro <3>Discord</3>. Voy a presentar un procesamiento más rápido (menos de un minuto) para aquellos que nos siguen y ayudan a respaldar nuestro trabajo. Así que sigue nuestro Twitter y únete a nuestro Discord. <5>Nuestra nueva tecnología de videos falsos profundos debutará en Twitch</5>, así que síganos allí también.",
         }
       },
       pages: {
@@ -230,7 +230,7 @@ const FAKEYOU_TRANSLATIONS : any = {
       notices: {
         pleaseFollow: {
           title: 'Desculpe, nosso site é tão lento!',
-          body: "Sinto muito que o site esteja lento. Estamos recebendo milhões de solicitações. <1>Por favor, siga-nos no Twitter</1> e também <3>entre no nosso Discord</3>. Vou apresentar um processamento mais rápido (menos de um minuto) para aqueles que nos seguem e ajudam a apoiar nosso trabalho. Então, por favor, siga nosso Twitter e participe do nosso Discord.",
+          body: "Sinto muito que o site esteja lento. Estamos recebendo milhões de solicitações. <1>Por favor, siga-nos no Twitter</1> e também <3>entre no nosso Discord</3>. Vou apresentar um processamento mais rápido (menos de um minuto) para aqueles que nos seguem e ajudam a apoiar nosso trabalho. Então, por favor, siga nosso Twitter e participe do nosso Discord. <5>Nossa nova tecnologia de deepfake de vídeo será lançada no Twitch</5>, então siga-nos lá também.",
         }
       },
       pages: {
