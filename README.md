@@ -71,4 +71,5 @@ Notes / TODOs:
 
 * Jobs for analytics queries
 
+* Pull jobs into own repo
 
