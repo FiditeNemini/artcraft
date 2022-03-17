@@ -1,6 +1,11 @@
 fakeyou-frontend
 ================
 
+TODO: 
+
+- Rename storyteller -> create-storyteller
+- Move static storyteller -> packages/, 
+
 Develop locally without CORS:
 ------------
 
