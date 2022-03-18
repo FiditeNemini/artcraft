@@ -13,6 +13,8 @@ use crate::http_server::endpoints::categories::get_category::get_category_handle
 use crate::http_server::endpoints::categories::list_tts_categories::list_tts_categories_handler;
 use crate::http_server::endpoints::categories::list_tts_model_assigned_categories::list_tts_model_assigned_categories_handler;
 use crate::http_server::endpoints::events::list_events::list_events_handler;
+use crate::http_server::endpoints::investor_demo::disable_demo_mode_handler::disable_demo_mode_handler;
+use crate::http_server::endpoints::investor_demo::enable_demo_mode_handler::enable_demo_mode_handler;
 use crate::http_server::endpoints::leaderboard::get_leaderboard::leaderboard_handler;
 use crate::http_server::endpoints::misc::default_route_404::default_route_404;
 use crate::http_server::endpoints::misc::detect_locale_handler::detect_locale_handler;
@@ -37,6 +39,7 @@ use crate::http_server::endpoints::moderation::user_roles::list_roles::list_user
 use crate::http_server::endpoints::moderation::user_roles::list_staff::list_staff_handler;
 use crate::http_server::endpoints::moderation::user_roles::set_user_role::set_user_role_handler;
 use crate::http_server::endpoints::moderation::users::list_users::list_users_handler;
+use crate::http_server::endpoints::service::health_check_handler::get_health_check_handler;
 use crate::http_server::endpoints::tts::delete_tts_model::delete_tts_model_handler;
 use crate::http_server::endpoints::tts::delete_tts_result::delete_tts_inference_result_handler;
 use crate::http_server::endpoints::tts::edit_tts_model::edit_tts_model_handler;
@@ -85,7 +88,6 @@ use crate::http_server::endpoints::w2l::get_w2l_template_use_count::get_w2l_temp
 use crate::http_server::endpoints::w2l::get_w2l_upload_template_job_status::get_w2l_upload_template_job_status_handler;
 use crate::http_server::endpoints::w2l::list_w2l_templates::list_w2l_templates_handler;
 use crate::http_server::endpoints::w2l::set_w2l_template_mod_approval::set_w2l_template_mod_approval_handler;
-use crate::http_server::endpoints::service::health_check_handler::get_health_check_handler;
 
 pub fn add_routes<T, B> (app: App<T, B>) -> App<T, B>
   where
@@ -106,6 +108,7 @@ pub fn add_routes<T, B> (app: App<T, B>) -> App<T, B>
   app = add_api_token_routes(app); /* /api_tokens */
   app = add_voice_clone_request_routes(app); /* /voice_clone_requests */
   app = add_twitch_routes(app); /* /twitch */ // TODO: MAYBE TEMPORARY
+  app = add_investor_demo_routes(app); /* /demo_mode */ // TODO: DEFINITELY TEMPORARY
 
   // ==================== SERVICE ====================
   app.service(
@@ -615,6 +618,30 @@ fn add_voice_clone_request_routes<T, B> (app: App<T, B>) -> App<T, B>
   )
 }
 
+// ==================== INVESTOR DEMO MODE ====================
+
+fn add_investor_demo_routes<T, B> (app: App<T, B>) -> App<T, B>
+  where
+      B: MessageBody,
+      T: ServiceFactory<
+        ServiceRequest,
+        Config = (),
+        Response = ServiceResponse<B>,
+        Error = Error,
+        InitError = (),
+      >,
+{
+  app.service(web::scope("/demo_mode")
+      .service(web::resource("/enable")
+          .route(web::post().to(enable_demo_mode_handler))
+          .route(web::head().to(|| HttpResponse::Ok()))
+      )
+      .service(web::resource("/disable")
+          .route(web::post().to(disable_demo_mode_handler))
+          .route(web::head().to(|| HttpResponse::Ok()))
+      )
+  )
+}
 
 // ==================== TWITCH ROUTES ====================
 

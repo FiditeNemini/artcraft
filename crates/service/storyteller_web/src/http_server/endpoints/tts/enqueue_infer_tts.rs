@@ -23,6 +23,10 @@ use sqlx::mysql::MySqlDatabaseError;
 use std::fmt;
 use std::sync::Arc;
 use user_input_common::check_for_slurs::contains_slurs;
+use crate::http_server::endpoints::investor_demo::demo_cookie::request_has_demo_cookie;
+
+// TODO: Temporary for investor demo
+const STORYTELLER_DEMO_COOKIE_NAME : &'static str = "storyteller_demo";
 
 #[derive(Deserialize)]
 pub struct InferTtsRequest {
@@ -30,6 +34,7 @@ pub struct InferTtsRequest {
   tts_model_token: String,
   inference_text: String,
   creator_set_visibility: Option<RecordVisibility>,
+  is_storyteller_demo: Option<bool>,
 }
 
 #[derive(Serialize)]
@@ -89,9 +94,36 @@ pub async fn infer_tts_handler(
       InferTtsError::ServerError
     })?;
 
+  // ==================== PRIORITY ==================== //
+
+  // Give logged in users execution priority.
+  let mut priority_level = if maybe_user_session.is_some() { 1 } else { 0 };
+
+  // TODO/TEMP: Give investors even more priority
+  let mut is_investor = false;
+
+  // TODO/TEMP: The storyteller.io website's AJAX calls will set this.
+  //  This is just for the YCombinator demo.
+  match request.is_storyteller_demo {
+    Some(true) => {
+      is_investor = true;
+    },
+    _ => {},
+  };
+
+  // TODO/TEMP: The storyteller.io website will redirect and establish this cookie.
+  //  This is just for the YCombinator demo.
+  if request_has_demo_cookie(&http_request) {
+    is_investor = true;
+  }
+
+  if is_investor {
+    priority_level = 2;
+  }
+
   // ==================== RATE LIMIT ==================== //
 
-  let rate_limiter = match maybe_user_session {
+  let mut rate_limiter = match maybe_user_session {
     None => &server_state.redis_rate_limiters.logged_out,
     Some(ref user) => {
       if user.is_banned {
@@ -100,6 +132,11 @@ pub async fn infer_tts_handler(
       &server_state.redis_rate_limiters.logged_in
     },
   };
+
+  // TODO/TEMP
+  if is_investor {
+    rate_limiter = &server_state.redis_rate_limiters.logged_in;
+  }
 
   if let Err(_err) = rate_limiter.rate_limit_request(&http_request) {
     return Err(InferTtsError::RateLimited);
@@ -155,9 +192,6 @@ pub async fn infer_tts_handler(
         warn!("Error creating token");
         InferTtsError::ServerError
       })?;
-
-  // Give logged in users execution priority.
-  let priority_level = if maybe_user_session.is_some() { 1 } else { 0 };
 
   info!("Creating w2l inference job record...");
 
