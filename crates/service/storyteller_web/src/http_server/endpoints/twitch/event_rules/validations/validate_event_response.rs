@@ -20,6 +20,19 @@ pub fn validate_event_response(event_response: &EventResponse) -> Result<(), Str
         }
       }
     },
+    EventResponse::TtsCommandPresets { .. } => {
+      // Implicitly valid
+    }
+    EventResponse::TtsCommandCustom { command_map, .. } => {
+      for (command, model_token) in command_map.iter() {
+        if command.trim().is_empty() {
+          return Err("one or more commands is invalid".to_string());
+        }
+        if model_token.is_empty() {
+          return Err("one or more model tokens is invalid".to_string());
+        }
+      }
+    },
   }
 
   Ok(())

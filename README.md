@@ -41,6 +41,19 @@ Development notes
 
 [Development notes README](_docs/development_notes.md)
 
+Dump a MySQL report
+-------------------
+
+```
+mysql -u storyteller \
+  -pPasswordHere \
+  -h IP_HERE \
+  -P 3306 \
+  -D storyteller \
+  -B \
+  -e "select * from voice_clone_requests;" | sed "s/'/\'/;s/\t/\",\"/g;s/^/\"/;s/$/\"/;s/\n//g" > voice_clone_report.csv
+```
+
 TODO
 ----
 

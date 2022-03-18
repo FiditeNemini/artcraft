@@ -1,4 +1,17 @@
 use container_common::anyhow_result::AnyhowResult;
+use std::collections::HashMap;
+
+/// How TTS commands should be prefixed: !voiceName, /voiceName, etc.
+#[derive(Serialize, Deserialize, Debug, PartialEq, Eq, Clone, Copy)]
+#[serde(rename_all = "snake_case")]
+pub enum CommandPrefixType {
+  /// Prefix voice commands with "!"
+  Exclamation,
+  /// Prefix voice commands with "!" or "/"
+  ExclamationOrSlash,
+  /// Prefix voice commands with "/"
+  Slash,
+}
 
 #[derive(Serialize, Deserialize, Debug, PartialEq, Eq, Clone)]
 #[serde(rename_all = "snake_case")]
@@ -15,6 +28,19 @@ pub enum EventResponse {
   /// Respond with a random TTS voice.
   TtsRandomVoice {
     tts_model_tokens: Vec<String>,
+  },
+
+  /// Use TTS commands that FakeYou recommends.
+  TtsCommandPresets {
+    command_prefix_type: CommandPrefixType,
+  },
+
+  /// Use your own TTS commands.
+  /// The map is from "!command" (without the "/" or "!" prefix) to model token.
+  /// Command is lower case, alphanum only, and compared case insensitive.
+  TtsCommandCustom {
+    command_prefix_type: CommandPrefixType,
+    command_map: HashMap<String, String>,
   },
 }
 
