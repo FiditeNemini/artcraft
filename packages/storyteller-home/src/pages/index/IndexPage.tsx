@@ -1,4 +1,7 @@
 
+import { faTwitch } from '@fortawesome/free-brands-svg-icons';
+import { faUser, faUserAlt, faVoicemail } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import React from 'react';
 
 function IndexPage () {
@@ -67,9 +70,35 @@ function IndexPage () {
 
 
       <section className="section is-small">
-        <h1 className="title">Try It!</h1>
-        <h2 className="subtitle">
+        <h1 className="title is-4">Try It!</h1>
+        <h2 className="subtitle is-6">
         </h2>
+        <br />
+
+        <div className="columns">
+          <div className="column">
+            <a 
+              className="button is-fullwidth is-info is-large"
+              href="https://fakeyou.com"
+              >
+              Check out our 1,500 other voices
+            </a>
+          </div>
+
+          <div className="column">
+
+            <a 
+              className="button is-fullwidth is-primary is-large"
+              href="https://fakeyou.com/clone"
+              >
+              Then Clone&nbsp;<em>Your</em>&nbsp;Voice <FontAwesomeIcon icon={faUserAlt} />
+            </a>
+
+          </div>
+        </div>
+
+
+
       </section>
 
       <section className="hero is-small">
@@ -106,6 +135,41 @@ function IndexPage () {
           There's nothing to install. It's the easiest, most engaging, most fun system for Twitch yet.
           And it earns <em>you</em> money.
         </h2>
+
+        <a 
+          className="button is-fullwidth is-info is-large"
+          href="https://create.storyteller.io"
+          >
+          Get Started Now!&nbsp;<FontAwesomeIcon icon={faTwitch} />
+        </a>
+
+      </section>
+
+      <section className="hero is-small">
+        <div className="hero-body">
+          <div className="columns is-vcentered">
+            <div className="column is-one-third">
+              <div className="mascot">
+                <img src="/mascot/kitsune_pose5_black_2000.webp" alt="FakeYou's mascot!" />
+              </div>
+            </div>
+
+            <div className="column">
+              <p className="title is-3">
+                3) <em>Storyteller VoxelCam</em>
+              </p>
+              <p className="subtitle is-5">
+                Volumetric capture for your stream, and soon for your film set.
+              </p>
+              <p>
+                Webcams are boring and flat. You can use our volumetric camera in-stream to make
+                your personality come to life. We'll be leveraging this tech to build a no-camera 
+                virtual set.
+              </p>
+            </div>
+
+          </div>
+        </div>
       </section>
 
 
