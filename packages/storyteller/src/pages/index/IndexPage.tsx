@@ -34,7 +34,7 @@ function IndexPage(props: Props) {
 
             <div className="column">
               <p className="title is-1">
-                Storyteller
+                Storyteller TTS for Twitch
               </p>
               <p className="subtitle is-3">
                 Supercharge your Stream

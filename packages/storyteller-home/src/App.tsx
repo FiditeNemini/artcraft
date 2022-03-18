@@ -1,24 +1,29 @@
 import 'bulma/css/bulma.css'
 
 import React from 'react';
-import { BrowserRouter, Route } from 'react-router-dom';
+import { BrowserRouter, Route, Switch } from 'react-router-dom';
+import { TopNav } from './common/TopNav';
 import IndexPage from './pages/index/IndexPage';
-import VoxelCamPage from './pages/voxelcam/IndexPage';
+import VoxelCamPage from './pages/voxelcam/VoxelCamPage';
 
 function App () {
   return (
-    <div id="main" className="mainwrap">
-      <div id="viewable">
-        <BrowserRouter>
-          <Route path="/voxelcam">
-            <VoxelCamPage />
-          </Route>
-          <Route exact={true} path="/">
-            <IndexPage />
-          </Route>
-        </BrowserRouter>
+    <BrowserRouter>
+      <div id="main" className="mainwrap">
+        <div id="viewable">
+          <TopNav />
+
+          <Switch>
+            <Route path="/voxelcam">
+              <VoxelCamPage />
+            </Route>
+            <Route exact={true} path="/">
+              <IndexPage />
+            </Route>
+          </Switch>
+        </div>
       </div>
-    </div>
+    </BrowserRouter>
   );
 }
 
