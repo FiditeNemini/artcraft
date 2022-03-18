@@ -46,4 +46,5 @@ pub async fn disable_demo_mode_handler(
   HttpResponse::build(StatusCode::FOUND)
       .append_header((header::LOCATION, url.to_string()))
       .del_cookie(&cookie)
+      .finish()
 }
