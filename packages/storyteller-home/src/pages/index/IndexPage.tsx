@@ -10,11 +10,16 @@ function IndexPage () {
     <div>
 
       <section className="section is-small">
-        <h1 className="title is-1">Storyteller</h1>
+        <h1 className="title is-1">
+          Storyteller&nbsp;
+          <figure className="image is-64x64 is-inline-block">
+            <img src="/logo/storyteller_kitsune_logo_3000.png" alt="FakeYou's mascot!" />
+          </figure>
+        </h1>
         <h2 className="subtitle is-3">
           The future of production
         </h2>
-        <p>We're building all the components of the future studio.</p>
+        <p>We're streamers and filmmakers building all of the components of the future Hollywood studio.</p>
       </section>
 
       <section className="hero is-small">
@@ -42,6 +47,7 @@ function IndexPage () {
                 We offer paid voice cloning services, an API with free 
                 and paid tiers, and in the future, 
                 our users will be able to monetize their own voices.
+                Use this to dub your work.
               </p>
             </div>
           </div>
@@ -76,7 +82,7 @@ function IndexPage () {
         </div>
       </section>
 
-      <section className="hero is-small">
+      <section className="hero is-small is-link">
         <div className="hero-body">
           <div className="columns is-vcentered">
 
@@ -101,22 +107,20 @@ function IndexPage () {
               </div>
             </div>
           </div>
-        </div>
-      </section>
 
-      <section className="section is-small">
-        <h1 className="title is-4">Get started with your channel!</h1>
-        <h2 className="subtitle is-6">
-          There's nothing to install. It's the easiest, most engaging, most fun system for Twitch yet.
-          &nbsp;
-          <em><u>And it earns you money!</u></em>
-        </h2>
-        <a 
-          className="button is-fullwidth is-large is-info"
-          href="https://create.storyteller.io"
-          >
-          Add to your stream now!&nbsp;<FontAwesomeIcon icon={faTwitch} />
-        </a>
+          <h1 className="title is-4">Get started with your channel!</h1>
+          <h2 className="subtitle is-6">
+            There's nothing to install. It's the easiest, most engaging, most fun system for Twitch yet.
+            &nbsp;
+            <em><u>And it earns you money!</u></em>
+          </h2>
+          <a 
+            className="button is-fullwidth is-large is-black is-inverted"
+            href="https://create.storyteller.io"
+            >
+            Add to your stream now!&nbsp;<FontAwesomeIcon icon={faTwitch} />
+          </a>
+        </div>
       </section>
 
       <section className="hero is-small">
@@ -205,7 +209,7 @@ function IndexPage () {
         </a>
       </section>
 
-      <section className="hero is-small">
+      <section className="hero is-small is-link">
         <div className="hero-body">
           <div className="columns is-vcentered">
             <div className="column">
@@ -228,19 +232,16 @@ function IndexPage () {
               </div>
             </div>
           </div>
-        </div>
-      </section>
 
-      <section className="section is-small">
         <h1 className="title is-4">Volumetric cameras aren't limited to two dimensions</h1>
         <h2 className="subtitle is-6">
         </h2>
 
+        <p>
         [ demo goes here ]
-      </section>
+        </p>
+        <br />
 
-
-      <section className="section is-small">
         <h1 className="title is-4">Downloads coming soon</h1>
         <h2 className="subtitle is-6">
           For Windows, Mac, and Linux
@@ -284,6 +285,7 @@ function IndexPage () {
             </a>
 
           </div>
+        </div>
         </div>
       </section>
 
@@ -357,6 +359,36 @@ function IndexPage () {
         </a>
 
       </section>
+
+      <section className="hero is-small">
+        <div className="hero-body">
+          <p className="title is-3">
+            Together we're going to make great things
+          </p>
+          <p className="subtitle is-5">
+            We're just getting started
+          </p>
+          <p>
+            Blah blah
+          </p>
+        </div>
+      </section>
+
+      <section className="hero is-small">
+        <div className="hero-body">
+          <p className="title is-3">
+            Press and social media mentions
+          </p>
+          <p className="subtitle is-5">
+            TODO
+          </p>
+          <p>
+            Blah blah
+          </p>
+        </div>
+      </section>
+
+
 
 
     </div>
