@@ -249,39 +249,38 @@ function IndexPage () {
           You'll need a Microsoft Kinect (v1, v2, Azure Kinect) or Intel RealSense camera. 
           We plan to support ordinary webcams too!
         </p>
-
         <br />
+
+        <article className="message is-danger">
+          <div className="message-body">
+            Downloads coming late March!
+          </div>
+        </article>
+
 
         <div className="columns">
           <div className="column">
-            <a 
+            <button 
               className="button is-fullwidth is-large is-info is-inverted"
-              href="#"
               >
               Windows&nbsp;<FontAwesomeIcon icon={faWindows} />
-            </a>
+            </button>
           </div>
 
           <div className="column">
-
-            <a 
+            <button 
               className="button is-fullwidth is-large is-info is-inverted"
-              href="#"
               >
               Mac&nbsp;<FontAwesomeIcon icon={faApple} />
-            </a>
-
+            </button>
           </div>
 
           <div className="column">
-
-            <a
+            <button
               className="button is-fullwidth is-large is-info is-inverted"
-              href="#"
               >
               Linux&nbsp;<FontAwesomeIcon icon={faLinux} />
-            </a>
-
+            </button>
           </div>
         </div>
         </div>
@@ -351,9 +350,9 @@ function IndexPage () {
         <br />
         <a 
           className="button is-fullwidth is-large is-info"
-          href="https://create.storyteller.io"
+          href="https://discord.gg/H72KFXm"
           >
-          Ask us about hosting a stream!&nbsp;<FontAwesomeIcon icon={faFlask} />
+          Ask us about hosting a stream in Discord!&nbsp;<FontAwesomeIcon icon={faFlask} />
         </a>
 
       </section>
