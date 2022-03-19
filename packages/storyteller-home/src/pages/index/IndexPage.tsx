@@ -69,7 +69,6 @@ function IndexPage () {
         </div>
       </section>
 
-
       <section className="section is-small">
         <h1 className="title is-4">Try It!</h1>
         <h2 className="subtitle is-6">
@@ -97,9 +96,6 @@ function IndexPage () {
 
           </div>
         </div>
-
-
-
       </section>
 
       <section className="hero is-small">
@@ -149,12 +145,6 @@ function IndexPage () {
       <section className="hero is-small">
         <div className="hero-body">
           <div className="columns is-vcentered">
-            <div className="column is-one-third">
-              <div className="mascot">
-                <img src="/mascot/kitsune_pose5_black_2000.webp" alt="FakeYou's mascot!" />
-              </div>
-            </div>
-
             <div className="column">
               <p className="title is-3">
                 3) <em>Storyteller VoxelCam</em>
@@ -168,12 +158,54 @@ function IndexPage () {
                 virtual set.
               </p>
             </div>
+            
+            <div className="column is-one-third">
+              <div className="mascot">
+                <img src="/mascot/kitsune_pose5_black_2000.webp" alt="FakeYou's mascot!" />
+              </div>
+            </div>
+
 
           </div>
         </div>
       </section>
 
+      <section className="section is-small">
+        <h1 className="title is-4">Downloads coming soon</h1>
+        <h2 className="subtitle is-6">
+          For Windows, Mac, and Linux
+        </h2>
+        <br />
+      </section>
 
+      <section className="hero is-small">
+        <div className="hero-body">
+          <div className="columns is-vcentered">
+            <div className="column is-one-third">
+              <div className="mascot">
+                <img src="/mascot/kitsune_pose9_black_2000.webp" alt="FakeYou's mascot!" />
+              </div>
+            </div>
+
+            <div className="column">
+              <p className="title is-3">
+                4) <em>Storyteller Engine</em>
+              </p>
+              <p className="subtitle is-5">
+                A virtual set for your stream or film
+              </p>
+              <p>
+                Our community contributes sets, character models, props, events, and more.
+                Use motion or volumetric capture.
+                Your audience can control everything. 
+                Ideal for improv, news casts, interviews, gaming, fast virtual filmmaking, 
+                and much more!
+              </p>
+            </div>
+
+          </div>
+        </div>
+      </section>
 
     </div>
   );
