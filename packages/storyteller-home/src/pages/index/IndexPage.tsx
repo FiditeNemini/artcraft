@@ -1,6 +1,6 @@
 
-import { faTwitch } from '@fortawesome/free-brands-svg-icons';
-import { faUser, faUserAlt, faVoicemail } from '@fortawesome/free-solid-svg-icons';
+import { faApple, faLinux, faTwitch, faWindows } from '@fortawesome/free-brands-svg-icons';
+import { faAsterisk, faUser, faUserAlt, faVoicemail } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import React from 'react';
 
@@ -134,7 +134,7 @@ function IndexPage () {
         </h2>
 
         <a 
-          className="button is-fullwidth is-info is-large"
+          className="button is-fullwidth is-large is-success"
           href="https://create.storyteller.io"
           >
           Get Started Now!&nbsp;<FontAwesomeIcon icon={faTwitch} />
@@ -158,7 +158,7 @@ function IndexPage () {
                 virtual set.
               </p>
             </div>
-            
+
             <div className="column is-one-third">
               <div className="mascot">
                 <img src="/mascot/kitsune_pose5_black_2000.webp" alt="FakeYou's mascot!" />
@@ -175,7 +175,46 @@ function IndexPage () {
         <h2 className="subtitle is-6">
           For Windows, Mac, and Linux
         </h2>
+
+        <p>
+          You'll need a Microsoft Kinect (v1, v2, Azure Kinect) or Intel RealSense camera. 
+          We plan to support stereoscopic webcams soon.
+        </p>
+
         <br />
+
+        <div className="columns">
+          <div className="column">
+            <a 
+              className="button is-fullwidth is-large is-info"
+              href="#"
+              >
+              Windows&nbsp;<FontAwesomeIcon icon={faWindows} />
+            </a>
+          </div>
+
+          <div className="column">
+
+            <a 
+              className="button is-fullwidth is-large is-warning"
+              href="#"
+              >
+              Mac&nbsp;<FontAwesomeIcon icon={faApple} />
+            </a>
+
+          </div>
+
+          <div className="column">
+
+            <a
+              className="button is-fullwidth is-large is-danger"
+              href="#"
+              >
+              Linux&nbsp;<FontAwesomeIcon icon={faLinux} />
+            </a>
+
+          </div>
+        </div>
       </section>
 
       <section className="hero is-small">
@@ -206,6 +245,22 @@ function IndexPage () {
           </div>
         </div>
       </section>
+
+      <section className="section is-small">
+        <h1 className="title is-4">Apply for our beta program</h1>
+        <h2 className="subtitle is-6">
+          We need early alpha testers
+        </h2>
+        <br />
+        <a 
+          className="button is-fullwidth is-large is-primary"
+          href="https://create.storyteller.io"
+          >
+          Ask us about hosting a stream!&nbsp;<FontAwesomeIcon icon={faAsterisk} />
+        </a>
+
+      </section>
+
 
     </div>
   );
