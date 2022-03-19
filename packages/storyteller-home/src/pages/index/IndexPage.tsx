@@ -115,7 +115,7 @@ function IndexPage () {
             <em><u>And it earns you money!</u></em>
           </h2>
           <a 
-            className="button is-fullwidth is-large is-black is-inverted"
+            className="button is-fullwidth is-large is-info is-inverted"
             href="https://create.storyteller.io"
             >
             Add to your stream now!&nbsp;<FontAwesomeIcon icon={faTwitch} />
@@ -249,7 +249,7 @@ function IndexPage () {
 
         <p>
           You'll need a Microsoft Kinect (v1, v2, Azure Kinect) or Intel RealSense camera. 
-          We plan to support stereoscopic webcams soon.
+          We plan to support ordinary webcams too!
         </p>
 
         <br />
@@ -257,7 +257,7 @@ function IndexPage () {
         <div className="columns">
           <div className="column">
             <a 
-              className="button is-fullwidth is-large is-info"
+              className="button is-fullwidth is-large is-info is-inverted"
               href="#"
               >
               Windows&nbsp;<FontAwesomeIcon icon={faWindows} />
@@ -267,7 +267,7 @@ function IndexPage () {
           <div className="column">
 
             <a 
-              className="button is-fullwidth is-large is-info"
+              className="button is-fullwidth is-large is-info is-inverted"
               href="#"
               >
               Mac&nbsp;<FontAwesomeIcon icon={faApple} />
@@ -278,7 +278,7 @@ function IndexPage () {
           <div className="column">
 
             <a
-              className="button is-fullwidth is-large is-info"
+              className="button is-fullwidth is-large is-info is-inverted"
               href="#"
               >
               Linux&nbsp;<FontAwesomeIcon icon={faLinux} />
