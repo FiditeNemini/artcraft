@@ -1,6 +1,6 @@
 
 import { faApple, faLinux, faTwitch, faWindows } from '@fortawesome/free-brands-svg-icons';
-import { faAsterisk, faFlask, faUser, faUserAlt, faVoicemail } from '@fortawesome/free-solid-svg-icons';
+import { faAsterisk, faFlask, faMicrophone, faUser, faUserAlt, faVoicemail } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import React from 'react';
 
@@ -132,14 +132,48 @@ function IndexPage () {
           There's nothing to install. It's the easiest, most engaging, most fun system for Twitch yet.
           And it earns <em>you</em> money.
         </h2>
-
         <a 
-          className="button is-fullwidth is-large is-success"
+          className="button is-fullwidth is-large is-info"
           href="https://create.storyteller.io"
           >
-          Get Started Now!&nbsp;<FontAwesomeIcon icon={faTwitch} />
+          Add to your stream now!&nbsp;<FontAwesomeIcon icon={faTwitch} />
         </a>
+      </section>
 
+      <section className="hero is-small">
+        <div className="hero-body">
+          <div className="columns is-vcentered">
+            <div className="column is-one-third">
+              <div className="mascot">
+                <img src="/mascot/kitsune_pose4_black_2000.webp" alt="FakeYou's mascot!" />
+              </div>
+            </div>
+            <div className="column">
+              <p className="title is-3">
+                3) <em>FakeYou Voice Changer</em>
+              </p>
+              <p className="subtitle is-5">
+                Now you can sound like someone else
+              </p>
+              <p>
+                Change how you sound in <em>real time</em>.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="section is-small">
+        <h1 className="title is-4">We can train your very own voice changer</h1>
+        <h2 className="subtitle is-6">
+          We'll be rolling this out shortly. Get on the list!
+        </h2>
+        <a 
+          className="button is-fullwidth is-large is-info"
+          href="https://create.storyteller.io"
+          >
+          Transform my voice!&nbsp;<FontAwesomeIcon icon={faMicrophone} />
+        </a>
       </section>
 
       <section className="hero is-small">
@@ -164,8 +198,6 @@ function IndexPage () {
                 <img src="/mascot/kitsune_pose5_black_2000.webp" alt="FakeYou's mascot!" />
               </div>
             </div>
-
-
           </div>
         </div>
       </section>
