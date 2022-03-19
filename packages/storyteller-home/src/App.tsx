@@ -3,7 +3,6 @@ import './App.scss';
 
 import React from 'react';
 import { BrowserRouter, Route, Switch } from 'react-router-dom';
-import { TopNav } from './common/TopNav';
 import IndexPage from './pages/index/IndexPage';
 import VoxelCamPage from './pages/voxelcam/VoxelCamPage';
 import { Footer } from './common/Footer';

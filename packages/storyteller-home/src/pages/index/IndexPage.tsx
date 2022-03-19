@@ -1,6 +1,6 @@
 
-import { faApple, faLinux, faSpeakap, faSpeakerDeck, faTwitch, faWindows } from '@fortawesome/free-brands-svg-icons';
-import { faArrowLeft, faArrowRight, faAsterisk, faFlask, faHeadphonesAlt, faMicrophone, faQuoteLeft, faUser, faUserAlt, faUserCircle, faUsers, faVoicemail } from '@fortawesome/free-solid-svg-icons';
+import { faApple, faLinux, faTwitch, faWindows } from '@fortawesome/free-brands-svg-icons';
+import { faArrowRight, faFlask, faMicrophone, faQuoteLeft, faUserCircle } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import React from 'react';
 import AudioSample from './AudioSample';
@@ -325,19 +325,19 @@ function IndexPage () {
         <div className="columns">
           <div className="column">
             <figure className="image is-square">
-              <img src="/screenshots/engine-fuji.png" />
+              <img src="/screenshots/engine-fuji.png" alt="screenshot" />
             </figure>
           </div>
 
           <div className="column">
             <figure className="image is-square">
-              <img src="/screenshots/engine-zelda-monsters.png" />
+              <img src="/screenshots/engine-zelda-monsters.png" alt="screenshot" />
             </figure>
           </div>
 
           <div className="column">
             <figure className="image is-square">
-              <img src="/screenshots/engine-point-cloud.png" />
+              <img src="/screenshots/engine-point-cloud.png" alt="screenshot" />
             </figure>
           </div>
         </div>
@@ -382,7 +382,7 @@ function IndexPage () {
                     <p>Techstars</p>
 
                     <figure className="image is-64x64 is-inline-block">
-                      <img src="/press-logos/techstars_logo.png" className="is-rounded" />
+                      <img src="/press-logos/techstars_logo.png" className="is-rounded" alt="logo" />
                     </figure>
                   </div>
                 </div>
@@ -403,7 +403,7 @@ function IndexPage () {
                     <p>Gigazine</p>
 
                     <figure className="image is-64x64 is-inline-block">
-                      <img src="/press-logos/gigazine_g.jpg" className="is-rounded" />
+                      <img src="/press-logos/gigazine_g.jpg" className="is-rounded" alt="logo" />
                     </figure>
 
                   </div>
@@ -424,7 +424,7 @@ function IndexPage () {
                     <p>Shots</p>
 
                     <figure className="image is-64x64 is-inline-block">
-                      <img src="/press-logos/shots.png" className="is-rounded" />
+                      <img src="/press-logos/shots.png" className="is-rounded" alt="logo" />
                     </figure>
                   </div>
                 </div>
