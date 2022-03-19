@@ -254,7 +254,7 @@ function IndexPage () {
 
         <article className="message is-danger">
           <div className="message-body">
-            Downloads coming late March!
+            Downloads coming April 8th, 2022!
           </div>
         </article>
 
