@@ -1,6 +1,6 @@
 
 import { faApple, faLinux, faTwitch, faWindows } from '@fortawesome/free-brands-svg-icons';
-import { faAsterisk, faUser, faUserAlt, faVoicemail } from '@fortawesome/free-solid-svg-icons';
+import { faAsterisk, faFlask, faUser, faUserAlt, faVoicemail } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import React from 'react';
 
@@ -231,7 +231,7 @@ function IndexPage () {
                 4) <em>Storyteller Engine</em>
               </p>
               <p className="subtitle is-5">
-                A virtual set for your stream or film
+                A fully 3D virtual set for your stream or film
               </p>
               <p>
                 Our community contributes sets, character models, props, events, and more.
@@ -247,6 +247,33 @@ function IndexPage () {
       </section>
 
       <section className="section is-small">
+        <h1 className="title is-4">Demo and screenshots</h1>
+        <h2 className="subtitle is-6">
+        </h2>
+        <br />
+
+        <div className="columns">
+          <div className="column">
+            <figure className="image is-square">
+              <img src="/screenshots/engine-fuji.png" />
+            </figure>
+          </div>
+
+          <div className="column">
+            <figure className="image is-square">
+              <img src="/screenshots/engine-zelda-monsters.png" />
+            </figure>
+          </div>
+
+          <div className="column">
+            <figure className="image is-square">
+              <img src="/screenshots/engine-point-cloud.png" />
+            </figure>
+          </div>
+        </div>
+      </section>
+
+      <section className="section is-small">
         <h1 className="title is-4">Apply for our beta program</h1>
         <h2 className="subtitle is-6">
           We need early alpha testers
@@ -256,7 +283,7 @@ function IndexPage () {
           className="button is-fullwidth is-large is-primary"
           href="https://create.storyteller.io"
           >
-          Ask us about hosting a stream!&nbsp;<FontAwesomeIcon icon={faAsterisk} />
+          Ask us about hosting a stream!&nbsp;<FontAwesomeIcon icon={faFlask} />
         </a>
 
       </section>

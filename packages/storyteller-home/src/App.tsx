@@ -6,25 +6,29 @@ import { BrowserRouter, Route, Switch } from 'react-router-dom';
 import { TopNav } from './common/TopNav';
 import IndexPage from './pages/index/IndexPage';
 import VoxelCamPage from './pages/voxelcam/VoxelCamPage';
+import { Footer } from './common/Footer';
 
 function App () {
   return (
-    <BrowserRouter>
-      <div id="main" className="mainwrap">
-        <div id="viewable">
-          <TopNav />
+    <>
+      <BrowserRouter>
+        <div id="main" className="mainwrap">
+          <div id="viewable">
+            <TopNav />
 
-          <Switch>
-            <Route path="/voxelcam">
-              <VoxelCamPage />
-            </Route>
-            <Route exact={true} path="/">
-              <IndexPage />
-            </Route>
-          </Switch>
+            <Switch>
+              <Route path="/voxelcam">
+                <VoxelCamPage />
+              </Route>
+              <Route exact={true} path="/">
+                <IndexPage />
+              </Route>
+            </Switch>
+          </div>
         </div>
-      </div>
-    </BrowserRouter>
+        <Footer />
+      </BrowserRouter>
+    </>
   );
 }
 
