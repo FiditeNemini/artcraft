@@ -14,7 +14,7 @@ function App () {
       <BrowserRouter>
         <div id="main" className="mainwrap">
           <div id="viewable">
-            <TopNav />
+            {/*<TopNav /> */}
 
             <Switch>
               <Route path="/voxelcam">

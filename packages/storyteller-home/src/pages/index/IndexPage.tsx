@@ -1,6 +1,6 @@
 
-import { faApple, faLinux, faTwitch, faWindows } from '@fortawesome/free-brands-svg-icons';
-import { faAsterisk, faFlask, faMicrophone, faUser, faUserAlt, faVoicemail } from '@fortawesome/free-solid-svg-icons';
+import { faApple, faLinux, faSpeakap, faSpeakerDeck, faTwitch, faWindows } from '@fortawesome/free-brands-svg-icons';
+import { faAsterisk, faFlask, faHeadphonesAlt, faMicrophone, faUser, faUserAlt, faUserCircle, faUsers, faVoicemail } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import React from 'react';
 
@@ -13,31 +13,9 @@ function IndexPage () {
         <h2 className="subtitle is-3">
           The future of production
         </h2>
-        <p>We're building all the components of the future studio</p>
+        <p>We're building all the components of the future studio.</p>
       </section>
 
-      {/*
-      <section className="hero is-small">
-        <div className="hero-body">
-          <div className="columns is-vcentered">
-            <div className="column is-one-third">
-              <div className="mascot">
-                <img src="/mascot/kitsune_pose2_black_2000.webp" alt="FakeYou's mascot!" />
-              </div>
-            </div>
-            <div className="column">
-              <p className="title is-1">
-                Storyteller
-              </p>
-              <p className="subtitle is-3">
-                The future of production
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-      */}
-      
       <section className="hero is-small">
         <div className="hero-body">
           <div className="columns is-vcentered">
@@ -72,13 +50,14 @@ function IndexPage () {
       <section className="section is-small">
         <h1 className="title is-4">Try It!</h1>
         <h2 className="subtitle is-6">
+        [ demo goes here ]
         </h2>
         <br />
 
         <div className="columns">
           <div className="column">
             <a 
-              className="button is-fullwidth is-info is-large"
+              className="button is-fullwidth is-large is-info is-inverted"
               href="https://fakeyou.com"
               >
               Check out our 1,500 other voices
@@ -86,14 +65,12 @@ function IndexPage () {
           </div>
 
           <div className="column">
-
             <a 
-              className="button is-fullwidth is-primary is-large"
+              className="button is-fullwidth is-large is-info"
               href="https://fakeyou.com/clone"
               >
-              Then Clone&nbsp;<em>Your</em>&nbsp;Voice <FontAwesomeIcon icon={faUserAlt} />
+              Then Clone&nbsp;<em>Your</em>&nbsp;Voice&nbsp;<FontAwesomeIcon icon={faUserCircle} />
             </a>
-
           </div>
         </div>
       </section>
@@ -111,9 +88,9 @@ function IndexPage () {
               </p>
               <p>
                 It's tough to build an audience on Twitch. It's even tougher to earn an
-                income. We've built the most engaging donation system for Twitch to date,
-                letting audience members pay to use Deep Fake voices and emotes in their
-                favorite streamers' live broadcasts. 
+                income. We've built the most comprehensive and engaging donation system 
+                for Twitch to date, letting audience members pay to use Deep Fake voices 
+                and emotes in their favorite streamers' live broadcasts. 
               </p>
             </div>
 
@@ -130,7 +107,8 @@ function IndexPage () {
         <h1 className="title is-4">Get started with your channel!</h1>
         <h2 className="subtitle is-6">
           There's nothing to install. It's the easiest, most engaging, most fun system for Twitch yet.
-          And it earns <em>you</em> money.
+          &nbsp;
+          <em><u>And it earns you money!</u></em>
         </h2>
         <a 
           className="button is-fullwidth is-large is-info"
@@ -156,7 +134,8 @@ function IndexPage () {
                 Now you can sound like someone else
               </p>
               <p>
-                Change how you sound in <em>real time</em>.
+                Change how you sound in <em>real time</em>. Choose your next voice.
+                Great for your stream, hanging out in VR, or filming that historical drama.
               </p>
             </div>
           </div>
@@ -164,7 +143,19 @@ function IndexPage () {
       </section>
 
       <section className="section is-small">
-        <h1 className="title is-4">We can train your very own voice changer</h1>
+        <h1 className="title is-4">Voice changing demo</h1>
+        <h2 className="subtitle is-6">
+        </h2>
+
+        This is still an early beta. Voice quality will improve substantially over time.
+        <br />
+        <br />
+
+        [ demo goes here ]
+      </section>
+
+      <section className="section is-small">
+        <h1 className="title is-4">Sign up for your very own voice changer</h1>
         <h2 className="subtitle is-6">
           We'll be rolling this out shortly. Get on the list!
         </h2>
@@ -203,6 +194,15 @@ function IndexPage () {
       </section>
 
       <section className="section is-small">
+        <h1 className="title is-4">Volumetric cameras aren't limited to two dimensions</h1>
+        <h2 className="subtitle is-6">
+        </h2>
+
+        [ demo goes here ]
+      </section>
+
+
+      <section className="section is-small">
         <h1 className="title is-4">Downloads coming soon</h1>
         <h2 className="subtitle is-6">
           For Windows, Mac, and Linux
@@ -228,7 +228,7 @@ function IndexPage () {
           <div className="column">
 
             <a 
-              className="button is-fullwidth is-large is-warning"
+              className="button is-fullwidth is-large is-info"
               href="#"
               >
               Mac&nbsp;<FontAwesomeIcon icon={faApple} />
@@ -239,7 +239,7 @@ function IndexPage () {
           <div className="column">
 
             <a
-              className="button is-fullwidth is-large is-danger"
+              className="button is-fullwidth is-large is-info"
               href="#"
               >
               Linux&nbsp;<FontAwesomeIcon icon={faLinux} />
@@ -312,7 +312,7 @@ function IndexPage () {
         </h2>
         <br />
         <a 
-          className="button is-fullwidth is-large is-primary"
+          className="button is-fullwidth is-large is-info"
           href="https://create.storyteller.io"
           >
           Ask us about hosting a stream!&nbsp;<FontAwesomeIcon icon={faFlask} />
