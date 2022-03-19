@@ -13,6 +13,7 @@ function IndexPage () {
         <h2 className="subtitle is-3">
           The future of production
         </h2>
+        <p>We're building all the components of the future studio</p>
       </section>
 
       {/*
