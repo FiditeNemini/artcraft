@@ -44,7 +44,7 @@ function IndexPage () {
                 
                 <em>FakeYou</em> is a place where creators can upload and 
                 manage a variety of deep fake models: speech, music, lipsyncing, and more.
-                Every day, artists and musicians are using our tools to their to dub their 
+                Every day, artists and musicians use our tools to their to dub their 
                 creative work.
                 We offer paid voice cloning services, an API with free 
                 and paid tiers, and in the future, 
