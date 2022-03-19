@@ -374,19 +374,140 @@ function IndexPage () {
         </div>
       </section>
 
-      <section className="hero is-small">
+      <section className="hero is-small ">
         <div className="hero-body">
           <p className="title is-3">
             Press and social media mentions
           </p>
           <p className="subtitle is-5">
-            TODO
           </p>
-          <p>
-            Blah blah
-          </p>
+
+          <div className="columns is-vcentered has-text-centered">
+
+            <div className="column is-one-third">
+              <div className="card">
+                <div className="card-content">
+                  <div className="content">
+                    <p>
+                      <FontAwesomeIcon icon={faQuoteLeft} />&nbsp;
+                      Tool of the Week: AI voice generator | [FakeYou ...] is a window into 
+                      the future [...]. Play with it with a number of celebrity voices, including Judi Dench, 
+                      Neil DeGrasse Tyson, and Bill Gates.</p>
+                    <figure className="image is-64x64 is-inline-block">
+                      <img src="/press-logos/techstars_logo.png" className="is-rounded" />
+                    </figure>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="column is-one-third">
+              <div className="card">
+                <div className="card-content">
+                  <div className="content">
+                    <p>
+                      <FontAwesomeIcon icon={faQuoteLeft} />&nbsp;
+                      無料でビル・ゲイツやアーノルド・シュワルツネッガーなど有名人に好きな台詞をしゃべらせることができる「Vocodes」レビュー</p>
+                    <p>
+                      ("Vocodes" [now FakeYou] allows users to use celebrities such as Bill Gates and 
+                      Arnold Schwarzenegger to speak their favorite lines for free.)</p>
+
+                    <figure className="image is-64x64 is-inline-block">
+                      <img src="/press-logos/gigazine_g.jpg" className="is-rounded" />
+                    </figure>
+
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="column is-one-third">
+              <div className="card">
+                <div className="card-content">
+                  <div className="content">
+                    <p>
+                      <FontAwesomeIcon icon={faQuoteLeft} />&nbsp;
+								      Have you ever wanted David Attenborough to narrate your audiobook? 
+									    Judi Dench to read your shopping list? Gilbert Gottfried to... well... some things are better left unsaid.
+                    </p>
+
+                    <figure className="image is-64x64 is-inline-block">
+                      <img src="/press-logos/shots.png" className="is-rounded" />
+                    </figure>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+
         </div>
       </section>
+
+      {/*
+
+      
+				
+						<!-- testimonial single -->
+						<div class="item text-center">
+							<i class="tf-ion-quote"></i>
+							<!-- client info -->
+							<div class="client-details">
+							</div>
+							<!-- /client info -->
+							<!-- client photo -->
+							<div class="client-thumb">
+								<a href="https://gigazine.net/news/20200728-vocodes/" target="_blank"><img src="images/news/gigazine_g.jpg" class="img-fluid" alt="gigazine"></a>
+							</div>
+							<div class="client-meta">
+								<h4>Gigazine</h4>
+								<span>Popular and influential Japanese blog</span>
+							</div>
+							<!-- /client photo -->
+						</div>
+						<!-- /testimonial single -->
+					
+						<!-- testimonial single -->
+						<div class="item text-center">
+							<i class="tf-ion-quote"></i>
+							<!-- client info -->
+							<div class="client-details">
+								<p>It’s simply a piece of AI software called Vocodes. The tool, which I can best describe as a deepfake generator, 
+									can mimic the voices of a slew of politicians and celebrities including Donald Trump, Barack Obama, Bryan Cranston, 
+									Danny Devito, and a dozen more.</p>
+							</div>
+							<!-- /client info -->
+							<!-- client photo -->
+							<div class="client-thumb">
+								<a href="https://thenextweb.com" target="_blank"><img src="images/news/tnw.png" class="img-fluid" alt="TNW"></a>
+							</div>
+							<div class="client-meta">
+								<h4>The Next Web</h4>
+							</div>
+							<!-- /client photo -->
+						</div>
+						<!-- /testimonial single -->
+
+						<!-- testimonial single -->
+						<div class="item text-center">
+							<i class="tf-ion-quote"></i>
+							<!-- client info -->
+							<div class="client-details">
+								<p>Have you ever wanted David Attenborough to narrate your audiobook? 
+									Judi Dench to read your shopping list? Gilbert Gottfried to... well... some things are better left unsaid.</p>
+							</div>
+							<!-- /client info -->
+							<!-- client photo -->
+							<div class="client-thumb">
+								<a href="https://www.shots.net/news/view/weekly-rewind-july-31st-2020" target="_blank"><img src="images/news/shots.png" class="img-fluid" alt="shots.net"></a>
+							</div>
+							<div class="client-meta">
+								<h4>Shots</h4>
+							</div>
+							<!-- /client photo -->
+						</div>
+						<!-- /testimonial single -->
+      */}
 
 
 
