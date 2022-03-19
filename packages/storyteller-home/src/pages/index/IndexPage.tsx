@@ -1,8 +1,9 @@
 
 import { faApple, faLinux, faSpeakap, faSpeakerDeck, faTwitch, faWindows } from '@fortawesome/free-brands-svg-icons';
-import { faAsterisk, faFlask, faHeadphonesAlt, faMicrophone, faUser, faUserAlt, faUserCircle, faUsers, faVoicemail } from '@fortawesome/free-solid-svg-icons';
+import { faArrowLeft, faArrowRight, faAsterisk, faFlask, faHeadphonesAlt, faMicrophone, faQuoteLeft, faUser, faUserAlt, faUserCircle, faUsers, faVoicemail } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import React from 'react';
+import AudioSample from './AudioSample';
 
 function IndexPage () {
   return (
@@ -148,16 +149,53 @@ function IndexPage () {
         </h2>
 
         This is still an early beta. Voice quality will improve substantially over time.
+
         <br />
         <br />
 
-        [ demo goes here ]
+        <div className="columns is-mobile has-text-centered">
+          <div className="column">
+            <AudioSample sampleUrl="/audio-samples/voice-conversion-1.mp3" />
+            <br />
+            <br />
+            <p>
+              <em>
+                &ldquo;I've got a huge announcement. 
+                This just sounds really, really great.
+                And other than some phase distortion, artifacts, 
+                this is just sounding really great. 
+                And it's good for America. 
+                And voice synthesis is amazing.&rdquo;
+              </em>
+            </p>
+          </div>
+          <div className="column">
+            <AudioSample sampleUrl="/audio-samples/voice-conversion-2.mp3" />
+            <br />
+            <br />
+            <p>
+              <em>
+                &ldquo;My favorite game is Super Smash Bros Ultimate. 
+                It's a really, really great game. 
+                It's huge. There's so many characters.&rdquo;
+              </em>
+            </p>
+          </div>
+        </div>
+
+        <p className="has-text-centered">
+          Brandon <FontAwesomeIcon icon={faArrowRight} /> Donald Trump<br />
+          Real time voice to voice conversion.
+        </p>
+
+
+
       </section>
 
       <section className="section is-small">
         <h1 className="title is-4">Sign up for your very own voice changer</h1>
         <h2 className="subtitle is-6">
-          We'll be rolling this out shortly. Get on the list!
+          We'll be rolling this out shortly. Get on the list! Tell us who you want to be.
         </h2>
         <a 
           className="button is-fullwidth is-large is-info"
