@@ -192,8 +192,6 @@ function IndexPage () {
           Real time voice to voice conversion.
         </p>
 
-
-
       </section>
 
       <section className="section is-small">
@@ -203,7 +201,7 @@ function IndexPage () {
         </h2>
         <a 
           className="button is-fullwidth is-large is-info"
-          href="https://create.storyteller.io"
+          href="https://fakeyou.com/clone"
           >
           Transform my voice!&nbsp;<FontAwesomeIcon icon={faMicrophone} />
         </a>
@@ -363,23 +361,10 @@ function IndexPage () {
       <section className="hero is-small">
         <div className="hero-body">
           <p className="title is-3">
-            Together we're going to make great things
-          </p>
-          <p className="subtitle is-5">
-            We're just getting started
-          </p>
-          <p>
-            Blah blah
-          </p>
-        </div>
-      </section>
-
-      <section className="hero is-small ">
-        <div className="hero-body">
-          <p className="title is-3">
             Press and social media mentions
           </p>
           <p className="subtitle is-5">
+            This is only a sample of our hundreds of mentions across the web
           </p>
 
           <div className="columns is-vcentered has-text-centered">
@@ -393,6 +378,9 @@ function IndexPage () {
                       Tool of the Week: AI voice generator | [FakeYou ...] is a window into 
                       the future [...]. Play with it with a number of celebrity voices, including Judi Dench, 
                       Neil DeGrasse Tyson, and Bill Gates.</p>
+                    
+                    <p>Techstars</p>
+
                     <figure className="image is-64x64 is-inline-block">
                       <img src="/press-logos/techstars_logo.png" className="is-rounded" />
                     </figure>
@@ -411,6 +399,8 @@ function IndexPage () {
                     <p>
                       ("Vocodes" [now FakeYou] allows users to use celebrities such as Bill Gates and 
                       Arnold Schwarzenegger to speak their favorite lines for free.)</p>
+
+                    <p>Gigazine</p>
 
                     <figure className="image is-64x64 is-inline-block">
                       <img src="/press-logos/gigazine_g.jpg" className="is-rounded" />
@@ -431,6 +421,8 @@ function IndexPage () {
 									    Judi Dench to read your shopping list? Gilbert Gottfried to... well... some things are better left unsaid.
                     </p>
 
+                    <p>Shots</p>
+
                     <figure className="image is-64x64 is-inline-block">
                       <img src="/press-logos/shots.png" className="is-rounded" />
                     </figure>
@@ -441,77 +433,68 @@ function IndexPage () {
 
           </div>
 
+          <div className="columns is-vcentered has-text-centered">
+
+            <div className="column is-one-third">
+              <div className="card">
+                <div className="card-content">
+                  <div className="content">
+                    <p>
+                      <FontAwesomeIcon icon={faQuoteLeft} />&nbsp;
+                      Un truco secreto de WhatsApp se acaba de volver tendencia en las redes sociales, 
+                      sobre todo entre los fanáticos de Dragon Ball Super, debido a que permite que los 
+                      usuarios puedan enviar audios con la voz de Gokú, 
+                    </p>
+                    <p>(A secret WhatsApp trick has just become a trend on social networks , especially 
+                      among Dragon Ball Super fans , because it allows users to send audios with the 
+                      voice of Goku</p>
+
+                    <p>La República</p>
+
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="column is-one-third">
+              <div className="card">
+                <div className="card-content">
+                  <div className="content">
+                    <p>
+                      <FontAwesomeIcon icon={faQuoteLeft} />&nbsp;
+                      We’ve previously seen apps like this, but Vocodes [now FakeYou] impresses with the sheer 
+                      volume of voices available to test out.
+                    </p>
+                    <p>TheNextWeb</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="column is-one-third">
+              <div className="card">
+                <div className="card-content">
+                  <div className="content">
+                    <p>
+                      <FontAwesomeIcon icon={faQuoteLeft} />&nbsp;
+                      [Digital artist Glenn Marshall's recent project employs]
+                      a classic 19th-century 
+                      poem as AI-imaging fuel alongside an uncanny narration from an artificial Christopher Lee.
+                      To make "In the Bleak Midwinter" even more, uh, bleak, Marshall then employed software called 
+                      vo.codes [now FakeYou] to approximate a poetic narration in the voice of the late Sir Christopher Lee. 
+                      [...] to be honest with you, we initially thought Marshall simply dubbed an old audio recording of 
+                      Lee actually reading the poem, that's how convincing the result is.</p>
+
+                    <p>Input</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+
         </div>
       </section>
-
-      {/*
-
-      
-				
-						<!-- testimonial single -->
-						<div class="item text-center">
-							<i class="tf-ion-quote"></i>
-							<!-- client info -->
-							<div class="client-details">
-							</div>
-							<!-- /client info -->
-							<!-- client photo -->
-							<div class="client-thumb">
-								<a href="https://gigazine.net/news/20200728-vocodes/" target="_blank"><img src="images/news/gigazine_g.jpg" class="img-fluid" alt="gigazine"></a>
-							</div>
-							<div class="client-meta">
-								<h4>Gigazine</h4>
-								<span>Popular and influential Japanese blog</span>
-							</div>
-							<!-- /client photo -->
-						</div>
-						<!-- /testimonial single -->
-					
-						<!-- testimonial single -->
-						<div class="item text-center">
-							<i class="tf-ion-quote"></i>
-							<!-- client info -->
-							<div class="client-details">
-								<p>It’s simply a piece of AI software called Vocodes. The tool, which I can best describe as a deepfake generator, 
-									can mimic the voices of a slew of politicians and celebrities including Donald Trump, Barack Obama, Bryan Cranston, 
-									Danny Devito, and a dozen more.</p>
-							</div>
-							<!-- /client info -->
-							<!-- client photo -->
-							<div class="client-thumb">
-								<a href="https://thenextweb.com" target="_blank"><img src="images/news/tnw.png" class="img-fluid" alt="TNW"></a>
-							</div>
-							<div class="client-meta">
-								<h4>The Next Web</h4>
-							</div>
-							<!-- /client photo -->
-						</div>
-						<!-- /testimonial single -->
-
-						<!-- testimonial single -->
-						<div class="item text-center">
-							<i class="tf-ion-quote"></i>
-							<!-- client info -->
-							<div class="client-details">
-								<p>Have you ever wanted David Attenborough to narrate your audiobook? 
-									Judi Dench to read your shopping list? Gilbert Gottfried to... well... some things are better left unsaid.</p>
-							</div>
-							<!-- /client info -->
-							<!-- client photo -->
-							<div class="client-thumb">
-								<a href="https://www.shots.net/news/view/weekly-rewind-july-31st-2020" target="_blank"><img src="images/news/shots.png" class="img-fluid" alt="shots.net"></a>
-							</div>
-							<div class="client-meta">
-								<h4>Shots</h4>
-							</div>
-							<!-- /client photo -->
-						</div>
-						<!-- /testimonial single -->
-      */}
-
-
-
-
     </div>
   );
 }
