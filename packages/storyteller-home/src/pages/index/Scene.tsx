@@ -1,8 +1,5 @@
 import React, { useEffect, useRef } from 'react';
 import * as THREE from 'three';
-
-//import { PCDLoader } from '@loaders.gl/pcd';
-//import {load} from '@loaders.gl/core';
 import { PCDLoader } from './PCDLoader';
 import { OrbitControls } from './OrbitControls';
 
@@ -11,26 +8,9 @@ interface Props {
 
 function Scene(props: Props) {
   const mountRef = useRef(null);
-  const pointCloudRef = useRef<number|null>(null);
-
-  /*const [isPlaying, setIsPlaying] = useState(false);
-
-  const scene = useRef(function() {
-    const scene = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
-
-    const renderer = new THREE.WebGLRenderer();
-    renderer.setSize( window.innerWidth, window.innerHeight );
-    document.body.appendChild( renderer.domElement );
-
-    const geometry = new THREE.BoxGeometry();
-    const material = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
-    const cube = new THREE.Mesh( geometry, material );
-    scene.add( cube );
-
-    camera.position.z = 5;
-
-  }());*/
+  // NB: Must use union type to avoid compile error
+  // https://www.designcise.com/web/tutorial/how-to-fix-useref-react-hook-cannot-assign-to-read-only-property-typescript-error
+  const pointCloudRef = useRef<any|null>(null);
 
   useEffect(() => {
     if (mountRef.current === null) {
@@ -93,50 +73,30 @@ function Scene(props: Props) {
     // instantiate a loader
     const loader = new PCDLoader();
 
-    // load a resource
     loader.load(
-      // resource URL
-      '/assets/temp.pcd',
-      // called when the resource is loaded
+      '/assets/temp.pcd', // resource URL
       function (mesh : any) {
+        // on load handler
         mesh.geometry.center();
         mesh.geometry.rotateX( Math.PI );
         mesh.scale.x = 2;
         mesh.scale.y = 2;
         mesh.scale.z = 2;
         mesh.material.color.setHex( 0xffffff );
-        //mesh.scale.x = 3;
-        //mesh.position.x = 0;
         scene.add( mesh );
-
         pointCloudRef.current = mesh;
       },
-      // called when loading is in progresses
       function ( xhr : any ) {
-        // console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
+        // in-progress updates
       },
-      // called when loading has errors
       function ( error : any) {
-        console.log( 'An error happened' );
+        // error handler
       }
     );
 
-    /*async function doLoad() {
-      const url = '/assets/temp.pcd';
-      const options = {};
-      const data = await load(url, PCDLoader, options);
-
-      console.log('loaded pcd', data);
-
-      scene.add(data);
-    }
-    doLoad();
-    */
-
-
+    // React DTOR hook
     return () => (mountRef.current as any).removeChild(renderer.domElement);
   }, []);
-
 
   return (
     <div ref={mountRef}></div>
