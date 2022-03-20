@@ -94,8 +94,11 @@ function Scene(props: Props) {
       }
     );
 
+    // NB: React wants a closure to avoid destructing the wrong thing.
+    const currentMountRef = mountRef.current;
+
     // React DTOR hook
-    return () => (mountRef.current as any).removeChild(renderer.domElement);
+    return () => (currentMountRef as any).removeChild(renderer.domElement);
   }, []);
 
   return (
