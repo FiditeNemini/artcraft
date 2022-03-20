@@ -2,6 +2,9 @@
 // Three.js does not export this, so we include it ourselves.
 // This is what the official documentation recommends.
 
+// These files are causing lint errors
+/* eslint-disable */
+
 import {
 	EventDispatcher,
 	MOUSE,
