@@ -41,11 +41,13 @@ impl MultiDeviceCapturer {
       let mut device = Device::open(i).unwrap();
       let jack_status = device.get_synchronization_jack_status().unwrap();
 
-      if jack_status.sync_out_jack_connected && !jack_status.sync_in_jack_connected {
-        if primary_device.is_some() {
-          // NB: This assumes a daisy chain topology.
-          panic!("We already one primary device. We can't have two.");
-        }
+      // TODO/NB(2022-03-20): This is broken
+      //if jack_status.sync_out_jack_connected && !jack_status.sync_in_jack_connected {
+      if primary_device.is_none() {
+        //if primary_device.is_some() {
+        //  // NB: This assumes a daisy chain topology.
+        //  panic!("We already one primary device. We can't have two.");
+        //}
 
         let calibration = device.get_calibration(depth_mode, color_format).unwrap();
 
@@ -55,9 +57,10 @@ impl MultiDeviceCapturer {
         continue;
       }
 
-      if !jack_status.sync_in_jack_connected {
-        panic!("Secondary device does not have 'in' jack connected!");
-      }
+      // TODO/NB(2022-03-20): This is broken
+      //if !jack_status.sync_in_jack_connected {
+      //  panic!("Secondary device does not have 'in' jack connected!");
+      //}
 
       let calibration = device.get_calibration(depth_mode, color_format).unwrap();
 
@@ -200,8 +203,9 @@ pub fn start_capture_thread(capturer: MultiDeviceCapturer) {
 
 fn get_primary_device_config() -> DeviceConfiguration {
   let mut config = get_default_device_config();
-  config.wired_sync_mode = k4a_sys::k4a_wired_sync_mode_t_K4A_WIRED_SYNC_MODE_MASTER;
-  config.synchronized_images_only = true;
+  // TODO/NB(2022-03-20): This is broken
+  //config.wired_sync_mode = k4a_sys::k4a_wired_sync_mode_t_K4A_WIRED_SYNC_MODE_MASTER;
+  //config.synchronized_images_only = true;
 
   // Two depth images should be seperated by MIN_TIME_BETWEEN_DEPTH_CAMERA_PICTURES_USEC to ensure the depth imaging
   // sensor doesn't interfere with the other. To accomplish this the master depth image captures
