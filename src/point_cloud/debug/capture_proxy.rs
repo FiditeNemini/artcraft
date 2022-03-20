@@ -1,7 +1,7 @@
 use anyhow::Result as AnyhowResult;
 use crate::point_cloud::debug::image_proxy::ImageProxy;
 use k4a_sys_temp as k4a_sys;
-use kinect::CaptureError;
+//use kinect::CaptureError;
 use kinect;
 use std::path::Path;
 use std::sync::{RwLock, Mutex, PoisonError, MutexGuard, Arc};
@@ -48,13 +48,13 @@ impl CaptureProxy {
   pub fn consume_k4a_capture(capture: kinect::Capture) -> Self {
     // NB: I tried to lazily unpack these, but interior mutability Sync/Send was a nightmare.
     // The poor ergonomics were not worth it.
-    let color_image = capture.get_color_image()
+    let color_image = Some(capture.get_color_image()
         .map(|image| ImageProxy::consume_k4a_image(image))
-        .ok();
+        .unwrap());
 
-    let depth_image = capture.get_depth_image()
+    let depth_image = Some(capture.get_depth_image()
         .map(|image| ImageProxy::consume_k4a_image(image))
-        .ok();
+        .unwrap());
 
     Self {
       storage: UnderlyingStorage::K4aCapture {
@@ -77,7 +77,8 @@ impl CaptureProxy {
       UnderlyingStorage::CameraImageBytes { color_image, .. } => Ok(color_image),
       UnderlyingStorage::K4aCapture{ maybe_color_image, .. } => {
         let inner = maybe_color_image.as_ref()
-            .ok_or(CaptureError::NullCapture)?;
+            .unwrap();
+            //.ok_or(CaptureError::NullCapture)?;
         Ok(inner)
       }
     }
@@ -88,7 +89,8 @@ impl CaptureProxy {
       UnderlyingStorage::CameraImageBytes { depth_image, .. } => Ok(depth_image),
       UnderlyingStorage::K4aCapture{ maybe_depth_image, .. } => {
         let inner = maybe_depth_image.as_ref()
-            .ok_or(CaptureError::NullCapture)?;
+            .unwrap();
+            //.ok_or(CaptureError::NullCapture)?;
         Ok(inner)
       }
     }

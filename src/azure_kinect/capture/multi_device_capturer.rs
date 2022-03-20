@@ -1,7 +1,8 @@
 use crate::azure_kinect::capture::device_capturer::CaptureProvider;
 use crate::point_cloud::debug::capture_proxy::CaptureProxy;
 use k4a_sys_temp as k4a_sys;
-use kinect::{Device, KinectError, Capture, CaptureError, GetCaptureError, Calibration};
+use kinect::{Device, KinectError, Capture, Calibration, DeviceConfiguration};
+use anyhow::Result;
 use std::sync::Arc;
 use std::sync::Mutex;
 
@@ -37,8 +38,8 @@ impl MultiDeviceCapturer {
     let color_format: k4a_sys::k4a_color_resolution_t = k4a_sys::k4a_color_resolution_t_K4A_COLOR_RESOLUTION_2160P;
 
     for i in 0..num_devices {
-      let mut device = Device::open(i)?;
-      let jack_status = device.get_synchronization_jack_status()?;
+      let mut device = Device::open(i).unwrap();
+      let jack_status = device.get_synchronization_jack_status().unwrap();
 
       if jack_status.sync_out_jack_connected && !jack_status.sync_in_jack_connected {
         if primary_device.is_some() {
@@ -103,25 +104,25 @@ impl MultiDeviceCapturer {
 
     // NB: Secondary devices *MUST* be started before the master!
     for device in self.secondary_devices.iter() {
-      device.start_cameras(secondary_config)?;
+      device.start_cameras(&secondary_config).unwrap();
     }
 
     // Once the secondaries start, we can start the primary.
     let primary_config = get_primary_device_config();
-    self.primary_device.start_cameras(primary_config)?;
+    self.primary_device.start_cameras(&primary_config).unwrap();
 
     Ok(())
   }
 
-  pub fn get_synchronized_captures(&self) -> Result<Vec<Capture>, GetCaptureError> {
+  pub fn get_synchronized_captures(&self) -> anyhow::Result<Vec<Capture>> {
     let mut captures = Vec::with_capacity(1 + self.secondary_devices.len());
 
     // TODO: -1 is K4A_WAIT_INDEFINITE
-    let capture = self.primary_device.get_capture(-1)?;
+    let capture = self.primary_device.get_capture(-1).unwrap();
     captures.push(capture);
 
     for device in self.secondary_devices.iter() {
-      let capture = device.get_capture(-1)?;
+      let capture = device.get_capture(-1).unwrap();
       captures.push(capture);
     }
 
@@ -197,7 +198,7 @@ pub fn start_capture_thread(capturer: MultiDeviceCapturer) {
   }
 }
 
-fn get_primary_device_config() -> k4a_sys::k4a_device_configuration_t {
+fn get_primary_device_config() -> DeviceConfiguration {
   let mut config = get_default_device_config();
   config.wired_sync_mode = k4a_sys::k4a_wired_sync_mode_t_K4A_WIRED_SYNC_MODE_MASTER;
   config.synchronized_images_only = true;
@@ -215,10 +216,10 @@ fn get_primary_device_config() -> k4a_sys::k4a_device_configuration_t {
   config.depth_mode = k4a_sys::k4a_depth_mode_t_K4A_DEPTH_MODE_NFOV_UNBINNED;
   //config.camera_fps = k4a_sys::k4a_fps_t_K4A_FRAMES_PER_SECOND_30;
 
-  config
+  DeviceConfiguration(config)
 }
 
-fn get_secondary_device_config() -> k4a_sys::k4a_device_configuration_t {
+fn get_secondary_device_config() -> DeviceConfiguration {
   let mut config = get_default_device_config();
   config.wired_sync_mode = k4a_sys::k4a_wired_sync_mode_t_K4A_WIRED_SYNC_MODE_SUBORDINATE;
 
@@ -235,7 +236,7 @@ fn get_secondary_device_config() -> k4a_sys::k4a_device_configuration_t {
   config.depth_mode = k4a_sys::k4a_depth_mode_t_K4A_DEPTH_MODE_NFOV_UNBINNED;
   //config.camera_fps = k4a_sys::k4a_fps_t_K4A_FRAMES_PER_SECOND_30;
 
-  config
+  DeviceConfiguration(config)
 }
 
 
