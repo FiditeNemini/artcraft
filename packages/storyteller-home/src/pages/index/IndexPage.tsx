@@ -19,7 +19,7 @@ function IndexPage () {
         <h2 className="subtitle is-3">
           The future of production
         </h2>
-        <p>We're streamers and filmmakers building all of the components of the future Hollywood studio.</p>
+        <p>We&rsquo;re streamers and filmmakers building the components of the future Hollywood studio.</p>
       </section>
 
       <section className="hero is-small">
@@ -95,7 +95,7 @@ function IndexPage () {
                 Twitch Streamers and Creators can engage and monetize
               </p>
               <p>
-                It's tough to build an audience on Twitch. It's even tougher to earn an
+                It&rsquo;s tough to build an audience on Twitch. It's even tougher to earn an
                 income. We've built the most comprehensive and engaging donation system 
                 for Twitch to date, letting audience members pay to use Deep Fake voices 
                 and emotes in their favorite streamers' live broadcasts. 

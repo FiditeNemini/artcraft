@@ -13,6 +13,15 @@ Develop locally without CORS:
 chromium-browser --disable-web-security --user-data-dir=~/chrome
 ```
 
+To add local libraries from the monorepo as dependencies
+--------------------------------------------------------
+
+eg, to add the common "components" package to the "storyteller-home" website,
+
+```
+yarn workspace @storyteller/storyteller-home add file file:../components
+```
+
 NB: This is now a MONOREPO
 --------------------------
 
