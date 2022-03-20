@@ -151,6 +151,9 @@ impl PointCloudRenderer {
     let mut point_cloud_vertex_shader = read_file_string_contents("src/point_cloud/shaders/point_cloud_vertex_shader.glsl").unwrap();
     let mut point_cloud_fragment_shader = read_file_string_contents("src/point_cloud/shaders/point_cloud_fragment_shader.glsl").unwrap();
 
+    println!("{}", point_cloud_vertex_shader);
+    println!("{}", point_cloud_fragment_shader);
+
     //let mut point_cloud_vertex_shader = read_file_string_contents("src/point_cloud/shaders/simple_vertex_shader.glsl").unwrap();
 
     let vertex_shader_id = compile_shader(&point_cloud_vertex_shader, gl::VERTEX_SHADER);

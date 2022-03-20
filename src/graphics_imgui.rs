@@ -149,9 +149,10 @@ pub fn run(capture_provider: Arc<CaptureProvider>, program_args: ProgramArgs) ->
 
     if imgui_visualizer_xyz_texture_1.is_none() {
       // TODO: TEMPORARY MESS TO SUPPORT MULTI-CAMERA
-      if visualizer.xyz_textures.get(1).unwrap().id() != 0 {
-        imgui_visualizer_xyz_texture_1 = Some(TextureId::from(visualizer.xyz_textures.get(1).unwrap().id() as usize));
-      }
+      // TODO/NB(2022-03-20): No multi camera
+      //if visualizer.xyz_textures.get(1).unwrap().id() != 0 {
+      //  imgui_visualizer_xyz_texture_1 = Some(TextureId::from(visualizer.xyz_textures.get(1).unwrap().id() as usize));
+      //}
     }
 
     Window::new(im_str!("Visualizer XYZ Texture (0)"))
@@ -167,18 +168,19 @@ pub fn run(capture_provider: Arc<CaptureProvider>, program_args: ProgramArgs) ->
           }
         });
 
-    Window::new(im_str!("Visualizer XYZ Texture (1)"))
-        .size([window_width, window_height], Condition::FirstUseEver)
-        .position([window_width + 50.0, 0.0], Condition::FirstUseEver)
-        .movable(false)
-        .build(&ui, || {
-          match imgui_visualizer_xyz_texture_1.as_ref() {
-            None => {},
-            Some(xyz_texture) => {
-              Image::new(xyz_texture.clone(), [1280.0, 720.0]).build(&ui);
-            },
-          }
-        });
+    // TODO/NB(2022-03-20): No multi camera
+    //Window::new(im_str!("Visualizer XYZ Texture (1)"))
+    //    .size([window_width, window_height], Condition::FirstUseEver)
+    //    .position([window_width + 50.0, 0.0], Condition::FirstUseEver)
+    //    .movable(false)
+    //    .build(&ui, || {
+    //      match imgui_visualizer_xyz_texture_1.as_ref() {
+    //        None => {},
+    //        Some(xyz_texture) => {
+    //          Image::new(xyz_texture.clone(), [1280.0, 720.0]).build(&ui);
+    //        },
+    //      }
+    //    });
 
     Window::new(im_str!("Point Cloud Converter XY Table"))
         .size([window_width, window_height], Condition::FirstUseEver)

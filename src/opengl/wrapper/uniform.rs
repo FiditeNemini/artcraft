@@ -3,6 +3,7 @@ use anyhow::bail;
 use gl::types::*;
 use std::os::raw::c_char;
 use std::ffi::CString;
+use crate::opengl::wrapper::other_misc_wrapper::gl_get_error;
 
 /// A typesafe handle on uniform IDs with convenience methods.
 #[derive(Clone, Debug, Copy)]
@@ -21,7 +22,9 @@ impl Uniform {
     }
 
     if loc < 0 {
-      bail!("Couldn't find uniform named '{}' in OpenGL program {}.", identifier, opengl_program_id);
+      let error = gl_get_error();
+      println!("GL Error: {:?}", error);
+      bail!("Couldn't find uniform named '{}' in OpenGL program {}. (err = {})", identifier, opengl_program_id, loc);
     }
 
     Ok(Self {

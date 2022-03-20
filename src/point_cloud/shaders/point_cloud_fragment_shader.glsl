@@ -27,9 +27,9 @@ void main()
 
       // TODO/NB(2022-03-20): This is broken - why did GLSL break!?
       //fragmentColor = texture2D(objTexture, coord);
-      //fragmentColor = texture(objTexture, coord);
+      fragmentColor = texture(objTexture, coord);
         //fragmentColor = vec4(0, 0, 0, 0);
-        fragmentColor = vertexColor;
+        //fragmentColor = vertexColor;
     }
     else if (vertexType == 2)
     {
