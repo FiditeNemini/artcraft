@@ -33,7 +33,7 @@ function IndexPage () {
             </div>
             <div className="column">
               <p className="title is-3">
-                1) <em>FakeYou</em> Text to Speech
+                1) <em>FakeYou</em> Social Deep Learning 
               </p>
               <p className="subtitle is-5">
                 FakeYou is used by millions of people every month.
