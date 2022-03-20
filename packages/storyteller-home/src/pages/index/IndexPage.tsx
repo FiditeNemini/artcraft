@@ -4,6 +4,7 @@ import { faArrowRight, faFlask, faMicrophone, faQuoteLeft, faUserCircle } from '
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import React from 'react';
 import AudioSample from './AudioSample';
+import Scene from './Scene';
 
 function IndexPage () {
   return (
@@ -237,7 +238,7 @@ function IndexPage () {
         </h2>
 
         <p>
-        [ demo goes here ]
+          <Scene />
         </p>
         <br />
 
