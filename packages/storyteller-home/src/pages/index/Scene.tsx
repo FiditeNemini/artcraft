@@ -11,6 +11,7 @@ interface Props {
 
 function Scene(props: Props) {
   const mountRef = useRef(null);
+  const pointCloudRef = useRef<number|null>(null);
 
   /*const [isPlaying, setIsPlaying] = useState(false);
 
@@ -33,6 +34,7 @@ function Scene(props: Props) {
 
   useEffect(() => {
     if (mountRef.current === null) {
+      // NB: This is just to satisfy TypeScript.
       return;
     }
 
@@ -77,8 +79,12 @@ function Scene(props: Props) {
     
     const animate = function () {
       requestAnimationFrame(animate);
-      //cube.rotation.x += 0.01;
-      //cube.rotation.y += 0.01;
+
+      if (pointCloudRef.current !== null) {
+        (pointCloudRef.current as any).rotation.x += 0.0005;
+        (pointCloudRef.current as any).rotation.y += 0.001;
+      }
+
       renderer.render(scene, camera);
     };
     
@@ -92,13 +98,18 @@ function Scene(props: Props) {
       // resource URL
       '/assets/temp.pcd',
       // called when the resource is loaded
-      function ( mesh  : any ) {
+      function (mesh : any) {
         mesh.geometry.center();
         mesh.geometry.rotateX( Math.PI );
-        scene.add( mesh );
+        mesh.scale.x = 2;
+        mesh.scale.y = 2;
+        mesh.scale.z = 2;
         mesh.material.color.setHex( 0xffffff );
         //mesh.scale.x = 3;
         //mesh.position.x = 0;
+        scene.add( mesh );
+
+        pointCloudRef.current = mesh;
       },
       // called when loading is in progresses
       function ( xhr : any ) {
