@@ -1,11 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { v4 as uuidv4 } from 'uuid';
-import { GenerateTtsAudio, GenerateTtsAudioErrorType, GenerateTtsAudioIsError, GenerateTtsAudioIsOk } from '@storyteller/components/src/api/tts/GenerateTtsAudio';
-//import { GetTtsInferenceJobStatus, GetTtsInferenceJobStatusIsOk, TtsInferenceJobStatus } from "@storyteller/components/src/api/jobs/GetTtsInferenceJobStatus";
-
-import { BucketConfig } from "@storyteller/components/src/api/BucketConfig";
-import { GetTtsInferenceJobStatus, GetTtsInferenceJobStatusIsOk, TtsInferenceJobStatus } from "@storyteller/components/src/api/jobs/GetTtsInferenceJobStatus";
-import { JobState, jobStateCanChange, jobStateFromString } from "@storyteller/components/src/jobs/JobStates";
+import { GenerateTtsAudio, GenerateTtsAudioErrorType, GenerateTtsAudioRequest, GenerateTtsAudioIsError, GenerateTtsAudioIsOk } from '@storyteller/components/src/api/tts/GenerateTtsAudio';
+import { jobStateCanChange } from "@storyteller/components/src/jobs/JobStates";
 import { TtsInferenceJob, TtsInferenceJobStateResponsePayload } from "@storyteller/components/src/jobs/TtsInferenceJobs";
 import { ApiConfig } from '@storyteller/components';
 import { TtsResultsList } from './TtsResultsList'
@@ -99,6 +95,11 @@ function TtsComponent(props: Props) {
     setInferenceText(textValue);
   };
 
+  const handleVoiceChange = (ev: React.FormEvent<HTMLSelectElement>) => {
+    const token = (ev.target as HTMLSelectElement).value;
+    setSelectedModelToken(token);
+  };
+
   const handleFormSubmit = async (ev: React.FormEvent<HTMLFormElement>) => { 
     ev.preventDefault();
 
@@ -110,10 +111,11 @@ function TtsComponent(props: Props) {
       return false;
     }
 
-    const request = {
+    const request : GenerateTtsAudioRequest = {
       uuid_idempotency_token: uuidv4(),
       tts_model_token: selectedModelToken,
       inference_text: inferenceText,
+      is_storyteller_demo: true, // TODO(2022-03): Temporary.
     }
 
     const response = await GenerateTtsAudio(request)
@@ -128,14 +130,32 @@ function TtsComponent(props: Props) {
     return false;
   };
 
+  let voiceOptions : any = [];
+  DEMO_VOICES_TOKEN_TO_NAME.forEach((name, token) => {
+    voiceOptions.push(<option key={token} value={token}>{name}</option>)
+  })
+
   return (
     <>
       <form onSubmit={handleFormSubmit} className="main-form">
+
+        <div className="field">
+          <div className="control">
+            <div className="select is-fullwidth">
+              <select
+                onChange={handleVoiceChange}
+                >
+                {voiceOptions}
+              </select>
+            </div>
+          </div>
+        </div>
+
         <div className="field">
           <div className="control">
             <textarea 
               onChange={handleChangeText}
-              className="textarea is-large" 
+              className="textarea is-normal" 
               value={inferenceText}
               placeholder="Type something fun..."></textarea>
           </div>
@@ -145,12 +165,12 @@ function TtsComponent(props: Props) {
           <div className="columns is-mobile">
             <div className="column has-text-centered">
               <button 
-                className="button is-danger is-large" 
+                className="button is-info is-large" 
                 disabled={false}>Generate</button>
             </div>
             <div className="column has-text-centered">
               <button 
-                className="button is-danger is-light is-large" 
+                className="button is-info is-light is-large" 
                 onClick={() => {}}>Clear</button>
             </div>
           </div>

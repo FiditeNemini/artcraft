@@ -5,6 +5,8 @@ export interface GenerateTtsAudioRequest {
   uuid_idempotency_token: string,
   tts_model_token: string,
   inference_text: string,
+  // TODO(2022-03): TEMPORARY
+  is_storyteller_demo?: boolean,
 }
 
 export interface GenerateTtsAudioSuccess {

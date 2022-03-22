@@ -94,7 +94,12 @@ function TtsResultsList(props: Props) {
 
   let title = <span />;
   if  (results.length !== 0) {
-      title = <h4 className="title is-4">Session TTS Results</h4>;
+      title = (
+        <>
+          <br /> {/* Vertical separation from above elements. */}
+          <h4 className="title is-4">TTS Results</h4>
+        </>
+      );
   }
 
   // Users have requested reverse chronological results

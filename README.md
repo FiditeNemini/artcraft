@@ -13,6 +13,12 @@ Develop locally without CORS:
 chromium-browser --disable-web-security --user-data-dir=~/chrome
 ```
 
+Or Mac,
+
+```
+/Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome --disable-web-security --user-data-dir=~/chrome
+```
+
 To add local libraries from the monorepo as dependencies
 --------------------------------------------------------
 

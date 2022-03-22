@@ -1,10 +1,10 @@
-
+import React from 'react';
 import { faApple, faLinux, faTwitch, faWindows } from '@fortawesome/free-brands-svg-icons';
 import { faArrowRight, faFlask, faMicrophone, faQuoteLeft, faUserCircle } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import React from 'react';
 import AudioSample from './AudioSample';
 import Scene from './Scene';
+import { TtsComponent } from './TtsComponent';
 
 function IndexPage () {
   return (
@@ -59,8 +59,12 @@ function IndexPage () {
       <section className="section is-small">
         <h1 className="title is-4">Try It!</h1>
         <h2 className="subtitle is-6">
-        [ demo goes here ]
         </h2>
+
+        <br />
+
+        <TtsComponent />
+
         <br />
 
         <div className="columns">

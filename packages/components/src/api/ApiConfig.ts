@@ -52,6 +52,11 @@ class ApiConfig {
       domain = Domain.Storyteller;
     }
 
+    // TODO TEMPORARY !!!
+    let fail_to_build = null;
+      domain = Domain.Storyteller;
+      useSsl = true;
+
     let v2ApiHost = "api.fakeyou.com";
     if (domain === Domain.Storyteller) {
       v2ApiHost = "api.storyteller.io";
