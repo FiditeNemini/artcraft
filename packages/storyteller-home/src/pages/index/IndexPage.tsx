@@ -349,12 +349,16 @@ function IndexPage () {
         <h2 className="subtitle is-6">
           We need early alpha testers
         </h2>
+        <p>
+          Are you a streamer or filmmaker? Want to help us test 
+          Storyteller Engine?
+        </p>
         <br />
         <a 
           className="button is-fullwidth is-large is-info"
           href="https://discord.gg/H72KFXm"
           >
-          Ask us about hosting a stream in Discord!&nbsp;<FontAwesomeIcon icon={faFlask} />
+          Ask us in Discord!&nbsp;<FontAwesomeIcon icon={faFlask} />
         </a>
 
       </section>
