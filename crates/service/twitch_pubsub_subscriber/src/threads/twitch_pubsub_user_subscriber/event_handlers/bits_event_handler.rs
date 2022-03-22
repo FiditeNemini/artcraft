@@ -124,6 +124,8 @@ impl BitsEventHandler {
               .await?;
         }
       }
+      EventResponse::TtsCommandPresets { .. } => {} // TODO
+      EventResponse::TtsCommandCustom { .. } => {} // TODO
     }
 
     Ok(())

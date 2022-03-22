@@ -133,6 +133,8 @@ impl ChannelPointsEventHandler {
               .await?;
         }
       }
+      EventResponse::TtsCommandPresets { .. } => {} // TODO
+      EventResponse::TtsCommandCustom { .. } => {} // TODO
     }
 
     Ok(())
