@@ -553,6 +553,7 @@ function IndexPage () {
 
         </div>
       </section>
+
     </div>
   );
 }

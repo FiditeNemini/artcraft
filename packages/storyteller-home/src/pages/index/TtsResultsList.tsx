@@ -56,7 +56,7 @@ function TtsResultsList(props: Props) {
       );
     } else {
       let audioLink = new BucketConfig().getGcsUrl(job.maybePublicBucketWavAudioPath);
-      let ttsPermalink = `/tts/result/${job.maybeResultToken}`
+      let ttsPermalink = `https://fakeyou.com/tts/result/${job.maybeResultToken}`
       results.push(
         <div key={job.jobToken}>
           <article className="message is-dark">
@@ -98,6 +98,8 @@ function TtsResultsList(props: Props) {
         <>
           <br /> {/* Vertical separation from above elements. */}
           <h4 className="title is-4">TTS Results</h4>
+          <p>Please note that we're recieving a second wave of traffic from Latin America.</p>
+          <br />
         </>
       );
   }
