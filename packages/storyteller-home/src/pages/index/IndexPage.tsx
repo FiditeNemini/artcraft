@@ -61,30 +61,50 @@ function IndexPage () {
         <h2 className="subtitle is-6">
         </h2>
 
+        <p>
+          We have nearly 1,500 voices (with more added every day), but we've selected 
+          a few to show off.
+        </p>
+
         <br />
 
         <TtsComponent />
 
-        <br />
+      </section>
 
-        <div className="columns">
-          <div className="column">
-            <a 
-              className="button is-fullwidth is-large is-info is-inverted"
-              href="https://fakeyou.com"
-              >
-              Check out our 1,500 other voices
-            </a>
-          </div>
+      <section className="hero is-small">
+        <div className="hero-body">
 
-          <div className="column">
-            <a 
-              className="button is-fullwidth is-large is-info"
-              href="https://fakeyou.com/clone"
-              >
-              Then Clone&nbsp;<em>Your</em>&nbsp;Voice&nbsp;<FontAwesomeIcon icon={faUserCircle} />
-            </a>
+          <h1 className="title is-4">Want to hear more?</h1>
+          <h2 className="subtitle is-6"></h2>
+
+          <br />
+
+          <div className="columns">
+            <div className="column">
+              <a 
+                className="button is-fullwidth is-large is-info is-inverted"
+                href="https://fakeyou.com"
+                >
+                Check out our 1,500 other voices
+              </a>
+            </div>
+
+            <div className="column">
+              <a 
+                className="button is-fullwidth is-large is-link is-info "
+                href="https://fakeyou.com/clone"
+                >
+                Then Clone&nbsp;<em>Your</em>&nbsp;Voice&nbsp;<FontAwesomeIcon icon={faUserCircle} />
+              </a>
+            </div>
           </div>
+        </div>
+      </section>
+
+      <section className="hero is-small">
+        <div className="hero-body">
+          &nbsp;
         </div>
       </section>
 
@@ -131,6 +151,12 @@ function IndexPage () {
 
       <section className="hero is-small">
         <div className="hero-body">
+          &nbsp;
+        </div>
+      </section>
+
+      <section className="hero is-small">
+        <div className="hero-body">
           <div className="columns is-vcentered">
             <div className="column is-one-third">
               <div className="mascot">
@@ -153,12 +179,18 @@ function IndexPage () {
         </div>
       </section>
 
+      <section className="hero is-small">
+        <div className="hero-body">
+          &nbsp;
+        </div>
+      </section>
+
       <section className="section is-small">
         <h1 className="title is-4">Voice changing demo</h1>
         <h2 className="subtitle is-6">
         </h2>
 
-        This is still an early beta. Voice quality will improve substantially over time.
+        This is still an early beta. Voice quality will change and improve substantially over time.
 
         <br />
         <br />
@@ -211,6 +243,12 @@ function IndexPage () {
           >
           Transform my voice!&nbsp;<FontAwesomeIcon icon={faMicrophone} />
         </a>
+      </section>
+
+      <section className="hero is-small">
+        <div className="hero-body">
+          &nbsp;
+        </div>
       </section>
 
       <section className="hero is-small is-link">
@@ -291,6 +329,12 @@ function IndexPage () {
         </div>
         </div>
       </section>
+      
+      <section className="hero is-small">
+        <div className="hero-body">
+          &nbsp;
+        </div>
+      </section>
 
       <section className="hero is-small">
         <div className="hero-body">
@@ -364,7 +408,12 @@ function IndexPage () {
           >
           Ask us in Discord!&nbsp;<FontAwesomeIcon icon={faFlask} />
         </a>
+      </section>
 
+      <section className="hero is-small">
+        <div className="hero-body">
+          &nbsp;
+        </div>
       </section>
 
       <section className="hero is-small">
