@@ -76,7 +76,6 @@ function IndexPage () {
         <div className="hero-body">
 
           <h1 className="title is-4">Want to hear more?</h1>
-          <h2 className="subtitle is-6"></h2>
 
           <br />
 

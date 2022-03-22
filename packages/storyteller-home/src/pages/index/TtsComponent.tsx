@@ -1,6 +1,6 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { v4 as uuidv4 } from 'uuid';
-import { GenerateTtsAudio, GenerateTtsAudioErrorType, GenerateTtsAudioRequest, GenerateTtsAudioIsError, GenerateTtsAudioIsOk } from '@storyteller/components/src/api/tts/GenerateTtsAudio';
+import { GenerateTtsAudio, GenerateTtsAudioRequest, GenerateTtsAudioIsError, GenerateTtsAudioIsOk } from '@storyteller/components/src/api/tts/GenerateTtsAudio';
 import { jobStateCanChange } from "@storyteller/components/src/jobs/JobStates";
 import { TtsInferenceJob, TtsInferenceJobStateResponsePayload } from "@storyteller/components/src/jobs/TtsInferenceJobs";
 import { ApiConfig } from '@storyteller/components';
@@ -25,7 +25,7 @@ interface Props {
 function TtsComponent(props: Props) {
   const [selectedModelToken, setSelectedModelToken] = useState(DEFAULT_MODEL_TOKEN);
   const [inferenceText, setInferenceText] = useState('');
-  const [maybeTtsError, setMaybeTtsError] = useState<GenerateTtsAudioErrorType|undefined>(undefined);
+  //const [maybeTtsError, setMaybeTtsError] = useState<GenerateTtsAudioErrorType|undefined>(undefined);
   const [jobs, setJobs] = useState<TtsInferenceJob[]>([]);
 
   const ttsInferenceJobs = useRef<TtsInferenceJob[]>([]);
@@ -76,19 +76,19 @@ function TtsComponent(props: Props) {
     .catch(e => { /* Ignore. */ });
   }
 
-  const pollJobs = () => {
+  const pollJobs = useCallback(() => {
     console.log('pollJob')
     ttsInferenceJobs.current.forEach(job => {
       if (jobStateCanChange(job.jobState)) {
         checkTtsJob(job.jobToken);
       }
     });
-  }
+  }, []);
 
   useEffect(() => {
     console.log('useEffect')
     setInterval(() => { pollJobs() }, 2000);
-  }, [])
+  }, [pollJobs])
 
   const handleChangeText = (ev: React.FormEvent<HTMLTextAreaElement>) => { 
     const textValue = (ev.target as HTMLTextAreaElement).value;
@@ -121,10 +121,10 @@ function TtsComponent(props: Props) {
     const response = await GenerateTtsAudio(request)
 
     if (GenerateTtsAudioIsOk(response)) {
-      setMaybeTtsError(undefined);
+      //setMaybeTtsError(undefined);
       enqueueTtsJob(response.inference_job_token);
     } else if (GenerateTtsAudioIsError(response)) {
-      setMaybeTtsError(response.error);
+      //setMaybeTtsError(response.error);
     }
 
     return false;

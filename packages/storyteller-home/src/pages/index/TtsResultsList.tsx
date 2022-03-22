@@ -1,5 +1,4 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
 import { BucketConfig } from '@storyteller/components/src/api/BucketConfig';
 import { JobState } from '@storyteller/components/src/jobs/JobStates';
 import { TtsInferenceJob } from '@storyteller/components/src/jobs/TtsInferenceJobs';
@@ -76,10 +75,10 @@ function TtsResultsList(props: Props) {
             </audio>
             &nbsp;
 
-            <Link 
-              to={ttsPermalink}
+            <a
+              href={ttsPermalink}
               className="button is-normal is-outlined is-dark"
-              >Permalink &amp; download</Link>
+              >Permalink &amp; download</a>
               </div>
           </article>
           &nbsp;
