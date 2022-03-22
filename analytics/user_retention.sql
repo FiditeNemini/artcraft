@@ -56,5 +56,20 @@ order by number desc
 limit 100;
 
 
+select count(*) from tts_inference_jobs 
+where created_at > now() - interval 1 day ;
+
+select count(distinct creator_ip_address) from tts_inference_jobs 
+where created_at > now() - interval 1 day ;
+
+
+
+select j.creator_ip_address, count(*) as number 
+from tts_inference_jobs as j 
+where j.created_at > now() - interval 1 day 
+group by j.creator_ip_address 
+order by number desc 
+limit 100;
+
 
 
