@@ -53,7 +53,7 @@ pub async fn disable_demo_mode_handler(
       .permanent();
 
   if let Some(cookie_domain) = maybe_cookie_domain {
-    cookie_builder = cookie_builder.domain("api.storyteller.io");
+    cookie_builder = cookie_builder.domain(cookie_domain);
   }
 
   let cookie = cookie_builder.finish();
