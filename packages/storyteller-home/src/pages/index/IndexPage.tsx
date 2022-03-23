@@ -255,7 +255,7 @@ function IndexPage () {
           <div className="columns is-vcentered">
             <div className="column">
               <p className="title is-3">
-                3) <em>Storyteller VoxelCam</em>
+                4) <em>Storyteller VoxelCam</em>
               </p>
               <p className="subtitle is-5">
                 Volumetric capture for your stream, and soon for your film set.
@@ -346,7 +346,7 @@ function IndexPage () {
 
             <div className="column">
               <p className="title is-3">
-                4) <em>Storyteller Engine</em>
+                5) <em>Storyteller Engine</em>
               </p>
               <p className="subtitle is-5">
                 A fully 3D virtual set for your stream or film

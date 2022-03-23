@@ -25,7 +25,7 @@ To add local libraries from the monorepo as dependencies
 eg, to add the common "components" package to the "storyteller-home" website,
 
 ```
-yarn workspace @storyteller/storyteller-home add file file:../components
+yarn workspace @storyteller/storyteller-home add file file:../components (ACTUALLY, THIS MAY HAVE ISSUES)
 ```
 
 NB: This is now a MONOREPO

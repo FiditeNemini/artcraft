@@ -97,7 +97,11 @@ function TtsResultsList(props: Props) {
         <>
           <br /> {/* Vertical separation from above elements. */}
           <h4 className="title is-4">TTS Results</h4>
-          <p>Please note that we're recieving a second wave of traffic from Latin America.</p>
+          <p>
+            Please note that we're currently recieving daily peaks of 1000+ 
+            concurrent visitors from a second wave of Latin American traffic.
+            (Hola! Olá amigos!)
+            </p>
           <br />
         </>
       );
