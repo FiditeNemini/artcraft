@@ -284,7 +284,7 @@ function TtsModelListFc(props: Props) {
 
       {vocodesNotice}
 
-      {/* twitchTtsNotice */}
+      {twitchTtsNotice}
 
       <form onSubmit={handleFormSubmit} className="main-form">
 
