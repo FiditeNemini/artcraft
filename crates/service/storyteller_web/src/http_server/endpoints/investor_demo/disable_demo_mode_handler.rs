@@ -11,6 +11,7 @@ use log::info;
 use std::ops::Deref;
 use std::sync::Arc;
 use time::OffsetDateTime;
+use http_server_common::request::get_request_host::get_request_host;
 
 #[derive(Deserialize)]
 pub struct QueryFields {
@@ -36,13 +37,26 @@ pub async fn disable_demo_mode_handler(
     DEFAULT_INVESTOR_REDIRECT.to_string()
   };
 
-  // Kill the cookie.
-  let cookie = Cookie::build(STORYTELLER_DEMO_COOKIE_NAME, "")
+  let maybe_host = get_request_host(&http_request);
+  let maybe_cookie_domain = match maybe_host.as_deref() {
+    Some("jungle.horse") | Some("api.jungle.horse") => Some(".jungle.horse"),
+    Some("fakeyou.com") | Some("api.fakeyou.com") => Some(".fakeyou.com"),
+    Some("storyteller.io") | Some("api.storyteller.io") => Some(".storyteller.io"),
+    _ => None,
+  };
+
+  // Kill the cookie
+  let mut cookie_builder = Cookie::build(STORYTELLER_DEMO_COOKIE_NAME, "")
       .secure(server_state.env_config.cookie_secure) // HTTPS-only
       .expires(OffsetDateTime::unix_epoch())
       .http_only(false) // This is meant to be exposed to Javascript!
-      .permanent()
-      .finish();
+      .permanent();
+
+  if let Some(cookie_domain) = maybe_cookie_domain {
+    cookie_builder = cookie_builder.domain("api.storyteller.io");
+  }
+
+  let cookie = cookie_builder.finish();
 
   HttpResponse::build(StatusCode::FOUND)
       .append_header((header::LOCATION, safe_redirect_url.to_string()))
