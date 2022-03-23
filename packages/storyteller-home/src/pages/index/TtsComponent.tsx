@@ -171,7 +171,7 @@ function TtsComponent(props: Props) {
             <div className="column has-text-centered">
               <button 
                 className="button is-info is-light is-large" 
-                onClick={() => {}}>Clear</button>
+                onClick={() => setInferenceText('')}>Clear</button>
             </div>
           </div>
         </div>
