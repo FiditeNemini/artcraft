@@ -633,11 +633,11 @@ fn add_investor_demo_routes<T, B> (app: App<T, B>) -> App<T, B>
 {
   app.service(web::scope("/demo_mode")
       .service(web::resource("/enable")
-          .route(web::post().to(enable_demo_mode_handler))
+          .route(web::get().to(enable_demo_mode_handler))
           .route(web::head().to(|| HttpResponse::Ok()))
       )
       .service(web::resource("/disable")
-          .route(web::post().to(disable_demo_mode_handler))
+          .route(web::get().to(disable_demo_mode_handler))
           .route(web::head().to(|| HttpResponse::Ok()))
       )
   )

@@ -8,7 +8,7 @@ pub fn redirect_is_allowed(redirect_url: &str) -> bool {
     "https://create.storyteller.io" => true,
     "https://create.storyteller.io/" => true,
     "https://fakeyou.com" => true,
-    "https://fakeyou.com/" => true,
+    "https://fakeyou.com/clone" => true,
     "https://jungle.horse" => true,
     "https://jungle.horse/" => true,
     "https://storyteller.io" => true,

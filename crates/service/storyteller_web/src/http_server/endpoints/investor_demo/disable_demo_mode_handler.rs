@@ -24,12 +24,13 @@ pub async fn disable_demo_mode_handler(
 ) -> impl Responder
 {
   let unsafe_redirect = query.redirect_to
-      .map(|r| r.clone())
+      .as_deref()
+      .map(|r| r.to_string())
       .unwrap_or(DEFAULT_INVESTOR_REDIRECT.to_string());
 
   let redirect_allowed = redirect_is_allowed(&unsafe_redirect);
 
-  let safe_redirect = if redirect_allowed {
+  let safe_redirect_url = if redirect_allowed {
     unsafe_redirect
   } else {
     DEFAULT_INVESTOR_REDIRECT.to_string()
@@ -44,7 +45,7 @@ pub async fn disable_demo_mode_handler(
       .finish();
 
   HttpResponse::build(StatusCode::FOUND)
-      .append_header((header::LOCATION, url.to_string()))
+      .append_header((header::LOCATION, safe_redirect_url.to_string()))
       .del_cookie(&cookie)
       .finish()
 }
