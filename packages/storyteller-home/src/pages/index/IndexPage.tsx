@@ -83,7 +83,7 @@ function IndexPage () {
             <div className="column">
               <a 
                 className="button is-fullwidth is-large is-info is-inverted"
-                href="https://fakeyou.com"
+                href="https://api.fakeyou.com/demo_mode/enable?redirect_to=https://fakeyou.com/"
                 >
                 Check out our 1,500 other voices
               </a>
@@ -92,7 +92,7 @@ function IndexPage () {
             <div className="column">
               <a 
                 className="button is-fullwidth is-large is-link is-info "
-                href="https://fakeyou.com/clone"
+                href="https://api.fakeyou.com/demo_mode/enable?redirect_to=https://fakeyou.com/clone"
                 >
                 Then Clone&nbsp;<em>Your</em>&nbsp;Voice&nbsp;<FontAwesomeIcon icon={faUserCircle} />
               </a>
@@ -238,7 +238,7 @@ function IndexPage () {
         </h2>
         <a 
           className="button is-fullwidth is-large is-info"
-          href="https://fakeyou.com/clone"
+          href="https://api.fakeyou.com/demo_mode/enable?redirect_to=https://fakeyou.com/clone"
           >
           Transform my voice!&nbsp;<FontAwesomeIcon icon={faMicrophone} />
         </a>

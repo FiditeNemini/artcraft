@@ -98,9 +98,8 @@ function TtsResultsList(props: Props) {
           <br /> {/* Vertical separation from above elements. */}
           <h4 className="title is-4">TTS Results</h4>
           <p>
-            Please note that we're currently recieving daily peaks of 1000+ 
-            concurrent visitors from a second wave of Latin American traffic.
-            (Hola! Olá amigos!)
+            Please note that we're currently recieving massive amounts of traffic.
+            Creating an account on FakeYou.com places you into a higher priority queue.
             </p>
           <br />
         </>
