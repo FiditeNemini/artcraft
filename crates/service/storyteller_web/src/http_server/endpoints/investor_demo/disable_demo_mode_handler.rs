@@ -50,6 +50,10 @@ pub async fn disable_demo_mode_handler(
       .secure(server_state.env_config.cookie_secure) // HTTPS-only
       .expires(OffsetDateTime::unix_epoch())
       .http_only(false) // This is meant to be exposed to Javascript!
+      // NB: Since we're setting this from direct HTTP access rather than XHR, the browser
+      // implicitly sets the path used to access the cookie, ie. '/demo_mode', which is not what
+      // we want!
+      .path("/")
       .permanent();
 
   if let Some(cookie_domain) = maybe_cookie_domain {
