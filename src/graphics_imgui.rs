@@ -59,7 +59,9 @@ pub fn run(capture_provider: Arc<CaptureProvider>, program_args: ProgramArgs) ->
 
   let colorization_strategy = ColorizationStrategy::Color;
 
-  let clear_color = RgbaF32::gray(0.5);
+  // NB: Green screen
+  //let clear_color = RgbaF32::gray(0.5);
+  let clear_color = RgbaF32::rgb(0.0, 1.0, 0.0);
 
   let mut visualizer = PointCloudVisualizer::new(
     capture_provider.get_num_cameras(),
