@@ -7,6 +7,8 @@ CREATE TABLE twitch_event_match_logs(
   -- Not used for anything except replication.
   id BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
 
+  token VARCHAR(32) NOT NULL,
+
   -- Type of event, eg.
   event_type VARCHAR(32) NOT NULL,
 
@@ -15,6 +17,7 @@ CREATE TABLE twitch_event_match_logs(
   deleted_at TIMESTAMP DEFAULT NULL,
 
   -- INDICES --
-  PRIMARY KEY (id)
+  PRIMARY KEY (id),
+  UNIQUE KEY (token)
 
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin;
