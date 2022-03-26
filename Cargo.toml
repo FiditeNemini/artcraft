@@ -1,0 +1,19 @@
+[workspace]
+
+members = [
+  # Shared libraries
+  "crates/lib/config",
+  "crates/lib/container_common",
+  "crates/lib/database_queries",
+  "crates/lib/http_server_common",
+  "crates/lib/redis_common",
+  "crates/lib/tts_common",
+  "crates/lib/twitch_common",
+  "crates/lib/user_input_common",
+
+  # Application 
+  "crates/service/storyteller_web",
+  "crates/service/twitch_pubsub_subscriber",
+  "crates/service/websocket_gateway",
+]
+

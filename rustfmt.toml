@@ -1,0 +1,42 @@
+# Storyteller rustfmt rules
+# (Not yet happy with these.)
+
+# Four spaces is excessive in any language.
+# Conserve horizontal space for small laptop screens.
+tab_spaces = 2
+
+# Only Unix
+newline_style = "unix"
+
+# We won't change any vendor code.
+# Note: This appears not to work in stable, so it's necessary to run `cargo +nightly fmt`.
+ignore = [
+  "vendor"
+]
+
+# Item-level imports makes for better diffs and fewer merge conflicts.
+# Another suitable option is "Module", but that's not the default either.
+# (This is commented out for now to reduce the first round of rustfmt diffs, but will be enabled.)
+imports_granularity = "Item"
+
+# It's better to keep stdlib, crate (self), and external crates separate.
+# (This is commented out for now to reduce the first round of rustfmt diffs, but will be enabled.)
+group_imports = "StdExternalCrate"
+
+# The default is wrong
+match_block_trailing_comma = true
+
+# 'try!' shouldn't exist in our codebase.
+use_try_shorthand = true
+
+# MAYBE
+#struct_lit_single_line = true
+
+# This fixes method chaining. 
+# (rustfmt ordinarily puts everything on one line.)
+use_small_heuristics = "Off" 
+
+# TEMPORARY
+#reorder_imports = false
+#max_width = 180 # default 100
+#chain_width = 10

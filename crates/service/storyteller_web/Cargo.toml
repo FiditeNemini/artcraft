@@ -1,0 +1,151 @@
+[package]
+name = "storyteller-web"
+edition = "2018"
+version = "0.0.1"
+authors = [
+  "Brandon Thomas <bt@brand.io>",
+  "Brandon Thomas <echelon@gmail.com>",
+]
+publish = false
+
+# Main server monolith
+[[bin]]
+name = "storyteller-web"
+path = "src/main.rs"
+
+## OBS websocket server
+#[[bin]]
+#name = "obs-gateway-server"
+#path = "src/obs_gateway_server.rs"
+
+# Jobs for managing downloads and inference
+[[bin]]
+name = "tts-download-job"
+path = "src/tts_download_job.rs"
+
+[[bin]]
+name = "tts-inference-job"
+path = "src/tts_inference_job.rs"
+
+[[bin]]
+name = "w2l-download-job"
+path = "src/w2l_download_job.rs"
+
+[[bin]]
+name = "w2l-inference-job"
+path = "src/w2l_inference_job.rs"
+
+[dependencies]
+
+# Internal
+config = { path = "../../lib/config" }
+container_common = { path = "../../lib/container_common" }
+database_queries = { path = "../../lib/database_queries" }
+http_server_common = { path = "../../lib/http_server_common" }
+redis_common = { path = "../../lib/redis_common" }
+tts_common = { path = "../../lib/tts_common" }
+twitch_common = { path = "../../lib/twitch_common" }
+user_input_common = { path = "../../lib/user_input_common" }
+
+# Vendored code
+newrelic-telemetry = { path = "../../vendor/newrelic-telemetry-sdk-rust" }
+
+# External
+anyhow = "1.0.40"
+base64 = "0.13.0"
+chrono = { version = "0.4.19", features = ["serde"] }
+derive_more = "0.99.14"
+dotenv = "0.15.0"
+easyenv = "0.0.6"
+hex = "0.4.3"
+hostname = "0.3.1"
+lazy_static = "1.4.0"
+lexical-sort = "0.3.1"
+lfu = "0.2.5"
+log = "0.4.14"
+rand = "0.8.3"
+regex = "1.5.4"
+time = "0.2.26"
+uuid = { version = "0.8.2", features = ["v4"] }
+
+# TODO/TEMPORARY:
+#  Twitch
+#  NB: "unsupported" pubsub features may disappear from the Twitch API at any time. It's an unofficial API.
+twitch_api2 = { version = "0.6.0-rc.2", features = ["helix", "reqwest_client", "pubsub", "chrono", "unsupported"] }
+twitch_oauth2 = "0.6.0-rc.2"
+
+# Language tag parsing
+# TODO: Move to language support crate
+language-tags = "0.3.2" # Parsing single tags richly
+
+# HTTP
+# TODO/NB: This is just for Twitch, but we might need it later.
+reqwest = { version = "0.11.4" }
+native-tls = "0.2.8"
+
+# Runtime
+# NB: We switched to Tokio from `async-std` for broader ecosystem support.
+tokio = { version = "1.6.0", features = ["macros"] }
+
+# Futures
+futures = { version = "0.3.17", features = ["thread-pool"] } # feature for ThreadPool
+futures-util = "0.3.9"
+futures_old_for_limiter = { package = "futures", version = "0.1.29" } # Older version of futures for `limiter` crate
+
+# MySql Database
+# "offline" supports typesafe builds without a live database
+# "rustls" doesn't appear to work with IP addresses, per:
+# https://github.com/launchbadge/sqlx/issues/1095#issuecomment-798050828
+sqlx = { version = "0.5", features = [ "mysql", "runtime-actix-native-tls", "offline", "chrono" ] }
+
+# Redis Database
+limitation = "0.1.1" # Redis rate limiter
+r2d2_redis = "0.14.0"
+
+# In-memory caching
+lru_time_cache = "0.11.11"
+
+# Files
+data-encoding = "2.3.2"
+ring = "0.17.0-alpha.10"
+rust-s3 = { version = "0.28", features = ["never-encode-slash"] }
+infer = "0.5.0"
+
+subprocess = "0.2.6"
+tempdir = "0.3.7"
+
+actix = "0.12.0"
+actix-cors = "0.6.0-beta.3"
+actix-files= "0.6.0-beta.8"
+actix-http = "3.0.0-beta.11"
+actix-multipart = "0.4.0-beta.7"
+actix-rt = "2.4.0"
+actix-service = "2.0.1"
+actix-utils = "3.0.0"
+actix-web = "4.0.0-beta.10"
+actix-web-actors = "4.0.0-beta.7"
+jwt = "0.13.0"
+
+# NB: Hyper is just for HTTP client use in jobs. I'd use Actix client, but I need tokio runtime
+# NB: Furthermore, the Tokio runtime is old, so I have to use an older Hyper.
+hyper = { version = "0.14.14" }
+
+# Crypto
+bcrypt = "0.8" # password hashes
+hmac = "0.10.0" # cookies
+magic-crypt = "3.1.8" # encrypting sort IDs for the frontend so we don't leak info
+md-5 = "0.9.1" # gravatar
+sha2 = "0.9.5" # file hashes, inference text hashes, etc.
+
+# Serialization
+serde = "1.0.125"
+serde_derive = "1.0.125"
+serde_json = "1.0.64"
+toml = "0.5.8"
+
+# Text processing
+pulldown-cmark = "0.8.0"
+
+[build-dependencies]
+# NB: Only using diesel for migrations support
+diesel = { version = "1.4.6", features = ["mysql"] }

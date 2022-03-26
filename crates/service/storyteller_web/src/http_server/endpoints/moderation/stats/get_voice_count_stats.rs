@@ -1,0 +1,137 @@
+use actix_http::Error;
+use actix_http::http::header;
+use actix_web::cookie::Cookie;
+use actix_web::HttpResponseBuilder;
+use actix_web::error::ResponseError;
+use actix_web::http::StatusCode;
+use actix_web::web::Path;
+use actix_web::{Responder, web, HttpResponse, error, HttpRequest};
+use chrono::{DateTime, Utc};
+use crate::http_server::web_utils::ip_address::get_request_ip;
+use crate::http_server::web_utils::response_success_helpers::simple_json_success;
+use crate::http_server::web_utils::serialize_as_json_error::serialize_as_json_error;
+use crate::server_state::ServerState;
+use log::{info, warn, log};
+use regex::Regex;
+use sqlx::error::DatabaseError;
+use sqlx::error::Error::Database;
+use sqlx::mysql::MySqlDatabaseError;
+use std::fmt;
+use std::sync::Arc;
+
+#[derive(Serialize)]
+pub struct GetVoiceCountStatsResponse {
+  pub success: bool,
+  pub all_voices_count_including_deleted: i64,
+  pub public_voices_count: i64,
+}
+
+#[derive(Debug, Serialize)]
+pub enum GetVoiceCountStatsError {
+  ServerError,
+  Unauthorized,
+}
+
+impl ResponseError for GetVoiceCountStatsError {
+  fn status_code(&self) -> StatusCode {
+    match *self {
+      GetVoiceCountStatsError::ServerError => StatusCode::INTERNAL_SERVER_ERROR,
+      GetVoiceCountStatsError::Unauthorized => StatusCode::UNAUTHORIZED,
+    }
+  }
+
+  fn error_response(&self) -> HttpResponse {
+    serialize_as_json_error(self)
+  }
+}
+
+// NB: Not using DeriveMore since Clion doesn't understand it.
+impl fmt::Display for GetVoiceCountStatsError {
+  fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+    write!(f, "{:?}", self)
+  }
+}
+
+pub async fn get_voice_count_stats_handler(
+  http_request: HttpRequest,
+  server_state: web::Data<Arc<ServerState>>
+) -> Result<HttpResponse, GetVoiceCountStatsError> {
+
+  let maybe_user_session = server_state
+      .session_checker
+      .maybe_get_user_session(&http_request, &server_state.mysql_pool)
+      .await
+      .map_err(|e| {
+        warn!("Session checker error: {:?}", e);
+        GetVoiceCountStatsError::ServerError
+      })?;
+
+  let user_session = match maybe_user_session {
+    Some(session) => session,
+    None => {
+      warn!("not logged in");
+      return Err(GetVoiceCountStatsError::Unauthorized);
+    }
+  };
+
+  // TODO: Not a good fit for this permission.
+  if !user_session.can_edit_other_users_tts_models {
+    warn!("user is not allowed to edit user tts: {}", user_session.user_token);
+    return Err(GetVoiceCountStatsError::Unauthorized);
+  }
+
+  // NB: Lookup failure is Err(RowNotFound).
+  let maybe_result = sqlx::query_as!(
+      VoiceStats,
+        r#"
+SELECT public_count, all_count FROM (
+  (SELECT count(*) as public_count 
+   FROM tts_models 
+   WHERE user_deleted_at IS NULL 
+   AND mod_deleted_at IS NULL) as pc,
+  (SELECT count(*) as all_count 
+   FROM tts_models) as ac
+)
+      "#,
+    )
+      .fetch_one(&server_state.mysql_pool)
+      .await;
+
+  let result : VoiceStats = match maybe_result {
+    Ok(result) => result,
+    Err(err) => {
+      match err {
+        sqlx::Error::RowNotFound => {
+          // NB: Not Found for null results means nothing is pending in the queue
+          VoiceStats {
+            all_count: -1,
+            public_count: -1,
+          }
+        },
+        _ => {
+          warn!("get tts pending count error: {:?}", err);
+          return Err(GetVoiceCountStatsError::ServerError)
+        }
+      }
+    },
+  };
+
+  let response = GetVoiceCountStatsResponse {
+    success: true,
+    all_voices_count_including_deleted: result.all_count,
+    public_voices_count: result.public_count,
+  };
+
+  let body = serde_json::to_string(&response)
+      .map_err(|e| GetVoiceCountStatsError::ServerError)?;
+
+  Ok(HttpResponse::Ok()
+      .content_type("application/json")
+      .body(body))
+}
+
+#[derive(Serialize)]
+pub struct VoiceStats {
+  pub public_count: i64,
+  pub all_count: i64,
+}

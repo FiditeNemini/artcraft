@@ -1,0 +1,10 @@
+# This is a more restrictive list of reserved usernames.
+# Any of the substrings may not be used.
+# You should check string.remove('_') as well.
+fakeyou
+storytell
+storyteller
+test
+vocode
+vocodes
+voxelcam

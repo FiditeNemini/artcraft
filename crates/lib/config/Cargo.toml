@@ -1,0 +1,13 @@
+[package]
+name = "config"
+edition = "2018"
+version = "0.0.1"
+authors = [
+    "Brandon Thomas <bt@brand.io>",
+    "Brandon Thomas <echelon@gmail.com>",
+]
+publish = false
+
+[lib]
+name = "config"
+path = "src/lib.rs"
