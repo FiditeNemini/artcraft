@@ -5,6 +5,7 @@ TODO:
 
 - Rename storyteller -> create-storyteller
 - Move static storyteller -> packages/, 
+- Merge in other frontends
 
 Develop locally without CORS:
 ------------
