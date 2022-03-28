@@ -6,6 +6,7 @@ TODO:
 - Rename storyteller -> create-storyteller
 - Move static storyteller -> packages/, 
 - Merge in other frontends
+- Merge with backend and use protos for API?
 
 Develop locally without CORS:
 ------------
