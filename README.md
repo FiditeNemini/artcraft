@@ -7,6 +7,7 @@ TODO:
 - Move static storyteller -> packages/, 
 - Merge in other frontends
 - Merge with backend and use protos for API?
+- Rename this repo to `storyteller-frontend`
 
 Develop locally without CORS:
 ------------
