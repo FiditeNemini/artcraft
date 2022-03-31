@@ -17,6 +17,11 @@ pub fn main() -> Result<(), BuildError> {
     let profile = std::env::var("PROFILE")?;
     let destination = format!("target/{}/deps/k4a.lib", &profile);
     fs::copy("vendor/k4a.lib", &destination)?;
+  } else {
+    // NB(2022-03-12): It's not finding the depth engine sofile on Linux. 
+    // Maybe this will fix. This search path was installed by the Debian package,
+    // not building from source.
+    println!(r"cargo:rustc-link-search=/usr/lib/x86_64-linux-gnu/libk4a1.4/");
   }
 
   Ok(())

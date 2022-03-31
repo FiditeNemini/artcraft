@@ -29,8 +29,11 @@ use zmq::{Error, Socket, Context, DONTWAIT};
 use crate::zeromq::protocol::{encode_point_data, send_message};
 
 
-const SOCKET_ADDRESS : &'static str = "tcp://127.0.0.1:8888";
+//const SOCKET_ADDRESS : &'static str = "tcp://127.0.0.1:8888";
 //const SOCKET_ADDRESS : &'static str = "tcp://192.168.50.3:8888";
+//const SOCKET_ADDRESS : &'static str = "tcp://192.168.4.64:8888";
+//const SOCKET_ADDRESS : &'static str = "tcp://10.154.106.143:8888";
+const SOCKET_ADDRESS : &'static str = "tcp://10.154.106.144:8888";
 
 /// The command line args for the program.
 #[derive(Clap, Debug, Clone)]
@@ -98,8 +101,9 @@ fn main() -> AnyhowResult<()> {
   println!("Opening device...");
   thread::sleep(Duration::from_millis(100));
 
-  let device = Device::open(1)?;
+  let device = Device::open(0)?;
 
+  println!("Configuring device...");
   let mut config = DeviceConfiguration::init_disable_all();
 
   let mut camera_fps = k4a_sys::k4a_fps_t_K4A_FRAMES_PER_SECOND_30;
@@ -140,6 +144,8 @@ fn main() -> AnyhowResult<()> {
   let mut socket = context.socket(zmq::PUSH).unwrap();
   //let mut socket = context.socket(zmq::REQ).unwrap();
 
+  println!("Socket address: {}", SOCKET_ADDRESS);
+  
   //socket.bind(SOCKET_ADDRESS).unwrap();
   socket.connect(SOCKET_ADDRESS).unwrap();
 
