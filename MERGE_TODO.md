@@ -3,7 +3,15 @@ Instructions for merging repos
 
 Following https://stackoverflow.com/a/14470212
 
-- Merge in cloudcam w/ ZK protocol
-- Merge in cloudcam w/ working GUI
+Status:
+
+
+- `old_a`: storyteller-web (FakeYou, Storyteller)
+- `old_b`: cloudcam w/ working green screen GUI
+- `old_c`: cloudcam w/ ZeroMQ protocol that talks to Unreal Engine "CloudCamPlugin"
+
+TODO: 
+
 - Merge in realtime voice conversion
+- Merge in old 'voder'
 
