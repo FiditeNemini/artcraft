@@ -1,0 +1,132 @@
+#![allow(warnings)]
+
+#[macro_use] extern crate clap;
+#[macro_use] extern crate glium;
+#[macro_use] extern crate imgui;
+#[macro_use] extern crate log;
+
+extern crate anyhow;
+extern crate arcball;
+extern crate cgmath;
+extern crate clipboard;
+extern crate gl;
+extern crate glfw;
+extern crate glfw_sys;
+extern crate image;
+extern crate imgui_glium_renderer;
+extern crate imgui_opengl_renderer;
+extern crate imgui_sdl2;
+extern crate imgui_winit_support;
+extern crate libc;
+extern crate rand;
+extern crate sdl2;
+extern crate tobj;
+extern crate winit;
+extern crate gltf;
+
+use std::sync::Arc;
+use std::{thread, env};
+
+use anyhow::Result as AnyhowResult;
+use anyhow::bail;
+use kinect::{Device, Calibration};
+use azure_kinect::sensor_control::capture_thread;
+use azure_kinect::capture::multi_device_capturer::{MultiDeviceCapturer, start_capture_thread};
+use azure_kinect::capture::fake_device_capturer::FakeDeviceCaptureProvider;
+use azure_kinect::capture::device_capturer::CaptureProvider;
+use clap::{Clap};
+
+pub mod assets;
+pub mod azure_kinect;
+pub mod core_types;
+pub mod files;
+pub mod graphics_imgui;
+pub mod gui;
+pub mod image_debug;
+pub mod imgui_support;
+pub mod opengl;
+pub mod point_cloud;
+pub mod webcam;
+
+const ENV_RUST_LOG : &'static str = "RUST_LOG";
+const DEFAULT_RUST_LOG: &'static str = "debug,actix_web=info"; // NB: We don't use actix, but this is preserved for syntax ref
+
+/// This is the serial number for the camera I have mounted to the utility wall.
+const PRIMARY_DEVICE_SERIAL : &'static str = "000513594512";
+
+/// This is a second device
+const SECONDARY_DEVICE_SERIAL : &'static str = "000886694512";
+
+#[derive(Clap, Debug)]
+struct Opts {
+  #[clap(long, parse(try_from_str = true_or_false), default_value = "true")]
+  pub enable_cameras: bool,
+  #[clap(long, parse(try_from_str = true_or_false), default_value = "false")]
+  pub enable_webcam: bool,
+  #[clap(long, parse(try_from_str = true_or_false), default_value = "false")]
+  pub save_captures: bool,
+}
+
+fn true_or_false(s: &str) -> Result<bool, &'static str> {
+  match s {
+    "true" => Ok(true),
+    "false" => Ok(false),
+    _ => Err("expected `true` or `false`"),
+  }
+}
+
+/// Arguments to pass through the program
+pub struct ProgramArgs {
+  pub save_captures: bool,
+  pub enable_webcam_output_writing: bool,
+}
+
+pub fn main() -> AnyhowResult<()> {
+  if env::var(ENV_RUST_LOG)
+      .as_ref()
+      .ok()
+      .is_none()
+  {
+    println!("Setting default logging level to \"{}\", override with env var {}.",
+      DEFAULT_RUST_LOG, ENV_RUST_LOG);
+    env::set_var(ENV_RUST_LOG, DEFAULT_RUST_LOG);
+  }
+
+  env_logger::init();
+
+  let opts = Opts::parse();
+
+  println!("opts: {:?}", opts);
+
+  // Validate args.
+  if opts.save_captures && !opts.enable_cameras {
+    bail!("Can't save captures without cameras enabled.");
+  }
+
+  let program_args = ProgramArgs {
+    enable_webcam_output_writing: opts.enable_webcam,
+    save_captures: opts.save_captures,
+  };
+
+  let capture_provider: Arc<dyn CaptureProvider> = if opts.enable_cameras {
+    let multi_device = MultiDeviceCapturer::new(1, None)
+        .expect("multi-device create");
+
+    multi_device.start_cameras().expect("start cameras");
+
+    let capture_provider = multi_device.get_sync_capture_provider();
+
+    thread::spawn(move || start_capture_thread(multi_device));
+
+    capture_provider
+  } else {
+    Arc::new(FakeDeviceCaptureProvider::new().unwrap())
+  };
+
+  //let calibration = capture_provider.get_calibration().clone();
+  //calibration.debug_print();
+
+  graphics_imgui::run(capture_provider, program_args)?;
+
+  Ok(())
+}
