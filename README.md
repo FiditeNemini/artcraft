@@ -1,6 +1,37 @@
 Cloudcam (WIP)
 ==============
 
+2022-03-12: Updated Instructions
+--------------------------------
+
+I'm having difficulty running this on Windows. (Maybe it never ran there.)
+
+I can run it on my Linux Ubuntu 20.04 Thinkpad (Carbon 2016), but it's taken
+a bit of updating. Follow these instructions:
+
+- Install the SDK:
+  https://github.com/microsoft/Azure-Kinect-Sensor-SDK/blob/develop/docs/building.md
+
+  Note that this uses the "ninja" build system, which is something I haven't used
+  before. The package dependencies are listed in the Dockerfile.
+
+- Camera isn't detected without sudo. Try this:
+  https://github.com/microsoft/Azure-Kinect-Sensor-SDK/issues/869#issuecomment-548562354
+  In particular, copying the config makes Microsoft's `k4aviewer` work, but it still 
+  doesn't work for our cloudcam. Still figuring this out.
+
+  Copying the depthengine sofile seems to work (but we still have one last error):
+
+  `sudo cp /usr/lib/x86_64-linux-gnu/libk4a1.4/libdepthengine.so.2.0 /usr/lib`
+
+  Maybe it needed the rules file copied into `/usr/lib/udev/rules.d` instead.
+
+  NOPE! I used a device index of "1", when only one camera was plugged in!
+
+
+Older Instructions / README
+---------------------------
+
 This is a Rust server that polls Kinect camera(s) and sends
 streaming point clouds to Unreal Engine or some other consumer.
 

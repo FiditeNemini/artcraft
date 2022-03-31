@@ -1,6 +1,6 @@
 use byteorder::{WriteBytesExt, LittleEndian, BigEndian};
 use bytes::{BytesMut, BufMut};
-use crate::zeromq::color::Color;
+use crate::pointcloud::color::Color;
 use rand::Rng;
 use rand::distributions::Uniform;
 

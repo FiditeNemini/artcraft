@@ -1,0 +1,32 @@
+/// Receive ack from server
+fn receive_ack(socket: &Socket) -> AnyhowResult<()> {
+  let _result = socket.recv_bytes(DONTWAIT)?;
+  Ok(())
+}
+
+fn reconnect_socket(context: &Context, socket: Socket, address: &str) -> Socket {
+  //println!("[reconnect] Creating new socket...");
+
+  let mut socket = match context.socket(zmq::REQ) {
+    Ok(s) => {
+      //println!("New socket created.");
+      s
+    },
+    Err(e) => {
+      //println!("Error creating new socket: {:?}", e);
+      return socket;
+    },
+  };
+
+  //println!("Connecting new socket...");
+  match socket.connect(address) {
+    Ok(_) => {
+      //println!("New socket connected.");
+    },
+    Err(err) => {
+      //println!("Error connecting new socket: {:?}", err);
+    },
+  }
+
+  return socket;
+}

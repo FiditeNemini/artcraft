@@ -6,46 +6,20 @@ authors = [ "Brandon Thomas <bt@brand.io>",
             "Brandon Thomas <echelon@gmail.com>" ]
 
 [[bin]]
-name = "cloudcam_visualizer"
-path = "src/main_opencv.rs"
-
-[[bin]]
-name = "cloudcam_points"
-path = "src/main_points.rs"
-
-[[bin]]
 name = "cloudcam_zeromq"
 path = "src/main_zeromq.rs"
 
 [dependencies]
 anyhow = "1.0.32"
-arcball = "1.0.0" # camera
 byteorder = "1.4.2"
 bytes = "1.0.1"
-cgmath = "0.17.0" # for arcball, but probably good for matrices, vecs, etc.
 clap = "3.0.0-beta.1"
-clipboard = "0.5" # to support imgui...
 env_logger = "0.7.1"
-gl = "0.14.0" # this looks like bare bones OpenGL
-glfw = "0.37.0" # GL framework - windows, contexts, devices
-glfw-sys = "3.3.2" # Does this have linear algebra?
-glium = { version = "0.26.0", default-features = true } # high-level OpenGL abstraction (*not* vanilla OpenGL)
-gltf = "0.15.2" # glTF loader (more modern OBJ)
-image = "0.23.8" # all the image formats
-imgui = "0.3.0" # OpenGL windowing toolkit (experimental bindings)
-imgui-glium-renderer = "0.3.0"
-imgui-opengl-renderer = "0.7.0"
-imgui-sdl2 = "0.9.0" # for imgui-opengl-renderer
-imgui-winit-support = "0.3.1"
 k4a-sys-temp = "0.2.3"
-kinect = "0.0.5"
-#kinect = { path = "../kinect.rs" }
+kinect = { path = "../kinect.rs" }
+#kinect = "0.0.5"
 libc = "0.2.68"
 log = "0.4.11"
-nalgebra = "0.21.1" # linear algebra and matrices, fantastic docs
-nalgebra-glm = "0.7.0" # computer graphics-friendly nalgebra, inspired by C++'s glm
+num-traits = "0.2.14"
 rand = "0.7.3"
-sdl2 = "0.33" # for imgui-opengl-renderer
-tobj = { version = "1.0", features = ["log"] }# Another obj loader (using older version to match `tobj_viewer` binary/crate)
-winit = "=0.21.0" # cross-platform window management, because imgui
 zmq = { version = "0.9", features = ['vendored'] }
