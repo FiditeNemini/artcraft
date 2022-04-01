@@ -1,0 +1,590 @@
+early_access_voices = [
+    "goku",
+    "peter-griffin",
+    "eric-cartman",
+    "tails",
+    "knuckles",
+    "samuel-l-jackson",
+    "sailor-moon",
+    "tom-hanks",
+    "hank-hill",
+]
+
+[[speakers]]
+name = "Hank Hill"
+slug = "hank-hill"
+model_pipeline = "ArpabetGlowTtsMelgan"
+glow_tts = "glow-tts_hank_hill_ljstx_2021.03.29_expr-1_chkpt-6000.torchjit"
+melgan = "melgan_manyvoice5.0_2020-07-23_12d5838_10760.torchjit"
+
+[[speakers]]
+name = "Tom Hanks"
+slug = "tom-hanks"
+model_pipeline = "ArpabetGlowTtsMelgan"
+glow_tts = "glow-tts_tom_hanks_ljstx_2020.07.10_expr-1_chkpt-3686.torchjit"
+melgan = "melgan_manyvoice5.0_2020-07-23_12d5838_10760.torchjit"
+
+[[speakers]]
+name = "Sailor Moon"
+slug = "sailor-moon"
+model_pipeline = "ArpabetGlowTtsMelgan"
+glow_tts = "glow-tts_sailor_moon_ljstx_2021.03.15_expr-1_chkpt-4750.torchjit"
+melgan = "melgan_manyvoice5.0_2020-07-23_12d5838_10760.torchjit" # TODO: Needs custom vocoder
+
+[[speakers]]
+name = "Samuel L. Jackson"
+slug = "samuel-l-jackson"
+model_pipeline = "ArpabetGlowTtsMelgan"
+glow_tts = "glow-tts_samuel_l_jackson_ljstx_2020.07.05_expr-1_chkpt-2444.torchjit"
+melgan = "melgan_manyvoice5.0_2020-07-23_12d5838_10760.torchjit" # TODO: Needs custom vocoder
+
+[[speakers]]
+name = "Michael Jackson"
+slug = "michael-jackson"
+model_pipeline = "ArpabetGlowTtsMelgan"
+glow_tts = "glow-tts_michael-jackson_ljstx_2020.00.00_expr-1_chkpt-6400.torchjit"
+melgan = "melgan_manyvoice5.0_2020-07-23_12d5838_10760.torchjit" # TODO: Needs custom vocoder
+
+[[speakers]]
+name = "Knuckles"
+slug = "knuckles"
+model_pipeline = "ArpabetGlowTtsMelgan"
+glow_tts = "glow-tts_knuckles_ljstx_2021.03.15_expr-1_chkpt-5040.torchjit"
+melgan = "melgan_manyvoice5.0_2020-07-23_12d5838_10760.torchjit" # TODO: Needs custom vocoder
+
+[[speakers]]
+name = "Tails"
+slug = "tails"
+model_pipeline = "ArpabetGlowTtsMelgan"
+glow_tts = "glow-tts_tails_ljstx_2021.03.15_expr-1_chkpt-5020.torchjit"
+melgan = "melgan_manyvoice5.0_2020-07-23_12d5838_10760.torchjit" # TODO: Needs custom vocoder
+
+[[speakers]]
+name = "Goku"
+slug = "goku"
+model_pipeline = "ArpabetGlowTtsMelgan"
+glow_tts = "glow-tts_goku_ljstx_2021.03.14_expr-1_chkpt-5300.torchjit"
+melgan = "melgan_manyvoice5.0_2020-07-23_12d5838_10760.torchjit" # TODO: Needs custom vocoder
+
+[[speakers]]
+name = "Peter Griffin"
+slug = "peter-griffin"
+model_pipeline = "ArpabetGlowTtsMelgan"
+glow_tts = "glow-tts_peter-griffin_ljstx_2021.03.07_expr-1_chkpt-5000.torchjit"
+melgan = "melgan_manyvoice5.0_2020-07-23_12d5838_10760.torchjit" # TODO: Needs custom vocoder
+
+[[speakers]]
+name = "Eric Cartman"
+slug = "eric-cartman"
+model_pipeline = "ArpabetGlowTtsMelgan"
+glow_tts = "glow-tts_eric-cartman_ljstx_2021.03.07_expr-1_chkpt-5000.torchjit"
+melgan = "melgan_manyvoice5.0_2020-07-23_12d5838_10760.torchjit" # TODO: Needs custom vocoder
+
+[[speakers]]
+name = "Bob Barker"
+slug = "bob-barker"
+model_pipeline = "ArpabetGlowTtsMelgan"
+glow_tts = "glow-tts_bob-barker_ljstx_2020.10.21_expr-1_chkpt-5470.torchjit"
+melgan = "melgan_manyvoice5.0_2020-07-23_12d5838_10760.torchjit" # TODO: Needs custom vocoder
+
+[[speakers]]
+name = "Jim Cramer"
+slug = "jim-cramer"
+model_pipeline = "ArpabetGlowTtsMelgan"
+glow_tts = "glow-tts_jim-cramer_ljstx_2020.10.21_expr-1_chkpt-5554.torchjit"
+melgan = "melgan_manyvoice5.0_2020-07-23_12d5838_10760.torchjit" # TODO: Needs custom vocoder
+
+[[speakers]]
+name = "Crypt Keeper"
+slug = "crypt-keeper"
+model_pipeline = "ArpabetGlowTtsMelgan"
+glow_tts = "glow-tts_crypt-keeper_ljstx_2020.10.24_expr-1_chkpt-10000.torchjit"
+melgan = "melgan_manyvoice5.0_2020-07-23_12d5838_10760.torchjit" # TODO: Needs custom vocoder
+
+[[speakers]]
+name = "Paz"
+slug = "paz"
+model_pipeline = "ArpabetGlowTtsMelgan"
+glow_tts = "glow-tts_paz_ljstx_2020.10.24_expr-1_chkpt-6500.torchjit"
+melgan = "melgan_manyvoice5.0_2020-07-23_12d5838_10760.torchjit" # TODO: Needs custom vocoder
+
+[[speakers]]
+name = "Etika"
+slug = "etika"
+model_pipeline = "ArpabetGlowTtsMelgan"
+glow_tts = "glow-tts_etika_ljstx_2020.10.09_expr-1_chkpt-4594.torchjit"
+melgan = "melgan_manyvoice5.0_2020-07-23_12d5838_10760.torchjit" # TODO: Needs custom vocoder
+
+[[speakers]]
+name = "Mitch McConnell"
+slug = "mitch-mcconnell"
+model_pipeline = "ArpabetGlowTtsMelgan"
+glow_tts = "glow-tts_mitch-mcconnell_ljstx_2020.10.09_expr-1_chkpt-3700.torchjit"
+melgan = "melgan_manyvoice5.0_2020-07-23_12d5838_10760.torchjit"
+
+[[speakers]]
+name = "Moistcr1tikal"
+slug = "moistcr1tikal"
+model_pipeline = "ArpabetGlowTtsMelgan"
+glow_tts = "glow-tts_moistcr1tikal_ljstx_2020.10.09_expr-1_chkpt-4858.torchjit"
+melgan = "melgan_moistcr1tikal_2020-10-10_d3b9647_12000.torchjit" # TODO: Train more
+
+[[speakers]]
+name = "Paula Deen"
+slug = "paula-deen"
+model_pipeline = "ArpabetGlowTtsMelgan"
+glow_tts = "glow-tts_paula-deen_ljstx_2020.10.09_expr-1_chkpt-3900.torchjit"
+melgan = "melgan_manyvoice5.0_2020-07-23_12d5838_10760.torchjit"
+
+[[speakers]]
+name = "Tommy Wiseau"
+slug = "tommy-wiseau"
+model_pipeline = "ArpabetGlowTtsMelgan"
+glow_tts = "glow-tts_tommy-wiseau_ljstx_2020.08.11_expr-1_chkpt-5448.torchjit"
+melgan = "melgan_manyvoice5.0_2020-07-23_12d5838_10760.torchjit"
+
+[[speakers]]
+name = "Yami Yugi"
+slug = "yami-yugi"
+model_pipeline = "ArpabetGlowTtsMelgan"
+glow_tts = "glow-tts_yami-yugi_ljstx_2020.10.02_expr-2_chkpt-4500.torchjit"
+melgan = "melgan_manyvoice5.0_2020-07-23_12d5838_10760.torchjit" # TODO: Needs custom vocoder
+
+[[speakers]]
+name = "Scout"
+slug = "scout"
+model_pipeline = "ArpabetGlowTtsMelgan"
+glow_tts = "glow-tts_scout_ljstx_2020.10.02_expr-1_chkpt-3800.torchjit"
+melgan = "melgan_manyvoice5.0_2020-07-23_12d5838_10760.torchjit" # TODO: Needs custom vocoder
+
+[[speakers]]
+name = "Solid Snake"
+slug = "solid-snake"
+model_pipeline = "ArpabetGlowTtsMelgan"
+glow_tts = "glow-tts_solid-snake_ljstx_2020.09.21_expr-1_chkpt-4500.torchjit"
+melgan = "melgan_manyvoice5.0_2020-07-23_12d5838_10760.torchjit" # TODO: Needs custom vocoder
+
+[[speakers]]
+name = "The Boss"
+slug = "the-boss"
+model_pipeline = "ArpabetGlowTtsMelgan"
+glow_tts = "glow-tts_the-boss_ljstx_2020.10.02_expr-1_chkpt-4500.torchjit"
+melgan = "melgan_manyvoice5.0_2020-07-23_12d5838_10760.torchjit" # TODO: Needs custom vocoder
+
+[[speakers]]
+name = "Trevor Philips"
+slug = "trevor-philips"
+model_pipeline = "ArpabetGlowTtsMelgan"
+glow_tts = "glow-tts_trevor-philips_ljstx_2020.10.02_expr-1_chkpt-4500.torchjit"
+melgan = "melgan_manyvoice5.0_2020-07-23_12d5838_10760.torchjit" # TODO: Needs custom vocoder
+
+[[speakers]]
+name = "Vegeta"
+slug = "vegeta"
+model_pipeline = "ArpabetGlowTtsMelgan"
+glow_tts = "glow-tts_vegeta_ljstx_2020.09.21_expr-1_chkpt-4500.torchjit"
+melgan = "melgan_manyvoice5.0_2020-07-23_12d5838_10760.torchjit" # TODO: Needs custom vocoder
+
+[[speakers]]
+name = "Boomstick (Death Battle!)"
+slug = "boomstick"
+model_pipeline = "ArpabetGlowTtsMelgan"
+glow_tts = "glow-tts_boomstick_ljstx_2020.09.13_expr-1_chkpt-4500.torchjit"
+melgan = "melgan_boomstick_2020.09.15_d3b9647_13750.torchjit"
+
+[[speakers]]
+name = "Sonic"
+slug = "sonic"
+model_pipeline = "ArpabetGlowTtsMelgan"
+glow_tts = "glow-tts_sonic_ljstx_2020.09.12_expr-1_chkpt-3750.torchjit"
+melgan = "melgan_sonic_2020.09.15_d3b9647_11000.torchjit"
+
+[[speakers]]
+name = "Richard Ayoade"
+slug = "richard-ayoade"
+model_pipeline = "ArpabetGlowTtsMelgan"
+glow_tts = "glow-tts_richard_ayoade_ljstx_2020.09.12_expr-1_chkpt-4500.torchjit"
+melgan = "melgan_richard-ayoade_2020.09.15_d3b9647_11500.torchjit"
+
+[[speakers]]
+name = "Ben Shapiro"
+slug = "ben-shapiro"
+model_pipeline = "ArpabetGlowTtsMelgan"
+glow_tts = "glow-tts_ben_shapiro_ljstx_2020.09.13_expr-1_chkpt-4250.torchjit"
+melgan = "melgan_ben-shapiro_2020.09.15_d3b9647_11250.torchjit"
+
+[[speakers]]
+name = "Michael Rosen"
+slug = "michael-rosen"
+model_pipeline = "ArpabetGlowTtsMelgan"
+glow_tts = "glow-tts_michael-rosen_ljstx_2020.09.05_expr-1_chkpt-5682.torchjit"
+melgan = "melgan_manyvoice5.0_2020-07-23_12d5838_10760.torchjit"
+
+[[speakers]]
+name = "Wizard (Death Battle!)"
+slug = "wizard"
+model_pipeline = "ArpabetGlowTtsMelgan"
+glow_tts = "glow-tts_wiz_ljstx_2020.09.05_expr-1_chkpt-4500.torchjit"
+melgan = "melgan_wiz_2020.09.07_d3b9647_17000.torchjit"
+
+[[speakers]]
+name = "Tucker Carlson"
+slug = "tucker-carlson"
+model_pipeline = "ArpabetGlowTtsMelgan"
+glow_tts = "glow-tts_tucker-carlson_ljstx_2020.09.04_expr-1_chkpt-4570.torchjit"
+melgan = "melgan_manyvoice5.0_2020-07-23_12d5838_10760.torchjit"
+
+[[speakers]]
+name = "Lisa Simpson"
+slug = "lisa-simpson"
+model_pipeline = "ArpabetGlowTtsMelgan"
+glow_tts = "glow-tts_lisa-simpson_ljstx_2020.09.04_expr-1_chkpt-5000.torchjit"
+melgan = "melgan_lisa-simpson_2020.09.05_d3b9647_15000.torchjit"
+
+[[speakers]]
+name = "Squidward"
+slug = "squidward"
+model_pipeline = "ArpabetGlowTtsMelgan"
+glow_tts = "glow-tts_squidward_ljstx_2020.09.03_expr-1_chkpt-4500.torchjit"
+melgan = "melgan_squidward_2020.09.05_d3b9647_14000.torchjit"
+
+[[speakers]]
+name = "Mr. Krabs"
+slug = "mr-krabs"
+model_pipeline = "ArpabetGlowTtsMelgan"
+glow_tts = "glow-tts_mr_krabs_ljstx_2020.09.03_expr-1_chkpt-4500.torchjit"
+melgan = "melgan_mr-krabs_2020.09.05_d3b9647_14000.torchjit"
+
+[[speakers]]
+name = "Homer Simpson"
+slug = "homer-simpson"
+model_pipeline = "ArpabetGlowTtsMelgan"
+glow_tts = "glow-tts_homer_simpson_ljstx_2020.08.21_expr-1_chkpt-7000.torchjit"
+melgan = "melgan_homer-simpson_2020.08.23_04b87e3_16300.torchjit"
+
+[[speakers]]
+name = "SpongeBob SquarePants"
+slug = "spongebob-squarepants"
+model_pipeline = "ArpabetGlowTtsMelgan"
+glow_tts = "glow-tts_spongebob_squarepants_ljstx_2020.08.11_expr-1_chkpt-5740.torchjit"
+melgan = "melgan_spongebob-squarepants_2020.08.11_58e5387_11725.torchjit"
+
+[[speakers]]
+name = "Bart Simpson"
+slug = "bart-simpson"
+model_pipeline = "ArpabetGlowTtsMelgan"
+glow_tts = "glow-tts_bart_simpson_ljstx_2020.08.02_expr-1_chkpt-5507.torchjit"
+melgan = "melgan_bart-simpson_2020.08.03_58e5387_15100.torchjit"
+
+[[speakers]]
+name = "Palmer Luckey"
+slug = "palmer-luckey"
+model_pipeline = "ArpabetGlowTtsMelgan"
+glow_tts = "glow-tts_palmer_luckey_ljstx_2020.08.03_expr-1_chkpt-5192.torchjit"
+# TODO: Palmer doesn't have any Melgan training contribution yet!
+melgan = "melgan_manyvoice5.0_2020-07-23_12d5838_10760.torchjit"
+
+[[speakers]]
+name = "Sarah Palin"
+slug = "sarah-palin"
+model_pipeline = "ArpabetGlowTtsMelgan"
+glow_tts = "glow-tts_sarah_palin_ljstx_2020.07.28_expr-1_chkpt-5736.torchjit"
+# TODO: Sarah doesn't have any Melgan training contribution yet!
+melgan = "melgan_manyvoice5.0_2020-07-23_12d5838_10760.torchjit"
+
+[[speakers]]
+name = "Shohreh Aghdashloo"
+slug = "shohreh-aghdashloo"
+model_pipeline = "ArpabetGlowTtsMelgan"
+glow_tts = "glow-tts_shohreh-aghdashloo_ljstx_2020.08.03_expr-1_chkpt-4177.torchjit"
+# TODO: Shohreh doesn't have any Melgan training contribution yet!
+melgan = "melgan_manyvoice5.0_2020-07-23_12d5838_10760.torchjit"
+
+[[speakers]]
+name = "Wilford Brimley"
+slug = "wilford-brimley"
+model_pipeline = "ArpabetGlowTtsMelgan"
+glow_tts = "glow-tts_wilford_brimley_ljstx_2020.07.26_expr-1_chkpt-4441.torchjit"
+# TODO: Wilford doesn't have any Melgan training contribution yet!
+melgan = "melgan_manyvoice5.0_2020-07-23_12d5838_10760.torchjit"
+
+[[speakers]]
+name = "John Oliver"
+slug = "john-oliver"
+model_pipeline = "ArpabetGlowTtsMelgan"
+glow_tts = "glow-tts_john_oliver_ljstx_2020.07.26_expr-3_chkpt-4789.torchjit"
+# TODO: John Oliver only has 15 minutes of Melgan contribution
+melgan = "melgan_manyvoice5.0_2020-07-23_12d5838_10760.torchjit"
+
+[[speakers]]
+name = "Peter Thiel"
+slug = "peter-thiel"
+model_pipeline = "ArpabetGlowTtsMelgan"
+glow_tts = "glow-tts_peter_thiel_ljstx_2020.07.18_expr-1_chkpt-8182.torchjit"
+melgan = "melgan_manyvoice5.0_2020-07-23_12d5838_10490.torchit"
+
+[[speakers]]
+name = "Larry King"
+slug = "larry-king"
+model_pipeline = "ArpabetGlowTtsMelgan"
+glow_tts = "glow-tts_larry_king_ljstx_2020.07.19_expr-1_chkpt-6656.torchjit"
+melgan = "melgan_manyvoice5.0_2020-07-23_12d5838_10490.torchit"
+
+[[speakers]]
+name = "J.K. Simmons"
+slug = "j-k-simmons"
+model_pipeline = "ArpabetGlowTtsMelgan"
+glow_tts = "glow-tts_j-k-simmons_ljstx_2020.07.19_expr-1_chkpt-6633.torchjit"
+melgan = "melgan_manyvoice5.0_2020-07-23_12d5838_10490.torchit"
+
+[[speakers]]
+name = "Sam Altman"
+slug = "sam-altman"
+model_pipeline = "ArpabetGlowTtsMelgan"
+glow_tts = "glow-tts_sam_altman_ljstx_2020.07.20_expr-2_chkpt-4871.torchjit"
+melgan = "melgan_manyvoice5.0_2020-07-23_12d5838_10760.torchjit"
+
+[[speakers]]
+name = "Leonard Nimoy"
+slug = "leonard-nimoy"
+model_pipeline = "ArpabetGlowTtsMelgan"
+glow_tts = "glow-tts_leonard_nimoy_ljstx_2020.07.20_expr-1_chkpt-6401.torchjit"
+melgan = "melgan_manyvoice5.0_2020-07-23_12d5838_10760.torchjit"
+
+[[speakers]]
+name = "Ben Stein"
+slug = "ben-stein"
+model_pipeline = "ArpabetGlowTtsMelgan"
+glow_tts = "glow-tts_ben-stein_ljstx_2020.07.21_expr-1_chkpt-7516.torchjit"
+melgan = "melgan_manyvoice5.0_2020-07-23_12d5838_10490.torchit"
+
+[[speakers]]
+name = "Anderson Cooper"
+slug = "anderson-cooper"
+model_pipeline = "ArpabetGlowTtsMelgan"
+glow_tts = "glow-tts_anderson_cooper_ljstx_2020.07.21_expr-1_chkpt-6622.torchjit"
+melgan = "melgan_manyvoice5.0_2020-07-23_12d5838_10760.torchjit"
+
+[[speakers]]
+name = "Paul Graham"
+slug = "paul-graham"
+model_pipeline = "ArpabetGlowTtsMelgan"
+glow_tts = "glow-tts_paul_graham_ljstx_2020.07.22_expr-1_chkpt-5605.torchjit"
+melgan = "melgan_manyvoice5.0_2020-07-23_12d5838_10490.torchit"
+
+[[speakers]]
+name = "Alan Rickman"
+slug = "alan-rickman"
+model_pipeline = "ArpabetGlowTtsMelgan"
+glow_tts = "glow-tts_alan-rickman_ljstx_2020.07.22_expr-1_chkpt-4765.torchjit"
+melgan = "melgan_manyvoice5.0_2020-07-23_12d5838_10760.torchjit"
+
+[[speakers]]
+name = "Craig Ferguson"
+slug = "craig-ferguson"
+model_pipeline = "ArpabetGlowTtsMelgan"
+glow_tts = "glow-tts_craig_ferguson_ljstx_2020.07.13_expr-1_chkpt-7680.torchjit"
+melgan = "melgan_manyvoice3.0_2020-07-17_12d5838_10090.torchjit"
+
+[[speakers]]
+name = "Bryan Cranston"
+slug = "bryan-cranston"
+model_pipeline = "ArpabetGlowTtsMelgan"
+glow_tts = "glow-tts_bryan_cranston_ljstx_2020.07.13_expr-1_chkpt-7795.torchjit"
+melgan = "melgan_manyvoice5.0_2020-07-23_12d5838_10760.torchjit"
+
+[[speakers]]
+name = "Neil deGrasse Tyson"
+slug = "neil-degrasse-tyson"
+model_pipeline = "ArpabetGlowTtsMelgan"
+glow_tts = "glow-tts_neil_degrasse_tyson_ljstx_2020.07.05_expr-1_chkpt-2482.torchjit"
+melgan = "melgan_manyvoice3.0_2020-07-17_12d5838_10090.torchjit"
+
+[[speakers]]
+name = "Hillary Clinton"
+slug = "hillary-clinton"
+model_pipeline = "ArpabetGlowTtsMelgan"
+glow_tts = "glow-tts_hillary_clinton_ljstx_2020.07.15_expr-2_chkpt-7250.torchjit"
+melgan = "melgan_manyvoice3.0_2020-07-17_12d5838_10090.torchjit"
+
+[[speakers]]
+name = "James Earl Jones"
+slug = "james-earl-jones"
+model_pipeline = "ArpabetGlowTtsMelgan"
+glow_tts = "glow-tts_james_earl_jones_ljstx_2020.07.07_expr-1_chkpt-2573.torchjit"
+melgan = "melgan_manyvoice3.0_2020-07-17_12d5838_10090.torchjit"
+
+[[speakers]]
+name = "Arnold Schwarzenegger"
+slug = "arnold-schwarzenegger"
+model_pipeline = "ArpabetGlowTtsMelgan"
+glow_tts = "glow-tts_arnold_schwarzenegger_ljstx_2020.07.16_expr-2_chkpt-9045.torchjit"
+melgan = "melgan_manyvoice3.0_2020-07-17_12d5838_10090.torchjit"
+
+[[speakers]]
+name = "David Cross"
+slug = "david-cross"
+model_pipeline = "ArpabetGlowTtsMelgan"
+glow_tts = "glow-tts_david_cross_ljstx_2020.07.13_expr-1_chkpt-9462.torchjit"
+melgan = "melgan_manyvoice3.0_2020-07-17_12d5838_10090.torchjit"
+
+[[speakers]]
+name = "George Takei"
+slug = "george-takei"
+model_pipeline = "ArpabetGlowTtsMelgan"
+glow_tts = "glow-tts_george_takei_ljstx_2020.07.08_expr-1_chkpt-4060.torchjit"
+melgan = "melgan_manyvoice5.0_2020-07-23_12d5838_10490.torchit"
+
+[[speakers]]
+name = "Judi Dench"
+slug = "judi-dench"
+model_pipeline = "ArpabetGlowTtsMelgan"
+glow_tts = "glow-tts_judi_dench_ljstx_2020.07.08_expr-1_chkpt-4693.torchjit"
+melgan = "melgan_manyvoice3.0_2020-07-17_12d5838_10090.torchjit"
+
+[[speakers]]
+name = "George W. Bush"
+slug = "george-w-bush"
+model_pipeline = "ArpabetGlowTtsMelgan"
+glow_tts = "glow-tts_george_w_bush_ljstx_2020.06.26_expr-1_chkpt-1735.torchjit"
+melgan = "melgan_manyvoice3.0_2020-07-17_12d5838_10090.torchjit"
+
+# ---
+
+[[speakers]]
+name = "Bill Nye"
+slug = "bill-nye"
+model_pipeline = "ArpabetGlowTtsMelgan"
+glow_tts = "glow-tts_bill_nye_ljstx_2020.07.07_expr-1_chkpt-2510.torchjit"
+melgan = "melgan_manyvoice2.0_2020-07-08_12d5838_9330.torchjit"
+
+[[speakers]]
+name = "Jimmy Carter"
+slug = "jimmy-carter"
+model_pipeline = "ArpabetGlowTtsMelgan"
+glow_tts = "glow-tts_jimmy_carter_ljstx_2020.07.05_expr-1_chkpt-2391.torchjit"
+melgan = "melgan_manyvoice2.0_2020-07-08_12d5838_9330.torchjit"
+
+[[speakers]]
+name = "Richard Nixon"
+slug = "richard-nixon"
+model_pipeline = "ArpabetGlowTtsMelgan"
+glow_tts = "glow-tts_richard_nixon_ljstx_2020.07.08_expr-1_chkpt-3847.torchjit"
+melgan = "melgan_manyvoice2.0_2020-07-08_12d5838_8940.torchjit"
+
+[[speakers]]
+name = "Sir David Attenborough"
+slug = "david-attenborough"
+model_pipeline = "ArpabetGlowTtsMelgan"
+glow_tts = "glow-tts_david_attenborough_ljstx_2020.07.05_expr-1_chkpt-2446.torchjit"
+melgan = "melgan_manyvoice2.0_2020-07-08_12d5838_8940.torchjit"
+
+[[speakers]]
+name = "Bill Clinton"
+slug = "bill-clinton"
+model_pipeline = "ArpabetGlowTtsMelgan"
+glow_tts = "glow-tts_bill_clinton_ljstx_2020.06.28_expr-1_chkpt-1659.torchjit"
+melgan = "melgan_manyvoice1.0_2020-06-28_12d5838_7050.torchjit"
+
+[[speakers]]
+name = "Christopher Lee"
+slug = "christopher-lee"
+model_pipeline = "ArpabetGlowTtsMelgan"
+glow_tts = "glow-tts_christopher_lee_ljstx_2020.06.28_expr-1_chkpt-4100.torchjit"
+melgan = "melgan_manyvoice1.0_2020-06-28_12d5838_7050.torchjit"
+
+[[speakers]]
+name = "Barack Obama (needs work)"
+slug = "barack-obama"
+model_pipeline = "ArpabetGlowTtsMelgan"
+glow_tts = "glow-tts_barack_obama_ljstx_2020.06.28_expr-1_chkpt-1729.torchjit"
+melgan = "melgan_manyvoice1.0_2020-06-28_12d5838_7050.torchjit"
+sample_rate_hz = 22000 # This is lower than normal
+
+[[speakers]]
+name = "Betty White (needs work)"
+slug = "betty-white"
+model_pipeline = "ArpabetGlowTtsMelgan"
+glow_tts = "glow-tts_betty_white_ljstx_2020.06.28_expr-1_chkpt-1666.torchjit"
+melgan = "melgan_manyvoice1.0_2020-06-28_12d5838_7050.torchjit"
+
+[[speakers]]
+name = "Dr. Phil McGraw"
+slug = "dr-phil-mcgraw"
+model_pipeline = "ArpabetGlowTtsMelgan"
+glow_tts = "glow-tts_dr_phil_mcgraw_ljstx_2020.06.28_expr-1_chkpt-1813.torchjit"
+melgan = "melgan_manyvoice1.0_2020-06-28_12d5838_7050.torchjit"
+
+[[speakers]]
+name = "Fred Rogers"
+slug = "fred-rogers"
+model_pipeline = "ArpabetGlowTtsMelgan"
+glow_tts = "glow-tts_fred_rogers_ljstx_2020.06.28_expr-1_chkpt-2575.torchjit"
+melgan = "melgan_manyvoice1.0_2020-06-28_12d5838_7050.torchjit"
+
+[[speakers]]
+name = "Danny Devito"
+slug = "danny-devito"
+model_pipeline = "ArpabetGlowTtsMelgan"
+glow_tts = "glow-tts_danny_devito_ljstx_2020.06.28_expr-1_chkpt-3757.torchjit"
+melgan = "melgan_manyvoice1.0_2020-06-28_12d5838_7050.torchjit"
+
+
+[[speakers]]
+name = "Donald Trump"
+slug = "donald-trump"
+model_pipeline = "ArpabetGlowTtsMelgan"
+glow_tts = "glow_tts_ljs_txlearn_arpabet_2020-06-01_G_1689-2.torchjit"
+melgan = "melgan_trump_txlearn_2020-05-30_steno_chkpt9800.torchjit" # Bespoke melgan
+sample_rate_hz = 21000 # This is lower than normal
+
+[[speakers]]
+name = "Gilbert Gottfried"
+slug = "gilbert-gottfried"
+model_pipeline = "ArpabetGlowTtsMelgan"
+glow_tts = "glow-tts_gilbert-gottfried_ljstx_2020.06.28_expr-1_chkpt-1766.torchjit"
+melgan = "melgan_manyvoice5.0_2020-07-23_12d5838_10490.torchit"
+
+[[speakers]]
+name = "Ronald Reagan"
+slug = "ronald-reagan"
+model_pipeline = "ArpabetGlowTtsMelgan"
+glow_tts = "glow-tts_solo_reagan_ljstx_2020.06.22_expr-1_chkpt-1406.torchjit"
+melgan = "melgan_manyvoice1.0_2020-06-28_12d5838_7050.torchjit"
+sample_rate_hz = 21000 # This is lower than normal
+
+[[speakers]]
+name = "Bill Gates"
+slug = "bill-gates"
+model_pipeline = "ArpabetGlowTtsMelgan"
+glow_tts = "glow-tts_solo_billgates_ljstx_2020.06.24_expr-1_chkpt-2011.torchjit"
+melgan = "melgan_manyvoice1.0_2020-06-28_12d5838_7050.torchjit"
+
+[[speakers]]
+name = "Mark Zuckerberg"
+slug = "mark-zuckerberg"
+model_pipeline = "ArpabetGlowTtsMelgan"
+glow_tts = "glow-tts_solo_zuckerberg_ljstx_2020.06.24_expr-1_chkpt-2280.torchjit"
+melgan = "melgan_manyvoice1.0_2020-06-28_12d5838_7050.torchjit"
+sample_rate_hz = 21000 # This is lower than normal
+
+[[speakers]]
+name = "Tupac Shakur"
+slug = "tupac-shakur"
+model_pipeline = "ArpabetGlowTtsMelgan"
+glow_tts = "glow-tts_tupac_shakur_ljstx_2020.07.16_expr-2_chkpt-6341.torchjit"
+melgan = "melgan_manyvoice3.0_2020-07-17_12d5838_9920.torchjit"
+
+# --------------- Model configs ---------------
+
+[[model_locations]]
+model_type = "ArpabetGlowTts"
+prod_base_directory = "/data/downloads/downloaded/models/glow-tts-jaywalnut/"
+
+[[model_locations]]
+model_type = "ArpabetGlowTtsMultiSpeaker"
+prod_base_directory = "/data/downloads/downloaded/models/glow-tts-jaywalnut-multispeaker/"
+
+[[model_locations]]
+model_type = "Melgan"
+prod_base_directory = "/data/downloads/downloaded/models/melgan-swpark/"

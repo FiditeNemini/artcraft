@@ -1,0 +1,26 @@
+.git
+.idea/
+cmake-build-debug/
+cycle_gan/
+data/
+examples/
+extra_model/
+node_modules/
+python/
+saved_model/
+saved_model_old/
+tacotron_melgan/
+tacotron_tensorflow/
+target/
+tmp/
+tts_frontend/
+tts_frontend_old/
+voice_conversion_sidecar/
+
+# Ignore Files
+*png
+*pt
+*pyc
+*pyo
+*wav
+*~

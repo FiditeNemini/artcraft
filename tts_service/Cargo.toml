@@ -1,0 +1,47 @@
+[package]
+name = "tts_service"
+edition = "2018"
+version = "0.0.3"
+authors = [
+  "Brandon Thomas <bt@brand.io>",
+  "Brandon Thomas <echelon@gmail.com>",
+]
+publish = false
+
+[[bin]]
+name = "tts_service"
+path = "src/main.rs"
+
+[dependencies]
+actix = "0.9.0"
+actix-cors = "0.2.0"
+actix-files= "0.2.1"
+actix-http = "1.0.0"
+actix-rt = "1.1.1"
+actix-utils = "1.0.3"
+actix-web = "2.0.0"
+anyhow = "1.0.30"
+base64 = "0.12.2"
+chrono = { version = "0.4.11", features = ["serde"] }
+diesel = { version = "1.4.4", features = ["mysql", "r2d2", "chrono"] }
+easyenv = "0.0.4" # my own simple env bootstrapping
+env_logger = "0.7.1"
+futures = "0.1.29"
+hostname = "0.3.1"
+hound = "3.4.0" # wav codec
+limitation = "0.1.1" # redis rate limiter
+log = "0.4.8"
+serde = "1.0.104"
+serde_derive = "1.0.104"
+serde_json = "1.0.56"
+tch = "0.1.7" # libtorch bindings (pytorch)
+toml = "0.5.6"
+
+# TODO: Investigate the following Rate Limiting library
+#rusty_redis_rate_limiting = { git = "https://github.com/tinrab/rusty-redis-rate-limiting", rev = "46d95040708df92d46cef22d319d0182e12a2c0c" }
+
+# My libraries
+arpabet = "2.0.0"
+grapheme_to_phoneme = "0.1.0"
+numerics = "0.0.1"
+sentence = "0.0.2"

@@ -1,0 +1,39 @@
+import React from 'react';
+import Howl from 'howler';
+import { TextAudioPair } from '../../MainComponent';
+import TextAudioTrack from './TextAudioTrack';
+import ApiConfig from '../../../ApiConfig';
+
+interface Props {
+  apiConfig: ApiConfig,
+  utterances: Array<TextAudioPair>
+}
+
+interface State {
+}
+
+class TrackList extends React.Component<Props, State> {
+
+  constructor(props: Props) {
+    super(props);
+  }
+
+  public render() {
+    const tracks = this.props.utterances.map((utterance) =>
+    <TextAudioTrack 
+        key={utterance.text.toString()}
+        apiConfig={this.props.apiConfig}
+        text={utterance.text} 
+        howl={utterance.howl}>
+      {utterance.text}
+    </TextAudioTrack>
+    );
+    return (
+      <div>
+        {tracks}
+      </div>
+    );
+  }
+}
+
+export default TrackList;

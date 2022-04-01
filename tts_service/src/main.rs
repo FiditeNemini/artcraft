@@ -1,0 +1,458 @@
+#![allow(warnings, unused)]
+
+#[macro_use] extern crate anyhow;
+#[macro_use] extern crate diesel;
+#[macro_use] extern crate log;
+#[macro_use] extern crate serde_derive;
+
+extern crate actix_files;
+extern crate actix_web;
+extern crate arpabet;
+extern crate easyenv;
+extern crate hound;
+extern crate serde;
+extern crate tch;
+
+pub mod bonus_voices;
+pub mod database;
+pub mod endpoints;
+pub mod inference;
+pub mod model;
+pub mod rate_limiter;
+pub mod schema;
+pub mod text;
+
+use std::env;
+use std::fmt::Debug;
+use std::fmt::Display;
+use std::path::Path;
+use std::path::PathBuf;
+use std::str::FromStr;
+use std::sync::Arc;
+
+use actix_cors::Cors;
+use actix_files::Files;
+use actix_web::middleware::{Logger, DefaultHeaders};
+use actix_web::{App, HttpResponse, HttpServer, web, http};
+use anyhow::Result as AnyhowResult;
+
+use actix::{Addr, SyncArbiter, Context};
+use arpabet::Arpabet;
+use arpabet::load_cmudict;
+use arpabet::load_from_file as arpabet_load_from_file;
+use crate::bonus_voices::config::BonusEndpointMappings;
+use crate::bonus_voices::config::BonusEndpoints;
+use crate::bonus_voices::endpoints::get_dynamic_early_access_speakers;
+use crate::database::connector::DatabaseConnector;
+use crate::database::sentence_recorder::SentenceRecorder;
+use crate::endpoints::helpers::stats_recorder::StatsRecorder;
+use crate::endpoints::index::get_root;
+use crate::endpoints::liveness::get_liveness;
+use crate::endpoints::models::get_models;
+use crate::endpoints::readiness::get_readiness;
+use crate::endpoints::sentences::get_sentences;
+use crate::endpoints::service_settings::get_service_settings;
+use crate::endpoints::speak::legacy_speak::legacy_get_speak;
+use crate::endpoints::speak::legacy_tts::post_tts;
+use crate::endpoints::speak::speak::post_speak;
+use crate::endpoints::speak::speak_with_spectrogram::post_speak_with_spectrogram;
+use crate::endpoints::speakers::get_early_access_speakers;
+use crate::endpoints::speakers::get_speakers;
+use crate::endpoints::words::get_words;
+use crate::model::model_cache::ModelCache;
+use crate::model::model_config::ModelConfigs;
+use crate::rate_limiter::noop_rate_limiter::NoOpRateLimiter;
+use crate::rate_limiter::rate_limiter::RateLimiter;
+use crate::rate_limiter::redis_rate_limiter::RedisRateLimiter;
+use crate::text::checker::TextChecker;
+use easyenv::get_env_bool_or_default;
+use easyenv::get_env_num;
+use easyenv::get_env_string_optional;
+use easyenv::get_env_string_or_default;
+use easyenv::init_env_logger;
+use grapheme_to_phoneme::Model;
+use limitation::Limiter;
+use std::time::Duration;
+
+const ENV_ALLOW_MODEL_RELOAD : &'static str = "ALLOW_MODEL_RELOAD";
+const ENV_ARPABET_EXTRAS_FILE : &'static str = "ARPABET_EXTRAS_FILE";
+const ENV_ASSET_DIRECTORY: &'static str = "ASSET_DIRECTORY";
+const ENV_ASSET_SUBDIRECTORY_ADMIN: &'static str = "ASSET_SUBDIRECTORY_ADMIN";
+const ENV_ASSET_SUBDIRECTORY_PATREON: &'static str = "ASSET_SUBDIRECTORY_PATREON";
+const ENV_ASSET_SUBDIRECTORY_STATIC: &'static str = "ASSET_SUBDIRECTORY_STATIC";
+const ENV_ASSET_SUBDIRECTORY_TWITCH: &'static str = "ASSET_SUBDIRECTORY_TWITCH";
+const ENV_BIND_ADDRESS: &'static str = "BIND_ADDRESS";
+const ENV_BONUS_VOICES_CONFIG_FILE: &'static str = "BONUS_VOICES_CONFIG_FILE";
+const ENV_DATABASE_ENABLED : &'static str = "DATABASE_ENABLED";
+const ENV_DATABASE_URL : &'static str = "DATABASE_URL";
+const ENV_DEFAULT_SAMPLE_RATE_HZ : &'static str = "DEFAULT_SAMPLE_RATE_HZ";
+const ENV_EARLY_ACCESS_URL : &'static str = "EARLY_ACCESS_URL";
+const ENV_MAX_CHAR_LEN : &'static str = "MAX_CHAR_LEN";
+const ENV_MIN_CHAR_LEN : &'static str = "MIN_CHAR_LEN";
+const ENV_MODEL_CONFIG_FILE: &'static str = "MODEL_CONFIG_FILE";
+const ENV_NUM_WORKERS: &'static str = "NUM_WORKERS";
+const ENV_RATE_LIMITER_ENABLED : &'static str = "RATE_LIMITER_ENABLED";
+const ENV_RATE_LIMITER_MAX_REQUESTS : &'static str = "RATE_LIMITER_MAX_REQUESTS";
+const ENV_RATE_LIMITER_REDIS_HOST : &'static str = "RATE_LIMITER_REDIS_HOST";
+const ENV_RATE_LIMITER_REDIS_PASS: &'static str = "RATE_LIMITER_REDIS_PASS";
+const ENV_RATE_LIMITER_REDIS_PORT : &'static str = "RATE_LIMITER_REDIS_PORT";
+const ENV_RATE_LIMITER_REDIS_USER : &'static str = "RATE_LIMITER_REDIS_USER";
+const ENV_RATE_LIMITER_WINDOW_SECONDS : &'static str = "RATE_LIMITER_WINDOW_SECONDS";
+const ENV_RUST_LOG : &'static str = "RUST_LOG";
+const ENV_STATS_MICROSERVICE_ENABLED : &'static str = "STATS_MICROSERVICE_ENABLED";
+const ENV_STATS_MICROSERVICE_ENDPOINT : &'static str = "STATS_MICROSERVICE_ENDPOINT";
+
+const DEFAULT_ALLOW_MODEL_RELOAD : bool = true;
+const DEFAULT_ASSET_DIRECTORY : &'static str = "/home/bt/dev/voice/voder/frontends";
+const DEFAULT_ASSET_SUBDIRECTORY_ADMIN : &'static str = "admin/build";
+const DEFAULT_ASSET_SUBDIRECTORY_PATREON : &'static str = "twitch-early-access/build";
+const DEFAULT_ASSET_SUBDIRECTORY_STATIC : &'static str = "twitch-early-access/build/static";
+const DEFAULT_ASSET_SUBDIRECTORY_TWITCH : &'static str = "twitch-early-access/build";
+const DEFAULT_BIND_ADDRESS : &'static str = "0.0.0.0:12345";
+const DEFAULT_BONUS_VOICES_CONFIG_FILE: &'static str = "bonus_endpoints.toml";
+const DEFAULT_DATABASE_ENABLED : bool = false;
+const DEFAULT_DATABASE_URL : &'static str = "mysql://root:root@localhost/mumble";
+const DEFAULT_DEFAULT_SAMPLE_RATE_HZ : u32 = 22050;
+const DEFAULT_EARLY_ACCESS_URL : &'static str = "/hidden_early_access";
+const DEFAULT_MAX_CHAR_LEN : usize = 255;
+const DEFAULT_MIN_CHAR_LEN : usize = 0;
+const DEFAULT_MODEL_CONFIG_FILE: &'static str = "models.toml";
+const DEFAULT_NUM_WORKERS : usize = 4;
+const DEFAULT_RATE_LIMITER_ENABLED : bool = true;
+const DEFAULT_RATE_LIMITER_MAX_REQUESTS : usize = 3;
+const DEFAULT_RATE_LIMITER_REDIS_HOST : &'static str = "127.0.0.1";
+const DEFAULT_RATE_LIMITER_REDIS_PORT : u16 = 6379;
+const DEFAULT_RATE_LIMITER_WINDOW_SECONDS : u64 = 10;
+const DEFAULT_RUST_LOG: &'static str = "debug,actix_web=info";
+const DEFAULT_STATS_MICROSERVICE_ENABLED : bool = true;
+const DEFAULT_STATS_MICROSERVICE_ENDPOINT : &'static str = "http://localhost:11111/sentence";
+
+
+/** State that is easy to pass between handlers. */
+pub struct AppState {
+  pub arpabet: Arpabet,
+  pub g2p_model: Model,
+  pub model_configs: ModelConfigs,
+  pub model_cache: ModelCache,
+  pub sentence_recorder: SentenceRecorder,
+  pub text_checker: TextChecker,
+  pub default_sample_rate_hz: u32,
+  pub rate_limiter: Box<dyn RateLimiter>,
+  pub stats_recorder: StatsRecorder,
+  pub allow_model_reload: bool,
+
+  // Bonus voices for "early access" and rewards.
+  pub bonus_endpoint_mappings: BonusEndpointMappings,
+}
+
+/** Startup parameters for the server. */
+#[derive(Clone)]
+pub struct ServerArgs {
+  pub bind_address: String,
+  pub hostname: String,
+  pub num_workers: usize,
+
+  // Directories for web assets
+  pub root_asset_directory: PathBuf,
+  pub patreon_asset_directory: PathBuf,
+  pub twitch_asset_directory: PathBuf,
+  pub admin_asset_directory: PathBuf,
+  pub static_asset_directory: PathBuf, // Subdirectory of the above (TODO: cleanup all of this)
+
+  // Location of the Twitch "early access" endpoint
+  pub early_access_url: String,
+}
+
+pub fn get_rate_limiter_redis() -> AnyhowResult<String> {
+  let redis_host = get_env_string_or_default(ENV_RATE_LIMITER_REDIS_HOST, DEFAULT_RATE_LIMITER_REDIS_HOST);
+  let redis_port = get_env_num::<u16>(ENV_RATE_LIMITER_REDIS_PORT, DEFAULT_RATE_LIMITER_REDIS_PORT)?;
+
+  let address = if let Some(redis_user) = get_env_string_optional(ENV_RATE_LIMITER_REDIS_USER) {
+    if let Some(redis_password) = get_env_string_optional(ENV_RATE_LIMITER_REDIS_PASS) {
+      format!("redis://{}:{}@{}:{}/", redis_user, redis_password, redis_host, redis_port)
+    } else {
+      format!("redis://{}@{}:{}/", redis_user, redis_host, redis_port)
+    }
+  } else {
+    format!("redis://{}:{}/", redis_host, redis_port)
+  };
+
+  Ok(address)
+}
+
+pub fn main() -> AnyhowResult<()> {
+  init_env_logger(Some(DEFAULT_RUST_LOG));
+
+  let arpabet_extras_file = get_env_string_optional(ENV_ARPABET_EXTRAS_FILE);
+  let bind_address = get_env_string_or_default(ENV_BIND_ADDRESS, DEFAULT_BIND_ADDRESS);
+  let model_config_file = get_env_string_or_default(ENV_MODEL_CONFIG_FILE, DEFAULT_MODEL_CONFIG_FILE);
+  let bonus_voices_config_file = get_env_string_or_default(ENV_BONUS_VOICES_CONFIG_FILE, DEFAULT_BONUS_VOICES_CONFIG_FILE);
+  let num_workers = get_env_num::<usize>(ENV_NUM_WORKERS, DEFAULT_NUM_WORKERS)?;
+  let database_enabled = get_env_bool_or_default(ENV_DATABASE_ENABLED, DEFAULT_DATABASE_ENABLED);
+  let database_url = get_env_string_or_default(ENV_DATABASE_URL, DEFAULT_DATABASE_URL);
+  let max_char_len = get_env_num::<usize>(ENV_MAX_CHAR_LEN, DEFAULT_MAX_CHAR_LEN)?;
+  let min_char_len = get_env_num::<usize>(ENV_MIN_CHAR_LEN, DEFAULT_MIN_CHAR_LEN)?;
+  let default_sample_rate_hz = get_env_num::<u32>(ENV_DEFAULT_SAMPLE_RATE_HZ, DEFAULT_DEFAULT_SAMPLE_RATE_HZ)?;
+
+  let limiter_enabled = get_env_bool_or_default(ENV_RATE_LIMITER_ENABLED, DEFAULT_RATE_LIMITER_ENABLED);
+  let limiter_max_requests = get_env_num::<usize>(ENV_RATE_LIMITER_MAX_REQUESTS, DEFAULT_RATE_LIMITER_MAX_REQUESTS)?;
+  let limiter_window_seconds = get_env_num::<u64>(ENV_RATE_LIMITER_WINDOW_SECONDS, DEFAULT_RATE_LIMITER_WINDOW_SECONDS)?;
+
+  let allow_model_reload = get_env_bool_or_default(ENV_ALLOW_MODEL_RELOAD, DEFAULT_ALLOW_MODEL_RELOAD);
+  let stats_recorder_enabled = get_env_bool_or_default(ENV_STATS_MICROSERVICE_ENABLED, DEFAULT_STATS_MICROSERVICE_ENABLED);
+  let stats_recorder_endpoint = get_env_string_or_default(ENV_STATS_MICROSERVICE_ENDPOINT, DEFAULT_STATS_MICROSERVICE_ENDPOINT);
+
+  let asset_directory = get_env_string_or_default(ENV_ASSET_DIRECTORY, DEFAULT_ASSET_DIRECTORY);
+  let asset_subdirectory_admin = get_env_string_or_default(ENV_ASSET_SUBDIRECTORY_ADMIN, DEFAULT_ASSET_SUBDIRECTORY_ADMIN);
+  let asset_subdirectory_patreon = get_env_string_or_default(ENV_ASSET_SUBDIRECTORY_PATREON, DEFAULT_ASSET_SUBDIRECTORY_PATREON);
+  let asset_subdirectory_twitch = get_env_string_or_default(ENV_ASSET_SUBDIRECTORY_TWITCH, DEFAULT_ASSET_SUBDIRECTORY_TWITCH);
+  let asset_subdirectory_static = get_env_string_or_default(ENV_ASSET_SUBDIRECTORY_STATIC, DEFAULT_ASSET_SUBDIRECTORY_STATIC);
+
+  let early_access_url = get_env_string_or_default(ENV_EARLY_ACCESS_URL, DEFAULT_EARLY_ACCESS_URL);
+
+  let server_hostname = hostname::get()
+      .ok()
+      .and_then(|h| h.into_string().ok())
+      .unwrap_or("tts-unknown".to_string());
+
+  let root_asset_directory = Path::new(&asset_directory).to_path_buf();
+  let admin_asset_directory = root_asset_directory.join(asset_subdirectory_admin);
+  let patreon_asset_directory = root_asset_directory.join(asset_subdirectory_patreon);
+  let twitch_asset_directory = root_asset_directory.join(asset_subdirectory_twitch);
+  let static_asset_directory = root_asset_directory.join(asset_subdirectory_static);
+
+  info!("Arpabet extras file: {:?}", arpabet_extras_file);
+  info!("Asset directory: {}", asset_directory);
+  info!("Admin asset directory: {:?}", admin_asset_directory);
+  info!("Patreon asset directory: {:?}", patreon_asset_directory);
+  info!("Twitch asset directory: {:?}", twitch_asset_directory);
+  info!("Static asset directory: {:?}", static_asset_directory);
+
+  info!("Bind address: {}", bind_address);
+  info!("Using model config file: {}", model_config_file);
+  info!("Using bonus voices config file: {}", bonus_voices_config_file);
+  info!("Max character length: {}", max_char_len);
+  info!("Min character length: {}", min_char_len);
+  info!("Hostname: {}", server_hostname);
+  info!("Default sample rate hz: {}", default_sample_rate_hz);
+
+  info!("Rate Limiter enabled: {}", limiter_enabled);
+  info!("Rate Limiter max requests: {}", limiter_max_requests);
+  info!("Rate Limiter window seconds: {}", limiter_window_seconds);
+
+  info!("Stats Recorder Enabled: {}", stats_recorder_enabled);
+  info!("Stats Recorder Endpoint: {}", stats_recorder_endpoint);
+
+  let model_configs = ModelConfigs::load_from_file(&model_config_file);
+
+  info!("Model configs: {:?}", model_configs);
+
+  let bonus_endpoints = BonusEndpoints::load_from_file(&bonus_voices_config_file)?;
+
+  info!("Bonus endpoints: {:?}", bonus_endpoints);
+
+  let bonus_endpoint_mappings = bonus_endpoints.to_mappings()?;
+
+  let model_cache = ModelCache::new(&model_configs.model_locations);
+
+  let rate_limiter : Box<dyn RateLimiter> = if limiter_enabled {
+    let redis_address = get_rate_limiter_redis()?;
+    info!("Redis connection string: {} ; connecting...", redis_address);
+
+    let limiter = Limiter::build(&redis_address)
+        .limit(limiter_max_requests)
+        .period(Duration::from_secs(limiter_window_seconds))
+        .finish()?;
+
+    Box::new(RedisRateLimiter::new(limiter))
+  } else {
+    info!("Not using Redis. Installing NoOp limiter.");
+    Box::new(NoOpRateLimiter {})
+  };
+
+  let sentence_recorder = if database_enabled {
+    info!("Connecting to database...");
+    let mut db_connector = DatabaseConnector::create(&database_url);
+
+    match db_connector.connect() {
+      Ok(_) => info!("Connected successfully"),
+      Err(_) => error!("Could not connect to database."),
+    }
+
+    SentenceRecorder::new(db_connector)
+  } else {
+    info!("Not using database; will not record sentences.");
+    SentenceRecorder::no_op_recoder()
+  };
+
+  let max_char_len = if max_char_len == 0 { None } else { Some(max_char_len) };
+  let min_char_len = if min_char_len == 0 { None } else { Some(min_char_len) };
+
+  let mut text_checker = TextChecker::create();
+  text_checker.set_max_character_length(max_char_len);
+  text_checker.set_min_character_length(min_char_len);
+
+  let arpabet : Arpabet = match arpabet_extras_file {
+    Some(extras_filename) => {
+      info!("Loading default CMUdict Arpabet...");
+      // Here we introduce silly internet words such as "lulz".
+      // NB: The extras file takes precedence for any dictionary collisions.
+      let cmu_dict = load_cmudict();
+      info!("Loading Arpabet extensions...");
+      let extra_arpabet = arpabet_load_from_file(&extras_filename)?;
+      let arpabet = cmu_dict.combine(&extra_arpabet);
+      arpabet.clone()
+    },
+    None => {
+      info!("Loading default CMUdict Arpabet...");
+      load_cmudict().clone()
+    },
+  };
+
+  info!("Arpabet loaded. {} entries", arpabet.len());
+
+  info!("Loading G2P model...");
+
+  let g2p_model = Model::load_in_memory()?;
+
+  info!("G2P model loaded.");
+
+  let stats_recorder = StatsRecorder::new(&stats_recorder_endpoint, stats_recorder_enabled);
+
+  let app_state = AppState {
+    arpabet,
+    g2p_model,
+    model_configs,
+    model_cache,
+    sentence_recorder,
+    text_checker,
+    default_sample_rate_hz,
+    rate_limiter,
+    stats_recorder,
+    allow_model_reload,
+    bonus_endpoint_mappings,
+  };
+
+  let server_args = ServerArgs {
+    bind_address,
+    hostname: server_hostname,
+    num_workers,
+    root_asset_directory,
+    twitch_asset_directory,
+    static_asset_directory,
+    patreon_asset_directory,
+    admin_asset_directory,
+    early_access_url,
+  };
+
+  run_server(app_state, server_args)?;
+  Ok(())
+}
+
+#[actix_rt::main]
+async fn run_server(app_state: AppState, server_args: ServerArgs) -> std::io::Result<()>
+{
+  let bonus_urls : Vec<String> = app_state.bonus_endpoint_mappings.url_slug_to_voices.keys()
+      .map(|k| k.clone())
+      .collect();
+
+  let arc = web::Data::new(Arc::new(app_state));
+
+  info!("Starting HTTP service.");
+
+  let log_format = "[%{HOSTNAME}e] %a \"%r\" %s %b \"%{Referer}i\" \"%{User-Agent}i\" %T";
+
+  let admin_asset_directory = server_args.admin_asset_directory.clone();
+  let patreon_asset_directory = server_args.patreon_asset_directory.clone();
+  let twitch_asset_directory = server_args.twitch_asset_directory.clone();
+  let static_asset_directory = server_args.static_asset_directory.clone();
+
+  let bind_address = server_args.bind_address.clone();
+  let server_hostname = server_args.hostname.clone();
+
+  let early_access_url = server_args.early_access_url.clone();
+
+  HttpServer::new(move || {
+    let mut app = App::new()
+        .wrap(Cors::new()
+            .allowed_origin("http://localhost:12345")
+            .allowed_origin("http://localhost:3000")
+            .allowed_origin("http://localhost:5555")
+            .allowed_origin("http://localhost:8080")
+            .allowed_origin("http://localhost:8000")
+            .allowed_origin("http://localhost:7000")
+            .allowed_origin("http://jungle.horse")
+            .allowed_origin("https://jungle.horse")
+            .allowed_origin("http://mumble.stream")
+            .allowed_origin("https://mumble.stream")
+            .allowed_origin("http://trumped.com")
+            .allowed_origin("https://trumped.com")
+            .allowed_origin("http://vo.codes")
+            .allowed_origin("https://vo.codes")
+            .allowed_origin("http://vocodes.com")
+            .allowed_origin("https://vocodes.com")
+            .allowed_origin("http://www.fakeyou.com")
+            .allowed_origin("https://www.fakeyou.com")
+            .allowed_origin("http://fakeyou.com")
+            .allowed_origin("https://fakeyou.com")
+            .allowed_methods(vec!["GET", "POST", "OPTIONS"])
+            .allowed_headers(vec![
+              http::header::ACCEPT,
+              http::header::ACCESS_CONTROL_ALLOW_ORIGIN, // Tabulator Ajax
+              http::header::CONTENT_TYPE,
+              http::header::HeaderName::from_static("x-requested-with") // Tabulator Ajax sends
+            ])
+            .max_age(3600)
+            .finish())
+        .wrap(Logger::new(&log_format)
+            .exclude("/liveness")
+            .exclude("/readiness"))
+        .wrap(DefaultHeaders::new().header("X-Backend-Hostname", &server_hostname))
+        // Admin UI & old frontend
+        .service(Files::new("/frontend", admin_asset_directory.clone())
+            .index_file("FAKE_INDEX.HTML"))
+        .service(Files::new("/adminui", admin_asset_directory.clone())
+            .index_file("index.html"))
+        // Early access static path for assets
+        .service(Files::new("/static", static_asset_directory.clone())
+            .index_file("FAKE_INDEX.HTML"))
+        .service(
+          web::resource("/advanced_tts")
+              .route(web::post().to(post_tts))
+              .route(web::head().to(|| HttpResponse::Ok()))
+        )
+        .service(
+          web::resource("/speak")
+              .route(web::post().to(post_speak))
+              .route(web::get().to(legacy_get_speak))
+              .route(web::head().to(|| HttpResponse::Ok()))
+        )
+        .service(
+          web::resource("/speak_spectrogram")
+              .route(web::post().to(post_speak_with_spectrogram))
+              .route(web::head().to(|| HttpResponse::Ok()))
+        )
+        .service(get_liveness)
+        .service(get_models)
+        .service(get_readiness)
+        .service(get_root)
+        .service(get_sentences)
+        .service(get_service_settings)
+        .service(get_speakers)
+        .service(get_early_access_speakers)
+        .service(get_dynamic_early_access_speakers)
+        .service(get_words);
+
+      for key in bonus_urls.iter() {
+        let url = format!("/{}", key);
+        app = app.service(Files::new(&url, twitch_asset_directory.clone())
+            .index_file("index.html"));
+      }
+
+      app.app_data(arc.clone())
+    })
+    .bind(bind_address)?
+    .workers(server_args.num_workers)
+    .run()
+    .await
+}

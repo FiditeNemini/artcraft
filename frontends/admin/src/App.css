@@ -1,0 +1,27 @@
+.App {
+  text-align: center;
+}
+
+.track {
+  margin: 10px auto;
+  width: 600px;
+  border: 1px solid #ccc;
+  padding: 1em 1em 1em 0;
+  text-align: left;
+}
+
+.play_button,
+.reload_button {
+  size: 4em;
+  padding: 1em;
+  background-color: #ccc;
+  cursor: pointer;
+}
+
+.track_text {
+  margin-left: 0.5em;
+}
+
+canvas#spectrogram {
+  transform: scaleY(-1); /* Spectrograms are flipped */
+}

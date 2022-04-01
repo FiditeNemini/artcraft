@@ -1,0 +1,43 @@
+# =================
+# Bonus Voices
+#  `http_endpoint` is what binds the URL the voices will be hosted on.
+#  There is a JSON endpoint and an HTTP endpoint that hosts the
+#  frontend, and both use the same string.
+# =================
+
+# Testing
+[[bonus_endpoints]]
+http_endpoint = "gotta_go_fast"
+voices = [
+    "knuckles",
+    "sonic",
+    "tails",
+]
+
+# Twitter Campaign
+[[bonus_endpoints]]
+http_endpoint = "hold_on_to_your_butts"
+voices = [
+    "samuel-l-jackson",
+]
+
+# Twitch Stream
+[[bonus_endpoints]]
+http_endpoint = "twitch_stream"
+voices = [
+    "samuel-l-jackson",
+    "tom-hanks",
+    "hank-hill",
+]
+
+# Patreon Gets Everything
+[[bonus_endpoints]]
+http_endpoint = "patreon-thanks"
+voices = [
+    "hank-hill",
+    "knuckles",
+    "sailor-moon",
+    "samuel-l-jackson",
+    "tails",
+    "tom-hanks",
+]

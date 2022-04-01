@@ -1,0 +1,16 @@
+[package]
+edition = "2018"
+name = "voder"
+version = "0.0.0"
+authors = [ "Brandon Thomas <bt@brand.io>",
+            "Brandon Thomas <echelon@gmail.com>" ]
+
+[workspace]
+members = [
+  "tts_service",
+]
+
+default-members = [
+  "tts_service",
+]
+
