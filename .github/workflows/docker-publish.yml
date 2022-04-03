@@ -10,7 +10,7 @@ on:
       #- $default-branch
       - master
 env:
-  IMAGE_NAME: storyteller-web
+  IMAGE_NAME: storyteller-rust
 
 jobs:
   # Push image to GitHub Packages.
