@@ -9,6 +9,7 @@ Status:
 - `old_a`: storyteller-web (FakeYou, Storyteller)
 - `old_b`: cloudcam w/ working green screen GUI
 - `old_c`: cloudcam w/ ZeroMQ protocol that talks to Unreal Engine "CloudCamPlugin"
+- `old_d`: old voder (vocodes 1.0, I think)
 
 TODO: 
 
