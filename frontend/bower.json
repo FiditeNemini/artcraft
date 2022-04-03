@@ -1,0 +1,21 @@
+{
+  "name": "jungle.horse",
+  "description": "none",
+  "main": "",
+  "authors": [
+    "Brandon Thomas <echelon@gmail.com>"
+  ],
+  "license": "none",
+  "homepage": "https://github.com/echelon/trumpet",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "buzz": "^1.2.0"
+  }
+}

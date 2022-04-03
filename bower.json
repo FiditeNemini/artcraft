@@ -1,0 +1,22 @@
+{
+  "name": "trumpet",
+  "moduleType": [],
+  "license": "none",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "web/components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "jquery": "~2.2.0",
+    "underscore": "~1.8.3",
+    "urijs": "uri.js#~1.17.0",
+    "SoundJS": "~0.6.2",
+    "buzz": "~1.1.10",
+    "wavesurfer.js": "^1.1.12"
+  }
+}

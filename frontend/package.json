@@ -1,0 +1,16 @@
+{
+  "dependencies": {
+    "bower": "^1.7.9",
+    "buzz": "^1.2.0",
+    "jquery": "^3.0.0",
+    "pixi.js": "^4.1.0",
+    "ts-loader": "^0.8.2",
+    "typescript": "^1.8.10",
+    "urijs": "^1.18.2",
+    "vue": "^1.0.28",
+    "wavesurfer.js": "^1.1.12"
+  },
+  "devDependencies": {
+    "webpack": "^1.13.3"
+  }
+}

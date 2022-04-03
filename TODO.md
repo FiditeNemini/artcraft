@@ -1,0 +1,149 @@
+Trumped TODO
+============
+
+Improve synthesis system
+------------------------
+- Speech modes:
+  - "SHOUT" words for emphasis.
+  - Question intonation in interrogative sentences.
+  - Clear conjection words: "But I think..." vs. "Blah blah, BUT blah blah blah."
+- Arpabet where the numbers are parameters: AW(0), AW(2), etc.
+- Multiple word samples with unit selection
+- Pluralization
+
+Words to Fix
+------------
+- you're / your is 'yer'. too short.
+- want is 'wan'. too short.
+- that's
+- 'what' is 'wet'. bad.
+
+# Needed words
+- need
+- shut up
+- suck/sucks
+- tell
+- idea
+
+# Shout words
+- die
+- favorite
+- hands
+- tiny
+
+# Phonemes to fix
+- BReak
+- badASS
+- deMAND
+- naME
+- thinKING
+- unfortuNate
+
+OLD Last Minute Burndown
+------------------------
+- Disable volume and speed parameters.
+- In-Memory LRU Cache
+
+- Better audio samples
+  - Multiple "umm" / "uhh" samples
+  - Fix words that sound bad
+
+- User input filtering
+  - Strip spaces in frontend.
+  - Make sure there's no XSS injection.
+  - Remove speed query parameter (for now).
+
+- Frontend filesize
+  - Downscale the animation. Maybe make a sprite sheet?
+
+OLD Super Low Priority
+----------------------
+- Frontend filesize:
+  - Progressive loading of the animation (involved).
+  - Zepto.js
+  - Remove pixi.js dependency
+
+OLDER Old Goals
+---------------
+
+*HIGH LEVEL GOALS*
+  1. Sound better
+  2. Handle load
+  3. Recoup costs
+  4. Look good (UI, speaking capability) - good reflection
+  5. Good code
+
+Audio Samples
+  - Remove extra space between words (using parsing to insert spacing)
+  - Phonemes
+    - Real versions of ['AO0', 'AW0', 'AW2', 'AY0', 'EY0', 'OY0', 'UH0'], which
+      were backfilled with fakes.
+
+Scaling
+  1. Load test
+  2. Read wave files into memory
+  3. Multi-server, with nginx as load balancer
+  4. Prevent others from calling it
+  5. Caching strategy
+    - Caching headers (make sure they work)
+    - Filter strings clientside to boost savings.
+
+Tokenizing
+  - Plurals
+  - Times (9 p.m. ET)
+
+Parsing
+  - (Everything in tokenizing)
+  - Decimal numbers
+  - Collapse pauses, eg: "Foo,,," -> "Foo (breath)"
+  - Numbers that are years (2016)!
+  - Twitter hashtags, usernames - conjoined word parsing (difficult)
+
+Synthesis
+  - Get rid of static with "Uhhh", "Ummm" of variable length (option).
+  - Syllable System:
+    - http://cdmckay.org/blog/2012/08/15/counting-syllables-and-detecting-rhyme-in-php/
+    - http://stackoverflow.com/questions/33111685/convert-arpabet-to-ipa-with-stress
+    - Or scrape something:
+      - http://www.syllablecount.com/syllables/biologically
+
+Cleanup
+  - Refactor into a very well-defined "SpeakRequest" with all
+    parameters, including new ones like "is_twitter",
+    "missing_word_mode = slience, record_pop, umm", etc.
+  - Remove old query parameters
+  - Set default volume
+
+Server
+  1. Favicon, .ico and apple icon
+  2. robots.txt
+
+Hardening
+  1. Reduce API surface
+  2. Limit length of input sentences
+  3. Rate limiting
+
+Presentation
+  - Better frontend UI
+  - Testing page (current frontend)
+
+Monetization
+  - Can I get sued?
+  - Ads
+  - Native Apps
+    - (I don't have time to learn this.)
+    - Contact other developers?
+    - PhoneGap? (Blah)
+
+Extra
+  - Clientside speed changing
+  - Let people type nonsense syllables
+
+OLD Parsing Examples
+--------------------
+- Camel case even outside of hashtags:
+  - "Google acquires FameBit", StateOfW, AdaLovelaceDay
+- Hyphenated: 2-party
+- They will get horrible sentences, violently.We have the support.#RepealThe1st
+- #100YearsStrong
+

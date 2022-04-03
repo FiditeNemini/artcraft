@@ -1,0 +1,98 @@
+; Abbreviations
+; ---------------------------
+AFAIK  as far as i know
+AFK  away from keyboard
+BBL  be back later
+BRB  be right back
+DT  donald trump
+FML  fuck my life
+FTL  faster than light
+FU  fuck you
+FWIW  for what it's worth
+GTFO  get the fuck out
+H8  hate
+HBU  how about you
+HC  hillary clinton
+HN  hacker news
+IANAL  i am not a lawyer
+IDK  i don't know
+IIRC  if i recall correctly
+IMHO  in my humble opinion
+IOT  internet of things
+IRL  in real life
+LLAP  live long and prosper
+OMFG  oh my fucking god
+OMG  oh my god
+RT  retweet
+TBH  to be honest
+TTYL  talk to you later
+WRT  with regard to
+WTF  what the fuck
+WYSIWYG  what you see is what you get
+
+; Corrections
+; This is a hack. They'll simply work due to the order of parsing.
+; ---------------------------
+911  nine one one
+DAMNIT  damn it
+WWI  world war one
+WWII  world war two
+WWIII  world war three
+w/  with
+
+; States
+; Some of these are commented out as they may interfere with words
+; that are more common than the state abbreviation.
+; ---------------------------
+; AL  Alabama
+; CO  Colorado
+; DC  District of Columbia
+; DE  Delaware
+; HI  Hawaii
+; ID  Idaho
+; IN  Indiana
+; LA  Louisiana
+; MA  Massachusetts
+; ME  Maine
+; MI  Michigan
+; MO  Missouri
+; MS  Mississippi
+; MT  Montana
+; OH  Ohio
+; OK  Oklahoma
+; OR  Oregon
+; PA  Pennsylvania
+; SD  South Dakota
+; ---------------------------
+AK  Alaska
+AR  Arkansas
+AZ  Arizona
+CA  California
+CT  Connecticut
+FL  Florida
+GA  Georgia
+IA  Iowa
+IL  Illinois
+KS  Kansas
+KY  Kentucky
+MD  Maryland
+MN  Minnesota
+NC  North Carolina
+ND  North Dakota
+NE  Nebraska
+NH  New Hampshire
+NJ  New Jersey
+NM  New Mexico
+NV  Nevada
+NY  New York
+RI  Rhode Island
+SC  South Carolina
+TN  Tennessee
+TX  Texas
+UT  Utah
+VA  Virginia
+VT  Vermont
+WA  Washington
+WI  Wisconsin
+WV  West Virginia
+WY  Wyoming

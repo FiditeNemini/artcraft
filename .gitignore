@@ -1,0 +1,16 @@
+*~
+.idea/libraries/Cargo__trumpet_.xml
+.idea/workspace.xml
+bower_components/
+docker/*zip
+docker/files/
+node_modules/
+sounds/
+target/
+web/*.css
+web/*.js
+web/deploy/
+web/images/
+web/output/
+brandon.audio/deploy/
+brandon.audio/output/

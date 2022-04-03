@@ -1,0 +1,36 @@
+# Configs for the server.
+
+[default] # Production
+  use_caching_headers = true
+  sound_path = "./sounds"
+  html_path = "./web"
+  phoneme_dictionary_file = "./dictionary/cmudict-0.7b"
+  arpabet_override_dictionary_file = "./dictionary/cmu-changeset"
+  extra_dictionary_file = "./dictionary/extra-dict"
+  square_dictionary_file = "./dictionary/square-dict"
+  abbreviation_file = "./dictionary/abbreviations.dict"
+
+  # Input control. Respond with 400 when over limit.
+  max_num_characters = 255
+  max_num_words = 100
+
+  # Logging verbosity
+  log_handler = false
+  log_parsing = false
+  log_raw_sentence = true
+  log_syllable_decomposition = false
+  log_synthesis = false
+  log_timing  = true
+
+[x16] # Local Development
+  use_caching_headers = false
+  sound_path = "/home/bt/Dropbox/jungle.horse/sounds"
+
+  # Logging verbosity
+  log_handler = false
+  log_parsing = true
+  log_raw_sentence = true
+  log_syllable_decomposition = true
+  log_synthesis = true
+  log_timing  = false
+
