@@ -8,7 +8,7 @@ TODO:
 - Merge in other frontends
 - Merge with backend and use protos for API?
 - Rename this repo to `storyteller-frontend`
-- Upgrade to React 18
+- ~~Upgrade to React 18~~ Carefully upgrade react. OMG. Also tests in place to ensure builds.
 
 Develop locally without CORS:
 ------------
