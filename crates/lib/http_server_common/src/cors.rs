@@ -38,7 +38,7 @@ pub fn build_common_cors_config() -> Cors {
       .allowed_origin("http://fakeyou.com")
       .allowed_origin("https://api.fakeyou.com")
       .allowed_origin("https://fakeyou.com")
-      // Storyteller
+      // Storyteller.io
       .allowed_origin("http://api.storyteller.io")
       .allowed_origin("http://create.storyteller.io")
       .allowed_origin("http://obs.storyteller.io")
@@ -49,6 +49,15 @@ pub fn build_common_cors_config() -> Cors {
       .allowed_origin("https://obs.storyteller.io")
       .allowed_origin("https://storyteller.io")
       .allowed_origin("https://ws.storyteller.io")
+      // Storyteller.stream
+      .allowed_origin("http://api.storyteller.stream")
+      .allowed_origin("http://obs.storyteller.stream")
+      .allowed_origin("http://storyteller.stream")
+      .allowed_origin("http://ws.storyteller.stream")
+      .allowed_origin("https://api.storyteller.stream")
+      .allowed_origin("https://obs.storyteller.stream")
+      .allowed_origin("https://storyteller.stream")
+      .allowed_origin("https://ws.storyteller.stream")
       // Trumped (legacy)
       .allowed_origin("http://trumped.com")
       .allowed_origin("https://trumped.com")
