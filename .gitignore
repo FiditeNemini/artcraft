@@ -11,6 +11,7 @@ models/Wav2Lip/python/
 models/tacotron2/python/
 production_database_secret_connect.sh
 production_database_secret_query.sh
+production_database_voice_clone_report_download.sh
 secrets.toml
 secrets.yaml
 target/
