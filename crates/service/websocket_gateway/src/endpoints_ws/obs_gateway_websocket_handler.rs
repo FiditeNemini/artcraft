@@ -30,6 +30,7 @@ use twitch_api2::pubsub::TopicData::ChannelPointsChannelV1;
 use twitch_api2::pubsub::channel_bits::ChannelBitsEventsV2Reply::BitsEvent;
 use twitch_api2::pubsub;
 use twitch_common::twitch_user_id::TwitchUserId;
+use crate::endpoints_ws::helpers::publish_active_browser_info::publish_active_browser_info;
 
 // TODO: Redis calls are synchronous (but fast), but is there any way to make them async?
 
@@ -100,18 +101,9 @@ pub async fn obs_gateway_websocket_handler(
         CommonServerError::ServerError
       })?;
 
-  let channel = RedisKeys::obs_active_sessions_topic();
-
-  let payload = ObsActivePayload::new(&token_record.twitch_user_id);
-  let json_payload = payload.serialize()
+  publish_active_browser_info(&mut redis, twitch_user_id.get_str())
       .map_err(|e| {
-        error!("Could not serialize JSON: {:?}", e);
-        CommonServerError::ServerError
-      })?;
-
-  let _count_received : Option<u64> = redis.publish(channel, &json_payload)
-      .map_err(|e| {
-        warn!("redis error: {:?}", e);
+        error!("Error publishing active browser session: {:?}", e);
         CommonServerError::ServerError
       })?;
 
@@ -168,19 +160,9 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for ObsGatewayWebSock
             CommonServerError::ServerError
           }).unwrap(); // TODO: FIXME
 
-      let channel = RedisKeys::obs_active_sessions_topic();
-
-      let payload = ObsActivePayload::new(self.twitch_user_id.get_str());
-
-      let json_payload = payload.serialize()
+      publish_active_browser_info(&mut redis, self.twitch_user_id.get_str())
           .map_err(|e| {
-            error!("Could not serialize JSON: {:?}", e);
-            CommonServerError::ServerError
-          }).unwrap(); // TODO: FIXME
-
-      let _count_received : Option<u64> = redis.publish(channel, &json_payload)
-          .map_err(|e| {
-            warn!("redis error: {:?}", e);
+            error!("Error publishing active browser session: {:?}", e);
             CommonServerError::ServerError
           }).unwrap(); // TODO: Fixme
 
