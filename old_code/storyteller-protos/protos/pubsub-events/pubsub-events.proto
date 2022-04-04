@@ -1,0 +1,191 @@
+syntax = 'proto2';
+
+package storyteller.pubsub;
+
+// Ingestion platforms are "dumb" and shouldn't have much logic in them.
+// (Granted, we might eventually grow to send them back messages.)
+//
+// The "enricher" is the smarts. It does denylisting, rate limiting, 
+// service calls, transforms, etc.
+//
+// What if we need to scale? Several ideas: Sharding (redis db indices), 
+// brokers with read-once semantics (our own intelligence - UUIDs with 
+// transactional semantics in MySQL).
+//
+// Events coming from multiple sources
+message PubsubEventPayloadV1 {
+
+  // TODO: This should all be merged in the future, but I need to settle on proto2 vs proto3
+  // And I also need to figure out package names, etc.
+  enum IngestionSourceType {
+    IST_DO_NOT_USE = 0;
+    IST_ADMIN_PANEL = 1;
+    IST_VOCODES_WEBSITE = 2;
+    IST_TWITCH = 3;
+    IST_TWITTER = 4;
+    IST_DISCORD = 5;
+    IST_YOUTUBE = 6;
+    IST_REDDIT = 7;
+    IST_TIKTOK = 8;
+  }
+
+  // These will differ from the "enriched" types.
+  enum IngestionPayloadType {
+    IPT_DO_NOT_USE = 0;
+
+    // Twitch-specific events.
+    TWITCH_MESSAGE = 100; // This can encode lots of things.
+    TWITCH_SUBSCRIBED = 101;
+
+    // Twitter-specific events.
+    TWITTER_FOLLOW = 200;
+    TWITTER_RETWEET = 201;
+    TWITTER_MENTION = 202;
+
+    // Discord-specific events.
+    DISCORD_MESSAGE = 300;
+    DISCORD_JOINED = 301;
+
+    // YouTube-specific events.
+    YOUTUBE_SUBSCRIBED = 400;
+
+    // Reddit-specific events.
+    REDDIT_MESSAGE = 500;
+  }
+
+  // Source of the event.
+  optional IngestionSourceType ingestion_source_type = 1;
+  optional IngestionPayloadType ingestion_payload_type = 2;
+
+  // A binary-encoded proto whose type is based on IngestionSourceType
+  optional bytes ingestion_source_data = 3;
+
+  // A binary-encoded proto whose type is based on IngestionPayloadType
+  optional bytes ingestion_payload_data = 4;
+
+  // An optional debug message.
+  optional string debug_message = 5;
+}
+
+// ============================== SOURCE PROTOS ============================== //
+
+
+message IngestionTwitchMetadata {
+  // Optional. Fields describing the user that sent the message.
+  optional int64 user_id = 1;
+  optional string username = 2;
+  optional bool user_is_mod = 3;
+  optional bool user_is_subscribed = 4;
+
+  // Optional. Name of the channel, prefixed with hash. eg. `#vocodes`.
+  optional string channel = 5;
+}
+
+
+message IngestionTwitterMetadata {
+  // Optional. Fields describing the user that sent the message.
+
+  // TODO: This is a u64. We need to be careful with math to assure non-overflow.
+  //optional int64 user_id = 1;
+
+  optional string username = 2;
+  optional string display_name = 3;
+  optional string avatar_url = 4;
+}
+
+
+message IngestionDiscordMetadata {
+  // Optional. Fields describing the user that sent the message.
+  optional string username = 1;
+}
+
+
+message IngestionYoutubeMetadata {
+  // Optional. Fields describing the user that sent the message.
+  optional string username = 1;
+}
+
+
+message IngestionRedditMetadata {
+  // Optional. Fields describing the user that sent the message.
+  optional string username = 1;
+}
+
+
+message IngestionTikTokMetadata {
+  // Optional. Fields describing the user that sent the message.
+  optional string username = 1;
+}
+
+
+// ============================== TWITCH PAYLOAD PROTOS ============================== //
+
+
+// These are raw messages from Twitch that we send to the PubSub enricher.
+message IngestionTwitchMessage {
+  // TODO: DEPRECATE THESE
+  optional int64 user_id = 1;
+  optional string username = 2;
+  optional bool is_mod = 3;
+  optional bool is_subscribed = 4;
+
+  // TODO: DEPRECATE THESE
+  // Name of the channel, prefixed with hash. eg. `#vocodes`.
+  optional string channel = 5;
+
+  // Actual message. Doesn't need to be trimmed.
+  optional string message_contents = 6;
+}
+
+
+message IngestionTwitchSubscribed {
+  // Intentionally blank for now
+}
+
+
+// ============================== TWITTER PAYLOAD PROTOS ============================== //
+
+
+message IngestionTwitterFollow {
+  // Intentionally blank for now
+}
+message IngestionTwitterRetweet {
+  // Intentionally blank for now
+  optional string original_text = 1;
+}
+message IngestionTwitterMention {
+  // Intentionally blank for now
+  optional string text = 1;
+}
+
+
+// ============================== DISCORD PAYLOAD PROTOS ============================== //
+
+
+message IngestionDiscordMessage {
+  // Raw message. Needs to be trimmed
+  optional string message_contents = 6;
+}
+
+message IngestionDiscordJoined {
+  // Intentionally blank for now
+}
+
+
+// ============================== YOUTUBE PAYLOAD PROTOS ============================== //
+
+
+message IngestionYoutubeSubscribed {
+  // Intentionally blank for now
+}
+
+
+
+// ============================== REDDIT PAYLOAD PROTOS ============================== //
+
+
+message IngestionRedditMessage {
+  // Raw message. Needs to be trimmed
+  optional string message_contents = 6;
+}
+

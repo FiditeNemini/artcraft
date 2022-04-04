@@ -1,0 +1,3 @@
+[submodule "protos/storyteller-protos"]
+	path = old_code/twitch-ingestion-client/protos/storyteller-protos
+	url = git@github.com:storytold/storyteller-protos.git

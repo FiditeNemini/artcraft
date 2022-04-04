@@ -1,0 +1,36 @@
+[package]
+name = "twitch-ingestion-client"
+version = "0.0.0"
+edition = "2018"
+authors = [
+  "Brandon Thomas <bt@brand.io>",
+  "Brandon Thomas <echelon@gmail.com>"
+]
+
+[[bin]]
+name = "twitch-ingestion-client"
+path = "src/main.rs"
+
+[dependencies]
+anyhow = "1.0.38"
+easyenv = "0.0.5"
+log = "0.4.14"
+prost = "0.7.0"
+rustls = "0.18"
+serde = "1.0.123"
+serde_derive = "1.0.123"
+tokio = { version = "0.2", features = ["full"] }
+toml = "0.5.8"
+
+redis = { version = "0.17.0", features = ["tls", "async-std-tls-comp", "tokio-tls-comp", "connection-manager"] }
+
+# Twitch Helix etc. API, but no PubSub just yet
+#twitch_api2 = "0.4.1"
+#twitch_oauth2 = "0.4.1"
+
+# Fairly mature and robust Twitch chat library
+twitchchat = { version = "0.14.8", features = ["tokio", "tokio-util", "async", "webpki-roots", "tokio-rustls"] }
+
+[build-dependencies]
+anyhow = "1.0.38"
+prost-build = "0.7.0"

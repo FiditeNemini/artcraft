@@ -1,0 +1,13 @@
+#!/bin/sh
+
+# We can't run this as a CronJob since it isn't guaranteed to be scheduled
+# to the same nodes. (Maybe there's a way for Kubernetes to do that?)
+
+mkdir -p "${DOWNLOAD_DIR}"
+mkdir -p "${TEMP_DIR}"
+
+while :; do
+  ./discord-vocodes
+  echo "Sleeping for ${SLEEP_TIMEOUT} seconds at $(date)"
+  sleep "${SLEEP_TIMEOUT}"
+done

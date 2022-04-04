@@ -1,0 +1,11 @@
+.git
+.idea/
+target/
+
+# Ignore Files
+*png
+*pt
+*pyc
+*pyo
+*wav
+*~
