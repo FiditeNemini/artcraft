@@ -152,13 +152,8 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for ObsGatewayWebSock
       // TODO: Error handling.
       // TODO: Reconnecting.
 
-      let mut redis = self.server_state.backends
-          .redis_pool
-          .get()
-          .map_err(|err| {
-            error!("Could not get Redis: {:?}", err);
-            CommonServerError::ServerError
-          }).unwrap(); // TODO: FIXME
+      // TODO: Fix unwraps.
+      let mut redis = self.get_redis().unwrap();
 
       publish_active_browser_info(&mut redis, self.twitch_user_id.get_str())
           .map_err(|e| {
@@ -169,25 +164,11 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for ObsGatewayWebSock
       // TODO: This should be done *BEFORE* PubSub
       self.write_obs_active().unwrap();
 
+      // TODO: Redis LPOP supports a number of list items to pop, but apparently it's broken in the
+      //  Rust API bindings (?). When I last deployed this, though the code compiled, it broke.
+      //  It would be a nice optimization to make.
+
       let redis_key = RedisKeys::twitch_tts_job_queue(&self.twitch_user_id.get_str());
-//      let values : Vec<String> = redis.lpop((&redis_key, 5)).unwrap(); // TODO: Error handling
-//
-//      if !values.is_empty() {
-//        info!("Got {} TTS values", values.len());
-//
-//        let payload = FrontendEventPayload {
-//          tts_job_tokens: values,
-//        };
-//
-//        match serde_json::to_string(&payload) {
-//          Ok(json) => {
-//            ctx.text(json);
-//          },
-//          Err(e) => {
-//            error!("Error with JSON payload: {:?}", e);
-//          }
-//        }
-//      }
 
       let lookup_result : Option<String> = redis.lpop(&redis_key).unwrap(); // TODO: Error handling
       let mut values = Vec::new();
