@@ -12,10 +12,6 @@ publish = false
 name = "websocket-gateway"
 path = "src/main.rs"
 
-[[bin]]
-name = "twitch-pubsub-job"
-path = "src/twitch_pubsub_job.rs"
-
 [dependencies]
 
 # Internal
