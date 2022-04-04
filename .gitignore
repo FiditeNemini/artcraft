@@ -1,0 +1,8 @@
+*.swo
+*.swp
+*~
+.env
+.idea/
+__pycache__/
+secrets.toml
+target/
