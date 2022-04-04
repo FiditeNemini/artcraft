@@ -1,0 +1,6 @@
+*~
+.env
+.idea/
+secrets.toml
+secrets.yaml
+target/
