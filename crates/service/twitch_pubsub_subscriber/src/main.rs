@@ -104,17 +104,13 @@ pub async fn main() -> AnyhowResult<()> {
       .enable_all()
       .build()?;
 
-  let runtime = Arc::new(runtime);
-
   // https://docs.rs/tokio/latest/tokio/runtime/struct.Builder.html
-  let runtime_2 = Builder::new_multi_thread()
+  let runtime_2 = Arc::new(Builder::new_multi_thread()
       .worker_threads(8)
       .thread_name("twitch-pubsub-")
       .thread_stack_size(3 * 1024 * 1024)
       .enable_all()
-      .build()?;
-
-  let runtime_2 = Arc::new(runtime_2);
+      .build()?);
 
   info!("Thread pool created");
 

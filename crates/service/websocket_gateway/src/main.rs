@@ -24,7 +24,7 @@ use config::shared_constants::DEFAULT_REDIS_DATABASE_1_CONNECTION_STRING;
 use config::shared_constants::DEFAULT_RUST_LOG;
 use container_common::anyhow_result::AnyhowResult;
 use crate::endpoints_ws::obs_gateway_websocket_handler::obs_gateway_websocket_handler;
-use crate::server_state::{ObsGatewayServerState, EnvConfig, TwitchOauthSecrets, BackendsConfig};
+use crate::server_state::{ObsGatewayServerState, EnvConfig, TwitchOauthSecrets, BackendsConfig, MultithreadingConfig};
 use futures::Future;
 use futures::executor::ThreadPool;
 use http_server_common::cors::build_common_cors_config;
@@ -40,7 +40,7 @@ use sqlx::mysql::MySqlPoolOptions;
 use std::sync::Arc;
 use std::thread::sleep;
 use std::time::Duration;
-use tokio::runtime::{Handle, Runtime};
+use tokio::runtime::{Builder, Handle, Runtime};
 use twitch_api2::pubsub::Topic;
 use twitch_api2::pubsub;
 use twitch_common::twitch_secrets::TwitchSecrets;
@@ -106,7 +106,15 @@ async fn main() -> AnyhowResult<()> {
   let redis_pool = r2d2::Pool::builder()
       .build(redis_manager)?;
 
+  let runtime = Arc::new(Builder::new_multi_thread()
+      .worker_threads(32)
+      .thread_name("redis-pubsub-event-consumer-")
+      .thread_stack_size(3 * 1024 * 1024)
+      .enable_all()
+      .build()?);
+
   let server_state = ObsGatewayServerState {
+    hostname: server_hostname,
     env_config: EnvConfig {
       num_workers,
       bind_address,
@@ -119,11 +127,13 @@ async fn main() -> AnyhowResult<()> {
       client_id: twitch_secrets.app_client_id.clone(),
       client_secret: twitch_secrets.app_client_secret.clone(),
     },
-    hostname: server_hostname,
     backends: BackendsConfig {
       mysql_pool: pool,
       redis_pool,
-    }
+    },
+    multithreading: MultithreadingConfig {
+      redis_pubsub_runtime: runtime,
+    },
   };
 
   info!("Starting server...");

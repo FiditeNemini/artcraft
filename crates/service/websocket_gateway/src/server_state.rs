@@ -1,18 +1,23 @@
 use r2d2_redis::{r2d2, RedisConnectionManager};
 use sqlx::MySqlPool;
+use std::sync::Arc;
+use tokio::runtime::Runtime;
 use twitch_oauth2::{ClientId, ClientSecret};
 
 /// State that is injected into every endpoint.
 #[derive(Clone)]
 pub struct ObsGatewayServerState {
+  pub hostname: String,
+
   /// Configuration from ENV vars.
   /// Some of this might not be used.
   pub env_config: EnvConfig,
-  pub hostname: String,
 
   pub twitch_oauth_secrets: TwitchOauthSecrets,
 
   pub backends: BackendsConfig,
+
+  pub multithreading: MultithreadingConfig,
 }
 
 #[derive(Clone)]
@@ -38,4 +43,9 @@ pub struct EnvConfig {
 pub struct TwitchOauthSecrets {
   pub client_id: String,
   pub client_secret: String,
+}
+
+#[derive(Clone)]
+pub struct MultithreadingConfig {
+  pub redis_pubsub_runtime: Arc<Runtime>,
 }
