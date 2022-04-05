@@ -58,7 +58,8 @@ impl RedisKeys {
     format!("obsActiveSessionKeepalive:{}", twitch_user_id)
   }
 
-  /// This is a key that denotes a PubSub lease subscriber.
+  /// This is a key that acts as a lock guaranteeing that there is at most *only one*
+  /// Twitch PubSub subscriber per Twitch streamer, no matter how many browsers are open.
   /// Only one thread should be PubSub subscribed to any given user at a time.
   /// These keys should have a TTL so that they naturally expire without maintenance.
   pub fn twitch_pubsub_lease(twitch_user_id: &str) -> String {
