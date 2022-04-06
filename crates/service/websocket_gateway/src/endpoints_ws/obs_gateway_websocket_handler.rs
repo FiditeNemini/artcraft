@@ -31,6 +31,8 @@ use twitch_api2::pubsub::channel_bits::ChannelBitsEventsV2Reply::BitsEvent;
 use twitch_api2::pubsub;
 use twitch_common::twitch_user_id::TwitchUserId;
 use crate::endpoints_ws::helpers::publish_active_browser_info::publish_active_browser_info;
+use crate::endpoints_ws::threads::redis_pubsub_event_listener_thread::RedisPubsubEventListenerThread;
+use crate::endpoints_ws::threads::tts_inference_job_token_queue::TtsInferenceJobTokenQueue;
 
 // TODO: Redis calls are synchronous (but fast), but is there any way to make them async?
 
@@ -109,7 +111,28 @@ pub async fn obs_gateway_websocket_handler(
 
   let server_state_arc = server_state.get_ref().clone();
 
+  info!("Building user Redis PubSub thread...");
+
+  // TODO: Pass a timestamp-based and/or exit-based killswitch flag to the thread.
+  //  struct AsyncThreadKillSignal { Option<timestamp>, Option<Duration>, bool: manualKill }
+
+  let tts_job_token_queue = TtsInferenceJobTokenQueue::new();
+
+  let thread = RedisPubsubEventListenerThread::new(
+    &twitch_user_id,
+    &server_state.backends.redis_pubsub_connection_string,
+    tts_job_token_queue.clone(),
+  ).map_err(|e| {
+    error!("Error creating pubsub thread: {:?}", e);
+    CommonServerError::ServerError
+  })?;
+
+  info!("Starting user Redis PubSub thread...");
+
+  server_state.multithreading.redis_pubsub_runtime.spawn(thread.start_thread());
+
   let websocket = ObsGatewayWebSocket::new(
+    tts_job_token_queue,
     twitch_user_id.clone(),
     server_state_arc
   );
@@ -127,6 +150,7 @@ pub async fn obs_gateway_websocket_handler(
 struct ObsGatewayWebSocket {
   twitch_user_id: TwitchUserId,
   server_state: Arc<ObsGatewayServerState>,
+  tts_job_token_queue: TtsInferenceJobTokenQueue,
 }
 
 impl Actor for ObsGatewayWebSocket {
@@ -234,10 +258,12 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for ObsGatewayWebSock
 
 impl ObsGatewayWebSocket {
   fn new(
+    tts_job_token_queue: TtsInferenceJobTokenQueue,
     twitch_user_id: TwitchUserId,
     server_state: Arc<ObsGatewayServerState>,
   ) -> Self {
     Self {
+      tts_job_token_queue,
       twitch_user_id,
       server_state,
     }

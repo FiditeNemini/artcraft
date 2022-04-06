@@ -92,6 +92,11 @@ async fn main() -> AnyhowResult<()> {
         "REDIS_1_URL",
         DEFAULT_REDIS_DATABASE_1_CONNECTION_STRING);
 
+  // NB: Redis PubSub doesn't care about Redis DB index number.
+  // NB: Note, it's also a bit messy to reuse the "1" index here, since I'm not sure this is the
+  //  intention I originally had about separation of concerns.
+  let redis_pubsub_connection_string = redis_connection_string.clone();
+
   info!("Connecting to mysql...");
 
   let pool = MySqlPoolOptions::new()
@@ -130,6 +135,7 @@ async fn main() -> AnyhowResult<()> {
     backends: BackendsConfig {
       mysql_pool: pool,
       redis_pool,
+      redis_pubsub_connection_string: redis_connection_string.clone(),
     },
     multithreading: MultithreadingConfig {
       redis_pubsub_runtime: runtime,

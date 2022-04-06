@@ -24,6 +24,8 @@ pub struct ObsGatewayServerState {
 pub struct BackendsConfig {
   pub mysql_pool: MySqlPool,
   pub redis_pool: r2d2::Pool<RedisConnectionManager>,
+  /// We need the connection string to launch new PubSub threads from WebSocket connections.
+  pub redis_pubsub_connection_string: String,
 }
 
 // TODO: Many of these do not need to be passed around past server init.
@@ -47,5 +49,7 @@ pub struct TwitchOauthSecrets {
 
 #[derive(Clone)]
 pub struct MultithreadingConfig {
+  /// So our WebSockets can launch new PubSub threads.
+  /// These threads are 1:1 with websockets.
   pub redis_pubsub_runtime: Arc<Runtime>,
 }

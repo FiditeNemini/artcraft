@@ -66,6 +66,7 @@ impl RedisKeys {
     format!("twitchPubsubLease:{}", twitch_user_id)
   }
 
+  // TODO/FIXME: This appears to be unused.
   /// This is a PubSub topic.
   /// These are "unenriched" Twitch events from the PubSub (and eventually IRC)
   /// subscribers. Downstream listeners will enrich these for user-facing functionality.
@@ -76,7 +77,16 @@ impl RedisKeys {
   /// This is a lazy first approximation of the worker -> OBS messaging.
   /// We push new TTS job tokens into a Redis list (with long expiry), and OBS
   /// will dequeue the events in order.
+  #[deprecated(note="Use twitch_tts_job_topic instead (PubSub instead of a Redis list)")]
   pub fn twitch_tts_job_queue(twitch_user_id: &str) -> String {
     format!("twitchTtsJobs:{}", twitch_user_id)
+  }
+
+  /// This is a PubSub topic.
+  /// These are TTS job tokens pushed to a Redis PubSub topic (per-user!). This should
+  /// have better usability characteristics than a mutable Redis list that sends different
+  /// browsers different states (race conditions from first principles!)
+  pub fn twitch_tts_job_topic(twitch_user_id: &str) -> String {
+    format!("twitchTtsJobTopic:{}", twitch_user_id)
   }
 }
