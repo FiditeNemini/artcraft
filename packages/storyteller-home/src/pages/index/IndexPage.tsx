@@ -5,6 +5,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import AudioSample from './AudioSample';
 import Scene from './Scene';
 import { TtsComponent } from './TtsComponent';
+import { Link } from 'react-router-dom';
 
 function IndexPage () {
   return (
@@ -389,7 +390,6 @@ function IndexPage () {
       </section>
 
       <section className="section is-small">
-
         <div className="columns is-vcentered">
           <div className="column is-8">
             <video src="/video/webpage-demo-1-640.mp4" autoPlay={true} playsInline={true} loop={true} muted={true}></video>
@@ -423,7 +423,6 @@ function IndexPage () {
               and lighting &mdash; all post capture.</p>
           </div>
         </div>
-
       </section>
 
       <section className="section is-small">
@@ -587,6 +586,24 @@ function IndexPage () {
           </div>
 
         </div>
+      </section>
+
+      <section className="section is-small">
+        <h1 className="title is-4">We're hiring!</h1>
+        <h2 className="subtitle is-6">
+          Fun and challenging tech. World-changing mission.
+        </h2>
+        <p>
+          We already have incredible traction, but there's 
+          no better time to help us make an impact.
+        </p>
+        <br />
+        <Link
+          className="button is-fullwidth is-large is-info"
+          to="/jobs"
+          >
+          Learn More and Apply 
+        </Link>
       </section>
 
     </div>
