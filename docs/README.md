@@ -399,6 +399,9 @@ https://storage.googleapis.com/vocodes-public/tts_inference_output/9/c/d/vocodes
 
 * [justinjohn0306 / FakeYou-Tacotron2-Notebook](https://github.com/justinjohn0306/FakeYou-Tacotron2-Notebook) - 
   Tacotron2 Training and Synthesis Notebooks for FakeYou.com, including HifiGan and Arpabet support. 
+  
+* [MysteryPancake / Discord-TTS](https://github.com/MysteryPancake/Discord-TTS) - 
+  a Discord bot you can run in your server that uses FakeYou's API to provide custom text to speech commands.
 
 * (More to come)
 
