@@ -262,8 +262,8 @@ function IndexPage () {
               </p>
               <p>
                 Webcams are boring and flat. You can use our volumetric camera in-stream to make
-                your personality come to life. We'll be leveraging this tech to build a no-camera 
-                virtual set.
+                your personality come to life. This system can also be integrated into our
+                no-cinema camera virtual set.
               </p>
             </div>
 
@@ -283,6 +283,30 @@ function IndexPage () {
         </p>
         <br />
 
+        <h1 className="title is-4">Screenshots</h1>
+        <h2 className="subtitle is-6">
+        </h2>
+
+        <div className="columns">
+          <div className="column">
+            <figure className="image is-square">
+              <img src="/screenshots/engine-fuji.png" alt="screenshot" />
+            </figure>
+          </div>
+
+          <div className="column">
+            <figure className="image is-square">
+              <img src="/screenshots/engine-zelda-monsters.png" alt="screenshot" />
+            </figure>
+          </div>
+
+          <div className="column">
+            <figure className="image is-square">
+              <img src="/screenshots/engine-point-cloud.png" alt="screenshot" />
+            </figure>
+          </div>
+        </div>
+
         <h1 className="title is-4">Downloads coming soon</h1>
         <h2 className="subtitle is-6">
           For Windows, Mac, and Linux
@@ -293,10 +317,10 @@ function IndexPage () {
           We plan to support ordinary webcams too!
         </p>
         <br />
-
+        
         <article className="message is-danger">
           <div className="message-body">
-            Downloads coming April 8th, 2022!
+            Downloads coming April 16th, 2022!
           </div>
         </article>
 
@@ -365,40 +389,52 @@ function IndexPage () {
       </section>
 
       <section className="section is-small">
-        <h1 className="title is-4">Demo and screenshots</h1>
-        <h2 className="subtitle is-6">
-        </h2>
-        <br />
 
-        <div className="columns">
-          <div className="column">
-            <figure className="image is-square">
-              <img src="/screenshots/engine-fuji.png" alt="screenshot" />
-            </figure>
+        <div className="columns is-vcentered">
+          <div className="column is-8">
+            <video src="/video/webpage-demo-1-640.mp4" autoPlay={true} playsInline={true} loop={true} muted={true}></video>
           </div>
-
           <div className="column">
-            <figure className="image is-square">
-              <img src="/screenshots/engine-zelda-monsters.png" alt="screenshot" />
-            </figure>
-          </div>
-
-          <div className="column">
-            <figure className="image is-square">
-              <img src="/screenshots/engine-point-cloud.png" alt="screenshot" />
-            </figure>
+            <h3 className="title is-5">Volumetric Capture</h3>
+            <p className="bd-notification is-primary">Use one or more cameras to build a 3D volumetric capture of your actors. In the future, 
+            we'll be upscaling from VGA-resolution depth maps to full 4K.</p>
           </div>
         </div>
+
+        <div className="columns is-vcentered">
+          <div className="column is-8">
+            <video src="/video/webpage-demo-2-640.mp4" autoPlay={true} playsInline={true} loop={true} muted={true}></video>
+          </div>
+          <div className="column">
+            <h3 className="title is-5">Motion Capture</h3>
+            <p className="bd-notification is-primary">Community-contributed models, sets, and scenarios can be controlled with webcam, 
+              Kinect, or motion capture systems and directed remotely from the web.</p>
+          </div>
+        </div>
+
+        <div className="columns is-vcentered">
+          <div className="column is-8">
+            <video src="/video/webpage-demo-3-640.mp4" autoPlay={true} playsInline={true} loop={true} muted={true}></video>
+          </div>
+          <div className="column">
+            <h3 className="title is-5">Fake Faces, Voices, and Corrected Motion</h3>
+            <p className="bd-notification is-primary">We couldn't hire Elon Musk, but that didn't stop us and it won't stop you. 
+              Change your actors faces and voices to fit your needs. Tweak their movements and posture &mdash; even the location 
+              and lighting &mdash; all post capture.</p>
+          </div>
+        </div>
+
       </section>
 
       <section className="section is-small">
         <h1 className="title is-4">Apply for our beta program</h1>
         <h2 className="subtitle is-6">
-          We need early alpha testers
+          We need early testers and contributors
         </h2>
         <p>
           Are you a streamer or filmmaker? Want to help us test 
-          Storyteller Engine?
+          and develop Storyteller Engine into the best tool ever 
+          created for making narrative content? 
         </p>
         <br />
         <a 
