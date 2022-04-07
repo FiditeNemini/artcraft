@@ -33,6 +33,7 @@ use twitch_common::twitch_user_id::TwitchUserId;
 use crate::endpoints_ws::helpers::publish_active_browser_info::publish_active_browser_info;
 use crate::endpoints_ws::threads::redis_pubsub_event_listener_thread::RedisPubsubEventListenerThread;
 use crate::endpoints_ws::threads::tts_inference_job_token_queue::TtsInferenceJobTokenQueue;
+use tokio::task::JoinHandle;
 
 // TODO: Redis calls are synchronous (but fast), but is there any way to make them async?
 
@@ -129,7 +130,10 @@ pub async fn obs_gateway_websocket_handler(
 
   info!("Starting user Redis PubSub thread...");
 
-  server_state.multithreading.redis_pubsub_runtime.spawn(thread.start_thread());
+  let mut jh = server_state.multithreading.redis_pubsub_runtime.spawn(thread.start_thread());
+
+
+  server_state.multithreading.redis_pubsub_runtime.spawn(kill(jh));
 
   let websocket = ObsGatewayWebSocket::new(
     tts_job_token_queue,
@@ -144,6 +148,15 @@ pub async fn obs_gateway_websocket_handler(
         warn!("Websocket ws::start() error: {}", e);
         CommonServerError::ServerError
       })
+}
+
+// NB: Well, abort() doesn't stop the thread :(
+async fn kill (handle: JoinHandle<()>) {
+  error!("Waiting to kill pubsub thread...");
+  sleep(Duration::from_secs(120));
+  error!("Killing pubsub thread...");
+  handle.abort();
+  error!("Killed pubsub thread.");
 }
 
 /// Websocket behavior

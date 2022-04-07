@@ -63,6 +63,7 @@ sqlx = { version = "0.5", features = [ "mysql", "runtime-actix-native-tls", "off
 # Redis Database
 limitation = "0.1.1" # Redis rate limiter
 r2d2_redis = "0.14.0"
+redis_async = { package = "redis", version = "0.21.5", features = ["tokio-comp"] }
 
 # Twitch
 # NB "unsupported" pubsub features may disappear from the Twitch API at any time. It's an unofficial API.

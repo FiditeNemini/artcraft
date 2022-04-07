@@ -1019,12 +1019,16 @@ dependencies = [
 
 [[package]]
 name = "combine"
-version = "4.5.2"
+version = "4.6.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "cc4369b5e4c0cddf64ad8981c0111e7df4f7078f4d6ba98fb31f2e17c4c57b7e"
+checksum = "50b727aacc797f9fc28e355d21f34709ac4fc9adecfe470ad07b8f4464f53062"
 dependencies = [
  "bytes 1.0.1",
+ "futures-core",
  "memchr",
+ "pin-project-lite 0.2.6",
+ "tokio 1.13.0",
+ "tokio-util 0.6.9",
 ]
 
 [[package]]
@@ -3005,11 +3009,31 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "0a32cb439c4e89c1e6415e5b3b23d9d8cc6dc1bf5a8cade19adbd5418de803be"
 dependencies = [
  "async-trait",
- "combine 4.5.2",
+ "combine 4.6.3",
  "dtoa",
  "itoa",
  "percent-encoding 2.1.0",
  "sha1",
+ "url 2.2.2",
+]
+
+[[package]]
+name = "redis"
+version = "0.21.5"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "1a80b5f38d7f5a020856a0e16e40a9cfabf88ae8f0e4c2dcd8a3114c1e470852"
+dependencies = [
+ "async-trait",
+ "bytes 1.0.1",
+ "combine 4.6.3",
+ "dtoa",
+ "futures-util",
+ "itoa",
+ "percent-encoding 2.1.0",
+ "pin-project-lite 0.2.6",
+ "sha1",
+ "tokio 1.13.0",
+ "tokio-util 0.6.9",
  "url 2.2.2",
 ]
 
@@ -4762,6 +4786,7 @@ dependencies = [
  "pulldown-cmark",
  "r2d2_redis",
  "rand 0.8.4",
+ "redis 0.21.5",
  "redis_common",
  "regex",
  "reqwest",
