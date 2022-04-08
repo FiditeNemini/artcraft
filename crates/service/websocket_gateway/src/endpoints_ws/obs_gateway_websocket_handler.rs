@@ -201,30 +201,25 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for ObsGatewayWebSock
       // TODO: This should be done *BEFORE* PubSub
       self.write_obs_active().unwrap();
 
-      // TODO: Redis LPOP supports a number of list items to pop, but apparently it's broken in the
-      //  Rust API bindings (?). When I last deployed this, though the code compiled, it broke.
-      //  It would be a nice optimization to make.
+      // TODO: Error handling
+      if let Some(tts_job_token) = self.tts_job_token_queue.dequeue_token().unwrap() {
+        let tts_job_tokens = Some(vec![tts_job_token]);
 
-      let redis_key = RedisKeys::twitch_tts_job_queue(&self.twitch_user_id.get_str());
+        warn!("Sending job tokens: {:?}", tts_job_tokens);
 
-      let lookup_result : Option<String> = redis.lpop(&redis_key).unwrap(); // TODO: Error handling
-      let mut values = Vec::new();
-
-      if let Some(v) = lookup_result.as_deref() {
-        values.push(v.to_string());
         let payload = FrontendEventPayload {
           response_type: TtsEvent,
-          tts_job_tokens: Some(values),
+          tts_job_tokens,
         };
 
         match serde_json::to_string(&payload) {
-          Ok(json) => {
-            ctx.text(json);
-          },
+          Ok(json) => ctx.text(json),
           Err(e) => {
             error!("Error with JSON payload: {:?}", e);
           }
         }
+
+        return;
       }
 
       match msg {
