@@ -5,6 +5,7 @@ use actix_web::cookie::Cookie;
 use actix_web::error::ResponseError;
 use actix_web::http::StatusCode;
 use actix_web::{Responder, web, HttpResponse, error, HttpRequest};
+use crate::http_server::endpoints::investor_demo::demo_cookie::request_has_demo_cookie;
 use crate::http_server::web_utils::ip_address::get_request_ip;
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 use crate::server_state::ServerState;
@@ -22,8 +23,8 @@ use sqlx::error::Error::Database;
 use sqlx::mysql::MySqlDatabaseError;
 use std::fmt;
 use std::sync::Arc;
+use tts_common::priority::{FAKEYOU_LOGGED_IN_PRIORITY_LEVEL, FAKEYOU_ANONYMOUS_PRIORITY_LEVEL, FAKEYOU_INVESTOR_PRIORITY_LEVEL};
 use user_input_common::check_for_slurs::contains_slurs;
-use crate::http_server::endpoints::investor_demo::demo_cookie::request_has_demo_cookie;
 
 // TODO: Temporary for investor demo
 const STORYTELLER_DEMO_COOKIE_NAME : &'static str = "storyteller_demo";
@@ -97,7 +98,11 @@ pub async fn infer_tts_handler(
   // ==================== PRIORITY ==================== //
 
   // Give logged in users execution priority.
-  let mut priority_level = if maybe_user_session.is_some() { 1 } else { 0 };
+  let mut priority_level = if maybe_user_session.is_some() {
+    FAKEYOU_LOGGED_IN_PRIORITY_LEVEL
+  } else {
+    FAKEYOU_ANONYMOUS_PRIORITY_LEVEL
+  };
 
   // TODO/TEMP: Give investors even more priority
   let mut is_investor = false;
@@ -118,7 +123,7 @@ pub async fn infer_tts_handler(
   }
 
   if is_investor {
-    priority_level = 2;
+    priority_level = FAKEYOU_INVESTOR_PRIORITY_LEVEL;
   }
 
   // ==================== RATE LIMIT ==================== //

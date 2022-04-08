@@ -20,6 +20,7 @@ container_common = { path = "../../lib/container_common" }
 database_queries = { path = "../../lib/database_queries" }
 http_server_common = { path = "../../lib/http_server_common" }
 redis_common = { path = "../../lib/redis_common" }
+tts_common = { path = "../../lib/tts_common" }
 twitch_common = { path = "../../lib/twitch_common" }
 
 # External

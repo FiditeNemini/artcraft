@@ -9,12 +9,9 @@ use redis_common::redis_keys::RedisKeys;
 use redis_common::shared_constants::STREAMER_TTS_JOB_QUEUE_TTL_SECONDS;
 use sqlx::MySql;
 use std::sync::Arc;
+use tts_common::priority::TWITCH_TTS_PRIORITY_LEVEL;
 use twitch_common::cheers::remove_cheers;
 use twitch_common::twitch_user_id::TwitchUserId;
-
-/// Twitch users get priority above all FakeYou users.
-///  TODO: In the future, there should be higher priority for paid users.
-const TWITCH_TTS_PRIORITY_LEVEL : u8 = 10;
 
 pub struct TtsWriter {
   mysql_pool: Arc<sqlx::Pool<MySql>>,
