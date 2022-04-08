@@ -1,15 +1,17 @@
 use container_common::anyhow_result::AnyhowResult;
-use futures_util::StreamExt;
 use crate::endpoints_ws::threads::tts_inference_job_token_queue::TtsInferenceJobTokenQueue;
 use futures::Future;
 use futures::future::Ready;
+use futures_util::Stream;
+use futures_util::StreamExt;
 use log::error;
 use log::info;
 use r2d2_redis::RedisConnectionManager;
 use r2d2_redis::r2d2;
 use r2d2_redis::redis::{Commands, PubSub, Msg};
-use redis_common::redis_keys::RedisKeys;
 use redis_async::Client as AsyncClient;
+use redis_common::redis_keys::RedisKeys;
+use std::pin::Pin;
 use std::sync::Arc;
 use std::thread::sleep;
 use time::Duration;
@@ -63,42 +65,75 @@ impl RedisPubsubEventListenerThread {
 
     let pubsub_key = RedisKeys::twitch_tts_job_topic(self.twitch_user_id.get_str());
     pubsub.subscribe(&pubsub_key).unwrap();
+    async_pubsub.subscribe(&pubsub_key).await.unwrap();
 
     let mut pubsub_stream = async_pubsub.on_message();
 
     loop {
-      info!("Twitch user Redis PubSub thread loop iter");
+      error!("Twitch user Redis PubSub thread loop iter, key: {}", pubsub_key);
+
+//      for maybe_message in pubsub_stream {
+//        if let Some(message) = futures::stream::iter(maybe_message) {
+//          let tts_job_token : String = message.get_payload().unwrap();
+//
+//          error!("Job token received from Redis: {}", tts_job_token);
+//          self.token_queue.enqueue_token(&tts_job_token).unwrap();
+//
+//        } else {
+//          error!("NO MESSAGE");
+//        }
+//      }
 
 
-      // NB: We can't have calls to read the Twitch websocket client block forever, and they
-      // would do exactly that if not for this code. This is adapted from the very good example
-      // in the `tokio-tungstenite` repo, which also contains good recipes for splitting sockets
-      // into two unidirectional streams:
-      // https://github.com/snapview/tokio-tungstenite/blob/master/examples/interval-server.rs
-
-      let mut interval = tokio::time::interval(std::time::Duration::from_secs(1));
-      tokio::select! {
-        //maybe_message = pubsub.get_message().unwrap() => {
-        //maybe_message = Self::blocking_get_message(&mut pubsub) => {
-        maybe_message = pubsub_stream.next() => {
-          //let tts_job_token : String = maybe_message.unwrap().get_payload().unwrap();
-          if let Some(message) = maybe_message {
-            let tts_job_token : String = message.get_payload().unwrap();
-
-            info!("Job token received from Redis: {}", tts_job_token);
-            self.token_queue.enqueue_token(&tts_job_token).unwrap();
-
-          } else {
-            info!("NO MESSAGE");
-            sleep(std::time::Duration::from_secs(1));
-
-          }
-        }
-        _ = interval.tick() => {
-          sleep(std::time::Duration::from_secs(1));
-          error!(".");
-        }
+      while let Some(value) = pubsub_stream.next().await {
+        error!("got {:?}", value);
       }
+
+      error!("NO NEXT");
+
+//      //let maybe_message = Pin::new(&mut pubsub_stream).poll_next().await;
+//      let maybe_message = pubsub_stream.next().await;
+//
+//      if let Some(message) = maybe_message {
+//        let tts_job_token : String = message.get_payload().unwrap();
+//
+//        error!("Job token received from Redis: {}", tts_job_token);
+//        self.token_queue.enqueue_token(&tts_job_token).unwrap();
+//
+//      } else {
+//        error!("NO MESSAGE");
+//      }
+
+
+//      // NB: We can't have calls to read the Twitch websocket client block forever, and they
+//      // would do exactly that if not for this code. This is adapted from the very good example
+//      // in the `tokio-tungstenite` repo, which also contains good recipes for splitting sockets
+//      // into two unidirectional streams:
+//      // https://github.com/snapview/tokio-tungstenite/blob/master/examples/interval-server.rs
+//
+//      let mut interval = tokio::time::interval(std::time::Duration::from_secs(1));
+//      tokio::select! {
+//        //maybe_message = pubsub.get_message().unwrap() => {
+//        //maybe_message = Self::blocking_get_message(&mut pubsub) => {
+//        maybe_message = pubsub_stream.next() => {
+//          //let tts_job_token : String = maybe_message.unwrap().get_payload().unwrap();
+//          if let Some(message) = maybe_message {
+//            let tts_job_token : String = message.get_payload().unwrap();
+//
+//            info!("Job token received from Redis: {}", tts_job_token);
+//            self.token_queue.enqueue_token(&tts_job_token).unwrap();
+//
+//          } else {
+//            info!("NO MESSAGE");
+//            sleep(std::time::Duration::from_secs(1));
+//
+//          }
+//        }
+//        _ = interval.tick() => {
+//          sleep(std::time::Duration::from_secs(1));
+//          error!(".");
+//        }
+//      }
 
 
 //      // TODO: This is blocking. We need a way to exit the thread.

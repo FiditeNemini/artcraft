@@ -1,6 +1,7 @@
 use container_common::anyhow_result::AnyhowResult;
 use database_queries::queries::tts::tts_inference_jobs::insert_tts_inference_job::TtsInferenceJobInsertBuilder;
 use database_queries::tokens::Tokens;
+use log::info;
 use r2d2_redis::RedisConnectionManager;
 use r2d2_redis::r2d2;
 use r2d2_redis::redis::Commands;
@@ -44,6 +45,8 @@ impl TtsWriter {
   pub async fn write_tts_with_model(&self, message_text: &str, model_token: &str) -> AnyhowResult<()> {
     let sanitized_text = remove_cheers(message_text);
     let job_token = Tokens::new_tts_inference_job()?;
+
+    info!("Writing TTS: model={}, text={}", model_token, sanitized_text);
 
     let mut builder = TtsInferenceJobInsertBuilder::new_for_internal_tts()
         .set_is_for_twitch(true)

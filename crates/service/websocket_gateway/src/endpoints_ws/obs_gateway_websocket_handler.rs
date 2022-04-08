@@ -180,10 +180,10 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for ObsGatewayWebSock
     msg: Result<ws::Message, ws::ProtocolError>,
     ctx: &mut Self::Context,
   ) {
-    debug!("Socket Handler::handle()");
+    //debug!("Socket Handler::handle()");
 
     if let Ok(msg) = msg {
-      debug!("Socket Handler::handle(): msg = {:?}", msg);
+      //debug!("Socket Handler::handle(): msg = {:?}", msg);
 
       // TODO: Only send this every 60 seconds.
       // TODO: Error handling.
@@ -229,11 +229,11 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for ObsGatewayWebSock
 
       match msg {
         ws::Message::Ping(bytes) => {
-          debug!("Socket Handler::handle(): got ping");
+          //debug!("Socket Handler::handle(): got ping");
           ctx.pong(&bytes)
         },
         ws::Message::Text(text) => {
-          debug!("Socket Handler::handle(): got text = {:?}", text);
+          //debug!("Socket Handler::handle(): got text = {:?}", text);
 
           let payload = FrontendEventPayload {
             response_type: ResponseType::Pong,
@@ -252,7 +252,7 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for ObsGatewayWebSock
           //ctx.text("response")
         },
         ws::Message::Binary(bin) => {
-          debug!("Socket Handler::handle(): got binary...");
+          //debug!("Socket Handler::handle(): got binary...");
           //ctx.binary("response".as_bytes())
         },
         ws::Message::Close(reason) => {
