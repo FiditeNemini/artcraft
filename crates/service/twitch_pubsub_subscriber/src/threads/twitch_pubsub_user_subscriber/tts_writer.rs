@@ -57,13 +57,7 @@ impl TtsWriter {
 
     let _r = builder.insert(&self.mysql_pool).await?;
 
-    // TODO: Report job token to frontend
     let mut redis = self.redis_pool.get()?;
-    let redis_key = RedisKeys::twitch_tts_job_queue(&self.twitch_user_id.get_str());
-
-    // TODO: Deprecate the RPUSH to the list in favor of PubSub.
-    let _size : Option<u64> = redis.rpush(&redis_key, job_token.clone())?;
-    let _size : Option<u64> = redis.expire(&redis_key, STREAMER_TTS_JOB_QUEUE_TTL_SECONDS)?;
 
     // NB: Be very careful when migrating PubSub Redis. This is starting to get a little messy
     //  with different aliases kept everywhere.

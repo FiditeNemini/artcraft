@@ -52,7 +52,7 @@ impl RedisPubsubEventListenerThread {
     let pubsub_key = RedisKeys::twitch_tts_job_topic(self.twitch_user_id.get_str());
 
     loop {
-      error!("Twitch user Redis PubSub thread loop iter, key: {}", pubsub_key);
+      info!("Twitch user Redis PubSub thread loop iter, key: {}", pubsub_key);
 
       let async_redis = AsyncClient::open(self.redis_pubsub_connection_string.as_str()).unwrap();
 
@@ -66,7 +66,7 @@ impl RedisPubsubEventListenerThread {
       while let Some(message) = pubsub_stream.next().await {
         let tts_job_token : String = message.get_payload().unwrap();
 
-        error!("Job token received from Redis: {}", tts_job_token);
+        info!("Job token received from Redis: {}", tts_job_token);
         self.token_queue.enqueue_token(&tts_job_token).unwrap();
       }
 

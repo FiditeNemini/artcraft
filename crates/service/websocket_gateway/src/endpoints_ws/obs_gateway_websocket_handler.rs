@@ -127,7 +127,10 @@ pub async fn obs_gateway_websocket_handler(
       server_state.multithreading.redis_pubsub_runtime.spawn(thread.start_thread());
 
   server_state.multithreading.redis_pubsub_runtime.spawn(
-    eventually_kill(join_handle, async_thread_kill_signal.clone()));
+    eventually_kill(
+      join_handle,
+      async_thread_kill_signal.clone(),
+      twitch_user_id.clone()));
 
   let websocket = ObsGatewayWebSocket::new(
     tts_job_token_queue,
@@ -148,17 +151,15 @@ pub async fn obs_gateway_websocket_handler(
 async fn eventually_kill(
   handle: JoinHandle<()>,
   async_thread_kill_signal: AsyncThreadKillSignal,
+  twitch_user_id: TwitchUserId,
 ) {
   loop {
-    error!("Waiting to kill pubsub thread...");
-
     if !async_thread_kill_signal.is_alive().unwrap() {
-      error!("Killing pubsub thread...");
+      warn!("Killing pubsub thread for user: {} (they may have multiple browser sessions)",
+        twitch_user_id.get_str());
       handle.abort();
-      error!("Killed pubsub thread.");
       return;
     }
-
     sleep(Duration::from_secs(10));
   }
 }
@@ -260,11 +261,12 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for ObsGatewayWebSock
           warn!("Socket Handler::handle(): got close, reason = {:?}", reason);
           ctx.close(reason);
           ctx.stop();
+          warn!("Marking PubSub thread for death.");
+          self.async_thread_kill_signal.mark_thread_for_kill().unwrap();
         }
         _ => {}
       }
     } else {
-      error!(">>>>>> obs streamhandler::STOP");
       ctx.stop();
     }
   }
