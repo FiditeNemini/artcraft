@@ -4,8 +4,12 @@ use actix_web::web::Path;
 use actix_web::{middleware, web, App, Error, HttpRequest, HttpResponse, HttpServer};
 use actix_web_actors::ws;
 use container_common::anyhow_result::AnyhowResult;
+use container_common::thread::async_thread_kill_signal::AsyncThreadKillSignal;
 use container_common::token::random_crockford_token::random_crockford_token;
+use crate::endpoints_ws::helpers::publish_active_browser_info::publish_active_browser_info;
 use crate::endpoints_ws::obs_gateway_websocket_handler::ResponseType::TtsEvent;
+use crate::endpoints_ws::threads::redis_pubsub_event_listener_thread::RedisPubsubEventListenerThread;
+use crate::endpoints_ws::threads::tts_inference_job_token_queue::TtsInferenceJobTokenQueue;
 use crate::server_state::ObsGatewayServerState;
 use database_queries::queries::twitch::twitch_oauth::find::{TwitchOauthTokenFinder, TwitchOauthTokenRecord};
 use futures_timer::Delay;
@@ -25,28 +29,16 @@ use std::sync::Arc;
 use std::thread::sleep;
 use std::time::Duration;
 use tokio::runtime::Handle;
+use tokio::task::JoinHandle;
 use twitch_api2::pubsub::Topic;
 use twitch_api2::pubsub::TopicData::ChannelPointsChannelV1;
 use twitch_api2::pubsub::channel_bits::ChannelBitsEventsV2Reply::BitsEvent;
 use twitch_api2::pubsub;
 use twitch_common::twitch_user_id::TwitchUserId;
-use crate::endpoints_ws::helpers::publish_active_browser_info::publish_active_browser_info;
-use crate::endpoints_ws::threads::redis_pubsub_event_listener_thread::RedisPubsubEventListenerThread;
-use crate::endpoints_ws::threads::tts_inference_job_token_queue::TtsInferenceJobTokenQueue;
-use tokio::task::JoinHandle;
-
-// TODO: Redis calls are synchronous (but fast), but is there any way to make them async?
 
 #[derive(Deserialize)]
 pub struct PathInfo {
   twitch_username: String,
-}
-
-#[derive(Deserialize)]
-pub struct QueryData {
-  voice_token_1: Option<String>,
-  voice_token_2: Option<String>,
-  // Other preferences...
 }
 
 /// Sent back to the frontend websocket.
@@ -114,8 +106,8 @@ pub async fn obs_gateway_websocket_handler(
 
   info!("Building user Redis PubSub thread...");
 
-  // TODO: Pass a timestamp-based and/or exit-based killswitch flag to the thread.
-  //  struct AsyncThreadKillSignal { Option<timestamp>, Option<Duration>, bool: manualKill }
+  let async_thread_kill_signal
+      = AsyncThreadKillSignal::new_with_ttl(Duration::from_secs(30)); // TODO
 
   let tts_job_token_queue = TtsInferenceJobTokenQueue::new();
 
@@ -123,6 +115,7 @@ pub async fn obs_gateway_websocket_handler(
     &twitch_user_id,
     &server_state.backends.redis_pubsub_connection_string,
     tts_job_token_queue.clone(),
+    async_thread_kill_signal.clone(),
   ).map_err(|e| {
     error!("Error creating pubsub thread: {:?}", e);
     CommonServerError::ServerError
@@ -130,15 +123,17 @@ pub async fn obs_gateway_websocket_handler(
 
   info!("Starting user Redis PubSub thread...");
 
-  let mut jh = server_state.multithreading.redis_pubsub_runtime.spawn(thread.start_thread());
+  let mut join_handle =
+      server_state.multithreading.redis_pubsub_runtime.spawn(thread.start_thread());
 
-
-  server_state.multithreading.redis_pubsub_runtime.spawn(kill(jh));
+  server_state.multithreading.redis_pubsub_runtime.spawn(
+    eventually_kill(join_handle, async_thread_kill_signal.clone()));
 
   let websocket = ObsGatewayWebSocket::new(
     tts_job_token_queue,
     twitch_user_id.clone(),
-    server_state_arc
+    server_state_arc,
+    async_thread_kill_signal
   );
 
   info!("Begin Javascript WebSocket...");
@@ -150,13 +145,22 @@ pub async fn obs_gateway_websocket_handler(
       })
 }
 
-// NB: Well, abort() doesn't stop the thread :(
-async fn kill (handle: JoinHandle<()>) {
-  error!("Waiting to kill pubsub thread...");
-  sleep(Duration::from_secs(120));
-  error!("Killing pubsub thread...");
-  handle.abort();
-  error!("Killed pubsub thread.");
+async fn eventually_kill(
+  handle: JoinHandle<()>,
+  async_thread_kill_signal: AsyncThreadKillSignal,
+) {
+  loop {
+    error!("Waiting to kill pubsub thread...");
+
+    if !async_thread_kill_signal.is_alive().unwrap() {
+      error!("Killing pubsub thread...");
+      handle.abort();
+      error!("Killed pubsub thread.");
+      return;
+    }
+
+    sleep(Duration::from_secs(10));
+  }
 }
 
 /// Websocket behavior
@@ -164,6 +168,7 @@ struct ObsGatewayWebSocket {
   twitch_user_id: TwitchUserId,
   server_state: Arc<ObsGatewayServerState>,
   tts_job_token_queue: TtsInferenceJobTokenQueue,
+  async_thread_kill_signal: AsyncThreadKillSignal,
 }
 
 impl Actor for ObsGatewayWebSocket {
@@ -180,9 +185,10 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for ObsGatewayWebSock
     msg: Result<ws::Message, ws::ProtocolError>,
     ctx: &mut Self::Context,
   ) {
-    //debug!("Socket Handler::handle()");
-
     if let Ok(msg) = msg {
+      // NB: Keep the Redis PubSub thread alive.
+      self.async_thread_kill_signal.bump_ttl().unwrap();
+
       //debug!("Socket Handler::handle(): msg = {:?}", msg);
 
       // TODO: Only send this every 60 seconds.
@@ -269,11 +275,13 @@ impl ObsGatewayWebSocket {
     tts_job_token_queue: TtsInferenceJobTokenQueue,
     twitch_user_id: TwitchUserId,
     server_state: Arc<ObsGatewayServerState>,
+    async_thread_kill_signal: AsyncThreadKillSignal,
   ) -> Self {
     Self {
       tts_job_token_queue,
       twitch_user_id,
       server_state,
+      async_thread_kill_signal,
     }
   }
 

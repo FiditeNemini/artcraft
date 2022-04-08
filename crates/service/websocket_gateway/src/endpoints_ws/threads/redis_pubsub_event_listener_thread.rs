@@ -16,12 +16,14 @@ use std::sync::Arc;
 use std::thread::sleep;
 use time::Duration;
 use twitch_common::twitch_user_id::TwitchUserId;
+use container_common::thread::async_thread_kill_signal::AsyncThreadKillSignal;
 
 pub struct RedisPubsubEventListenerThread {
   twitch_user_id: TwitchUserId,
   /// We'll be maintaining a thread-specific async connection to Redis.
   redis_pubsub_connection_string: String,
   token_queue: TtsInferenceJobTokenQueue,
+  async_thread_kill_signal: AsyncThreadKillSignal,
 }
 
 impl RedisPubsubEventListenerThread {
@@ -29,14 +31,14 @@ impl RedisPubsubEventListenerThread {
   pub fn new(
     twitch_user_id: &TwitchUserId,
     redis_pubsub_connection_string: &str,
-    token_queue: TtsInferenceJobTokenQueue
+    token_queue: TtsInferenceJobTokenQueue,
+    async_thread_kill_signal: AsyncThreadKillSignal,
   ) -> AnyhowResult<Self> {
-
-
     Ok(Self {
       twitch_user_id: twitch_user_id.clone(),
       redis_pubsub_connection_string: redis_pubsub_connection_string.to_string(),
       token_queue,
+      async_thread_kill_signal,
     })
   }
 
@@ -66,6 +68,11 @@ impl RedisPubsubEventListenerThread {
 
         error!("Job token received from Redis: {}", tts_job_token);
         self.token_queue.enqueue_token(&tts_job_token).unwrap();
+      }
+
+      if !self.async_thread_kill_signal.is_alive().unwrap() {
+        info!("Thread has been instructed to die.");
+        return;
       }
 
       // TODO: Proper error handling and avoid thundering herd
