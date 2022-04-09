@@ -1015,13 +1015,6 @@
     core-js-pure "^3.20.2"
     regenerator-runtime "^0.13.4"
 
-"@babel/runtime@^7.0.0", "@babel/runtime@^7.3.1":
-  version "7.17.8"
-  resolved "https://registry.yarnpkg.com/@babel/runtime/-/runtime-7.17.8.tgz#3e56e4aff81befa55ac3ac6a0967349fd1c5bca2"
-  integrity sha512-dQpEpK0O9o6lj6oPu0gRDbbnk+4LeHlNcBpspf6Olzt3GIX4P1lWF1gS+pHLDFlaJvbR6q7jCfQ08zA4QJBnmA==
-  dependencies:
-    regenerator-runtime "^0.13.4"
-
 "@babel/runtime@^7.1.2", "@babel/runtime@^7.10.2", "@babel/runtime@^7.11.2", "@babel/runtime@^7.12.1", "@babel/runtime@^7.12.13", "@babel/runtime@^7.12.5", "@babel/runtime@^7.16.3", "@babel/runtime@^7.5.1", "@babel/runtime@^7.8.4", "@babel/runtime@^7.9.2":
   version "7.16.7"
   resolved "https://registry.yarnpkg.com/@babel/runtime/-/runtime-7.16.7.tgz#03ff99f64106588c9c403c6ecb8c3bafbbdff1fa"
@@ -2097,48 +2090,6 @@
     npmlog "^4.1.2"
     write-file-atomic "^3.0.3"
 
-"@loaders.gl/core@^3.1.8":
-  version "3.1.8"
-  resolved "https://registry.yarnpkg.com/@loaders.gl/core/-/core-3.1.8.tgz#7c546cbda5e5dff8cb26a4600922ace3e1efa131"
-  integrity sha512-y+dMqkWjnC7WnrSEMBMe5vVN6N6m+eQXaEdsE8QhuFZo/np9/HkSF3Fod1pYcmlATthp5dB1djYjzQeYR/njxw==
-  dependencies:
-    "@babel/runtime" "^7.3.1"
-    "@loaders.gl/loader-utils" "3.1.8"
-    "@loaders.gl/worker-utils" "3.1.8"
-    "@probe.gl/log" "^3.5.0"
-    probe.gl "^3.4.0"
-
-"@loaders.gl/loader-utils@3.1.8":
-  version "3.1.8"
-  resolved "https://registry.yarnpkg.com/@loaders.gl/loader-utils/-/loader-utils-3.1.8.tgz#25c84ef9dcefd355e48b9dba50e7158e8cb5cbdc"
-  integrity sha512-Lgyk6RZv9ekE0MUMAmEqiEr+p3G/1XPNmMs2boyiZNy/xjq6lyBIEIqh5vALqkUWgm6519fhHjeNNwYLWY3n+Q==
-  dependencies:
-    "@babel/runtime" "^7.3.1"
-    "@loaders.gl/worker-utils" "3.1.8"
-    "@probe.gl/stats" "^3.5.0"
-
-"@loaders.gl/pcd@^3.1.8":
-  version "3.1.8"
-  resolved "https://registry.yarnpkg.com/@loaders.gl/pcd/-/pcd-3.1.8.tgz#858be302da1079e253131bda9bc87a4d06a7ae75"
-  integrity sha512-e/N8bHkKAtiaBms4Detd4HqZdFSxf4FSiLuoyzgnOQdWSNvyGJizYeN6ou8Keah+ohch+Bydg0ToQG00wSUIsg==
-  dependencies:
-    "@loaders.gl/loader-utils" "3.1.8"
-    "@loaders.gl/schema" "3.1.8"
-
-"@loaders.gl/schema@3.1.8":
-  version "3.1.8"
-  resolved "https://registry.yarnpkg.com/@loaders.gl/schema/-/schema-3.1.8.tgz#49d1cc8161356dcb4d25c35bc0e4a2a2240f4662"
-  integrity sha512-yf/zX/yyXyTV2/mUDLoPiZQsCLQmJmYW8ecbEVXnQh5XDJVWEjRL5RT9FC6/QhI3+DuUTJ6gX4nlxOpl0xmMmw==
-  dependencies:
-    "@types/geojson" "^7946.0.7"
-
-"@loaders.gl/worker-utils@3.1.8":
-  version "3.1.8"
-  resolved "https://registry.yarnpkg.com/@loaders.gl/worker-utils/-/worker-utils-3.1.8.tgz#69fc22acb1327bc5eb7045d150a762394ba01ac3"
-  integrity sha512-w2OK4EmKqQMKezgYBXii4sXczxrHf6sksYEoJUveJsZoCjN/8gGeV6X2G4Ll4TAGwOjBluSdqRNtWlU7xpV/Mw==
-  dependencies:
-    "@babel/runtime" "^7.3.1"
-
 "@nodelib/fs.scandir@2.1.5":
   version "2.1.5"
   resolved "https://registry.yarnpkg.com/@nodelib/fs.scandir/-/fs.scandir-2.1.5.tgz#7619c2eb21b25483f6d167548b4cfd5a7488c3d5"
@@ -2346,28 +2297,6 @@
     schema-utils "^3.0.0"
     source-map "^0.7.3"
 
-"@probe.gl/env@3.5.0":
-  version "3.5.0"
-  resolved "https://registry.yarnpkg.com/@probe.gl/env/-/env-3.5.0.tgz#c6d8fbf414fda3eba7b3813cc274e76245216fe0"
-  integrity sha512-YdlpZZshhyYxvWDBmZ5RIW2pTR14Pw4p9czMlt/v7F6HbFzWfAdmH7q6xVwFRYxUpQLwhWensWyv4aFysiWl4g==
-  dependencies:
-    "@babel/runtime" "^7.0.0"
-
-"@probe.gl/log@3.5.0", "@probe.gl/log@^3.5.0":
-  version "3.5.0"
-  resolved "https://registry.yarnpkg.com/@probe.gl/log/-/log-3.5.0.tgz#6589822ab771eadf77787ffc6ecf73e59d181c64"
-  integrity sha512-nW/qz2X1xY08WU/TsmJP6/6IPNcaY5fS/vLjpC4ahJuE2Mezga4hGM/R2X5JWE/nkPc+BsC5GnAnD13rwAxS7g==
-  dependencies:
-    "@babel/runtime" "^7.0.0"
-    "@probe.gl/env" "3.5.0"
-
-"@probe.gl/stats@3.5.0", "@probe.gl/stats@^3.5.0":
-  version "3.5.0"
-  resolved "https://registry.yarnpkg.com/@probe.gl/stats/-/stats-3.5.0.tgz#774495772f06e898aae28c1d315c9edac07f3425"
-  integrity sha512-IH2M+F3c8HR1DTroBARePUFG7wIewumtKA0UFqx51Z7S4hKrD60wFbpMmg0AcF4FvHAXMBoC+kYi1UKW9XbAOw==
-  dependencies:
-    "@babel/runtime" "^7.0.0"
-
 "@rollup/plugin-babel@^5.2.0":
   version "5.3.0"
   resolved "https://registry.yarnpkg.com/@rollup/plugin-babel/-/plugin-babel-5.3.0.tgz#9cb1c5146ddd6a4968ad96f209c50c62f92f9879"
@@ -2428,24 +2357,6 @@
   integrity sha512-OAPJUAtgeINhh/TAlUID4QTs53Njm7xzddaVlEs/SXwgtiD1tW22zAB/W1wdqfrpmikgaWQ9Fw6Ws+hsiRm5Vg==
   dependencies:
     "@sinonjs/commons" "^1.7.0"
-
-"@storyteller/components@file:packages/components":
-  version "0.1.0"
-  dependencies:
-    "@testing-library/jest-dom" "^5.16.1"
-    "@testing-library/react" "^9.5.0"
-    "@testing-library/user-event" "^13.5.0"
-    "@types/jest" "^27.4.0"
-    "@types/node" "^16.11.21"
-    "@types/react" "^16.9.36"
-    "@types/react-dom" "^16.9.8"
-    react "^16.13.1"
-    react-autocomplete "^1.8.1"
-    react-dom "^16.13.1"
-    react-router-dom "^5.2.0"
-    react-scripts "5.0.0"
-    typescript "^4.5.5"
-    web-vitals "^2.1.4"
 
 "@surma/rollup-plugin-off-main-thread@^2.2.3":
   version "2.2.3"
@@ -2800,11 +2711,6 @@
     "@types/express-serve-static-core" "^4.17.18"
     "@types/qs" "*"
     "@types/serve-static" "*"
-
-"@types/geojson@^7946.0.7":
-  version "7946.0.8"
-  resolved "https://registry.yarnpkg.com/@types/geojson/-/geojson-7946.0.8.tgz#30744afdb385e2945e22f3b033f897f76b1f12ca"
-  integrity sha512-1rkryxURpr6aWP7R786/UQOkJ3PcpQiWkAXBmdWc7ryFWqN6a4xfK7BtjXvFBKO9LjQ+MWQSWxYeZX1OApnArA==
 
 "@types/graceful-fs@^4.1.2":
   version "4.1.5"
@@ -11265,16 +11171,6 @@ pretty-format@^27.0.0, pretty-format@^27.0.2, pretty-format@^27.4.6:
     ansi-regex "^5.0.1"
     ansi-styles "^5.0.0"
     react-is "^17.0.1"
-
-probe.gl@^3.4.0:
-  version "3.5.0"
-  resolved "https://registry.yarnpkg.com/probe.gl/-/probe.gl-3.5.0.tgz#084c0ef3a233e1c055cd8a88efb67abb11eba483"
-  integrity sha512-KWj8u0PNytr/rVwcQFcN7O8SK7n/ITOsUZ91l4fSX95oHhKvVCI7eadrzFUzFRlXkFfBWpMWZXFHITsHHHUctw==
-  dependencies:
-    "@babel/runtime" "^7.0.0"
-    "@probe.gl/env" "3.5.0"
-    "@probe.gl/log" "3.5.0"
-    "@probe.gl/stats" "3.5.0"
 
 process-nextick-args@~2.0.0:
   version "2.0.1"

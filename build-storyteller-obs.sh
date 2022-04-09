@@ -1,4 +1,5 @@
 #!/bin/bash
+# NB: This file is executed by Netlify to build obs.storyteller.io (soon obs.storyteller.stream)
 
 set -euxo pipefail
 
