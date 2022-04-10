@@ -3,13 +3,12 @@ fakeyou-frontend
 
 TODO: 
 
-- Rename storyteller -> create-storyteller
 - Move static storyteller -> packages/, 
 - Merge in other frontends
 - Merge with backend and use protos for API?
 - Rename this repo to `storyteller-frontend`
 - ~~Upgrade to React 18~~ Carefully upgrade react. OMG. Also tests in place to ensure builds.
-- New domain. Storyteller.stream. Add video too.
+- New domain. Storyteller.stream. Add video tutorials, testimonials too.
 - Fix Discord cached social/meta tag issue
 - upgrade / fix fontawesome build issue 
 
