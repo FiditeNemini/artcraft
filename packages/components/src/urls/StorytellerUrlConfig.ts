@@ -8,7 +8,9 @@ export class StorytellerUrlConfig {
     let useSsl = true;
     let domain = StorytellerDomain.Storyteller;
 
-    if (document.location.host.includes("localhost")) {
+    if (document.location.host.includes("storyteller.stream")) {
+      domain = StorytellerDomain.StorytellerStream;
+    } else if (document.location.host.includes("localhost")) {
       // NB: `localhost` seems to have problems with cookies. 
       // I've added jungle.horse as a localhost mapped domain in /etc/hosts,
       // This should be the preferred mechanism for local testing.
@@ -40,6 +42,8 @@ export class StorytellerUrlConfig {
         return 'localhost';
       case StorytellerDomain.JungleHorse:
         return 'api.jungle.horse';
+      case StorytellerDomain.StorytellerStream:
+        return 'api.storyteller.stream';
       case StorytellerDomain.Storyteller:
       default:
         return 'api.storyteller.io';
@@ -52,6 +56,8 @@ export class StorytellerUrlConfig {
         return 'localhost';
       case StorytellerDomain.JungleHorse:
         return 'obs.jungle.horse';
+      case StorytellerDomain.StorytellerStream:
+        return 'obs.storyteller.stream';
       case StorytellerDomain.Storyteller:
       default:
         return 'obs.storyteller.io';

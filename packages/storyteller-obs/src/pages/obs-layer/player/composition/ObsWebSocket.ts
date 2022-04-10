@@ -54,6 +54,7 @@ class ObsWebSocket {
   }
 
   private onError(event: Event) {
+    console.log('error with websocket: ', event);
     if (!!this.onErrorCallback) {
       this.onErrorCallback(event);
     }

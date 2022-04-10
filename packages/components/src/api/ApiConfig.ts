@@ -21,6 +21,7 @@ enum Domain {
   Vocodes,
   FakeYou,
   Storyteller,
+  StorytellerStream,
   Unknown,
 }
 
@@ -50,11 +51,15 @@ class ApiConfig {
       domain = Domain.FakeYou;
     } else if (document.location.host.includes("storyteller.io")) {
       domain = Domain.Storyteller;
+    } else if (document.location.host.includes("storyteller.stream")) {
+      domain = Domain.StorytellerStream;
     }
 
     let v2ApiHost = "api.fakeyou.com";
     if (domain === Domain.Storyteller) {
       v2ApiHost = "api.storyteller.io";
+    } else if (domain === Domain.StorytellerStream) {
+      v2ApiHost = "api.storyteller.stream";
     } else if (!useSsl && (domain === Domain.Localhost || domain === Domain.JungleHorse)) {
       // NB: Lack of SSL means use local development.
       v2ApiHost = "api.jungle.horse";

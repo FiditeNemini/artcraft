@@ -5,6 +5,7 @@ export enum StorytellerDomain {
   JungleHorse,
   // Production
   Storyteller,
+  StorytellerStream,
 }
 
 //// Web-accessible, user-facing (non-API) domain names and subdomains

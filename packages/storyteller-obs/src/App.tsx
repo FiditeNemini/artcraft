@@ -16,7 +16,7 @@ function App () {
           <Route exact={true} path="/">
             <div style={{ width: "500px", margin: "auto", textAlign: "center" }}>
             <h1>Invalid Page for OBS</h1>
-            <h3><a href="https://controls.storyteller.io">Back to Storyteller</a></h3>
+            <h3><a href="https://create.storyteller.io">Go Back</a></h3>
             </div>
           </Route>
         </BrowserRouter>
