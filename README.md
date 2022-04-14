@@ -12,6 +12,7 @@ TODO:
   - Add video tutorials, testimonials too.
 - Fix Discord cached social/meta tag issue
 - upgrade / fix fontawesome build issue 
+- better iconography
 - UI for storyteller.stream settings
 
 Develop locally without CORS:
