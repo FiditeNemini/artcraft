@@ -14,6 +14,7 @@ TODO:
 - upgrade / fix fontawesome build issue 
 - better iconography
 - UI for storyteller.stream settings
+- Vocoder uploads
 
 Develop locally without CORS:
 ------------
