@@ -15,6 +15,7 @@ TODO:
 - better iconography
 - UI for storyteller.stream settings
 - Vocoder uploads
+- pricing plans for TTS
 
 Develop locally without CORS:
 ------------
