@@ -12,11 +12,13 @@ Application overview
   * `tts-inference-job` - Async TTS inference
   * `w2l-download-job` - Async download of videos and images
   * `w2l-inference-job` - Async W2L inference
+
 * obs_gateway
   * `obs-gateway-server` - websocket for hosting OBS, twitch pieces (move!)
   * `twitch-pubsub-job` - Subscribes to Twitch PubSub
   * `twitch-chat-job` (*TODO*) - Subscribes to Twitch chat
   * `reddit-chat-job` (*TODO*) - Subscribes to Reddit RPAN chat
+
 * social  
   * `discord-chat-job` (*TODO*) - Subscribes to Reddit RPAN chat
   * `twitter-feed-job` (*TODO*) - Subscribes to Reddit RPAN chat
