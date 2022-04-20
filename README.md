@@ -1,55 +1,28 @@
-fakeyou-frontend
-================
+storyteller-frontend
+====================
 
-TODO: 
+This repository is a frontend [monorepo](https://en.wikipedia.org/wiki/Monorepo), containing all of our websites
+and shared library code. Each website can be built and run independently of one another, but they share the same
+API backend.
 
-- Move static storyteller -> packages/, 
-- Merge in other frontends
-- Merge with backend and use protos for API?
-- Rename this repo to `storyteller-frontend`
-- ~~Upgrade to React 18~~ Carefully upgrade react. OMG. Also tests in place to ensure builds.
-- ~~New domain. Storyteller.stream.~~
-  - Add video tutorials, testimonials too.
-- Fix Discord cached social/meta tag issue
-- upgrade / fix fontawesome build issue 
-- better iconography
-- UI for storyteller.stream settings
-- Vocoder uploads
-- pricing plans for TTS
+Here are the websites contained: 
 
-Develop locally without CORS:
-------------
+- [FakeYou.com](https://fakeyou.com), our social deepfaking website
+- [Storyteller.io](https://storyteller.io), our investor relations website and eventual home of our production software
+- [Storyteller.stream](https://storyteller.stream), a Twitch TTS platform
 
-```
-chromium-browser --disable-web-security --user-data-dir=~/chrome
-```
 
-Or Mac,
+Here are some static websites contained:
 
-```
-/Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome --disable-web-security --user-data-dir=~/chrome
-```
+- [FakeYou API Docs](https://docs.fakeyou.com), API documentation for the core TTS feature. This does not document our complete API.
+- [the.storyteller.company](https://the.storyteller.company), DEPRECATED investor website. Used to get into *Founder Friendly Labs*.
 
-To add local libraries from the monorepo as dependencies
---------------------------------------------------------
 
-eg, to add the common "components" package to the "storyteller-home" website,
+Development
+-----------
 
-```
-yarn workspace @storyteller/storyteller-home add file file:../components (ACTUALLY, THIS MAY HAVE ISSUES)
-```
 
-NB: This is now a MONOREPO
---------------------------
-
-Based on https://medium.com/geekculture/setting-up-monorepo-with-create-react-app-cb2cfa763b96,
-which isn't the best guide, but it works.
-
-Library code is exported in the library's index.tsx (meh)
-
-To start the react server, run "yarn start-storyteller" or "yarn start-fakeyou"
-
-### Running
+### Development environment setup
 
 ```
 # Install Yarn if not present (Linux/Mac)
@@ -67,16 +40,38 @@ yarn start-fakeyou
 yarn start-storyteller
 ```
 
-TODO: Upgrade React, it's a bit behind. See downgrade @ SHA
-`d739b66bfa3315620208579193d652e8e460da1e`.
+### Develop locally without CORS:
 
-Good Code Examples
-------------------
+Launch Chrome without CORS enforcement, which will allow targeting against FakeYou.com's API directly:
+
+```
+chromium-browser --disable-web-security --user-data-dir=~/chrome
+```
+
+Or Mac,
+
+```
+/Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome --disable-web-security --user-data-dir=~/chrome
+```
+
+### Monorepo design
+
+The React monorepo build pattern we're using is based on 
+[this blog post](https://medium.com/geekculture/setting-up-monorepo-with-create-react-app-cb2cfa763b96),
+which while lacking in some respects, still works for our purposes.
+
+Library code is exported in the library's index.tsx (not very pretty)
+
+
+### Good Code Examples
 
 * `storyteller/src/pages/tts_configs/TtsConfigsEditRulePage.tsx` - Tree of components that handle a very complicated update API
 
-Documentation
--------------
+
+Site-specific docs
+------------------
+
+### API Documentation Site
 
 docs.fakeyou.com is generated from `./docs` using [Docsify](https://docsify.js.org/).
 
@@ -87,54 +82,35 @@ sudo npm i docsify-cli -g
 docsify serve docs
 ```
 
+Deployment
+----------
 
-Netlify Notes
--------------
+Our websites are deployed on Netlify.
+
+### Netlify notes
 
 The `.node-version` file controls which version of node Netlify uses to build!
 
-Old Readme Follows
-------------------
 
-Frontend website for https://fakeyou.com/ (previously https://vo.codes)
+Design and brand notes
+----------------------
 
-Hosted with netlify.
+### FakeYou design / brand
 
-Installation in Dev
--------------------
+FakeYou (formerly vo.codes) uses the following:
 
-Normally, `npm install` in the `./fakeyou` directory works, but Mac needed
-the following workaround for a [sass build failure](https://stackoverflow.com/a/67242989):
+* Font: fugaz one, 110, #209CEE
+* Favicon: https://favicon.io/favicon-generator/
 
-```
-nvm install 14
-```
+Social icons are paid from the subscription service [FlatIcon](https://www.flaticon.com), 
+and in particular [this pack](https://www.flaticon.com/packs/social-logo-1)
 
 
-Logo, Favicon, Font
--------------------
-Font: fugaz one, 110, #209CEE
-
-Using https://favicon.io/favicon-generator/
-
-Transparent Images
-------------------
-https://www.remove.bg (pretty cheap)gt
-
-
-Social Icons
-------------
-Taken from subscription service https://www.flaticon.com
-
-This pack: https://www.flaticon.com/packs/social-logo-1
-
-Video Thumbnails
-----------------
-Generated with https://ezgif.com/
+Video thumbnails are generated with [https://ezgif.com/](ezgif) at the following settings:
 
 * webp, 500x300px (~100kb each)
 
-Reverse clips:
+Reverse clips are generated with ffmpeg:
 
 ```
 ffmpeg -i input.mp4 -vf reverse reversed.mp4
