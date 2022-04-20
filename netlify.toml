@@ -1,0 +1,4 @@
+# Hide sourcemaps in production
+[context.production]
+environment = { GENERATE_SOURCEMAP = "false" }
+

@@ -1,0 +1,28 @@
+
+// Default langague
+export const DEFAULT_MODEL_LANGUAGE = 'English';
+
+// These are set in the backend as constants
+export const SUPPORTED_MODEL_LANGUAGE_TAG_TO_FULL : Map<string, string> = new Map([
+  ["en", "English"],
+  ["en-AU", "English (AUS)"],
+  ["en-UK", "English (UK)"],
+  ["en-US", "English (US)"],
+  ["es", "Spanish (Español)"],
+  ["es-419", "Spanish (Español Latinoamerica)"],
+  ["es-ES", "Spanish (Español España)"],
+  ["es-MX", "Spanish (Español México)"],
+  ["pt", "Portuguese (Portugués)"],
+  ["pt-BR", "Portuguese (Português Brasileiro)"],
+]);
+
+export function LanguageCodeToDescription(languageCode: string | undefined) : string | undefined {
+  if (languageCode === undefined) {
+    return undefined;
+  }
+  return SUPPORTED_MODEL_LANGUAGE_TAG_TO_FULL.get(languageCode);
+}
+
+export function LanguageCodeToDescriptionWithDefault(languageCode: string | undefined) : string | undefined {
+  return LanguageCodeToDescription(languageCode) ||  DEFAULT_MODEL_LANGUAGE;
+}

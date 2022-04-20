@@ -1,0 +1,70 @@
+{
+  "name": "@storyteller/fakeyou",
+  "version": "0.1.0",
+  "private": true,
+  "dependencies": {
+    "@storyteller/components": "0.1.0",
+    "@colormap/core": "0.1.0-3",
+    "@colormap/presets": "0.1.0-4",
+    "@craco/craco": "^6.4.3",
+    "@fortawesome/fontawesome-svg-core": "^1.2.36",
+    "@fortawesome/free-brands-svg-icons": "^5.15.4",
+    "@fortawesome/free-solid-svg-icons": "^5.15.4",
+    "@fortawesome/react-fontawesome": "^0.1.15",
+    "@testing-library/jest-dom": "^4.2.4",
+    "@testing-library/react": "^9.5.0",
+    "@testing-library/user-event": "^7.2.1",
+    "@types/axios": "^0.14.0",
+    "@types/howler": "^2.1.2",
+    "@types/jest": "^24.9.1",
+    "@types/node": "^12.12.47",
+    "@types/react": "^16.9.36",
+    "@types/react-dom": "^16.9.8",
+    "axios": "^0.21.0",
+    "bulma": "^0.9.0",
+    "craco": "^0.0.3",
+    "date-fns": "^2.22.1",
+    "howler": "^2.2.0",
+    "i18next": "^21.6.11",
+    "node-sass": "^4.14.1",
+    "react": "^16.13.1",
+    "react-autocomplete": "^1.8.1",
+    "react-dom": "^16.13.1",
+    "react-i18next": "^11.15.4",
+    "react-router-dom": "^5.2.0",
+    "react-scripts": "5.0.0",
+    "typescript": "^3.7.5",
+    "uuid": "^8.3.2",
+    "wavesurfer.js": "^5.2.0"
+  },
+  "scripts": {
+    "start": "BROWSER=none craco start",
+    "start7000": "BROWSER=none PORT=7000 craco start",
+    "start8000": "BROWSER=none PORT=8000 craco start",
+    "start8080": "BROWSER=none PORT=8080 craco start",
+    "build": "craco build",
+    "test": "craco test",
+    "eject": "craco eject"
+  },
+  "eslintConfig": {
+    "extends": "react-app"
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  },
+  "devDependencies": {
+    "@types/react-autocomplete": "^1.8.6",
+    "@types/react-router-dom": "^5.1.7",
+    "@types/uuid": "^8.3.0",
+    "@types/wavesurfer.js": "^5.2.0"
+  }
+}

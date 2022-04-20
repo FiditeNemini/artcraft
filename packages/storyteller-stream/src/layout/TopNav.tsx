@@ -1,0 +1,107 @@
+import { SessionWrapper } from '@storyteller/components/src/session/SessionWrapper';
+import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
+import { TopNavSessionButton } from './TopNavSessionButton'
+
+interface Props {
+  sessionWrapper: SessionWrapper,
+  querySessionCallback: () => void,
+}
+
+function TopNav(props: Props) {
+
+  const [mobileHamburgerIsActive, setMobileHamburgerIsActive] = useState<boolean>(false);
+
+  const toggleHamburger = () => { 
+    setMobileHamburgerIsActive(!mobileHamburgerIsActive);
+  }
+
+  const closeHamburger = () => { 
+    // TODO: This is an ergonomic hack. 
+    // The hamburger ideally should close whenever it is no longer active.
+    setMobileHamburgerIsActive(false);
+  }
+
+  const navbarClasses = mobileHamburgerIsActive ? "navbar-menu is-active" : "navbar-menu";
+  const navbarBurgerClasses = mobileHamburgerIsActive ? "navbar-burger is-active" : "navbar-burger";
+
+  return (
+    <>
+      <nav className="navbar is-transparent padding-bottom-1em">
+        <div className="navbar-brand">
+          <Link className="navbar-item" to="/">
+            <img src="/storyteller-nav-logo-mascot-pink.png" alt="Storyteller: Stream tech" />
+          </Link>
+          <div className={navbarBurgerClasses} data-target="navbarExampleTransparentExample" onClick={() => toggleHamburger()}>
+            <span></span>
+            <span></span>
+            <span></span>
+          </div>
+        </div>
+
+        <div id="navbarExampleTransparentExample" className={navbarClasses}>
+          <div className="navbar-start">
+
+            <Link to="/tts_configs"
+              className="navbar-item"
+              onClick={() => closeHamburger()}
+              >TTS Configs</Link>
+
+            <Link to="/obs_configs"
+              className="navbar-item"
+              onClick={() => closeHamburger()}
+              >OBS Configs</Link>
+
+            {/* 
+            <div className="navbar-item has-dropdown is-hoverable">
+              <Link to="/"
+                className="navbar-link"
+                onClick={() => closeHamburger()}
+                >Community</Link>
+
+              <div className="navbar-dropdown is-boxed">
+                {/* NB: There's an "is-active" class that looks nice. * /}
+
+                <Link to="/contribute"
+                  className="navbar-item"
+                  onClick={() => closeHamburger()}
+                  ><FontAwesomeIcon icon={faUpload} />&nbsp;&nbsp;Contribute / Upload</Link>
+
+              </div>
+            </div>
+            */}
+          </div>
+
+
+          <div className="navbar-end">
+            <div className="navbar-item">
+              <div className="field is-grouped">
+                <p className="control">
+                  <TopNavSessionButton
+                    sessionWrapper={props.sessionWrapper}
+                    enableAlpha={true}
+                    querySessionAction={props.querySessionCallback}
+                    closeHamburgerAction={() => closeHamburger()}
+                    />
+                </p>
+              </div>
+            </div>
+          </div>
+          {/*<div className="navbar-end">
+            <div className="navbar-item">
+              <div className="field is-grouped">
+                <p className="control">
+                  TODO
+                </p>
+              </div>
+            </div>
+          </div>*/}
+        </div>
+      </nav>
+    </>
+  )
+
+
+}
+
+export { TopNav }
