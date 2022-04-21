@@ -1,5 +1,5 @@
-storyteller-web
-===============
+storyteller-rust
+================
 
 This is the main user account monolith that we'll also bake other pieces into.
 
