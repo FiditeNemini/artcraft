@@ -48,7 +48,7 @@ const FAKEYOU_TRANSLATIONS : any = {
           buttonSpeak: 'Speak',
           errorTooManyRequests: "<strong>You're sending too many requests!</strong> Slow down a little. We have to slow things down a little when the server gets busy.",
           heroSubtitle: 'Use <strong>FakeYou</strong> deep fake tech to say stuff with your favorite characters',
-          heroTitle: 'Text to Speech*',
+          heroTitle: 'Text to Speech',
           placeholderTextGoesHere: 'Textual shenanigans go here...',
         },
         // Other pages
