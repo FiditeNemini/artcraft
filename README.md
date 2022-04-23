@@ -1,7 +1,8 @@
 storyteller-rust
 ================
 
-This is the main user account monolith that we'll also bake other pieces into.
+Our Rust monorepo, which services our 
+API surface area. 
 
 Application overview
 --------------------
