@@ -62,6 +62,15 @@ function TermsPage(props: Props) {
         Please send us an email to <code>copyright@storyteller.io</code> with details in order to 
         request a take down. 
       </p>
+
+      <p>
+        If you're a voice actor or musician, we're looking to hire talented performers to help us build
+        commercial-friendly AI voices. (The user-submitted models on FakeYou are just a technology
+        demonstration and may not be used commercially.) We want to empower small creators (game 
+        designers, musicians, and more) to voice, sing, and speak emotion into their work. Please reach
+        out to <code>jobs@storyteller.io</code> if you'd like to work with us. We can pay a flat fee 
+        and/or royalty. Please get in touch to learn more!
+      </p>
     </div>
   )
 }
