@@ -3,7 +3,7 @@ import React from 'react';
 interface Props {
 }
 
-function TermsFc(props: Props) {
+function TermsPage(props: Props) {
   return (
     <div className="content is-medium">
 
@@ -52,12 +52,18 @@ function TermsFc(props: Props) {
       </p>
 
       <p>
-        We'll be happy to remove any of the voices featured here for any reason.
+        <strong>The audio we generate is watermarked, and we will soon release a tool to verify that 
+          it is deep fake generated.</strong>
       </p>
 
-
+      <p>
+        The machine learning models and content at FakeYou are user-submitted, but we'll be happy to 
+        remove content for any reason for copyright holders, original speakers, voice actors, et al. 
+        Please send us an email to <code>copyright@storyteller.io</code> with details in order to 
+        request a take down. 
+      </p>
     </div>
   )
 }
 
-export { TermsFc };
+export { TermsPage };

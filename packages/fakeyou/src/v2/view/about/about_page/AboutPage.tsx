@@ -1,9 +1,10 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 
 interface Props {
 }
 
-function AboutFc(props: Props) {
+function AboutPage(props: Props) {
   return (
     <div className="content is-medium">
 
@@ -45,7 +46,8 @@ function AboutFc(props: Props) {
       <h1 className="title is-4"> Technology disclosure </h1>
 
       <p>
-        <em>We'll be happy to remove any of the voices featured here for any reason.</em>
+        <em>We'll be happy to remove any of the voices featured here for any reason.
+        See our <Link to="/terms">terms page</Link> for more info.</em> 
       </p>
 
       <p>
@@ -163,4 +165,4 @@ function AboutFc(props: Props) {
   )
 }
 
-export { AboutFc };
+export { AboutPage };

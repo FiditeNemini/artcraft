@@ -1,5 +1,5 @@
 import React from 'react';
-import { AboutFc } from './about/about_page/AboutFc';
+import { AboutPage } from './about/about_page/AboutPage';
 import { FirehoseEventListFc } from './firehose/FirehoseEventListFc';
 import { LoginPage } from './login/LoginPage';
 import { ModerationFc } from './moderation/moderation_main/ModerationFc';
@@ -12,7 +12,7 @@ import { ProfileFc } from './profile/profile_view/ProfileFc';
 import { SessionWrapper } from '@storyteller/components/src/session/SessionWrapper';
 import { SignupPage } from './signup/SignupPage';
 import { Switch, Route } from 'react-router-dom';
-import { TermsFc } from './about/terms_page/TermsFc';
+import { TermsPage } from './about/terms_page/TermsPage';
 import { TtsInferenceJob, W2lInferenceJob } from '../../App';
 import { TtsModelDeleteFc } from './tts/tts_model_delete/TtsModelDeleteFc';
 import { TtsModelEditFc } from './tts/tts_model_edit/TtsModelEditFc';
@@ -386,11 +386,11 @@ class NewVocodesContainer extends React.Component<Props, State> {
             </Route>
 
             <Route path="/about">
-              <AboutFc />
+              <AboutPage />
             </Route>
 
             <Route path="/terms">
-              <TermsFc />
+              <TermsPage />
             </Route>
 
             <Route path="/">
