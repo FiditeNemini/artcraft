@@ -16,6 +16,7 @@ pub const RESERVED_USERNAMES : &'static str = include_str!("../../../../db/reser
 pub const RESERVED_SUBSTRINGS : &'static str = include_str!("../../../../db/reserved_usernames_including.txt");
 
 pub mod common_env;
+pub mod configs;
 pub mod http_clients;
 pub mod http_server;
 pub mod routes;
@@ -24,9 +25,11 @@ pub mod threads;
 pub mod util;
 pub mod validations;
 
+// TODO: Eventually move all of these to the `database_queries` crate and no longer write inline MySQL.
 // NB: This is included so sqlx can generate all the queries.
 mod job_queries;
 
+// TODO: Eventually move all of these to the `database_queries` crate and no longer write inline MySQL.
 // NB: Also so sqlx codegens everything.
 // Not sure if this is strictly necessary.
 mod shared_queries {

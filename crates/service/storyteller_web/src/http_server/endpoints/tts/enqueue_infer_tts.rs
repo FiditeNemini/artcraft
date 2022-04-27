@@ -191,6 +191,9 @@ pub async fn infer_tts_handler(
       .or(maybe_user_preferred_visibility)
       .unwrap_or(RecordVisibility::Public);
 
+  // API tokens
+  let is_from_api = false;
+
   // This token is returned to the client.
   let job_token = Tokens::new_tts_inference_job()
       .map_err(|e| {
@@ -213,6 +216,7 @@ SET
   creator_ip_address = ?,
   creator_set_visibility = ?,
   priority_level = ?,
+  is_from_api = ?,
   status = "pending"
         "#,
       &job_token,
@@ -223,6 +227,7 @@ SET
       ip_address,
       set_visibility.to_str(),
       priority_level,
+      is_from_api,
     )
     .execute(&server_state.mysql_pool)
     .await;
