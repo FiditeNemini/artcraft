@@ -52,16 +52,20 @@ function TermsPage(props: Props) {
       </p>
 
       <p>
-        <strong>The audio we generate is watermarked, and we will soon release a tool to verify that 
-          it is deep fake generated.</strong>
+        <em>The audio we generate is watermarked, and we will soon release a tool to 
+          verify that it is deep fake generated and trace it back to its source.</em>
       </p>
+
+      <h1 className="title is-5">Takedown Requests</h1>
 
       <p>
         The machine learning models and content at FakeYou are user-submitted, but we'll be happy to 
         remove content for any reason for copyright holders, original speakers, voice actors, et al. 
         Please send us an email to <code>copyright@storyteller.io</code> with details in order to 
-        request a take down. 
+        request a takedown. 
       </p>
+
+      <h1 className="title is-5">Voice Acting &amp; Musician Jobs</h1>
 
       <p>
         If you're a voice actor or musician, we're looking to hire talented performers to help us build
