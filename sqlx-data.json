@@ -7834,6 +7834,16 @@
       ]
     }
   },
+  "1db585d64370f413784c3a3974ff5643c9002127fe1f45c56c9736449188061e": {
+    "query": "\nINSERT INTO tts_inference_jobs\nSET\n  token = ?,\n  uuid_idempotency_token = ?,\n\n  model_token = ?,\n  raw_inference_text = ?,\n  maybe_creator_user_token = ?,\n  creator_ip_address = ?,\n  creator_set_visibility = ?,\n  priority_level = ?,\n  is_from_api = ?,\n  status = \"pending\"\n        ",
+    "describe": {
+      "columns": [],
+      "parameters": {
+        "Right": 9
+      },
+      "nullable": []
+    }
+  },
   "218b3fe667b34bfa158bb7d4f600a3b91a22460adf566dcdf6ce540006e6c684": {
     "query": "\nUPDATE model_categories\nSET\n    name = ?,\n    maybe_dropdown_name = ?,\n\n    can_directly_have_models = ?,\n    can_have_subcategories = ?,\n    can_only_mods_apply = ?,\n\n    maybe_super_category_token = ?,\n\n    is_mod_approved = ?,\n    maybe_mod_user_token = ?,\n    maybe_mod_comments = ?,\n\n    version = version + 1\n\nWHERE token = ?\nLIMIT 1\n        ",
     "describe": {
@@ -10163,16 +10173,6 @@
         false,
         true
       ]
-    }
-  },
-  "e5d2e0881e3003256fbf54f494c356187c331c2311a6d8b53f1b4f0e72def332": {
-    "query": "\nINSERT INTO tts_inference_jobs\nSET\n  token = ?,\n  uuid_idempotency_token = ?,\n\n  model_token = ?,\n  raw_inference_text = ?,\n  maybe_creator_user_token = ?,\n  creator_ip_address = ?,\n  creator_set_visibility = ?,\n  priority_level = ?,\n  status = \"pending\"\n        ",
-    "describe": {
-      "columns": [],
-      "parameters": {
-        "Right": 8
-      },
-      "nullable": []
     }
   },
   "e73192a3e763a287d5737821443c5a81649f17e39978497b99c52e1e896a75f6": {

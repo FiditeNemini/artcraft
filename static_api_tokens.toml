@@ -7,6 +7,8 @@ maybe_user_token = 'FOO'
 maybe_priority_level = 3
 
 # /profile/api_edymuro (EdyMuro#8205)
+# Requested 2022-04-18 in Discord chat with Vegito
+# Using for their own mobile TTS app.
 [[api_tokens]]
 api_token = "SAPI:EDYMURO_A648684D5C6FDCFD"
 maybe_user_token = 'U:VR4HNTYCDBR9W'
