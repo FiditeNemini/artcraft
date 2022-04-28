@@ -22,8 +22,9 @@ maybe_user_token = 'U:VR4HNTYCDBR9W'
 api_token = "SAPI:FTK789_6096133E1D79D6FB"
 maybe_user_token = 'U:0S09H086R6TRH'
 
-# /profile/api_duke (Duke#4009)
-# Wants this for a Hackathon but "won't pay".
-[[api_tokens]]
-api_token = "API:TEMPORARY_DUKE_97FA10"
-maybe_user_token = 'U:D3TR4XRJZ3K3R'
+## /profile/api_duke (Duke#4009)
+## Wants this for a Hackathon but "won't pay".
+## Update: Cancelled hackathon
+#[[api_tokens]]
+#api_token = "API:TEMPORARY_DUKE_97FA10"
+#maybe_user_token = 'U:D3TR4XRJZ3K3R'
