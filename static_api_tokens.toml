@@ -2,12 +2,11 @@
 # This file is not distributed with the docker image and is just an example for local development.
 
 [[api_tokens]]
-api_token = "foo"
+api_token = 'foo'
 maybe_user_token = 'FOO'
-maybe_priority_level = 7
+maybe_priority_level = 3
 
+# /profile/api_edymuro (EdyMuro#8205)
 [[api_tokens]]
-api_token = "bar"
-
-[[api_tokens]]
-api_token = "baz"
+api_token = "SAPI:EDYMURO_A648684D5C6FDCFD"
+maybe_user_token = 'U:VR4HNTYCDBR9W'
