@@ -23,7 +23,8 @@ use sqlx::error::Error::Database;
 use sqlx::mysql::MySqlDatabaseError;
 use std::fmt;
 use std::sync::Arc;
-use tts_common::priority::{FAKEYOU_LOGGED_IN_PRIORITY_LEVEL, FAKEYOU_ANONYMOUS_PRIORITY_LEVEL, FAKEYOU_INVESTOR_PRIORITY_LEVEL};
+use http_server_common::request::get_request_api_token::get_request_api_token;
+use tts_common::priority::{FAKEYOU_LOGGED_IN_PRIORITY_LEVEL, FAKEYOU_ANONYMOUS_PRIORITY_LEVEL, FAKEYOU_INVESTOR_PRIORITY_LEVEL, FAKEYOU_DEFAULT_VALID_API_TOKEN_PRIORITY_LEVEL};
 use user_input_common::check_for_slurs::contains_slurs;
 
 // TODO: Temporary for investor demo
@@ -86,6 +87,12 @@ pub async fn infer_tts_handler(
   request: web::Json<InferTtsRequest>,
   server_state: web::Data<Arc<ServerState>>) -> Result<HttpResponse, InferTtsError>
 {
+  let mut is_from_api = false;
+  let mut maybe_user_token : Option<String> = None;
+  let mut priority_level = FAKEYOU_ANONYMOUS_PRIORITY_LEVEL;
+
+  // ==================== USER SESSION ==================== //
+
   let maybe_user_session = server_state
     .session_checker
     .maybe_get_user_session(&http_request, &server_state.mysql_pool)
@@ -95,14 +102,31 @@ pub async fn infer_tts_handler(
       InferTtsError::ServerError
     })?;
 
-  // ==================== PRIORITY ==================== //
+  if let Some(user_session) = maybe_user_session.as_ref() {
+    maybe_user_token = Some(user_session.user_token.to_string());
+    priority_level = FAKEYOU_LOGGED_IN_PRIORITY_LEVEL; // Give logged in users execution priority.
+  }
 
-  // Give logged in users execution priority.
-  let mut priority_level = if maybe_user_session.is_some() {
-    FAKEYOU_LOGGED_IN_PRIORITY_LEVEL
-  } else {
-    FAKEYOU_ANONYMOUS_PRIORITY_LEVEL
-  };
+  // ==================== API TOKENS ==================== //
+
+  if let Some(api_token) = get_request_api_token(&http_request) {
+    let maybe_api_token_configs = server_state
+        .static_api_token_set
+        .get_api_token(&api_token);
+
+    if let Some(api_token_configs) = maybe_api_token_configs {
+      is_from_api = true;
+
+      priority_level = api_token_configs.maybe_priority_level
+          .unwrap_or(FAKEYOU_DEFAULT_VALID_API_TOKEN_PRIORITY_LEVEL);
+
+      if let Some(user_token_override) = api_token_configs.maybe_user_token.as_deref() {
+        maybe_user_token = Some(user_token_override.trim().to_string());
+      }
+    }
+  }
+
+  // ==================== INVESTOR PRIORITY ==================== //
 
   // TODO/TEMP: Give investors even more priority
   let mut is_investor = false;
@@ -139,7 +163,7 @@ pub async fn infer_tts_handler(
   };
 
   // TODO/TEMP
-  if is_investor {
+  if is_investor || is_from_api {
     rate_limiter = &server_state.redis_rate_limiters.logged_in;
   }
 
@@ -148,10 +172,6 @@ pub async fn infer_tts_handler(
   }
 
   // ==================== CHECK AND PERFORM TTS ==================== //
-
-  let mut maybe_user_token : Option<String> = maybe_user_session
-    .as_ref()
-    .map(|user_session| user_session.user_token.to_string());
 
   let inference_text = &request.inference_text.trim().to_string();
 
@@ -190,9 +210,6 @@ pub async fn infer_tts_handler(
   let set_visibility = request.creator_set_visibility
       .or(maybe_user_preferred_visibility)
       .unwrap_or(RecordVisibility::Public);
-
-  // API tokens
-  let is_from_api = false;
 
   // This token is returned to the client.
   let job_token = Tokens::new_tts_inference_job()

@@ -3,6 +3,8 @@
 
 [[api_tokens]]
 api_token = "foo"
+maybe_user_token = 'FOO'
+maybe_priority_level = 7
 
 [[api_tokens]]
 api_token = "bar"

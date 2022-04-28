@@ -11,6 +11,10 @@ pub const FAKEYOU_ANONYMOUS_PRIORITY_LEVEL : u8 = 0;
 /// Logged in users
 pub const FAKEYOU_LOGGED_IN_PRIORITY_LEVEL : u8 = 1;
 
+/// Default API priority
+/// This is only for "valid" API tokens and can be adjusted up or down.
+pub const FAKEYOU_DEFAULT_VALID_API_TOKEN_PRIORITY_LEVEL : u8 = 1;
+
 /// Investors accessing storyteller.io
 pub const FAKEYOU_INVESTOR_PRIORITY_LEVEL : u8 = 2;
 
