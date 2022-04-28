@@ -1,11 +1,46 @@
 //! Static FakeYou API tokens can be read from a config file.
 //! This will be a stopgap until we deploy the full system.
 
+use container_common::anyhow_result::AnyhowResult;
+use container_common::files::read_toml_file_to_struct::read_toml_file_to_struct;
+use log::{error, info};
+use std::collections::HashMap;
 use std::fs::File;
 use std::io::Read;
-use container_common::anyhow_result::AnyhowResult;
 
-#[derive(Clone, Deserialize, Debug)]
+/// Config to pass to handlers
+pub struct StaticApiTokenSet {
+  /// Token -> Token config
+  api_tokens: HashMap<String, StaticApiTokenConfig>
+}
+
+impl StaticApiTokenSet {
+  /// Read from file
+  pub fn from_file(filename: &str) -> Self {
+    let api_tokens = read_toml_file_to_struct(filename).unwrap_or_else(|e| {
+      error!("Error reading static API tokens config file: {:?}", e);
+      StaticApiTokens::default()
+    });
+
+    info!("Static API Tokens: {} total", api_tokens.api_tokens.len());
+
+    let mut map = HashMap::new();
+    for item in api_tokens.api_tokens.into_iter() {
+      info!("{:?}", &item);
+      map.insert(item.api_token.clone(), item);
+    }
+
+    Self {
+      api_tokens: map,
+    }
+  }
+  pub fn get_api_token(&self, api_token: &str) -> Option<StaticApiTokenConfig> {
+    self.api_tokens.get(api_token).map(|token| token.clone())
+  }
+}
+
+/// Struct deserialization of TOML config file
+#[derive(Clone, Deserialize, Debug, Default)]
 pub struct StaticApiTokens {
   pub api_tokens: Vec<StaticApiTokenConfig>
 }
@@ -19,15 +54,4 @@ pub struct StaticApiTokenConfig {
   /// Priority level to force
   /// Defaults to "1" if not set.
   pub maybe_priority_level: Option<u8>,
-}
-
-impl StaticApiTokens {
-
-  pub fn read_from_file(filename: &str) -> AnyhowResult<StaticApiTokens> {
-    let mut file = File::open(filename)?;
-    let mut buffer = String::new();
-    file.read_to_string(&mut buffer)?;
-    let api_tokens = toml::from_str(&buffer)?;
-    Ok(api_tokens)
-  }
 }

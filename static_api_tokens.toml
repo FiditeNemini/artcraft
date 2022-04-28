@@ -1,0 +1,11 @@
+# A list of statically-configured (not-DB backed) API tokens.
+# This file is not distributed with the docker image and is just an example for local development.
+
+[[api_tokens]]
+api_token = "foo"
+
+[[api_tokens]]
+api_token = "bar"
+
+[[api_tokens]]
+api_token = "baz"

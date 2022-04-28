@@ -12,9 +12,9 @@ use r2d2_redis::{r2d2, RedisConnectionManager};
 use sqlx::MySqlPool;
 use crate::threads::db_health_checker_thread::db_health_check_status::HealthCheckStatus;
 use crate::http_server::endpoints::categories::list_tts_categories::DisplayCategory;
+use crate::StaticApiTokenSet;
 
 /// State that is injected into every endpoint.
-#[derive(Clone)]
 pub struct ServerState {
   /// Configuration from ENV vars.
   pub env_config: EnvConfig,
@@ -45,6 +45,8 @@ pub struct ServerState {
   pub sort_key_crypto: SortKeyCrypto,
 
   pub ip_banlist: IpBanlistSet,
+
+  pub static_api_token_set: StaticApiTokenSet,
 
   pub caches: InMemoryCaches,
 

@@ -117,7 +117,7 @@ use database_queries::mediators::firehose_publisher::FirehosePublisher;
 use futures::Future;
 use http_server_common::cors::build_common_cors_config;
 use limitation::Limiter;
-use log::{info};
+use log::{error, info};
 use r2d2_redis::RedisConnectionManager;
 use r2d2_redis::r2d2;
 use r2d2_redis::redis::Commands;
@@ -126,7 +126,9 @@ use sqlx::mysql::MySqlPoolOptions;
 use std::sync::Arc;
 use std::time::Duration;
 use tokio::runtime::Runtime;
+use container_common::files::read_toml_file_to_struct::read_toml_file_to_struct;
 use twitch_common::twitch_secrets::TwitchSecrets;
+use crate::configs::static_api_tokens::{StaticApiTokenConfig, StaticApiTokens, StaticApiTokenSet};
 use crate::threads::db_health_checker_thread::db_health_checker_thread::db_health_checker_thread;
 use crate::threads::db_health_checker_thread::db_health_check_status::HealthCheckStatus;
 
@@ -315,6 +317,8 @@ async fn main() -> AnyhowResult<()> {
 
   let twitch_secrets = TwitchSecrets::from_env()?;
 
+  let static_api_token_set = read_static_api_tokens();
+
   // Background jobs.
 
   let health_check_status = HealthCheckStatus::new();
@@ -365,6 +369,7 @@ async fn main() -> AnyhowResult<()> {
     audio_uploads_bucket_root,
     sort_key_crypto,
     ip_banlist,
+    static_api_token_set,
     caches: InMemoryCaches {
       voice_list: voice_list_cache,
       category_list: category_list_cache,
@@ -382,6 +387,14 @@ async fn main() -> AnyhowResult<()> {
   serve(server_state)
     .await?;
   Ok(())
+}
+
+fn read_static_api_tokens() -> StaticApiTokenSet {
+  let filename = easyenv::get_env_string_or_default(
+    "STATIC_API_TOKENS_CONFIG_FILE",
+    "static_api_tokens.toml");
+
+  StaticApiTokenSet::from_file(&filename)
 }
 
 pub async fn serve(server_state: ServerState) -> AnyhowResult<()>
