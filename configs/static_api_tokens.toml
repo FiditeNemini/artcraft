@@ -1,5 +1,5 @@
 # A list of statically-configured (not-DB backed) API tokens.
-# This file is not distributed with the docker image and is just an example for local development.
+# This file is *NOT* distributed with the docker image and is just an example for local development.
 
 # kubectl create configmap static-api-tokens --namespace storyteller --from-file=static_api_tokens.toml
 
@@ -21,6 +21,13 @@ maybe_user_token = 'U:VR4HNTYCDBR9W'
 [[api_tokens]]
 api_token = "SAPI:FTK789_6096133E1D79D6FB"
 maybe_user_token = 'U:0S09H086R6TRH'
+
+# /profile/Hmm (ID10T#6255)
+# Requested 2022-04-29 in Discord
+# Using for their own mobile TTS app.
+[[api_tokens]]
+api_token = "SAPI:HMM_7B3CFC9D64A90006"
+maybe_user_token = 'U:B2MQPN6ZGAXH5'
 
 ## /profile/api_duke (Duke#4009)
 ## Wants this for a Hackathon but "won't pay".

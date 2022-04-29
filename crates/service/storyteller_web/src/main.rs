@@ -392,7 +392,7 @@ async fn main() -> AnyhowResult<()> {
 fn read_static_api_tokens() -> StaticApiTokenSet {
   let filename = easyenv::get_env_string_or_default(
     "STATIC_API_TOKENS_CONFIG_FILE",
-    "static_api_tokens.toml");
+    "./configs/static_api_tokens.toml");
 
   StaticApiTokenSet::from_file(&filename)
 }

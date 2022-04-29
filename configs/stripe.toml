@@ -1,0 +1,5 @@
+# Stripe configs
+# This file will get bundled with `storyteller-web` in the Docker image,
+# but it can be overwritten by Kubernetes if necessary.
+# IT CONTAINS NO SECRETS, SUCH AS API KEYS.
+
