@@ -37,7 +37,7 @@ yarn install
 
 # Start one or more of the several frontends (Linux/Mac)
 yarn start-fakeyou
-yarn start-storyteller
+yarn start-storyteller-home
 ```
 
 ### Develop locally without CORS:
