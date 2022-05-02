@@ -17,12 +17,30 @@ use sqlx::error::Error::Database;
 use sqlx::mysql::MySqlDatabaseError;
 use std::sync::Arc;
 
+#[derive(Serialize, Copy, Clone)]
+pub enum FakeYouPlan {
+  Free,
+  Basic,
+  Pro,
+}
+
+#[derive(Serialize, Copy, Clone)]
+pub enum StorytellerStreamPlan {
+  Free,
+  Basic,
+  Pro,
+}
+
 #[derive(Serialize)]
 pub struct UserInfo {
   pub user_token: String,
   pub username: String,
   pub display_name: String,
   pub email_gravatar_hash: String,
+
+  // Premium plans:
+  pub fakeyou_plan: FakeYouPlan,
+  pub storyteller_stream_plan: StorytellerStreamPlan,
 
   // Usage permissions:
   pub can_use_tts: bool,
@@ -105,6 +123,10 @@ pub async fn session_info_handler(
           username: session_data.username.to_string(),
           display_name: session_data.display_name.to_string(),
           email_gravatar_hash: session_data.email_gravatar_hash.to_string(),
+
+          // Premium plans:
+          fakeyou_plan: FakeYouPlan::Free,
+          storyteller_stream_plan: StorytellerStreamPlan::Free,
 
           // Usage permissions:
           can_use_tts: session_data.can_use_tts,
