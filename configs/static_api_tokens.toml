@@ -29,6 +29,13 @@ maybe_user_token = 'U:0S09H086R6TRH'
 api_token = "SAPI:HMM_7B3CFC9D64A90006"
 maybe_user_token = 'U:B2MQPN6ZGAXH5'
 
+# /profile/majd (Majd#3540)
+# Requested 2022-05-01 in Discord
+# For Elon Musk + Unity experiment
+[[api_tokens]]
+api_token = "SAPI:MAJD_0001A330EC41FB6D"
+maybe_user_token = 'U:WSKSXDAZVXY5W'
+
 ## /profile/api_duke (Duke#4009)
 ## Wants this for a Hackathon but "won't pay".
 ## Update: Cancelled hackathon
