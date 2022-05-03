@@ -15,7 +15,10 @@ NB: Debugging with CORS and self signed certs in local dev is a nightmare. Use t
 function ObsLayerPage() {
   const { username } : { username : string } = useParams();
 
-  const [interfaceHidden, setInterfaceHidden]= useState(false);
+  // FIXME: We're going to remove the "click to activate" button by switching this to true
+  // Ultimately all of this UI should be pulled out, because very few people are using this
+  // through their browsers.
+  const [interfaceHidden, setInterfaceHidden]= useState(true);
 
   const webSocketProtocolRef = useRef<WebSocketProtocol>(new WebSocketProtocol(username));
 
