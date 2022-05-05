@@ -11,6 +11,7 @@ import { ProfileEditFc } from './profile/profile_edit/ProfileEditFc';
 import { ProfileFc } from './profile/profile_view/ProfileFc';
 import { SessionWrapper } from '@storyteller/components/src/session/SessionWrapper';
 import { SignupPage } from './signup/SignupPage';
+import { PricingPage } from './pricing/Pricing';
 import { Switch, Route } from 'react-router-dom';
 import { TermsPage } from './about/terms_page/TermsPage';
 import { TtsInferenceJob, W2lInferenceJob } from '../../App';
@@ -94,9 +95,9 @@ interface Props {
   allTtsCategories: TtsCategoryType[],
   setAllTtsCategories: (allTtsCategories: TtsCategoryType[]) => void,
 
-  allTtsCategoriesByTokenMap: Map<string,TtsCategoryType>,
-  allTtsModelsByTokenMap: Map<string,TtsModelListItem>,
-  ttsModelsByCategoryToken: Map<string,Set<TtsModelListItem>>,
+  allTtsCategoriesByTokenMap: Map<string, TtsCategoryType>,
+  allTtsModelsByTokenMap: Map<string, TtsModelListItem>,
+  ttsModelsByCategoryToken: Map<string, Set<TtsModelListItem>>,
 
   dropdownCategories: TtsCategoryType[][],
   setDropdownCategories: (dropdownCategories: TtsCategoryType[][]) => void,
@@ -131,7 +132,7 @@ class NewVocodesContainer extends React.Component<Props, State> {
             logoutHandler={this.logout}
             sessionWrapper={this.props.sessionWrapper}
             querySessionCallback={this.props.querySessionAction}
-            />
+          />
 
           <ScrollToTop />
 
@@ -157,9 +158,9 @@ class NewVocodesContainer extends React.Component<Props, State> {
 
 
             <Route path="/profile/:username/edit">
-                <ProfileEditFc
-                  sessionWrapper={this.props.sessionWrapper}
-                />
+              <ProfileEditFc
+                sessionWrapper={this.props.sessionWrapper}
+              />
             </Route>
 
             <Route path="/profile/:username/ban">
@@ -169,14 +170,21 @@ class NewVocodesContainer extends React.Component<Props, State> {
             </Route>
 
             <Route path="/profile/:username">
-                <ProfileFc
-                  sessionWrapper={this.props.sessionWrapper}
-                />
+              <ProfileFc
+                sessionWrapper={this.props.sessionWrapper}
+              />
             </Route>
 
             <Route path="/signup">
               <SignupPage
-                querySessionCallback={()=>{}}
+                querySessionCallback={() => { }}
+                sessionWrapper={this.props.sessionWrapper}
+              />
+            </Route>
+
+            <Route path="/pricing">
+              <PricingPage
+                querySessionCallback={() => { }}
                 sessionWrapper={this.props.sessionWrapper}
               />
             </Route>
@@ -357,7 +365,7 @@ class NewVocodesContainer extends React.Component<Props, State> {
                 sessionWrapper={this.props.sessionWrapper}
               />
             </Route>
-            
+
             <Route path="/moderation/category/delete/:token">
               <ModerationCategoryDeletePage
                 sessionWrapper={this.props.sessionWrapper}
@@ -438,7 +446,7 @@ class NewVocodesContainer extends React.Component<Props, State> {
 
           <NewFooterNavFc
             sessionWrapper={this.props.sessionWrapper}
-            />
+          />
 
         </div>
       </div>

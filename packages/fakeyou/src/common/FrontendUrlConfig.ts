@@ -4,7 +4,7 @@ class FrontendUrlConfig {
 
   // Main
 
-  static indexPage() : string {
+  static indexPage(): string {
     return '/';
   }
 
@@ -16,109 +16,113 @@ class FrontendUrlConfig {
 
   // Standalone pages
 
-  static aboutUsPage() : string {
+  static aboutUsPage(): string {
     return '/about';
   }
-  
-  static termsPage() : string {
+
+  static pricingPage(): string {
+    return '/pricing';
+  }
+
+  static termsPage(): string {
     return '/terms';
   }
-  
-  static patronsPage() : string {
+
+  static patronsPage(): string {
     return '/patrons';
   }
 
-  static cloneRequestPage() : string {
+  static cloneRequestPage(): string {
     return '/clone';
   }
 
   // Other domains
 
-  static developerDocs() : string {
+  static developerDocs(): string {
     return 'https://docs.fakeyou.com/';
   }
 
   // TTS model links
 
-  static ttsModelPage(modelToken: string) : string {
+  static ttsModelPage(modelToken: string): string {
     return `/tts/${modelToken}`;
   }
 
-  static ttsModelEditPage(modelToken: string) : string {
+  static ttsModelEditPage(modelToken: string): string {
     return `/tts/${modelToken}/edit`;
   }
 
-  static ttsModelEditCategoriesPage(modelToken: string) : string {
+  static ttsModelEditCategoriesPage(modelToken: string): string {
     return `/tts/${modelToken}/categories`;
   }
 
-  static ttsModelDeletePage(modelToken: string) : string {
+  static ttsModelDeletePage(modelToken: string): string {
     return `/tts/${modelToken}/delete`;
   }
 
-  static ttsResultPage(resultToken: string) : string {
+  static ttsResultPage(resultToken: string): string {
     return `/tts/result/${resultToken}`;
   }
 
-  static ttsResultEditPage(resultToken: string) : string {
+  static ttsResultEditPage(resultToken: string): string {
     return `/tts/result/${resultToken}/edit`;
   }
 
-  static ttsResultDeletePage(resultToken: string) : string {
+  static ttsResultDeletePage(resultToken: string): string {
     return `/tts/result/${resultToken}/delete`;
   }
 
   // W2L template links
 
-  static w2lListPage() : string {
+  static w2lListPage(): string {
     return '/video';
   }
 
-  static w2lTemplatePage(templateToken: string) : string {
+  static w2lTemplatePage(templateToken: string): string {
     return `/w2l/${templateToken}`;
   }
 
-  static w2lTemplateEditPage(templateToken: string) : string {
+  static w2lTemplateEditPage(templateToken: string): string {
     return `/w2l/${templateToken}/edit`;
   }
 
-  static w2lTemplateApprovalPage(templateToken: string) : string {
+  static w2lTemplateApprovalPage(templateToken: string): string {
     return `/w2l/${templateToken}/approval`;
   }
 
-  static w2lTemplateDeletePage(templateToken: string) : string {
+  static w2lTemplateDeletePage(templateToken: string): string {
     return `/w2l/${templateToken}/delete`;
   }
 
-  static w2lResultPage(resultToken: string) : string {
+  static w2lResultPage(resultToken: string): string {
     return `/w2l/result/${resultToken}`;
   }
 
-  static w2lResultEditPage(resultToken: string) : string {
+  static w2lResultEditPage(resultToken: string): string {
     return `/w2l/result/${resultToken}/edit`;
   }
 
-  static w2lResultDeletePage(resultToken: string) : string {
+  static w2lResultDeletePage(resultToken: string): string {
     return `/w2l/result/${resultToken}/delete`;
   }
 
   // User links
 
-  static userProfilePage(userDisplayName: string) : string {
+  static userProfilePage(userDisplayName: string): string {
     return `/profile/${userDisplayName}`;
   }
 
-  static userProfileEditPage(userDisplayName: string) : string {
+  static userProfileEditPage(userDisplayName: string): string {
     return `/profile/${userDisplayName}/edit`;
   }
 
-  static userProfileBanPage(userDisplayName: string) : string {
+  static userProfileBanPage(userDisplayName: string): string {
     return `/profile/${userDisplayName}/ban`;
   }
 
   // Contribute 
 
-  static contributePage() : string {
+  static contributePage(): string {
     return '/contribute';
   }
 
@@ -128,19 +132,19 @@ class FrontendUrlConfig {
 
   // Moderation links
 
-  static moderationMain() : string {
+  static moderationMain(): string {
     return '/moderation';
   }
 
-  static moderationTtsCategoryList() : string {
+  static moderationTtsCategoryList(): string {
     return '/moderation/tts_category/list';
   }
 
-  static moderationTtsCategoryEdit(categoryToken: string) : string {
+  static moderationTtsCategoryEdit(categoryToken: string): string {
     return `/moderation/tts_category/edit/${categoryToken}`;
   }
 
-  static moderationCategoryDeletePage(categoryToken: string) : string {
+  static moderationCategoryDeletePage(categoryToken: string): string {
     return `/moderation/category/delete/${categoryToken}`;
   }
 }
