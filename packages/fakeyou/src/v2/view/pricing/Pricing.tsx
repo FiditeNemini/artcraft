@@ -17,8 +17,6 @@ function PricingPage(props: Props) {
   const BASIC = FAKEYOU_PRICES.basic
   const PRO = FAKEYOU_PRICES.pro
 
-  console.log(PRICE_LIST)
-
   return (
     <div>
       <h1 className="title is-1">
