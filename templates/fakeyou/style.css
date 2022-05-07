@@ -69,9 +69,10 @@ h1 {
   padding-left: var(--bs-gutter-x, 1rem);
 }
 
-/*margin top 2rem for panels*/
-.pt-6 {
+/*margin top/bottom for panels*/
+.py-6 {
   padding-top: 2rem !important;
+  padding-bottom: 1rem !important;
 }
 
 .navbar {
@@ -244,7 +245,7 @@ h1 {
 }
 
 .social-icon {
-  font-size: 28px;
+  font-size: 24px;
   color: #fff;
   text-decoration: none;
   cursor: pointer;
