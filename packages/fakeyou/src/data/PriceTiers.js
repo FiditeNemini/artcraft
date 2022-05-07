@@ -1,53 +1,59 @@
 const FAKEYOU_PRICES = {
-  free: {
+  'free': {
+    tier: 'free',
     price: 0,
     features: {
-      extendedAudio: false,
-      mp3: false,
-      priorityProcessing: false,
-      commercialVoices: false
+      'Extended Audio': false,
+      'mp3': false,
+      'Priority Processing': false,
+      'Commercial Voices': false
     }
   },
-  basic: {
+  'basic': {
+    tier: 'basic',
     price: 5,
     features: {
-      extendedAudio: true,
-      mp3: false,
-      priorityProcessing: false,
-      commercialVoices: false
+      'Extended Audio': true,
+      'mp3': false,
+      'Priority Processing': false,
+      'Commercial Voices': false
     }
   },
-  pro: {
+  'pro': {
+    tier: 'pro',
     price: 30,
     features: {
-      extendedAudio: true,
-      mp3: true,
-      priorityProcessing: true,
-      commercialVoices: true
+      'Extended Audio': true,
+      'mp3': true,
+      'Priority Processing': true,
+      'Commercial Voices': true
     }
   }
 }
 
 const STORYTELLER_PRICES = {
-  free: {
+  'free': {
+    tier: 'free',
     price: 0,
     features: {
-      priorityProcessing: false,
-      streamlabs: false
+      'Priority Processing': false,
+      'Stream Labs': false
     }
   },
   basic: {
+    tier: 'basic',
     price: 5,
     features: {
-      priorityProcessing: false,
-      streamlabs: false
+      'Priority Processing': false,
+      'Stream Labs': false
     }
   },
   pro: {
+    tier: 'premium',
     price: 50,
     features: {
-      priorityProcessing: true,
-      streamlabs: true
+      'Priority Processing': true,
+      "Stream Labs": true
     }
   }
 }

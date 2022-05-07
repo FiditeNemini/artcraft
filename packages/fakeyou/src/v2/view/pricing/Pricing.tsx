@@ -1,11 +1,8 @@
 import React, { useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faMoneyBillWave, faCheckCircle as TRUE, faTimesCircle as FALSE } from '@fortawesome/free-solid-svg-icons';
-import { CreateAccount, CreateAccountIsError, CreateAccountIsSuccess } from '@storyteller/components/src/api/user/CreateAccount';
-
-import { Link } from 'react-router-dom';
 import { SessionWrapper } from '@storyteller/components/src/session/SessionWrapper';
-import { FAKEYOU_PRICES } from '../../../data/PriceTiers'
+import { FAKEYOU_PRICES as FYP, STORYTELLER_PRICES as STP } from '@storyteller/fakeyou/src/data/PriceTiers'
 
 interface Props {
   sessionWrapper: SessionWrapper,
@@ -13,9 +10,33 @@ interface Props {
 }
 
 function PricingPage(props: Props) {
-  const FREE = FAKEYOU_PRICES.free
-  const BASIC = FAKEYOU_PRICES.basic
-  const PRO = FAKEYOU_PRICES.pro
+  function capitalize(word: string) {
+    return word.charAt(0).toUpperCase() + word.slice(1)
+  }
+
+  const [FY_TIERS, ST_TIERS] = [
+    Object.keys(FYP),
+    Object.keys(STP)
+  ]
+
+  const [FY_FEATURES, ST_FEATURES] = [Object.keys(FYP.free.features), Object.keys(STP.free.features)]
+
+  let current_tiers: string[], current_features: string[], current_list: any
+
+  const site = window.location.hostname
+
+  switch (site) {
+    case 'fakeyou':
+      [current_tiers, current_features, current_list] = [FY_TIERS, FY_FEATURES, FYP];
+      break
+    case 'storyteller':
+      [current_tiers, current_features, current_list] = [ST_TIERS, ST_FEATURES, STP];
+      break
+    default:
+      [current_tiers, current_features, current_list] = [FY_TIERS, FY_FEATURES, FYP];
+      break
+  }
+
 
   return (
     <div>
@@ -30,99 +51,45 @@ function PricingPage(props: Props) {
               <th className="is-flex is-align-items-center is-justify-content-center">
                 <FontAwesomeIcon icon={faMoneyBillWave} className="fa-3x" />
               </th>
-              <th className="has-text-weight-bold is-size-1-desktop is-size-4-tablet is-size-6-mobile">
-                Free
-              </th>
-              <th className="has-text-weight-bold is-size-1-desktop is-size-4-tablet is-size-6-mobile">
-                Basic
-              </th>
-              <th className="has-text-weight-bold is-size-1-desktop is-size-4-tablet is-size-6-mobile">
-                Pro
-              </th>
+
+              {
+                current_tiers.map(e => { return <th key={e} className="has-text-weight-bold is-size-1-desktop is-size-4-tablet is-size-6-mobile">{capitalize(e)}</th> })
+              }
             </tr>
           </thead>
 
           <tbody>
-            {/* Price */}
             <tr>
               <td className="has-text-weight-bold">Price</td>
-              <td>${FREE.price}/month</td>
-              <td>${BASIC.price}/month</td>
-              <td>${PRO.price}/month</td>
+              <td>${current_list.free.price}/month</td>
+              <td>${current_list.basic.price}/month</td>
+              <td>${current_list.pro.price}/month</td>
             </tr>
 
-            {/* Extended Audio */}
-            <tr>
-              <td>Extended Audio</td>
-              <td>
-                <FontAwesomeIcon icon={FREE.features.extendedAudio ? TRUE : FALSE} className={`fa-3x ${FREE.features.extendedAudio ? "has-text-success" : "has-text-danger"}`}
-                />
-              </td>
-              <td>
-                <FontAwesomeIcon icon={BASIC.features.extendedAudio ? TRUE : FALSE} className={`fa-3x ${BASIC.features.extendedAudio ? "has-text-success" : "has-text-danger"}`}
-                />
-              </td>
-              <td>
-                <FontAwesomeIcon icon={PRO.features.extendedAudio ? TRUE : FALSE} className={`fa-3x ${PRO.features.extendedAudio ? "has-text-success" : "has-text-danger"}`}
-                />
-              </td>
-            </tr>
+            {
+              current_features.map((e, i) => {
+                return (
+                  <tr key={i}>
+                    <td >{e}</td>
 
-            {/* mp3 */}
-            <tr>
-              <td>mp3 Format</td>
-              <td>
-                <FontAwesomeIcon icon={FREE.features.mp3 ? TRUE : FALSE} className={`fa-3x ${FREE.features.mp3 ? "has-text-success" : "has-text-danger"}`}
-                />
-              </td>
-              <td>
-                <FontAwesomeIcon icon={BASIC.features.mp3 ? TRUE : FALSE} className={`fa-3x ${BASIC.features.mp3 ? "has-text-success" : "has-text-danger"}`}
-                />
-              </td>
-              <td>
-                <FontAwesomeIcon icon={PRO.features.mp3 ? TRUE : FALSE} className={`fa-3x ${PRO.features.mp3 ? "has-text-success" : "has-text-danger"}`}
-                />
-              </td>
-            </tr>
+                    <td>
+                      <FontAwesomeIcon icon={current_list.free.features[e] ? TRUE : FALSE} className={`fa-3x ${current_list.free.features[e] ? "has-text-success" : "has-text-danger"}`} />
+                    </td>
 
-            {/* Priority Processing */}
-            <tr>
-              <td>Priority Processing</td>
-              <td>
-                <FontAwesomeIcon icon={FREE.features.priorityProcessing ? TRUE : FALSE} className={`fa-3x ${FREE.features.priorityProcessing ? "has-text-success" : "has-text-danger"}`}
-                />
-              </td>
-              <td>
-                <FontAwesomeIcon icon={BASIC.features.priorityProcessing ? TRUE : FALSE} className={`fa-3x ${BASIC.features.priorityProcessing ? "has-text-success" : "has-text-danger"}`}
-                />
-              </td>
-              <td>
-                <FontAwesomeIcon icon={PRO.features.priorityProcessing ? TRUE : FALSE} className={`fa-3x ${PRO.features.priorityProcessing ? "has-text-success" : "has-text-danger"}`}
-                />
-              </td>
-            </tr>
+                    <td>
+                      <FontAwesomeIcon icon={current_list.basic.features[e] ? TRUE : FALSE} className={`fa-3x ${current_list.basic.features[e] ? "has-text-success" : "has-text-danger"}`} />
+                    </td>
 
-            {/* Commercial Voices */}
-            <tr>
-              <td>Commercial Voices</td>
-              <td>
-                <FontAwesomeIcon icon={FREE.features.commercialVoices ? TRUE : FALSE} className={`fa-3x ${FREE.features.commercialVoices ? "has-text-success" : "has-text-danger"}`}
-                />
-              </td>
-              <td>
-                <FontAwesomeIcon icon={BASIC.features.commercialVoices ? TRUE : FALSE} className={`fa-3x ${BASIC.features.commercialVoices ? "has-text-success" : "has-text-danger"}`}
-                />
-              </td>
-              <td>
-                <FontAwesomeIcon icon={PRO.features.commercialVoices ? TRUE : FALSE} className={`fa-3x ${PRO.features.commercialVoices ? "has-text-success" : "has-text-danger"}`}
-                />
-              </td>
-            </tr>
-
+                    <td>
+                      <FontAwesomeIcon icon={current_list.pro.features[e] ? TRUE : FALSE} className={`fa-3x ${current_list.pro.features[e] ? "has-text-success" : "has-text-danger"}`} />
+                    </td>
+                  </tr>
+                )
+              })
+            }
           </tbody>
         </table>
       </div>
-
     </div>
   )
 }
