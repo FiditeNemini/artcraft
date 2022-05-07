@@ -13,17 +13,18 @@
       crossorigin="anonymous"
     />
     <link rel="stylesheet" href="style.css" />
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fira+Sans:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
+      href="https://fonts.googleapis.com/css2?family=Fira+Sans:wght@100;200;300;400;500;600;700;800;900&display=swap"
       rel="stylesheet"
-      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css"
     />
 
     <script src="https://unpkg.com/scrollreveal"></script>
-
-    
+    <script
+      src="https://kit.fontawesome.com/a73498f2ed.js"
+      crossorigin="anonymous"
+    ></script>
 
     <title>FakeYou. Deep Fake Text to Speech.</title>
   </head>
@@ -32,7 +33,7 @@
       <div class="particles-container">
         <div id="particles-js"></div>
       </div>
-      
+
       <nav class="navbar navbar-expand-lg navbar-dark navbar-fixed py-3">
         <div class="container">
           <a class="navbar-brand me-5 pr-8" href="#">
@@ -106,7 +107,7 @@
             class="d-grid gap-2 d-flex justify-content-start d-none d-lg-block"
           >
             <a class="nav-login me-3" href="">Login</a>
-            <button type="button" class="btn btn-primary btn-lg px-4 me-md-2">
+            <button type="button" class="btn btn-primary btn-lg">
               Sign up
             </button>
           </div>
@@ -125,20 +126,28 @@
               />
             </div>
           </div>
-          <div class="col-lg-6">
-            <h1 class="ani1 load-hidden display-3 fw-bold lh-1 mb-3">Text to Speech</h1>
-            <div class="d-flex justify-content-center">
-              <p class="ani2 load-hidden lead mb-5">
-                Use FakeYou deep fake tech to say stuff with your favorite
-                characters.
-              </p>
+          <div class="col-lg-6 px-md-2 px-lg-5 px-xl-2">
+            <div>
+              <h1
+                class="ani1 load-hidden display-3 fw-bold lh-1 mb-3 text-center text-lg-start"
+              >
+                Text to Speech
+              </h1>
+              <div class="d-flex justify-content-center">
+                <p class="ani2 load-hidden lead mb-5 text-center text-lg-start">
+                  Use FakeYou deep fake tech to say stuff with your favorite
+                  characters.
+                </p>
+              </div>
             </div>
 
-            <div class="ani3 load-hidden d-grid gap-2 d-md-flex justify-content-md-start">
-              <button type="button" class="btn btn-primary btn-lg px-4 me-md-2">
+            <div
+              class="ani3 load-hidden d-grid gap-3 d-lg-flex justify-content-lg-start"
+            >
+              <button type="button" class="btn btn-primary btn-lg">
                 Sign Up
               </button>
-              <button type="button" class="btn btn-secondary btn-lg px-4">
+              <button type="button" class="btn btn-secondary btn-lg">
                 Clone My Voice!
               </button>
             </div>
@@ -146,24 +155,20 @@
         </div>
       </div>
 
-      <div class="container py-5">
-        <div class="create-panel load-hidden">
-          <div class="panel-title d-flex align-items-center gap-3">
-            <div>
-              <i class="bi-volume-up-fill"></i>
-            </div>
-            <div>Create Your TTS</div>
+      <div class="container-panel py-5">
+        <div class="panel p-3 p-lg-4 load-hidden mt-5 mt-lg-0">
+          <div
+            class="panel-title d-flex align-items-center gap-3 w-100 justify-content-center justify-content-lg-start"
+          >
+            <i class="fa-solid fa-volume-high fs-2 mb-2"></i>
+            <h1>Create TTS</h1>
           </div>
-          <div class="py-5">
+          <div class="pt-6">
             <div class="d-flex flex-column gap-4">
               <div>
                 <label class="sub-title">Category Filters</label>
-                <div class="input-group">
-                  <span class="input-group-prepend">
-                    <div class="input-group-text">
-                      <i class="bi-tags-fill"></i>
-                    </div>
-                  </span>
+                <div class="form-group input-icon">
+                  <span class="fa fa-tags form-control-feedback"></span>
                   <select class="form-select">
                     <option>All Voices</option>
                     <option>All Voices 2</option>
@@ -171,14 +176,11 @@
                   </select>
                 </div>
               </div>
+
               <div>
                 <label class="sub-title">Voice (1696 to choose from)</label>
-                <div class="input-group">
-                  <span class="input-group-prepend">
-                    <div class="input-group-text">
-                      <i class="bi-headphones"></i>
-                    </div>
-                  </span>
+                <div class="form-group input-icon">
+                  <span class="fa fa-microphone form-control-feedback"></span>
                   <select class="form-select">
                     <option>Frank Sinatra (by Vegito1089)</option>
                     <option>Frank Sinatra (by Vegito1089) 2</option>
@@ -186,21 +188,22 @@
                   </select>
                 </div>
               </div>
+
               <div>
                 <a class="text-link"
                   >>> See more details about the "Frank Sinatra" by
                   Vegito1089</a
                 >
               </div>
-              <div class="search-input">
+              <div>
                 <label class="sub-title">Search</label>
-                <div class="input-group">
-                  <span class="input-group-prepend">
-                    <div class="input-group-text">
-                      <i class="bi-search"></i>
-                    </div>
-                  </span>
-                  <input class="form-control" placeholder="Search term"></input>
+                <div class="form-group input-icon">
+                  <span class="fa fa-search form-control-feedback"></span>
+                  <input
+                    type="text"
+                    class="form-control"
+                    placeholder="Search"
+                  />
                 </div>
               </div>
               <div class="text-input">
@@ -208,57 +211,47 @@
                 <textarea
                   class="form-control"
                   placeholder="Textual shenanigans go here..."
-                  id="floatingTextarea2"
                   style="height: 160px; min-height: 160px"
                 ></textarea>
               </div>
-            </div>
-          </div>
-          <div class="d-flex w-100 justify-content-center">
-            <div
-              class="d-grid gap-2 d-flex justify-content-start d-none d-lg-block"
-            >
-              <button type="button" class="btn btn-primary btn-lg px-4 me-md-2">
-                Speak
-              </button>
-              <button
-                type="button"
-                class="btn btn-secondary btn-lg px-4 me-md-2"
-              >
-                Clear
-              </button>
+              <div class="d-flex flex-column flex-lg-row w-100 gap-3">
+                <button type="button" class="btn btn-primary btn-lg w-100">
+                  Speak
+                </button>
+                <button type="button" class="btn btn-secondary btn-lg w-100">
+                  Clear
+                </button>
+              </div>
             </div>
           </div>
         </div>
       </div>
 
-      
-      
-    
-
       <footer class="container">
-        <hr/>
-      <div class="d-flex flex-column flex-lg-row align-items-center justify-content-center gap-3 py-4 ">
-        <a class="footer-link" href="#">Text to Speech</a>
-        <a class="footer-link" href="#">Video</a>
-        <a class="footer-link" href="#">Upload</a>
-        <a class="footer-link" href="#">Leaderboard</a>
-        <a class="footer-link" href="#">Patrons</a>
-        <a class="footer-link" href="#">Feed</a>
-        <a class="footer-link" href="#">API Docs</a>
-        <a class="footer-link" href="#">About Us</a>
-        <a class="footer-link" href="#">Terms of Use</a>
-      </div>
-      <div class="d-flex justify-content-center gap-4">
-        <a class="social-icon" href="#"><i class="bi-discord"></i></a>
-        <a class="social-icon" href="#"><i class="bi-twitch"></i></a>
-        <a class="social-icon" href="#"><i class="bi-twitter"></i></a>
-        <a class="social-icon" href="#"><i class="bi-facebook"></i></a>
-      </div>
-      <div class="d-flex justify-content-center py-4 ">
-        Built by&nbsp<a class="footer-link" href="#">echelon</a>&nbspin Atlanta.
-        
-      </div>
+        <hr />
+        <div
+          class="d-flex flex-column flex-lg-row align-items-center justify-content-center gap-3 py-4"
+        >
+          <a class="footer-link" href="#">Text to Speech</a>
+          <a class="footer-link" href="#">Video</a>
+          <a class="footer-link" href="#">Upload</a>
+          <a class="footer-link" href="#">Leaderboard</a>
+          <a class="footer-link" href="#">Patrons</a>
+          <a class="footer-link" href="#">Feed</a>
+          <a class="footer-link" href="#">API Docs</a>
+          <a class="footer-link" href="#">About Us</a>
+          <a class="footer-link" href="#">Terms of Use</a>
+        </div>
+        <div class="d-flex justify-content-center gap-4">
+          <a class="social-icon" href="#"><i class="bi-discord"></i></a>
+          <a class="social-icon" href="#"><i class="bi-twitch"></i></a>
+          <a class="social-icon" href="#"><i class="bi-twitter"></i></a>
+          <a class="social-icon" href="#"><i class="bi-facebook"></i></a>
+        </div>
+        <div class="d-flex justify-content-center py-4">
+          Built by&nbsp<a class="footer-link" href="#">echelon</a>&nbspin
+          Atlanta.
+        </div>
       </footer>
     </div>
 
@@ -280,11 +273,11 @@
     ></script>
 
     <script>
-      ScrollReveal().reveal('.ani1', { delay: 100, distance: '20px' });
-      ScrollReveal().reveal('.ani2', { delay: 200, distance: '20px' });
-      ScrollReveal().reveal('.ani3', { delay: 250, distance: '20px' });
-      ScrollReveal().reveal('.ani4', { delay: 150, distance: '20px' });
-      ScrollReveal().reveal('.create-panel', { delay: 400, distance: '100px' });
+      ScrollReveal().reveal(".ani1", { delay: 100, distance: "20px" });
+      ScrollReveal().reveal(".ani2", { delay: 200, distance: "20px" });
+      ScrollReveal().reveal(".ani3", { delay: 250, distance: "20px" });
+      ScrollReveal().reveal(".ani4", { delay: 150, distance: "20px" });
+      ScrollReveal().reveal(".panel", { delay: 400, distance: "100px" });
     </script>
 
     <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
