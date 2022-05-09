@@ -302,18 +302,28 @@ p {
 .video-card {
   border-radius: 5px;
   border: 5px solid;
-  border-color: rgba(255, 255, 255, 0.6);
+  border-color: #fff;
   padding: 1rem;
   position: relative;
   width: 100%;
   min-height: 220px;
-  transition: 0.2s;
-  overflow: none;
+  transition: 0.4s;
+  overflow: clip;
+  z-index: 2;
 }
 
 .video-card:hover {
   cursor: pointer;
   border-color: #fc6b68;
+}
+
+.video-card:hover .video-card-body {
+  opacity: 1;
+}
+
+.video-card:hover .video-img {
+  transform: scale(1.05);
+  transition: 0.4s;
 }
 
 .video-img {
@@ -324,6 +334,8 @@ p {
   top: 0;
   left: 0;
   pointer-events: none;
+  overflow: none;
+  transition: 0.4s;
 }
 
 .video-card-body {
@@ -340,6 +352,8 @@ p {
     rgba(0, 0, 0, 0.5) 32%,
     rgba(0, 0, 0, 1) 100%
   );
+  opacity: 0;
+  transition: 0.4s;
 }
 
 .video-card-title {
