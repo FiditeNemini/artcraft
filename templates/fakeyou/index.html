@@ -155,7 +155,7 @@
         </div>
       </div>
 
-      <div class="container-panel py-5">
+      <div class="container-panel mt-4">
         <div class="panel p-3 p-lg-4 load-hidden mt-5 mt-lg-0">
           <div
             class="panel-title d-flex align-items-center gap-3 w-100 justify-content-center justify-content-lg-start"
@@ -227,6 +227,55 @@
         </div>
       </div>
 
+      <div class="container mt-5 mb-4">
+        <h2><i class="fa-solid fa-list me-3"></i> Session TTS Results</h2>
+        <div class="alert alert-secondary my-4" role="alert">Pending...</div>
+        <div class="alert alert-success my-4" role="alert">
+          Running inference...
+        </div>
+      </div>
+      <div class="container-panel">
+        <div class="d-flex flex-column gap-4 mb-5">
+          <div class="panel p-3 p-lg-4 load-hidden gap-4 d-flex flex-column">
+            <div>
+              <h4>Mario* (FakeYou impersonator)</h4>
+              <p>Its a me mario!</p>
+            </div>
+            <audio controls>
+              <source src="horse.ogg" type="audio/ogg" />
+              <source src="horse.mp3" type="audio/mpeg" />
+              Your browser does not support the audio element.
+            </audio>
+            <div>
+              <button type="button" class="btn btn-primary btn-lg">
+                Permalink & Download
+              </button>
+            </div>
+          </div>
+          <div class="panel p-3 p-lg-4 load-hidden gap-4 d-flex flex-column">
+            <div>
+              <h4>Yami Yugi</h4>
+              <p>
+                She didn't understand how changed worked. When she looked at
+                today compared to yesterday, there was nothing that she could
+                see that was different. Yet, when she looked at today compared
+                to last year, she couldn't see how anything was ever the same.
+              </p>
+            </div>
+            <audio controls>
+              <source src="horse.ogg" type="audio/ogg" />
+              <source src="horse.mp3" type="audio/mpeg" />
+              Your browser does not support the audio element.
+            </audio>
+            <div>
+              <button type="button" class="btn btn-primary btn-lg">
+                Permalink & Download
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <div class="container">
         <hr />
       </div>
@@ -291,7 +340,7 @@
       ScrollReveal().reveal(".ani2", { delay: 200, distance: "20px" });
       ScrollReveal().reveal(".ani3", { delay: 250, distance: "20px" });
       ScrollReveal().reveal(".ani4", { delay: 150, distance: "20px" });
-      ScrollReveal().reveal(".panel", { delay: 400, distance: "100px" });
+      ScrollReveal().reveal(".panel", { delay: 0, distance: "100px" });
     </script>
 
     <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>

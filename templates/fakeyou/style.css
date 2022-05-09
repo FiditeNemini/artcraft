@@ -45,6 +45,11 @@ h1 {
   font-weight: 700;
 }
 
+p {
+  font-weight: 400;
+  margin-bottom: 0;
+}
+
 #particles-js {
   position: absolute;
   width: 100%;
@@ -143,9 +148,9 @@ h1 {
 
 .btn-primary:hover,
 .btn-primary:focus {
-  background-color: #fc6b68;
+  background-color: #ff8d8b;
   border: 2.5px solid;
-  border-color: rgba(255, 255, 255, 0.6);
+  border-color: #ff8d8b;
 }
 
 .btn-secondary {
@@ -158,10 +163,10 @@ h1 {
 
 .btn-secondary:hover,
 .btn-secondary:focus {
-  background-color: #fff;
+  background-color: #ccc;
   color: #443a40;
   border: 2.5px solid;
-  border-color: #fc6b68;
+  border-color: #ccc;
 }
 
 .nav-login {
@@ -182,6 +187,10 @@ h1 {
   border-left: 3px solid #fc6b68;
   height: 100%;
   top: 0;
+}
+
+.alert {
+  border-radius: 8px;
 }
 
 .panel {
