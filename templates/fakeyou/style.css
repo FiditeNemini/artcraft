@@ -123,7 +123,7 @@ p {
     rgba(16, 14, 26, 1) 100%
   ) !important;
   position: relative;
-  overflow-y: hidden;
+  overflow: hidden;
 }
 
 .lead {
@@ -181,10 +181,10 @@ p {
 
 .btn-destructive:hover,
 .btn-destructive:focus {
-  background-color: #ccc;
+  background-color: #fdcfce;
   color: #fc6b68;
   border: 2.5px solid;
-  border-color: #ccc;
+  border-color: #fdcfce;
 }
 
 .nav-login {
