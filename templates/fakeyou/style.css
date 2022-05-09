@@ -3,8 +3,8 @@ html {
 }
 
 body {
+  min-height: 100%;
   font-family: "Fira Sans", sans-serif;
-  height: 100%;
   color: #fff;
 }
 
@@ -46,14 +46,14 @@ h1 {
 }
 
 p {
-  font-weight: 400;
+  font-weight: 300;
   margin-bottom: 0;
 }
 
 #particles-js {
   position: absolute;
   width: 100%;
-  height: 620px;
+  height: 100%;
   top: 0;
   pointer-events: none;
 }
@@ -76,7 +76,7 @@ p {
 
 /*margin top/bottom for panels*/
 .py-6 {
-  padding-top: 2rem !important;
+  padding-top: 1.6rem !important;
   padding-bottom: 1rem !important;
 }
 
@@ -122,6 +122,8 @@ p {
     rgba(42, 21, 34, 1) 55%,
     rgba(16, 14, 26, 1) 100%
   ) !important;
+  position: relative;
+  overflow-y: hidden;
 }
 
 .lead {
@@ -169,6 +171,22 @@ p {
   border-color: #ccc;
 }
 
+.btn-destructive {
+  background-color: #fff;
+  color: #fc6b68;
+  border: 2.5px solid;
+  border-color: #fff;
+  transition: 0.2s;
+}
+
+.btn-destructive:hover,
+.btn-destructive:focus {
+  background-color: #ccc;
+  color: #fc6b68;
+  border: 2.5px solid;
+  border-color: #ccc;
+}
+
 .nav-login {
   font-size: 15px;
   font-weight: 600;
@@ -193,6 +211,10 @@ p {
   border-radius: 5px;
 }
 
+.hero-section {
+  height: 100%;
+}
+
 .panel {
   position: relative;
   width: 100%;
@@ -200,6 +222,7 @@ p {
   border-color: #ffffff12 !important;
   border: 1px solid;
   border-radius: 0px;
+  backdrop-filter: blur(5px);
 }
 
 .panel-title {
@@ -210,6 +233,7 @@ p {
 }
 
 .sub-title {
+  font-weight: 600;
   padding-bottom: 10px;
 }
 
@@ -263,6 +287,15 @@ p {
 
 .social-icon:hover {
   color: rgba(255, 255, 255, 0.601);
+}
+
+.form-check-input:checked {
+  background-color: #fc6b68;
+  border-color: #fc6b68;
+}
+
+.form-check-input:focus {
+  box-shadow: none;
 }
 
 @media (min-width: 992px) {
