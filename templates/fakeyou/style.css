@@ -34,11 +34,15 @@ label:focus,
 }
 
 a {
-  font-weight: 600;
+  font-weight: 400;
   color: #fc6b68;
   text-decoration: none;
   cursor: pointer;
   transition: 0.1s;
+}
+
+.text-link {
+  color: #fc6b68;
 }
 
 a:hover {
