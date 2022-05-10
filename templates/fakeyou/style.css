@@ -18,6 +18,10 @@ html.sr .load-hidden {
   visibility: hidden;
 }
 
+select {
+  cursor: pointer;
+}
+
 button:focus,
 button:active,
 button:hover,
@@ -228,9 +232,9 @@ p {
 
 .panel-title {
   position: static;
-  top: 0;
+  text-align: center;
   text-shadow: 0px 3px 26px #00000060;
-  margin-top: -34px;
+  margin-top: -35px;
 }
 
 .sub-title {
@@ -371,6 +375,15 @@ p {
 }
 
 @media (min-width: 992px) {
+  .panel-title {
+    position: absolute;
+    text-align: left;
+    top: 0;
+    margin-top: -25px;
+  }
+  .p-lg-4 {
+    padding: 2rem !important;
+  }
 }
 
 @media (min-width: 768px) {
@@ -384,17 +397,7 @@ p {
     border-radius: 8px;
   }
 
-  .p-lg-4 {
-    padding: 2rem !important;
-  }
-
   .panel {
     border-radius: 8px;
-  }
-
-  .panel-title {
-    position: absolute;
-    top: 0;
-    margin-top: -25px;
   }
 }
