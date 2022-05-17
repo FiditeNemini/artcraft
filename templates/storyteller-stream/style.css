@@ -346,9 +346,11 @@ span.word:after {
   width: 100%;
   background-color: rgba(255, 255, 255, 0.1);
   border-color: #ffffff12 !important;
-  border: 1px solid;
+  border: 2px solid;
   border-radius: 0px;
   backdrop-filter: blur(5px);
+  -webkit-box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.25);
+  box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.25);
 }
 
 .hero-floating-panel {
@@ -360,9 +362,6 @@ span.word:after {
   height: auto;
   padding: 1rem 1.25rem;
   pointer-events: none;
-  border: 2px solid;
-  -webkit-box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.25);
-  box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.25);
 }
 
 .hero-floating-panel-left {
@@ -401,6 +400,7 @@ span.word:after {
 .features-panel {
   padding: 1rem 1rem 2rem 1rem;
   position: relative;
+  border-radius: 8px;
 }
 
 .features-panel-sides {
@@ -429,6 +429,7 @@ span.word:after {
 .insights-panel {
   padding: 32px;
   position: relative;
+  border-radius: 8px;
 }
 
 .insights-circle-1 {
@@ -449,12 +450,17 @@ span.word:after {
   margin-right: 50px;
 }
 
+.insights-text {
+  color: rgba(255, 255, 255, 0.6);
+}
+
 .insights-panel-text {
   color: rgba(255, 255, 255, 0.8);
 }
 
-.questions-section {
+.questions-panel {
   max-width: 700px;
+  border-radius: 8px;
 }
 
 .cta-panel {

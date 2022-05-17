@@ -26,8 +26,6 @@
       crossorigin="anonymous"
     ></script>
 
-    <script src="https://unpkg.com/wavesurfer.js"></script>
-
     <title>FakeYou. Deep Fake Text to Speech.</title>
   </head>
   <body>
@@ -126,9 +124,110 @@
         <div class="panel p-3 p-lg-4 load-hidden">
           <h1 class="panel-title">TTS Result</h1>
           <div class="py-6">
-            <div id="waveform"></div>
+            <img
+              class="img-fluid"
+              src="assets/audiowave-placeholder.png"
+              style="opacity: 0.8"
+            />
+            <div
+              class="d-flex gap-3 flex-sm-row flex-column justify-content-center align-items-center mt-4"
+            >
+              <div class="d-flex gap-2">
+                <button class="btn btn-primary">
+                  <i class="fa-solid fa-play"></i>
+                </button>
+                <button class="btn btn-secondary">
+                  <i class="fa-solid fa-arrow-right"></i>
+                </button>
+                <button class="btn btn-secondary">1x</button>
+              </div>
+              <button class="btn btn-primary">
+                <i class="fa-solid fa-download me-2"></i>Download File
+              </button>
+            </div>
           </div>
         </div>
+      </div>
+
+      <div class="container-panel pt-3 pb-5">
+        <div class="panel p-3 p-lg-4 load-hidden">
+          <h2 class="panel-title">Spectrogram</h2>
+          <div class="py-6">
+            <img
+              class="w-100 rounded"
+              src="assets/spectrogram.png"
+              height="250"
+            />
+          </div>
+        </div>
+      </div>
+
+      <div class="container-panel pt-3 pb-5">
+        <div class="panel p-3 p-lg-4 load-hidden">
+          <h2 class="panel-title">Result Details</h2>
+          <div class="py-6">
+            <table class="table">
+              <tbody>
+                <tr>
+                  <th scope="row">Original text</th>
+                  <td>What are you doing?!</td>
+                </tr>
+                <tr>
+                  <th scope="row">Audio creator</th>
+                  <td><a class="text-link">bflatastic</a></td>
+                </tr>
+                <tr>
+                  <th scope="row">Audio duration</th>
+                  <td>1.474 seconds</td>
+                </tr>
+                <tr>
+                  <th scope="row">Visibility</th>
+                  <td><i class="fa-solid fa-eye-slash me-2"></i>Hidden</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <div class="container-panel pt-3 pb-5">
+        <div class="panel p-3 p-lg-4 load-hidden">
+          <h2 class="panel-title">Model Used</h2>
+          <div class="py-6">
+            <table class="table">
+              <tbody>
+                <tr>
+                  <th scope="row">Model name</th>
+                  <td><a class="text-link">Piccolo (Dragonball/Z/GT)</a></td>
+                </tr>
+                <tr>
+                  <th scope="row">Model creator</th>
+                  <td><a class="text-link">Vegito1089</a></td>
+                </tr>
+                <tr>
+                  <th scope="row">Vocoder used</th>
+                  <td>HiFi-GAN</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <div class="container pb-5">
+        <div class="d-flex flex-column flex-sm-row gap-3 mb-4">
+          <button class="btn btn-secondary w-100">
+            <i class="fa-solid fa-pen-to-square me-2"></i>Edit Results
+            Visibility
+          </button>
+          <button class="btn btn-destructive w-100">
+            <i class="fa-solid fa-trash-can me-2"></i>Delete Result
+          </button>
+        </div>
+        <p class="text-center text-lg-start">
+          Report inappropriate content on
+          <a href=""><i class="fa-brands fa-discord me-1"></i>Discord</a>.
+        </p>
       </div>
 
       <div class="container">
@@ -199,21 +298,6 @@
     ></script>
 
     <script>
-      let wavesurfer = WaveSurfer.create({
-        container: document.querySelector("#waveform"),
-        barWidth: 2,
-        barHeight: 1, // the height of the wave
-        barGap: null, // the optional spacing between bars of the wave, if not provided will be calculated in legacy format
-      });
-
-      wavesurfer.load("assets/audio.wav");
-    </script>
-
-    <script>
-      ScrollReveal().reveal(".ani1", { delay: 100, distance: "20px" });
-      ScrollReveal().reveal(".ani2", { delay: 200, distance: "20px" });
-      ScrollReveal().reveal(".ani3", { delay: 250, distance: "20px" });
-      ScrollReveal().reveal(".ani4", { delay: 150, distance: "20px" });
       ScrollReveal().reveal(".panel", { delay: 0, distance: "100px" });
     </script>
 

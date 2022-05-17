@@ -58,6 +58,21 @@ p {
   margin-bottom: 0;
 }
 
+tbody {
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+th {
+  color: #fff;
+  font-weight: 500;
+  width: 40 %;
+}
+
+td {
+  color: rgba(255, 255, 255, 0.8);
+  font-weight: 400;
+}
+
 #particles-js {
   position: absolute;
   width: 100%;
