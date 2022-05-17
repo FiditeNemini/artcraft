@@ -420,6 +420,7 @@ td {
 
 .nav-pills {
   backdrop-filter: blur(5px);
+  width: 100% !important;
 }
 
 .nav-link:focus,
