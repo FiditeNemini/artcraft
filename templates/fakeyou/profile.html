@@ -124,7 +124,7 @@
             <div class="d-flex justify-content-center">
               <img
                 class="profile-img"
-                src="assets/echelon-profile.jpeg"
+                src="assets/Profile_avatar_placeholder_large.png"
                 alt=""
               />
             </div>
@@ -139,9 +139,19 @@
                   </button>
                 </div>
               </div>
-              <p class="fw-bold text-center text-lg-start">
-                <i class="fa-solid fa-clock me-2 mb-4"></i>Joined June 2021
-              </p>
+              <div class="d-flex gap-lg-3 flex-column flex-lg-row">
+                <p class="fw-bold text-center text-lg-start me-2">
+                  <i class="fa-solid fa-clock me-2 mb-4"></i>Joined June 2021
+                </p>
+                <div class="d-flex gap-3 justify-content-center mb-3 mb-lg-0">
+                  <a href=""><i class="fa-brands fa-twitter fs-5"></i></a>
+                  <a data-bs-toggle="tooltip" data-bs-placement="top" title="echelon#0001" href=""><i class="fa-brands fa-discord fs-5"></i></a>
+                  <a href=""><i class="fa-brands fa-twitch fs-5"></i></a>
+                  <a href=""><i class="fa-brands fa-github fs-5"></i></a>
+                  <a href=""><i class="fa-solid fa-globe fs-5"></i></i></a>
+                </div>
+              </div>
+
               <p class="mb-3 text-center text-lg-start profile-bio">
                 Hi! I'm the creator of the site. I'm working on virtual
                 production, photogrammetry, and of course, deep fakes. If you're
@@ -474,6 +484,11 @@
     <script>
       ScrollReveal().reveal(".panel", { delay: 0, distance: "100px" });
     </script>
+
+    <script>
+    const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+      const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
+      </script>
 
     <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
     <script type="text/javascript">
