@@ -59,6 +59,10 @@ p {
   color: rgba(255, 255, 255, 0.8);
 }
 
+.panel p {
+  color: rgba(255, 255, 255, 0.9);
+}
+
 thead,
 tbody {
   border-color: rgba(255, 255, 255, 0.2) !important;
