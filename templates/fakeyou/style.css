@@ -268,6 +268,10 @@ td {
   margin-top: -35px;
 }
 
+h2.panel-title {
+  margin-top: -32px;
+}
+
 .sub-title {
   font-weight: 500;
   padding-bottom: 10px;
@@ -438,6 +442,14 @@ td {
   border-radius: 0;
 }
 
+.lb-profile {
+  object-fit: cover;
+  border-radius: 300px;
+  border-color: #fff;
+  height: 20px;
+  width: 20px;
+}
+
 @media (min-width: 992px) {
   .panel-title {
     position: absolute;
@@ -445,6 +457,15 @@ td {
     top: 0;
     margin-top: -25px;
   }
+
+  h2.panel-title {
+    margin-top: -20px;
+  }
+
+  /* .panel-title-h2 {
+    margin-top: -20px;
+  } */
+
   .p-lg-4 {
     padding: 2rem !important;
   }
