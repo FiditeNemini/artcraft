@@ -83,6 +83,11 @@ td {
   font-weight: 400;
 }
 
+code {
+  color: #fc6b68;
+  background-color: rgba(255, 255, 255, 0.06);
+}
+
 #particles-js {
   position: absolute;
   width: 100%;
