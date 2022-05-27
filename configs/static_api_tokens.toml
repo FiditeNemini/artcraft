@@ -7,6 +7,14 @@
 #api_token = 'foo'
 #maybe_user_token = 'FOO'
 #maybe_priority_level = 3
+#
+
+# /profile/api_vidvoiceai (VidVoice.ai)
+# Requested 2022-05-27 in Discord
+# Startup raising "institutional capital"
+[[api_tokens]]
+api_token = "SAPI:VIDVOICE_255DC19ADE35"
+maybe_user_token = 'U:CAJN68CFEK0FD'
 
 # /profile/api_edymuro (EdyMuro#8205)
 # Requested 2022-04-18 in Discord chat with Vegito
