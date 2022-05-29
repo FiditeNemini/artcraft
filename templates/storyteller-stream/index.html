@@ -75,16 +75,21 @@
 
       <div class="hero-section d-flex flex-column align-items-center">
         <div class="container-fluid d-flex flex-column align-items-center">
-          <h1 class="display-4 fw-bold mb-3 parent">
+          <h1 class="display-3 fw-bold mb-3 parent">
             Text to Speech For <span class="word">Your Stream</span>
           </h1>
-          <p class="hero-text mb-4">
+          <p class="hero-text lead mb-4">
             Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
             eiusmod tempor incididunt ut labore et dolore magna aliqua.
           </p>
-          <button type="button" class="btn btn-primary btn-lg btn-hero">
-            Sign Up<i class="fa-solid fa-arrow-right-long ms-2"></i>
-          </button>
+          <div class="panel-ani">
+            <button
+              type="button"
+              class="btn btn-primary btn-lg btn-hero load-hidden"
+            >
+              Sign Up<i class="fa-solid fa-arrow-right-long ms-2"></i>
+            </button>
+          </div>
         </div>
 
         <div class="hero-img-section noselect">
@@ -121,7 +126,7 @@
         <div class="features-section">
           <div class="row">
             <div class="col-md-4 d-flex align-items-stretch">
-              <div class="panel features-panel features-panel-sides">
+              <div class="panel features-panel features-panel-sides panel-ani">
                 <img
                   class="features-icon red-glow"
                   src="assets/channel-points-icon.png"
@@ -137,7 +142,7 @@
               </div>
             </div>
             <div class="col-md-4 d-flex align-items-stretch">
-              <div class="panel features-panel">
+              <div class="panel features-panel panel-ani">
                 <img
                   class="features-icon red-glow"
                   src="assets/voices-icon.png"
@@ -153,7 +158,7 @@
               </div>
             </div>
             <div class="col-md-4 d-flex align-items-stretch">
-              <div class="panel features-panel features-panel-sides">
+              <div class="panel features-panel features-panel-sides panel-ani">
                 <img
                   class="features-icon red-glow"
                   src="assets/bits-icon.png"
@@ -173,16 +178,18 @@
       </div>
 
       <div class="container section d-flex flex-column align-items-center">
-        <div class="row w-100 insights-section align-items-center">
-          <div class="col-md-6">
-            <h1 class="mb-4"><span class="word">Our Insights</span></h1>
+        <div class="row insights-section align-items-center">
+          <div class="col-md-6 mb-4 mb-md-0 text-center text-md-start">
+            <h1 class="mb-4">
+              <span class="word">Our Insights</span>
+            </h1>
             <p class="insights-text">
               Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
               eiusmod tempor incididunt ut labore et dolore magna aliqua.
             </p>
           </div>
           <div class="col-md-6">
-            <div class="panel insights-panel h-100">
+            <div class="panel insights-panel h-100 panel-ani">
               <h2 class="fw-bold mb-1">+1700</h2>
               <p class="insights-panel-text">
                 TTS Voices in the library (and growing)
@@ -210,13 +217,15 @@
         </div>
       </div>
 
-      <div class="container d-flex flex-column align-items-center my-5">
+      <div class="container section d-flex flex-column align-items-center">
         <h1 class="fw-bold mb-4">
           <span class="word">Got Any Questions?</span>
         </h1>
-        <div class="panel py-4 mt-5 questions-panel mb-5">
+        <div class="panel p-4 mt-5 questions-panel mb-5 panel-ani">
           <div class="text-center">
-            <h2 class="panel-title w-100 text-center">Join us in Discord</h2>
+            <h2 class="w-100 text-center">
+              <i class="fa-brands fa-discord me-3"></i>Join us in Discord!
+            </h2>
             <p class="text-center my-4">
               We'd love to chat with you!
               <br />
@@ -227,15 +236,15 @@
         </div>
       </div>
 
-      <div class="container section d-flex flex-column align-items-center mt-5">
-        <div class="cta-panel">
+      <div class="container section d-flex flex-column align-items-center">
+        <div class="cta-panel panel-ani">
           <div class="row">
             <div class="col-md-6 parent">
-              <img class="cta-img" src="assets/cta-img.png" alt="" />
+              <img class="cta-img w-100" src="assets/cta-img.png" alt="" />
             </div>
-            <div class="col-md-6">
+            <div class="col-md-6 cta-right text-center text-sm-start px-5">
               <h1 class="mb-4">Get started with Storyteller Stream!</h1>
-              <button class="btn btn-secondary">Sign Up</button>
+              <button class="btn btn-secondary w-100">Sign Up</button>
             </div>
           </div>
         </div>
@@ -296,11 +305,48 @@
     ></script>
 
     <script>
-      ScrollReveal().reveal(".ani1", { delay: 100, distance: "20px" });
-      ScrollReveal().reveal(".ani2", { delay: 200, distance: "20px" });
-      ScrollReveal().reveal(".ani3", { delay: 250, distance: "20px" });
-      ScrollReveal().reveal(".ani4", { delay: 150, distance: "20px" });
-      ScrollReveal().reveal(".panel", { delay: 0, distance: "100px" });
+      ScrollReveal().reveal("h1", {
+        delay: 0,
+        distance: "30px",
+        duration: 600,
+      });
+      ScrollReveal().reveal(".hero-text", {
+        delay: 50,
+        distance: "30px",
+        duration: 600,
+      });
+      ScrollReveal().reveal(".btn-hero", {
+        delay: 100,
+        distance: "30px",
+        duration: 600,
+      });
+      ScrollReveal().reveal(".hero-floating-panel-left", {
+        delay: 200,
+        distance: "60px",
+        duration: 600,
+      });
+      ScrollReveal().reveal(".hero-floating-panel-right", {
+        delay: 300,
+        distance: "60px",
+        duration: 600,
+      });
+    </script>
+
+    <script>
+      var nodeList = document.querySelectorAll(".panel-ani");
+
+      ScrollReveal().reveal(nodeList, {
+        delay: 100,
+        distance: "30px",
+        duration: 600,
+        interval: 60,
+      });
+
+      ScrollReveal().reveal(".insights-text", {
+        delay: 50,
+        distance: "30px",
+        duration: 600,
+      });
     </script>
 
     <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>

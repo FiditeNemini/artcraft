@@ -86,7 +86,7 @@ img {
 }
 
 .container {
-  max-width: 1080px;
+  max-width: 1200px;
 }
 
 .container,
@@ -281,9 +281,10 @@ span.word:after {
 }
 
 .hero-section {
-  height: 680px;
+  height: 100vh;
+  min-height: 840px;
   width: 100%;
-  padding-top: 120px;
+  padding-top: 180px;
   text-align: center;
   overflow: hidden;
 }
@@ -293,7 +294,7 @@ span.word:after {
 }
 
 .hero-text {
-  max-width: 585px;
+  max-width: 800px;
   color: rgba(255, 255, 255, 0.6);
 }
 
@@ -309,8 +310,8 @@ span.word:after {
 .hero-img {
   position: absolute;
   bottom: 0;
-  max-height: 105%;
-  max-width: 120%;
+  max-height: 520px;
+  max-width: 100%;
   z-index: 2;
 }
 
@@ -333,9 +334,12 @@ span.word:after {
 }
 
 #hero-audio-wave {
-  margin-top: 70px;
+  position: absolute;
+  bottom: 0;
+  margin-bottom: 220px;
   opacity: 20%;
   width: 115%;
+  min-height: 150px;
   background-image: url("assets/hero-audio-wave.png");
   background-repeat: repeat-x;
   animation: animatedBackground 20s linear infinite;
@@ -356,7 +360,7 @@ span.word:after {
 .hero-floating-panel {
   text-align: left;
   position: absolute;
-  bottom: 100px;
+  bottom: 180px;
   z-index: 3;
   width: auto;
   height: auto;
@@ -365,13 +369,13 @@ span.word:after {
 }
 
 .hero-floating-panel-left {
-  margin-left: -660px;
-  margin-bottom: 30px;
+  margin-left: -800px;
+  margin-bottom: 25px;
 }
 
 .hero-floating-panel-right {
-  margin-right: -600px;
-  margin-bottom: 130px;
+  margin-right: -800px;
+  margin-bottom: 140px;
 }
 
 .hero-floating-panel-text {
@@ -387,14 +391,15 @@ span.word:after {
 }
 
 .section {
-  padding-top: 7rem;
-  padding-bottom: 7rem;
+  padding-top: 4rem;
+  padding-bottom: 4rem;
 }
 
 .features-section {
   width: 100%;
   text-align: center;
-  margin-top: 90px;
+  margin-top: 50px;
+  margin-bottom: -60px;
 }
 
 .features-panel {
@@ -404,8 +409,8 @@ span.word:after {
 }
 
 .features-panel-sides {
-  margin-top: 50px;
-  margin-bottom: -50px;
+  margin-top: 40px;
+  margin-bottom: 40px;
 }
 
 .features-icon {
@@ -475,7 +480,7 @@ span.word:after {
 
 .cta-img {
   position: absolute;
-  max-width: 100%;
+  max-width: 500px;
   left: 50%;
   top: 50%;
   transform: translate(-50%, -55%);
@@ -485,6 +490,10 @@ span.word:after {
   -moz-user-select: none;
   -o-user-select: none;
   user-select: none;
+}
+
+.cta-right {
+  padding-top: 150px;
 }
 
 .red-glow {
@@ -654,5 +663,24 @@ span.word:after {
 
   .panel {
     border-radius: 8px;
+  }
+
+  .features-panel-sides {
+    margin-top: 50px;
+    margin-bottom: -50px;
+  }
+
+  .features-section {
+    margin-top: 90px;
+    margin-bottom: 50px;
+  }
+
+  .section {
+    padding-top: 6rem;
+    padding-bottom: 6rem;
+  }
+
+  .cta-right {
+    padding-top: 0px;
   }
 }
