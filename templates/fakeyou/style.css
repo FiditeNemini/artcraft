@@ -127,7 +127,7 @@ code {
 }
 
 .nav-link {
-  font-size: 15px;
+  font-size: 16px;
   font-weight: 600;
   padding-left: 16px !important;
   padding-right: 16px !important;
@@ -164,6 +164,14 @@ code {
   position: relative;
   overflow: hidden;
   min-height: 100%;
+}
+
+.nav-bg-dark {
+  background-color: #17101c !important;
+}
+
+.offcanvas {
+  width: 100vw;
 }
 
 .lead {
@@ -477,6 +485,10 @@ h2.panel-title {
 
   .p-lg-4 {
     padding: 2rem !important;
+  }
+
+  .nav-bg-dark {
+    background-color: #17101c00 !important;
   }
 }
 
