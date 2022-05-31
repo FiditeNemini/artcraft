@@ -222,9 +222,9 @@ LABEL org.opencontainers.image.source='https://github.com/storytold/storyteller-
 # A better long term fix is to remove these dependencies outright and not have ML deps in this repo.
 # https://developer.nvidia.com/blog/updating-the-cuda-linux-gpg-repository-key/
 # https://forums.developer.nvidia.com/t/invalid-public-key-for-cuda-apt-repository/212901/11
-RUN sudo apt-key del 7fa2af80
+RUN apt-key del 7fa2af80
 RUN wget https://developer.download.nvidia.com/compute/cuda/repos/$distro/$arch/cuda-keyring_1.0-1_all.deb
-RUN sudo dpkg -i cuda-keyring_1.0-1_all.deb
+RUN dpkg -i cuda-keyring_1.0-1_all.deb
 
 # NB: Comment this out for non-debug images
 # TODO: Figure out how this is done elsewhere with just the static binaries
