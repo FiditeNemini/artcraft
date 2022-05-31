@@ -227,7 +227,9 @@ RUN apt-key del 7fa2af80
 RUN wget https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2004/x86_64/cuda-keyring_1.0-1_all.deb
 RUN dpkg -i cuda-keyring_1.0-1_all.deb
 
-RUN apt-key adv --fetch-keys https://repo.download.nvidia.com/baseos/GPG-KEY-dgx-debian-prod
+# NB: Fix for 'E: Conflicting values set for option Signed-By regarding source'
+#RUN apt-key adv --fetch-keys https://repo.download.nvidia.com/baseos/GPG-KEY-dgx-debian-prod
+RUN sed -i '/developer\.download\.nvidia\.com\/compute\/cuda\/repos/d' /etc/apt/sources.list
 
 # NB: Comment this out for non-debug images
 # TODO: Figure out how this is done elsewhere with just the static binaries
