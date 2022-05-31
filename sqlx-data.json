@@ -7655,6 +7655,239 @@
       "nullable": []
     }
   },
+  "ff1b32530e25cf671ea095c0af280adb9d8cabbdaf1134c5b2ab0fda903b279a": {
+    "query": "\nSELECT\n  id,\n  token AS inference_job_token,\n  uuid_idempotency_token,\n\n  model_token,\n  raw_inference_text,\n\n  creator_ip_address,\n  maybe_creator_user_token,\n  creator_set_visibility as `creator_set_visibility: crate::column_types::record_visibility::RecordVisibility`,\n\n  is_from_api,\n  is_for_twitch,\n\n  status as `status: crate::column_types::job_status::JobStatus`,\n  priority_level,\n  attempt_count,\n  failure_reason,\n\n  created_at,\n  updated_at,\n  retry_at\nFROM tts_inference_jobs\nWHERE\n  priority_level >= ?\n  AND\n  (\n    status IN (\"pending\", \"attempt_failed\")\n  )\n  AND\n  (\n    retry_at IS NULL\n    OR\n    retry_at < CURRENT_TIMESTAMP\n  )\n  ORDER BY priority_level DESC, id ASC\n  LIMIT ?\n        ",
+    "describe": {
+      "columns": [
+        {
+          "ordinal": 0,
+          "name": "id",
+          "type_info": {
+            "type": "LongLong",
+            "flags": {
+              "bits": 515
+            },
+            "char_set": 63,
+            "max_size": 20
+          }
+        },
+        {
+          "ordinal": 1,
+          "name": "inference_job_token",
+          "type_info": {
+            "type": "VarString",
+            "flags": {
+              "bits": 4229
+            },
+            "char_set": 224,
+            "max_size": 128
+          }
+        },
+        {
+          "ordinal": 2,
+          "name": "uuid_idempotency_token",
+          "type_info": {
+            "type": "VarString",
+            "flags": {
+              "bits": 4229
+            },
+            "char_set": 224,
+            "max_size": 144
+          }
+        },
+        {
+          "ordinal": 3,
+          "name": "model_token",
+          "type_info": {
+            "type": "VarString",
+            "flags": {
+              "bits": 4233
+            },
+            "char_set": 224,
+            "max_size": 128
+          }
+        },
+        {
+          "ordinal": 4,
+          "name": "raw_inference_text",
+          "type_info": {
+            "type": "Blob",
+            "flags": {
+              "bits": 4241
+            },
+            "char_set": 224,
+            "max_size": 262140
+          }
+        },
+        {
+          "ordinal": 5,
+          "name": "creator_ip_address",
+          "type_info": {
+            "type": "VarString",
+            "flags": {
+              "bits": 4233
+            },
+            "char_set": 224,
+            "max_size": 160
+          }
+        },
+        {
+          "ordinal": 6,
+          "name": "maybe_creator_user_token",
+          "type_info": {
+            "type": "VarString",
+            "flags": {
+              "bits": 136
+            },
+            "char_set": 224,
+            "max_size": 128
+          }
+        },
+        {
+          "ordinal": 7,
+          "name": "creator_set_visibility: crate::column_types::record_visibility::RecordVisibility",
+          "type_info": {
+            "type": "String",
+            "flags": {
+              "bits": 385
+            },
+            "char_set": 224,
+            "max_size": 28
+          }
+        },
+        {
+          "ordinal": 8,
+          "name": "is_from_api",
+          "type_info": {
+            "type": "Tiny",
+            "flags": {
+              "bits": 1
+            },
+            "char_set": 63,
+            "max_size": 1
+          }
+        },
+        {
+          "ordinal": 9,
+          "name": "is_for_twitch",
+          "type_info": {
+            "type": "Tiny",
+            "flags": {
+              "bits": 1
+            },
+            "char_set": 63,
+            "max_size": 1
+          }
+        },
+        {
+          "ordinal": 10,
+          "name": "status: crate::column_types::job_status::JobStatus",
+          "type_info": {
+            "type": "String",
+            "flags": {
+              "bits": 393
+            },
+            "char_set": 224,
+            "max_size": 64
+          }
+        },
+        {
+          "ordinal": 11,
+          "name": "priority_level",
+          "type_info": {
+            "type": "Tiny",
+            "flags": {
+              "bits": 33
+            },
+            "char_set": 63,
+            "max_size": 3
+          }
+        },
+        {
+          "ordinal": 12,
+          "name": "attempt_count",
+          "type_info": {
+            "type": "Long",
+            "flags": {
+              "bits": 1
+            },
+            "char_set": 63,
+            "max_size": 3
+          }
+        },
+        {
+          "ordinal": 13,
+          "name": "failure_reason",
+          "type_info": {
+            "type": "VarString",
+            "flags": {
+              "bits": 128
+            },
+            "char_set": 224,
+            "max_size": 2048
+          }
+        },
+        {
+          "ordinal": 14,
+          "name": "created_at",
+          "type_info": {
+            "type": "Timestamp",
+            "flags": {
+              "bits": 1153
+            },
+            "char_set": 63,
+            "max_size": 19
+          }
+        },
+        {
+          "ordinal": 15,
+          "name": "updated_at",
+          "type_info": {
+            "type": "Timestamp",
+            "flags": {
+              "bits": 9345
+            },
+            "char_set": 63,
+            "max_size": 19
+          }
+        },
+        {
+          "ordinal": 16,
+          "name": "retry_at",
+          "type_info": {
+            "type": "Timestamp",
+            "flags": {
+              "bits": 128
+            },
+            "char_set": 63,
+            "max_size": 19
+          }
+        }
+      ],
+      "parameters": {
+        "Right": 2
+      },
+      "nullable": [
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        true,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        true,
+        false,
+        false,
+        true
+      ]
+    }
+  },
   "ffa85f7c65101a43653c724479ee080e0a74577d2ae37863b039f3a452493d1e": {
     "query": "\nUPDATE w2l_results\nSET\n  user_deleted_at = CURRENT_TIMESTAMP\nWHERE\n  token = ?\nLIMIT 1\n        ",
     "describe": {
