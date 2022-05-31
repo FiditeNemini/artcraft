@@ -18,16 +18,20 @@ use sqlx::mysql::MySqlDatabaseError;
 use std::sync::Arc;
 
 #[derive(Serialize, Copy, Clone)]
+#[serde(rename_all = "snake_case")]
 pub enum FakeYouPlan {
   Free,
   Basic,
+  Standard,
   Pro,
 }
 
 #[derive(Serialize, Copy, Clone)]
+#[serde(rename_all = "snake_case")]
 pub enum StorytellerStreamPlan {
   Free,
   Basic,
+  Standard,
   Pro,
 }
 
