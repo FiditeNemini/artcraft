@@ -149,7 +149,7 @@ struct Inferencer {
 
   // A worker can be configured to only run jobs of a certain priority.
   // This finds jobs of equal or greater priority.
-  pub maybe_minium_priority: Option<u8>,
+  pub maybe_minimum_priority: Option<u8>,
 }
 
 #[tokio::main]
@@ -328,7 +328,7 @@ async fn main() -> AnyhowResult<()> {
     no_op_logger_millis: common_env.no_op_logger_millis,
     sidecar_max_synthesizer_models,
     low_priority_starvation_prevention_every_nth,
-    maybe_minium_priority,
+    maybe_minimum_priority,
   };
 
   main_loop(inferencer).await;
@@ -359,7 +359,7 @@ async fn main_loop(inferencer: Inferencer) {
     }
 
     let maybe_available_jobs =
-        if let Some(minimum_priority) = inferencer.maybe_minium_priority {
+        if let Some(minimum_priority) = inferencer.maybe_minimum_priority {
           // Special high-priority workers
           list_available_tts_inference_jobs_with_minimum_priority(
             &inferencer.mysql_pool,
