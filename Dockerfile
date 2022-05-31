@@ -223,7 +223,8 @@ LABEL org.opencontainers.image.source='https://github.com/storytold/storyteller-
 # https://developer.nvidia.com/blog/updating-the-cuda-linux-gpg-repository-key/
 # https://forums.developer.nvidia.com/t/invalid-public-key-for-cuda-apt-repository/212901/11
 RUN apt-key del 7fa2af80
-RUN wget https://developer.download.nvidia.com/compute/cuda/repos/$distro/$arch/cuda-keyring_1.0-1_all.deb
+#RUN wget https://developer.download.nvidia.com/compute/cuda/repos/$distro/$arch/cuda-keyring_1.0-1_all.deb
+RUN wget https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2004/x86_64/cuda-keyring_1.0-1_all.deb
 RUN dpkg -i cuda-keyring_1.0-1_all.deb
 
 # NB: Comment this out for non-debug images
