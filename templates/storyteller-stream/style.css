@@ -60,6 +60,7 @@ h3 {
 p {
   font-weight: 300;
   margin-bottom: 0;
+  color: rgba(255, 255, 255, 0.8);
 }
 
 img {
@@ -134,8 +135,8 @@ img {
 }
 
 .nav-link {
-  font-size: 16px;
-  font-weight: 600;
+  font-size: 15px;
+  font-weight: 500;
   padding-left: 16px !important;
   padding-right: 16px !important;
 }
@@ -202,14 +203,10 @@ span.word:after {
   );
 }
 
-.lead {
-  color: rgba(255, 255, 255, 0.8);
-}
-
 .btn {
   border-radius: 5px;
   outline: none;
-  font-size: 16px;
+  font-size: 15px;
   font-weight: 600;
   padding: 10px 24px;
   z-index: 1;
@@ -267,8 +264,8 @@ span.word:after {
 }
 
 .nav-login {
-  font-size: 16px;
-  font-weight: 600;
+  font-size: 15px;
+  font-weight: 500;
   color: #fff;
   text-decoration: none;
   transition: 0.1s;
@@ -306,7 +303,6 @@ span.word:after {
 
 .hero-text {
   max-width: 800px;
-  color: rgba(255, 255, 255, 0.6);
 }
 
 .hero-img-section {
@@ -362,7 +358,7 @@ span.word:after {
   background-color: rgba(255, 255, 255, 0.1);
   border-color: #ffffff12 !important;
   border: 2px solid;
-  border-radius: 0px;
+  border-radius: 8px;
   backdrop-filter: blur(10px);
   -webkit-box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.25);
   box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.25);
@@ -434,12 +430,8 @@ span.word:after {
   margin-top: 60px;
 }
 
-.features-text {
-  color: rgba(255, 255, 255, 0.8);
-}
-
 .insights-section {
-  max-width: 900px;
+  max-width: 1000px;
 }
 
 .insights-panel {
@@ -464,14 +456,6 @@ span.word:after {
   width: 46px;
   margin-bottom: -25px;
   margin-right: 50px;
-}
-
-.insights-text {
-  color: rgba(255, 255, 255, 0.6);
-}
-
-.insights-panel-text {
-  color: rgba(255, 255, 255, 0.8);
 }
 
 .questions-panel {
@@ -651,8 +635,8 @@ span.word:after {
   }
 
   .section {
-    padding-top: 6rem;
-    padding-bottom: 6rem;
+    padding-top: 8rem;
+    padding-bottom: 8rem;
   }
 
   .cta-right {
