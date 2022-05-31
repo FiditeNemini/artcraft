@@ -44,7 +44,7 @@ use crate::util::semi_persistent_cache_dir::SemiPersistentCacheDir;
 use data_encoding::{HEXUPPER, HEXLOWER, HEXLOWER_PERMISSIVE};
 use database_queries::column_types::vocoder_type::VocoderType;
 use database_queries::mediators::firehose_publisher::FirehosePublisher;
-use database_queries::queries::tts::tts_inference_jobs::list_available_tts_inference_jobs::{AvailableTtsInferenceJob, list_available_tts_inference_jobs};
+use database_queries::queries::tts::tts_inference_jobs::list_available_tts_inference_jobs::{AvailableTtsInferenceJob, list_available_tts_inference_jobs, list_available_tts_inference_jobs_with_minimum_priority};
 use database_queries::queries::tts::tts_inference_jobs::mark_tts_inference_job_done::mark_tts_inference_job_done;
 use database_queries::queries::tts::tts_inference_jobs::mark_tts_inference_job_failure::mark_tts_inference_job_failure;
 use database_queries::queries::tts::tts_inference_jobs::mark_tts_inference_job_pending_and_grab_lock::mark_tts_inference_job_pending_and_grab_lock;
@@ -146,6 +146,10 @@ struct Inferencer {
   // priority jobs to run in the order they were enqueued.
   // If this is set to "0", we no longer consider priority
   pub low_priority_starvation_prevention_every_nth: usize,
+
+  // A worker can be configured to only run jobs of a certain priority.
+  // This finds jobs of equal or greater priority.
+  pub maybe_minium_priority: Option<u8>,
 }
 
 #[tokio::main]
@@ -295,6 +299,12 @@ async fn main() -> AnyhowResult<()> {
   let license_key = easyenv::get_env_string_required("NEWRELIC_API_KEY")?;
   let newrelic_client = ClientBuilder::new(&license_key).build().unwrap();
 
+  let maybe_minimum_priority = easyenv::get_env_string_optional("MAYBE_MINIMUM_PRIORITY")
+      .map(|priority_string| {
+        priority_string.parse::<u8>()
+      })
+      .transpose()?;
+
   let inferencer = Inferencer {
     download_temp_directory: temp_directory,
     mysql_pool,
@@ -318,6 +328,7 @@ async fn main() -> AnyhowResult<()> {
     no_op_logger_millis: common_env.no_op_logger_millis,
     sidecar_max_synthesizer_models,
     low_priority_starvation_prevention_every_nth,
+    maybe_minium_priority,
   };
 
   main_loop(inferencer).await;
@@ -348,11 +359,21 @@ async fn main_loop(inferencer: Inferencer) {
     }
 
     let maybe_available_jobs =
-        list_available_tts_inference_jobs(
-          &inferencer.mysql_pool,
-          sort_by_priority,
-          num_records
-        ).await;
+        if let Some(minimum_priority) = inferencer.maybe_minium_priority {
+          // Special high-priority workers
+          list_available_tts_inference_jobs_with_minimum_priority(
+            &inferencer.mysql_pool,
+            minimum_priority,
+            num_records
+          ).await
+        } else {
+          // Normal path
+          list_available_tts_inference_jobs(
+            &inferencer.mysql_pool,
+            sort_by_priority,
+            num_records
+          ).await
+        };
 
     sort_by_priority = true;
     sort_by_priority_count += 1;
