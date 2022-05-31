@@ -53,6 +53,10 @@ h1 {
   font-weight: 700;
 }
 
+h3 {
+  color: rgba(255, 255, 255, 0.8);
+}
+
 p {
   font-weight: 300;
   margin-bottom: 0;
@@ -121,8 +125,16 @@ img {
   border: none;
 }
 
+.nav-bg-dark {
+  background-color: #17101c !important;
+}
+
+.offcanvas {
+  width: 100vw;
+}
+
 .nav-link {
-  font-size: 15px;
+  font-size: 16px;
   font-weight: 600;
   padding-left: 16px !important;
   padding-right: 16px !important;
@@ -178,6 +190,7 @@ span.word:after {
   ) !important;
   position: relative;
   overflow: hidden;
+  min-height: 100%;
 }
 
 .bg-hero {
@@ -190,18 +203,16 @@ span.word:after {
 }
 
 .lead {
-  color: rgba(255, 255, 255, 0.6);
+  color: rgba(255, 255, 255, 0.8);
 }
 
 .btn {
   border-radius: 5px;
   outline: none;
-  height: 42px;
-  font-size: 15px;
+  font-size: 16px;
   font-weight: 600;
-  padding-left: 24px !important;
-  padding-right: 24px !important;
-  z-index: 2;
+  padding: 10px 24px;
+  z-index: 1;
 }
 
 .btn-primary {
@@ -253,11 +264,10 @@ span.word:after {
 .btn-hero {
   padding-left: 35px !important;
   padding-right: 35px !important;
-  height: 48px;
 }
 
 .nav-login {
-  font-size: 15px;
+  font-size: 16px;
   font-weight: 600;
   color: #fff;
   text-decoration: none;
@@ -313,7 +323,7 @@ span.word:after {
   bottom: 0;
   max-height: 110%;
   max-width: 140%;
-  z-index: 2;
+  z-index: 1;
 }
 
 .hero-floor {
@@ -573,6 +583,32 @@ span.word:after {
   max-width: 800px !important;
 }
 
+.nav-pills {
+  backdrop-filter: blur(5px);
+  width: 100% !important;
+}
+
+.nav-link:focus,
+.nav-link:hover {
+  color: #fc6b68;
+}
+
+.nav-pills .nav-link {
+  padding: 16px 24px !important;
+  background-color: rgba(255, 255, 255, 0.1);
+  border-radius: 0;
+  border-color: rgba(255, 255, 255, 0.1) !important;
+  border-bottom: 5px solid;
+  color: #fff !important;
+}
+
+.nav-pills .nav-link.active,
+.nav-pills .show > .nav-link {
+  background-color: rgba(255, 255, 255, 0.15);
+  border-color: #fc6b68 !important;
+  border-bottom: 5px solid;
+}
+
 @media (min-width: 992px) {
   .panel-title {
     position: absolute;
@@ -582,6 +618,10 @@ span.word:after {
   }
   .p-lg-4 {
     padding: 2rem !important;
+  }
+
+  .nav-bg-dark {
+    background-color: #17101c00 !important;
   }
 }
 
