@@ -13,6 +13,7 @@ static SUPPORTED_LANGUAGES_FOR_MODELS : Lazy<HashSet<String>> = Lazy::new(|| {
     "en-CA",
     "en-GB",
     "en-US",
+
     // Spanish
     "es",
     "es-419",
@@ -23,21 +24,26 @@ static SUPPORTED_LANGUAGES_FOR_MODELS : Lazy<HashSet<String>> = Lazy::new(|| {
     "es-MX",
     "es-PE",
     "es-US",
+
+    // French
+    "fr",
+    "fr-CA",
+    "fr-FR",
+
     // Portuguese
     "pt",
     "pt-BR",
 
     // ========== But these are on the horizon ==========
 
-    // French
-    "fr",
-    "fr-FR",
     // German
     "de",
     "de-DE",
+
     // Japanese
     "ja",
     "ja-JP",
+
     // Misc
     "id",
     "id-ID",
