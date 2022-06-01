@@ -305,6 +305,8 @@ async fn main() -> AnyhowResult<()> {
       })
       .transpose()?;
 
+  info!("Using 'MAYBE_MINIMUM_PRIORITY' of {:?}", maybe_minimum_priority);
+
   let inferencer = Inferencer {
     download_temp_directory: temp_directory,
     mysql_pool,
@@ -389,7 +391,7 @@ async fn main_loop(inferencer: Inferencer) {
     };
 
     if jobs.is_empty() {
-      noop_logger.log_after_awhile();
+      noop_logger.log_message_after_awhile("No TTS jobs picked up from database!");
 
       std::thread::sleep(Duration::from_millis(inferencer.job_batch_wait_millis));
       continue;

@@ -29,4 +29,17 @@ impl NoOpLogger {
 
     self.op_count += 1;
   }
+
+  pub fn log_message_after_awhile(&mut self, message: &str) {
+    let now = Utc::now();
+    let delta = now - self.last_log_time;
+
+    if delta > self.logless_duration {
+      info!("No operations for {:?}. {} operations: {}", delta, self.op_count, message);
+      self.op_count = 0;
+      self.last_log_time  = now;
+    }
+
+    self.op_count += 1;
+  }
 }
