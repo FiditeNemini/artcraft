@@ -63,6 +63,20 @@ p {
   color: rgba(255, 255, 255, 0.8);
 }
 
+.pre-heading {
+  font-size: 18px;
+  color: #fc6b68;
+  text-transform: uppercase;
+}
+
+.rotateimg180 {
+  -webkit-transform: rotate(180deg);
+  -moz-transform: rotate(180deg);
+  -ms-transform: rotate(180deg);
+  -o-transform: rotate(180deg);
+  transform: rotate(180deg);
+}
+
 img {
   image-rendering: auto;
   image-rendering: crisp-edges;
@@ -475,7 +489,7 @@ span.word:after {
 
 .cta-img {
   position: absolute;
-  max-width: 500px;
+  max-width: 600px;
   left: 50%;
   top: 50%;
   transform: translate(-50%, -55%);
@@ -565,6 +579,47 @@ span.word:after {
 
 .login-panel {
   max-width: 800px !important;
+}
+
+.faq-panel {
+  max-width: 800px;
+}
+
+.accordion-item {
+  background-color: rgba(255, 255, 255, 0.1) !important;
+  border-color: #ffffff12 !important;
+  border: 2px solid;
+  border-radius: 5px;
+}
+
+.accordion-button {
+  background-color: rgba(255, 255, 255, 0) !important;
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 20px;
+}
+
+.accordion-button:hover {
+  color: #fff;
+}
+
+.accordion-button::after {
+  background-image: url(assets/plus.svg);
+  opacity: 0.5;
+  background-position: center;
+}
+
+.accordion-button:not(.collapsed)::after {
+  background-image: url(assets/munis.svg);
+  opacity: 0.5;
+}
+
+.accordion-body {
+  color: rgba(255, 255, 255, 0.8);
+  font-weight: 300;
+}
+
+.accordion-button:not(.collapsed) {
+  color: #fff;
 }
 
 .nav-pills {
