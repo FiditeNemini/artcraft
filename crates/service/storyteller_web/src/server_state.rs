@@ -88,6 +88,12 @@ pub struct RedisRateLimiters {
   /// Logged in users have a little more leeway
   pub logged_in: RedisRateLimiter,
 
+  /// API consumers have even higher priority
+  /// (Temporary for VidVoice.ai; a long term solution builds an in-memory cache
+  /// of these or finds a better rate limit library that allows on-demand rate
+  /// constructions)
+  pub api_high_priority: RedisRateLimiter,
+
   /// A rate limiter for TTS and W2L uploads
   pub model_upload: RedisRateLimiter,
 }

@@ -241,6 +241,19 @@ async fn main() -> AnyhowResult<()> {
     RedisRateLimiter::new(limiter, "logged_in", limiter_enabled)
   };
 
+  let api_high_priority_redis_rate_limiter = {
+    let limiter_enabled = easyenv::get_env_bool_or_default("LIMITER_API_HIGH_PRIORITY_ENABLED", true);
+    let limiter_max_requests = easyenv::get_env_num("LIMITER_API_HIGH_PRIORITY_MAX_REQUESTS", 30)?;
+    let limiter_window_seconds = easyenv::get_env_num("LIMITER_API_HIGH_PRIORITY_WINDOW_SECONDS", 30)?;
+
+    let limiter = Limiter::build(&common_env.redis_0_connection_string)
+        .limit(limiter_max_requests)
+        .period(Duration::from_secs(limiter_window_seconds))
+        .finish()?;
+
+    RedisRateLimiter::new(limiter, "api_high_priority", limiter_enabled)
+  };
+
   let model_upload_rate_limiter = {
     let limiter_enabled = easyenv::get_env_bool_or_default("LIMITER_MODEL_UPLOAD_ENABLED", true);
     let limiter_max_requests = easyenv::get_env_num("LIMITER_MODEL_UPLOAD_MAX_REQUESTS", 3)?;
@@ -358,6 +371,7 @@ async fn main() -> AnyhowResult<()> {
     redis_rate_limiters: RedisRateLimiters {
       logged_out: logged_out_redis_rate_limiter,
       logged_in: logged_in_redis_rate_limiter,
+      api_high_priority: api_high_priority_redis_rate_limiter,
       model_upload: model_upload_rate_limiter,
     },
     firehose_publisher,

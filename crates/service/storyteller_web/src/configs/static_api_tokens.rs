@@ -49,9 +49,19 @@ pub struct StaticApiTokens {
 pub struct StaticApiTokenConfig {
   /// API token.
   pub api_token: String,
+
   /// Force this user token if present.
   pub maybe_user_token: Option<String>,
+
   /// Priority level to force
   /// Defaults to "1" if not set.
   pub maybe_priority_level: Option<u8>,
+
+  /// Use a higher priority rate limiter (with higher QPS)
+  /// Defaults to "false" if not set.
+  pub maybe_use_high_priority_rate_limiter: Option<bool>,
+
+  /// Disable rate limiter?
+  /// Defaults to "false" if not set.
+  pub maybe_disable_rate_limiter: Option<bool>,
 }

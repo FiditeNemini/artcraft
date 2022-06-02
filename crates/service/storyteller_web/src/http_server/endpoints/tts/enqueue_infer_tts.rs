@@ -90,6 +90,8 @@ pub async fn infer_tts_handler(
   let mut is_from_api = false;
   let mut maybe_user_token : Option<String> = None;
   let mut priority_level = FAKEYOU_ANONYMOUS_PRIORITY_LEVEL;
+  let mut use_high_priority_rate_limiter = false; // NB: Careful!
+  let mut disable_rate_limiter = false; // NB: Careful!
 
   // ==================== USER SESSION ==================== //
 
@@ -119,6 +121,11 @@ pub async fn infer_tts_handler(
 
       priority_level = api_token_configs.maybe_priority_level
           .unwrap_or(FAKEYOU_DEFAULT_VALID_API_TOKEN_PRIORITY_LEVEL);
+
+      use_high_priority_rate_limiter = api_token_configs.maybe_use_high_priority_rate_limiter
+          .unwrap_or(false);
+
+      disable_rate_limiter = api_token_configs.maybe_disable_rate_limiter.unwrap_or(false);
 
       if let Some(user_token_override) = api_token_configs.maybe_user_token.as_deref() {
         maybe_user_token = Some(user_token_override.trim().to_string());
@@ -152,23 +159,30 @@ pub async fn infer_tts_handler(
 
   // ==================== RATE LIMIT ==================== //
 
-  let mut rate_limiter = match maybe_user_session {
-    None => &server_state.redis_rate_limiters.logged_out,
-    Some(ref user) => {
-      if user.is_banned {
-        return Err(InferTtsError::NotAuthorized);
-      }
-      &server_state.redis_rate_limiters.logged_in
-    },
-  };
+  if !disable_rate_limiter {
+    let mut rate_limiter = match maybe_user_session {
+      None => &server_state.redis_rate_limiters.logged_out,
+      Some(ref user) => {
+        if user.is_banned {
+          return Err(InferTtsError::NotAuthorized);
+        }
+        &server_state.redis_rate_limiters.logged_in
+      },
+    };
 
-  // TODO/TEMP
-  if is_investor || is_from_api {
-    rate_limiter = &server_state.redis_rate_limiters.logged_in;
-  }
+    // TODO/TEMP
+    if is_investor || is_from_api {
+      rate_limiter = &server_state.redis_rate_limiters.logged_in;
+    }
 
-  if let Err(_err) = rate_limiter.rate_limit_request(&http_request) {
-    return Err(InferTtsError::RateLimited);
+    // TODO: This is for VidVoice.ai and should be replaced with per-API consumer rate limiters
+    if use_high_priority_rate_limiter {
+      rate_limiter = &server_state.redis_rate_limiters.api_high_priority;
+    }
+
+    if let Err(_err) = rate_limiter.rate_limit_request(&http_request) {
+      return Err(InferTtsError::RateLimited);
+    }
   }
 
   // ==================== CHECK AND PERFORM TTS ==================== //
