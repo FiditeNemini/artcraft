@@ -208,6 +208,12 @@ span.word:after {
   min-height: 100%;
 }
 
+.bg-title {
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' version='1.1' xmlns:xlink='http://www.w3.org/1999/xlink' xmlns:svgjs='http://svgjs.com/svgjs' width='1920' height='300' preserveAspectRatio='none' viewBox='0 0 1920 300'%3e%3cg mask='url(%26quot%3b%23SvgjsMask1028%26quot%3b)' fill='none'%3e%3cpath d='M1170 175L183 174' stroke-width='8' stroke='url(%23SvgjsLinearGradient1029)' stroke-linecap='round' class='Left'%3e%3c/path%3e%3cpath d='M1456 93L968 92' stroke-width='10' stroke='url(%23SvgjsLinearGradient1029)' stroke-linecap='round' class='Left'%3e%3c/path%3e%3cpath d='M1459 102L2490 101' stroke-width='6' stroke='url(%23SvgjsLinearGradient1029)' stroke-linecap='round' class='Left'%3e%3c/path%3e%3cpath d='M766 41L192 40' stroke-width='6' stroke='url(%23SvgjsLinearGradient1030)' stroke-linecap='round' class='Right'%3e%3c/path%3e%3cpath d='M261 212L-475 211' stroke-width='10' stroke='url(%23SvgjsLinearGradient1030)' stroke-linecap='round' class='Right'%3e%3c/path%3e%3cpath d='M251 192L1533 191' stroke-width='6' stroke='url(%23SvgjsLinearGradient1029)' stroke-linecap='round' class='Left'%3e%3c/path%3e%3cpath d='M172 211L936 210' stroke-width='8' stroke='url(%23SvgjsLinearGradient1030)' stroke-linecap='round' class='Right'%3e%3c/path%3e%3cpath d='M1070 207L1854 206' stroke-width='10' stroke='url(%23SvgjsLinearGradient1029)' stroke-linecap='round' class='Left'%3e%3c/path%3e%3c/g%3e%3cdefs%3e%3cmask id='SvgjsMask1028'%3e%3crect width='1920' height='300' fill='white'%3e%3c/rect%3e%3c/mask%3e%3clinearGradient x1='100%25' y1='0%25' x2='0%25' y2='0%25' id='SvgjsLinearGradient1029'%3e%3cstop stop-color='rgba(247%2c 84%2c 92%2c 0)' offset='0'%3e%3c/stop%3e%3cstop stop-color='rgba(247%2c 84%2c 92%2c 0.1)' offset='1'%3e%3c/stop%3e%3c/linearGradient%3e%3clinearGradient x1='0%25' y1='0%25' x2='100%25' y2='0%25' id='SvgjsLinearGradient1030'%3e%3cstop stop-color='rgba(247%2c 84%2c 92%2c 0)' offset='0'%3e%3c/stop%3e%3cstop stop-color='rgba(247%2c 84%2c 92%2c 0.1)' offset='1'%3e%3c/stop%3e%3c/linearGradient%3e%3c/defs%3e%3c/svg%3e");
+  background-size: auto;
+  background-repeat: no-repeat;
+}
+
 .bg-hero {
   background: rgb(18, 14, 26);
   background: linear-gradient(
@@ -226,21 +232,24 @@ span.word:after {
   z-index: 1;
 }
 
-.btn-primary {
+.btn-primary,
+.btn-primary:active,
+.btn-primary:focus {
   background-color: #fc6b68;
   border: 2.5px solid;
   border-color: #fc6b68;
   transition: 0.2s;
 }
 
-.btn-primary:hover,
-.btn-primary:focus {
+.btn-primary:hover {
   background-color: #ff8d8b;
   border: 2.5px solid;
   border-color: #ff8d8b;
 }
 
-.btn-secondary {
+.btn-secondary,
+.btn-secondary:focus,
+.btn-secondary:active {
   background-color: #fff;
   color: #443a40;
   border: 2.5px solid;
@@ -248,15 +257,16 @@ span.word:after {
   transition: 0.2s;
 }
 
-.btn-secondary:hover,
-.btn-secondary:focus {
+.btn-secondary:hover {
   background-color: #ccc;
   color: #443a40;
   border: 2.5px solid;
   border-color: #ccc;
 }
 
-.btn-destructive {
+.btn-destructive,
+.btn-destructive:active,
+.btn-destructive:focus {
   background-color: #fff;
   color: #fc6b68;
   border: 2.5px solid;
@@ -264,8 +274,7 @@ span.word:after {
   transition: 0.2s;
 }
 
-.btn-destructive:hover,
-.btn-destructive:focus {
+.btn-destructive:hover {
   background-color: #fdcfce;
   color: #fc6b68;
   border: 2.5px solid;
@@ -622,6 +631,7 @@ span.word:after {
   background-color: rgba(255, 255, 255, 0) !important;
   color: rgba(255, 255, 255, 0.8);
   font-size: 20px;
+  line-height: 1.5;
 }
 
 .accordion-button:hover {
@@ -646,6 +656,7 @@ span.word:after {
 
 .accordion-button:not(.collapsed) {
   color: #fff;
+  box-shadow: none;
 }
 
 .nav-pills {
@@ -672,6 +683,43 @@ span.word:after {
   background-color: rgba(255, 255, 255, 0.15);
   border-color: #fc6b68 !important;
   border-bottom: 5px solid;
+}
+
+.modal {
+  background-color: rgba(19, 15, 27, 0.5);
+}
+
+.modal-content {
+  background-color: #342b35;
+  border-color: #4b3c46 !important;
+  border: 2px solid;
+  border-radius: 8px;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  -webkit-box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.25);
+  box-shadow: 0px 0px 30px 0px rgba(0, 0, 0, 0.5);
+}
+
+.modal-header {
+  border-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+.modal-footer {
+  border-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+.modal-close-btn {
+  background: none !important;
+  border-radius: 5px;
+  outline: none;
+  border: none;
+  font-size: 22px;
+  color: rgba(255, 255, 255, 0.8);
+  transition: 0.1s;
+}
+
+.modal-close-btn:hover {
+  color: rgba(255, 255, 255, 0.4);
 }
 
 @media (min-width: 992px) {
@@ -716,8 +764,8 @@ span.word:after {
   }
 
   .section {
-    padding-top: 8rem;
-    padding-bottom: 8rem;
+    padding-top: 8.5rem;
+    padding-bottom: 8.5rem;
   }
 
   .cta-right {
