@@ -127,7 +127,7 @@ code {
 }
 
 .nav-link {
-  font-size: 16px;
+  font-size: 15px;
   font-weight: 600;
   padding-left: 16px !important;
   padding-right: 16px !important;
@@ -185,29 +185,30 @@ code {
 .btn {
   border-radius: 5px;
   outline: none;
-  height: 42px;
   font-size: 15px;
   font-weight: 600;
-  padding-left: 24px !important;
-  padding-right: 24px !important;
+  padding: 10px 24px;
   z-index: 2;
 }
 
-.btn-primary {
+.btn-primary,
+.btn-primary:focus,
+.btn-primary:active {
   background-color: #fc6b68;
   border: 2.5px solid;
   border-color: #fc6b68;
   transition: 0.2s;
 }
 
-.btn-primary:hover,
-.btn-primary:focus {
+.btn-primary:hover {
   background-color: #ff8d8b;
   border: 2.5px solid;
   border-color: #ff8d8b;
 }
 
-.btn-secondary {
+.btn-secondary,
+.btn-secondary:focus,
+.btn-secondary:active {
   background-color: #fff;
   color: #443a40;
   border: 2.5px solid;
@@ -215,15 +216,16 @@ code {
   transition: 0.2s;
 }
 
-.btn-secondary:hover,
-.btn-secondary:focus {
+.btn-secondary:hover {
   background-color: #ccc;
   color: #443a40;
   border: 2.5px solid;
   border-color: #ccc;
 }
 
-.btn-destructive {
+.btn-destructive,
+.btn-destructive:focus,
+.btn-destructive:active {
   background-color: #fff;
   color: #fc6b68;
   border: 2.5px solid;
@@ -231,8 +233,7 @@ code {
   transition: 0.2s;
 }
 
-.btn-destructive:hover,
-.btn-destructive:focus {
+.btn-destructive:hover {
   background-color: #fdcfce;
   color: #fc6b68;
   border: 2.5px solid;
@@ -240,7 +241,7 @@ code {
 }
 
 .nav-login {
-  font-size: 16px;
+  font-size: 15px;
   font-weight: 600;
   color: #fff;
   text-decoration: none;
