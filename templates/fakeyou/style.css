@@ -254,6 +254,30 @@ code {
   transition: 0.1s;
 }
 
+.navbar-main {
+  z-index: 100;
+  width: 100%;
+  transition: all 0.1s;
+  border-color: rgba(255, 255, 255, 0.07) !important;
+  border-bottom: 0px solid;
+  padding-top: 10px;
+  padding-bottom: 10px;
+}
+
+.navbar-fixed {
+  position: fixed;
+}
+
+.navbar-main.scrolled {
+  background-color: #2e222c;
+  border-color: rgba(255, 255, 255, 0.07) !important;
+  border-bottom: 1px solid;
+}
+
+.m-page-top {
+  margin-top: 100px;
+}
+
 .red-line {
   border-left: 3px solid #fc6b68;
   height: 100%;
