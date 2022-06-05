@@ -136,8 +136,8 @@ img {
   transition: all 0.1s;
   border-color: rgba(255, 255, 255, 0.07) !important;
   border-bottom: 0px solid;
-  padding-top: 12px;
-  padding-bottom: 12px;
+  padding-top: 10px;
+  padding-bottom: 10px;
 }
 
 .navbar-fixed {
@@ -168,8 +168,8 @@ img {
 }
 
 .offcanvas-header {
-  padding-top: 12px;
-  padding-bottom: 12px;
+  padding-top: 10px;
+  padding-bottom: 10px;
 }
 
 .nav-link {
