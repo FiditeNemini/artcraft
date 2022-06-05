@@ -167,6 +167,11 @@ img {
   height: 100%;
 }
 
+.offcanvas-header {
+  padding-top: 12px;
+  padding-bottom: 12px;
+}
+
 .nav-link {
   font-size: 15px;
   font-weight: 500;
