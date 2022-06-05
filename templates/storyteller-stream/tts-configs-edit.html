@@ -26,12 +26,18 @@
       crossorigin="anonymous"
     ></script>
 
+    <script
+      src="https://code.jquery.com/jquery-3.6.0.min.js"
+      integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4="
+      crossorigin="anonymous"
+    ></script>
+
     <title>Storyteller Stream. Text to Speech For Your Stream.</title>
   </head>
   <body></body>
     <div class="bg-gradient">
       <nav
-        class="navbar navbar-expand-lg navbar-dark py-3"
+        class="navbar navbar-expand-lg navbar-dark navbar-fixed navbar-main"
         aria-label="Offcanvas navbar large"
       >
         <div class="container">
@@ -97,7 +103,7 @@
         </div>
       </nav>
 
-      <div class="bg-title">
+      <div class="bg-title m-page-top">
         <div class="container py-5 d-flex flex-column">
           <h1><span class="word">Edit Rule</span></h1>
           <h3 class="mb-5">Change rule settings</h3>
@@ -247,7 +253,12 @@
       crossorigin="anonymous"
     ></script>
 
-    
+    <script>
+      $(window).scroll(function () {
+        $("nav").toggleClass("scrolled", $(this).scrollTop() > 50);
+      });
+      s;
+    </script>
 
     <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
     <script type="text/javascript">

@@ -26,6 +26,12 @@
       crossorigin="anonymous"
     ></script>
 
+    <script
+      src="https://code.jquery.com/jquery-3.6.0.min.js"
+      integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4="
+      crossorigin="anonymous"
+    ></script>
+
     <title>Storyteller Stream. Text to Speech For Your Stream.</title>
   </head>
   <body>
@@ -35,7 +41,7 @@
       </div> -->
 
       <nav
-        class="navbar navbar-expand-lg navbar-dark py-3 navbar-home"
+        class="navbar navbar-expand-lg navbar-dark navbar-fixed navbar-main"
         aria-label="Offcanvas navbar large"
       >
         <div class="container">
@@ -513,6 +519,13 @@
         distance: "30px",
         duration: 600,
       });
+    </script>
+
+    <script>
+      $(window).scroll(function () {
+        $("nav").toggleClass("scrolled", $(this).scrollTop() > 50);
+      });
+      s;
     </script>
 
     <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
