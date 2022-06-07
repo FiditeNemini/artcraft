@@ -263,10 +263,10 @@ code {
   padding-top: 10px;
   padding-bottom: 10px;
 }
-
+/* 
 .navbar-fixed {
   position: fixed;
-}
+} */
 
 .navbar-main.scrolled {
   background-color: #2e222c;
