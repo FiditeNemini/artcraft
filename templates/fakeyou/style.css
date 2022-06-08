@@ -174,6 +174,10 @@ code {
   width: 100vw;
 }
 
+.dropdown-menu {
+  transition: all 0.1s;
+}
+
 .lead {
   color: rgba(255, 255, 255, 0.8);
 }

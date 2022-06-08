@@ -26,6 +26,12 @@
       crossorigin="anonymous"
     ></script>
 
+    <script
+      src="https://code.jquery.com/jquery-3.6.0.min.js"
+      integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4="
+      crossorigin="anonymous"
+    ></script>
+
     <title>FakeYou. Deep Fake Text to Speech.</title>
   </head>
   <body>
@@ -377,6 +383,21 @@
       integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p"
       crossorigin="anonymous"
     ></script>
+
+    <!-- Hover Nav -->
+    <script>
+      $(document).ready(function () {
+        if ($(window).width() >= 992) {
+          $(".dropdown").hover(function () {
+            var dropdownToggle = $(this).children(".dropdown-toggle");
+            var dropdownMenu = $(this).children(".dropdown-menu");
+            if (dropdownToggle.is(":visible")) {
+              dropdownMenu.toggleClass("show");
+            }
+          });
+        }
+      });
+    </script>
 
     <script>
       ScrollReveal().reveal(".ani1", { delay: 100, distance: "20px" });
