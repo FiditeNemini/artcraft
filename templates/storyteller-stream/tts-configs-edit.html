@@ -105,72 +105,84 @@
 
       <div class="bg-title m-page-top">
         <div class="container py-5 d-flex flex-column">
-          <h1><span class="word">Stream Setup</span></h1>
-          <h3>Configure TTS (and soon much more!)</h3>
-  
-        <div class="alert alert-primary mt-4">
-          You can create rules for matching different categories of events: cheers (bits), channel point rewards, etc. When an event occurs in your stream, we compare it against the rules in its category. The first matched rule (from the top) is selected, and the action that it specifies is taken. For now this is limited to FakeYou text to speech, but we'll be adding lots of new capabilities soon.
-        </div>
-  
-        <!-- Tabs Section -->
-        <div class="pt-5">
-          <!-- Nav -->
-          <ul class="nav nav-pills mb-4" id="pills-tab" role="tablist">
-            <li class="nav-item w-50" role="presentation">
-              <button class="nav-link active w-100 rounded-start" id="pills-bits-tab" data-bs-toggle="pill" data-bs-target="#pills-bits" type="button" role="tab" aria-controls="pills-bits" aria-selected="true">Bits</button>
-            </li>
-            <li class="nav-item w-50" role="presentation">
-              <button class="nav-link w-100 rounded-end" id="pills-cp-tab" data-bs-toggle="pill" data-bs-target="#pills-cp" type="button" role="tab" aria-controls="pills-cp" aria-selected="false">Channel Points</button>
-            </li>
-          </ul>
-          <!-- Content -->
-          <div class="tab-content pt-4" id="pills-tabContent">
-            <div class="tab-pane fade show active" id="pills-bits" role="tabpanel" aria-labelledby="pills-bits-tab">
-              <h2 class="d-flex fw-bold align-items-center"><img class="me-3" src="assets/bits-icon.png" height="34" alt="">Bits / Cheers</h2> 
-              <p class="fs-5">These settings are best for small and medium-sized channels.</p>
-              <div class="d-flex flex-column gap-3 mt-4">
-                <button class="btn btn-primary w-100"><i class="fa-solid fa-plus me-2"></i>Create New Bits / Cheer Rule</button>
-                <button class="btn btn-secondary w-100"><i class="fa-solid fa-sort me-2"></i>Reorder Rules</button>
+          <h1><span class="word">Edit Rule</span></h1>
+          <h3 class="mb-5">Change rule settings</h3>
+
+          <div class="d-flex flex-column gap-4">
+            <div class="panel p-3 p-lg-4">
+              <h4 class="d-flex align-items-center mb-4">1) Pick what to match on</h4>
+              <div class="form-group">
+                <select class="form-select">
+                  <option>All Voices</option>
+                  <option>All Voices 2</option>
+                  <option>All Voices 3</option>
+                </select>
               </div>
-  
-              <div class="d-flex flex-column panel p-3 p-lg-4 mt-4">
-                <h4 class="fw-bold pb-3">Spend at least 100 bits</h4>
-                <p class="pb-4">
-                  TTS with a random voice from the following 2 voice(s):<br/><br/>
-  
-                  • "Weird Al" Yankovic<br/>
-                  • Phoenix Wright (Ultimate Marvel vs. Capcom 3, Sam Riegel)
-                </p>
-                <div class="d-flex gap-3">
-                  <a class="w-50" href="tts-configs-edit.html"><button class="btn btn-secondary w-100"><i class="fa-solid fa-pen-to-square me-2"></i>Edit</button></a>
-                  <button class="btn btn-destructive w-50" data-bs-toggle="modal" data-bs-target="#deleteModal"><i class="fa-solid fa-trash-can me-2"></i>Delete</button>
+            </div>
+
+            <div class="panel p-3 p-lg-4">
+              <h4 class="d-flex align-items-center mb-4">2) Configure the matching</h4>
+              <div class="row gy-4">
+                <div class="col-12 col-lg-3">
+                  <label class="sub-title">Pick the cheer</label>
+                  <div class="form-group">
+                    <select class="form-select">
+                      <option>DoodleCheer</option>
+                    </select>
+                  </div>
                 </div>
-              </div>
-  
-              <div class="d-flex flex-column panel p-3 p-lg-4 mt-4">
-                <h4 class="fw-bold pb-3">Cheermote name matches "DoodleCheer100"</h4>
-                <p class="pb-4">
-                  TTS with voice: Phoenix Wright (Ultimate Marvel vs. Capcom 3, Sam Riegel)
-                </p>
-                <div class="d-flex gap-3">
-                  <a class="w-50" href="tts-configs-edit.html"><button class="btn btn-secondary w-100"><i class="fa-solid fa-pen-to-square me-2"></i>Edit</button></a>
-                  <button class="btn btn-destructive w-50" data-bs-toggle="modal" data-bs-target="#deleteModal"><i class="fa-solid fa-trash-can me-2"></i>Delete</button>
+                <div class="col-12 col-lg-3">
+                  <label class="sub-title">Then the bit value</label>
+                  <div class="form-group">
+                    <select class="form-select">
+                      <option>100</option>
+                    </select>
+                  </div>
+                </div>
+                <div class="col-12 col-lg-6"><label class="sub-title">To match against this (or set something custom)</label>
+                  <div class="form-group input-icon">
+                    <span class="fa-solid fa-gem form-control-feedback"></span>
+                    <input
+                      type="text"
+                      class="form-control"
+                      placeholder="DoodleCheer100"
+                    />
+                  </div>
                 </div>
               </div>
             </div>
-  
-            <div class="tab-pane fade" id="pills-cp" role="tabpanel" aria-labelledby="pills-cp-tab">
-              <h2 class="d-flex fw-bold align-items-center"><img class="me-3" src="assets/channel-points-icon.png" height="34" alt="">Channel Points / Rewards</h2> 
-              <p class="fs-5">These settings are best for small channels.</p>
-              <div class="d-flex flex-column gap-3 mt-4">
-                <button class="btn btn-primary w-100"><i class="fa-solid fa-plus me-2"></i>Create Channel Points Rule</button>
-                <button class="btn btn-secondary w-100"><i class="fa-solid fa-sort me-2"></i>Reorder Rules</button>
+
+            <div class="panel p-3 p-lg-4">
+              <h4 class="d-flex align-items-center mb-4">3) Pick how to respond</h4>
+              <label class="sub-title">Response Type</label>
+              <div class="form-group">
+                <select class="form-select">
+                  <option>Respond with a TTS voice</option>
+                </select>
               </div>
             </div>
-  
+
+            <div class="panel p-3 p-lg-4">
+              <h4 class="d-flex align-items-center mb-4">4) Configure the response</h4>
+              <label class="sub-title">TTS Voice Model</label>
+              <div class="form-group">
+                <select class="form-select">
+                  <option>Respond with a TTS voice</option>
+                </select>
+              </div>
+            </div>
           </div>
-        </div>
-          
+
+          <h4 class="d-flex align-items-center mt-5 mb-3">This is the rule:</h4>
+          <div class="panel panel-outline p-3 p-lg-4">
+            <h4 class="d-flex align-items-center mb-4">Cheermote name matches "DoodleCheer100"</h4>
+            <p>TTS with voice: Phoenix Wright (Ultimate Marvel vs. Capcom 3, Sam Riegel) <a class="ms-1" href=""><i class="fa-solid fa-up-right-from-square icon-red"></i></a></p>
+          </div>
+          <div class="d-flex mt-4 gap-3">
+            <a class="w-100" href="tts-configs.html"><button class="btn btn-secondary w-100"><i class="fa-solid fa-angle-left me-2"></i>Cancel / Back</button></a>
+            <a class="w-100" href=""><button class="btn btn-primary w-100"><i class="fa-solid fa-floppy-disk me-2"></i>Save Changes</button></a>
+          </div>
+
       </div>
     </div>
 
@@ -247,8 +259,6 @@
       });
       s;
     </script>
-
-    
 
     <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
     <script type="text/javascript">

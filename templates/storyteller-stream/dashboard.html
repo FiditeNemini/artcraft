@@ -104,74 +104,86 @@
       </nav>
 
       <div class="bg-title m-page-top">
-        <div class="container py-5 d-flex flex-column">
-          <h1><span class="word">Stream Setup</span></h1>
-          <h3>Configure TTS (and soon much more!)</h3>
-  
-        <div class="alert alert-primary mt-4">
-          You can create rules for matching different categories of events: cheers (bits), channel point rewards, etc. When an event occurs in your stream, we compare it against the rules in its category. The first matched rule (from the top) is selected, and the action that it specifies is taken. For now this is limited to FakeYou text to speech, but we'll be adding lots of new capabilities soon.
-        </div>
-  
-        <!-- Tabs Section -->
-        <div class="pt-5">
-          <!-- Nav -->
-          <ul class="nav nav-pills mb-4" id="pills-tab" role="tablist">
-            <li class="nav-item w-50" role="presentation">
-              <button class="nav-link active w-100 rounded-start" id="pills-bits-tab" data-bs-toggle="pill" data-bs-target="#pills-bits" type="button" role="tab" aria-controls="pills-bits" aria-selected="true">Bits</button>
-            </li>
-            <li class="nav-item w-50" role="presentation">
-              <button class="nav-link w-100 rounded-end" id="pills-cp-tab" data-bs-toggle="pill" data-bs-target="#pills-cp" type="button" role="tab" aria-controls="pills-cp" aria-selected="false">Channel Points</button>
-            </li>
-          </ul>
-          <!-- Content -->
-          <div class="tab-content pt-4" id="pills-tabContent">
-            <div class="tab-pane fade show active" id="pills-bits" role="tabpanel" aria-labelledby="pills-bits-tab">
-              <h2 class="d-flex fw-bold align-items-center"><img class="me-3" src="assets/bits-icon.png" height="34" alt="">Bits / Cheers</h2> 
-              <p class="fs-5">These settings are best for small and medium-sized channels.</p>
-              <div class="d-flex flex-column gap-3 mt-4">
-                <button class="btn btn-primary w-100"><i class="fa-solid fa-plus me-2"></i>Create New Bits / Cheer Rule</button>
-                <button class="btn btn-secondary w-100"><i class="fa-solid fa-sort me-2"></i>Reorder Rules</button>
-              </div>
-  
-              <div class="d-flex flex-column panel p-3 p-lg-4 mt-4">
-                <h4 class="fw-bold pb-3">Spend at least 100 bits</h4>
-                <p class="pb-4">
-                  TTS with a random voice from the following 2 voice(s):<br/><br/>
-  
-                  • "Weird Al" Yankovic<br/>
-                  • Phoenix Wright (Ultimate Marvel vs. Capcom 3, Sam Riegel)
-                </p>
-                <div class="d-flex gap-3">
-                  <a class="w-50" href="tts-configs-edit.html"><button class="btn btn-secondary w-100"><i class="fa-solid fa-pen-to-square me-2"></i>Edit</button></a>
-                  <button class="btn btn-destructive w-50" data-bs-toggle="modal" data-bs-target="#deleteModal"><i class="fa-solid fa-trash-can me-2"></i>Delete</button>
+        <div class="container py-5 d-flex flex-column align-items-center">
+          <h1 class="mb-2">
+            <span class="word">Dashboard</span></h1>
+            <h3>Link your stream and manage your TTS here.</h3>
+
+          <div class="features-section">
+            <div class="row gy-5">
+              <div class="col-md-4 d-flex align-items-stretch">
+                <div
+                  class="panel features-panel panel-ani"
+                >
+                  <img
+                    class="features-icon red-glow"
+                    src="assets/twitch-icon.png"
+                    alt=""
+                    width="65"
+                  />
+                  <h4 class="features-title mb-3">Link Your Twitch</h4>
+                  <p class="mb-4">
+                    Morbi dapibus commodo porta. Sed faucibus tristique orci in
+                    tristique. Praesent quam nunc, fermentum eu feugiat sit.
+                  </p>
+                  <button class="btn btn-primary w-100">Link Twitch</button>
                 </div>
               </div>
-  
-              <div class="d-flex flex-column panel p-3 p-lg-4 mt-4">
-                <h4 class="fw-bold pb-3">Cheermote name matches "DoodleCheer100"</h4>
-                <p class="pb-4">
-                  TTS with voice: Phoenix Wright (Ultimate Marvel vs. Capcom 3, Sam Riegel)
-                </p>
-                <div class="d-flex gap-3">
-                  <a class="w-50" href="tts-configs-edit.html"><button class="btn btn-secondary w-100"><i class="fa-solid fa-pen-to-square me-2"></i>Edit</button></a>
-                  <button class="btn btn-destructive w-50" data-bs-toggle="modal" data-bs-target="#deleteModal"><i class="fa-solid fa-trash-can me-2"></i>Delete</button>
+              <div class="col-md-4 d-flex align-items-stretch">
+                <div class="panel features-panel panel-ani">
+                  <img
+                    class="features-icon red-glow"
+                    src="assets/voices-icon.png"
+                    alt=""
+                    width="80"
+                  />
+                  <h4 class="features-title mb-3">Configure TTS</h4>
+                  <p class="mb-4">
+                    Morbi dapibus commodo porta. Sed faucibus tristique orci in
+                    tristique. Praesent quam nunc, fermentum eu feugiat sit.
+                  </p>
+                  <button class="btn btn-primary w-100">TTS Settings</button>
+                </div>
+              </div>
+              <div class="col-md-4 d-flex align-items-stretch">
+                <div
+                  class="panel features-panel panel-ani"
+                >
+                  <img
+                    class="features-icon red-glow"
+                    src="assets/obs-icon.png"
+                    alt=""
+                    width="65"
+                  />
+                  <h4 class="features-title mb-3">Configure OBS</h4>
+                  <p class="mb-4">
+                    Morbi dapibus commodo porta. Sed faucibus tristique orci in
+                    tristique. Praesent quam nunc, fermentum eu feugiat sit.
+                  </p>
+                  <button class="btn btn-primary w-100">OBS Settings</button>
                 </div>
               </div>
             </div>
-  
-            <div class="tab-pane fade" id="pills-cp" role="tabpanel" aria-labelledby="pills-cp-tab">
-              <h2 class="d-flex fw-bold align-items-center"><img class="me-3" src="assets/channel-points-icon.png" height="34" alt="">Channel Points / Rewards</h2> 
-              <p class="fs-5">These settings are best for small channels.</p>
-              <div class="d-flex flex-column gap-3 mt-4">
-                <button class="btn btn-primary w-100"><i class="fa-solid fa-plus me-2"></i>Create Channel Points Rule</button>
-                <button class="btn btn-secondary w-100"><i class="fa-solid fa-sort me-2"></i>Reorder Rules</button>
-              </div>
+          </div>
+      </div>
+
+      <div class="container section d-flex flex-column align-items-center">
+        <div class="cta-panel panel-ani">
+          <div class="row">
+            <div class="col-md-6 parent">
+              <img class="cta-img w-75 red-glow" src="assets/hanashi-mc.png" alt="" />
             </div>
-  
+            <div class="col-md-6 cta-right text-center text-sm-start px-5">
+              <h1 class="display-5 fw-bold">
+                Join us in Discord!
+              </h1>
+              <h5 class="mb-5">We'd like to chat with you.</h5>
+              <button class="btn btn-secondary w-100">Join Discord</button>
+            </div>
           </div>
         </div>
-          
       </div>
+
     </div>
 
 <!-- Delete Modal -->

@@ -26,6 +26,12 @@
       crossorigin="anonymous"
     ></script>
 
+    <script
+      src="https://code.jquery.com/jquery-3.6.0.min.js"
+      integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4="
+      crossorigin="anonymous"
+    ></script>
+
     <title>Storyteller Stream. Text to Speech For Your Stream.</title>
   </head>
   <body>
@@ -35,7 +41,7 @@
       </div> -->
 
       <nav
-        class="navbar navbar-expand-lg navbar-dark py-3 navbar-home"
+        class="navbar navbar-expand-lg navbar-dark navbar-fixed navbar-main"
         aria-label="Offcanvas navbar large"
       >
         <div class="container">
@@ -112,17 +118,27 @@
             Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
             eiusmod tempor incididunt ut labore et dolore magna aliqua.
           </p>
-          <div class="panel-ani mt-3">
+          <div class="panel-ani mt-4 d-flex gap-3 flex-column flex-md-row">
             <button type="button" class="btn btn-primary btn-hero load-hidden">
-              Sign Up<i class="fa-solid fa-arrow-right-long ms-2"></i>
+              Sign Up Now<i class="fa-solid fa-arrow-right-long ms-2"></i>
+            </button>
+            <button
+              type="button"
+              class="btn btn-secondary btn-hero load-hidden"
+            >
+              <i class="fa-brands fa-discord me-2"></i>Join Discord
             </button>
           </div>
         </div>
 
         <div class="hero-img-section noselect">
           <img class="hero-img" src="assets/hero-kitsune.png" alt="" />
-          <div id="hero-audio-wave"></div>
-          <img class="hero-floor" src="assets/hero-bg-floor.png" alt="" />
+          <div class="d-none d-md-flex" id="hero-audio-wave"></div>
+          <img
+            class="hero-floor d-none d-md-flex"
+            src="assets/hero-bg-floor.png"
+            alt=""
+          />
 
           <div
             class="panel hero-floating-panel hero-floating-panel-left d-none d-lg-block"
@@ -149,113 +165,263 @@
     </div>
 
     <div class="bg-gradient">
-      <div class="container section d-flex flex-column align-items-center">
-        <h1 class="fw-bold mt-3"><span class="word">Features</span></h1>
-        <div class="features-section">
-          <div class="row">
-            <div class="col-md-4 d-flex align-items-stretch">
-              <div class="panel features-panel features-panel-sides panel-ani">
-                <img
-                  class="features-icon red-glow"
-                  src="assets/channel-points-icon.png"
-                  alt=""
-                  width="65"
-                />
-                <h4 class="features-title mb-3">Channel Points</h4>
-                <p class="mb-4">
-                  Morbi dapibus commodo porta. Sed faucibus tristique orci in
-                  tristique. Praesent quam nunc, fermentum eu feugiat sit.
-                </p>
-                <a class="fw-bold" href="">Sign up now ></a>
+      <div class="features-bg">
+        <div class="container section d-flex flex-column align-items-center">
+          <div class="d-flex justify-content-center align-items-center gap-4">
+            <img class="rotateimg180" src="assets/title-shape.png" alt="" />
+            <h6 class="pre-heading text-center fw-bold pt-2">Features</h6>
+            <img src="assets/title-shape.png" alt="" />
+          </div>
+          <h1 class="display-5 fw-bold mt-3">
+            <span class="word">TTS Features</span>
+          </h1>
+          <div class="features-section">
+            <div class="row">
+              <div class="col-md-4 d-flex align-items-stretch">
+                <div
+                  class="panel features-panel features-panel-sides panel-ani"
+                >
+                  <img
+                    class="features-icon red-glow"
+                    src="assets/channel-points-icon.png"
+                    alt=""
+                    width="65"
+                  />
+                  <h4 class="features-title mb-3">Channel Points</h4>
+                  <p class="mb-4">
+                    Morbi dapibus commodo porta. Sed faucibus tristique orci in
+                    tristique. Praesent quam nunc, fermentum eu feugiat sit.
+                  </p>
+                  <a class="fw-bold" href="">Sign up now ></a>
+                </div>
               </div>
-            </div>
-            <div class="col-md-4 d-flex align-items-stretch">
-              <div class="panel features-panel panel-ani">
-                <img
-                  class="features-icon red-glow"
-                  src="assets/voices-icon.png"
-                  alt=""
-                  width="80"
-                />
-                <h4 class="features-title mb-3">Over 1700 voices!</h4>
-                <p class="mb-4">
-                  Morbi dapibus commodo porta. Sed faucibus tristique orci in
-                  tristique. Praesent quam nunc, fermentum eu feugiat sit.
-                </p>
-                <a class="fw-bold" href="">See all the voices on FakeYou ></a>
+              <div class="col-md-4 d-flex align-items-stretch">
+                <div class="panel features-panel panel-ani">
+                  <img
+                    class="features-icon red-glow"
+                    src="assets/voices-icon.png"
+                    alt=""
+                    width="80"
+                  />
+                  <h4 class="features-title mb-3">Over 1700 voices!</h4>
+                  <p class="mb-4">
+                    Morbi dapibus commodo porta. Sed faucibus tristique orci in
+                    tristique. Praesent quam nunc, fermentum eu feugiat sit.
+                  </p>
+                  <a class="fw-bold" href="">See all the voices on FakeYou ></a>
+                </div>
               </div>
-            </div>
-            <div class="col-md-4 d-flex align-items-stretch">
-              <div class="panel features-panel features-panel-sides panel-ani">
-                <img
-                  class="features-icon red-glow"
-                  src="assets/bits-icon.png"
-                  alt=""
-                  width="65"
-                />
-                <h4 class="features-title mb-3">Bits</h4>
-                <p class="mb-4">
-                  Morbi dapibus commodo porta. Sed faucibus tristique orci in
-                  tristique. Praesent quam nunc, fermentum eu feugiat sit.
-                </p>
-                <a class="fw-bold" href="">Sign up now ></a>
+              <div class="col-md-4 d-flex align-items-stretch">
+                <div
+                  class="panel features-panel features-panel-sides panel-ani"
+                >
+                  <img
+                    class="features-icon red-glow"
+                    src="assets/bits-icon.png"
+                    alt=""
+                    width="65"
+                  />
+                  <h4 class="features-title mb-3">Bits</h4>
+                  <p class="mb-4">
+                    Morbi dapibus commodo porta. Sed faucibus tristique orci in
+                    tristique. Praesent quam nunc, fermentum eu feugiat sit.
+                  </p>
+                  <a class="fw-bold" href="">Sign up now ></a>
+                </div>
               </div>
             </div>
           </div>
         </div>
       </div>
 
-      <div class="container section d-flex flex-column align-items-center">
-        <div class="row insights-section align-items-center">
-          <div class="col-md-6 mb-4 mb-md-0 text-center text-md-start">
-            <h1 class="mb-4">
-              <span class="word">Our Insights</span>
-            </h1>
-            <p>
-              Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
-              eiusmod tempor incididunt ut labore et dolore magna aliqua.
-            </p>
-          </div>
-          <div class="col-md-6">
-            <div class="panel insights-panel h-100 panel-ani">
-              <h2 class="fw-bold mb-1">+1700</h2>
-              <p>TTS Voices in the library (and growing)</p>
-              <hr />
-              <h2 class="fw-bold mb-1">+10K</h2>
-              <p>Daily generated TTS or something</p>
-              <hr />
-              <h2 class="fw-bold mb-1">+1.1M</h2>
-              <p>Some kind of statistic here</p>
-              <img
-                class="red-glow insights-circle-1"
-                src="assets/circle-1.png"
-                alt=""
-              />
-              <img
-                class="red-glow insights-circle-2"
-                src="assets/circle-1.png"
-                alt=""
-              />
+      <div class="insights-bg">
+        <div class="container section d-flex flex-column align-items-center">
+          <div class="row insights-section align-items-center">
+            <div class="col-md-6 mb-4 mb-md-0 text-center text-md-start">
+              <div
+                class="d-flex justify-content-center justify-content-md-start align-items-center gap-4"
+              >
+                <img
+                  class="rotateimg180 d-block d-md-none"
+                  src="assets/title-shape.png"
+                  alt=""
+                />
+                <h6 class="pre-heading fw-bold pt-2">Statistics</h6>
+                <img src="assets/title-shape.png" alt="" />
+              </div>
+              <h1 class="display-5 fw-bold mb-4 mt-3">
+                <span class="word">Our Insights</span>
+              </h1>
+              <p>
+                Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
+                eiusmod tempor incididunt ut labore et dolore magna aliqua.
+              </p>
+            </div>
+            <div class="col-md-6">
+              <div class="panel insights-panel h-100 panel-ani">
+                <h2 class="fw-bold mb-1">+1700</h2>
+                <p>TTS Voices in the library (and growing)</p>
+                <hr />
+                <h2 class="fw-bold mb-1">+10K</h2>
+                <p>Daily generated TTS or something</p>
+                <hr />
+                <h2 class="fw-bold mb-1">+1.1M</h2>
+                <p>Some kind of statistic here</p>
+                <img
+                  class="red-glow insights-circle-1"
+                  src="assets/circle-1.png"
+                  alt=""
+                />
+                <img
+                  class="red-glow insights-circle-2"
+                  src="assets/circle-1.png"
+                  alt=""
+                />
+              </div>
             </div>
           </div>
         </div>
       </div>
 
-      <div class="container section d-flex flex-column align-items-center">
-        <h1 class="fw-bold mb-4">
-          <span class="word">Got Any Questions?</span>
-        </h1>
-        <div class="panel p-4 py-5 mt-5 questions-panel mb-5 panel-ani">
-          <div class="text-center">
-            <h2 class="w-100 text-center">
-              <i class="fa-brands fa-discord me-3"></i>Join us in Discord!
-            </h2>
-            <p class="text-center my-4">
-              We'd love to chat with you!
-              <br />
-              Please join us in Discord so that we know what you're thinking.
-            </p>
-            <button class="btn btn-primary">Join Discord</button>
+      <div class="faq-bg">
+        <div class="container section d-flex flex-column align-items-center">
+          <div class="d-flex justify-content-center align-items-center gap-4">
+            <img class="rotateimg180" src="assets/title-shape.png" alt="" />
+            <h6 class="pre-heading text-center fw-bold pt-2">
+              Questions and Answers
+            </h6>
+            <img src="assets/title-shape.png" alt="" />
+          </div>
+          <h1 class="display-5 fw-bold mt-3 text-center d-none d-lg-block">
+            <span class="word">Frequently Asked Questions</span>
+          </h1>
+          <h1 class="display-5 fw-bold mt-3 text-center d-lg-none">
+            <span class="word">FAQ</span>
+          </h1>
+
+          <div class="faq-panel pt-5 w-100">
+            <div
+              class="accordion d-flex flex-column gap-3"
+              id="accordionExample"
+            >
+              <div class="accordion-item">
+                <h2 class="accordion-header" id="headingOne">
+                  <button
+                    class="accordion-button collapsed"
+                    type="button"
+                    data-bs-toggle="collapse"
+                    data-bs-target="#collapseOne"
+                    aria-expanded="false"
+                    aria-controls="collapseOne"
+                  >
+                    What is Storyteller TTS?
+                  </button>
+                </h2>
+                <div
+                  id="collapseOne"
+                  class="accordion-collapse collapse"
+                  aria-labelledby="headingOne"
+                  data-bs-parent="#accordionExample"
+                >
+                  <div class="accordion-body">
+                    Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed
+                    do eiusmod tempor incididunt ut labore et dolore magna
+                    aliqua. Ut enim ad minim veniam, quis nostrud exercitation
+                    ullamco laboris nisi ut aliquip ex ea commodo consequat.
+                    Duis aute irure dolor in reprehenderit in voluptate velit
+                    esse cillum dolore eu fugiat nulla pariatur.
+                  </div>
+                </div>
+              </div>
+              <div class="accordion-item">
+                <h2 class="accordion-header" id="headingTwo">
+                  <button
+                    class="accordion-button collapsed"
+                    type="button"
+                    data-bs-toggle="collapse"
+                    data-bs-target="#collapseTwo"
+                    aria-expanded="false"
+                    aria-controls="collapseTwo"
+                  >
+                    How do I use Storyteller TTS?
+                  </button>
+                </h2>
+                <div
+                  id="collapseTwo"
+                  class="accordion-collapse collapse"
+                  aria-labelledby="headingTwo"
+                  data-bs-parent="#accordionExample"
+                >
+                  <div class="accordion-body">
+                    Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed
+                    do eiusmod tempor incididunt ut labore et dolore magna
+                    aliqua. Ut enim ad minim veniam, quis nostrud exercitation
+                    ullamco laboris nisi ut aliquip ex ea commodo consequat.
+                    Duis aute irure dolor in reprehenderit in voluptate velit
+                    esse cillum dolore eu fugiat nulla pariatur.
+                  </div>
+                </div>
+              </div>
+              <div class="accordion-item">
+                <h2 class="accordion-header" id="headingThree">
+                  <button
+                    class="accordion-button collapsed"
+                    type="button"
+                    data-bs-toggle="collapse"
+                    data-bs-target="#collapseThree"
+                    aria-expanded="false"
+                    aria-controls="collapseThree"
+                  >
+                    What is this question?
+                  </button>
+                </h2>
+                <div
+                  id="collapseThree"
+                  class="accordion-collapse collapse"
+                  aria-labelledby="headingThree"
+                  data-bs-parent="#accordionExample"
+                >
+                  <div class="accordion-body">
+                    Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed
+                    do eiusmod tempor incididunt ut labore et dolore magna
+                    aliqua. Ut enim ad minim veniam, quis nostrud exercitation
+                    ullamco laboris nisi ut aliquip ex ea commodo consequat.
+                    Duis aute irure dolor in reprehenderit in voluptate velit
+                    esse cillum dolore eu fugiat nulla pariatur.
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="community-bg">
+        <div
+          class="container section mb-3 d-flex flex-column align-items-center"
+        >
+          <div class="d-flex justify-content-center align-items-center gap-4">
+            <img class="rotateimg180" src="assets/title-shape.png" alt="" />
+            <h6 class="pre-heading text-center fw-bold pt-2">
+              Still got questions?
+            </h6>
+            <img src="assets/title-shape.png" alt="" />
+          </div>
+          <h1 class="display-5 fw-bold mb-4 mt-3">
+            <span class="word">Join Our Community</span>
+          </h1>
+          <p class="lead text-center mb-5">
+            We'd love to chat with you!
+            <br />
+            Please join us in Discord so that we know what you're thinking.
+          </p>
+          <div class="d-flex flex-column flex-lg-row gap-3 mb-5">
+            <button class="btn btn-secondary">
+              <i class="fa-brands fa-twitter me-2"></i>Follow on Twitter
+            </button>
+            <button class="btn btn-primary">
+              <i class="fa-brands fa-discord me-2"></i>Join our Discord
+            </button>
           </div>
         </div>
       </div>
@@ -267,7 +433,9 @@
               <img class="cta-img w-100" src="assets/cta-img.png" alt="" />
             </div>
             <div class="col-md-6 cta-right text-center text-sm-start px-5">
-              <h1 class="mb-4">Get started with Storyteller Stream!</h1>
+              <h1 class="display-5 fw-bold mb-5">
+                Get started with Storyteller Stream!
+              </h1>
               <button class="btn btn-secondary w-100">Sign Up</button>
             </div>
           </div>
@@ -361,6 +529,13 @@
         distance: "30px",
         duration: 600,
       });
+    </script>
+
+    <script>
+      $(window).scroll(function () {
+        $("nav").toggleClass("scrolled", $(this).scrollTop() > 50);
+      });
+      s;
     </script>
 
     <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>

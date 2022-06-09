@@ -26,6 +26,12 @@
       crossorigin="anonymous"
     ></script>
 
+    <script
+      src="https://code.jquery.com/jquery-3.6.0.min.js"
+      integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4="
+      crossorigin="anonymous"
+    ></script>
+
     <title>FakeYou. Deep Fake Text to Speech.</title>
   </head>
   <body>
@@ -73,7 +79,9 @@
               ></button>
             </div>
             <div class="offcanvas-body">
-              <ul class="navbar-nav justify-content-start flex-grow-1 pe-3">
+              <ul
+                class="navbar-nav justify-content-start align-items-lg-center flex-grow-1 pe-3"
+              >
                 <li class="nav-item">
                   <a class="nav-link" aria-current="page" href="#"
                     >Clone Your Voice!</a
@@ -109,7 +117,6 @@
                     id="offcanvasNavbarLgDropdown"
                     role="button"
                     data-bs-toggle="dropdown"
-                    aria-expanded="false"
                   >
                     Community
                   </a>
@@ -300,7 +307,7 @@
           </div>
           <div class="panel p-3 p-lg-4 load-hidden gap-4 d-flex flex-column">
             <div>
-              <h4><i class="fa-solid fa-microphone me -3"></i>Yami Yugi</h4>
+              <h4><i class="fa-solid fa-microphone me-3"></i>Yami Yugi</h4>
               <p>
                 She didn't understand how changed worked. When she looked at
                 today compared to yesterday, there was nothing that she could
@@ -376,6 +383,21 @@
       integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p"
       crossorigin="anonymous"
     ></script>
+
+    <!-- Hover Nav -->
+    <script>
+      $(document).ready(function () {
+        if ($(window).width() >= 992) {
+          $(".dropdown").hover(function () {
+            var dropdownToggle = $(this).children(".dropdown-toggle");
+            var dropdownMenu = $(this).children(".dropdown-menu");
+            if (dropdownToggle.is(":visible")) {
+              dropdownMenu.toggleClass("show");
+            }
+          });
+        }
+      });
+    </script>
 
     <script>
       ScrollReveal().reveal(".ani1", { delay: 100, distance: "20px" });
