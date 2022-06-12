@@ -77,6 +77,11 @@ CREATE TABLE tts_results (
   is_from_api BOOLEAN NOT NULL DEFAULT FALSE,
   is_for_twitch BOOLEAN NOT NULL DEFAULT FALSE,
 
+  -- ========== INFERENCE METADATA ==========
+
+  is_generated_on_premise BOOLEAN NOT NULL DEFAULT FALSE,
+  generated_by_worker VARCHAR(255) DEFAULT NULL,
+
   -- ========== MODERATION DETAILS ==========
 
   -- The last moderator that made changes.
