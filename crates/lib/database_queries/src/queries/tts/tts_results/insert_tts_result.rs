@@ -21,7 +21,9 @@ pub async fn insert_tts_result<P: AsRef<Path>>(
   bucket_audio_results_path: P,
   bucket_spectrogram_results_path: P,
   file_size_bytes: u64,
-  duration_millis: u64
+  duration_millis: u64,
+  is_on_prem: bool,
+  worker_hostname: &str,
 ) -> AnyhowResult<(u64, String)>
 {
   let inference_result_token = Tokens::new_tts_result()?;
@@ -120,7 +122,10 @@ SET
   public_bucket_spectrogram_path = ?,
 
   file_size_bytes = ?,
-  duration_millis = ?
+  duration_millis = ?,
+
+  is_generated_on_prem = ?,
+  generated_by_worker = ?
         "#,
       inference_result_token,
       job.model_token.clone(),
@@ -139,7 +144,9 @@ SET
       bucket_spectrogram_result_path,
 
       file_size_bytes,
-      duration_millis
+      duration_millis,
+      is_on_prem,
+      worker_hostname,
     )
         .execute(&mut transaction)
         .await;

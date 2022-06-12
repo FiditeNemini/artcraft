@@ -113,6 +113,8 @@ struct Inferencer {
 
   pub newrelic_client: NewRelicClient,
 
+  pub worker_details: InferencerWorkerDetails,
+
   // Keep tabs of which models to hold in the sidecar memory with this virtual LRU cache
   pub virtual_model_lfu: SyncVirtualLfuCache,
   pub cache_miss_strategizers: SyncMultiCacheMissStrategizer,
@@ -152,6 +154,11 @@ struct Inferencer {
   pub maybe_minimum_priority: Option<u8>,
 }
 
+struct InferencerWorkerDetails {
+  pub is_on_prem: bool,
+  pub worker_hostname: String,
+}
+
 #[tokio::main]
 async fn main() -> AnyhowResult<()> {
   easyenv::init_all_with_default_logging(Some(DEFAULT_RUST_LOG));
@@ -167,7 +174,11 @@ async fn main() -> AnyhowResult<()> {
       .and_then(|h| h.into_string().ok())
       .unwrap_or("tts-inference-job".to_string());
 
+  // NB: It'll be worthwhile to see how much compute is happening at our local on-premises cluster
+  let is_on_prem = easyenv::get_env_bool_or_default("IS_ON_PREM", false);
+
   info!("Hostname: {}", &server_hostname);
+  info!("Is on-premises: {}", is_on_prem);
 
   // Bucket stuff (shared)
   let access_key = easyenv::get_env_string_required(ENV_ACCESS_KEY)?;
@@ -316,6 +327,10 @@ async fn main() -> AnyhowResult<()> {
     tts_inference_command,
     tts_inference_sidecar_client,
     newrelic_client,
+    worker_details: InferencerWorkerDetails {
+      is_on_prem,
+      worker_hostname: server_hostname.clone(),
+    },
     virtual_model_lfu: virtual_lfu_cache,
     cache_miss_strategizers,
     bucket_path_unifier: BucketPathUnifier::default_paths(),
@@ -939,8 +954,10 @@ async fn process_job(
     &audio_result_object_path,
     &spectrogram_result_object_path,
     file_metadata.file_size_bytes,
-    file_metadata.duration_millis.unwrap_or(0))
-      .await?;
+    file_metadata.duration_millis.unwrap_or(0),
+    inferencer.worker_details.is_on_prem,
+    &inferencer.worker_details.worker_hostname,
+  ).await?;
 
   info!("Marking job complete...");
   mark_tts_inference_job_done(

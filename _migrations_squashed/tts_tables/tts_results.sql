@@ -79,7 +79,7 @@ CREATE TABLE tts_results (
 
   -- ========== INFERENCE METADATA ==========
 
-  is_generated_on_premise BOOLEAN NOT NULL DEFAULT FALSE,
+  is_generated_on_prem BOOLEAN NOT NULL DEFAULT FALSE,
   generated_by_worker VARCHAR(255) DEFAULT NULL,
 
   -- ========== MODERATION DETAILS ==========
