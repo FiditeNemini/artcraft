@@ -981,8 +981,8 @@ async fn process_job(
 
   redis_logger.log_status("done")?;
 
-  info!("Job {:?} complete success! Downloaded, ran inference, and uploaded. Saved model record: {}",
-        job.id, id);
+  info!("Job {:?} complete success! Downloaded, ran inference, and uploaded. Saved model record: {}, Result Token: {}",
+        job.id, id, &inference_result_token);
 
   let duration = start.elapsed();
 
