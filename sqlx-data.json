@@ -1283,7 +1283,7 @@
               "bits": 129
             },
             "char_set": 63,
-            "max_size": 2
+            "max_size": 1
           }
         }
       ],
@@ -5370,6 +5370,16 @@
       "nullable": []
     }
   },
+  "97fabf6b2efc18910e7dff6356e749a777bc7e8d70513904921ba089045506d5": {
+    "query": "\nINSERT INTO tts_results\nSET\n  token = ?,\n\n  model_token = ?,\n  maybe_pretrained_vocoder_used = ?,\n  raw_inference_text = ?,\n  raw_inference_text_hash_sha2 = ?,\n  normalized_inference_text = ?,\n\n  maybe_creator_user_token = ?,\n  maybe_creator_synthetic_id = ?,\n\n  creator_ip_address = ?,\n  creator_set_visibility = ?,\n\n  public_bucket_wav_audio_path = ?,\n  public_bucket_spectrogram_path = ?,\n\n  file_size_bytes = ?,\n  duration_millis = ?,\n\n  is_generated_on_prem = ?,\n  generated_by_worker = ?\n        ",
+    "describe": {
+      "columns": [],
+      "parameters": {
+        "Right": 16
+      },
+      "nullable": []
+    }
+  },
   "9b63758edee6341cb417073775eea2782137c680c1827189d6f7a93c40d70e44": {
     "query": "\nSELECT\n    tts.token as model_token,\n    tts.tts_model_type,\n    tts.creator_user_token,\n    users.username as creator_username,\n    users.display_name as creator_display_name,\n    users.email_gravatar_hash as creator_gravatar_hash,\n    tts.title,\n    tts.ietf_language_tag,\n    tts.ietf_primary_language_subtag,\n    tts.is_locked_from_use,\n    tts.is_front_page_featured,\n    tts.is_twitch_featured,\n    tts.maybe_suggested_unique_bot_command,\n    tts.created_at,\n    tts.updated_at\nFROM tts_models as tts\nJOIN users\n    ON users.token = tts.creator_user_token\nWHERE\n    tts.is_locked_from_use IS FALSE\n    AND tts.user_deleted_at IS NULL\n    AND tts.mod_deleted_at IS NULL\n        ",
     "describe": {
@@ -6039,16 +6049,6 @@
         true,
         true
       ]
-    }
-  },
-  "b8746ae4ff2d4dcd54563eff64877f924bb119681ad78f1300146e00b762ca4f": {
-    "query": "\nINSERT INTO tts_results\nSET\n  token = ?,\n\n  model_token = ?,\n  maybe_pretrained_vocoder_used = ?,\n  raw_inference_text = ?,\n  raw_inference_text_hash_sha2 = ?,\n  normalized_inference_text = ?,\n\n  maybe_creator_user_token = ?,\n  maybe_creator_synthetic_id = ?,\n\n  creator_ip_address = ?,\n  creator_set_visibility = ?,\n\n  public_bucket_wav_audio_path = ?,\n  public_bucket_spectrogram_path = ?,\n\n  file_size_bytes = ?,\n  duration_millis = ?\n        ",
-    "describe": {
-      "columns": [],
-      "parameters": {
-        "Right": 14
-      },
-      "nullable": []
     }
   },
   "ba31fefd3e96fd238fc2bcdfab64f390a17293f2c0996ae891ed8821e57512cd": {
