@@ -88,6 +88,11 @@ code {
   background-color: rgba(255, 255, 255, 0.06);
 }
 
+img {
+  z-index: 1;
+  image-rendering: smooth;
+}
+
 #particles-js {
   position: absolute;
   width: 100%;
@@ -494,6 +499,10 @@ h2.panel-title {
   border-color: #fff;
   height: 20px;
   width: 20px;
+}
+
+.patron-img {
+  width: 400px;
 }
 
 @media (min-width: 992px) {
