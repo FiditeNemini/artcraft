@@ -146,6 +146,7 @@ img {
 .dropdown-item {
   font-size: 15px;
   font-weight: 600;
+  padding: 0.5rem 1rem;
 }
 
 .dropdown-item:active {
@@ -219,7 +220,7 @@ img {
 .btn-secondary:focus,
 .btn-secondary:active {
   background-color: #fff;
-  color: #443a40;
+  color: #212529;
   border: 2.5px solid;
   border-color: #fff;
   transition: 0.2s;
@@ -227,7 +228,7 @@ img {
 
 .btn-secondary:hover {
   background-color: #ccc;
-  color: #443a40;
+  color: #212529;
   border: 2.5px solid;
   border-color: #ccc;
 }
@@ -247,6 +248,11 @@ img {
   color: #fc6b68;
   border: 2.5px solid;
   border-color: #fdcfce;
+}
+
+.btn-inform {
+  padding: 0 0.7rem;
+  font-size: 22px;
 }
 
 .nav-login {
@@ -342,12 +348,15 @@ h2.panel-title {
   line-height: 2.375rem;
   text-align: center;
   pointer-events: none;
-  color: #443a40;
+  color: #212529;
+  opacity: 0.9;
 }
 
-.form-control {
+.form-control,
+.form-select {
   border-width: 1px;
   border-color: #fff;
+  border-radius: 5px;
 }
 
 .form-control:focus,
