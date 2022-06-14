@@ -36,6 +36,9 @@ pub struct TtsResultRecordForResponse {
 
   pub creator_set_visibility: RecordVisibility,
 
+  // Worker hostname that generated the audio. Has the value "unknown" if null.
+  pub generated_by_worker: String,
+
   pub file_size_bytes: u32,
   pub duration_millis: u32,
 
@@ -85,6 +88,8 @@ pub struct TtsResultRecordRaw {
   pub public_bucket_spectrogram_path: String,
 
   pub creator_set_visibility: String,
+
+  pub generated_by_worker: Option<String>,
 
   pub file_size_bytes: i32,
   pub duration_millis: i32,
@@ -163,6 +168,8 @@ pub async fn select_tts_result_by_token(
     creator_set_visibility: RecordVisibility::from_str(&ir.creator_set_visibility)
         .unwrap_or(RecordVisibility::Public),
 
+    generated_by_worker: ir.generated_by_worker.unwrap_or("unknown".to_string()),
+
     file_size_bytes: if ir.file_size_bytes > 0 { ir.file_size_bytes as u32 } else { 0 },
     duration_millis: if ir.duration_millis > 0 { ir.duration_millis as u32 } else { 0 },
 
@@ -216,6 +223,8 @@ SELECT
     tts_results.public_bucket_spectrogram_path,
 
     tts_results.creator_set_visibility,
+
+    tts_results.generated_by_worker,
 
     tts_results.file_size_bytes,
     tts_results.duration_millis,
@@ -275,6 +284,8 @@ SELECT
     tts_results.public_bucket_spectrogram_path,
 
     tts_results.creator_set_visibility,
+
+    tts_results.generated_by_worker,
 
     tts_results.file_size_bytes,
     tts_results.duration_millis,
