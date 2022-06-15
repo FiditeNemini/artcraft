@@ -251,7 +251,8 @@ img {
 }
 
 .btn-inform {
-  padding: 0 0.7rem;
+  height: 100%;
+  padding: 0 0.75rem;
   font-size: 22px;
 }
 
@@ -357,6 +358,7 @@ h2.panel-title {
   border-width: 1px;
   border-color: #fff;
   border-radius: 5px;
+  padding: 0.5rem 0.75rem;
 }
 
 .form-control:focus,
