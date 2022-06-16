@@ -88,6 +88,11 @@ code {
   background-color: rgba(255, 255, 255, 0.06);
 }
 
+img {
+  z-index: 1;
+  image-rendering: smooth;
+}
+
 #particles-js {
   position: absolute;
   width: 100%;
@@ -141,6 +146,7 @@ code {
 .dropdown-item {
   font-size: 15px;
   font-weight: 600;
+  padding: 0.5rem 1rem;
 }
 
 .dropdown-item:active {
@@ -214,7 +220,7 @@ code {
 .btn-secondary:focus,
 .btn-secondary:active {
   background-color: #fff;
-  color: #443a40;
+  color: #212529;
   border: 2.5px solid;
   border-color: #fff;
   transition: 0.2s;
@@ -222,7 +228,7 @@ code {
 
 .btn-secondary:hover {
   background-color: #ccc;
-  color: #443a40;
+  color: #212529;
   border: 2.5px solid;
   border-color: #ccc;
 }
@@ -242,6 +248,12 @@ code {
   color: #fc6b68;
   border: 2.5px solid;
   border-color: #fdcfce;
+}
+
+.btn-inform {
+  height: 100%;
+  padding: 0 0.75rem;
+  font-size: 22px;
 }
 
 .nav-login {
@@ -323,9 +335,13 @@ h2.panel-title {
   padding-bottom: 10px;
 }
 
-.input-icon .form-control,
+.input-icon .form-control {
+  padding-left: 2.375rem;
+}
+
 .input-icon .form-select {
   padding-left: 2.375rem;
+  padding-right: 2.375rem;
 }
 
 .input-icon .form-control-feedback {
@@ -337,12 +353,16 @@ h2.panel-title {
   line-height: 2.375rem;
   text-align: center;
   pointer-events: none;
-  color: #443a40;
+  color: #212529;
+  opacity: 0.9;
 }
 
-.form-control {
+.form-control,
+.form-select {
   border-width: 1px;
   border-color: #fff;
+  border-radius: 5px;
+  padding: 0.5rem 0.75rem;
 }
 
 .form-control:focus,
@@ -426,7 +446,7 @@ h2.panel-title {
 
 .video-card-body {
   position: absolute;
-  z-index: 1;
+  z-index: 2;
   left: 0;
   bottom: 0;
   padding: 0.75rem;
@@ -494,6 +514,10 @@ h2.panel-title {
   border-color: #fff;
   height: 20px;
   width: 20px;
+}
+
+.patron-img {
+  width: 400px;
 }
 
 @media (min-width: 992px) {

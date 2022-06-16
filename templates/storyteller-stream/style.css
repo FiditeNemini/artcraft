@@ -198,6 +198,10 @@ img {
   border-radius: 8px;
 }
 
+.lead {
+  font-size: 18px;
+}
+
 .parent {
   position: relative;
 }
