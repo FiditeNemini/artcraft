@@ -335,9 +335,13 @@ h2.panel-title {
   padding-bottom: 10px;
 }
 
-.input-icon .form-control,
+.input-icon .form-control {
+  padding-left: 2.375rem;
+}
+
 .input-icon .form-select {
   padding-left: 2.375rem;
+  padding-right: 2.375rem;
 }
 
 .input-icon .form-control-feedback {
