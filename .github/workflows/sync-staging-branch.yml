@@ -18,7 +18,7 @@ jobs:
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
           #git fetch master staging:staging
-          git branch -D staging
+          #git branch -D staging
           git checkout -b staging
           git commit -m "Syncing staging with master"
       - name: Push changes #push files into master branch
