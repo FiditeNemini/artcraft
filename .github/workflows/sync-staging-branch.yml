@@ -1,0 +1,26 @@
+# Adapted from: 
+# https://github.community/t/user-github-pages-site-auto-deploy-from-another-branch-on-push/17912/2
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  job1:
+    runs-on: [ubuntu-latest]
+    steps:
+      - name: checkout master branch # checkout master branch
+        uses: actions/checkout@v2
+        with:
+          persist-credentials: false
+      - name: Sync master to staging
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git fetch master staging:staging
+          git commit -m "Syncing staging with master"
+      - name: Push changes #push files into master branch
+        uses: ad-m/github-push-action@master
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          force: true
