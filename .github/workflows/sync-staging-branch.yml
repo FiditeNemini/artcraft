@@ -20,9 +20,10 @@ jobs:
           #git fetch master staging:staging
           #git branch -D staging
           git checkout -b staging
-          git commit -m "Syncing staging with master"
+          #git commit -m "Syncing staging with master"
       - name: Push changes #push files into master branch
         uses: ad-m/github-push-action@master
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
+          branch: staging
           force: true
