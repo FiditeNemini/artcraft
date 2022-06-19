@@ -3,6 +3,7 @@ import './App.scss';
 
 import React from 'react';
 import { BrowserRouter, Route, Switch } from "react-router-dom";
+import { GitSha } from '@storyteller/components/src/elements/GitSha';
 import { ListTtsModels, TtsModelListItem } from '@storyteller/components/src/api/tts/ListTtsModels';
 import StreamPage from './pages/stream/StreamPage';
 import i18n from 'i18next';
@@ -184,6 +185,17 @@ class App extends React.Component<Props, State> {
                   />
               </Route>
             </Switch>
+
+            <footer className="footer">
+              <div className="content has-text-centered">
+                <p>
+                  Copyright &copy; 2022 Storyteller
+                </p>
+                <p>
+                  <GitSha />
+                </p>
+              </div>
+            </footer>
 
           </div>
         </div>
