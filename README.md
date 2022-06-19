@@ -22,7 +22,6 @@ Here are some static websites contained:
 Development
 -----------
 
-
 ### Development environment setup
 
 ```
@@ -91,7 +90,6 @@ Our websites are deployed on Netlify.
 ### Netlify notes
 
 The `.node-version` file controls which version of node Netlify uses to build!
-
 
 Design and brand notes
 ----------------------
