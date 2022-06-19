@@ -13,7 +13,8 @@ mv packages/fakeyou/build/ fakeyou/build/
 # COMMIT_REF is defined by Netlify to be the commit SHA
 # We want a short 8 character reference.
 SHORT_SHA=$(echo "${COMMIT_REF}" | cut -c1-8)
-find . -type f -exec sed -i '' -e "s/CURRENT_STORYTELLER_VERSION/${SHORT_SHA}/g" {} +
+# find . -type f -exec sed -i '' -e "s/CURRENT_STORYTELLER_VERSION/${SHORT_SHA}/g" {} + # Mac-friendly version
+find . -type f -exec sed -i "s/CURRENT_STORYTELLER_VERSION/${SHORT_SHA}/g" {} +
 
 echo "Copying redirects configuration to Netlify build dir..."
 cp _redirects fakeyou/build/
