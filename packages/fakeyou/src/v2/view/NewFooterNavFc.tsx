@@ -1,4 +1,5 @@
 import React from 'react';
+import { GitSha } from '@storyteller/components/src/elements/GitSha';
 import { SessionWrapper } from '@storyteller/components/src/session/SessionWrapper';
 import { Link } from 'react-router-dom';
 
@@ -62,6 +63,10 @@ function NewFooterNavFc(props: Props) {
           <Trans i18nKey="coreUi.footerNav.builtBy">
             Built by <Link to="/profile/echelon">@echelon</Link> in Atlanta.
           </Trans>
+        </p>
+
+        <p>
+          <GitSha />
         </p>
 
         {/*<p>
