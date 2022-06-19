@@ -12,6 +12,8 @@ export const SUPPORTED_MODEL_LANGUAGE_TAG_TO_FULL : Map<string, string> = new Ma
   ["es-419", "Spanish (Español Latinoamerica)"],
   ["es-ES", "Spanish (Español España)"],
   ["es-MX", "Spanish (Español México)"],
+  ["fr", "French (Français)"],
+  ["fr-CA", "French (Français Canadien)"],
   ["pt", "Portuguese (Portugués)"],
   ["pt-BR", "Portuguese (Português Brasileiro)"],
 ]);
