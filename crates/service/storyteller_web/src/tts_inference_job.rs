@@ -175,6 +175,7 @@ async fn main() -> AnyhowResult<()> {
       .unwrap_or("tts-inference-job".to_string());
 
   // NB: It'll be worthwhile to see how much compute is happening at our local on-premises cluster
+  // Only our local workers will set this to true.
   let is_on_prem = easyenv::get_env_bool_or_default("IS_ON_PREM", false);
 
   info!("Hostname: {}", &server_hostname);
@@ -412,6 +413,8 @@ async fn main_loop(inferencer: Inferencer) {
       continue;
     }
 
+    info!("Queried {} jobs from database", jobs.len());
+
     let batch_result = process_jobs(
       &inferencer,
       jobs,
@@ -467,7 +470,6 @@ async fn process_jobs(
           ModelStateError::CacheError { .. } => ("internal cache error", false),
           ModelStateError::DatabaseError { .. } => ("unknown database error", false),
         };
-
 
         let mut redis = inferencer.redis_pool.get()?;
         let mut redis_logger = RedisJobStatusLogger::new_tts_inference(
@@ -691,6 +693,8 @@ async fn process_job(
 
   // ==================== ATTEMPT TO GRAB JOB LOCK ==================== //
 
+  info!("Attempting to grab lock for job: {}", job.inference_job_token);
+
   let lock_acquired =
       mark_tts_inference_job_pending_and_grab_lock(&inferencer.mysql_pool, job.id).await?;
 
@@ -706,6 +710,8 @@ async fn process_job(
 
     return Ok((since_creation_span, job_iteration_span));
   }
+
+  info!("Lock acquired for job: {}", job.inference_job_token);
 
   // ==================== CONFIRM OR DOWNLOAD WAVEGLOW VOCODER MODEL ==================== //
 
