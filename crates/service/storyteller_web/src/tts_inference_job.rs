@@ -512,7 +512,7 @@ async fn process_jobs(
 
       match maybe_strategy {
         Err(err) => {
-          warn!("Failure to process job: {:?}", err);
+          warn!("Unable to process job: {:?}", err);
           let failure_reason = "";
           let _r = mark_tts_inference_job_failure(
             &inferencer.mysql_pool,
