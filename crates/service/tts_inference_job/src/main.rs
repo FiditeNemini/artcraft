@@ -10,10 +10,10 @@
 
 #[macro_use] extern crate serde_derive;
 
+pub mod caching;
 pub mod http_clients;
 pub mod job_queries;
 pub mod script_execution;
-pub mod util;
 
 use anyhow::{anyhow, Error};
 use chrono::{Utc, DateTime, TimeZone};
@@ -28,16 +28,12 @@ use container_common::filesystem::safe_delete_temp_directory::safe_delete_temp_d
 use container_common::filesystem::safe_delete_temp_file::safe_delete_temp_file;
 use container_common::hashing::hash_string_sha2::hash_string_sha2;
 use container_common::token::random_uuid::generate_random_uuid;
-
-// tts job
+use crate::caching::cache_miss_strategizer::CacheMissStrategizer;
+use crate::caching::cache_miss_strategizer::CacheMissStrategy;
+use crate::caching::cache_miss_strategizer_multi::SyncMultiCacheMissStrategizer;
+use crate::caching::virtual_lfu_cache::SyncVirtualLfuCache;
 use crate::http_clients::tts_inference_sidecar_client::TtsInferenceSidecarClient;
 use crate::script_execution::tacotron_inference_command::TacotronInferenceCommand;
-use crate::util::jobs::cache_miss_strategizer::CacheMissStrategizer;
-use crate::util::jobs::cache_miss_strategizer::CacheMissStrategy;
-use crate::util::jobs::cache_miss_strategizer_multi::SyncMultiCacheMissStrategizer;
-use crate::util::jobs::virtual_lfu_cache::SyncVirtualLfuCache;
-
-use data_encoding::{HEXUPPER, HEXLOWER, HEXLOWER_PERMISSIVE};
 use database_queries::column_types::vocoder_type::VocoderType;
 use database_queries::mediators::firehose_publisher::FirehosePublisher;
 use database_queries::queries::tts::tts_inference_jobs::list_available_tts_inference_jobs::{AvailableTtsInferenceJob, list_available_tts_inference_jobs, list_available_tts_inference_jobs_with_minimum_priority};
@@ -58,7 +54,6 @@ use r2d2_redis::RedisConnectionManager;
 use r2d2_redis::r2d2::PooledConnection;
 use r2d2_redis::r2d2;
 use r2d2_redis::redis::Commands;
-use ring::digest::{Context, Digest, SHA256};
 use sqlx::MySqlPool;
 use sqlx::mysql::MySqlPoolOptions;
 use std::collections::HashMap;

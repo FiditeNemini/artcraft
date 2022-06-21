@@ -1,4 +1,3 @@
-use actix_web::http::header;
 use anyhow::anyhow;
 use container_common::anyhow_result::AnyhowResult;
 use database_queries::column_types::vocoder_type::VocoderType;

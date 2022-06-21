@@ -24,10 +24,6 @@ name = "tts-download-job"
 path = "src/tts_download_job.rs"
 
 [[bin]]
-name = "tts-inference-job"
-path = "src/tts_inference_job.rs"
-
-[[bin]]
 name = "w2l-download-job"
 path = "src/w2l_download_job.rs"
 

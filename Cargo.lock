@@ -4343,6 +4343,35 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "59547bce71d9c38b83d9c0e92b6066c4253371f15005def0c30d9657f50c7642"
 
 [[package]]
+name = "tts-inference-job"
+version = "0.0.1"
+dependencies = [
+ "anyhow",
+ "chrono",
+ "config",
+ "container_common",
+ "database_queries",
+ "dotenv",
+ "easyenv",
+ "hostname",
+ "hyper 0.14.14",
+ "jobs_common",
+ "lfu",
+ "log",
+ "newrelic-telemetry",
+ "r2d2_redis",
+ "serde",
+ "serde_derive",
+ "serde_json",
+ "sqlx",
+ "storage_buckets_common",
+ "subprocess",
+ "tempdir",
+ "tokio 1.13.0",
+ "tts_common",
+]
+
+[[package]]
 name = "tts_common"
 version = "0.0.1"
 dependencies = [

@@ -1,7 +1,7 @@
 use anyhow::anyhow;
 use chrono::{DateTime, Utc, Duration};
 use container_common::anyhow_result::AnyhowResult;
-use crate::util::jobs::cache_miss_strategizer::{CacheMissStrategizer, CacheMissStrategy};
+use crate::caching::cache_miss_strategizer::{CacheMissStrategizer, CacheMissStrategy};
 use std::sync::{RwLock, Arc};
 
 /// Keep track of multiple caches, each with different time penalties.
