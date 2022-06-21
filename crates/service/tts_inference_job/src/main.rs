@@ -67,6 +67,7 @@ use storage_buckets_common::bucket_client::BucketClient;
 use storage_buckets_common::bucket_path_unifier::BucketPathUnifier;
 use tempdir::TempDir;
 use tts_common::clean_symbols::clean_symbols;
+use clap::{App, Arg};
 
 // Buckets (shared config)
 const ENV_ACCESS_KEY : &'static str = "ACCESS_KEY";
@@ -164,7 +165,16 @@ async fn main() -> AnyhowResult<()> {
   // This file should only contain *development* secrets, never production.
   let _ = dotenv::from_filename(".env-secrets").ok();
 
-  info!("Obtaining hostname...");
+  let matches = App::new("tts-inference-job")
+      .arg(Arg::with_name("config")
+          .long("sidecar_hostname")
+          .value_name("HOSTNAME")
+          .help("Hostname for the TTS inference sidecar")
+          .takes_value(true)
+          .required(false))
+      .get_matches();
+
+  info!("Obtaining worker hostname...");
 
   let server_hostname = hostname::get()
       .ok()
@@ -211,8 +221,14 @@ async fn main() -> AnyhowResult<()> {
     &py_script_name,
   );
 
-  let sidecar_hostname =
+  let mut sidecar_hostname =
       easyenv::get_env_string_required(ENV_TTS_INFERENCE_SIDECAR_HOSTNAME)?;
+
+  if let Some(hostname) = matches.value_of("sidecar_hostname") {
+    sidecar_hostname = hostname.to_string();
+  }
+
+  info!("Sidecar hostname: {:?}", sidecar_hostname);
 
   let tts_inference_sidecar_client =
       TtsInferenceSidecarClient::new(&sidecar_hostname);
