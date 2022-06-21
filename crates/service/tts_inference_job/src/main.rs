@@ -166,7 +166,7 @@ async fn main() -> AnyhowResult<()> {
   let _ = dotenv::from_filename(".env-secrets").ok();
 
   let matches = App::new("tts-inference-job")
-      .arg(Arg::with_name("config")
+      .arg(Arg::with_name("sidecar_hostname")
           .long("sidecar_hostname")
           .value_name("HOSTNAME")
           .help("Hostname for the TTS inference sidecar")
