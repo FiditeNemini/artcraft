@@ -12,7 +12,6 @@
 
 pub mod caching;
 pub mod http_clients;
-pub mod job_queries;
 pub mod script_execution;
 
 use anyhow::{anyhow, Error};
