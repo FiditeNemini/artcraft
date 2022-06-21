@@ -27,6 +27,9 @@ export interface TtsResult {
 
   file_size_bytes: number,
   duration_millis: number,
+
+  generated_by_worker: string,
+
   created_at: string,
   updated_at: string,
 

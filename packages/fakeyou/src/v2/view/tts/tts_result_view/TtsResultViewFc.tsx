@@ -272,6 +272,18 @@ function TtsResultViewFc(props: Props) {
             <th>Vocoder used</th>
             <td>{vocoderUsed}</td>
           </tr>
+          <tr>
+            <td colSpan={2}>
+              <br />
+              <h4 className="subtitle is-4">Worker Details</h4>
+            </td>
+          </tr>
+          <tr>
+            <th>Worker</th>
+            <td>
+              {ttsInferenceResult.generated_by_worker}
+            </td>
+          </tr>
       
           {moderatorRows}
 
