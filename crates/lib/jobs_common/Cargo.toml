@@ -1,0 +1,29 @@
+# This crate is simply meant to collect common shared legacy "jobs" components
+# It's an artifact of refactoring and maybe should mostly disappear.
+
+[package]
+name = "jobs_common"
+edition = "2018"
+version = "0.0.1"
+authors = [
+    "Brandon Thomas <bt@brand.io>",
+    "Brandon Thomas <echelon@gmail.com>",
+]
+publish = false
+
+[lib]
+name = "jobs_common"
+path = "src/lib.rs"
+
+[dependencies]
+
+# Internal
+container_common = { path = "../container_common" }
+redis_common = { path = "../redis_common" }
+
+# External
+anyhow = "1.0.40"
+chrono = { version = "0.4.19", features = ["serde"] }
+log = "0.4.14"
+r2d2_redis = "0.14.0"
+tempdir = "0.3.7"

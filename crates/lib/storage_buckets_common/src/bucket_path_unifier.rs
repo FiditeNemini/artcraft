@@ -1,5 +1,5 @@
 use container_common::anyhow_result::AnyhowResult;
-use crate::util::buckets::bucket_paths::hash_to_bucket_path;
+use crate::bucket_paths::hash_to_bucket_path;
 use std::path::PathBuf;
 
 /// This is designed to make it centrally configurable where

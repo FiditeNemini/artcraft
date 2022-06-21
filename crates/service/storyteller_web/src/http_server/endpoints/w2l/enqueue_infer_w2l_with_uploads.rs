@@ -16,8 +16,6 @@ use crate::http_server::web_utils::read_multipart_field_bytes::read_multipart_fi
 use crate::http_server::web_utils::read_multipart_field_bytes::read_multipart_field_bytes;
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 use crate::server_state::ServerState;
-use crate::util::buckets::bucket_client::BucketClient;
-use crate::util::buckets::bucket_paths::hash_to_bucket_path;
 use database_queries::column_types::record_visibility::RecordVisibility;
 use database_queries::tokens::Tokens;
 use futures::{StreamExt, TryStreamExt};
@@ -29,6 +27,7 @@ use sqlx::error::Error::Database;
 use std::fmt;
 use std::io::Write;
 use std::sync::Arc;
+use storage_buckets_common::bucket_paths::hash_to_bucket_path;
 
 const BUCKET_AUDIO_FILE_NAME : &'static str = "input_audio_file";
 const BUCKET_IMAGE_FILE_NAME: &'static str = "input_image_file";

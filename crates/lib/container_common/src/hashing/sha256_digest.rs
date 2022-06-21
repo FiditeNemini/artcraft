@@ -1,4 +1,4 @@
-use container_common::anyhow_result::AnyhowResult;
+use crate::anyhow_result::AnyhowResult;
 use data_encoding::HEXLOWER_PERMISSIVE;
 use ring::digest::{Context, Digest, SHA256};
 use std::fs::File;

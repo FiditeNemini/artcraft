@@ -36,15 +36,11 @@ use crate::script_execution::ffmpeg_generate_preview_video_command::FfmpegGenera
 use crate::script_execution::google_drive_download_command::GoogleDriveDownloadCommand;
 use crate::script_execution::imagemagick_generate_preview_image_command::ImagemagickGeneratePreviewImageCommand;
 use crate::script_execution::wav2lip_inference_command::Wav2LipInferenceCommand;
-use crate::util::buckets::bucket_client::BucketClient;
-use crate::util::buckets::bucket_path_unifier::BucketPathUnifier;
-use crate::util::buckets::bucket_paths::hash_to_bucket_path;
-use crate::util::hashing::hash_file_sha2::hash_file_sha2;
-use crate::util::noop_logger::NoOpLogger;
-use crate::util::redis::redis_job_status_logger::RedisJobStatusLogger;
-use crate::util::semi_persistent_cache_dir::SemiPersistentCacheDir;
 use data_encoding::{HEXUPPER, HEXLOWER, HEXLOWER_PERMISSIVE};
 use database_queries::mediators::firehose_publisher::FirehosePublisher;
+use jobs_common::noop_logger::NoOpLogger;
+use jobs_common::redis_job_status_logger::RedisJobStatusLogger;
+use jobs_common::semi_persistent_cache_dir::SemiPersistentCacheDir;
 use log::{warn, info};
 use r2d2_redis::RedisConnectionManager;
 use r2d2_redis::r2d2::PooledConnection;
@@ -60,6 +56,8 @@ use std::path::{PathBuf, Path};
 use std::process::Command;
 use std::thread;
 use std::time::Duration;
+use storage_buckets_common::bucket_client::BucketClient;
+use storage_buckets_common::bucket_path_unifier::BucketPathUnifier;
 use tempdir::TempDir;
 
 // Buckets (shared config)

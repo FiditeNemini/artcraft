@@ -26,14 +26,8 @@ use container_common::filesystem::check_directory_exists::check_directory_exists
 use container_common::filesystem::check_file_exists::check_file_exists;
 use container_common::filesystem::safe_delete_temp_directory::safe_delete_temp_directory;
 use container_common::filesystem::safe_delete_temp_file::safe_delete_temp_file;
+use container_common::hashing::hash_string_sha2::hash_string_sha2;
 use container_common::token::random_uuid::generate_random_uuid;
-
-// buckets_common
-use crate::util::buckets::bucket_client::BucketClient;
-use crate::util::buckets::bucket_path_unifier::BucketPathUnifier;
-use crate::util::buckets::bucket_paths::hash_to_bucket_path;
-use crate::util::hashing::hash_file_sha2::hash_file_sha2;
-use crate::util::hashing::hash_string_sha2::hash_string_sha2;
 
 // tts job
 use crate::http_clients::tts_inference_sidecar_client::TtsInferenceSidecarClient;
@@ -42,11 +36,6 @@ use crate::util::jobs::cache_miss_strategizer::CacheMissStrategizer;
 use crate::util::jobs::cache_miss_strategizer::CacheMissStrategy;
 use crate::util::jobs::cache_miss_strategizer_multi::SyncMultiCacheMissStrategizer;
 use crate::util::jobs::virtual_lfu_cache::SyncVirtualLfuCache;
-
-// jobs_common
-use crate::util::noop_logger::NoOpLogger;
-use crate::util::redis::redis_job_status_logger::RedisJobStatusLogger;
-use crate::util::semi_persistent_cache_dir::SemiPersistentCacheDir;
 
 use data_encoding::{HEXUPPER, HEXLOWER, HEXLOWER_PERMISSIVE};
 use database_queries::column_types::vocoder_type::VocoderType;
@@ -58,6 +47,9 @@ use database_queries::queries::tts::tts_inference_jobs::mark_tts_inference_job_p
 use database_queries::queries::tts::tts_inference_jobs::mark_tts_inference_job_permanently_dead::mark_tts_inference_job_permanently_dead;
 use database_queries::queries::tts::tts_models::get_tts_model_for_inference::{get_tts_model_for_inference, TtsModelForInferenceError, TtsModelForInferenceRecord};
 use database_queries::queries::tts::tts_results::insert_tts_result::insert_tts_result;
+use jobs_common::noop_logger::NoOpLogger;
+use jobs_common::redis_job_status_logger::RedisJobStatusLogger;
+use jobs_common::semi_persistent_cache_dir::SemiPersistentCacheDir;
 use log::{warn, info, error};
 use newrelic_telemetry::Client as NewRelicClient;
 use newrelic_telemetry::ClientBuilder;
@@ -77,6 +69,8 @@ use std::path::{PathBuf, Path};
 use std::process::Command;
 use std::thread;
 use std::time::{Duration, SystemTime, UNIX_EPOCH, Instant};
+use storage_buckets_common::bucket_client::BucketClient;
+use storage_buckets_common::bucket_path_unifier::BucketPathUnifier;
 use tempdir::TempDir;
 use tts_common::clean_symbols::clean_symbols;
 

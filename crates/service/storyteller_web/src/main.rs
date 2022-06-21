@@ -112,7 +112,6 @@ use crate::threads::db_health_checker_thread::db_health_check_status::HealthChec
 use crate::threads::db_health_checker_thread::db_health_checker_thread::db_health_checker_thread;
 use crate::threads::ip_banlist_set::IpBanlistSet;
 use crate::threads::poll_ip_banlist_thread::poll_ip_bans;
-use crate::util::buckets::bucket_client::BucketClient;
 use crate::util::caching::single_item_ttl_cache::SingleItemTtlCache;
 use crate::util::encrypted_sort_id::SortKeyCrypto;
 use database_queries::mediators::badge_granter::BadgeGranter;
@@ -128,6 +127,7 @@ use sqlx::MySqlPool;
 use sqlx::mysql::MySqlPoolOptions;
 use std::sync::Arc;
 use std::time::Duration;
+use storage_buckets_common::bucket_client::BucketClient;
 use tokio::runtime::Runtime;
 use twitch_common::twitch_secrets::TwitchSecrets;
 

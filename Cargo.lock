@@ -1050,9 +1050,11 @@ name = "container_common"
 version = "0.0.1"
 dependencies = [
  "anyhow",
+ "data-encoding",
  "log",
  "once_cell",
  "rand 0.8.4",
+ "ring 0.17.0-alpha.10",
  "serde",
  "serde_json",
  "tempfile",
@@ -2053,6 +2055,19 @@ name = "itoa"
 version = "0.4.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "dd25036021b0de88a0aff6b850051563c6516d0bf53f8638938edbb9de732736"
+
+[[package]]
+name = "jobs_common"
+version = "0.0.1"
+dependencies = [
+ "anyhow",
+ "chrono",
+ "container_common",
+ "log",
+ "r2d2_redis",
+ "redis_common",
+ "tempdir",
+]
 
 [[package]]
 name = "jobserver"
@@ -3727,6 +3742,17 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "213701ba3370744dcd1a12960caa4843b3d68b4d1c0a5d575e0d65b2ee9d16c0"
 
 [[package]]
+name = "storage_buckets_common"
+version = "0.0.1"
+dependencies = [
+ "anyhow",
+ "container_common",
+ "log",
+ "rust-s3",
+ "tokio 1.13.0",
+]
+
+[[package]]
 name = "storyteller-web"
 version = "0.0.1"
 dependencies = [
@@ -3761,6 +3787,7 @@ dependencies = [
  "http_server_common",
  "hyper 0.14.14",
  "infer",
+ "jobs_common",
  "jwt",
  "language-tags 0.3.2",
  "lazy_static",
@@ -3786,6 +3813,7 @@ dependencies = [
  "serde_json",
  "sha2",
  "sqlx",
+ "storage_buckets_common",
  "subprocess",
  "tempdir",
  "time 0.2.26",
