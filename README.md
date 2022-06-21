@@ -19,6 +19,9 @@ Here are some static websites contained:
 - [the.storyteller.company](https://the.storyteller.company), DEPRECATED investor website. Used to get into *Founder Friendly Labs*.
 
 
+In the future, it will be worth updating this structure to match Netlify's recommended monorepo practices: 
+https://docs.netlify.com/configure-builds/monorepos/
+
 Development
 -----------
 
