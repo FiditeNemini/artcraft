@@ -15,7 +15,6 @@
 pub const RESERVED_USERNAMES : &'static str = include_str!("../../../../db/reserved_usernames.txt");
 pub const RESERVED_SUBSTRINGS : &'static str = include_str!("../../../../db/reserved_usernames_including.txt");
 
-pub mod common_env;
 pub mod configs;
 pub mod http_clients;
 pub mod http_server;
@@ -41,10 +40,12 @@ use actix_cors::Cors;
 use actix_http::http;
 use actix_web::middleware::{Logger, DefaultHeaders};
 use actix_web::{HttpServer, web, HttpResponse, App};
+use config::common_env::CommonEnv;
 use config::shared_constants::DEFAULT_MYSQL_CONNECTION_STRING;
 use config::shared_constants::DEFAULT_RUST_LOG;
 use container_common::anyhow_result::AnyhowResult;
-use crate::common_env::CommonEnv;
+use container_common::files::read_toml_file_to_struct::read_toml_file_to_struct;
+use crate::configs::static_api_tokens::{StaticApiTokenConfig, StaticApiTokens, StaticApiTokenSet};
 use crate::http_server::endpoints::events::list_events::list_events_handler;
 use crate::http_server::endpoints::leaderboard::get_leaderboard::leaderboard_handler;
 use crate::http_server::endpoints::misc::default_route_404::default_route_404;
@@ -107,6 +108,8 @@ use crate::http_server::web_utils::redis_rate_limiter::RedisRateLimiter;
 use crate::http_server::web_utils::session_checker::SessionChecker;
 use crate::routes::add_routes;
 use crate::server_state::{ServerState, EnvConfig, TwitchOauthSecrets, TwitchOauth, RedisRateLimiters, InMemoryCaches};
+use crate::threads::db_health_checker_thread::db_health_check_status::HealthCheckStatus;
+use crate::threads::db_health_checker_thread::db_health_checker_thread::db_health_checker_thread;
 use crate::threads::ip_banlist_set::IpBanlistSet;
 use crate::threads::poll_ip_banlist_thread::poll_ip_bans;
 use crate::util::buckets::bucket_client::BucketClient;
@@ -126,11 +129,7 @@ use sqlx::mysql::MySqlPoolOptions;
 use std::sync::Arc;
 use std::time::Duration;
 use tokio::runtime::Runtime;
-use container_common::files::read_toml_file_to_struct::read_toml_file_to_struct;
 use twitch_common::twitch_secrets::TwitchSecrets;
-use crate::configs::static_api_tokens::{StaticApiTokenConfig, StaticApiTokens, StaticApiTokenSet};
-use crate::threads::db_health_checker_thread::db_health_checker_thread::db_health_checker_thread;
-use crate::threads::db_health_checker_thread::db_health_check_status::HealthCheckStatus;
 
 // TODO TODO TODO TODO
 // TODO TODO TODO TODO

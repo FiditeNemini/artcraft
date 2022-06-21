@@ -1,6 +1,5 @@
-use config::shared_constants::DEFAULT_REDIS_DATABASE_0_CONNECTION_STRING;
-use config::shared_constants::DEFAULT_REDIS_DATABASE_1_CONNECTION_STRING;
-use container_common::anyhow_result::AnyhowResult;
+use crate::shared_constants::DEFAULT_REDIS_DATABASE_0_CONNECTION_STRING;
+use crate::shared_constants::DEFAULT_REDIS_DATABASE_1_CONNECTION_STRING;
 
 // TODO: Move more shared configs here.
 
@@ -40,7 +39,7 @@ pub struct CommonEnv {
 
 impl CommonEnv {
 
-  pub fn read_from_env() -> AnyhowResult<Self> {
+  pub fn read_from_env() -> anyhow::Result<Self> {
     Ok(Self {
       redis_0_connection_string: easyenv::get_env_string_or_default("REDIS_0_URL",
         DEFAULT_REDIS_DATABASE_0_CONNECTION_STRING),

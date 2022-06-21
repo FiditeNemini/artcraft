@@ -10,13 +10,13 @@
 
 #[macro_use] extern crate serde_derive;
 
-pub mod common_env;
 pub mod job_queries;
 pub mod script_execution;
 pub mod util;
 
 use anyhow::{anyhow, Error};
 use chrono::Utc;
+use config::common_env::CommonEnv;
 use config::shared_constants::DEFAULT_MYSQL_CONNECTION_STRING;
 use config::shared_constants::DEFAULT_RUST_LOG;
 use container_common::anyhow_result::AnyhowResult;
@@ -24,7 +24,6 @@ use container_common::filesystem::check_directory_exists::check_directory_exists
 use container_common::filesystem::check_file_exists::check_file_exists;
 use container_common::filesystem::safe_delete_temp_directory::safe_delete_temp_directory;
 use container_common::filesystem::safe_delete_temp_file::safe_delete_temp_file;
-use crate::common_env::CommonEnv;
 use crate::job_queries::w2l_download_job_queries::W2lTemplateUploadJobRecord;
 use crate::job_queries::w2l_download_job_queries::grab_job_lock_and_mark_pending;
 use crate::job_queries::w2l_download_job_queries::insert_w2l_template;

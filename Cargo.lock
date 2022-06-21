@@ -1034,6 +1034,10 @@ dependencies = [
 [[package]]
 name = "config"
 version = "0.0.1"
+dependencies = [
+ "anyhow",
+ "easyenv",
+]
 
 [[package]]
 name = "const_fn"

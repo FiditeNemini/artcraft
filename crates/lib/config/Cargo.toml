@@ -11,3 +11,9 @@ publish = false
 [lib]
 name = "config"
 path = "src/lib.rs"
+
+# TODO: Remove these dependencies.
+#  These were introduced in refactoring. Config should have few, if any, dependencies.
+[dependencies]
+anyhow = "1.0.40"
+easyenv = "0.0.6"
