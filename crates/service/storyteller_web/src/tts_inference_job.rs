@@ -114,6 +114,8 @@ struct Inferencer {
 
   pub newrelic_client: NewRelicClient,
 
+  pub newrelic_disabled: bool,
+
   pub worker_details: InferencerWorkerDetails,
 
   // Keep tabs of which models to hold in the sidecar memory with this virtual LRU cache
@@ -310,6 +312,9 @@ async fn main() -> AnyhowResult<()> {
   };
 
   let license_key = easyenv::get_env_string_required("NEWRELIC_API_KEY")?;
+
+  let newrelic_disabled = easyenv::get_env_bool_or_default("IS_NEWRELIC_DISABLED", false);
+
   let newrelic_client = ClientBuilder::new(&license_key).build().unwrap();
 
   let maybe_minimum_priority = easyenv::get_env_string_optional("MAYBE_MINIMUM_PRIORITY")
@@ -329,6 +334,7 @@ async fn main() -> AnyhowResult<()> {
     tts_inference_command,
     tts_inference_sidecar_client,
     newrelic_client,
+    newrelic_disabled,
     worker_details: InferencerWorkerDetails {
       is_on_prem,
       worker_hostname: server_hostname.clone(),
@@ -431,11 +437,13 @@ async fn main_loop(inferencer: Inferencer) {
       }
     };
 
-    span_batch.append(&mut spans);
+    if !inferencer.newrelic_disabled {
+      span_batch.append(&mut spans);
 
-    if span_batch.len() > 50  {
-      let spans_to_send = span_batch.split_off(0).into();
-      inferencer.newrelic_client.send_spans(spans_to_send).await;
+      if span_batch.len() > 50 {
+        let spans_to_send = span_batch.split_off(0).into();
+        inferencer.newrelic_client.send_spans(spans_to_send).await;
+      }
     }
 
     error_timeout_millis = START_TIMEOUT_MILLIS; // reset
