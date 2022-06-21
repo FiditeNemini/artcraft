@@ -64,7 +64,7 @@ use sqlx::MySqlPool;
 use sqlx::mysql::MySqlPoolOptions;
 use std::collections::HashMap;
 use std::fs::{File, metadata};
-use std::io::{BufReader, Read};
+use std::io::{BufReader, Read, ErrorKind};
 use std::ops::Deref;
 use std::path::{PathBuf, Path};
 use std::process::Command;
@@ -500,7 +500,8 @@ async fn process_jobs(
     };
 
     if !model_state.is_downloaded_to_filesystem || !model_state.is_in_memory_cache {
-      warn!("Model isn't ready (downloaded = {}), (in memory = {})",
+      warn!("Model isn't ready: {} (downloaded = {}), (in memory = {})",
+        &model_state.model_record.model_token,
         model_state.is_downloaded_to_filesystem,
         model_state.is_in_memory_cache);
 
@@ -645,11 +646,44 @@ impl ModelState {
   }
 }
 
+/// Error from processing a single job
+#[derive(Debug)]
+enum ProcessJobError {
+  /// The filesystem is out of space and we need to free it up.
+  FilesystemFull,
+  /// This is any other kind of error.
+  /// It might be important, we just haven't special cased it yet.
+  Other(anyhow::Error),
+}
+
+impl ProcessJobError {
+  fn from_io_error(error: std::io::Error) -> Self {
+    match error.raw_os_error() {
+      // NB: We can't use err.kind() -> ErrorKind::StorageFull, because it's marked unstable:
+      // `io_error_more` is unstable [E0658]
+      Some(28) => ProcessJobError::FilesystemFull,
+      _ => ProcessJobError::Other(anyhow!(error)),
+    }
+  }
+
+  fn from_anyhow_error(error: anyhow::Error) -> Self {
+    match error.downcast_ref::<std::io::Error>() {
+      Some(e) => match e.raw_os_error() {
+        // NB: We can't use err.kind() -> ErrorKind::StorageFull, because it's marked unstable:
+        // `io_error_more` is unstable [E0658]
+        Some(28) => ProcessJobError::FilesystemFull,
+        _ => ProcessJobError::Other(anyhow!(error)),
+      },
+      None => ProcessJobError::Other(error),
+    }
+  }
+}
+
 async fn process_job(
   inferencer: &Inferencer,
   job: &AvailableTtsInferenceJob,
   model_record: &TtsModelForInferenceRecord,
-) -> AnyhowResult<(Span, Span)> {
+) -> Result<(Span, Span), ProcessJobError> {
 
   // TODO 1. Mark processing (DONE)
 
@@ -686,7 +720,9 @@ async fn process_job(
       .attribute("user_token", maybe_user_token)
       .service_name("tts-inference-job");
 
-  let mut redis = inferencer.redis_pool.get()?;
+  let mut redis = inferencer.redis_pool.get()
+      .map_err(|e| ProcessJobError::Other(anyhow!(e)))?;
+
   let mut redis_logger = RedisJobStatusLogger::new_tts_inference(
     &mut redis,
     &job.inference_job_token);
@@ -696,7 +732,9 @@ async fn process_job(
   info!("Attempting to grab lock for job: {}", job.inference_job_token);
 
   let lock_acquired =
-      mark_tts_inference_job_pending_and_grab_lock(&inferencer.mysql_pool, job.id).await?;
+      mark_tts_inference_job_pending_and_grab_lock(&inferencer.mysql_pool, job.id)
+          .await
+          .map_err(|e| ProcessJobError::Other(e))?;
 
   if !lock_acquired {
     warn!("Could not acquire job lock for: {:?}", &job.id);
@@ -721,7 +759,8 @@ async fn process_job(
   if !waveglow_vocoder_model_fs_path.exists() {
     warn!("Waveglow vocoder model file does not exist: {:?}", &waveglow_vocoder_model_fs_path);
 
-    redis_logger.log_status("downloading vocoder (1 of 3)")?;
+    redis_logger.log_status("downloading vocoder (1 of 3)")
+        .map_err(|e| ProcessJobError::Other(e))?;
 
     let waveglow_vocoder_model_object_path = inferencer.bucket_path_unifier
         .tts_pretrained_vocoders_path(&waveglow_vocoder_model_filename);
@@ -730,8 +769,9 @@ async fn process_job(
 
     inferencer.private_bucket_client.download_file_to_disk(
       &waveglow_vocoder_model_object_path,
-      &waveglow_vocoder_model_fs_path
-    ).await?;
+      &waveglow_vocoder_model_fs_path)
+        .await
+        .map_err(|e| ProcessJobError::Other(e))?;
 
     info!("Downloaded waveglow vocoder model from bucket!");
   }
@@ -744,7 +784,8 @@ async fn process_job(
   if !hifigan_vocoder_model_fs_path.exists() {
     warn!("Hifigan vocoder model file does not exist: {:?}", &hifigan_vocoder_model_fs_path);
 
-    redis_logger.log_status("downloading vocoder (2 of 3)")?;
+    redis_logger.log_status("downloading vocoder (2 of 3)")
+        .map_err(|e| ProcessJobError::Other(e))?;
 
     let hifigan_vocoder_model_object_path = inferencer.bucket_path_unifier
         .tts_pretrained_vocoders_path(&hifigan_vocoder_model_filename);
@@ -753,8 +794,9 @@ async fn process_job(
 
     inferencer.private_bucket_client.download_file_to_disk(
       &hifigan_vocoder_model_object_path,
-      &hifigan_vocoder_model_fs_path
-    ).await?;
+      &hifigan_vocoder_model_fs_path)
+        .await
+        .map_err(|e| ProcessJobError::Other(e))?;
 
     info!("Downloaded hifigan vocoder model from bucket!");
   }
@@ -767,7 +809,8 @@ async fn process_job(
   if !hifigan_superres_vocoder_model_fs_path.exists() {
     warn!("Hifigan superres vocoder model file does not exist: {:?}", &hifigan_superres_vocoder_model_fs_path);
 
-    redis_logger.log_status("downloading vocoder (3 of 3)")?;
+    redis_logger.log_status("downloading vocoder (3 of 3)")
+        .map_err(|e| ProcessJobError::Other(e))?;
 
     let hifigan_superres_vocoder_model_object_path = inferencer.bucket_path_unifier
         .tts_pretrained_vocoders_path(&hifigan_superres_vocoder_model_filename);
@@ -776,8 +819,9 @@ async fn process_job(
 
     inferencer.private_bucket_client.download_file_to_disk(
       &hifigan_superres_vocoder_model_object_path,
-      &hifigan_superres_vocoder_model_fs_path
-    ).await?;
+      &hifigan_superres_vocoder_model_fs_path)
+        .await
+        .map_err(|e| ProcessJobError::Other(e))?;
 
     info!("Downloaded hifigan superres vocoder model from bucket!");
   }
@@ -809,7 +853,8 @@ async fn process_job(
   if !tts_synthesizer_fs_path.exists() {
     info!("TTS synthesizer model file does not exist: {:?}", &tts_synthesizer_fs_path);
 
-    redis_logger.log_status("downloading synthesizer")?;
+    redis_logger.log_status("downloading synthesizer")
+        .map_err(|e| ProcessJobError::Other(e))?;
 
     let tts_synthesizer_object_path  = inferencer.bucket_path_unifier
         .tts_synthesizer_path(&model_record.private_bucket_hash);
@@ -818,8 +863,9 @@ async fn process_job(
 
     inferencer.private_bucket_client.download_file_to_disk(
       &tts_synthesizer_object_path,
-      &tts_synthesizer_fs_path
-    ).await?;
+      &tts_synthesizer_fs_path)
+        .await
+        .map_err(|e| ProcessJobError::from_anyhow_error(e))?;
 
     info!("Downloaded template media from bucket!");
   }
@@ -830,21 +876,29 @@ async fn process_job(
 
   // ==================== WRITE TEXT TO FILE ==================== //
 
+  info!("Creating tempdir for inference results.");
+
   let temp_dir = format!("temp_tts_inference_{}", job.id.0);
-  let temp_dir = TempDir::new(&temp_dir)?; // NB: Exists until it goes out of scope.
+
+  // NB: TempDir exists until it goes out of scope, at which point it should delete from filesystem.
+  let temp_dir = TempDir::new(&temp_dir)
+      .map_err(|e| ProcessJobError::from_io_error(e))?;
 
   let text_input_fs_path = temp_dir.path().join("inference_input.txt");
 
-  std::fs::write(&text_input_fs_path, &cleaned_inference_text)?;
+  std::fs::write(&text_input_fs_path, &cleaned_inference_text)
+      .map_err(|e| ProcessJobError::from_io_error(e))?;
 
   // ==================== RUN INFERENCE ==================== //
 
-  redis_logger.log_status("running inference")?;
+  redis_logger.log_status("running inference")
+      .map_err(|e| ProcessJobError::Other(e))?;
 
   // TODO: Fix this.
   let maybe_unload_model_path = inferencer
       .virtual_model_lfu
-      .insert_returning_replaced(tts_synthesizer_fs_path.to_str().unwrap_or(""))?;
+      .insert_returning_replaced(tts_synthesizer_fs_path.to_str().unwrap_or(""))
+      .map_err(|e| ProcessJobError::Other(e))?;
 
   if let Some(model_path) = maybe_unload_model_path.as_deref() {
     warn!("Remove model from LFU cache: {:?}", model_path);
@@ -876,7 +930,8 @@ async fn process_job(
 
   let mut pretrained_vocoder = VocoderType::HifiGanSuperResolution;
   if let Some(default_vocoder) = model_record.maybe_default_pretrained_vocoder.as_deref() {
-    pretrained_vocoder = VocoderType::from_str(default_vocoder)?;
+    pretrained_vocoder = VocoderType::from_str(default_vocoder)
+        .map_err(|e| ProcessJobError::Other(e))?;
   }
 
   info!("With pretrained vocoder: {:?}", pretrained_vocoder);
@@ -891,24 +946,27 @@ async fn process_job(
     &output_audio_fs_path,
     &output_spectrogram_fs_path,
     &output_metadata_fs_path,
-    maybe_unload_model_path,
-  ).await?;
+    maybe_unload_model_path)
+      .await
+      .map_err(|e| ProcessJobError::Other(e))?;
 
   // ==================== CHECK ALL FILES EXIST AND GET METADATA ==================== //
 
   info!("Checking that output files exist...");
 
-  check_file_exists(&output_audio_fs_path)?;
-  check_file_exists(&output_spectrogram_fs_path)?;
-  check_file_exists(&output_metadata_fs_path)?;
+  check_file_exists(&output_audio_fs_path).map_err(|e| ProcessJobError::Other(e))?;
+  check_file_exists(&output_spectrogram_fs_path).map_err(|e| ProcessJobError::Other(e))?;
+  check_file_exists(&output_metadata_fs_path).map_err(|e| ProcessJobError::Other(e))?;
 
-  let file_metadata = read_metadata_file(&output_metadata_fs_path)?;
+  let file_metadata = read_metadata_file(&output_metadata_fs_path)
+      .map_err(|e| ProcessJobError::Other(e))?;
 
   safe_delete_temp_file(&output_metadata_fs_path);
 
   // ==================== UPLOAD AUDIO TO BUCKET ==================== //
 
-  redis_logger.log_status("uploading result")?;
+  redis_logger.log_status("uploading result")
+      .map_err(|e| ProcessJobError::Other(e))?;
 
   let audio_result_object_path = inferencer.bucket_path_unifier.tts_inference_wav_audio_output_path(
     &job.uuid_idempotency_token); // TODO: Don't use this!
@@ -921,7 +979,8 @@ async fn process_job(
     &audio_result_object_path,
     &output_audio_fs_path,
     "audio/wav")
-      .await?;
+      .await
+      .map_err(|e| ProcessJobError::Other(e))?;
 
   safe_delete_temp_file(&output_audio_fs_path);
 
@@ -938,7 +997,8 @@ async fn process_job(
     &spectrogram_result_object_path,
     &output_spectrogram_fs_path,
     "application/json")
-      .await?;
+      .await
+      .map_err(|e| ProcessJobError::Other(e))?;
 
   safe_delete_temp_file(&output_spectrogram_fs_path);
 
@@ -949,7 +1009,8 @@ async fn process_job(
 
   // ==================== SAVE RECORDS ==================== //
 
-  let text_hash = hash_string_sha2(&cleaned_inference_text)?;
+  let text_hash = hash_string_sha2(&cleaned_inference_text)
+      .map_err(|e| ProcessJobError::Other(e))?;
 
   info!("Saving tts inference record...");
   let (id, inference_result_token) = insert_tts_result(
@@ -962,16 +1023,18 @@ async fn process_job(
     file_metadata.file_size_bytes,
     file_metadata.duration_millis.unwrap_or(0),
     inferencer.worker_details.is_on_prem,
-    &inferencer.worker_details.worker_hostname,
-  ).await?;
+    &inferencer.worker_details.worker_hostname)
+      .await
+      .map_err(|e| ProcessJobError::Other(e))?;
 
   info!("Marking job complete...");
   mark_tts_inference_job_done(
     &inferencer.mysql_pool,
     job.id,
     true,
-    Some(&inference_result_token)
-  ).await?;
+    Some(&inference_result_token))
+      .await
+      .map_err(|e| ProcessJobError::Other(e))?;
 
   info!("TTS Done. Original text was: {}", &job.raw_inference_text);
 
@@ -982,10 +1045,11 @@ async fn process_job(
       .await
       .map_err(|e| {
         error!("error publishing event: {:?}", e);
-        anyhow!("error publishing event")
+        ProcessJobError::Other(anyhow!("error publishing event"))
       })?;
 
-  redis_logger.log_status("done")?;
+  redis_logger.log_status("done")
+      .map_err(|e| ProcessJobError::Other(e))?;
 
   info!("Job {:?} complete success! Downloaded, ran inference, and uploaded. Saved model record: {}, Result Token: {}",
         job.id, id, &inference_result_token);
