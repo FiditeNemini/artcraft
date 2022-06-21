@@ -46,7 +46,7 @@ impl SemiPersistentCacheDir {
 
   /// We cache TTS synthesizer models here.
   /// We'll likely need to LRU cache them.
-  pub fn tts_synthesizer_model_path(&self, model_filename: &str) -> PathBuf {
+  pub fn tts_synthesizer_model_path<P: AsRef<Path>>(&self, model_filename: P) -> PathBuf {
     self.tts_synthesizer_model_root.join(model_filename)
   }
 

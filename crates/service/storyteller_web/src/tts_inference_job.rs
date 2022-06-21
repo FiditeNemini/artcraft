@@ -21,6 +21,7 @@ use chrono::{Utc, DateTime, TimeZone};
 use config::shared_constants::DEFAULT_MYSQL_CONNECTION_STRING;
 use config::shared_constants::DEFAULT_RUST_LOG;
 use container_common::anyhow_result::AnyhowResult;
+use container_common::collections::multiple_random_from_vec::multiple_random_from_vec;
 use container_common::token::random_uuid::generate_random_uuid;
 use crate::common_env::CommonEnv;
 use crate::http_clients::tts_inference_sidecar_client::TtsInferenceSidecarClient;
@@ -550,11 +551,46 @@ async fn process_jobs(
           failure_reason,
           inferencer.job_max_attempts
         ).await;
+
+        match e {
+          ProcessJobError::Other(_) => {} // No-op
+          ProcessJobError::FilesystemFull => {
+            // TODO: Refactor - we should stop processing all of these jobs as we'll lose out
+            //  on this entire batch by attempting to clear the filesystem. This should be handled
+            //  in the calling code.
+            delete_tts_synthesizers_from_cache(&inferencer.semi_persistent_cache)?;
+          }
+        }
       }
     }
   }
 
   Ok(batch_spans)
+}
+
+/// Hack to delete locally cached TTS synthesizers to free up space from a full filesystem.
+/// This is not intelligent and doesn't use any LRU/LFU mechanic.
+/// This also relies on files not being read or written by concurrent workers while deleting.
+fn delete_tts_synthesizers_from_cache(cache_dir: &SemiPersistentCacheDir) -> AnyhowResult<()> {
+  warn!("Deleting cached TTS synthesizers to free up disk space.");
+
+  let tts_synthesizer_dir = cache_dir.tts_synthesizer_model_directory();
+
+  // TODO: When this is no longer sufficient, delete other types of locally-cached data.
+  let mut paths = std::fs::read_dir(tts_synthesizer_dir)?
+      .map(|res| res.map(|e| e.path()))
+      .collect::<Result<Vec<_>, std::io::Error>>()?;
+
+  let models_to_delete = multiple_random_from_vec(&paths, 35);
+
+  for model_to_delete in models_to_delete {
+    warn!("Deleting cached model file: {:?}", model_to_delete);
+
+    let full_model_path = cache_dir.tts_synthesizer_model_path(model_to_delete);
+    std::fs::remove_file(full_model_path)?;
+  }
+
+  Ok(())
 }
 
 #[derive(Deserialize, Default)]
