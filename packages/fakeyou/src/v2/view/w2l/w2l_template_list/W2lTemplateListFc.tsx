@@ -44,26 +44,26 @@ function W2lTemplateListFc(props: Props) {
       },
       credentials: 'include',
     })
-    .then(res => res.json())
-    .then(res => {
-      const templatesResponse : W2lTemplateListResponsePayload  = res;
-      if (!templatesResponse.success) {
-        return;
-      }
+      .then(res => res.json())
+      .then(res => {
+        const templatesResponse: W2lTemplateListResponsePayload = res;
+        if (!templatesResponse.success) {
+          return;
+        }
 
-      setW2lTemplates(templatesResponse.templates)
-    })
-    .catch(e => {
-      //this.props.onSpeakErrorCallback();
-    });
+        setW2lTemplates(templatesResponse.templates)
+      })
+      .catch(e => {
+        //this.props.onSpeakErrorCallback();
+      });
   }, []); // NB: Empty array dependency sets to run ONLY on mount
 
-  
-  let templateElements : Array<JSX.Element> = [];
+
+  let templateElements: Array<JSX.Element> = [];
 
   w2lTemplates.forEach(t => {
     let object = null;
-    
+
     if (t.maybe_image_object_name !== undefined && t.maybe_image_object_name !== null) {
       object = t.maybe_image_object_name;
     } else if (t.maybe_video_object_name !== undefined && t.maybe_video_object_name !== null) {
@@ -76,7 +76,7 @@ function W2lTemplateListFc(props: Props) {
     let url = new BucketConfig().getGcsUrl(object);
 
     let link = `/w2l/${t.template_token}`;
-  
+
     templateElements.push((
       <div className="tile is-parent" key={t.template_token}>
         <article className="tile is-child box">
@@ -86,8 +86,8 @@ function W2lTemplateListFc(props: Props) {
     ));
   });
 
-  let allRowsOfTemplateElements : Array<JSX.Element> = [];
-  let rowOfTemplateElements : Array<JSX.Element> = [];
+  let allRowsOfTemplateElements: Array<JSX.Element> = [];
+  let rowOfTemplateElements: Array<JSX.Element> = [];
 
   // NB: To prevent React spamming about children having unique key props
   let rowKey = "row0";
@@ -134,7 +134,7 @@ function W2lTemplateListFc(props: Props) {
       <p>
         Pick a template, then you can make it lip sync.
         If you want to use your own video or image, you can
-        <Link to="/upload">upload it as a template</Link>.
+        <Link to="/contribute">upload it as a template</Link>.
         You'll then be able to use it whenever you want!
       </p>
     );
@@ -145,7 +145,7 @@ function W2lTemplateListFc(props: Props) {
         Pick a template, then you can make it lip sync.
         If you want to use your own video or image, you'll
         need to <Link to="/signup">create an account</Link>.
-        You'll then be able to upload and reuse your templates 
+        You'll then be able to upload and reuse your templates
         whenever you want!
       </p>
     );
@@ -163,8 +163,8 @@ function W2lTemplateListFc(props: Props) {
       {allRowsOfTemplateElements.map(el => el)}
 
       <br />
-      
-      <p>This feature is based on Wav2Lip by by Prajwal, K R and Mukhopadhyay, 
+
+      <p>This feature is based on Wav2Lip by by Prajwal, K R and Mukhopadhyay,
         Rudrabha and Namboodiri, Vinay P. and Jawahar, C.V.</p>
 
       <br />
