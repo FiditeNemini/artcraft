@@ -110,7 +110,8 @@
               >
                 <li class="nav-item">
                   <a class="nav-link" aria-current="page" href="clone.html"
-                    >Clone Your Voice!</a
+                    ><i class="fa-solid fa-microphone me-2"></i>Clone Your
+                    Voice!</a
                   >
                 </li>
 
@@ -123,7 +124,7 @@
                     data-bs-toggle="dropdown"
                     aria-expanded="false"
                   >
-                    Create
+                    <i class="fa-solid fa-plus me-2"></i>Create
                   </a>
                   <ul
                     class="dropdown-menu"
@@ -150,7 +151,7 @@
                     role="button"
                     data-bs-toggle="dropdown"
                   >
-                    Community
+                    <i class="fa-solid fa-users me-2"></i>Community
                   </a>
                   <ul
                     class="dropdown-menu"
@@ -535,6 +536,9 @@
             var dropdownMenu = $(this).children(".dropdown-menu");
             if (dropdownToggle.is(":visible")) {
               dropdownMenu.toggleClass("show");
+              dropdownMenu
+                .css({ opacity: 0.0, visibility: "visible" })
+                .animate({ opacity: 1.0 }, 200);
             }
           });
         }
