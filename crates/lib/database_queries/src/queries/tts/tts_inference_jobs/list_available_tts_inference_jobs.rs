@@ -24,6 +24,7 @@ pub struct AvailableTtsInferenceJob {
 
   pub is_from_api: bool,
   pub is_for_twitch: bool,
+  pub is_debug_request: bool,
 
   pub status: JobStatus,
   pub priority_level: u8,
@@ -41,7 +42,8 @@ pub struct AvailableTtsInferenceJob {
 pub async fn list_available_tts_inference_jobs(
   pool: &MySqlPool,
   sort_by_priority: bool,
-  num_records: u32
+  num_records: u32,
+  is_debug_worker: bool
 ) -> AnyhowResult<Vec<AvailableTtsInferenceJob>> {
 
   // NB: This query is awkwardly written twice because this is the only way the
@@ -66,6 +68,7 @@ SELECT
 
   is_from_api,
   is_for_twitch,
+  is_debug_request,
 
   status as `status: crate::column_types::job_status::JobStatus`,
   priority_level,
@@ -77,6 +80,8 @@ SELECT
   retry_at
 FROM tts_inference_jobs
 WHERE
+  is_debug_request = ?
+  AND
   (
     status IN ("pending", "attempt_failed")
   )
@@ -89,6 +94,7 @@ WHERE
   ORDER BY priority_level DESC, id ASC
   LIMIT ?
         "#,
+      is_debug_worker,
       num_records,
     ).fetch_all(pool).await?
   } else {
@@ -109,6 +115,7 @@ SELECT
 
   is_from_api,
   is_for_twitch,
+  is_debug_request,
 
   status as `status: crate::column_types::job_status::JobStatus`,
   priority_level,
@@ -120,6 +127,8 @@ SELECT
   retry_at
 FROM tts_inference_jobs
 WHERE
+  is_debug_request = ?
+  AND
   (
     status IN ("pending", "attempt_failed")
   )
@@ -131,6 +140,7 @@ WHERE
   )
   LIMIT ?
         "#,
+      is_debug_worker,
       num_records,
     ).fetch_all(pool).await?
   };
@@ -148,6 +158,7 @@ WHERE
           creator_set_visibility: record.creator_set_visibility,
           is_from_api: i8_to_bool(record.is_from_api),
           is_for_twitch: i8_to_bool(record.is_for_twitch),
+          is_debug_request: i8_to_bool(record.is_debug_request),
           status: record.status,
           priority_level: record.priority_level,
           attempt_count: record.attempt_count,
@@ -167,7 +178,8 @@ WHERE
 pub async fn list_available_tts_inference_jobs_with_minimum_priority(
   pool: &MySqlPool,
   minimum_priority: u8,
-  num_records: u32
+  num_records: u32,
+  is_debug_worker: bool
 ) -> AnyhowResult<Vec<AvailableTtsInferenceJob>> {
 
   // NB: This query is awkwardly written twice because this is the only way the
@@ -192,6 +204,7 @@ SELECT
 
   is_from_api,
   is_for_twitch,
+  is_debug_request,
 
   status as `status: crate::column_types::job_status::JobStatus`,
   priority_level,
@@ -204,6 +217,7 @@ SELECT
 FROM tts_inference_jobs
 WHERE
   priority_level >= ?
+  AND is_debug_request = ?
   AND
   (
     status IN ("pending", "attempt_failed")
@@ -218,6 +232,7 @@ WHERE
   LIMIT ?
         "#,
       minimum_priority,
+      is_debug_worker,
       num_records,
     ).fetch_all(pool).await?;
 
@@ -234,6 +249,7 @@ WHERE
           creator_set_visibility: record.creator_set_visibility,
           is_from_api: i8_to_bool(record.is_from_api),
           is_for_twitch: i8_to_bool(record.is_for_twitch),
+          is_debug_request: i8_to_bool(record.is_debug_request),
           status: record.status,
           priority_level: record.priority_level,
           attempt_count: record.attempt_count,
@@ -263,6 +279,7 @@ struct AvailableTtsInferenceJobRawInternal {
 
   pub is_from_api: i8,
   pub is_for_twitch: i8,
+  pub is_debug_request: i8,
 
   pub status: JobStatus,
   pub priority_level: u8,

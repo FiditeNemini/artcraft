@@ -118,7 +118,14 @@ pub struct JobArgs {
 }
 
 pub struct JobWorkerDetails {
+  // Debug workers only process special debug requests. They're silent otherwise.
+  // Non-debug workers ignore debug requests. This is so we can deploy special code
+  // to debug nodes (typically just one, perhaps even ephemerally).
+  pub is_debug_worker: bool,
+
+  // The worker is "on-premises".
   pub is_on_prem: bool,
+
+  // Hostname of the worker.
   pub worker_hostname: String,
 }
-

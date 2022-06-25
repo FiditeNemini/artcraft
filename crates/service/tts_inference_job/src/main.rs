@@ -273,6 +273,8 @@ async fn main() -> AnyhowResult<()> {
 
   info!("Using 'MAYBE_MINIMUM_PRIORITY' of {:?}", maybe_minimum_priority);
 
+  let is_debug_worker = easyenv::get_env_bool_or_default("IS_DEBUG_WORKER", false);
+
   let inferencer = JobArgs {
     download_temp_directory: temp_directory,
     mysql_pool,
@@ -286,6 +288,7 @@ async fn main() -> AnyhowResult<()> {
     worker_details: JobWorkerDetails {
       is_on_prem,
       worker_hostname: server_hostname.clone(),
+      is_debug_worker,
     },
     virtual_model_lfu: virtual_lfu_cache,
     cache_miss_strategizers,
@@ -337,14 +340,16 @@ async fn main_loop(inferencer: JobArgs) {
           list_available_tts_inference_jobs_with_minimum_priority(
             &inferencer.mysql_pool,
             minimum_priority,
-            num_records
+            num_records,
+            inferencer.worker_details.is_debug_worker
           ).await
         } else {
           // Normal path
           list_available_tts_inference_jobs(
             &inferencer.mysql_pool,
             sort_by_priority,
-            num_records
+            num_records,
+            inferencer.worker_details.is_debug_worker
           ).await
         };
 
