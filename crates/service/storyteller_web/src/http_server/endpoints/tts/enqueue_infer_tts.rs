@@ -26,9 +26,13 @@ use std::sync::Arc;
 use http_server_common::request::get_request_api_token::get_request_api_token;
 use tts_common::priority::{FAKEYOU_LOGGED_IN_PRIORITY_LEVEL, FAKEYOU_ANONYMOUS_PRIORITY_LEVEL, FAKEYOU_INVESTOR_PRIORITY_LEVEL, FAKEYOU_DEFAULT_VALID_API_TOKEN_PRIORITY_LEVEL};
 use user_input_common::check_for_slurs::contains_slurs;
+use http_server_common::request::get_request_header_optional::get_request_header_optional;
 
 // TODO: Temporary for investor demo
 const STORYTELLER_DEMO_COOKIE_NAME : &'static str = "storyteller_demo";
+
+///
+const DEBUG_HEADER_NAME : &'static str = "enable_debug_mode";
 
 #[derive(Deserialize)]
 pub struct InferTtsRequest {
@@ -157,6 +161,11 @@ pub async fn infer_tts_handler(
     priority_level = FAKEYOU_INVESTOR_PRIORITY_LEVEL;
   }
 
+  // ==================== DEBUG MODE ==================== //
+
+  let is_debug_request = get_request_header_optional(&http_request, DEBUG_HEADER_NAME)
+      .is_some();
+
   // ==================== RATE LIMIT ==================== //
 
   if !disable_rate_limiter {
@@ -248,6 +257,7 @@ SET
   creator_set_visibility = ?,
   priority_level = ?,
   is_from_api = ?,
+  is_debug_request = ?,
   status = "pending"
         "#,
       &job_token,
@@ -259,6 +269,7 @@ SET
       set_visibility.to_str(),
       priority_level,
       is_from_api,
+      is_debug_request,
     )
     .execute(&server_state.mysql_pool)
     .await;
