@@ -3,7 +3,7 @@ use chrono::{DateTime, Utc};
 use container_common::anyhow_result::AnyhowResult;
 use crate::column_types::record_visibility::RecordVisibility;
 use crate::column_types::vocoder_type::VocoderType;
-use crate::helpers::boolean_converters::nullable_i8_to_bool;
+use crate::helpers::boolean_converters::{nullable_i8_to_bool, i8_to_bool};
 use log::{info, warn, log};
 use sqlx::MySqlPool;
 use sqlx::error::DatabaseError;
@@ -38,6 +38,9 @@ pub struct TtsResultRecordForResponse {
 
   // Worker hostname that generated the audio. Has the value "unknown" if null.
   pub generated_by_worker: String,
+
+  // If the request was originally targeted to a special "debug" worker.
+  pub is_debug_request: bool,
 
   pub file_size_bytes: u32,
   pub duration_millis: u32,
@@ -90,6 +93,8 @@ pub struct TtsResultRecordRaw {
   pub creator_set_visibility: String,
 
   pub generated_by_worker: Option<String>,
+
+  pub is_debug_request: i8,
 
   pub file_size_bytes: i32,
   pub duration_millis: i32,
@@ -170,6 +175,8 @@ pub async fn select_tts_result_by_token(
 
     generated_by_worker: ir.generated_by_worker.unwrap_or("unknown".to_string()),
 
+    is_debug_request: i8_to_bool(ir.is_debug_request),
+
     file_size_bytes: if ir.file_size_bytes > 0 { ir.file_size_bytes as u32 } else { 0 },
     duration_millis: if ir.duration_millis > 0 { ir.duration_millis as u32 } else { 0 },
 
@@ -225,6 +232,7 @@ SELECT
     tts_results.creator_set_visibility,
 
     tts_results.generated_by_worker,
+    tts_results.is_debug_request,
 
     tts_results.file_size_bytes,
     tts_results.duration_millis,
@@ -286,6 +294,7 @@ SELECT
     tts_results.creator_set_visibility,
 
     tts_results.generated_by_worker,
+    tts_results.is_debug_request,
 
     tts_results.file_size_bytes,
     tts_results.duration_millis,
