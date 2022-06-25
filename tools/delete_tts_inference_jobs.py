@@ -39,6 +39,17 @@ cursor = connection.cursor()
 SAFE_ID = 76000000 # Reasonably completed on 2022-06-24
 LIMIT = 100000
 
+#def get_record_count():
+#    query = f"SELECT COUNT(*) FROM tts_inference_jobs"
+#    cursor.execute(query)
+#    result = cursor.fetchall()
+#    print(result)
+#    return result[0]
+#
+##total_count = get_record_count()
+
+total_count = 75082057
+
 total_deleted = 0
 
 keep_deleting = True
@@ -52,10 +63,12 @@ while keep_deleting:
     count = cursor.rowcount
     total_deleted += count
 
-    print(f'Deleted {count}; total deleted = {total_deleted}')
+    percent_deleted = (total_deleted / total_count) * 100.0
+
+    print(f'Deleted {count}; total deleted = {total_deleted} ({percent_deleted:.4f})')
 
     if count < LIMIT - 1:
         keep_deleting = False
 
-    time.sleep(1)
+    #time.sleep(0.2)
 
