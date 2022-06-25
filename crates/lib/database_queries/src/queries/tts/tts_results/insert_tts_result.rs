@@ -24,6 +24,7 @@ pub async fn insert_tts_result<P: AsRef<Path>>(
   duration_millis: u64,
   is_on_prem: bool,
   worker_hostname: &str,
+  is_debug_worker: bool,
 ) -> AnyhowResult<(u64, String)>
 {
   let inference_result_token = Tokens::new_tts_result()?;
@@ -125,7 +126,9 @@ SET
   duration_millis = ?,
 
   is_generated_on_prem = ?,
-  generated_by_worker = ?
+  generated_by_worker = ?,
+
+  is_debug_request = ?
         "#,
       inference_result_token,
       job.model_token.clone(),
@@ -147,6 +150,7 @@ SET
       duration_millis,
       is_on_prem,
       worker_hostname,
+      is_debug_worker,
     )
         .execute(&mut transaction)
         .await;

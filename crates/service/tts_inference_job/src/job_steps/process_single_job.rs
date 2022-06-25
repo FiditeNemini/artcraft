@@ -409,7 +409,8 @@ pub async fn process_single_job(
     file_metadata.file_size_bytes,
     file_metadata.duration_millis.unwrap_or(0),
     inferencer.worker_details.is_on_prem,
-    &inferencer.worker_details.worker_hostname)
+    &inferencer.worker_details.worker_hostname,
+    inferencer.worker_details.is_debug_worker)
       .await
       .map_err(|e| ProcessSingleJobError::Other(e))?;
 
