@@ -31,7 +31,8 @@ use http_server_common::request::get_request_header_optional::get_request_header
 // TODO: Temporary for investor demo
 const STORYTELLER_DEMO_COOKIE_NAME : &'static str = "storyteller_demo";
 
-///
+/// Debug requests can get routed to special "debug-only" workers, which can
+/// be used to trial new code, run debugging, etc.
 const DEBUG_HEADER_NAME : &'static str = "enable_debug_mode";
 
 #[derive(Deserialize)]

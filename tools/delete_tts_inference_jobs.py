@@ -62,12 +62,12 @@ total_deleted = 0
 keep_deleting = True
 
 while keep_deleting:
-    #query = f"DELETE FROM tts_inference_jobs WHERE id < {SAFE_ID} ORDER BY ID ASC LIMIT {LIMIT}"
-    query = f"DELETE FROM tts_inference_jobs ORDER BY ID asc LIMIT {LIMIT}"
-    print(query)
+    query = f"DELETE FROM tts_inference_jobs WHERE id < {SAFE_ID} ORDER BY ID ASC LIMIT {LIMIT}"
+    #query = f"DELETE FROM tts_inference_jobs ORDER BY ID asc LIMIT {LIMIT}"
+    #print(query)
 
     cursor.execute(query)
-    connection.commit()
+    connection.commit() # NB: Python does not autocommit changes!
 
     #result = cursor.fetchall()
     count = cursor.rowcount
@@ -80,9 +80,8 @@ while keep_deleting:
     if count < LIMIT - 1:
         keep_deleting = False
 
-    time.sleep(2)
+    time.sleep(0.5)
 
-    record = get_first_record(cursor)
-
-    time.sleep(2)
+    #record = get_first_record(cursor)
+    #time.sleep(2)
 
