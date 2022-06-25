@@ -25,22 +25,33 @@ build_storyteller_web_app() {
   popd
 }
 
+build_tts_inference_job() {
+  # NB: This imports the inference/upload job queries
+  # It should also import the shared database lib queries, but something(???) broke.
+  pushd crates/service/tts_inference_job
+  SQLX_OFFLINE=true cargo sqlx prepare tts_inference_job
+  popd
+}
+
 combine_sqlx_queries() {
   # Merge multiple JSON files into a single dictionary.
   # https://stackoverflow.com/a/24904276
   jq -s '.[0] * .[1]' \
     crates/lib/database_queries/sqlx-data.json \
     crates/service/storyteller_web/sqlx-data.json \
+    crates/service/tts_inference_job/sqlx-data.json \
     > sqlx-data.json
 }
 
 cleanup_temp_files() {
   rm crates/lib/database_queries/sqlx-data.json \
-    crates/service/storyteller_web/sqlx-data.json
+    crates/service/storyteller_web/sqlx-data.json \
+    crates/service/tts_inference_job/sqlx-data.json
 }
 
 build_shared_database_library
 build_storyteller_web_app
+build_tts_inference_job
 combine_sqlx_queries
 cleanup_temp_files
 
