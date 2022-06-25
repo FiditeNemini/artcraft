@@ -34,11 +34,6 @@ CREATE TABLE tts_inference_jobs (
   -- The raw, unprocessed user input.
   raw_inference_text TEXT NOT NULL,
 
-  -- ========== INFERENCE METADATA, DC, ROUTING, DEBUGGING ==========
-
-  -- If true, the request gets routed to a special "debug" worker.
-  is_debug_request BOOLEAN NOT NULL DEFAULT FALSE,
-
   -- ========== CREATOR DETAILS ==========
 
   -- Foreign key to user
@@ -66,6 +61,9 @@ CREATE TABLE tts_inference_jobs (
 
   is_from_api BOOLEAN NOT NULL DEFAULT FALSE,
   is_for_twitch BOOLEAN NOT NULL DEFAULT FALSE,
+
+  -- If true, the request gets routed to a special "debug" worker.
+  is_debug_request BOOLEAN NOT NULL DEFAULT FALSE,
 
   -- ========== JOB SYSTEM DETAILS ==========
 

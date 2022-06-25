@@ -4,7 +4,7 @@
 
 ALTER TABLE tts_inference_jobs
     ADD COLUMN is_debug_request BOOLEAN NOT NULL DEFAULT FALSE
-    AFTER raw_inference_text;
+    AFTER is_for_twitch;
 
 ALTER TABLE tts_inference_jobs
     ADD INDEX index_is_debug_request (is_debug_request);
