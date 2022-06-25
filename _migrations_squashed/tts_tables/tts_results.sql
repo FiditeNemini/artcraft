@@ -77,7 +77,10 @@ CREATE TABLE tts_results (
   is_from_api BOOLEAN NOT NULL DEFAULT FALSE,
   is_for_twitch BOOLEAN NOT NULL DEFAULT FALSE,
 
-  -- ========== INFERENCE METADATA ==========
+  -- ========== INFERENCE METADATA, DC, ROUTING, DEBUGGING ==========
+
+  -- If true, the request was routed to a special "debug" worker.
+  is_debug_request BOOLEAN NOT NULL DEFAULT FALSE,
 
   is_generated_on_prem BOOLEAN NOT NULL DEFAULT FALSE,
   generated_by_worker VARCHAR(255) DEFAULT NULL,

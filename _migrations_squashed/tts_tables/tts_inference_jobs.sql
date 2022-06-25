@@ -34,6 +34,11 @@ CREATE TABLE tts_inference_jobs (
   -- The raw, unprocessed user input.
   raw_inference_text TEXT NOT NULL,
 
+  -- ========== INFERENCE METADATA, DC, ROUTING, DEBUGGING ==========
+
+  -- If true, the request gets routed to a special "debug" worker.
+  is_debug_request BOOLEAN NOT NULL DEFAULT FALSE,
+
   -- ========== CREATOR DETAILS ==========
 
   -- Foreign key to user
@@ -115,6 +120,7 @@ CREATE TABLE tts_inference_jobs (
   KEY fk_model_token (model_token),
   KEY fk_maybe_creator_user_token (maybe_creator_user_token),
   KEY index_status (status),
-  KEY index_creator_ip_address (creator_ip_address)
+  KEY index_creator_ip_address (creator_ip_address),
+  KEY index_is_debug_request (is_debug_request)
 
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin;
