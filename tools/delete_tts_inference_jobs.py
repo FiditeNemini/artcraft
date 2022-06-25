@@ -50,14 +50,24 @@ LIMIT = 100000
 
 total_count = 75082057
 
+def get_first_record(cursor):
+    query = f"select * from tts_inference_jobs order by id limit 1"
+    cursor.execute(query)
+    result = cursor.fetchall()
+    print(result)
+    return result
+
 total_deleted = 0
 
 keep_deleting = True
 
 while keep_deleting:
-    query = f"DELETE FROM tts_inference_jobs WHERE id < {SAFE_ID} ORDER BY ID desc LIMIT {LIMIT}"
+    #query = f"DELETE FROM tts_inference_jobs WHERE id < {SAFE_ID} ORDER BY ID ASC LIMIT {LIMIT}"
+    query = f"DELETE FROM tts_inference_jobs ORDER BY ID asc LIMIT {LIMIT}"
+    print(query)
 
     cursor.execute(query)
+    connection.commit()
 
     #result = cursor.fetchall()
     count = cursor.rowcount
@@ -70,5 +80,9 @@ while keep_deleting:
     if count < LIMIT - 1:
         keep_deleting = False
 
-    #time.sleep(0.2)
+    time.sleep(2)
+
+    record = get_first_record(cursor)
+
+    time.sleep(2)
 
