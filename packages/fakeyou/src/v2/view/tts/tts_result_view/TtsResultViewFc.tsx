@@ -73,6 +73,17 @@ function TtsResultViewFc(props: Props) {
 
   //const currentlyDeleted = !!ttsInferenceResult?.maybe_moderator_fields?.mod_deleted_at || !!ttsInferenceResult?.maybe_moderator_fields?.user_deleted_at;
 
+  let debugRows = null;
+
+  if (ttsInferenceResult?.is_debug_request) {
+    debugRows = (
+      <tr>
+        <th>Was Debug Mode?</th>
+        <td>true</td>
+      </tr>
+    );
+  }
+
   let moderatorRows = null;
 
   if (props.sessionWrapper.canDeleteOtherUsersTtsResults() || props.sessionWrapper.canDeleteOtherUsersTtsModels()) {
@@ -284,6 +295,8 @@ function TtsResultViewFc(props: Props) {
               {ttsInferenceResult.generated_by_worker}
             </td>
           </tr>
+
+          {debugRows}
       
           {moderatorRows}
 
