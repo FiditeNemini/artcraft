@@ -30,6 +30,8 @@ export interface TtsResult {
 
   generated_by_worker: string,
 
+  is_debug_request: boolean,
+
   created_at: string,
   updated_at: string,
 
