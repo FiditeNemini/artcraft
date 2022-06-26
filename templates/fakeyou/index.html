@@ -41,6 +41,32 @@
       </div>
 
       <!-- //new nav -->
+      <div class="top-bar d-none d-lg-flex">
+        <div class="container d-flex">
+          <div class="d-flex gap-4 flex-grow-1">
+            <a class="top-bar-text" href="about.html">About</a>
+            <a class="top-bar-text" href="terms.html">Terms of Use</a>
+            <a class="top-bar-text" href="#">Developers</a>
+            <a
+              class="top-bar-text d-flex align-items-center dropdown-toggle"
+              href="#"
+              id="offcanvasNavbarLgDropdown"
+              role="button"
+              data-bs-toggle="dropdown"
+              aria-expanded="false"
+              ><img class="me-2" src="assets/eng-flag.png" height="12" />ENG
+            </a>
+          </div>
+          <div class="d-flex gap-4">
+            <p class="top-bar-text">
+              Online: <span class="fw-bold text-red">1,204</span>
+            </p>
+            <p class="top-bar-text">
+              Queued: <span class="fw-bold text-red">48</span>
+            </p>
+          </div>
+        </div>
+      </div>
       <nav
         class="navbar navbar-expand-lg navbar-dark py-3"
         aria-label="Offcanvas navbar large"
@@ -84,7 +110,8 @@
               >
                 <li class="nav-item">
                   <a class="nav-link" aria-current="page" href="clone.html"
-                    >Clone Your Voice!</a
+                    ><i class="fa-solid fa-microphone me-2"></i>Clone Your
+                    Voice!</a
                   >
                 </li>
 
@@ -97,7 +124,7 @@
                     data-bs-toggle="dropdown"
                     aria-expanded="false"
                   >
-                    Create
+                    <i class="fa-solid fa-plus me-2"></i>Create
                   </a>
                   <ul
                     class="dropdown-menu"
@@ -124,7 +151,7 @@
                     role="button"
                     data-bs-toggle="dropdown"
                   >
-                    Community
+                    <i class="fa-solid fa-users me-2"></i>Community
                   </a>
                   <ul
                     class="dropdown-menu"
@@ -157,23 +184,87 @@
                         ><i class="fa-solid fa-user me-2"></i>My Data</a
                       >
                     </li>
-                    <li><div class="dropdown-divider"></div></li>
+                  </ul>
+                </li>
+
+                <li class="nav-item d-lg-none">
+                  <a class="nav-link" aria-current="page" href="about.html"
+                    >About
+                  </a>
+                </li>
+
+                <li class="nav-item d-lg-none">
+                  <a class="nav-link" aria-current="page" href="terms.html"
+                    >Terms of Use</a
+                  >
+                </li>
+
+                <li class="nav-item d-lg-none">
+                  <a class="nav-link" aria-current="page" href="#"
+                    >Developers</a
+                  >
+                </li>
+                <li class="d-lg-none">
+                  <div
+                    class="dropdown-divider dropdown-divider-white mt-3"
+                  ></div>
+                </li>
+
+                <li class="nav-item dropdown d-lg-none">
+                  <a
+                    class="nav-link dropdown-toggle"
+                    href="#"
+                    id="offcanvasNavbarLgDropdown"
+                    role="button"
+                    data-bs-toggle="dropdown"
+                  >
+                    <img
+                      class="me-2"
+                      src="assets/eng-flag.png"
+                      height="12"
+                    />English
+                  </a>
+                  <ul
+                    class="dropdown-menu"
+                    aria-labelledby="offcanvasNavbarLgDropdown"
+                  >
                     <li>
-                      <a class="dropdown-item" href="about.html"
-                        ><i class="fa-solid fa-face-smile me-2"></i>About Us</a
+                      <a class="dropdown-item" href=""
+                        ><img
+                          class="me-2"
+                          src="assets/eng-flag.png"
+                          height="12"
+                        />English</a
                       >
                     </li>
                     <li>
-                      <a class="dropdown-item" href="terms.html"
-                        ><i class="fa-solid fa-gavel me-2"></i>Terms of Use</a
+                      <a class="dropdown-item" href=""
+                        ><img
+                          class="me-2"
+                          src="assets/esp-flag.png"
+                          height="12"
+                        />Spanish</a
                       >
                     </li>
                   </ul>
                 </li>
-                <li class="nav-item">
-                  <a class="nav-link" aria-current="page" href="#"
-                    >Developers</a
-                  >
+                <li class="d-lg-none">
+                  <div class="dropdown-divider dropdown-divider-white"></div>
+                </li>
+
+                <li class="ps-3 d-lg-none">
+                  <div class="d-flex gap-4 py-2">
+                    <p class="top-bar-text">
+                      Online: <span class="fw-bold text-red">1,204</span>
+                    </p>
+                    <p class="top-bar-text">
+                      Queued: <span class="fw-bold text-red">48</span>
+                    </p>
+                  </div>
+                </li>
+
+                <li class="d-lg-none">
+                  <div class="dropdown-divider dropdown-divider-white"></div>
                 </li>
               </ul>
               <div
@@ -445,6 +536,9 @@
             var dropdownMenu = $(this).children(".dropdown-menu");
             if (dropdownToggle.is(":visible")) {
               dropdownMenu.toggleClass("show");
+              dropdownMenu
+                .css({ opacity: 0.0, visibility: "visible" })
+                .animate({ opacity: 1.0 }, 200);
             }
           });
         }
@@ -490,7 +584,7 @@
             },
           },
           opacity: {
-            value: 0.1,
+            value: 0.06,
             random: false,
             anim: {
               enable: false,
