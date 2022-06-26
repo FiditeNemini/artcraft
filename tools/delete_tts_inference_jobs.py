@@ -48,7 +48,8 @@ LIMIT = 100000
 #
 ##total_count = get_record_count()
 
-total_count = 75082057
+#total_count = 75082057
+total_count = 21925602
 
 def get_first_record(cursor):
     query = f"select * from tts_inference_jobs order by id limit 1"
@@ -63,7 +64,7 @@ keep_deleting = True
 
 while keep_deleting:
     query = f"DELETE FROM tts_inference_jobs WHERE id < {SAFE_ID} ORDER BY ID ASC LIMIT {LIMIT}"
-    #query = f"DELETE FROM tts_inference_jobs ORDER BY ID asc LIMIT {LIMIT}"
+    query = f"DELETE FROM tts_inference_jobs WHERE status = 'complete_success' ORDER BY ID ASC LIMIT {LIMIT}"
     #print(query)
 
     cursor.execute(query)
