@@ -1,5 +1,6 @@
-@import './scss/normalize.scss';
-@import './scss/colours.scss';
+// @import "./scss/normalize.scss";
+@import "./scss/colours.scss";
+@import "./scss/site-refresh.scss";
 //@import-normalize; /* bring in normalize.css styles */
 
 $page-width: 700px;
@@ -7,15 +8,24 @@ $page-width: 700px;
 $light-text-color: #777;
 $button-text-color: #666;
 
-$body-font-family: 'Fira Sans', serif;
-$nav-font-family: 'Fira Sans', sans-serif;
-$footer-font-family: 'Fira Sans Condensed', sans-serif;
-$textarea-font-family: 'Fira Sans', sans-serif;
-$headings-font-family: 'Merriweather', serif;
+$body-font-family: "Fira Sans", serif;
+$nav-font-family: "Fira Sans", sans-serif;
+$footer-font-family: "Fira Sans Condensed", sans-serif;
+$textarea-font-family: "Fira Sans", sans-serif;
+$headings-font-family: "Merriweather", serif;
 
 body {
   font-family: $body-font-family;
   font-weight: 300; // For Fira Sans
+  color: $white;
+  //background gradient
+  background: rgb(13, 16, 25) !important;
+  background: linear-gradient(
+    325deg,
+    rgba(13, 16, 25, 1) 0%,
+    rgba(42, 21, 34, 1) 55%,
+    rgba(16, 14, 26, 1) 100%
+  ) !important;
 }
 
 // Style for user text input that overflows
@@ -23,10 +33,11 @@ body {
   overflow-wrap: anywhere;
 }
 
-.mainwrap {
-  max-width: 800px;
-  margin: auto;
-}
+//old wrapper
+// .mainwrap {
+//   max-width: 800px;
+//   margin: auto;
+// }
 
 canvas#spectrogram {
   margin: 0.5em 0;
@@ -52,7 +63,7 @@ canvas#spectrogram {
 
 p {
   a:before {
-    content: ' ';
+    content: " ";
   }
 }
 
@@ -75,7 +86,7 @@ footer {
   bottom: 0;
   // NB: Setting explicit height doesn't appear to be necessary, and
   // it was creating an annoying scrollbar.
-  //height: $footer-height; 
+  //height: $footer-height;
   color: $light-text-color;
 }
 
@@ -121,7 +132,7 @@ nav {
     padding: 0;
 
     .vo {
-      color: #209CEE;
+      color: #209cee;
       padding: 0;
       margin: 0;
     }
@@ -164,7 +175,7 @@ nav {
   }
 
   a:after {
-    content: '';
+    content: "";
     width: 99.5%;
   }
 
@@ -218,7 +229,7 @@ nav {
 
   .selected {
     filter: brightness(100%) grayscale(0);
-    box-shadow: 0px 0px 25px #209CEE
+    box-shadow: 0px 0px 25px #209cee;
   }
 }
 
@@ -230,7 +241,6 @@ nav {
 #updates,
 #help-wanted,
 #terms {
-
   h1,
   h2 {
     font-family: $headings-font-family;
@@ -305,7 +315,7 @@ nav {
   }
 
   footer p:after {
-    content: ' '; // Not sure why the space disappears when inline.
+    content: " "; // Not sure why the space disappears when inline.
   }
 
   .social {
