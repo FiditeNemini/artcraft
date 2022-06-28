@@ -5,7 +5,7 @@
 
 $page-width: 700px;
 
-$light-text-color: #777;
+$light-text-color: rgba($white, 0.8);
 $button-text-color: #666;
 
 $body-font-family: "Fira Sans", serif;
@@ -61,11 +61,11 @@ canvas#spectrogram {
   }
 }*/
 
-p {
-  a:before {
-    content: " ";
-  }
-}
+// p {
+//   a:before {
+//     content: " ";
+//   }
+// }
 
 #main {
   position: relative; // Footer attachment.
@@ -105,88 +105,93 @@ footer {
 }
 
 nav {
-  font-family: "Fugaz One";
-  margin: 0.2em 0 0 0;
-  padding: 0;
+  font-family: $nav-font-family;
 
-  .signup {
-    font-weight: bold;
-    font-size: 1.2em;
+  .navbar {
+    z-index: 2;
   }
 
-  a:link.signup,
-  a:visited.signup {
-    color: #da4f18;
+  .navbar-dark .navbar-toggler {
+    border: none;
   }
 
-  a:hover.signup,
-  a:active.signup {
-    color: #da4f18;
-    text-decoration: underlinegt;
-  }
-
-  #logo_text {
-    font-family: "Fugaz One";
-    font-size: 1.5em;
-    margin: 0 0.3em 0 0;
-    padding: 0;
-
-    .vo {
-      color: #209cee;
-      padding: 0;
-      margin: 0;
-    }
-
-    .codes {
-      color: rgba(32, 156, 238, 0.685);
-      padding: 0;
-      margin: 0;
-    }
-
-    a {
-      padding: 0;
-      margin: 0;
-    }
-
-    a:link,
-    a:visited {
-      text-decoration: none;
-      background-color: #fff;
-    }
-
-    a:active,
-    a:hover {
-      text-decoration: underline;
-      background-color: #fff;
-    }
-  }
-
-  a {
-    margin: 0;
-    padding: 0;
-  }
-
-  a,
-  a:link {
-    text-decoration: none;
+  .nav-link {
+    font-size: 15px;
+    font-weight: 600;
+    padding-left: 16px !important;
+    padding-right: 16px !important;
     color: $light-text-color;
-    padding: 0 10px;
-    cursor: pointer;
   }
 
-  a:after {
-    content: "";
-    width: 99.5%;
+  .navbar-brand {
+    padding-top: 0;
   }
 
-  a:hover,
-  a:active {
-    background-color: #bfdff5;
+  .dropdown-item {
+    font-size: 15px;
+    font-weight: 600;
+    padding: 0.5rem 1rem;
   }
 
-  hr {
-    margin: 5px 0 15px 0;
+  .dropdown-item:active {
+    background-color: #fc6b68;
   }
+
+  .dropdown-menu {
+    border-color: #ffffff12 !important;
+    border: 1px solid;
+    border-radius: 8px;
+  }
+
+  .nav-bg-dark {
+    background-color: #17101c !important;
+  }
+
+  .offcanvas {
+    width: 100vw;
+  }
+
+  .dropdown-menu {
+    transition: all 0.1s;
+  }
+
+  .nav-login {
+    font-size: 15px;
+    font-weight: 600;
+    color: #fff;
+    text-decoration: none;
+    transition: 0.1s;
+
+    &:hover {
+      color: rgba(255, 255, 255, 0.6);
+      text-decoration: none;
+      transition: 0.1s;
+    }
+  }
+}
+
+.top-bar {
+  display: flex;
+  align-items: center;
+  background-color: rgba(255, 255, 255, 0.05);
+  margin-bottom: 5px;
+  padding: 10px 0;
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+  border-bottom: 1px solid;
+  border-color: rgba(255, 255, 255, 0.1);
+
+  .top-bar-text {
+    color: #fff;
+    font-size: 12px;
+    font-weight: 400;
+    opacity: 0.7;
+    transition: 0.2s;
+  }
+}
+
+.dropdown-divider-white {
+  border-top: 1px solid rgba(255, 255, 255, 0.15);
 }
 
 .button-group {
@@ -333,5 +338,13 @@ nav {
   #root {
     max-width: 380px;
     margin: auto;
+  }
+}
+
+@media (min-width: 992px) {
+  nav {
+    .nav-bg-dark {
+      background-color: #17101c00 !important;
+    }
   }
 }
