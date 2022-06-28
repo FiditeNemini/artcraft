@@ -39,6 +39,7 @@
   },
   "scripts": {
     "start": "BROWSER=none craco start",
+    "start-w": "set BROWSER=none && craco start",
     "start7000": "BROWSER=none PORT=7000 craco start",
     "start8000": "BROWSER=none PORT=8000 craco start",
     "start8080": "BROWSER=none PORT=8080 craco start",
