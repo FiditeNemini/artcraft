@@ -1,0 +1,68 @@
+$primary: #1d84b5;
+$info: #252d43;
+$success: #40AD48;
+$danger: #e51c23;
+$warning: darken(#f7941c, 5%);
+$accent: #80cfd3;
+$workflow: $primary; // Used to be accent-dark
+
+// Darken some of the grays, since the default bootswatch grays are almost impossible to see against white
+$gray-100: #ecf0f1;
+$gray-200: #dee2e6;
+$gray-300: #ced4da;
+$gray-400: #b4bcc2;
+$gray-500: #a5b2b4;
+// These have not been changed yet
+$gray-600: #95a5a6 !default;
+$gray-700: #7b8a8b !default;
+$gray-800: #343a40 !default;
+$gray-900: #212529 !default;
+$black: #000;
+$white: #fff;
+
+// Changes and new classes
+$gray-750: #5c656e;
+$light: $gray-300;
+$lighter: $gray-200;
+$medium: $gray-500;
+$medium-dark: $gray-600;
+$dark: $gray-750;
+
+// lighter and darker colors
+$primary-light: desaturate(lighten($primary, 20%), 15%);
+$primary-dark: saturate(darken($primary, 15%), 10%);
+$primary-very-light: desaturate(lighten($primary, 45%), 35%);
+
+$info-light: desaturate(lighten($info, 15%), 15%);
+$info-dark: darken($info, 10%);
+$info-very-light: desaturate(lighten($info, 55%), 30%);
+
+$success-light: desaturate(lighten($success, 15%), 15%);
+$success-dark: darken($success, 10%);
+
+$warning-light: desaturate(lighten($warning, 15%), 15%);
+$warning-dark: darken($warning, 10%);
+
+$danger-light: desaturate(lighten($danger, 15%), 15%);
+$danger-dark: darken($danger, 10%);
+
+$accent-light: desaturate(lighten($accent, 20%), 15%);
+$accent-dark: saturate(darken($accent, 15%), 10%);
+
+
+// Add all these to $theme-colors
+// Each addition adds like 4KB
+$theme-colors: (
+  'lighter': $lighter,
+  'primary-light': $primary-light,
+  'primary-dark': $primary-dark,
+  'info-light': $info-light,
+  'info-dark': $info-dark,
+  'warning-light': $warning-light,
+  // 'warning-dark': $warning-dark,
+  'danger-light': $danger-light,
+  // 'danger-dark': $danger-dark,
+  'workflow': $workflow,
+  'accent': $accent,
+  'accent-dark': $accent-dark
+);

@@ -1,3 +1,5 @@
+@import './scss/normalize.scss';
+@import './scss/colours.scss';
 //@import-normalize; /* bring in normalize.css styles */
 
 $page-width: 700px;
@@ -28,7 +30,8 @@ body {
 
 canvas#spectrogram {
   margin: 0.5em 0;
-  transform: scaleY(-1); /* Spectrograms are flipped */
+  transform: scaleY(-1);
+  /* Spectrograms are flipped */
   height: 300px;
   width: 100%;
   cursor: pointer;
@@ -99,12 +102,14 @@ nav {
     font-weight: bold;
     font-size: 1.2em;
   }
+
   a:link.signup,
   a:visited.signup {
     color: #da4f18;
   }
+
   a:hover.signup,
-  a:active.signup{
+  a:active.signup {
     color: #da4f18;
     text-decoration: underlinegt;
   }
@@ -114,35 +119,42 @@ nav {
     font-size: 1.5em;
     margin: 0 0.3em 0 0;
     padding: 0;
+
     .vo {
-      color:  #209CEE;
+      color: #209CEE;
       padding: 0;
       margin: 0;
     }
+
     .codes {
-      color:  rgba(32, 156, 238, 0.685);
+      color: rgba(32, 156, 238, 0.685);
       padding: 0;
       margin: 0;
     }
+
     a {
       padding: 0;
       margin: 0;
     }
+
     a:link,
     a:visited {
       text-decoration: none;
       background-color: #fff;
     }
+
     a:active,
-    a:hover{
+    a:hover {
       text-decoration: underline;
       background-color: #fff;
     }
   }
+
   a {
     margin: 0;
     padding: 0;
   }
+
   a,
   a:link {
     text-decoration: none;
@@ -150,10 +162,12 @@ nav {
     padding: 0 10px;
     cursor: pointer;
   }
+
   a:after {
     content: '';
     width: 99.5%;
   }
+
   a:hover,
   a:active {
     background-color: #bfdff5;
@@ -172,12 +186,15 @@ nav {
   .info {
     color: #888888;
   }
+
   .warn {
     color: #aaaa00;
   }
+
   .error {
     color: #aa0000;
   }
+
   min-height: 1.5em;
 }
 
@@ -213,12 +230,16 @@ nav {
 #updates,
 #help-wanted,
 #terms {
-  h1, h2 {
+
+  h1,
+  h2 {
     font-family: $headings-font-family;
   }
+
   p {
     text-align: justify;
   }
+
   li {
     font-size: 1.2em;
     text-align: justify;
@@ -282,6 +303,7 @@ nav {
   footer p {
     display: inline;
   }
+
   footer p:after {
     content: ' '; // Not sure why the space disappears when inline.
   }
