@@ -5,6 +5,11 @@ import { MigrationTopNavSession } from "../../migration/MigrationTopNav_Session"
 import { FrontendUrlConfig } from "../../common/FrontendUrlConfig";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
+  faMicrophone,
+  faPlus,
+  faUsers,
+  faVideo,
+  faHeadphones,
   faGavel,
   faGrinBeamSweat,
   faList,
@@ -54,13 +59,16 @@ function NewTopNavFc(props: Props) {
       <div className="top-bar d-none d-lg-flex">
         <div className="container d-flex">
           <div className="d-flex gap-4 flex-grow-1">
-            <a className="top-bar-text" href="about.html">
+            <Link className="top-bar-text" to="/about">
               About
-            </a>
-            <a className="top-bar-text" href="terms.html">
+            </Link>
+            <Link className="top-bar-text" to="/terms">
               Terms of Use
-            </a>
-            <a className="top-bar-text" href="#">
+            </Link>
+            <a
+              className="top-bar-text"
+              href={FrontendUrlConfig.developerDocs()}
+            >
               Developers
             </a>
             <a
@@ -113,9 +121,13 @@ function NewTopNavFc(props: Props) {
             aria-labelledby="offcanvasNavbar2Label"
           >
             <div className="offcanvas-header">
-              <a className="navbar-brand me-5 pr-8" href="#">
-                <img src="assets/FakeYou-Logo-Left.png" alt="" height="34" />
-              </a>
+              <Link className="navbar-brand me-5 pr-8" to="/">
+                <img
+                  src="fakeyou/FakeYou-Logo.png"
+                  alt="FakeYou: Cartoon and Celebrity Text to Speech"
+                  height="34"
+                />
+              </Link>
 
               <button
                 type="button"
@@ -131,6 +143,7 @@ function NewTopNavFc(props: Props) {
                     to={FrontendUrlConfig.cloneRequestPage()}
                     className="nav-link"
                   >
+                    <FontAwesomeIcon icon={faMicrophone} className="me-2" />
                     Clone My Voice!
                   </Link>
                 </li>
@@ -144,7 +157,8 @@ function NewTopNavFc(props: Props) {
                     data-bs-toggle="dropdown"
                     aria-expanded="false"
                   >
-                    <i className="fa-solid fa-plus me-2"></i>Create
+                    <FontAwesomeIcon icon={faPlus} className="me-2" />
+                    Create
                   </a>
                   <ul
                     className="dropdown-menu"
@@ -152,12 +166,14 @@ function NewTopNavFc(props: Props) {
                   >
                     <li>
                       <a className="dropdown-item" href="index.html">
-                        <i className="fa-solid fa-volume-high me-2"></i>TTS
+                        <FontAwesomeIcon icon={faMicrophone} className="me-2" />
+                        TTS
                       </a>
                     </li>
                     <li>
                       <a className="dropdown-item" href="video.html">
-                        <i className="fa-solid fa-video me-2"></i>Video
+                        <FontAwesomeIcon icon={faVideo} className="me-2" />
+                        Video
                       </a>
                     </li>
                   </ul>
@@ -171,21 +187,23 @@ function NewTopNavFc(props: Props) {
                     role="button"
                     data-bs-toggle="dropdown"
                   >
-                    <i className="fa-solid fa-users me-2"></i>Community
+                    <FontAwesomeIcon icon={faUsers} className="me-2" />
+                    Community
                   </a>
                   <ul
                     className="dropdown-menu"
                     aria-labelledby="offcanvasNavbarLgDropdown"
                   >
                     <li>
-                      <a className="dropdown-item" href="contribute.html">
-                        <i className="fa-solid fa-upload me-2"></i>
+                      <Link className="dropdown-item" to="/contribute">
+                        <FontAwesomeIcon icon={faMicrophone} className="me-2" />
                         Contribute/Upload
-                      </a>
+                      </Link>
                     </li>
                     <li>
                       <a className="dropdown-item" href="leaderboard.html">
-                        <i className="fa-solid fa-trophy me-2"></i>Leaderboard
+                        <FontAwesomeIcon icon={faMicrophone} className="me-2" />
+                        Leaderboard
                       </a>
                     </li>
                     <li>

@@ -249,25 +249,28 @@ function AboutPage(props: Props) {
             </div>
             <div>
               <h2 className="mb-4">Built With</h2>
-              <div className="d-flex gap-3 w-100">
-                <img
-                  className="rounded img-fluid"
-                  src="/logos/pytorch.png"
-                  alt="models are written in pytorch"
-                  width="200"
-                />
-                <img
-                  className="rounded img-fluid"
-                  src="/logos/rust.png"
-                  alt="core server components are written in Rust"
-                  width="200"
-                />
-                <img
-                  className="rounded img-fluid"
-                  src="/logos/kubernetes.png"
-                  alt="the cluster scales with k8s"
-                  width="200"
-                />
+              <div className="row">
+                <div className="col-4 col-md-3">
+                  <img
+                    className="rounded img-fluid"
+                    src="/logos/pytorch.png"
+                    alt="models are written in pytorch"
+                  />
+                </div>
+                <div className="col-4 col-md-3">
+                  <img
+                    className="rounded img-fluid"
+                    src="/logos/rust.png"
+                    alt="core server components are written in Rust"
+                  />
+                </div>
+                <div className="col-4 col-md-3">
+                  <img
+                    className="rounded img-fluid"
+                    src="/logos/kubernetes.png"
+                    alt="the cluster scales with k8s"
+                  />
+                </div>
               </div>
             </div>
           </div>

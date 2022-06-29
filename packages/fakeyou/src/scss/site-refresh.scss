@@ -50,8 +50,17 @@ label:focus,
   box-shadow: none !important;
 }
 
+code {
+  color: $primary;
+  background-color: rgba($white, 0.06);
+}
+
 .text-link {
   color: $primary;
+}
+
+.text-light {
+  color: rgba($white, 0.7) !important;
 }
 
 .container {
@@ -102,6 +111,22 @@ label:focus,
 }
 .btn-primary:hover {
   background-color: lighten($primary, 5%) !important;
+}
+
+.btn-secondary,
+.btn-secondary:focus,
+.btn-secondary:active {
+  background-color: #fff;
+  color: #212529;
+  border: 2.5px solid;
+  border-color: #fff;
+  transition: 0.2s;
+}
+.btn-secondary:hover {
+  background-color: #ccc;
+  color: #212529;
+  border: 2.5px solid;
+  border-color: #ccc;
 }
 
 .panel {
