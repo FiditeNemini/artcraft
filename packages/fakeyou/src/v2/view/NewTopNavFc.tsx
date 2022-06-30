@@ -165,16 +165,16 @@ function NewTopNavFc(props: Props) {
                     aria-labelledby="offcanvasNavbarLgDropdown"
                   >
                     <li>
-                      <a className="dropdown-item" href="index.html">
+                      <Link className="dropdown-item" to="/">
                         <FontAwesomeIcon icon={faMicrophone} className="me-2" />
                         TTS
-                      </a>
+                      </Link>
                     </li>
                     <li>
-                      <a className="dropdown-item" href="video.html">
+                      <Link className="dropdown-item" to="/video">
                         <FontAwesomeIcon icon={faVideo} className="me-2" />
                         Video
-                      </a>
+                      </Link>
                     </li>
                   </ul>
                 </li>
@@ -196,47 +196,50 @@ function NewTopNavFc(props: Props) {
                   >
                     <li>
                       <Link className="dropdown-item" to="/contribute">
-                        <FontAwesomeIcon icon={faMicrophone} className="me-2" />
+                        <FontAwesomeIcon icon={faUpload} className="me-2" />
                         Contribute/Upload
                       </Link>
                     </li>
                     <li>
-                      <a className="dropdown-item" href="leaderboard.html">
-                        <FontAwesomeIcon icon={faMicrophone} className="me-2" />
+                      <Link className="dropdown-item" to="/leaderboard">
+                        <FontAwesomeIcon icon={faTrophy} className="me-2" />
                         Leaderboard
-                      </a>
+                      </Link>
                     </li>
                     <li>
-                      <a className="dropdown-item" href="patrons.html">
-                        <i className="fa-brands fa-patreon me-2"></i>Patrons
-                      </a>
+                      <Link className="dropdown-item" to="/patrons">
+                        <FontAwesomeIcon icon={faPatreon} className="me-2" />
+                        Patrons
+                      </Link>
                     </li>
                     <li>
-                      <a className="dropdown-item" href="firehose.html">
-                        <i className="fa-solid fa-list me-2"></i>Feed
-                      </a>
+                      <Link className="dropdown-item" to="/firehose">
+                        <FontAwesomeIcon icon={faList} className="me-2" />
+                        Feed
+                      </Link>
                     </li>
                     <li>
                       <div className="dropdown-divider"></div>
                     </li>
                     <li>
-                      <a className="dropdown-item" href="profile.html">
-                        <i className="fa-solid fa-user me-2"></i>My Data
-                      </a>
+                      <Link className="dropdown-item" to="/profile">
+                        <FontAwesomeIcon icon={faUser} className="me-2" />
+                        My Data
+                      </Link>
                     </li>
                   </ul>
                 </li>
 
                 <li className="nav-item d-lg-none">
-                  <a className="nav-link" aria-current="page" href="about.html">
+                  <Link className="nav-link" aria-current="page" to="/about">
                     About
-                  </a>
+                  </Link>
                 </li>
 
                 <li className="nav-item d-lg-none">
-                  <a className="nav-link" aria-current="page" href="terms.html">
+                  <Link className="nav-link" aria-current="page" to="/terms">
                     Terms of Use
-                  </a>
+                  </Link>
                 </li>
 
                 <li className="nav-item d-lg-none">
@@ -309,12 +312,14 @@ function NewTopNavFc(props: Props) {
                 </li>
               </ul>
               <div className="d-grid gap-2 d-flex justify-content-start align-items-center pt-4 ps-3 pt-lg-0 ps-lg-0">
-                <a className="nav-login me-3" href="">
+                <Link className="nav-login me-3" to="/login">
                   Login
-                </a>
-                <button type="button" className="btn btn-primary btn-lg">
-                  Sign up
-                </button>
+                </Link>
+                <Link to="/signup">
+                  <button type="button" className="btn btn-primary btn-lg">
+                    Sign up
+                  </button>
+                </Link>
               </div>
               {/* <div className="navbar-end">
                 <div className="navbar-item">

@@ -116,10 +116,10 @@ code {
 .btn-secondary,
 .btn-secondary:focus,
 .btn-secondary:active {
-  background-color: #fff;
+  background-color: $white;
   color: #212529;
   border: 2.5px solid;
-  border-color: #fff;
+  border-color: $white;
   transition: 0.2s;
 }
 .btn-secondary:hover {
@@ -132,7 +132,7 @@ code {
 .panel {
   position: relative;
   width: 100%;
-  background-color: rgba(255, 255, 255, 0.1);
+  background-color: rgba($white, 0.1);
   border-color: #ffffff12 !important;
   border: 1px solid;
   border-radius: 0px;
@@ -151,17 +151,62 @@ code {
   }
 }
 
+.login-panel {
+  max-width: 800px !important;
+}
+
+.sub-title {
+  font-weight: 500;
+  padding-bottom: 10px;
+}
+
 .form-control,
 .form-select {
   border-width: 1px;
-  border-color: #fff;
+  border-color: $white;
   border-radius: 5px;
   padding: 0.5rem 0.75rem;
 
   &:focus {
-    border-color: #fc6b68;
+    border-color: $primary;
     outline: 0;
-    box-shadow: 0 0 0 0.1rem #fc6b68;
+    box-shadow: 0 0 0 0.1rem $primary;
+  }
+}
+
+.input-icon {
+  .form-control {
+    padding-left: 2.375rem;
+  }
+
+  .form-select {
+    padding-left: 2.375rem;
+    padding-right: 2.375rem;
+  }
+
+  .form-control-feedback {
+    position: absolute;
+    z-index: 2;
+    display: block;
+    width: 2.375rem;
+    height: 2.375rem;
+    line-height: 2.375rem;
+    text-align: center;
+    pointer-events: none;
+    color: #212529;
+    opacity: 0.9;
+  }
+}
+
+.social-icon {
+  font-size: 24px;
+  color: $white;
+  text-decoration: none;
+  cursor: pointer;
+  transition: 0.2s;
+
+  &:hover {
+    color: rgba($white, 0.6);
   }
 }
 
