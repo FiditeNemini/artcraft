@@ -133,18 +133,17 @@ nav {
     font-size: 15px;
     font-weight: 600;
     padding: 0.5rem 1rem;
-    display: flex;
-    align-items: center;
 
     &:active {
-      background-color: #fc6b68;
+      background-color: $primary;
     }
   }
 
   .dropdown-menu {
-    border-color: #ffffff12 !important;
+    border-color: rgba($white, 0.12) !important;
     border: 1px solid;
     border-radius: 8px;
+    box-shadow: 0px 5px 20px rgba($black, 0.3);
   }
 
   .nav-bg-dark {
