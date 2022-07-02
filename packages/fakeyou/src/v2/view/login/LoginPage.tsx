@@ -72,7 +72,7 @@ function LoginPage(props: Props) {
   let errorWarning = <span />;
   if (errorMessage) {
     errorWarning = (
-      <div className="notification is-danger is-light">
+      <div className="alert alert-danger mb-4">
         <strong>Login Error:</strong> {errorMessage}
       </div>
     );
