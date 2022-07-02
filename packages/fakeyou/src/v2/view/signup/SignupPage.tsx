@@ -12,6 +12,8 @@ import {
   iconPasswordField,
   iconUser,
 } from "@storyteller/components/src/icons/SemanticIcons";
+import { distance, delay, duration } from "../../../data/animation";
+const Fade = require("react-reveal/Fade");
 
 enum FieldTriState {
   EMPTY_FALSE,
@@ -272,101 +274,104 @@ function SignupPage(props: Props) {
 
   return (
     <div>
-      <div className="container-panel pb-5 pt-lg-5 my-lg-5 login-panel">
-        <div className="panel p-3 p-lg-4 load-hidden mt-5 mt-lg-0">
-          <h1 className="panel-title fw-bold ">Sign Up</h1>
-          <div className="py-6">
-            <form onSubmit={handleFormSubmit}>
-              <div className="d-flex flex-column gap-4">
-                <div>
-                  <label className="sub-title">Username</label>
-                  <div className="form-group input-icon">
-                    <span className="form-control-feedback">
-                      <FontAwesomeIcon icon={iconUser} />
-                    </span>
-                    <input
-                      className={usernameInputClass}
-                      type="text"
-                      placeholder="Username"
-                      value={username}
-                      onChange={handleUsernameChange}
-                    />
+      <Fade bottom duration={duration} distance={distance}>
+        <div className="container-panel pb-5 pt-lg-5 my-lg-5 login-panel">
+          <div className="panel p-3 p-lg-4 load-hidden mt-5 mt-lg-0">
+            <h1 className="panel-title fw-bold ">Sign Up</h1>
+            <div className="py-6">
+              <form onSubmit={handleFormSubmit}>
+                <div className="d-flex flex-column gap-4">
+                  <div>
+                    <label className="sub-title">Username</label>
+                    <div className="form-group input-icon">
+                      <span className="form-control-feedback">
+                        <FontAwesomeIcon icon={iconUser} />
+                      </span>
+                      <input
+                        className={usernameInputClass}
+                        type="text"
+                        placeholder="Username"
+                        value={username}
+                        onChange={handleUsernameChange}
+                      />
+                    </div>
+                    <p className={usernameHelpClass}>{usernameInvalidReason}</p>
                   </div>
-                  <p className={usernameHelpClass}>{usernameInvalidReason}</p>
-                </div>
-                <div>
-                  <label className="sub-title">Email</label>
-                  <div className="form-group input-icon">
-                    <span className="form-control-feedback">
-                      <FontAwesomeIcon icon={iconEmailField} />
-                    </span>
-                    <input
-                      className={emailInputClass}
-                      type="email"
-                      placeholder="Email"
-                      value={email}
-                      onChange={handleEmailChange}
-                    />
+                  <div>
+                    <label className="sub-title">Email</label>
+                    <div className="form-group input-icon">
+                      <span className="form-control-feedback">
+                        <FontAwesomeIcon icon={iconEmailField} />
+                      </span>
+                      <input
+                        className={emailInputClass}
+                        type="email"
+                        placeholder="Email"
+                        value={email}
+                        onChange={handleEmailChange}
+                      />
+                    </div>
+                    <p className={emailHelpClass}>{emailInvalidReason}</p>
                   </div>
-                  <p className={emailHelpClass}>{emailInvalidReason}</p>
-                </div>
-                <div>
-                  <label className="sub-title">Password</label>
-                  <div className="form-group input-icon">
-                    <span className="form-control-feedback">
-                      <FontAwesomeIcon icon={iconPasswordField} />
-                    </span>
-                    <input
-                      className={passwordInputClass}
-                      type="password"
-                      placeholder="Password"
-                      value={password}
-                      onChange={handlePasswordChange}
-                    />
+                  <div>
+                    <label className="sub-title">Password</label>
+                    <div className="form-group input-icon">
+                      <span className="form-control-feedback">
+                        <FontAwesomeIcon icon={iconPasswordField} />
+                      </span>
+                      <input
+                        className={passwordInputClass}
+                        type="password"
+                        placeholder="Password"
+                        value={password}
+                        onChange={handlePasswordChange}
+                      />
+                    </div>
+                    <p className={passwordHelpClass}>{passwordInvalidReason}</p>
                   </div>
-                  <p className={passwordHelpClass}>{passwordInvalidReason}</p>
-                </div>
-                <div>
-                  <label className="sub-title">Password Confirmation</label>
-                  <div className="form-group input-icon">
-                    <span className="form-control-feedback">
-                      <FontAwesomeIcon icon={iconPasswordField} />
-                    </span>
-                    <input
-                      className={passwordConfirmationInputClass}
-                      type="password"
-                      placeholder="Password confirmation"
-                      value={passwordConfirmation}
-                      onChange={handlePasswordConfirmationChange}
-                    />
+                  <div>
+                    <label className="sub-title">Password Confirmation</label>
+                    <div className="form-group input-icon">
+                      <span className="form-control-feedback">
+                        <FontAwesomeIcon icon={iconPasswordField} />
+                      </span>
+                      <input
+                        className={passwordConfirmationInputClass}
+                        type="password"
+                        placeholder="Password confirmation"
+                        value={passwordConfirmation}
+                        onChange={handlePasswordConfirmationChange}
+                      />
+                    </div>
+                    <p className={passwordConfirmationHelpClass}>
+                      {passwordConfirmationInvalidReason}
+                    </p>
                   </div>
-                  <p className={passwordConfirmationHelpClass}>
-                    {passwordConfirmationInvalidReason}
+                  <div className="alert alert-warning mb-0">
+                    <strong>Remember your password!</strong> We don't have
+                    password reset currently, and it'll be a few more weeks
+                    before it's added (there are more important features to work
+                    on). If you lose your password, please let us know in
+                    Discord.
+                  </div>
+                  <button className="btn btn-primary btn-lg w-100 mt-2">
+                    Sign up
+                  </button>
+                  <p>
+                    Already have an account?
+                    <Link
+                      to="/login"
+                      className="button is-info is-large is-fullwidth is-inverted"
+                    >
+                      Log in instead.
+                    </Link>
                   </p>
                 </div>
-                <div className="alert alert-warning mb-0">
-                  <strong>Remember your password!</strong> We don't have
-                  password reset currently, and it'll be a few more weeks before
-                  it's added (there are more important features to work on). If
-                  you lose your password, please let us know in Discord.
-                </div>
-                <button className="btn btn-primary btn-lg w-100 mt-2">
-                  Sign up
-                </button>
-                <p>
-                  Already have an account?
-                  <Link
-                    to="/login"
-                    className="button is-info is-large is-fullwidth is-inverted"
-                  >
-                    Log in instead.
-                  </Link>
-                </p>
-              </div>
-            </form>
+              </form>
+            </div>
           </div>
         </div>
-      </div>
+      </Fade>
     </div>
   );
 }

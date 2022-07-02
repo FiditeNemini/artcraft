@@ -11,6 +11,8 @@ import {
   iconPasswordField,
 } from "@storyteller/components/src/icons/SemanticIcons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { distance, delay, duration } from "../../../data/animation";
+const Fade = require("react-reveal/Fade");
 
 interface Props {
   sessionWrapper: SessionWrapper;
@@ -80,61 +82,63 @@ function LoginPage(props: Props) {
 
   return (
     <div>
-      <div className="container-panel pb-5 pt-lg-5 my-lg-5 login-panel">
-        <div className="panel p-3 p-lg-4 load-hidden mt-5 mt-lg-0">
-          <h1 className="panel-title fw-bold">Login</h1>
-          <div className="py-6">
-            {errorWarning}
+      <Fade bottom duration={duration} distance={distance}>
+        <div className="container-panel pb-5 pt-lg-5 my-lg-5 login-panel">
+          <div className="panel p-3 p-lg-4 load-hidden mt-5 mt-lg-0">
+            <h1 className="panel-title fw-bold">Login</h1>
+            <div className="py-6">
+              {errorWarning}
 
-            <form onSubmit={handleFormSubmit}>
-              <div className="d-flex flex-column gap-4">
-                <div>
-                  <label className="sub-title">Username or Email</label>
-                  <div className="form-group input-icon">
-                    <span className="form-control-feedback">
-                      <FontAwesomeIcon icon={iconUser} />
-                    </span>
-                    <input
-                      className="form-control"
-                      type="text"
-                      placeholder="Username or Email"
-                      value={usernameOrEmail}
-                      onChange={handleUsernameOrEmailChange}
-                    />
+              <form onSubmit={handleFormSubmit}>
+                <div className="d-flex flex-column gap-4">
+                  <div>
+                    <label className="sub-title">Username or Email</label>
+                    <div className="form-group input-icon">
+                      <span className="form-control-feedback">
+                        <FontAwesomeIcon icon={iconUser} />
+                      </span>
+                      <input
+                        className="form-control"
+                        type="text"
+                        placeholder="Username or Email"
+                        value={usernameOrEmail}
+                        onChange={handleUsernameOrEmailChange}
+                      />
+                    </div>
+                    {/*<p className="help"></p>*/}
                   </div>
-                  {/*<p className="help"></p>*/}
-                </div>
 
-                <div>
-                  <label className="sub-title">Password</label>
-                  <div className="form-group input-icon">
-                    <span className="form-control-feedback">
-                      <FontAwesomeIcon icon={iconPasswordField} />
-                    </span>
-                    <input
-                      className="form-control"
-                      type="password"
-                      placeholder="Password"
-                      value={password}
-                      onChange={handlePasswordChange}
-                    />
+                  <div>
+                    <label className="sub-title">Password</label>
+                    <div className="form-group input-icon">
+                      <span className="form-control-feedback">
+                        <FontAwesomeIcon icon={iconPasswordField} />
+                      </span>
+                      <input
+                        className="form-control"
+                        type="password"
+                        placeholder="Password"
+                        value={password}
+                        onChange={handlePasswordChange}
+                      />
+                    </div>
+                    {/*<p className="help"></p>*/}
                   </div>
-                  {/*<p className="help"></p>*/}
-                </div>
 
-                <button className="btn btn-primary btn-lg w-100 mt-2">
-                  <FontAwesomeIcon icon={iconUser} className="me-2" />
-                  Login
-                </button>
-                <p>
-                  Don’t have an account?
-                  <a className="text-link">Create an account now.</a>
-                </p>
-              </div>
-            </form>
+                  <button className="btn btn-primary btn-lg w-100 mt-2">
+                    <FontAwesomeIcon icon={iconUser} className="me-2" />
+                    Login
+                  </button>
+                  <p>
+                    Don’t have an account?
+                    <a className="text-link">Create an account now.</a>
+                  </p>
+                </div>
+              </form>
+            </div>
           </div>
         </div>
-      </div>
+      </Fade>
     </div>
   );
 }

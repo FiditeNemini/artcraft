@@ -36,6 +36,8 @@ import { t } from "i18next";
 import { Trans } from "react-i18next";
 import { TwitchTtsNotice } from "./notices/TwitchTtsNotice";
 import { PleaseFollowNotice } from "./notices/PleaseFollowNotice";
+import { distance, delay, delay2, duration } from "../../../../data/animation";
+const Fade = require("react-reveal/Fade");
 
 export interface EnqueueJobResponsePayload {
   success: boolean;
@@ -278,41 +280,48 @@ function TtsModelListFc(props: Props) {
         <div className="row gx-3 flex-lg-row-reverse align-items-center">
           <div className="col-lg-6">
             <div className="d-flex justify-content-center">
-              <img
-                src="mascot/kitsune_pose2.png"
-                className="ani4 load-hidden img-fluid"
-                width="560"
-                loading="lazy"
-              />
+              <Fade right distance={distance} delay={delay} duration={duration}>
+                <img
+                  src="mascot/kitsune_pose2.png"
+                  className="ani4 load-hidden img-fluid"
+                  width="560"
+                  loading="lazy"
+                  alt="FakeYou Mascot"
+                />
+              </Fade>
             </div>
           </div>
           <div className="col-lg-6 px-md-2 px-lg-5 px-xl-2">
-            <div>
-              <h1 className="ani1 load-hidden display-3 fw-bold lh-1 mb-3 text-center text-lg-start">
-                Text to Speech
-              </h1>
-              <div className="d-flex justify-content-center">
-                <p className="ani2 load-hidden lead mb-5 text-center text-lg-start">
-                  <Trans i18nKey="pages.ttsList.heroSubtitle">
-                    Use FakeYou's deepfake tech to say stuff with your favorite
-                    characters.
-                  </Trans>
-                </p>
+            <Fade bottom cascade duration={duration} distance={distance}>
+              <div>
+                <h1 className="display-3 fw-bold lh-1 mb-3 text-center text-lg-start">
+                  Text to Speech
+                </h1>
+                <div className="d-flex justify-content-center">
+                  <p className="ani2 load-hidden lead mb-5 text-center text-lg-start">
+                    <Trans i18nKey="pages.ttsList.heroSubtitle">
+                      Use FakeYou's deepfake tech to say stuff with your
+                      favorite characters.
+                    </Trans>
+                  </p>
+                </div>
               </div>
-            </div>
 
-            <div className="ani3 load-hidden d-grid gap-3 d-lg-flex justify-content-lg-start mb-4">
-              <Link to="/">
-                <button type="button" className="btn btn-primary w-100">
-                  Sign Up
-                </button>
-              </Link>
-              <Link to="/clone">
-                <button type="button" className="btn btn-secondary w-100">
-                  Clone My Voice!
-                </button>
-              </Link>
-            </div>
+              <div>
+                <div className="d-grid gap-3 d-lg-flex justify-content-lg-start mb-4">
+                  <Link to="/">
+                    <button type="button" className="btn btn-primary w-100">
+                      Sign Up
+                    </button>
+                  </Link>
+                  <Link to="/clone">
+                    <button type="button" className="btn btn-secondary w-100">
+                      Clone My Voice!
+                    </button>
+                  </Link>
+                </div>
+              </div>
+            </Fade>
           </div>
         </div>
       </div>
@@ -326,76 +335,80 @@ function TtsModelListFc(props: Props) {
       {twitchTtsNotice}
 
       <div className="container-panel pt-4 pb-5">
-        <div className="panel p-3 p-lg-4 load-hidden mt-5 mt-lg-0">
-          <h1 className="panel-title fw-bold">Create TTS</h1>
-          <div className="py-6">
-            <div className="d-flex flex-column gap-4">
-              <form onSubmit={handleFormSubmit}>
-                <MultiDropdownSearch
-                  allTtsCategories={props.allTtsCategories}
-                  allTtsModels={props.ttsModels}
-                  allTtsCategoriesByTokenMap={props.allTtsCategoriesByTokenMap}
-                  allTtsModelsByTokenMap={props.allTtsModelsByTokenMap}
-                  ttsModelsByCategoryToken={props.ttsModelsByCategoryToken}
-                  dropdownCategories={props.dropdownCategories}
-                  setDropdownCategories={props.setDropdownCategories}
-                  selectedCategories={props.selectedCategories}
-                  setSelectedCategories={props.setSelectedCategories}
-                  maybeSelectedTtsModel={props.maybeSelectedTtsModel}
-                  setMaybeSelectedTtsModel={props.setMaybeSelectedTtsModel}
-                />
+        <Fade bottom distance={distance} delay={delay2} duration={duration}>
+          <div className="panel p-3 p-lg-4 load-hidden mt-5 mt-lg-0">
+            <h1 className="panel-title fw-bold">Create TTS</h1>
+            <div className="py-6">
+              <div className="d-flex flex-column gap-4">
+                <form onSubmit={handleFormSubmit}>
+                  <MultiDropdownSearch
+                    allTtsCategories={props.allTtsCategories}
+                    allTtsModels={props.ttsModels}
+                    allTtsCategoriesByTokenMap={
+                      props.allTtsCategoriesByTokenMap
+                    }
+                    allTtsModelsByTokenMap={props.allTtsModelsByTokenMap}
+                    ttsModelsByCategoryToken={props.ttsModelsByCategoryToken}
+                    dropdownCategories={props.dropdownCategories}
+                    setDropdownCategories={props.setDropdownCategories}
+                    selectedCategories={props.selectedCategories}
+                    setSelectedCategories={props.setSelectedCategories}
+                    maybeSelectedTtsModel={props.maybeSelectedTtsModel}
+                    setMaybeSelectedTtsModel={props.setMaybeSelectedTtsModel}
+                  />
 
-                <AutocompleteSearch
-                  allTtsCategories={props.allTtsCategories}
-                  allTtsModels={props.ttsModels}
-                  allTtsModelsByTokenMap={props.allTtsModelsByTokenMap}
-                  dropdownCategories={props.dropdownCategories}
-                  setDropdownCategories={props.setDropdownCategories}
-                  selectedCategories={props.selectedCategories}
-                  setSelectedCategories={props.setSelectedCategories}
-                  maybeSelectedTtsModel={props.maybeSelectedTtsModel}
-                  setMaybeSelectedTtsModel={props.setMaybeSelectedTtsModel}
-                />
+                  <AutocompleteSearch
+                    allTtsCategories={props.allTtsCategories}
+                    allTtsModels={props.ttsModels}
+                    allTtsModelsByTokenMap={props.allTtsModelsByTokenMap}
+                    dropdownCategories={props.dropdownCategories}
+                    setDropdownCategories={props.setDropdownCategories}
+                    selectedCategories={props.selectedCategories}
+                    setSelectedCategories={props.setSelectedCategories}
+                    maybeSelectedTtsModel={props.maybeSelectedTtsModel}
+                    setMaybeSelectedTtsModel={props.setMaybeSelectedTtsModel}
+                  />
 
-                {directViewLink}
+                  {directViewLink}
 
-                <div className="field">
-                  <div className="control">
-                    <textarea
-                      onChange={handleChangeText}
-                      className="textarea is-large"
-                      value={props.textBuffer}
-                      placeholder={t("pages.ttsList.placeholderTextGoesHere")}
-                    ></textarea>
-                  </div>
-                </div>
-
-                {maybeError}
-
-                <div className="button-group">
-                  <div className="columns is-mobile">
-                    <div className="column has-text-centered">
-                      <button
-                        className="button is-danger is-large"
-                        disabled={remainingCharactersButtonDisabled}
-                      >
-                        {t("pages.ttsList.buttonSpeak")}
-                      </button>
-                    </div>
-                    <div className="column has-text-centered">
-                      <button
-                        className="button is-danger is-light is-large"
-                        onClick={handleClearClick}
-                      >
-                        {t("pages.ttsList.buttonClear")}
-                      </button>
+                  <div className="field">
+                    <div className="control">
+                      <textarea
+                        onChange={handleChangeText}
+                        className="textarea is-large"
+                        value={props.textBuffer}
+                        placeholder={t("pages.ttsList.placeholderTextGoesHere")}
+                      ></textarea>
                     </div>
                   </div>
-                </div>
-              </form>
+
+                  {maybeError}
+
+                  <div className="button-group">
+                    <div className="columns is-mobile">
+                      <div className="column has-text-centered">
+                        <button
+                          className="button is-danger is-large"
+                          disabled={remainingCharactersButtonDisabled}
+                        >
+                          {t("pages.ttsList.buttonSpeak")}
+                        </button>
+                      </div>
+                      <div className="column has-text-centered">
+                        <button
+                          className="button is-danger is-light is-large"
+                          onClick={handleClearClick}
+                        >
+                          {t("pages.ttsList.buttonClear")}
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </form>
+              </div>
             </div>
           </div>
-        </div>
+        </Fade>
       </div>
 
       <br />
