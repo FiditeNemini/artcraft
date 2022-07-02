@@ -25,7 +25,7 @@ function AboutPage(props: Props) {
           </div>
           <div className="col-lg-6 px-md-2 px-lg-5 px-xl-2">
             <div className="text-center text-lg-start">
-              <Fade bottom cascade duration={duration} distance={distance}>
+              <Fade bottom cascade duration={duration}>
                 <div>
                   <h1 className="display-5 fw-bold lh-1 mb-4">
                     A Glimpse of the Future

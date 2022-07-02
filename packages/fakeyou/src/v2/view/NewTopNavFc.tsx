@@ -137,7 +137,7 @@ function NewTopNavFc(props: Props) {
               ></button>
             </div>
             <div className="offcanvas-body">
-              <ul className="navbar-nav justify-content-start align-items-lg-center flex-grow-1">
+              <ul className="navbar-nav justify-content-start align-items-lg-center flex-grow-1 gap-2 gap-lg-0">
                 <li className="nav-item">
                   <Link
                     to={FrontendUrlConfig.cloneRequestPage()}

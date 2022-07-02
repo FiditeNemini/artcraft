@@ -33,6 +33,7 @@ import { TtsCategoryType } from "./AppWrapper";
 import { FAKEYOU_MERGED_TRANSLATIONS } from "./_i18n/FakeYouTranslations";
 import i18n from "i18next";
 import { initReactI18next } from "react-i18next";
+import ParticlesBG from "./Particles";
 
 i18n
   .use(initReactI18next) // passes i18n down to react-i18next
@@ -519,7 +520,9 @@ class App extends React.Component<Props, State> {
   public render() {
     return (
       <BrowserRouter>
-        <div id="main" className="mainwrap">
+        <div id="main" className="bg-gradient">
+          <ParticlesBG></ParticlesBG>
+
           <div id="viewable">
             {/* This is the old vocodes1.0-compatible username and version switch
             <MigrationTopNav

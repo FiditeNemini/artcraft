@@ -297,29 +297,27 @@ function TtsModelListFc(props: Props) {
                 <h1 className="display-3 fw-bold lh-1 mb-3 text-center text-lg-start">
                   Text to Speech
                 </h1>
-                <div className="d-flex justify-content-center">
-                  <p className="ani2 load-hidden lead mb-5 text-center text-lg-start">
-                    <Trans i18nKey="pages.ttsList.heroSubtitle">
-                      Use FakeYou's deepfake tech to say stuff with your
-                      favorite characters.
-                    </Trans>
-                  </p>
-                </div>
+                <p className="lead mb-5 text-center text-lg-start pe-xl-2">
+                  <Trans i18nKey="pages.ttsList.heroSubtitle">
+                    Use FakeYou's deepfake tech to say stuff with your favorite
+                    characters.
+                  </Trans>
+                </p>
               </div>
+            </Fade>
 
-              <div>
-                <div className="d-grid gap-3 d-lg-flex justify-content-lg-start mb-4">
-                  <Link to="/">
-                    <button type="button" className="btn btn-primary w-100">
-                      Sign Up
-                    </button>
-                  </Link>
-                  <Link to="/clone">
-                    <button type="button" className="btn btn-secondary w-100">
-                      Clone My Voice!
-                    </button>
-                  </Link>
-                </div>
+            <Fade bottom delay={delay} duration={duration} distance={distance}>
+              <div className="d-grid gap-3 d-lg-flex justify-content-lg-start mb-4">
+                <Link to="/">
+                  <button type="button" className="btn btn-primary w-100">
+                    Sign Up
+                  </button>
+                </Link>
+                <Link to="/clone">
+                  <button type="button" className="btn btn-secondary w-100">
+                    Clone My Voice!
+                  </button>
+                </Link>
               </div>
             </Fade>
           </div>
