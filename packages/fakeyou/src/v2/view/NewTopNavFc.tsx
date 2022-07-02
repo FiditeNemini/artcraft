@@ -34,25 +34,25 @@ function NewTopNavFc(props: Props) {
     myDataLink = `/profile/${username}`;
   }
 
-  const [mobileHamburgerIsActive, setMobileHamburgerIsActive] =
-    useState<boolean>(false);
+  // const [mobileHamburgerIsActive, setMobileHamburgerIsActive] =
+  //   useState<boolean>(false);
 
-  const toggleHamburger = () => {
-    setMobileHamburgerIsActive(!mobileHamburgerIsActive);
-  };
+  // const toggleHamburger = () => {
+  //   setMobileHamburgerIsActive(!mobileHamburgerIsActive);
+  // };
 
-  const closeHamburger = () => {
-    // TODO: This is an ergonomic hack.
-    // The hamburger ideally should close whenever it is no longer active.
-    setMobileHamburgerIsActive(false);
-  };
+  // const closeHamburger = () => {
+  //   // TODO: This is an ergonomic hack.
+  //   // The hamburger ideally should close whenever it is no longer active.
+  //   setMobileHamburgerIsActive(false);
+  // };
 
-  const navbarClasses = mobileHamburgerIsActive
-    ? "navbar-menu is-active"
-    : "navbar-menu";
-  const navbarBurgerClasses = mobileHamburgerIsActive
-    ? "navbar-burger is-active"
-    : "navbar-burger";
+  // const navbarClasses = mobileHamburgerIsActive
+  //   ? "navbar-menu is-active"
+  //   : "navbar-menu";
+  // const navbarBurgerClasses = mobileHamburgerIsActive
+  //   ? "navbar-burger is-active"
+  //   : "navbar-burger";
 
   return (
     <>
@@ -131,13 +131,13 @@ function NewTopNavFc(props: Props) {
 
               <button
                 type="button"
-                className="btn-close btn-close-white"
+                className="btn-close btn-close-white me-0"
                 data-bs-dismiss="offcanvas"
                 aria-label="Close"
               ></button>
             </div>
             <div className="offcanvas-body">
-              <ul className="navbar-nav justify-content-start align-items-lg-center flex-grow-1 pe-3">
+              <ul className="navbar-nav justify-content-start align-items-lg-center flex-grow-1">
                 <li className="nav-item">
                   <Link
                     to={FrontendUrlConfig.cloneRequestPage()}

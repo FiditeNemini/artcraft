@@ -163,12 +163,11 @@ nav {
     font-weight: 600;
     color: #fff;
     text-decoration: none;
-    transition: 0.1s;
+    transition: 0.2s;
 
     &:hover {
       color: rgba($white, 0.6);
       text-decoration: none;
-      transition: 0.1s;
     }
   }
 }
@@ -335,19 +334,44 @@ nav {
   }
 }
 
-// Prevent Android devices from horizontal scrolling
-// Mine is 412x846.
-@media screen and (max-width: 412px) {
-  #root {
-    max-width: 380px;
-    margin: auto;
-  }
-}
+// // Prevent Android devices from horizontal scrolling
+// // Mine is 412x846.
+// @media screen and (max-width: 412px) {
+//   #root {
+//     max-width: 380px;
+//     margin: auto;
+//   }
+// }
 
 @media (min-width: 992px) {
   nav {
     .nav-bg-dark {
       background-color: #17101c00 !important;
+    }
+
+    // hover nav dropdown on desktop
+    &.navbar {
+      .nav-item {
+        &:hover {
+          .nav-link {
+            color: $white;
+          }
+          .dropdown-menu {
+            transition: 0.2s;
+            opacity: 1;
+            visibility: visible;
+            top: 100%;
+            transform: rotateX(0deg);
+          }
+        }
+        .dropdown-menu {
+          display: block;
+          opacity: 0;
+          visibility: hidden;
+          transition: 0.2s;
+          margin-top: 0;
+        }
+      }
     }
   }
 }
