@@ -213,7 +213,7 @@ function SignupPage(props: Props) {
   }
 
   let usernameInputClass = "form-control";
-  let usernameHelpClass = "form-text";
+  let usernameHelpClass = "form-text red";
   switch (usernameValid) {
     case FieldTriState.EMPTY_FALSE:
       break;
@@ -228,7 +228,7 @@ function SignupPage(props: Props) {
   }
 
   let emailInputClass = "form-control";
-  let emailHelpClass = "form-text";
+  let emailHelpClass = "form-text red";
   switch (emailValid) {
     case FieldTriState.EMPTY_FALSE:
       break;
@@ -243,7 +243,7 @@ function SignupPage(props: Props) {
   }
 
   let passwordInputClass = "form-control";
-  let passwordHelpClass = "form-text";
+  let passwordHelpClass = "form-text red";
   switch (passwordValid) {
     case FieldTriState.EMPTY_FALSE:
       break;
