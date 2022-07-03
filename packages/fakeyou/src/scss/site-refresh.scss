@@ -21,10 +21,6 @@ a {
   }
 }
 
-a.top-bar-text:hover {
-  color: $primary !important;
-}
-
 hr {
   border: 0;
   border-top: 1px solid $white;
@@ -175,7 +171,12 @@ code {
 }
 
 .form-text {
-  color: lighten($primary, 5%);
+  margin-top: 10px;
+  color: darken($white, 10%);
+
+  &.red {
+    color: lighten($primary, 5%);
+  }
 }
 
 .alert {
@@ -247,6 +248,7 @@ code {
     margin-left: auto;
     max-width: 1080px;
     border-radius: 8px;
+    backdrop-filter: blur(5px);
   }
 
   .panel {

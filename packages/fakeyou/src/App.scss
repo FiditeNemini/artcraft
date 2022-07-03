@@ -179,6 +179,10 @@ nav {
   }
 }
 
+a.top-bar-text:hover {
+  color: $primary !important;
+}
+
 .top-bar {
   display: flex;
   align-items: center;
@@ -188,7 +192,7 @@ nav {
   backdrop-filter: blur(5px);
   -webkit-backdrop-filter: blur(5px);
   border-bottom: 1px solid;
-  border-color: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.04);
 
   .top-bar-text {
     color: #fff;
@@ -290,10 +294,11 @@ nav {
 //   padding: 0 15px;
 // }
 
-// .git-sha {
-//   color: #999;
-//   font-size: 0.8rem;
-// }
+.git-sha {
+  color: #999;
+  font-size: 0.8rem;
+  margin-top: 10px;
+}
 
 // /* TAILWIND STYLE CLASSES */
 
