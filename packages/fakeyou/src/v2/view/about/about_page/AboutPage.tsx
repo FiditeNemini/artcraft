@@ -23,7 +23,7 @@ function AboutPage(props: Props) {
               </Fade>
             </div>
           </div>
-          <div className="col-lg-6 px-md-2 px-lg-5 px-xl-2">
+          <div className="col-lg-6 px-md-2 ps-lg-5 ps-xl-2">
             <div className="text-center text-lg-start">
               <Fade bottom cascade duration={duration}>
                 <div>
