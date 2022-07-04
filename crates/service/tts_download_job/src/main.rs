@@ -10,9 +10,7 @@
 
 #[macro_use] extern crate serde_derive;
 
-pub mod job_queries;
 pub mod script_execution;
-pub mod util;
 
 use anyhow::anyhow;
 use chrono::Utc;
@@ -25,25 +23,23 @@ use container_common::filesystem::check_file_exists::check_file_exists;
 use container_common::filesystem::safe_delete_temp_directory::safe_delete_temp_directory;
 use container_common::filesystem::safe_delete_temp_file::safe_delete_temp_file;
 use container_common::hashing::hash_file_sha2::hash_file_sha2;
-use crate::job_queries::tts_download_job_queries::TtsUploadJobRecord;
-use crate::job_queries::tts_download_job_queries::grab_job_lock_and_mark_pending;
-use crate::job_queries::tts_download_job_queries::insert_tts_model;
-use crate::job_queries::tts_download_job_queries::mark_tts_upload_job_done;
-use crate::job_queries::tts_download_job_queries::mark_tts_upload_job_failure;
-use crate::job_queries::tts_download_job_queries::query_tts_upload_job_records;
-use crate::script_execution::google_drive_download_command::GoogleDriveDownloadCommand;
 use crate::script_execution::tacotron_model_check_command::TacotronModelCheckCommand;
 use crate::script_execution::talknet_model_check_command::TalknetModelCheckCommand;
-use data_encoding::{HEXUPPER, HEXLOWER, HEXLOWER_PERMISSIVE};
 use database_queries::column_types::tts_model_type::TtsModelType;
 use database_queries::mediators::badge_granter::BadgeGranter;
 use database_queries::mediators::firehose_publisher::FirehosePublisher;
+use database_queries::queries::tts::tts_download_jobs::tts_download_job_queries::TtsUploadJobRecord;
+use database_queries::queries::tts::tts_download_jobs::tts_download_job_queries::grab_job_lock_and_mark_pending;
+use database_queries::queries::tts::tts_download_jobs::tts_download_job_queries::insert_tts_model;
+use database_queries::queries::tts::tts_download_jobs::tts_download_job_queries::mark_tts_upload_job_done;
+use database_queries::queries::tts::tts_download_jobs::tts_download_job_queries::mark_tts_upload_job_failure;
+use database_queries::queries::tts::tts_download_jobs::tts_download_job_queries::query_tts_upload_job_records;
+use google_drive_common::google_drive_download_command::GoogleDriveDownloadCommand;
 use jobs_common::noop_logger::NoOpLogger;
 use jobs_common::redis_job_status_logger::RedisJobStatusLogger;
 use log::{warn, info};
 use r2d2_redis::RedisConnectionManager;
 use r2d2_redis::r2d2;
-use ring::digest::{Context, Digest, SHA256};
 use sqlx::MySqlPool;
 use sqlx::mysql::MySqlPoolOptions;
 use std::fs::File;

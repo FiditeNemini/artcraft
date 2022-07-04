@@ -5,12 +5,9 @@
 use anyhow::anyhow;
 use chrono::Utc;
 use container_common::anyhow_result::AnyhowResult;
-use database_queries::tokens::Tokens;
+use crate::tokens::Tokens;
 use sqlx::MySqlPool;
 use std::path::Path;
-
-// TODO(2022-02-10): Move these queries to the 'database_queries' crate
-//  I moved tts_inference_job queries out already.
 
 /// table: tts_model_upload_jobs
 #[derive(Debug)]

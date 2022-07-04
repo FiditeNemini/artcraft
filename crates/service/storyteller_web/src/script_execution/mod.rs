@@ -1,8 +1,5 @@
 pub mod ffmpeg_generate_preview_image_command;
 pub mod ffmpeg_generate_preview_video_command;
-pub mod google_drive_download_command;
 pub mod imagemagick_generate_preview_image_command;
-pub mod tacotron_model_check_command;
-pub mod talknet_model_check_command;
 pub mod wav2lip_inference_command;
 pub mod wav2lip_process_upload_command;

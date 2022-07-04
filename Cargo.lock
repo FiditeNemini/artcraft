@@ -1731,6 +1731,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "google_drive_common"
+version = "0.0.1"
+dependencies = [
+ "anyhow",
+ "container_common",
+ "log",
+ "tempdir",
+]
+
+[[package]]
 name = "h2"
 version = "0.2.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3805,6 +3815,7 @@ dependencies = [
  "futures 0.1.31",
  "futures 0.3.17",
  "futures-util",
+ "google_drive_common",
  "hex",
  "hmac 0.10.1",
  "hostname",
@@ -4380,6 +4391,37 @@ name = "try-lock"
 version = "0.2.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "59547bce71d9c38b83d9c0e92b6066c4253371f15005def0c30d9657f50c7642"
+
+[[package]]
+name = "tts-download-job"
+version = "0.0.1"
+dependencies = [
+ "anyhow",
+ "chrono",
+ "clap",
+ "config",
+ "container_common",
+ "database_queries",
+ "dotenv",
+ "easyenv",
+ "google_drive_common",
+ "hostname",
+ "hyper 0.14.14",
+ "jobs_common",
+ "lfu",
+ "log",
+ "newrelic-telemetry",
+ "r2d2_redis",
+ "serde",
+ "serde_derive",
+ "serde_json",
+ "sqlx",
+ "storage_buckets_common",
+ "subprocess",
+ "tempdir",
+ "tokio 1.13.0",
+ "tts_common",
+]
 
 [[package]]
 name = "tts-inference-job"

@@ -34,12 +34,12 @@ use crate::job_queries::w2l_download_job_queries::mark_w2l_template_upload_job_p
 use crate::job_queries::w2l_download_job_queries::query_w2l_template_upload_job_records;
 use crate::script_execution::ffmpeg_generate_preview_image_command::FfmpegGeneratePreviewImageCommand;
 use crate::script_execution::ffmpeg_generate_preview_video_command::FfmpegGeneratePreviewVideoCommand;
-use crate::script_execution::google_drive_download_command::GoogleDriveDownloadCommand;
 use crate::script_execution::imagemagick_generate_preview_image_command::ImagemagickGeneratePreviewImageCommand;
 use crate::script_execution::wav2lip_process_upload_command::{Wav2LipPreprocessClient, Wav2LipPreprocessError};
 use data_encoding::{HEXUPPER, HEXLOWER, HEXLOWER_PERMISSIVE};
 use database_queries::mediators::badge_granter::BadgeGranter;
 use database_queries::mediators::firehose_publisher::FirehosePublisher;
+use google_drive_common::google_drive_download_command::GoogleDriveDownloadCommand;
 use jobs_common::noop_logger::NoOpLogger;
 use jobs_common::redis_job_status_logger::RedisJobStatusLogger;
 use log::{warn, info};

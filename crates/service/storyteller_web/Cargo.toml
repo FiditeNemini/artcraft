@@ -13,16 +13,7 @@ publish = false
 name = "storyteller-web"
 path = "src/main.rs"
 
-## OBS websocket server
-#[[bin]]
-#name = "obs-gateway-server"
-#path = "src/obs_gateway_server.rs"
-
 # Jobs for managing downloads and inference
-[[bin]]
-name = "tts-download-job"
-path = "src/tts_download_job.rs"
-
 [[bin]]
 name = "w2l-download-job"
 path = "src/w2l_download_job.rs"
@@ -37,6 +28,7 @@ path = "src/w2l_inference_job.rs"
 config = { path = "../../lib/config" }
 container_common = { path = "../../lib/container_common" }
 database_queries = { path = "../../lib/database_queries" }
+google_drive_common = { path = "../../lib/google_drive_common" }
 http_server_common = { path = "../../lib/http_server_common" }
 jobs_common = { path = "../../lib/jobs_common" }
 redis_common = { path = "../../lib/redis_common" }
