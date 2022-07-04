@@ -24,12 +24,10 @@ body {
 .bg-gradient {
   background: rgb(13, 16, 25) !important;
 
-  background: linear-gradient(
-    325deg,
-    rgba(13, 16, 25, 1) 0%,
-    rgba(42, 21, 34, 1) 55%,
-    rgba(16, 14, 26, 1) 100%
-  ) !important;
+  background: linear-gradient(325deg,
+      rgba(13, 16, 25, 1) 0%,
+      rgba(42, 21, 34, 1) 55%,
+      rgba(16, 14, 26, 1) 100%) !important;
   background-repeat: no-repeat;
   background-attachment: fixed;
 }
@@ -180,7 +178,7 @@ nav {
 }
 
 a.top-bar-text:hover {
-  color: $primary !important;
+  color: $primary  !important;
 }
 
 .top-bar {
@@ -394,6 +392,7 @@ a.top-bar-text:hover {
           .nav-link {
             color: $white;
           }
+
           .dropdown-menu {
             transition: 0.2s;
             opacity: 1;
@@ -402,6 +401,7 @@ a.top-bar-text:hover {
             transform: rotateX(0deg);
           }
         }
+
         .dropdown-menu {
           display: block;
           opacity: 0;

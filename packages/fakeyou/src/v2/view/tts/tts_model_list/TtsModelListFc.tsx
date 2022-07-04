@@ -332,13 +332,14 @@ function TtsModelListFc(props: Props) {
 
       {twitchTtsNotice}
 
-      <div className="container-panel pt-4 pb-5">
+      <div className="container">
         <Fade bottom distance={distance} delay={delay2} duration={duration}>
           <div className="panel p-3 p-lg-4 load-hidden mt-5 mt-lg-0">
-            <h1 className="panel-title fw-bold">Create TTS</h1>
+            <i className="fas fa-volume-high"></i>
+            <h1 className="panel-title fw-bold"> Create TTS</h1>
             <div className="py-6">
-              <div className="d-flex flex-column gap-4">
-                <form onSubmit={handleFormSubmit}>
+              <div className="d-flex  gap-4">
+                <form className="w-100" onSubmit={handleFormSubmit}>
                   <MultiDropdownSearch
                     allTtsCategories={props.allTtsCategories}
                     allTtsModels={props.ttsModels}
@@ -369,11 +370,11 @@ function TtsModelListFc(props: Props) {
 
                   {directViewLink}
 
-                  <div className="field">
-                    <div className="control">
+                  <div className="field my-4">
+                    <div className="input-group input-group-lg control">
                       <textarea
                         onChange={handleChangeText}
-                        className="textarea is-large"
+                        className="textarea w-100" style={{ minHeight: '200px' }}
                         value={props.textBuffer}
                         placeholder={t("pages.ttsList.placeholderTextGoesHere")}
                       ></textarea>
@@ -383,18 +384,18 @@ function TtsModelListFc(props: Props) {
                   {maybeError}
 
                   <div className="button-group">
-                    <div className="columns is-mobile">
-                      <div className="column has-text-centered">
+                    <div className="d-flex flex-row justify-content-around">
+                      <div className="col-5 text-center">
                         <button
-                          className="button is-danger is-large"
+                          className="btn btn-primary w-100"
                           disabled={remainingCharactersButtonDisabled}
                         >
                           {t("pages.ttsList.buttonSpeak")}
                         </button>
                       </div>
-                      <div className="column has-text-centered">
+                      <div className="col-5 text-center">
                         <button
-                          className="button is-danger is-light is-large"
+                          className="btn btn-secondary w-100"
                           onClick={handleClearClick}
                         >
                           {t("pages.ttsList.buttonClear")}
@@ -406,8 +407,8 @@ function TtsModelListFc(props: Props) {
               </div>
             </div>
           </div>
-        </Fade>
-      </div>
+        </Fade >
+      </div >
 
       <br />
       <br />
@@ -434,7 +435,7 @@ function TtsModelListFc(props: Props) {
       <SessionTtsModelUploadResultListFc
         modelUploadJobs={props.ttsModelUploadJobs}
       />
-    </div>
+    </div >
   );
 }
 

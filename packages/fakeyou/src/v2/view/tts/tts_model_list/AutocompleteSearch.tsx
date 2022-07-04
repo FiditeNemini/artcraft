@@ -15,7 +15,7 @@ import { t } from 'i18next';
 interface Props {
   allTtsCategories: TtsCategoryType[],
   allTtsModels: TtsModelListItem[],
-  allTtsModelsByTokenMap: Map<string,TtsModelListItem>,
+  allTtsModelsByTokenMap: Map<string, TtsModelListItem>,
 
   dropdownCategories: TtsCategoryType[][],
   setDropdownCategories: (dropdownCategories: TtsCategoryType[][]) => void,
@@ -37,18 +37,18 @@ export function AutocompleteSearch(props: Props) {
   return (
     <>
       <div className="field">
-        <strong style={{ display: "block", margin: "7px 0 0 0"}}>{t('ttsListPage.search')}</strong>
-        <div className="control has-icons-left">
+        <strong style={{ display: "block", margin: "7px 0 0 0" }}>{t('ttsListPage.search')}</strong>
+        <div className="control" style={{ width: '100%;' }}>
 
           {/* NB: See note above about this library. */}
           <Autocomplete
-            getItemValue={(item : TtsModelListItem) => item.title}
+            getItemValue={(item: TtsModelListItem) => item.title}
             items={props.allTtsModels}
             renderInput={(props) => (
-              <input 
-                className="input" 
-                type="text" 
-                placeholder={t('ttsListPage.searchTerm')} 
+              <input
+                className="input"
+                type="text"
+                placeholder={t('ttsListPage.searchTerm')}
                 value={searchValue} {...props} />
             )}
             renderMenu={children => (
@@ -56,14 +56,14 @@ export function AutocompleteSearch(props: Props) {
                 {children.slice(0, maxMenuItems)}
               </div>
             )}
-            renderItem={(item : TtsModelListItem, isHighlighted : boolean) =>
+            renderItem={(item: TtsModelListItem, isHighlighted: boolean) =>
               <div style={{ background: isHighlighted ? 'lightgray' : 'white' }}>
                 {item.title}
               </div>
             }
             value={searchValue}
-            onChange={(e : any) => setSearchValue(e.target.value) }
-            onSelect={(val : string, item: TtsModelListItem) => {
+            onChange={(e: any) => setSearchValue(e.target.value)}
+            onSelect={(val: string, item: TtsModelListItem) => {
               // Nothing selected.
               props.setSelectedCategories([]);
 
@@ -81,7 +81,7 @@ export function AutocompleteSearch(props: Props) {
               props.setDropdownCategories(newDropdownCategories);
               props.setMaybeSelectedTtsModel(item)
             }}
-            shouldItemRender={(item : TtsModelListItem, value) => {
+            shouldItemRender={(item: TtsModelListItem, value) => {
               // TODO: A trie would be so much better. Ugh, this is so bad.
               let test = value.toLocaleLowerCase().trim();
               if (test.length === 0) {
@@ -93,9 +93,9 @@ export function AutocompleteSearch(props: Props) {
             inputProps={{ id: 'states-autocomplete' }}
             wrapperStyle={{ position: 'relative', display: 'inline-block' }}
           />
-          <span className="icon is-small is-left">
+          {/* <span className="icon is-small is-left">
             <FontAwesomeIcon icon={faSearch} />
-          </span>
+          </span> */}
         </div>
       </div>
     </>

@@ -2,7 +2,7 @@ import { COMMON_TRANSLATIONS, MergeDeepDictionary } from '@storyteller/component
 
 // Use \u{00a0} = &nbsp; character literal
 
-const FAKEYOU_TRANSLATIONS : any = {
+const FAKEYOU_TRANSLATIONS: any = {
   // English: 46.6% Twitch (#1), 30+% FakeYou (#1)
   en: {
     translation: {
@@ -269,6 +269,6 @@ const FAKEYOU_TRANSLATIONS : any = {
 }
 
 // TODO: Type these as i18next dictionaries
-const FAKEYOU_MERGED_TRANSLATIONS : any = MergeDeepDictionary(FAKEYOU_TRANSLATIONS, COMMON_TRANSLATIONS);
+const FAKEYOU_MERGED_TRANSLATIONS: any = MergeDeepDictionary(FAKEYOU_TRANSLATIONS, COMMON_TRANSLATIONS);
 
 export { FAKEYOU_MERGED_TRANSLATIONS }
