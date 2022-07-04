@@ -48,20 +48,3 @@ $danger-dark: darken($danger, 10%);
 
 $accent-light: desaturate(lighten($accent, 20%), 15%);
 $accent-dark: saturate(darken($accent, 15%), 10%);
-
-// Add all these to $theme-colors
-// Each addition adds like 4KB
-$theme-colors: (
-  "lighter": $lighter,
-  "primary-light": $primary-light,
-  "primary-dark": $primary-dark,
-  "info-light": $info-light,
-  "info-dark": $info-dark,
-  "warning-light": $warning-light,
-  // 'warning-dark': $warning-dark,
-  "danger-light": $danger-light,
-  // 'danger-dark': $danger-dark,
-  "workflow": $workflow,
-  "accent": $accent,
-  "accent-dark": $accent-dark,
-);
