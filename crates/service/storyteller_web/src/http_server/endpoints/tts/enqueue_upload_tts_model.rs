@@ -137,8 +137,15 @@ pub async fn upload_tts_model_handler(
   let title = request.title.to_string();
   let download_url = request.download_url.to_string();
 
-  if is_bad_tts_model_download_url(&download_url) {
-    return Err(UploadTtsModelError::BadInput("Bad model download URL".to_string()));
+  match is_bad_tts_model_download_url(&download_url) {
+    Ok(false) => {} // Ok case
+    Ok(true) => {
+      return Err(UploadTtsModelError::BadInput("Bad model download URL".to_string()));
+    }
+    Err(err) => {
+      warn!("Error parsing url: {:?}", err);
+      return Err(UploadTtsModelError::BadInput("Bad model download URL".to_string()));
+    }
   }
 
   let tts_model_type = "tacotron2".to_string();
