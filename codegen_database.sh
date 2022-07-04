@@ -29,7 +29,7 @@ build_tts_download_job() {
   # NB: This imports the inference/upload job queries
   # It should also import the shared database lib queries, but something(???) broke.
   pushd crates/service/tts_download_job
-  SQLX_OFFLINE=true cargo sqlx prepare tts_download_job
+  SQLX_OFFLINE=true cargo sqlx prepare -- --bin tts-download-job
   popd
 }
 
@@ -37,7 +37,7 @@ build_tts_inference_job() {
   # NB: This imports the inference/upload job queries
   # It should also import the shared database lib queries, but something(???) broke.
   pushd crates/service/tts_inference_job
-  SQLX_OFFLINE=true cargo sqlx prepare tts_inference_job
+  SQLX_OFFLINE=true cargo sqlx prepare -- --bin tts-inference-job
   popd
 }
 
