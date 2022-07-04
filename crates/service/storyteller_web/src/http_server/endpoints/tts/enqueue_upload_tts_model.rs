@@ -19,6 +19,7 @@ use sqlx::error::Error::Database;
 use sqlx::mysql::MySqlDatabaseError;
 use std::fmt;
 use std::sync::Arc;
+use config::bad_urls::is_bad_tts_model_download_url;
 
 #[derive(Deserialize)]
 pub enum TtsModelType {
@@ -135,6 +136,10 @@ pub async fn upload_tts_model_handler(
   let uuid = request.idempotency_token.to_string();
   let title = request.title.to_string();
   let download_url = request.download_url.to_string();
+
+  if is_bad_tts_model_download_url(&download_url) {
+    return Err(UploadTtsModelError::BadInput("Bad model download URL".to_string()));
+  }
 
   let tts_model_type = "tacotron2".to_string();
   let creator_set_visibility = "public".to_string();

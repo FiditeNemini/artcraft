@@ -17,3 +17,4 @@ path = "src/lib.rs"
 [dependencies]
 anyhow = "1.0.40"
 easyenv = "0.0.6"
+url = "2.2.2"

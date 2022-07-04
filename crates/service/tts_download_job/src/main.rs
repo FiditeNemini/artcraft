@@ -14,6 +14,7 @@ pub mod script_execution;
 
 use anyhow::anyhow;
 use chrono::Utc;
+use config::bad_urls::is_bad_tts_model_download_url;
 use config::common_env::CommonEnv;
 use config::shared_constants::DEFAULT_MYSQL_CONNECTION_STRING;
 use config::shared_constants::DEFAULT_RUST_LOG;
@@ -330,6 +331,11 @@ async fn process_job(downloader: &Downloader, job: &TtsUploadJobRecord) -> Anyho
   let download_url = job.download_url.as_ref()
     .map(|c| c.to_string())
     .unwrap_or("".to_string());
+
+  if is_bad_tts_model_download_url(&download_url)? {
+    warn!("Bad download URL: `{}`", &download_url);
+    return Err(anyhow!("Bad download URL: `{}`", &download_url));
+  }
 
   let download_filename = match downloader.google_drive_downloader.download_file(&download_url, &temp_dir).await {
     Ok(filename) => filename,

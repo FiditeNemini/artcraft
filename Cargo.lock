@@ -1061,6 +1061,7 @@ version = "0.0.1"
 dependencies = [
  "anyhow",
  "easyenv",
+ "url 2.2.2",
 ]
 
 [[package]]
