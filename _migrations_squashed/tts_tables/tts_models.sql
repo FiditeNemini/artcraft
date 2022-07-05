@@ -22,6 +22,13 @@ CREATE TABLE tts_models (
       'talknet'
   ) NOT NULL DEFAULT 'not-set',
 
+  -- The name of the type of pipeline to use, eg "legacy_fakeyou", "legacy_vocodes", "english_v1", etc.
+  -- New pipelines may be added at any point in the future and the source of truth for them will mostly
+  -- live in the `storyteller-ml` repository.
+  -- Older models and brand new models will have this field set to null, and we'll infer which value to
+  -- lazily backfill based on the creation date and language setting.
+  text_pipeline_type VARCHAR(64) DEFAULT NULL,
+
   -- For models distributed as archives/bundles (eg. TalkNet), we can pack
   -- in a vocoder. Note that this vocoder does not have to be used.
   has_self_contained_vocoder BOOLEAN NOT NULL DEFAULT FALSE,
@@ -34,6 +41,7 @@ CREATE TABLE tts_models (
   -- in a pitch model.
   has_self_contained_pitch_model BOOLEAN NOT NULL DEFAULT FALSE,
 
+  -- NB(2022-07-05): THIS IS NOW MEANINGLESS AND SUPERSEDED BY `TEXT_PIPELINE_TYPE`.
   -- NB: DO NOT CHANGE ORDER; APPEND ONLY!
   -- How text should be handled.
   text_preprocessing_algorithm ENUM(
