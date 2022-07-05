@@ -10,7 +10,9 @@ use chrono::{DateTime, Utc};
 use crate::AnyhowResult;
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 use crate::server_state::ServerState;
-use database_queries::queries::tts::tts_models::get_tts_model::{TtsModelRecordForResponse, get_tts_model_by_token};
+use database_queries::column_types::record_visibility::RecordVisibility;
+use database_queries::column_types::vocoder_type::VocoderType;
+use database_queries::queries::tts::tts_models::get_tts_model::get_tts_model_by_token;
 use log::{info, warn, log};
 use regex::Regex;
 use sqlx::MySqlPool;
@@ -19,8 +21,7 @@ use sqlx::error::Error::Database;
 use sqlx::mysql::MySqlDatabaseError;
 use std::fmt;
 use std::sync::Arc;
-use database_queries::column_types::record_visibility::RecordVisibility;
-use database_queries::column_types::vocoder_type::VocoderType;
+use tts_common::text_pipeline_defaults::guess_text_pipeline_heuristic;
 
 // =============== Request ===============
 
@@ -43,6 +44,12 @@ pub struct GetTtsModelSuccessResponse {
 pub struct TtsModelInfo {
   pub model_token: String,
   pub tts_model_type: String,
+
+  /// NB: text_pipeline_type may not always be present in the database, but if absent we'll
+  /// inform the frontend (and inference pipeline) of our best guess according to a heuristic.
+  pub text_pipeline_type: Option<String>,
+  pub text_pipeline_type_guess: String,
+
   pub maybe_default_pretrained_vocoder: Option<VocoderType>,
   pub text_preprocessing_algorithm: String,
 
@@ -174,12 +181,18 @@ pub async fn get_tts_model_handler(
     model.maybe_moderator_fields = None;
   }
 
+  // TODO: Use language to infer as well.
+  let text_pipeline_type_guess =
+      guess_text_pipeline_heuristic(Some(model.created_at.clone()));
+
   // Map to public response type.
   let response = GetTtsModelSuccessResponse {
     success: true,
     model: TtsModelInfo {
       model_token: model.model_token,
       tts_model_type: model.tts_model_type,
+      text_pipeline_type: model.text_pipeline_type,
+      text_pipeline_type_guess: text_pipeline_type_guess.to_string(),
       maybe_default_pretrained_vocoder: model.maybe_default_pretrained_vocoder,
       text_preprocessing_algorithm: model.text_preprocessing_algorithm,
       creator_user_token: model.creator_user_token,

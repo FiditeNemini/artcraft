@@ -17,8 +17,12 @@ static ENGLISH_V1_EPOCH : Lazy<DateTime<Utc>> = Lazy::new(|| {
 /// New models won't necessarily have a user-selected text pipeline (so we'll guess),
 /// and old models will need to be backfilled since we never collected that information.
 ///
+/// There will always be a guess returned.
+///
 ///   maybe_model_created_at - `created_at` timestamp from database
 pub fn guess_text_pipeline_heuristic(maybe_model_created_at: Option<DateTime<Utc>>) -> &'static str {
+
+  // TODO: Use language to infer as well.
 
   if let Some(created_at) = maybe_model_created_at {
     if created_at < *ENGLISH_V1_EPOCH {

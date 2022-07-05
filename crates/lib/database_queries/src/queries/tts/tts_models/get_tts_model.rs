@@ -10,9 +10,13 @@ use sqlx::MySqlPool;
 // FIXME: This is the old style of query scoping and shouldn't be copied.
 //  The moderator-only fields are good practice, though.
 
-pub struct TtsModelRecordForResponse {
+pub struct TtsModelRecord {
   pub model_token: String,
   pub tts_model_type: String,
+
+  /// NB: text_pipeline_type may not always be present in the database.
+  pub text_pipeline_type: Option<String>,
+
   pub maybe_default_pretrained_vocoder: Option<VocoderType>,
   pub text_preprocessing_algorithm: String,
 
@@ -61,7 +65,7 @@ pub async fn get_tts_model_by_token(
   tts_model_token: &str,
   can_see_deleted: bool,
   mysql_pool: &MySqlPool
-) -> AnyhowResult<Option<TtsModelRecordForResponse>> {
+) -> AnyhowResult<Option<TtsModelRecord>> {
 
   let maybe_record = if can_see_deleted {
     select_including_deleted(tts_model_token, mysql_pool).await
@@ -90,9 +94,10 @@ pub async fn get_tts_model_by_token(
     maybe_vocoder = Some(VocoderType::from_str(vocoder)?);
   }
 
-  let model_for_response = TtsModelRecordForResponse {
+  let model_for_response = TtsModelRecord {
     model_token: model.model_token,
     tts_model_type: model.tts_model_type,
+    text_pipeline_type: model.text_pipeline_type,
     maybe_default_pretrained_vocoder: maybe_vocoder,
     text_preprocessing_algorithm: model.text_preprocessing_algorithm,
     creator_user_token: model.creator_user_token,
@@ -136,6 +141,7 @@ async fn select_including_deleted(
 SELECT
     tts.token as model_token,
     tts.tts_model_type,
+    tts.text_pipeline_type,
     tts.text_preprocessing_algorithm,
     tts.maybe_default_pretrained_vocoder,
 
@@ -191,6 +197,7 @@ async fn select_without_deleted(
 SELECT
     tts.token as model_token,
     tts.tts_model_type,
+    tts.text_pipeline_type,
     tts.text_preprocessing_algorithm,
     tts.maybe_default_pretrained_vocoder,
 
@@ -243,6 +250,7 @@ WHERE
 struct InternalTtsModelRecordRaw {
   pub model_token: String,
   pub tts_model_type: String,
+  pub text_pipeline_type: Option<String>,
   pub maybe_default_pretrained_vocoder: Option<String>,
   pub text_preprocessing_algorithm: String,
 
