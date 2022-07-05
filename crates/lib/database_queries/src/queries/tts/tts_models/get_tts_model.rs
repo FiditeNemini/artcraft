@@ -10,8 +10,6 @@ use sqlx::MySqlPool;
 // FIXME: This is the old style of query scoping and shouldn't be copied.
 //  The moderator-only fields are good practice, though.
 
-// TODO/FIXME : This struct is returned publicly in some endpoints!
-#[derive(Serialize)]
 pub struct TtsModelRecordForResponse {
   pub model_token: String,
   pub tts_model_type: String,
@@ -48,7 +46,6 @@ pub struct TtsModelRecordForResponse {
 
 /// "Moderator-only fields" that we wouldn't want to expose to ordinary users.
 /// It's the web endpoint controller's responsibility to clear these for non-mods.
-#[derive(Serialize)]
 pub struct TtsModelModeratorFields {
   pub creator_is_banned: bool,
   pub creator_ip_address_creation: String,

@@ -19,6 +19,8 @@ use sqlx::error::Error::Database;
 use sqlx::mysql::MySqlDatabaseError;
 use std::fmt;
 use std::sync::Arc;
+use database_queries::column_types::record_visibility::RecordVisibility;
+use database_queries::column_types::vocoder_type::VocoderType;
 
 // =============== Request ===============
 
@@ -33,7 +35,55 @@ pub struct GetTtsModelPathInfo {
 #[derive(Serialize)]
 pub struct GetTtsModelSuccessResponse {
   pub success: bool,
-  pub model: TtsModelRecordForResponse,
+  pub model: TtsModelInfo,
+}
+
+/// Publicly exposed TTS model fields.
+#[derive(Serialize)]
+pub struct TtsModelInfo {
+  pub model_token: String,
+  pub tts_model_type: String,
+  pub maybe_default_pretrained_vocoder: Option<VocoderType>,
+  pub text_preprocessing_algorithm: String,
+
+  pub creator_user_token: String,
+  pub creator_username: String,
+  pub creator_display_name: String,
+  pub creator_gravatar_hash: String,
+
+  pub title: String,
+  pub description_markdown: String,
+  pub description_rendered_html: String,
+
+  pub ietf_language_tag: String,
+  pub ietf_primary_language_subtag: String,
+
+  pub is_front_page_featured: bool,
+  pub is_twitch_featured: bool,
+
+  pub maybe_suggested_unique_bot_command: Option<String>,
+
+  pub creator_set_visibility: RecordVisibility,
+
+  pub is_locked_from_use: bool,
+  pub is_locked_from_user_modification: bool,
+
+  pub created_at: DateTime<Utc>,
+  pub updated_at: DateTime<Utc>,
+
+  /// NB: Moderator fields are sensitive and should only be displayed for moderators!
+  pub maybe_moderator_fields: Option<TtsModelModeratorFieldInfo>,
+}
+
+/// "Moderator-only fields" that we wouldn't want to expose to ordinary users.
+/// It's the web endpoint controller's responsibility to clear these for non-mods.
+#[derive(Serialize)]
+pub struct TtsModelModeratorFieldInfo {
+  pub creator_is_banned: bool,
+  pub creator_ip_address_creation: String,
+  pub creator_ip_address_last_update: String,
+  pub user_deleted_at: Option<DateTime<Utc>>,
+  pub mod_deleted_at: Option<DateTime<Utc>>,
 }
 
 // =============== Error Response ===============
@@ -124,9 +174,41 @@ pub async fn get_tts_model_handler(
     model.maybe_moderator_fields = None;
   }
 
+  // Map to public response type.
   let response = GetTtsModelSuccessResponse {
     success: true,
-    model,
+    model: TtsModelInfo {
+      model_token: model.model_token,
+      tts_model_type: model.tts_model_type,
+      maybe_default_pretrained_vocoder: model.maybe_default_pretrained_vocoder,
+      text_preprocessing_algorithm: model.text_preprocessing_algorithm,
+      creator_user_token: model.creator_user_token,
+      creator_username: model.creator_username,
+      creator_display_name: model.creator_display_name,
+      creator_gravatar_hash: model.creator_gravatar_hash,
+      title: model.title,
+      description_markdown: model.description_markdown,
+      description_rendered_html: model.description_rendered_html,
+      ietf_language_tag: model.ietf_language_tag,
+      ietf_primary_language_subtag: model.ietf_primary_language_subtag,
+      is_front_page_featured: model.is_front_page_featured,
+      is_twitch_featured: model.is_twitch_featured,
+      maybe_suggested_unique_bot_command: model.maybe_suggested_unique_bot_command,
+      creator_set_visibility: model.creator_set_visibility,
+      is_locked_from_use: model.is_locked_from_use,
+      is_locked_from_user_modification: model.is_locked_from_user_modification,
+      created_at: model.created_at,
+      updated_at: model.updated_at,
+      maybe_moderator_fields: model.maybe_moderator_fields.map(|mod_fields| {
+        TtsModelModeratorFieldInfo {
+          creator_is_banned: mod_fields.creator_is_banned,
+          creator_ip_address_creation: mod_fields.creator_ip_address_creation,
+          creator_ip_address_last_update: mod_fields.creator_ip_address_last_update,
+          user_deleted_at: mod_fields.user_deleted_at,
+          mod_deleted_at: mod_fields.mod_deleted_at,
+        }
+      })
+    },
   };
 
   let body = serde_json::to_string(&response)
