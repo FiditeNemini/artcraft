@@ -275,6 +275,8 @@ async fn main() -> AnyhowResult<()> {
 
   let is_debug_worker = easyenv::get_env_bool_or_default("IS_DEBUG_WORKER", false);
 
+  info!("Is debug worker? {}", is_debug_worker);
+
   let inferencer = JobArgs {
     download_temp_directory: temp_directory,
     mysql_pool,
