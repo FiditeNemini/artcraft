@@ -4,6 +4,8 @@ export interface TtsModel {
   model_token: string,
   title: string,
   tts_model_type: string,
+  text_pipeline_type: string | null,
+  text_pipeline_type_guess: string,
   maybe_default_pretrained_vocoder: string | null,
   text_preprocessing_algorithm: string,
   creator_user_token: string,

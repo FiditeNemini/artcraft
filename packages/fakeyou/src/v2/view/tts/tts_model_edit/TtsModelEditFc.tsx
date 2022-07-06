@@ -12,6 +12,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faHeadphones, faHome, faRobot } from '@fortawesome/free-solid-svg-icons';
 import { faTwitch } from '@fortawesome/free-brands-svg-icons';
 import { DEFAULT_MODEL_LANGUAGE, SUPPORTED_MODEL_LANGUAGE_TAG_TO_FULL } from '@storyteller/components/src/i18n/SupportedModelLanguages';
+import { TEXT_PIPELINE_NAMES } from '@storyteller/components/src/constants/TextPipeline';
 
 const DEFAULT_VISIBILITY = 'public';
 
@@ -34,6 +35,7 @@ function TtsModelEditFc(props: Props) {
 
   // Fields
   const [title, setTitle] = useState("");
+  const [textPipelineType, setTextPipelineType] = useState<string|null>(null);
   const [descriptionMarkdown, setDescriptionMarkdown] = useState("");
   const [fullLanguageTag, setFullLanguageTag] = useState(""); // NB: Should be full IETF, eg. ["en", "en-US", "es-419", etc.]
   const [visibility, setVisibility] = useState(DEFAULT_VISIBILITY);
@@ -47,6 +49,10 @@ function TtsModelEditFc(props: Props) {
 
     if (GetTtsModelIsOk(model)) {
       setTtsModel(model);
+
+      // NB: empty string isn't a correct value for Rust to parse as an enum
+      // Server will also try to send us a guess if we don't have a value set in the DB.
+      setTextPipelineType(model.text_pipeline_type || model.text_pipeline_type_guess || null) 
 
       setTitle(model.title || "")
       setDescriptionMarkdown(model.description_markdown || "")
@@ -76,6 +82,10 @@ function TtsModelEditFc(props: Props) {
     const textValue = (ev.target as HTMLInputElement).value;
     setTitle(textValue);
     return false;
+  };
+
+  const handleTextPipelineChange = (ev: React.FormEvent<HTMLSelectElement>) => { 
+    setTextPipelineType((ev.target as HTMLSelectElement).value)
   };
 
   const handleDescriptionMarkdownChange = (ev: React.FormEvent<HTMLTextAreaElement>) => { 
@@ -139,6 +149,7 @@ function TtsModelEditFc(props: Props) {
       creator_set_visibility: visibility || DEFAULT_VISIBILITY,
       maybe_default_pretrained_vocoder: defaultPretrainedVocoder || DEFAULT_PRETRAINED_VOCODER,
       ietf_language_tag: fullLanguageTag || DEFAULT_MODEL_LANGUAGE,
+      text_pipeline_type: textPipelineType,
     }
 
     if (isModerator) {
@@ -311,6 +322,23 @@ function TtsModelEditFc(props: Props) {
             </div>
           </div>
 
+          <div className="field">
+            <label className="label">Text Pipeline</label>
+            <div className="control select">
+              <select 
+                name="text_pipeline_type" 
+                onChange={handleTextPipelineChange}
+                value={textPipelineType || "legacy_fakeyou"}
+                >
+                {Array.from(TEXT_PIPELINE_NAMES, ([textPipelineType, description]) => {
+                  return <option 
+                    key={textPipelineType}
+                    value={textPipelineType}
+                    >{description}</option>
+                })}
+              </select>
+            </div>
+          </div>
           <div className="field">
             <label className="label">Default vocoder</label>
             <div className="control select">

@@ -6,6 +6,7 @@ import { SessionWrapper } from '@storyteller/components/src/session/SessionWrapp
 import { Gravatar } from '@storyteller/components/src/elements/Gravatar';
 import { LanguageCodeToDescriptionWithDefault } from '@storyteller/components/src/i18n/SupportedModelLanguages';
 import { TtsInferenceJob } from '@storyteller/components/src/jobs/TtsInferenceJobs';
+import { TEXT_PIPELINE_NAMES } from '@storyteller/components/src/constants/TextPipeline';
 import { useParams, Link } from 'react-router-dom';
 import { v4 as uuidv4 } from 'uuid';
 import { FrontendUrlConfig } from '../../../../common/FrontendUrlConfig';
@@ -372,6 +373,12 @@ function TtsModelViewFc(props: Props) {
     <><code>/tts {ttsModel?.maybe_suggested_unique_bot_command}</code></> :
     <>not set (ask a moderator in <DiscordLink text="Discord" />)</> ;
 
+  const textPipelineType = !!ttsModel.text_pipeline_type ? 
+    ttsModel.text_pipeline_type :
+    ttsModel.text_pipeline_type_guess;
+
+  let textPipelineName = TEXT_PIPELINE_NAMES.get(textPipelineType) || "Unknown";
+
   return (
     <div className="content">
       <h1 className="title is-1"> {title} </h1>
@@ -418,8 +425,8 @@ function TtsModelViewFc(props: Props) {
             <td>{defaultVocoder}</td>
           </tr>
           <tr>
-            <th>Text preprocessing algorithm</th>
-            <td>{ttsModel?.text_preprocessing_algorithm}</td>
+            <th>Text pipeline</th>
+            <td>{textPipelineName}</td>
           </tr>
           <tr>
             <th>Upload date (UTC)</th>
