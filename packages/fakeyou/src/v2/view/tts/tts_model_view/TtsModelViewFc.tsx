@@ -373,11 +373,22 @@ function TtsModelViewFc(props: Props) {
     <><code>/tts {ttsModel?.maybe_suggested_unique_bot_command}</code></> :
     <>not set (ask a moderator in <DiscordLink text="Discord" />)</> ;
 
-  const textPipelineType = !!ttsModel.text_pipeline_type ? 
+  const textPipelineConfigured = ttsModel.text_pipeline_type; // NB: Might not bet set
+
+  const textPipelineUsed = !!ttsModel.text_pipeline_type ? 
     ttsModel.text_pipeline_type :
     ttsModel.text_pipeline_type_guess;
 
-  let textPipelineName = TEXT_PIPELINE_NAMES.get(textPipelineType) || "Unknown";
+  const UNKNOWN = "Unknown";
+
+  let textPipelineName = UNKNOWN;
+  
+  if (!!textPipelineConfigured) {
+    textPipelineName = TEXT_PIPELINE_NAMES.get(textPipelineConfigured) || UNKNOWN;
+  } else {
+    let configuredName = TEXT_PIPELINE_NAMES.get(textPipelineUsed) || UNKNOWN;
+    textPipelineName = `Not set; using default of ${configuredName}`;
+  }
 
   return (
     <div className="content">
