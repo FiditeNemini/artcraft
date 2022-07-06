@@ -50,9 +50,10 @@ pub struct EditTtsModelRequest {
   // NB: We calculate 'ietf_primary_language_subtag' from this value.
   pub ietf_language_tag: Option<String>,
 
+  pub text_pipeline_type: Option<String>,
+
   //pub updatable_slug: Option<String>,
   //pub tts_model_type: Option<String>,
-  //pub text_preprocessing_algorithm: Option<String>,
   //pub vocoder_token: Option<String>,
 
   // ========== Moderator options (protection) ==========
@@ -306,8 +307,8 @@ pub async fn edit_tts_model_handler(
 
 async fn update_mod_details(
   request: &Json<EditTtsModelRequest>,
-  mod_user_token: &str,
-  model_token: &str,
+  moderator_user_token: &str,
+  tts_model_token: &str,
   mysql_pool: &MySqlPool
 ) -> Result<(), EditTtsModelError> {
 
@@ -333,14 +334,14 @@ async fn update_mod_details(
 
   let query_result = edit_tts_model_moderator_details(
     &mysql_pool,
-    model_token,
+    tts_model_token,
     is_public_listing_approved,
     is_locked_from_user_modification,
     is_locked_from_use,
     maybe_suggested_unique_bot_command.as_deref(),
     is_front_page_featured,
     is_twitch_featured,
-    mod_user_token,
+    moderator_user_token,
     request.maybe_mod_comments.as_deref(),
   ).await;
 

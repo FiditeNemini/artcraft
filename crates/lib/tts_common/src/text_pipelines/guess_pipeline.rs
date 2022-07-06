@@ -1,7 +1,7 @@
 use std::ops::Deref;
 use chrono::{DateTime, Utc};
 use once_cell::sync::Lazy;
-use crate::text_pipelines::{ENGLISH_V1, LEGACY_FAKEYOU};
+use crate::text_pipelines::text_pipeline::TtsTextPipeline;
 
 const ENGLISH_V1_EPOCH_STR : &'static str = "2022-05-01T00:00:00.00Z";
 
@@ -20,27 +20,28 @@ static ENGLISH_V1_EPOCH : Lazy<DateTime<Utc>> = Lazy::new(|| {
 /// There will always be a guess returned.
 ///
 ///   maybe_model_created_at - `created_at` timestamp from database
-pub fn guess_text_pipeline_heuristic(maybe_model_created_at: Option<DateTime<Utc>>) -> &'static str {
+pub fn guess_text_pipeline_heuristic(maybe_model_created_at: Option<DateTime<Utc>>) -> TtsTextPipeline {
 
   // TODO: Use language to infer as well.
 
   if let Some(created_at) = maybe_model_created_at {
     if created_at < *ENGLISH_V1_EPOCH {
-      return LEGACY_FAKEYOU;
+      return TtsTextPipeline::LegacyFakeYou;
     }
   }
 
-  ENGLISH_V1
+  TtsTextPipeline::EnglishV1
 }
 
 #[cfg(test)]
 mod tests {
   use chrono::{DateTime, Utc};
-  use crate::text_pipeline_defaults::guess_text_pipeline_heuristic;
+  use crate::text_pipelines::guess_pipeline::guess_text_pipeline_heuristic;
+  use crate::text_pipelines::text_pipeline::TtsTextPipeline;
 
   #[test]
   fn new_models_just_created_with_no_date_use_english_v1() {
-    assert_eq!(guess_text_pipeline_heuristic(None), "english_v1");
+    assert_eq!(guess_text_pipeline_heuristic(None), TtsTextPipeline::EnglishV1);
   }
 
   #[test]
@@ -48,7 +49,7 @@ mod tests {
     let datetime = DateTime::parse_from_rfc3339("2022-07-01T00:00:00.00Z")
         .expect("should parse")
         .with_timezone(&Utc);
-    assert_eq!(guess_text_pipeline_heuristic(Some(datetime)), "english_v1");
+    assert_eq!(guess_text_pipeline_heuristic(Some(datetime)), TtsTextPipeline::EnglishV1);
   }
 
   #[test]
@@ -56,6 +57,6 @@ mod tests {
     let datetime = DateTime::parse_from_rfc3339("2022-01-01T00:00:00.00Z")
         .expect("should parse")
         .with_timezone(&Utc);
-    assert_eq!(guess_text_pipeline_heuristic(Some(datetime)), "legacy_fakeyou");
+    assert_eq!(guess_text_pipeline_heuristic(Some(datetime)), TtsTextPipeline::LegacyFakeYou);
   }
 }
