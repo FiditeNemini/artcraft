@@ -27,6 +27,7 @@ use std::fmt;
 use std::sync::Arc;
 use database_queries::queries::tts::tts_models::edit_tts_model_details::{edit_tts_model_details_as_author, edit_tts_model_details_as_mod};
 use database_queries::queries::tts::tts_models::edit_tts_model_moderator_details::edit_tts_model_moderator_details;
+use tts_common::text_pipelines::text_pipeline_type::TextPipelineType;
 use user_input_common::check_for_slurs::contains_slurs;
 
 const DEFAULT_IETF_LANGUAGE_TAG : &'static str = "en-US";
@@ -47,10 +48,12 @@ pub struct EditTtsModelRequest {
   pub creator_set_visibility: Option<String>,
   pub maybe_default_pretrained_vocoder: Option<VocoderType>,
 
+  // Text pipeline won't be set by default on model upload (for now),
+  // and a lot of existing models will have null values.
+  pub text_pipeline_type: Option<TextPipelineType>,
+
   // NB: We calculate 'ietf_primary_language_subtag' from this value.
   pub ietf_language_tag: Option<String>,
-
-  pub text_pipeline_type: Option<String>,
 
   //pub updatable_slug: Option<String>,
   //pub tts_model_type: Option<String>,
@@ -245,6 +248,9 @@ pub async fn edit_tts_model_handler(
     maybe_default_pretrained_vocoder = Some(vocoder);
   }
 
+  let text_pipeline_type = request.text_pipeline_type
+      .map(|pipeline_type| pipeline_type.to_str());
+
   let ip_address = get_request_ip(&http_request);
 
   let query_result = if is_author {
@@ -259,6 +265,7 @@ pub async fn edit_tts_model_handler(
       &ietf_primary_language_subtag,
       creator_set_visibility,
       maybe_default_pretrained_vocoder,
+      text_pipeline_type,
       &ip_address,
     ).await
   } else {
@@ -273,6 +280,7 @@ pub async fn edit_tts_model_handler(
       &ietf_primary_language_subtag,
       creator_set_visibility,
       maybe_default_pretrained_vocoder,
+      text_pipeline_type,
       &user_session.user_token,
     ).await
   };

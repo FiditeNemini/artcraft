@@ -22,7 +22,7 @@ use sqlx::mysql::MySqlDatabaseError;
 use std::fmt;
 use std::sync::Arc;
 use tts_common::text_pipelines::guess_pipeline::guess_text_pipeline_heuristic;
-use tts_common::text_pipelines::text_pipeline::TtsTextPipeline;
+use tts_common::text_pipelines::text_pipeline_type::TextPipelineType;
 
 // =============== Request ===============
 
@@ -50,8 +50,8 @@ pub struct TtsModelInfo {
   ///
   /// >> NB: text_pipeline_type may not always be present in the database, but if absent we'll
   /// inform the frontend (and inference pipeline) of our best guess according to a heuristic.
-  pub text_pipeline_type: Option<TtsTextPipeline>,
-  pub text_pipeline_type_guess: TtsTextPipeline,
+  pub text_pipeline_type: Option<TextPipelineType>,
+  pub text_pipeline_type_guess: TextPipelineType,
 
   pub maybe_default_pretrained_vocoder: Option<VocoderType>,
   pub text_preprocessing_algorithm: String,
@@ -187,7 +187,7 @@ pub async fn get_tts_model_handler(
   // If there's an error deserializing, turn it to None.
   let text_pipeline_type = model.text_pipeline_type
       .as_deref()
-      .and_then(|pipeline_type| TtsTextPipeline::from_str(pipeline_type).ok());
+      .and_then(|pipeline_type| TextPipelineType::from_str(pipeline_type).ok());
 
   // TODO: Use language to infer as well.
   let text_pipeline_type_guess =

@@ -51,7 +51,7 @@ use storage_buckets_common::bucket_path_unifier::BucketPathUnifier;
 use tempdir::TempDir;
 use tts_common::clean_symbols::clean_symbols;
 use tts_common::text_pipelines::guess_pipeline::guess_text_pipeline_heuristic;
-use tts_common::text_pipelines::text_pipeline::TtsTextPipeline;
+use tts_common::text_pipelines::text_pipeline_type::TextPipelineType;
 
 #[derive(Deserialize, Default)]
 struct FileMetadata {
@@ -327,7 +327,7 @@ pub async fn process_single_job(
   let text_pipeline_type_or_guess = model_record.text_pipeline_type
       .as_deref()
       .and_then(|pipeline_type|
-          TtsTextPipeline::from_str(pipeline_type).ok())// NB: If there's an error deserializing, turn it to None.
+          TextPipelineType::from_str(pipeline_type).ok())// NB: If there's an error deserializing, turn it to None.
       .unwrap_or_else(||
           guess_text_pipeline_heuristic(Some(model_record.created_at)));
 

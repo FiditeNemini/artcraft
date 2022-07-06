@@ -7,7 +7,7 @@ use container_common::anyhow_result::AnyhowResult;
 /// This is *not* a database enum, but the text serializations get stored in the database in a
 /// varchar field and communicated over the API.
 #[derive(Clone, Copy, PartialEq, Eq, Debug, Serialize, Deserialize)]
-pub enum TtsTextPipeline {
+pub enum TextPipelineType {
 
   // TODO: Introduce old vocodes models.
   //#[serde(rename = "legacy_vocodes")]
@@ -46,7 +46,7 @@ const ENGLISH_V1 : &'static str = "english_v1";
 const SPANISH_V1 : &'static str = "spanish_v1";
 const SPANISH_V2 : &'static str = "spanish_v2";
 
-impl TtsTextPipeline {
+impl TextPipelineType {
 
   /// Check if the text pipeline name is valid and supported.
   pub fn is_valid_name(tts_text_pipeline: &str) -> bool {
@@ -57,10 +57,10 @@ impl TtsTextPipeline {
   //  `serde_variant` looks like a fix, but it's GPL3.
   pub fn to_str(&self) -> &'static str {
     match self {
-      TtsTextPipeline::LegacyFakeYou => LEGACY_FAKEYOU,
-      TtsTextPipeline::EnglishV1 => ENGLISH_V1,
-      TtsTextPipeline::SpanishV1 => SPANISH_V1,
-      TtsTextPipeline::SpanishV2 => SPANISH_V2,
+      TextPipelineType::LegacyFakeYou => LEGACY_FAKEYOU,
+      TextPipelineType::EnglishV1 => ENGLISH_V1,
+      TextPipelineType::SpanishV1 => SPANISH_V1,
+      TextPipelineType::SpanishV2 => SPANISH_V2,
     }
   }
 
@@ -77,36 +77,36 @@ impl TtsTextPipeline {
 
 #[cfg(test)]
 mod tests {
-  use crate::text_pipelines::text_pipeline::TtsTextPipeline;
+  use crate::text_pipelines::text_pipeline_type::TextPipelineType;
 
   #[test]
   fn valid_text_pipeline_names() {
-    assert!(TtsTextPipeline::is_valid_name("legacy_fakeyou"));
-    assert!(TtsTextPipeline::is_valid_name("english_v1"));
-    assert!(TtsTextPipeline::is_valid_name("spanish_v1"));
-    assert!(TtsTextPipeline::is_valid_name("spanish_v2"));
+    assert!(TextPipelineType::is_valid_name("legacy_fakeyou"));
+    assert!(TextPipelineType::is_valid_name("english_v1"));
+    assert!(TextPipelineType::is_valid_name("spanish_v1"));
+    assert!(TextPipelineType::is_valid_name("spanish_v2"));
   }
 
   #[test]
   fn invalid_text_pipeline_names() {
     // Garbage
-    assert!(!TtsTextPipeline::is_valid_name(""));
-    assert!(!TtsTextPipeline::is_valid_name("asdf"));
+    assert!(!TextPipelineType::is_valid_name(""));
+    assert!(!TextPipelineType::is_valid_name("asdf"));
 
     // NB: Must be lower case
-    assert!(!TtsTextPipeline::is_valid_name("LEGACY_FAKEYOU"));
-    assert!(!TtsTextPipeline::is_valid_name("ENGLISH_V1"));
-    assert!(!TtsTextPipeline::is_valid_name("SPANISH_V1"));
-    assert!(!TtsTextPipeline::is_valid_name("SPANISH_V2"));
+    assert!(!TextPipelineType::is_valid_name("LEGACY_FAKEYOU"));
+    assert!(!TextPipelineType::is_valid_name("ENGLISH_V1"));
+    assert!(!TextPipelineType::is_valid_name("SPANISH_V1"));
+    assert!(!TextPipelineType::is_valid_name("SPANISH_V2"));
 
     // NB: Not yet supported
-    assert!(!TtsTextPipeline::is_valid_name("legacy_vocodes"));
-    assert!(!TtsTextPipeline::is_valid_name("spanish_v3"));
-    assert!(!TtsTextPipeline::is_valid_name("english_v2"));
+    assert!(!TextPipelineType::is_valid_name("legacy_vocodes"));
+    assert!(!TextPipelineType::is_valid_name("spanish_v3"));
+    assert!(!TextPipelineType::is_valid_name("english_v2"));
 
     // Wrong names
-    assert!(!TtsTextPipeline::is_valid_name("english"));
-    assert!(!TtsTextPipeline::is_valid_name("spanish"));
-    assert!(!TtsTextPipeline::is_valid_name("vocodes"));
+    assert!(!TextPipelineType::is_valid_name("english"));
+    assert!(!TextPipelineType::is_valid_name("spanish"));
+    assert!(!TextPipelineType::is_valid_name("vocodes"));
   }
 }

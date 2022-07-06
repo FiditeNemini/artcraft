@@ -14,6 +14,7 @@ pub async fn edit_tts_model_details_as_author(
   ietf_primary_language_subtag: &str,
   creator_set_visibility: RecordVisibility,
   maybe_default_pretrained_vocoder: Option<VocoderType>,
+  text_pipeline_type: Option<&str>,
   // Author fields
   author_ip_address: &str,
 ) -> Result<MySqlQueryResult, sqlx::Error> {
@@ -23,6 +24,7 @@ pub async fn edit_tts_model_details_as_author(
 UPDATE tts_models
 SET
     maybe_default_pretrained_vocoder = ?,
+    text_pipeline_type = ?,
     title = ?,
     description_markdown = ?,
     description_rendered_html = ?,
@@ -35,6 +37,7 @@ WHERE token = ?
 LIMIT 1
         "#,
       maybe_default_pretrained_vocoder.map(|v| v.to_str()),
+      text_pipeline_type,
       title,
       description_markdown,
       description_html,
@@ -58,6 +61,7 @@ pub async fn edit_tts_model_details_as_mod(
   ietf_primary_language_subtag: &str,
   creator_set_visibility: RecordVisibility,
   maybe_default_pretrained_vocoder: Option<VocoderType>,
+  text_pipeline_type: Option<&str>,
   // moderator fields
   moderator_user_token: &str,
 ) -> Result<MySqlQueryResult, sqlx::Error> {
@@ -67,6 +71,7 @@ pub async fn edit_tts_model_details_as_mod(
 UPDATE tts_models
 SET
     maybe_default_pretrained_vocoder = ?,
+    text_pipeline_type = ?,
     title = ?,
     description_markdown = ?,
     description_rendered_html = ?,
@@ -79,6 +84,7 @@ WHERE token = ?
 LIMIT 1
         "#,
       maybe_default_pretrained_vocoder.map(|v| v.to_str()),
+      text_pipeline_type,
       title,
       description_markdown,
       description_html,
