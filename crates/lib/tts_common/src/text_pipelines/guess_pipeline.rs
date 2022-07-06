@@ -3,7 +3,8 @@ use chrono::{DateTime, Utc};
 use once_cell::sync::Lazy;
 use crate::text_pipelines::text_pipeline_type::TextPipelineType;
 
-const ENGLISH_V1_EPOCH_STR : &'static str = "2022-05-01T00:00:00.00Z";
+// TODO: This is not yet popularized
+const ENGLISH_V1_EPOCH_STR : &'static str = "2023-01-01T00:00:00.00Z";
 
 /// Date we consider to switch models to "english_v1" instead of "legacy_fakeyou"
 static ENGLISH_V1_EPOCH : Lazy<DateTime<Utc>> = Lazy::new(|| {
@@ -46,7 +47,7 @@ mod tests {
 
   #[test]
   fn newish_models_use_english_v1() {
-    let datetime = DateTime::parse_from_rfc3339("2022-07-01T00:00:00.00Z")
+    let datetime = DateTime::parse_from_rfc3339("2023-07-01T00:00:00.00Z")
         .expect("should parse")
         .with_timezone(&Utc);
     assert_eq!(guess_text_pipeline_heuristic(Some(datetime)), TextPipelineType::EnglishV1);
