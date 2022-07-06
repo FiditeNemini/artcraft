@@ -45,7 +45,9 @@ pub struct TtsModelInfo {
   pub model_token: String,
   pub tts_model_type: String,
 
-  /// NB: text_pipeline_type may not always be present in the database, but if absent we'll
+  /// Named text pipeline/algorithm, eg. "legacy_fakeyou", "english_v1", "spanish_v2", etc.
+  ///
+  /// >> NB: text_pipeline_type may not always be present in the database, but if absent we'll
   /// inform the frontend (and inference pipeline) of our best guess according to a heuristic.
   pub text_pipeline_type: Option<String>,
   pub text_pipeline_type_guess: String,

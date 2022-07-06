@@ -10,6 +10,9 @@ pub struct TtsModelForInferenceRecord {
   pub model_token: String,
   pub tts_model_type: String,
 
+  /// NB: text_pipeline_type may not always be present in the database.
+  pub text_pipeline_type: Option<String>,
+
   pub maybe_default_pretrained_vocoder: Option<String>,
 
   pub creator_user_token: String,
@@ -58,6 +61,7 @@ pub async fn get_tts_model_for_inference(
 SELECT
     tts.token as model_token,
     tts.tts_model_type,
+    tts.text_pipeline_type,
     tts.maybe_default_pretrained_vocoder,
     tts.creator_user_token,
     users.username as creator_username,

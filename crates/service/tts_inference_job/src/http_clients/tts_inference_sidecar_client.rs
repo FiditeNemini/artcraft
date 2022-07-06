@@ -24,6 +24,9 @@ struct InferenceRequest {
   // Text
   pub inference_text : String,
 
+  // Named text pipeline/algorithm, eg. "legacy_fakeyou", "english_v1", "spanish_v2", etc.
+  pub text_pipeline_type: String,
+
   // Output information
   pub output_audio_filename : String,
   pub output_spectrogram_filename : String,
@@ -49,6 +52,7 @@ impl TtsInferenceSidecarClient {
     raw_text: &str,
     synthesizer_checkpoint_path: P,
     vocoder_type: VocoderType,
+    text_pipeline_type: &str,
     hifigan_vocoder_checkpoint_path: P,
     hifigan_superres_vocoder_checkpoint_path: P,
     waveglow_vocoder_checkpoint_path: P,
@@ -103,6 +107,7 @@ impl TtsInferenceSidecarClient {
     let request = InferenceRequest {
       inference_text: raw_text.to_string(),
       vocoder_type,
+      text_pipeline_type: text_pipeline_type.to_string(),
       waveglow_vocoder_checkpoint_path,
       hifigan_vocoder_checkpoint_path,
       hifigan_superres_vocoder_checkpoint_path,

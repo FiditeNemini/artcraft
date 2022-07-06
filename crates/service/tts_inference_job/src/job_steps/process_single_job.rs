@@ -50,6 +50,7 @@ use storage_buckets_common::bucket_client::BucketClient;
 use storage_buckets_common::bucket_path_unifier::BucketPathUnifier;
 use tempdir::TempDir;
 use tts_common::clean_symbols::clean_symbols;
+use tts_common::text_pipeline_defaults::guess_text_pipeline_heuristic;
 
 #[derive(Deserialize, Default)]
 struct FileMetadata {
@@ -322,10 +323,19 @@ pub async fn process_single_job(
 
   info!("With pretrained vocoder: {:?}", pretrained_vocoder);
 
+  let text_pipeline_type_or_guess = model_record.text_pipeline_type
+      .clone()
+      .unwrap_or_else(|| guess_text_pipeline_heuristic(Some(model_record.created_at)).to_string());
+
+  info!("With text pipeline type `{:?} ` (or guess: {})",
+    &model_record.text_pipeline_type,
+    &text_pipeline_type_or_guess);
+
   inferencer.tts_inference_sidecar_client.request_inference(
     &cleaned_inference_text,
     &tts_synthesizer_fs_path,
     pretrained_vocoder,
+    &text_pipeline_type_or_guess,
     &hifigan_vocoder_model_fs_path,
     &hifigan_superres_vocoder_model_fs_path,
     &waveglow_vocoder_model_fs_path,
