@@ -332,14 +332,17 @@ function TtsModelListFc(props: Props) {
 
       {twitchTtsNotice}
 
-      <div className="container">
+      <div className="container-panel pt-4 pb-5">
         <Fade bottom distance={distance} delay={delay2} duration={duration}>
           <div className="panel p-3 p-lg-4 load-hidden mt-5 mt-lg-0">
             <i className="fas fa-volume-high"></i>
             <h1 className="panel-title fw-bold"> Create TTS</h1>
             <div className="py-6">
-              <div className="d-flex  gap-4">
-                <form className="w-100" onSubmit={handleFormSubmit}>
+              <div className="d-flex gap-4">
+                <form
+                  className="w-100 d-flex flex-column gap-3"
+                  onSubmit={handleFormSubmit}
+                >
                   <MultiDropdownSearch
                     allTtsCategories={props.allTtsCategories}
                     allTtsModels={props.ttsModels}
@@ -370,45 +373,38 @@ function TtsModelListFc(props: Props) {
 
                   {directViewLink}
 
-                  <div className="field my-4">
-                    <div className="input-group input-group-lg control">
-                      <textarea
-                        onChange={handleChangeText}
-                        className="textarea w-100" style={{ minHeight: '200px' }}
-                        value={props.textBuffer}
-                        placeholder={t("pages.ttsList.placeholderTextGoesHere")}
-                      ></textarea>
-                    </div>
+                  <div className="text-input">
+                    <textarea
+                      onChange={handleChangeText}
+                      className="form-control fs-5"
+                      style={{ minHeight: "200px" }}
+                      value={props.textBuffer}
+                      placeholder={t("pages.ttsList.placeholderTextGoesHere")}
+                    ></textarea>
                   </div>
 
                   {maybeError}
 
-                  <div className="button-group">
-                    <div className="d-flex flex-row justify-content-around">
-                      <div className="col-5 text-center">
-                        <button
-                          className="btn btn-primary w-100"
-                          disabled={remainingCharactersButtonDisabled}
-                        >
-                          {t("pages.ttsList.buttonSpeak")}
-                        </button>
-                      </div>
-                      <div className="col-5 text-center">
-                        <button
-                          className="btn btn-secondary w-100"
-                          onClick={handleClearClick}
-                        >
-                          {t("pages.ttsList.buttonClear")}
-                        </button>
-                      </div>
-                    </div>
+                  <div className="d-flex flex-column flex-lg-row w-100 gap-3 mt-3">
+                    <button
+                      className="btn btn-primary w-100"
+                      disabled={remainingCharactersButtonDisabled}
+                    >
+                      {t("pages.ttsList.buttonSpeak")}
+                    </button>
+                    <button
+                      className="btn btn-destructive w-100"
+                      onClick={handleClearClick}
+                    >
+                      {t("pages.ttsList.buttonClear")}
+                    </button>
                   </div>
                 </form>
               </div>
             </div>
           </div>
-        </Fade >
-      </div >
+        </Fade>
+      </div>
 
       <br />
       <br />
@@ -435,7 +431,7 @@ function TtsModelListFc(props: Props) {
       <SessionTtsModelUploadResultListFc
         modelUploadJobs={props.ttsModelUploadJobs}
       />
-    </div >
+    </div>
   );
 }
 

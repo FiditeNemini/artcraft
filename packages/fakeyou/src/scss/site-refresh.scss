@@ -125,6 +125,23 @@ code {
   border-color: #ccc;
 }
 
+.btn-destructive,
+.btn-destructive:focus,
+.btn-destructive:active {
+  background-color: #fff;
+  color: #fc6b68;
+  border: 2.5px solid;
+  border-color: #fff;
+  transition: 0.2s;
+}
+
+.btn-destructive:hover {
+  background-color: #fdcfce;
+  color: #fc6b68;
+  border: 2.5px solid;
+  border-color: #fdcfce;
+}
+
 .panel {
   position: relative;
   width: 100%;
