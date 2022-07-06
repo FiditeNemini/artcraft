@@ -1,3 +1,6 @@
+-- noinspection SqlDialectInspectionForFile
+-- noinspection SqlNoDataSourceInspectionForFile
+-- noinspection SqlResolveForFile
 
 -- All logged in users with results in the last X days
 select u.created_at from users as u
