@@ -25,6 +25,8 @@ use sqlx::error::Error::Database;
 use sqlx::mysql::MySqlDatabaseError;
 use std::fmt;
 use std::sync::Arc;
+use database_queries::queries::tts::tts_models::edit_tts_model_details::{edit_tts_model_details_as_author, edit_tts_model_details_as_mod};
+use database_queries::queries::tts::tts_models::edit_tts_model_moderator_details::edit_tts_model_moderator_details;
 use user_input_common::check_for_slurs::contains_slurs;
 
 const DEFAULT_IETF_LANGUAGE_TAG : &'static str = "en-US";
@@ -246,64 +248,32 @@ pub async fn edit_tts_model_handler(
 
   let query_result = if is_author {
     // We need to store the IP address details.
-    sqlx::query!(
-        r#"
-UPDATE tts_models
-SET
-    maybe_default_pretrained_vocoder = ?,
-    title = ?,
-    description_markdown = ?,
-    description_rendered_html = ?,
-    ietf_language_tag = ?,
-    ietf_primary_language_subtag = ?,
-    creator_set_visibility = ?,
-    creator_ip_address_last_update = ?,
-    version = version + 1
-WHERE token = ?
-LIMIT 1
-        "#,
-      maybe_default_pretrained_vocoder.map(|v| v.to_str()),
-      &title,
-      &description_markdown,
-      &description_html,
+    edit_tts_model_details_as_author(
+      &server_state.mysql_pool,
+      &model_record.model_token,
+      title.as_deref(),
+      description_markdown.as_deref(),
+      description_html.as_deref(),
       &ietf_language_tag,
       &ietf_primary_language_subtag,
-      &creator_set_visibility.to_str(),
+      creator_set_visibility,
+      maybe_default_pretrained_vocoder,
       &ip_address,
-      &model_record.model_token,
-    )
-        .execute(&server_state.mysql_pool)
-        .await
+    ).await
   } else {
     // We need to store the moderator details.
-    sqlx::query!(
-        r#"
-UPDATE tts_models
-SET
-    maybe_default_pretrained_vocoder = ?,
-    title = ?,
-    description_markdown = ?,
-    description_rendered_html = ?,
-    ietf_language_tag = ?,
-    ietf_primary_language_subtag = ?,
-    creator_set_visibility = ?,
-    maybe_mod_user_token = ?,
-    version = version + 1
-WHERE token = ?
-LIMIT 1
-        "#,
-      maybe_default_pretrained_vocoder.map(|v| v.to_str()),
-      &title,
-      &description_markdown,
-      &description_html,
+    edit_tts_model_details_as_mod(
+      &server_state.mysql_pool,
+      &model_record.model_token,
+      title.as_deref(),
+      description_markdown.as_deref(),
+      description_html.as_deref(),
       &ietf_language_tag,
       &ietf_primary_language_subtag,
-      &creator_set_visibility.to_str(),
+      creator_set_visibility,
+      maybe_default_pretrained_vocoder,
       &user_session.user_token,
-      &model_record.model_token,
-    )
-        .execute(&server_state.mysql_pool)
-        .await
+    ).await
   };
 
   // =============================================
@@ -361,34 +331,18 @@ async fn update_mod_details(
     }
   }
 
-  let query_result = sqlx::query!(
-        r#"
-UPDATE tts_models
-SET
-    is_public_listing_approved = ?,
-    is_locked_from_user_modification = ?,
-    is_locked_from_use = ?,
-    maybe_mod_comments = ?,
-    maybe_mod_user_token = ?,
-    is_front_page_featured = ?,
-    is_twitch_featured = ?,
-    maybe_suggested_unique_bot_command = ?,
-    version = version + 1
-WHERE token = ?
-LIMIT 1
-        "#,
-      is_public_listing_approved,
-      is_locked_from_user_modification,
-      is_locked_from_use,
-      request.maybe_mod_comments,
-      mod_user_token,
-      is_front_page_featured,
-      is_twitch_featured,
-      maybe_suggested_unique_bot_command,
-      model_token
-    )
-      .execute(mysql_pool)
-      .await;
+  let query_result = edit_tts_model_moderator_details(
+    &mysql_pool,
+    model_token,
+    is_public_listing_approved,
+    is_locked_from_user_modification,
+    is_locked_from_use,
+    maybe_suggested_unique_bot_command.as_deref(),
+    is_front_page_featured,
+    is_twitch_featured,
+    mod_user_token,
+    request.maybe_mod_comments.as_deref(),
+  ).await;
 
   match query_result {
     Ok(_) => Ok(()),

@@ -1,0 +1,93 @@
+use crate::column_types::record_visibility::RecordVisibility;
+use crate::column_types::vocoder_type::VocoderType;
+use sqlx::MySqlPool;
+use sqlx::mysql::MySqlQueryResult;
+use sqlx;
+
+pub async fn edit_tts_model_details_as_author(
+  mysql_pool: &MySqlPool,
+  tts_model_token: &str,
+  title: Option<&str>,
+  description_markdown: Option<&str>,
+  description_html: Option<&str>,
+  ietf_language_tag: &str,
+  ietf_primary_language_subtag: &str,
+  creator_set_visibility: RecordVisibility,
+  maybe_default_pretrained_vocoder: Option<VocoderType>,
+  // Author fields
+  author_ip_address: &str,
+) -> Result<MySqlQueryResult, sqlx::Error> {
+  // We need to store the IP address details.
+  sqlx::query!(
+        r#"
+UPDATE tts_models
+SET
+    maybe_default_pretrained_vocoder = ?,
+    title = ?,
+    description_markdown = ?,
+    description_rendered_html = ?,
+    ietf_language_tag = ?,
+    ietf_primary_language_subtag = ?,
+    creator_set_visibility = ?,
+    creator_ip_address_last_update = ?,
+    version = version + 1
+WHERE token = ?
+LIMIT 1
+        "#,
+      maybe_default_pretrained_vocoder.map(|v| v.to_str()),
+      title,
+      description_markdown,
+      description_html,
+      ietf_language_tag,
+      ietf_primary_language_subtag,
+      &creator_set_visibility.to_str(),
+      author_ip_address,
+      tts_model_token,
+    )
+      .execute(mysql_pool)
+      .await
+}
+
+pub async fn edit_tts_model_details_as_mod(
+  mysql_pool: &MySqlPool,
+  tts_model_token: &str,
+  title: Option<&str>,
+  description_markdown: Option<&str>,
+  description_html: Option<&str>,
+  ietf_language_tag: &str,
+  ietf_primary_language_subtag: &str,
+  creator_set_visibility: RecordVisibility,
+  maybe_default_pretrained_vocoder: Option<VocoderType>,
+  // moderator fields
+  moderator_user_token: &str,
+) -> Result<MySqlQueryResult, sqlx::Error> {
+  // We need to store the moderator details.
+  sqlx::query!(
+        r#"
+UPDATE tts_models
+SET
+    maybe_default_pretrained_vocoder = ?,
+    title = ?,
+    description_markdown = ?,
+    description_rendered_html = ?,
+    ietf_language_tag = ?,
+    ietf_primary_language_subtag = ?,
+    creator_set_visibility = ?,
+    maybe_mod_user_token = ?,
+    version = version + 1
+WHERE token = ?
+LIMIT 1
+        "#,
+      maybe_default_pretrained_vocoder.map(|v| v.to_str()),
+      title,
+      description_markdown,
+      description_html,
+      ietf_language_tag,
+      ietf_primary_language_subtag,
+      &creator_set_visibility.to_str(),
+      moderator_user_token,
+      tts_model_token,
+    )
+      .execute(mysql_pool)
+      .await
+}
