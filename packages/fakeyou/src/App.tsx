@@ -31,6 +31,7 @@ import { FAKEYOU_MERGED_TRANSLATIONS } from "./_i18n/FakeYouTranslations";
 import i18n from "i18next";
 import { initReactI18next } from "react-i18next";
 import ParticlesBG from "./Particles";
+import Cookies from "js-cookie";
 
 i18n
   .use(initReactI18next) // passes i18n down to react-i18next
@@ -55,7 +56,7 @@ enum MigrationMode {
   OLD_VOCODES,
 }
 
-const USE_REFRESH = false;
+const USE_REFRESH = Cookies.get('refresh') === 'true';
 
 interface Props {
   enableSpectrograms: boolean;
