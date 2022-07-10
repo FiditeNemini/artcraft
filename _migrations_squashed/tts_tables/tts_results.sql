@@ -108,6 +108,7 @@ CREATE TABLE tts_results (
   KEY fk_maybe_mod_user_token (maybe_mod_user_token),
   KEY index_creator_ip_address (creator_ip_address),
   KEY index_user_deleted_at(user_deleted_at),
-  KEY index_mod_deleted_at(mod_deleted_at)
+  KEY index_mod_deleted_at(mod_deleted_at),
+  KEY index_created_at(created_at)
 
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin;
