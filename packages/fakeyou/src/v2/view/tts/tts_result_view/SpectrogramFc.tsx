@@ -1,7 +1,7 @@
 import React, { useEffect, useRef }  from 'react';
 import { VIRIDIS, MAGMA } from "@colormap/presets";
 import { createColorMap, linearScale } from "@colormap/core";
-import { getRandomArrayValue } from "../../../../v1/api/Utils";
+import { GetRandomArrayValue } from '@storyteller/components/src/utils/GetRandomArrayValue';
 
 interface Props {
   spectrogramJsonLink: string  
@@ -29,7 +29,7 @@ function SpectrogramFc(props: Props) {
     let bytes = new Uint8ClampedArray(size);
 
     let colorMapScale = linearScale([0, 255], [0, 1]);
-    let colorMapColors = getRandomArrayValue(COLOR_MAP_PRESETS);
+    let colorMapColors = GetRandomArrayValue(COLOR_MAP_PRESETS);
     let colorMap = createColorMap(colorMapColors, colorMapScale);
 
     let k = 0;
