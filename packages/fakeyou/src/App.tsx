@@ -31,7 +31,7 @@ import { FAKEYOU_MERGED_TRANSLATIONS } from "./_i18n/FakeYouTranslations";
 import i18n from "i18next";
 import { initReactI18next } from "react-i18next";
 import ParticlesBG from "./Particles";
-import Cookies from "js-cookie";
+import { USE_REFRESH } from "./Refresh";
 
 i18n
   .use(initReactI18next) // passes i18n down to react-i18next
@@ -55,8 +55,6 @@ enum MigrationMode {
   NEW_VOCODES,
   OLD_VOCODES,
 }
-
-const USE_REFRESH = Cookies.get('refresh') === 'true';
 
 interface Props {
   enableSpectrograms: boolean;
@@ -176,6 +174,7 @@ class App extends React.Component<Props, State> {
     } else {
       require("bulma/css/bulma.css");
       require("./AppOld.scss");
+      require("./v2/view/_css/footer.scss");
     }
   }
 
