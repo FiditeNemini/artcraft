@@ -82,6 +82,7 @@ code {
 
 .lead {
   color: rgba($white, 0.8);
+  font-size: 18px;
 }
 
 .text-red {
@@ -261,6 +262,10 @@ code {
 
   .p-lg-4 {
     padding: 2rem !important;
+  }
+
+  .lead {
+    font-size: 20px;
   }
 }
 
