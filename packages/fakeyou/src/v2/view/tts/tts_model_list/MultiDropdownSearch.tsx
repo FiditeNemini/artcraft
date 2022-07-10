@@ -2,7 +2,7 @@ import React, { useEffect } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faChevronRight,
-  faHeadphonesAlt,
+  faMicrophone,
   faTags,
   faTimes,
 } from "@fortawesome/free-solid-svg-icons";
@@ -293,9 +293,9 @@ export function MultiDropdownSearch(props: Props) {
           Voice ({voiceCount} to choose from)
         </Trans>
       </label>
-      <div className="form-group input-icon d-flex align-items-center">
+      <div className="form-group input-icon">
         <span className="form-control-feedback">
-          <FontAwesomeIcon icon={faHeadphonesAlt} />
+          <FontAwesomeIcon icon={faMicrophone} />
         </span>
         <select
           className={selectClasses}

@@ -6,12 +6,10 @@ import { FrontendUrlConfig } from "../../common/FrontendUrlConfig";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faMicrophone,
+  faVolumeUp,
   faPlus,
   faUsers,
   faVideo,
-  faHeadphones,
-  faGavel,
-  faGrinBeamSweat,
   faList,
   faTrophy,
   faUpload,
@@ -166,7 +164,7 @@ function NewTopNavFc(props: Props) {
                   >
                     <li>
                       <Link className="dropdown-item" to="/">
-                        <FontAwesomeIcon icon={faMicrophone} className="me-2" />
+                        <FontAwesomeIcon icon={faVolumeUp} className="me-2" />
                         TTS
                       </Link>
                     </li>

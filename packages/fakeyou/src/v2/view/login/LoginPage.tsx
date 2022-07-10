@@ -11,6 +11,7 @@ import {
   iconPasswordField,
 } from "@storyteller/components/src/icons/SemanticIcons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faUser, faKey } from "@fortawesome/free-solid-svg-icons";
 import { distance, delay, duration } from "../../../data/animation";
 const Fade = require("react-reveal/Fade");
 
@@ -95,7 +96,7 @@ function LoginPage(props: Props) {
                     <label className="sub-title">Username or Email</label>
                     <div className="form-group input-icon">
                       <span className="form-control-feedback">
-                        <FontAwesomeIcon icon={iconUser} />
+                        <FontAwesomeIcon icon={faUser} />
                       </span>
                       <input
                         className="form-control"
@@ -112,7 +113,7 @@ function LoginPage(props: Props) {
                     <label className="sub-title">Password</label>
                     <div className="form-group input-icon">
                       <span className="form-control-feedback">
-                        <FontAwesomeIcon icon={iconPasswordField} />
+                        <FontAwesomeIcon icon={faKey} />
                       </span>
                       <input
                         className="form-control"
@@ -126,7 +127,7 @@ function LoginPage(props: Props) {
                   </div>
 
                   <button className="btn btn-primary btn-lg w-100 mt-2">
-                    <FontAwesomeIcon icon={iconUser} className="me-2" />
+                    <FontAwesomeIcon icon={faUser} className="me-2" />
                     Login
                   </button>
                   <p>

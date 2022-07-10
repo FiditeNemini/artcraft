@@ -37,7 +37,7 @@ export function AutocompleteSearch(props: Props) {
     <>
       <div>
         <label className="sub-title">{t("ttsListPage.search")}</label>
-        <div className="form-group input-icon d-flex align-items-center">
+        <div className="form-group input-icon">
           {/* NB: See note above about this library. */}
           <span className="form-control-feedback">
             <FontAwesomeIcon icon={faSearch} />

@@ -5,13 +5,9 @@ import {
   CreateAccountIsSuccess,
 } from "@storyteller/components/src/api/user/CreateAccount";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faUser, faEnvelope, faKey } from "@fortawesome/free-solid-svg-icons";
 import { Link } from "react-router-dom";
 import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
-import {
-  iconEmailField,
-  iconPasswordField,
-  iconUser,
-} from "@storyteller/components/src/icons/SemanticIcons";
 import { distance, delay, duration } from "../../../data/animation";
 const Fade = require("react-reveal/Fade");
 
@@ -285,7 +281,7 @@ function SignupPage(props: Props) {
                     <label className="sub-title">Username</label>
                     <div className="form-group input-icon">
                       <span className="form-control-feedback">
-                        <FontAwesomeIcon icon={iconUser} />
+                        <FontAwesomeIcon icon={faUser} />
                       </span>
                       <input
                         className={usernameInputClass}
@@ -301,7 +297,7 @@ function SignupPage(props: Props) {
                     <label className="sub-title">Email</label>
                     <div className="form-group input-icon">
                       <span className="form-control-feedback">
-                        <FontAwesomeIcon icon={iconEmailField} />
+                        <FontAwesomeIcon icon={faEnvelope} />
                       </span>
                       <input
                         className={emailInputClass}
@@ -317,7 +313,7 @@ function SignupPage(props: Props) {
                     <label className="sub-title">Password</label>
                     <div className="form-group input-icon">
                       <span className="form-control-feedback">
-                        <FontAwesomeIcon icon={iconPasswordField} />
+                        <FontAwesomeIcon icon={faKey} />
                       </span>
                       <input
                         className={passwordInputClass}
@@ -333,7 +329,7 @@ function SignupPage(props: Props) {
                     <label className="sub-title">Password Confirmation</label>
                     <div className="form-group input-icon">
                       <span className="form-control-feedback">
-                        <FontAwesomeIcon icon={iconPasswordField} />
+                        <FontAwesomeIcon icon={faKey} />
                       </span>
                       <input
                         className={passwordConfirmationInputClass}
