@@ -1,6 +1,3 @@
-// import 'bulma/css/bulma.css'
-import "./App.scss";
-
 import React from "react";
 import { ApiConfig } from "@storyteller/components";
 import {
@@ -57,6 +54,8 @@ enum MigrationMode {
   NEW_VOCODES,
   OLD_VOCODES,
 }
+
+const USE_REFRESH = false;
 
 interface Props {
   enableSpectrograms: boolean;
@@ -167,6 +166,16 @@ class App extends React.Component<Props, State> {
 
       textBuffer: "",
     };
+  }
+
+  componentWillMount() {
+    // Handle redesign
+    if (USE_REFRESH) {
+      require("./AppNew.scss");
+    } else {
+      require("bulma/css/bulma.css");
+      require("./AppOld.scss");
+    }
   }
 
   async componentDidMount() {
