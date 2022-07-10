@@ -1,6 +1,5 @@
 import React from 'react';
 import { render } from '@testing-library/react';
-import { OldVocodesContainer } from './v1/OldVocodesContainer';
 
 test('renders learn react link', () => {
   // NB(2022-02-01): This broke when converting to a monorepo. 

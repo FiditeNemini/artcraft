@@ -7,7 +7,6 @@ import { DetectLocale, DetectLocaleIsOk } from '@storyteller/components/src/api/
 import { Language } from '@storyteller/components/src/i18n/Language';
 import { BrowserRouter, Route, Switch } from "react-router-dom";
 import { NewVocodesContainer } from './v2/view/NewVocodesContainer';
-import { OldVocodesContainer } from './v1/OldVocodesContainer';
 import { SessionWrapper } from '@storyteller/components/src/session/SessionWrapper';
 import { TtsInferenceJob, TtsInferenceJobStateResponsePayload } from '@storyteller/components/src/jobs/TtsInferenceJobs';
 import { W2lInferenceJob, W2lInferenceJobStateResponsePayload } from '@storyteller/components/src/jobs/W2lInferenceJobs';
@@ -480,14 +479,6 @@ class App extends React.Component<Props, State> {
   }
 
   public render() {
-    if (this.state.migrationMode === MigrationMode.OLD_VOCODES) {
-      return (
-        <OldVocodesContainer
-          enableSpectrograms={this.props.enableSpectrograms}
-          />
-      );
-    }
-
     return (
       <BrowserRouter>
         <div id="main" className="mainwrap">
@@ -504,11 +495,6 @@ class App extends React.Component<Props, State> {
             <div className="migrationComponentWrapper">
 
               <Switch>
-                <Route path="/old">
-                  <OldVocodesContainer
-                    enableSpectrograms={this.props.enableSpectrograms}
-                    />
-                </Route>
                 <Route path="/">
                   <NewVocodesContainer
                     sessionWrapper={this.state.sessionWrapper}

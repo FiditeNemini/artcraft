@@ -52,6 +52,7 @@ import { PatronPage } from './patrons/PatronPage';
 import ScrollToTop from './_common/ScrollToTop';
 import { Language } from '@storyteller/components/src/i18n/Language';
 import { VoiceCloneRequestPage } from './clone_voice_requests/VoiceCloneRequestPage';
+import { VocodesPage } from './vocodes/VocodesPage';
 
 interface Props {
   sessionWrapper: SessionWrapper,
@@ -391,6 +392,10 @@ class NewVocodesContainer extends React.Component<Props, State> {
 
             <Route path="/terms">
               <TermsPage />
+            </Route>
+
+            <Route path="/old">
+              <VocodesPage/>
             </Route>
 
             <Route path="/">
