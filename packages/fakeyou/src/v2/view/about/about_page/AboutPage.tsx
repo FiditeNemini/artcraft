@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { distance, delay, delay2, duration } from "../../../../data/animation";
 const Fade = require("react-reveal/Fade");
 
-interface Props { }
+interface Props {}
 
 function AboutPage(props: Props) {
   return (
@@ -24,8 +24,8 @@ function AboutPage(props: Props) {
             </div>
           </div>
           <div className="col-lg-6 px-md-2 ps-lg-5 ps-xl-2">
-            <div className="text-center text-lg-start">
-              <Fade bottom cascade duration={duration}>
+            <Fade bottom cascade duration={duration} distance={distance}>
+              <div className="text-center text-lg-start">
                 <div>
                   <h1 className="display-5 fw-bold lh-1 mb-4">
                     A Glimpse of the Future
@@ -37,8 +37,8 @@ function AboutPage(props: Props) {
                     of production and creative tooling.
                   </p>
                 </div>
-              </Fade>
-            </div>
+              </div>
+            </Fade>
           </div>
         </div>
       </div>
@@ -131,21 +131,24 @@ function AboutPage(props: Props) {
                 </p>
                 <br />
                 <p>
-                  Vegito1089, Shin, Ashurath, MakaveliGH, Blutarch Mann, Yahia, Tim Squid, Seuneramet, Matt, Seth, CookiePPP,{" "}
+                  Vegito1089, Shin, Ashurath, MakaveliGH, Blutarch Mann, Yahia,
+                  Tim Squid, Seuneramet, Matt, Seth, CookiePPP,{" "}
                   <a
                     href="https://twitter.com/r9y9/"
                     target="_blank"
                     rel="noopener noreferrer"
                   >
                     @r9y9
-                  </a>, BFlat, Raisin.
+                  </a>
+                  , BFlat, Raisin.
                 </p>
 
                 <br />
 
                 <p>
                   The following papers, models, and resources were used:
-                  <br /><br />
+                  <br />
+                  <br />
                   <a
                     href="https://github.com/NVIDIA/tacotron2"
                     target="_blank"
@@ -193,7 +196,7 @@ function AboutPage(props: Props) {
                   >
                     Wav2Lip
                   </a>{" "}
-                  (MIT license),{" "} {/* Non-commercial */}
+                  (MIT license), {/* Non-commercial */}
                   <a
                     href="http://www.speech.cs.cmu.edu/cgi-bin/cmudict"
                     target="_blank"

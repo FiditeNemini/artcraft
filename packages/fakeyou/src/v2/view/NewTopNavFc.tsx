@@ -53,7 +53,7 @@ function NewTopNavFc(props: Props) {
   //   : "navbar-burger";
 
   return (
-    <>
+    <div>
       <div className="top-bar d-none d-lg-flex">
         <div className="container d-flex">
           <div className="d-flex gap-4 flex-grow-1">
@@ -69,24 +69,13 @@ function NewTopNavFc(props: Props) {
             >
               Developers
             </a>
-            <a
-              className="top-bar-text d-flex align-items-center dropdown-toggle"
-              href="#"
-              id="offcanvasNavbarLgDropdown"
-              role="button"
-              data-bs-toggle="dropdown"
-              aria-expanded="false"
-            >
-              <img className="me-2" src="assets/eng-flag.png" height="12" />
-              ENG
-            </a>
           </div>
           <div className="d-flex gap-4">
             <p className="top-bar-text">
-              Online: <span className="fw-bold text-red">1,204</span>
+              Online Users: <span className="fw-bold text-red">1,204</span>
             </p>
             <p className="top-bar-text">
-              Queued: <span className="fw-bold text-red">48</span>
+              TTS Queued: <span className="fw-bold text-red">48</span>
             </p>
           </div>
         </div>
@@ -249,51 +238,6 @@ function NewTopNavFc(props: Props) {
                   <div className="dropdown-divider dropdown-divider-white mt-3"></div>
                 </li>
 
-                <li className="nav-item dropdown d-lg-none">
-                  <a
-                    className="nav-link dropdown-toggle"
-                    href="#"
-                    id="offcanvasNavbarLgDropdown"
-                    role="button"
-                    data-bs-toggle="dropdown"
-                  >
-                    <img
-                      className="me-2"
-                      src="assets/eng-flag.png"
-                      height="12"
-                    />
-                    English
-                  </a>
-                  <ul
-                    className="dropdown-menu"
-                    aria-labelledby="offcanvasNavbarLgDropdown"
-                  >
-                    <li>
-                      <a className="dropdown-item" href="">
-                        <img
-                          className="me-2"
-                          src="assets/eng-flag.png"
-                          height="12"
-                        />
-                        English
-                      </a>
-                    </li>
-                    <li>
-                      <a className="dropdown-item" href="">
-                        <img
-                          className="me-2"
-                          src="assets/esp-flag.png"
-                          height="12"
-                        />
-                        Spanish
-                      </a>
-                    </li>
-                  </ul>
-                </li>
-                <li className="d-lg-none">
-                  <div className="dropdown-divider dropdown-divider-white"></div>
-                </li>
-
                 <li className="ps-3 d-lg-none">
                   <div className="d-flex gap-4 py-2">
                     <p className="top-bar-text">
@@ -337,7 +281,7 @@ function NewTopNavFc(props: Props) {
           </div>
         </div>
       </nav>
-    </>
+    </div>
   );
 }
 

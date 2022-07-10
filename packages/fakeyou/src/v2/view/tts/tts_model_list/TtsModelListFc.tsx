@@ -37,6 +37,8 @@ import { Trans } from "react-i18next";
 import { TwitchTtsNotice } from "./notices/TwitchTtsNotice";
 import { PleaseFollowNotice } from "./notices/PleaseFollowNotice";
 import { distance, delay, delay2, duration } from "../../../../data/animation";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faVolumeUp } from "@fortawesome/free-solid-svg-icons";
 const Fade = require("react-reveal/Fade");
 
 export interface EnqueueJobResponsePayload {
@@ -336,7 +338,10 @@ function TtsModelListFc(props: Props) {
         <Fade bottom distance={distance} delay={delay2} duration={duration}>
           <div className="panel p-3 p-lg-4 load-hidden mt-5 mt-lg-0">
             <i className="fas fa-volume-high"></i>
-            <h1 className="panel-title fw-bold"> Create TTS</h1>
+            <h1 className="panel-title fw-bold">
+              <FontAwesomeIcon icon={faVolumeUp} className="me-3" />
+              Create TTS
+            </h1>
             <div className="py-6">
               <div className="d-flex gap-4">
                 <form

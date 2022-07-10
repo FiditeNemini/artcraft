@@ -24,10 +24,12 @@ body {
 .bg-gradient {
   background: rgb(13, 16, 25) !important;
 
-  background: linear-gradient(325deg,
-      rgba(13, 16, 25, 1) 0%,
-      rgba(42, 21, 34, 1) 55%,
-      rgba(16, 14, 26, 1) 100%) !important;
+  background: linear-gradient(
+    325deg,
+    rgba(13, 16, 25, 1) 0%,
+    rgba(42, 21, 34, 1) 55%,
+    rgba(16, 14, 26, 1) 100%
+  ) !important;
   background-repeat: no-repeat;
   background-attachment: fixed;
 }
@@ -159,10 +161,6 @@ nav {
     width: 100vw;
   }
 
-  .dropdown-menu {
-    transition: all 0.1s;
-  }
-
   .nav-login {
     font-size: 15px;
     font-weight: 600;
@@ -178,25 +176,23 @@ nav {
 }
 
 a.top-bar-text:hover {
-  color: $primary  !important;
+  color: $primary !important;
 }
 
 .top-bar {
   display: flex;
   align-items: center;
-  background-color: rgba($white, 0.05);
+  background-color: rgba($white, 0.04);
   margin-bottom: 5px;
   padding: 10px 0;
   backdrop-filter: blur(5px);
-  -webkit-backdrop-filter: blur(5px);
   border-bottom: 1px solid;
-  border-color: rgba(255, 255, 255, 0.04);
+  border-color: rgba(255, 255, 255, 0.06);
 
   .top-bar-text {
-    color: #fff;
+    color: rgba($white, 0.7);
     font-size: 12px;
     font-weight: 400;
-    opacity: 0.7;
     transition: 0.2s;
   }
 }

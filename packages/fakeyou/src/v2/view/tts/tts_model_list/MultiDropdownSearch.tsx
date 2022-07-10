@@ -272,7 +272,7 @@ export function MultiDropdownSearch(props: Props) {
   let loadingOption = undefined;
 
   if (isLoading) {
-    selectClasses = "form-select is-loading";
+    selectClasses = "form-select";
     loadingOption = (
       <option key="waiting" value="" disabled={true}>
         {t("ttsListPage.loading")}

@@ -254,7 +254,7 @@ function SignupPage(props: Props) {
   }
 
   let passwordConfirmationInputClass = "form-control";
-  let passwordConfirmationHelpClass = "form-text";
+  let passwordConfirmationHelpClass = "form-text red";
   switch (passwordConfirmationValid) {
     case FieldTriState.EMPTY_FALSE:
       break;
