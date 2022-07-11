@@ -6,6 +6,7 @@ import { PATRONS } from '../../../data/Patrons';
 import { PatreonLink } from '@storyteller/components/src/elements/PatreonLink';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPatreon } from "@fortawesome/free-brands-svg-icons";
+import { Container } from 'tsparticles-engine';
 interface Props {
   sessionWrapper: SessionWrapper,
 }
@@ -34,6 +35,8 @@ function PatronPage(props: Props) {
                 Our Patrons help support our work.
               </h3>
             </div>
+            <p className="lead mb-5">Our Patrons help pay offset (but not completely cover) our
+             expensive server bills.</p>
             <div>
               <button type="button" className="btn btn-primary">
               <FontAwesomeIcon icon={faPatreon} className="me-2" />
@@ -45,16 +48,23 @@ function PatronPage(props: Props) {
 
         </div>
       </section>
-
       <div>
-        <div className="content">
-          <p>Our Patrons help pay offset (but not completely cover) our expensive server bills.</p>
-
+        <div className="content">  
+        <div className="container-panel pb-5">
+          <div className="panel p-3 p-lg-4 load-hidden">
+          <h1 className="panel-title">Our Patrons</h1>
+          <div className="py-6"></div>
+          <div className="row text-center"></div>
           <ul>
             {PATRONS.map(patron => {
               return (<li>{patron.username} &mdash; ${patron.donationTotal}</li>);
             })}
           </ul>
+        </div>
+        </div>
+        
+        
+        
 
           <p>Patrons will get first looks at new features, get dedicated access to Patron-only 
             Discord channels, can ask for specific voices from our in-house audio engineers,
@@ -69,7 +79,7 @@ function PatronPage(props: Props) {
       
       
     </>
-  )
+  );
 }
 
 export { PatronPage }
