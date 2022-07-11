@@ -8,10 +8,12 @@ import { PatreonLink } from '@storyteller/components/src/elements/PatreonLink';
 interface Props {
   sessionWrapper: SessionWrapper,
 }
+<script src="https://fonts.googleapis.com"></script>
 
 function PatronPage(props: Props) {
   return (
     <>
+     
       <section className="hero is-small">
         <div className="hero-body">
 
@@ -24,9 +26,9 @@ function PatronPage(props: Props) {
             </div>
 
             <div className="column">
-              <p className="title">
+              <h1 className="display-5 fw-bold">
                 Thanks to our Patrons!
-              </p>
+              </h1>
               <p className="subtitle">
                 Our Patrons help support our work.
               </p>
@@ -55,8 +57,10 @@ function PatronPage(props: Props) {
 
           <BackLink link={FrontendUrlConfig.indexPage()} text='Back to main' />
         </div>
-
-      </div>
+        </div>
+    
+      
+      
     </>
   )
 }
