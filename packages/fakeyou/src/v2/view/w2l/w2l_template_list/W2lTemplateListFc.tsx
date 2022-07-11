@@ -4,7 +4,9 @@ import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapp
 import { Link } from "react-router-dom";
 //import { getRandomInt } from '../../../../v1/api/Utils';
 import { BucketConfig } from "@storyteller/components/src/api/BucketConfig";
-import { distance, delay, delay2, duration } from "../../../../data/animation";
+import { distance, duration } from "../../../../data/animation";
+import { USE_REFRESH } from "../../../../Refresh";
+
 const Fade = require("react-reveal/Fade");
 
 interface W2lTemplateListResponsePayload {
@@ -155,6 +157,29 @@ function W2lTemplateListFc(props: Props) {
         <Link to="/signup">create an account</Link>. You'll then be able to
         upload and reuse your templates whenever you want!
       </p>
+    );
+  }
+
+  if (!USE_REFRESH) {
+    return (
+      <div>
+        <br />
+        <h1 className="title is-1"> Video lip sync templates </h1>
+
+        {extraDetails}
+
+        <br />
+
+        {allRowsOfTemplateElements.map(el => el)}
+
+        <br />
+
+        <p>This feature is based on Wav2Lip by by Prajwal, K R and Mukhopadhyay,
+          Rudrabha and Namboodiri, Vinay P. and Jawahar, C.V.</p>
+
+        <br />
+
+      </div>
     );
   }
 
