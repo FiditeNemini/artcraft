@@ -1,24 +1,25 @@
 {
-    "name": "@storyteller/root",
-    "private": true,
-    "version": "1.0.0",
-    "workspaces": {
-        "packages": [
-            "./packages/**"
-        ]
-    },
-    "scripts": {
-        "start-fakeyou": "PORT=7000 BROWSER=none lerna exec --scope @storyteller/fakeyou -- yarn start",
-        "build-fakeyou": "lerna exec --scope @storyteller/fakeyou -- yarn build",
-        "start-storyteller-home": "PORT=7008 BROWSER=none lerna exec --scope @storyteller/storyteller-home -- yarn start",
-        "build-storyteller-home": "lerna exec --scope @storyteller/storyteller-home -- yarn build",
-        "start-storyteller-obs": "PORT=7007 BROWSER=none lerna exec --scope @storyteller/storyteller-obs -- yarn start",
-        "build-storyteller-obs": "lerna exec --scope @storyteller/storyteller-obs -- yarn build",
-        "start-storyteller-stream": "PORT=7000 BROWSER=none lerna exec --scope @storyteller/storyteller -- yarn start",
-        "build-storyteller-stream": "lerna exec --scope @storyteller/storyteller-stream -- yarn build"
-    },
-    "devDependencies": {
-        "craco": "^0.0.3",
-        "lerna": "^4.0.0"
-    }
+  "name": "@storyteller/root",
+  "private": true,
+  "version": "1.0.0",
+  "workspaces": {
+    "packages": [
+      "./packages/**"
+    ]
+  },
+  "scripts": {
+    "start-fakeyou": "PORT=7000 BROWSER=none lerna exec --scope @storyteller/fakeyou -- yarn start",
+    "start-fakeyou-w": "set PORT=7000 && lerna exec --scope @storyteller/fakeyou -- yarn start-w",
+    "build-fakeyou": "lerna exec --scope @storyteller/fakeyou -- yarn build",
+    "start-storyteller-home": "PORT=7008 BROWSER=none lerna exec --scope @storyteller/storyteller-home -- yarn start",
+    "build-storyteller-home": "lerna exec --scope @storyteller/storyteller-home -- yarn build",
+    "start-storyteller-obs": "PORT=7007 BROWSER=none lerna exec --scope @storyteller/storyteller-obs -- yarn start",
+    "build-storyteller-obs": "lerna exec --scope @storyteller/storyteller-obs -- yarn build",
+    "start-storyteller-stream": "PORT=7000 BROWSER=none lerna exec --scope @storyteller/storyteller -- yarn start",
+    "build-storyteller-stream": "lerna exec --scope @storyteller/storyteller-stream -- yarn build"
+  },
+  "devDependencies": {
+    "craco": "^0.0.3",
+    "lerna": "^4.0.0"
+  }
 }

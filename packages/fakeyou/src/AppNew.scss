@@ -1,0 +1,411 @@
+// @import "./scss/normalize.scss";
+@import "./scss/colours.scss";
+@import "./scss/site-refresh.scss";
+//@import-normalize; /* bring in normalize.css styles */
+
+$page-width: 700px;
+
+$light-text-color: rgba($white, 0.8);
+$button-text-color: #666;
+
+$body-font-family: "Fira Sans", serif;
+$nav-font-family: "Fira Sans", sans-serif;
+$footer-font-family: "Fira Sans Condensed", sans-serif;
+$textarea-font-family: "Fira Sans", sans-serif;
+$headings-font-family: "Merriweather", serif;
+
+body {
+  font-family: $body-font-family;
+  font-weight: 300; // For Fira Sans
+  color: $white;
+  //background gradient
+}
+
+.bg-gradient {
+  background: rgb(13, 16, 25) !important;
+
+  background: linear-gradient(
+    325deg,
+    rgba(13, 16, 25, 1) 0%,
+    rgba(42, 21, 34, 1) 55%,
+    rgba(16, 14, 26, 1) 100%
+  ) !important;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+}
+
+// Style for user text input that overflows
+.overflow-fix {
+  overflow-wrap: anywhere;
+}
+
+//old wrapper
+// .mainwrap {
+//   max-width: 800px;
+//   margin: auto;
+// }
+
+canvas#spectrogram {
+  margin: 0.5em 0;
+  transform: scaleY(-1);
+  /* Spectrograms are flipped */
+  height: 300px;
+  width: 100%;
+  cursor: pointer;
+}
+
+/*p {
+  a:link, 
+  a:visited {
+    color: rgb(119, 165, 235);
+    font-weight: bold;
+  }
+  a:hover, 
+  a:active{
+    color: rgb(85, 133, 204);
+    font-weight: bold;
+  }
+}*/
+
+// p {
+//   a:before {
+//     content: " ";
+//   }
+// }
+
+#main {
+  position: relative; // Footer attachment.
+  min-height: 100vh;
+  overflow: hidden;
+}
+
+$footer-height: 2rem;
+
+#viewable {
+  padding-bottom: $footer-height;
+}
+
+footer {
+  font-family: $footer-font-family;
+  text-align: center;
+  width: 100%;
+  position: absolute; // Footer attachment.
+  bottom: 0;
+  // NB: Setting explicit height doesn't appear to be necessary, and
+  // it was creating an annoying scrollbar.
+  //height: $footer-height;
+  color: $light-text-color;
+}
+
+.social {
+  img {
+    max-width: 70px;
+    max-height: 70px;
+    padding: 1em;
+  }
+}
+
+// Tech logos need a hack to not have margin.
+.vocodes-grid-marginless {
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+}
+
+nav {
+  font-family: $nav-font-family;
+
+  .navbar {
+    z-index: 2;
+  }
+
+  .navbar-dark .navbar-toggler {
+    border: none;
+  }
+
+  .nav-link {
+    font-size: 15px;
+    font-weight: 600;
+    padding-left: 16px !important;
+    padding-right: 16px !important;
+    color: $light-text-color;
+    display: flex;
+    align-items: center;
+  }
+
+  .navbar-brand {
+    padding-top: 0;
+  }
+
+  .dropdown-item {
+    font-size: 15px;
+    font-weight: 600;
+    padding: 0.5rem 1rem;
+
+    &:active {
+      background-color: $primary;
+    }
+  }
+
+  .dropdown-menu {
+    border-color: rgba($white, 0.12) !important;
+    border: 1px solid;
+    border-radius: 8px;
+    box-shadow: 0px 5px 20px rgba($black, 0.3);
+  }
+
+  .nav-bg-dark {
+    background-color: #17101c !important;
+  }
+
+  .offcanvas {
+    width: 100vw;
+  }
+
+  .nav-login {
+    font-size: 15px;
+    font-weight: 600;
+    color: #fff;
+    text-decoration: none;
+    transition: 0.2s;
+
+    &:hover {
+      color: rgba($white, 0.6);
+      text-decoration: none;
+    }
+  }
+}
+
+a.top-bar-text:hover {
+  color: $primary !important;
+}
+
+.top-bar {
+  display: flex;
+  align-items: center;
+  background-color: rgba($white, 0.04);
+  margin-bottom: 5px;
+  padding: 10px 0;
+  backdrop-filter: blur(5px);
+  border-bottom: 1px solid;
+  border-color: rgba(255, 255, 255, 0.06);
+
+  .top-bar-text {
+    color: rgba($white, 0.7);
+    font-size: 12px;
+    font-weight: 400;
+    transition: 0.2s;
+  }
+}
+
+.dropdown-divider-white {
+  border-top: 1px solid rgba($white, 0.15);
+}
+
+.button-group {
+  padding: 1em 0;
+}
+
+#status {
+  .info {
+    color: #888888;
+  }
+
+  .warn {
+    color: #aaaa00;
+  }
+
+  .error {
+    color: #aa0000;
+  }
+
+  min-height: 1.5em;
+}
+
+.upload-box {
+  padding: 0 0 1em;
+}
+
+.video-template-selector {
+  margin: 1.5em 0 1.5em 0;
+  text-align: center;
+
+  .thumbnail {
+    max-width: 220px;
+    padding: 0em;
+    margin: 5px;
+    filter: brightness(70%) grayscale(1);
+    user-select: none;
+    -moz-user-select: none;
+    -webkit-user-select: none;
+  }
+
+  .selected {
+    filter: brightness(100%) grayscale(0);
+    box-shadow: 0px 0px 25px #209cee;
+  }
+}
+
+.video-wrapper {
+  text-align: center;
+}
+
+// #usage,
+// #updates,
+// #help-wanted,
+// #terms {
+//   h1,
+//   h2 {
+//     font-family: $headings-font-family;
+//   }
+
+//   p {
+//     text-align: justify;
+//   }
+
+//   li {
+//     font-size: 1.2em;
+//     text-align: justify;
+//     margin-bottom: 1em;
+//   }
+// }
+
+// .template-preview {
+//   text-align: center;
+// }
+
+// /* V2 (but probably defined elsewhere too) */
+
+.mascot {
+  text-align: center;
+  margin: auto;
+}
+
+.mascot img {
+  max-width: 200px;
+}
+
+// .main-form {
+//   padding: 0 15px;
+// }
+
+.git-sha {
+  color: #999;
+  font-size: 0.8rem;
+  margin-top: 10px;
+}
+
+// /* TAILWIND STYLE CLASSES */
+
+// .display-inline {
+//   display: inline;
+// }
+
+// .white-space-nowrap {
+//   white-space: nowrap;
+// }
+
+// .padding-bottom-1em {
+//   padding-bottom: 1em;
+// }
+
+/** RESPONSIVENESS **/
+
+/** Hide footer when using onscreen keyboard. */
+/* Actually, let's not do that because people filed bug reports.
+@media screen and (max-height: 550px) {
+  footer {
+    display: none;
+  }
+  nav {
+    display: none;
+  }
+}
+*/
+
+#particles-container {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  pointer-events: none;
+
+  canvas {
+    pointer-events: none !important;
+  }
+}
+
+#tsparticles {
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  padding: 0;
+  margin: 0;
+  z-index: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+@media screen and (max-height: 740px) {
+  footer p {
+    display: inline;
+  }
+
+  footer p:after {
+    content: " "; // Not sure why the space disappears when inline.
+  }
+
+  .social {
+    img {
+      max-width: 50px;
+      max-height: 50px;
+      padding: 0.2em;
+    }
+  }
+}
+
+// // Prevent Android devices from horizontal scrolling
+// // Mine is 412x846.
+// @media screen and (max-width: 412px) {
+//   #root {
+//     max-width: 380px;
+//     margin: auto;
+//   }
+// }
+
+@media (min-width: 992px) {
+  nav {
+    .nav-bg-dark {
+      background-color: #17101c00 !important;
+    }
+
+    // hover nav dropdown on desktop
+    &.navbar {
+      .nav-item {
+        &:hover {
+          .nav-link {
+            color: $white;
+          }
+
+          .dropdown-menu {
+            transition: 0.2s;
+            opacity: 1;
+            visibility: visible;
+            top: 100%;
+            transform: rotateX(0deg);
+          }
+        }
+
+        .dropdown-menu {
+          display: block;
+          opacity: 0;
+          visibility: hidden;
+          transition: 0.2s;
+          margin-top: 0;
+        }
+      }
+    }
+  }
+}

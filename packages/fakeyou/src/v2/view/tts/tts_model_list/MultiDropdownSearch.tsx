@@ -1,31 +1,38 @@
-import React, { useEffect } from 'react';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faChevronRight, faHeadphonesAlt, faTags, faTimes } from '@fortawesome/free-solid-svg-icons';
-import { TtsModelListItem } from '@storyteller/components/src/api/tts/ListTtsModels';
-import { TtsCategoryType } from '../../../../AppWrapper';
-import { Trans, useTranslation } from 'react-i18next';
+import React, { useEffect } from "react";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import {
+  faChevronRight,
+  faHeadphonesAlt,
+  faMicrophone,
+  faTags,
+  faTimes,
+} from "@fortawesome/free-solid-svg-icons";
+import { TtsModelListItem } from "@storyteller/components/src/api/tts/ListTtsModels";
+import { TtsCategoryType } from "../../../../AppWrapper";
+import { Trans, useTranslation } from "react-i18next";
+import { USE_REFRESH } from "../../../../Refresh";
 
 interface Props {
-  allTtsCategories: TtsCategoryType[],
-  allTtsModels: TtsModelListItem[],
+  allTtsCategories: TtsCategoryType[];
+  allTtsModels: TtsModelListItem[];
 
-  allTtsCategoriesByTokenMap: Map<string,TtsCategoryType>,
-  allTtsModelsByTokenMap: Map<string,TtsModelListItem>,
-  ttsModelsByCategoryToken: Map<string,Set<TtsModelListItem>>,
+  allTtsCategoriesByTokenMap: Map<string, TtsCategoryType>;
+  allTtsModelsByTokenMap: Map<string, TtsModelListItem>;
+  ttsModelsByCategoryToken: Map<string, Set<TtsModelListItem>>;
 
-  dropdownCategories: TtsCategoryType[][],
-  setDropdownCategories: (dropdownCategories: TtsCategoryType[][]) => void,
+  dropdownCategories: TtsCategoryType[][];
+  setDropdownCategories: (dropdownCategories: TtsCategoryType[][]) => void;
 
-  selectedCategories: TtsCategoryType[],
-  setSelectedCategories: (selectedCategories: TtsCategoryType[]) => void,
+  selectedCategories: TtsCategoryType[];
+  setSelectedCategories: (selectedCategories: TtsCategoryType[]) => void;
 
-  maybeSelectedTtsModel?: TtsModelListItem,
-  setMaybeSelectedTtsModel: (maybeSelectedTtsModel: TtsModelListItem) => void,
+  maybeSelectedTtsModel?: TtsModelListItem;
+  setMaybeSelectedTtsModel: (maybeSelectedTtsModel: TtsModelListItem) => void;
 }
 
 export function MultiDropdownSearch(props: Props) {
-  const { 
-    allTtsCategories, 
+  const {
+    allTtsCategories,
     allTtsModels,
     allTtsCategoriesByTokenMap,
     allTtsModelsByTokenMap,
@@ -43,7 +50,7 @@ export function MultiDropdownSearch(props: Props) {
 
   useEffect(() => {
     // NB: Dropdowns do not seem to respect React very well.
-    // Despite setting <select>'s value and defaultValue, and <option>'s selected=true, 
+    // Despite setting <select>'s value and defaultValue, and <option>'s selected=true,
     // the dropdowns are left in a default state. I'll use the post-render side effect
     // to select the correct options.
 
@@ -56,7 +63,7 @@ export function MultiDropdownSearch(props: Props) {
       //selectedModelToken = allTtsModels[0].model_token;
     }
 
-    let maybeElement = document.getElementsByName('tts-model-select')[0];
+    let maybeElement = document.getElementsByName("tts-model-select")[0];
 
     if (!!maybeElement && !!selectedModelToken) {
       (maybeElement as any).value = selectedModelToken;
@@ -64,9 +71,13 @@ export function MultiDropdownSearch(props: Props) {
       (maybeElement as any).value = ""; // Empty string will match "loading" <option>
     }
 
-    let categoryDropdownElements = document.getElementsByClassName('category-dropdown');
+    let categoryDropdownElements =
+      document.getElementsByClassName("category-dropdown");
 
-    const iterLength = Math.min(selectedCategories.length, categoryDropdownElements.length);
+    const iterLength = Math.min(
+      selectedCategories.length,
+      categoryDropdownElements.length
+    );
 
     for (let i = 0; i < iterLength; i++) {
       let categoryDropdownElement = categoryDropdownElements[i];
@@ -81,7 +92,7 @@ export function MultiDropdownSearch(props: Props) {
   const doChangeCategory = (level: number, maybeToken: string) => {
     // Slice off all the irrelevant child category choices, then append new choice.
     let newCategorySelections = selectedCategories.slice(0, level);
-    
+
     // And the dropdowns themselves
     let newDropdownCategories = dropdownCategories.slice(0, level + 1);
 
@@ -92,7 +103,7 @@ export function MultiDropdownSearch(props: Props) {
 
     setSelectedCategories(newCategorySelections);
 
-    const newSubcategories = allTtsCategories.filter(category => {
+    const newSubcategories = allTtsCategories.filter((category) => {
       return category.maybe_super_category_token === maybeToken;
     });
 
@@ -112,9 +123,12 @@ export function MultiDropdownSearch(props: Props) {
     if (!!maybeNewModel) {
       props.setMaybeSelectedTtsModel(maybeNewModel);
     }
-  }
+  };
 
-  const handleChangeCategory = (ev: React.FormEvent<HTMLSelectElement>, level: number) => { 
+  const handleChangeCategory = (
+    ev: React.FormEvent<HTMLSelectElement>,
+    level: number
+  ) => {
     const maybeToken = (ev.target as HTMLSelectElement).value;
     if (!maybeToken) {
       return true;
@@ -125,19 +139,21 @@ export function MultiDropdownSearch(props: Props) {
 
   const handleRemoveCategory = (level: number) => {
     let parentLevel = Math.max(level - 1, 0);
-    let maybeToken = '*'; // NB: Sentinel for the "All Voices" / "Select..." <option>
+    let maybeToken = "*"; // NB: Sentinel for the "All Voices" / "Select..." <option>
 
     doChangeCategory(parentLevel, maybeToken);
 
     // NB: There's a bug selecting the "default" of the parent category.
     // React won't respect the state, so we'll brute force it here.
-    let maybeElement = document.getElementsByName(`categories-${parentLevel}`)[0];
+    let maybeElement = document.getElementsByName(
+      `categories-${parentLevel}`
+    )[0];
     if (maybeElement) {
-      (maybeElement as any).value = '*';
+      (maybeElement as any).value = "*";
     }
-  }
+  };
 
-  const handleChangeVoice = (ev: React.FormEvent<HTMLSelectElement>) => { 
+  const handleChangeVoice = (ev: React.FormEvent<HTMLSelectElement>) => {
     const ttsModelToken = (ev.target as HTMLSelectElement).value;
     const maybeTtsModel = allTtsModelsByTokenMap.get(ttsModelToken);
     if (maybeTtsModel) {
@@ -150,18 +166,16 @@ export function MultiDropdownSearch(props: Props) {
   for (let i = 0; i < dropdownCategories.length; i++) {
     const currentDropdownCategories = dropdownCategories[i];
 
-    let defaultName = (i === 0) ? 'All Voices' : 'Select...';
+    let defaultName = i === 0 ? "All Voices" : "Select...";
 
     let dropdownOptions = [];
     dropdownOptions.push(
-      <option 
-        key={`option-${i}-*`} 
-        value="*">
-          {defaultName}
+      <option key={`option-${i}-*`} value="*">
+        {defaultName}
       </option>
     );
 
-    currentDropdownCategories.forEach(category => {
+    currentDropdownCategories.forEach((category) => {
       const models = ttsModelsByCategoryToken.get(category.category_token);
       if (models === undefined || models.size === 0) {
         return; // If there are no models at the leaves, skip
@@ -169,16 +183,17 @@ export function MultiDropdownSearch(props: Props) {
       dropdownOptions.push(
         <option
           key={`option-${i}-${category.category_token}`}
-          value={category.category_token}>
+          value={category.category_token}
+        >
           {category.name_for_dropdown}
         </option>
-      )
-    })
+      );
+    });
 
     if (dropdownOptions.length <= 1) {
       // We've run out of subcategories. (1 == "Select...")
       // No sense trying to build more.
-      break; 
+      break;
     }
 
     categoryDropdowns.push(
@@ -190,7 +205,7 @@ export function MultiDropdownSearch(props: Props) {
               name={`categories-${i}`}
               onChange={(ev) => handleChangeCategory(ev, i)}
               defaultValue="*"
-              >
+            >
               {dropdownOptions}
             </select>
           </div>
@@ -200,7 +215,7 @@ export function MultiDropdownSearch(props: Props) {
         </div>
 
         <div className="control">
-          <button 
+          <button
             className="button is-rounded is-outlined"
             onClick={() => handleRemoveCategory(i)}
           >
@@ -210,8 +225,7 @@ export function MultiDropdownSearch(props: Props) {
           </button>
         </div>
 
-
-        <div className="control" >
+        <div className="control">
           <FontAwesomeIcon icon={faChevronRight} size="2x" color="#999" />
         </div>
       </React.Fragment>
@@ -219,7 +233,7 @@ export function MultiDropdownSearch(props: Props) {
   }
 
   // Group categories into rows of two (on Desktop)
-  let groupSize = (window.innerWidth < 550) ? 1 : 2;
+  let groupSize = window.innerWidth < 550 ? 1 : 2;
   let categoryFields = [];
   let categoryFieldGroups = [];
 
@@ -245,60 +259,104 @@ export function MultiDropdownSearch(props: Props) {
 
   const leafiestCategory = selectedCategories[selectedCategories.length - 1];
 
-  let leafiestCategoryModels : Set<TtsModelListItem> = new Set();
+  let leafiestCategoryModels: Set<TtsModelListItem> = new Set();
   if (leafiestCategory !== undefined) {
-    leafiestCategoryModels = ttsModelsByCategoryToken.get(leafiestCategory.category_token) || new Set();
+    leafiestCategoryModels =
+      ttsModelsByCategoryToken.get(leafiestCategory.category_token) ||
+      new Set();
   } else {
     leafiestCategoryModels = new Set(allTtsModels);
   }
 
   const voiceCount = leafiestCategoryModels.size;
 
-  let selectClasses = 'select is-normal';
+  let selectClasses = USE_REFRESH ? "form-select" : "select is-normal";
   let loadingOption = undefined;
 
   if (isLoading) {
-    selectClasses = 'select is-normal is-loading';
+    selectClasses = USE_REFRESH ? "form-select" : "select is-normal is-loading";
     loadingOption = (
-      <option key="waiting" value="" disabled={true}>{t('ttsListPage.loading')}</option>
+      <option key="waiting" value="" disabled={true}>
+        {t("ttsListPage.loading")}
+      </option>
+    );
+  }
+
+  if (!USE_REFRESH) {
+    return (
+      <div>
+        {/* Category Dropdowns */}
+        <strong>{t('ttsListPage.categoryFilters')}</strong>
+        <br />
+        {categoryFieldGroups}
+
+        {/* Model Dropdown */}
+        <strong>
+          <Trans i18nKey="ttsListPage.voiceCount" count={voiceCount}>
+          Voice ({voiceCount} to choose from)
+          </Trans>
+        </strong>
+        <br />
+        <div className="control has-icons-left">
+          <div className={selectClasses}>
+            <select 
+                name="tts-model-select"
+                onChange={handleChangeVoice}
+                disabled={isLoading}
+              >
+              {isLoading ? loadingOption : Array.from(leafiestCategoryModels).map(model => {
+                return (
+                  <option
+                    key={model.model_token}
+                    value={model.model_token}
+                    >{model.title} ({t('ttsListPage.by')} {model.creator_display_name})</option>
+                );
+              })}
+            </select>
+          </div>
+          <span className="icon is-small is-left">
+            <FontAwesomeIcon icon={faHeadphonesAlt} />
+          </span>
+        </div>
+      </div>
     )
   }
 
   return (
     <div>
       {/* Category Dropdowns */}
-      <strong>{t('ttsListPage.categoryFilters')}</strong>
+      <label className="sub-title">{t("ttsListPage.categoryFilters")}</label>
       <br />
       {categoryFieldGroups}
 
       {/* Model Dropdown */}
-      <strong>
+      <label className="sub-title">
         <Trans i18nKey="ttsListPage.voiceCount" count={voiceCount}>
-        Voice ({voiceCount} to choose from)
+          Voice ({voiceCount} to choose from)
         </Trans>
-      </strong>
-      <br />
-      <div className="control has-icons-left">
-        <div className={selectClasses}>
-          <select 
-              name="tts-model-select"
-              onChange={handleChangeVoice}
-              disabled={isLoading}
-            >
-            {isLoading ? loadingOption : Array.from(leafiestCategoryModels).map(model => {
-              return (
-                <option
-                  key={model.model_token}
-                  value={model.model_token}
-                  >{model.title} ({t('ttsListPage.by')} {model.creator_display_name})</option>
-              );
-            })}
-          </select>
-        </div>
-        <span className="icon is-small is-left">
-          <FontAwesomeIcon icon={faHeadphonesAlt} />
+      </label>
+      <div className="form-group input-icon">
+        <span className="form-control-feedback">
+          <FontAwesomeIcon icon={faMicrophone} />
         </span>
+        <select
+          className={selectClasses}
+          name="tts-model-select"
+          onChange={handleChangeVoice}
+          disabled={isLoading}
+        >
+          {isLoading
+            ? loadingOption
+            : Array.from(leafiestCategoryModels).map((model) => {
+                return (
+                  <option key={model.model_token} value={model.model_token}>
+                    {model.title} ({t("ttsListPage.by")}{" "}
+                    {model.creator_display_name})
+                  </option>
+                );
+              })}
+        </select>
       </div>
     </div>
-  )
+  );
 }

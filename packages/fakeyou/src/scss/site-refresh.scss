@@ -1,0 +1,287 @@
+/*
+styles with important tags:
+.container
+*/
+
+p {
+  font-weight: 300;
+  margin-bottom: 0;
+  color: rgba($white, 0.9);
+}
+
+a {
+  font-weight: 400;
+  color: $primary;
+  text-decoration: none;
+  cursor: pointer;
+  transition: 0.1s;
+
+  &:hover {
+    color: lighten($primary, 5%);
+  }
+}
+
+hr {
+  border: 0;
+  border-top: 1px solid $white;
+  opacity: 0.1;
+}
+
+html.sr .load-hidden {
+  visibility: hidden;
+}
+
+select {
+  cursor: pointer;
+}
+
+button:focus,
+button:active,
+button:hover,
+label:focus,
+.btn:active,
+.btn.focus {
+  outline: 0px !important;
+  -webkit-appearance: none;
+  box-shadow: none !important;
+}
+
+code {
+  color: $primary;
+  background-color: rgba($white, 0.06);
+}
+
+.text-link {
+  color: $primary;
+}
+
+.text-light {
+  color: rgba($white, 0.7) !important;
+}
+
+.container {
+  max-width: 1080px !important;
+}
+
+.container,
+.container-fluid,
+.container-lg,
+.container-md,
+.container-sm,
+.container-xl,
+.container-xxl {
+  width: 100%;
+  padding-right: var(--bs-gutter-x, 1rem);
+  padding-left: var(--bs-gutter-x, 1rem);
+}
+
+.py-6 {
+  padding-top: 1.6rem !important;
+  padding-bottom: 0rem !important;
+}
+
+.lead {
+  color: rgba($white, 0.8);
+  font-size: 18px;
+}
+
+.text-red {
+  color: $primary;
+}
+
+.btn {
+  border-radius: 5px;
+  outline: none;
+  font-size: 15px;
+  font-weight: 600;
+  padding: 10px 24px;
+  z-index: 2;
+}
+
+.btn-primary,
+.btn-primary:focus,
+.btn-primary:active {
+  background-color: $primary !important;
+  border: 2.5px solid;
+  border-color: $primary !important;
+  transition: 0.2s;
+}
+.btn-primary:hover {
+  background-color: lighten($primary, 5%) !important;
+}
+
+.btn-secondary,
+.btn-secondary:focus,
+.btn-secondary:active {
+  background-color: $white;
+  color: #212529;
+  border: 2.5px solid;
+  border-color: $white;
+  transition: 0.2s;
+}
+.btn-secondary:hover {
+  background-color: #ccc;
+  color: #212529;
+  border: 2.5px solid;
+  border-color: #ccc;
+}
+
+.btn-destructive,
+.btn-destructive:focus,
+.btn-destructive:active {
+  background-color: #fff;
+  color: #fc6b68;
+  border: 2.5px solid;
+  border-color: #fff;
+  transition: 0.2s;
+}
+
+.btn-destructive:hover {
+  background-color: #fdcfce;
+  color: #fc6b68;
+  border: 2.5px solid;
+  border-color: #fdcfce;
+}
+
+.panel {
+  position: relative;
+  width: 100%;
+  background-color: rgba($white, 0.1);
+  border-color: #ffffff12 !important;
+  border: 1px solid;
+  border-radius: 0px;
+  backdrop-filter: blur(5px);
+
+  .panel-title {
+    position: static;
+    text-align: center;
+    text-shadow: 0px 3px 26px #00000060;
+    margin-top: -35px;
+  }
+
+  h2.panel-title {
+    margin-top: -32px;
+  }
+}
+
+.login-panel {
+  max-width: 800px !important;
+  backdrop-filter: blur(5px);
+}
+
+.sub-title {
+  font-weight: 500;
+  padding-bottom: 10px;
+}
+
+.form-control,
+.form-select {
+  border-width: 1px;
+  border-color: $white;
+  border-radius: 5px;
+  padding: 0.5rem 0.75rem;
+
+  &:focus {
+    border-color: $primary;
+    outline: 0;
+    box-shadow: 0 0 0 0.1rem $primary;
+  }
+}
+
+.fa-solid,
+.fas {
+  font-family: "Font Awesome 6 Free";
+  font-weight: 900;
+}
+
+.form-text {
+  margin-top: 10px;
+  color: darken($white, 10%);
+
+  &.red {
+    color: lighten($primary, 5%);
+  }
+}
+
+.alert {
+  border-radius: 5px;
+  font-weight: 400;
+}
+
+.input-icon {
+  display: flex;
+  align-items: center;
+
+  .form-control {
+    padding-left: 2.375rem;
+  }
+
+  .form-select {
+    padding-left: 2.375rem;
+    padding-right: 2.375rem;
+  }
+
+  .form-control-feedback {
+    position: absolute;
+    z-index: 2;
+    width: 2.375rem;
+    // height: 2.375rem;
+    // line-height: 2.69rem;
+    text-align: center;
+    pointer-events: none;
+    color: #212529;
+    opacity: 0.9;
+  }
+}
+
+.social-icon {
+  font-size: 24px;
+  color: $white;
+  text-decoration: none;
+  cursor: pointer;
+  transition: 0.2s;
+
+  &:hover {
+    color: rgba($white, 0.6);
+  }
+}
+
+@media (min-width: 992px) {
+  .panel {
+    .panel-title {
+      position: absolute;
+      text-align: left;
+      top: 0;
+      margin-top: -25px;
+    }
+
+    h2.panel-title {
+      margin-top: -20px;
+    }
+  }
+
+  .p-lg-4 {
+    padding: 2rem !important;
+  }
+
+  .lead {
+    font-size: 20px;
+  }
+}
+
+@media (min-width: 768px) {
+  .container-panel {
+    width: 100%;
+    padding-right: var(--bs-gutter-x, 1rem);
+    padding-left: var(--bs-gutter-x, 1rem);
+    margin-right: auto;
+    margin-left: auto;
+    max-width: 1080px;
+    border-radius: 8px;
+    backdrop-filter: blur(5px);
+  }
+
+  .panel {
+    border-radius: 8px;
+  }
+}
