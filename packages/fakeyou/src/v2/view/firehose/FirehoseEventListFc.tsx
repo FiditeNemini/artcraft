@@ -3,7 +3,7 @@ import { ApiConfig } from "@storyteller/components";
 import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
 import { Gravatar } from "@storyteller/components/src/elements/Gravatar";
 import { Link } from "react-router-dom";
-import { distance, duration } from "../../../data/animation";
+import { distance, duration, delay } from "../../../data/animation";
 import { USE_REFRESH } from "../../../Refresh";
 
 const Fade = require("react-reveal/Fade");
@@ -270,8 +270,8 @@ function FirehoseEventListFc(props: Props) {
       eventItems.push(<li key={event.event_token}>{inner}</li>);
     } else {
       eventItems.push(
-        <li className="mb-3" key={event.event_token}>
-          <div className="panel p-3 p-lg-3">{inner}</div>
+        <li className="panel p-3 p-lg-3" key={event.event_token}>
+          {inner}
         </li>
       );
     }
@@ -300,21 +300,23 @@ function FirehoseEventListFc(props: Props) {
   return (
     <div>
       <div className="container py-5">
-        <div className="d-flex flex-column">
-          <h1 className="display-5 fw-bold">Firehose Event Feed</h1>
-          <h4 className="mb-4">
-            The latest FakeYou events refreshed every few seconds.
-          </h4>
-          <p className="lead">
-            As you can see, we're really popular. But we owe it to you, our
-            users. Thank you!
-          </p>
-        </div>
+        <Fade bottom cascade duration={duration} distance={distance}>
+          <div className="d-flex flex-column">
+            <h1 className="display-5 fw-bold">Firehose Event Feed</h1>
+            <h4 className="mb-4">
+              The latest FakeYou events refreshed every few seconds.
+            </h4>
+            <p className="lead">
+              As you can see, we're really popular. But we owe it to you, our
+              users. Thank you!
+            </p>
+          </div>
+        </Fade>
       </div>
 
       <div className="container-panel pb-5">
-        <Fade bottom cascade>
-          <ul className="firehose-ul">{eventItems}</ul>
+        <Fade bottom cascade delay={delay} duration="800" distance="300px">
+          <ul className="firehose-ul d-flex flex-column gap-3">{eventItems}</ul>
         </Fade>
       </div>
     </div>
