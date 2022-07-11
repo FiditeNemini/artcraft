@@ -13,6 +13,8 @@ use crate::http_server::endpoints::categories::get_category::get_category_handle
 use crate::http_server::endpoints::categories::list_tts_categories::list_tts_categories_handler;
 use crate::http_server::endpoints::categories::list_tts_model_assigned_categories::list_tts_model_assigned_categories_handler;
 use crate::http_server::endpoints::events::list_events::list_events_handler;
+use crate::http_server::endpoints::flags::design_refresh_flag::disable_design_refresh_flag_handler::disable_design_refresh_flag_handler;
+use crate::http_server::endpoints::flags::design_refresh_flag::enable_design_refresh_flag_handler::enable_design_refresh_flag_handler;
 use crate::http_server::endpoints::investor_demo::disable_demo_mode_handler::disable_demo_mode_handler;
 use crate::http_server::endpoints::investor_demo::enable_demo_mode_handler::enable_demo_mode_handler;
 use crate::http_server::endpoints::leaderboard::get_leaderboard::leaderboard_handler;
@@ -109,6 +111,7 @@ pub fn add_routes<T, B> (app: App<T, B>) -> App<T, B>
   app = add_voice_clone_request_routes(app); /* /voice_clone_requests */
   app = add_twitch_routes(app); /* /twitch */ // TODO: MAYBE TEMPORARY
   app = add_investor_demo_routes(app); /* /demo_mode */ // TODO: DEFINITELY TEMPORARY
+  app = add_flag_routes(app); /* /flag */
 
   // ==================== SERVICE ====================
   app.service(
@@ -639,6 +642,33 @@ fn add_investor_demo_routes<T, B> (app: App<T, B>) -> App<T, B>
       .service(web::resource("/disable")
           .route(web::get().to(disable_demo_mode_handler))
           .route(web::head().to(|| HttpResponse::Ok()))
+      )
+  )
+}
+
+// ==================== FLAG ROUTES ====================
+
+fn add_flag_routes<T, B> (app: App<T, B>) -> App<T, B>
+  where
+      B: MessageBody,
+      T: ServiceFactory<
+        ServiceRequest,
+        Config = (),
+        Response = ServiceResponse<B>,
+        Error = Error,
+        InitError = (),
+      >,
+{
+  app.service(web::scope("/flags")
+      .service(web::scope("/design_refresh")
+          .service(web::resource("/enable")
+              .route(web::get().to(enable_design_refresh_flag_handler))
+              .route(web::head().to(|| HttpResponse::Ok()))
+          )
+          .service(web::resource("/disable")
+              .route(web::get().to(disable_design_refresh_flag_handler))
+              .route(web::head().to(|| HttpResponse::Ok()))
+          )
       )
   )
 }
