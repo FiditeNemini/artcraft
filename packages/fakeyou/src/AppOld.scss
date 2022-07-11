@@ -1,5 +1,13 @@
 //@import-normalize; /* bring in normalize.css styles */
 
+#particles-container {
+  display: none;
+}
+
+#tsparticles {
+  display: none;
+}
+
 $page-width: 700px;
 
 $light-text-color: #777;
