@@ -21,9 +21,9 @@ function PatronPage(props: Props) {
 
           <div className="columns is-vcentered">
 
-            <div className="column is-one-third">
+            <div className="col-12 col-md-5 d-flex flex-column">
               <div className="mascot">
-                <img src="/mascot/kitsune_pose7_black_2000.webp" alt="FakeYou's mascot!" />
+                <img className="img-fuild mt-5" src="/mascot/kitsune_pose7_black_2000.webp" alt="FakeYou's mascot!" />
               </div>
             </div>
 
@@ -45,8 +45,8 @@ function PatronPage(props: Props) {
             </div>
 
           </div>
-
         </div>
+
       </section>
       <div>
         <div className="content">  
@@ -63,16 +63,16 @@ function PatronPage(props: Props) {
         </div>
         </div>
         
-        
+        <div className="container pb-5">
         
 
           <p>Patrons will get first looks at new features, get dedicated access to Patron-only 
             Discord channels, can ask for specific voices from our in-house audio engineers,
             and more!</p>
-
+            <br/><br/>
           <p>Please consider <PatreonLink text="donating on Patreon" iconAfterText={true} />.</p>
-
-          <BackLink link={FrontendUrlConfig.indexPage()} text='Back to main' />
+          </div>
+          
         </div>
         </div>
     
