@@ -182,10 +182,10 @@ class App extends React.Component<Props, State> {
 
       // TODO(echelon): Once ported, statically move JS to "index.html". Also consider not using a CDN.
       const bootstrapJs = document.createElement("script");
-      bootstrapCss.setAttribute("rel", "stylesheet");
-      bootstrapCss.setAttribute("crossorigin", "anonymous");
-      bootstrapCss.setAttribute("integrity", "sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p");
-      bootstrapCss.setAttribute("src", "https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js");
+      bootstrapJs.setAttribute("rel", "stylesheet");
+      bootstrapJs.setAttribute("crossorigin", "anonymous");
+      bootstrapJs.setAttribute("integrity", "sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p");
+      bootstrapJs.setAttribute("src", "https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js");
 
       document.getElementsByTagName("body")[0].appendChild(bootstrapJs);
 
