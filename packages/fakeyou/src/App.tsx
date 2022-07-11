@@ -548,10 +548,17 @@ class App extends React.Component<Props, State> {
   };
 
   public render() {
+    // Redesign features
+    let mainClassNames = USE_REFRESH ? "bg-gradient" : "";
+    let particlesBg = <></>;
+    if (USE_REFRESH) {
+      particlesBg = <><ParticlesBG></ParticlesBG></>
+    }
+
     return (
       <BrowserRouter>
-        <div id="main" className="bg-gradient">
-          <ParticlesBG></ParticlesBG>
+        <div id="main" className={mainClassNames}>
+          {particlesBg}
 
           <div id="viewable">
             {/* This is the old vocodes1.0-compatible username and version switch
