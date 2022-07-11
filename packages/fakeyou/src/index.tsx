@@ -1,6 +1,5 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import './index.css';
 import * as serviceWorker from './serviceWorker';
 import AppTranslated from './AppTranslated';
 import { USE_REFRESH } from './Refresh';
@@ -35,7 +34,7 @@ if (USE_REFRESH) {
   bulmaCss.setAttribute("rel", "stylesheet");
   bulmaCss.setAttribute("crossorigin", "anonymous");
   bulmaCss.setAttribute("href", "https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css");
-  document.getElementsByTagName("head")[0].appendChild(bulmaCss);
+  document.getElementsByTagName("head")[0].prepend(bulmaCss);
 }
 
 ReactDOM.render(
