@@ -3,7 +3,10 @@ import { ApiConfig } from "@storyteller/components";
 import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
 import { Gravatar } from "@storyteller/components/src/elements/Gravatar";
 import { Link } from "react-router-dom";
+import { distance, duration } from "../../../data/animation";
 import { USE_REFRESH } from "../../../Refresh";
+
+const Fade = require("react-reveal/Fade");
 
 interface FirehoseEventListResponsePayload {
   success: boolean;
@@ -27,7 +30,9 @@ interface Props {
 }
 
 function FirehoseEventListFc(props: Props) {
-  const [firehoseEvents, setFirehoseEvents] = useState<Array<FirehoseEvent>>([]);
+  const [firehoseEvents, setFirehoseEvents] = useState<Array<FirehoseEvent>>(
+    []
+  );
 
   const fetchEvents = () => {
     const api = new ApiConfig();
@@ -103,7 +108,7 @@ function FirehoseEventListFc(props: Props) {
             {gravatar}
             &nbsp;
             {userLink}
-            &nbsp; signed up for FakeYou!
+            &nbsp;signed up for FakeYou!
           </span>
         );
         break;
@@ -113,7 +118,7 @@ function FirehoseEventListFc(props: Props) {
             {gravatar}
             &nbsp;
             {userLink}
-            &nbsp; got a badge!
+            &nbsp;got a badge!
           </span>
         );
         break;
@@ -123,7 +128,7 @@ function FirehoseEventListFc(props: Props) {
             {gravatar}
             &nbsp;
             {userLink}
-            &nbsp; started TTS model upload
+            &nbsp;started TTS model upload
           </span>
         );
         break;
@@ -133,7 +138,7 @@ function FirehoseEventListFc(props: Props) {
             {gravatar}
             &nbsp;
             {userLink}
-            &nbsp; completed TTS model upload
+            &nbsp;completed TTS model upload
           </span>
         );
         break;
@@ -143,7 +148,7 @@ function FirehoseEventListFc(props: Props) {
             {gravatar}
             &nbsp;
             {userLink}
-            &nbsp; started TTS
+            &nbsp;started TTS
           </span>
         );
         break;
@@ -153,7 +158,7 @@ function FirehoseEventListFc(props: Props) {
             {gravatar}
             &nbsp;
             {userLink}
-            &nbsp; completed TTS
+            &nbsp;completed TTS
           </span>
         );
         break;
@@ -163,7 +168,7 @@ function FirehoseEventListFc(props: Props) {
             {gravatar}
             &nbsp;
             {userLink}
-            &nbsp; started uploading a lipsync template.
+            &nbsp;started uploading a lipsync template.
           </span>
         );
         break;
@@ -173,7 +178,7 @@ function FirehoseEventListFc(props: Props) {
             {gravatar}
             &nbsp;
             {userLink}
-            &nbsp; finished uploading a lipsync template.
+            &nbsp;finished uploading a lipsync template.
           </span>
         );
         break;
@@ -183,7 +188,7 @@ function FirehoseEventListFc(props: Props) {
             {gravatar}
             &nbsp;
             {userLink}
-            &nbsp; started a W2L lipsync video
+            &nbsp;started a W2L lipsync video
           </span>
         );
         break;
@@ -193,7 +198,7 @@ function FirehoseEventListFc(props: Props) {
             {gravatar}
             &nbsp;
             {userLink}
-            &nbsp; completed a W2L lipsync video
+            &nbsp;completed a W2L lipsync video
           </span>
         );
         break;
@@ -203,7 +208,7 @@ function FirehoseEventListFc(props: Props) {
             {gravatar}
             &nbsp;
             {userLink}
-            &nbsp; mentioned us on twitter!
+            &nbsp;mentioned us on twitter!
           </span>
         );
         break;
@@ -213,7 +218,7 @@ function FirehoseEventListFc(props: Props) {
             {gravatar}
             &nbsp;
             {userLink}
-            &nbsp; retweeted us!
+            &nbsp;retweeted us!
           </span>
         );
         break;
@@ -223,7 +228,7 @@ function FirehoseEventListFc(props: Props) {
             {gravatar}
             &nbsp;
             {userLink}
-            &nbsp; joined discord!
+            &nbsp;joined discord!
           </span>
         );
         break;
@@ -233,7 +238,7 @@ function FirehoseEventListFc(props: Props) {
             {gravatar}
             &nbsp;
             {userLink}
-            &nbsp; sent a discord message
+            &nbsp;sent a discord message
           </span>
         );
         break;
@@ -243,7 +248,7 @@ function FirehoseEventListFc(props: Props) {
             {gravatar}
             &nbsp;
             {userLink}
-            &nbsp; subscribed to us on twitch!
+            &nbsp;subscribed to us on twitch!
           </span>
         );
         break;
@@ -253,7 +258,7 @@ function FirehoseEventListFc(props: Props) {
             {gravatar}
             &nbsp;
             {userLink}
-            &nbsp; followed us on twitch!
+            &nbsp;followed us on twitch!
           </span>
         );
         break;
@@ -261,20 +266,32 @@ function FirehoseEventListFc(props: Props) {
         return;
     }
 
-    eventItems.push(<li key={event.event_token}>{inner}</li>);
+    if (!USE_REFRESH) {
+      eventItems.push(<li key={event.event_token}>{inner}</li>);
+    } else {
+      eventItems.push(
+        <li className="mb-3" key={event.event_token}>
+          <div className="panel p-3 p-lg-3">{inner}</div>
+        </li>
+      );
+    }
   });
 
   if (!USE_REFRESH) {
     return (
       <div>
         <h1 className="title is-1"> Firehose event feed </h1>
-        <h1 className="subtitle is-3"> The latest <em>FakeYou</em> events refreshed every few seconds</h1>
+        <h1 className="subtitle is-3">
+          {" "}
+          The latest <em>FakeYou</em> events refreshed every few seconds
+        </h1>
 
         <div className="content is-large">
-          <p>As you can see, we're <em>really</em> popular. But we owe it to you, our users. Thank you!</p>
-          <ul>
-            {eventItems}
-          </ul>
+          <p>
+            As you can see, we're <em>really</em> popular. But we owe it to you,
+            our users. Thank you!
+          </p>
+          <ul>{eventItems}</ul>
         </div>
       </div>
     );
@@ -295,8 +312,10 @@ function FirehoseEventListFc(props: Props) {
         </div>
       </div>
 
-      <div className="container-panel pb-5 d-flex flex-column gap-3">
-        <ul>{eventItems}</ul>
+      <div className="container-panel pb-5">
+        <Fade bottom cascade>
+          <ul className="firehose-ul">{eventItems}</ul>
+        </Fade>
       </div>
     </div>
   );

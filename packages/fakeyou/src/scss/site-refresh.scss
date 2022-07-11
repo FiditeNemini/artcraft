@@ -275,29 +275,35 @@ styles with important tags:
       color: rgba($white, 0.6);
     }
   }
-}
 
-ul.patrons-list {
-  columns: 1;
-  list-style: none;
-}
+  ul.patrons-list {
+    columns: 1;
+    list-style: none;
+  }
 
-.form-check-input:checked {
-  background-color: $primary;
-  border-color: $primary;
-}
+  .form-check-input:checked {
+    background-color: $primary;
+    border-color: $primary;
+  }
 
-.form-check-input:focus {
-  box-shadow: none;
-}
+  .form-check-input:focus {
+    box-shadow: none;
+  }
 
-.panel-border {
-  box-sizing: border-box;
-  box-shadow: inset 0px 0px 0px 4px lighten($primary, 5%);
-}
+  .panel-border {
+    box-sizing: border-box;
+    box-shadow: inset 0px 0px 0px 4px lighten($primary, 5%);
+  }
 
-ul.pricing-list {
-  list-style: none;
+  ul.pricing-list {
+    list-style: none;
+  }
+
+  .firehose-ul {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+  }
 }
 
 @media (min-width: 992px) {
