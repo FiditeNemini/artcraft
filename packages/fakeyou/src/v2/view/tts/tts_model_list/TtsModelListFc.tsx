@@ -39,6 +39,7 @@ import { PleaseFollowNotice } from "./notices/PleaseFollowNotice";
 import { distance, delay, delay2, duration } from "../../../../data/animation";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faVolumeUp } from "@fortawesome/free-solid-svg-icons";
+
 const Fade = require("react-reveal/Fade");
 
 export interface EnqueueJobResponsePayload {

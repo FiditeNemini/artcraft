@@ -2,6 +2,7 @@ import React, { useEffect } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faChevronRight,
+  faHeadphonesAlt,
   faMicrophone,
   faTags,
   faTimes,
@@ -9,6 +10,7 @@ import {
 import { TtsModelListItem } from "@storyteller/components/src/api/tts/ListTtsModels";
 import { TtsCategoryType } from "../../../../AppWrapper";
 import { Trans, useTranslation } from "react-i18next";
+import { USE_REFRESH } from "../../../../Refresh";
 
 interface Props {
   allTtsCategories: TtsCategoryType[];
@@ -268,16 +270,56 @@ export function MultiDropdownSearch(props: Props) {
 
   const voiceCount = leafiestCategoryModels.size;
 
-  let selectClasses = "form-select";
+  let selectClasses = USE_REFRESH ? "form-select" : "select is-normal";
   let loadingOption = undefined;
 
   if (isLoading) {
-    selectClasses = "form-select";
+    selectClasses = USE_REFRESH ? "form-select" : "select is-normal is-loading";
     loadingOption = (
       <option key="waiting" value="" disabled={true}>
         {t("ttsListPage.loading")}
       </option>
     );
+  }
+
+  if (!USE_REFRESH) {
+    return (
+      <div>
+        {/* Category Dropdowns */}
+        <strong>{t('ttsListPage.categoryFilters')}</strong>
+        <br />
+        {categoryFieldGroups}
+
+        {/* Model Dropdown */}
+        <strong>
+          <Trans i18nKey="ttsListPage.voiceCount" count={voiceCount}>
+          Voice ({voiceCount} to choose from)
+          </Trans>
+        </strong>
+        <br />
+        <div className="control has-icons-left">
+          <div className={selectClasses}>
+            <select 
+                name="tts-model-select"
+                onChange={handleChangeVoice}
+                disabled={isLoading}
+              >
+              {isLoading ? loadingOption : Array.from(leafiestCategoryModels).map(model => {
+                return (
+                  <option
+                    key={model.model_token}
+                    value={model.model_token}
+                    >{model.title} ({t('ttsListPage.by')} {model.creator_display_name})</option>
+                );
+              })}
+            </select>
+          </div>
+          <span className="icon is-small is-left">
+            <FontAwesomeIcon icon={faHeadphonesAlt} />
+          </span>
+        </div>
+      </div>
+    )
   }
 
   return (
