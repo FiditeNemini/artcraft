@@ -3,6 +3,7 @@ import { ApiConfig } from "@storyteller/components";
 import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
 import { Gravatar } from "@storyteller/components/src/elements/Gravatar";
 import { Link } from "react-router-dom";
+import { USE_REFRESH } from "../../../Refresh";
 
 interface FirehoseEventListResponsePayload {
   success: boolean;
@@ -26,9 +27,7 @@ interface Props {
 }
 
 function FirehoseEventListFc(props: Props) {
-  const [firehoseEvents, setFirehoseEvents] = useState<Array<FirehoseEvent>>(
-    []
-  );
+  const [firehoseEvents, setFirehoseEvents] = useState<Array<FirehoseEvent>>([]);
 
   const fetchEvents = () => {
     const api = new ApiConfig();
@@ -43,7 +42,6 @@ function FirehoseEventListFc(props: Props) {
     })
       .then((res) => res.json())
       .then((res) => {
-        console.log("list", res);
         const firehoseResponse: FirehoseEventListResponsePayload = res;
         if (!firehoseResponse.success) {
           return;
@@ -265,6 +263,22 @@ function FirehoseEventListFc(props: Props) {
 
     eventItems.push(<li key={event.event_token}>{inner}</li>);
   });
+
+  if (!USE_REFRESH) {
+    return (
+      <div>
+        <h1 className="title is-1"> Firehose event feed </h1>
+        <h1 className="subtitle is-3"> The latest <em>FakeYou</em> events refreshed every few seconds</h1>
+
+        <div className="content is-large">
+          <p>As you can see, we're <em>really</em> popular. But we owe it to you, our users. Thank you!</p>
+          <ul>
+            {eventItems}
+          </ul>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div>
