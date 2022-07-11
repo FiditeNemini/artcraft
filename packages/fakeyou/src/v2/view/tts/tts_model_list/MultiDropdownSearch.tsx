@@ -196,12 +196,21 @@ export function MultiDropdownSearch(props: Props) {
       break;
     }
 
+    let selectCssClasses = "category-dropdown"; // NB: 'category-dropdown' is important for function.
+    let xButtonCssClasses = "button is-rounded is-outlined";
+
+    if (USE_REFRESH) {
+      // Redesign and Bootstrap CSS
+      selectCssClasses = "category-dropdown form-select";  // NB: 'category-dropdown' is important for function.
+      xButtonCssClasses = "btn btn-destructive btn-inform";
+    }
+
     categoryDropdowns.push(
       <React.Fragment key={`categoryDropdown-${i}`}>
         <div className="control has-icons-left is-expanded">
           <div className="select is-fullwidth">
             <select
-              className="category-dropdown"
+              className={selectCssClasses}
               name={`categories-${i}`}
               onChange={(ev) => handleChangeCategory(ev, i)}
               defaultValue="*"
@@ -216,7 +225,7 @@ export function MultiDropdownSearch(props: Props) {
 
         <div className="control">
           <button
-            className="button is-rounded is-outlined"
+            className={xButtonCssClasses}
             onClick={() => handleRemoveCategory(i)}
           >
             <span className="icon is-normal">
