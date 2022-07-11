@@ -1,6 +1,7 @@
 import React, { useState } from "react";
+import { FrontendUrlConfig } from "../../../common/FrontendUrlConfig";
 import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
-import { useHistory } from "react-router-dom";
+import { Link, useHistory } from "react-router-dom";
 import {
   CreateSession,
   CreateSessionIsError,
@@ -177,7 +178,13 @@ function LoginPage(props: Props) {
                   </button>
                   <p>
                     Don’t have an account?
-                    <a className="text-link">Create an account now.</a>
+                    &nbsp;
+                    <Link 
+                      to={FrontendUrlConfig.signupPage()} 
+                      className="text-link"
+                    >
+                      Create an account now.
+                    </Link>
                   </p>
                 </div>
               </form>

@@ -8,6 +8,12 @@ class FrontendUrlConfig {
     return '/';
   }
 
+  // Login and signup flow
+
+  static signupPage() : string {
+    return '/signup';
+  }
+
   // Standalone pages
 
   static aboutUsPage() : string {
