@@ -109,7 +109,6 @@
   nav {
     font-family: "Fugaz One";
     margin: 0.2em 0 0 0;
-    padding: 0;
 
     .signup {
       font-weight: bold;
@@ -130,20 +129,6 @@
       font-size: 1.5em;
       margin: 0 0.3em 0 0;
       padding: 0;
-      .vo {
-        color:  #209CEE;
-        padding: 0;
-        margin: 0;
-      }
-      .codes {
-        color:  rgba(32, 156, 238, 0.685);
-        padding: 0;
-        margin: 0;
-      }
-      a {
-        padding: 0;
-        margin: 0;
-      }
       a:link,
       a:visited {
         text-decoration: none;
@@ -155,15 +140,9 @@
         background-color: #fff;
       }
     }
-    a {
-      margin: 0;
-      padding: 0;
-    }
     a,
     a:link {
       text-decoration: none;
-      color: $light-text-color;
-      padding: 0 10px;
       cursor: pointer;
     }
     a:after {
