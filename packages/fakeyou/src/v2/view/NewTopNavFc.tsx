@@ -263,7 +263,7 @@ function NewTopNavFc(props: Props) {
                   {/* TODO(echelon): Fix the build warnings about href not being accessible. */}
                   <a
                     className="nav-link dropdown-toggle"
-                    href="javascript:void(0);"
+                    href="/"
                     id="offcanvasNavbarLgDropdown"
                     role="button"
                     data-bs-toggle="dropdown"
@@ -295,7 +295,7 @@ function NewTopNavFc(props: Props) {
                   {/* TODO(echelon): Fix the build warnings about href not being accessible. */}
                   <a
                     className="nav-link dropdown-toggle"
-                    href="javascript:void(0);"
+                    href="/"
                     id="offcanvasNavbarLgDropdown"
                     role="button"
                     data-bs-toggle="dropdown"
@@ -360,7 +360,7 @@ function NewTopNavFc(props: Props) {
                   <a 
                     className="nav-link" 
                     aria-current="page" 
-                    href="javascript:void(0);"
+                    href="/"
                   >
                     Developers
                   </a>
