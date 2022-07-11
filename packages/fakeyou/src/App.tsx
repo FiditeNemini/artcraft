@@ -196,7 +196,16 @@ class App extends React.Component<Props, State> {
     } else {
       // Old design CSS
       // NB(echelon): Despite the branches here, scss is all combined together at compile time.
-      require("bulma/css/bulma.css");
+      //require("bulma/css/bulma.css");
+
+      const bulmaCss = document.createElement("link");
+      bulmaCss.setAttribute("rel", "stylesheet");
+      bulmaCss.setAttribute("crossorigin", "anonymous");
+      //bulmaCss.setAttribute("integrity", "sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3");
+      bulmaCss.setAttribute("href", "https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css");
+
+      document.getElementsByTagName("head")[0].appendChild(bulmaCss);
+
       require("./AppOld.scss");
       require("./v2/view/_css/footer.scss");
     }
