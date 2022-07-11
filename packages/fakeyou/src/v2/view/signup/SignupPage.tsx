@@ -9,6 +9,7 @@ import { faUser, faEnvelope, faKey } from "@fortawesome/free-solid-svg-icons";
 import { Link } from "react-router-dom";
 import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
 import { distance, duration } from "../../../data/animation";
+import { USE_REFRESH } from "../../../Refresh";
 
 const Fade = require("react-reveal/Fade");
 
@@ -209,8 +210,8 @@ function SignupPage(props: Props) {
     return <div>Invalid view for logged in users.</div>;
   }
 
-  let usernameInputClass = "form-control";
-  let usernameHelpClass = "form-text red";
+  let usernameInputClass = USE_REFRESH ? "form-control" : "input";
+  let usernameHelpClass = USE_REFRESH ? "form-text red" : "help";
   switch (usernameValid) {
     case FieldTriState.EMPTY_FALSE:
       break;
@@ -224,8 +225,8 @@ function SignupPage(props: Props) {
       break;
   }
 
-  let emailInputClass = "form-control";
-  let emailHelpClass = "form-text red";
+  let emailInputClass = USE_REFRESH ? "form-control" : "input";
+  let emailHelpClass = USE_REFRESH ? "form-text red" : "help";
   switch (emailValid) {
     case FieldTriState.EMPTY_FALSE:
       break;
@@ -239,8 +240,8 @@ function SignupPage(props: Props) {
       break;
   }
 
-  let passwordInputClass = "form-control";
-  let passwordHelpClass = "form-text red";
+  let passwordInputClass = USE_REFRESH ? "form-control" : "input";
+  let passwordHelpClass = USE_REFRESH ? "form-text red" : "help";
   switch (passwordValid) {
     case FieldTriState.EMPTY_FALSE:
       break;
@@ -254,8 +255,8 @@ function SignupPage(props: Props) {
       break;
   }
 
-  let passwordConfirmationInputClass = "form-control";
-  let passwordConfirmationHelpClass = "form-text red";
+  let passwordConfirmationInputClass = USE_REFRESH ? "form-control" : "input";
+  let passwordConfirmationHelpClass = USE_REFRESH ? "form-text red" : "help";
   switch (passwordConfirmationValid) {
     case FieldTriState.EMPTY_FALSE:
       break;
@@ -267,6 +268,79 @@ function SignupPage(props: Props) {
       passwordConfirmationInputClass += " is-success";
       passwordConfirmationHelpClass += " is-success";
       break;
+  }
+
+  if (!USE_REFRESH) {
+    return (
+      <div>
+        <h1 className="title is-1"> Sign Up </h1>
+  
+        <form onSubmit={handleFormSubmit}>
+          <div className="field">
+            <label className="label">Username</label>
+            <div className="control has-icons-left has-icons-right">
+              <input className={usernameInputClass} type="text" placeholder="Username" value={username} onChange={handleUsernameChange} />
+              <span className="icon is-small is-left">
+                <FontAwesomeIcon icon={faUser} />
+              </span>
+            </div>
+            <p className={usernameHelpClass}>{usernameInvalidReason}</p>
+          </div>
+  
+          <div className="field">
+            <label className="label">Email</label>
+            <div className="control has-icons-left has-icons-right">
+              <input className={emailInputClass} type="email" placeholder="Email" value={email} onChange={handleEmailChange} />
+              <span className="icon is-small is-left">
+                <FontAwesomeIcon icon={faEnvelope} />
+              </span>
+            </div>
+            <p className={emailHelpClass}>{emailInvalidReason}</p>
+          </div>
+  
+          <div className="field">
+            <label className="label">Password</label>
+            <div className="control has-icons-left has-icons-right">
+              <input className={passwordInputClass} type="password" placeholder="Password" value={password} onChange={handlePasswordChange} />
+              <span className="icon is-small is-left">
+                <FontAwesomeIcon icon={faKey} />
+              </span>
+            </div>
+            <p className={passwordHelpClass}>{passwordInvalidReason}</p>
+          </div>
+  
+          <div className="field">
+            <label className="label">Password Confirmation</label>
+            <div className="control has-icons-left has-icons-right">
+              <input className={passwordConfirmationInputClass} type="password" placeholder="Password confirmation" value={passwordConfirmation} onChange={handlePasswordConfirmationChange} />
+              <span className="icon is-small is-left">
+                <FontAwesomeIcon icon={faKey} />
+              </span>
+            </div>
+            <p className={passwordConfirmationHelpClass}>
+              {passwordConfirmationInvalidReason}
+            </p>
+          </div>
+  
+          <br />
+  
+          <div className="notification is-warning">
+            <strong>Remember your password!</strong> We don't have password reset currently, and it'll be a 
+            few more weeks before it's added (there are more important features to work on). If you lose your
+            password, please let us know in Discord.
+          </div>
+  
+          <button className="button is-link is-large is-fullwidth">Sign up</button>
+        </form>
+  
+        <br />
+  
+        <Link to="/login"
+          className="button is-info is-large is-fullwidth is-inverted"
+          >Already have an account? Log in instead!</Link>
+  
+      </div>
+    );
   }
 
   return (
