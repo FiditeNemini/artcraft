@@ -170,6 +170,24 @@ class App extends React.Component<Props, State> {
   componentWillMount() {
     // Handle redesign
     if (USE_REFRESH) {
+      // TODO(echelon): Once ported, statically move CSS to "index.html". Also consider not using a CDN.
+      const bootstrapCss = document.createElement("link");
+      bootstrapCss.setAttribute("rel", "stylesheet");
+      bootstrapCss.setAttribute("crossorigin", "anonymous");
+      bootstrapCss.setAttribute("integrity", "sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3");
+      bootstrapCss.setAttribute("href", "https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css");
+
+      document.getElementsByTagName("head")[0].appendChild(bootstrapCss);
+
+      // TODO(echelon): Once ported, statically move JS to "index.html". Also consider not using a CDN.
+      const bootstrapJs = document.createElement("script");
+      bootstrapCss.setAttribute("rel", "stylesheet");
+      bootstrapCss.setAttribute("crossorigin", "anonymous");
+      bootstrapCss.setAttribute("integrity", "sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p");
+      bootstrapCss.setAttribute("src", "https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js");
+
+      document.getElementsByTagName("body")[0].appendChild(bootstrapJs);
+
       require("./AppNew.scss");
     } else {
       require("bulma/css/bulma.css");
