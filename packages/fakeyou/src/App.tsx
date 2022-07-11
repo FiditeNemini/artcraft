@@ -169,6 +169,7 @@ class App extends React.Component<Props, State> {
 
   componentWillMount() {
     // Handle redesign
+    console.log('componentWillMount', 'useRefresh?', USE_REFRESH);
     if (USE_REFRESH) {
       // We can't include Bootstrap CSS along with Bulma since some of the class names conflict.
       // TODO(echelon): Once ported, statically move CSS to "index.html". Also consider not using a CDN.
