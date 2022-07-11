@@ -6,13 +6,11 @@ import {
   CreateSessionIsError,
   CreateSessionIsSuccess,
 } from "@storyteller/components/src/api/session/CreateSession";
-import {
-  iconUser,
-  iconPasswordField,
-} from "@storyteller/components/src/icons/SemanticIcons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faUser, faKey } from "@fortawesome/free-solid-svg-icons";
-import { distance, delay, duration } from "../../../data/animation";
+import { distance, duration } from "../../../data/animation";
+import { USE_REFRESH } from "../../../Refresh";
+
 const Fade = require("react-reveal/Fade");
 
 interface Props {
@@ -74,9 +72,56 @@ function LoginPage(props: Props) {
 
   let errorWarning = <span />;
   if (errorMessage) {
-    errorWarning = (
-      <div className="alert alert-danger mb-4">
-        <strong>Login Error:</strong> {errorMessage}
+    if (!USE_REFRESH) {
+      errorWarning = (
+        <div className="notification is-danger is-light">
+          <strong>Login Error:</strong> {errorMessage}
+        </div>
+      )
+    } else {
+      errorWarning = (
+        <div className="alert alert-danger mb-4">
+          <strong>Login Error:</strong> {errorMessage}
+        </div>
+      );
+    }
+  }
+
+  if (!USE_REFRESH) {
+    return (
+      <div>
+        <h1 className="title is-1"> Login </h1>
+  
+        {errorWarning}
+  
+        <form onSubmit={handleFormSubmit}>
+          <div className="field">
+            <label className="label">Username or Email</label>
+            <div className="control has-icons-left has-icons-right">
+              <input className="input" type="text" placeholder="Username or Email" value={usernameOrEmail} onChange={handleUsernameOrEmailChange} />
+              <span className="icon is-small is-left">
+                <FontAwesomeIcon icon={faUser} />
+              </span>
+            </div>
+            {/*<p className="help"></p>*/}
+          </div>
+  
+          <div className="field">
+            <label className="label">Password</label>
+            <div className="control has-icons-left has-icons-right">
+              <input className="input" type="password" placeholder="Password" value={password} onChange={handlePasswordChange} />
+              <span className="icon is-small is-left">
+                <FontAwesomeIcon icon={faKey} />
+              </span>
+            </div>
+            {/*<p className="help"></p>*/}
+          </div>
+  
+          <br />
+  
+          <button className="button is-link is-large is-fullwidth">Login</button>
+  
+        </form>
       </div>
     );
   }

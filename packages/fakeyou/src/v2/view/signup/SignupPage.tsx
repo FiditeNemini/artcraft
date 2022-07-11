@@ -8,7 +8,8 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faUser, faEnvelope, faKey } from "@fortawesome/free-solid-svg-icons";
 import { Link } from "react-router-dom";
 import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
-import { distance, delay, duration } from "../../../data/animation";
+import { distance, duration } from "../../../data/animation";
+
 const Fade = require("react-reveal/Fade");
 
 enum FieldTriState {
