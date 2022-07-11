@@ -9,6 +9,7 @@ pub fn build_design_refresh_cookie(server_state: &ServerState, enable: bool) -> 
   Cookie::build(REFRESH_COOKIE_NAME, value)
       .domain(&server_state.env_config.cookie_domain)
       .secure(server_state.env_config.cookie_secure) // HTTPS-only
+      .path("/")
       .http_only(false) // This is meant to be exposed to Javascript!
       .permanent()
 }
