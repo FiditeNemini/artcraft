@@ -170,42 +170,14 @@ class App extends React.Component<Props, State> {
   componentWillMount() {
     // Handle redesign
     console.log('componentWillMount', 'useRefresh?', USE_REFRESH);
+    
     if (USE_REFRESH) {
-      // We can't include Bootstrap CSS along with Bulma since some of the class names conflict.
-      // TODO(echelon): Once ported, statically move CSS to "index.html". Also consider not using a CDN.
-      const bootstrapCss = document.createElement("link");
-      bootstrapCss.setAttribute("rel", "stylesheet");
-      bootstrapCss.setAttribute("crossorigin", "anonymous");
-      bootstrapCss.setAttribute("integrity", "sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3");
-      bootstrapCss.setAttribute("href", "https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css");
-
-      document.getElementsByTagName("head")[0].appendChild(bootstrapCss);
-
-      // TODO(echelon): Once ported, statically move JS to "index.html". Also consider not using a CDN.
-      const bootstrapJs = document.createElement("script");
-      bootstrapJs.setAttribute("rel", "stylesheet");
-      bootstrapJs.setAttribute("crossorigin", "anonymous");
-      bootstrapJs.setAttribute("integrity", "sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p");
-      bootstrapJs.setAttribute("src", "https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js");
-
-      document.getElementsByTagName("body")[0].appendChild(bootstrapJs);
-
       // Redesign-specific CSS
       // NB(echelon): Despite the branches here, scss is all combined together at compile time.
       require("./AppNew.scss");
     } else {
       // Old design CSS
       // NB(echelon): Despite the branches here, scss is all combined together at compile time.
-      //require("bulma/css/bulma.css");
-
-      const bulmaCss = document.createElement("link");
-      bulmaCss.setAttribute("rel", "stylesheet");
-      bulmaCss.setAttribute("crossorigin", "anonymous");
-      //bulmaCss.setAttribute("integrity", "sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3");
-      bulmaCss.setAttribute("href", "https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css");
-
-      document.getElementsByTagName("head")[0].appendChild(bulmaCss);
-
       require("./AppOld.scss");
       require("./v2/view/_css/footer.scss");
     }
