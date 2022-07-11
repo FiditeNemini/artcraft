@@ -191,9 +191,11 @@ class App extends React.Component<Props, State> {
       document.getElementsByTagName("body")[0].appendChild(bootstrapJs);
 
       // Redesign-specific CSS
+      // NB(echelon): Despite the branches here, scss is all combined together at compile time.
       require("./AppNew.scss");
     } else {
       // Old design CSS
+      // NB(echelon): Despite the branches here, scss is all combined together at compile time.
       require("bulma/css/bulma.css");
       require("./AppOld.scss");
       require("./v2/view/_css/footer.scss");
