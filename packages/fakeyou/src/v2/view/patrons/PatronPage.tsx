@@ -4,7 +4,8 @@ import { FrontendUrlConfig } from '../../../common/FrontendUrlConfig';
 import { SessionWrapper } from '@storyteller/components/src/session/SessionWrapper';
 import { PATRONS } from '../../../data/Patrons';
 import { PatreonLink } from '@storyteller/components/src/elements/PatreonLink';
-
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faPatreon } from "@fortawesome/free-brands-svg-icons";
 interface Props {
   sessionWrapper: SessionWrapper,
 }
@@ -14,7 +15,7 @@ function PatronPage(props: Props) {
   return (
     <>
      
-      <section className="hero is-small">
+      <section className="container-panel">
         <div className="hero-body">
 
           <div className="columns is-vcentered">
@@ -29,9 +30,15 @@ function PatronPage(props: Props) {
               <h1 className="display-5 fw-bold">
                 Thanks to our Patrons!
               </h1>
-              <p className="subtitle">
+              <h3 className="mb-4">
                 Our Patrons help support our work.
-              </p>
+              </h3>
+            </div>
+            <div>
+              <button type="button" className="btn btn-primary">
+              <FontAwesomeIcon icon={faPatreon} className="me-2" />
+               Support us on Patreon
+              </button>
             </div>
 
           </div>
