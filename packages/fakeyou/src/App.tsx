@@ -170,6 +170,7 @@ class App extends React.Component<Props, State> {
   componentWillMount() {
     // Handle redesign
     if (USE_REFRESH) {
+      // We can't include Bootstrap CSS along with Bulma since some of the class names conflict.
       // TODO(echelon): Once ported, statically move CSS to "index.html". Also consider not using a CDN.
       const bootstrapCss = document.createElement("link");
       bootstrapCss.setAttribute("rel", "stylesheet");
@@ -188,8 +189,10 @@ class App extends React.Component<Props, State> {
 
       document.getElementsByTagName("body")[0].appendChild(bootstrapJs);
 
+      // Redesign-specific CSS
       require("./AppNew.scss");
     } else {
+      // Old design CSS
       require("bulma/css/bulma.css");
       require("./AppOld.scss");
       require("./v2/view/_css/footer.scss");
