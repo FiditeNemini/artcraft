@@ -39,6 +39,7 @@ import { PleaseFollowNotice } from "./notices/PleaseFollowNotice";
 import { distance, delay, delay2, duration } from "../../../../data/animation";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faVolumeUp } from "@fortawesome/free-solid-svg-icons";
+import { USE_REFRESH } from "../../../../Refresh";
 
 const Fade = require("react-reveal/Fade");
 
@@ -275,6 +276,138 @@ function TtsModelListFc(props: Props) {
         </div>
       );
     }
+  }
+
+  if (!USE_REFRESH) {
+    return (
+      <div>
+
+        <section className="hero is-small">
+          <div className="hero-body">
+
+            <div className="columns is-vcentered">
+
+              <div className="column is-one-third">
+                <div className="mascot">
+                  <img src="/mascot/kitsune_pose2_black_2000.webp" alt="FakeYou's mascot!" />
+                </div>
+              </div>
+
+              <div className="column">
+                <p className="title">
+                  {t('pages.ttsList.heroTitle')}
+                </p>
+                <p className="subtitle">
+                  <Trans i18nKey="pages.ttsList.heroSubtitle">
+                    Use <strong>FakeYou</strong> deep fake tech to say stuff with your 
+                    favorite characters.
+                  </Trans>
+                </p>
+              </div>
+
+            </div>
+
+          </div>
+        </section>
+
+        <br />
+
+        {pleaseFollowNotice}
+
+        {languageNotice}
+
+        {vocodesNotice}
+
+        {twitchTtsNotice}
+
+        <form onSubmit={handleFormSubmit} className="main-form">
+
+          <MultiDropdownSearch 
+            allTtsCategories={props.allTtsCategories} 
+            allTtsModels={props.ttsModels}
+            allTtsCategoriesByTokenMap={props.allTtsCategoriesByTokenMap}
+            allTtsModelsByTokenMap={props.allTtsModelsByTokenMap}
+            ttsModelsByCategoryToken={props.ttsModelsByCategoryToken}
+            dropdownCategories={props.dropdownCategories}
+            setDropdownCategories={props.setDropdownCategories}
+            selectedCategories={props.selectedCategories}
+            setSelectedCategories={props.setSelectedCategories}
+            maybeSelectedTtsModel={props.maybeSelectedTtsModel}
+            setMaybeSelectedTtsModel={props.setMaybeSelectedTtsModel}
+            />
+
+          <AutocompleteSearch
+            allTtsCategories={props.allTtsCategories} 
+            allTtsModels={props.ttsModels}
+            allTtsModelsByTokenMap={props.allTtsModelsByTokenMap}
+            dropdownCategories={props.dropdownCategories}
+            setDropdownCategories={props.setDropdownCategories}
+            selectedCategories={props.selectedCategories}
+            setSelectedCategories={props.setSelectedCategories}
+            maybeSelectedTtsModel={props.maybeSelectedTtsModel}
+            setMaybeSelectedTtsModel={props.setMaybeSelectedTtsModel}
+            />
+
+          {directViewLink}
+
+          <br />
+          <br />
+
+          <div className="field">
+            <div className="control">
+              <textarea 
+                onChange={handleChangeText}
+                className="textarea is-large" 
+                value={props.textBuffer}
+                placeholder={t('pages.ttsList.placeholderTextGoesHere')}></textarea>
+            </div>
+          </div>
+
+          {maybeError}
+
+          <div className="button-group">
+            <div className="columns is-mobile">
+              <div className="column has-text-centered">
+                <button 
+                  className="button is-danger is-large" 
+                  disabled={remainingCharactersButtonDisabled}>{t('pages.ttsList.buttonSpeak')}</button>
+              </div>
+              <div className="column has-text-centered">
+                <button 
+                  className="button is-danger is-light is-large" 
+                  onClick={handleClearClick}>{t('pages.ttsList.buttonClear')}</button>
+              </div>
+            </div>
+          </div>
+
+        </form>
+
+        <br />
+        <br />
+        <SessionTtsInferenceResultListFc ttsInferenceJobs={props.ttsInferenceJobs} />
+
+        <br />
+        <br />
+
+        <SessionW2lInferenceResultListFc
+          w2lInferenceJobs={props.w2lInferenceJobs}
+          />
+        <br />
+        <br />
+
+        <SessionW2lTemplateUploadResultListFc
+          w2lTemplateUploadJobs={props.w2lTemplateUploadJobs}
+          />
+
+        <br />
+        <br />
+
+        <SessionTtsModelUploadResultListFc
+          modelUploadJobs={props.ttsModelUploadJobs}
+          />
+
+      </div>
+    );
   }
 
   return (
