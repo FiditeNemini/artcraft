@@ -40,31 +40,68 @@ function NewFooterNavFc(props: Props) {
         <hr />
         <div className="content has-text-centered">
           <p>
-            <Link to="/">{t('coreUi.footerNav.textToSpeech')}</Link>
+            <Link to="/">{t("coreUi.footerNav.textToSpeech")}</Link>
             &nbsp;|
-            <Link to="/video">{t('coreUi.footerNav.video')}</Link>
+            <Link to="/video">{t("coreUi.footerNav.video")}</Link>
             &nbsp;|
-            <Link to="/contribute">{t('coreUi.footerNav.upload')}</Link>
+            <Link to="/contribute">{t("coreUi.footerNav.upload")}</Link>
             &nbsp;|
-            <Link to="/leaderboard">{t('coreUi.footerNav.leaderboard')}</Link>
+            <Link to="/leaderboard">{t("coreUi.footerNav.leaderboard")}</Link>
             &nbsp;|
-            <Link to={FrontendUrlConfig.patronsPage()}>{t('coreUi.footerNav.patrons')}</Link>
+            <Link to={FrontendUrlConfig.patronsPage()}>
+              {t("coreUi.footerNav.patrons")}
+            </Link>
             &nbsp;|
-            <Link to="/firehose">{t('coreUi.footerNav.feed')}</Link>
+            <Link to="/firehose">{t("coreUi.footerNav.feed")}</Link>
             &nbsp;|
-            <a href={FrontendUrlConfig.developerDocs()}>{t('coreUi.footerNav.apiDocs')}</a>
+            <a href={FrontendUrlConfig.developerDocs()}>
+              {t("coreUi.footerNav.apiDocs")}
+            </a>
             &nbsp;|
-            <Link to="/about">{t('coreUi.footerNav.aboutUs')}</Link>
+            <Link to="/about">{t("coreUi.footerNav.aboutUs")}</Link>
             &nbsp;|
-            <Link to="/terms">{t('coreUi.footerNav.termsOfUse')}</Link>
+            <Link to="/terms">{t("coreUi.footerNav.termsOfUse")}</Link>
           </p>
 
           <div className="v2_social">
-            <a href="https://discord.gg/H72KFXm" target="_blank" rel="noopener noreferrer"><img src="/social-icons/016-discord.png" alt="Join us on Discord!" /></a>
-            <a href="https://twitch.tv/FakeYouLabs" target="_blank" rel="noopener noreferrer"><img src="/social-icons/094-twitch.png" alt="Twitch" /></a>
-            <a href="https://twitter.com/intent/follow?screen_name=FakeYouApp" target="_blank" rel="noopener noreferrer"><img src="/social-icons/096-twitter.png" alt="Twitter" /></a>
-            <a href="https://facebook.com/vocodes" target="_blank" rel="noopener noreferrer"><img src="/social-icons/024-facebook.png" alt="Facething" /></a>
-            <a href="https://www.patreon.com/FakeYou" target="_blank" rel="noopener noreferrer"><img src="/social-icons/061-patreon.png" alt="Patreon" /></a>
+            <a
+              href="https://discord.gg/H72KFXm"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <img
+                src="/social-icons/016-discord.png"
+                alt="Join us on Discord!"
+              />
+            </a>
+            <a
+              href="https://twitch.tv/FakeYouLabs"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <img src="/social-icons/094-twitch.png" alt="Twitch" />
+            </a>
+            <a
+              href="https://twitter.com/intent/follow?screen_name=FakeYouApp"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <img src="/social-icons/096-twitter.png" alt="Twitter" />
+            </a>
+            <a
+              href="https://facebook.com/vocodes"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <img src="/social-icons/024-facebook.png" alt="Facething" />
+            </a>
+            <a
+              href="https://www.patreon.com/FakeYou"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <img src="/social-icons/061-patreon.png" alt="Patreon" />
+            </a>
           </div>
 
           <p>
@@ -78,7 +115,6 @@ function NewFooterNavFc(props: Props) {
           </p>
 
           {moderationLink}
-
         </div>
       </div>
     );
@@ -91,24 +127,42 @@ function NewFooterNavFc(props: Props) {
       </div>
 
       <div className="d-flex flex-column container py-5 gap-4">
-        <div className="text-center align-items-center justify-content-center gap-3">
-          <Link to="/">Text to Speech</Link>
-          &nbsp;|&nbsp;
-          <Link to="/video">Video</Link>
-          &nbsp;|&nbsp;
-          <Link to="/contribute">Upload</Link>
-          &nbsp;|&nbsp;
-          <Link to="/leaderboard">Leaderboard</Link>
-          &nbsp;|&nbsp;
-          <Link to={FrontendUrlConfig.patronsPage()}>Patrons</Link>
-          &nbsp;|&nbsp;
-          <Link to="/firehose">Feed</Link>
-          &nbsp;|&nbsp;
-          <a href={FrontendUrlConfig.developerDocs()}>API Docs</a>
-          &nbsp;|&nbsp;
-          <Link to="/about">About Us</Link>
-          &nbsp;|&nbsp;
-          <Link to="/terms">Terms of Use</Link>
+        <div className="text-center align-items-center justify-content-center gap-2 d-flex flex-wrap">
+          <div>
+            <Link to="/">Text to Speech</Link>
+          </div>
+          &nbsp;|
+          <div>
+            <Link to="/video">Video</Link>
+          </div>
+          &nbsp;|
+          <div>
+            <Link to="/contribute">Upload</Link>
+          </div>
+          &nbsp;|
+          <div>
+            <Link to="/leaderboard">Leaderboard</Link>
+          </div>
+          &nbsp;|
+          <div>
+            <Link to={FrontendUrlConfig.patronsPage()}>Patrons</Link>
+          </div>
+          &nbsp;|
+          <div>
+            <Link to="/firehose">Feed</Link>
+          </div>
+          &nbsp;|
+          <div>
+            <a href={FrontendUrlConfig.developerDocs()}>API Docs</a>
+          </div>
+          &nbsp;|
+          <div>
+            <Link to="/about">About Us</Link>
+          </div>
+          &nbsp;|
+          <div>
+            <Link to="/terms">Terms of Use</Link>
+          </div>
         </div>
 
         <div className="d-flex justify-content-center gap-4">
