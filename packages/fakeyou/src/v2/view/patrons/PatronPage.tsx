@@ -133,7 +133,12 @@ function PatronPage(props: Props) {
               </div>
             </div>
           </div>
-          <div className="pt-5">
+        </Fade>
+      </div>
+
+      <div className="container pb-5">
+        <Fade bottom distance={distance} delay={delay2} duration={duration}>
+          <div>
             <p>
               Patrons will get first looks at new features, get dedicated access
               to Patron-only Discord channels, can ask for specific voices from
