@@ -771,19 +771,19 @@ function VoiceCloneRequestPage(props: Props) {
 
             <br />
 
-            <div className="field">
-              <label className="label">
+            <div>
+              <label className="sub-title">
                 If it isn't your voice, tell us about who it is!
               </label>
-              <div className="control has-icons-left">
+              <div className="form-group input-icon">
                 <input
-                  className="input is-medium is-fullwidth"
+                  className="form-control"
                   type="text"
                   placeholder="Notes on the person"
                   value={notesOnSubject}
                   onChange={handleSubjectNotesChange}
                 />
-                <span className="icon is-small is-left">
+                <span className="form-control-feedback">
                   <FontAwesomeIcon icon={faUser} />
                 </span>
               </div>
@@ -799,10 +799,12 @@ function VoiceCloneRequestPage(props: Props) {
 
             <br />
 
-            <div className="checkbox-block">
+            <div className="form-check">
               <label className="checkbox">
                 <input
                   type="checkbox"
+                  id="check1"
+                  className="form-check-input"
                   checked={isForMusic}
                   onChange={handleIsForMusicChange}
                 />
@@ -859,18 +861,19 @@ function VoiceCloneRequestPage(props: Props) {
             <br />
 
             <div className="field">
-              <label className="label">
+              <label className="sub-title">
                 Let us know more about your use (optional)
               </label>
-              <div className="control has-icons-left">
+              <div className="form-group input-icon">
                 <input
-                  className="input is-medium is-fullwidth"
+                  
                   type="text"
+                  className="form-control"
                   placeholder="Optional details"
                   value={optionalNotesOnUse}
                   onChange={handleOptionalNotesOnUseChange}
                 />
-                <span className="icon is-small is-left">
+                <span className="form-control-feedback">
                   <FontAwesomeIcon icon={faEnvelope} />
                 </span>
               </div>
@@ -957,10 +960,10 @@ function VoiceCloneRequestPage(props: Props) {
             <h1 className="title is-3">Anything else?</h1>
 
             <div className="field">
-              <label className="label">Do you have any questions for us?</label>
-              <div className="control">
+              <label className="sub-title">Do you have any questions for us?</label>
+              <div className="form-group input-icon">
                 <textarea
-                  className="textarea"
+                  className="form-control"
                   placeholder="Optional Questions"
                   onChange={handleOptionalQuestionsChange}
                   value={optionalQuestions}
@@ -969,12 +972,12 @@ function VoiceCloneRequestPage(props: Props) {
             </div>
 
             <div className="field">
-              <label className="label">
+              <label className="sub-title">
                 Do you have any important notes or details?
               </label>
-              <div className="control">
+              <div className="form-control">
                 <textarea
-                  className="textarea"
+                  className="form-control"
                   placeholder="Optional Notes"
                   onChange={handleOptionalExtraCommentsChange}
                   value={optionalExtraComments}
@@ -987,7 +990,7 @@ function VoiceCloneRequestPage(props: Props) {
             {errorMessage}
 
             <button
-              className="button is-link is-large is-fullwidth"
+              className="btn btn-primary btn-lg w-100 mt-2"
               onClick={handleSubmit}
             >
               Clone my voice!&nbsp;
