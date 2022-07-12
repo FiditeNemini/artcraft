@@ -54,6 +54,26 @@ styles with important tags:
     box-shadow: none !important;
   }
 
+  thead,
+  tbody {
+    border-color: rgba($white, 0.2) !important;
+  }
+
+  th {
+    color: $white;
+    font-weight: 700;
+    vertical-align: text-top;
+  }
+
+  td {
+    color: rgba($white, 0.8);
+    font-weight: 400;
+  }
+
+  .rounded {
+    border-radius: 8px !important;
+  }
+
   code {
     color: $primary;
     background-color: rgba($white, 0.06);
@@ -269,6 +289,15 @@ ul.patrons-list {
 
 .form-check-input:focus {
   box-shadow: none;
+}
+
+.panel-border {
+  box-sizing: border-box;
+  box-shadow: inset 0px 0px 0px 4px lighten($primary, 5%);
+}
+
+ul.pricing-list {
+  list-style: none;
 }
 
 @media (min-width: 992px) {
