@@ -249,7 +249,7 @@ function NewTopNavFc(props: Props) {
             </div>
             <div className="offcanvas-body">
               <ul className="navbar-nav justify-content-start align-items-lg-center flex-grow-1 gap-2 gap-lg-0">
-                <li className="nav-item">
+                <li data-bs-toggle="offcanvas" className="nav-item">
                   <Link
                     to={FrontendUrlConfig.cloneRequestPage()}
                     className="nav-link"
@@ -276,13 +276,13 @@ function NewTopNavFc(props: Props) {
                     className="dropdown-menu"
                     aria-labelledby="offcanvasNavbarLgDropdown"
                   >
-                    <li>
+                    <li data-bs-toggle="offcanvas">
                       <Link className="dropdown-item" to="/">
                         <FontAwesomeIcon icon={faVolumeUp} className="me-2" />
                         TTS
                       </Link>
                     </li>
-                    <li>
+                    <li data-bs-toggle="offcanvas">
                       <Link className="dropdown-item" to="/video">
                         <FontAwesomeIcon icon={faVideo} className="me-2" />
                         Video
@@ -307,26 +307,26 @@ function NewTopNavFc(props: Props) {
                     className="dropdown-menu"
                     aria-labelledby="offcanvasNavbarLgDropdown"
                   >
-                    <li>
+                    <li data-bs-toggle="offcanvas">
                       <Link className="dropdown-item" to="/contribute">
                         <FontAwesomeIcon icon={faUpload} className="me-2" />
                         Contribute/Upload
                       </Link>
                     </li>
-                    <li>
+                    <li data-bs-toggle="offcanvas">
                       <Link className="dropdown-item" to="/leaderboard">
                         <FontAwesomeIcon icon={faTrophy} className="me-2" />
                         Leaderboard
                       </Link>
                     </li>
-                    <li>
+                    <li data-bs-toggle="offcanvas">
                       <Link className="dropdown-item" to="/patrons">
                         <FontAwesomeIcon icon={faPatreon} className="me-2" />
                         Patrons
                       </Link>
                     </li>
-                    <li>
-                      <Link className="dropdown-item" to="/firehose">
+                    <li data-bs-toggle="offcanvas">
+                      <Link  className="dropdown-item" to="/firehose">
                         <FontAwesomeIcon icon={faList} className="me-2" />
                         Feed
                       </Link>
@@ -334,7 +334,7 @@ function NewTopNavFc(props: Props) {
                     <li>
                       <div className="dropdown-divider"></div>
                     </li>
-                    <li>
+                    <li data-bs-toggle="offcanvas">
                       <Link className="dropdown-item" to="/profile">
                         <FontAwesomeIcon icon={faUser} className="me-2" />
                         My Data
@@ -343,13 +343,13 @@ function NewTopNavFc(props: Props) {
                   </ul>
                 </li>
 
-                <li className="nav-item d-lg-none">
+                <li data-bs-toggle="offcanvas" className="nav-item d-lg-none">
                   <Link className="nav-link" aria-current="page" to="/about">
                     About
                   </Link>
                 </li>
 
-                <li className="nav-item d-lg-none">
+                <li data-bs-toggle="offcanvas" className="nav-item d-lg-none">
                   <Link className="nav-link" aria-current="page" to="/terms">
                     Terms of Use
                   </Link>
