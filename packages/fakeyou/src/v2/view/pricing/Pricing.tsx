@@ -12,6 +12,8 @@ import {
   FAKEYOU_PRICES as FYP,
   STORYTELLER_PRICES as STP,
 } from "@storyteller/fakeyou/src/data/PriceTiers";
+import { distance, delay, delay2, duration } from "../../../data/animation";
+const Fade = require("react-reveal/Fade");
 
 interface Props {
   sessionWrapper: SessionWrapper;
@@ -60,169 +62,187 @@ function PricingPage(props: Props) {
 
   return (
     <div>
-      <div className="container py-5 text-center">
-        <h1 className="display-5 fw-bold">FakeYou Pricing</h1>
-      </div>
+      <Fade bottom duration={duration} distance={distance}>
+        <div className="container py-5 text-center">
+          <h1 className="display-5 fw-bold">FakeYou Pricing</h1>
+        </div>
+      </Fade>
 
       <div className="container mt-3">
         <div className="row gy-4">
-          <div className="col-12 col-lg-4">
-            <div className="rounded panel p-4 h-100">
-              <h2 className="text-center my-2">Free</h2>
-              <p className="mb-4 text-center">Great for hobbyists</p>
-              <Link to="/" className="btn btn-secondary w-100 fs-5">
-                Create free TTS
-              </Link>
-              <h2 className="display-5 fw-bold text-center my-5">
-                ${current_list.free.price}
-                <span className="fs-5 opacity-75 fw-normal"> /month</span>
-              </h2>
-              <ul className="pricing-list d-flex flex-column gap-3">
-                <li>
-                  <FontAwesomeIcon icon={faCheck} className="text-red me-3" />
-                  Unlimited TTS Generation
-                </li>
-                <li>
-                  <FontAwesomeIcon icon={faCheck} className="text-red me-3" />
-                  Up to 10 seconds audio
-                </li>
-              </ul>
+          <Fade
+            bottom
+            cascade
+            duration={duration}
+            distance={distance}
+            delay={delay2}
+          >
+            <div className="col-12 col-lg-4">
+              <div className="rounded panel p-4 h-100">
+                <h2 className="text-center my-2">Free</h2>
+                <p className="mb-4 text-center">Great for hobbyists</p>
+                <Link to="/" className="btn btn-secondary w-100 fs-5">
+                  Create free TTS
+                </Link>
+                <h2 className="display-5 fw-bold text-center my-5">
+                  ${current_list.free.price}
+                  <span className="fs-5 opacity-75 fw-normal"> /month</span>
+                </h2>
+                <ul className="pricing-list d-flex flex-column gap-3">
+                  <li>
+                    <FontAwesomeIcon icon={faCheck} className="text-red me-3" />
+                    Unlimited TTS Generation
+                  </li>
+                  <li>
+                    <FontAwesomeIcon icon={faCheck} className="text-red me-3" />
+                    Up to 10 seconds audio
+                  </li>
+                </ul>
+              </div>
             </div>
-          </div>
-          <div className="col-12 col-lg-4">
-            <div className="rounded panel p-4 panel-border h-100">
-              <h2 className="text-center my-2">Basic</h2>
-              <p className="mb-4 text-center">Great for hobbyists</p>
-              <Link to="/" className="btn btn-primary w-100 fs-5">
-                Buy Basic
-              </Link>
-              <h2 className="display-5 fw-bold text-center my-5">
-                ${current_list.basic.price}
-                <span className="fs-5 opacity-75 fw-normal"> /month</span>
-              </h2>
-              <ul className="pricing-list d-flex flex-column gap-3">
-                <li>
-                  <FontAwesomeIcon icon={faCheck} className="text-red me-3" />
-                  Unlimited TTS Generation
-                </li>
-                <li>
-                  <FontAwesomeIcon icon={faCheck} className="text-red me-3" />
-                  Up to 30 seconds audio
-                </li>
-                <li>
-                  <FontAwesomeIcon icon={faCheck} className="text-red me-3" />
-                  Priority processing
-                </li>
-              </ul>
+            <div className="col-12 col-lg-4">
+              <div className="rounded panel p-4 panel-border h-100">
+                <h2 className="text-center my-2">Basic</h2>
+                <p className="mb-4 text-center">Great for hobbyists</p>
+                <Link to="/" className="btn btn-primary w-100 fs-5">
+                  Buy Basic
+                </Link>
+                <h2 className="display-5 fw-bold text-center my-5">
+                  ${current_list.basic.price}
+                  <span className="fs-5 opacity-75 fw-normal"> /month</span>
+                </h2>
+                <ul className="pricing-list d-flex flex-column gap-3">
+                  <li>
+                    <FontAwesomeIcon icon={faCheck} className="text-red me-3" />
+                    Unlimited TTS Generation
+                  </li>
+                  <li>
+                    <FontAwesomeIcon icon={faCheck} className="text-red me-3" />
+                    Up to 30 seconds audio
+                  </li>
+                  <li>
+                    <FontAwesomeIcon icon={faCheck} className="text-red me-3" />
+                    Priority processing
+                  </li>
+                </ul>
+              </div>
             </div>
-          </div>
-          <div className="col-12 col-lg-4">
-            <div className="rounded panel p-4 h-100">
-              <h2 className="text-center my-2">Pro</h2>
-              <p className="mb-4 text-center">Great for hobbyists</p>
-              <Link to="/" className="btn btn-primary w-100 fs-5">
-                Buy Pro
-              </Link>
-              <h2 className="display-5 fw-bold text-center my-5">
-                ${current_list.pro.price}
-                <span className="fs-5 opacity-75 fw-normal"> /month</span>
-              </h2>
-              <ul className="pricing-list d-flex flex-column gap-3">
-                <li>
-                  <FontAwesomeIcon icon={faCheck} className="text-red me-3" />
-                  Unlimited TTS Generation
-                </li>
-                <li>
-                  <FontAwesomeIcon icon={faCheck} className="text-red me-3" />
-                  Up to 1 minute audio
-                </li>
-                <li>
-                  <FontAwesomeIcon icon={faCheck} className="text-red me-3" />
-                  Priority processing
-                </li>
-                <li>
-                  <FontAwesomeIcon icon={faCheck} className="text-red me-3" />
-                  Generate mp3 file
-                </li>
-                <li>
-                  <FontAwesomeIcon icon={faCheck} className="text-red me-3" />
-                  For Commercial Use
-                </li>
-              </ul>
+            <div className="col-12 col-lg-4">
+              <div className="rounded panel p-4 h-100">
+                <h2 className="text-center my-2">Pro</h2>
+                <p className="mb-4 text-center">Great for hobbyists</p>
+                <Link to="/" className="btn btn-primary w-100 fs-5">
+                  Buy Pro
+                </Link>
+                <h2 className="display-5 fw-bold text-center my-5">
+                  ${current_list.pro.price}
+                  <span className="fs-5 opacity-75 fw-normal"> /month</span>
+                </h2>
+                <ul className="pricing-list d-flex flex-column gap-3">
+                  <li>
+                    <FontAwesomeIcon icon={faCheck} className="text-red me-3" />
+                    Unlimited TTS Generation
+                  </li>
+                  <li>
+                    <FontAwesomeIcon icon={faCheck} className="text-red me-3" />
+                    Up to 1 minute audio
+                  </li>
+                  <li>
+                    <FontAwesomeIcon icon={faCheck} className="text-red me-3" />
+                    Priority processing
+                  </li>
+                  <li>
+                    <FontAwesomeIcon icon={faCheck} className="text-red me-3" />
+                    Generate mp3 file
+                  </li>
+                  <li>
+                    <FontAwesomeIcon icon={faCheck} className="text-red me-3" />
+                    For Commercial Use
+                  </li>
+                </ul>
+              </div>
             </div>
-          </div>
+          </Fade>
         </div>
       </div>
 
-      <div className="container-panel mt-5 py-5">
-        <div className="panel p-4">
-          <table className="table">
-            <thead>
-              <tr>
-                <th className="">Feature List</th>
+      <Fade
+        bottom
+        cascade
+        duration={duration}
+        distance={distance}
+        delay={delay2}
+      >
+        <div className="container-panel mt-5 py-5">
+          <div className="panel p-4">
+            <table className="table">
+              <thead>
+                <tr>
+                  <th className="">Feature List</th>
 
-                {current_tiers.map((e) => {
+                  {current_tiers.map((e) => {
+                    return (
+                      <th key={e} className="">
+                        {capitalize(e)}
+                      </th>
+                    );
+                  })}
+                </tr>
+              </thead>
+
+              <tbody>
+                <tr>
+                  <td className="has-text-weight-bold">Price</td>
+                  <td>${current_list.free.price}/month</td>
+                  <td>${current_list.basic.price}/month</td>
+                  <td>${current_list.pro.price}/month</td>
+                </tr>
+
+                {current_features.map((e, i) => {
                   return (
-                    <th key={e} className="">
-                      {capitalize(e)}
-                    </th>
+                    <tr key={i}>
+                      <td>{e}</td>
+
+                      <td>
+                        <FontAwesomeIcon
+                          icon={current_list.free.features[e] ? TRUE : FALSE}
+                          className={`fa-2x ${
+                            current_list.free.features[e]
+                              ? "has-text-success"
+                              : "has-text-danger"
+                          }`}
+                        />
+                      </td>
+
+                      <td>
+                        <FontAwesomeIcon
+                          icon={current_list.basic.features[e] ? TRUE : FALSE}
+                          className={`fa-2x ${
+                            current_list.basic.features[e]
+                              ? "has-text-success"
+                              : "has-text-danger"
+                          }`}
+                        />
+                      </td>
+
+                      <td>
+                        <FontAwesomeIcon
+                          icon={current_list.pro.features[e] ? TRUE : FALSE}
+                          className={`fa-2x ${
+                            current_list.pro.features[e]
+                              ? "has-text-success"
+                              : "has-text-danger"
+                          }`}
+                        />
+                      </td>
+                    </tr>
                   );
                 })}
-              </tr>
-            </thead>
-
-            <tbody>
-              <tr>
-                <td className="has-text-weight-bold">Price</td>
-                <td>${current_list.free.price}/month</td>
-                <td>${current_list.basic.price}/month</td>
-                <td>${current_list.pro.price}/month</td>
-              </tr>
-
-              {current_features.map((e, i) => {
-                return (
-                  <tr key={i}>
-                    <td>{e}</td>
-
-                    <td>
-                      <FontAwesomeIcon
-                        icon={current_list.free.features[e] ? TRUE : FALSE}
-                        className={`fa-2x ${
-                          current_list.free.features[e]
-                            ? "has-text-success"
-                            : "has-text-danger"
-                        }`}
-                      />
-                    </td>
-
-                    <td>
-                      <FontAwesomeIcon
-                        icon={current_list.basic.features[e] ? TRUE : FALSE}
-                        className={`fa-2x ${
-                          current_list.basic.features[e]
-                            ? "has-text-success"
-                            : "has-text-danger"
-                        }`}
-                      />
-                    </td>
-
-                    <td>
-                      <FontAwesomeIcon
-                        icon={current_list.pro.features[e] ? TRUE : FALSE}
-                        className={`fa-2x ${
-                          current_list.pro.features[e]
-                            ? "has-text-success"
-                            : "has-text-danger"
-                        }`}
-                      />
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
+              </tbody>
+            </table>
+          </div>
         </div>
-      </div>
+      </Fade>
     </div>
   );
 }
