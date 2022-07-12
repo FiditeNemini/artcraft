@@ -149,7 +149,7 @@ function ContributeIndexPage(props: Props) {
         <div className="container-panel pt-5 pb-5">
           <div className="panel p-3 p-lg-4 load-hidden mt-3">
             <h1 className="panel-title fw-bold">
-              <FontAwesomeIcon icon={faVolumeHigh} className="me-3" />
+              <FontAwesomeIcon icon={faUpload} className="me-3" />
               {t("pages.contributeIndex.headingUploadModels")}
             </h1>
             <div className="py-6 d-flex flex-column gap-4">
