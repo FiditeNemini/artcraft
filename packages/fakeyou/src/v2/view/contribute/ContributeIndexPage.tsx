@@ -11,6 +11,8 @@ import {
   faVideo,
   faUpload,
   faImage,
+  faTags,
+  faHandsHelping,
 } from "@fortawesome/free-solid-svg-icons";
 import { distance, delay, delay2, duration } from "../../../data/animation";
 import { USE_REFRESH } from "../../../Refresh";
@@ -121,70 +123,102 @@ function ContributeIndexPage(props: Props) {
 
   return (
     <div>
-      <div className="container py-5">
-        <div className="d-flex flex-column">
-          <h1 className="display-5 fw-bold">
-            {t("pages.contributeIndex.heroTitle")}
-          </h1>
-          <h3 className="mb-4">
-            <Trans i18nKey="pages.contributeIndex.heroSubtitle">
-              You make FakeYou <strong>better</strong> by contributing
-            </Trans>
-          </h3>
-          <p className="lead">{t("pages.contributeIndex.introText")}</p>
-        </div>
-      </div>
-      <div className="container-panel pt-4 pb-5">
-        <div className="panel p-3 p-lg-4 load-hidden mt-3">
-          <h1 className="panel-title fw-bold">
-            <i className="fa-solid fa-upload me-3"></i>
-            {t("pages.contributeIndex.headingUploadModels")}
-          </h1>
-          <div className="py-6 d-flex flex-column gap-4">
-            <p>
-              <Trans i18nKey="pages.contributeIndex.describeUploadModels">
-                Create new voices and video templates for FakeYou.
-                <DiscordLink
-                  text={t("pages.contributeIndex.discordLink1")}
-                  iconAfterText={true}
-                />
-                to learn how.
+      <div className="container py-5 pb-4 pb-lg-5">
+        <Fade bottom cascade duration={duration} distance={distance}>
+          <div className="d-flex flex-column text-center text-lg-start">
+            <h1 className="display-5 fw-bold">
+              {t("pages.contributeIndex.heroTitle")}
+            </h1>
+            <h3 className="mb-4">
+              <Trans i18nKey="pages.contributeIndex.heroSubtitle">
+                You make FakeYou <strong>better</strong> by contributing
               </Trans>
-            </p>
-            <div className="d-flex flex-column flex-md-row gap-3">
-              <Link to="/upload/tts" className="btn btn-primary w-100">
-                {t("pages.contributeIndex.buttonUploadVoice")}
-              </Link>
+            </h3>
+            <p className="lead">{t("pages.contributeIndex.introText")}</p>
+          </div>
+        </Fade>
+      </div>
 
-              <button className="btn btn-primary w-100">
-                <i className="fa-solid fa-video me-2"></i>Lipsync Video (w2l)
-              </button>
-              <button className="btn btn-primary w-100">
-                <i className="fa-solid fa-image me-2"></i>Lipsync Photo (w2l)
-              </button>
+      <Fade
+        bottom
+        cascade
+        distance={distance}
+        delay={delay2}
+        duration={duration}
+      >
+        <div className="container-panel pt-5 pb-5">
+          <div className="panel p-3 p-lg-4 load-hidden mt-3">
+            <h1 className="panel-title fw-bold">
+              <FontAwesomeIcon icon={faVolumeHigh} className="me-3" />
+              {t("pages.contributeIndex.headingUploadModels")}
+            </h1>
+            <div className="py-6 d-flex flex-column gap-4">
+              <p className="text-center text-lg-start">
+                <Trans i18nKey="pages.contributeIndex.describeUploadModels">
+                  Create new voices and video templates for FakeYou.
+                  <DiscordLink
+                    text={t("pages.contributeIndex.discordLink1")}
+                    iconAfterText={true}
+                  />
+                  to learn how.
+                </Trans>
+              </p>
+              <div className="d-flex flex-column flex-lg-row gap-3">
+                <Link to="/upload/tts" className="btn btn-primary w-100">
+                  <FontAwesomeIcon icon={faVolumeHigh} className="me-3" />
+                  {t("pages.contributeIndex.buttonUploadVoice")}
+                </Link>
+                <Link to="/upload/w2l_video" className="btn btn-primary w-100">
+                  <FontAwesomeIcon icon={faVideo} className="me-3" />
+                  {t("pages.contributeIndex.buttonUploadW2lVideo")}
+                </Link>
+                <Link to="/upload/w2l_photo" className="btn btn-primary w-100">
+                  <FontAwesomeIcon icon={faImage} className="me-3" />
+                  {t("pages.contributeIndex.buttonUploadW2lPhoto")}
+                </Link>
+              </div>
             </div>
           </div>
         </div>
-      </div>
-      <div className="container-panel pt-2 pb-4">
-        <div className="panel p-3 p-lg-4 load-hidden mt-lg-0">
-          <h2 className="panel-title">Suggest Categories</h2>
-          <div className="py-6 d-flex flex-column gap-4">
-            <p>Help us organize the models!</p>
-            <div className="d-flex gap-3">
-              <button className="btn btn-secondary w-100">
-                Suggest category
-              </button>
+        <div className="container-panel pt-4 pb-4">
+          <div className="panel p-3 p-lg-4 load-hidden mt-lg-0">
+            <h2 className="panel-title fw-bold">
+              <FontAwesomeIcon icon={faTags} className="me-3" />
+              {categoryHeading}
+            </h2>
+            <div className="py-6 d-flex flex-column gap-4">
+              <p className="text-center text-lg-start">
+                {t("pages.contributeIndex.describeSuggest")}
+              </p>
+              <div className="d-flex gap-3">
+                <button className="btn btn-secondary w-100">
+                  Suggest category
+                </button>
+              </div>
             </div>
           </div>
         </div>
-      </div>
-      <div className="container pb-5">
-        <p>
-          Want to contribute code, design, or data science?
-          <a className="text-link">Say hi in Discord</a>.
-        </p>
-      </div>
+        <div className="container-panel py-5">
+          <div className="panel p-3 p-lg-4 load-hidden mt-lg-0">
+            <h2 className="panel-title fw-bold">
+              <FontAwesomeIcon icon={faHandsHelping} className="me-3" />
+              {t("pages.contributeIndex.headingMore")}
+            </h2>
+            <div className="py-6 d-flex flex-column gap-4">
+              <p className="text-center text-lg-start">
+                <Trans i18nKey="pages.contributeIndex.describeMore">
+                  Want to contribute code, design, or data science?
+                  <DiscordLink
+                    text={t("pages.contributeIndex.discordLink2")}
+                    iconAfterText={true}
+                  />
+                  !
+                </Trans>
+              </p>
+            </div>
+          </div>
+        </div>
+      </Fade>
     </div>
   );
 }
