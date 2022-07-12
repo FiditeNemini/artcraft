@@ -54,8 +54,8 @@ function NewTopNavFc(props: Props) {
     return (
       <>
         <nav className="navbar is-transparent padding-bottom-1em">
-          <div className="navbar-brand">
-            <Link className="navbar-item" to="/">
+          <div  className="navbar-brand">
+            <Link  className="navbar-item" to="/">
               <img src="/fakeyou/fakeyou-nav-logo-mascot.webp" alt="FakeYou: Cartoon and Celebrity Text to Speech" />
             </Link>
             <div className={navbarBurgerClasses} data-target="navbarExampleTransparentExample" onClick={() => toggleHamburger()}>
@@ -232,7 +232,7 @@ function NewTopNavFc(props: Props) {
             aria-labelledby="offcanvasNavbar2Label"
           >
             <div className="offcanvas-header">
-              <Link className="navbar-brand me-5 pr-8" to="/">
+              <Link data-bs-toggle="offcanvas" className="navbar-brand me-5 pr-8" to="/">
                 <img
                   src="fakeyou/FakeYou-Logo.png"
                   alt="FakeYou: Cartoon and Celebrity Text to Speech"
@@ -385,10 +385,10 @@ function NewTopNavFc(props: Props) {
                 </li>
               </ul>
               <div className="d-grid gap-2 d-flex justify-content-start align-items-center pt-4 ps-3 pt-lg-0 ps-lg-0">
-                <Link className="nav-login me-3" to="/login">
+                <Link data-bs-toggle="offcanvas" className="nav-login me-3" to="/login">
                   Login
                 </Link>
-                <Link to="/signup">
+                <Link data-bs-toggle="offcanvas" to="/signup">
                   <button type="button" className="btn btn-primary btn-lg">
                     Sign up
                   </button>
