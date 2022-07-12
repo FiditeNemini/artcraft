@@ -91,11 +91,13 @@ function PatronPage(props: Props) {
               </p>
 
               <div>
-                <a href="https://www.patreon.com/fakeyou" target="_blank">
-                  <button className="btn btn-primary">
-                    <FontAwesomeIcon icon={faPatreon} className="me-2" />
-                    Support us on Patreon
-                  </button>
+                <a
+                  href="https://www.patreon.com/fakeyou"
+                  target="_blank"
+                  className="btn btn-primary"
+                >
+                  <FontAwesomeIcon icon={faPatreon} className="me-2" />
+                  Support us on Patreon
                 </a>
               </div>
             </div>
