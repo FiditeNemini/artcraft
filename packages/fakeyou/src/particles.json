@@ -49,7 +49,7 @@
     },
     "move": {
       "enable": true,
-      "speed": 1,
+      "speed": 2.5,
       "direction": "top",
       "random": true,
       "straight": false,
