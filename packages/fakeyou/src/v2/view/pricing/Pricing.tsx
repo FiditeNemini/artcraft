@@ -70,13 +70,7 @@ function PricingPage(props: Props) {
 
       <div className="container mt-3">
         <div className="row gy-4">
-          <Fade
-            bottom
-            cascade
-            duration={duration}
-            distance={distance}
-            delay={delay2}
-          >
+          <Fade bottom duration={duration} distance={distance} delay={delay2}>
             <div className="col-12 col-lg-4">
               <div className="rounded panel p-4 h-100">
                 <h2 className="text-center my-2">Free</h2>
@@ -166,13 +160,7 @@ function PricingPage(props: Props) {
         </div>
       </div>
 
-      <Fade
-        bottom
-        cascade
-        duration={duration}
-        distance={distance}
-        delay={delay2}
-      >
+      <Fade bottom duration={duration} distance={distance} delay={delay2}>
         <div className="container-panel mt-5 py-5">
           <div className="panel p-4">
             <table className="table">
