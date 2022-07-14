@@ -1,6 +1,5 @@
 use crate::AnyhowResult;
-use log::{info,warn};
-use std::process::{Command, Stdio};
+use log::info;
 use subprocess::{Popen, PopenConfig, Redirection};
 use std::fs::OpenOptions;
 use std::path::Path;

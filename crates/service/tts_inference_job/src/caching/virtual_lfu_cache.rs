@@ -1,7 +1,6 @@
 use anyhow::anyhow;
 use container_common::anyhow_result::AnyhowResult;
 use lfu::LFUCache;
-use std::borrow::Borrow;
 use std::collections::HashSet;
 use std::sync::{Arc, RwLock};
 

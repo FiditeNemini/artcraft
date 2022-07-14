@@ -1,53 +1,25 @@
-use anyhow::{anyhow, Error};
-use chrono::{Utc, DateTime, TimeZone};
-use config::common_env::CommonEnv;
+use anyhow::anyhow;
 use container_common::anyhow_result::AnyhowResult;
-use container_common::filesystem::check_directory_exists::check_directory_exists;
 use container_common::filesystem::check_file_exists::check_file_exists;
 use container_common::filesystem::safe_delete_temp_directory::safe_delete_temp_directory;
 use container_common::filesystem::safe_delete_temp_file::safe_delete_temp_file;
 use container_common::hashing::hash_string_sha2::hash_string_sha2;
 use container_common::token::random_uuid::generate_random_uuid;
-use crate::caching::cache_miss_strategizer::CacheMissStrategizer;
-use crate::caching::cache_miss_strategizer::CacheMissStrategy;
-use crate::caching::cache_miss_strategizer_multi::SyncMultiCacheMissStrategizer;
-use crate::caching::virtual_lfu_cache::SyncVirtualLfuCache;
-use crate::http_clients::tts_inference_sidecar_client::TtsInferenceSidecarClient;
 use crate::job_steps::job_args::JobArgs;
 use crate::job_steps::process_single_job_error::ProcessSingleJobError;
-use crate::script_execution::tacotron_inference_command::TacotronInferenceCommand;
 use database_queries::column_types::vocoder_type::VocoderType;
-use database_queries::mediators::firehose_publisher::FirehosePublisher;
-use database_queries::queries::tts::tts_inference_jobs::list_available_tts_inference_jobs::{AvailableTtsInferenceJob, list_available_tts_inference_jobs, list_available_tts_inference_jobs_with_minimum_priority};
+use database_queries::queries::tts::tts_inference_jobs::list_available_tts_inference_jobs::AvailableTtsInferenceJob;
 use database_queries::queries::tts::tts_inference_jobs::mark_tts_inference_job_done::mark_tts_inference_job_done;
-use database_queries::queries::tts::tts_inference_jobs::mark_tts_inference_job_failure::mark_tts_inference_job_failure;
 use database_queries::queries::tts::tts_inference_jobs::mark_tts_inference_job_pending_and_grab_lock::mark_tts_inference_job_pending_and_grab_lock;
-use database_queries::queries::tts::tts_inference_jobs::mark_tts_inference_job_permanently_dead::mark_tts_inference_job_permanently_dead;
-use database_queries::queries::tts::tts_models::get_tts_model_for_inference::{get_tts_model_for_inference, TtsModelForInferenceError, TtsModelForInferenceRecord};
+use database_queries::queries::tts::tts_models::get_tts_model_for_inference::TtsModelForInferenceRecord;
 use database_queries::queries::tts::tts_results::insert_tts_result::insert_tts_result;
-use jobs_common::noop_logger::NoOpLogger;
 use jobs_common::redis_job_status_logger::RedisJobStatusLogger;
-use jobs_common::semi_persistent_cache_dir::SemiPersistentCacheDir;
 use log::{warn, info, error};
-use newrelic_telemetry::Client as NewRelicClient;
-use newrelic_telemetry::ClientBuilder;
 use newrelic_telemetry::Span;
-use r2d2_redis::RedisConnectionManager;
-use r2d2_redis::r2d2::PooledConnection;
-use r2d2_redis::r2d2;
-use r2d2_redis::redis::Commands;
-use sqlx::MySqlPool;
-use sqlx::mysql::MySqlPoolOptions;
-use std::collections::HashMap;
-use std::fs::{File, metadata};
-use std::io::{BufReader, Read, ErrorKind};
-use std::ops::Deref;
-use std::path::{PathBuf, Path};
-use std::process::Command;
-use std::thread;
-use std::time::{Duration, SystemTime, UNIX_EPOCH, Instant};
-use storage_buckets_common::bucket_client::BucketClient;
-use storage_buckets_common::bucket_path_unifier::BucketPathUnifier;
+use std::fs::File;
+use std::io::Read;
+use std::path::PathBuf;
+use std::time::{SystemTime, UNIX_EPOCH, Instant};
 use tempdir::TempDir;
 use tts_common::clean_symbols::clean_symbols;
 use tts_common::text_pipelines::guess_pipeline::guess_text_pipeline_heuristic;
@@ -72,20 +44,6 @@ pub async fn process_single_job(
   job: &AvailableTtsInferenceJob,
   model_record: &TtsModelForInferenceRecord,
 ) -> Result<(Span, Span), ProcessSingleJobError> {
-
-  // TODO 1. Mark processing (DONE)
-
-  // TODO 2. Check if vocoder model is downloaded / download to stable location (DONE)
-
-  // TODO 3. Query model by token. (DONE)
-  // TODO 4. Check if model is downloaded, otherwise download to stable location (DONE)
-
-  // TODO 5. Write text to file
-  // TODO 6. Process Inference
-
-  // TODO 7. Upload Result
-  // TODO 8. Save record
-  // TODO 9. Mark job done
 
   let start = Instant::now();
 
