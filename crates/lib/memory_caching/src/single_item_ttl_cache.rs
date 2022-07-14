@@ -1,7 +1,7 @@
 use anyhow::bail;
 use container_common::anyhow_result::AnyhowResult;
 use lru_time_cache::LruCache;
-use std::sync::{Arc, Mutex, PoisonError, MutexGuard};
+use std::sync::{Arc, Mutex};
 use std::time::Duration;
 
 /// NB: There's only ONE ITEM of ONE TYPE in the cache. We can use a single key.
@@ -27,7 +27,7 @@ impl <T: Clone + ?Sized> SingleItemTtlCache<T> {
   pub fn copy_without_bump_if_unexpired(&self) -> AnyhowResult<Option<T>> {
     let maybe_copy = match self.cache.lock() {
       Err(e) => bail!("could not unlock mutex to read: {:?}", e),
-      Ok(mut cache) => {
+      Ok(cache) => {
         cache.peek(CACHE_KEY).map(|inner| inner.clone())
       },
     };

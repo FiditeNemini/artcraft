@@ -4454,6 +4454,7 @@ dependencies = [
  "jobs_common",
  "lfu",
  "log",
+ "memory_caching",
  "newrelic-telemetry",
  "r2d2_redis",
  "serde",
