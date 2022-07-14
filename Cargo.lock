@@ -2383,6 +2383,18 @@ dependencies = [
 ]
 
 [[package]]
+name = "memory_caching"
+version = "0.0.1"
+dependencies = [
+ "anyhow",
+ "chrono",
+ "config",
+ "container_common",
+ "log",
+ "lru_time_cache",
+]
+
+[[package]]
 name = "mime"
 version = "0.3.16"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3834,6 +3846,7 @@ dependencies = [
  "lru_time_cache",
  "magic-crypt",
  "md-5",
+ "memory_caching",
  "native-tls",
  "newrelic-telemetry",
  "pulldown-cmark",

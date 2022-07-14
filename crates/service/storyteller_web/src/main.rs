@@ -111,7 +111,6 @@ use crate::threads::db_health_checker_thread::db_health_check_status::HealthChec
 use crate::threads::db_health_checker_thread::db_health_checker_thread::db_health_checker_thread;
 use crate::threads::ip_banlist_set::IpBanlistSet;
 use crate::threads::poll_ip_banlist_thread::poll_ip_bans;
-use crate::util::caching::single_item_ttl_cache::SingleItemTtlCache;
 use crate::util::encrypted_sort_id::SortKeyCrypto;
 use database_queries::mediators::badge_granter::BadgeGranter;
 use database_queries::mediators::firehose_publisher::FirehosePublisher;
@@ -119,6 +118,7 @@ use futures::Future;
 use http_server_common::cors::build_common_cors_config;
 use limitation::Limiter;
 use log::{error, info};
+use memory_caching::single_item_ttl_cache::SingleItemTtlCache;
 use r2d2_redis::RedisConnectionManager;
 use r2d2_redis::r2d2;
 use r2d2_redis::redis::Commands;
