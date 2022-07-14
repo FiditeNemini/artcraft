@@ -1,12 +1,16 @@
+// Never allow these
 #![forbid(private_in_public)]
-#![forbid(unused_must_use)]
-//#![forbid(warnings)]
+#![forbid(unused_must_use)] // NB: It's unsafe to not close/check some things
 
-#![allow(dead_code)]
-#![allow(non_snake_case)]
+// Okay to toggle
+//#![forbid(warnings)]
 #![allow(unused_imports)]
 #![allow(unused_mut)]
 #![allow(unused_variables)]
+
+// Always allow
+#![allow(dead_code)]
+#![allow(non_snake_case)]
 
 #[macro_use] extern crate lazy_static;
 #[macro_use] extern crate magic_crypt;
