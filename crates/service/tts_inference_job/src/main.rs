@@ -1,12 +1,12 @@
 // Never allow these
 #![forbid(private_in_public)]
-#![forbid(unused_must_use)]
+#![forbid(unused_must_use)] // NB: It's unsafe to not close/check some things
 
 // Okay to toggle
 //#![forbid(warnings)]
 #![forbid(unused_imports)]
-#![allow(unused_mut)]
-#![allow(unused_variables)]
+#![forbid(unused_mut)]
+#![forbid(unused_variables)]
 
 // Always allow
 #![allow(dead_code)]
@@ -523,7 +523,7 @@ fn delete_tts_synthesizers_from_cache(cache_dir: &SemiPersistentCacheDir) -> Any
   let tts_synthesizer_dir = cache_dir.tts_synthesizer_model_directory();
 
   // TODO: When this is no longer sufficient, delete other types of locally-cached data.
-  let mut paths = std::fs::read_dir(tts_synthesizer_dir)?
+  let paths = std::fs::read_dir(tts_synthesizer_dir)?
       .map(|res| res.map(|e| e.path()))
       .collect::<Result<Vec<_>, std::io::Error>>()?;
 

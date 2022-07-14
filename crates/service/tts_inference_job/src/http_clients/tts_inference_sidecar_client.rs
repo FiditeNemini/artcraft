@@ -136,7 +136,7 @@ impl TtsInferenceSidecarClient {
 
     let client = Client::new();
 
-    let maybe_response = client.request(req).await?;
+    let _maybe_response = client.request(req).await?;
 
     //match maybe_response {
     //  Err(e) => Err(anyhow!("Error talking to sidecar: {:?}", e)),
