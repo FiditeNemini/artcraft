@@ -262,6 +262,15 @@ ul.patrons-list {
   list-style: none;
 }
 
+.form-check-input:checked {
+  background-color: $primary;
+  border-color: $primary;
+}
+
+.form-check-input:focus {
+  box-shadow: none;
+}
+
 @media (min-width: 992px) {
   .fakeyou-refresh {
     .panel {
