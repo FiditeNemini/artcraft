@@ -5,6 +5,7 @@ use container_common::filesystem::safe_delete_temp_directory::safe_delete_temp_d
 use container_common::filesystem::safe_delete_temp_file::safe_delete_temp_file;
 use container_common::hashing::hash_string_sha2::hash_string_sha2;
 use container_common::token::random_uuid::generate_random_uuid;
+use crate::job_steps::download_file_from_bucket::maybe_download_file_from_bucket;
 use crate::job_steps::job_args::JobArgs;
 use crate::job_steps::process_single_job_error::ProcessSingleJobError;
 use database_queries::column_types::vocoder_type::VocoderType;
@@ -99,78 +100,63 @@ pub async fn process_single_job(
 
   // ==================== CONFIRM OR DOWNLOAD WAVEGLOW VOCODER MODEL ==================== //
 
-  let waveglow_vocoder_model_filename = inferencer.waveglow_vocoder_model_filename.clone();
-  let waveglow_vocoder_model_fs_path = inferencer.semi_persistent_cache.tts_pretrained_vocoder_model_path(&waveglow_vocoder_model_filename);
+  let waveglow_vocoder_model_fs_path = {
+    let waveglow_vocoder_model_filename = inferencer.waveglow_vocoder_model_filename.clone();
+    let waveglow_vocoder_model_fs_path = inferencer.semi_persistent_cache.tts_pretrained_vocoder_model_path(&waveglow_vocoder_model_filename);
+    let waveglow_vocoder_model_object_path = inferencer.bucket_path_unifier.tts_pretrained_vocoders_path(&waveglow_vocoder_model_filename);
 
-  if !waveglow_vocoder_model_fs_path.exists() {
-    warn!("Waveglow vocoder model file does not exist: {:?}", &waveglow_vocoder_model_fs_path);
-
-    redis_logger.log_status("downloading vocoder (1 of 3)")
-        .map_err(|e| ProcessSingleJobError::Other(e))?;
-
-    let waveglow_vocoder_model_object_path = inferencer.bucket_path_unifier
-        .tts_pretrained_vocoders_path(&waveglow_vocoder_model_filename);
-
-    info!("Download waveglow vocoder from bucket path: {:?}", &waveglow_vocoder_model_object_path);
-
-    inferencer.private_bucket_client.download_file_to_disk(
+    maybe_download_file_from_bucket(
+      "waveglow vocoder model",
+      &waveglow_vocoder_model_fs_path,
       &waveglow_vocoder_model_object_path,
-      &waveglow_vocoder_model_fs_path)
-        .await
-        .map_err(|e| ProcessSingleJobError::Other(e))?;
+      &inferencer.private_bucket_client,
+      &mut redis_logger,
+      "downloading vocoder (1 of 3)",
+      job.id.0,
+    ).await?;
 
-    info!("Downloaded waveglow vocoder model from bucket!");
-  }
+    waveglow_vocoder_model_fs_path
+  };
 
   // ==================== CONFIRM OR DOWNLOAD HIFIGAN (NORMAL) VOCODER MODEL ==================== //
 
-  let hifigan_vocoder_model_filename = inferencer.hifigan_vocoder_model_filename.clone();
-  let hifigan_vocoder_model_fs_path = inferencer.semi_persistent_cache.tts_pretrained_vocoder_model_path(&hifigan_vocoder_model_filename);
+  let hifigan_vocoder_model_fs_path = {
+    let hifigan_vocoder_model_filename = inferencer.hifigan_vocoder_model_filename.clone();
+    let hifigan_vocoder_model_fs_path = inferencer.semi_persistent_cache.tts_pretrained_vocoder_model_path(&hifigan_vocoder_model_filename);
+    let hifigan_vocoder_model_object_path = inferencer.bucket_path_unifier.tts_pretrained_vocoders_path(&hifigan_vocoder_model_filename);
 
-  if !hifigan_vocoder_model_fs_path.exists() {
-    warn!("Hifigan vocoder model file does not exist: {:?}", &hifigan_vocoder_model_fs_path);
-
-    redis_logger.log_status("downloading vocoder (2 of 3)")
-        .map_err(|e| ProcessSingleJobError::Other(e))?;
-
-    let hifigan_vocoder_model_object_path = inferencer.bucket_path_unifier
-        .tts_pretrained_vocoders_path(&hifigan_vocoder_model_filename);
-
-    info!("Download hifigan vocoder from bucket path: {:?}", &hifigan_vocoder_model_object_path);
-
-    inferencer.private_bucket_client.download_file_to_disk(
+    maybe_download_file_from_bucket(
+      "hifigan vocoder model",
+      &hifigan_vocoder_model_fs_path,
       &hifigan_vocoder_model_object_path,
-      &hifigan_vocoder_model_fs_path)
-        .await
-        .map_err(|e| ProcessSingleJobError::Other(e))?;
+      &inferencer.private_bucket_client,
+      &mut redis_logger,
+      "downloading vocoder (2 of 3)",
+      job.id.0,
+    ).await?;
 
-    info!("Downloaded hifigan vocoder model from bucket!");
-  }
+    hifigan_vocoder_model_fs_path
+  };
 
   // ==================== CONFIRM OR DOWNLOAD HIFIGAN (SUPERRES) VOCODER MODEL ==================== //
 
-  let hifigan_superres_vocoder_model_filename = inferencer.hifigan_superres_vocoder_model_filename.clone();
-  let hifigan_superres_vocoder_model_fs_path = inferencer.semi_persistent_cache.tts_pretrained_vocoder_model_path(&hifigan_superres_vocoder_model_filename);
+  let hifigan_superres_vocoder_model_fs_path = {
+    let hifigan_superres_vocoder_model_filename = inferencer.hifigan_superres_vocoder_model_filename.clone();
+    let hifigan_superres_vocoder_model_fs_path = inferencer.semi_persistent_cache.tts_pretrained_vocoder_model_path(&hifigan_superres_vocoder_model_filename);
+    let hifigan_superres_vocoder_model_object_path = inferencer.bucket_path_unifier.tts_pretrained_vocoders_path(&hifigan_superres_vocoder_model_filename);
 
-  if !hifigan_superres_vocoder_model_fs_path.exists() {
-    warn!("Hifigan superres vocoder model file does not exist: {:?}", &hifigan_superres_vocoder_model_fs_path);
-
-    redis_logger.log_status("downloading vocoder (3 of 3)")
-        .map_err(|e| ProcessSingleJobError::Other(e))?;
-
-    let hifigan_superres_vocoder_model_object_path = inferencer.bucket_path_unifier
-        .tts_pretrained_vocoders_path(&hifigan_superres_vocoder_model_filename);
-
-    info!("Download hifigan superres vocoder from bucket path: {:?}", &hifigan_superres_vocoder_model_object_path);
-
-    inferencer.private_bucket_client.download_file_to_disk(
+    maybe_download_file_from_bucket(
+      "hifigan superres vocoder model",
+      &hifigan_superres_vocoder_model_fs_path,
       &hifigan_superres_vocoder_model_object_path,
-      &hifigan_superres_vocoder_model_fs_path)
-        .await
-        .map_err(|e| ProcessSingleJobError::Other(e))?;
+      &inferencer.private_bucket_client,
+      &mut redis_logger,
+      "downloading vocoder (3 of 3)",
+      job.id.0,
+    ).await?;
 
-    info!("Downloaded hifigan superres vocoder model from bucket!");
-  }
+    hifigan_superres_vocoder_model_fs_path
+  };
 
 //  // ==================== LOOK UP TTS SYNTHESIZER RECORD (WHICH CONTAINS ITS BUCKET PATH) ==================== //
 //
@@ -193,28 +179,22 @@ pub async fn process_single_job(
   // TODO: Let's just put paths in the db
   // TODO: We'll probably need to LRU cache these.
 
-  let tts_synthesizer_fs_path = inferencer.semi_persistent_cache.tts_synthesizer_model_path(
-    &model_record.model_token);
+  let tts_synthesizer_fs_path = {
+    let tts_synthesizer_fs_path = inferencer.semi_persistent_cache.tts_synthesizer_model_path(&model_record.model_token);
+    let tts_synthesizer_object_path  = inferencer.bucket_path_unifier.tts_synthesizer_path(&model_record.private_bucket_hash);
 
-  if !tts_synthesizer_fs_path.exists() {
-    info!("TTS synthesizer model file does not exist: {:?}", &tts_synthesizer_fs_path);
-
-    redis_logger.log_status("downloading synthesizer")
-        .map_err(|e| ProcessSingleJobError::Other(e))?;
-
-    let tts_synthesizer_object_path  = inferencer.bucket_path_unifier
-        .tts_synthesizer_path(&model_record.private_bucket_hash);
-
-    info!("Download from template media path: {:?}", &tts_synthesizer_object_path);
-
-    inferencer.private_bucket_client.download_file_to_disk(
+    maybe_download_file_from_bucket(
+      "synthesizer",
+      &tts_synthesizer_fs_path,
       &tts_synthesizer_object_path,
-      &tts_synthesizer_fs_path)
-        .await
-        .map_err(|e| ProcessSingleJobError::from_anyhow_error(e))?;
+      &inferencer.private_bucket_client,
+      &mut redis_logger,
+      "downloading synthesizer",
+      job.id.0,
+    ).await?;
 
-    info!("Downloaded template media from bucket!");
-  }
+    tts_synthesizer_fs_path
+  };
 
   // ==================== Preprocess text ==================== //
 
