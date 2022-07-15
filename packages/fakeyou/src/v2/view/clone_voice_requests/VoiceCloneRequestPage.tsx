@@ -1000,7 +1000,7 @@ function VoiceCloneRequestPage(props: Props) {
                   </label>
                 </div>
 
-                <h2 className="my-3">Anything else?</h2>
+                <h2 className="mt-3">Anything else?</h2>
 
                 <div>
                   <label className="sub-title">
@@ -1008,6 +1008,7 @@ function VoiceCloneRequestPage(props: Props) {
                   </label>
                   <div className="form-group">
                     <textarea
+                      rows={4}
                       className="form-control"
                       placeholder="Optional Questions"
                       onChange={handleOptionalQuestionsChange}
@@ -1022,6 +1023,7 @@ function VoiceCloneRequestPage(props: Props) {
                   </label>
                   <div className="form-group">
                     <textarea
+                      rows={4}
                       className="form-control"
                       placeholder="Optional Notes"
                       onChange={handleOptionalExtraCommentsChange}
