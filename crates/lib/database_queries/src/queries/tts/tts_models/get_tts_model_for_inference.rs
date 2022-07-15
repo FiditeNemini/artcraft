@@ -6,6 +6,7 @@ use sqlx;
 
 // TODO: Can probably just reuse another query.
 
+#[derive(Clone)]
 pub struct TtsModelForInferenceRecord {
   pub model_token: String,
   pub tts_model_type: String,

@@ -9,6 +9,8 @@ use r2d2_redis::RedisConnectionManager;
 use r2d2_redis::r2d2;
 use sqlx::MySqlPool;
 use std::path::PathBuf;
+use database_queries::queries::tts::tts_models::get_tts_model_for_inference::TtsModelForInferenceRecord;
+use memory_caching::multi_item_ttl_cache::MultiItemTtlCache;
 use storage_buckets_common::bucket_client::BucketClient;
 use storage_buckets_common::bucket_path_unifier::BucketPathUnifier;
 
@@ -38,6 +40,9 @@ pub struct JobArgs {
   // Keep tabs of which models to hold in the sidecar memory with this virtual LRU cache
   pub virtual_model_lfu: SyncVirtualLfuCache,
   pub cache_miss_strategizers: SyncMultiCacheMissStrategizer,
+
+  // In-process cache of database lookup records, etc.
+  pub caches: JobCaches,
 
   // Waveglow vocoder filename
   pub waveglow_vocoder_model_filename: String,
@@ -85,4 +90,8 @@ pub struct JobWorkerDetails {
 
   // Hostname of the worker.
   pub worker_hostname: String,
+}
+
+pub struct JobCaches {
+  pub tts_model_record_cache: MultiItemTtlCache<String, TtsModelForInferenceRecord>,
 }

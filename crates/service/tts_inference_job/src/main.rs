@@ -31,7 +31,7 @@ use crate::caching::cache_miss_strategizer::CacheMissStrategy;
 use crate::caching::cache_miss_strategizer_multi::SyncMultiCacheMissStrategizer;
 use crate::caching::virtual_lfu_cache::SyncVirtualLfuCache;
 use crate::http_clients::tts_inference_sidecar_client::TtsInferenceSidecarClient;
-use crate::job_steps::job_args::JobArgs;
+use crate::job_steps::job_args::{JobArgs, JobCaches};
 use crate::job_steps::job_args::JobWorkerDetails;
 use crate::job_steps::process_single_job::process_single_job;
 use crate::job_steps::process_single_job_error::ProcessSingleJobError;
@@ -54,6 +54,7 @@ use sqlx::mysql::MySqlPoolOptions;
 use std::ops::Deref;
 use std::path::PathBuf;
 use std::time::Duration;
+use memory_caching::multi_item_ttl_cache::MultiItemTtlCache;
 use storage_buckets_common::bucket_client::BucketClient;
 use storage_buckets_common::bucket_path_unifier::BucketPathUnifier;
 
@@ -242,6 +243,10 @@ async fn main() -> AnyhowResult<()> {
     )
   };
 
+  let model_cache_duration = std::time::Duration::from_millis(
+    easyenv::get_env_num("TTS_MODEL_RECORD_CACHE_MILLIS", 300_000)?, // Five minutes
+  );
+
   let license_key = easyenv::get_env_string_required("NEWRELIC_API_KEY")?;
 
   let newrelic_disabled = easyenv::get_env_bool_or_default("IS_NEWRELIC_DISABLED", false);
@@ -274,6 +279,9 @@ async fn main() -> AnyhowResult<()> {
       is_on_prem,
       worker_hostname: server_hostname.clone(),
       is_debug_worker,
+    },
+    caches: JobCaches {
+      tts_model_record_cache: MultiItemTtlCache::create_with_duration(model_cache_duration),
     },
     virtual_model_lfu: virtual_lfu_cache,
     cache_miss_strategizers,
@@ -402,6 +410,7 @@ async fn process_jobs(
     let model_state_result = ModelState::query_model_and_check_filesystem(
       &job,
       &inferencer.mysql_pool,
+      &inferencer.caches.tts_model_record_cache,
       &inferencer.semi_persistent_cache,
       &inferencer.virtual_model_lfu,
     ).await;
@@ -583,15 +592,32 @@ impl ModelState {
   pub async fn query_model_and_check_filesystem(
     job: &AvailableTtsInferenceJob,
     mysql_pool: &MySqlPool,
+    tts_model_record_cache: &MultiItemTtlCache<String, TtsModelForInferenceRecord>,
     semi_persistent_cache: &SemiPersistentCacheDir,
     virtual_cache: &SyncVirtualLfuCache,
   ) -> Result<Self, ModelStateError> {
-    info!("Looking up TTS model by token: {}", &job.model_token);
+    // Many workers will be querying models constantly (n-many per batch).
+    // We can save on a lot of DB query volume by caching model records.
+    let maybe_cached_tts_model =
+        tts_model_record_cache.copy_without_bump_if_unexpired(job.model_token.clone())
+            .ok()
+            .flatten();
 
-    let tts_model = get_tts_model_for_inference(
-      &mysql_pool,
-      &job.model_token
-    ).await?;
+    let tts_model = match maybe_cached_tts_model {
+      Some(tts_model) => tts_model,
+      None => {
+        info!("Looking up TTS model record by token: {}", &job.model_token);
+
+        let tts_model = get_tts_model_for_inference(
+          &mysql_pool,
+          &job.model_token
+        ).await?;
+
+        tts_model_record_cache.store_copy(&job.model_token, &tts_model).ok();
+
+        tts_model
+      }
+    };
 
     let tts_synthesizer_fs_path = semi_persistent_cache.tts_synthesizer_model_path(
       &tts_model.model_token);
