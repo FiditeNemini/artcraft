@@ -6460,7 +6460,7 @@
           "type_info": {
             "type": "Timestamp",
             "flags": {
-              "bits": 1153
+              "bits": 1161
             },
             "char_set": 63,
             "max_size": 19
@@ -7355,7 +7355,7 @@
           "type_info": {
             "type": "Timestamp",
             "flags": {
-              "bits": 1153
+              "bits": 1161
             },
             "char_set": 63,
             "max_size": 19
