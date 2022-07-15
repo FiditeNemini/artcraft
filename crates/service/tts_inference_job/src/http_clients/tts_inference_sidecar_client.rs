@@ -38,6 +38,7 @@ struct InferenceRequest {
 
 impl TtsInferenceSidecarClient {
   pub fn new(hostname: &str) -> Self {
+    // TODO(bt): Why don't have have a cached HTTP client here? Did it get poisoned?
     //let client = Client::builder()
     //    .header("User-Agent", "actix/tts_inference_job")
     //    .finish();

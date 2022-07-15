@@ -293,7 +293,7 @@ pub async fn process_single_job(
     &model_record.text_pipeline_type,
     &text_pipeline_type_or_guess);
 
-  inferencer.tts_inference_sidecar_client.request_inference(
+  inferencer.http_clients.tts_inference_sidecar_client.request_inference(
     &cleaned_inference_text,
     &tts_synthesizer_fs_path,
     pretrained_vocoder,

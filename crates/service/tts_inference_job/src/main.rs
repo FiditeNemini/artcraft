@@ -31,8 +31,10 @@ use crate::caching::cache_miss_strategizer::CacheMissStrategy;
 use crate::caching::cache_miss_strategizer_multi::SyncMultiCacheMissStrategizer;
 use crate::caching::virtual_lfu_cache::SyncVirtualLfuCache;
 use crate::http_clients::tts_inference_sidecar_client::TtsInferenceSidecarClient;
-use crate::job_steps::job_args::{JobArgs, JobCaches};
+use crate::http_clients::tts_sidecar_health_check_client::TtsSidecarHealthCheckClient;
+use crate::job_steps::health_check_trap::maybe_block_on_sidecar_health_check;
 use crate::job_steps::job_args::JobWorkerDetails;
+use crate::job_steps::job_args::{JobArgs, JobCaches, JobHttpClients};
 use crate::job_steps::process_single_job::process_single_job;
 use crate::job_steps::process_single_job_error::ProcessSingleJobError;
 use crate::script_execution::tacotron_inference_command::TacotronInferenceCommand;
@@ -45,6 +47,7 @@ use jobs_common::noop_logger::NoOpLogger;
 use jobs_common::redis_job_status_logger::RedisJobStatusLogger;
 use jobs_common::semi_persistent_cache_dir::SemiPersistentCacheDir;
 use log::{warn, info, error};
+use memory_caching::multi_item_ttl_cache::MultiItemTtlCache;
 use newrelic_telemetry::ClientBuilder;
 use newrelic_telemetry::Span;
 use r2d2_redis::RedisConnectionManager;
@@ -54,7 +57,6 @@ use sqlx::mysql::MySqlPoolOptions;
 use std::ops::Deref;
 use std::path::PathBuf;
 use std::time::Duration;
-use memory_caching::multi_item_ttl_cache::MultiItemTtlCache;
 use storage_buckets_common::bucket_client::BucketClient;
 use storage_buckets_common::bucket_path_unifier::BucketPathUnifier;
 
@@ -154,6 +156,9 @@ async fn main() -> AnyhowResult<()> {
 
   let tts_inference_sidecar_client =
       TtsInferenceSidecarClient::new(&sidecar_hostname);
+
+  let tts_sidecar_health_check_client=
+      TtsSidecarHealthCheckClient::new(&sidecar_hostname)?;
 
   let temp_directory = easyenv::get_env_string_or_default(
     "DOWNLOAD_TEMP_DIR",
@@ -272,7 +277,10 @@ async fn main() -> AnyhowResult<()> {
     public_bucket_client,
     private_bucket_client,
     tts_inference_command,
-    tts_inference_sidecar_client,
+    http_clients: JobHttpClients {
+      tts_inference_sidecar_client,
+      tts_sidecar_health_check_client,
+    },
     newrelic_client,
     newrelic_disabled,
     worker_details: JobWorkerDetails {
@@ -305,6 +313,7 @@ async fn main() -> AnyhowResult<()> {
   Ok(())
 }
 
+// Job runner timeouts (guards MySQL)
 const START_TIMEOUT_MILLIS : u64 = 500;
 const INCREASE_TIMEOUT_MILLIS : u64 = 1000;
 
@@ -317,6 +326,8 @@ async fn main_loop(inferencer: JobArgs) {
 
   let mut sort_by_priority = true;
   let mut sort_by_priority_count = 0;
+
+  let mut needs_health_check_at_start = true; // Run health check at startup.
 
   loop {
     let num_records = inferencer.job_batch_size;
@@ -371,12 +382,17 @@ async fn main_loop(inferencer: JobArgs) {
     let batch_result = process_jobs(
       &inferencer,
       jobs,
+      needs_health_check_at_start,
     ).await;
+
+    if needs_health_check_at_start {
+      needs_health_check_at_start = false;
+    }
 
     let mut spans = match batch_result {
       Ok(spans) => spans,
       Err(e) => {
-        warn!("Error querying jobs: {:?}", e);
+        warn!("Error running job batch: {:?}", e);
         std::thread::sleep(Duration::from_millis(error_timeout_millis));
         error_timeout_millis += INCREASE_TIMEOUT_MILLIS;
         continue;
@@ -402,7 +418,14 @@ async fn main_loop(inferencer: JobArgs) {
 async fn process_jobs(
   inferencer: &JobArgs,
   jobs: Vec<AvailableTtsInferenceJob>,
+  needs_health_check_at_start: bool,
 ) -> AnyhowResult<Vec<Span>> {
+
+  if needs_health_check_at_start {
+    maybe_block_on_sidecar_health_check(&inferencer.http_clients.tts_sidecar_health_check_client).await;
+  }
+
+  let mut maybe_sidecar_health_issue = false;
 
   let mut batch_spans = Vec::new();
 
@@ -491,6 +514,14 @@ async fn process_jobs(
       }
     }
 
+    if maybe_sidecar_health_issue {
+      // Since we'll have a signal of the sidecar's health potentially being an issue, we don't
+      // need to background health check it from another thread. Instead we can react to the
+      // "potentially down" signal and block until it alleviates.
+      maybe_block_on_sidecar_health_check(&inferencer.http_clients.tts_sidecar_health_check_client).await;
+      maybe_sidecar_health_issue = false;
+    }
+
     let result = process_single_job(inferencer, &job, &model_state.model_record).await;
     match result {
       Ok((span1, span2)) => {
@@ -499,6 +530,9 @@ async fn process_jobs(
       },
       Err(e) => {
         warn!("Failure to process job: {:?}", e);
+
+        maybe_sidecar_health_issue = true;
+
         let failure_reason = "";
         let _r = mark_tts_inference_job_failure(
           &inferencer.mysql_pool,

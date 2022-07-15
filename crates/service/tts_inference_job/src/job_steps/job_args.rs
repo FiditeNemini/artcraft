@@ -13,6 +13,7 @@ use database_queries::queries::tts::tts_models::get_tts_model_for_inference::Tts
 use memory_caching::multi_item_ttl_cache::MultiItemTtlCache;
 use storage_buckets_common::bucket_client::BucketClient;
 use storage_buckets_common::bucket_path_unifier::BucketPathUnifier;
+use crate::http_clients::tts_sidecar_health_check_client::TtsSidecarHealthCheckClient;
 
 pub struct JobArgs {
   pub download_temp_directory: PathBuf,
@@ -28,8 +29,9 @@ pub struct JobArgs {
   pub bucket_path_unifier: BucketPathUnifier,
   pub semi_persistent_cache: SemiPersistentCacheDir,
 
+  pub http_clients: JobHttpClients,
+
   pub tts_inference_command: TacotronInferenceCommand,
-  pub tts_inference_sidecar_client: TtsInferenceSidecarClient,
 
   pub newrelic_client: NewRelicClient,
 
@@ -94,4 +96,9 @@ pub struct JobWorkerDetails {
 
 pub struct JobCaches {
   pub tts_model_record_cache: MultiItemTtlCache<String, TtsModelForInferenceRecord>,
+}
+
+pub struct JobHttpClients {
+  pub tts_inference_sidecar_client: TtsInferenceSidecarClient,
+  pub tts_sidecar_health_check_client: TtsSidecarHealthCheckClient,
 }
