@@ -291,7 +291,7 @@ function VoiceCloneRequestPage(props: Props) {
                 </Fade>
               </div>
             </div>
-            <div className="col-lg-6 px-md-2 px-lg-5 px-xl-2">
+            <div className="col-lg-6 px-3 px-md-2 px-lg-5 px-xl-2">
               <Fade bottom cascade distance={distance} duration={duration}>
                 <div className="text-center text-lg-start">
                   <h1 className="display-5 fw-bold lh-1">
@@ -299,7 +299,9 @@ function VoiceCloneRequestPage(props: Props) {
                   </h1>
                   <h3 className="mb-4">(or any voice) for just $70</h3>
                   <div className="d-flex flex-column justify-content-center">
-                    <h3>Want a Custom Voice You Can Use?</h3>
+                    <h3 className="px-5 px-md-0">
+                      Want a Custom Voice You Can Use?
+                    </h3>
                     <p className="lead">
                       For Music, Videos, Twitch Rewards, API, Friends, Family…
                       whatever you want!

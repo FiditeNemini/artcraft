@@ -123,9 +123,9 @@ function ContributeIndexPage(props: Props) {
 
   return (
     <div>
-      <div className="container py-5 pb-4 pb-lg-5">
+      <div className="container py-5 pb-4 pb-lg-5 px-md-4 px-lg-5 px-xl-3">
         <Fade bottom cascade duration={duration} distance={distance}>
-          <div className="d-flex flex-column text-center text-lg-start">
+          <div className="d-flex flex-column">
             <h1 className="display-5 fw-bold">
               {t("pages.contributeIndex.heroTitle")}
             </h1>

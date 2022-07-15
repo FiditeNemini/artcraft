@@ -170,29 +170,30 @@ function W2lTemplateListFc(props: Props) {
 
         <br />
 
-        {allRowsOfTemplateElements.map(el => el)}
+        {allRowsOfTemplateElements.map((el) => el)}
 
         <br />
 
-        <p>This feature is based on Wav2Lip by by Prajwal, K R and Mukhopadhyay,
-          Rudrabha and Namboodiri, Vinay P. and Jawahar, C.V.</p>
+        <p>
+          This feature is based on Wav2Lip by by Prajwal, K R and Mukhopadhyay,
+          Rudrabha and Namboodiri, Vinay P. and Jawahar, C.V.
+        </p>
 
         <br />
-
       </div>
     );
   }
 
   return (
     <div>
-      <Fade bottom cascade duration={duration} distance={distance}>
-        <div className="container py-5">
+      <div className="container py-5 px-md-4 px-lg-5 px-xl-3">
+        <Fade bottom cascade duration={duration} distance={distance}>
           <div>
             <h1 className="display-5 fw-bold mb-3">Video Lip Sync Templates</h1>
+            {extraDetails}
           </div>
-          <div>{extraDetails}</div>
-        </div>
-      </Fade>
+        </Fade>
+      </div>
 
       <div className="container">
         {allRowsOfTemplateElements.map((el) => el)}

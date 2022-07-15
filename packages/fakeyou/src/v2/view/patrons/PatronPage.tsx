@@ -79,12 +79,14 @@ function PatronPage(props: Props) {
 
   return (
     <div>
-      <div className="container py-5 ps-3 pt-lg-0 ps-md-5 ps-lg-3">
+      <div className="container py-5 pt-lg-0">
         <div className="row">
           <Fade bottom cascade duration={duration} distance={distance}>
-            <div className="col-12 col-lg-7 d-flex flex-column justify-content-center text-center text-lg-start">
+            <div className="col-12 col-lg-7 d-flex flex-column justify-content-center text-center text-lg-start px-3 px-md-2 px-lg-5 px-xl-3">
               <h1 className="display-5 fw-bold">Thanks to our Patrons!</h1>
-              <h3 className="mb-4">Our Patrons help support our work.</h3>
+              <h3 className="mb-4 px-4 px-md-0">
+                Our Patrons help support our work.
+              </h3>
               <p className="lead mb-5">
                 Our Patrons help pay offset (but not completely cover) our
                 expensive server bills.

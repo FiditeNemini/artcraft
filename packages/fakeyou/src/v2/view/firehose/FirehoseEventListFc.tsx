@@ -299,7 +299,7 @@ function FirehoseEventListFc(props: Props) {
 
   return (
     <div>
-      <div className="container py-5">
+      <div className="container py-5 px-md-4 px-lg-5 px-xl-3">
         <Fade bottom cascade duration={duration} distance={distance}>
           <div className="d-flex flex-column">
             <h1 className="display-5 fw-bold">Firehose Event Feed</h1>
