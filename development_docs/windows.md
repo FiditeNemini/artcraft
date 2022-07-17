@@ -86,6 +86,14 @@ You can also set cookie flags by accessing the flag API, eg.
 
 https://api.jungle.horse/flags/design_refresh/enable
 
+Or toggle cookies manually, eg.
+
+```javascript
+let flagValue=(document.cookie.split(";").find(f => f.includes("refresh")) || "").trim().split("=")[1] === "true"; document.cookie = `refresh=${!flagValue}`; document.location.reload();
+```
+
+Where "refresh" is the name of the cookie flag to toggle.
+
 Fixing common errors
 --------------------
 
