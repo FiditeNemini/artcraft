@@ -16,7 +16,7 @@ Running the project
 --------------------
 
 1. Run `yarn install`
-2. Run `yarn start-w
+2. Run `yarn start-fakeyou-w`
 
 (You may need to run one or both of these commands *twice* for it to work.)
 
@@ -76,10 +76,15 @@ Edit `packages\components\src\api\ApiConfig.ts` to set SSL to true in developmen
 
 We'll come up with a better long-term solution.
 
-You will then be able to access the website at http://jungle.horse:3000 and load data from production.
+You will then be able to access the website at http://jungle.horse:3000 (or :7000, or whatever yarn 
+development port you use) and load data from production.
 
 Note that audio files and spectrogram files will not load from Google due to certificate issues, 
 but we will also fix this issue.
+
+You can also set cookie flags by accessing the flag API, eg.
+
+https://api.jungle.horse/flags/design_refresh/enable
 
 Fixing common errors
 --------------------
