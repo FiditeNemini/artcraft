@@ -1,5 +1,16 @@
-node_modules/
+# VIM
 *~
-.DS_Store
+
+# NPM
+node_modules/
+
+# Yarn
 yarn-error.log
+.yarn/cache
+
+# Windows
+.DS_Store
+
+# Project-specific
 templates/storyteller-stream-green
+
