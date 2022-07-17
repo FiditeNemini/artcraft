@@ -5,6 +5,8 @@ import { Gravatar } from "@storyteller/components/src/elements/Gravatar";
 import { Link } from "react-router-dom";
 import { distance, duration, delay } from "../../../data/animation";
 import { USE_REFRESH } from "../../../Refresh";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faPlay, faFlagCheckered } from "@fortawesome/free-solid-svg-icons";
 
 const Fade = require("react-reveal/Fade");
 
@@ -79,7 +81,7 @@ function FirehoseEventListFc(props: Props) {
 
   let eventItems: Array<JSX.Element> = [];
 
-  firehoseEvents.forEach((event) => {
+  firehoseEvents.slice(0, 12).forEach((event) => {
     let inner = <span />;
     let userLink = <span>Anonymous user</span>;
     let gravatar = <span />;
@@ -145,6 +147,7 @@ function FirehoseEventListFc(props: Props) {
       case "tts_inference_started":
         inner = (
           <span>
+            <FontAwesomeIcon icon={faPlay} className="me-3" />
             {gravatar}
             &nbsp;
             {userLink}
@@ -155,6 +158,7 @@ function FirehoseEventListFc(props: Props) {
       case "tts_inference_completed":
         inner = (
           <span>
+            <FontAwesomeIcon icon={faFlagCheckered} className="me-3" />
             {gravatar}
             &nbsp;
             {userLink}
@@ -315,8 +319,8 @@ function FirehoseEventListFc(props: Props) {
       </div>
 
       <div className="container-panel pb-5">
-        <Fade bottom cascade delay={delay} duration="800" distance="300px">
-          <ul className="firehose-ul d-flex flex-column gap-3">{eventItems}</ul>
+        <Fade right cascade delay={delay} duration={duration} distance="100px">
+          <ul className="firehose-ul d-flex flex-column gap-4">{eventItems}</ul>
         </Fade>
       </div>
     </div>
