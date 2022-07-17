@@ -94,6 +94,26 @@ let flagValue=(document.cookie.split(";").find(f => f.includes("refresh")) || ""
 
 Where "refresh" is the name of the cookie flag to toggle.
 
+Force SSL in development
+------------------------
+
+Development won't allow login against production since they differ in terms of scheme (`http` in dev 
+vs. `https` in production). There's a way to force HTTPS/SSL in development.
+
+You can force the development server to run SSL by creating a `.env` file in the appropriate project, eg.
+`packages/fakeyou/.env` is the name of the file for FakeYou.
+
+The contents should be set to the following:
+
+```
+BROWSER=none
+HTTPS=true
+```
+
+When you start the server, it'll run on `https:` instead of `http:`, which will fix the login issue. 
+Don't commit this file to the repo, though, as it will affect the Linux development setup. We'll work to 
+consolidate these soon.
+
 Fixing common errors
 --------------------
 
