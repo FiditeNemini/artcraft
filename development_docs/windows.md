@@ -20,6 +20,66 @@ Running the project
 
 (You may need to run one or both of these commands *twice* for it to work.)
 
+Setting up the hosts file
+-------------------------
+
+Just like Linux and Mac, Windows too has a concept of a "hosts file". This file lets you point any 
+domain name or host name to any IP address you choose. (Note that this doesn't resolve browser 
+protection issues with SSL or CORS).
+
+Edit `C:\Windows\System32\drivers\etc\hosts`. You will need to open and edit this file as an 
+administrator, otherwise you will not be able to save your changes.
+
+Running `notepad.exe` is slightly tricky. Right click, and "run as administrator". Then open the 
+file manually from File > Open.
+
+You will have to make sure "Text Files (\*.txt)" is set to "All Files (\*.\*) since the hosts file
+does not end with the ".txt" extension.
+
+Add the following lines:
+
+```
+127.0.0.1       jungle.horse 
+34.102.242.35   api.jungle.horse 
+```
+
+Running chrome without SSL and CORS protection
+----------------------------------------------
+
+DO NOT USE THIS FOR YOUR NORMAL BROWSING! IT IS UNSAFE! (ie. Don't use this for mail, banking, etc.!)
+
+Run the following command under the "run" dialog. You can also set this up as a windows shortcut to 
+make launching it easy.
+
+```
+"C:\Program Files\Google\Chrome\Application\chrome.exe" --disable-web-security --ignore-certificate-errors --user-data-dir=~/chromeTemp
+```
+
+Or on 32 bit, 
+
+```
+"C:\Program Files (x86)\Google\Chrome\Application\chrome.exe" --disable-web-security --ignore-certificate-errors --user-data-dir=~/chromeTemp
+```
+
+Final steps
+-----------
+
+Edit `packages\components\src\api\ApiConfig.ts` to set SSL to true in development (but don't commit it):
+
+```typescript
+    } else if (document.location.host.includes("jungle.horse")) {
+      // NB: Local dev.
+      domain = Domain.JungleHorse;
+      useSsl = document.location.protocol === 'https:';
+      useSsl = true; // ***OVERRIDE HERE***
+```
+
+We'll come up with a better long-term solution.
+
+You will then be able to access the website at http://jungle.horse:3000 and load data from production.
+
+Note that audio files and spectrogram files will not load from Google due to certificate issues, 
+but we will also fix this issue.
 
 Fixing common errors
 --------------------
