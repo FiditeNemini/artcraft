@@ -10,7 +10,8 @@ import { HiddenIconFc } from '../../_icons/HiddenIcon';
 import { VisibleIconFc } from '../../_icons/VisibleIcon';
 import { GetTtsResult, GetTtsResultIsErr, GetTtsResultIsOk, TtsResult, TtsResultLookupError } from '../../../api/tts/GetTtsResult';
 import { TtsResultAudioPlayerFc } from './TtsResultAudioPlayerFc';
-
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faDownload } from "@fortawesome/free-solid-svg-icons";
 interface Props {
   sessionWrapper: SessionWrapper,
 }
@@ -204,11 +205,21 @@ function TtsResultViewFc(props: Props) {
   }
 
   return (
-    <div>
-      <h1 className="title is-1"> {headingTitle} </h1>
+    <div className="container py-5">
+    <div className="d-flex flex-column">
+      <h1 className="display-5 fw-bold mb-4"> {headingTitle} </h1>
       {subtitle}
-
+      </div>
+      <div className="container-panel pb-5">
+      <div className="panel p-3 p-lg-4 load-hidden">
       <TtsResultAudioPlayerFc ttsResult={ttsInferenceResult} />
+      <a className=" btn btn-primary w-100"
+          href={audioLink}
+          download={audioDownloadFilename}>
+            <FontAwesomeIcon icon={faDownload} />  Download File </a>
+
+      </div>
+      </div>
 
       {/* Without wavesurfer, 
       <audio
@@ -219,52 +230,53 @@ function TtsResultViewFc(props: Props) {
       </audio>*/}
 
       <br />
-
-      <a className="button is-large is-primary is-fullwidth"
-          href={audioLink}
-          download={audioDownloadFilename}>Download File</a>
+      
 
       <br />
       <br />
-
-      <h4 className="subtitle is-4"> Spectrogram </h4>
+      <div className="container-panel pt-3 pb-5">
+      <div className="panel p-3 p-lg-4 load-hidden">
+      <h2 className="panel-title"> Spectrogram </h2>
       <SpectrogramFc spectrogramJsonLink={spectrogramLink} />
-
+      </div>
+      </div>
       <br />
-
+      <div className="panel p-3 p-lg-4 load-hidden">
+      <div className="panel p-3 p-lg-4 load-hidden">
       <table className="table is-fullwidth">
         <tbody>
           <tr>
             <td colSpan={2}>
-              <h4 className="subtitle is-4"> Result Details </h4>
+              <h2 className="panel-title"> Result Details </h2>
             </td>
           </tr>
           <tr>
-            <th>Original text</th>
+            <th scope="row">Original text</th>
             <td className="overflow-fix">
               {ttsInferenceResult.raw_inference_text}
             </td>
           </tr>
           <tr>
-            <th>Audio creator</th>
+            <th scope="row">Audio creator</th>
             <td>
               {creatorDetails}
             </td>
           </tr>
           <tr>
-            <th>Audio duration</th>
+            <th scope="row">Audio duration</th>
             <td>{durationSeconds} seconds</td>
           </tr>
           <tr>
-            <th>Visibility</th>
+            <th scope="row">Visibility</th>
             <td>{resultVisibility}</td>
           </tr>
           <tr>
             <td colSpan={2}>
               <br />
-              <h4 className="subtitle is-4">Model Used</h4>
+              <h2 className="title">Model Used</h2>
             </td>
           </tr>
+          <div className="py-6">
           <tr>
             <th>Model name</th>
             <td>
@@ -295,6 +307,7 @@ function TtsResultViewFc(props: Props) {
               {ttsInferenceResult.generated_by_worker}
             </td>
           </tr>
+          </div>
 
           {debugRows}
       
@@ -302,14 +315,20 @@ function TtsResultViewFc(props: Props) {
 
         </tbody>
       </table>
+      </div>
+      </div>
+      
       
       {editButton}
-
+      
       {deleteButton}
-
+      
       <br />
+      <p className="text-center text-lg-start">
       <ReportDiscordLinkFc />
+      </p>
     </div>
+    
   )
 }
 
