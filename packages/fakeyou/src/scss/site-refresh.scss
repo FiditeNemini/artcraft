@@ -276,15 +276,15 @@ styles with important tags:
     }
   }
 
-  ul.patrons-list {
-    columns: 1;
-    list-style: none;
-  }
-
   .firehose-ul {
     list-style-type: none;
     padding: 0;
     margin: 0;
+  }
+
+  ul.patrons-list {
+    columns: 1;
+    list-style: none;
   }
 
   .form-check-input:checked {
@@ -347,9 +347,9 @@ styles with important tags:
     .panel {
       border-radius: 8px;
     }
-  }
 
-  ul.patrons-list {
-    columns: 3;
+    ul.patrons-list {
+      columns: 3;
+    }
   }
 }
