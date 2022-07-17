@@ -79,7 +79,7 @@ function PricingPage(props: Props) {
           >
             <div className="col-12 col-lg-4">
               <div className="rounded panel p-4 h-100">
-                <h2 className="text-center my-2">Free</h2>
+                <h2 className="text-center my-2 fw-bold">Free</h2>
                 <p className="mb-4 text-center">Great for hobbyists</p>
                 <Link to="/" className="btn btn-secondary w-100 fs-5">
                   Create free TTS
@@ -102,7 +102,7 @@ function PricingPage(props: Props) {
             </div>
             <div className="col-12 col-lg-4">
               <div className="rounded panel p-4 panel-border h-100">
-                <h2 className="text-center my-2">Basic</h2>
+                <h2 className="text-center my-2 fw-bold">Basic</h2>
                 <p className="mb-4 text-center">Great for hobbyists</p>
                 <Link to="/" className="btn btn-primary w-100 fs-5">
                   Buy Basic
@@ -129,7 +129,7 @@ function PricingPage(props: Props) {
             </div>
             <div className="col-12 col-lg-4">
               <div className="rounded panel p-4 h-100">
-                <h2 className="text-center my-2">Pro</h2>
+                <h2 className="text-center my-2 fw-bold">Pro</h2>
                 <p className="mb-4 text-center">Great for hobbyists</p>
                 <Link to="/" className="btn btn-primary w-100 fs-5">
                   Buy Pro
