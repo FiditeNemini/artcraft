@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Link } from "react-router-dom";
 import {
-  faMoneyBillWave,
   faCheckCircle as TRUE,
   faTimesCircle as FALSE,
   faCheck,
@@ -12,7 +11,14 @@ import {
   FAKEYOU_PRICES as FYP,
   STORYTELLER_PRICES as STP,
 } from "@storyteller/fakeyou/src/data/PriceTiers";
-import { distance, delay, delay2, duration } from "../../../data/animation";
+import {
+  distance,
+  pricing1,
+  pricing2,
+  pricing3,
+  delay2,
+  duration,
+} from "../../../data/animation";
 const Fade = require("react-reveal/Fade");
 
 interface Props {
@@ -70,14 +76,13 @@ function PricingPage(props: Props) {
 
       <div className="container mt-3">
         <div className="row gy-4">
-          <Fade
-            bottom
-            cascade
-            duration={duration}
-            distance={distance}
-            delay={delay2}
-          >
-            <div className="col-12 col-lg-4">
+          <div className="col-12 col-lg-4">
+            <Fade
+              bottom
+              duration={duration}
+              distance={distance}
+              delay={pricing1}
+            >
               <div className="rounded panel p-4 h-100">
                 <h2 className="text-center my-2 fw-bold">Free</h2>
                 <p className="mb-4 text-center">Great for hobbyists</p>
@@ -99,8 +104,15 @@ function PricingPage(props: Props) {
                   </li>
                 </ul>
               </div>
-            </div>
-            <div className="col-12 col-lg-4">
+            </Fade>
+          </div>
+          <div className="col-12 col-lg-4">
+            <Fade
+              bottom
+              duration={duration}
+              distance={distance}
+              delay={pricing2}
+            >
               <div className="rounded panel p-4 panel-border h-100">
                 <h2 className="text-center my-2 fw-bold">Basic</h2>
                 <p className="mb-4 text-center">Great for hobbyists</p>
@@ -126,8 +138,15 @@ function PricingPage(props: Props) {
                   </li>
                 </ul>
               </div>
-            </div>
-            <div className="col-12 col-lg-4">
+            </Fade>
+          </div>
+          <div className="col-12 col-lg-4">
+            <Fade
+              bottom
+              duration={duration}
+              distance={distance}
+              delay={pricing3}
+            >
               <div className="rounded panel p-4 h-100">
                 <h2 className="text-center my-2 fw-bold">Pro</h2>
                 <p className="mb-4 text-center">Great for hobbyists</p>
@@ -161,8 +180,8 @@ function PricingPage(props: Props) {
                   </li>
                 </ul>
               </div>
-            </div>
-          </Fade>
+            </Fade>
+          </div>
         </div>
       </div>
 

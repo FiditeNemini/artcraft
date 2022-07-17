@@ -6,7 +6,17 @@ import { Link } from "react-router-dom";
 import { distance, duration, delay } from "../../../data/animation";
 import { USE_REFRESH } from "../../../Refresh";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faPlay, faFlagCheckered } from "@fortawesome/free-solid-svg-icons";
+import {
+  faPlay,
+  faFlagCheckered,
+  faAward,
+  faPenToSquare,
+} from "@fortawesome/free-solid-svg-icons";
+import {
+  faTwitter,
+  faDiscord,
+  faTwitch,
+} from "@fortawesome/free-brands-svg-icons";
 
 const Fade = require("react-reveal/Fade");
 
@@ -107,6 +117,7 @@ function FirehoseEventListFc(props: Props) {
       case "user_sign_up":
         inner = (
           <span>
+            <FontAwesomeIcon icon={faPenToSquare} />
             {gravatar}
             &nbsp;
             {userLink}
@@ -117,6 +128,7 @@ function FirehoseEventListFc(props: Props) {
       case "user_badge_granted":
         inner = (
           <span>
+            <FontAwesomeIcon icon={faAward} />
             {gravatar}
             &nbsp;
             {userLink}
@@ -127,6 +139,7 @@ function FirehoseEventListFc(props: Props) {
       case "tts_model_upload_started":
         inner = (
           <span>
+            <FontAwesomeIcon icon={faPlay} className="me-3" />
             {gravatar}
             &nbsp;
             {userLink}
@@ -137,6 +150,7 @@ function FirehoseEventListFc(props: Props) {
       case "tts_model_upload_completed":
         inner = (
           <span>
+            <FontAwesomeIcon icon={faFlagCheckered} className="me-3" />
             {gravatar}
             &nbsp;
             {userLink}
@@ -169,6 +183,7 @@ function FirehoseEventListFc(props: Props) {
       case "w2l_template_upload_started":
         inner = (
           <span>
+            <FontAwesomeIcon icon={faPlay} className="me-3" />
             {gravatar}
             &nbsp;
             {userLink}
@@ -179,6 +194,7 @@ function FirehoseEventListFc(props: Props) {
       case "w2l_template_upload_completed":
         inner = (
           <span>
+            <FontAwesomeIcon icon={faFlagCheckered} className="me-3" />
             {gravatar}
             &nbsp;
             {userLink}
@@ -189,6 +205,7 @@ function FirehoseEventListFc(props: Props) {
       case "w2l_inference_started":
         inner = (
           <span>
+            <FontAwesomeIcon icon={faPlay} className="me-3" />
             {gravatar}
             &nbsp;
             {userLink}
@@ -199,6 +216,7 @@ function FirehoseEventListFc(props: Props) {
       case "w2l_inference_completed":
         inner = (
           <span>
+            <FontAwesomeIcon icon={faFlagCheckered} className="me-3" />
             {gravatar}
             &nbsp;
             {userLink}
@@ -209,6 +227,7 @@ function FirehoseEventListFc(props: Props) {
       case "twitter_mention":
         inner = (
           <span>
+            <FontAwesomeIcon icon={faTwitter} />
             {gravatar}
             &nbsp;
             {userLink}
@@ -219,6 +238,7 @@ function FirehoseEventListFc(props: Props) {
       case "twitter_retweet":
         inner = (
           <span>
+            <FontAwesomeIcon icon={faTwitter} />
             {gravatar}
             &nbsp;
             {userLink}
@@ -229,6 +249,7 @@ function FirehoseEventListFc(props: Props) {
       case "discord_join":
         inner = (
           <span>
+            <FontAwesomeIcon icon={faDiscord} />
             {gravatar}
             &nbsp;
             {userLink}
@@ -239,6 +260,7 @@ function FirehoseEventListFc(props: Props) {
       case "discord_message":
         inner = (
           <span>
+            <FontAwesomeIcon icon={faDiscord} />
             {gravatar}
             &nbsp;
             {userLink}
@@ -249,6 +271,7 @@ function FirehoseEventListFc(props: Props) {
       case "twitch_subscribe":
         inner = (
           <span>
+            <FontAwesomeIcon icon={faTwitch} />
             {gravatar}
             &nbsp;
             {userLink}
@@ -259,6 +282,7 @@ function FirehoseEventListFc(props: Props) {
       case "twitch_follow":
         inner = (
           <span>
+            <FontAwesomeIcon icon={faTwitch} />
             {gravatar}
             &nbsp;
             {userLink}
