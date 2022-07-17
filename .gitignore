@@ -5,8 +5,10 @@
 node_modules/
 
 # Yarn
-yarn-error.log
 .yarn/cache
+.yarn/install-state.gz
+.yarn/releases/
+yarn-error.log
 
 # Windows
 .DS_Store
