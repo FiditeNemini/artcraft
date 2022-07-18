@@ -22,6 +22,7 @@ import {
   faVolumeHigh,
   faVideo,
   faGlobe,
+  faDollarSign,
 } from "@fortawesome/free-solid-svg-icons";
 
 import {
@@ -222,7 +223,7 @@ function ProfileFc(props: Props) {
     let cashAppLink = (
       <Tippy content="CashApp">
         <a href={cashAppUrl} target="_blank" rel="noopener noreferrer nofollow">
-          Cashapp
+          <FontAwesomeIcon icon={faDollarSign} />
         </a>
       </Tippy>
     );
