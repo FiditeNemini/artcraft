@@ -142,7 +142,8 @@ function TtsResultEditFc(props: Props) {
   const visibilityIcon = (visibility === 'public') ? <VisibleIconFc /> : <HiddenIconFc />;
 
   return (
-    <div className="content">
+    <div className="container">
+    <div className="container">
       <h1 className="title is-1"> Edit Result Visibility </h1>
 
       <p>
@@ -153,11 +154,12 @@ function TtsResultEditFc(props: Props) {
         <fieldset disabled={isDisabled}>
 
           <div className="field">
-            <label className="label">
+            <label className="sub-title">
               Result Visibility&nbsp;{visibilityIcon}
             </label>
             <div className="control select">
               <select 
+              className="form-select"
                 name="creator_set_visibility" 
                 onChange={handleVisibilityChange}
                 value={visibility}
@@ -170,11 +172,12 @@ function TtsResultEditFc(props: Props) {
 
           <br />
 
-          <button className="button is-link is-large is-fullwidth">Update</button>
+          <button className="btn btn-primary btn-lg w-100">Update</button>
 
         </fieldset>
       </form>
       
+    </div>
     </div>
   )
 }
