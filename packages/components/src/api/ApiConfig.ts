@@ -43,7 +43,6 @@ class ApiConfig {
       // NB: Local dev.
       domain = Domain.JungleHorse;
       useSsl = document.location.protocol === "https:";
-      useSsl = true;
     } else if (document.location.host.includes("vo.codes")) {
       domain = Domain.Vocodes;
     } else if (document.location.host.includes("fakeyou.com")) {
