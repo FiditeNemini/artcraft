@@ -10,7 +10,6 @@ import { useParams } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faDiscord,
-  faFirefox,
   faGithub,
   faTwitch,
   faTwitter,
@@ -22,6 +21,7 @@ import {
   faAward,
   faVolumeHigh,
   faVideo,
+  faGlobe,
 } from "@fortawesome/free-solid-svg-icons";
 
 import {
@@ -152,7 +152,7 @@ function ProfileFc(props: Props) {
             target="_blank"
             rel="noopener noreferrer nofollow"
           >
-            <FontAwesomeIcon icon={faFirefox} />
+            <FontAwesomeIcon icon={faGlobe} />
           </a>
         </Tippy>
       );
