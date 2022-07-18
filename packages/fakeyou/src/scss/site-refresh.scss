@@ -335,6 +335,14 @@ styles with important tags:
   .content p:not(:last-child) {
     margin-bottom: 0.5rem;
   }
+
+  tbody tr {
+    @for $i from 1 through 12 {
+      &:nth-of-type(#{$i}) {
+        animation-delay: $i * 20ms !important;
+      }
+    }
+  }
 }
 
 @media (min-width: 992px) {

@@ -297,14 +297,14 @@ function ProfileFc(props: Props) {
       </div>
 
       <div
-        className="container content mb-5 text-center text-lg-start px-4 px-md-5 px-lg-3"
+        className="container content mb-0 mb-lg-5 text-center text-lg-start px-4 px-md-5 px-lg-3"
         dangerouslySetInnerHTML={{
           __html: userData.profile_rendered_html || "",
         }}
       />
 
       <div className="container-panel py-5">
-        <div className="panel p-3 p-lg-4 mt-5 mt-lg-0">
+        <div className="panel p-3 p-lg-4">
           <h2 className="panel-title fw-bold">
             <FontAwesomeIcon icon={faAward} className="me-3" />
             Badges{" "}
@@ -315,7 +315,7 @@ function ProfileFc(props: Props) {
       </div>
 
       <div className="container-panel pt-3 pb-5">
-        <div className="panel p-3 p-lg-4 mt-5 mt-lg-0">
+        <div className="panel p-3 p-lg-4">
           <h2 className="panel-title fw-bold">
             <FontAwesomeIcon icon={faVolumeHigh} className="me-3" />
             TTS Results
@@ -327,7 +327,7 @@ function ProfileFc(props: Props) {
       </div>
 
       <div className="container-panel pt-3 pb-5">
-        <div className="panel p-3 p-lg-4 mt-5 mt-lg-0">
+        <div className="panel p-3 p-lg-4">
           <h2 className="panel-title fw-bold">
             <FontAwesomeIcon icon={faVideo} className="me-3" />
             Lipsync Results

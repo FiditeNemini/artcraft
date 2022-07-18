@@ -1,26 +1,26 @@
-import React, { useState, useEffect } from 'react';
-import { ApiConfig } from '@storyteller/components';
-import { Link } from 'react-router-dom';
-import { formatDistance } from 'date-fns';
+import React, { useState, useEffect } from "react";
+import { ApiConfig } from "@storyteller/components";
+import { Link } from "react-router-dom";
+import { formatDistance } from "date-fns";
 
 interface TtsModelListResponsePayload {
-  success: boolean,
-  models: Array<TtsModel>,
+  success: boolean;
+  models: Array<TtsModel>;
 }
 
 interface TtsModel {
-  model_token: string,
-  tts_model_type: string,
-  title: string,
-  updatable_slug: string,
+  model_token: string;
+  tts_model_type: string;
+  title: string;
+  updatable_slug: string;
   // TODO: No need for "creator_*" fields. Remove them from backend.
-  is_mod_disabled: boolean,
-  created_at: string,
-  updated_at: string,
+  is_mod_disabled: boolean;
+  created_at: string;
+  updated_at: string;
 }
 
 interface Props {
-  username: string,
+  username: string;
 }
 
 function ProfileTtsModelListFc(props: Props) {
@@ -31,40 +31,44 @@ function ProfileTtsModelListFc(props: Props) {
     const endpointUrl = api.listTtsModelsForUser(props.username);
 
     fetch(endpointUrl, {
-      method: 'GET',
+      method: "GET",
       headers: {
-        'Accept': 'application/json',
+        Accept: "application/json",
       },
-      credentials: 'include',
+      credentials: "include",
     })
-    .then(res => res.json())
-    .then(res => {
-      const modelsResponse : TtsModelListResponsePayload  = res;
-      if (!modelsResponse.success) {
-        return;
-      }
+      .then((res) => res.json())
+      .then((res) => {
+        const modelsResponse: TtsModelListResponsePayload = res;
+        if (!modelsResponse.success) {
+          return;
+        }
 
-      setTtsModels(modelsResponse.models)
-    })
-    .catch(e => {
-    });
+        setTtsModels(modelsResponse.models);
+      })
+      .catch((e) => {});
   }, [props.username]); // NB: Empty array dependency sets to run ONLY on mount
 
   const now = new Date();
 
-  let rows : Array<JSX.Element> = [];
-  
-  ttsModels.forEach(model => {
-    const modelTitle = model.title.length < 5 ? `Model: ${model.title}` : model.title;
+  let rows: Array<JSX.Element> = [];
+
+  ttsModels.slice(0, 10).forEach((model) => {
+    const modelTitle =
+      model.title.length < 5 ? `Model: ${model.title}` : model.title;
 
     const modelLink = `/tts/${model.model_token}`;
 
     const createTime = new Date(model.created_at);
-    const relativeCreateTime = formatDistance(createTime, now, { addSuffix: true });
+    const relativeCreateTime = formatDistance(createTime, now, {
+      addSuffix: true,
+    });
 
     rows.push(
       <tr key={model.model_token}>
-        <th><Link to={modelLink}>{modelTitle}</Link></th>
+        <th>
+          <Link to={modelLink}>{modelTitle}</Link>
+        </th>
         <td>{relativeCreateTime}</td>
       </tr>
     );
@@ -75,16 +79,19 @@ function ProfileTtsModelListFc(props: Props) {
       <table className="table">
         <thead>
           <tr>
-            <th><abbr title="Model Name">Model Name</abbr></th>
-            <th><abbr title="Creation Date">Creation Time</abbr></th>
+            <th>
+              <abbr title="Model Name">Model Name</abbr>
+            </th>
+            <th>
+              <abbr title="Creation Date">Creation Time</abbr>
+            </th>
           </tr>
         </thead>
-        <tbody>
-          {rows}
-        </tbody>
+        <tbody>{rows}</tbody>
       </table>
+      <div className="text-center">ADD OLDER/NEWER PAGINATION BUTTON HERE</div>
     </div>
-  )
+  );
 }
 
 export { ProfileTtsModelListFc };
