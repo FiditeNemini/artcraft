@@ -109,7 +109,7 @@ function ProfileW2lTemplateListFc(props: Props) {
 
     if (rowOfTemplateElements.length === nextRowSize) {
       allRowsOfTemplateElements.push(
-        <div className="col-sm-6 col-md-4 col-lg-3 mb-4 d-flex" key={rowKey}>
+        <div className="col-sm-6 col-md-4 col-lg-3 d-flex" key={rowKey}>
           {rowOfTemplateElements.map((el) => el)}
         </div>
       );
@@ -128,14 +128,16 @@ function ProfileW2lTemplateListFc(props: Props) {
   // Make sure last row is built.
   if (rowOfTemplateElements.length !== 0) {
     allRowsOfTemplateElements.push(
-      <div className="col-sm-6 col-md-4 col-lg-3 mb-4 d-flex" key={rowKey}>
+      <div className="col-sm-6 col-md-4 col-lg-3 d-flex" key={rowKey}>
         {rowOfTemplateElements.map((el) => el)}
       </div>
     );
     rowOfTemplateElements = [];
   }
 
-  return <div className="row">{allRowsOfTemplateElements.map((el) => el)}</div>;
+  return (
+    <div className="row gy-4">{allRowsOfTemplateElements.map((el) => el)}</div>
+  );
 }
 
 export { ProfileW2lTemplateListFc };
