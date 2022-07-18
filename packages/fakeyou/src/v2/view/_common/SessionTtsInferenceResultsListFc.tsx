@@ -3,7 +3,8 @@ import { Link } from 'react-router-dom';
 import { TtsInferenceJob } from '../../../App'
 import { BucketConfig } from '@storyteller/components/src/api/BucketConfig';
 import { JobState } from '@storyteller/components/src/jobs/JobStates';
-
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faLink, faList, faMicrophone } from '@fortawesome/free-solid-svg-icons';
 interface Props {
   ttsInferenceJobs: Array<TtsInferenceJob>,
 }
@@ -15,7 +16,7 @@ function SessionTtsInferenceResultListFc(props: Props) {
   props.ttsInferenceJobs.forEach(job => {
 
     if (!job.maybeResultToken) {
-      let cssStyle = "message";
+      let cssStyle = "alert alert-secondary my-4 alert text-black";
       let stateDescription = "Pending...";
 
       switch (job.jobState) {
@@ -24,16 +25,16 @@ function SessionTtsInferenceResultListFc(props: Props) {
           stateDescription = job.maybeExtraStatusDescription == null ? "Pending..." : job.maybeExtraStatusDescription;
           break;
         case JobState.STARTED:
-          cssStyle = "message is-primary";
+          cssStyle = "alert alert-success my-4 alert";
           stateDescription = job.maybeExtraStatusDescription == null ? "Started..." : job.maybeExtraStatusDescription;
           break;
         case JobState.ATTEMPT_FAILED:
-          cssStyle = "message is-warning";
+          cssStyle = "alert alert-danger my-4 alert";
           stateDescription = `Failed ${job.attemptCount} attempt(s). Will retry...`;
           break;
         case JobState.COMPLETE_FAILURE:
         case JobState.DEAD:
-          cssStyle = "message is-danger";
+          cssStyle = "alert alert-danger my-4 alert";
           stateDescription = "Failed Permanently. Please tell us in Discord so we can fix. :(";
           break;
         case JobState.COMPLETE_SUCCESS:
@@ -64,22 +65,23 @@ function SessionTtsInferenceResultListFc(props: Props) {
               <p>{job.title}</p>
               <button className="delete" aria-label="delete"></button>
             </div>*/}
-            <div className="message-body">
-              <strong>{job.title}</strong>
+            <div className="panel p-3 p-lg-4 load-hidden gap-4 d-flex flex-column">
+              <h4> <FontAwesomeIcon icon={faMicrophone} /> {job.title}</h4>
               <p>{job.rawInferenceText}</p>
 
-            <audio
+            <audio className="w-100"
               controls
               src={audioLink}>
                 Your browser does not support the
                 <code>audio</code> element.
             </audio>
-            &nbsp;
-
+            
+            <div>
             <Link 
               to={ttsPermalink}
-              className="button is-normal is-outlined is-dark"
-              >Permalink &amp; download</Link>
+              className="btn btn-primary btn-lg"
+              > <FontAwesomeIcon icon={faLink} /> Permalink &amp; download</Link>
+              </div>
               </div>
           </article>
           &nbsp;
@@ -94,7 +96,8 @@ function SessionTtsInferenceResultListFc(props: Props) {
 
   let title = <span />;
   if  (results.length !== 0) {
-      title = <h4 className="title is-4">Session TTS Results</h4>;
+      title = <h2 className="text-center text-lg-start"
+      > <FontAwesomeIcon icon={faList} /> Session TTS Results</h2>;
   }
 
   // Users have requested reverse chronological results
@@ -102,6 +105,8 @@ function SessionTtsInferenceResultListFc(props: Props) {
 
   return (
     <div>
+      <div className="container mb-4">
+        <div className="d-flex flex-column gap-4 mb-5">
       {title}
       {/*<div className="notification is-info is-light">
         <strong>Working on speeding this up</strong> 
@@ -111,6 +116,9 @@ function SessionTtsInferenceResultListFc(props: Props) {
       </div>*/}
       {results}
     </div>
+    </div>
+    </div>
+    
   );
 }
 
