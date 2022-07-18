@@ -192,6 +192,18 @@ styles with important tags:
     h2.panel-title {
       margin-top: -32px;
     }
+
+    a {
+      color: lighten($primary, 5%);
+
+      &:hover {
+        color: $primary;
+      }
+
+      &.btn {
+        color: $white;
+      }
+    }
   }
 
   .login-panel {
@@ -311,6 +323,17 @@ styles with important tags:
         animation-delay: $i * 100ms !important;
       }
     }
+  }
+
+  dl,
+  ol,
+  ul {
+    margin-top: 0;
+    margin-bottom: 0rem;
+  }
+
+  .content p:not(:last-child) {
+    margin-bottom: 0.5rem;
   }
 }
 

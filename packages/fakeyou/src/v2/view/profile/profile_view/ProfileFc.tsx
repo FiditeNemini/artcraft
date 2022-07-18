@@ -15,7 +15,16 @@ import {
   faTwitch,
   faTwitter,
 } from "@fortawesome/free-brands-svg-icons";
-import { faClock, faDollarSign } from "@fortawesome/free-solid-svg-icons";
+import {
+  faClock,
+  faDollarSign,
+  faBan,
+  faGear,
+  faAward,
+  faVolumeHigh,
+  faVideo,
+} from "@fortawesome/free-solid-svg-icons";
+
 import {
   GetUserByUsername,
   GetUserByUsernameIsErr,
@@ -55,7 +64,11 @@ function ProfileFc(props: Props) {
   }, [username, getUser]);
 
   if (notFoundState) {
-    return <h1 className="title is-1">User not found</h1>;
+    return (
+      <div className="container py-5">
+        <h1 className="text-center fw-bold">User not found</h1>
+      </div>
+    );
   }
 
   if (!userData) {
@@ -80,13 +93,10 @@ function ProfileFc(props: Props) {
 
     editProfileButton = (
       <>
-        <Link
-          className={"button is-large is-fullwidth is-info"}
-          to={editLinkUrl}
-        >
+        <Link className={"btn btn-primary"} to={editLinkUrl}>
+          <FontAwesomeIcon icon={faGear} className="me-2" />
           {buttonLabel}
         </Link>
-        <br />
       </>
     );
   }
@@ -98,20 +108,33 @@ function ProfileFc(props: Props) {
     const banLinkUrl = FrontendUrlConfig.userProfileBanPage(userData.username);
     const buttonLabel = currentlyBanned ? "Unban User" : "Ban User";
     const banButtonCss = currentlyBanned
-      ? "button is-warning is-large is-fullwidth"
-      : "button is-danger is-large is-fullwidth";
+      ? "btn btn-secondary"
+      : "btn btn-destructive";
 
     banUserButton = (
       <>
         <Link className={banButtonCss} to={banLinkUrl}>
+          <FontAwesomeIcon icon={faBan} className="me-2" />
           {buttonLabel}
         </Link>
-        <br />
       </>
     );
   }
 
   let profileRows: Array<JSX.Element> = [];
+  let profileJoinDate: Array<JSX.Element> = [];
+
+  const createdAt = new Date(userData.created_at);
+  const joinDate = format(createdAt, "LLLL y");
+  profileJoinDate.push(
+    <div
+      key="created"
+      className="d-flex align-items-center justify-content-center fs-6 me-3"
+    >
+      <FontAwesomeIcon icon={faClock} className="me-2" />
+      <p className="fw-bold">Joined {joinDate}</p>
+    </div>
+  );
 
   if (userData.website_url !== undefined && userData.website_url !== null) {
     let websiteUrl = <span>{userData.website_url}</span>;
@@ -125,67 +148,47 @@ function ProfileFc(props: Props) {
           target="_blank"
           rel="noopener noreferrer nofollow"
         >
-          {userData.website_url}
+          <FontAwesomeIcon icon={faFirefox} />
         </a>
       );
     }
 
-    profileRows.push(
-      <tr key="website">
-        <th>
-          Website&nbsp;
-          <FontAwesomeIcon icon={faFirefox} />
-        </th>
-        <td>{websiteUrl}</td>
-      </tr>
-    );
+    profileRows.push(<div key="website">{websiteUrl}</div>);
   }
 
   if (userData.twitch_username) {
     let twitchUrl = `https://twitch.com/${userData.twitch_username}`;
     let twitchLink = (
       <a href={twitchUrl} target="_blank" rel="noopener noreferrer nofollow">
-        {userData.twitch_username}
+        <FontAwesomeIcon icon={faTwitch} />
       </a>
     );
-    profileRows.push(
-      <tr key="twitch">
-        <th>
-          Twitch&nbsp;
-          <FontAwesomeIcon icon={faTwitch} />
-        </th>
-        <td>{twitchLink}</td>
-      </tr>
-    );
+
+    profileRows.push(<div key="twitch">{twitchLink}</div>);
   }
 
   if (userData.twitter_username) {
     let twitterUrl = `https://twitter.com/${userData.twitter_username}`;
     let twitterLink = (
       <a href={twitterUrl} target="_blank" rel="noopener noreferrer nofollow">
-        @{userData.twitter_username}
+        <FontAwesomeIcon icon={faTwitter} />
       </a>
     );
-    profileRows.push(
-      <tr key="twitter">
-        <th>
-          Twitter&nbsp;
-          <FontAwesomeIcon icon={faTwitter} />
-        </th>
-        <td>{twitterLink}</td>
-      </tr>
-    );
+    profileRows.push(<div key="twitter">{twitterLink}</div>);
   }
 
   if (userData.discord_username) {
     profileRows.push(
-      <tr key="discord">
-        <th>
-          Discord&nbsp;
+      <div
+        key="discord"
+        data-bs-toggle="tooltip"
+        data-bs-placement="top"
+        title="{userData.discord_username}"
+      >
+        <a href="#">
           <FontAwesomeIcon icon={faDiscord} />
-        </th>
-        <td>{userData.discord_username}</td>
-      </tr>
+        </a>
+      </div>
     );
   }
 
@@ -193,18 +196,10 @@ function ProfileFc(props: Props) {
     let githubUrl = `https://github.com/${userData.github_username}`;
     let githubLink = (
       <a href={githubUrl} target="_blank" rel="noopener noreferrer nofollow">
-        {userData.github_username}
+        <FontAwesomeIcon icon={faGithub} />
       </a>
     );
-    profileRows.push(
-      <tr key="github">
-        <th>
-          Github&nbsp;
-          <FontAwesomeIcon icon={faGithub} />
-        </th>
-        <td>{githubLink}</td>
-      </tr>
-    );
+    profileRows.push(<div key="github">{githubLink}</div>);
   }
 
   if (userData.cashapp_username) {
@@ -215,28 +210,8 @@ function ProfileFc(props: Props) {
         ${userData.cashapp_username}
       </a>
     );
-    profileRows.push(
-      <tr key="cashapp">
-        <th>
-          CashApp&nbsp;
-          <FontAwesomeIcon icon={faDollarSign} />
-        </th>
-        <td>{cashAppLink}</td>
-      </tr>
-    );
+    profileRows.push(<div key="cashapp">CashApp {cashAppLink}</div>);
   }
-
-  const createdAt = new Date(userData.created_at);
-  const joinDate = format(createdAt, "LLLL y");
-  profileRows.push(
-    <tr key="created">
-      <th>
-        Joined&nbsp;
-        <FontAwesomeIcon icon={faClock} />
-      </th>
-      <td>{joinDate}</td>
-    </tr>
-  );
 
   let badges = <div>None yet</div>;
 
@@ -293,44 +268,93 @@ function ProfileFc(props: Props) {
   }
 
   return (
-    <div className="container">
-      <h1 className="title is-1">
-        <Gravatar
-          size={45}
-          username={userData.display_name}
-          email_hash={userEmailHash}
-        />
-        {userData.display_name}
-      </h1>
-
-      {editProfileButton}
-      {banUserButton}
+    <div>
+      <div className="container pt-5 pb-4">
+        <div className="d-flex flex-column flex-lg-row align-items-center">
+          <div className="mb-3 me-lg-4 mb-lg-0">
+            <Gravatar
+              size={45}
+              username={userData.display_name}
+              email_hash={userEmailHash}
+            />
+          </div>
+          <h1 className="display-5 fw-bold text-center text-lg-start w-100 mb-0">
+            {userData.display_name}
+          </h1>
+          <div className="w-100 justify-content-end d-none d-lg-flex">
+            <div className="d-flex gap-3">
+              {editProfileButton}
+              {banUserButton}
+            </div>
+          </div>
+        </div>
+        <div className="d-flex flex-column flex-lg-row gap-3 mt-3">
+          {profileJoinDate}
+          <div className="d-flex justify-content-center gap-3 fs-5">
+            {profileRows}
+          </div>
+        </div>
+      </div>
 
       <div
-        className="profile content is-medium"
+        className="container content mb-5 text-center text-lg-start px-4 px-md-5 px-lg-3"
         dangerouslySetInnerHTML={{
           __html: userData.profile_rendered_html || "",
         }}
       />
 
-      <table className="table">
-        <tbody>{profileRows}</tbody>
-      </table>
+      <div className="container-panel py-5">
+        <div className="panel p-3 p-lg-4 mt-5 mt-lg-0">
+          <h2 className="panel-title fw-bold">
+            <FontAwesomeIcon icon={faAward} className="me-3" />
+            Badges{" "}
+            <span className="fs-5 fw-normal ms-2">(images coming soon)</span>
+          </h2>
+          <div className="py-6">{badges}</div>
+        </div>
+      </div>
 
-      <h3 className="title is-3"> Badges (images coming soon) </h3>
-      {badges}
+      <div className="container-panel pt-3 pb-5">
+        <div className="panel p-3 p-lg-4 mt-5 mt-lg-0">
+          <h2 className="panel-title fw-bold">
+            <FontAwesomeIcon icon={faVolumeHigh} className="me-3" />
+            TTS Results
+          </h2>
+          <div className="py-6">
+            <ProfileTtsInferenceResultsListFc username={userData.username} />
+          </div>
+        </div>
+      </div>
 
-      <h3 className="title is-3"> TTS Results </h3>
-      <ProfileTtsInferenceResultsListFc username={userData.username} />
+      <div className="container-panel pt-3 pb-5">
+        <div className="panel p-3 p-lg-4 mt-5 mt-lg-0">
+          <h2 className="panel-title fw-bold">
+            <FontAwesomeIcon icon={faVideo} className="me-3" />
+            Lipsync Results
+          </h2>
+          <div className="py-6">
+            <ProfileW2lInferenceResultsListFc username={userData.username} />
+          </div>
+        </div>
+      </div>
 
-      <h3 className="title is-3"> Lipsync Results </h3>
-      <ProfileW2lInferenceResultsListFc username={userData.username} />
+      <div className="container-panel pt-3 pb-5">
+        <div className="panel p-3 p-lg-4 mt-5 mt-lg-0">
+          <h2 className="panel-title fw-bold"> Uploaded TTS Models </h2>
+          <div className="py-6">
+            <ProfileTtsModelListFc username={userData.username} />
+          </div>
+        </div>
+      </div>
 
-      <h3 className="title is-3"> Uploaded TTS Models </h3>
-      <ProfileTtsModelListFc username={userData.username} />
-
-      <h3 className="title is-3"> Uploaded Templates </h3>
-      <ProfileW2lTemplateListFc username={userData.username} />
+      <div className="container-panel pt-3 pb-5">
+        <div className="panel p-3 p-lg-4 mt-5 mt-lg-0">
+          <h2 className="panel-title fw-bold"> Uploaded Templates </h2>
+          <div className="py-6">
+            <ProfileW2lTemplateListFc username={userData.username} />
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
