@@ -11,7 +11,7 @@ import { VisibleIconFc } from '../../_icons/VisibleIcon';
 import { GetTtsResult, GetTtsResultIsErr, GetTtsResultIsOk, TtsResult, TtsResultLookupError } from '../../../api/tts/GetTtsResult';
 import { TtsResultAudioPlayerFc } from './TtsResultAudioPlayerFc';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faDownload } from "@fortawesome/free-solid-svg-icons";
+import { faDownload, faEdit, faTrash } from "@fortawesome/free-solid-svg-icons";
 interface Props {
   sessionWrapper: SessionWrapper,
 }
@@ -217,7 +217,6 @@ function TtsResultViewFc(props: Props) {
           href={audioLink}
           download={audioDownloadFilename}>
             <FontAwesomeIcon icon={faDownload} />  Download File </a>
-
       </div>
       </div>
 
@@ -241,9 +240,9 @@ function TtsResultViewFc(props: Props) {
       </div>
       </div>
       <br />
+      <div className="container-panel pt-3 pb-5">
       <div className="panel p-3 p-lg-4 load-hidden">
-      <div className="panel p-3 p-lg-4 load-hidden">
-      <table className="table is-fullwidth">
+      <table className="table">
         <tbody>
           <tr>
             <td colSpan={2}>
@@ -270,15 +269,20 @@ function TtsResultViewFc(props: Props) {
             <th scope="row">Visibility</th>
             <td>{resultVisibility}</td>
           </tr>
-          <tr>
-            <td colSpan={2}>
-              <br />
-              <h2 className="title">Model Used</h2>
-            </td>
-          </tr>
+          </tbody>
+          </table>
+          </div>
+          </div>
+
+
+          <div className="container-panel pt-3 pb-5">
+          <div className="panel p-3 p-lg-4 load-hidden">
+          <h2 className="panel-title">Model Used</h2>
           <div className="py-6">
+          <table className="table">
+          <tbody>
           <tr>
-            <th>Model name</th>
+            <th scope="row">Model name</th>
             <td>
               <Link to={modelLink}>
                 {modelName}
@@ -286,13 +290,13 @@ function TtsResultViewFc(props: Props) {
             </td>
           </tr>
           <tr>
-            <th>Model creator</th>
+            <th scope="row">Model creator</th>
             <td>
               {modelCreatorDetails}
             </td>
           </tr>
           <tr>
-            <th>Vocoder used</th>
+            <th scope="row">Vocoder used</th>
             <td>{vocoderUsed}</td>
           </tr>
           <tr>
@@ -302,31 +306,35 @@ function TtsResultViewFc(props: Props) {
             </td>
           </tr>
           <tr>
-            <th>Worker</th>
+            <th scope="row">Worker</th>
             <td>
               {ttsInferenceResult.generated_by_worker}
             </td>
           </tr>
+          </tbody>
+          </table>
           </div>
-
+          </div>    
+          </div>    
           {debugRows}
       
           {moderatorRows}
-
-        </tbody>
-      </table>
-      </div>
-      </div>
-      
-      
+          <div className="container pb-5">
+          <div className="d-flex flex-column flex-sm-row gap-3 mb-4">
+      <button className="btn btn-secondary w-100">
+      <FontAwesomeIcon icon={faEdit} />
       {editButton}
-      
+      </button>
+      <button className="btn btn-secondary w-100">
+      <FontAwesomeIcon icon={faTrash} />
       {deleteButton}
-      
+       </button>
+      </div>
       <br />
       <p className="text-center text-lg-start">
       <ReportDiscordLinkFc />
       </p>
+    </div>
     </div>
     
   )
