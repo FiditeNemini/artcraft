@@ -1,25 +1,33 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import { SessionWrapper } from '@storyteller/components/src/session/SessionWrapper';
-import { Gravatar } from '@storyteller/components/src/elements/Gravatar';
-import { BucketConfig } from '@storyteller/components/src/api/BucketConfig';
-import { useParams, Link } from 'react-router-dom';
-import { SpectrogramFc } from './SpectrogramFc';
-import { ReportDiscordLinkFc } from '../../_common/DiscordReportLinkFc';
-import { FrontendUrlConfig } from '../../../../common/FrontendUrlConfig';
-import { HiddenIconFc } from '../../_icons/HiddenIcon';
-import { VisibleIconFc } from '../../_icons/VisibleIcon';
-import { GetTtsResult, GetTtsResultIsErr, GetTtsResultIsOk, TtsResult, TtsResultLookupError } from '../../../api/tts/GetTtsResult';
-import { TtsResultAudioPlayerFc } from './TtsResultAudioPlayerFc';
+import React, { useState, useEffect, useCallback } from "react";
+import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
+import { Gravatar } from "@storyteller/components/src/elements/Gravatar";
+import { BucketConfig } from "@storyteller/components/src/api/BucketConfig";
+import { useParams, Link } from "react-router-dom";
+import { SpectrogramFc } from "./SpectrogramFc";
+import { ReportDiscordLinkFc } from "../../_common/DiscordReportLinkFc";
+import { FrontendUrlConfig } from "../../../../common/FrontendUrlConfig";
+import { HiddenIconFc } from "../../_icons/HiddenIcon";
+import { VisibleIconFc } from "../../_icons/VisibleIcon";
+import {
+  GetTtsResult,
+  GetTtsResultIsErr,
+  GetTtsResultIsOk,
+  TtsResult,
+  TtsResultLookupError,
+} from "../../../api/tts/GetTtsResult";
+import { TtsResultAudioPlayerFc } from "./TtsResultAudioPlayerFc";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faDownload, faEdit, faTrash } from "@fortawesome/free-solid-svg-icons";
 interface Props {
-  sessionWrapper: SessionWrapper,
+  sessionWrapper: SessionWrapper;
 }
 
 function TtsResultViewFc(props: Props) {
-  let { token } : { token: string }= useParams();
+  let { token }: { token: string } = useParams();
 
-  const [ttsInferenceResult, setTtsInferenceResult] = useState<TtsResult|undefined>(undefined);
+  const [ttsInferenceResult, setTtsInferenceResult] = useState<
+    TtsResult | undefined
+  >(undefined);
   const [notFoundState, setNotFoundState] = useState<boolean>(false);
 
   const getTtsResult = useCallback(async (token) => {
@@ -27,7 +35,7 @@ function TtsResultViewFc(props: Props) {
     if (GetTtsResultIsOk(result)) {
       setTtsInferenceResult(result);
     } else if (GetTtsResultIsErr(result)) {
-      switch(result) {
+      switch (result) {
         case TtsResultLookupError.NotFound:
           setNotFoundState(true);
           break;
@@ -39,36 +47,40 @@ function TtsResultViewFc(props: Props) {
     getTtsResult(token);
   }, [token, getTtsResult]); // NB: Empty array dependency sets to run ONLY on mount
 
-
   if (notFoundState) {
-    return (
-      <h1 className="title is-1">TTS result not found</h1>
-    );
+    return <h1 className="title is-1">TTS result not found</h1>;
   }
 
   if (!ttsInferenceResult) {
     return <div />;
   }
 
-  let audioLink = new BucketConfig().getGcsUrl(ttsInferenceResult?.public_bucket_wav_audio_path);
+  let audioLink = new BucketConfig().getGcsUrl(
+    ttsInferenceResult?.public_bucket_wav_audio_path
+  );
   let modelLink = `/tts/${ttsInferenceResult.tts_model_token}`;
 
   // NB: Not respected in firefox: https://stackoverflow.com/a/28468261
-  let audioDownloadFilename = `vocodes-${ttsInferenceResult.tts_model_token.replace(':', '')}.wav`;
+  let audioDownloadFilename = `vocodes-${ttsInferenceResult.tts_model_token.replace(
+    ":",
+    ""
+  )}.wav`;
 
-  let spectrogramLink = new BucketConfig().getGcsUrl(ttsInferenceResult?.public_bucket_spectrogram_path);
+  let spectrogramLink = new BucketConfig().getGcsUrl(
+    ttsInferenceResult?.public_bucket_spectrogram_path
+  );
 
   let durationSeconds = ttsInferenceResult?.duration_millis / 1000;
 
   let modelName = ttsInferenceResult.tts_model_title;
 
-  let vocoderUsed = 'unknown';
+  let vocoderUsed = "unknown";
   switch (ttsInferenceResult?.maybe_pretrained_vocoder_used) {
-    case 'hifigan-superres':
-      vocoderUsed = 'HiFi-GAN'
+    case "hifigan-superres":
+      vocoderUsed = "HiFi-GAN";
       break;
-    case 'waveglow':
-      vocoderUsed = 'WaveGlow'
+    case "waveglow":
+      vocoderUsed = "WaveGlow";
       break;
   }
 
@@ -87,35 +99,62 @@ function TtsResultViewFc(props: Props) {
 
   let moderatorRows = null;
 
-  if (props.sessionWrapper.canDeleteOtherUsersTtsResults() || props.sessionWrapper.canDeleteOtherUsersTtsModels()) {
+  if (
+    props.sessionWrapper.canDeleteOtherUsersTtsResults() ||
+    props.sessionWrapper.canDeleteOtherUsersTtsModels()
+  ) {
     moderatorRows = (
       <>
-        <tr>
-          <td colSpan={2}>
-            <br />
-            <h4 className="subtitle is-4"> Moderator Details </h4>
-          </td>
-        </tr>
-        <tr>
-          <th>Model creator is banned</th>
-          <td>{ttsInferenceResult?.maybe_moderator_fields?.model_creator_is_banned ? "banned" : "good standing" }</td>
-        </tr>
-        <tr>
-          <th>Result creator is banned (if user)</th>
-          <td>{ttsInferenceResult?.maybe_moderator_fields?.result_creator_is_banned_if_user ? "banned" : "good standing" }</td>
-        </tr>
-        <tr>
-          <th>Result creator IP address</th>
-          <td>{ttsInferenceResult?.maybe_moderator_fields?.result_creator_ip_address || "server error"}</td>
-        </tr>
-        <tr>
-          <th>Mod deleted at (UTC)</th>
-          <td>{ttsInferenceResult?.maybe_moderator_fields?.mod_deleted_at || "not deleted"}</td>
-        </tr>
-        <tr>
-          <th>Result creator deleted at (UTC)</th>
-          <td>{ttsInferenceResult?.maybe_moderator_fields?.result_creator_deleted_at || "not deleted"}</td>
-        </tr>
+        <div className="container-panel pt-3 pb-5">
+          <div className="panel p-3 p-lg-4">
+            <h2 className="panel-title fw-bold">Moderator Details</h2>
+            <div className="py-6">
+              <table className="table tts-result-table">
+                <tbody>
+                  <tr>
+                    <th>Model creator is banned</th>
+                    <td>
+                      {ttsInferenceResult?.maybe_moderator_fields
+                        ?.model_creator_is_banned
+                        ? "banned"
+                        : "good standing"}
+                    </td>
+                  </tr>
+                  <tr>
+                    <th>Result creator is banned (if user)</th>
+                    <td>
+                      {ttsInferenceResult?.maybe_moderator_fields
+                        ?.result_creator_is_banned_if_user
+                        ? "banned"
+                        : "good standing"}
+                    </td>
+                  </tr>
+                  <tr>
+                    <th>Result creator IP address</th>
+                    <td>
+                      {ttsInferenceResult?.maybe_moderator_fields
+                        ?.result_creator_ip_address || "server error"}
+                    </td>
+                  </tr>
+                  <tr>
+                    <th>Mod deleted at (UTC)</th>
+                    <td>
+                      {ttsInferenceResult?.maybe_moderator_fields
+                        ?.mod_deleted_at || "not deleted"}
+                    </td>
+                  </tr>
+                  <tr>
+                    <th>Result creator deleted at (UTC)</th>
+                    <td>
+                      {ttsInferenceResult?.maybe_moderator_fields
+                        ?.result_creator_deleted_at || "not deleted"}
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
       </>
     );
   }
@@ -127,11 +166,13 @@ function TtsResultViewFc(props: Props) {
       <span>
         <Gravatar
           size={15}
-          username={ttsInferenceResult.maybe_creator_display_name || ""} 
-          email_hash={ttsInferenceResult.maybe_creator_gravatar_hash || ""} 
-          />
+          username={ttsInferenceResult.maybe_creator_display_name || ""}
+          email_hash={ttsInferenceResult.maybe_creator_gravatar_hash || ""}
+        />
         &nbsp;
-        <Link to={creatorLink}>{ttsInferenceResult.maybe_creator_display_name}</Link>
+        <Link to={creatorLink}>
+          {ttsInferenceResult.maybe_creator_display_name}
+        </Link>
       </span>
     );
   }
@@ -143,81 +184,115 @@ function TtsResultViewFc(props: Props) {
       <span>
         <Gravatar
           size={15}
-          username={ttsInferenceResult.maybe_model_creator_display_name || ""} 
-          email_hash={ttsInferenceResult.maybe_model_creator_gravatar_hash || ""} 
-          />
+          username={ttsInferenceResult.maybe_model_creator_display_name || ""}
+          email_hash={
+            ttsInferenceResult.maybe_model_creator_gravatar_hash || ""
+          }
+        />
         &nbsp;
-        <Link to={modelCreatorLink}>{ttsInferenceResult.maybe_model_creator_display_name}</Link>
+        <Link to={modelCreatorLink}>
+          {ttsInferenceResult.maybe_model_creator_display_name}
+        </Link>
       </span>
     );
   }
 
-  let resultVisibility = ttsInferenceResult?.creator_set_visibility === 'hidden' ? 
-    <span>Hidden <HiddenIconFc /></span> :
-    <span>Public <VisibleIconFc /></span> ;
+  let resultVisibility =
+    ttsInferenceResult?.creator_set_visibility === "hidden" ? (
+      <span>
+        Hidden <HiddenIconFc />
+      </span>
+    ) : (
+      <span>
+        Public <VisibleIconFc />
+      </span>
+    );
 
-
-  let headingTitle = 'TTS Result';
+  let headingTitle = "TTS Result";
   let subtitle = <span />;
-  if (ttsInferenceResult.tts_model_title !== undefined && ttsInferenceResult.tts_model_title !== null) {
+  if (
+    ttsInferenceResult.tts_model_title !== undefined &&
+    ttsInferenceResult.tts_model_title !== null
+  ) {
     headingTitle = `${ttsInferenceResult.tts_model_title}`;
-    subtitle = <h3 className="subtitle is-3"> TTS Result</h3>;
+    subtitle = <h1 className="panel-title fw-bold">TTS Result</h1>;
   }
 
-  const currentlyDeleted = !!ttsInferenceResult?.maybe_moderator_fields?.mod_deleted_at || 
-      !!ttsInferenceResult?.maybe_moderator_fields?.result_creator_deleted_at;
+  const currentlyDeleted =
+    !!ttsInferenceResult?.maybe_moderator_fields?.mod_deleted_at ||
+    !!ttsInferenceResult?.maybe_moderator_fields?.result_creator_deleted_at;
 
-  const deleteButtonTitle = currentlyDeleted ? "Undelete Result?" : "Delete Result?";
+  const deleteButtonTitle = currentlyDeleted
+    ? "Undelete Result?"
+    : "Delete Result?";
 
-  const deleteButtonCss = currentlyDeleted ? 
-    "button is-warning is-large is-fullwidth" :
-    "button is-danger is-large is-fullwidth";
+  const deleteButtonCss = currentlyDeleted
+    ? "btn btn-primary w-100"
+    : "btn btn-destructive w-100";
 
-  
   let editButton = null;
-  const canEdit = props.sessionWrapper.canEditTtsResultAsUserOrMod(ttsInferenceResult?.maybe_creator_user_token);
+  const canEdit = props.sessionWrapper.canEditTtsResultAsUserOrMod(
+    ttsInferenceResult?.maybe_creator_user_token
+  );
 
   if (canEdit) {
     editButton = (
       <>
-        <br />
-        <Link 
-          className="button is-info is-large is-fullwidth"
+        <Link
+          className="btn btn-secondary w-100"
           to={FrontendUrlConfig.ttsResultEditPage(token)}
-          >Edit Result Visibility</Link>
+        >
+          <FontAwesomeIcon icon={faEdit} className="me-2" />
+          Edit Result Visibility
+        </Link>
       </>
     );
   }
 
   let deleteButton = null;
-  const canDelete = props.sessionWrapper.deleteTtsResultAsMod(ttsInferenceResult?.maybe_creator_user_token);
+  const canDelete = props.sessionWrapper.deleteTtsResultAsMod(
+    ttsInferenceResult?.maybe_creator_user_token
+  );
 
   if (canDelete) {
     deleteButton = (
       <>
-        <br />
-        <Link 
+        <Link
           className={deleteButtonCss}
           to={FrontendUrlConfig.ttsResultDeletePage(token)}
-          >{deleteButtonTitle}</Link>
+        >
+          <FontAwesomeIcon icon={faTrash} className="me-2" />
+          {deleteButtonTitle}
+        </Link>
       </>
     );
   }
 
   return (
-    <div className="container py-5">
-    <div className="d-flex flex-column">
-      <h1 className="display-5 fw-bold mb-4"> {headingTitle} </h1>
-      {subtitle}
+    <div>
+      <div className="container py-5">
+        <div className="d-flex flex-column">
+          <h1 className="display-5 fw-bold mb-4 text-center text-lg-start">
+            {headingTitle}
+          </h1>
+        </div>
       </div>
-      <div className="container-panel pb-5">
-      <div className="panel p-3 p-lg-4 load-hidden">
-      <TtsResultAudioPlayerFc ttsResult={ttsInferenceResult} />
-      <a className=" btn btn-primary w-100"
-          href={audioLink}
-          download={audioDownloadFilename}>
-            <FontAwesomeIcon icon={faDownload} />  Download File </a>
-      </div>
+
+      <div className="container-panel pt-3 pb-5">
+        <div className="panel p-3 p-lg-4">
+          {subtitle}
+          <div className="py-6">
+            <TtsResultAudioPlayerFc ttsResult={ttsInferenceResult} />
+            <a
+              className=" btn btn-primary w-100 mt-4"
+              href={audioLink}
+              download={audioDownloadFilename}
+            >
+              <FontAwesomeIcon icon={faDownload} className="me-2" />
+              Download File{" "}
+            </a>
+          </div>
+        </div>
       </div>
 
       {/* Without wavesurfer, 
@@ -228,116 +303,84 @@ function TtsResultViewFc(props: Props) {
             <code>audio</code> element.
       </audio>*/}
 
-      <br />
-      
-
-      <br />
-      <br />
       <div className="container-panel pt-3 pb-5">
-      <div className="panel p-3 p-lg-4 load-hidden">
-      <h2 className="panel-title"> Spectrogram </h2>
-      <SpectrogramFc spectrogramJsonLink={spectrogramLink} />
+        <div className="panel p-3 p-lg-4">
+          <h2 className="panel-title fw-bold">Spectrogram</h2>
+          <SpectrogramFc spectrogramJsonLink={spectrogramLink} />
+        </div>
       </div>
-      </div>
-      <br />
+
       <div className="container-panel pt-3 pb-5">
-      <div className="panel p-3 p-lg-4 load-hidden">
-      <table className="table">
-        <tbody>
-          <tr>
-            <td colSpan={2}>
-              <h2 className="panel-title"> Result Details </h2>
-            </td>
-          </tr>
-          <tr>
-            <th scope="row">Original text</th>
-            <td className="overflow-fix">
-              {ttsInferenceResult.raw_inference_text}
-            </td>
-          </tr>
-          <tr>
-            <th scope="row">Audio creator</th>
-            <td>
-              {creatorDetails}
-            </td>
-          </tr>
-          <tr>
-            <th scope="row">Audio duration</th>
-            <td>{durationSeconds} seconds</td>
-          </tr>
-          <tr>
-            <th scope="row">Visibility</th>
-            <td>{resultVisibility}</td>
-          </tr>
-          </tbody>
-          </table>
-          </div>
-          </div>
-
-
-          <div className="container-panel pt-3 pb-5">
-          <div className="panel p-3 p-lg-4 load-hidden">
-          <h2 className="panel-title">Model Used</h2>
+        <div className="panel p-3 p-lg-4">
+          <h2 className="panel-title fw-bold">Result Details</h2>
           <div className="py-6">
-          <table className="table">
-          <tbody>
-          <tr>
-            <th scope="row">Model name</th>
-            <td>
-              <Link to={modelLink}>
-                {modelName}
-              </Link>
-            </td>
-          </tr>
-          <tr>
-            <th scope="row">Model creator</th>
-            <td>
-              {modelCreatorDetails}
-            </td>
-          </tr>
-          <tr>
-            <th scope="row">Vocoder used</th>
-            <td>{vocoderUsed}</td>
-          </tr>
-          <tr>
-            <td colSpan={2}>
-              <br />
-              <h4 className="subtitle is-4">Worker Details</h4>
-            </td>
-          </tr>
-          <tr>
-            <th scope="row">Worker</th>
-            <td>
-              {ttsInferenceResult.generated_by_worker}
-            </td>
-          </tr>
-          </tbody>
-          </table>
+            <table className="table tts-result-table">
+              <tbody>
+                <tr>
+                  <th scope="row">Original text</th>
+                  <td className="overflow-fix">
+                    {ttsInferenceResult.raw_inference_text}
+                  </td>
+                </tr>
+                <tr>
+                  <th scope="row">Audio creator</th>
+                  <td>{creatorDetails}</td>
+                </tr>
+                <tr>
+                  <th scope="row">Audio duration</th>
+                  <td>{durationSeconds} seconds</td>
+                </tr>
+                <tr>
+                  <th scope="row">Visibility</th>
+                  <td>{resultVisibility}</td>
+                </tr>
+              </tbody>
+            </table>
           </div>
-          </div>    
-          </div>    
-          {debugRows}
-      
-          {moderatorRows}
-          <div className="container pb-5">
-          <div className="d-flex flex-column flex-sm-row gap-3 mb-4">
-      <button className="btn btn-secondary w-100">
-      <FontAwesomeIcon icon={faEdit} />
-      {editButton}
-      </button>
-      <button className="btn btn-secondary w-100">
-      <FontAwesomeIcon icon={faTrash} />
-      {deleteButton}
-       </button>
+        </div>
       </div>
-      <br />
-      <p className="text-center text-lg-start">
-      <ReportDiscordLinkFc />
-      </p>
+
+      <div className="container-panel pt-3 pb-5">
+        <div className="panel p-3 p-lg-4">
+          <h2 className="panel-title fw-bold">Model Used</h2>
+          <div className="py-6">
+            <table className="table tts-result-table">
+              <tbody>
+                <tr>
+                  <th scope="row">Model name</th>
+                  <td>
+                    <Link to={modelLink}>{modelName}</Link>
+                  </td>
+                </tr>
+                <tr>
+                  <th scope="row">Model creator</th>
+                  <td>{modelCreatorDetails}</td>
+                </tr>
+                <tr>
+                  <th scope="row">Vocoder used</th>
+                  <td>{vocoderUsed}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      {debugRows}
+
+      {moderatorRows}
+
+      <div className="container pb-5">
+        <div className="d-flex flex-column flex-md-row gap-3 mb-4">
+          {editButton}
+          {deleteButton}
+        </div>
+        <p className="text-center text-lg-start">
+          <ReportDiscordLinkFc />
+        </p>
+      </div>
     </div>
-    </div>
-    
-  )
+  );
 }
 
 export { TtsResultViewFc };
