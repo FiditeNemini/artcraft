@@ -164,7 +164,7 @@ function ProfileFc(props: Props) {
   if (userData.twitch_username) {
     let twitchUrl = `https://twitch.com/${userData.twitch_username}`;
     let twitchLink = (
-      <Tippy content={userData.discord_username}>
+      <Tippy content="Twitch">
         <a href={twitchUrl} target="_blank" rel="noopener noreferrer nofollow">
           <FontAwesomeIcon icon={faTwitch} />
         </a>
@@ -177,36 +177,41 @@ function ProfileFc(props: Props) {
   if (userData.twitter_username) {
     let twitterUrl = `https://twitter.com/${userData.twitter_username}`;
     let twitterLink = (
-      <a href={twitterUrl} target="_blank" rel="noopener noreferrer nofollow">
-        <FontAwesomeIcon icon={faTwitter} />
-      </a>
+      <Tippy content="Twitter">
+        <a href={twitterUrl} target="_blank" rel="noopener noreferrer nofollow">
+          <FontAwesomeIcon icon={faTwitter} />
+        </a>
+      </Tippy>
     );
     profileRows.push(<div key="twitter">{twitterLink}</div>);
   }
 
   if (userData.discord_username) {
     profileRows.push(
-      <div
-        key="discord"
-        data-bs-toggle="tooltip"
-        data-bs-placement="top"
-        title="{userData.discord_username}"
+      <Tippy
+        content={
+          <span className="text-center">
+            Discord
+            <br />
+            {userData.discord_username}
+          </span>
+        }
       >
-        <Tippy content={userData.discord_username}>
-          <Link to="#">
-            <FontAwesomeIcon icon={faDiscord} />
-          </Link>
-        </Tippy>
-      </div>
+        <Link to="#">
+          <FontAwesomeIcon icon={faDiscord} />
+        </Link>
+      </Tippy>
     );
   }
 
   if (userData.github_username) {
     let githubUrl = `https://github.com/${userData.github_username}`;
     let githubLink = (
-      <a href={githubUrl} target="_blank" rel="noopener noreferrer nofollow">
-        <FontAwesomeIcon icon={faGithub} />
-      </a>
+      <Tippy content="GitHub">
+        <a href={githubUrl} target="_blank" rel="noopener noreferrer nofollow">
+          <FontAwesomeIcon icon={faGithub} />
+        </a>
+      </Tippy>
     );
     profileRows.push(<div key="github">{githubLink}</div>);
   }
@@ -215,9 +220,11 @@ function ProfileFc(props: Props) {
     // NB: URL includes a dollar sign
     let cashAppUrl = `https://cash.me/$${userData.cashapp_username}`;
     let cashAppLink = (
-      <a href={cashAppUrl} target="_blank" rel="noopener noreferrer nofollow">
-        Cashapp
-      </a>
+      <Tippy content="CashApp">
+        <a href={cashAppUrl} target="_blank" rel="noopener noreferrer nofollow">
+          Cashapp
+        </a>
+      </Tippy>
     );
     profileRows.push(<div key="cashapp">{cashAppLink}</div>);
   }
@@ -279,7 +286,7 @@ function ProfileFc(props: Props) {
   return (
     <div>
       <Fade bottom cascade duration={duration} distance={distance}>
-        <div className="container pt-5 pb-4">
+        <div className="container pt-5 pb-4 px-lg-5 px-xl-3">
           <div className="d-flex flex-column flex-lg-row align-items-center">
             <div className="mb-3 me-lg-4 mb-lg-0">
               <Gravatar
@@ -309,7 +316,7 @@ function ProfileFc(props: Props) {
 
       <Fade bottom duration={duration} delay={delay} distance={distance}>
         <div
-          className="container content mb-4 mb-lg-5 text-center text-lg-start px-4 px-md-5 px-lg-3"
+          className="container content mb-4 mb-lg-5 text-center text-lg-start px-4 px-md-5 px-lg-5 px-xl-3"
           dangerouslySetInnerHTML={{
             __html: userData.profile_rendered_html || "",
           }}
