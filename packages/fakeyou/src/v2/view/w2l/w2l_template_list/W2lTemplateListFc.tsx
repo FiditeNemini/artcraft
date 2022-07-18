@@ -87,12 +87,14 @@ function W2lTemplateListFc(props: Props) {
     let link = `/w2l/${t.template_token}`;
 
     templateElements.push(
-      <div className="tile is-parent" key={t.template_token}>
-        <article className="tile is-child box">
-          <Link to={link}>
-            <img src={url} alt="template" />
-          </Link>
-        </article>
+      <div className="video-card">
+        <div className="video-card-body d-flex flex-column">
+          <h6 className="video-card-title mb-1">Title</h6>
+          <p className="video-card-text">by (name))</p>
+        </div>
+        <Link to={link}>
+          <img className="video-img" src={url} alt="" />
+        </Link>
       </div>
     );
   });
@@ -105,14 +107,14 @@ function W2lTemplateListFc(props: Props) {
   let rowIndex = 0;
 
   //let nextRowSize = getRandomInt(3, 4);
-  let nextRowSize = 3;
+  let nextRowSize = 1;
 
-  templateElements.forEach((el) => {
+  templateElements.slice(0, 16).forEach((el) => {
     rowOfTemplateElements.push(el);
 
     if (rowOfTemplateElements.length === nextRowSize) {
       allRowsOfTemplateElements.push(
-        <div className="tile is-ancestor" key={rowKey}>
+        <div className="col-sm-6 col-md-4 col-lg-3 mb-4 d-flex" key={rowKey}>
           {rowOfTemplateElements.map((el) => el)}
         </div>
       );
@@ -131,7 +133,7 @@ function W2lTemplateListFc(props: Props) {
   // Make sure last row is built.
   if (rowOfTemplateElements.length !== 0) {
     allRowsOfTemplateElements.push(
-      <div className="tile is-ancestor" key={rowKey}>
+      <div className="col-sm-6 col-md-4 col-lg-3 mb-4 d-flex" key={rowKey}>
         {rowOfTemplateElements.map((el) => el)}
       </div>
     );
@@ -145,7 +147,7 @@ function W2lTemplateListFc(props: Props) {
       <p className="lead mb-4">
         Pick a template, then you can make it lip sync. If you want to use your
         own video or image, you can
-        <Link to="/contribute">upload it as a template</Link>. You'll then be
+        <Link to="/contribute"> upload it as a template</Link>. You'll then be
         able to use it whenever you want!
       </p>
     );
@@ -195,18 +197,18 @@ function W2lTemplateListFc(props: Props) {
         </Fade>
       </div>
 
-      <div className="container">
-        {allRowsOfTemplateElements.map((el) => el)}
+      <div className="container-panel pb-4">
+        <div className="panel p-3 p-lg-4 load-hidden">
+          <div className="row">{allRowsOfTemplateElements.map((el) => el)}</div>
+        </div>
       </div>
 
-      <div className="container">
+      <div className="container pb-5">
         <p>
           This feature is based on Wav2Lip by by Prajwal, K R and Mukhopadhyay,
           Rudrabha and Namboodiri, Vinay P. and Jawahar, C.V.
         </p>
       </div>
-
-      <br />
     </div>
   );
 }

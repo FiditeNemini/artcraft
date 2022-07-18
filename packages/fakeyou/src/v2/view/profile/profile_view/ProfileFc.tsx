@@ -17,7 +17,6 @@ import {
 } from "@fortawesome/free-brands-svg-icons";
 import {
   faClock,
-  faDollarSign,
   faBan,
   faGear,
   faAward,
@@ -35,6 +34,10 @@ import {
 import { format } from "date-fns";
 import { FrontendUrlConfig } from "../../../../common/FrontendUrlConfig";
 import { USE_REFRESH } from "../../../../Refresh";
+import { distance, duration, delay, delay2 } from "../../../../data/animation";
+import Tippy from "@tippyjs/react";
+import "tippy.js/dist/tippy.css";
+const Fade = require("react-reveal/Fade");
 
 interface Props {
   sessionWrapper: SessionWrapper;
@@ -93,7 +96,7 @@ function ProfileFc(props: Props) {
 
     editProfileButton = (
       <>
-        <Link className={"btn btn-primary"} to={editLinkUrl}>
+        <Link className={"btn btn-secondary"} to={editLinkUrl}>
           <FontAwesomeIcon icon={faGear} className="me-2" />
           {buttonLabel}
         </Link>
@@ -143,13 +146,15 @@ function ProfileFc(props: Props) {
       userData.website_url?.startsWith("https://")
     ) {
       websiteUrl = (
-        <a
-          href={userData.website_url}
-          target="_blank"
-          rel="noopener noreferrer nofollow"
-        >
-          <FontAwesomeIcon icon={faFirefox} />
-        </a>
+        <Tippy content="Website">
+          <a
+            href={userData.website_url}
+            target="_blank"
+            rel="noopener noreferrer nofollow"
+          >
+            <FontAwesomeIcon icon={faFirefox} />
+          </a>
+        </Tippy>
       );
     }
 
@@ -159,9 +164,11 @@ function ProfileFc(props: Props) {
   if (userData.twitch_username) {
     let twitchUrl = `https://twitch.com/${userData.twitch_username}`;
     let twitchLink = (
-      <a href={twitchUrl} target="_blank" rel="noopener noreferrer nofollow">
-        <FontAwesomeIcon icon={faTwitch} />
-      </a>
+      <Tippy content={userData.discord_username}>
+        <a href={twitchUrl} target="_blank" rel="noopener noreferrer nofollow">
+          <FontAwesomeIcon icon={faTwitch} />
+        </a>
+      </Tippy>
     );
 
     profileRows.push(<div key="twitch">{twitchLink}</div>);
@@ -185,9 +192,11 @@ function ProfileFc(props: Props) {
         data-bs-placement="top"
         title="{userData.discord_username}"
       >
-        <a href="#">
-          <FontAwesomeIcon icon={faDiscord} />
-        </a>
+        <Tippy content={userData.discord_username}>
+          <Link to="#">
+            <FontAwesomeIcon icon={faDiscord} />
+          </Link>
+        </Tippy>
       </div>
     );
   }
@@ -207,10 +216,10 @@ function ProfileFc(props: Props) {
     let cashAppUrl = `https://cash.me/$${userData.cashapp_username}`;
     let cashAppLink = (
       <a href={cashAppUrl} target="_blank" rel="noopener noreferrer nofollow">
-        ${userData.cashapp_username}
+        Cashapp
       </a>
     );
-    profileRows.push(<div key="cashapp">CashApp {cashAppLink}</div>);
+    profileRows.push(<div key="cashapp">{cashAppLink}</div>);
   }
 
   let badges = <div>None yet</div>;
@@ -269,92 +278,110 @@ function ProfileFc(props: Props) {
 
   return (
     <div>
-      <div className="container pt-5 pb-4">
-        <div className="d-flex flex-column flex-lg-row align-items-center">
-          <div className="mb-3 me-lg-4 mb-lg-0">
-            <Gravatar
-              size={45}
-              username={userData.display_name}
-              email_hash={userEmailHash}
-            />
+      <Fade bottom cascade duration={duration} distance={distance}>
+        <div className="container pt-5 pb-4">
+          <div className="d-flex flex-column flex-lg-row align-items-center">
+            <div className="mb-3 me-lg-4 mb-lg-0">
+              <Gravatar
+                size={45}
+                username={userData.display_name}
+                email_hash={userEmailHash}
+              />
+            </div>
+            <h1 className="display-5 fw-bold text-center text-lg-start w-100 mb-0">
+              {userData.display_name}
+            </h1>
+            <div className="w-100 justify-content-end d-none d-lg-flex">
+              <div className="d-flex gap-3">
+                {editProfileButton}
+                {banUserButton}
+              </div>
+            </div>
           </div>
-          <h1 className="display-5 fw-bold text-center text-lg-start w-100 mb-0">
-            {userData.display_name}
-          </h1>
-          <div className="w-100 justify-content-end d-none d-lg-flex">
-            <div className="d-flex gap-3">
-              {editProfileButton}
-              {banUserButton}
+          <div className="d-flex flex-column flex-lg-row gap-3 mt-3">
+            {profileJoinDate}
+            <div className="d-flex justify-content-center gap-3 fs-5">
+              {profileRows}
             </div>
           </div>
         </div>
-        <div className="d-flex flex-column flex-lg-row gap-3 mt-3">
-          {profileJoinDate}
-          <div className="d-flex justify-content-center gap-3 fs-5">
-            {profileRows}
+      </Fade>
+
+      <Fade bottom duration={duration} delay={delay} distance={distance}>
+        <div
+          className="container content mb-4 mb-lg-5 text-center text-lg-start px-4 px-md-5 px-lg-3"
+          dangerouslySetInnerHTML={{
+            __html: userData.profile_rendered_html || "",
+          }}
+        />
+        <div className="container d-flex d-lg-none my-5">
+          <div className="d-flex w-100 gap-3 justify-content-center flex-column flex-md-row">
+            {editProfileButton}
+            {banUserButton}
           </div>
         </div>
-      </div>
+      </Fade>
 
-      <div
-        className="container content mb-0 mb-lg-5 text-center text-lg-start px-4 px-md-5 px-lg-3"
-        dangerouslySetInnerHTML={{
-          __html: userData.profile_rendered_html || "",
-        }}
-      />
-
-      <div className="container-panel py-5">
-        <div className="panel p-3 p-lg-4">
-          <h2 className="panel-title fw-bold">
-            <FontAwesomeIcon icon={faAward} className="me-3" />
-            Badges{" "}
-            <span className="fs-5 fw-normal ms-2">(images coming soon)</span>
-          </h2>
-          <div className="py-6">{badges}</div>
-        </div>
-      </div>
-
-      <div className="container-panel pt-3 pb-5">
-        <div className="panel p-3 p-lg-4">
-          <h2 className="panel-title fw-bold">
-            <FontAwesomeIcon icon={faVolumeHigh} className="me-3" />
-            TTS Results
-          </h2>
-          <div className="py-6">
-            <ProfileTtsInferenceResultsListFc username={userData.username} />
+      <Fade
+        bottom
+        cascade
+        duration={duration}
+        delay={delay2}
+        distance={distance}
+      >
+        <div className="container-panel py-5">
+          <div className="panel p-3 p-lg-4">
+            <h2 className="panel-title fw-bold">
+              <FontAwesomeIcon icon={faAward} className="me-3" />
+              Badges{" "}
+              <span className="fs-5 fw-normal ms-2">(images coming soon)</span>
+            </h2>
+            <div className="py-6">{badges}</div>
           </div>
         </div>
-      </div>
 
-      <div className="container-panel pt-3 pb-5">
-        <div className="panel p-3 p-lg-4">
-          <h2 className="panel-title fw-bold">
-            <FontAwesomeIcon icon={faVideo} className="me-3" />
-            Lipsync Results
-          </h2>
-          <div className="py-6">
-            <ProfileW2lInferenceResultsListFc username={userData.username} />
+        <div className="container-panel pt-3 pb-5">
+          <div className="panel p-3 p-lg-4">
+            <h2 className="panel-title fw-bold">
+              <FontAwesomeIcon icon={faVolumeHigh} className="me-3" />
+              TTS Results
+            </h2>
+            <div className="py-6">
+              <ProfileTtsInferenceResultsListFc username={userData.username} />
+            </div>
           </div>
         </div>
-      </div>
 
-      <div className="container-panel pt-3 pb-5">
-        <div className="panel p-3 p-lg-4 mt-5 mt-lg-0">
-          <h2 className="panel-title fw-bold"> Uploaded TTS Models </h2>
-          <div className="py-6">
-            <ProfileTtsModelListFc username={userData.username} />
+        <div className="container-panel pt-3 pb-5">
+          <div className="panel p-3 p-lg-4">
+            <h2 className="panel-title fw-bold">
+              <FontAwesomeIcon icon={faVideo} className="me-3" />
+              Lipsync Results
+            </h2>
+            <div className="py-6">
+              <ProfileW2lInferenceResultsListFc username={userData.username} />
+            </div>
           </div>
         </div>
-      </div>
 
-      <div className="container-panel pt-3 pb-5">
-        <div className="panel p-3 p-lg-4 mt-5 mt-lg-0">
-          <h2 className="panel-title fw-bold"> Uploaded Templates </h2>
-          <div className="py-6">
-            <ProfileW2lTemplateListFc username={userData.username} />
+        <div className="container-panel pt-3 pb-5">
+          <div className="panel p-3 p-lg-4">
+            <h2 className="panel-title fw-bold">Uploaded TTS Models </h2>
+            <div className="py-6">
+              <ProfileTtsModelListFc username={userData.username} />
+            </div>
           </div>
         </div>
-      </div>
+
+        <div className="container-panel pt-3 pb-5">
+          <div className="panel p-3 p-lg-4">
+            <h2 className="panel-title fw-bold">Uploaded Templates </h2>
+            <div className="py-6">
+              <ProfileW2lTemplateListFc username={userData.username} />
+            </div>
+          </div>
+        </div>
+      </Fade>
     </div>
   );
 }
