@@ -1,3 +1,4 @@
+/* eslint-disable jsx-a11y/anchor-is-valid */
 import React, { useCallback, useEffect, useState } from "react";
 import { Gravatar } from "@storyteller/components/src/elements/Gravatar";
 import { Link } from "react-router-dom";
@@ -46,7 +47,6 @@ interface Props {
 
 function copyToClipboard(username: string): any {
   navigator.clipboard.writeText(username);
-  // alert("Copied the text: " + username);
 }
 
 function ProfileFc(props: Props) {
@@ -203,7 +203,9 @@ function ProfileFc(props: Props) {
           </span>
         }
       >
+
         <a
+          // eslint-disable-next-line no-script-url
           href="javascript:;"
           onClick={copyToClipboard(userData.discord_username)}
         >
