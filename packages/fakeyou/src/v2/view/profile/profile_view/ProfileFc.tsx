@@ -187,6 +187,11 @@ function ProfileFc(props: Props) {
     profileRows.push(<div key="twitter">{twitterLink}</div>);
   }
 
+  function copyToClipboard(username: string): void {
+    navigator.clipboard.writeText(username);
+    alert("Copied the text: " + copyText);
+  }
+
   if (userData.discord_username) {
     profileRows.push(
       <Tippy
@@ -198,9 +203,9 @@ function ProfileFc(props: Props) {
           </span>
         }
       >
-        <Link to="#">
+        <a href="/" onclick="copyToClipboard(userData.discord_username)">
           <FontAwesomeIcon icon={faDiscord} />
-        </Link>
+        </a>
       </Tippy>
     );
   }
