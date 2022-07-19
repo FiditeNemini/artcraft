@@ -44,6 +44,11 @@ interface Props {
   sessionWrapper: SessionWrapper;
 }
 
+function copyToClipboard(username: string): void {
+  navigator.clipboard.writeText(username);
+  alert("Copied the text: " + username);
+}
+
 function ProfileFc(props: Props) {
   const { username }: { username: string } = useParams();
 
@@ -187,10 +192,6 @@ function ProfileFc(props: Props) {
     profileRows.push(<div key="twitter">{twitterLink}</div>);
   }
 
-  function copyToClipboard(username: string): void {
-    navigator.clipboard.writeText(username);
-    alert("Copied the text: " + copyText);
-  }
 
   if (userData.discord_username) {
     profileRows.push(
@@ -203,10 +204,10 @@ function ProfileFc(props: Props) {
           </span>
         }
       >
-        <a href="/" onclick="copyToClipboard(userData.discord_username)">
+        <a href="/" onClick={copyToClipboard(userData.discord_username)}>
           <FontAwesomeIcon icon={faDiscord} />
         </a>
-      </Tippy>
+      </Tippy >
     );
   }
 
