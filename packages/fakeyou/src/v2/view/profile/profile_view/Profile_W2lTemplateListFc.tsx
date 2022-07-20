@@ -3,6 +3,8 @@ import { ApiConfig } from "@storyteller/components";
 import { Link } from "react-router-dom";
 //import { getRandomInt } from '../../../../v1/api/Utils';
 import { BucketConfig } from "@storyteller/components/src/api/BucketConfig";
+import { distance, duration, delay, delay2 } from "../../../../data/animation";
+const Fade = require("react-reveal/Fade");
 
 interface W2lTemplateListResponsePayload {
   success: boolean;
@@ -59,7 +61,7 @@ function ProfileW2lTemplateListFc(props: Props) {
 
   let templateElements: Array<JSX.Element> = [];
 
-  w2lTemplates.forEach((t) => {
+  w2lTemplates.slice(0, 8).forEach((t) => {
     let object = null;
 
     if (
@@ -109,7 +111,10 @@ function ProfileW2lTemplateListFc(props: Props) {
 
     if (rowOfTemplateElements.length === nextRowSize) {
       allRowsOfTemplateElements.push(
-        <div className="col-sm-6 col-md-4 col-lg-3 d-flex" key={rowKey}>
+        <div
+          className="col-sm-6 col-md-4 col-lg-3 d-flex w2l-ani-item"
+          key={rowKey}
+        >
           {rowOfTemplateElements.map((el) => el)}
         </div>
       );
@@ -128,7 +133,10 @@ function ProfileW2lTemplateListFc(props: Props) {
   // Make sure last row is built.
   if (rowOfTemplateElements.length !== 0) {
     allRowsOfTemplateElements.push(
-      <div className="col-sm-6 col-md-4 col-lg-3 d-flex" key={rowKey}>
+      <div
+        className="col-sm-6 col-md-4 col-lg-3 d-flex w2l-ani-item"
+        key={rowKey}
+      >
         {rowOfTemplateElements.map((el) => el)}
       </div>
     );
@@ -136,7 +144,11 @@ function ProfileW2lTemplateListFc(props: Props) {
   }
 
   return (
-    <div className="row gy-4">{allRowsOfTemplateElements.map((el) => el)}</div>
+    <Fade bottom cascade duration={duration} distance={distance}>
+      <div className="row gy-4 w2l-ani">
+        {allRowsOfTemplateElements.map((el) => el)}
+      </div>
+    </Fade>
   );
 }
 

@@ -87,6 +87,10 @@ styles with important tags:
     color: rgba($white, 0.7) !important;
   }
 
+  .fw-semibold {
+    font-weight: 600;
+  }
+
   .container {
     max-width: 1080px !important;
   }
@@ -408,6 +412,18 @@ styles with important tags:
   .video-card-text {
     font-size: 12px;
     color: rgba(255, 255, 255, 0.6);
+  }
+
+  .profile-social-icons {
+    font-size: 22px;
+  }
+
+  .w2l-ani .w2l-ani-item {
+    @for $i from 1 through 100 {
+      &:nth-of-type(#{$i}) {
+        animation-delay: $i * 50ms !important;
+      }
+    }
   }
 }
 

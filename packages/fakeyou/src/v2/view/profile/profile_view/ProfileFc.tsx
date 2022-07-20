@@ -201,7 +201,7 @@ function ProfileFc(props: Props) {
           <div className="text-center">
             Discord
             <br />
-            <p className="fw-bold fs-6">{userData.discord_username}</p>
+            <p className="fw-semibold fs-6">{userData.discord_username}</p>
           </div>
         }
         interactive
@@ -319,9 +319,9 @@ function ProfileFc(props: Props) {
               </div>
             </div>
           </div>
-          <div className="d-flex flex-column flex-lg-row gap-3 mt-3">
+          <div className="d-flex flex-column flex-lg-row gap-4 gap-lg-3 mt-3">
             {profileJoinDate}
-            <div className="d-flex justify-content-center gap-3 fs-5">
+            <div className="d-flex justify-content-center gap-4 gap-lg-3 profile-social-icons">
               {profileRows}
             </div>
           </div>
