@@ -318,7 +318,7 @@ styles with important tags:
   }
 
   ul li {
-    @for $i from 1 through 12 {
+    @for $i from 1 through 20 {
       &:nth-of-type(#{$i}) {
         animation-delay: $i * 100ms !important;
       }

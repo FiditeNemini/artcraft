@@ -91,7 +91,7 @@ function FirehoseEventListFc(props: Props) {
 
   let eventItems: Array<JSX.Element> = [];
 
-  firehoseEvents.slice(0, 12).forEach((event) => {
+  firehoseEvents.slice(0, 16).forEach((event) => {
     let inner = <span />;
     let userLink = <span>Anonymous user</span>;
     let gravatar = <span />;
