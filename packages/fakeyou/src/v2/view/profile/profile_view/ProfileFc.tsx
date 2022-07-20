@@ -39,15 +39,16 @@ import { USE_REFRESH } from "../../../../Refresh";
 import { distance, duration, delay, delay2 } from "../../../../data/animation";
 import Tippy from "@tippyjs/react";
 import "tippy.js/dist/tippy.css";
+import "tippy.js/animations/shift-away.css";
 const Fade = require("react-reveal/Fade");
 
 interface Props {
   sessionWrapper: SessionWrapper;
 }
 
-function copyToClipboard(username: string): any {
-  navigator.clipboard.writeText(username);
-}
+// function copyToClipboard(username: string): any {
+//   navigator.clipboard.writeText(username);
+// }
 
 function ProfileFc(props: Props) {
   const { username }: { username: string } = useParams();
@@ -152,7 +153,7 @@ function ProfileFc(props: Props) {
       userData.website_url?.startsWith("https://")
     ) {
       websiteUrl = (
-        <Tippy content="Website">
+        <Tippy content="Website" animation="shift-away">
           <a
             href={userData.website_url}
             target="_blank"
@@ -170,7 +171,7 @@ function ProfileFc(props: Props) {
   if (userData.twitch_username) {
     let twitchUrl = `https://twitch.com/${userData.twitch_username}`;
     let twitchLink = (
-      <Tippy content="Twitch">
+      <Tippy content="Twitch" animation="shift-away">
         <a href={twitchUrl} target="_blank" rel="noopener noreferrer nofollow">
           <FontAwesomeIcon icon={faTwitch} />
         </a>
@@ -183,7 +184,7 @@ function ProfileFc(props: Props) {
   if (userData.twitter_username) {
     let twitterUrl = `https://twitter.com/${userData.twitter_username}`;
     let twitterLink = (
-      <Tippy content="Twitter">
+      <Tippy content="Twitter" animation="shift-away">
         <a href={twitterUrl} target="_blank" rel="noopener noreferrer nofollow">
           <FontAwesomeIcon icon={faTwitter} />
         </a>
@@ -195,19 +196,21 @@ function ProfileFc(props: Props) {
   if (userData.discord_username) {
     profileRows.push(
       <Tippy
+        allowHTML
         content={
-          <span className="text-center">
+          <div className="text-center">
             Discord
             <br />
-            {userData.discord_username}
-          </span>
+            <p className="fw-bold fs-6">{userData.discord_username}</p>
+          </div>
         }
+        interactive
+        animation="shift-away"
       >
-
         <a
           // eslint-disable-next-line no-script-url
           href="javascript:;"
-          onClick={copyToClipboard(userData.discord_username)}
+          // onClick={copyToClipboard(userData.discord_username)}
         >
           <FontAwesomeIcon icon={faDiscord} />
         </a>
@@ -218,7 +221,7 @@ function ProfileFc(props: Props) {
   if (userData.github_username) {
     let githubUrl = `https://github.com/${userData.github_username}`;
     let githubLink = (
-      <Tippy content="GitHub">
+      <Tippy content="GitHub" animation="shift-away">
         <a href={githubUrl} target="_blank" rel="noopener noreferrer nofollow">
           <FontAwesomeIcon icon={faGithub} />
         </a>
@@ -231,7 +234,7 @@ function ProfileFc(props: Props) {
     // NB: URL includes a dollar sign
     let cashAppUrl = `https://cash.me/$${userData.cashapp_username}`;
     let cashAppLink = (
-      <Tippy content="CashApp">
+      <Tippy content="CashApp" animation="shift-away">
         <a href={cashAppUrl} target="_blank" rel="noopener noreferrer nofollow">
           <FontAwesomeIcon icon={faDollarSign} />
         </a>
