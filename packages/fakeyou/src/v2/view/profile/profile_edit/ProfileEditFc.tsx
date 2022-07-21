@@ -246,7 +246,13 @@ function ProfileEditFc(props: Props) {
 
       <form onSubmit={handleFormSubmit}>
         <fieldset disabled={isDisabled}>
-          <Fade bottom cascade duration={duration} distance={distance}>
+          <Fade
+            bottom
+            cascade
+            delay={delay}
+            duration={duration}
+            distance={distance}
+          >
             <div className="container-panel py-5">
               <div className="panel p-3 p-lg-4">
                 <h2 className="panel-title fw-bold">Preferences</h2>
@@ -508,22 +514,26 @@ function ProfileEditFc(props: Props) {
             </div>
           </Fade>
 
-          <div className="container">
-            <button className="btn btn-primary w-100">Update</button>
-          </div>
+          <Fade bottom duration={duration} distance={distance} delay={delay2}>
+            <div className="container">
+              <button className="btn btn-primary w-100">Update</button>
+            </div>
+          </Fade>
         </fieldset>
       </form>
 
-      <div className="container py-5">
-        <p>More profile and account features coming soon:</p>
-        <ul>
-          <li>Fully private models and templates</li>
-          <li>Sharing preferences (private, friends, auto-expire, etc.)</li>
-          <li>Website preferences</li>
-          <li>Custom avatar / profile pic uploads</li>
-          <li>Email change, password change, and password reset</li>
-        </ul>
-      </div>
+      <Fade bottom duration={duration} distance={distance} delay={delay}>
+        <div className="container py-5">
+          <p>More profile and account features coming soon:</p>
+          <ul>
+            <li>Fully private models and templates</li>
+            <li>Sharing preferences (private, friends, auto-expire, etc.)</li>
+            <li>Website preferences</li>
+            <li>Custom avatar / profile pic uploads</li>
+            <li>Email change, password change, and password reset</li>
+          </ul>
+        </div>
+      </Fade>
     </div>
   );
 }

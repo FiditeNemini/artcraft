@@ -87,7 +87,7 @@ function ProfileW2lTemplateListFc(props: Props) {
       <div className="video-card">
         <div className="video-card-body d-flex flex-column">
           <h6 className="video-card-title mb-1">Title</h6>
-          <p className="video-card-text">by (name))</p>
+          <p className="video-card-text">by NAME</p>
         </div>
         <Link to={link}>
           <img className="video-img" src={url} alt="" />
