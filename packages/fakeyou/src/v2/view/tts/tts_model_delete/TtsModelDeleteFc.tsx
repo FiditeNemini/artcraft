@@ -1,76 +1,80 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import { ApiConfig } from '@storyteller/components';
-import { FrontendUrlConfig } from '../../../../common/FrontendUrlConfig';
-import { SessionWrapper } from '@storyteller/components/src/session/SessionWrapper';
-import { useParams, Link, useHistory } from 'react-router-dom';
-import { BackLink } from '../../_common/BackLink';
+import React, { useState, useEffect, useCallback } from "react";
+import { ApiConfig } from "@storyteller/components";
+import { FrontendUrlConfig } from "../../../../common/FrontendUrlConfig";
+import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
+import { useParams, Link, useHistory } from "react-router-dom";
+import { BackLink } from "../../_common/BackLink";
+import { distance, delay, duration } from "../../../../data/animation";
+const Fade = require("react-reveal/Fade");
 
 interface TtsModelViewResponsePayload {
-  success: boolean,
-  model: TtsModel,
+  success: boolean;
+  model: TtsModel;
 }
 
 interface TtsModelUseCountResponsePayload {
-  success: boolean,
-  count: number | null | undefined,
+  success: boolean;
+  count: number | null | undefined;
 }
 
 interface TtsModel {
-  model_token: string,
-  title: string,
-  tts_model_type: string,
-  text_preprocessing_algorithm: string,
-  creator_user_token: string,
-  creator_username: string,
-  creator_display_name: string,
-  description_markdown: string,
-  description_rendered_html: string,
-  updatable_slug: string,
-  created_at: string,
-  updated_at: string,
-  maybe_moderator_fields: TtsModelModeratorFields | null | undefined,
+  model_token: string;
+  title: string;
+  tts_model_type: string;
+  text_preprocessing_algorithm: string;
+  creator_user_token: string;
+  creator_username: string;
+  creator_display_name: string;
+  description_markdown: string;
+  description_rendered_html: string;
+  updatable_slug: string;
+  created_at: string;
+  updated_at: string;
+  maybe_moderator_fields: TtsModelModeratorFields | null | undefined;
 }
 
 interface TtsModelModeratorFields {
-  creator_ip_address_creation: string,
-  creator_ip_address_last_update: string,
-  mod_deleted_at: string | undefined | null,
-  user_deleted_at: string | undefined | null,
+  creator_ip_address_creation: string;
+  creator_ip_address_last_update: string;
+  mod_deleted_at: string | undefined | null;
+  user_deleted_at: string | undefined | null;
 }
 
 interface Props {
-  sessionWrapper: SessionWrapper,
+  sessionWrapper: SessionWrapper;
 }
 
 function TtsModelDeleteFc(props: Props) {
   const history = useHistory();
 
-  let { token } = useParams() as { token : string };
+  let { token } = useParams() as { token: string };
 
-  const [ttsModel, setTtsModel] = useState<TtsModel|undefined>(undefined);
-  const [ttsModelUseCount, setTtsModelUseCount] = useState<number|undefined>(undefined);
+  const [ttsModel, setTtsModel] = useState<TtsModel | undefined>(undefined);
+  const [ttsModelUseCount, setTtsModelUseCount] = useState<number | undefined>(
+    undefined
+  );
 
   const getModel = useCallback((token) => {
     const api = new ApiConfig();
     const endpointUrl = api.viewTtsModel(token);
 
     fetch(endpointUrl, {
-      method: 'GET',
+      method: "GET",
       headers: {
-        'Accept': 'application/json',
+        Accept: "application/json",
       },
-      credentials: 'include',
+      credentials: "include",
     })
-    .then(res => res.json())
-    .then(res => {
-      const modelsResponse : TtsModelViewResponsePayload = res;
-      if (!modelsResponse.success) {
-        return;
-      }
+      .then((res) => res.json())
+      .then((res) => {
+        const modelsResponse: TtsModelViewResponsePayload = res;
+        if (!modelsResponse.success) {
+          return;
+        }
 
-      setTtsModel(modelsResponse.model)
-    })
-    .catch(e => {});
+        setTtsModel(modelsResponse.model);
+      })
+      .catch((e) => {});
   }, []);
 
   const getModelUseCount = useCallback((token) => {
@@ -78,24 +82,23 @@ function TtsModelDeleteFc(props: Props) {
     const endpointUrl = api.getTtsModelUseCount(token);
 
     fetch(endpointUrl, {
-      method: 'GET',
+      method: "GET",
       headers: {
-        'Accept': 'application/json',
+        Accept: "application/json",
       },
-      credentials: 'include',
+      credentials: "include",
     })
-    .then(res => res.json())
-    .then(res => {
-      const modelsResponse : TtsModelUseCountResponsePayload = res;
-      if (!modelsResponse.success) {
-        return;
-      }
+      .then((res) => res.json())
+      .then((res) => {
+        const modelsResponse: TtsModelUseCountResponsePayload = res;
+        if (!modelsResponse.success) {
+          return;
+        }
 
-      setTtsModelUseCount(modelsResponse.count || 0)
-    })
-    .catch(e => {});
+        setTtsModelUseCount(modelsResponse.count || 0);
+      })
+      .catch((e) => {});
   }, []);
-
 
   useEffect(() => {
     getModel(token);
@@ -104,7 +107,9 @@ function TtsModelDeleteFc(props: Props) {
 
   const modelLink = FrontendUrlConfig.ttsModelPage(token);
 
-  const handleDeleteFormSubmit = (ev: React.FormEvent<HTMLFormElement>) : boolean => {
+  const handleDeleteFormSubmit = (
+    ev: React.FormEvent<HTMLFormElement>
+  ): boolean => {
     ev.preventDefault();
 
     const api = new ApiConfig();
@@ -112,58 +117,60 @@ function TtsModelDeleteFc(props: Props) {
 
     const request = {
       set_delete: !currentlyDeleted,
-      as_mod: props.sessionWrapper.deleteTtsResultAsMod(ttsModel?.creator_user_token)
-    }
+      as_mod: props.sessionWrapper.deleteTtsResultAsMod(
+        ttsModel?.creator_user_token
+      ),
+    };
 
     fetch(endpointUrl, {
-      method: 'POST',
+      method: "POST",
       headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json',
+        Accept: "application/json",
+        "Content-Type": "application/json",
       },
-      credentials: 'include',
+      credentials: "include",
       body: JSON.stringify(request),
     })
-    .then(res => res.json())
-    .then(res => {
-      if (res.success) {
-        if (props.sessionWrapper.canDeleteOtherUsersTtsResults()) {
-          history.push(modelLink); // Mods can perform further actions
-        } else {
-          history.push('/');
+      .then((res) => res.json())
+      .then((res) => {
+        if (res.success) {
+          if (props.sessionWrapper.canDeleteOtherUsersTtsResults()) {
+            history.push(modelLink); // Mods can perform further actions
+          } else {
+            history.push("/");
+          }
         }
-      }
-    })
-    .catch(e => {
-    });
+      })
+      .catch((e) => {});
     return false;
-  }
+  };
 
   let creatorLink = <span />;
 
   if (!!ttsModel?.creator_display_name) {
-    const creatorUrl = FrontendUrlConfig.userProfilePage(ttsModel?.creator_display_name);
-    creatorLink = (
-      <Link to={creatorUrl}>{ttsModel?.creator_display_name}</Link>
+    const creatorUrl = FrontendUrlConfig.userProfilePage(
+      ttsModel?.creator_display_name
     );
+    creatorLink = <Link to={creatorUrl}>{ttsModel?.creator_display_name}</Link>;
   }
 
-  let currentlyDeleted = !!ttsModel?.maybe_moderator_fields?.mod_deleted_at ||
-      !!ttsModel?.maybe_moderator_fields?.user_deleted_at;
+  let currentlyDeleted =
+    !!ttsModel?.maybe_moderator_fields?.mod_deleted_at ||
+    !!ttsModel?.maybe_moderator_fields?.user_deleted_at;
 
   const h1Title = currentlyDeleted ? "Undelete Model?" : "Delete Model?";
 
   const buttonTitle = currentlyDeleted ? "Confirm Undelete" : "Confirm Delete";
 
-  const buttonCss = currentlyDeleted ? 
-    "button is-warning is-large is-fullwidth" :
-    "button is-danger is-large is-fullwidth";
+  const buttonCss = currentlyDeleted
+    ? "btn btn-primary w-100"
+    : "btn btn-primary w-100";
 
-  const formLabel = currentlyDeleted ? 
-     "Recover the TTS Model (makes it visible again)" : 
-     "Delete TTS Model (hides from everyone but mods)";
+  const formLabel = currentlyDeleted
+    ? "Recover the TTS Model (makes it visible again)"
+    : "Delete TTS Model (hides from everyone but mods)";
 
-  let humanUseCount : string | number = 'Fetching...';
+  let humanUseCount: string | number = "Fetching...";
 
   if (ttsModelUseCount !== undefined && ttsModelUseCount !== null) {
     humanUseCount = ttsModelUseCount;
@@ -171,94 +178,118 @@ function TtsModelDeleteFc(props: Props) {
 
   let moderatorRows = null;
 
-  if (props.sessionWrapper.canDeleteOtherUsersTtsResults() || props.sessionWrapper.canDeleteOtherUsersTtsModels()) {
+  if (
+    props.sessionWrapper.canDeleteOtherUsersTtsResults() ||
+    props.sessionWrapper.canDeleteOtherUsersTtsModels()
+  ) {
     moderatorRows = (
       <>
         <tr>
           <th>Creator IP Address (Creation)</th>
-          <td>{ttsModel?.maybe_moderator_fields?.creator_ip_address_creation || "server error"}</td>
+          <td>
+            {ttsModel?.maybe_moderator_fields?.creator_ip_address_creation ||
+              "server error"}
+          </td>
         </tr>
         <tr>
           <th>Creator IP Address (Update)</th>
-          <td>{ttsModel?.maybe_moderator_fields?.creator_ip_address_last_update || "server error"}</td>
+          <td>
+            {ttsModel?.maybe_moderator_fields?.creator_ip_address_last_update ||
+              "server error"}
+          </td>
         </tr>
         <tr>
           <th>Mod Deleted At (UTC)</th>
-          <td>{ttsModel?.maybe_moderator_fields?.mod_deleted_at || "not deleted"}</td>
+          <td>
+            {ttsModel?.maybe_moderator_fields?.mod_deleted_at || "not deleted"}
+          </td>
         </tr>
         <tr>
           <th>User Deleted At (UTC)</th>
-          <td>{ttsModel?.maybe_moderator_fields?.user_deleted_at || "not deleted"}</td>
+          <td>
+            {ttsModel?.maybe_moderator_fields?.user_deleted_at || "not deleted"}
+          </td>
         </tr>
       </>
     );
   }
 
   return (
-    <div className="content">
-      <h1 className="title is-1"> {h1Title} </h1>
-      
-      <p>
-        <BackLink link={modelLink} text="Back to model" />
-      </p>
-      
-      <table className="table">
-        <thead>
-          <tr>
-            <th><abbr title="Detail">Detail</abbr></th>
-            <th><abbr title="Value">Value</abbr></th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <th>Creator</th>
-            <td>
-              {creatorLink}
-            </td>
-          </tr>
-          <tr>
-            <th>Use Count</th>
-            <td>{humanUseCount}</td>
-          </tr>
-          <tr>
-            <th>Title</th>
-            <td>{ttsModel?.title}</td>
-          </tr>
-          <tr>
-            <th>Model Type</th>
-            <td>{ttsModel?.tts_model_type}</td>
-          </tr>
-          <tr>
-            <th>Text Preprocessing Algorithm</th>
-            <td>{ttsModel?.text_preprocessing_algorithm}</td>
-          </tr>
-          <tr>
-            <th>Upload Date (UTC)</th>
-            <td>{ttsModel?.created_at}</td>
-          </tr>
+    <div>
+      <div className="container py-5 pb-4 px-lg-5 px-xl-3">
+        <Fade cascade bottom distance={distance} duration={duration}>
+          <div className="d-flex flex-column">
+            <h1 className="display-5 fw-bold mb-3">{h1Title}</h1>
+            <p>
+              <BackLink link={modelLink} text="Back to model" />
+            </p>
+          </div>
+        </Fade>
+      </div>
 
-          {moderatorRows}
+      <Fade
+        cascade
+        bottom
+        distance={distance}
+        delay={delay}
+        duration={duration}
+      >
+        <div className="container-panel pt-4 pb-5">
+          <div className="panel p-3 py-4 p-lg-4">
+            <table className="table">
+              <thead>
+                <tr>
+                  <th>
+                    <abbr title="Detail">Detail</abbr>
+                  </th>
+                  <th>
+                    <abbr title="Value">Value</abbr>
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <th>Creator</th>
+                  <td>{creatorLink}</td>
+                </tr>
+                <tr>
+                  <th>Use Count</th>
+                  <td>{humanUseCount}</td>
+                </tr>
+                <tr>
+                  <th>Title</th>
+                  <td>{ttsModel?.title}</td>
+                </tr>
+                <tr>
+                  <th>Model Type</th>
+                  <td>{ttsModel?.tts_model_type}</td>
+                </tr>
+                <tr>
+                  <th>Text Preprocessing Algorithm</th>
+                  <td>{ttsModel?.text_preprocessing_algorithm}</td>
+                </tr>
+                <tr>
+                  <th>Upload Date (UTC)</th>
+                  <td>{ttsModel?.created_at}</td>
+                </tr>
 
-        </tbody>
-      </table>
+                {moderatorRows}
+              </tbody>
+            </table>
+          </div>
+        </div>
 
-      <br />
-
-      <form onSubmit={handleDeleteFormSubmit}>
-        <label className="label">{formLabel}</label>
-
-        <p className="control">
-          <button className={buttonCss}>
-            {buttonTitle}
-          </button>
-        </p>
-      </form>
-
-      <br />
-      <br />
-      <BackLink link={modelLink} text="Back to model" />
+        <div className="container pb-5">
+          <form onSubmit={handleDeleteFormSubmit}>
+            <p>
+              <button className={buttonCss}>{buttonTitle}</button>
+            </p>
+            <label className="pt-4">{formLabel}</label>
+          </form>
+        </div>
+      </Fade>
     </div>
-  )
+  );
 }
 
 export { TtsModelDeleteFc };

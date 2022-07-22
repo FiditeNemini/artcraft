@@ -206,6 +206,10 @@ styles with important tags:
 
       &.btn {
         color: $white;
+
+        &.btn-secondary {
+          color: #212529;
+        }
       }
     }
   }
@@ -428,6 +432,32 @@ styles with important tags:
 
   .tts-result-table tbody tr th {
     width: 35%;
+  }
+
+  .badge {
+    font-weight: 500;
+    font-size: 13px;
+    padding: 8px 16px;
+    border: none;
+    border-radius: 50px;
+
+    &.badge-destructive {
+      background-color: $white;
+      color: $primary;
+
+      &.btn {
+        border-radius: 5px;
+        font-weight: 600;
+        &:hover {
+          background-color: #fdcfce;
+        }
+      }
+    }
+
+    &.badge-warning {
+      background-color: #fff3cd;
+      color: #664d03;
+    }
   }
 }
 
