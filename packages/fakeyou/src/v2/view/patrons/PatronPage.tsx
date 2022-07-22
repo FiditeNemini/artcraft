@@ -96,6 +96,7 @@ function PatronPage(props: Props) {
                 <a
                   href="https://www.patreon.com/fakeyou"
                   target="_blank"
+                  rel="noreferrer"
                   className="btn btn-primary"
                 >
                   <FontAwesomeIcon icon={faPatreon} className="me-2" />

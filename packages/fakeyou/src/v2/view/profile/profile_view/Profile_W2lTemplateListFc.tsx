@@ -3,7 +3,7 @@ import { ApiConfig } from "@storyteller/components";
 import { Link } from "react-router-dom";
 //import { getRandomInt } from '../../../../v1/api/Utils';
 import { BucketConfig } from "@storyteller/components/src/api/BucketConfig";
-import { distance, duration, delay, delay2 } from "../../../../data/animation";
+import { distance, duration } from "../../../../data/animation";
 const Fade = require("react-reveal/Fade");
 
 interface W2lTemplateListResponsePayload {

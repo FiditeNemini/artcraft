@@ -9,8 +9,6 @@ import {
   User,
 } from "../../../api/user/GetUserByUsername";
 import { BackLink } from "../../_common/BackLink";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faBan } from "@fortawesome/free-solid-svg-icons";
 import { distance, duration, delay, delay2 } from "../../../../data/animation";
 
 const Fade = require("react-reveal/Fade");

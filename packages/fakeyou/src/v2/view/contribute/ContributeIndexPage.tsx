@@ -14,7 +14,7 @@ import {
   faTags,
   faHandsHelping,
 } from "@fortawesome/free-solid-svg-icons";
-import { distance, delay, delay2, duration } from "../../../data/animation";
+import { distance, delay2, duration } from "../../../data/animation";
 import { USE_REFRESH } from "../../../Refresh";
 const Fade = require("react-reveal/Fade");
 
