@@ -4,7 +4,7 @@ import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapp
 import { Link } from "react-router-dom";
 //import { getRandomInt } from '../../../../v1/api/Utils';
 import { BucketConfig } from "@storyteller/components/src/api/BucketConfig";
-import { distance, duration } from "../../../../data/animation";
+import { distance, duration, delay } from "../../../../data/animation";
 import { USE_REFRESH } from "../../../../Refresh";
 
 const Fade = require("react-reveal/Fade");
@@ -87,12 +87,14 @@ function W2lTemplateListFc(props: Props) {
     let link = `/w2l/${t.template_token}`;
 
     templateElements.push(
-      <div className="tile is-parent" key={t.template_token}>
-        <article className="tile is-child box">
-          <Link to={link}>
-            <img src={url} alt="template" />
-          </Link>
-        </article>
+      <div className="video-card">
+        <div className="video-card-body d-flex flex-column">
+          <h6 className="video-card-title mb-1">Title</h6>
+          <p className="video-card-text">by (name))</p>
+        </div>
+        <Link to={link}>
+          <img className="video-img" src={url} alt="" />
+        </Link>
       </div>
     );
   });
@@ -105,14 +107,17 @@ function W2lTemplateListFc(props: Props) {
   let rowIndex = 0;
 
   //let nextRowSize = getRandomInt(3, 4);
-  let nextRowSize = 3;
+  let nextRowSize = 1;
 
-  templateElements.forEach((el) => {
+  templateElements.slice(0, 16).forEach((el) => {
     rowOfTemplateElements.push(el);
 
     if (rowOfTemplateElements.length === nextRowSize) {
       allRowsOfTemplateElements.push(
-        <div className="tile is-ancestor" key={rowKey}>
+        <div
+          className="col-sm-6 col-md-4 col-lg-3 d-flex w2l-ani-item"
+          key={rowKey}
+        >
           {rowOfTemplateElements.map((el) => el)}
         </div>
       );
@@ -131,7 +136,10 @@ function W2lTemplateListFc(props: Props) {
   // Make sure last row is built.
   if (rowOfTemplateElements.length !== 0) {
     allRowsOfTemplateElements.push(
-      <div className="tile is-ancestor" key={rowKey}>
+      <div
+        className="col-sm-6 col-md-4 col-lg-3 d-flex w2l-ani-item"
+        key={rowKey}
+      >
         {rowOfTemplateElements.map((el) => el)}
       </div>
     );
@@ -145,7 +153,7 @@ function W2lTemplateListFc(props: Props) {
       <p className="lead mb-4">
         Pick a template, then you can make it lip sync. If you want to use your
         own video or image, you can
-        <Link to="/contribute">upload it as a template</Link>. You'll then be
+        <Link to="/contribute"> upload it as a template</Link>. You'll then be
         able to use it whenever you want!
       </p>
     );
@@ -170,42 +178,49 @@ function W2lTemplateListFc(props: Props) {
 
         <br />
 
-        {allRowsOfTemplateElements.map(el => el)}
+        {allRowsOfTemplateElements.map((el) => el)}
 
         <br />
 
-        <p>This feature is based on Wav2Lip by by Prajwal, K R and Mukhopadhyay,
-          Rudrabha and Namboodiri, Vinay P. and Jawahar, C.V.</p>
+        <p>
+          This feature is based on Wav2Lip by by Prajwal, K R and Mukhopadhyay,
+          Rudrabha and Namboodiri, Vinay P. and Jawahar, C.V.
+        </p>
 
         <br />
-
       </div>
     );
   }
 
   return (
     <div>
-      <Fade bottom cascade duration={duration} distance={distance}>
-        <div className="container py-5">
+      <div className="container py-5 px-md-4 px-lg-5 px-xl-3">
+        <Fade bottom cascade duration={duration} distance={distance}>
           <div>
             <h1 className="display-5 fw-bold mb-3">Video Lip Sync Templates</h1>
+            {extraDetails}
           </div>
-          <div>{extraDetails}</div>
-        </div>
-      </Fade>
-
-      <div className="container">
-        {allRowsOfTemplateElements.map((el) => el)}
+        </Fade>
       </div>
 
-      <div className="container">
+      <div className="container-panel pb-4">
+        <Fade bottom duration={duration} distance={distance} delay={delay}>
+          <div className="panel p-3 p-lg-4">
+            <Fade bottom cascade duration={duration} distance={distance}>
+              <div className="row gy-4 w2l-ani">
+                {allRowsOfTemplateElements.map((el) => el)}
+              </div>
+            </Fade>
+          </div>
+        </Fade>
+      </div>
+
+      <div className="container pb-5">
         <p>
           This feature is based on Wav2Lip by by Prajwal, K R and Mukhopadhyay,
           Rudrabha and Namboodiri, Vinay P. and Jawahar, C.V.
         </p>
       </div>
-
-      <br />
     </div>
   );
 }

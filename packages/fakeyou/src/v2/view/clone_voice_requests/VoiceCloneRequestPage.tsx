@@ -65,7 +65,8 @@ function VoiceCloneRequestPage(props: Props) {
   const [formWasSubmitted, setFormWasSubmitted] = useState(false);
 
   // Previous form submission state
-  const [formWasPrevioiuslySubmitted, setFormWasPreviouslySubmitted] = useState(false);
+  const [formWasPrevioiuslySubmitted, setFormWasPreviouslySubmitted] =
+    useState(false);
 
   const checkPreviousApplication = useCallback(async () => {
     const request: CheckVoiceCloneApplicationRequest = {};
@@ -248,25 +249,20 @@ function VoiceCloneRequestPage(props: Props) {
       <>
         <section className="hero is-small">
           <div className="hero-body">
-
             <div className="columns is-vcentered">
-
               <div className="column is-one-third">
                 <div className="mascot">
-                  <img src="/mascot/kitsune_pose4_black_2000.webp" alt="FakeYou's mascot!" />
+                  <img
+                    src="/mascot/kitsune_pose4_black_2000.webp"
+                    alt="FakeYou's mascot!"
+                  />
                 </div>
               </div>
 
               <div className="column">
-                <p className="title is-1">
-                  Professionally Clone Your Voice
-                </p>
-                <p className="subtitle is-3">
-                  (or any voice) for just $70
-                </p>
-
+                <p className="title is-1">Professionally Clone Your Voice</p>
+                <p className="subtitle is-3">(or any voice) for just $70</p>
               </div>
-
             </div>
           </div>
         </section>
@@ -279,7 +275,12 @@ function VoiceCloneRequestPage(props: Props) {
           <div className="row gx-3 flex-lg-row-reverse align-items-center">
             <div className="col-lg-6">
               <div className="d-flex justify-content-center">
-                <Fade right distance={distance} duration={duration} delay={delay}>
+                <Fade
+                  right
+                  distance={distance}
+                  duration={duration}
+                  delay={delay}
+                >
                   <img
                     src="/mascot/kitsune_pose4.png"
                     className="ani4 load-hidden img-fluid"
@@ -290,7 +291,7 @@ function VoiceCloneRequestPage(props: Props) {
                 </Fade>
               </div>
             </div>
-            <div className="col-lg-6 px-md-2 px-lg-5 px-xl-2">
+            <div className="col-lg-6 px-3 px-md-2 px-lg-5 px-xl-2">
               <Fade bottom cascade distance={distance} duration={duration}>
                 <div className="text-center text-lg-start">
                   <h1 className="display-5 fw-bold lh-1">
@@ -298,7 +299,9 @@ function VoiceCloneRequestPage(props: Props) {
                   </h1>
                   <h3 className="mb-4">(or any voice) for just $70</h3>
                   <div className="d-flex flex-column justify-content-center">
-                    <h3>Want a Custom Voice You Can Use?</h3>
+                    <h3 className="px-5 px-md-0">
+                      Want a Custom Voice You Can Use?
+                    </h3>
                     <p className="lead">
                       For Music, Videos, Twitch Rewards, API, Friends, Family…
                       whatever you want!
@@ -362,7 +365,7 @@ function VoiceCloneRequestPage(props: Props) {
       <>
         <article className="message is-danger">
           <div className="message-body">
-            <strong>Error with form:</strong> {formErrorMessage}
+            <strong className="red">Error with form:</strong> {formErrorMessage}
           </div>
         </article>
       </>
@@ -372,37 +375,39 @@ function VoiceCloneRequestPage(props: Props) {
   if (!USE_REFRESH) {
     return (
       <div>
-  
         {header}
-  
+
         <section className="section">
           <div className="container">
-  
             <h1 className="title is-2">Want a Custom Voice You Can Use?</h1>
-            <h1 className="subtitle is-4">For Music, Videos, Twitch Rewards, API, Friends, Family&hellip; whatever you want!</h1>
-  
+            <h1 className="subtitle is-4">
+              For Music, Videos, Twitch Rewards, API, Friends, Family&hellip;
+              whatever you want!
+            </h1>
+
             {previouslySubmittedNote}
-  
+
             <p>
-              We have an extremely talented staff that will personally handle your voice clone request. 
-              Please help us understand more about your voice and how you want to use it, and we'll be in touch
+              We have an extremely talented staff that will personally handle
+              your voice clone request. Please help us understand more about
+              your voice and how you want to use it, and we'll be in touch
               shortly.
             </p>
-  
+
             <br />
-  
+
             <h1 className="title is-3">First, how should we get in touch?</h1>
-  
+
             <div className="field">
               <label className="label">Email Address</label>
               <div className="control has-icons-left">
-                <input 
-                  className="input is-medium is-fullwidth" 
-                  type="text" 
-                  placeholder="Email Address" 
-                  value={emailAddress} 
-                  onChange={handleEmailAddressChange} 
-                  />
+                <input
+                  className="input is-medium is-fullwidth"
+                  type="text"
+                  placeholder="Email Address"
+                  value={emailAddress}
+                  onChange={handleEmailAddressChange}
+                />
                 <span className="icon is-small is-left">
                   <FontAwesomeIcon icon={faEnvelope} />
                 </span>
@@ -410,19 +415,20 @@ function VoiceCloneRequestPage(props: Props) {
               <p className="help is-success"></p>
               <p className="help is-danger"></p>
             </div>
-  
+
             <div className="field">
               <label className="label">
                 Discord Username (Optional, but an alternate way to reach you.)
                 <br />
               </label>
               <div className="control has-icons-left">
-                <input className="input is-medium is-fullwidth" 
-                  type="text" 
-                  placeholder="Discord" 
-                  value={discord} 
-                  onChange={handleDiscordChange} 
-                  />
+                <input
+                  className="input is-medium is-fullwidth"
+                  type="text"
+                  placeholder="Discord"
+                  value={discord}
+                  onChange={handleDiscordChange}
+                />
                 <span className="icon is-small is-left">
                   <FontAwesomeIcon icon={faDiscord} />
                 </span>
@@ -432,296 +438,18 @@ function VoiceCloneRequestPage(props: Props) {
               </p>
               <p className="help is-danger"></p>
             </div>
-  
+
             <br />
-  
+
             <h1 className="title is-3">Who's voice is this?</h1>
-  
-            <p>If it's your voice, you'll be able to do anything you want with it. If it's another person's voice, you may have 
-              limits on how you can use it (eg. limits on commercialization.) That doesn't mean we can't help you. Even if you
-              just want your favorite character so you can make Twitter memes, that's fine!</p>
-  
-            <br />
-  
-            <div className="checkbox-block">
-              <div className="control">
-                <label className="radio">
-                  <input type="radio" name="subject" value="mine" onChange={handleSubjectChange} />
-                  &nbsp;My own voice
-                </label>
-                <br />
-                <label className="radio">
-                  <input type="radio" name="subject" value="family" onChange={handleSubjectChange} />
-                  &nbsp;A family member's voice
-                </label>
-                <br />
-                <label className="radio">
-                  <input type="radio" name="subject" value="client" onChange={handleSubjectChange} />
-                  &nbsp;A client's voice
-                </label>
-                <br />
-                <label className="radio">
-                  <input type="radio" name="subject" value="3rd" onChange={handleSubjectChange} />
-                  &nbsp;Another person's voice
-                </label>
-              </div>
-            </div>
-  
-            <br />
-  
-            <div className="field">
-              <label className="label">If it isn't your voice, tell us about who it is!</label>
-              <div className="control has-icons-left">
-                <input 
-                  className="input is-medium is-fullwidth" 
-                  type="text" 
-                  placeholder="Notes on the person" 
-                  value={notesOnSubject}
-                  onChange={handleSubjectNotesChange}
-                  />
-                <span className="icon is-small is-left">
-                  <FontAwesomeIcon icon={faUser} />
-                </span>
-              </div>
-              <p className="help is-success"></p>
-              <p className="help is-danger"></p>
-            </div>
-  
-            <br />
-  
-            <h1 className="title is-3">How will you use it?</h1>
-  
-            <p>Click as many as you plan to use!</p>
-  
-            <br />
-  
-            <div className="checkbox-block">
-              <label className="checkbox">
-                <input type="checkbox" checked={isForMusic} onChange={handleIsForMusicChange} />
-                &nbsp;For Music (for creating new songs)
-              </label>
-  
-              <br />
-  
-              <label className="checkbox">
-                <input type="checkbox" checked={isForGames} onChange={handleIsForGamesChange} />
-                &nbsp;For Games (because NPCs won't talk by themselves)
-              </label>
-  
-              <br />
-  
-              <label className="checkbox">
-                <input type="checkbox" checked={isForTwitchTts} onChange={handleIsForTwitchTtsChange} />
-                &nbsp;For Twitch TTS (creating rewards for my stream, helping me engage and monetize)
-              </label>
-  
-              <br />
-  
-              <label className="checkbox">
-                <input type="checkbox" checked={isForApiUse} onChange={handleIsForApiUseChange} />
-                &nbsp;For API use (unlimited use of the FakeYou.com API for anything you want to build)
-              </label>
-  
-              <br />
-  
-              <label className="checkbox">
-                <input type="checkbox" checked={isForOther} onChange={handleIsForOtherChange} />
-                &nbsp;Other (Now we're curious!)
-              </label>
-            </div>
-  
-            <br />
-  
-            <div className="field">
-              <label className="label">Let us know more about your use (optional)</label>
-              <div className="control has-icons-left">
-                <input 
-                  className="input is-medium is-fullwidth" 
-                  type="text" 
-                  placeholder="Optional details" 
-                  value={optionalNotesOnUse}
-                  onChange={handleOptionalNotesOnUseChange}
-                  />
-                <span className="icon is-small is-left">
-                  <FontAwesomeIcon icon={faEnvelope} />
-                </span>
-              </div>
-              <p className="help is-success"></p>
-              <p className="help is-danger"></p>
-            </div>
-  
-            <br />
-  
-            <h1 className="title is-3">Do you want it to be private?</h1>
-  
-            <p>(We'll accept multiple answers here, because maybe you want to use it multiple ways.)</p>
-  
-            <br />
-  
-            <div className="checkbox-block">
-              <label className="checkbox">
-                <input type="checkbox" />
-                &nbsp;This is for private use for just me
-              </label>
-  
-              <br />
-              
-              <label className="checkbox">
-                <input type="checkbox" checked={isForPrivateUse} onChange={handleIsForPrivateUseChange} />
-                &nbsp;This is for private use amongst a group of people
-              </label>
-  
-              <br />
-  
-              <label className="checkbox">
-                <input type="checkbox" checked={isForPublicUse} onChange={handleIsForPublicUseChange} />
-                &nbsp;This is for public use
-              </label>
-            </div>
-  
-            <br />
-  
-            <h1 className="title is-3">How's your audio quality?</h1>
-  
-            <p>It's okay if you don't have a quality source of audio, but the results are top notch only with a good recording setup.</p>
-  
-            <br />
-  
-            <div className="checkbox-block">
-              <label className="checkbox">
-                <input type="checkbox" checked={hasGoodMicrophone} onChange={handleHasGoodMicrophoneChange} />
-                &nbsp;I have a good microphone (and I know what a condenser microphone is)
-              </label>
-  
-              <br />
-  
-              <label className="checkbox">
-                <input type="checkbox" checked={hasCleanAudioRecordings} onChange={handleHasCleanAudioRecordingsChange} />
-                &nbsp;I have really good preexisting recordings.
-              </label>
-            </div>
-  
-            <br />
-  
-            <h1 className="title is-3">Anything else?</h1>
-  
-  
-            <div className="field">
-              <label className="label">Do you have any questions for us?</label>
-              <div className="control">
-                <textarea 
-                  className="textarea" 
-                  placeholder="Optional Questions"
-                  onChange={handleOptionalQuestionsChange}
-                  value={optionalQuestions}
-                  ></textarea>
-              </div>
-            </div>          
-  
-            <div className="field">
-              <label className="label">Do you have any important notes or details?</label>
-              <div className="control">
-                <textarea 
-                  className="textarea" 
-                  placeholder="Optional Notes"
-                  onChange={handleOptionalExtraCommentsChange}
-                  value={optionalExtraComments}
-                  ></textarea>
-              </div>
-            </div>          
-  
-            <br />
-  
-            {errorMessage}
-  
-            <button 
-              className="button is-link is-large is-fullwidth"
-              onClick={handleSubmit}
-              >
-                Clone my voice!&nbsp;<FontAwesomeIcon icon={faMicrophone} />
-              </button>
-  
-          </div>
-        </section>
-      </div>
-    );
-  }
 
-  return (
-    <div>
-      {header}
-
-      <Fade bottom duration={duration} distance={distance} delay={delay2}>
-        <div className="container-panel pt-4 pb-5">
-          <div className="panel p-3 p-lg-4 load-hidden mt-5 mt-lg-0">
-            <h1 className="panel-title fw-bold">Clone Your Voice</h1>
-            <div className="py-6">
-              {previouslySubmittedNote}
-              <div className="d-flex flex-column gap-4">
-                <p>
-                  We have an extremely talented staff that will personally
-                  handle your voice clone request. Please help us understand
-                  more about your voice and how you want to use it, and we'll be
-                  in touch shortly.
-                </p>
-
-                <h2>First, how should we get in touch?</h2>
-
-                <div>
-                  <label className="sub-title">Email Address</label>
-                  <div className="form-group input-icon">
-                    <span className="form-control-feedback">
-                      <FontAwesomeIcon icon={faEnvelope} />
-                    </span>
-                    <input
-                      className="form-control"
-                      type="text"
-                      placeholder="Email Address"
-                      value={emailAddress}
-                      onChange={handleEmailAddressChange}
-                    />
-                  </div>
-                  <p className="form-text"></p>
-                  <p className="form-text red"></p>
-                </div>
-
-                <div>
-                  <label className="sub-title">
-                    Discord Username (Optional, but an alternate way to reach
-                    you.)
-                    <br />
-                  </label>
-                  <div className="form-group input-icon">
-                    <span className="form-control-feedback">
-                      <FontAwesomeIcon icon={faDiscord} />
-                    </span>
-                    <input
-                      className="form-control"
-                      type="text"
-                      placeholder="Discord"
-                      value={discord}
-                      onChange={handleDiscordChange}
-                    />
-                  </div>
-                  <p className="form-text">
-                    Don't forget the <em>#0000</em> part of your username!
-                  </p>
-                  <p className="form-text red"></p>
-                </div>
-
-                <div>
-                  <h2 className="mb-3">Who's voice is this?</h2>
-                  <p>
-                    If it's your voice, you'll be able to do anything you want
-                    with it. If it's another person's voice, you may have limits
-                    on how you can use it (eg. limits on commercialization.)
-                    That doesn't mean we can't help you. Even if you just want
-                    your favorite character so you can make Twitter memes,
-                    that's fine!
-                  </p>
-                </div>
-              </div>
-            </div>
+            <p>
+              If it's your voice, you'll be able to do anything you want with
+              it. If it's another person's voice, you may have limits on how you
+              can use it (eg. limits on commercialization.) That doesn't mean we
+              can't help you. Even if you just want your favorite character so
+              you can make Twitter memes, that's fine!
+            </p>
 
             <br />
 
@@ -993,6 +721,330 @@ function VoiceCloneRequestPage(props: Props) {
               Clone my voice!&nbsp;
               <FontAwesomeIcon icon={faMicrophone} />
             </button>
+          </div>
+        </section>
+      </div>
+    );
+  }
+
+  return (
+    <div>
+      {header}
+
+      <Fade bottom duration={duration} distance={distance} delay={delay2}>
+        <div className="container-panel pt-4 pb-5">
+          <div className="panel p-3 p-lg-4 load-hidden mt-5 mt-lg-0">
+            <h1 className="panel-title fw-bold">Clone Your Voice</h1>
+            <div className="py-6">
+              {previouslySubmittedNote}
+              <div className="d-flex flex-column gap-4">
+                <p>
+                  We have an extremely talented staff that will personally
+                  handle your voice clone request. Please help us understand
+                  more about your voice and how you want to use it, and we'll be
+                  in touch shortly.
+                </p>
+
+                <h2>First, how should we get in touch?</h2>
+
+                <div>
+                  <label className="sub-title">Email Address</label>
+                  <div className="form-group input-icon">
+                    <span className="form-control-feedback">
+                      <FontAwesomeIcon icon={faEnvelope} />
+                    </span>
+                    <input
+                      className="form-control"
+                      type="text"
+                      placeholder="Email Address"
+                      value={emailAddress}
+                      onChange={handleEmailAddressChange}
+                    />
+                  </div>
+                  <p className="form-text"></p>
+                  <p className="form-text red"></p>
+                </div>
+
+                <div>
+                  <label className="sub-title">
+                    Discord Username (Optional, but an alternate way to reach
+                    you.)
+                    <br />
+                  </label>
+                  <div className="form-group input-icon">
+                    <span className="form-control-feedback">
+                      <FontAwesomeIcon icon={faDiscord} />
+                    </span>
+                    <input
+                      className="form-control"
+                      type="text"
+                      placeholder="Discord"
+                      value={discord}
+                      onChange={handleDiscordChange}
+                    />
+                  </div>
+                  <p className="form-text">
+                    Don't forget the <em>#0000</em> part of your username!
+                  </p>
+                  <p className="form-text red"></p>
+                </div>
+
+                <div>
+                  <h2 className="my-3">Who's voice is this?</h2>
+                  <p>
+                    If it's your voice, you'll be able to do anything you want
+                    with it. If it's another person's voice, you may have limits
+                    on how you can use it (eg. limits on commercialization.)
+                    That doesn't mean we can't help you. Even if you just want
+                    your favorite character so you can make Twitter memes,
+                    that's fine!
+                  </p>
+                </div>
+
+                <div className="form-check d-flex flex-column gap-2">
+                  <label className="form-check-label">
+                    <input
+                      type="radio"
+                      className="form-check-input"
+                      name="subject"
+                      value="mine"
+                      onChange={handleSubjectChange}
+                    />
+                    &nbsp;My own voice
+                  </label>
+                  <label className="form-check-label">
+                    <input
+                      type="radio"
+                      className="form-check-input"
+                      name="subject"
+                      value="family"
+                      onChange={handleSubjectChange}
+                    />
+                    &nbsp;A family member's voice
+                  </label>
+                  <label className="form-check-label">
+                    <input
+                      type="radio"
+                      className="form-check-input"
+                      name="subject"
+                      value="client"
+                      onChange={handleSubjectChange}
+                    />
+                    &nbsp;A client's voice
+                  </label>
+                  <label className="form-check-label">
+                    <input
+                      type="radio"
+                      className="form-check-input"
+                      name="subject"
+                      value="3rd"
+                      onChange={handleSubjectChange}
+                    />
+                    &nbsp;Another person's voice
+                  </label>
+                </div>
+
+                <div>
+                  <label className="sub-title">
+                    If it isn't your voice, tell us about who it is!
+                  </label>
+                  <div className="form-group">
+                    <input
+                      className="form-control"
+                      type="text"
+                      placeholder="Notes on the person"
+                      value={notesOnSubject}
+                      onChange={handleSubjectNotesChange}
+                    />
+                  </div>
+                  <p className="form-text"></p>
+                  <p className="form-text red"></p>
+                </div>
+
+                <div>
+                  <h2 className="my-3">How will you use it?</h2>
+                  <p>Click as many as you plan to use!</p>
+                </div>
+
+                <div className="form-check d-flex flex-column gap-2">
+                  <label className="form-check-label">
+                    <input
+                      type="checkbox"
+                      className="form-check-input"
+                      checked={isForMusic}
+                      onChange={handleIsForMusicChange}
+                    />
+                    &nbsp;For Music (for creating new songs)
+                  </label>
+
+                  <label className="form-check-label">
+                    <input
+                      type="checkbox"
+                      className="form-check-input"
+                      checked={isForGames}
+                      onChange={handleIsForGamesChange}
+                    />
+                    &nbsp;For Games (because NPCs won't talk by themselves)
+                  </label>
+
+                  <label className="form-check-label">
+                    <input
+                      type="checkbox"
+                      className="form-check-input"
+                      checked={isForTwitchTts}
+                      onChange={handleIsForTwitchTtsChange}
+                    />
+                    &nbsp;For Twitch TTS (creating rewards for my stream,
+                    helping me engage and monetize)
+                  </label>
+
+                  <label className="form-check-label">
+                    <input
+                      type="checkbox"
+                      className="form-check-input"
+                      checked={isForApiUse}
+                      onChange={handleIsForApiUseChange}
+                    />
+                    &nbsp;For API use (unlimited use of the FakeYou.com API for
+                    anything you want to build)
+                  </label>
+
+                  <label className="form-check-label">
+                    <input
+                      type="checkbox"
+                      className="form-check-input"
+                      checked={isForOther}
+                      onChange={handleIsForOtherChange}
+                    />
+                    &nbsp;Other (Now we're curious!)
+                  </label>
+                </div>
+                <div>
+                  <label className="sub-title">
+                    Let us know more about your use (optional)
+                  </label>
+                  <div className="form-group">
+                    <input
+                      type="text"
+                      className="form-control"
+                      placeholder="Optional details"
+                      value={optionalNotesOnUse}
+                      onChange={handleOptionalNotesOnUseChange}
+                    />
+                  </div>
+                  <p className="form-text"></p>
+                  <p className="form-text red"></p>
+                </div>
+
+                <div>
+                  <h2 className="my-3">Do you want it to be private?</h2>
+                  <p>
+                    (We'll accept multiple answers here, because maybe you want
+                    to use it multiple ways.)
+                  </p>
+                </div>
+
+                <div className="form-check d-flex flex-column gap-2">
+                  <label className="form-check-label">
+                    <input type="checkbox" className="form-check-input" />
+                    &nbsp;This is for private use for just me
+                  </label>
+
+                  <label className="form-check-label">
+                    <input
+                      type="checkbox"
+                      className="form-check-input"
+                      checked={isForPrivateUse}
+                      onChange={handleIsForPrivateUseChange}
+                    />
+                    &nbsp;This is for private use amongst a group of people
+                  </label>
+
+                  <label className="form-check-label">
+                    <input
+                      type="checkbox"
+                      className="form-check-input"
+                      checked={isForPublicUse}
+                      onChange={handleIsForPublicUseChange}
+                    />
+                    &nbsp;This is for public use
+                  </label>
+                </div>
+
+                <div>
+                  <h2 className="my-3">How's your audio quality?</h2>
+                  <p>
+                    It's okay if you don't have a quality source of audio, but
+                    the results are top notch only with a good recording setup.
+                  </p>
+                </div>
+
+                <div className="form-check d-flex flex-column gap-2">
+                  <label className="form-check-label">
+                    <input
+                      type="checkbox"
+                      className="form-check-input"
+                      checked={hasGoodMicrophone}
+                      onChange={handleHasGoodMicrophoneChange}
+                    />
+                    &nbsp;I have a good microphone (and I know what a condenser
+                    microphone is)
+                  </label>
+
+                  <label className="form-check-label">
+                    <input
+                      type="checkbox"
+                      className="form-check-input"
+                      checked={hasCleanAudioRecordings}
+                      onChange={handleHasCleanAudioRecordingsChange}
+                    />
+                    &nbsp;I have really good preexisting recordings.
+                  </label>
+                </div>
+
+                <h2 className="mt-3">Anything else?</h2>
+
+                <div>
+                  <label className="sub-title">
+                    Do you have any questions for us?
+                  </label>
+                  <div className="form-group">
+                    <textarea
+                      rows={4}
+                      className="form-control"
+                      placeholder="Optional Questions"
+                      onChange={handleOptionalQuestionsChange}
+                      value={optionalQuestions}
+                    ></textarea>
+                  </div>
+                </div>
+
+                <div>
+                  <label className="sub-title">
+                    Do you have any important notes or details?
+                  </label>
+                  <div className="form-group">
+                    <textarea
+                      rows={4}
+                      className="form-control"
+                      placeholder="Optional Notes"
+                      onChange={handleOptionalExtraCommentsChange}
+                      value={optionalExtraComments}
+                    ></textarea>
+                  </div>
+                </div>
+
+                {errorMessage}
+
+                <button
+                  className="btn btn-primary btn-lg w-100 mt-2"
+                  onClick={handleSubmit}
+                >
+                  Clone my voice!&nbsp;
+                  <FontAwesomeIcon icon={faMicrophone} />
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       </Fade>

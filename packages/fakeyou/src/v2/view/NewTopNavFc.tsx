@@ -5,7 +5,7 @@ import { MigrationTopNavSession } from "../../migration/MigrationTopNav_Session"
 import { FrontendUrlConfig } from "../../common/FrontendUrlConfig";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
-  faGavel, 
+  faGavel,
   faGrinBeamSweat,
   faMicrophone,
   faVolumeUp,
@@ -35,7 +35,8 @@ function NewTopNavFc(props: Props) {
     myDataLink = `/profile/${username}`;
   }
 
-  const [mobileHamburgerIsActive, setMobileHamburgerIsActive] = useState<boolean>(false);
+  const [mobileHamburgerIsActive, setMobileHamburgerIsActive] =
+    useState<boolean>(false);
 
   const toggleHamburger = () => {
     setMobileHamburgerIsActive(!mobileHamburgerIsActive);
@@ -47,8 +48,12 @@ function NewTopNavFc(props: Props) {
     setMobileHamburgerIsActive(false);
   };
 
-  const navbarClasses = mobileHamburgerIsActive ? "navbar-menu is-active" : "navbar-menu";
-  const navbarBurgerClasses = mobileHamburgerIsActive ? "navbar-burger is-active" : "navbar-burger";
+  const navbarClasses = mobileHamburgerIsActive
+    ? "navbar-menu is-active"
+    : "navbar-menu";
+  const navbarBurgerClasses = mobileHamburgerIsActive
+    ? "navbar-burger is-active"
+    : "navbar-burger";
 
   if (!USE_REFRESH) {
     return (
@@ -56,9 +61,16 @@ function NewTopNavFc(props: Props) {
         <nav className="navbar is-transparent padding-bottom-1em">
           <div className="navbar-brand">
             <Link className="navbar-item" to="/">
-              <img src="/fakeyou/fakeyou-nav-logo-mascot.webp" alt="FakeYou: Cartoon and Celebrity Text to Speech" />
+              <img
+                src="/fakeyou/fakeyou-nav-logo-mascot.webp"
+                alt="FakeYou: Cartoon and Celebrity Text to Speech"
+              />
             </Link>
-            <div className={navbarBurgerClasses} data-target="navbarExampleTransparentExample" onClick={() => toggleHamburger()}>
+            <div
+              className={navbarBurgerClasses}
+              data-target="navbarExampleTransparentExample"
+              onClick={() => toggleHamburger()}
+            >
               <span></span>
               <span></span>
               <span></span>
@@ -67,93 +79,136 @@ function NewTopNavFc(props: Props) {
 
           <div id="navbarExampleTransparentExample" className={navbarClasses}>
             <div className="navbar-start">
-
-              <Link to={FrontendUrlConfig.cloneRequestPage()}
+              <Link
+                to={FrontendUrlConfig.cloneRequestPage()}
                 className="navbar-item "
                 onClick={() => closeHamburger()}
-                >Clone&nbsp;My&nbsp;Voice!</Link>
+              >
+                Clone&nbsp;My&nbsp;Voice!
+              </Link>
 
               {/* DROPDOWN: CREATE */}
 
               <div className="navbar-item has-dropdown is-hoverable">
-                <Link to={FrontendUrlConfig.indexPage()}
+                <Link
+                  to={FrontendUrlConfig.indexPage()}
                   className="navbar-link"
                   onClick={() => closeHamburger()}
-                  >{t('coreUi.topNav.create')}</Link>
+                >
+                  {t("coreUi.topNav.create")}
+                </Link>
 
                 <div className="navbar-dropdown is-boxed">
                   {/* NB: There's an "is-active" class that looks nice. */}
 
-                  <Link to="/"
+                  <Link
+                    to="/"
                     className="navbar-item"
                     onClick={() => closeHamburger()}
-                    >TTS</Link>
+                  >
+                    TTS
+                  </Link>
 
-                  <Link to="/video"
+                  <Link
+                    to="/video"
                     className="navbar-item"
                     onClick={() => closeHamburger()}
-                    >{t('coreUi.topNav.video')}</Link>
-
+                  >
+                    {t("coreUi.topNav.video")}
+                  </Link>
                 </div>
               </div>
 
               {/* DROPDOWN: COMMUNITY */}
 
               <div className="navbar-item has-dropdown is-hoverable">
-                <Link to={myDataLink}
+                <Link
+                  to={myDataLink}
                   className="navbar-link"
                   onClick={() => closeHamburger()}
-                  >{t('coreUi.topNav.community')}</Link>
+                >
+                  {t("coreUi.topNav.community")}
+                </Link>
 
                 <div className="navbar-dropdown is-boxed">
                   {/* NB: There's an "is-active" class that looks nice. */}
 
-                  <Link to="/contribute"
+                  <Link
+                    to="/contribute"
                     className="navbar-item"
                     onClick={() => closeHamburger()}
-                    ><FontAwesomeIcon icon={faUpload} />&nbsp;&nbsp;{t('coreUi.topNav.contributeUpload')}</Link>
+                  >
+                    <FontAwesomeIcon icon={faUpload} />
+                    &nbsp;&nbsp;{t("coreUi.topNav.contributeUpload")}
+                  </Link>
 
-                  <Link to="/leaderboard"
+                  <Link
+                    to="/leaderboard"
                     className="navbar-item"
                     onClick={() => closeHamburger()}
-                    ><FontAwesomeIcon icon={faTrophy} />&nbsp;&nbsp;{t('coreUi.topNav.leaderboard')}</Link>
+                  >
+                    <FontAwesomeIcon icon={faTrophy} />
+                    &nbsp;&nbsp;{t("coreUi.topNav.leaderboard")}
+                  </Link>
 
-                  <Link to={FrontendUrlConfig.patronsPage()}
+                  <Link
+                    to={FrontendUrlConfig.patronsPage()}
                     className="navbar-item"
                     onClick={() => closeHamburger()}
-                    ><FontAwesomeIcon icon={faPatreon}/>&nbsp;&nbsp;{t('coreUi.topNav.patrons')}</Link>
+                  >
+                    <FontAwesomeIcon icon={faPatreon} />
+                    &nbsp;&nbsp;{t("coreUi.topNav.patrons")}
+                  </Link>
 
-                  <Link to="/firehose"
+                  <Link
+                    to="/firehose"
                     className="navbar-item"
                     onClick={() => closeHamburger()}
-                    ><FontAwesomeIcon icon={faList} />&nbsp;&nbsp;{t('coreUi.topNav.feed')}</Link>
+                  >
+                    <FontAwesomeIcon icon={faList} />
+                    &nbsp;&nbsp;{t("coreUi.topNav.feed")}
+                  </Link>
 
                   <hr className="navbar-divider" />
 
-                  <Link to={myDataLink}
+                  <Link
+                    to={myDataLink}
                     className="navbar-item"
                     onClick={() => closeHamburger()}
-                    ><FontAwesomeIcon icon={faUser} />&nbsp;&nbsp;{t('coreUi.topNav.myData')}</Link>
+                  >
+                    <FontAwesomeIcon icon={faUser} />
+                    &nbsp;&nbsp;{t("coreUi.topNav.myData")}
+                  </Link>
 
                   <hr className="navbar-divider" />
 
-                  <Link to={FrontendUrlConfig.aboutUsPage()}
+                  <Link
+                    to={FrontendUrlConfig.aboutUsPage()}
                     className="navbar-item"
                     onClick={() => closeHamburger()}
-                    ><FontAwesomeIcon icon={faGrinBeamSweat} />&nbsp;&nbsp;{t('coreUi.topNav.aboutUs')}</Link>
+                  >
+                    <FontAwesomeIcon icon={faGrinBeamSweat} />
+                    &nbsp;&nbsp;{t("coreUi.topNav.aboutUs")}
+                  </Link>
 
-                  <Link to={FrontendUrlConfig.termsPage()}
+                  <Link
+                    to={FrontendUrlConfig.termsPage()}
                     className="navbar-item"
                     onClick={() => closeHamburger()}
-                    ><FontAwesomeIcon icon={faGavel} />&nbsp;&nbsp;{t('coreUi.topNav.terms')}</Link>
+                  >
+                    <FontAwesomeIcon icon={faGavel} />
+                    &nbsp;&nbsp;{t("coreUi.topNav.terms")}
+                  </Link>
                 </div>
               </div>
 
-              <a href={FrontendUrlConfig.developerDocs()}
+              <a
+                href={FrontendUrlConfig.developerDocs()}
                 className="navbar-item"
                 onClick={() => closeHamburger()}
-                >{t('coreUi.topNav.developers')}</a>
-
+              >
+                {t("coreUi.topNav.developers")}
+              </a>
             </div>
 
             <div className="navbar-end">
@@ -165,7 +220,7 @@ function NewTopNavFc(props: Props) {
                       enableAlpha={true}
                       querySessionAction={props.querySessionCallback}
                       closeHamburgerAction={() => closeHamburger()}
-                      />
+                    />
                   </p>
                 </div>
               </div>
@@ -211,7 +266,7 @@ function NewTopNavFc(props: Props) {
         <div className="container">
           <Link className="navbar-brand me-5 pr-8" to="/">
             <img
-              src="fakeyou/FakeYou-Logo.png"
+              src="/fakeyou/FakeYou-Logo.png"
               alt="FakeYou: Cartoon and Celebrity Text to Speech"
               height="34"
             />
@@ -232,9 +287,13 @@ function NewTopNavFc(props: Props) {
             aria-labelledby="offcanvasNavbar2Label"
           >
             <div className="offcanvas-header">
-              <Link className="navbar-brand me-5 pr-8" to="/">
+              <Link
+                data-bs-toggle="offcanvas"
+                className="navbar-brand me-5 pr-8"
+                to="/"
+              >
                 <img
-                  src="fakeyou/FakeYou-Logo.png"
+                  src="/fakeyou/FakeYou-Logo.png"
                   alt="FakeYou: Cartoon and Celebrity Text to Speech"
                   height="34"
                 />
@@ -249,7 +308,7 @@ function NewTopNavFc(props: Props) {
             </div>
             <div className="offcanvas-body">
               <ul className="navbar-nav justify-content-start align-items-lg-center flex-grow-1 gap-2 gap-lg-0">
-                <li className="nav-item">
+                <li data-bs-toggle="offcanvas" className="nav-item">
                   <Link
                     to={FrontendUrlConfig.cloneRequestPage()}
                     className="nav-link"
@@ -276,13 +335,13 @@ function NewTopNavFc(props: Props) {
                     className="dropdown-menu"
                     aria-labelledby="offcanvasNavbarLgDropdown"
                   >
-                    <li>
+                    <li data-bs-toggle="offcanvas">
                       <Link className="dropdown-item" to="/">
                         <FontAwesomeIcon icon={faVolumeUp} className="me-2" />
                         TTS
                       </Link>
                     </li>
-                    <li>
+                    <li data-bs-toggle="offcanvas">
                       <Link className="dropdown-item" to="/video">
                         <FontAwesomeIcon icon={faVideo} className="me-2" />
                         Video
@@ -307,25 +366,25 @@ function NewTopNavFc(props: Props) {
                     className="dropdown-menu"
                     aria-labelledby="offcanvasNavbarLgDropdown"
                   >
-                    <li>
+                    <li data-bs-toggle="offcanvas">
                       <Link className="dropdown-item" to="/contribute">
                         <FontAwesomeIcon icon={faUpload} className="me-2" />
                         Contribute/Upload
                       </Link>
                     </li>
-                    <li>
+                    <li data-bs-toggle="offcanvas">
                       <Link className="dropdown-item" to="/leaderboard">
                         <FontAwesomeIcon icon={faTrophy} className="me-2" />
                         Leaderboard
                       </Link>
                     </li>
-                    <li>
+                    <li data-bs-toggle="offcanvas">
                       <Link className="dropdown-item" to="/patrons">
                         <FontAwesomeIcon icon={faPatreon} className="me-2" />
                         Patrons
                       </Link>
                     </li>
-                    <li>
+                    <li data-bs-toggle="offcanvas">
                       <Link className="dropdown-item" to="/firehose">
                         <FontAwesomeIcon icon={faList} className="me-2" />
                         Feed
@@ -334,7 +393,7 @@ function NewTopNavFc(props: Props) {
                     <li>
                       <div className="dropdown-divider"></div>
                     </li>
-                    <li>
+                    <li data-bs-toggle="offcanvas">
                       <Link className="dropdown-item" to="/profile">
                         <FontAwesomeIcon icon={faUser} className="me-2" />
                         My Data
@@ -343,13 +402,13 @@ function NewTopNavFc(props: Props) {
                   </ul>
                 </li>
 
-                <li className="nav-item d-lg-none">
+                <li data-bs-toggle="offcanvas" className="nav-item d-lg-none">
                   <Link className="nav-link" aria-current="page" to="/about">
                     About
                   </Link>
                 </li>
 
-                <li className="nav-item d-lg-none">
+                <li data-bs-toggle="offcanvas" className="nav-item d-lg-none">
                   <Link className="nav-link" aria-current="page" to="/terms">
                     Terms of Use
                   </Link>
@@ -357,11 +416,7 @@ function NewTopNavFc(props: Props) {
 
                 <li className="nav-item d-lg-none">
                   {/* TODO(echelon): Fix the build warnings about href not being accessible. */}
-                  <a 
-                    className="nav-link" 
-                    aria-current="page" 
-                    href="/"
-                  >
+                  <a className="nav-link" aria-current="page" href="/">
                     Developers
                   </a>
                 </li>
@@ -385,10 +440,14 @@ function NewTopNavFc(props: Props) {
                 </li>
               </ul>
               <div className="d-grid gap-2 d-flex justify-content-start align-items-center pt-4 ps-3 pt-lg-0 ps-lg-0">
-                <Link className="nav-login me-3" to="/login">
+                <Link
+                  data-bs-toggle="offcanvas"
+                  className="nav-login me-3"
+                  to="/login"
+                >
                   Login
                 </Link>
-                <Link to="/signup">
+                <Link data-bs-toggle="offcanvas" to="/signup">
                   <button type="button" className="btn btn-primary btn-lg">
                     Sign up
                   </button>

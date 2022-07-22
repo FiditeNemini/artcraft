@@ -1,13 +1,13 @@
-import React  from 'react';
+import React from "react";
 
 interface Props {
-  size: number,
-  email_hash?: string,
-  username?: string,
+  size: number;
+  email_hash?: string;
+  username?: string;
 }
 
 function Gravatar(props: Props) {
-  const gravatarUrl = `https://www.gravatar.com/avatar/${props.email_hash}?s=${props.size}`
+  const gravatarUrl = `https://www.gravatar.com/avatar/${props.email_hash}?s=${props.size}`;
 
   let altText = "gravatar";
   if (props.username !== undefined) {
@@ -15,8 +15,8 @@ function Gravatar(props: Props) {
   }
 
   return (
-    <img alt={altText} src={gravatarUrl} />
-  )
+    <img className="rounded border border-2" alt={altText} src={gravatarUrl} />
+  );
 }
 
 export { Gravatar };

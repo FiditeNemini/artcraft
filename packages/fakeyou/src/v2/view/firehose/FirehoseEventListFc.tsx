@@ -3,7 +3,22 @@ import { ApiConfig } from "@storyteller/components";
 import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
 import { Gravatar } from "@storyteller/components/src/elements/Gravatar";
 import { Link } from "react-router-dom";
+import { distance, duration, delay } from "../../../data/animation";
 import { USE_REFRESH } from "../../../Refresh";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import {
+  faPlay,
+  faFlagCheckered,
+  faAward,
+  faPenToSquare,
+} from "@fortawesome/free-solid-svg-icons";
+import {
+  faTwitter,
+  faDiscord,
+  faTwitch,
+} from "@fortawesome/free-brands-svg-icons";
+
+const Fade = require("react-reveal/Fade");
 
 interface FirehoseEventListResponsePayload {
   success: boolean;
@@ -27,7 +42,9 @@ interface Props {
 }
 
 function FirehoseEventListFc(props: Props) {
-  const [firehoseEvents, setFirehoseEvents] = useState<Array<FirehoseEvent>>([]);
+  const [firehoseEvents, setFirehoseEvents] = useState<Array<FirehoseEvent>>(
+    []
+  );
 
   const fetchEvents = () => {
     const api = new ApiConfig();
@@ -74,7 +91,7 @@ function FirehoseEventListFc(props: Props) {
 
   let eventItems: Array<JSX.Element> = [];
 
-  firehoseEvents.forEach((event) => {
+  firehoseEvents.slice(0, 16).forEach((event) => {
     let inner = <span />;
     let userLink = <span>Anonymous user</span>;
     let gravatar = <span />;
@@ -100,160 +117,176 @@ function FirehoseEventListFc(props: Props) {
       case "user_sign_up":
         inner = (
           <span>
+            <FontAwesomeIcon icon={faPenToSquare} />
             {gravatar}
             &nbsp;
             {userLink}
-            &nbsp; signed up for FakeYou!
+            &nbsp;signed up for FakeYou!
           </span>
         );
         break;
       case "user_badge_granted":
         inner = (
           <span>
+            <FontAwesomeIcon icon={faAward} />
             {gravatar}
             &nbsp;
             {userLink}
-            &nbsp; got a badge!
+            &nbsp;got a badge!
           </span>
         );
         break;
       case "tts_model_upload_started":
         inner = (
           <span>
+            <FontAwesomeIcon icon={faPlay} className="me-3" />
             {gravatar}
             &nbsp;
             {userLink}
-            &nbsp; started TTS model upload
+            &nbsp;started TTS model upload
           </span>
         );
         break;
       case "tts_model_upload_completed":
         inner = (
           <span>
+            <FontAwesomeIcon icon={faFlagCheckered} className="me-3" />
             {gravatar}
             &nbsp;
             {userLink}
-            &nbsp; completed TTS model upload
+            &nbsp;completed TTS model upload
           </span>
         );
         break;
       case "tts_inference_started":
         inner = (
           <span>
+            <FontAwesomeIcon icon={faPlay} className="me-3" />
             {gravatar}
             &nbsp;
             {userLink}
-            &nbsp; started TTS
+            &nbsp;started TTS
           </span>
         );
         break;
       case "tts_inference_completed":
         inner = (
           <span>
+            <FontAwesomeIcon icon={faFlagCheckered} className="me-3" />
             {gravatar}
             &nbsp;
             {userLink}
-            &nbsp; completed TTS
+            &nbsp;completed TTS
           </span>
         );
         break;
       case "w2l_template_upload_started":
         inner = (
           <span>
+            <FontAwesomeIcon icon={faPlay} className="me-3" />
             {gravatar}
             &nbsp;
             {userLink}
-            &nbsp; started uploading a lipsync template.
+            &nbsp;started uploading a lipsync template.
           </span>
         );
         break;
       case "w2l_template_upload_completed":
         inner = (
           <span>
+            <FontAwesomeIcon icon={faFlagCheckered} className="me-3" />
             {gravatar}
             &nbsp;
             {userLink}
-            &nbsp; finished uploading a lipsync template.
+            &nbsp;finished uploading a lipsync template.
           </span>
         );
         break;
       case "w2l_inference_started":
         inner = (
           <span>
+            <FontAwesomeIcon icon={faPlay} className="me-3" />
             {gravatar}
             &nbsp;
             {userLink}
-            &nbsp; started a W2L lipsync video
+            &nbsp;started a W2L lipsync video
           </span>
         );
         break;
       case "w2l_inference_completed":
         inner = (
           <span>
+            <FontAwesomeIcon icon={faFlagCheckered} className="me-3" />
             {gravatar}
             &nbsp;
             {userLink}
-            &nbsp; completed a W2L lipsync video
+            &nbsp;completed a W2L lipsync video
           </span>
         );
         break;
       case "twitter_mention":
         inner = (
           <span>
+            <FontAwesomeIcon icon={faTwitter} />
             {gravatar}
             &nbsp;
             {userLink}
-            &nbsp; mentioned us on twitter!
+            &nbsp;mentioned us on twitter!
           </span>
         );
         break;
       case "twitter_retweet":
         inner = (
           <span>
+            <FontAwesomeIcon icon={faTwitter} />
             {gravatar}
             &nbsp;
             {userLink}
-            &nbsp; retweeted us!
+            &nbsp;retweeted us!
           </span>
         );
         break;
       case "discord_join":
         inner = (
           <span>
+            <FontAwesomeIcon icon={faDiscord} />
             {gravatar}
             &nbsp;
             {userLink}
-            &nbsp; joined discord!
+            &nbsp;joined discord!
           </span>
         );
         break;
       case "discord_message":
         inner = (
           <span>
+            <FontAwesomeIcon icon={faDiscord} />
             {gravatar}
             &nbsp;
             {userLink}
-            &nbsp; sent a discord message
+            &nbsp;sent a discord message
           </span>
         );
         break;
       case "twitch_subscribe":
         inner = (
           <span>
+            <FontAwesomeIcon icon={faTwitch} />
             {gravatar}
             &nbsp;
             {userLink}
-            &nbsp; subscribed to us on twitch!
+            &nbsp;subscribed to us on twitch!
           </span>
         );
         break;
       case "twitch_follow":
         inner = (
           <span>
+            <FontAwesomeIcon icon={faTwitch} />
             {gravatar}
             &nbsp;
             {userLink}
-            &nbsp; followed us on twitch!
+            &nbsp;followed us on twitch!
           </span>
         );
         break;
@@ -261,20 +294,32 @@ function FirehoseEventListFc(props: Props) {
         return;
     }
 
-    eventItems.push(<li key={event.event_token}>{inner}</li>);
+    if (!USE_REFRESH) {
+      eventItems.push(<li key={event.event_token}>{inner}</li>);
+    } else {
+      eventItems.push(
+        <li className="panel p-3 p-lg-3" key={event.event_token}>
+          {inner}
+        </li>
+      );
+    }
   });
 
   if (!USE_REFRESH) {
     return (
       <div>
         <h1 className="title is-1"> Firehose event feed </h1>
-        <h1 className="subtitle is-3"> The latest <em>FakeYou</em> events refreshed every few seconds</h1>
+        <h1 className="subtitle is-3">
+          {" "}
+          The latest <em>FakeYou</em> events refreshed every few seconds
+        </h1>
 
         <div className="content is-large">
-          <p>As you can see, we're <em>really</em> popular. But we owe it to you, our users. Thank you!</p>
-          <ul>
-            {eventItems}
-          </ul>
+          <p>
+            As you can see, we're <em>really</em> popular. But we owe it to you,
+            our users. Thank you!
+          </p>
+          <ul>{eventItems}</ul>
         </div>
       </div>
     );
@@ -282,21 +327,25 @@ function FirehoseEventListFc(props: Props) {
 
   return (
     <div>
-      <div className="container py-5">
-        <div className="d-flex flex-column">
-          <h1 className="display-5 fw-bold">Firehose Event Feed</h1>
-          <h4 className="mb-4">
-            The latest FakeYou events refreshed every few seconds.
-          </h4>
-          <p className="lead">
-            As you can see, we're really popular. But we owe it to you, our
-            users. Thank you!
-          </p>
-        </div>
+      <div className="container py-5 px-md-4 px-lg-5 px-xl-3">
+        <Fade bottom cascade duration={duration} distance={distance}>
+          <div className="d-flex flex-column">
+            <h1 className="display-5 fw-bold">Firehose Event Feed</h1>
+            <h4 className="mb-4">
+              The latest FakeYou events refreshed every few seconds.
+            </h4>
+            <p className="lead">
+              As you can see, we're really popular. But we owe it to you, our
+              users. Thank you!
+            </p>
+          </div>
+        </Fade>
       </div>
 
-      <div className="container-panel pb-5 d-flex flex-column gap-3">
-        <ul>{eventItems}</ul>
+      <div className="container-panel pb-5">
+        <Fade right cascade delay={delay} duration={duration} distance="100px">
+          <ul className="firehose-ul d-flex flex-column gap-4">{eventItems}</ul>
+        </Fade>
       </div>
     </div>
   );

@@ -1,23 +1,30 @@
-import React, { useCallback, useEffect, useState }  from 'react';
-import { ApiConfig } from '@storyteller/components';
-import { useHistory } from 'react-router-dom';
-import { SessionWrapper } from '@storyteller/components/src/session/SessionWrapper';
-import { useParams } from 'react-router-dom';
-import { GetUserByUsername, GetUserByUsernameIsOk, User } from '../../../api/user/GetUserByUsername';
-import { BackLink } from '../../_common/BackLink';
+import React, { useCallback, useEffect, useState } from "react";
+import { ApiConfig } from "@storyteller/components";
+import { useHistory } from "react-router-dom";
+import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
+import { useParams } from "react-router-dom";
+import {
+  GetUserByUsername,
+  GetUserByUsernameIsOk,
+  User,
+} from "../../../api/user/GetUserByUsername";
+import { BackLink } from "../../_common/BackLink";
+import { distance, duration, delay, delay2 } from "../../../../data/animation";
+
+const Fade = require("react-reveal/Fade");
 
 interface Props {
-  sessionWrapper: SessionWrapper,
+  sessionWrapper: SessionWrapper;
 }
 
 function ProfileBanFc(props: Props) {
-  const { username } : { username: string }= useParams();
+  const { username }: { username: string } = useParams();
   const userProfilePage = `/profile/${username}`;
 
   const history = useHistory();
 
   // From endpoint
-  const [userData, setUserData] = useState<User|undefined>(undefined);
+  const [userData, setUserData] = useState<User | undefined>(undefined);
 
   // Form values
   const [modComments, setModComments] = useState<string>("");
@@ -36,7 +43,7 @@ function ProfileBanFc(props: Props) {
     getUserProfile(username);
   }, [username, getUserProfile]);
 
-  const handleFormSubmit = (ev: React.FormEvent<HTMLFormElement>) : boolean => {
+  const handleFormSubmit = (ev: React.FormEvent<HTMLFormElement>): boolean => {
     ev.preventDefault();
 
     const api = new ApiConfig();
@@ -46,29 +53,27 @@ function ProfileBanFc(props: Props) {
       username: userData?.username,
       is_banned: isBanned,
       mod_notes: modComments,
-    }
+    };
 
     fetch(endpointUrl, {
-      method: 'POST',
+      method: "POST",
       headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json',
+        Accept: "application/json",
+        "Content-Type": "application/json",
       },
-      credentials: 'include',
+      credentials: "include",
       body: JSON.stringify(request),
     })
-    .then(res => res.json())
-    .then(res => {
-      if (res.success) {
-        history.push(userProfilePage);
-      }
-    })
-    .catch(e => {
-    });
+      .then((res) => res.json())
+      .then((res) => {
+        if (res.success) {
+          history.push(userProfilePage);
+        }
+      })
+      .catch((e) => {});
 
     return false;
-  }
-
+  };
 
   if (!userData) {
     // Waiting for load.
@@ -80,8 +85,7 @@ function ProfileBanFc(props: Props) {
     history.push(userProfilePage);
   }
 
-
-  const handleModCommentsChange = (ev: React.FormEvent<HTMLInputElement>) => { 
+  const handleModCommentsChange = (ev: React.FormEvent<HTMLInputElement>) => {
     ev.preventDefault();
     const textValue = (ev.target as HTMLInputElement).value;
     setModComments(textValue);
@@ -98,75 +102,95 @@ function ProfileBanFc(props: Props) {
         bannedState = true;
         break;
     }
-    setIsBanned(bannedState)
+    setIsBanned(bannedState);
   };
 
   let viewLinkUrl = `/profile/${userData?.username}`;
 
   let isDisabled = userData === undefined;
 
-
   return (
     <div>
-      <h2 className="subtitle is-2">Profile &amp; Preferences</h2>
-
-      <BackLink link={viewLinkUrl} text="Back to profile" />
-
-      <br />
-      <br />
+      <Fade bottom cascade duration={duration} distance={distance}>
+        <div className="container pt-5 pb-4 px-lg-5 px-xl-3">
+          <h2 className="display-5 fw-bold mb-3">Profile &amp; Preferences</h2>
+          <div>
+            <BackLink link={viewLinkUrl} text="Back to profile" />
+          </div>
+        </div>
+      </Fade>
 
       <form onSubmit={handleFormSubmit}>
         <fieldset disabled={isDisabled}>
+          <Fade
+            bottom
+            cascade
+            duration={duration}
+            distance={distance}
+            delay={delay}
+          >
+            <div className="container-panel py-5">
+              <div className="panel p-3 p-lg-4">
+                <h2 className="panel-title fw-bold">Ban/Unban User</h2>
+                <div className="py-6">
+                  <div className="d-flex flex-column gap-4">
+                    <div>
+                      <label className="sub-title">Is Banned?</label>
+                      <div className="form-group">
+                        <select
+                          name="default_pretrained_vocoder"
+                          onChange={handleIsBannedChange}
+                          value={isBanned ? "true" : "false"}
+                          className="form-select"
+                        >
+                          <option value="true">Banned</option>
+                          <option value="false">Not Banned</option>
+                        </select>
+                      </div>
+                    </div>
 
-          <div className="field">
-            <label className="label">Is Banned?</label>
-            <div className="control select">
-              <select 
-                name="default_pretrained_vocoder" 
-                onChange={handleIsBannedChange}
-                value={isBanned ? "true" : "false"}
-                >
-                <option value="true">Banned</option>
-                <option value="false">Not Banned</option>
-              </select>
+                    <div>
+                      <label className="sub-title">
+                        Moderator Comments (Short)
+                      </label>
+                      <div className="control has-icons-left has-icons-right">
+                        <input
+                          onChange={handleModCommentsChange}
+                          className="form-control"
+                          type="text"
+                          placeholder="Moderator Comments"
+                          value={modComments}
+                        />
+                      </div>
+                    </div>
+
+                    {/*<p className="help">{invalidReason}</p>*/}
+                  </div>
+                </div>
+              </div>
             </div>
-          </div>
+          </Fade>
 
-          <div className="field">
-            <label className="label">Moderator Comments (Short)</label>
-            <div className="control has-icons-left has-icons-right">
-              <input 
-                onChange={handleModCommentsChange}
-                className="input" 
-                type="text" 
-                placeholder="Moderator Comments" 
-                value={modComments}
-                />
+          <Fade bottom duration={duration} distance={distance} delay={delay2}>
+            <div className="container">
+              <button className="btn btn-primary w-100">Update Ban</button>
             </div>
-            {/*<p className="help">{invalidReason}</p>*/}
-          </div>
-
-
-          <br />
-
-          <button className="button is-danger is-large is-fullwidth">Update Ban</button>
-
+          </Fade>
         </fieldset>
       </form>
 
-      <br />
-
-      <div>
-        <p>Notes on banned users:</p>
-        <ul>
-          <li></li>
-          <li></li>
-          <li></li>
-        </ul>
-      </div>
-
+      <Fade bottom duration={duration} distance={distance} delay={delay2}>
+        <div className="container py-5">
+          <p>Notes on banned users:</p>
+          <ul>
+            <li></li>
+            <li></li>
+            <li></li>
+          </ul>
+        </div>
+      </Fade>
     </div>
-  )
+  );
 }
 
 export { ProfileBanFc };

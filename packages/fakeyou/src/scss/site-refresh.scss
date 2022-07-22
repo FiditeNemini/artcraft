@@ -6,7 +6,7 @@ styles with important tags:
 // Old design parents all elements with class "fakeyou-old"
 // Refresh design parents all elements with class "fakeyou-refresh"
 //
-// The reason for this is that WebPack imports and packs all SCSS files, which 
+// The reason for this is that WebPack imports and packs all SCSS files, which
 // makes it impossible to dynamically change styles.
 //
 // Once the rollout is complete, this outer wrapper class can be removed.
@@ -54,6 +54,26 @@ styles with important tags:
     box-shadow: none !important;
   }
 
+  thead,
+  tbody {
+    border-color: rgba($white, 0.2) !important;
+  }
+
+  th {
+    color: $white;
+    font-weight: 700;
+    vertical-align: text-top;
+  }
+
+  td {
+    color: rgba($white, 0.8);
+    font-weight: 400;
+  }
+
+  .rounded {
+    border-radius: 8px !important;
+  }
+
   code {
     color: $primary;
     background-color: rgba($white, 0.06);
@@ -65,6 +85,10 @@ styles with important tags:
 
   .text-light {
     color: rgba($white, 0.7) !important;
+  }
+
+  .fw-semibold {
+    font-weight: 600;
   }
 
   .container {
@@ -85,12 +109,12 @@ styles with important tags:
 
   .py-6 {
     padding-top: 1.6rem !important;
-    padding-bottom: 0rem !important;
+    padding-bottom: 0.4rem !important;
   }
 
   .lead {
     color: rgba($white, 0.8);
-    font-size: 18px;
+    font-size: 17px;
   }
 
   .text-red {
@@ -113,9 +137,11 @@ styles with important tags:
     border: 2.5px solid;
     border-color: $primary !important;
     transition: 0.2s;
+    color: $white;
   }
   .btn-primary:hover {
     background-color: lighten($primary, 5%) !important;
+    color: $white;
   }
 
   .btn-secondary,
@@ -169,6 +195,18 @@ styles with important tags:
 
     h2.panel-title {
       margin-top: -32px;
+    }
+
+    a {
+      color: lighten($primary, 5%);
+
+      &:hover {
+        color: $primary;
+      }
+
+      &.btn {
+        color: $white;
+      }
     }
   }
 
@@ -253,6 +291,140 @@ styles with important tags:
       color: rgba($white, 0.6);
     }
   }
+
+  .firehose-ul {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  ul.patrons-list {
+    columns: 1;
+    list-style: none;
+  }
+
+  .form-check-input:checked {
+    background-color: $primary;
+    border-color: $primary;
+  }
+
+  .form-check-input:focus {
+    box-shadow: none;
+  }
+
+  .panel-border {
+    box-sizing: border-box;
+    box-shadow: inset 0px 0px 0px 4px lighten($primary, 5%);
+  }
+
+  ul.pricing-list {
+    list-style: none;
+  }
+
+  ul li {
+    @for $i from 1 through 20 {
+      &:nth-of-type(#{$i}) {
+        animation-delay: $i * 100ms !important;
+      }
+    }
+  }
+
+  dl,
+  ol,
+  ul {
+    margin-top: 0;
+    margin-bottom: 0rem;
+  }
+
+  .content p:not(:last-child) {
+    margin-bottom: 0.5rem;
+  }
+
+  tbody tr {
+    @for $i from 1 through 12 {
+      &:nth-of-type(#{$i}) {
+        animation-delay: $i * 20ms !important;
+      }
+    }
+  }
+
+  .video-card {
+    border-radius: 5px;
+    border: 5px solid;
+    border-color: #fff;
+    padding: 1rem;
+    position: relative;
+    width: 100%;
+    min-height: 220px;
+    transition: 0.2s;
+    overflow: clip;
+    z-index: 2;
+  }
+
+  .video-card:hover {
+    cursor: pointer;
+    border-color: #fc6b68;
+  }
+
+  .video-card:hover .video-card-body {
+    opacity: 1;
+  }
+
+  .video-card:hover .video-img {
+    transform: scale(1.05);
+    transition: 0.2s;
+  }
+
+  .video-img {
+    position: absolute;
+    object-fit: cover;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    pointer-events: none;
+    overflow: none;
+    transition: 0.2s;
+  }
+
+  .video-card-body {
+    position: absolute;
+    z-index: 2;
+    left: 0;
+    bottom: 0;
+    padding: 0.75rem;
+    width: 100%;
+    background: rgb(0, 0, 0);
+    background: linear-gradient(
+      180deg,
+      rgba(0, 0, 0, 0) 0%,
+      rgba(0, 0, 0, 0.5) 32%,
+      rgba(0, 0, 0, 1) 100%
+    );
+    opacity: 0;
+    transition: 0.2s;
+  }
+
+  .video-card-title {
+    font-size: 14px;
+  }
+
+  .video-card-text {
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.6);
+  }
+
+  .profile-social-icons {
+    font-size: 22px;
+  }
+
+  .w2l-ani .w2l-ani-item {
+    @for $i from 1 through 100 {
+      &:nth-of-type(#{$i}) {
+        animation-delay: $i * 50ms !important;
+      }
+    }
+  }
 }
 
 @media (min-width: 992px) {
@@ -295,6 +467,10 @@ styles with important tags:
 
     .panel {
       border-radius: 8px;
+    }
+
+    ul.patrons-list {
+      columns: 3;
     }
   }
 }

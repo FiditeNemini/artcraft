@@ -18,6 +18,7 @@ const FAKEYOU_TRANSLATIONS: any = {
           textToSpeech: 'Text to Speech',
           upload: 'Upload',
           video: 'Video',
+          pricing: 'Pricing'
         },
         topNav: {
           aboutUs: 'About Us',

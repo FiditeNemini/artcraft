@@ -1,32 +1,34 @@
-import React, { useState, useEffect } from 'react';
-import { ApiConfig } from '@storyteller/components';
+import React, { useState, useEffect } from "react";
+import { ApiConfig } from "@storyteller/components";
 import { Link } from "react-router-dom";
 //import { getRandomInt } from '../../../../v1/api/Utils';
-import { BucketConfig } from '@storyteller/components/src/api/BucketConfig';
+import { BucketConfig } from "@storyteller/components/src/api/BucketConfig";
+import { distance, duration } from "../../../../data/animation";
+const Fade = require("react-reveal/Fade");
 
 interface W2lTemplateListResponsePayload {
-  success: boolean,
-  templates: Array<W2lTemplate>,
+  success: boolean;
+  templates: Array<W2lTemplate>;
 }
 
 interface W2lTemplate {
-  template_token: string,
-  template_type: string,
-  creator_user_token: string,
-  username: string,
-  display_name: string,
-  title: string,
-  frame_width: number,
-  frame_height: number,
-  duration_millis: number,
-  maybe_image_object_name: string,
-  maybe_video_object_name: string,
-  created_at: string,
-  updated_at: string,
+  template_token: string;
+  template_type: string;
+  creator_user_token: string;
+  username: string;
+  display_name: string;
+  title: string;
+  frame_width: number;
+  frame_height: number;
+  duration_millis: number;
+  maybe_image_object_name: string;
+  maybe_video_object_name: string;
+  created_at: string;
+  updated_at: string;
 }
 
 interface Props {
-  username: string,
+  username: string;
 }
 
 function ProfileW2lTemplateListFc(props: Props) {
@@ -37,35 +39,40 @@ function ProfileW2lTemplateListFc(props: Props) {
     const endpointUrl = api.listW2lTemplatesForUser(props.username);
 
     fetch(endpointUrl, {
-      method: 'GET',
+      method: "GET",
       headers: {
-        'Accept': 'application/json',
+        Accept: "application/json",
       },
-      credentials: 'include',
+      credentials: "include",
     })
-    .then(res => res.json())
-    .then(res => {
-      const templatesResponse : W2lTemplateListResponsePayload  = res;
-      if (!templatesResponse.success) {
-        return;
-      }
+      .then((res) => res.json())
+      .then((res) => {
+        const templatesResponse: W2lTemplateListResponsePayload = res;
+        if (!templatesResponse.success) {
+          return;
+        }
 
-      setW2lTemplates(templatesResponse.templates)
-    })
-    .catch(e => {
-      //this.props.onSpeakErrorCallback();
-    });
+        setW2lTemplates(templatesResponse.templates);
+      })
+      .catch((e) => {
+        //this.props.onSpeakErrorCallback();
+      });
   }, [props.username]); // NB: Empty array dependency sets to run ONLY on mount
 
-  
-  let templateElements : Array<JSX.Element> = [];
+  let templateElements: Array<JSX.Element> = [];
 
-  w2lTemplates.forEach(t => {
+  w2lTemplates.slice(0, 8).forEach((t) => {
     let object = null;
-    
-    if (t.maybe_image_object_name !== undefined && t.maybe_image_object_name !== null) {
+
+    if (
+      t.maybe_image_object_name !== undefined &&
+      t.maybe_image_object_name !== null
+    ) {
       object = t.maybe_image_object_name;
-    } else if (t.maybe_video_object_name !== undefined && t.maybe_video_object_name !== null) {
+    } else if (
+      t.maybe_video_object_name !== undefined &&
+      t.maybe_video_object_name !== null
+    ) {
       object = t.maybe_video_object_name;
     } else {
       console.warn(`No image for template ${t.template_token}`);
@@ -75,34 +82,40 @@ function ProfileW2lTemplateListFc(props: Props) {
     let url = new BucketConfig().getGcsUrl(object);
 
     let link = `/w2l/${t.template_token}`;
-  
-    templateElements.push((
-      <div className="tile is-parent" key={t.template_token}>
-        <article className="tile is-child box">
-          {/*<p className="title">One</p>*/}
-          <Link to={link}><img src={url} alt="" /></Link>
-        </article>
+
+    templateElements.push(
+      <div className="video-card">
+        <div className="video-card-body d-flex flex-column">
+          <h6 className="video-card-title mb-1">Title</h6>
+          <p className="video-card-text">by NAME</p>
+        </div>
+        <Link to={link}>
+          <img className="video-img" src={url} alt="" />
+        </Link>
       </div>
-    ));
+    );
   });
 
-  let allRowsOfTemplateElements : Array<JSX.Element> = [];
-  let rowOfTemplateElements : Array<JSX.Element> = [];
+  let allRowsOfTemplateElements: Array<JSX.Element> = [];
+  let rowOfTemplateElements: Array<JSX.Element> = [];
 
   //let nextRowSize = getRandomInt(3, 4);
-  let nextRowSize = 3;
+  let nextRowSize = 1;
 
   // NB: To prevent React spamming about children having unique key props
   let rowKey = "row0";
   let rowIndex = 0;
 
-  templateElements.forEach(el => {
+  templateElements.forEach((el) => {
     rowOfTemplateElements.push(el);
 
     if (rowOfTemplateElements.length === nextRowSize) {
       allRowsOfTemplateElements.push(
-        <div className="tile is-ancestor" key={rowKey}>
-          {rowOfTemplateElements.map(el => el)}
+        <div
+          className="col-sm-6 col-md-4 col-lg-3 d-flex w2l-ani-item"
+          key={rowKey}
+        >
+          {rowOfTemplateElements.map((el) => el)}
         </div>
       );
       rowOfTemplateElements = [];
@@ -120,18 +133,23 @@ function ProfileW2lTemplateListFc(props: Props) {
   // Make sure last row is built.
   if (rowOfTemplateElements.length !== 0) {
     allRowsOfTemplateElements.push(
-      <div className="tile is-ancestor" key={rowKey}>
-        {rowOfTemplateElements.map(el => el)}
+      <div
+        className="col-sm-6 col-md-4 col-lg-3 d-flex w2l-ani-item"
+        key={rowKey}
+      >
+        {rowOfTemplateElements.map((el) => el)}
       </div>
     );
     rowOfTemplateElements = [];
   }
 
   return (
-    <div>
-      {allRowsOfTemplateElements.map(el => el)}
-    </div>
-  )
+    <Fade bottom cascade duration={duration} distance={distance}>
+      <div className="row gy-4 w2l-ani">
+        {allRowsOfTemplateElements.map((el) => el)}
+      </div>
+    </Fade>
+  );
 }
 
 export { ProfileW2lTemplateListFc };
