@@ -1,19 +1,18 @@
-
 export interface ListTtsInferenceResultsForUserArgs {
-  username: string, 
-  cursor?: string,
-  cursor_is_reversed?: boolean,
-  sort_ascending?: boolean,
-  limit?: number
-};
+  username: string;
+  cursor?: string;
+  cursor_is_reversed?: boolean;
+  sort_ascending?: boolean;
+  limit?: number;
+}
 
 export interface ListW2lInferenceResultsForUserArgs {
-  username: string, 
-  cursor?: string,
-  cursor_is_reversed?: boolean,
-  sort_ascending?: boolean,
-  limit?: number
-};
+  username: string;
+  cursor?: string;
+  cursor_is_reversed?: boolean;
+  sort_ascending?: boolean;
+  limit?: number;
+}
 
 enum Domain {
   Localhost,
@@ -26,7 +25,6 @@ enum Domain {
 }
 
 class ApiConfig {
-  
   domain: Domain;
   useSsl: boolean;
   v2ApiHost: string;
@@ -36,7 +34,7 @@ class ApiConfig {
     let domain = Domain.Unknown;
 
     if (document.location.host.includes("localhost")) {
-      // NB: `localhost` seems to have problems with cookies. 
+      // NB: `localhost` seems to have problems with cookies.
       // I've added jungle.horse as a localhost mapped domain in /etc/hosts,
       // This should be the preferred mechanism for local testing.
       domain = Domain.Localhost;
@@ -44,7 +42,7 @@ class ApiConfig {
     } else if (document.location.host.includes("jungle.horse")) {
       // NB: Local dev.
       domain = Domain.JungleHorse;
-      useSsl = document.location.protocol === 'https:';
+      useSsl = document.location.protocol === "https:";
     } else if (document.location.host.includes("vo.codes")) {
       domain = Domain.Vocodes;
     } else if (document.location.host.includes("fakeyou.com")) {
@@ -60,7 +58,10 @@ class ApiConfig {
       v2ApiHost = "api.storyteller.io";
     } else if (domain === Domain.StorytellerStream) {
       v2ApiHost = "api.storyteller.stream";
-    } else if (!useSsl && (domain === Domain.Localhost || domain === Domain.JungleHorse)) {
+    } else if (
+      !useSsl &&
+      (domain === Domain.Localhost || domain === Domain.JungleHorse)
+    ) {
       // NB: Lack of SSL means use local development.
       v2ApiHost = "api.jungle.horse";
     } else if (domain === Domain.JungleHorse) {
@@ -73,68 +74,72 @@ class ApiConfig {
     this.v2ApiHost = v2ApiHost;
   }
 
-  speakEndpoint() : string {
-    return 'https://mumble.stream/speak_spectrogram';
+  speakEndpoint(): string {
+    return "https://mumble.stream/speak_spectrogram";
   }
 
-  speakSpectrogramEndpoint() : string {
-    return 'https://mumble.stream/speak_spectrogram';
+  speakSpectrogramEndpoint(): string {
+    return "https://mumble.stream/speak_spectrogram";
   }
 
-  createAccount() : string {
+  createAccount(): string {
     return `${this.getScheme()}://${this.getNewApiHost()}/create_account`;
   }
 
-  login() : string {
+  login(): string {
     return `${this.getScheme()}://${this.getNewApiHost()}/login`;
   }
 
-  logout() : string {
+  logout(): string {
     return `${this.getScheme()}://${this.getNewApiHost()}/logout`;
   }
 
-  sessionDetails() : string {
+  sessionDetails(): string {
     return `${this.getScheme()}://${this.getNewApiHost()}/session`;
   }
 
-  listTts() : string {
+  listTts(): string {
     return `${this.getScheme()}://${this.getNewApiHost()}/tts/list`;
   }
 
-  viewTtsModel(modelSlug: string) : string {
+  viewTtsModel(modelSlug: string): string {
     return `${this.getScheme()}://${this.getNewApiHost()}/tts/model/${modelSlug}`;
   }
 
-  deleteTtsModel(modelToken: string) : string {
+  deleteTtsModel(modelToken: string): string {
     return `${this.getScheme()}://${this.getNewApiHost()}/tts/model/${modelToken}/delete`;
   }
 
-  editTtsModel(modelToken: string) : string {
+  editTtsModel(modelToken: string): string {
     return `${this.getScheme()}://${this.getNewApiHost()}/tts/model/${modelToken}/edit`;
   }
 
-  getTtsModelUseCount(modelToken: string) : string {
+  getTtsModelUseCount(modelToken: string): string {
     return `${this.getScheme()}://${this.getNewApiHost()}/tts/model/${modelToken}/count`;
   }
 
-  viewTtsInferenceResult(token: string) : string {
+  viewTtsInferenceResult(token: string): string {
     return `${this.getScheme()}://${this.getNewApiHost()}/tts/result/${token}`;
   }
 
-  deleteTtsInferenceResult(resultToken: string) : string {
+  deleteTtsInferenceResult(resultToken: string): string {
     return `${this.getScheme()}://${this.getNewApiHost()}/tts/result/${resultToken}/delete`;
   }
 
-  editTtsInferenceResult(resultToken: string) : string {
+  editTtsInferenceResult(resultToken: string): string {
     return `${this.getScheme()}://${this.getNewApiHost()}/tts/result/${resultToken}/edit`;
   }
 
-  listTtsModelsForUser(username: string) : string {
+  listTtsModelsForUser(username: string): string {
     return `${this.getScheme()}://${this.getNewApiHost()}/user/${username}/tts_models`;
   }
 
-  listTtsInferenceResultsForUser(params: ListTtsInferenceResultsForUserArgs) : string {
-    const base_url = `${this.getScheme()}://${this.getNewApiHost()}/user/${params.username}/tts_results`;
+  listTtsInferenceResultsForUser(
+    params: ListTtsInferenceResultsForUserArgs
+  ): string {
+    const base_url = `${this.getScheme()}://${this.getNewApiHost()}/user/${
+      params.username
+    }/tts_results`;
 
     let query = "";
     let query_prepend = "?";
@@ -160,92 +165,96 @@ class ApiConfig {
     return base_url + query;
   }
 
-  getTtsInferenceJobState(jobToken: string) : string {
+  getTtsInferenceJobState(jobToken: string): string {
     return `${this.getScheme()}://${this.getNewApiHost()}/tts/job/${jobToken}`;
   }
 
-  getTtsModelUploadJobState(jobToken: string) : string {
+  getTtsModelUploadJobState(jobToken: string): string {
     return `${this.getScheme()}://${this.getNewApiHost()}/tts/upload_model_job/${jobToken}`;
   }
 
-  uploadTts() : string {
+  uploadTts(): string {
     return `${this.getScheme()}://${this.getNewApiHost()}/tts/upload`;
   }
 
-  uploadW2l() : string {
+  uploadW2l(): string {
     return `${this.getScheme()}://${this.getNewApiHost()}/w2l/upload`;
   }
 
-  listW2l() : string {
+  listW2l(): string {
     return `${this.getScheme()}://${this.getNewApiHost()}/w2l/list`;
   }
 
-  viewW2l(templateToken: string) : string {
+  viewW2l(templateToken: string): string {
     return `${this.getScheme()}://${this.getNewApiHost()}/w2l/template/${templateToken}`;
   }
 
-  viewW2lTemplate(templateToken: string) : string {
+  viewW2lTemplate(templateToken: string): string {
     return this.viewW2l(templateToken);
   }
 
-  editW2lTemplate(templateToken: string) : string {
+  editW2lTemplate(templateToken: string): string {
     return `${this.getScheme()}://${this.getNewApiHost()}/w2l/template/${templateToken}/edit`;
   }
 
-  deleteW2lTemplate(templateToken: string) : string {
+  deleteW2lTemplate(templateToken: string): string {
     return `${this.getScheme()}://${this.getNewApiHost()}/w2l/template/${templateToken}/delete`;
   }
 
-  getW2lTemplateUseCount(templateSlug: string) : string {
+  getW2lTemplateUseCount(templateSlug: string): string {
     return `${this.getScheme()}://${this.getNewApiHost()}/w2l/template/${templateSlug}/count`;
   }
 
-  moderateW2l(templateSlug: string) : string {
+  moderateW2l(templateSlug: string): string {
     return `${this.getScheme()}://${this.getNewApiHost()}/w2l/template/${templateSlug}/moderate`;
   }
 
-  viewW2lInferenceResult(token: string) : string {
+  viewW2lInferenceResult(token: string): string {
     return `${this.getScheme()}://${this.getNewApiHost()}/w2l/result/${token}`;
   }
 
-  editW2lInferenceResult(token: string) : string {
+  editW2lInferenceResult(token: string): string {
     return `${this.getScheme()}://${this.getNewApiHost()}/w2l/result/${token}/edit`;
   }
 
-  deleteW2lInferenceResult(resultToken: string) : string {
+  deleteW2lInferenceResult(resultToken: string): string {
     return `${this.getScheme()}://${this.getNewApiHost()}/w2l/result/${resultToken}/delete`;
   }
 
-  inferTts() : string {
+  inferTts(): string {
     return `${this.getScheme()}://${this.getNewApiHost()}/tts/inference`;
   }
 
-  inferW2l() : string {
+  inferW2l(): string {
     return `${this.getScheme()}://${this.getNewApiHost()}/w2l/inference`;
   }
 
-  getProfile(username: string) : string {
+  getProfile(username: string): string {
     return `${this.getScheme()}://${this.getNewApiHost()}/user/${username}/profile`;
   }
 
-  editProfile(username: string) : string {
+  editProfile(username: string): string {
     return `${this.getScheme()}://${this.getNewApiHost()}/user/${username}/edit_profile`;
   }
 
-  listW2lTemplatesForUser(username: string) : string {
+  listW2lTemplatesForUser(username: string): string {
     return `${this.getScheme()}://${this.getNewApiHost()}/user/${username}/w2l_templates`;
   }
 
-  getW2lInferenceJobState(jobToken: string) : string {
+  getW2lInferenceJobState(jobToken: string): string {
     return `${this.getScheme()}://${this.getNewApiHost()}/w2l/job/${jobToken}`;
   }
 
-  getW2lTemplateUploadJobState(jobToken: string) : string {
+  getW2lTemplateUploadJobState(jobToken: string): string {
     return `${this.getScheme()}://${this.getNewApiHost()}/w2l/upload_template_job/${jobToken}`;
   }
 
-  listW2lInferenceResultsForUser(params: ListTtsInferenceResultsForUserArgs) : string {
-    const base_url = `${this.getScheme()}://${this.getNewApiHost()}/user/${params.username}/w2l_results`;
+  listW2lInferenceResultsForUser(
+    params: ListTtsInferenceResultsForUserArgs
+  ): string {
+    const base_url = `${this.getScheme()}://${this.getNewApiHost()}/user/${
+      params.username
+    }/w2l_results`;
 
     let query = "";
     let query_prepend = "?";
@@ -270,32 +279,32 @@ class ApiConfig {
 
     return base_url + query;
   }
-  
-  createCategory() : string {
+
+  createCategory(): string {
     return `${this.getScheme()}://${this.getNewApiHost()}/category/create`;
   }
 
-  getCategory(categoryToken: string) : string {
+  getCategory(categoryToken: string): string {
     return `${this.getScheme()}://${this.getNewApiHost()}/category/view/${categoryToken}`;
   }
 
-  assignTtsCategory() : string {
+  assignTtsCategory(): string {
     return `${this.getScheme()}://${this.getNewApiHost()}/category/assign/tts`;
   }
 
-  listTtsCategories() : string {
+  listTtsCategories(): string {
     return `${this.getScheme()}://${this.getNewApiHost()}/category/list/tts`;
   }
 
-  listTtsCategoriesForModel(ttsModelToken: string) : string {
+  listTtsCategoriesForModel(ttsModelToken: string): string {
     return `${this.getScheme()}://${this.getNewApiHost()}/category/assignments/tts/${ttsModelToken}`;
   }
 
-  firehoseEvents() : string {
+  firehoseEvents(): string {
     return `${this.getScheme()}://${this.getNewApiHost()}/events`;
   }
 
-  getLeaderboard() : string {
+  getLeaderboard(): string {
     return `${this.getScheme()}://${this.getNewApiHost()}/leaderboard`;
   }
 
@@ -315,27 +324,27 @@ class ApiConfig {
     return `${this.getScheme()}://${this.getNewApiHost()}/moderation/ip_bans/${ipAddress}/delete`;
   }
 
-  banUser() : string {
+  banUser(): string {
     return `${this.getScheme()}://${this.getNewApiHost()}/moderation/user_bans/manage_ban`;
   }
 
-  getModerationUserList() : string {
+  getModerationUserList(): string {
     return `${this.getScheme()}://${this.getNewApiHost()}/moderation/user/list`;
   }
 
-  getTtsVoiceInventoryStats() : string {
+  getTtsVoiceInventoryStats(): string {
     return `${this.getScheme()}://${this.getNewApiHost()}/moderation/stats/tts_voices`;
   }
 
-  getTtsInferenceStats() : string {
+  getTtsInferenceStats(): string {
     return `${this.getScheme()}://${this.getNewApiHost()}/moderation/jobs/tts_inference_queue_stats`;
   }
 
-  killTtsInferenceJobs() : string {
+  killTtsInferenceJobs(): string {
     return `${this.getScheme()}://${this.getNewApiHost()}/moderation/jobs/kill_tts_inference_jobs`;
   }
 
-  getW2lInferenceStats() : string {
+  getW2lInferenceStats(): string {
     return `${this.getScheme()}://${this.getNewApiHost()}/moderation/jobs/w2l_inference_queue_stats`;
   }
 
@@ -347,59 +356,59 @@ class ApiConfig {
     return `${this.getScheme()}://${this.getNewApiHost()}/moderation/categories/tts/list`;
   }
 
-  moderatorEditCategory(categoryToken: string) : string {
+  moderatorEditCategory(categoryToken: string): string {
     return `${this.getScheme()}://${this.getNewApiHost()}/moderation/categories/${categoryToken}/edit`;
   }
 
-  moderatorSetCategoryDeletionState(categoryToken: string) : string {
+  moderatorSetCategoryDeletionState(categoryToken: string): string {
     return `${this.getScheme()}://${this.getNewApiHost()}/moderation/categories/${categoryToken}/delete`;
   }
 
-  detectLocale() : string {
+  detectLocale(): string {
     return `${this.getScheme()}://${this.getNewApiHost()}/detect_locale`;
   }
 
-  createVoiceCloneRequest() : string {
+  createVoiceCloneRequest(): string {
     return `${this.getScheme()}://${this.getNewApiHost()}/voice_clone_requests/create`;
   }
 
-  checkVoiceCloneRequest() : string {
+  checkVoiceCloneRequest(): string {
     return `${this.getScheme()}://${this.getNewApiHost()}/voice_clone_requests/check`;
   }
 
   // =============== Storyteller-specific ===============
 
-  listTwitchEventRules() : string {
+  listTwitchEventRules(): string {
     return `${this.getScheme()}://${this.getNewApiHost()}/twitch/event_rule/list`;
   }
 
-  createTwitchEventRule() : string {
+  createTwitchEventRule(): string {
     return `${this.getScheme()}://${this.getNewApiHost()}/twitch/event_rule/create`;
   }
 
-  reorderTwitchEventRules() : string {
+  reorderTwitchEventRules(): string {
     return `${this.getScheme()}://${this.getNewApiHost()}/twitch/event_rule/reorder`;
   }
 
-  getTwitchEventRule(eventRuleToken: string) : string {
+  getTwitchEventRule(eventRuleToken: string): string {
     return `${this.getScheme()}://${this.getNewApiHost()}/twitch/event_rule/${eventRuleToken}/info`;
   }
 
-  editTwitchEventRule(eventRuleToken: string) : string {
+  editTwitchEventRule(eventRuleToken: string): string {
     return `${this.getScheme()}://${this.getNewApiHost()}/twitch/event_rule/${eventRuleToken}/update`;
   }
 
-  deleteTwitchEventRule(eventRuleToken: string) : string {
+  deleteTwitchEventRule(eventRuleToken: string): string {
     return `${this.getScheme()}://${this.getNewApiHost()}/twitch/event_rule/${eventRuleToken}/delete`;
   }
 
   // =============== Twitch OAuth ===============
 
-  checkTwitchOauthStatus() : string {
+  checkTwitchOauthStatus(): string {
     return `${this.getScheme()}://${this.getNewApiHost()}/twitch/oauth/check`;
   }
 
-  obsEventsWebsocket(twitchUsername: string) : string {
+  obsEventsWebsocket(twitchUsername: string): string {
     if (this.domain === Domain.Localhost) {
       return `ws://localhost:54321/obs/${twitchUsername}`;
     } else if (this.domain === Domain.JungleHorse) {
@@ -411,13 +420,13 @@ class ApiConfig {
     //return `wss://obs.storyteller.io/obs/${twitchUsername}`;
   }
 
-  private getScheme() : string {
+  private getScheme(): string {
     return this.useSsl ? "https" : "http";
   }
 
-  private getNewApiHost() : string {
+  private getNewApiHost(): string {
     return this.v2ApiHost;
   }
 }
 
-export { ApiConfig }
+export { ApiConfig };

@@ -425,6 +425,10 @@ styles with important tags:
       }
     }
   }
+
+  .tts-result-table tbody tr th {
+    width: 35%;
+  }
 }
 
 @media (min-width: 992px) {

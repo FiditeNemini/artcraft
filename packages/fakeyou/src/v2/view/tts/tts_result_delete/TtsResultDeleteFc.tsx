@@ -166,15 +166,13 @@ function TtsResultDeleteFc(props: Props) {
 
   const buttonTitle = currentlyDeleted ? "Confirm Undelete" : "Confirm Delete";
 
-  const buttonCss = currentlyDeleted ? 
-    "button is-warning is-large is-fullwidth" :
-    "button is-danger is-large is-fullwidth";
-
   const formLabel = currentlyDeleted ? 
      "Recover the TTS Result (makes it visible again)" : 
      "Delete TTS Result (hides from everyone but mods)";
 
   return (
+    <div className="container-panel pt-3 pb-5">
+    <div className="panel p-3 p-lg-4">
     <div>
       <h1 className="title is-1"> {h1Title} </h1>
 
@@ -225,14 +223,15 @@ function TtsResultDeleteFc(props: Props) {
 
         </tbody>
       </table>
-
+      </div>
+      </div>
       <br />
 
       <form onSubmit={handleDeleteFormSubmit}>
-        <label className="label">{formLabel}</label>
+        <label className="panel-title fw-bold">{formLabel}</label>
 
         <p className="control">
-          <button className={buttonCss}>
+          <button className=" btn btn-primary w-100 mt-4">
             {buttonTitle}
           </button>
         </p>

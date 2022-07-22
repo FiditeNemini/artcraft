@@ -406,7 +406,7 @@ function TtsModelViewFc(props: Props) {
         <tbody>
           <tr>
             <td colSpan={2}>
-              <h4 className="subtitle is-4"> Model Details </h4>
+              <h4 className="subtitle is-4"> Model Details. </h4>
             </td>
           </tr>
           <tr>
