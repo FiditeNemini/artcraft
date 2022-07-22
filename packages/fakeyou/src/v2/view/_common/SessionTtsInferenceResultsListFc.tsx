@@ -9,7 +9,7 @@ import {
   faList,
   faMicrophone,
 } from "@fortawesome/free-solid-svg-icons";
-import { distance, delay, delay2, duration } from "../../../data/animation";
+import { distance, duration } from "../../../data/animation";
 const Fade = require("react-reveal/Fade");
 
 interface Props {
