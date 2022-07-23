@@ -1,85 +1,115 @@
-import React, { useState } from 'react';
-import { SessionWrapper } from '@storyteller/components/src/session/SessionWrapper';
+import React, { useState } from "react";
+import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
 import { Link, useHistory } from "react-router-dom";
-import { v4 as uuidv4 } from 'uuid';
-import { CreateCategory, CreateCategoryIsError, CreateCategoryIsSuccess, CreateCategoryRequest } from '../../api/category/CreateCategory';
-import { BackLink } from '../_common/BackLink';
-import { FrontendUrlConfig } from '../../../common/FrontendUrlConfig';
+import { v4 as uuidv4 } from "uuid";
+import {
+  CreateCategory,
+  CreateCategoryIsError,
+  CreateCategoryIsSuccess,
+  CreateCategoryRequest,
+} from "../../api/category/CreateCategory";
+import { BackLink } from "../_common/BackLink";
+import { FrontendUrlConfig } from "../../../common/FrontendUrlConfig";
+import { distance, duration, delay, delay2 } from "../../../data/animation";
+
+const Fade = require("react-reveal/Fade");
 
 const DEFAULT_CAN_DIRECTLY_HAVE_MODELS = true;
 const DEFAULT_CAN_HAVE_SUBCATEGORIES = false;
 const DEFAULT_CAN_ONLY_MODS_APPLY = false;
 
 interface Props {
-  sessionWrapper: SessionWrapper,
+  sessionWrapper: SessionWrapper;
 }
 
 function CreateCategoryPage(props: Props) {
   let history = useHistory();
 
   // Request
-  const [name, setName] = useState('');
-  const [modelType, setModelType] = useState('tts');
-  const [canDirectlyHaveModels, setCanDirectlyHaveModels] = useState(DEFAULT_CAN_DIRECTLY_HAVE_MODELS);
-  const [canHaveSubcategories, setCanHaveSubcategories] = useState(DEFAULT_CAN_HAVE_SUBCATEGORIES);
-  const [canOnlyModsApply, setCanOnlyModsApply] = useState(DEFAULT_CAN_ONLY_MODS_APPLY);
+  const [name, setName] = useState("");
+  const [modelType, setModelType] = useState("tts");
+  const [canDirectlyHaveModels, setCanDirectlyHaveModels] = useState(
+    DEFAULT_CAN_DIRECTLY_HAVE_MODELS
+  );
+  const [canHaveSubcategories, setCanHaveSubcategories] = useState(
+    DEFAULT_CAN_HAVE_SUBCATEGORIES
+  );
+  const [canOnlyModsApply, setCanOnlyModsApply] = useState(
+    DEFAULT_CAN_ONLY_MODS_APPLY
+  );
 
   // Auto generated
   const [idempotencyToken, setIdempotencyToken] = useState(uuidv4());
 
   // Errors
-  const [errorMessage, setErrorMessage] = useState<string|undefined>(undefined);
+  const [errorMessage, setErrorMessage] = useState<string | undefined>(
+    undefined
+  );
 
   if (!props.sessionWrapper.isLoggedIn()) {
-    return <div>You need to create an account or sign in.</div>
+    return <div>You need to create an account or sign in.</div>;
   }
 
-  const maybeRecalculateIdempotencyToken = <T, >(before: T, after: T) => {
+  const maybeRecalculateIdempotencyToken = <T,>(before: T, after: T) => {
     if (before === after) return;
     setIdempotencyToken(uuidv4());
-  }
+  };
 
   const handleNameChange = (ev: React.FormEvent<HTMLInputElement>) => {
     const newName = (ev.target as HTMLInputElement).value;
     maybeRecalculateIdempotencyToken(name, newName);
     setName(newName);
-  }
+  };
 
   const handleModelTypeChange = (ev: React.FormEvent<HTMLSelectElement>) => {
     const newModelType = (ev.target as HTMLSelectElement).value;
     maybeRecalculateIdempotencyToken(modelType, newModelType);
     setModelType(newModelType);
-  }
+  };
 
-  const handleCanDirectlyHaveModelsChange = (ev: React.FormEvent<HTMLInputElement>) => {
+  const handleCanDirectlyHaveModelsChange = (
+    ev: React.FormEvent<HTMLInputElement>
+  ) => {
     const newCanDirectlyHaveModels = (ev.target as HTMLInputElement).checked;
-    maybeRecalculateIdempotencyToken(canDirectlyHaveModels, newCanDirectlyHaveModels);
+    maybeRecalculateIdempotencyToken(
+      canDirectlyHaveModels,
+      newCanDirectlyHaveModels
+    );
     setCanDirectlyHaveModels(newCanDirectlyHaveModels);
-  }
+  };
 
-  const handleCanHaveSubcategoriesChange = (ev: React.FormEvent<HTMLInputElement>) => {
+  const handleCanHaveSubcategoriesChange = (
+    ev: React.FormEvent<HTMLInputElement>
+  ) => {
     const newCanHaveSubcategories = (ev.target as HTMLInputElement).checked;
-    maybeRecalculateIdempotencyToken(canHaveSubcategories, newCanHaveSubcategories);
+    maybeRecalculateIdempotencyToken(
+      canHaveSubcategories,
+      newCanHaveSubcategories
+    );
     setCanHaveSubcategories(newCanHaveSubcategories);
-  }
+  };
 
-  const handleCanOnlyModsApplyChange = (ev: React.FormEvent<HTMLInputElement>) => {
+  const handleCanOnlyModsApplyChange = (
+    ev: React.FormEvent<HTMLInputElement>
+  ) => {
     const newCanOnlyModsApply = (ev.target as HTMLInputElement).checked;
     maybeRecalculateIdempotencyToken(canOnlyModsApply, newCanOnlyModsApply);
     setCanOnlyModsApply(newCanOnlyModsApply);
-  }
+  };
 
-  const handleFormSubmit = async (ev: React.FormEvent<HTMLFormElement>) : Promise<boolean> => {
+  const handleFormSubmit = async (
+    ev: React.FormEvent<HTMLFormElement>
+  ): Promise<boolean> => {
     ev.preventDefault();
 
     setErrorMessage(undefined);
 
-    let request : CreateCategoryRequest = {
+    let request: CreateCategoryRequest = {
       name: name,
       model_type: modelType,
       idempotency_token: idempotencyToken,
       can_directly_have_models: undefined,
-    }
+    };
 
     if (props.sessionWrapper.canEditCategories()) {
       // Moderator-only
@@ -91,13 +121,13 @@ function CreateCategoryPage(props: Props) {
     const response = await CreateCategory(request);
 
     if (CreateCategoryIsError(response)) {
-      setErrorMessage('there was an error with the request'); // TODO: Fix error serialization
+      setErrorMessage("there was an error with the request"); // TODO: Fix error serialization
     } else if (CreateCategoryIsSuccess(response)) {
-      history.push('/');
+      history.push("/");
     }
 
     return false;
-  }
+  };
 
   const isMod = props.sessionWrapper.canEditCategories();
   const categoryActionName = isMod ? "Create" : "Suggest";
@@ -107,11 +137,9 @@ function CreateCategoryPage(props: Props) {
   if (!!errorMessage) {
     errorFlash = (
       <>
-        <article className="message is-error">
-          <div className="message-body">
-            {errorMessage}
-          </div>
-        </article>
+        <div className="container">
+          <div className="alert alert-primary">{errorMessage}</div>
+        </div>
       </>
     );
   }
@@ -121,39 +149,44 @@ function CreateCategoryPage(props: Props) {
   if (isMod) {
     additionalModFields = (
       <>
-        <div className="control">
-          <label className="label">Moderator Options</label>
+        <div className="d-flex flex-column">
+          <label className="sub-title my-2">Moderator Options</label>
 
-          <label className="checkbox">
-            <input 
-              type="checkbox"
-              checked={canDirectlyHaveModels} 
-              onChange={handleCanDirectlyHaveModelsChange} />
-            &nbsp;Can this category be assigned to models? (If not, it's a super category.)
-          </label>
+          <div className="d-flex flex-column gap-3">
+            <label className="form-check-label">
+              <input
+                type="checkbox"
+                checked={canDirectlyHaveModels}
+                onChange={handleCanDirectlyHaveModelsChange}
+                className="form-check-input"
+              />
+              &nbsp; Can this category be assigned to models? (If not, it's a
+              super category.)
+            </label>
 
-          <br />
+            <label className="form-check-label">
+              <input
+                type="checkbox"
+                checked={canHaveSubcategories}
+                onChange={handleCanHaveSubcategoriesChange}
+                className="form-check-input"
+              />
+              &nbsp; Can this category have subcategories?
+            </label>
 
-          <label className="checkbox">
-            <input 
-              type="checkbox"
-              checked={canHaveSubcategories} 
-              onChange={handleCanHaveSubcategoriesChange} />
-            &nbsp;Can this category have subcategories?
-          </label>
-
-          <br />
-
-          <label className="checkbox">
-            <input 
-              type="checkbox"
-              checked={canOnlyModsApply} 
-              onChange={handleCanOnlyModsApplyChange} />
-            &nbsp;Can only mods apply this category?
-          </label>
+            <label className="form-check-label">
+              <input
+                type="checkbox"
+                checked={canOnlyModsApply}
+                onChange={handleCanOnlyModsApplyChange}
+                className="form-check-input"
+              />
+              &nbsp; Can only mods apply this category?
+            </label>
+          </div>
         </div>
       </>
-    )
+    );
   }
 
   let moderateCategoriesLink = undefined;
@@ -161,56 +194,96 @@ function CreateCategoryPage(props: Props) {
   if (props.sessionWrapper.canEditCategories()) {
     moderateCategoriesLink = (
       <>
-        <Link to={FrontendUrlConfig.moderationTtsCategoryList()}>Moderate categories</Link>
-        <br/>
-        <br/>
+        <Fade
+          bottom
+          cascade
+          duration={duration}
+          distance={distance}
+          delay={delay2}
+        >
+          <div className="container pt-4 pb-5">
+            <Link
+              to={FrontendUrlConfig.moderationTtsCategoryList()}
+              className="btn btn-secondary w-100"
+            >
+              Moderate categories
+            </Link>
+          </div>
+        </Fade>
       </>
-    )
+    );
   }
 
   return (
     <div>
-      <h1 className="title is-1"> {categoryActionName} Category </h1>
+      <Fade bottom cascade duration={duration} distance={distance}>
+        <div className="container pb-4 pt-5 px-md-4 px-lg-5 px-xl-3">
+          <h1 className="display-5 fw-bold">{categoryActionName} Category</h1>
+          <div className="pt-3">
+            <BackLink
+              link={FrontendUrlConfig.contributePage()}
+              text="Back to contribute page"
+            />
+          </div>
+        </div>
+      </Fade>
 
       {errorFlash}
 
-      <form onSubmit={handleFormSubmit}>
+      <Fade
+        bottom
+        cascade
+        duration={duration}
+        distance={distance}
+        delay={delay}
+      >
+        <form onSubmit={handleFormSubmit}>
+          <div className="container-panel pt-4 pb-5">
+            <div className="panel p-3 py-4 p-lg-4">
+              <div className="d-flex flex-column gap-4">
+                <div>
+                  <label className="sub-title">Category Name</label>
+                  <div className="form-group">
+                    <input
+                      className="form-control"
+                      type="text"
+                      placeholder="Category Name"
+                      value={name}
+                      onChange={handleNameChange}
+                    />
+                  </div>
+                </div>
 
-        <div className="field">
-          <label className="label">Category Name</label>
-          <div className="control">
-            <input className="input" type="text" placeholder="Category Name" value={name} onChange={handleNameChange} />
-          </div>
-        </div>
+                <div>
+                  <label className="sub-title">Category Type</label>
 
-        <div className="field">
-          <label className="label">Category Type</label>
-          <div className="control">
-            <div className="select is-info">
-              <select onChange={handleModelTypeChange}>
-                <option value="tts">TTS voice</option>
-                <option value="w2l">W2L video</option>
-              </select>
+                  <div className="form-group">
+                    <select
+                      onChange={handleModelTypeChange}
+                      className="form-select"
+                    >
+                      <option value="tts">TTS voice</option>
+                      <option value="w2l">W2L video</option>
+                    </select>
+                  </div>
+                </div>
+
+                {additionalModFields}
+              </div>
             </div>
           </div>
-        </div>
 
-        {additionalModFields}
-
-        <br />
-
-        <button className="button is-link is-large is-fullwidth"> {categoryActionName} </button>
-      </form>
-
-      <br />
+          <div className="container">
+            <button className="btn btn-primary w-100">
+              {categoryActionName}
+            </button>
+          </div>
+        </form>
+      </Fade>
 
       {moderateCategoriesLink}
-
-      <BackLink link={FrontendUrlConfig.contributePage()} text="Back to contribute page" />
-
-      <br />
     </div>
-  )
+  );
 }
 
 export { CreateCategoryPage };

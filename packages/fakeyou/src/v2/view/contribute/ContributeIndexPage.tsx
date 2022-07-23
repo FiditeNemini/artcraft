@@ -14,7 +14,7 @@ import {
   faTags,
   faHandsHelping,
 } from "@fortawesome/free-solid-svg-icons";
-import { distance, delay2, duration } from "../../../data/animation";
+import { distance, delay, duration } from "../../../data/animation";
 import { USE_REFRESH } from "../../../Refresh";
 const Fade = require("react-reveal/Fade");
 
@@ -123,7 +123,7 @@ function ContributeIndexPage(props: Props) {
 
   return (
     <div>
-      <div className="container py-5 pb-4 pb-lg-5 px-md-4 px-lg-5 px-xl-3">
+      <div className="container py-5 px-md-4 px-lg-5 px-xl-3">
         <Fade bottom cascade duration={duration} distance={distance}>
           <div className="d-flex flex-column">
             <h1 className="display-5 fw-bold">
@@ -143,15 +143,15 @@ function ContributeIndexPage(props: Props) {
         bottom
         cascade
         distance={distance}
-        delay={delay2}
+        delay={delay}
         duration={duration}
       >
-        <div className="container-panel pt-5 pb-5">
-          <div className="panel p-3 p-lg-4 load-hidden mt-3">
-            <h1 className="panel-title fw-bold">
+        <div className="container-panel pt-4 pb-5">
+          <div className="panel p-3 p-lg-4 mt-3">
+            <h2 className="panel-title fw-bold">
               <FontAwesomeIcon icon={faUpload} className="me-3" />
               {t("pages.contributeIndex.headingUploadModels")}
-            </h1>
+            </h2>
             <div className="py-6 d-flex flex-column gap-4">
               <p className="text-center text-lg-start">
                 <Trans i18nKey="pages.contributeIndex.describeUploadModels">
@@ -180,8 +180,8 @@ function ContributeIndexPage(props: Props) {
             </div>
           </div>
         </div>
-        <div className="container-panel pt-4 pb-4">
-          <div className="panel p-3 p-lg-4 load-hidden mt-lg-0">
+        <div className="container-panel pt-3 pb-5">
+          <div className="panel p-3 p-lg-4 mt-lg-0">
             <h2 className="panel-title fw-bold">
               <FontAwesomeIcon icon={faTags} className="me-3" />
               {categoryHeading}
@@ -191,14 +191,17 @@ function ContributeIndexPage(props: Props) {
                 {t("pages.contributeIndex.describeSuggest")}
               </p>
               <div className="d-flex gap-3">
-                <button className="btn btn-secondary w-100">
-                  Suggest category
-                </button>
+                <Link
+                  to={FrontendUrlConfig.createCategoryPage()}
+                  className="btn btn-secondary w-100"
+                >
+                  {categoryButton}
+                </Link>
               </div>
             </div>
           </div>
         </div>
-        <div className="container-panel py-5">
+        <div className="container-panel pt-3 pb-5">
           <div className="panel p-3 p-lg-4 load-hidden mt-lg-0">
             <h2 className="panel-title fw-bold">
               <FontAwesomeIcon icon={faHandsHelping} className="me-3" />
