@@ -1,32 +1,44 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import { Gravatar } from '@storyteller/components/src/elements/Gravatar';
-import { SessionWrapper } from '@storyteller/components/src/session/SessionWrapper';
-import { useParams, Link } from 'react-router-dom';
-import { ReportDiscordLinkFc } from '../../_common/DiscordReportLinkFc';
-import { BucketConfig } from '@storyteller/components/src/api/BucketConfig';
-import { HiddenIconFc } from '../../_icons/HiddenIcon';
-import { VisibleIconFc } from '../../_icons/VisibleIcon';
-import { FrontendUrlConfig } from '../../../../common/FrontendUrlConfig';
-import { DownloadIcon } from '../../_icons/DownloadIcon';
-import { GetW2lResult, GetW2lResultIsErr, GetW2lResultIsOk, W2lResult, W2lResultLookupError } from '../../../api/w2l/GetW2lResult';
-import { MetaTags } from '../../../../common/MetaTags';
+import React, { useState, useEffect, useCallback } from "react";
+import { Gravatar } from "@storyteller/components/src/elements/Gravatar";
+import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
+import { useParams, Link } from "react-router-dom";
+import { ReportDiscordLinkFc } from "../../_common/DiscordReportLinkFc";
+import { BucketConfig } from "@storyteller/components/src/api/BucketConfig";
+import { HiddenIconFc } from "../../_icons/HiddenIcon";
+import { VisibleIconFc } from "../../_icons/VisibleIcon";
+import { FrontendUrlConfig } from "../../../../common/FrontendUrlConfig";
+import {
+  GetW2lResult,
+  GetW2lResultIsErr,
+  GetW2lResultIsOk,
+  W2lResult,
+  W2lResultLookupError,
+} from "../../../api/w2l/GetW2lResult";
+import { MetaTags } from "../../../../common/MetaTags";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faDownload, faEdit, faTrash } from "@fortawesome/free-solid-svg-icons";
+import { distance, delay, duration } from "../../../../data/animation";
+
+const Fade = require("react-reveal/Fade");
 
 interface Props {
-  sessionWrapper: SessionWrapper,
+  sessionWrapper: SessionWrapper;
 }
 
 function W2lResultViewFc(props: Props) {
-  let { token } = useParams() as { token : string };
+  let { token } = useParams() as { token: string };
 
-  const [w2lInferenceResult, setW2lInferenceResult] = useState<W2lResult|undefined>(undefined);
+  const [w2lInferenceResult, setW2lInferenceResult] = useState<
+    W2lResult | undefined
+  >(undefined);
   const [notFoundState, setNotFoundState] = useState<boolean>(false);
 
   const getInferenceResult = useCallback(async (token) => {
     const templateResponse = await GetW2lResult(token);
     if (GetW2lResultIsOk(templateResponse)) {
-      setW2lInferenceResult(templateResponse)
+      setW2lInferenceResult(templateResponse);
     } else if (GetW2lResultIsErr(templateResponse)) {
-      switch(templateResponse) {
+      switch (templateResponse) {
         case W2lResultLookupError.NotFound:
           setNotFoundState(true);
           break;
@@ -39,58 +51,89 @@ function W2lResultViewFc(props: Props) {
   }, [token, getInferenceResult]); // NB: Empty array dependency sets to run ONLY on mount
 
   if (notFoundState) {
-    return (
-      <h1 className="title is-1">Template result not found</h1>
-    );
+    return <h1 className="title is-1">Template result not found</h1>;
   }
 
   if (!w2lInferenceResult) {
-    return <div />
+    return <div />;
   }
 
-  let videoLink = new BucketConfig().getGcsUrl(w2lInferenceResult?.public_bucket_video_path);
+  let videoLink = new BucketConfig().getGcsUrl(
+    w2lInferenceResult?.public_bucket_video_path
+  );
   let templateLink = `/w2l/${w2lInferenceResult.maybe_w2l_template_token}`;
-  let videoDownloadFilename = `vocodes-${w2lInferenceResult.w2l_result_token.replace(':', '')}.mp4`;
+  let videoDownloadFilename = `vocodes-${w2lInferenceResult.w2l_result_token.replace(
+    ":",
+    ""
+  )}.mp4`;
 
   MetaTags.setVideoUrl(videoLink);
-  MetaTags.setTitle('testing...');
+  MetaTags.setTitle("testing...");
 
   let durationSeconds = w2lInferenceResult?.duration_millis / 1000;
 
   let templateName = w2lInferenceResult.template_title;
 
-
   let moderatorRows = null;
 
-  if (props.sessionWrapper.canDeleteOtherUsersW2lResults() || props.sessionWrapper.canDeleteOtherUsersW2lTemplates()) {
+  if (
+    props.sessionWrapper.canDeleteOtherUsersW2lResults() ||
+    props.sessionWrapper.canDeleteOtherUsersW2lTemplates()
+  ) {
     moderatorRows = (
       <>
-        <tr>
-          <td colSpan={2}>
-            <br />
-            <h4 className="subtitle is-4"> Moderator Details </h4>
-          </td>
-        </tr>
-        <tr>
-          <th>Template creator is banned</th>
-          <td>{w2lInferenceResult?.maybe_moderator_fields?.template_creator_is_banned ? "banned" : "good standing" }</td>
-        </tr>
-        <tr>
-          <th>Result creator is banned (if user)</th>
-          <td>{w2lInferenceResult?.maybe_moderator_fields?.result_creator_is_banned_if_user ? "banned" : "good standing" }</td>
-        </tr>
-        <tr>
-          <th>Result creator IP address</th>
-          <td>{w2lInferenceResult?.maybe_moderator_fields?.result_creator_ip_address || "server error"}</td>
-        </tr>
-        <tr>
-          <th>Mod deleted at (UTC)</th>
-          <td>{w2lInferenceResult?.maybe_moderator_fields?.mod_deleted_at || "not deleted"}</td>
-        </tr>
-        <tr>
-          <th>Result creator deleted at (UTC)</th>
-          <td>{w2lInferenceResult?.maybe_moderator_fields?.result_creator_deleted_at || "not deleted"}</td>
-        </tr>
+        <Fade bottom duration={duration} distance={distance} delay={delay}>
+          <div className="container-panel pt-3 pb-5">
+            <div className="panel p-3 p-lg-4">
+              <h2 className="panel-title fw-bold">Moderator Details</h2>
+              <div className="py-6">
+                <table className="table">
+                  <tbody>
+                    <tr>
+                      <th>Template creator is banned</th>
+                      <td>
+                        {w2lInferenceResult?.maybe_moderator_fields
+                          ?.template_creator_is_banned
+                          ? "banned"
+                          : "good standing"}
+                      </td>
+                    </tr>
+                    <tr>
+                      <th>Result creator is banned (if user)</th>
+                      <td>
+                        {w2lInferenceResult?.maybe_moderator_fields
+                          ?.result_creator_is_banned_if_user
+                          ? "banned"
+                          : "good standing"}
+                      </td>
+                    </tr>
+                    <tr>
+                      <th>Result creator IP address</th>
+                      <td>
+                        {w2lInferenceResult?.maybe_moderator_fields
+                          ?.result_creator_ip_address || "server error"}
+                      </td>
+                    </tr>
+                    <tr>
+                      <th>Mod deleted at (UTC)</th>
+                      <td>
+                        {w2lInferenceResult?.maybe_moderator_fields
+                          ?.mod_deleted_at || "not deleted"}
+                      </td>
+                    </tr>
+                    <tr>
+                      <th>Result creator deleted at (UTC)</th>
+                      <td>
+                        {w2lInferenceResult?.maybe_moderator_fields
+                          ?.result_creator_deleted_at || "not deleted"}
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </Fade>
       </>
     );
   }
@@ -106,11 +149,13 @@ function W2lResultViewFc(props: Props) {
       <span>
         <Gravatar
           size={15}
-          username={w2lInferenceResult.maybe_creator_display_name || ""} 
-          email_hash={w2lInferenceResult.maybe_creator_gravatar_hash || ""} 
-          />
+          username={w2lInferenceResult.maybe_creator_display_name || ""}
+          email_hash={w2lInferenceResult.maybe_creator_gravatar_hash || ""}
+        />
         &nbsp;
-        <Link to={creatorLink}>{w2lInferenceResult.maybe_creator_display_name}</Link>
+        <Link to={creatorLink}>
+          {w2lInferenceResult.maybe_creator_display_name}
+        </Link>
       </span>
     );
   }
@@ -122,135 +167,179 @@ function W2lResultViewFc(props: Props) {
       <span>
         <Gravatar
           size={15}
-          username={w2lInferenceResult.maybe_template_creator_display_name || ""} 
-          email_hash={w2lInferenceResult.maybe_template_creator_gravatar_hash || ""} 
-          />
+          username={
+            w2lInferenceResult.maybe_template_creator_display_name || ""
+          }
+          email_hash={
+            w2lInferenceResult.maybe_template_creator_gravatar_hash || ""
+          }
+        />
         &nbsp;
-        <Link to={templateCreatorLink}>{w2lInferenceResult.maybe_template_creator_display_name}</Link>
+        <Link to={templateCreatorLink}>
+          {w2lInferenceResult.maybe_template_creator_display_name}
+        </Link>
       </span>
     );
   }
 
-  let resultVisibility = w2lInferenceResult?.creator_set_visibility === 'hidden' ? 
-    <span>Hidden <HiddenIconFc /></span> :
-    <span>Public <VisibleIconFc /></span> ;
+  let resultVisibility =
+    w2lInferenceResult?.creator_set_visibility === "hidden" ? (
+      <span>
+        Hidden <HiddenIconFc />
+      </span>
+    ) : (
+      <span>
+        Public <VisibleIconFc />
+      </span>
+    );
 
-  const currentlyDeleted = !!w2lInferenceResult?.maybe_moderator_fields?.mod_deleted_at || 
-      !!w2lInferenceResult?.maybe_moderator_fields?.result_creator_deleted_at;
+  const currentlyDeleted =
+    !!w2lInferenceResult?.maybe_moderator_fields?.mod_deleted_at ||
+    !!w2lInferenceResult?.maybe_moderator_fields?.result_creator_deleted_at;
 
-  const deleteButtonTitle = currentlyDeleted ? "Undelete Result?" : "Delete Result?";
+  const deleteButtonTitle = currentlyDeleted
+    ? "Undelete Result?"
+    : "Delete Result?";
 
-  const deleteButtonCss = currentlyDeleted ? 
-    "button is-warning is-large is-fullwidth" :
-    "button is-danger is-large is-fullwidth";
+  const deleteButtonCss = currentlyDeleted
+    ? "btn btn-secondary w-100"
+    : "btn btn-destructive w-100";
 
   let editButton = null;
-  const canEdit = props.sessionWrapper.canEditW2lResultAsUserOrMod(w2lInferenceResult?.maybe_creator_user_token);
+  const canEdit = props.sessionWrapper.canEditW2lResultAsUserOrMod(
+    w2lInferenceResult?.maybe_creator_user_token
+  );
 
   if (canEdit) {
     editButton = (
       <>
-        <br />
-        <Link 
-          className="button is-info is-large is-fullwidth"
+        <Link
+          className="btn btn-secondary w-100"
           to={FrontendUrlConfig.w2lResultEditPage(token)}
-          >Edit Result Visibility</Link>
+        >
+          <FontAwesomeIcon icon={faEdit} className="me-2" />
+          Edit Result Visibility
+        </Link>
       </>
     );
   }
 
   let deleteButton = null;
-  const canDelete = props.sessionWrapper.canDeleteW2lResultAsUserOrMod(w2lInferenceResult?.maybe_creator_user_token);
+  const canDelete = props.sessionWrapper.canDeleteW2lResultAsUserOrMod(
+    w2lInferenceResult?.maybe_creator_user_token
+  );
 
   if (canDelete) {
     deleteButton = (
       <>
-        <br />
-        <Link 
+        <Link
           className={deleteButtonCss}
           to={FrontendUrlConfig.w2lResultDeletePage(token)}
-          >{deleteButtonTitle}</Link>
+        >
+          <FontAwesomeIcon icon={faTrash} className="me-2" />
+          {deleteButtonTitle}
+        </Link>
       </>
     );
   }
   return (
     <div>
-      <h1 className="title is-1"> Lipsync Result </h1>
+      <Fade cascade bottom duration={duration} distance={distance}>
+        <div className="container py-5 px-md-4 px-lg-5 px-xl-3">
+          <h1 className="display-5 fw-bold text-center text-lg-start">
+            Lipsync Result
+          </h1>
+        </div>
+      </Fade>
 
-      <video width="100%" height="auto" controls={true}>
-        <source src={videoLink} />
-        Your device doesn't support video.
-      </video> 
+      <Fade bottom duration={duration} distance={distance} delay={delay}>
+        <div className="container">
+          <video width="100%" height="auto" controls={true} className="rounded">
+            <source src={videoLink} />
+            Your device doesn't support video.
+          </video>
+        </div>
 
-      <br />
-      <br />
+        <div className="container pt-4 pb-5">
+          <a
+            className="btn btn-primary w-100"
+            href={videoLink}
+            download={videoDownloadFilename}
+          >
+            {" "}
+            <FontAwesomeIcon icon={faDownload} className="me-2" />
+            Download File
+          </a>
+        </div>
 
-      <a className="button is-large is-primary is-fullwidth" 
-          href={videoLink}
-          download={videoDownloadFilename}> <DownloadIcon />&nbsp;Download File</a>
+        <div className="container-panel pt-5 pb-5">
+          <div className="panel p-3 p-lg-4">
+            <h2 className="panel-title fw-bold">Result Details</h2>
+            <div className="py-6">
+              <table className="table">
+                <tbody>
+                  <tr>
+                    <th>Creator</th>
+                    <td>{creatorDetails}</td>
+                  </tr>
+                  <tr>
+                    <th>Duration</th>
+                    <td>{durationSeconds} seconds</td>
+                  </tr>
+                  <tr>
+                    <th>Visibility</th>
+                    <td>{resultVisibility}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+        <div className="container-panel pt-3 pb-5">
+          <div className="panel p-3 p-lg-4">
+            <h2 className="panel-title fw-bold"> Template Details </h2>
+            <div className="py-6">
+              <table className="table">
+                <tbody>
+                  <tr>
+                    <th>Template used</th>
+                    <td>
+                      <Link to={templateLink}>{templateName}</Link>
+                    </td>
+                  </tr>
+                  <tr>
+                    <th>Template creator</th>
+                    <td>{templateCreatorDetails}</td>
+                  </tr>
+                  <tr>
+                    <th>Dimensions</th>
+                    <td>
+                      {w2lInferenceResult?.frame_width} x{" "}
+                      {w2lInferenceResult?.frame_height}
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </Fade>
 
-      <br />
-      <br />
+      <div>{moderatorRows}</div>
 
-      <table className="table is-fullwidth">
-        <tbody>
-          <tr>
-            <td colSpan={2}>
-              <h4 className="subtitle is-4"> Result Details </h4>
-            </td>
-          </tr>
-          <tr>
-            <th>Creator</th>
-            <td>
-              {creatorDetails}
-            </td>
-          </tr>
-          <tr>
-            <th>Duration</th>
-            <td>{durationSeconds} seconds</td>
-          </tr>
-          <tr>
-            <th>Visibility</th>
-            <td>{resultVisibility}</td>
-          </tr>
-          <tr>
-            <td colSpan={2}>
-              <br />
-              <h4 className="subtitle is-4"> Template Details </h4>
-            </td>
-          </tr>
-          <tr>
-            <th>Template used</th>
-            <td>
-              <Link to={templateLink}>
-                {templateName}
-              </Link>
-            </td>
-          </tr>
-          <tr>
-            <th>Template creator</th>
-            <td>
-              {templateCreatorDetails}
-            </td>
-          </tr>
-          <tr>
-            <th>Dimensions</th>
-            <td>{w2lInferenceResult?.frame_width} x {w2lInferenceResult?.frame_height}</td>
-          </tr>
-
-          {moderatorRows}
-
-        </tbody>
-      </table>
-
-      {editButton}
-
-      {deleteButton}
-
-      <br />
-      <ReportDiscordLinkFc />
+      <Fade bottom duration={duration} distance={distance} delay={delay}>
+        <div className="container pb-5">
+          <div className="d-flex gap-3 flex-column flex-md-row">
+            {editButton}
+            {deleteButton}
+          </div>
+          <div className="mt-4">
+            <ReportDiscordLinkFc />
+          </div>
+        </div>
+      </Fade>
     </div>
-  )
+  );
 }
 
 export { W2lResultViewFc };
