@@ -39,6 +39,13 @@
     -->
     <title>FakeYou. Deep Fake Text to Speech.</title>
 
+    <!-- Preload important images on index so they don't load late and "flicker". -->
+    <link rel="preload" as="image" href="%PUBLIC_URL%/fakeyou/FakeYou-Logo.png" />
+    <link rel="preload" as="image" href="%PUBLIC_URL%/mascot/kitsune_pose2.png" />
+    <!-- Preload images on other pages. -->
+    <link rel="preload" as="image" href="%PUBLIC_URL%/mascot/kitsune_pose7.png" />
+    <link rel="preload" as="image" href="%PUBLIC_URL%/mascot/kitsune_pose3.png" />
+
     <!-- Twitter, Discord, etc. -->
     <meta
       property="og:title"
