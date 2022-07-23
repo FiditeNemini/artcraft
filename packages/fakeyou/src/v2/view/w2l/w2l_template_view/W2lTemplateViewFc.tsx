@@ -9,7 +9,6 @@ import { v4 as uuidv4 } from "uuid";
 import { SessionW2lInferenceResultListFc } from "../../_common/SessionW2lInferenceResultsListFc";
 import { ReportDiscordLinkFc } from "../../_common/DiscordReportLinkFc";
 import { BucketConfig } from "@storyteller/components/src/api/BucketConfig";
-import { UploadIcon } from "../../_icons/UploadIcon";
 import { VisibleIconFc } from "../../_icons/VisibleIcon";
 import { HiddenIconFc } from "../../_icons/HiddenIcon";
 import { FrontendUrlConfig } from "../../../../common/FrontendUrlConfig";
@@ -380,7 +379,7 @@ function W2lTemplateViewFc(props: Props) {
       <div className="container py-5 px-md-4 px-lg-5 px-xl-3">
         <div className="d-flex flex-column">
           <h1 className="display-5 fw-bold">Video Lip Sync Template</h1>
-          <h4>Template: (Template name)</h4>
+          <h4>Template: {w2lTemplate?.title}</h4>
         </div>
         <div className="mt-3">
           <BackLink
