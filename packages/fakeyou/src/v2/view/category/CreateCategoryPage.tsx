@@ -217,7 +217,7 @@ function CreateCategoryPage(props: Props) {
   return (
     <div>
       <Fade bottom cascade duration={duration} distance={distance}>
-        <div className="container pb-4 pt-5">
+        <div className="container pb-4 pt-5 px-md-4 px-lg-5 px-xl-3">
           <h1 className="display-5 fw-bold">{categoryActionName} Category</h1>
           <div className="pt-3">
             <BackLink
@@ -238,7 +238,7 @@ function CreateCategoryPage(props: Props) {
         delay={delay}
       >
         <form onSubmit={handleFormSubmit}>
-          <div className="container-panel pt-4 pb-5 px-md-4 px-lg-5 px-xl-3">
+          <div className="container-panel pt-4 pb-5">
             <div className="panel p-3 py-4 p-lg-4">
               <div className="d-flex flex-column gap-4">
                 <div>
