@@ -10,7 +10,7 @@ import {
 } from "../../../api/w2l/GetW2lTemplate";
 import { GetW2lTemplateUseCount } from "../../../api/w2l/GetW2lTemplateUseCount";
 import { BackLink } from "../../_common/BackLink";
-import { distance, delay, delay2, duration } from "../../../../data/animation";
+import { distance, delay, duration } from "../../../../data/animation";
 const Fade = require("react-reveal/Fade");
 
 const DEFAULT_APPROVED_STATE = true;

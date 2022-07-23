@@ -11,7 +11,7 @@ import {
   W2lTemplate,
 } from "../../../api/w2l/GetW2lTemplate";
 import { BackLink } from "../../_common/BackLink";
-import { distance, delay, delay2, duration } from "../../../../data/animation";
+import { distance, delay, duration } from "../../../../data/animation";
 const Fade = require("react-reveal/Fade");
 
 const DEFAULT_VISIBILITY = "public";
