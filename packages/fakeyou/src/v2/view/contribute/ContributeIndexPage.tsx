@@ -191,9 +191,12 @@ function ContributeIndexPage(props: Props) {
                 {t("pages.contributeIndex.describeSuggest")}
               </p>
               <div className="d-flex gap-3">
-                <button className="btn btn-secondary w-100">
-                  Suggest category
-                </button>
+                <Link
+                  to={FrontendUrlConfig.createCategoryPage()}
+                  className="btn btn-secondary w-100"
+                >
+                  {categoryButton}
+                </Link>
               </div>
             </div>
           </div>

@@ -206,6 +206,10 @@ styles with important tags:
 
       &.btn {
         color: $white;
+
+        &.btn-secondary {
+          color: #212529;
+        }
       }
     }
   }
