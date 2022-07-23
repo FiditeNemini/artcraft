@@ -94,7 +94,7 @@ function UploadTtsModelFc(props: Props) {
 
   return (
     <div>
-      <div className="container pt-5 pb-4">
+      <div className="container pt-5 pb-4 px-md-4 px-lg-5 px-xl-3">
         <Fade bottom cascade duration={duration} distance={distance}>
           <div className="d-flex flex-column">
             <h1 className="display-5 fw-bold">Upload Voice (TTS Model)</h1>
@@ -110,7 +110,7 @@ function UploadTtsModelFc(props: Props) {
       </div>
 
       <Fade bottom duration={duration} distance={distance} delay={delay}>
-        <div className="container">
+        <div className="container px-md-4 px-lg-5 px-xl-3">
           <div className="alert alert-primary">
             <strong>Content Creator Rewards!</strong>
             {/*<p>You can help FakeYou grow by uploading Tacotron2 models. 
@@ -127,7 +127,7 @@ function UploadTtsModelFc(props: Props) {
       </Fade>
 
       <Fade bottom duration={duration} distance={distance} delay={delay}>
-        <div className="container pt-3 d-flex flex-column gap-3">
+        <div className="container pt-3 d-flex flex-column gap-3 px-md-4 px-lg-5 px-xl-3">
           <p>
             If you're new to voice cloning, join our{" "}
             <span>

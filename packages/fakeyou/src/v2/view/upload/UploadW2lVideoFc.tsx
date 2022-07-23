@@ -92,7 +92,7 @@ function UploadW2lVideoFc(props: Props) {
 
   return (
     <div>
-      <div className="container pt-5 pb-3">
+      <div className="container pt-5 pb-3 px-md-4 px-lg-5 px-xl-3">
         <Fade bottom cascade duration={duration} distance={distance}>
           <div className="d-flex flex-column">
             <h1 className="display-5 fw-bold">Upload Video (w2l template)</h1>
@@ -107,7 +107,7 @@ function UploadW2lVideoFc(props: Props) {
       </div>
 
       <Fade bottom duration={duration} distance={distance} delay={delay}>
-        <div className="container">
+        <div className="container px-md-4 px-lg-5 px-xl-3">
           <p>
             The videos you upload can be used for lipsyncing with audio using
             the Wav2Lip model.
