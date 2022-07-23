@@ -21,7 +21,10 @@ import {
 } from "../../../api/w2l/GetW2lTemplate";
 import { GetW2lTemplateUseCount } from "../../../api/w2l/GetW2lTemplateUseCount";
 import { BackLink } from "../../_common/BackLink";
-import { distance, delay, delay2, duration } from "../../../../data/animation";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faEdit, faTrash, faCheck } from "@fortawesome/free-solid-svg-icons";
+import { distance, delay, duration } from "../../../../data/animation";
+
 const Fade = require("react-reveal/Fade");
 
 interface EnqueueJobResponsePayload {
@@ -203,53 +206,55 @@ function W2lTemplateViewFc(props: Props) {
   ) {
     moderatorRows = (
       <>
-        <div className="container-panel pt-3 pb-5">
-          <div className="panel p-3 p-lg-4">
-            <h2 className="panel-title fw-bold">Moderator Details</h2>
-            <div className="py-6">
-              <table className="table">
-                <tbody>
-                  <tr>
-                    <th>Creator is banned</th>
-                    <td>
-                      {w2lTemplate?.maybe_moderator_fields?.creator_is_banned
-                        ? "banned"
-                        : "good standing"}
-                    </td>
-                  </tr>
-                  <tr>
-                    <th>Create IP address</th>
-                    <td>
-                      {w2lTemplate?.maybe_moderator_fields
-                        ?.creator_ip_address_creation || "server error"}
-                    </td>
-                  </tr>
-                  <tr>
-                    <th>Update IP address</th>
-                    <td>
-                      {w2lTemplate?.maybe_moderator_fields
-                        ?.creator_ip_address_last_update || "server error"}
-                    </td>
-                  </tr>
-                  <tr>
-                    <th>Mod deleted at (UTC)</th>
-                    <td>
-                      {w2lTemplate?.maybe_moderator_fields?.mod_deleted_at ||
-                        "not deleted"}
-                    </td>
-                  </tr>
-                  <tr>
-                    <th>User deleted at (UTC)</th>
-                    <td>
-                      {w2lTemplate?.maybe_moderator_fields?.user_deleted_at ||
-                        "not deleted"}
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
+        <Fade bottom duration={duration} distance={distance} delay={delay}>
+          <div className="container-panel pt-3 pb-5">
+            <div className="panel p-3 p-lg-4">
+              <h2 className="panel-title fw-bold">Moderator Details</h2>
+              <div className="py-6">
+                <table className="table">
+                  <tbody>
+                    <tr>
+                      <th>Creator is banned</th>
+                      <td>
+                        {w2lTemplate?.maybe_moderator_fields?.creator_is_banned
+                          ? "banned"
+                          : "good standing"}
+                      </td>
+                    </tr>
+                    <tr>
+                      <th>Create IP address</th>
+                      <td>
+                        {w2lTemplate?.maybe_moderator_fields
+                          ?.creator_ip_address_creation || "server error"}
+                      </td>
+                    </tr>
+                    <tr>
+                      <th>Update IP address</th>
+                      <td>
+                        {w2lTemplate?.maybe_moderator_fields
+                          ?.creator_ip_address_last_update || "server error"}
+                      </td>
+                    </tr>
+                    <tr>
+                      <th>Mod deleted at (UTC)</th>
+                      <td>
+                        {w2lTemplate?.maybe_moderator_fields?.mod_deleted_at ||
+                          "not deleted"}
+                      </td>
+                    </tr>
+                    <tr>
+                      <th>User deleted at (UTC)</th>
+                      <td>
+                        {w2lTemplate?.maybe_moderator_fields?.user_deleted_at ||
+                          "not deleted"}
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
             </div>
           </div>
-        </div>
+        </Fade>
       </>
     );
   }
@@ -292,6 +297,7 @@ function W2lTemplateViewFc(props: Props) {
           className={"btn btn-secondary w-100"}
           to={FrontendUrlConfig.w2lTemplateEditPage(templateSlug)}
         >
+          <FontAwesomeIcon icon={faEdit} className="me-2" />
           Edit Template Details
         </Link>
       </>
@@ -348,6 +354,7 @@ function W2lTemplateViewFc(props: Props) {
           className={deleteButtonCss}
           to={FrontendUrlConfig.w2lTemplateDeletePage(templateSlug)}
         >
+          <FontAwesomeIcon icon={faTrash} className="me-2" />
           {deleteButtonTitle}
         </Link>
       </>
@@ -359,19 +366,21 @@ function W2lTemplateViewFc(props: Props) {
   if (!!w2lTemplate?.description_rendered_html) {
     templateDescription = (
       <>
-        <div className="container-panel pt-3 pb-5">
-          <div className="panel p-3 p-lg-4">
-            <h2 className="panel-title fw-bold">Model Description</h2>
-            <div className="py-6">
-              <div
-                className="profile content is-medium"
-                dangerouslySetInnerHTML={{
-                  __html: w2lTemplate?.description_rendered_html || "",
-                }}
-              />
+        <Fade bottom duration={duration} distance={distance} delay={delay}>
+          <div className="container-panel pt-3 pb-5">
+            <div className="panel p-3 p-lg-4">
+              <h2 className="panel-title fw-bold">Model Description</h2>
+              <div className="py-6">
+                <div
+                  className="profile content is-medium"
+                  dangerouslySetInnerHTML={{
+                    __html: w2lTemplate?.description_rendered_html || "",
+                  }}
+                />
+              </div>
             </div>
           </div>
-        </div>
+        </Fade>
       </>
     );
   }
@@ -449,9 +458,7 @@ function W2lTemplateViewFc(props: Props) {
           </div>
         </form>
 
-        <div>
-          <div>{templateDescription}</div>
-        </div>
+        <div>{templateDescription}</div>
 
         <div className="container-panel pt-3 pb-5">
           <div className="panel p-3 p-lg-4">
@@ -519,9 +526,7 @@ function W2lTemplateViewFc(props: Props) {
           </div>
         </div>
 
-        <div>
-          <div>{moderatorRows}</div>
-        </div>
+        <div>{moderatorRows}</div>
 
         <div className="container">
           <div className="d-flex flex-column flex-lg-row gap-3">

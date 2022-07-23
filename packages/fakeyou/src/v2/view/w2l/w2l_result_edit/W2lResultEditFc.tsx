@@ -1,65 +1,70 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import { ApiConfig } from '@storyteller/components';
-import { SessionWrapper } from '@storyteller/components/src/session/SessionWrapper';
-import { useParams, Link, useHistory } from 'react-router-dom';
-import { FrontendUrlConfig } from '../../../../common/FrontendUrlConfig';
-import { VisibleIconFc } from '../../_icons/VisibleIcon';
-import { HiddenIconFc } from '../../_icons/HiddenIcon';
+import React, { useState, useEffect, useCallback } from "react";
+import { ApiConfig } from "@storyteller/components";
+import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
+import { useParams, Link, useHistory } from "react-router-dom";
+import { FrontendUrlConfig } from "../../../../common/FrontendUrlConfig";
+import { VisibleIconFc } from "../../_icons/VisibleIcon";
+import { HiddenIconFc } from "../../_icons/HiddenIcon";
+import { distance, delay, duration } from "../../../../data/animation";
 
-const DEFAULT_VISIBILITY = 'public';
+const Fade = require("react-reveal/Fade");
+
+const DEFAULT_VISIBILITY = "public";
 
 interface W2lInferenceResultResponsePayload {
-  success: boolean,
-  result: W2lInferenceResult,
+  success: boolean;
+  result: W2lInferenceResult;
 }
 
 interface W2lInferenceResult {
-  w2l_result_token: string,
+  w2l_result_token: string;
 
-  w2l_model_token: string,
-  w2l_model_title: string,
+  w2l_model_token: string;
+  w2l_model_title: string;
 
-  raw_inference_text: string,
+  raw_inference_text: string;
 
-  maybe_creator_user_token?: string,
-  maybe_creator_username?: string,
-  maybe_creator_display_name?: string,
-  maybe_creator_gravatar_hash?: string,
+  maybe_creator_user_token?: string;
+  maybe_creator_username?: string;
+  maybe_creator_display_name?: string;
+  maybe_creator_gravatar_hash?: string;
 
-  maybe_model_creator_user_token?: string,
-  maybe_model_creator_username?: string,
-  maybe_model_creator_display_name?: string,
-  maybe_model_creator_gravatar_hash?: string,
+  maybe_model_creator_user_token?: string;
+  maybe_model_creator_username?: string;
+  maybe_model_creator_display_name?: string;
+  maybe_model_creator_gravatar_hash?: string;
 
-  public_bucket_wav_audio_path: string,
-  public_bucket_spectrogram_path: string,
+  public_bucket_wav_audio_path: string;
+  public_bucket_spectrogram_path: string;
 
-  creator_set_visibility?: string,
+  creator_set_visibility?: string;
 
-  file_size_bytes: number,
-  duration_millis: number,
-  created_at: string,
-  updated_at: string,
+  file_size_bytes: number;
+  duration_millis: number;
+  created_at: string;
+  updated_at: string;
 
-  maybe_moderator_fields: W2lInferenceResultModeratorFields | null | undefined,
+  maybe_moderator_fields: W2lInferenceResultModeratorFields | null | undefined;
 }
 
 interface W2lInferenceResultModeratorFields {
-  creator_ip_address: string,
-  mod_deleted_at: string | undefined | null,
-  user_deleted_at: string | undefined | null,
+  creator_ip_address: string;
+  mod_deleted_at: string | undefined | null;
+  user_deleted_at: string | undefined | null;
 }
 
 interface Props {
-  sessionWrapper: SessionWrapper,
+  sessionWrapper: SessionWrapper;
 }
 
 function W2lResultEditFc(props: Props) {
-  let { token } : { token : string } = useParams();
+  let { token }: { token: string } = useParams();
 
   const history = useHistory();
 
-  const [w2lInferenceResult, setW2lInferenceResult] = useState<W2lInferenceResult|undefined>(undefined);
+  const [w2lInferenceResult, setW2lInferenceResult] = useState<
+    W2lInferenceResult | undefined
+  >(undefined);
   const [visibility, setVisibility] = useState<string>(DEFAULT_VISIBILITY);
 
   const getW2lResult = useCallback((token) => {
@@ -67,24 +72,25 @@ function W2lResultEditFc(props: Props) {
     const endpointUrl = api.viewW2lInferenceResult(token);
 
     fetch(endpointUrl, {
-      method: 'GET',
+      method: "GET",
       headers: {
-        'Accept': 'application/json',
+        Accept: "application/json",
       },
-      credentials: 'include',
+      credentials: "include",
     })
-    .then(res => res.json())
-    .then(res => {
-      const modelsResponse : W2lInferenceResultResponsePayload = res;
-      if (!modelsResponse.success) {
-        return;
-      }
+      .then((res) => res.json())
+      .then((res) => {
+        const modelsResponse: W2lInferenceResultResponsePayload = res;
+        if (!modelsResponse.success) {
+          return;
+        }
 
-      setW2lInferenceResult(modelsResponse.result);
-      setVisibility(modelsResponse?.result?.creator_set_visibility || DEFAULT_VISIBILITY);
-    })
-    .catch(e => {
-    });
+        setW2lInferenceResult(modelsResponse.result);
+        setVisibility(
+          modelsResponse?.result?.creator_set_visibility || DEFAULT_VISIBILITY
+        );
+      })
+      .catch((e) => {});
   }, []);
 
   useEffect(() => {
@@ -92,12 +98,12 @@ function W2lResultEditFc(props: Props) {
   }, [token, getW2lResult]);
 
   const handleVisibilityChange = (ev: React.FormEvent<HTMLSelectElement>) => {
-    setVisibility((ev.target as HTMLSelectElement).value)
+    setVisibility((ev.target as HTMLSelectElement).value);
   };
 
   const resultLink = FrontendUrlConfig.w2lResultPage(token);
 
-  const handleFormSubmit = (ev: React.FormEvent<HTMLFormElement>) => { 
+  const handleFormSubmit = (ev: React.FormEvent<HTMLFormElement>) => {
     ev.preventDefault();
 
     if (!w2lInferenceResult) {
@@ -108,76 +114,88 @@ function W2lResultEditFc(props: Props) {
 
     const api = new ApiConfig();
     const endpointUrl = api.editW2lInferenceResult(resultToken);
-    
+
     const request = {
       creator_set_visibility: visibility || DEFAULT_VISIBILITY,
-    }
+    };
 
     fetch(endpointUrl, {
-      method: 'POST',
+      method: "POST",
       headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json',
+        Accept: "application/json",
+        "Content-Type": "application/json",
       },
-      credentials: 'include',
+      credentials: "include",
       body: JSON.stringify(request),
     })
-    .then(res => res.json())
-    .then(res => {
-      if (res === undefined ||
-        !res.success) {
-        return; // Endpoint error?
-      }
+      .then((res) => res.json())
+      .then((res) => {
+        if (res === undefined || !res.success) {
+          return; // Endpoint error?
+        }
 
-      history.push(resultLink);
-    })
-    .catch(e => {
-    });
+        history.push(resultLink);
+      })
+      .catch((e) => {});
 
     return false;
   };
 
   let isDisabled = !w2lInferenceResult;
 
-  const visibilityIcon = (visibility === 'public') ? <VisibleIconFc /> : <HiddenIconFc />;
+  const visibilityIcon =
+    visibility === "public" ? <VisibleIconFc /> : <HiddenIconFc />;
 
   return (
-    <div className="content">
-      <h1 className="title is-1"> Edit Result Visibility </h1>
+    <div>
+      <Fade cascade bottom duration={duration} distance={distance}>
+        <div className="container pb-4 pt-5 px-md-4 px-lg-5 px-xl-3">
+          <h1 className="display-5 fw-bold">Edit Result Visibility</h1>
+          <div className="pt-3">
+            <Link to={resultLink}>&lt; Back to result </Link>
+          </div>
+        </div>
+      </Fade>
 
-      <p>
-        <Link to={resultLink}>&lt; Back to result </Link>
-      </p>
-
-      <form onSubmit={handleFormSubmit}>
-        <fieldset disabled={isDisabled}>
-
-          <div className="field">
-            <label className="label">
-              Result Visibility&nbsp;{visibilityIcon}
-            </label>
-            <div className="control select">
-              <select 
-                name="creator_set_visibility" 
-                onChange={handleVisibilityChange}
-                value={visibility}
-                >
-                <option value="public">Public (visible from your profile)</option>
-                <option value="hidden">Unlisted (shareable URLs)</option>
-              </select>
+      <Fade
+        cascade
+        bottom
+        duration={duration}
+        distance={distance}
+        delay={delay}
+      >
+        <form onSubmit={handleFormSubmit}>
+          <div className="container-panel pt-4 pb-5">
+            <div className="panel p-3 py-4 p-lg-4">
+              <fieldset disabled={isDisabled}>
+                <div>
+                  <label className="sub-title">
+                    Result Visibility&nbsp;{visibilityIcon}
+                  </label>
+                  <div className="form-group">
+                    <select
+                      name="creator_set_visibility"
+                      onChange={handleVisibilityChange}
+                      value={visibility}
+                      className="form-control"
+                    >
+                      <option value="public">
+                        Public (visible from your profile)
+                      </option>
+                      <option value="hidden">Unlisted (shareable URLs)</option>
+                    </select>
+                  </div>
+                </div>
+              </fieldset>
             </div>
           </div>
-
-          <br />
-
-          <button className="button is-link is-large is-fullwidth">Update</button>
-
-        </fieldset>
-      </form>
-      
+          <div className="container pb-5">
+            <button className="btn btn-primary w-100">Update</button>
+          </div>
+        </form>
+      </Fade>
     </div>
-  )
+  );
 }
 
 export { W2lResultEditFc };
-
