@@ -10,6 +10,8 @@ import {
 } from "../../../api/w2l/GetW2lTemplate";
 import { GetW2lTemplateUseCount } from "../../../api/w2l/GetW2lTemplateUseCount";
 import { BackLink } from "../../_common/BackLink";
+import { distance, delay, delay2, duration } from "../../../../data/animation";
+const Fade = require("react-reveal/Fade");
 
 const DEFAULT_APPROVED_STATE = true;
 
@@ -117,76 +119,86 @@ function W2lTemplateApproveFc(props: Props) {
 
   return (
     <div>
-      <div className="container py-5">
-        <div className="d-flex flex-column">
-          <h1 className="display-5 fw-bold">{h1Title}</h1>
+      <Fade bottom cascade duration={duration} distance={distance}>
+        <div className="container pt-5 pb-4 px-lg-5 px-xl-3">
+          <div className="d-flex flex-column">
+            <h1 className="display-5 fw-bold">{h1Title}</h1>
+          </div>
+          <div className="pt-3">
+            <BackLink link={templateLink} text="Back to template" />
+          </div>
         </div>
-        <div className="pt-3">
-          <BackLink link={templateLink} text="Back to template" />
-        </div>
-      </div>
+      </Fade>
 
-      <div className="container-panel pt-2 pb-5">
-        <div className="panel p-3 py-4 p-lg-4">
-          <table className="table">
-            <thead>
-              <tr>
-                <th>
-                  <abbr title="Detail">Detail</abbr>
-                </th>
-                <th>
-                  <abbr title="Value">Value</abbr>
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <th>Creator</th>
-                <td>{creatorLink}</td>
-              </tr>
-              <tr>
-                <th>Use Count</th>
-                <td>{humanUseCount}</td>
-              </tr>
-              <tr>
-                <th>Title</th>
-                <td>{w2lTemplate?.title}</td>
-              </tr>
-              <tr>
-                <th>Upload Date (UTC)</th>
-                <td>{w2lTemplate?.created_at}</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-
-      <form onSubmit={handleApproveFormSubmit}>
-        <div className="container-panel pt-1 pb-5">
+      <Fade
+        bottom
+        cascade
+        duration={duration}
+        delay={delay}
+        distance={distance}
+      >
+        <div className="container-panel pt-4 pb-5">
           <div className="panel p-3 py-4 p-lg-4">
-            <label className="sub-title">
-              Mod Approval (sets public list visibility)
-            </label>
+            <table className="table">
+              <thead>
+                <tr>
+                  <th>
+                    <abbr title="Detail">Detail</abbr>
+                  </th>
+                  <th>
+                    <abbr title="Value">Value</abbr>
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <th>Creator</th>
+                  <td>{creatorLink}</td>
+                </tr>
+                <tr>
+                  <th>Use Count</th>
+                  <td>{humanUseCount}</td>
+                </tr>
+                <tr>
+                  <th>Title</th>
+                  <td>{w2lTemplate?.title}</td>
+                </tr>
+                <tr>
+                  <th>Upload Date (UTC)</th>
+                  <td>{w2lTemplate?.created_at}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
 
-            <div>
-              <div className="form-group">
-                <select
-                  name="approve"
-                  value={approvedFormDefaultState}
-                  onChange={handleModApprovalChange}
-                  className="form-select"
-                >
-                  <option value="true">Approve</option>
-                  <option value="false">Disapprove</option>
-                </select>
+        <form onSubmit={handleApproveFormSubmit}>
+          <div className="container-panel pt-1 pb-5">
+            <div className="panel p-3 py-4 p-lg-4">
+              <label className="sub-title">
+                Mod Approval (sets public list visibility)
+              </label>
+
+              <div>
+                <div className="form-group">
+                  <select
+                    name="approve"
+                    value={approvedFormDefaultState}
+                    onChange={handleModApprovalChange}
+                    className="form-select"
+                  >
+                    <option value="true">Approve</option>
+                    <option value="false">Disapprove</option>
+                  </select>
+                </div>
               </div>
             </div>
           </div>
-        </div>
-        <div className="container pb-5">
-          <button className="btn btn-primary w-100">Moderate</button>
-        </div>
-      </form>
+          <div className="container pb-5">
+            <button className="btn btn-primary w-100">Moderate</button>
+          </div>
+        </form>
+      </Fade>
     </div>
   );
 }

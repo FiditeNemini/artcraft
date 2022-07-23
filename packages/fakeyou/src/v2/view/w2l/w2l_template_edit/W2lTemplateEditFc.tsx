@@ -11,6 +11,8 @@ import {
   W2lTemplate,
 } from "../../../api/w2l/GetW2lTemplate";
 import { BackLink } from "../../_common/BackLink";
+import { distance, delay, delay2, duration } from "../../../../data/animation";
+const Fade = require("react-reveal/Fade");
 
 const DEFAULT_VISIBILITY = "public";
 
@@ -117,76 +119,88 @@ function W2lTemplateEditFc(props: Props) {
 
   return (
     <div>
-      <div className="container py-5">
-        <div className="d-flex flex-column">
-          <h1 className="display-5 fw-bold">Edit Template</h1>
+      <Fade bottom cascade duration={duration} distance={distance}>
+        <div className="container pt-5 pb-4 px-lg-5 px-xl-3">
+          <div className="d-flex flex-column">
+            <h1 className="display-5 fw-bold">Edit Template</h1>
+          </div>
+          <div className="mt-3">
+            <BackLink link={templateLink} text="Back to template" />
+          </div>
         </div>
-        <div className="mt-3">
-          <BackLink link={templateLink} text="Back to template" />
-        </div>
-      </div>
+      </Fade>
 
-      <form onSubmit={handleFormSubmit}>
-        <fieldset disabled={isDisabled}>
-          <div className="container-panel pt-2 pb-5">
-            <div className="panel p-3 py-4 p-lg-4">
-              <div className="d-flex flex-column gap-4">
-                <div>
-                  <label className="sub-title">Template title</label>
-                  <div className="form-group">
-                    <input
-                      onChange={handleTitleChange}
-                      className="form-control"
-                      type="text"
-                      placeholder="Template title"
-                      value={title}
-                    />
+      <Fade
+        bottom
+        cascade
+        duration={duration}
+        delay={delay}
+        distance={distance}
+      >
+        <form onSubmit={handleFormSubmit}>
+          <fieldset disabled={isDisabled}>
+            <div className="container-panel pt-4 pb-5">
+              <div className="panel p-3 py-4 p-lg-4">
+                <div className="d-flex flex-column gap-4">
+                  <div>
+                    <label className="sub-title">Template title</label>
+                    <div className="form-group">
+                      <input
+                        onChange={handleTitleChange}
+                        className="form-control"
+                        type="text"
+                        placeholder="Template title"
+                        value={title}
+                      />
+                    </div>
+                    {/*<p className="help">{invalidReason}</p>*/}
                   </div>
-                  {/*<p className="help">{invalidReason}</p>*/}
-                </div>
 
-                <div>
-                  <label className="sub-title">
-                    Description (supports Markdown)
-                  </label>
-                  <div className="form-group">
-                    <textarea
-                      onChange={handleDescriptionMarkdownChange}
-                      className="form-control"
-                      placeholder="Model description (ie. source of data, training duration, etc)"
-                      value={descriptionMarkdown}
-                      rows={5}
-                    />
+                  <div>
+                    <label className="sub-title">
+                      Description (supports Markdown)
+                    </label>
+                    <div className="form-group">
+                      <textarea
+                        onChange={handleDescriptionMarkdownChange}
+                        className="form-control"
+                        placeholder="Model description (ie. source of data, training duration, etc)"
+                        value={descriptionMarkdown}
+                        rows={5}
+                      />
+                    </div>
                   </div>
-                </div>
 
-                <div>
-                  <label className="sub-title">
-                    Template Visibility&nbsp;{visibilityIcon}
-                  </label>
-                  <div className="form-group">
-                    <select
-                      name="creator_set_visibility"
-                      onChange={handleVisibilityChange}
-                      value={visibility}
-                      className="form-control"
-                    >
-                      <option value="public">
-                        Public (visible from your profile)
-                      </option>
-                      <option value="hidden">Unlisted (shareable URLs)</option>
-                    </select>
+                  <div>
+                    <label className="sub-title">
+                      Template Visibility&nbsp;{visibilityIcon}
+                    </label>
+                    <div className="form-group">
+                      <select
+                        name="creator_set_visibility"
+                        onChange={handleVisibilityChange}
+                        value={visibility}
+                        className="form-control"
+                      >
+                        <option value="public">
+                          Public (visible from your profile)
+                        </option>
+                        <option value="hidden">
+                          Unlisted (shareable URLs)
+                        </option>
+                      </select>
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
-          </div>
 
-          <div className="container pb-5">
-            <button className="btn btn-primary w-100">Update Template</button>
-          </div>
-        </fieldset>
-      </form>
+            <div className="container pb-5">
+              <button className="btn btn-primary w-100">Update Template</button>
+            </div>
+          </fieldset>
+        </form>
+      </Fade>
     </div>
   );
 }

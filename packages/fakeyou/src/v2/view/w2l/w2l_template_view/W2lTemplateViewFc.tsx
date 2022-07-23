@@ -21,6 +21,8 @@ import {
 } from "../../../api/w2l/GetW2lTemplate";
 import { GetW2lTemplateUseCount } from "../../../api/w2l/GetW2lTemplateUseCount";
 import { BackLink } from "../../_common/BackLink";
+import { distance, delay, delay2, duration } from "../../../../data/animation";
+const Fade = require("react-reveal/Fade");
 
 interface EnqueueJobResponsePayload {
   success: boolean;
@@ -376,147 +378,161 @@ function W2lTemplateViewFc(props: Props) {
 
   return (
     <div>
-      <div className="container py-5 px-md-4 px-lg-5 px-xl-3">
-        <div className="d-flex flex-column">
+      <Fade bottom cascade duration={duration} distance={distance}>
+        <div className="container py-5 px-md-4 px-lg-5 px-xl-3">
           <h1 className="display-5 fw-bold">Video Lip Sync Template</h1>
           <h4>Template: {w2lTemplate?.title}</h4>
+          <div className="pt-3">
+            <BackLink
+              link={FrontendUrlConfig.w2lListPage()}
+              text="Back to all templates"
+            />
+          </div>
         </div>
-        <div className="mt-3">
-          <BackLink
-            link={FrontendUrlConfig.w2lListPage()}
-            text="Back to all templates"
-          />
-        </div>
-      </div>
+      </Fade>
 
-      <form onSubmit={handleInferenceFormSubmit}>
-        <div className="container-panel pt-4 pb-5">
-          <div className="panel p-3 p-lg-4">
-            <h2 className="panel-title fw-bold">Upload Audio</h2>
-            <div className="py-6">
-              <div className="d-flex flex-column flex-lg-row gap-5">
-                <div className="d-flex flex-column gap-4 w-100 w-lg-50">
-                  <p>
-                    Upload audio from FakeYou or any other source (eg. music),
-                    then submit. You'll get a beautifully lipsynced video.
-                  </p>
-                  <div>
-                    <label className="sub-title">Select an audio file</label>
-                    <input
-                      id="formFileLg"
-                      type="file"
-                      name="audio"
-                      className="form-control form-control-lg"
-                      onChange={(e) => handleAudioFileChange(e.target.files)}
-                    />
+      <Fade
+        bottom
+        cascade
+        duration={duration}
+        distance={distance}
+        delay={delay}
+      >
+        <form onSubmit={handleInferenceFormSubmit}>
+          <div className="container-panel pt-4 pb-5">
+            <div className="panel p-3 p-lg-4">
+              <h2 className="panel-title fw-bold">Upload Audio</h2>
+              <div className="py-6">
+                <div className="d-flex flex-column flex-lg-row gap-5">
+                  <div className="d-flex flex-column gap-4 w-100 w-lg-50">
+                    <p>
+                      Upload audio from FakeYou or any other source (eg. music),
+                      then submit. You'll get a beautifully lipsynced video.
+                    </p>
+                    <div>
+                      <label className="sub-title">Select an audio file</label>
+                      <input
+                        id="formFileLg"
+                        type="file"
+                        name="audio"
+                        className="form-control form-control-lg"
+                        onChange={(e) => handleAudioFileChange(e.target.files)}
+                      />
+                    </div>
+                    <button className="btn btn-primary w-100 mt-3">
+                      Submit
+                    </button>
                   </div>
-                  <button className="btn btn-primary w-100 mt-3">Submit</button>
-                </div>
-                <div className="d-flex w-100 w-lg-50 justify-content-center">
-                  <div className="template-preview ">
-                    <img
-                      src={url}
-                      alt="template preview"
-                      className="img-fluid rounded"
-                    />
+                  <div className="d-flex w-100 w-lg-50 justify-content-center">
+                    <div className="template-preview ">
+                      <img
+                        src={url}
+                        alt="template preview"
+                        className="img-fluid rounded"
+                      />
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
           </div>
+        </form>
+
+        <div>
+          <div>{templateDescription}</div>
         </div>
-      </form>
 
-      {templateDescription}
-
-      <div className="container-panel pt-3 pb-5">
-        <div className="panel p-3 p-lg-4">
-          <h2 className="panel-title fw-bold">Template Details</h2>
-          <div className="py-6">
-            <table className="table">
-              <tbody>
-                <tr>
-                  <th>Title</th>
-                  <td>{w2lTemplate?.title}</td>
-                </tr>
-                <tr>
-                  <th>Creator</th>
-                  <td>{creatorLink}</td>
-                </tr>
-                <tr>
-                  <th>Use count</th>
-                  <td>{humanUseCount}</td>
-                </tr>
-                <tr>
-                  <th>Visibility</th>
-                  <td>{resultVisibility}</td>
-                </tr>
-                <tr>
-                  <th>Is public listing approved?</th>
-                  <td>{modApprovalStatus}</td>
-                </tr>
-              </tbody>
-            </table>
+        <div className="container-panel pt-3 pb-5">
+          <div className="panel p-3 p-lg-4">
+            <h2 className="panel-title fw-bold">Template Details</h2>
+            <div className="py-6">
+              <table className="table">
+                <tbody>
+                  <tr>
+                    <th>Title</th>
+                    <td>{w2lTemplate?.title}</td>
+                  </tr>
+                  <tr>
+                    <th>Creator</th>
+                    <td>{creatorLink}</td>
+                  </tr>
+                  <tr>
+                    <th>Use count</th>
+                    <td>{humanUseCount}</td>
+                  </tr>
+                  <tr>
+                    <th>Visibility</th>
+                    <td>{resultVisibility}</td>
+                  </tr>
+                  <tr>
+                    <th>Is public listing approved?</th>
+                    <td>{modApprovalStatus}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
           </div>
         </div>
-      </div>
 
-      <div className="container-panel pt-3 pb-5">
-        <div className="panel p-3 p-lg-4">
-          <h2 className="panel-title fw-bold">Media Details</h2>
-          <div className="py-6">
-            <table className="table">
-              <tbody>
-                <tr>
-                  <th>Media type</th>
-                  <td>{w2lTemplate?.template_type}</td>
-                </tr>
-                <tr>
-                  <th>Dimensions</th>
-                  <td>
-                    {w2lTemplate?.frame_width} x {w2lTemplate?.frame_height}
-                  </td>
-                </tr>
-                <tr>
-                  <th>Duration (milliseconds)</th>
-                  <td>{w2lTemplate?.duration_millis}</td>
-                </tr>
-                <tr>
-                  <th>Created at (UTC)</th>
-                  <td>{w2lTemplate?.created_at}</td>
-                </tr>
-                <tr>
-                  <th>Updated at (UTC)</th>
-                  <td>{w2lTemplate?.updated_at}</td>
-                </tr>
-              </tbody>
-            </table>
+        <div className="container-panel pt-3 pb-5">
+          <div className="panel p-3 p-lg-4">
+            <h2 className="panel-title fw-bold">Media Details</h2>
+            <div className="py-6">
+              <table className="table">
+                <tbody>
+                  <tr>
+                    <th>Media type</th>
+                    <td>{w2lTemplate?.template_type}</td>
+                  </tr>
+                  <tr>
+                    <th>Dimensions</th>
+                    <td>
+                      {w2lTemplate?.frame_width} x {w2lTemplate?.frame_height}
+                    </td>
+                  </tr>
+                  <tr>
+                    <th>Duration (milliseconds)</th>
+                    <td>{w2lTemplate?.duration_millis}</td>
+                  </tr>
+                  <tr>
+                    <th>Created at (UTC)</th>
+                    <td>{w2lTemplate?.created_at}</td>
+                  </tr>
+                  <tr>
+                    <th>Updated at (UTC)</th>
+                    <td>{w2lTemplate?.updated_at}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
           </div>
         </div>
-      </div>
 
-      <div className="container-panel pt-3 pb-5">
-        <div className="panel p-3 p-lg-4">
-          <h2 className="panel-title fw-bold">Moderator Details</h2>
-          <div className="py-6">
-            <table className="table">
-              <tbody>{moderatorRows}</tbody>
-            </table>
+        <div className="container-panel pt-3 pb-5">
+          <div className="panel p-3 p-lg-4">
+            <h2 className="panel-title fw-bold">Moderator Details</h2>
+            <div className="py-6">
+              <table className="table">
+                <tbody>{moderatorRows}</tbody>
+              </table>
+            </div>
           </div>
         </div>
-      </div>
 
-      <div className="container">
-        <div className="d-flex flex-column flex-lg-row gap-3">
-          {editButton}
-          {approveButton}
-          {deleteButton}
+        <div className="container">
+          <div className="d-flex flex-column flex-lg-row gap-3">
+            {editButton}
+            {approveButton}
+            {deleteButton}
+          </div>
         </div>
-      </div>
 
-      <div className="container pt-4 pb-5">
-        <ReportDiscordLinkFc />
-      </div>
+        <div>
+          <div className="container pt-4 pb-5">
+            <ReportDiscordLinkFc />
+          </div>
+        </div>
+      </Fade>
 
       <SessionW2lInferenceResultListFc
         w2lInferenceJobs={props.w2lInferenceJobs}
