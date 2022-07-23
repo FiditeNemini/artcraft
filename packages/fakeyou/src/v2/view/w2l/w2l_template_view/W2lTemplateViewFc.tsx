@@ -203,42 +203,53 @@ function W2lTemplateViewFc(props: Props) {
   ) {
     moderatorRows = (
       <>
-        <tr>
-          <th>Creator is banned</th>
-          <td>
-            {w2lTemplate?.maybe_moderator_fields?.creator_is_banned
-              ? "banned"
-              : "good standing"}
-          </td>
-        </tr>
-        <tr>
-          <th>Create IP address</th>
-          <td>
-            {w2lTemplate?.maybe_moderator_fields?.creator_ip_address_creation ||
-              "server error"}
-          </td>
-        </tr>
-        <tr>
-          <th>Update IP address</th>
-          <td>
-            {w2lTemplate?.maybe_moderator_fields
-              ?.creator_ip_address_last_update || "server error"}
-          </td>
-        </tr>
-        <tr>
-          <th>Mod deleted at (UTC)</th>
-          <td>
-            {w2lTemplate?.maybe_moderator_fields?.mod_deleted_at ||
-              "not deleted"}
-          </td>
-        </tr>
-        <tr>
-          <th>User deleted at (UTC)</th>
-          <td>
-            {w2lTemplate?.maybe_moderator_fields?.user_deleted_at ||
-              "not deleted"}
-          </td>
-        </tr>
+        <div className="container-panel pt-3 pb-5">
+          <div className="panel p-3 p-lg-4">
+            <h2 className="panel-title fw-bold">Moderator Details</h2>
+            <div className="py-6">
+              <table className="table">
+                <tbody>
+                  <tr>
+                    <th>Creator is banned</th>
+                    <td>
+                      {w2lTemplate?.maybe_moderator_fields?.creator_is_banned
+                        ? "banned"
+                        : "good standing"}
+                    </td>
+                  </tr>
+                  <tr>
+                    <th>Create IP address</th>
+                    <td>
+                      {w2lTemplate?.maybe_moderator_fields
+                        ?.creator_ip_address_creation || "server error"}
+                    </td>
+                  </tr>
+                  <tr>
+                    <th>Update IP address</th>
+                    <td>
+                      {w2lTemplate?.maybe_moderator_fields
+                        ?.creator_ip_address_last_update || "server error"}
+                    </td>
+                  </tr>
+                  <tr>
+                    <th>Mod deleted at (UTC)</th>
+                    <td>
+                      {w2lTemplate?.maybe_moderator_fields?.mod_deleted_at ||
+                        "not deleted"}
+                    </td>
+                  </tr>
+                  <tr>
+                    <th>User deleted at (UTC)</th>
+                    <td>
+                      {w2lTemplate?.maybe_moderator_fields?.user_deleted_at ||
+                        "not deleted"}
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
       </>
     );
   }
@@ -508,15 +519,8 @@ function W2lTemplateViewFc(props: Props) {
           </div>
         </div>
 
-        <div className="container-panel pt-3 pb-5">
-          <div className="panel p-3 p-lg-4">
-            <h2 className="panel-title fw-bold">Moderator Details</h2>
-            <div className="py-6">
-              <table className="table">
-                <tbody>{moderatorRows}</tbody>
-              </table>
-            </div>
-          </div>
+        <div>
+          <div>{moderatorRows}</div>
         </div>
 
         <div className="container">
