@@ -1,6 +1,7 @@
 import React, { useEffect } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
+  faCaretRight,
   faChevronRight,
   faHeadphonesAlt,
   faMicrophone,
@@ -201,14 +202,14 @@ export function MultiDropdownSearch(props: Props) {
 
     if (USE_REFRESH) {
       // Redesign and Bootstrap CSS
-      selectCssClasses = "category-dropdown form-select";  // NB: 'category-dropdown' is important for function.
+      selectCssClasses = "category-dropdown form-select"; // NB: 'category-dropdown' is important for function.
       xButtonCssClasses = "btn btn-destructive btn-inform";
     }
 
     categoryDropdowns.push(
       <React.Fragment key={`categoryDropdown-${i}`}>
-        <div className="control has-icons-left is-expanded">
-          <div className="select is-fullwidth">
+        <div className="d-flex gap-3 align-items-center mb-4 w-100">
+          <div className="form-group input-icon w-100">
             <select
               className={selectCssClasses}
               name={`categories-${i}`}
@@ -217,25 +218,29 @@ export function MultiDropdownSearch(props: Props) {
             >
               {dropdownOptions}
             </select>
-          </div>
-          <span className="icon is-small is-left">
-            <FontAwesomeIcon icon={faTags} />
-          </span>
-        </div>
-
-        <div className="control">
-          <button
-            className={xButtonCssClasses}
-            onClick={() => handleRemoveCategory(i)}
-          >
-            <span className="icon is-normal">
-              <FontAwesomeIcon icon={faTimes} title="remove" color="#f14668" />
+            <span className="form-control-feedback">
+              <FontAwesomeIcon icon={faTags} />
             </span>
-          </button>
-        </div>
+          </div>
 
-        <div className="control">
-          <FontAwesomeIcon icon={faChevronRight} size="2x" color="#999" />
+          <div>
+            <button
+              className={xButtonCssClasses}
+              onClick={() => handleRemoveCategory(i)}
+            >
+              <span className="icon is-normal">
+                <FontAwesomeIcon
+                  icon={faTimes}
+                  title="remove"
+                  color="#f14668"
+                />
+              </span>
+            </button>
+          </div>
+
+          <div className="control">
+            <FontAwesomeIcon icon={faCaretRight} size="2x" color="#999" />
+          </div>
         </div>
       </React.Fragment>
     );
@@ -251,7 +256,10 @@ export function MultiDropdownSearch(props: Props) {
 
     if (categoryFields.length >= groupSize) {
       categoryFieldGroups.push(
-        <div className="field is-grouped is-grouped" key={`fieldGroup-${i}`}>
+        <div
+          className="d-flex gap-0 flex-column flex-lg-row gap-lg-3"
+          key={`fieldGroup-${i}`}
+        >
           {categoryFields.splice(0, categoryFields.length)}
         </div>
       );
@@ -260,7 +268,7 @@ export function MultiDropdownSearch(props: Props) {
 
   if (categoryFields.length >= 0) {
     categoryFieldGroups.push(
-      <div className="field is-grouped is-grouped" key="fieldGroup-last">
+      <div className="d-flex" key="fieldGroup-last">
         {categoryFields.splice(0, categoryFields.length)}
       </div>
     );
@@ -295,32 +303,34 @@ export function MultiDropdownSearch(props: Props) {
     return (
       <div>
         {/* Category Dropdowns */}
-        <strong>{t('ttsListPage.categoryFilters')}</strong>
+        <strong>{t("ttsListPage.categoryFilters")}</strong>
         <br />
         {categoryFieldGroups}
 
         {/* Model Dropdown */}
         <strong>
           <Trans i18nKey="ttsListPage.voiceCount" count={voiceCount}>
-          Voice ({voiceCount} to choose from)
+            Voice ({voiceCount} to choose from)
           </Trans>
         </strong>
         <br />
         <div className="control has-icons-left">
           <div className={selectClasses}>
-            <select 
-                name="tts-model-select"
-                onChange={handleChangeVoice}
-                disabled={isLoading}
-              >
-              {isLoading ? loadingOption : Array.from(leafiestCategoryModels).map(model => {
-                return (
-                  <option
-                    key={model.model_token}
-                    value={model.model_token}
-                    >{model.title} ({t('ttsListPage.by')} {model.creator_display_name})</option>
-                );
-              })}
+            <select
+              name="tts-model-select"
+              onChange={handleChangeVoice}
+              disabled={isLoading}
+            >
+              {isLoading
+                ? loadingOption
+                : Array.from(leafiestCategoryModels).map((model) => {
+                    return (
+                      <option key={model.model_token} value={model.model_token}>
+                        {model.title} ({t("ttsListPage.by")}{" "}
+                        {model.creator_display_name})
+                      </option>
+                    );
+                  })}
             </select>
           </div>
           <span className="icon is-small is-left">
@@ -328,14 +338,13 @@ export function MultiDropdownSearch(props: Props) {
           </span>
         </div>
       </div>
-    )
+    );
   }
 
   return (
     <div>
       {/* Category Dropdowns */}
       <label className="sub-title">{t("ttsListPage.categoryFilters")}</label>
-      <br />
       {categoryFieldGroups}
 
       {/* Model Dropdown */}
