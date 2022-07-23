@@ -38,7 +38,11 @@ import { TwitchTtsNotice } from "./notices/TwitchTtsNotice";
 import { PleaseFollowNotice } from "./notices/PleaseFollowNotice";
 import { distance, delay, delay2, duration } from "../../../../data/animation";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faVolumeUp } from "@fortawesome/free-solid-svg-icons";
+import {
+  faTrash,
+  faVolumeHigh,
+  faVolumeUp,
+} from "@fortawesome/free-solid-svg-icons";
 import { USE_REFRESH } from "../../../../Refresh";
 
 const Fade = require("react-reveal/Fade");
@@ -208,10 +212,11 @@ function TtsModelListFc(props: Props) {
     let modelName = props.maybeSelectedTtsModel.title;
     let userName = props.maybeSelectedTtsModel.creator_display_name;
     directViewLink = (
-      <Link to={modelLink}>
+      <Link to={modelLink} className="py-2">
         <Trans i18nKey="ttsListPage.seeModelDetails">
-          See more details about the "<strong>{{ modelName }}</strong>" model
-          by&nbsp;<strong>{{ userName }}</strong>&nbsp;
+          See more details about the "
+          <span className="fw-semibold">{{ modelName }}</span>" model by&nbsp;
+          <span className="fw-semibold">{{ userName }}</span>&nbsp;
         </Trans>
         <Gravatar
           size={15}
@@ -267,11 +272,10 @@ function TtsModelListFc(props: Props) {
 
     if (hasMessage) {
       maybeError = (
-        <div className="notification is-warning">
-          <button
-            className="delete"
-            onClick={() => setMaybeTtsError(undefined)}
-          ></button>
+        <div className="alert alert-warning m-0">
+          <button className="close" onClick={() => setMaybeTtsError(undefined)}>
+            <span aria-hidden="true">&times;</span>
+          </button>
           {message}
         </div>
       );
@@ -343,10 +347,7 @@ function TtsModelListFc(props: Props) {
             setMaybeSelectedTtsModel={props.setMaybeSelectedTtsModel}
           />
 
-          {directViewLink}
-
-          <br />
-          <br />
+          <div>{directViewLink}</div>
 
           <div className="field">
             <div className="control">
@@ -470,7 +471,7 @@ function TtsModelListFc(props: Props) {
 
       {twitchTtsNotice}
 
-      <div className="container-panel pt-4 pb-5">
+      <div className="container-panel pt-4 pb-5 mb-4">
         <Fade bottom distance={distance} delay={delay2} duration={duration}>
           <div className="panel p-3 p-lg-4 mt-5 mt-lg-0">
             <i className="fas fa-volume-high"></i>
@@ -531,12 +532,14 @@ function TtsModelListFc(props: Props) {
                       className="btn btn-primary w-100"
                       disabled={remainingCharactersButtonDisabled}
                     >
+                      <FontAwesomeIcon icon={faVolumeHigh} className="me-2" />
                       {t("pages.ttsList.buttonSpeak")}
                     </button>
                     <button
                       className="btn btn-destructive w-100"
                       onClick={handleClearClick}
                     >
+                      <FontAwesomeIcon icon={faTrash} className="me-2" />
                       {t("pages.ttsList.buttonClear")}
                     </button>
                   </div>
@@ -547,31 +550,22 @@ function TtsModelListFc(props: Props) {
         </Fade>
       </div>
 
-      <br />
-      <br />
       <SessionTtsInferenceResultListFc
         ttsInferenceJobs={props.ttsInferenceJobs}
       />
 
-      <br />
-      <br />
-
       <SessionW2lInferenceResultListFc
         w2lInferenceJobs={props.w2lInferenceJobs}
       />
-      <br />
-      <br />
 
       <SessionW2lTemplateUploadResultListFc
         w2lTemplateUploadJobs={props.w2lTemplateUploadJobs}
       />
 
-      <br />
-      <br />
-
       <SessionTtsModelUploadResultListFc
         modelUploadJobs={props.ttsModelUploadJobs}
       />
+      <br />
     </div>
   );
 }

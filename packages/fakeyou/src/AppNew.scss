@@ -147,10 +147,10 @@ $headings-font-family: "Merriweather", serif;
       font-size: 15px;
       font-weight: 600;
       padding: 0.5rem 1rem;
-      color: #212529;
+      color: $secondary;
 
       &:hover {
-        color: #212529;
+        color: $secondary;
       }
       &:focus {
         background-color: $white;
