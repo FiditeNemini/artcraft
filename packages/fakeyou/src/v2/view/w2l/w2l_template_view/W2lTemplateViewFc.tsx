@@ -22,7 +22,7 @@ import {
 import { GetW2lTemplateUseCount } from "../../../api/w2l/GetW2lTemplateUseCount";
 import { BackLink } from "../../_common/BackLink";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faEdit, faTrash, faCheck } from "@fortawesome/free-solid-svg-icons";
+import { faEdit, faTrash } from "@fortawesome/free-solid-svg-icons";
 import { distance, delay, duration } from "../../../../data/animation";
 
 const Fade = require("react-reveal/Fade");
@@ -167,10 +167,10 @@ function W2lTemplateViewFc(props: Props) {
 
   let url = new BucketConfig().getGcsUrl(object);
 
-  let audioFilename = "(select a file)";
-  if (audioFile !== undefined) {
-    audioFilename = audioFile?.name;
-  }
+  // let audioFilename = "(select a file)";
+  // if (audioFile !== undefined) {
+  //   audioFilename = audioFile?.name;
+  // }
 
   let modApprovalStatus = <span />;
 
