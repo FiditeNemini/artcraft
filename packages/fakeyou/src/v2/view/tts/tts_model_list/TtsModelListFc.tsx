@@ -461,7 +461,7 @@ function TtsModelListFc(props: Props) {
 
             <Fade bottom delay={delay} duration={duration} distance={distance}>
               <div className="d-flex flex-column flex-md-row gap-3 justify-content-center justify-content-lg-start mb-5 mb-lg-4">
-                <Link to="/">
+                <Link to="/signup">
                   <button type="button" className="btn btn-primary w-100">
                     Sign Up
                   </button>
