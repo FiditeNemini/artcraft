@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
-import { Link } from "react-router-dom";
+import { Link, useHistory } from "react-router-dom";
 import { MigrationTopNavSession } from "../../migration/MigrationTopNav_Session";
 import { FrontendUrlConfig } from "../../common/FrontendUrlConfig";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -20,6 +20,8 @@ import {
 import { faPatreon } from "@fortawesome/free-brands-svg-icons";
 import { t } from "i18next";
 import { USE_REFRESH } from "../../Refresh";
+import { Logout } from "@storyteller/components/src/api/session/Logout";
+import { Gravatar } from "@storyteller/components/src/elements/Gravatar";
 
 interface Props {
   sessionWrapper: SessionWrapper;
@@ -28,6 +30,8 @@ interface Props {
 }
 
 function NewTopNavFc(props: Props) {
+  let history = useHistory();
+
   let myDataLink = "/signup";
 
   if (props.sessionWrapper.isLoggedIn()) {
@@ -227,6 +231,77 @@ function NewTopNavFc(props: Props) {
             </div>
           </div>
         </nav>
+      </>
+    );
+  }
+
+  const logoutHandler = async () => {
+    await Logout();
+    props.querySessionCallback();
+    history.push('/');
+  }
+
+  const loggedIn = props.sessionWrapper.isLoggedIn();
+
+  let userOrLoginButton = (
+    <>
+      <Link
+        data-bs-toggle="offcanvas"
+        className="nav-login me-3"
+        to="/login"
+      >
+        Login
+      </Link>
+    </>
+  );
+
+  let signupOrLogOutButton =  (
+    <>
+      <Link data-bs-toggle="offcanvas" to="/signup">
+        <button type="button" className="btn btn-primary btn-lg">
+          Sign up
+        </button>
+      </Link>
+    </>
+  );
+
+  if (loggedIn) {
+    let displayName = props.sessionWrapper.getDisplayName();
+    let gravatarHash = props.sessionWrapper.getEmailGravatarHash();
+    let gravatar = <span />;
+
+    if (displayName === undefined) {
+      displayName = 'My Account';
+    }
+
+    if (gravatarHash !== undefined) {
+      gravatar = <Gravatar email_hash={gravatarHash} size={15} />
+    }
+
+    let url = `/profile/${displayName}`;
+    userOrLoginButton = (
+      <>
+        <Link
+          className="nav-login me-3"
+          to={url}
+          >
+          {gravatar}&nbsp; {displayName}
+        </Link>
+
+      </>
+    );
+
+    signupOrLogOutButton = (
+      <>
+        <button 
+          type="button" 
+          className="btn btn-primary btn-lg"
+          onClick={async () => {
+            await logoutHandler();
+          }}
+          >
+          Log Out
+        </button>
       </>
     );
   }
@@ -440,18 +515,8 @@ function NewTopNavFc(props: Props) {
                 </li>
               </ul>
               <div className="d-grid gap-2 d-flex justify-content-start align-items-center pt-4 ps-3 pt-lg-0 ps-lg-0">
-                <Link
-                  data-bs-toggle="offcanvas"
-                  className="nav-login me-3"
-                  to="/login"
-                >
-                  Login
-                </Link>
-                <Link data-bs-toggle="offcanvas" to="/signup">
-                  <button type="button" className="btn btn-primary btn-lg">
-                    Sign up
-                  </button>
-                </Link>
+                {userOrLoginButton}
+                {signupOrLogOutButton}
               </div>
               {/* <div className="navbar-end">
                 <div className="navbar-item">
