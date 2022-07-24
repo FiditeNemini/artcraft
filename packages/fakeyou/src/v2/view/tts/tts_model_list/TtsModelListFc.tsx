@@ -415,6 +415,14 @@ function TtsModelListFc(props: Props) {
 
   return (
     <div>
+      {pleaseFollowNotice}
+
+      {languageNotice}
+
+      {vocodesNotice}
+
+      {twitchTtsNotice}
+
       <div className="container hero-section">
         <div className="row gx-3 flex-lg-row-reverse align-items-center">
           <div className="col-lg-6">
@@ -446,7 +454,7 @@ function TtsModelListFc(props: Props) {
             </Fade>
 
             <Fade bottom delay={delay} duration={duration} distance={distance}>
-              <div className="d-grid gap-3 d-lg-flex justify-content-lg-start mb-4">
+              <div className="d-flex flex-column flex-md-row gap-3 justify-content-center justify-content-lg-start mb-5 mb-lg-4">
                 <Link to="/">
                   <button type="button" className="btn btn-primary w-100">
                     Sign Up
@@ -462,14 +470,6 @@ function TtsModelListFc(props: Props) {
           </div>
         </div>
       </div>
-
-      {pleaseFollowNotice}
-
-      {languageNotice}
-
-      {vocodesNotice}
-
-      {twitchTtsNotice}
 
       <div className="container-panel pt-4 pb-5 mb-4">
         <Fade bottom distance={distance} delay={delay2} duration={duration}>
@@ -527,7 +527,7 @@ function TtsModelListFc(props: Props) {
 
                   {maybeError}
 
-                  <div className="d-flex flex-column flex-lg-row w-100 gap-3 mt-3">
+                  <div className="d-flex flex-column flex-md-row w-100 gap-3 mt-3">
                     <button
                       className="btn btn-primary w-100"
                       disabled={remainingCharactersButtonDisabled}

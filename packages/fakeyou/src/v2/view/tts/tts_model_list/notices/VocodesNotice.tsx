@@ -16,11 +16,17 @@ function VocodesNotice(props: Props) {
           production and deepfake tools, so stay tuned.
         </div>
       </article>*/}
-      <div className="container pb-5">
-        <div className="alert alert-primary alert-dismissible position-relative">
-          <button className="close" onClick={() => props.clearVocodesNotice()}>
-            <span aria-hidden="true">&times;</span>
-          </button>
+      <div className="container pt-3">
+        <div
+          className="alert alert-primary alert-dismissible fade show"
+          role="alert"
+        >
+          <button
+            className="btn-close"
+            onClick={() => props.clearVocodesNotice()}
+            data-bs-dismiss="alert"
+            aria-label="Close"
+          ></button>
           <em>Vocodes</em> is now{" "}
           <strong>
             <em>FakeYou</em>

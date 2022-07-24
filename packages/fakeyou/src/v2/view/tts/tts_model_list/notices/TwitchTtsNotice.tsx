@@ -7,14 +7,17 @@ interface Props {
 function TwitchTtsNotice(props: Props) {
   return (
     <>
-      <div className="container pb-5">
-        <div className="alert alert-primary alert-dismissible position-relative">
+      <div className="container pt-3">
+        <div
+          className="alert alert-primary alert-dismissible fade show"
+          role="alert"
+        >
           <button
-            className="close"
+            className="btn-close"
             onClick={() => props.clearTwitchTtsNotice()}
-          >
-            <span aria-hidden="true">&times;</span>
-          </button>
+            data-bs-dismiss="alert"
+            aria-label="Close"
+          ></button>
           <strong>
             If you stream on Twitch, we have a brand new platform for you!
           </strong>
