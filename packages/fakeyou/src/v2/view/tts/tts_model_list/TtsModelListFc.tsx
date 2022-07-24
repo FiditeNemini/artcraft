@@ -272,10 +272,16 @@ function TtsModelListFc(props: Props) {
 
     if (hasMessage) {
       maybeError = (
-        <div className="alert alert-warning m-0">
-          <button className="close" onClick={() => setMaybeTtsError(undefined)}>
-            <span aria-hidden="true">&times;</span>
-          </button>
+        <div
+          className="alert alert-primary alert-dismissible fade show m-0"
+          role="alert"
+        >
+          <button
+            className="btn-close"
+            onClick={() => setMaybeTtsError(undefined)}
+            data-bs-dismiss="alert"
+            aria-label="Close"
+          ></button>
           {message}
         </div>
       );
