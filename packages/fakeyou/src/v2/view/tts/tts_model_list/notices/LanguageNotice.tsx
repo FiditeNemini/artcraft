@@ -80,11 +80,17 @@ function LanguageNotice(props: Props) {
   return (
     <>
       \
-      <div className="container pb-5">
-        <div className="alert alert-primary alert-dismissible position-relative">
-          <button className="close" onClick={() => props.clearLanguageNotice()}>
-            <span aria-hidden="true">&times;</span>
-          </button>
+      <div className="container pt-3">
+        <div
+          className="alert alert-primary alert-dismissible fade show"
+          role="alert"
+        >
+          <button
+            className="btn-close"
+            onClick={() => props.clearLanguageNotice()}
+            data-bs-dismiss="alert"
+            aria-label="Close"
+          ></button>
           <h1>{title}</h1>
           {weHaveModels}
           {joinUs}

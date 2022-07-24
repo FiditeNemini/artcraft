@@ -11,14 +11,17 @@ interface Props {
 function PleaseFollowNotice(props: Props) {
   return (
     <>
-      <div className="container pb-5">
-        <div className="alert alert-primary alert-dismissible position-relative">
+      <div className="container pt-3">
+        <div
+          className="alert alert-primary alert-dismissible fade show"
+          role="alert"
+        >
           <button
-            className="close"
+            className="btn-close"
             onClick={() => props.clearPleaseFollowNotice()}
-          >
-            <span aria-hidden="true">&times;</span>
-          </button>
+            data-bs-dismiss="alert"
+            aria-label="Close"
+          ></button>
           <strong>
             <Trans i18nKey="notices.pleaseFollow.title">
               Sorry our site is so slow!
