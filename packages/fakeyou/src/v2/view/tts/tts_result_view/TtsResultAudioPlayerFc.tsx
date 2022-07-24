@@ -28,10 +28,10 @@ function TtsResultAudioPlayerFc(props: Props) {
     const wavesurferInstance = WaveSurfer.create({
       container: "#waveform", // Previousy I used 'this.ref.current' and React.createRef()
       height: 200,
-      barWidth: 2,
+
       responsive: true,
       waveColor: "#cbcbcb",
-      progressColor: "#fc6b68",
+      progressColor: "#fc8481",
       cursorColor: "#fc6b68",
       cursorWidth: 2,
       normalize: false,
