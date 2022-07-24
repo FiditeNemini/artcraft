@@ -88,7 +88,7 @@ function SpectrogramFc(props: Props) {
     />
   );
 
-  return <div>{canvas}</div>;
+  return <div className="py-6">{canvas}</div>;
 }
 
 export { SpectrogramFc };
