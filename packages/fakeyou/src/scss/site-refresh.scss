@@ -489,17 +489,7 @@ styles with important tags:
   }
 
   .alert {
-    .close {
-      position: absolute;
-      border-radius: 50px;
-      border: none;
-      background: none;
-      padding: 0;
-      margin: 0;
-      right: 12px;
-      top: 0px;
-      font-size: 30px;
-    }
+    font-size: 14px;
   }
 }
 
@@ -547,6 +537,10 @@ styles with important tags:
 
     ul.patrons-list {
       columns: 3;
+    }
+
+    .alert {
+      font-size: 16px;
     }
   }
 }
