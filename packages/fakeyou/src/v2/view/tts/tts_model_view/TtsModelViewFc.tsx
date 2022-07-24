@@ -235,58 +235,6 @@ function TtsModelViewFc(props: Props) {
 
   let moderatorRows = null;
 
-  if (
-    props.sessionWrapper.canDeleteOtherUsersTtsResults() ||
-    props.sessionWrapper.canDeleteOtherUsersTtsModels()
-  ) {
-    moderatorRows = (
-      <>
-        <tr>
-          <th>Creator is banned</th>
-          <td>
-            {ttsModel?.maybe_moderator_fields?.creator_is_banned
-              ? "banned"
-              : "good standing"}
-          </td>
-        </tr>
-        <tr>
-          <th>Creation IP address</th>
-          <td>
-            {ttsModel?.maybe_moderator_fields?.creator_ip_address_creation ||
-              "server error"}
-          </td>
-        </tr>
-        <tr>
-          <th>Update IP address</th>
-          <td>
-            {ttsModel?.maybe_moderator_fields?.creator_ip_address_last_update ||
-              "server error"}
-          </td>
-        </tr>
-        <tr>
-          <th>Mod deleted at (UTC)</th>
-          <td>
-            {ttsModel?.maybe_moderator_fields?.mod_deleted_at || "not deleted"}
-          </td>
-        </tr>
-        <tr>
-          <th>User deleted at (UTC)</th>
-          <td>
-            {ttsModel?.maybe_moderator_fields?.user_deleted_at || "not deleted"}
-          </td>
-        </tr>
-        <tr>
-          <th>Is Front Page Featured?</th>
-          <td>{ttsModel?.is_front_page_featured ? "yes" : "no"}</td>
-        </tr>
-        <tr>
-          <th>Is Twitch Featured?</th>
-          <td>{ttsModel?.is_twitch_featured ? "yes" : "no"}</td>
-        </tr>
-      </>
-    );
-  }
-
   let canEditModel = props.sessionWrapper.canEditTtsModelByUserToken(
     ttsModel?.creator_user_token
   );
@@ -486,6 +434,77 @@ function TtsModelViewFc(props: Props) {
     textPipelineName = `Not set; using default of ${configuredName}`;
   }
 
+  if (
+    props.sessionWrapper.canDeleteOtherUsersTtsResults() ||
+    props.sessionWrapper.canDeleteOtherUsersTtsModels()
+  ) {
+    moderatorRows = (
+      <>
+        <div className="container-panel pt-3 pb-5">
+          <div className="panel p-3 p-lg-4">
+            <h2 className="panel-title fw-bold">Moderator Details</h2>
+            <div className="py-6">
+              <table className="table">
+                <tbody>
+                  <tr>
+                    <th>Creator is banned</th>
+                    <td>
+                      {ttsModel?.maybe_moderator_fields?.creator_is_banned
+                        ? "banned"
+                        : "good standing"}
+                    </td>
+                  </tr>
+                  <tr>
+                    <th>Creation IP address</th>
+                    <td>
+                      {ttsModel?.maybe_moderator_fields
+                        ?.creator_ip_address_creation || "server error"}
+                    </td>
+                  </tr>
+                  <tr>
+                    <th>Update IP address</th>
+                    <td>
+                      {ttsModel?.maybe_moderator_fields
+                        ?.creator_ip_address_last_update || "server error"}
+                    </td>
+                  </tr>
+                  <tr>
+                    <th>Mod deleted at (UTC)</th>
+                    <td>
+                      {ttsModel?.maybe_moderator_fields?.mod_deleted_at ||
+                        "not deleted"}
+                    </td>
+                  </tr>
+                  <tr>
+                    <th>User deleted at (UTC)</th>
+                    <td>
+                      {ttsModel?.maybe_moderator_fields?.user_deleted_at ||
+                        "not deleted"}
+                    </td>
+                  </tr>
+                  <tr>
+                    <th>Is Front Page Featured?</th>
+                    <td>{ttsModel?.is_front_page_featured ? "yes" : "no"}</td>
+                  </tr>
+                  <tr>
+                    <th>Is Twitch Featured?</th>
+                    <td>{ttsModel?.is_twitch_featured ? "yes" : "no"}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+        <div className="container pb-5">
+          <div className="d-flex flex-column flex-md-row gap-3">
+            {editModelButton}
+            {deleteModelButton}
+          </div>
+        </div>
+      </>
+    );
+  }
+
   return (
     <div>
       <div className="container py-5">
@@ -564,23 +583,7 @@ function TtsModelViewFc(props: Props) {
           </div>
         </div>
 
-        <div className="container-panel pt-3 pb-5">
-          <div className="panel p-3 p-lg-4">
-            <h2 className="panel-title fw-bold">Moderator Details</h2>
-            <div className="py-6">
-              <table className="table">
-                <tbody>{moderatorRows}</tbody>
-              </table>
-            </div>
-          </div>
-        </div>
-
-        <div className="container pb-5">
-          <div className="d-flex flex-column flex-md-row gap-3">
-            {editModelButton}
-            {deleteModelButton}
-          </div>
-        </div>
+        <div>{moderatorRows}</div>
 
         <div className="container-panel py-5">
           <div className="panel p-3 p-lg-4">
