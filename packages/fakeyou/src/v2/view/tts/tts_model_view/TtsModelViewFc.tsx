@@ -271,7 +271,7 @@ function TtsModelViewFc(props: Props) {
       : "Delete Model?";
 
     const deleteButtonCss = currentlyDeleted
-      ? "btn btn-primary w-100"
+      ? "btn btn-secondary w-100"
       : "btn btn-destructive w-100";
 
     deleteModelButton = (
