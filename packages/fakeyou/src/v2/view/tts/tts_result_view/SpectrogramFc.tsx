@@ -79,7 +79,13 @@ function SpectrogramFc(props: Props) {
   let height = 80 * 3;
 
   let canvas = (
-    <canvas ref={canvasRef} width="100%" height={height} id="spectrogram" />
+    <canvas
+      ref={canvasRef}
+      width="100%"
+      height={height}
+      id="spectrogram"
+      className="rounded"
+    />
   );
 
   return <div>{canvas}</div>;
