@@ -495,12 +495,6 @@ function TtsModelViewFc(props: Props) {
             </div>
           </div>
         </div>
-        <div className="container pb-5">
-          <div className="d-flex flex-column flex-md-row gap-3">
-            {editModelButton}
-            {deleteModelButton}
-          </div>
-        </div>
       </>
     );
   }
@@ -584,6 +578,13 @@ function TtsModelViewFc(props: Props) {
         </div>
 
         <div>{moderatorRows}</div>
+
+        <div className="container pb-5">
+          <div className="d-flex flex-column flex-md-row gap-3">
+            {editModelButton}
+            {deleteModelButton}
+          </div>
+        </div>
 
         <div className="container-panel py-5">
           <div className="panel p-3 p-lg-4">
