@@ -110,7 +110,7 @@ function PatronPage(props: Props) {
               <img
                 className="img-fluid mt-5 mw-50"
                 src="/mascot/kitsune_pose7.png"
-                alt=""
+                alt="FakeYou Mascot"
                 width="560"
               />
             </Fade>

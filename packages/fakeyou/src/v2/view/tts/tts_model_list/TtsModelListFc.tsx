@@ -436,9 +436,8 @@ function TtsModelListFc(props: Props) {
               <Fade right distance={distance} delay={delay} duration={duration}>
                 <img
                   src="mascot/kitsune_pose2.png"
-                  className="ani4 load-hidden img-fluid"
+                  className="img-fluid"
                   width="560"
-                  loading="lazy"
                   alt="FakeYou Mascot"
                 />
               </Fade>

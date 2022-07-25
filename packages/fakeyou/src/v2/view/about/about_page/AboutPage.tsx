@@ -282,7 +282,6 @@ function AboutPage(props: Props) {
                   src="/mascot/kitsune_pose3.png"
                   className="img-fluid"
                   width="520"
-                  loading="lazy"
                   alt="FakeYou Kitsune Mascot!"
                 />
               </Fade>

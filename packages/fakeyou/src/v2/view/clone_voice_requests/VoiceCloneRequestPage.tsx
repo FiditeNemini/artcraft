@@ -283,9 +283,8 @@ function VoiceCloneRequestPage(props: Props) {
                 >
                   <img
                     src="/mascot/kitsune_pose4.png"
-                    className="ani4 load-hidden img-fluid"
+                    className="img-fluid"
                     width="560"
-                    loading="lazy"
                     alt="FakeYou Mascot"
                   />
                 </Fade>
