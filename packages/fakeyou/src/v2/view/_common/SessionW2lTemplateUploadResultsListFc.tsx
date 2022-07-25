@@ -80,7 +80,7 @@ function SessionW2lTemplateUploadResultListFc(props: Props) {
   return (
     <div>
       <Fade cascade right distance="100px" duration="400">
-        <div className="container-panel py-5">
+        <div className="container-panel pt-4 pb-5">
           <div className="pb-4">{title}</div>
           <div className="d-flex flex-column gap-4">{results}</div>
         </div>
