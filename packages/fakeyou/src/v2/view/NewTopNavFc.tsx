@@ -526,7 +526,7 @@ function NewTopNavFc(props: Props) {
                       Online: <span className="fw-bold text-red">1,204</span>
                     </p> */}
                     <div className="top-bar-text mobile">
-                      TTS Queued: <span className="fw-bold text-red ">48</span>
+                      TTS Queued: <span className="fw-bold text-red ">{pendingTtsJobs.pending_job_count}</span>
                     </div>
                   </div>
                 </li>
