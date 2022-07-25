@@ -102,6 +102,10 @@ class ApiConfig {
     return `${this.getScheme()}://${this.getNewApiHost()}/tts/list`;
   }
 
+  getPendingTtsJobCount(): string {
+    return `${this.getScheme()}://${this.getNewApiHost()}/tts/queue_length`;
+  }
+
   viewTtsModel(modelSlug: string): string {
     return `${this.getScheme()}://${this.getNewApiHost()}/tts/model/${modelSlug}`;
   }
