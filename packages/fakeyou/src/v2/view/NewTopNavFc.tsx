@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
 import { Link, useHistory } from "react-router-dom";
 import { MigrationTopNavSession } from "../../migration/MigrationTopNav_Session";
@@ -23,6 +23,7 @@ import { t } from "i18next";
 import { USE_REFRESH } from "../../Refresh";
 import { Logout } from "@storyteller/components/src/api/session/Logout";
 import { Gravatar } from "@storyteller/components/src/elements/Gravatar";
+import { GetPendingTtsJobCount, GetPendingTtsJobCountIsOk, GetPendingTtsJobCountSuccessResponse } from "@storyteller/components/src/api/tts/GetPendingTtsJobCount";
 
 interface Props {
   sessionWrapper: SessionWrapper;
@@ -39,6 +40,29 @@ function NewTopNavFc(props: Props) {
     let username = props.sessionWrapper.getUsername();
     myDataLink = `/profile/${username}`;
   }
+
+  // NB: The responses from the "job count" endpoint are cached in a distributed manner.
+  // We use the timestamp as a vector clock to know when to update our view.
+  const [pendingTtsJobs, setPendingTtsJobs] = useState<GetPendingTtsJobCountSuccessResponse>({ 
+    success: true,
+    pending_job_count: 0,
+    cache_time: new Date(0), // NB: Epoch
+  });
+
+  useEffect(() => {
+    const fetch = async () => {
+      const response = await GetPendingTtsJobCount();
+      if (GetPendingTtsJobCountIsOk(response)) {
+        console.log(response);
+        if (response.cache_time.getTime() > pendingTtsJobs.cache_time.getTime()) {
+          setPendingTtsJobs(response);
+        }
+      }
+    };
+    const interval = setInterval(async () => fetch(), 15000);
+    fetch();
+    return () => clearInterval(interval);
+  }, [pendingTtsJobs]);
 
   const [mobileHamburgerIsActive, setMobileHamburgerIsActive] =
     useState<boolean>(false);
@@ -326,7 +350,7 @@ function NewTopNavFc(props: Props) {
               Online Users: <span className="fw-bold text-red">1,204</span>
             </p> */}
             <p className="top-bar-text">
-              TTS Queued: <span className="fw-bold text-red">48</span>
+              TTS Queued: <span className="fw-bold text-red">{pendingTtsJobs.pending_job_count}</span>
             </p>
           </div>
         </div>
