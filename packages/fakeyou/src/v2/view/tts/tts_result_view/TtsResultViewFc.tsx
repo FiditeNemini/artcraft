@@ -6,8 +6,7 @@ import { useParams, Link } from "react-router-dom";
 import { SpectrogramFc } from "./SpectrogramFc";
 import { ReportDiscordLinkFc } from "../../_common/DiscordReportLinkFc";
 import { FrontendUrlConfig } from "../../../../common/FrontendUrlConfig";
-import { HiddenIconFc } from "../../_icons/HiddenIcon";
-import { VisibleIconFc } from "../../_icons/VisibleIcon";
+
 import {
   GetTtsResult,
   GetTtsResultIsErr,
@@ -17,7 +16,17 @@ import {
 } from "../../../api/tts/GetTtsResult";
 import { TtsResultAudioPlayerFc } from "./TtsResultAudioPlayerFc";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faDownload, faEdit, faTrash } from "@fortawesome/free-solid-svg-icons";
+import {
+  faDownload,
+  faEdit,
+  faTrash,
+  faEye,
+  faEyeSlash,
+} from "@fortawesome/free-solid-svg-icons";
+import { distance, delay, duration } from "../../../../data/animation";
+
+const Fade = require("react-reveal/Fade");
+
 interface Props {
   sessionWrapper: SessionWrapper;
 }
@@ -105,56 +114,64 @@ function TtsResultViewFc(props: Props) {
   ) {
     moderatorRows = (
       <>
-        <div className="container-panel pt-3 pb-5">
-          <div className="panel p-3 p-lg-4">
-            <h2 className="panel-title fw-bold">Moderator Details</h2>
-            <div className="py-6">
-              <table className="table tts-result-table">
-                <tbody>
-                  <tr>
-                    <th>Model creator is banned</th>
-                    <td>
-                      {ttsInferenceResult?.maybe_moderator_fields
-                        ?.model_creator_is_banned
-                        ? "banned"
-                        : "good standing"}
-                    </td>
-                  </tr>
-                  <tr>
-                    <th>Result creator is banned (if user)</th>
-                    <td>
-                      {ttsInferenceResult?.maybe_moderator_fields
-                        ?.result_creator_is_banned_if_user
-                        ? "banned"
-                        : "good standing"}
-                    </td>
-                  </tr>
-                  <tr>
-                    <th>Result creator IP address</th>
-                    <td>
-                      {ttsInferenceResult?.maybe_moderator_fields
-                        ?.result_creator_ip_address || "server error"}
-                    </td>
-                  </tr>
-                  <tr>
-                    <th>Mod deleted at (UTC)</th>
-                    <td>
-                      {ttsInferenceResult?.maybe_moderator_fields
-                        ?.mod_deleted_at || "not deleted"}
-                    </td>
-                  </tr>
-                  <tr>
-                    <th>Result creator deleted at (UTC)</th>
-                    <td>
-                      {ttsInferenceResult?.maybe_moderator_fields
-                        ?.result_creator_deleted_at || "not deleted"}
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
+        <Fade
+          cascade
+          bottom
+          duration={duration}
+          distance={distance}
+          delay={delay}
+        >
+          <div className="container-panel pt-3 pb-5">
+            <div className="panel p-3 p-lg-4">
+              <h2 className="panel-title fw-bold">Moderator Details</h2>
+              <div className="py-6">
+                <table className="table">
+                  <tbody>
+                    <tr>
+                      <th>Model creator is banned</th>
+                      <td>
+                        {ttsInferenceResult?.maybe_moderator_fields
+                          ?.model_creator_is_banned
+                          ? "banned"
+                          : "good standing"}
+                      </td>
+                    </tr>
+                    <tr>
+                      <th>Result creator is banned (if user)</th>
+                      <td>
+                        {ttsInferenceResult?.maybe_moderator_fields
+                          ?.result_creator_is_banned_if_user
+                          ? "banned"
+                          : "good standing"}
+                      </td>
+                    </tr>
+                    <tr>
+                      <th>Result creator IP address</th>
+                      <td>
+                        {ttsInferenceResult?.maybe_moderator_fields
+                          ?.result_creator_ip_address || "server error"}
+                      </td>
+                    </tr>
+                    <tr>
+                      <th>Mod deleted at (UTC)</th>
+                      <td>
+                        {ttsInferenceResult?.maybe_moderator_fields
+                          ?.mod_deleted_at || "not deleted"}
+                      </td>
+                    </tr>
+                    <tr>
+                      <th>Result creator deleted at (UTC)</th>
+                      <td>
+                        {ttsInferenceResult?.maybe_moderator_fields
+                          ?.result_creator_deleted_at || "not deleted"}
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
             </div>
           </div>
-        </div>
+        </Fade>
       </>
     );
   }
@@ -200,11 +217,11 @@ function TtsResultViewFc(props: Props) {
   let resultVisibility =
     ttsInferenceResult?.creator_set_visibility === "hidden" ? (
       <span>
-        Hidden <HiddenIconFc />
+        Hidden <FontAwesomeIcon icon={faEyeSlash} />
       </span>
     ) : (
       <span>
-        Public <VisibleIconFc />
+        Public <FontAwesomeIcon icon={faEye} />
       </span>
     );
 
@@ -270,32 +287,41 @@ function TtsResultViewFc(props: Props) {
 
   return (
     <div>
-      <div className="container py-5">
-        <div className="d-flex flex-column">
-          <h1 className="display-5 fw-bold mb-4 text-center text-lg-start">
-            {headingTitle}
-          </h1>
-        </div>
-      </div>
-
-      <div className="container-panel pt-3 pb-5">
-        <div className="panel p-3 p-lg-4">
-          {subtitle}
-          <div className="py-6">
-            <TtsResultAudioPlayerFc ttsResult={ttsInferenceResult} />
-            <a
-              className=" btn btn-primary w-100 mt-4"
-              href={audioLink}
-              download={audioDownloadFilename}
-            >
-              <FontAwesomeIcon icon={faDownload} className="me-2" />
-              Download File{" "}
-            </a>
+      <Fade cascade bottom duration={duration} distance={distance}>
+        <div className="container py-5">
+          <div className="d-flex flex-column">
+            <h1 className="display-5 fw-bold mb-4 text-center text-lg-start">
+              {headingTitle}
+            </h1>
           </div>
         </div>
-      </div>
+      </Fade>
 
-      {/* Without wavesurfer, 
+      <Fade
+        cascade
+        bottom
+        duration={duration}
+        delay={delay}
+        distance={distance}
+      >
+        <div className="container-panel pt-3 pb-5">
+          <div className="panel p-3 p-lg-4">
+            {subtitle}
+            <div className="py-6">
+              <TtsResultAudioPlayerFc ttsResult={ttsInferenceResult} />
+              <a
+                className=" btn btn-primary w-100 mt-4"
+                href={audioLink}
+                download={audioDownloadFilename}
+              >
+                <FontAwesomeIcon icon={faDownload} className="me-2" />
+                Download File{" "}
+              </a>
+            </div>
+          </div>
+        </div>
+
+        {/* Without wavesurfer, 
       <audio
         controls
         src={audioLink}>
@@ -303,82 +329,91 @@ function TtsResultViewFc(props: Props) {
             <code>audio</code> element.
       </audio>*/}
 
-      <div className="container-panel pt-3 pb-5">
-        <div className="panel p-3 p-lg-4">
-          <h2 className="panel-title fw-bold">Spectrogram</h2>
-          <SpectrogramFc spectrogramJsonLink={spectrogramLink} />
-        </div>
-      </div>
-
-      <div className="container-panel pt-3 pb-5">
-        <div className="panel p-3 p-lg-4">
-          <h2 className="panel-title fw-bold">Result Details</h2>
-          <div className="py-6">
-            <table className="table tts-result-table">
-              <tbody>
-                <tr>
-                  <th scope="row">Original text</th>
-                  <td className="overflow-fix">
-                    {ttsInferenceResult.raw_inference_text}
-                  </td>
-                </tr>
-                <tr>
-                  <th scope="row">Audio creator</th>
-                  <td>{creatorDetails}</td>
-                </tr>
-                <tr>
-                  <th scope="row">Audio duration</th>
-                  <td>{durationSeconds} seconds</td>
-                </tr>
-                <tr>
-                  <th scope="row">Visibility</th>
-                  <td>{resultVisibility}</td>
-                </tr>
-              </tbody>
-            </table>
+        <div className="container-panel pt-3 pb-5">
+          <div className="panel p-3 p-lg-4">
+            <h2 className="panel-title fw-bold">Spectrogram</h2>
+            <SpectrogramFc spectrogramJsonLink={spectrogramLink} />
           </div>
         </div>
-      </div>
 
-      <div className="container-panel pt-3 pb-5">
-        <div className="panel p-3 p-lg-4">
-          <h2 className="panel-title fw-bold">Model Used</h2>
-          <div className="py-6">
-            <table className="table tts-result-table">
-              <tbody>
-                <tr>
-                  <th scope="row">Model name</th>
-                  <td>
-                    <Link to={modelLink}>{modelName}</Link>
-                  </td>
-                </tr>
-                <tr>
-                  <th scope="row">Model creator</th>
-                  <td>{modelCreatorDetails}</td>
-                </tr>
-                <tr>
-                  <th scope="row">Vocoder used</th>
-                  <td>{vocoderUsed}</td>
-                </tr>
-              </tbody>
-            </table>
+        <div className="container-panel pt-3 pb-5">
+          <div className="panel p-3 p-lg-4">
+            <h2 className="panel-title fw-bold">Result Details</h2>
+            <div className="py-6">
+              <table className="table tts-result-table">
+                <tbody>
+                  <tr>
+                    <th scope="row">Original text</th>
+                    <td className="overflow-fix">
+                      {ttsInferenceResult.raw_inference_text}
+                    </td>
+                  </tr>
+                  <tr>
+                    <th scope="row">Audio creator</th>
+                    <td>{creatorDetails}</td>
+                  </tr>
+                  <tr>
+                    <th scope="row">Audio duration</th>
+                    <td>{durationSeconds} seconds</td>
+                  </tr>
+                  <tr>
+                    <th scope="row">Visibility</th>
+                    <td>{resultVisibility}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
           </div>
         </div>
-      </div>
 
-      {debugRows}
-
-      {moderatorRows}
-
-      <div className="container pb-5">
-        <div className="d-flex flex-column flex-md-row gap-3 mb-4">
-          {editButton}
-          {deleteButton}
+        <div className="container-panel pt-3 pb-5">
+          <div className="panel p-3 p-lg-4">
+            <h2 className="panel-title fw-bold">Model Used</h2>
+            <div className="py-6">
+              <table className="table tts-result-table">
+                <tbody>
+                  <tr>
+                    <th scope="row">Model name</th>
+                    <td>
+                      <Link to={modelLink}>{modelName}</Link>
+                    </td>
+                  </tr>
+                  <tr>
+                    <th scope="row">Model creator</th>
+                    <td>{modelCreatorDetails}</td>
+                  </tr>
+                  <tr>
+                    <th scope="row">Vocoder used</th>
+                    <td>{vocoderUsed}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
         </div>
-        <p className="text-center text-lg-start">
-          <ReportDiscordLinkFc />
-        </p>
-      </div>
+      </Fade>
+
+      <div>{debugRows}</div>
+
+      <div>{moderatorRows}</div>
+
+      <Fade
+        cascade
+        bottom
+        duration={duration}
+        distance={distance}
+        delay={delay}
+      >
+        <div className="container pb-5">
+          <div className="d-flex flex-column flex-md-row gap-3 mb-4">
+            {editButton}
+            {deleteButton}
+          </div>
+          <p className="text-center text-lg-start">
+            <ReportDiscordLinkFc />
+          </p>
+        </div>
+      </Fade>
     </div>
   );
 }
