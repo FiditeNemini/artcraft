@@ -183,10 +183,6 @@ function TtsResultDeleteFc(props: Props) {
 
   const buttonTitle = currentlyDeleted ? "Confirm Undelete" : "Confirm Delete";
 
-  const buttonCss = currentlyDeleted
-    ? "button is-warning is-large is-fullwidth"
-    : "button is-danger is-large is-fullwidth";
-
   const formLabel = currentlyDeleted
     ? "Recover the TTS Result (makes it visible again)"
     : "Delete TTS Result (hides from everyone but mods)";
