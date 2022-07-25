@@ -207,7 +207,20 @@ function SignupPage(props: Props) {
   };
 
   if (props.sessionWrapper.isLoggedIn()) {
-    return <div>Invalid view for logged in users.</div>;
+    return (
+      <div className="container py-5">
+        <div className="py-5">
+          <h1 className="fw-semibold text-center mb-4">
+            Invalid view for logged in users.
+          </h1>
+          <div className="text-center">
+            <Link className="btn btn-primary" to="/">
+              Back to main
+            </Link>
+          </div>
+        </div>
+      </div>
+    );
   }
 
   let usernameInputClass = USE_REFRESH ? "form-control" : "input";
@@ -274,45 +287,69 @@ function SignupPage(props: Props) {
     return (
       <div>
         <h1 className="title is-1"> Sign Up </h1>
-  
+
         <form onSubmit={handleFormSubmit}>
           <div className="field">
             <label className="label">Username</label>
             <div className="control has-icons-left has-icons-right">
-              <input className={usernameInputClass} type="text" placeholder="Username" value={username} onChange={handleUsernameChange} />
+              <input
+                className={usernameInputClass}
+                type="text"
+                placeholder="Username"
+                value={username}
+                onChange={handleUsernameChange}
+              />
               <span className="icon is-small is-left">
                 <FontAwesomeIcon icon={faUser} />
               </span>
             </div>
             <p className={usernameHelpClass}>{usernameInvalidReason}</p>
           </div>
-  
+
           <div className="field">
             <label className="label">Email</label>
             <div className="control has-icons-left has-icons-right">
-              <input className={emailInputClass} type="email" placeholder="Email" value={email} onChange={handleEmailChange} />
+              <input
+                className={emailInputClass}
+                type="email"
+                placeholder="Email"
+                value={email}
+                onChange={handleEmailChange}
+              />
               <span className="icon is-small is-left">
                 <FontAwesomeIcon icon={faEnvelope} />
               </span>
             </div>
             <p className={emailHelpClass}>{emailInvalidReason}</p>
           </div>
-  
+
           <div className="field">
             <label className="label">Password</label>
             <div className="control has-icons-left has-icons-right">
-              <input className={passwordInputClass} type="password" placeholder="Password" value={password} onChange={handlePasswordChange} />
+              <input
+                className={passwordInputClass}
+                type="password"
+                placeholder="Password"
+                value={password}
+                onChange={handlePasswordChange}
+              />
               <span className="icon is-small is-left">
                 <FontAwesomeIcon icon={faKey} />
               </span>
             </div>
             <p className={passwordHelpClass}>{passwordInvalidReason}</p>
           </div>
-  
+
           <div className="field">
             <label className="label">Password Confirmation</label>
             <div className="control has-icons-left has-icons-right">
-              <input className={passwordConfirmationInputClass} type="password" placeholder="Password confirmation" value={passwordConfirmation} onChange={handlePasswordConfirmationChange} />
+              <input
+                className={passwordConfirmationInputClass}
+                type="password"
+                placeholder="Password confirmation"
+                value={passwordConfirmation}
+                onChange={handlePasswordConfirmationChange}
+              />
               <span className="icon is-small is-left">
                 <FontAwesomeIcon icon={faKey} />
               </span>
@@ -321,24 +358,29 @@ function SignupPage(props: Props) {
               {passwordConfirmationInvalidReason}
             </p>
           </div>
-  
+
           <br />
-  
+
           <div className="notification is-warning">
-            <strong>Remember your password!</strong> We don't have password reset currently, and it'll be a 
-            few more weeks before it's added (there are more important features to work on). If you lose your
+            <strong>Remember your password!</strong> We don't have password
+            reset currently, and it'll be a few more weeks before it's added
+            (there are more important features to work on). If you lose your
             password, please let us know in Discord.
           </div>
-  
-          <button className="button is-link is-large is-fullwidth">Sign up</button>
+
+          <button className="button is-link is-large is-fullwidth">
+            Sign up
+          </button>
         </form>
-  
+
         <br />
-  
-        <Link to="/login"
+
+        <Link
+          to="/login"
           className="button is-info is-large is-fullwidth is-inverted"
-          >Already have an account? Log in instead!</Link>
-  
+        >
+          Already have an account? Log in instead!
+        </Link>
       </div>
     );
   }
@@ -347,7 +389,7 @@ function SignupPage(props: Props) {
     <div>
       <Fade bottom duration={duration} distance={distance}>
         <div className="container-panel pb-5 pt-lg-5 my-lg-5 login-panel">
-          <div className="panel p-3 p-lg-4 load-hidden mt-5 mt-lg-0">
+          <div className="panel p-3 p-lg-4 load-hidden mt-5 mt-lg-0 px-md-4">
             <h1 className="panel-title fw-bold ">Sign Up</h1>
             <div className="py-6">
               <form onSubmit={handleFormSubmit}>
@@ -429,13 +471,8 @@ function SignupPage(props: Props) {
                     Sign up
                   </button>
                   <p>
-                    Already have an account?
-                    <Link
-                      to="/login"
-                      className="button is-info is-large is-fullwidth is-inverted"
-                    >
-                      Log in instead.
-                    </Link>
+                    Already have an account?{" "}
+                    <Link to="/login">Log in instead.</Link>
                   </p>
                 </div>
               </form>

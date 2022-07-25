@@ -492,6 +492,10 @@ styles with important tags:
   .alert {
     font-size: 14px;
   }
+
+  .rounded-circle {
+    border-radius: 50px;
+  }
 }
 
 @media (min-width: 992px) {

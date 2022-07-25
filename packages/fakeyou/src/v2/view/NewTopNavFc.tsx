@@ -16,6 +16,7 @@ import {
   faTrophy,
   faUpload,
   faUser,
+  faSignOutAlt,
 } from "@fortawesome/free-solid-svg-icons";
 import { faPatreon } from "@fortawesome/free-brands-svg-icons";
 import { t } from "i18next";
@@ -238,28 +239,26 @@ function NewTopNavFc(props: Props) {
   const logoutHandler = async () => {
     await Logout();
     props.querySessionCallback();
-    history.push('/');
-  }
+    history.push("/");
+  };
 
   const loggedIn = props.sessionWrapper.isLoggedIn();
 
   let userOrLoginButton = (
     <>
-      <Link
-        data-bs-toggle="offcanvas"
-        className="nav-login me-3"
-        to="/login"
-      >
-        Login
+      <Link to="/login">
+        <span className="nav-login me-4" data-bs-toggle="offcanvas">
+          Login
+        </span>
       </Link>
     </>
   );
 
-  let signupOrLogOutButton =  (
+  let signupOrLogOutButton = (
     <>
-      <Link data-bs-toggle="offcanvas" to="/signup">
-        <button type="button" className="btn btn-primary btn-lg">
-          Sign up
+      <Link to="/signup">
+        <button className="btn btn-primary" data-bs-toggle="offcanvas">
+          Sign Up
         </button>
       </Link>
     </>
@@ -271,36 +270,34 @@ function NewTopNavFc(props: Props) {
     let gravatar = <span />;
 
     if (displayName === undefined) {
-      displayName = 'My Account';
+      displayName = "My Account";
     }
 
     if (gravatarHash !== undefined) {
-      gravatar = <Gravatar email_hash={gravatarHash} size={15} />
+      gravatar = <Gravatar email_hash={gravatarHash} size={15} />;
     }
 
     let url = `/profile/${displayName}`;
     userOrLoginButton = (
       <>
-        <Link
-          className="nav-login me-3"
-          to={url}
-          >
-          {gravatar}&nbsp; {displayName}
+        <Link className="btn btn-secondary me-3" to={url}>
+          <span data-bs-toggle="offcanvas">
+            {gravatar}&nbsp; {displayName}
+          </span>
         </Link>
-
       </>
     );
 
     signupOrLogOutButton = (
       <>
-        <button 
-          type="button" 
-          className="btn btn-primary btn-lg"
+        <button
+          type="button"
+          className="btn btn-destructive d-flex gap-2 align-items-center"
           onClick={async () => {
             await logoutHandler();
           }}
-          >
-          Log Out
+        >
+          <FontAwesomeIcon icon={faSignOutAlt} /> Log Out
         </button>
       </>
     );
@@ -325,9 +322,9 @@ function NewTopNavFc(props: Props) {
             </a>
           </div>
           <div className="d-flex gap-4">
-            <p className="top-bar-text">
+            {/* <p className="top-bar-text">
               Online Users: <span className="fw-bold text-red">1,204</span>
-            </p>
+            </p> */}
             <p className="top-bar-text">
               TTS Queued: <span className="fw-bold text-red">48</span>
             </p>
@@ -469,7 +466,7 @@ function NewTopNavFc(props: Props) {
                       <div className="dropdown-divider"></div>
                     </li>
                     <li data-bs-toggle="offcanvas">
-                      <Link className="dropdown-item" to="/profile">
+                      <Link className="dropdown-item" to={myDataLink}>
                         <FontAwesomeIcon icon={faUser} className="me-2" />
                         My Data
                       </Link>
@@ -501,12 +498,12 @@ function NewTopNavFc(props: Props) {
 
                 <li className="ps-3 d-lg-none">
                   <div className="d-flex gap-4 py-2">
-                    <p className="top-bar-text">
+                    {/* <p className="top-bar-text">
                       Online: <span className="fw-bold text-red">1,204</span>
-                    </p>
-                    <p className="top-bar-text">
-                      Queued: <span className="fw-bold text-red">48</span>
-                    </p>
+                    </p> */}
+                    <div className="top-bar-text mobile">
+                      TTS Queued: <span className="fw-bold text-red ">48</span>
+                    </div>
                   </div>
                 </li>
 
@@ -514,7 +511,7 @@ function NewTopNavFc(props: Props) {
                   <div className="dropdown-divider dropdown-divider-white"></div>
                 </li>
               </ul>
-              <div className="d-grid gap-2 d-flex justify-content-start align-items-center pt-4 ps-3 pt-lg-0 ps-lg-0">
+              <div className="d-grid d-flex justify-content-start align-items-center pt-4 ps-3 pt-lg-0 ps-lg-0">
                 {userOrLoginButton}
                 {signupOrLogOutButton}
               </div>

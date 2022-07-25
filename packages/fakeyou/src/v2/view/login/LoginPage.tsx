@@ -78,7 +78,7 @@ function LoginPage(props: Props) {
         <div className="notification is-danger is-light">
           <strong>Login Error:</strong> {errorMessage}
         </div>
-      )
+      );
     } else {
       errorWarning = (
         <div className="alert alert-danger mb-4">
@@ -92,36 +92,49 @@ function LoginPage(props: Props) {
     return (
       <div>
         <h1 className="title is-1"> Login </h1>
-  
+
         {errorWarning}
-  
+
         <form onSubmit={handleFormSubmit}>
           <div className="field">
             <label className="label">Username or Email</label>
             <div className="control has-icons-left has-icons-right">
-              <input className="input" type="text" placeholder="Username or Email" value={usernameOrEmail} onChange={handleUsernameOrEmailChange} />
+              <input
+                className="input"
+                type="text"
+                placeholder="Username or Email"
+                value={usernameOrEmail}
+                onChange={handleUsernameOrEmailChange}
+              />
               <span className="icon is-small is-left">
                 <FontAwesomeIcon icon={faUser} />
               </span>
             </div>
             {/*<p className="help"></p>*/}
           </div>
-  
+
           <div className="field">
             <label className="label">Password</label>
             <div className="control has-icons-left has-icons-right">
-              <input className="input" type="password" placeholder="Password" value={password} onChange={handlePasswordChange} />
+              <input
+                className="input"
+                type="password"
+                placeholder="Password"
+                value={password}
+                onChange={handlePasswordChange}
+              />
               <span className="icon is-small is-left">
                 <FontAwesomeIcon icon={faKey} />
               </span>
             </div>
             {/*<p className="help"></p>*/}
           </div>
-  
+
           <br />
-  
-          <button className="button is-link is-large is-fullwidth">Login</button>
-  
+
+          <button className="button is-link is-large is-fullwidth">
+            Login
+          </button>
         </form>
       </div>
     );
@@ -131,7 +144,7 @@ function LoginPage(props: Props) {
     <div>
       <Fade bottom duration={duration} distance={distance}>
         <div className="container-panel pb-5 pt-lg-5 my-lg-5 login-panel">
-          <div className="panel p-3 p-lg-4 load-hidden mt-5 mt-lg-0">
+          <div className="panel p-3 p-lg-4 load-hidden mt-5 mt-lg-0 px-md-4">
             <h1 className="panel-title fw-bold">Login</h1>
             <div className="py-6">
               {errorWarning}
@@ -177,10 +190,9 @@ function LoginPage(props: Props) {
                     Login
                   </button>
                   <p>
-                    Don’t have an account?
-                    &nbsp;
-                    <Link 
-                      to={FrontendUrlConfig.signupPage()} 
+                    Don’t have an account? &nbsp;
+                    <Link
+                      to={FrontendUrlConfig.signupPage()}
                       className="text-link"
                     >
                       Create an account now.
