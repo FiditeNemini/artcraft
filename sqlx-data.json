@@ -2975,6 +2975,44 @@
       "nullable": []
     }
   },
+  "6098826a8ada75442be5b7ac1d0199694e01c5959666f59986cd8b2ed6f51882": {
+    "query": "\nSELECT\n  COUNT(distinct token) as record_count,\n  NOW() as present_time\nFROM\n(\n  SELECT token\n  FROM tts_inference_jobs\n  WHERE status = \"started\"\n  AND created_at > (CURDATE() - INTERVAL 5 MINUTE)\nUNION\n  SELECT token\n  FROM tts_inference_jobs\n  WHERE status IN (\"pending\", \"attempt_failed\")\n) as t\n        ",
+    "describe": {
+      "columns": [
+        {
+          "ordinal": 0,
+          "name": "record_count",
+          "type_info": {
+            "type": "LongLong",
+            "flags": {
+              "bits": 129
+            },
+            "char_set": 63,
+            "max_size": 21
+          }
+        },
+        {
+          "ordinal": 1,
+          "name": "present_time",
+          "type_info": {
+            "type": "Datetime",
+            "flags": {
+              "bits": 129
+            },
+            "char_set": 63,
+            "max_size": 19
+          }
+        }
+      ],
+      "parameters": {
+        "Right": 0
+      },
+      "nullable": [
+        false,
+        false
+      ]
+    }
+  },
   "65ce50a3aafe979e77a541d576228d7fcfe76e33400427d01382da36c1585edb": {
     "query": "\nUPDATE tts_inference_jobs\nSET\n  status = ?,\n  on_success_result_token = ?,\n  failure_reason = NULL,\n  retry_at = NULL\nWHERE id = ?\n        ",
     "describe": {
@@ -6664,44 +6702,6 @@
         "Right": 6
       },
       "nullable": []
-    }
-  },
-  "b05c1c6f84d75f75f3bf9ab8672650822ffa2d9c062671b71176c6d74136b04d": {
-    "query": "\nSELECT\n  count(*) as record_count,\n  NOW() as present_time\nFROM tts_inference_jobs\nWHERE status IN (\"pending\", \"started\", \"attempt_failed\")\n        ",
-    "describe": {
-      "columns": [
-        {
-          "ordinal": 0,
-          "name": "record_count",
-          "type_info": {
-            "type": "LongLong",
-            "flags": {
-              "bits": 129
-            },
-            "char_set": 63,
-            "max_size": 21
-          }
-        },
-        {
-          "ordinal": 1,
-          "name": "present_time",
-          "type_info": {
-            "type": "Datetime",
-            "flags": {
-              "bits": 129
-            },
-            "char_set": 63,
-            "max_size": 19
-          }
-        }
-      ],
-      "parameters": {
-        "Right": 0
-      },
-      "nullable": [
-        false,
-        false
-      ]
     }
   },
   "b1ad806aa93f66cab358d7cdb405d57c643e2ff131cfec9f1ced55c2e6ca9511": {

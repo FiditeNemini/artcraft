@@ -17,17 +17,28 @@ struct QueryResultInternal {
 pub async fn get_pending_tts_inference_job_count(
   pool: &MySqlPool,
 ) -> AnyhowResult<TtsQueueLengthResult> {
-  // NB: We query the server timestamp so we can cache the results.
+  // NB (1): We query as a union since "started" jobs can get picked off mid-run and go stale
+  // forever. We currently have no automated means of collecting those jobs.
+  // NB (2): We query the server timestamp so we can cache the results.
   // The frontend can then monotonically adjust the count based on timestamp by ignoring
   // past times.
   let result : QueryResultInternal = sqlx::query_as!(
       QueryResultInternal,
         r#"
 SELECT
-  count(*) as record_count,
+  COUNT(distinct token) as record_count,
   NOW() as present_time
-FROM tts_inference_jobs
-WHERE status IN ("pending", "started", "attempt_failed")
+FROM
+(
+  SELECT token
+  FROM tts_inference_jobs
+  WHERE status = "started"
+  AND created_at > (CURDATE() - INTERVAL 5 MINUTE)
+UNION
+  SELECT token
+  FROM tts_inference_jobs
+  WHERE status IN ("pending", "attempt_failed")
+) as t
         "#,
     )
       .fetch_one(pool)
