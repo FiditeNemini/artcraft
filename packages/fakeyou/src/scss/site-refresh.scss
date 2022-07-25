@@ -141,6 +141,7 @@ styles with important tags:
   }
   .btn-primary:hover {
     background-color: lighten($primary, 5%) !important;
+    border-color: lighten($primary, 5%) !important;
     color: $white;
   }
 
