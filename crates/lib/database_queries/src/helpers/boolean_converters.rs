@@ -1,3 +1,4 @@
+// TODO: Use macros to generate everything, or better, use a library (or stdlib) that does these.
 
 /// MySQL stores non-nullable booleans as i8.
 pub fn i8_to_bool(value: i8) -> bool {

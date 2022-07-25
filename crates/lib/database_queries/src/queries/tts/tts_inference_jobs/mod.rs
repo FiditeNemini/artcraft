@@ -1,4 +1,5 @@
 pub mod _keys;
+pub mod get_pending_tts_inference_job_count;
 pub mod insert_tts_inference_job;
 pub mod kill_tts_inference_jobs;
 pub mod list_available_tts_inference_jobs;
