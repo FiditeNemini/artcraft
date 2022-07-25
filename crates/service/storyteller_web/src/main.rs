@@ -316,6 +316,10 @@ async fn main() -> AnyhowResult<()> {
   let voice_list_cache = SingleItemTtlCache::create_with_duration(voice_list_cache_ttl);
   let category_list_cache = SingleItemTtlCache::create_with_duration(category_list_cache_ttl);
 
+  let tts_queue_length_cache = SingleItemTtlCache::create_with_duration(
+    easyenv::get_env_duration_seconds_or_default("TTS_QUEUE_LENGTH_CACHE_TTL_SECONDS", Duration::from_secs(30))
+  );
+
   // NB: This secret really isn't too important.
   // We can even rotate it without too much impact to users.
   let sort_key_crypto_secret =
@@ -389,6 +393,7 @@ async fn main() -> AnyhowResult<()> {
     caches: InMemoryCaches {
       voice_list: voice_list_cache,
       category_list: category_list_cache,
+      tts_queue_length: tts_queue_length_cache,
     },
     twitch_oauth: TwitchOauth {
       secrets: TwitchOauthSecrets {

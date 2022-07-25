@@ -48,6 +48,7 @@ use crate::http_server::endpoints::tts::edit_tts_model::edit_tts_model_handler;
 use crate::http_server::endpoints::tts::edit_tts_result::edit_tts_inference_result_handler;
 use crate::http_server::endpoints::tts::enqueue_infer_tts::infer_tts_handler;
 use crate::http_server::endpoints::tts::enqueue_upload_tts_model::upload_tts_model_handler;
+use crate::http_server::endpoints::tts::get_pending_tts_inference_job_count::get_pending_tts_inference_job_count_handler;
 use crate::http_server::endpoints::tts::get_tts_inference_job_status::get_tts_inference_job_status_handler;
 use crate::http_server::endpoints::tts::get_tts_model::get_tts_model_handler;
 use crate::http_server::endpoints::tts::get_tts_model_use_count::get_tts_model_use_count_handler;
@@ -375,6 +376,11 @@ fn add_tts_routes<T, B> (app: App<T, B>) -> App<T, B>
       .service(
         web::resource("/upload_model_job/{token}")
             .route(web::get().to(get_tts_upload_model_job_status_handler))
+            .route(web::head().to(|| HttpResponse::Ok()))
+      )
+      .service(
+        web::resource("/queue_length")
+            .route(web::get().to(get_pending_tts_inference_job_count_handler))
             .route(web::head().to(|| HttpResponse::Ok()))
       )
   )

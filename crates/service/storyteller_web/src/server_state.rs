@@ -12,6 +12,7 @@ use database_queries::mediators::firehose_publisher::FirehosePublisher;
 use memory_caching::single_item_ttl_cache::SingleItemTtlCache;
 use r2d2_redis::{r2d2, RedisConnectionManager};
 use sqlx::MySqlPool;
+use database_queries::queries::tts::tts_inference_jobs::get_pending_tts_inference_job_count::TtsQueueLengthResult;
 use storage_buckets_common::bucket_client::BucketClient;
 
 /// State that is injected into every endpoint.
@@ -106,4 +107,9 @@ pub struct InMemoryCaches {
 
   /// In-memory caches with TTL-based eviction. Contains a list of all TTS categories.
   pub category_list: SingleItemTtlCache<Vec<DisplayCategory>>,
+
+  /// TTS queue length
+  /// The frontend will consult a distributed cache and use the monotonic DB time as a
+  /// vector clock.
+  pub tts_queue_length: SingleItemTtlCache<TtsQueueLengthResult>,
 }

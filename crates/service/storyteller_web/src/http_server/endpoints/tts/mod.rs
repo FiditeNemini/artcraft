@@ -4,6 +4,7 @@ pub mod edit_tts_model;
 pub mod edit_tts_result;
 pub mod enqueue_infer_tts;
 pub mod enqueue_upload_tts_model;
+pub mod get_pending_tts_inference_job_count;
 pub mod get_tts_inference_job_status;
 pub mod get_tts_model;
 pub mod get_tts_model_use_count;
