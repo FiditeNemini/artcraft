@@ -279,7 +279,7 @@ function AboutPage(props: Props) {
             <div className="d-flex justify-content-center">
               <Fade right distance={distance} delay={delay} duration={duration}>
                 <img
-                  src="/mascot/kitsune_pose3.png"
+                  src="/mascot/kitsune_pose3.webp"
                   className="img-fluid"
                   width="520"
                   alt="FakeYou Kitsune Mascot!"
