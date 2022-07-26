@@ -7,7 +7,6 @@ import {
   faChevronLeft,
   faChevronRight,
 } from "@fortawesome/free-solid-svg-icons";
-import { distance, duration } from "../../../../data/animation";
 
 const Fade = require("react-reveal/Fade");
 

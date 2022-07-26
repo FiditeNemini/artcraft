@@ -10,7 +10,7 @@ import { BackLink } from "../_common/BackLink";
 import { Link } from "react-router-dom";
 import { FrontendUrlConfig } from "../../../common/FrontendUrlConfig";
 import { distance, delay, duration } from "../../../data/animation";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+
 const Fade = require("react-reveal/Fade");
 
 interface Props {
