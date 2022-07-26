@@ -3,7 +3,13 @@ import { ApiConfig } from "@storyteller/components";
 import { Link } from "react-router-dom";
 import { formatDistance } from "date-fns";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faChevronLeft, faChevronRight } from "@fortawesome/free-solid-svg-icons";
+import {
+  faChevronLeft,
+  faChevronRight,
+} from "@fortawesome/free-solid-svg-icons";
+import { distance, duration } from "../../../../data/animation";
+
+const Fade = require("react-reveal/Fade");
 
 const PER_PAGE = 10;
 
@@ -107,27 +113,27 @@ function ProfileTtsModelListFc(props: Props) {
             </th>
           </tr>
         </thead>
-        <tbody>{rows}</tbody>
+        <Fade cascade bottom duration="200" distance="10px">
+          <tbody>{rows}</tbody>
+        </Fade>
       </table>
-      <div className="d-flex flex-column flex-md-row w-100 gap-3 mt-3">
+      <div className="d-flex w-100 gap-3 mt-4">
         <button
-          className="btn btn-primary w-100"
+          className="btn btn-secondary w-100"
           disabled={isLastButtonDisabled}
           onClick={() => previousPage()}
         >
           <FontAwesomeIcon icon={faChevronLeft} className="me-2" />
-          {" "}
-          Last Page
+          <span>Last Page</span>
         </button>
 
         <button
-          className="btn btn-primary w-100"
+          className="btn btn-secondary w-100"
           disabled={isNextButtonDisabled}
           onClick={() => nextPage()}
         >
-          Next Page
-          {" "}
-          <FontAwesomeIcon icon={faChevronRight} className="me-2" />
+          <span>Next Page</span>
+          <FontAwesomeIcon icon={faChevronRight} className="ms-2" />
         </button>
       </div>
     </div>
