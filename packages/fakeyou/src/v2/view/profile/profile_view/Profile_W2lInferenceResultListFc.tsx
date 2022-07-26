@@ -199,14 +199,14 @@ function ProfileW2lInferenceResultsListFc(props: Props) {
 
       <div className="justify-content-center d-flex gap-3">
         <button
-          className="btn btn-secondary"
+          className="btn btn-secondary w-100"
           onClick={() => getPage(previousCursor, true)}
           disabled={prevDisabled}
         >
           <FontAwesomeIcon icon={faArrowLeft} className="me-2" /> Get newer
         </button>
         <button
-          className="btn btn-secondary"
+          className="btn btn-secondary w-100"
           onClick={() => getPage(nextCursor, false)}
           disabled={nextDisabled}
         >
