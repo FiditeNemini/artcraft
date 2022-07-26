@@ -20,16 +20,16 @@ export const container = {
 };
 
 export const item = {
-  visible: { opacity: 1, y: 0 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.3 } },
   hidden: { opacity: 0, y: 50 },
 };
 
 export const image = {
-  visible: { opacity: 1, x: 0, transition: { delay: 0.1 } },
+  visible: { opacity: 1, x: 0, transition: { duration: 0.4 } },
   hidden: { opacity: 0, x: 100 },
 };
 
 export const panel = {
-  visible: { opacity: 1, y: 0, transition: { delay: 0.25 } },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.35 } },
   hidden: { opacity: 0, y: 50 },
 };
