@@ -76,7 +76,14 @@ function ProfileFc(props: Props) {
   if (notFoundState) {
     return (
       <div className="container py-5">
-        <h1 className="text-center fw-bold">User not found</h1>
+        <div className="py-5">
+          <h1 className="fw-semibold text-center mb-4">User not found</h1>
+          <div className="text-center">
+            <Link className="btn btn-primary" to="/">
+              Back to main
+            </Link>
+          </div>
+        </div>
       </div>
     );
   }

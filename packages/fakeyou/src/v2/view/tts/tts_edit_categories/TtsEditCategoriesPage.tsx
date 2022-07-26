@@ -31,7 +31,7 @@ import {
   faExclamationCircle,
   faXmark,
 } from "@fortawesome/free-solid-svg-icons";
-import { useParams } from "react-router-dom";
+import { useParams, Link } from "react-router-dom";
 import { distance, delay, duration } from "../../../../data/animation";
 const Fade = require("react-reveal/Fade");
 
@@ -95,7 +95,18 @@ function TtsEditCategoriesPage(props: Props) {
   }, [token, getModel, listTtsCategories, listTtsCategoriesForModel]);
 
   if (notFoundState) {
-    return <h1 className="title is-1">Model not found</h1>;
+    return (
+      <div className="container py-5">
+        <div className="py-5">
+          <h1 className="fw-semibold text-center mb-4">Model not found</h1>
+          <div className="text-center">
+            <Link className="btn btn-primary" to="/">
+              Back to main
+            </Link>
+          </div>
+        </div>
+      </div>
+    );
   }
 
   if (!ttsModel) {
