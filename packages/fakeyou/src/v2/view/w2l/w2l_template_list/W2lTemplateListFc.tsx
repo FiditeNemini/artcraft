@@ -18,8 +18,8 @@ interface W2lTemplate {
   template_token: string;
   template_type: string;
   creator_user_token: string;
-  username: string;
-  display_name: string;
+  creator_username: string;
+  creator_display_name: string;
   title: string;
   frame_width: number;
   frame_height: number;
@@ -90,8 +90,8 @@ function W2lTemplateListFc(props: Props) {
       <Link to={link} className="w-100">
         <div className="video-card">
           <div className="video-card-body d-flex flex-column">
-            <h6 className="video-card-title mb-1">Title</h6>
-            <p className="video-card-text">by (name))</p>
+            <h6 className="video-card-title mb-1">{t.title}</h6>
+            <p className="video-card-text">by {t.creator_display_name}</p>
           </div>
           <img className="video-img" src={url} alt="" />
         </div>
