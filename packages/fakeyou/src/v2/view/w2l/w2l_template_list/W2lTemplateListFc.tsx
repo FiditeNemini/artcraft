@@ -6,7 +6,10 @@ import { BucketConfig } from "@storyteller/components/src/api/BucketConfig";
 import { distance, duration, delay } from "../../../../data/animation";
 import { USE_REFRESH } from "../../../../Refresh";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faChevronLeft, faChevronRight } from "@fortawesome/free-solid-svg-icons";
+import {
+  faChevronLeft,
+  faChevronRight,
+} from "@fortawesome/free-solid-svg-icons";
 
 const Fade = require("react-reveal/Fade");
 
@@ -119,7 +122,8 @@ function W2lTemplateListFc(props: Props) {
   const currentPageElements = templateElements.slice(start, end);
 
   const isLastButtonDisabled = currentPageIndex < 1;
-  const isNextButtonDisabled = w2lTemplates.length === 0 || end > w2lTemplates.length;
+  const isNextButtonDisabled =
+    w2lTemplates.length === 0 || end > w2lTemplates.length;
 
   // NB: To prevent React spamming about children having unique key props
   let rowKey = "row0";
@@ -133,7 +137,7 @@ function W2lTemplateListFc(props: Props) {
     if (rowOfTemplateElements.length === nextRowSize) {
       allRowsOfTemplateElements.push(
         <div
-          className="col-sm-6 col-md-4 col-lg-3 d-flex w2l-ani-item"
+          className="col-6 col-sm-4 col-lg-3 d-flex w2l-ani-item"
           key={rowKey}
         >
           {rowOfTemplateElements.map((el) => el)}
@@ -154,10 +158,7 @@ function W2lTemplateListFc(props: Props) {
   // Make sure last row is built.
   if (rowOfTemplateElements.length !== 0) {
     allRowsOfTemplateElements.push(
-      <div
-        className="col-sm-6 col-md-4 col-lg-3 d-flex w2l-ani-item"
-        key={rowKey}
-      >
+      <div className="col-6 col-sm-4 col-lg-3 d-flex w2l-ani-item" key={rowKey}>
         {rowOfTemplateElements.map((el) => el)}
       </div>
     );
@@ -212,7 +213,7 @@ function W2lTemplateListFc(props: Props) {
 
   return (
     <div>
-      <div className="container py-5 px-md-4 px-lg-5 px-xl-3">
+      <div className="container pt-5 pb-4 px-md-4 px-lg-5 px-xl-3">
         <Fade bottom cascade duration={duration} distance={distance}>
           <div>
             <h1 className="display-5 fw-bold mb-3">Video Lip Sync Templates</h1>
@@ -221,38 +222,60 @@ function W2lTemplateListFc(props: Props) {
         </Fade>
       </div>
 
-      <div className="container-panel pb-4">
+      <div className="container">
+        <div className="d-flex  w-100 gap-3 mb-4">
+          <button
+            className="btn btn-secondary w-100 d-flex align-items-center justify-content-center"
+            disabled={isLastButtonDisabled}
+            onClick={() => previousPage()}
+          >
+            <FontAwesomeIcon icon={faChevronLeft} className="me-2" />
+            <span>Previous Page</span>
+          </button>
+
+          <button
+            className="btn btn-secondary w-100 d-flex align-items-center justify-content-center"
+            disabled={isNextButtonDisabled}
+            onClick={() => nextPage()}
+          >
+            <span>Next Page</span>{" "}
+            <FontAwesomeIcon icon={faChevronRight} className="ms-2" />
+          </button>
+        </div>
+      </div>
+
+      <div className="container-panel">
         <Fade bottom duration={duration} distance={distance} delay={delay}>
           <div className="panel p-3 p-lg-4">
             <Fade bottom cascade duration={duration} distance={distance}>
-              <div className="row gy-4 w2l-ani">
+              <div className="row gy-3 gx-3 gx-md-4 gy-md-4 w2l-ani">
                 {allRowsOfTemplateElements.map((el) => el)}
               </div>
             </Fade>
           </div>
-
-          <div className="d-flex flex-column flex-md-row w-100 gap-3 mt-3">
-            <button
-              className="btn btn-primary w-100"
-              disabled={isLastButtonDisabled}
-              onClick={() => previousPage()}
-            >
-              <FontAwesomeIcon icon={faChevronLeft} className="me-2" />
-              {" "}
-              Last Page
-            </button>
-
-            <button
-              className="btn btn-primary w-100"
-              disabled={isNextButtonDisabled}
-              onClick={() => nextPage()}
-            >
-              Next Page
-              {" "}
-              <FontAwesomeIcon icon={faChevronRight} className="me-2" />
-            </button>
-          </div>
         </Fade>
+      </div>
+
+      <div className="container">
+        <div className="d-flex w-100 gap-3 my-4">
+          <button
+            className="btn btn-secondary w-100 d-flex align-items-center justify-content-center"
+            disabled={isLastButtonDisabled}
+            onClick={() => previousPage()}
+          >
+            <FontAwesomeIcon icon={faChevronLeft} className="me-2" />
+            <span>Previous Page</span>
+          </button>
+
+          <button
+            className="btn btn-secondary w-100 d-flex align-items-center justify-content-center"
+            disabled={isNextButtonDisabled}
+            onClick={() => nextPage()}
+          >
+            <span>Next Page</span>{" "}
+            <FontAwesomeIcon icon={faChevronRight} className="ms-2" />
+          </button>
+        </div>
       </div>
 
       <div className="container pb-5">
