@@ -2,6 +2,10 @@ import React, { useState, useEffect } from "react";
 import { ApiConfig } from "@storyteller/components";
 import { Link } from "react-router-dom";
 import { formatDistance } from "date-fns";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faChevronLeft, faChevronRight } from "@fortawesome/free-solid-svg-icons";
+
+const PER_PAGE = 10;
 
 interface TtsModelListResponsePayload {
   success: boolean;
@@ -25,6 +29,7 @@ interface Props {
 
 function ProfileTtsModelListFc(props: Props) {
   const [ttsModels, setTtsModels] = useState<Array<TtsModel>>([]);
+  const [currentPageIndex, setCurrentPageIndex] = useState(0);
 
   useEffect(() => {
     const api = new ApiConfig();
@@ -49,11 +54,23 @@ function ProfileTtsModelListFc(props: Props) {
       .catch((e) => {});
   }, [props.username]); // NB: Empty array dependency sets to run ONLY on mount
 
+  const nextPage = () => {
+    setCurrentPageIndex(currentPageIndex + 1);
+  };
+
+  const previousPage = () => {
+    setCurrentPageIndex(Math.max(currentPageIndex - 1, 0));
+  };
+
+  const start = currentPageIndex * PER_PAGE;
+  const end = start + PER_PAGE;
+  const pageTtsModels = ttsModels.slice(start, end);
+
   const now = new Date();
 
   let rows: Array<JSX.Element> = [];
 
-  ttsModels.slice(0, 10).forEach((model) => {
+  pageTtsModels.forEach((model) => {
     const modelTitle =
       model.title.length < 5 ? `Model: ${model.title}` : model.title;
 
@@ -74,6 +91,9 @@ function ProfileTtsModelListFc(props: Props) {
     );
   });
 
+  const isLastButtonDisabled = currentPageIndex < 1;
+  const isNextButtonDisabled = ttsModels.length === 0 || end > ttsModels.length;
+
   return (
     <div>
       <table className="table">
@@ -89,7 +109,27 @@ function ProfileTtsModelListFc(props: Props) {
         </thead>
         <tbody>{rows}</tbody>
       </table>
-      <div className="text-center">ADD OLDER/NEWER PAGINATION BUTTON HERE</div>
+      <div className="d-flex flex-column flex-md-row w-100 gap-3 mt-3">
+        <button
+          className="btn btn-primary w-100"
+          disabled={isLastButtonDisabled}
+          onClick={() => previousPage()}
+        >
+          <FontAwesomeIcon icon={faChevronLeft} className="me-2" />
+          {" "}
+          Last Page
+        </button>
+
+        <button
+          className="btn btn-primary w-100"
+          disabled={isNextButtonDisabled}
+          onClick={() => nextPage()}
+        >
+          Next Page
+          {" "}
+          <FontAwesomeIcon icon={faChevronRight} className="me-2" />
+        </button>
+      </div>
     </div>
   );
 }
