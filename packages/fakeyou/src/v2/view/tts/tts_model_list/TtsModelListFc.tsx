@@ -419,6 +419,20 @@ function TtsModelListFc(props: Props) {
     );
   }
 
+  let signUpButton = <></>;
+
+  if (!props.sessionWrapper.isLoggedIn()) {
+    signUpButton = (
+      <>
+        <Link to="/signup">
+          <button type="button" className="btn btn-primary w-100">
+            Sign Up
+          </button>
+        </Link>
+      </>
+    );
+  }
+
   return (
     <div>
       {pleaseFollowNotice}
@@ -460,11 +474,7 @@ function TtsModelListFc(props: Props) {
 
             <Fade bottom delay={delay} duration={duration} distance={distance}>
               <div className="d-flex flex-column flex-md-row gap-3 justify-content-center justify-content-lg-start mb-5 mb-lg-4">
-                <Link to="/signup">
-                  <button type="button" className="btn btn-primary w-100">
-                    Sign Up
-                  </button>
-                </Link>
+                {signUpButton}
                 <Link to="/clone">
                   <button type="button" className="btn btn-secondary w-100">
                     Clone My Voice!
