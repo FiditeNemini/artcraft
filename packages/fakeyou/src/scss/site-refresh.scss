@@ -383,14 +383,14 @@ styles with important tags:
 
   .video-card {
     border-radius: 5px;
-    border: 5px solid;
+    border: 4px solid;
     border-color: #fff;
     padding: 1rem;
     position: relative;
     width: 100%;
-    min-height: 220px;
+    min-height: 160px;
     transition: 0.2s;
-    overflow: clip;
+    overflow: hidden;
     z-index: 2;
   }
 
@@ -416,7 +416,7 @@ styles with important tags:
     top: 0;
     left: 0;
     pointer-events: none;
-    overflow: none;
+    overflow: hidden;
     transition: 0.2s;
   }
 
@@ -547,6 +547,10 @@ styles with important tags:
 
     .alert {
       font-size: 16px;
+    }
+
+    .video-card {
+      min-height: 220px;
     }
   }
 }
