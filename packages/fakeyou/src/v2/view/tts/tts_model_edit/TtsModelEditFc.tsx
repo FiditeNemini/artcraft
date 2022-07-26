@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback } from "react";
 import { ApiConfig } from "@storyteller/components";
 import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
 import { TtsInferenceJob } from "@storyteller/components/src/jobs/TtsInferenceJobs";
-import { useParams, useHistory } from "react-router-dom";
+import { useParams, useHistory, Link } from "react-router-dom";
 import { FrontendUrlConfig } from "../../../../common/FrontendUrlConfig";
 import { VisibleIconFc } from "../../_icons/VisibleIcon";
 import { HiddenIconFc } from "../../_icons/HiddenIcon";
@@ -216,7 +216,18 @@ function TtsModelEditFc(props: Props) {
   };
 
   if (notFoundState) {
-    return <h1 className="title is-1">Model not found</h1>;
+    return (
+      <div className="container py-5">
+        <div className="py-5">
+          <h1 className="fw-semibold text-center mb-4">Model not found</h1>
+          <div className="text-center">
+            <Link className="btn btn-primary" to="/">
+              Back to main
+            </Link>
+          </div>
+        </div>
+      </div>
+    );
   }
 
   if (!ttsModel) {

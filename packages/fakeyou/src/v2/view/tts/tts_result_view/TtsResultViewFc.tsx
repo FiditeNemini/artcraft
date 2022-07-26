@@ -57,7 +57,18 @@ function TtsResultViewFc(props: Props) {
   }, [token, getTtsResult]); // NB: Empty array dependency sets to run ONLY on mount
 
   if (notFoundState) {
-    return <h1 className="title is-1">TTS result not found</h1>;
+    return (
+      <div className="container py-5">
+        <div className="py-5">
+          <h1 className="fw-semibold text-center mb-4">TTS result not found</h1>
+          <div className="text-center">
+            <Link className="btn btn-primary" to="/">
+              Back to main
+            </Link>
+          </div>
+        </div>
+      </div>
+    );
   }
 
   if (!ttsInferenceResult) {

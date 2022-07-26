@@ -7,8 +7,10 @@ import { DiscordLink } from "@storyteller/components/src/elements/DiscordLink";
 import { useHistory } from "react-router-dom";
 import { v4 as uuidv4 } from "uuid";
 import { BackLink } from "../_common/BackLink";
+import { Link } from "react-router-dom";
 import { FrontendUrlConfig } from "../../../common/FrontendUrlConfig";
 import { distance, delay, duration } from "../../../data/animation";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 const Fade = require("react-reveal/Fade");
 
 interface Props {
@@ -31,7 +33,23 @@ function UploadTtsModelFc(props: Props) {
   const [titleInvalidReason] = useState("");
 
   if (!props.sessionWrapper.isLoggedIn()) {
-    return <div>You need to create an account or sign in.</div>;
+    return (
+      <div className="container py-5">
+        <div className="py-5">
+          <h1 className="fw-semibold text-center mb-4">
+            You need to create an account or log in.
+          </h1>
+          <div className="d-flex gap-3 justify-content-center">
+            <Link className="btn btn-secondary" to="/login">
+              Login
+            </Link>
+            <Link className="btn btn-primary" to="/signup">
+              Sign Up
+            </Link>
+          </div>
+        </div>
+      </div>
+    );
   }
 
   const handleDownloadUrlChange = (ev: React.FormEvent<HTMLInputElement>) => {
