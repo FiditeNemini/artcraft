@@ -109,7 +109,7 @@ function PatronPage(props: Props) {
             <Fade right distance={distance} delay={delay} duration={duration}>
               <img
                 className="img-fluid mt-5 mw-50"
-                src="/mascot/kitsune_pose7.png"
+                src="/mascot/kitsune_pose7.webp"
                 alt="FakeYou Mascot"
                 width="560"
               />

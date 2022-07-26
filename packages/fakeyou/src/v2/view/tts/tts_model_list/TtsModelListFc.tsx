@@ -449,7 +449,7 @@ function TtsModelListFc(props: Props) {
             <div className="d-flex justify-content-center">
               <Fade right distance={distance} delay={delay} duration={duration}>
                 <img
-                  src="mascot/kitsune_pose2.png"
+                  src="mascot/kitsune_pose2.webp"
                   className="img-fluid"
                   width="560"
                   alt="FakeYou Mascot"

@@ -282,7 +282,7 @@ function VoiceCloneRequestPage(props: Props) {
                   delay={delay}
                 >
                   <img
-                    src="/mascot/kitsune_pose4.png"
+                    src="/mascot/kitsune_pose4.webp"
                     className="img-fluid"
                     width="560"
                     alt="FakeYou Mascot"
