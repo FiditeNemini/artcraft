@@ -4,7 +4,10 @@ import { Link } from "react-router-dom";
 import { BucketConfig } from "@storyteller/components/src/api/BucketConfig";
 import { distance, duration } from "../../../../data/animation";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faChevronLeft, faChevronRight } from "@fortawesome/free-solid-svg-icons";
+import {
+  faChevronLeft,
+  faChevronRight,
+} from "@fortawesome/free-solid-svg-icons";
 
 const Fade = require("react-reveal/Fade");
 
@@ -128,7 +131,7 @@ function ProfileW2lTemplateListFc(props: Props) {
     if (rowOfTemplateElements.length === nextRowSize) {
       allRowsOfTemplateElements.push(
         <div
-          className="col-sm-6 col-md-4 col-lg-3 d-flex w2l-ani-item"
+          className="col-6 col-md-4 col-lg-3 d-flex w2l-ani-item"
           key={rowKey}
         >
           {rowOfTemplateElements.map((el) => el)}
@@ -149,10 +152,7 @@ function ProfileW2lTemplateListFc(props: Props) {
   // Make sure last row is built.
   if (rowOfTemplateElements.length !== 0) {
     allRowsOfTemplateElements.push(
-      <div
-        className="col-sm-6 col-md-4 col-lg-3 d-flex w2l-ani-item"
-        key={rowKey}
-      >
+      <div className="col-6 col-md-4 col-lg-3 d-flex w2l-ani-item" key={rowKey}>
         {rowOfTemplateElements.map((el) => el)}
       </div>
     );
@@ -160,32 +160,31 @@ function ProfileW2lTemplateListFc(props: Props) {
   }
 
   const isLastButtonDisabled = currentPageIndex < 1;
-  const isNextButtonDisabled = w2lTemplates.length === 0 || end > w2lTemplates.length;
+  const isNextButtonDisabled =
+    w2lTemplates.length === 0 || end > w2lTemplates.length;
 
   return (
     <Fade bottom cascade duration={duration} distance={distance}>
-      <div className="row gy-4 w2l-ani">
+      <div className="row gy-3 gx-3 gx-lg-4 gy-lg-4 w2l-ani">
         {allRowsOfTemplateElements.map((el) => el)}
       </div>
-      <div className="d-flex flex-column flex-md-row w-100 gap-3 mt-3">
+      <div className="d-flex w-100 gap-3 mt-4">
         <button
-          className="btn btn-primary w-100"
+          className="btn btn-secondary w-100"
           disabled={isLastButtonDisabled}
           onClick={() => previousPage()}
         >
           <FontAwesomeIcon icon={faChevronLeft} className="me-2" />
-          {" "}
-          Last Page
+          <span>Last Page</span>
         </button>
 
         <button
-          className="btn btn-primary w-100"
+          className="btn btn-secondary w-100"
           disabled={isNextButtonDisabled}
           onClick={() => nextPage()}
         >
-          Next Page
-          {" "}
-          <FontAwesomeIcon icon={faChevronRight} className="me-2" />
+          <span>Next Page</span>
+          <FontAwesomeIcon icon={faChevronRight} className="ms-2" />
         </button>
       </div>
     </Fade>
