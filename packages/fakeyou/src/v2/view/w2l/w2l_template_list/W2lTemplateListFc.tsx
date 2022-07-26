@@ -2,12 +2,15 @@ import React, { useState, useEffect } from "react";
 import { ApiConfig } from "@storyteller/components";
 import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
 import { Link } from "react-router-dom";
-//import { getRandomInt } from '../../../../v1/api/Utils';
 import { BucketConfig } from "@storyteller/components/src/api/BucketConfig";
 import { distance, duration, delay } from "../../../../data/animation";
 import { USE_REFRESH } from "../../../../Refresh";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faChevronLeft, faChevronRight } from "@fortawesome/free-solid-svg-icons";
 
 const Fade = require("react-reveal/Fade");
+
+const PER_PAGE = 16;
 
 interface W2lTemplateListResponsePayload {
   success: boolean;
@@ -36,6 +39,7 @@ interface Props {
 
 function W2lTemplateListFc(props: Props) {
   const [w2lTemplates, setW2lTemplates] = useState<Array<W2lTemplate>>([]);
+  const [currentPageIndex, setCurrentPageIndex] = useState(0);
 
   useEffect(() => {
     const api = new ApiConfig();
@@ -61,6 +65,14 @@ function W2lTemplateListFc(props: Props) {
         //this.props.onSpeakErrorCallback();
       });
   }, []); // NB: Empty array dependency sets to run ONLY on mount
+
+  const nextPage = () => {
+    setCurrentPageIndex(currentPageIndex + 1);
+  };
+
+  const previousPage = () => {
+    setCurrentPageIndex(Math.max(currentPageIndex - 1, 0));
+  };
 
   let templateElements: Array<JSX.Element> = [];
 
@@ -102,14 +114,20 @@ function W2lTemplateListFc(props: Props) {
   let allRowsOfTemplateElements: Array<JSX.Element> = [];
   let rowOfTemplateElements: Array<JSX.Element> = [];
 
+  const start = currentPageIndex * PER_PAGE;
+  const end = start + PER_PAGE;
+  const currentPageElements = templateElements.slice(start, end);
+
+  const isLastButtonDisabled = currentPageIndex < 1;
+  const isNextButtonDisabled = w2lTemplates.length === 0 || end > w2lTemplates.length;
+
   // NB: To prevent React spamming about children having unique key props
   let rowKey = "row0";
   let rowIndex = 0;
 
-  //let nextRowSize = getRandomInt(3, 4);
   let nextRowSize = 1;
 
-  templateElements.slice(0, 16).forEach((el) => {
+  currentPageElements.forEach((el) => {
     rowOfTemplateElements.push(el);
 
     if (rowOfTemplateElements.length === nextRowSize) {
@@ -211,6 +229,28 @@ function W2lTemplateListFc(props: Props) {
                 {allRowsOfTemplateElements.map((el) => el)}
               </div>
             </Fade>
+          </div>
+
+          <div className="d-flex flex-column flex-md-row w-100 gap-3 mt-3">
+            <button
+              className="btn btn-primary w-100"
+              disabled={isLastButtonDisabled}
+              onClick={() => previousPage()}
+            >
+              <FontAwesomeIcon icon={faChevronLeft} className="me-2" />
+              {" "}
+              Last Page
+            </button>
+
+            <button
+              className="btn btn-primary w-100"
+              disabled={isNextButtonDisabled}
+              onClick={() => nextPage()}
+            >
+              Next Page
+              {" "}
+              <FontAwesomeIcon icon={faChevronRight} className="me-2" />
+            </button>
           </div>
         </Fade>
       </div>
