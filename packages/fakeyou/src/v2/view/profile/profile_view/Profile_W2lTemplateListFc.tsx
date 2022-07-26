@@ -1,10 +1,14 @@
 import React, { useState, useEffect } from "react";
 import { ApiConfig } from "@storyteller/components";
 import { Link } from "react-router-dom";
-//import { getRandomInt } from '../../../../v1/api/Utils';
 import { BucketConfig } from "@storyteller/components/src/api/BucketConfig";
 import { distance, duration } from "../../../../data/animation";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faChevronLeft, faChevronRight } from "@fortawesome/free-solid-svg-icons";
+
 const Fade = require("react-reveal/Fade");
+
+const PER_PAGE = 8;
 
 interface W2lTemplateListResponsePayload {
   success: boolean;
@@ -15,8 +19,8 @@ interface W2lTemplate {
   template_token: string;
   template_type: string;
   creator_user_token: string;
-  username: string;
-  display_name: string;
+  creator_username: string;
+  creator_display_name: string;
   title: string;
   frame_width: number;
   frame_height: number;
@@ -33,6 +37,7 @@ interface Props {
 
 function ProfileW2lTemplateListFc(props: Props) {
   const [w2lTemplates, setW2lTemplates] = useState<Array<W2lTemplate>>([]);
+  const [currentPageIndex, setCurrentPageIndex] = useState(0);
 
   useEffect(() => {
     const api = new ApiConfig();
@@ -59,9 +64,21 @@ function ProfileW2lTemplateListFc(props: Props) {
       });
   }, [props.username]); // NB: Empty array dependency sets to run ONLY on mount
 
+  const nextPage = () => {
+    setCurrentPageIndex(currentPageIndex + 1);
+  };
+
+  const previousPage = () => {
+    setCurrentPageIndex(Math.max(currentPageIndex - 1, 0));
+  };
+
   let templateElements: Array<JSX.Element> = [];
 
-  w2lTemplates.slice(0, 8).forEach((t) => {
+  const start = currentPageIndex * PER_PAGE;
+  const end = start + PER_PAGE;
+  const pageW2lTemplates = w2lTemplates.slice(start, end);
+
+  pageW2lTemplates.forEach((t) => {
     let object = null;
 
     if (
@@ -87,8 +104,8 @@ function ProfileW2lTemplateListFc(props: Props) {
       <Link to={link} className="w-100">
         <div className="video-card">
           <div className="video-card-body d-flex flex-column">
-            <h6 className="video-card-title mb-1">Title</h6>
-            <p className="video-card-text">by NAME</p>
+            <h6 className="video-card-title mb-1">{t.title}</h6>
+            <p className="video-card-text">by {t.creator_display_name}</p>
           </div>
           <img className="video-img" src={url} alt="" />
         </div>
@@ -99,12 +116,11 @@ function ProfileW2lTemplateListFc(props: Props) {
   let allRowsOfTemplateElements: Array<JSX.Element> = [];
   let rowOfTemplateElements: Array<JSX.Element> = [];
 
-  //let nextRowSize = getRandomInt(3, 4);
-  let nextRowSize = 1;
-
   // NB: To prevent React spamming about children having unique key props
   let rowKey = "row0";
   let rowIndex = 0;
+
+  let nextRowSize = 1;
 
   templateElements.forEach((el) => {
     rowOfTemplateElements.push(el);
@@ -143,10 +159,34 @@ function ProfileW2lTemplateListFc(props: Props) {
     rowOfTemplateElements = [];
   }
 
+  const isLastButtonDisabled = currentPageIndex < 1;
+  const isNextButtonDisabled = w2lTemplates.length === 0 || end > w2lTemplates.length;
+
   return (
     <Fade bottom cascade duration={duration} distance={distance}>
       <div className="row gy-4 w2l-ani">
         {allRowsOfTemplateElements.map((el) => el)}
+      </div>
+      <div className="d-flex flex-column flex-md-row w-100 gap-3 mt-3">
+        <button
+          className="btn btn-primary w-100"
+          disabled={isLastButtonDisabled}
+          onClick={() => previousPage()}
+        >
+          <FontAwesomeIcon icon={faChevronLeft} className="me-2" />
+          {" "}
+          Last Page
+        </button>
+
+        <button
+          className="btn btn-primary w-100"
+          disabled={isNextButtonDisabled}
+          onClick={() => nextPage()}
+        >
+          Next Page
+          {" "}
+          <FontAwesomeIcon icon={faChevronRight} className="me-2" />
+        </button>
       </div>
     </Fade>
   );
