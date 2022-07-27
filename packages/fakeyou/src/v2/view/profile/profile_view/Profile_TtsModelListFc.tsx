@@ -67,9 +67,12 @@ function ProfileTtsModelListFc(props: Props) {
     setCurrentPageIndex(Math.max(currentPageIndex - 1, 0));
   };
 
+  // NB: It's more convenient to show recent data first
+  var reversedTtsModels = ttsModels.slice().reverse();
+
   const start = currentPageIndex * PER_PAGE;
   const end = start + PER_PAGE;
-  const pageTtsModels = ttsModels.slice(start, end);
+  const pageTtsModels = reversedTtsModels.slice(start, end);
 
   const now = new Date();
 

@@ -75,11 +75,14 @@ function ProfileW2lTemplateListFc(props: Props) {
     setCurrentPageIndex(Math.max(currentPageIndex - 1, 0));
   };
 
+  // NB: It's more convenient to show recent data first
+  var reversedW2lTemplates = w2lTemplates.slice().reverse();
+
   let templateElements: Array<JSX.Element> = [];
 
   const start = currentPageIndex * PER_PAGE;
   const end = start + PER_PAGE;
-  const pageW2lTemplates = w2lTemplates.slice(start, end);
+  const pageW2lTemplates = reversedW2lTemplates.slice(start, end);
 
   pageW2lTemplates.forEach((t) => {
     let object = null;
