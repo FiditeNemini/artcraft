@@ -168,24 +168,26 @@ function ProfileW2lTemplateListFc(props: Props) {
       <div className="row gy-3 gx-3 gx-lg-4 gy-lg-4 w2l-ani">
         {allRowsOfTemplateElements.map((el) => el)}
       </div>
-      <div className="d-flex w-100 gap-3 mt-4">
-        <button
-          className="btn btn-secondary w-100"
-          disabled={isLastButtonDisabled}
-          onClick={() => previousPage()}
-        >
-          <FontAwesomeIcon icon={faChevronLeft} className="me-2" />
-          <span>Last Page</span>
-        </button>
+      <div>
+        <div className="d-flex w-100 gap-3 mt-4">
+          <button
+            className="btn btn-secondary w-100"
+            disabled={isLastButtonDisabled}
+            onClick={() => previousPage()}
+          >
+            <FontAwesomeIcon icon={faChevronLeft} className="me-2" />
+            <span>Last Page</span>
+          </button>
 
-        <button
-          className="btn btn-secondary w-100"
-          disabled={isNextButtonDisabled}
-          onClick={() => nextPage()}
-        >
-          <span>Next Page</span>
-          <FontAwesomeIcon icon={faChevronRight} className="ms-2" />
-        </button>
+          <button
+            className="btn btn-secondary w-100"
+            disabled={isNextButtonDisabled}
+            onClick={() => nextPage()}
+          >
+            <span>Next Page</span>
+            <FontAwesomeIcon icon={faChevronRight} className="ms-2" />
+          </button>
+        </div>
       </div>
     </Fade>
   );

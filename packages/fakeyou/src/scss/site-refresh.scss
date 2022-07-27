@@ -154,11 +154,19 @@ styles with important tags:
     border-color: $white;
     transition: 0.2s;
   }
+
   .btn-secondary:hover {
     background-color: #ccc;
     color: $secondary;
     border: 2.5px solid;
     border-color: #ccc;
+  }
+
+  .btn-secondary.disabled,
+  .btn-secondary:disabled {
+    color: rgba($secondary, 0.8);
+    background-color: #fff;
+    border-color: #fff;
   }
 
   .btn-destructive,
