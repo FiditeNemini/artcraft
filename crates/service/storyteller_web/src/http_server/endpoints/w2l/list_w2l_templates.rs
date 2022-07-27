@@ -10,7 +10,7 @@ use crate::AnyhowResult;
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 use crate::server_state::ServerState;
 use database_queries::queries::w2l::w2l_templates::list_w2l_templates::{W2lTemplateRecordForList, list_w2l_templates};
-use log::{info, warn, log};
+use log::{info, warn, log, error};
 use regex::Regex;
 use sqlx::MySqlPool;
 use sqlx::error::DatabaseError;
@@ -57,22 +57,47 @@ pub async fn list_w2l_templates_handler(
   http_request: HttpRequest,
   server_state: web::Data<Arc<ServerState>>) -> Result<HttpResponse, ListW2lTemplatesError>
 {
-  let no_scope_creator = None;
+  // TODO(bt): Perhaps we should build a second endpoint to allow fetching a user's W2L templates
+  //  and including them in the global list (before they're mod approved!) just for the uploader.
 
-  // TODO(bt): Ideally we show users their own W2L templates here before they're mod approved.
+  let maybe_templates = server_state
+      .caches
+      .w2l_template_list
+      .copy_without_bump_if_unexpired()
+      .map_err(|e| {
+        error!("Error consulting cache: {:?}", e);
+        ListW2lTemplatesError::ServerError
+      })?;
 
-  let query_results = list_w2l_templates(
-    &server_state.mysql_pool,
-    no_scope_creator,
-    true,
-  ).await;
+  let templates = match maybe_templates {
+    Some(templates) => {
+      templates
+    },
+    None => {
+      const NO_CREATOR_SCOPING_HERE : Option<&'static str> = None;
 
-  let templates = match query_results {
-    Ok(results) => results,
-    Err(e) => {
-      warn!("w2l template list query error: {:?}", e);
-      return Err(ListW2lTemplatesError::ServerError);
-    }
+      let query_results = list_w2l_templates(
+        &server_state.mysql_pool,
+        NO_CREATOR_SCOPING_HERE,
+        true,
+      ).await;
+
+      let templates = match query_results {
+        Ok(results) => results,
+        Err(e) => {
+          warn!("w2l template list query error: {:?}", e);
+          return Err(ListW2lTemplatesError::ServerError);
+        }
+      };
+
+      server_state.caches.w2l_template_list.store_copy(&templates)
+          .map_err(|e| {
+            error!("error storing cache: {:?}", e);
+            ListW2lTemplatesError::ServerError
+          })?;
+      
+      templates
+    },
   };
 
   let response = ListW2lTemplatesSuccessResponse {

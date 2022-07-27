@@ -316,6 +316,10 @@ async fn main() -> AnyhowResult<()> {
   let voice_list_cache = SingleItemTtlCache::create_with_duration(voice_list_cache_ttl);
   let category_list_cache = SingleItemTtlCache::create_with_duration(category_list_cache_ttl);
 
+  let w2l_template_cache = SingleItemTtlCache::create_with_duration(
+    easyenv::get_env_duration_seconds_or_default("W2L_TEMPLATE_LIST_CACHE_TTL_SECONDS", Duration::from_secs(300)) // 5 minutes
+  );
+
   let tts_queue_length_cache = SingleItemTtlCache::create_with_duration(
     easyenv::get_env_duration_seconds_or_default("TTS_QUEUE_LENGTH_CACHE_TTL_SECONDS", Duration::from_secs(30))
   );
@@ -392,6 +396,7 @@ async fn main() -> AnyhowResult<()> {
     static_api_token_set,
     caches: InMemoryCaches {
       voice_list: voice_list_cache,
+      w2l_template_list: w2l_template_cache,
       category_list: category_list_cache,
       tts_queue_length: tts_queue_length_cache,
     },

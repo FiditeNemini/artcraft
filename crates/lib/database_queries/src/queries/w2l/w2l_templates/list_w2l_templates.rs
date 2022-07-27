@@ -7,7 +7,7 @@ use sqlx::MySqlPool;
 
 // FIXME: This is the old style of query scoping and shouldn't be copied.
 
-#[derive(Serialize)]
+#[derive(Serialize, Clone)]
 pub struct W2lTemplateRecordForList {
   pub template_token: String,
   pub template_type: String,

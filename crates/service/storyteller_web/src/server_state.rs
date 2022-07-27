@@ -13,6 +13,7 @@ use memory_caching::single_item_ttl_cache::SingleItemTtlCache;
 use r2d2_redis::{r2d2, RedisConnectionManager};
 use sqlx::MySqlPool;
 use database_queries::queries::tts::tts_inference_jobs::get_pending_tts_inference_job_count::TtsQueueLengthResult;
+use database_queries::queries::w2l::w2l_templates::list_w2l_templates::W2lTemplateRecordForList;
 use storage_buckets_common::bucket_client::BucketClient;
 
 /// State that is injected into every endpoint.
@@ -104,6 +105,9 @@ pub struct RedisRateLimiters {
 pub struct InMemoryCaches {
   /// In-memory caches with TTL-based eviction. Contains a list of all voices.
   pub voice_list: SingleItemTtlCache<Vec<TtsModelRecordForResponse>>,
+
+  /// Contains a list of all W2L templates.
+  pub w2l_template_list: SingleItemTtlCache<Vec<W2lTemplateRecordForList>>,
 
   /// In-memory caches with TTL-based eviction. Contains a list of all TTS categories.
   pub category_list: SingleItemTtlCache<Vec<DisplayCategory>>,
