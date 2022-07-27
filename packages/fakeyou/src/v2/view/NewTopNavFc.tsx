@@ -512,7 +512,7 @@ function NewTopNavFc(props: Props) {
 
                 <li className="nav-item d-lg-none">
                   {/* TODO(echelon): Fix the build warnings about href not being accessible. */}
-                  <a className="nav-link" aria-current="page" href="/">
+                  <a className="nav-link" aria-current="page" href={FrontendUrlConfig.developerDocs()}>
                     Developers
                   </a>
                 </li>
