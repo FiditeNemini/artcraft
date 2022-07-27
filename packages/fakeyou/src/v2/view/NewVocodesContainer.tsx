@@ -11,7 +11,6 @@ import { ProfileEditFc } from './profile/profile_edit/ProfileEditFc';
 import { ProfileFc } from './profile/profile_view/ProfileFc';
 import { SessionWrapper } from '@storyteller/components/src/session/SessionWrapper';
 import { SignupPage } from './signup/SignupPage';
-import { PricingPage } from './pricing/Pricing';
 import { Switch, Route } from 'react-router-dom';
 import { TermsPage } from './about/terms_page/TermsPage';
 import { TtsInferenceJob, W2lInferenceJob } from '../../App';
@@ -182,12 +181,14 @@ class NewVocodesContainer extends React.Component<Props, State> {
               />
             </Route>
 
+            {/*
             <Route path="/pricing">
               <PricingPage
                 querySessionCallback={() => { }}
                 sessionWrapper={this.props.sessionWrapper}
               />
             </Route>
+            */}
 
             <Route path="/tts/result/:token/edit">
               <TtsResultEditFc

@@ -131,8 +131,10 @@ function NewFooterNavFc(props: Props) {
           <div>
             <Link to="/">Text to Speech</Link>
           </div>
+          {/*
           &nbsp;|
           <Link to="/pricing">{t('coreUi.footerNav.pricing')}</Link>
+          */}
           &nbsp;|
           <Link to="/video">{t('coreUi.footerNav.video')}</Link>
           &nbsp;|
