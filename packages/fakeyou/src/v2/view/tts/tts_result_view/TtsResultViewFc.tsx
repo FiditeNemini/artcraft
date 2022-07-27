@@ -397,14 +397,19 @@ function TtsResultViewFc(props: Props) {
                     <th scope="row">Vocoder used</th>
                     <td>{vocoderUsed}</td>
                   </tr>
+                  <tr>
+                    <th scope="row">Worker</th>
+                    <td>{ttsInferenceResult.generated_by_worker}</td>
+                  </tr>
+
+                  {debugRows}
+
                 </tbody>
               </table>
             </div>
           </div>
         </div>
       </Fade>
-
-      <div>{debugRows}</div>
 
       <div>{moderatorRows}</div>
 
