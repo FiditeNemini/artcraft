@@ -6,7 +6,7 @@ import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapp
 import { Gravatar } from "@storyteller/components/src/elements/Gravatar";
 import { LanguageCodeToDescriptionWithDefault } from "@storyteller/components/src/i18n/SupportedModelLanguages";
 import { TtsInferenceJob } from "@storyteller/components/src/jobs/TtsInferenceJobs";
-import { TEXT_PIPELINE_NAMES } from "@storyteller/components/src/constants/TextPipeline";
+import { TEXT_PIPELINE_NAMES, TEXT_PIPELINE_NAMES_FOR_MODERATORS } from "@storyteller/components/src/constants/TextPipeline";
 import { useParams, Link } from "react-router-dom";
 import { v4 as uuidv4 } from "uuid";
 import { FrontendUrlConfig } from "../../../../common/FrontendUrlConfig";
@@ -437,11 +437,12 @@ function TtsModelViewFc(props: Props) {
 
   let textPipelineName = UNKNOWN;
 
+  let usableTextPipelines = canEditModel ? TEXT_PIPELINE_NAMES_FOR_MODERATORS : TEXT_PIPELINE_NAMES;
+
   if (!!textPipelineConfigured) {
-    textPipelineName =
-      TEXT_PIPELINE_NAMES.get(textPipelineConfigured) || UNKNOWN;
+    textPipelineName = usableTextPipelines.get(textPipelineConfigured) || UNKNOWN;
   } else {
-    let configuredName = TEXT_PIPELINE_NAMES.get(textPipelineUsed) || UNKNOWN;
+    let configuredName = usableTextPipelines.get(textPipelineUsed) || UNKNOWN;
     textPipelineName = `Not set; using default of ${configuredName}`;
   }
 

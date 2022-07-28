@@ -25,8 +25,12 @@ import {
   DEFAULT_MODEL_LANGUAGE,
   SUPPORTED_MODEL_LANGUAGE_TAG_TO_FULL,
 } from "@storyteller/components/src/i18n/SupportedModelLanguages";
-import { TEXT_PIPELINE_NAMES } from "@storyteller/components/src/constants/TextPipeline";
+import { 
+  TEXT_PIPELINE_NAMES, 
+  TEXT_PIPELINE_NAMES_FOR_MODERATORS,
+} from "@storyteller/components/src/constants/TextPipeline";
 import { distance, delay, duration } from "../../../../data/animation";
+
 const Fade = require("react-reveal/Fade");
 
 const DEFAULT_VISIBILITY = "public";
@@ -309,6 +313,8 @@ function TtsModelEditFc(props: Props) {
     );
   }
 
+  let usableTextPipelines = isModerator ? TEXT_PIPELINE_NAMES_FOR_MODERATORS : TEXT_PIPELINE_NAMES;
+
   let isDisabled = ttsModel === undefined;
 
   const visibilityIcon =
@@ -404,7 +410,7 @@ function TtsModelEditFc(props: Props) {
                         className="form-select"
                       >
                         {Array.from(
-                          TEXT_PIPELINE_NAMES,
+                          usableTextPipelines,
                           ([textPipelineType, description]) => {
                             return (
                               <option
