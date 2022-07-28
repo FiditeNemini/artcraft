@@ -397,13 +397,25 @@ https://storage.googleapis.com/vocodes-public/tts_inference_output/9/c/d/vocodes
 
 # Open Source
 
+**FakeYou API Bindings**
+
+* [shards-7 / fakeyou.py](https://github.com/shards-7/fakeyou.py) - 
+  Python client library by thedemonicat#9335
+   
+* [leunamcrack / fakeyou.js](https://github.com/leunamcrack/fakeyou.js) - 
+  Node.js module with API token or user session support.
+
+**FakeYou Discord Bots**
+
 * [justinjohn0306 / FakeYou-Tacotron2-Notebook](https://github.com/justinjohn0306/FakeYou-Tacotron2-Notebook) - 
   Tacotron2 Training and Synthesis Notebooks for FakeYou.com, including HifiGan and Arpabet support. 
+
+**FakeYou Discord Bots**
   
 * [MysteryPancake / Discord-TTS](https://github.com/MysteryPancake/Discord-TTS) - 
   a Discord bot you can run in your server that uses FakeYou's API to provide custom text to speech commands.
 
-* (More to come)
+(More to come!)
 
 # Need help, additional docs, or anything else?
 
