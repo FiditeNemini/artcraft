@@ -113,6 +113,7 @@ pub async fn process_single_job(
       &mut redis_logger,
       "downloading vocoder (1 of 3)",
       job.id.0,
+      &inferencer.scoped_temp_dir_creator,
     ).await?;
 
     waveglow_vocoder_model_fs_path
@@ -133,6 +134,7 @@ pub async fn process_single_job(
       &mut redis_logger,
       "downloading vocoder (2 of 3)",
       job.id.0,
+      &inferencer.scoped_temp_dir_creator,
     ).await?;
 
     hifigan_vocoder_model_fs_path
@@ -153,6 +155,7 @@ pub async fn process_single_job(
       &mut redis_logger,
       "downloading vocoder (3 of 3)",
       job.id.0,
+      &inferencer.scoped_temp_dir_creator,
     ).await?;
 
     hifigan_superres_vocoder_model_fs_path
@@ -191,6 +194,7 @@ pub async fn process_single_job(
       &mut redis_logger,
       "downloading synthesizer",
       job.id.0,
+      &inferencer.scoped_temp_dir_creator,
     ).await?;
 
     tts_synthesizer_fs_path
