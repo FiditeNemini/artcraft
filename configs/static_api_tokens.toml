@@ -35,9 +35,16 @@ maybe_use_high_priority_rate_limiter = true
 
 # ==================== LESS IMPORTANT ====================
 
+# /profile/api_d (DanLop#6659)
+# Requested 2022-07-07 in Discord DM
+# Using for Discord bot in 7000 servers.
+[[api_tokens]]
+api_token = "SAPI:D_515590A3E79F5EF9"
+maybe_user_token = 'U:1BC03G9Z6P198'
+
 # /profile/api_j (James222#8264)
-# Requested 2022-04-18 in Discord chat with Vegito
-# Using for their own mobile TTS app.
+# Requested 2022-06-06 in Discord DM
+# Using for "Jarvis". Made C# bindings. In Uberduck server, using them.
 [[api_tokens]]
 api_token = "SAPI:J_6E75E7543E1AC93D1"
 maybe_user_token = 'U:1BC03G9Z6P198'
