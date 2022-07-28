@@ -34,10 +34,16 @@ pub enum TextPipelineType {
   SpanishV1,
 
   /// Introduction date: approx July 2022.
-  /// An improvement upon "spanish_v1" that uses Ezequiel's Espeak system.
+  /// An improvement upon "spanish_v1" that uses Mathias's Espeak system.
   /// (Technically "spanish_v1" has not been introduced.)
   #[serde(rename = "spanish_v2")]
   SpanishV2,
+
+  /// NB: This is to sneak by UberDuck. This is an alias for "spanish_v2".
+  /// We will only intercept this from the frontend and will never save it to the database.
+  /// This will be removed in the future when the API no longer needs to be sneaky.
+  #[serde(rename = "legacy_fakeyou_2")]
+  SyntheticLegacyFakeYou2,
 }
 
 // TODO: Sucks to redefine enum variants. `serde_variant` looks like a fix, but it's GPL3.
@@ -45,6 +51,7 @@ const LEGACY_FAKEYOU : &'static str = "legacy_fakeyou";
 const ENGLISH_V1 : &'static str = "english_v1";
 const SPANISH_V1 : &'static str = "spanish_v1";
 const SPANISH_V2 : &'static str = "spanish_v2";
+const SYNTHETIC_LEGACY_FAKEYOU_2 : &'static str = "legacy_fakeyou_2";
 
 impl TextPipelineType {
 
@@ -61,6 +68,7 @@ impl TextPipelineType {
       TextPipelineType::EnglishV1 => ENGLISH_V1,
       TextPipelineType::SpanishV1 => SPANISH_V1,
       TextPipelineType::SpanishV2 => SPANISH_V2,
+      TextPipelineType::SyntheticLegacyFakeYou2 => SYNTHETIC_LEGACY_FAKEYOU_2,
     }
   }
 
@@ -70,7 +78,44 @@ impl TextPipelineType {
       ENGLISH_V1 => Ok(Self::EnglishV1),
       SPANISH_V1 => Ok(Self::SpanishV1),
       SPANISH_V2 => Ok(Self::SpanishV2),
+      SYNTHETIC_LEGACY_FAKEYOU_2 => Ok(Self::SyntheticLegacyFakeYou2),
       _ => Err(anyhow!("invalid variant: {}", tts_text_pipeline)),
+    }
+  }
+
+  /// Convert DB variant into API variant.
+  /// This is for "general use" and intentionally hides some pipeline options.
+  pub fn to_api_variant_for_anyone(&self) -> TextPipelineType {
+    match self {
+      // Be sneaky for UberDuck
+      TextPipelineType::SpanishV1 => TextPipelineType::LegacyFakeYou,
+      TextPipelineType::SpanishV2 => TextPipelineType::LegacyFakeYou,
+      TextPipelineType::SyntheticLegacyFakeYou2 => TextPipelineType::LegacyFakeYou,
+      // Maintain original type for everything else
+      _ => self.clone(),
+    }
+  }
+
+  /// Convert DB variant into API variant.
+  /// This is for "privileged use" and enables more pipelines.
+  pub fn to_api_variant_for_authors_and_mods(&self) -> TextPipelineType {
+    match self {
+      // Mods and selected authors have access to "spanish_v2", but it's communicated over the API
+      // with the mysterious "legacy_fakeyou_2".
+      TextPipelineType::SpanishV2 => TextPipelineType::SyntheticLegacyFakeYou2,
+      // Maintain original type for everything else
+      _ => self.clone(),
+    }
+  }
+
+  /// Convert the variant we accept from the frontend into something we save to the DB.
+  pub fn to_db_variant(&self) -> TextPipelineType {
+    match self {
+      // The "legacy_fakeyou_2" enum variant is a "semi-synthetic" alias for "spanish_v2"
+      //  and it should never be saved to the DB.
+      TextPipelineType::SyntheticLegacyFakeYou2 => TextPipelineType::SpanishV2,
+      // Maintain original type for everything else
+      _ => self.clone(),
     }
   }
 }
@@ -85,6 +130,7 @@ mod tests {
     assert!(TextPipelineType::is_valid_name("english_v1"));
     assert!(TextPipelineType::is_valid_name("spanish_v1"));
     assert!(TextPipelineType::is_valid_name("spanish_v2"));
+    assert!(TextPipelineType::is_valid_name("legacy_fakeyou_2"));
   }
 
   #[test]
