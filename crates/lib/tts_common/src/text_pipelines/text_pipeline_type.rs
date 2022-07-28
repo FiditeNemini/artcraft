@@ -29,13 +29,13 @@ pub enum TextPipelineType {
   /// Introduction date: approx July 2022.
   /// This was developed by Ezequiel and Mathias using a modified arpabet scheme similar to
   /// "english_v1".
-  /// NB(2022-07-05): Technically not landed yet.
+  /// NB(2022-07-05): not landed or supported landed yet.
   #[serde(rename = "spanish_v1")]
   SpanishV1,
 
   /// Introduction date: approx July 2022.
-  /// An improvement upon "spanish_v1" that uses an entirely different phonetic system.
-  /// NB(2022-07-05): Technically not landed yet.
+  /// An improvement upon "spanish_v1" that uses Ezequiel's Espeak system.
+  /// (Technically "spanish_v1" has not been introduced.)
   #[serde(rename = "spanish_v2")]
   SpanishV2,
 }
