@@ -52,7 +52,7 @@ interface Props {
   sessionWrapper: SessionWrapper;
 }
 
-function TtsResultDeleteFc(props: Props) {
+function TtsResultDeletePage(props: Props) {
   const history = useHistory();
 
   let { token }: { token: string } = useParams();
@@ -261,4 +261,4 @@ function TtsResultDeleteFc(props: Props) {
   );
 }
 
-export { TtsResultDeleteFc };
+export { TtsResultDeletePage };

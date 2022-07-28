@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { ApiConfig } from "@storyteller/components";
-import { EnqueueJobResponsePayload } from "../tts_model_list/TtsModelListFc";
+import { EnqueueJobResponsePayload } from "../tts_model_list/TtsModelListPage";
 import { SessionTtsInferenceResultListFc } from "../../_common/SessionTtsInferenceResultsListFc";
 import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
 import { Gravatar } from "@storyteller/components/src/elements/Gravatar";
@@ -55,7 +55,7 @@ interface Props {
   clearTextBuffer: () => void;
 }
 
-function TtsModelViewFc(props: Props) {
+function TtsModelViewPage(props: Props) {
   let { token } = useParams() as { token: string };
 
   const [ttsModel, setTtsModel] = useState<TtsModel | undefined>(undefined);
@@ -669,4 +669,4 @@ function recursiveBuildHierarchy(
   ];
 }
 
-export { TtsModelViewFc };
+export { TtsModelViewPage };

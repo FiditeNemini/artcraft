@@ -57,7 +57,7 @@ interface Props {
   sessionWrapper: SessionWrapper;
 }
 
-function TtsResultEditFc(props: Props) {
+function TtsResultEditPage(props: Props) {
   let { token }: { token: string } = useParams();
 
   const history = useHistory();
@@ -204,4 +204,4 @@ function TtsResultEditFc(props: Props) {
   );
 }
 
-export { TtsResultEditFc };
+export { TtsResultEditPage };
