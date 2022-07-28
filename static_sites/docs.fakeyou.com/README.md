@@ -399,11 +399,14 @@ https://storage.googleapis.com/vocodes-public/tts_inference_output/9/c/d/vocodes
 
 **FakeYou API Bindings**
 
-* [shards-7 / fakeyou.py](https://github.com/shards-7/fakeyou.py) - 
-  Python client library by thedemonicat#9335
-   
+* [jgric2 / FakeYou-Wrapper-CSharp](https://github.com/jgric2/FakeYou-Wrapper-CSharp) - 
+  C# API wrapper
+
 * [leunamcrack / fakeyou.js](https://github.com/leunamcrack/fakeyou.js) - 
   Node.js module with API token or user session support.
+
+* [shards-7 / fakeyou.py](https://github.com/shards-7/fakeyou.py) - 
+  Python client library by thedemonicat#9335
 
 **FakeYou Discord Bots**
 
