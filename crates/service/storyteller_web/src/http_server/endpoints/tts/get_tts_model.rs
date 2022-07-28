@@ -147,8 +147,9 @@ pub async fn get_tts_model_handler(
 
   let mut show_deleted_models = false;
   let mut is_moderator = false;
+  let mut is_original_author = false;
 
-  if let Some(user_session) = maybe_user_session {
+  if let Some(user_session) = &maybe_user_session {
     // NB: Moderators can see deleted models
     // Original creators cannot see them (unless they're moderators!)
     show_deleted_models = user_session.can_delete_other_users_tts_models;
@@ -172,6 +173,10 @@ pub async fn get_tts_model_handler(
     Ok(Some(model)) => model,
   };
 
+  if let Some(user_session) = &maybe_user_session {
+    is_original_author = user_session.user_token == model.creator_user_token;
+  }
+
   if let Some(moderator_fields) = model.maybe_moderator_fields.as_ref() {
     // NB: The moderator fields will always be present before removal
     // We don't want non-mods seeing stuff made by banned users.
@@ -184,10 +189,23 @@ pub async fn get_tts_model_handler(
     model.maybe_moderator_fields = None;
   }
 
-  // If there's an error deserializing, turn it to None.
-  let text_pipeline_type = model.text_pipeline_type
+  let mut text_pipeline_type = model.text_pipeline_type
       .as_deref()
-      .and_then(|pipeline_type| TextPipelineType::from_str(pipeline_type).ok());
+      .and_then(|pipeline_type| {
+        // If there's an error deserializing, turn it to None instead of 500ing. The column is
+        // nullable by default, and legacy records have no type.
+        TextPipelineType::from_str(pipeline_type).ok()
+      })
+      .map(|pipeline_type| {
+        // NB(bt, 2022-07-27): For now, we're being intentionally misleading and obscuring our text
+        //  pipelines so that UberDuck doesn't catch on about Espeak. Only uploaders and mods will
+        //  see the original value.
+        if is_moderator || is_original_author {
+          pipeline_type.to_api_variant_for_authors_and_mods()
+        } else {
+          pipeline_type.to_api_variant_for_anyone()
+        }
+      });
 
   // TODO: Use language to infer as well.
   let text_pipeline_type_guess =

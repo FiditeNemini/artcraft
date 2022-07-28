@@ -249,6 +249,7 @@ pub async fn edit_tts_model_handler(
   }
 
   let text_pipeline_type = request.text_pipeline_type
+      .map(|pipeline_type| pipeline_type.to_db_variant())
       .map(|pipeline_type| pipeline_type.to_str());
 
   let ip_address = get_request_ip(&http_request);
