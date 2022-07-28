@@ -408,7 +408,7 @@ https://storage.googleapis.com/vocodes-public/tts_inference_output/9/c/d/vocodes
 * [shards-7 / fakeyou.py](https://github.com/shards-7/fakeyou.py) - 
   Python client library by thedemonicat#9335
 
-**FakeYou Discord Bots**
+**FakeYou Training Notebooks**
 
 * [justinjohn0306 / FakeYou-Tacotron2-Notebook](https://github.com/justinjohn0306/FakeYou-Tacotron2-Notebook) - 
   Tacotron2 Training and Synthesis Notebooks for FakeYou.com, including HifiGan and Arpabet support. 
