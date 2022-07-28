@@ -1,9 +1,8 @@
 use std::path::Path;
 use log::{info, warn};
-use tempdir::TempDir;
 use jobs_common::redis_job_status_logger::RedisJobStatusLogger;
 use storage_buckets_common::bucket_client::BucketClient;
-use crate::ProcessSingleJobError;
+use crate::{ProcessSingleJobError, ScopedTempDirCreator};
 
 // TODO(bt, 2022-07-15): Make a concrete type for bucket paths
 
@@ -15,6 +14,7 @@ pub async fn maybe_download_file_from_bucket(
   redis_logger: &mut RedisJobStatusLogger<'_>,
   redis_status_update_description: &str,
   job_id: i64,
+  scoped_tempdir_creator: &ScopedTempDirCreator,
 ) -> Result<(), ProcessSingleJobError> {
 
   if file_path.exists() {
@@ -32,7 +32,7 @@ pub async fn maybe_download_file_from_bucket(
   let temp_dir = format!("temp_download_{}", job_id);
 
   // NB: TempDir exists until it goes out of scope, at which point it should delete from filesystem.
-  let temp_dir = TempDir::new(&temp_dir)
+  let temp_dir = scoped_tempdir_creator.new_tempdir(&temp_dir)
       .map_err(|e| ProcessSingleJobError::from_io_error(e))?;
 
   let temp_path = temp_dir.path().join("download.part");

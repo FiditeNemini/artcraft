@@ -18,6 +18,7 @@ pub mod caching;
 pub mod http_clients;
 pub mod job_steps;
 pub mod script_execution;
+pub mod util;
 
 use clap::{App, Arg};
 use config::common_env::CommonEnv;
@@ -59,6 +60,7 @@ use std::path::PathBuf;
 use std::time::Duration;
 use storage_buckets_common::bucket_client::BucketClient;
 use storage_buckets_common::bucket_path_unifier::BucketPathUnifier;
+use crate::util::scoped_temp_dir_creator::ScopedTempDirCreator;
 
 // Buckets (shared config)
 const ENV_ACCESS_KEY : &'static str = "ACCESS_KEY";
@@ -271,6 +273,7 @@ async fn main() -> AnyhowResult<()> {
   info!("Is debug worker? {}", is_debug_worker);
 
   let inferencer = JobArgs {
+    scoped_temp_dir_creator: ScopedTempDirCreator::for_directory(&temp_directory),
     download_temp_directory: temp_directory,
     mysql_pool,
     redis_pool,

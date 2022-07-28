@@ -14,9 +14,12 @@ use memory_caching::multi_item_ttl_cache::MultiItemTtlCache;
 use storage_buckets_common::bucket_client::BucketClient;
 use storage_buckets_common::bucket_path_unifier::BucketPathUnifier;
 use crate::http_clients::tts_sidecar_health_check_client::TtsSidecarHealthCheckClient;
+use crate::util::scoped_temp_dir_creator::ScopedTempDirCreator;
 
 pub struct JobArgs {
   pub download_temp_directory: PathBuf,
+  pub scoped_temp_dir_creator: ScopedTempDirCreator,
+
   pub mysql_pool: MySqlPool,
 
   pub redis_pool: r2d2::Pool<RedisConnectionManager>,
