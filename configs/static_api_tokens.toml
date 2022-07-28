@@ -35,6 +35,13 @@ maybe_use_high_priority_rate_limiter = true
 
 # ==================== LESS IMPORTANT ====================
 
+# /profile/api_j (James222#8264)
+# Requested 2022-04-18 in Discord chat with Vegito
+# Using for their own mobile TTS app.
+[[api_tokens]]
+api_token = "SAPI:J_6E75E7543E1AC93D1"
+maybe_user_token = 'U:1BC03G9Z6P198'
+
 # /profile/api_edymuro (EdyMuro#8205)
 # Requested 2022-04-18 in Discord chat with Vegito
 # Using for their own mobile TTS app.
