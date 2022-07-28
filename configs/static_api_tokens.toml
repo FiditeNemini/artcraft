@@ -1,6 +1,9 @@
 # A list of statically-configured (not-DB backed) API tokens.
-# This file is *NOT* distributed with the docker image and is just an example for local development.
+# This file is *NOT* distributed with the docker image.
 
+# NB: YES, THESE ARE SECRETS. THESE ARE THE ONLY SECRETS IN THE REPO. DON'T DO THIS AGAIN.
+
+# kubectl delete configmap static-api-tokens --namespace storyteller
 # kubectl create configmap static-api-tokens --namespace storyteller --from-file=static_api_tokens.toml
 
 #[[api_tokens]]
