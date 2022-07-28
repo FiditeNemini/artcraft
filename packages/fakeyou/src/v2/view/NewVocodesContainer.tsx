@@ -14,12 +14,12 @@ import { SignupPage } from './signup/SignupPage';
 import { Switch, Route } from 'react-router-dom';
 import { TermsPage } from './about/terms_page/TermsPage';
 import { TtsInferenceJob, W2lInferenceJob } from '../../App';
-import { TtsModelDeleteFc } from './tts/tts_model_delete/TtsModelDeleteFc';
-import { TtsModelEditFc } from './tts/tts_model_edit/TtsModelEditFc';
+import { TtsModelDeletePage } from './tts/tts_model_delete/TtsModelDeletePage';
+import { TtsModelEditPage } from './tts/tts_model_edit/TtsModelEditPage';
 import { TtsModelUploadJob } from '@storyteller/components/src/jobs/TtsModelUploadJobs';
-import { TtsModelViewFc } from './tts/tts_model_view/TtsModelViewFc';
-import { TtsResultDeleteFc } from './tts/tts_result_delete/TtsResultDeleteFc';
-import { TtsResultViewFc } from './tts/tts_result_view/TtsResultViewFc';
+import { TtsModelViewPage } from './tts/tts_model_view/TtsModelViewPage';
+import { TtsResultDeletePage } from './tts/tts_result_delete/TtsResultDeletePage';
+import { TtsResultViewPage } from './tts/tts_result_view/TtsResultViewPage';
 import { ContributeIndexPage } from './contribute/ContributeIndexPage';
 import { UploadTtsModelFc } from './upload/UploadTtsModelFc';
 import { UploadW2lPhotoFc } from './upload/UploadW2lPhotoFc';
@@ -28,13 +28,13 @@ import { W2lResultViewFc } from './w2l/w2l_result_view/W2lResultViewFc';
 import { W2lTemplateListFc } from './w2l/w2l_template_list/W2lTemplateListFc';
 import { W2lTemplateUploadJob } from '@storyteller/components/src/jobs/W2lTemplateUploadJobs';
 import { W2lTemplateViewFc } from './w2l/w2l_template_view/W2lTemplateViewFc';
-import { TtsResultEditFc } from './tts/tts_result_edit/TtsResultEditFc';
+import { TtsResultEditPage } from './tts/tts_result_edit/TtsResultEditPage';
 import { W2lResultEditFc } from './w2l/w2l_result_edit/W2lResultEditFc';
 import { W2lTemplateDeleteFc } from './w2l/w2l_template_delete/W2lTemplateDeleteFc';
 import { W2lTemplateEditFc } from './w2l/w2l_template_edit/W2lTemplateEditFc';
 import { W2lResultDeleteFc } from './w2l/w2l_result_delete/W2lResultDeleteFc';
 import { W2lTemplateApproveFc } from './w2l/w2l_template_approve/W2lTemplateApproveFc';
-import { TtsModelListFc } from './tts/tts_model_list/TtsModelListFc';
+import { TtsModelListPage } from './tts/tts_model_list/TtsModelListPage';
 import { TtsModelListItem } from '@storyteller/components/src/api/tts/ListTtsModels';
 import { ProfileBanFc } from './profile/profile_ban/ProfileBanFc';
 import { ModerationUserListFc } from './moderation/moderation_user_list/ModerationUserList';
@@ -191,25 +191,25 @@ class NewVocodesContainer extends React.Component<Props, State> {
             */}
 
             <Route path="/tts/result/:token/edit">
-              <TtsResultEditFc
+              <TtsResultEditPage
                 sessionWrapper={this.props.sessionWrapper}
               />
             </Route>
 
             <Route path="/tts/result/:token/delete">
-              <TtsResultDeleteFc
+              <TtsResultDeletePage
                 sessionWrapper={this.props.sessionWrapper}
               />
             </Route>
 
             <Route path="/tts/result/:token">
-              <TtsResultViewFc
+              <TtsResultViewPage
                 sessionWrapper={this.props.sessionWrapper}
               />
             </Route>
 
             <Route path="/tts/:token/edit">
-              <TtsModelEditFc
+              <TtsModelEditPage
                 sessionWrapper={this.props.sessionWrapper}
                 enqueueTtsJob={this.props.enqueueTtsJob}
                 ttsInferenceJobs={this.props.ttsInferenceJobs}
@@ -217,7 +217,7 @@ class NewVocodesContainer extends React.Component<Props, State> {
             </Route>
 
             <Route path="/tts/:token/delete">
-              <TtsModelDeleteFc
+              <TtsModelDeletePage
                 sessionWrapper={this.props.sessionWrapper}
               />
             </Route>
@@ -229,7 +229,7 @@ class NewVocodesContainer extends React.Component<Props, State> {
             </Route>
 
             <Route path="/tts/:token">
-              <TtsModelViewFc
+              <TtsModelViewPage
                 sessionWrapper={this.props.sessionWrapper}
                 enqueueTtsJob={this.props.enqueueTtsJob}
                 ttsInferenceJobs={this.props.ttsInferenceJobs}
@@ -408,7 +408,7 @@ class NewVocodesContainer extends React.Component<Props, State> {
             </Route>
 
             <Route path="/">
-              <TtsModelListFc
+              <TtsModelListPage
                 sessionWrapper={this.props.sessionWrapper}
                 isShowingVocodesNotice={this.props.isShowingVocodesNotice}
                 clearVocodesNotice={this.props.clearVocodesNotice}

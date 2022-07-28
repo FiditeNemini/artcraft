@@ -44,7 +44,7 @@ interface Props {
   sessionWrapper: SessionWrapper;
 }
 
-function TtsModelDeleteFc(props: Props) {
+function TtsModelDeletePage(props: Props) {
   const history = useHistory();
 
   let { token } = useParams() as { token: string };
@@ -292,4 +292,4 @@ function TtsModelDeleteFc(props: Props) {
   );
 }
 
-export { TtsModelDeleteFc };
+export { TtsModelDeletePage };

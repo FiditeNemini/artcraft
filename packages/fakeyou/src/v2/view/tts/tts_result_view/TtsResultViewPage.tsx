@@ -31,7 +31,7 @@ interface Props {
   sessionWrapper: SessionWrapper;
 }
 
-function TtsResultViewFc(props: Props) {
+function TtsResultViewPage(props: Props) {
   let { token }: { token: string } = useParams();
 
   const [ttsInferenceResult, setTtsInferenceResult] = useState<
@@ -434,4 +434,4 @@ function TtsResultViewFc(props: Props) {
   );
 }
 
-export { TtsResultViewFc };
+export { TtsResultViewPage };

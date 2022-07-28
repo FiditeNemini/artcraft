@@ -43,7 +43,7 @@ interface Props {
   ttsInferenceJobs: Array<TtsInferenceJob>;
 }
 
-function TtsModelEditFc(props: Props) {
+function TtsModelEditPage(props: Props) {
   let { token } = useParams() as { token: string };
 
   const history = useHistory();
@@ -479,4 +479,4 @@ function TtsModelEditFc(props: Props) {
   );
 }
 
-export { TtsModelEditFc };
+export { TtsModelEditPage };

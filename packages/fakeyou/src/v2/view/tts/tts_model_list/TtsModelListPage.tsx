@@ -96,7 +96,7 @@ interface Props {
   setMaybeSelectedTtsModel: (maybeSelectedTtsModel: TtsModelListItem) => void;
 }
 
-function TtsModelListFc(props: Props) {
+function TtsModelListPage(props: Props) {
   let {
     setTtsModels,
     setAllTtsCategories,
@@ -636,4 +636,4 @@ function dynamicallyCategorizeModels(models: TtsModelListItem[]) {
   });
 }
 
-export { TtsModelListFc };
+export { TtsModelListPage };
