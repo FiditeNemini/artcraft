@@ -1,4 +1,8 @@
 {
-    "heroSubtitle": "Use <strong>FakeYou</strong> deep fake tech to say stuff with your favorite characters*",
-    "heroTitle": "Text to Speech*"
+    "heroButtons": {
+        "cloneVoice": "Clone My Voice!",
+        "signUp": "Sign Up"
+    },
+    "heroSubtitle": "Use <strong>FakeYou</strong> deep fake tech to say stuff with your favorite characters",
+    "heroTitle": "Text to Speech"
 }

@@ -1,4 +1,4 @@
-import { COMMON_TRANSLATIONS, MergeDeepDictionary } from '@storyteller/components/src/_i18n/CommonTranslations';
+import { COMMON_TRANSLATIONS, DebugPrefixLeaves, MergeDeepDictionary } from '@storyteller/components/src/_i18n/CommonTranslations';
 
 // Use \u{00a0} = &nbsp; character literal
 
@@ -7,10 +7,12 @@ import { COMMON_TRANSLATIONS, MergeDeepDictionary } from '@storyteller/component
 import * as en from './locales/en';
 import * as es from './locales/es';
 
-const NEW_TRANSLATIONS: any = {
+let NEW_TRANSLATIONS: any = {
   en: { translation: en },
   es: { translation: es },
 }
+
+NEW_TRANSLATIONS = DebugPrefixLeaves(NEW_TRANSLATIONS, '\u{2705} ');
 
 // NB: These are the old translations. They should be phased out.
 const FAKEYOU_TRANSLATIONS: any = {
