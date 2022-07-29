@@ -72,6 +72,9 @@ interface Props {
   isShowingPleaseFollowNotice: boolean,
   clearPleaseFollowNotice: () => void,
 
+  isShowingBootstrapLanguageNotice: boolean,
+  clearBootstrapLanguageNotice: () => void,
+
   enqueueTtsJob: (jobToken: string) => void,
   ttsInferenceJobs: Array<TtsInferenceJob>,
 
@@ -419,6 +422,8 @@ class NewVocodesContainer extends React.Component<Props, State> {
                 clearTwitchTtsNotice={this.props.clearTwitchTtsNotice}
                 isShowingPleaseFollowNotice={this.props.isShowingPleaseFollowNotice}
                 clearPleaseFollowNotice={this.props.clearPleaseFollowNotice}
+                isShowingBootstrapLanguageNotice={this.props.isShowingBootstrapLanguageNotice}
+                clearBootstrapLanguageNotice={this.props.clearBootstrapLanguageNotice}
                 enqueueTtsJob={this.props.enqueueTtsJob}
                 ttsInferenceJobs={this.props.ttsInferenceJobs}
                 ttsModelUploadJobs={this.props.ttsModelUploadJobs}
