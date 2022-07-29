@@ -10,6 +10,7 @@ enum Language {
   Vietnamese,
   Hindi,
   ChineseSimplified,
+  Korean,
 }
 
 export { Language }

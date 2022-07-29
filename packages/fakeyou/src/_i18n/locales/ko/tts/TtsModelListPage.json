@@ -1,25 +1,25 @@
 {
     "form": {
-        "asyncLoadingDropdownValue": "Loading...",
+        "asyncLoadingDropdownValue": "초기화 중",
         "buttons": {
-            "clear": "Clear",
-            "speak": "Speak"
+            "clear": "초기화",
+            "speak": "말하다"
         },
-        "by": "by",
-        "categoryFiltersLabel": "Category / Langauge",
-        "modelSeeMoreLink": "See more details about the \"<1>{{modelName}}</1>\" model by <3>{{userName}}</3>",
-        "searchHint": "Search Term",
-        "searchLabel": "Search",
-        "textInputHint": "Textual shenanigans go here...",
-        "voicesLabel": "Voice ({{count}} to choose from)"
+        "by": "의",
+        "categoryFiltersLabel": "카테고리 / 언어",
+        "modelSeeMoreLink": "<3>{{userName}}</3>의 \"<1>{{modelName}}</1>\" 모델에 대한 자세한 내용 보기",
+        "searchHint": "검색어",
+        "searchLabel": "검색",
+        "textInputHint": "여기에 텍스트를 입력하세요",
+        "voicesLabel": "음성({{count}}개 중에서 선택)"
     },
-    "formTitle": "Create TTS",
+    "formTitle": "TTS 생성",
     "heroSection": {
         "buttons": {
-            "cloneVoice": "Clone My Voice!",
-            "signUp": "Sign Up"
+            "cloneVoice": "내 목소리를 복제하십시오!",
+            "signUp": "가입하기"
         },
-        "subtitle": "Use <strong>FakeYou</strong> deep fake tech to say stuff with your favorite characters",
-        "title": "Text to Speech"
+        "subtitle": "<strong>FakeYou</strong> 딥 페이크 기술을 사용하여 좋아하는 캐릭터와 함께 말하세요.",
+        "title": "텍스트 음성 변환"
     }
 }
