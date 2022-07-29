@@ -2,6 +2,17 @@ import { COMMON_TRANSLATIONS, MergeDeepDictionary } from '@storyteller/component
 
 // Use \u{00a0} = &nbsp; character literal
 
+// NB: This is the new translation system design. Multiple, per-page or per-module files are easier 
+// to navigate and maintain than singular monolithic files. We'll gradually phase out the old system.
+import * as en from './locales/en';
+import * as es from './locales/es';
+
+const NEW_TRANSLATIONS: any = {
+  en: { translation: en },
+  es: { translation: es },
+}
+
+// NB: These are the old translations. They should be phased out.
 const FAKEYOU_TRANSLATIONS: any = {
   // English: 46.6% Twitch (#1), 30+% FakeYou (#1)
   en: {
@@ -270,6 +281,9 @@ const FAKEYOU_TRANSLATIONS: any = {
 }
 
 // TODO: Type these as i18next dictionaries
-const FAKEYOU_MERGED_TRANSLATIONS: any = MergeDeepDictionary(FAKEYOU_TRANSLATIONS, COMMON_TRANSLATIONS);
+const FAKEYOU_MERGED_TRANSLATIONS: any = MergeDeepDictionary(
+  NEW_TRANSLATIONS, 
+  MergeDeepDictionary(FAKEYOU_TRANSLATIONS, COMMON_TRANSLATIONS)
+);
 
 export { FAKEYOU_MERGED_TRANSLATIONS }
