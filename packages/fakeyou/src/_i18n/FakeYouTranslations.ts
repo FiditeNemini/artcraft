@@ -1,4 +1,4 @@
-import { COMMON_TRANSLATIONS, DebugPrefixLeaves, MergeDeepDictionary } from '@storyteller/components/src/_i18n/CommonTranslations';
+import { COMMON_TRANSLATIONS, MergeDeepDictionary } from '@storyteller/components/src/_i18n/CommonTranslations';
 
 // Use \u{00a0} = &nbsp; character literal
 
