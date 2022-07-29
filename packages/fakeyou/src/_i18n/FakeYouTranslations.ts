@@ -1,7 +1,41 @@
-import { COMMON_TRANSLATIONS, MergeDeepDictionary } from '@storyteller/components/src/_i18n/CommonTranslations';
+import { COMMON_TRANSLATIONS, DebugPrefixLeaves, MergeDeepDictionary } from '@storyteller/components/src/_i18n/CommonTranslations';
 
 // Use \u{00a0} = &nbsp; character literal
 
+// NB: This is the new translation system design. Multiple, per-page or per-module files are easier 
+// to navigate and maintain than singular monolithic files. We'll gradually phase out the old system.
+import * as de from './locales/de';
+import * as en from './locales/en';
+import * as es from './locales/es';
+import * as fr from './locales/fr';
+import * as hi from './locales/hi';
+import * as id from './locales/id';
+import * as it from './locales/it';
+import * as ja from './locales/ja';
+import * as ko from './locales/ko';
+import * as pt from './locales/pt';
+import * as vi from './locales/vi';
+import * as zh from './locales/zh';
+
+const NEW_TRANSLATIONS: any = {
+  de: { translation: de },
+  en: { translation: en },
+  es: { translation: es },
+  fr: { translation: fr },
+  hi: { translation: hi },
+  id: { translation: id },
+  it: { translation: it },
+  ja: { translation: ja },
+  ko: { translation: ko },
+  pt: { translation: pt },
+  vi: { translation: vi },
+  zh: { translation: zh },
+}
+
+// Make it easy to "see" new translations. Comment out when not developing.
+// NEW_TRANSLATIONS = DebugPrefixLeaves(NEW_TRANSLATIONS, '\u{2705} ');
+
+// NB: These are the old translations. They should be phased out.
 const FAKEYOU_TRANSLATIONS: any = {
   // English: 46.6% Twitch (#1), 30+% FakeYou (#1)
   en: {
@@ -270,6 +304,9 @@ const FAKEYOU_TRANSLATIONS: any = {
 }
 
 // TODO: Type these as i18next dictionaries
-const FAKEYOU_MERGED_TRANSLATIONS: any = MergeDeepDictionary(FAKEYOU_TRANSLATIONS, COMMON_TRANSLATIONS);
+const FAKEYOU_MERGED_TRANSLATIONS: any = MergeDeepDictionary(
+  NEW_TRANSLATIONS, 
+  MergeDeepDictionary(FAKEYOU_TRANSLATIONS, COMMON_TRANSLATIONS)
+);
 
 export { FAKEYOU_MERGED_TRANSLATIONS }

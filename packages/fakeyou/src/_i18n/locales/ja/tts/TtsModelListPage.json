@@ -1,0 +1,25 @@
+{
+    "form": {
+        "asyncLoadingDropdownValue": "初期化中...",
+        "buttons": {
+            "clear": "クリア",
+            "speak": "話す"
+        },
+        "by": "の",
+        "categoryFiltersLabel": "カテゴリ/言語",
+        "modelSeeMoreLink": "<3>{{userName}}</3>による\"<1>{{modelName}}</1>\"モデルの詳細をご覧ください",
+        "searchHint": "検索語",
+        "searchLabel": "探す",
+        "textInputHint": "ここに言うテキストを入力してください",
+        "voicesLabel": "音声（{{count}}から選択）"
+    },
+    "formTitle": "TTSを作成する",
+    "heroSection": {
+        "buttons": {
+            "cloneVoice": "私の声を複製する",
+            "signUp": "サインアップ"
+        },
+        "subtitle": "<strong>FakeYou</ strong>ディープフェイクテックを使用して、お気に入りのキャラクターと話します",
+        "title": "テキスト読み上げ"
+    }
+}

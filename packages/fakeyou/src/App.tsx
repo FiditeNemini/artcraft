@@ -219,6 +219,11 @@ class App extends React.Component<Props, State> {
       const hasIndonesian = locale.language_codes.indexOf("id") > -1;
       const hasGerman = locale.language_codes.indexOf("de") > -1;
       const hasJapanese = locale.language_codes.indexOf("ja") > -1;
+      const hasFrench = locale.language_codes.indexOf("fr") > -1;
+      const hasVietnamese = locale.language_codes.indexOf("vi") > -1;
+      const hasHindi= locale.language_codes.indexOf("hi") > -1;
+      const hasChineseSimplified = locale.language_codes.indexOf("zh") > -1;
+      const hasKorean = locale.language_codes.indexOf("ko") > -1;
       const showNotice = hasSpanish || hasPortuguese || hasTurkish; //|| hasIndonesian || hasGerman || hasJapanese;
 
       let displayLanguage = Language.English;
@@ -246,6 +251,21 @@ class App extends React.Component<Props, State> {
       } else if (hasJapanese) {
         displayLanguage = Language.Japanese;
         languageCode = "ja";
+      } else if (hasKorean) {
+        displayLanguage = Language.Korean;
+        languageCode = "ko";
+      } else if (hasFrench) {
+        displayLanguage = Language.French;
+        languageCode = "fr";
+      } else if (hasVietnamese) {
+        displayLanguage = Language.Vietnamese;
+        languageCode = "vi";
+      } else if (hasHindi) {
+        displayLanguage = Language.Hindi;
+        languageCode = "hi";
+      } else if (hasChineseSimplified) {
+        displayLanguage = Language.ChineseSimplified;
+        languageCode = "zh";
       }
 
       this.setState({

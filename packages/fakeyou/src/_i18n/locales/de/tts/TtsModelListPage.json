@@ -1,0 +1,25 @@
+{
+    "form": {
+        "asyncLoadingDropdownValue": "Initialisierung...",
+        "buttons": {
+            "clear": "Klar",
+            "speak": "Sprechen"
+        },
+        "by": "von",
+        "categoryFiltersLabel": "Kategorie / Spracvon",
+        "modelSeeMoreLink": "Weitere Details zum Modell \"<1>{{modelName}}</1>\" von <3>{{userName}}</3>",
+        "searchHint": "Suchbegriff",
+        "searchLabel": "Suche",
+        "textInputHint": "Eingang...",
+        "voicesLabel": "Stimme ({{count}} zur Auswahl)"
+    },
+    "formTitle": "TTS erstellen",
+    "heroSection": {
+        "buttons": {
+            "cloneVoice": "Klonen Sie meine Stimme!",
+            "signUp": "Anmelden"
+        },
+        "subtitle": "Verwenden Sie die Deep-Fake-Technologie von <strong>FakeYou</strong>, um Dinge mit Ihren Lieblingsfiguren zu sagen",
+        "title": "Text zu Sprache"
+    }
+}

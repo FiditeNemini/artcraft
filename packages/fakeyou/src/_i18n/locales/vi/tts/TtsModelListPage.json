@@ -1,0 +1,25 @@
+{
+    "form": {
+        "asyncLoadingDropdownValue": "Khởi tạo...",
+        "buttons": {
+            "clear": "Cài lại",
+            "speak": "Nói"
+        },
+        "by": "của",
+        "categoryFiltersLabel": "Thể loại / Ngôn ngữ",
+        "modelSeeMoreLink": "Xem thêm chi tiết về mô hình \"<1>{{modelName}}</1>\" của <3>{{userName}}</3>",
+        "searchHint": "Cụm từ tìm kiếm",
+        "searchLabel": "Tìm kiếm",
+        "textInputHint": "Nhập văn bản tại đây",
+        "voicesLabel": "Giọng nói ({{count}} để chọn)"
+    },
+    "formTitle": "Tạo TTS",
+    "heroSection": {
+        "buttons": {
+            "cloneVoice": "Sao chép giọng nói của tôi!",
+            "signUp": "Đăng ký"
+        },
+        "subtitle": "Sử dụng công nghệ giả sâu <strong>FakeYou</strong> để nói nội dung với các nhân vật yêu thích của bạn",
+        "title": "Chuyển văn bản thành giọng nói"
+    }
+}

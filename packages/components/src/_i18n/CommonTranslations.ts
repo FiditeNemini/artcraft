@@ -110,5 +110,22 @@ function MergeDeepDictionary(dictA: DeepDictionary, dictB: DeepDictionary) : Dee
   return output;
 }
 
+// Modify all the string leaves of a dictionary to include a prefix string
+// This is useful to test if translations were updated using i18next.
+function DebugPrefixLeaves(obj: DeepDictionary, prefix: string) : DeepDictionary {
+  let output : DeepDictionary = {};
 
-export { COMMON_TRANSLATIONS, MergeDeepDictionary }
+  Object.keys(obj).forEach((key : string) => {
+    const value = obj[key];
+    if (typeof value === 'string') {
+      output[key] = `${prefix}${value}`;
+    } else {
+      output[key] = DebugPrefixLeaves(value, prefix);
+    }
+  });
+
+  return output;
+}
+
+
+export { COMMON_TRANSLATIONS, MergeDeepDictionary, DebugPrefixLeaves }

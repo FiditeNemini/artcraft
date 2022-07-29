@@ -1,0 +1,25 @@
+{
+    "form": {
+        "asyncLoadingDropdownValue": "Cargando...",
+        "buttons": {
+            "clear": "Claro",
+            "speak": "Hablar"
+        },
+        "by": "por",
+        "categoryFiltersLabel": "Categoría / Idioma",
+        "modelSeeMoreLink": "Ver más detalles sobre el modelo \"<1>{{modelName}}</1>\" de <3>{{userName}}</3>",
+        "searchHint": "Término de búsqueda",
+        "searchLabel": "Búsqueda",
+        "textInputHint": "Las travesuras de texto van aquí...",
+        "voicesLabel": "Voz ({{count}} para elegir)"
+    },
+    "formTitle": "Crear mensaje de texto",
+    "heroSection": {
+        "buttons": {
+            "cloneVoice": "Clonar mi Voz!",
+            "signUp": "Inscribirse"
+        },
+        "subtitle": "Usa <strong>FakeYou</strong> tecnología falsa profunda para decir cosas con tus personajes favoritos",
+        "title": "Texto a Voz"
+    }
+}

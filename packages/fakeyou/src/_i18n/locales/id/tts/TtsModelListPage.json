@@ -1,0 +1,25 @@
+{
+    "form": {
+        "asyncLoadingDropdownValue": "Inisialisasi...",
+        "buttons": {
+            "clear": "Jernih",
+            "speak": "Berbicara"
+        },
+        "by": "oleh",
+        "categoryFiltersLabel": "Kategori / Bahasa",
+        "modelSeeMoreLink": "Lihat detail selengkapnya tentang model \"<1>{{modelName}}</1>\" oleh <3>{{userName}}</3>",
+        "searchHint": "Istilah Pencarian",
+        "searchLabel": "Mencari",
+        "textInputHint": "Masukan teks",
+        "voicesLabel": "Suara ({{count}} untuk dipilih)"
+    },
+    "formTitle": "Buat TTS",
+    "heroSection": {
+        "buttons": {
+            "cloneVoice": "Klon suara saya",
+            "signUp": "Daftar"
+        },
+        "subtitle": "Gunakan teknologi palsu mendalam <strong>FakeYou</strong> untuk mengatakan hal-hal dengan karakter favorit Anda",
+        "title": "Teks pidato"
+    }
+}

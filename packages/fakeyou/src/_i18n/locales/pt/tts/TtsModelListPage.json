@@ -1,0 +1,25 @@
+{
+    "form": {
+        "asyncLoadingDropdownValue": "Inicializando",
+        "buttons": {
+            "clear": "Redefinir",
+            "speak": "Falar"
+        },
+        "by": "de",
+        "categoryFiltersLabel": "Categoria / Idioma",
+        "modelSeeMoreLink": "Veja mais detalhes sobre o modelo \"<1>{{modelName}}</1>\" de <3>{{userName}}</3>",
+        "searchHint": "Termo de pesquisa",
+        "searchLabel": "Procurar",
+        "textInputHint": "Insira o texto aqui",
+        "voicesLabel": "Voz ({{count}} para escolher)"
+    },
+    "formTitle": "Criar TTS",
+    "heroSection": {
+        "buttons": {
+            "cloneVoice": "Clonar minha voz!",
+            "signUp": "Inscrever-se"
+        },
+        "subtitle": "Use a tecnologia deepfake do <strong>FakeYou</strong> para dizer coisas com seus personagens favoritos",
+        "title": "Texto para fala"
+    }
+}

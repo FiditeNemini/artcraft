@@ -6,6 +6,11 @@ enum Language {
   Indonesian,
   German,
   Japanese,
+  French,
+  Vietnamese,
+  Hindi,
+  ChineseSimplified,
+  Korean,
 }
 
 export { Language }
