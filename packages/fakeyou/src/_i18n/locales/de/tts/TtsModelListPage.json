@@ -1,25 +1,25 @@
 {
     "form": {
-        "asyncLoadingDropdownValue": "Loading...",
+        "asyncLoadingDropdownValue": "Initialisierung...",
         "buttons": {
-            "clear": "Clear",
-            "speak": "Speak"
+            "clear": "Klar",
+            "speak": "Sprechen"
         },
-        "by": "by",
-        "categoryFiltersLabel": "Category / Langauge",
-        "modelSeeMoreLink": "See more details about the \"<1>{{modelName}}</1>\" model by <3>{{userName}}</3>",
-        "searchHint": "Search Term",
-        "searchLabel": "Search",
-        "textInputHint": "Textual shenanigans go here...",
-        "voicesLabel": "Voice ({{count}} to choose from)"
+        "by": "von",
+        "categoryFiltersLabel": "Kategorie / Spracvon",
+        "modelSeeMoreLink": "Weitere Details zum Modell \"<1>{{modelName}}</1>\" von <3>{{userName}}</3>",
+        "searchHint": "Suchbegriff",
+        "searchLabel": "Suche",
+        "textInputHint": "Eingang...",
+        "voicesLabel": "Stimme ({{count}} zur Auswahl)"
     },
-    "formTitle": "Create TTS",
+    "formTitle": "TTS erstellen",
     "heroSection": {
         "buttons": {
-            "cloneVoice": "Clone My Voice!",
-            "signUp": "Sign Up"
+            "cloneVoice": "Klonen Sie meine Stimme!",
+            "signUp": "Anmelden"
         },
-        "subtitle": "Use <strong>FakeYou</strong> deep fake tech to say stuff with your favorite characters",
-        "title": "Text to Speech"
+        "subtitle": "Verwenden Sie die Deep-Fake-Technologie von <strong>FakeYou</strong>, um Dinge mit Ihren Lieblingsfiguren zu sagen",
+        "title": "Text zu Sprache"
     }
 }
