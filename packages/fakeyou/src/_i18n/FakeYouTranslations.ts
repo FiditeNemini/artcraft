@@ -4,12 +4,38 @@ import { COMMON_TRANSLATIONS, DebugPrefixLeaves, MergeDeepDictionary } from '@st
 
 // NB: This is the new translation system design. Multiple, per-page or per-module files are easier 
 // to navigate and maintain than singular monolithic files. We'll gradually phase out the old system.
+import * as de from './locales/de';
 import * as en from './locales/en';
 import * as es from './locales/es';
+import * as fr from './locales/fr';
+import * as hi from './locales/hi';
+import * as id from './locales/id';
+import * as it from './locales/it';
+import * as ja from './locales/ja';
+import * as ko from './locales/ko';
+import * as nl from './locales/nl';
+import * as pl from './locales/pl';
+import * as pt from './locales/pt';
+import * as tr from './locales/tr';
+import * as vi from './locales/vi';
+import * as zh from './locales/zh';
 
 let NEW_TRANSLATIONS: any = {
+  de: { translation: de },
   en: { translation: en },
   es: { translation: es },
+  fr: { translation: fr },
+  hi: { translation: hi },
+  id: { translation: id },
+  it: { translation: it },
+  ja: { translation: ja },
+  ko: { translation: ko },
+  nl: { translation: nl },
+  pl: { translation: pl },
+  pt: { translation: pt },
+  tr: { translation: tr },
+  vi: { translation: vi },
+  zh: { translation: zh },
 }
 
 // Make it easy to "see" new translations. Comment out when not developing.

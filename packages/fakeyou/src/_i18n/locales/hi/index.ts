@@ -1,0 +1,8 @@
+// "hi" - Hindi
+// 615 million speakers (worldwide #3)
+// Twitch negligable (<50 streamers)
+import * as tts from './tts';
+
+export {
+    tts,
+}
