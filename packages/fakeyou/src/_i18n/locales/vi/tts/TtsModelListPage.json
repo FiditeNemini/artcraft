@@ -1,25 +1,25 @@
 {
     "form": {
-        "asyncLoadingDropdownValue": "Loading...",
+        "asyncLoadingDropdownValue": "Khởi tạo...",
         "buttons": {
-            "clear": "Clear",
-            "speak": "Speak"
+            "clear": "Cài lại",
+            "speak": "Nói"
         },
-        "by": "by",
-        "categoryFiltersLabel": "Category / Langauge",
-        "modelSeeMoreLink": "See more details about the \"<1>{{modelName}}</1>\" model by <3>{{userName}}</3>",
-        "searchHint": "Search Term",
-        "searchLabel": "Search",
-        "textInputHint": "Textual shenanigans go here...",
-        "voicesLabel": "Voice ({{count}} to choose from)"
+        "by": "của",
+        "categoryFiltersLabel": "Thể loại / Ngôn ngữ",
+        "modelSeeMoreLink": "Xem thêm chi tiết về mô hình \"<1>{{modelName}}</1>\" của <3>{{userName}}</3>",
+        "searchHint": "Cụm từ tìm kiếm",
+        "searchLabel": "Tìm kiếm",
+        "textInputHint": "Nhập văn bản tại đây",
+        "voicesLabel": "Giọng nói ({{count}} để chọn)"
     },
-    "formTitle": "Create TTS",
+    "formTitle": "Tạo TTS",
     "heroSection": {
         "buttons": {
-            "cloneVoice": "Clone My Voice!",
-            "signUp": "Sign Up"
+            "cloneVoice": "Sao chép giọng nói của tôi!",
+            "signUp": "Đăng ký"
         },
-        "subtitle": "Use <strong>FakeYou</strong> deep fake tech to say stuff with your favorite characters",
-        "title": "Text to Speech"
+        "subtitle": "Sử dụng công nghệ giả sâu <strong>FakeYou</strong> để nói nội dung với các nhân vật yêu thích của bạn",
+        "title": "Chuyển văn bản thành giọng nói"
     }
 }

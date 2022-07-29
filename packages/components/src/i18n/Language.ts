@@ -7,6 +7,7 @@ enum Language {
   German,
   Japanese,
   French,
+  Vietnamese,
 }
 
 export { Language }
