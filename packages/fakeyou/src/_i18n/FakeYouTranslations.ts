@@ -17,7 +17,7 @@ import * as pt from './locales/pt';
 import * as vi from './locales/vi';
 import * as zh from './locales/zh';
 
-let NEW_TRANSLATIONS: any = {
+const NEW_TRANSLATIONS: any = {
   de: { translation: de },
   en: { translation: en },
   es: { translation: es },
@@ -33,7 +33,7 @@ let NEW_TRANSLATIONS: any = {
 }
 
 // Make it easy to "see" new translations. Comment out when not developing.
-NEW_TRANSLATIONS = DebugPrefixLeaves(NEW_TRANSLATIONS, '\u{2705} ');
+// NEW_TRANSLATIONS = DebugPrefixLeaves(NEW_TRANSLATIONS, '\u{2705} ');
 
 // NB: These are the old translations. They should be phased out.
 const FAKEYOU_TRANSLATIONS: any = {
