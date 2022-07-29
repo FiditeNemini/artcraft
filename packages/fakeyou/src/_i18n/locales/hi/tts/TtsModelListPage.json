@@ -1,25 +1,25 @@
 {
     "form": {
-        "asyncLoadingDropdownValue": "Loading...",
+        "asyncLoadingDropdownValue": "शुरु कर रहा है",
         "buttons": {
-            "clear": "Clear",
-            "speak": "Speak"
+            "clear": "रीसेट",
+            "speak": "बोलना"
         },
-        "by": "by",
-        "categoryFiltersLabel": "Category / Langauge",
-        "modelSeeMoreLink": "See more details about the \"<1>{{modelName}}</1>\" model by <3>{{userName}}</3>",
-        "searchHint": "Search Term",
-        "searchLabel": "Search",
-        "textInputHint": "Textual shenanigans go here...",
-        "voicesLabel": "Voice ({{count}} to choose from)"
+        "by": "द्वारा",
+        "categoryFiltersLabel": "श्रेणी / भाषा",
+        "modelSeeMoreLink": "<3>{{userName}}</3> के \"<1>{{modelName}}</1>\" मॉडल के बारे में अधिक विवरण देखें",
+        "searchHint": "शब्द को खोजें",
+        "searchLabel": "तलाशी",
+        "textInputHint": "यहां टेक्स्ट इनपुट करें",
+        "voicesLabel": "आवाज ({{count}} चुनने के लिए)"
     },
     "formTitle": "Create TTS",
     "heroSection": {
         "buttons": {
-            "cloneVoice": "Clone My Voice!",
-            "signUp": "Sign Up"
+            "cloneVoice": "क्लोन माय वॉयस",
+            "signUp": "साइन अप करें"
         },
-        "subtitle": "Use <strong>FakeYou</strong> deep fake tech to say stuff with your favorite characters",
-        "title": "Text to Speech"
+        "subtitle": "अपने पसंदीदा पात्रों के साथ बातें कहने के लिए <strong>FakeYou</strong> गहरी नकली तकनीक का उपयोग करें",
+        "title": "लिखे हुए को बोलने में बदलना"
     }
 }

@@ -8,6 +8,7 @@ enum Language {
   Japanese,
   French,
   Vietnamese,
+  Hindi,
 }
 
 export { Language }
