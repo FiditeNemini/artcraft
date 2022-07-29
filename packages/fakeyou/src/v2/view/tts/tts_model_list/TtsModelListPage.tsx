@@ -212,11 +212,12 @@ function TtsModelListPage(props: Props) {
     let userName = props.maybeSelectedTtsModel.creator_display_name;
     directViewLink = (
       <Link to={modelLink} className="py-2">
-        <Trans i18nKey="ttsListPage.seeModelDetails">
+        <Trans i18nKey="tts.TtsModelListPage.form.modelSeeMoreLink">
           See more details about the "
           <span className="fw-semibold">{{ modelName }}</span>" model by&nbsp;
           <span className="fw-semibold">{{ userName }}</span>&nbsp;
         </Trans>
+        {" "}
         <Gravatar
           size={15}
           username={props.maybeSelectedTtsModel.creator_display_name}
@@ -294,7 +295,7 @@ function TtsModelListPage(props: Props) {
       <>
         <Link to="/signup">
           <button type="button" className="btn btn-primary w-100">
-            Sign Up
+            {t("tts.TtsModelListPage.heroSection.buttons.signUp")}
           </button>
         </Link>
       </>
@@ -329,10 +330,10 @@ function TtsModelListPage(props: Props) {
             <Fade bottom cascade duration={duration} distance={distance}>
               <div>
                 <h1 className="display-3 fw-bold lh-1 mb-3 text-center text-lg-start">
-                  {t('tts.TtsModelListPage.heroTitle')}
+                  {t('tts.TtsModelListPage.heroSection.title')}
                 </h1>
                 <p className="lead mb-5 text-center text-lg-start pe-xl-2">
-                  <Trans i18nKey="tts.TtsModelListPage.heroSubtitle">
+                  <Trans i18nKey="tts.TtsModelListPage.heroSection.subtitle">
                     Use FakeYou's deepfake tech to say stuff with your favorite
                     characters.
                   </Trans>
@@ -345,7 +346,7 @@ function TtsModelListPage(props: Props) {
                 {signUpButton}
                 <Link to="/clone">
                   <button type="button" className="btn btn-secondary w-100">
-                    Clone My Voice!
+                    {t("tts.TtsModelListPage.heroSection.buttons.cloneVoice")}
                   </button>
                 </Link>
               </div>
@@ -360,7 +361,7 @@ function TtsModelListPage(props: Props) {
             <i className="fas fa-volume-high"></i>
             <h1 className="panel-title fw-bold">
               <FontAwesomeIcon icon={faVolumeUp} className="me-3" />
-              Create TTS
+              {t("tts.TtsModelListPage.formTitle")}
             </h1>
             <div className="py-6">
               <div className="d-flex gap-4">
@@ -404,7 +405,7 @@ function TtsModelListPage(props: Props) {
                       className="form-control fs-5"
                       style={{ minHeight: "200px" }}
                       value={props.textBuffer}
-                      placeholder={t("pages.ttsList.placeholderTextGoesHere")}
+                      placeholder={t("tts.TtsModelListPage.form.textInputHint")}
                     ></textarea>
                   </div>
 
@@ -416,14 +417,14 @@ function TtsModelListPage(props: Props) {
                       disabled={remainingCharactersButtonDisabled}
                     >
                       <FontAwesomeIcon icon={faVolumeHigh} className="me-2" />
-                      {t("pages.ttsList.buttonSpeak")}
+                      {t("tts.TtsModelListPage.form.buttons.speak")}
                     </button>
                     <button
                       className="btn btn-destructive w-100"
                       onClick={handleClearClick}
                     >
                       <FontAwesomeIcon icon={faTrash} className="me-2" />
-                      {t("pages.ttsList.buttonClear")}
+                      {t("tts.TtsModelListPage.form.buttons.clear")}
                     </button>
                   </div>
                 </form>

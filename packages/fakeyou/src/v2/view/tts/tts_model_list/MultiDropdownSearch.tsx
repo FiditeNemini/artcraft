@@ -2,7 +2,6 @@ import React, { useEffect } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faCaretRight,
-  faHeadphonesAlt,
   faMicrophone,
   faTags,
   faTimes,
@@ -10,7 +9,6 @@ import {
 import { TtsModelListItem } from "@storyteller/components/src/api/tts/ListTtsModels";
 import { TtsCategoryType } from "../../../../AppWrapper";
 import { Trans, useTranslation } from "react-i18next";
-import { USE_REFRESH } from "../../../../Refresh";
 
 interface Props {
   allTtsCategories: TtsCategoryType[];
@@ -196,14 +194,8 @@ export function MultiDropdownSearch(props: Props) {
       break;
     }
 
-    let selectCssClasses = "category-dropdown"; // NB: 'category-dropdown' is important for function.
-    let xButtonCssClasses = "button is-rounded is-outlined";
-
-    if (USE_REFRESH) {
-      // Redesign and Bootstrap CSS
-      selectCssClasses = "category-dropdown form-select"; // NB: 'category-dropdown' is important for function.
-      xButtonCssClasses = "btn btn-destructive btn-inform";
-    }
+    const selectCssClasses = "category-dropdown form-select"; // NB: 'category-dropdown' is important for function.
+    const xButtonCssClasses = "btn btn-destructive btn-inform";
 
     categoryDropdowns.push(
       <React.Fragment key={`categoryDropdown-${i}`}>
@@ -286,69 +278,27 @@ export function MultiDropdownSearch(props: Props) {
 
   const voiceCount = leafiestCategoryModels.size;
 
-  let selectClasses = USE_REFRESH ? "form-select" : "select is-normal";
+  let selectClasses = "form-select";
   let loadingOption = undefined;
 
   if (isLoading) {
-    selectClasses = USE_REFRESH ? "form-select" : "select is-normal is-loading";
+    selectClasses = "form-select";
     loadingOption = (
       <option key="waiting" value="" disabled={true}>
-        {t("ttsListPage.loading")}
+        {t("tts.TtsModelListPage.form.asyncLoadingDropdownValue")}
       </option>
-    );
-  }
-
-  if (!USE_REFRESH) {
-    return (
-      <div>
-        {/* Category Dropdowns */}
-        <strong>{t("ttsListPage.categoryFilters")}</strong>
-        <br />
-        {categoryFieldGroups}
-
-        {/* Model Dropdown */}
-        <strong>
-          <Trans i18nKey="ttsListPage.voiceCount" count={voiceCount}>
-            Voice ({voiceCount} to choose from)
-          </Trans>
-        </strong>
-        <br />
-        <div className="control has-icons-left">
-          <div className={selectClasses}>
-            <select
-              name="tts-model-select"
-              onChange={handleChangeVoice}
-              disabled={isLoading}
-            >
-              {isLoading
-                ? loadingOption
-                : Array.from(leafiestCategoryModels).map((model) => {
-                    return (
-                      <option key={model.model_token} value={model.model_token}>
-                        {model.title} ({t("ttsListPage.by")}{" "}
-                        {model.creator_display_name})
-                      </option>
-                    );
-                  })}
-            </select>
-          </div>
-          <span className="icon is-small is-left">
-            <FontAwesomeIcon icon={faHeadphonesAlt} />
-          </span>
-        </div>
-      </div>
     );
   }
 
   return (
     <div>
       {/* Category Dropdowns */}
-      <label className="sub-title">{t("ttsListPage.categoryFilters")}</label>
+      <label className="sub-title">{t("tts.TtsModelListPage.form.categoryFiltersLabel")}</label>
       {categoryFieldGroups}
 
       {/* Model Dropdown */}
       <label className="sub-title">
-        <Trans i18nKey="ttsListPage.voiceCount" count={voiceCount}>
+        <Trans i18nKey="tts.TtsModelListPage.form.voicesLabel" count={voiceCount}>
           Voice ({voiceCount} to choose from)
         </Trans>
       </label>
@@ -367,7 +317,7 @@ export function MultiDropdownSearch(props: Props) {
             : Array.from(leafiestCategoryModels).map((model) => {
                 return (
                   <option key={model.model_token} value={model.model_token}>
-                    {model.title} ({t("ttsListPage.by")}{" "}
+                    {model.title} ({t("tts.TtsModelListPage.form.by")}{" "}
                     {model.creator_display_name})
                   </option>
                 );

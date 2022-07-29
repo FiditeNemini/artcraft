@@ -12,6 +12,7 @@ let NEW_TRANSLATIONS: any = {
   es: { translation: es },
 }
 
+// Make it easy to "see" new translations. Comment out when not developing.
 NEW_TRANSLATIONS = DebugPrefixLeaves(NEW_TRANSLATIONS, '\u{2705} ');
 
 // NB: These are the old translations. They should be phased out.
