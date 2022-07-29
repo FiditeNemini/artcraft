@@ -215,17 +215,18 @@ class App extends React.Component<Props, State> {
     let locale = await DetectLocale();
     if (DetectLocaleIsOk(locale)) {
       // TODO: Does not respect preference
-      const hasSpanish = locale.language_codes.indexOf("es") > -1;
-      const hasPortuguese = locale.language_codes.indexOf("pt") > -1;
-      const hasTurkish = locale.language_codes.indexOf("tr") > -1;
-      const hasIndonesian = locale.language_codes.indexOf("id") > -1;
-      const hasGerman = locale.language_codes.indexOf("de") > -1;
-      const hasJapanese = locale.language_codes.indexOf("ja") > -1;
-      const hasFrench = locale.language_codes.indexOf("fr") > -1;
-      const hasVietnamese = locale.language_codes.indexOf("vi") > -1;
-      const hasHindi= locale.language_codes.indexOf("hi") > -1;
       const hasChineseSimplified = locale.language_codes.indexOf("zh") > -1;
+      const hasFrench = locale.language_codes.indexOf("fr") > -1;
+      const hasGerman = locale.language_codes.indexOf("de") > -1;
+      const hasHindi= locale.language_codes.indexOf("hi") > -1;
+      const hasIndonesian = locale.language_codes.indexOf("id") > -1;
+      const hasItalian = locale.language_codes.indexOf("it") > -1;
+      const hasJapanese = locale.language_codes.indexOf("ja") > -1;
       const hasKorean = locale.language_codes.indexOf("ko") > -1;
+      const hasPortuguese = locale.language_codes.indexOf("pt") > -1;
+      const hasSpanish = locale.language_codes.indexOf("es") > -1;
+      const hasTurkish = locale.language_codes.indexOf("tr") > -1;
+      const hasVietnamese = locale.language_codes.indexOf("vi") > -1;
 
       let displayLanguage = Language.English;
       let languageCode = "en";
@@ -260,6 +261,9 @@ class App extends React.Component<Props, State> {
       } else if (hasHindi) {
         displayLanguage = Language.Hindi;
         languageCode = "hi";
+      } else if (hasItalian) {
+        displayLanguage = Language.Italian;
+        languageCode = "it";
       } else if (hasChineseSimplified) {
         displayLanguage = Language.ChineseSimplified;
         languageCode = "zh";
@@ -270,15 +274,15 @@ class App extends React.Component<Props, State> {
 
       const showBootstrapLanguageNotice = (
         hasJapanese 
-        || hasKorean 
-        || hasFrench 
-        || hasTurkish 
-        || hasIndonesian 
-        || hasGerman 
-        || hasVietnamese 
-        || hasHindi 
         || hasChineseSimplified
-        || true
+        || hasFrench 
+        || hasGerman 
+        || hasHindi 
+        || hasIndonesian 
+        || hasItalian 
+        || hasKorean 
+        || hasTurkish 
+        || hasVietnamese 
       );
 
       this.setState({

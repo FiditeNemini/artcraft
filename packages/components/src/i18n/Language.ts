@@ -11,6 +11,7 @@ enum Language {
   Hindi,
   ChineseSimplified,
   Korean,
+  Italian,
 }
 
 export { Language }
