@@ -9,6 +9,7 @@ enum Language {
   French,
   Vietnamese,
   Hindi,
+  ChineseSimplified,
 }
 
 export { Language }
