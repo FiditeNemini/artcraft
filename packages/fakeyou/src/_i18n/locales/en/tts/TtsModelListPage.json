@@ -6,7 +6,7 @@
             "speak": "Speak"
         },
         "by": "by",
-        "categoryFiltersLabel": "Category / Langauge",
+        "categoryFiltersLabel": "Category / Language",
         "modelSeeMoreLink": "See more details about the \"<1>{{modelName}}</1>\" model by <3>{{userName}}</3>",
         "searchHint": "Search Term",
         "searchLabel": "Search",
