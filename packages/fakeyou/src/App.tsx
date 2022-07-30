@@ -101,6 +101,9 @@ interface State {
   isShowingTwitchTtsNotice: boolean;
   isShowingPleaseFollowNotice: boolean;
 
+  // An improved notice for "new" languages asking users to help.
+  isShowingBootstrapLanguageNotice: boolean;
+
   // Jobs enqueued during this browser session.
   ttsInferenceJobs: Array<TtsInferenceJob>;
   w2lInferenceJobs: Array<W2lInferenceJob>;
@@ -149,14 +152,13 @@ class App extends React.Component<Props, State> {
 
       isShowingVocodesNotice: props.flashVocodesNotice,
 
-      //localeLanguageCodes: [],
-      //localeFullLanguageTags: [],
       isShowingLanguageNotice: false,
       displayLanguage: Language.English,
       primaryLanguageCode: "en",
 
       isShowingTwitchTtsNotice: showTwitchNotice,
       isShowingPleaseFollowNotice: showPleaseFollowNotice,
+      isShowingBootstrapLanguageNotice: false,
 
       ttsInferenceJobs: [],
       w2lInferenceJobs: [],
@@ -213,32 +215,28 @@ class App extends React.Component<Props, State> {
     let locale = await DetectLocale();
     if (DetectLocaleIsOk(locale)) {
       // TODO: Does not respect preference
-      const hasSpanish = locale.language_codes.indexOf("es") > -1;
-      const hasPortuguese = locale.language_codes.indexOf("pt") > -1;
-      const hasTurkish = locale.language_codes.indexOf("tr") > -1;
-      const hasIndonesian = locale.language_codes.indexOf("id") > -1;
-      const hasGerman = locale.language_codes.indexOf("de") > -1;
-      const hasJapanese = locale.language_codes.indexOf("ja") > -1;
-      const hasFrench = locale.language_codes.indexOf("fr") > -1;
-      const hasVietnamese = locale.language_codes.indexOf("vi") > -1;
-      const hasHindi= locale.language_codes.indexOf("hi") > -1;
       const hasChineseSimplified = locale.language_codes.indexOf("zh") > -1;
+      const hasFrench = locale.language_codes.indexOf("fr") > -1;
+      const hasGerman = locale.language_codes.indexOf("de") > -1;
+      const hasHindi= locale.language_codes.indexOf("hi") > -1;
+      const hasIndonesian = locale.language_codes.indexOf("id") > -1;
+      const hasItalian = locale.language_codes.indexOf("it") > -1;
+      const hasJapanese = locale.language_codes.indexOf("ja") > -1;
       const hasKorean = locale.language_codes.indexOf("ko") > -1;
-      const showNotice = hasSpanish || hasPortuguese || hasTurkish; //|| hasIndonesian || hasGerman || hasJapanese;
+      const hasPortuguese = locale.language_codes.indexOf("pt") > -1;
+      const hasSpanish = locale.language_codes.indexOf("es") > -1;
+      const hasTurkish = locale.language_codes.indexOf("tr") > -1;
+      const hasVietnamese = locale.language_codes.indexOf("vi") > -1;
 
       let displayLanguage = Language.English;
       let languageCode = "en";
 
-      let showPleaseFollowNotice = false;
-
       if (hasSpanish) {
         displayLanguage = Language.Spanish;
         languageCode = "es";
-        showPleaseFollowNotice = true;
       } else if (hasPortuguese) {
         displayLanguage = Language.Portuguese;
         languageCode = "pt";
-        showPleaseFollowNotice = true;
       } else if (hasTurkish) {
         displayLanguage = Language.Turkish;
         languageCode = "tr";
@@ -263,16 +261,36 @@ class App extends React.Component<Props, State> {
       } else if (hasHindi) {
         displayLanguage = Language.Hindi;
         languageCode = "hi";
+      } else if (hasItalian) {
+        displayLanguage = Language.Italian;
+        languageCode = "it";
       } else if (hasChineseSimplified) {
         displayLanguage = Language.ChineseSimplified;
         languageCode = "zh";
       }
+
+      const showNotice = hasSpanish || hasPortuguese || hasTurkish;
+      const showPleaseFollowNotice = hasSpanish || hasPortuguese;
+
+      const showBootstrapLanguageNotice = (
+        hasJapanese 
+        || hasChineseSimplified
+        || hasFrench 
+        || hasGerman 
+        || hasHindi 
+        || hasIndonesian 
+        || hasItalian 
+        || hasKorean 
+        || hasTurkish 
+        || hasVietnamese 
+      );
 
       this.setState({
         isShowingLanguageNotice: showNotice,
         displayLanguage: displayLanguage,
         primaryLanguageCode: languageCode,
         isShowingPleaseFollowNotice: showPleaseFollowNotice,
+        isShowingBootstrapLanguageNotice: showBootstrapLanguageNotice,
       });
 
       i18n.changeLanguage(languageCode);
@@ -312,6 +330,10 @@ class App extends React.Component<Props, State> {
 
   clearPleaseFollowNotice = () => {
     this.setState({ isShowingPleaseFollowNotice: false });
+  };
+
+  clearBootstrapLanguageNotice = () => {
+    this.setState({ isShowingBootstrapLanguageNotice: false });
   };
 
   enqueueTtsJob = (jobToken: string) => {
@@ -599,6 +621,10 @@ class App extends React.Component<Props, State> {
                       this.state.isShowingPleaseFollowNotice
                     }
                     clearPleaseFollowNotice={this.clearPleaseFollowNotice}
+                    isShowingBootstrapLanguageNotice={
+                      this.state.isShowingBootstrapLanguageNotice
+                    }
+                    clearBootstrapLanguageNotice={this.clearBootstrapLanguageNotice}
                     enqueueTtsJob={this.enqueueTtsJob}
                     ttsInferenceJobs={this.state.ttsInferenceJobs}
                     enqueueW2lJob={this.enqueueW2lJob}
