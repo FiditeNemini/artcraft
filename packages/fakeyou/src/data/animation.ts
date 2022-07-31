@@ -45,3 +45,12 @@ export const panel = {
   },
   hidden: { opacity: 0, y: 50 },
 };
+
+export const sessionItem = {
+  visible: {
+    opacity: 1,
+    x: 0,
+    transition: { duration: 0.75, ease: [0.1, 0.8, 0.44, 1] },
+  },
+  hidden: { opacity: 0, x: 50 },
+};

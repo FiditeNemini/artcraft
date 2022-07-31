@@ -2,8 +2,8 @@ import React from "react";
 import { Link } from "react-router-dom";
 import { JobState } from "@storyteller/components/src/jobs/JobStates";
 import { W2lTemplateUploadJob } from "@storyteller/components/src/jobs/W2lTemplateUploadJobs";
-import { distance, duration } from "../../../data/animation";
-const Fade = require("react-reveal/Fade");
+import { motion } from "framer-motion";
+import { container, item, sessionItem } from "../../../data/animation";
 
 interface Props {
   w2lTemplateUploadJobs: Array<W2lTemplateUploadJob>;
@@ -47,9 +47,7 @@ function SessionW2lTemplateUploadResultListFc(props: Props) {
 
       results.push(
         <div key={job.jobToken}>
-          <Fade bottom cascade duration={duration} distance={distance}>
-            <div className="alert alert-primary">{stateDescription}</div>
-          </Fade>
+          <div className="alert alert-primary">{stateDescription}</div>
         </div>
       );
     } else {
@@ -57,12 +55,15 @@ function SessionW2lTemplateUploadResultListFc(props: Props) {
 
       results.push(
         <div key={job.jobToken}>
-          <div className="panel py-4 p-3 p-lg-4 gap-4">
+          <motion.div
+            className="panel py-4 p-3 p-lg-4 gap-4"
+            variants={sessionItem}
+          >
             Complete!
             <Link to={w2lPermalink} className="btn btn-primary ms-4">
               See &amp; use template
             </Link>
-          </div>
+          </motion.div>
         </div>
       );
     }
@@ -71,21 +72,19 @@ function SessionW2lTemplateUploadResultListFc(props: Props) {
   let title = <span />;
   if (results.length !== 0) {
     title = (
-      <h2 className="text-center text-lg-start fw-bold">
+      <motion.h2 className="text-center text-lg-start fw-bold" variants={item}>
         W2L Template Upload Status
-      </h2>
+      </motion.h2>
     );
   }
 
   return (
-    <div>
-      <Fade cascade right distance="100px" duration="400">
-        <div className="container-panel pt-4 pb-5">
-          <div className="pb-4">{title}</div>
-          <div className="d-flex flex-column gap-4">{results}</div>
-        </div>
-      </Fade>
-    </div>
+    <motion.div initial="hidden" animate="visible" variants={container}>
+      <div className="container-panel pt-4 pb-5">
+        <div className="pb-4">{title}</div>
+        <div className="d-flex flex-column gap-4">{results}</div>
+      </div>
+    </motion.div>
   );
 }
 

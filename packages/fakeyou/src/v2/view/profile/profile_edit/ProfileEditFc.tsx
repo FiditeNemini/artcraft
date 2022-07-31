@@ -19,8 +19,8 @@ import {
   faGlobe,
 } from "@fortawesome/free-solid-svg-icons";
 import { BackLink } from "../../_common/BackLink";
-import { distance, duration, delay, delay2 } from "../../../../data/animation";
-const Fade = require("react-reveal/Fade");
+import { motion } from "framer-motion";
+import { container, item, panel } from "../../../../data/animation";
 
 const DEFAULT_VISIBILITY = "public";
 
@@ -234,123 +234,116 @@ function ProfileEditFc(props: Props) {
     );
 
   return (
-    <div>
-      <Fade bottom cascade duration={duration} distance={distance}>
-        <div className="container pt-5 pb-4 px-lg-5 px-xl-3">
-          <h1 className="display-5 fw-bold mb-3">Profile &amp; Preferences</h1>
-          <div>
-            <BackLink link={viewLinkUrl} text="Back to profile" />
-          </div>
-        </div>
-      </Fade>
+    <motion.div initial="hidden" animate="visible" variants={container}>
+      <div className="container pt-5 pb-4 px-lg-5 px-xl-3">
+        <motion.h1 className="display-5 fw-bold mb-3" variants={item}>
+          Profile &amp; Preferences
+        </motion.h1>
+        <motion.div variants={item}>
+          <BackLink link={viewLinkUrl} text="Back to profile" />
+        </motion.div>
+      </div>
 
-      <form onSubmit={handleFormSubmit}>
+      <motion.form onSubmit={handleFormSubmit} variants={panel}>
         <fieldset disabled={isDisabled}>
-          <Fade
-            bottom
-            cascade
-            delay={delay}
-            duration={duration}
-            distance={distance}
-          >
-            <div className="container-panel py-5">
-              <div className="panel p-3 p-lg-4">
-                <h2 className="panel-title fw-bold">Preferences</h2>
-                <div className="py-6">
-                  <div className="d-flex flex-column gap-4">
-                    <p>Control how the site functions.</p>
-                    <div>
-                      <label className="sub-title">
-                        Audio Result Privacy&nbsp;{ttsVisibilityIcon}
-                      </label>
-                      <div className="form-group">
-                        <select
-                          name="preferred_tts_result_visibility"
-                          onChange={handlePreferredTtsResultVisibilityChange}
-                          value={preferredTtsResultVisibility}
-                          className="form-select"
-                        >
-                          <option value="public">
-                            Public (visible from your profile)
-                          </option>
-                          <option value="hidden">
-                            Unlisted (shareable URLs)
-                          </option>
-                        </select>
-                      </div>
+          <div className="container-panel py-5">
+            <div className="panel p-3 p-lg-4">
+              <h2 className="panel-title fw-bold">Preferences</h2>
+              <div className="py-6">
+                <div className="d-flex flex-column gap-4">
+                  <p>Control how the site functions.</p>
+                  <div>
+                    <label className="sub-title">
+                      Audio Result Privacy&nbsp;{ttsVisibilityIcon}
+                    </label>
+                    <div className="form-group">
+                      <select
+                        name="preferred_tts_result_visibility"
+                        onChange={handlePreferredTtsResultVisibilityChange}
+                        value={preferredTtsResultVisibility}
+                        className="form-select"
+                      >
+                        <option value="public">
+                          Public (visible from your profile)
+                        </option>
+                        <option value="hidden">
+                          Unlisted (shareable URLs)
+                        </option>
+                      </select>
                     </div>
+                  </div>
 
-                    <div>
-                      <label className="sub-title">
-                        Video Result Privacy&nbsp;{w2lVisibilityIcon}
-                      </label>
-                      <div className="control select">
-                        <select
-                          name="preferred_w2l_result_visibility"
-                          onChange={handlePreferredW2lResultVisibilityChange}
-                          value={preferredW2lResultVisibility}
-                          className="form-select"
-                        >
-                          <option value="public">
-                            Public (visible from your profile)
-                          </option>
-                          <option value="hidden">
-                            Unlisted (shareable URLs)
-                          </option>
-                        </select>
-                      </div>
+                  <div>
+                    <label className="sub-title">
+                      Video Result Privacy&nbsp;{w2lVisibilityIcon}
+                    </label>
+                    <div className="control select">
+                      <select
+                        name="preferred_w2l_result_visibility"
+                        onChange={handlePreferredW2lResultVisibilityChange}
+                        value={preferredW2lResultVisibility}
+                        className="form-select"
+                      >
+                        <option value="public">
+                          Public (visible from your profile)
+                        </option>
+                        <option value="hidden">
+                          Unlisted (shareable URLs)
+                        </option>
+                      </select>
                     </div>
                   </div>
                 </div>
               </div>
             </div>
+          </div>
 
-            <div className="container-panel pt-3 pb-5">
-              <div className="panel p-3 p-lg-4">
-                <h2 className="panel-title fw-bold">Profile Picture</h2>
-                <div className="py-6">
-                  <div className="d-flex align-items-center gap-3">
-                    <Gravatar
-                      size={48}
-                      email_hash={userData.email_gravatar_hash}
-                    />
-                    <div>
-                      <h4 className="mb-0">{userData.username}</h4>
-                      <p>@{userData.username}</p>
-                    </div>
+          <motion.div className="container-panel pt-3 pb-5" variants={panel}>
+            <div className="panel p-3 p-lg-4">
+              <h2 className="panel-title fw-bold">Profile Picture</h2>
+              <div className="py-6">
+                <div className="d-flex align-items-center gap-3">
+                  <Gravatar
+                    size={48}
+                    email_hash={userData.email_gravatar_hash}
+                  />
+                  <div>
+                    <h4 className="mb-0">{userData.username}</h4>
+                    <p>@{userData.username}</p>
                   </div>
-                  <p className="mt-4">
-                    You can set your profile picture on{" "}
-                    <a href="https://gravatar.com">gravatar.com</a>. Use the
-                    same email address you did to sign up for FakeYou. (In the
-                    future, we'll support image uploads.)
-                  </p>
                 </div>
+                <p className="mt-4">
+                  You can set your profile picture on{" "}
+                  <a href="https://gravatar.com">gravatar.com</a>. Use the same
+                  email address you did to sign up for FakeYou. (In the future,
+                  we'll support image uploads.)
+                </p>
               </div>
             </div>
+          </motion.div>
 
-            <div className="container-panel pt-3 pb-5">
-              <div className="panel p-3 p-lg-4">
-                <h2 className="panel-title fw-bold">Profile Details</h2>
-                <div className="py-6">
-                  <div className="d-flex flex-column gap-4">
-                    <div>
-                      <label className="sub-title">
-                        <FontAwesomeIcon icon={faUser} className="me-2" />
-                        &nbsp;Bio or whatever (supports Markdown)
-                      </label>
-                      <div className="form-group">
-                        <textarea
-                          onChange={handleProfileMarkdownChange}
-                          className="form-control"
-                          placeholder="Profile (about you)"
-                          value={profileMarkdown}
-                          rows={5}
-                        />
-                      </div>
+          <motion.div className="container-panel pt-3 pb-5" variants={panel}>
+            <div className="panel p-3 p-lg-4">
+              <h2 className="panel-title fw-bold">Profile Details</h2>
+              <div className="py-6">
+                <div className="d-flex flex-column gap-4">
+                  <div>
+                    <label className="sub-title">
+                      <FontAwesomeIcon icon={faUser} className="me-2" />
+                      &nbsp;Bio or whatever (supports Markdown)
+                    </label>
+                    <div className="form-group">
+                      <textarea
+                        onChange={handleProfileMarkdownChange}
+                        className="form-control"
+                        placeholder="Profile (about you)"
+                        value={profileMarkdown}
+                        rows={5}
+                      />
                     </div>
+                  </div>
 
-                    {/*<div className="field">
+                  {/*<div className="field">
             <label className="sub-title">FakeYou Display Name</label>
             <div className="form-group">
               //value={downloadUrl} onChange={handleDownloadUrlChange}
@@ -370,171 +363,166 @@ function ProfileEditFc(props: Props) {
             //<p className="help">{titleInvalidReason}</p>
           </div>*/}
 
-                    <div className="field">
-                      <label className="sub-title">
-                        <FontAwesomeIcon icon={faTwitter} className="me-2" />
-                        Twitter Username
-                      </label>
-                      <div className="form-group">
-                        <input
-                          onChange={handleTwitterChange}
-                          className="form-control"
-                          type="text"
-                          placeholder="Twitter"
-                          value={twitter}
-                        />
-                        <span className="icon is-small is-left">
-                          <i className="fas fa-envelope"></i>
-                        </span>
-                        <span className="icon is-small is-right">
-                          <i className="fas fa-exclamation-triangle"></i>
-                        </span>
-                      </div>
-                      {/*<p className="help">{downloadUrlInvalidReason}</p>*/}
+                  <div className="field">
+                    <label className="sub-title">
+                      <FontAwesomeIcon icon={faTwitter} className="me-2" />
+                      Twitter Username
+                    </label>
+                    <div className="form-group">
+                      <input
+                        onChange={handleTwitterChange}
+                        className="form-control"
+                        type="text"
+                        placeholder="Twitter"
+                        value={twitter}
+                      />
+                      <span className="icon is-small is-left">
+                        <i className="fas fa-envelope"></i>
+                      </span>
+                      <span className="icon is-small is-right">
+                        <i className="fas fa-exclamation-triangle"></i>
+                      </span>
                     </div>
+                    {/*<p className="help">{downloadUrlInvalidReason}</p>*/}
+                  </div>
 
-                    <div className="field">
-                      <label className="sub-title">
-                        <FontAwesomeIcon icon={faDiscord} className="me-2" />
-                        Discord Username (don't forget the #0000)
-                      </label>
-                      <div className="form-group">
-                        <input
-                          onChange={handleDiscordChange}
-                          className="form-control"
-                          type="text"
-                          placeholder="Discord"
-                          value={discord}
-                        />
-                        <span className="icon is-small is-left">
-                          <i className="fas fa-envelope"></i>
-                        </span>
-                        <span className="icon is-small is-right">
-                          <i className="fas fa-exclamation-triangle"></i>
-                        </span>
-                      </div>
-                      {/*<p className="help">{downloadUrlInvalidReason}</p>*/}
+                  <div className="field">
+                    <label className="sub-title">
+                      <FontAwesomeIcon icon={faDiscord} className="me-2" />
+                      Discord Username (don't forget the #0000)
+                    </label>
+                    <div className="form-group">
+                      <input
+                        onChange={handleDiscordChange}
+                        className="form-control"
+                        type="text"
+                        placeholder="Discord"
+                        value={discord}
+                      />
+                      <span className="icon is-small is-left">
+                        <i className="fas fa-envelope"></i>
+                      </span>
+                      <span className="icon is-small is-right">
+                        <i className="fas fa-exclamation-triangle"></i>
+                      </span>
                     </div>
+                    {/*<p className="help">{downloadUrlInvalidReason}</p>*/}
+                  </div>
 
-                    <div className="field">
-                      <label className="sub-title">
-                        <FontAwesomeIcon icon={faTwitch} className="me-2" />
-                        Twitch Username
-                      </label>
-                      <div className="form-group">
-                        <input
-                          onChange={handleTwitchChange}
-                          className="form-control"
-                          type="text"
-                          placeholder="Twitch"
-                          value={twitch}
-                        />
-                        <span className="icon is-small is-left">
-                          <i className="fas fa-envelope"></i>
-                        </span>
-                        <span className="icon is-small is-right">
-                          <i className="fas fa-exclamation-triangle"></i>
-                        </span>
-                      </div>
-                      {/*<p className="help">{downloadUrlInvalidReason}</p>*/}
+                  <div className="field">
+                    <label className="sub-title">
+                      <FontAwesomeIcon icon={faTwitch} className="me-2" />
+                      Twitch Username
+                    </label>
+                    <div className="form-group">
+                      <input
+                        onChange={handleTwitchChange}
+                        className="form-control"
+                        type="text"
+                        placeholder="Twitch"
+                        value={twitch}
+                      />
+                      <span className="icon is-small is-left">
+                        <i className="fas fa-envelope"></i>
+                      </span>
+                      <span className="icon is-small is-right">
+                        <i className="fas fa-exclamation-triangle"></i>
+                      </span>
                     </div>
+                    {/*<p className="help">{downloadUrlInvalidReason}</p>*/}
+                  </div>
 
-                    <div className="field">
-                      <label className="sub-title">
-                        <FontAwesomeIcon icon={faDollarSign} className="me-2" />
-                        CashApp $CashTag (for reward payouts)
-                      </label>
-                      <div className="form-group">
-                        <input
-                          onChange={handleCashAppChange}
-                          className="form-control"
-                          type="text"
-                          placeholder="CashApp"
-                          value={cashApp}
-                        />
-                        <span className="icon is-small is-left">
-                          <i className="fas fa-envelope"></i>
-                        </span>
-                        <span className="icon is-small is-right">
-                          <i className="fas fa-exclamation-triangle"></i>
-                        </span>
-                      </div>
-                      {/*<p className="help">{downloadUrlInvalidReason}</p>*/}
+                  <div className="field">
+                    <label className="sub-title">
+                      <FontAwesomeIcon icon={faDollarSign} className="me-2" />
+                      CashApp $CashTag (for reward payouts)
+                    </label>
+                    <div className="form-group">
+                      <input
+                        onChange={handleCashAppChange}
+                        className="form-control"
+                        type="text"
+                        placeholder="CashApp"
+                        value={cashApp}
+                      />
+                      <span className="icon is-small is-left">
+                        <i className="fas fa-envelope"></i>
+                      </span>
+                      <span className="icon is-small is-right">
+                        <i className="fas fa-exclamation-triangle"></i>
+                      </span>
                     </div>
+                    {/*<p className="help">{downloadUrlInvalidReason}</p>*/}
+                  </div>
 
-                    <div className="field">
-                      <label className="sub-title">
-                        <FontAwesomeIcon icon={faGithub} className="me-2" />
-                        Github Username (I'm hiring engineers and data
-                        scientists!)
-                      </label>
-                      <div className="form-group">
-                        <input
-                          onChange={handleGithubChange}
-                          className="form-control"
-                          type="text"
-                          placeholder="Github"
-                          value={github}
-                        />
-                        <span className="icon is-small is-left">
-                          <i className="fas fa-envelope"></i>
-                        </span>
-                        <span className="icon is-small is-right">
-                          <i className="fas fa-exclamation-triangle"></i>
-                        </span>
-                      </div>
-                      {/*<p className="help">{downloadUrlInvalidReason}</p>*/}
+                  <div className="field">
+                    <label className="sub-title">
+                      <FontAwesomeIcon icon={faGithub} className="me-2" />
+                      Github Username (I'm hiring engineers and data
+                      scientists!)
+                    </label>
+                    <div className="form-group">
+                      <input
+                        onChange={handleGithubChange}
+                        className="form-control"
+                        type="text"
+                        placeholder="Github"
+                        value={github}
+                      />
+                      <span className="icon is-small is-left">
+                        <i className="fas fa-envelope"></i>
+                      </span>
+                      <span className="icon is-small is-right">
+                        <i className="fas fa-exclamation-triangle"></i>
+                      </span>
                     </div>
+                    {/*<p className="help">{downloadUrlInvalidReason}</p>*/}
+                  </div>
 
-                    <div className="field">
-                      <label className="sub-title">
-                        <FontAwesomeIcon icon={faGlobe} className="me-2" />
-                        Personal Website URL
-                      </label>
-                      <div className="form-group">
-                        <input
-                          onChange={handleWebsiteUrlChange}
-                          className="form-control"
-                          type="text"
-                          placeholder="Website URL"
-                          value={websiteUrl}
-                        />
-                        <span className="icon is-small is-left">
-                          <i className="fas fa-envelope"></i>
-                        </span>
-                        <span className="icon is-small is-right">
-                          <i className="fas fa-exclamation-triangle"></i>
-                        </span>
-                      </div>
-                      {/*<p className="help">{downloadUrlInvalidReason}</p>*/}
+                  <div className="field">
+                    <label className="sub-title">
+                      <FontAwesomeIcon icon={faGlobe} className="me-2" />
+                      Personal Website URL
+                    </label>
+                    <div className="form-group">
+                      <input
+                        onChange={handleWebsiteUrlChange}
+                        className="form-control"
+                        type="text"
+                        placeholder="Website URL"
+                        value={websiteUrl}
+                      />
+                      <span className="icon is-small is-left">
+                        <i className="fas fa-envelope"></i>
+                      </span>
+                      <span className="icon is-small is-right">
+                        <i className="fas fa-exclamation-triangle"></i>
+                      </span>
                     </div>
+                    {/*<p className="help">{downloadUrlInvalidReason}</p>*/}
                   </div>
                 </div>
               </div>
             </div>
-          </Fade>
+          </motion.div>
 
-          <Fade bottom duration={duration} distance={distance} delay={delay2}>
-            <div className="container">
-              <button className="btn btn-primary w-100">Update</button>
-            </div>
-          </Fade>
+          <motion.div className="container" variants={item}>
+            <button className="btn btn-primary w-100">Update</button>
+          </motion.div>
         </fieldset>
-      </form>
+      </motion.form>
 
-      <Fade bottom duration={duration} distance={distance} delay={delay}>
-        <div className="container py-5">
-          <p>More profile and account features coming soon:</p>
-          <ul>
-            <li>Fully private models and templates</li>
-            <li>Sharing preferences (private, friends, auto-expire, etc.)</li>
-            <li>Website preferences</li>
-            <li>Custom avatar / profile pic uploads</li>
-            <li>Email change, password change, and password reset</li>
-          </ul>
-        </div>
-      </Fade>
-    </div>
+      <motion.div className="container py-5" variants={item}>
+        <p>More profile and account features coming soon:</p>
+        <ul>
+          <li>Fully private models and templates</li>
+          <li>Sharing preferences (private, friends, auto-expire, etc.)</li>
+          <li>Website preferences</li>
+          <li>Custom avatar / profile pic uploads</li>
+          <li>Email change, password change, and password reset</li>
+        </ul>
+      </motion.div>
+    </motion.div>
   );
 }
 

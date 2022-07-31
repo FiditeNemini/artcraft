@@ -7,8 +7,8 @@ import { v4 as uuidv4 } from "uuid";
 import { SessionW2lTemplateUploadResultListFc } from "../_common/SessionW2lTemplateUploadResultsListFc";
 import { BackLink } from "../_common/BackLink";
 import { FrontendUrlConfig } from "../../../common/FrontendUrlConfig";
-import { distance, delay, duration } from "../../../data/animation";
-const Fade = require("react-reveal/Fade");
+import { motion } from "framer-motion";
+import { container, item, panel } from "../../../data/animation";
 
 interface W2lTemplateUploadJobResponsePayload {
   success: boolean;
@@ -91,91 +91,86 @@ function UploadW2lPhotoFc(props: Props) {
   };
 
   return (
-    <div>
+    <motion.div initial="hidden" animate="visible" variants={container}>
       <div className="container pt-5 pb-3 px-md-4 px-lg-5 px-xl-3">
-        <Fade bottom cascade duration={duration} distance={distance}>
-          <div className="d-flex flex-column">
-            <h1 className="display-5 fw-bold"> Upload Photo (w2l template) </h1>
-            <div className="my-3">
-              <BackLink
-                link={FrontendUrlConfig.contributePage()}
-                text="Back to contribute page"
-              />
-            </div>
-          </div>
-        </Fade>
+        <div className="d-flex flex-column">
+          <motion.h1 className="display-5 fw-bold" variants={item}>
+            Upload Photo (w2l template)
+          </motion.h1>
+          <motion.div className="my-3" variants={item}>
+            <BackLink
+              link={FrontendUrlConfig.contributePage()}
+              text="Back to contribute page"
+            />
+          </motion.div>
+        </div>
       </div>
 
-      <Fade bottom duration={duration} distance={distance} delay={delay}>
-        <div className="container px-md-4 px-lg-5 px-xl-3">
-          <p>
-            The photos you upload can be used for lipsyncing with audio using
-            the Wav2Lip model. In the future, you'll be able to use these for
-            first-order-model and much more!
-          </p>
-        </div>
-      </Fade>
+      <motion.div className="container px-md-4 px-lg-5 px-xl-3" variants={item}>
+        <p>
+          The photos you upload can be used for lipsyncing with audio using the
+          Wav2Lip model. In the future, you'll be able to use these for
+          first-order-model and much more!
+        </p>
+      </motion.div>
 
-      <form onSubmit={handleFormSubmit}>
-        <Fade bottom duration={duration} distance={distance} delay={delay}>
-          <div className="container-panel py-5">
-            <div className="panel p-3 py-4 p-lg-4">
-              <div className="d-flex flex-column gap-4">
-                <div>
-                  <label className="sub-title">
-                    Title, eg. "Dr. Phil stares into your soul"
-                  </label>
-                  <div className="form-group">
-                    <input
-                      className="form-control"
-                      type="text"
-                      placeholder="Title"
-                      value={title}
-                      onChange={handleTitleChange}
-                    />
-                  </div>
-                  <p className="help">{titleInvalidReason}</p>
+      <motion.form onSubmit={handleFormSubmit} variants={panel}>
+        <div className="container-panel py-5">
+          <div className="panel p-3 py-4 p-lg-4">
+            <div className="d-flex flex-column gap-4">
+              <div>
+                <label className="sub-title">
+                  Title, eg. "Dr. Phil stares into your soul"
+                </label>
+                <div className="form-group">
+                  <input
+                    className="form-control"
+                    type="text"
+                    placeholder="Title"
+                    value={title}
+                    onChange={handleTitleChange}
+                  />
                 </div>
+                <p className="help">{titleInvalidReason}</p>
+              </div>
 
-                {/* 
+              {/* 
         https://drive.google.com/file/d/{TOKEN}/view?usp=sharing
         */}
-                <div>
-                  <label className="sub-title">
-                    Download URL, eg.{" "}
-                    <code>https://i.imgur.com/lKaQ4Er.jpg</code>
-                  </label>
-                  <div className="form-group">
-                    <input
-                      className="form-control"
-                      type="text"
-                      placeholder="Download URL"
-                      value={downloadUrl}
-                      onChange={handleDownloadUrlChange}
-                    />
-                  </div>
-                  <p className="help">{downloadUrlInvalidReason}</p>
+              <div>
+                <label className="sub-title">
+                  Download URL, eg. <code>https://i.imgur.com/lKaQ4Er.jpg</code>
+                </label>
+                <div className="form-group">
+                  <input
+                    className="form-control"
+                    type="text"
+                    placeholder="Download URL"
+                    value={downloadUrl}
+                    onChange={handleDownloadUrlChange}
+                  />
                 </div>
+                <p className="help">{downloadUrlInvalidReason}</p>
               </div>
             </div>
           </div>
+        </div>
 
-          <div className="container pb-5">
-            <button className="btn btn-primary w-100">Upload</button>
-          </div>
+        <motion.div className="container pb-5" variants={item}>
+          <button className="btn btn-primary w-100">Upload</button>
+        </motion.div>
 
-          {/*<div className="field is-grouped">
+        {/*<div className="field is-grouped">
           <div className="control">
             <button className="button is-link is-large is-fullwidth">Upload</button>
           </div>
         </div>*/}
-        </Fade>
-      </form>
+      </motion.form>
 
       <SessionW2lTemplateUploadResultListFc
         w2lTemplateUploadJobs={props.w2lTemplateUploadJobs}
       />
-    </div>
+    </motion.div>
   );
 }
 

@@ -9,9 +9,8 @@ import { v4 as uuidv4 } from "uuid";
 import { BackLink } from "../_common/BackLink";
 import { Link } from "react-router-dom";
 import { FrontendUrlConfig } from "../../../common/FrontendUrlConfig";
-import { distance, delay, duration } from "../../../data/animation";
-
-const Fade = require("react-reveal/Fade");
+import { motion } from "framer-motion";
+import { container, item, panel } from "../../../data/animation";
 
 interface Props {
   sessionWrapper: SessionWrapper;
@@ -111,128 +110,125 @@ function UploadTtsModelFc(props: Props) {
   };
 
   return (
-    <div>
+    <motion.div initial="hidden" animate="visible" variants={container}>
       <div className="container pt-5 pb-4 px-md-4 px-lg-5 px-xl-3">
-        <Fade bottom cascade duration={duration} distance={distance}>
-          <div className="d-flex flex-column">
-            <h1 className="display-5 fw-bold">Upload Voice (TTS Model)</h1>
-            <h4>This works just like YouTube!</h4>
-            <div className="my-3">
-              <BackLink
-                link={FrontendUrlConfig.contributePage()}
-                text="Back to contribute page"
-              />
-            </div>
-          </div>
-        </Fade>
+        <div className="d-flex flex-column">
+          <motion.h1 className="display-5 fw-bold" variants={item}>
+            Upload Voice (TTS Model)
+          </motion.h1>
+          <motion.h4 variants={item}>This works just like YouTube!</motion.h4>
+          <motion.div className="my-3" variants={item}>
+            <BackLink
+              link={FrontendUrlConfig.contributePage()}
+              text="Back to contribute page"
+            />
+          </motion.div>
+        </div>
       </div>
 
-      <Fade bottom duration={duration} distance={distance} delay={delay}>
-        <div className="container px-md-4 px-lg-5 px-xl-3">
-          <div className="alert alert-primary">
-            <strong>Content Creator Rewards!</strong>
-            {/*<p>You can help FakeYou grow by uploading Tacotron2 models. 
+      <motion.div className="container px-md-4 px-lg-5 px-xl-3" variants={item}>
+        <div className="alert alert-primary">
+          <strong>Content Creator Rewards!</strong>
+          {/*<p>You can help FakeYou grow by uploading Tacotron2 models. 
         The person that uploads the most models will get $100, 
         the person that uploads the most popular model will get $100,
         and a number of other lucky winners will be chosen at random to 
         recieve cash prizes. Uploaders will also get queue priority!</p>*/}
-            <div>
-              As you upload and help us grow, you'll earn unique perks such as
-              featured roles in Discord, queue priority, and more!
-            </div>
+          <div>
+            As you upload and help us grow, you'll earn unique perks such as
+            featured roles in Discord, queue priority, and more!
           </div>
         </div>
-      </Fade>
+      </motion.div>
 
-      <Fade bottom duration={duration} distance={distance} delay={delay}>
-        <div className="container pt-3 d-flex flex-column gap-3 px-md-4 px-lg-5 px-xl-3">
-          <p>
-            If you're new to voice cloning, join our{" "}
-            <span>
-              <DiscordLink />
-            </span>{" "}
-            to get started. We have a friendly community that can help you start
-            creating your own voices of your favorite characters.
-          </p>
+      <motion.div
+        className="container pt-3 d-flex flex-column gap-3 px-md-4 px-lg-5 px-xl-3"
+        variants={item}
+      >
+        <p>
+          If you're new to voice cloning, join our{" "}
+          <span>
+            <DiscordLink />
+          </span>{" "}
+          to get started. We have a friendly community that can help you start
+          creating your own voices of your favorite characters.
+        </p>
 
-          {/* TODO TEMP (2022-03-08) <p>
+        {/* TODO TEMP (2022-03-08) <p>
         FakeYou currently supports <em>Tacotron 2</em>, GlowTTS, and a custom synthesizer architecture 
         that we intend to open source. We'll soon add TalkNet, custom vocoder uploads, and more model 
         architectures.
       </p>*/}
 
-          <p>
-            Once your voice is successfully uploaded, you'll be able to start
-            using it and sharing it with others. You'll also be able to edit the
-            title, tags, and vocoder used, so don't worry if you typo something.
-          </p>
+        <p>
+          Once your voice is successfully uploaded, you'll be able to start
+          using it and sharing it with others. You'll also be able to edit the
+          title, tags, and vocoder used, so don't worry if you typo something.
+        </p>
 
-          {/* TODO TEMP (2022-03-08) <p>
+        {/* TODO TEMP (2022-03-08) <p>
         Please do not upload voices that you didn't train yourself or voices of individuals
         who wish to not be voice cloned. We'll post a list of banned voices soon.
       </p>*/}
-        </div>
-      </Fade>
+      </motion.div>
 
-      <form onSubmit={handleFormSubmit}>
-        <Fade bottom duration={duration} distance={distance} delay={delay}>
-          <div className="container-panel py-5">
-            <div className="panel p-3 py-4 p-lg-4">
-              <div className="d-flex flex-column gap-4">
-                <div>
-                  <label className="sub-title">
-                    Title, eg. "Goku (Sean Schemmel)"
-                  </label>
-                  <div className="form-group">
-                    <input
-                      className="form-control"
-                      type="text"
-                      placeholder="Title"
-                      value={title}
-                      onChange={handleTitleChange}
-                    />
-                  </div>
-                  <p className="help">{titleInvalidReason}</p>
+      <motion.form onSubmit={handleFormSubmit} variants={panel}>
+        <div className="container-panel py-5">
+          <div className="panel p-3 py-4 p-lg-4">
+            <div className="d-flex flex-column gap-4">
+              <div>
+                <label className="sub-title">
+                  Title, eg. "Goku (Sean Schemmel)"
+                </label>
+                <div className="form-group">
+                  <input
+                    className="form-control"
+                    type="text"
+                    placeholder="Title"
+                    value={title}
+                    onChange={handleTitleChange}
+                  />
                 </div>
-
-                {/* 
-        https://drive.google.com/file/d/{TOKEN}/view?usp=sharing
-        */}
-                <div>
-                  <label className="sub-title">
-                    Download URL, eg. Google Drive link
-                  </label>
-                  <div className="form-group">
-                    <input
-                      className="form-control"
-                      type="text"
-                      placeholder="Download URL"
-                      value={downloadUrl}
-                      onChange={handleDownloadUrlChange}
-                    />
-                  </div>
-                  <p className="help">{downloadUrlInvalidReason}</p>
-                </div>
+                <p className="help">{titleInvalidReason}</p>
               </div>
 
-              {/*<div className="field is-grouped">
+              {/* 
+        https://drive.google.com/file/d/{TOKEN}/view?usp=sharing
+        */}
+              <div>
+                <label className="sub-title">
+                  Download URL, eg. Google Drive link
+                </label>
+                <div className="form-group">
+                  <input
+                    className="form-control"
+                    type="text"
+                    placeholder="Download URL"
+                    value={downloadUrl}
+                    onChange={handleDownloadUrlChange}
+                  />
+                </div>
+                <p className="help">{downloadUrlInvalidReason}</p>
+              </div>
+            </div>
+
+            {/*<div className="field is-grouped">
           <div className="control">
             <button className="button is-link is-large is-fullwidth">Upload</button>
           </div>
         </div>*/}
-            </div>
           </div>
+        </div>
 
-          <div className="container pb-5">
-            <button className="btn btn-primary w-100">Upload</button>
-          </div>
-        </Fade>
-      </form>
+        <motion.div className="container pb-5" variants={item}>
+          <button className="btn btn-primary w-100">Upload</button>
+        </motion.div>
+      </motion.form>
 
       <SessionTtsModelUploadResultListFc
         modelUploadJobs={props.ttsModelUploadJobs}
       />
-    </div>
+    </motion.div>
   );
 }
 

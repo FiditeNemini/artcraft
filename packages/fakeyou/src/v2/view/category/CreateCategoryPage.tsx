@@ -10,9 +10,8 @@ import {
 } from "../../api/category/CreateCategory";
 import { BackLink } from "../_common/BackLink";
 import { FrontendUrlConfig } from "../../../common/FrontendUrlConfig";
-import { distance, duration, delay, delay2 } from "../../../data/animation";
-
-const Fade = require("react-reveal/Fade");
+import { motion } from "framer-motion";
+import { container, item, panel } from "../../../data/animation";
 
 const DEFAULT_CAN_DIRECTLY_HAVE_MODELS = true;
 const DEFAULT_CAN_HAVE_SUBCATEGORIES = false;
@@ -194,95 +193,79 @@ function CreateCategoryPage(props: Props) {
   if (props.sessionWrapper.canEditCategories()) {
     moderateCategoriesLink = (
       <>
-        <Fade
-          bottom
-          cascade
-          duration={duration}
-          distance={distance}
-          delay={delay2}
-        >
-          <div className="container pt-4 pb-5">
-            <Link
-              to={FrontendUrlConfig.moderationTtsCategoryList()}
-              className="btn btn-secondary w-100"
-            >
-              Moderate categories
-            </Link>
-          </div>
-        </Fade>
+        <motion.div className="container pt-4 pb-5" variants={item}>
+          <Link
+            to={FrontendUrlConfig.moderationTtsCategoryList()}
+            className="btn btn-secondary w-100"
+          >
+            Moderate categories
+          </Link>
+        </motion.div>
       </>
     );
   }
 
   return (
-    <div>
-      <Fade bottom cascade duration={duration} distance={distance}>
-        <div className="container pb-4 pt-5 px-md-4 px-lg-5 px-xl-3">
-          <h1 className="display-5 fw-bold">{categoryActionName} Category</h1>
-          <div className="pt-3">
-            <BackLink
-              link={FrontendUrlConfig.contributePage()}
-              text="Back to contribute page"
-            />
-          </div>
-        </div>
-      </Fade>
+    <motion.div initial="hidden" animate="visible" variants={container}>
+      <div className="container pb-4 pt-5 px-md-4 px-lg-5 px-xl-3">
+        <motion.h1 className="display-5 fw-bold" variants={item}>
+          {categoryActionName} Category
+        </motion.h1>
+        <motion.div className="pt-3" variants={item}>
+          <BackLink
+            link={FrontendUrlConfig.contributePage()}
+            text="Back to contribute page"
+          />
+        </motion.div>
+      </div>
 
       {errorFlash}
 
-      <Fade
-        bottom
-        cascade
-        duration={duration}
-        distance={distance}
-        delay={delay}
-      >
-        <form onSubmit={handleFormSubmit}>
-          <div className="container-panel pt-4 pb-5">
-            <div className="panel p-3 py-4 p-lg-4">
-              <div className="d-flex flex-column gap-4">
-                <div>
-                  <label className="sub-title">Category Name</label>
-                  <div className="form-group">
-                    <input
-                      className="form-control"
-                      type="text"
-                      placeholder="Category Name"
-                      value={name}
-                      onChange={handleNameChange}
-                    />
-                  </div>
+      <motion.form onSubmit={handleFormSubmit} variants={panel}>
+        <div className="container-panel pt-4 pb-5">
+          <div className="panel p-3 py-4 p-lg-4">
+            <div className="d-flex flex-column gap-4">
+              <div>
+                <label className="sub-title">Category Name</label>
+                <div className="form-group">
+                  <input
+                    className="form-control"
+                    type="text"
+                    placeholder="Category Name"
+                    value={name}
+                    onChange={handleNameChange}
+                  />
                 </div>
-
-                <div>
-                  <label className="sub-title">Category Type</label>
-
-                  <div className="form-group">
-                    <select
-                      onChange={handleModelTypeChange}
-                      className="form-select"
-                    >
-                      <option value="tts">TTS voice</option>
-                      <option value="w2l">W2L video</option>
-                    </select>
-                  </div>
-                </div>
-
-                {additionalModFields}
               </div>
+
+              <div>
+                <label className="sub-title">Category Type</label>
+
+                <div className="form-group">
+                  <select
+                    onChange={handleModelTypeChange}
+                    className="form-select"
+                  >
+                    <option value="tts">TTS voice</option>
+                    <option value="w2l">W2L video</option>
+                  </select>
+                </div>
+              </div>
+
+              {additionalModFields}
             </div>
           </div>
+        </div>
 
-          <div className="container">
-            <button className="btn btn-primary w-100">
-              {categoryActionName}
-            </button>
-          </div>
-        </form>
-      </Fade>
+        <motion.div className="container" variants={item}>
+          <button className="btn btn-primary w-100">
+            {categoryActionName}
+          </button>
+        </motion.div>
+      </motion.form>
 
       {moderateCategoriesLink}
-    </div>
+    </motion.div>
   );
 }
 

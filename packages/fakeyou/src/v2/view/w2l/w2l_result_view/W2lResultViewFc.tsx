@@ -17,9 +17,8 @@ import {
 import { MetaTags } from "../../../../common/MetaTags";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faDownload, faEdit, faTrash } from "@fortawesome/free-solid-svg-icons";
-import { distance, delay, duration } from "../../../../data/animation";
-
-const Fade = require("react-reveal/Fade");
+import { motion } from "framer-motion";
+import { container, item, panel } from "../../../../data/animation";
 
 interface Props {
   sessionWrapper: SessionWrapper;
@@ -95,58 +94,56 @@ function W2lResultViewFc(props: Props) {
   ) {
     moderatorRows = (
       <>
-        <Fade bottom duration={duration} distance={distance} delay={delay}>
-          <div className="container-panel pt-3 pb-5">
-            <div className="panel p-3 p-lg-4">
-              <h2 className="panel-title fw-bold">Moderator Details</h2>
-              <div className="py-6">
-                <table className="table">
-                  <tbody>
-                    <tr>
-                      <th>Template creator is banned</th>
-                      <td>
-                        {w2lInferenceResult?.maybe_moderator_fields
-                          ?.template_creator_is_banned
-                          ? "banned"
-                          : "good standing"}
-                      </td>
-                    </tr>
-                    <tr>
-                      <th>Result creator is banned (if user)</th>
-                      <td>
-                        {w2lInferenceResult?.maybe_moderator_fields
-                          ?.result_creator_is_banned_if_user
-                          ? "banned"
-                          : "good standing"}
-                      </td>
-                    </tr>
-                    <tr>
-                      <th>Result creator IP address</th>
-                      <td>
-                        {w2lInferenceResult?.maybe_moderator_fields
-                          ?.result_creator_ip_address || "server error"}
-                      </td>
-                    </tr>
-                    <tr>
-                      <th>Mod deleted at (UTC)</th>
-                      <td>
-                        {w2lInferenceResult?.maybe_moderator_fields
-                          ?.mod_deleted_at || "not deleted"}
-                      </td>
-                    </tr>
-                    <tr>
-                      <th>Result creator deleted at (UTC)</th>
-                      <td>
-                        {w2lInferenceResult?.maybe_moderator_fields
-                          ?.result_creator_deleted_at || "not deleted"}
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
+        <div className="container-panel pt-3 pb-5">
+          <div className="panel p-3 p-lg-4">
+            <h2 className="panel-title fw-bold">Moderator Details</h2>
+            <div className="py-6">
+              <table className="table">
+                <tbody>
+                  <tr>
+                    <th>Template creator is banned</th>
+                    <td>
+                      {w2lInferenceResult?.maybe_moderator_fields
+                        ?.template_creator_is_banned
+                        ? "banned"
+                        : "good standing"}
+                    </td>
+                  </tr>
+                  <tr>
+                    <th>Result creator is banned (if user)</th>
+                    <td>
+                      {w2lInferenceResult?.maybe_moderator_fields
+                        ?.result_creator_is_banned_if_user
+                        ? "banned"
+                        : "good standing"}
+                    </td>
+                  </tr>
+                  <tr>
+                    <th>Result creator IP address</th>
+                    <td>
+                      {w2lInferenceResult?.maybe_moderator_fields
+                        ?.result_creator_ip_address || "server error"}
+                    </td>
+                  </tr>
+                  <tr>
+                    <th>Mod deleted at (UTC)</th>
+                    <td>
+                      {w2lInferenceResult?.maybe_moderator_fields
+                        ?.mod_deleted_at || "not deleted"}
+                    </td>
+                  </tr>
+                  <tr>
+                    <th>Result creator deleted at (UTC)</th>
+                    <td>
+                      {w2lInferenceResult?.maybe_moderator_fields
+                        ?.result_creator_deleted_at || "not deleted"}
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
             </div>
           </div>
-        </Fade>
+        </div>
       </>
     );
   }
@@ -256,102 +253,100 @@ function W2lResultViewFc(props: Props) {
     );
   }
   return (
-    <div>
-      <Fade cascade bottom duration={duration} distance={distance}>
-        <div className="container py-5 px-md-4 px-lg-5 px-xl-3">
-          <h1 className="display-5 fw-bold text-center text-lg-start">
-            Lipsync Result
-          </h1>
-        </div>
-      </Fade>
+    <motion.div initial="hidden" animate="visible" variants={container}>
+      <div className="container py-5 px-md-4 px-lg-5 px-xl-3">
+        <motion.h1
+          className="display-5 fw-bold text-center text-lg-start"
+          variants={item}
+        >
+          Lipsync Result
+        </motion.h1>
+      </div>
 
-      <Fade bottom duration={duration} distance={distance} delay={delay}>
-        <div className="container">
-          <video width="100%" height="auto" controls={true} className="rounded">
-            <source src={videoLink} />
-            Your device doesn't support video.
-          </video>
-        </div>
+      <motion.div className="container" variants={item}>
+        <video width="100%" height="auto" controls={true} className="rounded">
+          <source src={videoLink} />
+          Your device doesn't support video.
+        </video>
+      </motion.div>
 
-        <div className="container pt-4 pb-5">
-          <a
-            className="btn btn-primary w-100"
-            href={videoLink}
-            download={videoDownloadFilename}
-          >
-            {" "}
-            <FontAwesomeIcon icon={faDownload} className="me-2" />
-            Download File
-          </a>
-        </div>
+      <motion.div className="container pt-4 pb-5" variants={item}>
+        <a
+          className="btn btn-primary w-100"
+          href={videoLink}
+          download={videoDownloadFilename}
+        >
+          {" "}
+          <FontAwesomeIcon icon={faDownload} className="me-2" />
+          Download File
+        </a>
+      </motion.div>
 
-        <div className="container-panel pt-5 pb-5">
-          <div className="panel p-3 p-lg-4">
-            <h2 className="panel-title fw-bold">Result Details</h2>
-            <div className="py-6">
-              <table className="table">
-                <tbody>
-                  <tr>
-                    <th>Creator</th>
-                    <td>{creatorDetails}</td>
-                  </tr>
-                  <tr>
-                    <th>Duration</th>
-                    <td>{durationSeconds} seconds</td>
-                  </tr>
-                  <tr>
-                    <th>Visibility</th>
-                    <td>{resultVisibility}</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
+      <motion.div className="container-panel pt-5 pb-5" variants={panel}>
+        <div className="panel p-3 p-lg-4">
+          <h2 className="panel-title fw-bold">Result Details</h2>
+          <div className="py-6">
+            <table className="table">
+              <tbody>
+                <tr>
+                  <th>Creator</th>
+                  <td>{creatorDetails}</td>
+                </tr>
+                <tr>
+                  <th>Duration</th>
+                  <td>{durationSeconds} seconds</td>
+                </tr>
+                <tr>
+                  <th>Visibility</th>
+                  <td>{resultVisibility}</td>
+                </tr>
+              </tbody>
+            </table>
           </div>
         </div>
-        <div className="container-panel pt-3 pb-5">
-          <div className="panel p-3 p-lg-4">
-            <h2 className="panel-title fw-bold"> Template Details </h2>
-            <div className="py-6">
-              <table className="table">
-                <tbody>
-                  <tr>
-                    <th>Template used</th>
-                    <td>
-                      <Link to={templateLink}>{templateName}</Link>
-                    </td>
-                  </tr>
-                  <tr>
-                    <th>Template creator</th>
-                    <td>{templateCreatorDetails}</td>
-                  </tr>
-                  <tr>
-                    <th>Dimensions</th>
-                    <td>
-                      {w2lInferenceResult?.frame_width} x{" "}
-                      {w2lInferenceResult?.frame_height}
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
+      </motion.div>
+
+      <motion.div className="container-panel pt-3 pb-5" variants={panel}>
+        <div className="panel p-3 p-lg-4">
+          <h2 className="panel-title fw-bold"> Template Details </h2>
+          <div className="py-6">
+            <table className="table">
+              <tbody>
+                <tr>
+                  <th>Template used</th>
+                  <td>
+                    <Link to={templateLink}>{templateName}</Link>
+                  </td>
+                </tr>
+                <tr>
+                  <th>Template creator</th>
+                  <td>{templateCreatorDetails}</td>
+                </tr>
+                <tr>
+                  <th>Dimensions</th>
+                  <td>
+                    {w2lInferenceResult?.frame_width} x{" "}
+                    {w2lInferenceResult?.frame_height}
+                  </td>
+                </tr>
+              </tbody>
+            </table>
           </div>
         </div>
-      </Fade>
+      </motion.div>
 
-      <div>{moderatorRows}</div>
+      <motion.div variants={panel}>{moderatorRows}</motion.div>
 
-      <Fade bottom duration={duration} distance={distance} delay={delay}>
-        <div className="container pb-5">
-          <div className="d-flex gap-3 flex-column flex-md-row">
-            {editButton}
-            {deleteButton}
-          </div>
-          <div className="mt-4">
-            <ReportDiscordLinkFc />
-          </div>
+      <motion.div className="container pb-5" variants={item}>
+        <div className="d-flex gap-3 flex-column flex-md-row">
+          {editButton}
+          {deleteButton}
         </div>
-      </Fade>
-    </div>
+        <motion.div className="mt-4" variants={item}>
+          <ReportDiscordLinkFc />
+        </motion.div>
+      </motion.div>
+    </motion.div>
   );
 }
 

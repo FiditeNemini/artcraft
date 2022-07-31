@@ -4,9 +4,8 @@ import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapp
 import { useParams, Link, useHistory } from "react-router-dom";
 import { Gravatar } from "@storyteller/components/src/elements/Gravatar";
 import { FrontendUrlConfig } from "../../../../common/FrontendUrlConfig";
-import { distance, delay, delay2, duration } from "../../../../data/animation";
-
-const Fade = require("react-reveal/Fade");
+import { motion } from "framer-motion";
+import { container, item, panel } from "../../../../data/animation";
 
 interface TtsInferenceResultResponsePayload {
   success: boolean;
@@ -188,18 +187,18 @@ function TtsResultDeletePage(props: Props) {
     : "Delete TTS Result (hides from everyone but mods)";
 
   return (
-    <div>
-      <Fade cascade bottom duration={duration} distance={distance}>
-        <div className="container pt-5 pb-4 px-lg-5 px-xl-3">
-          <h1 className="display-5 fw-bold mb-3">{h1Title}</h1>
-          <div>
-            <Link to={resultLink}>&lt; Back to result</Link>
-          </div>
-        </div>
-      </Fade>
+    <motion.div initial="hidden" animate="visible" variants={container}>
+      <div className="container pt-5 pb-4 px-lg-5 px-xl-3">
+        <motion.h1 className="display-5 fw-bold mb-3" variants={item}>
+          {h1Title}
+        </motion.h1>
+        <motion.div variants={item}>
+          <Link to={resultLink}>&lt; Back to result</Link>
+        </motion.div>
+      </div>
 
-      <div className="container-panel pt-4 pb-5">
-        <Fade bottom duration={duration} distance={distance} delay={delay}>
+      <motion.form onSubmit={handleDeleteFormSubmit} variants={panel}>
+        <div className="container-panel pt-4 pb-5">
           <div className="panel p-3 p-lg-4">
             <table className="table tts-result-table">
               <thead>
@@ -240,24 +239,16 @@ function TtsResultDeletePage(props: Props) {
               </tbody>
             </table>
           </div>
-        </Fade>
-      </div>
+        </div>
 
-      <form onSubmit={handleDeleteFormSubmit}>
-        <Fade
-          cascade
-          bottom
-          duration={duration}
-          distance={distance}
-          delay={delay2}
-        >
-          <div className="container pb-5">
-            <button className=" btn btn-primary w-100">{buttonTitle}</button>
-            <p className="mt-4">{formLabel}</p>
-          </div>
-        </Fade>
-      </form>
-    </div>
+        <motion.div className="container pb-5" variants={item}>
+          <button className=" btn btn-primary w-100">{buttonTitle}</button>
+          <motion.p className="mt-4" variants={item}>
+            {formLabel}
+          </motion.p>
+        </motion.div>
+      </motion.form>
+    </motion.div>
   );
 }
 

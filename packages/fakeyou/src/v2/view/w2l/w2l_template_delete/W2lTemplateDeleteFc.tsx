@@ -10,8 +10,8 @@ import {
 } from "../../../api/w2l/GetW2lTemplate";
 import { GetW2lTemplateUseCount } from "../../../api/w2l/GetW2lTemplateUseCount";
 import { BackLink } from "../../_common/BackLink";
-import { distance, delay, duration } from "../../../../data/animation";
-const Fade = require("react-reveal/Fade");
+import { motion } from "framer-motion";
+import { container, item, panel } from "../../../../data/animation";
 
 interface Props {
   sessionWrapper: SessionWrapper;
@@ -169,26 +169,20 @@ function W2lTemplateDeleteFc(props: Props) {
   }
 
   return (
-    <div>
-      <Fade bottom cascade duration={duration} distance={distance}>
-        <div className="container pt-5 pb-4 px-lg-5 px-xl-3">
-          <div className="d-flex flex-column">
-            <h1 className="display-5 fw-bold">{h1Title}</h1>
-          </div>
-          <div className="pt-3">
-            <BackLink link={templateLink} text="Back to template" />
-          </div>
+    <motion.div initial="hidden" animate="visible" variants={container}>
+      <div className="container pt-5 pb-4 px-lg-5 px-xl-3">
+        <div className="d-flex flex-column">
+          <motion.h1 className="display-5 fw-bold" variants={item}>
+            {h1Title}
+          </motion.h1>
         </div>
-      </Fade>
+        <motion.div className="pt-3" variants={item}>
+          <BackLink link={templateLink} text="Back to template" />
+        </motion.div>
+      </div>
 
-      <Fade
-        bottom
-        cascade
-        duration={duration}
-        delay={delay}
-        distance={distance}
-      >
-        <div className="container pt-4 pb-5">
+      <motion.form onSubmit={handleDeleteFormSubmit} variants={panel}>
+        <div className="container-panel pt-4 pb-5">
           <div className="panel p-3 py-4 p-lg-4">
             <table className="table">
               <thead>
@@ -225,16 +219,14 @@ function W2lTemplateDeleteFc(props: Props) {
           </div>
         </div>
 
-        <form onSubmit={handleDeleteFormSubmit}>
-          <div className="container">
-            <button className={buttonCss}>{buttonTitle}</button>
-          </div>
-          <div className="container pb-5">
-            <p className="pt-4">{formLabel}</p>
-          </div>
-        </form>
-      </Fade>
-    </div>
+        <motion.div className="container" variants={item}>
+          <button className={buttonCss}>{buttonTitle}</button>
+        </motion.div>
+        <motion.div className="container pb-5" variants={item}>
+          <p className="pt-4">{formLabel}</p>
+        </motion.div>
+      </motion.form>
+    </motion.div>
   );
 }
 

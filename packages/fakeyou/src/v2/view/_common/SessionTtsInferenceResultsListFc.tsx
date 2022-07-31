@@ -9,8 +9,8 @@ import {
   faList,
   faMicrophone,
 } from "@fortawesome/free-solid-svg-icons";
-import { distance, duration } from "../../../data/animation";
-const Fade = require("react-reveal/Fade");
+import { motion } from "framer-motion";
+import { container, item, sessionItem } from "../../../data/animation";
 
 interface Props {
   ttsInferenceJobs: Array<TtsInferenceJob>;
@@ -58,13 +58,11 @@ function SessionTtsInferenceResultListFc(props: Props) {
       results.push(
         <div key={job.jobToken}>
           <div>
-            <Fade right duration={duration} distance={distance}>
-              <div>
-                <Fade bottom cascade duration={duration} distance={distance}>
-                  <div className={cssStyle}>{stateDescription}</div>
-                </Fade>
-              </div>
-            </Fade>
+            <div>
+              <motion.div className={cssStyle} variants={sessionItem}>
+                {stateDescription}
+              </motion.div>
+            </div>
           </div>
         </div>
       );
@@ -79,31 +77,32 @@ function SessionTtsInferenceResultListFc(props: Props) {
               <p>{job.title}</p>
               <button className="delete" aria-label="delete"></button>
             </div>*/}
-          <Fade right cascade duration={duration} distance={distance}>
-            <div>
-              <div className="panel py-4 p-3 p-lg-4 gap-4 d-flex flex-column">
-                <div>
-                  <h4>
-                    <FontAwesomeIcon icon={faMicrophone} className="me-3" />
-                    {job.title}
-                  </h4>
-                  <p>{job.rawInferenceText}</p>
-                </div>
-
-                <audio className="w-100" controls src={audioLink}>
-                  Your browser does not support the
-                  <code>audio</code> element.
-                </audio>
-
-                <div>
-                  <Link to={ttsPermalink} className="btn btn-primary">
-                    <FontAwesomeIcon icon={faLink} className="me-2" />
-                    Permalink &amp; download
-                  </Link>
-                </div>
+          <div>
+            <motion.div
+              className="panel py-4 p-3 p-lg-4 gap-4 d-flex flex-column"
+              variants={sessionItem}
+            >
+              <div>
+                <h4>
+                  <FontAwesomeIcon icon={faMicrophone} className="me-3" />
+                  {job.title}
+                </h4>
+                <p>{job.rawInferenceText}</p>
               </div>
-            </div>
-          </Fade>
+
+              <audio className="w-100" controls src={audioLink}>
+                Your browser does not support the
+                <code>audio</code> element.
+              </audio>
+
+              <div>
+                <Link to={ttsPermalink} className="btn btn-primary">
+                  <FontAwesomeIcon icon={faLink} className="me-2" />
+                  Permalink &amp; download
+                </Link>
+              </div>
+            </motion.div>
+          </div>
         </div>
       );
     }
@@ -116,10 +115,10 @@ function SessionTtsInferenceResultListFc(props: Props) {
   let title = <span />;
   if (results.length !== 0) {
     title = (
-      <h2 className="text-center text-lg-start fw-bold">
+      <motion.h2 className="text-center text-lg-start fw-bold" variants={item}>
         <FontAwesomeIcon icon={faList} className="me-3" />
         Session TTS Results
-      </h2>
+      </motion.h2>
     );
   }
 
@@ -127,7 +126,7 @@ function SessionTtsInferenceResultListFc(props: Props) {
   results.reverse();
 
   return (
-    <div>
+    <motion.div initial="hidden" animate="visible" variants={container}>
       <div className="container-panel mb-5">
         <div className="d-flex flex-column gap-4">
           {title}
@@ -141,7 +140,7 @@ function SessionTtsInferenceResultListFc(props: Props) {
           <div className="d-flex flex-column gap-4">{results}</div>
         </div>
       </div>
-    </div>
+    </motion.div>
   );
 }
 

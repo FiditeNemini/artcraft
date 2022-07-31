@@ -6,7 +6,10 @@ import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapp
 import { Gravatar } from "@storyteller/components/src/elements/Gravatar";
 import { LanguageCodeToDescriptionWithDefault } from "@storyteller/components/src/i18n/SupportedModelLanguages";
 import { TtsInferenceJob } from "@storyteller/components/src/jobs/TtsInferenceJobs";
-import { TEXT_PIPELINE_NAMES, TEXT_PIPELINE_NAMES_FOR_MODERATORS } from "@storyteller/components/src/constants/TextPipeline";
+import {
+  TEXT_PIPELINE_NAMES,
+  TEXT_PIPELINE_NAMES_FOR_MODERATORS,
+} from "@storyteller/components/src/constants/TextPipeline";
 import { useParams, Link } from "react-router-dom";
 import { v4 as uuidv4 } from "uuid";
 import { FrontendUrlConfig } from "../../../../common/FrontendUrlConfig";
@@ -43,8 +46,8 @@ import {
   faVolumeHigh,
   faDeleteLeft,
 } from "@fortawesome/free-solid-svg-icons";
-import { distance, delay, duration } from "../../../../data/animation";
-const Fade = require("react-reveal/Fade");
+import { motion } from "framer-motion";
+import { container, item, panel } from "../../../../data/animation";
 
 interface Props {
   sessionWrapper: SessionWrapper;
@@ -303,20 +306,18 @@ function TtsModelViewPage(props: Props) {
   if (!!ttsModel?.description_rendered_html) {
     modelDescription = (
       <>
-        <Fade bottom distance={distance} delay={delay} duration={duration}>
-          <div className="container-panel pt-3 pb-5">
-            <div className="panel p-3 p-lg-4">
-              <h2 className="panel-title fw-bold">Model Description</h2>
-              <div className="py-6">
-                <p
-                  dangerouslySetInnerHTML={{
-                    __html: ttsModel?.description_rendered_html || "",
-                  }}
-                />
-              </div>
+        <motion.div className="container-panel pt-3 pb-5" variants={panel}>
+          <div className="panel p-3 p-lg-4">
+            <h2 className="panel-title fw-bold">Model Description</h2>
+            <div className="py-6">
+              <p
+                dangerouslySetInnerHTML={{
+                  __html: ttsModel?.description_rendered_html || "",
+                }}
+              />
             </div>
           </div>
-        </Fade>
+        </motion.div>
       </>
     );
   }
@@ -377,17 +378,15 @@ function TtsModelViewPage(props: Props) {
 
     modelCategoriesSection = (
       <>
-        <Fade bottom distance={distance} delay={delay} duration={duration}>
-          <div className="container-panel pt-3 pb-5">
-            <div className="panel p-3 p-lg-4">
-              <h2 className="panel-title fw-bold">Model Categories</h2>
-              <div className="py-6">
-                {modelCategories}
-                {editModelCategoriesButton}
-              </div>
+        <motion.div className="container-panel pt-3 pb-5" variants={panel}>
+          <div className="panel p-3 p-lg-4">
+            <h2 className="panel-title fw-bold">Model Categories</h2>
+            <div className="py-6">
+              {modelCategories}
+              {editModelCategoriesButton}
             </div>
           </div>
-        </Fade>
+        </motion.div>
       </>
     );
   }
@@ -437,10 +436,13 @@ function TtsModelViewPage(props: Props) {
 
   let textPipelineName = UNKNOWN;
 
-  let usableTextPipelines = canEditModel ? TEXT_PIPELINE_NAMES_FOR_MODERATORS : TEXT_PIPELINE_NAMES;
+  let usableTextPipelines = canEditModel
+    ? TEXT_PIPELINE_NAMES_FOR_MODERATORS
+    : TEXT_PIPELINE_NAMES;
 
   if (!!textPipelineConfigured) {
-    textPipelineName = usableTextPipelines.get(textPipelineConfigured) || UNKNOWN;
+    textPipelineName =
+      usableTextPipelines.get(textPipelineConfigured) || UNKNOWN;
   } else {
     let configuredName = usableTextPipelines.get(textPipelineUsed) || UNKNOWN;
     textPipelineName = `Not set; using default of ${configuredName}`;
@@ -512,132 +514,125 @@ function TtsModelViewPage(props: Props) {
   }
 
   return (
-    <div>
+    <motion.div initial="hidden" animate="visible" variants={container}>
       <div className="container py-5">
-        <Fade cascade bottom distance={distance} duration={duration}>
-          <div className="d-flex flex-column">
-            <h1 className="display-5 fw-bold mb-4  text-center text-lg-start">
-              {title}
-            </h1>
-          </div>
-        </Fade>
+        <div className="d-flex flex-column">
+          <motion.h1
+            className="display-5 fw-bold mb-4  text-center text-lg-start"
+            variants={item}
+          >
+            {title}
+          </motion.h1>
+        </div>
       </div>
 
       <div>{modelDescription}</div>
 
       <div>{modelCategoriesSection}</div>
 
-      <Fade
-        cascade
-        bottom
-        distance={distance}
-        delay={delay}
-        duration={duration}
-      >
-        <div className="container-panel pt-3 pb-5">
-          <div className="panel p-3 p-lg-4">
-            <h2 className="panel-title fw-bold">Model Details</h2>
-            <div className="py-6">
-              <table className="table">
-                <tbody>
-                  <tr>
-                    <th>Creator</th>
-                    <td>{creatorLink}</td>
-                  </tr>
-                  <tr>
-                    <th>Use count</th>
-                    <td>{humanUseCount}</td>
-                  </tr>
-                  <tr>
-                    <th>Title</th>
-                    <td>{ttsModel?.title}</td>
-                  </tr>
-                  <tr>
-                    <th>Spoken Language</th>
-                    <td>{language}</td>
-                  </tr>
-                  <tr>
-                    <th>Model type</th>
-                    <td>{ttsModel?.tts_model_type}</td>
-                  </tr>
-                  <tr>
-                    <th>Default vocoder</th>
-                    <td>{defaultVocoder}</td>
-                  </tr>
-                  <tr>
-                    <th>Text pipeline</th>
-                    <td>{textPipelineName}</td>
-                  </tr>
-                  <tr>
-                    <th>Upload date (UTC)</th>
-                    <td>{ttsModel?.created_at}</td>
-                  </tr>
-                  <tr>
-                    <th>Visibility</th>
-                    <td>{resultVisibility}</td>
-                  </tr>
-                  <tr>
-                    <th>
-                      Bot TTS Command for <FontAwesomeIcon icon={faDiscord} /> /{" "}
-                      <FontAwesomeIcon icon={faTwitch} />
-                    </th>
-                    <td>{discordCommand}</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
+      <motion.div className="container-panel pt-3 pb-5" variants={panel}>
+        <div className="panel p-3 p-lg-4">
+          <h2 className="panel-title fw-bold">Model Details</h2>
+          <div className="py-6">
+            <table className="table">
+              <tbody>
+                <tr>
+                  <th>Creator</th>
+                  <td>{creatorLink}</td>
+                </tr>
+                <tr>
+                  <th>Use count</th>
+                  <td>{humanUseCount}</td>
+                </tr>
+                <tr>
+                  <th>Title</th>
+                  <td>{ttsModel?.title}</td>
+                </tr>
+                <tr>
+                  <th>Spoken Language</th>
+                  <td>{language}</td>
+                </tr>
+                <tr>
+                  <th>Model type</th>
+                  <td>{ttsModel?.tts_model_type}</td>
+                </tr>
+                <tr>
+                  <th>Default vocoder</th>
+                  <td>{defaultVocoder}</td>
+                </tr>
+                <tr>
+                  <th>Text pipeline</th>
+                  <td>{textPipelineName}</td>
+                </tr>
+                <tr>
+                  <th>Upload date (UTC)</th>
+                  <td>{ttsModel?.created_at}</td>
+                </tr>
+                <tr>
+                  <th>Visibility</th>
+                  <td>{resultVisibility}</td>
+                </tr>
+                <tr>
+                  <th>
+                    Bot TTS Command for <FontAwesomeIcon icon={faDiscord} /> /{" "}
+                    <FontAwesomeIcon icon={faTwitch} />
+                  </th>
+                  <td>{discordCommand}</td>
+                </tr>
+              </tbody>
+            </table>
           </div>
         </div>
+      </motion.div>
 
-        <div>{moderatorRows}</div>
+      <motion.div variants={panel}>{moderatorRows}</motion.div>
 
-        <div className="container pb-5">
-          <div className="d-flex flex-column flex-md-row gap-3">
-            {editModelButton}
-            {deleteModelButton}
+      <motion.div className="container pb-4" variants={panel}>
+        <div className="d-flex flex-column flex-md-row gap-3">
+          {editModelButton}
+          {deleteModelButton}
+        </div>
+      </motion.div>
+
+      <motion.div className="container-panel py-5" variants={panel}>
+        <div className="panel p-3 p-lg-4">
+          <h2 className="panel-title fw-bold">Use Model</h2>
+          <div className="py-6">
+            <form onSubmit={handleFormSubmit}>
+              <textarea
+                onChange={handleChangeText}
+                value={props.textBuffer}
+                className="form-control fs-5"
+                placeholder="Textual shenanigans go here..."
+                rows={6}
+              ></textarea>
+              <div className="d-flex gap-3 mt-4 pt-3 flex-column flex-md-row">
+                <button className="btn btn-primary w-100">
+                  <FontAwesomeIcon icon={faVolumeHigh} className="me-2" />
+                  Speak
+                </button>
+
+                <button
+                  className="btn btn-destructive w-100"
+                  onClick={handleClearClick}
+                >
+                  <FontAwesomeIcon icon={faDeleteLeft} className="me-2" />
+                  Clear
+                </button>
+              </div>
+            </form>
           </div>
         </div>
+      </motion.div>
 
-        <div className="container-panel py-5">
-          <div className="panel p-3 p-lg-4">
-            <h2 className="panel-title fw-bold">Use Model</h2>
-            <div className="py-6">
-              <form onSubmit={handleFormSubmit}>
-                <textarea
-                  onChange={handleChangeText}
-                  value={props.textBuffer}
-                  className="form-control fs-5"
-                  placeholder="Textual shenanigans go here..."
-                  rows={6}
-                ></textarea>
-                <div className="d-flex gap-3 mt-4 pt-3 flex-column flex-md-row">
-                  <button className="btn btn-primary w-100">
-                    <FontAwesomeIcon icon={faVolumeHigh} className="me-2" />
-                    Speak
-                  </button>
-
-                  <button
-                    className="btn btn-destructive w-100"
-                    onClick={handleClearClick}
-                  >
-                    <FontAwesomeIcon icon={faDeleteLeft} className="me-2" />
-                    Clear
-                  </button>
-                </div>
-              </form>
-            </div>
-          </div>
-        </div>
-
-        <div className="container pb-5">
-          <BackLink link="/" text="Back to all models" />
-        </div>
-      </Fade>
+      <motion.div className="container pb-5" variants={item}>
+        <BackLink link="/" text="Back to all models" />
+      </motion.div>
 
       <SessionTtsInferenceResultListFc
         ttsInferenceJobs={props.ttsInferenceJobs}
       />
-    </div>
+    </motion.div>
   );
 }
 

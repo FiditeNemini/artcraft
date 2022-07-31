@@ -9,9 +9,8 @@ import {
   User,
 } from "../../../api/user/GetUserByUsername";
 import { BackLink } from "../../_common/BackLink";
-import { distance, duration, delay, delay2 } from "../../../../data/animation";
-
-const Fade = require("react-reveal/Fade");
+import { motion } from "framer-motion";
+import { container, item, panel } from "../../../../data/animation";
 
 interface Props {
   sessionWrapper: SessionWrapper;
@@ -110,86 +109,74 @@ function ProfileBanFc(props: Props) {
   let isDisabled = userData === undefined;
 
   return (
-    <div>
-      <Fade bottom cascade duration={duration} distance={distance}>
-        <div className="container pt-5 pb-4 px-lg-5 px-xl-3">
-          <h2 className="display-5 fw-bold mb-3">Profile &amp; Preferences</h2>
-          <div>
-            <BackLink link={viewLinkUrl} text="Back to profile" />
-          </div>
-        </div>
-      </Fade>
+    <motion.div initial="hidden" animate="visible" variants={container}>
+      <div className="container pt-5 pb-4 px-lg-5 px-xl-3">
+        <motion.h1 className="display-5 fw-bold mb-3" variants={item}>
+          Profile &amp; Preferences
+        </motion.h1>
+        <motion.div variants={item}>
+          <BackLink link={viewLinkUrl} text="Back to profile" />
+        </motion.div>
+      </div>
 
-      <form onSubmit={handleFormSubmit}>
+      <motion.form onSubmit={handleFormSubmit} variants={panel}>
         <fieldset disabled={isDisabled}>
-          <Fade
-            bottom
-            cascade
-            duration={duration}
-            distance={distance}
-            delay={delay}
-          >
-            <div className="container-panel py-5">
-              <div className="panel p-3 p-lg-4">
-                <h2 className="panel-title fw-bold">Ban/Unban User</h2>
-                <div className="py-6">
-                  <div className="d-flex flex-column gap-4">
-                    <div>
-                      <label className="sub-title">Is Banned?</label>
-                      <div className="form-group">
-                        <select
-                          name="default_pretrained_vocoder"
-                          onChange={handleIsBannedChange}
-                          value={isBanned ? "true" : "false"}
-                          className="form-select"
-                        >
-                          <option value="true">Banned</option>
-                          <option value="false">Not Banned</option>
-                        </select>
-                      </div>
+          <div className="container-panel py-5">
+            <div className="panel p-3 p-lg-4">
+              <h2 className="panel-title fw-bold">Ban/Unban User</h2>
+              <div className="py-6">
+                <div className="d-flex flex-column gap-4">
+                  <div>
+                    <label className="sub-title">Is Banned?</label>
+                    <div className="form-group">
+                      <select
+                        name="default_pretrained_vocoder"
+                        onChange={handleIsBannedChange}
+                        value={isBanned ? "true" : "false"}
+                        className="form-select"
+                      >
+                        <option value="true">Banned</option>
+                        <option value="false">Not Banned</option>
+                      </select>
                     </div>
-
-                    <div>
-                      <label className="sub-title">
-                        Moderator Comments (Short)
-                      </label>
-                      <div className="control has-icons-left has-icons-right">
-                        <input
-                          onChange={handleModCommentsChange}
-                          className="form-control"
-                          type="text"
-                          placeholder="Moderator Comments"
-                          value={modComments}
-                        />
-                      </div>
-                    </div>
-
-                    {/*<p className="help">{invalidReason}</p>*/}
                   </div>
+
+                  <div>
+                    <label className="sub-title">
+                      Moderator Comments (Short)
+                    </label>
+                    <div className="control has-icons-left has-icons-right">
+                      <input
+                        onChange={handleModCommentsChange}
+                        className="form-control"
+                        type="text"
+                        placeholder="Moderator Comments"
+                        value={modComments}
+                      />
+                    </div>
+                  </div>
+
+                  {/*<p className="help">{invalidReason}</p>*/}
                 </div>
               </div>
             </div>
-          </Fade>
+          </div>
 
-          <Fade bottom duration={duration} distance={distance} delay={delay2}>
-            <div className="container">
-              <button className="btn btn-primary w-100">Update Ban</button>
-            </div>
-          </Fade>
+          <motion.div className="container" variants={item}>
+            <button className="btn btn-primary w-100">Update Ban</button>
+          </motion.div>
         </fieldset>
-      </form>
+      </motion.form>
 
-      <Fade bottom duration={duration} distance={distance} delay={delay2}>
-        <div className="container py-5">
-          <p>Notes on banned users:</p>
-          <ul>
-            <li></li>
-            <li></li>
-            <li></li>
-          </ul>
-        </div>
-      </Fade>
-    </div>
+      <motion.div className="container py-5" variants={item}>
+        <p>Notes on banned users:</p>
+        <ul>
+          <li></li>
+          <li></li>
+          <li></li>
+        </ul>
+      </motion.div>
+    </motion.div>
   );
 }
 
