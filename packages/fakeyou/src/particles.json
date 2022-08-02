@@ -1,7 +1,7 @@
 {
   "particles": {
     "number": {
-      "value": 0,
+      "value": 70,
       "density": {
         "enable": true,
         "value_area": 800
@@ -62,9 +62,7 @@
       }
     }
   },
-  "fullScreen": {
-    "enable": false
-  },
+  "fullScreen": { "enable": false },
   "fpsLimit": 30,
   "interactivity": {
     "detect_on": "canvas",
