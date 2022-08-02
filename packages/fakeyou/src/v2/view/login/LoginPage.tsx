@@ -10,7 +10,7 @@ import {
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faUser, faKey } from "@fortawesome/free-solid-svg-icons";
 import { motion } from "framer-motion";
-import { container, item, panel } from "../../../data/animation";
+import { container, panel } from "../../../data/animation";
 import { USE_REFRESH } from "../../../Refresh";
 
 interface Props {

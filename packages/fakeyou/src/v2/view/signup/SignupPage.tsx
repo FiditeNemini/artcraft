@@ -10,7 +10,7 @@ import { Link } from "react-router-dom";
 import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
 import { USE_REFRESH } from "../../../Refresh";
 import { motion } from "framer-motion";
-import { container, item, panel } from "../../../data/animation";
+import { container, panel } from "../../../data/animation";
 
 enum FieldTriState {
   EMPTY_FALSE,

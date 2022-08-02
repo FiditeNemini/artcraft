@@ -1,7 +1,7 @@
 import React from "react";
 import { USE_REFRESH } from "../../../../Refresh";
 import { motion } from "framer-motion";
-import { container, item, image, panel } from "../../../../data/animation";
+import { container, item, panel } from "../../../../data/animation";
 
 interface Props {}
 
