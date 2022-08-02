@@ -4,8 +4,8 @@ import { FrontendUrlConfig } from "../../../../common/FrontendUrlConfig";
 import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
 import { useParams, Link, useHistory } from "react-router-dom";
 import { BackLink } from "../../_common/BackLink";
-import { distance, delay, duration } from "../../../../data/animation";
-const Fade = require("react-reveal/Fade");
+import { motion } from "framer-motion";
+import { container, item, panel } from "../../../../data/animation";
 
 interface TtsModelViewResponsePayload {
   success: boolean;
@@ -215,25 +215,19 @@ function TtsModelDeletePage(props: Props) {
   }
 
   return (
-    <div>
+    <motion.div initial="hidden" animate="visible" variants={container}>
       <div className="container py-5 pb-4 px-lg-5 px-xl-3">
-        <Fade cascade bottom distance={distance} duration={duration}>
-          <div className="d-flex flex-column">
-            <h1 className="display-5 fw-bold mb-3">{h1Title}</h1>
-            <p>
-              <BackLink link={modelLink} text="Back to model" />
-            </p>
-          </div>
-        </Fade>
+        <div className="d-flex flex-column">
+          <motion.h1 className="display-5 fw-bold mb-3" variants={item}>
+            {h1Title}
+          </motion.h1>
+          <motion.p variants={item}>
+            <BackLink link={modelLink} text="Back to model" />
+          </motion.p>
+        </div>
       </div>
 
-      <Fade
-        cascade
-        bottom
-        distance={distance}
-        delay={delay}
-        duration={duration}
-      >
+      <motion.form onSubmit={handleDeleteFormSubmit} variants={panel}>
         <div className="container-panel pt-4 pb-5">
           <div className="panel p-3 py-4 p-lg-4">
             <table className="table">
@@ -279,16 +273,14 @@ function TtsModelDeletePage(props: Props) {
           </div>
         </div>
 
-        <div className="container pb-5">
-          <form onSubmit={handleDeleteFormSubmit}>
-            <p>
-              <button className={buttonCss}>{buttonTitle}</button>
-            </p>
-            <label className="pt-4">{formLabel}</label>
-          </form>
-        </div>
-      </Fade>
-    </div>
+        <motion.div className="container pb-5" variants={item}>
+          <button className={buttonCss}>{buttonTitle}</button>
+          <motion.label className="pt-4" variants={item}>
+            {formLabel}
+          </motion.label>
+        </motion.div>
+      </motion.form>
+    </motion.div>
   );
 }
 

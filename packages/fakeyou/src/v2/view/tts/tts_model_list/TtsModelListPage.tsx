@@ -36,7 +36,6 @@ import { t } from "i18next";
 import { Trans } from "react-i18next";
 import { TwitchTtsNotice } from "./notices/TwitchTtsNotice";
 import { PleaseFollowNotice } from "./notices/PleaseFollowNotice";
-import { distance, delay, delay2, duration } from "../../../../data/animation";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faTrash,
@@ -45,8 +44,8 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { GenericNotice } from "./notices/GenericNotice";
 import { DiscordLink2 } from "@storyteller/components/src/elements/DiscordLink2";
-
-const Fade = require("react-reveal/Fade");
+import { motion } from "framer-motion";
+import { container, item, image, panel } from "../../../../data/animation";
 
 export interface EnqueueJobResponsePayload {
   success: boolean;
@@ -221,8 +220,7 @@ function TtsModelListPage(props: Props) {
           See more details about the "
           <span className="fw-semibold">{{ modelName }}</span>" model by&nbsp;
           <span className="fw-semibold">{{ userName }}</span>&nbsp;
-        </Trans>
-        {" "}
+        </Trans>{" "}
         <Gravatar
           size={15}
           username={props.maybeSelectedTtsModel.creator_display_name}
@@ -258,10 +256,13 @@ function TtsModelListPage(props: Props) {
   const bootstrapLanguageNotice = props.isShowingBootstrapLanguageNotice ? (
     <GenericNotice
       title={t("notices.HelpBootstrapLanguage.title")}
-      body={<Trans i18nKey="notices.HelpBootstrapLanguage.body">
-        We don't have enough voices in this language yet. Please help us build your favorite characters. 
-        Join our <DiscordLink2 /> and we'll teach you how. We'll pay {dollars} you per voice, too!
-      </Trans>}
+      body={
+        <Trans i18nKey="notices.HelpBootstrapLanguage.body">
+          We don't have enough voices in this language yet. Please help us build
+          your favorite characters. Join our <DiscordLink2 /> and we'll teach
+          you how. We'll pay {dollars} you per voice, too!
+        </Trans>
+      }
       clearNotice={props.clearBootstrapLanguageNotice}
     />
   ) : undefined;
@@ -321,7 +322,7 @@ function TtsModelListPage(props: Props) {
   }
 
   return (
-    <div>
+    <motion.div initial="hidden" animate="visible" variants={container}>
       {bootstrapLanguageNotice}
 
       {pleaseFollowNotice}
@@ -336,123 +337,124 @@ function TtsModelListPage(props: Props) {
         <div className="row gx-3 flex-lg-row-reverse align-items-center">
           <div className="col-lg-6">
             <div className="d-flex justify-content-center">
-              <Fade right distance={distance} delay={delay} duration={duration}>
-                <img
-                  src="mascot/kitsune_pose2.webp"
-                  className="img-fluid"
-                  width="560"
-                  alt="FakeYou Mascot"
-                />
-              </Fade>
+              <motion.img
+                src="mascot/kitsune_pose2.webp"
+                className="img-fluid"
+                width="516"
+                height="508"
+                alt="FakeYou Mascot"
+                variants={image}
+              />
             </div>
           </div>
           <div className="col-lg-6 px-md-2 px-lg-5 px-xl-2">
-            <Fade bottom cascade duration={duration} distance={distance}>
-              <div>
-                <h1 className="display-3 fw-bold lh-1 mb-3 text-center text-lg-start">
-                  {t('tts.TtsModelListPage.heroSection.title')}
-                </h1>
-                <p className="lead mb-5 text-center text-lg-start pe-xl-2">
-                  <Trans i18nKey="tts.TtsModelListPage.heroSection.subtitle">
-                    Use FakeYou's deepfake tech to say stuff with your favorite
-                    characters.
-                  </Trans>
-                </p>
-              </div>
-            </Fade>
+            <div>
+              <motion.h1
+                className="display-3 fw-bold lh-1 mb-3 text-center text-lg-start"
+                variants={item}
+              >
+                {t("tts.TtsModelListPage.heroSection.title")}
+              </motion.h1>
+              <motion.p
+                className="lead mb-5 text-center text-lg-start pe-xl-2"
+                variants={item}
+              >
+                <Trans i18nKey="tts.TtsModelListPage.heroSection.subtitle">
+                  Use FakeYou's deepfake tech to say stuff with your favorite
+                  characters.
+                </Trans>
+              </motion.p>
+            </div>
 
-            <Fade bottom delay={delay} duration={duration} distance={distance}>
-              <div className="d-flex flex-column flex-md-row gap-3 justify-content-center justify-content-lg-start mb-5 mb-lg-4">
-                {signUpButton}
-                <Link to="/clone">
-                  <button type="button" className="btn btn-secondary w-100">
-                    {t("tts.TtsModelListPage.heroSection.buttons.cloneVoice")}
-                  </button>
-                </Link>
-              </div>
-            </Fade>
+            <motion.div
+              className="d-flex flex-column flex-md-row gap-3 justify-content-center justify-content-lg-start mb-5 mb-lg-4"
+              variants={item}
+            >
+              {signUpButton}
+              <Link to="/clone">
+                <button type="button" className="btn btn-secondary w-100">
+                  {t("tts.TtsModelListPage.heroSection.buttons.cloneVoice")}
+                </button>
+              </Link>
+            </motion.div>
           </div>
         </div>
       </div>
 
-      <div className="container-panel pt-4 pb-5 mb-4">
-        <Fade bottom distance={distance} delay={delay2} duration={duration}>
-          <div className="panel p-3 p-lg-4 mt-5 mt-lg-0">
-            <i className="fas fa-volume-high"></i>
-            <h1 className="panel-title fw-bold">
-              <FontAwesomeIcon icon={faVolumeUp} className="me-3" />
-              {t("tts.TtsModelListPage.formTitle")}
-            </h1>
-            <div className="py-6">
-              <div className="d-flex gap-4">
-                <form
-                  className="w-100 d-flex flex-column gap-4"
-                  onSubmit={handleFormSubmit}
-                >
-                  <MultiDropdownSearch
-                    allTtsCategories={props.allTtsCategories}
-                    allTtsModels={props.ttsModels}
-                    allTtsCategoriesByTokenMap={
-                      props.allTtsCategoriesByTokenMap
-                    }
-                    allTtsModelsByTokenMap={props.allTtsModelsByTokenMap}
-                    ttsModelsByCategoryToken={props.ttsModelsByCategoryToken}
-                    dropdownCategories={props.dropdownCategories}
-                    setDropdownCategories={props.setDropdownCategories}
-                    selectedCategories={props.selectedCategories}
-                    setSelectedCategories={props.setSelectedCategories}
-                    maybeSelectedTtsModel={props.maybeSelectedTtsModel}
-                    setMaybeSelectedTtsModel={props.setMaybeSelectedTtsModel}
-                  />
+      <motion.div className="container-panel pt-4 pb-5 mb-4" variants={panel}>
+        <div className="panel p-3 p-lg-4 mt-5 mt-lg-0">
+          <i className="fas fa-volume-high"></i>
+          <h1 className="panel-title fw-bold">
+            <FontAwesomeIcon icon={faVolumeUp} className="me-3" />
+            {t("tts.TtsModelListPage.formTitle")}
+          </h1>
+          <div className="py-6">
+            <div className="d-flex gap-4">
+              <form
+                className="w-100 d-flex flex-column gap-4"
+                onSubmit={handleFormSubmit}
+              >
+                <MultiDropdownSearch
+                  allTtsCategories={props.allTtsCategories}
+                  allTtsModels={props.ttsModels}
+                  allTtsCategoriesByTokenMap={props.allTtsCategoriesByTokenMap}
+                  allTtsModelsByTokenMap={props.allTtsModelsByTokenMap}
+                  ttsModelsByCategoryToken={props.ttsModelsByCategoryToken}
+                  dropdownCategories={props.dropdownCategories}
+                  setDropdownCategories={props.setDropdownCategories}
+                  selectedCategories={props.selectedCategories}
+                  setSelectedCategories={props.setSelectedCategories}
+                  maybeSelectedTtsModel={props.maybeSelectedTtsModel}
+                  setMaybeSelectedTtsModel={props.setMaybeSelectedTtsModel}
+                />
 
-                  <AutocompleteSearch
-                    allTtsCategories={props.allTtsCategories}
-                    allTtsModels={props.ttsModels}
-                    allTtsModelsByTokenMap={props.allTtsModelsByTokenMap}
-                    dropdownCategories={props.dropdownCategories}
-                    setDropdownCategories={props.setDropdownCategories}
-                    selectedCategories={props.selectedCategories}
-                    setSelectedCategories={props.setSelectedCategories}
-                    maybeSelectedTtsModel={props.maybeSelectedTtsModel}
-                    setMaybeSelectedTtsModel={props.setMaybeSelectedTtsModel}
-                  />
+                <AutocompleteSearch
+                  allTtsCategories={props.allTtsCategories}
+                  allTtsModels={props.ttsModels}
+                  allTtsModelsByTokenMap={props.allTtsModelsByTokenMap}
+                  dropdownCategories={props.dropdownCategories}
+                  setDropdownCategories={props.setDropdownCategories}
+                  selectedCategories={props.selectedCategories}
+                  setSelectedCategories={props.setSelectedCategories}
+                  maybeSelectedTtsModel={props.maybeSelectedTtsModel}
+                  setMaybeSelectedTtsModel={props.setMaybeSelectedTtsModel}
+                />
 
-                  {directViewLink}
+                {directViewLink}
 
-                  <div className="text-input">
-                    <textarea
-                      onChange={handleChangeText}
-                      className="form-control fs-5"
-                      style={{ minHeight: "200px" }}
-                      value={props.textBuffer}
-                      placeholder={t("tts.TtsModelListPage.form.textInputHint")}
-                    ></textarea>
-                  </div>
+                <div className="text-input">
+                  <textarea
+                    onChange={handleChangeText}
+                    className="form-control fs-5"
+                    style={{ minHeight: "200px" }}
+                    value={props.textBuffer}
+                    placeholder={t("tts.TtsModelListPage.form.textInputHint")}
+                  ></textarea>
+                </div>
 
-                  {maybeError}
+                {maybeError}
 
-                  <div className="d-flex flex-column flex-md-row w-100 gap-3 mt-3">
-                    <button
-                      className="btn btn-primary w-100"
-                      disabled={remainingCharactersButtonDisabled}
-                    >
-                      <FontAwesomeIcon icon={faVolumeHigh} className="me-2" />
-                      {t("tts.TtsModelListPage.form.buttons.speak")}
-                    </button>
-                    <button
-                      className="btn btn-destructive w-100"
-                      onClick={handleClearClick}
-                    >
-                      <FontAwesomeIcon icon={faTrash} className="me-2" />
-                      {t("tts.TtsModelListPage.form.buttons.clear")}
-                    </button>
-                  </div>
-                </form>
-              </div>
+                <div className="d-flex flex-column flex-md-row w-100 gap-3 mt-3">
+                  <button
+                    className="btn btn-primary w-100"
+                    disabled={remainingCharactersButtonDisabled}
+                  >
+                    <FontAwesomeIcon icon={faVolumeHigh} className="me-2" />
+                    {t("tts.TtsModelListPage.form.buttons.speak")}
+                  </button>
+                  <button
+                    className="btn btn-destructive w-100"
+                    onClick={handleClearClick}
+                  >
+                    <FontAwesomeIcon icon={faTrash} className="me-2" />
+                    {t("tts.TtsModelListPage.form.buttons.clear")}
+                  </button>
+                </div>
+              </form>
             </div>
           </div>
-        </Fade>
-      </div>
+        </div>
+      </motion.div>
 
       <SessionTtsInferenceResultListFc
         ttsInferenceJobs={props.ttsInferenceJobs}
@@ -470,7 +472,7 @@ function TtsModelListPage(props: Props) {
         modelUploadJobs={props.ttsModelUploadJobs}
       />
       <br />
-    </div>
+    </motion.div>
   );
 }
 

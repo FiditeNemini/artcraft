@@ -23,9 +23,8 @@ import { GetW2lTemplateUseCount } from "../../../api/w2l/GetW2lTemplateUseCount"
 import { BackLink } from "../../_common/BackLink";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEdit, faTrash } from "@fortawesome/free-solid-svg-icons";
-import { distance, delay, duration } from "../../../../data/animation";
-
-const Fade = require("react-reveal/Fade");
+import { motion } from "framer-motion";
+import { container, item, panel } from "../../../../data/animation";
 
 interface EnqueueJobResponsePayload {
   success: boolean;
@@ -217,55 +216,53 @@ function W2lTemplateViewFc(props: Props) {
   ) {
     moderatorRows = (
       <>
-        <Fade bottom duration={duration} distance={distance} delay={delay}>
-          <div className="container-panel pt-3 pb-5">
-            <div className="panel p-3 p-lg-4">
-              <h2 className="panel-title fw-bold">Moderator Details</h2>
-              <div className="py-6">
-                <table className="table">
-                  <tbody>
-                    <tr>
-                      <th>Creator is banned</th>
-                      <td>
-                        {w2lTemplate?.maybe_moderator_fields?.creator_is_banned
-                          ? "banned"
-                          : "good standing"}
-                      </td>
-                    </tr>
-                    <tr>
-                      <th>Create IP address</th>
-                      <td>
-                        {w2lTemplate?.maybe_moderator_fields
-                          ?.creator_ip_address_creation || "server error"}
-                      </td>
-                    </tr>
-                    <tr>
-                      <th>Update IP address</th>
-                      <td>
-                        {w2lTemplate?.maybe_moderator_fields
-                          ?.creator_ip_address_last_update || "server error"}
-                      </td>
-                    </tr>
-                    <tr>
-                      <th>Mod deleted at (UTC)</th>
-                      <td>
-                        {w2lTemplate?.maybe_moderator_fields?.mod_deleted_at ||
-                          "not deleted"}
-                      </td>
-                    </tr>
-                    <tr>
-                      <th>User deleted at (UTC)</th>
-                      <td>
-                        {w2lTemplate?.maybe_moderator_fields?.user_deleted_at ||
-                          "not deleted"}
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
+        <motion.div className="container-panel pt-3 pb-5" variants={item}>
+          <div className="panel p-3 p-lg-4">
+            <h2 className="panel-title fw-bold">Moderator Details</h2>
+            <div className="py-6">
+              <table className="table">
+                <tbody>
+                  <tr>
+                    <th>Creator is banned</th>
+                    <td>
+                      {w2lTemplate?.maybe_moderator_fields?.creator_is_banned
+                        ? "banned"
+                        : "good standing"}
+                    </td>
+                  </tr>
+                  <tr>
+                    <th>Create IP address</th>
+                    <td>
+                      {w2lTemplate?.maybe_moderator_fields
+                        ?.creator_ip_address_creation || "server error"}
+                    </td>
+                  </tr>
+                  <tr>
+                    <th>Update IP address</th>
+                    <td>
+                      {w2lTemplate?.maybe_moderator_fields
+                        ?.creator_ip_address_last_update || "server error"}
+                    </td>
+                  </tr>
+                  <tr>
+                    <th>Mod deleted at (UTC)</th>
+                    <td>
+                      {w2lTemplate?.maybe_moderator_fields?.mod_deleted_at ||
+                        "not deleted"}
+                    </td>
+                  </tr>
+                  <tr>
+                    <th>User deleted at (UTC)</th>
+                    <td>
+                      {w2lTemplate?.maybe_moderator_fields?.user_deleted_at ||
+                        "not deleted"}
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
             </div>
           </div>
-        </Fade>
+        </motion.div>
       </>
     );
   }
@@ -377,21 +374,19 @@ function W2lTemplateViewFc(props: Props) {
   if (!!w2lTemplate?.description_rendered_html) {
     templateDescription = (
       <>
-        <Fade bottom duration={duration} distance={distance} delay={delay}>
-          <div className="container-panel pt-3 pb-5">
-            <div className="panel p-3 p-lg-4">
-              <h2 className="panel-title fw-bold">Model Description</h2>
-              <div className="py-6">
-                <div
-                  className="profile content is-medium"
-                  dangerouslySetInnerHTML={{
-                    __html: w2lTemplate?.description_rendered_html || "",
-                  }}
-                />
-              </div>
+        <motion.div className="container-panel pt-3 pb-5" variants={panel}>
+          <div className="panel p-3 p-lg-4">
+            <h2 className="panel-title fw-bold">Model Description</h2>
+            <div className="py-6">
+              <div
+                className="profile content is-medium"
+                dangerouslySetInnerHTML={{
+                  __html: w2lTemplate?.description_rendered_html || "",
+                }}
+              />
             </div>
           </div>
-        </Fade>
+        </motion.div>
       </>
     );
   }
@@ -408,156 +403,146 @@ function W2lTemplateViewFc(props: Props) {
     );
 
   return (
-    <div>
-      <Fade bottom cascade duration={duration} distance={distance}>
-        <div className="container py-5 px-md-4 px-lg-5 px-xl-3">
-          <h1 className="display-5 fw-bold">Video Lip Sync Template</h1>
-          <h4>Template: {w2lTemplate?.title}</h4>
-          <div className="pt-3">
-            <BackLink
-              link={FrontendUrlConfig.w2lListPage()}
-              text="Back to all templates"
-            />
-          </div>
-        </div>
-      </Fade>
+    <motion.div initial="hidden" animate="visible" variants={container}>
+      <div className="container py-5 px-md-4 px-lg-5 px-xl-3">
+        <motion.h1 className="display-5 fw-bold" variants={item}>
+          Video Lip Sync Template
+        </motion.h1>
+        <motion.h4 variants={item}>Template: {w2lTemplate?.title}</motion.h4>
+        <motion.div className="pt-3" variants={item}>
+          <BackLink
+            link={FrontendUrlConfig.w2lListPage()}
+            text="Back to all templates"
+          />
+        </motion.div>
+      </div>
 
-      <Fade
-        bottom
-        cascade
-        duration={duration}
-        distance={distance}
-        delay={delay}
-      >
-        <form onSubmit={handleInferenceFormSubmit}>
-          <div className="container-panel pt-4 pb-5">
-            <div className="panel p-3 p-lg-4">
-              <h2 className="panel-title fw-bold">Upload Audio</h2>
-              <div className="py-6">
-                <div className="d-flex flex-column flex-lg-row gap-5">
-                  <div className="d-flex flex-column gap-4 w-100 w-lg-50">
-                    <p>
-                      Upload audio from FakeYou or any other source (eg. music),
-                      then submit. You'll get a beautifully lipsynced video.
-                    </p>
-                    <div>
-                      <label className="sub-title">Select an audio file</label>
-                      <input
-                        id="formFileLg"
-                        type="file"
-                        name="audio"
-                        className="form-control form-control-lg"
-                        onChange={(e) => handleAudioFileChange(e.target.files)}
-                      />
-                    </div>
-                    <button className="btn btn-primary w-100 mt-3">
-                      Submit
-                    </button>
+      <motion.form onSubmit={handleInferenceFormSubmit} variants={panel}>
+        <div className="container-panel pt-4 pb-5">
+          <div className="panel p-3 p-lg-4">
+            <h2 className="panel-title fw-bold">Upload Audio</h2>
+            <div className="py-6">
+              <div className="d-flex flex-column flex-lg-row gap-5">
+                <div className="d-flex flex-column gap-4 w-100 w-lg-50">
+                  <p>
+                    Upload audio from FakeYou or any other source (eg. music),
+                    then submit. You'll get a beautifully lipsynced video.
+                  </p>
+                  <div>
+                    <label className="sub-title">Select an audio file</label>
+                    <input
+                      id="formFileLg"
+                      type="file"
+                      name="audio"
+                      className="form-control form-control-lg"
+                      onChange={(e) => handleAudioFileChange(e.target.files)}
+                    />
                   </div>
-                  <div className="d-flex w-100 w-lg-50 justify-content-center">
-                    <div className="template-preview ">
-                      <img
-                        src={url}
-                        alt="template preview"
-                        className="img-fluid rounded"
-                      />
-                    </div>
+                  <button className="btn btn-primary w-100 mt-3">Submit</button>
+                </div>
+                <div className="d-flex w-100 w-lg-50 justify-content-center">
+                  <div className="template-preview ">
+                    <img
+                      src={url}
+                      alt="template preview"
+                      className="img-fluid rounded"
+                    />
                   </div>
                 </div>
               </div>
             </div>
           </div>
-        </form>
+        </div>
+      </motion.form>
 
-        <div>{templateDescription}</div>
+      <motion.div variants={panel}>{templateDescription}</motion.div>
 
-        <div className="container-panel pt-3 pb-5">
-          <div className="panel p-3 p-lg-4">
-            <h2 className="panel-title fw-bold">Template Details</h2>
-            <div className="py-6">
-              <table className="table">
-                <tbody>
-                  <tr>
-                    <th>Title</th>
-                    <td>{w2lTemplate?.title}</td>
-                  </tr>
-                  <tr>
-                    <th>Creator</th>
-                    <td>{creatorLink}</td>
-                  </tr>
-                  <tr>
-                    <th>Use count</th>
-                    <td>{humanUseCount}</td>
-                  </tr>
-                  <tr>
-                    <th>Visibility</th>
-                    <td>{resultVisibility}</td>
-                  </tr>
-                  <tr>
-                    <th>Is public listing approved?</th>
-                    <td>{modApprovalStatus}</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
+      <motion.div className="container-panel pt-3 pb-5" variants={panel}>
+        <div className="panel p-3 p-lg-4">
+          <h2 className="panel-title fw-bold">Template Details</h2>
+          <div className="py-6">
+            <table className="table">
+              <tbody>
+                <tr>
+                  <th>Title</th>
+                  <td>{w2lTemplate?.title}</td>
+                </tr>
+                <tr>
+                  <th>Creator</th>
+                  <td>{creatorLink}</td>
+                </tr>
+                <tr>
+                  <th>Use count</th>
+                  <td>{humanUseCount}</td>
+                </tr>
+                <tr>
+                  <th>Visibility</th>
+                  <td>{resultVisibility}</td>
+                </tr>
+                <tr>
+                  <th>Is public listing approved?</th>
+                  <td>{modApprovalStatus}</td>
+                </tr>
+              </tbody>
+            </table>
           </div>
         </div>
+      </motion.div>
 
-        <div className="container-panel pt-3 pb-5">
-          <div className="panel p-3 p-lg-4">
-            <h2 className="panel-title fw-bold">Media Details</h2>
-            <div className="py-6">
-              <table className="table">
-                <tbody>
-                  <tr>
-                    <th>Media type</th>
-                    <td>{w2lTemplate?.template_type}</td>
-                  </tr>
-                  <tr>
-                    <th>Dimensions</th>
-                    <td>
-                      {w2lTemplate?.frame_width} x {w2lTemplate?.frame_height}
-                    </td>
-                  </tr>
-                  <tr>
-                    <th>Duration (milliseconds)</th>
-                    <td>{w2lTemplate?.duration_millis}</td>
-                  </tr>
-                  <tr>
-                    <th>Created at (UTC)</th>
-                    <td>{w2lTemplate?.created_at}</td>
-                  </tr>
-                  <tr>
-                    <th>Updated at (UTC)</th>
-                    <td>{w2lTemplate?.updated_at}</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
+      <motion.div className="container-panel pt-3 pb-5" variants={panel}>
+        <div className="panel p-3 p-lg-4">
+          <h2 className="panel-title fw-bold">Media Details</h2>
+          <div className="py-6">
+            <table className="table">
+              <tbody>
+                <tr>
+                  <th>Media type</th>
+                  <td>{w2lTemplate?.template_type}</td>
+                </tr>
+                <tr>
+                  <th>Dimensions</th>
+                  <td>
+                    {w2lTemplate?.frame_width} x {w2lTemplate?.frame_height}
+                  </td>
+                </tr>
+                <tr>
+                  <th>Duration (milliseconds)</th>
+                  <td>{w2lTemplate?.duration_millis}</td>
+                </tr>
+                <tr>
+                  <th>Created at (UTC)</th>
+                  <td>{w2lTemplate?.created_at}</td>
+                </tr>
+                <tr>
+                  <th>Updated at (UTC)</th>
+                  <td>{w2lTemplate?.updated_at}</td>
+                </tr>
+              </tbody>
+            </table>
           </div>
         </div>
+      </motion.div>
 
-        <div>{moderatorRows}</div>
+      <motion.div variants={panel}>{moderatorRows}</motion.div>
 
-        <div className="container">
-          <div className="d-flex flex-column flex-lg-row gap-3">
-            {editButton}
-            {approveButton}
-            {deleteButton}
-          </div>
+      <motion.div className="container" variants={item}>
+        <div className="d-flex flex-column flex-lg-row gap-3">
+          {editButton}
+          {approveButton}
+          {deleteButton}
         </div>
+      </motion.div>
 
-        <div>
-          <div className="container pt-4 pb-5">
-            <ReportDiscordLinkFc />
-          </div>
+      <motion.div variants={item}>
+        <div className="container pt-4 pb-5">
+          <ReportDiscordLinkFc />
         </div>
-      </Fade>
+      </motion.div>
 
       <SessionW2lInferenceResultListFc
         w2lInferenceJobs={props.w2lInferenceJobs}
       />
-    </div>
+    </motion.div>
   );
 }
 

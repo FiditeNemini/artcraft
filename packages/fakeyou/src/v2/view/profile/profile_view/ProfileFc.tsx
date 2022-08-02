@@ -36,11 +36,11 @@ import {
 import { format } from "date-fns";
 import { FrontendUrlConfig } from "../../../../common/FrontendUrlConfig";
 import { USE_REFRESH } from "../../../../Refresh";
-import { distance, duration, delay, delay2 } from "../../../../data/animation";
+import { container, item, panel } from "../../../../data/animation";
 import Tippy from "@tippyjs/react";
 import "tippy.js/dist/tippy.css";
 import "tippy.js/animations/shift-away.css";
-const Fade = require("react-reveal/Fade");
+import { motion } from "framer-motion";
 
 interface Props {
   sessionWrapper: SessionWrapper;
@@ -305,112 +305,107 @@ function ProfileFc(props: Props) {
   }
 
   return (
-    <div>
-      <Fade bottom cascade duration={duration} distance={distance}>
-        <div className="container pt-5 pb-4 px-lg-5 px-xl-3">
-          <div className="d-flex flex-column flex-lg-row align-items-center">
-            <div className="mb-3 me-lg-4 mb-lg-0">
-              <Gravatar
-                size={45}
-                username={userData.display_name}
-                email_hash={userEmailHash}
-              />
-            </div>
-            <h1 className="display-5 fw-bold text-center text-lg-start w-100 mb-0">
-              {userData.display_name}
-            </h1>
-            <div className="w-100 justify-content-end d-none d-lg-flex">
-              <div className="d-flex gap-3">
-                {editProfileButton}
-                {banUserButton}
-              </div>
+    <motion.div initial="hidden" animate="visible" variants={container}>
+      <div className="container pt-5 pb-4 px-lg-5 px-xl-3">
+        <motion.div
+          className="d-flex flex-column flex-lg-row align-items-center"
+          variants={item}
+        >
+          <div className="mb-3 me-lg-4 mb-lg-0">
+            <Gravatar
+              size={45}
+              username={userData.display_name}
+              email_hash={userEmailHash}
+            />
+          </div>
+          <h1 className="display-5 fw-bold text-center text-lg-start w-100 mb-0">
+            {userData.display_name}
+          </h1>
+          <div className="w-100 justify-content-end d-none d-lg-flex">
+            <div className="d-flex gap-3">
+              {banUserButton}
+              {editProfileButton}
             </div>
           </div>
-          <div className="d-flex flex-column flex-lg-row gap-4 gap-lg-3 mt-3">
-            {profileJoinDate}
-            <div className="d-flex justify-content-center gap-4 gap-lg-3 profile-social-icons">
-              {profileRows}
-            </div>
+        </motion.div>
+        <motion.div
+          className="d-flex flex-column flex-lg-row gap-4 gap-lg-3 mt-3"
+          variants={item}
+        >
+          {profileJoinDate}
+          <div className="d-flex justify-content-center gap-4 gap-lg-3 profile-social-icons">
+            {profileRows}
           </div>
-        </div>
-      </Fade>
+        </motion.div>
+      </div>
 
-      <Fade bottom duration={duration} delay={delay} distance={distance}>
-        <div
-          className="container content mb-4 mb-lg-5 text-center text-lg-start px-4 px-md-5 px-lg-5 px-xl-3"
-          dangerouslySetInnerHTML={{
-            __html: userData.profile_rendered_html || "",
-          }}
-        />
-        <div className="container d-flex d-lg-none my-5">
-          <div className="d-flex w-100 gap-3 justify-content-center flex-column flex-md-row">
-            {editProfileButton}
-            {banUserButton}
-          </div>
+      <motion.div
+        className="container content mb-4 mb-lg-5 text-center text-lg-start px-4 px-md-5 px-lg-5 px-xl-3"
+        variants={item}
+        dangerouslySetInnerHTML={{
+          __html: userData.profile_rendered_html || "",
+        }}
+      />
+      <div className="container d-flex d-lg-none my-5">
+        <div className="d-flex w-100 gap-3 justify-content-center flex-column flex-md-row">
+          {editProfileButton}
+          {banUserButton}
         </div>
-      </Fade>
+      </div>
 
-      <Fade
-        bottom
-        cascade
-        duration={duration}
-        delay={delay2}
-        distance={distance}
-      >
-        <div className="container-panel py-5">
-          <div className="panel p-3 p-lg-4">
-            <h2 className="panel-title fw-bold">
-              <FontAwesomeIcon icon={faAward} className="me-3" />
-              Badges{" "}
-              <span className="fs-5 fw-normal ms-2">(images coming soon)</span>
-            </h2>
-            <div className="py-6">{badges}</div>
-          </div>
+      <motion.div className="container-panel py-5" variants={panel}>
+        <div className="panel p-3 p-lg-4">
+          <h2 className="panel-title fw-bold">
+            <FontAwesomeIcon icon={faAward} className="me-3" />
+            Badges{" "}
+            <span className="fs-5 fw-normal ms-2">(images coming soon)</span>
+          </h2>
+          <div className="py-6">{badges}</div>
         </div>
+      </motion.div>
 
-        <div className="container-panel pt-3 pb-5">
-          <div className="panel p-3 p-lg-4">
-            <h2 className="panel-title fw-bold">
-              <FontAwesomeIcon icon={faVolumeHigh} className="me-3" />
-              TTS Results
-            </h2>
-            <div className="py-6">
-              <ProfileTtsInferenceResultsListFc username={userData.username} />
-            </div>
+      <motion.div className="container-panel pt-3 pb-5" variants={panel}>
+        <div className="panel p-3 p-lg-4">
+          <h2 className="panel-title fw-bold">
+            <FontAwesomeIcon icon={faVolumeHigh} className="me-3" />
+            TTS Results
+          </h2>
+          <div className="py-6">
+            <ProfileTtsInferenceResultsListFc username={userData.username} />
           </div>
         </div>
+      </motion.div>
 
-        <div className="container-panel pt-3 pb-5">
-          <div className="panel p-3 p-lg-4">
-            <h2 className="panel-title fw-bold">
-              <FontAwesomeIcon icon={faVideo} className="me-3" />
-              Lipsync Results
-            </h2>
-            <div className="py-6">
-              <ProfileW2lInferenceResultsListFc username={userData.username} />
-            </div>
+      <motion.div className="container-panel pt-3 pb-5" variants={panel}>
+        <div className="panel p-3 p-lg-4">
+          <h2 className="panel-title fw-bold">
+            <FontAwesomeIcon icon={faVideo} className="me-3" />
+            Lipsync Results
+          </h2>
+          <div className="py-6">
+            <ProfileW2lInferenceResultsListFc username={userData.username} />
           </div>
         </div>
+      </motion.div>
 
-        <div className="container-panel pt-3 pb-5">
-          <div className="panel p-3 p-lg-4">
-            <h2 className="panel-title fw-bold">Uploaded TTS Models </h2>
-            <div className="py-6">
-              <ProfileTtsModelListFc username={userData.username} />
-            </div>
+      <motion.div className="container-panel pt-3 pb-5" variants={panel}>
+        <div className="panel p-3 p-lg-4">
+          <h2 className="panel-title fw-bold">Uploaded TTS Models </h2>
+          <div className="py-6">
+            <ProfileTtsModelListFc username={userData.username} />
           </div>
         </div>
+      </motion.div>
 
-        <div className="container-panel pt-3 pb-5">
-          <div className="panel p-3 p-lg-4">
-            <h2 className="panel-title fw-bold">Uploaded Templates </h2>
-            <div className="py-6">
-              <ProfileW2lTemplateListFc username={userData.username} />
-            </div>
+      <motion.div className="container-panel pt-3 pb-5" variants={panel}>
+        <div className="panel p-3 p-lg-4">
+          <h2 className="panel-title fw-bold">Uploaded Templates </h2>
+          <div className="py-6">
+            <ProfileW2lTemplateListFc username={userData.username} />
           </div>
         </div>
-      </Fade>
-    </div>
+      </motion.div>
+    </motion.div>
   );
 }
 

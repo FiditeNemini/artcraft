@@ -5,9 +5,8 @@ import { useParams, Link, useHistory } from "react-router-dom";
 import { FrontendUrlConfig } from "../../../../common/FrontendUrlConfig";
 import { VisibleIconFc } from "../../_icons/VisibleIcon";
 import { HiddenIconFc } from "../../_icons/HiddenIcon";
-import { distance, delay, duration } from "../../../../data/animation";
-
-const Fade = require("react-reveal/Fade");
+import { motion } from "framer-motion";
+import { container, item, panel } from "../../../../data/animation";
 
 const DEFAULT_VISIBILITY = "public";
 
@@ -147,54 +146,46 @@ function W2lResultEditFc(props: Props) {
     visibility === "public" ? <VisibleIconFc /> : <HiddenIconFc />;
 
   return (
-    <div>
-      <Fade cascade bottom duration={duration} distance={distance}>
-        <div className="container pb-4 pt-5 px-md-4 px-lg-5 px-xl-3">
-          <h1 className="display-5 fw-bold">Edit Result Visibility</h1>
-          <div className="pt-3">
-            <Link to={resultLink}>&lt; Back to result </Link>
+    <motion.div initial="hidden" animate="visible" variants={container}>
+      <div className="container pb-4 pt-5 px-md-4 px-lg-5 px-xl-3">
+        <motion.h1 className="display-5 fw-bold" variants={item}>
+          Edit Result Visibility
+        </motion.h1>
+        <motion.div className="pt-3" variants={item}>
+          <Link to={resultLink}>&lt; Back to result </Link>
+        </motion.div>
+      </div>
+
+      <motion.form onSubmit={handleFormSubmit} variants={panel}>
+        <div className="container-panel pt-4 pb-5">
+          <div className="panel p-3 py-4 p-lg-4">
+            <fieldset disabled={isDisabled}>
+              <div>
+                <label className="sub-title">
+                  Result Visibility&nbsp;{visibilityIcon}
+                </label>
+                <div className="form-group">
+                  <select
+                    name="creator_set_visibility"
+                    onChange={handleVisibilityChange}
+                    value={visibility}
+                    className="form-control"
+                  >
+                    <option value="public">
+                      Public (visible from your profile)
+                    </option>
+                    <option value="hidden">Unlisted (shareable URLs)</option>
+                  </select>
+                </div>
+              </div>
+            </fieldset>
           </div>
         </div>
-      </Fade>
-
-      <Fade
-        cascade
-        bottom
-        duration={duration}
-        distance={distance}
-        delay={delay}
-      >
-        <form onSubmit={handleFormSubmit}>
-          <div className="container-panel pt-4 pb-5">
-            <div className="panel p-3 py-4 p-lg-4">
-              <fieldset disabled={isDisabled}>
-                <div>
-                  <label className="sub-title">
-                    Result Visibility&nbsp;{visibilityIcon}
-                  </label>
-                  <div className="form-group">
-                    <select
-                      name="creator_set_visibility"
-                      onChange={handleVisibilityChange}
-                      value={visibility}
-                      className="form-control"
-                    >
-                      <option value="public">
-                        Public (visible from your profile)
-                      </option>
-                      <option value="hidden">Unlisted (shareable URLs)</option>
-                    </select>
-                  </div>
-                </div>
-              </fieldset>
-            </div>
-          </div>
-          <div className="container pb-5">
-            <button className="btn btn-primary w-100">Update</button>
-          </div>
-        </form>
-      </Fade>
-    </div>
+        <motion.div className="container pb-5" variants={item}>
+          <button className="btn btn-primary w-100">Update</button>
+        </motion.div>
+      </motion.form>
+    </motion.div>
   );
 }
 

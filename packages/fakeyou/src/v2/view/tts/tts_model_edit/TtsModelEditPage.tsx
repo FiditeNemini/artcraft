@@ -25,13 +25,12 @@ import {
   DEFAULT_MODEL_LANGUAGE,
   SUPPORTED_MODEL_LANGUAGE_TAG_TO_FULL,
 } from "@storyteller/components/src/i18n/SupportedModelLanguages";
-import { 
-  TEXT_PIPELINE_NAMES, 
+import {
+  TEXT_PIPELINE_NAMES,
   TEXT_PIPELINE_NAMES_FOR_MODERATORS,
 } from "@storyteller/components/src/constants/TextPipeline";
-import { distance, delay, duration } from "../../../../data/animation";
-
-const Fade = require("react-reveal/Fade");
+import { motion } from "framer-motion";
+import { container, item, panel } from "../../../../data/animation";
 
 const DEFAULT_VISIBILITY = "public";
 
@@ -313,7 +312,9 @@ function TtsModelEditPage(props: Props) {
     );
   }
 
-  let usableTextPipelines = isModerator ? TEXT_PIPELINE_NAMES_FOR_MODERATORS : TEXT_PIPELINE_NAMES;
+  let usableTextPipelines = isModerator
+    ? TEXT_PIPELINE_NAMES_FOR_MODERATORS
+    : TEXT_PIPELINE_NAMES;
 
   let isDisabled = ttsModel === undefined;
 
@@ -321,161 +322,151 @@ function TtsModelEditPage(props: Props) {
     visibility === "public" ? <VisibleIconFc /> : <HiddenIconFc />;
 
   return (
-    <div>
+    <motion.div initial="hidden" animate="visible" variants={container}>
       <div className="container py-5 pb-4 px-lg-5 px-xl-3">
-        <Fade cascade bottom distance={distance} duration={duration}>
-          <div className="d-flex flex-column">
-            <h1 className="display-5 fw-bold mb-3">Edit Model</h1>
-            <p>
-              <BackLink link={modelLink} text="Back to model" />
-            </p>
-          </div>
-        </Fade>
+        <div className="d-flex flex-column">
+          <motion.h1 className="display-5 fw-bold mb-3" variants={item}>
+            Edit Model
+          </motion.h1>
+          <motion.p variants={item}>
+            <BackLink link={modelLink} text="Back to model" />
+          </motion.p>
+        </div>
       </div>
 
-      <form onSubmit={handleFormSubmit}>
+      <motion.form onSubmit={handleFormSubmit} variants={panel}>
         <fieldset disabled={isDisabled}>
-          <Fade
-            bottom
-            cascade
-            distance={distance}
-            delay={delay}
-            duration={duration}
-          >
-            <div className="container-panel pt-4 pb-5">
-              <div className="panel p-3 py-4 p-lg-4">
-                <div className="d-flex flex-column gap-4">
-                  <div>
-                    <label className="sub-title">Model Title</label>
-                    <div className="form-group input-icon">
-                      <FontAwesomeIcon
-                        icon={faMicrophone}
-                        className="form-control-feedback"
-                      />
-                      <input
-                        onChange={handleTitleChange}
-                        className="form-control"
-                        type="text"
-                        placeholder="Model Title"
-                        value={title}
-                      />
-                    </div>
-                    {/*<p className="help">{invalidReason}</p>*/}
+          <div className="container-panel pt-4 pb-5">
+            <div className="panel p-3 py-4 p-lg-4">
+              <div className="d-flex flex-column gap-4">
+                <div>
+                  <label className="sub-title">Model Title</label>
+                  <div className="form-group input-icon">
+                    <FontAwesomeIcon
+                      icon={faMicrophone}
+                      className="form-control-feedback"
+                    />
+                    <input
+                      onChange={handleTitleChange}
+                      className="form-control"
+                      type="text"
+                      placeholder="Model Title"
+                      value={title}
+                    />
                   </div>
-
-                  <div>
-                    <label className="sub-title">
-                      Description (supports Markdown)
-                    </label>
-                    <div className="form-group">
-                      <textarea
-                        onChange={handleDescriptionMarkdownChange}
-                        className="form-control"
-                        placeholder="Model description (ie. source of data, training duration, etc)"
-                        value={descriptionMarkdown}
-                        rows={4}
-                      />
-                    </div>
-                  </div>
-
-                  <div>
-                    <label className="sub-title">Model Spoken Language</label>
-                    <div className="form-group">
-                      <select
-                        onChange={handleSpokenLanguageChange}
-                        value={fullLanguageTag}
-                        className="form-select"
-                      >
-                        {Array.from(
-                          SUPPORTED_MODEL_LANGUAGE_TAG_TO_FULL,
-                          ([languageTag, description]) => {
-                            return (
-                              <option key={languageTag} value={languageTag}>
-                                {description}
-                              </option>
-                            );
-                          }
-                        )}
-                      </select>
-                    </div>
-                  </div>
-
-                  <div>
-                    <label className="sub-title">Text Pipeline</label>
-                    <div className="form-group">
-                      <select
-                        name="text_pipeline_type"
-                        onChange={handleTextPipelineChange}
-                        value={textPipelineType || "legacy_fakeyou"}
-                        className="form-select"
-                      >
-                        {Array.from(
-                          usableTextPipelines,
-                          ([textPipelineType, description]) => {
-                            return (
-                              <option
-                                key={textPipelineType}
-                                value={textPipelineType}
-                              >
-                                {description}
-                              </option>
-                            );
-                          }
-                        )}
-                      </select>
-                    </div>
-                  </div>
-
-                  <div>
-                    <label className="sub-title">Default vocoder</label>
-                    <div className="form-group">
-                      <select
-                        name="default_pretrained_vocoder"
-                        onChange={handleDefaultPretrainedVocoderChange}
-                        value={defaultPretrainedVocoder}
-                        className="form-select"
-                      >
-                        <option value="hifigan-superres">
-                          HiFi-Gan (typically sounds best)
-                        </option>
-                        <option value="waveglow">WaveGlow</option>
-                      </select>
-                    </div>
-                  </div>
-
-                  <div>
-                    <label className="sub-title">
-                      Model Visibility&nbsp;{visibilityIcon}
-                    </label>
-                    <div className="form-group">
-                      <select
-                        name="creator_set_visibility"
-                        onChange={handleVisibilityChange}
-                        value={visibility}
-                        className="form-select"
-                      >
-                        <option value="public">
-                          Public (visible from your profile)
-                        </option>
-                        <option value="hidden">
-                          Unlisted (shareable URLs)
-                        </option>
-                      </select>
-                    </div>
-                  </div>
-
-                  {optionalModeratorFields}
+                  {/*<p className="help">{invalidReason}</p>*/}
                 </div>
+
+                <div>
+                  <label className="sub-title">
+                    Description (supports Markdown)
+                  </label>
+                  <div className="form-group">
+                    <textarea
+                      onChange={handleDescriptionMarkdownChange}
+                      className="form-control"
+                      placeholder="Model description (ie. source of data, training duration, etc)"
+                      value={descriptionMarkdown}
+                      rows={4}
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="sub-title">Model Spoken Language</label>
+                  <div className="form-group">
+                    <select
+                      onChange={handleSpokenLanguageChange}
+                      value={fullLanguageTag}
+                      className="form-select"
+                    >
+                      {Array.from(
+                        SUPPORTED_MODEL_LANGUAGE_TAG_TO_FULL,
+                        ([languageTag, description]) => {
+                          return (
+                            <option key={languageTag} value={languageTag}>
+                              {description}
+                            </option>
+                          );
+                        }
+                      )}
+                    </select>
+                  </div>
+                </div>
+
+                <div>
+                  <label className="sub-title">Text Pipeline</label>
+                  <div className="form-group">
+                    <select
+                      name="text_pipeline_type"
+                      onChange={handleTextPipelineChange}
+                      value={textPipelineType || "legacy_fakeyou"}
+                      className="form-select"
+                    >
+                      {Array.from(
+                        usableTextPipelines,
+                        ([textPipelineType, description]) => {
+                          return (
+                            <option
+                              key={textPipelineType}
+                              value={textPipelineType}
+                            >
+                              {description}
+                            </option>
+                          );
+                        }
+                      )}
+                    </select>
+                  </div>
+                </div>
+
+                <div>
+                  <label className="sub-title">Default vocoder</label>
+                  <div className="form-group">
+                    <select
+                      name="default_pretrained_vocoder"
+                      onChange={handleDefaultPretrainedVocoderChange}
+                      value={defaultPretrainedVocoder}
+                      className="form-select"
+                    >
+                      <option value="hifigan-superres">
+                        HiFi-Gan (typically sounds best)
+                      </option>
+                      <option value="waveglow">WaveGlow</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div>
+                  <label className="sub-title">
+                    Model Visibility&nbsp;{visibilityIcon}
+                  </label>
+                  <div className="form-group">
+                    <select
+                      name="creator_set_visibility"
+                      onChange={handleVisibilityChange}
+                      value={visibility}
+                      className="form-select"
+                    >
+                      <option value="public">
+                        Public (visible from your profile)
+                      </option>
+                      <option value="hidden">Unlisted (shareable URLs)</option>
+                    </select>
+                  </div>
+                </div>
+
+                {optionalModeratorFields}
               </div>
             </div>
+          </div>
 
-            <div className="container pb-5">
-              <button className="btn btn-primary w-100">Update</button>
-            </div>
-          </Fade>
+          <motion.div className="container pb-5" variants={item}>
+            <button className="btn btn-primary w-100">Update</button>
+          </motion.div>
         </fieldset>
-      </form>
-    </div>
+      </motion.form>
+    </motion.div>
   );
 }
 

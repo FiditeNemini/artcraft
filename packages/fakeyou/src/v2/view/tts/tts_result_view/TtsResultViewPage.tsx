@@ -23,9 +23,8 @@ import {
   faEye,
   faEyeSlash,
 } from "@fortawesome/free-solid-svg-icons";
-import { distance, delay, duration } from "../../../../data/animation";
-
-const Fade = require("react-reveal/Fade");
+import { motion } from "framer-motion";
+import { container, item, panel } from "../../../../data/animation";
 
 interface Props {
   sessionWrapper: SessionWrapper;
@@ -125,64 +124,56 @@ function TtsResultViewPage(props: Props) {
   ) {
     moderatorRows = (
       <>
-        <Fade
-          cascade
-          bottom
-          duration={duration}
-          distance={distance}
-          delay={delay}
-        >
-          <div className="container-panel pt-3 pb-5">
-            <div className="panel p-3 p-lg-4">
-              <h2 className="panel-title fw-bold">Moderator Details</h2>
-              <div className="py-6">
-                <table className="table">
-                  <tbody>
-                    <tr>
-                      <th>Model creator is banned</th>
-                      <td>
-                        {ttsInferenceResult?.maybe_moderator_fields
-                          ?.model_creator_is_banned
-                          ? "banned"
-                          : "good standing"}
-                      </td>
-                    </tr>
-                    <tr>
-                      <th>Result creator is banned (if user)</th>
-                      <td>
-                        {ttsInferenceResult?.maybe_moderator_fields
-                          ?.result_creator_is_banned_if_user
-                          ? "banned"
-                          : "good standing"}
-                      </td>
-                    </tr>
-                    <tr>
-                      <th>Result creator IP address</th>
-                      <td>
-                        {ttsInferenceResult?.maybe_moderator_fields
-                          ?.result_creator_ip_address || "server error"}
-                      </td>
-                    </tr>
-                    <tr>
-                      <th>Mod deleted at (UTC)</th>
-                      <td>
-                        {ttsInferenceResult?.maybe_moderator_fields
-                          ?.mod_deleted_at || "not deleted"}
-                      </td>
-                    </tr>
-                    <tr>
-                      <th>Result creator deleted at (UTC)</th>
-                      <td>
-                        {ttsInferenceResult?.maybe_moderator_fields
-                          ?.result_creator_deleted_at || "not deleted"}
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
+        <div className="container-panel pt-3 pb-5">
+          <div className="panel p-3 p-lg-4">
+            <h2 className="panel-title fw-bold">Moderator Details</h2>
+            <div className="py-6">
+              <table className="table">
+                <tbody>
+                  <tr>
+                    <th>Model creator is banned</th>
+                    <td>
+                      {ttsInferenceResult?.maybe_moderator_fields
+                        ?.model_creator_is_banned
+                        ? "banned"
+                        : "good standing"}
+                    </td>
+                  </tr>
+                  <tr>
+                    <th>Result creator is banned (if user)</th>
+                    <td>
+                      {ttsInferenceResult?.maybe_moderator_fields
+                        ?.result_creator_is_banned_if_user
+                        ? "banned"
+                        : "good standing"}
+                    </td>
+                  </tr>
+                  <tr>
+                    <th>Result creator IP address</th>
+                    <td>
+                      {ttsInferenceResult?.maybe_moderator_fields
+                        ?.result_creator_ip_address || "server error"}
+                    </td>
+                  </tr>
+                  <tr>
+                    <th>Mod deleted at (UTC)</th>
+                    <td>
+                      {ttsInferenceResult?.maybe_moderator_fields
+                        ?.mod_deleted_at || "not deleted"}
+                    </td>
+                  </tr>
+                  <tr>
+                    <th>Result creator deleted at (UTC)</th>
+                    <td>
+                      {ttsInferenceResult?.maybe_moderator_fields
+                        ?.result_creator_deleted_at || "not deleted"}
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
             </div>
           </div>
-        </Fade>
+        </div>
       </>
     );
   }
@@ -297,42 +288,36 @@ function TtsResultViewPage(props: Props) {
   }
 
   return (
-    <div>
-      <Fade cascade bottom duration={duration} distance={distance}>
-        <div className="container py-5">
-          <div className="d-flex flex-column">
-            <h1 className="display-5 fw-bold mb-4 text-center text-lg-start">
-              {headingTitle}
-            </h1>
+    <motion.div initial="hidden" animate="visible" variants={container}>
+      <div className="container py-5">
+        <div className="d-flex flex-column">
+          <motion.h1
+            className="display-5 fw-bold mb-4 text-center text-lg-start"
+            variants={item}
+          >
+            {headingTitle}
+          </motion.h1>
+        </div>
+      </div>
+
+      <motion.div className="container-panel pt-3 pb-5" variants={panel}>
+        <div className="panel p-3 p-lg-4">
+          {subtitle}
+          <div className="py-6">
+            <TtsResultAudioPlayerFc ttsResult={ttsInferenceResult} />
+            <a
+              className=" btn btn-primary w-100 mt-4"
+              href={audioLink}
+              download={audioDownloadFilename}
+            >
+              <FontAwesomeIcon icon={faDownload} className="me-2" />
+              Download File{" "}
+            </a>
           </div>
         </div>
-      </Fade>
+      </motion.div>
 
-      <Fade
-        cascade
-        bottom
-        duration={duration}
-        delay={delay}
-        distance={distance}
-      >
-        <div className="container-panel pt-3 pb-5">
-          <div className="panel p-3 p-lg-4">
-            {subtitle}
-            <div className="py-6">
-              <TtsResultAudioPlayerFc ttsResult={ttsInferenceResult} />
-              <a
-                className=" btn btn-primary w-100 mt-4"
-                href={audioLink}
-                download={audioDownloadFilename}
-              >
-                <FontAwesomeIcon icon={faDownload} className="me-2" />
-                Download File{" "}
-              </a>
-            </div>
-          </div>
-        </div>
-
-        {/* Without wavesurfer, 
+      {/* Without wavesurfer, 
       <audio
         controls
         src={audioLink}>
@@ -340,97 +325,87 @@ function TtsResultViewPage(props: Props) {
             <code>audio</code> element.
       </audio>*/}
 
-        <div className="container-panel pt-3 pb-5">
-          <div className="panel p-3 p-lg-4">
-            <h2 className="panel-title fw-bold">Spectrogram</h2>
-            <SpectrogramFc spectrogramJsonLink={spectrogramLink} />
+      <motion.div className="container-panel pt-3 pb-5" variants={panel}>
+        <div className="panel p-3 p-lg-4">
+          <h2 className="panel-title fw-bold">Spectrogram</h2>
+          <SpectrogramFc spectrogramJsonLink={spectrogramLink} />
+        </div>
+      </motion.div>
+
+      <motion.div className="container-panel pt-3 pb-5" variants={panel}>
+        <div className="panel p-3 p-lg-4">
+          <h2 className="panel-title fw-bold">Result Details</h2>
+          <div className="py-6">
+            <table className="table tts-result-table">
+              <tbody>
+                <tr>
+                  <th scope="row">Original text</th>
+                  <td className="overflow-fix">
+                    {ttsInferenceResult.raw_inference_text}
+                  </td>
+                </tr>
+                <tr>
+                  <th scope="row">Audio creator</th>
+                  <td>{creatorDetails}</td>
+                </tr>
+                <tr>
+                  <th scope="row">Audio duration</th>
+                  <td>{durationSeconds} seconds</td>
+                </tr>
+                <tr>
+                  <th scope="row">Visibility</th>
+                  <td>{resultVisibility}</td>
+                </tr>
+              </tbody>
+            </table>
           </div>
         </div>
+      </motion.div>
 
-        <div className="container-panel pt-3 pb-5">
-          <div className="panel p-3 p-lg-4">
-            <h2 className="panel-title fw-bold">Result Details</h2>
-            <div className="py-6">
-              <table className="table tts-result-table">
-                <tbody>
-                  <tr>
-                    <th scope="row">Original text</th>
-                    <td className="overflow-fix">
-                      {ttsInferenceResult.raw_inference_text}
-                    </td>
-                  </tr>
-                  <tr>
-                    <th scope="row">Audio creator</th>
-                    <td>{creatorDetails}</td>
-                  </tr>
-                  <tr>
-                    <th scope="row">Audio duration</th>
-                    <td>{durationSeconds} seconds</td>
-                  </tr>
-                  <tr>
-                    <th scope="row">Visibility</th>
-                    <td>{resultVisibility}</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
+      <motion.div className="container-panel pt-3 pb-5" variants={panel}>
+        <div className="panel p-3 p-lg-4">
+          <h2 className="panel-title fw-bold">Model Used</h2>
+          <div className="py-6">
+            <table className="table tts-result-table">
+              <tbody>
+                <tr>
+                  <th scope="row">Model name</th>
+                  <td>
+                    <Link to={modelLink}>{modelName}</Link>
+                  </td>
+                </tr>
+                <tr>
+                  <th scope="row">Model creator</th>
+                  <td>{modelCreatorDetails}</td>
+                </tr>
+                <tr>
+                  <th scope="row">Vocoder used</th>
+                  <td>{vocoderUsed}</td>
+                </tr>
+                <tr>
+                  <th scope="row">Worker</th>
+                  <td>{ttsInferenceResult.generated_by_worker}</td>
+                </tr>
+
+                {debugRows}
+              </tbody>
+            </table>
           </div>
         </div>
+      </motion.div>
 
-        <div className="container-panel pt-3 pb-5">
-          <div className="panel p-3 p-lg-4">
-            <h2 className="panel-title fw-bold">Model Used</h2>
-            <div className="py-6">
-              <table className="table tts-result-table">
-                <tbody>
-                  <tr>
-                    <th scope="row">Model name</th>
-                    <td>
-                      <Link to={modelLink}>{modelName}</Link>
-                    </td>
-                  </tr>
-                  <tr>
-                    <th scope="row">Model creator</th>
-                    <td>{modelCreatorDetails}</td>
-                  </tr>
-                  <tr>
-                    <th scope="row">Vocoder used</th>
-                    <td>{vocoderUsed}</td>
-                  </tr>
-                  <tr>
-                    <th scope="row">Worker</th>
-                    <td>{ttsInferenceResult.generated_by_worker}</td>
-                  </tr>
+      <motion.div variants={panel}>{moderatorRows}</motion.div>
 
-                  {debugRows}
-
-                </tbody>
-              </table>
-            </div>
-          </div>
+      <motion.div className="container pb-5" variants={item}>
+        <div className="d-flex flex-column flex-md-row gap-3 mb-4">
+          {editButton}
+          {deleteButton}
         </div>
-      </Fade>
-
-      <div>{moderatorRows}</div>
-
-      <Fade
-        cascade
-        bottom
-        duration={duration}
-        distance={distance}
-        delay={delay}
-      >
-        <div className="container pb-5">
-          <div className="d-flex flex-column flex-md-row gap-3 mb-4">
-            {editButton}
-            {deleteButton}
-          </div>
-          <p className="text-center text-lg-start">
-            <ReportDiscordLinkFc />
-          </p>
-        </div>
-      </Fade>
-    </div>
+        <motion.p className="text-center text-lg-start" variants={item}>
+          <ReportDiscordLinkFc />
+        </motion.p>
+      </motion.div>
+    </motion.div>
   );
 }
 

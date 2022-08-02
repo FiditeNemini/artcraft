@@ -3,7 +3,6 @@ import { ApiConfig } from "@storyteller/components";
 import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
 import { Gravatar } from "@storyteller/components/src/elements/Gravatar";
 import { Link } from "react-router-dom";
-import { distance, duration, delay } from "../../../data/animation";
 import { USE_REFRESH } from "../../../Refresh";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -17,6 +16,8 @@ import {
   faDiscord,
   faTwitch,
 } from "@fortawesome/free-brands-svg-icons";
+import { motion } from "framer-motion";
+import { duration, delay, container, item } from "../../../data/animation";
 
 const Fade = require("react-reveal/Fade");
 
@@ -326,28 +327,28 @@ function FirehoseEventListFc(props: Props) {
   }
 
   return (
-    <div>
+    <motion.div initial="hidden" animate="visible" variants={container}>
       <div className="container py-5 px-md-4 px-lg-5 px-xl-3">
-        <Fade bottom cascade duration={duration} distance={distance}>
-          <div className="d-flex flex-column">
-            <h1 className="display-5 fw-bold">Firehose Event Feed</h1>
-            <h4 className="mb-4">
-              The latest FakeYou events refreshed every few seconds.
-            </h4>
-            <p className="lead">
-              As you can see, we're really popular. But we owe it to you, our
-              users. Thank you!
-            </p>
-          </div>
-        </Fade>
+        <div className="d-flex flex-column">
+          <motion.h1 className="display-5 fw-bold" variants={item}>
+            Firehose Event Feed
+          </motion.h1>
+          <motion.h4 className="mb-4" variants={item}>
+            The latest FakeYou events refreshed every few seconds.
+          </motion.h4>
+          <motion.p className="lead" variants={item}>
+            As you can see, we're really popular. But we owe it to you, our
+            users. Thank you!
+          </motion.p>
+        </div>
       </div>
 
       <div className="container-panel pb-5">
         <Fade right cascade delay={delay} duration={duration} distance="100px">
-          <ul className="firehose-ul d-flex flex-column gap-4">{eventItems}</ul>
+          <ul className="firehose-ul d-flex flex-column gap-3">{eventItems}</ul>
         </Fade>
       </div>
-    </div>
+    </motion.div>
   );
 }
 

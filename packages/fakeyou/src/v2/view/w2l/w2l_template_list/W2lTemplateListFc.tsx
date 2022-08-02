@@ -3,13 +3,20 @@ import { ApiConfig } from "@storyteller/components";
 import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
 import { Link } from "react-router-dom";
 import { BucketConfig } from "@storyteller/components/src/api/BucketConfig";
-import { distance, duration, delay } from "../../../../data/animation";
+import {
+  distance,
+  duration,
+  container,
+  item,
+  panel,
+} from "../../../../data/animation";
 import { USE_REFRESH } from "../../../../Refresh";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faChevronLeft,
   faChevronRight,
 } from "@fortawesome/free-solid-svg-icons";
+import { motion } from "framer-motion";
 
 const Fade = require("react-reveal/Fade");
 
@@ -212,17 +219,17 @@ function W2lTemplateListFc(props: Props) {
   }
 
   return (
-    <div>
+    <motion.div initial="hidden" animate="visible" variants={container}>
       <div className="container pt-5 pb-4 px-md-4 px-lg-5 px-xl-3">
-        <Fade bottom cascade duration={duration} distance={distance}>
-          <div>
-            <h1 className="display-5 fw-bold mb-3">Video Lip Sync Templates</h1>
-            {extraDetails}
-          </div>
-        </Fade>
+        <div>
+          <motion.h1 className="display-5 fw-bold mb-3" variants={item}>
+            Video Lip Sync Templates
+          </motion.h1>
+          <motion.div variants={item}>{extraDetails}</motion.div>
+        </div>
       </div>
 
-      <div className="container">
+      <motion.div className="container" variants={item}>
         <div className="d-flex  w-100 gap-3 mb-4">
           <button
             className="btn btn-secondary w-100 d-flex align-items-center justify-content-center"
@@ -242,21 +249,19 @@ function W2lTemplateListFc(props: Props) {
             <FontAwesomeIcon icon={faChevronRight} className="ms-2" />
           </button>
         </div>
-      </div>
+      </motion.div>
 
-      <div className="container-panel">
-        <Fade bottom duration={duration} distance={distance} delay={delay}>
-          <div className="panel p-3 p-lg-4">
-            <Fade bottom cascade duration={duration} distance={distance}>
-              <div className="row gy-3 gx-3 gx-md-4 gy-md-4 w2l-ani">
-                {allRowsOfTemplateElements.map((el) => el)}
-              </div>
-            </Fade>
-          </div>
-        </Fade>
-      </div>
+      <motion.div className="container-panel" variants={panel}>
+        <div className="panel p-3 p-lg-4">
+          <Fade bottom cascade duration={duration} distance={distance}>
+            <div className="row gy-3 gx-3 gx-md-4 gy-md-4 w2l-ani">
+              {allRowsOfTemplateElements.map((el) => el)}
+            </div>
+          </Fade>
+        </div>
+      </motion.div>
 
-      <div className="container">
+      <motion.div className="container" variants={item}>
         <div className="d-flex w-100 gap-3 my-4">
           <button
             className="btn btn-secondary w-100 d-flex align-items-center justify-content-center"
@@ -276,15 +281,15 @@ function W2lTemplateListFc(props: Props) {
             <FontAwesomeIcon icon={faChevronRight} className="ms-2" />
           </button>
         </div>
-      </div>
+      </motion.div>
 
-      <div className="container pb-5">
+      <motion.div className="container pb-5" variants={item}>
         <p>
           This feature is based on Wav2Lip by by Prajwal, K R and Mukhopadhyay,
           Rudrabha and Namboodiri, Vinay P. and Jawahar, C.V.
         </p>
-      </div>
-    </div>
+      </motion.div>
+    </motion.div>
   );
 }
 

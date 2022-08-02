@@ -32,8 +32,8 @@ import {
   faXmark,
 } from "@fortawesome/free-solid-svg-icons";
 import { useParams, Link } from "react-router-dom";
-import { distance, delay, duration } from "../../../../data/animation";
-const Fade = require("react-reveal/Fade");
+import { motion } from "framer-motion";
+import { container, item, panel } from "../../../../data/animation";
 
 interface Props {
   sessionWrapper: SessionWrapper;
@@ -257,61 +257,56 @@ function TtsEditCategoriesPage(props: Props) {
   }
 
   return (
-    <div>
+    <motion.div initial="hidden" animate="visible" variants={container}>
       <div className="container py-5 pb-4 px-lg-5 px-xl-3">
-        <Fade cascade bottom distance={distance} duration={duration}>
-          <div className="d-flex flex-column">
-            <h1 className="display-5 fw-bold">Edit Categories</h1>
-            <h4 className="mb-4"> TTS Model: {ttsModel.title} </h4>
-            <p>
-              <BackLink link={modelLink} text="Back to model" />
-            </p>
-          </div>
-        </Fade>
+        <div className="d-flex flex-column">
+          <motion.h1 className="display-5 fw-bold" variants={item}>
+            Edit Categories
+          </motion.h1>
+          <motion.h4 className="mb-4" variants={item}>
+            {" "}
+            TTS Model: {ttsModel.title}{" "}
+          </motion.h4>
+          <motion.p variants={item}>
+            <BackLink link={modelLink} text="Back to model" />
+          </motion.p>
+        </div>
       </div>
 
-      <Fade
-        cascade
-        bottom
-        distance={distance}
-        delay={delay}
-        duration={duration}
-      >
-        {errorFlash}
+      {errorFlash}
 
-        <div className="container-panel py-5">
-          <div className="panel p-3 p-lg-4">
-            <h2 className="panel-title fw-bold">Current categories</h2>
-            <div className="py-6">
-              {" "}
-              <ul className="d-flex flex-column gap-3">
-                {currentCategoriesList}
-              </ul>
-            </div>
+      <motion.div className="container-panel py-5" variants={panel}>
+        <div className="panel p-3 p-lg-4">
+          <h2 className="panel-title fw-bold">Current categories</h2>
+          <div className="py-6">
+            {" "}
+            <ul className="d-flex flex-column gap-3">
+              {currentCategoriesList}
+            </ul>
           </div>
         </div>
+      </motion.div>
 
-        <div className="container-panel pt-3 pb-5">
-          <div className="panel p-3 p-lg-4">
-            <h2 className="panel-title fw-bold">Add new category</h2>
-            <div className="py-6">
-              <div>
-                <div className="form-group">
-                  <select
-                    onChange={handleAddCategory}
-                    value=""
-                    className="form-select"
-                  >
-                    <option value="">Select category to add...</option>
-                    {addCategoryOptions}
-                  </select>
-                </div>
+      <motion.div className="container-panel pt-3 pb-5" variants={panel}>
+        <div className="panel p-3 p-lg-4">
+          <h2 className="panel-title fw-bold">Add new category</h2>
+          <div className="py-6">
+            <div>
+              <div className="form-group">
+                <select
+                  onChange={handleAddCategory}
+                  value=""
+                  className="form-select"
+                >
+                  <option value="">Select category to add...</option>
+                  {addCategoryOptions}
+                </select>
               </div>
             </div>
           </div>
         </div>
-      </Fade>
-    </div>
+      </motion.div>
+    </motion.div>
   );
 }
 

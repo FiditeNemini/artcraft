@@ -2,8 +2,8 @@ import React from "react";
 import { Link } from "react-router-dom";
 import { JobState } from "@storyteller/components/src/jobs/JobStates";
 import { TtsModelUploadJob } from "@storyteller/components/src/jobs/TtsModelUploadJobs";
-import { distance, duration } from "../../../data/animation";
-const Fade = require("react-reveal/Fade");
+import { motion } from "framer-motion";
+import { container, sessionItem, item } from "../../../data/animation";
 
 interface Props {
   modelUploadJobs: Array<TtsModelUploadJob>;
@@ -45,9 +45,7 @@ function SessionTtsModelUploadResultListFc(props: Props) {
 
       results.push(
         <div key={job.jobToken}>
-          <Fade bottom cascade duration={duration} distance={distance}>
-            <div className="alert alert-primary">{stateDescription}</div>
-          </Fade>
+          <div className="alert alert-primary">{stateDescription}</div>
         </div>
       );
     } else {
@@ -55,12 +53,15 @@ function SessionTtsModelUploadResultListFc(props: Props) {
 
       results.push(
         <div key={job.jobToken}>
-          <div className="panel py-4 p-3 p-lg-4 gap-4">
+          <motion.div
+            className="panel py-4 p-3 p-lg-4 gap-4"
+            variants={sessionItem}
+          >
             Complete!
             <Link to={ttsPermalink} className="btn btn-primary ms-4">
               See &amp; use TTS model
             </Link>
-          </div>
+          </motion.div>
         </div>
       );
     }
@@ -69,21 +70,19 @@ function SessionTtsModelUploadResultListFc(props: Props) {
   let title = <span />;
   if (results.length !== 0) {
     title = (
-      <h2 className="text-center text-lg-start fw-bold">
+      <motion.h2 className="text-center text-lg-start fw-bold" variants={item}>
         TTS Model Upload Status
-      </h2>
+      </motion.h2>
     );
   }
 
   return (
-    <div>
-      <Fade cascade right distance="100px" duration="400">
-        <div className="container-panel pt-4 pb-5">
-          <div className="pb-4">{title}</div>
-          <div className="d-flex flex-column gap-4">{results}</div>
-        </div>
-      </Fade>
-    </div>
+    <motion.div initial="hidden" animate="visible" variants={container}>
+      <div className="container-panel pt-4 pb-5">
+        <div className="pb-4">{title}</div>
+        <div className="d-flex flex-column gap-4">{results}</div>
+      </div>
+    </motion.div>
   );
 }
 

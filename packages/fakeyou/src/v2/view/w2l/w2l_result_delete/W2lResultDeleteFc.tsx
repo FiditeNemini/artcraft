@@ -8,9 +8,8 @@ import {
   GetW2lResultIsOk,
   W2lResult,
 } from "../../../api/w2l/GetW2lResult";
-import { distance, delay, duration } from "../../../../data/animation";
-
-const Fade = require("react-reveal/Fade");
+import { motion } from "framer-motion";
+import { container, item, panel } from "../../../../data/animation";
 
 interface Props {
   sessionWrapper: SessionWrapper;
@@ -105,23 +104,17 @@ function W2lResultDeleteFc(props: Props) {
   const durationSeconds = (w2lInferenceResult?.duration_millis || 0) / 1000;
 
   return (
-    <div>
-      <Fade cascade bottom duration={duration} distance={distance}>
-        <div className="container pt-5 pb-4 px-md-4 px-lg-5 px-xl-3">
-          <h1 className="display-5 fw-bold">{h1Title}</h1>
-          <div className="pt-3">
-            <Link to={templateResultLink}>&lt; Back to result</Link>
-          </div>
-        </div>
-      </Fade>
+    <motion.div initial="hidden" animate="visible" variants={container}>
+      <div className="container pt-5 pb-4 px-md-4 px-lg-5 px-xl-3">
+        <motion.h1 className="display-5 fw-bold" variants={item}>
+          {h1Title}
+        </motion.h1>
+        <motion.div className="pt-3" variants={item}>
+          <Link to={templateResultLink}>&lt; Back to result</Link>
+        </motion.div>
+      </div>
 
-      <Fade
-        cascade
-        bottom
-        duration={duration}
-        distance={distance}
-        delay={delay}
-      >
+      <motion.form onSubmit={handleDeleteFormSubmit} variants={panel}>
         <div className="container-panel pt-4 pb-5">
           <div className="panel p-3 py-4 p-lg-4">
             <table className="table">
@@ -153,14 +146,14 @@ function W2lResultDeleteFc(props: Props) {
           </div>
         </div>
 
-        <div className="container pb-5">
-          <form onSubmit={handleDeleteFormSubmit}>
-            <button className={buttonCss}>{buttonTitle}</button>
-            <p className="pt-4">{formLabel}</p>
-          </form>
-        </div>
-      </Fade>
-    </div>
+        <motion.div className="container pb-5" variants={item}>
+          <button className={buttonCss}>{buttonTitle}</button>
+          <motion.p className="pt-4" variants={item}>
+            {formLabel}
+          </motion.p>
+        </motion.div>
+      </motion.form>
+    </motion.div>
   );
 }
 

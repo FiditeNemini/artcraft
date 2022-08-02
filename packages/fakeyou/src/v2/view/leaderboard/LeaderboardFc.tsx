@@ -12,10 +12,9 @@ import {
   LeaderboardLookupError,
 } from "../../api/misc/GetLeaderboard";
 import { DiscordLink2 } from "@storyteller/components/src/elements/DiscordLink2";
-import { distance, delay, duration } from "../../../data/animation";
 import { USE_REFRESH } from "../../../Refresh";
-
-const Fade = require("react-reveal/Fade");
+import { motion } from "framer-motion";
+import { container, item, panel } from "../../../data/animation";
 
 interface Props {
   sessionWrapper: SessionWrapper;
@@ -144,50 +143,44 @@ function LeaderboardFc(props: Props) {
   }
 
   return (
-    <div>
+    <motion.div initial="hidden" animate="visible" variants={container}>
       <div className="container py-5 px-md-4 px-lg-5 px-xl-3">
-        <Fade cascade bottom distance={distance} duration={duration}>
-          <div className="d-flex flex-column">
-            <h1 className="display-5 fw-bold">Leaderboard</h1>
-            <h3 className="mb-4">Our most frequent contributors!</h3>
-            <p className="lead">
-              Want to be on the leaderboard?{" "}
-              <DiscordLink2>Join our Discord</DiscordLink2> and learn more!
-            </p>
-          </div>
-        </Fade>
+        <div className="d-flex flex-column">
+          <motion.h1 className="display-5 fw-bold" variants={item}>
+            Leaderboard
+          </motion.h1>
+          <motion.h3 className="mb-4" variants={item}>
+            Our most frequent contributors!
+          </motion.h3>
+          <motion.p className="lead" variants={item}>
+            Want to be on the leaderboard?{" "}
+            <DiscordLink2>Join our Discord</DiscordLink2> and learn more!
+          </motion.p>
+        </div>
       </div>
 
-      <Fade
-        cascade
-        bottom
-        distance={distance}
-        duration={duration}
-        delay={delay}
-      >
-        <div className="container-panel pt-5 pb-5">
-          <div className="panel p-3 p-lg-4">
-            <h2 className="panel-title fw-bold">TTS Models Uploaded</h2>
-            <div className="py-6">
-              <table className="table">
-                <tbody>{ttsRows}</tbody>
-              </table>
-            </div>
+      <motion.div className="container-panel pt-5 pb-5" variants={panel}>
+        <div className="panel p-3 p-lg-4">
+          <h2 className="panel-title fw-bold">TTS Models Uploaded</h2>
+          <div className="py-6">
+            <table className="table">
+              <tbody>{ttsRows}</tbody>
+            </table>
           </div>
         </div>
+      </motion.div>
 
-        <div className="container-panel pt-3 pb-5">
-          <div className="panel p-3 p-lg-4">
-            <h2 className="panel-title fw-bold">W2L Templates Uploaded</h2>
-            <div className="py-6">
-              <table className="table">
-                <tbody>{w2lRows}</tbody>
-              </table>
-            </div>
+      <motion.div className="container-panel pt-3 pb-5" variants={panel}>
+        <div className="panel p-3 p-lg-4">
+          <h2 className="panel-title fw-bold">W2L Templates Uploaded</h2>
+          <div className="py-6">
+            <table className="table">
+              <tbody>{w2lRows}</tbody>
+            </table>
           </div>
         </div>
-      </Fade>
-    </div>
+      </motion.div>
+    </motion.div>
   );
 }
 

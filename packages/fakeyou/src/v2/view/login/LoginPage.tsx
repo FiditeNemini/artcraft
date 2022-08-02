@@ -9,10 +9,9 @@ import {
 } from "@storyteller/components/src/api/session/CreateSession";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faUser, faKey } from "@fortawesome/free-solid-svg-icons";
-import { distance, duration } from "../../../data/animation";
+import { motion } from "framer-motion";
+import { container, item, panel } from "../../../data/animation";
 import { USE_REFRESH } from "../../../Refresh";
-
-const Fade = require("react-reveal/Fade");
 
 interface Props {
   sessionWrapper: SessionWrapper;
@@ -141,70 +140,68 @@ function LoginPage(props: Props) {
   }
 
   return (
-    <div>
-      <Fade bottom duration={duration} distance={distance}>
-        <div className="container-panel pb-5 pt-lg-5 my-lg-5 login-panel">
-          <div className="panel p-3 p-lg-4 load-hidden mt-5 mt-lg-0 px-md-4">
-            <h1 className="panel-title fw-bold">Login</h1>
-            <div className="py-6">
-              {errorWarning}
+    <motion.div initial="hidden" animate="visible" variants={container}>
+      <motion.div
+        className="container-panel pb-5 pt-lg-5 my-lg-5 login-panel"
+        variants={panel}
+      >
+        <div className="panel p-3 p-lg-4 load-hidden mt-5 mt-lg-0 px-md-4">
+          <h1 className="panel-title fw-bold">Login</h1>
+          <div className="py-6">
+            {errorWarning}
 
-              <form onSubmit={handleFormSubmit}>
-                <div className="d-flex flex-column gap-4">
-                  <div>
-                    <label className="sub-title">Username or Email</label>
-                    <div className="form-group input-icon">
-                      <span className="form-control-feedback">
-                        <FontAwesomeIcon icon={faUser} />
-                      </span>
-                      <input
-                        className="form-control"
-                        type="text"
-                        placeholder="Username or Email"
-                        value={usernameOrEmail}
-                        onChange={handleUsernameOrEmailChange}
-                      />
-                    </div>
-                    {/*<p className="help"></p>*/}
+            <form onSubmit={handleFormSubmit}>
+              <div className="d-flex flex-column gap-4">
+                <div>
+                  <label className="sub-title">Username or Email</label>
+                  <div className="form-group input-icon">
+                    <span className="form-control-feedback">
+                      <FontAwesomeIcon icon={faUser} />
+                    </span>
+                    <input
+                      className="form-control"
+                      type="text"
+                      placeholder="Username or Email"
+                      value={usernameOrEmail}
+                      onChange={handleUsernameOrEmailChange}
+                    />
                   </div>
-
-                  <div>
-                    <label className="sub-title">Password</label>
-                    <div className="form-group input-icon">
-                      <span className="form-control-feedback">
-                        <FontAwesomeIcon icon={faKey} />
-                      </span>
-                      <input
-                        className="form-control"
-                        type="password"
-                        placeholder="Password"
-                        value={password}
-                        onChange={handlePasswordChange}
-                      />
-                    </div>
-                    {/*<p className="help"></p>*/}
-                  </div>
-
-                  <button className="btn btn-primary btn-lg w-100 mt-2">
-                    <FontAwesomeIcon icon={faUser} className="me-2" />
-                    Login
-                  </button>
-                  <p>
-                    Don’t have an account? &nbsp;
-                    <Link
-                      to={FrontendUrlConfig.signupPage()}
-                      className="text-link"
-                    >
-                      Create an account now.
-                    </Link>
-                  </p>
+                  {/*<p className="help"></p>*/}
                 </div>
-              </form>
-            </div>
+
+                <div>
+                  <label className="sub-title">Password</label>
+                  <div className="form-group input-icon">
+                    <span className="form-control-feedback">
+                      <FontAwesomeIcon icon={faKey} />
+                    </span>
+                    <input
+                      className="form-control"
+                      type="password"
+                      placeholder="Password"
+                      value={password}
+                      onChange={handlePasswordChange}
+                    />
+                  </div>
+                  {/*<p className="help"></p>*/}
+                </div>
+
+                <button className="btn btn-primary w-100 mt-2">Login</button>
+                <p>
+                  Don’t have an account? &nbsp;
+                  <Link
+                    to={FrontendUrlConfig.signupPage()}
+                    className="text-link"
+                  >
+                    Create an account now.
+                  </Link>
+                </p>
+              </div>
+            </form>
           </div>
         </div>
-      </Fade>
-    </div>
+      </motion.div>
+    </motion.div>
   );
 }
 

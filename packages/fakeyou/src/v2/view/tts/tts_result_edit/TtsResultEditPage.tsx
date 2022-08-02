@@ -5,9 +5,8 @@ import { useParams, Link, useHistory } from "react-router-dom";
 import { FrontendUrlConfig } from "../../../../common/FrontendUrlConfig";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
-import { distance, delay, delay2, duration } from "../../../../data/animation";
-
-const Fade = require("react-reveal/Fade");
+import { motion } from "framer-motion";
+import { container, item, panel } from "../../../../data/animation";
 
 const DEFAULT_VISIBILITY = "public";
 
@@ -151,56 +150,46 @@ function TtsResultEditPage(props: Props) {
     );
 
   return (
-    <div>
-      <Fade cascade bottom duration={duration} distance={distance}>
-        <div className="container pt-5 pb-4 px-lg-5 px-xl-3">
-          <h1 className="display-5 fw-bold mb-3">Edit Result Visibility</h1>
-          <div>
-            <Link to={resultLink}>&lt; Back to result</Link>
-          </div>
-        </div>
-      </Fade>
+    <motion.div initial="hidden" animate="visible" variants={container}>
+      <div className="container pt-5 pb-4 px-lg-5 px-xl-3">
+        <motion.h1 className="display-5 fw-bold mb-3" variants={item}>
+          Edit Result Visibility
+        </motion.h1>
+        <motion.div variants={item}>
+          <Link to={resultLink}>&lt; Back to result</Link>
+        </motion.div>
+      </div>
 
-      <form onSubmit={handleFormSubmit}>
+      <motion.form onSubmit={handleFormSubmit} variants={panel}>
         <fieldset disabled={isDisabled}>
           <div className="container-panel pt-4 pb-5">
-            <Fade bottom duration={duration} distance={distance} delay={delay}>
-              <div className="panel p-3 py-4 p-lg-4">
-                <div>
-                  <label className="sub-title">
-                    Result Visibility&nbsp;{visibilityIcon}
-                  </label>
-                  <div className="control select">
-                    <select
-                      className="form-select"
-                      name="creator_set_visibility"
-                      onChange={handleVisibilityChange}
-                      value={visibility}
-                    >
-                      <option value="public">
-                        Public (visible from your profile)
-                      </option>
-                      <option value="hidden">Unlisted (shareable URLs)</option>
-                    </select>
-                  </div>
+            <div className="panel p-3 py-4 p-lg-4">
+              <div>
+                <label className="sub-title">
+                  Result Visibility&nbsp;{visibilityIcon}
+                </label>
+                <div className="control select">
+                  <select
+                    className="form-select"
+                    name="creator_set_visibility"
+                    onChange={handleVisibilityChange}
+                    value={visibility}
+                  >
+                    <option value="public">
+                      Public (visible from your profile)
+                    </option>
+                    <option value="hidden">Unlisted (shareable URLs)</option>
+                  </select>
                 </div>
               </div>
-            </Fade>
-          </div>
-          <Fade
-            cascade
-            bottom
-            duration={duration}
-            distance={distance}
-            delay={delay2}
-          >
-            <div className="container">
-              <button className="btn btn-primary w-100 mb-5">Update</button>
             </div>
-          </Fade>
+          </div>
+          <motion.div className="container" variants={item}>
+            <button className="btn btn-primary w-100 mb-5">Update</button>
+          </motion.div>
         </fieldset>
-      </form>
-    </div>
+      </motion.form>
+    </motion.div>
   );
 }
 

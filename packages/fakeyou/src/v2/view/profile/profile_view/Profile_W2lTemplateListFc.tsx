@@ -167,10 +167,12 @@ function ProfileW2lTemplateListFc(props: Props) {
     w2lTemplates.length === 0 || end > w2lTemplates.length;
 
   return (
-    <Fade bottom cascade duration={duration} distance={distance}>
-      <div className="row gy-3 gx-3 gx-lg-4 gy-lg-4 w2l-ani">
-        {allRowsOfTemplateElements.map((el) => el)}
-      </div>
+    <div>
+      <Fade bottom cascade duration={duration} distance={distance}>
+        <div className="row gy-3 gx-3 gx-lg-4 gy-lg-4 w2l-ani">
+          {allRowsOfTemplateElements.map((el) => el)}
+        </div>
+      </Fade>
       <div>
         <div className="d-flex w-100 gap-3 mt-4">
           <button
@@ -192,7 +194,7 @@ function ProfileW2lTemplateListFc(props: Props) {
           </button>
         </div>
       </div>
-    </Fade>
+    </div>
   );
 }
 

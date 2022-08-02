@@ -8,10 +8,9 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faUser, faEnvelope, faKey } from "@fortawesome/free-solid-svg-icons";
 import { Link } from "react-router-dom";
 import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
-import { distance, duration } from "../../../data/animation";
 import { USE_REFRESH } from "../../../Refresh";
-
-const Fade = require("react-reveal/Fade");
+import { motion } from "framer-motion";
+import { container, item, panel } from "../../../data/animation";
 
 enum FieldTriState {
   EMPTY_FALSE,
@@ -386,101 +385,101 @@ function SignupPage(props: Props) {
   }
 
   return (
-    <div>
-      <Fade bottom duration={duration} distance={distance}>
-        <div className="container-panel pb-5 pt-lg-5 my-lg-5 login-panel">
-          <div className="panel p-3 p-lg-4 load-hidden mt-5 mt-lg-0 px-md-4">
-            <h1 className="panel-title fw-bold ">Sign Up</h1>
-            <div className="py-6">
-              <form onSubmit={handleFormSubmit}>
-                <div className="d-flex flex-column gap-4">
-                  <div>
-                    <label className="sub-title">Username</label>
-                    <div className="form-group input-icon">
-                      <span className="form-control-feedback">
-                        <FontAwesomeIcon icon={faUser} />
-                      </span>
-                      <input
-                        className={usernameInputClass}
-                        type="text"
-                        placeholder="Username"
-                        value={username}
-                        onChange={handleUsernameChange}
-                      />
-                    </div>
-                    <p className={usernameHelpClass}>{usernameInvalidReason}</p>
+    <motion.div initial="hidden" animate="visible" variants={container}>
+      <motion.div
+        className="container-panel pb-5 pt-lg-5 my-lg-5 login-panel"
+        variants={panel}
+      >
+        <div className="panel p-3 p-lg-4 load-hidden mt-5 mt-lg-0 px-md-4">
+          <h1 className="panel-title fw-bold ">Sign Up</h1>
+          <div className="py-6">
+            <form onSubmit={handleFormSubmit}>
+              <div className="d-flex flex-column gap-4">
+                <div>
+                  <label className="sub-title">Username</label>
+                  <div className="form-group input-icon">
+                    <span className="form-control-feedback">
+                      <FontAwesomeIcon icon={faUser} />
+                    </span>
+                    <input
+                      className={usernameInputClass}
+                      type="text"
+                      placeholder="Username"
+                      value={username}
+                      onChange={handleUsernameChange}
+                    />
                   </div>
-                  <div>
-                    <label className="sub-title">Email</label>
-                    <div className="form-group input-icon">
-                      <span className="form-control-feedback">
-                        <FontAwesomeIcon icon={faEnvelope} />
-                      </span>
-                      <input
-                        className={emailInputClass}
-                        type="email"
-                        placeholder="Email"
-                        value={email}
-                        onChange={handleEmailChange}
-                      />
-                    </div>
-                    <p className={emailHelpClass}>{emailInvalidReason}</p>
+                  <p className={usernameHelpClass}>{usernameInvalidReason}</p>
+                </div>
+                <div>
+                  <label className="sub-title">Email</label>
+                  <div className="form-group input-icon">
+                    <span className="form-control-feedback">
+                      <FontAwesomeIcon icon={faEnvelope} />
+                    </span>
+                    <input
+                      className={emailInputClass}
+                      type="email"
+                      placeholder="Email"
+                      value={email}
+                      onChange={handleEmailChange}
+                    />
                   </div>
-                  <div>
-                    <label className="sub-title">Password</label>
-                    <div className="form-group input-icon">
-                      <span className="form-control-feedback">
-                        <FontAwesomeIcon icon={faKey} />
-                      </span>
-                      <input
-                        className={passwordInputClass}
-                        type="password"
-                        placeholder="Password"
-                        value={password}
-                        onChange={handlePasswordChange}
-                      />
-                    </div>
-                    <p className={passwordHelpClass}>{passwordInvalidReason}</p>
+                  <p className={emailHelpClass}>{emailInvalidReason}</p>
+                </div>
+                <div>
+                  <label className="sub-title">Password</label>
+                  <div className="form-group input-icon">
+                    <span className="form-control-feedback">
+                      <FontAwesomeIcon icon={faKey} />
+                    </span>
+                    <input
+                      className={passwordInputClass}
+                      type="password"
+                      placeholder="Password"
+                      value={password}
+                      onChange={handlePasswordChange}
+                    />
                   </div>
-                  <div>
-                    <label className="sub-title">Password Confirmation</label>
-                    <div className="form-group input-icon">
-                      <span className="form-control-feedback">
-                        <FontAwesomeIcon icon={faKey} />
-                      </span>
-                      <input
-                        className={passwordConfirmationInputClass}
-                        type="password"
-                        placeholder="Password confirmation"
-                        value={passwordConfirmation}
-                        onChange={handlePasswordConfirmationChange}
-                      />
-                    </div>
-                    <p className={passwordConfirmationHelpClass}>
-                      {passwordConfirmationInvalidReason}
-                    </p>
+                  <p className={passwordHelpClass}>{passwordInvalidReason}</p>
+                </div>
+                <div>
+                  <label className="sub-title">Password Confirmation</label>
+                  <div className="form-group input-icon">
+                    <span className="form-control-feedback">
+                      <FontAwesomeIcon icon={faKey} />
+                    </span>
+                    <input
+                      className={passwordConfirmationInputClass}
+                      type="password"
+                      placeholder="Password confirmation"
+                      value={passwordConfirmation}
+                      onChange={handlePasswordConfirmationChange}
+                    />
                   </div>
-                  <div className="alert alert-warning mb-0">
-                    <strong>Remember your password!</strong> We don't have
-                    password reset currently, and it'll be a few more weeks
-                    before it's added (there are more important features to work
-                    on). If you lose your password, please let us know in
-                    Discord.
-                  </div>
-                  <button className="btn btn-primary btn-lg w-100 mt-2">
-                    Sign up
-                  </button>
-                  <p>
-                    Already have an account?{" "}
-                    <Link to="/login">Log in instead.</Link>
+                  <p className={passwordConfirmationHelpClass}>
+                    {passwordConfirmationInvalidReason}
                   </p>
                 </div>
-              </form>
-            </div>
+                <div className="alert alert-warning mb-0">
+                  <strong>Remember your password!</strong> We don't have
+                  password reset currently, and it'll be a few more weeks before
+                  it's added (there are more important features to work on). If
+                  you lose your password, please let us know in Discord.
+                </div>
+                <button className="btn btn-primary btn-lg w-100 mt-2">
+                  Sign up
+                </button>
+                <p>
+                  Already have an account?{" "}
+                  <Link to="/login">Log in instead.</Link>
+                </p>
+              </div>
+            </form>
           </div>
         </div>
-      </Fade>
-    </div>
+      </motion.div>
+    </motion.div>
   );
 }
 

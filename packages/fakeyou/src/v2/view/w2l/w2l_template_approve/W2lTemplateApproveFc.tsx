@@ -10,8 +10,8 @@ import {
 } from "../../../api/w2l/GetW2lTemplate";
 import { GetW2lTemplateUseCount } from "../../../api/w2l/GetW2lTemplateUseCount";
 import { BackLink } from "../../_common/BackLink";
-import { distance, delay, duration } from "../../../../data/animation";
-const Fade = require("react-reveal/Fade");
+import { motion } from "framer-motion";
+import { container, item, panel } from "../../../../data/animation";
 
 const DEFAULT_APPROVED_STATE = true;
 
@@ -118,88 +118,80 @@ function W2lTemplateApproveFc(props: Props) {
   }
 
   return (
-    <div>
-      <Fade bottom cascade duration={duration} distance={distance}>
-        <div className="container pt-5 pb-4 px-lg-5 px-xl-3">
-          <div className="d-flex flex-column">
-            <h1 className="display-5 fw-bold">{h1Title}</h1>
-          </div>
-          <div className="pt-3">
-            <BackLink link={templateLink} text="Back to template" />
-          </div>
+    <motion.div initial="hidden" animate="visible" variants={container}>
+      <div className="container pt-5 pb-4 px-lg-5 px-xl-3">
+        <div className="d-flex flex-column">
+          <motion.h1 className="display-5 fw-bold" variants={item}>
+            {h1Title}
+          </motion.h1>
         </div>
-      </Fade>
+        <motion.div className="pt-3" variants={item}>
+          <BackLink link={templateLink} text="Back to template" />
+        </motion.div>
+      </div>
 
-      <Fade
-        bottom
-        cascade
-        duration={duration}
-        delay={delay}
-        distance={distance}
-      >
-        <div className="container-panel pt-4 pb-5">
+      <motion.div className="container-panel pt-4 pb-5" variants={panel}>
+        <div className="panel p-3 py-4 p-lg-4">
+          <table className="table">
+            <thead>
+              <tr>
+                <th>
+                  <abbr title="Detail">Detail</abbr>
+                </th>
+                <th>
+                  <abbr title="Value">Value</abbr>
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <th>Creator</th>
+                <td>{creatorLink}</td>
+              </tr>
+              <tr>
+                <th>Use Count</th>
+                <td>{humanUseCount}</td>
+              </tr>
+              <tr>
+                <th>Title</th>
+                <td>{w2lTemplate?.title}</td>
+              </tr>
+              <tr>
+                <th>Upload Date (UTC)</th>
+                <td>{w2lTemplate?.created_at}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </motion.div>
+
+      <motion.form onSubmit={handleApproveFormSubmit} variants={panel}>
+        <div className="container-panel pt-1 pb-5">
           <div className="panel p-3 py-4 p-lg-4">
-            <table className="table">
-              <thead>
-                <tr>
-                  <th>
-                    <abbr title="Detail">Detail</abbr>
-                  </th>
-                  <th>
-                    <abbr title="Value">Value</abbr>
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <th>Creator</th>
-                  <td>{creatorLink}</td>
-                </tr>
-                <tr>
-                  <th>Use Count</th>
-                  <td>{humanUseCount}</td>
-                </tr>
-                <tr>
-                  <th>Title</th>
-                  <td>{w2lTemplate?.title}</td>
-                </tr>
-                <tr>
-                  <th>Upload Date (UTC)</th>
-                  <td>{w2lTemplate?.created_at}</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
+            <label className="sub-title">
+              Mod Approval (sets public list visibility)
+            </label>
 
-        <form onSubmit={handleApproveFormSubmit}>
-          <div className="container-panel pt-1 pb-5">
-            <div className="panel p-3 py-4 p-lg-4">
-              <label className="sub-title">
-                Mod Approval (sets public list visibility)
-              </label>
-
-              <div>
-                <div className="form-group">
-                  <select
-                    name="approve"
-                    value={approvedFormDefaultState}
-                    onChange={handleModApprovalChange}
-                    className="form-select"
-                  >
-                    <option value="true">Approve</option>
-                    <option value="false">Disapprove</option>
-                  </select>
-                </div>
+            <div>
+              <div className="form-group">
+                <select
+                  name="approve"
+                  value={approvedFormDefaultState}
+                  onChange={handleModApprovalChange}
+                  className="form-select"
+                >
+                  <option value="true">Approve</option>
+                  <option value="false">Disapprove</option>
+                </select>
               </div>
             </div>
           </div>
-          <div className="container pb-5">
-            <button className="btn btn-primary w-100">Moderate</button>
-          </div>
-        </form>
-      </Fade>
-    </div>
+        </div>
+        <motion.div className="container pb-5" variants={item}>
+          <button className="btn btn-primary w-100">Moderate</button>
+        </motion.div>
+      </motion.form>
+    </motion.div>
   );
 }
 
