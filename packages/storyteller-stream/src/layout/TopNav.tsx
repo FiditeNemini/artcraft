@@ -1,107 +1,85 @@
-import { SessionWrapper } from '@storyteller/components/src/session/SessionWrapper';
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
-import { TopNavSessionButton } from './TopNavSessionButton'
+import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
+import React, { useState } from "react";
+import { Link } from "react-router-dom";
+import { TopNavSessionButton } from "./TopNavSessionButton";
 
 interface Props {
-  sessionWrapper: SessionWrapper,
-  querySessionCallback: () => void,
+  sessionWrapper: SessionWrapper;
+  querySessionCallback: () => void;
 }
 
 function TopNav(props: Props) {
-
-  const [mobileHamburgerIsActive, setMobileHamburgerIsActive] = useState<boolean>(false);
-
-  const toggleHamburger = () => { 
-    setMobileHamburgerIsActive(!mobileHamburgerIsActive);
-  }
-
-  const closeHamburger = () => { 
-    // TODO: This is an ergonomic hack. 
-    // The hamburger ideally should close whenever it is no longer active.
-    setMobileHamburgerIsActive(false);
-  }
-
-  const navbarClasses = mobileHamburgerIsActive ? "navbar-menu is-active" : "navbar-menu";
-  const navbarBurgerClasses = mobileHamburgerIsActive ? "navbar-burger is-active" : "navbar-burger";
-
   return (
     <>
-      <nav className="navbar is-transparent padding-bottom-1em">
-        <div className="navbar-brand">
-          <Link className="navbar-item" to="/">
-            <img src="/storyteller-nav-logo-mascot-pink.png" alt="Storyteller: Stream tech" />
-          </Link>
-          <div className={navbarBurgerClasses} data-target="navbarExampleTransparentExample" onClick={() => toggleHamburger()}>
-            <span></span>
-            <span></span>
-            <span></span>
-          </div>
-        </div>
+      <nav
+        className="navbar navbar-expand-lg navbar-dark navbar-fixed navbar-main"
+        aria-label="Offcanvas navbar large"
+      >
+        <div className="container">
+          <a className="navbar-brand me-5 pr-8" href="#">
+            <img
+              src="assets/storyteller-logo.png"
+              alt="Fake You Logo"
+              height="34"
+            />
+          </a>
+          <button
+            className="navbar-toggler p-0 border-0"
+            type="button"
+            data-bs-toggle="offcanvas"
+            data-bs-target="#offcanvasNavbar2"
+            aria-controls="offcanvasNavbar2"
+          >
+            <span className="navbar-toggler-icon"></span>
+          </button>
+          <div
+            className="offcanvas offcanvas-end text-white nav-bg-dark"
+            id="offcanvasNavbar2"
+            aria-labelledby="offcanvasNavbar2Label"
+          >
+            <div className="offcanvas-header">
+              <a className="navbar-brand me-5 pr-8" href="index.html">
+                <img src="assets/storyteller-logo.png" alt="" height="34" />
+              </a>
+              <button
+                type="button"
+                className="btn-close btn-close-white"
+                data-bs-dismiss="offcanvas"
+                aria-label="Close"
+              ></button>
+            </div>
+            <div className="offcanvas-body">
+              <ul className="navbar-nav justify-content-start flex-grow-1 align-items-lg-center">
+                <li className="nav-item">
+                  <a
+                    className="nav-link"
+                    aria-current="page"
+                    href="tts-configs.html"
+                  >
+                    TTS Configs
+                  </a>
+                </li>
 
-        <div id="navbarExampleTransparentExample" className={navbarClasses}>
-          <div className="navbar-start">
-
-            <Link to="/tts_configs"
-              className="navbar-item"
-              onClick={() => closeHamburger()}
-              >TTS Configs</Link>
-
-            <Link to="/obs_configs"
-              className="navbar-item"
-              onClick={() => closeHamburger()}
-              >OBS Configs</Link>
-
-            {/* 
-            <div className="navbar-item has-dropdown is-hoverable">
-              <Link to="/"
-                className="navbar-link"
-                onClick={() => closeHamburger()}
-                >Community</Link>
-
-              <div className="navbar-dropdown is-boxed">
-                {/* NB: There's an "is-active" class that looks nice. * /}
-
-                <Link to="/contribute"
-                  className="navbar-item"
-                  onClick={() => closeHamburger()}
-                  ><FontAwesomeIcon icon={faUpload} />&nbsp;&nbsp;Contribute / Upload</Link>
-
+                <li className="nav-item">
+                  <a className="nav-link" aria-current="page" href="#">
+                    OBS Configs
+                  </a>
+                </li>
+              </ul>
+              <div className="d-grid gap-2 d-flex justify-content-start align-items-center pt-4 ps-3 pt-lg-0 ps-lg-0">
+                <a className="nav-login me-3" href="">
+                  Login
+                </a>
+                <button type="button" className="btn btn-primary">
+                  Sign up
+                </button>
               </div>
             </div>
-            */}
           </div>
-
-
-          <div className="navbar-end">
-            <div className="navbar-item">
-              <div className="field is-grouped">
-                <p className="control">
-                  <TopNavSessionButton
-                    sessionWrapper={props.sessionWrapper}
-                    enableAlpha={true}
-                    querySessionAction={props.querySessionCallback}
-                    closeHamburgerAction={() => closeHamburger()}
-                    />
-                </p>
-              </div>
-            </div>
-          </div>
-          {/*<div className="navbar-end">
-            <div className="navbar-item">
-              <div className="field is-grouped">
-                <p className="control">
-                  TODO
-                </p>
-              </div>
-            </div>
-          </div>*/}
         </div>
       </nav>
     </>
-  )
-
-
+  );
 }
 
-export { TopNav }
+export { TopNav };
