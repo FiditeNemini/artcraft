@@ -16,13 +16,13 @@ function TopNav(props: Props) {
         aria-label="Offcanvas navbar large"
       >
         <div className="container">
-          <a className="navbar-brand me-5 pr-8" href="#">
+          <Link className="navbar-brand me-5 pr-8" to="/">
             <img
-              src="assets/storyteller-logo.png"
+              src="/assets/storyteller-logo.png"
               alt="Fake You Logo"
               height="34"
             />
-          </a>
+          </Link>
           <button
             className="navbar-toggler p-0 border-0"
             type="button"
@@ -39,7 +39,7 @@ function TopNav(props: Props) {
           >
             <div className="offcanvas-header">
               <a className="navbar-brand me-5 pr-8" href="index.html">
-                <img src="assets/storyteller-logo.png" alt="" height="34" />
+                <img src="/assets/storyteller-logo.png" alt="" height="34" />
               </a>
               <button
                 type="button"
@@ -50,7 +50,7 @@ function TopNav(props: Props) {
             </div>
             <div className="offcanvas-body">
               <ul className="navbar-nav justify-content-start flex-grow-1 align-items-lg-center">
-                <li className="nav-item">
+                {/* <li className="nav-item">
                   <a
                     className="nav-link"
                     aria-current="page"
@@ -64,7 +64,7 @@ function TopNav(props: Props) {
                   <a className="nav-link" aria-current="page" href="#">
                     OBS Configs
                   </a>
-                </li>
+                </li> */}
               </ul>
               <div className="d-grid gap-2 d-flex justify-content-start align-items-center pt-4 ps-3 pt-lg-0 ps-lg-0">
                 <a className="nav-login me-3" href="">
