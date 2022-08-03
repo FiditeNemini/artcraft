@@ -27,7 +27,7 @@ mod client {
         Ok((endpoint, client))
     }
 
-    #[tokio::test(threaded_scheduler)]
+    #[tokio::test(flavor = "multi_thread")]
     async fn empty() -> Result<()> {
         let (mut endpoint, client) = setup()?;
 
@@ -51,7 +51,7 @@ mod client {
         Ok(())
     }
 
-    #[tokio::test(threaded_scheduler)]
+    #[tokio::test(flavor = "multi_thread")]
     async fn simple() -> Result<()> {
         let (mut endpoint, client) = setup()?;
 
@@ -86,7 +86,7 @@ mod client {
         Ok(())
     }
 
-    #[tokio::test(threaded_scheduler)]
+    #[tokio::test(flavor = "multi_thread")]
     async fn all_api_attrs() -> Result<()> {
         let (mut endpoint, client) = setup()?;
 
@@ -129,7 +129,7 @@ mod client {
         Ok(())
     }
 
-    #[tokio::test(threaded_scheduler)]
+    #[tokio::test(flavor = "multi_thread")]
     async fn custom_attrs() -> Result<()> {
         let (mut endpoint, client) = setup()?;
 
@@ -176,7 +176,7 @@ mod client {
         Ok(())
     }
 
-    #[tokio::test(threaded_scheduler)]
+    #[tokio::test(flavor = "multi_thread")]
     async fn two_spans() -> Result<()> {
         let (mut endpoint, client) = setup()?;
 

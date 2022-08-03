@@ -344,7 +344,7 @@ pub struct Client {
     user_agent: String,
     backoff_sequence: Vec<Duration>,
     endpoint_traces: Uri,
-    client: hyper::Client<HttpsConnector<HttpConnector>>,
+    client: hyper::client::Client<HttpsConnector<HttpConnector>>,
 }
 
 impl Client {
@@ -359,7 +359,7 @@ impl Client {
             endpoint_traces: builder.endpoint_traces.uri(builder.use_tls)?,
             user_agent: user_agent,
             backoff_sequence: backoff_seq,
-            client: hyper::Client::builder().build::<_, hyper::Body>(https),
+            client: hyper::client::Client::builder().build::<_, hyper::Body>(https),
         })
     }
 

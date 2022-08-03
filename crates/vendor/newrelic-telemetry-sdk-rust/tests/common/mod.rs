@@ -56,8 +56,8 @@ impl From<std::str::Utf8Error> for Error {
     }
 }
 
-impl From<hyper::error::Error> for Error {
-    fn from(error: hyper::error::Error) -> Self {
+impl From<hyper::Error> for Error {
+    fn from(error: hyper::Error) -> Self {
         Error::new(&error.to_string())
     }
 }
@@ -102,8 +102,7 @@ impl Endpoint {
             }
         });
 
-        let mut runtime = Builder::new()
-            .threaded_scheduler()
+        let mut runtime = Builder::new_multi_thread()
             .enable_all()
             .build()
             .unwrap();
