@@ -1,0 +1,212 @@
+import React, { useCallback, useEffect, useState } from 'react';
+import { SessionWrapper } from '@storyteller/components/src/session/SessionWrapper';
+import { ListTwitchEventRules, ListTwitchEventRulesIsError, ListTwitchEventRulesIsOk, TwitchEventRule } from '@storyteller/components/src/api/storyteller/twitch_event_rules/ListTwitchEventRules';
+import { TwitchEventRuleElement } from './rule_cards/TwitchEventRuleElement';
+import { TwitchEventCategory } from '@storyteller/components/src/api/storyteller/twitch_event_rules/shared/TwitchEventCategory';
+import { DiscordLink } from '@storyteller/components/src/elements/DiscordLink';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faBox, faDonate, faFilm, faGem, faHeart, faLightbulb, faMeteor, faPlus, faSort, faTerminal, faUsers } from '@fortawesome/free-solid-svg-icons';
+import { TtsModelListItem } from '@storyteller/components/src/api/tts/ListTtsModels';
+import { Link } from 'react-router-dom';
+
+interface Props {
+  sessionWrapper: SessionWrapper,
+  allTtsModelsByToken: Map<string, TtsModelListItem>,
+}
+
+function TtsConfigsIndexPage(props: Props) {
+  const [twitchEventRules, setTwitchEventRules] = useState<TwitchEventRule[]>([]);
+
+  const listTwitchEventRules = useCallback(async () => {
+    const response = await ListTwitchEventRules();
+
+    if (ListTwitchEventRulesIsOk(response)) {
+      setTwitchEventRules(response.twitch_event_rules);
+    } else if (ListTwitchEventRulesIsError(response))  {
+      // TODO
+    }
+  }, []);
+
+  useEffect(() => {
+    listTwitchEventRules();
+  }, [listTwitchEventRules]);
+
+  if (!props.sessionWrapper.isLoggedIn()) {
+    return <h1>Must Log In</h1>;
+  }
+
+  const cheerEventRules = twitchEventRules.filter(rule => rule.event_category === TwitchEventCategory.Bits);
+
+  const channelPointsEventRules = twitchEventRules.filter(rule => rule.event_category === TwitchEventCategory.ChannelPoints);
+
+  return (
+    <>
+
+      <section className="hero is-small">
+        <div className="hero-body">
+
+          <div className="columns is-vcentered">
+
+            <div className="column is-one-third">
+              <div className="mascot">
+                <img src="/mascot/kitsune_pose8_black_2000.webp" alt="Storyteller's mascot!" />
+              </div>
+            </div>
+
+            <div className="column">
+              <p className="title is-1">
+                Stream Setup
+              </p>
+              <p className="subtitle is-3">
+                Configure TTS (and soon much more!)
+              </p>
+            </div>
+
+          </div>
+        </div>
+      </section>
+
+      <div className="content">
+        <article className="message is-dark">
+          <div className="message-body">
+          You can create rules for matching <em>different categories of events</em>: cheers (bits), 
+          channel point rewards, etc. 
+          
+          When an event occurs in your stream, we compare it against the rules in its 
+          category. <strong>The first matched rule</strong> (from the top) is selected, and the action 
+          that it specifies is taken. For now this is limited to FakeYou text to speech, but we'll be 
+          adding lots of new capabilities soon.
+          </div>
+        </article>
+        <h1 className="title is-3"> <FontAwesomeIcon icon={faGem} /> Bits / Cheers </h1>
+        <h2 className="subtitle is-5">
+          These settings are best for small and medium-sized channels.
+        </h2>
+        <p>
+        </p>
+        {cheerEventRules.map(rule => {
+          return <TwitchEventRuleElement 
+            key={rule.token}
+            rule={rule} 
+            allTtsModelsByToken={props.allTtsModelsByToken}
+            />
+        })}
+      </div>
+
+      <Link
+        to="/tts_configs/create/bits" 
+        className="button is-large is-fullwidth is-primary"
+        >
+        <FontAwesomeIcon icon={faPlus} />&nbsp;Create New Bits / Cheer Rule
+      </Link>
+
+      <br />
+
+      <Link
+        to="/tts_configs/reorder/bits" 
+        className="button is-large is-fullwidth is-primary is-outlined"
+        >
+        <FontAwesomeIcon icon={faSort} />&nbsp;Reorder Rules
+      </Link>
+
+      <br />
+      <br />
+
+      <div className="content">
+        <h1 className="title is-3"> <FontAwesomeIcon icon={faBox} /> Channel Points / Rewards </h1>
+        <h2 className="subtitle is-5">
+          These settings are best for small channels.
+        </h2>
+        {channelPointsEventRules.map(rule => {
+          return <TwitchEventRuleElement 
+            key={rule.token}
+            rule={rule} 
+            allTtsModelsByToken={props.allTtsModelsByToken}
+            />
+        })}
+      </div>
+
+      <Link
+        to="/tts_configs/create/channel_points" 
+        className="button is-large is-fullwidth is-primary"
+        >
+        <FontAwesomeIcon icon={faPlus} />&nbsp;Create Channel Points Rule
+      </Link>
+
+      <br />
+      
+      <Link
+        to="/tts_configs/reorder/channel_points" 
+        className="button is-large is-fullwidth is-primary is-outlined"
+        >
+        <FontAwesomeIcon icon={faSort} />&nbsp;Reorder Rules
+      </Link>
+
+      <br />
+      <br />
+
+      <div className="content">
+        <h1 className="title is-1"> <FontAwesomeIcon icon={faMeteor} /> Coming Soon&hellip;</h1>
+      </div>
+      <br />
+
+      <div className="content">
+        <h1 className="title is-4"> <FontAwesomeIcon icon={faHeart} /> Subs, Resubs, and Gifted Subs </h1>
+        <h2 className="subtitle is-6">
+          These settings are great for all channel sizes.
+        </h2>
+      </div>
+      <br />
+
+      <div className="content">
+        <h1 className="title is-4"> <FontAwesomeIcon icon={faDonate} /> Donation Services (Streamlabs, StreamElements, etc.) </h1>
+        <h2 className="subtitle is-6">
+          These settings are great for large channels, but work for channels of all sizes.
+        </h2>
+      </div>
+
+      <br />
+
+      <div className="content">
+        <h1 className="title is-5"> <FontAwesomeIcon icon={faTerminal} /> Text <code>/slash</code> Commands</h1>
+        <h2 className="subtitle is-6">
+          These settings are great for very small channels.
+        </h2>
+      </div>
+
+      <br />
+
+      <div className="content">
+        <h1 className="title is-4"> <FontAwesomeIcon icon={faFilm} /> User-generated Animated Deepfake Rewards </h1>
+        <h2 className="subtitle is-6">
+          A lip-synced, green screened <em>&ldquo;Famous Person&rdquo;</em> pops up and says something.
+        </h2>
+      </div>
+
+      <br />
+
+      <div className="content">
+        <h1 className="title is-4"> <FontAwesomeIcon icon={faUsers} /> Multi Voice and Sound Effects </h1>
+        <h2 className="subtitle is-6">
+          User-selected voices can be strung together in a single reward, interspersed with sound effects.
+        </h2>
+      </div>
+
+      <br />
+
+      <div className="content">
+        <h1 className="title is-2"> <FontAwesomeIcon icon={faLightbulb} /> Suggestions? </h1>
+        <h2 className="subtitle is-4">
+          Let us know what to build!
+        </h2>
+        <p>Can you think of anything we haven't 
+          provided? <DiscordLink text="Please let us know in Discord" iconAfterText={true} /> so 
+          that we can build it!</p>
+      </div>
+      <br />
+      <br />
+    </>
+  )
+}
+
+export { TtsConfigsIndexPage }
