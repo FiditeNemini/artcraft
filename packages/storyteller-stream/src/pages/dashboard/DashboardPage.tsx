@@ -1,12 +1,6 @@
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  faCog,
-  faHome,
-  faVideo,
-  faVolumeUp,
-} from "@fortawesome/free-solid-svg-icons";
+import { Feed } from "./components/Feed";
 
-function DashboardPage(props: Props) {
+function DashboardPage() {
   // if (!props.sessionWrapper.isLoggedIn()) {
   //   return (
   //     <div className="container vh-100 d-flex align-items-center">
@@ -22,9 +16,10 @@ function DashboardPage(props: Props) {
       <h1 className="word mb-4">
         <span className="word">Dashboard</span>
       </h1>
-      <button className="btn btn-primary w-100">
+      <button className="btn btn-primary w-100 mb-4">
         Link your Twitch account
       </button>
+      <Feed />
     </div>
   );
 }

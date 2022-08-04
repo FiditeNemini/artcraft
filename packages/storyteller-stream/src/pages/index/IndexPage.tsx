@@ -26,13 +26,13 @@ function IndexPage(props: Props) {
                 type="button"
                 className="btn btn-primary btn-hero load-hidden"
               >
-                Sign Up Now<i className="fa-solid fa-arrow-right-long ms-2"></i>
+                Sign Up Now
               </button>
               <button
                 type="button"
                 className="btn btn-secondary btn-hero load-hidden"
               >
-                <i className="fa-brands fa-discord me-2"></i>Join Discord
+                Join Discord
               </button>
             </div>
           </div>
@@ -47,19 +47,13 @@ function IndexPage(props: Props) {
             />
 
             <div className="panel hero-floating-panel hero-floating-panel-left d-none d-lg-block">
-              <h6 className="pb-0">
-                <i className="fa-solid fa-volume-high me-2"></i>Tracer
-                (Overwatch)
-              </h6>
+              <h6 className="pb-0">Tracer (Overwatch)</h6>
               <p className="hero-floating-panel-text">
                 “Look out world! Tracer's here.”
               </p>
             </div>
             <div className="panel hero-floating-panel hero-floating-panel-right d-none d-lg-block">
-              <h6 className="pb-0">
-                <i className="fa-solid fa-volume-high me-2"></i>Sonic the
-                Hedgehog
-              </h6>
+              <h6 className="pb-0">Sonic the Hedgehog</h6>
               <p className="hero-floating-panel-text">
                 "This is what speed looks like."
               </p>
