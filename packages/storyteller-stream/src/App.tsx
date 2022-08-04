@@ -1,4 +1,4 @@
-// import 'bulma/css/bulma.css'
+import "bulma/css/bulma.css";
 import "./App.scss";
 
 import React from "react";
@@ -28,7 +28,6 @@ import { TtsConfigsDeleteRulePage } from "./pages/tts_configs/TtsConfigsDeleteRu
 import { TtsConfigsEditRulePage } from "./pages/tts_configs/TtsConfigsEditRulePage";
 import { TtsConfigsReorderPage } from "./pages/tts_configs/TtsConfigsReorderPage";
 import { ObsConfigsPage } from "./pages/obs_configs/ObsConfigsPage";
-import { Dashboard } from "./pages/dashboard/Dashboard";
 
 i18n
   .use(initReactI18next) // passes i18n down to react-i18next
@@ -121,7 +120,7 @@ class App extends React.Component<Props, State> {
   public render() {
     return (
       <BrowserRouter>
-        <div>
+        <div id="main" className="mainwrap">
           <div id="viewable">
             <TopNav
               sessionWrapper={this.state.sessionWrapper}
@@ -173,10 +172,6 @@ class App extends React.Component<Props, State> {
                   allTtsModelsByToken={this.state.allTtsModelsByToken}
                 />
               </Route>
-              <Route exact={true} path="/dashboard">
-                <Dashboard sessionWrapper={this.state.sessionWrapper} />
-              </Route>
-
               <Route exact={true} path="/tts_configs">
                 <TtsConfigsIndexPage
                   sessionWrapper={this.state.sessionWrapper}
@@ -191,14 +186,14 @@ class App extends React.Component<Props, State> {
               </Route>
             </Switch>
 
-            {/* <footer className="footer">
+            <footer className="footer">
               <div className="content has-text-centered">
                 <p>Copyright &copy; 2022 Storyteller</p>
                 <p>
                   <GitSha />
                 </p>
               </div>
-            </footer> */}
+            </footer>
           </div>
         </div>
       </BrowserRouter>

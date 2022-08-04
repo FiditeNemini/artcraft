@@ -13,7 +13,7 @@ enum FieldTriState {
 
 interface Props {
   sessionWrapper: SessionWrapper,
-  querySessionCallback: () => void,
+  querySessionCallback : () => void,
 }
 
 function SignupPage(props: Props) {
@@ -152,14 +152,14 @@ function SignupPage(props: Props) {
     return false;
   }
 
-  const handleFormSubmit = async (ev: React.FormEvent<HTMLFormElement>): Promise<boolean> => {
+  const handleFormSubmit = async (ev: React.FormEvent<HTMLFormElement>) : Promise<boolean> => {
     ev.preventDefault();
 
-    if (!usernameValid ||
-      !emailValid ||
-      !passwordValid ||
+    if (!usernameValid || 
+      !emailValid || 
+      !passwordValid || 
       !passwordConfirmationValid) {
-      return false;
+        return false;
     }
 
     const request = {
@@ -266,7 +266,7 @@ function SignupPage(props: Props) {
           <div className="control has-icons-left has-icons-right">
             <input className={usernameInputClass} type="text" placeholder="Username" value={username} onChange={handleUsernameChange} />
             <span className="icon is-small is-left">
-              {/* <FontAwesomeIcon icon={iconUser} /> */}
+              <FontAwesomeIcon icon={iconUser} />
             </span>
           </div>
           <p className={usernameHelpClass}>{usernameInvalidReason}</p>
@@ -277,7 +277,7 @@ function SignupPage(props: Props) {
           <div className="control has-icons-left has-icons-right">
             <input className={emailInputClass} type="email" placeholder="Email" value={email} onChange={handleEmailChange} />
             <span className="icon is-small is-left">
-              {/* <FontAwesomeIcon icon={iconEmailField} /> */}
+              <FontAwesomeIcon icon={iconEmailField} />
             </span>
           </div>
           <p className={emailHelpClass}>{emailInvalidReason}</p>
@@ -288,7 +288,7 @@ function SignupPage(props: Props) {
           <div className="control has-icons-left has-icons-right">
             <input className={passwordInputClass} type="password" placeholder="Password" value={password} onChange={handlePasswordChange} />
             <span className="icon is-small is-left">
-              {/* <FontAwesomeIcon icon={iconPasswordField} /> */}
+              <FontAwesomeIcon icon={iconPasswordField} />
             </span>
           </div>
           <p className={passwordHelpClass}>{passwordInvalidReason}</p>
@@ -299,7 +299,7 @@ function SignupPage(props: Props) {
           <div className="control has-icons-left has-icons-right">
             <input className={passwordConfirmationInputClass} type="password" placeholder="Password confirmation" value={passwordConfirmation} onChange={handlePasswordConfirmationChange} />
             <span className="icon is-small is-left">
-              {/* <FontAwesomeIcon icon={iconPasswordField} /> */}
+              <FontAwesomeIcon icon={iconPasswordField} />
             </span>
           </div>
           <p className={passwordConfirmationHelpClass}>
@@ -310,7 +310,7 @@ function SignupPage(props: Props) {
         <br />
 
         <div className="notification is-warning">
-          <strong>Remember your password!</strong> We don't have password reset currently, and it'll be a
+          <strong>Remember your password!</strong> We don't have password reset currently, and it'll be a 
           few more weeks before it's added (there are more important features to work on). If you lose your
           password, please let us know in Discord.
         </div>
@@ -322,7 +322,7 @@ function SignupPage(props: Props) {
 
       <Link to="/login"
         className="button is-info is-large is-fullwidth is-inverted"
-      >Already have an account? Log in instead!</Link>
+        >Already have an account? Log in instead!</Link>
 
     </div>
   )

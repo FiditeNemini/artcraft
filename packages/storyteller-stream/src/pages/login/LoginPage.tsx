@@ -23,7 +23,7 @@ function LoginPage(props: Props) {
 
   const handleUsernameOrEmailChange = (ev: React.FormEvent<HTMLInputElement>) => {
     ev.preventDefault();
-    const usernameOrEmailValue = (ev.target as HTMLInputElement).value;
+    const usernameOrEmailValue  = (ev.target as HTMLInputElement).value;
     setUsernameOrEmail(usernameOrEmailValue);
     setErrorMessage("");
     return false;
@@ -37,7 +37,7 @@ function LoginPage(props: Props) {
     return false;
   };
 
-  const handleFormSubmit = async (ev: React.FormEvent<HTMLFormElement>): Promise<boolean> => {
+  const handleFormSubmit = async (ev: React.FormEvent<HTMLFormElement>) : Promise<boolean> => {
     ev.preventDefault();
 
     const request = {
@@ -82,7 +82,7 @@ function LoginPage(props: Props) {
               <div className="control has-icons-left has-icons-right">
                 <input className="input" type="text" placeholder="Username or Email" value={usernameOrEmail} onChange={handleUsernameOrEmailChange} />
                 <span className="icon is-small is-left">
-                  {/* <FontAwesomeIcon icon={iconUser} /> */}
+                  <FontAwesomeIcon icon={iconUser} />
                 </span>
               </div>
               {/*<p className="help"></p>*/}
@@ -93,7 +93,7 @@ function LoginPage(props: Props) {
               <div className="control has-icons-left has-icons-right">
                 <input className="input" type="password" placeholder="Password" value={password} onChange={handlePasswordChange} />
                 <span className="icon is-small is-left">
-                  {/* <FontAwesomeIcon icon={iconPasswordField} /> */}
+                  <FontAwesomeIcon icon={iconPasswordField} />
                 </span>
               </div>
               {/*<p className="help"></p>*/}
