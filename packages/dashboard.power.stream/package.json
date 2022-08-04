@@ -1,5 +1,5 @@
 {
-  "name": "@storyteller/storyteller-stream",
+  "name": "@storyteller/dashboard.power.stream",
   "version": "0.1.0",
   "private": true,
   "dependencies": {

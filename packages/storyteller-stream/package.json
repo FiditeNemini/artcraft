@@ -28,6 +28,7 @@
   },
   "scripts": {
     "start": "craco start",
+    "start-w": "set BROWSER=none && craco start",
     "build": "craco build",
     "test": "craco test",
     "eject": "craco eject"
