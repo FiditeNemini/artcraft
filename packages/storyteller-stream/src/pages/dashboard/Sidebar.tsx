@@ -7,7 +7,7 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { Link } from "react-router-dom";
 
-function Sidebar(props: Props) {
+function Sidebar() {
   // if (!props.sessionWrapper.isLoggedIn()) {
   //   return (
   //     <div className="container vh-100 d-flex align-items-center">
@@ -25,7 +25,7 @@ function Sidebar(props: Props) {
           <li className="nav-item">
             <Link to="/" className="nav-link active d-flex" aria-current="page">
               <div className="icon">
-                <FontAwesomeIcon icon={faHome} />
+                {/* <FontAwesomeIcon icon={faHome} /> */}
               </div>
               Dashboard
             </Link>
@@ -33,7 +33,7 @@ function Sidebar(props: Props) {
           <li>
             <Link to="/test" className="nav-link d-flex">
               <div className="icon">
-                <FontAwesomeIcon icon={faVolumeUp} />
+                {/* <FontAwesomeIcon icon={faVolumeUp} /> */}
               </div>
               TTS Configs
             </Link>
@@ -41,7 +41,7 @@ function Sidebar(props: Props) {
           <li>
             <a href="/" className="nav-link d-flex">
               <div className="icon">
-                <FontAwesomeIcon icon={faVideo} />
+                {/* <FontAwesomeIcon icon={faVideo} /> */}
               </div>
               OBS Setup
             </a>
@@ -49,7 +49,7 @@ function Sidebar(props: Props) {
           <li>
             <a href="/" className="nav-link d-flex">
               <div className="icon">
-                <FontAwesomeIcon icon={faCog} />
+                {/* <FontAwesomeIcon icon={faCog} /> */}
               </div>
               Settings
             </a>
@@ -57,7 +57,7 @@ function Sidebar(props: Props) {
           <li>
             <a href="/" className="nav-link d-flex">
               <div className="icon">
-                <FontAwesomeIcon icon={faCog} />
+                {/* <FontAwesomeIcon icon={faCog} /> */}
               </div>
               Support
             </a>

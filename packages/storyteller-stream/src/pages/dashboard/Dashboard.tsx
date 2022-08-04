@@ -33,7 +33,7 @@ class Dashboard extends React.Component<Props> {
               <div className="col-lg-9">
                 {/* Page routes */}
                 <Switch>
-                  <Route path="/dashboard">
+                  <Route path="/dashboard/home">
                     <DashboardPage />
                   </Route>
                   <Route path="/dashboard/test">

@@ -6,7 +6,7 @@ import {
   faVolumeUp,
 } from "@fortawesome/free-solid-svg-icons";
 
-function DashboardPage(props: Props) {
+function DashboardPage() {
   // if (!props.sessionWrapper.isLoggedIn()) {
   //   return (
   //     <div className="container vh-100 d-flex align-items-center">

@@ -1,12 +1,13 @@
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  faCog,
-  faHome,
-  faVideo,
-  faVolumeUp,
-} from "@fortawesome/free-solid-svg-icons";
+// import React from 'react'
+// import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+// import {
+//   faCog,
+//   faHome,
+//   faVideo,
+//   faVolumeUp,
+// } from "@fortawesome/free-solid-svg-icons";
 
-function Test(props: Props) {
+function Test() {
   // if (!props.sessionWrapper.isLoggedIn()) {
   //   return (
   //     <div className="container vh-100 d-flex align-items-center">
