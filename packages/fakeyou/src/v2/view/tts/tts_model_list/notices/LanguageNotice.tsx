@@ -79,7 +79,6 @@ function LanguageNotice(props: Props) {
 
   return (
     <>
-      \
       <div className="container pt-3">
         <div
           className="alert alert-primary alert-dismissible fade show"
