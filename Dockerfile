@@ -55,8 +55,6 @@ COPY Cargo.toml .
 COPY sqlx-data.json .
 COPY crates/ ./crates
 COPY db/ ./db
-# TODO(2022-01-16): Might not be necessary:
-# COPY _migrations/ ./_migrations
 
 RUN $HOME/.cargo/bin/cargo fetch
 
@@ -64,7 +62,7 @@ RUN $HOME/.cargo/bin/cargo fetch
 RUN SQLX_OFFLINE=true \
   LD_LIBRARY_PATH=/usr/lib:${LD_LIBRARY_PATH} \
   $HOME/.cargo/bin/cargo test
-    
+
 # Build all the binaries.
 RUN SQLX_OFFLINE=true \
   LD_LIBRARY_PATH=/usr/lib:${LD_LIBRARY_PATH} \
@@ -111,10 +109,8 @@ RUN SQLX_OFFLINE=true \
 # Final image
 #  FROM ubuntu:xenial
 FROM pybuild-requirements as final
-#RUN mkdir /storyteller
-#WORKDIR /storyteller
-WORKDIR /
 
+WORKDIR /
 
 COPY scripts/ ./scripts
 
@@ -149,11 +145,6 @@ RUN apt-get update \
         wget
 
 RUN python3 --version
-#RUN python3.7 -m venv python
-#RUN . python/bin/activate \
-#  && pip install --upgrade pip \
-#  && pip install -r requirements.txt
-
 
 # TODO: Use venv to do this instead.
 RUN pip3 install gdown
@@ -183,56 +174,3 @@ RUN touch .env-secrets
 
 EXPOSE 8080
 CMD LD_LIBRARY_PATH=/usr/lib /storyteller-web
-
-# ===================================================================================================
-# WAV2LIP WORKER
-
-# ==================== Rust Build Base ====================
-
-#  #FROM ubuntu:xenial as rustbuild-base
-#  WORKDIR /tmp
-#  RUN apt-get update \
-#      && apt-get install -y \
-#          build-essential \
-#          curl \
-#          libssl-dev \
-#          libssl1.0.0 \
-#          pkg-config \
-#          unzip \
-#          wget
-#  RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs \
-#      | sh  -s -- --default-toolchain stable -y
-
-
-
-# ==================== Rust Build Binary ====================
-
-#  FROM rustbuild-base as rustbuild-binary
-#
-#  COPY Cargo.lock .
-#  COPY Cargo.toml .
-#  COPY w2l_server ./w2l_server
-#  COPY w2l_shared ./w2l_shared
-#  COPY w2l_worker ./w2l_worker
-#
-#  RUN $HOME/.cargo/bin/cargo fetch
-#  RUN LD_LIBRARY_PATH=/usr/lib:${LD_LIBRARY_PATH} $HOME/.cargo/bin/cargo build --release --bin wav2lip_worker
-
-# ==================== Final Image ====================
-
-#  FROM pybuild-requirements as final
-#  WORKDIR /
-#
-#  COPY --from=rustbuild-binary /tmp/target/release/wav2lip_worker     /
-#  COPY --from=rustbuild-binary /etc/ssl                               /etc/ssl
-#  COPY --from=rustbuild-binary /lib/x86_64-linux-gnu/libssl.*         /lib/x86_64-linux-gnu/
-#  COPY --from=rustbuild-binary /lib/x86_64-linux-gnu/libcrypto.*      /lib/x86_64-linux-gnu/
-#
-#  # Without a .env file, Rust crashes "mysteriously" (ugh)
-#  RUN touch .env
-#
-#  RUN ldd wav2lip_worker
-#
-#  EXPOSE 8080
-#  CMD LD_LIBRARY_PATH=/usr/lib /wav2lip_worker
-
