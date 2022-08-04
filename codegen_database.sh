@@ -41,6 +41,22 @@ build_tts_inference_job() {
   popd
 }
 
+build_w2l_download_job() {
+  # NB: This imports the inference/upload job queries
+  # It should also import the shared database lib queries, but something(???) broke.
+  pushd crates/service/w2l_download_job
+  SQLX_OFFLINE=true cargo sqlx prepare -- --bin w2l-download-job
+  popd
+}
+
+build_w2l_inference_job() {
+  # NB: This imports the inference/upload job queries
+  # It should also import the shared database lib queries, but something(???) broke.
+  pushd crates/service/w2l_inference_job
+  SQLX_OFFLINE=true cargo sqlx prepare -- --bin w2l-inference-job
+  popd
+}
+
 combine_sqlx_queries() {
   # Merge multiple JSON files into a single dictionary.
   # https://stackoverflow.com/a/24904276
@@ -49,6 +65,8 @@ combine_sqlx_queries() {
     crates/service/storyteller_web/sqlx-data.json \
     crates/service/tts_download_job/sqlx-data.json \
     crates/service/tts_inference_job/sqlx-data.json \
+    crates/service/w2l_download_job/sqlx-data.json \
+    crates/service/w2l_inference_job/sqlx-data.json \
     > sqlx-data.json
 }
 
@@ -56,13 +74,16 @@ cleanup_temp_files() {
   rm crates/lib/database_queries/sqlx-data.json \
     crates/service/storyteller_web/sqlx-data.json \
     crates/service/tts_download_job/sqlx-data.json \
-    crates/service/tts_inference_job/sqlx-data.json
+    crates/service/tts_inference_job/sqlx-data.json \
+    crates/service/w2l_download_job/sqlx-data.json \
+    crates/service/w2l_inference_job/sqlx-data.json
 }
 
 build_shared_database_library
 build_storyteller_web_app
 build_tts_download_job
 build_tts_inference_job
+build_w2l_download_job
+build_w2l_inference_job
 combine_sqlx_queries
 cleanup_temp_files
-
