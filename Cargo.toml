@@ -20,6 +20,8 @@ members = [
   "crates/service/tts_download_job",
   "crates/service/tts_inference_job",
   "crates/service/twitch_pubsub_subscriber",
+  "crates/service/w2l_download_job",
+  "crates/service/w2l_inference_job",
   "crates/service/websocket_gateway",
 ]
 

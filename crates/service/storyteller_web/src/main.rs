@@ -28,10 +28,6 @@ pub mod util;
 pub mod validations;
 
 // TODO: Eventually move all of these to the `database_queries` crate and no longer write inline MySQL.
-// NB: This is included so sqlx can generate all the queries.
-mod job_queries;
-
-// TODO: Eventually move all of these to the `database_queries` crate and no longer write inline MySQL.
 // NB: Also so sqlx codegens everything.
 // Not sure if this is strictly necessary.
 mod shared_queries {

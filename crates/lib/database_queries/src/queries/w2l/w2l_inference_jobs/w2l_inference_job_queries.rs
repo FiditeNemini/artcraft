@@ -5,14 +5,15 @@
 use anyhow::anyhow;
 use chrono::{Utc, DateTime};
 use container_common::anyhow_result::AnyhowResult;
-use database_queries::column_types::record_visibility::RecordVisibility;
-use database_queries::tokens::Tokens;
+use crate::column_types::record_visibility::RecordVisibility;
+use crate::tokens::Tokens;
 use log::{warn, info};
 use sqlx::MySqlPool;
 use std::path::Path;
 
-// TODO(2022-02-10): Move these queries to the 'database_queries' crate
-//  I moved tts_inference_job queries out already.
+// TODO(2022-08-04): These were moved into the 'database_queries' crate, but they need
+//  to be split up into several modules for better maintainability. cf the already moved
+//  `tts_inference_job` queries.
 
 /// table: w2l_inference_jobs
 #[derive(Debug)]
@@ -75,7 +76,7 @@ SELECT
   creator_ip_address,
   maybe_creator_user_token,
 
-  creator_set_visibility as `creator_set_visibility: database_queries::column_types::record_visibility::RecordVisibility`,
+  creator_set_visibility as `creator_set_visibility: crate::column_types::record_visibility::RecordVisibility`,
   disable_end_bump,
   disable_watermark,
 

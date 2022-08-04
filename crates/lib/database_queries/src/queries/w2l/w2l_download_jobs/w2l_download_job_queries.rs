@@ -5,11 +5,12 @@
 use anyhow::anyhow;
 use chrono::Utc;
 use container_common::anyhow_result::AnyhowResult;
-use database_queries::tokens::Tokens;
+use crate::tokens::Tokens;
 use sqlx::MySqlPool;
 
-// TODO(2022-02-10): Move these queries to the 'database_queries' crate
-//  I moved tts_inference_job queries out already.
+// TODO(2022-08-04): These were moved into the 'database_queries' crate, but they need
+//  to be split up into several modules for better maintainability. cf the already moved
+//  `tts_inference_job` queries.
 
 /// table: w2l_template_upload_jobs
 #[derive(Debug)]

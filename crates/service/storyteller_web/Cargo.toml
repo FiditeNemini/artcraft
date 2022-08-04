@@ -13,15 +13,6 @@ publish = false
 name = "storyteller-web"
 path = "src/main.rs"
 
-# Jobs for managing downloads and inference
-[[bin]]
-name = "w2l-download-job"
-path = "src/w2l_download_job.rs"
-
-[[bin]]
-name = "w2l-inference-job"
-path = "src/w2l_inference_job.rs"
-
 [dependencies]
 
 # Internal
