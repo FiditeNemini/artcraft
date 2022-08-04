@@ -9,7 +9,8 @@ interface Props {
   sessionWrapper: SessionWrapper;
 }
 
-function Dashboard(props: Props) {
+class Dashboard extends React.Component<Props> {
+  // function Dashboard(props: Props) {
   // if (!props.sessionWrapper.isLoggedIn()) {
   //   return (
   //     <div className="container vh-100 d-flex align-items-center">
@@ -19,32 +20,33 @@ function Dashboard(props: Props) {
   //     </div>
   //   );
   // }
-
-  return (
-    <>
-      <div className="bg-gradient">
-        <div className="container vh-100">
-          <div className="p-page-top row gx-5 h-100">
-            <div className="d-none d-lg-flex col-lg-3 pb-5">
-              {/* Sidebar */}
-              <Sidebar />
-            </div>
-            <div className="col-lg-9">
-              {/* Page routes */}
-              <Switch>
-                <Route path="/">
-                  <DashboardPage />
-                </Route>
-                <Route path="/test">
-                  <Test />
-                </Route>
-              </Switch>
+  public render() {
+    return (
+      <>
+        <div className="bg-gradient">
+          <div className="container vh-100">
+            <div className="p-page-top row gx-5 h-100">
+              <div className="d-none d-lg-flex col-lg-3 pb-5">
+                {/* Sidebar */}
+                <Sidebar />
+              </div>
+              <div className="col-lg-9">
+                {/* Page routes */}
+                <Switch>
+                  <Route path="/dashboard">
+                    <DashboardPage />
+                  </Route>
+                  <Route path="/dashboard/test">
+                    <Test />
+                  </Route>
+                </Switch>
+              </div>
             </div>
           </div>
         </div>
-      </div>
-    </>
-  );
+      </>
+    );
+  }
 }
 
 export { Dashboard };
