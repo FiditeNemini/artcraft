@@ -105,7 +105,7 @@ impl SyncVirtualLfuCache {
 
 #[cfg(test)]
 pub mod tests {
-  use crate::util::jobs::virtual_lfu_cache::VirtualLfuCache;
+  use crate::caching::virtual_lfu_cache::VirtualLfuCache;
 
   #[test]
   fn large_capacity_does_not_shed() {

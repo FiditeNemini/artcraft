@@ -121,9 +121,8 @@ impl <T: Hash + Eq> CacheMissStrategizer<T> {
 
 #[cfg(test)]
 mod tests {
-  use chrono::{Duration, Utc, DateTime, TimeZone};
-  use crate::util::jobs::cache_miss_strategizer::CacheMissStrategizer;
-  use crate::util::jobs::cache_miss_strategizer::CacheMissStrategy;
+  use chrono::{Duration, Utc, DateTime};
+  use crate::{CacheMissStrategizer, CacheMissStrategy};
 
   fn get_date(datetime: &str) -> DateTime<Utc> {
     let datetime = DateTime::parse_from_rfc3339(datetime).unwrap();
