@@ -7,22 +7,22 @@ API surface area.
 Application overview
 --------------------
 
-* storyteller_web
-  * `storyteller-web` - HTTP + database monolith for FakeYou
-  * `tts-download-job` - Async download of models
-  * `tts-inference-job` - Async TTS inference
-  * `w2l-download-job` - Async download of videos and images
-  * `w2l-inference-job` - Async W2L inference
+* [FakeYou.com](https://fakeyou.com) is powered by:
+  * HTTP APIs:
+    * `storyteller-web` - HTTP + database monolith for FakeYou
+  * Asynchronous Jobs:
+    * `tts-download-job` - Async download of models
+    * `tts-inference-job` - Async TTS inference
+    * `w2l-download-job` - Async download of videos and images
+    * `w2l-inference-job` - Async W2L inference
 
-* obs_gateway
-  * `obs-gateway-server` - websocket for hosting OBS, twitch pieces (move!)
-  * `twitch-pubsub-job` - Subscribes to Twitch PubSub
-  * `twitch-chat-job` (*TODO*) - Subscribes to Twitch chat
-  * `reddit-chat-job` (*TODO*) - Subscribes to Reddit RPAN chat
-
-* social  
-  * `discord-chat-job` (*TODO*) - Subscribes to Reddit RPAN chat
-  * `twitter-feed-job` (*TODO*) - Subscribes to Reddit RPAN chat
+* [StorytellerStream](https://storyteller.stream) is powered by:
+  * HTTP APIs:
+    * `storyteller-web` - HTTP + database monolith for FakeYou
+  * Websocket events:
+    * `websocket-gateway` - Websocket to pull down Twitch events.
+  * Twitch API integration:
+    * `twitch-pubsub-subscriber` - Dynamically subscribes to Twitch PubSub for "active" users
 
 Schema and API notes
 --------------------
@@ -70,9 +70,8 @@ Notes / TODOs:
 * Actix/sqlx runtime compat:
   https://github.com/launchbadge/sqlx/issues/1117#issuecomment-801237734
   
-* Redis caching
+* Redis caching of more endpoints
 
-* Jobs for analytics queries
-
-* Pull jobs into own repo
+* Jobs for analytics queries (#uses per model, etc)
+* Jobs for ingesting Discord, Twitter, Reddit RPAN chat, Twitch chat (not PubSub), etc.
 
