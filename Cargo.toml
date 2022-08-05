@@ -16,6 +16,7 @@ members = [
   "crates/lib/user_input_common",
 
   # Application 
+  "crates/service/generic_download_job",
   "crates/service/storyteller_web",
   "crates/service/tts_download_job",
   "crates/service/tts_inference_job",

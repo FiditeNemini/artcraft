@@ -1701,6 +1701,37 @@ dependencies = [
 ]
 
 [[package]]
+name = "generic-download-job"
+version = "0.0.1"
+dependencies = [
+ "anyhow",
+ "chrono",
+ "clap",
+ "config",
+ "container_common",
+ "database_queries",
+ "dotenv",
+ "easyenv",
+ "google_drive_common",
+ "hostname",
+ "hyper 0.14.14",
+ "jobs_common",
+ "lfu",
+ "log",
+ "newrelic-telemetry",
+ "r2d2_redis",
+ "serde",
+ "serde_derive",
+ "serde_json",
+ "sqlx",
+ "storage_buckets_common",
+ "subprocess",
+ "tempdir",
+ "tokio 1.13.0",
+ "tts_common",
+]
+
+[[package]]
 name = "getopts"
 version = "0.2.21"
 source = "registry+https://github.com/rust-lang/crates.io-index"
