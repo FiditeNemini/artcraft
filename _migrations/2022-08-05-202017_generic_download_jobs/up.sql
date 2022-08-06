@@ -18,7 +18,11 @@ CREATE TABLE generic_download_jobs (
 
   -- If the job completes successfully, this is the result token.
   -- This is only populated on a successful result.
-  on_success_result_token VARCHAR(32) DEFAULT NULL,
+  on_success_downloaded_entity_token VARCHAR(32) DEFAULT NULL,
+
+  -- The type of the object will vary based on the type of the upload,
+  -- and we may include heuristics that auto-detect types in the future
+  on_success_downloaded_entity_type VARCHAR(32) DEFAULT NULL,
 
   -- ========== UPLOAD DETAILS ==========
 
@@ -98,7 +102,6 @@ CREATE TABLE generic_download_jobs (
   PRIMARY KEY (id),
   UNIQUE KEY (token),
   UNIQUE KEY (uuid_idempotency_token),
-  KEY fk_on_success_result_token (on_success_result_token),
   KEY fk_on_download_type (download_type),
   KEY fk_creator_user_token (creator_user_token),
   KEY index_status (status),

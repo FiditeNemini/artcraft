@@ -1,16 +1,17 @@
 use actix_http::Error;
 use actix_http::http::header;
-use actix_web::cookie::Cookie;
 use actix_web::HttpResponseBuilder;
+use actix_web::cookie::Cookie;
 use actix_web::error::ResponseError;
 use actix_web::http::StatusCode;
 use actix_web::web::Path;
 use actix_web::{Responder, web, HttpResponse, error, HttpRequest, HttpMessage};
+use anyhow::anyhow;
 use chrono::{DateTime, Utc};
 use crate::AnyhowResult;
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 use crate::server_state::ServerState;
-use derive_more::{Display, Error};
+use database_queries::queries::generic_download::get_generic_download_job_status::{GenericDownloadJobStatus, get_generic_download_job_status};
 use log::{info, warn, log};
 use r2d2_redis::redis::Commands;
 use redis_common::redis_keys::RedisKeys;
@@ -19,46 +20,46 @@ use sqlx::MySqlPool;
 use sqlx::error::DatabaseError;
 use sqlx::error::Error::Database;
 use sqlx::mysql::MySqlDatabaseError;
+use std::fmt;
 use std::sync::Arc;
 
 /// For the URL PathInfo
 #[derive(Deserialize)]
-pub struct GetTtsUploadModelStatusPathInfo {
+pub struct GetGenericDownloadJobStatusPathInfo {
   token: String,
 }
 
 #[derive(Serialize)]
-pub struct TtsUploadModelJobStatusForResponse {
+pub struct GetGenericDownloadJobStatusForResponse {
   pub job_token: String,
-
-  /// Primary status from the database (a state machine).
   pub status: String,
 
-  // TODO: Not yet used.
   /// Extra, temporary status from Redis.
   /// This can denote inference progress, and the Python code can write to it.
   pub maybe_extra_status_description: Option<String>,
 
   pub attempt_count: u8,
-  pub maybe_model_token: Option<String>,
+  pub maybe_downloaded_entity_type: Option<String>,
+  pub maybe_downloaded_entity_token: Option<String>,
 
   pub created_at: DateTime<Utc>,
   pub updated_at: DateTime<Utc>,
 }
 
 #[derive(Serialize)]
-pub struct GetTtsUploadModelStatusSuccessResponse {
+pub struct GetGenericDownloadJobStatusSuccessResponse {
   pub success: bool,
-  pub state: TtsUploadModelJobStatusForResponse,
+  pub state: GetGenericDownloadJobStatusForResponse,
 }
 
-#[derive(Debug, Display)]
-pub enum GetTtsUploadModelStatusError {
+#[derive(Debug)]
+pub enum GetGenericDownloadJobStatusError {
+  NotFoundError,
   ServerError,
 }
 
 #[derive(Serialize)]
-pub struct TtsUploadModelJobStatusRecord {
+pub struct GetGenericDownloadJobStatusRecord {
   pub job_token: String,
 
   pub status: String,
@@ -69,63 +70,52 @@ pub struct TtsUploadModelJobStatusRecord {
   pub updated_at: DateTime<Utc>,
 }
 
-impl ResponseError for GetTtsUploadModelStatusError {
+impl ResponseError for GetGenericDownloadJobStatusError {
   fn status_code(&self) -> StatusCode {
     match *self {
-      GetTtsUploadModelStatusError::ServerError=> StatusCode::INTERNAL_SERVER_ERROR,
+      GetGenericDownloadJobStatusError::NotFoundError => StatusCode::NOT_FOUND,
+      GetGenericDownloadJobStatusError::ServerError=> StatusCode::INTERNAL_SERVER_ERROR,
     }
   }
 
   fn error_response(&self) -> HttpResponse {
     let error_reason = match self {
-      GetTtsUploadModelStatusError::ServerError => "server error".to_string(),
+      GetGenericDownloadJobStatusError::NotFoundError=> "not found".to_string(),
+      GetGenericDownloadJobStatusError::ServerError => "server error".to_string(),
     };
 
     to_simple_json_error(&error_reason, self.status_code())
   }
 }
 
-pub async fn get_tts_upload_model_job_status_handler(
+// NB: Not using derive_more::Display since Clion doesn't understand it.
+impl fmt::Display for GetGenericDownloadJobStatusError {
+  fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+    write!(f, "{:?}", self)
+  }
+}
+
+
+pub async fn get_generic_download_job_status_handler(
   http_request: HttpRequest,
-  path: Path<GetTtsUploadModelStatusPathInfo>,
-  server_state: web::Data<Arc<ServerState>>) -> Result<HttpResponse, GetTtsUploadModelStatusError>
+  path: Path<GetGenericDownloadJobStatusPathInfo>,
+  server_state: web::Data<Arc<ServerState>>) -> Result<HttpResponse, GetGenericDownloadJobStatusError>
 {
-  // NB: Lookup failure is Err(RowNotFound).
-  // NB: Since this is publicly exposed, we don't query sensitive data.
-  let maybe_status = sqlx::query_as!(
-      TtsUploadModelJobStatusRecord,
-        r#"
-SELECT
-    jobs.token as job_token,
+  let maybe_job_status = get_generic_download_job_status(
+    &path.token,
+    &server_state.mysql_pool
+  )
+      .await
+      .map_err(|err| {
+        warn!("error querying job record: {:?}", err);
+        return GetGenericDownloadJobStatusError::ServerError
+      })?;
 
-    jobs.status,
-    jobs.attempt_count,
-    jobs.on_success_result_token as maybe_model_token,
-
-    jobs.created_at,
-    jobs.updated_at
-
-FROM tts_model_upload_jobs as jobs
-
-WHERE jobs.token = ?
-        "#,
-      &path.token
-    )
-      .fetch_one(&server_state.mysql_pool)
-      .await; // TODO: This will return error if it doesn't exist
-
-  let record : TtsUploadModelJobStatusRecord = match maybe_status {
-    Ok(record) => record,
-    Err(err) => {
-      match err {
-        sqlx::Error::RowNotFound => {
-          return Err(GetTtsUploadModelStatusError::ServerError);
-        },
-        _ => {
-          warn!("tts template query error: {:?}", err);
-          return Err(GetTtsUploadModelStatusError::ServerError);
-        }
-      }
+  let job_status = match maybe_job_status {
+    Some(record) => record,
+    None => {
+      warn!("job record not found");
+      return Err(GetGenericDownloadJobStatusError::NotFoundError);
     }
   };
 
@@ -133,10 +123,10 @@ WHERE jobs.token = ?
       .get()
       .map_err(|e| {
         warn!("redis error: {:?}", e);
-        GetTtsUploadModelStatusError::ServerError
+        GetGenericDownloadJobStatusError::ServerError
       })?;
 
-  let extra_status_key = RedisKeys::tts_download_extra_status_info(&path.token);
+  let extra_status_key = RedisKeys::generic_download_extra_status_info(&path.token);
   let maybe_extra_status_description : Option<String> = match redis.get(&extra_status_key) {
     Ok(Some(status)) => {
       Some(status)
@@ -148,23 +138,24 @@ WHERE jobs.token = ?
     },
   };
 
-  let model_for_response = TtsUploadModelJobStatusForResponse {
-    job_token: record.job_token.clone(),
-    status: record.status.clone(),
+  let model_for_response = GetGenericDownloadJobStatusForResponse {
+    job_token: job_status.job_token,
+    status: job_status.status,
     maybe_extra_status_description,
-    attempt_count: record.attempt_count as u8,
-    maybe_model_token: record.maybe_model_token.clone(),
-    created_at: record.created_at.clone(),
-    updated_at: record.updated_at.clone(),
+    attempt_count: job_status.attempt_count as u8,
+    maybe_downloaded_entity_token: job_status.maybe_downloaded_entity_token,
+    maybe_downloaded_entity_type: job_status.maybe_downloaded_entity_type,
+    created_at: job_status.created_at.clone(),
+    updated_at: job_status.updated_at.clone(),
   };
 
-  let response = GetTtsUploadModelStatusSuccessResponse {
+  let response = GetGenericDownloadJobStatusSuccessResponse {
     success: true,
     state: model_for_response,
   };
 
   let body = serde_json::to_string(&response)
-      .map_err(|e| GetTtsUploadModelStatusError::ServerError)?;
+      .map_err(|e| GetGenericDownloadJobStatusError::ServerError)?;
 
   Ok(HttpResponse::Ok()
       .content_type("application/json")

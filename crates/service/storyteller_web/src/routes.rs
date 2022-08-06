@@ -12,6 +12,8 @@ use crate::http_server::endpoints::categories::create_category::create_category_
 use crate::http_server::endpoints::categories::get_category::get_category_handler;
 use crate::http_server::endpoints::categories::list_tts_categories::list_tts_categories_handler;
 use crate::http_server::endpoints::categories::list_tts_model_assigned_categories::list_tts_model_assigned_categories_handler;
+use crate::http_server::endpoints::download_job::enqueue_generic_download::enqueue_generic_download_handler;
+use crate::http_server::endpoints::download_job::get_generic_upload_job_status::get_generic_download_job_status_handler;
 use crate::http_server::endpoints::events::list_events::list_events_handler;
 use crate::http_server::endpoints::flags::design_refresh_flag::disable_design_refresh_flag_handler::disable_design_refresh_flag_handler;
 use crate::http_server::endpoints::flags::design_refresh_flag::enable_design_refresh_flag_handler::enable_design_refresh_flag_handler;
@@ -106,6 +108,7 @@ pub fn add_routes<T, B> (app: App<T, B>) -> App<T, B>
   let mut app = add_moderator_routes(app); /* /moderation */
   app = add_tts_routes(app); /* /tts */
   app = add_w2l_routes(app); /* /w2l */
+  app = add_retrieval_routes(app); /* /retrieval (aka. "generic_download_jobs") */
   app = add_category_routes(app); /* /category */
   app = add_user_profile_routes(app); /* /user */
   app = add_api_token_routes(app); /* /api_tokens */
@@ -466,6 +469,34 @@ fn add_w2l_routes<T, B> (app: App<T, B>) -> App<T, B>
             .route(web::get().to(get_w2l_upload_template_job_status_handler))
             .route(web::head().to(|| HttpResponse::Ok()))
       )
+  )
+}
+
+// ==================== RETRIEVAL ROUTES ("GENERIC_DOWNLOAD_JOBS") ====================
+
+fn add_retrieval_routes<T, B> (app: App<T, B>) -> App<T, B>
+  where
+      B: MessageBody,
+      T: ServiceFactory<
+        ServiceRequest,
+        Config = (),
+        Response = ServiceResponse<B>,
+        Error = Error,
+        InitError = (),
+      >,
+{
+  app.service(
+    web::scope("/retrieval")
+        .service(
+          web::resource("/enqueue")
+              .route(web::post().to(enqueue_generic_download_handler))
+              .route(web::head().to(|| HttpResponse::Ok()))
+        )
+        .service(
+          web::resource("/job_status/{token}")
+              .route(web::get().to(get_generic_download_job_status_handler))
+              .route(web::head().to(|| HttpResponse::Ok()))
+        )
   )
 }
 
