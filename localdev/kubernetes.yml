@@ -1,0 +1,148 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata: 
+  name: mysql
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mysql
+  template:
+    metadata:
+      labels:
+        app: mysql
+    spec:
+      containers:
+      - name: mysql
+        image: mysql:8.0.30
+        env:
+        - name: MYSQL_USER
+          value: storyteller
+        - name: MYSQL_PASSWORD
+          value: password
+        - name: MYSQL_DATABASE
+          value: storyteller
+        - name: MYSQL_ROOT_PASSWORD
+          value: password
+        ports:
+          - containerPort: 3306 
+
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata: 
+  name: redis
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: redis
+  template:
+    metadata:
+      labels:
+        app: redis
+    spec:
+      containers:
+      - name: redis
+        image: redis:7.0.4
+        command: ["redis-server", "--requirepass", "password"]
+        ports:
+          - containerPort: 6379
+
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata: 
+  name: storyteller-web
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: storyteller-web
+  template:
+    metadata:
+      labels:
+        app: storyteller-web
+    spec:
+      containers:
+      - name: storyteller-web
+        image: storyteller-web:latest
+        imagePullPolicy: Never
+        env:
+          - name: MYSQL_URL
+            value: mysql://storyteller:password@mysql.default/storyteller
+          - name: REDIS_0_URL
+            value: redis://redisd@redis.default/0
+          - name: REDIS_1_URL
+            value: redis://redisd@redis.default/1
+          - name: ACCESS_KEY
+            value: garbage
+          - name: SECRET_KEY
+            value: garbage
+          - name: REGION_NAME
+            value: garbage
+          - name: W2L_PRIVATE_DOWNLOAD_BUCKET_NAME
+            value: garbage
+          - name: W2L_PUBLIC_DOWNLOAD_BUCKET_NAME
+            value: garbage
+          - name: AUDIO_UPLOADS_BUCKET_ROOT
+            value: garbage
+          - name: TWITCH_USERNAME
+            value: garbage
+          - name: TWITCH_STREAM_KEY
+            value: garbage
+          - name: TWITCH_APP_CLIENT_ID
+            value: garbage
+          - name: TWITCH_APP_CLIENT_SECRET
+            value: garbage
+        ports:
+          - containerPort: 12345
+
+---
+
+apiVersion: v1
+kind: Service
+metadata: 
+  name: mysql
+spec:
+  type: NodePort
+  ports:
+    - name: mysql
+      port: 3306
+      nodePort: 3306
+  selector:
+    app: mysql
+
+---
+
+apiVersion: v1
+kind: Service
+metadata: 
+  name: redis
+spec:
+  type: NodePort
+  ports:
+    - name: redis
+      port: 6379
+      nodePort: 6379
+  selector:
+    app: redis
+
+---
+
+apiVersion: v1
+kind: Service
+metadata: 
+  name: storyteller-web
+spec:
+  type: NodePort
+  ports:
+    - name: storyteller-web
+      port: 12345
+      nodePort: 12345
+  selector:
+    app: storyteller-web
+
+
