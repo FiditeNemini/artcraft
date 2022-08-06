@@ -15,6 +15,7 @@ use crate::validations::username::validate_username;
 use crate::validations::validate_idempotency_token_format::validate_idempotency_token_format;
 use database_queries::queries::generic_download::insert_generic_download_job::{Args, insert_generic_download_job};
 use database_queries::tokens::Tokens;
+use http_server_common::response::serialize_as_json_error::serialize_as_json_error;
 use log::{info, warn, log};
 use regex::Regex;
 use reusable_types::entity_visibility::EntityVisibility;
@@ -45,7 +46,7 @@ pub struct EnqueueGenericDownloadSuccessResponse {
   pub job_token: String,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Serialize)]
 pub enum EnqueueGenericDownloadError {
   BadInput(String),
   MustBeLoggedIn,
@@ -64,14 +65,7 @@ impl ResponseError for EnqueueGenericDownloadError {
   }
 
   fn error_response(&self) -> HttpResponse {
-    let error_reason = match self {
-      EnqueueGenericDownloadError::BadInput(reason) => reason.to_string(),
-      EnqueueGenericDownloadError::MustBeLoggedIn => "user must be logged in".to_string(),
-      EnqueueGenericDownloadError::ServerError => "server error".to_string(),
-      EnqueueGenericDownloadError::RateLimited => "rate limited".to_string(),
-    };
-
-    to_simple_json_error(&error_reason, self.status_code())
+    serialize_as_json_error(self)
   }
 }
 

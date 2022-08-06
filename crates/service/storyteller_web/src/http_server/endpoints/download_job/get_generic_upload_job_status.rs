@@ -12,6 +12,7 @@ use crate::AnyhowResult;
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 use crate::server_state::ServerState;
 use database_queries::queries::generic_download::get_generic_download_job_status::{GenericDownloadJobStatus, get_generic_download_job_status};
+use http_server_common::response::serialize_as_json_error::serialize_as_json_error;
 use log::{info, warn, log};
 use r2d2_redis::redis::Commands;
 use redis_common::redis_keys::RedisKeys;
@@ -52,7 +53,7 @@ pub struct GetGenericDownloadJobStatusSuccessResponse {
   pub state: GetGenericDownloadJobStatusForResponse,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Serialize)]
 pub enum GetGenericDownloadJobStatusError {
   NotFoundError,
   ServerError,
@@ -79,12 +80,7 @@ impl ResponseError for GetGenericDownloadJobStatusError {
   }
 
   fn error_response(&self) -> HttpResponse {
-    let error_reason = match self {
-      GetGenericDownloadJobStatusError::NotFoundError=> "not found".to_string(),
-      GetGenericDownloadJobStatusError::ServerError => "server error".to_string(),
-    };
-
-    to_simple_json_error(&error_reason, self.status_code())
+    serialize_as_json_error(self)
   }
 }
 
