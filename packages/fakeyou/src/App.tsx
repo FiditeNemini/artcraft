@@ -176,13 +176,17 @@ class App extends React.Component<Props, State> {
     // Handle redesign
     console.log('componentWillMount', 'useRefresh?', USE_REFRESH);
 
+    // Check to see if there is a cookie for lightMode; 
     if (!window.localStorage.getItem('lightMode')) {
+      // if not, set one to false to ensure we are defualting to dark mode.
       window.localStorage.setItem('lightMode', 'false')
     } else {
+      // otherwise, make sure our state matches the users preference
       const currentView = window.localStorage.getItem('lightMode') === 'true' ? true : false
 
       this.setState({
-        lightMode: currentView
+        // lightMode: currentView
+        lightMode: true
       })
     }
 
@@ -202,8 +206,6 @@ class App extends React.Component<Props, State> {
       require("./AppOld.scss");
       require("./v2/view/_css/footer.scss");
     }
-
-    // check to see if their is a cookie
   }
 
   async componentDidMount() {
@@ -217,6 +219,11 @@ class App extends React.Component<Props, State> {
     setInterval(() => {
       this.pollJobs();
     }, 1000);
+
+    let DOM = document.getElementsByClassName('fakeyou-refresh')[0].className
+
+    DOM = this.state.lightMode ? `${DOM} light-mode` : `${DOM}`
+    console.log()
   }
 
   querySession = async () => {
@@ -684,6 +691,7 @@ class App extends React.Component<Props, State> {
                     setMaybeSelectedTtsModel={
                       this.props.setMaybeSelectedTtsModel
                     }
+                    lightMode={this.state.lightMode}
                   />
                 </Route>
               </Switch>
