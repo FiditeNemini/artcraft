@@ -32,22 +32,19 @@ impl HifiGanModelCheckCommand {
 
   pub fn execute<P: AsRef<Path>>(
     &self,
-    synthesizer_checkpoint_path: P,
+    checkpoint_path: P,
     output_metadata_filename: P,
-    spawn_process: bool
   ) -> AnyhowResult<()> {
-    let mut command = String::new();
 
-    command.push_str("echo 'test'");
-    command.push_str(" && ");
+    let mut command = String::new();
     command.push_str(&format!("cd {}", self.hifigan_root_code_directory));
     command.push_str(" && ");
     command.push_str(&self.virtual_env_activation_command);
     command.push_str(" && ");
     command.push_str("python ");
     command.push_str(&self.hifigan_model_check_script_name);
-    command.push_str(" --synthesizer_checkpoint_path ");
-    command.push_str(&synthesizer_checkpoint_path.as_ref().display().to_string());
+    command.push_str(" --checkpoint_path ");
+    command.push_str(&checkpoint_path.as_ref().display().to_string());
     command.push_str(" --output_metadata_filename ");
     command.push_str(&output_metadata_filename.as_ref().display().to_string());
 
@@ -60,8 +57,6 @@ impl HifiGanModelCheckCommand {
     ];
 
     let mut p = Popen::create(&command_parts, PopenConfig {
-      //stdout: Redirection::Pipe,
-      //stderr: Redirection::Pipe,
       ..Default::default()
     })?;
 

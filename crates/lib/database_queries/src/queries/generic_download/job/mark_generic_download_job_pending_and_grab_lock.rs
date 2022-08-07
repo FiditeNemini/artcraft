@@ -21,7 +21,7 @@ pub async fn mark_generic_download_job_pending_and_grab_lock(
   let mut transaction = pool.begin().await?;
 
   let maybe_record = sqlx::query_as!(
-    TtsInferenceLockRecord,
+    GenericDownloadJobLockRecord,
         r#"
 SELECT
   id,
