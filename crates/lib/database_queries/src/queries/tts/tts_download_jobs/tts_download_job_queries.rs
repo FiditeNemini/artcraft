@@ -1,7 +1,3 @@
-//! NB: This seems required for sqlx to generate the cached queries.
-//! Sqlx's prepare needs a *single* binary to work against, so we need to
-//! include these in the main binary to generate all the queries.
-
 use anyhow::anyhow;
 use chrono::Utc;
 use container_common::anyhow_result::AnyhowResult;

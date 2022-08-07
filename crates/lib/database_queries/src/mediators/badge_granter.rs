@@ -12,7 +12,7 @@ pub enum UserBadge {
   // Granted for early vocodes users.
   EarlyUser,
 
-  // Granted for uploading models
+  // Granted for uploading tts models
   TtsModelUploader1,
   TtsModelUploader5,
   TtsModelUploader10,
@@ -22,6 +22,17 @@ pub enum UserBadge {
   TtsModelUploader150,
   TtsModelUploader200,
   TtsModelUploader250,
+
+  // Granted for vocoder models
+  VocoderModelUploader1,
+  VocoderModelUploader5,
+  VocoderModelUploader10,
+  VocoderModelUploader20,
+  VocoderModelUploader50,
+  VocoderModelUploader100,
+  VocoderModelUploader150,
+  VocoderModelUploader200,
+  VocoderModelUploader250,
 
   // Granted for uploading templates
   W2lTemplateUploader1,
@@ -63,6 +74,15 @@ impl UserBadge {
       UserBadge::TtsModelUploader150 => "tts_model_uploader_150",
       UserBadge::TtsModelUploader200 => "tts_model_uploader_200",
       UserBadge::TtsModelUploader250 => "tts_model_uploader_250",
+      UserBadge::VocoderModelUploader1 => "vocoder_model_uploader_1",
+      UserBadge::VocoderModelUploader5 => "vocoder_model_uploader_5",
+      UserBadge::VocoderModelUploader10 => "vocoder_model_uploader_10",
+      UserBadge::VocoderModelUploader20 => "vocoder_model_uploader_20",
+      UserBadge::VocoderModelUploader50 => "vocoder_model_uploader_50",
+      UserBadge::VocoderModelUploader100 => "vocoder_model_uploader_100",
+      UserBadge::VocoderModelUploader150 => "vocoder_model_uploader_150",
+      UserBadge::VocoderModelUploader200 => "vocoder_model_uploader_200",
+      UserBadge::VocoderModelUploader250 => "vocoder_model_uploader_250",
       UserBadge::W2lTemplateUploader1 => "w2l_template_uploader_1",
       UserBadge::W2lTemplateUploader10 => "w2l_template_uploader_10",
       UserBadge::W2lTemplateUploader50 => "w2l_template_uploader_50",
@@ -206,6 +226,51 @@ impl BadgeGranter {
     Ok(())
   }
 
+  /// This needs to be called *after* successful upload.
+  pub async fn maybe_grant_vocoder_model_uploads_badge(&self, user_token: &str) -> AnyhowResult<()> {
+    let count = self.count_vocoder_models_uploaded(user_token).await?;
+
+    let mut maybe_badge = None;
+
+    if count >= 250 {
+      maybe_badge = Some(UserBadge::VocoderModelUploader250);
+    } else if count >= 200 {
+      maybe_badge = Some(UserBadge::VocoderModelUploader200);
+    } else if count >= 150 {
+      maybe_badge = Some(UserBadge::VocoderModelUploader150);
+    } else if count >= 100 {
+      maybe_badge = Some(UserBadge::VocoderModelUploader100);
+    } else if count >= 50 {
+      maybe_badge = Some(UserBadge::VocoderModelUploader50);
+    } else if count >= 20 {
+      maybe_badge = Some(UserBadge::VocoderModelUploader20);
+    } else if count >= 10 {
+      maybe_badge = Some(UserBadge::VocoderModelUploader10);
+    } else if count >= 5 {
+      maybe_badge = Some(UserBadge::VocoderModelUploader5);
+    } else if count >= 1 {
+      maybe_badge = Some(UserBadge::VocoderModelUploader1);
+    }
+
+    let badge = match maybe_badge {
+      Some(badge) => badge,
+      None => return Ok(()),
+    };
+
+    if self.has_badge(user_token, badge).await? {
+      return Ok(())
+    }
+
+    let _record_id = self.insert(
+      badge,
+      user_token,
+    ).await?;
+
+    self.firehose_publisher.publish_user_badge_granted(user_token, badge.to_db_value())
+        .await?;
+
+    Ok(())
+  }
 
   // =======================================================================
 
@@ -255,6 +320,28 @@ LIMIT 1
         r#"
 SELECT count(*) as count
 FROM tts_models
+WHERE
+  creator_user_token = ?
+LIMIT 1
+        "#,
+      user_token
+    )
+        .fetch_one(&self.mysql_pool)
+        .await;
+
+    self.handle_count_query(maybe_result)
+  }
+
+  async fn count_vocoder_models_uploaded(
+    &self,
+    user_token: &str,
+  ) -> AnyhowResult<u64> {
+    // NB: This could get expensive!
+    let maybe_result = sqlx::query_as!(
+      CountRecord,
+        r#"
+SELECT count(*) as count
+FROM vocoder_models
 WHERE
   creator_user_token = ?
 LIMIT 1

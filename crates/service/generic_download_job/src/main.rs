@@ -10,6 +10,8 @@
 
 #[macro_use] extern crate serde_derive;
 
+pub mod job_state;
+pub mod job_steps;
 pub mod script_execution;
 
 use anyhow::anyhow;
@@ -24,16 +26,20 @@ use container_common::filesystem::check_file_exists::check_file_exists;
 use container_common::filesystem::safe_delete_temp_directory::safe_delete_temp_directory;
 use container_common::filesystem::safe_delete_temp_file::safe_delete_temp_file;
 use container_common::hashing::hash_file_sha2::hash_file_sha2;
+use crate::job_state::JobState;
+use crate::job_steps::process_single_job::process_single_job;
+use crate::script_execution::hifigan_model_check_command::HifiGanModelCheckCommand;
 use crate::script_execution::tacotron_model_check_command::TacotronModelCheckCommand;
 use crate::script_execution::talknet_model_check_command::TalknetModelCheckCommand;
 use database_queries::column_types::tts_model_type::TtsModelType;
 use database_queries::mediators::badge_granter::BadgeGranter;
 use database_queries::mediators::firehose_publisher::FirehosePublisher;
+use database_queries::queries::generic_download::job::list_available_generic_download_jobs::{AvailableDownloadJob, list_available_generic_download_jobs};
+use database_queries::queries::generic_download::job::mark_generic_download_job_failure::mark_generic_download_job_failure;
 use database_queries::queries::tts::tts_download_jobs::tts_download_job_queries::TtsUploadJobRecord;
 use database_queries::queries::tts::tts_download_jobs::tts_download_job_queries::grab_job_lock_and_mark_pending;
 use database_queries::queries::tts::tts_download_jobs::tts_download_job_queries::insert_tts_model;
 use database_queries::queries::tts::tts_download_jobs::tts_download_job_queries::mark_tts_upload_job_done;
-use database_queries::queries::tts::tts_download_jobs::tts_download_job_queries::mark_tts_upload_job_failure;
 use database_queries::queries::tts::tts_download_jobs::tts_download_job_queries::query_tts_upload_job_records;
 use google_drive_common::google_drive_download_command::GoogleDriveDownloadCommand;
 use jobs_common::noop_logger::NoOpLogger;
@@ -53,7 +59,6 @@ use std::time::Duration;
 use storage_buckets_common::bucket_client::BucketClient;
 use storage_buckets_common::bucket_path_unifier::BucketPathUnifier;
 use tempdir::TempDir;
-use crate::script_execution::hifigan_model_check_command::HifiGanModelCheckCommand;
 
 // Buckets
 const ENV_ACCESS_KEY : &'static str = "ACCESS_KEY";
@@ -63,37 +68,6 @@ const ENV_BUCKET_NAME : &'static str = "TTS_DOWNLOAD_BUCKET_NAME";
 const ENV_BUCKET_ROOT : &'static str = "TTS_DOWNLOAD_BUCKET_ROOT";
 
 const DEFAULT_TEMP_DIR: &'static str = "/tmp";
-
-struct Downloader {
-  pub download_temp_directory: PathBuf,
-  pub mysql_pool: MySqlPool,
-
-  pub redis_pool: r2d2::Pool<RedisConnectionManager>,
-
-  pub bucket_client: BucketClient,
-  pub firehose_publisher: FirehosePublisher,
-  pub badge_granter: BadgeGranter,
-  pub google_drive_downloader: GoogleDriveDownloadCommand,
-
-  pub bucket_path_unifier: BucketPathUnifier,
-
-  pub hifigan_model_check_command: HifiGanModelCheckCommand,
-
-  // Command to run
-  pub download_script: String,
-  // Root to store TTS results
-  pub bucket_root_tts_model_uploads: String,
-
-  // Sleep between batches
-  pub job_batch_wait_millis: u64,
-
-  // How long to wait between log lines
-  pub no_op_logger_millis: u64,
-
-  // Max job attempts before failure.
-  // NB: This is an i32 so we don't need to convert to db column type.
-  pub job_max_attempts: i32,
-}
 
 #[tokio::main]
 async fn main() -> AnyhowResult<()> {
@@ -106,7 +80,7 @@ async fn main() -> AnyhowResult<()> {
   let server_hostname = hostname::get()
     .ok()
     .and_then(|h| h.into_string().ok())
-    .unwrap_or("tts-download-job".to_string());
+    .unwrap_or("generic-download-job".to_string());
 
   info!("Hostname: {}", &server_hostname);
 
@@ -170,22 +144,17 @@ async fn main() -> AnyhowResult<()> {
     firehose_publisher: firehose_publisher.clone(), // NB: Also safe
   };
 
-  let hifigan_root_code_directory = easyenv::get_env_string_required("HIFIGAN_ROOT_CODE_DIRECTORY")?;
-  let hifigan_virtual_env_activation_command = easyenv::get_env_string_or_default(
-    "HIFIGAN_VIRTUAL_ENV_ACTIVATION_COMMAND",
-    "source python-tacotron/bin/activate");
-
-  let hifigan_model_check_script_name = easyenv::get_env_string_or_default(
-    "HIFIGAN_MODEL_CHECK_SCRIPT_NAME",
-    "vocodes_model_check_hifigan.py");
-
   let hifigan_model_check_command= HifiGanModelCheckCommand::new(
-    &hifigan_root_code_directory,
-    &hifigan_virtual_env_activation_command,
-    &hifigan_model_check_script_name,
+    &easyenv::get_env_string_required("HIFIGAN_ROOT_CODE_DIRECTORY")?,
+    &easyenv::get_env_string_or_default(
+    "HIFIGAN_VIRTUAL_ENV_ACTIVATION_COMMAND",
+    "source python-tacotron/bin/activate"),
+  &easyenv::get_env_string_or_default(
+    "HIFIGAN_MODEL_CHECK_SCRIPT_NAME",
+    "vocodes_model_check_hifigan.py"),
   );
 
-  let downloader = Downloader {
+  let job_state = JobState {
     download_temp_directory: temp_directory,
     mysql_pool,
     redis_pool,
@@ -202,7 +171,7 @@ async fn main() -> AnyhowResult<()> {
     no_op_logger_millis: common_env.no_op_logger_millis,
   };
 
-  main_loop(downloader).await;
+  main_loop(job_state).await;
 
   Ok(())
 }
@@ -210,16 +179,16 @@ async fn main() -> AnyhowResult<()> {
 const START_TIMEOUT_MILLIS : u64 = 500;
 const INCREASE_TIMEOUT_MILLIS : u64 = 1000;
 
-async fn main_loop(downloader: Downloader) {
+async fn main_loop(job_state: JobState) {
   let mut error_timeout_millis = START_TIMEOUT_MILLIS;
 
-  let mut noop_logger = NoOpLogger::new(downloader.no_op_logger_millis as i64);
+  let mut noop_logger = NoOpLogger::new(job_state.no_op_logger_millis as i64);
 
   loop {
     let num_records = 1;
-    let query_result = query_tts_upload_job_records(&downloader.mysql_pool, num_records).await;
+    let maybe_available_jobs = list_available_generic_download_jobs(&job_state.mysql_pool, num_records).await;
 
-    let jobs = match query_result {
+    let jobs = match maybe_available_jobs {
       Ok(jobs) => jobs,
       Err(e) => {
         warn!("Error querying jobs: {:?}", e);
@@ -232,11 +201,11 @@ async fn main_loop(downloader: Downloader) {
     if jobs.is_empty() {
       noop_logger.log_after_awhile();
 
-      std::thread::sleep(Duration::from_millis(downloader.job_batch_wait_millis));
+      std::thread::sleep(Duration::from_millis(job_state.job_batch_wait_millis));
       continue;
     }
 
-    let result = process_jobs(&downloader, jobs).await;
+    let result = process_jobs(&job_state, jobs).await;
 
     match result {
       Ok(_) => {},
@@ -250,23 +219,23 @@ async fn main_loop(downloader: Downloader) {
 
     error_timeout_millis = START_TIMEOUT_MILLIS; // reset
 
-    std::thread::sleep(Duration::from_millis(downloader.job_batch_wait_millis));
+    std::thread::sleep(Duration::from_millis(job_state.job_batch_wait_millis));
   }
 }
 
-async fn process_jobs(downloader: &Downloader, jobs: Vec<TtsUploadJobRecord>) -> AnyhowResult<()> {
+async fn process_jobs(job_state: &JobState, jobs: Vec<AvailableDownloadJob>) -> AnyhowResult<()> {
   for job in jobs.into_iter() {
-    let result = process_job(downloader, &job).await;
+    let result = process_single_job(job_state, &job).await;
     match result {
       Ok(_) => {},
       Err(e) => {
         warn!("Failure to process job: {:?}", e);
         let failure_reason = "";
-        let _r = mark_tts_upload_job_failure(
-          &downloader.mysql_pool,
+        let _r = mark_generic_download_job_failure(
+          &job_state.mysql_pool,
           &job,
           failure_reason,
-          downloader.job_max_attempts
+          job_state.job_max_attempts
         ).await;
       }
     }
@@ -287,191 +256,3 @@ fn read_metadata_file(filename: &PathBuf) -> AnyhowResult<FileMetadata> {
   Ok(serde_json::from_str(&buffer)?)
 }
 
-async fn process_job(downloader: &Downloader, job: &TtsUploadJobRecord) -> AnyhowResult<()> {
-  // TODO: 1. Mark processing. (DONE)
-  // TODO: 2. Download. (DONE)
-  // TODO: 3. Upload. (DONE)
-  // TODO: 4. Save record. (DONE)
-  // TODO: 5. Mark job done. (DONE)
-
-  let mut redis = downloader.redis_pool.get()?;
-  let mut redis_logger = RedisJobStatusLogger::new_tts_download(
-    &mut redis,
-    &job.token);
-
-  // ==================== ATTEMPT TO GRAB JOB LOCK ==================== //
-
-  let lock_acquired = grab_job_lock_and_mark_pending(&downloader.mysql_pool, job).await?;
-
-  if !lock_acquired {
-    warn!("Could not acquire job lock for: {}", &job.id);
-    return Ok(())
-  }
-
-  // ==================== SETUP TEMP DIRS ==================== //
-
-  let temp_dir = format!("temp_{}", job.id);
-  let temp_dir = TempDir::new(&temp_dir)?;
-
-  // ==================== DOWNLOAD MODEL FILE ==================== //
-
-  info!("Calling downloader...");
-
-  redis_logger.log_status("downloading model")?;
-
-  let download_url = job.download_url.as_ref()
-    .map(|c| c.to_string())
-    .unwrap_or("".to_string());
-
-  if is_bad_tts_model_download_url(&download_url)? {
-    warn!("Bad download URL: `{}`", &download_url);
-    return Err(anyhow!("Bad download URL: `{}`", &download_url));
-  }
-
-  let download_filename = match downloader.google_drive_downloader.download_file(&download_url, &temp_dir).await {
-    Ok(filename) => filename,
-    Err(e) => {
-      safe_delete_temp_directory(&temp_dir);
-      return Err(e);
-    }
-  };
-
-  let model_type = if download_filename.to_lowercase().ends_with("zip") {
-    TtsModelType::Talknet
-  } else {
-    TtsModelType::Tacotron2
-  };
-
-  info!("Uploaded model type: {:?}", model_type);
-
-  if model_type == TtsModelType::Talknet {
-    // TODO: Finish supporting TalkNet
-    warn!("Unsupported model type");
-    return Err(anyhow!("unsupported model type"));
-  }
-
-  // ==================== RUN MODEL CHECK ==================== //
-
-  info!("Checking that model is valid...");
-
-  redis_logger.log_status("checking model")?;
-
-  let file_path = PathBuf::from(download_filename.clone());
-
-  let output_metadata_fs_path = temp_dir.path().join("metadata.json");
-
-  match model_type {
-    TtsModelType::Tacotron2 => {
-      let result = downloader.tacotron_tts_check.execute(
-        &file_path,
-        &output_metadata_fs_path,
-        false,
-      );
-
-      if let Err(e) = result {
-        safe_delete_temp_file(&file_path);
-        safe_delete_temp_directory(&temp_dir);
-      }
-    },
-    TtsModelType::Talknet => {
-      let result = downloader.talknet_tts_check.execute(
-        &file_path,
-        &output_metadata_fs_path,
-        false,
-      );
-
-      if let Err(e) = result {
-        safe_delete_temp_file(&file_path);
-        safe_delete_temp_directory(&temp_dir);
-      }
-    },
-  }
-
-  // ==================== CHECK ALL FILES EXIST AND GET METADATA ==================== //
-
-  info!("Checking that metadata output file exists...");
-
-  check_file_exists(&output_metadata_fs_path)?;
-
-  let file_metadata = match read_metadata_file(&output_metadata_fs_path) {
-    Ok(metadata) => metadata,
-    Err(e) => {
-      safe_delete_temp_file(&file_path);
-      safe_delete_temp_file(&output_metadata_fs_path);
-      safe_delete_temp_directory(&temp_dir);
-      return Err(e);
-    }
-  };
-
-  // ==================== UPLOAD MODEL FILE ==================== //
-
-  info!("Uploading model to GCS...");
-
-  let private_bucket_hash = hash_file_sha2(&download_filename)?;
-
-  info!("File hash: {}", private_bucket_hash);
-
-  let synthesizer_model_bucket_path = match model_type {
-    TtsModelType::Tacotron2 => downloader.bucket_path_unifier.tts_synthesizer_path(&private_bucket_hash),
-    TtsModelType::Talknet => downloader.bucket_path_unifier.tts_zipped_synthesizer_path(&private_bucket_hash),
-  };
-
-  info!("Destination bucket path: {:?}", &synthesizer_model_bucket_path);
-
-  redis_logger.log_status("uploading model")?;
-
-  if let Err(e) = downloader.bucket_client.upload_filename(&synthesizer_model_bucket_path, &file_path).await {
-    safe_delete_temp_file(&output_metadata_fs_path);
-    safe_delete_temp_file(&file_path);
-    safe_delete_temp_directory(&temp_dir);
-    return Err(e);
-  }
-
-  // ==================== DELETE DOWNLOADED FILE ==================== //
-
-  // NB: We should be using a tempdir, but to make absolutely certain we don't overflow the disk...
-  safe_delete_temp_file(&output_metadata_fs_path);
-  safe_delete_temp_file(&file_path);
-  safe_delete_temp_directory(&temp_dir);
-
-  // ==================== SAVE RECORDS ==================== //
-
-  info!("Saving model record...");
-  let (id, model_token) = insert_tts_model(
-    &downloader.mysql_pool,
-    job,
-    &private_bucket_hash,
-    synthesizer_model_bucket_path,
-    file_metadata.file_size_bytes)
-    .await?;
-
-  info!("Marking job complete...");
-  mark_tts_upload_job_done(
-    &downloader.mysql_pool,
-    job,
-    true,
-    Some(&model_token)
-  ).await?;
-
-  info!("Saved model record: {}", id);
-
-  downloader.firehose_publisher.publish_tts_model_upload_finished(&job.creator_user_token, &model_token)
-      .await
-      .map_err(|e| {
-        warn!("error publishing event: {:?}", e);
-        anyhow!("error publishing event")
-      })?;
-
-  downloader.badge_granter.maybe_grant_tts_model_uploads_badge(&job.creator_user_token)
-      .await
-      .map_err(|e| {
-        warn!("error maybe awarding badge: {:?}", e);
-        anyhow!("error maybe awarding badge")
-      })?;
-
-  redis_logger.log_status("done")?;
-
-  info!("Job done: {}", job.id);
-
-  Ok(())
-}
