@@ -111,6 +111,8 @@ interface State {
 
   // Current text entered
   textBuffer: string;
+
+  lightMode: boolean;
 }
 
 function newVocodes() {
@@ -165,12 +167,24 @@ class App extends React.Component<Props, State> {
       w2lTemplateUploadJobs: [],
 
       textBuffer: "",
+
+      lightMode: true
     };
   }
 
   componentWillMount() {
     // Handle redesign
     console.log('componentWillMount', 'useRefresh?', USE_REFRESH);
+
+    if (!window.localStorage.getItem('lightMode')) {
+      window.localStorage.setItem('lightMode', 'false')
+    } else {
+      const currentView = window.localStorage.getItem('lightMode') === 'true' ? true : false
+
+      this.setState({
+        lightMode: currentView
+      })
+    }
 
     if (USE_REFRESH) {
       // Redesign-specific CSS
@@ -188,6 +202,8 @@ class App extends React.Component<Props, State> {
       require("./AppOld.scss");
       require("./v2/view/_css/footer.scss");
     }
+
+    // check to see if their is a cookie
   }
 
   async componentDidMount() {
@@ -217,7 +233,7 @@ class App extends React.Component<Props, State> {
       const hasChineseSimplified = locale.language_codes.indexOf("zh") > -1;
       const hasFrench = locale.language_codes.indexOf("fr") > -1;
       const hasGerman = locale.language_codes.indexOf("de") > -1;
-      const hasHindi= locale.language_codes.indexOf("hi") > -1;
+      const hasHindi = locale.language_codes.indexOf("hi") > -1;
       const hasIndonesian = locale.language_codes.indexOf("id") > -1;
       const hasItalian = locale.language_codes.indexOf("it") > -1;
       const hasJapanese = locale.language_codes.indexOf("ja") > -1;
@@ -272,16 +288,16 @@ class App extends React.Component<Props, State> {
       const showPleaseFollowNotice = hasSpanish || hasPortuguese;
 
       const showBootstrapLanguageNotice = (
-        hasJapanese 
+        hasJapanese
         || hasChineseSimplified
-        || hasFrench 
-        || hasGerman 
-        || hasHindi 
-        || hasIndonesian 
-        || hasItalian 
-        || hasKorean 
-        || hasTurkish 
-        || hasVietnamese 
+        || hasFrench
+        || hasGerman
+        || hasHindi
+        || hasIndonesian
+        || hasItalian
+        || hasKorean
+        || hasTurkish
+        || hasVietnamese
       );
 
       this.setState({
@@ -578,27 +594,29 @@ class App extends React.Component<Props, State> {
     this.setState({ textBuffer: "" });
   };
 
+
+
   public render() {
     // Redesign features
-    let mainClassNames = USE_REFRESH ? "bg-gradient" : "";
-    if (USE_REFRESH) {
+    let mainClassNames;
 
-    }
+    mainClassNames = USE_REFRESH ? "bg-gradient " : "";
+    mainClassNames = mainClassNames + (this.state.lightMode ? ' light-mode' : '')
 
     return (
       <BrowserRouter>
-        
-        <div id="main" className={mainClassNames}>
-        <div className="page-bg"></div>
 
-<div className="animation-wrapper">
-  <div className="particle particle-1"></div>
-  <div className="particle particle-2"></div>
-  <div className="particle particle-3"></div>
-  <div className="particle particle-4"></div>
-</div>
-<div className="page-wrapper"> 
-</div>
+        <div id="main" className={mainClassNames}>
+          <div className="page-bg light-mode"></div>
+
+          <div className="animation-wrapper">
+            <div className="particle particle-1"></div>
+            <div className="particle particle-2"></div>
+            <div className="particle particle-3"></div>
+            <div className="particle particle-4"></div>
+          </div>
+          <div className="page-wrapper">
+          </div>
 
 
           <div id="viewable">
@@ -610,7 +628,7 @@ class App extends React.Component<Props, State> {
               />
             */}
 
-            <div className="migrationComponentWrapper">
+            <div className="migrationComponentWrapper light-mode">
               <Switch>
                 <Route path="/">
                   <NewVocodesContainer

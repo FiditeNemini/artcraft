@@ -43,7 +43,7 @@ function NewTopNavFc(props: Props) {
 
   // NB: The responses from the "job count" endpoint are cached in a distributed manner.
   // We use the timestamp as a vector clock to know when to update our view.
-  const [pendingTtsJobs, setPendingTtsJobs] = useState<GetPendingTtsJobCountSuccessResponse>({ 
+  const [pendingTtsJobs, setPendingTtsJobs] = useState<GetPendingTtsJobCountSuccessResponse>({
     success: true,
     pending_job_count: 0,
     cache_time: new Date(0), // NB: Epoch
@@ -407,7 +407,7 @@ function NewTopNavFc(props: Props) {
                 <li data-bs-toggle="offcanvas" className="nav-item">
                   <Link
                     to={FrontendUrlConfig.cloneRequestPage()}
-                    className="nav-link"
+                    className="nav-link "
                   >
                     <FontAwesomeIcon icon={faMicrophone} className="me-2" />
                     Clone My Voice!

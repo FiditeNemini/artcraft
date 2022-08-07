@@ -22,25 +22,46 @@ $headings-font-family: "Merriweather", serif;
 // makes it impossible to dynamically change styles.
 //
 // Once the rollout is complete, this outer wrapper class can be removed.
+
 .fakeyou-refresh {
   body {
     font-family: $body-font-family;
     font-weight: 300; // For Fira Sans
     color: $white;
-    //background gradient
+
+    &.light-mode {
+
+      p,
+      h1,
+      h2,
+      h3,
+      h4,
+      h5,
+      h6 {
+        color: $black  !important;
+      }
+    }
   }
 
   .bg-gradient {
     background: rgb(13, 16, 25) !important;
 
-    background: linear-gradient(
-      325deg,
-      rgba(13, 16, 25, 1) 0%,
-      rgba(42, 21, 34, 1) 55%,
-      rgba(16, 14, 26, 1) 100%
-    ) !important;
+    background: linear-gradient(325deg,
+        rgba(13, 16, 25, 1) 0%,
+        rgba(42, 21, 34, 1) 55%,
+        rgba(16, 14, 26, 1) 100%) !important;
     background-repeat: no-repeat;
     background-attachment: fixed;
+
+    &.light-mode {
+
+      background: #fff !important;
+
+      background: #fff !important;
+      background-repeat: no-repeat;
+      background-attachment: fixed;
+
+    }
   }
 
   // Style for user text input that overflows
@@ -149,6 +170,7 @@ $headings-font-family: "Merriweather", serif;
     .navbar-brand {
       padding-top: 0;
     }
+
     .dropdown-item {
       font-size: 15px;
       font-weight: 600;
@@ -158,6 +180,7 @@ $headings-font-family: "Merriweather", serif;
       &:hover {
         color: $secondary;
       }
+
       &:focus {
         background-color: $white;
       }
@@ -198,7 +221,7 @@ $headings-font-family: "Merriweather", serif;
   }
 
   a.top-bar-text:hover {
-    color: $primary !important;
+    color: $primary  !important;
   }
 
   .top-bar {
