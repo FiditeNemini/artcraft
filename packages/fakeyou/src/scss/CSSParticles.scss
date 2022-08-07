@@ -1,6 +1,6 @@
 /* Config */
 $color-bg: #000000;
-$color-particle: rgba(255, 255, 255, 0.03);
+$color-particle: rgba(255, 255, 255, 0.05);
 $spacing: 2560px;
 $time-1: 120s;
 $time-2: 240s;
@@ -11,7 +11,7 @@ $time-4: 420s;
 @function particles($max) {
   $val: 0px 0px $color-particle;
   @for $i from 1 through $max {
-    $val: #{$val}, random($spacing)+px random($spacing)+px $color-particle;
+    $val: #{$val}, random($spacing) + px random($spacing) + px $color-particle;
   }
   @return $val;
 }
@@ -23,8 +23,8 @@ $time-4: 420s;
 
 /* Styles */
 
-
-.page-bg, .animation-wrapper {
+.page-bg,
+.animation-wrapper {
   position: absolute;
   top: 0;
   left: 0;
@@ -40,7 +40,8 @@ $time-4: 420s;
   z-index: -1;
 }
 
-.particle, .particle:after {
+.particle,
+.particle:after {
   background: transparent;
 }
 
@@ -54,13 +55,13 @@ $time-4: 420s;
   animation: animParticle $time-1 linear infinite;
   @include particles(500);
   height: 7px;
-  width:7px;
+  width: 7px;
 }
 
 .particle-1:after {
   @include particles(400);
-  height: 7px;
-  width: 7px;
+  height: 8px;
+  width: 8px;
 }
 
 .particle-2 {
@@ -76,12 +77,12 @@ $time-4: 420s;
   width: 5px;
 }
 
-.particle-3:after {
-  @include particles(800);
-  height: 10px;
-  width: 10px;
-  border-radius: 50%;
-}
+// .particle-3:after {
+//   @include particles(800);
+//   height: 10px;
+//   width: 10px;
+//   border-radius: 50%;
+// }
 
 .particle-4 {
   animation: animParticle $time-4 linear infinite;
@@ -110,4 +111,3 @@ $time-4: 420s;
   color: #fff;
   z-index: 2;
 }
-
