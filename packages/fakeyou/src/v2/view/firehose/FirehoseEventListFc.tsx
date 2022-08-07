@@ -118,7 +118,7 @@ function FirehoseEventListFc(props: Props) {
       case "user_sign_up":
         inner = (
           <span>
-            <FontAwesomeIcon icon={faPenToSquare} />
+            <FontAwesomeIcon icon={faPenToSquare} className="me-3" />
             {gravatar}
             &nbsp;
             {userLink}
@@ -129,7 +129,7 @@ function FirehoseEventListFc(props: Props) {
       case "user_badge_granted":
         inner = (
           <span>
-            <FontAwesomeIcon icon={faAward} />
+            <FontAwesomeIcon icon={faAward} className="me-3" />
             {gravatar}
             &nbsp;
             {userLink}
@@ -228,7 +228,7 @@ function FirehoseEventListFc(props: Props) {
       case "twitter_mention":
         inner = (
           <span>
-            <FontAwesomeIcon icon={faTwitter} />
+            <FontAwesomeIcon icon={faTwitter} className="me-3" />
             {gravatar}
             &nbsp;
             {userLink}
@@ -239,7 +239,7 @@ function FirehoseEventListFc(props: Props) {
       case "twitter_retweet":
         inner = (
           <span>
-            <FontAwesomeIcon icon={faTwitter} />
+            <FontAwesomeIcon icon={faTwitter} className="me-3" />
             {gravatar}
             &nbsp;
             {userLink}
@@ -250,7 +250,7 @@ function FirehoseEventListFc(props: Props) {
       case "discord_join":
         inner = (
           <span>
-            <FontAwesomeIcon icon={faDiscord} />
+            <FontAwesomeIcon icon={faDiscord} className="me-3" />
             {gravatar}
             &nbsp;
             {userLink}
@@ -261,7 +261,7 @@ function FirehoseEventListFc(props: Props) {
       case "discord_message":
         inner = (
           <span>
-            <FontAwesomeIcon icon={faDiscord} />
+            <FontAwesomeIcon icon={faDiscord} className="me-3" />
             {gravatar}
             &nbsp;
             {userLink}
@@ -272,7 +272,7 @@ function FirehoseEventListFc(props: Props) {
       case "twitch_subscribe":
         inner = (
           <span>
-            <FontAwesomeIcon icon={faTwitch} />
+            <FontAwesomeIcon icon={faTwitch} className="me-3" />
             {gravatar}
             &nbsp;
             {userLink}
@@ -283,7 +283,7 @@ function FirehoseEventListFc(props: Props) {
       case "twitch_follow":
         inner = (
           <span>
-            <FontAwesomeIcon icon={faTwitch} />
+            <FontAwesomeIcon icon={faTwitch} className="me-3" />
             {gravatar}
             &nbsp;
             {userLink}
