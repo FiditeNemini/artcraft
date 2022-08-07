@@ -59,60 +59,17 @@ impl HifiGanModelCheckCommand {
       &command
     ];
 
-    if spawn_process {
-      // NB: This forks and returns immediately.
-      //let _child_pid = command_builder.spawn()?;
+    let mut p = Popen::create(&command_parts, PopenConfig {
+      //stdout: Redirection::Pipe,
+      //stderr: Redirection::Pipe,
+      ..Default::default()
+    })?;
 
-      let stdout_file = OpenOptions::new()
-          .read(true)
-          .write(true)
-          .create(true)
-          .truncate(true)
-          .open("/tmp/hifigan_upload_stdout.txt")?;
+    info!("Pid : {:?}", p.pid());
 
-      let stderr_file = OpenOptions::new()
-          .read(true)
-          .write(true)
-          .create(true)
-          .truncate(true)
-          .open("/tmp/hifigan_upload_stderr.txt")?;
+    let exit_status = p.wait()?;
 
-      let mut p = Popen::create(&command_parts, PopenConfig {
-        //stdout: Redirection::Pipe,
-        //stderr: Redirection::Pipe,
-        stdout: Redirection::File(stdout_file),
-        stderr: Redirection::File(stderr_file),
-        ..Default::default()
-      })?;
-
-      info!("Pid : {:?}", p.pid());
-
-      p.detach();
-
-    } else {
-      // NB: This is a blocking call.
-      /*let output = command_builder.output()?;
-
-      info!("Output status: {}", output.status);
-      info!("Stdout: {:?}", String::from_utf8(output.stdout));
-      error!("Stderr: {:?}", String::from_utf8(output.stderr));
-
-      if !output.status.success() {
-        bail!("Bad error code: {:?}", output.status);
-      }*/
-
-      let mut p = Popen::create(&command_parts, PopenConfig {
-        //stdout: Redirection::Pipe,
-        //stderr: Redirection::Pipe,
-        ..Default::default()
-      })?;
-
-      info!("Pid : {:?}", p.pid());
-
-      let exit_status = p.wait()?;
-
-      info!("Exit status: {:?}", exit_status);
-    }
+    info!("Exit status: {:?}", exit_status);
 
     Ok(())
   }

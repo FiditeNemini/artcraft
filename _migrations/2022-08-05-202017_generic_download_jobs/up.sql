@@ -39,7 +39,7 @@ CREATE TABLE generic_download_jobs (
   -- Assume the same URL can be uploaded more than once (in case of errors or
   -- people sharing models)
 
-  download_url VARCHAR(512) DEFAULT NULL,
+  download_url VARCHAR(512) NOT NULL,
 
   -- ========== CREATOR DETAILS AND PREFERENCES ==========
 

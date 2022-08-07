@@ -20,7 +20,7 @@ pub struct AvailableDownloadJob {
   pub creator_set_visibility: EntityVisibility,
 
   pub download_type: GenericDownloadType,
-  pub download_url: Option<String>,
+  pub download_url: String,
   pub title: String,
 
   pub status: JobStatus,
@@ -110,7 +110,7 @@ struct AvailableDownloadJobRawInternal {
   pub creator_set_visibility: EntityVisibility,
 
   pub download_type: GenericDownloadType,
-  pub download_url: Option<String>,
+  pub download_url: String,
   pub title: String,
 
   pub status: JobStatus,

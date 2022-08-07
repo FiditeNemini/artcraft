@@ -12,6 +12,7 @@ use jobs_common::redis_job_status_logger::RedisJobStatusLogger;
 use log::{info, warn};
 use std::path::PathBuf;
 use tempdir::TempDir;
+use config::is_bad_download_url::is_bad_download_url;
 use database_queries::queries::generic_download::job::mark_generic_download_job_done::mark_generic_download_job_done;
 use crate::job_steps::process_hifigan_vocoder::process_hifigan_vocoder;
 
@@ -41,16 +42,12 @@ pub async fn process_single_job(job_state: &JobState, job: &AvailableDownloadJob
 
   redis_logger.log_status("downloading model")?;
 
-  let download_url = job.download_url.as_ref()
-      .map(|c| c.to_string())
-      .unwrap_or("".to_string());
-
-  if is_bad_tts_model_download_url(&download_url)? {
-    warn!("Bad download URL: `{}`", &download_url);
-    return Err(anyhow!("Bad download URL: `{}`", &download_url));
+  if is_bad_download_url(&job.download_url)? {
+    warn!("Bad download URL: `{}`", &job.download_url);
+    return Err(anyhow!("Bad download URL: `{}`", &job.download_url));
   }
 
-  let download_filename = match job_state.google_drive_downloader.download_file(&download_url, &temp_dir).await {
+  let download_filename = match job_state.google_drive_downloader.download_file(&job.download_url, &temp_dir).await {
     Ok(filename) => filename,
     Err(e) => {
       safe_delete_temp_directory(&temp_dir);

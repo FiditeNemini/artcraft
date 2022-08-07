@@ -6,5 +6,6 @@ pub mod model_categories;
 pub mod tts;
 pub mod twitch;
 pub mod users;
+pub mod vocoder;
 pub mod voice_clone_requests;
 pub mod w2l;
