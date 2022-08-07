@@ -30,7 +30,6 @@ import { TtsCategoryType } from "./AppWrapper";
 import { FAKEYOU_MERGED_TRANSLATIONS } from "./_i18n/FakeYouTranslations";
 import i18n from "i18next";
 import { initReactI18next } from "react-i18next";
-import ParticlesBG from "./Particles";
 import { USE_REFRESH } from "./Refresh";
 
 i18n
@@ -582,15 +581,25 @@ class App extends React.Component<Props, State> {
   public render() {
     // Redesign features
     let mainClassNames = USE_REFRESH ? "bg-gradient" : "";
-    let particlesBg = <></>;
     if (USE_REFRESH) {
-      particlesBg = <><ParticlesBG></ParticlesBG></>
+
     }
 
     return (
       <BrowserRouter>
+        
         <div id="main" className={mainClassNames}>
-          {particlesBg}
+        <div className="page-bg"></div>
+
+<div className="animation-wrapper">
+  <div className="particle particle-1"></div>
+  <div className="particle particle-2"></div>
+  <div className="particle particle-3"></div>
+  <div className="particle particle-4"></div>
+</div>
+<div className="page-wrapper"> 
+</div>
+
 
           <div id="viewable">
             {/* This is the old vocodes1.0-compatible username and version switch
