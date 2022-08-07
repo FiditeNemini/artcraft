@@ -98,7 +98,13 @@ spec:
             value: garbage
         ports:
           - containerPort: 12345
-
+        volumeMounts:
+          - mountPath: /storyteller-rust
+            name: storyteller-rust-folder
+      volumes:
+        - name: storyteller-rust-folder
+          hostPath:
+            path: /storyteller-rust
 ---
 
 apiVersion: v1
