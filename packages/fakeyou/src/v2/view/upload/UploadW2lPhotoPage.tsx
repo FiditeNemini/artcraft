@@ -1,10 +1,10 @@
 import React, { useState } from "react";
 import { ApiConfig } from "@storyteller/components";
-import { SessionW2lTemplateUploadResultListFc } from "../_common/SessionW2lTemplateUploadResultsListFc";
 import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
 import { W2lTemplateUploadJob } from "@storyteller/components/src/jobs/W2lTemplateUploadJobs";
 import { useHistory } from "react-router-dom";
 import { v4 as uuidv4 } from "uuid";
+import { SessionW2lTemplateUploadResultListFc } from "../_common/SessionW2lTemplateUploadResultsListFc";
 import { BackLink } from "../_common/BackLink";
 import { FrontendUrlConfig } from "../../../common/FrontendUrlConfig";
 import { motion } from "framer-motion";
@@ -21,7 +21,7 @@ interface Props {
   w2lTemplateUploadJobs: Array<W2lTemplateUploadJob>;
 }
 
-function UploadW2lVideoFc(props: Props) {
+function UploadW2lPhotoPage(props: Props) {
   let history = useHistory();
 
   const [downloadUrl, setDownloadUrl] = useState("");
@@ -95,7 +95,7 @@ function UploadW2lVideoFc(props: Props) {
       <div className="container pt-5 pb-3 px-md-4 px-lg-5 px-xl-3">
         <div className="d-flex flex-column">
           <motion.h1 className="display-5 fw-bold" variants={item}>
-            Upload Video (w2l template)
+            Upload Photo (w2l template)
           </motion.h1>
           <motion.div className="my-3" variants={item}>
             <BackLink
@@ -108,8 +108,9 @@ function UploadW2lVideoFc(props: Props) {
 
       <motion.div className="container px-md-4 px-lg-5 px-xl-3" variants={item}>
         <p>
-          The videos you upload can be used for lipsyncing with audio using the
-          Wav2Lip model.
+          The photos you upload can be used for lipsyncing with audio using the
+          Wav2Lip model. In the future, you'll be able to use these for
+          first-order-model and much more!
         </p>
       </motion.div>
 
@@ -119,7 +120,7 @@ function UploadW2lVideoFc(props: Props) {
             <div className="d-flex flex-column gap-4">
               <div>
                 <label className="sub-title">
-                  Title, eg. "Morshu tells you things"
+                  Title, eg. "Dr. Phil stares into your soul"
                 </label>
                 <div className="form-group">
                   <input
@@ -138,7 +139,7 @@ function UploadW2lVideoFc(props: Props) {
         */}
               <div>
                 <label className="sub-title">
-                  Download URL, eg. Google Drive link
+                  Download URL, eg. <code>https://i.imgur.com/lKaQ4Er.jpg</code>
                 </label>
                 <div className="form-group">
                   <input
@@ -173,4 +174,4 @@ function UploadW2lVideoFc(props: Props) {
   );
 }
 
-export { UploadW2lVideoFc };
+export { UploadW2lPhotoPage };

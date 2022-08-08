@@ -380,6 +380,14 @@ class ApiConfig {
     return `${this.getScheme()}://${this.getNewApiHost()}/voice_clone_requests/check`;
   }
 
+  enqueueRetrievalJob(): string {
+    return `${this.getScheme()}://${this.getNewApiHost()}/retrieval/enqueue`;
+  }
+
+  getRetrievalJobStatus(jobToken: string): string {
+    return `${this.getScheme()}://${this.getNewApiHost()}/retrieval/job_status/${jobToken}`;
+  }
+
   // =============== Storyteller-specific ===============
 
   listTwitchEventRules(): string {
