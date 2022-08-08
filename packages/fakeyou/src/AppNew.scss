@@ -29,7 +29,7 @@ $headings-font-family: "Merriweather", serif;
     font-weight: 300; // For Fira Sans
     color: $white;
 
-    &.light-mode {
+    &.dark-mode {
 
       p,
       h1,
@@ -38,7 +38,7 @@ $headings-font-family: "Merriweather", serif;
       h4,
       h5,
       h6 {
-        color: $black  !important;
+        color: #fff  ;
       }
     }
   }
@@ -53,13 +53,78 @@ $headings-font-family: "Merriweather", serif;
     background-repeat: no-repeat;
     background-attachment: fixed;
 
-    &.light-mode {
+    &.dark-mode {
 
-      background: #fff !important;
+      .panel{
+       background-color: #261924 !important;
 
-      background: #fff !important;
-      background-repeat: no-repeat;
-      background-attachment: fixed;
+      }
+     select
+    {
+      border-color: #372C34 !important;
+      background-color: #372C34 !important;
+
+    }
+      
+      .btn-destructive{
+        
+        background-color: #FFCFCE !important;
+
+      }
+
+      .video-card-title,
+      .video-card-text {
+
+      color: #ffffff !important;
+
+      }
+      textarea{
+
+      background-color: #372C34 !important;
+      border-color: #372C34 !important;
+      
+
+      }
+      .form-select {
+        color:#fff;
+        }
+        ::placeholder{
+
+          color: #fff !important;
+        }
+        .input-icon .form-control-feedback{
+
+          color: #fff !important
+        }
+        input{
+          background-color: #372C34 !important;
+          border-color: #372C34 !important;
+        }
+      menu.item{
+
+        background: #372C34;
+      }
+      .btn-secondary{
+        color: #fff;
+        border-color: #46343F;
+        background-color: #46343F;
+      }
+      .btn-destructive{
+        background-color: #FC6B68;
+        border-color: #FFCFCE;
+      }
+      .dropdown-menu{
+        background-color: #261924;
+      }
+      .dropdown-item{
+        color: #fff;
+      }
+      a.btn.btn-secondary{
+        color: #fff;
+      }
+       
+
+
 
     }
   }

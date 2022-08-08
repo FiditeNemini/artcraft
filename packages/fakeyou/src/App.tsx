@@ -112,7 +112,7 @@ interface State {
   // Current text entered
   textBuffer: string;
 
-  lightMode: boolean;
+  darkMode: boolean;
 }
 
 function newVocodes() {
@@ -168,7 +168,7 @@ class App extends React.Component<Props, State> {
 
       textBuffer: "",
 
-      lightMode: true
+      darkMode: true
     };
   }
 
@@ -176,17 +176,17 @@ class App extends React.Component<Props, State> {
     // Handle redesign
     console.log('componentWillMount', 'useRefresh?', USE_REFRESH);
 
-    // Check to see if there is a cookie for lightMode; 
-    if (!window.localStorage.getItem('lightMode')) {
+    // Check to see if there is a cookie for darkMode; 
+    if (!window.localStorage.getItem('darkMode')) {
       // if not, set one to false to ensure we are defualting to dark mode.
-      window.localStorage.setItem('lightMode', 'false')
+      window.localStorage.setItem('darkMode', 'false')
     } else {
       // otherwise, make sure our state matches the users preference
-      const currentView = window.localStorage.getItem('lightMode') === 'true' ? true : false
+      const currentView = window.localStorage.getItem('darkMode') === 'true' ? true : false
 
       this.setState({
-        // lightMode: currentView
-        lightMode: true
+        // darkMode: currentView
+        darkMode: true
       })
     }
 
@@ -222,7 +222,7 @@ class App extends React.Component<Props, State> {
 
     let DOM = document.getElementsByClassName('fakeyou-refresh')[0].className
 
-    DOM = this.state.lightMode ? `${DOM} light-mode` : `${DOM}`
+    DOM = this.state.darkMode ? `${DOM} light-mode` : `${DOM}`
     console.log()
   }
 
@@ -608,13 +608,13 @@ class App extends React.Component<Props, State> {
     let mainClassNames;
 
     mainClassNames = USE_REFRESH ? "bg-gradient " : "";
-    mainClassNames = mainClassNames + (this.state.lightMode ? ' light-mode' : '')
+    mainClassNames = mainClassNames + (this.state.darkMode ? ' dark-mode' : '')
 
     return (
       <BrowserRouter>
 
         <div id="main" className={mainClassNames}>
-          <div className="page-bg light-mode"></div>
+          <div className="dark-mode"></div>
 
           <div className="animation-wrapper">
             <div className="particle particle-1"></div>
@@ -622,8 +622,7 @@ class App extends React.Component<Props, State> {
             <div className="particle particle-3"></div>
             <div className="particle particle-4"></div>
           </div>
-          <div className="page-wrapper">
-          </div>
+          
 
 
           <div id="viewable">
@@ -635,7 +634,7 @@ class App extends React.Component<Props, State> {
               />
             */}
 
-            <div className="migrationComponentWrapper light-mode">
+            <div className="migrationComponentWrapper dark-mode">
               <Switch>
                 <Route path="/">
                   <NewVocodesContainer
@@ -691,7 +690,7 @@ class App extends React.Component<Props, State> {
                     setMaybeSelectedTtsModel={
                       this.props.setMaybeSelectedTtsModel
                     }
-                    lightMode={this.state.lightMode}
+                    dark-mode={this.state.darkMode}
                   />
                 </Route>
               </Switch>
