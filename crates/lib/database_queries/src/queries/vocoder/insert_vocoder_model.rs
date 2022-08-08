@@ -31,10 +31,10 @@ pub async fn insert_vocoder_model<P: AsRef<Path>>(
 
   let model_token = Tokens::new_vocoder_model()?;
 
-  //let private_bucket_object_name = &private_bucket_object_name
-  //    .as_ref()
-  //    .display()
-  //    .to_string();
+  let private_bucket_object_name = &args.private_bucket_object_name
+      .as_ref()
+      .display()
+      .to_string();
 
   let query_result = sqlx::query!(
         r#"
@@ -65,8 +65,8 @@ SET
       &args.creator_ip_address,
       &args.creator_ip_address,
       args.creator_set_visibility,
-      "todo",
-      "todo",
+      args.private_bucket_hash,
+      private_bucket_object_name,
     )
       .execute(args.mysql_pool)
       .await;

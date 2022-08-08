@@ -29,18 +29,11 @@ use container_common::hashing::hash_file_sha2::hash_file_sha2;
 use crate::job_state::JobState;
 use crate::job_steps::process_single_job::process_single_job;
 use crate::script_execution::hifigan_model_check_command::HifiGanModelCheckCommand;
-use crate::script_execution::tacotron_model_check_command::TacotronModelCheckCommand;
-use crate::script_execution::talknet_model_check_command::TalknetModelCheckCommand;
 use database_queries::column_types::tts_model_type::TtsModelType;
 use database_queries::mediators::badge_granter::BadgeGranter;
 use database_queries::mediators::firehose_publisher::FirehosePublisher;
 use database_queries::queries::generic_download::job::list_available_generic_download_jobs::{AvailableDownloadJob, list_available_generic_download_jobs};
 use database_queries::queries::generic_download::job::mark_generic_download_job_failure::mark_generic_download_job_failure;
-use database_queries::queries::tts::tts_download_jobs::tts_download_job_queries::TtsUploadJobRecord;
-use database_queries::queries::tts::tts_download_jobs::tts_download_job_queries::grab_job_lock_and_mark_pending;
-use database_queries::queries::tts::tts_download_jobs::tts_download_job_queries::insert_tts_model;
-use database_queries::queries::tts::tts_download_jobs::tts_download_job_queries::mark_tts_upload_job_done;
-use database_queries::queries::tts::tts_download_jobs::tts_download_job_queries::query_tts_upload_job_records;
 use google_drive_common::google_drive_download_command::GoogleDriveDownloadCommand;
 use jobs_common::noop_logger::NoOpLogger;
 use jobs_common::redis_job_status_logger::RedisJobStatusLogger;
@@ -243,16 +236,3 @@ async fn process_jobs(job_state: &JobState, jobs: Vec<AvailableDownloadJob>) -> 
 
   Ok(())
 }
-
-#[derive(Deserialize)]
-struct FileMetadata {
-  pub file_size_bytes: u64,
-}
-
-fn read_metadata_file(filename: &PathBuf) -> AnyhowResult<FileMetadata> {
-  let mut file = File::open(filename)?;
-  let mut buffer = String::new();
-  file.read_to_string(&mut buffer)?;
-  Ok(serde_json::from_str(&buffer)?)
-}
-

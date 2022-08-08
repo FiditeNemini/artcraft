@@ -1,26 +1,25 @@
 use anyhow::anyhow;
 use config::bad_urls::is_bad_tts_model_download_url;
+use config::is_bad_download_url::is_bad_download_url;
 use container_common::anyhow_result::AnyhowResult;
 use container_common::filesystem::check_file_exists::check_file_exists;
 use container_common::filesystem::safe_delete_temp_directory::safe_delete_temp_directory;
 use container_common::filesystem::safe_delete_temp_file::safe_delete_temp_file;
 use container_common::hashing::hash_file_sha2::hash_file_sha2;
 use crate::JobState;
+use crate::job_steps::process_hifigan_vocoder::process_hifigan_vocoder;
 use database_queries::queries::generic_download::job::list_available_generic_download_jobs::AvailableDownloadJob;
+use database_queries::queries::generic_download::job::mark_generic_download_job_done::mark_generic_download_job_done;
 use database_queries::queries::generic_download::job::mark_generic_download_job_pending_and_grab_lock::mark_generic_download_job_pending_and_grab_lock;
 use jobs_common::redis_job_status_logger::RedisJobStatusLogger;
 use log::{info, warn};
+use reusable_types::generic_download_type::GenericDownloadType;
 use std::path::PathBuf;
 use tempdir::TempDir;
-use config::is_bad_download_url::is_bad_download_url;
-use database_queries::queries::generic_download::job::mark_generic_download_job_done::mark_generic_download_job_done;
-use crate::job_steps::process_hifigan_vocoder::process_hifigan_vocoder;
 
 pub async fn process_single_job(job_state: &JobState, job: &AvailableDownloadJob) -> AnyhowResult<()> {
   let mut redis = job_state.redis_pool.get()?;
-  let mut redis_logger = RedisJobStatusLogger::new_tts_download(
-    &mut redis,
-    &job.token);
+  let mut redis_logger = RedisJobStatusLogger::new_generic_download(&mut redis, &job.download_job_token);
 
   // ==================== ATTEMPT TO GRAB JOB LOCK ==================== //
 
@@ -40,7 +39,7 @@ pub async fn process_single_job(job_state: &JobState, job: &AvailableDownloadJob
 
   info!("Calling downloader...");
 
-  redis_logger.log_status("downloading model")?;
+  redis_logger.log_status("downloading URL")?;
 
   if is_bad_download_url(&job.download_url)? {
     warn!("Bad download URL: `{}`", &job.download_url);
@@ -57,9 +56,20 @@ pub async fn process_single_job(job_state: &JobState, job: &AvailableDownloadJob
 
   // ==================== HANDLE DIFFERENT DOWNLOAD TYPES ==================== //
 
+  let mut entity_token : Option<String> = None;
+  let mut entity_type : Option<String> = None;
+
   match job.download_type {
     GenericDownloadType::HifiGan => {
-      process_hifigan_vocoder(job_state, job, &temp_dir).await?;
+      let results = process_hifigan_vocoder(
+        job_state,
+        job,
+        &temp_dir,
+        &download_filename,
+        &mut redis_logger,
+      ).await?;
+      entity_token = results.entity_token.clone();
+      entity_type = results.entity_type.clone();
     }
   }
 
@@ -70,13 +80,15 @@ pub async fn process_single_job(job_state: &JobState, job: &AvailableDownloadJob
     &job_state.mysql_pool,
     job,
     true,
-    Some(&entity_token),
-    Some(&entity_type),
+    entity_token.as_deref(),
+    entity_type.as_deref(),
   ).await?;
 
-  info!("Saved model record: {}", id);
+  info!("Saved model record: {} - {}", job.id.0, &job.download_job_token);
 
-  job_state.firehose_publisher.publish_generic_download_finished(&job.creator_user_token, &model_token)
+  job_state.firehose_publisher.publish_generic_download_finished(
+    &job.creator_user_token,
+    entity_token.as_deref())
       .await
       .map_err(|e| {
         warn!("error publishing event: {:?}", e);

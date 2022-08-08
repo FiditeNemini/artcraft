@@ -1721,6 +1721,7 @@ dependencies = [
  "log",
  "newrelic-telemetry",
  "r2d2_redis",
+ "reusable_types",
  "serde",
  "serde_derive",
  "serde_json",

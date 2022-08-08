@@ -187,12 +187,13 @@ impl FirehosePublisher {
     Ok(())
   }
 
-  pub async fn publish_generic_download_finished(&self, user_token: &str, template_token: &str) -> AnyhowResult<()> {
+  // NB: Entity token is optional.
+  pub async fn publish_generic_download_finished(&self, user_token: &str, entity_token: Option<&str>) -> AnyhowResult<()> {
     let _record_id = self.insert(
       FirehoseEvent::GenericDownloadCompleted,
       Some(user_token),
-      Some(template_token),
-      Some(template_token)
+      entity_token,
+      entity_token,
     ).await?;
     Ok(())
   }
