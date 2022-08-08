@@ -59,6 +59,10 @@ impl Tokens {
     random_prefix_crockford_token("JWINF:", 32, false)
   }
 
+  pub fn new_generic_upload_job() -> AnyhowResult<String> {
+    random_prefix_crockford_token("JGUP:", 32, false)
+  }
+
   pub fn new_firehose_event() -> AnyhowResult<String> {
     random_prefix_crockford_token("EV:", 32, false)
   }

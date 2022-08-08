@@ -130,7 +130,7 @@ pub async fn enqueue_generic_download_handler(
   }
 
   // This token is returned to the client.
-  let job_token = Tokens::new_tts_model_upload_job()
+  let job_token = Tokens::new_generic_upload_job()
     .map_err(|e| {
       warn!("Error creating token");
       EnqueueGenericDownloadError::ServerError

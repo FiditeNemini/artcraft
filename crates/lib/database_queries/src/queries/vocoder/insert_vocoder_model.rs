@@ -56,7 +56,7 @@ SET
   private_bucket_object_name = ?
         "#,
       &model_token,
-      args.vocoder_type,
+      args.vocoder_type.to_str(),
       &args.title,
       &args.original_download_url,
       &args.original_filename,
@@ -64,7 +64,7 @@ SET
       &args.creator_user_token,
       &args.creator_ip_address,
       &args.creator_ip_address,
-      args.creator_set_visibility,
+      args.creator_set_visibility.to_str(),
       args.private_bucket_hash,
       private_bucket_object_name,
     )

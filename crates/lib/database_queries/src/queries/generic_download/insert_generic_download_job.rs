@@ -34,12 +34,12 @@ SET
         "#,
         args.job_token,
         args.uuid_idempotency_token,
-        args.download_type,
+        args.download_type.to_str(),
         args.download_url,
         args.title,
         args.creator_user_token,
         args.creator_ip_address,
-        args.creator_set_visibility,
+        args.creator_set_visibility.to_str(),
     );
 
   let query_result = query.execute(args.mysql_pool)

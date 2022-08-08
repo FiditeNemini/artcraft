@@ -30,16 +30,16 @@ CREATE TABLE generic_download_jobs (
   -- The first upload type will be "hifigan_model"
   download_type VARCHAR(32) NOT NULL,
 
+  -- Assume the same URL can be uploaded more than once (in case of errors or
+  -- people sharing models)
+
+  download_url VARCHAR(512) NOT NULL,
+
   -- The user-supplied title of the upload
   -- This might have different meanings for different upload types
   -- The "name" of the voice model, which might be complicated.
   -- If maybe_subject_token (etc.) is set, then it's authoritative instead.
   title VARCHAR(255) NOT NULL,
-
-  -- Assume the same URL can be uploaded more than once (in case of errors or
-  -- people sharing models)
-
-  download_url VARCHAR(512) NOT NULL,
 
   -- ========== CREATOR DETAILS AND PREFERENCES ==========
 
