@@ -24,7 +24,7 @@ function DiscordLink(props: Props) {
   );
   return (
     <a
-      href="https://discord.gg/H72KFXm"
+      href="https://discord.gg/fakeyou"
       target="_blank"
       rel="noopener noreferrer"
     >

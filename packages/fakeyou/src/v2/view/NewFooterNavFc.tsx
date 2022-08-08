@@ -136,7 +136,7 @@ function NewFooterNavFc(props: Props) {
           <Link to="/pricing">{t('coreUi.footerNav.pricing')}</Link>
           */}
           &nbsp;|
-          <Link to="/video">{t('coreUi.footerNav.video')}</Link>
+          <Link to="/video">{t("coreUi.footerNav.video")}</Link>
           &nbsp;|
           <div>
             <Link to="/contribute">Upload</Link>
@@ -170,7 +170,7 @@ function NewFooterNavFc(props: Props) {
         <div className="d-flex justify-content-center gap-4">
           <a
             className="social-icon"
-            href="https://discord.gg/H72KFXm"
+            href="https://discord.gg/fakeyou"
             target="_blank"
             rel="noopener noreferrer"
           >
