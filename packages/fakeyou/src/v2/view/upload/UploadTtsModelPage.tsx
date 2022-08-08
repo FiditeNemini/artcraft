@@ -23,7 +23,7 @@ interface TtsModelUploadJobResponsePayload {
   job_token?: string;
 }
 
-function UploadTtsModelFc(props: Props) {
+function UploadTtsModelPage(props: Props) {
   let history = useHistory();
 
   const [downloadUrl, setDownloadUrl] = useState("");
@@ -232,4 +232,4 @@ function UploadTtsModelFc(props: Props) {
   );
 }
 
-export { UploadTtsModelFc };
+export { UploadTtsModelPage };

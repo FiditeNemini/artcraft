@@ -17,13 +17,14 @@ import { TtsInferenceJob, W2lInferenceJob } from '../../App';
 import { TtsModelDeletePage } from './tts/tts_model_delete/TtsModelDeletePage';
 import { TtsModelEditPage } from './tts/tts_model_edit/TtsModelEditPage';
 import { TtsModelUploadJob } from '@storyteller/components/src/jobs/TtsModelUploadJobs';
+import { VocoderUploadJob } from '@storyteller/components/src/jobs/VocoderUploadJobs';
 import { TtsModelViewPage } from './tts/tts_model_view/TtsModelViewPage';
 import { TtsResultDeletePage } from './tts/tts_result_delete/TtsResultDeletePage';
 import { TtsResultViewPage } from './tts/tts_result_view/TtsResultViewPage';
 import { ContributeIndexPage } from './contribute/ContributeIndexPage';
-import { UploadTtsModelFc } from './upload/UploadTtsModelFc';
-import { UploadW2lPhotoFc } from './upload/UploadW2lPhotoFc';
-import { UploadW2lVideoFc } from './upload/UploadW2lVideoFc';
+import { UploadTtsModelPage } from './upload/UploadTtsModelPage';
+import { UploadW2lPhotoPage } from './upload/UploadW2lPhotoPage';
+import { UploadW2lVideoPage } from './upload/UploadW2lVideoPage';
 import { W2lResultViewFc } from './w2l/w2l_result_view/W2lResultViewFc';
 import { W2lTemplateListFc } from './w2l/w2l_template_list/W2lTemplateListFc';
 import { W2lTemplateUploadJob } from '@storyteller/components/src/jobs/W2lTemplateUploadJobs';
@@ -53,6 +54,7 @@ import ScrollToTop from './_common/ScrollToTop';
 import { Language } from '@storyteller/components/src/i18n/Language';
 import { VoiceCloneRequestPage } from './clone_voice_requests/VoiceCloneRequestPage';
 import { VocodesPage } from './vocodes/VocodesPage';
+import { UploadVocoderPage } from './upload/UploadVocoderPage';
 
 interface Props {
   sessionWrapper: SessionWrapper,
@@ -86,6 +88,9 @@ interface Props {
 
   enqueueW2lTemplateUploadJob: (jobToken: string) => void,
   w2lTemplateUploadJobs: Array<W2lTemplateUploadJob>,
+
+  enqueueVocoderUploadJob: (jobToken: string) => void,
+  vocoderUploadJobs: Array<VocoderUploadJob>,
 
   textBuffer: string,
   setTextBuffer: (textBuffer: string) => void,
@@ -293,7 +298,7 @@ class NewVocodesContainer extends React.Component<Props, State> {
             </Route>
 
             <Route path="/upload/w2l_photo">
-              <UploadW2lPhotoFc
+              <UploadW2lPhotoPage
                 sessionWrapper={this.props.sessionWrapper}
                 w2lTemplateUploadJobs={this.props.w2lTemplateUploadJobs}
                 enqueueW2lTemplateUploadJob={this.props.enqueueW2lTemplateUploadJob}
@@ -301,7 +306,7 @@ class NewVocodesContainer extends React.Component<Props, State> {
             </Route>
 
             <Route path="/upload/w2l_video">
-              <UploadW2lVideoFc
+              <UploadW2lVideoPage
                 sessionWrapper={this.props.sessionWrapper}
                 w2lTemplateUploadJobs={this.props.w2lTemplateUploadJobs}
                 enqueueW2lTemplateUploadJob={this.props.enqueueW2lTemplateUploadJob}
@@ -309,10 +314,18 @@ class NewVocodesContainer extends React.Component<Props, State> {
             </Route>
 
             <Route path="/upload/tts">
-              <UploadTtsModelFc
+              <UploadTtsModelPage
                 sessionWrapper={this.props.sessionWrapper}
                 ttsModelUploadJobs={this.props.ttsModelUploadJobs}
                 enqueueTtsModelUploadJob={this.props.enqueueTtsModelUploadJob}
+              />
+            </Route>
+
+            <Route path="/upload/vocoder" exact={true}>
+              <UploadVocoderPage
+                sessionWrapper={this.props.sessionWrapper}
+                vocoderUploadJobs={this.props.vocoderUploadJobs}
+                enqueueVocoderUploadJob={this.props.enqueueVocoderUploadJob}
               />
             </Route>
 
