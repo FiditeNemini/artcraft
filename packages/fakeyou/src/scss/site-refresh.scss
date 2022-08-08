@@ -43,6 +43,10 @@ styles with important tags:
     cursor: pointer;
   }
 
+  .no-wrap {
+    white-space: nowrap;
+  }
+
   button:focus,
   button:active,
   button:hover,
