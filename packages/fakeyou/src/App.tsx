@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect} from "react";
 import { ApiConfig } from "@storyteller/components";
 import {
   DetectLocale,
@@ -31,6 +31,7 @@ import { FAKEYOU_MERGED_TRANSLATIONS } from "./_i18n/FakeYouTranslations";
 import i18n from "i18next";
 import { initReactI18next } from "react-i18next";
 import { USE_REFRESH } from "./Refresh";
+import { DragControls } from "framer-motion";
 
 i18n
   .use(initReactI18next) // passes i18n down to react-i18next
@@ -169,6 +170,7 @@ class App extends React.Component<Props, State> {
       textBuffer: "",
 
       darkMode: true
+      
     };
   }
 
@@ -602,17 +604,29 @@ class App extends React.Component<Props, State> {
   };
 
 
-
   public render() {
+    
     // Redesign features
     let mainClassNames;
 
     mainClassNames = USE_REFRESH ? "bg-gradient " : "";
-    mainClassNames = mainClassNames + (this.state.darkMode ? ' dark-mode' : '')
+    mainClassNames = mainClassNames + (this.state.darkMode ? '' : 'dark-mode')
+    const DarkModeOff = () =>{
+      const currentValue = this.state.darkMode // true or false
 
+       window.localStorage.setItem("darkMode", (currentValue ? "true" : "false"))
+       
+       this.setState({darkMode: !currentValue})
+       
+
+    }
     return (
       <BrowserRouter>
-
+  <div className="form-check form-switch">
+  <input className="form-check-input" type="checkbox" id="DarkModeToggle" onClick={DarkModeOff}></input>
+  <label className="form-check-label">Dark Mode</label>
+</div>
+        <button onClick={ DarkModeOff}>This is a test</button>
         <div id="main" className={mainClassNames}>
           <div className="dark-mode"></div>
 
@@ -623,7 +637,6 @@ class App extends React.Component<Props, State> {
             <div className="particle particle-4"></div>
           </div>
           
-
 
           <div id="viewable">
             {/* This is the old vocodes1.0-compatible username and version switch
@@ -694,12 +707,14 @@ class App extends React.Component<Props, State> {
                   />
                 </Route>
               </Switch>
-            </div>
+            </div> 
           </div>
         </div>
+        
+        
       </BrowserRouter>
     );
   }
 }
 
-export { App, MigrationMode, TtsInferenceJob, W2lInferenceJob };
+export { DarkModeOff, App, MigrationMode, TtsInferenceJob, W2lInferenceJob };

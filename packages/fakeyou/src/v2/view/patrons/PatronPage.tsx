@@ -9,7 +9,6 @@ import { faPatreon } from "@fortawesome/free-brands-svg-icons";
 import { USE_REFRESH } from "../../../Refresh";
 import { motion } from "framer-motion";
 import { container, item, image, panel } from "../../../data/animation";
-
 interface Props {
   sessionWrapper: SessionWrapper;
 }
@@ -78,6 +77,7 @@ function PatronPage(props: Props) {
   }
 
   return (
+    
     <motion.div initial="hidden" animate="visible" variants={container}>
       <div className="container py-5 pt-lg-0">
         <div className="row">
@@ -104,8 +104,7 @@ function PatronPage(props: Props) {
                 Support us on Patreon
               </a>
             </motion.div>
-          </div>
-          <div className="col-12 col-lg-5 d-flex flex-column align-items-center">
+          </div>          <div className="col-12 col-lg-5 d-flex flex-column align-items-center">
             <motion.img
               className="img-fluid mt-5 mw-50"
               src="/mascot/kitsune_pose7.webp"
