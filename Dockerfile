@@ -58,6 +58,9 @@ COPY db/ ./db
 
 RUN $HOME/.cargo/bin/cargo fetch
 
+ARG GIT_SHA
+RUN echo -n ${GIT_SHA} > GIT_SHA
+
 # Run all of the tests
 RUN SQLX_OFFLINE=true \
   LD_LIBRARY_PATH=/usr/lib:${LD_LIBRARY_PATH} \
@@ -157,6 +160,7 @@ COPY --from=rust-build /tmp/target/release/w2l-download-job /
 COPY --from=rust-build /tmp/target/release/w2l-inference-job /
 COPY --from=rust-build /tmp/target/release/websocket-gateway /
 COPY --from=rust-build /tmp/target/release/twitch-pubsub-subscriber /
+COPY --from=rust-build /tmp/GIT_SHA /
 
 # SSL certs are required for crypto
 COPY --from=rust-build /etc/ssl /etc/ssl

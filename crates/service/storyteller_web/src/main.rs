@@ -143,7 +143,6 @@ use twitch_common::twitch_secrets::TwitchSecrets;
 
 // TODO TODO -- also this: https://material-ui.com
 
-
 const DEFAULT_BIND_ADDRESS : &'static str = "0.0.0.0:12345";
 
 // Buckets (shared config)
@@ -434,13 +433,14 @@ pub async fn serve(server_state: ServerState) -> AnyhowResult<()>
   HttpServer::new(move || {
     // NB: Safe to clone due to internal arc
     let ip_banlist = server_state_arc.ip_banlist.clone();
+    let build_sha = std::fs::read_to_string("/GIT_SHA").unwrap_or(String::from("unknown"));
 
     let app = App::new()
       .app_data(server_state_arc.clone())
       .wrap(build_common_cors_config())
       .wrap(DefaultHeaders::new()
         .header("X-Backend-Hostname", &hostname)
-        .header("X-Build-Sha", ""))
+        .header("X-Build-Sha", build_sha.trim()))
       .wrap(IpFilter::new(ip_banlist))
       .wrap(Logger::new(&log_format)
         .exclude("/liveness")
