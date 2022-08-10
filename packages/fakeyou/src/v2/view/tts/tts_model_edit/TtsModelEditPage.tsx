@@ -41,6 +41,8 @@ const DEFAULT_VISIBILITY = "public";
 
 const DEFAULT_PRETRAINED_VOCODER = "hifigan-superres";
 
+const UNSET_CUSTOM_VOCODER_SENTINEL = ""; // NB: Empty string
+
 interface Props {
   sessionWrapper: SessionWrapper;
   enqueueTtsJob: (jobToken: string) => void;
@@ -218,10 +220,13 @@ function TtsModelEditPage(props: Props) {
       creator_set_visibility: visibility || DEFAULT_VISIBILITY,
       maybe_default_pretrained_vocoder:
         defaultPretrainedVocoder || DEFAULT_PRETRAINED_VOCODER,
-      maybe_custom_vocoder_token: maybeCustomVocoderToken,
       ietf_language_tag: fullLanguageTag || DEFAULT_MODEL_LANGUAGE,
       text_pipeline_type: textPipelineType,
     };
+
+    if (!!maybeCustomVocoderToken && maybeCustomVocoderToken !== UNSET_CUSTOM_VOCODER_SENTINEL) {
+      request.maybe_custom_vocoder_token = maybeCustomVocoderToken;
+    }
 
     if (isModerator) {
       request.is_front_page_featured = isFrontPageFeatured;
@@ -492,6 +497,9 @@ function TtsModelEditPage(props: Props) {
                       value={maybeCustomVocoderToken || ""}
                       className="form-select"
                     >
+                      <option value={UNSET_CUSTOM_VOCODER_SENTINEL}>
+                        Unset / Do Not Use
+                      </option>
                       {customVocoderOptions}
                     </select>
                   </div>
