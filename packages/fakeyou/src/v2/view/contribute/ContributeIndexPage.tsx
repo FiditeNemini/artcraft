@@ -13,7 +13,6 @@ import {
   faImage,
   faTags,
   faHandsHelping,
-  faChartArea,
 } from "@fortawesome/free-solid-svg-icons";
 import { motion } from "framer-motion";
 import { container, item, panel } from "../../../data/animation";
