@@ -32,6 +32,7 @@ import i18n from "i18next";
 import { initReactI18next } from "react-i18next";
 import { USE_REFRESH } from "./Refresh";
 import { DragControls } from "framer-motion";
+import { container, item, panel, image, sessionItem } from "../src/data/animation";
 
 i18n
   .use(initReactI18next) // passes i18n down to react-i18next
@@ -114,6 +115,7 @@ interface State {
   textBuffer: string;
 
   darkMode: boolean;
+  LowSpec: boolean;
 }
 
 function newVocodes() {
@@ -169,7 +171,8 @@ class App extends React.Component<Props, State> {
 
       textBuffer: "",
 
-      darkMode: true
+      darkMode: true,
+      LowSpec : true
       
     };
   }
@@ -190,7 +193,22 @@ class App extends React.Component<Props, State> {
         // darkMode: currentView
         darkMode: true
       })
+      
     }
+    if (!window.localStorage.getItem('LowSpec')) {
+      // if not, set one to false to ensure we are defualting to dark mode.
+      window.localStorage.setItem('LowSpec', 'false')
+    } else {
+      // otherwise, make sure our state matches the users preference
+      const currentView = window.localStorage.getItem('LowSpec') === 'true' ? true : false
+
+      this.setState({
+        // darkMode: currentView
+        LowSpec: true
+      })
+      
+    }
+
 
     if (USE_REFRESH) {
       // Redesign-specific CSS
@@ -224,7 +242,6 @@ class App extends React.Component<Props, State> {
 
     let DOM = document.getElementsByClassName('fakeyou-refresh')[0].className
 
-    DOM = this.state.darkMode ? `${DOM} light-mode` : `${DOM}`
     console.log()
   }
 
@@ -611,6 +628,7 @@ class App extends React.Component<Props, State> {
 
     mainClassNames = USE_REFRESH ? "bg-gradient " : "";
     mainClassNames = mainClassNames + (this.state.darkMode ? '' : 'dark-mode')
+    mainClassNames = mainClassNames + mainClassNames + (this.state.LowSpec ? '' : 'low-spec')
     const DarkModeOff = () =>{
       const currentValue = this.state.darkMode // true or false
 
@@ -620,13 +638,47 @@ class App extends React.Component<Props, State> {
        
 
     }
+     const LowSpec = () =>{
+      const currentValue2 = this.state.LowSpec // true or false
+
+       window.localStorage.setItem("LowSpec", (currentValue2 ? "true" : "false"))
+       
+       this.setState({LowSpec: !currentValue2})
+       if (currentValue2 == true){
+      image.hidden.opacity = 1
+      image.hidden.x = 0
+      panel.hidden.y = 0
+      item.hidden.y = 0
+      sessionItem.hidden.x = 0
+      panel.hidden.opacity = 1
+      item.hidden.opacity = 1
+      container.hidden.opacity = 1
+      sessionItem.hidden.opacity = 1
+    }
+    else{
+      image.hidden.opacity = 0
+      image.hidden.x = 100
+      panel.hidden.y = 50
+      item.hidden.y = 50
+      sessionItem.hidden.x = 50
+      panel.hidden.opacity = 0
+      item.hidden.opacity = 0
+      container.hidden.opacity = 0
+      sessionItem.hidden.opacity = 0
+    }
+
+    }
     return (
       <BrowserRouter>
   <div className="form-check form-switch">
   <input className="form-check-input" type="checkbox" id="DarkModeToggle" onClick={DarkModeOff}></input>
   <label className="form-check-label">Dark Mode</label>
 </div>
-        <button onClick={ DarkModeOff}>This is a test</button>
+<div className="form-check form-switch">
+  <input className="form-check-input" type="checkbox" id="LowSpec" onClick={LowSpec}></input>
+  <label className="form-check-label">Low Spec</label>
+</div>
+
         <div id="main" className={mainClassNames}>
           <div className="dark-mode"></div>
 
@@ -639,6 +691,7 @@ class App extends React.Component<Props, State> {
           
 
           <div id="viewable">
+            
             {/* This is the old vocodes1.0-compatible username and version switch
             <MigrationTopNav
               enableAlpha={this.state.enableAlpha}
@@ -648,9 +701,12 @@ class App extends React.Component<Props, State> {
             */}
 
             <div className="migrationComponentWrapper dark-mode">
+              
               <Switch>
                 <Route path="/">
+        
                   <NewVocodesContainer
+                  
                     sessionWrapper={this.state.sessionWrapper}
                     querySessionAction={this.querySession}
                     isShowingVocodesNotice={this.state.isShowingVocodesNotice}
@@ -704,6 +760,7 @@ class App extends React.Component<Props, State> {
                       this.props.setMaybeSelectedTtsModel
                     }
                     dark-mode={this.state.darkMode}
+                    
                   />
                 </Route>
               </Switch>
@@ -717,4 +774,4 @@ class App extends React.Component<Props, State> {
   }
 }
 
-export { DarkModeOff, App, MigrationMode, TtsInferenceJob, W2lInferenceJob };
+export { App, MigrationMode, TtsInferenceJob, W2lInferenceJob };

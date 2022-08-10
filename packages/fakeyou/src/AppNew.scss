@@ -52,7 +52,55 @@ $headings-font-family: "Merriweather", serif;
         rgba(16, 14, 26, 1) 100%) !important;
     background-repeat: no-repeat;
     background-attachment: fixed;
+    &.low-spec{
 
+      .particle-1 {
+        animation: animParticle $time-1 linear infinite;
+        @include particles(0);
+        height: 7px;
+        width: 7px;
+      }
+      
+      .particle-1:after {
+        @include particles(0);
+        height: 8px;
+        width: 8px;
+      }
+      
+      .particle-2 {
+        animation: animParticle $time-2 linear infinite;
+        @include particles(0);
+        height: 5px;
+        width: 5px;
+      }
+      
+      .particle-2:after {
+        @include particles(0);
+        height: 5px;
+        width: 5px;
+      }
+      
+      // .particle-3:after {
+      //   @include particles(800);
+      //   height: 10px;
+      //   width: 10px;
+      //   border-radius: 50%;
+      // }
+      
+      .particle-4 {
+        animation: animParticle $time-4 linear infinite;
+        @include particles(0);
+        height: 1px;
+        width: 1px;
+      }
+      
+      .particle-4:after {
+        @include particles(0);
+        height: 1px;
+        width: 1px;
+      }
+    
+    }
     &.dark-mode {
 
       .panel{
