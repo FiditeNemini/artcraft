@@ -1,3 +1,8 @@
+// NB: Incrementally getting rid of build warnings...
+#![forbid(unused_imports)]
+#![forbid(unused_mut)]
+#![forbid(unused_variables)]
+
 use anyhow::anyhow;
 use chrono::{DateTime, Utc};
 use container_common::anyhow_result::AnyhowResult;
@@ -60,15 +65,13 @@ pub async fn list_vocoder_models(
 
   let models : Vec<InternalVocoderModelListItemRaw> = match maybe_models {
     Ok(models) => models,
-    Err(err) => {
-      match err {
-        RowNotFound => {
-          return Ok(Vec::new());
-        },
-        _ => {
-          warn!("vocoder model list query error: {:?}", err);
-          return Err(anyhow!("vocoder model list query error"));
-        }
+    Err(err) => return match err {
+      _RowNotFound => {
+        Ok(Vec::new())
+      },
+      _ => {
+        warn!("vocoder model list query error: {:?}", err);
+        Err(anyhow!("vocoder model list query error"))
       }
     }
   };
