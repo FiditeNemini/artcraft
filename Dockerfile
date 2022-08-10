@@ -160,6 +160,7 @@ COPY --from=rust-build /tmp/target/release/w2l-download-job /
 COPY --from=rust-build /tmp/target/release/w2l-inference-job /
 COPY --from=rust-build /tmp/target/release/websocket-gateway /
 COPY --from=rust-build /tmp/target/release/twitch-pubsub-subscriber /
+COPY --from=rust-build /tmp/target/release/generic-download-job /
 COPY --from=rust-build /tmp/GIT_SHA /
 
 # SSL certs are required for crypto
