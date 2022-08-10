@@ -1,32 +1,28 @@
-use actix_http::Error;
-use actix_http::http::header;
-use actix_web::HttpResponseBuilder;
-use actix_web::cookie::Cookie;
+// NB: Incrementally getting rid of build warnings...
+#![forbid(unused_imports)]
+#![forbid(unused_mut)]
+#![forbid(unused_variables)]
+
 use actix_web::error::ResponseError;
 use actix_web::http::StatusCode;
 use actix_web::web::{Path, Json};
-use actix_web::{Responder, web, HttpResponse, error, HttpRequest};
-use container_common::i18n::supported_languages_for_models::{is_valid_language_for_models, get_canonicalized_language_tag_for_model};
+use actix_web::{web, HttpResponse, HttpRequest};
+use container_common::i18n::supported_languages_for_models::get_canonicalized_language_tag_for_model;
 use crate::http_server::web_utils::ip_address::get_request_ip;
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 use crate::http_server::web_utils::response_success_helpers::simple_json_success;
 use crate::server_state::ServerState;
-use crate::util::email_to_gravatar::email_to_gravatar;
 use crate::util::markdown_to_html::markdown_to_html;
 use database_queries::column_types::record_visibility::RecordVisibility;
 use database_queries::column_types::vocoder_type::VocoderType;
-use database_queries::queries::tts::tts_models::get_tts_model::get_tts_model_by_token;
-use language_tags::{LanguageTag, ParseError};
-use log::{info, warn, log, error};
-use regex::Regex;
-use sqlx::MySqlPool;
-use sqlx::error::DatabaseError;
-use sqlx::error::Error::Database;
-use sqlx::mysql::MySqlDatabaseError;
-use std::fmt;
-use std::sync::Arc;
 use database_queries::queries::tts::tts_models::edit_tts_model_details::{edit_tts_model_details_as_author, edit_tts_model_details_as_mod};
 use database_queries::queries::tts::tts_models::edit_tts_model_moderator_details::edit_tts_model_moderator_details;
+use database_queries::queries::tts::tts_models::get_tts_model::get_tts_model_by_token;
+use language_tags::LanguageTag;
+use log::{info, warn, error};
+use sqlx::MySqlPool;
+use std::fmt;
+use std::sync::Arc;
 use tts_common::text_pipelines::text_pipeline_type::TextPipelineType;
 use user_input_common::check_for_slurs::contains_slurs;
 
@@ -46,18 +42,30 @@ pub struct EditTtsModelRequest {
   pub title: Option<String>,
   pub description_markdown: Option<String>,
   pub creator_set_visibility: Option<String>,
-  pub maybe_default_pretrained_vocoder: Option<VocoderType>,
 
-  // Text pipeline won't be set by default on model upload (for now),
-  // and a lot of existing models will have null values.
+  // This controls how text will be pre-processed before it is handed off to the TTS
+  // synthesizer model. Different pipelines treat graphemes, acronyms, arpabet, language
+  // specifics, and integer encodings in their own way.
+  // Note that the text pipeline option won't be set by default on new model uploads (for
+  // now), and that most existing models will have null values here.
   pub text_pipeline_type: Option<TextPipelineType>,
+
+  // [vocoders 1]
+  // This is the new type of vocoder configuration. Users can choose a custom trained
+  // vocoder to associate with their model. These tokens reference the `vocoder_models`
+  // table.
+  pub maybe_custom_vocoder_token: Option<String>,
+
+  // [vocoders 2]
+  // This is the old type of vocoder configuration, which leverages old pretrained
+  // vocoders that we manually uploaded. There aren't many good options for users to
+  // choose here, so this should be treated as a legacy option going forward. We'll
+  // likely be stuck with this configuration for some time, however, due to the large
+  // collection of legacy models we have.
+  pub maybe_default_pretrained_vocoder: Option<VocoderType>,
 
   // NB: We calculate 'ietf_primary_language_subtag' from this value.
   pub ietf_language_tag: Option<String>,
-
-  //pub updatable_slug: Option<String>,
-  //pub tts_model_type: Option<String>,
-  //pub vocoder_token: Option<String>,
 
   // ========== Moderator options (protection) ==========
 
@@ -233,10 +241,10 @@ pub async fn edit_tts_model_handler(
     }
   }
 
-  let mut ietf_language_tag = ietf_language_tag
+  let ietf_language_tag = ietf_language_tag
       .unwrap_or(DEFAULT_IETF_LANGUAGE_TAG.to_string());
 
-  let mut ietf_primary_language_subtag = ietf_primary_language_subtag
+  let ietf_primary_language_subtag = ietf_primary_language_subtag
       .unwrap_or(DEFAULT_IETF_PRIMARY_LANGUAGE_SUBTAG.to_string());
 
   if let Some(visibility) = request.creator_set_visibility.as_deref() {
@@ -244,13 +252,13 @@ pub async fn edit_tts_model_handler(
         .map_err(|_| EditTtsModelError::BadInput("bad record visibility".to_string()))?;
   }
 
-  if let Some(vocoder) = request.maybe_default_pretrained_vocoder {
-    maybe_default_pretrained_vocoder = Some(vocoder);
-  }
-
   let text_pipeline_type = request.text_pipeline_type
       .map(|pipeline_type| pipeline_type.to_db_variant())
       .map(|pipeline_type| pipeline_type.to_str());
+
+  if let Some(vocoder) = request.maybe_default_pretrained_vocoder {
+    maybe_default_pretrained_vocoder = Some(vocoder);
+  }
 
   let ip_address = get_request_ip(&http_request);
 
@@ -266,6 +274,7 @@ pub async fn edit_tts_model_handler(
       &ietf_primary_language_subtag,
       creator_set_visibility,
       maybe_default_pretrained_vocoder,
+      request.maybe_custom_vocoder_token.as_deref(),
       text_pipeline_type,
       &ip_address,
     ).await
@@ -281,6 +290,7 @@ pub async fn edit_tts_model_handler(
       &ietf_primary_language_subtag,
       creator_set_visibility,
       maybe_default_pretrained_vocoder,
+      request.maybe_custom_vocoder_token.as_deref(),
       text_pipeline_type,
       &user_session.user_token,
     ).await

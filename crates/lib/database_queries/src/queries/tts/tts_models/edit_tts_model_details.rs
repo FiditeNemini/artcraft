@@ -14,6 +14,7 @@ pub async fn edit_tts_model_details_as_author(
   ietf_primary_language_subtag: &str,
   creator_set_visibility: RecordVisibility,
   maybe_default_pretrained_vocoder: Option<VocoderType>,
+  maybe_custom_vocoder_token: Option<&str>,
   text_pipeline_type: Option<&str>,
   // Author fields
   author_ip_address: &str,
@@ -24,6 +25,7 @@ pub async fn edit_tts_model_details_as_author(
 UPDATE tts_models
 SET
     maybe_default_pretrained_vocoder = ?,
+    maybe_custom_vocoder_token = ?,
     text_pipeline_type = ?,
     title = ?,
     description_markdown = ?,
@@ -37,6 +39,7 @@ WHERE token = ?
 LIMIT 1
         "#,
       maybe_default_pretrained_vocoder.map(|v| v.to_str()),
+      maybe_custom_vocoder_token,
       text_pipeline_type,
       title,
       description_markdown,
@@ -61,6 +64,7 @@ pub async fn edit_tts_model_details_as_mod(
   ietf_primary_language_subtag: &str,
   creator_set_visibility: RecordVisibility,
   maybe_default_pretrained_vocoder: Option<VocoderType>,
+  maybe_custom_vocoder_token: Option<&str>,
   text_pipeline_type: Option<&str>,
   // moderator fields
   moderator_user_token: &str,
@@ -71,6 +75,7 @@ pub async fn edit_tts_model_details_as_mod(
 UPDATE tts_models
 SET
     maybe_default_pretrained_vocoder = ?,
+    maybe_custom_vocoder_token = ?,
     text_pipeline_type = ?,
     title = ?,
     description_markdown = ?,
@@ -84,6 +89,7 @@ WHERE token = ?
 LIMIT 1
         "#,
       maybe_default_pretrained_vocoder.map(|v| v.to_str()),
+      maybe_custom_vocoder_token,
       text_pipeline_type,
       title,
       description_markdown,
