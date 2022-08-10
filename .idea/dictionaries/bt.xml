@@ -1,0 +1,18 @@
+<component name="ProjectDictionaryState">
+  <!--
+  Despite spellcheck dictionaries being created per-user, IntelliJ loads all of them, per:
+  https://stackoverflow.com/a/28151692
+  -->
+  <dictionary name="bt">
+    <words>
+      <w>arpabet</w>
+      <w>backfill</w>
+      <w>cheermote</w>
+      <w>fakeyou</w>
+      <w>hifigan</w>
+      <w>scrollback</w>
+      <w>vocoder</w>
+      <w>vocoders</w>
+    </words>
+  </dictionary>
+</component>
