@@ -1,5 +1,6 @@
 pub mod api_tokens;
 pub mod categories;
+pub mod download_job;
 pub mod events;
 pub mod flags;
 pub mod investor_demo;
@@ -10,5 +11,6 @@ pub mod service;
 pub mod tts;
 pub mod twitch;
 pub mod users;
+pub mod vocoders;
 pub mod voice_clone_requests;
 pub mod w2l;

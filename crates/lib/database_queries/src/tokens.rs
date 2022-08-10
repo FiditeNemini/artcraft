@@ -13,6 +13,10 @@ impl Tokens {
     random_prefix_crockford_token("TM:", 15, false)
   }
 
+  pub fn new_vocoder_model() -> AnyhowResult<String> {
+    random_prefix_crockford_token("VM:", 15, false)
+  }
+
   pub fn new_tts_result() -> AnyhowResult<String> {
     random_prefix_crockford_token("TR:", 32, false)
   }
@@ -53,6 +57,10 @@ impl Tokens {
 
   pub fn new_w2l_inference_job() -> AnyhowResult<String> {
     random_prefix_crockford_token("JWINF:", 32, false)
+  }
+
+  pub fn new_generic_upload_job() -> AnyhowResult<String> {
+    random_prefix_crockford_token("JGUP:", 32, false)
   }
 
   pub fn new_firehose_event() -> AnyhowResult<String> {

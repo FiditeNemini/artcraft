@@ -1,11 +1,14 @@
-use anyhow::anyhow;
+// NB: Incrementally getting rid of build warnings...
+#![forbid(unused_imports)]
+#![forbid(unused_mut)]
+#![forbid(unused_variables)]
+
 use chrono::{Utc, DateTime};
 use container_common::anyhow_result::AnyhowResult;
 use crate::column_types::job_status::JobStatus;
 use crate::column_types::record_visibility::RecordVisibility;
 use crate::helpers::boolean_converters::i8_to_bool;
 use crate::queries::tts::tts_inference_jobs::_keys::TtsInferenceJobId;
-use log::{warn, info};
 use sqlx::MySqlPool;
 
 /// table: tts_inference_jobs
@@ -31,9 +34,9 @@ pub struct AvailableTtsInferenceJob {
   pub attempt_count: i32,
   pub failure_reason: Option<String>,
 
-  pub created_at: chrono::DateTime<Utc>,
-  pub updated_at: chrono::DateTime<Utc>,
-  pub retry_at: Option<chrono::DateTime<Utc>>,
+  pub created_at: DateTime<Utc>,
+  pub updated_at: DateTime<Utc>,
+  pub retry_at: Option<DateTime<Utc>>,
 }
 
 /// Query jobs that are ready to run

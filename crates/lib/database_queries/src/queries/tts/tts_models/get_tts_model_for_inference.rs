@@ -1,8 +1,13 @@
-use anyhow::anyhow;
+// NB: Incrementally getting rid of build warnings...
+#![forbid(unused_imports)]
+#![forbid(unused_mut)]
+#![forbid(unused_variables)]
+
 use chrono::{Utc, DateTime};
 use log::warn;
 use sqlx::MySqlPool;
 use sqlx;
+use reusable_types::vocoder_type::VocoderType;
 
 // TODO: Can probably just reuse another query.
 
@@ -14,6 +19,18 @@ pub struct TtsModelForInferenceRecord {
   /// NB: text_pipeline_type may not always be present in the database.
   pub text_pipeline_type: Option<String>,
 
+  /// [vocoders 1]
+  /// This is the new type of vocoder configuration. Users can choose a custom trained
+  /// vocoder to associate with their model. The tokens reference the `vocoder_models`
+  /// table.
+  pub maybe_custom_vocoder: Option<CustomVocoderFields>,
+
+  /// [vocoders 2]
+  /// This is the old type of vocoder configuration, which leverages old pretrained
+  /// vocoders that we manually uploaded. There aren't many good options for users to
+  /// choose here, so this should be treated as a legacy option going forward. We'll
+  /// likely be stuck with this configuration for some time, however, due to the large
+  /// collection of legacy models we have.
   pub maybe_default_pretrained_vocoder: Option<String>,
 
   pub creator_user_token: String,
@@ -28,6 +45,13 @@ pub struct TtsModelForInferenceRecord {
   pub user_deleted_at: Option<DateTime<Utc>>,
 }
 
+#[derive(Clone)]
+pub struct CustomVocoderFields {
+  pub vocoder_token: String,
+  pub vocoder_type: VocoderType,
+  pub vocoder_title: String,
+  pub vocoder_private_bucket_hash: String,
+}
 
 #[derive(Clone, Debug)]
 pub enum TtsModelForInferenceError {
@@ -57,13 +81,20 @@ pub async fn get_tts_model_for_inference(
   // NB: Lookup failure is Err(RowNotFound).
   // NB: Since this is publicly exposed, we don't query sensitive data.
   let maybe_model = sqlx::query_as!(
-      TtsModelForInferenceRecord,
+      InternalTtsModelForInferenceRecordRaw,
         r#"
 SELECT
     tts.token as model_token,
     tts.tts_model_type,
     tts.text_pipeline_type,
+
     tts.maybe_default_pretrained_vocoder,
+
+    tts.maybe_custom_vocoder_token,
+    vocoder.vocoder_type as `maybe_custom_vocoder_type: reusable_types::vocoder_type::VocoderType`,
+    vocoder.title as maybe_custom_vocoder_title,
+    vocoder.private_bucket_hash as maybe_custom_vocoder_private_bucket_hash,
+
     tts.creator_user_token,
     users.username as creator_username,
     users.display_name as creator_display_name,
@@ -73,9 +104,15 @@ SELECT
     tts.updated_at,
     tts.user_deleted_at,
     tts.mod_deleted_at
+
 FROM tts_models as tts
+
 JOIN users
-ON users.token = tts.creator_user_token
+    ON users.token = tts.creator_user_token
+
+LEFT OUTER JOIN vocoder_models AS vocoder
+    ON vocoder.token = tts.maybe_custom_vocoder_token
+
 WHERE tts.token = ?
         "#,
       &model_token
@@ -83,7 +120,7 @@ WHERE tts.token = ?
       .fetch_one(pool)
       .await; // TODO: This will return error if it doesn't exist
 
-  let model : TtsModelForInferenceRecord = match maybe_model {
+  let model : InternalTtsModelForInferenceRecordRaw = match maybe_model {
     Ok(model) => model,
     Err(err) => {
       match err {
@@ -104,5 +141,61 @@ WHERE tts.token = ?
     return Err(TtsModelForInferenceError::ModelDeleted);
   }
 
-  Ok(model)
+  Ok(TtsModelForInferenceRecord {
+    model_token: model.model_token,
+    tts_model_type: model.tts_model_type,
+    text_pipeline_type: model.text_pipeline_type,
+    maybe_custom_vocoder: match model.maybe_custom_vocoder_token {
+      // NB: We're relying on a single field's presence to infer that the others vocoder fields
+      // are also there. If for some reason they aren't, fail open.
+      None => None,
+      Some(vocoder_token) => Some(CustomVocoderFields {
+        vocoder_token,
+        vocoder_type: model.maybe_custom_vocoder_type.ok_or(
+          TtsModelForInferenceError::DatabaseError { reason: "custom_vocoder_type field error".to_string() })?,
+        vocoder_title: model.maybe_custom_vocoder_title.ok_or(
+          TtsModelForInferenceError::DatabaseError { reason: "custom_vocoder_title field error".to_string() })?,
+        vocoder_private_bucket_hash: model.maybe_custom_vocoder_private_bucket_hash.ok_or(
+          TtsModelForInferenceError::DatabaseError { reason: "vocoder_private_bucket_hash field error".to_string() })?,
+      })
+    },
+    maybe_default_pretrained_vocoder: model.maybe_default_pretrained_vocoder,
+    creator_user_token: model.creator_user_token,
+    creator_username: model.creator_username,
+    creator_display_name: model.creator_display_name,
+    title: model.title,
+    private_bucket_hash: model.private_bucket_hash,
+    created_at: model.created_at,
+    updated_at: model.updated_at,
+    mod_deleted_at: model.mod_deleted_at,
+    user_deleted_at: model.user_deleted_at,
+  })
 }
+
+struct InternalTtsModelForInferenceRecordRaw {
+  model_token: String,
+  tts_model_type: String,
+
+  text_pipeline_type: Option<String>,
+
+  // Joined custom vocoder fields
+  maybe_custom_vocoder_token: Option<String>,
+  maybe_custom_vocoder_type: Option<VocoderType>,
+  maybe_custom_vocoder_title: Option<String>,
+  maybe_custom_vocoder_private_bucket_hash: Option<String>,
+
+  // Legacy vocoder config
+  maybe_default_pretrained_vocoder: Option<String>,
+
+  creator_user_token: String,
+  creator_username: String,
+  creator_display_name: String,
+
+  title: String,
+  private_bucket_hash: String,
+  created_at: DateTime<Utc>,
+  updated_at: DateTime<Utc>,
+  mod_deleted_at: Option<DateTime<Utc>>,
+  user_deleted_at: Option<DateTime<Utc>>,
+}
+

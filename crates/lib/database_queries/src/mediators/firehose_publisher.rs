@@ -24,6 +24,9 @@ enum FirehoseEvent {
   W2lInferenceStarted,
   W2lInferenceCompleted,
 
+  GenericDownloadStarted,
+  GenericDownloadCompleted,
+
   TwitterMention,
   TwitterRetweet,
   DiscordJoin,
@@ -51,6 +54,8 @@ impl FirehoseEvent {
       FirehoseEvent::DiscordMessage => "discord_message",
       FirehoseEvent::TwitchSubscribe => "twitch_subscribe",
       FirehoseEvent::TwitchFollow => "twitch_follow",
+      FirehoseEvent::GenericDownloadStarted => "generic_download_started",
+      FirehoseEvent::GenericDownloadCompleted => "generic_download_completed",
     }
   }
 }
@@ -168,6 +173,27 @@ impl FirehosePublisher {
       maybe_user_token,
       Some(job_token), // TODO: This could be template_token
       Some(result_token)
+    ).await?;
+    Ok(())
+  }
+
+  pub async fn enqueue_generic_download(&self, user_token: &str, job_token: &str) -> AnyhowResult<()> {
+    let _record_id = self.insert(
+      FirehoseEvent::GenericDownloadStarted,
+      Some(user_token),
+      None,
+      Some(job_token)
+    ).await?;
+    Ok(())
+  }
+
+  // NB: Entity token is optional.
+  pub async fn publish_generic_download_finished(&self, user_token: &str, entity_token: Option<&str>) -> AnyhowResult<()> {
+    let _record_id = self.insert(
+      FirehoseEvent::GenericDownloadCompleted,
+      Some(user_token),
+      entity_token,
+      entity_token,
     ).await?;
     Ok(())
   }

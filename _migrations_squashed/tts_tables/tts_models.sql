@@ -53,6 +53,10 @@ CREATE TABLE tts_models (
   -- If not set, use the website default. (Currently HifiGan-SS)
   maybe_default_pretrained_vocoder VARCHAR(64) DEFAULT NULL,
 
+  -- If set, we'll use a custom vocoder (from table vocoder_models) instead of a default vocoder.
+  -- If not set, we'll use `maybe_default_pretrained_vocoder` (or the website default).
+  maybe_custom_vocoder_token VARCHAR(32) DEFAULT NULL,
+
   -- Optional Pointer to a newer version of the voice
   -- If there's a newer version, we can disable this one.
   -- maybe_updated_model_token VARCHAR(32) DEFAULT NULL,
@@ -201,6 +205,7 @@ CREATE TABLE tts_models (
   UNIQUE KEY (token),
   KEY fk_creator_user_token (creator_user_token),
   KEY fk_maybe_mod_user_token (maybe_mod_user_token),
+  KEY fk_maybe_custom_vocoder_token (maybe_custom_vocoder_token),
   KEY index_creator_ip_address_creation (creator_ip_address_creation),
   KEY index_creator_ip_address_last_update (creator_ip_address_last_update),
   KEY index_creator_set_visibility (creator_set_visibility),

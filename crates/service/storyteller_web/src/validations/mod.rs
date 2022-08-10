@@ -8,4 +8,5 @@ pub mod twitch_username;
 pub mod twitter_username;
 pub mod username;
 pub mod username_reservations;
+pub mod validate_idempotency_token_format;
 pub mod website_url;

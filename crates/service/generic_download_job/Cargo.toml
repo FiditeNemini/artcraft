@@ -1,0 +1,62 @@
+[package]
+name = "generic-download-job"
+publish = false
+edition = "2018"
+version = "0.0.1"
+authors = [
+    "Brandon Thomas <bt@brand.io>",
+    "Brandon Thomas <echelon@gmail.com>",
+]
+
+[[bin]]
+name = "generic-download-job"
+path = "src/main.rs"
+
+[dependencies]
+
+# Internal
+config = { path = "../../lib/config" }
+container_common = { path = "../../lib/container_common" }
+database_queries = { path = "../../lib/database_queries" }
+google_drive_common = { path = "../../lib/google_drive_common" }
+jobs_common = { path = "../../lib/jobs_common" }
+reusable_types = { path = "../../lib/reusable_types" }
+storage_buckets_common = { path = "../../lib/storage_buckets_common" }
+tts_common = { path = "../../lib/tts_common" }
+
+# Vendored code
+newrelic-telemetry = { path = "../../vendor/newrelic-telemetry-sdk-rust" }
+
+# External
+anyhow = "1.0.40"
+chrono = { version = "0.4.19", features = ["serde"] }
+clap = "2.34.0" # TODO: This is really out of date, but has conflicts when updated
+dotenv = "0.15.0"
+easyenv = "0.0.6"
+hostname = "0.3.1"
+lfu = "0.2.5"
+log = "0.4.14"
+subprocess = "0.2.6"
+tempdir = "0.3.7"
+
+# MySql Database
+# "offline" supports typesafe builds without a live database
+# "rustls" doesn't appear to work with IP addresses, per:
+# https://github.com/launchbadge/sqlx/issues/1095#issuecomment-798050828
+sqlx = { version = "0.5", features = [ "mysql", "runtime-actix-native-tls", "offline", "chrono" ] }
+
+# Redis
+r2d2_redis = "0.14.0"
+
+# Runtime
+# NB: We switched to Tokio from `async-std` for broader ecosystem support.
+tokio = { version = "1.6.0", features = ["macros"] }
+
+# NB: Hyper is just for HTTP client use in jobs. I'd use Actix client, but I need tokio runtime
+# NB: Furthermore, the Tokio runtime is old, so I have to use an older Hyper.
+hyper = { version = "0.14.14" }
+
+# Serialization
+serde = "1.0.125"
+serde_derive = "1.0.125"
+serde_json = "1.0.64"

@@ -6,9 +6,10 @@ use std::path::PathBuf;
 /// different types of objects are stored.
 pub struct BucketPathUnifier {
   // TTS
-  pub tts_pretrained_vocoder_model_root: PathBuf,
   pub tts_synthesizer_model_root: PathBuf,
   pub tts_inference_output_root: PathBuf,
+  pub tts_pretrained_vocoder_model_root: PathBuf, // Pretrained, non-user uploaded vocoders
+  pub vocoder_model_root: PathBuf, // User-uploaded vocoders
   // W2L
   pub user_uploaded_w2l_templates_root: PathBuf,
   pub user_uploaded_audio_for_w2l_root: PathBuf,
@@ -19,20 +20,13 @@ pub struct BucketPathUnifier {
 
 impl BucketPathUnifier {
 
-  // TODO
-  //pub fn from_env_vars() -> AnyhowResult<Self> {
-  //  Ok(Self {
-  //    user_uploaded_audio_for_w2l_root: ,
-  //    user_uploaded_w2l_templates_root: ,
-  //  })
-  //}
-
   pub fn default_paths() -> Self {
     Self {
       // TTS
-      tts_pretrained_vocoder_model_root: PathBuf::from("/tts_pretrained_vocoders"),
       tts_synthesizer_model_root: PathBuf::from("/user_uploaded_tts_synthesizers"),
       tts_inference_output_root: PathBuf::from("/tts_inference_output"),
+      tts_pretrained_vocoder_model_root: PathBuf::from("/tts_pretrained_vocoders"), // Pretrained, non-user uploaded vocoders
+      vocoder_model_root: PathBuf::from("/user_uploaded_vocoders"),
       // W2L
       user_uploaded_audio_for_w2l_root: PathBuf::from("/user_uploaded_w2l_audio"),
       user_uploaded_w2l_templates_root: PathBuf::from("/user_uploaded_w2l_templates"),
@@ -43,12 +37,6 @@ impl BucketPathUnifier {
   }
 
   // ==================== TTS MODELS (SYNTHESIZER + VOCODER) ==================== //
-
-  // TTS pretrained vocoder models.
-  // For now this will be limited, but once they're user-uploadable, we'll add more.
-  pub fn tts_pretrained_vocoders_path(&self, tts_vocoder_model_name: &str) -> PathBuf {
-    self.tts_pretrained_vocoder_model_root.join(tts_vocoder_model_name)
-  }
 
   pub fn tts_synthesizer_path(&self, tts_synthesizer_file_hash: &str) -> PathBuf {
     let hashed_path = Self::hashed_directory_path(tts_synthesizer_file_hash);
@@ -64,6 +52,25 @@ impl BucketPathUnifier {
     let model_filename = format!("{}.zip", &tts_synthesizer_file_hash);
 
     self.tts_synthesizer_model_root
+        .join(hashed_path)
+        .join(model_filename)
+  }
+
+  // ==================== VOCODER MODELS ==================== //
+
+  /// TTS pretrained vocoder models.
+  /// For now this will be limited, but once they're user-uploadable, we'll add more.
+  /// NB: These are vocoders that we uploaded without the FakeYou upload system!!
+  pub fn tts_pretrained_vocoders_path(&self, tts_vocoder_model_name: &str) -> PathBuf {
+    self.tts_pretrained_vocoder_model_root.join(tts_vocoder_model_name)
+  }
+
+  /// User-uploaded vocoders.
+  pub fn vocoder_path(&self, vocoder_file_hash: &str) -> PathBuf {
+    let hashed_path = Self::hashed_directory_path(vocoder_file_hash);
+    let model_filename = format!("{}.pt", &vocoder_file_hash);
+
+    self.vocoder_model_root
         .join(hashed_path)
         .join(model_filename)
   }
@@ -179,9 +186,10 @@ mod tests {
   fn get_instance() -> BucketPathUnifier {
     BucketPathUnifier {
       // TTS
-      tts_pretrained_vocoder_model_root: PathBuf::from("/test_path_tts_vocoders"),
       tts_synthesizer_model_root: PathBuf::from("/test_path_synthesizers"),
       tts_inference_output_root: PathBuf::from("/test_path_tts_output"),
+      tts_pretrained_vocoder_model_root: PathBuf::from("/test_path_tts_vocoders"), // Pretrained, non-user uploaded vocoders
+      vocoder_model_root: PathBuf::from("/test_path_user_vocoders"), // User-uploaded vocoders
       // W2L
       user_uploaded_w2l_templates_root: PathBuf::from("/test_path_w2l_templates"),
       user_uploaded_audio_for_w2l_root: PathBuf::from("/test_path_w2l_audio"),
@@ -191,11 +199,20 @@ mod tests {
     }
   }
 
+  // NB: Pretrained, non-user uploaded vocoders
   #[test]
   fn test_tts_pretrained_vocoders_path() {
     let paths = get_instance();
     assert_eq!(paths.tts_pretrained_vocoders_path("melgan.pth").to_str().unwrap(),
       "/test_path_tts_vocoders/melgan.pth");
+  }
+
+  // NB: User-uploaded vocoders
+  #[test]
+  fn test_vocoders_path() {
+    let paths = get_instance();
+    assert_eq!(paths.vocoder_path("foobar").to_str().unwrap(),
+      "/test_path_user_vocoders/f/o/o/foobar.pt");
   }
 
   #[test]

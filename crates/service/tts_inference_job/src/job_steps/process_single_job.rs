@@ -1,3 +1,8 @@
+// NB: Incrementally getting rid of build warnings...
+#![forbid(unused_imports)]
+#![forbid(unused_mut)]
+#![forbid(unused_variables)]
+
 use anyhow::anyhow;
 use container_common::anyhow_result::AnyhowResult;
 use container_common::filesystem::check_file_exists::check_file_exists;
@@ -121,7 +126,7 @@ pub async fn process_single_job(
 
   // ==================== CONFIRM OR DOWNLOAD HIFIGAN (NORMAL) VOCODER MODEL ==================== //
 
-  let hifigan_vocoder_model_fs_path = {
+  let pretrained_hifigan_vocoder_model_fs_path = {
     let hifigan_vocoder_model_filename = inferencer.hifigan_vocoder_model_filename.clone();
     let hifigan_vocoder_model_fs_path = inferencer.semi_persistent_cache.tts_pretrained_vocoder_model_path(&hifigan_vocoder_model_filename);
     let hifigan_vocoder_model_object_path = inferencer.bucket_path_unifier.tts_pretrained_vocoders_path(&hifigan_vocoder_model_filename);
@@ -161,26 +166,30 @@ pub async fn process_single_job(
     hifigan_superres_vocoder_model_fs_path
   };
 
-//  // ==================== LOOK UP TTS SYNTHESIZER RECORD (WHICH CONTAINS ITS BUCKET PATH) ==================== //
-//
-//  info!("Looking up TTS model by token: {}", &job.model_token);
-//
-//  let query_result = get_tts_model_by_token(
-//    &inferencer.mysql_pool,
-//    &job.model_token).await?;
-//
-//  let tts_model = match query_result {
-//    Some(model) => model,
-//    None => {
-//      warn!("TTS model not found: {}", &job.model_token);
-//      return Err(anyhow!("Model not found!"))
-//    },
-//  };
+//  // ==================== CONFIRM OR DOWNLOAD OPTIONAL CUSTOM VOCODER MODEL ==================== //
+
+  let custom_vocoder_fs_path = match &model_record.maybe_custom_vocoder {
+    None => None,
+    Some(vocoder) => {
+      let custom_vocoder_fs_path = inferencer.semi_persistent_cache.custom_vocoder_model_path(&vocoder.vocoder_token);
+      let custom_vocoder_object_path  = inferencer.bucket_path_unifier.vocoder_path(&vocoder.vocoder_private_bucket_hash);
+
+      maybe_download_file_from_bucket(
+        "custom vocoder",
+        &custom_vocoder_fs_path,
+        &custom_vocoder_object_path,
+        &inferencer.private_bucket_client,
+        &mut redis_logger,
+        "downloading user vocoder",
+        job.id.0,
+        &inferencer.scoped_temp_dir_creator,
+      ).await?;
+
+      Some(custom_vocoder_fs_path)
+    }
+  };
 
   // ==================== CONFIRM OR DOWNLOAD TTS SYNTHESIZER MODEL ==================== //
-
-  // TODO: Let's just put paths in the db
-  // TODO: We'll probably need to LRU cache these.
 
   let tts_synthesizer_fs_path = {
     let tts_synthesizer_fs_path = inferencer.semi_persistent_cache.tts_synthesizer_model_path(&model_record.model_token);
@@ -248,16 +257,6 @@ pub async fn process_single_job(
     warn!("Unload model from sidecar: {:?}", &model_path);
   }
 
-  //inferencer.tts_inference_command.execute(
-  //  &tts_synthesizer_fs_path,
-  //  &tts_vocoder_model_fs_path,
-  //  &text_input_fs_path,
-  //  &output_audio_fs_path,
-  //  &output_spectrogram_fs_path,
-  //  &output_metadata_fs_path,
-  //  false,
-  //)?;
-
   let mut pretrained_vocoder = VocoderType::HifiGanSuperResolution;
   if let Some(default_vocoder) = model_record.maybe_default_pretrained_vocoder.as_deref() {
     pretrained_vocoder = VocoderType::from_str(default_vocoder)
@@ -277,12 +276,23 @@ pub async fn process_single_job(
     &model_record.text_pipeline_type,
     &text_pipeline_type_or_guess);
 
+  let hifigan_vocoder_model_fs_path_to_use = match custom_vocoder_fs_path {
+    None => {
+      info!("using pretrained HiFi-GAN vocoder");
+      pretrained_hifigan_vocoder_model_fs_path
+    },
+    Some(custom_vocoder_fs_path) => {
+      info!("using custom user-trained HiFi-GAN vocoder: {:?}", custom_vocoder_fs_path);
+      custom_vocoder_fs_path
+    },
+  };
+
   inferencer.http_clients.tts_inference_sidecar_client.request_inference(
     &cleaned_inference_text,
     &tts_synthesizer_fs_path,
     pretrained_vocoder,
     &text_pipeline_type_or_guess.to_str(),
-    &hifigan_vocoder_model_fs_path,
+    &hifigan_vocoder_model_fs_path_to_use,
     &hifigan_superres_vocoder_model_fs_path,
     &waveglow_vocoder_model_fs_path,
     &output_audio_fs_path,

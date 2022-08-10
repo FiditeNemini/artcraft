@@ -1297,6 +1297,7 @@ dependencies = [
  "log",
  "once_cell",
  "regex",
+ "reusable_types",
  "serde",
  "serde_derive",
  "serde_json",
@@ -1698,6 +1699,38 @@ checksum = "501466ecc8a30d1d3b7fc9229b122b2ce8ed6e9d9223f1138d4babb253e51817"
 dependencies = [
  "typenum",
  "version_check",
+]
+
+[[package]]
+name = "generic-download-job"
+version = "0.0.1"
+dependencies = [
+ "anyhow",
+ "chrono",
+ "clap",
+ "config",
+ "container_common",
+ "database_queries",
+ "dotenv",
+ "easyenv",
+ "google_drive_common",
+ "hostname",
+ "hyper 0.14.14",
+ "jobs_common",
+ "lfu",
+ "log",
+ "newrelic-telemetry",
+ "r2d2_redis",
+ "reusable_types",
+ "serde",
+ "serde_derive",
+ "serde_json",
+ "sqlx",
+ "storage_buckets_common",
+ "subprocess",
+ "tempdir",
+ "tokio 1.13.0",
+ "tts_common",
 ]
 
 [[package]]
@@ -3226,6 +3259,19 @@ dependencies = [
 ]
 
 [[package]]
+name = "reusable_types"
+version = "0.0.1"
+dependencies = [
+ "anyhow",
+ "chrono",
+ "serde",
+ "serde_derive",
+ "serde_json",
+ "sqlx",
+ "toml",
+]
+
+[[package]]
 name = "ring"
 version = "0.16.20"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3849,12 +3895,14 @@ dependencies = [
  "memory_caching",
  "native-tls",
  "newrelic-telemetry",
+ "once_cell",
  "pulldown-cmark",
  "r2d2_redis",
  "rand 0.8.4",
  "redis_common",
  "regex",
  "reqwest",
+ "reusable_types",
  "ring 0.17.0-alpha.10",
  "rust-s3",
  "serde",

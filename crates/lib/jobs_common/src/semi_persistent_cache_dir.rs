@@ -8,7 +8,8 @@ pub struct SemiPersistentCacheDir {
   cache_root: PathBuf,
 
   tts_synthesizer_model_root: PathBuf,
-  tts_pretrained_vocoder_model_root: PathBuf,
+  tts_pretrained_vocoder_model_root: PathBuf, // Pretrained, non-user uploaded vocoders
+  vocoder_model_root: PathBuf, // User-uploaded vocoders
 
   w2l_model_root: PathBuf,
   w2l_end_bump_root: PathBuf,
@@ -33,6 +34,7 @@ impl SemiPersistentCacheDir {
 
       tts_synthesizer_model_root: cache_root.join("tts/synthesizer_models/"),
       tts_pretrained_vocoder_model_root: cache_root.join("tts/vocoder_models_pretrained/"),
+      vocoder_model_root: cache_root.join("tts/user_uploaded_vocoder_models/"),
 
       w2l_model_root: cache_root.join("w2l/models/"),
       w2l_end_bump_root: cache_root.join("w2l/end_bumps/"),
@@ -72,6 +74,21 @@ impl SemiPersistentCacheDir {
 
   pub fn create_tts_pretrained_vocoder_model_path(&self) -> AnyhowResult<()> {
     let _ = fs::create_dir_all(self.tts_pretrained_vocoder_model_directory())?;
+    Ok(())
+  }
+
+  // ==================== USER UPLOADED VOCODER MODELS ====================
+
+  pub fn custom_vocoder_model_path(&self, model_filename: &str) -> PathBuf {
+    self.vocoder_model_root.join(model_filename)
+  }
+
+  pub fn custom_vocoder_model_directory(&self) -> &Path {
+    &self.vocoder_model_root
+  }
+
+  pub fn create_custom_vocoder_model_path(&self) -> AnyhowResult<()> {
+    let _ = fs::create_dir_all(self.custom_vocoder_model_directory())?;
     Ok(())
   }
 
@@ -165,23 +182,3 @@ impl SemiPersistentCacheDir {
   //  temp_dir.path().join(&filename)
   //}
 }
-
-//#[cfg(test)]
-//mod tests {
-//  use crate::util::semi_persistent_cache_dir::SemiPersistentCacheDir;
-//  use tempdir::TempDir;
-//
-//  #[test]
-//  fn test_w2l_output_results_path() {
-//    let dirs = SemiPersistentCacheDir::default_paths();
-//    let temp_dir = TempDir::new("test").unwrap();
-//
-//    let filename = dirs.w2l_output_results_path(&temp_dir, "TYPE:TOKEN")
-//      .to_str()
-//      .map(|s| s.to_string())
-//      .unwrap();
-//
-//    assert!(&filename.ends_with("TYPETOKEN_result.mp4"));
-//  }
-//}
-//

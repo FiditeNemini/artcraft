@@ -10,12 +10,14 @@ members = [
   "crates/lib/jobs_common",
   "crates/lib/memory_caching",
   "crates/lib/redis_common",
+  "crates/lib/reusable_types",
   "crates/lib/storage_buckets_common",
   "crates/lib/tts_common",
   "crates/lib/twitch_common",
   "crates/lib/user_input_common",
 
   # Application 
+  "crates/service/generic_download_job",
   "crates/service/storyteller_web",
   "crates/service/tts_download_job",
   "crates/service/tts_inference_job",
