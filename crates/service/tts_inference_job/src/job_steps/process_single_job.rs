@@ -248,16 +248,6 @@ pub async fn process_single_job(
     warn!("Unload model from sidecar: {:?}", &model_path);
   }
 
-  //inferencer.tts_inference_command.execute(
-  //  &tts_synthesizer_fs_path,
-  //  &tts_vocoder_model_fs_path,
-  //  &text_input_fs_path,
-  //  &output_audio_fs_path,
-  //  &output_spectrogram_fs_path,
-  //  &output_metadata_fs_path,
-  //  false,
-  //)?;
-
   let mut pretrained_vocoder = VocoderType::HifiGanSuperResolution;
   if let Some(default_vocoder) = model_record.maybe_default_pretrained_vocoder.as_deref() {
     pretrained_vocoder = VocoderType::from_str(default_vocoder)
