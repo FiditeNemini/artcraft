@@ -6,6 +6,7 @@ export interface TtsModel {
   tts_model_type: string,
   text_pipeline_type: string | null,
   text_pipeline_type_guess: string,
+  maybe_custom_vocoder: CustomVocoderFields | null | undefined,
   maybe_default_pretrained_vocoder: string | null,
   text_preprocessing_algorithm: string,
   creator_user_token: string,
@@ -24,6 +25,15 @@ export interface TtsModel {
   created_at: string,
   updated_at: string,
   maybe_moderator_fields: TtsModelModeratorFields | null | undefined,
+}
+
+export interface CustomVocoderFields {
+  vocoder_token: string,
+  vocoder_title: string,
+  creator_user_token: string,
+  creator_username: string,
+  creator_display_name: string,
+  creator_gravatar_hash: string,
 }
 
 export interface TtsModelModeratorFields {

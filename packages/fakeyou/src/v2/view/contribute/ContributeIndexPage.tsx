@@ -13,6 +13,7 @@ import {
   faImage,
   faTags,
   faHandsHelping,
+  faChartArea,
 } from "@fortawesome/free-solid-svg-icons";
 import { motion } from "framer-motion";
 import { container, item, panel } from "../../../data/animation";
@@ -70,10 +71,10 @@ function ContributeIndexPage(props: Props) {
                 <FontAwesomeIcon icon={faVolumeHigh} className="me-3" />
                 {t("pages.contributeIndex.buttonUploadVoice")}
               </Link>
-              {/*<Link to="/upload/vocoder" className="btn btn-primary w-100">
+              <Link to="/upload/vocoder" className="btn btn-primary w-100">
                 <FontAwesomeIcon icon={faChartArea} className="me-3" />
                 Upload Vocoder
-              </Link>*/}
+              </Link>
               <Link to="/upload/w2l_video" className="btn btn-primary w-100">
                 <FontAwesomeIcon icon={faVideo} className="me-3" />
                 {t("pages.contributeIndex.buttonUploadW2lVideo")}

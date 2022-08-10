@@ -513,6 +513,37 @@ function TtsModelViewPage(props: Props) {
     );
   }
 
+  let vocoderRow = (
+    <tr>
+      <th>Default vocoder</th>
+      <td>{defaultVocoder}</td>
+    </tr>
+  );
+
+  if (!!ttsModel.maybe_custom_vocoder) {
+    const vocoderCreatorUrl = FrontendUrlConfig.userProfilePage(
+      ttsModel.maybe_custom_vocoder.creator_username
+    );
+    const vocoderCreatorLink = (
+      <span>
+        <Gravatar
+          size={15}
+          username={ttsModel.maybe_custom_vocoder.creator_display_name}
+          email_hash={ttsModel.maybe_custom_vocoder.creator_gravatar_hash}
+        />
+        &nbsp;
+        <Link to={vocoderCreatorUrl}>{ttsModel.maybe_custom_vocoder.creator_display_name}</Link>
+      </span>
+    );
+    vocoderRow = (
+      <tr>
+        <th>Custom tuned vocoder</th>
+        <td>{ttsModel.maybe_custom_vocoder.vocoder_title} by {vocoderCreatorLink}</td>
+      </tr>
+    );
+  }
+
+
   return (
     <motion.div initial="hidden" animate="visible" variants={container}>
       <div className="container py-5">
@@ -556,10 +587,7 @@ function TtsModelViewPage(props: Props) {
                   <th>Model type</th>
                   <td>{ttsModel?.tts_model_type}</td>
                 </tr>
-                <tr>
-                  <th>Default vocoder</th>
-                  <td>{defaultVocoder}</td>
-                </tr>
+                {vocoderRow}
                 <tr>
                   <th>Text pipeline</th>
                   <td>{textPipelineName}</td>
