@@ -13,6 +13,11 @@ import {
   TtsModel,
   TtsModelLookupError,
 } from "@storyteller/components/src/api/tts/GetTtsModel";
+import {
+  ListVocoderModels,
+  ListVocoderModelsIsOk,
+  VocoderModel,
+} from "@storyteller/components/src/api/vocoder/ListVocoderModels";
 import { BackLink } from "../../_common/BackLink";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -51,19 +56,27 @@ function TtsModelEditPage(props: Props) {
   const [ttsModel, setTtsModel] = useState<TtsModel | undefined>(undefined);
   const [notFoundState, setNotFoundState] = useState<boolean>(false);
 
+  // Vocoder lookup
+  const [vocoderModels, setVocoderModels] = useState<VocoderModel[]>([]);
+
   // Fields
   const [title, setTitle] = useState("");
   const [textPipelineType, setTextPipelineType] = useState<string | null>(null);
   const [descriptionMarkdown, setDescriptionMarkdown] = useState("");
   const [fullLanguageTag, setFullLanguageTag] = useState(""); // NB: Should be full IETF, eg. ["en", "en-US", "es-419", etc.]
   const [visibility, setVisibility] = useState(DEFAULT_VISIBILITY);
-  const [defaultPretrainedVocoder, setDefaultPretrainedVocoder] = useState(
-    DEFAULT_PRETRAINED_VOCODER
-  );
   const [isFrontPageFeatured, setIsFrontPageFeatured] = useState(false);
   const [isTwitchFeatured, setIsTwitchFeatured] = useState(false);
   const [suggestedUniqueBotCommand, setSuggestedUniqueBotCommand] =
     useState("");
+
+  // Vocoder config (modern)
+  const [maybeCustomVocoderToken, setMaybeCustomVocoderToken] = useState<string | null>(null);
+
+  // Vocoder config (legacy)
+  const [defaultPretrainedVocoder, setDefaultPretrainedVocoder] = useState(
+    DEFAULT_PRETRAINED_VOCODER
+  );
 
   const getModel = useCallback(async (token) => {
     const model = await GetTtsModel(token);
@@ -81,13 +94,16 @@ function TtsModelEditPage(props: Props) {
       setDescriptionMarkdown(model.description_markdown || "");
       setFullLanguageTag(model.ietf_language_tag || DEFAULT_MODEL_LANGUAGE);
       setVisibility(model.creator_set_visibility || DEFAULT_VISIBILITY);
-      setDefaultPretrainedVocoder(
-        model.maybe_default_pretrained_vocoder || DEFAULT_PRETRAINED_VOCODER
-      );
       setIsFrontPageFeatured(model.is_front_page_featured || false);
       setIsTwitchFeatured(model.is_twitch_featured || false);
       setSuggestedUniqueBotCommand(
         model.maybe_suggested_unique_bot_command || ""
+      );
+      if (!!model.maybe_custom_vocoder) {
+        setMaybeCustomVocoderToken(model.maybe_custom_vocoder.vocoder_token);
+      }
+      setDefaultPretrainedVocoder(
+        model.maybe_default_pretrained_vocoder || DEFAULT_PRETRAINED_VOCODER
       );
     } else if (GetTtsModelIsErr(model)) {
       switch (model) {
@@ -98,9 +114,20 @@ function TtsModelEditPage(props: Props) {
     }
   }, []);
 
+
+  const listVocoderModels = useCallback(async () => {
+    const models = await ListVocoderModels();
+
+    if (ListVocoderModelsIsOk(models)) {
+      setVocoderModels(models.vocoders);
+    }
+  }, []);
+
+
   useEffect(() => {
     getModel(token);
-  }, [token, getModel]);
+    listVocoderModels();
+  }, [token, getModel, listVocoderModels]);
 
   const handleTitleChange = (ev: React.FormEvent<HTMLInputElement>) => {
     ev.preventDefault();
@@ -137,6 +164,13 @@ function TtsModelEditPage(props: Props) {
   ) => {
     setDefaultPretrainedVocoder((ev.target as HTMLSelectElement).value);
   };
+
+  const handleCustomVocoderChange = (
+    ev: React.FormEvent<HTMLSelectElement>
+  ) => {
+    setMaybeCustomVocoderToken((ev.target as HTMLSelectElement).value);
+  };
+
 
   const handleIsFrontPageFeaturedChange = (
     ev: React.FormEvent<HTMLSelectElement>
@@ -184,6 +218,7 @@ function TtsModelEditPage(props: Props) {
       creator_set_visibility: visibility || DEFAULT_VISIBILITY,
       maybe_default_pretrained_vocoder:
         defaultPretrainedVocoder || DEFAULT_PRETRAINED_VOCODER,
+      maybe_custom_vocoder_token: maybeCustomVocoderToken,
       ietf_language_tag: fullLanguageTag || DEFAULT_MODEL_LANGUAGE,
       text_pipeline_type: textPipelineType,
     };
@@ -312,6 +347,17 @@ function TtsModelEditPage(props: Props) {
     );
   }
 
+  let customVocoderOptions = vocoderModels.map((vocoder) =>  {
+    return (
+      <option
+        key={vocoder.vocoder_token}
+        value={vocoder.vocoder_token}
+        >
+        {vocoder.title} (by {vocoder.creator_display_name})
+      </option>
+    )
+  });
+
   let usableTextPipelines = isModerator
     ? TEXT_PIPELINE_NAMES_FOR_MODERATORS
     : TEXT_PIPELINE_NAMES;
@@ -433,6 +479,20 @@ function TtsModelEditPage(props: Props) {
                         HiFi-Gan (typically sounds best)
                       </option>
                       <option value="waveglow">WaveGlow</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div>
+                  <label className="sub-title">Custom tuned vocoder</label>
+                  <div className="form-group">
+                    <select
+                      name="custom_vocoder"
+                      onChange={handleCustomVocoderChange}
+                      value={maybeCustomVocoderToken || ""}
+                      className="form-select"
+                    >
+                      {customVocoderOptions}
                     </select>
                   </div>
                 </div>

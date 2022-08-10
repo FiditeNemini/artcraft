@@ -284,6 +284,14 @@ class ApiConfig {
     return base_url + query;
   }
 
+  listVocoderModels(): string {
+    return `${this.getScheme()}://${this.getNewApiHost()}/vocoder/list`;
+  }
+
+  getVocoderModel(vocoderToken: string): string {
+    return `${this.getScheme()}://${this.getNewApiHost()}/vocoder/model/${vocoderToken}`;
+  }
+
   createCategory(): string {
     return `${this.getScheme()}://${this.getNewApiHost()}/category/create`;
   }
