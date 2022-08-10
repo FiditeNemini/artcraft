@@ -1,24 +1,19 @@
-use actix_http::http::header;
-use actix_web::HttpResponseBuilder;
-use actix_web::cookie::Cookie;
+// NB: Incrementally getting rid of build warnings...
+#![forbid(unused_imports)]
+#![forbid(unused_mut)]
+#![forbid(unused_variables)]
+
 use actix_web::error::ResponseError;
 use actix_web::http::StatusCode;
 use actix_web::web::Path;
-use actix_web::{Responder, web, HttpResponse, error, HttpRequest, HttpMessage};
-use anyhow::Error;
+use actix_web::{web, HttpResponse, HttpRequest};
 use chrono::{DateTime, Utc};
-use crate::AnyhowResult;
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 use crate::server_state::ServerState;
 use database_queries::column_types::record_visibility::RecordVisibility;
 use database_queries::column_types::vocoder_type::VocoderType;
 use database_queries::queries::tts::tts_models::get_tts_model::get_tts_model_by_token;
-use log::{info, warn, log};
-use regex::Regex;
-use sqlx::MySqlPool;
-use sqlx::error::DatabaseError;
-use sqlx::error::Error::Database;
-use sqlx::mysql::MySqlDatabaseError;
+use log::warn;
 use std::fmt;
 use std::sync::Arc;
 use tts_common::text_pipelines::guess_pipeline::guess_text_pipeline_heuristic;
@@ -52,9 +47,21 @@ pub struct TtsModelInfo {
   /// inform the frontend (and inference pipeline) of our best guess according to a heuristic.
   pub text_pipeline_type: Option<TextPipelineType>,
   pub text_pipeline_type_guess: TextPipelineType,
-
-  pub maybe_default_pretrained_vocoder: Option<VocoderType>,
   pub text_preprocessing_algorithm: String,
+
+  /// [vocoders 1]
+  /// This is the new type of vocoder configuration. Users can choose a custom trained
+  /// vocoder to associate with their model. The tokens reference the `vocoder_models`
+  /// table.
+  pub maybe_custom_vocoder: Option<CustomVocoderInfo>,
+
+  /// [vocoders 2]
+  /// This is the old type of vocoder configuration, which leverages old pretrained
+  /// vocoders that we manually uploaded. There aren't many good options for users to
+  /// choose here, so this should be treated as a legacy option going forward. We'll
+  /// likely be stuck with this configuration for some time, however, due to the large
+  /// collection of legacy models we have.
+  pub maybe_default_pretrained_vocoder: Option<VocoderType>,
 
   pub creator_user_token: String,
   pub creator_username: String,
@@ -83,6 +90,17 @@ pub struct TtsModelInfo {
 
   /// NB: Moderator fields are sensitive and should only be displayed for moderators!
   pub maybe_moderator_fields: Option<TtsModelModeratorFieldInfo>,
+}
+
+/// New vocoder configuration options.
+#[derive(Serialize)]
+pub struct CustomVocoderInfo {
+  pub vocoder_token: String,
+  pub vocoder_title: String,
+  pub creator_user_token: String,
+  pub creator_username: String,
+  pub creator_display_name: String,
+  pub creator_gravatar_hash: String,
 }
 
 /// "Moderator-only fields" that we wouldn't want to expose to ordinary users.
@@ -189,7 +207,7 @@ pub async fn get_tts_model_handler(
     model.maybe_moderator_fields = None;
   }
 
-  let mut text_pipeline_type = model.text_pipeline_type
+  let text_pipeline_type = model.text_pipeline_type
       .as_deref()
       .and_then(|pipeline_type| {
         // If there's an error deserializing, turn it to None instead of 500ing. The column is
@@ -219,6 +237,17 @@ pub async fn get_tts_model_handler(
       tts_model_type: model.tts_model_type,
       text_pipeline_type,
       text_pipeline_type_guess,
+      maybe_custom_vocoder: match model.maybe_custom_vocoder {
+        None => None,
+        Some(vocoder) => Some(CustomVocoderInfo {
+          vocoder_token: vocoder.vocoder_token,
+          vocoder_title: vocoder.vocoder_title,
+          creator_user_token: vocoder.creator_user_token,
+          creator_username: vocoder.creator_username,
+          creator_display_name: vocoder.creator_display_name,
+          creator_gravatar_hash: vocoder.creator_gravatar_hash,
+        })
+      },
       maybe_default_pretrained_vocoder: model.maybe_default_pretrained_vocoder,
       text_preprocessing_algorithm: model.text_preprocessing_algorithm,
       creator_user_token: model.creator_user_token,
@@ -251,7 +280,7 @@ pub async fn get_tts_model_handler(
   };
 
   let body = serde_json::to_string(&response)
-      .map_err(|e| GetTtsModelError::ServerError)?;
+      .map_err(|_e| GetTtsModelError::ServerError)?;
 
   Ok(HttpResponse::Ok()
       .content_type("application/json")

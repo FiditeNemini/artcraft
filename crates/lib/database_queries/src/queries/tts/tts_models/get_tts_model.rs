@@ -1,3 +1,8 @@
+// NB: Incrementally getting rid of build warnings...
+#![forbid(unused_imports)]
+#![forbid(unused_mut)]
+#![forbid(unused_variables)]
+
 use anyhow::anyhow;
 use chrono::{DateTime, Utc};
 use container_common::anyhow_result::AnyhowResult;
@@ -16,9 +21,10 @@ pub struct TtsModelRecord {
 
   /// NB: text_pipeline_type may not always be present in the database.
   pub text_pipeline_type: Option<String>,
-
-  pub maybe_default_pretrained_vocoder: Option<VocoderType>,
   pub text_preprocessing_algorithm: String,
+
+  pub maybe_custom_vocoder: Option<CustomVocoderFields>,
+  pub maybe_default_pretrained_vocoder: Option<VocoderType>,
 
   pub creator_user_token: String,
   pub creator_username: String,
@@ -46,6 +52,15 @@ pub struct TtsModelRecord {
   pub updated_at: DateTime<Utc>,
 
   pub maybe_moderator_fields: Option<TtsModelModeratorFields>,
+}
+
+pub struct CustomVocoderFields {
+  pub vocoder_token: String,
+  pub vocoder_title: String,
+  pub creator_user_token: String,
+  pub creator_username: String,
+  pub creator_display_name: String,
+  pub creator_gravatar_hash: String,
 }
 
 /// "Moderator-only fields" that we wouldn't want to expose to ordinary users.
@@ -98,8 +113,21 @@ pub async fn get_tts_model_by_token(
     model_token: model.model_token,
     tts_model_type: model.tts_model_type,
     text_pipeline_type: model.text_pipeline_type,
-    maybe_default_pretrained_vocoder: maybe_vocoder,
     text_preprocessing_algorithm: model.text_preprocessing_algorithm,
+    maybe_default_pretrained_vocoder: maybe_vocoder,
+    maybe_custom_vocoder: match model.maybe_custom_vocoder_token {
+      // NB: We're relying on a single field's presence to infer that the others vocoder fields
+      // are also there. If for some reason they aren't, fail open.
+      None => None,
+      Some(vocoder_token) => Some(CustomVocoderFields {
+        vocoder_token,
+        vocoder_title: model.maybe_custom_vocoder_title.unwrap_or("".to_string()),
+        creator_user_token: model.maybe_custom_vocoder_creator_user_token.unwrap_or("".to_string()),
+        creator_username: model.maybe_custom_vocoder_creator_username.unwrap_or("".to_string()),
+        creator_display_name: model.maybe_custom_vocoder_creator_display_name.unwrap_or("".to_string()),
+        creator_gravatar_hash: model.maybe_custom_vocoder_creator_gravatar_hash.unwrap_or("".to_string()),
+      })
+    },
     creator_user_token: model.creator_user_token,
     creator_username: model.creator_username,
     creator_display_name: model.creator_display_name,
@@ -168,6 +196,13 @@ SELECT
     tts.is_locked_from_use,
     tts.is_locked_from_user_modification,
 
+    tts.maybe_custom_vocoder_token,
+    vocoder.title as maybe_custom_vocoder_title,
+    vocoder_user.token as maybe_custom_vocoder_creator_user_token,
+    vocoder_user.username as maybe_custom_vocoder_creator_username,
+    vocoder_user.display_name as maybe_custom_vocoder_creator_display_name,
+    vocoder_user.email_gravatar_hash as maybe_custom_vocoder_creator_gravatar_hash,
+
     tts.created_at,
     tts.updated_at,
 
@@ -179,6 +214,12 @@ SELECT
 FROM tts_models as tts
 JOIN users
     ON users.token = tts.creator_user_token
+
+LEFT OUTER JOIN vocoder_models AS vocoder
+    ON vocoder.token = tts.maybe_custom_vocoder_token
+LEFT OUTER JOIN users AS vocoder_user
+    ON vocoder_user.token = vocoder.creator_user_token
+
 WHERE tts.token = ?
         "#,
       tts_model_token
@@ -224,6 +265,13 @@ SELECT
     tts.is_locked_from_use,
     tts.is_locked_from_user_modification,
 
+    tts.maybe_custom_vocoder_token,
+    vocoder.title as maybe_custom_vocoder_title,
+    vocoder_user.token as maybe_custom_vocoder_creator_user_token,
+    vocoder_user.username as maybe_custom_vocoder_creator_username,
+    vocoder_user.display_name as maybe_custom_vocoder_creator_display_name,
+    vocoder_user.email_gravatar_hash as maybe_custom_vocoder_creator_gravatar_hash,
+
     tts.created_at,
     tts.updated_at,
 
@@ -235,6 +283,12 @@ SELECT
 FROM tts_models as tts
 JOIN users
     ON users.token = tts.creator_user_token
+
+LEFT OUTER JOIN vocoder_models AS vocoder
+    ON vocoder.token = tts.maybe_custom_vocoder_token
+LEFT OUTER JOIN users AS vocoder_user
+    ON vocoder_user.token = vocoder.creator_user_token
+
 WHERE
     tts.token = ?
     AND tts.user_deleted_at IS NULL
@@ -279,6 +333,14 @@ struct InternalTtsModelRecordRaw {
 
   pub created_at: DateTime<Utc>,
   pub updated_at: DateTime<Utc>,
+
+  // Joined custom vocoder fields
+  pub maybe_custom_vocoder_token: Option<String>,
+  pub maybe_custom_vocoder_title: Option<String>,
+  pub maybe_custom_vocoder_creator_user_token: Option<String>,
+  pub maybe_custom_vocoder_creator_username: Option<String>,
+  pub maybe_custom_vocoder_creator_display_name: Option<String>,
+  pub maybe_custom_vocoder_creator_gravatar_hash: Option<String>,
 
   // Moderator fields
   pub creator_ip_address_creation: String,
