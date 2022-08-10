@@ -77,6 +77,7 @@ use crate::http_server::endpoints::users::list_user_w2l_templates::list_user_w2l
 use crate::http_server::endpoints::users::login::login_handler;
 use crate::http_server::endpoints::users::logout::logout_handler;
 use crate::http_server::endpoints::users::session_info::session_info_handler;
+use crate::http_server::endpoints::vocoders::get_vocoder::get_vocoder_handler;
 use crate::http_server::endpoints::vocoders::list_vocoders::list_vocoders_handler;
 use crate::http_server::endpoints::voice_clone_requests::check_if_voice_clone_request_submitted::check_if_voice_clone_request_submitted_handler;
 use crate::http_server::endpoints::voice_clone_requests::create_voice_clone_request::create_voice_clone_request_handler;
@@ -494,11 +495,11 @@ fn add_vocoder_routes<T, B> (app: App<T, B>) -> App<T, B>
               .route(web::get().to(list_vocoders_handler))
               .route(web::head().to(|| HttpResponse::Ok()))
         )
-        //.service(
-        //  web::resource("/model/{token}")
-        //      .route(web::get().to(get_w2l_template_handler))
-        //      .route(web::head().to(|| HttpResponse::Ok()))
-        //)
+        .service(
+          web::resource("/model/{token}")
+              .route(web::get().to(get_vocoder_handler))
+              .route(web::head().to(|| HttpResponse::Ok()))
+        )
         //.service(
         //  web::resource("/model/{token}/edit")
         //      .route(web::post().to(edit_w2l_template_handler))

@@ -1,23 +1,17 @@
-use actix_http::Error;
-use actix_http::http::header;
-use actix_web::HttpResponseBuilder;
-use actix_web::cookie::Cookie;
+// NB: Incrementally getting rid of build warnings...
+#![forbid(unused_imports)]
+#![forbid(unused_mut)]
+#![forbid(unused_variables)]
+
 use actix_web::error::ResponseError;
 use actix_web::http::StatusCode;
-use actix_web::{Responder, web, HttpResponse, error, HttpRequest, HttpMessage};
+use actix_web::{web, HttpResponse, HttpRequest};
 use chrono::{DateTime, Utc};
-use crate::AnyhowResult;
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 use crate::server_state::ServerState;
 use database_queries::queries::vocoder::list_vocoder_models::{list_vocoder_models, VocoderModelListItem};
-use database_queries::queries::w2l::w2l_templates::list_w2l_templates::{W2lTemplateRecordForList, list_w2l_templates};
-use log::{info, warn, log, error};
-use regex::Regex;
+use log::warn;
 use reusable_types::vocoder_type::VocoderType;
-use sqlx::MySqlPool;
-use sqlx::error::DatabaseError;
-use sqlx::error::Error::Database;
-use sqlx::mysql::MySqlDatabaseError;
 use std::fmt;
 use std::sync::Arc;
 
@@ -159,7 +153,7 @@ pub async fn list_vocoders_handler(
   };
 
   let body = serde_json::to_string(&response)
-      .map_err(|e| ListVocodersError::ServerError)?;
+      .map_err(|_e| ListVocodersError::ServerError)?;
 
   Ok(HttpResponse::Ok()
       .content_type("application/json")
