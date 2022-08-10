@@ -3,6 +3,7 @@ use chrono::{DateTime, Utc};
 use container_common::anyhow_result::AnyhowResult;
 use crate::helpers::boolean_converters::i8_to_bool;
 use log::{warn, info};
+use reusable_types::vocoder_type::VocoderType;
 use sqlx::MySqlPool;
 
 // FIXME: This is the old style of query scoping and shouldn't be copied.
@@ -11,7 +12,7 @@ use sqlx::MySqlPool;
 // NB: Do not publicly expose this type.
 pub struct VocoderModelListItem {
   pub vocoder_token: String,
-  pub vocoder_type: String,
+  pub vocoder_type: VocoderType,
 
   pub title: String,
   pub is_staff_recommended: bool,
@@ -75,7 +76,7 @@ pub async fn list_vocoder_models(
   Ok(models.into_iter()
       .map(|model| {
         VocoderModelListItem {
-          vocoder_token: model.model_token,
+          vocoder_token: model.vocoder_token,
           vocoder_type: model.vocoder_type,
           title: model.title,
           is_staff_recommended: i8_to_bool(model.is_staff_recommended),
@@ -111,7 +112,7 @@ async fn list_vocoder_models_for_all_creators(
         r#"
 SELECT
     vocoder.token as vocoder_token,
-    vocoder.vocoder_type,
+    vocoder.vocoder_type as `vocoder_type: reusable_types::vocoder_type::VocoderType`,
     vocoder.creator_user_token,
     users.username as creator_username,
     users.display_name as creator_display_name,
@@ -143,7 +144,7 @@ WHERE
         r#"
 SELECT
     vocoder.token as vocoder_token,
-    vocoder.vocoder_type,
+    vocoder.vocoder_type as `vocoder_type: reusable_types::vocoder_type::VocoderType`,
     vocoder.creator_user_token,
     users.username as creator_username,
     users.display_name as creator_display_name,
@@ -183,7 +184,7 @@ async fn list_vocoder_models_creator_scoped(
         r#"
 SELECT
     vocoder.token as vocoder_token,
-    vocoder.vocoder_type,
+    vocoder.vocoder_type as `vocoder_type: reusable_types::vocoder_type::VocoderType`,
     vocoder.creator_user_token,
     users.username as creator_username,
     users.display_name as creator_display_name,
@@ -217,7 +218,7 @@ WHERE
         r#"
 SELECT
     vocoder.token as vocoder_token,
-    vocoder.vocoder_type,
+    vocoder.vocoder_type as `vocoder_type: reusable_types::vocoder_type::VocoderType`,
     vocoder.creator_user_token,
     users.username as creator_username,
     users.display_name as creator_display_name,
@@ -247,7 +248,7 @@ WHERE
 
 struct InternalVocoderModelListItemRaw {
   pub vocoder_token: String,
-  pub vocoder_type: String,
+  pub vocoder_type: VocoderType,
 
   pub title: String,
   pub is_staff_recommended: i8,
