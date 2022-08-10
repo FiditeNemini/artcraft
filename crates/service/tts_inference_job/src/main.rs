@@ -202,6 +202,7 @@ async fn main() -> AnyhowResult<()> {
   info!("Creating pod semi-persistent cache dirs...");
   semi_persistent_cache.create_tts_synthesizer_model_path()?;
   semi_persistent_cache.create_tts_pretrained_vocoder_model_path()?;
+  semi_persistent_cache.create_custom_vocoder_model_path()?;
 
   let waveglow_vocoder_model_filename = easyenv::get_env_string_or_default(
     "TTS_WAVEGLOW_VOCODER_MODEL_FILENAME", "waveglow.pth");

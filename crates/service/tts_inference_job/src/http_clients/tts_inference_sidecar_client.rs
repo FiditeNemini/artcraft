@@ -48,6 +48,7 @@ impl TtsInferenceSidecarClient {
     }
   }
 
+  /// NB: 'hifigan_vocoder_checkpoint_path' may be either a pretrained or custom vocoder
   pub async fn request_inference<P: AsRef<Path>>(
     &self,
     raw_text: &str,
