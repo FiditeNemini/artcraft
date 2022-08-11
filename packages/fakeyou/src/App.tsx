@@ -1,3 +1,5 @@
+import "./AppNew.scss";
+
 import React from "react";
 import { ApiConfig } from "@storyteller/components";
 import {
@@ -30,7 +32,6 @@ import { TtsCategoryType } from "./AppWrapper";
 import { FAKEYOU_MERGED_TRANSLATIONS } from "./_i18n/FakeYouTranslations";
 import i18n from "i18next";
 import { initReactI18next } from "react-i18next";
-import { USE_REFRESH } from "./Refresh";
 import { VocoderUploadJob } from "@storyteller/components/src/jobs/VocoderUploadJobs";
 import { GetRetrievalJobStatus, GetRetrievalJobStatusIsOk } from "@storyteller/components/src/api/retrieval/GetRetrievalJobStatus";
 
@@ -170,28 +171,6 @@ class App extends React.Component<Props, State> {
 
       textBuffer: "",
     };
-  }
-
-  componentWillMount() {
-    // Handle redesign
-    console.log('componentWillMount', 'useRefresh?', USE_REFRESH);
-
-    if (USE_REFRESH) {
-      // Redesign-specific CSS
-      // NB(echelon): Despite the branches here, scss is all combined together at compile time 
-      // in staging and production (not development). To handle those environments, styles are 
-      // additionally applied based on the root "fakeyou-refresh" class, which may have changed 
-      // some of the specificity rules of Bootstrap.
-      require("./AppNew.scss");
-    } else {
-      // Old design CSS
-      // NB(echelon): Despite the branches here, scss is all combined together at compile time
-      // in staging and production (not development). To handle those environments, styles are 
-      // additionally applied based on the root "fakeyou-old" class, which may have changed some 
-      // of the specificity rules of Bulma.
-      require("./AppOld.scss");
-      require("./v2/view/_css/footer.scss");
-    }
   }
 
   async componentDidMount() {
@@ -624,16 +603,10 @@ class App extends React.Component<Props, State> {
   };
 
   public render() {
-    // Redesign features
-    let mainClassNames = USE_REFRESH ? "bg-gradient" : "";
-    if (USE_REFRESH) {
-
-    }
-
     return (
       <BrowserRouter>
-        
-        <div id="main" className={mainClassNames}>
+
+        <div id="main" className="bg-gradient">
         <div className="page-bg"></div>
 
 <div className="animation-wrapper">

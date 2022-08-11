@@ -10,7 +10,6 @@ import {
   item,
   panel,
 } from "../../../../data/animation";
-import { USE_REFRESH } from "../../../../Refresh";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faChevronLeft,
@@ -191,30 +190,6 @@ function W2lTemplateListFc(props: Props) {
         <Link to="/signup">create an account</Link>. You'll then be able to
         upload and reuse your templates whenever you want!
       </p>
-    );
-  }
-
-  if (!USE_REFRESH) {
-    return (
-      <div>
-        <br />
-        <h1 className="title is-1"> Video lip sync templates </h1>
-
-        {extraDetails}
-
-        <br />
-
-        {allRowsOfTemplateElements.map((el) => el)}
-
-        <br />
-
-        <p>
-          This feature is based on Wav2Lip by by Prajwal, K R and Mukhopadhyay,
-          Rudrabha and Namboodiri, Vinay P. and Jawahar, C.V.
-        </p>
-
-        <br />
-      </div>
     );
   }
 
