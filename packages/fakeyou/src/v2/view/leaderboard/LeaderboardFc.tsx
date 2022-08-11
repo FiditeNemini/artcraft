@@ -12,7 +12,6 @@ import {
   LeaderboardLookupError,
 } from "../../api/misc/GetLeaderboard";
 import { DiscordLink2 } from "@storyteller/components/src/elements/DiscordLink2";
-import { USE_REFRESH } from "../../../Refresh";
 import { motion } from "framer-motion";
 import { container, item, panel } from "../../../data/animation";
 
@@ -105,41 +104,6 @@ function LeaderboardFc(props: Props) {
         </tr>
       );
     });
-  }
-
-  if (!USE_REFRESH) {
-    return (
-      <div>
-        <h1 className="title is-1"> Leaderboard </h1>
-        <h1 className="subtitle is-3"> Our most frequent contributors! </h1>
-
-        <p>
-          Want to be on the leaderboard?{" "}
-          <DiscordLink2>Join our Discord</DiscordLink2> and learn more!
-        </p>
-
-        <table className="table is-fullwidth">
-          <tbody>
-            <tr>
-              <td colSpan={2}>
-                <h4 className="subtitle is-4"> TTS Models Uploaded </h4>
-              </td>
-            </tr>
-
-            {ttsRows}
-
-            <tr>
-              <td colSpan={2}>
-                <br />
-                <h4 className="subtitle is-4"> W2L Templates Uploaded </h4>
-              </td>
-            </tr>
-
-            {w2lRows}
-          </tbody>
-        </table>
-      </div>
-    );
   }
 
   return (

@@ -3,7 +3,6 @@ import { ApiConfig } from "@storyteller/components";
 import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
 import { Gravatar } from "@storyteller/components/src/elements/Gravatar";
 import { Link } from "react-router-dom";
-import { USE_REFRESH } from "../../../Refresh";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faPlay,
@@ -295,36 +294,12 @@ function FirehoseEventListFc(props: Props) {
         return;
     }
 
-    if (!USE_REFRESH) {
-      eventItems.push(<li key={event.event_token}>{inner}</li>);
-    } else {
-      eventItems.push(
-        <li className="panel p-3 p-lg-3" key={event.event_token}>
-          {inner}
-        </li>
-      );
-    }
-  });
-
-  if (!USE_REFRESH) {
-    return (
-      <div>
-        <h1 className="title is-1"> Firehose event feed </h1>
-        <h1 className="subtitle is-3">
-          {" "}
-          The latest <em>FakeYou</em> events refreshed every few seconds
-        </h1>
-
-        <div className="content is-large">
-          <p>
-            As you can see, we're <em>really</em> popular. But we owe it to you,
-            our users. Thank you!
-          </p>
-          <ul>{eventItems}</ul>
-        </div>
-      </div>
+    eventItems.push(
+      <li className="panel p-3 p-lg-3" key={event.event_token}>
+        {inner}
+      </li>
     );
-  }
+  });
 
   return (
     <motion.div initial="hidden" animate="visible" variants={container}>

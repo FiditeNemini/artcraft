@@ -35,7 +35,6 @@ import {
 } from "../../../api/user/GetUserByUsername";
 import { format } from "date-fns";
 import { FrontendUrlConfig } from "../../../../common/FrontendUrlConfig";
-import { USE_REFRESH } from "../../../../Refresh";
 import { container, item, panel } from "../../../../data/animation";
 import Tippy from "@tippyjs/react";
 import "tippy.js/dist/tippy.css";
@@ -258,50 +257,6 @@ function ProfileFc(props: Props) {
       badgeList.push(<li key={badge.slug}>{badge.title}</li>);
     });
     badges = <ul>{badgeList}</ul>;
-  }
-
-  if (!USE_REFRESH) {
-    return (
-      <div className="content">
-        <h1 className="title is-1">
-          <Gravatar
-            size={45}
-            username={userData.display_name}
-            email_hash={userEmailHash}
-          />
-          {userData.display_name}
-        </h1>
-
-        {editProfileButton}
-        {banUserButton}
-
-        <div
-          className="profile content is-medium"
-          dangerouslySetInnerHTML={{
-            __html: userData.profile_rendered_html || "",
-          }}
-        />
-
-        <table className="table">
-          <tbody>{profileRows}</tbody>
-        </table>
-
-        <h3 className="title is-3"> Badges (images coming soon) </h3>
-        {badges}
-
-        <h3 className="title is-3"> TTS Results </h3>
-        <ProfileTtsInferenceResultsListFc username={userData.username} />
-
-        <h3 className="title is-3"> Lipsync Results </h3>
-        <ProfileW2lInferenceResultsListFc username={userData.username} />
-
-        <h3 className="title is-3"> Uploaded TTS Models </h3>
-        <ProfileTtsModelListFc username={userData.username} />
-
-        <h3 className="title is-3"> Uploaded Templates </h3>
-        <ProfileW2lTemplateListFc username={userData.username} />
-      </div>
-    );
   }
 
   return (
