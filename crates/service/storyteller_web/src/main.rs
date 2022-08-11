@@ -185,7 +185,7 @@ async fn main() -> AnyhowResult<()> {
       DEFAULT_MYSQL_CONNECTION_STRING);
 
   let pool = MySqlPoolOptions::new()
-    .max_connections(5)
+    .max_connections(easyenv::get_env_num("MYSQL_MAX_CONNECTIONS", 5)?)
     .connect(&db_connection_string)
     .await?;
 
